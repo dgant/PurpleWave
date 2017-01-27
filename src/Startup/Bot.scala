@@ -19,6 +19,7 @@ class Bot(var game:bwapi.Game) extends DefaultBWListener {
     Logger.debug("Analyzing map")
     BWTA.analyze()
     Logger.debug("Bot initialization complete.")
+    game.setLocalSpeed(1)
   }
 
   override def onFrame(): Unit = {

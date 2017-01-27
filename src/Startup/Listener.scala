@@ -2,7 +2,7 @@ package Startup
 
 import bwapi.{BWEventListener, Player}
 
-object BotListener extends BWEventListener{
+object Listener extends BWEventListener{
   val mirror:bwapi.Mirror = new bwapi.Mirror()
   var bot:Option[Bot] = None
 
@@ -15,7 +15,8 @@ object BotListener extends BWEventListener{
 
   override def onStart(): Unit = {
     System.out.println("BWMirror dispatched an onStart event.")
-    bot = Some(new Bot(mirror.getGame))
+    With.game = mirror.getGame
+    bot = Some(new Bot())
     var foo = 3
     var bar = 5
     var qux = foo * bar

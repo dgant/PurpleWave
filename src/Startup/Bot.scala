@@ -6,8 +6,7 @@ import Processes.{Commander, DecisionMaker, Delegator, Visionary}
 import bwapi.DefaultBWListener
 import bwta.BWTA
 
-class Bot(var game:bwapi.Game) extends DefaultBWListener {
-  val self = game.self
+class Bot() extends DefaultBWListener {
   val visionary = new Visionary()
   val decisionMaker = new DecisionMaker()
   val delegator = new Delegator()
@@ -20,7 +19,7 @@ class Bot(var game:bwapi.Game) extends DefaultBWListener {
     Logger.debug("Analyzing map")
     BWTA.analyze()
     Logger.debug("Bot initialization complete.")
-    game.setLocalSpeed(1)
+    With.game.setLocalSpeed(1)
   }
 
   override def onFrame() {

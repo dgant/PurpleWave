@@ -1,7 +1,8 @@
 package Development
 
-import Startup.BotListener
+import Startup.With
 import bwapi.Position
+
 import scala.collection.JavaConverters._
 
 object AutoCamera {
@@ -13,18 +14,21 @@ object AutoCamera {
       pickNewUnit()
     }
 
-    BotListener.bot.get.game.setScreenPosition(
+    With.game.setScreenPosition(
       unit.get.getPosition.getX - 320,
       unit.get.getPosition.getY - 240)
   }
 
   def focusUnit(newUnit:bwapi.Unit) {
-    unit = Some(newUnit)
+    if (newUnit.getPlayer == With.game.self) {
+      unit = Some(newUnit)
+    }
+
     pointOfInterest = unit.get.getPosition
   }
 
   def pickNewUnit() {
-    var units = BotListener.bot.get.self.getUnits.asScala
+    var units = With.game.self.getUnits.asScala
       .filter(unit => unit.isVisible)
       .sortBy(unit => pointOfInterest.getApproxDistance(unit.getPosition))
 

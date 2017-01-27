@@ -1,5 +1,6 @@
 package Startup
 
+import Development.AutoCamera
 import Operations.Logger
 import Processes.{Commander, DecisionMaker, Delegator, Visionary}
 import bwapi.DefaultBWListener
@@ -12,7 +13,7 @@ class Bot(var game:bwapi.Game) extends DefaultBWListener {
   val delegator = new Delegator()
   val commander = new Commander()
 
-  override def onStart(): Unit = {
+  override def onStart() {
     Logger.debug("Purple Wave, reporting in.")
     Logger.debug("Reading map")
     BWTA.readMap()
@@ -22,10 +23,23 @@ class Bot(var game:bwapi.Game) extends DefaultBWListener {
     game.setLocalSpeed(1)
   }
 
-  override def onFrame(): Unit = {
-    val plans = visionary.envisionPlans()
+  override def onFrame() {
+    val plans = visionary.envisionPlans
     val decisions = decisionMaker.makeDecisions(plans)
     val tactics = delegator.delegateTactics(decisions)
     commander.command(tactics)
+    AutoCamera.update
+  }
+
+  override def onUnitComplete(unit: bwapi.Unit) {
+    AutoCamera.focusUnit(unit)
+  }
+
+  override def onUnitDestroy(unit: bwapi.Unit) {
+    AutoCamera.focusUnit(unit)
+  }
+
+  override def onUnitDiscover(unit: bwapi.Unit) {
+    AutoCamera.focusUnit(unit)
   }
 }

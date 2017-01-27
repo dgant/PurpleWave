@@ -3,7 +3,6 @@ package Processes
 import Startup.BotListener
 import Types.Tactics.Tactic
 import bwapi.UnitCommandType
-
 import scala.collection.JavaConverters._
 
 class Commander {

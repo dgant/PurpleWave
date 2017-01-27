@@ -1,0 +1,9 @@
+.cache-main
+
+*.class
+
+*.jar
+!./lib/*.jar
+
+bwapi-data/
+/bin/

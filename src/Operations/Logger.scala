@@ -1,10 +1,10 @@
 package Operations
 
-import Startup.Main
+import Startup.BotListener
 
 object Logger {
   def debug(message:String) {
     System.out.println(message)
-    Main.bot.get.game.sendText(message)
+    BotListener.bot.get.game.sendText(message)
   }
 }

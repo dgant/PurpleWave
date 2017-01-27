@@ -1,6 +1,6 @@
 package Types.Plans
 
-import Startup.Main
+import Startup.BotListener
 import Types.Matcher.UnitMatcher
 import Types.Quantities.AtLeast
 import Types.Resources.{Resource, ResourceUnit}
@@ -12,7 +12,7 @@ class PlanGatherMinerals extends Plan {
 
   override def execute():Iterable[Tactic] = {
     //Let's keep this real simple for the moment
-    return Main.bot.get.game
+    return BotListener.bot.get.game
       .getAllUnits().asScala
       .filter(unit => unit.canGather())
       .map(unit => new TacticGatherMinerals(unit))

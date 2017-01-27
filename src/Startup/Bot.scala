@@ -13,20 +13,18 @@ class Bot(var game:bwapi.Game) extends DefaultBWListener {
   val commander = new Commander()
 
   override def onStart(): Unit = {
-    Logger.debug("Purple Wave, reporting in.");
-    Logger.debug("Reading map");
-    BWTA.readMap();
-
-    Logger.debug("Analyzing map");
-    BWTA.analyze();
-
-    Logger.debug("Initialization complete");
+    Logger.debug("Purple Wave, reporting in.")
+    Logger.debug("Reading map")
+    BWTA.readMap()
+    Logger.debug("Analyzing map")
+    BWTA.analyze()
+    Logger.debug("Bot initialization complete.")
   }
 
   override def onFrame(): Unit = {
-    var plans = visionary.envisionPlans()
-    var decisions = decisionMaker.makeDecisions(plans)
-    var tactics = delegator.delegateTactics(decisions)
+    val plans = visionary.envisionPlans()
+    val decisions = decisionMaker.makeDecisions(plans)
+    val tactics = delegator.delegateTactics(decisions)
     commander.command(tactics)
   }
 }

@@ -7,8 +7,8 @@ import Types.BuildOrders.BuildOrder
 import Types.Quantities.Exactly
 import Types.Resources.JobDescription
 import Types.Tactics.{Tactic, TacticBuildUnit}
-import UnitMatching.Matcher.{UnitMatchType, UnitMatchWorker}
-import bwapi.{Position, TilePosition, UnitType}
+import UnitMatching.Matcher.UnitMatchType
+import bwapi.{TilePosition, UnitType}
 import bwta.BWTA
 
 import scala.collection.JavaConverters._
@@ -28,8 +28,15 @@ class PlanBuildOrder extends Plan {
     existingBuilds.keys.filter(contract => contract.employees.size == 0).foreach(existingBuilds.remove)
     
     buildOrder.getUnitTypes.foreach(t => {
+      if ( ! need.contains(t)) {
+        need.put(t, 0)
+      }
       need(t) += 1
-      if(need(t) > have(t) + existingBuilds.groupBy(p => p._2).size) {
+      var haveN = 0
+      if (have.contains(t)) {
+        haveN = have(t)
+      }
+      if(need(t) > haveN + existingBuilds.groupBy(p => p._2).size) {
         queue.append(t)
       }
     })

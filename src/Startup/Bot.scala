@@ -25,13 +25,22 @@ class Bot() extends DefaultBWListener {
   }
 
   override def onFrame() {
-    With.bank.tally()
-    With.recruiter.headcount()
-    val plans = visionary.envisionPlans()
-    val decisions = decisionMaker.makeDecisions(plans)
-    val tactics = delegator.delegateTactics(decisions)
-    commander.command(tactics)
-    AutoCamera.update()
+    try {
+      With.bank.tally()
+      With.recruiter.headcount()
+      val plans = visionary.envisionPlans()
+      val decisions = decisionMaker.makeDecisions(plans)
+      val tactics = delegator.delegateTactics(decisions)
+      commander.command(tactics)
+      AutoCamera.update()
+    }
+    catch {
+      case e:Exception =>
+        Logger.debug("EXCEPTION")
+        Logger.debug(e.getMessage)
+        e.printStackTrace()
+    }
+      
   }
 
   override def onUnitComplete(unit: bwapi.Unit) {

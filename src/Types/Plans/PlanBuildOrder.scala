@@ -41,7 +41,8 @@ class PlanBuildOrder extends Plan {
       }
     })
     
-    queue.map(build).filter(_ == Some).map(_.get)
+    var output = queue.map(build).filterNot(_ == None).map(_.get)
+    output
   }
 
   def build(unitType:UnitType): Option[Tactic] = {
@@ -69,7 +70,8 @@ class PlanBuildOrder extends Plan {
       position = Architect.placeBuilding(unitType, BWTA.getStartLocation(With.game.self).getTilePosition)
     }
     
-    contract.get.employees.take(1).map(unit => new TacticBuildUnit(unit, unitType, position)).headOption
+    var output = contract.get.employees.take(1).map(unit => new TacticBuildUnit(unit, unitType, position)).headOption
+    output
   }
   
   

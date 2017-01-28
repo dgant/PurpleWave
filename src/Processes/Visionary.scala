@@ -1,6 +1,7 @@
 package Processes
 
-import Types.Plans.{Plan, PlanGatherMinerals}
+import Types.Plans.{Plan, PlanBuildOrder, PlanGatherMinerals}
+
 import scala.collection.mutable.ListBuffer
 
 class Visionary {
@@ -15,6 +16,7 @@ class Visionary {
   }
 
   def _populateDefaultPlans(): Unit = {
-    _defaultPlans += new PlanGatherMinerals()
+    _defaultPlans += new PlanGatherMinerals
+    _defaultPlans += new PlanBuildOrder
   }
 }

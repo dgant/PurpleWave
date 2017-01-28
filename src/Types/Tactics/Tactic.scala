@@ -1,4 +1,5 @@
 package Types.Tactics
 
-class Tactic(var unit:bwapi.Unit) {
+abstract class Tactic(var unit:bwapi.Unit) {
+  def execute();
 }

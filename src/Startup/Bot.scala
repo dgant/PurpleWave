@@ -26,6 +26,7 @@ class Bot() extends DefaultBWListener {
 
   override def onFrame() {
     With.bank.tally()
+    With.recruiter.headcount()
     val plans = visionary.envisionPlans()
     val decisions = decisionMaker.makeDecisions(plans)
     val tactics = delegator.delegateTactics(decisions)

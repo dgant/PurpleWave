@@ -4,6 +4,7 @@ import Startup.With
 import Types.Resources.JobDescription
 
 import scala.collection.mutable
+import scala.collection.JavaConverters._
 
 object Interviewer {
   def hunt(
@@ -12,19 +13,13 @@ object Interviewer {
       :Option[Iterable[bwapi.Unit]] = {
     val candidates:mutable.Set[bwapi.Unit] = mutable.Set.empty
     
-    //First, take unemployed candidates
-    //TODO: poach employed candidates
-    With.recruiter.getUnemployed
+    //Take unemployed candidates first, then just blindly poach employed candidates like a buffoon
+    With.game.self.getUnits.asScala
       .filter(jobDescription.matcher.accept)
+      .filter(x => hireGreedily || ! jobDescription.quantity.accept(candidates.size))
+      .sortBy(x => With.recruiter.getUnemployed.toSeq.contains(x))
       .foreach(candidate => {
-        
-        //So, I think this is going to be slow because it will match on every unit every time,
-        //even if the job description quantity has been fulfilled.
-        //But if filtering is lazy-evaluated, we could insteadput the accept() as a filter
-        //
-        if (hireGreedily || ! jobDescription.quantity.accept(candidates.size)) {
-          candidates.add(candidate)
-        }
+        candidates.add(candidate)
       })
   
     if (jobDescription.quantity.accept(candidates.size)) {

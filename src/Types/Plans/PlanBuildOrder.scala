@@ -57,7 +57,7 @@ class PlanBuildOrder extends Plan {
     
     var job = new JobDescription(
       new Exactly(1),
-      new UnitMatchType(unitType))
+      new UnitMatchType(unitType.whatBuilds().first))
     
     val contract = With.recruiter.source(job)
     if (contract == None) {

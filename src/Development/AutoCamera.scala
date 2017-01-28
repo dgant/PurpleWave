@@ -16,7 +16,7 @@ object AutoCamera {
 
     With.game.setScreenPosition(
       unit.get.getPosition.getX - 320,
-      unit.get.getPosition.getY - 240)
+      unit.get.getPosition.getY - 200)
   }
 
   def focusUnit(newUnit:bwapi.Unit) {

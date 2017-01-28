@@ -2,7 +2,7 @@ package Startup
 
 import Development.AutoCamera
 import Operations.Logger
-import Processes.{Commander, DecisionMaker, Delegator, Visionary}
+import Processes._
 import bwapi.DefaultBWListener
 import bwta.BWTA
 
@@ -14,6 +14,8 @@ class Bot() extends DefaultBWListener {
 
   override def onStart() {
     Logger.debug("Purple Wave, reporting in.")
+    With.bank = new Banker
+    With.recruiter = new Recruiter
     Logger.debug("Reading map")
     BWTA.readMap()
     Logger.debug("Analyzing map")
@@ -23,11 +25,12 @@ class Bot() extends DefaultBWListener {
   }
 
   override def onFrame() {
-    val plans = visionary.envisionPlans
+    With.bank.tally()
+    val plans = visionary.envisionPlans()
     val decisions = decisionMaker.makeDecisions(plans)
     val tactics = delegator.delegateTactics(decisions)
     commander.command(tactics)
-    AutoCamera.update
+    AutoCamera.update()
   }
 
   override def onUnitComplete(unit: bwapi.Unit) {

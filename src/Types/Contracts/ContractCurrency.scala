@@ -7,6 +7,4 @@ class ContractCurrency(
   buyer: Buyer,
   priority: PriorityMultiplier)
     extends Contract(buyer, priority) {
-  
-  var isAvailable = false
 }

@@ -4,9 +4,9 @@ abstract class Contract(
   val buyer:Buyer,
   val priority:PriorityMultiplier) {
   
-  var active = true
+  var requirementsMet = false
   
-  def priority():Integer = {
-    priority * buyer.priority
+  def calculatePriority():Integer = {
+    priority.multiplier * buyer.priority
   }
 }

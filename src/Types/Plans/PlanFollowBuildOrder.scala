@@ -2,10 +2,8 @@ package Types.Plans
 
 import Processes.Architect
 import Startup.With
-import Types.Invoices.InvoiceUnits
 import Types.BuildOrders.BuildOrder
 import Types.Contracts.ContractUnits
-import Types.Quantities.Exactly
 import Types.Requirements.RequireCurrency
 import Types.Tactics.{Tactic, TacticBuildUnit}
 import UnitMatching.Matcher.UnitMatchType
@@ -47,7 +45,7 @@ class PlanFollowBuildOrder extends Plan() {
     val need:mutable.HashMap[UnitType, Integer] = mutable.HashMap()
     val queue:ListBuffer[UnitType] = ListBuffer.empty
 
-    existingBuilds.keys.filter(contract => contract.employees.size == 0).foreach(existingBuilds.remove)
+    existingBuilds.keys.filter(contract => contract.units.size == 0).foreach(existingBuilds.remove)
     
     buildOrder.getUnitTypes.foreach(t => {
       if ( ! need.contains(t)) {

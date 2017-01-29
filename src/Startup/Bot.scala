@@ -2,6 +2,7 @@ package Startup
 
 import Development.AutoCamera
 import Operations.Logger
+import Processes.Allocation.{Banker, Recruiter}
 import Processes._
 import bwapi.DefaultBWListener
 import bwta.BWTA

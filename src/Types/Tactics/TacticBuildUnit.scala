@@ -40,5 +40,6 @@ class TacticBuildUnit(
     result = result || unit.getLastCommand.getUnitCommandType == UnitCommandType.Build
     result = result || unit.getLastCommand.getUnitCommandType == UnitCommandType.Build_Addon
     result = result || unit.getLastCommand.getUnitCommandType == UnitCommandType.Train
+    result
   }
 }

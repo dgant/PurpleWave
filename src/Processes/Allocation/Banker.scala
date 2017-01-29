@@ -1,4 +1,4 @@
-package Processes
+package Processes.Allocation
 
 import Startup.With
 import Types.Contracts.{Buyer, ContractCurrency, PriorityMultiplier}
@@ -38,14 +38,13 @@ class Banker {
   }
   
   def releaseContract(contract:ContractCurrency) {
-    contract.active = false
-    contract.isAvailable = false
+    contract.requirementsMet = false
     _activeContracts.remove(contract)
     tally()
   }
   
   def _deductContractValue(contract: ContractCurrency) {
-    contract.isAvailable = _isAvailableNow(
+    contract.requirementsMet = _isAvailableNow(
       contract.requirements,
       contract.buyer,
       contract.priority)

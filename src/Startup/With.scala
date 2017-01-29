@@ -1,6 +1,6 @@
 package Startup
 
-import Processes.{Recruiter, Banker}
+import Processes.Allocation.{Banker, Recruiter}
 
 object With {
   var game:bwapi.Game = null

@@ -10,5 +10,5 @@ class ContractUnits(
   priorityMultiplier: PriorityMultiplier)
     extends Contract(buyer, priorityMultiplier) {
   
-  val employees:mutable.Set[bwapi.Unit] = mutable.Set.empty
+  val units:mutable.Set[bwapi.Unit] = mutable.Set.empty
 }

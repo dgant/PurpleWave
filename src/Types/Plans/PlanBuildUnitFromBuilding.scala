@@ -1,6 +1,5 @@
 package Types.Plans
 
-import Startup.With
 import Types.Tactics.Tactic
 import bwapi.UnitType
 
@@ -13,7 +12,6 @@ class PlanBuildUnitFromBuilding(
   var _product:Option[bwapi.Unit] = None
   
   override def execute(): Iterable[Tactic] = {
-    With.recruiter.
+    throw new Exception
   }
-  
 }

@@ -2,10 +2,11 @@ package Types.Plans
 
 import Processes.Architect
 import Startup.With
-import Types.Allocations.{Contract, Invoice}
+import Types.Invoices.InvoiceUnits
 import Types.BuildOrders.BuildOrder
+import Types.Contracts.ContractUnits
 import Types.Quantities.Exactly
-import Types.Resources.JobDescription
+import Types.Requirements.RequireCurrency
 import Types.Tactics.{Tactic, TacticBuildUnit}
 import UnitMatching.Matcher.UnitMatchType
 import bwapi.{TilePosition, UnitType}
@@ -15,10 +16,31 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
-class PlanBuildOrder extends Plan {
+class PlanFollowBuildOrder extends Plan() {
   val buildOrder = new BuildOrder
+  val existingBuilds:mutable.HashMap[ContractUnits, UnitType] = mutable.HashMap.empty
   
-  val existingBuilds:mutable.HashMap[Contract, UnitType] = mutable.HashMap.empty
+  var _children:List[Plan] = List.empty
+  
+  override def update() {
+    if (_children.isEmpty) {
+      _children = buildOrder.getUnitTypes.map(_buildBuildPlan).toList
+    }
+  }
+  
+  def _buildBuildPlan(product: UnitType):Plan = {
+    val builder = product.whatBuilds.first
+    if (builder.isBuilding) {
+      return new PlanBuildUnitFromBuilding(builder, product)
+    }
+    if (builder.isWorker) {
+      return new PlanBuildBuildingWithWorker(builder, product)
+    }
+    
+    throw new Exception("Don't know how to build this yet.")
+  }
+  
+  override def children(): Iterable[Plan] = _children
 
   override def execute(): Iterable[Tactic] = {
     val have = With.game.self.getUnits.asScala.groupBy(_.getType).mapValues(_.size)
@@ -46,7 +68,7 @@ class PlanBuildOrder extends Plan {
   }
 
   def build(unitType:UnitType): Option[Tactic] = {
-    val invoice = new Invoice(
+    val invoice = new RequireCurrency(
       minerals = unitType.mineralPrice(),
       gas = unitType.gasPrice(),
       supply = unitType.supplyRequired())
@@ -56,7 +78,7 @@ class PlanBuildOrder extends Plan {
       return None
     }
     
-    var job = new JobDescription(
+    var job = new InvoiceUnits(
       new Exactly(1),
       new UnitMatchType(unitType.whatBuilds().first))
     

@@ -8,9 +8,7 @@ import bwapi.DefaultBWListener
 import bwta.BWTA
 
 class Bot() extends DefaultBWListener {
-  val visionary = new Visionary()
-  val decisionMaker = new DecisionMaker()
-  val delegator = new Delegator()
+  val visionary = new Planner()
   val commander = new Commander()
 
   override def onStart() {
@@ -29,10 +27,11 @@ class Bot() extends DefaultBWListener {
     try {
       With.bank.tally()
       With.recruiter.tally()
-      val plans = visionary.envisionPlans()
-      val decisions = decisionMaker.makeDecisions(plans)
-      val tactics = delegator.delegateTactics(decisions)
-      commander.command(tactics)
+      val plans = visionary.getPlans()
+      //val tactics = delegator.delegateTactics(decisions)
+      //
+      //commander.command(tactics)
+      //TODO
       AutoCamera.update()
     }
     catch {

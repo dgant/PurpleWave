@@ -1,7 +1,5 @@
 package Types.Requirements
 
-import Types.Contracts.{Buyer, PriorityMultiplier}
-
 abstract class Requirement(
   val buyer: Buyer,
   val priorityMultiplier: PriorityMultiplier) {

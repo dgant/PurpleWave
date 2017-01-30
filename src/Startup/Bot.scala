@@ -8,7 +8,7 @@ import bwapi.DefaultBWListener
 import bwta.BWTA
 
 class Bot() extends DefaultBWListener {
-  val visionary = new Planner()
+  val planner = new Planner()
   val commander = new Commander()
 
   override def onStart() {
@@ -30,23 +30,23 @@ class Bot() extends DefaultBWListener {
   
     //Update priorities for each buyer
     var priority = 0
-    visionary.plans.foreach(_.update())
-    visionary.plans.foreach(plan => {
+    planner.plans.foreach(_.update())
+    planner.plans.foreach(plan => {
       plan.priority = priority
       priority += 1
     })
     
-    //For each plan
-      //Try to fulfill all requirements
-      //If successful, mark plan as active
-      //If unsuccessful, mark plan as inactive, and release all contracts
+    //Fulfill minimum requirements
+    planner.plans.foreach(_.update)
+    planner.plans.foreach(_.requirementsMinimal.fulfill)
     
-    //Fulfill
-    visionary.plans.foreach(plan => {
-      plan.requirementsMinimal
-    })
-    
-    //Reallocate resources
+    //Fulfill remaining requirements for active plans
+    val activePlans = planner.plans.filter(_.active)
+    var inactivePlans = planner.plans.filterNot(_.active)
+    inactivePlans.foreach(_.abort())
+    activePlans.foreach(_.requirementsOptional.fulfill)
+    activePlans.foreach(_.requirementsOptimal.fulfill)
+    activePlans.foreach(_.execute())
     
     AutoCamera.update()
   }

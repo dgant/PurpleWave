@@ -1,4 +1,4 @@
-package Types.Contracts
+package Types.Requirements
 
 trait PriorityMultiplier {
   def multiplier():Integer

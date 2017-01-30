@@ -1,4 +1,4 @@
-package Types.Contracts
+package Types.Requirements
 
 trait Buyer {
   var enabled:Boolean = false

@@ -64,7 +64,7 @@ class Recruiter {
     _requirements.remove(requirement)
   }
   
-  def getUnits(requirement: RequireUnits):collection.Set[bwapi.Unit] = {
-    _requirements.getOrElse(requirement, Set.empty)
+  def getUnits(requirement: RequireUnits):mutable.Set[bwapi.Unit] = {
+    _requirements.getOrElse(requirement, mutable.Set.empty)
   }
 }

@@ -9,10 +9,10 @@ class Planner {
   )
 
   def plans(): Iterable[Plan] = {
-    _defaultPlans.flatten(_flatten)
+    _defaultPlans.flatten(_flattenActivePlans)
   }
   
-  def _flatten(plan:Plan):Iterable[Plan] = {
-    Iterable(plan) ++ plan.children().flatten(_flatten)
+  def _flattenActivePlans(plan:Plan):Iterable[Plan] = {
+    Iterable(plan) ++ plan.children().filter(x => plan.active).flatten(_flattenActivePlans)
   }
 }

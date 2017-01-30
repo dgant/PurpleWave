@@ -1,7 +1,6 @@
 package Types.Requirements
 
 import Startup.With
-import Types.Contracts.{Buyer, ContractCurrency, PriorityMultiplier}
 
 class RequireCurrency (
   buyer:Buyer,
@@ -13,17 +12,16 @@ class RequireCurrency (
       buyer,
       priorityMultiplier: PriorityMultiplier) {
   
-  var contract:Option[ContractCurrency] = None
+  var isAvailableNow:Boolean = false
   
   override def fulfill() {
-    abort()
-    contract = Some(With.bank.fulfill(this, priorityMultiplier))
+    With.bank.fulfill(this)
     isFulfilled = true
   }
   
   override def abort() = {
-    contract.foreach(With.bank.abort)
-    contract = None
+    With.bank.abort(this)
     isFulfilled = false
+    isAvailableNow = false
   }
 }

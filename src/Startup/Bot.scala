@@ -9,7 +9,6 @@ import bwta.BWTA
 
 class Bot() extends DefaultBWListener {
   val planner = new Planner()
-  val commander = new Commander()
 
   override def onStart() {
     Logger.debug("Purple Wave, reporting in.")
@@ -46,7 +45,8 @@ class Bot() extends DefaultBWListener {
     inactivePlans.foreach(_.abort())
     activePlans.foreach(_.requirementsOptional.fulfill)
     activePlans.foreach(_.requirementsOptimal.fulfill)
-    activePlans.foreach(_.execute())
+    var tactics = activePlans.flatten(_.execute())
+    tactics.foreach(_.execute())
     
     AutoCamera.update()
   }

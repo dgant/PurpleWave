@@ -4,8 +4,8 @@ import Types.Plans.{Plan, PlanFollowBuildOrder, PlanGatherMinerals}
 
 class Planner {
   val _defaultPlans:List[Plan] = List(
-    new PlanGatherMinerals,
-    new PlanFollowBuildOrder
+    new PlanFollowBuildOrder,
+    new PlanGatherMinerals
   )
 
   def plans(): Iterable[Plan] = {

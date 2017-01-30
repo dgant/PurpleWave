@@ -18,18 +18,16 @@ class Banker {
     _supply    = With.game.self.supplyTotal - With.game.self.supplyUsed
     
     _activeContracts.toSeq
-      .sortBy(c => c.buyer.priority * c.priority.multiplier)
+      .sortBy(c => - c.requirement.priority)
       .foreach(_deductContractValue)
   }
   
-  def getContract(
+  def fulfill(
     requirement:RequireCurrency,
-    buyer: Buyer,
     priorityMultiplier: PriorityMultiplier):ContractCurrency = {
   
     val contract = new ContractCurrency(
       requirement,
-      buyer,
       priorityMultiplier)
       
     _activeContracts.add(contract)
@@ -37,16 +35,15 @@ class Banker {
     contract
   }
   
-  def releaseContract(contract:ContractCurrency) {
-    contract.requirementsMet = false
+  def abort(contract:ContractCurrency) {
+    contract.isFulfilled = false
     _activeContracts.remove(contract)
     tally()
   }
   
   def _deductContractValue(contract: ContractCurrency) {
-    contract.requirementsMet = _isAvailableNow(
+    contract.isFulfilled = _isAvailableNow(
       contract.requirements,
-      contract.buyer,
       contract.priority)
     
     _minerals -= contract.requirements.minerals

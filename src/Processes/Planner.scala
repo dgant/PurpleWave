@@ -2,21 +2,17 @@ package Processes
 
 import Types.Plans.{Plan, PlanFollowBuildOrder, PlanGatherMinerals}
 
-import scala.collection.mutable.ListBuffer
-
 class Planner {
-  val _defaultPlans:ListBuffer[Plan] = ListBuffer.empty
+  val _defaultPlans:List[Plan] = List(
+    new PlanGatherMinerals,
+    new PlanFollowBuildOrder
+  )
 
-  def getPlans(): Seq[Plan] = {
-    if (_defaultPlans.length == 0) {
-      _populateDefaultPlans
-    }
-
-    _defaultPlans
+  def plans(): Iterable[Plan] = {
+    _defaultPlans.flatten(_flatten)
   }
-
-  def _populateDefaultPlans(): Unit = {
-    _defaultPlans += new PlanGatherMinerals
-    _defaultPlans += new PlanFollowBuildOrder
+  
+  def _flatten(plan:Plan):Iterable[Plan] = {
+    Iterable(plan) ++ plan.children().flatten(_flatten)
   }
 }

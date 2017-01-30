@@ -22,25 +22,45 @@ class Bot() extends DefaultBWListener {
     Logger.debug("Bot initialization complete.")
     With.game.setLocalSpeed(1)
   }
+  
+  def _onFrame() {
+    //Update Bank & Recruiter
+    With.bank.tally()
+    With.recruiter.tally()
+  
+    //Update priorities for each buyer
+    var priority = 0
+    visionary.plans.foreach(_.update())
+    visionary.plans.foreach(plan => {
+      plan.priority = priority
+      priority += 1
+    })
+    
+    //For each plan
+      //Try to fulfill all requirements
+      //If successful, mark plan as active
+      //If unsuccessful, mark plan as inactive, and release all contracts
+    
+    //Fulfill
+    visionary.plans.foreach(plan => {
+      plan.requirementsMinimal
+    })
+    
+    //Reallocate resources
+    
+    AutoCamera.update()
+  }
 
   override def onFrame() {
     try {
-      With.bank.tally()
-      With.recruiter.tally()
-      val plans = visionary.getPlans()
-      //val tactics = delegator.delegateTactics(decisions)
-      //
-      //commander.command(tactics)
-      //TODO
-      AutoCamera.update()
+      _onFrame()
     }
     catch {
-      case e:Exception =>
+      case exception:Exception =>
         Logger.debug("EXCEPTION")
-        Logger.debug(e.getMessage)
-        e.printStackTrace()
+        Logger.debug(exception.getMessage)
+        exception.printStackTrace()
     }
-      
   }
 
   override def onUnitComplete(unit: bwapi.Unit) {

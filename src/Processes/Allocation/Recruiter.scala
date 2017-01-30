@@ -1,58 +1,70 @@
 package Processes.Allocation
 
 import Startup.With
-import Types.Contracts.{Buyer, ContractUnits, PriorityMultiplier}
 import Types.Requirements.RequireUnits
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 class Recruiter {
-  val _contracts:mutable.Set[ContractUnits] = mutable.Set.empty
-  val _unassignedUnits:mutable.Set[bwapi.Unit] = mutable.Set.empty
+  val _assignments:mutable.HashMap[bwapi.Unit, RequireUnits] = mutable.HashMap.empty
+  val _unassigned:mutable.Set[bwapi.Unit] = mutable.Set.empty
+  val _requirements:mutable.HashMap[RequireUnits, mutable.Set[bwapi.Unit]] = mutable.HashMap.empty
 
-  def tally(): Unit = {
-    _unassignedUnits.clear()
-    With.game.self.getUnits.asScala.filter(_.exists).filterNot(_contracts.flatten(_.units).contains).foreach(_unassignedUnits.add)
-    _contracts.flatten(_.units).filterNot(_.exists).foreach(_removeFromContracts)
+  def tally() {
+    
+    //Remove dead units
+    _assignments.keys.filterNot(_.exists).foreach(_unassign)
+    _unassigned.filterNot(_.exists).foreach(_unassigned.remove)
+    
+    //Add new units
+    With.game.self.getUnits.asScala.toSet.diff(_unassigned ++ _assignments.keys).foreach(_unassigned.add)
   }
   
-  def getContract(
-     requirement:RequireUnits,
-     buyer: Buyer,
-     priority: PriorityMultiplier):ContractUnits = {
+  def fulfill(requirement: RequireUnits) {
+    _requirements(requirement) = _requirements.getOrElse(requirement, mutable.Set.empty)
+    
+    //Offer batches of units for the requirement to choose
+    //
+    val requestedUnits = requirement.offerBatchesOfUnits(
+      Iterable(_unassigned) ++
+        _requirements.keys
+          .filter(otherRequirement => requirement.priority > otherRequirement.priority)
+          .map(getUnits))
   
-    val contract = new ContractUnits(requirement, buyer, priority)
-    _tryToFulfill(contract)
-    contract
-  }
-  
-  def releaseContract(contract: ContractUnits) {
-    contract.units.foreach(unit => { _unassignedUnits.add(unit); _removeFromContracts(unit) })
-    _contracts.remove(contract)
-  }
-  
-  def _removeFromContracts(unit:bwapi.Unit) {
-    _contracts.filter(_.units.contains(unit)).foreach(_.units.remove(unit))
-  }
-  
-  def _tryToFulfill(contract:ContractUnits) {
-    
-    val candidates:mutable.Set[bwapi.Unit] = mutable.Set.empty
-    contract.units.foreach(candidates.add)
-    
-    (_unassignedUnits ++ _contracts.filter(p => p.calculatePriority <= contract.calculatePriority).flatten(_.units))
-      .filter(unit => candidates.size < contract.requirements.quantity)
-      .filter(contract.requirements.unitMatcher.accept)
-      .foreach(candidates.add(_))
-    
-    contract.requirementsMet = candidates.size >= contract.requirements.quantity
-    
-    //Slow but simple
-    contract.units.clear()
-    
-    if (contract.requirementsMet) {
-      candidates.foreach(contract.units.add(_))
+    //This process is kind of goofy:
+    //The requirement flags itself fulfilled if it likes the most recent offer
+    //BEFORE the units are actually assigned
+    //
+    if (requirement.isFulfilled) {
+      
+      //Unassign any units we no longer want
+      getUnits(requirement).diff(requestedUnits.toSet).foreach(_unassign)
+      
+      //Assign the requested units
+      requestedUnits.foreach(unit => _assign(unit, requirement))
+      
+    } else {
+      abort(requirement)
     }
+  }
+  
+  def _assign(unit:bwapi.Unit, requirement:RequireUnits) {
+    _assignments(unit) = requirement
+    _unassigned.remove(unit)
+  }
+  
+  def _unassign(unit:bwapi.Unit) {
+    _unassigned.add(unit)
+    _assignments.remove(unit)
+  }
+  
+  def abort(requirement: RequireUnits) {
+     requirement.units.foreach(unit => { _unassigned.add(unit); _assignments.remove(unit) })
+    _requirements.remove(requirement)
+  }
+  
+  def getUnits(requirement: RequireUnits):collection.Set[bwapi.Unit] = {
+    _requirements.getOrElse(requirement, Set.empty)
   }
 }

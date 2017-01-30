@@ -2,9 +2,6 @@ package Types.Contracts
 
 import Types.Requirements.RequireCurrency
 
-class ContractCurrency(
-  val requirements: RequireCurrency,
-  buyer: Buyer,
-  priority: PriorityMultiplier)
-    extends Contract(buyer, priority) {
+class ContractCurrency(val requirement: RequireCurrency) {
+  var availableRightNow:Boolean = false
 }

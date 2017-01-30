@@ -4,38 +4,33 @@ import Startup.With
 import Types.BuildOrders.BuildOrder
 import bwapi.UnitType
 
-import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
+import scala.collection.JavaConverters._
 
 class PlanFollowBuildOrder extends Plan() {
+  
   val buildOrder = new BuildOrder
   var _children:ListBuffer[Plan] = ListBuffer.empty
   
   override def children(): Iterable[Plan] = {
-    _children
-  }
+    if (_children.isEmpty) {
+      val have = _defaultZeroMutableHashMap
+      val need = _defaultZeroMutableHashMap
+      val planned = _defaultZeroMutableHashMap
   
-  override def update() {
-    if (! _children.isEmpty) {
-      return
+      With.game.self.getUnits.asScala.groupBy(_.getType).foreach(pair => have.put(pair._1, pair._2.size))
+  
+      buildOrder.getUnitTypes.foreach(t => {
+        need(t) += 1
+        if (need(t) > have(t) + planned(t)) {
+          _children.append(_createABuildPlan(t))
+          planned(t) += 1
+        }
+      })
     }
     
-    _children = ListBuffer.empty
-  
-    val have = _defaultZeroMutableHashMap
-    val need = _defaultZeroMutableHashMap
-    var planned = _defaultZeroMutableHashMap
-    
-    With.game.self.getUnits.asScala.groupBy(_.getType).foreach(pair => have.put(pair._1, pair._2.size))
-  
-    buildOrder.getUnitTypes.foreach(t => {
-      need(t) += 1
-      if(need(t) > have(t) + planned(t)) {
-        _children.append(_createABuildPlan(t))
-        planned(t) += 1
-      }
-    })
+    _children
   }
   
   def _defaultZeroMutableHashMap():mutable.HashMap[UnitType, Integer] = {

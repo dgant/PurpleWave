@@ -57,9 +57,17 @@ class Bot() extends DefaultBWListener {
     }
     catch {
       case exception:Exception =>
-        Logger.debug("EXCEPTION")
-        Logger.debug(exception.getMessage)
         exception.printStackTrace()
+        Logger.debug(exception.getClass.getSimpleName)
+        
+        if (exception.getStackTrace.nonEmpty) {
+          Logger.debug(
+            exception.getStackTrace.head.getClassName
+            + "."
+            + exception.getStackTrace.head.getMethodName
+            + "(): "
+            + exception.getStackTrace.head.getLineNumber)
+        }
     }
   }
 

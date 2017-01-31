@@ -14,7 +14,6 @@ class PlanBuildUnitFromBuilding(
   
   var _builder:Option[bwapi.Unit] = None
   var _product:Option[bwapi.Unit] = None
-  
   var _tactic:Option[Tactic] = None
   
   override def execute(): Iterable[Tactic] = {

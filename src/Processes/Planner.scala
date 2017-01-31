@@ -13,6 +13,6 @@ class Planner {
   }
   
   def _flattenActivePlans(plan:Plan):Iterable[Plan] = {
-    Iterable(plan) ++ plan.children().filter(x => plan.active).flatten(_flattenActivePlans)
+    Iterable(plan) ++ plan.children().flatten(_flattenActivePlans)
   }
 }

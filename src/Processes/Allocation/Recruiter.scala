@@ -51,11 +51,13 @@ class Recruiter {
   
   def _assign(unit:bwapi.Unit, requirement:RequireUnits) {
     _assignments(unit) = requirement
+    _requirements(requirement).add(unit)
     _unassigned.remove(unit)
   }
   
   def _unassign(unit:bwapi.Unit) {
     _unassigned.add(unit)
+    _assignments.get(unit).foreach(_requirements(_).remove(unit))
     _assignments.remove(unit)
   }
   

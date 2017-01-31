@@ -36,6 +36,8 @@ class RequireUnits (
           .filter(unitMatcher.accept)
           .foreach(desiredUnits.add(_)))
     
+    isFulfilled = desiredUnits.size >= quantity
+      
     desiredUnits
   }
 }

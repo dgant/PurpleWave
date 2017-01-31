@@ -1,11 +1,13 @@
 package Startup
 
-import Processes.Allocation.{Banker, Recruiter}
-import Processes.Planner
+import Processes.{Banker, Prioritizer, Recruiter}
+import Types.Plans.PlanWinTheGame
 
 object With {
   var game:bwapi.Game = null
   var recruiter:Recruiter = null
   var bank:Banker = null
-  var planner:Planner = null
+  var prioritizer:Prioritizer = null
+  var gameplan:PlanWinTheGame = null
+  
 }

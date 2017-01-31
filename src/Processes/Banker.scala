@@ -1,4 +1,4 @@
-package Processes.Allocation
+package Processes
 
 import Startup.With
 import Types.Requirements.RequireCurrency
@@ -11,7 +11,7 @@ class Banker {
   var _supply = 0
   val _requirements:mutable.Set[RequireCurrency] = mutable.Set.empty
   
-  def tally() {
+  def startFrame() {
     _minerals  = With.game.self.minerals
     _gas       = With.game.self.gas
     _supply    = With.game.self.supplyTotal - With.game.self.supplyUsed
@@ -20,12 +20,12 @@ class Banker {
   
   def fulfill(requirement:RequireCurrency) {
     _requirements.add(requirement)
-    tally()
+    startFrame()
   }
   
   def abort(requirement:RequireCurrency) {
     _requirements.remove(requirement)
-    tally()
+    startFrame()
   }
   
   def _deductContractValue(requirement: RequireCurrency) {

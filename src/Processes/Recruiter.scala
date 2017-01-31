@@ -1,4 +1,4 @@
-package Processes.Allocation
+package Processes
 
 import Startup.With
 import Types.Requirements.RequireUnits
@@ -11,7 +11,7 @@ class Recruiter {
   val _unassigned:mutable.Set[bwapi.Unit] = mutable.Set.empty
   val _requirements:mutable.HashMap[RequireUnits, mutable.Set[bwapi.Unit]] = mutable.HashMap.empty
 
-  def tally() {
+  def startFrame() {
     
     //Remove dead units
     _assignments.keys.filterNot(_.exists).foreach(_unassign)

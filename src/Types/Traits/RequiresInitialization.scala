@@ -4,7 +4,7 @@ trait RequiresInitialization {
   
   var _isInitialized:Boolean = false
   
-  def requireInitialization() {
+  def _requireInitialization() {
     if ( ! _isInitialized) {
       _onInitialization()
     }

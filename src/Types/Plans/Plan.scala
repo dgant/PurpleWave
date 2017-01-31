@@ -6,26 +6,49 @@ import Types.Traits.RequiresInitialization
 
 abstract class Plan extends Buyer with RequiresInitialization {
   
-  val requirements:Requirement = new RequireNothing()
-  
-  var _initialized:Boolean = false
-  var isComplete:Boolean = false
-  
-  def _onInitialization() {
-    requirements.buyer = this
+  val _requirements:Requirement = new RequireNothing()
+  var _isComplete:Boolean = false
+ 
+  def prioritize() {
+    
   }
   
-  def children():Iterable[Plan] = { return List.empty }
-  def execute():Iterable[Tactic] = { return List.empty }
+  def children():Iterable[Plan] = {
+    _requireInitialization()
+    List.empty
+  }
   
-  def active:Boolean = { requirements.isFulfilled && ! isComplete }
+  def startFrame() {
+    _requirements.fulfill()
+  }
   
   def abort() {
-    requirements.abort()
+    _requireInitialization()
+    _requirements.abort()
   }
   
-  def flagComplete() {
-    isComplete = true
+  def execute():Iterable[Tactic] = {
+    _requireInitialization()
+    List.empty
+  }
+  
+  def active:Boolean = {
+    _requireInitialization()
+    _requirements.isFulfilled && ! isComplete
+  }
+  
+  def isComplete():Boolean = {
+    _requireInitialization()
+    _isComplete
+  }
+  
+  def _flagComplete() {
+    _requireInitialization()
+    _isComplete = true
     abort()
+  }
+  
+  def _onInitialization() {
+    _requirements.buyer = this
   }
 }

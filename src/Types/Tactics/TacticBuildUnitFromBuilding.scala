@@ -3,7 +3,7 @@ package Types.Tactics
 import Startup.With
 import bwapi.{TilePosition, UnitCommandType, UnitType}
 
-class TacticBuildUnit(
+class TacticBuildUnitFromBuilding(
   unit:bwapi.Unit,
   unitType:UnitType,
   val position:Option[TilePosition])
@@ -40,10 +40,6 @@ class TacticBuildUnit(
   }
   
   def _isBuildingOrTraining(): Boolean = {
-    var result = false
-    result = result || unit.getLastCommand.getUnitCommandType == UnitCommandType.Build
-    result = result || unit.getLastCommand.getUnitCommandType == UnitCommandType.Build_Addon
-    result = result || unit.getLastCommand.getUnitCommandType == UnitCommandType.Train
-    result
+    unit.getLastCommand.getUnitCommandType == UnitCommandType.Train
   }
 }

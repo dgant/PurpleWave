@@ -9,13 +9,14 @@ import scala.collection.mutable
 
 class PlanGatherMinerals extends Plan {
   
-  override val requirements:RequireUnits = new RequireUnitsGreedy(1, UnitMatchWorker)
+  override val _requirements:RequireUnits = new RequireUnitsGreedy(1, UnitMatchWorker)
   
   val _tactics:mutable.Map[bwapi.Unit, Tactic] = mutable.Map.empty
   
   override def execute():Iterable[Tactic] = {
-    val workers = With.recruiter.getUnits(requirements)
+    super.execute()
     
+    val workers = With.recruiter.getUnits(_requirements)
     _tactics.keySet.diff(workers).foreach(_tactics.remove)
     workers.filterNot(_tactics.contains).foreach(worker => _tactics.put(worker, new TacticGatherMinerals(worker)))
     _tactics.values

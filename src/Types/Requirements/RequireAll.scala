@@ -8,7 +8,7 @@ class RequireAll(requirements:Requirement*)
   val _requirements = requirements.toList
   
   override def fulfill() {
-    requireInitialization()
+    _requireInitialization()
     for(requirement <- _requirements) {
       requirement.fulfill()
       
@@ -22,7 +22,7 @@ class RequireAll(requirements:Requirement*)
   }
   
   override def abort() {
-    requireInitialization()
+    _requireInitialization()
     _requirements.foreach(_.abort())
   }
   

@@ -2,8 +2,8 @@ package Startup
 
 import Development.{AutoCamera, Overlay}
 import Operations.Logger
-import Processes.Allocation.{Banker, Recruiter}
-import Processes._
+import Processes.{Banker, Prioritizer, Recruiter}
+import Types.Plans.PlanWinTheGame
 import bwapi.DefaultBWListener
 import bwta.BWTA
 
@@ -13,45 +13,26 @@ class Bot() extends DefaultBWListener {
     Logger.debug("Purple Wave, reporting in.")
     With.bank = new Banker
     With.recruiter = new Recruiter
-    With.planner = new Planner
+    With.prioritizer = new Prioritizer
+    With.gameplan = new PlanWinTheGame
     Logger.debug("Reading map")
     BWTA.readMap()
     Logger.debug("Analyzing map")
     BWTA.analyze()
     Logger.debug("Bot initialization complete.")
-    With.game.setLocalSpeed(0)
+    With.game.setLocalSpeed(1)
   }
   
   def _onFrame() {
-    //Update Bank & Recruiter
-    With.bank.tally()
-    With.recruiter.tally()
-    With.planner.plans.foreach(_.requireInitialization)
-  
-    //Update priorities for each buyer
-    var priority = 0
-    With.planner.plans.foreach(plan => {
-      plan.priority = priority
-      priority += 1
-    })
-    
-    //Fulfill minimum requirements
-    With.planner.plans.filterNot(_.isComplete).foreach(_.requirements.fulfill)
-    
-    //Fulfill remaining requirements for active plans
-    val activePlans = With.planner.plans.filter(_.active)
-    val inactivePlans = With.planner.plans.filterNot(_.active)
-    inactivePlans.foreach(_.abort())
-    
-    //Get and execute tactics
-    val tactics = activePlans.flatten(_.execute())
+    With.bank.startFrame()
+    With.recruiter.startFrame()
+    With.prioritizer.startFrame()
+    With.gameplan.startFrame()
+    val tactics = With.gameplan.execute()
     tactics.foreach(_.execute())
-    
     Overlay.update()
     AutoCamera.update()
   }
-  
-  
 
   override def onFrame() {
     try {

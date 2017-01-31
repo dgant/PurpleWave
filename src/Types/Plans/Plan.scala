@@ -2,32 +2,30 @@ package Types.Plans
 
 import Types.Requirements._
 import Types.Tactics.Tactic
+import Types.Traits.RequiresInitialization
 
-abstract class Plan extends Buyer {
+abstract class Plan extends Buyer with RequiresInitialization {
   
   val requirements:Requirement = new RequireNothing()
   
   var _initialized:Boolean = false
-  
-  def initialize() {
-    if ( ! _initialized) {
-      _onInitialization()
-      _initialized = true;
-    }
-  }
+  var isComplete:Boolean = false
   
   def _onInitialization() {
     requirements.buyer = this
-    requirements.priorityMultiplier = PriorityMinimum
   }
   
-  def update() = {}
   def children():Iterable[Plan] = { return List.empty }
   def execute():Iterable[Tactic] = { return List.empty }
   
-  def active:Boolean = { requirements.isFulfilled }
+  def active:Boolean = { requirements.isFulfilled && ! isComplete }
   
   def abort() {
     requirements.abort()
+  }
+  
+  def flagComplete() {
+    isComplete = true
+    abort()
   }
 }

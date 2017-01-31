@@ -1,5 +1,6 @@
 package Types.Tactics
 
+import Startup.With
 import bwapi.{TilePosition, UnitCommandType, UnitType}
 
 class TacticBuildUnit(
@@ -10,16 +11,18 @@ class TacticBuildUnit(
   
   var _issuedOrder = false
   var _startedBuilding = false
+  var _timeout = Integer.MAX_VALUE
+  
+  override def isComplete(): Boolean = {
+    _issuedOrder && _startedBuilding && With.game.getFrameCount >= _timeout
+  }
   
   override def execute() {
     
     if (_startedBuilding) {
-      if ( ! _isBuildingOrTraining()) {
-        //TODO: Release!
-      }
     }
     else if (_issuedOrder) {
-      if (_isBuildingOrTraining()) {
+      if (_isBuildingOrTraining) {
         _startedBuilding = true
       }
     }
@@ -31,6 +34,7 @@ class TacticBuildUnit(
         unit.train(unitType)
       }
   
+      _timeout = With.game.getFrameCount + unitType.buildTime
       _issuedOrder = true
     }
   }

@@ -3,7 +3,7 @@ package Types.Requirements
 abstract class Requirement() {
   
   var buyer: Buyer = null
-  var priorityMultiplier: PriorityMultiplier = null
+  var priorityMultiplier: PriorityMultiplier = PriorityMinimum
   
   var isFulfilled:Boolean = false
   

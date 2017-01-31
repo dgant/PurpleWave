@@ -8,7 +8,11 @@ class Planner {
     new PlanFollowBuildOrder,
     new PlanGatherMinerals
   )
-  _defaultPlans.foreach(_.initialize())
+  _defaultPlans.foreach(_.requireInitialization())
+  
+  def topLevelPlans(): Iterable[Plan] = {
+    _defaultPlans
+  }
 
   def plans(): Iterable[Plan] = {
     _defaultPlans.flatten(_flattenActivePlans)

@@ -1,6 +1,6 @@
 package Types.Plans
 
-import Types.Requirements.{RequireUnits, RequireUnitsByQuantity}
+import Types.Requirements.{RequireAll, RequireCurrencyForUnit, RequireUnitsByQuantity}
 import Types.Tactics.{Tactic, TacticBuildUnit}
 import UnitMatching.Matcher.UnitMatchType
 import bwapi.UnitType
@@ -10,7 +10,9 @@ class PlanBuildUnitFromBuilding(
   val product:UnitType)
     extends Plan {
    
-  override val requirements:RequireUnits = new RequireUnitsByQuantity(1, new UnitMatchType(builder))
+  val requireCurrency = new RequireCurrencyForUnit(product)
+  val requireBuilder = new RequireUnitsByQuantity(1, new UnitMatchType(builder))
+  override val requirements = new RequireAll(requireCurrency, requireBuilder)
   
   var _builder:Option[bwapi.Unit] = None
   var _product:Option[bwapi.Unit] = None
@@ -18,9 +20,13 @@ class PlanBuildUnitFromBuilding(
   
   override def execute(): Iterable[Tactic] = {
     if (_tactic == None) {
-      _tactic = Some(new TacticBuildUnit(requirements.units.head, product, None))
+      if (requireCurrency.isAvailableNow) {
+        _tactic = Some(new TacticBuildUnit(requireBuilder.units.head, product, None))
+      }
+    } else if (_tactic.get.isComplete) {
+      flagComplete()
     }
     
-    Iterable(_tactic.get)
+    return _tactic.toIterable
   }
 }

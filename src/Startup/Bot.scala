@@ -26,26 +26,25 @@ class Bot() extends DefaultBWListener {
     //Update Bank & Recruiter
     With.bank.tally()
     With.recruiter.tally()
+    planner.plans.foreach(_.initialize)
   
     //Update priorities for each buyer
     var priority = 0
-    planner.plans.foreach(_.update())
     planner.plans.foreach(plan => {
       plan.priority = priority
       priority += 1
     })
     
     //Fulfill minimum requirements
+    
     planner.plans.foreach(_.update)
-    planner.plans.foreach(_.requirementsMinimal.fulfill)
+    planner.plans.foreach(_.requirements.fulfill)
     
     //Fulfill remaining requirements for active plans
     val activePlans = planner.plans.filter(_.active)
-    var inactivePlans = planner.plans.filterNot(_.active)
+    val inactivePlans = planner.plans.filterNot(_.active)
     inactivePlans.foreach(_.abort())
-    activePlans.foreach(_.requirementsOptional.fulfill)
-    activePlans.foreach(_.requirementsOptimal.fulfill)
-    var tactics = activePlans.flatten(_.execute())
+    val tactics = activePlans.flatten(_.execute())
     tactics.foreach(_.execute())
     
     AutoCamera.update()

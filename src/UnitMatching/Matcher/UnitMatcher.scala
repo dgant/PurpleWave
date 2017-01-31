@@ -1,5 +1,5 @@
 package UnitMatching.Matcher
 
-trait UnitMatch {
+trait UnitMatcher {
   def accept(unit:bwapi.Unit): Boolean
 }

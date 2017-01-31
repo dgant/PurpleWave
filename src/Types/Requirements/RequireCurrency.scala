@@ -3,14 +3,10 @@ package Types.Requirements
 import Startup.With
 
 class RequireCurrency (
-  buyer:Buyer,
-  priorityMultiplier: PriorityMultiplier,
   val minerals:Integer,
   val gas:Integer,
   val supply:Integer)
-    extends Requirement(
-      buyer,
-      priorityMultiplier: PriorityMultiplier) {
+    extends Requirement {
   
   var isAvailableNow:Boolean = false
   

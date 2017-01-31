@@ -1,8 +1,9 @@
 package Types.Requirements
 
-abstract class Requirement(
-  val buyer: Buyer,
-  val priorityMultiplier: PriorityMultiplier) {
+abstract class Requirement() {
+  
+  var buyer: Buyer = null
+  var priorityMultiplier: PriorityMultiplier = null
   
   var isFulfilled:Boolean = false
   

@@ -9,6 +9,8 @@ import scala.collection.mutable
 
 abstract class PlanAcquireUnits extends Plan with UnitRequest {
   
+  override def isComplete(): Boolean = { requestFulfilled }
+  
   override def execute() {
     With.recruiter.add(this)
   }
@@ -20,6 +22,4 @@ abstract class PlanAcquireUnits extends Plan with UnitRequest {
   def units():mutable.Set[Unit] = {
     With.recruiter.getUnits(this)
   }
-  
-  def getRequiredUnits(candidates:Iterable[Iterable[bwapi.Unit]]):Option[Iterable[bwapi.Unit]]
 }

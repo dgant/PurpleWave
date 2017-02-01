@@ -1,7 +1,7 @@
 package Processes
 
 import Startup.With
-import Types.Traits.CurrencyRequest
+import Types.Plans.Generic.Allocation.PlanAcquireCurrency
 
 import scala.collection.mutable
 
@@ -9,34 +9,34 @@ class Banker {
   var _mineralsLeft = 0
   var _gasLeft = 0
   var _supplyLeft = 0
-  val _requests = new mutable.HashSet[CurrencyRequest]()
+  val _requests = new mutable.HashSet[PlanAcquireCurrency]()
   
   def recountResources() {
     _mineralsLeft  = With.game.self.minerals
     _gasLeft       = With.game.self.gas
     _supplyLeft    = With.game.self.supplyTotal - With.game.self.supplyUsed
-    _requests.toSeq.sortBy(- _.priority).foreach(_queueBuyer)
+    _requests.toSeq.sortBy(With.prioritizer.getPriority(_)).foreach(_queueBuyer)
   }
   
-  def add(request:CurrencyRequest) {
+  def add(request:PlanAcquireCurrency) {
     _requests.add(request)
     recountResources()
   }
   
-  def remove(request:CurrencyRequest) {
+  def remove(request:PlanAcquireCurrency) {
     request.requestFulfilled = false
     _requests.remove(request)
     recountResources()
   }
   
-  def _queueBuyer(request:CurrencyRequest) {
+  def _queueBuyer(request:PlanAcquireCurrency) {
     request.requestFulfilled = _isAvailableNow(request)
     _mineralsLeft -= request.minerals
     _gasLeft      -= request.gas
     _supplyLeft   -= request.supply
   }
   
-  def _isAvailableNow(request:CurrencyRequest): Boolean = {
+  def _isAvailableNow(request:PlanAcquireCurrency): Boolean = {
     _mineralsLeft  >= request.minerals &&
     _gasLeft       >= request.gas &&
     _supplyLeft    >= request.supply

@@ -17,30 +17,29 @@ object Overlay {
   
   def _describePlan(plan:Plan, depth:Integer):String = {
     val planName = plan.getClass.getSimpleName
-    
-    val qualities = (if (plan.isComplete) "complete" else "")
+    val qualities = (if (plan.isComplete) " (complete)" else "")
     
     val resources = Iterable(plan)
       .filter(_.isInstanceOf[PlanAcquireCurrency])
       .map(_.asInstanceOf[PlanAcquireCurrency])
-      .map(r => "  " * 2 * depth ++ r.minerals.toString ++ "m " ++ r.gas.toString ++ "g " ++ r.supply.toString ++ "s\n")
+      .map(r => ": " ++ r.minerals.toString ++ "m " ++ r.gas.toString ++ "g " ++ r.supply.toString ++ "s")
       .mkString("")
     
     val units = Iterable(plan)
       .filter(_.isInstanceOf[PlanAcquireUnits])
       .flatten(_.asInstanceOf[PlanAcquireUnits].units)
       .groupBy(unit => unit.getType.toString)
-      .map(pair => "  " * 2 * depth ++ pair._2.size.toString ++ " " ++ _formatUnitTypeName(pair._1) ++ "\n")
+      .map(pair => ": " ++ pair._2.size.toString ++ " " ++ _formatUnitTypeName(pair._1))
       .mkString("")
     
     ("  " * depth
       ++ ""
       ++ plan.getClass.getSimpleName.replace("Plan", "")
       ++ " " * Math.max(0, 20 - planName.size)
-      ++ qualities
-      ++ "\n"
       ++ resources
-      ++ units)
+      ++ units
+      ++ qualities
+      ++ "\n")
   }
   
   def _formatUnitTypeName(name: String):String = {

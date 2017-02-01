@@ -1,15 +1,15 @@
 package Processes
 
 import Startup.With
-import Types.Traits.UnitRequest
+import Types.Plans.Generic.Allocation.PlanAcquireUnits
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 class Recruiter {
-  val _assignments:mutable.HashMap[bwapi.Unit, UnitRequest] = mutable.HashMap.empty
+  val _assignments:mutable.HashMap[bwapi.Unit, PlanAcquireUnits] = mutable.HashMap.empty
   val _unassigned:mutable.Set[bwapi.Unit] = mutable.Set.empty
-  val _requests:mutable.HashMap[UnitRequest, mutable.Set[bwapi.Unit]] = mutable.HashMap.empty
+  val _requests:mutable.HashMap[PlanAcquireUnits, mutable.Set[bwapi.Unit]] = mutable.HashMap.empty
 
   def recountUnits() {
     // Remove dead units
@@ -22,7 +22,7 @@ class Recruiter {
     With.game.self.getUnits.asScala.toSet.diff(_unassigned ++ _assignments.keys).foreach(_unassigned.add)
   }
   
-  def add(request: UnitRequest) {
+  def add(request: PlanAcquireUnits) {
     _requests(request) = _requests.getOrElse(request, mutable.Set.empty)
     
     // Offer batches of units for the request to choose.
@@ -32,7 +32,9 @@ class Recruiter {
     val requiredUnits = request.getRequiredUnits(
       Iterable(_unassigned) ++
         _requests.keys
-          .filter(otherRequest => request.priority > otherRequest.priority)
+          .filter(otherRequest =>
+            With.prioritizer.getPriority(request) <
+            With.prioritizer.getPriority(otherRequest))
           .map(getUnits))
   
     // This process is kind of goofy:
@@ -56,12 +58,12 @@ class Recruiter {
     }
   }
   
-  def remove(request: UnitRequest) {
-    _requests(request).foreach(unit => { _unassigned.add(unit); _assignments.remove(unit) })
+  def remove(request: PlanAcquireUnits) {
+    _requests.get(request).foreach(_.foreach(unit => { _unassigned.add(unit); _assignments.remove(unit) }))
     _requests.remove(request)
   }
   
-  def _assign(unit:bwapi.Unit, request:UnitRequest) {
+  def _assign(unit:bwapi.Unit, request:PlanAcquireUnits) {
     _assignments(unit) = request
     _requests(request).add(unit)
     _unassigned.remove(unit)
@@ -73,7 +75,7 @@ class Recruiter {
     _assignments.remove(unit)
   }
   
-  def getUnits(request: UnitRequest):mutable.Set[bwapi.Unit] = {
+  def getUnits(request: PlanAcquireUnits):mutable.Set[bwapi.Unit] = {
     _requests.getOrElse(request, mutable.Set.empty)
   }
 }

@@ -6,6 +6,8 @@ import Types.Traits.CurrencyRequest
 
 class PlanAcquireCurrency extends Plan with CurrencyRequest {
   
+  override def isComplete(): Boolean = { requestFulfilled }
+  
   override def execute() {
     With.bank.add(this)
   }

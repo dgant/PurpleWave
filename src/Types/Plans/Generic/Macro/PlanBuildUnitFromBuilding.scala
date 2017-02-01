@@ -22,6 +22,11 @@ class PlanBuildUnitFromBuilding(
   override def isComplete(): Boolean = { _isFinished }
   
   override def execute() {
+    if (_isFinished) {
+      abort()
+      return
+    }
+    
     super.execute()
     
     if (_tactic == None && _children.forall(_.isComplete)) {

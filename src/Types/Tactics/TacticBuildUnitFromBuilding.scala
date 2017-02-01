@@ -9,34 +9,28 @@ class TacticBuildUnitFromBuilding(
   val position:Option[TilePosition] = None)
     extends Tactic(unit) {
   
-  var _issuedOrder = false
   var _startedBuilding = false
   var _timeout = Integer.MAX_VALUE
   
   override def isComplete(): Boolean = {
-    _issuedOrder && _startedBuilding && With.game.getFrameCount >= _timeout
+    With.game.getFrameCount >= _timeout
   }
   
   override def execute() {
     
-    if (_startedBuilding) {
+    if (_isBuildingOrTraining) {
+      if ( ! _startedBuilding) {
+        _setTimeout()
+      }
+      _startedBuilding = true
     }
-    else if (_issuedOrder) {
-      if (_isBuildingOrTraining) {
-        _startedBuilding = true
-      }
+    else if (unit.getTrainingQueue.isEmpty) {
+      unit.train(unitType)
     }
-    else {
-      if (unitType.isBuilding) {
-        unit.build(unitType, position.get)
-      }
-      else {
-        unit.train(unitType)
-      }
+  }
   
-      _timeout = With.game.getFrameCount + unitType.buildTime
-      _issuedOrder = true
-    }
+  def _setTimeout() {
+    _timeout = With.game.getFrameCount + unitType.buildTime
   }
   
   def _isBuildingOrTraining(): Boolean = {

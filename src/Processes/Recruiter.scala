@@ -19,7 +19,7 @@ class Recruiter {
     
     // Add new units
     //
-    With.game.self.getUnits.asScala.toSet.diff(_unassigned ++ _assignments.keys).foreach(_unassigned.add)
+    With.game.self.getUnits.asScala.filter(_.isCompleted).toSet.diff(_unassigned ++ _assignments.keys).foreach(_unassigned.add)
   }
   
   def add(request: PlanAcquireUnits) {

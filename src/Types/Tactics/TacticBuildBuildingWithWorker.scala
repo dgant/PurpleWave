@@ -2,7 +2,10 @@ package Types.Tactics
 
 import Startup.With
 import Types.PositionFinders.PositionFinder
-import bwapi.{UnitCommandType, UnitType}
+import bwapi.{TilePosition, UnitType}
+
+import scala.collection.JavaConverters._
+
 
 class TacticBuildBuildingWithWorker(
   worker:bwapi.Unit,
@@ -10,34 +13,19 @@ class TacticBuildBuildingWithWorker(
   positionFinder:PositionFinder)
     extends Tactic(worker) {
 
-  var _startedBuilding = false
-  var _timeout = Integer.MAX_VALUE
+  var _position:Option[TilePosition] = None
+  var _building:Option[bwapi.Unit] = None
   
   override def isComplete(): Boolean = {
-    _startedBuilding && With.game.getFrameCount >= _timeout
+    _building.exists(_.isCompleted)
   }
   
   override def execute() {
-
-    if (_isBuilding) {
-      if ( ! _startedBuilding) {
-        _startedBuilding = true
-        _resetTimeout()
-      }
+    if (_building.filter(_.exists).isEmpty) {
+      _position = positionFinder.find()
+      _position.foreach(worker.build(buildingType, _))
+      _building = With.game.self.getUnits.asScala.filter(_.getTilePosition == _position).headOption
     }
-    else {
-      _startedBuilding = false
-      _resetTimeout()
-      positionFinder.find().foreach(worker.build(buildingType, _))
-    }
-  }
-  
-  def _resetTimeout() {
-    _timeout = With.game.getFrameCount + buildingType.buildTime
-  }
-  
-  def _isBuilding(): Boolean = {
-    worker.getLastCommand.getUnitCommandType == UnitCommandType.Build
   }
 }
 

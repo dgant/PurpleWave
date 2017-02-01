@@ -5,11 +5,23 @@ import Types.Plans.Generic.Allocation.{PlanAcquireCurrency, PlanAcquireUnits}
 import Types.Plans.Plan
 
 object Overlay {
+  
   def render() {
+    With.game.setTextSize(bwapi.Text.Size.Enum.Small)
     With.game.drawTextScreen(
       5, 5,
       _describePlanTree(With.gameplan, 0))
+    
+    _drawTactics()
   }
+  
+  def _drawTactics() {
+    With.commander.getQueue()
+      .foreach(tactic => With.game.drawTextMap(
+        tactic.unit.getPosition,
+        tactic.getClass.getSimpleName.replace("Tactic", "")))
+  }
+  
   
   def _describePlanTree(plan:Plan, depth:Integer):String = {
     if (_isRelevant(plan)) {

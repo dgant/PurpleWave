@@ -36,6 +36,6 @@ class PlanBuildUnitFromBuilding(
     }
     
     _isFinished ||= _tactic.exists(_.isComplete)
-    _tactic.filterNot(t => _isFinished).foreach(With.commander.queue(_))
+    _tactic.filterNot(t => _isFinished).foreach(With.commander.enqueue(_))
   }
 }

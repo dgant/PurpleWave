@@ -23,6 +23,6 @@ class PlanGatherMinerals extends Plan {
       .filterNot(_workerTactics.contains)
       .foreach(worker => _workerTactics.put(worker, new TacticGatherMinerals(worker)))
     
-    _workerTactics.values.foreach(With.commander.queue)
+    _workerTactics.values.foreach(With.commander.enqueue)
   }
 }

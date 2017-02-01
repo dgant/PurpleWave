@@ -5,11 +5,15 @@ import bwapi.Position
 
 object AutoCamera {
   
-  var enable = true
+  var enabled = true
   var unit:Option[bwapi.Unit] = None
   var pointOfInterest = new Position(0, 0)
 
   def render() {
+    if ( ! enabled) {
+      return
+    }
+    
     if (unit == None || ! unit.get.exists()) {
       pickNewUnit()
     }

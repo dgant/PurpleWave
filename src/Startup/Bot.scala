@@ -22,7 +22,7 @@ class Bot() extends DefaultBWListener {
     Logger.debug("Bot initialization complete.")
     
     val manualControl = true
-    AutoCamera.enable = ! manualControl
+    AutoCamera.enabled = ! manualControl
     
     if (manualControl) {
       With.game.setLocalSpeed(1)

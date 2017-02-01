@@ -37,13 +37,13 @@ class PlanTrainUnitFromBuilding(
     }
     
     _trainerPlan.units.headOption.foreach(
-      builder => {
-        if (_orderedTrainer.contains(builder)) {
+      trainer => {
+        if (_orderedTrainer.contains(trainer)) {
           if (_trainee.isEmpty) {
             _trainee = With.ourUnits.filter(u => u.getType == traineeType && ! u.isCompleted).headOption
           }
         }
-        else {
+        if (trainer.getTrainingQueue.isEmpty || _trainee.isEmpty) {
           val trainer = _trainerPlan.units.head
           trainer.build(traineeType)
           _orderedTrainer = Some(trainer)

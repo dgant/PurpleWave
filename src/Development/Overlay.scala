@@ -3,6 +3,7 @@ package Development
 import Startup.With
 import Types.Plans.Generic.Allocation.{PlanAcquireCurrency, PlanAcquireUnits}
 import Types.Plans.Plan
+import Types.Traits.ResourceRequest
 
 object Overlay {
   def render() {
@@ -12,7 +13,11 @@ object Overlay {
   }
   
   def _describePlanTree(plan:Plan, depth:Integer):String = {
-    _describePlan(plan, depth) + plan.children.map(_describePlanTree(_, depth + 1)).mkString("")
+    if (_isRelevant(plan)) {
+      _describePlan(plan, depth) ++ plan.children.map(_describePlanTree(_, depth + 1)).mkString("")
+    } else {
+      ""
+    }
   }
   
   def _describePlan(plan:Plan, depth:Integer):String = {
@@ -49,5 +54,13 @@ object Overlay {
       .replace("Protoss_", "")
       .replace("Neutral_", "")
       .replaceAll("_", " ")
+  }
+  
+  def _isRelevant(plan:Plan):Boolean = {
+    if (plan.isComplete) {
+      return plan.isInstanceOf[ResourceRequest]
+    }
+    
+    plan.children.exists(_isRelevant(_))
   }
 }

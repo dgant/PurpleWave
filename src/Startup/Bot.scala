@@ -21,6 +21,7 @@ class Bot() extends DefaultBWListener {
     BWTA.analyze()
     Logger.debug("Bot initialization complete.")
     With.game.setLocalSpeed(0)
+    With.game.enableFlag(1) //Enable user input
   }
   
   def _onFrame() {

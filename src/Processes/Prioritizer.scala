@@ -1,19 +1,26 @@
 package Processes
 
 import Startup.With
-import Types.Requirements.Buyer
+import Types.Plans.Plan
+import Types.Traits.ResourceRequest
 
 class Prioritizer {
   var _nextPriority:Integer = 0
   
-  def startFrame() {
+  def reassignPriorities() {
     _nextPriority = 0
-    prioritize(With.gameplan)
-    With.gameplan.children.foreach(prioritize)
+    _prioritizeRecurisvely(With.gameplan)
   }
   
-  def prioritize(buyer:Buyer) {
-    buyer.priority = _nextPriority
-    _nextPriority += 1
+  def _prioritizeRecurisvely(plan:Plan) {
+    Iterable(plan)
+      .filter(_.isInstanceOf[ResourceRequest])
+      .map(_.asInstanceOf[ResourceRequest])
+      .foreach(plan => {
+        plan.priority = _nextPriority
+        _nextPriority += 1
+      })
+    
+    plan._children.foreach(_prioritizeRecurisvely)
   }
 }

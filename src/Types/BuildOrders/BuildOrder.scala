@@ -3,7 +3,7 @@ package Types.BuildOrders
 import bwapi.UnitType
 
 class BuildOrder {
-  def buildOrder = Array(
+  def _buildOrder = Array(
     UnitType.Terran_SCV,
     UnitType.Terran_SCV,
     UnitType.Terran_SCV,
@@ -15,7 +15,7 @@ class BuildOrder {
     UnitType.Terran_Marine
   )
 
-  def getUnitTypes():Iterable[bwapi.UnitType] = {
-    return buildOrder
+  def orders():Iterable[bwapi.UnitType] = {
+    return _buildOrder
   }
 }

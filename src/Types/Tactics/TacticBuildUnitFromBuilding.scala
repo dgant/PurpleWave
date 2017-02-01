@@ -6,7 +6,7 @@ import bwapi.{TilePosition, UnitCommandType, UnitType}
 class TacticBuildUnitFromBuilding(
   unit:bwapi.Unit,
   unitType:UnitType,
-  val position:Option[TilePosition])
+  val position:Option[TilePosition] = None)
     extends Tactic(unit) {
   
   var _issuedOrder = false

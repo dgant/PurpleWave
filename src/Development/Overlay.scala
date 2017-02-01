@@ -1,11 +1,11 @@
 package Development
 
 import Startup.With
+import Types.Plans.Generic.Allocation.{PlanAcquireCurrency, PlanAcquireUnits}
 import Types.Plans.Plan
-import Types.Requirements.{RequireAll, RequireCurrency, RequireUnits, Requirement}
 
 object Overlay {
-  def update() {
+  def render() {
     With.game.drawTextScreen(
       5, 5,
       _describePlanTree(With.gameplan, 0))
@@ -18,16 +18,17 @@ object Overlay {
   def _describePlan(plan:Plan, depth:Integer):String = {
     val planName = plan.getClass.getSimpleName
     
-    val qualities =
-      (if (plan.active) "active " else "") ++
-      (if (plan.isComplete) "complete" else "")
+    val qualities = (if (plan.isComplete) "complete" else "")
     
-    val resources = _getRequirementsCurrency(plan._requirements)
+    val resources = Iterable(plan)
+      .filter(_.isInstanceOf[PlanAcquireCurrency])
+      .map(_.asInstanceOf[PlanAcquireCurrency])
       .map(r => "  " * 2 * depth ++ r.minerals.toString ++ "m " ++ r.gas.toString ++ "g " ++ r.supply.toString ++ "s\n")
       .mkString("")
     
-    val units = _getRequirementsUnits(plan._requirements)
-      .flatten(With.recruiter.getUnits(_))
+    val units = Iterable(plan)
+      .filter(_.isInstanceOf[PlanAcquireUnits])
+      .flatten(_.asInstanceOf[PlanAcquireUnits].units)
       .groupBy(unit => unit.getType.toString)
       .map(pair => "  " * 2 * depth ++ pair._2.size.toString ++ " " ++ _formatUnitTypeName(pair._1) ++ "\n")
       .mkString("")
@@ -40,34 +41,6 @@ object Overlay {
       ++ "\n"
       ++ resources
       ++ units)
-  }
-  
-  // This is dumb, but type erasure in Java makes it impossible (I think) to implement these generically
-  def _getRequirementsUnits(requirement:Requirement):Iterable[RequireUnits] = {
-    val a = Iterable(requirement)
-      .filter(_.isInstanceOf[RequireUnits])
-      .map(_.asInstanceOf[RequireUnits])
-    
-    val b = Iterable(requirement)
-      .filter(_.isInstanceOf[RequireAll])
-      .map(_.asInstanceOf[RequireAll])
-      .flatten(r => r._requirements.flatten(_getRequirementsUnits))
-    
-    a ++ b
-  }
-  
-  // This is dumb, but type erasure in Java makes it impossible (I think) to implement these generically
-  def _getRequirementsCurrency(requirement:Requirement):Iterable[RequireCurrency] = {
-    val a = Iterable(requirement)
-      .filter(_.isInstanceOf[RequireCurrency])
-      .map(_.asInstanceOf[RequireCurrency])
-    
-    val b = Iterable(requirement)
-      .filter(_.isInstanceOf[RequireAll])
-      .map(_.asInstanceOf[RequireAll])
-      .flatten(r => r._requirements.flatten(_getRequirementsCurrency))
-    
-    a ++ b
   }
   
   def _formatUnitTypeName(name: String):String = {

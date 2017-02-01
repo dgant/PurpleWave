@@ -1,43 +1,44 @@
 package Processes
 
 import Startup.With
-import Types.Requirements.RequireCurrency
+import Types.Traits.CurrencyRequest
 
 import scala.collection.mutable
 
 class Banker {
-  var _minerals = 0
-  var _gas = 0
-  var _supply = 0
-  val _requirements:mutable.Set[RequireCurrency] = mutable.Set.empty
+  var _mineralsLeft = 0
+  var _gasLeft = 0
+  var _supplyLeft = 0
+  val _requests = new mutable.HashSet[CurrencyRequest]()
   
-  def startFrame() {
-    _minerals  = With.game.self.minerals
-    _gas       = With.game.self.gas
-    _supply    = With.game.self.supplyTotal - With.game.self.supplyUsed
-    _requirements.toSeq.sortBy(- _.priority).foreach(_deductContractValue)
+  def recountResources() {
+    _mineralsLeft  = With.game.self.minerals
+    _gasLeft       = With.game.self.gas
+    _supplyLeft    = With.game.self.supplyTotal - With.game.self.supplyUsed
+    _requests.toSeq.sortBy(- _.priority).foreach(_queueBuyer)
   }
   
-  def fulfill(requirement:RequireCurrency) {
-    _requirements.add(requirement)
-    startFrame()
+  def add(request:CurrencyRequest) {
+    _requests.add(request)
+    recountResources()
   }
   
-  def abort(requirement:RequireCurrency) {
-    _requirements.remove(requirement)
-    startFrame()
+  def remove(request:CurrencyRequest) {
+    request.requestFulfilled = false
+    _requests.remove(request)
+    recountResources()
   }
   
-  def _deductContractValue(requirement: RequireCurrency) {
-    requirement.isAvailableNow = _isAvailableNow(requirement)
-    _minerals -= requirement.minerals
-    _gas      -= requirement.gas
-    _supply   -= requirement.supply
+  def _queueBuyer(request:CurrencyRequest) {
+    request.requestFulfilled = _isAvailableNow(request)
+    _mineralsLeft -= request.minerals
+    _gasLeft      -= request.gas
+    _supplyLeft   -= request.supply
   }
   
-  def _isAvailableNow(requirement:RequireCurrency): Boolean = {
-    _minerals  >= requirement.minerals &&
-    _gas       >= requirement.gas &&
-    _supply    >= requirement.supply
+  def _isAvailableNow(request:CurrencyRequest): Boolean = {
+    _mineralsLeft  >= request.minerals &&
+    _gasLeft       >= request.gas &&
+    _supplyLeft    >= request.supply
   }
 }

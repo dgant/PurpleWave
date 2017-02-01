@@ -9,7 +9,7 @@ object AutoCamera {
   var unit:Option[bwapi.Unit] = None
   var pointOfInterest:Position = new Position(0, 0)
 
-  def update() {
+  def render() {
     if (unit == None || ! unit.get.exists()) {
       pickNewUnit()
     }

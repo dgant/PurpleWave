@@ -3,26 +3,27 @@ package Types.Plans.Generic.Macro
 import Startup.With
 import Types.Plans.Generic.Allocation.PlanAcquireUnitsGreedily
 import Types.Plans.Plan
-import Types.Tactics.{Tactic, TacticGatherMinerals}
 import UnitMatchers.UnitMatchWorker
 
-import scala.collection.mutable
+import scala.collection.JavaConverters._
 
 class PlanGatherMinerals extends Plan {
   
   val _workerPlan = new PlanAcquireUnitsGreedily(UnitMatchWorker)
   _children = List(_workerPlan)
   
-  val _workerTactics:mutable.Map[bwapi.Unit, Tactic] = mutable.Map.empty
+  var _mineral:Option[bwapi.Unit] = None
   
   override def execute() {
-    _workerPlan.execute()
-    
-    _workerTactics.keySet.diff(_workerPlan.units).foreach(_workerTactics.remove)
-    _workerPlan.units
-      .filterNot(_workerTactics.contains)
-      .foreach(worker => _workerTactics.put(worker, new TacticGatherMinerals(worker)))
-    
-    _workerTactics.values.foreach(With.commander.enqueue)
+    if (_mineral.isEmpty) {
+      _mineral = With.game.getMinerals.asScala.filter(_.isVisible).headOption
+    }
+  
+    if ( ! _mineral.isEmpty) {
+      _workerPlan.execute()
+      _workerPlan.units
+        .filterNot(worker => worker.isGatheringMinerals)
+        .foreach(worker => worker.gather(_mineral.head))
+    }
   }
 }

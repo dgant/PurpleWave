@@ -19,7 +19,7 @@ class Recruiter {
     
     // Add new units
     //
-    With.game.self.getUnits.asScala.filter(_.isCompleted).toSet.diff(_unassigned ++ _assignments.keys).foreach(_unassigned.add)
+    With.ourUnits.filter(_.isCompleted).toSet.diff(_unassigned ++ _assignments.keys).foreach(_unassigned.add)
   }
   
   def add(request: PlanAcquireUnits) {
@@ -36,11 +36,7 @@ class Recruiter {
             With.prioritizer.getPriority(request) <
             With.prioritizer.getPriority(otherRequest))
           .map(getUnits))
-  
-    // This process is kind of goofy:
-    // The request flags itself fulfilled if it likes the most recent offer
-    // BEFORE the units are actually assigned
-    //
+
     if (requiredUnits == None) {
       request.requestFulfilled = false
       remove(request)

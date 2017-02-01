@@ -2,12 +2,11 @@ package Processes
 
 import Startup.With
 import bwapi.{TilePosition, UnitType}
-import scala.collection.JavaConverters._
 
 object Architect {
   
   def getHq():TilePosition = {
-    With.game.self.getUnits.asScala
+    With.ourUnits
       .filter(_.getType.isResourceDepot)
       .map(_.getTilePosition)
       .headOption
@@ -22,7 +21,7 @@ object Architect {
       :Option[TilePosition] = {
   
     _radialSearch(center, searchRadius)
-      .filter(_canBuildWithMargin(_, buildingType))
+      .filter(_canBuildWithMargin(_, buildingType, margin))
       .headOption
   }
   
@@ -43,7 +42,7 @@ object Architect {
   def _canBuildWithMargin(
     position:TilePosition,
     buildingType:UnitType,
-    margin:Integer=0):Boolean = {
+    margin:Integer):Boolean = {
     (Iterable(position) ++ _radialSearch(position, margin))
         .forall(With.game.canBuildHere(_, buildingType))
   }

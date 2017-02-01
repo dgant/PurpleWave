@@ -3,11 +3,11 @@ package Development
 import Startup.With
 import bwapi.Position
 
-import scala.collection.JavaConverters._
-
 object AutoCamera {
+  
+  var enable = true
   var unit:Option[bwapi.Unit] = None
-  var pointOfInterest:Position = new Position(0, 0)
+  var pointOfInterest = new Position(0, 0)
 
   def render() {
     if (unit == None || ! unit.get.exists()) {
@@ -28,7 +28,7 @@ object AutoCamera {
   }
 
   def pickNewUnit() {
-    var units = With.game.self.getUnits.asScala
+    val units = With.ourUnits
       .filter(unit => unit.isVisible)
       .sortBy(unit => pointOfInterest.getApproxDistance(unit.getPosition))
 

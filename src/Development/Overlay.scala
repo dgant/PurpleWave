@@ -3,6 +3,7 @@ package Development
 import Startup.With
 import Types.Plans.Generic.Allocation.{PlanAcquireCurrency, PlanAcquireUnits}
 import Types.Plans.Plan
+import bwapi.UnitCommandType
 
 object Overlay {
   
@@ -12,16 +13,28 @@ object Overlay {
       5, 5,
       _describePlanTree(With.gameplan, 0))
     
-    _drawTactics()
+    _drawUnits()
   }
   
-  def _drawTactics() {
-    With.commander.getQueue()
-      .foreach(tactic => With.game.drawTextMap(
-        tactic.unit.getPosition,
-        tactic.getClass.getSimpleName.replace("Tactic", "")))
+  def _drawTextLabel(textLines:Iterable[String], unit:bwapi.Unit) {
+    val horizontalMargin = 2
+    val x = unit.getPosition.getX - horizontalMargin
+    val y = unit.getPosition.getY
+    val width = (9 * textLines.map(_.size).max) / 2 + 2 * horizontalMargin
+    val height = 11 * textLines.size
+  
+    With.game.drawBox(bwapi.CoordinateType.Enum.Map, x, y, x+width, y+height, bwapi.Color.Grey, true)
+    With.game.drawTextMap(unit.getPosition, textLines.mkString("\n"))
   }
   
+  def _drawUnits() {
+    With.ourUnits
+      .filterNot(_.getLastCommand.getUnitCommandType == UnitCommandType.None)
+      .foreach(unit => _drawTextLabel(
+      Iterable(unit.getLastCommand.getUnitCommandType.toString),
+      unit
+    ))
+  }
   
   def _describePlanTree(plan:Plan, depth:Integer):String = {
     if (_isRelevant(plan)) {

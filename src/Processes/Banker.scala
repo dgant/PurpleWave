@@ -30,10 +30,13 @@ class Banker {
   }
   
   def _queueBuyer(request:PlanAcquireCurrency) {
-    request.requestFulfilled = _isAvailableNow(request)
-    _mineralsLeft -= request.minerals
-    _gasLeft      -= request.gas
-    _supplyLeft   -= request.supply
+    request.requestFulfilled = request.isSpent || _isAvailableNow(request)
+    
+    if ( ! request.isSpent) {
+      _mineralsLeft -= request.minerals
+      _gasLeft      -= request.gas
+      _supplyLeft   -= request.supply
+    }
   }
   
   def _isAvailableNow(request:PlanAcquireCurrency): Boolean = {

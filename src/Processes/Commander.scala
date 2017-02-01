@@ -21,7 +21,7 @@ class Commander {
   }
   
   def execute() {
-    _tactics.foreach(_.execute())
+    _tactics.filterNot(_.isComplete).foreach(_.execute())
     
   }
 }

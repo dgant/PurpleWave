@@ -8,6 +8,7 @@ class PlanAcquireCurrency extends Plan {
   var gas = 0
   var supply = 0
   var requestFulfilled = false
+  var isSpent = false
   
   override def isComplete(): Boolean = { requestFulfilled }
   
@@ -17,5 +18,6 @@ class PlanAcquireCurrency extends Plan {
   
   override def abort() {
     With.bank.remove(this)
+    isSpent = false
   }
 }

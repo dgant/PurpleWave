@@ -20,7 +20,7 @@ class Bot() extends DefaultBWListener {
     Logger.debug("Analyzing map")
     BWTA.analyze()
     Logger.debug("Bot initialization complete.")
-    With.game.setLocalSpeed(1)
+    With.game.setLocalSpeed(0)
   }
   
   def _onFrame() {

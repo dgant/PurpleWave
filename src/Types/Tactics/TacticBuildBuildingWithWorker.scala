@@ -20,7 +20,10 @@ class TacticBuildBuildingWithWorker(
   }
   
   override def execute() {
+  
+    worker.build(buildingType, position.get)
     
+    /*
     if (_startedBuilding) {
     }
     else if (_issuedOrder) {
@@ -39,6 +42,7 @@ class TacticBuildBuildingWithWorker(
       _timeout = With.game.getFrameCount + buildingType.buildTime
       _issuedOrder = true
     }
+    */
   }
   
   def _isBuildingOrTraining(): Boolean = {

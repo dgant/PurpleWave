@@ -1,12 +1,11 @@
 package Types.Tactics
 
 import Startup.With
-import bwapi.{TilePosition, UnitCommandType, UnitType}
+import bwapi.{UnitCommandType, UnitType}
 
 class TacticBuildUnitFromBuilding(
   unit:bwapi.Unit,
-  unitType:UnitType,
-  positionFinder:PositionFinder)
+  unitType:UnitType)
     extends Tactic(unit) {
   
   var _issuedOrder = false

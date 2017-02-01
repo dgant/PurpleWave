@@ -4,7 +4,9 @@ import Startup.With
 import Types.Plans.Plan
 
 class PlanAcquireCurrency extends Plan {
-  
+  var minerals = 0
+  var gas = 0
+  var supply = 0
   var requestFulfilled = false
   
   override def isComplete(): Boolean = { requestFulfilled }

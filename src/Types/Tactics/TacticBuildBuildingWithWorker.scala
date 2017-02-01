@@ -28,7 +28,7 @@ class TacticBuildBuildingWithWorker(
     else {
       _startedBuilding = false
       _resetTimeout()
-      worker.build(buildingType, positionFinder.find())
+      positionFinder.find().foreach(worker.build(buildingType, _))
     }
   }
   

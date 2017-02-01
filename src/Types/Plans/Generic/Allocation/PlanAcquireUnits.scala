@@ -23,4 +23,6 @@ abstract class PlanAcquireUnits extends Plan {
   def units():mutable.Set[Unit] = {
     With.recruiter.getUnits(this)
   }
+  
+  def getRequiredUnits(candidates:Iterable[Iterable[bwapi.Unit]]):Option[Iterable[bwapi.Unit]]
 }

@@ -3,7 +3,6 @@ package Development
 import Startup.With
 import Types.Plans.Generic.Allocation.{PlanAcquireCurrency, PlanAcquireUnits}
 import Types.Plans.Plan
-import Types.Traits.ResourceRequest
 
 object Overlay {
   def render() {
@@ -58,7 +57,7 @@ object Overlay {
   
   def _isRelevant(plan:Plan):Boolean = {
     if (plan.isComplete) {
-      return plan.isInstanceOf[ResourceRequest]
+      return plan.isInstanceOf[PlanAcquireCurrency] || plan.isInstanceOf[PlanAcquireUnits]
     }
     
     plan.children.exists(_isRelevant(_))

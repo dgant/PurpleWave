@@ -1,15 +1,12 @@
 package Types.Plans.Generic.Macro
 
-import Processes.Architect
 import Startup.With
 import Types.Plans.Generic.Allocation.{PlanAcquireCurrencyForUnit, PlanAcquireUnitsExactly}
 import Types.Plans.Generic.Compound.PlanDelegateInSerial
-import Types.Tactics.Tactic
-import Types.Tactics.Types.Tactics.TacticBuildBuildingWithWorker
+import Types.PositionFinders.PositionFindBuildingSimple
+import Types.Tactics.{Tactic, TacticBuildBuildingWithWorker}
 import UnitMatchers.UnitMatchType
 import bwapi.UnitType
-
-import scala.collection.JavaConverters._
 
 class PlanBuildBuildingWithWorker(
   val builder:UnitType,
@@ -20,6 +17,7 @@ class PlanBuildBuildingWithWorker(
   val _workerPlan = new PlanAcquireUnitsExactly(new UnitMatchType(builder), 1)
   _children = List(_currencyPlan, _workerPlan)
   
+  val _positionFinder = new PositionFindBuildingSimple(product)
   var _tactic:Option[Tactic] = None
   var _isFinished = false
   
@@ -34,15 +32,7 @@ class PlanBuildBuildingWithWorker(
     super.execute()
     
     if (_tactic == None && _children.forall(_.isComplete)) {
-      
-      val basePosition = With.game.self.getUnits.asScala
-        .filter(_.getType.isBuilding)
-        .sortBy( ! _.getType.isResourceDepot)
-        .head
-        .getTilePosition
-      
-      val position = Architect.placeBuilding(product, basePosition)
-      _tactic = Some(new TacticBuildBuildingWithWorker(_workerPlan.units.head, product, position))
+      _tactic = Some(new TacticBuildBuildingWithWorker(_workerPlan.units.head, product, _positionFinder))
     }
   
     _isFinished ||= _tactic.exists(_.isComplete)

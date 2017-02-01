@@ -14,9 +14,10 @@ class PlanAcquireUnitsExactly(
     
     candidates
       .foreach(pool => pool
-        .filter(x => desiredUnits.size < quantity)
-        .filter(unitMatcher.accept(_))
-        .foreach(desiredUnits.add(_)))
+        .foreach(unit =>
+          if (desiredUnits.size < quantity && unitMatcher.accept(unit)) {
+            desiredUnits.add(unit)
+          }))
     
     if (desiredUnits.size >= quantity) {
       Some(desiredUnits)

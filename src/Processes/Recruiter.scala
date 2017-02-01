@@ -59,7 +59,7 @@ class Recruiter {
   }
   
   def remove(request: PlanAcquireUnits) {
-    _requests.get(request).foreach(_.foreach(unit => { _unassigned.add(unit); _assignments.remove(unit) }))
+    _requests.get(request).foreach(_.foreach(_unassign))
     _requests.remove(request)
   }
   

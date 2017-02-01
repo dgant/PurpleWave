@@ -6,7 +6,7 @@ import Types.Plans.Generic.Allocation.{PlanAcquireCurrencyForUnit, PlanAcquireUn
 import Types.Plans.Generic.Compound.PlanDelegateInSerial
 import Types.Tactics.Tactic
 import Types.Tactics.Types.Tactics.TacticBuildBuildingWithWorker
-import UnitMatching.Matcher.UnitMatchType
+import UnitMatchers.UnitMatchType
 import bwapi.UnitType
 
 import scala.collection.JavaConverters._

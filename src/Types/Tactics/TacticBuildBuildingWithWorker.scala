@@ -1,14 +1,13 @@
 package Types.Tactics
 
-package Types.Tactics
-
 import Startup.With
-import bwapi.{TilePosition, UnitCommandType, UnitType}
+import Types.PositionFinders.PositionFinder
+import bwapi.{UnitCommandType, UnitType}
 
 class TacticBuildBuildingWithWorker(
   worker:bwapi.Unit,
   buildingType:UnitType,
-  val position:Option[TilePosition])
+  positionFinder:PositionFinder)
     extends Tactic(worker) {
 
   var _startedBuilding = false
@@ -29,7 +28,7 @@ class TacticBuildBuildingWithWorker(
     else {
       _startedBuilding = false
       _resetTimeout()
-      worker.build(buildingType, position.get)
+      worker.build(buildingType, positionFinder.find())
     }
   }
   

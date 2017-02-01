@@ -2,12 +2,13 @@ package Types.Plans.Generic.Allocation
 
 import Startup.With
 import Types.Plans.Plan
-import Types.Traits.UnitRequest
 import bwapi.Unit
 
 import scala.collection.mutable
 
-abstract class PlanAcquireUnits extends Plan with UnitRequest {
+abstract class PlanAcquireUnits extends Plan {
+  
+  var requestFulfilled = false
   
   override def isComplete(): Boolean = { requestFulfilled }
   

@@ -2,9 +2,10 @@ package Types.Plans.Generic.Allocation
 
 import Startup.With
 import Types.Plans.Plan
-import Types.Traits.CurrencyRequest
 
-class PlanAcquireCurrency extends Plan with CurrencyRequest {
+class PlanAcquireCurrency extends Plan {
+  
+  var requestFulfilled = false
   
   override def isComplete(): Boolean = { requestFulfilled }
   

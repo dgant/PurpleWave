@@ -4,7 +4,7 @@ import Startup.With
 import Types.Plans.Generic.Allocation.PlanAcquireUnitsGreedily
 import Types.Plans.Plan
 import Types.Tactics.{Tactic, TacticGatherMinerals}
-import UnitMatching.Matcher.UnitMatchWorker
+import UnitMatchers.UnitMatchWorker
 
 import scala.collection.mutable
 

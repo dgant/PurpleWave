@@ -4,7 +4,7 @@ import Startup.With
 import Types.Plans.Generic.Allocation.{PlanAcquireCurrencyForUnit, PlanAcquireUnitsExactly}
 import Types.Plans.Generic.Compound.PlanDelegateInSerial
 import Types.Tactics.{Tactic, TacticBuildUnitFromBuilding}
-import UnitMatching.Matcher.UnitMatchType
+import UnitMatchers.UnitMatchType
 import bwapi.UnitType
 
 class PlanBuildUnitFromBuilding(

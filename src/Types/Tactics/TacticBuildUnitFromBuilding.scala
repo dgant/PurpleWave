@@ -9,6 +9,7 @@ class TacticBuildUnitFromBuilding(
   val position:Option[TilePosition] = None)
     extends Tactic(unit) {
   
+  var _issuedOrder = false
   var _startedBuilding = false
   var _timeout = Integer.MAX_VALUE
   
@@ -18,14 +19,19 @@ class TacticBuildUnitFromBuilding(
   
   override def execute() {
     
-    if (_isBuildingOrTraining) {
+    if (_issuedOrder && _isTraining) {
       if ( ! _startedBuilding) {
         _setTimeout()
       }
       _startedBuilding = true
     }
-    else if (unit.getTrainingQueue.isEmpty) {
-      unit.train(unitType)
+    else {
+      _issuedOrder = false
+  
+      if (unit.getTrainingQueue.isEmpty) {
+        unit.train(unitType)
+        _issuedOrder = true
+      }
     }
   }
   
@@ -33,7 +39,7 @@ class TacticBuildUnitFromBuilding(
     _timeout = With.game.getFrameCount + unitType.buildTime
   }
   
-  def _isBuildingOrTraining(): Boolean = {
+  def _isTraining(): Boolean = {
     unit.getLastCommand.getUnitCommandType == UnitCommandType.Train
   }
 }

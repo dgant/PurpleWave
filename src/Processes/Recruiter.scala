@@ -48,13 +48,14 @@ class Recruiter {
     else {
       request.requestFulfilled = true
   
-      // Unassign any units we no longer want
-      //
-      getUnits(request).diff(requiredUnits.get.toSet).foreach(_unassign)
-  
-      //Assign the requested units
-      //
-      requiredUnits.get.foreach(unit => _assign(unit, request))
+      // 1. Unassign all the current units
+      // 2. Unassign all the required units
+      // 3. Assign all the required units
+      val unitsOld = getUnits(request)
+      val unitsNew = requiredUnits.get
+      unitsOld.foreach(_unassign)
+      unitsNew.foreach(_unassign)
+      unitsNew.foreach(_assign(_, request))
     }
   }
   

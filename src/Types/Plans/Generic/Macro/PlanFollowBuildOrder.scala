@@ -11,13 +11,12 @@ class PlanFollowBuildOrder extends PlanDelegateInParallel {
   _children = buildOrder.orders.map(_createABuildPlan)
   
   def _createABuildPlan(product: UnitType):Plan = {
-    val builder = product.whatBuilds.first
     
-    if (builder.isBuilding) {
-      return new PlanTrainUnitFromBuilding(product)
+    if (product.isBuilding) {
+      return new PlanBuildBuilding(product)
     }
-    if (builder.isWorker) {
-      return new PlanBuildBuildingWithWorker(builder, product)
+    else {
+      return new PlanTrainUnit(product)
     }
     
     throw new Exception("Don't know how to build this yet.")

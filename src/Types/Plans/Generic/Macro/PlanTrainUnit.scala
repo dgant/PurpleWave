@@ -7,7 +7,7 @@ import Types.Plans.Generic.Compound.PlanDelegateInSerial
 import UnitMatchers.UnitMatchType
 import bwapi.UnitType
 
-class PlanTrainUnitFromBuilding(val traineeType:UnitType) extends PlanDelegateInSerial {
+class PlanTrainUnit(val traineeType:UnitType) extends PlanDelegateInSerial {
   
   val _currencyPlan = new PlanAcquireCurrencyForUnit(traineeType)
   val _trainerPlan = new PlanAcquireUnitsExactly(new UnitMatchType(traineeType.whatBuilds.first), 1)

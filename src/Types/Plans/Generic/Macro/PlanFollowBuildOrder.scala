@@ -14,7 +14,7 @@ class PlanFollowBuildOrder extends PlanDelegateInParallel {
     val builder = product.whatBuilds.first
     
     if (builder.isBuilding) {
-      return new PlanTrainUnitFromBuilding(builder, product)
+      return new PlanTrainUnitFromBuilding(product)
     }
     if (builder.isWorker) {
       return new PlanBuildBuildingWithWorker(builder, product)

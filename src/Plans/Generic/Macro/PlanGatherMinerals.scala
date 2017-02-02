@@ -3,7 +3,7 @@ package Plans.Generic.Macro
 import Startup.With
 import Plans.Generic.Allocation.PlanAcquireUnitsGreedily
 import Plans.Plan
-import UnitMatchers.UnitMatchWorker
+import Types.UnitMatchers.UnitMatchWorker
 
 import scala.collection.JavaConverters._
 

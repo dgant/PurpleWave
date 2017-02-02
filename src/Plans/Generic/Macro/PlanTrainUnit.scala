@@ -4,7 +4,7 @@ import Development.{Logger, TypeDescriber}
 import Plans.Generic.Allocation.{PlanAcquireCurrencyForUnit, PlanAcquireUnitsExactly}
 import Plans.Generic.Compound.PlanDelegateInSerial
 import Startup.With
-import UnitMatchers.UnitMatchType
+import Types.UnitMatchers.UnitMatchType
 import bwapi.UnitType
 
 class PlanTrainUnit(val traineeType:UnitType) extends PlanDelegateInSerial {

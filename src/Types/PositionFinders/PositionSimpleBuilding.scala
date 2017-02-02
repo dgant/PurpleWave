@@ -4,7 +4,7 @@ import Development.Logger
 import Processes.Architect
 import bwapi.{TilePosition, UnitType}
 
-class PositionFindBuildingSimple(
+class PositionSimpleBuilding(
   val buildingType:UnitType)
     extends PositionFinder {
   
@@ -12,7 +12,8 @@ class PositionFindBuildingSimple(
     val output = Architect.placeBuilding(
       buildingType,
       Architect.getHq,
-      margin = 1)
+      margin = 0,
+      searchRadius = 50)
     
     if (output == None) {
       Logger.warn("Failed to place a " ++ buildingType.toString)

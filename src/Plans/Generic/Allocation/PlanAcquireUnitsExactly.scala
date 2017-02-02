@@ -1,7 +1,7 @@
 package Plans.Generic.Allocation
 
 import Startup.With
-import UnitMatchers.UnitMatcher
+import Types.UnitMatchers.UnitMatcher
 
 class PlanAcquireUnitsExactly(
   val unitMatcher:UnitMatcher,

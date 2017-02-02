@@ -4,13 +4,13 @@ import Development.{Logger, TypeDescriber}
 import Startup.With
 import Plans.Generic.Allocation.{PlanAcquireCurrencyForUnit, PlanAcquireUnitsExactly}
 import Plans.Generic.Compound.PlanDelegateInSerial
-import Types.PositionFinders.PositionFindBuildingSimple
-import UnitMatchers.{UnitMatchType, UnitMatchTypeAbandonedBuilding}
+import Types.PositionFinders.PositionSimpleBuilding
+import Types.UnitMatchers.{UnitMatchType, UnitMatchTypeAbandonedBuilding}
 import bwapi.UnitType
 
 class PlanBuildBuilding(val buildingType:UnitType) extends PlanDelegateInSerial {
   
-  val _positionFinder = new PositionFindBuildingSimple(buildingType)
+  val _positionFinder = new PositionSimpleBuilding(buildingType)
   
   val _currencyPlan = new PlanAcquireCurrencyForUnit(buildingType)
   val _builderPlan = new PlanAcquireUnitsExactly(new UnitMatchType(buildingType.whatBuilds.first), 1)
@@ -65,12 +65,20 @@ class PlanBuildBuilding(val buildingType:UnitType) extends PlanDelegateInSerial 
   def _orderToBuild(builder:bwapi.Unit) {
     if (_lastOrderFrame < With.game.getFrameCount - 24) {
       _lastOrderFrame = With.game.getFrameCount
+      
       val position = _positionFinder.find
+  
       if (position.isEmpty) {
-        Logger.warn("Failed to find a position to place a " ++ buildingType.toString)
+        Logger.warn("Failed to place a " ++ buildingType.toString)
       }
       else {
-        _builder.get.build(buildingType, position.get)
+        val positionExplored = With.game.isExplored(position.get)
+        
+        if (positionExplored) {
+          builder.build(buildingType, position.get)
+        } else {
+          builder.move(position.get.toPosition)
+        }
       }
     }
   }

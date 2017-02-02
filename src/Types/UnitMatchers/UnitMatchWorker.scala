@@ -1,4 +1,4 @@
-package UnitMatchers
+package Types.UnitMatchers
 
 import bwapi.Unit
 

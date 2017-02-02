@@ -24,8 +24,8 @@ class Bot() extends DefaultBWListener {
     AutoCamera.enabled = ! manualControl
     
     if (manualControl) {
-      With.game.setLocalSpeed(1)
       With.game.enableFlag(1) //Enable user input
+      With.game.setLocalSpeed(5)
     } else {
       With.game.setLocalSpeed(0)
     }

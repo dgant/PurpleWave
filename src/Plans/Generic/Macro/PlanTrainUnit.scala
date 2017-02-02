@@ -52,7 +52,7 @@ class PlanTrainUnit(val traineeType:UnitType) extends PlanDelegateInSerial {
     // ---------- --------- ----- ----
     // Yes		    No		    -	    Wait
     // Yes		    Yes		    Yes	  Wait
-    // Yes		    Yes		    No	  WTF   (what the heck is it training, then?)
+    // Yes		    Yes		    No	  Wait (Unit should appear eventually)
     // No		      No		    -	    Order
     // No		      Yes		    -	    Order (again; unexpected, but stuff happens)
     
@@ -73,8 +73,9 @@ class PlanTrainUnit(val traineeType:UnitType) extends PlanDelegateInSerial {
             u.getY == trainer.getY)
           .headOption
         
-        //There seems to be a 1+ frame delay between the queue getting started and the unit being created
-        //So don't freak out if we don't see the unit right away
+        //There seems to be a 1+ frame delay between the queue getting started
+        //and the incomplete unit being created.
+        //So don't freak out if the unit doesn't show up right away
       }
     }
     else {

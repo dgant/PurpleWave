@@ -5,7 +5,7 @@ import Startup.With
 import Plans.Generic.Allocation.{PlanAcquireCurrencyForUnit, PlanAcquireUnitsExactly}
 import Plans.Generic.Compound.PlanDelegateInSerial
 import Types.PositionFinders.PositionFindBuildingSimple
-import UnitMatchers.{UnitMatchType, UnitMatchTypeIncomplete}
+import UnitMatchers.{UnitMatchType, UnitMatchTypeAbandonedBuilding}
 import bwapi.UnitType
 
 class PlanBuildBuilding(val buildingType:UnitType) extends PlanDelegateInSerial {
@@ -14,7 +14,7 @@ class PlanBuildBuilding(val buildingType:UnitType) extends PlanDelegateInSerial 
   
   val _currencyPlan = new PlanAcquireCurrencyForUnit(buildingType)
   val _builderPlan = new PlanAcquireUnitsExactly(new UnitMatchType(buildingType.whatBuilds.first), 1)
-  val _recyclePlan = new PlanAcquireUnitsExactly(new UnitMatchTypeIncomplete(buildingType), 1)
+  val _recyclePlan = new PlanAcquireUnitsExactly(new UnitMatchTypeAbandonedBuilding(buildingType), 1)
   
   _children = List(_currencyPlan, _builderPlan, _recyclePlan)
   

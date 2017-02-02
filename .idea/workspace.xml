@@ -22,21 +22,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="Banker.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Processes/Banker.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="171">
-              <caret line="28" column="22" lean-forward="true" selection-start-line="28" selection-start-column="22" selection-end-line="28" selection-end-column="22" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="Overlay.scala" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Development/Overlay.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="312">
-              <caret line="69" column="12" lean-forward="true" selection-start-line="69" selection-start-column="12" selection-end-line="69" selection-end-column="12" />
+            <state relative-caret-position="327">
+              <caret line="26" column="43" lean-forward="false" selection-start-line="26" selection-start-column="43" selection-end-line="26" selection-end-column="43" />
               <folding />
             </state>
           </provider>
@@ -70,6 +60,7 @@
       <find>requirement</find>
       <find>asScala</find>
       <find>completed</find>
+      <find>Terran</find>
     </findStrings>
     <replaceStrings>
       <replace>{  _mirror</replace>
@@ -80,8 +71,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/Types/Traits/PriceTag.scala" />
-        <option value="$PROJECT_DIR$/src/Types/Traits/Buyer.scala" />
         <option value="$PROJECT_DIR$/src/Types/Plans/ResourceAcquisition/PlanAcquireCurrencyForUnit.scala" />
         <option value="$PROJECT_DIR$/src/Types/Plans/ResourceAcquisition/PlanAcquireCurrency.scala" />
         <option value="$PROJECT_DIR$/src/Types/Plans/ResourceAcquisition/PlanAcquireUnit.scala" />
@@ -127,8 +116,10 @@
         <option value="$PROJECT_DIR$/src/UnitMatchers/UnitMatchTypeIncomplete.scala" />
         <option value="$PROJECT_DIR$/src/UnitMatchers/UnitMatchType.scala" />
         <option value="$PROJECT_DIR$/src/Processes/Recruiter.scala" />
-        <option value="$PROJECT_DIR$/src/Plans/Plan.scala" />
         <option value="$PROJECT_DIR$/src/Plans/Generic/Macro/PlanFollowBuildOrder.scala" />
+        <option value="$PROJECT_DIR$/src/Plans/Plan.scala" />
+        <option value="$PROJECT_DIR$/src/Development/TypeDescriber.scala" />
+        <option value="$PROJECT_DIR$/src/Plans/Generic/Macro/PlanBuildBuilding.scala" />
         <option value="$PROJECT_DIR$/src/Plans/Generic/Macro/PlanTrainUnit.scala" />
         <option value="$PROJECT_DIR$/src/Development/Overlay.scala" />
       </list>
@@ -670,7 +661,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="scala-line">
           <url>file://$PROJECT_DIR$/src/Plans/Generic/Macro/PlanTrainUnit.scala</url>
-          <line>74</line>
+          <line>78</line>
           <properties />
           <option name="timeStamp" value="159" />
         </line-breakpoint>
@@ -690,14 +681,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/Startup/Main.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="26">
-          <caret line="2" column="7" lean-forward="false" selection-start-line="2" selection-start-column="7" selection-end-line="2" selection-end-column="7" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Types/Requirements/Requirement.scala" />
     <entry file="file://$PROJECT_DIR$/src/Types/Requirements/RequireCurrency.scala" />
     <entry file="file://$PROJECT_DIR$/src/Types/Requirements/RequireAllInParallel.scala" />
@@ -741,6 +724,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="78">
           <caret line="6" column="6" lean-forward="false" selection-start-line="6" selection-start-column="6" selection-end-line="6" selection-end-column="6" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -813,14 +797,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="208">
           <caret line="16" column="24" lean-forward="false" selection-start-line="16" selection-start-column="24" selection-end-line="16" selection-end-column="24" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Allocation/PlanAcquireUnits.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="143">
-          <caret line="11" column="2" lean-forward="true" selection-start-line="11" selection-start-column="2" selection-end-line="11" selection-end-column="2" />
           <folding />
         </state>
       </provider>
@@ -905,14 +881,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Plans/Plan.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="39">
-          <caret line="3" column="16" lean-forward="false" selection-start-line="3" selection-start-column="16" selection-end-line="3" selection-end-column="16" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Startup/Bot.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="197">
@@ -929,22 +897,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Macro/PlanTrainUnit.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="145">
-          <caret line="58" column="5" lean-forward="true" selection-start-line="58" selection-start-column="5" selection-end-line="58" selection-end-column="5" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Macro/PlanBuildBuilding.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="321">
-          <caret line="29" column="4" lean-forward="false" selection-start-line="29" selection-start-column="4" selection-end-line="29" selection-end-column="4" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Processes/Banker.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="171">
@@ -953,10 +905,50 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/Plans/Plan.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="117">
+          <caret line="9" column="42" lean-forward="true" selection-start-line="9" selection-start-column="42" selection-end-line="9" selection-end-column="42" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Allocation/PlanAcquireUnits.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="143">
+          <caret line="11" column="2" lean-forward="true" selection-start-line="11" selection-start-column="2" selection-end-line="11" selection-end-column="2" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Development/TypeDescriber.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="52">
+          <caret line="4" column="20" lean-forward="false" selection-start-line="4" selection-start-column="7" selection-end-line="4" selection-end-column="20" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Macro/PlanBuildBuilding.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="234">
+          <caret line="24" column="2" lean-forward="false" selection-start-line="24" selection-start-column="2" selection-end-line="26" selection-end-column="3" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Macro/PlanTrainUnit.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="15" column="40" lean-forward="true" selection-start-line="15" selection-start-column="40" selection-end-line="15" selection-end-column="40" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/Development/Overlay.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="312">
-          <caret line="69" column="12" lean-forward="true" selection-start-line="69" selection-start-column="12" selection-end-line="69" selection-end-column="12" />
+        <state relative-caret-position="327">
+          <caret line="26" column="43" lean-forward="false" selection-start-line="26" selection-start-column="43" selection-end-line="26" selection-end-column="43" />
           <folding />
         </state>
       </provider>

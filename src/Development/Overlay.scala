@@ -18,13 +18,13 @@ object Overlay {
   
   def _drawTextLabel(textLines:Iterable[String], unit:bwapi.Unit) {
     val horizontalMargin = 2
-    val x = unit.getPosition.getX - horizontalMargin
-    val y = unit.getPosition.getY
     val width = (9 * textLines.map(_.size).max) / 2 + 2 * horizontalMargin
     val height = 11 * textLines.size
+    val x = unit.getPosition.getX - width/2 - horizontalMargin
+    val y = unit.getPosition.getY - height/2
   
     With.game.drawBox(bwapi.CoordinateType.Enum.Map, x, y, x+width, y+height, bwapi.Color.Grey, true)
-    With.game.drawTextMap(unit.getPosition, textLines.mkString("\n"))
+    With.game.drawTextMap(unit.getX-width/2, unit.getY-height/2, textLines.mkString("\n"))
   }
   
   def _drawUnits() {
@@ -47,41 +47,34 @@ object Overlay {
   }
   
   def _describePlan(plan:Plan, childOrder:Integer, depth:Integer):String = {
-    val planName = plan.getClass.getSimpleName
+    val planName = plan.getClass.getSimpleName.replace("Plan", "")
+    val planDescription = plan.describe.map(d => ": " + d).mkString("")
     val checkbox = if (plan.isComplete) "[X] " else "[_] "
     
     val resources = Iterable(plan)
       .filter(_.isInstanceOf[PlanAcquireCurrency])
       .map(_.asInstanceOf[PlanAcquireCurrency])
-      .map(r => ": " ++ r.minerals.toString ++ "m " ++ r.gas.toString ++ "g " ++ r.supply.toString ++ "s")
+      .map(r => r.minerals.toString ++ "m " ++ r.gas.toString ++ "g " ++ r.supply.toString ++ "s")
       .mkString("")
     
     val units = Iterable(plan)
       .filter(_.isInstanceOf[PlanAcquireUnits])
       .flatten(_.asInstanceOf[PlanAcquireUnits].units)
-      .groupBy(unit => unit.getType.toString)
-      .map(pair => ": " ++ pair._2.size.toString ++ " " ++ _formatUnitTypeName(pair._1))
+      .groupBy(unit => TypeDescriber.describeUnitType(unit.getType))
+      .map(pair => pair._2.size.toString ++ " " ++ pair._1)
       .mkString("")
     
+    val spacer = "  " * depth
+    val leftColumn =
     (checkbox
-      ++ "  " * depth
+      ++ spacer
       ++ "#"
       ++ (childOrder + 1).toString
       ++ " "
-      ++ plan.getClass.getSimpleName.replace("Plan", "")
-      ++ " " * Math.max(0, 20 - planName.size)
-      ++ resources
-      ++ units
-      ++ "\n")
-  }
-  
-  def _formatUnitTypeName(name: String):String = {
-    name
-      .replace("Terran_", "")
-      .replace("Zerg_", "")
-      .replace("Protoss_", "")
-      .replace("Neutral_", "")
-      .replaceAll("_", " ")
+      ++ planName
+      ++ planDescription)
+    
+    leftColumn + " " * Math.max(0, 45 - leftColumn.length) + "\n"
   }
   
   def _isRelevant(plan:Plan):Boolean = {

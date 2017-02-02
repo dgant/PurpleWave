@@ -7,4 +7,5 @@ abstract class Plan {
   def children(): Iterable[Plan] = { _children }
   def execute()
   def abort() { children().foreach(_.abort()) }
+  def describe():Option[String] = { None }
 }

@@ -1,5 +1,6 @@
 package Plans.Generic.Macro
 
+import Development.TypeDescriber
 import Plans.Generic.Allocation.{PlanAcquireCurrencyForUnit, PlanAcquireUnitsExactly}
 import Plans.Generic.Compound.PlanDelegateInSerial
 import Startup.With
@@ -14,6 +15,10 @@ class PlanTrainUnit(val traineeType:UnitType) extends PlanDelegateInSerial {
   
   var _trainer:Option[bwapi.Unit] = None
   var _trainee:Option[bwapi.Unit] = None
+  
+  override def describe(): Option[String] = {
+    Some(TypeDescriber.describeUnitType(traineeType))
+  }
   
   override def isComplete(): Boolean = {
     _trainee.exists(p => p.exists && p.isCompleted)
@@ -52,7 +57,6 @@ class PlanTrainUnit(val traineeType:UnitType) extends PlanDelegateInSerial {
     // Yes		    Yes		    No	  WTF   (what the heck is it training, then?)
     // No		      No		    -	    Order
     // No		      Yes		    -	    Order (again; unexpected, but stuff happens)
-    
     
     if ( ! _trainer.contains(trainer)) {
       _reset()

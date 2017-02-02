@@ -1,6 +1,6 @@
 package Plans.Generic.Macro
 
-import Development.Logger
+import Development.{Logger, TypeDescriber}
 import Startup.With
 import Plans.Generic.Allocation.{PlanAcquireCurrencyForUnit, PlanAcquireUnitsExactly}
 import Plans.Generic.Compound.PlanDelegateInSerial
@@ -21,6 +21,10 @@ class PlanBuildBuilding(val buildingType:UnitType) extends PlanDelegateInSerial 
   var _builder:Option[bwapi.Unit] = None
   var _building:Option[bwapi.Unit] = None
   var _lastOrderFrame = Integer.MIN_VALUE
+  
+  override def describe(): Option[String] = {
+    Some(TypeDescriber.describeUnitType(buildingType))
+  }
   
   override def isComplete(): Boolean = {
     _building.exists(_.isCompleted)

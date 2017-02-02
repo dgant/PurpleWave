@@ -25,6 +25,7 @@ class Bot() extends DefaultBWListener {
     
     if (manualControl) {
       With.game.enableFlag(1) //Enable user input
+      With.game.enableFlag(2) //black sheep wall
       With.game.setLocalSpeed(5)
     } else {
       With.game.setLocalSpeed(0)

@@ -1,19 +1,20 @@
 package Development
 
-import Startup.With
 import Plans.Generic.Allocation.{PlanAcquireCurrency, PlanAcquireUnits}
 import Plans.Plan
-import bwapi.UnitCommandType
+import Startup.With
+import bwapi.{Position, UnitCommandType}
+import bwta.BWTA
+
+import scala.collection.JavaConverters._
 
 object Overlay {
   
   def render() {
     With.game.setTextSize(bwapi.Text.Size.Enum.Small)
-    With.game.drawTextScreen(
-      5, 5,
-      _describePlanTree(With.gameplan, 0, 0))
-    
+    _drawTerrain()
     _drawUnits()
+    With.game.drawTextScreen(5, 5, _describePlanTree(With.gameplan, 0, 0))
   }
   
   def _drawTextLabel(textLines:Iterable[String], unit:bwapi.Unit) {
@@ -83,5 +84,40 @@ object Overlay {
     }
     
     plan.children.exists(_isRelevant(_))
+  }
+  
+  def _drawTerrain() {
+    BWTA.getRegions.asScala
+      .foreach(region => {
+  
+        _drawPolygonPositions(region.getPolygon.getPoints.asScala)
+        
+        With.game.drawLineMap(
+          region.getPolygon.getPoints.asScala.head,
+          region.getPolygon.getPoints.asScala.last,
+          bwapi.Color.Brown)
+        
+        With.game.drawTextMap(
+          region.getCenter,
+          region.getCenter.toString ++
+          "\n" ++
+          region.getCenter.toTilePosition.toString)
+        
+        region.getChokepoints.asScala.foreach(
+          choke => {
+            With.game.drawLineMap(choke.getSides.first, choke.getSides.second, bwapi.Color.Purple)
+            With.game.drawTextMap(
+              choke.getCenter,
+              choke.getCenter.toString ++
+              "\n" ++
+              choke.getCenter.toTilePosition.toString)
+          })
+      }
+    )
+  }
+  
+  def _drawPolygonPositions(points:Iterable[Position], color:bwapi.Color = bwapi.Color.Brown) {
+    points.reduce((p1, p2) => { With.game.drawLineMap(p1, p2, color); p2 })
+    With.game.drawLineMap(points.head, points.last, color)
   }
 }

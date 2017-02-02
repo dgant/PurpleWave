@@ -1,7 +1,7 @@
 package Types.BuildOrders.Protoss
 
 import Types.BuildOrders.{BuildOrder, Buildable}
-import Types.PositionFinders.PositionProxy
+import Types.PositionFinders.{PositionProxyGateway, PositionProxyPylon}
 import bwapi.UnitType
 
 class BuildProxyGateway extends BuildOrder {
@@ -10,10 +10,10 @@ class BuildProxyGateway extends BuildOrder {
     new Buildable(UnitType.Protoss_Probe),
     new Buildable(UnitType.Protoss_Probe),
     new Buildable(UnitType.Protoss_Probe),
-    new Buildable(UnitType.Protoss_Pylon, positionFinder = new PositionProxy),
+    new Buildable(UnitType.Protoss_Pylon, positionFinder = PositionProxyPylon),
     new Buildable(UnitType.Protoss_Probe),
-    new Buildable(UnitType.Protoss_Gateway, positionFinder = new PositionProxy),
-    new Buildable(UnitType.Protoss_Gateway, positionFinder = new PositionProxy),
+    new Buildable(UnitType.Protoss_Gateway, positionFinder = PositionProxyGateway),
+    new Buildable(UnitType.Protoss_Gateway, positionFinder = PositionProxyGateway),
     new Buildable(UnitType.Protoss_Zealot),
     new Buildable(UnitType.Protoss_Pylon),
     new Buildable(UnitType.Protoss_Zealot),

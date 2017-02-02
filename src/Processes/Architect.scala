@@ -28,7 +28,7 @@ object Architect {
   
   def _radialSearch(
     position:TilePosition,
-    searchRadius:Integer=20)
+    searchRadius:Integer = 20)
       :Iterable[TilePosition] = {
     var dx = 1
     var dy = 0
@@ -38,7 +38,7 @@ object Architect {
     var y = position.getY
     var segment_passed = 0
     
-    val pointsToSearch = (searchRadius + 1) * (searchRadius + 1)
+    val pointsToSearch = (2 * searchRadius + 1) * (2 * searchRadius + 1)
     (0 to pointsToSearch)
       .map(i => {
         x += dx

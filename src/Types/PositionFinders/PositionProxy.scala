@@ -17,15 +17,15 @@ class PositionProxy extends PositionFinder {
     
     val ourStartLocation = BWTA.getBaseLocations.asScala
         .filter(_.isStartLocation)
-        .filter(base => base.isStartLocation
-          && With.ourUnits.exists(unit =>
-            unit.getType.isResourceDepot
-            && base.getRegion.getPolygon.isInside(unit.getPosition)))
+        .sortBy(base => base.getPosition.getApproxDistance(
+          With.ourUnits
+            .filter(_.getType.isBuilding)
+            .sortBy(building => ! building.getType.isResourceDepot)
+            .head.getPosition))
         .head
     
     val enemyStartLocations = BWTA.getBaseLocations.asScala
       .filter(base => base.isStartLocation  && base != ourStartLocation)
-  
     
     val centroid:TilePosition =
       if(enemyStartLocations.size == 1) {
@@ -41,8 +41,8 @@ class PositionProxy extends PositionFinder {
 
         val weightThem = closestChoke.getDistance(ourStartLocation.getTilePosition)
         val weightUs = 12 //A bit further than the common sight distance of 7
-        val x = round((closestChoke.getX * weightThem + ourStartLocation.getX * weightUs) / (weightThem + weightUs)).toInt
-        val y = round((closestChoke.getY * weightThem + ourStartLocation.getY * weightUs) / (weightThem + weightUs)).toInt
+        val x = round((closestChoke.getX * weightThem + ourStartLocation.getTilePosition.getX * weightUs) / (weightThem + weightUs)).toInt
+        val y = round((closestChoke.getY * weightThem + ourStartLocation.getTilePosition.getY * weightUs) / (weightThem + weightUs)).toInt
         new TilePosition(x, y)
       } else {
         //Default: Position at the centroid of enemy bases
@@ -51,6 +51,6 @@ class PositionProxy extends PositionFinder {
           enemyStartLocations.map(_.getTilePosition.getY).sum / enemyStartLocations.size)
       }
     
-    Architect.placeBuilding(unitType, centroid, margin)
+    Architect.placeBuilding(unitType, centroid, margin, 30)
   }
 }

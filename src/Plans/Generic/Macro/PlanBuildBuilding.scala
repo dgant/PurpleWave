@@ -60,9 +60,10 @@ class PlanBuildBuilding(val buildingType:UnitType) extends Plan {
             _building = _recyclePlan.units.headOption
           }
         }
-        // getBuildUnit() and recycling only work for Terran
+        // getBuildUnit() only works for Terran
         else {
-          _position.foreach(position => _building = With.ourUnits.filter(u => u.getType == buildingType && u.getTilePosition == position).headOption)
+          _recyclePlan.execute()
+          _building = _recyclePlan.units.headOption
         }
   
         if (_building.isEmpty) {
@@ -78,12 +79,13 @@ class PlanBuildBuilding(val buildingType:UnitType) extends Plan {
   def _orderToBuild(builder:bwapi.Unit) {
     if (_lastOrderFrame < With.game.getFrameCount - 24) {
       _lastOrderFrame = With.game.getFrameCount
-  
-      //TODO: Don't change the position if we can still build in the previous position
-      _position = _positionFinder.find
+      
+      if (_position.filter(p => With.game.canBuildHere(p, buildingType, builder)).isEmpty) {
+        _position = _positionFinder.find
+      }
   
       if (_position.isEmpty) {
-        Logger.warn("Failed to place a " ++ buildingType.toString)
+        Logger.warn("Failed to place a " ++ buildingType.toString ++ " near " ++ _position.toString)
       }
       else {
         val positionExplored = With.game.isExplored(_position.get)

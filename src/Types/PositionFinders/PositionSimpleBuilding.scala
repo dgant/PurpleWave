@@ -9,14 +9,15 @@ class PositionSimpleBuilding(
     extends PositionFinder {
   
   override def find(): Option[TilePosition] = {
+    val position = Architect.getHq
     val output = Architect.placeBuilding(
       buildingType,
-      Architect.getHq,
+      position,
       margin = 0,
       searchRadius = 50)
     
     if (output == None) {
-      Logger.warn("Failed to place a " ++ buildingType.toString)
+      Logger.warn("Failed to place a " ++ buildingType.toString ++ " near " ++ position.toString)
     }
     
     output

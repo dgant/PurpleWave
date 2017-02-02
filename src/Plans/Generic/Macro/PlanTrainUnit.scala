@@ -1,6 +1,6 @@
 package Plans.Generic.Macro
 
-import Development.TypeDescriber
+import Development.{Logger, TypeDescriber}
 import Plans.Generic.Allocation.{PlanAcquireCurrencyForUnit, PlanAcquireUnitsExactly}
 import Plans.Generic.Compound.PlanDelegateInSerial
 import Startup.With
@@ -25,8 +25,6 @@ class PlanTrainUnit(val traineeType:UnitType) extends PlanDelegateInSerial {
   }
   
   override def execute() {
-    _currencyPlan.isSpent = ! _trainee.isEmpty
-  
     if (isComplete) {
       abort()
       return
@@ -75,18 +73,21 @@ class PlanTrainUnit(val traineeType:UnitType) extends PlanDelegateInSerial {
             u.getY == trainer.getY)
           .headOption
         
-        if (_trainee.isEmpty) {
-          //wtf
-        }
+        //There seems to be a 1+ frame delay between the queue getting started and the unit being created
+        //So don't freak out if we don't see the unit right away
       }
     }
     else {
+      if (ordered) {
+        Logger.warn("We ordered to train a unit, but it's not training.")
+      }
       _orderUnit(trainer)
     }
   }
   
   def _orderUnit(trainer:bwapi.Unit) {
     _trainer = Some(trainer)
+    _currencyPlan.isSpent = true
     trainer.train(traineeType)
   }
 }

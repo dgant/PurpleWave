@@ -11,7 +11,7 @@ object Overlay {
     With.game.setTextSize(bwapi.Text.Size.Enum.Small)
     With.game.drawTextScreen(
       5, 5,
-      _describePlanTree(With.gameplan, 0))
+      _describePlanTree(With.gameplan, 0, 0))
     
     _drawUnits()
   }
@@ -36,17 +36,19 @@ object Overlay {
     ))
   }
   
-  def _describePlanTree(plan:Plan, depth:Integer):String = {
+  def _describePlanTree(plan:Plan, childOrder:Integer, depth:Integer):String = {
     if (_isRelevant(plan)) {
-      _describePlan(plan, depth) ++ plan.children.map(_describePlanTree(_, depth + 1)).mkString("")
+      (_describePlan(plan, childOrder, depth)
+        ++ plan.children.zipWithIndex.map(x => _describePlanTree(x._1, x._2, depth + 1)))
+        .mkString("")
     } else {
       ""
     }
   }
   
-  def _describePlan(plan:Plan, depth:Integer):String = {
+  def _describePlan(plan:Plan, childOrder:Integer, depth:Integer):String = {
     val planName = plan.getClass.getSimpleName
-    val qualities = (if (plan.isComplete) " (complete)" else "")
+    val checkbox = if (plan.isComplete) "[X] " else "[_] "
     
     val resources = Iterable(plan)
       .filter(_.isInstanceOf[PlanAcquireCurrency])
@@ -61,13 +63,15 @@ object Overlay {
       .map(pair => ": " ++ pair._2.size.toString ++ " " ++ _formatUnitTypeName(pair._1))
       .mkString("")
     
-    ("  " * depth
-      ++ ""
+    (checkbox
+      ++ "  " * depth
+      ++ "#"
+      ++ (childOrder + 1).toString
+      ++ " "
       ++ plan.getClass.getSimpleName.replace("Plan", "")
       ++ " " * Math.max(0, 20 - planName.size)
       ++ resources
       ++ units
-      ++ qualities
       ++ "\n")
   }
   

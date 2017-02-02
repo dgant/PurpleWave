@@ -1,9 +1,8 @@
 package Plans.Generic.Macro
 
-import Development.Logger
-import Startup.With
 import Plans.Generic.Allocation.{PlanAcquireCurrencyForUnit, PlanAcquireUnitsExactly}
 import Plans.Generic.Compound.PlanDelegateInSerial
+import Startup.With
 import UnitMatchers.UnitMatchType
 import bwapi.UnitType
 
@@ -49,10 +48,11 @@ class PlanTrainUnit(val traineeType:UnitType) extends PlanDelegateInSerial {
     // Training?	Ordered?	Unit?	Then
     // ---------- --------- ----- ----
     // Yes		    No		    -	    Wait
+    // Yes		    Yes		    Yes	  Wait
+    // Yes		    Yes		    No	  WTF   (what the heck is it training, then?)
     // No		      No		    -	    Order
     // No		      Yes		    -	    Order (again; unexpected, but stuff happens)
-    // Yes		    Yes		    No	  WTF   (what the heck is it training, then?)
-    // Yes		    Yes		    Yes	  Wait
+    
     
     if ( ! _trainer.contains(trainer)) {
       _reset()
@@ -61,8 +61,9 @@ class PlanTrainUnit(val traineeType:UnitType) extends PlanDelegateInSerial {
     val isTraining = ! trainer.getTrainingQueue.isEmpty
     val ordered = _trainer.nonEmpty
     
-    if (ordered) {
-      if (isTraining) {
+    if (isTraining) {
+      if (ordered) {
+        //Note that it's possible for a building to briefly have a unit type in the queue with no unit created.
         _trainee = With.ourUnits
           .filter(u =>
             u.getType == traineeType &&
@@ -71,16 +72,8 @@ class PlanTrainUnit(val traineeType:UnitType) extends PlanDelegateInSerial {
           .headOption
         
         if (_trainee.isEmpty) {
-          Logger.warn(
-            "Weird state: We ordered a "
-              ++ trainer.getType.toString
-              ++ " with an empty queue to build a "
-              ++ traineeType.toString
-              ++ " but it's building something that doesn't match.")
+          //wtf
         }
-      }
-      else {
-        _orderUnit(trainer)
       }
     }
     else {

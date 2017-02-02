@@ -18,7 +18,5 @@ class PlanFollowBuildOrder extends PlanDelegateInParallel {
     else {
       return new PlanTrainUnit(product)
     }
-    
-    throw new Exception("Don't know how to build this yet.")
   }
 }

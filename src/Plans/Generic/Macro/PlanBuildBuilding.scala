@@ -1,14 +1,14 @@
 package Plans.Generic.Macro
 
 import Development.{Logger, TypeDescriber}
-import Startup.With
 import Plans.Generic.Allocation.{PlanAcquireCurrencyForUnit, PlanAcquireUnitsExactly}
-import Plans.Generic.Compound.PlanDelegateInSerial
+import Plans.Plan
+import Startup.With
 import Types.PositionFinders.PositionSimpleBuilding
 import Types.UnitMatchers.{UnitMatchType, UnitMatchTypeAbandonedBuilding}
-import bwapi.UnitType
+import bwapi.{Race, TilePosition, UnitType}
 
-class PlanBuildBuilding(val buildingType:UnitType) extends PlanDelegateInSerial {
+class PlanBuildBuilding(val buildingType:UnitType) extends Plan {
   
   val _positionFinder = new PositionSimpleBuilding(buildingType)
   
@@ -20,6 +20,7 @@ class PlanBuildBuilding(val buildingType:UnitType) extends PlanDelegateInSerial 
   
   var _builder:Option[bwapi.Unit] = None
   var _building:Option[bwapi.Unit] = None
+  var _position:Option[TilePosition] = None
   var _lastOrderFrame = Integer.MIN_VALUE
   
   override def describe(): Option[String] = {
@@ -37,19 +38,30 @@ class PlanBuildBuilding(val buildingType:UnitType) extends PlanDelegateInSerial 
       abort()
       return
     }
-  
-    // Don't use the default serial execution.
-    // We only want to execute the recycling plan if we don't have a builder
-    //
+    
+    // Chill out if we have a Protoss building warping in
+    if (_building.exists(_.exists) && buildingType.getRace == Race.Protoss) {
+      _builderPlan.abort
+      return
+    }
+    
     _currencyPlan.execute()
     if (_currencyPlan.isComplete) {
       _builderPlan.execute()
       if (_builderPlan.isComplete) {
         _builder = _builderPlan.units.headOption
-        _builder.foreach(b => _building = Option.apply(b.getBuildUnit))
-        if (_building.isEmpty) {
-          _recyclePlan.execute()
-          _building = _recyclePlan.units.headOption
+        
+        if (buildingType.getRace == Race.Terran) {
+          _builder.foreach(b => _building = Option.apply(b.getBuildUnit))
+  
+          //Resume incomplete Terran buildings
+          if (_building.isEmpty && buildingType.getRace == Race.Terran) {
+            _recyclePlan.execute()
+            _building = _recyclePlan.units.headOption
+          }
+        }
+        else {
+          _position.foreach(position => _building = With.ourUnits.filter(u => u.getType == buildingType && u.getTilePosition == position).headOption)
         }
   
         if (_building.isEmpty) {
@@ -65,19 +77,21 @@ class PlanBuildBuilding(val buildingType:UnitType) extends PlanDelegateInSerial 
   def _orderToBuild(builder:bwapi.Unit) {
     if (_lastOrderFrame < With.game.getFrameCount - 24) {
       _lastOrderFrame = With.game.getFrameCount
-      
-      val position = _positionFinder.find
   
-      if (position.isEmpty) {
+      //TODO: Don't change the position if we can still build there
+      _position = _positionFinder.find
+  
+      if (_position.isEmpty) {
         Logger.warn("Failed to place a " ++ buildingType.toString)
       }
       else {
-        val positionExplored = With.game.isExplored(position.get)
+        val positionExplored = With.game.isExplored(_position.get)
         
+        // Can't order builds in fog of war
         if (positionExplored) {
-          builder.build(buildingType, position.get)
+          builder.build(buildingType, _position.get)
         } else {
-          builder.move(position.get.toPosition)
+          builder.move(_position.get.toPosition)
         }
       }
     }

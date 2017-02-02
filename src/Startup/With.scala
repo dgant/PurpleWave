@@ -1,6 +1,6 @@
 package Startup
 
-import Processes.{Banker, Commander, Prioritizer, Recruiter}
+import Processes.{Banker, Prioritizer, Recruiter}
 import Types.Plans.Strategy.PlanWinTheGame
 
 import scala.collection.JavaConverters._
@@ -12,7 +12,6 @@ object With {
   var bank:Banker = null
   var prioritizer:Prioritizer = null
   var gameplan:PlanWinTheGame = null
-  var commander:Commander = null
   
   def ourUnits:mutable.Buffer[bwapi.Unit] = {
     game.self.getUnits.asScala

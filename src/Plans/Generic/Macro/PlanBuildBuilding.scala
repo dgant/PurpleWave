@@ -4,13 +4,13 @@ import Development.{Logger, TypeDescriber}
 import Plans.Generic.Allocation.{PlanAcquireCurrencyForUnit, PlanAcquireUnitsExactly}
 import Plans.Plan
 import Startup.With
-import Types.PositionFinders.PositionSimpleBuilding
+import Types.PositionFinders.{PositionFinder, PositionSimpleBuilding}
 import Types.UnitMatchers.{UnitMatchType, UnitMatchTypeAbandonedBuilding}
 import bwapi.{Race, TilePosition, UnitType}
 
 class PlanBuildBuilding(val buildingType:UnitType) extends Plan {
   
-  val _positionFinder = new PositionSimpleBuilding(buildingType)
+  var _positionFinder:PositionFinder = new PositionSimpleBuilding(buildingType)
   
   val _currencyPlan = new PlanAcquireCurrencyForUnit(buildingType)
   val _builderPlan = new PlanAcquireUnitsExactly(new UnitMatchType(buildingType.whatBuilds.first), 1)
@@ -60,6 +60,7 @@ class PlanBuildBuilding(val buildingType:UnitType) extends Plan {
             _building = _recyclePlan.units.headOption
           }
         }
+        // getBuildUnit() and recycling only work for Terran
         else {
           _position.foreach(position => _building = With.ourUnits.filter(u => u.getType == buildingType && u.getTilePosition == position).headOption)
         }
@@ -78,7 +79,7 @@ class PlanBuildBuilding(val buildingType:UnitType) extends Plan {
     if (_lastOrderFrame < With.game.getFrameCount - 24) {
       _lastOrderFrame = With.game.getFrameCount
   
-      //TODO: Don't change the position if we can still build there
+      //TODO: Don't change the position if we can still build in the previous position
       _position = _positionFinder.find
   
       if (_position.isEmpty) {

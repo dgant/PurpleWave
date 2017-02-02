@@ -14,7 +14,7 @@ class PlanFollowBuildOrder extends PlanDelegateInParallel {
     
     if (buildable.unitType != null) {
       if (buildable.unitType.isBuilding) {
-        return new PlanBuildBuilding(buildable.unitType)
+        return new PlanBuildBuilding(buildable.unitType) { if (buildable.positionFinder != null) _positionFinder = buildable.positionFinder }
       }
       else {
         return new PlanTrainUnit(buildable.unitType)

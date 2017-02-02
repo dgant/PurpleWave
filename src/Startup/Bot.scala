@@ -2,7 +2,7 @@ package Startup
 
 import Development.{AutoCamera, Logger, Overlay}
 import Processes.{Banker, Prioritizer, Recruiter}
-import Types.Plans.Strategy.PlanWinTheGame
+import Plans.Strategy.PlanWinTheGame
 import bwapi.DefaultBWListener
 import bwta.BWTA
 

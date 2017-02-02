@@ -1,7 +1,7 @@
 package Processes
 
 import Startup.With
-import Types.Plans.Plan
+import Plans.Plan
 
 import scala.collection.mutable
 

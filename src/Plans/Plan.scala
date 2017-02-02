@@ -1,4 +1,4 @@
-package Types.Plans
+package Plans
 
 abstract class Plan {
   var _children:Iterable[Plan] = List.empty

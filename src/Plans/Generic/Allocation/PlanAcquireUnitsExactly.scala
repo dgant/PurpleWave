@@ -1,11 +1,11 @@
-package Types.Plans.Generic.Allocation
+package Plans.Generic.Allocation
 
 import Startup.With
 import UnitMatchers.UnitMatcher
 
-class PlanAcquireUnitsGreedily(
+class PlanAcquireUnitsExactly(
   val unitMatcher:UnitMatcher,
-  val minimum: Integer = 0)
+  val quantity: Integer = 0)
     extends PlanAcquireUnits {
   
   override def getRequiredUnits(candidates:Iterable[Iterable[bwapi.Unit]]):Option[Iterable[bwapi.Unit]] = {
@@ -14,10 +14,12 @@ class PlanAcquireUnitsGreedily(
     
     candidates
       .foreach(pool => pool
-        .filter(unitMatcher.accept(_))
-        .foreach(desiredUnits.add(_)))
+        .foreach(unit =>
+          if (desiredUnits.size < quantity && unitMatcher.accept(unit)) {
+            desiredUnits.add(unit)
+          }))
     
-    if (desiredUnits.size >= minimum) {
+    if (desiredUnits.size >= quantity) {
       Some(desiredUnits)
     }
     else {

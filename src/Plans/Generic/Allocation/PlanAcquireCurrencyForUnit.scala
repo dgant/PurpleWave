@@ -1,4 +1,4 @@
-package Types.Plans.Generic.Allocation
+package Plans.Generic.Allocation
 
 import bwapi.UnitType
 

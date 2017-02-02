@@ -1,6 +1,6 @@
-package Types.Plans.Generic.Compound
+package Plans.Generic.Compound
 
-import Types.Plans.Plan
+import Plans.Plan
 
 class PlanDelegateInSerial extends Plan {
   

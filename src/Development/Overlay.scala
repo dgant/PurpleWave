@@ -1,8 +1,8 @@
 package Development
 
 import Startup.With
-import Types.Plans.Generic.Allocation.{PlanAcquireCurrency, PlanAcquireUnits}
-import Types.Plans.Plan
+import Plans.Generic.Allocation.{PlanAcquireCurrency, PlanAcquireUnits}
+import Plans.Plan
 import bwapi.UnitCommandType
 
 object Overlay {

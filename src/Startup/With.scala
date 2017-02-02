@@ -1,7 +1,7 @@
 package Startup
 
 import Processes.{Banker, Prioritizer, Recruiter}
-import Types.Plans.Strategy.PlanWinTheGame
+import Plans.Strategy.PlanWinTheGame
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable

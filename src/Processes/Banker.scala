@@ -1,7 +1,7 @@
 package Processes
 
 import Startup.With
-import Types.Plans.Generic.Allocation.PlanAcquireCurrency
+import Plans.Generic.Allocation.PlanAcquireCurrency
 
 import scala.collection.mutable
 

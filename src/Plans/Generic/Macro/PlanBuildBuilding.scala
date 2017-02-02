@@ -1,9 +1,9 @@
-package Types.Plans.Generic.Macro
+package Plans.Generic.Macro
 
 import Development.Logger
 import Startup.With
-import Types.Plans.Generic.Allocation.{PlanAcquireCurrencyForUnit, PlanAcquireUnitsExactly}
-import Types.Plans.Generic.Compound.PlanDelegateInSerial
+import Plans.Generic.Allocation.{PlanAcquireCurrencyForUnit, PlanAcquireUnitsExactly}
+import Plans.Generic.Compound.PlanDelegateInSerial
 import Types.PositionFinders.PositionFindBuildingSimple
 import UnitMatchers.{UnitMatchType, UnitMatchTypeIncomplete}
 import bwapi.UnitType

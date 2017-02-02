@@ -1,7 +1,7 @@
 package Processes
 
 import Startup.With
-import Types.Plans.Generic.Allocation.PlanAcquireUnits
+import Plans.Generic.Allocation.PlanAcquireUnits
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable

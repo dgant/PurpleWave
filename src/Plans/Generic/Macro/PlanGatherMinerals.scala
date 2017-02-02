@@ -1,8 +1,8 @@
-package Types.Plans.Generic.Macro
+package Plans.Generic.Macro
 
 import Startup.With
-import Types.Plans.Generic.Allocation.PlanAcquireUnitsGreedily
-import Types.Plans.Plan
+import Plans.Generic.Allocation.PlanAcquireUnitsGreedily
+import Plans.Plan
 import UnitMatchers.UnitMatchWorker
 
 import scala.collection.JavaConverters._

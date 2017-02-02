@@ -1,7 +1,7 @@
-package Types.Plans.Generic.Allocation
+package Plans.Generic.Allocation
 
 import Startup.With
-import Types.Plans.Plan
+import Plans.Plan
 
 class PlanAcquireCurrency extends Plan {
   var minerals = 0

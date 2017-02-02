@@ -1,8 +1,8 @@
-package Types.Plans.Generic.Macro
+package Plans.Generic.Macro
 
 import Types.BuildOrders.BuildOrder
-import Types.Plans.Generic.Compound.PlanDelegateInParallel
-import Types.Plans.Plan
+import Plans.Generic.Compound.PlanDelegateInParallel
+import Plans.Plan
 import bwapi.UnitType
 
 class PlanFollowBuildOrder extends PlanDelegateInParallel {

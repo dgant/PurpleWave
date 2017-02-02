@@ -1,9 +1,8 @@
 package Processes
 
-import Startup.With
 import Plans.Generic.Allocation.PlanAcquireUnits
+import Startup.With
 
-import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 class Recruiter {
@@ -19,7 +18,7 @@ class Recruiter {
     
     // Add new units
     //
-    With.ourUnits.filter(_.isCompleted).toSet.diff(_unassigned ++ _assignments.keys).foreach(_unassigned.add)
+    With.ourUnits.toSet.diff(_unassigned ++ _assignments.keys).foreach(_unassigned.add)
   }
   
   def add(request: PlanAcquireUnits) {

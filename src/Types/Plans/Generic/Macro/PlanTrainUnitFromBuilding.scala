@@ -72,9 +72,11 @@ class PlanTrainUnitFromBuilding(val traineeType:UnitType) extends PlanDelegateIn
         
         if (_trainee.isEmpty) {
           Logger.warn(
-            "Weird state: We ordered a %s at %s with an empty queue to build a %s, but there are no matching units.".format(
-              trainer.getType,
-              traineeType))
+            "Weird state: We ordered a "
+              ++ trainer.getType.toString
+              ++ " with an empty queue to build a "
+              ++ traineeType.toString
+              ++ " but it's building something that doesn't match.")
         }
       }
       else {

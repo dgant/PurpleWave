@@ -40,8 +40,8 @@ class Banker {
   }
   
   def _isAvailableNow(request:PlanAcquireCurrency): Boolean = {
-    _mineralsLeft  >= request.minerals &&
-    _gasLeft       >= request.gas &&
-    _supplyLeft    >= request.supply
+    (request.minerals == 0  ||  _mineralsLeft  >= request.minerals) &&
+    (request.gas      == 0  ||  _gasLeft       >= request.gas)      &&
+    (request.supply   == 0  ||  _supplyLeft    >= request.supply)
   }
 }

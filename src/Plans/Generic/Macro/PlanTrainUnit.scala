@@ -2,16 +2,16 @@ package Plans.Generic.Macro
 
 import Development.{Logger, TypeDescriber}
 import Plans.Generic.Allocation.{PlanAcquireCurrencyForUnit, PlanAcquireUnitsExactly}
-import Plans.Generic.Compound.PlanDelegateInSerial
+import Plans.Generic.Compound.PlanCompleteAllInSerial
 import Startup.With
-import Types.UnitMatchers.UnitMatchType
+import Strategies.UnitMatchers.UnitMatchType
 import bwapi.UnitType
 
-class PlanTrainUnit(val traineeType:UnitType) extends PlanDelegateInSerial {
+class PlanTrainUnit(val traineeType:UnitType) extends PlanCompleteAllInSerial {
   
   val _currencyPlan = new PlanAcquireCurrencyForUnit(traineeType)
-  val _trainerPlan = new PlanAcquireUnitsExactly(new UnitMatchType(traineeType.whatBuilds.first), 1)
-  _children = List(_currencyPlan, _trainerPlan)
+  val _trainerPlan = new PlanAcquireUnitsExactly(new UnitMatchType(traineeType.whatBuilds.first))
+  kids = List(_currencyPlan, _trainerPlan)
   
   var _trainer:Option[bwapi.Unit] = None
   var _trainee:Option[bwapi.Unit] = None
@@ -33,7 +33,7 @@ class PlanTrainUnit(val traineeType:UnitType) extends PlanDelegateInSerial {
     super.execute()
   
     //Require all the resources
-    if (!_children.forall(_.isComplete)) {
+    if ( ! kids.forall(_.isComplete)) {
       return
     }
   

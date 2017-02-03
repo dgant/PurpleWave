@@ -1,11 +1,11 @@
 package Plans.Generic.Allocation
 
 import Startup.With
-import Types.UnitMatchers.UnitMatcher
+import Strategies.UnitMatchers.UnitMatcher
 
 class PlanAcquireUnitsExactly(
   val unitMatcher:UnitMatcher,
-  val quantity: Integer = 0)
+  val quantity: Integer = 1)
     extends PlanAcquireUnits {
   
   override def getRequiredUnits(candidates:Iterable[Iterable[bwapi.Unit]]):Option[Iterable[bwapi.Unit]] = {

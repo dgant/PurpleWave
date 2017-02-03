@@ -1,8 +1,8 @@
 package Startup
 
 import Development.{AutoCamera, Logger, Overlay}
-import Processes.{Banker, Prioritizer, Recruiter}
-import Plans.Strategy.PlanWinTheGame
+import Processes._
+import Plans.GamePlans.PlanWinTheGame
 import bwapi.DefaultBWListener
 import bwta.BWTA
 
@@ -10,10 +10,14 @@ class Bot() extends DefaultBWListener {
 
   override def onStart() {
     Logger.debug("Purple Wave, reporting in.")
+    
+    With.architect = new Architect
     With.bank = new Banker
-    With.recruiter = new Recruiter
-    With.prioritizer = new Prioritizer
     With.gameplan = new PlanWinTheGame
+    With.prioritizer = new Prioritizer
+    With.recruiter = new Recruiter
+    With.scout = new Scout
+    
     Logger.debug("Reading map")
     BWTA.readMap()
     Logger.debug("Analyzing map")
@@ -33,10 +37,12 @@ class Bot() extends DefaultBWListener {
   }
   
   def _onFrame() {
+    With.architect.update()
     With.bank.recountResources()
     With.recruiter.recountUnits()
     With.prioritizer.reassignPriorities()
     With.gameplan.execute()
+    With.scout.update()
     Overlay.render()
     AutoCamera.render()
   }

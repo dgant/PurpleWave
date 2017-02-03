@@ -1,7 +1,7 @@
 package Plans.Generic.Allocation
 
 import Startup.With
-import Types.UnitMatchers.UnitMatcher
+import Strategies.UnitMatchers.UnitMatcher
 
 class PlanAcquireUnitsGreedily(
   val unitMatcher:UnitMatcher,

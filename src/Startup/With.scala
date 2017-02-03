@@ -1,17 +1,19 @@
 package Startup
 
-import Processes.{Banker, Prioritizer, Recruiter}
-import Plans.Strategy.PlanWinTheGame
+import Processes._
+import Plans.GamePlans.PlanWinTheGame
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 object With {
   var game:bwapi.Game = null
-  var recruiter:Recruiter = null
+  var architect:Architect = null
   var bank:Banker = null
-  var prioritizer:Prioritizer = null
   var gameplan:PlanWinTheGame = null
+  var prioritizer:Prioritizer = null
+  var recruiter:Recruiter = null
+  var scout:Scout = null
   
   def ourUnits:mutable.Buffer[bwapi.Unit] = {
     game.self.getUnits.asScala

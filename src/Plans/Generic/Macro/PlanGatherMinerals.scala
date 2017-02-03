@@ -1,16 +1,16 @@
 package Plans.Generic.Macro
 
-import Startup.With
 import Plans.Generic.Allocation.PlanAcquireUnitsGreedily
-import Plans.Plan
-import Types.UnitMatchers.UnitMatchWorker
+import Plans.Generic.Compound.PlanWithSettableListOfChildren
+import Startup.With
+import Strategies.UnitMatchers.UnitMatchWorker
 
 import scala.collection.JavaConverters._
 
-class PlanGatherMinerals extends Plan {
+class PlanGatherMinerals extends PlanWithSettableListOfChildren {
   
   val _workerPlan = new PlanAcquireUnitsGreedily(UnitMatchWorker)
-  _children = List(_workerPlan)
+  kids = List(_workerPlan)
   
   var _mineral:Option[bwapi.Unit] = None
   

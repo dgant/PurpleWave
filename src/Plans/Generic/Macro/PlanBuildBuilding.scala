@@ -2,21 +2,24 @@ package Plans.Generic.Macro
 
 import Development.{Logger, TypeDescriber}
 import Plans.Generic.Allocation.{PlanAcquireCurrencyForUnit, PlanAcquireUnitsExactly}
-import Plans.Plan
+import Plans.Generic.Compound.PlanWithSettableListOfChildren
 import Startup.With
-import Types.PositionFinders.{PositionFinder, PositionSimpleBuilding}
-import Types.UnitMatchers.{UnitMatchType, UnitMatchTypeAbandonedBuilding}
+import Strategies.PositionFinders.{PositionFinder, PositionSimpleBuilding}
+import Strategies.UnitMatchers.{UnitMatchType, UnitMatchTypeAbandonedBuilding}
 import bwapi.{Race, TilePosition, UnitType}
 
-class PlanBuildBuilding(val buildingType:UnitType) extends Plan {
+class PlanBuildBuilding(val buildingType:UnitType) extends PlanWithSettableListOfChildren {
   
-  var _positionFinder:PositionFinder = new PositionSimpleBuilding(buildingType)
+  
+  var positionFinder:PositionFinder = new PositionSimpleBuilding(buildingType)
+  
+  
   
   val _currencyPlan = new PlanAcquireCurrencyForUnit(buildingType)
-  val _builderPlan = new PlanAcquireUnitsExactly(new UnitMatchType(buildingType.whatBuilds.first), 1)
-  val _recyclePlan = new PlanAcquireUnitsExactly(new UnitMatchTypeAbandonedBuilding(buildingType), 1)
+  val _builderPlan = new PlanAcquireUnitsExactly(new UnitMatchType(buildingType.whatBuilds.first))
+  val _recyclePlan = new PlanAcquireUnitsExactly(new UnitMatchTypeAbandonedBuilding(buildingType))
   
-  _children = List(_currencyPlan, _builderPlan, _recyclePlan)
+  kids = List(_currencyPlan, _builderPlan, _recyclePlan)
   
   var _builder:Option[bwapi.Unit] = None
   var _building:Option[bwapi.Unit] = None
@@ -81,7 +84,7 @@ class PlanBuildBuilding(val buildingType:UnitType) extends Plan {
       _lastOrderFrame = With.game.getFrameCount
       
       if (_position.filter(p => With.game.canBuildHere(p, buildingType, builder)).isEmpty) {
-        _position = _positionFinder.find
+        _position = positionFinder.find
       }
   
       if (_position.isEmpty) {

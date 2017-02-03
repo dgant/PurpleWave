@@ -1,11 +1,10 @@
 package Plans
 
 abstract class Plan {
-  var _children:Iterable[Plan] = List.empty
   
   def isComplete():Boolean = { false }
-  def children(): Iterable[Plan] = { _children }
-  def execute()
+  def children(): Iterable[Plan] = { List.empty }
+  def execute() = {}
   def abort() { children().foreach(_.abort()) }
   def describe():Option[String] = { None }
 }

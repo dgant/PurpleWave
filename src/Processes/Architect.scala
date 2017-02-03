@@ -3,9 +3,13 @@ package Processes
 import Startup.With
 import bwapi.{TilePosition, UnitType}
 
-object Architect {
+class Architect {
   
-  def getHq():TilePosition = {
+  def update() {
+    
+  }
+  
+  def getHq:TilePosition = {
     With.ourUnits
       .filter(_.getType.isResourceDepot)
       .map(_.getTilePosition)

@@ -5,9 +5,8 @@ import Plans.Generic.Compound.PlanCompleteAllInParallel
 import Plans.Generic.Macro.PlanGatherMinerals
 
 class ProtossStrategyCheese extends PlanCompleteAllInParallel {
-  
-  kids = List(
+  setChildren(List(
     new ProtossRushWithProxyZealots(),
     new PlanGatherMinerals()
-  )
+  ))
 }

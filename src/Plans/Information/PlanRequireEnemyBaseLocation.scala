@@ -1,8 +1,13 @@
 package Plans.Information
 
-import Plans.Generic.Compound.PlanFulfillRequirements
+import Plans.Generic.Compound.AbstractPlanFulfillRequirements
 
-class PlanRequireEnemyBaseLocation extends PlanFulfillRequirements {
-  requirement = new PlanKnowEnemyBaseLocation
-  fulfiller = new PlanDiscoverEnemyBaseLocation
+class PlanRequireEnemyBaseLocation
+  extends AbstractPlanFulfillRequirements {
+  
+  var _checker = new PlanCheckKnowingEnemyBaseLocation
+  var _fulfiller = new PlanFulfillKnowingEnemyBaseLocation
+  
+  override def _getChecker() = { _checker }
+  override def _getFulfiller() = { _fulfiller }
 }

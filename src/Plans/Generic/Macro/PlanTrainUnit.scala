@@ -2,16 +2,18 @@ package Plans.Generic.Macro
 
 import Development.{Logger, TypeDescriber}
 import Plans.Generic.Allocation.{PlanAcquireCurrencyForUnit, PlanAcquireUnitsExactly}
-import Plans.Generic.Compound.PlanCompleteAllInSerial
+import Plans.Plan
 import Startup.With
 import Strategies.UnitMatchers.UnitMatchType
 import bwapi.UnitType
 
-class PlanTrainUnit(val traineeType:UnitType) extends PlanCompleteAllInSerial {
+class PlanTrainUnit(val traineeType:UnitType)
+  extends Plan {
   
   val _currencyPlan = new PlanAcquireCurrencyForUnit(traineeType)
-  val _trainerPlan = new PlanAcquireUnitsExactly(new UnitMatchType(traineeType.whatBuilds.first))
-  kids = List(_currencyPlan, _trainerPlan)
+  val _trainerPlan = new PlanAcquireUnitsExactly {
+    setUnitMatcher(new UnitMatchType(traineeType.whatBuilds.first))
+  }
   
   var _trainer:Option[bwapi.Unit] = None
   var _trainee:Option[bwapi.Unit] = None
@@ -24,16 +26,15 @@ class PlanTrainUnit(val traineeType:UnitType) extends PlanCompleteAllInSerial {
     _trainee.exists(p => p.exists && p.isCompleted)
   }
   
-  override def execute() {
-    if (isComplete) {
-      abort()
-      return
-    }
+  override def children(): Iterable[Plan] = {
+    List(_currencyPlan, _trainerPlan)
+  }
   
-    super.execute()
+  override def onFrame() {
+    children.foreach(_.onFrame())
   
     //Require all the resources
-    if ( ! kids.forall(_.isComplete)) {
+    if (!children.forall(_.isComplete)) {
       return
     }
   

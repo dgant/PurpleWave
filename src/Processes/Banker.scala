@@ -11,6 +11,11 @@ class Banker {
   var _supplyLeft = 0
   val _requests = new mutable.HashSet[PlanAcquireCurrency]()
   
+  def onFrame() {
+    _requests.clear()
+    recountResources()
+  }
+  
   def recountResources() {
     _mineralsLeft  = With.game.self.minerals
     _gasLeft       = With.game.self.gas
@@ -24,13 +29,13 @@ class Banker {
   }
   
   def remove(request:PlanAcquireCurrency) {
-    request.requestFulfilled = false
+    request.setSatisfaction(false)
     _requests.remove(request)
     recountResources()
   }
   
   def _queueBuyer(request:PlanAcquireCurrency) {
-    request.requestFulfilled = request.isSpent || _isAvailableNow(request)
+    request.setSatisfaction(request.isSpent || _isAvailableNow(request))
     
     if ( ! request.isSpent) {
       _mineralsLeft -= request.minerals

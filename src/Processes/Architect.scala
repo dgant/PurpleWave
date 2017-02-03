@@ -5,10 +5,6 @@ import bwapi.{TilePosition, UnitType}
 
 class Architect {
   
-  def update() {
-    
-  }
-  
   def getHq:TilePosition = {
     With.ourUnits
       .filter(_.getType.isResourceDepot)

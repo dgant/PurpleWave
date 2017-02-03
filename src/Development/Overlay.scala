@@ -10,7 +10,7 @@ import scala.collection.JavaConverters._
 
 object Overlay {
   
-  def render() {
+  def onFrame() {
     With.game.setTextSize(bwapi.Text.Size.Enum.Small)
     _drawTerrain()
     _drawUnits()

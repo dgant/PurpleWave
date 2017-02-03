@@ -11,7 +11,7 @@ class Prioritizer {
   
   var _nextPriority = 0
   
-  def reassignPriorities() {
+  def onFrame() {
     _priorities.clear()
     _nextPriority = 0
     _prioritizeRecurisvely(With.gameplan)

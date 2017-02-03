@@ -2,22 +2,21 @@ package Plans.Generic.Allocation
 
 import Startup.With
 import Plans.Plan
+import Traits.{TraitSettableSatisfaction, TraitSettableUnitMatcher, TraitSettableUnitPreference}
 import bwapi.Unit
 
 import scala.collection.mutable
 
-abstract class PlanAcquireUnits extends Plan {
+abstract class PlanAcquireUnits
+  extends Plan
+  with TraitSettableSatisfaction
+  with TraitSettableUnitMatcher
+  with TraitSettableUnitPreference {
   
-  var requestFulfilled = false
+  override def isComplete(): Boolean = { getSatisfaction }
   
-  override def isComplete(): Boolean = { requestFulfilled }
-  
-  override def execute() {
+  override def onFrame() {
     With.recruiter.add(this)
-  }
-  
-  override def abort() {
-    With.recruiter.remove(this)
   }
   
   def units():mutable.Set[Unit] = {

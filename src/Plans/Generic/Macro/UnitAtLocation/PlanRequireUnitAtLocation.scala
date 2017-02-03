@@ -1,15 +1,30 @@
 package Plans.Generic.Macro.UnitAtLocation
 
-import Plans.Generic.Compound.PlanFulfillRequirements
-import Strategies.PositionFinders.PositionFinder
-import Strategies.UnitMatchers.UnitMatcher
+import Plans.Generic.Compound.AbstractPlanFulfillRequirements
+import Plans.Plan
+import Traits.{TraitSettablePositionFinder, TraitSettableRange, TraitSettableUnitMatcher, TraitSettableUnitPreference}
 
-class PlanRequireUnitAtLocation(
-  val unitMatcher: UnitMatcher,
-  val positionFinder: PositionFinder,
-  val leashRange:Integer = 32)
-    extends PlanFulfillRequirements {
+class PlanRequireUnitAtLocation
+    extends AbstractPlanFulfillRequirements
+    with TraitSettablePositionFinder
+    with TraitSettableUnitMatcher
+    with TraitSettableUnitPreference
+    with TraitSettableRange {
   
-  requirement = new PlanCheckUnitAtLocation(unitMatcher, positionFinder, leashRange)
-  fulfiller = new PlanFulfillUnitAtLocation(unitMatcher, positionFinder)
+  var _check = new PlanCheckUnitAtLocation
+  var _fulfill = new PlanFulfillUnitAtLocation
+  
+  override def _getChecker:Plan = {
+    _check.setPositionFinder(getPositionFinder)
+    _check.setUnitMatcher(getUnitMatcher)
+    _check.setRange(getRange)
+    _check
+  }
+  
+  override def _getFulfiller() :Plan = {
+    _fulfill.setPositionFinder(getPositionFinder)
+    _fulfill.setUnitMatcher(getUnitMatcher)
+    _fulfill.setUnitPreference(getUnitPreference)
+    _fulfill
+  }
 }

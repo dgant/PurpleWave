@@ -9,7 +9,7 @@ object AutoCamera {
   var unit:Option[bwapi.Unit] = None
   var pointOfInterest = new Position(0, 0)
 
-  def render() {
+  def onFrame() {
     if ( ! enabled) {
       return
     }

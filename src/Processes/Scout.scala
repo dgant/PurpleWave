@@ -11,7 +11,7 @@ class Scout {
   
   val _knownEnemyUnits:mutable.HashSet[bwapi.Unit] = mutable.HashSet.empty
   
-  def update() {
+  def onFrame() {
     With.game.getPlayers.asScala
       .filter(_.isEnemy(With.game.self))
       .flatten(_.getUnits.asScala)

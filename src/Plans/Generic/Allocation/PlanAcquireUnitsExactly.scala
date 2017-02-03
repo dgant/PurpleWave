@@ -1,12 +1,11 @@
 package Plans.Generic.Allocation
 
+import Traits.TraitSettableQuantity
 import Startup.With
-import Strategies.UnitMatchers.UnitMatcher
 
-class PlanAcquireUnitsExactly(
-  val unitMatcher:UnitMatcher,
-  val quantity: Integer = 1)
-    extends PlanAcquireUnits {
+class PlanAcquireUnitsExactly
+    extends PlanAcquireUnits
+    with TraitSettableQuantity {
   
   override def getRequiredUnits(candidates:Iterable[Iterable[bwapi.Unit]]):Option[Iterable[bwapi.Unit]] = {
     
@@ -14,12 +13,15 @@ class PlanAcquireUnitsExactly(
     
     candidates
       .foreach(pool => pool
+        .toList
+        .sortBy(getUnitPreference.preference(_))
         .foreach(unit =>
-          if (desiredUnits.size < quantity && unitMatcher.accept(unit)) {
+          if (desiredUnits.size < getQuantity
+            && getUnitMatcher.accept(unit)) {
             desiredUnits.add(unit)
           }))
     
-    if (desiredUnits.size >= quantity) {
+    if (desiredUnits.size >= getQuantity) {
       Some(desiredUnits)
     }
     else {

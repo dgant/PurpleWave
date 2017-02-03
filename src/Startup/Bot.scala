@@ -37,14 +37,13 @@ class Bot() extends DefaultBWListener {
   }
   
   def _onFrame() {
-    With.architect.update()
-    With.bank.recountResources()
-    With.recruiter.recountUnits()
-    With.prioritizer.reassignPriorities()
-    With.gameplan.execute()
-    With.scout.update()
-    Overlay.render()
-    AutoCamera.render()
+    With.bank.onFrame()
+    With.recruiter.onFrame()
+    With.prioritizer.onFrame()
+    With.scout.onFrame()
+    With.gameplan.onFrame() //This needs to be last!
+    Overlay.onFrame()
+    AutoCamera.onFrame()
   }
 
   override def onFrame() {

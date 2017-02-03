@@ -2,24 +2,26 @@ package Plans.Generic.Macro
 
 import Development.{Logger, TypeDescriber}
 import Plans.Generic.Allocation.{PlanAcquireCurrencyForUnit, PlanAcquireUnitsExactly}
-import Plans.Generic.Compound.PlanWithSettableListOfChildren
+import Plans.Plan
+import Traits.TraitSettablePositionFinder
 import Startup.With
-import Strategies.PositionFinders.{PositionFinder, PositionSimpleBuilding}
+import Strategies.PositionFinders.PositionSimpleBuilding
 import Strategies.UnitMatchers.{UnitMatchType, UnitMatchTypeAbandonedBuilding}
 import bwapi.{Race, TilePosition, UnitType}
 
-class PlanBuildBuilding(val buildingType:UnitType) extends PlanWithSettableListOfChildren {
+class PlanBuildBuilding(val buildingType:UnitType)
+  extends Plan
+  with TraitSettablePositionFinder {
   
-  
-  var positionFinder:PositionFinder = new PositionSimpleBuilding(buildingType)
-  
-  
+  setPositionFinder(new PositionSimpleBuilding(buildingType))
   
   val _currencyPlan = new PlanAcquireCurrencyForUnit(buildingType)
-  val _builderPlan = new PlanAcquireUnitsExactly(new UnitMatchType(buildingType.whatBuilds.first))
-  val _recyclePlan = new PlanAcquireUnitsExactly(new UnitMatchTypeAbandonedBuilding(buildingType))
-  
-  kids = List(_currencyPlan, _builderPlan, _recyclePlan)
+  val _builderPlan = new PlanAcquireUnitsExactly {
+    setUnitMatcher(new UnitMatchType(buildingType.whatBuilds.first))
+  }
+  val _recyclePlan = new PlanAcquireUnitsExactly {
+    setUnitMatcher (new UnitMatchTypeAbandonedBuilding(buildingType))
+  }
   
   var _builder:Option[bwapi.Unit] = None
   var _building:Option[bwapi.Unit] = None
@@ -30,27 +32,25 @@ class PlanBuildBuilding(val buildingType:UnitType) extends PlanWithSettableListO
     Some(TypeDescriber.describeUnitType(buildingType))
   }
   
+  override def children(): Iterable[Plan] = {
+    List(_currencyPlan, _builderPlan, _recyclePlan)
+  }
+  
   override def isComplete(): Boolean = {
     _building.exists(_.isCompleted)
   }
   
-  override def execute() {
+  override def onFrame() {
     _currencyPlan.isSpent = ! _building.isEmpty
-  
-    if (isComplete) {
-      abort()
-      return
-    }
-    
+
     // Chill out if we have a Protoss building warping in
     if (_building.exists(_.exists) && buildingType.getRace == Race.Protoss) {
-      _builderPlan.abort
       return
     }
     
-    _currencyPlan.execute()
+    _currencyPlan.onFrame()
     if (_currencyPlan.isComplete) {
-      _builderPlan.execute()
+      _builderPlan.onFrame()
       if (_builderPlan.isComplete) {
         _builder = _builderPlan.units.headOption
         
@@ -59,13 +59,13 @@ class PlanBuildBuilding(val buildingType:UnitType) extends PlanWithSettableListO
   
           //Resume incomplete Terran buildings
           if (_building.isEmpty && buildingType.getRace == Race.Terran) {
-            _recyclePlan.execute()
+            _recyclePlan.onFrame()
             _building = _recyclePlan.units.headOption
           }
         }
         // getBuildUnit() only works for Terran
         else {
-          _recyclePlan.execute()
+          _recyclePlan.onFrame()
           _building = _recyclePlan.units.headOption
         }
   
@@ -84,7 +84,7 @@ class PlanBuildBuilding(val buildingType:UnitType) extends PlanWithSettableListO
       _lastOrderFrame = With.game.getFrameCount
       
       if (_position.filter(p => With.game.canBuildHere(p, buildingType, builder)).isEmpty) {
-        _position = positionFinder.find
+        _position = getPositionFinder.find
       }
   
       if (_position.isEmpty) {

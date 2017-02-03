@@ -9,8 +9,13 @@ class Recruiter {
   val _assignments:mutable.HashMap[bwapi.Unit, PlanAcquireUnits] = mutable.HashMap.empty
   val _unassigned:mutable.Set[bwapi.Unit] = mutable.Set.empty
   val _requests:mutable.HashMap[PlanAcquireUnits, mutable.Set[bwapi.Unit]] = mutable.HashMap.empty
+  val _updatedRequests:mutable.Set[PlanAcquireUnits] = mutable.Set.empty
 
-  def recountUnits() {
+  def onFrame() {
+    //Automatically free units held by dead requests
+    _requests.keySet.diff(_updatedRequests).foreach(remove)
+    _updatedRequests.clear()
+    
     // Remove dead units
     //
     _assignments.keys.filterNot(_.exists).foreach(_unassign)
@@ -22,6 +27,7 @@ class Recruiter {
   }
   
   def add(request: PlanAcquireUnits) {
+    _updatedRequests.add(request)
     _requests(request) = _requests.getOrElse(request, mutable.Set.empty)
     
     // Offer batches of units for the request to choose.
@@ -37,11 +43,11 @@ class Recruiter {
           .map(getUnits))
 
     if (requiredUnits == None) {
-      request.requestFulfilled = false
+      request.setSatisfaction(false)
       remove(request)
     }
     else {
-      request.requestFulfilled = true
+      request.setSatisfaction(true)
   
       // 1. Unassign all the current units
       // 2. Unassign all the required units

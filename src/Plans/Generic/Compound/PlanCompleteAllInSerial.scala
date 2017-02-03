@@ -1,17 +1,19 @@
 package Plans.Generic.Compound
 
-class PlanCompleteAllInSerial extends PlanWithSettableListOfChildren {
+import Traits.TraitSettableChildren
+
+class PlanCompleteAllInSerial
+  extends AbstractPlanCompleteAll
+  with TraitSettableChildren {
   
-  override def isComplete():Boolean = {
-    children.forall(_.isComplete)
-  }
+  final override def children = getChildren
   
-  override def execute() {
+  final override def onFrame() {
     var continue = true
     children
       .foreach(child => {
         if (continue) {
-          child.execute()
+          child.onFrame()
           continue &&= child.isComplete
         }
       })

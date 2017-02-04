@@ -15,6 +15,7 @@ object Overlay {
     _drawTerrain()
     _drawUnits()
     With.game.drawTextScreen(5, 5, _describePlanTree(With.gameplan, 0, 0))
+    _drawPlans(With.gameplan)
     _drawResources()
   }
   
@@ -122,6 +123,11 @@ object Overlay {
   def _drawPolygonPositions(points:Iterable[Position], color:bwapi.Color = bwapi.Color.Brown) {
     points.reduce((p1, p2) => { With.game.drawLineMap(p1, p2, color); p2 })
     With.game.drawLineMap(points.head, points.last, color)
+  }
+  
+  def _drawPlans(plan:Plan) {
+    plan.drawOverlay()
+    plan.children.foreach(_drawPlans)
   }
   
   def _drawResources() {

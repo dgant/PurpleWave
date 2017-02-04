@@ -22,7 +22,7 @@ class ProtossRushWithProxyZealots
               setUnitMatcher(UnitMatchWorker)
               setUnitPreference(new UnitPreferClose{setPositionFinder(PositionProxyPylon)})
               setPositionFinder(PositionProxyPylon)
-              setRange(8 * 32)
+              setRange(4 * 32)
             },
             new BuildBuilding(UnitType.Protoss_Pylon)   { setPositionFinder(PositionProxyPylon) },
             new BuildBuilding(UnitType.Protoss_Gateway) { setPositionFinder(PositionProxyGateway) },

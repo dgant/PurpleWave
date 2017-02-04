@@ -2,6 +2,7 @@ package Plans.Generic.Macro.UnitAtLocation
 
 import Plans.Generic.Compound.AbstractPlanFulfillRequirements
 import Plans.Plan
+import Startup.With
 import Traits.{TraitSettablePositionFinder, TraitSettableRange, TraitSettableUnitMatcher, TraitSettableUnitPreference}
 
 class RequireUnitAtLocation
@@ -26,5 +27,16 @@ class RequireUnitAtLocation
     _fulfill.setUnitMatcher(getUnitMatcher)
     _fulfill.setUnitPreference(getUnitPreference)
     _fulfill
+  }
+  
+  override def drawOverlay() = {
+    getPositionFinder.find.foreach(position => {
+      With.game.drawCircleMap(
+        position.toPosition,
+        getRange,
+        bwapi.Color.Green)
+      With.game.drawTextMap(
+        position.toPosition,
+        "Requiring units")})
   }
 }

@@ -6,4 +6,5 @@ class Plan {
   def children(): Iterable[Plan] = { List.empty }
   def onFrame() = {}
   def describe():Option[String] = { None }
+  def drawOverlay() = { }
 }

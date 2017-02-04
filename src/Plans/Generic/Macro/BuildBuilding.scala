@@ -7,7 +7,7 @@ import Traits.TraitSettablePositionFinder
 import Startup.With
 import Strategies.PositionFinders.PositionSimpleBuilding
 import Strategies.UnitMatchers.{UnitMatchType, UnitMatchTypeAbandonedBuilding}
-import bwapi.{Race, TilePosition, UnitType}
+import bwapi.{Position, Race, TilePosition, UnitType}
 
 class BuildBuilding(val buildingType:UnitType)
   extends Plan
@@ -89,7 +89,9 @@ class BuildBuilding(val buildingType:UnitType)
       _lastOrderFrame = With.game.getFrameCount
       
       if (_position.filter(p => With.game.canBuildHere(p, buildingType, builder)).isEmpty) {
+        With.architect.setBuilder(builder)
         _position = getPositionFinder.find
+        With.architect.clearBuilder()
       }
   
       if (_position.isEmpty) {
@@ -106,5 +108,18 @@ class BuildBuilding(val buildingType:UnitType)
         }
       }
     }
+  }
+  
+  override def drawOverlay() = {
+    _position.foreach(position => {
+      With.game.drawBoxMap(
+        position.toPosition,
+        new Position(
+          position.toPosition.getX + buildingType.width,
+          position.toPosition.getY + buildingType.height),
+        bwapi.Color.Green)
+      With.game.drawTextMap(
+        position.toPosition,
+        "Building a " + buildingType.toString)})
   }
 }

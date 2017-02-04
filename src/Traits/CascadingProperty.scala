@@ -5,7 +5,7 @@ class CascadingProperty[T] {
   private var _value:Option[T] = None
   
   def get:Option[T] = {
-    _parent.get.get.getOrElse(_value)
+    _parent.map(_.get).getOrElse(_value)
   }
   
   def set(value:T) {

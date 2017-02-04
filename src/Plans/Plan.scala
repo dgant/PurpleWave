@@ -1,10 +1,12 @@
 package Plans
 
-class Plan {
+import Traits.TraitSettableDescription
+
+class Plan
+extends TraitSettableDescription {
   
   def isComplete():Boolean = { false }
   def children(): Iterable[Plan] = { List.empty }
   def onFrame() = {}
-  def describe():Option[String] = { None }
   def drawOverlay() = { }
 }

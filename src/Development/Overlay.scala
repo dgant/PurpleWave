@@ -47,8 +47,7 @@ object Overlay {
   }
   
   def _describePlan(plan:Plan, childOrder:Integer, depth:Integer):String = {
-    val planName = plan.getClass.getSimpleName.replace("Plan", "")
-    val planDescription = plan.describe.map(d => ": " + d).mkString("")
+    val planName = plan.getDescription.getOrElse(plan.getClass.getSimpleName.replace("Plan", "").replace("$anon$", "Plan"))
     val checkbox = if (plan.isComplete) "[X] " else "[_] "
     
     val resources = Iterable(plan)

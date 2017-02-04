@@ -18,31 +18,33 @@ class ProtossRushWithProxyZealots
     setPositionFinder(PositionProxyPylon)
     setRange(4 * 32)
   }
-  
+
   setChildren(List(
-    new AllSimultaneous { setChildren(List(
-      new AllSerial { setChildren(List(
-        new TrainUnit(UnitType.Protoss_Probe),
-        new AllSimultaneous { setChildren(List(
-          new TrainUnit(UnitType.Protoss_Probe),
-          new AllSerial { setChildren(List(
-            new BuildBuilding(UnitType.Protoss_Pylon)   { setPositionFinder(PositionProxyPylon);  monopolizeWorker = true },
-            new BuildBuilding(UnitType.Protoss_Gateway) { setPositionFinder(PositionProxyGateway); monopolizeWorker = true },
-            new BuildBuilding(UnitType.Protoss_Gateway) { setPositionFinder(PositionProxyGateway); monopolizeWorker = true },
-            new RequireEnemyBaseLocation
-          ))},
-          new TrainUnit(UnitType.Protoss_Probe),
-          new TrainUnit(UnitType.Protoss_Probe)
-        ))}
-      ))},
-      new TrainUnit(UnitType.Protoss_Zealot),
-      new TrainUnit(UnitType.Protoss_Zealot),
-      new TrainUnit(UnitType.Protoss_Zealot),
+    new AllSerial {
+      setDescription("Build proxy and early probes")
+      setChildren(List(
       new TrainUnit(UnitType.Protoss_Probe),
-      new BuildBuilding(UnitType.Protoss_Pylon),
-      new TrainUnit(UnitType.Protoss_Zealot),
-      new TrainUnit(UnitType.Protoss_Zealot),
-      new TrainUnit(UnitType.Protoss_Zealot)
-    ))}
+      new AllSimultaneous {
+        setDescription("Build at proxy")
+        setChildren(List(
+        new TrainUnit(UnitType.Protoss_Probe),
+        new AllSerial { setChildren(List(
+          new BuildBuilding(UnitType.Protoss_Pylon)   { setPositionFinder(PositionProxyPylon);  monopolizeWorker = true },
+          new BuildBuilding(UnitType.Protoss_Gateway) { setPositionFinder(PositionProxyGateway); monopolizeWorker = true },
+          new BuildBuilding(UnitType.Protoss_Gateway) { setPositionFinder(PositionProxyGateway); monopolizeWorker = true },
+          new RequireEnemyBaseLocation
+        ))},
+        new TrainUnit(UnitType.Protoss_Probe),
+        new TrainUnit(UnitType.Protoss_Probe)
+      ))}
+    ))},
+    new TrainUnit(UnitType.Protoss_Zealot),
+    new TrainUnit(UnitType.Protoss_Zealot),
+    new TrainUnit(UnitType.Protoss_Zealot),
+    new TrainUnit(UnitType.Protoss_Probe),
+    new BuildBuilding(UnitType.Protoss_Pylon),
+    new TrainUnit(UnitType.Protoss_Zealot),
+    new TrainUnit(UnitType.Protoss_Zealot),
+    new TrainUnit(UnitType.Protoss_Zealot)
   ))
 }

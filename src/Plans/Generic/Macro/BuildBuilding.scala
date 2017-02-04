@@ -13,6 +13,8 @@ class BuildBuilding(val buildingType:UnitType)
   extends Plan
   with TraitSettablePositionFinder {
   
+  var monopolizeWorker:Boolean = false
+  
   setPositionFinder(new PositionSimpleBuilding(buildingType))
   
   val _currencyPlan = new PlanAcquireCurrencyForUnit(buildingType)
@@ -54,33 +56,45 @@ class BuildBuilding(val buildingType:UnitType)
     }
     
     _currencyPlan.onFrame()
-    if (_currencyPlan.isComplete) {
+    if (_currencyPlan.isComplete || monopolizeWorker) {
       _builderPlan.onFrame()
       if (_builderPlan.isComplete) {
         _builder = _builderPlan.units.headOption
         
-        if (buildingType.getRace == Race.Terran) {
-          _builder.foreach(b => _building = Option.apply(b.getBuildUnit))
-  
-          //Resume incomplete Terran buildings
-          if (_building.isEmpty && buildingType.getRace == Race.Terran) {
-            _recyclePlan.onFrame()
-            _building = _recyclePlan.units.headOption
-          }
-        }
-        // getBuildUnit() only works for Terran
-        else {
-          _recyclePlan.onFrame()
-          _building = _recyclePlan.units.headOption
-        }
-  
-        if (_building.isEmpty) {
-          _builder.foreach(_orderToBuild)
+        if ( _currencyPlan.isComplete) {
+          _construct()
         }
         else {
-          _builder.foreach(_.rightClick(_building.get))
+          _builder.foreach(builder =>
+            getPositionFinder.find.foreach(position =>
+              builder.move(position.toPosition)))
         }
       }
+    }
+  }
+  
+  def _construct() {
+    if (buildingType.getRace == Race.Terran) {
+      _builder.foreach(b => _building = Option.apply(b.getBuildUnit))
+    
+      //Resume incomplete Terran buildings
+      if (_building.isEmpty && buildingType.getRace == Race.Terran) {
+        _recyclePlan.onFrame()
+        _building = _recyclePlan.units.headOption
+      }
+    }
+      
+    // getBuildUnit() only works for Terran
+    else {
+      _recyclePlan.onFrame()
+      _building = _recyclePlan.units.headOption
+    }
+  
+    if (_building.isEmpty) {
+      _builder.foreach(_orderToBuild)
+    }
+    else {
+      _builder.foreach(_.rightClick(_building.get))
     }
   }
   

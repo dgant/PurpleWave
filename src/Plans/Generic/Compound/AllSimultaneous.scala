@@ -2,7 +2,7 @@ package Plans.Generic.Compound
 
 import Traits.TraitSettableChildren
 
-class Simultaneous
+class AllSimultaneous
   extends AbstractPlanCompleteAll
   with TraitSettableChildren {
   

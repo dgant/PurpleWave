@@ -7,7 +7,7 @@ import Startup.With
 import Strategies.UnitMatchers.UnitMatchType
 import bwapi.UnitType
 
-class PlanTrainUnit(val traineeType:UnitType)
+class TrainUnit(val traineeType:UnitType)
   extends Plan {
   
   val _currencyPlan = new PlanAcquireCurrencyForUnit(traineeType)
@@ -31,6 +31,11 @@ class PlanTrainUnit(val traineeType:UnitType)
   }
   
   override def onFrame() {
+    if (isComplete) {
+      //It's important to quit so we release our resources
+      return
+    }
+    
     children.foreach(_.onFrame())
   
     //Require all the resources

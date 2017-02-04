@@ -26,6 +26,10 @@ class Recruiter {
     With.ourUnits.toSet.diff(_unassigned ++ _assignments.keys).foreach(_unassigned.add)
   }
   
+  def getAssignment(unit:bwapi.Unit):Option[PlanAcquireUnits] = {
+    _assignments.get(unit)
+  }
+  
   def add(request: PlanAcquireUnits) {
     _updatedRequests.add(request)
     _requests(request) = _requests.getOrElse(request, mutable.Set.empty)

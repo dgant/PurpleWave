@@ -4,7 +4,7 @@ import Plans.Generic.Compound.AbstractPlanFulfillRequirements
 import Plans.Plan
 import Traits.{TraitSettablePositionFinder, TraitSettableRange, TraitSettableUnitMatcher, TraitSettableUnitPreference}
 
-class PlanRequireUnitAtLocation
+class RequireUnitAtLocation
     extends AbstractPlanFulfillRequirements
     with TraitSettablePositionFinder
     with TraitSettableUnitMatcher

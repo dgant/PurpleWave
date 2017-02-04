@@ -2,7 +2,7 @@ package Plans.Information
 
 import Plans.Generic.Compound.AbstractPlanFulfillRequirements
 
-class PlanRequireEnemyBaseLocation
+class RequireEnemyBaseLocation
   extends AbstractPlanFulfillRequirements {
   
   var _checker = new PlanCheckKnowingEnemyBaseLocation

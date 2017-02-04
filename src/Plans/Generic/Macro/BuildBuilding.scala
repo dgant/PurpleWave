@@ -9,7 +9,7 @@ import Strategies.PositionFinders.PositionSimpleBuilding
 import Strategies.UnitMatchers.{UnitMatchType, UnitMatchTypeAbandonedBuilding}
 import bwapi.{Race, TilePosition, UnitType}
 
-class PlanBuildBuilding(val buildingType:UnitType)
+class BuildBuilding(val buildingType:UnitType)
   extends Plan
   with TraitSettablePositionFinder {
   
@@ -41,6 +41,11 @@ class PlanBuildBuilding(val buildingType:UnitType)
   }
   
   override def onFrame() {
+    if (isComplete) {
+      //It's important to quit so we release our resources
+      return
+    }
+    
     _currencyPlan.isSpent = ! _building.isEmpty
 
     // Chill out if we have a Protoss building warping in

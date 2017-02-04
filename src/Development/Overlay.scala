@@ -15,6 +15,7 @@ object Overlay {
     _drawTerrain()
     _drawUnits()
     With.game.drawTextScreen(5, 5, _describePlanTree(With.gameplan, 0, 0))
+    _drawResources()
   }
   
   def _drawTextLabel(textLines:Iterable[String], unit:bwapi.Unit) {
@@ -31,10 +32,12 @@ object Overlay {
   def _drawUnits() {
     With.ourUnits
       .filterNot(_.getLastCommand.getUnitCommandType == UnitCommandType.None)
-      .foreach(unit => _drawTextLabel(
-      Iterable(unit.getLastCommand.getUnitCommandType.toString),
-      unit
-    ))
+      .foreach(unit =>
+        _drawTextLabel(
+          List(
+            With.recruiter.getAssignment(unit).map(plan => plan.getClass.getSimpleName.replace("Plan", "")).mkString(""),
+            unit.getLastCommand.getUnitCommandType.toString),
+        unit))
   }
   
   def _describePlanTree(plan:Plan, childOrder:Integer, depth:Integer):String = {
@@ -119,5 +122,18 @@ object Overlay {
   def _drawPolygonPositions(points:Iterable[Position], color:bwapi.Color = bwapi.Color.Brown) {
     points.reduce((p1, p2) => { With.game.drawLineMap(p1, p2, color); p2 })
     With.game.drawLineMap(points.head, points.last, color)
+  }
+  
+  def _drawResources() {
+    With.game.drawTextScreen(
+      205,
+      5,
+      With.bank.getPrioritizedRequests
+        .map(r =>
+          (if (r.getSatisfaction) "[X] " else "[_]") ++
+          (if (r.minerals > 0)  r.minerals  .toString ++ "m " else "") ++
+          (if (r.gas > 0)       r.gas       .toString ++ "g " else "") ++
+          (if (r.supply > 0)    r.supply    .toString ++ "s " else ""))
+        .mkString("\n"))
   }
 }

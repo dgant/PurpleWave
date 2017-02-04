@@ -2,7 +2,7 @@ package Plans.Generic.Compound
 
 import Traits.TraitSettableChildren
 
-class PlanCompleteAllInSerial
+class Serial
   extends AbstractPlanCompleteAll
   with TraitSettableChildren {
   

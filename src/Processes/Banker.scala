@@ -16,11 +16,15 @@ class Banker {
     recountResources()
   }
   
+  def getPrioritizedRequests:Iterable[PlanAcquireCurrency] = {
+    _requests.toSeq.sortBy(With.prioritizer.getPriority(_))
+  }
+  
   def recountResources() {
     _mineralsLeft  = With.game.self.minerals
     _gasLeft       = With.game.self.gas
     _supplyLeft    = With.game.self.supplyTotal - With.game.self.supplyUsed
-    _requests.toSeq.sortBy(With.prioritizer.getPriority(_)).foreach(_queueBuyer)
+    getPrioritizedRequests.foreach(_queueBuyer)
   }
   
   def add(request:PlanAcquireCurrency) {

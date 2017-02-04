@@ -1,46 +1,45 @@
 package Plans.GamePlans.Protoss.Proxy
 
-import Plans.Generic.Compound.{PlanCompleteAllInParallel, PlanCompleteAllInSerial}
-import Plans.Generic.Macro.UnitAtLocation.PlanRequireUnitAtLocation
-import Plans.Generic.Macro.UnitCount.PlanCheckUnitCountAtLeast
-import Plans.Generic.Macro.{PlanBuildBuilding, PlanTrainUnit}
-import Plans.Information.PlanRequireEnemyBaseLocation
+import Plans.Generic.Compound.{Simultaneous, Serial}
+import Plans.Generic.Macro.UnitAtLocation.RequireUnitAtLocation
+import Plans.Generic.Macro.{BuildBuilding, TrainUnit}
+import Plans.Information.RequireEnemyBaseLocation
 import Strategies.PositionFinders.{PositionProxyGateway, PositionProxyPylon}
 import Strategies.UnitMatchers.UnitMatchWorker
+import Strategies.UnitPreferences.UnitPreferClose
 import bwapi.UnitType
 
 class ProtossRushWithProxyZealots
-  extends PlanCompleteAllInParallel {
+  extends Simultaneous {
   
   setChildren(List(
-    new PlanCompleteAllInSerial {
-      setChildren(List(
-        new PlanCheckUnitCountAtLeast {
-          setUnitMatcher(UnitMatchWorker);
-          setQuantity(5)
-        },
-        new PlanRequireUnitAtLocation {
-          setUnitMatcher(UnitMatchWorker)
-          setPositionFinder(PositionProxyPylon)
-        },
-          new PlanBuildBuilding(UnitType.Protoss_Pylon)   { setPositionFinder(PositionProxyPylon) },
-          new PlanBuildBuilding(UnitType.Protoss_Gateway) { setPositionFinder(PositionProxyGateway) },
-          new PlanBuildBuilding(UnitType.Protoss_Gateway) { setPositionFinder(PositionProxyGateway) },
-          new PlanRequireEnemyBaseLocation
-        )
-      )
-    },
-    new PlanTrainUnit(UnitType.Protoss_Probe),
-    new PlanTrainUnit(UnitType.Protoss_Probe),
-    new PlanTrainUnit(UnitType.Protoss_Probe),
-    new PlanTrainUnit(UnitType.Protoss_Probe),
-    new PlanTrainUnit(UnitType.Protoss_Zealot),
-    new PlanTrainUnit(UnitType.Protoss_Zealot),
-    new PlanTrainUnit(UnitType.Protoss_Zealot),
-    new PlanTrainUnit(UnitType.Protoss_Probe),
-    new PlanBuildBuilding(UnitType.Protoss_Pylon),
-    new PlanTrainUnit(UnitType.Protoss_Zealot),
-    new PlanTrainUnit(UnitType.Protoss_Zealot),
-    new PlanTrainUnit(UnitType.Protoss_Zealot)
+    new Serial { setChildren(List(
+      new TrainUnit(UnitType.Protoss_Probe),
+      new TrainUnit(UnitType.Protoss_Probe),
+      new Simultaneous { setChildren(List(
+        new Serial { setChildren(List(
+            new RequireUnitAtLocation {
+              setUnitMatcher(UnitMatchWorker)
+              setUnitPreference(new UnitPreferClose{setPositionFinder(PositionProxyPylon)})
+              setPositionFinder(PositionProxyPylon)
+              setRange(8 * 32)
+            },
+            new BuildBuilding(UnitType.Protoss_Pylon)   { setPositionFinder(PositionProxyPylon) },
+            new BuildBuilding(UnitType.Protoss_Gateway) { setPositionFinder(PositionProxyGateway) },
+            new BuildBuilding(UnitType.Protoss_Gateway) { setPositionFinder(PositionProxyGateway) },
+            new RequireEnemyBaseLocation
+          ))},
+        new TrainUnit(UnitType.Protoss_Probe),
+        new TrainUnit(UnitType.Protoss_Probe)
+      ))},
+      new TrainUnit(UnitType.Protoss_Zealot),
+      new TrainUnit(UnitType.Protoss_Zealot),
+      new TrainUnit(UnitType.Protoss_Zealot),
+      new TrainUnit(UnitType.Protoss_Probe),
+      new BuildBuilding(UnitType.Protoss_Pylon),
+      new TrainUnit(UnitType.Protoss_Zealot),
+      new TrainUnit(UnitType.Protoss_Zealot),
+      new TrainUnit(UnitType.Protoss_Zealot)
+    ))}
   ))
 }

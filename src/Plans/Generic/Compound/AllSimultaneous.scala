@@ -1,14 +1,8 @@
 package Plans.Generic.Compound
 
-import Traits.TraitSettableChildren
-
-class AllSimultaneous
-  extends AbstractPlanCompleteAll
-  with TraitSettableChildren {
-  
-  final override def children = getChildren
+class AllSimultaneous extends AbstractPlanCompleteAll {
   
   final override def onFrame() = {
-    children.foreach(_.onFrame())
+    getChildren.foreach(_.onFrame())
   }
 }

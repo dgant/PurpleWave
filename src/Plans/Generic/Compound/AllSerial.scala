@@ -1,16 +1,10 @@
 package Plans.Generic.Compound
 
-import Traits.TraitSettableChildren
-
-class AllSerial
-  extends AbstractPlanCompleteAll
-  with TraitSettableChildren {
-  
-  final override def children = getChildren
+class AllSerial extends AbstractPlanCompleteAll {
   
   final override def onFrame() {
     var continue = true
-    children
+    getChildren
       .foreach(child => {
         if (continue) {
           child.onFrame()

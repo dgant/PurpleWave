@@ -2,17 +2,16 @@ package Plans.Generic.Macro.UnitCount
 
 import Plans.Plan
 import Startup.With
-import Traits.{TraitSettableQuantity, TraitSettableUnitMatcher}
+import Strategies.UnitMatchers.{UnitMatchAnything, UnitMatcher}
+import Traits.Property
 
-class PlanCheckUnitCountAtLeast
-  extends Plan
-  with TraitSettableUnitMatcher
-  with TraitSettableQuantity {
+class PlanCheckUnitCountAtLeast extends Plan {
   
-  override def isComplete(): Boolean = {
-    With.ourUnits
-      .filter(getUnitMatcher.accept)
-      .size >= getQuantity
+  val unitMatcher = new Property[UnitMatcher](UnitMatchAnything)
+  val quantity    = new Property[Integer](0)
+  
+  override def isComplete: Boolean = {
+    With.ourUnits.filter(unitMatcher.get.accept).size >= quantity.get
   }
   
 }

@@ -5,7 +5,7 @@ import Plans.Generic.Compound.AllSimultaneous
 import Plans.Generic.Macro.PlanGatherMinerals
 
 class ProtossStrategyCheese extends AllSimultaneous {
-  setChildren(List(
+  children.set(List(
     new ProtossRushWithProxyZealots(),
     new PlanGatherMinerals()
   ))

@@ -1,29 +1,22 @@
 package Plans.Generic.Macro.UnitAtLocation
 
-import Plans.Generic.Allocation.PlanAcquireUnitsExactly
+import Plans.Generic.Allocation.LockUnits
 import Plans.Plan
-import Traits.{TraitSettablePositionFinder, TraitSettableUnitMatcher, TraitSettableUnitPreference}
+import Strategies.PositionFinders.{PositionCenter, PositionFinder}
+import Traits.Property
 
-class PlanFulfillUnitAtLocation
-    extends Plan
-    with TraitSettableUnitMatcher
-    with TraitSettableUnitPreference
-    with TraitSettablePositionFinder {
+class PlanFulfillUnitAtLocation extends Plan {
   
-  var _units = new PlanAcquireUnitsExactly
+  val unitPlan        = new Property[Option[LockUnits]](None)
+  val positionFinder  = new Property[PositionFinder](new PositionCenter)
   
-  override def children(): Iterable[Plan] = List(_units)
-  override def isComplete(): Boolean = { false }
+  override def getChildren: Iterable[Plan] = unitPlan.get
   
   final override def onFrame(): Unit = {
-    _units.setUnitMatcher(getUnitMatcher)
-    _units.setUnitPreference(getUnitPreference)
-    _units.onFrame()
-    
-    if (_units.isComplete) {
-      _units.units.foreach(unit =>
-        getPositionFinder.find.foreach(position =>
-          unit.move(position.toPosition)))
-    }
+    unitPlan.get.foreach(plan => {
+      plan.onFrame()
+      plan.units.foreach(unit =>
+        positionFinder.get.find.foreach(position =>
+          unit.move(position.toPosition)))})
   }
 }

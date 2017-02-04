@@ -1,15 +1,15 @@
 package Processes
 
-import Plans.Generic.Allocation.PlanAcquireUnits
+import Plans.Generic.Allocation.LockUnits
 import Startup.With
 
 import scala.collection.mutable
 
 class Recruiter {
-  val _assignments:mutable.HashMap[bwapi.Unit, PlanAcquireUnits] = mutable.HashMap.empty
+  val _assignments:mutable.HashMap[bwapi.Unit, LockUnits] = mutable.HashMap.empty
   val _unassigned:mutable.Set[bwapi.Unit] = mutable.Set.empty
-  val _requests:mutable.HashMap[PlanAcquireUnits, mutable.Set[bwapi.Unit]] = mutable.HashMap.empty
-  val _updatedRequests:mutable.Set[PlanAcquireUnits] = mutable.Set.empty
+  val _requests:mutable.HashMap[LockUnits, mutable.Set[bwapi.Unit]] = mutable.HashMap.empty
+  val _updatedRequests:mutable.Set[LockUnits] = mutable.Set.empty
 
   def onFrame() {
     //Automatically free units held by dead requests
@@ -26,11 +26,11 @@ class Recruiter {
     With.ourUnits.toSet.diff(_unassigned ++ _assignments.keys).foreach(_unassigned.add)
   }
   
-  def getAssignment(unit:bwapi.Unit):Option[PlanAcquireUnits] = {
+  def getAssignment(unit:bwapi.Unit):Option[LockUnits] = {
     _assignments.get(unit)
   }
   
-  def add(request: PlanAcquireUnits) {
+  def add(request: LockUnits) {
     _updatedRequests.add(request)
     _requests(request) = _requests.getOrElse(request, mutable.Set.empty)
     
@@ -47,11 +47,11 @@ class Recruiter {
           .map(getUnits))
 
     if (requiredUnits == None) {
-      request.setSatisfaction(false)
+      request.isSatisfied = false
       remove(request)
     }
     else {
-      request.setSatisfaction(true)
+      request.isSatisfied = true
   
       // 1. Unassign all the current units
       // 2. Unassign all the required units
@@ -64,12 +64,12 @@ class Recruiter {
     }
   }
   
-  def remove(request: PlanAcquireUnits) {
+  def remove(request: LockUnits) {
     _requests.get(request).foreach(_.foreach(_unassign))
     _requests.remove(request)
   }
   
-  def _assign(unit:bwapi.Unit, request:PlanAcquireUnits) {
+  def _assign(unit:bwapi.Unit, request:LockUnits) {
     _assignments(unit) = request
     _requests(request).add(unit)
     _unassigned.remove(unit)
@@ -81,7 +81,7 @@ class Recruiter {
     _assignments.remove(unit)
   }
   
-  def getUnits(request: PlanAcquireUnits):mutable.Set[bwapi.Unit] = {
+  def getUnits(request: LockUnits):mutable.Set[bwapi.Unit] = {
     _requests.getOrElse(request, mutable.Set.empty)
   }
 }

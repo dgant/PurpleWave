@@ -2,19 +2,20 @@ package Plans.Generic.Macro.UnitAtLocation
 
 import Plans.Plan
 import Startup.With
-import Traits.{TraitSettablePositionFinder, TraitSettableRange, TraitSettableUnitMatcher}
+import Strategies.PositionFinders.{PositionCenter, PositionFinder}
+import Strategies.UnitMatchers.{UnitMatchAnything, UnitMatcher}
+import Traits.Property
 
-class PlanCheckUnitAtLocation
-  extends Plan
-  with TraitSettablePositionFinder
-  with TraitSettableUnitMatcher
-  with TraitSettableRange {
+class PlanCheckUnitAtLocation extends Plan {
   
-  override def isComplete(): Boolean = {
-    val position = getPositionFinder.find
+  val positionFinder  = new Property[PositionFinder](new PositionCenter)
+  val unitMatcher     = new Property[UnitMatcher](UnitMatchAnything)
+  val range           = new Property[Integer](32)
+  
+  override def isComplete: Boolean = {
     With.ourUnits
-      .filter(getUnitMatcher.accept)
-      .exists(unit => position.exists(
-        _.toPosition.getDistance(unit.getPosition) < getRange))
+      .filter(unitMatcher.get.accept)
+      .exists(unit => positionFinder.get.find.exists(
+        _.toPosition.getDistance(unit.getPosition) < range.get))
   }
 }

@@ -1,48 +1,35 @@
 package Plans.Generic.Macro
 
 import Development.{Logger, TypeDescriber}
-import Plans.Generic.Allocation.{PlanAcquireCurrencyForUnit, PlanAcquireUnitsExactly}
+import Plans.Generic.Allocation.{LockCurrency, LockCurrencyForUnit, LockUnits, LockUnitsExactly}
 import Plans.Plan
 import Startup.With
 import Strategies.PositionFinders.{PositionFinder, PositionSimpleBuilding}
-import Strategies.UnitMatchers.{UnitMatchType, UnitMatchTypeAbandonedBuilding}
-import Strategies.UnitPreferences.UnitPreferClose
-import Traits.{TraitSettablePositionFinder, TraitSettableUnits}
+import Strategies.UnitMatchers.{UnitMatchIncompleteBuilding, UnitMatchType, UnitMatcher}
+import Strategies.UnitPreferences.{UnitPreferClose, UnitPreference}
+import Traits.Property
 import bwapi.{Position, Race, TilePosition, UnitType}
 
-class BuildBuilding(val buildingType:UnitType)
-  extends Plan
-  with TraitSettableUnits
-  with TraitSettablePositionFinder {
+class BuildBuilding(val buildingType:UnitType) extends Plan {
+
+  val me = this
+  val positionFinder    = new Property[PositionFinder] (new PositionSimpleBuilding(buildingType))
+  val builderMatcher    = new Property[UnitMatcher]    (new UnitMatchType(buildingType.whatBuilds.first))
+  val builderPreference = new Property[UnitPreference] (new UnitPreferClose { positionFinder.inherit(me.positionFinder)})
+  val buildingMatcher   = new Property[UnitMatcher]    (new UnitMatchIncompleteBuilding(buildingType))
+  val currencyPlan      = new Property[LockCurrency]   (new LockCurrencyForUnit(buildingType))
+  val builderPlan       = new Property[LockUnits]      (new LockUnitsExactly { unitMatcher.inherit(builderMatcher); unitPreference.inherit(builderPreference)})
+  val buildingPlan      = new Property[LockUnits]      (new LockUnitsExactly { unitMatcher.inherit(buildingMatcher) })
   
   var _builder:Option[bwapi.Unit] = None
   var _building:Option[bwapi.Unit] = None
   var _position:Option[TilePosition] = None
   var _lastOrderFrame = Integer.MIN_VALUE
+    
+  description.set(Some(TypeDescriber.describeUnitType(buildingType)))
   
-  val _currencyPlan = new PlanAcquireCurrencyForUnit(buildingType)
-  val _defaultBuilderPlan = new PlanAcquireUnitsExactly { setUnitMatcher(new UnitMatchType(buildingType.whatBuilds.first)) }
-  val _ourNewBuilding = new PlanAcquireUnitsExactly {setUnitMatcher (new UnitMatchTypeAbandonedBuilding(buildingType)) }
-  
-  setUnits(_defaultBuilderPlan)
-  override def setPositionFinder(value: PositionFinder) {
-    super.setPositionFinder(value)
-    _defaultBuilderPlan.setUnitPreference(new UnitPreferClose { setPositionFinder(value) })
-    _ourNewBuilding.setUnitPreference(new UnitPreferClose { setPositionFinder(value) })
-  }
-  setPositionFinder(new PositionSimpleBuilding(buildingType))
-  
-  override def getDescription = {
-    Some(super.getDescription.getOrElse(TypeDescriber.describeUnitType(buildingType)))
-  }
-  
-  override def children(): Iterable[Plan] = {
-    List(_currencyPlan, getUnits.get, _ourNewBuilding)
-  }
-  
-  override def isComplete(): Boolean = {
-    _building.exists(_.isCompleted)
-  }
+  override def getChildren: Iterable[Plan] = { List(currencyPlan.get, builderPlan.get, buildingPlan.get) }
+  override def isComplete: Boolean = { _building.exists(_.isCompleted) }
   
   override def onFrame() {
     if (isComplete) {
@@ -50,36 +37,35 @@ class BuildBuilding(val buildingType:UnitType)
       return
     }
   
-    _currencyPlan.isSpent = !_building.isEmpty
-  
+    currencyPlan.get.isSpent = !_building.isEmpty
   
     // Chill out if we have a Protoss building warping in
     if (_building.exists(_.exists) && buildingType.getRace == Race.Protoss) {
       return
     }
   
-    _currencyPlan.onFrame()
-    if (_currencyPlan.isComplete) {
-      getUnits.foreach(_.onFrame())
-      if (getUnits.exists(_.isComplete)) {
-        _builder = getUnits.map(_.units.head).headOption
+    currencyPlan.get.onFrame()
+    if (currencyPlan.get.isComplete) {
+      builderPlan.get.onFrame()
+      if (builderPlan.get.isComplete) {
+        _builder = builderPlan.get.units.headOption
         
         //We can probably simplify this
-        if (_currencyPlan.isComplete) {
+        if (currencyPlan.get.isComplete) {
           if (buildingType.getRace == Race.Terran) {
             _builder.foreach(b => _building = Option.apply(b.getBuildUnit))
   
             //Resume incomplete Terran buildings
             if (_building.isEmpty && buildingType.getRace == Race.Terran) {
-              _ourNewBuilding.onFrame()
-              _building = _ourNewBuilding.units.headOption
+              buildingPlan.get.onFrame()
+              _building = buildingPlan.get.units.headOption
             }
           }
 
           // getBuildUnit() only works for Terran
           else {
-            _ourNewBuilding.onFrame()
-            _building = _ourNewBuilding.units.headOption
+            buildingPlan.get.onFrame()
+            _building = buildingPlan.get.units.headOption
           }
   
           if (_building.isDefined) {
@@ -101,7 +87,7 @@ class BuildBuilding(val buildingType:UnitType)
       
       if (_position.filter(p => With.game.canBuildHere(p, buildingType, builder)).isEmpty) {
         With.architect.setBuilder(builder)
-        _position = getPositionFinder.find
+        _position = positionFinder.get.find
         With.architect.clearBuilder()
       }
   

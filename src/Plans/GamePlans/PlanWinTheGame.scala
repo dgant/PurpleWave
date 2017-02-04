@@ -1,8 +1,8 @@
 package Plans.GamePlans
 
-import Plans.Generic.Compound.AllSimultaneous
 import Plans.GamePlans.Protoss.ProtossStrategyCheese
+import Plans.Generic.Compound.AllSimultaneous
 
 class PlanWinTheGame extends AllSimultaneous {
-  setChildren(List(new ProtossStrategyCheese))
+  children.set(List(new ProtossStrategyCheese))
 }

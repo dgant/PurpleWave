@@ -1,6 +1,6 @@
 package Development
 
-import Plans.Generic.Allocation.{PlanAcquireCurrency, PlanAcquireUnits}
+import Plans.Generic.Allocation.{LockCurrency, LockUnits}
 import Plans.Plan
 import Startup.With
 import bwapi.{Position, UnitCommandType}
@@ -39,7 +39,7 @@ object Overlay {
   def _describePlanTree(plan:Plan, childOrder:Integer, depth:Integer):String = {
     if (_isRelevant(plan)) {
       (_describePlan(plan, childOrder, depth)
-        ++ plan.children.zipWithIndex.map(x => _describePlanTree(x._1, x._2, depth + 1)))
+        ++ plan.getChildren.zipWithIndex.map(x => _describePlanTree(x._1, x._2, depth + 1)))
         .mkString("")
     } else {
       ""
@@ -47,7 +47,7 @@ object Overlay {
   }
   
   def _describePlan(plan:Plan, childOrder:Integer, depth:Integer):String = {
-    val planName = plan.getDescription.getOrElse(plan.getClass.getSimpleName.replace("Plan", "").replace("$anon$", "Plan"))
+    val planName = plan.description.get.getOrElse(plan.getClass.getSimpleName.replace("Plan", "").replace("$anon$", "Plan"))
     val checkbox = if (plan.isComplete) "[X] " else "[_] "
     
     val spacer = "  " * depth
@@ -64,10 +64,10 @@ object Overlay {
   
   def _isRelevant(plan:Plan):Boolean = {
     if (plan.isComplete) {
-      return plan.isInstanceOf[PlanAcquireCurrency] || plan.isInstanceOf[PlanAcquireUnits]
+      return plan.isInstanceOf[LockCurrency] || plan.isInstanceOf[LockUnits]
     }
     
-    plan.children.exists(_isRelevant(_))
+    plan.getChildren.exists(_isRelevant(_))
   }
   
   def _drawTerrain() {
@@ -107,7 +107,7 @@ object Overlay {
   
   def _drawPlans(plan:Plan) {
     plan.drawOverlay()
-    plan.children.foreach(_drawPlans)
+    plan.getChildren.foreach(_drawPlans)
   }
   
   def _drawResources() {
@@ -116,7 +116,7 @@ object Overlay {
       5,
       With.bank.getPrioritizedRequests
         .map(r =>
-          (if (r.getSatisfaction) "[X] " else "[_]") ++
+          (if (r.isSatisfied) "[X] " else "[_]") ++
           (if (r.minerals > 0)  r.minerals  .toString ++ "m " else "") ++
           (if (r.gas > 0)       r.gas       .toString ++ "g " else "") ++
           (if (r.supply > 0)    r.supply    .toString ++ "s " else ""))

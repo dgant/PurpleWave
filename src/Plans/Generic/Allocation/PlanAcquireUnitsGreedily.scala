@@ -6,7 +6,7 @@ import Strategies.UnitMatchers.UnitMatcher
 class PlanAcquireUnitsGreedily(
   val unitMatcher:UnitMatcher,
   val minimum: Integer = 0)
-    extends PlanAcquireUnits {
+    extends LockUnits {
   
   override def getRequiredUnits(candidates:Iterable[Iterable[bwapi.Unit]]):Option[Iterable[bwapi.Unit]] = {
     

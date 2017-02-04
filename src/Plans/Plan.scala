@@ -1,12 +1,12 @@
 package Plans
 
-import Traits.TraitSettableDescription
+import Traits.Property
 
-class Plan
-extends TraitSettableDescription {
+class Plan {
+  val description = new Property[Option[String]](None)
   
-  def isComplete():Boolean = { false }
-  def children(): Iterable[Plan] = { List.empty }
+  def isComplete:Boolean = { false }
+  def getChildren:Iterable[Plan] = { List.empty }
   def onFrame() = {}
   def drawOverlay() = { }
 }

@@ -1,6 +1,6 @@
 package Plans.GamePlans.Protoss.Proxy
 
-import Plans.Generic.Allocation.PlanAcquireUnitsExactly
+import Plans.Generic.Allocation.LockUnitsExactly
 import Plans.Generic.Compound.{AllSerial, AllSimultaneous}
 import Plans.Generic.Macro.{BuildBuilding, TrainUnit}
 import Plans.Plan
@@ -13,21 +13,23 @@ import bwapi.UnitType
 class ProtossRushWithProxyZealots
   extends AllSimultaneous {
   
-  var proxyBuilder = new PlanAcquireUnitsExactly {
-    setUnitMatcher(UnitMatchWorker)
-    setUnitPreference(new UnitPreferClose{ setPositionFinder(PositionProxyPylon) })
+  var proxyBuilder = new LockUnitsExactly {
+    unitMatcher.set(UnitMatchWorker)
+    unitPreference.set(new UnitPreferClose{
+      positionFinder.set(PositionProxyPylon)
+    })
   }
 
-  setChildren(List(
+  children.set(List(
     new AllSerial {
-      setDescription("Build proxy and early probes")
-      setChildren(List(
+      description.set(Some("Build proxy and early probes"))
+      children.set(List(
       new TrainUnit(UnitType.Protoss_Probe),
       new AllSimultaneous {
-        setDescription("Build at proxy")
-        setChildren(List(
+        description.set(Some("Build at proxy"))
+        children.set(List(
         new TrainUnit(UnitType.Protoss_Probe),
-        new AllSimultaneous { setChildren(List(
+        new AllSimultaneous { children.set(List(
           proxyBuilder,
           //Dumb hack to send probe in advance.
           new Plan {
@@ -42,9 +44,9 @@ class ProtossRushWithProxyZealots
               }
             }
           },
-          new BuildBuilding(UnitType.Protoss_Pylon)   { setUnits(proxyBuilder); setPositionFinder(PositionProxyPylon); },
-          new BuildBuilding(UnitType.Protoss_Gateway) { setUnits(proxyBuilder); setPositionFinder(PositionProxyGateway); },
-          new BuildBuilding(UnitType.Protoss_Gateway) { setUnits(proxyBuilder); setPositionFinder(PositionProxyGateway); }
+          new BuildBuilding(UnitType.Protoss_Pylon)   { builderPlan.set(proxyBuilder); positionFinder.set(PositionProxyPylon); },
+          new BuildBuilding(UnitType.Protoss_Gateway) { builderPlan.set(proxyBuilder); positionFinder.set(PositionProxyGateway); },
+          new BuildBuilding(UnitType.Protoss_Gateway) { builderPlan.set(proxyBuilder); positionFinder.set(PositionProxyGateway); }
           //new RequireEnemyBaseLocation
         ))},
         new TrainUnit(UnitType.Protoss_Probe),

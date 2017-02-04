@@ -1,39 +1,34 @@
 package Plans.Generic.Macro.UnitAtLocation
 
 import Plans.Generic.Compound.AbstractPlanFulfillRequirements
-import Plans.Plan
 import Startup.With
-import Traits._
+import Strategies.PositionFinders.{PositionCenter, PositionFinder}
+import Strategies.UnitMatchers.{UnitMatchAnything, UnitMatcher}
+import Traits.Property
 
-class RequireUnitAtLocation
-    extends AbstractPlanFulfillRequirements
-    with TraitSettablePositionFinder
-    with TraitSettableUnitMatcher
-    with TraitSettableUnitPreference
-    with TraitSettableRange {
+class RequireUnitAtLocation extends AbstractPlanFulfillRequirements {
   
-  var _check = new PlanCheckUnitAtLocation
-  var _fulfill = new PlanFulfillUnitAtLocation
+  val me = this
+  val positionFinder  = new Property[PositionFinder]  (new PositionCenter)
+  val unitMatcher     = new Property[UnitMatcher]     (UnitMatchAnything)
+  val range           = new Property[Integer]         (32)
   
-  override def _getChecker:Plan = {
-    _check.setPositionFinder(getPositionFinder)
-    _check.setUnitMatcher(getUnitMatcher)
-    _check.setRange(getRange)
-    _check
-  }
+  checker.set(new PlanCheckUnitAtLocation {
+    positionFinder.inherit(me.positionFinder)
+    unitMatcher.inherit(me.unitMatcher)
+    range.inherit(me.range)
+  })
   
-  override def _getFulfiller() :Plan = {
-    _fulfill.setPositionFinder(getPositionFinder)
-    _fulfill.setUnitMatcher(getUnitMatcher)
-    _fulfill.setUnitPreference(getUnitPreference)
-    _fulfill
-  }
+  fulfiller.set(new PlanFulfillUnitAtLocation {
+    positionFinder.inherit(me.positionFinder)
+    unitMatcher.inherit(me.unitMatcher)
+  })
   
   override def drawOverlay() = {
-    getPositionFinder.find.foreach(position => {
+    positionFinder.get.find.foreach(position => {
       With.game.drawCircleMap(
         position.toPosition,
-        getRange,
+        range.get,
         bwapi.Color.Green)
       With.game.drawTextMap(
         position.toPosition,

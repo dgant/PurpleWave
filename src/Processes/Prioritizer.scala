@@ -24,6 +24,6 @@ class Prioritizer {
   def _prioritizeRecurisvely(plan:Plan) {
     _priorities.put(plan, _nextPriority)
     _nextPriority += 1
-    plan.children.foreach(_prioritizeRecurisvely)
+    plan.getChildren.foreach(_prioritizeRecurisvely)
   }
 }

@@ -1,53 +1,46 @@
 package Plans.Generic.Macro
 
 import Development.{Logger, TypeDescriber}
-import Plans.Generic.Allocation.{PlanAcquireCurrencyForUnit, PlanAcquireUnitsExactly}
+import Plans.Generic.Allocation.{LockCurrency, LockCurrencyForUnit, LockUnits, LockUnitsExactly}
 import Plans.Plan
 import Startup.With
 import Strategies.UnitMatchers.UnitMatchType
+import Traits.Property
 import bwapi.UnitType
 
 class TrainUnit(val traineeType:UnitType)
   extends Plan {
   
-  val _currencyPlan = new PlanAcquireCurrencyForUnit(traineeType)
-  val _trainerPlan = new PlanAcquireUnitsExactly {
-    setUnitMatcher(new UnitMatchType(traineeType.whatBuilds.first))
-  }
+  val currencyPlan  = new Property[LockCurrency] (new LockCurrencyForUnit(traineeType))
+  val trainerPlan   = new Property[LockUnits] (new LockUnitsExactly {
+    unitMatcher.set(new UnitMatchType(traineeType.whatBuilds.first))
+  })
   
   var _trainer:Option[bwapi.Unit] = None
   var _trainee:Option[bwapi.Unit] = None
   
-  override def getDescription = {
-    Some(super.getDescription.getOrElse(TypeDescriber.describeUnitType(traineeType)))
-  }
+  description.set(Some(TypeDescriber.describeUnitType(traineeType)))
   
-  override def isComplete(): Boolean = {
-    _trainee.exists(p => p.exists && p.isCompleted)
-  }
-  
-  override def children(): Iterable[Plan] = {
-    List(_currencyPlan, _trainerPlan)
-  }
-  
+  override def isComplete: Boolean = { _trainee.exists(p => p.exists && p.isCompleted) }
+  override def getChildren: Iterable[Plan] = { List(currencyPlan.get, trainerPlan.get) }
   override def onFrame() {
     if (isComplete) {
       //It's important to quit so we release our resources
       return
     }
     
-    children.foreach(_.onFrame())
+    getChildren.foreach(_.onFrame())
   
     //Require all the resources
-    if (!children.forall(_.isComplete)) {
+    if (!getChildren.forall(_.isComplete)) {
       return
     }
   
-    _trainerPlan.units.headOption.foreach(_requireTraining)
+    trainerPlan.get.units.headOption.foreach(_requireTraining)
   }
   
   def _reset() {
-    _currencyPlan.isSpent = false
+    currencyPlan.get.isSpent = false
     _trainer = None
     _trainee = None
   }
@@ -94,7 +87,7 @@ class TrainUnit(val traineeType:UnitType)
   
   def _orderUnit(trainer:bwapi.Unit) {
     _trainer = Some(trainer)
-    _currencyPlan.isSpent = true
+    currencyPlan.get.isSpent = true
     trainer.train(traineeType)
   }
 }

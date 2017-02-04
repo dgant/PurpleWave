@@ -1,47 +1,42 @@
 package Plans.Information
 
-import Plans.Generic.Allocation.PlanAcquireUnitsExactly
+import Plans.Generic.Allocation.{LockUnits, LockUnitsExactly}
 import Plans.Plan
 import Startup.With
-import Strategies.PositionFinders.PositionSpecific
-import Strategies.UnitMatchers.UnitMatchMobile
-import Strategies.UnitPreferences.UnitPreferClose
+import Strategies.PositionFinders.{PositionCenter, PositionFinder, PositionSpecific}
+import Strategies.UnitPreferences.{UnitPreferClose, UnitPreference}
+import Traits.Property
 import bwapi.Position
 
-class PlanFulfillKnowingEnemyBaseLocation
-  extends Plan {
+class PlanFulfillKnowingEnemyBaseLocation extends Plan {
   
-  var _requireScout = new PlanAcquireUnitsExactly { setUnitMatcher(new UnitMatchMobile) }
+  val me = this
+  val positionFinder = new Property[PositionFinder](new PositionCenter)
+  val unitPreference = new Property[UnitPreference](new UnitPreferClose  { positionFinder.inherit(me.positionFinder) })
+  val unitPlan       = new Property[LockUnits]     (new LockUnitsExactly { unitPreference.inherit(me.unitPreference) })
   
-  override def children(): Iterable[Plan] = {
-    List(_requireScout)
-  }
+  override def getChildren: Iterable[Plan] = { List(unitPlan.get) }
   
   override def onFrame() {
-    _getFirstScoutingPosition.foreach(
-      position => _requireScout.setUnitPreference(
-        new UnitPreferClose {
-          setPositionFinder(new PositionSpecific(position.toTilePosition))
-        }))
-    
-    _requireScout.onFrame()
-    _requireScout.units.foreach(_orderScout)
+    _getFirstScoutingPosition.foreach(position => positionFinder.set(new PositionSpecific(position.toTilePosition)))
+    unitPlan.get.onFrame()
+    unitPlan.get.units.foreach(_orderScout)
   }
   
   def _orderScout(scout:bwapi.Unit) {
     _getNextScoutingPosition(scout).foreach(scout.move(_))
   }
   
-  def _getNextScoutingPosition(scout:bwapi.Unit):Option[Position] = {
+  def _getFirstScoutingPosition():Option[Position] = {
     With.scout.unexploredStartLocations
-      .toList
-      .sortBy(_.getPosition.getDistance(scout.getPosition))
       .headOption
       .map(_.getPosition)
   }
   
-  def _getFirstScoutingPosition():Option[Position] = {
+  def _getNextScoutingPosition(scout:bwapi.Unit):Option[Position] = {
     With.scout.unexploredStartLocations
+      .toList
+      .sortBy(_.getPosition.getDistance(scout.getPosition))
       .headOption
       .map(_.getPosition)
   }

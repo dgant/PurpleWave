@@ -1,21 +1,19 @@
 package Plans.Generic.Macro
 
-import Plans.Generic.Allocation.PlanAcquireUnitsGreedily
+import Plans.Generic.Allocation.{LockUnits, PlanAcquireUnitsGreedily}
 import Plans.Plan
-import Traits.TraitSettableChildren
 import Startup.With
 import Strategies.UnitMatchers.UnitMatchWorker
+import Traits.Property
 
 import scala.collection.JavaConverters._
 
-class PlanGatherMinerals
-  extends Plan
-  with TraitSettableChildren {
+class PlanGatherMinerals extends Plan {
   
-  val _workerPlan = new PlanAcquireUnitsGreedily(UnitMatchWorker)
-  setChildren(List(_workerPlan))
-  
+  val workerPlan = new Property[LockUnits](new PlanAcquireUnitsGreedily(UnitMatchWorker))
   var _mineral:Option[bwapi.Unit] = None
+  
+  override def getChildren: Iterable[Plan] = { List(workerPlan.get) }
   
   override def onFrame() {
     if (_mineral.isEmpty) {
@@ -23,8 +21,8 @@ class PlanGatherMinerals
     }
   
     if ( ! _mineral.isEmpty) {
-      _workerPlan.onFrame()
-      _workerPlan.units
+      workerPlan.get.onFrame()
+      workerPlan.get.units
         .filterNot(worker => worker.isGatheringMinerals)
         .foreach(worker => worker.gather(_mineral.head))
     }

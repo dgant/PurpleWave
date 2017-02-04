@@ -1,14 +1,15 @@
 package Strategies.UnitPreferences
 
-import Traits.TraitSettablePositionFinder
+import Strategies.PositionFinders.{PositionCenter, PositionFinder}
+import Traits.Property
 import bwapi.Unit
 
-class UnitPreferClose
-  extends UnitPreference
-  with TraitSettablePositionFinder{
+class UnitPreferClose extends UnitPreference {
+  
+  val positionFinder = new Property[PositionFinder](new PositionCenter)
   
   override def preference(unit: Unit): Double = {
-    getPositionFinder.find
+    positionFinder.get.find
       .map(position => position.toPosition.getDistance(unit.getPosition))
       .getOrElse(0)
   }

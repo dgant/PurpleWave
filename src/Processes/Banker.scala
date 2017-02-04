@@ -1,7 +1,7 @@
 package Processes
 
 import Startup.With
-import Plans.Generic.Allocation.PlanAcquireCurrency
+import Plans.Generic.Allocation.LockCurrency
 
 import scala.collection.mutable
 
@@ -9,14 +9,14 @@ class Banker {
   var _mineralsLeft = 0
   var _gasLeft = 0
   var _supplyLeft = 0
-  val _requests = new mutable.HashSet[PlanAcquireCurrency]()
+  val _requests = new mutable.HashSet[LockCurrency]()
   
   def onFrame() {
     _requests.clear()
     recountResources()
   }
   
-  def getPrioritizedRequests:Iterable[PlanAcquireCurrency] = {
+  def getPrioritizedRequests:Iterable[LockCurrency] = {
     _requests.toSeq.sortBy(With.prioritizer.getPriority(_))
   }
   
@@ -27,19 +27,19 @@ class Banker {
     getPrioritizedRequests.foreach(_queueBuyer)
   }
   
-  def add(request:PlanAcquireCurrency) {
+  def add(request:LockCurrency) {
     _requests.add(request)
     recountResources()
   }
   
-  def remove(request:PlanAcquireCurrency) {
-    request.setSatisfaction(false)
+  def remove(request:LockCurrency) {
+    request.isSatisfied = false
     _requests.remove(request)
     recountResources()
   }
   
-  def _queueBuyer(request:PlanAcquireCurrency) {
-    request.setSatisfaction(request.isSpent || _isAvailableNow(request))
+  def _queueBuyer(request:LockCurrency) {
+    request.isSatisfied = request.isSpent || _isAvailableNow(request)
     
     if ( ! request.isSpent) {
       _mineralsLeft -= request.minerals
@@ -48,7 +48,7 @@ class Banker {
     }
   }
   
-  def _isAvailableNow(request:PlanAcquireCurrency): Boolean = {
+  def _isAvailableNow(request:LockCurrency): Boolean = {
     (request.minerals == 0  ||  _mineralsLeft  >= request.minerals) &&
     (request.gas      == 0  ||  _gasLeft       >= request.gas)      &&
     (request.supply   == 0  ||  _supplyLeft    >= request.supply)

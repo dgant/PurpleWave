@@ -20,7 +20,7 @@ class ProtossRushWithProxyZealots
         new Serial { setChildren(List(
             new RequireUnitAtLocation {
               setUnitMatcher(UnitMatchWorker)
-              setUnitPreference(new UnitPreferClose{setPositionFinder(PositionProxyPylon)})
+              setUnitPreference(new UnitPreferClose { setPositionFinder(PositionProxyPylon) })
               setPositionFinder(PositionProxyPylon)
               setRange(4 * 32)
             },

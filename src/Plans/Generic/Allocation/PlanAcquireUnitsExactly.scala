@@ -11,15 +11,19 @@ class PlanAcquireUnitsExactly
     
     val desiredUnits = With.recruiter.getUnits(this).clone
     
+    //The candidates are offered in pools.
+    //Originally, we wanted to force plans to hire from the unemployed pool first
+    //But that meant that when we had a strong preference, the pooling was overriding it
+    //Flattening it basically retains the "welfare" effect, but still allows sorting to work
     candidates
-      .foreach(pool => pool
-        .toList
-        .sortBy(getUnitPreference.preference(_))
-        .foreach(unit =>
-          if (desiredUnits.size < getQuantity
-            && getUnitMatcher.accept(unit)) {
-            desiredUnits.add(unit)
-          }))
+      .flatten
+      .toList
+      .sortBy(getUnitPreference.preference(_))
+      .foreach(unit =>
+        if (desiredUnits.size < getQuantity
+          && getUnitMatcher.accept(unit)) {
+          desiredUnits.add(unit)
+        })
     
     if (desiredUnits.size >= getQuantity) {
       Some(desiredUnits)

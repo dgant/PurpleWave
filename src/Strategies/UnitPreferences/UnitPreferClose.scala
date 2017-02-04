@@ -8,8 +8,8 @@ class UnitPreferClose
   with TraitSettablePositionFinder{
   
   override def preference(unit: Unit): Double = {
-    getPositionFinder.find.map(position => position.toPosition
-      .getDistance(unit.getPosition))
+    getPositionFinder.find
+      .map(position => position.toPosition.getDistance(unit.getPosition))
       .getOrElse(0)
   }
 }

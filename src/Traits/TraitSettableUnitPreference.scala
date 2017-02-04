@@ -6,7 +6,7 @@ trait TraitSettableUnitPreference {
   
   var _unitPreference:UnitPreference = UnitPreferAnything
   
-  def getUnitPreference():UnitPreference = {
+  def getUnitPreference:UnitPreference = {
     _unitPreference
   }
   

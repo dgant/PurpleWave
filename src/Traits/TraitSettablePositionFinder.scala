@@ -6,7 +6,7 @@ trait TraitSettablePositionFinder {
   
   var _positionFinder:PositionFinder = new PositionCenter
   
-  def getPositionFinder():PositionFinder = {
+  def getPositionFinder:PositionFinder = {
     _positionFinder
   }
   

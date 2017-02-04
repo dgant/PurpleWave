@@ -6,7 +6,7 @@ trait TraitSettableChildren {
   
   var _children:Iterable[Plan] = List.empty
   
-  def getChildren():Iterable[Plan] = {
+  def getChildren:Iterable[Plan] = {
     _children
   }
   

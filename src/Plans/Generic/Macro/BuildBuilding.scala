@@ -3,10 +3,11 @@ package Plans.Generic.Macro
 import Development.{Logger, TypeDescriber}
 import Plans.Generic.Allocation.{PlanAcquireCurrencyForUnit, PlanAcquireUnitsExactly}
 import Plans.Plan
-import Traits.TraitSettablePositionFinder
 import Startup.With
-import Strategies.PositionFinders.PositionSimpleBuilding
+import Strategies.PositionFinders.{PositionFinder, PositionSimpleBuilding}
 import Strategies.UnitMatchers.{UnitMatchType, UnitMatchTypeAbandonedBuilding}
+import Strategies.UnitPreferences.UnitPreferClose
+import Traits.TraitSettablePositionFinder
 import bwapi.{Position, Race, TilePosition, UnitType}
 
 class BuildBuilding(val buildingType:UnitType)
@@ -15,15 +16,16 @@ class BuildBuilding(val buildingType:UnitType)
   
   var monopolizeWorker:Boolean = false
   
-  setPositionFinder(new PositionSimpleBuilding(buildingType))
-  
   val _currencyPlan = new PlanAcquireCurrencyForUnit(buildingType)
-  val _builderPlan = new PlanAcquireUnitsExactly {
-    setUnitMatcher(new UnitMatchType(buildingType.whatBuilds.first))
+  val _builderPlan = new PlanAcquireUnitsExactly { setUnitMatcher(new UnitMatchType(buildingType.whatBuilds.first)) }
+  val _recyclePlan = new PlanAcquireUnitsExactly {setUnitMatcher (new UnitMatchTypeAbandonedBuilding(buildingType)) }
+  
+  override def setPositionFinder(value: PositionFinder) {
+    super.setPositionFinder(value)
+    _builderPlan.setUnitPreference(new UnitPreferClose { setPositionFinder(value) })
+    _recyclePlan.setUnitPreference(new UnitPreferClose { setPositionFinder(value) })
   }
-  val _recyclePlan = new PlanAcquireUnitsExactly {
-    setUnitMatcher (new UnitMatchTypeAbandonedBuilding(buildingType))
-  }
+  setPositionFinder(new PositionSimpleBuilding(buildingType))
   
   var _builder:Option[bwapi.Unit] = None
   var _building:Option[bwapi.Unit] = None

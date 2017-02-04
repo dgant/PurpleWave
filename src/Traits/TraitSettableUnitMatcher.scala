@@ -6,7 +6,7 @@ trait TraitSettableUnitMatcher {
   
   var _unitMatcher:UnitMatcher = UnitMatchAnything
   
-  def getUnitMatcher():UnitMatcher = {
+  def getUnitMatcher:UnitMatcher = {
     _unitMatcher
   }
   

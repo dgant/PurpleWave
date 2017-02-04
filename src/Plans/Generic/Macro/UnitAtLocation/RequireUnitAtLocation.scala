@@ -3,7 +3,7 @@ package Plans.Generic.Macro.UnitAtLocation
 import Plans.Generic.Compound.AbstractPlanFulfillRequirements
 import Plans.Plan
 import Startup.With
-import Traits.{TraitSettablePositionFinder, TraitSettableRange, TraitSettableUnitMatcher, TraitSettableUnitPreference}
+import Traits._
 
 class RequireUnitAtLocation
     extends AbstractPlanFulfillRequirements

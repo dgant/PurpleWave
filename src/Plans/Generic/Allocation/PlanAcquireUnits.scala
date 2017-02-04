@@ -19,7 +19,7 @@ abstract class PlanAcquireUnits
     With.recruiter.add(this)
   }
   
-  def units():mutable.Set[Unit] = {
+  def units:mutable.Set[Unit] = {
     With.recruiter.getUnits(this)
   }
   

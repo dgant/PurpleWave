@@ -1,9 +1,10 @@
 package Plans.GamePlans.Protoss.Proxy
 
-import Plans.Generic.Compound.{AllSimultaneous, AllSerial}
-import Plans.Generic.Macro.UnitAtLocation.RequireUnitAtLocation
+import Plans.Generic.Allocation.PlanAcquireUnitsExactly
+import Plans.Generic.Compound.{AllSerial, AllSimultaneous}
 import Plans.Generic.Macro.{BuildBuilding, TrainUnit}
-import Plans.Information.RequireEnemyBaseLocation
+import Plans.Plan
+import Startup.With
 import Strategies.PositionFinders.{PositionProxyGateway, PositionProxyPylon}
 import Strategies.UnitMatchers.UnitMatchWorker
 import Strategies.UnitPreferences.UnitPreferClose
@@ -12,11 +13,9 @@ import bwapi.UnitType
 class ProtossRushWithProxyZealots
   extends AllSimultaneous {
   
-  var holdWorkerAtProxy = new RequireUnitAtLocation {
+  var proxyBuilder = new PlanAcquireUnitsExactly {
     setUnitMatcher(UnitMatchWorker)
-    setUnitPreference(new UnitPreferClose { setPositionFinder(PositionProxyPylon) })
-    setPositionFinder(PositionProxyPylon)
-    setRange(4 * 32)
+    setUnitPreference(new UnitPreferClose{ setPositionFinder(PositionProxyPylon) })
   }
 
   setChildren(List(
@@ -28,11 +27,25 @@ class ProtossRushWithProxyZealots
         setDescription("Build at proxy")
         setChildren(List(
         new TrainUnit(UnitType.Protoss_Probe),
-        new AllSerial { setChildren(List(
-          new BuildBuilding(UnitType.Protoss_Pylon)   { setPositionFinder(PositionProxyPylon);  monopolizeWorker = true },
-          new BuildBuilding(UnitType.Protoss_Gateway) { setPositionFinder(PositionProxyGateway); monopolizeWorker = true },
-          new BuildBuilding(UnitType.Protoss_Gateway) { setPositionFinder(PositionProxyGateway); monopolizeWorker = true },
-          new RequireEnemyBaseLocation
+        new AllSimultaneous { setChildren(List(
+          proxyBuilder,
+          //Dumb hack to send probe in advance.
+          new Plan {
+            override def isComplete(): Boolean = true
+            override def onFrame() {
+              if (With.ourUnits.filter(_.getType == UnitType.Protoss_Pylon).isEmpty
+                && With.game.self.minerals < UnitType.Protoss_Pylon.mineralPrice()) {
+                proxyBuilder.units.foreach(builder =>
+                  PositionProxyPylon.find.foreach(position =>
+                    builder.move(position.toPosition)
+                  ))
+              }
+            }
+          },
+          new BuildBuilding(UnitType.Protoss_Pylon)   { setUnits(proxyBuilder); setPositionFinder(PositionProxyPylon); },
+          new BuildBuilding(UnitType.Protoss_Gateway) { setUnits(proxyBuilder); setPositionFinder(PositionProxyGateway); },
+          new BuildBuilding(UnitType.Protoss_Gateway) { setUnits(proxyBuilder); setPositionFinder(PositionProxyGateway); }
+          //new RequireEnemyBaseLocation
         ))},
         new TrainUnit(UnitType.Protoss_Probe),
         new TrainUnit(UnitType.Protoss_Probe)

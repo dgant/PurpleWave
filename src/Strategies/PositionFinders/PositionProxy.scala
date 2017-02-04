@@ -18,7 +18,7 @@ class PositionProxy extends PositionFinder {
   
   def _recalculate(): Option[TilePosition] = {
     val ourStartLocation = BWTA.getStartLocation(With.game.self)
-    val enemyStartLocations = BWTA.getStartLocations.asScala.filter(_ != ourStartLocation)
+    val enemyStartLocations = With.scout.unexploredStartLocations()
     
     val centroid:TilePosition =
       if(enemyStartLocations.size == 1) {

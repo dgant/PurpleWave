@@ -32,8 +32,8 @@ class BuildBuilding(val buildingType:UnitType)
   var _position:Option[TilePosition] = None
   var _lastOrderFrame = Integer.MIN_VALUE
   
-  override def describe(): Option[String] = {
-    Some(TypeDescriber.describeUnitType(buildingType))
+  override def getDescription = {
+    Some(super.getDescription.getOrElse(TypeDescriber.describeUnitType(buildingType)))
   }
   
   override def children(): Iterable[Plan] = {

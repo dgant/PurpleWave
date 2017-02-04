@@ -50,19 +50,6 @@ object Overlay {
     val planName = plan.getDescription.getOrElse(plan.getClass.getSimpleName.replace("Plan", "").replace("$anon$", "Plan"))
     val checkbox = if (plan.isComplete) "[X] " else "[_] "
     
-    val resources = Iterable(plan)
-      .filter(_.isInstanceOf[PlanAcquireCurrency])
-      .map(_.asInstanceOf[PlanAcquireCurrency])
-      .map(r => r.minerals.toString ++ "m " ++ r.gas.toString ++ "g " ++ r.supply.toString ++ "s")
-      .mkString("")
-    
-    val units = Iterable(plan)
-      .filter(_.isInstanceOf[PlanAcquireUnits])
-      .flatten(_.asInstanceOf[PlanAcquireUnits].units)
-      .groupBy(unit => TypeDescriber.describeUnitType(unit.getType))
-      .map(pair => pair._2.size.toString ++ " " ++ pair._1)
-      .mkString("")
-    
     val spacer = "  " * depth
     val leftColumn =
     (checkbox
@@ -70,8 +57,7 @@ object Overlay {
       ++ "#"
       ++ (childOrder + 1).toString
       ++ " "
-      ++ planName
-      ++ planDescription)
+      ++ planName)
     
     leftColumn + " " * Math.max(0, 45 - leftColumn.length) + "\n"
   }

@@ -18,8 +18,8 @@ class TrainUnit(val traineeType:UnitType)
   var _trainer:Option[bwapi.Unit] = None
   var _trainee:Option[bwapi.Unit] = None
   
-  override def describe(): Option[String] = {
-    Some(TypeDescriber.describeUnitType(traineeType))
+  override def getDescription = {
+    Some(super.getDescription.getOrElse(TypeDescriber.describeUnitType(traineeType)))
   }
   
   override def isComplete(): Boolean = {

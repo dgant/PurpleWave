@@ -33,12 +33,7 @@ object Overlay {
   def _drawUnits() {
     With.ourUnits
       .filterNot(_.getLastCommand.getUnitCommandType == UnitCommandType.None)
-      .foreach(unit =>
-        _drawTextLabel(
-          List(
-            With.recruiter.getAssignment(unit).map(plan => plan.getClass.getSimpleName.replace("Plan", "")).mkString(""),
-            unit.getLastCommand.getUnitCommandType.toString),
-        unit))
+      .foreach(unit => _drawTextLabel(List(unit.getLastCommand.getUnitCommandType.toString), unit))
   }
   
   def _describePlanTree(plan:Plan, childOrder:Integer, depth:Integer):String = {

@@ -52,8 +52,13 @@ class BuildBuilding(val buildingType:UnitType)
     
     _currencyPlan.isSpent = ! _building.isEmpty
 
+
     // Chill out if we have a Protoss building warping in
     if (_building.exists(_.exists) && buildingType.getRace == Race.Protoss) {
+      //Don't let that worker go!
+      if (monopolizeWorker) {
+        _builderPlan.onFrame()
+      }
       return
     }
     

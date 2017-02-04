@@ -32,17 +32,17 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="BuildBuilding.scala" pinned="false" current-in-tab="false">
+      <file leaf-file-name="BuildBuilding.scala" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Macro/BuildBuilding.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="260">
-              <caret line="35" column="86" lean-forward="false" selection-start-line="35" selection-start-column="86" selection-end-line="35" selection-end-column="86" />
+            <state relative-caret-position="273">
+              <caret line="138" column="17" lean-forward="false" selection-start-line="138" selection-start-column="17" selection-end-line="138" selection-end-column="17" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="TrainUnit.scala" pinned="false" current-in-tab="true">
+      <file leaf-file-name="TrainUnit.scala" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Macro/TrainUnit.scala">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="175">
@@ -52,11 +52,51 @@
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="PositionSimpleBuilding.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Strategies/PositionFinders/PositionSimpleBuilding.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="221">
+              <caret line="20" column="24" lean-forward="true" selection-start-line="20" selection-start-column="24" selection-end-line="20" selection-end-column="24" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="PositionProxy.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Strategies/PositionFinders/PositionProxy.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="156">
+              <caret line="15" column="0" lean-forward="false" selection-start-line="15" selection-start-column="0" selection-end-line="16" selection-end-column="56" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="Overlay.scala" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Development/Overlay.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="188">
-              <caret line="59" column="18" lean-forward="false" selection-start-line="59" selection-start-column="18" selection-end-line="59" selection-end-column="18" />
+            <state relative-caret-position="145">
+              <caret line="112" column="16" lean-forward="true" selection-start-line="112" selection-start-column="16" selection-end-line="112" selection-end-column="16" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Game.class" pinned="false" current-in-tab="false">
+        <entry file="jar://$PROJECT_DIR$/lib/bwmirror_v2_5.jar!/bwapi/Game.class">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="138">
+              <caret line="1095" column="27" lean-forward="false" selection-start-line="1095" selection-start-column="27" selection-end-line="1095" selection-end-column="27" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Architect.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Processes/Architect.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="130">
+              <caret line="73" column="4" lean-forward="false" selection-start-line="73" selection-start-column="4" selection-end-line="73" selection-end-column="4" />
               <folding />
             </state>
           </provider>
@@ -118,7 +158,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/Plans/Traits/TraitChildren.scala" />
         <option value="$PROJECT_DIR$/src/Plans/Traits/TraitChildSetter.scala" />
         <option value="$PROJECT_DIR$/src/Plans/Generic/Compound/AbstractPlanCompleteAny.scala" />
         <option value="$PROJECT_DIR$/src/Plans/Generic/Compound/AbstractPlanCompleteAll.scala" />
@@ -157,7 +196,6 @@
         <option value="$PROJECT_DIR$/src/Plans/Generic/Macro/UnitAtLocation/RequireUnitAtLocation.scala" />
         <option value="$PROJECT_DIR$/src/Strategies/UnitPreferences/UnitPreferClose.scala" />
         <option value="$PROJECT_DIR$/src/Plans/Generic/Allocation/PlanAcquireUnitsExactly.scala" />
-        <option value="$PROJECT_DIR$/src/Strategies/PositionFinders/PositionProxy.scala" />
         <option value="$PROJECT_DIR$/src/Traits/TraitSettableChildren.scala" />
         <option value="$PROJECT_DIR$/src/Traits/TraitSettablePositionFinder.scala" />
         <option value="$PROJECT_DIR$/src/Traits/TraitSettableUnitMatcher.scala" />
@@ -167,8 +205,10 @@
         <option value="$PROJECT_DIR$/src/Plans/Plan.scala" />
         <option value="$PROJECT_DIR$/src/Plans/GamePlans/Protoss/Proxy/ProtossRushWithProxyZealots.scala" />
         <option value="$PROJECT_DIR$/src/Development/Overlay.scala" />
-        <option value="$PROJECT_DIR$/src/Plans/Generic/Macro/BuildBuilding.scala" />
         <option value="$PROJECT_DIR$/src/Plans/Generic/Macro/TrainUnit.scala" />
+        <option value="$PROJECT_DIR$/src/Strategies/PositionFinders/PositionProxy.scala" />
+        <option value="$PROJECT_DIR$/src/Strategies/PositionFinders/PositionSimpleBuilding.scala" />
+        <option value="$PROJECT_DIR$/src/Plans/Generic/Macro/BuildBuilding.scala" />
       </list>
     </option>
   </component>
@@ -805,7 +845,7 @@
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3011696" sideWeight="0.49411765" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3611111" sideWeight="0.4970588" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3611111" sideWeight="0.4970588" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -1047,14 +1087,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Processes/Architect.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="85" column="5" lean-forward="true" selection-start-line="85" selection-start-column="5" selection-end-line="85" selection-end-column="5" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Compound/AllSimultaneous.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="52">
@@ -1067,14 +1099,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="156">
           <caret line="12" column="21" lean-forward="true" selection-start-line="12" selection-start-column="21" selection-end-line="12" selection-end-column="21" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Strategies/PositionFinders/PositionProxy.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="117">
-          <caret line="12" column="41" lean-forward="false" selection-start-line="12" selection-start-column="26" selection-end-line="12" selection-end-column="41" />
           <folding />
         </state>
       </provider>
@@ -1175,26 +1199,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="jar://$PROJECT_DIR$/lib/bwmirror_v2_5.jar!/bwapi/Game.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="138">
-          <caret line="1095" column="27" lean-forward="false" selection-start-line="1095" selection-start-column="27" selection-end-line="1095" selection-end-column="27" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Strategies/UnitPreferences/UnitPreferClose.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="130">
           <caret line="10" column="4" lean-forward="false" selection-start-line="10" selection-start-column="4" selection-end-line="10" selection-end-column="4" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Strategies/PositionFinders/PositionSimpleBuilding.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="171">
-          <caret line="14" column="15" lean-forward="true" selection-start-line="14" selection-start-column="15" selection-end-line="14" selection-end-column="15" />
           <folding />
         </state>
       </provider>
@@ -1231,26 +1239,58 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Macro/TrainUnit.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="175">
+          <caret line="30" column="3" lean-forward="true" selection-start-line="30" selection-start-column="3" selection-end-line="30" selection-end-column="3" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$PROJECT_DIR$/lib/bwmirror_v2_5.jar!/bwapi/Game.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="138">
+          <caret line="1095" column="27" lean-forward="false" selection-start-line="1095" selection-start-column="27" selection-end-line="1095" selection-end-column="27" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Processes/Architect.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="130">
+          <caret line="73" column="4" lean-forward="false" selection-start-line="73" selection-start-column="4" selection-end-line="73" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Strategies/PositionFinders/PositionProxy.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="156">
+          <caret line="15" column="0" lean-forward="false" selection-start-line="15" selection-start-column="0" selection-end-line="16" selection-end-column="56" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Strategies/PositionFinders/PositionSimpleBuilding.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="221">
+          <caret line="20" column="24" lean-forward="true" selection-start-line="20" selection-start-column="24" selection-end-line="20" selection-end-column="24" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/Development/Overlay.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="188">
-          <caret line="59" column="18" lean-forward="false" selection-start-line="59" selection-start-column="18" selection-end-line="59" selection-end-column="18" />
+        <state relative-caret-position="145">
+          <caret line="112" column="16" lean-forward="true" selection-start-line="112" selection-start-column="16" selection-end-line="112" selection-end-column="16" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Macro/BuildBuilding.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="260">
-          <caret line="35" column="86" lean-forward="false" selection-start-line="35" selection-start-column="86" selection-end-line="35" selection-end-column="86" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Macro/TrainUnit.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="175">
-          <caret line="30" column="3" lean-forward="true" selection-start-line="30" selection-start-column="3" selection-end-line="30" selection-end-column="3" />
+        <state relative-caret-position="273">
+          <caret line="138" column="17" lean-forward="false" selection-start-line="138" selection-start-column="17" selection-end-line="138" selection-end-column="17" />
           <folding />
         </state>
       </provider>

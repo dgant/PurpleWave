@@ -136,8 +136,8 @@ class BuildBuilding(val buildingType:UnitType)
       With.game.drawBoxMap(
         position.toPosition,
         new Position(
-          position.toPosition.getX + buildingType.tileWidth,
-          position.toPosition.getY + buildingType.tileHeight),
+          32 * (position.getX + buildingType.tileWidth),
+          32 * (position.getY + buildingType.tileHeight)),
         bwapi.Color.Green)
       With.game.drawTextMap(
         position.toPosition,

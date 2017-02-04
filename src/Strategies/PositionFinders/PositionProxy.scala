@@ -13,7 +13,7 @@ class PositionProxy extends PositionFinder {
   var unitType = UnitType.Terran_Barracks
   var margin = 0
   
-  val _cache = new Cache[Option[TilePosition]] { duration = 24 * 10; override def recalculate = _recalculate }
+  val _cache = new Cache[Option[TilePosition]] { duration = 24 * 5; override def recalculate = _recalculate }
   override def find(): Option[TilePosition] = _cache.get
   
   def _recalculate(): Option[TilePosition] = {

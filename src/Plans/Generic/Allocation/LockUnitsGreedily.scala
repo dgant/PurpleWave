@@ -3,7 +3,7 @@ package Plans.Generic.Allocation
 import Startup.With
 import Strategies.UnitMatchers.UnitMatcher
 
-class PlanAcquireUnitsGreedily(
+class LockUnitsGreedily(
   val unitMatcher:UnitMatcher,
   val minimum: Integer = 0)
     extends LockUnits {

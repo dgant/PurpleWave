@@ -8,12 +8,12 @@ import Strategies.UnitPreferences.{UnitPreferClose, UnitPreference}
 import Traits.Property
 import bwapi.Position
 
-class PlanFulfillKnowingEnemyBaseLocation extends Plan {
+class KnowEnemyBaseLocationFulfiller extends Plan {
   
-  val me = this
+  val meKEBLF = this
   val positionFinder = new Property[PositionFinder](new PositionCenter)
-  val unitPreference = new Property[UnitPreference](new UnitPreferClose  { positionFinder.inherit(me.positionFinder) })
-  val unitPlan       = new Property[LockUnits]     (new LockUnitsExactly { unitPreference.inherit(me.unitPreference) })
+  val unitPreference = new Property[UnitPreference](new UnitPreferClose  { positionFinder.inherit(meKEBLF.positionFinder) })
+  val unitPlan       = new Property[LockUnits]     (new LockUnitsExactly { unitPreference.inherit(meKEBLF.unitPreference) })
   
   override def getChildren: Iterable[Plan] = { List(unitPlan.get) }
   

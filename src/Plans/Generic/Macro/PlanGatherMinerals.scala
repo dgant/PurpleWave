@@ -1,6 +1,6 @@
 package Plans.Generic.Macro
 
-import Plans.Generic.Allocation.{LockUnits, PlanAcquireUnitsGreedily}
+import Plans.Generic.Allocation.{LockUnits, LockUnitsGreedily}
 import Plans.Plan
 import Startup.With
 import Strategies.UnitMatchers.UnitMatchWorker
@@ -10,7 +10,7 @@ import scala.collection.JavaConverters._
 
 class PlanGatherMinerals extends Plan {
   
-  val workerPlan = new Property[LockUnits](new PlanAcquireUnitsGreedily(UnitMatchWorker))
+  val workerPlan = new Property[LockUnits](new LockUnitsGreedily(UnitMatchWorker))
   var _mineral:Option[bwapi.Unit] = None
   
   override def getChildren: Iterable[Plan] = { List(workerPlan.get) }

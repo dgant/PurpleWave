@@ -18,8 +18,8 @@ class BuildBuilding(val buildingType:UnitType) extends Plan {
   val builderPreference = new Property[UnitPreference] (new UnitPreferClose { positionFinder.inherit(me.positionFinder)})
   val buildingMatcher   = new Property[UnitMatcher]    (new UnitMatchIncompleteBuilding(buildingType))
   val currencyPlan      = new Property[LockCurrency]   (new LockCurrencyForUnit(buildingType))
-  val builderPlan       = new Property[LockUnits]      (new LockUnitsExactly { unitMatcher.inherit(builderMatcher); unitPreference.inherit(builderPreference)})
-  val buildingPlan      = new Property[LockUnits]      (new LockUnitsExactly { unitMatcher.inherit(buildingMatcher) })
+  val builderPlan       = new Property[LockUnits]      (new LockUnitsExactly { description.set(Some("Builder"));  unitMatcher.inherit(builderMatcher); unitPreference.inherit(builderPreference)})
+  val buildingPlan      = new Property[LockUnits]      (new LockUnitsExactly { description.set(Some("Building")); unitMatcher.inherit(buildingMatcher) })
   
   var _builder:Option[bwapi.Unit] = None
   var _building:Option[bwapi.Unit] = None

@@ -8,10 +8,10 @@ import bwta.BWTA
 import scala.collection.JavaConverters._
 import scala.math._
 
-class PositionProxy extends PositionFinder {
+class PositionProxyArea extends PositionFinder {
   
-  var unitType = UnitType.Terran_Barracks
-  var margin = 0
+  var unitType = UnitType.Protoss_Pylon
+  var margin = 3
   
   val _cache = new Cache[Option[TilePosition]] { duration = 24 * 5; override def recalculate = _recalculate }
   override def find(): Option[TilePosition] = _cache.get

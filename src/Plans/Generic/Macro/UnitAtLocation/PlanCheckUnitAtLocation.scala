@@ -8,6 +8,7 @@ import Traits.Property
 
 class PlanCheckUnitAtLocation extends Plan {
   
+  val quantity        = new Property[Integer](1)
   val positionFinder  = new Property[PositionFinder](new PositionCenter)
   val unitMatcher     = new Property[UnitMatcher](UnitMatchAnything)
   val range           = new Property[Integer](32)
@@ -15,7 +16,9 @@ class PlanCheckUnitAtLocation extends Plan {
   override def isComplete: Boolean = {
     With.ourUnits
       .filter(unitMatcher.get.accept)
-      .exists(unit => positionFinder.get.find.exists(
-        _.toPosition.getDistance(unit.getPosition) < range.get))
+      .filter(unit =>
+        positionFinder.get.find.exists(position =>
+          position.toPosition.getDistance(unit.getPosition) < range.get))
+      .size >= quantity.get
   }
 }

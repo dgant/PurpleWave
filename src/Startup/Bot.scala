@@ -9,30 +9,36 @@ import bwta.BWTA
 class Bot() extends DefaultBWListener {
 
   override def onStart() {
-    Logger.debug("Purple Wave, reporting in.")
-    
-    With.architect = new Architect
-    With.bank = new Banker
-    With.gameplan = new PlanWinTheGame
-    With.prioritizer = new Prioritizer
-    With.recruiter = new Recruiter
-    With.scout = new Scout
-    
-    Logger.debug("Reading map")
-    BWTA.readMap()
-    Logger.debug("Analyzing map")
-    BWTA.analyze()
-    Logger.debug("Bot initialization complete.")
-    
-    val manualControl = true
-    AutoCamera.enabled = ! manualControl
-    
-    if (manualControl) {
-      With.game.enableFlag(1) //Enable user input
-      With.game.enableFlag(2) //black sheep wall
-      With.game.setLocalSpeed(5)
-    } else {
-      With.game.setLocalSpeed(0)
+    try {
+      Logger.debug("Purple Wave, reporting in.")
+
+      With.architect = new Architect
+      With.bank = new Banker
+      With.gameplan = new PlanWinTheGame
+      With.prioritizer = new Prioritizer
+      With.recruiter = new Recruiter
+      With.scout = new Scout
+
+      Logger.debug("Reading map")
+      BWTA.readMap()
+      Logger.debug("Analyzing map")
+      BWTA.analyze()
+      Logger.debug("Bot initialization complete.")
+
+      val manualControl = true
+      AutoCamera.enabled = !manualControl
+
+      if (manualControl) {
+        With.game.enableFlag(1) //Enable user input
+        With.game.enableFlag(2) //black sheep wall
+        With.game.setLocalSpeed(5)
+      } else {
+        With.game.setLocalSpeed(0)
+      }
+    }
+    catch {
+      case exception:Exception =>
+        _onException(exception)
     }
   }
   
@@ -45,6 +51,20 @@ class Bot() extends DefaultBWListener {
     Overlay.onFrame()
     AutoCamera.onFrame()
   }
+  
+  def _onException(exception: Exception) {
+    exception.printStackTrace()
+    Logger.debug(exception.getClass.getSimpleName)
+  
+    if (exception.getStackTrace.nonEmpty) {
+      Logger.debug(
+        exception.getStackTrace.head.getClassName
+          + "."
+          + exception.getStackTrace.head.getMethodName
+          + "(): "
+          + exception.getStackTrace.head.getLineNumber)
+    }
+  }
 
   override def onFrame() {
     try {
@@ -52,17 +72,7 @@ class Bot() extends DefaultBWListener {
     }
     catch {
       case exception:Exception =>
-        exception.printStackTrace()
-        Logger.debug(exception.getClass.getSimpleName)
-        
-        if (exception.getStackTrace.nonEmpty) {
-          Logger.debug(
-            exception.getStackTrace.head.getClassName
-            + "."
-            + exception.getStackTrace.head.getMethodName
-            + "(): "
-            + exception.getStackTrace.head.getLineNumber)
-        }
+        _onException(exception)
     }
   }
 

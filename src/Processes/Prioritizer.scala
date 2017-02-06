@@ -22,8 +22,10 @@ class Prioritizer {
   }
   
   def _prioritizeRecurisvely(plan:Plan) {
-    _priorities.put(plan, _nextPriority)
-    _nextPriority += 1
-    plan.getChildren.foreach(_prioritizeRecurisvely)
+    if ( ! _priorities.contains(plan)) {
+      _priorities.put(plan, _nextPriority)
+      _nextPriority += 1
+      plan.getChildren.foreach(_prioritizeRecurisvely)
+    }
   }
 }

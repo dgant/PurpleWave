@@ -1,7 +1,7 @@
 package Plans.GamePlans.Protoss.Proxy
 
 import Plans.Generic.Allocation.LockUnitsExactly
-import Plans.Generic.Compound.{AllSerial, AllSimultaneous}
+import Plans.Generic.Compound.{AllParallel, AllSerial}
 import Plans.Generic.Macro.UnitAtLocation.RequireUnitAtLocation
 import Plans.Generic.Macro.{BuildBuilding, TrainUnit}
 import Plans.Information.RequireEnemyBaseLocation
@@ -11,34 +11,39 @@ import Strategies.UnitPreferences.UnitPreferClose
 import bwapi.UnitType
 
 class ProtossRushWithProxyZealots
-  extends AllSimultaneous {
+  extends AllSerial {
   
   val proxyBuilder = new LockUnitsExactly {
-    description.set(Some("Proxy builder lock"))
-    unitMatcher.set(UnitMatchWorker)
-    unitPreference.set(new UnitPreferClose{ positionFinder.set(PositionProxyPylon) })
+    this.description.set(Some("Proxy builder lock"))
+    this.unitMatcher.set(UnitMatchWorker)
+    this.unitPreference.set(new UnitPreferClose{ positionFinder.set(PositionProxyPylon) })
   }
 
   children.set(List(
     new TrainUnit(UnitType.Protoss_Probe),
-    new AllSerial { description.set(Some("Proxy activities")); children.set(List(
-      proxyBuilder,
-      new RequireUnitAtLocation                   { unitPlan.set(proxyBuilder);    positionFinder.set(PositionProxyPylon); range.set(32 * 12) },
-      new BuildBuilding(UnitType.Protoss_Pylon)   { builderPlan.set(proxyBuilder); positionFinder.set(PositionProxyPylon); },
-      new BuildBuilding(UnitType.Protoss_Gateway) { builderPlan.set(proxyBuilder); positionFinder.set(new PositionProxyGateway); },
-      new BuildBuilding(UnitType.Protoss_Gateway) { builderPlan.set(proxyBuilder); positionFinder.set(new PositionProxyGateway); },
-      new RequireEnemyBaseLocation                { scoutPlan.set(proxyBuilder) }
+    new AllParallel { description.set(Some("Train next probe and build proxy")); children.set(List(
+      new TrainUnit(UnitType.Protoss_Probe),
+      new AllSerial { description.set(Some("Proxy builder activities")); children.set(List(
+        proxyBuilder,
+        new RequireUnitAtLocation                   { this.unitPlan.set(proxyBuilder);    this.positionFinder.set(PositionProxyPylon); this.range.set(32 * 12); this.description.set(Some("Send builder to proxy")) },
+        new BuildBuilding(UnitType.Protoss_Pylon)   { this.builderPlan.set(proxyBuilder); this.positionFinder.set(PositionProxyPylon); },
+        new BuildBuilding(UnitType.Protoss_Gateway) { this.builderPlan.set(proxyBuilder); this.positionFinder.set(new PositionProxyGateway); },
+        new BuildBuilding(UnitType.Protoss_Gateway) { this.builderPlan.set(proxyBuilder); this.positionFinder.set(new PositionProxyGateway); },
+        new RequireEnemyBaseLocation                { this.scoutPlan.set(proxyBuilder) }
+      ))}
     ))},
-    new TrainUnit(UnitType.Protoss_Probe),
-    new TrainUnit(UnitType.Protoss_Probe),
-    new TrainUnit(UnitType.Protoss_Probe),
-    new TrainUnit(UnitType.Protoss_Zealot),
-    new TrainUnit(UnitType.Protoss_Zealot),
-    new TrainUnit(UnitType.Protoss_Zealot),
-    new TrainUnit(UnitType.Protoss_Probe),
-    new BuildBuilding(UnitType.Protoss_Pylon),
-    new TrainUnit(UnitType.Protoss_Zealot),
-    new TrainUnit(UnitType.Protoss_Zealot),
-    new TrainUnit(UnitType.Protoss_Zealot)
+    new AllParallel { description.set(Some("Post-proxy build order")); children.set(List(
+      new TrainUnit(UnitType.Protoss_Probe),
+      new TrainUnit(UnitType.Protoss_Probe),
+      new TrainUnit(UnitType.Protoss_Probe),
+      new TrainUnit(UnitType.Protoss_Zealot),
+      new TrainUnit(UnitType.Protoss_Zealot),
+      new TrainUnit(UnitType.Protoss_Zealot),
+      new TrainUnit(UnitType.Protoss_Probe),
+      new BuildBuilding(UnitType.Protoss_Pylon),
+      new TrainUnit(UnitType.Protoss_Zealot),
+      new TrainUnit(UnitType.Protoss_Zealot),
+      new TrainUnit(UnitType.Protoss_Zealot)
+    ))}
   ))
 }

@@ -1,6 +1,6 @@
 package Strategies.PositionFinders
 
-import Caching.Cache
+import Caching.PermanentCache
 import Startup.With
 import bwapi.{TilePosition, UnitType}
 import bwta.BWTA
@@ -13,7 +13,7 @@ class PositionProxyArea extends PositionFinder {
   var unitType = UnitType.Protoss_Pylon
   var margin = 3
   
-  val _cache = new Cache[Option[TilePosition]] { duration = 24 * 5; override def recalculate = _recalculate }
+  val _cache = new PermanentCache[Option[TilePosition]] { override def recalculate = _recalculate }
   override def find(): Option[TilePosition] = _cache.get
   
   def _recalculate(): Option[TilePosition] = {
@@ -21,7 +21,13 @@ class PositionProxyArea extends PositionFinder {
     val enemyStartLocations = With.scout.unexploredStartLocations()
     
     val centroid:TilePosition =
-      if(enemyStartLocations.size == 1) {
+      if(enemyStartLocations.size == 0) {
+        //WTF, but let's work with it; otherwise we're just going to divide by zero and choke when we calculate the centroid later
+        new TilePosition(
+          With.game.mapWidth / 2,
+          With.game.mapHeight / 2)
+      }
+      else if(enemyStartLocations.size == 1) {
         
         //Fantastic. We know where they are so we can proxy as close to their base as we want.
         

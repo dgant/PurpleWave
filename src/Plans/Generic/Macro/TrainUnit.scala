@@ -8,12 +8,11 @@ import Strategies.UnitMatchers.UnitMatchType
 import Traits.Property
 import bwapi.UnitType
 
-class TrainUnit(val traineeType:UnitType)
-  extends Plan {
+class TrainUnit(val traineeType:UnitType) extends Plan {
   
   val currencyPlan  = new Property[LockCurrency] (new LockCurrencyForUnit(traineeType))
   val trainerPlan   = new Property[LockUnits] (new LockUnitsExactly {
-    unitMatcher.set(new UnitMatchType(traineeType.whatBuilds.first))
+    this.unitMatcher.set(new UnitMatchType(traineeType.whatBuilds.first))
   })
   
   var _trainer:Option[bwapi.Unit] = None

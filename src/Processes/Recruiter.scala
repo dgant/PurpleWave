@@ -1,5 +1,6 @@
 package Processes
 
+import Development.Logger
 import Plans.Generic.Allocation.LockUnits
 import Startup.With
 
@@ -31,8 +32,17 @@ class Recruiter {
   }
   
   def add(request: LockUnits) {
+    //This lock is already up to date. Chill.
+    if (_updatedRequests.contains(request)) {
+      //  return
+    }
+  
     _updatedRequests.add(request)
     _requests(request) = _requests.getOrElse(request, mutable.Set.empty)
+    _tryToSatisfy(request)
+  }
+  
+  def _tryToSatisfy(request: LockUnits) {
     
     // Offer batches of units for the request to choose.
     //   Batch 0: Units not assigned
@@ -61,6 +71,16 @@ class Recruiter {
       unitsOld.foreach(_unassign)
       unitsNew.foreach(_unassign)
       unitsNew.foreach(_assign(_, request))
+      
+      //Clean things up for any plans that lost units
+      val disappointedPlans = unitsNew.toSet
+        .diff(unitsOld)
+        .map(_assignments(_))
+        .filterNot(_ == request)
+      
+      disappointedPlans.foreach(plan => {
+        Logger.debug("Removed units from " + plan.description.get)
+      })
     }
   }
   

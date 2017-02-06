@@ -23,6 +23,7 @@ class RequireUnitAtLocation extends AbstractPlanFulfillRequirements {
   })
   
   checker.set(new PlanCheckUnitAtLocation {
+    this.description.set(Some("Check if a unit is at the location"))
     this.quantity.inherit(meRUAL.quantity)
     this.range.inherit(meRUAL.range)
     this.positionFinder.inherit(meRUAL.positionFinder)
@@ -30,6 +31,7 @@ class RequireUnitAtLocation extends AbstractPlanFulfillRequirements {
   })
   
   fulfiller.set(new PlanFulfillUnitAtLocation {
+    this.description.set(Some("Send matching unit(s) to the location"))
     this.unitPlan.inherit(meRUAL.unitPlan)
     this.positionFinder.inherit(meRUAL.positionFinder)
   })

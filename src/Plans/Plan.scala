@@ -9,4 +9,6 @@ class Plan {
   def getChildren:Iterable[Plan] = { List.empty }
   def onFrame() = {}
   def drawOverlay() = { }
+  
+  override def toString: String = { this.getClass.getName ++ description.get.getOrElse("") }
 }

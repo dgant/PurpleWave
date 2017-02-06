@@ -13,5 +13,4 @@ class PlanCheckUnitCountAtLeast extends Plan {
   override def isComplete: Boolean = {
     With.ourUnits.filter(unitMatcher.get.accept).size >= quantity.get
   }
-  
 }

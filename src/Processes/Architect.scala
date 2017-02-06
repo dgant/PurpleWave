@@ -5,14 +5,6 @@ import bwapi.{TilePosition, UnitType}
 
 class Architect {
   
-  var _builder:Option[bwapi.Unit] = None
-  def setBuilder(unit:bwapi.Unit) = {
-    _builder = Some(unit)
-  }
-  def clearBuilder() {
-    _builder = None
-  }
-  
   def getHq:TilePosition = {
     With.ourUnits
       .filter(_.getType.isResourceDepot)
@@ -81,8 +73,14 @@ class Architect {
   }
   
   def _test(position: TilePosition, buildingType:UnitType):Boolean = {
-    if (_builder.isDefined) {
-      With.game.canBuildHere(position, buildingType, _builder.get)
+    //This tends to get confused due to the builder being nearby
+    val likelyBuilders = With.ourUnits
+      .filter(_.getType.isWorker)
+      .filter(_.getDistance(position.toPosition) < 32 * 3)
+      .take(3)
+    
+    if (likelyBuilders.nonEmpty) {
+      likelyBuilders.exists(builder => With.game.canBuildHere(position, buildingType, builder))
     }
     else {
       With.game.canBuildHere(position, buildingType)

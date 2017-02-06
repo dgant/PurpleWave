@@ -27,7 +27,11 @@ class BuildBuilding(val buildingType:UnitType) extends Plan {
   description.set(Some(TypeDescriber.describeUnitType(buildingType)))
   
   override def getChildren: Iterable[Plan] = { List(currencyPlan.get, builderPlan.get) }
-  override def isComplete: Boolean = { _building.exists(_.isCompleted) }
+  override def isComplete: Boolean = {
+    _building.exists(
+      building => building.isCompleted
+        || (building.exists && buildingType.getRace == Race.Protoss))
+  }
   
   override def onFrame() {
     if (isComplete) {
@@ -36,11 +40,6 @@ class BuildBuilding(val buildingType:UnitType) extends Plan {
     }
   
     currencyPlan.get.isSpent = !_building.isEmpty
-  
-    // Chill out if we have a Protoss building warping in
-    if (_building.exists(_.exists) && buildingType.getRace == Race.Protoss) {
-      return
-    }
   
     currencyPlan.get.onFrame()
     if (currencyPlan.get.isComplete) {

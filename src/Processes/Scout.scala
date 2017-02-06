@@ -26,7 +26,7 @@ class Scout {
     _knownEnemyUnits
   }
   
-  def enemyBaseLocationPosition():Option[Position] = {
+  def enemyBaseLocationPosition:Option[Position] = {
     
     val visibleBase = enemyUnits
       .filter(_.getType.isResourceDepot)

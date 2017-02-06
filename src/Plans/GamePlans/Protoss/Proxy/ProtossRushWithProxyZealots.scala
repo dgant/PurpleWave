@@ -1,6 +1,7 @@
 package Plans.GamePlans.Protoss.Proxy
 
 import Plans.Generic.Allocation.LockUnitsExactly
+import Plans.Generic.Army.DestroyEconomy
 import Plans.Generic.Compound.{AllParallel, AllSerial}
 import Plans.Generic.Macro.UnitAtLocation.RequireUnitAtLocation
 import Plans.Generic.Macro.{BuildBuilding, TrainUnit}
@@ -31,10 +32,8 @@ class ProtossRushWithProxyZealots
     ))},
     new AllParallel { description.set(Some("Post-proxy build order")); children.set(List(
       new AllSerial { description.set(Some("Post-proxy build order")); children.set(List(
-        new AllParallel { description.set(Some("Post-proxy build order")); children.set(List(
-          new BuildBuilding(UnitType.Protoss_Gateway) { this.builderPlan.set(proxyBuilder); this.positionFinder.set(new PositionProxyGateway); },
-          new BuildBuilding(UnitType.Protoss_Gateway) { this.builderPlan.set(proxyBuilder); this.positionFinder.set(new PositionProxyGateway); }
-        ))},
+        new BuildBuilding(UnitType.Protoss_Gateway) { this.builderPlan.set(proxyBuilder); this.positionFinder.set(new PositionProxyGateway); },
+        new BuildBuilding(UnitType.Protoss_Gateway) { this.builderPlan.set(proxyBuilder); this.positionFinder.set(new PositionProxyGateway); },
         new RequireEnemyBaseLocation { this.scoutPlan.set(proxyBuilder) }
       ))},
       new TrainUnit(UnitType.Protoss_Probe),
@@ -47,7 +46,8 @@ class ProtossRushWithProxyZealots
       new BuildBuilding(UnitType.Protoss_Pylon),
       new TrainUnit(UnitType.Protoss_Zealot),
       new TrainUnit(UnitType.Protoss_Zealot),
-      new TrainUnit(UnitType.Protoss_Zealot)
+      new TrainUnit(UnitType.Protoss_Zealot),
+      new DestroyEconomy
     ))}
   ))
 }

@@ -10,7 +10,7 @@ import scala.collection.JavaConverters._
 
 class PlanGatherMinerals extends Plan {
   
-  val workerPlan = new Property[LockUnits](new LockUnitsGreedily(UnitMatchWorker))
+  val workerPlan = new Property[LockUnits](new LockUnitsGreedily { unitMatcher.set(UnitMatchWorker) })
   var _mineral:Option[bwapi.Unit] = None
   
   override def getChildren: Iterable[Plan] = { List(workerPlan.get) }

@@ -5,7 +5,7 @@ import Plans.Generic.Allocation.{LockCurrency, LockCurrencyForUnit, LockUnits, L
 import Plans.Plan
 import Startup.With
 import Strategies.PositionFinders.{PositionFinder, PositionSimpleBuilding}
-import Strategies.UnitMatchers.{UnitMatchIncompleteBuilding, UnitMatchType, UnitMatcher}
+import Strategies.UnitMatchers.{UnitMatchType, UnitMatcher}
 import Strategies.UnitPreferences.{UnitPreferClose, UnitPreference}
 import Traits.Property
 import bwapi.{Position, Race, TilePosition, UnitType}
@@ -16,10 +16,8 @@ class BuildBuilding(val buildingType:UnitType) extends Plan {
   val positionFinder    = new Property[PositionFinder] (new PositionSimpleBuilding(buildingType))
   val builderMatcher    = new Property[UnitMatcher]    (new UnitMatchType(buildingType.whatBuilds.first))
   val builderPreference = new Property[UnitPreference] (new UnitPreferClose { positionFinder.inherit(me.positionFinder)})
-  val buildingMatcher   = new Property[UnitMatcher]    (new UnitMatchIncompleteBuilding(buildingType))
   val currencyPlan      = new Property[LockCurrency]   (new LockCurrencyForUnit(buildingType))
   val builderPlan       = new Property[LockUnits]      (new LockUnitsExactly { description.set(Some("Builder"));  unitMatcher.inherit(builderMatcher); unitPreference.inherit(builderPreference)})
-  val buildingPlan      = new Property[LockUnits]      (new LockUnitsExactly { description.set(Some("Building")); unitMatcher.inherit(buildingMatcher) })
   
   var _builder:Option[bwapi.Unit] = None
   var _building:Option[bwapi.Unit] = None
@@ -28,7 +26,7 @@ class BuildBuilding(val buildingType:UnitType) extends Plan {
     
   description.set(Some(TypeDescriber.describeUnitType(buildingType)))
   
-  override def getChildren: Iterable[Plan] = { List(currencyPlan.get, builderPlan.get, buildingPlan.get) }
+  override def getChildren: Iterable[Plan] = { List(currencyPlan.get, builderPlan.get) }
   override def isComplete: Boolean = { _building.exists(_.isCompleted) }
   
   override def onFrame() {
@@ -49,33 +47,24 @@ class BuildBuilding(val buildingType:UnitType) extends Plan {
       builderPlan.get.onFrame()
       if (builderPlan.get.isComplete) {
         _builder = builderPlan.get.units.headOption
-        
+  
         //We can probably simplify this
         if (currencyPlan.get.isComplete) {
+  
+          if (_building.isEmpty)
+            _building = With.ourUnits
+              .filter(unit => unit.getType == buildingType)
+              .filter(unit => _position.exists(position => position == unit.getTilePosition))
+              .headOption
+        }
+  
+        if (_building.isDefined) {
           if (buildingType.getRace == Race.Terran) {
-            _builder.foreach(b => _building = Option.apply(b.getBuildUnit))
-  
-            //Resume incomplete Terran buildings
-            if (_building.isEmpty && buildingType.getRace == Race.Terran) {
-              buildingPlan.get.onFrame()
-              _building = buildingPlan.get.units.headOption
-            }
+            _builder.foreach(_.rightClick(_building.get))
           }
-
-          // getBuildUnit() only works for Terran
-          else {
-            buildingPlan.get.onFrame()
-            _building = buildingPlan.get.units.headOption
-          }
-  
-          if (_building.isDefined) {
-            if (buildingType.getRace == Race.Terran) {
-              _builder.foreach(_.rightClick(_building.get))
-            }
-          }
-          else {
-            _builder.foreach(_orderToBuild)
-          }
+        }
+        else {
+          _builder.foreach(_orderToBuild)
         }
       }
     }

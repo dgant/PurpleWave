@@ -23,22 +23,26 @@ class ProtossRushWithProxyZealots
     new TrainUnit(UnitType.Protoss_Probe),
     new AllParallel { description.set(Some("Train next probe and build proxy")); children.set(List(
       new TrainUnit(UnitType.Protoss_Probe),
-      new AllSerial { description.set(Some("Proxy builder activities")); children.set(List(
+      new AllSerial { description.set(Some("Build proxy pylon")); children.set(List(
         proxyBuilder,
         new RequireUnitAtLocation                   { this.unitPlan.set(proxyBuilder);    this.positionFinder.set(PositionProxyPylon); this.range.set(32 * 12); this.description.set(Some("Send builder to proxy")) },
-        new BuildBuilding(UnitType.Protoss_Pylon)   { this.builderPlan.set(proxyBuilder); this.positionFinder.set(PositionProxyPylon); },
-        new BuildBuilding(UnitType.Protoss_Gateway) { this.builderPlan.set(proxyBuilder); this.positionFinder.set(new PositionProxyGateway); },
-        new BuildBuilding(UnitType.Protoss_Gateway) { this.builderPlan.set(proxyBuilder); this.positionFinder.set(new PositionProxyGateway); },
-        new RequireEnemyBaseLocation                { this.scoutPlan.set(proxyBuilder) }
+        new BuildBuilding(UnitType.Protoss_Pylon)   { this.builderPlan.set(proxyBuilder); this.positionFinder.set(PositionProxyPylon); }
       ))}
     ))},
     new AllParallel { description.set(Some("Post-proxy build order")); children.set(List(
-      new TrainUnit(UnitType.Protoss_Probe),
-      new TrainUnit(UnitType.Protoss_Probe),
+      new AllSerial { description.set(Some("Post-proxy build order")); children.set(List(
+        new AllParallel { description.set(Some("Post-proxy build order")); children.set(List(
+          new BuildBuilding(UnitType.Protoss_Gateway) { this.builderPlan.set(proxyBuilder); this.positionFinder.set(new PositionProxyGateway); },
+          new BuildBuilding(UnitType.Protoss_Gateway) { this.builderPlan.set(proxyBuilder); this.positionFinder.set(new PositionProxyGateway); }
+        ))},
+        new RequireEnemyBaseLocation { this.scoutPlan.set(proxyBuilder) }
+      ))},
       new TrainUnit(UnitType.Protoss_Probe),
       new TrainUnit(UnitType.Protoss_Zealot),
       new TrainUnit(UnitType.Protoss_Zealot),
       new TrainUnit(UnitType.Protoss_Zealot),
+      new TrainUnit(UnitType.Protoss_Probe),
+      new TrainUnit(UnitType.Protoss_Probe),
       new TrainUnit(UnitType.Protoss_Probe),
       new BuildBuilding(UnitType.Protoss_Pylon),
       new TrainUnit(UnitType.Protoss_Zealot),

@@ -1,22 +1,23 @@
 package Plans.Generic.Army
 
 import Plans.Generic.Allocation.LockUnitsGreedily
-import Plans.Generic.Compound.{AbstractPlanFulfillRequirements, AllSerial}
+import Plans.Generic.Compound.AllSerial
 import Plans.Information.KnowEnemyBaseLocationChecker
 import Strategies.UnitMatchers.UnitMatchWarriors
 
-class DestroyEconomy extends AbstractPlanFulfillRequirements {
+class DestroyEconomy extends AllSerial {
   
   var _fighters = new LockUnitsGreedily {
     unitMatcher.set(new UnitMatchWarriors)
   }
   
-  checker.set(new AllSerial { children.set(List(
-    new KnowEnemyBaseLocationChecker,
-    _fighters
-  )) })
-  
-  fulfiller.set(new DestroyEconomyFulfiller {
-    
-  })
+  children.set(List(
+    new AllSerial { children.set(List(
+      new KnowEnemyBaseLocationChecker,
+      _fighters
+    )) },
+    new DestroyEconomyFulfiller {
+      fighters.set(_fighters)
+    }
+  ))
 }

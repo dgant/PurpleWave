@@ -1,7 +1,7 @@
 package Processes
 
 import Startup.With
-import bwapi.Position
+import bwapi.{Position, UnitType}
 import bwta.{BWTA, BaseLocation}
 
 import scala.collection.JavaConverters._
@@ -26,10 +26,19 @@ class Scout {
     _knownEnemyUnits
   }
   
+  //someBuilding.getType.isResourceDepot seems to fail when a hatchery starts to morph
+  val _townHallTypes = Set(
+    UnitType.Terran_Command_Center,
+    UnitType.Protoss_Nexus,
+    UnitType.Zerg_Hatchery,
+    UnitType.Zerg_Lair,
+    UnitType.Zerg_Hive
+  )
+  
   def enemyBaseLocationPosition:Option[Position] = {
     
     val visibleBase = enemyUnits
-      .filter(_.getType.isResourceDepot)
+      .filter(unit => _townHallTypes.contains(unit.getType))
       .headOption
     
     if (visibleBase.isDefined) {

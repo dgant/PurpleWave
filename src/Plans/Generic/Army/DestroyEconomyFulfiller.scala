@@ -13,12 +13,17 @@ class DestroyEconomyFulfiller extends Plan {
   
   val _lastOrderFrame = new mutable.HashMap[bwapi.Unit, Integer]
   
+  override def getChildren: Iterable[Plan] = { List(fighters.get) }
   override def onFrame() {
     if (With.scout.enemyBaseLocationPosition.isEmpty) {
       Logger.warn("Trying to destroy economy without knowing where to go")
     }
   
     fighters.get.onFrame()
+    if ( ! fighters.get.isComplete) {
+      return
+    }
+    
     val units = fighters.get.units
     _lastOrderFrame.keySet.diff(units).foreach(_lastOrderFrame.remove)
     units.diff(_lastOrderFrame.keySet).foreach(_lastOrderFrame.put(_, 0))

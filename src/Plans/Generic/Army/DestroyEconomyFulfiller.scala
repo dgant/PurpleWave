@@ -64,6 +64,7 @@ class DestroyEconomyFulfiller extends Plan {
         unit.getPosition,
         unit.getType.groundWeapon.maxRange * 2)
       .asScala
+      .filter(_.getPlayer.isEnemy(With.game.self))
       .filter(_.getType.canAttack)
       .sortBy(_.getType.isWorker)
       .headOption

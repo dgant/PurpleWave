@@ -7,28 +7,28 @@ import Startup.With
 import scala.collection.mutable
 
 class Recruiter {
-  val _assignments:mutable.HashMap[bwapi.Unit, LockUnits] = mutable.HashMap.empty
-  val _unassigned:mutable.Set[bwapi.Unit] = mutable.Set.empty
-  val _requests:mutable.HashMap[LockUnits, mutable.Set[bwapi.Unit]] = mutable.HashMap.empty
+  val _requestByUnit:mutable.HashMap[bwapi.Unit, LockUnits] = mutable.HashMap.empty
+  val _unassignedUnits:mutable.Set[bwapi.Unit] = mutable.Set.empty
+  val _unitsByRequest:mutable.HashMap[LockUnits, mutable.Set[bwapi.Unit]] = mutable.HashMap.empty
   val _updatedRequests:mutable.Set[LockUnits] = mutable.Set.empty
 
   def onFrame() {
     //Automatically free units held by dead requests
-    _requests.keySet.diff(_updatedRequests).foreach(remove)
+    _unitsByRequest.keySet.diff(_updatedRequests).foreach(remove)
     _updatedRequests.clear()
     
     // Remove dead units
     //
-    _assignments.keys.filterNot(_.exists).foreach(_unassign)
-    _unassigned.filterNot(_.exists).foreach(_unassigned.remove)
+    _requestByUnit.keys.filterNot(_.exists).foreach(_unassign)
+    _unassignedUnits.filterNot(_.exists).foreach(_unassignedUnits.remove)
     
     // Add new units
     //
-    With.ourUnits.toSet.diff(_unassigned ++ _assignments.keys).foreach(_unassigned.add)
+    With.ourUnits.toSet.diff(_unassignedUnits ++ _requestByUnit.keys).foreach(_unassignedUnits.add)
   }
   
   def getAssignment(unit:bwapi.Unit):Option[LockUnits] = {
-    _assignments.get(unit)
+    _requestByUnit.get(unit)
   }
   
   def add(request: LockUnits) {
@@ -38,7 +38,7 @@ class Recruiter {
     }
   
     _updatedRequests.add(request)
-    _requests(request) = _requests.getOrElse(request, mutable.Set.empty)
+    _unitsByRequest(request) = _unitsByRequest.getOrElse(request, mutable.Set.empty)
     _tryToSatisfy(request)
   }
   
@@ -49,8 +49,8 @@ class Recruiter {
     //   Batch 1+: Units assigned to weaker-priority requests
     //
     val requiredUnits = request.getRequiredUnits(
-      Iterable(_unassigned) ++
-        _requests.keys
+      Iterable(_unassignedUnits) ++
+        _unitsByRequest.keys
           .filter(otherRequest =>
             With.prioritizer.getPriority(request) <
             With.prioritizer.getPriority(otherRequest))
@@ -75,7 +75,7 @@ class Recruiter {
       //Clean things up for any plans that lost units
       val disappointedPlans = unitsNew.toSet
         .diff(unitsOld)
-        .map(_assignments(_))
+        .map(_requestByUnit(_))
         .filterNot(_ == request)
       
       disappointedPlans.foreach(plan => {
@@ -85,23 +85,23 @@ class Recruiter {
   }
   
   def remove(request: LockUnits) {
-    _requests.get(request).foreach(_.foreach(_unassign))
-    _requests.remove(request)
+    _unitsByRequest.get(request).foreach(_.foreach(_unassign))
+    _unitsByRequest.remove(request)
   }
   
   def _assign(unit:bwapi.Unit, request:LockUnits) {
-    _assignments(unit) = request
-    _requests(request).add(unit)
-    _unassigned.remove(unit)
+    _requestByUnit(unit) = request
+    _unitsByRequest(request).add(unit)
+    _unassignedUnits.remove(unit)
   }
   
   def _unassign(unit:bwapi.Unit) {
-    _unassigned.add(unit)
-    _assignments.get(unit).foreach(_requests(_).remove(unit))
-    _assignments.remove(unit)
+    _unassignedUnits.add(unit)
+    _requestByUnit.get(unit).foreach(lock => _unitsByRequest.get(lock).foreach(unitSet => unitSet.remove(unit)))
+    _requestByUnit.remove(unit)
   }
   
   def getUnits(request: LockUnits):mutable.Set[bwapi.Unit] = {
-    _requests.getOrElse(request, mutable.Set.empty)
+    _unitsByRequest.getOrElse(request, mutable.Set.empty)
   }
 }

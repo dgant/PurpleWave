@@ -11,7 +11,7 @@ import scala.math._
 class PositionProxyArea extends PositionFinder {
   
   var unitType = UnitType.Protoss_Pylon
-  var margin = 3
+  var margin = 4
   
   val _cache = new PermanentCache[Option[TilePosition]] { override def recalculate = _recalculate }
   override def find(): Option[TilePosition] = _cache.get
@@ -44,7 +44,7 @@ class PositionProxyArea extends PositionFinder {
         //We want to proxy a little bit away from the entrance to their base.
         //Here's a crude algorithm to do that by drawing a straight line from their choke to our base. It might fail on sufficiently twisty maps
         val weightThem = closestChoke.getDistance(ourStartLocation.getTilePosition)
-        val weightUs = 12 //A bit further than the common sight distance of 7
+        val weightUs = 24 //This should get us out of their base
         val x = round((closestChoke.getX * weightThem + ourStartLocation.getTilePosition.getX * weightUs) / (weightThem + weightUs)).toInt
         val y = round((closestChoke.getY * weightThem + ourStartLocation.getTilePosition.getY * weightUs) / (weightThem + weightUs)).toInt
         new TilePosition(x, y)

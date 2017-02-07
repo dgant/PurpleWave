@@ -25,8 +25,28 @@
       <file leaf-file-name="Architect.scala" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Processes/Architect.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="34">
-              <caret line="86" column="38" lean-forward="false" selection-start-line="86" selection-start-column="38" selection-end-line="86" selection-end-column="38" />
+            <state relative-caret-position="203">
+              <caret line="128" column="35" lean-forward="false" selection-start-line="128" selection-start-column="6" selection-end-line="128" selection-end-column="35" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="TileRectangle.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Geometry/TileRectangle.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="182">
+              <caret line="14" column="22" lean-forward="true" selection-start-line="14" selection-start-column="22" selection-end-line="14" selection-end-column="22" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Pylon.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Geometry/Pylon.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="195">
+              <caret line="15" column="30" lean-forward="false" selection-start-line="15" selection-start-column="30" selection-end-line="15" selection-end-column="30" />
               <folding />
             </state>
           </provider>
@@ -72,16 +92,6 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="PositionCenter.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Strategies/PositionFinders/PositionCenter.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="130">
-              <caret line="10" column="46" lean-forward="false" selection-start-line="10" selection-start-column="46" selection-end-line="10" selection-end-column="46" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="BuildProxyTwoGateways.scala" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Plans/GamePlans/Protoss/Proxy/BuildProxyTwoGateways.scala">
           <provider selected="true" editor-type-id="text-editor">
@@ -107,16 +117,6 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="124">
               <caret line="41" column="23" lean-forward="false" selection-start-line="41" selection-start-column="23" selection-end-line="41" selection-end-column="23" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ProtossRushWithProxyZealots.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Plans/GamePlans/Protoss/Proxy/ProtossRushWithProxyZealots.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="117">
-              <caret line="9" column="21" lean-forward="true" selection-start-line="9" selection-start-column="21" selection-end-line="9" selection-end-column="21" />
               <folding />
             </state>
           </provider>
@@ -215,11 +215,9 @@
         <option value="$PROJECT_DIR$/src/Strategies/PositionFinders/PositionProxyPylon.scala" />
         <option value="$PROJECT_DIR$/src/Strategies/PositionFinders/PositionProxyArea.scala" />
         <option value="$PROJECT_DIR$/src/Geometry/Rectangle.scala" />
-        <option value="$PROJECT_DIR$/src/Geometry/TileRectangle.scala" />
         <option value="$PROJECT_DIR$/src/Geometry/PylonMask.scala" />
         <option value="$PROJECT_DIR$/src/Geometry/PylonPsi.scala" />
         <option value="$PROJECT_DIR$/src/Caching/Cache.scala" />
-        <option value="$PROJECT_DIR$/src/Geometry/Pylon.scala" />
         <option value="$PROJECT_DIR$/src/Geometry/SpiralSearch.scala" />
         <option value="$PROJECT_DIR$/src/Geometry/package.scala" />
         <option value="$PROJECT_DIR$/src/Geometry/WalkRectangle.scala" />
@@ -229,6 +227,8 @@
         <option value="$PROJECT_DIR$/src/Plans/Generic/Macro/UnitAtLocation/RequireUnitAtLocation.scala" />
         <option value="$PROJECT_DIR$/src/Plans/GamePlans/Protoss/Proxy/ProtossRushWithProxyZealots.scala" />
         <option value="$PROJECT_DIR$/src/Plans/GamePlans/Protoss/Proxy/BuildProxyTwoGateways.scala" />
+        <option value="$PROJECT_DIR$/src/Geometry/Pylon.scala" />
+        <option value="$PROJECT_DIR$/src/Geometry/TileRectangle.scala" />
         <option value="$PROJECT_DIR$/src/Processes/Architect.scala" />
       </list>
     </option>
@@ -966,7 +966,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="scala-line">
           <url>file://$PROJECT_DIR$/src/Processes/Architect.scala</url>
-          <line>161</line>
+          <line>160</line>
           <properties>
             <option name="lambda-ordinal" value="-1" />
           </properties>
@@ -974,7 +974,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="scala-line">
           <url>file://$PROJECT_DIR$/src/Processes/Architect.scala</url>
-          <line>131</line>
+          <line>130</line>
           <properties />
           <option name="timeStamp" value="349" />
         </line-breakpoint>
@@ -1205,14 +1205,6 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Strategies/PositionFinders/PositionProxyPylon.scala" />
     <entry file="file://$PROJECT_DIR$/src/Geometry/package.scala" />
-    <entry file="file://$PROJECT_DIR$/src/Geometry/TileRectangle.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="52">
-          <caret line="4" column="19" lean-forward="false" selection-start-line="4" selection-start-column="6" selection-end-line="4" selection-end-column="19" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Strategies/PositionFinders/PositionFinder.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="78">
@@ -1233,13 +1225,6 @@
         <state relative-caret-position="52">
           <caret line="4" column="16" lean-forward="false" selection-start-line="4" selection-start-column="16" selection-end-line="4" selection-end-column="16" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Geometry/Pylon.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="117">
-          <caret line="9" column="6" lean-forward="false" selection-start-line="9" selection-start-column="6" selection-end-line="9" selection-end-column="6" />
         </state>
       </provider>
     </entry>
@@ -1346,10 +1331,26 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/Geometry/Pylon.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="15" column="30" lean-forward="false" selection-start-line="15" selection-start-column="30" selection-end-line="15" selection-end-column="30" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Geometry/TileRectangle.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="182">
+          <caret line="14" column="22" lean-forward="true" selection-start-line="14" selection-start-column="22" selection-end-line="14" selection-end-column="22" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/Processes/Architect.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="34">
-          <caret line="86" column="38" lean-forward="false" selection-start-line="86" selection-start-column="38" selection-end-line="86" selection-end-column="38" />
+        <state relative-caret-position="203">
+          <caret line="128" column="35" lean-forward="false" selection-start-line="128" selection-start-column="6" selection-end-line="128" selection-end-column="35" />
           <folding />
         </state>
       </provider>

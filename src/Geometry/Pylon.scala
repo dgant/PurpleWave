@@ -12,8 +12,8 @@ object Pylon {
     val y = _normalize(pylon.getY - target.getY)
     
     return y match {
-      case 0 => x < 7
-      case 1 => x < 7
+      case 0 => x < 7 && x > 1
+      case 1 => x < 7 && x > 1
       case 2 => x < 6
       case 4 => x < 4
       case _ => false

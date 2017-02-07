@@ -124,9 +124,8 @@ class Architect {
       new TilePosition(
         position.getX + buildingType.tileWidth - 1,
         position.getY + buildingType.tileHeight - 1))
-     
-    //TODO: Count exclusions
     
+    exclusions.filter(_.intersects(marginArea)).isEmpty &&
     //_rectangleContainsOnlyAWorker(marginArea) &&
     //_rectangleIsWalkable(marginArea) &&
     _rectangleIsBuildable(buildingArea, buildingType, hypotheticalPylon)

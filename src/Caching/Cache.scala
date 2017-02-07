@@ -8,13 +8,13 @@ class Cache[T]() {
   var _lastUpdateFrame = Integer.MIN_VALUE
   var _cachedValue:Option[T] = None
   
-  def recalculate(): T = {
+  def recalculate: T = {
     throw new Exception("This cache doesn't know how to recalculate!")
   }
   
-  def get():T = {
+  def get:T = {
     if (_cacheHasExpired) {
-      _cachedValue = Some(recalculate())
+      _cachedValue = Some(recalculate)
       _lastUpdateFrame = With.game.getFrameCount
     }
     _cachedValue.get

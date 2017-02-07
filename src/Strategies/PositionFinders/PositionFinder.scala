@@ -4,6 +4,6 @@ import bwapi.TilePosition
 
 trait PositionFinder {
   
-  def find():Option[TilePosition]
+  def find:Option[TilePosition]
   
 }

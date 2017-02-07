@@ -29,8 +29,8 @@ class Bot() extends DefaultBWListener {
       AutoCamera.enabled = !manualControl
 
       if (manualControl) {
+        With.game.enableFlag(0) //black sheep wall
         With.game.enableFlag(1) //Enable user input
-        With.game.enableFlag(2) //black sheep wall
         With.game.setLocalSpeed(5)
       } else {
         With.game.setLocalSpeed(0)
@@ -81,6 +81,7 @@ class Bot() extends DefaultBWListener {
   }
 
   override def onUnitDestroy(unit: bwapi.Unit) {
+    With.scout.onUnitDestroy(unit)
     AutoCamera.focusUnit(unit)
   }
 

@@ -18,8 +18,11 @@ class Scout {
       .foreach(_knownEnemyUnits.add)
     
     _knownEnemyUnits
-      .filterNot(unit => unit.exists)
       .foreach(_knownEnemyUnits.remove)
+  }
+  
+  def onUnitDestroy(unit:bwapi.Unit) {
+    _knownEnemyUnits.remove(unit)
   }
   
   def enemyUnits():Iterable[bwapi.Unit] = {

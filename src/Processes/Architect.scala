@@ -5,6 +5,7 @@ import Startup.With
 import bwapi.{TilePosition, UnitType, WalkPosition}
 
 import scala.collection.JavaConverters._
+import scala.collection.mutable
 
 class Architect {
   
@@ -25,6 +26,7 @@ class Architect {
   
     SpiralSearch
       .forPointsInSpiral(center, searchRadius)
+      .view
       .find(position => _canBuild(buildingType, position, margin))
   }
   
@@ -54,36 +56,51 @@ class Architect {
     //  Having failed that
     //    return None
     
-    val nextBuilding = buildingTypes.head
-    
     SpiralSearch
       .forPointsInSpiral(center, searchRadius)
-      .find(point => {
-        if (_canBuild(nextBuilding, point, margin, exclusions, hypotheticalPylon)) {
-          val newHypotheticalPylon = if (nextBuilding == UnitType.Protoss_Pylon) Some(point) else hypotheticalPylon
-          val newExclusions = exclusions :+ new TileRectangle(
-            point,
-            new TilePosition(
-              point.getX + nextBuilding.width,
-              point.getY + nextBuilding.height))
+      .view
+      .map(searchPoint => _tryThing(searchPoint, buildingTypes, margin, searchRadius, exclusions, hypotheticalPylon))
+      .find(_.isDefined)
+      .getOrElse(None)
+  }
   
-          val rest = placeBuildings(
-            buildingTypes.drop(1),
-            point,
-            margin,
-            searchRadius,
-            newExclusions,
-            newHypotheticalPylon)
-          
-          if (rest.isDefined) {
-            val result = point :: rest.get.toList
-            return Some(result)
-          }
-        }
-        return None
-      })
+  def _tryThing(
+    searchPoint:        TilePosition,
+    buildingTypes:      Iterable[UnitType],
+    margin:             Integer                 = 0,
+    searchRadius:       Integer                 = 20,
+    exclusions:         Iterable[TileRectangle] = List.empty,
+    hypotheticalPylon:  Option[TilePosition]    = None)
+      :Option[Iterable[TilePosition]] = {
+    
+    val nextBuilding = buildingTypes.head
+    
+    if (_canBuild(nextBuilding, searchPoint, margin, exclusions, hypotheticalPylon)) {
+      val newHypotheticalPylon = if (nextBuilding == UnitType.Protoss_Pylon) Some(searchPoint) else hypotheticalPylon
+      val newExclusions = exclusions ++ List(new TileRectangle(
+        searchPoint,
+        new TilePosition(
+          searchPoint.getX + nextBuilding.tileWidth - 1,
+          searchPoint.getY + nextBuilding.tileHeight - 1)))
+      
+      if (buildingTypes.size == 1) {
+        return Some(List(searchPoint))
+      }
+      
+      val rest = placeBuildings(
+        buildingTypes.drop(1),
+        searchPoint,
+        margin,
+        searchRadius,
+        newExclusions,
+        newHypotheticalPylon)
+    
+      if (rest.isDefined) {
+        return Some(searchPoint :: rest.get.toList)
+      }
+    }
   
-    return None
+    None
   }
   
   def _canBuild(
@@ -99,18 +116,20 @@ class Architect {
         position.getX - margin,
         position.getY - margin),
       new TilePosition(
-        position.getX + margin + buildingType.width,
-        position.getY + margin + buildingType.height))
+        position.getX + margin + buildingType.tileWidth - 1,
+        position.getY + margin + buildingType.tileHeight - 1))
     
     val buildingArea = new TileRectangle(
       position,
       new TilePosition(
-        position.getX + buildingType.width,
-        position.getY + buildingType.height))
+        position.getX + buildingType.tileWidth - 1,
+        position.getY + buildingType.tileHeight - 1))
      
-    _rectangleContainsOnlyAWorker(marginArea) &&
-    _rectangleIsWalkable(marginArea) &&
-    _rectangleIsBuildable(buildingArea, buildingType)
+    //TODO: Count exclusions
+    
+    //_rectangleContainsOnlyAWorker(marginArea) &&
+    //_rectangleIsWalkable(marginArea) &&
+    _rectangleIsBuildable(buildingArea, buildingType, hypotheticalPylon)
   }
   
   def _rectangleContainsOnlyAWorker(
@@ -131,11 +150,11 @@ class Architect {
     val walkRectangle = Positions.toWalkRectangle(rectangle)
     (walkRectangle.start.getX to walkRectangle.end.getX).forall(x =>
       (walkRectangle.start.getY to walkRectangle.end.getY).forall(y =>
-        With.game.isWalkable(new WalkPosition(x, y))))
+        _isWalkable(new WalkPosition(x, y))))
   }
   
   def _rectangleIsBuildable(
-    area:             TileRectangle,
+    area:              TileRectangle,
     buildingType:      UnitType,
     hypotheticalPylon: Option[TilePosition] = None)
       :Boolean = {
@@ -143,9 +162,25 @@ class Architect {
     (area.start.getX to area.end.getX).forall(x =>
       (area.start.getY to area.end.getY).forall(y => {
         val position = new TilePosition(x, y)
-        With.game.isBuildable(position) &&
+        _isBuildable(position) &&
           ((!buildingType.requiresPsi())   || With.game.hasPower(position) || hypotheticalPylon.exists(pylon => Pylon.powers(pylon, position))) &&
           ((!buildingType.requiresCreep()) || With.game.hasCreep(position))
       }))
+  }
+  
+  val _walkableCache = new mutable.HashMap[WalkPosition, Boolean]
+  def _isWalkable(walkPosition: WalkPosition):Boolean = {
+    if ( ! _walkableCache.contains(walkPosition)) {
+      _walkableCache.put(walkPosition, With.game.isWalkable(walkPosition))
+    }
+    _walkableCache(walkPosition)
+  }
+  
+  val _buildableCache = new mutable.HashMap[TilePosition, Boolean]
+  def _isBuildable(tilePosition: TilePosition):Boolean = {
+    if ( ! _buildableCache.contains(tilePosition)) {
+      _buildableCache.put(tilePosition, With.game.isBuildable(tilePosition))
+    }
+    _buildableCache(tilePosition)
   }
 }

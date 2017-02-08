@@ -29,7 +29,6 @@ class Bot() extends DefaultBWListener {
       AutoCamera.enabled = !manualControl
 
       if (manualControl) {
-        With.game.enableFlag(0) //black sheep wall
         With.game.enableFlag(1) //Enable user input
         With.game.setLocalSpeed(5)
       } else {

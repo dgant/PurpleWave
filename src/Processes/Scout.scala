@@ -16,9 +16,6 @@ class Scout {
       .filter(_.isEnemy(With.game.self))
       .flatten(_.getUnits.asScala)
       .foreach(_knownEnemyUnits.add)
-    
-    _knownEnemyUnits
-      .foreach(_knownEnemyUnits.remove)
   }
   
   def onUnitDestroy(unit:bwapi.Unit) {

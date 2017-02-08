@@ -6,7 +6,7 @@ import Startup.With
 import Strategies.PositionFinders.{PositionCenter, PositionFinder}
 import Strategies.UnitMatchers.{UnitMatchAnything, UnitMatcher}
 import Strategies.UnitPreferences.{UnitPreferAnything, UnitPreference}
-import Traits.Property
+import Types.Property
 
 class RequireUnitAtLocation extends AbstractPlanFulfillRequirements {
   

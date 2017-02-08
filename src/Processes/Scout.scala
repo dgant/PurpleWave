@@ -1,6 +1,7 @@
 package Processes
 
 import Startup.With
+import Types.EnemyUnitInfo
 import bwapi.{Position, UnitType}
 import bwta.{BWTA, BaseLocation}
 
@@ -9,21 +10,39 @@ import scala.collection.mutable
 
 class Scout {
   
-  val _knownEnemyUnits:mutable.HashSet[bwapi.Unit] = mutable.HashSet.empty
+  val _knownEnemyUnits = new mutable.HashMap[Integer, EnemyUnitInfo].empty
   
   def onFrame() {
+    //Stop tracking units that aren't enemies
+    //Vespene geysers, add-ons, mind-controlled units, etc.
+    With.game.getAllUnits.asScala
+      .filter(unit => _knownEnemyUnits.contains(unit.getID))
+      .filterNot(unit => unit.getPlayer.isEnemy(With.game.self))
+      .foreach(unit => _knownEnemyUnits.remove(unit.getID))
+      
     With.game.getPlayers.asScala
       .filter(_.isEnemy(With.game.self))
       .flatten(_.getUnits.asScala)
-      .foreach(_knownEnemyUnits.add)
+      .filterNot(unit => _knownEnemyUnits.contains(unit.getID))
+      .map(unit => new EnemyUnitInfo(
+        getID           = unit.getID,
+        lastSeen        = With.game.getFrameCount,
+        getPlayer       = unit.getPlayer,
+        getPosition     = unit.getPosition,
+        getTilePosition = unit.getTilePosition,
+        getHitPoints    = unit.getHitPoints,
+        getShields      = unit.getShields,
+        getType         = unit.getType,
+        isCompleted     = unit.isCompleted))
+      .foreach(knownUnit => _knownEnemyUnits.put(knownUnit.getID, knownUnit))
   }
   
   def onUnitDestroy(unit:bwapi.Unit) {
-    _knownEnemyUnits.remove(unit)
+    _knownEnemyUnits.remove(unit.getID)
   }
   
-  def enemyUnits():Iterable[bwapi.Unit] = {
-    _knownEnemyUnits
+  def enemyUnits():Iterable[EnemyUnitInfo] = {
+    _knownEnemyUnits.values
   }
   
   //someBuilding.getType.isResourceDepot seems to fail when a hatchery starts to morph

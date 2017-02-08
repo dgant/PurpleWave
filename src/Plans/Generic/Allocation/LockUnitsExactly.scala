@@ -3,7 +3,7 @@ package Plans.Generic.Allocation
 import Startup.With
 import Strategies.UnitMatchers.{UnitMatchAnything, UnitMatcher}
 import Strategies.UnitPreferences.{UnitPreferAnything, UnitPreference}
-import Traits.Property
+import Types.Property
 
 class LockUnitsExactly extends LockUnits {
   

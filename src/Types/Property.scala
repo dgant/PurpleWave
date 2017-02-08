@@ -1,4 +1,4 @@
-package Traits
+package Types
 
 class Property[T](default:T) {
   

@@ -11,7 +11,7 @@ import Startup.With
 import Strategies.PositionFinders.{PositionCenter, PositionFinder, PositionSpecific}
 import Strategies.UnitMatchers.{UnitMatchWorker, UnitMatcher}
 import Strategies.UnitPreferences.{UnitPreferClose, UnitPreference}
-import Traits.Property
+import Types.Property
 import bwapi.{TilePosition, UnitType}
 
 class BuildProxyTwoGateways extends Plan {

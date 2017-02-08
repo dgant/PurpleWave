@@ -1,6 +1,6 @@
 package Plans
 
-import Traits.Property
+import Types.Property
 
 class Plan {
   val description = new Property[Option[String]](None)

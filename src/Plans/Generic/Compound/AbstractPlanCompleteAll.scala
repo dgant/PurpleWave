@@ -1,7 +1,7 @@
 package Plans.Generic.Compound
 
 import Plans.Plan
-import Traits.Property
+import Types.Property
 
 abstract class AbstractPlanCompleteAll extends Plan {
   

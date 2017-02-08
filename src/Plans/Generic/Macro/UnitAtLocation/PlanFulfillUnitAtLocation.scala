@@ -3,7 +3,7 @@ package Plans.Generic.Macro.UnitAtLocation
 import Plans.Generic.Allocation.{LockUnits, LockUnitsNobody}
 import Plans.Plan
 import Strategies.PositionFinders.{PositionCenter, PositionFinder}
-import Traits.Property
+import Types.Property
 
 class PlanFulfillUnitAtLocation extends Plan {
   

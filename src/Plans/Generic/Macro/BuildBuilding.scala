@@ -7,7 +7,7 @@ import Startup.With
 import Strategies.PositionFinders.{PositionFinder, PositionSimpleBuilding}
 import Strategies.UnitMatchers.{UnitMatchType, UnitMatcher}
 import Strategies.UnitPreferences.{UnitPreferClose, UnitPreference}
-import Traits.Property
+import Types.Property
 import bwapi.{Position, Race, TilePosition, UnitType}
 
 class BuildBuilding(val buildingType:UnitType) extends Plan {
@@ -17,7 +17,11 @@ class BuildBuilding(val buildingType:UnitType) extends Plan {
   val builderMatcher    = new Property[UnitMatcher]    (new UnitMatchType(buildingType.whatBuilds.first))
   val builderPreference = new Property[UnitPreference] (new UnitPreferClose { positionFinder.inherit(me.positionFinder)})
   val currencyPlan      = new Property[LockCurrency]   (new LockCurrencyForUnit(buildingType))
-  val builderPlan       = new Property[LockUnits]      (new LockUnitsExactly { description.set(Some("Builder"));  unitMatcher.inherit(builderMatcher); unitPreference.inherit(builderPreference)})
+  val builderPlan       = new Property[LockUnits]      (new LockUnitsExactly {
+    description.set(Some("Builder"));
+    unitMatcher.inherit(builderMatcher);
+    unitPreference.inherit(builderPreference)
+  })
   
   var _builder:Option[bwapi.Unit] = None
   var _building:Option[bwapi.Unit] = None

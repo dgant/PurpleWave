@@ -4,7 +4,7 @@ import Development.Logger
 import Plans.Generic.Allocation.{LockUnits, LockUnitsNobody}
 import Plans.Plan
 import Startup.With
-import Traits.Property
+import Types.Property
 import bwapi.Position
 
 import scala.collection.mutable

@@ -12,7 +12,13 @@ class Architect {
   def getHq:TilePosition = {
     With.ourUnits
       .filter(_.getType.isBuilding)
-      .sortBy(_.getType.isResourceDepot)
+      .sortBy(unit => ! List(
+        UnitType.Terran_Command_Center,
+        UnitType.Protoss_Nexus,
+        UnitType.Zerg_Hatchery,
+        UnitType.Zerg_Lair,
+        UnitType.Zerg_Hive
+      ).contains(unit.getType))
       .map(_.getTilePosition)
       .head
   }

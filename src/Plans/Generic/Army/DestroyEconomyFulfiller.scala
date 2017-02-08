@@ -57,20 +57,23 @@ class DestroyEconomyFulfiller extends Plan {
   }
   
   def _issueOrder(unit:bwapi.Unit, targetPosition:Position) {
+    //Kill any nearby workers
+    //Kill any very nearby combat units
+    //Otherwise, check out the mineral line and make sure it's empty
+    //Then destroy the base
+
     //Attack nearby targets
     //Otherwise, attack-move the mineral line
-    var target = With.game
-      .getUnitsInRadius(
-        unit.getPosition,
-        unit.getType.groundWeapon.maxRange * 2)
+    val combatTarget = With.game
+      .getUnitsInRadius(unit.getPosition, 128)
       .asScala
       .filter(_.getPlayer.isEnemy(With.game.self))
       .filter(_.getType.canAttack)
       .sortBy(_.getType.isWorker)
       .headOption
     
-    if (target.isDefined) {
-      unit.attack(target.get)
+    if (combatTarget.isDefined) {
+      unit.attack(combatTarget.get)
     } else {
       unit.attack(targetPosition)
     }

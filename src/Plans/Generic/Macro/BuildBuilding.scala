@@ -32,9 +32,11 @@ class BuildBuilding(val buildingType:UnitType) extends Plan {
   
   override def getChildren: Iterable[Plan] = { List(currencyPlan.get, builderPlan.get) }
   override def isComplete: Boolean = {
-    _building.exists(
-      building => building.isCompleted
-        || (building.exists && buildingType.getRace == Race.Protoss))
+    _building.exists(building => building.isCompleted || (building.exists && buildingType.getRace == Race.Protoss))
+  }
+  
+  def startedBuilding:Boolean = {
+    _building.isDefined
   }
   
   override def onFrame() {

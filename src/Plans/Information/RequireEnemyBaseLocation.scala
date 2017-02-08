@@ -8,6 +8,8 @@ import Traits.Property
 
 class RequireEnemyBaseLocation extends AbstractPlanFulfillRequirements {
   
+  description.set(Some("We must know where an enemy's base is"))
+  
   val meREBL = this
   val positionFinder = new Property[PositionFinder](new PositionCenter)
   val unitPreference = new Property[UnitPreference](new UnitPreferClose  { positionFinder.inherit(meREBL.positionFinder) })

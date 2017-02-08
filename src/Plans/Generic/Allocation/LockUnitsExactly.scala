@@ -7,6 +7,8 @@ import Traits.Property
 
 class LockUnitsExactly extends LockUnits {
   
+  description.set(Some("Reserve a fixed number of units"))
+  
   val quantity        = new Property[Integer](1)
   val unitPreference  = new Property[UnitPreference](UnitPreferAnything)
   val unitMatcher     = new Property[UnitMatcher](UnitMatchAnything)

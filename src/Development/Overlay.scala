@@ -32,8 +32,16 @@ object Overlay {
   
   def _drawUnits() {
     With.ourUnits
+      .filter(unit => Debugger.highlitUnits.contains(unit))
+      .foreach(unit =>
+      With.game.drawCircleMap(unit.getPosition, 32, bwapi.Color.Orange))
+    With.ourUnits
       .filterNot(_.getLastCommand.getUnitCommandType == UnitCommandType.None)
-      .foreach(unit => _drawTextLabel(List(unit.getLastCommand.getUnitCommandType.toString), unit))
+      .foreach(unit => _drawTextLabel(List(
+        //This gives us the uninteresting name of the Lock plan
+        //With.recruiter.getAssignment(unit).map(_getPlanNameOrDescription(_)).getOrElse(""),
+        //unit.toString.replace("Unit@", ""),
+        unit.getLastCommand.getUnitCommandType.toString), unit))
   }
   
   def _describePlanTree(plan:Plan, childOrder:Integer, depth:Integer):String = {
@@ -46,8 +54,12 @@ object Overlay {
     }
   }
   
+  def _getPlanNameOrDescription(plan:Plan):String = {
+    plan.description.get.getOrElse(plan.getClass.getSimpleName.replace("Plan", "").replace("$anon$", "Plan"))
+  }
+  
   def _describePlan(plan:Plan, childOrder:Integer, depth:Integer):String = {
-    val planName = plan.description.get.getOrElse(plan.getClass.getSimpleName.replace("Plan", "").replace("$anon$", "Plan"))
+    val planName = _getPlanNameOrDescription(plan)
     val checkbox = if (plan.isComplete) "[X] " else "[_] "
     
     val spacer = "  " * depth
@@ -112,11 +124,11 @@ object Overlay {
   
   def _drawResources() {
     With.game.drawTextScreen(
-      205,
+      305,
       5,
       With.bank.getPrioritizedRequests
         .map(r =>
-          (if (r.isSatisfied) "[X] " else "[_]") ++
+          (if (r.isSatisfied) "[X] " else "[_] ") ++
           (if (r.minerals > 0)  r.minerals  .toString ++ "m " else "") ++
           (if (r.gas > 0)       r.gas       .toString ++ "g " else "") ++
           (if (r.supply > 0)    r.supply    .toString ++ "s " else ""))

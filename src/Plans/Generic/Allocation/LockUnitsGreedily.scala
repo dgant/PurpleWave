@@ -7,6 +7,8 @@ import Traits.Property
 
 class LockUnitsGreedily extends LockUnits {
   
+  description.set(Some("Reserve as many units as we can"))
+  
   val unitMatcher = new Property[UnitMatcher](UnitMatchAnything)
   val unitPreference = new Property[UnitPreference](UnitPreferAnything)
   val minimum = new Property[Integer](1)

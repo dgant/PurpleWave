@@ -10,6 +10,8 @@ import bwapi.Position
 
 class KnowEnemyBaseLocationFulfiller extends Plan {
   
+  description.set(Some("Discover an enemy base"))
+  
   val meKEBLF = this
   val positionFinder = new Property[PositionFinder](new PositionCenter)
   val unitPreference = new Property[UnitPreference](new UnitPreferClose  { positionFinder.inherit(meKEBLF.positionFinder) })

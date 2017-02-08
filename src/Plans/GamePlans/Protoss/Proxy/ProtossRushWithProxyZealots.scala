@@ -11,11 +11,14 @@ class ProtossRushWithProxyZealots
 
   children.set(List(
     new TrainUnit(UnitType.Protoss_Probe),
-    new BuildProxyTwoGateways,
+    new AllParallel { children.set(List(
+      new BuildProxyTwoGateways,
+      new TrainUnit(UnitType.Protoss_Probe)
+    ))},
     new AllParallel { description.set(Some("Post-proxy build order")); children.set(List(
       new RequireEnemyBaseLocation,
-      new TrainUnit(UnitType.Protoss_Probe),
       new TrainUnit(UnitType.Protoss_Zealot),
+      new TrainUnit(UnitType.Protoss_Probe),
       new TrainUnit(UnitType.Protoss_Zealot),
       new TrainUnit(UnitType.Protoss_Zealot),
       new TrainUnit(UnitType.Protoss_Probe),

@@ -126,15 +126,17 @@ class Architect {
         position.getY + buildingType.tileHeight - 1))
     
     exclusions.filter(_.intersects(marginArea)).isEmpty &&
-    //_rectangleContainsOnlyAWorker(marginArea) &&
+    _rectangleIsBuildable(buildingArea, buildingType, hypotheticalPylon) &&
+    _rectangleContainsOnlyAWorker(marginArea)
     //_rectangleIsWalkable(marginArea) &&
-    _rectangleIsBuildable(buildingArea, buildingType, hypotheticalPylon)
+    
   }
   
   def _rectangleContainsOnlyAWorker(
     rectangle: TileRectangle)
       :Boolean = {
-    val trespassingUnits = With.game.getUnitsInRectangle(rectangle.start.toPosition, rectangle.end.toPosition)
+    val trespassingUnits =
+        With.game.getUnitsInRectangle(rectangle.start.toPosition, rectangle.end.toPosition)
         .asScala
       .filterNot(_.isFlying)
   

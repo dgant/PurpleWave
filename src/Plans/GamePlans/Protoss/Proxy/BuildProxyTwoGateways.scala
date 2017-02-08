@@ -3,7 +3,7 @@ package Plans.GamePlans.Protoss.Proxy
 import Caching.Cache
 import Development.Logger
 import Plans.Generic.Allocation.{LockUnits, LockUnitsExactly}
-import Plans.Generic.Compound.AllSerial
+import Plans.Generic.Compound.{AllSerial, CompleteOnce}
 import Plans.Generic.Macro.BuildBuilding
 import Plans.Generic.Macro.UnitAtLocation.RequireUnitAtLocation
 import Plans.Plan
@@ -58,26 +58,33 @@ class BuildProxyTwoGateways extends Plan {
     this.positionFinder.set(new PositionSpecific(_proxyPositions.get.drop(2).head))
   })
   
+  val _completeSendBuilderOnce = new CompleteOnce {
+    child.inherit(sendBuilderPlan)
+  }
+  
   val _child = new AllSerial
   
   override def isComplete: Boolean = {
-    _updateChildren()
+    _updateGrandchildren()
     _child.isComplete
   }
   
   override def getChildren:Iterable[Plan] = {
-    _updateChildren()
+    _updateGrandchildren()
     List(_child)
   }
   
   override def onFrame() {
-    _updateChildren()
-    _child.onFrame()
+    _updateGrandchildren()
+    if ( ! _child.isComplete) {
+      _child.onFrame()
+    }
   }
   
-  def _updateChildren() {
+  def _updateGrandchildren() {
     _child.children.set(List(
       builderPlan.get,
+      _completeSendBuilderOnce,
       sendBuilderPlan.get,
       pylonPlan.get,
       gateway1Plan.get,

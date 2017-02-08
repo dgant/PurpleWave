@@ -1,6 +1,5 @@
 package Processes
 
-import Development.Logger
 import Plans.Generic.Allocation.LockUnits
 import Startup.With
 
@@ -66,21 +65,14 @@ class Recruiter {
       // 1. Unassign all the current units
       // 2. Unassign all the required units
       // 3. Assign all the required units
-      val unitsOld = getUnits(request)
-      val unitsNew = requiredUnits.get
-      unitsOld.foreach(_unassign)
+      val unitsBefore = getUnits(request)
+      val unitsAfter = requiredUnits.get.toSet
+      val unitsObsolete = unitsBefore.diff(unitsAfter)
+      val unitsNew = unitsAfter.diff(unitsBefore)
+      
+      unitsObsolete.foreach(_unassign)
       unitsNew.foreach(_unassign)
       unitsNew.foreach(_assign(_, request))
-      
-      //Clean things up for any plans that lost units
-      val disappointedPlans = unitsNew.toSet
-        .diff(unitsOld)
-        .map(_requestByUnit(_))
-        .filterNot(_ == request)
-      
-      disappointedPlans.foreach(plan => {
-        Logger.debug("Removed units from " + plan.description.get)
-      })
     }
   }
   

@@ -2,9 +2,12 @@
 
 *.log
 *.class
-
+*.zip
 *.jar
 !./lib/*.jar
 
+out/
+src/META-INF
+.idea/artifacts
 bwapi-data/
-/bin/
+bin/

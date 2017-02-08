@@ -17,7 +17,7 @@ class PositionSimpleBuilding(
     val output = With.architect.placeBuilding(
       buildingType,
       position,
-      margin = 0,
+      margin = 1,
       searchRadius = 50)
     
     if (output == None) {

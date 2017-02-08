@@ -7,8 +7,8 @@ import Startup.With
 import Types.Property
 import bwapi.Position
 
-import scala.collection.mutable
 import scala.collection.JavaConverters._
+import scala.collection.mutable
 
 class DestroyEconomyFulfiller extends Plan {
   val fighters = new Property[LockUnits](LockUnitsNobody)
@@ -18,7 +18,7 @@ class DestroyEconomyFulfiller extends Plan {
   override def getChildren: Iterable[Plan] = { List(fighters.get) }
   override def onFrame() {
     
-    if (With.scout.enemyBaseLocationPosition.isEmpty) {
+    if (With.scout.nextEnemyBase.isEmpty) {
       Logger.warn("Trying to destroy economy without knowing where to go")
       return
     }
@@ -32,17 +32,7 @@ class DestroyEconomyFulfiller extends Plan {
     _lastOrderFrame.keySet.diff(units).foreach(_lastOrderFrame.remove)
     units.diff(_lastOrderFrame.keySet).foreach(_lastOrderFrame.put(_, 0))
     
-    val baseMinerals = With.game
-      .getStaticMinerals
-      .asScala
-      .filter(_.getPosition.getApproxDistance(With.scout.enemyBaseLocationPosition.get) < 32 * 8)
-    
-    var targetPosition = With.scout.enemyBaseLocationPosition.get
-    if (baseMinerals.nonEmpty) {
-      targetPosition = new Position(
-        baseMinerals.map(_.getX).sum / baseMinerals.size,
-        baseMinerals.map(_.getY).sum / baseMinerals.size)
-    }
+    val targetPosition = With.scout.nextEnemyBase.get.getPosition
     
     units
       .filter(_canOrder)
@@ -54,7 +44,7 @@ class DestroyEconomyFulfiller extends Plan {
   }
   
   def _canOrder(unit:bwapi.Unit):Boolean = {
-    _lastOrderFrame(unit) < With.game.getFrameCount - 12
+    _lastOrderFrame(unit) < With.game.getFrameCount - 24
   }
   
   def _issueOrder(unit:bwapi.Unit, targetPosition:Position) {
@@ -65,18 +55,30 @@ class DestroyEconomyFulfiller extends Plan {
 
     //Attack nearby targets
     //Otherwise, attack-move the mineral line
-    val combatTarget = With.game
-      .getUnitsInRadius(unit.getPosition, 128)
+    
+    val combatTarget = unit.getUnitsInWeaponRange(unit.getType.groundWeapon)
       .asScala
       .filter(_.getPlayer.isEnemy(With.game.self))
       .filter(_.getType.canAttack)
-      .sortBy(_.getType.isWorker)
+      .sortBy(unit => unit.getHitPoints + unit.getShields)
       .headOption
     
     if (combatTarget.isDefined) {
       unit.attack(combatTarget.get)
-    } else if (unit.getPosition.getDistance(targetPosition) > 256) {
-      unit.attack(targetPosition)
+    } else {
+      
+      val workerTarget = unit.getUnitsInRadius(256)
+        .asScala
+        .filter(_.getPlayer.isEnemy(With.game.self))
+        .sortBy( ! _.getType.isWorker)
+        .headOption
+      
+      if (workerTarget.isDefined) {
+        unit.attack(workerTarget.get.getPosition)
+      }
+      else if (unit.getPosition.getDistance(targetPosition) > 512) {
+        unit.attack(targetPosition)
+      }
     }
   }
 }

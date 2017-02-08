@@ -8,6 +8,9 @@ import Strategies.UnitMatchers.{UnitMatchMobile, UnitMatcher}
 import Strategies.UnitPreferences.{UnitPreferClose, UnitPreference}
 import Types.Property
 import bwapi.Position
+import bwta.BWTA
+
+import scala.collection.JavaConverters._
 
 class KnowEnemyBaseLocationFulfiller extends Plan {
   
@@ -25,26 +28,30 @@ class KnowEnemyBaseLocationFulfiller extends Plan {
   override def getChildren: Iterable[Plan] = { List(unitPlan.get) }
   
   override def onFrame() {
-    _getFirstScoutingPosition.foreach(position => positionFinder.set(new PositionSpecific(position.toTilePosition)))
+    positionFinder.set(new PositionSpecific(_getNextScoutingPosition.toTilePosition))
     unitPlan.get.onFrame()
     unitPlan.get.units.foreach(_orderScout)
   }
   
   def _orderScout(scout:bwapi.Unit) {
-    _getNextScoutingPosition(scout).foreach(scout.move(_))
+    val nextBase = With.scout.unscoutedBases.head
+    if (scout.canGather) {
+      val nearestMineral = BWTA.getNearestBaseLocation(_getNextScoutingPosition)
+        .getStaticMinerals
+        .asScala
+        .headOption
+      
+      if (nearestMineral.isDefined &&
+        nextBase.getRegion.getPolygon.isInside(nearestMineral.get.getPosition)) {
+          scout.rightClick(nearestMineral.get)
+          return
+      }
+    }
+  
+    scout.move(nextBase.getPosition)
   }
   
-  def _getFirstScoutingPosition():Option[Position] = {
-    With.scout.unexploredStartLocations
-      .headOption
-      .map(_.getPosition)
-  }
-  
-  def _getNextScoutingPosition(scout:bwapi.Unit):Option[Position] = {
-    With.scout.unexploredStartLocations
-      .toList
-      .sortBy(_.getPosition.getDistance(scout.getPosition))
-      .headOption
-      .map(_.getPosition)
+  def _getNextScoutingPosition:Position = {
+    With.scout.unscoutedBases.head.getPosition
   }
 }

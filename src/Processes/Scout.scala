@@ -2,7 +2,7 @@ package Processes
 
 import Startup.With
 import Types.EnemyUnitInfo
-import bwapi.{Position, UnitType}
+import bwapi.UnitType
 import bwta.{BWTA, BaseLocation}
 
 import scala.collection.JavaConverters._
@@ -20,8 +20,15 @@ class Scout {
       .filterNot(unit => unit.getPlayer.isEnemy(With.game.self))
       .foreach(unit => _knownEnemyUnits.remove(unit.getID))
       
+    //Track (reasonable) enemy units
     With.game.getPlayers.asScala
       .filter(_.isEnemy(With.game.self))
+      .filterNot(unit => List(
+        UnitType.None,
+        UnitType.Unknown,
+        UnitType.Zerg_Larva,
+        UnitType.Zerg_Egg)
+        .contains(unit.getType))
       .flatten(_.getUnits.asScala)
       .filterNot(unit => _knownEnemyUnits.contains(unit.getID))
       .map(unit => new EnemyUnitInfo(
@@ -41,7 +48,7 @@ class Scout {
     _knownEnemyUnits.remove(unit.getID)
   }
   
-  def enemyUnits():Iterable[EnemyUnitInfo] = {
+  def enemyUnits:Iterable[EnemyUnitInfo] = {
     _knownEnemyUnits.values
   }
   
@@ -54,27 +61,17 @@ class Scout {
     UnitType.Zerg_Hive
   )
   
-  def enemyBaseLocationPosition:Option[Position] = {
-    
-    val visibleBase = enemyUnits
-      .filter(unit => _townHallTypes.contains(unit.getType))
+  def nextEnemyBase:Option[EnemyUnitInfo] = {
+    enemyUnits
+      .toList
+      .sortBy(unit => ! _townHallTypes.contains(unit.getType))
+      .sortBy(unit => ! unit.getType.isBuilding)
       .headOption
-    
-    if (visibleBase.isDefined) {
-      return Some(visibleBase.get.getPosition)
-    }
-      
-    if (unexploredStartLocations.size == 1) {
-      return Some(unexploredStartLocations.head.getPosition)
-    }
-    
-    //If their base is in a non-start location, we're screwed.
-    
-    None
   }
   
-  def unexploredStartLocations():Iterable[BaseLocation] = {
-    BWTA.getStartLocations.asScala
-      .filterNot(base => With.game.isExplored(base.getTilePosition))
+  def unscoutedBases():Iterable[BaseLocation] = {
+    BWTA.getBaseLocations.asScala
+      .sortBy(base => With.game.isExplored(base.getTilePosition))
+      .sortBy(base => ! base.isStartLocation)
   }
 }

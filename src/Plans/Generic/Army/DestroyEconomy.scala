@@ -2,7 +2,7 @@ package Plans.Generic.Army
 
 import Plans.Generic.Allocation.LockUnitsGreedily
 import Plans.Generic.Compound.AllSerial
-import Plans.Information.KnowEnemyBaseLocationChecker
+import Plans.Information.RequireEnemyBaseLocation
 import Strategies.UnitMatchers.UnitMatchWarriors
 
 class DestroyEconomy extends AllSerial {
@@ -13,7 +13,7 @@ class DestroyEconomy extends AllSerial {
   
   children.set(List(
     new AllSerial { children.set(List(
-      new KnowEnemyBaseLocationChecker,
+      new RequireEnemyBaseLocation,
       _fighters
     )) },
     new DestroyEconomyFulfiller {

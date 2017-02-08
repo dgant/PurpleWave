@@ -142,8 +142,10 @@ class Architect {
     rectangle: TileRectangle)
       :Boolean = {
     val trespassingUnits =
-        With.game.getUnitsInRectangle(rectangle.start.toPosition, rectangle.end.toPosition)
-        .asScala
+      (rectangle.start.getX to rectangle.end.getX).flatten(x =>
+        (rectangle.start.getY to rectangle.end.getY).flatten(y =>
+          With.game.getUnitsOnTile(x, y).asScala
+      ))
       .filterNot(_.isFlying)
   
     trespassingUnits.size <= 1 &&

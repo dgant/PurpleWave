@@ -3,7 +3,7 @@ package Plans.GamePlans.Protoss.Proxy
 import Caching.Cache
 import Development.Logger
 import Plans.Generic.Allocation.{LockUnits, LockUnitsExactly}
-import Plans.Generic.Compound.{AllSerial, CompleteOnce, DontBlock}
+import Plans.Generic.Compound.{AllSerial, CompleteOnce}
 import Plans.Generic.Macro.BuildBuilding
 import Plans.Generic.Macro.UnitAtLocation.RequireUnitAtLocation
 import Plans.Information.RequireEnemyBaseLocation
@@ -58,8 +58,8 @@ class BuildProxyTwoGateways extends Plan {
     this.builderPlan.inherit(meBPTG.builderPlan)
     this.positionFinder.set(new PositionSpecific(_proxyPositions.get.drop(2).head))
   })
-  val scoutingPlan = new Property[Plan](new DontBlock {
-    this.child.set(new RequireEnemyBaseLocation)
+  val scoutingPlan = new Property[Plan](new RequireEnemyBaseLocation {
+    this.scoutPlan.inherit(meBPTG.builderPlan)
   })
   
   val _completeSendBuilderOnce = new CompleteOnce {

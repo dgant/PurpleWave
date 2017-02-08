@@ -17,6 +17,7 @@ class DestroyEconomyFulfiller extends Plan {
   
   override def getChildren: Iterable[Plan] = { List(fighters.get) }
   override def onFrame() {
+    
     if (With.scout.enemyBaseLocationPosition.isEmpty) {
       Logger.warn("Trying to destroy economy without knowing where to go")
       return
@@ -74,7 +75,7 @@ class DestroyEconomyFulfiller extends Plan {
     
     if (combatTarget.isDefined) {
       unit.attack(combatTarget.get)
-    } else {
+    } else if (unit.getPosition.getDistance(targetPosition) > 256) {
       unit.attack(targetPosition)
     }
   }

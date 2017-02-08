@@ -37,13 +37,16 @@ class RequireUnitAtLocation extends AbstractPlanFulfillRequirements {
   })
   
   override def drawOverlay() = {
-    positionFinder.get.find.foreach(position => {
-      With.game.drawCircleMap(
-        position.toPosition,
-        range.get,
-        bwapi.Color.Green)
-      With.game.drawTextMap(
-        position.toPosition,
-        "Requiring units")})
+    if ( ! isComplete) {
+      positionFinder.get.find.foreach(position => {
+        With.game.drawCircleMap(
+          position.toPosition,
+          range.get,
+          bwapi.Color.Green)
+        With.game.drawTextMap(
+          position.toPosition,
+          "Requiring units")
+      })
+    }
   }
 }

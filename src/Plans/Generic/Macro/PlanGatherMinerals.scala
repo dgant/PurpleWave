@@ -17,7 +17,10 @@ class PlanGatherMinerals extends Plan {
   
   override def onFrame() {
     if (_mineral.isEmpty) {
-      _mineral = With.game.getMinerals.asScala.filter(_.isVisible).headOption
+      _mineral = With.game.getMinerals.asScala
+        .filter(_.isVisible)
+        .sortBy(mineral => With.architect.getHq.getPoint.toPosition.getDistance(mineral.getPosition))
+        .headOption
     }
   
     if ( ! _mineral.isEmpty) {

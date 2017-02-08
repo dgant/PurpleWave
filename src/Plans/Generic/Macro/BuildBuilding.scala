@@ -41,9 +41,13 @@ class BuildBuilding(val buildingType:UnitType) extends Plan {
   
   override def onFrame() {
     if (isComplete) {
-      //It's important to quit so we release our resources
       return
     }
+  
+    _building = With.ourUnits
+      .filter(unit => unit.getType == buildingType)
+      .filter(unit => _position.exists(position => position == unit.getTilePosition))
+      .headOption
   
     currencyPlan.get.isSpent = !_building.isEmpty
   
@@ -52,17 +56,6 @@ class BuildBuilding(val buildingType:UnitType) extends Plan {
       builderPlan.get.onFrame()
       if (builderPlan.get.isComplete) {
         _builder = builderPlan.get.units.headOption
-  
-        //We can probably simplify this
-        if (currencyPlan.get.isComplete) {
-  
-          if (_building.isEmpty)
-            _building = With.ourUnits
-              .filter(unit => unit.getType == buildingType)
-              .filter(unit => _position.exists(position => position == unit.getTilePosition))
-              .headOption
-        }
-  
         if (_building.isDefined) {
           if (buildingType.getRace == Race.Terran) {
             _builder.foreach(_.rightClick(_building.get))

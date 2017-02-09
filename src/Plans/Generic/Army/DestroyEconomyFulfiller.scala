@@ -47,15 +47,8 @@ class DestroyEconomyFulfiller extends Plan {
   }
   
   def _issueOrder(fighter:bwapi.Unit, targetPosition:Position) {
-    //Kill any nearby workers
-    //Kill any very nearby combat units
-    //Otherwise, check out the mineral line and make sure it's empty
-    //Then destroy the base
-
-    //Attack nearby targets
-    //Otherwise, attack-move the mineral line
     
-    val baseRadius = 32 * 25
+    val baseRadius = 32 * 8
     val combatRadius = 32 * 4
     
     val weAreNearTheirBase = fighter.getPosition.getDistance(targetPosition) < baseRadius

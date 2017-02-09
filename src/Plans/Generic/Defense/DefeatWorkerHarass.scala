@@ -44,7 +44,7 @@ class DefeatWorkerHarass extends Plan {
       miningArea.end.getY   * 32)
     .asScala
     .filter(unit => unit.getPlayer.isEnemy(With.game.self))
-    .filter(unit => unit.canAttack)
+    .filter(unit => unit.getType.canAttack)
     .filter(unit => ! unit.isFlying)
     
     enemiesInBox.foreach(_defendFromEnemy)

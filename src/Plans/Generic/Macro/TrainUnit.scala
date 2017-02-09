@@ -8,6 +8,8 @@ import Strategies.UnitMatchers.UnitMatchType
 import Types.Property
 import bwapi.UnitType
 
+import scala.collection.JavaConverters._
+
 class TrainUnit(val traineeType:UnitType) extends Plan {
   
   val currencyPlan  = new Property[LockCurrency] (new LockCurrencyForUnit(traineeType))
@@ -58,6 +60,13 @@ class TrainUnit(val traineeType:UnitType) extends Plan {
       _reset()
     }
     
+    if (trainer.getTrainingQueue.size > 1) {
+      With.logger.warn("A "
+        + trainer.getType.toString
+        + " is queuing: "
+        + trainer.getTrainingQueue.asScala.map(_.toString).mkString(", "))
+    }
+    
     val isTraining = ! trainer.getTrainingQueue.isEmpty
     val ordered = _trainer.nonEmpty
     
@@ -77,9 +86,6 @@ class TrainUnit(val traineeType:UnitType) extends Plan {
       }
     }
     else {
-      if (ordered) {
-        With.logger.warn("We ordered to train a fighter, but it's not training.")
-      }
       _orderUnit(trainer)
     }
   }

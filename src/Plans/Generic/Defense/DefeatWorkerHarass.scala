@@ -7,20 +7,11 @@ import Startup.With
 import Strategies.PositionFinders.PositionSpecific
 import Strategies.UnitMatchers.UnitMatchWorker
 import Strategies.UnitPreferences.UnitPreferClose
-import bwapi.UnitType
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 class DefeatWorkerHarass extends Plan {
-  
-  val _townHallTypes = Set(
-    UnitType.Terran_Command_Center,
-    UnitType.Protoss_Nexus,
-    UnitType.Zerg_Hatchery,
-    UnitType.Zerg_Lair,
-    UnitType.Zerg_Hive
-  )
   
   val _enemyDefense = new mutable.HashMap[bwapi.Unit, LockUnits]
   val _enemyUpdateFrames = new mutable.HashMap[bwapi.Unit, Integer]
@@ -47,10 +38,10 @@ class DefeatWorkerHarass extends Plan {
   
   def _defendBaseWorkers(miningArea:TileRectangle) {
     val enemiesInBox = With.game.getUnitsInRectangle(
-      miningArea.start.getX,
-      miningArea.start.getY,
-      miningArea.end.getX,
-      miningArea.end.getY)
+      miningArea.start.getX * 32,
+      miningArea.start.getY * 32,
+      miningArea.end.getX   * 32,
+      miningArea.end.getY   * 32)
     .asScala
     .filter(unit => unit.getPlayer.isEnemy(With.game.self))
     .filter(unit => unit.canAttack)
@@ -74,5 +65,4 @@ class DefeatWorkerHarass extends Plan {
     }
     _enemyUpdateFrames.put(enemy, With.game.getFrameCount)
   }
-  
 }

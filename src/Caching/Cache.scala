@@ -8,16 +8,25 @@ class Cache[T]() {
   var _lastUpdateFrame = Integer.MIN_VALUE
   var _cachedValue:Option[T] = None
   
-  def recalculate: T = {
-    throw new Exception("This cache doesn't know how to recalculate!")
+  var _recalculator:Option[() => T] = None
+  
+  def setCalculator(recalculator:() => T) {
+    _recalculator = Some(recalculator)
   }
   
   def get:T = {
     if (_cacheHasExpired) {
-      _cachedValue = Some(recalculate)
+      _cachedValue = Some(_recalculateAsNeeded)
       _lastUpdateFrame = With.game.getFrameCount
     }
     _cachedValue.get
+  }
+  
+  def _recalculateAsNeeded:T = {
+    if (_recalculator.isEmpty) {
+      throw new Exception("This cache lacks a recalculator")
+    }
+    _recalculator.get.apply()
   }
   
   def _cacheHasExpired:Boolean = {

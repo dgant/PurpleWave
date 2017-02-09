@@ -9,8 +9,11 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable.ListBuffer
 
 class Logger {
+  
+  var enableStdOut = false
+  var enableGameMessage = true
+  
   val _logMessages = new ListBuffer[String]
-  val _exceptions = new ListBuffer[Exception]
   
   def onEnd() {
     val opponents = With.game.getPlayers.asScala
@@ -22,27 +25,25 @@ class Logger {
     val filenameRaw = (opponents + "-" + Calendar.getInstance.getTime.toString)
     val filename = "bwapi-data/write/" + filenameRaw.replaceAll("[^A-Za-z0-9 \\-\\.]", "") + ".log.txt";
     val file = new File(filename)
-    System.out.println("Writing log to")
-    System.out.println(file.getAbsolutePath)
     val printWriter = new PrintWriter(file)
-    printWriter.write(exceptionLog)
+    printWriter.write(_logMessages.distinct.mkString("\n"))
     printWriter.close()
   }
   
-  def exceptionLog:String = {
-    _exceptions
-        .map(_formatException)
-        .distinct
-        .mkString("\n")
-  }
-  
   def onException(exception: Exception) {
-    _exceptions.append(exception)
+    _logMessages.append(_formatException(exception))
     debug(_formatException(exception))
   }
   
   def _log(message:String) {
-    System.out.println(message)
+    if (enableStdOut) {
+      System.out.println(message)
+    }
+    
+    if (enableGameMessage) {
+      With.game.sendText(message)
+    }
+    
     _logMessages.append(message)
   }
 

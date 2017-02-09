@@ -8,10 +8,15 @@ class PositionSimpleBuilding(
   val buildingType:UnitType)
     extends PositionFinder {
   
-  val _cache = new Cache[Option[TilePosition]] { duration = 24 * 2; override def recalculate = _recalculate }
-  override def find(): Option[TilePosition] = _cache.get
+  val _cache = new Cache[Option[TilePosition]] { duration = 24 * 2; setCalculator(() => _recalculate) }
+  override def find: Option[TilePosition] = _cache.get
   
   def _recalculate: Option[TilePosition] = {
+    if (With.map.ourBaseHalls.isEmpty) {
+      With.logger.warn("Couldn't place a building because we had no town halls")
+      return None
+    }
+    
     val position = With.map.ourBaseHalls.head.getTilePosition
     val output = With.architect.placeBuilding(
       buildingType,

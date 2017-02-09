@@ -1,5 +1,6 @@
 package Plans.Generic.Defense
 
+import Geometry.TileRectangle
 import Plans.Generic.Allocation.{LockUnits, LockUnitsExactly}
 import Plans.Plan
 import Startup.With
@@ -35,9 +36,8 @@ class DefeatWorkerHarass extends Plan {
           _enemyDefense.remove(pair._1)
           _enemyUpdateFrames.remove(pair._1)
         })
-    With.ourUnits
-      .filter(unit => _townHallTypes.contains(unit.getType))
-      .foreach(_defendBaseWorkers)
+    
+    With.map.ourMiningAreas.foreach(_defendBaseWorkers)
   
     _enemyDefense.foreach(pair => {
       pair._2.onFrame()
@@ -45,30 +45,16 @@ class DefeatWorkerHarass extends Plan {
     })
   }
   
-  def _defendBaseWorkers(base:bwapi.Unit) {
-    val nearbyUnits = base.getUnitsInRadius(32 * 8).asScala
-    val nearbyEnemies = nearbyUnits
-      .filter(unit => unit.getPlayer.isEnemy(With.game.self))
-      .filter(unit => unit.canAttack)
-      .filter(unit => ! unit.isFlying)
-      .toSet
-    
-    if (nearbyEnemies.isEmpty) {
-      return
-    }
-    
-    val minerals = nearbyUnits.filter(_.getType == UnitType.Resource_Mineral_Field)
-    val geysers = nearbyUnits.filter(_.getType.isRefinery)
-    if (minerals.isEmpty) {
-      return
-    }
-    
-    //Draw a box around the area
-    val top           = (minerals ++ geysers :+ base).map(_.getTop   ).min - 32
-    val bottom        = (minerals ++ geysers :+ base).map(_.getBottom).max - 32
-    val left          = (minerals ++ geysers :+ base).map(_.getLeft  ).min - 32
-    val right         = (minerals ++ geysers :+ base).map(_.getRight ).max - 32
-    val enemiesInBox  = With.game.getUnitsInRectangle(left, top, right, bottom).asScala.toSet.intersect(nearbyEnemies)
+  def _defendBaseWorkers(miningArea:TileRectangle) {
+    val enemiesInBox = With.game.getUnitsInRectangle(
+      miningArea.start.getX,
+      miningArea.start.getY,
+      miningArea.end.getX,
+      miningArea.end.getY)
+    .asScala
+    .filter(unit => unit.getPlayer.isEnemy(With.game.self))
+    .filter(unit => unit.canAttack)
+    .filter(unit => ! unit.isFlying)
     
     enemiesInBox.foreach(_defendFromEnemy)
   }

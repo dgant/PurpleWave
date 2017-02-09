@@ -1,7 +1,7 @@
 package Startup
 
 import Development.Logger
-import Processes._
+import Processes.{Map, _}
 import Plans.GamePlans.PlanWinTheGame
 
 import scala.collection.JavaConverters._

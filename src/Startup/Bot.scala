@@ -1,8 +1,8 @@
 package Startup
 
-import Development.{AutoCamera, Logger, Overlay}
+import Development.{AutoCamera, Configuration, Logger, Overlay}
 import Plans.GamePlans.PlanWinTheGame
-import Processes._
+import Processes.{Map, _}
 import bwapi.DefaultBWListener
 import bwta.BWTA
 
@@ -11,9 +11,11 @@ class Bot() extends DefaultBWListener {
   override def onStart() {
     _try(() => {
       With.logger = new Logger
-  
+      
+      With.logger.debug("Loading BWTA.")
       BWTA.readMap()
       BWTA.analyze()
+      With.logger.debug("BWTA analysis complete.")
       
       With.architect = new Architect
       With.bank = new Banker
@@ -23,8 +25,9 @@ class Bot() extends DefaultBWListener {
       With.recruiter = new Recruiter
       With.scout = new Scout
 
-      Overlay.enabled = true
-      AutoCamera.enabled = false
+      Overlay.enabled = Configuration.enableOverlay
+      AutoCamera.enabled = Configuration.enableCamera
+      With.game.enableFlag(1)
       With.game.setLocalSpeed(0)
     })
   }
@@ -62,6 +65,7 @@ class Bot() extends DefaultBWListener {
   
   override def onEnd(isWinner: Boolean) {
     _try(() => {
+      With.logger.debug(if (isWinner) "We won!" else "We lost!")
       With.logger.onEnd
     })
   }

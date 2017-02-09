@@ -20,7 +20,7 @@ class BuildProxyTwoGateways extends Plan {
   
   val _proxyPositions = new Cache[Iterable[TilePosition]] {
     duration = 24 * 15
-    override def recalculate: Iterable[TilePosition] = _getProxyPositions
+    setCalculator(() =>  _getProxyPositions)
   }
   
   val meBPTG = this

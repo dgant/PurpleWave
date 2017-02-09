@@ -7,14 +7,11 @@ object Listener extends BWEventListener{
   var bot:Option[Bot] = None
 
   def initialize(): Unit = {
-    System.out.println("Starting Scala bot.")
     mirror.getModule.setEventListener(this)
     mirror.startGame
-    System.out.println("Finished configuring BWMirror. Now ready and waiting for a game to begin.")
   }
 
   override def onStart(): Unit = {
-    System.out.println("BWMirror dispatched an onStart event.")
     With.game = mirror.getGame
     bot = Some(new Bot())
     var foo = 3

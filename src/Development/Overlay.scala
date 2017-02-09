@@ -3,7 +3,7 @@ package Development
 import Plans.Generic.Allocation.{LockCurrency, LockUnits}
 import Plans.Plan
 import Startup.With
-import bwapi.{Position, UnitCommandType}
+import bwapi.{Color, Position, UnitCommandType}
 import bwta.BWTA
 
 import scala.collection.JavaConverters._
@@ -88,8 +88,21 @@ object Overlay {
   }
   
   def _drawTerrain() {
-    BWTA.getRegions.asScala
-      .foreach(region => {
+    var i = 0
+    With.map.ourMiningAreas.foreach(area => With.game.drawBoxMap(
+      area.start.toPosition,
+      area.end.toPosition,
+      Color.Red))
+    BWTA.getBaseLocations.asScala.foreach(base => {
+      val label = (if (base.isStartLocation) "Start location" else "Expansion") +
+        " #" + i
+        "\n" +
+        (if (With.game.isExplored(base.getTilePosition)) "Explored" else "Unexplored")
+      With.game.drawCircleMap(base.getPosition, 128, Color.Blue)
+      With.game.drawTextMap(base.getPosition, label)
+      i += 1
+    })
+    BWTA.getRegions.asScala .foreach(region => {
   
         _drawPolygonPositions(region.getPolygon.getPoints.asScala)
         

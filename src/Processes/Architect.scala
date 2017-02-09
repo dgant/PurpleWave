@@ -13,13 +13,14 @@ class Architect {
     buildingType: UnitType,
     center:       TilePosition,
     margin:       Integer = 0,
-    searchRadius: Integer = 20)
+    searchRadius: Integer = 20,
+    exclusions:   Iterable[TileRectangle] = List.empty)
       :Option[TilePosition] = {
   
     SpiralSearch
       .forPointsInSpiral(center, searchRadius)
       .view
-      .find(position => _canBuild(buildingType, position, margin))
+      .find(position => _canBuild(buildingType, position, margin, exclusions))
   }
   
   // Try to place a collection of buildingshy

@@ -1,7 +1,7 @@
 package Plans.GamePlans.Protoss.Proxy
 
 import Plans.Generic.Army.DestroyEconomy
-import Plans.Generic.Compound.{AllParallel, AllSerial, CompleteOnce}
+import Plans.Generic.Compound.{AllParallel, AllSerial}
 import Plans.Generic.Macro.{BuildBuilding, TrainUnit}
 import bwapi.UnitType
 
@@ -12,7 +12,7 @@ class ProtossRushWithProxyZealots
     new TrainUnit(UnitType.Protoss_Probe),
     new TrainUnit(UnitType.Protoss_Probe),
     new AllParallel { children.set(List(
-      new CompleteOnce { child.set( new BuildProxyTwoGateways )},
+      new BuildProxyTwoGateways,
       new TrainUnit(UnitType.Protoss_Probe),
       new TrainUnit(UnitType.Protoss_Probe)
     ))},

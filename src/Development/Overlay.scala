@@ -98,7 +98,7 @@ object Overlay {
         " #" + i
         "\n" +
         (if (With.game.isExplored(base.getTilePosition)) "Explored" else "Unexplored")
-      With.game.drawCircleMap(base.getPosition, 128, Color.Blue)
+      With.game.drawCircleMap(base.getPosition, 80, Color.Blue)
       With.game.drawTextMap(base.getPosition, label)
       i += 1
     })

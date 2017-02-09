@@ -23,16 +23,9 @@ class Bot() extends DefaultBWListener {
       With.recruiter = new Recruiter
       With.scout = new Scout
 
-      val debugMode = true
-      Overlay.enabled = debugMode
-      AutoCamera.enabled = ! debugMode
+      Overlay.enabled = true
+      AutoCamera.enabled = false
       With.game.setLocalSpeed(0)
-
-      if (debugMode) {
-        //Enable user input
-        With.game.enableFlag(1)
-      } else {
-      }
     })
   }
 

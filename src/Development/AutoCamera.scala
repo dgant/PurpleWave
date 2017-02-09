@@ -24,14 +24,21 @@ object AutoCamera {
   }
 
   def focusUnit(newUnit:bwapi.Unit) {
-    if (newUnit.getPlayer == With.game.self) {
-      unit = Some(newUnit)
+    if ( ! enabled) {
+      return
     }
-  
-    unit.foreach(u => pointOfInterest = u.getPosition)
+    
+    if (newUnit.exists && newUnit.getPlayer == With.game.self) {
+      unit = Some(newUnit)
+      pointOfInterest = unit.get.getPosition
+    }
   }
 
   def pickNewUnit() {
+    if ( ! enabled) {
+      return
+    }
+    
     val units = With.ourUnits
       .filter(unit => unit.isVisible)
       .sortBy(unit => pointOfInterest.getApproxDistance(unit.getPosition))

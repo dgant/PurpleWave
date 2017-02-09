@@ -1,5 +1,6 @@
 .cache-main
 
+*.log.txt
 *.log
 *.class
 *.zip

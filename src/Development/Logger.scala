@@ -5,8 +5,8 @@ import java.util.Calendar
 
 import Startup.With
 
-import scala.collection.mutable.ListBuffer
 import scala.collection.JavaConverters._
+import scala.collection.mutable.ListBuffer
 
 class Logger {
   val _logMessages = new ListBuffer[String]
@@ -20,7 +20,7 @@ class Logger {
       .mkString("-")
     
     val filenameRaw = (opponents + "-" + Calendar.getInstance.getTime.toString)
-    val filename = filenameRaw.replaceAll("[^A-Za-z0-9 \\-\\.]", "") + ".txt";
+    val filename = "bwapi-data/write/" + filenameRaw.replaceAll("[^A-Za-z0-9 \\-\\.]", "") + ".log.txt";
     val file = new File(filename)
     System.out.println("Writing log to")
     System.out.println(file.getAbsolutePath)

@@ -46,7 +46,7 @@ class DestroyEconomyFulfiller extends Plan {
     _lastOrderFrame(unit) < With.game.getFrameCount - 24
   }
   
-  def _issueOrder(unit:bwapi.Unit, targetPosition:Position) {
+  def _issueOrder(fighter:bwapi.Unit, targetPosition:Position) {
     //Kill any nearby workers
     //Kill any very nearby combat units
     //Otherwise, check out the mineral line and make sure it's empty
@@ -55,29 +55,32 @@ class DestroyEconomyFulfiller extends Plan {
     //Attack nearby targets
     //Otherwise, attack-move the mineral line
     
-    val combatTarget = unit.getUnitsInRadius(32)//getUnitsInWeaponRange(unit.getType.groundWeapon)
-      .asScala
+    val baseRadius = 32 * 25
+    val combatRadius = 32 * 4
+    
+    val weAreNearTheirBase = fighter.getPosition.getDistance(targetPosition) < baseRadius
+    val workersNearTheirBase = With.game.getUnitsInRadius(targetPosition, baseRadius).asScala
+        .filter(_.getPlayer.isEnemy(With.game.self))
+        .filter(_.getType.isWorker)
+    
+    val enemyFightersNearby = fighter.getUnitsInRadius(combatRadius).asScala
       .filter(_.getPlayer.isEnemy(With.game.self))
       .filter(_.getType.canAttack)
-      .sortBy(unit => unit.getHitPoints + unit.getShields)
-      .headOption
-    
-    if (combatTarget.isDefined) {
-      unit.attack(combatTarget.get)
-    } else {
-      
-      val workerTarget = unit.getUnitsInRadius(256)
-        .asScala
-        .filter(_.getPlayer.isEnemy(With.game.self))
-        .sortBy( ! _.getType.isWorker)
-        .headOption
-      
-      if (workerTarget.isDefined) {
-        unit.attack(workerTarget.get.getPosition)
+      .filterNot(_.isFlying)
+  
+    if (enemyFightersNearby.nonEmpty) {
+      fighter.attack(enemyFightersNearby.sortBy(_.getDistance(fighter)).head)
+    }
+    else if (weAreNearTheirBase) {
+      if (workersNearTheirBase.nonEmpty) {
+        fighter.attack(workersNearTheirBase.sortBy(_.getDistance(fighter)).head)
       }
-      else if (unit.getPosition.getDistance(targetPosition) > 512) {
-        unit.attack(targetPosition)
+      else if (With.scout.enemyUnits.nonEmpty) {
+        fighter.patrol(With.scout.enemyUnits.minBy(enemy => fighter.getDistance(enemy.getPosition)).getPosition)
       }
+    }
+    else {
+      fighter.move(targetPosition)
     }
   }
 }

@@ -44,8 +44,8 @@ object Overlay {
       .filterNot(_.getLastCommand.getUnitCommandType == UnitCommandType.None)
       .foreach(unit => _drawTextLabel(List(
         //This gives us the uninteresting name of the Lock plan
-        //With.recruiter.getAssignment(unit).map(_getPlanNameOrDescription(_)).getOrElse(""),
-        //unit.toString.replace("Unit@", ""),
+        //With.recruiter.getAssignment(fighter).map(_getPlanNameOrDescription(_)).getOrElse(""),
+        //fighter.toString.replace("Unit@", ""),
         unit.getLastCommand.getUnitCommandType.toString), unit))
   }
   

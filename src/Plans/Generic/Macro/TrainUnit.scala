@@ -63,7 +63,7 @@ class TrainUnit(val traineeType:UnitType) extends Plan {
     
     if (isTraining) {
       if (ordered) {
-        //Note that it's possible for a building to briefly have a unit type in the queue with no unit created.
+        //Note that it's possible for a building to briefly have a fighter type in the queue with no fighter created.
         _trainee = With.ourUnits
           .filter(u =>
             u.getType == traineeType &&
@@ -72,13 +72,13 @@ class TrainUnit(val traineeType:UnitType) extends Plan {
           .headOption
         
         //There seems to be a 1+ frame delay between the queue getting started
-        //and the incomplete unit being created.
-        //So don't freak out if the unit doesn't show up right away
+        //and the incomplete fighter being created.
+        //So don't freak out if the fighter doesn't show up right away
       }
     }
     else {
       if (ordered) {
-        With.logger.warn("We ordered to train a unit, but it's not training.")
+        With.logger.warn("We ordered to train a fighter, but it's not training.")
       }
       _orderUnit(trainer)
     }

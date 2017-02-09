@@ -26,6 +26,11 @@ class Recruiter {
     With.ourUnits.toSet.diff(_unassignedUnits ++ _requestByUnit.keys).foreach(_unassignedUnits.add)
   }
   
+  def onUnitDestroyed(unit:bwapi.Unit) {
+    _unassign(unit)
+    _unassignedUnits.remove(unit)
+  }
+  
   def getAssignment(unit:bwapi.Unit):Option[LockUnits] = {
     _requestByUnit.get(unit)
   }

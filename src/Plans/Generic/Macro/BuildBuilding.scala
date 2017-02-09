@@ -1,6 +1,6 @@
 package Plans.Generic.Macro
 
-import Development.{Logger, TypeDescriber}
+import Development.TypeDescriber
 import Plans.Generic.Allocation.{LockCurrency, LockCurrencyForUnit, LockUnits, LockUnitsExactly}
 import Plans.Plan
 import Startup.With
@@ -77,7 +77,7 @@ class BuildBuilding(val buildingType:UnitType) extends Plan {
       }
   
       if (_position.isEmpty) {
-        Logger.warn("Failed to place a " ++ buildingType.toString ++ " near " ++ _position.toString)
+        With.logger.warn("Failed to place a " ++ buildingType.toString ++ " near " ++ _position.toString)
       }
       else {
         val positionExplored = With.game.isExplored(_position.get)

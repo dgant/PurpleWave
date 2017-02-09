@@ -27,8 +27,8 @@ object AutoCamera {
     if (newUnit.getPlayer == With.game.self) {
       unit = Some(newUnit)
     }
-
-    pointOfInterest = unit.get.getPosition
+  
+    unit.foreach(u => pointOfInterest = u.getPosition)
   }
 
   def pickNewUnit() {

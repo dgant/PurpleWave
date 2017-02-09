@@ -8,7 +8,7 @@ import Types.Property
 
 import scala.collection.JavaConverters._
 
-class PlanGatherMinerals extends Plan {
+class GatherMinerals extends Plan {
   
   val workerPlan = new Property[LockUnits](new LockUnitsGreedily { unitMatcher.set(UnitMatchWorker) })
   var _mineral:Option[bwapi.Unit] = None
@@ -19,7 +19,7 @@ class PlanGatherMinerals extends Plan {
     if (_mineral.isEmpty) {
       _mineral = With.game.getMinerals.asScala
         .filter(_.isVisible)
-        .sortBy(mineral => With.architect.getHq.getPoint.toPosition.getDistance(mineral.getPosition))
+        .sortBy(mineral => With.map.ourBaseHalls.map(_.getPosition.getDistance(mineral.getPosition)).headOption.getOrElse(0.0))
         .headOption
     }
   

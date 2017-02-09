@@ -1,7 +1,6 @@
 package Plans.GamePlans.Protoss.Proxy
 
 import Caching.Cache
-import Development.Logger
 import Plans.Generic.Allocation.{LockUnits, LockUnitsExactly}
 import Plans.Generic.Compound.{AllSerial, CompleteOnce}
 import Plans.Generic.Macro.BuildBuilding
@@ -104,10 +103,10 @@ class BuildProxyTwoGateways extends Plan {
     val buildings = List(UnitType.Protoss_Pylon, UnitType.Protoss_Gateway, UnitType.Protoss_Gateway)
     val center = new PositionCenter().find.get
     
-    Logger.debug("Going to try to place multiple buildings. Good luck.")
-    Logger.debug("Map: " + With.game.mapName + "(" + With.game.mapFileName() + ")")
-    Logger.debug("Building types: " + buildings.map(_.toString).mkString(", "))
-    Logger.debug("Centerpoint: " + center.toString)
+    With.logger.debug("Going to try to place multiple buildings. Good luck.")
+    With.logger.debug("Map: " + With.game.mapName + "(" + With.game.mapFileName() + ")")
+    With.logger.debug("Building types: " + buildings.map(_.toString).mkString(", "))
+    With.logger.debug("Centerpoint: " + center.toString)
     
     With.architect.placeBuildings(
       buildings,

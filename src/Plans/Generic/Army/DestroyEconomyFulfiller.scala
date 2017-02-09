@@ -1,6 +1,5 @@
 package Plans.Generic.Army
 
-import Development.Logger
 import Plans.Generic.Allocation.{LockUnits, LockUnitsNobody}
 import Plans.Plan
 import Startup.With
@@ -19,7 +18,7 @@ class DestroyEconomyFulfiller extends Plan {
   override def onFrame() {
     
     if (With.scout.nextEnemyBase.isEmpty) {
-      Logger.warn("Trying to destroy economy without knowing where to go")
+      With.logger.warn("Trying to destroy economy without knowing where to go")
       return
     }
   
@@ -56,7 +55,7 @@ class DestroyEconomyFulfiller extends Plan {
     //Attack nearby targets
     //Otherwise, attack-move the mineral line
     
-    val combatTarget = unit.getUnitsInWeaponRange(unit.getType.groundWeapon)
+    val combatTarget = unit.getUnitsInRadius(32)//getUnitsInWeaponRange(unit.getType.groundWeapon)
       .asScala
       .filter(_.getPlayer.isEnemy(With.game.self))
       .filter(_.getType.canAttack)

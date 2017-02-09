@@ -2,7 +2,7 @@ package Processes
 
 import Startup.With
 import Types.EnemyUnitInfo
-import bwapi.UnitType
+import bwapi.{TilePosition, UnitType}
 import bwta.{BWTA, BaseLocation}
 
 import scala.collection.JavaConverters._
@@ -61,6 +61,10 @@ class Scout {
     UnitType.Zerg_Hive
   )
   
+  def unexploredStartLocations():Iterable[TilePosition] = {
+    With.game.getStartLocations.asScala.filterNot(With.game.isExplored)
+  }
+  
   def nextEnemyBase:Option[EnemyUnitInfo] = {
     enemyUnits
       .toList
@@ -71,7 +75,7 @@ class Scout {
   
   def unscoutedBases():Iterable[BaseLocation] = {
     BWTA.getBaseLocations.asScala
-      .sortBy(base => With.game.isExplored(base.getTilePosition))
       .sortBy(base => ! base.isStartLocation)
+      .sortBy(base => With.game.isExplored(base.getTilePosition))
   }
 }

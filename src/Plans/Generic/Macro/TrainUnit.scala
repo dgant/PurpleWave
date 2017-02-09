@@ -1,6 +1,6 @@
 package Plans.Generic.Macro
 
-import Development.{Logger, TypeDescriber}
+import Development.TypeDescriber
 import Plans.Generic.Allocation.{LockCurrency, LockCurrencyForUnit, LockUnits, LockUnitsExactly}
 import Plans.Plan
 import Startup.With
@@ -78,7 +78,7 @@ class TrainUnit(val traineeType:UnitType) extends Plan {
     }
     else {
       if (ordered) {
-        Logger.warn("We ordered to train a unit, but it's not training.")
+        With.logger.warn("We ordered to train a unit, but it's not training.")
       }
       _orderUnit(trainer)
     }

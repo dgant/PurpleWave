@@ -1,7 +1,6 @@
 package Strategies.PositionFinders
 
 import Caching.Cache
-import Development.Logger
 import Startup.With
 import bwapi.{TilePosition, UnitType}
 
@@ -13,7 +12,7 @@ class PositionSimpleBuilding(
   override def find(): Option[TilePosition] = _cache.get
   
   def _recalculate: Option[TilePosition] = {
-    val position = With.architect.getHq
+    val position = With.map.ourBaseHalls.head.getTilePosition
     val output = With.architect.placeBuilding(
       buildingType,
       position,
@@ -21,7 +20,7 @@ class PositionSimpleBuilding(
       searchRadius = 50)
     
     if (output == None) {
-      Logger.warn("Failed to place a " ++ buildingType.toString ++ " near " ++ position.toString)
+      With.logger.warn("Failed to place a " ++ buildingType.toString ++ " near " ++ position.toString)
     }
     
     output

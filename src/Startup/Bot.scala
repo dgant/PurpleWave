@@ -1,90 +1,85 @@
 package Startup
 
 import Development.{AutoCamera, Logger, Overlay}
-import Processes._
 import Plans.GamePlans.PlanWinTheGame
+import Processes._
 import bwapi.DefaultBWListener
 import bwta.BWTA
 
 class Bot() extends DefaultBWListener {
 
   override def onStart() {
-    try {
-      Logger.debug("Purple Wave, reporting in.")
-
+    _try(() => {
+      With.logger = new Logger
+  
+      BWTA.readMap()
+      BWTA.analyze()
+      
       With.architect = new Architect
       With.bank = new Banker
+      With.map = new Map
       With.gameplan = new PlanWinTheGame
       With.prioritizer = new Prioritizer
       With.recruiter = new Recruiter
       With.scout = new Scout
 
-      Logger.debug("Reading map")
-      BWTA.readMap()
-      Logger.debug("Analyzing map")
-      BWTA.analyze()
-      Logger.debug("Bot initialization complete.")
-
-      val manualControl = true
-      Overlay.enabled = manualControl
-      AutoCamera.enabled = !manualControl
+      val debugMode = true
+      Overlay.enabled = debugMode
+      AutoCamera.enabled = ! debugMode
       With.game.setLocalSpeed(0)
 
-      if (manualControl) {
-        With.game.enableFlag(1) //Enable user input
+      if (debugMode) {
+        //Enable user input
+        With.game.enableFlag(1)
       } else {
       }
-    }
-    catch {
-      case exception:Exception =>
-        _onException(exception)
-    }
-  }
-  
-  def _onFrame() {
-    With.bank.onFrame()
-    With.recruiter.onFrame()
-    With.prioritizer.onFrame()
-    With.scout.onFrame()
-    With.gameplan.onFrame() //This needs to be last!
-    Overlay.onFrame()
-    AutoCamera.onFrame()
-  }
-  
-  def _onException(exception: Exception) {
-    exception.printStackTrace()
-    Logger.debug(exception.getClass.getSimpleName)
-  
-    if (exception.getStackTrace.nonEmpty) {
-      Logger.debug(
-        exception.getStackTrace.head.getClassName
-          + "."
-          + exception.getStackTrace.head.getMethodName
-          + "(): "
-          + exception.getStackTrace.head.getLineNumber)
-    }
+    })
   }
 
   override def onFrame() {
-    try {
-      _onFrame()
-    }
-    catch {
-      case exception:Exception =>
-        _onException(exception)
-    }
+    _try(() => {
+      With.scout.onFrame()
+      With.bank.onFrame()
+      With.recruiter.onFrame()
+      With.prioritizer.onFrame()
+      With.gameplan.onFrame() //This needs to be last!
+      Overlay.onFrame()
+      AutoCamera.onFrame()
+    })
   }
 
   override def onUnitComplete(unit: bwapi.Unit) {
-    AutoCamera.focusUnit(unit)
+    _try(() => {
+      AutoCamera.focusUnit(unit)
+    })
   }
 
   override def onUnitDestroy(unit: bwapi.Unit) {
-    With.scout.onUnitDestroy(unit)
-    AutoCamera.focusUnit(unit)
+    _try(() => {
+      With.scout.onUnitDestroy(unit)
+      AutoCamera.focusUnit(unit)
+    })
   }
 
   override def onUnitDiscover(unit: bwapi.Unit) {
-    AutoCamera.focusUnit(unit)
+    _try(() => {
+      AutoCamera.focusUnit(unit)
+    })
+  }
+  
+  override def onEnd(isWinner: Boolean) {
+    _try(() => {
+      With.logger.onEnd
+    })
+  }
+  
+  def _try(action:() => Unit) = {
+    try { action() }
+    catch { case exception:Exception =>
+      if (With.logger != null) {
+        With.logger.onException(exception)
+      } else {
+        System.out.println(exception)
+      }}
   }
 }

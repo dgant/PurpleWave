@@ -7,13 +7,16 @@ import Strategies.UnitMatchers.UnitMatchWarriors
 
 class DestroyEconomy extends AllSerial {
   
+  val meDE = this
   var _fighters = new LockUnitsGreedily {
     unitMatcher.set(new UnitMatchWarriors)
   }
   
   children.set(List(
     new AllSerial { children.set(List(
-      new RequireEnemyBaseLocation,
+      new RequireEnemyBaseLocation {
+        this.scoutPlan.set(meDE._fighters)
+      },
       _fighters
     )) },
     new DestroyEconomyFulfiller {

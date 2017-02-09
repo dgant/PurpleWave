@@ -8,9 +8,6 @@ import Strategies.UnitMatchers.{UnitMatchMobile, UnitMatcher}
 import Strategies.UnitPreferences.{UnitPreferClose, UnitPreference}
 import Types.Property
 import bwapi.Position
-import bwta.BWTA
-
-import scala.collection.JavaConverters._
 
 class KnowEnemyBaseLocationFulfiller extends Plan {
   
@@ -35,6 +32,7 @@ class KnowEnemyBaseLocationFulfiller extends Plan {
   
   def _orderScout(scout:bwapi.Unit) {
     val nextBase = With.scout.unscoutedBases.head
+    /*
     if (scout.canGather) {
       val nearestMineral = BWTA.getNearestBaseLocation(_getNextScoutingPosition)
         .getStaticMinerals
@@ -47,6 +45,7 @@ class KnowEnemyBaseLocationFulfiller extends Plan {
           return
       }
     }
+    */
   
     scout.move(nextBase.getPosition)
   }

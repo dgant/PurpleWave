@@ -1,5 +1,6 @@
 package Types
 
+import Startup.With
 import bwapi.{Player, Position, TilePosition, UnitType}
 
 class EnemyUnitInfo(
@@ -13,4 +14,8 @@ class EnemyUnitInfo(
    var getShields:Integer,
    var getType:UnitType,
    var isCompleted:Boolean) {
+  
+  def unit:Option[bwapi.Unit] = {
+    With.unit(getID)
+  }
 }

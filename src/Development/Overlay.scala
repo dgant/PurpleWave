@@ -182,12 +182,15 @@ object Overlay {
   }
   
   def _drawTrackedUnit(trackedUnit:EnemyUnitInfo) {
-    if (trackedUnit.possiblyStillThere) {
+    if (trackedUnit.possiblyStillThere && trackedUnit.unit.isEmpty) {
       With.game.drawCircleMap(
         trackedUnit.getPosition,
         trackedUnit.getType.width / 2,
         Color.Grey)
-      _drawTextLabel(List(trackedUnit.getType.toString), trackedUnit.getPosition, drawBackground = true)
+      _drawTextLabel(
+        List(TypeDescriber.describeUnitType(trackedUnit.getType)),
+        trackedUnit.getPosition,
+        drawBackground = true)
     }
   }
 }

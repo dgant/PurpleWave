@@ -16,15 +16,15 @@ class Tracker {
   
   def onFrame() {
     val trackedVisibleUnits = knownEnemyUnits
-      .filter(trackedUnit => With.unit(trackedUnit.getID).exists(_.isVisible))
+      .filter(trackedUnit => trackedUnit.unit.exists(_.isVisible))
     
     val trackedInvalidUnits = knownEnemyUnits
-      .filter(trackedUnit => With.unit(trackedUnit.getID).exists( ! _isValidEnemyUnit(_)))
+      .filter(trackedUnit => trackedUnit.unit.exists( ! _isValidEnemyUnit(_)))
     
     val trackedRelocatedUnits = knownEnemyUnits
       .filter(_.possiblyStillThere)
       .filter(trackedUnit => With.game.isVisible(trackedUnit.getTilePosition))
-      .filterNot(trackedUnit => With.unit(trackedUnit.getID).isDefined)
+      .filterNot(trackedUnit => trackedUnit.unit.isDefined)
     
     val untrackedVisibleUnits = With.enemyUnits
       .filter(unit => ! _knownEnemyUnits.contains(unit.getID))
@@ -41,16 +41,17 @@ class Tracker {
   }
   
   def _updateVisibleTrackedUnit(trackedUnit:EnemyUnitInfo) {
-    val unit = With.unit(trackedUnit.getID).get
-    trackedUnit.lastSeen            = With.game.getFrameCount
-    trackedUnit.possiblyStillThere  = true
-    trackedUnit.getPlayer           = unit.getPlayer
-    trackedUnit.getPosition         = unit.getPosition
-    trackedUnit.getTilePosition     = unit.getTilePosition
-    trackedUnit.getHitPoints        = unit.getHitPoints
-    trackedUnit.getShields          = unit.getShields
-    trackedUnit.getType             = unit.getType
-    trackedUnit.isCompleted         = unit.isCompleted
+    trackedUnit.unit.foreach(unit => {
+      trackedUnit.lastSeen            = With.game.getFrameCount
+      trackedUnit.possiblyStillThere  = true
+      trackedUnit.getPlayer           = unit.getPlayer
+      trackedUnit.getPosition         = unit.getPosition
+      trackedUnit.getTilePosition     = unit.getTilePosition
+      trackedUnit.getHitPoints        = unit.getHitPoints
+      trackedUnit.getShields          = unit.getShields
+      trackedUnit.getType             = unit.getType
+      trackedUnit.isCompleted         = unit.isCompleted
+    })
   }
   
   def _updateMissingTrackedUnit(unit:EnemyUnitInfo) {

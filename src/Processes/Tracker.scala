@@ -19,7 +19,7 @@ class Tracker {
       .filter(trackedUnit => With.unit(trackedUnit.getID).exists(_.isVisible))
     
     val trackedInvalidUnits = knownEnemyUnits
-      .filterNot(trackedUnit => With.unit(trackedUnit.getID).exists(_isValidEnemyUnit))
+      .filter(trackedUnit => With.unit(trackedUnit.getID).exists( ! _isValidEnemyUnit(_)))
     
     val trackedRelocatedUnits = knownEnemyUnits
       .filter(_.possiblyStillThere)
@@ -37,7 +37,7 @@ class Tracker {
   }
   
   def onUnitDestroy(unit:bwapi.Unit) {
-    _removeKnownUnit(unit.getID)
+    _knownEnemyUnits.get(unit.getID).foreach(_removeTrackedUnit)
   }
   
   def _updateVisibleTrackedUnit(trackedUnit:EnemyUnitInfo) {

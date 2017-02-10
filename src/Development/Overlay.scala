@@ -4,6 +4,7 @@ import Plans.Generic.Allocation.{LockCurrency, LockUnits}
 import Plans.Plan
 import Processes.Economist
 import Startup.With
+import Types.EnemyUnitInfo
 import bwapi.{Color, Position, UnitCommandType}
 import bwta.BWTA
 
@@ -14,26 +15,42 @@ object Overlay {
   var enabled:Boolean = true
   
   def onFrame() {
-    if (!enabled) {
-      return
-    }
+    if (!enabled) { return }
     With.game.setTextSize(bwapi.Text.Size.Enum.Small)
     _drawTerrain()
     _drawUnits()
     With.game.drawTextScreen(5, 5, _describePlanTree(With.gameplan, 0, 0))
     _drawPlans(With.gameplan)
     _drawResources()
+    _drawTrackedUnits()
   }
   
-  def _drawTextLabel(textLines:Iterable[String], unit:bwapi.Unit) {
+  def _drawTextLabel(
+    textLines:Iterable[String],
+    position:Position,
+    drawBackground:Boolean = false) {
     val horizontalMargin = 2
-    val width = (9 * textLines.map(_.size).max) / 2 + 2 * horizontalMargin
-    val height = 11 * textLines.size
-    val x = unit.getPosition.getX - width/2 - horizontalMargin
-    val y = unit.getPosition.getY - height/2
+    val estimatedTextWidth = (9 * textLines.map(_.size).max) / 2
+    val boxWidth = estimatedTextWidth + 2 * horizontalMargin
+    val boxHeight = 11 * textLines.size
+    val textX = position.getX - boxWidth/2
+    val textY = position.getY - boxHeight/2
+    val boxX = textX - horizontalMargin
+    val boxY = textY
   
-    With.game.drawBox(bwapi.CoordinateType.Enum.Map, x, y, x+width, y+height, bwapi.Color.Grey, true)
-    With.game.drawTextMap(unit.getX-width/2, unit.getY-height/2, textLines.mkString("\n"))
+    if (drawBackground) {
+      With.game.drawBoxMap(
+        boxX,
+        boxY,
+        boxX + boxWidth,
+        boxY + boxHeight,
+        bwapi.Color.Grey,
+        true) //isSolid
+    }
+    With.game.drawTextMap(
+      textX,
+      textY,
+      textLines.mkString("\n"))
   }
   
   def _drawUnits() {
@@ -43,11 +60,10 @@ object Overlay {
       With.game.drawCircleMap(unit.getPosition, 32, bwapi.Color.Orange))
     With.ourUnits
       .filterNot(_.getLastCommand.getUnitCommandType == UnitCommandType.None)
-      .foreach(unit => _drawTextLabel(List(
-        //This gives us the uninteresting name of the Lock plan
-        //With.recruiter.getAssignment(fighter).map(_getPlanNameOrDescription(_)).getOrElse(""),
-        //fighter.toString.replace("Unit@", ""),
-        unit.getLastCommand.getUnitCommandType.toString), unit))
+      .foreach(unit => _drawTextLabel(
+        List(unit.getLastCommand.getUnitCommandType.toString),
+        unit.getPosition,
+        drawBackground = true))
   }
   
   def _describePlanTree(plan:Plan, childOrder:Integer, depth:Integer):String = {
@@ -100,7 +116,10 @@ object Overlay {
         "\n" +
         (if (With.game.isExplored(base.getTilePosition)) "Explored" else "Unexplored")
       With.game.drawCircleMap(base.getPosition, 80, Color.Blue)
-      With.game.drawTextMap(base.getPosition, label)
+      _drawTextLabel(
+        List(label),
+        base.getPosition,
+        drawBackground = false)
       i += 1
     })
     BWTA.getRegions.asScala .foreach(region => {
@@ -148,7 +167,7 @@ object Overlay {
       "      Active miners:   " + Economist.ourActiveMiners.size + "\n" +
       "      Active drillers:   " + Economist.ourActiveDrillers.size + "\n" +
       "Minerals per minute:   " + Economist.ourMineralIncomePerMinute + "\n" +
-      "     Gas per minute:  " + Economist.ourMineralIncomePerMinute + "\n" +
+      "     Gas per minute:  " + Economist.ourGasIncomePerMinute + "\n" +
       With.bank.getPrioritizedRequests
         .map(r =>
           (if (r.isSatisfied) "X " else "  ") ++
@@ -156,5 +175,19 @@ object Overlay {
           (if (r.gas > 0)       r.gas       .toString ++ "g " else "") ++
           (if (r.supply > 0)    r.supply    .toString ++ "s " else ""))
         .mkString("\n"))
+  }
+  
+  def _drawTrackedUnits() {
+    With.tracker.knownEnemyUnits.foreach(_drawTrackedUnit)
+  }
+  
+  def _drawTrackedUnit(trackedUnit:EnemyUnitInfo) {
+    if (trackedUnit.possiblyStillThere) {
+      With.game.drawCircleMap(
+        trackedUnit.getPosition,
+        trackedUnit.getType.width / 2,
+        Color.Grey)
+      _drawTextLabel(List(trackedUnit.getType.toString), trackedUnit.getPosition, drawBackground = true)
+    }
   }
 }

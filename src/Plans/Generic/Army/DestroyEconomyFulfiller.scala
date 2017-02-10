@@ -67,8 +67,8 @@ class DestroyEconomyFulfiller extends Plan {
       if (workersNearTheirBase.nonEmpty) {
         fighter.attack(workersNearTheirBase.sortBy(_.getDistance(fighter)).head)
       }
-      else if (With.scout.knownEnemyUnits.nonEmpty) {
-        fighter.patrol(With.scout.knownEnemyUnits.minBy(enemy => fighter.getDistance(enemy.getPosition)).getPosition)
+      else if (With.tracker.knownEnemyUnits.exists(! _.getType.isFlyer)) {
+        fighter.patrol(With.tracker.knownEnemyUnits.minBy(enemy => fighter.getDistance(enemy.getPosition)).getPosition)
       }
     }
     else {

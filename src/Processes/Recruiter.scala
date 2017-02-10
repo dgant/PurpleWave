@@ -23,7 +23,7 @@ class Recruiter {
     
     // Add new units
     //
-    With.ourUnits.toSet.diff(_unassignedUnits ++ _requestByUnit.keys).foreach(_unassignedUnits.add)
+    With.ourUnits.diff(_unassignedUnits ++ _requestByUnit.keys).foreach(_unassignedUnits.add)
   }
   
   def onUnitDestroyed(unit:bwapi.Unit) {

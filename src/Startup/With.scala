@@ -1,11 +1,11 @@
 package Startup
 
 import Development.Logger
-import Processes.{Map, _}
 import Plans.GamePlans.PlanWinTheGame
+import Processes._
 
 import scala.collection.JavaConverters._
-import scala.collection.mutable
+import scala.collection.immutable.{HashMap, HashSet}
 
 object With {
   var game:bwapi.Game = null
@@ -17,12 +17,22 @@ object With {
   var prioritizer:Prioritizer = null
   var recruiter:Recruiter = null
   var scout:Scout = null
+  var tracker:Tracker = null
   
-  def ourUnits:mutable.Buffer[bwapi.Unit] = {
-    game.self.getUnits.asScala
+  var _ourUnits:Set[bwapi.Unit] = new HashSet
+  var _enemyUnits:Set[bwapi.Unit] = new HashSet
+  var _unitsById:scala.collection.Map[Int, bwapi.Unit] = new HashMap
+  
+  def onFrame() {
+    _ourUnits = game.self.getUnits.asScala.toSet
+    _enemyUnits = game.enemies.asScala.flatten(_.getUnits.asScala).toSet
+    _unitsById = With.game.getAllUnits.asScala
+      .filter(_.exists)
+      .map(unit => unit.getID -> unit)
+      .toMap
   }
   
-  def enemyUnits:mutable.Buffer[bwapi.Unit] = {
-    game.enemies.asScala.flatten(_.getUnits.asScala)
-  }
+  def unit(id:Int):Option[bwapi.Unit] = { _unitsById.get(id) }
+  def ourUnits:Set[bwapi.Unit] = { _ourUnits }
+  def enemyUnits:Set[bwapi.Unit] = { _enemyUnits }
 }

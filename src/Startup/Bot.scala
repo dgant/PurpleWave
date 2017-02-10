@@ -24,6 +24,7 @@ class Bot() extends DefaultBWListener {
       With.prioritizer = new Prioritizer
       With.recruiter = new Recruiter
       With.scout = new Scout
+      With.tracker = new Tracker
 
       Overlay.enabled = Configuration.enableOverlay
       AutoCamera.enabled = Configuration.enableCamera
@@ -34,7 +35,8 @@ class Bot() extends DefaultBWListener {
 
   override def onFrame() {
     _try(() => {
-      With.scout.onFrame()
+      With.onFrame()
+      With.tracker.onFrame()
       With.bank.onFrame()
       With.recruiter.onFrame()
       With.prioritizer.onFrame()
@@ -52,7 +54,7 @@ class Bot() extends DefaultBWListener {
 
   override def onUnitDestroy(unit: bwapi.Unit) {
     _try(() => {
-      With.scout.onUnitDestroy(unit)
+      With.tracker.onUnitDestroy(unit)
       AutoCamera.focusUnit(unit)
     })
   }

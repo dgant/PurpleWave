@@ -39,12 +39,6 @@ object AutoCamera {
       return
     }
     
-    val units = With.ourUnits
-      .filter(unit => unit.isVisible)
-      .sortBy(unit => pointOfInterest.getApproxDistance(unit.getPosition))
-
-    if (units.length > 0) {
-      unit = Some(units(0))
-    }
+    unit = Some(With.ourUnits.minBy(u => pointOfInterest.getApproxDistance(u.getPosition)))
   }
 }

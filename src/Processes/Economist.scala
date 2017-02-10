@@ -8,7 +8,8 @@ import scala.collection.JavaConverters._
 
 class Economist {
   
-  var ourEstimatedTotalMinerals = 50.0
+  //Should be 50, but this offsets the effect of starting workers all being far from minerals
+  var ourEstimatedTotalMinerals = 20.0
   var ourEstimatedTotalGas = 0.0
   
   def onFrame() = {
@@ -59,7 +60,8 @@ class Economist {
   }
   
   def ourMineralIncomePerMinute:Integer = {
-    //Source: http://www.teamliquid.net/forum/brood-war/484849-improving-mineral-gathering-rate-in-brood-war
+    //These values are hand tuned
+    //Original source: http://www.teamliquid.net/forum/brood-war/484849-improving-mineral-gathering-rate-in-brood-war
     //See also: http://www.teamliquid.net/forum/brood-war/89939-ideal-mining-thoughts
     //http://wiki.teamliquid.net/starcraft/Mining gives 182, 174, and 154-frame cycles for mining (for each race
     //
@@ -82,8 +84,8 @@ class Economist {
         .map(_.size)
         .map(n => Math.min(n, 23)) //9 * 2.5
         .map(n =>
-          if(n <= 9 * 1.0) n * 59 else
-          if(n <= 9 * 1.3) n * 54 else
+          if(n <= 9 * 1.0) n * 58 else
+          if(n <= 9 * 1.3) n * 53 else
           if(n <= 9 * 1.6) n * 50 else
           if(n <= 9 * 1.9) n * 47 else
           if(n <= 9 * 2.2) n * 45 else

@@ -6,7 +6,23 @@ import bwapi.{Race, UnitCommandType}
 
 import scala.collection.JavaConverters._
 
-object Economist {
+class Economist {
+  
+  var ourEstimatedTotalMinerals = 50.0
+  var ourEstimatedTotalGas = 0.0
+  
+  def onFrame() = {
+    ourEstimatedTotalMinerals += ourMineralIncomePerMinute.toDouble / (24.0 * 60)
+    ourEstimatedTotalGas += ourGasIncomePerMinute.toDouble / (24.0 * 60)
+  }
+  
+  def ourActualTotalMinerals:Integer = {
+    With.game.self.gatheredMinerals
+  }
+  
+  def ourActualTotalGas:Integer = {
+    With.game.self.gatheredGas
+  }
   
   def ourActiveHarvesters:Iterable[bwapi.Unit] = {
     With.map.ourHarvestingAreas.flatten(ourActiveHarvesters)

@@ -2,7 +2,6 @@ package Development
 
 import Plans.Generic.Allocation.{LockCurrency, LockUnits}
 import Plans.Plan
-import Processes.Economist
 import Startup.With
 import Types.EnemyUnitInfo
 import bwapi.{Color, Position, UnitCommandType}
@@ -18,11 +17,12 @@ object Overlay {
     if (!enabled) { return }
     With.game.setTextSize(bwapi.Text.Size.Enum.Small)
     _drawTerrain()
+    _drawEconomy
     _drawUnits()
     With.game.drawTextScreen(5, 5, _describePlanTree(With.gameplan, 0, 0))
-    _drawPlans(With.gameplan)
-    _drawResources()
     _drawTrackedUnits()
+    _drawResources()
+    _drawPlans(With.gameplan)
   }
   
   def _drawTextLabel(
@@ -164,10 +164,7 @@ object Overlay {
     With.game.drawTextScreen(
       305,
       5,
-      "      Active miners:   " + Economist.ourActiveMiners.size + "\n" +
-      "      Active drillers:   " + Economist.ourActiveDrillers.size + "\n" +
-      "Minerals per minute:   " + Economist.ourMineralIncomePerMinute + "\n" +
-      "     Gas per minute:  " + Economist.ourGasIncomePerMinute + "\n" +
+      
       With.bank.getPrioritizedRequests
         .map(r =>
           (if (r.isSatisfied) "X " else "  ") ++
@@ -175,6 +172,31 @@ object Overlay {
           (if (r.gas > 0)       r.gas       .toString ++ "g " else "") ++
           (if (r.supply > 0)    r.supply    .toString ++ "s " else ""))
         .mkString("\n"))
+  }
+  
+  def _drawEconomy() {
+    val labels = List(
+      "Active miners:",
+      "Active drillers:",
+      "Minerals per minute:",
+      "Gas per minute:",
+      "Total minerals (est.):",
+      "Total gas (est.):",
+      "Total minerals (real):",
+      "Total gas (real):"
+    )
+    val values = List(
+      With.economist.ourActiveMiners.size,
+      With.economist.ourActiveDrillers.size,
+      With.economist.ourMineralIncomePerMinute,
+      With.economist.ourGasIncomePerMinute,
+      With.economist.ourEstimatedTotalMinerals.toInt,
+      With.economist.ourEstimatedTotalGas.toInt,
+      With.economist.ourActualTotalMinerals,
+      With.economist.ourActualTotalGas
+    )
+    With.game.drawTextScreen(450, 5, labels.mkString("\n"))
+    With.game.drawTextScreen(550, 5, values.mkString("\n"))
   }
   
   def _drawTrackedUnits() {

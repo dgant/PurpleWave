@@ -60,15 +60,12 @@ class Logger {
   }
   
   def _formatException(exception: Exception):String = {
-    "EXCEPTION:\n" +
-      "----------\n" +
-      exception.getClass.getSimpleName +
-      "\n" +
-      exception.getMessage +
-      exception.getStackTrace.foreach(stackElement => {
+      exception.getClass.getSimpleName + "\n" +
+      exception.getMessage + "\n"
+      exception.getStackTrace.map(stackElement => {
         stackElement.getClassName + "." +
         stackElement.getMethodName + "(): " +
         stackElement.getLineNumber
-    })
+    }).mkString("\n")
   }
 }

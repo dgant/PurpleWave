@@ -17,7 +17,7 @@ class DestroyEconomyFulfiller extends Plan {
   override def getChildren: Iterable[Plan] = { List(fighters.get) }
   override def onFrame() {
     
-    if (With.scout.mostBaselikeEnemyUnit.isEmpty) {
+    if (With.scout.mostBaselikeEnemyBuilding.isEmpty) {
       With.logger.warn("Trying to destroy economy without knowing where to go")
       return
     }
@@ -31,7 +31,7 @@ class DestroyEconomyFulfiller extends Plan {
     _lastOrderFrame.keySet.diff(units).foreach(_lastOrderFrame.remove)
     units.diff(_lastOrderFrame.keySet).foreach(_lastOrderFrame.put(_, 0))
     
-    val targetPosition = With.scout.mostBaselikeEnemyUnit.get.getPosition
+    val targetPosition = With.scout.mostBaselikeEnemyBuilding.get.getPosition
     
     units
       .filter(_canOrder)

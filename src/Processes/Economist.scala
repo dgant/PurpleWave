@@ -32,11 +32,14 @@ object Economist {
   }
   
   def ourActiveMiners(miningArea:TileRectangle):Iterable[bwapi.Unit] = {
-    ourActiveHarvesters(miningArea).filter(_.getOrderTarget.getType.isMineralField)
+    ourActiveHarvesters
+    //TODO: This fails because getOrderTarget can return invalid targets that NPE on property access
+    //ourActiveHarvesters(miningArea).filter(_.getOrderTarget.getType.isMineralField)
   }
   
   def ourActiveDrillers(miningArea:TileRectangle):Iterable[bwapi.Unit] = {
-    ourActiveHarvesters(miningArea).filter(_.getOrderTarget.getType.isRefinery)
+    List.empty
+    //ourActiveHarvesters(miningArea).filter(_.getOrderTarget.getType.isRefinery)
   }
   
   def ourMineralIncomePerMinute:Integer = {

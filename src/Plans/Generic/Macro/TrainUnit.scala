@@ -19,6 +19,7 @@ class TrainUnit(val traineeType:UnitType) extends Plan {
   
   var _trainer:Option[bwapi.Unit] = None
   var _trainee:Option[bwapi.Unit] = None
+  var lastOrderFrame = 0
   
   description.set(Some(TypeDescriber.describeUnitType(traineeType)))
   
@@ -61,10 +62,13 @@ class TrainUnit(val traineeType:UnitType) extends Plan {
     }
     
     if (trainer.getTrainingQueue.size > 1) {
-      With.logger.warn("A "
-        + trainer.getType.toString
-        + " is queuing: "
-        + trainer.getTrainingQueue.asScala.map(_.toString).mkString(", "))
+      
+      if (lastOrderFrame + With.game.getLatencyFrames < With.game.getFrameCount) {
+        With.logger.warn("A "
+          + trainer.getType.toString
+          + " is queuing: "
+          + trainer.getTrainingQueue.asScala.map(_.toString).mkString(", "))
+      }
     }
     
     val isTraining = ! trainer.getTrainingQueue.isEmpty
@@ -94,5 +98,6 @@ class TrainUnit(val traineeType:UnitType) extends Plan {
     _trainer = Some(trainer)
     currencyPlan.get.isSpent = true
     trainer.train(traineeType)
+    lastOrderFrame = With.game.getFrameCount
   }
 }

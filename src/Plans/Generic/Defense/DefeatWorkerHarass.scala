@@ -13,8 +13,8 @@ import scala.collection.mutable
 
 class DefeatWorkerHarass extends Plan {
   
-  val _enemyDefense = new mutable.HashMap[bwapi.Unit, LockUnits]
-  val _enemyUpdateFrames = new mutable.HashMap[bwapi.Unit, Integer]
+  val _enemyDefense = new mutable.HashMap[Int, LockUnits]
+  val _enemyUpdateFrames = new mutable.HashMap[Int, Integer]
   
   override def getChildren: Iterable[Plan] = { _enemyDefense.values }
   
@@ -32,7 +32,9 @@ class DefeatWorkerHarass extends Plan {
   
     _enemyDefense.foreach(pair => {
       pair._2.onFrame()
-      pair._2.units.foreach(defender => defender.attack(pair._1))
+      pair._2.units.foreach(defender =>
+        With.enemyUnits.filter(_.getID == pair._1).foreach(enemy =>
+          defender.attack(enemy)))
     })
   }
   
@@ -51,9 +53,9 @@ class DefeatWorkerHarass extends Plan {
   }
   
   def _defendFromEnemy(enemy:bwapi.Unit) {
-    if ( ! _enemyDefense.contains(enemy)) {
+    if ( ! _enemyDefense.contains(enemy.getID)) {
       _enemyDefense.put(
-        enemy,
+        enemy.getID,
         new LockUnitsExactly {
           this.description.set(Some("Eject enemy scout"))
           this.quantity.set(2)
@@ -63,6 +65,6 @@ class DefeatWorkerHarass extends Plan {
           })
         })
     }
-    _enemyUpdateFrames.put(enemy, With.game.getFrameCount)
+    _enemyUpdateFrames.put(enemy.getID, With.game.getFrameCount)
   }
 }

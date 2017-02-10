@@ -145,10 +145,10 @@ object Overlay {
     With.game.drawTextScreen(
       305,
       5,
-      "Active miners:       " + Economist.ourActiveMiners.size + "\n" +
-      "Active drillers:     " + Economist.ourActiveDrillers.size + "\n" +
-      "Minerals per minute: " + Economist.ourMineralIncomePerMinute + "\n" +
-      "     Gas per minute: " + Economist.ourMineralIncomePerMinute + "\n" +
+      "      Active miners:   " + Economist.ourActiveMiners.size + "\n" +
+      "      Active drillers:   " + Economist.ourActiveDrillers.size + "\n" +
+      "Minerals per minute:   " + Economist.ourMineralIncomePerMinute + "\n" +
+      "     Gas per minute:  " + Economist.ourMineralIncomePerMinute + "\n" +
       With.bank.getPrioritizedRequests
         .map(r =>
           (if (r.isSatisfied) "X " else "  ") ++

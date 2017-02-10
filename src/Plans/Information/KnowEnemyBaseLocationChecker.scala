@@ -7,8 +7,6 @@ class KnowEnemyBaseLocationChecker extends Plan {
   description.set(Some("Do we know where an enemy base is?"))
   
   override def isComplete(): Boolean = {
-    With.scout.mostBaselikeEnemyUnit
-      .find(_.getType.isBuilding)
-      .isDefined
+    With.scout.mostBaselikeEnemyBuilding.isDefined
   }
 }

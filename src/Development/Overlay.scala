@@ -2,6 +2,7 @@ package Development
 
 import Plans.Generic.Allocation.{LockCurrency, LockUnits}
 import Plans.Plan
+import Processes.Economist
 import Startup.With
 import bwapi.{Color, Position, UnitCommandType}
 import bwta.BWTA
@@ -65,7 +66,7 @@ object Overlay {
   
   def _describePlan(plan:Plan, childOrder:Integer, depth:Integer):String = {
     val planName = _getPlanNameOrDescription(plan)
-    val checkbox = if (plan.isComplete) "[X] " else "[_] "
+    val checkbox = if (plan.isComplete) "X " else "  "
     
     val spacer = "  " * depth
     val leftColumn =
@@ -89,7 +90,7 @@ object Overlay {
   
   def _drawTerrain() {
     var i = 0
-    With.map.ourMiningAreas.foreach(area => With.game.drawBoxMap(
+    With.map.ourHarvestingAreas.foreach(area => With.game.drawBoxMap(
       area.start.toPosition,
       area.end.toPosition,
       Color.Red))
@@ -144,6 +145,10 @@ object Overlay {
     With.game.drawTextScreen(
       305,
       5,
+      "Active miners:       " + Economist.ourActiveMiners.size + "\n" +
+      "Active drillers:     " + Economist.ourActiveDrillers.size + "\n" +
+      "Minerals per minute: " + Economist.ourMineralIncomePerMinute + "\n" +
+      "     Gas per minute: " + Economist.ourMineralIncomePerMinute + "\n" +
       With.bank.getPrioritizedRequests
         .map(r =>
           (if (r.isSatisfied) "X " else "  ") ++

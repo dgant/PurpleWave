@@ -31,26 +31,14 @@ class KnowEnemyBaseLocationFulfiller extends Plan {
   }
   
   def _orderScout(scout:bwapi.Unit) {
-    val nextBase = With.scout.unscoutedBases.head
-    /*
-    if (scout.canGather) {
-      val nearestMineral = BWTA.getNearestBaseLocation(_getNextScoutingPosition)
-        .getStaticMinerals
-        .asScala
-        .headOption
-      
-      if (nearestMineral.isDefined &&
-        nextBase.getRegion.getPolygon.isInside(nearestMineral.get.getPosition)) {
-          scout.rightClick(nearestMineral.get)
-          return
-      }
-    }
-    */
-  
-    scout.move(nextBase.getPosition)
+    scout.move(_getNextScoutingPosition)
   }
   
   def _getNextScoutingPosition:Position = {
-    With.scout.unscoutedBases.head.getPosition
+    
+    With.scout.mostUnscoutedBases
+      .filter(base => ! base.isIsland) //BWTA.isConnected could also help
+      .head
+      .getPosition
   }
 }

@@ -28,7 +28,7 @@ class DefeatWorkerHarass extends Plan {
           _enemyUpdateFrames.remove(pair._1)
         })
     
-    With.map.ourMiningAreas.foreach(_defendBaseWorkers)
+    With.map.ourHarvestingAreas.foreach(_defendBaseWorkers)
   
     _enemyDefense.foreach(pair => {
       pair._2.onFrame()

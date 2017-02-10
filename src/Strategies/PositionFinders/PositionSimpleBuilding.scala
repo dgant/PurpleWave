@@ -23,7 +23,7 @@ class PositionSimpleBuilding(
       position,
       margin = 1,
       searchRadius = 50,
-      exclusions = With.map.ourMiningAreas)
+      exclusions = With.map.ourHarvestingAreas)
     
     if (output == None) {
       With.logger.warn("Failed to place a " ++ buildingType.toString ++ " near " ++ position.toString)

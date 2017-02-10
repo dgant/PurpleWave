@@ -21,7 +21,7 @@ class Map {
     With.ourUnits.filter(unit => isTownHall(unit.getType) && ! unit.isFlying)
   }
   
-  def ourMiningAreas:Iterable[TileRectangle] = { _ourMiningAreasCache.get }
+  def ourHarvestingAreas:Iterable[TileRectangle] = { _ourMiningAreasCache.get }
   val _ourMiningAreasCache = new Cache[Iterable[TileRectangle]] {
     duration = 24 * 15
     setCalculator(() => _recalculateOurMiningAreas)

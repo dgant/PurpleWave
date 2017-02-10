@@ -21,4 +21,8 @@ object With {
   def ourUnits:mutable.Buffer[bwapi.Unit] = {
     game.self.getUnits.asScala
   }
+  
+  def enemyUnits:mutable.Buffer[bwapi.Unit] = {
+    game.enemies.asScala.flatten(_.getUnits.asScala)
+  }
 }

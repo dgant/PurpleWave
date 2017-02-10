@@ -17,7 +17,7 @@ class DestroyEconomyFulfiller extends Plan {
   override def getChildren: Iterable[Plan] = { List(fighters.get) }
   override def onFrame() {
     
-    if (With.scout.nextEnemyBase.isEmpty) {
+    if (With.scout.mostBaselikeEnemyUnit.isEmpty) {
       With.logger.warn("Trying to destroy economy without knowing where to go")
       return
     }
@@ -31,7 +31,7 @@ class DestroyEconomyFulfiller extends Plan {
     _lastOrderFrame.keySet.diff(units).foreach(_lastOrderFrame.remove)
     units.diff(_lastOrderFrame.keySet).foreach(_lastOrderFrame.put(_, 0))
     
-    val targetPosition = With.scout.nextEnemyBase.get.getPosition
+    val targetPosition = With.scout.mostBaselikeEnemyUnit.get.getPosition
     
     units
       .filter(_canOrder)
@@ -39,7 +39,6 @@ class DestroyEconomyFulfiller extends Plan {
         _issueOrder(unit, targetPosition)
         _lastOrderFrame(unit) = With.game.getFrameCount
       })
-    
   }
   
   def _canOrder(unit:bwapi.Unit):Boolean = {
@@ -68,8 +67,8 @@ class DestroyEconomyFulfiller extends Plan {
       if (workersNearTheirBase.nonEmpty) {
         fighter.attack(workersNearTheirBase.sortBy(_.getDistance(fighter)).head)
       }
-      else if (With.scout.enemyUnits.nonEmpty) {
-        fighter.patrol(With.scout.enemyUnits.minBy(enemy => fighter.getDistance(enemy.getPosition)).getPosition)
+      else if (With.scout.knownEnemyUnits.nonEmpty) {
+        fighter.patrol(With.scout.knownEnemyUnits.minBy(enemy => fighter.getDistance(enemy.getPosition)).getPosition)
       }
     }
     else {

@@ -5,6 +5,8 @@ import Strategies.UnitMatchers.{UnitMatchAnything, UnitMatcher}
 import Strategies.UnitPreferences.{UnitPreferAnything, UnitPreference}
 import Types.Property
 
+import scala.collection.mutable
+
 class LockUnitsExactly extends LockUnits {
   
   description.set(Some("Reserve a fixed number of units"))
@@ -14,14 +16,14 @@ class LockUnitsExactly extends LockUnits {
   val unitMatcher     = new Property[UnitMatcher](UnitMatchAnything)
   
   override def getRequiredUnits(candidates:Iterable[Iterable[bwapi.Unit]]):Option[Iterable[bwapi.Unit]] = {
+  
+    val desiredUnits = With.recruiter.getUnits(this).to[mutable.Set]
     
-    val desiredUnits = With.recruiter.getUnits(this).clone
-    
-    //The candidates are offered in pools.
-    //Originally, we wanted to force plans to hire from the unemployed pool first
-    //But that meant that when we had a strong preference, the pooling was overriding it
-    //Flattening it basically retains the "welfare" effect, but still allows sorting to work
-    candidates
+      //The candidates are offered in pools.
+      //Originally, we wanted to force plans to hire from the unemployed pool first
+      //But that meant that when we had a strong preference, the pooling was overriding it
+      //Flattening it basically retains the "welfare" effect, but still allows sorting to work
+      candidates
       .flatten
       .toList
       .sortBy(unitPreference.get.preference(_))
@@ -30,7 +32,6 @@ class LockUnitsExactly extends LockUnits {
           && unitMatcher.get.accept(unit)) {
           desiredUnits.add(unit)
         })
-    
     if (desiredUnits.size >= quantity.get) {
       Some(desiredUnits)
     }

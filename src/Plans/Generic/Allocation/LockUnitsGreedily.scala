@@ -5,6 +5,8 @@ import Strategies.UnitMatchers.{UnitMatchAnything, UnitMatcher}
 import Strategies.UnitPreferences.{UnitPreferAnything, UnitPreference}
 import Types.Property
 
+import scala.collection.mutable
+
 class LockUnitsGreedily extends LockUnits {
   
   description.set(Some("Reserve as many units as we can"))
@@ -14,8 +16,8 @@ class LockUnitsGreedily extends LockUnits {
   val minimum = new Property[Integer](1)
   
   override def getRequiredUnits(candidates:Iterable[Iterable[bwapi.Unit]]):Option[Iterable[bwapi.Unit]] = {
-    
-    val desiredUnits = With.recruiter.getUnits(this).clone
+  
+    val desiredUnits = With.recruiter.getUnits(this).to[mutable.Set]
     
     candidates
       .foreach(pool => pool

@@ -83,7 +83,8 @@ class TrainUnit(val traineeType:UnitType) extends Plan {
           .filter(u =>
             u.getType == traineeType &&
             u.getX == trainer.getX &&
-            u.getY == trainer.getY)
+            u.getY == trainer.getY &&
+            ! u.isCompleted)
           .headOption
         
         //There seems to be a 1+ frame delay between the queue getting started

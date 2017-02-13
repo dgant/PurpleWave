@@ -1,10 +1,8 @@
 package Plans.Generic.Allocation
 
-import Startup.With
 import Plans.Plan
+import Startup.With
 import bwapi.Unit
-
-import scala.collection.mutable
 
 abstract class LockUnits extends Plan {
   
@@ -16,7 +14,7 @@ abstract class LockUnits extends Plan {
     With.recruiter.add(this)
   }
   
-  def units:mutable.Set[Unit] = {
+  def units:Set[Unit] = {
     With.recruiter.getUnits(this)
   }
   

@@ -27,7 +27,15 @@ class GatherMinerals extends Plan {
       workerPlan.get.onFrame()
       workerPlan.get.units
         .filterNot(worker => worker.isGatheringMinerals)
-        .foreach(worker => worker.gather(_mineral.head))
+        .foreach(worker => _orderWorker(worker, _mineral.head))
+    }
+  }
+  
+  def _orderWorker(unit:bwapi.Unit, mineral:bwapi.Unit) {
+    if (unit.isCarryingMinerals || unit.isCarryingGas) {
+      unit.returnCargo()
+    } else {
+      unit.gather(mineral)
     }
   }
 }

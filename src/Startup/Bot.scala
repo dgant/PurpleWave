@@ -24,6 +24,7 @@ class Bot() extends DefaultBWListener {
       With.gameplan = new PlanWinTheGame
       With.prioritizer = new Prioritizer
       With.recruiter = new Recruiter
+      With.scheduler = new Scheduler
       With.scout = new Scout
       With.tracker = new Tracker
 
@@ -43,6 +44,7 @@ class Bot() extends DefaultBWListener {
       With.recruiter.onFrame()
       With.prioritizer.onFrame()
       With.gameplan.onFrame() //This needs to be last!
+      With.scheduler.onFrame()
       Overlay.onFrame()
       AutoCamera.onFrame()
     })

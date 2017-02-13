@@ -17,6 +17,7 @@ object With {
   var gameplan:PlanWinTheGame = null
   var prioritizer:Prioritizer = null
   var recruiter:Recruiter = null
+  var scheduler:Scheduler = null
   var scout:Scout = null
   var tracker:Tracker = null
   

@@ -60,10 +60,15 @@ class Economist {
   }
   
   def ourMineralIncomePerMinute:Integer = {
-    //These values are hand tuned
-    //Original source: http://www.teamliquid.net/forum/brood-war/484849-improving-mineral-gathering-rate-in-brood-war
-    //See also: http://www.teamliquid.net/forum/brood-war/89939-ideal-mining-thoughts
-    //http://wiki.teamliquid.net/starcraft/Mining gives 182, 174, and 154-frame cycles for mining (for each race
+    // These values are hand tuned.
+    //
+    // Original source: http://www.teamliquid.net/forum/brood-war/89939-ideal-mining-thoughts
+    // See also Martin Rooijackers:  http://www.teamliquid.net/forum/brood-war/484849-improving-mineral-gathering-rate-in-brood-war
+    //
+    // Dave Churchill via https://pdfs.semanticscholar.org/dfd9/1e739bd979c08485a75fd11c501a6ec05118.pdf
+    // gives a flat .045 minerals per frame and .07 gas per frame
+    //
+    // http://wiki.teamliquid.net/starcraft/Mining gives 182, 174, and 154-frame cycles for mining (for each race, Terran, Zerg, protoss)
     //
     // Also, according to meltYSC:
     // meLtySC : I can tell you how many workers you need to optimally mine

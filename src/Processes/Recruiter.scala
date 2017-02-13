@@ -12,16 +12,16 @@ class Recruiter {
   val _updatedRequests:mutable.Set[LockUnits] = mutable.Set.empty
 
   def onFrame() {
-    //Automatically free units held by dead requests
+    //Automatically free buildersOccupied held by dead requests
     _unitsByRequest.keySet.diff(_updatedRequests).foreach(remove)
     _updatedRequests.clear()
     
-    // Remove dead units
+    // Remove dead buildersOccupied
     //
     _requestByUnit.keys.filterNot(_.exists).foreach(_unassign)
     _unassignedUnits.filterNot(_.exists).foreach(_unassignedUnits.remove)
     
-    // Add new units
+    // Add new buildersOccupied
     //
     With.ourUnits.diff(_unassignedUnits ++ _requestByUnit.keys).foreach(_unassignedUnits.add)
   }
@@ -48,7 +48,7 @@ class Recruiter {
   
   def _tryToSatisfy(request: LockUnits) {
     
-    // Offer batches of units for the request to choose.
+    // Offer batches of buildersOccupied for the request to choose.
     //   Batch 0: Units not assigned
     //   Batch 1+: Units assigned to weaker-priority requests
     //
@@ -67,9 +67,9 @@ class Recruiter {
     else {
       request.isSatisfied = true
   
-      // 1. Unassign all the current units
-      // 2. Unassign all the required units
-      // 3. Assign all the required units
+      // 1. Unassign all the current buildersOccupied
+      // 2. Unassign all the required buildersOccupied
+      // 3. Assign all the required buildersOccupied
       val unitsBefore = getUnits(request)
       val unitsAfter = requiredUnits.get.toSet
       val unitsObsolete = unitsBefore.diff(unitsAfter)

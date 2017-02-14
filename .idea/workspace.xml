@@ -30,8 +30,48 @@
       <file leaf-file-name="Economist.scala" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Processes/Economist.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="165">
-              <caret line="70" column="31" lean-forward="true" selection-start-line="70" selection-start-column="31" selection-end-line="70" selection-end-column="31" />
+            <state relative-caret-position="325">
+              <caret line="97" column="33" lean-forward="false" selection-start-line="97" selection-start-column="33" selection-end-line="97" selection-end-column="33" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Overlay.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Development/Overlay.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="91">
+              <caret line="161" column="2" lean-forward="true" selection-start-line="161" selection-start-column="2" selection-end-line="161" selection-end-column="2" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="PositionSimpleBuilding.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Strategies/PositionFinders/PositionSimpleBuilding.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="260">
+              <caret line="20" column="4" lean-forward="true" selection-start-line="20" selection-start-column="4" selection-end-line="20" selection-end-column="4" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="DestroyEconomyFulfiller.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Army/DestroyEconomyFulfiller.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="234">
+              <caret line="66" column="43" lean-forward="true" selection-start-line="66" selection-start-column="43" selection-end-line="66" selection-end-column="43" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="GatherMinerals.scala" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Macro/GatherMinerals.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="338">
+              <caret line="29" column="41" lean-forward="true" selection-start-line="29" selection-start-column="41" selection-end-line="29" selection-end-column="41" />
               <folding />
             </state>
           </provider>
@@ -40,88 +80,48 @@
       <file leaf-file-name="ProtossRushWithProxyZealots.scala" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Plans/GamePlans/Protoss/Proxy/ProtossRushWithProxyZealots.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="119">
-              <caret line="10" column="20" lean-forward="true" selection-start-line="10" selection-start-column="20" selection-end-line="10" selection-end-column="20" />
+            <state relative-caret-position="143">
+              <caret line="14" column="58" lean-forward="false" selection-start-line="14" selection-start-column="58" selection-end-line="14" selection-end-column="58" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Map.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Processes/Map.scala">
+      <file leaf-file-name="BuildProxyTwoGateways.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Plans/GamePlans/Protoss/Proxy/BuildProxyTwoGateways.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="256">
-              <caret line="31" column="2" lean-forward="true" selection-start-line="31" selection-start-column="2" selection-end-line="31" selection-end-column="2" />
+            <state relative-caret-position="-117">
+              <caret line="78" column="2" lean-forward="true" selection-start-line="78" selection-start-column="2" selection-end-line="78" selection-end-column="2" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="TrainUnit.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Macro/TrainUnit.scala">
+      <file leaf-file-name="DestroyEconomy.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Army/DestroyEconomy.scala">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="117">
-              <caret line="69" column="20" lean-forward="true" selection-start-line="69" selection-start-column="20" selection-end-line="69" selection-end-column="20" />
+              <caret line="9" column="17" lean-forward="true" selection-start-line="9" selection-start-column="17" selection-end-line="9" selection-end-column="17" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Recruiter.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Processes/Recruiter.scala">
+      <file leaf-file-name="Logger.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Development/Logger.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-11">
-              <caret line="61" column="102" lean-forward="false" selection-start-line="61" selection-start-column="102" selection-end-line="61" selection-end-column="102" />
+            <state relative-caret-position="149">
+              <caret line="33" column="4" lean-forward="false" selection-start-line="33" selection-start-column="4" selection-end-line="33" selection-end-column="4" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="LockUnits.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Allocation/LockUnits.scala">
+      <file leaf-file-name="Bot.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Startup/Bot.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="208">
-              <caret line="16" column="25" lean-forward="false" selection-start-line="16" selection-start-column="25" selection-end-line="16" selection-end-column="25" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="LockUnitsExactly.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Allocation/LockUnitsExactly.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="247">
-              <caret line="19" column="0" lean-forward="false" selection-start-line="19" selection-start-column="0" selection-end-line="19" selection-end-column="68" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="LockUnitsGreedily.scala" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Allocation/LockUnitsGreedily.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="234">
-              <caret line="18" column="2" lean-forward="true" selection-start-line="18" selection-start-column="2" selection-end-line="18" selection-end-column="2" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="GatherMinerals.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Macro/GatherMinerals.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="178">
-              <caret line="23" column="5" lean-forward="true" selection-start-line="23" selection-start-column="5" selection-end-line="23" selection-end-column="5" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="DefeatWorkerHarass.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Defense/DefeatWorkerHarass.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="171">
-              <caret line="22" column="22" lean-forward="true" selection-start-line="22" selection-start-column="22" selection-end-line="22" selection-end-column="22" />
+            <state relative-caret-position="269">
+              <caret line="82" column="8" lean-forward="false" selection-start-line="82" selection-start-column="8" selection-end-line="82" selection-end-column="8" />
               <folding />
             </state>
           </provider>
@@ -139,7 +139,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>Failed to place</find>
       <find>getHq</find>
       <find>super.</find>
       <find>abort</find>
@@ -169,6 +168,7 @@
       <find>getType.toString</find>
       <find>getAllUnits</find>
       <find>getUnits</find>
+      <find>minBy</find>
     </findStrings>
     <replaceStrings>
       <replace>{  _mirror</replace>
@@ -184,7 +184,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/Geometry/Positions.scala" />
         <option value="$PROJECT_DIR$/src/Plans/GamePlans/Protoss/Proxy/BuildProxyArea.scala" />
         <option value="$PROJECT_DIR$/src/Geometry/Pylon.scala" />
         <option value="$PROJECT_DIR$/src/Geometry/TileRectangle.scala" />
@@ -200,7 +199,6 @@
         <option value="$PROJECT_DIR$/src/Development/LogLevel.scala" />
         <option value="$PROJECT_DIR$/src/Plans/Generic/Allocation/LockUnitsNobody.scala" />
         <option value="$PROJECT_DIR$/src/Plans/Generic/Macro/BuildBuilding.scala" />
-        <option value="$PROJECT_DIR$/src/Plans/Generic/Army/DestroyEconomy.scala" />
         <option value="$PROJECT_DIR$/src/Plans/GamePlans/Protoss/ProtossStrategyCheese.scala" />
         <option value="$PROJECT_DIR$/src/Startup/Listener.scala" />
         <option value="$PROJECT_DIR$/src/Caching/Cache.scala" />
@@ -208,8 +206,6 @@
         <option value="$PROJECT_DIR$/src/Processes/Mapping/Map.scala" />
         <option value="$PROJECT_DIR$/src/Processes/Mapping/MiningArea.scala" />
         <option value="$PROJECT_DIR$/src/Processes/Architect.scala" />
-        <option value="$PROJECT_DIR$/src/Strategies/PositionFinders/PositionSimpleBuilding.scala" />
-        <option value="$PROJECT_DIR$/src/Processes/Map.scala" />
         <option value="$PROJECT_DIR$/src/Plans/Information/KnowEnemyBaseLocationFulfiller.scala" />
         <option value="$PROJECT_DIR$/src/Plans/Information/KnowEnemyBaseLocationChecker.scala" />
         <option value="$PROJECT_DIR$/src/Plans/Generic/Defense/DefeatWorkerHarass.scala" />
@@ -218,23 +214,27 @@
         <option value="$PROJECT_DIR$/src/Processes/Scout.scala" />
         <option value="$PROJECT_DIR$/src/Types/EnemyUnitInfo.scala" />
         <option value="$PROJECT_DIR$/src/Processes/Tracker.scala" />
-        <option value="$PROJECT_DIR$/src/Plans/Generic/Army/DestroyEconomyFulfiller.scala" />
         <option value="$PROJECT_DIR$/src/Development/Logger.scala" />
         <option value="$PROJECT_DIR$/src/Processes/History.scala" />
-        <option value="$PROJECT_DIR$/src/Development/Overlay.scala" />
         <option value="$PROJECT_DIR$/src/Startup/With.scala" />
         <option value="$PROJECT_DIR$/src/Startup/Bot.scala" />
         <option value="$PROJECT_DIR$/src/Types/Buildable.scala" />
         <option value="$PROJECT_DIR$/src/Processes/Scheduler.scala" />
-        <option value="$PROJECT_DIR$/src/Processes/Economist.scala" />
-        <option value="$PROJECT_DIR$/src/Plans/GamePlans/Protoss/Proxy/BuildProxyTwoGateways.scala" />
-        <option value="$PROJECT_DIR$/src/Plans/Generic/Macro/GatherMinerals.scala" />
-        <option value="$PROJECT_DIR$/src/Plans/GamePlans/Protoss/Proxy/ProtossRushWithProxyZealots.scala" />
         <option value="$PROJECT_DIR$/src/Plans/Generic/Macro/TrainUnit.scala" />
         <option value="$PROJECT_DIR$/src/Processes/Recruiter.scala" />
         <option value="$PROJECT_DIR$/src/Plans/Generic/Allocation/LockUnits.scala" />
         <option value="$PROJECT_DIR$/src/Plans/Generic/Allocation/LockUnitsExactly.scala" />
         <option value="$PROJECT_DIR$/src/Plans/Generic/Allocation/LockUnitsGreedily.scala" />
+        <option value="$PROJECT_DIR$/src/Plans/Generic/Compound/AllSerial.scala" />
+        <option value="$PROJECT_DIR$/src/Processes/Map.scala" />
+        <option value="$PROJECT_DIR$/src/Plans/Generic/Army/DestroyEconomy.scala" />
+        <option value="$PROJECT_DIR$/src/Plans/GamePlans/Protoss/Proxy/ProtossRushWithProxyZealots.scala" />
+        <option value="$PROJECT_DIR$/src/Plans/GamePlans/Protoss/Proxy/BuildProxyTwoGateways.scala" />
+        <option value="$PROJECT_DIR$/src/Development/Overlay.scala" />
+        <option value="$PROJECT_DIR$/src/Strategies/PositionFinders/PositionSimpleBuilding.scala" />
+        <option value="$PROJECT_DIR$/src/Processes/Economist.scala" />
+        <option value="$PROJECT_DIR$/src/Plans/Generic/Army/DestroyEconomyFulfiller.scala" />
+        <option value="$PROJECT_DIR$/src/Plans/Generic/Macro/GatherMinerals.scala" />
       </list>
     </option>
   </component>
@@ -371,6 +371,28 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
+              <option name="myItemId" value="Strategies" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="PositionFinders" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="PurpleWave1" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="PurpleWave1" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
               <option name="myItemId" value="Startup" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
@@ -408,6 +430,54 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="Plans" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="PurpleWave1" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="PurpleWave1" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Plans" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Generic" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Macro" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="PurpleWave1" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="PurpleWave1" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Plans" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Generic" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -766,19 +836,11 @@
       <breakpoints-dialog>
         <breakpoints-dialog />
       </breakpoints-dialog>
-      <option name="time" value="478" />
+      <option name="time" value="486" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Macro/BuildBuilding.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="353">
-          <caret line="93" column="2" lean-forward="true" selection-start-line="93" selection-start-column="2" selection-end-line="93" selection-end-column="2" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$PROJECT_DIR$/lib/bwmirror_v2_5.jar!/bwapi/Mirror.class">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="85">
@@ -848,14 +910,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Startup/Listener.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="59">
-          <caret line="23" column="67" lean-forward="false" selection-start-line="23" selection-start-column="67" selection-end-line="23" selection-end-column="67" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Development/package.scala" />
     <entry file="jar://$PROJECT_DIR$/lib/bwmirror_v2_5.jar!/bwta/BWTA.class">
       <provider selected="true" editor-type-id="text-editor">
@@ -901,25 +955,11 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Processes/Mapping/MiningArea.scala" />
-    <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Army/DestroyEconomy.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="273">
-          <caret line="21" column="17" lean-forward="true" selection-start-line="21" selection-start-column="17" selection-end-line="21" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Processes/Architect.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="195">
           <caret line="15" column="31" lean-forward="true" selection-start-line="15" selection-start-column="31" selection-end-line="15" selection-end-column="31" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Strategies/PositionFinders/PositionSimpleBuilding.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="65">
-          <caret line="5" column="0" lean-forward="true" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
         </state>
       </provider>
     </entry>
@@ -987,14 +1027,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Army/DestroyEconomyFulfiller.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="82">
-          <caret line="48" column="4" lean-forward="true" selection-start-line="48" selection-start-column="4" selection-end-line="48" selection-end-column="4" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Processes/History.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="65">
@@ -1011,26 +1043,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Development/Overlay.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="351">
-          <caret line="193" column="47" lean-forward="false" selection-start-line="193" selection-start-column="47" selection-end-line="193" selection-end-column="47" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Startup/With.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="386">
           <caret line="39" column="1" lean-forward="true" selection-start-line="39" selection-start-column="1" selection-end-line="39" selection-end-column="1" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Startup/Bot.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="321">
-          <caret line="71" column="41" lean-forward="false" selection-start-line="71" selection-start-column="41" selection-end-line="71" selection-end-column="41" />
           <folding />
         </state>
       </provider>
@@ -1051,66 +1067,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Development/Logger.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="188">
-          <caret line="36" column="2" lean-forward="true" selection-start-line="36" selection-start-column="2" selection-end-line="36" selection-end-column="2" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$PROJECT_DIR$/lib/bwmirror_v2_5.jar!/bwapi/UnitType.class">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="141">
           <caret line="81" column="33" lean-forward="false" selection-start-line="81" selection-start-column="33" selection-end-line="81" selection-end-column="33" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Plans/GamePlans/Protoss/Proxy/BuildProxyTwoGateways.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="37">
-          <caret line="48" column="4" lean-forward="true" selection-start-line="48" selection-start-column="4" selection-end-line="48" selection-end-column="4" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Macro/GatherMinerals.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="178">
-          <caret line="23" column="5" lean-forward="true" selection-start-line="23" selection-start-column="5" selection-end-line="23" selection-end-column="5" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Defense/DefeatWorkerHarass.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="171">
-          <caret line="22" column="22" lean-forward="true" selection-start-line="22" selection-start-column="22" selection-end-line="22" selection-end-column="22" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Processes/Map.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="256">
-          <caret line="31" column="2" lean-forward="true" selection-start-line="31" selection-start-column="2" selection-end-line="31" selection-end-column="2" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Plans/GamePlans/Protoss/Proxy/ProtossRushWithProxyZealots.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="10" column="20" lean-forward="true" selection-start-line="10" selection-start-column="20" selection-end-line="10" selection-end-column="20" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Processes/Economist.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="70" column="31" lean-forward="true" selection-start-line="70" selection-start-column="31" selection-end-line="70" selection-end-column="31" />
           <folding />
         </state>
       </provider>
@@ -1139,18 +1099,130 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Allocation/LockUnitsExactly.scala">
+    <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Compound/AllSerial.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="247">
-          <caret line="19" column="0" lean-forward="false" selection-start-line="19" selection-start-column="0" selection-end-line="19" selection-end-column="68" />
+        <state relative-caret-position="52">
+          <caret line="4" column="2" lean-forward="false" selection-start-line="4" selection-start-column="2" selection-end-line="4" selection-end-column="2" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Allocation/LockUnitsGreedily.scala">
       <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="117">
+          <caret line="9" column="23" lean-forward="false" selection-start-line="9" selection-start-column="23" selection-end-line="9" selection-end-column="23" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Allocation/LockUnitsExactly.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="117">
+          <caret line="9" column="42" lean-forward="true" selection-start-line="9" selection-start-column="42" selection-end-line="9" selection-end-column="42" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Processes/Map.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="312">
+          <caret line="38" column="58" lean-forward="false" selection-start-line="38" selection-start-column="58" selection-end-line="38" selection-end-column="58" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Defense/DefeatWorkerHarass.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-63">
+          <caret line="22" column="22" lean-forward="true" selection-start-line="22" selection-start-column="22" selection-end-line="22" selection-end-column="22" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Startup/Listener.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="149">
+          <caret line="23" column="67" lean-forward="false" selection-start-line="23" selection-start-column="67" selection-end-line="23" selection-end-column="67" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Startup/Bot.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="269">
+          <caret line="82" column="8" lean-forward="false" selection-start-line="82" selection-start-column="8" selection-end-line="82" selection-end-column="8" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Development/Logger.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="149">
+          <caret line="33" column="4" lean-forward="false" selection-start-line="33" selection-start-column="4" selection-end-line="33" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Army/DestroyEconomy.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="117">
+          <caret line="9" column="17" lean-forward="true" selection-start-line="9" selection-start-column="17" selection-end-line="9" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Development/Overlay.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="91">
+          <caret line="161" column="2" lean-forward="true" selection-start-line="161" selection-start-column="2" selection-end-line="161" selection-end-column="2" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Plans/GamePlans/Protoss/Proxy/BuildProxyTwoGateways.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-117">
+          <caret line="78" column="2" lean-forward="true" selection-start-line="78" selection-start-column="2" selection-end-line="78" selection-end-column="2" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Strategies/PositionFinders/PositionSimpleBuilding.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="260">
+          <caret line="20" column="4" lean-forward="true" selection-start-line="20" selection-start-column="4" selection-end-line="20" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Plans/GamePlans/Protoss/Proxy/ProtossRushWithProxyZealots.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="143">
+          <caret line="14" column="58" lean-forward="false" selection-start-line="14" selection-start-column="58" selection-end-line="14" selection-end-column="58" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Processes/Economist.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="325">
+          <caret line="97" column="33" lean-forward="false" selection-start-line="97" selection-start-column="33" selection-end-line="97" selection-end-column="33" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Army/DestroyEconomyFulfiller.scala">
+      <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="234">
-          <caret line="18" column="2" lean-forward="true" selection-start-line="18" selection-start-column="2" selection-end-line="18" selection-end-column="2" />
+          <caret line="66" column="43" lean-forward="true" selection-start-line="66" selection-start-column="43" selection-end-line="66" selection-end-column="43" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Macro/GatherMinerals.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="338">
+          <caret line="29" column="41" lean-forward="true" selection-start-line="29" selection-start-column="41" selection-end-line="29" selection-end-column="41" />
           <folding />
         </state>
       </provider>

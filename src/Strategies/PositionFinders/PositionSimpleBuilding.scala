@@ -17,11 +17,13 @@ class PositionSimpleBuilding(
       return None
     }
     
+    val margin = if(buildingType == UnitType.Protoss_Pylon) 4 else 1
+    
     val position = With.map.ourBaseHalls.head.getTilePosition
     val output = With.architect.placeBuilding(
       buildingType,
       position,
-      margin = 1,
+      margin = margin,
       searchRadius = 50,
       exclusions = With.map.ourHarvestingAreas)
     

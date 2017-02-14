@@ -166,6 +166,7 @@ object Overlay {
       5,
       
       With.bank.getPrioritizedRequests
+        .take(8)
         .map(r =>
           (if (r.isSatisfied) "X " else "  ") ++
           (if (r.minerals > 0)  r.minerals  .toString ++ "m " else "") ++

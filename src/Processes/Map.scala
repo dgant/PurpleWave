@@ -3,11 +3,19 @@ package Processes
 import Caching.Cache
 import Geometry.TileRectangle
 import Startup.With
-import bwapi.{TilePosition, UnitType}
+import bwapi.{Position, TilePosition, UnitType}
 
 import scala.collection.JavaConverters._
 
 class Map {
+  
+  def centerPosition:Position = {
+    new Position(With.game.mapWidth * 32 / 2, With.game.mapHeight* 32 / 2)
+  }
+  
+  def centerTilePosition:TilePosition = {
+    new TilePosition(With.game.mapWidth / 2, With.game.mapHeight / 2)
+  }
   
   def isTownHall(unitType:UnitType):Boolean = Set(
     UnitType.Terran_Command_Center,

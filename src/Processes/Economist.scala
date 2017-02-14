@@ -12,9 +12,14 @@ class Economist {
   var ourEstimatedTotalMinerals = 20.0
   var ourEstimatedTotalGas = 0.0
   
+  var _lastFrame = 0
   def onFrame() = {
-    ourEstimatedTotalMinerals += ourMineralIncomePerMinute.toDouble / (24.0 * 60)
-    ourEstimatedTotalGas += ourGasIncomePerMinute.toDouble / (24.0 * 60)
+    //Don't change estimate while paused
+    if (With.game.getFrameCount > _lastFrame) {
+      ourEstimatedTotalMinerals += ourMineralIncomePerMinute.toDouble / (24.0 * 60)
+      ourEstimatedTotalGas += ourGasIncomePerMinute.toDouble / (24.0 * 60)
+    }
+    _lastFrame = With.game.getFrameCount
   }
   
   def ourActualTotalMinerals:Integer = {
@@ -89,7 +94,7 @@ class Economist {
         .map(_.size)
         .map(n => Math.min(n, 23)) //9 * 2.5
         .map(n =>
-          if(n <= 9 * 1.0) n * 58 else
+          if(n <= 9 * 1.0) n * 57 else
           if(n <= 9 * 1.3) n * 53 else
           if(n <= 9 * 1.6) n * 50 else
           if(n <= 9 * 1.9) n * 47 else

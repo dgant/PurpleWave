@@ -74,7 +74,7 @@ class BuildProxyTwoGateways extends Plan {
   
   override def getChildren:Iterable[Plan] = {
     _updateGrandchildren()
-    List(_child, scoutingPlan.get)
+    List(_child)
   }
   
   override def onFrame() {
@@ -82,7 +82,7 @@ class BuildProxyTwoGateways extends Plan {
     if ( ! _child.isComplete) {
       _child.onFrame()
     }
-    if (gateway2Plan.get.startedBuilding) {
+    if (gateway2Plan.get.startedBuilding && ! gateway2Plan.get.isComplete) {
       scoutingPlan.get.onFrame()
     }
   }
@@ -94,7 +94,8 @@ class BuildProxyTwoGateways extends Plan {
       sendBuilderPlan.get,
       pylonPlan.get,
       gateway1Plan.get,
-      gateway2Plan.get
+      gateway2Plan.get,
+      scoutingPlan.get
     ))
   }
   

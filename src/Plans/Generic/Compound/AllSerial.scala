@@ -2,7 +2,7 @@ package Plans.Generic.Compound
 
 class AllSerial extends AbstractPlanCompleteAll {
   
-  final override def onFrame() {
+  override def onFrame() {
     var continue = true
     getChildren
       .foreach(child => {

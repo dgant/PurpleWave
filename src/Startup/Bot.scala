@@ -73,6 +73,7 @@ class Bot() extends DefaultBWListener {
     _try(() => {
       With.logger.debug(if (isWinner) "We won!" else "We lost!")
       With.logger.onEnd
+      BWTA.cleanMemory()
     })
   }
   

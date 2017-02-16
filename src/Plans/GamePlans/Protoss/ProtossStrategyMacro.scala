@@ -12,8 +12,9 @@ class ProtossStrategyMacro extends AllParallel {
   val _buildOrder = List[Buildable] (
     new BuildableUnit(UnitType.Protoss_Nexus),
     new BuildableUnit(UnitType.Protoss_Gateway),
-    new BuildableUnit(UnitType.Protoss_Assimilator),
+    new BuildableUnit(UnitType.Protoss_Gateway),
     new BuildableUnit(UnitType.Protoss_Cybernetics_Core),
+    new BuildableUnit(UnitType.Protoss_Assimilator),
     new BuildableUnit(UnitType.Protoss_Gateway),
     new BuildableUnit(UnitType.Protoss_Gateway),
     new BuildableUnit(UnitType.Protoss_Gateway)

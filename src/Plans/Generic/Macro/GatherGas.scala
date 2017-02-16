@@ -5,7 +5,6 @@ import Plans.Plan
 import Startup.With
 import Strategies.UnitMatchers.UnitMatchWorker
 import Types.Property
-import bwapi.UnitCommandType
 
 import scala.collection.mutable
 
@@ -44,13 +43,16 @@ class GatherGas extends Plan {
             val worker = unassignedWorkers.minBy(_.getPosition.getApproxDistance(refinery.getPosition))
             unassignedWorkers.remove(worker)
             if ( ! worker.isGatheringGas) {
+              //Workers tend to get stuck returning cargo
+              /*
               if (worker.isCarryingMinerals || worker.isCarryingGas) {
+                
                 //Can't spam return cargo
-                if (worker.getLastCommand.getUnitCommandType != UnitCommandType.Return_Cargo  || ! worker.isMoving) {
+                if (worker.getLastCommand.getUnitCommandType != UnitCommandType.Return_Cargo  || worker.getLastCommandFrame < With.game.getFrameCount - 24) {
                   worker.returnCargo()
                 }
               }
-              else {
+              else*/ {
                 worker.gather(refinery)
               }
             }

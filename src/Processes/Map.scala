@@ -42,10 +42,10 @@ class Map {
       val geysers = nearbyUnits.filter(unit => unit.getType.isRefinery || unit.getType == UnitType.Resource_Vespene_Geyser)
   
       //Draw a box around the area
-      val top           = (minerals ++ geysers :+ base).map(_.getTop   ).min
-      val bottom        = (minerals ++ geysers :+ base).map(_.getBottom).max + 32
-      val left          = (minerals ++ geysers :+ base).map(_.getLeft  ).min
-      val right         = (minerals ++ geysers :+ base).map(_.getRight ).max + 32
+      val top           = (minerals ++ geysers :+ base).map(_.getPosition.getY).min
+      val bottom        = (minerals ++ geysers :+ base).map(_.getPosition.getY).max
+      val left          = (minerals ++ geysers :+ base).map(_.getPosition.getX).min
+      val right         = (minerals ++ geysers :+ base).map(_.getPosition.getX).max
       
       new TileRectangle(
         new TilePosition(left/32, top/32),

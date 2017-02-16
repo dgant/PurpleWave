@@ -3,6 +3,7 @@ package Strategies.PositionFinders
 import Caching.Cache
 import Startup.With
 import bwapi.{TilePosition, UnitType}
+import scala.collection.JavaConverters._
 
 class PositionSimpleBuilding(
   val buildingType:UnitType)
@@ -17,8 +18,14 @@ class PositionSimpleBuilding(
       return None
     }
     
-    val margin = if(buildingType == UnitType.Protoss_Pylon) 4 else 1
+    if (buildingType.isRefinery) {
+      //cheap
+      return Some(With.game.getStaticGeysers.asScala.minBy(_.getDistance(With.map.ourBaseHalls.head)).getTilePosition)
+    }
     
+    
+    val margin = if (buildingType == UnitType.Protoss_Pylon) 4 else 1
+  
     val position = With.map.ourBaseHalls.head.getTilePosition
     val output = With.architect.placeBuilding(
       buildingType,

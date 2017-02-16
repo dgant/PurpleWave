@@ -17,7 +17,11 @@ class LockUnitsExactly extends LockUnits {
   
   override def getRequiredUnits(candidates:Iterable[Iterable[bwapi.Unit]]):Option[Iterable[bwapi.Unit]] = {
   
-    val desiredUnits = With.recruiter.getUnits(this).to[mutable.Set]
+    val desiredUnits = With.recruiter.getUnits(this)
+      .toList
+      .sortBy(unitPreference.get.preference)
+      .take(quantity.get)
+      .to[mutable.Set]
     
       //The candidates are offered in pools.
       //Originally, we wanted to force _plans to hire from the unemployed pool first
@@ -26,7 +30,7 @@ class LockUnitsExactly extends LockUnits {
       candidates
       .flatten
       .toList
-      .sortBy(unitPreference.get.preference(_))
+      .sortBy(unitPreference.get.preference)
       .foreach(unit =>
         if (desiredUnits.size < quantity.get
           && unitMatcher.get.accept(unit)) {

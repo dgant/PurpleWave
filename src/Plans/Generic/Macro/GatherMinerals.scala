@@ -5,6 +5,7 @@ import Plans.Plan
 import Startup.With
 import Strategies.UnitMatchers.UnitMatchWorker
 import Types.Property
+import bwapi.UnitCommandType
 
 import scala.collection.JavaConverters._
 
@@ -21,16 +22,19 @@ class GatherMinerals extends Plan {
       .foreach(_orderWorker)
   }
   
-  def _orderWorker(unit:bwapi.Unit) {
-    if (unit.isCarryingMinerals || unit.isCarryingGas) {
-      unit.returnCargo()
+  def _orderWorker(worker:bwapi.Unit) {
+    if (worker.isCarryingMinerals || worker.isCarryingGas) {
+      //Can't spam return cargo
+      if (worker.getLastCommand.getUnitCommandType != UnitCommandType.Return_Cargo || ! worker.isMoving) {
+        worker.returnCargo()
+      }
     } else {
       val minerals = With.map.ourHarvestingAreas
         .flatten(area => With.game.getUnitsInRectangle(area.start.toPosition, area.end.toPosition).asScala)
         .filter(_.getType.isMineralField)
       
       if (minerals.nonEmpty) {
-        unit.gather(minerals.minBy(_.getDistance(unit)))
+        worker.gather(minerals.minBy(_.getDistance(worker)))
       }
     }
   }

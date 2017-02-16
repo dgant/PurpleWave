@@ -5,6 +5,7 @@ import Plans.Plan
 import Startup.With
 import Strategies.UnitMatchers.UnitMatchWorker
 import Types.Property
+import bwapi.UnitCommandType
 
 import scala.collection.mutable
 
@@ -18,7 +19,7 @@ class GatherGas extends Plan {
   override def onFrame() {
     _workerPlan.quantity.set(_getMinerCount)
     workerPlan.get.onFrame()
-    _orderWorkers(workerPlan.get.units)
+    _orderWorkers()
   }
   
   def _ourRefineries:Iterable[bwapi.Unit] = {
@@ -34,8 +35,8 @@ class GatherGas extends Plan {
     workers
   }
   
-  def _orderWorkers(workers:Set[bwapi.Unit]) {
-    val unassignedWorkers = new mutable.HashSet[bwapi.Unit] ++= workers
+  def _orderWorkers() {
+    val unassignedWorkers = new mutable.HashSet[bwapi.Unit] ++= workerPlan.get.units
     _ourRefineries
       .foreach(refinery => {
         (1 to 3).foreach(i => {
@@ -44,7 +45,10 @@ class GatherGas extends Plan {
             unassignedWorkers.remove(worker)
             if ( ! worker.isGatheringGas) {
               if (worker.isCarryingMinerals || worker.isCarryingGas) {
-                worker.returnCargo()
+                //Can't spam return cargo
+                if (worker.getLastCommand.getUnitCommandType != UnitCommandType.Return_Cargo  || ! worker.isMoving) {
+                  worker.returnCargo()
+                }
               }
               else {
                 worker.gather(refinery)

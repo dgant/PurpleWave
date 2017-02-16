@@ -76,14 +76,8 @@ object Overlay {
     }
   }
   
-  def _getPlanNameOrDescription(plan:Plan):String = {
-    plan.description.get.getOrElse(plan.getClass.getSimpleName.replace("Plan", "").replace("$anon$", "Plan"))
-  }
-  
   def _describePlan(plan:Plan, childOrder:Integer, depth:Integer):String = {
-    val planName = _getPlanNameOrDescription(plan)
     val checkbox = if (plan.isComplete) "X " else "  "
-    
     val spacer = "  " * depth
     val leftColumn =
     (checkbox
@@ -91,7 +85,7 @@ object Overlay {
       ++ "#"
       ++ (childOrder + 1).toString
       ++ " "
-      ++ planName)
+      ++ plan.toString)
     
     leftColumn + " " * Math.max(0, 45 - leftColumn.length) + "\n"
   }

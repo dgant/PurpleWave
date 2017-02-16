@@ -19,4 +19,8 @@ abstract class LockUnits extends Plan {
   }
   
   def getRequiredUnits(candidates:Iterable[Iterable[bwapi.Unit]]):Option[Iterable[bwapi.Unit]]
+  
+  override def toString: String = {
+    super.toString + (if(isComplete) ": " + units.size else "")
+  }
 }

@@ -64,9 +64,9 @@ class TrainUnit(val traineeType:UnitType) extends Plan {
     
     if (isTraining) {
       if (ordered) {
-        //TODO: Make sure we verify that the unit is *not complete* so, say, a wraith floating over a Startport doesn't get linked
+        //TODO: Make sure we verify that the worker is *not complete* so, say, a wraith floating over a Startport doesn't get linked
         
-        //Note that it's possible for a building to briefly have a unit type in the queue with no unit created.
+        //Note that it's possible for a building to briefly have a worker type in the queue with no worker created.
         _trainee = With.ourUnits
           .filter(u =>
             u.getType == traineeType &&
@@ -76,8 +76,8 @@ class TrainUnit(val traineeType:UnitType) extends Plan {
           .headOption
         
         //There seems to be a 1+ frame delay between the queue getting started
-        //and the incomplete unit being created.
-        //So don't freak out if the unit doesn't show up right away
+        //and the incomplete worker being created.
+        //So don't freak out if the worker doesn't show up right away
       }
     }
     else {

@@ -12,18 +12,31 @@ class Recruiter {
   val _updatedRequests:mutable.Set[LockUnits] = mutable.Set.empty
 
   def onFrame() {
-    //Automatically free buildersOccupied held by dead requests
-    _unitsByRequest.keySet.diff(_updatedRequests).foreach(remove)
+    // Free units held by inactive requests
+    _unitsByRequest.keySet.diff(_updatedRequests).foreach(_forgetRequest)
     _updatedRequests.clear()
     
-    // Remove dead buildersOccupied
-    //
+    // Remove dead units
     _requestByUnit.keys.filterNot(id => With.unit(id).exists(u => u.exists)).foreach(_unassign)
     _unassignedUnits.filterNot(id => With.unit(id).exists(u => u.exists)).foreach(_unassignedUnits.remove)
     
-    // Add new buildersOccupied
-    //
+    // Add new units
     With.ourUnits.map(_.getID).diff(_unassignedUnits ++ _requestByUnit.keys).foreach(_unassignedUnits.add)
+    
+    //If we suspect any bugginess, enable this
+    //_test
+  }
+  
+  def _test {
+    _unitsByRequest.foreach(pair1 =>
+      _unitsByRequest.foreach(pair2 =>
+        if (pair1 != pair2) {
+          val intersection = pair1._2.intersect(pair2._2)
+          if (intersection.nonEmpty) {
+            With.logger.warn(pair1._1.toString + " and " + pair2._1.toString + " share " + intersection.size + " units")
+          }
+        }
+      ))
   }
   
   def onUnitDestroyed(unit:bwapi.Unit) {
@@ -63,7 +76,7 @@ class Recruiter {
 
     if (requiredUnits == None) {
       request.isSatisfied = false
-      remove(request)
+      _forgetRequest(request)
     }
     else {
       request.isSatisfied = true
@@ -82,7 +95,7 @@ class Recruiter {
     }
   }
   
-  def remove(request: LockUnits) {
+  def _forgetRequest(request: LockUnits) {
     _unitsByRequest.get(request).foreach(_.foreach(_unassign))
     _unitsByRequest.remove(request)
   }
@@ -95,7 +108,7 @@ class Recruiter {
   
   def _unassign(id:Int) {
     _unassignedUnits.add(id)
-    _requestByUnit.get(id).foreach(lock => _unitsByRequest.get(lock).foreach(unitSet => unitSet.remove(id)))
+    _requestByUnit.get(id).foreach(request => _unitsByRequest.get(request).foreach(_.remove(id)))
     _requestByUnit.remove(id)
   }
   

@@ -23,7 +23,7 @@ class DefeatWorkerHarass extends Plan {
     _enemyUpdateFrames
         .filter(pair => pair._2 + 8 < With.game.getFrameCount)
         .foreach(pair => {
-          _enemyDefense.get(pair._1).foreach(defenders => With.recruiter.remove(defenders))
+          _enemyDefense.get(pair._1).foreach(defenders => With.recruiter._forgetRequest(defenders))
           _enemyDefense.remove(pair._1)
           _enemyUpdateFrames.remove(pair._1)
         })

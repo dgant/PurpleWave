@@ -3,7 +3,7 @@ package Plans.GamePlans.Protoss
 import Plans.Generic.Army.DestroyEconomy
 import Plans.Generic.Compound.AllParallel
 import Plans.Generic.Defense.DefeatWorkerHarass
-import Plans.Generic.Macro.{BuildWorkersContinuously, GatherGas, GatherMinerals}
+import Plans.Generic.Macro.{BuildSupplyContinuously, BuildWorkersContinuously, GatherGas, GatherMinerals}
 import Types.Buildable.{Buildable, BuildableUnit}
 import bwapi.UnitType
 
@@ -55,6 +55,7 @@ class ProtossStrategyMacro extends AllParallel {
   )
   
   children.set(List(
+    new BuildSupplyContinuously,
     new BuildWorkersContinuously,
     //new FollowBuildOrder { this.buildables.set(_buildOrder) },
     new DefeatWorkerHarass,

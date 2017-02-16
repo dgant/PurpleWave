@@ -2,7 +2,7 @@ package Processes
 
 import Geometry.TileRectangle
 import Startup.With
-import bwapi.{Race, UnitCommandType}
+import bwapi.Race
 
 import scala.collection.JavaConverters._
 
@@ -50,18 +50,15 @@ class Economist {
       // 1. There are several associated UnitCommandTypes, including ReturnCargo
       // 2. We could also check the current ORDER, which cycles between things like "MiningMinerals" and "MoveToMinerals"
       // This will work for now, but will likely break when we start trying to micro harvesters
-      .filter(_.getLastCommand.getUnitCommandType == UnitCommandType.Gather)
+      .filter(worker => worker.isGatheringMinerals || worker.isGatheringGas)
   }
   
   def ourActiveMiners(miningArea:TileRectangle):Iterable[bwapi.Unit] = {
-    ourActiveHarvesters
-    //TODO: This fails because getOrderTarget can return invalid targets that NPE on property access
-    //ourActiveHarvesters(miningArea).filter(_.getOrderTarget.getType.isMineralField)
+    ourActiveHarvesters.filter(_.isGatheringMinerals)
   }
   
   def ourActiveDrillers(miningArea:TileRectangle):Iterable[bwapi.Unit] = {
-    List.empty
-    //ourActiveHarvesters(miningArea).filter(_.getOrderTarget.getType.isRefinery)
+    ourActiveHarvesters.filter(_.isGatheringGas)
   }
   
   def ourMineralIncomePerMinute:Integer = {

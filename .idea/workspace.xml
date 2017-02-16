@@ -27,11 +27,51 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="BuildWorkersContinuously.scala" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Economist.scala" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/Processes/Economist.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="150">
+              <caret line="56" column="53" lean-forward="false" selection-start-line="56" selection-start-column="53" selection-end-line="56" selection-end-column="53" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="BuildWorkersContinuously.scala" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Macro/BuildWorkersContinuously.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="151">
-              <caret line="47" column="52" lean-forward="false" selection-start-line="47" selection-start-column="52" selection-end-line="47" selection-end-column="52" />
+            <state relative-caret-position="234">
+              <caret line="21" column="34" lean-forward="false" selection-start-line="21" selection-start-column="34" selection-end-line="21" selection-end-column="34" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Polygon.class" pinned="false" current-in-tab="false">
+        <entry file="jar://$PROJECT_DIR$/lib/bwmirror_v2_5.jar!/bwta/Polygon.class">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="201">
+              <caret line="64" column="51" lean-forward="false" selection-start-line="64" selection-start-column="51" selection-end-line="64" selection-end-column="51" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="BuildSupplyContinuously.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Macro/BuildSupplyContinuously.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="54">
+              <caret line="16" column="28" lean-forward="false" selection-start-line="16" selection-start-column="8" selection-end-line="16" selection-end-column="28" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="AbstractBuildContinuously.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Macro/AbstractBuildContinuously.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="247">
+              <caret line="19" column="30" lean-forward="false" selection-start-line="19" selection-start-column="6" selection-end-line="19" selection-end-column="30" />
               <folding />
             </state>
           </provider>
@@ -50,8 +90,8 @@
       <file leaf-file-name="ProtossStrategyMacro.scala" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Plans/GamePlans/Protoss/ProtossStrategyMacro.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="378">
-              <caret line="57" column="32" lean-forward="false" selection-start-line="57" selection-start-column="32" selection-end-line="57" selection-end-column="32" />
+            <state relative-caret-position="236">
+              <caret line="41" column="47" lean-forward="false" selection-start-line="41" selection-start-column="47" selection-end-line="41" selection-end-column="47" />
               <folding />
             </state>
           </provider>
@@ -124,8 +164,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/Development/LoggerLevel.scala" />
-        <option value="$PROJECT_DIR$/src/Development/LogLevel.scala" />
         <option value="$PROJECT_DIR$/src/Plans/Generic/Allocation/LockUnitsNobody.scala" />
         <option value="$PROJECT_DIR$/src/Plans/Generic/Macro/BuildBuilding.scala" />
         <option value="$PROJECT_DIR$/src/Plans/GamePlans/Protoss/ProtossStrategyCheese.scala" />
@@ -171,10 +209,12 @@
         <option value="$PROJECT_DIR$/src/Plans/Generic/Macro/GatherGas.scala" />
         <option value="$PROJECT_DIR$/src/Processes/Recruiter.scala" />
         <option value="$PROJECT_DIR$/src/Plans/Generic/Compound/AllParallel.scala" />
-        <option value="$PROJECT_DIR$/src/Processes/Economist.scala" />
-        <option value="$PROJECT_DIR$/src/Plans/GamePlans/Protoss/ProtossStrategyMacro.scala" />
         <option value="$PROJECT_DIR$/src/Plans/Generic/Compound/AbstractPlanCompleteAll.scala" />
+        <option value="$PROJECT_DIR$/src/Plans/Generic/Macro/AbstractContinuousBuild.scala" />
+        <option value="$PROJECT_DIR$/src/Plans/GamePlans/Protoss/ProtossStrategyMacro.scala" />
+        <option value="$PROJECT_DIR$/src/Plans/Generic/Macro/BuildSupplyContinuously.scala" />
         <option value="$PROJECT_DIR$/src/Plans/Generic/Macro/BuildWorkersContinuously.scala" />
+        <option value="$PROJECT_DIR$/src/Processes/Economist.scala" />
       </list>
     </option>
   </component>
@@ -751,7 +791,7 @@
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.28654972" sideWeight="0.49411765" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.5423977" sideWeight="0.49411765" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.33040935" sideWeight="0.49411765" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -768,36 +808,11 @@
       <breakpoints-dialog>
         <breakpoints-dialog />
       </breakpoints-dialog>
-      <option name="time" value="513" />
+      <option name="time" value="521" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/Processes/Banker.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="299">
-          <caret line="23" column="44" lean-forward="true" selection-start-line="23" selection-start-column="44" selection-end-line="23" selection-end-column="44" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Processes/Mapping/MiningArea.scala" />
-    <entry file="file://$PROJECT_DIR$/src/Plans/Information/KnowEnemyBaseLocationFulfiller.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="249">
-          <caret line="20" column="55" lean-forward="true" selection-start-line="20" selection-start-column="55" selection-end-line="20" selection-end-column="55" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://C:/Program Files/Java/jdk1.8.0_121/src.zip!/java/lang/Class.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="76">
-          <caret line="524" column="6" lean-forward="true" selection-start-line="524" selection-start-column="6" selection-end-line="524" selection-end-column="6" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Development/AutoCamera.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="364">
@@ -1126,34 +1141,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Processes/Economist.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="41">
-          <caret line="80" column="82" lean-forward="true" selection-start-line="80" selection-start-column="82" selection-end-line="80" selection-end-column="82" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Plans/GamePlans/Protoss/ProtossStrategyMacro.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="378">
-          <caret line="57" column="32" lean-forward="false" selection-start-line="57" selection-start-column="32" selection-end-line="57" selection-end-column="32" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Startup/Bot.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="143">
           <caret line="39" column="6" lean-forward="false" selection-start-line="39" selection-start-column="6" selection-end-line="39" selection-end-column="6" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Compound/AbstractPlanCompleteAll.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="91">
-          <caret line="7" column="6" lean-forward="false" selection-start-line="7" selection-start-column="6" selection-end-line="7" selection-end-column="6" />
           <folding />
         </state>
       </provider>
@@ -1166,10 +1157,66 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Compound/AbstractPlanCompleteAll.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="91">
+          <caret line="7" column="6" lean-forward="false" selection-start-line="7" selection-start-column="6" selection-end-line="7" selection-end-column="6" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Macro/AbstractBuildContinuously.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="247">
+          <caret line="19" column="30" lean-forward="false" selection-start-line="19" selection-start-column="6" selection-end-line="19" selection-end-column="30" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Plans/GamePlans/Protoss/ProtossStrategyMacro.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="236">
+          <caret line="41" column="47" lean-forward="false" selection-start-line="41" selection-start-column="47" selection-end-line="41" selection-end-column="47" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$PROJECT_DIR$/lib/bwmirror_v2_5.jar!/bwapi/Game.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="80">
+          <caret line="428" column="0" lean-forward="true" selection-start-line="428" selection-start-column="0" selection-end-line="428" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Macro/BuildSupplyContinuously.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="54">
+          <caret line="16" column="28" lean-forward="false" selection-start-line="16" selection-start-column="8" selection-end-line="16" selection-end-column="28" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$PROJECT_DIR$/lib/bwmirror_v2_5.jar!/bwta/Polygon.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="201">
+          <caret line="64" column="51" lean-forward="false" selection-start-line="64" selection-start-column="51" selection-end-line="64" selection-end-column="51" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Macro/BuildWorkersContinuously.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="151">
-          <caret line="47" column="52" lean-forward="false" selection-start-line="47" selection-start-column="52" selection-end-line="47" selection-end-column="52" />
+        <state relative-caret-position="234">
+          <caret line="21" column="34" lean-forward="false" selection-start-line="21" selection-start-column="34" selection-end-line="21" selection-end-column="34" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Processes/Economist.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="56" column="53" lean-forward="false" selection-start-line="56" selection-start-column="53" selection-end-line="56" selection-end-column="53" />
           <folding />
         </state>
       </provider>

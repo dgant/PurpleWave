@@ -1,6 +1,6 @@
 package Processes
 
-import Types.Buildable
+import Types.Buildable.Buildable
 
 class Scheduler {
   

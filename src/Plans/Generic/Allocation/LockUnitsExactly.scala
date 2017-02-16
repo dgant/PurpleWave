@@ -20,7 +20,7 @@ class LockUnitsExactly extends LockUnits {
     val desiredUnits = With.recruiter.getUnits(this).to[mutable.Set]
     
       //The candidates are offered in pools.
-      //Originally, we wanted to force plans to hire from the unemployed pool first
+      //Originally, we wanted to force _plans to hire from the unemployed pool first
       //But that meant that when we had a strong preference, the pooling was overriding it
       //Flattening it basically retains the "welfare" effect, but still allows sorting to work
       candidates

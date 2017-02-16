@@ -1,4 +1,4 @@
-package Types
+package Types.Buildable
 
 import bwapi.{TechType, UnitType, UpgradeType}
 
@@ -43,6 +43,7 @@ class Buildable(
         UnitType.Protoss_High_Templar,
         UnitType.Protoss_Dark_Templar,
         UnitType.Zerg_Larva,
+        UnitType.Zerg_Drone,
         UnitType.Zerg_Hydralisk,
         UnitType.Zerg_Mutalisk,
         UnitType.Zerg_Creep_Colony,

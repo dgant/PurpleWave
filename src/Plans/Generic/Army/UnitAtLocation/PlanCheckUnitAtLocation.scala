@@ -1,4 +1,4 @@
-package Plans.Generic.Macro.UnitAtLocation
+package Plans.Generic.Army.UnitAtLocation
 
 import Plans.Plan
 import Startup.With

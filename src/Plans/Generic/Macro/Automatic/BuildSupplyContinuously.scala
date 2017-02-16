@@ -1,5 +1,6 @@
-package Plans.Generic.Macro
+package Plans.Generic.Macro.Automatic
 
+import Plans.Generic.Macro.BuildBuilding
 import Startup.With
 
 class BuildSupplyContinuously extends AbstractBuildContinuously[BuildBuilding] {

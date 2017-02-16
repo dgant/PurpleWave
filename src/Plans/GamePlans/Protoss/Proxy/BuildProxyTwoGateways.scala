@@ -4,7 +4,7 @@ import Caching.Cache
 import Plans.Generic.Allocation.{LockUnits, LockUnitsExactly}
 import Plans.Generic.Compound.{AllSerial, CompleteOnce}
 import Plans.Generic.Macro.BuildBuilding
-import Plans.Generic.Macro.UnitAtLocation.RequireUnitAtLocation
+import Plans.Generic.Army.UnitAtLocation.RequireUnitAtLocation
 import Plans.Information.RequireEnemyBaseLocation
 import Plans.Plan
 import Startup.With

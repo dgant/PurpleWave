@@ -1,5 +1,6 @@
-package Plans.Generic.Macro
+package Plans.Generic.Macro.Automatic
 
+import Plans.Generic.Macro.TrainUnit
 import Startup.With
 
 class BuildWorkersContinuously extends AbstractBuildContinuously[TrainUnit] {

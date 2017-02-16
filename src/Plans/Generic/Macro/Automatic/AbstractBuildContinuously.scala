@@ -1,4 +1,4 @@
-package Plans.Generic.Macro
+package Plans.Generic.Macro.Automatic
 
 import Plans.Plan
 

@@ -32,7 +32,7 @@ class DestroyEconomyFulfiller extends Plan {
     units.diff(_lastOrderFrame.keySet).foreach(_lastOrderFrame.put(_, 0))
       
     val targetPosition = With.scout.mostBaselikeEnemyBuilding.get.getPosition
-    val gatheringPosition = With.map.centerPosition
+    val gatheringPosition = With.ourUnits.filter(_.getType.isBuilding).minBy(_.getDistance(targetPosition)).getPosition
     
     val ourStrength = units.toSeq.map(_strength).sum
     val theirStrength = With.tracker.knownEnemyUnits.map(_strength).sum
@@ -70,7 +70,7 @@ class DestroyEconomyFulfiller extends Plan {
   
   def _issueOrder(fighter:bwapi.Unit, targetPosition:Position, shouldGather:Boolean, gatheringPosition:Position) {
     val baseRadius = 32 * 8
-    val combatRadius = 32 * 3
+    val combatRadius = Math.max(fighter.getType.groundWeapon.maxRange, 32 * 3)
     
     val weAreNearTheirBase = fighter.getPosition.getDistance(targetPosition) < baseRadius
     val workersNearTheirBase = With.game.getUnitsInRadius(targetPosition, baseRadius).asScala

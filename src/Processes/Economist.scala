@@ -112,4 +112,9 @@ class Economist {
         .map(_.size * 96)
         .sum
   }
+  
+  def ourMiningBases:Iterable[bwapi.Unit] = {
+    //TODO: Don't count macro hatches or bases without minerals
+    With.map.ourBaseHalls
+  }
 }

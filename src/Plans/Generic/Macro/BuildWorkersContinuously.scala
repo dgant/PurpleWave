@@ -1,11 +1,10 @@
 package Plans.Generic.Macro
 
-import Plans.Plan
 import Startup.With
 
-class BuildWorkersContinuously extends AbstractBuildContinuously {
+class BuildWorkersContinuously extends AbstractBuildContinuously[TrainUnit] {
   
-  override def _buildPlan:Plan = {
+  override def _buildPlan:TrainUnit = {
     //This only builds workers of our own race. Sad!
     new TrainUnit(With.game.self.getRace.getWorker)
   }

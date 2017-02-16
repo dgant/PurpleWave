@@ -23,7 +23,7 @@ class Architect {
       .find(position => _canBuild(buildingType, position, margin, exclusions))
   }
   
-  // Try to place a collection of buildingshy
+  // Try to place a collection of buildings
   def placeBuildings(
     buildingTypes:      Iterable[UnitType],
     center:             TilePosition,

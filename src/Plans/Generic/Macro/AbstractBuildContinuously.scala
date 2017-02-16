@@ -4,9 +4,9 @@ import Plans.Plan
 
 import scala.collection.mutable.ListBuffer
 
-abstract class AbstractBuildContinuously extends Plan {
+abstract class AbstractBuildContinuously[T <: Plan] extends Plan {
   
-  val _currentBuilds = new ListBuffer[Plan]
+  val _currentBuilds:ListBuffer[T] = ListBuffer.empty
   
   override def isComplete:Boolean = { getChildren.forall(_.isComplete) && _additionalPlansRequired == 0 }
   override def getChildren: Iterable[Plan] = _currentBuilds
@@ -18,5 +18,5 @@ abstract class AbstractBuildContinuously extends Plan {
   }
   
   def _additionalPlansRequired:Int
-  def _buildPlan:Plan
+  def _buildPlan:T
 }

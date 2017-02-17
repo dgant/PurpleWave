@@ -40,7 +40,7 @@ class DestroyEconomyFulfiller extends Plan {
       units.map(_.getPosition.getY).sum / units.size)
     val targetPosition = With.scout.mostBaselikeEnemyBuilding.get.getPosition
     
-    val ourStrength = units.filter(_.getDistance(centroid) < 32 * 8).map(_strength).sum
+    val ourStrength = units.filter(_.getDistance(centroid) < 32 * 5).map(_strength).sum
     val theirStrength = With.tracker.knownEnemyUnits.map(_strength).sum
     val shouldGather = units.size < 12 && ourStrength < theirStrength
     

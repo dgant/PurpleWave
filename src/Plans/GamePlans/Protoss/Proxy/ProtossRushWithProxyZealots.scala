@@ -2,12 +2,36 @@ package Plans.GamePlans.Protoss.Proxy
 
 import Plans.Generic.Army.DestroyEconomy
 import Plans.Generic.Compound.{AllParallel, AllSerial, CompleteOnce}
-import Plans.Generic.Macro.{BuildBuilding, TrainUnit}
-import bwapi.UnitType
+import Plans.Generic.Macro.Automatic.{BuildGatewayUnitsContinuously, BuildSupplyContinuously, BuildWorkersContinuously}
+import Plans.Generic.Macro.{FollowBuildOrder, TrainUnit}
+import Types.Buildable.{Buildable, BuildableUnit, BuildableUpgrade}
+import bwapi.{UnitType, UpgradeType}
 
 class ProtossRushWithProxyZealots
   extends AllSerial {
-
+  
+  val _laterBuildOrder = List[Buildable] (
+    new BuildableUnit(UnitType.Protoss_Gateway),
+    new BuildableUnit(UnitType.Protoss_Gateway),
+    new BuildableUnit(UnitType.Protoss_Gateway),
+    new BuildableUnit(UnitType.Protoss_Gateway),
+    new BuildableUnit(UnitType.Protoss_Cybernetics_Core),
+    new BuildableUnit(UnitType.Protoss_Assimilator),
+    new BuildableUpgrade(UpgradeType.Singularity_Charge),
+    new BuildableUnit(UnitType.Protoss_Forge),
+    new BuildableUpgrade(UpgradeType.Protoss_Ground_Weapons, 1),
+    new BuildableUpgrade(UpgradeType.Protoss_Ground_Armor, 1),
+    new BuildableUnit(UnitType.Protoss_Citadel_of_Adun),
+    new BuildableUpgrade(UpgradeType.Leg_Enhancements),
+    new BuildableUnit(UnitType.Protoss_Templar_Archives),
+    new BuildableUpgrade(UpgradeType.Protoss_Ground_Weapons, 2),
+    new BuildableUnit(UnitType.Protoss_Gateway),
+    new BuildableUpgrade(UpgradeType.Protoss_Ground_Weapons, 3),
+    new BuildableUpgrade(UpgradeType.Protoss_Ground_Armor, 1),
+    new BuildableUpgrade(UpgradeType.Protoss_Ground_Armor, 2),
+    new BuildableUpgrade(UpgradeType.Protoss_Ground_Armor, 3)
+  )
+  
   children.set(List(
     new CompleteOnce { child.set(new TrainUnit(UnitType.Protoss_Probe)) },
     new CompleteOnce { child.set(new TrainUnit(UnitType.Protoss_Probe)) },
@@ -16,41 +40,11 @@ class ProtossRushWithProxyZealots
       new CompleteOnce { child.set(new TrainUnit(UnitType.Protoss_Probe)) },
       new CompleteOnce { child.set(new TrainUnit(UnitType.Protoss_Probe)) }, //Probe #8, enough to support two Gateways
       //It takes about 4 probes to continuously produce a zealot at a time.
-      new TrainUnit(UnitType.Protoss_Zealot), // 10/17
       new DestroyEconomy,
-      new TrainUnit(UnitType.Protoss_Probe), //9p 11/17
-      new TrainUnit(UnitType.Protoss_Zealot), //13/17
-      new TrainUnit(UnitType.Protoss_Probe), //10p 15/17
-      new TrainUnit(UnitType.Protoss_Zealot), // 17/17
-      new BuildBuilding(UnitType.Protoss_Pylon),
-      // 8 supply available
-      
-      new TrainUnit(UnitType.Protoss_Zealot),
-      new TrainUnit(UnitType.Protoss_Probe), //11
-      new TrainUnit(UnitType.Protoss_Probe), //12 -- enough for three gateways
-      new TrainUnit(UnitType.Protoss_Zealot),
-      new BuildBuilding(UnitType.Protoss_Pylon),
-      new BuildBuilding(UnitType.Protoss_Gateway),
-      //10 supply available
-      new TrainUnit(UnitType.Protoss_Zealot),
-      new TrainUnit(UnitType.Protoss_Zealot),
-      new TrainUnit(UnitType.Protoss_Probe), //13
-      new TrainUnit(UnitType.Protoss_Probe), //14
-      new TrainUnit(UnitType.Protoss_Probe), //15
-      new TrainUnit(UnitType.Protoss_Probe), //16 -- maybe enough for four gateways
-      new BuildBuilding(UnitType.Protoss_Pylon),
-      //10 supply available
-      new TrainUnit(UnitType.Protoss_Probe), //17
-      new BuildBuilding(UnitType.Protoss_Gateway),
-      new TrainUnit(UnitType.Protoss_Probe), //18 -- about enough for four gateways
-      new TrainUnit(UnitType.Protoss_Zealot),
-      new TrainUnit(UnitType.Protoss_Zealot),
-      new TrainUnit(UnitType.Protoss_Zealot),
-      new BuildBuilding(UnitType.Protoss_Pylon),
-      new TrainUnit(UnitType.Protoss_Zealot),
-      new TrainUnit(UnitType.Protoss_Zealot),
-      new TrainUnit(UnitType.Protoss_Zealot),
-      new TrainUnit(UnitType.Protoss_Zealot)
+      new BuildSupplyContinuously,
+      new BuildGatewayUnitsContinuously,
+      new BuildWorkersContinuously,
+      new FollowBuildOrder { buildables.set(_laterBuildOrder) }
     ))}
   ))
 }

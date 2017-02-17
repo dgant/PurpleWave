@@ -26,6 +26,7 @@ class GatherGas extends Plan {
   }
   
   def _getMinerCount:Int = {
+    //TODO: Stop taking guys off gas if we're saturated on minerals
     if (With.game.self.gas > Math.max(400, With.game.self.minerals)) {
       return 0
     }

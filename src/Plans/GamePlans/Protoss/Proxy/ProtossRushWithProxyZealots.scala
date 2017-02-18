@@ -35,6 +35,7 @@ class ProtossRushWithProxyZealots extends AllSerial {
   children.set(List(
     new CompleteOnce { child.set(new TrainUnit(UnitType.Protoss_Probe)) },
     new CompleteOnce { child.set(new TrainUnit(UnitType.Protoss_Probe)) },
+    new CompleteOnce { child.set(new TrainUnit(UnitType.Protoss_Probe)) },
     new CompleteOnce { child.set(
       new AllParallel { children.set(List(
         new CompleteOnce { child.set(new BuildProxyTwoGateways) },

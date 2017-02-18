@@ -56,6 +56,7 @@ class DestroyEconomyFulfiller extends Plan {
     _lastOrderFrame(unit) < With.game.getFrameCount - 24
   }
   
+  val _easyUnits = Set(UnitType.Terran_Marine, UnitType.Protoss_Dragoon)
   val _scaryUnits = Set(UnitType.Protoss_Photon_Cannon, UnitType.Zerg_Sunken_Colony, UnitType.Terran_Vulture)
   
   def _strength(unit:EnemyUnitInfo):Int = {
@@ -70,13 +71,16 @@ class DestroyEconomyFulfiller extends Plan {
   
   def _strength(unitType:UnitType):Int = {
     if (unitType.isWorker) { return 0 }
-    if ( ! unitType.canAttack) { return 0 }
-    return (unitType.mineralPrice + unitType.gasPrice) * (if(_scaryUnits.contains(unitType)) 2 else 1)
+    if ( ! unitType.canAttack && unitType != UnitType.Terran_Bunker) { return 0 }
+    return (unitType.mineralPrice + unitType.gasPrice) *
+      (if(_scaryUnits.contains(unitType)) { 3 }
+      else if (_easyUnits.contains(unitType)) { 1 }
+      else 2)
   }
   
   def _issueOrder(fighter:bwapi.Unit, targetPosition:Position, shouldGather:Boolean, gatheringPosition:Position) {
     val baseRadius = 32 * 8
-    val combatRadius = fighter.getType.groundWeapon.maxRange + 32 * 2
+    val combatRadius = fighter.getType.groundWeapon.maxRange + 32 * 3
     
     val weAreNearTheirBase = fighter.getPosition.getDistance(targetPosition) < baseRadius
     val workersNearTheirBase = With.game.getUnitsInRadius(targetPosition, baseRadius).asScala

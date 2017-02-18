@@ -30,7 +30,6 @@ class BuildProxyTwoGateways extends Plan {
   val unitPreference = new Property[UnitPreference](new UnitPreferClose {
     this.positionFinder.inherit(meBPTG.positionFinder)
   })
-  
   val builderPlan = new Property[LockUnits](new LockUnitsExactly {
     this.description.set(Some("Lock a proxy builder"))
     this.unitMatcher.inherit(meBPTG.unitMatcher)
@@ -57,9 +56,6 @@ class BuildProxyTwoGateways extends Plan {
     this.builderPlan.inherit(meBPTG.builderPlan)
     this.positionFinder.set(new PositionSpecific(_proxyPositions.get.drop(2).head))
   })
-  val scoutingPlan = new Property[Plan](new RequireEnemyBaseLocation {
-    this.scoutPlan.inherit(meBPTG.builderPlan)
-  })
   
   val _completeSendBuilderOnce = new CompleteOnce {
     child.inherit(sendBuilderPlan)
@@ -82,9 +78,6 @@ class BuildProxyTwoGateways extends Plan {
     if ( ! _child.isComplete) {
       _child.onFrame()
     }
-    if (gateway2Plan.get.startedBuilding && ! gateway2Plan.get.isComplete) {
-      scoutingPlan.get.onFrame()
-    }
   }
   
   def _updateGrandchildren() {
@@ -94,8 +87,7 @@ class BuildProxyTwoGateways extends Plan {
       sendBuilderPlan.get,
       pylonPlan.get,
       gateway1Plan.get,
-      gateway2Plan.get,
-      scoutingPlan.get
+      gateway2Plan.get
     ))
   }
   

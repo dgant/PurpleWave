@@ -80,8 +80,7 @@ class DestroyEconomyFulfiller extends Plan {
     }
     */
   
-    val baseRadius = 32 * 8
-    val combatRange = 32 * 6
+    val baseRadius = 32 * 4
     val weAreByTheirWorkerLine = fighter.getPosition.getDistance(targetPosition) < baseRadius
     if (weAreByTheirWorkerLine) {
       val enemyFightersNearby = With.game.getUnitsInRadius(targetPosition, baseRadius).asScala
@@ -96,6 +95,7 @@ class DestroyEconomyFulfiller extends Plan {
       }
     }
     else {
+      val combatRange = 32 * 6
       val nearbyUnits = With.game.getUnitsInRadius(fighter.getPosition, combatRange).asScala
       val nearbyEnemies = nearbyUnits.filter(_.getPlayer.isEnemy(With.game.self))
       
@@ -105,12 +105,12 @@ class DestroyEconomyFulfiller extends Plan {
         val nearbyAllies = nearbyUnits.filter(_.getPlayer.isAlly(With.game.self))
         val ourStrength = nearbyAllies.map(_strength).sum
         val theirStrength = nearbyEnemies.map(_strength).sum
-        val shouldFallback = ourStrength < theirStrength && ! nearbyUnits.exists(_.getType.isBuilding)
+        val shouldFallback = ourStrength < theirStrength && ! nearbyAllies.exists(_.getType.isBuilding)
   
         if (shouldFallback) {
           fighter.move(fallbackPosition)
         } else {
-          nearbyEnemies.sortBy(_.getDistance(fighter) / 32).minBy(enemy => enemy.getHitPoints + enemy.getShields)
+          fighter.attack(nearbyEnemies.sortBy(_.getDistance(fighter) / 32).minBy(enemy => enemy.getHitPoints + enemy.getShields))
         }
       }
     }

@@ -13,28 +13,21 @@ class FollowBuildOrder extends Plan {
   description.set(Some("Follow a build order"))
   
   val buildables = new Property[Iterable[Buildable]](List.empty)
-  
-  var _buildsToFulfill:Iterable[Buildable] = List.empty
   val _plans = new mutable.HashMap[Buildable, Plan]
-  val _unitIdsFromCompletedBuilds = new mutable.HashMap[Buildable, Int]
   
-  override def getChildren: Iterable[Plan] = {
-    _buildsToFulfill.filter(_plans.contains).map(_plans(_))
-  }
+  override def getChildren: Iterable[Plan] = { buildables.get.map(_plans.get).filter(_.nonEmpty).map(_.get) }
   
   override def onFrame() {
-    val buildsRecentlyCompleted   = _plans.filter(_._2.isComplete).keySet
-    val buildsRecentlyDestroyed   = _unitIdsFromCompletedBuilds.filter(pair => With.unit(pair._2).isEmpty)
     val unitsWanted               = new mutable.HashMap[UnitType, Int]
     val unitsActual               = With.ourUnits.groupBy(_.getType).mapValues(_.size)
-    
-    _buildsToFulfill              = buildables.get
-                                      .filterNot(buildsRecentlyCompleted.contains)
-                                      .toList
-                                      .sortBy(buildsRecentlyDestroyed.contains) //Redo destroyed builds first
-                                      .filterNot(_isFulfilled(_, unitsWanted, unitsActual))
-    
-    val buildsThatNeedPlans = _buildsToFulfill.filterNot(_plans.contains)
+    val buildsRecentlyCompleted   = _plans.filter(_._2.isComplete).keySet
+    val buildsToFulfill           = buildables.get
+                                    .filterNot(buildsRecentlyCompleted.contains)
+                                    .toList
+                                    .filterNot(_isFulfilled(_, unitsWanted, unitsActual))
+  
+    buildsRecentlyCompleted.foreach(_plans.remove)
+    val buildsThatNeedPlans = buildsToFulfill.filterNot(_plans.contains)
     buildsThatNeedPlans.foreach(order => _plans(order) = _buildPlan(order))
     getChildren.foreach(_.onFrame())
   }

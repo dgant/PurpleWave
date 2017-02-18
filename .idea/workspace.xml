@@ -27,21 +27,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="DestroyEconomyFulfiller.scala" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Army/DestroyEconomyFulfiller.scala">
+      <file leaf-file-name="FollowBuildOrder.scala" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Macro/FollowBuildOrder.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="245">
-              <caret line="92" column="28" lean-forward="true" selection-start-line="92" selection-start-column="28" selection-end-line="92" selection-end-column="28" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="BuildGatewayUnitsContinuously.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Macro/Automatic/BuildGatewayUnitsContinuously.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="156">
-              <caret line="12" column="55" lean-forward="false" selection-start-line="12" selection-start-column="55" selection-end-line="12" selection-end-column="55" />
+            <state relative-caret-position="125">
+              <caret line="23" column="22" lean-forward="true" selection-start-line="23" selection-start-column="22" selection-end-line="23" selection-end-column="22" />
               <folding />
             </state>
           </provider>
@@ -146,7 +136,6 @@
         <option value="$PROJECT_DIR$/src/Plans/Generic/Macro/ResearchTech.scala" />
         <option value="$PROJECT_DIR$/src/Plans/Generic/Allocation/LockCurrencyForUpgrade.scala" />
         <option value="$PROJECT_DIR$/src/Plans/Generic/Macro/ResearchUpgrade.scala" />
-        <option value="$PROJECT_DIR$/src/Plans/Generic/Macro/FollowBuildOrder.scala" />
         <option value="$PROJECT_DIR$/src/Plans/GamePlans/Protoss/ProtossStrategyMacro.scala" />
         <option value="$PROJECT_DIR$/src/Plans/GamePlans/PlanWinTheGame.scala" />
         <option value="$PROJECT_DIR$/src/Plans/GamePlans/Protoss/ProtossStrategyCheese.scala" />
@@ -155,6 +144,7 @@
         <option value="$PROJECT_DIR$/src/Plans/GamePlans/Protoss/Proxy/ProtossRushWithProxyZealots.scala" />
         <option value="$PROJECT_DIR$/src/Plans/Generic/Army/DestroyEconomyFulfiller.scala" />
         <option value="$PROJECT_DIR$/src/Plans/Generic/Macro/Automatic/BuildGatewayUnitsContinuously.scala" />
+        <option value="$PROJECT_DIR$/src/Plans/Generic/Macro/FollowBuildOrder.scala" />
       </list>
     </option>
   </component>
@@ -648,6 +638,36 @@
               <option name="myItemId" value="src" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Plans" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="GamePlans" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Protoss" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Proxy" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="PurpleWave1" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="PurpleWave1" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
           </PATH>
         </subPane>
       </pane>
@@ -894,7 +914,7 @@
       <breakpoints-dialog>
         <breakpoints-dialog />
       </breakpoints-dialog>
-      <option name="time" value="523" />
+      <option name="time" value="530" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -1219,14 +1239,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Macro/FollowBuildOrder.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="357">
-          <caret line="73" column="42" lean-forward="true" selection-start-line="73" selection-start-column="42" selection-end-line="73" selection-end-column="42" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Plans/GamePlans/Protoss/ProtossStrategyMacro.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="296">
@@ -1275,14 +1287,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Plans/GamePlans/Protoss/Proxy/ProtossRushWithProxyZealots.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="37">
-          <caret line="34" column="20" lean-forward="true" selection-start-line="34" selection-start-column="20" selection-end-line="34" selection-end-column="20" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Army/DestroyEconomy.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="193">
@@ -1301,8 +1305,24 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Army/DestroyEconomyFulfiller.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="245">
-          <caret line="92" column="28" lean-forward="true" selection-start-line="92" selection-start-column="28" selection-end-line="92" selection-end-column="28" />
+        <state relative-caret-position="180">
+          <caret line="72" column="39" lean-forward="true" selection-start-line="72" selection-start-column="39" selection-end-line="72" selection-end-column="39" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Plans/GamePlans/Protoss/Proxy/ProtossRushWithProxyZealots.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="297">
+          <caret line="51" column="18" lean-forward="false" selection-start-line="51" selection-start-column="18" selection-end-line="51" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Plans/Generic/Macro/FollowBuildOrder.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="125">
+          <caret line="23" column="22" lean-forward="true" selection-start-line="23" selection-start-column="22" selection-end-line="23" selection-end-column="22" />
           <folding />
         </state>
       </provider>

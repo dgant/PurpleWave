@@ -1,5 +1,6 @@
 package Processes
 
+import Plans.Plan
 import Types.Buildable.Buildable
 
 class Scheduler {
@@ -10,6 +11,10 @@ class Scheduler {
     
   
    */
+  
+  def request(requester:Plan, buildable: Buildable) {
+    
+  }
   
   def queue:Iterable[Buildable] = {
     List.empty

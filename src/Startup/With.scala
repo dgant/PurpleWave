@@ -12,6 +12,7 @@ object With {
   var architect:Architect = null
   var bank:Banker = null
   var economist:Economist = null
+  var history:History = null
   var logger:Logger = null
   var map:Map = null
   var gameplan:PlanWinTheGame = null

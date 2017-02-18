@@ -22,6 +22,7 @@ class Bot() extends DefaultBWListener {
       With.economist = new Economist
       With.map = new Map
       With.gameplan = new PlanWinTheGame
+      With.history = new History
       With.prioritizer = new Prioritizer
       With.recruiter = new Recruiter
       With.scheduler = new Scheduler
@@ -59,6 +60,7 @@ class Bot() extends DefaultBWListener {
   override def onUnitDestroy(unit: bwapi.Unit) {
     _try(() => {
       With.tracker.onUnitDestroy(unit)
+      With.history.onUnitDestroy(unit)
       AutoCamera.focusUnit(unit)
     })
   }

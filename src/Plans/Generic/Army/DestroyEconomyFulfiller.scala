@@ -5,6 +5,7 @@ import Plans.Plan
 import Startup.With
 import Types.{EnemyUnitInfo, Property}
 import bwapi.{Position, UnitType}
+import bwta.BWTA
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
@@ -35,25 +36,84 @@ class DestroyEconomyFulfiller extends Plan {
     _lastOrderFrame.keySet.diff(units).foreach(_lastOrderFrame.remove)
     units.diff(_lastOrderFrame.keySet).foreach(_lastOrderFrame.put(_, 0))
     
-    val centroid = new Position(
-      units.map(_.getPosition.getX).sum / units.size,
-      units.map(_.getPosition.getY).sum / units.size)
-    val targetPosition = With.scout.mostBaselikeEnemyBuilding.get.getPosition
+    if ( ! units.exists(_canOrder)) {
+      return
+    }
     
-    val ourStrength = units.filter(_.getDistance(centroid) < 32 * 5).map(_strength).sum
-    val theirStrength = With.tracker.knownEnemyUnits.map(_strength).sum
-    val shouldGather = units.size < 12 && ourStrength < theirStrength
+    val enemyHasWorkersLeft =
+      With.tracker.knownEnemyUnits.filter(_.getType.isWorker).size > 0 ||
+      List(UnitType.Protoss_Probe, UnitType.Terran_SCV, UnitType.Zerg_Drone).map(With.history.destroyedEnemyUnits(_)).sum < 3
+  
+    val baselikePosition = With.scout.mostBaselikeEnemyBuilding.get.getPosition
+    val targetPosition = if (enemyHasWorkersLeft) {
+      BWTA.getNearestBaseLocation(baselikePosition).getPosition
+    } else {
+      baselikePosition
+    }
+    val fallbackPosition = With.ourUnits.filter(_.getType.isBuilding).map(_.getPosition).minBy(_.getDistance(targetPosition))
     
     units
       .filter(_canOrder)
       .foreach(unit => {
-        _issueOrder(unit, targetPosition, shouldGather, centroid)
+        _issueOrder(unit, targetPosition, fallbackPosition)
         _lastOrderFrame(unit) = With.game.getFrameCount
       })
   }
   
   def _canOrder(unit:bwapi.Unit):Boolean = {
     _lastOrderFrame(unit) < With.game.getFrameCount - 24
+  }
+  
+  def _issueOrder(fighter:bwapi.Unit, targetPosition:Position, fallbackPosition:Position) {
+  
+    /*
+    Each unit:
+    if (We are close to the mineral line) {
+      Select the best target and hit it.
+    }
+    else {
+      if (We locally outnumber the enemy) {
+        Select the best target and hit it.
+      } else {
+        Retreat towards the forward position
+      }
+    }
+    */
+  
+    val baseRadius = 32 * 8
+    val combatRange = 32 * 6
+    val weAreByTheirWorkerLine = fighter.getPosition.getDistance(targetPosition) < baseRadius
+    if (weAreByTheirWorkerLine) {
+      val enemyFightersNearby = With.game.getUnitsInRadius(targetPosition, baseRadius).asScala
+        .filter(_.getPlayer.isEnemy(With.game.self))
+        .filter(_.getType.canAttack)
+        .filterNot(_.isFlying)
+      if (enemyFightersNearby.nonEmpty) {
+        fighter.attack(enemyFightersNearby.minBy(_.getDistance(fighter)))
+      }
+      else if (With.tracker.knownEnemyUnits.nonEmpty) {
+        fighter.patrol(With.tracker.knownEnemyUnits.minBy(enemy => fighter.getDistance(enemy.getPosition)).getPosition)
+      }
+    }
+    else {
+      val nearbyUnits = With.game.getUnitsInRadius(fighter.getPosition, combatRange).asScala
+      val nearbyEnemies = nearbyUnits.filter(_.getPlayer.isEnemy(With.game.self))
+      
+      if (nearbyEnemies.isEmpty) {
+        fighter.move(targetPosition)
+      } else {
+        val nearbyAllies = nearbyUnits.filter(_.getPlayer.isAlly(With.game.self))
+        val ourStrength = nearbyAllies.map(_strength).sum
+        val theirStrength = nearbyEnemies.map(_strength).sum
+        val shouldFallback = ourStrength < theirStrength && ! nearbyUnits.exists(_.getType.isBuilding)
+  
+        if (shouldFallback) {
+          fighter.move(fallbackPosition)
+        } else {
+          nearbyEnemies.sortBy(_.getDistance(fighter) / 32).minBy(enemy => enemy.getHitPoints + enemy.getShields)
+        }
+      }
+    }
   }
   
   val _easyUnits = Set(UnitType.Terran_Marine, UnitType.Protoss_Dragoon)
@@ -76,40 +136,5 @@ class DestroyEconomyFulfiller extends Plan {
       (if(_scaryUnits.contains(unitType)) { 3 }
       else if (_easyUnits.contains(unitType)) { 1 }
       else 2)
-  }
-  
-  def _issueOrder(fighter:bwapi.Unit, targetPosition:Position, shouldGather:Boolean, gatheringPosition:Position) {
-    val baseRadius = 32 * 8
-    val combatRadius = fighter.getType.groundWeapon.maxRange + 32 * 3
-    
-    val weAreNearTheirBase = fighter.getPosition.getDistance(targetPosition) < baseRadius
-    val workersNearTheirBase = With.game.getUnitsInRadius(targetPosition, baseRadius).asScala
-        .filter(_.getPlayer.isEnemy(With.game.self))
-        .filter(_.getType.isWorker)
-    
-    val enemyFightersNearby = fighter.getUnitsInRadius(combatRadius).asScala
-      .filter(_.getPlayer.isEnemy(With.game.self))
-      .filter(_.getType.canAttack)
-      .filterNot(_.isFlying)
-  
-    if (enemyFightersNearby.nonEmpty) {
-      fighter.attack(enemyFightersNearby.sortBy(_.getDistance(fighter)).head)
-    }
-    else if (weAreNearTheirBase) {
-      if (workersNearTheirBase.nonEmpty) {
-        fighter.attack(workersNearTheirBase.sortBy(_.getDistance(fighter)).head)
-      }
-      else if (With.tracker.knownEnemyUnits.exists(! _.getType.isFlyer)) {
-        fighter.patrol(With.tracker.knownEnemyUnits.minBy(enemy => fighter.getDistance(enemy.getPosition)).getPosition)
-      }
-    }
-    else {
-      if (shouldGather) {
-        fighter.attack(gatheringPosition)
-      }
-      else {
-        fighter.move(targetPosition)
-      }
-    }
   }
 }

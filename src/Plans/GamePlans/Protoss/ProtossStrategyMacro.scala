@@ -1,10 +1,11 @@
 package Plans.GamePlans.Protoss
 
-import Plans.Generic.Army.DestroyEconomy
-import Plans.Generic.Compound.AllParallel
-import Plans.Generic.Defense.DefeatWorkerHarass
-import Plans.Generic.Macro.Automatic.{BuildGatewayUnitsContinuously, BuildSupplyContinuously, BuildWorkersContinuously}
-import Plans.Generic.Macro._
+import Plans.Army.DestroyEconomy
+import Plans.Compound.AllParallel
+import Plans.Defense.DefeatWorkerHarass
+import Plans.Macro.Automatic._
+import Plans.Macro.Build.FollowBuildOrder
+import Plans.Macro._
 import Types.Buildable.{Buildable, BuildableUnit, BuildableUpgrade}
 import bwapi.{UnitType, UpgradeType}
 

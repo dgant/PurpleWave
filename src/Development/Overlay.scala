@@ -1,6 +1,6 @@
 package Development
 
-import Plans.Generic.Allocation.{LockCurrency, LockUnits}
+import Plans.Allocation.{LockCurrency, LockUnits}
 import Plans.Plan
 import Startup.With
 import Types.EnemyUnitInfo

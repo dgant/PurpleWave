@@ -1,7 +1,7 @@
 package Processes
 
 import Startup.With
-import Plans.Generic.Allocation.LockCurrency
+import Plans.Allocation.LockCurrency
 
 import scala.collection.mutable
 

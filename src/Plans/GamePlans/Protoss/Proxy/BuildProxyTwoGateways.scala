@@ -1,11 +1,11 @@
 package Plans.GamePlans.Protoss.Proxy
 
 import Caching.Cache
-import Plans.Generic.Allocation.{LockUnits, LockUnitsExactly}
-import Plans.Generic.Compound.{AllSerial, CompleteOnce}
-import Plans.Generic.Macro.BuildBuilding
-import Plans.Generic.Army.UnitAtLocation.RequireUnitAtLocation
+import Plans.Allocation.{LockUnits, LockUnitsExactly}
+import Plans.Compound.{AllSerial, CompleteOnce}
+import Plans.Army.UnitAtLocation.RequireUnitAtLocation
 import Plans.Information.RequireEnemyBaseLocation
+import Plans.Macro.Build.BuildBuilding
 import Plans.Plan
 import Startup.With
 import Strategies.PositionFinders.{PositionCenter, PositionFinder, PositionSpecific}

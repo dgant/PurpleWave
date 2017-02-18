@@ -1,7 +1,7 @@
 package Plans.Information
 
-import Plans.Generic.Allocation.{LockUnits, LockUnitsExactly}
-import Plans.Generic.Compound.AbstractPlanFulfillRequirements
+import Plans.Allocation.{LockUnits, LockUnitsExactly}
+import Plans.Compound.AbstractPlanFulfillRequirements
 import Strategies.PositionFinders.{PositionCenter, PositionFinder}
 import Strategies.UnitMatchers.{UnitMatchMobile, UnitMatcher}
 import Strategies.UnitPreferences.{UnitPreferClose, UnitPreference}

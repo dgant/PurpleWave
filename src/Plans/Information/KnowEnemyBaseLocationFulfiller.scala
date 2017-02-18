@@ -1,6 +1,6 @@
 package Plans.Information
 
-import Plans.Generic.Allocation.{LockUnits, LockUnitsExactly}
+import Plans.Allocation.{LockUnits, LockUnitsExactly}
 import Plans.Plan
 import Startup.With
 import Strategies.PositionFinders.{PositionCenter, PositionFinder, PositionSpecific}

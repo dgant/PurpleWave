@@ -1,9 +1,9 @@
 package Plans.GamePlans.Protoss
 
 import Plans.GamePlans.Protoss.Proxy.ProtossRushWithProxyZealots
-import Plans.Generic.Compound.AllParallel
-import Plans.Generic.Defense.DefeatWorkerHarass
-import Plans.Generic.Macro.{GatherGas, GatherMinerals}
+import Plans.Compound.AllParallel
+import Plans.Defense.DefeatWorkerHarass
+import Plans.Macro.Automatic.{GatherGas, GatherMinerals}
 
 class ProtossStrategyCheese extends AllParallel {
   children.set(List(

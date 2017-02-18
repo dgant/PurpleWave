@@ -1,6 +1,6 @@
 package Processes
 
-import Plans.Generic.Allocation.LockUnits
+import Plans.Allocation.LockUnits
 import Startup.With
 
 import scala.collection.mutable

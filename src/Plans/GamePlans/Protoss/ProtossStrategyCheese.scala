@@ -9,7 +9,7 @@ class ProtossStrategyCheese extends AllParallel {
   children.set(List(
     new ProtossRushWithProxyZealots,
     new DefeatWorkerHarass,
-    new GatherMinerals,
-    new GatherGas
+    new GatherGas,
+    new GatherMinerals
   ))
 }

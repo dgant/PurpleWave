@@ -38,8 +38,9 @@ class ProtossRushWithProxyZealots
     new AllParallel { children.set(List(
       new CompleteOnce { child.set(new BuildProxyTwoGateways) },
       new CompleteOnce { child.set(new TrainUnit(UnitType.Protoss_Probe)) },
-      new CompleteOnce { child.set(new TrainUnit(UnitType.Protoss_Probe)) }, //Probe #8, enough to support two Gateways
-      //It takes about 4 probes to continuously produce a zealot at a time.
+      new CompleteOnce { child.set(new TrainUnit(UnitType.Protoss_Probe)) }
+    ))},
+    new AllParallel { children.set(List(
       new DestroyEconomy,
       new BuildSupplyContinuously,
       new BuildGatewayUnitsContinuously,

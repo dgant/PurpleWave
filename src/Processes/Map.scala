@@ -38,15 +38,21 @@ class Map {
     ourBaseHalls.map(base => {
       val nearbyUnits = base.getUnitsInRadius(32 * 10).asScala
   
-      val minerals = nearbyUnits.filter(_.getType == UnitType.Resource_Mineral_Field)
-      val geysers = nearbyUnits.filter(unit => unit.getType.isRefinery || unit.getType == UnitType.Resource_Vespene_Geyser)
-      val boxedUnits = minerals ++ geysers :+ base
+      val minerals = nearbyUnits
+        .filter(_.getType == UnitType.Resource_Mineral_Field)
+        .map(_.getPosition)
+      
+      val geysers = nearbyUnits
+        .filter(unit => unit.getType.isRefinery || unit.getType == UnitType.Resource_Vespene_Geyser)
+        .flatten(unit => List(new Position(unit.getX - 32, unit.getY), new Position(unit.getX + 32, unit.getY)))
+      
+      val boxedUnits = minerals ++ geysers :+ base.getPosition
       
       //Draw a box around the area
-      val top    = boxedUnits.map(_.getPosition.getY).min + 16
-      val bottom = boxedUnits.map(_.getPosition.getY).max + 16
-      val left   = boxedUnits.map(_.getPosition.getX).min + 16
-      val right  = boxedUnits.map(_.getPosition.getX).max + 16
+      val top    = boxedUnits.map(_.getY).min + 16
+      val bottom = boxedUnits.map(_.getY).max + 16
+      val left   = boxedUnits.map(_.getX).min + 16
+      val right  = boxedUnits.map(_.getX).max + 16
       
       new TileRectangle(
         new TilePosition(left/32, top/32),

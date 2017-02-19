@@ -28,6 +28,7 @@ class ProtossStrategyMacro extends AllParallel {
     new BuildableUpgrade(UpgradeType.Protoss_Ground_Weapons, 2),
     new BuildableUnit(UnitType.Protoss_Gateway),
     new BuildableUpgrade(UpgradeType.Protoss_Ground_Weapons, 3),
+    new BuildableUnit(UnitType.Protoss_Gateway),
     new BuildableUpgrade(UpgradeType.Protoss_Ground_Armor, 1),
     new BuildableUpgrade(UpgradeType.Protoss_Ground_Armor, 2),
     new BuildableUpgrade(UpgradeType.Protoss_Ground_Armor, 3)

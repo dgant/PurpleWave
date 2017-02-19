@@ -5,15 +5,12 @@ import Plans.Plan
 import Startup.With
 import Types.{EnemyUnitInfo, Property}
 import bwapi.{Position, UnitType}
-import bwta.BWTA
 
 import scala.collection.JavaConverters._
-import scala.collection.mutable
 
 class DestroyEconomyFulfiller extends Plan {
-  val fighters = new Property[LockUnits](LockUnitsNobody)
   
-  val _lastOrderFrame = new mutable.HashMap[bwapi.Unit, Integer]
+  val fighters = new Property[LockUnits](LockUnitsNobody)
   
   override def getChildren: Iterable[Plan] = { List(fighters.get) }
   override def onFrame() {
@@ -32,91 +29,67 @@ class DestroyEconomyFulfiller extends Plan {
     if (units.isEmpty) {
       return
     }
-    
-    _lastOrderFrame.keySet.diff(units).foreach(_lastOrderFrame.remove)
-    units.diff(_lastOrderFrame.keySet).foreach(_lastOrderFrame.put(_, 0))
-    
-    if ( ! units.exists(_canOrder)) {
-      return
-    }
-    
-    val enemyHasWorkersLeft =
-      With.tracker.knownEnemyUnits.filter(_.getType.isWorker).size > 0 ||
-      List(UnitType.Protoss_Probe, UnitType.Terran_SCV, UnitType.Zerg_Drone).map(With.history.destroyedEnemyUnits(_)).sum < 3
   
     val baselikePosition = With.scout.mostBaselikeEnemyBuilding.get.getPosition
-    val targetPosition = if (enemyHasWorkersLeft) {
-      BWTA.getNearestBaseLocation(baselikePosition).getPosition
-    } else {
-      baselikePosition
-    }
+    val targetPosition = With.scout.mostBaselikeEnemyBuilding.get.getPosition
     val fallbackPosition = With.ourUnits.filter(_.getType.isBuilding).map(_.getPosition).minBy(_.getDistance(targetPosition))
     
-    units
-      .filter(_canOrder)
-      .foreach(unit => {
-        _issueOrder(unit, targetPosition, fallbackPosition)
-        _lastOrderFrame(unit) = With.game.getFrameCount
-      })
+    units.foreach(unit => _issueOrder(unit, targetPosition, fallbackPosition))
   }
   
-  def _canOrder(unit:bwapi.Unit):Boolean = {
-    _lastOrderFrame(unit) < With.game.getFrameCount - 24
+  def _canAttack(unit:bwapi.Unit):Boolean = {
+    unit.getLastCommandFrame < With.game.getFrameCount - 24
   }
   
   def _issueOrder(fighter:bwapi.Unit, targetPosition:Position, fallbackPosition:Position) {
   
-    val workerLineRadius = 32 * 3
-    val weAreByTheirWorkerLine = fighter.getPosition.getDistance(targetPosition) < workerLineRadius
-    if (weAreByTheirWorkerLine) {
-      val enemyFightersNearby = With.game.getUnitsInRadius(targetPosition, workerLineRadius).asScala
-        .filter(_.getPlayer.isEnemy(With.game.self))
-        .filter(_.getType.canAttack)
-        .filterNot(_.isFlying)
-      if (enemyFightersNearby.nonEmpty) {
-        val enemyTarget = getBestTarget(fighter, enemyFightersNearby)
-        if (fighter.getLastCommand.getTarget != enemyTarget) {
-          fighter.attack(enemyTarget)
-        }
-      }
-      else if (With.tracker.knownEnemyUnits.nonEmpty) {
-        fighter.patrol(With.tracker.knownEnemyUnits.minBy(enemy => fighter.getDistance(enemy.getPosition)).getPosition)
-      }
-    }
-    else {
-      val combatRange = 32 * 13 //Just longer than Siege Tank range
-      val nearbyUnits = With.game.getUnitsInRadius(fighter.getPosition, combatRange).asScala
-      val nearbyEnemies = nearbyUnits.filter(_.getPlayer.isEnemy(With.game.self))
+    val combatRange = 32 * 13 //Just longer than Siege Tank range
+    val nearbyUnits = With.game.getUnitsInRadius(fighter.getPosition, combatRange).asScala
+    val nearbyEnemies = nearbyUnits.filter(_.getPlayer.isEnemy(With.game.self))
+    
+    if (nearbyEnemies.isEmpty) {
+      fighter.attack(targetPosition)
+    } else {
+      val nearbyAllies = nearbyUnits
+        .filter(_.getPlayer.isAlly(With.game.self))
+        .filter(ally => ally.getType.groundWeapon != null)
+        .filter(ally => ally.getDistance(fighter) < 32 * 8)
+      val ourStrength = nearbyAllies.map(_strength).sum + _strength(fighter)
+      val theirStrength = With.tracker.knownEnemyUnits
+        .filter(_.possiblyStillThere)
+        .filter(enemy => fighter.getDistance(enemy.getPosition) < combatRange)
+        .map(_strength)
+        .sum
       
-      if (nearbyEnemies.isEmpty) {
-        fighter.move(targetPosition)
-      } else {
-        val nearbyAllies = nearbyUnits
-          .filter(_.getPlayer.isAlly(With.game.self))
-          .filter(ally => ally.getType.groundWeapon != null)
-          .filter(ally => ally.getDistance(fighter) < ally.getType.groundWeapon.maxRange + 32 * 3)
-        val ourStrength = nearbyAllies.map(_strength).sum
-        val theirStrength = nearbyEnemies.map(_strength).sum
-        val shouldFallback = ourStrength < theirStrength && ! nearbyAllies.exists(_.getType.isBuilding)
-  
-        if (shouldFallback) {
-          fighter.move(fallbackPosition)
+      val shouldFallback = ourStrength < theirStrength && ! nearbyAllies.exists(_.getType.isBuilding)
+
+      if (shouldFallback) {
+        fighter.move(fallbackPosition)
+      } else if (_canAttack(fighter)) {
+        val enemyTarget = _getBestTarget(fighter, nearbyEnemies)
+        if (enemyTarget.isEmpty) {
+          fighter.attack(targetPosition)
         } else {
-          val enemyTarget = getBestTarget(fighter, nearbyEnemies)
-          if (fighter.getLastCommand.getTarget != enemyTarget) {
-            fighter.attack(enemyTarget)
+          if (fighter.getLastCommand.getTarget != enemyTarget.get) {
+            fighter.attack(enemyTarget.get)
           }
         }
       }
     }
   }
     
-  def getBestTarget(fighter:bwapi.Unit, targets:Iterable[bwapi.Unit]):bwapi.Unit = {
-    targets.toList.sortBy(_.getDistance(fighter) / 16).minBy(enemy => enemy.getHitPoints + enemy.getShields)
+  def _getBestTarget(fighter:bwapi.Unit, targets:Iterable[bwapi.Unit]):Option[bwapi.Unit] = {
+    targets.toList
+      .filter(_.exists)
+      .filter(_.getType.canAttack)
+      .filterNot(enemy => enemy.isCloaked && ! enemy.isDetected)
+      .sortBy(enemy => enemy.getHitPoints + enemy.getShields)
+      .sortBy(_.getDistance(fighter) / 16)
+      .headOption
   }
   
   val _easyUnits = Set(UnitType.Terran_Marine, UnitType.Protoss_Dragoon)
-  val _scaryUnits = Set(UnitType.Protoss_Photon_Cannon, UnitType.Zerg_Sunken_Colony, UnitType.Terran_Vulture)
+  val _hardUnits = Set(UnitType.Protoss_Photon_Cannon, UnitType.Terran_Vulture)
   
   def _strength(unit:EnemyUnitInfo):Int = {
     if ( ! unit.isCompleted) { return 0 }
@@ -131,9 +104,10 @@ class DestroyEconomyFulfiller extends Plan {
   def _strength(unitType:UnitType):Int = {
     if (unitType.isWorker) { return 0 }
     if ( ! unitType.canAttack && unitType != UnitType.Terran_Bunker) { return 0 }
+    if (unitType == UnitType.Zerg_Sunken_Colony) { return 350 }
     return (unitType.mineralPrice + unitType.gasPrice) *
-      (if(_scaryUnits.contains(unitType)) { 4 }
-      else if (_easyUnits.contains(unitType)) { 1 }
-      else 2)
+      (if(_hardUnits.contains(unitType)) { 4 }
+      else if (_easyUnits.contains(unitType)) { 2 }
+      else 3)
   }
 }

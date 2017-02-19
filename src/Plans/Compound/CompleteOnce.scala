@@ -4,6 +4,8 @@ import Plans.Plan
 import Types.Property
 
 class CompleteOnce extends Plan {
+  
+  description.set(Some("Do once"))
     
   val child = new Property[Plan](new Plan)
   
@@ -11,7 +13,7 @@ class CompleteOnce extends Plan {
   
   override def isComplete: Boolean = { _everCompleted }
   override def getChildren: Iterable[Plan] = { List(child.get) }
-  override def onFrame(): Unit = {
+  override def onFrame() {
     _everCompleted = _everCompleted || child.get.isComplete
     
     if ( ! isComplete) {

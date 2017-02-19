@@ -37,7 +37,7 @@ class Bot() extends DefaultBWListener {
   }
 
   override def onFrame() {
-    _try(() => {
+    //_try(() => {
       With.onFrame()
       With.economist.onFrame()
       With.tracker.onFrame()
@@ -48,7 +48,8 @@ class Bot() extends DefaultBWListener {
       With.scheduler.onFrame()
       Overlay.onFrame()
       AutoCamera.onFrame()
-    })
+      _considerSurrender
+    //})
   }
 
   override def onUnitComplete(unit: bwapi.Unit) {
@@ -87,5 +88,15 @@ class Bot() extends DefaultBWListener {
       } else {
         System.out.println(exception)
       }}
+  }
+  
+  def _considerSurrender() = {
+    if (With.game.self.supplyUsed == 0
+      && With.game.self.minerals < 50
+      && With.tracker.knownEnemyUnits.exists(_.getType.isWorker)
+      && With.tracker.knownEnemyUnits.exists(_.getType.isResourceDepot)) {
+      With.game.sendText("Good game!")
+      With.game.leaveGame()
+    }
   }
 }

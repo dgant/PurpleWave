@@ -17,14 +17,21 @@ class Recruiter {
     _updatedRequests.clear()
     
     // Remove dead units
-    _requestByUnit.keys.filterNot(id => With.unit(id).exists(u => u.exists)).foreach(_unassign)
+    _requestByUnit.keys.filterNot(id => With.unit(id).exists(_isEligible)).foreach(_unassign)
     _unassignedUnits.filterNot(id => With.unit(id).exists(u => u.exists)).foreach(_unassignedUnits.remove)
     
     // Add new units
-    With.ourUnits.map(_.getID).diff(_unassignedUnits ++ _requestByUnit.keys).foreach(_unassignedUnits.add)
+    With.ourUnits
+      .filter(_isEligible)
+      .map(_.getID).diff(_unassignedUnits ++ _requestByUnit.keys)
+      .foreach(_unassignedUnits.add)
     
     //If we suspect any bugginess, enable this
     //_test
+  }
+  
+  def _isEligible(unit:bwapi.Unit):Boolean = {
+    unit.exists && unit.isCompleted
   }
   
   def _test {

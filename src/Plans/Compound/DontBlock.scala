@@ -5,7 +5,7 @@ import Types.Property
 
 class DontBlock extends Plan {
   
-  description.set(Some("Execute a plan without waiting on completion"))
+  description.set(Some("Dont wait for completion"))
   
   val child = new Property[Plan](new Plan)
   

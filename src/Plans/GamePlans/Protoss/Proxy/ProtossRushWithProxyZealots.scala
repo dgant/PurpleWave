@@ -13,9 +13,9 @@ class ProtossRushWithProxyZealots extends AllSerial {
   val _laterBuildOrder = List[Buildable] (
     new BuildableUnit(UnitType.Protoss_Gateway),
     new BuildableUnit(UnitType.Protoss_Gateway),
-    new BuildableUnit(UnitType.Protoss_Gateway),
     new BuildableUnit(UnitType.Protoss_Assimilator),
     new BuildableUnit(UnitType.Protoss_Cybernetics_Core),
+    new BuildableUnit(UnitType.Protoss_Gateway),
     new BuildableUpgrade(UpgradeType.Singularity_Charge),
     new BuildableUnit(UnitType.Protoss_Forge),
     new BuildableUpgrade(UpgradeType.Protoss_Ground_Weapons, 1),
@@ -28,6 +28,7 @@ class ProtossRushWithProxyZealots extends AllSerial {
     new BuildableUpgrade(UpgradeType.Protoss_Ground_Weapons, 3),
     new BuildableUnit(UnitType.Protoss_Gateway),
     new BuildableUpgrade(UpgradeType.Protoss_Ground_Armor, 1),
+    new BuildableUnit(UnitType.Protoss_Gateway),
     new BuildableUpgrade(UpgradeType.Protoss_Ground_Armor, 2),
     new BuildableUpgrade(UpgradeType.Protoss_Ground_Armor, 3)
   )

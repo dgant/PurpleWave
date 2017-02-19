@@ -3,8 +3,6 @@ package Plans.Macro.Build
 import Plans.Plan
 import Startup.With
 import Types.Buildable.Buildable
-import Types.Property
-import bwapi.UnitType
 
 import scala.collection.mutable
 
@@ -12,40 +10,18 @@ class FollowBuildOrder extends Plan {
   
   description.set(Some("Follow a build order"))
   
-  val buildables = new Property[Iterable[Buildable]](List.empty)
+  var _queue:Iterable[Buildable] = List.empty
   val _plans = new mutable.HashMap[Buildable, Plan]
   
-  override def getChildren: Iterable[Plan] = { buildables.get.map(_plans.get).filter(_.nonEmpty).map(_.get) }
+  override def getChildren: Iterable[Plan] = { _queue.map(_plans.get).filter(_.nonEmpty).map(_.get) }
   
   override def onFrame() {
-    val unitsWanted               = new mutable.HashMap[UnitType, Int]
-    val unitsActual               = With.ourUnits.groupBy(_.getType).mapValues(_.size)
-    val buildsRecentlyCompleted   = _plans.filter(_._2.isComplete).keySet
-    val buildsToFulfill           = buildables.get
-                                    .filterNot(buildsRecentlyCompleted.contains)
-                                    .toList
-                                    .filterNot(_isFulfilled(_, unitsWanted, unitsActual))
+    _plans.filter(_._2.isComplete).keys.foreach(_plans.remove)
+    _queue = With.scheduler.queue
   
-    buildsRecentlyCompleted.foreach(_plans.remove)
-    val buildsThatNeedPlans = buildsToFulfill.filterNot(_plans.contains)
+    val buildsThatNeedPlans = _queue.filterNot(_plans.contains)
     buildsThatNeedPlans.foreach(order => _plans(order) = _buildPlan(order))
     getChildren.foreach(_.onFrame())
-  }
-    
-  def _isFulfilled(
-    buildable:Buildable,
-    unitsWanted:mutable.HashMap[UnitType, Int],
-    unitsActual:Map[UnitType, Int])
-      :Boolean = {
-    if (buildable.upgrade.nonEmpty) {
-      return With.game.self.getUpgradeLevel(buildable.upgrade.get) >= buildable.level
-    }
-    if (buildable.tech.nonEmpty) {
-      return With.game.self.hasResearched(buildable.tech.get)
-    }
-    val unitType = buildable.unit.get
-    unitsWanted.put(unitType, 1 + unitsWanted.getOrElse(unitType, 0))
-    return unitsActual.getOrElse(unitType, 0) >= unitsWanted(unitType)
   }
   
   def _buildPlan(buildable:Buildable):Plan = {

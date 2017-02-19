@@ -61,7 +61,7 @@ class DestroyEconomyFulfiller extends Plan {
   }
   
   def _canOrder(unit:bwapi.Unit):Boolean = {
-    _lastOrderFrame(unit) < With.game.getFrameCount - 16
+    _lastOrderFrame(unit) < With.game.getFrameCount - 24
   }
   
   def _issueOrder(fighter:bwapi.Unit, targetPosition:Position, fallbackPosition:Position) {
@@ -94,7 +94,7 @@ class DestroyEconomyFulfiller extends Plan {
         val nearbyAllies = nearbyUnits
           .filter(_.getPlayer.isAlly(With.game.self))
           .filter(ally => ally.getType.groundWeapon != null)
-          .filter(ally => ally.getDistance(fighter) < ally.getType.groundWeapon.maxRange + 64)
+          .filter(ally => ally.getDistance(fighter) < ally.getType.groundWeapon.maxRange + 32 * 3)
         val ourStrength = nearbyAllies.map(_strength).sum
         val theirStrength = nearbyEnemies.map(_strength).sum
         val shouldFallback = ourStrength < theirStrength && ! nearbyAllies.exists(_.getType.isBuilding)

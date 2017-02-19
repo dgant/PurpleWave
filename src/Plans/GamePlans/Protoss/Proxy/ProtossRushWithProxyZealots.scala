@@ -2,9 +2,9 @@ package Plans.GamePlans.Protoss.Proxy
 
 import Plans.Army.DestroyEconomy
 import Plans.Compound.{AllParallel, AllSerial, CompleteOnce}
-import Plans.Macro.Automatic.{BuildGatewayUnitsContinuously, BuildSupplyContinuously, BuildWorkersContinuously}
 import Plans.Information.RequireEnemyBaseLocation
-import Plans.Macro.Build.{FollowBuildOrder, TrainUnit}
+import Plans.Macro.Automatic.{BuildGatewayUnitsContinuously, BuildSupplyContinuously, BuildWorkersContinuously}
+import Plans.Macro.Build.{FollowBuildOrder, ScheduleBuildOrder, TrainUnit}
 import Types.Buildable.{Buildable, BuildableUnit, BuildableUpgrade}
 import bwapi.{UnitType, UpgradeType}
 
@@ -26,6 +26,7 @@ class ProtossRushWithProxyZealots extends AllSerial {
     new BuildableUpgrade(UpgradeType.Protoss_Ground_Weapons, 2),
     new BuildableUnit(UnitType.Protoss_Gateway),
     new BuildableUpgrade(UpgradeType.Protoss_Ground_Weapons, 3),
+    new BuildableUnit(UnitType.Protoss_Gateway),
     new BuildableUpgrade(UpgradeType.Protoss_Ground_Armor, 1),
     new BuildableUpgrade(UpgradeType.Protoss_Ground_Armor, 2),
     new BuildableUpgrade(UpgradeType.Protoss_Ground_Armor, 3)
@@ -48,7 +49,8 @@ class ProtossRushWithProxyZealots extends AllSerial {
       new BuildSupplyContinuously,
       new BuildGatewayUnitsContinuously,
       new BuildWorkersContinuously,
-      new FollowBuildOrder { buildables.set(_laterBuildOrder) }
+      new ScheduleBuildOrder { buildables.set(_laterBuildOrder) },
+      new FollowBuildOrder
     ))}
   ))
 }

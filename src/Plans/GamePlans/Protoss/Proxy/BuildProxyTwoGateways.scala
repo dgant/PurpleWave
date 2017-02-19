@@ -97,7 +97,7 @@ class BuildProxyTwoGateways extends Plan {
     val center = new PositionCenter().find.get
     
     With.logger.debug("Going to try to place multiple buildings. Good luck.")
-    With.logger.debug("Map: " + With.game.mapName + "(" + With.game.mapFileName() + ")")
+    With.logger.debug("Geography: " + With.game.mapName + "(" + With.game.mapFileName() + ")")
     With.logger.debug("Building types: " + buildings.map(_.toString).mkString(", "))
     With.logger.debug("Centerpoint: " + center.toString)
     

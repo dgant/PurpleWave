@@ -14,7 +14,7 @@ object With {
   var economist:Economist = null
   var history:History = null
   var logger:Logger = null
-  var map:Map = null
+  var map:Geography = null
   var gameplan:PlanWinTheGame = null
   var prioritizer:Prioritizer = null
   var recruiter:Recruiter = null

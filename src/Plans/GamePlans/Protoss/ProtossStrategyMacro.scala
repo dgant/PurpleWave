@@ -4,8 +4,7 @@ import Plans.Army.DestroyEconomy
 import Plans.Compound.AllParallel
 import Plans.Defense.DefeatWorkerHarass
 import Plans.Macro.Automatic._
-import Plans.Macro.Build.FollowBuildOrder
-import Plans.Macro._
+import Plans.Macro.Build.{FollowBuildOrder, ScheduleBuildOrder}
 import Types.Buildable.{Buildable, BuildableUnit, BuildableUpgrade}
 import bwapi.{UnitType, UpgradeType}
 
@@ -38,7 +37,8 @@ class ProtossStrategyMacro extends AllParallel {
     new BuildSupplyContinuously,
     new BuildWorkersContinuously,
     new BuildGatewayUnitsContinuously,
-    new FollowBuildOrder { this.buildables.set(_buildOrder) },
+    new ScheduleBuildOrder { this.buildables.set(_buildOrder) },
+    new FollowBuildOrder,
     new DefeatWorkerHarass,
     new DestroyEconomy,
     new GatherGas,

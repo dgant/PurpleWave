@@ -7,7 +7,7 @@ import bwapi.{Position, TilePosition, UnitType}
 
 import scala.collection.JavaConverters._
 
-class Map {
+class Geography {
   
   def centerPosition:Position = {
     new Position(With.game.mapWidth * 32 / 2, With.game.mapHeight* 32 / 2)

@@ -2,7 +2,7 @@ package Startup
 
 import Development.{AutoCamera, Configuration, Logger, Overlay}
 import Plans.GamePlans.PlanWinTheGame
-import Processes.{Map, _}
+import Processes.{Geography, _}
 import bwapi.DefaultBWListener
 import bwta.BWTA
 
@@ -20,7 +20,7 @@ class Bot() extends DefaultBWListener {
       With.architect = new Architect
       With.bank = new Banker
       With.economist = new Economist
-      With.map = new Map
+      With.map = new Geography
       With.gameplan = new PlanWinTheGame
       With.history = new History
       With.prioritizer = new Prioritizer

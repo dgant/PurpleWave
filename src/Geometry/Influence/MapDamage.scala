@@ -32,17 +32,20 @@ abstract class MapDamage extends InfluenceMap {
       val position = unit._1
       val unitType = unit._2
       val weaponDamage = _weaponDamage(unitType)
-      Circle.points(getWeapon(unitType).maxRange).foreach(point =>
-        add(
-          position.getX + point._1,
-          position.getY + point._2,
-          weaponDamage))
-      if (getWeapon(unitType).minRange > 0) {
-        Circle.points(getWeapon(unitType).minRange).foreach(point =>
-          add(
-            position.getX + point._1,
-            position.getY + point._2,
-            -weaponDamage))
+      if (weaponDamage > 0) {
+        //Divide into granularity of tiles
+        Circle.points(getWeapon(unitType).maxRange / 32).foreach(point =>
+          addPosition(
+            position.getX + point._1 * 32,
+            position.getY + point._2 * 32,
+            weaponDamage))
+        if (getWeapon(unitType).minRange > 0) {
+          Circle.points(getWeapon(unitType).minRange / 32).foreach(point =>
+            addPosition(
+              position.getX + point._1 * 32,
+              position.getY + point._2 * 32,
+              -weaponDamage))
+        }
       }
     })
   }

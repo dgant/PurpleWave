@@ -70,7 +70,7 @@ object Overlay {
   def _drawMaps() {
     val map = With.influence.enemyMediumGroundDamage
       
-    map.indices.filter(map.get(_) > 0).foreach(i => With.game.drawTextMap(32 * map.x(i), 32 * map.y(i), map.get(i).toString))
+    map.indices.filter(map._get(_) > 0).foreach(i => With.game.drawTextMap(32 * map.x(i), 32 * map.y(i), map._get(i).toString))
   }
   
   def _describePlanTree(plan:Plan, childOrder:Integer, depth:Integer):String = {

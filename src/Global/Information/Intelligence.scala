@@ -1,4 +1,4 @@
-package Processes
+package Global.Information
 
 import Startup.With
 import Types.EnemyUnitInfo
@@ -7,18 +7,18 @@ import bwta.{BWTA, BaseLocation}
 
 import scala.collection.JavaConverters._
 
-class Scout {
+class Intelligence {
   
   def unexploredStartLocations():Iterable[TilePosition] = {
     With.game.getStartLocations.asScala.filterNot(With.game.isExplored)
   }
   
   def mostBaselikeEnemyBuilding:Option[EnemyUnitInfo] = {
-    With.tracker.knownEnemyUnits
+    With.memory.knownEnemyUnits
       .toList
       .filter(unit => unit.getType.isBuilding)
       .sortBy(unit => unit.getType.isFlyer)
-      .sortBy(unit => ! With.map.isTownHall(unit.getType))
+      .sortBy(unit => ! With.geography.isTownHall(unit.getType))
       .headOption
   }
   

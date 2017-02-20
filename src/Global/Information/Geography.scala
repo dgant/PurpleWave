@@ -1,4 +1,4 @@
-package Processes
+package Global.Information
 
 import Caching.Cache
 import Geometry.TileRectangle

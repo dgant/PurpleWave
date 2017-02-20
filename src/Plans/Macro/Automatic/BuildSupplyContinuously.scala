@@ -40,7 +40,7 @@ class BuildSupplyContinuously extends AbstractBuildContinuously[BuildBuilding] {
     val unitSpendingRatio     = 1.0
     val costPerUnitSupply     = 50.0
     val depotCompletionFrames = With.game.self.getRace.getSupplyProvider.buildTime + 24 * 4 //Add a few seconds to account for builder transit time
-    val incomePerMinute       = With.economist.ourMineralIncomePerMinute + With.economist.ourGasIncomePerMinute
+    val incomePerMinute       = With.economy.ourMineralIncomePerMinute + With.economy.ourGasIncomePerMinute
     val incomePerFrame        = incomePerMinute / 60.0 / 24.0
     val supplyUsedPerFrame    = incomePerFrame * unitSpendingRatio / costPerUnitSupply
     

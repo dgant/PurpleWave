@@ -36,7 +36,7 @@ class KnowEnemyBaseLocationFulfiller extends Plan {
   
   def _getNextScoutingPosition:Position = {
     
-    With.scout.mostUnscoutedBases
+    With.intelligence.mostUnscoutedBases
       .filter(base => ! base.isIsland) //BWTA.isConnected could also help
       .head
       .getPosition

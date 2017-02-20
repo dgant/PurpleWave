@@ -5,7 +5,7 @@ import Plans.Compound.AllSerial
 import Plans.Information.RequireEnemyBaseLocation
 import Strategies.UnitMatchers.UnitMatchWarriors
 
-class DestroyEconomy extends AllSerial {
+class PressureEnemyBase extends AllSerial {
   
   val meDE = this
   var _fighters = new LockUnitsGreedily {
@@ -19,7 +19,7 @@ class DestroyEconomy extends AllSerial {
       },
       _fighters
     )) },
-    new DestroyEconomyFulfiller {
+    new PressureEnemyBaseFulfiller {
       fighters.set(_fighters)
     }
   ))

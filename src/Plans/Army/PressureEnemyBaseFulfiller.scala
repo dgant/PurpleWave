@@ -8,14 +8,14 @@ import bwapi.{Position, UnitType}
 
 import scala.collection.JavaConverters._
 
-class DestroyEconomyFulfiller extends Plan {
+class PressureEnemyBaseFulfiller extends Plan {
   
   val fighters = new Property[LockUnits](LockUnitsNobody)
   
   override def getChildren: Iterable[Plan] = { List(fighters.get) }
   override def onFrame() {
     
-    if (With.scout.mostBaselikeEnemyBuilding.isEmpty) {
+    if (With.intelligence.mostBaselikeEnemyBuilding.isEmpty) {
       With.logger.warn("Trying to destroy economy without knowing where to go")
       return
     }
@@ -30,8 +30,8 @@ class DestroyEconomyFulfiller extends Plan {
       return
     }
   
-    val baselikePosition = With.scout.mostBaselikeEnemyBuilding.get.getPosition
-    val targetPosition = With.scout.mostBaselikeEnemyBuilding.get.getPosition
+    val baselikePosition = With.intelligence.mostBaselikeEnemyBuilding.get.getPosition
+    val targetPosition = With.intelligence.mostBaselikeEnemyBuilding.get.getPosition
     val fallbackPosition = With.ourUnits.filter(_.getType.isBuilding).map(_.getPosition).minBy(_.getDistance(targetPosition))
     
     units.foreach(unit => _issueOrder(unit, targetPosition, fallbackPosition))
@@ -55,7 +55,7 @@ class DestroyEconomyFulfiller extends Plan {
         .filter(ally => ally.getType.groundWeapon != null)
         .filter(ally => ally.getDistance(fighter) < 32 * 8)
       val ourStrength = nearbyAllies.map(_strength).sum + _strength(fighter)
-      val theirStrength = With.tracker.knownEnemyUnits
+      val theirStrength = With.memory.knownEnemyUnits
         .filter(_.possiblyStillThere)
         .filter(enemy => fighter.getDistance(enemy.getPosition) < combatRange)
         .map(_strength)
@@ -83,8 +83,9 @@ class DestroyEconomyFulfiller extends Plan {
       .filter(_.exists)
       .filter(_.getType.canAttack)
       .filterNot(enemy => enemy.isCloaked && ! enemy.isDetected)
+      .filterNot(enemy => enemy.isBurrowed && ! enemy.isDetected)
       .sortBy(enemy => enemy.getHitPoints + enemy.getShields)
-      .sortBy(_.getDistance(fighter) / 16)
+      .sortBy(_.getDistance(fighter) / 32)
       .headOption
   }
   
@@ -104,6 +105,7 @@ class DestroyEconomyFulfiller extends Plan {
   def _strength(unitType:UnitType):Int = {
     if (unitType.isWorker) { return 0 }
     if ( ! unitType.canAttack && unitType != UnitType.Terran_Bunker) { return 0 }
+    if (unitType == UnitType.Terran_Bunker) { return 225 }
     if (unitType == UnitType.Zerg_Sunken_Colony) { return 350 }
     return (unitType.mineralPrice + unitType.gasPrice) *
       (if(_hardUnits.contains(unitType)) { 4 }

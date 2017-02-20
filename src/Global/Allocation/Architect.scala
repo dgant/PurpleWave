@@ -1,4 +1,4 @@
-package Processes
+package Global.Allocation
 
 import Geometry.{Positions, Pylon, SpiralSearch, TileRectangle}
 import Startup.With

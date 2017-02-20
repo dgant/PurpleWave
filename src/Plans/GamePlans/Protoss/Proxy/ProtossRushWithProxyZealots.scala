@@ -1,6 +1,6 @@
 package Plans.GamePlans.Protoss.Proxy
 
-import Plans.Army.DestroyEconomy
+import Plans.Army.PressureEnemyBase
 import Plans.Compound.{AllParallel, AllSerial, CompleteOnce}
 import Plans.Information.RequireEnemyBaseLocation
 import Plans.Macro.Automatic.{BuildGatewayUnitsContinuously, BuildSupplyContinuously, BuildWorkersContinuously}
@@ -11,11 +11,14 @@ import bwapi.{UnitType, UpgradeType}
 class ProtossRushWithProxyZealots extends AllSerial {
   
   val _laterBuildOrder = List[Buildable] (
+    new BuildableUnit(UnitType.Protoss_Nexus),
+    new BuildableUnit(UnitType.Protoss_Pylon),
     new BuildableUnit(UnitType.Protoss_Gateway),
+    new BuildableUnit(UnitType.Protoss_Gateway),
+    new BuildableUnit(UnitType.Protoss_Pylon),
     new BuildableUnit(UnitType.Protoss_Gateway),
     new BuildableUnit(UnitType.Protoss_Assimilator),
     new BuildableUnit(UnitType.Protoss_Cybernetics_Core),
-    new BuildableUnit(UnitType.Protoss_Gateway),
     new BuildableUpgrade(UpgradeType.Singularity_Charge),
     new BuildableUnit(UnitType.Protoss_Forge),
     new BuildableUpgrade(UpgradeType.Protoss_Ground_Weapons, 1),
@@ -46,7 +49,7 @@ class ProtossRushWithProxyZealots extends AllSerial {
     )},
     new AllParallel { children.set(List(
       new CompleteOnce { child.set(new RequireEnemyBaseLocation) },
-      new DestroyEconomy,
+      new PressureEnemyBase,
       new BuildSupplyContinuously,
       new BuildGatewayUnitsContinuously,
       new BuildWorkersContinuously,

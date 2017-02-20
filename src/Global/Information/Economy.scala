@@ -1,4 +1,4 @@
-package Processes
+package Global.Information
 
 import Geometry.TileRectangle
 import Startup.With
@@ -6,7 +6,7 @@ import bwapi.Race
 
 import scala.collection.JavaConverters._
 
-class Economist {
+class Economy {
   
   //Should be 50, but this offsets the effect of starting workers all being far from minerals
   var ourEstimatedTotalMinerals = 20.0
@@ -31,15 +31,15 @@ class Economist {
   }
   
   def ourActiveHarvesters:Iterable[bwapi.Unit] = {
-    With.map.ourHarvestingAreas.flatten(ourActiveHarvesters)
+    With.geography.ourHarvestingAreas.flatten(ourActiveHarvesters)
   }
   
   def ourActiveMiners:Iterable[bwapi.Unit] = {
-    With.map.ourHarvestingAreas.flatten(ourActiveMiners)
+    With.geography.ourHarvestingAreas.flatten(ourActiveMiners)
   }
   
   def ourActiveDrillers:Iterable[bwapi.Unit] = {
-    With.map.ourHarvestingAreas.flatten(ourActiveDrillers)
+    With.geography.ourHarvestingAreas.flatten(ourActiveDrillers)
   }
   
   def ourActiveHarvesters(harvestingArea:TileRectangle):Iterable[bwapi.Unit] = {
@@ -86,7 +86,7 @@ class Economist {
       if (With.game.self.getRace == Race.Zerg)    1.05f else
                                                   1.0f
     Math.round(
-      With.map.ourHarvestingAreas
+      With.geography.ourHarvestingAreas
         .map(ourActiveMiners)
         .map(_.size)
         .map(n => Math.min(n, 23)) //9 * 2.5
@@ -94,8 +94,8 @@ class Economist {
           if(n <= 9 * 1.0) n * 57 else
           if(n <= 9 * 1.3) n * 53 else
           if(n <= 9 * 1.6) n * 50 else
-          if(n <= 9 * 1.9) n * 47 else
-          if(n <= 9 * 2.2) n * 45 else
+          if(n <= 9 * 1.9) n * 46 else
+          if(n <= 9 * 2.2) n * 44 else
           if(n <= 9 * 2.5) n * 43 else
                            n * 41)
         .sum * racialMultiplier)
@@ -104,7 +104,7 @@ class Economist {
   def ourGasIncomePerMinute:Integer = {
     //Source: http://wiki.teamliquid.net/starcraft/Resources
     //Fastest speed: 42ms per frame, or 24fps
-    With.map.ourHarvestingAreas
+    With.geography.ourHarvestingAreas
         .map(ourActiveDrillers)
         .map(_.size * 96)
         .sum
@@ -112,6 +112,6 @@ class Economist {
   
   def ourMiningBases:Iterable[bwapi.Unit] = {
     //TODO: Don't count macro hatches or bases without minerals
-    With.map.ourBaseHalls
+    With.geography.ourBaseHalls
   }
 }

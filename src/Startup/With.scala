@@ -1,8 +1,9 @@
 package Startup
 
 import Development.Logger
+import Global.Allocation._
+import Global.Information._
 import Plans.GamePlans.PlanWinTheGame
-import Processes._
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable.{HashMap, HashSet}
@@ -11,16 +12,17 @@ object With {
   var game:bwapi.Game = null
   var architect:Architect = null
   var bank:Banker = null
-  var economist:Economist = null
+  var economy:Economy = null
   var history:History = null
-  var logger:Logger = null
-  var map:Geography = null
+  var influence:Influence = null
+  var geography:Geography = null
   var gameplan:PlanWinTheGame = null
+  var logger:Logger = null
   var prioritizer:Prioritizer = null
   var recruiter:Recruiter = null
   var scheduler:Scheduler = null
-  var scout:Scout = null
-  var tracker:Tracker = null
+  var intelligence:Intelligence = null
+  var memory:Memory = null
   
   var _ourUnits:Set[bwapi.Unit] = new HashSet
   var _enemyUnits:Set[bwapi.Unit] = new HashSet

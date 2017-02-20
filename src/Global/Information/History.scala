@@ -1,4 +1,4 @@
-package Processes
+package Global.Information
 
 import Startup.With
 import bwapi.{Player, UnitType}

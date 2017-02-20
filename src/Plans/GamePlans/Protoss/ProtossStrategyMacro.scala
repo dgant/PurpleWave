@@ -1,6 +1,6 @@
 package Plans.GamePlans.Protoss
 
-import Plans.Army.DestroyEconomy
+import Plans.Army.PressureEnemyBase
 import Plans.Compound.AllParallel
 import Plans.Defense.DefeatWorkerHarass
 import Plans.Macro.Automatic._
@@ -41,7 +41,7 @@ class ProtossStrategyMacro extends AllParallel {
     new ScheduleBuildOrder { this.buildables.set(_buildOrder) },
     new FollowBuildOrder,
     new DefeatWorkerHarass,
-    new DestroyEconomy,
+    new PressureEnemyBase,
     new GatherGas,
     new GatherMinerals
   ))

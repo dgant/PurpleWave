@@ -13,26 +13,26 @@ class PositionSimpleBuilding(
   override def find: Option[TilePosition] = _cache.get
   
   def _recalculate: Option[TilePosition] = {
-    if (With.map.ourBaseHalls.isEmpty) {
+    if (With.geography.ourBaseHalls.isEmpty) {
       With.logger.warn("Couldn't place a building because we had no town halls")
       return None
     }
     
     if (buildingType.isRefinery) {
       //cheap
-      return Some(With.game.getStaticGeysers.asScala.minBy(_.getDistance(With.map.ourBaseHalls.head)).getTilePosition)
+      return Some(With.game.getStaticGeysers.asScala.minBy(_.getDistance(With.geography.ourBaseHalls.head)).getTilePosition)
     }
     
     
     val margin = if (buildingType == UnitType.Protoss_Pylon) 4 else 1
   
-    val position = With.map.ourBaseHalls.head.getTilePosition
+    val position = With.geography.ourBaseHalls.head.getTilePosition
     val output = With.architect.placeBuilding(
       buildingType,
       position,
       margin = margin,
       searchRadius = 50,
-      exclusions = With.map.ourHarvestingAreas)
+      exclusions = With.geography.ourHarvestingAreas)
     
     if (output == None) {
       With.logger.warn("Failed to place a " ++ buildingType.toString ++ " near " ++ position.toString)

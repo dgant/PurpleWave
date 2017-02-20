@@ -1,12 +1,12 @@
-package Processes
+package Global.Information
 
 import Startup.With
-import bwapi.UnitType
 import Types.EnemyUnitInfo
+import bwapi.UnitType
 
 import scala.collection.mutable
 
-class Tracker {
+class Memory {
   
   val _knownEnemyUnits = new mutable.HashMap[Integer, EnemyUnitInfo].empty
   

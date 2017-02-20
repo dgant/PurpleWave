@@ -17,6 +17,7 @@ object Overlay {
     if (!enabled) { return }
     With.game.setTextSize(bwapi.Text.Size.Enum.Small)
     _drawTerrain()
+    _drawMaps()
     _drawEconomy
     _drawUnits()
     With.game.drawTextScreen(5, 5, _describePlanTree(With.gameplan, 0, 0))
@@ -66,6 +67,12 @@ object Overlay {
         drawBackground = true))
   }
   
+  def _drawMaps() {
+    val map = With.influence.enemyMediumGroundDamage
+      
+    map.indices.filter(map.get(_) > 0).foreach(i => With.game.drawTextMap(32 * map.x(i), 32 * map.y(i), map.get(i).toString))
+  }
+  
   def _describePlanTree(plan:Plan, childOrder:Integer, depth:Integer):String = {
     if (_isRelevant(plan)) {
       (_describePlan(plan, childOrder, depth)
@@ -100,7 +107,7 @@ object Overlay {
   
   def _drawTerrain() {
     var i = 0
-    With.map.ourHarvestingAreas.foreach(area => With.game.drawBoxMap(
+    With.geography.ourHarvestingAreas.foreach(area => With.game.drawBoxMap(
       area.start.toPosition,
       area.end.toPosition,
       Color.Red))
@@ -181,21 +188,21 @@ object Overlay {
       "Total gas (real):"
     )
     val values = List(
-      With.economist.ourActiveMiners.size,
-      With.economist.ourActiveDrillers.size,
-      With.economist.ourMineralIncomePerMinute,
-      With.economist.ourGasIncomePerMinute,
-      With.economist.ourEstimatedTotalMinerals.toInt,
-      With.economist.ourEstimatedTotalGas.toInt,
-      With.economist.ourActualTotalMinerals,
-      With.economist.ourActualTotalGas
+      With.economy.ourActiveMiners.size,
+      With.economy.ourActiveDrillers.size,
+      With.economy.ourMineralIncomePerMinute,
+      With.economy.ourGasIncomePerMinute,
+      With.economy.ourEstimatedTotalMinerals.toInt,
+      With.economy.ourEstimatedTotalGas.toInt,
+      With.economy.ourActualTotalMinerals,
+      With.economy.ourActualTotalGas
     )
     With.game.drawTextScreen(450, 5, labels.mkString("\n"))
     With.game.drawTextScreen(550, 5, values.mkString("\n"))
   }
   
   def _drawTrackedUnits() {
-    With.tracker.knownEnemyUnits.foreach(_drawTrackedUnit)
+    With.memory.knownEnemyUnits.foreach(_drawTrackedUnit)
   }
   
   def _drawTrackedUnit(trackedUnit:EnemyUnitInfo) {

@@ -29,7 +29,7 @@ class GatherMinerals extends Plan {
         worker.returnCargo()
       }
     } else {
-      val minerals = With.map.ourHarvestingAreas
+      val minerals = With.geography.ourHarvestingAreas
         .flatten(area => With.game.getUnitsInRectangle(area.start.toPosition, area.end.toPosition).asScala)
         .filter(_.getType.isMineralField)
       

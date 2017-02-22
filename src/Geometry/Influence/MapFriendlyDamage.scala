@@ -7,6 +7,6 @@ import scala.collection.JavaConverters._
 
 abstract class MapFriendlyDamage extends MapDamage {
   override def getUnits:Iterable[(Position, UnitType)] = {
-    With.game.allies.asScala.flatten(_.getUnits.asScala).map(unit => (unit.getPosition, unit.getType))
+    (With.game.allies.asScala :+ With.game.self).flatten(_.getUnits.asScala).map(unit => (unit.getPosition, unit.getType))
   }
 }

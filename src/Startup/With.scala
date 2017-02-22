@@ -12,6 +12,7 @@ object With {
   var game:bwapi.Game = null
   var architect:Architect = null
   var bank:Banker = null
+  var commander:Commander = null
   var economy:Economy = null
   var history:History = null
   var influence:Influence = null

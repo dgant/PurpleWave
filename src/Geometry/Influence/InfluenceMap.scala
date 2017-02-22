@@ -5,6 +5,7 @@ import bwapi.{Position, TilePosition, WalkPosition}
 
 abstract class InfluenceMap {
   
+  //Could reasonably switch to 8 to do WalkPosition
   val _pointsPerTile = 1
   val _width = _pointsPerTile * With.game.mapWidth
   val _height = _pointsPerTile * With.game.mapHeight
@@ -29,14 +30,39 @@ abstract class InfluenceMap {
   def _get(x:Int, y:Int):Int = {
     _get(x + y * _width)
   }
-  def _get(position:Position):Int = {
+  def get(position:Position):Int = {
     _get(_pointsPerTile*position.getX/32, _pointsPerTile*position.getY/32)
   }
-  def _get(position:WalkPosition):Int = {
+  def get(position:WalkPosition):Int = {
     _get(_pointsPerTile*position.getX/8, _pointsPerTile*position.getY/8)
   }
-  def _get(position:TilePosition):Int = {
+  def get(position:TilePosition):Int = {
     _get(_pointsPerTile*position.getX, _pointsPerTile*position.getY)
+  }
+  def set(i:Int, value:Int) {
+    if (i < 0 || i >= _positions.length) return
+    _positions(i) = value
+  }
+  def _set(x:Int, y:Int, value:Int) {
+    set(x + y * _width, value)
+  }
+  def setPosition(x:Int, y:Int, value:Int) {
+    _set(_pointsPerTile*x/32, _pointsPerTile*y/32, value)
+  }
+  def setWalkPosition(walkX:Int, walkY:Int, value:Int) {
+    _set(_pointsPerTile*walkX/4, _pointsPerTile*walkY/4, value)
+  }
+  def setTilePosition(tileX:Int, tileY:Int, value:Int) {
+    _set(tileX, tileY, value)
+  }
+  def set(position:Position, value:Int) {
+    setPosition(position.getX, position.getY, value)
+  }
+  def set(position:WalkPosition, value:Int) {
+    setWalkPosition(position.getX, position.getY, value)
+  }
+  def set(position:TilePosition, value:Int) {
+    setTilePosition(position.getX, position.getY, value)
   }
   def add(i:Int, value:Int) {
     if (i < 0 || i >= _positions.length) return
@@ -55,12 +81,12 @@ abstract class InfluenceMap {
     _add(tileX, tileY, value)
   }
   def add(position:Position, value:Int) {
-    addPosition(_pointsPerTile*position.getX/32, _pointsPerTile*position.getY/32, value)
+    addPosition(position.getX, position.getY, value)
   }
   def add(position:WalkPosition, value:Int) {
-    addWalkPosition(_pointsPerTile*position.getX/8, _pointsPerTile*position.getY/8, value)
+    addWalkPosition(position.getX, position.getY, value)
   }
   def add(position:TilePosition, value:Int) {
-    addTilePosition(_pointsPerTile*position.getX, _pointsPerTile*position.getY, value)
+    addTilePosition(position.getX, position.getY, value)
   }
 }

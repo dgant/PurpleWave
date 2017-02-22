@@ -11,6 +11,8 @@ class Influence {
   val enemyLargeAirDamage     = new MapEnemyLargeAirDamage
   val friendlyGroundDamage    = new MapFriendlyGroundDamage
   val friendlyAirDamage       = new MapFriendlyAirDamage
+  val groundAttractors        = new MapGroundAttractors
+  val enemyVision             = new MapEnemyVision
   
   def onFrame() = {
     enemySmallGroundDamage.update()
@@ -21,5 +23,7 @@ class Influence {
     enemyLargeAirDamage.update()
     friendlyGroundDamage.update()
     friendlyAirDamage.update()
+    groundAttractors.update()
+    enemyVision.update()
   }
 }

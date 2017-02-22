@@ -6,8 +6,15 @@ import Startup.With
 import bwapi.{Position, TilePosition, UnitType}
 
 import scala.collection.JavaConverters._
+import scala.collection.mutable
 
 class Geography {
+  
+  val isWalkable = new mutable.HashMap[TilePosition, Boolean] {
+    override def default(tile: TilePosition): Boolean = {
+      (0 to 8).forall(dx =>
+        (0 to 8).forall(dy =>
+          With.game.isWalkable(tile.getX * 8 + dx, tile.getY * 8 + dy)))}}
   
   def centerPosition:Position = {
     new Position(With.game.mapWidth * 32 / 2, With.game.mapHeight* 32 / 2)

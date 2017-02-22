@@ -1,5 +1,6 @@
 package Plans.Army
 
+import Global.Allocation.Intents.Intent
 import Plans.Allocation.{LockUnits, LockUnitsNobody}
 import Plans.Plan
 import Startup.With
@@ -34,7 +35,8 @@ class PressureEnemyBaseFulfiller extends Plan {
     val targetPosition = With.intelligence.mostBaselikeEnemyBuilding.get.getPosition
     val fallbackPosition = With.ourUnits.filter(_.getType.isBuilding).map(_.getPosition).minBy(_.getDistance(targetPosition))
     
-    units.foreach(unit => _issueOrder(unit, targetPosition, fallbackPosition))
+    //units.foreach(unit => _issueOrder(unit, targetPosition, fallbackPosition))
+    units.foreach(unit => With.commander.intend(unit, new Intent(Some(targetPosition))))
   }
   
   def _canAttack(unit:bwapi.Unit):Boolean = {

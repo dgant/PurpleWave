@@ -12,8 +12,8 @@ class Geography {
   
   val isWalkable = new mutable.HashMap[TilePosition, Boolean] {
     override def default(tile: TilePosition): Boolean = {
-      (0 to 8).forall(dx =>
-        (0 to 8).forall(dy =>
+      (0 to 4).forall(dx =>
+        (0 to 4).forall(dy =>
           With.game.isWalkable(tile.getX * 8 + dx, tile.getY * 8 + dy)))}}
   
   def centerPosition:Position = {

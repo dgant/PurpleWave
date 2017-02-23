@@ -1,4 +1,4 @@
-package Caching
+package Utilities
 
 class PermanentCache[T] extends Cache[T] {
   

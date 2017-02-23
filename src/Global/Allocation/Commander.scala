@@ -72,14 +72,13 @@ class Commander {
   
   def _getAttackTarget(unit:bwapi.Unit, intent:Intent):Option[bwapi.Unit] = {
     if (!unit.canAttack) { return None }
-    if (unit.getGroundWeaponCooldown + unit.getAirWeaponCooldown > 0) { return None }
-      With.game.getUnitsInRadius(
-        unit.getPosition,
-        List(unit.getType.groundWeapon.maxRange, unit.getType.airWeapon.maxRange).max + 16)
-        .asScala
-        .filter(target => _canAttack(unit, target))
-        .sortBy(target => _evaluateTarget(unit, target))
-        .headOption
+    With.game.getUnitsInRadius(
+      unit.getPosition,
+      Math.max(96, List(unit.getType.groundWeapon.maxRange, unit.getType.airWeapon.maxRange).max + 16))
+      .asScala
+      .filter(target => _canAttack(unit, target))
+      .sortBy(target => _evaluateTarget(unit, target))
+      .headOption
   }
   
   def _getAdjacentTiles(tilePosition:TilePosition):Iterable[TilePosition] = {
@@ -95,8 +94,13 @@ class Commander {
   }
   
   def _evaluateTile(unit:bwapi.Unit, tile:TilePosition, intent:Intent):Int = {
-    _getEnemyDamageMap(unit).get(tile) - With.influence.friendlyGroundDamage.get(tile) *
-      (if (With.influence.groundAttractors.get(tile) > 0) 1 else 0)
+    if (_canAttack(unit)) {
+        Math.min(100, With.influence.friendlyGroundDamage.get(tile) * With.influence.groundAttractors.get(tile))
+    }
+    else {
+      _getEnemyDamageMap(unit).get(tile)
+    }
+    
   }
   
   def _getEnemyDamageMap(unit:bwapi.Unit):InfluenceMap = {
@@ -111,8 +115,12 @@ class Commander {
     }
   }
   
+  def _canAttack(unit:bwapi.Unit):Boolean = {
+    unit.getGroundWeaponCooldown + unit.getAirWeaponCooldown <= 0
+  }
+  
   def _canAttack(unit:bwapi.Unit, target:bwapi.Unit):Boolean = {
-    target.getPlayer.isEnemy(With.game.self) && unit.canAttack(target)
+    _canAttack(unit) && target.getPlayer.isEnemy(With.game.self) && unit.canAttack(target)
   }
   
   def _evaluateTarget(unit:bwapi.Unit, target:bwapi.Unit):Int = {

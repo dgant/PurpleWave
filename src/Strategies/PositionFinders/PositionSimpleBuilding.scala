@@ -1,6 +1,6 @@
 package Strategies.PositionFinders
 
-import Caching.Cache
+import Utilities.Cache
 import Startup.With
 import bwapi.{TilePosition, UnitType}
 import scala.collection.JavaConverters._

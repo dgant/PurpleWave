@@ -19,6 +19,7 @@ class Bot() extends DefaultBWListener {
       
       With.architect = new Architect
       With.bank = new Banker
+      With.combatPrediction = new CombatPrediction
       With.commander = new Commander
       With.economy = new Economy
       With.geography = new Geography
@@ -42,6 +43,7 @@ class Bot() extends DefaultBWListener {
   override def onFrame() {
     try {
       With.onFrame()
+      With.combatPrediction.onFrame()
       With.economy.onFrame()
       With.memory.onFrame()
       With.influence.onFrame()
@@ -82,19 +84,12 @@ class Bot() extends DefaultBWListener {
   }
   
   override def onEnd(isWinner: Boolean) {
-    With.logger.debug(if (isWinner) "We won!" else "We lost!")
-    With.logger.onEnd
-    BWTA.cleanMemory()
-  }
-  
-  def _try(action:() => Unit) = {
-    try { action() }
-    catch { case exception:Exception =>
-      if (With.logger != null) {
-        With.logger.onException(exception)
-      } else {
-        System.out.println(exception)
-      }}
+    try {
+      With.logger.debug(if (isWinner) "Looks like we won. Good game!" else "Good game! Let's pretend this never happened.")
+      With.logger.onEnd
+      BWTA.cleanMemory()
+    }
+    catch { case exception:Exception => With.logger.onException(exception) }
   }
   
   def _considerSurrender() = {
@@ -102,7 +97,7 @@ class Bot() extends DefaultBWListener {
       && With.game.self.minerals < 50
       && With.memory.knownEnemyUnits.exists(_.getType.isWorker)
       && With.memory.knownEnemyUnits.exists(_.getType.isResourceDepot)) {
-      With.game.sendText("Good game!")
+      With.game.sendText("Good game! Let's pretend this never happened.")
       With.game.leaveGame()
     }
   }

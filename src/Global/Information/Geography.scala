@@ -1,6 +1,6 @@
 package Global.Information
 
-import Caching.Cache
+import Utilities.Cache
 import Geometry.TileRectangle
 import Startup.With
 import bwapi.{Position, TilePosition, UnitType}

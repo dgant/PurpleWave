@@ -1,6 +1,6 @@
 package Plans.GamePlans.Protoss.Proxy
 
-import Caching.Cache
+import Utilities.Cache
 import Plans.Allocation.{LockUnits, LockUnitsExactly}
 import Plans.Army.UnitAtLocation.RequireUnitAtLocation
 import Plans.Compound.{AllSerial, CompleteOnce}

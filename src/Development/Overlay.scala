@@ -1,5 +1,7 @@
 package Development
 
+import Geometry.Positions
+import Global.Information.Combat.CombatSimulation
 import Plans.Allocation.{LockCurrency, LockUnits}
 import Plans.Plan
 import Startup.With
@@ -17,13 +19,14 @@ object Overlay {
     if (!enabled) { return }
     With.game.setTextSize(bwapi.Text.Size.Enum.Small)
     _drawTerrain()
-    _drawMaps()
+    //_drawMaps()
     _drawEconomy
     _drawUnits()
     With.game.drawTextScreen(5, 5, _describePlanTree(With.gameplan, 0, 0))
     _drawTrackedUnits()
     _drawResources()
     _drawPlans(With.gameplan)
+    _drawCombatSimulations
   }
   
   def _drawTextLabel(
@@ -224,5 +227,25 @@ object Overlay {
         trackedUnit.getPosition,
         drawBackground = true)
     }
+  }
+  
+  def _drawCombatSimulations {
+    With.simulator.combats.foreach(_drawCombatSimulation)
+  }
+  
+  def _drawCombatSimulation(simulation:CombatSimulation) {
+    With.game.drawCircleMap(simulation.focalPoint, 32, Color.Red)
+    With.game.drawCircleMap(simulation.ourGroup.vanguard, 32, Color.Red)
+    With.game.drawCircleMap(simulation.enemyGroup.vanguard, 32, Color.Red)
+    With.game.drawLineMap(simulation.focalPoint, simulation.ourGroup.vanguard, Color.Red)
+    With.game.drawLineMap(simulation.focalPoint, simulation.enemyGroup.vanguard, Color.Red)
+    With.game.drawCircleMap(
+      Positions.centroid(simulation.ourGroup.units.map(_.getPosition)),
+      simulation.ourGroup.units.map(_.getDistance(simulation.focalPoint)).max,
+      Color.Orange)
+    With.game.drawCircleMap(
+      Positions.centroid(simulation.enemyGroup.units.map(_.getPosition)),
+      simulation.enemyGroup.units.map(_.getDistance(simulation.focalPoint)).max,
+      Color.Orange)
   }
 }

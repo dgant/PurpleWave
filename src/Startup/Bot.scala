@@ -58,7 +58,11 @@ class Bot() extends DefaultBWListener {
       AutoCamera.onFrame()
       _considerSurrender
     }
-    catch { case exception:Exception => With.logger.onException(exception) }
+    catch {
+      case exception:Exception =>
+        exception.getStackTrace
+        With.logger.onException(exception)
+    }
   }
 
   override def onUnitComplete(unit: bwapi.Unit) {

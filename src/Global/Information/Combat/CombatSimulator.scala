@@ -24,10 +24,11 @@ class CombatSimulator {
     val ourGroups = ourGroupMaps.map(group => new CombatGroup(group._1.getPosition, group._2))
     val enemyGroups = enemyGroupMaps.map(group => new CombatGroup(group._1.getPosition, group._2))
     combats = _predictCombats(ourGroups, enemyGroups)
+    combats
   }
   
   def _mapUnitsToNeighbors(units:Iterable[bwapi.Unit]):Map[bwapi.Unit, Iterable[bwapi.Unit]] = {
-    units.map(x => (x, x.getUnitsInRadius(combatRange).asScala)).toMap
+    units.map(unit => (unit, unit.getUnitsInRadius(combatRange).asScala -- List(unit))).toMap
   }
   
   def _groupUnits(units:Iterable[bwapi.Unit]):mutable.HashMap[bwapi.Unit, mutable.HashSet[bwapi.Unit]] = {
@@ -36,18 +37,20 @@ class CombatSimulator {
       .toList
       .sortBy(fighter => (List(Int.MaxValue) ++neighborsByFighter(fighter)
         .filter(_.isEnemyOf(fighter))
-        .filter(_.canAttack)
+        .filter(_.isCombatUnit)
         .map(_.getDistance(fighter)))
         .min)
   
     val leaderBySoldier = new mutable.HashMap[bwapi.Unit, bwapi.Unit]
     val groupsByLeader = new mutable.HashMap[bwapi.Unit, mutable.HashSet[bwapi.Unit]] {
-      override def default(key: bwapi.Unit):mutable.HashSet[bwapi.Unit] = new mutable.HashSet[bwapi.Unit] }
+      override def default(key: bwapi.Unit):mutable.HashSet[bwapi.Unit] = {
+        put(key, new mutable.HashSet[bwapi.Unit])
+        this(key)}}
   
     fightersClosestToEnemyFighters.foreach(leader => {
       if ( ! leaderBySoldier.contains(leader)) {
         leaderBySoldier.put(leader, leader)
-        groupsByLeader(leader) ++= neighborsByFighter(leader)
+        groupsByLeader(leader) ++= neighborsByFighter(leader).filter(_.getPlayer == leader.getPlayer)
         neighborsByFighter(leader).foreach(neighbor => leaderBySoldier.put(neighbor, leader))
       }})
     
@@ -74,6 +77,10 @@ class CombatSimulator {
   }
   
   def _valueUnit(unit:bwapi.Unit, simulation: CombatSimulation):Int = {
+    //Fails to account for bunkers
+    //Fails to account for casters
+    //Fails to account for carriers/reavers
+    
     val distanceFactor = combatRange + unit.range - unit.getPosition.getApproxDistance(simulation.focalPoint)
     val combatEfficacy = unit.groundDps * unit.totalHealth / unit.initialTotalHealth
     Math.max(0, distanceFactor * combatEfficacy)

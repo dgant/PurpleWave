@@ -1,6 +1,5 @@
 package Development
 
-import Geometry.Positions
 import Global.Information.Combat.CombatSimulation
 import Plans.Allocation.{LockCurrency, LockUnits}
 import Plans.Plan
@@ -239,13 +238,21 @@ object Overlay {
     With.game.drawCircleMap(simulation.enemyGroup.vanguard, 32, Color.Red)
     With.game.drawLineMap(simulation.focalPoint, simulation.ourGroup.vanguard, Color.Red)
     With.game.drawLineMap(simulation.focalPoint, simulation.enemyGroup.vanguard, Color.Red)
-    With.game.drawCircleMap(
-      Positions.centroid(simulation.ourGroup.units.map(_.getPosition)),
-      simulation.ourGroup.units.map(_.getDistance(simulation.focalPoint)).max,
+    With.game.drawBoxMap(
+      new Position(
+        simulation.ourGroup.units.map(_.getX).min,
+        simulation.ourGroup.units.map(_.getY).min),
+      new Position(
+        simulation.ourGroup.units.map(_.getX).max,
+        simulation.ourGroup.units.map(_.getY).max),
       Color.Orange)
-    With.game.drawCircleMap(
-      Positions.centroid(simulation.enemyGroup.units.map(_.getPosition)),
-      simulation.enemyGroup.units.map(_.getDistance(simulation.focalPoint)).max,
+    With.game.drawBoxMap(
+      new Position(
+        simulation.enemyGroup.units.map(_.getX).min,
+        simulation.enemyGroup.units.map(_.getY).min),
+      new Position(
+        simulation.enemyGroup.units.map(_.getX).max,
+        simulation.enemyGroup.units.map(_.getY).max),
       Color.Orange)
   }
 }

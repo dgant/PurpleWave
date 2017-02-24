@@ -60,7 +60,7 @@ class Bot() extends DefaultBWListener {
     }
     catch {
       case exception:Exception =>
-        exception.getStackTrace
+        var dontLoseTheStackTraceWhileDebugging = exception.getStackTrace
         With.logger.onException(exception)
     }
   }

@@ -28,7 +28,8 @@ class CombatSimulator {
   }
   
   def _mapUnitsToNeighbors(units:Iterable[bwapi.Unit]):Map[bwapi.Unit, Iterable[bwapi.Unit]] = {
-    units.map(unit => (unit, unit.getUnitsInRadius(combatRange).asScala -- List(unit))).toMap
+    //Yes, this includes the unit itself
+    units.map(unit => (unit, unit.getUnitsInRadius(combatRange).asScala)).toMap
   }
   
   def _groupUnits(units:Iterable[bwapi.Unit]):mutable.HashMap[bwapi.Unit, mutable.HashSet[bwapi.Unit]] = {
@@ -49,9 +50,9 @@ class CombatSimulator {
   
     fightersClosestToEnemyFighters.foreach(leader => {
       if ( ! leaderBySoldier.contains(leader)) {
-        leaderBySoldier.put(leader, leader)
+        groupsByLeader(leader).add(leader)
         groupsByLeader(leader) ++= neighborsByFighter(leader).filter(_.getPlayer == leader.getPlayer)
-        neighborsByFighter(leader).foreach(neighbor => leaderBySoldier.put(neighbor, leader))
+        groupsByLeader(leader).foreach(groupMember => leaderBySoldier.put(groupMember, leader))
       }})
     
     return groupsByLeader

@@ -24,6 +24,8 @@ class Commander {
     
     if (_nextOrderFrame(unit) > With.game.getFrameCount) { return }
     
+    unit.attack(intent.position.get)
+    
     //Compensate for possibility of cancelling attack animation
     //See https://github.com/tscmoo/tsc-bwai/blob/master/src/unit_controls.h#L1569
     //and https://github.com/davechurchill/ualbertabot/blob/922966f5f1442029f811d9c6a34d9ba94fc871df/UAlbertaBot/Source/CombatData.cpp#L221

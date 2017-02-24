@@ -33,12 +33,13 @@ class CombatSimulator {
   }
   
   def _groupUnits(units:Iterable[bwapi.Unit]):mutable.HashMap[bwapi.Unit, mutable.HashSet[bwapi.Unit]] = {
-    val neighborsByFighter = _mapUnitsToNeighbors(With.ourUnits.filter(_.canFight))
+    val neighborsByFighter = _mapUnitsToNeighbors(units)
     val fightersClosestToEnemyFighters = neighborsByFighter.keys
+      .filter(_.canFight)
       .toList
       .sortBy(fighter => (List(Int.MaxValue) ++neighborsByFighter(fighter)
         .filter(_.isEnemyOf(fighter))
-        .filter(_.isCombatUnit)
+        .filter(_.canFight)
         .map(_.getDistance(fighter)))
         .min)
   

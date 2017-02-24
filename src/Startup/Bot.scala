@@ -26,7 +26,6 @@ class Bot() extends DefaultBWListener {
       With.geography = new Geography
       With.gameplan = new PlanWinTheGame
       With.history = new History
-      With.influence = new Influence
       With.memory = new Memory
       With.intelligence = new Intelligence
       With.prioritizer = new Prioritizer
@@ -47,7 +46,6 @@ class Bot() extends DefaultBWListener {
       With.simulator.onFrame()
       With.economy.onFrame()
       With.memory.onFrame()
-      With.influence.onFrame()
       With.bank.onFrame()
       With.recruiter.onFrame()
       With.prioritizer.onFrame()

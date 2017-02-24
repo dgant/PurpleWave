@@ -18,7 +18,6 @@ object Overlay {
     if (!enabled) { return }
     With.game.setTextSize(bwapi.Text.Size.Enum.Small)
     _drawTerrain()
-    //_drawMaps()
     _drawEconomy
     _drawUnits()
     With.game.drawTextScreen(5, 5, _describePlanTree(With.gameplan, 0, 0))
@@ -67,20 +66,6 @@ object Overlay {
         List(unit.getLastCommand.getUnitCommandType.toString),
         unit.getPosition,
         drawBackground = true))
-  }
-  
-  def _drawMaps() {
-    val maa = With.influence.enemyMediumGroundDamage
-    val mab = With.influence.groundAttractors
-    val mac = With.influence.friendlyGroundDamage
-    val mb = With.influence.groundAttractors
-      
-    mab.indices.filter(mab._get(_) > 0).foreach(i =>
-      With.game.drawTextMap(
-        32 * mab.x(i),
-        32 * mab.y(i),
-        (maa._get(i) - mab._get(i) * mac._get(i)).toString))
-    //mb.indices.filter(mb._get(_) > 0).foreach(i => With.game.drawTextMap(32 * mb.x(i), 32 * mb.y(i) + 13, mb._get(i).toString))
   }
   
   def _describePlanTree(plan:Plan, childOrder:Integer, depth:Integer):String = {

@@ -17,7 +17,6 @@ object With {
   var commander:Commander = null
   var economy:Economy = null
   var history:History = null
-  var influence:Influence = null
   var geography:Geography = null
   var gameplan:PlanWinTheGame = null
   var logger:Logger = null

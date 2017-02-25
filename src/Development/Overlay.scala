@@ -6,6 +6,7 @@ import Plans.Plan
 import Startup.With
 import Types.EnemyUnitInfo
 import bwapi.{Color, Position, UnitCommandType}
+import Utilities.Enrichment.EnrichUnit._
 import bwta.BWTA
 
 import scala.collection.JavaConverters._
@@ -24,7 +25,9 @@ object Overlay {
     _drawTrackedUnits()
     _drawResources()
     _drawPlans(With.gameplan)
-    _drawCombatSimulations
+    
+    //Buggy because it references old units
+    //_drawCombatSimulations
   }
   
   def _drawTextLabel(
@@ -225,19 +228,19 @@ object Overlay {
     With.game.drawLineMap(simulation.focalPoint, simulation.enemyGroup.vanguard, Color.Red)
     With.game.drawBoxMap(
       new Position(
-        simulation.ourGroup.units.map(_.getX).min,
-        simulation.ourGroup.units.map(_.getY).min),
+        simulation.ourGroup.units.filter(_.stillExists).map(_.getX).min,
+        simulation.ourGroup.units.filter(_.stillExists).map(_.getY).min),
       new Position(
-        simulation.ourGroup.units.map(_.getX).max,
-        simulation.ourGroup.units.map(_.getY).max),
+        simulation.ourGroup.units.filter(_.stillExists).map(_.getX).max,
+        simulation.ourGroup.units.filter(_.stillExists).map(_.getY).max),
       Color.Orange)
     With.game.drawBoxMap(
       new Position(
-        simulation.enemyGroup.units.map(_.getX).min,
-        simulation.enemyGroup.units.map(_.getY).min),
+        simulation.enemyGroup.units.filter(_.stillExists).map(_.getX).min,
+        simulation.enemyGroup.units.filter(_.stillExists).map(_.getY).min),
       new Position(
-        simulation.enemyGroup.units.map(_.getX).max,
-        simulation.enemyGroup.units.map(_.getY).max),
+        simulation.enemyGroup.units.filter(_.stillExists).map(_.getX).max,
+        simulation.enemyGroup.units.filter(_.stillExists).map(_.getY).max),
       Color.Orange)
   }
 }

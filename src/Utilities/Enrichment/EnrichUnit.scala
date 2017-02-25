@@ -8,8 +8,12 @@ case object EnrichUnit {
     
     //This ignores spellcasters and workers!
     def canFight: Boolean = {
-      unit.isCompleted && (unit.getType.canAttack  && ! unit.getType.isWorker) || List(UnitType.Protoss_Carrier, UnitType.Protoss_Reaver).contains(unit.getType)
+      unit.isCompleted && unit.getType.canAttack || List(UnitType.Protoss_Carrier, UnitType.Protoss_Reaver).contains(unit.getType)
     }
+    
+    def attackFrames                    : Int     = { 4 + (if (List(UnitType.Protoss_Dragoon, UnitType.Zerg_Devourer).contains(unit.getType)) 3 else 0) }
+    def cooldownRemaining               : Int     = { Math.max(unit.getGroundWeaponCooldown, unit.getAirWeaponCooldown) }
+    def stillExists                     : Boolean = { With.unit(unit.getID).nonEmpty }
     def isOurs                          : Boolean = { unit.getPlayer == With.game.self }
     def isFriendly                      : Boolean = { isOurs || unit.getPlayer.isAlly(With.game.self) }
     def isEnemy                         : Boolean = { unit.getPlayer.isEnemy(With.game.self) }

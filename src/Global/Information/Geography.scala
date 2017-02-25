@@ -32,6 +32,10 @@ class Geography {
     UnitType.Zerg_Hive
   ).contains(unitType)
   
+  def home:bwapi.Unit = {
+    ourBaseHalls.headOption.getOrElse(With.ourUnits.minBy(_.getType.isBuilding))
+  }
+  
   def ourBaseHalls:Iterable[bwapi.Unit] = {
     With.ourUnits.filter(unit => isTownHall(unit.getType) && ! unit.isFlying)
   }

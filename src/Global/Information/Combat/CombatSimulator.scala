@@ -2,6 +2,7 @@ package Global.Information.Combat
 
 import Startup.With
 import Utilities.Enrichment.EnrichUnit.EnrichedUnit
+import Utilities.Limiter
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
@@ -11,20 +12,23 @@ class CombatSimulator {
   val combatRange = 32 * 15
   var combats:Iterable[CombatSimulation] = List.empty
   
+  val limitCombatIdentification = new Limiter(24, _defineCombats)
+  val limitCombatSimulation = new Limiter(4, _simulateCombats)
   def onFrame() {
-    
-    //Assign to groups based on proximity to combat
-    //Identify line of engagement
-    //Simulate combat in tug-of-war tournament
-    //
-    //Warning: Ignores fogged units!
-    
+    limitCombatIdentification.act()
+    limitCombatSimulation.act()
+  }
+  
+  def _defineCombats() {
     val ourGroupMaps = _groupUnits(With.ourUnits)
     val enemyGroupMaps = _groupUnits(With.enemyUnits)
     val ourGroups = ourGroupMaps.map(group => new CombatGroup(group._1.getPosition, group._2))
     val enemyGroups = enemyGroupMaps.map(group => new CombatGroup(group._1.getPosition, group._2))
-    combats = _predictCombats(ourGroups, enemyGroups)
-    combats
+    combats = _buildCombats(ourGroups, enemyGroups)
+  }
+  
+  def _simulateCombats() {
+    combats.foreach(_update)
   }
   
   def _mapUnitsToNeighbors(units:Iterable[bwapi.Unit]):Map[bwapi.Unit, Iterable[bwapi.Unit]] = {
@@ -59,32 +63,38 @@ class CombatSimulator {
     return groupsByLeader
   }
   
-  def _predictCombats(
+  def _buildCombats(
     ourGroups:  Iterable[CombatGroup],
     theirGroups:Iterable[CombatGroup]):Iterable[CombatSimulation] = {
     //Shouldn't happen, but just in case
     if (theirGroups.isEmpty) return List.empty
   
-    val combats = ourGroups.map(ourGroup =>
+    ourGroups.map(ourGroup =>
       new CombatSimulation(ourGroup, theirGroups.minBy(_.vanguard.getDistance(ourGroup.vanguard))))
-    
-    combats.foreach(_predictCombat)
-    
-    combats
   }
   
-  def _predictCombat(simulation: CombatSimulation) {
+  def _update(simulation: CombatSimulation) {
+    _removeMissingUnits(simulation.ourGroup.units)
+    _removeMissingUnits(simulation.enemyGroup.units)
     simulation.ourScore = simulation.ourGroup.units.map(_valueUnit(_, simulation)).sum
-    simulation.enemyScore = simulation.ourGroup.units.map(_valueUnit(_, simulation)).sum
+    simulation.enemyScore = simulation.enemyGroup.units.map(_valueUnit(_, simulation)).sum
+  }
+  
+  def _removeMissingUnits(units:mutable.HashSet[bwapi.Unit]) {
+    units.filterNot(unit => With.unit(unit.getID).nonEmpty).foreach(units.remove)
   }
   
   def _valueUnit(unit:bwapi.Unit, simulation: CombatSimulation):Int = {
+    //Don't be afraid to fight workers.
+    //This is a hack, because it's affecting our expectation of combat, rather than our motivation for fighting
+    if (unit.getType.isWorker) return 0
+    
     //Fails to account for bunkers
     //Fails to account for casters
     //Fails to account for carriers/reavers
     
-    val distanceFactor = combatRange + unit.range - unit.getPosition.getApproxDistance(simulation.focalPoint)
-    val combatEfficacy = unit.groundDps * unit.totalHealth / unit.initialTotalHealth
+    val distanceFactor = Math.max(0, combatRange + unit.range - unit.getPosition.getApproxDistance(simulation.focalPoint))
+    val combatEfficacy = unit.groundDps * unit.totalHealth
     Math.max(0, distanceFactor * combatEfficacy)
   }
 }

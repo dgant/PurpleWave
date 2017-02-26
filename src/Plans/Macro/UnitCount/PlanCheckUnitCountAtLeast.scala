@@ -3,7 +3,7 @@ package Plans.Macro.UnitCount
 import Plans.Plan
 import Startup.With
 import Strategies.UnitMatchers.{UnitMatchAnything, UnitMatcher}
-import Types.Property
+import Utilities.Property
 
 class PlanCheckUnitCountAtLeast extends Plan {
   

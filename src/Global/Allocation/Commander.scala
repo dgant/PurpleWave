@@ -1,6 +1,6 @@
 package Global.Allocation
 
-import Global.Allocation.Intents.Intent
+import Types.Intents.Intent
 import Global.Information.Combat.CombatSimulation
 import Startup.With
 import Utilities.Enrichment.EnrichUnit._

@@ -3,7 +3,7 @@ package Plans.Allocation
 import Startup.With
 import Strategies.UnitMatchers.{UnitMatchAnything, UnitMatcher}
 import Strategies.UnitPreferences.{UnitPreferAnything, UnitPreference}
-import Types.Property
+import Utilities.Property
 
 import scala.collection.mutable
 

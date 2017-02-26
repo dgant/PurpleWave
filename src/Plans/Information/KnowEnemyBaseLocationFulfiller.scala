@@ -6,7 +6,7 @@ import Startup.With
 import Strategies.PositionFinders.{PositionCenter, PositionFinder, PositionSpecific}
 import Strategies.UnitMatchers.{UnitMatchMobile, UnitMatcher}
 import Strategies.UnitPreferences.{UnitPreferClose, UnitPreference}
-import Types.Property
+import Utilities.Property
 import bwapi.Position
 
 class KnowEnemyBaseLocationFulfiller extends Plan {

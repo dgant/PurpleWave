@@ -4,7 +4,7 @@ import Global.Information.Combat.CombatSimulation
 import Plans.Allocation.{LockCurrency, LockUnits}
 import Plans.Plan
 import Startup.With
-import Types.EnemyUnitInfo
+import Types.UnitInfo.EnemyUnitInfo
 import bwapi.{Color, Position, UnitCommandType}
 import Utilities.Enrichment.EnrichUnit._
 import bwta.BWTA
@@ -204,14 +204,14 @@ object Overlay {
   }
   
   def _drawTrackedUnit(trackedUnit:EnemyUnitInfo) {
-    if (trackedUnit.possiblyStillThere && trackedUnit.unit.isEmpty) {
+    if (trackedUnit._possiblyStillThere && trackedUnit.unit.isEmpty) {
       With.game.drawCircleMap(
-        trackedUnit.getPosition,
-        trackedUnit.getType.width / 2,
+        trackedUnit.position,
+        trackedUnit.unitType.width / 2,
         Color.Grey)
       _drawTextLabel(
-        List(TypeDescriber.describeUnitType(trackedUnit.getType)),
-        trackedUnit.getPosition,
+        List(TypeDescriber.describeUnitType(trackedUnit.unitType)),
+        trackedUnit.position,
         drawBackground = true)
     }
   }

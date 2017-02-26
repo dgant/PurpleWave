@@ -3,7 +3,7 @@ package Plans.Macro.Build
 import Plans.Plan
 import Startup.With
 import Types.Buildable.Buildable
-import Types.Property
+import Utilities.Property
 
 class ScheduleBuildOrder extends Plan {
   

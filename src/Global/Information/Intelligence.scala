@@ -1,7 +1,7 @@
 package Global.Information
 
 import Startup.With
-import Types.EnemyUnitInfo
+import Types.UnitInfo.EnemyUnitInfo
 import bwapi.TilePosition
 import bwta.{BWTA, BaseLocation}
 
@@ -16,9 +16,9 @@ class Intelligence {
   def mostBaselikeEnemyBuilding:Option[EnemyUnitInfo] = {
     With.memory.knownEnemyUnits
       .toList
-      .filter(unit => unit.getType.isBuilding)
-      .sortBy(unit => unit.getType.isFlyer)
-      .sortBy(unit => ! With.geography.isTownHall(unit.getType))
+      .filter(unit => unit.unitType.isBuilding)
+      .sortBy(unit => unit.unitType.isFlyer)
+      .sortBy(unit => ! With.geography.isTownHall(unit.unitType))
       .headOption
   }
   

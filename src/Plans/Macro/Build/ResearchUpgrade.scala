@@ -4,7 +4,7 @@ import Plans.Allocation._
 import Plans.Plan
 import Startup.With
 import Strategies.UnitMatchers.UnitMatchType
-import Types.Property
+import Utilities.Property
 import bwapi.UpgradeType
 
 class ResearchUpgrade(upgradeType: UpgradeType, level: Int) extends Plan {

@@ -5,7 +5,7 @@ import Plans.Compound.AbstractPlanFulfillRequirements
 import Strategies.PositionFinders.{PositionCenter, PositionFinder}
 import Strategies.UnitMatchers.{UnitMatchMobile, UnitMatcher}
 import Strategies.UnitPreferences.{UnitPreferClose, UnitPreference}
-import Types.Property
+import Utilities.Property
 
 class RequireEnemyBaseLocation extends AbstractPlanFulfillRequirements {
   

@@ -1,6 +1,6 @@
 package Plans.GamePlans.Protoss.Proxy
 
-import Utilities.Cache
+import Utilities.{Cache, Property}
 import Plans.Allocation.{LockUnits, LockUnitsExactly}
 import Plans.Army.UnitAtLocation.RequireUnitAtLocation
 import Plans.Compound.{AllSerial, CompleteOnce}
@@ -10,7 +10,6 @@ import Startup.With
 import Strategies.PositionFinders.{PositionCenter, PositionFinder, PositionSpecific}
 import Strategies.UnitMatchers.{UnitMatchWorker, UnitMatcher}
 import Strategies.UnitPreferences.{UnitPreferClose, UnitPreference}
-import Types.Property
 import bwapi.{TilePosition, UnitType}
 
 class BuildProxyTwoGateways extends Plan {

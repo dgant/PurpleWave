@@ -15,7 +15,7 @@ class BuildGatewayUnitsContinuously extends AbstractBuildContinuously[TrainUnit]
       }
       else if (With.ourUnits.exists(_.getType == UnitType.Protoss_Cybernetics_Core)
         && With.game.self.gas >= UnitType.Protoss_Dragoon.gasPrice
-        && (With.memory.knownEnemyUnits.exists(enemy => enemy.getType.isFlyer && enemy.getType.canAttack)
+        && (With.memory.knownEnemyUnits.exists(enemy => enemy.unitType.isFlyer && enemy.unitType.canAttack)
           || With.ourUnits.filter(_.getType == UnitType.Protoss_Dragoon).size * 2 <
              With.ourUnits.filter(_.getType == UnitType.Protoss_Zealot).size * 3)) {
         UnitType.Protoss_Dragoon

@@ -4,7 +4,7 @@ import Plans.Plan
 import Startup.With
 import Strategies.PositionFinders.{PositionCenter, PositionFinder}
 import Strategies.UnitMatchers.{UnitMatchAnything, UnitMatcher}
-import Types.Property
+import Utilities.Property
 
 class PlanCheckUnitAtLocation extends Plan {
   

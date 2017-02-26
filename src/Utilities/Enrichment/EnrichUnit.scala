@@ -1,7 +1,7 @@
 package Utilities.Enrichment
 
 import Startup.With
-import bwapi.UnitType
+import bwapi.{DamageType, UnitType}
 
 case object EnrichUnit {
   implicit class EnrichedUnit(unit: bwapi.Unit) {
@@ -27,10 +27,23 @@ case object EnrichUnit {
   }
   
   implicit class EnrichedUnitType(unitType:UnitType) {
-    //Based on IMP42's estimate of the difference between cooldown and actual frames between attacks
-    //To be really accurate, we should add another 3 frames for Dragoons + Devourers
+    def groundDps: Int = {
+      val typeMultiplier =
+        if (List(DamageType.Concussive, DamageType.Explosive).contains(unitType.groundWeapon.damageType())) {
+          .75
+        } else {
+          1
+        }
+      
+      val damagePerSecond = typeMultiplier *
+        unitType.maxGroundHits *
+        unitType.groundWeapon.damageFactor *
+        unitType.groundWeapon.damageAmount *
+          24 / (2 + unitType.groundWeapon.damageCooldown)
+      
+      damagePerSecond.toInt
+    }
     
-    def groundDps           : Int     = { unitType.groundWeapon.damageAmount * 24 / (2 + unitType.groundWeapon.damageCooldown) }
     def totalCost           : Int     = { unitType.mineralPrice + unitType.gasPrice }
   }
 }

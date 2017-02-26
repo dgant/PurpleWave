@@ -26,7 +26,7 @@ class Bot() extends DefaultBWListener {
       With.geography = new Geography
       With.gameplan = new PlanWinTheGame
       With.history = new History
-      With.memory = new Memory
+      With.memory = new EnemyUnitTracker
       With.intelligence = new Intelligence
       With.prioritizer = new Prioritizer
       With.recruiter = new Recruiter
@@ -98,8 +98,8 @@ class Bot() extends DefaultBWListener {
   def _considerSurrender() = {
     if (With.game.self.supplyUsed == 0
       && With.game.self.minerals < 50
-      && With.memory.knownEnemyUnits.exists(_.getType.isWorker)
-      && With.memory.knownEnemyUnits.exists(_.getType.isResourceDepot)) {
+      && With.memory.knownEnemyUnits.exists(_.unitType.isWorker)
+      && With.memory.knownEnemyUnits.exists(_.unitType.isResourceDepot)) {
       With.game.sendText("Good game! Let's pretend this never happened.")
       With.game.leaveGame()
     }

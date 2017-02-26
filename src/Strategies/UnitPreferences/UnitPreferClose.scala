@@ -1,7 +1,7 @@
 package Strategies.UnitPreferences
 
 import Strategies.PositionFinders.{PositionCenter, PositionFinder}
-import Types.Property
+import Utilities.Property
 import bwapi.Unit
 
 class UnitPreferClose extends UnitPreference {

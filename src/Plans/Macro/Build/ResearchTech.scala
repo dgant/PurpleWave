@@ -4,7 +4,7 @@ import Plans.Allocation.{LockCurrency, LockCurrencyForTech, LockUnits, LockUnits
 import Plans.Plan
 import Startup.With
 import Strategies.UnitMatchers.UnitMatchType
-import Types.Property
+import Utilities.Property
 import bwapi.TechType
 
 class ResearchTech(techType: TechType) extends Plan {

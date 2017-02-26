@@ -1,7 +1,7 @@
 package Plans.Compound
 
 import Plans.Plan
-import Types.Property
+import Utilities.Property
 
 class CompleteOnce extends Plan {
   

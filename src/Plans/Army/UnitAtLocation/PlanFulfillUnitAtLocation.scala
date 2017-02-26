@@ -3,7 +3,7 @@ package Plans.Army.UnitAtLocation
 import Plans.Allocation.{LockUnits, LockUnitsNobody}
 import Plans.Plan
 import Strategies.PositionFinders.{PositionCenter, PositionFinder}
-import Types.Property
+import Utilities.Property
 
 class PlanFulfillUnitAtLocation extends Plan {
   

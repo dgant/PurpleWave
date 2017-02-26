@@ -30,7 +30,7 @@ class PositionSimpleBuilding(
       exclusions = With.geography.ourHarvestingAreas)
     
     if (output == None) {
-      With.logger.warn("Failed to place a " ++ buildingType.toString ++ " near " ++ position.toString)
+      With.logger.warn("Failed to place a " ++ buildingType.toString ++ " near " ++ startPosition.toString)
     }
     
     output

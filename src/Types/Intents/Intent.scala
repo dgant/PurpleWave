@@ -1,4 +1,4 @@
-package Global.Allocation.Intents
+package Types.Intents
 
 import bwapi.Position
 

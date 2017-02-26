@@ -7,7 +7,7 @@ import Startup.With
 import Strategies.PositionFinders.{PositionFinder, PositionSimpleBuilding}
 import Strategies.UnitMatchers.{UnitMatchType, UnitMatcher}
 import Strategies.UnitPreferences.{UnitPreferClose, UnitPreference}
-import Types.Property
+import Utilities.Property
 import bwapi.{Position, Race, TilePosition, UnitType}
 
 class BuildBuilding(val buildingType:UnitType) extends Plan {

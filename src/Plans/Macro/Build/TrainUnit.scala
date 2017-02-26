@@ -5,7 +5,7 @@ import Plans.Allocation.{LockCurrency, LockCurrencyForUnit, LockUnits, LockUnits
 import Plans.Plan
 import Startup.With
 import Strategies.UnitMatchers.UnitMatchType
-import Types.Property
+import Utilities.Property
 import bwapi.UnitType
 
 class TrainUnit(val traineeType:UnitType) extends Plan {

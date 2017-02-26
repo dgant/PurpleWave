@@ -1,4 +1,4 @@
-package Types
+package Utilities
 
 class Property[T](default:T) {
   
@@ -24,5 +24,4 @@ class Property[T](default:T) {
     
     _parent = Some(parent)
   }
-  
 }

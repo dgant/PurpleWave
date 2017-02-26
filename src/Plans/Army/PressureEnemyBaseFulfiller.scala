@@ -1,10 +1,10 @@
 package Plans.Army
 
-import Global.Allocation.Intents.Intent
+import Types.Intents.Intent
 import Plans.Allocation.{LockUnits, LockUnitsNobody}
 import Plans.Plan
 import Startup.With
-import Types.Property
+import Utilities.Property
 
 class PressureEnemyBaseFulfiller extends Plan {
   
@@ -23,7 +23,7 @@ class PressureEnemyBaseFulfiller extends Plan {
       return
     }
     
-    val targetPosition = With.intelligence.mostBaselikeEnemyBuilding.get.getPosition
+    val targetPosition = With.intelligence.mostBaselikeEnemyBuilding.get.position
     fighters.get.units.foreach(unit => With.commander.intend(unit, new Intent(Some(targetPosition))))
   }
 }

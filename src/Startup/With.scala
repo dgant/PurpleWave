@@ -24,7 +24,7 @@ object With {
   var recruiter:Recruiter = null
   var scheduler:Scheduler = null
   var intelligence:Intelligence = null
-  var memory:Memory = null
+  var memory:EnemyUnitTracker = null
   
   var _ourUnits:Set[bwapi.Unit] = new HashSet
   var _enemyUnits:Set[bwapi.Unit] = new HashSet

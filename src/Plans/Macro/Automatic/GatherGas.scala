@@ -4,7 +4,7 @@ import Plans.Allocation.{LockUnits, LockUnitsExactly}
 import Plans.Plan
 import Startup.With
 import Strategies.UnitMatchers.UnitMatchWorker
-import Types.Property
+import Utilities.Property
 
 import scala.collection.mutable
 

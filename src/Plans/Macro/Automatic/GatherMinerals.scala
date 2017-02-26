@@ -4,7 +4,7 @@ import Plans.Allocation.{LockUnits, LockUnitsGreedily}
 import Plans.Plan
 import Startup.With
 import Strategies.UnitMatchers.UnitMatchWorker
-import Types.Property
+import Utilities.Property
 import bwapi.UnitCommandType
 
 import scala.collection.JavaConverters._

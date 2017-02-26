@@ -33,7 +33,7 @@ class EnemyUnitInfo (unit:bwapi.Unit) extends UnitInfo {
     _complete           = unit.isCompleted
   }
   
-  def invalidatePosition {
+  def invalidatePosition() {
     _possiblyStillThere = false
   }
   

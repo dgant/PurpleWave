@@ -27,11 +27,41 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="FriendlyUnitInfo.scala" pinned="false" current-in-tab="false">
+      <file leaf-file-name="FriendlyUnitInfo.scala" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Types/UnitInfo/FriendlyUnitInfo.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="221">
-              <caret line="17" column="52" lean-forward="false" selection-start-line="17" selection-start-column="52" selection-end-line="17" selection-end-column="52" />
+            <state relative-caret-position="247">
+              <caret line="19" column="0" lean-forward="true" selection-start-line="19" selection-start-column="0" selection-end-line="19" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Units.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Global/Information/UnitAbstraction/Units.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="104">
+              <caret line="8" column="39" lean-forward="true" selection-start-line="8" selection-start-column="39" selection-end-line="8" selection-end-column="39" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="With.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Startup/With.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="260">
+              <caret line="28" column="11" lean-forward="false" selection-start-line="28" selection-start-column="6" selection-end-line="28" selection-end-column="11" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Bot.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Startup/Bot.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="546">
+              <caret line="49" column="28" lean-forward="false" selection-start-line="49" selection-start-column="28" selection-end-line="49" selection-end-column="28" />
               <folding />
             </state>
           </provider>
@@ -40,18 +70,28 @@
       <file leaf-file-name="EnemyUnitInfo.scala" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Types/UnitInfo/EnemyUnitInfo.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="353">
-              <caret line="35" column="26" lean-forward="true" selection-start-line="35" selection-start-column="26" selection-end-line="35" selection-end-column="26" />
+            <state relative-caret-position="156">
+              <caret line="12" column="16" lean-forward="false" selection-start-line="12" selection-start-column="16" selection-end-line="12" selection-end-column="16" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="BuildGatewayUnitsContinuously.scala" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/Plans/Macro/Automatic/BuildGatewayUnitsContinuously.scala">
+      <file leaf-file-name="EnemyUnitTracker.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Global/Information/UnitAbstraction/EnemyUnitTracker.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="221">
-              <caret line="17" column="96" lean-forward="false" selection-start-line="17" selection-start-column="96" selection-end-line="17" selection-end-column="96" />
+            <state relative-caret-position="444">
+              <caret line="58" column="23" lean-forward="true" selection-start-line="58" selection-start-column="23" selection-end-line="58" selection-end-column="23" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="FriendlyUnitTracker.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Global/Information/UnitAbstraction/FriendlyUnitTracker.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="468">
+              <caret line="36" column="46" lean-forward="true" selection-start-line="36" selection-start-column="46" selection-end-line="36" selection-end-column="46" />
               <folding />
             </state>
           </provider>
@@ -70,7 +110,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>We ordered to</find>
       <find>.move</find>
       <find>Int</find>
       <find>Requirement</find>
@@ -100,6 +139,7 @@
       <find>getHq</find>
       <find>patrol</find>
       <find>move</find>
+      <find>EnemyUnitInfo</find>
     </findStrings>
     <replaceStrings>
       <replace>{  _mirror</replace>
@@ -111,14 +151,12 @@
       <replace>Fulfiller</replace>
       <replace>buildable</replace>
       <replace>set</replace>
+      <replace>FriendlyUnitInfo</replace>
     </replaceStrings>
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/Geometry/Influence/MapEnemySmallAirDamage.scala" />
-        <option value="$PROJECT_DIR$/src/Geometry/Influence/MapEnemyMediumAirDamage.scala" />
-        <option value="$PROJECT_DIR$/src/Geometry/Influence/MapEnemyLargeAirDamage.scala" />
         <option value="$PROJECT_DIR$/src/Geometry/Influence/MapFriendlyGroundDamage.scala" />
         <option value="$PROJECT_DIR$/src/Geometry/Influence/MapFriendlyAirDamage.scala" />
         <option value="$PROJECT_DIR$/src/Geometry/Influence/MapEnemyWeakness.scala" />
@@ -143,7 +181,6 @@
         <option value="$PROJECT_DIR$/src/Global/Information/Combat/CombatPredictor.scala" />
         <option value="$PROJECT_DIR$/src/Utilities/Positions.scala" />
         <option value="$PROJECT_DIR$/src/Geometry/Positions.scala" />
-        <option value="$PROJECT_DIR$/src/Startup/With.scala" />
         <option value="$PROJECT_DIR$/src/Plans/Information/KnowEnemyBaseLocationChecker.scala" />
         <option value="$PROJECT_DIR$/src/Plans/Information/KnowEnemyBaseLocationFulfiller.scala" />
         <option value="$PROJECT_DIR$/src/Global/Information/Geography.scala" />
@@ -156,17 +193,21 @@
         <option value="$PROJECT_DIR$/src/Utilities/Enrichment/EnrichPosition.scala" />
         <option value="$PROJECT_DIR$/src/Global/Information/Shmunits.scala" />
         <option value="$PROJECT_DIR$/src/Types/UnitInfo/UnitInfo.scala" />
-        <option value="$PROJECT_DIR$/src/Global/Information/Units.scala" />
-        <option value="$PROJECT_DIR$/src/Global/Information/EnemyUnitTracker.scala" />
         <option value="$PROJECT_DIR$/src/Development/Overlay.scala" />
         <option value="$PROJECT_DIR$/src/Global/Information/Intelligence.scala" />
         <option value="$PROJECT_DIR$/src/Plans/Army/PressureEnemyBaseFulfiller.scala" />
-        <option value="$PROJECT_DIR$/src/Startup/Bot.scala" />
         <option value="$PROJECT_DIR$/src/Strategies/PositionFinders/PositionSimpleBuilding.scala" />
-        <option value="$PROJECT_DIR$/src/Types/UnitInfo/EnemyUnitInfo.scala" />
         <option value="$PROJECT_DIR$/src/Types/UnitInfo/OurUnitInfo.scala" />
-        <option value="$PROJECT_DIR$/src/Types/UnitInfo/FriendlyUnitInfo.scala" />
         <option value="$PROJECT_DIR$/src/Plans/Macro/Automatic/BuildGatewayUnitsContinuously.scala" />
+        <option value="$PROJECT_DIR$/src/Global/Information/EnemyUnitTracker.scala" />
+        <option value="$PROJECT_DIR$/src/Types/UnitInfo/EnemyUnitInfo.scala" />
+        <option value="$PROJECT_DIR$/src/Startup/With.scala" />
+        <option value="$PROJECT_DIR$/src/Startup/Bot.scala" />
+        <option value="$PROJECT_DIR$/src/Global/Information/Units.scala" />
+        <option value="$PROJECT_DIR$/src/Types/UnitInfo/FriendlyUnitInfo.scala" />
+        <option value="$PROJECT_DIR$/src/Global/Information/UnitAbstraction/FriendlyUnitTracker.scala" />
+        <option value="$PROJECT_DIR$/src/Global/Information/UnitAbstraction/EnemyUnitTracker.scala" />
+        <option value="$PROJECT_DIR$/src/Global/Information/UnitAbstraction/Units.scala" />
       </list>
     </option>
   </component>
@@ -394,6 +435,32 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
+              <option name="myItemId" value="UnitAbstraction" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="PurpleWave1" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="PurpleWave1" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Global" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Information" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
               <option name="myItemId" value="Combat" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
@@ -473,11 +540,11 @@
       <recent name="UnitMatching" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="Global.Information.UnitAbstraction" />
       <recent name="Utilities.Enrichment" />
       <recent name="Geometry.Influence" />
       <recent name="Plans.Compound" />
       <recent name="Plans.Generic.Allocation" />
-      <recent name="Plans.Generic.Macro" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\prog\PurpleWave1" />
@@ -743,25 +810,25 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="scala-line">
           <url>file://$PROJECT_DIR$/src/Startup/Bot.scala</url>
-          <line>78</line>
+          <line>81</line>
           <properties />
           <option name="timeStamp" value="587" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="scala-line">
           <url>file://$PROJECT_DIR$/src/Startup/Bot.scala</url>
-          <line>85</line>
+          <line>88</line>
           <properties />
           <option name="timeStamp" value="588" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="scala-line">
           <url>file://$PROJECT_DIR$/src/Startup/Bot.scala</url>
-          <line>94</line>
+          <line>97</line>
           <properties />
           <option name="timeStamp" value="589" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="scala-line">
           <url>file://$PROJECT_DIR$/src/Startup/Bot.scala</url>
-          <line>39</line>
+          <line>41</line>
           <properties />
           <option name="timeStamp" value="590" />
         </line-breakpoint>
@@ -774,13 +841,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/Geometry/Influence/MapFriendlyDamage.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="117">
-          <caret line="9" column="122" lean-forward="true" selection-start-line="9" selection-start-column="122" selection-end-line="9" selection-end-column="122" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Geometry/Influence/MapDamage.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="151">
@@ -899,14 +959,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="127">
           <caret line="24" column="30" lean-forward="false" selection-start-line="24" selection-start-column="30" selection-end-line="24" selection-end-column="30" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$PROJECT_DIR$/lib/bwmirror_v2_5.jar!/bwapi/Unit.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="121">
-          <caret line="948" column="19" lean-forward="false" selection-start-line="948" selection-start-column="19" selection-end-line="948" selection-end-column="19" />
           <folding />
         </state>
       </provider>
@@ -1055,14 +1107,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Startup/With.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="13">
-          <caret line="12" column="28" lean-forward="true" selection-start-line="12" selection-start-column="28" selection-end-line="12" selection-end-column="28" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Utilities/Property.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="104">
@@ -1075,14 +1119,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="24" lean-forward="false" selection-start-line="0" selection-start-column="24" selection-end-line="0" selection-end-column="24" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Global/Information/Units.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="377">
-          <caret line="31" column="4" lean-forward="false" selection-start-line="31" selection-start-column="4" selection-end-line="31" selection-end-column="4" />
           <folding />
         </state>
       </provider>
@@ -1111,14 +1147,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Startup/Bot.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="224">
-          <caret line="101" column="54" lean-forward="false" selection-start-line="101" selection-start-column="54" selection-end-line="101" selection-end-column="54" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Strategies/PositionFinders/PositionSimpleBuilding.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="289">
@@ -1135,34 +1163,74 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Global/Information/EnemyUnitTracker.scala">
+    <entry file="file://$PROJECT_DIR$/src/Plans/Macro/Automatic/BuildGatewayUnitsContinuously.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="39">
-          <caret line="6" column="31" lean-forward="true" selection-start-line="6" selection-start-column="31" selection-end-line="6" selection-end-column="31" />
+        <state relative-caret-position="143">
+          <caret line="11" column="38" lean-forward="false" selection-start-line="11" selection-start-column="38" selection-end-line="11" selection-end-column="38" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Types/UnitInfo/FriendlyUnitInfo.scala">
+    <entry file="file://$PROJECT_DIR$/src/Startup/Bot.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="17" column="52" lean-forward="false" selection-start-line="17" selection-start-column="52" selection-end-line="17" selection-end-column="52" />
+        <state relative-caret-position="546">
+          <caret line="49" column="28" lean-forward="false" selection-start-line="49" selection-start-column="28" selection-end-line="49" selection-end-column="28" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Startup/With.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="260">
+          <caret line="28" column="11" lean-forward="false" selection-start-line="28" selection-start-column="6" selection-end-line="28" selection-end-column="11" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$PROJECT_DIR$/lib/bwmirror_v2_5.jar!/bwapi/Unit.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="220">
+          <caret line="28" column="15" lean-forward="false" selection-start-line="28" selection-start-column="15" selection-end-line="28" selection-end-column="15" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Global/Information/UnitAbstraction/Units.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="104">
+          <caret line="8" column="39" lean-forward="true" selection-start-line="8" selection-start-column="39" selection-end-line="8" selection-end-column="39" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Types/UnitInfo/EnemyUnitInfo.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="353">
-          <caret line="35" column="26" lean-forward="true" selection-start-line="35" selection-start-column="26" selection-end-line="35" selection-end-column="26" />
+        <state relative-caret-position="156">
+          <caret line="12" column="16" lean-forward="false" selection-start-line="12" selection-start-column="16" selection-end-line="12" selection-end-column="16" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Plans/Macro/Automatic/BuildGatewayUnitsContinuously.scala">
+    <entry file="file://$PROJECT_DIR$/src/Global/Information/UnitAbstraction/EnemyUnitTracker.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="17" column="96" lean-forward="false" selection-start-line="17" selection-start-column="96" selection-end-line="17" selection-end-column="96" />
+        <state relative-caret-position="444">
+          <caret line="58" column="23" lean-forward="true" selection-start-line="58" selection-start-column="23" selection-end-line="58" selection-end-column="23" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Global/Information/UnitAbstraction/FriendlyUnitTracker.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="468">
+          <caret line="36" column="46" lean-forward="true" selection-start-line="36" selection-start-column="46" selection-end-line="36" selection-end-column="46" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Types/UnitInfo/FriendlyUnitInfo.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="247">
+          <caret line="19" column="0" lean-forward="true" selection-start-line="19" selection-start-column="0" selection-end-line="19" selection-end-column="0" />
           <folding />
         </state>
       </provider>

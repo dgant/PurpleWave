@@ -3,6 +3,7 @@ package Startup
 import Development.Logger
 import Global.Allocation._
 import Global.Information.Combat.CombatSimulator
+import Global.Information.UnitAbstraction.{EnemyUnitTracker, Units}
 import Global.Information._
 import Plans.GamePlans.PlanWinTheGame
 
@@ -17,14 +18,15 @@ object With {
   var commander:Commander = null
   var economy:Economy = null
   var history:History = null
+  var intelligence:Intelligence = null
   var geography:Geography = null
   var gameplan:PlanWinTheGame = null
   var logger:Logger = null
   var prioritizer:Prioritizer = null
   var recruiter:Recruiter = null
   var scheduler:Scheduler = null
-  var intelligence:Intelligence = null
-  var memory:EnemyUnitTracker = null
+  var tracker:EnemyUnitTracker = null
+  var units: Units = null
   
   var _ourUnits:Set[bwapi.Unit] = new HashSet
   var _enemyUnits:Set[bwapi.Unit] = new HashSet

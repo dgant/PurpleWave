@@ -200,7 +200,7 @@ object Overlay {
   }
   
   def _drawTrackedUnits() {
-    With.memory.knownEnemyUnits.foreach(_drawTrackedUnit)
+    With.tracker.units.foreach(_drawTrackedUnit)
   }
   
   def _drawTrackedUnit(trackedUnit:EnemyUnitInfo) {

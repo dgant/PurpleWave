@@ -3,6 +3,7 @@ package Startup
 import Development.{AutoCamera, Configuration, Logger, Overlay}
 import Global.Allocation._
 import Global.Information.Combat.CombatSimulator
+import Global.Information.UnitAbstraction.{EnemyUnitTracker, Units}
 import Global.Information._
 import Plans.GamePlans.PlanWinTheGame
 import bwapi.DefaultBWListener
@@ -26,11 +27,12 @@ class Bot() extends DefaultBWListener {
       With.geography = new Geography
       With.gameplan = new PlanWinTheGame
       With.history = new History
-      With.memory = new EnemyUnitTracker
+      With.tracker = new EnemyUnitTracker
       With.intelligence = new Intelligence
       With.prioritizer = new Prioritizer
       With.recruiter = new Recruiter
       With.scheduler = new Scheduler
+      With.units = new Units
   
       Overlay.enabled = Configuration.enableOverlay
       AutoCamera.enabled = Configuration.enableCamera
@@ -43,9 +45,10 @@ class Bot() extends DefaultBWListener {
   override def onFrame() {
     try {
       With.onFrame()
+      With.units.onFrame()
       With.simulator.onFrame()
       With.economy.onFrame()
-      With.memory.onFrame()
+      With.tracker.onFrame()
       With.bank.onFrame()
       With.recruiter.onFrame()
       With.prioritizer.onFrame()
@@ -72,7 +75,7 @@ class Bot() extends DefaultBWListener {
 
   override def onUnitDestroy(unit: bwapi.Unit) {
     try {
-      With.memory.onUnitDestroy(unit)
+      With.tracker.onUnitDestroy(unit)
       With.history.onUnitDestroy(unit)
       AutoCamera.focusUnit(unit)
     }
@@ -98,8 +101,8 @@ class Bot() extends DefaultBWListener {
   def _considerSurrender() = {
     if (With.game.self.supplyUsed == 0
       && With.game.self.minerals < 50
-      && With.memory.knownEnemyUnits.exists(_.unitType.isWorker)
-      && With.memory.knownEnemyUnits.exists(_.unitType.isResourceDepot)) {
+      && With.tracker.units.exists(_.unitType.isWorker)
+      && With.tracker.units.exists(_.unitType.isResourceDepot)) {
       With.game.sendText("Good game! Let's pretend this never happened.")
       With.game.leaveGame()
     }

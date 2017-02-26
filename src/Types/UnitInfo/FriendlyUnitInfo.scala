@@ -4,16 +4,16 @@ import bwapi._
 
 import Utilities.Enrichment.EnrichPosition._
 
-class FriendlyUnitInfo(var _unit:bwapi.Unit) extends UnitInfo {
-  override def id: Int = _unit.getID
+class FriendlyUnitInfo(var baseUnit:bwapi.Unit) extends UnitInfo {
+  override def id: Int = baseUnit.getID
   override def lastSeen: Int = With.game.getFrameCount
   override def possiblyStillThere: Boolean = true
-  override def player: Player = _unit.getPlayer
-  override def position: Position = _unit.getPosition
+  override def player: Player = baseUnit.getPlayer
+  override def position: Position = baseUnit.getPosition
   override def walkPosition: WalkPosition = position.toWalkPosition
-  override def tilePosition: TilePosition = _unit.getTilePosition
-  override def hitPoints: Int = _unit.getHitPoints
-  override def shieldPoints: Int = _unit.getShields
-  override def unitType: UnitType = _unit.getType
-  override def complete: Boolean = _unit.isCompleted
+  override def tilePosition: TilePosition = baseUnit.getTilePosition
+  override def hitPoints: Int = baseUnit.getHitPoints
+  override def shieldPoints: Int = baseUnit.getShields
+  override def unitType: UnitType = baseUnit.getType
+  override def complete: Boolean = baseUnit.isCompleted
 }

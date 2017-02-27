@@ -16,6 +16,6 @@ class PlanFulfillUnitAtLocation extends Plan {
     unitPlan.get.onFrame()
     unitPlan.get.units.foreach(unit =>
         positionFinder.get.find.foreach(position =>
-          unit.move(position.toPosition)))
+          unit.baseUnit.move(position.toPosition)))
   }
 }

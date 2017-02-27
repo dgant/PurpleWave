@@ -19,7 +19,7 @@ class Scheduler {
   
   def queue:Iterable[Buildable] = {
     val unitsWanted = new mutable.HashMap[UnitType, Int]
-    val unitsActual = With.ourUnits.groupBy(_.getType).mapValues(_.size)
+    val unitsActual = With.units.ours.groupBy(_.unitType).mapValues(_.size)
     _requests.keys.toList
       .sortBy(With.prioritizer.getPriority)
       .flatten(_requests(_))

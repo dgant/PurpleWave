@@ -31,7 +31,7 @@ class ResearchTech(techType: TechType) extends Plan {
       currency.get.isSpent = true
     }
     else if (researcherUnit.getTech == TechType.None) {
-      researcherUnit.research(techType)
+      researcherUnit.baseUnit.research(techType)
       currency.get.isSpent = true
     }
   }

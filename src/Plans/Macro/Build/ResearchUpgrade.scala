@@ -31,7 +31,7 @@ class ResearchUpgrade(upgradeType: UpgradeType, level: Int) extends Plan {
       currency.get.isSpent = true
     }
     else if (researcherUnit.getUpgrade == UpgradeType.None) {
-      researcherUnit.upgrade(upgradeType)
+      researcherUnit.baseUnit.upgrade(upgradeType)
       currency.get.isSpent = true
     }
   }

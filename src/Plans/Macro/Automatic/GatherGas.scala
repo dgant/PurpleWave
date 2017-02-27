@@ -4,6 +4,7 @@ import Plans.Allocation.{LockUnits, LockUnitsExactly}
 import Plans.Plan
 import Startup.With
 import Strategies.UnitMatchers.UnitMatchWorker
+import Types.UnitInfo.FriendlyUnitInfo
 import Utilities.Property
 
 import scala.collection.mutable
@@ -21,8 +22,8 @@ class GatherGas extends Plan {
     _orderWorkers()
   }
   
-  def _ourRefineries:Iterable[bwapi.Unit] = {
-    With.ourUnits.filter(unit => unit.isCompleted && unit.getType.isRefinery)
+  def _ourRefineries:Iterable[FriendlyUnitInfo] = {
+    With.units.ours.filter(unit => unit.complete && unit.unitType.isRefinery)
   }
   
   def _getMinerCount:Int = {
@@ -31,17 +32,17 @@ class GatherGas extends Plan {
       return 0
     }
     var workers = 3 * _ourRefineries.size
-    workers = Math.min(workers, With.ourUnits.filter(unit => unit.isCompleted && unit.getType.isWorker).size / 3)
+    workers = Math.min(workers, With.units.ours.filter(unit => unit.complete && unit.unitType.isWorker).size / 3)
     workers
   }
   
   def _orderWorkers() {
-    val unassignedWorkers = new mutable.HashSet[bwapi.Unit] ++= workerPlan.get.units
+    val unassignedWorkers = new mutable.HashSet[FriendlyUnitInfo] ++= workerPlan.get.units
     _ourRefineries
       .foreach(refinery => {
         (1 to 3).foreach(i => {
           if (unassignedWorkers.nonEmpty) {
-            val worker = unassignedWorkers.minBy(_.getPosition.getApproxDistance(refinery.getPosition))
+            val worker = unassignedWorkers.minBy(_.position.getApproxDistance(refinery.position))
             unassignedWorkers.remove(worker)
             if ( ! worker.isGatheringGas) {
               //Workers tend to get stuck returning cargo
@@ -54,7 +55,7 @@ class GatherGas extends Plan {
                 }
               }
               else*/ {
-                worker.gather(refinery)
+                worker.baseUnit.gather(refinery.baseUnit)
               }
             }
           }

@@ -8,16 +8,16 @@ class BuildGatewayUnitsContinuously extends AbstractBuildContinuously[TrainUnit]
   
   override def _buildPlan:TrainUnit = {
     new TrainUnit(
-      if (With.ourUnits.exists(_.getType == UnitType.Protoss_Templar_Archives)
+      if (With.units.ours.exists(_.unitType == UnitType.Protoss_Templar_Archives)
         && With.game.self.gas >= UnitType.Protoss_Dark_Templar.gasPrice
-        && With.ourUnits.filter(_.getType == UnitType.Protoss_Dark_Templar).size < 2) {
+        && With.units.ours.filter(_.unitType == UnitType.Protoss_Dark_Templar).size < 2) {
         UnitType.Protoss_Dark_Templar
       }
-      else if (With.ourUnits.exists(_.getType == UnitType.Protoss_Cybernetics_Core)
+      else if (With.units.ours.exists(_.unitType == UnitType.Protoss_Cybernetics_Core)
         && With.game.self.gas >= UnitType.Protoss_Dragoon.gasPrice
-        && (With.tracker.units.exists(enemy => enemy.unitType.isFlyer && enemy.unitType.canAttack)
-          || With.ourUnits.filter(_.getType == UnitType.Protoss_Dragoon).size * 2 <
-             With.ourUnits.filter(_.getType == UnitType.Protoss_Zealot).size * 3)) {
+        && (With.units.enemy.exists(enemy => enemy.unitType.isFlyer && enemy.unitType.canAttack)
+          || With.units.ours.filter(_.unitType == UnitType.Protoss_Dragoon).size * 2 <
+             With.units.ours.filter(_.unitType == UnitType.Protoss_Zealot).size * 3)) {
         UnitType.Protoss_Dragoon
       }
       else {
@@ -26,6 +26,6 @@ class BuildGatewayUnitsContinuously extends AbstractBuildContinuously[TrainUnit]
   }
   
   override def _additionalPlansRequired:Int = {
-    Math.max(0, With.ourUnits.filter(_.getType == UnitType.Protoss_Gateway).size - _currentBuilds.size)
+    Math.max(0, With.units.ours.filter(_.unitType == UnitType.Protoss_Gateway).size - _currentBuilds.size)
   }
 }

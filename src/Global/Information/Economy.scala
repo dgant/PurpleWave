@@ -2,6 +2,7 @@ package Global.Information
 
 import Geometry.TileRectangle
 import Startup.With
+import Types.UnitInfo.FriendlyUnitInfo
 import bwapi.Race
 
 import scala.collection.JavaConverters._
@@ -110,7 +111,7 @@ class Economy {
         .sum
   }
   
-  def ourMiningBases:Iterable[bwapi.Unit] = {
+  def ourMiningBases:Iterable[FriendlyUnitInfo] = {
     //TODO: Don't count macro hatches or bases without minerals
     With.geography.ourBaseHalls
   }

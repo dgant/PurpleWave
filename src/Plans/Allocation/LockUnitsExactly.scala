@@ -3,6 +3,7 @@ package Plans.Allocation
 import Startup.With
 import Strategies.UnitMatchers.{UnitMatchAnything, UnitMatcher}
 import Strategies.UnitPreferences.{UnitPreferAnything, UnitPreference}
+import Types.UnitInfo.FriendlyUnitInfo
 import Utilities.Property
 
 import scala.collection.mutable
@@ -11,11 +12,11 @@ class LockUnitsExactly extends LockUnits {
   
   description.set(Some("Reserve a fixed number of units"))
   
-  val quantity        = new Property[Integer](1)
+  val quantity        = new Property[Int](1)
   val unitPreference  = new Property[UnitPreference](UnitPreferAnything)
   val unitMatcher     = new Property[UnitMatcher](UnitMatchAnything)
   
-  override def getRequiredUnits(candidates:Iterable[Iterable[bwapi.Unit]]):Option[Iterable[bwapi.Unit]] = {
+  override def getRequiredUnits(candidates:Iterable[Iterable[FriendlyUnitInfo]]):Option[Iterable[FriendlyUnitInfo]] = {
   
     val currentUnits = With.recruiter.getUnits(this)
     val desiredUnits =

@@ -4,9 +4,9 @@ import Global.Information.Combat.CombatSimulation
 import Plans.Allocation.{LockCurrency, LockUnits}
 import Plans.Plan
 import Startup.With
-import Types.UnitInfo.EnemyUnitInfo
+import Types.UnitInfo.ForeignUnitInfo
 import bwapi.{Color, Position, UnitCommandType}
-import Utilities.Enrichment.EnrichUnit._
+import Utilities.Enrichment.EnrichUnitType._
 import bwta.BWTA
 
 import scala.collection.JavaConverters._
@@ -59,15 +59,15 @@ object Overlay {
   }
   
   def _drawUnits() {
-    With.ourUnits
+    With.units.ours
       .filter(unit => Debugger.highlitUnits.contains(unit))
       .foreach(unit =>
-      With.game.drawCircleMap(unit.getPosition, 32, bwapi.Color.Orange))
-    With.ourUnits
-      .filterNot(_.getLastCommand.getUnitCommandType == UnitCommandType.None)
+      With.game.drawCircleMap(unit.position, 32, bwapi.Color.Orange))
+    With.units.ours
+      .filterNot(_.command.getUnitCommandType == UnitCommandType.None)
       .foreach(unit => _drawTextLabel(
-        List(unit.getLastCommand.getUnitCommandType.toString),
-        unit.getPosition,
+        List(unit.command.getUnitCommandType.toString),
+        unit.position,
         drawBackground = true))
   }
   
@@ -203,8 +203,8 @@ object Overlay {
     With.tracker.units.foreach(_drawTrackedUnit)
   }
   
-  def _drawTrackedUnit(trackedUnit:EnemyUnitInfo) {
-    if (trackedUnit._possiblyStillThere && trackedUnit.unit.isEmpty) {
+  def _drawTrackedUnit(trackedUnit:ForeignUnitInfo) {
+    if (trackedUnit._possiblyStillThere && ! trackedUnit.visible) {
       With.game.drawCircleMap(
         trackedUnit.position,
         trackedUnit.unitType.width / 2,
@@ -228,19 +228,19 @@ object Overlay {
     With.game.drawLineMap(simulation.focalPoint, simulation.enemyGroup.vanguard, Color.Red)
     With.game.drawBoxMap(
       new Position(
-        simulation.ourGroup.units.filter(_.stillExists).map(_.getX).min,
-        simulation.ourGroup.units.filter(_.stillExists).map(_.getY).min),
+        simulation.ourGroup.units.map(_.x).min,
+        simulation.ourGroup.units.map(_.y).min),
       new Position(
-        simulation.ourGroup.units.filter(_.stillExists).map(_.getX).max,
-        simulation.ourGroup.units.filter(_.stillExists).map(_.getY).max),
+        simulation.ourGroup.units.map(_.x).max,
+        simulation.ourGroup.units.map(_.y).max),
       Color.Orange)
     With.game.drawBoxMap(
       new Position(
-        simulation.enemyGroup.units.filter(_.stillExists).map(_.getX).min,
-        simulation.enemyGroup.units.filter(_.stillExists).map(_.getY).min),
+        simulation.enemyGroup.units.map(_.x).min,
+        simulation.enemyGroup.units.map(_.y).min),
       new Position(
-        simulation.enemyGroup.units.filter(_.stillExists).map(_.getX).max,
-        simulation.enemyGroup.units.filter(_.stillExists).map(_.getY).max),
+        simulation.enemyGroup.units.map(_.x).max,
+        simulation.enemyGroup.units.map(_.y).max),
       Color.Orange)
   }
 }

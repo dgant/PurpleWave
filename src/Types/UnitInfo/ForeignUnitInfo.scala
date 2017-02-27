@@ -4,9 +4,10 @@ import Startup.With
 import bwapi._
 import Utilities.Enrichment.EnrichPosition._
 
-class EnemyUnitInfo (unit:bwapi.Unit) extends UnitInfo {
+class ForeignUnitInfo(_baseUnit:bwapi.Unit) extends UnitInfo (_baseUnit) {
   
   var _possiblyStillThere = false
+  var _alive              = false
   var _lastSeen           = 0
   var _id                 = 0
   var _player             = With.game.self
@@ -17,9 +18,13 @@ class EnemyUnitInfo (unit:bwapi.Unit) extends UnitInfo {
   var _shieldPoints       = 0
   var _unitType           = UnitType.None
   var _complete           = false
-  update(unit)
+  var _flying             = false
+  var _cloaked            = false
+  update(baseUnit)
   
   def update(unit:bwapi.Unit) {
+    baseUnit = unit
+    _alive              = true
     _possiblyStillThere = true
     _lastSeen           = With.game.getFrameCount
     _id                 = unit.getID
@@ -31,12 +36,19 @@ class EnemyUnitInfo (unit:bwapi.Unit) extends UnitInfo {
     _shieldPoints       = unit.getShields
     _unitType           = unit.getType
     _complete           = unit.isCompleted
+    _flying             = unit.isFlying
+    _cloaked            = unit.isCloaked
+  }
+  
+  def flagDead() {
+    _alive = false
   }
   
   def invalidatePosition() {
     _possiblyStillThere = false
   }
   
+  override def alive: Boolean = _alive
   override def id: Int = _id
   override def lastSeen: Int = _lastSeen
   override def possiblyStillThere:Boolean = _possiblyStillThere
@@ -48,4 +60,7 @@ class EnemyUnitInfo (unit:bwapi.Unit) extends UnitInfo {
   override def shieldPoints: Int = _shieldPoints
   override def unitType: UnitType = _unitType
   override def complete: Boolean = _complete
+  override def flying: Boolean = _flying
+  override def visible: Boolean = lastSeen >= With.game.getFrameCount
+  override def cloaked: Boolean = _cloaked
 }

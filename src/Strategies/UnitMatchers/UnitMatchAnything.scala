@@ -1,6 +1,6 @@
 package Strategies.UnitMatchers
-import bwapi.Unit
+import Types.UnitInfo.FriendlyUnitInfo
 
 object UnitMatchAnything extends UnitMatcher {
-  override def accept(unit: Unit): Boolean = true
+  override def accept(unit: FriendlyUnitInfo): Boolean = true
 }

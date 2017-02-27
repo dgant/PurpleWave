@@ -13,11 +13,11 @@ class PositionSimpleBuilding(
   override def find: Option[TilePosition] = _cache.get
   
   def _recalculate: Option[TilePosition] = {
-    val startPosition = With.geography.home.getTilePosition
+    val startPosition = With.geography.home.tilePosition
     
     if (buildingType.isRefinery) {
       //cheap
-      return Some(With.game.getStaticGeysers.asScala.minBy(_.getDistance(With.geography.ourBaseHalls.head)).getTilePosition)
+      return Some(With.game.getStaticGeysers.asScala.minBy(_.getDistance(With.geography.ourBaseHalls.head.position)).getTilePosition)
     }
     
     val margin = if (buildingType == UnitType.Protoss_Pylon) 4 else 1

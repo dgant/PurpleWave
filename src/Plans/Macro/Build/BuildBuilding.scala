@@ -7,6 +7,7 @@ import Startup.With
 import Strategies.PositionFinders.{PositionFinder, PositionSimpleBuilding}
 import Strategies.UnitMatchers.{UnitMatchType, UnitMatcher}
 import Strategies.UnitPreferences.{UnitPreferClose, UnitPreference}
+import Types.UnitInfo.FriendlyUnitInfo
 import Utilities.Property
 import bwapi.{Position, Race, TilePosition, UnitType}
 
@@ -23,8 +24,8 @@ class BuildBuilding(val buildingType:UnitType) extends Plan {
     unitPreference.inherit(builderPreference)
   })
   
-  var _builder:Option[bwapi.Unit] = None
-  var _building:Option[bwapi.Unit] = None
+  var _builder:Option[FriendlyUnitInfo] = None
+  var _building:Option[FriendlyUnitInfo] = None
   var _position:Option[TilePosition] = None
   var _lastOrderFrame = Integer.MIN_VALUE
     
@@ -32,7 +33,7 @@ class BuildBuilding(val buildingType:UnitType) extends Plan {
   
   override def getChildren: Iterable[Plan] = { List(currencyPlan.get, builderPlan.get) }
   override def isComplete: Boolean = {
-    _building.exists(building => building.isCompleted || (building.exists && buildingType.getRace == Race.Protoss))
+    _building.exists(building => building.complete || (building.alive && buildingType.getRace == Race.Protoss))
   }
   
   def startedBuilding:Boolean = {
@@ -44,9 +45,9 @@ class BuildBuilding(val buildingType:UnitType) extends Plan {
       return
     }
   
-    _building = With.ourUnits
-      .filter(unit => unit.getType == buildingType)
-      .filter(unit => _position.exists(position => position == unit.getTilePosition))
+    _building = With.units.ours
+      .filter(unit => unit.unitType == buildingType)
+      .filter(unit => _position.exists(position => position == unit.tilePosition))
       .headOption
   
     currencyPlan.get.isSpent = !_building.isEmpty
@@ -58,7 +59,7 @@ class BuildBuilding(val buildingType:UnitType) extends Plan {
         _builder = builderPlan.get.units.headOption
         if (_building.isDefined) {
           if (buildingType.getRace == Race.Terran) {
-            _builder.foreach(_.rightClick(_building.get))
+            _builder.foreach(_.baseUnit.rightClick(_building.get.baseUnit))
           }
         }
         else {
@@ -68,11 +69,11 @@ class BuildBuilding(val buildingType:UnitType) extends Plan {
     }
   }
   
-  def _orderToBuild(builder:bwapi.Unit) {
+  def _orderToBuild(builder:FriendlyUnitInfo) {
     if (_lastOrderFrame < With.game.getFrameCount - 24) {
       _lastOrderFrame = With.game.getFrameCount
       
-      if (_position.filter(p => With.game.canBuildHere(p, buildingType, builder)).isEmpty) {
+      if (_position.filter(p => With.game.canBuildHere(p, buildingType, builder.baseUnit)).isEmpty) {
         _position = positionFinder.get.find
       }
   
@@ -84,9 +85,9 @@ class BuildBuilding(val buildingType:UnitType) extends Plan {
         
         // Can't order builds in fog of war
         if (positionExplored) {
-          builder.build(buildingType, _position.get)
+          builder.baseUnit.build(buildingType, _position.get)
         } else {
-          builder.move(_position.get.toPosition)
+          builder.baseUnit.move(_position.get.toPosition)
         }
       }
     }

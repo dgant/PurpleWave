@@ -2,7 +2,7 @@ package Plans.Allocation
 
 import Plans.Plan
 import Startup.With
-import bwapi.Unit
+import Types.UnitInfo.FriendlyUnitInfo
 
 abstract class LockUnits extends Plan {
   
@@ -14,11 +14,11 @@ abstract class LockUnits extends Plan {
     With.recruiter.add(this)
   }
   
-  def units:Set[Unit] = {
+  def units:Set[FriendlyUnitInfo] = {
     With.recruiter.getUnits(this)
   }
   
-  def getRequiredUnits(candidates:Iterable[Iterable[bwapi.Unit]]):Option[Iterable[bwapi.Unit]]
+  def getRequiredUnits(candidates:Iterable[Iterable[FriendlyUnitInfo]]):Option[Iterable[FriendlyUnitInfo]]
   
   override def toString: String = {
     super.toString + (if(isComplete) ": " + units.size else "")

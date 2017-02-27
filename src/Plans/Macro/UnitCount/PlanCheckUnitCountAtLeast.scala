@@ -8,9 +8,9 @@ import Utilities.Property
 class PlanCheckUnitCountAtLeast extends Plan {
   
   val unitMatcher = new Property[UnitMatcher](UnitMatchAnything)
-  val quantity    = new Property[Integer](0)
+  val quantity    = new Property[Int](0)
   
   override def isComplete: Boolean = {
-    With.ourUnits.filter(unitMatcher.get.accept).size >= quantity.get
+    With.units.ours.filter(unitMatcher.get.accept).size >= quantity.get
   }
 }

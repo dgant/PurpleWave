@@ -33,8 +33,8 @@ class DefeatWorkerHarass extends Plan {
     _enemyDefense.foreach(pair => {
       pair._2.onFrame()
       pair._2.units.foreach(defender =>
-        With.enemyUnits.filter(_.getID == pair._1).foreach(enemy =>
-          defender.attack(enemy)))
+        With.units.enemy.filter(_.id == pair._1).foreach(enemy =>
+          defender.baseUnit.attack(enemy.baseUnit)))
     })
   }
   

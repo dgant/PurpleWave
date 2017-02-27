@@ -1,11 +1,12 @@
 package Strategies.UnitMatchers
 
-import bwapi.{Unit, UnitType}
+import Types.UnitInfo.FriendlyUnitInfo
+import bwapi.UnitType
 
 class UnitMatchIncompleteBuilding(unitType:UnitType) extends UnitMatchType(unitType) {
-  override def accept(unit: Unit): Boolean = {
-    unit.getType == unitType &&
-      ! unit.isCompleted &&
-      unit.getBuildUnit == null
+  override def accept(unit: FriendlyUnitInfo): Boolean = {
+    unit.unitType == unitType &&
+      ! unit.complete &&
+      unit.getBuildUnit.nonEmpty
   }
 }

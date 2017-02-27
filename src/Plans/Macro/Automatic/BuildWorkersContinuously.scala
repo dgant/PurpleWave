@@ -33,6 +33,6 @@ class BuildWorkersContinuously extends AbstractBuildContinuously[TrainUnit] {
   }
   
   def _hatcheries:Int = {
-    With.ourUnits.filter(_.getType.producesLarva).size
+    With.units.ours.filter(_.unitType.producesLarva).size
   }
 }

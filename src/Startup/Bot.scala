@@ -1,9 +1,9 @@
 package Startup
 
-import Development.{AutoCamera, Configuration, Logger, Overlay}
+import Development.{Configuration, Logger, Overlay}
 import Global.Allocation._
 import Global.Information.Combat.CombatSimulator
-import Global.Information.UnitAbstraction.{EnemyUnitTracker, Units}
+import Global.Information.UnitAbstraction.{ForeignUnitTracker, Units}
 import Global.Information._
 import Plans.GamePlans.PlanWinTheGame
 import bwapi.DefaultBWListener
@@ -27,7 +27,7 @@ class Bot() extends DefaultBWListener {
       With.geography = new Geography
       With.gameplan = new PlanWinTheGame
       With.history = new History
-      With.tracker = new EnemyUnitTracker
+      With.tracker = new ForeignUnitTracker
       With.intelligence = new Intelligence
       With.prioritizer = new Prioritizer
       With.recruiter = new Recruiter
@@ -35,7 +35,6 @@ class Bot() extends DefaultBWListener {
       With.units = new Units
   
       Overlay.enabled = Configuration.enableOverlay
-      AutoCamera.enabled = Configuration.enableCamera
       With.game.enableFlag(1)
       With.game.setLocalSpeed(0)
     }
@@ -44,7 +43,6 @@ class Bot() extends DefaultBWListener {
 
   override def onFrame() {
     try {
-      With.onFrame()
       With.units.onFrame()
       With.simulator.onFrame()
       With.economy.onFrame()
@@ -56,7 +54,6 @@ class Bot() extends DefaultBWListener {
       With.scheduler.onFrame()
       With.commander.onFrame()
       Overlay.onFrame()
-      AutoCamera.onFrame()
       _considerSurrender
     }
     catch {
@@ -68,7 +65,6 @@ class Bot() extends DefaultBWListener {
 
   override def onUnitComplete(unit: bwapi.Unit) {
     try {
-      AutoCamera.focusUnit(unit)
     }
     catch { case exception:Exception => With.logger.onException(exception) }
   }
@@ -77,14 +73,12 @@ class Bot() extends DefaultBWListener {
     try {
       With.tracker.onUnitDestroy(unit)
       With.history.onUnitDestroy(unit)
-      AutoCamera.focusUnit(unit)
     }
     catch { case exception:Exception => With.logger.onException(exception) }
   }
 
   override def onUnitDiscover(unit: bwapi.Unit) {
     try {
-      AutoCamera.focusUnit(unit)
     }
     catch { case exception:Exception => With.logger.onException(exception) }
   }

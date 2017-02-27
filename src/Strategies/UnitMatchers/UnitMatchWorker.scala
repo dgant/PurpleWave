@@ -1,9 +1,9 @@
 package Strategies.UnitMatchers
 
-import bwapi.Unit
+import Types.UnitInfo.FriendlyUnitInfo
 
 object UnitMatchWorker extends UnitMatcher{
-  override def accept(unit: Unit): Boolean = {
-    return unit.canGather
+  override def accept(unit: FriendlyUnitInfo): Boolean = {
+    return unit.unitType.isWorker
   }
 }

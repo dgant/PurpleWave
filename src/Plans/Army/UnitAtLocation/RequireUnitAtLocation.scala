@@ -11,8 +11,8 @@ import Utilities.Property
 class RequireUnitAtLocation extends AbstractPlanFulfillRequirements {
   
   val meRUAL = this
-  val quantity        = new Property[Integer]         (1)
-  val range           = new Property[Integer]         (32)
+  val quantity        = new Property[Int]         (1)
+  val range           = new Property[Int]         (32)
   val positionFinder  = new Property[PositionFinder]  (new PositionCenter)
   val unitMatcher     = new Property[UnitMatcher]     (UnitMatchAnything)
   val unitPreference  = new Property[UnitPreference]  (UnitPreferAnything)

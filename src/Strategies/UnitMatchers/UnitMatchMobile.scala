@@ -1,8 +1,8 @@
 package Strategies.UnitMatchers
-import bwapi.Unit
+import Types.UnitInfo.FriendlyUnitInfo
 
 class UnitMatchMobile extends UnitMatcher {
-  override def accept(unit: Unit): Boolean = {
-    unit.canMove
+  override def accept(unit: FriendlyUnitInfo): Boolean = {
+    unit.unitType.canMove
   }
 }

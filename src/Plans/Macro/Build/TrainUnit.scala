@@ -5,6 +5,7 @@ import Plans.Allocation.{LockCurrency, LockCurrencyForUnit, LockUnits, LockUnits
 import Plans.Plan
 import Startup.With
 import Strategies.UnitMatchers.UnitMatchType
+import Types.UnitInfo.FriendlyUnitInfo
 import Utilities.Property
 import bwapi.UnitType
 
@@ -15,13 +16,13 @@ class TrainUnit(val traineeType:UnitType) extends Plan {
     this.unitMatcher.set(new UnitMatchType(traineeType.whatBuilds.first))
   })
   
-  var _trainer:Option[bwapi.Unit] = None
-  var _trainee:Option[bwapi.Unit] = None
+  var _trainer:Option[FriendlyUnitInfo] = None
+  var _trainee:Option[FriendlyUnitInfo] = None
   var lastOrderFrame = 0
   
   description.set(Some(TypeDescriber.describeUnitType(traineeType)))
   
-  override def isComplete: Boolean = { _trainee.exists(p => p.exists && p.isCompleted) }
+  override def isComplete: Boolean = { _trainee.exists(p => p.alive && p.complete) }
   override def getChildren: Iterable[Plan] = { List(currencyPlan.get, trainerPlan.get) }
   override def onFrame() {
     if (isComplete) {
@@ -45,7 +46,7 @@ class TrainUnit(val traineeType:UnitType) extends Plan {
     _trainee = None
   }
   
-  def _requireTraining(trainer:bwapi.Unit) {
+  def _requireTraining(trainer:FriendlyUnitInfo) {
     
     // Training?	Ordered?	Unit?	Then
     // ---------- --------- ----- ----
@@ -59,7 +60,7 @@ class TrainUnit(val traineeType:UnitType) extends Plan {
       _reset()
     }
     
-    val isTraining = ! trainer.getTrainingQueue.isEmpty
+    val isTraining = ! trainer.trainingQueue.isEmpty
     val ordered = _trainer.nonEmpty
     
     if (isTraining) {
@@ -67,12 +68,12 @@ class TrainUnit(val traineeType:UnitType) extends Plan {
         //TODO: Make sure we verify that the worker is *not complete* so, say, a wraith floating over a Startport doesn't get linked
         
         //Note that it's possible for a building to briefly have a worker type in the queue with no worker created.
-        _trainee = With.ourUnits
+        _trainee = With.units.ours
           .filter(u =>
-            u.getType == traineeType &&
-            u.getX == trainer.getX &&
-            u.getY == trainer.getY &&
-            ! u.isCompleted)
+            u.unitType == traineeType &&
+            u.x == trainer.x &&
+            u.y == trainer.y &&
+            ! u.complete)
           .headOption
         
         //There seems to be a 1+ frame delay between the queue getting started
@@ -85,10 +86,10 @@ class TrainUnit(val traineeType:UnitType) extends Plan {
     }
   }
   
-  def _orderUnit(trainer:bwapi.Unit) {
+  def _orderUnit(trainer:FriendlyUnitInfo) {
     _trainer = Some(trainer)
     currencyPlan.get.isSpent = true
-    trainer.train(traineeType)
+    trainer.baseUnit.train(traineeType)
     lastOrderFrame = With.game.getFrameCount
   }
 }

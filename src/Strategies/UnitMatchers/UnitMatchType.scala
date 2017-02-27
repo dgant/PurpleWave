@@ -1,9 +1,10 @@
 package Strategies.UnitMatchers
 
-import bwapi.{Unit, UnitType}
+import Types.UnitInfo.FriendlyUnitInfo
+import bwapi.UnitType
 
 class UnitMatchType(unitType:UnitType) extends UnitMatcher {
-  override def accept(unit: Unit): Boolean = {
-    unit.getType == unitType && unit.isCompleted
+  override def accept(unit: FriendlyUnitInfo): Boolean = {
+    unit.unitType == unitType && unit.complete
   }
 }

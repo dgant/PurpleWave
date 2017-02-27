@@ -1,19 +1,20 @@
 package Global.Allocation
 
-import Types.Intents.Intent
 import Global.Information.Combat.CombatSimulation
 import Startup.With
-import Utilities.Enrichment.EnrichUnit._
-import bwapi.{Position, Unit}
+import Types.Intents.Intent
+import Types.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import bwapi.Position
 
 import scala.collection.mutable
 
 class Commander {
   
-  val _intents = new mutable.HashMap[bwapi.Unit, Intent]
-  val _nextOrderFrame = new mutable.HashMap[bwapi.Unit, Int] { override def default(key: Unit): Int = 0 }
+  val _intents = new mutable.HashMap[FriendlyUnitInfo, Intent]
+  val _nextOrderFrame = new mutable.HashMap[FriendlyUnitInfo, Int] {
+    override def default(key: FriendlyUnitInfo): Int = 0 }
   
-  def intend(unit:bwapi.Unit, intent:Intent){
+  def intend(unit:FriendlyUnitInfo, intent:Intent){
     _intents.put(unit, intent)
   }
   
@@ -22,7 +23,7 @@ class Commander {
     _intents.clear()
   }
   
-  def _order(unit:bwapi.Unit, intent:Intent) {
+  def _order(unit:FriendlyUnitInfo, intent:Intent) {
     if (_nextOrderFrame(unit) > With.game.getFrameCount) {
       return
     }
@@ -35,7 +36,7 @@ class Commander {
       val combat = combatOption.get
       val strengthRatio = (1.0 + combat.ourScore) / (1.0 + combat.enemyScore)
     
-      if (unit.isCloaked && combat.enemyGroup.units.forall(!_.getType.isDetector)) {
+      if (unit.cloaked && combat.enemyGroup.units.forall(!_.unitType.isDetector)) {
         _destroy(unit, intent, combat)
       }
       else if (strengthRatio < .75) {
@@ -50,30 +51,30 @@ class Commander {
     }
   }
   
-  def _setOrderDelay(unit:bwapi.Unit, startedAttacking:Boolean = false) {
+  def _setOrderDelay(unit:FriendlyUnitInfo, startedAttacking:Boolean = false) {
     val baseDelay = 7 + With.game.getRemainingLatencyFrames
     val attackDelay = if (startedAttacking) unit.attackFrames else 0
     _nextOrderFrame.put(unit, With.game.getFrameCount + baseDelay + attackDelay)
   }
   
-  def _kite(unit:bwapi.Unit, intent:Intent, combat:CombatSimulation) {
+  def _kite(unit:FriendlyUnitInfo, intent:Intent, combat:CombatSimulation) {
     if (unit.cooldownRemaining > 0) {
       _flee(unit, intent, combat)
     } else {
       val target = _getTargetInRange(unit, intent, combat)
       if (target.isEmpty) {
-        unit.patrol(intent.position.get)
+        unit.baseUnit.patrol(intent.position.get)
         _setOrderDelay(unit, startedAttacking = true)
       } else {
-        unit.attack(target.get)
+        unit.baseUnit.attack(target.get.baseUnit)
         _setOrderDelay(unit, startedAttacking = true)
       }
     }
   }
   
-  def _destroy(unit:bwapi.Unit, intent:Intent, combat:CombatSimulation) {
+  def _destroy(unit:FriendlyUnitInfo, intent:Intent, combat:CombatSimulation) {
     if (unit.cooldownRemaining > 0) {
-      unit.move(intent.position.get)
+      unit.baseUnit.move(intent.position.get)
       _setOrderDelay(unit)
     }
     else {
@@ -81,40 +82,40 @@ class Commander {
       if (target.isEmpty) {
         _journey(unit, intent)
       } else {
-        unit.attack(target.get)
+        unit.baseUnit.attack(target.get.baseUnit)
         _setOrderDelay(unit, startedAttacking = true)
       }
     }
   }
   
-  def _flee(unit:bwapi.Unit, intent:Intent, combat:CombatSimulation) {
+  def _flee(unit:FriendlyUnitInfo, intent:Intent, combat:CombatSimulation) {
     val fleeDistance = 32 * 3
-    var fleePosition = With.geography.home.getPosition
-    val dx = unit.getX - combat.enemyGroup.vanguard.getX
-    val dy = unit.getY - combat.enemyGroup.vanguard.getY
+    var fleePosition = With.geography.home.position
+    val dx = unit.x - combat.enemyGroup.vanguard.getX
+    val dy = unit.y - combat.enemyGroup.vanguard.getY
     val lengthSquared = dx*dx + dy*dy
     if (lengthSquared > 0) {
       val directlyAway = new Position(
-        (unit.getX + fleeDistance * dx / Math.sqrt(lengthSquared)).toInt,
-        (unit.getY + fleeDistance * dy / Math.sqrt(lengthSquared)).toInt)
+        (unit.x + fleeDistance * dx / Math.sqrt(lengthSquared)).toInt,
+        (unit.y + fleeDistance * dy / Math.sqrt(lengthSquared)).toInt)
       if (directlyAway.isValid) {
        // fleePosition = directlyAway
       }
     }
-    unit.move(fleePosition)
+    unit.baseUnit.move(fleePosition)
   }
   
-  def _journey(unit:bwapi.Unit, intent:Intent) {
-    if (unit.getDistance(intent.position.get) < 32 * 8) {
-      unit.patrol(intent.position.get)
+  def _journey(unit:FriendlyUnitInfo, intent:Intent) {
+    if (unit.position.getDistance(intent.position.get) < 32 * 8) {
+      unit.baseUnit.patrol(intent.position.get)
       _setOrderDelay(unit, startedAttacking = true)
     } else {
-      unit.move(intent.position.get)
+      unit.baseUnit.move(intent.position.get)
     }
   }
   
-  def _getTargetInRange(unit:bwapi.Unit, intent:Intent, combat:CombatSimulation):Option[bwapi.Unit] = {
-    val targets = combat.enemyGroup.units.filter(_.getDistance(unit) <= Math.max(unit.range, 64))
+  def _getTargetInRange(unit:FriendlyUnitInfo, intent:Intent, combat:CombatSimulation):Option[UnitInfo] = {
+    val targets = combat.enemyGroup.units.filter(_.position.getDistance(unit.position) <= Math.max(unit.range, 64))
     if (targets.isEmpty) { return None }
     Some(targets.minBy(_.totalHealth))
   }

@@ -2,6 +2,7 @@ package Development
 
 import Plans.Plan
 import Startup.With
+import Types.UnitInfo.UnitInfo
 
 import scala.collection.mutable
 
@@ -19,8 +20,8 @@ object Debugger {
     List(plan) ++ plan.getChildren.flatten(_flatten)
   }
   
-  val highlitUnits = new mutable.HashSet[bwapi.Unit]
-  def toggleHighlight(unit:bwapi.Unit) {
+  val highlitUnits = new mutable.HashSet[UnitInfo]
+  def toggleHighlight(unit:UnitInfo) {
     if (highlitUnits.contains(unit)) {
       highlitUnits.remove(unit)
     } else {

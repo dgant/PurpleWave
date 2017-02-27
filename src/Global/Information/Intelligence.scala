@@ -1,7 +1,7 @@
 package Global.Information
 
 import Startup.With
-import Types.UnitInfo.EnemyUnitInfo
+import Types.UnitInfo.ForeignUnitInfo
 import bwapi.TilePosition
 import bwta.{BWTA, BaseLocation}
 
@@ -13,7 +13,7 @@ class Intelligence {
     With.game.getStartLocations.asScala.filterNot(With.game.isExplored)
   }
   
-  def mostBaselikeEnemyBuilding:Option[EnemyUnitInfo] = {
+  def mostBaselikeEnemyBuilding:Option[ForeignUnitInfo] = {
     With.tracker.units
       .toList
       .filter(unit => unit.unitType.isBuilding)

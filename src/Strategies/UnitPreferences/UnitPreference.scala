@@ -1,5 +1,7 @@
 package Strategies.UnitPreferences
 
+import Types.UnitInfo.FriendlyUnitInfo
+
 trait UnitPreference {
-  def preference(unit:bwapi.Unit):Double
+  def preference(unit:FriendlyUnitInfo):Double
 }

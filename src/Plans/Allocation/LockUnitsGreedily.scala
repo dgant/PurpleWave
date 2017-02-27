@@ -3,6 +3,7 @@ package Plans.Allocation
 import Startup.With
 import Strategies.UnitMatchers.{UnitMatchAnything, UnitMatcher}
 import Strategies.UnitPreferences.{UnitPreferAnything, UnitPreference}
+import Types.UnitInfo.FriendlyUnitInfo
 import Utilities.Property
 
 import scala.collection.mutable
@@ -13,9 +14,9 @@ class LockUnitsGreedily extends LockUnits {
   
   val unitMatcher = new Property[UnitMatcher](UnitMatchAnything)
   val unitPreference = new Property[UnitPreference](UnitPreferAnything)
-  val minimum = new Property[Integer](1)
+  val minimum = new Property[Int](1)
   
-  override def getRequiredUnits(candidates:Iterable[Iterable[bwapi.Unit]]):Option[Iterable[bwapi.Unit]] = {
+  override def getRequiredUnits(candidates:Iterable[Iterable[FriendlyUnitInfo]]):Option[Iterable[FriendlyUnitInfo]] = {
   
     val desiredUnits = With.recruiter.getUnits(this).to[mutable.Set]
     

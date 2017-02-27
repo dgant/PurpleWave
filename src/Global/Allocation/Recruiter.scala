@@ -2,13 +2,14 @@ package Global.Allocation
 
 import Plans.Allocation.LockUnits
 import Startup.With
+import Types.UnitInfo.FriendlyUnitInfo
 
 import scala.collection.mutable
 
 class Recruiter {
-  val _requestByUnit:mutable.HashMap[Int, LockUnits] = mutable.HashMap.empty
-  val _unassignedUnits:mutable.Set[Int] = mutable.Set.empty
-  val _unitsByRequest:mutable.HashMap[LockUnits, mutable.Set[Int]] = mutable.HashMap.empty
+  val _requestByUnit:mutable.HashMap[FriendlyUnitInfo, LockUnits] = mutable.HashMap.empty
+  val _unassignedUnits:mutable.Set[FriendlyUnitInfo] = mutable.Set.empty
+  val _unitsByRequest:mutable.HashMap[LockUnits, mutable.Set[FriendlyUnitInfo]] = mutable.HashMap.empty
   val _updatedRequests:mutable.Set[LockUnits] = mutable.Set.empty
 
   def onFrame() {
@@ -17,21 +18,22 @@ class Recruiter {
     _updatedRequests.clear()
     
     // Remove dead units
-    _requestByUnit.keys.filterNot(id => With.unit(id).exists(_isEligible)).foreach(_unassign)
-    _unassignedUnits.filterNot(id => With.unit(id).exists(u => u.exists)).foreach(_unassignedUnits.remove)
+    _requestByUnit.keys.filterNot(_isEligible).foreach(_unassign)
+    _unassignedUnits.filterNot(_isEligible).foreach(_unassignedUnits.remove)
     
     // Add new units
-    With.ourUnits
+    With.units.ours
       .filter(_isEligible)
-      .map(_.getID).diff(_unassignedUnits ++ _requestByUnit.keys)
+      .toSet
+      .diff(_unassignedUnits ++ _requestByUnit.keys)
       .foreach(_unassignedUnits.add)
     
     //If we suspect any bugginess, enable this
     //_test
   }
   
-  def _isEligible(unit:bwapi.Unit):Boolean = {
-    unit.exists && unit.isCompleted
+  def _isEligible(unit:FriendlyUnitInfo):Boolean = {
+    unit.alive && unit.complete
   }
   
   def _test {
@@ -46,13 +48,9 @@ class Recruiter {
       ))
   }
   
-  def onUnitDestroyed(unit:bwapi.Unit) {
-    _unassign(unit.getID)
-    _unassignedUnits.remove(unit.getID)
-  }
-  
-  def getAssignment(id:Int):Option[LockUnits] = {
-    _requestByUnit.get(id)
+  def onUnitDestroyed(unit:FriendlyUnitInfo) {
+    _unassign(unit)
+    _unassignedUnits.remove(unit)
   }
   
   def add(request: LockUnits) {
@@ -72,14 +70,13 @@ class Recruiter {
     //   Batch 0: Units not assigned
     //   Batch 1+: Units assigned to weaker-priority requests
     //
-    val unassignedUnits = _unassignedUnits.map(With.unit).flatten
     val assignedToLowerPriority = _unitsByRequest.keys
       .filter(otherRequest =>
         With.prioritizer.getPriority(request) <
           With.prioritizer.getPriority(otherRequest))
       .map(getUnits)
     
-    val requiredUnits = request.getRequiredUnits(Iterable(unassignedUnits) ++ assignedToLowerPriority)
+    val requiredUnits = request.getRequiredUnits(Iterable(_unassignedUnits) ++ assignedToLowerPriority)
 
     if (requiredUnits == None) {
       request.isSatisfied = false
@@ -96,9 +93,9 @@ class Recruiter {
       val unitsObsolete = unitsBefore.diff(unitsAfter)
       val unitsNew = unitsAfter.diff(unitsBefore)
       
-      unitsObsolete.map(_.getID).foreach(_unassign)
-      unitsNew.map(_.getID).foreach(_unassign)
-      unitsNew.map(_.getID).foreach(_assign(_, request))
+      unitsObsolete.foreach(_unassign)
+      unitsNew.foreach(_unassign)
+      unitsNew.foreach(_assign(_, request))
     }
   }
   
@@ -107,19 +104,19 @@ class Recruiter {
     _unitsByRequest.remove(request)
   }
   
-  def _assign(id:Int, request:LockUnits) {
-    _requestByUnit(id) = request
-    _unitsByRequest(request).add(id)
-    _unassignedUnits.remove(id)
+  def _assign(unit:FriendlyUnitInfo, request:LockUnits) {
+    _requestByUnit(unit) = request
+    _unitsByRequest(request).add(unit)
+    _unassignedUnits.remove(unit)
   }
   
-  def _unassign(id:Int) {
-    _unassignedUnits.add(id)
-    _requestByUnit.get(id).foreach(request => _unitsByRequest.get(request).foreach(_.remove(id)))
-    _requestByUnit.remove(id)
+  def _unassign(unit:FriendlyUnitInfo) {
+    _unassignedUnits.add(unit)
+    _requestByUnit.get(unit).foreach(request => _unitsByRequest.get(request).foreach(_.remove(unit)))
+    _requestByUnit.remove(unit)
   }
   
-  def getUnits(request: LockUnits):Set[bwapi.Unit] = {
-    _unitsByRequest.getOrElse(request, mutable.Set.empty).map(With.unit).flatten.toSet
+  def getUnits(request: LockUnits):Set[FriendlyUnitInfo] = {
+    _unitsByRequest.getOrElse(request, mutable.Set.empty).toSet
   }
 }

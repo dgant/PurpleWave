@@ -1,6 +1,6 @@
 package Strategies.UnitPreferences
-import bwapi.Unit
+import Types.UnitInfo.FriendlyUnitInfo
 
 object UnitPreferAnything extends UnitPreference {
-  override def preference(unit: Unit): Double = 0
+  override def preference(unit: FriendlyUnitInfo): Double = 0
 }

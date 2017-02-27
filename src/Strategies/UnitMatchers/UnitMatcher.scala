@@ -1,5 +1,7 @@
 package Strategies.UnitMatchers
 
+import Types.UnitInfo.FriendlyUnitInfo
+
 trait UnitMatcher {
-  def accept(unit:bwapi.Unit): Boolean
+  def accept(unit:FriendlyUnitInfo): Boolean
 }

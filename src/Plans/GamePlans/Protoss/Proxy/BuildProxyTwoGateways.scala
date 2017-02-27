@@ -22,7 +22,7 @@ class BuildProxyTwoGateways extends Plan {
   }
   
   val meBPTG = this
-  val proxySearchTileRadius = new Property[Integer](Math.max(With.game.mapWidth, With.game.mapHeight) * 3 / 8)
+  val proxySearchTileRadius = new Property[Int](Math.max(With.game.mapWidth, With.game.mapHeight) * 3 / 8)
   val positionFinder        = new Property[PositionFinder](new PositionCenter)
   val unitMatcher           = new Property[UnitMatcher](UnitMatchWorker)
   val unitPreference        = new Property[UnitPreference](new UnitPreferClose {

@@ -1,11 +1,11 @@
 package Global.Information
 
-import Utilities.Cache
 import Geometry.TileRectangle
 import Startup.With
+import Types.UnitInfo.FriendlyUnitInfo
+import Utilities.Cache
 import bwapi.{Position, TilePosition, UnitType}
 
-import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 class Geography {
@@ -32,12 +32,12 @@ class Geography {
     UnitType.Zerg_Hive
   ).contains(unitType)
   
-  def home:bwapi.Unit = {
-    ourBaseHalls.headOption.getOrElse(With.ourUnits.minBy(_.getType.isBuilding))
+  def home:FriendlyUnitInfo = {
+    ourBaseHalls.headOption.getOrElse(With.units.ours.minBy(_.unitType.isBuilding))
   }
   
-  def ourBaseHalls:Iterable[bwapi.Unit] = {
-    With.ourUnits.filter(unit => isTownHall(unit.getType) && ! unit.isFlying)
+  def ourBaseHalls:Iterable[FriendlyUnitInfo] = {
+    With.units.ours.filter(unit => isTownHall(unit.unitType) && ! unit.flying)
   }
   
   def ourHarvestingAreas:Iterable[TileRectangle] = { _ourMiningAreasCache.get }
@@ -47,17 +47,17 @@ class Geography {
   }
   def _recalculateOurMiningAreas:Iterable[TileRectangle] = {
     ourBaseHalls.map(base => {
-      val nearbyUnits = base.getUnitsInRadius(32 * 10).asScala
+      val nearbyUnits = With.units.inRadius(base.position, 32 * 10)
   
       val minerals = nearbyUnits
-        .filter(_.getType == UnitType.Resource_Mineral_Field)
-        .map(_.getPosition)
+        .filter(_.unitType == UnitType.Resource_Mineral_Field)
+        .map(_.position)
       
       val geysers = nearbyUnits
-        .filter(unit => unit.getType.isRefinery || unit.getType == UnitType.Resource_Vespene_Geyser)
-        .flatten(unit => List(new Position(unit.getX - 32, unit.getY - 16), new Position(unit.getX + 32, unit.getY + 16)))
+        .filter(unit => unit.unitType.isRefinery || unit.unitType == UnitType.Resource_Vespene_Geyser)
+        .flatten(unit => List(new Position(unit.x - 32, unit.y - 16), new Position(unit.x + 32, unit.y + 16)))
       
-      val boxedUnits = minerals ++ geysers :+ base.getPosition
+      val boxedUnits = minerals ++ geysers ++ Iterable(base.position)
       
       //Draw a box around the area
       val top    = boxedUnits.map(_.getY).min + 16

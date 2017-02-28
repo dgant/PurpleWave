@@ -23,7 +23,7 @@ class PositionSimpleBuilding(
     val maxMargin = if (buildingType == UnitType.Protoss_Pylon) 4 else 1
   
     var output:Option[TilePosition] = None
-    (maxMargin to 0).foreach(margin =>
+    (0 to maxMargin).reverse.foreach(margin =>
       output = output.orElse(
         With.architect.placeBuilding(
         buildingType,

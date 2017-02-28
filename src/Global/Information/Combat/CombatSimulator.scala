@@ -14,10 +14,9 @@ class CombatSimulator {
   var combats:Iterable[CombatSimulation] = List.empty
   
   val limitCombatIdentification = new Limiter(8, _defineCombats)
-  val limitCombatSimulation = new Limiter(1, _simulateCombats)
   def onFrame() {
     limitCombatIdentification.act()
-    limitCombatSimulation.act()
+    _simulateCombats
   }
   
   def _defineCombats() {

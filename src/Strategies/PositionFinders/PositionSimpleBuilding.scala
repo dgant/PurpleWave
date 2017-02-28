@@ -13,7 +13,7 @@ class PositionSimpleBuilding(
   override def find: Option[TilePosition] = _cache.get
   
   def _recalculate: Option[TilePosition] = {
-    val startPosition = With.geography.home.tilePosition
+    val startPosition = With.geography.home.toTilePosition
     
     if (buildingType.isRefinery) {
       //cheap

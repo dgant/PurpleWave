@@ -93,15 +93,15 @@ class Commander {
   }
   
   def _flee(unit:FriendlyUnitInfo, intent:Intent, combat:CombatSimulation) {
-    val leash = 32 * 10
-    val fleePosition = With.geography.ourHarvestingAreas
-      .map(area => area.start.midpoint(area.end).toPosition)
-      .headOption
-      .getOrElse(With.geography.home.position)
-    if (fleePosition.getDistance(unit.position) > leash) {
+    val marginOfSafety = 32 * 8
+    if (unit.position.getDistance(combat.enemyGroup.vanguard) < marginOfSafety) {
+      val fleePosition = With.geography.ourHarvestingAreas
+        .map(area => area.start.midpoint(area.end).toPosition)
+        .headOption
+        .getOrElse(With.geography.home)
       unit.baseUnit.move(fleePosition)
     } else {
-      _destroy(unit, new Intent(position = Some(unit.position)), combat)
+      _destroy(unit, intent, combat)
     }
   }
   

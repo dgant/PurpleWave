@@ -32,8 +32,10 @@ class Geography {
     UnitType.Zerg_Hive
   ).contains(unitType)
   
-  def home:FriendlyUnitInfo = {
-    ourBaseHalls.headOption.getOrElse(With.units.ours.minBy(_.unitType.isBuilding))
+  def home:Position = {
+    ourBaseHalls.view.map(_.position).headOption
+      .getOrElse(With.units.ours.view.filter(_.unitType.isBuilding).map(_.position).headOption
+      .getOrElse(new Position(0,0)))
   }
   
   def ourBaseHalls:Iterable[FriendlyUnitInfo] = {
@@ -55,7 +57,7 @@ class Geography {
       
       val geysers = nearbyUnits
         .filter(unit => unit.unitType.isRefinery || unit.unitType == UnitType.Resource_Vespene_Geyser)
-        .flatten(unit => List(new Position(unit.left, unit.top), new Position(unit.right, unit.bottom)))
+        .flatten(unit => List(new Position(unit.left - 16, unit.top), new Position(unit.right + 16, unit.bottom)))
       
       val boxedUnits = minerals ++ geysers ++ Iterable(base.position)
       

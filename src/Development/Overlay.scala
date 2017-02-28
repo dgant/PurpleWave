@@ -24,9 +24,7 @@ object Overlay {
     _drawTrackedUnits()
     _drawResources()
     _drawPlans(With.gameplan)
-    
-    //Buggy because it references old units
-    //_drawCombatSimulations
+    _drawCombatSimulations
   }
   
   def _drawTextLabel(
@@ -220,26 +218,36 @@ object Overlay {
   }
   
   def _drawCombatSimulation(simulation:CombatSimulation) {
-    With.game.drawCircleMap(simulation.focalPoint, 32, Color.Red)
-    With.game.drawCircleMap(simulation.ourGroup.vanguard, 32, Color.Red)
-    With.game.drawCircleMap(simulation.enemyGroup.vanguard, 32, Color.Red)
+    if (simulation.enemyScore * simulation.ourScore == 0) return
+    if (simulation.ourGroup.vanguard.getDistance(simulation.enemyGroup.vanguard) > 32 * 30) return
+    With.game.drawCircleMap(simulation.focalPoint, 8, Color.Red)
+    With.game.drawCircleMap(simulation.ourGroup.vanguard, 8, Color.Red)
+    With.game.drawCircleMap(simulation.enemyGroup.vanguard, 8, Color.Red)
     With.game.drawLineMap(simulation.focalPoint, simulation.ourGroup.vanguard, Color.Red)
     With.game.drawLineMap(simulation.focalPoint, simulation.enemyGroup.vanguard, Color.Red)
-    With.game.drawBoxMap(
-      new Position(
-        simulation.ourGroup.units.map(_.x).min,
-        simulation.ourGroup.units.map(_.y).min),
-      new Position(
-        simulation.ourGroup.units.map(_.x).max,
-        simulation.ourGroup.units.map(_.y).max),
-      Color.Orange)
-    With.game.drawBoxMap(
-      new Position(
-        simulation.enemyGroup.units.map(_.x).min,
-        simulation.enemyGroup.units.map(_.y).min),
-      new Position(
-        simulation.enemyGroup.units.map(_.x).max,
-        simulation.enemyGroup.units.map(_.y).max),
-      Color.Orange)
+    if (simulation.ourGroup.units.nonEmpty) {
+      With.game.drawBoxMap(
+        new Position(
+          simulation.ourGroup.units.map(_.x).min,
+          simulation.ourGroup.units.map(_.y).min),
+        new Position(
+          simulation.ourGroup.units.map(_.x).max,
+          simulation.ourGroup.units.map(_.y).max),
+        Color.Orange)
+    }
+    if (simulation.enemyGroup.units.nonEmpty) {
+      With.game.drawBoxMap(
+        new Position(
+          simulation.enemyGroup.units.map(_.x).min,
+          simulation.enemyGroup.units.map(_.y).min),
+        new Position(
+          simulation.enemyGroup.units.map(_.x).max,
+          simulation.enemyGroup.units.map(_.y).max),
+        Color.Orange)
+    }
+    _drawTextLabel(
+      List(simulation.ourScore + " - " + simulation.enemyScore),
+      simulation.focalPoint,
+      drawBackground = true)
   }
 }

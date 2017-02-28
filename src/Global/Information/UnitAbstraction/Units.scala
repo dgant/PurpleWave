@@ -19,20 +19,12 @@ class Units {
     get(unit.getID)
   }
   
-  def all:Iterable[UnitInfo] = {
-    _friendlyUnitTracker.units ++ _foreignUnitTracker.units
+  def ours:Set[FriendlyUnitInfo] = {
+    _friendlyUnitTracker.ourUnits
   }
   
-  def ours:Iterable[FriendlyUnitInfo] = {
-    _friendlyUnitTracker.units.filter(_.player == With.game.self)
-  }
-  
-  def enemy:Iterable[ForeignUnitInfo] = {
-    _foreignUnitTracker.units
-  }
-  
-  def ally:Iterable[FriendlyUnitInfo] = {
-    _friendlyUnitTracker.units.filter(_.player != With.game.self)
+  def enemy:Set[ForeignUnitInfo] = {
+    _foreignUnitTracker.enemyUnits
   }
   
   def _remap(units:java.util.List[bwapi.Unit]):Iterable[UnitInfo] = {

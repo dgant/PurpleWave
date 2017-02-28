@@ -7,8 +7,10 @@ import Startup.With
 import Strategies.PositionFinders.{PositionFinder, PositionSimpleBuilding}
 import Strategies.UnitMatchers.{UnitMatchType, UnitMatcher}
 import Strategies.UnitPreferences.{UnitPreferClose, UnitPreference}
+import Types.Intents.Intent
 import Types.UnitInfo.FriendlyUnitInfo
 import Utilities.Property
+import Utilities.Enrichment.EnrichPosition._
 import bwapi.{Position, Race, TilePosition, UnitType}
 
 class BuildBuilding(val buildingType:UnitType) extends Plan {
@@ -66,6 +68,14 @@ class BuildBuilding(val buildingType:UnitType) extends Plan {
           _builder.foreach(_orderToBuild)
         }
       }
+    }
+    else if (builderPlan.get.isComplete) {
+      //If the builder is available to us but we're not ready to build, let's just send it where it needs to go
+      _position = positionFinder.get.find
+      builderPlan.get.units.foreach(unit => With.commander.intend(
+        unit,
+        new Intent(position = Some(_position.get.toPosition.add(
+          new Position(buildingType.width/2, buildingType.height/2))))))
     }
   }
   

@@ -5,7 +5,7 @@ import Global.Allocation._
 import Global.Information.Combat.CombatSimulator
 import Global.Information.UnitAbstraction.Units
 import Global.Information._
-import Plans.GamePlans.PlanWinTheGame
+import Plans.GamePlans.WinTheGame
 
 object With {
   var game:bwapi.Game = null
@@ -17,7 +17,7 @@ object With {
   var history:History = null
   var intelligence:Intelligence = null
   var geography:Geography = null
-  var gameplan:PlanWinTheGame = null
+  var gameplan:WinTheGame = null
   var logger:Logger = null
   var prioritizer:Prioritizer = null
   var recruiter:Recruiter = null

@@ -4,7 +4,8 @@ import Global.Information.Combat.CombatSimulation
 import Startup.With
 import Types.Intents.Intent
 import Types.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import bwapi.Position
+import bwapi.{Position, UnitType}
+import Utilities.Enrichment.EnrichPosition._
 
 import scala.collection.mutable
 
@@ -34,12 +35,14 @@ class Commander {
       _journey(unit, intent)
     } else {
       val combat = combatOption.get
+      val enemyMaxRange = combat.enemyGroup.units.map(_.range).max
+      val distanceToEnemy = unit.position.getDistance(combat.enemyGroup.vanguard)
       val strengthRatio = (1.0 + combat.ourScore) / (1.0 + combat.enemyScore)
     
       if (unit.cloaked && combat.enemyGroup.units.forall(!_.unitType.isDetector)) {
         _destroy(unit, intent, combat)
       }
-      else if (strengthRatio < .75) {
+      else if (strengthRatio < .75 && distanceToEnemy < 32 + enemyMaxRange) {
         _flee(unit, intent, combat)
       }
       else if (strengthRatio > 1.3) {
@@ -58,7 +61,7 @@ class Commander {
   }
   
   def _kite(unit:FriendlyUnitInfo, intent:Intent, combat:CombatSimulation) {
-    if (unit.cooldownRemaining > 0) {
+    if (unit.cooldownRemaining > 0 && unit.range > 32) {
       _flee(unit, intent, combat)
     } else {
       val target = _getTargetInRange(unit, intent, combat)
@@ -89,8 +92,12 @@ class Commander {
   }
   
   def _flee(unit:FriendlyUnitInfo, intent:Intent, combat:CombatSimulation) {
+    val leash = 32 * 5
     val fleeDistance = 32 * 3
-    var fleePosition = With.geography.home.position
+    var fleePosition = With.geography.ourHarvestingAreas
+      .map(area => area.start.midpoint(area.end).toPosition)
+      .headOption
+      .getOrElse(With.geography.home.position)
     val dx = unit.x - combat.enemyGroup.vanguard.getX
     val dy = unit.y - combat.enemyGroup.vanguard.getY
     val lengthSquared = dx*dx + dy*dy
@@ -102,7 +109,12 @@ class Commander {
        // fleePosition = directlyAway
       }
     }
-    unit.baseUnit.move(fleePosition)
+    if (fleePosition.getDistance(unit.position) > leash) {
+      unit.baseUnit.move(fleePosition)
+    } else {
+      unit.baseUnit.patrol(fleePosition)
+      _destroy(unit, intent, combat)
+    }
   }
   
   def _journey(unit:FriendlyUnitInfo, intent:Intent) {
@@ -115,7 +127,10 @@ class Commander {
   }
   
   def _getTargetInRange(unit:FriendlyUnitInfo, intent:Intent, combat:CombatSimulation):Option[UnitInfo] = {
-    val targets = combat.enemyGroup.units.filter(_.position.getDistance(unit.position) <= Math.max(unit.range, 64))
+    val targets = combat.enemyGroup.units
+      .filter(_.position.getDistance(unit.position) <= Math.max(unit.range, 32 * 6))
+      .filterNot(target => List(UnitType.Zerg_Larva, UnitType.Zerg_Egg).contains(target.unitType))
+    
     if (targets.isEmpty) { return None }
     Some(targets.minBy(_.totalHealth))
   }

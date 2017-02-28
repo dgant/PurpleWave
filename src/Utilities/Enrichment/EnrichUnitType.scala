@@ -21,6 +21,8 @@ case object EnrichUnitType {
       damagePerSecond.toInt
     }
     
-    def totalCost           : Int     = { unitType.mineralPrice + unitType.gasPrice }
+    def range:Int = List(unitType.groundWeapon.maxRange, unitType.airWeapon.maxRange).max
+    def totalCost: Int = { unitType.mineralPrice + unitType.gasPrice }
+    
   }
 }

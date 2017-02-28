@@ -21,7 +21,7 @@ abstract class UnitInfo (var baseUnit:bwapi.Unit) {
   def visible:Boolean
   def cloaked:Boolean;
   
-  //This ignores spellcasters and workers!
+  //This ignores spellcasters
   def canFight: Boolean = {
     complete && unitType.canAttack || List(UnitType.Protoss_Carrier, UnitType.Protoss_Reaver).contains(unitType)
   }
@@ -34,8 +34,8 @@ abstract class UnitInfo (var baseUnit:bwapi.Unit) {
   def isEnemy                         : Boolean = { player.isEnemy(With.game.self) }
   def totalHealth                     : Int     = { hitPoints + shieldPoints }
   def maxTotalHealth                  : Int     = { unitType.maxHitPoints + unitType.maxShields }
-  def range                           : Int     = { List(unitType.groundWeapon.maxRange, unitType.airWeapon.maxRange).max }
+  def range                           : Int     = { unitType.range }
   def enemyOf(otherUnit:UnitInfo)     : Boolean = { player.isEnemy(otherUnit.player) }
-  def groundDps                       : Int     = { unitType.groundDps }
+  def groundDps                       : Int     = { if (canFight) unitType.groundDps else 0 }
   def totalCost                       : Int     = { unitType.totalCost }
 }

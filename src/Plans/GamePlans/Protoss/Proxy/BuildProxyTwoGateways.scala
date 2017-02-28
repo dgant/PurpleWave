@@ -22,6 +22,7 @@ class BuildProxyTwoGateways extends Plan {
   }
   
   val meBPTG = this
+  val proxyWorkerSpotRadius = new Property[Int](32 * 6)
   val proxySearchTileRadius = new Property[Int](Math.max(With.game.mapWidth, With.game.mapHeight) * 3 / 8)
   val positionFinder        = new Property[PositionFinder](new PositionCenter)
   val unitMatcher           = new Property[UnitMatcher](UnitMatchWorker)
@@ -37,7 +38,7 @@ class BuildProxyTwoGateways extends Plan {
     this.description.set(Some("Send builder to proxy"))
     this.unitPlan.inherit(meBPTG.builderPlan);
     this.positionFinder.set(new PositionSpecific(_proxyPositions.get.head))
-    this.range.inherit(proxySearchTileRadius);
+    this.range.inherit(proxyWorkerSpotRadius);
   })
   val pylonPlan = new Property[Plan](new BuildBuilding(UnitType.Protoss_Pylon) {
     this.description.set(Some("Build proxy Pylon"))

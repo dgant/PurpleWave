@@ -5,7 +5,7 @@ import Global.Allocation._
 import Global.Information.Combat.CombatSimulator
 import Global.Information.UnitAbstraction.Units
 import Global.Information._
-import Plans.GamePlans.PlanWinTheGame
+import Plans.GamePlans.WinTheGame
 import bwapi.DefaultBWListener
 import bwta.BWTA
 
@@ -25,7 +25,7 @@ class Bot() extends DefaultBWListener {
       With.commander = new Commander
       With.economy = new Economy
       With.geography = new Geography
-      With.gameplan = new PlanWinTheGame
+      With.gameplan = new WinTheGame
       With.history = new History
       With.intelligence = new Intelligence
       With.prioritizer = new Prioritizer

@@ -3,6 +3,8 @@ package Global.Information.Combat
 import Startup.With
 import Types.UnitInfo.UnitInfo
 import Utilities.Limiter
+import bwapi.UnitType
+import Utilities.Enrichment.EnrichUnitType._
 
 import scala.collection.mutable
 
@@ -88,9 +90,17 @@ class CombatSimulator {
     //This is a hack, because it's affecting our expectation of combat, rather than our motivation for fighting
     if (unit.unitType.isWorker) return 0
     
-    //Fails to account for bunkers
     //Fails to account for casters
     //Fails to account for carriers/reavers
+    //Fails to account for upgrades (including range upgrades)
+    
+    var dps = unit.groundDps
+    var range = unit.range
+    
+    if (unit.unitType == UnitType.Terran_Bunker) {
+      dps = 4 * UnitType.Terran_Marine.groundDps
+      range = UnitType.Terran_Marine.range
+    }
     
     val distanceFactor = Math.max(0, combatRange + unit.range - unit.position.getApproxDistance(simulation.focalPoint))
     val combatEfficacy = unit.groundDps * unit.totalHealth

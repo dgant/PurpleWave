@@ -17,7 +17,7 @@ class PositionSimpleBuilding(
     
     if (buildingType.isRefinery) {
       //cheap
-      return Some(With.game.getStaticGeysers.asScala.minBy(_.getDistance(With.geography.ourBaseHalls.head.position)).getTilePosition)
+      return Some(With.game.getStaticGeysers.asScala.minBy(_.getTilePosition.getDistance(startPosition)).getTilePosition)
     }
     
     val margin = if (buildingType == UnitType.Protoss_Pylon) 4 else 1

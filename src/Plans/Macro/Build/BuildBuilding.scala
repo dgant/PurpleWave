@@ -74,8 +74,11 @@ class BuildBuilding(val buildingType:UnitType) extends Plan {
       _position = positionFinder.get.find
       builderPlan.get.units.foreach(unit => With.commander.intend(
         unit,
-        new Intent(position = Some(_position.get.toPosition.add(
-          new Position(buildingType.width/2, buildingType.height/2))))))
+        new Intent(position = Some(_position.map(_
+          .toPosition
+          .add(new Position(buildingType.width/2, buildingType.height/2)))
+          .headOption
+          .getOrElse(unit.position)))))
     }
   }
   

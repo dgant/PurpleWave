@@ -219,7 +219,7 @@ object Overlay {
   
   def _drawCombatSimulation(simulation:CombatSimulation) {
     if (simulation.enemyScore * simulation.ourScore == 0) return
-    if (simulation.ourGroup.vanguard.getDistance(simulation.enemyGroup.vanguard) > 32 * 30) return
+    if (simulation.ourGroup.vanguard.getDistance(simulation.enemyGroup.vanguard) > 32 * 20) return
     With.game.drawCircleMap(simulation.focalPoint, 8, Color.Red)
     With.game.drawCircleMap(simulation.ourGroup.vanguard, 8, Color.Red)
     With.game.drawCircleMap(simulation.enemyGroup.vanguard, 8, Color.Red)
@@ -246,7 +246,7 @@ object Overlay {
         Color.Orange)
     }
     _drawTextLabel(
-      List(simulation.ourScore + " - " + simulation.enemyScore),
+      List(simulation.ourScore/1000 + " - " + simulation.enemyScore/1000),
       simulation.focalPoint,
       drawBackground = true)
   }

@@ -1,5 +1,6 @@
 package Global.Information.Combat
 
+import Geometry.Cluster
 import Startup.With
 import Types.UnitInfo.UnitInfo
 import Utilities.Limiter
@@ -20,8 +21,8 @@ class CombatSimulator {
   }
   
   def _defineCombats() {
-    val ourGroupMaps = _groupUnits(With.units.ours)
-    val enemyGroupMaps = _groupUnits(With.units.enemy)
+    val ourGroupMaps = Cluster.generate(With.units.ours, combatRange)
+    val enemyGroupMaps = Cluster.generate(With.units.enemy, combatRange)
     val ourGroups = ourGroupMaps.map(group => new CombatGroup(group._1.position, group._2))
     val enemyGroups = enemyGroupMaps.map(group => new CombatGroup(group._1.position, group._2))
     combats = _buildCombats(ourGroups, enemyGroups)
@@ -29,38 +30,6 @@ class CombatSimulator {
   
   def _simulateCombats() {
     combats.foreach(_update)
-  }
-  
-  def _mapUnitsToNeighbors(units:Iterable[UnitInfo]):Map[UnitInfo, Iterable[UnitInfo]] = {
-    //Yes, this includes the unit itself
-    units.map(unit => (unit, With.units.inRadius(unit.position, combatRange))).toMap
-  }
-  
-  def _groupUnits(units:Iterable[UnitInfo]):mutable.HashMap[UnitInfo, mutable.HashSet[UnitInfo]] = {
-    val neighborsByFighter = _mapUnitsToNeighbors(units)
-    val fightersClosestToEnemyFighters = neighborsByFighter.keys
-      .filter(_.canFight)
-      .toList
-      .sortBy(fighter => (List(Double.MaxValue) ++neighborsByFighter(fighter)
-        .filter(_.enemyOf(fighter))
-        .filter(_.canFight)
-        .map(_.position.getDistance(fighter.position)))
-        .min)
-  
-    val leaderBySoldier = new mutable.HashMap[UnitInfo, UnitInfo]
-    val groupsByLeader = new mutable.HashMap[UnitInfo, mutable.HashSet[UnitInfo]] {
-      override def default(key: UnitInfo):mutable.HashSet[UnitInfo] = {
-        put(key, new mutable.HashSet[UnitInfo])
-        this(key)}}
-  
-    fightersClosestToEnemyFighters.foreach(leader => {
-      if ( ! leaderBySoldier.contains(leader)) {
-        groupsByLeader(leader).add(leader)
-        groupsByLeader(leader) ++= neighborsByFighter(leader).filter(_.player == leader.player)
-        groupsByLeader(leader).foreach(groupMember => leaderBySoldier.put(groupMember, leader))
-      }})
-    
-    return groupsByLeader
   }
   
   def _buildCombats(
@@ -100,7 +69,17 @@ class CombatSimulator {
       dps = 4 * UnitType.Terran_Marine.groundDps
       range = UnitType.Terran_Marine.range
     }
-    val highGroundFactor = 1.3 * With.game.getGroundHeight(unit.tilePosition)
+    
+    val highGroundFactorRaw = With.game.getGroundHeight(unit.tilePosition)
+    val highGroundMultiplier = 1.3
+    val highGroundFactor = highGroundFactorRaw match {
+      case 0 => 1.0
+      case 1 => 1.0 * highGroundMultiplier
+      case 2 => 1.0 * highGroundMultiplier
+      case 3 => 1.0 * highGroundMultiplier * highGroundMultiplier
+      case 4 => 1.0 * highGroundMultiplier * highGroundMultiplier
+      case _ => 1.0 * highGroundMultiplier * highGroundMultiplier * highGroundMultiplier
+    }
     val distanceFactor = Math.min(5, Math.max(0, 3 + (range - unit.position.getDistance(simulation.focalPoint))/32))
     val combatEfficacy = dps * unit.totalHealth
     Math.max(0, highGroundFactor * distanceFactor * combatEfficacy).toInt

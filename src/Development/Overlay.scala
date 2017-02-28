@@ -1,6 +1,6 @@
 package Development
 
-import Global.Information.Combat.CombatSimulation
+import Global.Information.Combat.BattleSimulation
 import Plans.Allocation.{LockCurrency, LockUnits}
 import Plans.Plan
 import Startup.With
@@ -215,10 +215,10 @@ object Overlay {
   }
   
   def _drawCombatSimulations {
-    With.simulator.combats.foreach(_drawCombatSimulation)
+    With.simulator.battles.foreach(_drawCombatSimulation)
   }
   
-  def _drawCombatSimulation(simulation:CombatSimulation) {
+  def _drawCombatSimulation(simulation:BattleSimulation) {
     if (simulation.enemyScore * simulation.ourScore == 0) return
     if (simulation.ourGroup.vanguard.getDistance(simulation.enemyGroup.vanguard) > 32 * 20) return
     With.game.drawCircleMap(simulation.focalPoint, 8, Color.Orange)

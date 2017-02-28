@@ -5,7 +5,7 @@ import bwapi.Position
 
 import scala.collection.mutable
 
-class CombatGroup(
+class BattleGroup(
   var vanguard:Position,
   val units:mutable.HashSet[UnitInfo]) {
   

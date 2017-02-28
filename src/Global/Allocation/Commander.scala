@@ -1,6 +1,6 @@
 package Global.Allocation
 
-import Global.Information.Combat.CombatSimulation
+import Global.Information.Combat.BattleSimulation
 import Startup.With
 import Types.Intents.Intent
 import Types.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -29,7 +29,7 @@ class Commander {
       return
     }
   
-    val combatOption = With.simulator.combats.find(_.ourGroup.units.contains(unit))
+    val combatOption = With.simulator.battles.find(_.ourGroup.units.contains(unit))
   
     if (combatOption.isEmpty) {
       _journey(unit, intent)
@@ -57,7 +57,7 @@ class Commander {
     _nextOrderFrame.put(unit, With.game.getFrameCount + baseDelay + attackDelay)
   }
   
-  def _kite(unit:FriendlyUnitInfo, intent:Intent, combat:CombatSimulation) {
+  def _kite(unit:FriendlyUnitInfo, intent:Intent, combat:BattleSimulation) {
     if (unit.isMelee) {
       _destroy(unit, intent, combat)
     }
@@ -76,7 +76,7 @@ class Commander {
     }
   }
   
-  def _destroy(unit:FriendlyUnitInfo, intent:Intent, combat:CombatSimulation) {
+  def _destroy(unit:FriendlyUnitInfo, intent:Intent, combat:BattleSimulation) {
     val target = _getTargetInRange(unit, intent, combat)
     if (target.nonEmpty) {
       if (unit.cooldownRemaining > 0) {
@@ -92,7 +92,7 @@ class Commander {
     }
   }
   
-  def _flee(unit:FriendlyUnitInfo, intent:Intent, combat:CombatSimulation) {
+  def _flee(unit:FriendlyUnitInfo, intent:Intent, combat:BattleSimulation) {
     val marginOfSafety = 32 * 8
     val marginOfDesperation = 32 * 6
     if (unit.position.getDistance(combat.enemyGroup.vanguard) < marginOfSafety) {
@@ -121,7 +121,7 @@ class Commander {
     }
   }
   
-  def _getTargetInRange(unit:FriendlyUnitInfo, intent:Intent, combat:CombatSimulation):Option[UnitInfo] = {
+  def _getTargetInRange(unit:FriendlyUnitInfo, intent:Intent, combat:BattleSimulation):Option[UnitInfo] = {
     val targets = combat.enemyGroup.units
       .filter(_.position.getDistance(unit.position) <= Math.max(unit.range, 32 * 8))
       .filterNot(target => List(UnitType.Zerg_Larva, UnitType.Zerg_Egg).contains(target.unitType))

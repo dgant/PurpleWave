@@ -10,50 +10,50 @@ import Utilities.Enrichment.EnrichPosition._
 
 import scala.collection.mutable
 
-class CombatSimulator {
+class BattleSimulator {
   
-  val combatRange = 32 * 18
-  var combats:Iterable[CombatSimulation] = List.empty
+  val battleRange = 32 * 18
+  var battles:Iterable[BattleSimulation] = List.empty
   
-  val limitCombatIdentification = new Limiter(8, _defineCombats)
+  val limitCombatIdentification = new Limiter(8, _defineBattles)
   def onFrame() {
     limitCombatIdentification.act()
-    _simulateCombats
+    _simulateBattles
   }
   
-  def _defineCombats() {
-    val ourGroupMaps = Cluster.generate(With.units.ours.filter(_.canFight), combatRange)
-    val enemyGroupMaps = Cluster.generate(With.units.enemy.filter(_.canFight), combatRange)
-    val ourGroups = ourGroupMaps.map(group => new CombatGroup(group._1.position, group._2))
-    val enemyGroups = enemyGroupMaps.map(group => new CombatGroup(group._1.position, group._2))
-    combats = _buildCombats(ourGroups, enemyGroups)
+  def _defineBattles() {
+    val ourGroupMaps = Cluster.generate(With.units.ours.filter(_.canFight), battleRange)
+    val enemyGroupMaps = Cluster.generate(With.units.enemy.filter(_.canFight), battleRange)
+    val ourGroups = ourGroupMaps.map(group => new BattleGroup(group._1.position, group._2))
+    val enemyGroups = enemyGroupMaps.map(group => new BattleGroup(group._1.position, group._2))
+    battles = _constructBattle(ourGroups, enemyGroups)
   }
   
-  def _simulateCombats() {
-    combats.foreach(_update)
+  def _simulateBattles() {
+    battles.foreach(_update)
   }
   
-  def _buildCombats(
-    ourGroups:  Iterable[CombatGroup],
-    theirGroups:Iterable[CombatGroup]):Iterable[CombatSimulation] = {
+  def _constructBattle(
+                        ourGroups:  Iterable[BattleGroup],
+                        theirGroups:Iterable[BattleGroup]):Iterable[BattleSimulation] = {
     
     if (theirGroups.isEmpty) return List.empty
   
     ourGroups.filter(_.units.exists(_.alive)).map(ourGroup => {
       val enemyGroup = theirGroups.filter(_.units.exists(_.alive)).minBy(_.vanguard.getDistance(ourGroup.vanguard))
-      val simulation = new CombatSimulation(ourGroup, enemyGroup)
+      val simulation = new BattleSimulation(ourGroup, enemyGroup)
       simulation
     })
   }
   
-  def _update(simulation: CombatSimulation) {
-    _removeMissingUnits(simulation.ourGroup.units)
-    _removeMissingUnits(simulation.enemyGroup.units)
-    simulation.ourScore = simulation.ourGroup.units.map(_valueUnit(_, simulation)).sum
-    simulation.enemyScore = simulation.enemyGroup.units.map(_valueUnit(_, simulation)).sum
-    if (simulation.ourGroup.units.nonEmpty && simulation.enemyGroup.units.nonEmpty) {
-      simulation.ourGroup.vanguard = simulation.ourGroup.units.minBy(_.position.distanceSquared(simulation.enemyGroup.vanguard)).position
-      simulation.enemyGroup.vanguard = simulation.enemyGroup.units.minBy(_.position.distanceSquared(simulation.ourGroup.vanguard)).position
+  def _update(battle: BattleSimulation) {
+    _removeMissingUnits(battle.ourGroup.units)
+    _removeMissingUnits(battle.enemyGroup.units)
+    battle.ourScore = battle.ourGroup.units.map(_valueUnit(_, battle)).sum
+    battle.enemyScore = battle.enemyGroup.units.map(_valueUnit(_, battle)).sum
+    if (battle.ourGroup.units.nonEmpty && battle.enemyGroup.units.nonEmpty) {
+      battle.ourGroup.vanguard = battle.ourGroup.units.minBy(_.position.distanceSquared(battle.enemyGroup.vanguard)).position
+      battle.enemyGroup.vanguard = battle.enemyGroup.units.minBy(_.position.distanceSquared(battle.ourGroup.vanguard)).position
     }
   }
   
@@ -61,7 +61,7 @@ class CombatSimulator {
     units.filterNot(_.alive).foreach(units.remove)
   }
   
-  def _valueUnit(unit:UnitInfo, simulation: CombatSimulation):Int = {
+  def _valueUnit(unit:UnitInfo, battle: BattleSimulation):Int = {
     //Don't be afraid to fight workers.
     //This is a hack, because it's affecting our expectation of combat, rather than our motivation for fighting
     if (unit.unitType.isWorker) return 0
@@ -88,7 +88,7 @@ class CombatSimulator {
       case 4 => 1.0 * highGroundMultiplier * highGroundMultiplier
       case _ => 1.0 * highGroundMultiplier * highGroundMultiplier * highGroundMultiplier
     }
-    val distanceFactor = Math.min(6, Math.max(1, 3 + (range - unit.position.getDistance(simulation.focalPoint))/32))
+    val distanceFactor = Math.min(6, Math.max(1, 3 + (range - unit.position.getDistance(battle.focalPoint))/32))
     val combatEfficacy = dps * unit.totalHealth
     Math.max(0, highGroundFactor * distanceFactor * combatEfficacy).toInt
   }

@@ -2,7 +2,7 @@ package Startup
 
 import Development.{Configuration, Logger, Overlay}
 import Global.Allocation._
-import Global.Information.Combat.CombatSimulator
+import Global.Information.Combat.BattleSimulator
 import Global.Information.UnitAbstraction.Units
 import Global.Information._
 import Plans.GamePlans.WinTheGame
@@ -21,7 +21,7 @@ class Bot() extends DefaultBWListener {
       
       With.architect = new Architect
       With.bank = new Banker
-      With.simulator = new CombatSimulator
+      With.simulator = new BattleSimulator
       With.commander = new Commander
       With.economy = new Economy
       With.geography = new Geography

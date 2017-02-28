@@ -29,11 +29,31 @@
     <splitter split-orientation="horizontal" split-proportion="0.6415094">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file leaf-file-name="Geography.scala" pinned="false" current-in-tab="true">
+          <file leaf-file-name="Geography.scala" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/Global/Information/Geography.scala">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="184">
-                  <caret line="112" column="22" lean-forward="false" selection-start-line="112" selection-start-column="22" selection-end-line="112" selection-end-column="22" />
+                <state relative-caret-position="279">
+                  <caret line="137" column="32" lean-forward="false" selection-start-line="137" selection-start-column="32" selection-end-line="137" selection-end-column="32" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="EnrichUnitType.scala" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/src/Utilities/Enrichment/EnrichUnitType.scala">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="323">
+                  <caret line="36" column="8" lean-forward="false" selection-start-line="36" selection-start-column="8" selection-end-line="36" selection-end-column="8" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="TileRectangle.scala" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/src/Geometry/TileRectangle.scala">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="110">
+                  <caret line="26" column="26" lean-forward="true" selection-start-line="26" selection-start-column="26" selection-end-line="26" selection-end-column="26" />
                   <folding />
                 </state>
               </provider>
@@ -853,7 +873,7 @@
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.5204678" sideWeight="0.49411765" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22660819" sideWeight="0.49411765" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.4502924" sideWeight="0.49411765" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -914,18 +934,11 @@
       <breakpoints-dialog>
         <breakpoints-dialog />
       </breakpoints-dialog>
-      <option name="time" value="719" />
+      <option name="time" value="730" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/Strategies/UnitMatchers/UnitMatchWarriors.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="65">
-          <caret line="5" column="15" lean-forward="false" selection-start-line="5" selection-start-column="15" selection-end-line="5" selection-end-column="15" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Strategies/UnitMatchers/UnitMatchWorker.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="65">
@@ -1261,26 +1274,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Utilities/Enrichment/EnrichUnitType.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="468">
-          <caret line="39" column="36" lean-forward="true" selection-start-line="39" selection-start-column="36" selection-end-line="39" selection-end-column="36" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Global/Allocation/Architect.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="163">
           <caret line="145" column="49" lean-forward="false" selection-start-line="145" selection-start-column="49" selection-end-line="145" selection-end-column="49" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Geometry/TileRectangle.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="339">
-          <caret line="33" column="27" lean-forward="true" selection-start-line="33" selection-start-column="27" selection-end-line="33" selection-end-column="27" />
           <folding />
         </state>
       </provider>
@@ -1309,10 +1306,34 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/Utilities/Enrichment/EnrichUnitType.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="323">
+          <caret line="36" column="8" lean-forward="false" selection-start-line="36" selection-start-column="8" selection-end-line="36" selection-end-column="8" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://C:/Program Files (x86)/scala/lib/scala-library.jar!/scala/collection/Iterator.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="363">
+          <caret line="83" column="0" lean-forward="false" selection-start-line="83" selection-start-column="0" selection-end-line="83" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/Global/Information/Geography.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="184">
-          <caret line="112" column="22" lean-forward="false" selection-start-line="112" selection-start-column="22" selection-end-line="112" selection-end-column="22" />
+        <state relative-caret-position="279">
+          <caret line="137" column="32" lean-forward="false" selection-start-line="137" selection-start-column="32" selection-end-line="137" selection-end-column="32" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Geometry/TileRectangle.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="110">
+          <caret line="26" column="26" lean-forward="true" selection-start-line="26" selection-start-column="26" selection-end-line="26" selection-end-column="26" />
           <folding />
         </state>
       </provider>

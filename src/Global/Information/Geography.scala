@@ -116,20 +116,25 @@ class Geography {
   
   def _findBasePosition(positions:Iterable[TilePosition]):Option[TilePosition] = {
     val centroid = positions.centroid
-    val exclusions = _mineralExclusionCache.get ++ _gasExclusionCache.get
-    val buildingTiles = UnitType.Zerg_Hatchery.tiles
-    val searchRadius = 8
-    val candidates = (-searchRadius to searchRadius).flatten(dx =>
-      (-searchRadius to searchRadius).map(dy => {
-        val buildingPosition = centroid.add(new TilePosition(dx, dy))
-        val legal = buildingTiles.forall(tile =>
-          exclusions.forall(exclusion => ! exclusion.contains(tile)) &&
-          With.game.isBuildable(tile.add(buildingPosition)))
-        if (legal) Some(buildingPosition) else None
-      }))
+    val searchRadius = 10
+    val candidates =
+      (-searchRadius to searchRadius).flatten(dx =>
+        (-searchRadius to searchRadius).map(dy => {
+          val basePosition = centroid.add(new TilePosition(dx, dy))
+          val legal = _isLegalBasePosition(basePosition)
+          if (legal) Some(basePosition) else None
+        }))
     val extantCandidates = candidates.filter(_.nonEmpty).map(_.get)
     
     if (extantCandidates.isEmpty) return None
     Some(extantCandidates.minBy(candidate => positions.map(_.distanceSquared(candidate)).sum))
+  }
+  
+  def _isLegalBasePosition(position:TilePosition):Boolean = {
+    val exclusions = _mineralExclusionCache.get ++ _gasExclusionCache.get
+    val buildingTiles = UnitType.Zerg_Hatchery.tiles
+    buildingTiles.map(_.add(position)).forall(buildingTile =>
+      With.game.isBuildable(buildingTile) &&
+      exclusions.forall( ! _.contains(buildingTile)))
   }
 }

@@ -6,6 +6,7 @@ import Startup.With
 import Strategies.PositionFinders.{PositionCenter, PositionFinder, PositionSpecific}
 import Strategies.UnitMatchers.{UnitMatchMobile, UnitMatcher}
 import Strategies.UnitPreferences.{UnitPreferClose, UnitPreference}
+import Types.Intents.Intent
 import Types.UnitInfo.FriendlyUnitInfo
 import Utilities.Property
 import bwapi.Position
@@ -32,7 +33,7 @@ class KnowEnemyBaseLocationFulfiller extends Plan {
   }
   
   def _orderScout(scout:FriendlyUnitInfo) {
-    scout.baseUnit.move(_getNextScoutingPosition)
+    With.commander.intend(scout, new Intent(position = Some(_getNextScoutingPosition)))
   }
   
   def _getNextScoutingPosition:Position = {

@@ -20,6 +20,10 @@ class FriendlyUnitInfo(_baseUnit:bwapi.Unit) extends UnitInfo(_baseUnit) {
   override def flying:Boolean = baseUnit.isFlying
   override def visible:Boolean = baseUnit.isVisible
   override def cloaked: Boolean = baseUnit.isCloaked
+  override def top:Int = baseUnit.getTop
+  override def left:Int = baseUnit.getLeft
+  override def right:Int = baseUnit.getRight
+  override def bottom:Int = baseUnit.getBottom
   def isCarryingMinerals:Boolean = baseUnit.isCarryingMinerals
   def isCarryingGas:Boolean = baseUnit.isCarryingGas
   def isGatheringMinerals: Boolean = baseUnit.isGatheringMinerals

@@ -55,7 +55,7 @@ class Geography {
       
       val geysers = nearbyUnits
         .filter(unit => unit.unitType.isRefinery || unit.unitType == UnitType.Resource_Vespene_Geyser)
-        .flatten(unit => List(new Position(unit.x - 32, unit.y - 16), new Position(unit.x + 32, unit.y + 16)))
+        .flatten(unit => List(new Position(unit.left, unit.top), new Position(unit.right, unit.bottom)))
       
       val boxedUnits = minerals ++ geysers ++ Iterable(base.position)
       

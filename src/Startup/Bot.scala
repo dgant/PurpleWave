@@ -37,7 +37,9 @@ class Bot() extends DefaultBWListener {
       With.game.enableFlag(1)
       With.game.setLocalSpeed(0)
     }
-    catch { case exception:Exception => With.logger.onException(exception) }
+    catch { case exception:Exception =>
+      var dontLoseTheStackTraceWhileDebugging = exception.getStackTrace
+      With.logger.onException(exception)}
   }
 
   override def onFrame() {
@@ -64,7 +66,9 @@ class Bot() extends DefaultBWListener {
   override def onUnitComplete(unit: bwapi.Unit) {
     try {
     }
-    catch { case exception:Exception => With.logger.onException(exception) }
+    catch { case exception:Exception =>
+      var dontLoseTheStackTraceWhileDebugging = exception.getStackTrace
+      With.logger.onException(exception)}
   }
 
   override def onUnitDestroy(unit: bwapi.Unit) {
@@ -72,13 +76,17 @@ class Bot() extends DefaultBWListener {
       With.units.onUnitDestroy(unit)
       With.history.onUnitDestroy(unit)
     }
-    catch { case exception:Exception => With.logger.onException(exception) }
+    catch { case exception:Exception =>
+        var dontLoseTheStackTraceWhileDebugging = exception.getStackTrace
+        With.logger.onException(exception)}
   }
 
   override def onUnitDiscover(unit: bwapi.Unit) {
     try {
     }
-    catch { case exception:Exception => With.logger.onException(exception) }
+    catch { case exception:Exception =>
+      var dontLoseTheStackTraceWhileDebugging = exception.getStackTrace
+      With.logger.onException(exception)}
   }
   
   override def onEnd(isWinner: Boolean) {
@@ -87,7 +95,9 @@ class Bot() extends DefaultBWListener {
       With.logger.onEnd
       BWTA.cleanMemory()
     }
-    catch { case exception:Exception => With.logger.onException(exception) }
+    catch { case exception:Exception =>
+      var dontLoseTheStackTraceWhileDebugging = exception.getStackTrace
+      With.logger.onException(exception)}
   }
   
   def _considerSurrender() = {

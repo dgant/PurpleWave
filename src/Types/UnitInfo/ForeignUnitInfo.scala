@@ -20,6 +20,11 @@ class ForeignUnitInfo(_baseUnit:bwapi.Unit) extends UnitInfo (_baseUnit) {
   var _complete           = false
   var _flying             = false
   var _cloaked            = false
+  var _top                = 0
+  var _left               = 0
+  var _right              = 0
+  var _bottom             = 0
+  
   update(baseUnit)
   
   def update(unit:bwapi.Unit) {
@@ -38,6 +43,10 @@ class ForeignUnitInfo(_baseUnit:bwapi.Unit) extends UnitInfo (_baseUnit) {
     _complete           = unit.isCompleted
     _flying             = unit.isFlying
     _cloaked            = unit.isCloaked
+    _top                = unit.getTop
+    _left               = unit.getLeft
+    _right              = unit.getRight
+    _bottom             = unit.getBottom
   }
   
   def flagDead() {
@@ -63,4 +72,8 @@ class ForeignUnitInfo(_baseUnit:bwapi.Unit) extends UnitInfo (_baseUnit) {
   override def flying: Boolean = _flying
   override def visible: Boolean = lastSeen >= With.game.getFrameCount
   override def cloaked: Boolean = _cloaked
+  override def top:Int = _top
+  override def left:Int = _left
+  override def right:Int = _right
+  override def bottom:Int = _bottom
 }

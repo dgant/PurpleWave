@@ -20,6 +20,10 @@ abstract class UnitInfo (var baseUnit:bwapi.Unit) {
   def flying:Boolean;
   def visible:Boolean
   def cloaked:Boolean;
+  def top:Int;
+  def left:Int;
+  def right:Int;
+  def bottom:Int;
   
   //This ignores spellcasters
   def canFight: Boolean = {
@@ -32,6 +36,7 @@ abstract class UnitInfo (var baseUnit:bwapi.Unit) {
   def isOurs                          : Boolean = { player == With.game.self }
   def isFriendly                      : Boolean = { isOurs || player.isAlly(With.game.self) }
   def isEnemy                         : Boolean = { player.isEnemy(With.game.self) }
+  def isMelee                         : Boolean = { range <= 32 }
   def totalHealth                     : Int     = { hitPoints + shieldPoints }
   def maxTotalHealth                  : Int     = { unitType.maxHitPoints + unitType.maxShields }
   def range                           : Int     = { unitType.range }

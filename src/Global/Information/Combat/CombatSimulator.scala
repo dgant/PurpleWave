@@ -10,11 +10,11 @@ import scala.collection.mutable
 
 class CombatSimulator {
   
-  val combatRange = 32 * 15
+  val combatRange = 32 * 18
   var combats:Iterable[CombatSimulation] = List.empty
   
-  val limitCombatIdentification = new Limiter(24, _defineCombats)
-  val limitCombatSimulation = new Limiter(4, _simulateCombats)
+  val limitCombatIdentification = new Limiter(8, _defineCombats)
+  val limitCombatSimulation = new Limiter(1, _simulateCombats)
   def onFrame() {
     limitCombatIdentification.act()
     limitCombatSimulation.act()
@@ -102,8 +102,8 @@ class CombatSimulator {
       range = UnitType.Terran_Marine.range
     }
     
-    val distanceFactor = Math.max(0, combatRange + unit.range - unit.position.getApproxDistance(simulation.focalPoint))
-    val combatEfficacy = unit.groundDps * unit.totalHealth
+    val distanceFactor = Math.min(3, Math.max(1, (range - unit.position.getApproxDistance(simulation.focalPoint))/32))
+    val combatEfficacy = dps * unit.totalHealth
     Math.max(0, distanceFactor * combatEfficacy)
   }
 }

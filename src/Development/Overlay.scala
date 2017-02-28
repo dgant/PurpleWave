@@ -7,6 +7,7 @@ import Startup.With
 import Types.UnitInfo.ForeignUnitInfo
 import bwapi.{Color, Position, UnitCommandType}
 import bwta.BWTA
+import Utilities.Enrichment.EnrichPosition._
 
 import scala.collection.JavaConverters._
 
@@ -102,22 +103,34 @@ object Overlay {
   }
   
   def _drawTerrain() {
-    var i = 0
     With.geography.ourHarvestingAreas.foreach(area => With.game.drawBoxMap(
       area.start.toPosition,
       area.end.toPosition,
       Color.Red))
-    BWTA.getBaseLocations.asScala.foreach(base => {
-      val label = (if (base.isStartLocation) "Start location" else "Expansion") +
-        " #" + i
-        "\n" +
-        (if (With.game.isExplored(base.getTilePosition)) "Explored" else "Unexplored")
-      With.game.drawCircleMap(base.getPosition, 80, Color.Blue)
-      _drawTextLabel(
-        List(label),
-        base.getPosition,
-        drawBackground = false)
-      i += 1
+    With.geography._gasExclusionCache.get.foreach(box => With.game.drawBoxMap(
+      box.start.toPosition,
+      box.end.toPosition,
+      Color.Teal))
+    With.geography._mineralExclusionCache.get.foreach(box => With.game.drawBoxMap(
+      box.start.toPosition,
+      box.end.toPosition,
+      Color.Teal))
+    With.geography._resourceClusterCache.get.foreach(cluster => {
+      val centroid = cluster.centroid
+      cluster.foreach(position =>
+        With.game.drawLineMap(
+          centroid.toPosition,
+          position.toPosition,
+          Color.Teal))
+    })
+    With.geography._basePositionsCache.get.foreach(position => With.game.drawBoxMap(
+      position.toPosition,
+      position.toPosition.add(new Position(32 * 4, 32 * 3)),
+      Color.Yellow))
+    With.geography.basePositions.foreach(base => {
+      val label = "Available base"
+      With.game.drawCircleMap(base.toPosition, 80, Color.Blue)
+      _drawTextLabel(List(label), base.toPosition, backgroundColor = Color.Blue)
     })
     BWTA.getRegions.asScala .foreach(region => {
   

@@ -1,6 +1,6 @@
 package Utilities.Enrichment
 
-import bwapi.{DamageType, UnitType}
+import bwapi.{DamageType, TilePosition, UnitType}
 
 case object EnrichUnitType {
   implicit class EnrichedUnitType(unitType:UnitType) {
@@ -26,5 +26,18 @@ case object EnrichUnitType {
     def totalCost: Int = { unitType.mineralPrice + unitType.gasPrice }
     def isMinerals:Boolean = unitType.isMineralField
     def isGas:Boolean = List(UnitType.Resource_Vespene_Geyser, UnitType.Terran_Refinery, UnitType.Protoss_Assimilator, UnitType.Zerg_Extractor).contains(unitType)
+    def isTownHall:Boolean = Set(
+      UnitType.Terran_Command_Center,
+      UnitType.Protoss_Nexus,
+      UnitType.Zerg_Hatchery,
+      UnitType.Zerg_Lair,
+      UnitType.Zerg_Hive
+    ).contains(unitType)
+    
+    def tiles:Iterable[TilePosition] = {
+      (0 until unitType.tileWidth).flatten(dx =>
+        (0 until unitType.tileHeight).map(dy =>
+          new TilePosition(dx, dy)))
+    }
   }
 }

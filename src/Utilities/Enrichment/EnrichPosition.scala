@@ -1,8 +1,47 @@
 package Utilities.Enrichment
 
+import Geometry.Positions
 import bwapi.{Position, TilePosition, WalkPosition}
 
 case object EnrichPosition {
+  implicit class EnrichedPositionCollection(positions:Iterable[Position]) {
+    def minBound:Position = {
+      if (positions.isEmpty) return Positions.middle
+      new Position(
+        positions.view.map(_.getX).min,
+        positions.view.map(_.getY).min)}
+    def maxBound:Position = {
+      if (positions.isEmpty) return Positions.middle
+      new Position(
+        positions.view.map(_.getX).max,
+        positions.view.map(_.getY).max)}
+    def centroid:Position = {
+      if (positions.isEmpty) return Positions.middle
+      new Position(
+        positions.view.map(_.getX).sum / positions.size,
+        positions.view.map(_.getY).sum / positions.size)
+    }
+  }
+  
+  implicit class EnrichedTilePositionCollection(positions:Iterable[TilePosition]) {
+    def minBound:TilePosition = {
+      if (positions.isEmpty) return Positions.tileMiddle
+      new TilePosition(
+        positions.view.map(_.getX).min,
+        positions.view.map(_.getY).min)}
+    def maxBound:TilePosition = {
+      if (positions.isEmpty) return Positions.tileMiddle
+      new TilePosition(
+        positions.view.map(_.getX).max,
+        positions.view.map(_.getY).max)}
+    def centroid:TilePosition = {
+      if (positions.isEmpty) return Positions.tileMiddle
+      new TilePosition(
+        positions.view.map(_.getX).sum / positions.size,
+        positions.view.map(_.getY).sum / positions.size)
+    }
+  }
+  
   implicit class EnrichedPosition(position:Position) {
     def toWalkPosition:WalkPosition = {
       new WalkPosition(position.getX / 4, position.getY / 4)

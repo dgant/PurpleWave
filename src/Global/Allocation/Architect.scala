@@ -143,7 +143,7 @@ class Architect {
   def _rectangleIsWalkable(
     rectangle: TileRectangle)
       :Boolean = {
-    val walkRectangle = Positions.toWalkRectangle(rectangle)
+    val walkRectangle = rectangle.toWalkRectangle
     (walkRectangle.start.getX to walkRectangle.end.getX).forall(x =>
       (walkRectangle.start.getY to walkRectangle.end.getY).forall(y =>
         _isWalkable(new WalkPosition(x, y))))

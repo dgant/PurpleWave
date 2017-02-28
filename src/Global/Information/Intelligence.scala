@@ -4,6 +4,7 @@ import Startup.With
 import Types.UnitInfo.ForeignUnitInfo
 import bwapi.TilePosition
 import bwta.{BWTA, BaseLocation}
+import Utilities.Enrichment.EnrichUnitType._
 
 import scala.collection.JavaConverters._
 
@@ -18,7 +19,7 @@ class Intelligence {
       .toList
       .filter(unit => unit.unitType.isBuilding)
       .sortBy(unit => unit.unitType.isFlyer)
-      .sortBy(unit => ! With.geography.isTownHall(unit.unitType))
+      .sortBy(unit => unit.unitType.isTownHall)
       .headOption
   }
   

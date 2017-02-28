@@ -1,6 +1,7 @@
 package Geometry
 
 import bwapi.TilePosition
+import Utilities.Enrichment.EnrichPosition._
 
 class TileRectangle(
   val start:TilePosition,
@@ -26,5 +27,11 @@ class TileRectangle(
     contains(rectangle.end) ||
     contains(rectangle.start.getX, rectangle.end.getY) ||
     contains(rectangle.end.getX, rectangle.start.getY)
+  }
+  
+  def toWalkRectangle:WalkRectangle = {
+    new WalkRectangle(
+      start.toWalkPosition,
+      end.toWalkPosition)
   }
 }

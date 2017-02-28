@@ -1,6 +1,6 @@
 package Global.Information.Combat
 
-import Geometry.Cluster
+import Geometry.Clustering
 import Startup.With
 import Types.UnitInfo.UnitInfo
 import Utilities.Limiter
@@ -22,8 +22,8 @@ class BattleSimulator {
   }
   
   def _defineBattles() {
-    val ourGroupMaps = Cluster.generate(With.units.ours.filter(_.canFight), battleRange)
-    val enemyGroupMaps = Cluster.generate(With.units.enemy.filter(_.canFight), battleRange)
+    val ourGroupMaps = Clustering.groupUnits(With.units.ours.filter(_.canFight), battleRange)
+    val enemyGroupMaps = Clustering.groupUnits(With.units.enemy.filter(_.canFight), battleRange)
     val ourGroups = ourGroupMaps.map(group => new BattleGroup(group._1.position, group._2))
     val enemyGroups = enemyGroupMaps.map(group => new BattleGroup(group._1.position, group._2))
     battles = _constructBattle(ourGroups, enemyGroups)

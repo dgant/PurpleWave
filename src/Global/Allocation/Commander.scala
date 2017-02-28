@@ -132,6 +132,13 @@ class Commander {
       .filterNot(target => List(UnitType.Zerg_Larva, UnitType.Zerg_Egg).contains(target.unitType))
     
     if (targets.isEmpty) { return None }
-    Some(targets.minBy(_.totalHealth))
+    Some(targets.minBy(target => {
+      val value = target.totalCost
+      val health = target.totalHealth
+      val inRangeBuffer = 16
+      val inRangeBonus = 2
+      val inRange = target.position.getDistance(unit.position) < unit.range + inRangeBuffer
+      value * health * (if(inRange) inRangeBonus else 1)
+    }))
   }
 }

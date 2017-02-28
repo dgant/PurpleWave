@@ -24,6 +24,7 @@ case object EnrichUnitType {
     
     def range:Int = List(unitType.groundWeapon.maxRange, unitType.airWeapon.maxRange).max
     def totalCost: Int = { unitType.mineralPrice + unitType.gasPrice }
-    
+    def isMinerals:Boolean = unitType.isMineralField
+    def isGas:Boolean = List(UnitType.Resource_Vespene_Geyser, UnitType.Terran_Refinery, UnitType.Protoss_Assimilator, UnitType.Zerg_Extractor).contains(unitType)
   }
 }

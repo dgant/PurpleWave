@@ -42,7 +42,7 @@ class Commander {
       if (unit.cloaked && combat.enemyGroup.units.forall(!_.unitType.isDetector)) {
         _destroy(unit, intent, combat)
       }
-      else if (strengthRatio < .90) {
+      else if (strengthRatio < 1) {
         _flee(unit, intent, combat)
       }
       else {
@@ -94,12 +94,19 @@ class Commander {
   
   def _flee(unit:FriendlyUnitInfo, intent:Intent, combat:CombatSimulation) {
     val marginOfSafety = 32 * 8
+    val marginOfDesperation = 32 * 6
     if (unit.position.getDistance(combat.enemyGroup.vanguard) < marginOfSafety) {
       val fleePosition = With.geography.ourHarvestingAreas
         .map(area => area.start.midpoint(area.end).toPosition)
         .headOption
         .getOrElse(With.geography.home)
-      unit.baseUnit.move(fleePosition)
+      if (unit.position.getDistance(fleePosition) > marginOfDesperation) {
+        unit.baseUnit.move(fleePosition)
+      }
+      else {
+        _destroy(unit, intent, combat)
+      }
+      
     } else {
       _destroy(unit, intent, combat)
     }

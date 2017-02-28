@@ -1,8 +1,8 @@
 package Plans.GamePlans
 
-import Plans.GamePlans.Protoss.ProtossStrategyCheese
 import Plans.Compound.AllParallel
+import Plans.GamePlans.Protoss.ProtossStrategyMacro
 
 class WinTheGame extends AllParallel {
-  children.set(List(new ProtossStrategyCheese))
+  children.set(List(new ProtossStrategyMacro))
 }

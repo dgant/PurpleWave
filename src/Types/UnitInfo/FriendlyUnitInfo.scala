@@ -6,7 +6,7 @@ import bwapi._
 import scala.collection.JavaConverters._
 
 class FriendlyUnitInfo(_baseUnit:bwapi.Unit) extends UnitInfo(_baseUnit) {
-  override def alive: Boolean = baseUnit.exists
+  override def alive              : Boolean = baseUnit.exists
   override def lastSeen: Int = With.game.getFrameCount
   override def possiblyStillThere: Boolean = true
   override def player: Player = baseUnit.getPlayer
@@ -24,6 +24,8 @@ class FriendlyUnitInfo(_baseUnit:bwapi.Unit) extends UnitInfo(_baseUnit) {
   override def left:Int = baseUnit.getLeft
   override def right:Int = baseUnit.getRight
   override def bottom:Int = baseUnit.getBottom
+  override def mineralsLeft: Int = if (isMinerals) baseUnit.getResources else 0
+  override def gasLeft: Int = if (isGas) baseUnit.getResources else 0
   def isCarryingMinerals:Boolean = baseUnit.isCarryingMinerals
   def isCarryingGas:Boolean = baseUnit.isCarryingGas
   def isGatheringMinerals: Boolean = baseUnit.isGatheringMinerals
@@ -35,4 +37,5 @@ class FriendlyUnitInfo(_baseUnit:bwapi.Unit) extends UnitInfo(_baseUnit) {
   def trainingQueue:Iterable[UnitType] = baseUnit.getTrainingQueue.asScala
   def getTech:TechType = baseUnit.getTech
   def getUpgrade:UpgradeType = baseUnit.getUpgrade
+  
 }

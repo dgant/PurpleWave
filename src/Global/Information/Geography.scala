@@ -72,4 +72,14 @@ class Geography {
         new TilePosition(right/32, bottom/32))
     })
   }
+  
+  val _basePositionsCache = new Cache[Iterable[TilePosition]] {
+    duration = 24 * 20
+    setCalculator(() => _calculateBasePositions)
+  }
+  def basePositions:Iterable[TilePosition] = _basePositionsCache.get
+  def _calculateBasePositions:Iterable[TilePosition] = {
+    //With.units.neutral.filter(unit => unit.isMinerals || unit.isGas)
+    List.empty
+  }
 }

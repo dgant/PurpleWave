@@ -27,6 +27,10 @@ class Units {
     _foreignUnitTracker.enemyUnits
   }
   
+  def neutral:Set[ForeignUnitInfo] = {
+    _foreignUnitTracker.neutralUnits
+  }
+  
   def _remap(units:java.util.List[bwapi.Unit]):Iterable[UnitInfo] = {
     units.asScala.map(get).filter(_.nonEmpty).map(_.get)
   }

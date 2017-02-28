@@ -13,8 +13,10 @@ class ForeignUnitTracker {
   val _foreignUnitsById = new mutable.HashMap[Int, ForeignUnitInfo].empty
   var _foreignUnits:Set[ForeignUnitInfo] = new HashSet[ForeignUnitInfo]
   var _enemyUnits:Set[ForeignUnitInfo] = new HashSet[ForeignUnitInfo]
+  var _neutralUnits:Set[ForeignUnitInfo] = new HashSet[ForeignUnitInfo]
   var _bannedEnemyUnitIds:Set[Int] = new HashSet[Int]
   
+  def neutralUnits:Set[ForeignUnitInfo] = _neutralUnits
   def enemyUnits:Set[ForeignUnitInfo] = _enemyUnits
   def get(someUnit:bwapi.Unit):Option[ForeignUnitInfo] = get(someUnit.getID)
   def get(id:Int):Option[ForeignUnitInfo] = _foreignUnitsById.get(id)
@@ -40,13 +42,14 @@ class ForeignUnitTracker {
     unitsToInvalidatePosition.foreach(_updateMissing)
   
     //Remove no-longer-valid units
-    //We have to do this after updating because it needs the latest bwapi.Units
-    //val noLongerValid = foreignUnitsNow.values.filterNot(unitInfo => _isValidForeignUnit(unitInfo.baseUnit))
-    //noLongerValid.foreach(_remove)
+    //Whoops, foreignUnitsNew already lacks these units. Maybe this step isn't necessary
+    //val foreignUnitsInvalid = foreignUnitsNew.values.filterNot(_isValidForeignUnit)
+    //foreignUnitsInvalid.foreach(_remove)
   
     //Could speed things up by diffing instead of recreating these
     _foreignUnits = _foreignUnitsById.values.toSet
     _enemyUnits = _foreignUnits.filter(_.player.isEnemy(With.game.self))
+    _neutralUnits = _foreignUnits.filter(_.player.isNeutral)
   }
   
   def onUnitDestroy(unit:bwapi.Unit) {
@@ -86,12 +89,17 @@ class ForeignUnitTracker {
     _foreignUnitsById.remove(unit.id)
   }
   
+  def _remove(unit:bwapi.Unit) {
+    _remove(unit.getID)
+  }
+  
   def _remove(id:Int) {
     _foreignUnitsById.remove(id)
   }
   
   def _isValidForeignUnit(unit:bwapi.Unit):Boolean = {
-    //This just doesn't make sense; this is how to filter out the weird units that BWAPI gives us at the start of a game
+    //This case just doesn't make sense; if they're invisible and foreign how is BWAPI returning them
+    //This check filters out the weird ghost units that BWAPI gives us at the start of a game
     if (!unit.isVisible) return false
     
     if (List(UnitType.None, UnitType.Unknown).contains(unit.getType)) return false

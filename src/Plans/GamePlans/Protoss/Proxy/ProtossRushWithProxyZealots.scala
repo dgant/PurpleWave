@@ -5,8 +5,8 @@ import Plans.Compound.{AllParallel, AllSerial, CompleteOnce}
 import Plans.Information.RequireEnemyBaseLocation
 import Plans.Macro.Automatic.{BuildGatewayUnitsContinuously, BuildSupplyContinuously, BuildWorkersContinuously}
 import Plans.Macro.Build.{FollowBuildOrder, ScheduleBuildOrder, TrainUnit}
-import Types.Buildable.{Buildable, BuildableUnit, BuildableUpgrade}
-import bwapi.{UnitType, UpgradeType}
+import Types.Buildable.{Buildable, BuildableUnit}
+import bwapi.UnitType
 
 class ProtossRushWithProxyZealots extends AllSerial {
   
@@ -15,29 +15,13 @@ class ProtossRushWithProxyZealots extends AllSerial {
     new BuildableUnit(UnitType.Protoss_Pylon),
     new BuildableUnit(UnitType.Protoss_Gateway),
     new BuildableUnit(UnitType.Protoss_Gateway),
-    new BuildableUnit(UnitType.Protoss_Pylon),
-    new BuildableUnit(UnitType.Protoss_Cybernetics_Core),
-    new BuildableUnit(UnitType.Protoss_Assimilator),
     new BuildableUnit(UnitType.Protoss_Gateway),
-    new BuildableUpgrade(UpgradeType.Singularity_Charge),
-    new BuildableUnit(UnitType.Protoss_Forge),
-    new BuildableUpgrade(UpgradeType.Protoss_Ground_Weapons, 1),
-    new BuildableUpgrade(UpgradeType.Protoss_Ground_Armor, 1),
-    new BuildableUnit(UnitType.Protoss_Citadel_of_Adun),
-    new BuildableUpgrade(UpgradeType.Leg_Enhancements),
     new BuildableUnit(UnitType.Protoss_Gateway),
-    new BuildableUnit(UnitType.Protoss_Templar_Archives),
-    new BuildableUpgrade(UpgradeType.Protoss_Ground_Weapons, 2),
     new BuildableUnit(UnitType.Protoss_Gateway),
-    new BuildableUpgrade(UpgradeType.Protoss_Ground_Weapons, 3),
-    new BuildableUnit(UnitType.Protoss_Gateway),
-    new BuildableUpgrade(UpgradeType.Protoss_Ground_Armor, 1),
-    new BuildableUpgrade(UpgradeType.Protoss_Ground_Armor, 2),
-    new BuildableUpgrade(UpgradeType.Protoss_Ground_Armor, 3)
+    new BuildableUnit(UnitType.Protoss_Gateway)
   )
   
   children.set(List(
-    new CompleteOnce { child.set(new TrainUnit(UnitType.Protoss_Probe)) },
     new CompleteOnce { child.set(new TrainUnit(UnitType.Protoss_Probe)) },
     new CompleteOnce { child.set(new TrainUnit(UnitType.Protoss_Probe)) },
     new CompleteOnce { child.set(

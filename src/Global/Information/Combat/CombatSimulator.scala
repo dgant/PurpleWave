@@ -100,9 +100,9 @@ class CombatSimulator {
       dps = 4 * UnitType.Terran_Marine.groundDps
       range = UnitType.Terran_Marine.range
     }
-    
-    val distanceFactor = Math.min(3, Math.max(1, (range - unit.position.getApproxDistance(simulation.focalPoint))/32))
+    val highGroundFactor = 1.3 * With.game.getGroundHeight(unit.tilePosition)
+    val distanceFactor = Math.min(5, Math.max(0, 3 + (range - unit.position.getDistance(simulation.focalPoint))/32))
     val combatEfficacy = dps * unit.totalHealth
-    Math.max(0, distanceFactor * combatEfficacy)
+    Math.max(0, highGroundFactor * distanceFactor * combatEfficacy).toInt
   }
 }

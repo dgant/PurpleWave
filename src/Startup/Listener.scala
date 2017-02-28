@@ -14,9 +14,6 @@ object Listener extends BWEventListener{
   override def onStart(): Unit = {
     With.game = mirror.getGame
     bot = Some(new Bot())
-    var foo = 3
-    var bar = 5
-    var qux = foo * bar
     bot.get.onStart
   }
 

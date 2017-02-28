@@ -23,13 +23,14 @@ class ForeignUnitTracker {
     //Important to remember: bwapi.Units are not persisted frame-to-frame
     //So we do all our comparisons by ID, rather than by object
     
-    val foreignUnitsNow           = With.game.getAllUnits.asScala.filter(_isValidForeignUnit).map(unit => (unit.getID, unit)).toMap
+    val foreignUnitsNew           = With.game.getAllUnits.asScala.filter(_isValidForeignUnit).map(unit => (unit.getID, unit)).toMap
     val foreignUnitsOld           = _foreignUnitsById
-    val foreignIdsNow             = foreignUnitsNow.keySet
+    val foreignIdsNew             = foreignUnitsNew.keySet
     val foreignIdsOld             = foreignUnitsOld.keySet
-    val unitsToAdd                = foreignIdsNow.diff(foreignIdsOld).map(foreignUnitsNow)
-    val unitsToUpdate             = foreignIdsNow.intersect(foreignIdsOld).map(foreignUnitsNow)
-    val unitsToInvalidatePosition = enemyUnits
+    val unitsToAdd                = foreignIdsNew.diff(foreignIdsOld).map(foreignUnitsNew)
+    val unitsToUpdate             = foreignIdsNew.intersect(foreignIdsOld).map(foreignUnitsNew)
+    val unitsToInvalidatePosition = foreignIdsOld.diff(foreignIdsNew)
+      .map(foreignUnitsOld)
       .filter(_.possiblyStillThere) //This check is important! It makes the O(n^2) filter at the end O(n)
       .filter(unitInfo => With.game.isVisible(unitInfo.tilePosition))
     
@@ -39,8 +40,8 @@ class ForeignUnitTracker {
   
     //Remove no-longer-valid units
     //We have to do this after updating because it needs the latest bwapi.Units
-    val noLongerValid = _foreignUnitsById.values.filterNot(unitInfo => _isValidForeignUnit(unitInfo.baseUnit))
-    noLongerValid.foreach(_remove)
+    //val noLongerValid = foreignUnitsNow.values.filterNot(unitInfo => _isValidForeignUnit(unitInfo.baseUnit))
+    //noLongerValid.foreach(_remove)
   
     //Could speed things up by diffing instead of recreating these
     _foreignUnits = _foreignUnitsById.values.toSet

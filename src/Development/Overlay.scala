@@ -6,7 +6,6 @@ import Plans.Plan
 import Startup.With
 import Types.UnitInfo.ForeignUnitInfo
 import bwapi.{Color, Position, UnitCommandType}
-import Utilities.Enrichment.EnrichUnitType._
 import bwta.BWTA
 
 import scala.collection.JavaConverters._
@@ -200,7 +199,7 @@ object Overlay {
   }
   
   def _drawTrackedUnits() {
-    With.tracker.enemyUnits.foreach(_drawTrackedUnit)
+    With.units.enemy.foreach(_drawTrackedUnit)
   }
   
   def _drawTrackedUnit(trackedUnit:ForeignUnitInfo) {

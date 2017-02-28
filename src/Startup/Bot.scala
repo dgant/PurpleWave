@@ -3,7 +3,7 @@ package Startup
 import Development.{Configuration, Logger, Overlay}
 import Global.Allocation._
 import Global.Information.Combat.CombatSimulator
-import Global.Information.UnitAbstraction.{ForeignUnitTracker, Units}
+import Global.Information.UnitAbstraction.Units
 import Global.Information._
 import Plans.GamePlans.PlanWinTheGame
 import bwapi.DefaultBWListener
@@ -27,7 +27,6 @@ class Bot() extends DefaultBWListener {
       With.geography = new Geography
       With.gameplan = new PlanWinTheGame
       With.history = new History
-      With.tracker = new ForeignUnitTracker
       With.intelligence = new Intelligence
       With.prioritizer = new Prioritizer
       With.recruiter = new Recruiter
@@ -46,7 +45,6 @@ class Bot() extends DefaultBWListener {
       With.units.onFrame()
       With.simulator.onFrame()
       With.economy.onFrame()
-      With.tracker.onFrame()
       With.bank.onFrame()
       With.recruiter.onFrame()
       With.prioritizer.onFrame()
@@ -71,7 +69,7 @@ class Bot() extends DefaultBWListener {
 
   override def onUnitDestroy(unit: bwapi.Unit) {
     try {
-      With.tracker.onUnitDestroy(unit)
+      With.units.onUnitDestroy(unit)
       With.history.onUnitDestroy(unit)
     }
     catch { case exception:Exception => With.logger.onException(exception) }
@@ -95,8 +93,8 @@ class Bot() extends DefaultBWListener {
   def _considerSurrender() = {
     if (With.game.self.supplyUsed == 0
       && With.game.self.minerals < 50
-      && With.tracker.enemyUnits.exists(_.unitType.isWorker)
-      && With.tracker.enemyUnits.exists(_.unitType.isResourceDepot)) {
+      && With.units.enemy.exists(_.unitType.isWorker)
+      && With.units.enemy.exists(_.unitType.isResourceDepot)) {
       With.game.sendText("Good game! Let's pretend this never happened.")
       With.game.leaveGame()
     }

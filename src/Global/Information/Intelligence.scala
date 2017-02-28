@@ -14,7 +14,7 @@ class Intelligence {
   }
   
   def mostBaselikeEnemyBuilding:Option[ForeignUnitInfo] = {
-    With.tracker.enemyUnits
+    With.units.enemy
       .toList
       .filter(unit => unit.unitType.isBuilding)
       .sortBy(unit => unit.unitType.isFlyer)

@@ -3,7 +3,7 @@ package Startup
 import Development.Logger
 import Global.Allocation._
 import Global.Information.Combat.CombatSimulator
-import Global.Information.UnitAbstraction.{ForeignUnitTracker, Units}
+import Global.Information.UnitAbstraction.Units
 import Global.Information._
 import Plans.GamePlans.PlanWinTheGame
 
@@ -22,6 +22,5 @@ object With {
   var prioritizer:Prioritizer = null
   var recruiter:Recruiter = null
   var scheduler:Scheduler = null
-  var tracker:ForeignUnitTracker = null
   var units: Units = null
 }

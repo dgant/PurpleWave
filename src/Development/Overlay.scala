@@ -30,7 +30,8 @@ object Overlay {
   def _drawTextLabel(
     textLines:Iterable[String],
     position:Position,
-    drawBackground:Boolean = false) {
+    drawBackground:Boolean = false,
+    backgroundColor:Color = Color.Grey) {
     val horizontalMargin = 2
     val estimatedTextWidth = (9 * textLines.map(_.size).max) / 2
     val boxWidth = estimatedTextWidth + 2 * horizontalMargin
@@ -46,7 +47,7 @@ object Overlay {
         boxY,
         boxX + boxWidth,
         boxY + boxHeight,
-        bwapi.Color.Grey,
+        backgroundColor,
         true) //isSolid
     }
     With.game.drawTextMap(
@@ -220,10 +221,10 @@ object Overlay {
   def _drawCombatSimulation(simulation:CombatSimulation) {
     if (simulation.enemyScore * simulation.ourScore == 0) return
     if (simulation.ourGroup.vanguard.getDistance(simulation.enemyGroup.vanguard) > 32 * 20) return
-    With.game.drawCircleMap(simulation.focalPoint, 8, Color.Red)
-    With.game.drawCircleMap(simulation.ourGroup.vanguard, 8, Color.Red)
+    With.game.drawCircleMap(simulation.focalPoint, 8, Color.Orange)
+    With.game.drawCircleMap(simulation.ourGroup.vanguard, 8, Color.Green)
     With.game.drawCircleMap(simulation.enemyGroup.vanguard, 8, Color.Red)
-    With.game.drawLineMap(simulation.focalPoint, simulation.ourGroup.vanguard, Color.Red)
+    With.game.drawLineMap(simulation.focalPoint, simulation.ourGroup.vanguard, Color.Green)
     With.game.drawLineMap(simulation.focalPoint, simulation.enemyGroup.vanguard, Color.Red)
     if (simulation.ourGroup.units.nonEmpty) {
       With.game.drawBoxMap(
@@ -233,7 +234,7 @@ object Overlay {
         new Position(
           simulation.ourGroup.units.map(_.x).max,
           simulation.ourGroup.units.map(_.y).max),
-        Color.Orange)
+        Color.Green)
     }
     if (simulation.enemyGroup.units.nonEmpty) {
       With.game.drawBoxMap(
@@ -243,11 +244,12 @@ object Overlay {
         new Position(
           simulation.enemyGroup.units.map(_.x).max,
           simulation.enemyGroup.units.map(_.y).max),
-        Color.Orange)
+        Color.Red)
     }
     _drawTextLabel(
       List(simulation.ourScore/1000 + " - " + simulation.enemyScore/1000),
       simulation.focalPoint,
-      drawBackground = true)
+      drawBackground = true,
+      backgroundColor = Color.Orange)
   }
 }

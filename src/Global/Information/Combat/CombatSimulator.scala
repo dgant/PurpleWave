@@ -6,6 +6,7 @@ import Types.UnitInfo.UnitInfo
 import Utilities.Limiter
 import bwapi.UnitType
 import Utilities.Enrichment.EnrichUnitType._
+import Utilities.Enrichment.EnrichPosition._
 
 import scala.collection.mutable
 
@@ -21,8 +22,8 @@ class CombatSimulator {
   }
   
   def _defineCombats() {
-    val ourGroupMaps = Cluster.generate(With.units.ours, combatRange)
-    val enemyGroupMaps = Cluster.generate(With.units.enemy, combatRange)
+    val ourGroupMaps = Cluster.generate(With.units.ours.filter(_.canFight), combatRange)
+    val enemyGroupMaps = Cluster.generate(With.units.enemy.filter(_.canFight), combatRange)
     val ourGroups = ourGroupMaps.map(group => new CombatGroup(group._1.position, group._2))
     val enemyGroups = enemyGroupMaps.map(group => new CombatGroup(group._1.position, group._2))
     combats = _buildCombats(ourGroups, enemyGroups)
@@ -35,11 +36,14 @@ class CombatSimulator {
   def _buildCombats(
     ourGroups:  Iterable[CombatGroup],
     theirGroups:Iterable[CombatGroup]):Iterable[CombatSimulation] = {
-    //Shouldn't happen, but just in case
+    
     if (theirGroups.isEmpty) return List.empty
   
-    ourGroups.map(ourGroup =>
-      new CombatSimulation(ourGroup, theirGroups.minBy(_.vanguard.getDistance(ourGroup.vanguard))))
+    ourGroups.filter(_.units.exists(_.alive)).map(ourGroup => {
+      val enemyGroup = theirGroups.filter(_.units.exists(_.alive)).minBy(_.vanguard.getDistance(ourGroup.vanguard))
+      val simulation = new CombatSimulation(ourGroup, enemyGroup)
+      simulation
+    })
   }
   
   def _update(simulation: CombatSimulation) {
@@ -47,6 +51,10 @@ class CombatSimulator {
     _removeMissingUnits(simulation.enemyGroup.units)
     simulation.ourScore = simulation.ourGroup.units.map(_valueUnit(_, simulation)).sum
     simulation.enemyScore = simulation.enemyGroup.units.map(_valueUnit(_, simulation)).sum
+    if (simulation.ourGroup.units.nonEmpty && simulation.enemyGroup.units.nonEmpty) {
+      simulation.ourGroup.vanguard = simulation.ourGroup.units.minBy(_.position.distanceSquared(simulation.enemyGroup.vanguard)).position
+      simulation.enemyGroup.vanguard = simulation.enemyGroup.units.minBy(_.position.distanceSquared(simulation.ourGroup.vanguard)).position
+    }
   }
   
   def _removeMissingUnits(units:mutable.HashSet[UnitInfo]) {
@@ -80,7 +88,7 @@ class CombatSimulator {
       case 4 => 1.0 * highGroundMultiplier * highGroundMultiplier
       case _ => 1.0 * highGroundMultiplier * highGroundMultiplier * highGroundMultiplier
     }
-    val distanceFactor = Math.min(5, Math.max(0, 3 + (range - unit.position.getDistance(simulation.focalPoint))/32))
+    val distanceFactor = Math.min(6, Math.max(1, 3 + (range - unit.position.getDistance(simulation.focalPoint))/32))
     val combatEfficacy = dps * unit.totalHealth
     Math.max(0, highGroundFactor * distanceFactor * combatEfficacy).toInt
   }

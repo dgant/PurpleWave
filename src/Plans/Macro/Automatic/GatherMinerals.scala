@@ -26,9 +26,9 @@ class GatherMinerals extends Plan {
   override def onFrame() {
     workerPlan.get.onFrame()
     _limitResetAssignments.act()
+    _assignWorkers()
     val workers = workerPlan.get.units
-    workers.diff(_mineralByWorker.keySet).foreach(_assignWorker)
-    workers
+    workerPlan.get.units
       .filterNot(worker => worker.isGatheringMinerals)
       .foreach(_orderWorker)
   }
@@ -46,6 +46,24 @@ class GatherMinerals extends Plan {
   
   def _getTownHalls:Iterable[FriendlyUnitInfo] = {
     With.units.ours.filter(unit => unit.complete && unit.utype.isTownHall)
+  }
+  
+  def _assignWorkers() {
+    val unassignedWorkers = new mutable.HashSet[FriendlyUnitInfo]
+    unassignedWorkers ++= workerPlan.get.units.diff(_mineralByWorker.keySet)
+    _sortMinerals()
+    if (_minerals.isEmpty) { return }
+    while (unassignedWorkers.nonEmpty) {
+      _minerals.foreach(mineral => {
+        if (unassignedWorkers.nonEmpty) {
+          val worker = unassignedWorkers.minBy(_.position.getDistance(mineral.position))
+          _workersByMineral(mineral).add(worker)
+          _mineralByWorker.put(worker, mineral)
+          unassignedWorkers.remove(worker)
+          _orderWorker(worker)
+        }
+      })
+    }
   }
   
   def _assignWorker(worker:FriendlyUnitInfo) {
@@ -70,9 +88,9 @@ class GatherMinerals extends Plan {
         worker.baseUnit.returnCargo()
       }
     } else {
-      val minerals = _mineralByWorker.get(worker)
-      if (minerals.nonEmpty) {
-        worker.baseUnit.gather(minerals.minBy(_.position.getDistance(worker.position)).baseUnit)
+      val mineral = _mineralByWorker.get(worker)
+      if (mineral.nonEmpty) {
+        worker.baseUnit.gather(mineral.get.baseUnit)
       }
     }
   }

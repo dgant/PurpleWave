@@ -125,7 +125,7 @@ object Overlay {
   }
   
   def _drawTerrain() {
-    BWTA.getRegions.asScala .foreach(region => {
+    BWTA.getRegions.asScala.foreach(region => {
         _drawPolygonPositions(region.getPolygon.getPoints.asScala)
         With.game.drawLineMap(
           region.getPolygon.getPoints.asScala.head,

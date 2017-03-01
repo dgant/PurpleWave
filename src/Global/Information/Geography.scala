@@ -42,19 +42,15 @@ class Geography {
     setCalculator(() => _recalculateOurMiningAreas)
   }
   def _recalculateOurMiningAreas:Iterable[TileRectangle] = {
-    ourBaseHalls.map(base => {
+    ourBaseHalls.filter(_.complete).map(base => {
       val nearbyUnits = With.units.inRadius(base.position, 32 * 10)
-  
       val minerals = nearbyUnits
         .filter(_.utype == UnitType.Resource_Mineral_Field)
         .map(_.position)
-      
       val geysers = nearbyUnits
         .filter(unit => unit.utype.isRefinery || unit.utype == UnitType.Resource_Vespene_Geyser)
         .flatten(unit => List(new Position(unit.left - 16, unit.top), new Position(unit.right + 16, unit.bottom)))
-      
       val boxedUnits = minerals ++ geysers ++ Iterable(base.position)
-      
       //Draw a box around the area
       val top    = boxedUnits.map(_.getY).min + 16
       val bottom = boxedUnits.map(_.getY).max + 16
@@ -99,23 +95,12 @@ class Geography {
   }
   
   def _calculateBasePositions:Iterable[TilePosition] = {
-    /*
-    val occupiedPositions =
-      (mineralPositions.flatten(mineral => UnitType.Resource_Mineral_Field.tiles.map(mineral.add(_))) ++
-           gasPositions.flatten(gas     => UnitType.Resource_Vespene_Geyser.tiles.map(gas.add(_))))
-    val illegalPositions = occupiedPositions.flatten(occupiedPosition =>
-      (0 until 3).flatten(dx =>
-        (0 until 3).map(dy =>
-          occupiedPosition.add(new TilePosition(dx, dy)))))
-      .toSet
-      */
-    
     val basePositions = _resourceClusterCache.get.map(_findBasePosition).filter(_.nonEmpty).map(_.get)
     basePositions
   }
   
-  def _findBasePosition(positions:Iterable[TilePosition]):Option[TilePosition] = {
-    val centroid = positions.centroid
+  def _findBasePosition(resources:Iterable[TilePosition]):Option[TilePosition] = {
+    val centroid = resources.centroid
     val searchRadius = 10
     val candidates =
       (-searchRadius to searchRadius).flatten(dx =>
@@ -127,7 +112,7 @@ class Geography {
     val extantCandidates = candidates.filter(_.nonEmpty).map(_.get)
     
     if (extantCandidates.isEmpty) return None
-    Some(extantCandidates.minBy(candidate => positions.map(_.distanceSquared(candidate)).sum))
+    Some(extantCandidates.minBy(candidate => resources.map(_.distanceSquared(candidate)).sum))
   }
   
   def _isLegalBasePosition(position:TilePosition):Boolean = {

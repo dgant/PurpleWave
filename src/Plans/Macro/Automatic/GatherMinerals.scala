@@ -5,8 +5,9 @@ import Plans.Plan
 import Startup.With
 import Strategies.UnitMatchers.UnitMatchWorker
 import Types.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo}
+import Utilities.Caching.Limiter
 import Utilities.Enrichment.EnrichUnitType._
-import Utilities.{Limiter, Property}
+import Utilities.Property
 import bwapi.UnitCommandType
 
 import scala.collection.mutable

@@ -1,18 +1,13 @@
-package Utilities
+package Utilities.Caching
 
 import Startup.With
 
-class Cache[T]() {
+class Cache[T](
+  val duration:Int,
+  val recalculator:() => T) {
   
-  var duration = 24
   var _lastUpdateFrame = Integer.MIN_VALUE
   var _cachedValue:Option[T] = None
-  
-  var _recalculator:Option[() => T] = None
-  
-  def setCalculator(recalculator:() => T) {
-    _recalculator = Some(recalculator)
-  }
   
   def get:T = {
     if (_cacheHasExpired) {
@@ -23,10 +18,7 @@ class Cache[T]() {
   }
   
   def _recalculateAsNeeded:T = {
-    if (_recalculator.isEmpty) {
-      throw new Exception("This cache lacks a recalculator")
-    }
-    _recalculator.get.apply()
+    recalculator.apply()
   }
   
   def _cacheHasExpired:Boolean = {

@@ -3,13 +3,14 @@ package Global.Information
 import Geometry.{Clustering, TileRectangle}
 import Startup.With
 import Types.UnitInfo.FriendlyUnitInfo
-import Utilities.{Cache, CacheForever}
-import bwapi.{Position, TilePosition, UnitType}
 import Utilities.Enrichment.EnrichPosition._
 import Utilities.Enrichment.EnrichUnitType._
+import Utilities.CacheForever
+import Utilities.Caching.{Cache, CacheForever}
+import bwapi.{Position, TilePosition, UnitType}
 
-import scala.collection.mutable
 import scala.collection.JavaConverters._
+import scala.collection.mutable
 
 class Geography {
   
@@ -26,7 +27,12 @@ class Geography {
   def centerTilePosition:TilePosition = {
     new TilePosition(With.game.mapWidth / 2, With.game.mapHeight / 2)
   }
+  
+  val _cacheHome = new Cache[Position](24, () => _calculateHome)
   def home:Position = {
+    _cacheHome.get
+  }
+  def _calculateHome:Position = {
     ourBaseHalls.view.map(_.position).headOption
       .getOrElse(With.units.ours.view.filter(_.utype.isBuilding).map(_.position).headOption
       .getOrElse(new Position(0,0)))
@@ -36,12 +42,9 @@ class Geography {
     With.units.ours.filter(unit => unit.utype.isTownHall && ! unit.flying)
   }
   
-  def ourHarvestingAreas:Iterable[TileRectangle] = { _ourMiningAreasCache.get }
-  val _ourMiningAreasCache = new Cache[Iterable[TileRectangle]] {
-    duration = 24 * 5
-    setCalculator(() => _recalculateOurMiningAreas)
-  }
-  def _recalculateOurMiningAreas:Iterable[TileRectangle] = {
+  def ourHarvestingAreas:Iterable[TileRectangle] = { _ourHarvestingAreaCache.get }
+  val _ourHarvestingAreaCache = new Cache[Iterable[TileRectangle]](24 * 5, () => _ourHarvestingAreas)
+  def _ourHarvestingAreas:Iterable[TileRectangle] = {
     ourBaseHalls.filter(_.complete).map(base => {
       val nearbyUnits = With.units.inRadius(base.position, 32 * 10)
       val minerals = nearbyUnits
@@ -64,19 +67,10 @@ class Geography {
   }
   
   def basePositions:Iterable[TilePosition] = _basePositionsCache.get
-  val _basePositionsCache = new Cache[Iterable[TilePosition]] {
-    duration = 24 * 60
-    setCalculator(() => _calculateBasePositions)
-  }
-  val _resourceClusterCache = new CacheForever[Iterable[Iterable[TilePosition]]] {
-    setCalculator(() => _getResourceClusters)
-  }
-  val _mineralExclusionCache = new CacheForever[Iterable[TileRectangle]] {
-    setCalculator(() => _getMineralExclusions)
-  }
-  val _gasExclusionCache = new CacheForever[Iterable[TileRectangle]] {
-    setCalculator(() => _getGasExclusions)
-  }
+  val _basePositionsCache = new Cache[Iterable[TilePosition]](24 * 60, () => _calculateBasePositions)
+  val _resourceClusterCache = new CacheForever[Iterable[Iterable[TilePosition]]](() => _getResourceClusters)
+  val _mineralExclusionCache = new CacheForever[Iterable[TileRectangle]](() => _getMineralExclusions)
+  val _gasExclusionCache = new CacheForever[Iterable[TileRectangle]](() => _getGasExclusions)
   def _getMineralExclusions:Iterable[TileRectangle] = {
     val positions     = With.game.getStaticMinerals.asScala.map(_.getInitialTilePosition)
     val boundaryStart = new TilePosition(3, 3)

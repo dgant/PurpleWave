@@ -22,19 +22,16 @@ object Control extends Command {
       
       val groupConfidence = groupStrengthUs / groupStrengthEnemy
       val localConfidence = unit.totalHealth.toDouble / unit.maxTotalHealth * localStrengthUs / localStrengthEnemy
-  
-      if (groupConfidence < 0.2) {
-        Flee.execute(intent)
-      }
-      else if (groupConfidence < 0.5) {
-        if (localConfidence < 0.8) {
+
+      if (groupConfidence < 0.5) {
+        if (localConfidence < 1) {
           Flee.execute(intent)
         }
         else {
           Skirt.execute(intent)
         }
       }
-      else if (groupConfidence < 1.1) {
+      else if (groupConfidence < 1) {
         Skirt.execute(intent)
       }
       else {

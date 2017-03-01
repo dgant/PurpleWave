@@ -3,7 +3,7 @@ package Global.Combat.Battle
 import Geometry.Clustering
 import Startup.With
 import Types.UnitInfo.UnitInfo
-import Utilities.Limiter
+import Utilities.Caching.Limiter
 import Utilities.Enrichment.EnrichPosition._
 
 import scala.collection.mutable

@@ -2,6 +2,7 @@ package Global.Information
 
 import Startup.With
 import Types.UnitInfo.ForeignUnitInfo
+import Utilities.Caching.Cache
 import Utilities.Enrichment.EnrichUnitType._
 import bwapi.TilePosition
 
@@ -22,7 +23,11 @@ class Intelligence {
       .headOption
   }
   
+  val _unscoutedBaseCache = new Cache(24, () => _recalculateUnscoutedBases)
   def mostUnscoutedBases():Iterable[TilePosition] = {
+    _unscoutedBaseCache.get
+  }
+  def _recalculateUnscoutedBases:Iterable[TilePosition] = {
     (With.game.getStartLocations.asScala ++ With.game.getStaticGeysers.asScala.map(_.getTilePosition))
       .sortBy(base => With.game.isExplored(base))
   }

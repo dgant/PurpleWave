@@ -1,6 +1,6 @@
 package Plans.GamePlans.Protoss.Proxy
 
-import Utilities.{Cache, Property}
+import Utilities.Property
 import Plans.Allocation.{LockUnits, LockUnitsExactly}
 import Plans.Army.UnitAtLocation.RequireUnitAtLocation
 import Plans.Compound.{AllSerial, CompleteOnce}
@@ -10,17 +10,14 @@ import Startup.With
 import Strategies.PositionFinders.{PositionCenter, PositionFinder, PositionSpecific}
 import Strategies.UnitMatchers.{UnitMatchWorker, UnitMatcher}
 import Strategies.UnitPreferences.{UnitPreferClose, UnitPreference}
+import Utilities.Caching.Cache
 import bwapi.{TilePosition, UnitType}
 
 class BuildProxyTwoGateways extends Plan {
   
   description.set(Some("Build two proxy Gateways"))
   
-  val _proxyPositions = new Cache[Iterable[TilePosition]] {
-    duration = 24 * 15
-    setCalculator(() =>  _getProxyPositions)
-  }
-  
+  val _proxyPositionCache = new Cache[Iterable[TilePosition]](24 * 15, () =>  _proxyPositions)
   val meBPTG = this
   val proxyWorkerSpotRadius = new Property[Int](32 * 6)
   val proxySearchTileRadius = new Property[Int](Math.max(With.game.mapWidth, With.game.mapHeight) * 3 / 8)
@@ -37,23 +34,23 @@ class BuildProxyTwoGateways extends Plan {
   val sendBuilderPlan = new Property[Plan](new RequireUnitAtLocation {
     this.description.set(Some("Send builder to proxy"))
     this.unitPlan.inherit(meBPTG.builderPlan);
-    this.positionFinder.set(new PositionSpecific(_proxyPositions.get.head))
+    this.positionFinder.set(new PositionSpecific(_proxyPositionCache.get.head))
     this.range.inherit(proxyWorkerSpotRadius);
   })
   val pylonPlan = new Property[Plan](new BuildBuilding(UnitType.Protoss_Pylon) {
     this.description.set(Some("Build proxy Pylon"))
     this.builderPlan.inherit(meBPTG.builderPlan)
-    this.positionFinder.set(new PositionSpecific(_proxyPositions.get.head))
+    this.positionFinder.set(new PositionSpecific(_proxyPositionCache.get.head))
   })
   val gateway1Plan = new Property[Plan](new BuildBuilding(UnitType.Protoss_Gateway) {
     this.description.set(Some("Build first proxy Gateway"))
     this.builderPlan.inherit(meBPTG.builderPlan)
-    this.positionFinder.set(new PositionSpecific(_proxyPositions.get.drop(1).head))
+    this.positionFinder.set(new PositionSpecific(_proxyPositionCache.get.drop(1).head))
   })
   val gateway2Plan = new Property[BuildBuilding](new BuildBuilding(UnitType.Protoss_Gateway) {
     this.description.set(Some("Build second proxy Gateway"))
     this.builderPlan.inherit(meBPTG.builderPlan)
-    this.positionFinder.set(new PositionSpecific(_proxyPositions.get.drop(2).head))
+    this.positionFinder.set(new PositionSpecific(_proxyPositionCache.get.drop(2).head))
   })
   
   val _completeSendBuilderOnce = new CompleteOnce {
@@ -90,7 +87,7 @@ class BuildProxyTwoGateways extends Plan {
     ))
   }
   
-  def _getProxyPositions:Iterable[TilePosition] = {
+  def _proxyPositions:Iterable[TilePosition] = {
   
     val buildings = List(UnitType.Protoss_Pylon, UnitType.Protoss_Gateway, UnitType.Protoss_Gateway)
     val center = new PositionCenter().find.get

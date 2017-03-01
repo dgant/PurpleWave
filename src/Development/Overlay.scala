@@ -20,11 +20,10 @@ object Overlay {
       if (With.configuration.enableOverlayBattles)        _drawBattles()
       if (With.configuration.enableOverlayEconomy)        _drawEconomy()
       if (With.configuration.enableOverlayExclusions)     _drawExclusions()
-      if (With.configuration.enableOverlayHighlightUnits) _drawUnits()
+      if (With.configuration.enableOverlayUnits)          _drawUnits()
       if (With.configuration.enableOverlayPlans)          _drawPlans()
       if (With.configuration.enableOverlayResources)      _drawResources()
       if (With.configuration.enableOverlayTerrain)        _drawTerrain()
-      if (With.configuration.enableOverlayTrackedUnits)   _drawTrackedUnits()
       if (With.configuration.enableOverlayTrackedUnits)   _drawTrackedUnits()
     }
   }

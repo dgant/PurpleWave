@@ -27,7 +27,7 @@ class GatherMinerals extends Plan {
     workerPlan.get.onFrame()
     _limitResetAssignments.act()
     val workers = workerPlan.get.units
-    _mineralByWorker.keySet.diff(workers).foreach(_assignWorker)
+    workers.diff(_mineralByWorker.keySet).foreach(_assignWorker)
     workers
       .filterNot(worker => worker.isGatheringMinerals)
       .foreach(_orderWorker)

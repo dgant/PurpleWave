@@ -38,7 +38,7 @@ class Geography {
   
   def ourHarvestingAreas:Iterable[TileRectangle] = { _ourMiningAreasCache.get }
   val _ourMiningAreasCache = new Cache[Iterable[TileRectangle]] {
-    duration = 24 * 15
+    duration = 24 * 5
     setCalculator(() => _recalculateOurMiningAreas)
   }
   def _recalculateOurMiningAreas:Iterable[TileRectangle] = {
@@ -69,7 +69,7 @@ class Geography {
   
   def basePositions:Iterable[TilePosition] = _basePositionsCache.get
   val _basePositionsCache = new Cache[Iterable[TilePosition]] {
-    duration = 24 * 20
+    duration = 24 * 60
     setCalculator(() => _calculateBasePositions)
   }
   val _resourceClusterCache = new CacheForever[Iterable[Iterable[TilePosition]]] {

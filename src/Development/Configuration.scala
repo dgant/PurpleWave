@@ -9,7 +9,7 @@ class Configuration {
   var enableOverlayExclusions     = true
   var enableOverlayBattles        = true
   var enableOverlayEconomy        = true
-  var enableOverlayHighlightUnits = true
+  var enableOverlayUnits          = false
   var enableOverlayResources      = false
   var enableOverlayPlans          = false
   var enableOverlayTerrain        = false

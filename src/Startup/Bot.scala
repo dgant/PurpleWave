@@ -3,7 +3,7 @@ package Startup
 import Development.{AutoCamera, Configuration, Logger, Overlay}
 import Global.Resources._
 import Global.Combat.Commander
-import Global.Combat.Battle.BattleSimulator
+import Global.Combat.Battle.Battles
 import Global.Information.UnitAbstraction.Units
 import Global.Information._
 import Plans.GamePlans.WinTheGame
@@ -24,7 +24,7 @@ class Bot() extends DefaultBWListener {
       With.architect = new Architect
       With.bank = new Banker
       With.camera = new AutoCamera
-      With.simulator = new BattleSimulator
+      With.battles = new Battles
       With.commander = new Commander
       With.economy = new Economy
       With.geography = new Geography
@@ -47,7 +47,7 @@ class Bot() extends DefaultBWListener {
   override def onFrame() {
     try {
       With.units.onFrame()
-      With.simulator.onFrame()
+      With.battles.onFrame()
       With.economy.onFrame()
       With.bank.onFrame()
       With.recruiter.onFrame()

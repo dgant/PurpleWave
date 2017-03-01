@@ -35,32 +35,32 @@ object Overlay {
   }
   
   def _drawBattles() {
-    With.simulator.battles.foreach(_drawBattle)
+    With.battles.battles.foreach(_drawBattle)
   }
   
   def _drawBattle(battle:Battle) {
-    if (battle.enemyScore * battle.ourScore == 0) return
-    if (battle.ourGroup.vanguard.getDistance(battle.enemyGroup.vanguard) > 32 * 20) return
-    With.game.drawCircleMap(battle.focalPoint, 8, Color.Brown)
-    With.game.drawCircleMap(battle.ourGroup.vanguard, 8, Color.Green)
-    With.game.drawCircleMap(battle.enemyGroup.vanguard, 8, Color.Red)
-    With.game.drawLineMap(battle.focalPoint, battle.ourGroup.vanguard, Color.Green)
-    With.game.drawLineMap(battle.focalPoint, battle.enemyGroup.vanguard, Color.Red)
-    if (battle.ourGroup.units.nonEmpty) {
+    if (battle.enemy.strength * battle.us.strength == 0) return
+    if (battle.us.vanguard.getDistance(battle.enemy.vanguard) > 32 * 20) return
+    With.game.drawCircleMap(battle.focus, 8, Color.Brown)
+    With.game.drawCircleMap(battle.us.vanguard, 8, Color.Green)
+    With.game.drawCircleMap(battle.enemy.vanguard, 8, Color.Red)
+    With.game.drawLineMap(battle.focus, battle.us.vanguard, Color.Green)
+    With.game.drawLineMap(battle.focus, battle.enemy.vanguard, Color.Red)
+    if (battle.us.units.nonEmpty) {
       With.game.drawBoxMap(
-        battle.ourGroup.units.map(_.position).minBound,
-        battle.ourGroup.units.map(_.position).maxBound,
+        battle.us.units.map(_.position).minBound,
+        battle.us.units.map(_.position).maxBound,
         Color.Green)
     }
-    if (battle.enemyGroup.units.nonEmpty) {
+    if (battle.enemy.units.nonEmpty) {
       With.game.drawBoxMap(
-        battle.enemyGroup.units.map(_.position).minBound,
-        battle.enemyGroup.units.map(_.position).maxBound,
+        battle.enemy.units.map(_.position).minBound,
+        battle.enemy.units.map(_.position).maxBound,
         Color.Red)
     }
     _drawTextLabel(
-      List(battle.ourScore/1000 + " - " + battle.enemyScore/1000),
-      battle.focalPoint,
+      List(battle.us.strength/1000 + " - " + battle.enemy.strength/1000),
+      battle.focus,
       drawBackground = true,
       backgroundColor = Color.Brown)
   }

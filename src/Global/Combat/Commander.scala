@@ -11,8 +11,7 @@ import scala.collection.mutable
 class Commander {
   
   val _intentions = new mutable.HashSet[Intention]
-  val _nextOrderFrame = new mutable.HashMap[FriendlyUnitInfo, Int] {
-    override def default(key: FriendlyUnitInfo): Int = 0 }
+  val _nextOrderFrame = new mutable.HashMap[FriendlyUnitInfo, Int] { override def default(key: FriendlyUnitInfo): Int = 0 }
   
   def intend(intention:Intention) { _intentions.add(intention) }
   
@@ -23,26 +22,25 @@ class Commander {
   }
   
   def setOrderDelay(unit:FriendlyUnitInfo, startedAttacking:Boolean = false) {
-    val baseDelay = 0
-    val attackDelay = if (startedAttacking) unit.attackFrames + 8 + With.game.getRemainingLatencyFrames else 0
-    _nextOrderFrame.put(unit, With.game.getFrameCount + baseDelay + attackDelay)
+    val delay = if (startedAttacking) unit.attackFrames + 8 + With.game.getRemainingLatencyFrames else 0
+    _nextOrderFrame.put(unit, delay + With.game.getFrameCount)
   }
   
   def _fulfill(intent:Intention) {
     val unit = intent.unit
-    if (_nextOrderFrame(unit) > With.game.getFrameCount) { return }
+    if (_nextOrderFrame(unit) > With.game.getFrameCount) return
   
-    val combatOption = With.simulator.battles.find(_.ourGroup.units.contains(unit))
+    val battleOption = With.battles.battles.find(_.us.units.contains(unit))
   
-    if (combatOption.isEmpty || combatOption.get.enemyGroup.units.isEmpty) {
+    if (battleOption.isEmpty || battleOption.get.enemy.units.isEmpty) {
       _advance(intent)
     } else {
-      val combat = combatOption.get
-      val enemyMaxRange = if (combat.enemyGroup.units.nonEmpty) combat.enemyGroup.units.map(_.range).max else 0
-      val distanceToEnemy = unit.position.getDistance(combat.enemyGroup.vanguard)
-      val strengthRatio = (0.01 + combat.ourScore) / (0.01 + combat.enemyScore)
+      val combat = battleOption.get
+      val enemyMaxRange = if (combat.enemy.units.nonEmpty) combat.enemy.units.map(_.range).max else 0
+      val distanceToEnemy = unit.position.getDistance(combat.enemy.vanguard)
+      val strengthRatio = (0.01 + combat.us.strength) / (0.01 + combat.enemy.strength)
     
-      if (unit.cloaked && combat.enemyGroup.units.forall(!_.utype.isDetector)) {
+      if (unit.cloaked && combat.enemy.units.forall(!_.utype.isDetector)) {
         _fight(intent)
       }
       else if (strengthRatio < 0.7) {
@@ -56,7 +54,7 @@ class Commander {
   
   def _fightWhileAdvancing(intent:Intention) {
     val unit = intent.unit
-    val closestEnemy = intent.battle.enemyGroup.units.minBy(_.distanceSquared(unit))
+    val closestEnemy = intent.battle.enemy.units.minBy(_.distanceSquared(unit))
     val closestEnemyDistance2 = unit.distanceSquared(closestEnemy)
     if (unit.onCooldown || unit.range <= closestEnemy.range) {
       val kiteRange = unit.range
@@ -75,7 +73,7 @@ class Commander {
   
   def _fight(intent:Intention) {
     val unit = intent.unit
-    val closestEnemy = intent.battle.enemyGroup.units.minBy(_.distanceSquared(unit))
+    val closestEnemy = intent.battle.enemy.units.minBy(_.distanceSquared(unit))
     val closestEnemyDistance2 = intent.unit.distanceSquared(closestEnemy)
     if (unit.onCooldown) {
       unit.baseUnit.move(closestEnemy.position)
@@ -90,7 +88,7 @@ class Commander {
     val unit = intent.unit
     val marginOfSafety = 32 * 3
     val marginOfDesperation = 32 * 10
-    if (intent.battle.enemyGroup.units.exists(enemy => enemy.distance(unit) + enemy.range < marginOfSafety)) {
+    if (intent.battle.enemy.units.exists(enemy => enemy.distance(unit) + enemy.range < marginOfSafety)) {
       val fleePosition = With.geography.ourHarvestingAreas
         .map(area => area.start.midpoint(area.end).toPosition)
         .headOption
@@ -111,7 +109,7 @@ class Commander {
   
   def _getTargetInRange(intent:Intention):Option[UnitInfo] = {
     val unit = intent.unit
-    val targets = intent.battle.enemyGroup.units
+    val targets = intent.battle.enemy.units
       .filter(_.position.getDistance(unit.position) <= Math.max(unit.range, 32 * 4))
       .filterNot(target => List(UnitType.Zerg_Larva, UnitType.Zerg_Egg).contains(target.utype))
     

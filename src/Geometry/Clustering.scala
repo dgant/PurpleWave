@@ -1,5 +1,6 @@
 package Geometry
 
+import Startup.With
 import Types.UnitInfo.UnitInfo
 import Utilities.Enrichment.EnrichPosition._
 import bwapi.Position
@@ -10,14 +11,16 @@ object Clustering {
   
   def groupUnits(
     units:Iterable[UnitInfo],
-    radius:Int)
+    radius:Int,
+    limitRegion:Boolean = false)
       :mutable.HashMap[UnitInfo, mutable.HashSet[UnitInfo]] = {
-    group(units, radius, (u) => u.position)
+    group(units, radius, limitRegion, (u) => u.position)
   }
   
   def group[T](
     things:Iterable[T],
     radius:Int,
+    limitRegion:Boolean = false,
     extractPosition:(T) => Position)
       :mutable.HashMap[T, mutable.HashSet[T]] = {
     
@@ -28,11 +31,14 @@ object Clustering {
         put(key, new mutable.HashSet[T])
         this(key)}}
     
-    things.foreach(leader => {
-      if ( ! unitLeaders.contains(leader)) {
-        groupsByLeader(leader).add(leader)
-        groupsByLeader(leader) ++= neighborsByUnit(leader)
-        groupsByLeader(leader).foreach(groupMember => unitLeaders.put(groupMember, leader))
+    things.foreach(thing => {
+      if ( ! unitLeaders.contains(thing)) {
+        groupsByLeader(thing).add(thing)
+        groupsByLeader(thing) ++= neighborsByUnit(thing).filter(neighbor =>
+          ! limitRegion ||
+            With.game.getGroundHeight(extractPosition(thing).toTilePosition) ==
+            With.game.getGroundHeight(extractPosition(neighbor).toTilePosition))
+        groupsByLeader(thing).foreach(groupMember => unitLeaders.put(groupMember, thing))
       }})
     
     return groupsByLeader

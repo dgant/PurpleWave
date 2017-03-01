@@ -90,8 +90,8 @@ class Geography {
     positions.map(position => new TileRectangle(position.subtract(boundaryStart), position.add(boundaryEnd)))
   }
   def _getResourceClusters:Iterable[Iterable[TilePosition]] = {
-    val resources = With.game.getStaticMinerals.asScala.filter(unit => unit.getType.isGas || unit.getType.isMineralField).filter(unit => unit.getInitialResources > 50).map(_.getTilePosition)
-    Clustering.group[TilePosition](resources, 32 * 18, (x) => x.toPosition).values
+    val resources = (With.game.getStaticMinerals.asScala ++ With.game.getStaticGeysers.asScala).filter(unit => unit.getInitialResources > 50).map(_.getTilePosition)
+    Clustering.group[TilePosition](resources, 32 * 15, true, (x) => x.toPosition).values
   }
   
   def _calculateBasePositions:Iterable[TilePosition] = {
@@ -106,7 +106,7 @@ class Geography {
       (-searchRadius to searchRadius).flatten(dx =>
         (-searchRadius to searchRadius).map(dy => {
           val basePosition = centroid.add(new TilePosition(dx, dy))
-          val legal = _isLegalBasePosition(basePosition)
+          val legal = _isLegalBasePosition(basePosition, centroid)
           if (legal) Some(basePosition) else None
         }))
     val extantCandidates = candidates.filter(_.nonEmpty).map(_.get)
@@ -115,11 +115,12 @@ class Geography {
     Some(extantCandidates.minBy(candidate => resources.map(_.distanceSquared(candidate)).sum))
   }
   
-  def _isLegalBasePosition(position:TilePosition):Boolean = {
+  def _isLegalBasePosition(position:TilePosition, centroid:TilePosition):Boolean = {
     val exclusions = _mineralExclusionCache.get ++ _gasExclusionCache.get
     val buildingTiles = UnitType.Zerg_Hatchery.tiles
     buildingTiles.map(_.add(position)).forall(buildingTile =>
       With.game.isBuildable(buildingTile) &&
+      With.game.getGroundHeight(buildingTile) == With.game.getGroundHeight(centroid) &&
       exclusions.forall( ! _.contains(buildingTile)))
   }
 }

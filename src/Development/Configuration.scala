@@ -16,5 +16,5 @@ class Configuration {
   var enableOverlayPlans          = false
   var enableOverlayTerrain        = false
   var enableOverlayTrackedUnits   = true
-  var enableOverlayWorkers        = true
+  var enableOverlayWorkers        = false
 }

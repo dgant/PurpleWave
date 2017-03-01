@@ -25,15 +25,15 @@ object Control extends Command {
   
       if (groupConfidence < 1) {
         if (localConfidence < 1) {
-          Avoid.execute(intent)
+          Flee.execute(intent)
         }
         else {
-          Reenforce.execute(intent)
+          Avoid.execute(intent)
         }
       }
       else {
         if (localConfidence < 1) {
-          Reenforce.execute(intent)
+          Avoid.execute(intent)
         }
         else {
           Fight.execute(intent)

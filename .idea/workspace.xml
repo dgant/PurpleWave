@@ -27,21 +27,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="Commander.scala" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Commander.scala" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Global/Combat/Commander.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="223">
-              <caret line="30" column="3" lean-forward="true" selection-start-line="30" selection-start-column="3" selection-end-line="31" selection-end-column="2" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Fight.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Global/Combat/Commands/Fight.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="208">
-              <caret line="16" column="6" lean-forward="false" selection-start-line="16" selection-start-column="6" selection-end-line="16" selection-end-column="6" />
+            <state relative-caret-position="137">
+              <caret line="53" column="36" lean-forward="true" selection-start-line="53" selection-start-column="36" selection-end-line="53" selection-end-column="36" />
               <folding />
             </state>
           </provider>
@@ -50,58 +40,18 @@
       <file leaf-file-name="Control.scala" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Global/Combat/Commands/Control.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="315">
-              <caret line="38" column="10" lean-forward="false" selection-start-line="38" selection-start-column="10" selection-end-line="38" selection-end-column="10" />
+            <state relative-caret-position="176">
+              <caret line="30" column="13" lean-forward="false" selection-start-line="30" selection-start-column="13" selection-end-line="30" selection-end-column="13" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="BattleMetrics.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Global/Combat/Battle/BattleMetrics.scala">
+      <file leaf-file-name="Avoid.scala" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/Global/Combat/Commands/Avoid.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="67">
-              <caret line="30" column="10" lean-forward="false" selection-start-line="30" selection-start-column="10" selection-end-line="30" selection-end-column="10" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Battle.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Global/Combat/Battle/Battle.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="143">
-              <caret line="11" column="0" lean-forward="true" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Battles.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Global/Combat/Battle/Battles.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="144">
-              <caret line="18" column="4" lean-forward="false" selection-start-line="18" selection-start-column="4" selection-end-line="18" selection-end-column="4" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Overlay.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Development/Overlay.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="340">
-              <caret line="67" column="38" lean-forward="true" selection-start-line="67" selection-start-column="38" selection-end-line="67" selection-end-column="38" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Bot.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Startup/Bot.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="159">
-              <caret line="115" column="87" lean-forward="false" selection-start-line="115" selection-start-column="87" selection-end-line="115" selection-end-column="87" />
+            <state relative-caret-position="208">
+              <caret line="16" column="19" lean-forward="true" selection-start-line="16" selection-start-column="19" selection-end-line="16" selection-end-column="19" />
               <folding />
             </state>
           </provider>
@@ -110,8 +60,8 @@
       <file leaf-file-name="Configuration.scala" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Development/Configuration.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="39">
-              <caret line="3" column="37" lean-forward="true" selection-start-line="3" selection-start-column="37" selection-end-line="3" selection-end-column="37" />
+            <state relative-caret-position="182">
+              <caret line="14" column="6" lean-forward="false" selection-start-line="14" selection-start-column="6" selection-end-line="14" selection-end-column="6" />
               <folding />
             </state>
           </provider>
@@ -179,7 +129,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/Geometry/Cluster.scala" />
         <option value="$PROJECT_DIR$/src/Global/Information/Intelligence.scala" />
         <option value="$PROJECT_DIR$/src/Utilities/PermanentCache.scala" />
         <option value="$PROJECT_DIR$/src/Utilities/CacheForever.scala" />
@@ -215,7 +164,6 @@
         <option value="$PROJECT_DIR$/src/Plans/Information/KnowEnemyBaseLocationFulfiller.scala" />
         <option value="$PROJECT_DIR$/src/Plans/Macro/Build/BuildBuilding.scala" />
         <option value="$PROJECT_DIR$/src/Plans/Macro/Automatic/GatherMinerals.scala" />
-        <option value="$PROJECT_DIR$/src/Global/Combat/Commands/Flee.scala" />
         <option value="$PROJECT_DIR$/src/Global/Combat/Commands/March.scala" />
         <option value="$PROJECT_DIR$/src/Global/Combat/Commands/Fight.scala" />
         <option value="$PROJECT_DIR$/src/Global/Combat/Commands/Retreat.scala" />
@@ -224,12 +172,14 @@
         <option value="$PROJECT_DIR$/src/Global/Combat/Commands/Reenforce.scala" />
         <option value="$PROJECT_DIR$/src/Global/Combat/Battle/Battles.scala" />
         <option value="$PROJECT_DIR$/src/Global/Combat/Battle/Battle.scala" />
-        <option value="$PROJECT_DIR$/src/Global/Combat/Battle/BattleMetrics.scala" />
-        <option value="$PROJECT_DIR$/src/Global/Combat/Commands/Control.scala" />
         <option value="$PROJECT_DIR$/src/Startup/Bot.scala" />
+        <option value="$PROJECT_DIR$/src/Global/Combat/Battle/BattleMetrics.scala" />
+        <option value="$PROJECT_DIR$/src/Global/Combat/Commands/Regroup.scala" />
+        <option value="$PROJECT_DIR$/src/Global/Combat/Commands/Flee.scala" />
         <option value="$PROJECT_DIR$/src/Development/Overlay.scala" />
         <option value="$PROJECT_DIR$/src/Development/Configuration.scala" />
         <option value="$PROJECT_DIR$/src/Global/Combat/Commander.scala" />
+        <option value="$PROJECT_DIR$/src/Global/Combat/Commands/Control.scala" />
       </list>
     </option>
   </component>
@@ -812,19 +762,11 @@
       <breakpoints-dialog>
         <breakpoints-dialog />
       </breakpoints-dialog>
-      <option name="time" value="796" />
+      <option name="time" value="805" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/Strategies/PositionFinders/PositionSimpleBuilding.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="236">
-          <caret line="31" column="46" lean-forward="false" selection-start-line="31" selection-start-column="46" selection-end-line="31" selection-end-column="46" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Global/Information/Economy.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="159">
@@ -990,14 +932,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="jar://$PROJECT_DIR$/lib/bwmirror_v2_5.jar!/bwapi/Mirror.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="141">
-          <caret line="41" column="23" lean-forward="false" selection-start-line="41" selection-start-column="23" selection-end-line="41" selection-end-column="23" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$PROJECT_DIR$/lib/bwmirror_v2_5.jar!/bwapi/Unit.class">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-2">
@@ -1010,14 +944,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="156">
           <caret line="12" column="34" lean-forward="true" selection-start-line="12" selection-start-column="34" selection-end-line="12" selection-end-column="34" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Global/Combat/Commands/Command.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="52">
-          <caret line="4" column="6" lean-forward="true" selection-start-line="4" selection-start-column="6" selection-end-line="4" selection-end-column="13" />
           <folding />
         </state>
       </provider>
@@ -1102,26 +1028,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Global/Combat/Commands/Reenforce.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="104">
-          <caret line="8" column="75" lean-forward="true" selection-start-line="8" selection-start-column="75" selection-end-line="8" selection-end-column="75" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Global/Combat/Commands/March.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="104">
           <caret line="8" column="4" lean-forward="true" selection-start-line="8" selection-start-column="4" selection-end-line="8" selection-end-column="4" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Global/Combat/Commands/Avoid.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="273">
-          <caret line="21" column="15" lean-forward="false" selection-start-line="21" selection-start-column="15" selection-end-line="21" selection-end-column="15" />
           <folding />
         </state>
       </provider>
@@ -1150,34 +1060,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Global/Combat/Battle/Battle.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="143">
-          <caret line="11" column="0" lean-forward="true" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Global/Combat/Battle/BattleMetrics.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="67">
-          <caret line="30" column="10" lean-forward="false" selection-start-line="30" selection-start-column="10" selection-end-line="30" selection-end-column="10" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Global/Combat/Battle/Battles.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="144">
           <caret line="18" column="4" lean-forward="false" selection-start-line="18" selection-start-column="4" selection-end-line="18" selection-end-column="4" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Development/Overlay.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="340">
-          <caret line="67" column="38" lean-forward="true" selection-start-line="67" selection-start-column="38" selection-end-line="67" selection-end-column="38" />
           <folding />
         </state>
       </provider>
@@ -1190,14 +1076,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Development/Configuration.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="39">
-          <caret line="3" column="37" lean-forward="true" selection-start-line="3" selection-start-column="37" selection-end-line="3" selection-end-column="37" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Global/Combat/Commands/Fight.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="208">
@@ -1206,18 +1084,90 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Global/Combat/Commands/Control.scala">
+    <entry file="file://$PROJECT_DIR$/src/Global/Combat/Battle/BattleMetrics.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="315">
-          <caret line="38" column="10" lean-forward="false" selection-start-line="38" selection-start-column="10" selection-end-line="38" selection-end-column="10" />
+        <state relative-caret-position="254">
+          <caret line="69" column="4" lean-forward="false" selection-start-line="69" selection-start-column="4" selection-end-line="69" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Global/Combat/Battle/Battle.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="117">
+          <caret line="9" column="59" lean-forward="true" selection-start-line="9" selection-start-column="59" selection-end-line="9" selection-end-column="59" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Global/Combat/Commands/Command.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="52">
+          <caret line="4" column="6" lean-forward="true" selection-start-line="4" selection-start-column="6" selection-end-line="4" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Global/Combat/Commands/Flee.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="117">
+          <caret line="9" column="25" lean-forward="false" selection-start-line="9" selection-start-column="25" selection-end-line="9" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$PROJECT_DIR$/lib/bwmirror_v2_5.jar!/bwapi/Mirror.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="141">
+          <caret line="41" column="23" lean-forward="false" selection-start-line="41" selection-start-column="23" selection-end-line="41" selection-end-column="23" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Global/Combat/Commands/Reenforce.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="104">
+          <caret line="8" column="4" lean-forward="false" selection-start-line="8" selection-start-column="4" selection-end-line="8" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Development/Overlay.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="158">
+          <caret line="133" column="46" lean-forward="false" selection-start-line="133" selection-start-column="46" selection-end-line="133" selection-end-column="46" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Development/Configuration.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="182">
+          <caret line="14" column="6" lean-forward="false" selection-start-line="14" selection-start-column="6" selection-end-line="14" selection-end-column="6" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Global/Combat/Commander.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="223">
-          <caret line="30" column="3" lean-forward="true" selection-start-line="30" selection-start-column="3" selection-end-line="31" selection-end-column="2" />
+        <state relative-caret-position="137">
+          <caret line="53" column="36" lean-forward="true" selection-start-line="53" selection-start-column="36" selection-end-line="53" selection-end-column="36" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Global/Combat/Commands/Control.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="176">
+          <caret line="30" column="13" lean-forward="false" selection-start-line="30" selection-start-column="13" selection-end-line="30" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Global/Combat/Commands/Avoid.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="208">
+          <caret line="16" column="19" lean-forward="true" selection-start-line="16" selection-start-column="19" selection-end-line="16" selection-end-column="19" />
           <folding />
         </state>
       </provider>

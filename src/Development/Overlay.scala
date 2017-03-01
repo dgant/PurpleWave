@@ -130,9 +130,11 @@ object Overlay {
     With.units.ours
       .filterNot(_.command.getUnitCommandType == UnitCommandType.None)
       .foreach(unit => _drawTextLabel(
-        List(unit.command.getUnitCommandType.toString),
+        List(
+          unit.command.getUnitCommandType.toString,
+          With.commander._lastCommands.get(unit).getOrElse("")),
         unit.position,
-        drawBackground = true))
+        drawBackground = false))
   }
   
   def _drawTerrain() {

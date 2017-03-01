@@ -12,7 +12,7 @@ class AutoCamera {
   def onFrame() {
     if ( ! With.configuration.enableCamera) { return }
     if (With.simulator.battles.nonEmpty) {
-      With.simulator.battles.maxBy(b => b.enemyScore * b.ourScore)
+      focus = With.simulator.battles.maxBy(b => b.enemyScore * b.ourScore).focalPoint
     } else {
       focus = With.units.ours.minBy(_.distanceSquared(Positions.middle)).position
     }

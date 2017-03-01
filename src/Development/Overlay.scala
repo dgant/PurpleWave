@@ -1,5 +1,6 @@
 package Development
 
+import Geometry.TileRectangle
 import Global.Information.Combat.BattleSimulation
 import Plans.Allocation.{LockCurrency, LockUnits}
 import Plans.Plan
@@ -102,27 +103,26 @@ object Overlay {
     plan.getChildren.exists(_isRelevant(_))
   }
   
+  val _box31 = new Position(31, 31)
+  def _drawTileRectangle(rectangle:TileRectangle, color:Color) {
+    With.game.drawBoxMap(
+      rectangle.start.toPosition,
+      rectangle.end.toPosition.add(_box31),
+      color)
+    
+  }
+  
   def _drawTerrain() {
-    With.geography.ourHarvestingAreas.foreach(area => With.game.drawBoxMap(
-      area.start.toPosition,
-      area.end.toPosition,
-      Color.Red))
-    With.geography._gasExclusionCache.get.foreach(box => With.game.drawBoxMap(
-      box.start.toPosition,
-      box.end.toPosition,
-      Color.Teal))
-    With.geography._mineralExclusionCache.get.foreach(box => With.game.drawBoxMap(
-      box.start.toPosition,
-      box.end.toPosition,
-      Color.Teal))
+    With.geography.ourHarvestingAreas.foreach(area => _drawTileRectangle(area, Color.Red))
+    With.geography._gasExclusionCache.get.foreach(box => _drawTileRectangle(box, Color.Teal))
+    With.geography._mineralExclusionCache.get.foreach(box => _drawTileRectangle(box, Color.Teal))
     With.geography._resourceClusterCache.get.foreach(cluster => {
       val centroid = cluster.centroid
       cluster.foreach(position =>
         With.game.drawLineMap(
           centroid.toPosition,
           position.toPosition,
-          Color.Teal))
-    })
+          Color.Teal))})
     With.geography._basePositionsCache.get.foreach(position => With.game.drawBoxMap(
       position.toPosition,
       position.toPosition.add(new Position(32 * 4, 32 * 3)),
@@ -234,35 +234,27 @@ object Overlay {
   def _drawCombatSimulation(simulation:BattleSimulation) {
     if (simulation.enemyScore * simulation.ourScore == 0) return
     if (simulation.ourGroup.vanguard.getDistance(simulation.enemyGroup.vanguard) > 32 * 20) return
-    With.game.drawCircleMap(simulation.focalPoint, 8, Color.Orange)
+    With.game.drawCircleMap(simulation.focalPoint, 8, Color.Brown)
     With.game.drawCircleMap(simulation.ourGroup.vanguard, 8, Color.Green)
     With.game.drawCircleMap(simulation.enemyGroup.vanguard, 8, Color.Red)
     With.game.drawLineMap(simulation.focalPoint, simulation.ourGroup.vanguard, Color.Green)
     With.game.drawLineMap(simulation.focalPoint, simulation.enemyGroup.vanguard, Color.Red)
     if (simulation.ourGroup.units.nonEmpty) {
       With.game.drawBoxMap(
-        new Position(
-          simulation.ourGroup.units.map(_.x).min,
-          simulation.ourGroup.units.map(_.y).min),
-        new Position(
-          simulation.ourGroup.units.map(_.x).max,
-          simulation.ourGroup.units.map(_.y).max),
+        simulation.ourGroup.units.map(_.position).minBound,
+        simulation.ourGroup.units.map(_.position).maxBound,
         Color.Green)
     }
     if (simulation.enemyGroup.units.nonEmpty) {
       With.game.drawBoxMap(
-        new Position(
-          simulation.enemyGroup.units.map(_.x).min,
-          simulation.enemyGroup.units.map(_.y).min),
-        new Position(
-          simulation.enemyGroup.units.map(_.x).max,
-          simulation.enemyGroup.units.map(_.y).max),
+        simulation.enemyGroup.units.map(_.position).minBound,
+        simulation.enemyGroup.units.map(_.position).maxBound,
         Color.Red)
     }
     _drawTextLabel(
       List(simulation.ourScore/1000 + " - " + simulation.enemyScore/1000),
       simulation.focalPoint,
       drawBackground = true,
-      backgroundColor = Color.Orange)
+      backgroundColor = Color.Brown)
   }
 }

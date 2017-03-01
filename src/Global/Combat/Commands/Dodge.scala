@@ -21,6 +21,8 @@ object Dodge extends Command{
     if (kitePositions.nonEmpty) {
       With.commander.move(this, unit, kitePositions.map(_.toPosition).maxBy(closestEnemy.get.distanceSquared))
     }
+    else {
+      With.logger.warn(unit.utype + " had nowhere to dodge near " + unit.tilePosition)
+    }
   }
-  
 }

@@ -23,6 +23,6 @@ class BuildGatewayUnitsContinuously extends AbstractBuildContinuously[TrainUnit]
   }
   
   override def _additionalPlansRequired:Int = {
-    Math.max(0, With.units.ours.filter(_.complete).filter(_.utype == UnitType.Protoss_Gateway).size /* - _currentBuilds.size */)
+    Math.max(0, With.units.ours.filter(_.complete).filter(_.utype == UnitType.Protoss_Gateway).size - _currentBuilds.size)
   }
 }

@@ -1,6 +1,6 @@
 package Startup
 
-import Development.{Configuration, Logger, Overlay}
+import Development.{AutoCamera, Configuration, Logger, Overlay}
 import Global.Allocation._
 import Global.Information.Combat.BattleSimulator
 import Global.Information.UnitAbstraction.Units
@@ -22,6 +22,7 @@ class Bot() extends DefaultBWListener {
       
       With.architect = new Architect
       With.bank = new Banker
+      With.camera = new AutoCamera
       With.simulator = new BattleSimulator
       With.commander = new Commander
       With.economy = new Economy
@@ -53,6 +54,7 @@ class Bot() extends DefaultBWListener {
       With.gameplan.onFrame() //This needs to be last!
       With.scheduler.onFrame()
       With.commander.onFrame()
+      With.camera.onFrame()
       Overlay.onFrame()
       _considerSurrender
     }

@@ -5,6 +5,7 @@ class Configuration {
   
   var enableStdOut                = false
   var enableChat                  = true
+  var enableCamera                = true
   
   var enableOverlay               = true
   var enableOverlayBasePlacement  = true

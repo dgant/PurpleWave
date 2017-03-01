@@ -11,7 +11,7 @@ class BuildWorkersContinuously extends AbstractBuildContinuously[TrainUnit] {
   }
   
   override def _additionalPlansRequired:Int = {
-    Math.max(0, _additionalWorkersDesired /* - _currentBuilds.size*/)
+    Math.max(0, _additionalWorkersDesired - _currentBuilds.size)
   }
   
   def _additionalWorkersDesired:Int = {

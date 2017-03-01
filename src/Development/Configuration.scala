@@ -1,7 +1,7 @@
 package Development
 
 class Configuration {
-  var gameSpeed                   = 24
+  var gameSpeed                   = 0
   
   var enableStdOut                = false
   var enableChat                  = true

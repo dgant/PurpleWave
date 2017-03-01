@@ -21,6 +21,8 @@ class GatherMinerals extends Plan {
   val _workersByMineral = new mutable.HashMap[ForeignUnitInfo, mutable.HashSet[FriendlyUnitInfo]] {
     override def default(key: ForeignUnitInfo): mutable.HashSet[FriendlyUnitInfo] = { put(key, mutable.HashSet.empty); this(key)}}
   val _mineralByWorker = new mutable.HashMap[FriendlyUnitInfo, ForeignUnitInfo]
+  val _lastOrderFrame = new mutable.HashMap[FriendlyUnitInfo, Int] {
+    override def default(key: FriendlyUnitInfo): Int = { put(key, Int.MinValue); this(key) }}
   
   val _limitResetAssignments = new Limiter(24 * 5, _resetAssignments)
   override def onFrame() {
@@ -28,9 +30,7 @@ class GatherMinerals extends Plan {
     _limitResetAssignments.act()
     _assignWorkers()
     val workers = workerPlan.get.units
-    workerPlan.get.units
-      .filterNot(worker => worker.isGatheringMinerals)
-      .foreach(_orderWorker)
+    workerPlan.get.units.foreach(_orderWorker)
   }
   
   def _resetAssignments() {
@@ -82,17 +82,26 @@ class GatherMinerals extends Plan {
   }
   
   def _orderWorker(worker:FriendlyUnitInfo) {
-    if (worker.isCarryingMinerals || worker.isCarryingGas) {
-      //Can't spam return cargo
-      if (worker.command.getUnitCommandType != UnitCommandType.Return_Cargo || ! worker.isMoving) {
-        worker.baseUnit.returnCargo()
+    if (worker.isGatheringMinerals) {
+      _mineralByWorker.get(worker).foreach(mineral => {
+        if (mineral.position.getDistance(worker.position) > 32 * 12) {
+          _gather(worker, mineral)
+        }
+      })
+    } else {
+      if (worker.isCarryingMinerals || worker.isCarryingGas) {
+        //Can't spam return cargo
+        if (worker.command.getUnitCommandType != UnitCommandType.Return_Cargo || ! worker.isMoving) {
+          worker.baseUnit.returnCargo()
+        }
+      }
+      else {
+        _mineralByWorker.get(worker).foreach(mineral => _gather(worker, mineral))
       }
     }
-    else {
-      val order = worker.baseUnit.getOrder.toString
-      if ( ! List("MiningMinerals").contains(order)) {
-        _mineralByWorker.get(worker).foreach(mineral => worker.baseUnit.gather(mineral.baseUnit))
-      }
-    }
+  }
+  
+  def _gather(worker:FriendlyUnitInfo, mineral:ForeignUnitInfo) {
+    worker.baseUnit.gather(mineral.baseUnit)
   }
 }

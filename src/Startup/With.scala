@@ -1,8 +1,9 @@
 package Startup
 
 import Development.{AutoCamera, Configuration, Logger}
-import Global.Allocation._
-import Global.Information.Combat.BattleSimulator
+import Global.Resources._
+import Global.Combat.Commander
+import Global.Combat.Battle.BattleSimulator
 import Global.Information.UnitAbstraction.Units
 import Global.Information._
 import Plans.GamePlans.WinTheGame

@@ -1,7 +1,7 @@
 package Development
 
 import Geometry.TileRectangle
-import Global.Information.Combat.BattleSimulation
+import Global.Combat.Battle.Battle
 import Plans.Allocation.{LockCurrency, LockUnits}
 import Plans.Plan
 import Startup.With
@@ -38,7 +38,7 @@ object Overlay {
     With.simulator.battles.foreach(_drawBattle)
   }
   
-  def _drawBattle(battle:BattleSimulation) {
+  def _drawBattle(battle:Battle) {
     if (battle.enemyScore * battle.ourScore == 0) return
     if (battle.ourGroup.vanguard.getDistance(battle.enemyGroup.vanguard) > 32 * 20) return
     With.game.drawCircleMap(battle.focalPoint, 8, Color.Brown)

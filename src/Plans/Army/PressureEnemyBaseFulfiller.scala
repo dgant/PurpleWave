@@ -1,9 +1,9 @@
 package Plans.Army
 
-import Types.Intents.Intent
 import Plans.Allocation.{LockUnits, LockUnitsNobody}
 import Plans.Plan
 import Startup.With
+import Types.Intents.Intention
 import Utilities.Property
 
 class PressureEnemyBaseFulfiller extends Plan {
@@ -12,18 +12,13 @@ class PressureEnemyBaseFulfiller extends Plan {
   
   override def getChildren: Iterable[Plan] = { List(fighters.get) }
   override def onFrame() {
+ 
+    val targetPosition = With.intelligence.mostBaselikeEnemyBuilding.map(_.position)
+    if (targetPosition.isEmpty) return
     
-    if (With.intelligence.mostBaselikeEnemyBuilding.isEmpty) {
-      With.logger.warn("Trying to destroy economy without knowing where to go")
-      return
-    }
-  
     fighters.get.onFrame()
-    if ( ! fighters.get.isComplete) {
-      return
-    }
+    if ( ! fighters.get.isComplete) return
     
-    val targetPosition = With.intelligence.mostBaselikeEnemyBuilding.get.position
-    fighters.get.units.foreach(unit => With.commander.intend(unit, new Intent(Some(targetPosition))))
+    fighters.get.units.foreach(fighter => With.commander.intend(new Intention(fighter, targetPosition)))
   }
 }

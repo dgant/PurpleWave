@@ -1,4 +1,4 @@
-package Global.Information.Combat
+package Global.Combat.Battle
 
 import Geometry.Clustering
 import Startup.With
@@ -13,7 +13,7 @@ import scala.collection.mutable
 class BattleSimulator {
   
   val battleRange = 32 * 16
-  var battles:Iterable[BattleSimulation] = List.empty
+  var battles:Iterable[Battle] = List.empty
   
   val limitBattleDefinition = new Limiter(6, _defineBattles)
   def onFrame() {
@@ -35,18 +35,18 @@ class BattleSimulator {
   
   def _constructBattle(
     ourGroups:  Iterable[BattleGroup],
-    theirGroups:Iterable[BattleGroup]):Iterable[BattleSimulation] = {
+    theirGroups:Iterable[BattleGroup]):Iterable[Battle] = {
     
     if (theirGroups.isEmpty) return List.empty
   
     ourGroups.filter(_.units.exists(_.alive)).map(ourGroup => {
       val enemyGroup = theirGroups.filter(_.units.exists(_.alive)).minBy(_.vanguard.getDistance(ourGroup.vanguard))
-      val simulation = new BattleSimulation(ourGroup, enemyGroup)
+      val simulation = new Battle(ourGroup, enemyGroup)
       simulation
     })
   }
   
-  def _update(battle: BattleSimulation) {
+  def _update(battle: Battle) {
     _removeMissingUnits(battle.ourGroup.units)
     _removeMissingUnits(battle.enemyGroup.units)
     battle.ourScore = battle.ourGroup.units.map(_valueUnit(_, battle)).sum
@@ -61,7 +61,7 @@ class BattleSimulator {
     units.filterNot(_.alive).foreach(units.remove)
   }
   
-  def _valueUnit(unit:UnitInfo, battle: BattleSimulation):Int = {
+  def _valueUnit(unit:UnitInfo, battle: Battle):Int = {
     //Don't be afraid to fight workers.
     //This is a hack, because it's affecting our expectation of combat, rather than our motivation for fighting
     if (unit.utype.isWorker) return 0

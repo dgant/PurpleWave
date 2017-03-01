@@ -1,8 +1,9 @@
 package Startup
 
 import Development.{AutoCamera, Configuration, Logger, Overlay}
-import Global.Allocation._
-import Global.Information.Combat.BattleSimulator
+import Global.Resources._
+import Global.Combat.Commander
+import Global.Combat.Battle.BattleSimulator
 import Global.Information.UnitAbstraction.Units
 import Global.Information._
 import Plans.GamePlans.WinTheGame
@@ -100,6 +101,14 @@ class Bot() extends DefaultBWListener {
     catch { case exception:Exception =>
       var dontLoseTheStackTraceWhileDebugging = exception.getStackTrace
       With.logger.onException(exception)}
+  }
+  
+  override def onSendText(text: String) {
+    text match {
+      case "c" => With.configuration.enableCamera = ! With.configuration.enableCamera
+      case "slow" => With.game.setLocalSpeed(48)
+      case "fast" => With.game.setLocalSpeed(0)
+    }
   }
   
   def _considerSurrender() = {

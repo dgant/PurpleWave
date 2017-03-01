@@ -1,6 +1,6 @@
-package Global.Allocation
+package Global.Information
 
-import Geometry.{Positions, Pylon, SpiralSearch, TileRectangle}
+import Geometry.{Pylon, SpiralSearch, TileRectangle}
 import Startup.With
 import bwapi.{TilePosition, UnitType, WalkPosition}
 

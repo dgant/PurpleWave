@@ -1,4 +1,4 @@
-package Global.Allocation
+package Global.Resources
 
 import Plans.Plan
 import Startup.With

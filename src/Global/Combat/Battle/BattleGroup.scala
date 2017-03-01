@@ -1,4 +1,4 @@
-package Global.Information.Combat
+package Global.Combat.Battle
 
 import Types.UnitInfo.UnitInfo
 import bwapi.Position

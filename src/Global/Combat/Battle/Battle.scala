@@ -1,9 +1,9 @@
-package Global.Information.Combat
+package Global.Combat.Battle
 
 import bwapi.Position
 
 
-class BattleSimulation(
+class Battle(
   val ourGroup:BattleGroup,
   val enemyGroup:BattleGroup) {
   

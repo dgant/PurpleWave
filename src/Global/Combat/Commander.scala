@@ -1,8 +1,7 @@
-package Global.Allocation
+package Global.Combat
 
-import Global.Information.Combat.BattleSimulation
 import Startup.With
-import Types.Intents.Intent
+import Types.Intents.Intention
 import Types.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.Enrichment.EnrichPosition._
 import bwapi.UnitType
@@ -11,26 +10,32 @@ import scala.collection.mutable
 
 class Commander {
   
-  val _intents = new mutable.HashMap[FriendlyUnitInfo, Intent]
+  val _intentions = new mutable.HashSet[Intention]
   val _nextOrderFrame = new mutable.HashMap[FriendlyUnitInfo, Int] {
     override def default(key: FriendlyUnitInfo): Int = 0 }
   
-  def intend(unit:FriendlyUnitInfo, intent:Intent){
-    _intents.put(unit, intent)
-  }
+  def intend(intention:Intention) { _intentions.add(intention) }
   
   def onFrame() {
-    _intents.foreach(intent => _order(intent._1, intent._2))
-    _intents.clear()
+    _intentions.foreach(_fulfill)
+    _intentions.clear()
+    _nextOrderFrame.keySet.filter(_.alive).foreach(_nextOrderFrame.remove)
   }
   
-  def _order(unit:FriendlyUnitInfo, intent:Intent) {
+  def setOrderDelay(unit:FriendlyUnitInfo, startedAttacking:Boolean = false) {
+    val baseDelay = 0
+    val attackDelay = if (startedAttacking) unit.attackFrames + 8 + With.game.getRemainingLatencyFrames else 0
+    _nextOrderFrame.put(unit, With.game.getFrameCount + baseDelay + attackDelay)
+  }
+  
+  def _fulfill(intent:Intention) {
+    val unit = intent.unit
     if (_nextOrderFrame(unit) > With.game.getFrameCount) { return }
   
     val combatOption = With.simulator.battles.find(_.ourGroup.units.contains(unit))
   
     if (combatOption.isEmpty || combatOption.get.enemyGroup.units.isEmpty) {
-      _journey(unit, intent)
+      _advance(intent)
     } else {
       val combat = combatOption.get
       val enemyMaxRange = if (combat.enemyGroup.units.nonEmpty) combat.enemyGroup.units.map(_.range).max else 0
@@ -38,80 +43,81 @@ class Commander {
       val strengthRatio = (0.01 + combat.ourScore) / (0.01 + combat.enemyScore)
     
       if (unit.cloaked && combat.enemyGroup.units.forall(!_.utype.isDetector)) {
-        _fight(unit, intent, combat)
+        _fight(intent)
       }
-      else if (strengthRatio < 1.1) {
-        _flee(unit, intent, combat)
+      else if (strengthRatio < 0.7) {
+        _flee(intent)
       }
       else {
-        _kite(unit, intent, combat)
+        _fightWhileAdvancing(intent)
       }
     }
   }
   
-  def _setOrderDelay(unit:FriendlyUnitInfo, startedAttacking:Boolean = false) {
-    val baseDelay = 0
-    val attackDelay = if (startedAttacking) unit.attackFrames + 8 + With.game.getRemainingLatencyFrames else 0
-    _nextOrderFrame.put(unit, With.game.getFrameCount + baseDelay + attackDelay)
-  }
-  
-  def _kite(unit:FriendlyUnitInfo, intent:Intent, combat:BattleSimulation) {
-    val closestEnemy = combat.enemyGroup.units.minBy(_.distanceSquared(unit))
+  def _fightWhileAdvancing(intent:Intention) {
+    val unit = intent.unit
+    val closestEnemy = intent.battle.enemyGroup.units.minBy(_.distanceSquared(unit))
     val closestEnemyDistance2 = unit.distanceSquared(closestEnemy)
-    if (unit.onCooldown) {
+    if (unit.onCooldown || unit.range <= closestEnemy.range) {
       val kiteRange = unit.range
       if (closestEnemyDistance2 < kiteRange * kiteRange) {
-        _flee(unit, intent, combat)
+        _flee(intent)
       }
       else {
-        _journey(unit, intent)
+        _advance(intent)
       }
     }
     else {
-      unit.baseUnit.attack(closestEnemy.baseUnit)
-      _setOrderDelay(unit, startedAttacking = true)
+      intent.targetUnit = Some(closestEnemy)
+      _fight(intent)
     }
   }
   
-  def _fight(unit:FriendlyUnitInfo, intent:Intent, combat:BattleSimulation) {
-    val closestEnemy = combat.enemyGroup.units.minBy(_.distanceSquared(unit))
-    val closestEnemyDistance2 = unit.distanceSquared(closestEnemy)
+  def _fight(intent:Intention) {
+    val unit = intent.unit
+    val closestEnemy = intent.battle.enemyGroup.units.minBy(_.distanceSquared(unit))
+    val closestEnemyDistance2 = intent.unit.distanceSquared(closestEnemy)
     if (unit.onCooldown) {
       unit.baseUnit.move(closestEnemy.position)
-      _setOrderDelay(unit)
+      setOrderDelay(unit)
     } else {
       unit.baseUnit.attack(closestEnemy.baseUnit)
+      setOrderDelay(unit, startedAttacking = true)
     }
   }
   
-  def _flee(unit:FriendlyUnitInfo, intent:Intent, combat:BattleSimulation) {
+  def _flee(intent:Intention) {
+    val unit = intent.unit
     val marginOfSafety = 32 * 3
     val marginOfDesperation = 32 * 10
-    if (unit.position.getDistance(combat.enemyGroup.vanguard) + combat.enemyGroup.units.map(_.range).max < marginOfSafety) {
+    if (intent.battle.enemyGroup.units.exists(enemy => enemy.distance(unit) + enemy.range < marginOfSafety)) {
       val fleePosition = With.geography.ourHarvestingAreas
         .map(area => area.start.midpoint(area.end).toPosition)
         .headOption
         .getOrElse(With.geography.home)
-      if (unit.position.getDistance(fleePosition) > marginOfDesperation) {
+      if (unit.distance(fleePosition) > marginOfDesperation) {
         unit.baseUnit.move(fleePosition)
         return
       }
     }
-    _fight(unit, intent, combat)
+    _fight(intent)
   }
   
-  def _journey(unit:FriendlyUnitInfo, intent:Intent) {
-    unit.baseUnit.patrol(intent.position.get)
-    _setOrderDelay(unit, startedAttacking = true)
+  def _advance(intent:Intention) {
+    val unit = intent.unit
+    unit.baseUnit.patrol(intent.destination.get)
+    setOrderDelay(unit, startedAttacking = true)
   }
   
-  def _getTargetInRange(unit:FriendlyUnitInfo, intent:Intent, combat:BattleSimulation):Option[UnitInfo] = {
-    val targets = combat.enemyGroup.units
+  def _getTargetInRange(intent:Intention):Option[UnitInfo] = {
+    val unit = intent.unit
+    val targets = intent.battle.enemyGroup.units
       .filter(_.position.getDistance(unit.position) <= Math.max(unit.range, 32 * 4))
       .filterNot(target => List(UnitType.Zerg_Larva, UnitType.Zerg_Egg).contains(target.utype))
     
     if (targets.isEmpty) { return None }
     Some(targets.maxBy(target => {
+      
       val value = target.totalCost
       val health = target.totalHealth
       val fights = if(target.canFight) 5 else 1
@@ -119,8 +125,8 @@ class Commander {
       val inRangeBonus = 4
       val isCloseBonus = 2
       val baseBonus = 1
-      val inRange = target.position.getDistance(unit.position) <= unit.range
-      val isClose = inRange || target.position.getDistance(unit.position) <= unit.range + isCloseBuffer
+      val inRange = target.distance(unit) <= unit.range
+      val isClose = inRange || target.distance(unit) <= unit.range + isCloseBuffer
       val totalRangeBonus = if(inRange) inRangeBonus else if (isClose) isCloseBonus else baseBonus
       fights * value * totalRangeBonus / Math.max(health, unit.groundDps)
     }))

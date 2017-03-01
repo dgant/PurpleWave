@@ -7,7 +7,7 @@ import Startup.With
 import Strategies.PositionFinders.{PositionFinder, PositionSimpleBuilding}
 import Strategies.UnitMatchers.{UnitMatchType, UnitMatcher}
 import Strategies.UnitPreferences.{UnitPreferClose, UnitPreference}
-import Types.Intents.Intent
+import Types.Intents.Intention
 import Types.UnitInfo.FriendlyUnitInfo
 import Utilities.Property
 import Utilities.Enrichment.EnrichPosition._
@@ -73,8 +73,9 @@ class BuildBuilding(val buildingType:UnitType) extends Plan {
       //If the builder is available to us but we're not ready to build, let's just send it where it needs to go
       _position = positionFinder.get.find
       builderPlan.get.units.foreach(unit => With.commander.intend(
-        unit,
-        new Intent(position = Some(_position.map(_
+        new Intention(
+          unit,
+          Some(_position.map(_
           .toPosition
           .add(new Position(buildingType.width/2, buildingType.height/2)))
           .headOption

@@ -2,7 +2,7 @@ package Global.Combat.Commands
 
 import Types.Intents.Intention
 
-object Avoid extends Command {
+object Skirt extends Command {
  
   def execute(intent:Intention) {
     val unit = intent.unit

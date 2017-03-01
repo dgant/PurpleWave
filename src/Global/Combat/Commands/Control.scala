@@ -21,19 +21,25 @@ object Control extends Command {
       val localStrengthEnemy  = 0.01 + intent.battle.get.enemy.units.view.map(otherUnit => BattleMetrics.evaluate(otherUnit, unit.position)).sum
       
       val groupConfidence = groupStrengthUs / groupStrengthEnemy
-      val localConfidence = localStrengthUs / localStrengthEnemy
+      val localConfidence = unit.totalHealth.toDouble / unit.maxTotalHealth * localStrengthUs / localStrengthEnemy
   
-      if (groupConfidence < 1) {
-        if (localConfidence < 1) {
+      if (groupConfidence < 0.2) {
+        Flee.execute(intent)
+      }
+      else if (groupConfidence < 0.5) {
+        if (localConfidence < 0.8) {
           Flee.execute(intent)
         }
         else {
-          Avoid.execute(intent)
+          Skirt.execute(intent)
         }
+      }
+      else if (groupConfidence < 1.1) {
+        Skirt.execute(intent)
       }
       else {
         if (localConfidence < 1) {
-          Avoid.execute(intent)
+          Skirt.execute(intent)
         }
         else {
           Fight.execute(intent)

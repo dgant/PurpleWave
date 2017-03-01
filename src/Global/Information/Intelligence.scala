@@ -2,9 +2,8 @@ package Global.Information
 
 import Startup.With
 import Types.UnitInfo.ForeignUnitInfo
-import bwapi.TilePosition
-import bwta.{BWTA, BaseLocation}
 import Utilities.Enrichment.EnrichUnitType._
+import bwapi.TilePosition
 
 import scala.collection.JavaConverters._
 
@@ -23,9 +22,8 @@ class Intelligence {
       .headOption
   }
   
-  def mostUnscoutedBases():Iterable[BaseLocation] = {
-    BWTA.getBaseLocations.asScala
-      .sortBy(base => ! base.isStartLocation)
-      .sortBy(base => With.game.isExplored(base.getTilePosition))
+  def mostUnscoutedBases():Iterable[TilePosition] = {
+    (With.game.getStartLocations.asScala ++ With.game.getStaticGeysers.asScala.map(_.getTilePosition))
+      .sortBy(base => With.game.isExplored(base))
   }
 }

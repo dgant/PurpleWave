@@ -18,7 +18,7 @@ class Commander {
   def onFrame() {
     _intentions.filter(_isAwake).foreach(intent => intent.command.execute(intent))
     _intentions.clear()
-    _nextOrderFrame.keySet.filter(_.alive).foreach(_nextOrderFrame.remove)
+    _nextOrderFrame.keySet.filterNot(_.alive).foreach(_nextOrderFrame.remove)
   }
   
   def attack(command:Command, unit:FriendlyUnitInfo, target:UnitInfo) {

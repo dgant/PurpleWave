@@ -58,14 +58,14 @@ object Overlay {
       List(
         "Size: " + battle.us.expectedSpread,
         "Spread: " + battle.us.spread),
-      battle.us.center,
+      battle.us.center.subtract(64, 64),
       drawBackground = true,
       backgroundColor = Color.Black)
     _drawTextLabel(
       List(
         "Size: " + battle.enemy.expectedSpread,
         "Spread: " + battle.enemy.spread),
-      battle.enemy.center,
+      battle.enemy.center.add(64, 64),
       drawBackground = true,
       backgroundColor = Color.Black)
     _drawTextLabel(

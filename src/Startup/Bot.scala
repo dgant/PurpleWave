@@ -113,6 +113,7 @@ class Bot() extends DefaultBWListener {
     text match {
       case "c" => With.configuration.enableCamera = ! With.configuration.enableCamera
       case "f" => With.game.setLocalSpeed(1000)
+      case "o" => With.configuration.enableOverlay = ! With.configuration.enableOverlay
       case "slow" => With.game.setLocalSpeed(48)
       case "fast" => With.game.setLocalSpeed(0)
     }

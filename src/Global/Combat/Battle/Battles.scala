@@ -41,10 +41,10 @@ class Battles {
   
   def _defineBattles() {
     val battleRange = 32 * 16
-    val ourGroupMaps = Clustering.groupUnits(_getFighters(With.units.ours), battleRange)
-    val enemyGroupMaps = Clustering.groupUnits(_getFighters(With.units.enemy), battleRange)
-    val ourGroups = ourGroupMaps.map(group => new BattleGroup(group._1.position, group._2))
-    val enemyGroups = enemyGroupMaps.map(group => new BattleGroup(group._1.position, group._2))
+    val ourClusters = Clustering.groupUnits(_getFighters(With.units.ours), battleRange).values
+    val enemyClusters = Clustering.groupUnits(_getFighters(With.units.enemy), battleRange).values
+    val ourGroups = ourClusters.map(group => new BattleGroup(group))
+    val enemyGroups = enemyClusters.map(group => new BattleGroup(group))
     _assignBattles(ourGroups, enemyGroups)
   }
   
@@ -57,14 +57,20 @@ class Battles {
     theirGroups:Iterable[BattleGroup]) {
     
     all.clear()
+  
+    if (theirGroups.isEmpty) return
     
-    if (theirGroups.nonEmpty) {
-      ourGroups.filter(_.units.exists(_.alive))
-        .map(ourGroup => {
-          val enemyGroup = theirGroups.filter(_.units.exists(_.alive)).minBy(_.vanguard.getDistance(ourGroup.vanguard))
-          new Battle(ourGroup, enemyGroup)
-        })
-        .foreach(all.add)
-    }
+    (ourGroups ++ theirGroups).foreach(group => group.center = BattleMetrics.center(group))
+    
+    ourGroups
+      .groupBy(ourGroup => theirGroups.minBy(_.center.distanceSquared(ourGroup.center)))
+      .map(pair => new Battle(_mergeGroups(pair._2), pair._1))
+      .foreach(all.add)
+  }
+  
+  def _mergeGroups(groups:Iterable[BattleGroup]):BattleGroup = {
+    val output = new BattleGroup(new mutable.HashSet)
+    groups.foreach(output.units ++= _.units)
+    output
   }
 }

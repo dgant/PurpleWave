@@ -51,7 +51,7 @@ class Commander {
   
   def _sleep(unit:FriendlyUnitInfo, startedAttacking:Boolean = false) {
     val baseDelay = With.game.getRemainingLatencyFrames
-    val attackDelay = if (startedAttacking) unit.attackFrames + 8 else 0
+    val attackDelay = if (startedAttacking) unit.attackFrames else 0
     _nextOrderFrame.put(unit, baseDelay + attackDelay + With.game.getFrameCount)
   }
   
@@ -61,7 +61,7 @@ class Commander {
   
   def _recordCommand(unit:FriendlyUnitInfo, command:Command) {
     if (With.configuration.enableOverlayUnits) {
-      _lastCommands.put(unit, command.getClass.getSimpleName.replaceAll("$", ""))
+      _lastCommands.put(unit, command.getClass.getSimpleName.replace("$", ""))
     }
   }
 }

@@ -8,11 +8,20 @@ object Fight extends Command {
   def execute(intent:Intention) {
     
     val unit = intent.unit
-    
     val closestEnemy = intent.battle.map(_.enemy.units.minBy(_.distanceSquared(unit)))
+    
     if (unit.onCooldown) {
-      if (closestEnemy.exists(unit.distance(_) > unit.range))
-      With.commander.move(this, unit, closestEnemy.get.position)
+      if (closestEnemy.isEmpty) {
+        With.commander.attack(this, unit, intent.destination.get)
+      }
+      else {
+        if (closestEnemy.get.range < unit.range) {
+          Dodge.execute(intent)
+        } else {
+          With.commander.attack(this, unit, closestEnemy.get)
+        }
+      }
+      
     } else {
       closestEnemy.foreach(enemy => With.commander.attack(this, unit, enemy))
     }

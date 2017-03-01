@@ -64,7 +64,7 @@ object BattleMetrics {
     val distanceDropoff = 16.0
     val distanceCutoff = 32.0 * 4
     val distance = Math.max(0, unit.distance(position) - unit.range)
-    val distanceFactor = Math.max(0.0, Math.min(1.0, (distanceCutoff + distanceDropoff - distance )/distanceCutoff))
+    val distanceFactor = Math.max(0.0, Math.min(1.0, (distanceCutoff + distanceDropoff - distance ) / distanceCutoff))
     
     //Shortcut
     if (distanceFactor == 0) return 0

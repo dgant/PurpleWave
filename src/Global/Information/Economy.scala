@@ -103,11 +103,13 @@ class Economy {
   }
   
   def ourGasIncomePerMinute:Integer = {
-    //Source: http://wiki.teamliquid.net/starcraft/Resources
+    //Original source: http://wiki.teamliquid.net/starcraft/Resources
     //Fastest speed: 42ms per frame, or 24fps
+    //That would give 96 gas per driller per minute
+    //In practice it seems higher, so this number is a fudge
     With.geography.ourHarvestingAreas
         .map(ourActiveDrillers)
-        .map(_.size * 96)
+        .map(_.size * 118)
         .sum
   }
   

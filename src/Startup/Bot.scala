@@ -13,6 +13,7 @@ class Bot() extends DefaultBWListener {
 
   override def onStart() {
     try {
+      With.configuration = new Configuration
       With.logger = new Logger
       With.logger.debug("Loading BWTA.")
       BWTA.readMap()
@@ -32,8 +33,7 @@ class Bot() extends DefaultBWListener {
       With.recruiter = new Recruiter
       With.scheduler = new Scheduler
       With.units = new Units
-  
-      Overlay.enabled = Configuration.enableOverlay
+      
       With.game.enableFlag(1)
       With.game.setLocalSpeed(0)
     }

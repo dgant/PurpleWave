@@ -1,5 +1,6 @@
 package Strategies.PositionFinders
 
+import Geometry.TileRectangle
 import Startup.With
 import Utilities.Cache
 import Utilities.Enrichment.EnrichUnitType._
@@ -22,7 +23,11 @@ class PositionSimpleBuilding(
       return Some(geysers.minBy(_.tilePosition.getDistance(startPosition)).tilePosition)
     }
     else if (buildingType.isTownHall) {
-      val basePositions = With.geography.basePositions
+      val basePositions = With.geography.basePositions.filter(basePosition => {
+        val rectangle = new TileRectangle(basePosition, basePosition.add(buildingType.tileBottomRight))
+        With.units.all.filter(_.unitType.isBuilding).forall( ! _.tileArea.intersects(rectangle))
+      })
+        
       if (basePositions.isEmpty) return None
       return Some(basePositions.minBy(_.distanceSquared(startPosition)))
     }

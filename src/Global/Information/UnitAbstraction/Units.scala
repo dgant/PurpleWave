@@ -19,6 +19,10 @@ class Units {
     get(unit.getID)
   }
   
+  def all:Set[UnitInfo] = {
+    ours ++ enemy ++ neutral
+  }
+  
   def ours:Set[FriendlyUnitInfo] = {
     _friendlyUnitTracker.ourUnits
   }

@@ -1,6 +1,6 @@
 package Startup
 
-import Development.Logger
+import Development.{Configuration, Logger}
 import Global.Allocation._
 import Global.Information.Combat.BattleSimulator
 import Global.Information.UnitAbstraction.Units
@@ -11,6 +11,7 @@ object With {
   var game:bwapi.Game = null
   var architect:Architect = null
   var bank:Banker = null
+  var configuration:Configuration = null
   var simulator:BattleSimulator = null
   var commander:Commander = null
   var economy:Economy = null

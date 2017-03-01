@@ -84,13 +84,13 @@ class Geography {
   def _getMineralExclusions:Iterable[TileRectangle] = {
     val positions     = With.game.getStaticMinerals.asScala.map(_.getInitialTilePosition)
     val boundaryStart = new TilePosition(3, 3)
-    val boundaryEnd   = new TilePosition(3 + UnitType.Resource_Mineral_Field.tileWidth - 1, 3 + UnitType.Resource_Mineral_Field.tileHeight - 1)
+    val boundaryEnd   = boundaryStart.add(UnitType.Resource_Mineral_Field.tileWidth - 1, UnitType.Resource_Mineral_Field.tileHeight - 1)
     positions.map(position => new TileRectangle(position.subtract(boundaryStart), position.add(boundaryEnd)))
   }
   def _getGasExclusions:Iterable[TileRectangle] = {
     val positions         = With.game.getStaticGeysers.asScala.map(_.getInitialTilePosition)
     val boundaryStart     = new TilePosition(3, 3)
-    val boundaryEnd       = new TilePosition(3 + UnitType.Resource_Vespene_Geyser.tileWidth - 1, 3 + UnitType.Resource_Vespene_Geyser.tileHeight - 1)
+    val boundaryEnd       = boundaryStart.add(UnitType.Resource_Vespene_Geyser.tileWidth - 1, UnitType.Resource_Vespene_Geyser.tileHeight - 1)
     positions.map(position => new TileRectangle(position.subtract(boundaryStart), position.add(boundaryEnd)))
   }
   def _getResourceClusters:Iterable[Iterable[TilePosition]] = {

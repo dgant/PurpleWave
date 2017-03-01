@@ -10,9 +10,6 @@ import scala.collection.mutable.ListBuffer
 
 class Logger {
   
-  var enableStdOut = false
-  var enableGameMessage = true
-  
   val _logMessages = new ListBuffer[String]
   
   def onEnd() {
@@ -36,11 +33,11 @@ class Logger {
   }
   
   def _log(message:String) {
-    if (enableStdOut) {
+    if (With.configuration.enableStdOut) {
       System.out.println(message)
     }
     
-    if (enableGameMessage) {
+    if (With.configuration.enableChat) {
       With.game.sendText(message)
     }
     

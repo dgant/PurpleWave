@@ -46,25 +46,23 @@ case object EnrichPosition {
     def toWalkPosition:WalkPosition = {
       new WalkPosition(position.getX / 4, position.getY / 4)
     }
+    def add(dx:Int, dy:Int):Position = {
+      new Position(position.getX + dx, position.getY + dy)
+    }
     def add(otherPosition:Position):Position = {
-      new Position(
-        position.getX + otherPosition.getX,
-        position.getY + otherPosition.getY)
+      add(otherPosition.getX, otherPosition.getY)
+    }
+    def subtract(dx:Int, dy:Int):Position = {
+      add(-dx, -dy)
     }
     def subtract(otherPosition:Position):Position = {
-      new Position(
-        position.getX - otherPosition.getX,
-        position.getY - otherPosition.getY)
+      subtract(otherPosition.getX, otherPosition.getY)
     }
     def multiply(scale:Int):Position = {
-      new Position(
-        scale * position.getX,
-        scale * position.getY)
+      new Position(scale * position.getX, scale * position.getY)
     }
     def divide(scale:Int):Position = {
-      new Position(
-        position.getX / scale,
-        position.getY / scale)
+      new Position(position.getX / scale, position.getY / scale)
     }
     def midpoint(otherPosition:Position):Position = {
       add(otherPosition).divide(2)
@@ -76,25 +74,23 @@ case object EnrichPosition {
   }
   
   implicit class EnrichedTilePosition(position:TilePosition) {
+    def add(dx:Int, dy:Int):TilePosition = {
+      new TilePosition(position.getX + dx, position.getY + dy)
+    }
     def add(otherPosition:TilePosition):TilePosition = {
-      new TilePosition(
-        position.getX + otherPosition.getX,
-        position.getY + otherPosition.getY)
+      add(otherPosition.getX, otherPosition.getY)
+    }
+    def subtract(dx:Int, dy:Int):TilePosition = {
+      add(-dx, -dy)
     }
     def subtract(otherPosition:TilePosition):TilePosition = {
-      new TilePosition(
-        position.getX - otherPosition.getX,
-        position.getY - otherPosition.getY)
+      subtract(otherPosition.getX, otherPosition.getY)
     }
     def multiply(scale:Int):TilePosition = {
-      new TilePosition(
-        scale * position.getX,
-        scale * position.getY)
+      new TilePosition(scale * position.getX, scale * position.getY)
     }
     def divide(scale:Int):TilePosition = {
-      new TilePosition(
-        position.getX / scale,
-        position.getY / scale)
+      new TilePosition(position.getX / scale, position.getY / scale)
     }
     def midpoint(otherPosition:TilePosition):TilePosition = {
       add(otherPosition).divide(2)

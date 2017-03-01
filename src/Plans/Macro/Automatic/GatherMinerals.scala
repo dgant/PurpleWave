@@ -75,9 +75,11 @@ class GatherMinerals extends Plan {
   }
   
   def _sortMinerals() {
+    val townHalls = _getTownHalls
+    if (townHalls.isEmpty) return
     _minerals
       .sortBy(mineral => -mineral.mineralsLeft)
-      .sortBy(mineral => _getTownHalls.map(_.position.getDistance(mineral.position)).min)
+      .sortBy(mineral => townHalls.map(_.position.getDistance(mineral.position)).min)
       .sortBy(mineral => _workersByMineral(mineral).size)
   }
   

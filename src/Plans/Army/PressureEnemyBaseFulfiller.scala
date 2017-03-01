@@ -1,5 +1,6 @@
 package Plans.Army
 
+import Global.Combat.Commands.Control
 import Plans.Allocation.{LockUnits, LockUnitsNobody}
 import Plans.Plan
 import Startup.With
@@ -19,6 +20,6 @@ class PressureEnemyBaseFulfiller extends Plan {
     fighters.get.onFrame()
     if ( ! fighters.get.isComplete) return
     
-    fighters.get.units.foreach(fighter => With.commander.intend(new Intention(fighter, targetPosition)))
+    fighters.get.units.foreach(fighter => With.commander.intend(new Intention(fighter, Control, targetPosition)))
   }
 }

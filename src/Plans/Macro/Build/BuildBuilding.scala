@@ -1,6 +1,7 @@
 package Plans.Macro.Build
 
 import Development.TypeDescriber
+import Global.Combat.Commands.March
 import Plans.Allocation.{LockCurrency, LockCurrencyForUnit, LockUnits, LockUnitsExactly}
 import Plans.Plan
 import Startup.With
@@ -75,6 +76,7 @@ class BuildBuilding(val buildingType:UnitType) extends Plan {
       builderPlan.get.units.foreach(unit => With.commander.intend(
         new Intention(
           unit,
+          March,
           Some(_position.map(_
           .toPosition
           .add(new Position(buildingType.width/2, buildingType.height/2)))

@@ -1,5 +1,6 @@
 package Plans.Information
 
+import Global.Combat.Commands.March
 import Plans.Allocation.{LockUnits, LockUnitsExactly}
 import Plans.Plan
 import Startup.With
@@ -33,7 +34,7 @@ class KnowEnemyBaseLocationFulfiller extends Plan {
   }
   
   def _orderScout(scout:FriendlyUnitInfo) {
-    With.commander.intend(new Intention(scout, Some(_getNextScoutingPosition)))
+    With.commander.intend(new Intention(scout, March, Some(_getNextScoutingPosition)))
   }
   
   def _getNextScoutingPosition:Position = {

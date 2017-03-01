@@ -35,7 +35,7 @@ object Overlay {
   }
   
   def _drawBattles() {
-    With.battles.battles.foreach(_drawBattle)
+    With.battles.all.foreach(_drawBattle)
   }
   
   def _drawBattle(battle:Battle) {
@@ -55,12 +55,16 @@ object Overlay {
       battle.enemy.units.map(_.position).maxBound,
       Color.Red)
     _drawTextLabel(
-      List("Spread: " + battle.us.spread),
+      List(
+        "Size: " + battle.us.expectedSpread,
+        "Spread: " + battle.us.spread),
       battle.us.center,
       drawBackground = true,
       backgroundColor = Color.Black)
     _drawTextLabel(
-      List("Spread: " + battle.enemy.spread),
+      List(
+        "Size: " + battle.enemy.expectedSpread,
+        "Spread: " + battle.enemy.spread),
       battle.enemy.center,
       drawBackground = true,
       backgroundColor = Color.Black)

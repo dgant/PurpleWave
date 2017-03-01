@@ -1,13 +1,13 @@
 package Types.Intents
 
 import Global.Combat.Battle.Battle
-import Types.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import Global.Combat.Commands.Command
+import Types.UnitInfo.FriendlyUnitInfo
 import bwapi.Position
 
 class Intention(
   val unit:FriendlyUnitInfo,
+  val command:Command,
   var destination:Option[Position] = None,
-  var targetUnit:Option[UnitInfo] = None) {
-  
-  var battle:Battle = null
+  var battle:Option[Battle] = None) {
 }

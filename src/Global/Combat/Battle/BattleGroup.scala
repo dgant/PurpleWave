@@ -11,6 +11,7 @@ class BattleGroup(
   val units:mutable.HashSet[UnitInfo]) {
   
   var strength = 0
+  var expectedSpread = 0
   var spread = 0
   var center = Positions.middle
 }

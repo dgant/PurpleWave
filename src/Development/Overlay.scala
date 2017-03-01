@@ -13,22 +13,20 @@ import bwta.BWTA
 import scala.collection.JavaConverters._
 
 object Overlay {
-  
-  var enabled:Boolean = With.configuration.enableOverlay
-  
   def onFrame() {
-    if (!enabled) { return }
-    With.game.setTextSize(bwapi.Text.Size.Enum.Small)
-    if (With.configuration.enableOverlayBasePlacement)  _drawBases()
-    if (With.configuration.enableOverlayBattles)        _drawBattles()
-    if (With.configuration.enableOverlayEconomy)        _drawEconomy()
-    if (With.configuration.enableOverlayExclusions)     _drawExclusions()
-    if (With.configuration.enableOverlayHighlightUnits) _drawUnits()
-    if (With.configuration.enableOverlayPlans)          _drawPlans()
-    if (With.configuration.enableOverlayResources)      _drawResources()
-    if (With.configuration.enableOverlayTerrain)        _drawTerrain()
-    if (With.configuration.enableOverlayTrackedUnits)   _drawTrackedUnits()
-    if (With.configuration.enableOverlayTrackedUnits)   _drawTrackedUnits()
+    if (With.configuration.enableOverlay) {
+      With.game.setTextSize(bwapi.Text.Size.Enum.Small)
+      if (With.configuration.enableOverlayBasePlacement)  _drawBases()
+      if (With.configuration.enableOverlayBattles)        _drawBattles()
+      if (With.configuration.enableOverlayEconomy)        _drawEconomy()
+      if (With.configuration.enableOverlayExclusions)     _drawExclusions()
+      if (With.configuration.enableOverlayHighlightUnits) _drawUnits()
+      if (With.configuration.enableOverlayPlans)          _drawPlans()
+      if (With.configuration.enableOverlayResources)      _drawResources()
+      if (With.configuration.enableOverlayTerrain)        _drawTerrain()
+      if (With.configuration.enableOverlayTrackedUnits)   _drawTrackedUnits()
+      if (With.configuration.enableOverlayTrackedUnits)   _drawTrackedUnits()
+    }
   }
   
   def _drawBases() {

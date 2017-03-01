@@ -87,10 +87,11 @@ class GatherMinerals extends Plan {
       if (worker.command.getUnitCommandType != UnitCommandType.Return_Cargo || ! worker.isMoving) {
         worker.baseUnit.returnCargo()
       }
-    } else {
-      val mineral = _mineralByWorker.get(worker)
-      if (mineral.nonEmpty) {
-        worker.baseUnit.gather(mineral.get.baseUnit)
+    }
+    else {
+      val order = worker.baseUnit.getOrder.toString
+      if ( ! List("MiningMinerals").contains(order)) {
+        _mineralByWorker.get(worker).foreach(mineral => worker.baseUnit.gather(mineral.baseUnit))
       }
     }
   }

@@ -25,6 +25,7 @@ object Overlay {
       if (With.configuration.enableOverlayResources)      _drawResources()
       if (With.configuration.enableOverlayTerrain)        _drawTerrain()
       if (With.configuration.enableOverlayTrackedUnits)   _drawTrackedUnits()
+      if (With.configuration.enableOverlayWorkers)        _drawWorkers()
     }
   }
   
@@ -179,6 +180,11 @@ object Overlay {
         trackedUnit.position,
         drawBackground = true)
     }
+  }
+  
+  def _drawWorkers() {
+    With.units.ours.filter(_.utype.isWorker).foreach(unit =>
+      _drawTextLabel(List(unit.order.toString), unit.position, drawBackground = true))
   }
   
   def _describePlanTree(plan:Plan, childOrder:Integer, depth:Integer):String = {

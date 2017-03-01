@@ -1,8 +1,10 @@
 package Development
 
 class Configuration {
-  var enableStdOut = false
-  var enableChat = true
+  var gameSpeed                   = 24
+  
+  var enableStdOut                = false
+  var enableChat                  = true
   
   var enableOverlay               = true
   var enableOverlayBasePlacement  = true
@@ -14,4 +16,5 @@ class Configuration {
   var enableOverlayPlans          = false
   var enableOverlayTerrain        = false
   var enableOverlayTrackedUnits   = true
+  var enableOverlayWorkers        = true
 }

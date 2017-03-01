@@ -35,7 +35,7 @@ class Bot() extends DefaultBWListener {
       With.units = new Units
       
       With.game.enableFlag(1)
-      With.game.setLocalSpeed(0)
+      With.game.setLocalSpeed(With.configuration.gameSpeed)
     }
     catch { case exception:Exception =>
       var dontLoseTheStackTraceWhileDebugging = exception.getStackTrace

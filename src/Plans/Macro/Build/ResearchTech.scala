@@ -27,10 +27,10 @@ class ResearchTech(techType: TechType) extends Plan {
     }
     
     val researcherUnit = researcher.get.units.head
-    if (researcherUnit.getTech == techType) {
+    if (researcherUnit.teching == techType) {
       currency.get.isSpent = true
     }
-    else if (researcherUnit.getTech == TechType.None) {
+    else if (researcherUnit.teching == TechType.None) {
       researcherUnit.baseUnit.research(techType)
       currency.get.isSpent = true
     }

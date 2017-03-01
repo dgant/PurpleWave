@@ -27,10 +27,10 @@ class ResearchUpgrade(upgradeType: UpgradeType, level: Int) extends Plan {
     }
     
     val researcherUnit = researcher.get.units.head
-    if (researcherUnit.getUpgrade == upgradeType) {
+    if (researcherUnit.upgrading == upgradeType) {
       currency.get.isSpent = true
     }
-    else if (researcherUnit.getUpgrade == UpgradeType.None) {
+    else if (researcherUnit.upgrading == UpgradeType.None) {
       researcherUnit.baseUnit.upgrade(upgradeType)
       currency.get.isSpent = true
     }

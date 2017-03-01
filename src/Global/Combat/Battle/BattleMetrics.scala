@@ -8,6 +8,10 @@ import Utilities.Enrichment.EnrichUnitType._
 
 object BattleMetrics {
   
+  def vanguard(group:BattleGroup, otherGroup:BattleGroup):Position = {
+    group.units.minBy(_.distanceSquared(otherGroup.center)).position
+  }
+  
   def center(group:BattleGroup):Position = {
     val airCenter = group.units.map(_.position).centroid
     group.units.map(_.position).minBy(_.distanceSquared(airCenter))

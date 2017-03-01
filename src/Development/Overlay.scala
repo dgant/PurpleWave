@@ -69,7 +69,7 @@ object Overlay {
       drawBackground = true,
       backgroundColor = Color.Black)
     _drawTextLabel(
-      List(battle.us.strength/1000 + " - " + battle.enemy.strength/1000),
+      List(battle.us.strength + " - " + battle.enemy.strength),
       battle.focus,
       drawBackground = true,
       backgroundColor = Color.Brown)

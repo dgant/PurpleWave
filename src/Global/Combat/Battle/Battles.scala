@@ -20,18 +20,19 @@ class Battles {
   }
   
   def update(battle:Battle) {
-    List(battle.us, battle.enemy).foreach(group => {
-      group.units.filterNot(_.alive).foreach(group.units.remove)
-      if (isValid(battle)) {
-        group.strength        = BattleMetrics.evaluate(group, battle)
-        group.center          = BattleMetrics.center(group)
-        group.expectedSpread  = BattleMetrics.expectedSpread(group)
-        group.spread          = BattleMetrics.actualSpread(group)
-      }})
-    if (isValid(battle)) {
-      battle.us.vanguard = battle.us.units.minBy(_.position.distanceSquared(battle.enemy.vanguard)).position
-      battle.enemy.vanguard = battle.enemy.units.minBy(_.position.distanceSquared(battle.us.vanguard)).position
+    val groups = List(battle.us, battle.enemy)
+    groups.foreach(group => group.units.filterNot(_.alive).foreach(group.units.remove))
+    if ( ! isValid(battle)) {
+      return
     }
+    groups.foreach(group => {
+      group.center          = BattleMetrics.center(group)
+      group.expectedSpread  = BattleMetrics.expectedSpread(group)
+      group.spread          = BattleMetrics.actualSpread(group)
+    })
+    battle.us.vanguard    = battle.us.units.minBy(_.position.distanceSquared(battle.enemy.center)).position
+    battle.enemy.vanguard = battle.enemy.units.minBy(_.position.distanceSquared(battle.us.center)).position
+    groups.foreach(group => group.strength = BattleMetrics.evaluate(group, battle))
   }
   
   def isValid(battle:Battle):Boolean = {

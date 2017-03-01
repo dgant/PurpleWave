@@ -11,7 +11,7 @@ class BuildWorkersContinuously extends AbstractBuildContinuously[TrainUnit] {
   }
   
   override def _additionalPlansRequired:Int = {
-    Math.max(0, _additionalWorkersDesired - _currentBuilds.size)
+    Math.max(0, _additionalWorkersDesired /* - _currentBuilds.size*/)
   }
   
   def _additionalWorkersDesired:Int = {
@@ -24,8 +24,8 @@ class BuildWorkersContinuously extends AbstractBuildContinuously[TrainUnit] {
   
   def _workerCap:Int = {
     //Cap the number of bases to saturate so we don't accidentally max out on probes
-    //Assuming we want three on gas and 2.5 per mineral
-    Math.min(3, With.economy.ourMiningBases.size) * (3 + 9 * 5/2)
+    //Assuming we want three on gas and 2 per mineral
+    Math.min(3, With.economy.ourMiningBases.size) * (3 + 9 * 2)
   }
   
   def _maxWorkersToBuildSimultaneously:Int = {

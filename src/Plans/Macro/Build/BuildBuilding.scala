@@ -86,7 +86,7 @@ class BuildBuilding(val buildingType:UnitType) extends Plan {
     if (_lastOrderFrame < With.game.getFrameCount - 24) {
       _lastOrderFrame = With.game.getFrameCount
       
-      if (_position.filter(p => With.game.canBuildHere(p, buildingType, builder.baseUnit)).isEmpty) {
+      if ( ! _position.exists(p => With.game.canBuildHere(p, buildingType, builder.baseUnit))) {
         _position = positionFinder.get.find
       }
   

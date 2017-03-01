@@ -25,13 +25,11 @@ class Commander {
   }
   
   def _order(unit:FriendlyUnitInfo, intent:Intent) {
-    if (_nextOrderFrame(unit) > With.game.getFrameCount) {
-      return
-    }
+    if (_nextOrderFrame(unit) > With.game.getFrameCount) { return }
   
     val combatOption = With.simulator.battles.find(_.ourGroup.units.contains(unit))
   
-    if (combatOption.isEmpty) {
+    if (combatOption.isEmpty || combatOption.get.enemyGroup.units.isEmpty) {
       _journey(unit, intent)
     } else {
       val combat = combatOption.get
@@ -40,9 +38,9 @@ class Commander {
       val strengthRatio = (0.01 + combat.ourScore) / (0.01 + combat.enemyScore)
     
       if (unit.cloaked && combat.enemyGroup.units.forall(!_.utype.isDetector)) {
-        _destroy(unit, intent, combat)
+        _fight(unit, intent, combat)
       }
-      else if (strengthRatio < 1) {
+      else if (strengthRatio < 1.1) {
         _flee(unit, intent, combat)
       }
       else {
@@ -58,72 +56,58 @@ class Commander {
   }
   
   def _kite(unit:FriendlyUnitInfo, intent:Intent, combat:BattleSimulation) {
-    if (unit.isMelee) {
-      _destroy(unit, intent, combat)
-    }
-    else if (unit.cooldownRemaining > 0) {
-      _flee(unit, intent, combat)
+    val closestEnemy = combat.enemyGroup.units.minBy(_.distanceSquared(unit))
+    val closestEnemyDistance2 = unit.distanceSquared(closestEnemy)
+    if (unit.onCooldown) {
+      val kiteRange = unit.range
+      if (closestEnemyDistance2 < kiteRange * kiteRange) {
+        _flee(unit, intent, combat)
+      }
+      else {
+        _journey(unit, intent)
+      }
     }
     else {
-      val target = _getTargetInRange(unit, intent, combat)
-      if (target.isEmpty) {
-        unit.baseUnit.patrol(intent.position.get)
-        _setOrderDelay(unit, startedAttacking = true)
-      } else {
-        unit.baseUnit.attack(target.get.baseUnit)
-        _setOrderDelay(unit, startedAttacking = true)
-      }
+      unit.baseUnit.attack(closestEnemy.baseUnit)
+      _setOrderDelay(unit, startedAttacking = true)
     }
   }
   
-  def _destroy(unit:FriendlyUnitInfo, intent:Intent, combat:BattleSimulation) {
-    val target = _getTargetInRange(unit, intent, combat)
-    if (target.nonEmpty) {
-      if (unit.cooldownRemaining > 0) {
-        unit.baseUnit.move(target.get.position)
-        _setOrderDelay(unit)
-      } else {
-        unit.baseUnit.attack(target.get.baseUnit)
-        _setOrderDelay(unit, startedAttacking = true)
-      }
-    }
-    else {
-      _journey(unit, intent)
+  def _fight(unit:FriendlyUnitInfo, intent:Intent, combat:BattleSimulation) {
+    val closestEnemy = combat.enemyGroup.units.minBy(_.distanceSquared(unit))
+    val closestEnemyDistance2 = unit.distanceSquared(closestEnemy)
+    if (unit.onCooldown) {
+      unit.baseUnit.move(closestEnemy.position)
+      _setOrderDelay(unit)
+    } else {
+      unit.baseUnit.attack(closestEnemy.baseUnit)
     }
   }
   
   def _flee(unit:FriendlyUnitInfo, intent:Intent, combat:BattleSimulation) {
-    val marginOfSafety = 32 * 8
-    val marginOfDesperation = 32 * 6
-    if (unit.position.getDistance(combat.enemyGroup.vanguard) < marginOfSafety) {
+    val marginOfSafety = 32 * 3
+    val marginOfDesperation = 32 * 10
+    if (unit.position.getDistance(combat.enemyGroup.vanguard) + combat.enemyGroup.units.map(_.range).max < marginOfSafety) {
       val fleePosition = With.geography.ourHarvestingAreas
         .map(area => area.start.midpoint(area.end).toPosition)
         .headOption
         .getOrElse(With.geography.home)
       if (unit.position.getDistance(fleePosition) > marginOfDesperation) {
         unit.baseUnit.move(fleePosition)
+        return
       }
-      else {
-        _destroy(unit, intent, combat)
-      }
-      
-    } else {
-      _destroy(unit, intent, combat)
     }
+    _fight(unit, intent, combat)
   }
   
   def _journey(unit:FriendlyUnitInfo, intent:Intent) {
-    if (unit.position.getDistance(intent.position.get) < 32 * 8) {
-      unit.baseUnit.patrol(intent.position.get)
-      _setOrderDelay(unit, startedAttacking = true)
-    } else {
-      unit.baseUnit.move(intent.position.get)
-    }
+    unit.baseUnit.patrol(intent.position.get)
+    _setOrderDelay(unit, startedAttacking = true)
   }
   
   def _getTargetInRange(unit:FriendlyUnitInfo, intent:Intent, combat:BattleSimulation):Option[UnitInfo] = {
     val targets = combat.enemyGroup.units
-      .filter(_.position.getDistance(unit.position) <= Math.max(unit.range, 32 * 8))
+      .filter(_.position.getDistance(unit.position) <= Math.max(unit.range, 32 * 4))
       .filterNot(target => List(UnitType.Zerg_Larva, UnitType.Zerg_Egg).contains(target.utype))
     
     if (targets.isEmpty) { return None }

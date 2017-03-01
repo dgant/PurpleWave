@@ -15,7 +15,7 @@ class BattleSimulator {
   val battleRange = 32 * 16
   var battles:Iterable[BattleSimulation] = List.empty
   
-  val limitBattleDefinition = new Limiter(8, _defineBattles)
+  val limitBattleDefinition = new Limiter(6, _defineBattles)
   def onFrame() {
     limitBattleDefinition.act()
     _simulateBattles()

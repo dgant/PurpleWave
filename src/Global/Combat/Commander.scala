@@ -33,17 +33,18 @@ class Commander {
     val battleOption = With.battles.battles.find(_.us.units.contains(unit))
   
     if (battleOption.isEmpty || battleOption.get.enemy.units.isEmpty) {
-      _advance(intent)
+      _travel(intent)
     } else {
-      val combat = battleOption.get
-      val enemyMaxRange = if (combat.enemy.units.nonEmpty) combat.enemy.units.map(_.range).max else 0
-      val distanceToEnemy = unit.position.getDistance(combat.enemy.vanguard)
-      val strengthRatio = (0.01 + combat.us.strength) / (0.01 + combat.enemy.strength)
+      val battle = battleOption.get
+      intent.battle = battle
+      val enemyMaxRange = if (battle.enemy.units.nonEmpty) battle.enemy.units.map(_.range).max else 0
+      val distanceToEnemy = unit.position.getDistance(battle.enemy.vanguard)
+      val strengthRatio = (0.01 + battle.us.strength) / (0.01 + battle.enemy.strength)
     
-      if (unit.cloaked && combat.enemy.units.forall(!_.utype.isDetector)) {
+      if (unit.cloaked && ! battle.enemy.units.exists(_.utype.isDetector)) {
         _fight(intent)
       }
-      else if (strengthRatio < 0.7) {
+      else if (strengthRatio < 1) {
         _flee(intent)
       }
       else {
@@ -62,7 +63,7 @@ class Commander {
         _flee(intent)
       }
       else {
-        _advance(intent)
+        _travel(intent)
       }
     }
     else {
@@ -101,9 +102,13 @@ class Commander {
     _fight(intent)
   }
   
-  def _advance(intent:Intention) {
+  def _travel(intent:Intention) {
     val unit = intent.unit
-    unit.baseUnit.patrol(intent.destination.get)
+    if (unit.distance(intent.destination.get) > 32 * 8) {
+      unit.baseUnit.move(intent.destination.get)
+    } else {
+      unit.baseUnit.patrol(intent.destination.get)
+    }
     setOrderDelay(unit, startedAttacking = true)
   }
   

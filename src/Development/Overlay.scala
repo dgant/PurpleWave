@@ -46,18 +46,24 @@ object Overlay {
     With.game.drawCircleMap(battle.enemy.vanguard, 8, Color.Red)
     With.game.drawLineMap(battle.focus, battle.us.vanguard, Color.Green)
     With.game.drawLineMap(battle.focus, battle.enemy.vanguard, Color.Red)
-    if (battle.us.units.nonEmpty) {
-      With.game.drawBoxMap(
-        battle.us.units.map(_.position).minBound,
-        battle.us.units.map(_.position).maxBound,
-        Color.Green)
-    }
-    if (battle.enemy.units.nonEmpty) {
-      With.game.drawBoxMap(
-        battle.enemy.units.map(_.position).minBound,
-        battle.enemy.units.map(_.position).maxBound,
-        Color.Red)
-    }
+    With.game.drawBoxMap(
+      battle.us.units.map(_.position).minBound,
+      battle.us.units.map(_.position).maxBound,
+      Color.Green)
+    With.game.drawBoxMap(
+      battle.enemy.units.map(_.position).minBound,
+      battle.enemy.units.map(_.position).maxBound,
+      Color.Red)
+    _drawTextLabel(
+      List("Spread: " + battle.us.spread),
+      battle.us.center,
+      drawBackground = true,
+      backgroundColor = Color.Black)
+    _drawTextLabel(
+      List("Spread: " + battle.enemy.spread),
+      battle.enemy.center,
+      drawBackground = true,
+      backgroundColor = Color.Black)
     _drawTextLabel(
       List(battle.us.strength/1000 + " - " + battle.enemy.strength/1000),
       battle.focus,

@@ -40,7 +40,8 @@ class Bot() extends DefaultBWListener {
       With.game.setLocalSpeed(With.configuration.gameSpeed)
     }
     catch { case exception:Exception =>
-      var dontLoseTheStackTraceWhileDebugging = exception.getStackTrace
+      val dontLoseTheExceptionWhileDebugging = exception
+      val dontLoseTheStackTraceWhileDebugging = exception.getStackTrace
       With.logger.onException(exception)}
   }
 
@@ -61,7 +62,8 @@ class Bot() extends DefaultBWListener {
     }
     catch {
       case exception:Exception =>
-        var dontLoseTheStackTraceWhileDebugging = exception.getStackTrace
+        val dontLoseTheExceptionWhileDebugging = exception
+        val dontLoseTheStackTraceWhileDebugging = exception.getStackTrace
         With.logger.onException(exception)
     }
   }
@@ -70,7 +72,8 @@ class Bot() extends DefaultBWListener {
     try {
     }
     catch { case exception:Exception =>
-      var dontLoseTheStackTraceWhileDebugging = exception.getStackTrace
+      val dontLoseTheExceptionWhileDebugging = exception
+      val dontLoseTheStackTraceWhileDebugging = exception.getStackTrace
       With.logger.onException(exception)}
   }
 
@@ -80,15 +83,17 @@ class Bot() extends DefaultBWListener {
       With.history.onUnitDestroy(unit)
     }
     catch { case exception:Exception =>
-        var dontLoseTheStackTraceWhileDebugging = exception.getStackTrace
-        With.logger.onException(exception)}
+      val dontLoseTheExceptionWhileDebugging = exception
+      val dontLoseTheStackTraceWhileDebugging = exception.getStackTrace
+      With.logger.onException(exception)}
   }
 
   override def onUnitDiscover(unit: bwapi.Unit) {
     try {
     }
     catch { case exception:Exception =>
-      var dontLoseTheStackTraceWhileDebugging = exception.getStackTrace
+      val dontLoseTheExceptionWhileDebugging = exception
+      val dontLoseTheStackTraceWhileDebugging = exception.getStackTrace
       With.logger.onException(exception)}
   }
   
@@ -99,7 +104,8 @@ class Bot() extends DefaultBWListener {
       BWTA.cleanMemory()
     }
     catch { case exception:Exception =>
-      var dontLoseTheStackTraceWhileDebugging = exception.getStackTrace
+      val dontLoseTheExceptionWhileDebugging = exception
+      val dontLoseTheStackTraceWhileDebugging = exception.getStackTrace
       With.logger.onException(exception)}
   }
   

@@ -25,7 +25,7 @@ class PositionSimpleBuilding(
     else if (buildingType.isTownHall) {
       val basePositions = With.geography.basePositions.filter(basePosition => {
         val rectangle = new TileRectangle(basePosition, basePosition.add(buildingType.tileBottomRight))
-        With.units.all.filter(_.unitType.isBuilding).forall( ! _.tileArea.intersects(rectangle))
+        With.units.all.filter(_.utype.isBuilding).forall( ! _.tileArea.intersects(rectangle))
       })
         
       if (basePositions.isEmpty) return None

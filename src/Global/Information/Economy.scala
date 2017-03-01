@@ -109,7 +109,7 @@ class Economy {
     //In practice it seems higher, so this number is a fudge
     With.geography.ourHarvestingAreas
         .map(ourActiveDrillers)
-        .map(_.size * 118)
+        .map(_.size * 128)
         .sum
   }
   

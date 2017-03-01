@@ -15,7 +15,7 @@ class FriendlyUnitInfo(_baseUnit:bwapi.Unit) extends UnitInfo(_baseUnit) {
   override def tilePosition: TilePosition = baseUnit.getTilePosition
   override def hitPoints: Int = baseUnit.getHitPoints
   override def shieldPoints: Int = baseUnit.getShields
-  override def unitType: UnitType = baseUnit.getType
+  override def utype: UnitType = baseUnit.getType
   override def complete: Boolean = baseUnit.isCompleted
   override def flying:Boolean = baseUnit.isFlying
   override def visible:Boolean = baseUnit.isVisible

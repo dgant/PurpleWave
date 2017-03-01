@@ -12,18 +12,18 @@ import scala.collection.mutable
 
 class BattleSimulator {
   
-  val battleRange = 32 * 18
+  val battleRange = 32 * 16
   var battles:Iterable[BattleSimulation] = List.empty
   
-  val limitCombatIdentification = new Limiter(8, _defineBattles)
+  val limitBattleDefinition = new Limiter(8, _defineBattles)
   def onFrame() {
-    limitCombatIdentification.act()
-    _simulateBattles
+    limitBattleDefinition.act()
+    _simulateBattles()
   }
   
   def _defineBattles() {
-    val ourGroupMaps = Clustering.groupUnits(With.units.ours.filter(_.canFight), battleRange)
-    val enemyGroupMaps = Clustering.groupUnits(With.units.enemy.filter(_.canFight), battleRange)
+    val ourGroupMaps = Clustering.groupUnits(With.units.ours.filterNot(_.utype.isWorker).filter(_.canFight), battleRange)
+    val enemyGroupMaps = Clustering.groupUnits(With.units.enemy.filterNot(_.utype.isWorker).filter(_.canFight), battleRange)
     val ourGroups = ourGroupMaps.map(group => new BattleGroup(group._1.position, group._2))
     val enemyGroups = enemyGroupMaps.map(group => new BattleGroup(group._1.position, group._2))
     battles = _constructBattle(ourGroups, enemyGroups)
@@ -34,8 +34,8 @@ class BattleSimulator {
   }
   
   def _constructBattle(
-                        ourGroups:  Iterable[BattleGroup],
-                        theirGroups:Iterable[BattleGroup]):Iterable[BattleSimulation] = {
+    ourGroups:  Iterable[BattleGroup],
+    theirGroups:Iterable[BattleGroup]):Iterable[BattleSimulation] = {
     
     if (theirGroups.isEmpty) return List.empty
   
@@ -64,7 +64,7 @@ class BattleSimulator {
   def _valueUnit(unit:UnitInfo, battle: BattleSimulation):Int = {
     //Don't be afraid to fight workers.
     //This is a hack, because it's affecting our expectation of combat, rather than our motivation for fighting
-    if (unit.unitType.isWorker) return 0
+    if (unit.utype.isWorker) return 0
     
     //Fails to account for casters
     //Fails to account for carriers/reavers
@@ -73,7 +73,7 @@ class BattleSimulator {
     var dps = unit.groundDps
     var range = unit.range
     
-    if (unit.unitType == UnitType.Terran_Bunker) {
+    if (unit.utype == UnitType.Terran_Bunker) {
       dps = 4 * UnitType.Terran_Marine.groundDps
       range = UnitType.Terran_Marine.range
     }

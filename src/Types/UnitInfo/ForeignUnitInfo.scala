@@ -69,7 +69,7 @@ class ForeignUnitInfo(_baseUnit:bwapi.Unit) extends UnitInfo (_baseUnit) {
   override def tilePosition: TilePosition = _tilePosition
   override def hitPoints: Int = _hitPoints
   override def shieldPoints: Int = _shieldPoints
-  override def unitType: UnitType = _unitType
+  override def utype: UnitType = _unitType
   override def complete: Boolean = _complete
   override def flying: Boolean = _flying
   override def visible: Boolean = lastSeen >= With.game.getFrameCount

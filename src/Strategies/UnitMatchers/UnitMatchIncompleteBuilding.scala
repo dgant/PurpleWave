@@ -5,7 +5,7 @@ import bwapi.UnitType
 
 class UnitMatchIncompleteBuilding(unitType:UnitType) extends UnitMatchType(unitType) {
   override def accept(unit: FriendlyUnitInfo): Boolean = {
-    unit.unitType == unitType &&
+    unit.utype == unitType &&
       ! unit.complete &&
       unit.getBuildUnit.nonEmpty
   }

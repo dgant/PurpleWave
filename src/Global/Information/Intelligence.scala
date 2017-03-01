@@ -17,9 +17,9 @@ class Intelligence {
   def mostBaselikeEnemyBuilding:Option[ForeignUnitInfo] = {
     With.units.enemy
       .toList
-      .filter(unit => unit.unitType.isBuilding)
-      .sortBy(unit => unit.unitType.isFlyer)
-      .sortBy(unit => unit.unitType.isTownHall)
+      .filter(unit => unit.utype.isBuilding)
+      .sortBy(unit => unit.utype.isFlyer)
+      .sortBy(unit => unit.utype.isTownHall)
       .headOption
   }
   

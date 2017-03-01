@@ -33,7 +33,7 @@ class BuildSupplyContinuously extends AbstractBuildContinuously[BuildBuilding] {
     //   #2 Supply that will be provided by plans for which we haven't started building
   
     val supplyPerDepot        = With.game.self.getRace.getSupplyProvider.supplyProvided
-    val currentSupplyOfUnits  = With.units.ours.toSeq.map(_.unitType.supplyProvided).sum
+    val currentSupplyOfUnits  = With.units.ours.toSeq.map(_.utype.supplyProvided).sum
     val currentSupplyOfPlans  = _currentBuilds.filterNot(_.startedBuilding).size * supplyPerDepot
     val currentSupplyPlanned  = currentSupplyOfUnits + currentSupplyOfPlans
     val currentSupplyDeficit  = With.game.self.supplyUsed - currentSupplyPlanned

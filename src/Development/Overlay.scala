@@ -30,15 +30,8 @@ object Overlay {
   }
   
   def _drawBases() {
-    With.geography._basePositionsCache.get.foreach(position => With.game.drawBoxMap(
-      position.toPosition,
-      position.toPosition.add(new Position(32 * 4, 32 * 3)),
-      Color.Yellow))
-    With.geography.basePositions.foreach(base => {
-      val label = "Available base"
-      With.game.drawCircleMap(base.toPosition, 80, Color.Blue)
-      _drawTextLabel(List(label), base.toPosition, backgroundColor = Color.Blue)
-    })
+    With.geography.ourHarvestingAreas.foreach(area => _drawTileRectangle(area, Color.Red))
+    With.geography.basePositions.foreach(position => _drawTileRectangle(new TileRectangle(position, position.add(3, 2)), Color.Yellow))
   }
   
   def _drawBattles() {
@@ -98,7 +91,6 @@ object Overlay {
   }
   
   def _drawExclusions() {
-    With.geography.ourHarvestingAreas.foreach(area => _drawTileRectangle(area, Color.Red))
     With.geography._gasExclusionCache.get.foreach(box => _drawTileRectangle(box, Color.Teal))
     With.geography._mineralExclusionCache.get.foreach(box => _drawTileRectangle(box, Color.Teal))
     With.geography._resourceClusterCache.get.foreach(cluster => {
@@ -181,10 +173,10 @@ object Overlay {
     if (trackedUnit._possiblyStillThere && ! trackedUnit.visible) {
       With.game.drawCircleMap(
         trackedUnit.position,
-        trackedUnit.unitType.width / 2,
+        trackedUnit.utype.width / 2,
         Color.Grey)
       _drawTextLabel(
-        List(TypeDescriber.describeUnitType(trackedUnit.unitType)),
+        List(TypeDescriber.describeUnitType(trackedUnit.utype)),
         trackedUnit.position,
         drawBackground = true)
     }

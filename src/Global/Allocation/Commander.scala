@@ -39,7 +39,7 @@ class Commander {
       val distanceToEnemy = unit.position.getDistance(combat.enemyGroup.vanguard)
       val strengthRatio = (0.01 + combat.ourScore) / (0.01 + combat.enemyScore)
     
-      if (unit.cloaked && combat.enemyGroup.units.forall(!_.unitType.isDetector)) {
+      if (unit.cloaked && combat.enemyGroup.units.forall(!_.utype.isDetector)) {
         _destroy(unit, intent, combat)
       }
       else if (strengthRatio < 1) {
@@ -124,7 +124,7 @@ class Commander {
   def _getTargetInRange(unit:FriendlyUnitInfo, intent:Intent, combat:BattleSimulation):Option[UnitInfo] = {
     val targets = combat.enemyGroup.units
       .filter(_.position.getDistance(unit.position) <= Math.max(unit.range, 32 * 8))
-      .filterNot(target => List(UnitType.Zerg_Larva, UnitType.Zerg_Egg).contains(target.unitType))
+      .filterNot(target => List(UnitType.Zerg_Larva, UnitType.Zerg_Egg).contains(target.utype))
     
     if (targets.isEmpty) { return None }
     Some(targets.maxBy(target => {

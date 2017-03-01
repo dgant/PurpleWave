@@ -17,7 +17,7 @@ abstract class UnitInfo (var baseUnit:bwapi.Unit) {
   def tilePosition:TilePosition;
   def hitPoints:Int;
   def shieldPoints:Int;
-  def unitType:UnitType;
+  def utype:UnitType;
   def complete:Boolean;
   def flying:Boolean;
   def visible:Boolean
@@ -32,23 +32,23 @@ abstract class UnitInfo (var baseUnit:bwapi.Unit) {
   //This ignores spellcasters
   //TODO: Move this onto EnhancedUnitType
   def canFight: Boolean = {
-    complete && unitType.canAttack || List(UnitType.Protoss_Carrier, UnitType.Protoss_Reaver).contains(unitType)
+    complete && utype.canAttack || List(UnitType.Protoss_Carrier, UnitType.Protoss_Reaver).contains(utype)
   }
   
   def x                               : Int           = position.getX
   def y                               : Int           = position.getY
-  def attackFrames                    : Int           = 4 + (if (List(UnitType.Protoss_Dragoon, UnitType.Zerg_Devourer).contains(unitType)) 3 else 0)
+  def attackFrames                    : Int           = 4 + (if (List(UnitType.Protoss_Dragoon, UnitType.Zerg_Devourer).contains(utype)) 3 else 0)
   def isOurs                          : Boolean       = player == With.game.self
   def isFriendly                      : Boolean       = isOurs || player.isAlly(With.game.self)
   def isEnemy                         : Boolean       = player.isEnemy(With.game.self)
   def isMelee                         : Boolean       = range <= 32
   def totalHealth                     : Int           = hitPoints + shieldPoints
-  def maxTotalHealth                  : Int           = unitType.maxHitPoints + unitType.maxShields
-  def range                           : Int           = unitType.range
+  def maxTotalHealth                  : Int           = utype.maxHitPoints + utype.maxShields
+  def range                           : Int           = utype.range
   def enemyOf(otherUnit:UnitInfo)     : Boolean       = player.isEnemy(otherUnit.player)
-  def groundDps                       : Int           = if (canFight) unitType.groundDps else 0
-  def totalCost                       : Int           = unitType.totalCost
-  def isMinerals                      : Boolean       = unitType.isMinerals
-  def isGas                           : Boolean       = unitType.isGas
-  def tileArea                        : TileRectangle = new TileRectangle(tilePosition, tilePosition.add(new TilePosition(unitType.tileWidth-1, unitType.tileHeight-1)))
+  def groundDps                       : Int           = if (canFight) utype.groundDps else 0
+  def totalCost                       : Int           = utype.totalCost
+  def isMinerals                      : Boolean       = utype.isMinerals
+  def isGas                           : Boolean       = utype.isGas
+  def tileArea                        : TileRectangle = new TileRectangle(tilePosition, tilePosition.add(new TilePosition(utype.tileWidth-1, utype.tileHeight-1)))
 }

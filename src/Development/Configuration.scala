@@ -6,7 +6,7 @@ class Configuration {
   
   var enableOverlay               = true
   var enableOverlayBasePlacement  = true
-  var enableOverlayExclusions     = false
+  var enableOverlayExclusions     = true
   var enableOverlayBattles        = true
   var enableOverlayEconomy        = true
   var enableOverlayHighlightUnits = true

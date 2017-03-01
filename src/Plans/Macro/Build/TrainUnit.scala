@@ -70,7 +70,7 @@ class TrainUnit(val traineeType:UnitType) extends Plan {
         //Note that it's possible for a building to briefly have a worker type in the queue with no worker created.
         _trainee = With.units.ours
           .filter(u =>
-            u.unitType == traineeType &&
+            u.utype == traineeType &&
             u.x == trainer.x &&
             u.y == trainer.y &&
             ! u.complete)

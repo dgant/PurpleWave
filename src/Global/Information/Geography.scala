@@ -28,12 +28,12 @@ class Geography {
   }
   def home:Position = {
     ourBaseHalls.view.map(_.position).headOption
-      .getOrElse(With.units.ours.view.filter(_.unitType.isBuilding).map(_.position).headOption
+      .getOrElse(With.units.ours.view.filter(_.utype.isBuilding).map(_.position).headOption
       .getOrElse(new Position(0,0)))
   }
   
   def ourBaseHalls:Iterable[FriendlyUnitInfo] = {
-    With.units.ours.filter(unit => unit.unitType.isTownHall && ! unit.flying)
+    With.units.ours.filter(unit => unit.utype.isTownHall && ! unit.flying)
   }
   
   def ourHarvestingAreas:Iterable[TileRectangle] = { _ourMiningAreasCache.get }
@@ -46,11 +46,11 @@ class Geography {
       val nearbyUnits = With.units.inRadius(base.position, 32 * 10)
   
       val minerals = nearbyUnits
-        .filter(_.unitType == UnitType.Resource_Mineral_Field)
+        .filter(_.utype == UnitType.Resource_Mineral_Field)
         .map(_.position)
       
       val geysers = nearbyUnits
-        .filter(unit => unit.unitType.isRefinery || unit.unitType == UnitType.Resource_Vespene_Geyser)
+        .filter(unit => unit.utype.isRefinery || unit.utype == UnitType.Resource_Vespene_Geyser)
         .flatten(unit => List(new Position(unit.left - 16, unit.top), new Position(unit.right + 16, unit.bottom)))
       
       val boxedUnits = minerals ++ geysers ++ Iterable(base.position)

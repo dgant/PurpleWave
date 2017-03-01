@@ -5,6 +5,6 @@ import bwapi.UnitType
 
 class UnitMatchType(unitType:UnitType) extends UnitMatcher {
   override def accept(unit: FriendlyUnitInfo): Boolean = {
-    unit.unitType == unitType && unit.complete
+    unit.utype == unitType && unit.complete
   }
 }

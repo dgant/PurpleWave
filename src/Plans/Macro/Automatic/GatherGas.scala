@@ -23,7 +23,7 @@ class GatherGas extends Plan {
   }
   
   def _ourRefineries:Iterable[FriendlyUnitInfo] = {
-    With.units.ours.filter(unit => unit.complete && unit.unitType.isRefinery)
+    With.units.ours.filter(unit => unit.complete && unit.utype.isRefinery)
   }
   
   def _getMinerCount:Int = {
@@ -32,7 +32,7 @@ class GatherGas extends Plan {
       return 0
     }
     var workers = 3 * _ourRefineries.size
-    workers = Math.min(workers, With.units.ours.filter(unit => unit.complete && unit.unitType.isWorker).size / 3)
+    workers = Math.min(workers, With.units.ours.filter(unit => unit.complete && unit.utype.isWorker).size / 3)
     workers
   }
   

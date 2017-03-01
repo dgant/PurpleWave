@@ -13,22 +13,22 @@ object BattleMetrics {
   }
   
   def center(group:BattleGroup):Position = {
-    val airCenter = group.units.map(_.position).centroid
-    group.units.map(_.position).minBy(_.distanceSquared(airCenter))
+    val airCenter = group.units.view.map(_.position).centroid
+    group.units.view.map(_.position).minBy(_.distanceSquared(airCenter))
   }
   
   def expectedSpread(group:BattleGroup):Int = {
-    Math.sqrt(group.units.map(_.utype.width + 8).sum).toInt
+    Math.sqrt(group.units.view.map(_.utype.width + 8).sum).toInt
   }
   
   def actualSpread(group:BattleGroup):Int = {
     Math.max(0,
-      (group.units.map(unit => Math.max(0, unit.distance(group.center) - unit.range)).sum / group.units.size).toInt
+      (group.units.view.map(unit => Math.max(0, unit.distance(group.center) - unit.range)).sum / group.units.size).toInt
       - group.expectedSpread)
   }
   
   def evaluate(group:BattleGroup, battle:Battle):Int = {
-    group.units.map(evaluate(_, battle.focus)).sum
+    group.units.view.map(evaluate(_, battle.focus)).sum
   }
   
   def evaluate(unit:UnitInfo):Int = {
@@ -64,7 +64,7 @@ object BattleMetrics {
     val distanceDropoff = 16.0
     val distanceCutoff = 32.0 * 4
     val distance = Math.min(0, unit.distance(position) - unit.range)
-    val distanceFactor = Math.min(0.0, Math.max(1.0, (distanceCutoff + distanceDropoff - distance )/distanceCutoff))
+    val distanceFactor = Math.max(0.0, Math.min(1.0, (distanceCutoff + distanceDropoff - distance )/distanceCutoff))
     
     //Shortcut
     if (distanceFactor == 0) return 0

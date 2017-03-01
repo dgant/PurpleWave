@@ -39,8 +39,8 @@ object Overlay {
   }
   
   def _drawBattle(battle:Battle) {
-    if (battle.enemy.strength * battle.us.strength == 0) return
-    if (battle.us.vanguard.getDistance(battle.enemy.vanguard) > 32 * 20) return
+    //if (battle.enemy.strength * battle.us.strength == 0) return
+    //if (battle.us.vanguard.getDistance(battle.enemy.vanguard) > 32 * 20) return
     With.game.drawCircleMap(battle.focus, 8, Color.Brown)
     With.game.drawCircleMap(battle.us.vanguard, 8, Color.Green)
     With.game.drawCircleMap(battle.enemy.vanguard, 8, Color.Red)
@@ -69,7 +69,7 @@ object Overlay {
       drawBackground = true,
       backgroundColor = Color.Black)
     _drawTextLabel(
-      List(battle.us.strength + " - " + battle.enemy.strength),
+      List(battle.us.strength/100 + " - " + battle.enemy.strength/100),
       battle.focus,
       drawBackground = true,
       backgroundColor = Color.Brown)

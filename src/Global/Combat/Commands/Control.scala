@@ -17,8 +17,8 @@ object Control extends Command {
     } else {
       val groupStrengthUs     = 0.01 + intent.battle.get.us.strength
       val groupStrengthEnemy  = 0.01 + intent.battle.get.enemy.strength
-      val localStrengthUs     = 0.01 + intent.battle.get.us.units.map(otherUnit => BattleMetrics.evaluate(otherUnit, unit.position)).sum
-      val localStrengthEnemy  = 0.01 + intent.battle.get.enemy.units.map(otherUnit => BattleMetrics.evaluate(otherUnit, unit.position)).sum
+      val localStrengthUs     = 0.01 + intent.battle.get.us.units.view.map(otherUnit => BattleMetrics.evaluate(otherUnit, unit.position)).sum
+      val localStrengthEnemy  = 0.01 + intent.battle.get.enemy.units.view.map(otherUnit => BattleMetrics.evaluate(otherUnit, unit.position)).sum
       
       val groupConfidence = groupStrengthUs / groupStrengthEnemy
       val localConfidence = localStrengthUs / localStrengthEnemy

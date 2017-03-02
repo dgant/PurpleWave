@@ -13,7 +13,7 @@ class AutoCamera {
     if ( ! With.configuration.enableCamera) { return }
     if (With.battles.all.nonEmpty) {
       focus = With.battles.all.toList.sortBy(_.focus.getDistance(focus)).maxBy(b => b.enemy.strength * b.us.strength).us.vanguard
-      With.game.setLocalSpeed(30)
+      With.game.setLocalSpeed(20)
     } else {
       focus = With.units.ours.minBy(_.distanceSquared(Positions.middle)).position
       With.game.setLocalSpeed(0)

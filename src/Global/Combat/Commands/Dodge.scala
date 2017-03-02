@@ -9,11 +9,17 @@ object Dodge extends Command{
   def execute(intent:Intention) {
   
     val unit = intent.unit
-    val closestEnemy = intent.battle.map(_.enemy.units.minBy(_.distanceSquared(unit)))
+    
+    if (intent.battle.isEmpty) {
+      Flee.execute(intent)
+      return
+    }
+    
+    val enemies = intent.battle.get.enemy.units
     
     val kitePositions =
-      (-5 to 5).flatten(dy =>
-        (-5 to 5).map(dx =>
+      (-3 to 3).flatten(dy =>
+        (-3 to 3).map(dx =>
           unit.tilePosition.add(dx, dy)
         ))
         .filter(With.geography.isWalkable)
@@ -22,7 +28,7 @@ object Dodge extends Command{
       With.commander.move(this, unit,
         kitePositions.map(_.toPosition)
           .sortBy(position => position.distanceSquared(With.geography.home))
-          .maxBy(position => closestEnemy.get.distanceSquared(position).toInt/32))
+          .maxBy(position => enemies.map(_.distanceSquared(position)).min.toInt/32))
     }
     else {
       With.logger.warn(unit.utype + " had nowhere to dodge near " + unit.tilePosition)

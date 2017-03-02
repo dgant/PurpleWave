@@ -22,21 +22,12 @@ object Dodge extends Command{
         (-3 to 3).map(dx =>
           unit.tilePosition.add(dx, dy)
         ))
-        .filter(With.geography.isWalkable)
+        .filter(With.maps.walkability.get(_) > 0)
     
     if (kitePositions.nonEmpty) {
       With.commander.move(this, unit,
         kitePositions
-          .sortBy(tilePosition => tilePosition.distanceSquared(With.geography.home.toTilePosition))
-          .sortBy(tilePosition =>
-            - (-1 to 1).flatten(dy =>
-              (-1 to 1).map(dx =>
-                tilePosition.add(dx, dy)))
-              .filter(tilePosition => With.geography.isWalkable(tilePosition))
-              //This is probably good but is too slow
-              //.filter(tilePosition => ! With.units.all.filter(_.utype.isBuilding).forall(unit => unit.tileArea.contains(tilePosition)))
-              .size)
-          .maxBy(tilePosition => enemies.map(_.tilePosition.distanceSquared(tilePosition)).min)
+          .maxBy(tilePosition => With.maps.mobility.get(tilePosition) * enemies.map(_.tilePosition.distanceSquared(tilePosition)).min)
           .toPosition)
     }
     else {

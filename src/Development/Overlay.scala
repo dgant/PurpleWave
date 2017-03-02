@@ -1,5 +1,6 @@
 package Development
 
+import Geometry.Field.InfluenceMap
 import Geometry.TileRectangle
 import Global.Combat.Battle.Battle
 import Plans.Allocation.{LockCurrency, LockUnits}
@@ -7,7 +8,7 @@ import Plans.Plan
 import Startup.With
 import Types.UnitInfo.ForeignUnitInfo
 import Utilities.Enrichment.EnrichPosition._
-import bwapi.{Color, Position, UnitCommandType}
+import bwapi.{Color, Position, TilePosition, UnitCommandType}
 import bwta.BWTA
 
 import scala.collection.JavaConverters._
@@ -20,6 +21,7 @@ object Overlay {
       if (With.configuration.enableOverlayBattles)        _drawBattles()
       if (With.configuration.enableOverlayEconomy)        _drawEconomy()
       if (With.configuration.enableOverlayExclusions)     _drawExclusions()
+      if (With.configuration.enableOverlayMaps)           _drawMaps()
       if (With.configuration.enableOverlayUnits)          _drawUnits()
       if (With.configuration.enableOverlayPlans)          _drawPlans()
       if (With.configuration.enableOverlayResources)      _drawResources()
@@ -110,6 +112,17 @@ object Overlay {
           centroid.toPosition,
           position.toPosition,
           Color.Teal))})
+  }
+  
+  def _drawMaps() {
+    _drawMap(With.maps.mobility)
+  }
+  
+  def _drawMap(map:InfluenceMap) {
+    map.points
+      .map(point => new TilePosition(point._1, point._2))
+      .filter(tilePosition => map.get(tilePosition) > 0)
+      .foreach(tilePosition => With.game.drawTextMap(tilePosition.toPosition, map.get(tilePosition).toString))
   }
   
   def _drawPlans() {

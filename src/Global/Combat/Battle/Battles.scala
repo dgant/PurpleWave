@@ -49,7 +49,10 @@ class Battles {
   }
   
   def _getFighters(units:Iterable[UnitInfo]):Iterable[UnitInfo] = {
-    units.filter(u => u.possiblyStillThere && u.canFight && ! u.utype.isWorker)
+    units.filter(
+      u => u.possiblyStillThere
+      && u.canFight
+      && ! u.utype.isWorker)
   }
   
   def _assignBattles(

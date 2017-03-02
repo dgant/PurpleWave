@@ -31,6 +31,7 @@ class Bot() extends DefaultBWListener {
       With.gameplan = new WinTheGame
       With.history = new History
       With.intelligence = new Intelligence
+      With.maps = new Maps
       With.prioritizer = new Prioritizer
       With.recruiter = new Recruiter
       With.scheduler = new Scheduler
@@ -48,6 +49,7 @@ class Bot() extends DefaultBWListener {
   override def onFrame() {
     try {
       With.units.onFrame()
+      With.maps.onFrame()
       With.battles.onFrame()
       With.economy.onFrame()
       With.bank.onFrame()

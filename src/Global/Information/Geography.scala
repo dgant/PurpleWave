@@ -3,21 +3,14 @@ package Global.Information
 import Geometry.{Clustering, TileRectangle}
 import Startup.With
 import Types.UnitInfo.FriendlyUnitInfo
+import Utilities.Caching.{Cache, CacheForever}
 import Utilities.Enrichment.EnrichPosition._
 import Utilities.Enrichment.EnrichUnitType._
-import Utilities.Caching.{Cache, CacheForever}
 import bwapi.{Position, TilePosition, UnitType}
 
 import scala.collection.JavaConverters._
-import scala.collection.mutable
 
 class Geography {
-  
-  val isWalkable = new mutable.HashMap[TilePosition, Boolean] {
-    override def default(tile: TilePosition): Boolean = {
-      (0 to 3).forall(dx =>
-        (0 to 3).forall(dy =>
-          With.game.isWalkable(tile.getX * 4 + dx, tile.getY * 4 + dy)))}}
   
   def centerPosition:Position = {
     new Position(With.game.mapWidth * 32 / 2, With.game.mapHeight* 32 / 2)

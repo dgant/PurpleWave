@@ -70,7 +70,37 @@ case object EnrichPosition {
     def distanceSquared(otherPosition:Position):Int = {
       val dx = position.getX - otherPosition.getX
       val dy = position.getY - otherPosition.getY
-      dx * dx + dy * dy}
+      dx * dx + dy * dy
+    }
+  }
+  
+  implicit class EnrichedWalkPosition(position:WalkPosition) {
+    def add(dx:Int, dy:Int):WalkPosition = {
+      new WalkPosition(position.getX + dx, position.getY + dy)
+    }
+    def add(otherPosition:WalkPosition):WalkPosition = {
+      add(otherPosition.getX, otherPosition.getY)
+    }
+    def subtract(dx:Int, dy:Int):WalkPosition = {
+      add(-dx, -dy)
+    }
+    def subtract(otherPosition:WalkPosition):WalkPosition = {
+      subtract(otherPosition.getX, otherPosition.getY)
+    }
+    def multiply(scale:Int):WalkPosition = {
+      new WalkPosition(scale * position.getX, scale * position.getY)
+    }
+    def divide(scale:Int):WalkPosition = {
+      new WalkPosition(position.getX / scale, position.getY / scale)
+    }
+    def midpoint(otherPosition:WalkPosition):WalkPosition = {
+      add(otherPosition).divide(2)
+    }
+    def distanceSquared(otherPosition:WalkPosition):Int = {
+      val dx = position.getX - otherPosition.getX
+      val dy = position.getY - otherPosition.getY
+      dx * dx + dy * dy
+    }
   }
   
   implicit class EnrichedTilePosition(position:TilePosition) {
@@ -98,9 +128,10 @@ case object EnrichPosition {
     def distanceSquared(otherPosition:TilePosition):Int = {
       val dx = position.getX - otherPosition.getX
       val dy = position.getY - otherPosition.getY
-      dx * dx + dy * dy}
+      dx * dx + dy * dy
+    }
     def toWalkPosition:WalkPosition = {
-      new WalkPosition(position.getX * 8, position.getY * 8)
+      new WalkPosition(position.getX * 4, position.getY * 4)
     }
   }
 }

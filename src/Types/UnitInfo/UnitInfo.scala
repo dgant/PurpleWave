@@ -32,7 +32,7 @@ abstract class UnitInfo (var baseUnit:bwapi.Unit) {
   //This ignores spellcasters
   //TODO: Move this onto EnhancedUnitType
   def canFight: Boolean = {
-    complete && utype.canAttack || List(UnitType.Protoss_Carrier, UnitType.Protoss_Reaver).contains(utype)
+    complete && utype.canAttack || List(UnitType.Protoss_Carrier, UnitType.Protoss_Reaver, UnitType.Terran_Bunker).contains(utype)
   }
   
   def x                                       : Int           = position.getX

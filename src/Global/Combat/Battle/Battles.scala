@@ -14,9 +14,11 @@ class Battles {
   
   val limitBattleDefinition = new Limiter(6, _defineBattles)
   def onFrame() {
-    limitBattleDefinition.act()
-    all.foreach(update)
-    all.filterNot(isValid).foreach(all.remove)
+    if (With.game.getRemainingLatencyFrames == 0) {
+      limitBattleDefinition.act()
+      all.foreach(update)
+      all.filterNot(isValid).foreach(all.remove)
+    }
   }
   
   def update(battle:Battle) {

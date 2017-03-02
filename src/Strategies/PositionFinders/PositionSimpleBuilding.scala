@@ -33,7 +33,7 @@ class PositionSimpleBuilding(
       return Some(basePositions.minBy(_.distanceSquared(startPosition)))
     }
     
-    val maxMargin = if (buildingType == UnitType.Protoss_Pylon) 4 else 1
+    val maxMargin = if (buildingType == UnitType.Protoss_Pylon) 3 else 1
   
     var output:Option[TilePosition] = None
     (0 to maxMargin).reverse.foreach(margin =>

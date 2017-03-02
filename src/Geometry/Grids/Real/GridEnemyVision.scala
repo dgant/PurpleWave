@@ -1,9 +1,10 @@
-package Geometry.Field
+package Geometry.Grids.Real
 
 import Geometry.Circle
+import Geometry.Grids.Abstract.GridInt
 import Startup.With
 
-class MapEnemyVision extends InfluenceMap {
+class GridEnemyVision extends GridInt {
   override def update() {
     reset()
     With.units.enemy.filter(_.possiblyStillThere).foreach(u => {

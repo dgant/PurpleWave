@@ -1,5 +1,4 @@
 package Global.Combat.Commands
-import Global.Combat.Battle.BattleMetrics
 import Startup.With
 import Types.Intents.Intention
 
@@ -17,8 +16,10 @@ object Control extends Command {
     } else {
       val groupStrengthUs     = 0.01 + intent.battle.get.us.strength
       val groupStrengthEnemy  = 0.01 + intent.battle.get.enemy.strength
-      val localStrengthUs     = 0.01 + intent.battle.get.us.units.view.map(otherUnit => BattleMetrics.evaluate(otherUnit, unit.position)).sum
-      val localStrengthEnemy  = 0.01 + intent.battle.get.enemy.units.view.map(otherUnit => BattleMetrics.evaluate(otherUnit, unit.position)).sum
+      //val localStrengthUs     = 0.01 + intent.battle.get.us.units.view.map(otherUnit => BattleMetrics.evaluate(otherUnit, unit.position)).sum
+      //val localStrengthEnemy  = 0.01 + intent.battle.get.enemy.units.view.map(otherUnit => BattleMetrics.evaluate(otherUnit, unit.position)).sum
+      val localStrengthUs = With.maps.friendlyGroundStrength.get(unit.tilePosition)
+      val localStrengthEnemy = With.maps.enemyGroundStrength.get(unit.tilePosition)
       
       val strengthFactor =  0.5 + unit.totalHealth.toDouble / unit.maxTotalHealth / 2
       val groupConfidence = groupStrengthUs / groupStrengthEnemy

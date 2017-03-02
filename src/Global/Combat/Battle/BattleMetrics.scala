@@ -33,30 +33,21 @@ object BattleMetrics {
   
   def evaluate(unit:UnitInfo):Int = {
   
+    var dps = unit.groundDps
+    var range = unit.range
+    
     //Fails to account for casters
     //Fails to account for carriers/reavers
     //Fails to account for upgrades (including range upgrades)
-  
-    var dps = unit.groundDps
-    var range = unit.range
+    //Fails to account for medics
   
     if (unit.utype == UnitType.Terran_Bunker) {
       dps = 4 * UnitType.Terran_Marine.groundDps
       range = UnitType.Terran_Marine.range
     }
   
-    val highGroundFactorRaw = With.game.getGroundHeight(unit.tilePosition)
-    val highGroundMultiplier = 1.3
-    val highGroundFactor = highGroundFactorRaw match {
-      case 0 => 1.0
-      case 1 => 1.0 * highGroundMultiplier
-      case 2 => 1.0 * highGroundMultiplier
-      case 3 => 1.0 * highGroundMultiplier * highGroundMultiplier
-      case 4 => 1.0 * highGroundMultiplier * highGroundMultiplier
-      case _ => 1.0 * highGroundMultiplier * highGroundMultiplier * highGroundMultiplier
-    }
-  
-    val combatEfficacy = dps * unit.totalHealth * highGroundFactor
+    val highGroundBonus = With.maps.altitudeBonus.get(unit.tilePosition)
+    val combatEfficacy = dps * unit.totalHealth * highGroundBonus
     Math.max(0, combatEfficacy).toInt
   }
   

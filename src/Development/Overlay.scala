@@ -1,6 +1,6 @@
 package Development
 
-import Geometry.Field.InfluenceMap
+import Geometry.Grids.Abstract.Grid
 import Geometry.TileRectangle
 import Global.Combat.Battle.Battle
 import Plans.Allocation.{LockCurrency, LockUnits}
@@ -8,7 +8,7 @@ import Plans.Plan
 import Startup.With
 import Types.UnitInfo.ForeignUnitInfo
 import Utilities.Enrichment.EnrichPosition._
-import bwapi.{Color, Position, TilePosition, UnitCommandType}
+import bwapi.{Color, Position, UnitCommandType}
 import bwta.BWTA
 
 import scala.collection.JavaConverters._
@@ -115,14 +115,15 @@ object Overlay {
   }
   
   def _drawMaps() {
-    _drawMap(With.maps.mobility)
+    _drawMap(With.maps.friendlyGroundStrength, 0, 0)
+    _drawMap(With.maps.enemyGroundStrength, 0, 1)
+    //_drawMap(With.maps.mobility, 1, 1)
   }
   
-  def _drawMap(map:InfluenceMap) {
-    map.points
-      .map(point => new TilePosition(point._1, point._2))
-      .filter(tilePosition => map.get(tilePosition) > 0)
-      .foreach(tilePosition => With.game.drawTextMap(tilePosition.toPosition, map.get(tilePosition).toString))
+  def _drawMap[T](map:Grid[T], offsetX:Int=0, offsetY:Int=0) {
+    map.positions
+      .filter(tilePosition => map.get(tilePosition) != 0)
+      .foreach(tilePosition => With.game.drawTextMap(tilePosition.toPosition.add(offsetX*16, offsetY*13), map.repr(map.get(tilePosition))))
   }
   
   def _drawPlans() {

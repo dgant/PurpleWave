@@ -1,16 +1,20 @@
 package Global.Information
 
-import Geometry.Field.{MapEnemyGroundDamage, MapFriendlyGroundDamage, MapMobility, MapWalkability}
+import Geometry.Grids.Real._
 
 class Maps {
-  val enemyGroundDamage = new MapEnemyGroundDamage
-  val friendlyGroundDamage = new MapFriendlyGroundDamage
-  val walkability = new MapWalkability
-  val mobility = new MapMobility
+  val enemyGroundStrength = new GridEnemyGroundStrength
+  val friendlyGroundStrength = new GridFriendlyGroundStrength
+  val enemyVision = new GridEnemyVision
+  val altitudeBonus = new GridAltitudeBonus
+  val walkability = new GridWalkability
+  val mobility = new GridMobility
   
   def onFrame() {
-    enemyGroundDamage.update()
-    friendlyGroundDamage.update()
+    enemyGroundStrength.update()
+    friendlyGroundStrength.update()
+    enemyVision.update()
+    altitudeBonus.update()
     walkability.update()
     mobility.update()
   }

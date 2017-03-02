@@ -23,9 +23,7 @@ class BuildWorkersContinuously extends AbstractBuildContinuously[TrainUnit] {
   }
   
   def _workerCap:Int = {
-    //Cap the number of bases to saturate so we don't accidentally max out on probes
-    //Assuming we want three on gas and 2 per mineral
-    Math.min(3, With.economy.ourMiningBases.size) * (3 + 9 * 2)
+    Math.min(3, With.economy.ourMiningBases.size) * 24
   }
   
   def _maxWorkersToBuildSimultaneously:Int = {

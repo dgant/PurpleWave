@@ -45,19 +45,33 @@ abstract class Grid[T] {
     _get(x + y * _width)
   }
   def get(position:Position):T = {
-    _get(_pointsPerTile*position.getX/32, _pointsPerTile*position.getY/32)
+    if (position.isValid) {
+      _get(_pointsPerTile * position.getX / 32, _pointsPerTile * position.getY / 32)
+    }
+    else {
+      _defaultValue
+    }
   }
   def get(position:WalkPosition):T = {
-    _get(_pointsPerTile*position.getX/8, _pointsPerTile*position.getY/8)
+    if (position.isValid) {
+      _get(_pointsPerTile * position.getX / 8, _pointsPerTile * position.getY / 8)
+    } else {
+      _defaultValue
+    }
   }
   def get(position:TilePosition):T = {
-    _get(_pointsPerTile*position.getX, _pointsPerTile*position.getY)
+    if (position.isValid) {
+      _get(_pointsPerTile*position.getX, _pointsPerTile*position.getY)
+    } else {
+      _defaultValue
+    }
   }
   def set(i:Int, value:T) {
     if (i < 0 || i >= _positions.length) return
     _positions(i) = value
   }
   def _set(x:Int, y:Int, value:T) {
+    if (x > 0 && y > 0 && x < _width)
     set(x + y * _width, value)
   }
   def setPosition(x:Int, y:Int, value:T) {
@@ -70,13 +84,13 @@ abstract class Grid[T] {
     _set(tileX, tileY, value)
   }
   def set(position:Position, value:T) {
-    setPosition(position.getX, position.getY, value)
+    if (position.isValid) setPosition(position.getX, position.getY, value)
   }
   def set(position:WalkPosition, value:T) {
-    setWalkPosition(position.getX, position.getY, value)
+    if (position.isValid) setWalkPosition(position.getX, position.getY, value)
   }
   def set(position:TilePosition, value:T) {
-    setTilePosition(position.getX, position.getY, value)
+    if (position.isValid) setTilePosition(position.getX, position.getY, value)
   }
   
   def repr(value:T):String

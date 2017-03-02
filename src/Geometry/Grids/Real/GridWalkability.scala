@@ -4,6 +4,7 @@ import Geometry.Grids.Abstract.GridInt
 import Startup.With
 import Utilities.Caching.Limiter
 import Utilities.Enrichment.EnrichPosition._
+import Utilities.Enrichment.EnrichUnitType._
 
 class GridWalkability extends GridInt {
   
@@ -21,5 +22,9 @@ class GridWalkability extends GridInt {
             (0 to 3).forall(dx =>
               With.game.isWalkable(tilePosition.toWalkPosition.add(dx, dy)))))
           1 else 0))
+    With.units.buildings
+      .filter( ! _.flying)
+      .foreach(building => building.utype.tiles
+        .foreach(tile => set(building.tilePosition.add(tile), 0)))
   }
 }

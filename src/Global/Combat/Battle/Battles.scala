@@ -13,10 +13,10 @@ class Battles {
   val all = new mutable.HashSet[Battle]
   
   val limitBattleDefinition = new Limiter(6, _defineBattles)
+  val limitBattleUpdates = new Limiter(6, _updateBattles)
   def onFrame() {
     limitBattleDefinition.act()
-    all.foreach(update)
-    all.filterNot(isValid).foreach(all.remove)
+    limitBattleUpdates.act()
   }
   
   def update(battle:Battle) {
@@ -27,8 +27,6 @@ class Battles {
     }
     groups.foreach(group => {
       group.center          = BattleMetrics.center(group)
-      group.expectedSpread  = BattleMetrics.expectedSpread(group)
-      group.spread          = BattleMetrics.actualSpread(group)
     })
     battle.us.vanguard    = battle.us.units.minBy(_.position.distanceSquared(battle.enemy.center)).position
     battle.enemy.vanguard = battle.enemy.units.minBy(_.position.distanceSquared(battle.us.center)).position
@@ -46,6 +44,11 @@ class Battles {
     val ourGroups = ourClusters.map(group => new BattleGroup(group))
     val enemyGroups = enemyClusters.map(group => new BattleGroup(group))
     _assignBattles(ourGroups, enemyGroups)
+  }
+  
+  def _updateBattles() {
+    all.foreach(update)
+    all.filterNot(isValid).foreach(all.remove)
   }
   
   def _getFighters(units:Iterable[UnitInfo]):Iterable[UnitInfo] = {

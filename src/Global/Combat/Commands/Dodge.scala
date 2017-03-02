@@ -27,7 +27,6 @@ object Dodge extends Command{
         kitePositions
           .maxBy(tilePosition =>
             With.maps.mobility.get(tilePosition)
-              * With.maps.friendlyGroundStrength.get(tilePosition)
               / (1 + With.maps.enemyGroundStrength.get(tilePosition)))
           .toPosition)
     }

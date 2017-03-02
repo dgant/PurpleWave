@@ -1,6 +1,5 @@
 package Geometry.Grids.Real
 
-import Geometry.Circle
 import Geometry.Grids.Abstract.GridInt
 import Startup.With
 import Utilities.Caching.Limiter
@@ -15,12 +14,21 @@ class GridMobility extends GridInt {
   def _update() {
     reset()
     With.maps.walkability.update()
+    
+    val distanceMax = 3
   
     positions
       .filter(With.maps.walkability.get(_) > 0)
       .foreach(ourPosition =>
-        Circle.points(3)
-          .map(delta => ourPosition.add(delta._1, delta._2))
-          .foreach(nearbyPosition => add(ourPosition, With.maps.walkability.get(nearbyPosition))))
+        (-1 to 1).foreach(my =>
+          (-1 to 1).foreach(mx => {
+            var doContinue = mx != 0 || my != 0
+            (1 to distanceMax).foreach(distance =>
+              if (doContinue) {
+                val nextPosition = ourPosition.add(mx * distance, my * distance)
+                doContinue = With.maps.walkability.get(nextPosition) > 0
+                if (doContinue) { add(ourPosition, 1) }
+              })
+          })))
   }
 }

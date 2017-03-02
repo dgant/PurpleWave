@@ -23,6 +23,10 @@ class Units {
     ours ++ enemy ++ neutral
   }
   
+  def buildings:Set[UnitInfo] = {
+    all.filter(_.utype.isBuilding)
+  }
+  
   def ours:Set[FriendlyUnitInfo] = {
     _friendlyUnitTracker.ourUnits
   }

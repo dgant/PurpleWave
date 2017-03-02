@@ -57,20 +57,6 @@ object Overlay {
       battle.enemy.units.map(_.position).maxBound,
       Color.Red)
     _drawTextLabel(
-      List(
-        "Size: " + battle.us.expectedSpread,
-        "Spread: " + battle.us.spread),
-      battle.us.center.subtract(64, 64),
-      drawBackground = true,
-      backgroundColor = Color.Black)
-    _drawTextLabel(
-      List(
-        "Size: " + battle.enemy.expectedSpread,
-        "Spread: " + battle.enemy.spread),
-      battle.enemy.center.add(64, 64),
-      drawBackground = true,
-      backgroundColor = Color.Black)
-    _drawTextLabel(
       List(battle.us.strength/100 + " - " + battle.enemy.strength/100),
       battle.focus,
       drawBackground = true,
@@ -115,9 +101,7 @@ object Overlay {
   }
   
   def _drawGrids() {
-    _drawGrid(With.maps.friendlyGroundStrength, 0, 0)
-    _drawGrid(With.maps.enemyGroundStrength, 0, 1)
-    _drawGrid(With.maps.mobility, 1, 1)
+    _drawGrid(With.maps.mobility, 0, 0)
   }
   
   def _drawGrid[T](map:Grid[T], offsetX:Int=0, offsetY:Int=0) {

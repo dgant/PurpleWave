@@ -26,9 +26,16 @@ object Dodge extends Command{
     
     if (kitePositions.nonEmpty) {
       With.commander.move(this, unit,
-        kitePositions.map(_.toPosition)
-          .sortBy(position => position.distanceSquared(With.geography.home))
-          .maxBy(position => enemies.map(_.distanceSquared(position)).min.toInt/32))
+        kitePositions
+          .sortBy(tilePosition => tilePosition.distanceSquared(With.geography.home.toTilePosition))
+          .sortBy(tilePosition =>
+            - (-1 to 1).flatten(dy =>
+              (-1 to 1).map(dx =>
+                tilePosition.add(dx, dy)))
+              .filter(tilePosition => With.geography.isWalkable(tilePosition))
+              .size)
+          .maxBy(tilePosition => enemies.map(_.tilePosition.distanceSquared(tilePosition)).min)
+          .toPosition)
     }
     else {
       With.logger.warn(unit.utype + " had nowhere to dodge near " + unit.tilePosition)

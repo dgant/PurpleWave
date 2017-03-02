@@ -24,8 +24,8 @@ object Control extends Command {
       val groupConfidence = groupStrengthUs / groupStrengthEnemy
       val localConfidence = strengthFactor * localStrengthUs / localStrengthEnemy
 
-      if (groupConfidence < 0.5) {
-        if (localConfidence < 1) {
+      if (groupConfidence < 0.3) {
+        if (localConfidence < 0.3) {
           Flee.execute(intent)
         }
         else {

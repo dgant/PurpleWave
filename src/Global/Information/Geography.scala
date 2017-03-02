@@ -105,7 +105,7 @@ class Geography {
     val extantCandidates = candidates.filter(_.nonEmpty).map(_.get)
     
     if (extantCandidates.isEmpty) return None
-    Some(extantCandidates.minBy(candidate => resources.map(_.distanceSquared(candidate)).sum))
+    Some(extantCandidates.minBy(candidate => resources.map(_.distanceSquared(candidate)).max))
   }
   
   def _isLegalBasePosition(position:TilePosition, centroid:TilePosition):Boolean = {

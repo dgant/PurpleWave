@@ -14,7 +14,7 @@ object Flee extends Command {
       Engage.execute(intent)
     }
     else {
-      March.execute(intent)
+      Dodge.execute(intent)
     }
   }
   

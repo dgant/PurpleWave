@@ -21,7 +21,7 @@ object Overlay {
       if (With.configuration.enableOverlayBattles)        _drawBattles()
       if (With.configuration.enableOverlayEconomy)        _drawEconomy()
       if (With.configuration.enableOverlayExclusions)     _drawExclusions()
-      if (With.configuration.enableOverlayMaps)           _drawMaps()
+      if (With.configuration.enableOverlayGrids)          _drawGrids()
       if (With.configuration.enableOverlayUnits)          _drawUnits()
       if (With.configuration.enableOverlayPlans)          _drawPlans()
       if (With.configuration.enableOverlayResources)      _drawResources()
@@ -114,13 +114,13 @@ object Overlay {
           Color.Teal))})
   }
   
-  def _drawMaps() {
-    _drawMap(With.maps.friendlyGroundStrength, 0, 0)
-    _drawMap(With.maps.enemyGroundStrength, 0, 1)
-    //_drawMap(With.maps.mobility, 1, 1)
+  def _drawGrids() {
+    _drawGrid(With.maps.friendlyGroundStrength, 0, 0)
+    _drawGrid(With.maps.enemyGroundStrength, 0, 1)
+    _drawGrid(With.maps.mobility, 1, 1)
   }
   
-  def _drawMap[T](map:Grid[T], offsetX:Int=0, offsetY:Int=0) {
+  def _drawGrid[T](map:Grid[T], offsetX:Int=0, offsetY:Int=0) {
     map.positions
       .filter(tilePosition => map.get(tilePosition) != 0)
       .foreach(tilePosition => With.game.drawTextMap(tilePosition.toPosition.add(offsetX*16, offsetY*13), map.repr(map.get(tilePosition))))

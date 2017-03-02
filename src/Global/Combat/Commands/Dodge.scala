@@ -15,8 +15,6 @@ object Dodge extends Command{
       return
     }
     
-    val enemies = intent.battle.get.enemy.units
-    
     val kitePositions =
       (-3 to 3).flatten(dy =>
         (-3 to 3).map(dx =>
@@ -27,7 +25,10 @@ object Dodge extends Command{
     if (kitePositions.nonEmpty) {
       With.commander.move(this, unit,
         kitePositions
-          .maxBy(tilePosition => With.maps.mobility.get(tilePosition) * enemies.map(_.tilePosition.distanceSquared(tilePosition)).min)
+          .maxBy(tilePosition =>
+            With.maps.mobility.get(tilePosition)
+              * With.maps.friendlyGroundStrength.get(tilePosition)
+              / (1 + With.maps.enemyGroundStrength.get(tilePosition)))
           .toPosition)
     }
     else {

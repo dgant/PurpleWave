@@ -5,6 +5,7 @@ import Global.Combat.Battle.BattleMetrics
 import Types.UnitInfo.UnitInfo
 import Utilities.Caching.Limiter
 import Utilities.Enrichment.EnrichPosition._
+import bwapi.TilePosition
 
 abstract class GridStrength extends GridInt {
   
@@ -16,11 +17,17 @@ abstract class GridStrength extends GridInt {
   def _update() {
     reset()
     _getUnits.foreach(unit => {
-      val strength = BattleMetrics.evaluate(unit)
+      val rangeMarginFull = 32
+      val rangeMarginHalf = 32 * 3
+      val strengthHalf = BattleMetrics.evaluate(unit) / 2
       val tilePosition = unit.position.toTilePosition //position.toTilePosition uses the unit's center rather than its top-left corner
-      Circle.points((unit.range + 16)/32).foreach(point =>
-        add(tilePosition.add(point._1, point._2), strength))
+      _populate(tilePosition, (unit.range + rangeMarginFull)/32, strengthHalf)
+      _populate(tilePosition, (unit.range + rangeMarginHalf)/32, strengthHalf)
     })
+  }
+  
+  def _populate(tilePosition:TilePosition, tileRange:Int, strength:Int) {
+    Circle.points(tileRange).foreach(point => add(tilePosition.add(point._1, point._2), strength))
   }
   
   def _getUnits:Iterable[UnitInfo]

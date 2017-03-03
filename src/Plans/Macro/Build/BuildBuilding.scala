@@ -1,7 +1,7 @@
 package Plans.Macro.Build
 
 import Development.TypeDescriber
-import Global.Combat.Commands.March
+import Global.Combat.Commands.{Approach, March}
 import Plans.Allocation.{LockCurrency, LockCurrencyForUnit, LockUnits, LockUnitsExactly}
 import Plans.Plan
 import Startup.With
@@ -100,10 +100,10 @@ class BuildBuilding(val buildingType:UnitType) extends Plan {
         val positionExplored = With.game.isExplored(_position.get)
         
         // Can't order builds in fog of war
-        if (positionExplored) {
+        if (positionExplored && builder.distance(_position.get) < 32 * 4) {
           builder.baseUnit.build(buildingType, _position.get)
         } else {
-          builder.baseUnit.move(_position.get.toPosition)
+          With.commander.intend(new Intention(builder, Approach, Some(_position.get.centerPosition)))
         }
       }
     }

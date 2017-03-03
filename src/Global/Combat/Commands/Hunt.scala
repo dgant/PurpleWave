@@ -16,7 +16,7 @@ object Hunt extends Command {
         With.commander.move(this, intent.unit, intent.targetUnit.get.position)
       }
     } else {
-      With.commander.attack(this, intent.unit, intent.targetUnit.get)
+      With.commander.attack(this, intent.unit, intent.targetUnit.get.position)
     }
   }
 }

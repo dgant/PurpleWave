@@ -14,6 +14,7 @@ class ProtossStrategyMacro extends AllParallel {
     new BuildableUnit(UnitType.Protoss_Nexus),
     new BuildableUnit(UnitType.Protoss_Pylon),
     new BuildableUnit(UnitType.Protoss_Gateway),
+    new BuildableUnit(UnitType.Protoss_Pylon),
     new BuildableUnit(UnitType.Protoss_Cybernetics_Core),
     new BuildableUnit(UnitType.Protoss_Assimilator),
     new BuildableUnit(UnitType.Protoss_Gateway),

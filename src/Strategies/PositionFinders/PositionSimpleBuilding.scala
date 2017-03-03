@@ -30,7 +30,7 @@ class PositionSimpleBuilding(
       })
         
       if (basePositions.isEmpty) return None
-      return Some(basePositions.minBy(_.distanceSquared(startPosition)))
+      return Some(basePositions.minBy(With.paths.getGroundDistance(_, startPosition)))
     }
     
     val maxMargin = if (buildingType == UnitType.Protoss_Pylon) 3 else 1

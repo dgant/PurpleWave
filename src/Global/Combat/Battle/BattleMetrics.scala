@@ -33,25 +33,20 @@ object BattleMetrics {
       dps = 4 * UnitType.Terran_Marine.groundDps
     }
   
-    val highGroundBonus = With.maps.altitudeBonus.get(unit.tilePosition)
+    val highGroundBonus = With.grids.altitudeBonus.get(unit.tilePosition)
     val combatEfficacy = dps * unit.totalHealth * highGroundBonus
     Math.max(0, combatEfficacy).toInt
   }
   
   def evaluate(unit:UnitInfo, position:Position):Int = {
+    val distanceDropoff = 16.0
+    val distanceCutoff = 32.0 * 4
+    val distance = Math.max(0, unit.distance(position) - unit.range)
+    val distanceFactor = Math.max(0.0, Math.min(1.0, (distanceCutoff + distanceDropoff - distance ) / distanceCutoff))
     
-    if (false) {
-      val distanceDropoff = 16.0
-      val distanceCutoff = 32.0 * 4
-      val distance = Math.max(0, unit.distance(position) - unit.range)
-      val distanceFactor = Math.max(0.0, Math.min(1.0, (distanceCutoff + distanceDropoff - distance ) / distanceCutoff))
-      
-      //Shortcut
-      if (distanceFactor == 0) return 0
-      
-      (distanceFactor * evaluate(unit)).toInt
-    } else {
-      return evaluate(unit)
-    }
+    //Shortcut
+    if (distanceFactor == 0) return 0
+    
+    (distanceFactor * evaluate(unit)).toInt
   }
 }

@@ -12,8 +12,8 @@ class Battles {
   
   val all = new mutable.HashSet[Battle]
   
-  val limitBattleDefinition = new Limiter(6, _defineBattles)
-  val limitBattleUpdates = new Limiter(6, _updateBattles)
+  val limitBattleDefinition = new Limiter(24, _defineBattles)
+  val limitBattleUpdates = new Limiter(24, _updateBattles)
   def onFrame() {
     limitBattleDefinition.act()
     limitBattleUpdates.act()

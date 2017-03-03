@@ -16,33 +16,34 @@ object Control extends Command {
     } else {
       val groupStrengthUs     = 0.01 + intent.battle.get.us.strength
       val groupStrengthEnemy  = 0.01 + intent.battle.get.enemy.strength
-      //val localStrengthUs     = 0.01 + intent.battle.get.us.units.view.map(otherUnit => BattleMetrics.evaluate(otherUnit, unit.position)).sum
-      //val localStrengthEnemy  = 0.01 + intent.battle.get.enemy.units.view.map(otherUnit => BattleMetrics.evaluate(otherUnit, unit.position)).sum
-      val localStrengthUs = With.maps.friendlyGroundStrength.get(unit.tilePosition)
-      val localStrengthEnemy = With.maps.enemyGroundStrength.get(unit.tilePosition)
+      val localStrengthUs     = With.grids.friendlyGroundStrength.get(unit.position.toTilePosition)
+      val localStrengthEnemy  = With.grids.enemyGroundStrength.get(unit.position.toTilePosition)
       
       val strengthFactor =  0.5 + unit.totalHealth.toDouble / unit.maxTotalHealth / 2
       val groupConfidence = groupStrengthUs / groupStrengthEnemy
       val localConfidence = strengthFactor * localStrengthUs / localStrengthEnemy
 
-      if (groupConfidence < 0.3) {
-        if (localConfidence < 0.3) {
-          Flee.execute(intent)
+      if (groupConfidence < 1) {
+        if (localConfidence < 1) {
+          Approach.execute(intent)
         }
-        else {
+        else if (localConfidence < 1) {
           Skirt.execute(intent)
         }
+        else {
+          Engage.execute(intent)
+        }
       }
-      else if (groupConfidence < 1) {
-        Skirt.execute(intent)
-      }
-      else {
+      else if (groupConfidence < 2) {
         if (localConfidence < 1) {
           Skirt.execute(intent)
         }
         else {
           Engage.execute(intent)
         }
+      }
+      else {
+        Engage.execute(intent)
       }
     }
   }

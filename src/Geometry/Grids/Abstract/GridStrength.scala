@@ -2,10 +2,11 @@ package Geometry.Grids.Abstract
 
 import Geometry.Circle
 import Global.Combat.Battle.BattleMetrics
+import Startup.With
 import Types.UnitInfo.UnitInfo
 import Utilities.Caching.Limiter
-import Utilities.Enrichment.EnrichPosition._
 import bwapi.TilePosition
+import Utilities.Enrichment.EnrichPosition._
 
 abstract class GridStrength extends GridInt {
   
@@ -14,20 +15,29 @@ abstract class GridStrength extends GridInt {
     _limitUpdates.act()
   }
   
+  val rangeMargin = 16
+  
   def _update() {
     reset()
     _getUnits.foreach(unit => {
-      val rangeMarginFull = 32
-      val rangeMarginHalf = 32 * 3
-      val strengthHalf = BattleMetrics.evaluate(unit) / 2
+      val strength = BattleMetrics.evaluate(unit)
+      val latencyFrames = With.game.getLatencyFrames
       val tilePosition = unit.position.toTilePosition //position.toTilePosition uses the unit's center rather than its top-left corner
-      _populate(tilePosition, (unit.range + rangeMarginFull)/32, strengthHalf)
-      _populate(tilePosition, (unit.range + rangeMarginHalf)/32, strengthHalf)
+      val rangeFull = unit.range + rangeMargin
+      val rangeZero = unit.range + rangeMargin + (unit.utype.topSpeed() * (48 + latencyFrames)).toInt
+      if (strength > 0) {
+        _populate(tilePosition, rangeFull, rangeZero, strength)
+      }
     })
   }
   
-  def _populate(tilePosition:TilePosition, tileRange:Int, strength:Int) {
-    Circle.points(tileRange).foreach(point => add(tilePosition.add(point._1, point._2), strength))
+  def _populate(tile:TilePosition, distanceFull:Int, distanceZero:Int, strength:Int) {
+    Circle.points(distanceZero/32).foreach(point => {
+      val nearbyTile = tile.add(point._1, point._2)
+      val distance = Math.sqrt(32 * 32 * (point._1 * point._1 + point._2 * point._2))
+      val ratio = Math.min(1, Math.max(0, (distanceZero - distance) / (distanceZero - distanceFull)))
+      add(nearbyTile, (strength * ratio).toInt)
+    })
   }
   
   def _getUnits:Iterable[UnitInfo]

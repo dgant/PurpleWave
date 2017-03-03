@@ -4,6 +4,7 @@ import Plans.Allocation.{LockUnits, LockUnitsNobody}
 import Plans.Plan
 import Strategies.PositionFinders.{PositionCenter, PositionFinder}
 import Utilities.Property
+import Utilities.Enrichment.EnrichPosition._
 
 class PlanFulfillUnitAtLocation extends Plan {
   
@@ -16,6 +17,6 @@ class PlanFulfillUnitAtLocation extends Plan {
     unitPlan.get.onFrame()
     unitPlan.get.units.foreach(unit =>
         positionFinder.get.find.foreach(position =>
-          unit.baseUnit.move(position.toPosition)))
+          unit.baseUnit.move(position.centerPosition)))
   }
 }

@@ -17,5 +17,4 @@ object Flee extends Command {
       Dodge.execute(intent)
     }
   }
-  
 }

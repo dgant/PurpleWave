@@ -13,12 +13,12 @@ class GridMobility extends GridInt {
   }
   def _update() {
     reset()
-    With.maps.walkability.update()
+    With.grids.walkability.update()
     
     val distanceMax = 3
   
     positions
-      .filter(With.maps.walkability.get(_) > 0)
+      .filter(With.grids.walkability.get(_) > 0)
       .foreach(ourPosition =>
         (-1 to 1).foreach(my =>
           (-1 to 1).foreach(mx => {
@@ -26,7 +26,7 @@ class GridMobility extends GridInt {
             (1 to distanceMax).foreach(distance =>
               if (doContinue) {
                 val nextPosition = ourPosition.add(mx * distance, my * distance)
-                doContinue = With.maps.walkability.get(nextPosition) > 0
+                doContinue = With.grids.walkability.get(nextPosition) > 0
                 if (doContinue) { add(ourPosition, 1) }
               })
           })))

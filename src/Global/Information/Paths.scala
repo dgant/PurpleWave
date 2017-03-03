@@ -1,0 +1,42 @@
+package Global.Information
+
+import Startup.With
+import bwapi.TilePosition
+import bwta.BWTA
+
+import scala.collection.mutable
+
+class Paths {
+  
+  //Cache ground distances with a LRU (Least-recently used) cache
+  //This is a low number; let's increase it after we make sure _limitCacheSize works
+  val _maxCacheSize = 10000
+  val _distanceCache = new mutable.HashMap[(TilePosition, TilePosition), Int]
+  val _distanceAge = new mutable.HashMap[(TilePosition, TilePosition), Int]
+  
+  def getGroundDistance(origin:TilePosition, destination:TilePosition):Int = {
+    val request = (origin, destination)
+    if ( ! _distanceCache.contains(request)) {
+      _cacheDistance(request)
+    }
+    _distanceAge.put(request, With.game.getFrameCount)
+    val result = _distanceCache(request)
+    _limitCacheSize()
+    result
+  }
+  
+  def _cacheDistance(request:(TilePosition, TilePosition)) {
+    val distance = BWTA.getGroundDistance(request._1, request._2).toInt
+    _distanceCache.put(request, distance)
+  }
+  
+  def _limitCacheSize() {
+    if (_distanceCache.keys.size > _maxCacheSize) {
+      val cutoff = With.game.getFrameCount - 24 * 60
+      _distanceAge.filter(_._2 < cutoff).foreach(pair => {
+        _distanceCache.remove(pair._1)
+        _distanceAge.remove(pair._1)
+      })
+    }
+  }
+}

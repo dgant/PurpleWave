@@ -130,6 +130,9 @@ case object EnrichPosition {
       val dy = position.getY - otherPosition.getY
       dx * dx + dy * dy
     }
+    def centerPosition:Position = {
+      position.toPosition.add(16, 16)
+    }
     def toWalkPosition:WalkPosition = {
       new WalkPosition(position.getX * 4, position.getY * 4)
     }

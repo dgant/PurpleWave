@@ -22,7 +22,7 @@ object With {
   var geography:Geography = null
   var gameplan:WinTheGame = null
   var logger:Logger = null
-  var grids:Maps = null
+  var grids:Grids = null
   var paths:Paths = null
   var prioritizer:Prioritizer = null
   var recruiter:Recruiter = null

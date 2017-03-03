@@ -2,10 +2,10 @@ package Global.Information
 
 import Geometry.{Pylon, SpiralSearch, TileRectangle}
 import Startup.With
-import bwapi.{TilePosition, UnitType, WalkPosition}
-import scala.collection.JavaConverters._
-import scala.collection.mutable
 import Utilities.Enrichment.EnrichPosition._
+import bwapi.{TilePosition, UnitType}
+
+import scala.collection.JavaConverters._
 
 class Architect {
   
@@ -94,15 +94,15 @@ class Architect {
   
   def _canBuild(
     buildingType:       UnitType,
-    position:           TilePosition,
+    tile:               TilePosition,
     margin:             Integer                 = 0,
     exclusions:         Iterable[TileRectangle] = List.empty,
     hypotheticalPylon:  Option[TilePosition]    = None)
       :Boolean = {
   
     val buildingArea = new TileRectangle(
-      position,
-      position.add(buildingType.tileSize))
+      tile,
+      tile.add(buildingType.tileSize))
     
     val marginArea = new TileRectangle(
       buildingArea.startInclusive.subtract(margin, margin),
@@ -110,14 +110,11 @@ class Architect {
     
     exclusions.filter(_.intersects(marginArea)).isEmpty &&
     _rectangleIsBuildable(buildingArea, buildingType, hypotheticalPylon) &&
-    _rectangleContainsOnlyAWorker(marginArea)
-    //_rectangleIsWalkable(marginArea) &&
-    
+    _rectangleContainsOnlyAWorker(buildingArea) &&
+    marginArea.tiles.forall(With.grids.walkability.get)
   }
   
-  def _rectangleContainsOnlyAWorker(
-    rectangle: TileRectangle)
-      :Boolean = {
+  def _rectangleContainsOnlyAWorker(rectangle: TileRectangle):Boolean = {
     val trespassingUnits =
       (rectangle.startInclusive.getX to rectangle.endExclusive.getX).flatten(x =>
         (rectangle.startInclusive.getY to rectangle.endExclusive.getY).flatten(y =>
@@ -130,43 +127,10 @@ class Architect {
       trespassingUnits.forall(_.getPlayer == With.game.self)
   }
   
-  def _rectangleIsWalkable(
-    rectangle: TileRectangle)
-      :Boolean = {
-    val walkRectangle = rectangle.toWalkRectangle
-    (walkRectangle.start.getX to walkRectangle.end.getX).forall(x =>
-      (walkRectangle.start.getY to walkRectangle.end.getY).forall(y =>
-        _isWalkable(new WalkPosition(x, y))))
-  }
-  
-  def _rectangleIsBuildable(
-    area:              TileRectangle,
-    buildingType:      UnitType,
-    hypotheticalPylon: Option[TilePosition] = None)
-      :Boolean = {
-    
-    (area.startInclusive.getX to area.endExclusive.getX).forall(x =>
-      (area.startInclusive.getY to area.endExclusive.getY).forall(y => {
-        val position = new TilePosition(x, y)
-        _isBuildable(position) &&
-          ((!buildingType.requiresPsi())   || With.game.hasPower(position) || hypotheticalPylon.exists(pylon => Pylon.powers(pylon, position))) &&
-          ((!buildingType.requiresCreep()) || With.game.hasCreep(position))
-      }))
-  }
-  
-  val _walkableCache = new mutable.HashMap[WalkPosition, Boolean]
-  def _isWalkable(walkPosition: WalkPosition):Boolean = {
-    if ( ! _walkableCache.contains(walkPosition)) {
-      _walkableCache.put(walkPosition, With.game.isWalkable(walkPosition))
-    }
-    _walkableCache(walkPosition)
-  }
-  
-  val _buildableCache = new mutable.HashMap[TilePosition, Boolean]
-  def _isBuildable(tilePosition: TilePosition):Boolean = {
-    if ( ! _buildableCache.contains(tilePosition)) {
-      _buildableCache.put(tilePosition, With.game.isBuildable(tilePosition))
-    }
-    _buildableCache(tilePosition)
+  def _rectangleIsBuildable(area: TileRectangle, buildingType: UnitType, hypotheticalPylon: Option[TilePosition] = None):Boolean = {
+    area.tiles.forall(tile =>
+      With.grids.buildability.get(tile) &&
+        (( ! buildingType.requiresPsi())   || With.game.hasPower(tile) || hypotheticalPylon.exists(pylon => Pylon.powers(pylon, tile))) &&
+        (( ! buildingType.requiresCreep()) || With.game.hasCreep(tile)))
   }
 }

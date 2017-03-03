@@ -1,12 +1,12 @@
 package Geometry.Grids.Real
 
-import Geometry.Grids.Abstract.GridInt
+import Geometry.Grids.Abstract.GridBoolean
 import Startup.With
 import Utilities.Caching.Limiter
 import Utilities.Enrichment.EnrichPosition._
 import Utilities.Enrichment.EnrichUnitType._
 
-class GridWalkability extends GridInt {
+class GridWalkability extends GridBoolean {
   
   val limitUpdates = new Limiter(24 * 60, _update)
   override def update() {
@@ -14,17 +14,16 @@ class GridWalkability extends GridInt {
   }
   def _update() {
     reset()
-    positions
-      .foreach(tilePosition => set(
-        tilePosition,
-        if (
-          (0 to 3).forall(dy =>
-            (0 to 3).forall(dx =>
-              With.game.isWalkable(tilePosition.toWalkPosition.add(dx, dy)))))
-          1 else 0))
+    
+    positions.foreach(tilePosition => set(
+      tilePosition,
+      (0 to 3).forall(dy =>
+        (0 to 3).forall(dx =>
+          With.game.isWalkable(tilePosition.toWalkPosition.add(dx, dy))))))
+    
     With.units.buildings
       .filter( ! _.flying)
       .foreach(building => building.utype.tiles
-        .foreach(tile => set(building.tilePosition.add(tile), 0)))
+        .foreach(tile => set(building.tilePosition.add(tile), false)))
   }
 }

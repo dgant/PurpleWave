@@ -9,12 +9,11 @@ object EvaluatePositions {
   
   def bestPosition(unit:FriendlyUnitInfo, evaluator:EvaluatePosition, searchRange:Int = 3):TilePosition = {
     
-    val currentPosition = unit.tilePosition
     val candidates =
       (-searchRange to searchRange).flatten(dy =>
         (-searchRange to searchRange).map(dx => (dx, dy)))
-        .map(point => currentPosition.add(point._1, point._2))
-        .filter(tile => With.grids.walkability.get(tile) > 0)
+        .map(point => unit.tilePosition.add(point._1, point._2))
+        .filter(With.grids.walkability.get)
   
     if (candidates.isEmpty) {
       //Weird. unit is nowhere near a walkable position

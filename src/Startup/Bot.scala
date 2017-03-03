@@ -31,7 +31,7 @@ class Bot() extends DefaultBWListener {
       With.gameplan = new WinTheGame
       With.history = new History
       With.intelligence = new Intelligence
-      With.grids = new Maps
+      With.grids = new Grids
       With.paths = new Paths
       With.prioritizer = new Prioritizer
       With.recruiter = new Recruiter

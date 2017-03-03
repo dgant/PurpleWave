@@ -8,8 +8,8 @@ class Configuration {
   var enableCamera                = false
   
   var enableOverlay               = true
-  var enableOverlayBasePlacement  = true
-  var enableOverlayExclusions     = true
+  var enableOverlayBasePlacement  = false
+  var enableOverlayExclusions     = false
   var enableOverlayBattles        = false
   var enableOverlayEconomy        = false
   var enableOverlayGrids          = false

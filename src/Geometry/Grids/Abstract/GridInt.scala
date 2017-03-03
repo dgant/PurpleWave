@@ -6,6 +6,7 @@ class GridInt extends Grid[Int] {
   
   override val _positions:Array[Int] = Array.fill(_width * _height)(_defaultValue)
   override def _defaultValue:Int = 0
+  override def repr(value: Int) = value.toString
   
   def add(i:Int, value:Int) {
     if (i < 0 || i >= _positions.length) return
@@ -32,6 +33,4 @@ class GridInt extends Grid[Int] {
   def add(position:TilePosition, value:Int) {
     addTilePosition(position.getX, position.getY, value)
   }
-  
-  override def repr(value: Int) = value.toString
 }

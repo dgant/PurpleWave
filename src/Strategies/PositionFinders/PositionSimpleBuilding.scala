@@ -16,37 +16,35 @@ class PositionSimpleBuilding(
   override def find: Option[TilePosition] = _cache.get
   
   def _find: Option[TilePosition] = {
-    val startPosition = With.geography.home
+    val home = With.geography.home
     
     if (buildingType.isRefinery) {
-      val geysers = With.units.neutral.filter(_.isGas)
-      if (geysers.isEmpty) return None
-      return Some(geysers.minBy(_.tilePosition.getDistance(startPosition)).tilePosition)
+      val candidates = With.units.neutral.filter(_.isGas)
+      return if (candidates.isEmpty) None else Some(candidates.minBy(_.tilePosition.getDistance(home)).tilePosition)
     }
     else if (buildingType.isTownHall) {
-      val basePositions = With.geography.basePositions.filter(basePosition => {
+      val candidates = With.geography.basePositions.filter(basePosition => {
         val rectangle = new TileRectangle(basePosition, basePosition.add(buildingType.tileSize))
         With.units.all.filter(_.utype.isBuilding).forall( ! _.tileArea.intersects(rectangle))
       })
         
-      if (basePositions.isEmpty) return None
-      return Some(basePositions.minBy(With.paths.groundDistance(_, startPosition)))
+      return if (candidates.isEmpty) None else Some(candidates.minBy(With.paths.groundDistance(_, home)))
     }
     
-    val maxMargin = if (buildingType == UnitType.Protoss_Pylon) 3 else 1
+    val maxMargin = if (buildingType == UnitType.Protoss_Pylon) 5 else 1
   
     var output:Option[TilePosition] = None
     (0 to maxMargin).reverse.foreach(margin =>
       output = output.orElse(
         With.architect.placeBuilding(
         buildingType,
-        startPosition,
+        home,
         margin = margin,
         searchRadius = 50,
         exclusions = With.geography.ourHarvestingAreas)))
     
     if (output == None) {
-      With.logger.warn("Failed to place a " ++ buildingType.toString ++ " near " ++ startPosition.toString)
+      With.logger.warn("Failed to place a " ++ buildingType.toString ++ " near " ++ home.toString)
     }
     
     output

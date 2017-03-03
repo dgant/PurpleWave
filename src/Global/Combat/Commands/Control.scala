@@ -19,7 +19,7 @@ object Control extends Command {
       val localStrengthUs     = 0.01 + With.grids.friendlyGroundStrength.get(unit.position.toTilePosition)
       val localStrengthEnemy  = 0.01 + With.grids.enemyGroundStrength.get(unit.position.toTilePosition)
       
-      val strengthFactor =  0.5 + 0.5 * unit.totalHealth.toDouble / unit.maxTotalHealth
+      val strengthFactor =  0.8 + 0.2 * unit.totalHealth.toDouble / unit.maxTotalHealth
       val groupConfidence = groupStrengthUs / groupStrengthEnemy
       val localConfidence = groupConfidence * strengthFactor * localStrengthUs / localStrengthEnemy
       

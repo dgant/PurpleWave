@@ -9,6 +9,8 @@ object TypeDescriber {
       .replace("Zerg_", "")
       .replace("Protoss_", "")
       .replace("Neutral_", "")
+      .replace("Resource_", "")
+      .replace("Special_", "")
       .replaceAll("_", " ")
   }
 }

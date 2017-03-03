@@ -5,6 +5,7 @@ import Startup.With
 import Types.Intents.Intention
 import Types.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import bwapi.{Position, TilePosition}
+import Utilities.Enrichment.EnrichPosition._
 
 import scala.collection.mutable
 
@@ -51,6 +52,10 @@ class Commander {
     _recordCommand(unit, command)
     unit.baseUnit.move(position)
     _sleep(unit, false)
+  }
+  
+  def move(command:Command, unit:FriendlyUnitInfo, tilePosition:TilePosition) {
+    move(command, unit, tilePosition.centerPosition)
   }
   
   def _sleep(unit:FriendlyUnitInfo, startedAttacking:Boolean = false) {

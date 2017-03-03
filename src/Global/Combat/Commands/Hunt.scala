@@ -12,7 +12,7 @@ object Hunt extends Command {
       With.commander.attack(this, intent.unit, intent.destination)
     }
     else if ( ! unit.onCooldown) {
-      With.commander.attack(this, intent.unit, intent.targetUnit.get.position)
+      With.commander.attack(this, intent.unit, intent.targetUnit.get)
     }
   }
 }

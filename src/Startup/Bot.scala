@@ -42,7 +42,6 @@ class Bot() extends DefaultBWListener {
       With.game.setLocalSpeed(With.configuration.gameSpeed)
     }
     catch { case exception:Exception =>
-      
       val dontLoseTheStackTraceWhileDebugging = exception.getStackTrace
       With.logger.onException(exception)}
   }

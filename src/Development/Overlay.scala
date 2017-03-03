@@ -178,6 +178,7 @@ object Overlay {
   
   def _drawTrackedUnits() {
     With.units.enemy.foreach(_drawTrackedUnit)
+    With.units.neutral.foreach(_drawTrackedUnit)
   }
   
   def _drawTrackedUnit(trackedUnit:ForeignUnitInfo) {

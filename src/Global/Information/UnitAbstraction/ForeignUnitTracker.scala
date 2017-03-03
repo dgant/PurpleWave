@@ -22,7 +22,8 @@ class ForeignUnitTracker {
   def get(id:Int):Option[ForeignUnitInfo] = _foreignUnitsById.get(id)
   
   def onFrame() {
-    _populateBannedUnits()
+    _initialize()
+    
     //Important to remember: bwapi.Units are not persisted frame-to-frame
     //So we do all our comparisons by ID, rather than by object
     
@@ -56,17 +57,26 @@ class ForeignUnitTracker {
     _foreignUnitsById.get(unit.getID).foreach(_remove)
   }
   
-  def _populateBannedUnits() {
+  def _initialize() {
     //BWAPI seems to start some games returning enemy units that don't make any sense.
     //This will let us catch them while debugging until we figure this out for good
     if (With.game.getFrameCount == 0) {
-      val ghostUnits = With.game.getAllUnits.asScala.filter(_.getPlayer.isEnemy(With.game.self))
-      _bannedEnemyUnitIds = ghostUnits.map(_.getID).toSet
-      if (ghostUnits.nonEmpty) {
-        With.logger.warn("Found ghost units at start of game:")
-        ghostUnits.map(u => u.getType + ", " + u.getPlayer.getName + " " + u.getPosition).foreach(With.logger.warn)
-      }
+      _flagGhostUnits()
+      _trackStaticUnits()
     }
+  }
+  
+  def _flagGhostUnits() {
+    val ghostUnits = With.game.getAllUnits.asScala.filter(_.getPlayer.isEnemy(With.game.self))
+    _bannedEnemyUnitIds = ghostUnits.map(_.getID).toSet
+    if (ghostUnits.nonEmpty) {
+      With.logger.warn("Found ghost units at start of game:")
+      ghostUnits.map(u => u.getType + ", " + u.getPlayer.getName + " " + u.getPosition).foreach(With.logger.warn)
+    }
+  }
+  
+  def _trackStaticUnits() {
+    With.game.getStaticNeutralUnits.asScala.foreach(_add)
   }
   
   def _add(unit:bwapi.Unit) {

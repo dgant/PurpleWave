@@ -7,8 +7,7 @@ import bwapi.TilePosition
 
 object EvaluatePositions {
   
-  def bestPosition(unit:FriendlyUnitInfo, evaluator:EvaluatePosition, searchRange:Int = 3)
-      :TilePosition = {
+  def bestPosition(unit:FriendlyUnitInfo, evaluator:EvaluatePosition, searchRange:Int = 3):TilePosition = {
     
     val currentPosition = unit.tilePosition
     val candidates =

@@ -1,6 +1,6 @@
 package Global.Information
 
-import Geometry.{Clustering, TileRectangle}
+import Geometry.{Clustering, Positions, TileRectangle}
 import Startup.With
 import Types.UnitInfo.FriendlyUnitInfo
 import Utilities.Caching.{Cache, CacheForever}
@@ -20,14 +20,14 @@ class Geography {
     new TilePosition(With.game.mapWidth / 2, With.game.mapHeight / 2)
   }
   
-  val _cacheHome = new Cache[Position](24, () => _calculateHome)
-  def home:Position = {
+  val _cacheHome = new Cache[TilePosition](24, () => _calculateHome)
+  def home:TilePosition = {
     _cacheHome.get
   }
-  def _calculateHome:Position = {
-    ourBaseHalls.view.map(_.position).headOption
-      .getOrElse(With.units.ours.view.filter(_.utype.isBuilding).map(_.position).headOption
-      .getOrElse(new Position(0,0)))
+  def _calculateHome:TilePosition = {
+    ourBaseHalls.view.map(_.tilePosition).headOption
+      .getOrElse(With.units.ours.view.filter(_.utype.isBuilding).map(_.tilePosition).headOption
+        .getOrElse(Positions.tileMiddle))
   }
   
   def ourBaseHalls:Iterable[FriendlyUnitInfo] = {

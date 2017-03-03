@@ -1,12 +1,14 @@
 package Plans.Defense
 
 import Geometry.TileRectangle
+import Global.Combat.Commands.Hunt
 import Plans.Allocation.{LockUnits, LockUnitsExactly}
 import Plans.Plan
 import Startup.With
 import Strategies.PositionFinders.PositionSpecific
 import Strategies.UnitMatchers.UnitMatchWorker
 import Strategies.UnitPreferences.UnitPreferClose
+import Types.Intents.Intention
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
@@ -34,7 +36,7 @@ class DefeatWorkerHarass extends Plan {
       pair._2.onFrame()
       pair._2.units.foreach(defender =>
         With.units.enemy.filter(_.id == pair._1).foreach(enemy =>
-          defender.baseUnit.attack(enemy.baseUnit)))
+          With.commander.intend(new Intention(defender, Hunt, enemy.tilePosition) { targetUnit = Some(enemy) })))
     })
   }
   

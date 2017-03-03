@@ -9,13 +9,9 @@ object Hunt extends Command {
     val unit = intent.unit
     
     if (intent.targetUnit.isEmpty) {
-      With.commander.attack(this, intent.unit, intent.destination.get)
+      With.commander.attack(this, intent.unit, intent.destination)
     }
-    else if (unit.onCooldown) {
-      if (unit.isMelee) {
-        With.commander.move(this, intent.unit, intent.targetUnit.get.position)
-      }
-    } else {
+    else if ( ! unit.onCooldown) {
       With.commander.attack(this, intent.unit, intent.targetUnit.get.position)
     }
   }

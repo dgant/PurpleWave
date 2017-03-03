@@ -14,12 +14,12 @@ class PressureEnemyBaseFulfiller extends Plan {
   override def getChildren: Iterable[Plan] = { List(fighters.get) }
   override def onFrame() {
  
-    val targetPosition = With.intelligence.mostBaselikeEnemyBuilding.map(_.position)
+    val targetPosition = With.intelligence.mostBaselikeEnemyBuilding.map(_.tilePosition)
     if (targetPosition.isEmpty) return
     
     fighters.get.onFrame()
     if ( ! fighters.get.isComplete) return
     
-    fighters.get.units.foreach(fighter => With.commander.intend(new Intention(fighter, Control, targetPosition)))
+    fighters.get.units.foreach(fighter => With.commander.intend(new Intention(fighter, Control, targetPosition.get)))
   }
 }

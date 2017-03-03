@@ -16,7 +16,7 @@ class PositionSimpleBuilding(
   override def find: Option[TilePosition] = _cache.get
   
   def _find: Option[TilePosition] = {
-    val startPosition = With.geography.home.toTilePosition
+    val startPosition = With.geography.home
     
     if (buildingType.isRefinery) {
       val geysers = With.units.neutral.filter(_.isGas)
@@ -30,7 +30,7 @@ class PositionSimpleBuilding(
       })
         
       if (basePositions.isEmpty) return None
-      return Some(basePositions.minBy(With.paths.getGroundDistance(_, startPosition)))
+      return Some(basePositions.minBy(With.paths.groundDistance(_, startPosition)))
     }
     
     val maxMargin = if (buildingType == UnitType.Protoss_Pylon) 3 else 1

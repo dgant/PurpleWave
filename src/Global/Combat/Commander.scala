@@ -4,7 +4,7 @@ import Global.Combat.Commands.Command
 import Startup.With
 import Types.Intents.Intention
 import Types.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import bwapi.Position
+import bwapi.{Position, TilePosition}
 
 import scala.collection.mutable
 
@@ -30,6 +30,10 @@ class Commander {
     } else {
       attack(command, unit, target.position)
     }
+  }
+  
+  def attack(command:Command, unit:FriendlyUnitInfo, tilePosition:TilePosition) {
+    attack(command, unit, tilePosition.toPosition)
   }
   
   def attack(command:Command, unit:FriendlyUnitInfo, position:Position) {

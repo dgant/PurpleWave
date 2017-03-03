@@ -7,7 +7,7 @@ object Pillage extends Command {
   
   def execute(intent:Intention) {
     val unit = intent.unit
-    val destination = intent.destination.get
+    val destination = intent.destination
     val targets = With.units.enemy.filter(_.visible).filter(_.distance(destination) < 32 * 8)
     
     if (targets.nonEmpty) {

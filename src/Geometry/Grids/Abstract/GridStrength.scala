@@ -24,7 +24,7 @@ abstract class GridStrength extends GridInt {
       val latencyFrames = With.game.getLatencyFrames
       val tilePosition = unit.position.toTilePosition //position.toTilePosition uses the unit's center rather than its top-left corner
       val rangeFull = unit.range + rangeMargin
-      val rangeZero = unit.range + rangeMargin + (unit.utype.topSpeed() * (48 + latencyFrames)).toInt
+      val rangeZero = unit.range + rangeMargin + (unit.utype.topSpeed * (24 * 3 + latencyFrames)).toInt
       if (strength > 0) {
         _populate(tilePosition, rangeFull, rangeZero, strength)
       }

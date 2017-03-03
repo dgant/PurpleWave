@@ -32,9 +32,10 @@ object BattleMetrics {
     if (unit.utype == UnitType.Terran_Bunker) {
       dps = 4 * UnitType.Terran_Marine.groundDps
     }
-  
-    val highGroundBonus = With.grids.altitudeBonus.get(unit.tilePosition)
-    val combatEfficacy = dps * unit.totalHealth * highGroundBonus
+    
+    val highGroundBonus =  With.grids.altitudeBonus.get(unit.tilePosition)
+    val visibilityBonus = if (unit.visible) 1 else highGroundBonus
+    val combatEfficacy = dps * unit.totalHealth * highGroundBonus * visibilityBonus
     Math.max(0, combatEfficacy).toInt
   }
   

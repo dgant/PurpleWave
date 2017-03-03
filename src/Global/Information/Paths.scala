@@ -10,11 +10,16 @@ class Paths {
   
   //Cache ground distances with a LRU (Least-recently used) cache
   //This is a low number; let's increase it after we make sure _limitCacheSize works
+  val _impossiblyLargeDistance = Int.MaxValue / 1000
   val _maxCacheSize = 10000
   val _distanceCache = new mutable.HashMap[(TilePosition, TilePosition), Int]
   val _distanceAge = new mutable.HashMap[(TilePosition, TilePosition), Int]
   
-  def getGroundDistance(origin:TilePosition, destination:TilePosition):Int = {
+  def exists(origin:TilePosition, destination: TilePosition):Boolean = {
+    groundDistance(origin, destination) < _impossiblyLargeDistance
+  }
+  
+  def groundDistance(origin:TilePosition, destination:TilePosition):Int = {
     val request = (origin, destination)
     if ( ! _distanceCache.contains(request)) {
       _cacheDistance(request)
@@ -22,6 +27,11 @@ class Paths {
     _distanceAge.put(request, With.game.getFrameCount)
     val result = _distanceCache(request)
     _limitCacheSize()
+    
+    if (result < 0) {
+      return _impossiblyLargeDistance
+    }
+    
     result
   }
   

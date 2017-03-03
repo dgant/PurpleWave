@@ -1,7 +1,7 @@
 package Plans.Macro.Build
 
 import Development.TypeDescriber
-import Global.Combat.Commands.{Approach, March}
+import Global.Combat.Commands.Approach
 import Plans.Allocation.{LockCurrency, LockCurrencyForUnit, LockUnits, LockUnitsExactly}
 import Plans.Plan
 import Startup.With
@@ -10,8 +10,8 @@ import Strategies.UnitMatchers.{UnitMatchType, UnitMatcher}
 import Strategies.UnitPreferences.{UnitPreferClose, UnitPreference}
 import Types.Intents.Intention
 import Types.UnitInfo.FriendlyUnitInfo
-import Utilities.Property
 import Utilities.Enrichment.EnrichPosition._
+import Utilities.Property
 import bwapi.{Position, Race, TilePosition, UnitType}
 
 class BuildBuilding(val buildingType:UnitType) extends Plan {
@@ -76,12 +76,8 @@ class BuildBuilding(val buildingType:UnitType) extends Plan {
       builderPlan.get.units.foreach(unit => With.commander.intend(
         new Intention(
           unit,
-          March,
-          Some(_position.map(_
-          .toPosition
-          .add(new Position(buildingType.width/2, buildingType.height/2)))
-          .headOption
-          .getOrElse(unit.position)))))
+          Approach,
+          _position.map(_.add(1, 1)).headOption.getOrElse(unit.position.toTilePosition))))
     }
   }
   
@@ -97,13 +93,11 @@ class BuildBuilding(val buildingType:UnitType) extends Plan {
         With.logger.warn("Failed to place a " ++ buildingType.toString ++ " near " ++ _position.toString)
       }
       else {
-        val positionExplored = With.game.isExplored(_position.get)
-        
-        // Can't order builds in fog of war
-        if (positionExplored && builder.distance(_position.get) < 32 * 4) {
+        // This avoids trying to build in fog of war
+        if (builder.distance(_position.get) < 32 * 4) {
           builder.baseUnit.build(buildingType, _position.get)
         } else {
-          With.commander.intend(new Intention(builder, Approach, Some(_position.get.centerPosition)))
+          With.commander.intend(new Intention(builder, Approach, _position.get))
         }
       }
     }

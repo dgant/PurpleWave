@@ -10,7 +10,7 @@ import Strategies.UnitPreferences.{UnitPreferClose, UnitPreference}
 import Types.Intents.Intention
 import Types.UnitInfo.FriendlyUnitInfo
 import Utilities.Property
-import bwapi.Position
+import bwapi.TilePosition
 
 class KnowEnemyBaseLocationFulfiller extends Plan {
   
@@ -28,19 +28,18 @@ class KnowEnemyBaseLocationFulfiller extends Plan {
   override def getChildren: Iterable[Plan] = { List(unitPlan.get) }
   
   override def onFrame() {
-    positionFinder.set(new PositionSpecific(_getNextScoutingPosition.toTilePosition))
+    positionFinder.set(new PositionSpecific(_getNextScoutingPosition))
     unitPlan.get.onFrame()
     unitPlan.get.units.foreach(_orderScout)
   }
   
   def _orderScout(scout:FriendlyUnitInfo) {
-    With.commander.intend(new Intention(scout, Control, Some(_getNextScoutingPosition)))
+    With.commander.intend(new Intention(scout, Control, _getNextScoutingPosition))
   }
   
-  def _getNextScoutingPosition:Position = {
+  def _getNextScoutingPosition:TilePosition = {
     With.intelligence.mostUnscoutedBases
-      .filter(base => With.game.hasPath(With.geography.home.getPoint, base.toPosition)) //BWTA.isConnected could also help
+      .filter(base => With.paths.exists(With.geography.home, base)) //BWTA.isConnected could also help
       .head
-      .toPosition
   }
 }

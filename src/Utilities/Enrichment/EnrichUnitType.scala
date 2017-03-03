@@ -1,5 +1,6 @@
 package Utilities.Enrichment
 
+import Geometry.TileRectangle
 import bwapi.{DamageType, TilePosition, UnitType}
 
 case object EnrichUnitType {
@@ -33,16 +34,10 @@ case object EnrichUnitType {
       UnitType.Zerg_Lair,
       UnitType.Zerg_Hive
     ).contains(unitType)
-    
     def tiles:Iterable[TilePosition] = {
       (0 until unitType.tileWidth).flatten(dx =>
         (0 until unitType.tileHeight).map(dy =>
           new TilePosition(dx, dy)))
-    }
-    
-    def tileBottomRight:TilePosition = {
-      unitType.tileSize
-      //new TilePosition(unitType.tileWidth - 1, unitType.tileHeight - 1)
     }
   }
 }

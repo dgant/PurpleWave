@@ -26,6 +26,7 @@ class FriendlyUnitInfo(_baseUnit:bwapi.Unit) extends UnitInfo(_baseUnit) {
   override def bottom                     : Int                 = baseUnit.getBottom
   override def mineralsLeft               : Int                 = if (isMinerals) baseUnit.getResources else 0
   override def gasLeft                    : Int                 = if (isGas) baseUnit.getResources else 0
+  override def initialResources           : Int                 = baseUnit.getInitialResources
   def isCarryingMinerals                  : Boolean             = baseUnit.isCarryingMinerals
   def isCarryingGas                       : Boolean             = baseUnit.isCarryingGas
   def isGatheringMinerals                 : Boolean             = baseUnit.isGatheringMinerals

@@ -23,8 +23,12 @@ class TileRectangle(
   }
   
   def intersects(otherRectangle: TileRectangle):Boolean = {
+    _intersects(otherRectangle) || otherRectangle._intersects(this)
+  }
+  
+  def _intersects(otherRectangle:TileRectangle):Boolean = {
     contains(otherRectangle.startInclusive) ||
-    contains(otherRectangle.endExclusive) ||
+    contains(otherRectangle.endExclusive.subtract(1, 1)) ||
     contains(otherRectangle.startInclusive.getX, otherRectangle.endExclusive.getY - 1) ||
     contains(otherRectangle.endExclusive.getX - 1, otherRectangle.startInclusive.getY)
   }
@@ -41,5 +45,12 @@ class TileRectangle(
     new WalkRectangle(
       startInclusive.toWalkPosition,
       endExclusive.toWalkPosition)
+  }
+  
+  def tiles:Iterable[TilePosition] = {
+    (startInclusive.getX until endExclusive.getX).flatten(x =>
+      (startInclusive.getY until endExclusive.getY).map(y =>
+        new TilePosition(x, y)
+      ))
   }
 }

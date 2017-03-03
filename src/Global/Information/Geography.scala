@@ -2,13 +2,11 @@ package Global.Information
 
 import Geometry.{Clustering, Positions, TileRectangle}
 import Startup.With
-import Types.UnitInfo.FriendlyUnitInfo
+import Types.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo}
 import Utilities.Caching.{Cache, CacheForever}
 import Utilities.Enrichment.EnrichPosition._
 import Utilities.Enrichment.EnrichUnitType._
 import bwapi.{Position, TilePosition, UnitType}
-
-import scala.collection.JavaConverters._
 
 class Geography {
   
@@ -60,53 +58,43 @@ class Geography {
   
   def basePositions:Iterable[TilePosition] = _basePositionsCache.get
   val _basePositionsCache = new Cache[Iterable[TilePosition]](24 * 60, () => _calculateBasePositions)
-  val _resourceClusterCache = new CacheForever[Iterable[Iterable[TilePosition]]](() => _getResourceClusters)
-  val _mineralExclusionCache = new CacheForever[Iterable[TileRectangle]](() => _getMineralExclusions)
-  val _gasExclusionCache = new CacheForever[Iterable[TileRectangle]](() => _getGasExclusions)
-  def _getMineralExclusions:Iterable[TileRectangle] = {
-    val positions     = With.game.getStaticMinerals.asScala.map(_.getInitialTilePosition)
-    val boundaryStart = new TilePosition(3, 3)
-    val boundaryEnd   = boundaryStart.add(UnitType.Resource_Mineral_Field.tileWidth - 1, UnitType.Resource_Mineral_Field.tileHeight - 1)
-    positions.map(position => new TileRectangle(position.subtract(boundaryStart), position.add(boundaryEnd)))
+  val _resourceClusterCache = new CacheForever[Iterable[Iterable[ForeignUnitInfo]]](() => _getResourceClusters)
+  val _resourceExclusionCache = new CacheForever[Iterable[TileRectangle]](() => _getExclusions)
+  def _getResourceClusters:Iterable[Iterable[ForeignUnitInfo]] = {
+    //Probably TODO: Exclude mineral blocks
+    Clustering.group[ForeignUnitInfo](_getResources, 32 * 15, true, (unit) => unit.position).values
   }
-  def _getGasExclusions:Iterable[TileRectangle] = {
-    val positions         = With.game.getStaticGeysers.asScala.map(_.getInitialTilePosition)
-    val boundaryStart     = new TilePosition(3, 3)
-    val boundaryEnd       = boundaryStart.add(UnitType.Resource_Vespene_Geyser.tileWidth - 1, UnitType.Resource_Vespene_Geyser.tileHeight - 1)
-    positions.map(position => new TileRectangle(position.subtract(boundaryStart), position.add(boundaryEnd)))
+  def _getExclusions:Iterable[TileRectangle] = {
+    _getResources.map(_getExclusion)
   }
-  def _getResourceClusters:Iterable[Iterable[TilePosition]] = {
-    val resources = (With.game.getStaticMinerals.asScala ++ With.game.getStaticGeysers.asScala).filter(unit => unit.getInitialResources > 50).map(_.getTilePosition)
-    Clustering.group[TilePosition](resources, 32 * 15, true, (x) => x.toPosition).values
+  def _getExclusion(unit:ForeignUnitInfo):TileRectangle = {
+    new TileRectangle(unit.tilePosition.subtract(3, 3), unit.tilePosition.add(unit.utype.tileSize).add(3, 3))
   }
-  
+  def _getResources:Iterable[ForeignUnitInfo] = {
+    With.units.neutral.filter(unit => unit.isMinerals || unit.isGas).filter(_.baseUnit.getInitialResources > 24)
+  }
   def _calculateBasePositions:Iterable[TilePosition] = {
-    val basePositions = _resourceClusterCache.get.map(_findBasePosition).filter(_.nonEmpty).map(_.get)
-    basePositions
+    _resourceClusterCache.get.map(_findBasePosition).filter(_.nonEmpty).map(_.get)
   }
-  
-  def _findBasePosition(resources:Iterable[TilePosition]):Option[TilePosition] = {
-    val centroid = resources.centroid
+  def _findBasePosition(resources:Iterable[ForeignUnitInfo]):Option[TilePosition] = {
+    val centroid = resources.map(_.position).centroid
+    val centroidTile = centroid.toTilePosition
     val searchRadius = 10
     val candidates =
       (-searchRadius to searchRadius).flatten(dx =>
-        (-searchRadius to searchRadius).map(dy => {
-          val basePosition = centroid.add(new TilePosition(dx, dy))
-          val legal = _isLegalBasePosition(basePosition, centroid)
-          if (legal) Some(basePosition) else None
-        }))
-    val extantCandidates = candidates.filter(_.nonEmpty).map(_.get)
+        (-searchRadius to searchRadius).map(dy =>
+          centroidTile.add(new TilePosition(dx, dy))))
+    
+    val extantCandidates = candidates.filter(_isLegalBasePosition)
     
     if (extantCandidates.isEmpty) return None
-    Some(extantCandidates.minBy(candidate => resources.map(_.distanceSquared(candidate)).max))
+    
+    Some(extantCandidates.minBy(_.toPosition.add(64, 48).getDistance(centroid)))
   }
   
-  def _isLegalBasePosition(position:TilePosition, centroid:TilePosition):Boolean = {
-    val exclusions = _mineralExclusionCache.get ++ _gasExclusionCache.get
-    val buildingTiles = UnitType.Zerg_Hatchery.tiles
-    buildingTiles.map(_.add(position)).forall(buildingTile =>
-      With.game.isBuildable(buildingTile) &&
-      With.game.getGroundHeight(buildingTile) == With.game.getGroundHeight(centroid) &&
-      exclusions.forall( ! _.contains(buildingTile)))
+  def _isLegalBasePosition(position:TilePosition):Boolean = {
+    val exclusions = _resourceExclusionCache.get
+    val buildingArea = new TileRectangle(position, position.add(UnitType.Zerg_Hatchery.tileSize))
+    buildingArea.tiles.forall(With.game.isBuildable) && exclusions.forall( ! _.intersects(buildingArea))
   }
 }

@@ -28,6 +28,7 @@ abstract class UnitInfo (var baseUnit:bwapi.Unit) {
   def bottom:Int;
   def mineralsLeft:Int;
   def gasLeft:Int;
+  def initialResources:Int
   
   //This ignores spellcasters
   //TODO: Move this onto EnhancedUnitType

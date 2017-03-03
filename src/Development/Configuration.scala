@@ -10,13 +10,13 @@ class Configuration {
   var enableOverlay               = true
   var enableOverlayBasePlacement  = true
   var enableOverlayExclusions     = true
-  var enableOverlayBattles        = true
-  var enableOverlayEconomy        = true
+  var enableOverlayBattles        = false
+  var enableOverlayEconomy        = false
   var enableOverlayGrids          = false
-  var enableOverlayUnits          = true
+  var enableOverlayUnits          = false
   var enableOverlayResources      = false
   var enableOverlayPlans          = false
   var enableOverlayTerrain        = false
-  var enableOverlayTrackedUnits   = true
+  var enableOverlayTrackedUnits   = false
   var enableOverlayWorkers        = false
 }

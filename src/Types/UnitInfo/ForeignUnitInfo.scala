@@ -25,6 +25,7 @@ class ForeignUnitInfo(_baseUnit:bwapi.Unit) extends UnitInfo (_baseUnit) {
   var _right              = 0
   var _bottom             = 0
   var _resources          = 0
+  var _initialResources   = 0
   
   update(baseUnit)
   
@@ -49,6 +50,7 @@ class ForeignUnitInfo(_baseUnit:bwapi.Unit) extends UnitInfo (_baseUnit) {
     _right              = unit.getRight
     _bottom             = unit.getBottom
     _resources          = unit.getResources
+    _initialResources   = unit.getInitialResources
   }
   
   def flagDead() {
@@ -80,4 +82,5 @@ class ForeignUnitInfo(_baseUnit:bwapi.Unit) extends UnitInfo (_baseUnit) {
   override def bottom:Int = _bottom
   override def mineralsLeft: Int = if (isMinerals) _resources else 0
   override def gasLeft: Int = if (isGas) _resources else 0
+  override def initialResources = _initialResources
 }

@@ -89,14 +89,13 @@ object Overlay {
   }
   
   def _drawExclusions() {
-    With.geography._gasExclusionCache.get.foreach(box => _drawTileRectangle(box, Color.Teal))
-    With.geography._mineralExclusionCache.get.foreach(box => _drawTileRectangle(box, Color.Teal))
+    With.geography._resourceExclusionCache.get.foreach(box => _drawTileRectangle(box, Color.Teal))
     With.geography._resourceClusterCache.get.foreach(cluster => {
-      val centroid = cluster.centroid
-      cluster.foreach(position =>
+      val centroid = cluster.map(_.tileCenter).centroid
+      cluster.foreach(unit =>
         With.game.drawLineMap(
-          centroid.toPosition,
-          position.toPosition,
+          centroid.centerPosition,
+          unit.position,
           Color.Teal))})
   }
   

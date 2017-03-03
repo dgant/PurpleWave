@@ -41,11 +41,7 @@ class DefeatWorkerHarass extends Plan {
   }
   
   def _defendBaseWorkers(miningArea:TileRectangle) {
-    val enemiesInBox = With.game.getUnitsInRectangle(
-      miningArea.start.getX * 32,
-      miningArea.start.getY * 32,
-      miningArea.end.getX   * 32,
-      miningArea.end.getY   * 32)
+    val enemiesInBox = With.game.getUnitsInRectangle(miningArea.startPosition, miningArea.endPosition)
     .asScala
     .filter(unit => unit.getPlayer.isEnemy(With.game.self))
     .filter(unit => unit.getType.canAttack)

@@ -1,37 +1,45 @@
 package Geometry
 
-import bwapi.TilePosition
+import bwapi.{Position, TilePosition}
 import Utilities.Enrichment.EnrichPosition._
 
 class TileRectangle(
-  val start:TilePosition,
-  val end:TilePosition) {
+ val startInclusive:TilePosition,
+ val endExclusive:TilePosition) {
   
-  if (end.getX < start.getX || end.getY < start.getY) {
+  if (endExclusive.getX < startInclusive.getX || endExclusive.getY < startInclusive.getY) {
     throw new Exception("Created an invalid (non-normalized) rectangle")
   }
   
   def contains(x:Int, y:Int):Boolean = {
-    x >= start.getX &&
-    y >= start.getY &&
-    x <= end.getX &&
-    y <= end.getY
+    x >= startInclusive.getX &&
+    y >= startInclusive.getY &&
+    x < endExclusive.getX &&
+    y < endExclusive.getY
   }
   
   def contains(point:TilePosition):Boolean = {
     contains(point.getX, point.getY)
   }
   
-  def intersects(rectangle: TileRectangle):Boolean = {
-    contains(rectangle.start) ||
-    contains(rectangle.end) ||
-    contains(rectangle.start.getX, rectangle.end.getY) ||
-    contains(rectangle.end.getX, rectangle.start.getY)
+  def intersects(otherRectangle: TileRectangle):Boolean = {
+    contains(otherRectangle.startInclusive) ||
+    contains(otherRectangle.endExclusive) ||
+    contains(otherRectangle.startInclusive.getX, otherRectangle.endExclusive.getY - 1) ||
+    contains(otherRectangle.endExclusive.getX - 1, otherRectangle.startInclusive.getY)
+  }
+  
+  def startPosition:Position = {
+    startInclusive.toPosition
+  }
+  
+  def endPosition:Position = {
+    endExclusive.toPosition.subtract(1, 1)
   }
   
   def toWalkRectangle:WalkRectangle = {
     new WalkRectangle(
-      start.toWalkPosition,
-      end.toWalkPosition)
+      startInclusive.toWalkPosition,
+      endExclusive.toWalkPosition)
   }
 }

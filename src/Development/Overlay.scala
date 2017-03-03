@@ -33,7 +33,7 @@ object Overlay {
   
   def _drawBases() {
     With.geography.ourHarvestingAreas.foreach(area => _drawTileRectangle(area, Color.Red))
-    With.geography.basePositions.foreach(position => _drawTileRectangle(new TileRectangle(position, position.add(3, 2)), Color.Yellow))
+    With.geography.basePositions.foreach(position => _drawTileRectangle(new TileRectangle(position, position.add(4, 3)), Color.Yellow))
   }
   
   def _drawBattles() {
@@ -259,12 +259,8 @@ object Overlay {
       textLines.mkString("\n"))
   }
   
-  val _box31 = new Position(31, 31)
   def _drawTileRectangle(rectangle:TileRectangle, color:Color) {
-    With.game.drawBoxMap(
-      rectangle.start.toPosition,
-      rectangle.end.toPosition.add(_box31),
-      color)
+    With.game.drawBoxMap(rectangle.startPosition, rectangle.endPosition, color)
   }
   
   def _drawPolygonPositions(points:Iterable[Position], color:bwapi.Color = bwapi.Color.Brown) {

@@ -46,9 +46,7 @@ class Economy {
   }
   
   def ourActiveHarvesters(harvestingArea:TileRectangle):Iterable[bwapi.Unit] = {
-    With.game.getUnitsInRectangle(
-      harvestingArea.start.toPosition,
-      harvestingArea.end.toPosition).asScala
+    With.game.getUnitsInRectangle(harvestingArea.startPosition, harvestingArea.endPosition).asScala
       //This is a slightly dubious filter.
       // 1. There are several associated UnitCommandTypes, including ReturnCargo
       // 2. We could also check the current ORDER, which cycles between things like "MiningMinerals" and "MoveToMinerals"
@@ -57,11 +55,11 @@ class Economy {
   }
   
   def ourActiveMiners(miningArea:TileRectangle):Iterable[bwapi.Unit] = {
-    ourActiveHarvesters.filter(_.isGatheringMinerals)
+    ourActiveHarvesters(miningArea).filter(_.isGatheringMinerals)
   }
   
   def ourActiveDrillers(miningArea:TileRectangle):Iterable[bwapi.Unit] = {
-    ourActiveHarvesters.filter(_.isGatheringGas)
+    ourActiveHarvesters(miningArea).filter(_.isGatheringGas)
   }
   
   def ourMineralIncomePerMinute:Integer = {

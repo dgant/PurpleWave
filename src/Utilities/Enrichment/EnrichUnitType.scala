@@ -41,7 +41,8 @@ case object EnrichUnitType {
     }
     
     def tileBottomRight:TilePosition = {
-      new TilePosition(unitType.tileWidth - 1, unitType.tileHeight - 1)
+      unitType.tileSize
+      //new TilePosition(unitType.tileWidth - 1, unitType.tileHeight - 1)
     }
   }
 }

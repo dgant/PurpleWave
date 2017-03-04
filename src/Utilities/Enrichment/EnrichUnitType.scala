@@ -1,6 +1,5 @@
 package Utilities.Enrichment
 
-import Geometry.TileRectangle
 import bwapi.{DamageType, TilePosition, UnitType}
 
 case object EnrichUnitType {
@@ -22,8 +21,15 @@ case object EnrichUnitType {
       val damagePerSecond = groundDamage * 24 / (2 + unitType.groundWeapon.damageCooldown)
       damagePerSecond.toInt
     }
+  
+    //Range is from unit edge, so we account for the diagonal width of the unit
+    // 7/5 ~= sqrt(2)
+    def range:Int = {
+      if (unitType == UnitType.Terran_Bunker) { return UnitType.Terran_Marine.range }
+      val range = List(unitType.groundWeapon.maxRange, unitType.airWeapon.maxRange).max
+      range + unitType.width * 7 / 5
+    }
     
-    def range:Int = List(unitType.groundWeapon.maxRange, unitType.airWeapon.maxRange).max
     def totalCost: Int = { unitType.mineralPrice + unitType.gasPrice }
     def isMinerals:Boolean = unitType.isMineralField
     def isGas:Boolean = List(UnitType.Resource_Vespene_Geyser, UnitType.Terran_Refinery, UnitType.Protoss_Assimilator, UnitType.Zerg_Extractor).contains(unitType)

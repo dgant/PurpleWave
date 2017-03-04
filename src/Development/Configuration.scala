@@ -7,13 +7,13 @@ class Configuration {
   var enableChat                  = true
   var enableCamera                = false
   
-  var enableOverlay               = true
+  var enableOverlay               = false
   var enableOverlayBasePlacement  = false
   var enableOverlayExclusions     = false
-  var enableOverlayBattles        = false
-  var enableOverlayEconomy        = false
+  var enableOverlayBattles        = true
+  var enableOverlayEconomy        = true
   var enableOverlayGrids          = false
-  var enableOverlayUnits          = false
+  var enableOverlayUnits          = true
   var enableOverlayResources      = false
   var enableOverlayPlans          = false
   var enableOverlayTerrain        = false

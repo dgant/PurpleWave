@@ -14,7 +14,7 @@ abstract class UnitInfo (var baseUnit:bwapi.Unit) {
   def player:Player;
   def position:Position;
   def walkPosition:WalkPosition;
-  def tilePosition:TilePosition;
+  def tileTopLeft:TilePosition;
   def hitPoints:Int;
   def shieldPoints:Int;
   def utype:UnitType;
@@ -28,7 +28,6 @@ abstract class UnitInfo (var baseUnit:bwapi.Unit) {
   def bottom:Int;
   def mineralsLeft:Int;
   def gasLeft:Int;
-  def initialResources:Int
   
   //This ignores spellcasters
   //TODO: Move this onto EnhancedUnitType
@@ -38,7 +37,7 @@ abstract class UnitInfo (var baseUnit:bwapi.Unit) {
   
   def x                                           : Int                     = position.getX
   def y                                           : Int                     = position.getY
-  def attackFrames                                : Int                     = 8 + (if (List(UnitType.Protoss_Dragoon, UnitType.Zerg_Devourer).contains(utype)) 4 else 0)
+  def attackFrames                                : Int                     = 8 + (if (List(UnitType.Protoss_Dragoon, UnitType.Zerg_Devourer).contains(utype)) 5 else 0)
   def isOurs                                      : Boolean                 = player == With.game.self
   def isFriendly                                  : Boolean                 = isOurs || player.isAlly(With.game.self)
   def isEnemy                                     : Boolean                 = player.isEnemy(With.game.self)
@@ -51,8 +50,9 @@ abstract class UnitInfo (var baseUnit:bwapi.Unit) {
   def totalCost                                   : Int                     = utype.totalCost
   def isMinerals                                  : Boolean                 = utype.isMinerals
   def isGas                                       : Boolean                 = utype.isGas
+  def initialResources                            : Int                     = baseUnit.getInitialResources
   def tileCenter                                  : TilePosition            = position.toTilePosition
-  def tileArea                                    : TileRectangle           = new TileRectangle(tilePosition, tilePosition.add(utype.tileSize))
+  def tileArea                                    : TileRectangle           = new TileRectangle(tileTopLeft, tileTopLeft.add(utype.tileSize))
   def distance(otherUnit:UnitInfo)                : Double                  = distance(otherUnit.position)
   def distance(otherPosition:Position)            : Double                  = position.getDistance(otherPosition)
   def distance(otherPosition:TilePosition)        : Double                  = distance(otherPosition.toPosition)

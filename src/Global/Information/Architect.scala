@@ -1,6 +1,6 @@
 package Global.Information
 
-import Geometry.{Pylon, SpiralSearch, TileRectangle}
+import Geometry.{Pylon, Spiral, TileRectangle}
 import Startup.With
 import Utilities.Enrichment.EnrichPosition._
 import bwapi.{TilePosition, UnitType}
@@ -17,9 +17,10 @@ class Architect {
     exclusions:   Iterable[TileRectangle] = List.empty)
       :Option[TilePosition] = {
   
-    SpiralSearch
-      .forPointsInSpiral(center, searchRadius)
+    Spiral
+      .points(searchRadius)
       .view
+      .map(center.add)
       .find(position => _canBuild(buildingType, position, margin, exclusions))
   }
   
@@ -49,9 +50,10 @@ class Architect {
     //  Having failed that
     //    return None
     
-    SpiralSearch
-      .forPointsInSpiral(center, searchRadius)
+    Spiral
+      .points(searchRadius)
       .view
+      .map(center.add)
       .map(searchPoint => _tryThing(searchPoint, buildingTypes, margin, searchRadius, exclusions, hypotheticalPylon))
       .find(_.isDefined)
       .getOrElse(None)

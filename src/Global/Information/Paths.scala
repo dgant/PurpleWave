@@ -1,10 +1,13 @@
 package Global.Information
 
+import Geometry.Square
 import Startup.With
 import bwapi.TilePosition
 import bwta.BWTA
 
 import scala.collection.mutable
+import Utilities.Enrichment.EnrichPosition._
+import scala.collection.JavaConverters._
 
 class Paths {
   
@@ -36,8 +39,12 @@ class Paths {
   }
   
   def _cacheDistance(request:(TilePosition, TilePosition)) {
-    val distance = BWTA.getGroundDistance(request._1, request._2).toInt
-    _distanceCache.put(request, distance)
+    //Warm up the cache with all the nearby paths simultaneously. Hopefully BWTA is smart and optimizes for the similar searches.
+    val origin = request._1
+    val destination = request._2
+    val origins = Square.points(6).map(origin.add).toList
+    val distances = BWTA.getGroundDistances(destination, origins.asJava).asScala
+    distances.foreach(distancePair => _distanceCache.put((distancePair._1, destination), distancePair._2.toInt))
   }
   
   def _limitCacheSize() {

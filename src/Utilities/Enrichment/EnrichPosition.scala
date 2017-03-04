@@ -1,6 +1,6 @@
 package Utilities.Enrichment
 
-import Geometry.Positions
+import Geometry.{Point, Positions}
 import bwapi.{Position, TilePosition, WalkPosition}
 
 case object EnrichPosition {
@@ -49,6 +49,9 @@ case object EnrichPosition {
     def add(dx:Int, dy:Int):Position = {
       new Position(position.getX + dx, position.getY + dy)
     }
+    def add (point:Point):Position = {
+      add(point.x, point.y)
+    }
     def add(otherPosition:Position):Position = {
       add(otherPosition.getX, otherPosition.getY)
     }
@@ -78,6 +81,9 @@ case object EnrichPosition {
     def add(dx:Int, dy:Int):WalkPosition = {
       new WalkPosition(position.getX + dx, position.getY + dy)
     }
+    def add (point:Point):WalkPosition = {
+      add(point.x, point.y)
+    }
     def add(otherPosition:WalkPosition):WalkPosition = {
       add(otherPosition.getX, otherPosition.getY)
     }
@@ -106,6 +112,9 @@ case object EnrichPosition {
   implicit class EnrichedTilePosition(position:TilePosition) {
     def add(dx:Int, dy:Int):TilePosition = {
       new TilePosition(position.getX + dx, position.getY + dy)
+    }
+    def add (point:Point):TilePosition = {
+      add(point.x, point.y)
     }
     def add(otherPosition:TilePosition):TilePosition = {
       add(otherPosition.getX, otherPosition.getY)

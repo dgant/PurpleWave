@@ -1,24 +1,20 @@
 package Geometry
 
-import bwapi.TilePosition
-
-object SpiralSearch {
+object Spiral {
   
   //Via http://stackoverflow.com/questions/3706219/algorithm-for-iterating-over-an-outward-spiral-on-a-discrete-2d-grid-from-the-or
   
-  def forPointsInSpiral[T](
-    position:TilePosition,
-    searchRadius:Integer = 20):Iterable[TilePosition] = {
+  def points[T](radius:Integer = 20):Iterable[Point] = {
     
     var dx = 1
     var dy = 0
     var segment_length = 1
     
-    var x = position.getX
-    var y = position.getY
+    var x = 0
+    var y = 0
     var segment_passed = 0
     
-    val pointsToSearch = (2 * searchRadius + 1) * (2 * searchRadius + 1)
+    val pointsToSearch = (2 * radius + 1) * (2 * radius + 1)
     (0 to pointsToSearch).map(i => {
       x += dx
       y += dy
@@ -32,7 +28,7 @@ object SpiralSearch {
           segment_length += 1
         }
       }
-      new TilePosition(x, y)
+      new Point(x, y)
     })
   }
 }

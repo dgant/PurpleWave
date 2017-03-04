@@ -12,13 +12,13 @@ object EvaluatePositions {
     val candidates =
       (-searchRange to searchRange).flatten(dy =>
         (-searchRange to searchRange).map(dx => (dx, dy)))
-        .map(point => unit.tilePosition.add(point._1, point._2))
+        .map(point => unit.tileCenter.add(point._1, point._2))
         .filter(With.grids.walkability.get)
   
     if (candidates.isEmpty) {
       //Weird. unit is nowhere near a walkable position
       With.logger.warn("Unit appears to be in a totally unwalkable area")
-      return unit.tilePosition
+      return unit.tileCenter
     }
     
     return candidates.maxBy(evaluator.evaluate)

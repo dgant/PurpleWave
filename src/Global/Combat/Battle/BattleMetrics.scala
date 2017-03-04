@@ -18,7 +18,7 @@ object BattleMetrics {
   }
   
   def evaluate(group:BattleGroup, battle:Battle):Int = {
-    group.units.view.map(evaluate(_, battle.focus)).sum
+    group.units.view.map(evaluate).sum
   }
   
   def evaluate(unit:UnitInfo):Int = {

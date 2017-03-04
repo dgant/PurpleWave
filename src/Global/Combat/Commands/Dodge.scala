@@ -10,7 +10,7 @@ object Dodge extends Command {
   
   def execute(intent:Intention) {
     val unit = intent.unit
-    val evaluator = new EvaluateDodge(unit.tilePosition, intent.safety)
+    val evaluator = new EvaluateDodge(unit.tileCenter, intent.safety)
     val destination = EvaluatePositions.bestPosition(unit, evaluator)
     With.commander.move(this, unit, destination.centerPosition)
   }

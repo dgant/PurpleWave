@@ -1,6 +1,7 @@
 package Geometry.Grids.Real
 
 import Geometry.Grids.Abstract.GridBoolean
+import Geometry.Square
 import Startup.With
 import Utilities.Caching.Limiter
 import Utilities.Enrichment.EnrichPosition._
@@ -17,13 +18,13 @@ class GridWalkability extends GridBoolean {
     
     positions.foreach(tilePosition => set(
       tilePosition,
-      (0 to 3).forall(dy =>
-        (0 to 3).forall(dx =>
-          With.game.isWalkable(tilePosition.toWalkPosition.add(dx, dy))))))
+      Square.pointsDownAndRight(4)
+        .map(tilePosition.toWalkPosition.add)
+        .forall(With.game.isWalkable)))
     
     With.units.buildings
       .filter( ! _.flying)
       .foreach(building => building.utype.tiles
-        .foreach(tile => set(building.tilePosition.add(tile), false)))
+        .foreach(tile => set(building.tileTopLeft.add(tile), false)))
   }
 }

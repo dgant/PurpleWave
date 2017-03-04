@@ -33,8 +33,8 @@ abstract class GridStrength extends GridInt {
   
   def _populate(tile:TilePosition, distanceFull:Int, distanceZero:Int, strength:Int) {
     Circle.points(distanceZero/32).foreach(point => {
-      val nearbyTile = tile.add(point._1, point._2)
-      val distance = Math.sqrt(32 * 32 * (point._1 * point._1 + point._2 * point._2))
+      val nearbyTile = tile.add(point)
+      val distance = Math.sqrt(32 * 32 * point.lengthSquared)
       val ratio = Math.min(1, Math.max(0, (distanceZero - distance) / (distanceZero - distanceFull)))
       add(nearbyTile, (strength * ratio).toInt)
     })

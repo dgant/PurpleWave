@@ -3,7 +3,6 @@ package Geometry.Grids.Real
 import Geometry.Grids.Abstract.GridBoolean
 import Startup.With
 import Utilities.Caching.Limiter
-import Utilities.Enrichment.EnrichPosition._
 
 class GridBuildability extends GridBoolean {
   
@@ -17,6 +16,6 @@ class GridBuildability extends GridBoolean {
     
     With.units.buildings.filter( ! _.flying)
       .foreach(building => building.tileArea.tiles
-        .foreach(tile => set(building.tilePosition.add(tile), false)))
+        .foreach(tile => set(tile, false)))
   }
 }

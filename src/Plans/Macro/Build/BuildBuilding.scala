@@ -50,7 +50,7 @@ class BuildBuilding(val buildingType:UnitType) extends Plan {
   
     _building = With.units.ours
       .filter(unit => unit.utype == buildingType)
-      .filter(unit => _position.exists(position => position == unit.tilePosition))
+      .filter(unit => _position.exists(_ == unit.tileTopLeft))
       .headOption
   
     currencyPlan.get.isSpent = !_building.isEmpty

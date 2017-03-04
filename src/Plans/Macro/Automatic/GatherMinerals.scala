@@ -41,7 +41,7 @@ class GatherMinerals extends Plan {
     _workersByMineral.clear()
     _minerals = With.units.neutral
       .filter(_.isMinerals)
-      .filter(mineral => With.geography.ourHarvestingAreas.exists(_.contains(mineral.tilePosition)))
+      .filter(mineral => With.geography.ourHarvestingAreas.exists(_.contains(mineral.tileCenter)))
       .toList
   }
   

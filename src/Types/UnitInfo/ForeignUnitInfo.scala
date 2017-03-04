@@ -13,7 +13,7 @@ class ForeignUnitInfo(_baseUnit:bwapi.Unit) extends UnitInfo (_baseUnit) {
   var _player             = With.game.self
   var _position           = new Position(0,0)
   var _walkPosition       = new WalkPosition(0,0)
-  var _tilePosition       = new TilePosition(0,0)
+  var _tileTopleft       = new TilePosition(0,0)
   var _hitPoints          = 0
   var _shieldPoints       = 0
   var _unitType           = UnitType.None
@@ -38,7 +38,7 @@ class ForeignUnitInfo(_baseUnit:bwapi.Unit) extends UnitInfo (_baseUnit) {
     _player             = unit.getPlayer
     _position           = unit.getPosition
     _walkPosition       = _position.toWalkPosition
-    _tilePosition       = unit.getTilePosition
+    _tileTopleft       = unit.getTilePosition
     _hitPoints          = unit.getHitPoints
     _shieldPoints       = unit.getShields
     _unitType           = unit.getType
@@ -68,7 +68,7 @@ class ForeignUnitInfo(_baseUnit:bwapi.Unit) extends UnitInfo (_baseUnit) {
   override def player: Player = _player
   override def position: Position = _position
   override def walkPosition: WalkPosition = position.toWalkPosition
-  override def tilePosition: TilePosition = _tilePosition
+  override def tileTopLeft: TilePosition = _tileTopleft
   override def hitPoints: Int = _hitPoints
   override def shieldPoints: Int = _shieldPoints
   override def utype: UnitType = _unitType

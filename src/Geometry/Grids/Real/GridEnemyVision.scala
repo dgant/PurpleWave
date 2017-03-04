@@ -1,20 +1,20 @@
 package Geometry.Grids.Real
 
 import Geometry.Circle
-import Geometry.Grids.Abstract.GridInt
+import Geometry.Grids.Abstract.GridBoolean
 import Startup.With
+import Utilities.Enrichment.EnrichPosition._
 
-class GridEnemyVision extends GridInt {
+
+class GridEnemyVision extends GridBoolean {
   override def update() {
     reset()
-    With.units.enemy.filter(_.possiblyStillThere).foreach(u => {
-      val range = u.utype.sightRange / 32
-      Circle.points(range)
-        .foreach(tileDelta =>
-          setTilePosition(
-            u.tilePosition.getX + tileDelta._1 * 32,
-            u.tilePosition.getY + tileDelta._2 * 32,
-            1))
+    With.units.enemy
+      .filter(_.possiblyStillThere)
+      .foreach(u => {
+      Circle.points(u.utype.sightRange / 32)
+        .map(u.tileCenter.add)
+        .foreach(set(_, true))
     })
   }
 }

@@ -23,8 +23,8 @@ class Geography {
     _cacheHome.get
   }
   def _calculateHome:TilePosition = {
-    ourBaseHalls.view.map(_.tilePosition).headOption
-      .getOrElse(With.units.ours.view.filter(_.utype.isBuilding).map(_.tilePosition).headOption
+    ourBaseHalls.view.map(_.tileTopLeft).headOption
+      .getOrElse(With.units.ours.view.filter(_.utype.isBuilding).map(_.tileTopLeft).headOption
         .getOrElse(Positions.tileMiddle))
   }
   
@@ -68,7 +68,7 @@ class Geography {
     _getResources.map(_getExclusion)
   }
   def _getExclusion(unit:ForeignUnitInfo):TileRectangle = {
-    new TileRectangle(unit.tilePosition.subtract(3, 3), unit.tilePosition.add(unit.utype.tileSize).add(3, 3))
+    new TileRectangle(unit.tileTopLeft.subtract(3, 3), unit.tileTopLeft.add(unit.utype.tileSize).add(3, 3))
   }
   def _getResources:Iterable[ForeignUnitInfo] = {
     With.units.neutral.filter(unit => unit.isMinerals || unit.isGas).filter(_.baseUnit.getInitialResources > 24)

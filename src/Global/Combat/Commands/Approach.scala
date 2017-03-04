@@ -11,7 +11,7 @@ object Approach extends Command {
   def execute(intent:Intention) {
     val unit = intent.unit
     if (intent.battle.nonEmpty && intent.battle.get.enemy.units.exists(_.distanceSquared(unit) < 15 * 15 * 32 * 32)) {
-      val evaluator = new EvaluateApproach(unit.tilePosition, intent.destination)
+      val evaluator = new EvaluateApproach(unit.tileCenter, intent.destination)
       val nextStep = EvaluatePositions.bestPosition(unit, evaluator)
       With.commander.move(this, unit, nextStep.centerPosition)
     }

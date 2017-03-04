@@ -20,7 +20,7 @@ class PositionSimpleBuilding(
     
     if (buildingType.isRefinery) {
       val candidates = With.units.neutral.filter(_.isGas)
-      return if (candidates.isEmpty) None else Some(candidates.minBy(_.tilePosition.getDistance(home)).tilePosition)
+      return if (candidates.isEmpty) None else Some(candidates.minBy(_.tileTopLeft.getDistance(home)).tileTopLeft)
     }
     else if (buildingType.isTownHall) {
       val candidates = With.geography.basePositions.filter(basePosition => {
@@ -31,7 +31,7 @@ class PositionSimpleBuilding(
       return if (candidates.isEmpty) None else Some(candidates.minBy(With.paths.groundDistance(_, home)))
     }
     
-    val maxMargin = if (buildingType == UnitType.Protoss_Pylon) 4 else 1
+    val maxMargin = if (buildingType == UnitType.Protoss_Pylon) 3 else 1
   
     var output:Option[TilePosition] = None
     (0 to maxMargin).reverse.foreach(margin =>
@@ -40,7 +40,7 @@ class PositionSimpleBuilding(
         buildingType,
         home,
         margin = margin,
-        searchRadius = 50,
+        searchRadius = 30,
         exclusions = With.geography.ourHarvestingAreas)))
     
     if (output == None) {

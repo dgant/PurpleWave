@@ -36,7 +36,7 @@ class ForeignUnitTracker {
     val unitsToInvalidatePosition = foreignIdsOld.diff(foreignIdsNew)
       .map(foreignUnitsOld)
       .filter(_.possiblyStillThere) //This check is important! It makes the O(n^2) filter at the end O(n)
-      .filter(unitInfo => With.game.isVisible(unitInfo.tilePosition))
+      .filter(unitInfo => With.game.isVisible(unitInfo.tileCenter))
     
     unitsToAdd.foreach(_add)
     unitsToUpdate.foreach(unit => _foreignUnitsById(unit.getID).update(unit))

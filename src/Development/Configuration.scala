@@ -9,7 +9,7 @@ class Configuration {
   
   var enableOverlay               = false
   var enableOverlayBases          = false
-  var enableOverlayBattles        = false
+  var enableOverlayBattles        = true
   var enableOverlayChokes         = false
   var enableOverlayEconomy        = false
   var enableOverlayExclusions     = false

@@ -18,8 +18,9 @@ object Control extends Command {
       val groupStrengthEnemy  = 0.01 + intent.battle.get.enemy.strength
       val localStrengthUs     = 0.01 + With.grids.friendlyGroundStrength.get(unit.position.toTilePosition)
       val localStrengthEnemy  = 0.01 + With.grids.enemyGroundStrength.get(unit.position.toTilePosition)
+      val healthFactor = 0.5 + 0.5 * unit.totalHealth / unit.maxTotalHealth
       val groupConfidence = groupStrengthUs / groupStrengthEnemy
-      val localConfidence = groupConfidence * localStrengthUs / localStrengthEnemy
+      val localConfidence = healthFactor * groupConfidence * localStrengthUs / localStrengthEnemy
       
       if (groupConfidence < 1) {
         if (localConfidence < 1) {

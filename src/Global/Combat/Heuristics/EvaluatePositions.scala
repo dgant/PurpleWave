@@ -8,7 +8,7 @@ import bwapi.TilePosition
 
 object EvaluatePositions {
   
-  def bestPosition(unit:FriendlyUnitInfo, evaluator:EvaluatePosition, searchRange:Int = 4):TilePosition = {
+  def bestPosition(unit:FriendlyUnitInfo, evaluator:EvaluatePosition, searchRange:Int = 2):TilePosition = {
     
     val candidates =
       Circle.points(searchRange)

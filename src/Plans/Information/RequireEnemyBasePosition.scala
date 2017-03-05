@@ -2,7 +2,7 @@ package Plans.Information
 
 import Plans.Compound.IfThenElse
 
-class KnowEnemyBase extends IfThenElse {
+class RequireEnemyBasePosition extends IfThenElse {
   predicate.set(new FoundEnemyBase)
   whenFalse.set(new FindEnemyBase)
 }

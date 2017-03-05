@@ -5,6 +5,8 @@ import Utilities.Property
 
 class Not extends Plan {
   
+  description.set(Some("Not"))
+  
   val child = new Property[Plan](new Plan)
   
   override def isComplete: Boolean = ! child.get.isComplete

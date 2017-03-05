@@ -132,8 +132,9 @@ object Overlay {
       .filterNot(_.command.getUnitCommandType == UnitCommandType.None)
       .foreach(unit => _drawTextLabel(
         List(
-          unit.command.getUnitCommandType.toString,
-          With.commander._lastCommands.get(unit).getOrElse("")),
+          With.commander._lastIntentions.get(unit).map(_.plan.toString).getOrElse(""),
+          With.commander._lastCommands.get(unit).getOrElse(""),
+          unit.command.getUnitCommandType.toString),
         unit.position,
         drawBackground = false))
   }

@@ -11,16 +11,18 @@ import scala.collection.mutable
 
 class Commander {
   
-  val _intentions = new mutable.HashSet[Intention]
+  var _intentions = new mutable.HashMap[FriendlyUnitInfo, Intention]
   val _nextOrderFrame = new mutable.HashMap[FriendlyUnitInfo, Int] { override def default(key: FriendlyUnitInfo): Int = 0 }
   val _lastCommands = new mutable.HashMap[FriendlyUnitInfo, String]
+  var _lastIntentions = new mutable.HashMap[FriendlyUnitInfo, Intention]
   
-  def intend(intention:Intention) = _intentions.add(intention)
+  def intend(intention:Intention) = _intentions.put(intention.unit, intention)
   
   def onFrame() {
-    _intentions.filter(_isAwake).foreach(intent => intent.command.execute(intent))
+    _intentions.filter(pair => _isAwake(pair._1)).foreach(pair => pair._2.command.execute(pair._2))
     _nextOrderFrame.keySet.filterNot(_.alive).foreach(_nextOrderFrame.remove)
-    _intentions.clear()
+    _lastIntentions = _intentions
+    _intentions = new mutable.HashMap[FriendlyUnitInfo, Intention]
   }
   
   def attack(command:Command, unit:FriendlyUnitInfo, target:UnitInfo) {
@@ -64,8 +66,12 @@ class Commander {
     _nextOrderFrame.put(unit, baseDelay + attackDelay + With.game.getFrameCount)
   }
   
+  def _isAwake(unit:FriendlyUnitInfo):Boolean = {
+    _nextOrderFrame(unit) < With.game.getFrameCount
+  }
+  
   def _isAwake(intent:Intention):Boolean = {
-    _nextOrderFrame(intent.unit) < With.game.getFrameCount
+    _isAwake(intent.unit)
   }
   
   def _recordCommand(unit:FriendlyUnitInfo, command:Command) {

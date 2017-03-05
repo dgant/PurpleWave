@@ -4,6 +4,9 @@ import Plans.Plan
 import Utilities.Property
 
 class IfThenElse extends Plan {
+  
+  description.set(Some("If/Then/Else"))
+  
   val predicate = new Property[Plan](new Plan)
   val whenTrue  = new Property[Plan](new Plan)
   val whenFalse = new Property[Plan](new Plan)

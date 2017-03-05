@@ -11,6 +11,8 @@ import bwapi.{UnitType, UpgradeType}
 
 class ProtossVsTerran extends Parallel {
   
+  description.set(Some("Protoss vs Terran"))
+  
   children.set(List(
     new BuildSupplyContinuously,
     new BuildWorkersContinuously,

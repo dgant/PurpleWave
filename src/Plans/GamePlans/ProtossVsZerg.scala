@@ -12,6 +12,9 @@ import Types.Buildable.{Buildable, BuildableUnit, BuildableUpgrade}
 import bwapi.{UnitType, UpgradeType}
 
 class ProtossVsZerg extends Parallel {
+  
+  description.set(Some("Protoss vs Zerg"))
+  
   children.set(List(
     new BuildSupplyContinuously,
     new BuildWorkersContinuously,

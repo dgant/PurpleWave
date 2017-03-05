@@ -2,32 +2,34 @@ package Plans.Defense
 
 import Geometry.TileRectangle
 import Global.Combat.Commands.Hunt
-import Plans.Allocation.{LockUnits, LockUnitsExactly}
+import Plans.Allocation.LockUnits
 import Plans.Plan
 import Startup.With
 import Strategies.PositionFinders.PositionSpecific
+import Strategies.UnitCounters.UnitCountExactly
 import Strategies.UnitMatchers.UnitMatchWorker
 import Strategies.UnitPreferences.UnitPreferClose
 import Types.Intents.Intention
+import Types.UnitInfo.UnitInfo
 
-import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 class DefeatWorkerHarass extends Plan {
   
-  val _enemyDefense = new mutable.HashMap[Int, LockUnits]
-  val _enemyUpdateFrames = new mutable.HashMap[Int, Integer]
+  val _enemyDefense = new mutable.HashMap[UnitInfo, LockUnits]
+  val _enemyUpdateFrames = new mutable.HashMap[UnitInfo, Integer]
   
-  override def getChildren: Iterable[Plan] = { _enemyDefense.values }
+  override def getChildren: Iterable[Plan] = _enemyDefense.values
   
   override def onFrame() {
     //Release defenders shortly after defender leaves the box
     _enemyUpdateFrames
         .filter(pair => pair._2 + 8 < With.game.getFrameCount)
-        .foreach(pair => {
-          _enemyDefense.get(pair._1).foreach(defenders => With.recruiter._forgetRequest(defenders))
-          _enemyDefense.remove(pair._1)
-          _enemyUpdateFrames.remove(pair._1)
+        .map(_._1)
+        .foreach(enemy => {
+          _enemyDefense.get(enemy).foreach(defenders => With.recruiter._forgetRequest(defenders))
+          _enemyDefense.remove(enemy)
+          _enemyUpdateFrames.remove(enemy)
         })
     
     With.geography.ourHarvestingAreas.foreach(_defendBaseWorkers)
@@ -40,29 +42,26 @@ class DefeatWorkerHarass extends Plan {
     })
   }
   
-  def _defendBaseWorkers(miningArea:TileRectangle) {
-    val enemiesInBox = With.game.getUnitsInRectangle(miningArea.startPosition, miningArea.endPosition)
-    .asScala
-    .filter(unit => unit.getPlayer.isEnemy(With.game.self))
-    .filter(unit => unit.getType.canAttack)
-    .filter(unit => ! unit.isFlying)
-    
-    enemiesInBox.foreach(_defendFromEnemy)
-  }
+  def _defendBaseWorkers(miningArea:TileRectangle) =
+    With.units.inRectangle(miningArea)
+      .filter(_.isEnemy)
+      .filter(_.canFight)
+      .filter(! _.flying)
+      .foreach(_defendFromEnemy)
   
-  def _defendFromEnemy(enemy:bwapi.Unit) {
-    if ( ! _enemyDefense.contains(enemy.getID)) {
+  def _defendFromEnemy(enemy:UnitInfo) {
+    if ( ! _enemyDefense.contains(enemy)) {
       _enemyDefense.put(
-        enemy.getID,
-        new LockUnitsExactly {
-          this.description.set(Some("Eject enemy scout"))
-          this.quantity.set(2)
-          this.unitMatcher.set(UnitMatchWorker)
-          this.unitPreference.set(new UnitPreferClose {
-            this.positionFinder.set(new PositionSpecific(enemy.getTilePosition))
+        enemy,
+        new LockUnits {
+          description.set(Some("Eject enemy scout"))
+          unitCounter.set(new UnitCountExactly(2))
+          unitMatcher.set(UnitMatchWorker)
+          unitPreference.set(new UnitPreferClose {
+            positionFinder.set(new PositionSpecific(enemy.tileCenter))
           })
         })
     }
-    _enemyUpdateFrames.put(enemy.getID, With.game.getFrameCount)
+    _enemyUpdateFrames.put(enemy, With.game.getFrameCount)
   }
 }

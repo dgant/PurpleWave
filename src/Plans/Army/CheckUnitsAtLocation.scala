@@ -1,4 +1,4 @@
-package Plans.Army.UnitAtLocation
+package Plans.Army
 
 import Plans.Plan
 import Startup.With
@@ -6,7 +6,7 @@ import Strategies.PositionFinders.{PositionCenter, PositionFinder}
 import Strategies.UnitMatchers.{UnitMatchAnything, UnitMatcher}
 import Utilities.Property
 
-class PlanCheckUnitAtLocation extends Plan {
+class CheckUnitsAtLocation extends Plan {
   
   val quantity        = new Property[Int](1)
   val positionFinder  = new Property[PositionFinder](new PositionCenter)

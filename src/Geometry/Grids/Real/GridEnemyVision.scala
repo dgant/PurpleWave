@@ -3,11 +3,14 @@ package Geometry.Grids.Real
 import Geometry.Circle
 import Geometry.Grids.Abstract.GridBoolean
 import Startup.With
+import Utilities.Caching.Limiter
 import Utilities.Enrichment.EnrichPosition._
 
-
 class GridEnemyVision extends GridBoolean {
-  override def update() {
+  
+  val _limitUpdates = new Limiter(24, _update)
+  override def update() = _limitUpdates.act()
+  def _update() {
     reset()
     With.units.enemy
       .filter(_.possiblyStillThere)

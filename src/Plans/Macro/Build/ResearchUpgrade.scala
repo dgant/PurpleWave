@@ -3,36 +3,39 @@ package Plans.Macro.Build
 import Plans.Allocation._
 import Plans.Plan
 import Startup.With
+import Strategies.UnitCounters.UnitCountOne
 import Strategies.UnitMatchers.UnitMatchType
-import Utilities.Property
 import bwapi.UpgradeType
 
 class ResearchUpgrade(upgradeType: UpgradeType, level: Int) extends Plan {
   
-  val currency   = new Property[LockCurrency](new LockCurrencyForUpgrade(upgradeType, level))
-  val researcher = new Property[LockUnits](new LockUnitsExactly { unitMatcher.set(new UnitMatchType(upgradeType.whatUpgrades)) })
+  val currency = new LockCurrencyForUpgrade(upgradeType, level)
+  val researcher = new LockUnits {
+    unitMatcher.set(new UnitMatchType(upgradeType.whatUpgrades))
+    unitCounter.set(UnitCountOne)
+  }
   
   override def isComplete: Boolean = { With.game.self.getUpgradeLevel(upgradeType) >= level }
-  override def getChildren: Iterable[Plan] = { List (currency.get, researcher.get) }
+  override def getChildren: Iterable[Plan] = List (currency, researcher)
   
   override def onFrame() {
-    currency.get.onFrame()
-    if ( ! currency.get.isComplete) {
+    currency.onFrame()
+    if ( ! currency.isComplete) {
       return
     }
     
-    researcher.get.onFrame()
-    if ( ! researcher.get.isComplete || researcher.get.units.isEmpty) {
+    researcher.onFrame()
+    if ( ! researcher.isComplete || researcher.units.isEmpty) {
       return
     }
     
-    val researcherUnit = researcher.get.units.head
+    val researcherUnit = researcher.units.head
     if (researcherUnit.upgrading == upgradeType) {
-      currency.get.isSpent = true
+      currency.isSpent = true
     }
     else if (researcherUnit.upgrading == UpgradeType.None) {
       researcherUnit.baseUnit.upgrade(upgradeType)
-      currency.get.isSpent = true
+      currency.isSpent = true
     }
   }
 }

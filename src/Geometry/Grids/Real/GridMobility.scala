@@ -8,9 +8,7 @@ import Utilities.Enrichment.EnrichPosition._
 class GridMobility extends GridInt {
   
   val limitUpdates = new Limiter(24 * 60, _update)
-  override def update() {
-    limitUpdates.act()
-  }
+  override def update() = limitUpdates.act()
   def _update() {
     reset()
     With.grids.walkability.update()

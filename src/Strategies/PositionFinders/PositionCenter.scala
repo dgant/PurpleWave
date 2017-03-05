@@ -1,12 +1,8 @@
 package Strategies.PositionFinders
-import Startup.With
+import Geometry.Positions
 import bwapi.TilePosition
 
 class PositionCenter extends PositionFinder {
   
-  private val _center = new TilePosition(
-    With.game.mapWidth / 2,
-    With.game.mapHeight / 2)
-  
-  override def find(): Option[TilePosition] = Some(_center)
+  override def find(): Option[TilePosition] = Some(Positions.tileMiddle)
 }

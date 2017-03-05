@@ -1,34 +1,32 @@
 package Plans.Macro.Build
 
 import Development.TypeDescriber
-import Plans.Allocation.{LockCurrency, LockCurrencyForUnit, LockUnits, LockUnitsExactly}
+import Plans.Allocation.{LockCurrencyForUnit, LockUnits}
 import Plans.Plan
 import Startup.With
+import Strategies.UnitCounters.UnitCountOne
 import Strategies.UnitMatchers.UnitMatchType
 import Types.UnitInfo.FriendlyUnitInfo
-import Utilities.Property
 import bwapi.UnitType
 
 class TrainUnit(val traineeType:UnitType) extends Plan {
   
-  val currencyPlan  = new Property[LockCurrency] (new LockCurrencyForUnit(traineeType))
-  val trainerPlan   = new Property[LockUnits] (new LockUnitsExactly {
-    this.unitMatcher.set(new UnitMatchType(traineeType.whatBuilds.first))
-  })
+  val currency = new LockCurrencyForUnit(traineeType)
+  val trainerPlan = new LockUnits {
+    unitMatcher.set(new UnitMatchType(traineeType.whatBuilds.first))
+    unitCounter.set(UnitCountOne)
+  }
   
   var _trainer:Option[FriendlyUnitInfo] = None
   var _trainee:Option[FriendlyUnitInfo] = None
   var lastOrderFrame = 0
   
-  description.set(Some(TypeDescriber.describeUnitType(traineeType)))
+  description.set(Some("Train a " + TypeDescriber.describeUnitType(traineeType)))
   
-  override def isComplete: Boolean = { _trainee.exists(p => p.alive && p.complete) }
-  override def getChildren: Iterable[Plan] = { List(currencyPlan.get, trainerPlan.get) }
+  override def isComplete: Boolean = _trainee.exists(p => p.alive && p.complete)
+  override def getChildren: Iterable[Plan] = List(currency, trainerPlan)
   override def onFrame() {
-    if (isComplete) {
-      //It's important to quit so we release our resources
-      return
-    }
+    if (isComplete) { return }
     
     getChildren.foreach(_.onFrame())
   
@@ -37,11 +35,11 @@ class TrainUnit(val traineeType:UnitType) extends Plan {
       return
     }
   
-    trainerPlan.get.units.headOption.foreach(_requireTraining)
+    trainerPlan.units.headOption.foreach(_requireTraining)
   }
   
   def _reset() {
-    currencyPlan.get.isSpent = false
+    currency.isSpent = false
     _trainer = None
     _trainee = None
   }
@@ -88,7 +86,7 @@ class TrainUnit(val traineeType:UnitType) extends Plan {
   
   def _orderUnit(trainer:FriendlyUnitInfo) {
     _trainer = Some(trainer)
-    currencyPlan.get.isSpent = true
+    currency.isSpent = true
     trainer.baseUnit.train(traineeType)
     lastOrderFrame = With.game.getFrameCount
   }

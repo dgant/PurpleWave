@@ -15,7 +15,7 @@ abstract class GridStrength extends GridInt {
     _limitUpdates.act()
   }
   
-  val rangeMargin = 16
+  val rangeMargin = 48
   
   def _update() {
     reset()

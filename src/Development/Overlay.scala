@@ -3,7 +3,6 @@ package Development
 import Geometry.Grids.Abstract.Grid
 import Geometry.TileRectangle
 import Global.Combat.Battle.Battle
-import Plans.Allocation.{LockCurrency, LockUnits}
 import Plans.Plan
 import Startup.With
 import Types.UnitInfo.ForeignUnitInfo
@@ -19,6 +18,7 @@ object Overlay {
       With.game.setTextSize(bwapi.Text.Size.Enum.Small)
       if (With.configuration.enableOverlayBasePlacement)  _drawBases()
       if (With.configuration.enableOverlayBattles)        _drawBattles()
+      if (With.configuration.enableOverlayChokes)         _drawChokes()
       if (With.configuration.enableOverlayEconomy)        _drawEconomy()
       if (With.configuration.enableOverlayExclusions)     _drawExclusions()
       if (With.configuration.enableOverlayGrids)          _drawGrids()
@@ -63,6 +63,8 @@ object Overlay {
       backgroundColor = Color.Brown)
   }
   
+  def _drawChokes() = With.geography.chokes.foreach(choke => With.game.drawCircleMap(choke, 64, Color.Purple))
+  
   def _drawEconomy() {
     val labels = List(
       "Active miners:",
@@ -100,13 +102,14 @@ object Overlay {
   }
   
   def _drawGrids() {
-    _drawGrid(With.grids.friendlyGroundStrength, 0, 1)
-    _drawGrid(With.grids.enemyGroundStrength, 0, 0)
+    //_drawGrid(With.grids.walkability, 0, 1)
+    //_drawGrid(With.grids.mobility, 0, 0)
+    _drawGrid(With.grids.enemyVision, 0, 0)
   }
   
   def _drawGrid[T](map:Grid[T], offsetX:Int=0, offsetY:Int=0) {
     map.positions
-      .filter(tilePosition => map.get(tilePosition) != 0)
+      .filter(tilePosition => map.get(tilePosition) != 0 &&  map.get(tilePosition) != false)
       .foreach(tilePosition => With.game.drawTextMap(tilePosition.toPosition.add(offsetX*16, offsetY*13), map.repr(map.get(tilePosition))))
   }
   
@@ -137,27 +140,17 @@ object Overlay {
   
   def _drawTerrain() {
     BWTA.getRegions.asScala.foreach(region => {
-        _drawPolygonPositions(region.getPolygon.getPoints.asScala)
-        With.game.drawLineMap(
-          region.getPolygon.getPoints.asScala.head,
-          region.getPolygon.getPoints.asScala.last,
-          bwapi.Color.Brown)
-        With.game.drawTextMap(
-          region.getCenter,
-          region.getCenter.toString ++
-          "\n" ++
-          region.getCenter.toTilePosition.toString)
-        region.getChokepoints.asScala.foreach(
-          choke => {
-            With.game.drawLineMap(choke.getSides.first, choke.getSides.second, bwapi.Color.Purple)
-            With.game.drawTextMap(
-              choke.getCenter,
-              choke.getCenter.toString ++
-              "\n" ++
-              choke.getCenter.toTilePosition.toString)
-          })
-      }
-    )
+      _drawPolygonPositions(region.getPolygon.getPoints.asScala)
+      With.game.drawLineMap(
+        region.getPolygon.getPoints.asScala.head,
+        region.getPolygon.getPoints.asScala.last,
+        bwapi.Color.Brown)
+      With.game.drawTextMap(
+        region.getCenter,
+        region.getCenter.toString ++
+        "\n" ++
+        region.getCenter.toTilePosition.toString)
+      })
   }
   
   def _drawResources() {
@@ -223,11 +216,9 @@ object Overlay {
   }
   
   def _isRelevant(plan:Plan):Boolean = {
-    if (plan.isComplete) {
-      return plan.isInstanceOf[LockCurrency] || plan.isInstanceOf[LockUnits]
-    }
-    
-    plan.getChildren.exists(_isRelevant(_))
+    return ! plan.isComplete && plan.getChildren.exists(child => child.isComplete || _isRelevant(child))
+    //return plan.isInstanceOf[LockCurrency] || plan.isInstanceOf[LockUnits]
+    //plan.getChildren.exists(child => plan.isInstanceOf[LockCurrency] || plan.isInstanceOf[LockUnits])
   }
   
   def _drawTextLabel(

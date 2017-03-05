@@ -17,11 +17,6 @@ class Cache[T](
     _cachedValue.get
   }
   
-  def _recalculateAsNeeded:T = {
-    recalculator.apply()
-  }
-  
-  def _cacheHasExpired:Boolean = {
-    _lastUpdateFrame < 0 || With.game.getFrameCount - _lastUpdateFrame > duration
-  }
+  def _recalculateAsNeeded:T = recalculator.apply()
+  def _cacheHasExpired:Boolean = _lastUpdateFrame < 0 || With.game.getFrameCount - _lastUpdateFrame > duration
 }

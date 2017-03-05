@@ -1,26 +1,49 @@
 package Plans.Allocation
 
+import Development.TypeDescriber
 import Plans.Plan
 import Startup.With
+import Strategies.UnitCountEverything
+import Strategies.UnitCounters.UnitCounter
+import Strategies.UnitMatchers.{UnitMatchAnything, UnitMatcher}
+import Strategies.UnitPreferences.{UnitPreferAnything, UnitPreference}
 import Types.UnitInfo.FriendlyUnitInfo
+import Utilities.Property
 
-abstract class LockUnits extends Plan {
+import scala.collection.mutable
+
+class LockUnits extends Plan {
+  
+  val unitMatcher = new Property[UnitMatcher](UnitMatchAnything)
+  val unitPreference = new Property[UnitPreference](UnitPreferAnything)
+  val unitCounter = new Property[UnitCounter](UnitCountEverything)
   
   var isSatisfied:Boolean = false
   
-  override def isComplete: Boolean = { isSatisfied }
+  description.set(Some(
+    if(isComplete) ": " + units
+      .groupBy(_.utype)
+      .map(pair => TypeDescriber.describeUnitType(pair._1) + " " + pair._2.size)
+      .mkString(", ")
+    else ""))
   
-  override def onFrame() {
-    With.recruiter.add(this)
-  }
+  override def isComplete: Boolean = isSatisfied
+  override def onFrame() = With.recruiter.add(this)
+  def units:Set[FriendlyUnitInfo] = With.recruiter.getUnits(this)
   
-  def units:Set[FriendlyUnitInfo] = {
-    With.recruiter.getUnits(this)
-  }
+  def offerUnits(candidates:Iterable[Iterable[FriendlyUnitInfo]]):Option[Iterable[FriendlyUnitInfo]] = {
+    
+    val desiredUnits = With.recruiter.getUnits(this).to[mutable.Set]
+    
+    candidates
+      .flatten
+      .toList
+      .filter(unitMatcher.get.accept)
+        .sortBy(unitPreference.get.preference)
+        .filter(units => unitCounter.get.continue(desiredUnits))
+        .foreach(desiredUnits.add)
   
-  def getRequiredUnits(candidates:Iterable[Iterable[FriendlyUnitInfo]]):Option[Iterable[FriendlyUnitInfo]]
-  
-  override def toString: String = {
-    super.toString + (if(isComplete) ": " + units.size else "")
+    isSatisfied = unitCounter.get.accept(desiredUnits)
+    if (isSatisfied) Some(desiredUnits) else None
   }
 }

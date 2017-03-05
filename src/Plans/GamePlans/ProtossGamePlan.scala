@@ -1,19 +1,26 @@
-package Plans.GamePlans.Protoss
+package Plans.GamePlans
 
-import Plans.Army.PressureEnemyBase
-import Plans.Compound.AllParallel
+import Plans.Allocation.LockUnits
+import Plans.Army.{Attack, ControlPosition}
+import Plans.Compound.{AllParallel, While}
 import Plans.Defense.DefeatWorkerHarass
+import Plans.Information.ScoutAt
 import Plans.Macro.Automatic._
 import Plans.Macro.Build.{FollowBuildOrder, ScheduleBuildOrder}
+import Plans.Macro.UnitCount.UnitCountAtLeast
+import Strategies.PositionFinders.PositionChoke
+import Strategies.UnitCounters.UnitCountAll
+import Strategies.UnitMatchers.UnitMatchWarriors
 import Types.Buildable.{Buildable, BuildableUnit, BuildableUpgrade}
 import bwapi.{UnitType, UpgradeType}
 
-class ProtossStrategyMacro extends AllParallel {
+class ProtossGamePlan extends AllParallel {
   
   val _buildOrder = List[Buildable] (
     new BuildableUnit(UnitType.Protoss_Nexus),
     new BuildableUnit(UnitType.Protoss_Pylon),
     new BuildableUnit(UnitType.Protoss_Gateway),
+    new BuildableUnit(UnitType.Protoss_Pylon),
     new BuildableUnit(UnitType.Protoss_Cybernetics_Core),
     new BuildableUnit(UnitType.Protoss_Assimilator),
     new BuildableUnit(UnitType.Protoss_Gateway),
@@ -48,7 +55,18 @@ class ProtossStrategyMacro extends AllParallel {
     new ScheduleBuildOrder { this.buildables.set(_buildOrder) },
     new FollowBuildOrder,
     new DefeatWorkerHarass,
-    new PressureEnemyBase,
+    new ScoutAt(20),
+    new While {
+      predicate.set(new UnitCountAtLeast { quantity.set(5); unitMatcher.set(UnitMatchWarriors) })
+      action.set(new Attack)
+    },
+    new ControlPosition {
+      position.set(PositionChoke)
+      units.set(new LockUnits {
+        unitMatcher.set(UnitMatchWarriors)
+        unitCounter.set(UnitCountAll)
+      })
+    },
     new GatherGas,
     new GatherMinerals
   ))

@@ -1,5 +1,6 @@
 package Global.Combat.Heuristics
 
+import Geometry.Circle
 import Startup.With
 import Types.UnitInfo.FriendlyUnitInfo
 import Utilities.Enrichment.EnrichPosition._
@@ -7,12 +8,11 @@ import bwapi.TilePosition
 
 object EvaluatePositions {
   
-  def bestPosition(unit:FriendlyUnitInfo, evaluator:EvaluatePosition, searchRange:Int = 3):TilePosition = {
+  def bestPosition(unit:FriendlyUnitInfo, evaluator:EvaluatePosition, searchRange:Int = 4):TilePosition = {
     
     val candidates =
-      (-searchRange to searchRange).flatten(dy =>
-        (-searchRange to searchRange).map(dx => (dx, dy)))
-        .map(point => unit.tileCenter.add(point._1, point._2))
+      Circle.points(searchRange)
+        .map(unit.tileCenter.add)
         .filter(With.grids.walkability.get)
   
     if (candidates.isEmpty) {

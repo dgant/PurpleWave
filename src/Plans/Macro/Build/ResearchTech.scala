@@ -1,38 +1,41 @@
 package Plans.Macro.Build
 
-import Plans.Allocation.{LockCurrency, LockCurrencyForTech, LockUnits, LockUnitsExactly}
+import Plans.Allocation.{LockCurrencyForTech, LockUnits}
 import Plans.Plan
 import Startup.With
+import Strategies.UnitCounters.UnitCountOne
 import Strategies.UnitMatchers.UnitMatchType
-import Utilities.Property
 import bwapi.TechType
 
 class ResearchTech(techType: TechType) extends Plan {
   
-  val currency   = new Property[LockCurrency](new LockCurrencyForTech(techType))
-  val researcher = new Property[LockUnits](new LockUnitsExactly { unitMatcher.set(new UnitMatchType(techType.whatResearches)) })
+  val currency = new LockCurrencyForTech(techType)
+  val researcher = new LockUnits {
+    unitCounter.set(UnitCountOne)
+    unitMatcher.set(new UnitMatchType(techType.whatResearches))
+  }
   
-  override def isComplete: Boolean = { With.game.self.hasResearched(techType) }
-  override def getChildren: Iterable[Plan] = { List (currency.get, researcher.get) }
+  override def isComplete: Boolean = With.game.self.hasResearched(techType)
+  override def getChildren: Iterable[Plan] = List (currency, researcher)
   
   override def onFrame() {
-    currency.get.onFrame()
-    if ( ! currency.get.isComplete) {
+    currency.onFrame()
+    if ( ! currency.isComplete) {
       return
     }
     
-    researcher.get.onFrame()
-    if ( ! researcher.get.isComplete || researcher.get.units.isEmpty) {
+    researcher.onFrame()
+    if ( ! researcher.isComplete || researcher.units.isEmpty) {
       return
     }
     
-    val researcherUnit = researcher.get.units.head
+    val researcherUnit = researcher.units.head
     if (researcherUnit.teching == techType) {
-      currency.get.isSpent = true
+      currency.isSpent = true
     }
     else if (researcherUnit.teching == TechType.None) {
       researcherUnit.baseUnit.research(techType)
-      currency.get.isSpent = true
+      currency.isSpent = true
     }
   }
 }

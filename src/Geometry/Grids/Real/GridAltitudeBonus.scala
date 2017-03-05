@@ -10,7 +10,8 @@ class GridAltitudeBonus extends GridDouble {
   }
   
   def _getBonus(altitude:Int):Double = {
-    val multiplier = 1.3
+    //http://wiki.teamliquid.net/starcraft/Terrain_Features#High_Ground
+    val multiplier = 1.9
     return altitude match {
       case 0 => 1.0
       case 1 => 1.0 * multiplier

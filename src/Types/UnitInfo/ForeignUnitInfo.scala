@@ -13,7 +13,7 @@ class ForeignUnitInfo(_baseUnit:bwapi.Unit) extends UnitInfo (_baseUnit) {
   var _player             = With.game.self
   var _position           = new Position(0,0)
   var _walkPosition       = new WalkPosition(0,0)
-  var _tileTopleft       = new TilePosition(0,0)
+  var _tileTopleft        = new TilePosition(0,0)
   var _hitPoints          = 0
   var _shieldPoints       = 0
   var _unitType           = UnitType.None
@@ -38,7 +38,7 @@ class ForeignUnitInfo(_baseUnit:bwapi.Unit) extends UnitInfo (_baseUnit) {
     _player             = unit.getPlayer
     _position           = unit.getPosition
     _walkPosition       = _position.toWalkPosition
-    _tileTopleft       = unit.getTilePosition
+    _tileTopleft        = unit.getTilePosition
     _hitPoints          = unit.getHitPoints
     _shieldPoints       = unit.getShields
     _unitType           = unit.getType
@@ -71,7 +71,7 @@ class ForeignUnitInfo(_baseUnit:bwapi.Unit) extends UnitInfo (_baseUnit) {
   override def tileTopLeft: TilePosition = _tileTopleft
   override def hitPoints: Int = _hitPoints
   override def shieldPoints: Int = _shieldPoints
-  override def utype: UnitType = _unitType
+  override def utype: UnitType = if ( ! visible && _unitType == UnitType.Terran_Siege_Tank_Tank_Mode) UnitType.Terran_Siege_Tank_Siege_Mode else _unitType
   override def complete: Boolean = _complete
   override def flying: Boolean = _flying
   override def visible: Boolean = lastSeen >= With.game.getFrameCount

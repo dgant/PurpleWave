@@ -3,7 +3,7 @@ package Plans.Compound
 import Plans.Plan
 import Utilities.Property
 
-class CompleteOnce extends Plan {
+class JustOnce extends Plan {
   
   description.set(Some("Do once"))
     

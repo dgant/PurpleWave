@@ -76,14 +76,12 @@ class Recruiter {
           With.prioritizer.getPriority(otherRequest))
       .map(getUnits)
     
-    val requiredUnits = request.getRequiredUnits(Iterable(_unassignedUnits) ++ assignedToLowerPriority)
+    val requiredUnits = request.offerUnits(Iterable(_unassignedUnits) ++ assignedToLowerPriority)
 
     if (requiredUnits == None) {
-      request.isSatisfied = false
       _forgetRequest(request)
     }
     else {
-      request.isSatisfied = true
   
       // 1. Unassign all the current buildersOccupied
       // 2. Unassign all the required buildersOccupied

@@ -19,6 +19,9 @@ class Bot() extends DefaultBWListener {
       With.logger.debug("Loading BWTA.")
       BWTA.readMap()
       BWTA.analyze()
+      //Not sure if these help
+      BWTA.computeDistanceTransform()
+      BWTA.buildChokeNodes()
       With.logger.debug("BWTA analysis complete.")
       
       With.architect = new Architect

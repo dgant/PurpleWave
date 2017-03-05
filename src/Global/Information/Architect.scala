@@ -5,8 +5,6 @@ import Startup.With
 import Utilities.Enrichment.EnrichPosition._
 import bwapi.{TilePosition, UnitType}
 
-import scala.collection.JavaConverters._
-
 class Architect {
   
   def placeBuilding(
@@ -117,16 +115,11 @@ class Architect {
   }
   
   def _rectangleContainsOnlyAWorker(rectangle: TileRectangle):Boolean = {
-    val trespassingUnits =
-      (rectangle.startInclusive.getX to rectangle.endExclusive.getX).flatten(x =>
-        (rectangle.startInclusive.getY to rectangle.endExclusive.getY).flatten(y =>
-          With.game.getUnitsOnTile(x, y).asScala
-      ))
-      .filterNot(_.isFlying)
+    val trespassingUnits = With.units.inRectangle(rectangle).filterNot(_.flying)
   
     trespassingUnits.size <= 1 &&
-      trespassingUnits.forall(_.getType.isWorker) &&
-      trespassingUnits.forall(_.getPlayer == With.game.self)
+      trespassingUnits.forall(_.utype.isWorker) &&
+      trespassingUnits.forall(_.isOurs)
   }
   
   def _rectangleIsBuildable(area: TileRectangle, buildingType: UnitType, hypotheticalPylon: Option[TilePosition] = None):Boolean = {

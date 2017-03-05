@@ -70,6 +70,9 @@ case object EnrichPosition {
     def midpoint(otherPosition:Position):Position = {
       add(otherPosition).divide(2)
     }
+    def distance(otherPosition:Position):Double = {
+      Math.sqrt(distanceSquared(otherPosition))
+    }
     def distanceSquared(otherPosition:Position):Int = {
       val dx = position.getX - otherPosition.getX
       val dy = position.getY - otherPosition.getY
@@ -102,6 +105,9 @@ case object EnrichPosition {
     def midpoint(otherPosition:WalkPosition):WalkPosition = {
       add(otherPosition).divide(2)
     }
+    def distance(otherPosition:WalkPosition):Double = {
+      Math.sqrt(distanceSquared(otherPosition))
+    }
     def distanceSquared(otherPosition:WalkPosition):Int = {
       val dx = position.getX - otherPosition.getX
       val dy = position.getY - otherPosition.getY
@@ -133,6 +139,9 @@ case object EnrichPosition {
     }
     def midpoint(otherPosition:TilePosition):TilePosition = {
       add(otherPosition).divide(2)
+    }
+    def distance(otherPosition:TilePosition):Double = {
+      Math.sqrt(distanceSquared(otherPosition))
     }
     def distanceSquared(otherPosition:TilePosition):Int = {
       val dx = position.getX - otherPosition.getX

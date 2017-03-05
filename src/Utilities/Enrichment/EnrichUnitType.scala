@@ -40,10 +40,9 @@ case object EnrichUnitType {
       UnitType.Zerg_Lair,
       UnitType.Zerg_Hive
     ).contains(unitType)
-    def tiles:Iterable[TilePosition] = {
+    def tiles:Iterable[TilePosition] =
       (0 until unitType.tileWidth).flatten(dx =>
         (0 until unitType.tileHeight).map(dy =>
           new TilePosition(dx, dy)))
-    }
   }
 }

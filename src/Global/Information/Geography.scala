@@ -1,38 +1,33 @@
 package Global.Information
 
-import Geometry.{Clustering, Positions, TileRectangle}
+import Geometry._
 import Startup.With
 import Types.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo}
 import Utilities.Caching.{Cache, CacheForever}
 import Utilities.Enrichment.EnrichPosition._
 import Utilities.Enrichment.EnrichUnitType._
 import bwapi.{Position, TilePosition, UnitType}
+import bwta.BWTA
+
+import scala.collection.JavaConverters._
 
 class Geography {
   
-  def centerPosition:Position = {
-    new Position(With.game.mapWidth * 32 / 2, With.game.mapHeight* 32 / 2)
-  }
+  val _cacheChokes = new CacheForever[Iterable[Position]](() => BWTA.getChokepoints.asScala.map(_.getCenter))
+  def chokes:Iterable[Position] = _cacheChokes.get
+  def ourBases:Iterable[TilePosition] = ourBaseHalls.map(_.tileTopLeft)
   
-  def centerTilePosition:TilePosition = {
-    new TilePosition(With.game.mapWidth / 2, With.game.mapHeight / 2)
-  }
+  val _cacheBaseHalls = new Cache[Iterable[FriendlyUnitInfo]](1, () => With.units.ours.filter(unit => unit.utype.isTownHall && ! unit.flying))
+  def ourBaseHalls:Iterable[FriendlyUnitInfo] = _cacheBaseHalls.get
   
   val _cacheHome = new Cache[TilePosition](24, () => _calculateHome)
-  def home:TilePosition = {
-    _cacheHome.get
-  }
-  def _calculateHome:TilePosition = {
+  def home:TilePosition = _cacheHome.get
+  def _calculateHome:TilePosition =
     ourBaseHalls.view.map(_.tileTopLeft).headOption
       .getOrElse(With.units.ours.view.filter(_.utype.isBuilding).map(_.tileTopLeft).headOption
         .getOrElse(Positions.tileMiddle))
-  }
   
-  def ourBaseHalls:Iterable[FriendlyUnitInfo] = {
-    With.units.ours.filter(unit => unit.utype.isTownHall && ! unit.flying)
-  }
-  
-  def ourHarvestingAreas:Iterable[TileRectangle] = { _ourHarvestingAreaCache.get }
+  def ourHarvestingAreas:Iterable[TileRectangle] = _ourHarvestingAreaCache.get
   val _ourHarvestingAreaCache = new Cache[Iterable[TileRectangle]](24 * 5, () => _ourHarvestingAreas)
   def _ourHarvestingAreas:Iterable[TileRectangle] = {
     ourBaseHalls.filter(_.complete).map(base => {
@@ -60,36 +55,19 @@ class Geography {
   val _basePositionsCache = new Cache[Iterable[TilePosition]](24 * 60, () => _calculateBasePositions)
   val _resourceClusterCache = new CacheForever[Iterable[Iterable[ForeignUnitInfo]]](() => _getResourceClusters)
   val _resourceExclusionCache = new CacheForever[Iterable[TileRectangle]](() => _getExclusions)
-  def _getResourceClusters:Iterable[Iterable[ForeignUnitInfo]] = {
-    //Probably TODO: Exclude mineral blocks
-    Clustering.group[ForeignUnitInfo](_getResources, 32 * 15, true, (unit) => unit.position).values
-  }
-  def _getExclusions:Iterable[TileRectangle] = {
-    _getResources.map(_getExclusion)
-  }
-  def _getExclusion(unit:ForeignUnitInfo):TileRectangle = {
-    new TileRectangle(unit.tileTopLeft.subtract(3, 3), unit.tileTopLeft.add(unit.utype.tileSize).add(3, 3))
-  }
-  def _getResources:Iterable[ForeignUnitInfo] = {
-    With.units.neutral.filter(unit => unit.isMinerals || unit.isGas).filter(_.baseUnit.getInitialResources > 24)
-  }
-  def _calculateBasePositions:Iterable[TilePosition] = {
-    _resourceClusterCache.get.map(_findBasePosition).filter(_.nonEmpty).map(_.get)
-  }
+  //Probably TODO: Exclude mineral blocks
+  def _getResourceClusters:Iterable[Iterable[ForeignUnitInfo]] = Clustering.group[ForeignUnitInfo](_getResources, 32 * 15, true, (unit) => unit.position).values
+  def _getExclusions:Iterable[TileRectangle] = _getResources.map(_getExclusion)
+  def _getExclusion(unit:ForeignUnitInfo):TileRectangle = new TileRectangle(unit.tileTopLeft.subtract(3, 3), unit.tileTopLeft.add(unit.utype.tileSize).add(3, 3))
+  def _getResources:Iterable[ForeignUnitInfo] = With.units.neutral.filter(unit => unit.isMinerals || unit.isGas).filter(_.baseUnit.getInitialResources > 24)
+  def _calculateBasePositions:Iterable[TilePosition] = _resourceClusterCache.get.map(_findBasePosition).filter(_.nonEmpty).map(_.get)
   def _findBasePosition(resources:Iterable[ForeignUnitInfo]):Option[TilePosition] = {
     val centroid = resources.map(_.position).centroid
     val centroidTile = centroid.toTilePosition
     val searchRadius = 10
-    val candidates =
-      (-searchRadius to searchRadius).flatten(dx =>
-        (-searchRadius to searchRadius).map(dy =>
-          centroidTile.add(new TilePosition(dx, dy))))
-    
-    val extantCandidates = candidates.filter(_isLegalBasePosition)
-    
-    if (extantCandidates.isEmpty) return None
-    
-    Some(extantCandidates.minBy(_.toPosition.add(64, 48).getDistance(centroid)))
+    val candidates = Circle.points(searchRadius).map(centroidTile.add).filter(_isLegalBasePosition)
+    if (candidates.isEmpty) return None
+    Some(candidates.minBy(_.toPosition.add(64, 48).getDistance(centroid)))
   }
   
   def _isLegalBasePosition(position:TilePosition):Boolean = {

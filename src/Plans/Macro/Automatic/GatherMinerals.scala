@@ -1,22 +1,24 @@
 package Plans.Macro.Automatic
 
-import Plans.Allocation.{LockUnits, LockUnitsGreedily}
+import Plans.Allocation.LockUnits
 import Plans.Plan
 import Startup.With
+import Strategies.UnitCounters.UnitCountAll
 import Strategies.UnitMatchers.UnitMatchWorker
 import Types.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo}
 import Utilities.Caching.Limiter
 import Utilities.Enrichment.EnrichUnitType._
-import Utilities.Property
 import bwapi.UnitCommandType
 
 import scala.collection.mutable
 
 class GatherMinerals extends Plan {
+
+  val miners = new LockUnits
+  miners.unitMatcher.set(UnitMatchWorker)
+  miners.unitCounter.set(UnitCountAll)
   
-  val workerPlan = new Property[LockUnits](new LockUnitsGreedily { unitMatcher.set(UnitMatchWorker) })
-  
-  override def getChildren: Iterable[Plan] = { List(workerPlan.get) }
+  override def getChildren: Iterable[Plan] = List(miners)
   
   var _minerals:List[ForeignUnitInfo] = List.empty
   val _workersByMineral = new mutable.HashMap[ForeignUnitInfo, mutable.HashSet[FriendlyUnitInfo]] {
@@ -27,11 +29,10 @@ class GatherMinerals extends Plan {
   
   val _limitResetAssignments = new Limiter(24 * 5, _resetAssignments)
   override def onFrame() {
-    workerPlan.get.onFrame()
+    miners.onFrame()
     _limitResetAssignments.act()
     _assignWorkers()
-    val workers = workerPlan.get.units
-    workerPlan.get.units.foreach(_orderWorker)
+    miners.units.foreach(_orderWorker)
   }
   
   def _resetAssignments() {
@@ -51,7 +52,7 @@ class GatherMinerals extends Plan {
   
   def _assignWorkers() {
     val unassignedWorkers = new mutable.HashSet[FriendlyUnitInfo]
-    unassignedWorkers ++= workerPlan.get.units.diff(_mineralByWorker.keySet)
+    unassignedWorkers ++= miners.units.diff(_mineralByWorker.keySet)
     _sortMinerals()
     if (_minerals.isEmpty) { return }
     while (unassignedWorkers.nonEmpty) {
@@ -68,7 +69,7 @@ class GatherMinerals extends Plan {
   }
   
   def _assignWorker(worker:FriendlyUnitInfo) {
-    if (_minerals.isEmpty) { return }
+    if (_minerals.isEmpty) return
     _sortMinerals()
     val mineral = _minerals.head
     _workersByMineral(mineral).add(worker)
@@ -104,7 +105,5 @@ class GatherMinerals extends Plan {
     }
   }
   
-  def _gather(worker:FriendlyUnitInfo, mineral:ForeignUnitInfo) {
-    worker.baseUnit.gather(mineral.baseUnit)
-  }
+  def _gather(worker:FriendlyUnitInfo, mineral:ForeignUnitInfo) = worker.baseUnit.gather(mineral.baseUnit)
 }

@@ -1,8 +1,10 @@
 package Global.Information.UnitAbstraction
 
+import Geometry.TileRectangle
 import Startup.With
 import Types.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, UnitInfo}
 import bwapi.Position
+
 import scala.collection.JavaConverters._
 
 class Units {
@@ -49,6 +51,10 @@ class Units {
   
   def inRectangle(topLeft:Position, bottomRight:Position):Iterable[UnitInfo] = {
     _remap(With.game.getUnitsInRectangle(topLeft, bottomRight))
+  }
+  
+  def inRectangle(rectangle:TileRectangle):Iterable[UnitInfo] = {
+    inRectangle(rectangle.startPosition, rectangle.endPosition)
   }
   
   def onFrame() {

@@ -1,8 +1,8 @@
 package Plans.Information
 
-import Plans.Compound.Until
+import Plans.Compound.IfThenElse
 
-class KnowEnemyBase extends Until {
+class KnowEnemyBase extends IfThenElse {
   predicate.set(new FoundEnemyBase)
-  action.set(new FindEnemyBase)
+  whenFalse.set(new FindEnemyBase)
 }

@@ -11,7 +11,7 @@ import Utilities.Property
 class ControlPosition extends Plan {
   
   val units = new Property[LockUnits](new LockUnits)
-  var position = new Property[PositionFinder](new PositionFind)
+  var position = new Property[PositionFinder](new PositionEnemyBase)
   
   override def getChildren: Iterable[Plan] = List(units.get)
   override def onFrame() {

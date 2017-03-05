@@ -4,7 +4,5 @@ class AllParallel extends AbstractPlanCompleteAll {
   
   description.set(Some("Do in parallel"))
   
-  override def onFrame() = {
-    getChildren.foreach(_.onFrame())
-  }
+  override def onFrame() = getChildren.foreach(_.onFrame())
 }

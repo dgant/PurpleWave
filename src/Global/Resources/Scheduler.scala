@@ -22,7 +22,7 @@ class Scheduler {
     val unitsActual = With.units.ours.groupBy(_.utype).mapValues(_.size)
     _requests.keys.toList
       .sortBy(With.prioritizer.getPriority)
-      .flatten(_requests(_))
+      .flatten(_requests)
       .filterNot(buildable => _isFulfilled(buildable, unitsWanted, unitsActual))
   }
   

@@ -5,7 +5,7 @@ import Startup.With
 
 class BuildSupplyContinuously extends AbstractBuildContinuously[BuildBuilding] {
   
-  override def _buildPlan:BuildBuilding = {
+  override def _createPlan:BuildBuilding = {
     new BuildBuilding(With.game.self.getRace.getSupplyProvider)
   }
   

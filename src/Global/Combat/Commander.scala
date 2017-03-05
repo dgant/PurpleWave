@@ -15,7 +15,7 @@ class Commander {
   val _nextOrderFrame = new mutable.HashMap[FriendlyUnitInfo, Int] { override def default(key: FriendlyUnitInfo): Int = 0 }
   val _lastCommands = new mutable.HashMap[FriendlyUnitInfo, String]
   
-  def intend(intention:Intention) { _intentions.add(intention) }
+  def intend(intention:Intention) = _intentions.add(intention)
   
   def onFrame() {
     _intentions.filter(_isAwake).foreach(intent => intent.command.execute(intent))
@@ -65,7 +65,7 @@ class Commander {
   }
   
   def _isAwake(intent:Intention):Boolean = {
-    return _nextOrderFrame(intent.unit) < With.game.getFrameCount
+    _nextOrderFrame(intent.unit) < With.game.getFrameCount
   }
   
   def _recordCommand(unit:FriendlyUnitInfo, command:Command) {

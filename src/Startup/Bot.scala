@@ -58,7 +58,7 @@ class Bot() extends DefaultBWListener {
       With.bank.onFrame()
       With.recruiter.onFrame()
       With.prioritizer.onFrame()
-      With.gameplan.onFrame() //This needs to be last!
+      With.gameplan.onFrame()
       With.scheduler.onFrame()
       With.commander.onFrame()
       With.camera.onFrame()

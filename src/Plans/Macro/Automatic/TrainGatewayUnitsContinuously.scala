@@ -4,9 +4,9 @@ import Plans.Macro.Build.TrainUnit
 import Startup.With
 import bwapi.UnitType
 
-class BuildGatewayUnitsContinuously extends AbstractBuildContinuously[TrainUnit] {
+class TrainGatewayUnitsContinuously extends AbstractBuildContinuously[TrainUnit] {
   
-  override def _buildPlan:TrainUnit = {
+  override def _createPlan:TrainUnit = {
     new TrainUnit(
       if (With.units.ours.exists(_.utype == UnitType.Protoss_Templar_Archives)
         && With.game.self.gas >= UnitType.Protoss_Dark_Templar.gasPrice

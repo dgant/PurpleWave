@@ -5,7 +5,7 @@ import Startup.With
 
 class BuildWorkersContinuously extends AbstractBuildContinuously[TrainUnit] {
   
-  override def _buildPlan:TrainUnit = {
+  override def _createPlan:TrainUnit = {
     //This only builds workers of our own race. Sad!
     new TrainUnit(With.game.self.getRace.getWorker)
   }

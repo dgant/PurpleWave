@@ -13,10 +13,10 @@ abstract class AbstractBuildContinuously[T <: Plan] extends Plan {
   
   override def onFrame() {
     _currentBuilds --= _currentBuilds.filter(_.isComplete)
-    (1 to _additionalPlansRequired).foreach(i => _currentBuilds.append(_buildPlan))
+    (1 to _additionalPlansRequired).foreach(i => _currentBuilds.append(_createPlan))
     _currentBuilds.foreach(_.onFrame())
   }
   
   def _additionalPlansRequired:Int
-  def _buildPlan:T
+  def _createPlan:T
 }

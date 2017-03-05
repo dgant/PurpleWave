@@ -68,6 +68,7 @@ class BuildBuilding(val buildingType:UnitType) extends Plan {
       _position = buildingPlacer.find
       builderPlan.units.foreach(unit => With.commander.intend(
         new Intention(
+          this,
           unit,
           Approach,
           _position.map(_.add(1, 1)).headOption.getOrElse(unit.position.toTilePosition))))
@@ -90,7 +91,7 @@ class BuildBuilding(val buildingType:UnitType) extends Plan {
         if (builder.distance(_position.get) < 32 * 4) {
           builder.baseUnit.build(buildingType, _position.get)
         } else {
-          With.commander.intend(new Intention(builder, Approach, _position.get))
+          With.commander.intend(new Intention(this, builder, Approach, _position.get))
         }
       }
     }

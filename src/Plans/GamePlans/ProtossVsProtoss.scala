@@ -1,7 +1,7 @@
 package Plans.GamePlans
 
 import Plans.Army.{Attack, DefendChoke}
-import Plans.Compound.{AllParallel, IfThenElse}
+import Plans.Compound.{Parallel, IfThenElse}
 import Plans.Defense.DefeatWorkerHarass
 import Plans.Information.ScoutAt
 import Plans.Macro.Automatic._
@@ -11,12 +11,13 @@ import Strategies.UnitMatchers.UnitMatchWarriors
 import Types.Buildable.{Buildable, BuildableUnit, BuildableUpgrade}
 import bwapi.{UnitType, UpgradeType}
 
-class ProtossVsProtoss extends AllParallel {
+class ProtossVsProtoss extends Parallel {
   
   val _threeGateGoons = List[Buildable] (
     new BuildableUnit(UnitType.Protoss_Nexus),
     new BuildableUnit(UnitType.Protoss_Pylon),
     new BuildableUnit(UnitType.Protoss_Gateway),
+    new BuildableUnit(UnitType.Protoss_Pylon),
     new BuildableUnit(UnitType.Protoss_Cybernetics_Core),
     new BuildableUnit(UnitType.Protoss_Assimilator),
     new BuildableUnit(UnitType.Protoss_Gateway),

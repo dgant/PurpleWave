@@ -1,6 +1,6 @@
 package Plans.Compound
 
-class AllSerial extends AbstractPlanCompleteAll {
+class Serial extends AbstractAll {
   
   description.set(Some("Do in series"))
   

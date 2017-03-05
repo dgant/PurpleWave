@@ -38,7 +38,7 @@ class DefeatWorkerHarass extends Plan {
       pair._2.onFrame()
       pair._2.units.foreach(defender =>
         With.units.enemy.filter(_.id == pair._1).foreach(enemy =>
-          With.commander.intend(new Intention(defender, Hunt, enemy.tileCenter) { targetUnit = Some(enemy) })))
+          With.commander.intend(new Intention(this, defender, Hunt, enemy.tileCenter) { targetUnit = Some(enemy) })))
     })
   }
   

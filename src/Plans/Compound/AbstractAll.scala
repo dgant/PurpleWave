@@ -3,7 +3,7 @@ package Plans.Compound
 import Plans.Plan
 import Utilities.Property
 
-abstract class AbstractPlanCompleteAll extends Plan {
+abstract class AbstractAll extends Plan {
   
   val children = new Property[List[Plan]](List.empty)
   

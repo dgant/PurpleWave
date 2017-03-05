@@ -1,7 +1,7 @@
 package Plans.GamePlans
 
 import Plans.Army.Attack
-import Plans.Compound.AllParallel
+import Plans.Compound.Parallel
 import Plans.Defense.DefeatWorkerHarass
 import Plans.Information.ScoutAt
 import Plans.Macro.Automatic._
@@ -9,7 +9,7 @@ import Plans.Macro.Build.{FollowBuildOrder, ScheduleBuildOrder}
 import Types.Buildable.{Buildable, BuildableUnit, BuildableUpgrade}
 import bwapi.{UnitType, UpgradeType}
 
-class ProtossVsTerran extends AllParallel {
+class ProtossVsTerran extends Parallel {
   
   children.set(List(
     new BuildSupplyContinuously,

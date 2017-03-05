@@ -2,11 +2,13 @@ package Types.Intents
 
 import Global.Combat.Battle.Battle
 import Global.Combat.Commands.Command
+import Plans.Plan
 import Startup.With
 import Types.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import bwapi.TilePosition
 
 class Intention(
+  val plan:Plan,
   val unit:FriendlyUnitInfo,
   val command:Command,
   var destination:TilePosition) {

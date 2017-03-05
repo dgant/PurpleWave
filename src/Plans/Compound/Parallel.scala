@@ -1,6 +1,6 @@
 package Plans.Compound
 
-class AllParallel extends AbstractPlanCompleteAll {
+class Parallel extends AbstractAll {
   
   description.set(Some("Do in parallel"))
   

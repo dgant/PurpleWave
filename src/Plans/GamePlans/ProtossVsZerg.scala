@@ -1,7 +1,7 @@
 package Plans.GamePlans
 
 import Plans.Army.{Attack, DefendChoke}
-import Plans.Compound.{AllParallel, IfThenElse}
+import Plans.Compound.{Parallel, IfThenElse}
 import Plans.Defense.DefeatWorkerHarass
 import Plans.Information.ScoutAt
 import Plans.Macro.Automatic._
@@ -11,7 +11,7 @@ import Strategies.UnitMatchers.UnitMatchWarriors
 import Types.Buildable.{Buildable, BuildableUnit, BuildableUpgrade}
 import bwapi.{UnitType, UpgradeType}
 
-class ProtossVsZerg extends AllParallel {
+class ProtossVsZerg extends Parallel {
   children.set(List(
     new BuildSupplyContinuously,
     new BuildWorkersContinuously,

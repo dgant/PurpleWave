@@ -13,23 +13,6 @@ import bwapi.{UnitType, UpgradeType}
 
 class ProtossVsProtoss extends AllParallel {
   
-  children.set(List(
-    new BuildSupplyContinuously,
-    new BuildWorkersContinuously,
-    new TrainGatewayUnitsContinuously,
-    new ScheduleBuildOrder { buildables.set(_threeGateGoons) },
-    new ScheduleBuildOrder { buildables.set(_lateGame) },
-    new FollowBuildOrder,
-    new DefeatWorkerHarass,
-    new ScoutAt(20),
-    new IfThenElse {
-      predicate.set(new UnitCountAtLeast { quantity.set(6); unitMatcher.set(UnitMatchWarriors) })
-      whenFalse.set(new DefendChoke)
-      whenTrue.set(new Attack)
-    },
-    new GatherGas,
-    new GatherMinerals))
-  
   val _threeGateGoons = List[Buildable] (
     new BuildableUnit(UnitType.Protoss_Nexus),
     new BuildableUnit(UnitType.Protoss_Pylon),
@@ -61,4 +44,20 @@ class ProtossVsProtoss extends AllParallel {
     new BuildableUnit(UnitType.Protoss_Nexus)
   )
   
+  children.set(List(
+    new BuildSupplyContinuously,
+    new BuildWorkersContinuously,
+    new TrainGatewayUnitsContinuously,
+    new ScheduleBuildOrder { buildables.set(_threeGateGoons) },
+    new ScheduleBuildOrder { buildables.set(_lateGame) },
+    new FollowBuildOrder,
+    new DefeatWorkerHarass,
+    new ScoutAt(20),
+    new IfThenElse {
+      predicate.set(new UnitCountAtLeast { quantity.set(6); unitMatcher.set(UnitMatchWarriors) })
+      whenFalse.set(new DefendChoke)
+      whenTrue.set(new Attack)
+    },
+    new GatherGas,
+    new GatherMinerals))
 }

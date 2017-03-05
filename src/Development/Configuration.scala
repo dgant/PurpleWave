@@ -8,13 +8,13 @@ class Configuration {
   var enableCamera                = false
   
   var enableOverlay               = false
-  var enableOverlayBasePlacement  = false
+  var enableOverlayBases          = false
   var enableOverlayBattles        = true
   var enableOverlayChokes         = true
   var enableOverlayEconomy        = true
   var enableOverlayExclusions     = false
-  var enableOverlayGrids          = false
-  var enableOverlayPlans          = true
+  var enableOverlayGrids          = true
+  var enableOverlayPlans          = false
   var enableOverlayResources      = false
   var enableOverlayTerrain        = false
   var enableOverlayTrackedUnits   = true

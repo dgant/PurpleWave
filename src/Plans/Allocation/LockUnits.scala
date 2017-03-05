@@ -40,8 +40,7 @@ class LockUnits extends Plan {
       .toList
       .filter(unitMatcher.get.accept)
         .sortBy(unitPreference.get.preference)
-        .filter(units => unitCounter.get.continue(desiredUnits))
-        .foreach(desiredUnits.add)
+        .foreach(unit => if (unitCounter.get.continue(desiredUnits)) desiredUnits.add(unit))
   
     isSatisfied = unitCounter.get.accept(desiredUnits)
     if (isSatisfied) Some(desiredUnits) else None

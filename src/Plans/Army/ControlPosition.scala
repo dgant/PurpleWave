@@ -11,12 +11,12 @@ import Utilities.Property
 class ControlPosition extends Plan {
   
   val units = new Property[LockUnits](new LockUnits)
-  var position = new Property[PositionFinder](new PositionEnemyBase)
+  var position = new Property[PositionFinder](new PositionFind)
   
   override def getChildren: Iterable[Plan] = List(units.get)
   override def onFrame() {
     
-    val targetPosition = With.intelligence.mostBaselikeEnemyBuilding.map(_.tileCenter)
+    val targetPosition = position.get.find
     
     if (targetPosition.isEmpty) return
     

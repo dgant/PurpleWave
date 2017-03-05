@@ -25,7 +25,7 @@ object Dodge extends Command {
     override def evaluate(candidate: TilePosition): Double = {
       val distanceHomeCurrent = With.paths.groundDistance(currentPosition, safePosition)
       val distanceHomeKiting = With.paths.groundDistance(candidate, safePosition)
-      val distanceBonus = if (distanceHomeKiting < distanceHomeCurrent) 5 else 1
+      val distanceBonus = if (distanceHomeKiting < distanceHomeCurrent) 2 else 1
       val mobility = With.grids.mobility.get(candidate)
       val safety = With.grids.friendlyGroundStrength.get(candidate)
       val threat = With.grids.enemyGroundStrength.get(candidate)

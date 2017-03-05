@@ -12,12 +12,12 @@ class Cache[T](
   def get:T = {
     if (_cacheHasExpired) {
       _cachedValue = Some(_recalculateAsNeeded)
-      _lastUpdateFrame = With.game.getFrameCount + _getJitter
+      _lastUpdateFrame = With.game.getFrameCount + _jitter
     }
     _cachedValue.get
   }
   
-  def _getJitter:Int = if (duration > 1) CacheRandom.random.nextInt(2) else 0
+  def _jitter:Int = if (duration > 1) CacheRandom.random.nextInt(2) else 0
   def _recalculateAsNeeded:T = recalculator.apply()
   def _cacheHasExpired:Boolean = _lastUpdateFrame < 0 || With.game.getFrameCount - _lastUpdateFrame > duration
 }

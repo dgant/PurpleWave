@@ -13,6 +13,10 @@ import scala.collection.JavaConverters._
 
 class Geography {
   
+  val _startPositionCache = new CacheForever[Iterable[TilePosition]](() => _startPositions)
+  def startPositions = _startPositionCache.get
+  def _startPositions:Iterable[TilePosition] = With.game.getStartLocations.asScala
+  
   val _cacheChokes = new CacheForever[Iterable[Position]](() => BWTA.getChokepoints.asScala.map(_.getCenter))
   def chokes:Iterable[Position] = _cacheChokes.get
   def ourBases:Iterable[TilePosition] = ourBaseHalls.map(_.tileTopLeft)

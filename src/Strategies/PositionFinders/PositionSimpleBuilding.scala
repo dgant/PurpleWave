@@ -31,7 +31,9 @@ class PositionSimpleBuilding(
       return if (candidates.isEmpty) None else Some(candidates.minBy(With.paths.groundDistance(_, home)))
     }
     
-    val maxMargin = if (buildingType == UnitType.Protoss_Pylon) 3 else 1
+    val maxMargin = if (
+      buildingType == UnitType.Protoss_Pylon &&
+      With.units.ours.filter(_.utype == buildingType).size < 4) 3 else 1
   
     var output:Option[TilePosition] = None
     (0 to maxMargin).reverse.foreach(margin =>

@@ -21,7 +21,7 @@ class TrainUnit(val traineeType:UnitType) extends Plan {
   var _trainee:Option[FriendlyUnitInfo] = None
   var lastOrderFrame = 0
   
-  description.set(Some("Train a " + TypeDescriber.describeUnitType(traineeType)))
+  description.set("Train a " + TypeDescriber.describeUnitType(traineeType))
   
   override def isComplete: Boolean = _trainee.exists(p => p.alive && p.complete)
   override def getChildren: Iterable[Plan] = List(currency, trainerPlan)

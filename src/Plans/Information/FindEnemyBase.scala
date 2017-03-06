@@ -15,7 +15,7 @@ import bwapi.TilePosition
 
 class FindEnemyBase extends Plan {
   
-  description.set(Some("Discover an enemy base"))
+  description.set("Discover an enemy base")
   
   val scouts = new Property[LockUnits](new LockUnits {
     unitCounter.set(new UnitCountExactly(1))

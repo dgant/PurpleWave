@@ -7,7 +7,7 @@ import Utilities.Property
 
 class UnitCountAtLeast extends Plan {
   
-  description.set(Some("Require a minimum unit count"))
+  description.set("Require a minimum unit count")
   
   val unitMatcher = new Property[UnitMatcher](UnitMatchAnything)
   val quantity    = new Property[Int](0)

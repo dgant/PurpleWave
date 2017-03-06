@@ -2,7 +2,7 @@ package Plans.Compound
 
 class Serial extends AbstractAll {
   
-  description.set(Some("Do in series"))
+  description.set("Do in series")
   
   override def onFrame() {
     var continue = true

@@ -19,7 +19,7 @@ class BuildBuilding(val buildingType:UnitType) extends Plan {
   val buildingPlacer = new PositionSimpleBuilding(buildingType)
   val currencyPlan = new LockCurrencyForUnit(buildingType)
   val builderPlan = new LockUnits {
-    description.set(Some("Get a builder"));
+    description.set("Get a builder")
     unitCounter.set(UnitCountOne)
     unitMatcher.set(new UnitMatchType(buildingType.whatBuilds.first))
     unitPreference.set(new UnitPreferClose { positionFinder.set(buildingPlacer)})
@@ -30,7 +30,7 @@ class BuildBuilding(val buildingType:UnitType) extends Plan {
   var _position:Option[TilePosition] = None
   var _lastOrderFrame = Integer.MIN_VALUE
     
-  description.set(Some("Build a " + TypeDescriber.describeUnitType(buildingType)))
+  description.set("Build a " + TypeDescriber.describeUnitType(buildingType))
   
   override def getChildren: Iterable[Plan] = List(currencyPlan, builderPlan)
   override def isComplete: Boolean =
@@ -39,14 +39,14 @@ class BuildBuilding(val buildingType:UnitType) extends Plan {
   def startedBuilding:Boolean = _building.isDefined
   
   override def onFrame() {
-    if (isComplete) { return }
+    if (isComplete) return
   
     _building = With.units.ours
       .filter(unit => unit.utype == buildingType)
       .filter(unit => _position.exists(_ == unit.tileTopLeft))
       .headOption
   
-    currencyPlan.isSpent = !_building.isEmpty
+    currencyPlan.isSpent = _building.isDefined
   
     currencyPlan.onFrame()
     if (currencyPlan.isComplete) {
@@ -97,8 +97,8 @@ class BuildBuilding(val buildingType:UnitType) extends Plan {
     }
   }
   
-  override def drawOverlay() = {
-    if ( ! isComplete) {
+  override def drawOverlay(): Unit = {
+    if (isComplete) return
     _position.foreach(position => {
       With.game.drawBoxMap(
         position.toPosition,
@@ -109,6 +109,5 @@ class BuildBuilding(val buildingType:UnitType) extends Plan {
       With.game.drawTextMap(
         position.toPosition,
         "Building a " + buildingType.toString)})
-    }
   }
 }

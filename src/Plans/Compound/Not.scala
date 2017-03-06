@@ -5,7 +5,7 @@ import Utilities.Property
 
 class Not extends Plan {
   
-  description.set(Some("Not"))
+  description.set("Not")
   
   val child = new Property[Plan](new Plan)
   

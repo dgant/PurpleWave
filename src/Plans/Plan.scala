@@ -3,16 +3,17 @@ package Plans
 import Utilities.Property
 
 class Plan {
-  val description = new Property[Option[String]](None)
+  val description = new Property[String]("")
   
-  def isComplete:Boolean = { false }
-  def getChildren:Iterable[Plan] = { List.empty }
+  def isComplete:Boolean = false
+  def getChildren:Iterable[Plan] = List.empty
   def onFrame() = {}
-  def drawOverlay() = { }
+  def drawOverlay() = {}
   
-  override def toString: String = { _getRealName ++ description.get.getOrElse("") }
+  override def toString: String = _getRealName + (if (description.get == "") "" else ": " + description.get)
+  
   def _getRealName:String = {
-    val name = this.getClass.getSimpleName
-    if (name.contains("$anon$")) "-> " else (name + ": ")
+    val name = getClass.getSimpleName
+    if (name.contains("$anon$")) "-> " else name
   }
 }

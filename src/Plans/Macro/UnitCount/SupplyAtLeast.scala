@@ -6,7 +6,7 @@ import Utilities.Property
 
 class SupplyAtLeast extends Plan {
   
-  description.set(Some("Require a minimum supply count"))
+  description.set("Require a minimum supply count")
   
   val quantity = new Property[Int](0)
   

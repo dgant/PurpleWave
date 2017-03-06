@@ -24,7 +24,6 @@ object Overlay {
       if (With.configuration.enableOverlayResources)      _drawResources()
       if (With.configuration.enableOverlayTerrain)        _drawTerrain()
       if (With.configuration.enableOverlayTrackedUnits)   _drawTrackedUnits()
-      if (With.configuration.enableOverlayWorkers)        _drawWorkers()
     }
   }
   
@@ -135,8 +134,8 @@ object Overlay {
       })
       
       zone.bases.foreach(base => {
-        _drawTileRectangle(base.townHallArea, Color.Yellow)
         _drawTileRectangle(base.harvestingArea, Color.Cyan)
+        _drawTileRectangle(base.townHallArea, Color.Yellow)
         _drawTextLabel(
           List(base.zone.owner.getName, if (base.isStartLocation) "Start location" else ""),
           base.townHallArea.startInclusive.topLeftPixel,
@@ -179,19 +178,12 @@ object Overlay {
     }
   }
   
-  def _drawWorkers() {
-    With.units.ours.filter(_.utype.isWorker).foreach(unit =>
-      _drawTextLabel(List(unit.order.toString), unit.position, drawBackground = true))
-  }
-  
   def _describePlanTree(plan:Plan, childOrder:Integer, depth:Integer):String = {
     if (_isRelevant(plan)) {
       (_describePlan(plan, childOrder, depth)
         ++ plan.getChildren.zipWithIndex.map(x => _describePlanTree(x._1, x._2, depth + 1)))
         .mkString("")
-    } else {
-      ""
-    }
+    } else ""
   }
   
   def _describePlan(plan:Plan, childOrder:Integer, depth:Integer):String = {
@@ -209,9 +201,7 @@ object Overlay {
   }
   
   def _isRelevant(plan:Plan):Boolean = {
-    plan.getChildren.exists(child =>
-      (child.isInstanceOf[LockCurrency] || child.isInstanceOf[LockUnits])
-      && child.isComplete)
+    plan.getChildren.exists(child => _isRelevant(child) || ((child.isInstanceOf[LockCurrency] || child.isInstanceOf[LockUnits]) && child.isComplete))
   }
   
   def _drawTextLabel(

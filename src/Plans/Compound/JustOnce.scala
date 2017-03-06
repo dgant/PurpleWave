@@ -5,7 +5,7 @@ import Utilities.Property
 
 class JustOnce extends Plan {
   
-  description.set(Some("Do once"))
+  description.set("Do once")
     
   val child = new Property[Plan](new Plan)
   

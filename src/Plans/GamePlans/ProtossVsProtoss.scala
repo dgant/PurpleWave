@@ -13,7 +13,7 @@ import bwapi.{UnitType, UpgradeType}
 
 class ProtossVsProtoss extends Parallel {
   
-  description.set(Some("Protoss vs Protoss"))
+  description.set("Protoss vs Protoss")
   
   val _threeGateGoons = List[Buildable] (
     new BuildableUnit(UnitType.Protoss_Nexus),

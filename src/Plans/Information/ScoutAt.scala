@@ -5,7 +5,7 @@ import Plans.Macro.UnitCount.SupplyAtLeast
 
 class ScoutAt(minimumSupply:Int) extends IfThenElse {
   
-  description.set(Some("Send a scout at a specific supply count"))
+  description.set("Send a scout at a specific supply count")
   
   predicate.set(
     new And { children.set(List(

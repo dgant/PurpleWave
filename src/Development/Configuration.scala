@@ -6,19 +6,18 @@ class Configuration {
   var enableStdOut                = false
   var enableChat                  = true
   
-  var enableCamera                = true
+  var enableCamera                = false
   var cameraDynamicSpeed          = false
   var cameraDynamicSpeedMin       = 30
   var cameraDynamicSpeedMax       = 0
   
   var enableOverlay               = true
   var enableOverlayBattles        = true
-  var enableOverlayEconomy        = false
+  var enableOverlayEconomy        = true
   var enableOverlayGrids          = false
-  var enableOverlayPlans          = false
-  var enableOverlayResources      = false
+  var enableOverlayPlans          = true
+  var enableOverlayResources      = true
   var enableOverlayTerrain        = true
   var enableOverlayTrackedUnits   = true
   var enableOverlayUnits          = true
-  var enableOverlayWorkers        = false
 }

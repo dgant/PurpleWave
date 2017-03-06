@@ -35,7 +35,7 @@ class FindEnemyBase extends Plan {
     With.commander.intend(new Intention(this, scout, Approach, _getNextScoutingPosition))
   
   def _getNextScoutingPosition:TilePosition = {
-    With.intelligence.mostUnscoutedBases
+    With.intelligence.leastScoutedBases
       .filter(base => With.paths.exists(With.geography.home, base)) //BWTA.isConnected could also help
       .head
   }

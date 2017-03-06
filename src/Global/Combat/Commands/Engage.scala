@@ -13,7 +13,9 @@ object Engage extends Command {
       intent.targetUnit = Some(attackableEnemies.minBy(enemy => enemy.distanceSquared(unit)))
     }
     
-    val threat = With.grids.enemyGroundStrength.get(unit.position) / With.grids.friendlyGroundStrength.get(unit.position).toDouble
+    val threat =
+      With.grids.enemyGroundStrength.get(unit.tileCenter) /
+      With.grids.friendlyGroundStrength.get(unit.tileCenter).toDouble
     
     if (unit.onCooldown && intent.targetUnit.exists(_.range < unit.range) && threat > 0) {
       Dodge.execute(intent)

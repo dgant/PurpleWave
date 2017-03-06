@@ -9,7 +9,7 @@ object Skirt extends Command {
     val unit = intent.unit
     val nearestEnemy = intent.battle.map(_.enemy.units.minBy(unit.distance))
     val nearestEnemyOutranged = nearestEnemy.exists(_.range < unit.range)
-    val threat = With.grids.enemyGroundStrength.get(unit.position) / With.grids.friendlyGroundStrength.get(unit.position).toDouble
+    val threat = With.grids.enemyGroundStrength.get(unit.tileCenter) / With.grids.friendlyGroundStrength.get(unit.tileCenter).toDouble
     
     if (threat > 1) {
       Dodge.execute(intent)

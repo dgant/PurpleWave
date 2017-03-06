@@ -1,98 +1,33 @@
 package Geometry.Grids.Abstract
 
 import Startup.With
-import bwapi.{Position, TilePosition, WalkPosition}
+import bwapi.TilePosition
 
 
 abstract class Grid[T] {
-  
-  //Could reasonably switch to 8 to do WalkPosition
-  val _pointsPerTile = 1
-  val _width = _pointsPerTile * With.game.mapWidth
-  val _height = _pointsPerTile * With.game.mapHeight
+  val _width = With.game.mapWidth
+  val _height = With.game.mapHeight
   val _positions:Array[T]
+  var _initialized = false
   
   def _defaultValue:T
-  def reset() {
-    indices.foreach(_positions(_) = _defaultValue)
-  }
-  
-  var _initialized = false
-  def initialize() { if ( ! _initialized) { onInitialization(); _initialized = true }}
-  def onInitialization() {}
-  def update() { initialize() }
-  def indices:Iterable[Int] = {
-    _positions.indices
-  }
-
-  def points:Iterable[(Int, Int)] = {
-    indices.map(i => (x(i), y(i)))
-  }
-  def positions:Iterable[TilePosition] = {
-    indices.map(i => new TilePosition(x(i), y(i)))
-  }
-  def x(index:Int):Int = {
-    index % _width
-  }
-  def y(index:Int):Int = {
-    index / _width
-  }
-  def _get(i:Int):T = {
-    if (i < 0 || i >= _positions.length) return _defaultValue
-    _positions(i)
-  }
-  def _get(x:Int, y:Int):T = {
-    _get(x + y * _width)
-  }
-  def get(position:Position):T = {
-    if (position.isValid) {
-      _get(_pointsPerTile * position.getX / 32, _pointsPerTile * position.getY / 32)
-    }
-    else {
-      _defaultValue
-    }
-  }
-  def get(position:WalkPosition):T = {
-    if (position.isValid) {
-      _get(_pointsPerTile * position.getX / 8, _pointsPerTile * position.getY / 8)
-    } else {
-      _defaultValue
-    }
-  }
-  def get(position:TilePosition):T = {
-    if (position.isValid) {
-      _get(_pointsPerTile*position.getX, _pointsPerTile*position.getY)
-    } else {
-      _defaultValue
-    }
-  }
-  def set(i:Int, value:T) {
-    if (i < 0 || i >= _positions.length) return
-    _positions(i) = value
-  }
-  def _set(x:Int, y:Int, value:T) {
-    if (x > 0 && y > 0 && x < _width)
-    set(x + y * _width, value)
-  }
-  def setPosition(x:Int, y:Int, value:T) {
-    _set(_pointsPerTile*x/32, _pointsPerTile*y/32, value)
-  }
-  def setWalkPosition(walkX:Int, walkY:Int, value:T) {
-    _set(_pointsPerTile*walkX/4, _pointsPerTile*walkY/4, value)
-  }
-  def setTilePosition(tileX:Int, tileY:Int, value:T) {
-    _set(tileX, tileY, value)
-  }
-  def set(position:Position, value:T) {
-    if (position.isValid) setPosition(position.getX, position.getY, value)
-  }
-  def set(position:WalkPosition, value:T) {
-    if (position.isValid) setWalkPosition(position.getX, position.getY, value)
-  }
-  def set(position:TilePosition, value:T) {
-    if (position.isValid) setTilePosition(position.getX, position.getY, value)
-  }
-  
   def repr(value:T):String
+  def reset()                                         = indices.foreach(_positions(_) = _defaultValue)
+  def initialize()                             = if ( ! _initialized) { onInitialization(); _initialized = true }
+  def onInitialization()                       {}
+  def update()                                 = initialize()
+  def indices:Iterable[Int]                    = _positions.indices
+  def points:Iterable[(Int, Int)]              = indices.map(i => (x(i), y(i)))
+  def positions:Iterable[TilePosition]         = indices.map(i => new TilePosition(x(i), y(i)))
+  def valid(i:Int):Boolean                     = i > 0 && i < _positions.length
+  def i(tileX:Int, tileY:Int)                  = tileX + tileY * _width
+  def x(i:Int):Int                             = i % _width
+  def y(i:Int):Int                             = i / _width
+  def get(i:Int):T                             = if (valid(i)) _positions(i) else _defaultValue
+  def get(tileX:Int, tileY:Int):T              = get(i(tileX, tileY))
+  def get(tile: TilePosition):T                = get(i(tile.getX, tile.getY))
+  def set(i:Int, value:T):Unit                 = if (valid(i)) _positions(i) = value
+  def set(tileX:Int, tileY:Int, value:T):Unit  = set(i(tileX, tileY), value)
+  def set(position:TilePosition, value:T):Unit = set(i(position.getX, position.getY), value)
 }
 

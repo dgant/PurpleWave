@@ -1,8 +1,10 @@
 package Global.Information
 
+import Geometry.Grids.Abstract.GridUnits
 import Geometry.Grids.Real._
 
 class Grids {
+  val units = new GridUnits
   val enemyGroundStrength = new GridEnemyGroundStrength
   val friendlyGroundStrength = new GridFriendlyGroundStrength
   val enemyVision = new GridEnemyVision
@@ -12,6 +14,7 @@ class Grids {
   val mobility = new GridMobility
   
   def onFrame() {
+    units.update()
     enemyGroundStrength.update()
     friendlyGroundStrength.update()
     enemyVision.update()

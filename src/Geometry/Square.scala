@@ -1,11 +1,10 @@
 package Geometry
 
+import Geometry.Grids.Rectangle
+
 object Square {
   
-  def points(radius:Int):Iterable[Point] =
-    (-radius to radius).flatten(dy =>
-      (-radius to radius).map(dx =>
-        new Point(dx, dy)))
+  def points(width:Int):Iterable[Point] = Rectangle.points(width, width)
   
   def pointsDownAndRight(count:Int):Iterable[Point] =
     (0 until count).flatten(dy =>

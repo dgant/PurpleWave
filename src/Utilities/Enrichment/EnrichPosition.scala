@@ -89,6 +89,12 @@ case object EnrichPosition {
       val dy = position.getY - otherPosition.getY
       dx * dx + dy * dy
     }
+    def tileIncluding:TilePosition = {
+      position.toTilePosition
+    }
+    def tileNearest:TilePosition = {
+      position.add(16, 16).toTilePosition
+    }
   }
   
   implicit class EnrichedWalkPosition(position:WalkPosition) {

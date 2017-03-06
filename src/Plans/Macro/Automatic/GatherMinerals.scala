@@ -7,7 +7,6 @@ import Strategies.UnitCountEverything
 import Strategies.UnitMatchers.UnitMatchWorker
 import Types.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo}
 import Utilities.Caching.Limiter
-import Utilities.Enrichment.EnrichUnitType._
 import bwapi.UnitCommandType
 
 import scala.collection.mutable
@@ -77,11 +76,11 @@ class GatherMinerals extends Plan {
   }
   
   def _sortMinerals() {
-    val townHalls = _getTownHalls
+    val townHalls = With.geography.bases.map(_.centerTile)
     if (townHalls.isEmpty) return
     _minerals
       .sortBy(mineral => -mineral.mineralsLeft)
-      .sortBy(mineral => townHalls.map(_.position.getDistance(mineral.position)).min)
+      .sortBy(mineral => townHalls.map(_.getDistance(mineral.tileCenter)).min)
       .sortBy(mineral => _workersByMineral(mineral).size)
   }
   

@@ -58,7 +58,7 @@ class ProtossVsTerran extends Parallel {
     new ScheduleBuildOrder { buildables.set(_lateGame) },
     new FollowBuildOrder,
     new DefeatWorkerHarass,
-    new ScoutAt(20),
+    new ScoutAt(40),
     new IfThenElse {
       predicate.set(new UnitCountAtLeast { quantity.set(15); unitMatcher.set(UnitMatchWarriors) })
       whenFalse.set(new DefendChoke)

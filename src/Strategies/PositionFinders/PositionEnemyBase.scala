@@ -11,5 +11,5 @@ class PositionEnemyBase extends PositionFinder {
   
   def _find: Option[TilePosition] = Some(
     With.intelligence.mostBaselikeEnemyBuilding.map(_.tileCenter).getOrElse(
-      With.intelligence.mostUnscoutedBases.head))
+      With.intelligence.leastScoutedBases.head))
 }

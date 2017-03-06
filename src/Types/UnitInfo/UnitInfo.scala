@@ -61,4 +61,5 @@ abstract class UnitInfo (var baseUnit:bwapi.Unit) {
   def distanceSquared(otherPosition:Position)     : Double                  = position.pixelDistanceSquared(otherPosition)
   def distanceSquared(otherPosition:TilePosition) : Double                  = distance(otherPosition.toPosition)
   def impactsCombat                               : Boolean                 = canFight || List(UnitType.Terran_Medic).contains(utype)
+  def enemiesInRange                              : Iterable[UnitInfo]      = With.units.inRadius(position, range).filter(enemyOf)
 }

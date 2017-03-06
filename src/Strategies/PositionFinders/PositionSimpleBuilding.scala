@@ -18,25 +18,15 @@ class PositionSimpleBuilding(
   def _find: Option[TilePosition] = {
     val home = With.geography.home
     
-    if (buildingType.isRefinery) {
-      val candidates = With.units.neutral.filter(_.isGas)
-      return if (candidates.isEmpty) None else Some(candidates.minBy(_.tileTopLeft.getDistance(home)).tileTopLeft)
-    }
-    else if (buildingType.isTownHall) {
-      val candidates = With.geography.townHallPositions.filter(basePosition => {
-        val rectangle = new TileRectangle(basePosition, basePosition.add(buildingType.tileSize))
-        With.units.all.filter(_.utype.isBuilding).forall( ! _.tileArea.intersects(rectangle))
-      })
-        
-      return if (candidates.isEmpty) None else Some(candidates.minBy(With.paths.groundDistance(_, home)))
-    }
+    if (buildingType.isRefinery) return _positionRefinery
+    else if (buildingType.isTownHall) return _positionTownHall
     
     val maxMargin = if (
       buildingType == UnitType.Protoss_Pylon &&
       With.units.ours.filter(_.utype == buildingType).size < 4) 3 else 1
   
     var output:Option[TilePosition] = None
-    (0 to maxMargin).reverse.foreach(margin =>
+    (maxMargin to 0 by -1).foreach(margin =>
       output = output.orElse(
         With.architect.placeBuilding(
         buildingType,
@@ -46,5 +36,24 @@ class PositionSimpleBuilding(
         exclusions = With.geography.bases.map(_.harvestingArea))))
     
     output
+  }
+  
+  def _positionRefinery:Option[TilePosition] = {
+    val candidates = With.units.neutral.filter(_.isGas)
+    return if (candidates.isEmpty)
+      None
+    else
+      Some(candidates.minBy(_.tileTopLeft.getDistance(With.geography.home)).tileTopLeft)
+  }
+  
+  def _positionTownHall:Option[TilePosition] = {
+    val candidates = With.geography.townHallPositions.filter(basePosition => {
+      val rectangle = new TileRectangle(basePosition, basePosition.add(buildingType.tileSize))
+      With.units.all.filter(_.utype.isBuilding).forall( ! _.tileArea.intersects(rectangle))
+    })
+  
+    return if (candidates.isEmpty)
+      None
+    else Some(candidates.minBy(With.paths.groundDistance(_, With.geography.home)))
   }
 }

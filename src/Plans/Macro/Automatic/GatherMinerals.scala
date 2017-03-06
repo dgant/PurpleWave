@@ -5,7 +5,7 @@ import Plans.Plan
 import Startup.With
 import Strategies.UnitCountEverything
 import Strategies.UnitMatchers.UnitMatchWorker
-import Types.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo}
+import Types.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.Caching.Limiter
 import bwapi.UnitCommandType
 
@@ -19,10 +19,10 @@ class GatherMinerals extends Plan {
   
   override def getChildren: Iterable[Plan] = List(miners)
   
-  var _minerals:List[ForeignUnitInfo] = List.empty
-  val _workersByMineral = new mutable.HashMap[ForeignUnitInfo, mutable.HashSet[FriendlyUnitInfo]] {
-    override def default(key: ForeignUnitInfo): mutable.HashSet[FriendlyUnitInfo] = { put(key, mutable.HashSet.empty); this(key)}}
-  val _mineralByWorker = new mutable.HashMap[FriendlyUnitInfo, ForeignUnitInfo]
+  var _minerals:List[UnitInfo] = List.empty
+  val _workersByMineral = new mutable.HashMap[UnitInfo, mutable.HashSet[FriendlyUnitInfo]] {
+    override def default(key: UnitInfo): mutable.HashSet[FriendlyUnitInfo] = { put(key, mutable.HashSet.empty); this(key)}}
+  val _mineralByWorker = new mutable.HashMap[FriendlyUnitInfo, UnitInfo]
   val _lastOrderFrame = new mutable.HashMap[FriendlyUnitInfo, Int] {
     override def default(key: FriendlyUnitInfo): Int = { put(key, Int.MinValue); this(key) }}
   
@@ -35,17 +35,15 @@ class GatherMinerals extends Plan {
   }
   
   def _resetAssignments() {
-    val ourTownHalls = With.geography.ourBaseHalls.filter(_.complete)
+    val allMinerals = With.units.neutral.filter(_.isMinerals)
+    val completeBases = With.geography.ourBases.filter(_.townHall.exists(_.complete))
     _mineralByWorker.clear()
     _workersByMineral.clear()
-    _minerals = With.units.neutral
-      .filter(_.isMinerals)
-      .filter(mineral => With.geography.ourHarvestingAreas.exists(_.contains(mineral.tileCenter)))
-      .toList
+    _minerals = allMinerals.filter(mineral => completeBases.exists(_.harvestingArea.contains(mineral.tileCenter))).toList
     
-    //Long-distance mine
+    //Long-distance mining
     if (_minerals.isEmpty) {
-      With.units.neutral.filter(_.isMinerals).minBy(_.distance(With.geography.home))
+      _minerals = allMinerals.toList.sortBy(_.distance(With.geography.home))
     }
   }
   
@@ -76,7 +74,7 @@ class GatherMinerals extends Plan {
   }
   
   def _sortMinerals() {
-    val townHalls = With.geography.bases.map(_.centerTile)
+    val townHalls = With.geography.bases.filter(_.townHall.exists(_.complete)).map(_.centerTile)
     if (townHalls.isEmpty) return
     _minerals
       .sortBy(mineral => -mineral.mineralsLeft)
@@ -104,5 +102,5 @@ class GatherMinerals extends Plan {
     }
   }
   
-  def _gather(worker:FriendlyUnitInfo, mineral:ForeignUnitInfo) = worker.baseUnit.gather(mineral.baseUnit)
+  def _gather(worker:FriendlyUnitInfo, mineral:UnitInfo) = worker.baseUnit.gather(mineral.baseUnit)
 }

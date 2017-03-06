@@ -77,8 +77,8 @@ object Overlay {
   }
   
   def _drawGrids() {
-    _drawGrid(With.grids.units, 0, 0)
-    //_drawGrid(With.grids.enemyVision, 0, 1)
+    _drawGrid(With.grids.enemyGroundStrength, 0, 0)
+    _drawGrid(With.grids.units, 0, 1)
   }
   
   def _drawGrid[T](map:Grid[T], offsetX:Int=0, offsetY:Int=0) {

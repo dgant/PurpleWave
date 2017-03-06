@@ -100,9 +100,7 @@ class Architect {
     hypotheticalPylon:  Option[TilePosition]    = None)
       :Boolean = {
   
-    val buildingArea = new TileRectangle(
-      tile,
-      tile.add(buildingType.tileSize))
+    val buildingArea = new TileRectangle(tile, tile.add(buildingType.tileSize))
     
     val marginArea = new TileRectangle(
       buildingArea.startInclusive.subtract(margin, margin),
@@ -110,13 +108,12 @@ class Architect {
     
     exclusions.filter(_.intersects(marginArea)).isEmpty &&
     _rectangleIsBuildable(buildingArea, buildingType, hypotheticalPylon) &&
-    _rectangleContainsOnlyAWorker(buildingArea) &&
+    _rectangleContainsOnlyAWorker(marginArea) &&
     marginArea.tiles.forall(With.grids.walkability.get)
   }
   
   def _rectangleContainsOnlyAWorker(rectangle: TileRectangle):Boolean = {
     val trespassingUnits = With.units.inRectangle(rectangle).filterNot(_.flying)
-  
     trespassingUnits.size <= 1 &&
       trespassingUnits.forall(_.utype.isWorker) &&
       trespassingUnits.forall(_.isOurs)

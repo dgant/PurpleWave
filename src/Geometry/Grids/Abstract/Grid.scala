@@ -12,7 +12,7 @@ abstract class Grid[T] {
   
   def _defaultValue:T
   def repr(value:T):String
-  def reset()                                         = indices.foreach(_positions(_) = _defaultValue)
+  def reset()                                  = indices.foreach(_positions(_) = _defaultValue)
   def initialize()                             = if ( ! _initialized) { onInitialization(); _initialized = true }
   def onInitialization()                       {}
   def update()                                 = initialize()

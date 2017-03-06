@@ -36,18 +36,18 @@ class GatherMinerals extends Plan {
   }
   
   def _resetAssignments() {
-    val ourTownHalls = _getTownHalls
-    if (ourTownHalls.isEmpty) { return }
+    val ourTownHalls = With.geography.ourBaseHalls.filter(_.complete)
     _mineralByWorker.clear()
     _workersByMineral.clear()
     _minerals = With.units.neutral
       .filter(_.isMinerals)
       .filter(mineral => With.geography.ourHarvestingAreas.exists(_.contains(mineral.tileCenter)))
       .toList
-  }
-  
-  def _getTownHalls:Iterable[FriendlyUnitInfo] = {
-    With.units.ours.filter(unit => unit.complete && unit.utype.isTownHall)
+    
+    //Long-distance mine
+    if (_minerals.isEmpty) {
+      With.units.neutral.filter(_.isMinerals).minBy(_.distance(With.geography.home))
+    }
   }
   
   def _assignWorkers() {

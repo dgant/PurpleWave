@@ -45,10 +45,6 @@ class PositionSimpleBuilding(
         searchRadius = 40,
         exclusions = With.geography.bases.map(_.harvestingArea))))
     
-    if (output == None) {
-      With.logger.warn("Failed to place a " ++ buildingType.toString ++ " near " ++ home.toString)
-    }
-    
     output
   }
 }

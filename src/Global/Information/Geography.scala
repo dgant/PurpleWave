@@ -77,9 +77,11 @@ class Geography {
   def home:TilePosition = _cacheHome.get
   val _cacheHome = new Cache[TilePosition](24, () => _calculateHome)
   def _calculateHome:TilePosition =
-    ourBaseHalls.map(_.tileTopLeft).headOption
-      .getOrElse(With.units.ours.view.filter(_.utype.isBuilding).map(_.tileTopLeft).headOption
-        .getOrElse(Positions.tileMiddle))
+    ourBases.toList
+      .sortBy( ! _.isStartLocation).map(_.centerTile)
+      .headOption
+      .getOrElse(With.units.ours.view.filter(_.utype.isBuilding).map(_.tileCenter).headOption
+      .getOrElse(Positions.tileMiddle))
   
   def getHarvestingArea(townHallArea:TileRectangle):TileRectangle = {
     val resources = With.units

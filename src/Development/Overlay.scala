@@ -33,14 +33,14 @@ object Overlay {
     //if (battle.enemy.strength * battle.us.strength == 0) return
     //if (battle.us.vanguard.getDistance(battle.enemy.vanguard) > 32 * 20) return
     With.game.drawCircleMap(battle.focus, 8, Color.Brown)
-    With.game.drawCircleMap(battle.us.vanguard, 8, Color.Green)
+    With.game.drawCircleMap(battle.us.vanguard, 8, Color.Blue)
     With.game.drawCircleMap(battle.enemy.vanguard, 8, Color.Red)
-    With.game.drawLineMap(battle.focus, battle.us.vanguard, Color.Green)
+    With.game.drawLineMap(battle.focus, battle.us.vanguard, Color.Blue)
     With.game.drawLineMap(battle.focus, battle.enemy.vanguard, Color.Red)
     With.game.drawBoxMap(
       battle.us.units.map(_.position).minBound,
       battle.us.units.map(_.position).maxBound,
-      Color.Green)
+      Color.Blue)
     With.game.drawBoxMap(
       battle.enemy.units.map(_.position).minBound,
       battle.enemy.units.map(_.position).maxBound,
@@ -135,11 +135,11 @@ object Overlay {
       })
       
       zone.bases.foreach(base => {
-        _drawTileRectangle(base.townHallPosition, Color.Yellow)
-        _drawTileRectangle(base.miningArea, Color.Cyan)
+        _drawTileRectangle(base.townHallArea, Color.Yellow)
+        _drawTileRectangle(base.harvestingArea, Color.Cyan)
         _drawTextLabel(
           List(base.zone.owner.getName, if (base.isStartLocation) "Start location" else ""),
-          base.townHallPosition.midpoint.centerPixel,
+          base.townHallArea.startInclusive.topLeftPixel,
           true,
           _getPlayerColor(base.zone.owner))
       })
@@ -255,6 +255,6 @@ object Overlay {
   def _getPlayerColor(player:Player):Color = {
     if (player.isNeutral) Color.Grey
     else if (player.isEnemy(With.game.self)) Color.Red
-    else Color.Green
+    else Color.Blue
   }
 }

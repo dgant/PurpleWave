@@ -2,8 +2,10 @@ package Types.Geography
 
 import Geometry.TileRectangle
 import Startup.With
-import bwapi.{Player, TilePosition}
+import Types.UnitInfo.UnitInfo
+import bwapi.{Player, Position, TilePosition}
 import bwta.{Chokepoint, Region}
+import Utilities.Enrichment.EnrichPosition._
 
 import scala.collection.mutable.ListBuffer
 
@@ -19,7 +21,13 @@ class ZoneEdge(
   val zones:Iterable[Zone])
 
 class Base(
-  val townHallPosition:TileRectangle,
   val zone:Zone,
-  val miningArea:TileRectangle,
+  val townHallArea:TileRectangle,
+  val harvestingArea:TileRectangle,
   val isStartLocation:Boolean)
+{
+  var townHall:Option[UnitInfo] = None
+  def tile:TilePosition = townHallArea.startInclusive
+  def centerTile:TilePosition = townHallArea.midpoint
+  def centerPixel:Position = townHallArea.midpoint.centerPixel
+}

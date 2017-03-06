@@ -7,27 +7,28 @@ import Utilities.Enrichment.EnrichUnitType._
 import Utilities.Enrichment.EnrichPosition._
 
 abstract class UnitInfo (var baseUnit:bwapi.Unit) {
-  def alive:Boolean;
-  def id:Int = baseUnit.getID;
-  def lastSeen:Int;
-  def possiblyStillThere:Boolean;
-  def player:Player;
-  def position:Position;
-  def walkPosition:WalkPosition;
-  def tileTopLeft:TilePosition;
-  def hitPoints:Int;
-  def shieldPoints:Int;
-  def utype:UnitType;
-  def complete:Boolean;
-  def flying:Boolean;
+  def alive:Boolean
+  def id:Int = baseUnit.getID
+  def lastSeen:Int
+  def possiblyStillThere:Boolean
+  def player:Player
+  def position:Position
+  def walkPosition:WalkPosition
+  def tileTopLeft:TilePosition
+  def hitPoints:Int
+  def shieldPoints:Int
+  def utype:UnitType
+  def complete:Boolean
+  def flying:Boolean
   def visible:Boolean
-  def cloaked:Boolean;
-  def top:Int;
-  def left:Int;
-  def right:Int;
-  def bottom:Int;
-  def mineralsLeft:Int;
-  def gasLeft:Int;
+  def cloaked:Boolean
+  def top:Int
+  def left:Int
+  def right:Int
+  def bottom:Int
+  def mineralsLeft:Int = 0
+  def gasLeft:Int = 0
+  def initialResources: Int = 0
   
   //This ignores spellcasters
   //TODO: Move this onto EnhancedUnitType
@@ -50,7 +51,7 @@ abstract class UnitInfo (var baseUnit:bwapi.Unit) {
   def totalCost                                   : Int                     = utype.totalCost
   def isMinerals                                  : Boolean                 = utype.isMinerals
   def isGas                                       : Boolean                 = utype.isGas
-  def initialResources                            : Int                     = baseUnit.getInitialResources
+  def isResource                                  : Boolean                 = isMinerals || isGas
   def tileCenter                                  : TilePosition            = position.toTilePosition
   def tileArea                                    : TileRectangle           = utype.area.add(tileTopLeft)
   def distance(otherUnit:UnitInfo)                : Double                  = distance(otherUnit.position)

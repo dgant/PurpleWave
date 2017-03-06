@@ -14,6 +14,15 @@ class Intelligence {
     With.game.getStartLocations.asScala.filterNot(With.game.isExplored)
   }
   
+  def enemyBases:Option[TilePosition] =
+    With.units.enemy
+      .toList
+      .filter(_.utype.isBuilding)
+      .filter(! _.flying)
+      .filter(_.utype.isTownHall)
+      .map(_.tileTopLeft)
+      .headOption
+  
   def mostBaselikeEnemyBuilding:Option[ForeignUnitInfo] = {
     With.units.enemy
       .toList

@@ -88,7 +88,7 @@ class BuildBuilding(val buildingType:UnitType) extends Plan {
       }
       else {
         // This avoids trying to build in fog of war
-        if (builder.distance(_position.get) < 32 * 4) {
+        if (builder.distance(_position.get) < 32 * 6) {
           builder.baseUnit.build(buildingType, _position.get)
         } else {
           With.commander.intend(new Intention(this, builder, Approach, _position.get))

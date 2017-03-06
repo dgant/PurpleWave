@@ -2,16 +2,66 @@ package Global.Information
 
 import Geometry._
 import Startup.With
+import Types.Geography.{Base, Zone, ZoneEdge}
 import Types.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo}
-import Utilities.Caching.{Cache, CacheForever}
+import Utilities.Caching.{Cache, CacheForever, Limiter}
 import Utilities.Enrichment.EnrichPosition._
 import Utilities.Enrichment.EnrichUnitType._
 import bwapi.{Position, TilePosition, UnitType}
 import bwta.BWTA
 
 import scala.collection.JavaConverters._
+import scala.collection.mutable.ListBuffer
 
 class Geography {
+  
+  val _zoneCache = new CacheForever[Iterable[Zone]](() => _zones)
+  val _zoneLimiter = new Limiter(24, updateZones)
+  def zones:Iterable[Zone] = {
+    _zoneLimiter.act()
+    _zoneCache.get
+  }
+  def _zones:Iterable[Zone] = {
+    
+    //Build zones
+    val zonesByRegionCenter = BWTA.getRegions.asScala.map(region =>
+      (region.getCenter,
+      new Zone(
+        region.getCenter.toTilePosition,
+        region,
+        new ListBuffer[Base],
+        new ListBuffer[ZoneEdge])))
+      .toMap
+    
+    //Build bases
+    val allBases = townHallPositions.map(townHallPosition => {
+      val townHallArea = UnitType.Terran_Command_Center.area.add(townHallPosition)
+      new Base(
+        townHallArea,
+        zonesByRegionCenter.values
+          .find(_.region.getPolygon.isInside(townHallPosition.toPosition))
+          .getOrElse(zonesByRegionCenter.values.minBy(_.region.getCenter.distance(townHallPosition.centerPosition))),
+        getHarvestingArea(townHallArea))
+    })
+    
+    //Populate zones with bases
+    allBases.foreach(base => base.zone.bases += base)
+    
+    //Add edges
+    val edges = BWTA.getChokepoints.asScala.map(choke =>
+      new ZoneEdge(
+        choke,
+        List(choke.getRegions.first, choke.getRegions.second)
+          .map(region => zonesByRegionCenter(region.getCenter))))
+    
+    edges.foreach(edge => edge.zones.foreach(zone => zone.edges += edge))
+    
+    return zonesByRegionCenter.values
+  }
+  
+  def updateZones() = {
+    //update player
+  }
   
   val _startPositionCache = new CacheForever[Iterable[TilePosition]](() => _startPositions)
   def startPositions = _startPositionCache.get
@@ -33,29 +83,18 @@ class Geography {
   
   def ourHarvestingAreas:Iterable[TileRectangle] = _ourHarvestingAreaCache.get
   val _ourHarvestingAreaCache = new Cache[Iterable[TileRectangle]](24 * 5, () => _ourHarvestingAreas)
-  def _ourHarvestingAreas:Iterable[TileRectangle] = {
-    ourBaseHalls.filter(_.complete).map(base => {
-      val nearbyUnits = With.units.inRadius(base.position, 32 * 10)
-      val minerals = nearbyUnits
-        .filter(_.utype == UnitType.Resource_Mineral_Field)
-        .map(_.position)
-      val geysers = nearbyUnits
-        .filter(unit => unit.utype.isRefinery || unit.utype == UnitType.Resource_Vespene_Geyser)
-        .flatten(unit => List(new Position(unit.left - 16, unit.top), new Position(unit.right + 16, unit.bottom)))
-      val boxedUnits = minerals ++ geysers ++ Iterable(base.position)
-      //Draw a box around the area
-      val top    = boxedUnits.map(_.getY).min + 16
-      val bottom = boxedUnits.map(_.getY).max + 16
-      val left   = boxedUnits.map(_.getX).min + 16
-      val right  = boxedUnits.map(_.getX).max + 16
-      
-      new TileRectangle(
-        new TilePosition(left/32, top/32),
-        new TilePosition(right/32, bottom/32))
-    })
+  def _ourHarvestingAreas:Iterable[TileRectangle] = ourBaseHalls.filter(_.complete).map(_.tileArea).map(getHarvestingArea)
+  def getHarvestingArea(base:TileRectangle):TileRectangle = {
+    
+    val resources = With.units
+      .inRadius(base.midpoint.centerPosition, 32 * 10)
+      .filter(unit => unit.isMinerals || unit.isGas)
+      .map(_.tileArea)
+    
+    (List(base) ++ resources).boundary
   }
   
-  def basePositions:Iterable[TilePosition] = _basePositionsCache.get
+  def townHallPositions:Iterable[TilePosition] = _basePositionsCache.get
   val _basePositionsCache = new Cache[Iterable[TilePosition]](24 * 60, () => _calculateBasePositions)
   val _resourceClusterCache = new CacheForever[Iterable[Iterable[ForeignUnitInfo]]](() => _getResourceClusters)
   val _resourceExclusionCache = new CacheForever[Iterable[TileRectangle]](() => _getExclusions)

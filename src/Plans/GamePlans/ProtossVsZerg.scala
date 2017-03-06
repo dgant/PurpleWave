@@ -15,23 +15,6 @@ class ProtossVsZerg extends Parallel {
   
   description.set(Some("Protoss vs Zerg"))
   
-  children.set(List(
-    new BuildSupplyContinuously,
-    new BuildWorkersContinuously,
-    new TrainGatewayUnitsContinuously,
-    new ScheduleBuildOrder { buildables.set(_twoGateExpand) },
-    new ScheduleBuildOrder { buildables.set(_lateGame) },
-    new FollowBuildOrder,
-    new DefeatWorkerHarass,
-    new ScoutAt(20),
-    new IfThenElse {
-      predicate.set(new UnitCountAtLeast { quantity.set(6); unitMatcher.set(UnitMatchWarriors) })
-      whenFalse.set(new DefendChoke)
-      whenTrue.set(new Attack)
-    },
-    new GatherGas,
-    new GatherMinerals))
-  
   val _twoGateExpand = List[Buildable] (
     new BuildableUnit(UnitType.Protoss_Nexus),
     new BuildableUnit(UnitType.Protoss_Pylon),
@@ -52,10 +35,11 @@ class ProtossVsZerg extends Parallel {
     new BuildableUnit(UnitType.Protoss_Gateway),
     new BuildableUnit(UnitType.Protoss_Gateway),
     new BuildableUnit(UnitType.Protoss_Gateway),
-    new BuildableUnit(UnitType.Protoss_Gateway),
     new BuildableUnit(UnitType.Protoss_Forge),
     new BuildableUpgrade(UpgradeType.Protoss_Ground_Weapons, 1),
+    new BuildableUnit(UnitType.Protoss_Nexus),
     new BuildableUnit(UnitType.Protoss_Citadel_of_Adun),
+    new BuildableUnit(UnitType.Protoss_Gateway),
     new BuildableUnit(UnitType.Protoss_Gateway),
     new BuildableUnit(UnitType.Protoss_Gateway),
     new BuildableUpgrade(UpgradeType.Leg_Enhancements),
@@ -69,4 +53,21 @@ class ProtossVsZerg extends Parallel {
     new BuildableUpgrade(UpgradeType.Protoss_Ground_Armor, 2),
     new BuildableUpgrade(UpgradeType.Protoss_Ground_Armor, 3)
   )
+  
+  children.set(List(
+    new BuildSupplyContinuously,
+    new BuildWorkersContinuously,
+    new TrainGatewayUnitsContinuously,
+    new ScheduleBuildOrder { buildables.set(_twoGateExpand) },
+    new ScheduleBuildOrder { buildables.set(_lateGame) },
+    new FollowBuildOrder,
+    new DefeatWorkerHarass,
+    new ScoutAt(20),
+    new IfThenElse {
+      predicate.set(new UnitCountAtLeast { quantity.set(6); unitMatcher.set(UnitMatchWarriors) })
+      whenFalse.set(new DefendChoke)
+      whenTrue.set(new Attack)
+    },
+    new GatherGas,
+    new GatherMinerals))
 }

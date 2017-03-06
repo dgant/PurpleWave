@@ -8,7 +8,6 @@ import Startup.With
 import Types.UnitInfo.ForeignUnitInfo
 import Utilities.Enrichment.EnrichPosition._
 import bwapi.{Color, Position, UnitCommandType}
-import bwta.BWTA
 
 import scala.collection.JavaConverters._
 
@@ -18,7 +17,6 @@ object Overlay {
       With.game.setTextSize(bwapi.Text.Size.Enum.Small)
       if (With.configuration.enableOverlayBases)          _drawBases()
       if (With.configuration.enableOverlayBattles)        _drawBattles()
-      if (With.configuration.enableOverlayChokes)         _drawChokes()
       if (With.configuration.enableOverlayEconomy)        _drawEconomy()
       if (With.configuration.enableOverlayExclusions)     _drawExclusions()
       if (With.configuration.enableOverlayGrids)          _drawGrids()
@@ -33,7 +31,7 @@ object Overlay {
   
   def _drawBases() {
     With.geography.ourHarvestingAreas.foreach(area => _drawTileRectangle(area, Color.Red))
-    With.geography.basePositions.foreach(position => _drawTileRectangle(new TileRectangle(position, position.add(4, 3)), Color.Yellow))
+    With.geography.townHallPositions.foreach(position => _drawTileRectangle(new TileRectangle(position, position.add(4, 3)), Color.Yellow))
   }
   
   def _drawBattles() {
@@ -62,8 +60,6 @@ object Overlay {
       drawBackground = true,
       backgroundColor = Color.Brown)
   }
-  
-  def _drawChokes() = With.geography.chokes.foreach(choke => With.game.drawCircleMap(choke, 64, Color.Purple))
   
   def _drawEconomy() {
     val labels = List(
@@ -127,12 +123,13 @@ object Overlay {
     With.units.ours
       .filter(unit => Debugger.highlitUnits.contains(unit))
       .foreach(unit =>
-      With.game.drawCircleMap(unit.position, 32, bwapi.Color.Orange))
+      With.game.drawCircleMap(unit.position, 32, Color.Orange))
     With.units.ours
       .filterNot(_.command.getUnitCommandType == UnitCommandType.None)
       .foreach(unit => _drawTextLabel(
         List(
-          With.commander._lastIntentions.get(unit).map(_.plan.toString).getOrElse(""),
+          With.commander._lastIntentions.get(unit).map(intent => (intent.motivation * 100).toInt.toString).getOrElse(""),
+          With.commander._lastIntentions.get(unit).map(intent => intent.plan.toString).getOrElse(""),
           With.commander._lastCommands.get(unit).getOrElse(""),
           unit.command.getUnitCommandType.toString),
         unit.position,
@@ -140,18 +137,29 @@ object Overlay {
   }
   
   def _drawTerrain() {
-    BWTA.getRegions.asScala.foreach(region => {
-      _drawPolygonPositions(region.getPolygon.getPoints.asScala)
+    With.geography.zones.foreach(zone => {
+      _drawPolygonPositions(zone.region.getPolygon.getPoints.asScala)
       With.game.drawLineMap(
-        region.getPolygon.getPoints.asScala.head,
-        region.getPolygon.getPoints.asScala.last,
+        zone.region.getPolygon.getPoints.asScala.head,
+        zone.region.getPolygon.getPoints.asScala.last,
         bwapi.Color.Brown)
-      With.game.drawTextMap(
-        region.getCenter,
-        region.getCenter.toString ++
-        "\n" ++
-        region.getCenter.toTilePosition.toString)
+      _drawTextLabel(
+        List(zone.region.getCenter.toString, zone.region.getCenter.toTilePosition.toString, zone.owner.getName),
+        zone.region.getCenter)
+      
+      zone.edges.foreach(edge => {
+        _drawTextLabel(
+          List(edge.zones.map(_.centroid.toString).mkString(" -> ")),
+          edge.chokepoint.getCenter)
+        With.game.drawCircleMap(edge.chokepoint.getCenter, edge.chokepoint.getWidth.toInt/2, Color.Purple)
+        With.game.drawLineMap(edge.chokepoint.getSides.first, edge.chokepoint.getSides.second, Color.Purple)
       })
+      
+      zone.bases.foreach(base => {
+        _drawTileRectangle(base.townHallPosition, Color.Yellow)
+        _drawTileRectangle(base.miningArea, Color.Cyan)
+      })
+    })
   }
   
   def _drawResources() {

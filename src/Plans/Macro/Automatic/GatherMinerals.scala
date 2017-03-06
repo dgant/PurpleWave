@@ -3,7 +3,7 @@ package Plans.Macro.Automatic
 import Plans.Allocation.LockUnits
 import Plans.Plan
 import Startup.With
-import Strategies.UnitCounters.UnitCountAll
+import Strategies.UnitCountEverything
 import Strategies.UnitMatchers.UnitMatchWorker
 import Types.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo}
 import Utilities.Caching.Limiter
@@ -16,7 +16,7 @@ class GatherMinerals extends Plan {
 
   val miners = new LockUnits
   miners.unitMatcher.set(UnitMatchWorker)
-  miners.unitCounter.set(UnitCountAll)
+  miners.unitCounter.set(UnitCountEverything)
   
   override def getChildren: Iterable[Plan] = List(miners)
   

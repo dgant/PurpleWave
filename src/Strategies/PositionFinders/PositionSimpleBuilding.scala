@@ -23,7 +23,7 @@ class PositionSimpleBuilding(
       return if (candidates.isEmpty) None else Some(candidates.minBy(_.tileTopLeft.getDistance(home)).tileTopLeft)
     }
     else if (buildingType.isTownHall) {
-      val candidates = With.geography.basePositions.filter(basePosition => {
+      val candidates = With.geography.townHallPositions.filter(basePosition => {
         val rectangle = new TileRectangle(basePosition, basePosition.add(buildingType.tileSize))
         With.units.all.filter(_.utype.isBuilding).forall( ! _.tileArea.intersects(rectangle))
       })
@@ -42,7 +42,7 @@ class PositionSimpleBuilding(
         buildingType,
         home,
         margin = margin,
-        searchRadius = 30,
+        searchRadius = 40,
         exclusions = With.geography.ourHarvestingAreas)))
     
     if (output == None) {

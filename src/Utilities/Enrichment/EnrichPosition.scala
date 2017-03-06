@@ -1,6 +1,6 @@
 package Utilities.Enrichment
 
-import Geometry.{Point, Positions}
+import Geometry.{Point, Positions, TileRectangle}
 import bwapi.{Position, TilePosition, WalkPosition}
 
 case object EnrichPosition {
@@ -21,6 +21,17 @@ case object EnrichPosition {
         positions.view.map(_.getX).sum / positions.size,
         positions.view.map(_.getY).sum / positions.size)
     }
+  }
+  
+  implicit class EnrichedRectangleCollection(rectangles:Iterable[TileRectangle]) {
+    def boundary: TileRectangle =
+      new TileRectangle(
+        new TilePosition(
+          rectangles.map(_.startInclusive.getX).min,
+          rectangles.map(_.startInclusive.getY).min),
+        new TilePosition(
+          rectangles.map(_.endExclusive.getX).max,
+          rectangles.map(_.endExclusive.getY).max))
   }
   
   implicit class EnrichedTilePositionCollection(positions:Iterable[TilePosition]) {
@@ -147,6 +158,9 @@ case object EnrichPosition {
       val dx = position.getX - otherPosition.getX
       val dy = position.getY - otherPosition.getY
       dx * dx + dy * dy
+    }
+    def topLeftPosition:Position = {
+      position.toPosition
     }
     def centerPosition:Position = {
       position.toPosition.add(16, 16)

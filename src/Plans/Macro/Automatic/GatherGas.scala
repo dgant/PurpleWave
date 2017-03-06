@@ -19,16 +19,16 @@ class GatherGas extends Plan {
   override def getChildren: Iterable[Plan] = List(drillers)
   
   override def onFrame() {
-    unitCounter.quantity.set(_getMinerCount)
+    unitCounter.maximum.set(_getMinerCount)
     drillers.onFrame()
     _orderWorkers()
   }
   
-  def _ourRefineries:Iterable[FriendlyUnitInfo] =With.units.ours.filter(unit => unit.complete && unit.utype.isRefinery)
+  def _ourRefineries:Iterable[FriendlyUnitInfo] = With.units.ours.filter(unit => unit.complete && unit.utype.isRefinery)
   
   def _getMinerCount:Int = {
     //TODO: Stop taking guys off gas if we're saturated on minerals
-    if (With.game.self.gas > Math.max(400, With.game.self.minerals)) {
+    if (With.game.self.gas > Math.max(200, With.game.self.minerals)) {
       return 0
     }
     var workers = 3 * _ourRefineries.size

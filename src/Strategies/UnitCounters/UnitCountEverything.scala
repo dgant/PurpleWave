@@ -1,7 +1,8 @@
 package Strategies
 
-import Strategies.UnitCounters.UnitCountGreedily
+import Strategies.UnitCounters.UnitCountBetween
 
-object UnitCountEverything extends UnitCountGreedily {
+object UnitCountEverything extends UnitCountBetween {
   minimum.set(0)
+  maximum.set(Int.MaxValue)
 }

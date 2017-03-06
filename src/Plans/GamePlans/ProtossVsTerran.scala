@@ -13,25 +13,12 @@ class ProtossVsTerran extends Parallel {
   
   description.set(Some("Protoss vs Terran"))
   
-  children.set(List(
-    new BuildSupplyContinuously,
-    new BuildWorkersContinuously,
-    new TrainContinuously(UnitType.Protoss_Dragoon),
-    new ScheduleBuildOrder { buildables.set(_twoGateGoons) },
-    new ScheduleBuildOrder { buildables.set(_lateGame) },
-    new FollowBuildOrder,
-    new DefeatWorkerHarass,
-    new ScoutAt(20),
-    new Attack,
-    new GatherGas,
-    new GatherMinerals))
-  
   val _twoGateGoons = List[Buildable] (
     new BuildableUnit(UnitType.Protoss_Nexus),
     new BuildableUnit(UnitType.Protoss_Pylon),
     new BuildableUnit(UnitType.Protoss_Gateway),
-    new BuildableUnit(UnitType.Protoss_Assimilator),
     new BuildableUnit(UnitType.Protoss_Cybernetics_Core),
+    new BuildableUnit(UnitType.Protoss_Assimilator),
     new BuildableUnit(UnitType.Protoss_Nexus),
     new BuildableUnit(UnitType.Protoss_Gateway),
     new BuildableUnit(UnitType.Protoss_Gateway),
@@ -58,4 +45,17 @@ class ProtossVsTerran extends Parallel {
     new BuildableUpgrade(UpgradeType.Protoss_Ground_Weapons, 3),
     new BuildableUnit(UnitType.Protoss_Nexus)
   )
+  
+  children.set(List(
+    new BuildSupplyContinuously,
+    new BuildWorkersContinuously,
+    new TrainContinuously(UnitType.Protoss_Dragoon),
+    new ScheduleBuildOrder { buildables.set(_twoGateGoons) },
+    new ScheduleBuildOrder { buildables.set(_lateGame) },
+    new FollowBuildOrder,
+    new DefeatWorkerHarass,
+    new ScoutAt(20),
+    new Attack,
+    new GatherGas,
+    new GatherMinerals))
 }

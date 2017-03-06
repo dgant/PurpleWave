@@ -11,6 +11,16 @@ class TileRectangle(
     throw new Exception("Created an invalid (non-normalized) rectangle")
   }
   
+  def add(x:Int, y:Int):TileRectangle =
+    new TileRectangle(
+      startInclusive.add(x, y),
+      endExclusive.add(x, y))
+  
+  def add(tilePosition:TilePosition):TileRectangle =
+    add(tilePosition.getX, tilePosition.getY)
+  
+  def midpoint:TilePosition = startInclusive.midpoint(endExclusive)
+  
   def contains(x:Int, y:Int):Boolean = {
     x >= startInclusive.getX &&
     y >= startInclusive.getY &&

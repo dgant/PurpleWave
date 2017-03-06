@@ -13,9 +13,9 @@ abstract class GridItems[T] extends Grid[mutable.HashSet[T]] {
   
   override def update() {
     reset()
-    _getUnits.foreach(item => get(_getTile(item)).add(item))
+    _getUnits.foreach(item => _getTiles(item).foreach(tile => get(tile).add(item)))
   }
   
-  def _getTile(item: T): TilePosition
+  def _getTiles(item: T): Iterable[TilePosition]
   def _getUnits: Iterable[T]
 }

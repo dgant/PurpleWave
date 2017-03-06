@@ -31,7 +31,7 @@ class Units {
       .points(tileRadius)
       .map(tile.add)
       .flatten(With.grids.units.get)
-      .filter(_.position.pixelDistanceSquared(position) <= range)
+      .filter(_.position.pixelDistanceSquared(position) <= range * range)
   }
   
   def inRectangle(topLeftInclusive:Position, bottomRightExclusive:Position):Iterable[UnitInfo] = {

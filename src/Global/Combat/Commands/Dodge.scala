@@ -13,8 +13,8 @@ object Dodge extends Command {
     val evaluator = new EvaluateDodge(unit.tileCenter, intent.safety)
     val destination = EvaluatePositions.bestPosition(unit, evaluator)
     
-    if (unit.onCooldown || unit.distance(destination.centerPosition) > unit.range) {
-      With.commander.move(this, unit, destination.centerPosition)
+    if (unit.onCooldown || unit.distance(destination.centerPixel) > unit.range) {
+      With.commander.move(this, unit, destination.centerPixel)
     }
     else {
       Hunt.execute(intent)

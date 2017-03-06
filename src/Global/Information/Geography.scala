@@ -16,7 +16,7 @@ import scala.collection.mutable.ListBuffer
 class Geography {
   
   val _zoneCache = new CacheForever[Iterable[Zone]](() => _zones)
-  val _zoneLimiter = new Limiter(24, updateZones)
+  val _zoneLimiter = new Limiter(24 * 10, _updateZones)
   def zones:Iterable[Zone] = {
     _zoneLimiter.act()
     _zoneCache.get
@@ -40,8 +40,9 @@ class Geography {
         townHallArea,
         zonesByRegionCenter.values
           .find(_.region.getPolygon.isInside(townHallPosition.toPosition))
-          .getOrElse(zonesByRegionCenter.values.minBy(_.region.getCenter.distance(townHallPosition.centerPosition))),
-        getHarvestingArea(townHallArea))
+          .getOrElse(zonesByRegionCenter.values.minBy(_.region.getCenter.pixelDistance(townHallPosition.centerPixel))),
+        getHarvestingArea(townHallArea),
+        With.game.getStartLocations.asScala.exists(_.tileDistance(townHallPosition) < 6))
     })
     
     //Populate zones with bases
@@ -59,9 +60,13 @@ class Geography {
     return zonesByRegionCenter.values
   }
   
-  def updateZones() = {
-    //update player
-  }
+  def _updateZones() =
+    _zoneCache.get.foreach(zone =>
+      zone.owner = With.units.buildings.filter(_.utype.isTownHall)
+        .filter(townHall => zone.region.getPolygon.isInside(townHall.position))
+        .map(_.player)
+        .headOption
+        .getOrElse(With.game.neutral))
   
   val _startPositionCache = new CacheForever[Iterable[TilePosition]](() => _startPositions)
   def startPositions = _startPositionCache.get
@@ -87,7 +92,7 @@ class Geography {
   def getHarvestingArea(base:TileRectangle):TileRectangle = {
     
     val resources = With.units
-      .inRadius(base.midpoint.centerPosition, 32 * 10)
+      .inRadius(base.midpoint.centerPixel, 32 * 10)
       .filter(unit => unit.isMinerals || unit.isGas)
       .map(_.tileArea)
     

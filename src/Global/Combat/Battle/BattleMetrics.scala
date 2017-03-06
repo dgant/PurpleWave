@@ -14,7 +14,7 @@ object BattleMetrics {
   
   def center(group:BattleGroup):Position = {
     val airCenter = group.units.view.map(_.position).centroid
-    group.units.view.map(_.position).minBy(_.distanceSquared(airCenter))
+    group.units.view.map(_.position).minBy(_.pixelDistanceSquared(airCenter))
   }
   
   def evaluate(group:BattleGroup, battle:Battle):Int = {

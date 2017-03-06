@@ -53,6 +53,6 @@ object Clustering {
     val radiusSquared = radius * radius
     
     //Yes, this includes the unit itself
-    things.map(thing => (thing, things.filter(extractPosition(_).distanceSquared(extractPosition(thing)) <= radiusSquared))).toMap
+    things.map(thing => (thing, things.filter(extractPosition(_).pixelDistanceSquared(extractPosition(thing)) <= radiusSquared))).toMap
   }
 }

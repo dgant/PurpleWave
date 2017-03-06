@@ -21,4 +21,5 @@ class ZoneEdge(
 class Base(
   val townHallPosition:TileRectangle,
   val zone:Zone,
-  val miningArea:TileRectangle)
+  val miningArea:TileRectangle,
+  val isStartLocation:Boolean)

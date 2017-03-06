@@ -81,10 +81,10 @@ case object EnrichPosition {
     def midpoint(otherPosition:Position):Position = {
       add(otherPosition).divide(2)
     }
-    def distance(otherPosition:Position):Double = {
-      Math.sqrt(distanceSquared(otherPosition))
+    def pixelDistance(otherPosition:Position):Double = {
+      Math.sqrt(pixelDistanceSquared(otherPosition))
     }
-    def distanceSquared(otherPosition:Position):Int = {
+    def pixelDistanceSquared(otherPosition:Position):Int = {
       val dx = position.getX - otherPosition.getX
       val dy = position.getY - otherPosition.getY
       dx * dx + dy * dy
@@ -95,7 +95,7 @@ case object EnrichPosition {
     def add(dx:Int, dy:Int):WalkPosition = {
       new WalkPosition(position.getX + dx, position.getY + dy)
     }
-    def add (point:Point):WalkPosition = {
+    def add(point:Point):WalkPosition = {
       add(point.x, point.y)
     }
     def add(otherPosition:WalkPosition):WalkPosition = {
@@ -116,10 +116,10 @@ case object EnrichPosition {
     def midpoint(otherPosition:WalkPosition):WalkPosition = {
       add(otherPosition).divide(2)
     }
-    def distance(otherPosition:WalkPosition):Double = {
-      Math.sqrt(distanceSquared(otherPosition))
+    def walkDistance(otherPosition:WalkPosition):Double = {
+      Math.sqrt(walkDistanceSquared(otherPosition))
     }
-    def distanceSquared(otherPosition:WalkPosition):Int = {
+    def walkDistanceSquared(otherPosition:WalkPosition):Int = {
       val dx = position.getX - otherPosition.getX
       val dy = position.getY - otherPosition.getY
       dx * dx + dy * dy
@@ -151,18 +151,18 @@ case object EnrichPosition {
     def midpoint(otherPosition:TilePosition):TilePosition = {
       add(otherPosition).divide(2)
     }
-    def distance(otherPosition:TilePosition):Double = {
-      Math.sqrt(distanceSquared(otherPosition))
+    def tileDistance(otherPosition:TilePosition):Double = {
+      Math.sqrt(tileDistanceSquared(otherPosition))
     }
-    def distanceSquared(otherPosition:TilePosition):Int = {
+    def tileDistanceSquared(otherPosition:TilePosition):Int = {
       val dx = position.getX - otherPosition.getX
       val dy = position.getY - otherPosition.getY
       dx * dx + dy * dy
     }
-    def topLeftPosition:Position = {
+    def topLeftPixel:Position = {
       position.toPosition
     }
-    def centerPosition:Position = {
+    def centerPixel:Position = {
       position.toPosition.add(16, 16)
     }
     def toWalkPosition:WalkPosition = {

@@ -57,7 +57,7 @@ class Commander {
   }
   
   def move(command:Command, unit:FriendlyUnitInfo, tilePosition:TilePosition) {
-    move(command, unit, tilePosition.centerPosition)
+    move(command, unit, tilePosition.centerPixel)
   }
   
   def _sleep(unit:FriendlyUnitInfo, startedAttacking:Boolean = false) {

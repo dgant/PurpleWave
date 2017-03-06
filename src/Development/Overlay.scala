@@ -3,11 +3,12 @@ package Development
 import Geometry.Grids.Abstract.Grid
 import Geometry.TileRectangle
 import Global.Combat.Battle.Battle
+import Plans.Allocation.{LockCurrency, LockUnits}
 import Plans.Plan
 import Startup.With
 import Types.UnitInfo.ForeignUnitInfo
 import Utilities.Enrichment.EnrichPosition._
-import bwapi.{Color, Position, UnitCommandType}
+import bwapi.{Color, Player, Position, UnitCommandType}
 
 import scala.collection.JavaConverters._
 
@@ -15,10 +16,8 @@ object Overlay {
   def onFrame() {
     if (With.configuration.enableOverlay) {
       With.game.setTextSize(bwapi.Text.Size.Enum.Small)
-      if (With.configuration.enableOverlayBases)          _drawBases()
       if (With.configuration.enableOverlayBattles)        _drawBattles()
       if (With.configuration.enableOverlayEconomy)        _drawEconomy()
-      if (With.configuration.enableOverlayExclusions)     _drawExclusions()
       if (With.configuration.enableOverlayGrids)          _drawGrids()
       if (With.configuration.enableOverlayUnits)          _drawUnits()
       if (With.configuration.enableOverlayPlans)          _drawPlans()
@@ -29,15 +28,7 @@ object Overlay {
     }
   }
   
-  def _drawBases() {
-    With.geography.ourHarvestingAreas.foreach(area => _drawTileRectangle(area, Color.Red))
-    With.geography.townHallPositions.foreach(position => _drawTileRectangle(new TileRectangle(position, position.add(4, 3)), Color.Yellow))
-  }
-  
-  def _drawBattles() {
-    With.battles.all.foreach(_drawBattle)
-  }
-  
+  def _drawBattles() = With.battles.all.foreach(_drawBattle)
   def _drawBattle(battle:Battle) {
     //if (battle.enemy.strength * battle.us.strength == 0) return
     //if (battle.us.vanguard.getDistance(battle.enemy.vanguard) > 32 * 20) return
@@ -86,19 +77,7 @@ object Overlay {
     With.game.drawTextScreen(550, 5, values.mkString("\n"))
   }
   
-  def _drawExclusions() {
-    With.geography._resourceExclusionCache.get.foreach(box => _drawTileRectangle(box, Color.Teal))
-    With.geography._resourceClusterCache.get.foreach(cluster => {
-      val centroid = cluster.map(_.tileCenter).centroid
-      cluster.foreach(unit =>
-        With.game.drawLineMap(
-          centroid.centerPosition,
-          unit.position,
-          Color.Teal))})
-  }
-  
   def _drawGrids() {
-    //_drawGrid(With.grids.walkability, 0, 1)
     _drawGrid(With.grids.enemyGroundStrength, 0, 0)
     _drawGrid(With.grids.enemyVision, 0, 1)
   }
@@ -158,6 +137,11 @@ object Overlay {
       zone.bases.foreach(base => {
         _drawTileRectangle(base.townHallPosition, Color.Yellow)
         _drawTileRectangle(base.miningArea, Color.Cyan)
+        _drawTextLabel(
+          List(base.zone.owner.getName, if (base.isStartLocation) "Start location" else ""),
+          base.townHallPosition.midpoint.centerPixel,
+          true,
+          _getPlayerColor(base.zone.owner))
       })
     })
   }
@@ -166,7 +150,6 @@ object Overlay {
     With.game.drawTextScreen(
       305,
       5,
-      
       With.bank.getPrioritizedRequests
         .take(8)
         .map(r =>
@@ -187,11 +170,12 @@ object Overlay {
       With.game.drawCircleMap(
         trackedUnit.position,
         trackedUnit.utype.width / 2,
-        Color.Grey)
+        _getPlayerColor(trackedUnit.player))
       _drawTextLabel(
         List(TypeDescriber.describeUnitType(trackedUnit.utype)),
         trackedUnit.position,
-        drawBackground = true)
+        drawBackground = true,
+        _getPlayerColor(trackedUnit.player))
     }
   }
   
@@ -225,9 +209,9 @@ object Overlay {
   }
   
   def _isRelevant(plan:Plan):Boolean = {
-    return ! plan.isComplete && plan.getChildren.exists(child => child.isComplete || _isRelevant(child))
-    //return plan.isInstanceOf[LockCurrency] || plan.isInstanceOf[LockUnits]
-    //plan.getChildren.exists(child => plan.isInstanceOf[LockCurrency] || plan.isInstanceOf[LockUnits])
+    plan.getChildren.exists(child =>
+      (child.isInstanceOf[LockCurrency] || child.isInstanceOf[LockUnits])
+      && child.isComplete)
   }
   
   def _drawTextLabel(
@@ -266,5 +250,11 @@ object Overlay {
   def _drawPolygonPositions(points:Iterable[Position], color:bwapi.Color = bwapi.Color.Brown) {
     points.reduce((p1, p2) => { With.game.drawLineMap(p1, p2, color); p2 })
     With.game.drawLineMap(points.head, points.last, color)
+  }
+  
+  def _getPlayerColor(player:Player):Color = {
+    if (player.isNeutral) Color.Grey
+    else if (player.isEnemy(With.game.self)) Color.Red
+    else Color.Green
   }
 }

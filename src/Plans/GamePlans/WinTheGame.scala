@@ -1,3 +1,5 @@
 package Plans.GamePlans
 
-class WinTheGame extends ProtossGamePlan
+class WinTheGame extends ProtossGamePlan {
+  description.set("Overall plan")
+}

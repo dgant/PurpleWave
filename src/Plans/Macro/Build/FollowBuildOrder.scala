@@ -13,7 +13,7 @@ class FollowBuildOrder extends Plan {
   var _queue:Iterable[Buildable] = List.empty
   val _plans = new mutable.HashMap[Buildable, Plan]
   
-  override def getChildren: Iterable[Plan] = _queue.map(_plans.get).filter(_.nonEmpty).map(_.get)
+  override def getChildren: Iterable[Plan] = _queue.flatMap(_plans.get)
   
   override def onFrame() {
     _plans.filter(_._2.isComplete).keys.foreach(_plans.remove)

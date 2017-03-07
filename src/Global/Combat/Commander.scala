@@ -21,7 +21,8 @@ class Commander {
   def onFrame() {
     _intentions.filter(pair => _isAwake(pair._1)).foreach(pair => pair._2.command.execute(pair._2))
     _nextOrderFrame.keySet.filterNot(_.alive).foreach(_nextOrderFrame.remove)
-    _lastIntentions = _intentions
+    _lastIntentions --= _lastIntentions.keys.filterNot(_.alive)
+    _intentions.foreach(pair => _lastIntentions.put(pair._1, pair._2))
     _intentions = new mutable.HashMap[FriendlyUnitInfo, Intention]
   }
   

@@ -32,7 +32,7 @@ class FriendlyUnitInfo(_baseUnit:bwapi.Unit) extends UnitInfo(_baseUnit) {
   def command                             : UnitCommand         = baseUnit.getLastCommand
   def cooldownRemaining                   : Int                 = Math.max(baseUnit.getGroundWeaponCooldown, baseUnit.getAirWeaponCooldown)
   def onCooldown                          : Boolean             = cooldownRemaining > 0
-  def getBuildUnit                        : Option[UnitInfo]    = With.units.get(baseUnit.getBuildUnit)
+  def getBuildUnit                        : Option[UnitInfo]    = With.units.getUnit(baseUnit.getBuildUnit)
   def trainingQueue                       : Iterable[UnitType]  = baseUnit.getTrainingQueue.asScala
   def teching                             : TechType            = baseUnit.getTech
   def upgrading                           : UpgradeType         = baseUnit.getUpgrade

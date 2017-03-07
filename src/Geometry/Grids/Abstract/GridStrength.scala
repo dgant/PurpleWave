@@ -15,7 +15,7 @@ abstract class GridStrength extends GridInt {
     _limitUpdates.act()
   }
   
-  val rangeMargin = 24
+  val rangeMargin = 48
   val framesToLookAhead = 48
   
   def _update() {
@@ -24,7 +24,7 @@ abstract class GridStrength extends GridInt {
       val strength = BattleMetrics.evaluate(unit)
       val latencyFrames = With.game.getLatencyFrames
       val tilePosition = unit.position.toTilePosition //position.toTilePosition uses the unit's center rather than its top-left corner
-      val rangeFull = unit.range + rangeMargin
+      val rangeFull = unit.range
       val rangeZero = unit.range + rangeMargin + (unit.utype.topSpeed * (framesToLookAhead + latencyFrames)).toInt
       if (strength > 0) {
         _populate(tilePosition, rangeFull, rangeZero, strength)

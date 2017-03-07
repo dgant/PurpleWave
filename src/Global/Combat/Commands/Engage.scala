@@ -1,6 +1,5 @@
 package Global.Combat.Commands
 
-import Startup.With
 import Types.Intents.Intention
 
 object Engage extends Command {
@@ -8,19 +7,10 @@ object Engage extends Command {
   def execute(intent:Intention) {
     
     val unit = intent.unit
-    val attackableEnemies = intent.battle.map(battle => battle.enemy.units.filter(_.visible)).getOrElse(List.empty)
-    if (attackableEnemies.nonEmpty) {
-      intent.targetUnit = Some(attackableEnemies.minBy(enemy => enemy.distanceSquared(unit)))
-    }
+    val enemies = intent.battle.map(_.enemy.units).getOrElse(List.empty)
+    val closestEnemy = enemies.headOption
     
-    val threat =
-      With.grids.enemyGroundStrength.get(unit.tileCenter) /
-      With.grids.friendlyGroundStrength.get(unit.tileCenter).toDouble
-    
-    if (unit.onCooldown && intent.targetUnit.exists(_.range < unit.range) && threat > 0) {
-      Dodge.execute(intent)
-    }
-    else if (threat > 2) {
+    if (unit.onCooldown && closestEnemy.exists(_.range < unit.range)) {
       Dodge.execute(intent)
     }
     else {

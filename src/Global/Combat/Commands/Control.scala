@@ -15,7 +15,8 @@ object Control extends Command {
       Engage.execute(intent)
     } else {
       
-      val desperation         = Math.max(1.0, 32.0 * 32 / With.paths.groundDistance(unit.tileCenter, With.geography.home))
+      val distanceFromBase    = if (With.geography.ourBases.nonEmpty) With.geography.ourBases.map(base => With.paths.groundDistance(unit.tileCenter, base.centerTile)).min.toDouble else 0.0
+      val desperation         = Math.max(0.8, 32.0 * 40 / distanceFromBase)
       val groupStrengthUs     = 0.01 + intent.battle.get.us.strength
       val groupStrengthEnemy  = 0.01 + intent.battle.get.enemy.strength
       val localStrengthUs     = 0.01 + With.grids.friendlyGroundStrength.get(unit.position.toTilePosition)
@@ -30,10 +31,10 @@ object Control extends Command {
       if (intent.motivation < 0.5) {
         Flee.execute(intent)
       }
-      else if (intent.motivation < 0.8) {
+      else if (intent.motivation < 0.75) {
         Approach.execute(intent)
       }
-      else if (intent.motivation < 1.2) {
+      else if (intent.motivation < 1) {
         Skirt.execute(intent)
       }
       else {

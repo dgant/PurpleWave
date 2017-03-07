@@ -101,7 +101,7 @@ class Geography {
   def _getExclusions:Iterable[TileRectangle] = _getResources.map(_getExclusion)
   def _getExclusion(unit:ForeignUnitInfo):TileRectangle = new TileRectangle(unit.tileTopLeft.subtract(3, 3), unit.tileTopLeft.add(unit.utype.tileSize).add(3, 3))
   def _getResources:Iterable[ForeignUnitInfo] = With.units.neutral.filter(unit => unit.isMinerals || unit.isGas).filter(_.baseUnit.getInitialResources > 0)
-  def _calculateBasePositions:Iterable[TilePosition] = _resourceClusterCache.get.map(_findBasePosition).filter(_.nonEmpty).map(_.get)
+  def _calculateBasePositions:Iterable[TilePosition] = _resourceClusterCache.get.flatMap(_findBasePosition)
   def _findBasePosition(resources:Iterable[ForeignUnitInfo]):Option[TilePosition] = {
     val centroid = resources.map(_.position).centroid
     val centroidTile = centroid.toTilePosition

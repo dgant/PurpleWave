@@ -14,16 +14,17 @@ class Units {
   val _friendlyUnitTracker = new FriendlyUnitTracker
   val _foreignUnitTracker = new ForeignUnitTracker
   
-  def get(id:Int):Option[UnitInfo]          = _friendlyUnitTracker.get(id).orElse(_foreignUnitTracker.get(id))
-  def get(unit:bwapi.Unit):Option[UnitInfo] = if (unit == null) None else get(unit.getID)
-  def all:Set[UnitInfo]                     = ours ++ enemy ++ neutral
-  def buildings:Set[UnitInfo]               = all.filter(_.utype.isBuilding)
-  def ours:Set[FriendlyUnitInfo]            = _friendlyUnitTracker.ourUnits
-  def enemy:Set[ForeignUnitInfo]            = _foreignUnitTracker.enemyUnits
-  def neutral:Set[ForeignUnitInfo]          = _foreignUnitTracker.neutralUnits
+  def get(id:Int):Option[UnitInfo]              = _friendlyUnitTracker.get(id).orElse(_foreignUnitTracker.get(id))
+  def getUnit(unit:bwapi.Unit):Option[UnitInfo] = if (unit == null) None else get(unit.getID)
+  def all:Set[UnitInfo]                         = ours ++ enemy ++ neutral
+  def buildings:Set[UnitInfo]                   = all.filter(_.utype.isBuilding)
+  def ours:Set[FriendlyUnitInfo]                = _friendlyUnitTracker.ourUnits
+  def enemy:Set[ForeignUnitInfo]                = _foreignUnitTracker.enemyUnits
+  def neutral:Set[ForeignUnitInfo]              = _foreignUnitTracker.neutralUnits
   
-  def _remap(units:java.util.List[bwapi.Unit]):Iterable[UnitInfo] =
-    units.asScala.map(get).filter(_.nonEmpty).map(_.get)
+  def _remap(units:java.util.List[bwapi.Unit]):Iterable[UnitInfo] = {
+    units.asScala.flatMap(getUnit).toList
+  }
   
   def inRadius(position:Position, range:Int):Iterable[UnitInfo] = {
     val tileRadius = range / 32 + 1

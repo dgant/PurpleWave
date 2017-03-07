@@ -28,14 +28,15 @@ object Dodge extends Command {
       val distanceBefore = With.paths.groundDistance(currentPosition, safePosition)
       val distanceAfter = With.paths.groundDistance(candidate, safePosition)
       val distanceBonus = if (distanceAfter < distanceBefore) 2 else 1
-      val mobility = With.grids.mobility.get(candidate)
-      val safety = With.grids.friendlyGroundStrength.get(candidate)
-      val threat = With.grids.enemyGroundStrength.get(candidate)
-      val traffic = (With.grids.units.get(candidate) -- List(unit)).size
+      val stepSizePenalty = candidate.tileDistance(currentPosition)
+      val mobilityBonus = With.grids.mobility.get(candidate)
+      val safetyBonus = With.grids.friendlyGroundStrength.get(candidate)
+      val threatPenalty = With.grids.enemyGroundStrength.get(candidate)
+      val trafficPenalty = (With.grids.units.get(candidate) -- List(unit)).size
       
       val evaluation =
-        distanceBonus * mobility * safety /
-        ((1.0 + traffic) * threat * threat )
+        distanceBonus * mobilityBonus * safetyBonus /
+        ((1.0 + trafficPenalty) * threatPenalty * threatPenalty * stepSizePenalty)
       evaluation
     }
   }

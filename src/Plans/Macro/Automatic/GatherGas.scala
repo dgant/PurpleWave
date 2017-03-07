@@ -24,7 +24,7 @@ class GatherGas extends Plan {
     _orderWorkers()
   }
   
-  def _ourRefineries:Iterable[FriendlyUnitInfo] = With.units.ours.filter(unit => unit.complete && unit.utype.isRefinery)
+  def _ourRefineries:Iterable[FriendlyUnitInfo] = With.units.ours.filter(unit => unit.complete && unit.isGas)
   
   def _idealMinerCount:Int = {
     //TODO: Stop taking guys off gas if we're saturated on minerals

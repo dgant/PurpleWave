@@ -19,10 +19,11 @@ class Commander {
   def intend(intention:Intention) = _intentions.put(intention.unit, intention)
   
   def onFrame() {
-    _intentions.filter(pair => _isAwake(pair._1)).foreach(pair => pair._2.command.execute(pair._2))
+    val awakeIntentions = _intentions.filter(pair => _isAwake(pair._1))
+    awakeIntentions.foreach(pair => pair._2.command.execute(pair._2))
     _nextOrderFrame.keySet.filterNot(_.alive).foreach(_nextOrderFrame.remove)
     _lastIntentions --= _lastIntentions.keys.filterNot(_.alive)
-    _intentions.foreach(pair => _lastIntentions.put(pair._1, pair._2))
+    awakeIntentions.foreach(pair => _lastIntentions.put(pair._1, pair._2))
     _intentions = new mutable.HashMap[FriendlyUnitInfo, Intention]
   }
   
@@ -42,7 +43,8 @@ class Commander {
   
   def attack(command:Command, unit:FriendlyUnitInfo, position:Position) {
     _recordCommand(unit, command)
-    if (With.game.isVisible(position.toTilePosition)) {
+    //Workers don't fight when they patrol
+    if ( ! unit.utype.isWorker && With.game.isVisible(position.tileNearest)) {
       unit.baseUnit.patrol(position)
     }
     else {

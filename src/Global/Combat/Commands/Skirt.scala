@@ -9,14 +9,15 @@ object Skirt extends Command {
     val nearestEnemy = intent.battle.map(_.enemy.units.minBy(unit.distance))
     val nearestEnemyOutranged = nearestEnemy.exists(_.range < unit.range)
     
-    if (intent.motivation < 1) {
-      Dodge.execute(intent)
+    if (nearestEnemyOutranged && ! unit.onCooldown) {
+      Engage.execute(intent)
     }
-    else if (unit.onCooldown && nearestEnemyOutranged && intent.motivation < 5) {
-      Dodge.execute(intent)
+    else if (unit.isMelee && nearestEnemy.exists(_.edgeDistance(unit) < unit.range - unit.utype.width) && ! unit.onCooldown) {
+      intent.targetUnit = nearestEnemy
+      Hunt.execute(intent)
     }
     else {
-      Engage.execute(intent)
+      Dodge.execute(intent)
     }
   }
 }

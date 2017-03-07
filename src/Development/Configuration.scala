@@ -14,7 +14,7 @@ class Configuration {
   var enableOverlay               = false
   var enableOverlayBattles        = true
   var enableOverlayEconomy        = true
-  var enableOverlayGrids          = false
+  var enableOverlayGrids          = true
   var enableOverlayPlans          = true
   var enableOverlayResources      = true
   var enableOverlayTerrain        = true

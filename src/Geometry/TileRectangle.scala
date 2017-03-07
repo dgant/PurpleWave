@@ -51,12 +51,6 @@ class TileRectangle(
     endExclusive.toPosition.subtract(1, 1)
   }
   
-  def toWalkRectangle:WalkRectangle = {
-    new WalkRectangle(
-      startInclusive.toWalkPosition,
-      endExclusive.toWalkPosition)
-  }
-  
   def tiles:Iterable[TilePosition] = {
     (startInclusive.getX until endExclusive.getX).flatten(x =>
       (startInclusive.getY until endExclusive.getY).map(y =>

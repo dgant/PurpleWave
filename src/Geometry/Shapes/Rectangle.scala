@@ -1,4 +1,4 @@
-package Geometry.Grids
+package Geometry.Shapes
 
 import Geometry.Point
 

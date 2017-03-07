@@ -1,4 +1,6 @@
-package Geometry
+package Geometry.Shapes
+
+import Geometry.Point
 
 import scala.collection.mutable
 

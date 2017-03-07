@@ -1,6 +1,6 @@
 package Global.Combat.Heuristics
 
-import Geometry.Circle
+import Geometry.Shapes.Circle
 import Startup.With
 import Types.UnitInfo.FriendlyUnitInfo
 import Utilities.Enrichment.EnrichPosition._

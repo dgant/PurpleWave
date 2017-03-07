@@ -53,7 +53,7 @@ abstract class UnitInfo (var baseUnit:bwapi.Unit) {
   def isGas                                       : Boolean                 = utype.isGas
   def isResource                                  : Boolean                 = isMinerals || isGas
   def tileCenter                                  : TilePosition            = position.toTilePosition
-  def tileArea                                    : TileRectangle           = utype.area.add(tileTopLeft)
+  def tileArea                                    : TileRectangle           = new TileRectangle(tileTopLeft, new Position(right, bottom).tileIncluding.add(1, 1))
   def distance(otherUnit:UnitInfo)                : Double                  = distance(otherUnit.position)
   def distance(otherPosition:Position)            : Double                  = position.getDistance(otherPosition)
   def distance(otherPosition:TilePosition)        : Double                  = distance(otherPosition.toPosition)

@@ -1,7 +1,7 @@
 package Geometry.Grids.Real
 
-import Geometry.Circle
 import Geometry.Grids.Abstract.GridBoolean
+import Geometry.Shapes.Circle
 import Startup.With
 import Utilities.Caching.Limiter
 import Utilities.Enrichment.EnrichPosition._

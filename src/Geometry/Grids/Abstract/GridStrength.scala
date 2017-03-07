@@ -1,6 +1,6 @@
 package Geometry.Grids.Abstract
 
-import Geometry.Circle
+import Geometry.Shapes.Circle
 import Global.Combat.Battle.BattleMetrics
 import Startup.With
 import Types.UnitInfo.UnitInfo

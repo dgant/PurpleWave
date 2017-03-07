@@ -1,6 +1,6 @@
-package Geometry
+package Geometry.Shapes
 
-import Geometry.Grids.Rectangle
+import Geometry.Point
 
 object Square {
   

@@ -1,6 +1,7 @@
 package Global.Information.UnitAbstraction
 
-import Geometry.{Circle, TileRectangle}
+import Geometry.Shapes.Circle
+import Geometry.TileRectangle
 import Startup.With
 import Types.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, UnitInfo}
 import Utilities.Enrichment.EnrichPosition._

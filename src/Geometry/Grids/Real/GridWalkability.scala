@@ -1,7 +1,7 @@
 package Geometry.Grids.Real
 
 import Geometry.Grids.Abstract.GridBoolean
-import Geometry.Square
+import Geometry.Shapes.Square
 import Startup.With
 import Utilities.Caching.Limiter
 import Utilities.Enrichment.EnrichPosition._

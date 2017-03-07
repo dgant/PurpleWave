@@ -1,6 +1,7 @@
 package Global.Information
 
-import Geometry.{Pylon, Spiral, TileRectangle}
+import Geometry.Shapes.{Pylon, Spiral}
+import Geometry.TileRectangle
 import Startup.With
 import Utilities.Enrichment.EnrichPosition._
 import bwapi.{TilePosition, UnitType}
@@ -106,7 +107,8 @@ class Architect {
       buildingArea.startInclusive.subtract(margin, margin),
       buildingArea.endExclusive.add(margin, margin))
     
-    exclusions.filter(_.intersects(marginArea)).isEmpty &&
+    buildingArea.tiles.forall(_.isValid) &&
+    exclusions.filter(_.intersects(buildingArea)).isEmpty &&
     _rectangleIsBuildable(buildingArea, buildingType, hypotheticalPylon) &&
     _rectangleContainsOnlyAWorker(marginArea) &&
     marginArea.tiles.forall(With.grids.walkability.get)

@@ -1,22 +1,18 @@
 package Plans.Macro.Automatic
 
 import Plans.Plan
+import Startup.With
+import Types.Buildable.Buildable
+import Utilities.Caching.Cache
 
-import scala.collection.mutable.ListBuffer
-
-abstract class AbstractBuildContinuously[T <: Plan] extends Plan {
+abstract class AbstractBuildContinuously extends Plan {
   
-  val _currentBuilds:ListBuffer[T] = ListBuffer.empty
+  def _buildsRequired:Int
+  def _newBuild:Buildable
   
-  override def isComplete:Boolean = { getChildren.forall(_.isComplete) && _additionalPlansRequired == 0 }
-  override def getChildren: Iterable[Plan] = _currentBuilds
+  override def isComplete:Boolean = buildsRequired == 0
+  override def onFrame() = With.scheduler.request(this, (0 to buildsRequired).map(i => _newBuild))
   
-  override def onFrame() {
-    _currentBuilds --= _currentBuilds.filter(_.isComplete)
-    (1 to _additionalPlansRequired).foreach(i => _currentBuilds.append(_createPlan))
-    _currentBuilds.foreach(_.onFrame())
-  }
-  
-  def _additionalPlansRequired:Int
-  def _createPlan:T
+  def buildsRequired:Int = _buildsRequiredCache.get
+  val _buildsRequiredCache = new Cache(1, () => _buildsRequired)
 }

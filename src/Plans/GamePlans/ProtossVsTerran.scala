@@ -101,7 +101,6 @@ class ProtossVsTerran extends Parallel {
     new IfThenElse {
       predicate.set(new SupplyAtLeast { quantity.set(74) })
       whenTrue.set(new Parallel { children.set(List(
-        new BuildSupplyContinuously,
         new BuildWorkersContinuously,
         new TrainGatewayUnitsContinuously,
         new ScheduleBuildOrder { buildables.set(_lateGame) }

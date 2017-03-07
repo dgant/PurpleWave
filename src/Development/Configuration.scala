@@ -17,6 +17,7 @@ class Configuration {
   var enableOverlayGrids          = true
   var enableOverlayPlans          = true
   var enableOverlayResources      = true
+  var enableOverlayScheduler      = true
   var enableOverlayTerrain        = true
   var enableOverlayTrackedUnits   = true
   var enableOverlayUnits          = true

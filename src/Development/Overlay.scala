@@ -22,6 +22,7 @@ object Overlay {
       if (With.configuration.enableOverlayUnits)          _drawUnits()
       if (With.configuration.enableOverlayPlans)          _drawPlans()
       if (With.configuration.enableOverlayResources)      _drawResources()
+      if (With.configuration.enableOverlayScheduler)      _drawScheduler()
       if (With.configuration.enableOverlayTerrain)        _drawTerrain()
       if (With.configuration.enableOverlayTrackedUnits)   _drawTrackedUnits()
     }
@@ -156,6 +157,10 @@ object Overlay {
           (if (r.gas > 0)       r.gas       .toString ++ "g " else "") ++
           (if (r.supply > 0)    r.supply    .toString ++ "s " else ""))
         .mkString("\n"))
+  }
+  
+  def _drawScheduler {
+    
   }
   
   def _drawTrackedUnits() {

@@ -35,7 +35,7 @@ object BattleMetrics {
     
     val highGroundBonus =  With.grids.altitudeBonus.get(unit.tileCenter)
     val visibilityBonus = if (unit.visible) 1 else highGroundBonus
-    val combatEfficacy = dps * unit.totalHealth * highGroundBonus * visibilityBonus
+    val combatEfficacy = dps * Math.pow(unit.totalHealth, 1.2) * highGroundBonus * visibilityBonus
     Math.max(0, combatEfficacy).toInt
   }
   

@@ -21,9 +21,7 @@ class PositionSimpleBuilding(
     if (buildingType.isRefinery) return _positionRefinery
     else if (buildingType.isTownHall) return _positionTownHall
     
-    val maxMargin = if (
-      buildingType == UnitType.Protoss_Pylon &&
-      With.units.ours.filter(_.utype == buildingType).size < 4) 3 else 1
+    val maxMargin = if (buildingType == UnitType.Protoss_Pylon) 3 else 1
   
     var output:Option[TilePosition] = None
     (maxMargin to 0 by -1).foreach(margin =>
@@ -39,7 +37,14 @@ class PositionSimpleBuilding(
   }
   
   def _positionRefinery:Option[TilePosition] = {
-    val candidates = With.units.neutral.filter(_.isGas)
+    
+    val candidates = With.units.neutral
+      .filter(_.isGas)
+      .filter(gas =>
+        With.geography.bases.exists(base =>
+          base.zone.owner == With.game.self &&
+          base.harvestingArea.contains(gas.tileCenter)))
+    
     return if (candidates.isEmpty)
       None
     else

@@ -13,6 +13,7 @@ object EvaluatePositions {
     val candidates =
       Circle.points(searchRange)
         .map(unit.tileCenter.add)
+        .filter(_.isValid)
         .filter(With.grids.walkability.get)
   
     if (candidates.isEmpty) {

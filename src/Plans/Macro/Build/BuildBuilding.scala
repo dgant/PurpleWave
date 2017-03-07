@@ -83,10 +83,7 @@ class BuildBuilding(val buildingType:UnitType) extends Plan {
         _position = buildingPlacer.find
       }
   
-      if (_position.isEmpty) {
-        With.logger.warn("Failed to place a " ++ buildingType.toString ++ " near " ++ _position.toString)
-      }
-      else {
+      if (_position.nonEmpty)  {
         // This avoids trying to build in fog of war
         if (builder.distance(_position.get) < 32 * 6) {
           builder.baseUnit.build(buildingType, _position.get)

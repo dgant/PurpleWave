@@ -38,7 +38,7 @@ abstract class UnitInfo (var baseUnit:bwapi.Unit) {
   
   def x                                           : Int                     = position.getX
   def y                                           : Int                     = position.getY
-  def attackFrames                                : Int                     = 8 + (if (List(UnitType.Protoss_Dragoon, UnitType.Zerg_Devourer).contains(utype)) 5 else 0)
+  def attackFrames                                : Int                     = 8 + (if (List(UnitType.Protoss_Dragoon, UnitType.Zerg_Devourer).contains(utype)) 6 else 0)
   def isOurs                                      : Boolean                 = player == With.game.self
   def isFriendly                                  : Boolean                 = isOurs || player.isAlly(With.game.self)
   def isEnemy                                     : Boolean                 = player.isEnemy(With.game.self)

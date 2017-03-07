@@ -15,8 +15,8 @@ abstract class GridStrength extends GridInt {
     _limitUpdates.act()
   }
   
-  val rangeMargin = 0
-  val framesToLookAhead = 36
+  val rangeMargin = 24
+  val framesToLookAhead = 48
   
   def _update() {
     reset()

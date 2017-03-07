@@ -71,7 +71,7 @@ class ForeignUnitInfo(_baseUnit:bwapi.Unit) extends UnitInfo (_baseUnit) {
   override def tileTopLeft: TilePosition = _tileTopleft
   override def hitPoints: Int = _hitPoints
   override def shieldPoints: Int = _shieldPoints
-  override def utype: UnitType = if ( ! visible && _unitType == UnitType.Terran_Siege_Tank_Tank_Mode) UnitType.Terran_Siege_Tank_Siege_Mode else _unitType
+  override def utype: UnitType = if (_unitType == UnitType.Terran_Siege_Tank_Tank_Mode) UnitType.Terran_Siege_Tank_Siege_Mode else _unitType //isMorphing?!
   override def complete: Boolean = _complete
   override def flying: Boolean = _flying
   override def visible: Boolean = lastSeen >= With.game.getFrameCount

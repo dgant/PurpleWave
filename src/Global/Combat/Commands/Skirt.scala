@@ -1,6 +1,5 @@
 package Global.Combat.Commands
 
-import Startup.With
 import Types.Intents.Intention
 
 object Skirt extends Command {
@@ -9,12 +8,11 @@ object Skirt extends Command {
     val unit = intent.unit
     val nearestEnemy = intent.battle.map(_.enemy.units.minBy(unit.distance))
     val nearestEnemyOutranged = nearestEnemy.exists(_.range < unit.range)
-    val threat = With.grids.enemyGroundStrength.get(unit.tileCenter) / With.grids.friendlyGroundStrength.get(unit.tileCenter).toDouble
     
-    if (threat > 1) {
+    if (intent.motivation < 1) {
       Dodge.execute(intent)
     }
-    else if (unit.onCooldown && nearestEnemyOutranged) {
+    else if (unit.onCooldown && nearestEnemyOutranged && intent.motivation < 5) {
       Dodge.execute(intent)
     }
     else {

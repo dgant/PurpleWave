@@ -15,38 +15,29 @@ object Control extends Command {
       Engage.execute(intent)
     } else {
       
-      val desperation         = Math.max(1.0, 24.0 / unit.distance(With.geography.home))
+      val desperation         = Math.max(1.0, 32.0 * 32 / With.paths.groundDistance(unit.tileCenter, With.geography.home))
       val groupStrengthUs     = 0.01 + intent.battle.get.us.strength
       val groupStrengthEnemy  = 0.01 + intent.battle.get.enemy.strength
       val localStrengthUs     = 0.01 + With.grids.friendlyGroundStrength.get(unit.position.toTilePosition)
       val localStrengthEnemy  = 0.01 + With.grids.enemyGroundStrength.get(unit.position.toTilePosition)
-      val healthFactor = 0.5 + 0.5 * unit.totalHealth / unit.maxTotalHealth
-      val groupMotivation = groupStrengthUs / groupStrengthEnemy
-      val localMotivation = intent.motivation * desperation * healthFactor * groupMotivation * localStrengthUs / localStrengthEnemy
+      val groupConfidence     = groupStrengthUs / groupStrengthEnemy
+      val localConfidence     = localStrengthUs / localStrengthEnemy
+      val healthConfidence    = 0.2 + 0.8 * unit.totalHealth / unit.maxTotalHealth
+      val localMotivation     = intent.motivation * desperation * healthConfidence  * groupConfidence * localConfidence
   
       intent.motivation = localMotivation
       
-      if (groupMotivation < 1) {
+      if (intent.motivation < 0.5) {
         Flee.execute(intent)
       }
-      else if (groupMotivation < 1) {
-        if (localMotivation < 0.5) {
-          Flee.execute(intent)
-        }
-        else if (localMotivation < 1) {
-          Approach.execute(intent)
-        }
-        else {
-          Skirt.execute(intent)
-        }
+      else if (intent.motivation < 0.8) {
+        Approach.execute(intent)
+      }
+      else if (intent.motivation < 1.2) {
+        Skirt.execute(intent)
       }
       else {
-        if (localMotivation < 1) {
-          Skirt.execute(intent)
-        }
-        else {
-          Engage.execute(intent)
-        }
+        Engage.execute(intent)
       }
     }
   }

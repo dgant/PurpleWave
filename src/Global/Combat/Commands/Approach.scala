@@ -23,12 +23,14 @@ object Approach extends Command {
   class EvaluateApproach(currentPosition:TilePosition, destination:TilePosition) extends EvaluatePosition {
     override def evaluate(candidate: TilePosition): Double = {
       
-      val distanceNow = With.paths.groundDistance(currentPosition, destination)
-      val distanceCandidate = With.paths.groundDistance(candidate, destination)
-      val distanceBonus = distanceNow - distanceCandidate
+      val distanceBefore = With.paths.groundDistance(currentPosition, destination)
+      val distanceAfter = With.paths.groundDistance(candidate, destination)
+      val distanceBonus = distanceBefore - distanceAfter
       val mobility = With.grids.mobility.get(candidate)
       val threat = With.grids.enemyGroundStrength.get(candidate)
-      val evaluation = if (threat > 0) -threat / (1.0 + mobility) else distanceBonus
+      val evaluation =
+        if (threat > 0) -threat / mobility
+        else            distanceBonus
       evaluation
     }
   }

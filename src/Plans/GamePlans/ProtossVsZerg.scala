@@ -20,6 +20,7 @@ class ProtossVsZerg extends Parallel {
     new BuildableUnit(UnitType.Protoss_Pylon),
     new BuildableUnit(UnitType.Protoss_Gateway),
     new BuildableUnit(UnitType.Protoss_Gateway),
+    new BuildableUnit(UnitType.Protoss_Gateway),
     new BuildableUnit(UnitType.Protoss_Nexus),
     new BuildableUnit(UnitType.Protoss_Cybernetics_Core),
     new BuildableUnit(UnitType.Protoss_Assimilator),
@@ -64,7 +65,7 @@ class ProtossVsZerg extends Parallel {
     new DefeatWorkerHarass,
     new ScoutAt(20),
     new IfThenElse {
-      predicate.set(new UnitCountAtLeast { quantity.set(6); unitMatcher.set(UnitMatchWarriors) })
+      predicate.set(new UnitCountAtLeast { quantity.set(10); unitMatcher.set(UnitMatchWarriors) })
       whenFalse.set(new DefendChoke)
       whenTrue.set(new Attack)
     },

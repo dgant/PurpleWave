@@ -3,7 +3,7 @@ package Types.Buildable
 import Development.TypeDescriber
 import bwapi.{UpgradeType, UnitType}
 
-class BuildableUpgrade(upgrade:UpgradeType, level:Int) extends Buildable {
+class BuildableUpgrade(upgrade:UpgradeType, level:Int=1) extends Buildable {
   
   override def upgradeOption    : Option[UpgradeType]   = Some(upgrade)
   override def upgradeLevel     : Int                   = level
@@ -16,7 +16,7 @@ class BuildableUpgrade(upgrade:UpgradeType, level:Int) extends Buildable {
     List(new BuildableUnit(upgrade.whatUpgrades))
   }
   
-  override def prerequisites: Iterable[BuildableUnit] = {
+  override def requirements: Iterable[BuildableUnit] = {
     val requirement = upgrade.whatsRequired(upgradeLevel)
     if (requirement != UnitType.None) {
       List(new BuildableUnit(requirement))

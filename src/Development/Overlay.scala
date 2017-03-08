@@ -161,6 +161,7 @@ object Overlay {
   
   def _drawScheduler() {
     With.game.drawTextScreen(450, 100, With.scheduler.queue.map(_.toString).mkString("\n"))
+    With.game.drawTextScreen(500, 100, With.scheduler.simulationResults.map(_.toString).mkString("\n"))
   }
   
   def _drawTrackedUnits() {

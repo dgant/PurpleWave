@@ -5,6 +5,7 @@ import bwapi.{TechType, UnitType, UpgradeType}
 abstract class Buildable{
   
   def unitOption      : Option[UnitType]    = None
+  def unitsProduced   : Int                 = 0
   def techOption      : Option[TechType]    = None
   def upgradeOption   : Option[UpgradeType] = None
   def upgradeLevel    : Int                 = 0
@@ -14,7 +15,7 @@ abstract class Buildable{
   def supplyRequired  : Int = 0
   def supplyProvided  : Int = 0
   
-  def prerequisites:Iterable[Buildable] = List.empty
+  def requirements:Iterable[Buildable] = List.empty
   def buildersOccupied:Iterable[BuildableUnit] = List.empty
   def buildersConsumed:Iterable[BuildableUnit] = {
     //BuildableUnit accounts for lair/hive upgrade

@@ -12,6 +12,8 @@ class Scheduler {
   val _requests = new mutable.HashMap[Plan, Iterable[Buildable]]
   val _recentlyUpdated = new mutable.HashSet[Plan]
   
+  var simulationResults:Iterable[SimulationEvent] = List.empty
+  
   def request(requester:Plan, buildables: Iterable[Buildable]) {
     _requests.put(requester, buildables)
     _recentlyUpdated.add(requester)
@@ -29,20 +31,21 @@ class Scheduler {
   def onFrame() {
     _requests.keySet.diff(_recentlyUpdated).foreach(_requests.remove)
     _recentlyUpdated.clear()
+    simulationResults = ScheduleSimulator.simulate
   }
   
   def _isFulfilled(
     buildable:Buildable,
     unitsWanted:mutable.HashMap[UnitType, Int],
     unitsActual:Map[UnitType, Int]):Boolean = {
-    if (buildable.upgr.nonEmpty) {
-      return With.game.self.getUpgradeLevel(buildable.upgr.get) >= buildable.upgradeLevel
+    if (buildable.upgradeOption.nonEmpty) {
+      return With.game.self.getUpgradeLevel(buildable.upgradeOption.get) >= buildable.upgradeLevel
     }
-    else if (buildable.tech.nonEmpty) {
-      return With.game.self.hasResearched(buildable.tech.get)
+    else if (buildable.techOption.nonEmpty) {
+      return With.game.self.hasResearched(buildable.techOption.get)
     }
     else {
-      val unitType = buildable.unit.get
+      val unitType = buildable.unitOption.get
       unitsWanted.put(unitType, 1 + unitsWanted.getOrElse(unitType, 0))
       unitsActual.getOrElse(unitType, 0) >= unitsWanted(unitType)
     }

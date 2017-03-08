@@ -25,19 +25,19 @@ class FollowBuildOrder extends Plan {
   }
   
   def _buildPlan(buildable:Buildable):Plan = {
-    if (buildable.unit.nonEmpty) {
-      val unitType = buildable.unit.get
+    if (buildable.unitOption.nonEmpty) {
+      val unitType = buildable.unitOption.get
       if (unitType.isBuilding) {
         return new BuildBuilding(unitType)
       } else {
         return new TrainUnit(unitType)
       }
     }
-    if (buildable.tech.nonEmpty) {
-      return new ResearchTech(buildable.tech.get)
+    if (buildable.techOption.nonEmpty) {
+      return new ResearchTech(buildable.techOption.get)
     }
-    if (buildable.upgr.nonEmpty) {
-      return new ResearchUpgrade(buildable.upgr.get, buildable.upgradeLevel)
+    if (buildable.upgradeOption.nonEmpty) {
+      return new ResearchUpgrade(buildable.upgradeOption.get, buildable.upgradeLevel)
     }
     
     throw new Exception("Tried to build a Buildable that doesn't specify any unit, tech, or research")

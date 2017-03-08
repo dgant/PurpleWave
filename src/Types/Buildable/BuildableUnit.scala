@@ -8,6 +8,7 @@ import scala.collection.JavaConverters._
 class BuildableUnit(val unit: UnitType) extends Buildable {
   
   override def unitOption       : Option[UnitType]  = Some(unit)
+  override def unitsProduced    : Int               = if (unit.isTwoUnitsInOneEgg) 2 else 1
   override def toString         : String            = TypeDescriber.unit(unit)
   override def minerals         : Int               = unit.mineralPrice
   override def gas              : Int               = unit.gasPrice
@@ -27,7 +28,7 @@ class BuildableUnit(val unit: UnitType) extends Buildable {
       super.buildersConsumed
     }
   }
-  override def prerequisites: Iterable[BuildableUnit] = {
+  override def requirements: Iterable[BuildableUnit] = {
     unit.requiredUnits.asScala.flatten(pair => List.fill(pair._2)(pair._1)).map(new BuildableUnit(_))
   }
 }

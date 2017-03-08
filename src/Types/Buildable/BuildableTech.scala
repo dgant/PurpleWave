@@ -14,7 +14,7 @@ class BuildableTech(tech: TechType) extends Buildable {
   override def buildersOccupied: Iterable[BuildableUnit] = {
     List(new BuildableUnit(tech.whatResearches))
   }
-  override def prerequisites: Iterable[BuildableUnit] = {
+  override def requirements: Iterable[BuildableUnit] = {
     if (tech.requiredUnit != UnitType.None) {
       List(new BuildableUnit(tech.requiredUnit))
     }

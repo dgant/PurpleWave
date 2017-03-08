@@ -23,9 +23,9 @@ class ScheduleSimulationState(
   ////////////////////////////////////////
 
   def isBuildableEventually(buildable:Buildable):Boolean = {
-    hasMineralRequirements(buildable) || mineralsPerFrame > 0 &&
-    hasGasRequirements(buildable)     || gasPerFrame      > 0 &&
-    hasPrerequisites(buildable)       || false //TODO: See if prerequisites will be built
+    (hasMineralRequirements(buildable) || mineralsPerFrame > 0) &&
+    (hasGasRequirements(buildable)     || gasPerFrame      > 0) &&
+    (hasPrerequisites(buildable)       || false) //TODO: See if prerequisites will be built
   }
   
   def projectStartFrame(buildable: Buildable):Int = {

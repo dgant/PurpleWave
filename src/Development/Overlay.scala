@@ -159,8 +159,8 @@ object Overlay {
         .mkString("\n"))
   }
   
-  def _drawScheduler {
-    
+  def _drawScheduler() {
+    With.game.drawTextScreen(450, 100, With.scheduler.queue.map(_.toString).mkString("\n"))
   }
   
   def _drawTrackedUnits() {
@@ -175,7 +175,7 @@ object Overlay {
         trackedUnit.utype.width / 2,
         _getPlayerColor(trackedUnit.player))
       _drawTextLabel(
-        List(TypeDescriber.describeUnitType(trackedUnit.utype)),
+        List(TypeDescriber.unit(trackedUnit.utype)),
         trackedUnit.position,
         drawBackground = true,
         _getPlayerColor(trackedUnit.player))

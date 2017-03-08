@@ -23,7 +23,7 @@ class LockUnits extends Plan {
   description.set(
     if(isComplete) units
       .groupBy(_.utype)
-      .map(pair => TypeDescriber.describeUnitType(pair._1) + " " + pair._2.size)
+      .map(pair => TypeDescriber.unit(pair._1) + " " + pair._2.size)
       .mkString(", ")
     else "")
   

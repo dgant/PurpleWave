@@ -1,9 +1,9 @@
 package Development
 
-import bwapi.UnitType
+import bwapi.{TechType, UnitType, UpgradeType}
 
 object TypeDescriber {
-  def describeUnitType(unitType:UnitType):String = {
+  def unit(unitType:UnitType):String =
     unitType.toString
       .replace("Terran_", "")
       .replace("Zerg_", "")
@@ -12,5 +12,12 @@ object TypeDescriber {
       .replace("Resource_", "")
       .replace("Special_", "")
       .replaceAll("_", " ")
-  }
+  
+  def tech(techType:TechType):String =
+    techType.toString
+    .replaceAll("_", " ")
+  
+  def upgrade(upgradeType:UpgradeType):String =
+    upgradeType.toString
+      .replaceAll("_", " ")
 }

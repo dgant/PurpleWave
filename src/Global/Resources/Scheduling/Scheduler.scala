@@ -1,4 +1,4 @@
-package Global.Resources
+package Global.Resources.Scheduling
 
 import Plans.Plan
 import Startup.With
@@ -35,14 +35,16 @@ class Scheduler {
     buildable:Buildable,
     unitsWanted:mutable.HashMap[UnitType, Int],
     unitsActual:Map[UnitType, Int]):Boolean = {
-    if (buildable.upgrade.nonEmpty) {
-      return With.game.self.getUpgradeLevel(buildable.upgrade.get) >= buildable.level
+    if (buildable.upgr.nonEmpty) {
+      return With.game.self.getUpgradeLevel(buildable.upgr.get) >= buildable.upgradeLevel
     }
-    if (buildable.tech.nonEmpty) {
+    else if (buildable.tech.nonEmpty) {
       return With.game.self.hasResearched(buildable.tech.get)
     }
-    val unitType = buildable.unit.get
-    unitsWanted.put(unitType, 1 + unitsWanted.getOrElse(unitType, 0))
-    return unitsActual.getOrElse(unitType, 0) >= unitsWanted(unitType)
+    else {
+      val unitType = buildable.unit.get
+      unitsWanted.put(unitType, 1 + unitsWanted.getOrElse(unitType, 0))
+      unitsActual.getOrElse(unitType, 0) >= unitsWanted(unitType)
+    }
   }
 }

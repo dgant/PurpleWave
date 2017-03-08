@@ -36,8 +36,8 @@ class FollowBuildOrder extends Plan {
     if (buildable.tech.nonEmpty) {
       return new ResearchTech(buildable.tech.get)
     }
-    if (buildable.upgrade.nonEmpty) {
-      return new ResearchUpgrade(buildable.upgrade.get, buildable.level)
+    if (buildable.upgr.nonEmpty) {
+      return new ResearchUpgrade(buildable.upgr.get, buildable.upgradeLevel)
     }
     
     throw new Exception("Tried to build a Buildable that doesn't specify any unit, tech, or research")

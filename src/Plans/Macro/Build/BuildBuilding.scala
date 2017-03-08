@@ -30,7 +30,7 @@ class BuildBuilding(val buildingType:UnitType) extends Plan {
   var _position:Option[TilePosition] = None
   var _lastOrderFrame = Integer.MIN_VALUE
     
-  description.set("Build a " + TypeDescriber.describeUnitType(buildingType))
+  description.set("Build a " + TypeDescriber.unit(buildingType))
   
   override def getChildren: Iterable[Plan] = List(currencyPlan, builderPlan)
   override def isComplete: Boolean =

@@ -6,6 +6,7 @@ import Global.Combat.Commander
 import Global.Combat.Battle.Battles
 import Global.Information.UnitAbstraction.Units
 import Global.Information._
+import Global.Resources.Scheduling.Scheduler
 import Plans.GamePlans.WinTheGame
 
 object With {

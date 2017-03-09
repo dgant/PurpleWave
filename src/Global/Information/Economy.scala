@@ -82,35 +82,56 @@ class Economy {
     // <> 9 patches per base
     // Mining out
     // Gathering optimization
+    
+    With.geography.ourHarvestingAreas
+      .map(ourActiveMiners)
+      .map(_.size)
+      .map(n => Math.min(n, 23)) //9 * 2.5
+      .map(mineralIncomePerMinuteInOneBase)
+      .sum
+      .toInt
+  }
+  
+  def mineralIncomePerMinute(workers:Int, bases:Int):Double = {
+    mineralIncomePerMinuteInOneBase(workers/bases) * bases
+  }
+  
+  def mineralIncomePerMinuteInOneBase(workers:Int):Double = {
     val racialMultiplier =
       if (With.game.self.getRace == Race.Protoss) 1.18f else
       if (With.game.self.getRace == Race.Zerg)    1.05f else
                                                   1.0f
-    Math.round(
-      With.geography.ourHarvestingAreas
-        .map(ourActiveMiners)
-        .map(_.size)
-        .map(n => Math.min(n, 23)) //9 * 2.5
-        .map(n =>
-          if(n <= 9 * 1.0) n * 57 else
-          if(n <= 9 * 1.3) n * 53 else
-          if(n <= 9 * 1.6) n * 50 else
-          if(n <= 9 * 1.9) n * 46 else
-          if(n <= 9 * 2.2) n * 44 else
-          if(n <= 9 * 2.5) n * 43 else
-                           n * 41)
-        .sum * racialMultiplier)
+    racialMultiplier * (
+      if(workers <= 9 * 1.0) workers * 57 else
+      if(workers <= 9 * 1.3) workers * 53 else
+      if(workers <= 9 * 1.6) workers * 50 else
+      if(workers <= 9 * 1.9) workers * 46 else
+      if(workers <= 9 * 2.2) workers * 44 else
+      if(workers <= 9 * 2.5) workers * 43 else
+                             workers * 41
+      ).toInt
   }
   
   def ourGasIncomePerMinute:Integer = {
     //Original source: http://wiki.teamliquid.net/starcraft/Resources
     //Fastest speed: 42ms per frame, or 24fps
     //That would give 96 gas per driller per minute
-    //In practice it seems higher, so this number is a fudge
+    //In practice it seems higher, so this number is a fudge.
+    //Possible cause: Not detcecting workers inside refineries
     With.geography.ourHarvestingAreas
-        .map(ourActiveDrillers)
-        .map(_.size * 128)
-        .sum
+      .map(ourActiveDrillers)
+      .map(_.size)
+      .map(gasIncomePerMinute)
+      .sum
+      .toInt
+  }
+  
+  def gasIncomePerMinute(workers:Int, bases:Int):Double = {
+    gasIncomePerMinute(workers/bases) * bases
+  }
+  
+  def gasIncomePerMinute(workers:Int):Double = {
+    workers * 128
   }
   
   def ourMiningBases:Iterable[UnitInfo] = {

@@ -90,8 +90,16 @@ class ScheduleSimulationState(
     output
   }
   
-  def mineralsPerFrame  : Double  = 0.25 //TODO
-  def gasPerFrame       : Double  = 0.25 //TODO
+  def mineralsPerFrame  : Double  = With.economy.mineralIncomePerMinute (numberOfMiners,   numberOfBases) / 24.0 / 60.0
+  def gasPerFrame       : Double  = With.economy.gasIncomePerMinute     (numberOfDrillers, numberOfBases) / 24.0 / 60.0
+  
+  def numberOfType(unitType: UnitType):Int = unitsAvailable.get(unitType).getOrElse(0)
+  def numberOfBases: Int = List(UnitType.Terran_Command_Center, UnitType.Protoss_Nexus, UnitType.Zerg_Hatchery, UnitType.Zerg_Lair, UnitType.Zerg_Hive).map(numberOfType).sum
+  def numberOfWorkers: Int = List(UnitType.Terran_SCV, UnitType.Protoss_Probe, UnitType.Zerg_Drone).map(numberOfType).sum
+  def numberOfMiners: Int = Math.max(0, numberOfWorkers - numberOfDrillers)
+  def numberOfDrillers: Int = Math.min(
+    3 * List(UnitType.Terran_Refinery, UnitType.Protoss_Assimilator, UnitType.Zerg_Extractor).map(numberOfType).sum,
+    numberOfWorkers / 3)
   
   def nextEventByStart : SimulationEvent = eventQueue.minBy(_.frameStart)
   def nextEventByEnd   : SimulationEvent = eventQueue.minBy(_.frameEnd)

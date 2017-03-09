@@ -160,9 +160,9 @@ object Overlay {
   }
   
   def _drawScheduler() {
-    With.game.drawTextScreen(305, 100, With.scheduler.queue.map(_.toString).mkString("\n"))
-    With.game.drawTextScreen(450, 100, With.scheduler.simulationResults.events.map(_.toString).mkString("\n"))
-    With.game.drawTextScreen(550, 100, With.scheduler.simulationResults.unbuildable.map(_.toString).mkString("\n"))
+    With.game.drawTextScreen(200, 100, With.scheduler.queue.map(_.toString).mkString("\n"))
+    With.game.drawTextScreen(350, 100, With.scheduler.simulationResults.events.toList.sortBy(_.frameStart).sortBy(_.frameEnd).take(20).map(_.toString).mkString("\n"))
+    With.game.drawTextScreen(500, 100, With.scheduler.simulationResults.unbuildable.map(_.toString).mkString("\n"))
   }
   
   def _drawTrackedUnits() {

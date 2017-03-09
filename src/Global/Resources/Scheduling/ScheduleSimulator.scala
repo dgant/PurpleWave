@@ -20,7 +20,9 @@ object ScheduleSimulator {
       val build = currentState.tryBuilding(nextBuildable)
   
       if (build.buildEvent.isDefined) {
-        eventsPlanned += build.buildEvent.get
+        val buildEvent = build.buildEvent.get
+        eventsPlanned += buildEvent
+        currentState.eventQueue.add(buildEvent)
         index += 1
       }
       else if (build.unmetPrerequisites.nonEmpty) {

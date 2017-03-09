@@ -10,17 +10,17 @@ object ScheduleSimulator {
   def simulate:ScheduleSimulationResult = {
     val currentState = ScheduleSimulationStateBuilder.build
     var buildableQueue = With.scheduler.queue.toArray
-    val eventsPlanned = new mutable.PriorityQueue[SimulationEvent]
+    val eventsPlanned = new mutable.HashSet[SimulationEvent]
     val buildablesImpossible = new mutable.ListBuffer[Buildable]
   
     var index = 0
     while (index < buildableQueue.size) {
       
       val nextBuildable = buildableQueue(index)
-      val build = currentState.build(nextBuildable)
+      val build = currentState.tryBuilding(nextBuildable)
   
-      if (build.buildable.isDefined) {
-        eventsPlanned += currentState.startBuilding(nextBuildable)
+      if (build.buildEvent.isDefined) {
+        eventsPlanned += build.buildEvent.get
         index += 1
       }
       else if (build.unmetPrerequisites.nonEmpty) {

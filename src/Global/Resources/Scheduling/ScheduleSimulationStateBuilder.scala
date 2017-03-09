@@ -24,7 +24,7 @@ object ScheduleSimulationStateBuilder {
       unitsAvailable  = unitsAvailable,
       techsOwned      = techsOwned,
       upgradeLevels   = upgradesOwnedMutable,
-      eventQueue      = ScheduleSimulationEventAnticipator.anticipate.to[mutable.PriorityQueue])
+      eventQueue      = ScheduleSimulationEventAnticipator.anticipate)
   }
   
   def unitCount(requireAvailable:Boolean):collection.mutable.HashMap[UnitType, Int] = {

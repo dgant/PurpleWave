@@ -4,9 +4,11 @@ import Startup.With
 import Types.Buildable.{Buildable, BuildableTech, BuildableUnit, BuildableUpgrade}
 import Types.UnitInfo.FriendlyUnitInfo
 
+import scala.collection.mutable
+
 object ScheduleSimulationEventAnticipator {
   
-  def anticipate:Iterable[SimulationEvent] = {
+  def anticipate:mutable.HashSet[SimulationEvent] = {
     With.units.ours.flatten(unit => {
       List(
         getUnitCompletion(unit, false, unit.framesBeforeBecomingComplete),
@@ -17,6 +19,7 @@ object ScheduleSimulationEventAnticipator {
         getUpgradeCompletion(unit)
       ).flatten
     })
+    .to[mutable.HashSet]
   }
   
   def getUnitCompletion(

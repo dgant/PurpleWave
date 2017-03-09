@@ -12,17 +12,21 @@ object ScheduleSimulationEventAnticipator {
   def anticipate:Iterable[SimulationEvent] = {
     With.units.ours.flatten(unit => {
       List(
-        getUnitCompletion(unit, unit.framesBeforeBecomingComplete),
-        getUnitCompletion(unit, unit.framesBeforeBuildeeComplete, implicitEvent = true),
-        getUnitCompletion(unit, unit.framesBeforeTechComplete,    implicitEvent = true),
-        getUnitCompletion(unit, unit.framesBeforeUpgradeComplete, implicitEvent = true),
+        getUnitCompletion(unit, false, unit.framesBeforeBecomingComplete),
+        getUnitCompletion(unit, true,  unit.framesBeforeBuildeeComplete),
+        getUnitCompletion(unit, true,  unit.framesBeforeTechComplete),
+        getUnitCompletion(unit, true,  unit.framesBeforeUpgradeComplete),
         getTechCompletion(unit),
         getUpgradeCompletion(unit)
       ).flatten
     })
   }
   
-  def getUnitCompletion(unit:FriendlyUnitInfo, timeLeft:Int, implicitEvent:Boolean = false): Iterable[SimulationEvent] = {
+  def getUnitCompletion(
+    unit:FriendlyUnitInfo,
+    implicitEvent:Boolean,
+    timeLeft:Int):
+      Iterable[SimulationEvent] = {
     if (timeLeft <= 0) return List.empty
     List(buildEvent(new BuildableUnit(unit.utype), timeLeft))
   }
@@ -44,10 +48,7 @@ object ScheduleSimulationEventAnticipator {
   def buildEvent(buildable:Buildable, framesLeft:Int, implicitEvent:Boolean = false):SimulationEvent =
     new SimulationEvent(
       buildable,
-      frameStart(buildable.frames, framesLeft),
-      frameEnd(buildable.frames, framesLeft),
+      With.game.getFrameCount,
+      With.game.getFrameCount + framesLeft,
       isImplicit = implicitEvent)
-  
-  def frameStart(framesTotal:Int, framesLeft:Int):Int = With.game.getFrameCount + framesLeft - framesTotal
-  def frameEnd  (framesTotal:Int, framesLeft:Int):Int = With.game.getFrameCount + framesLeft
 }

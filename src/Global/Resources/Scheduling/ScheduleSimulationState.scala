@@ -51,9 +51,9 @@ class ScheduleSimulationState(
     prerequisites(buildable).foreach(buildable => {
       buildable.unitOption.foreach(unit => units.put(unit, 1 + units.getOrElse(unit, 0)))
       var unmet = false
-      unmet ||= buildable.techOption.exists(tech => ! techsOwned.contains(tech))
-      unmet ||= buildable.upgradeOption.exists(upgrade => upgradeLevels.getOrElse(upgrade, 0) < buildable.upgradeLevel)
-      unmet ||= buildable.unitOption.exists(unit => units(unit) > unitsAvailable(unit))
+      unmet ||= buildable.techOption    .exists(tech    => ! techsOwned.contains(tech))
+      unmet ||= buildable.upgradeOption .exists(upgrade => upgradeLevels.getOrElse(upgrade, 0) < buildable.upgradeLevel)
+      unmet ||= buildable.unitOption    .exists(unit    => units(unit) > unitsAvailable(unit))
       if (unmet) output.append(buildable)
     })
     

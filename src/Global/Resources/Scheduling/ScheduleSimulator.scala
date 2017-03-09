@@ -38,7 +38,8 @@ object ScheduleSimulator {
         //
         // TODO
   
-        // Evaluate again at the same index
+        // Evaluate again at the same index -- delete this once we're actually doing the insertion
+        index += 1
       }
     }
     

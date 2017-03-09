@@ -12,6 +12,6 @@ class SimulationEvent(
   override def compare(that: SimulationEvent): Int = frameEnd.compare(that.frameEnd)
   
   override def toString: String = {
-    buildable + ": " + frameStart + " - " + frameEnd
+    buildable + ": " + frameStart + " to " + frameEnd
   }
 }

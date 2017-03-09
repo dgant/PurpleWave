@@ -6,7 +6,7 @@ class SimulationEvent(
   val buildable:Buildable,
   val frameStart:Int,
   val frameEnd:Int,
-  val implicitEvent:Boolean)
+  val isImplicit:Boolean = false)
     extends Ordered[SimulationEvent] {
   
   override def compare(that: SimulationEvent): Int = frameEnd.compare(that.frameEnd)

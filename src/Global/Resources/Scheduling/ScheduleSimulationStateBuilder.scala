@@ -15,9 +15,7 @@ object ScheduleSimulationStateBuilder {
     val upgradesOwned   = UpgradeTypes.all.map(upgrade => (upgrade, With.game.self.getUpgradeLevel(upgrade))).toMap
     val upgradesOwnedMutable: mutable.Map[UpgradeType, Int] = upgradesOwned.map(identity)(breakOut)
   
-    //TODO: We need to include things that we're currently building/working on!
-  
-    new ScheduleSimulationState(
+    val output = new ScheduleSimulationState(
       frame           = With.game.getFrameCount,
       minerals        = With.game.self.minerals,
       gas             = With.game.self.gas,
@@ -26,6 +24,10 @@ object ScheduleSimulationStateBuilder {
       unitsAvailable  = unitsAvailable,
       techsOwned      = techsOwned,
       upgradeLevels   = upgradesOwnedMutable)
+    
+    ScheduleSimulationEventAnticipator.anticipate.foreach(output.futureEvents.enqueue)
+    
+    output
   }
   
   def unitCount(requireAvailable:Boolean):collection.mutable.HashMap[UnitType, Int] = {

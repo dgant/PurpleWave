@@ -77,7 +77,7 @@ class ScheduleSimulationState(
     val frameDifferential = nextEvent.frameEnd - frame
     minerals += (frameDifferential * mineralsPerFrame).toInt
     gas      += (frameDifferential * gasPerFrame).toInt
-    finishBuilding(nextEvent.buildable)
+    finishBuilding(nextEvent.buildable, nextEvent.isImplicit)
     frame += frameDifferential
   }
   
@@ -102,20 +102,20 @@ class ScheduleSimulationState(
     //TODO: Try to account for travel time
     buildable.buildersOccupied.foreach(builder => {
       unitsAvailable(builder.unit) -= 1
-      futureEvents.enqueue(new SimulationEvent(builder, startFrame, startFrame + buildable.frames, implicitEvent = true))
+      futureEvents.enqueue(new SimulationEvent(builder, startFrame, startFrame + buildable.frames, isImplicit = true))
     })
   }
   
   def enqueueBuildable(buildable: Buildable, startFrame:Int):SimulationEvent = {
     buildable.buildersConsumed.foreach(builder => unitsOwned(builder.unit) -= 1)
-    val output = new SimulationEvent(buildable, startFrame, startFrame + buildable.frames, implicitEvent = false)
+    val output = new SimulationEvent(buildable, startFrame, startFrame + buildable.frames)
     futureEvents.enqueue(output)
     output
   }
   
-  def finishBuilding(buildable: Buildable) {
+  def finishBuilding(buildable: Buildable, isImplicit: Boolean) {
     supplyAvailable += buildable.supplyProvided
-    buildable.unitOption.foreach(addOwnedUnit)
+    buildable.unitOption.filterNot(x => isImplicit).foreach(addOwnedUnit)
     buildable.unitOption.foreach(addAvailableUnit)
     buildable.techOption.foreach(addTech)
     buildable.upgradeOption.foreach(addUpgrade(_, buildable.upgradeLevel))

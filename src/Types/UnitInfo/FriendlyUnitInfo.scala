@@ -37,4 +37,8 @@ class FriendlyUnitInfo(_baseUnit:bwapi.Unit) extends UnitInfo(_baseUnit) {
   def teching                             : TechType            = baseUnit.getTech
   def upgrading                           : UpgradeType         = baseUnit.getUpgrade
   def order                               : Order               = baseUnit.getOrder
+  def framesBeforeBecomingComplete        : Int                 = baseUnit.getRemainingBuildTime
+  def framesBeforeBuildeeComplete         : Int                 = baseUnit.getRemainingTrainTime
+  def framesBeforeTechComplete            : Int                 = baseUnit.getRemainingResearchTime
+  def framesBeforeUpgradeComplete         : Int                 = baseUnit.getRemainingUpgradeTime
 }

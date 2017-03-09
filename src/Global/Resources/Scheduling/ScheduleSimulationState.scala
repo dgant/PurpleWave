@@ -70,7 +70,7 @@ class ScheduleSimulationState(
   
   def unmetSupplyPrerequisites(buildable: Buildable): Iterable[Buildable] = {
     val supplyType = With.game.self.getRace.getSupplyProvider
-    (0 to (buildable.supplyRequired - supplyAvailable) / supplyType.supplyProvided)
+    (0 until Math.max(0, (buildable.supplyRequired - supplyAvailable) / supplyType.supplyProvided))
       .map(i => new BuildableUnit(supplyType))
   }
   

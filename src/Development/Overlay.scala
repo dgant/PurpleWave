@@ -154,15 +154,49 @@ object Overlay {
         .map(r =>
           (if (r.isSatisfied) "X " else "  ") ++
           (if (r.minerals > 0)  r.minerals  .toString ++ "m " else "") ++
-          (if (r.gas > 0)       r.gas       .toString ++ "g " else "") ++
-          (if (r.supply > 0)    r.supply    .toString ++ "s " else ""))
+          (if (r.gas      > 0)  r.gas       .toString ++ "g " else "") ++
+          (if (r.supply   > 0)  r.supply    .toString ++ "s " else ""))
         .mkString("\n"))
   }
   
   def _drawScheduler() {
-    With.game.drawTextScreen(200, 100, With.scheduler.queue.map(_.toString).mkString("\n"))
-    With.game.drawTextScreen(350, 100, With.scheduler.simulationResults.events.toList.sortBy(_.frameStart).sortBy(_.frameEnd).take(20).map(_.toString).mkString("\n"))
+    
+    With.game.drawTextScreen(0, 85, "Build queue")
+    _drawTable(0, 100, With.scheduler.queue.take(20).map(buildable => List(buildable.toString)))
+    With.game.drawTextScreen(150, 85, "Simulated queue")
+    _drawTable(150, 100, With.scheduler.simulationResults.suggestedEvents
+      .toList
+      .sortBy(_.frameStart)
+      .sortBy(_.frameEnd)
+      .sortBy(_.buildable.toString)
+      .take(20)
+      .map(event => List(event.toString.split("\\s+")(0), _reframe(event.frameStart), _reframe(event.frameEnd))))
+    With.game.drawTextScreen(300, 85, "Simulated events")
+    _drawTable(300, 100, With.scheduler.simulationResults.simulatedEvents
+      .toList
+      .sortBy(_.frameStart)
+      .sortBy(_.frameEnd)
+      .sortBy(_.buildable.toString)
+      .take(20)
+      .map(event => List(event.toString.split("\\s+")(0), _reframe(event.frameStart), _reframe(event.frameEnd))))
+    With.game.drawTextScreen(500, 85, "Unbuildable")
     With.game.drawTextScreen(500, 100, With.scheduler.simulationResults.unbuildable.map(_.toString).mkString("\n"))
+  }
+  
+  def _reframe(frameAbsolute:Int):String = {
+    val reframed = frameAbsolute - With.game.getFrameCount
+    if (reframed <= 0) "Started" else reframed.toString
+  }
+  
+  def _drawTable(startX:Int, startY:Int, cells:Iterable[Iterable[String]]) {
+    cells.zipWithIndex.foreach(pair => _drawTableRow(startX, startY, pair._2, pair._1))
+  }
+  
+  def _drawTableRow(startX:Int, startY:Int, rowIndex:Int, row:Iterable[String]) {
+    row.zipWithIndex.foreach(pair => With.game.drawTextScreen(
+      startX + pair._2 * 50,
+      startY + rowIndex * 13,
+      pair._1))
   }
   
   def _drawTrackedUnits() {

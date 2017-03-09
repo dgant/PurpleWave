@@ -12,7 +12,7 @@ class Scheduler {
   val _requests = new mutable.HashMap[Plan, Iterable[Buildable]]
   val _recentlyUpdated = new mutable.HashSet[Plan]
   
-  var simulationResults:ScheduleSimulationResult = new ScheduleSimulationResult(List.empty, List.empty)
+  var simulationResults:ScheduleSimulationResult = new ScheduleSimulationResult(List.empty, List.empty, List.empty)
   
   def request(requester:Plan, buildables: Iterable[Buildable]) {
     _requests.put(requester, buildables)

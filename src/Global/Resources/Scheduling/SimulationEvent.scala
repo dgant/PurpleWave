@@ -9,13 +9,7 @@ class SimulationEvent(
   val frameEnd:Int,
   val isImplicit:Boolean = false) {
   
-  override def toString: String = {
-    buildable +
-      ": " +
-      formatTime(frameStart) +
-      " to " +
-      formatTime(frameEnd)
-  }
+  override def toString: String = buildable.toString + (if (isImplicit) "*" else "")
   
   def formatTime(time:Int):String = {
     val relativeTime = time - With.game.getFrameCount

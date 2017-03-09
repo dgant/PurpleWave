@@ -113,43 +113,62 @@ class ScheduleSimulationState(
   
   def tryBuilding(buildable: Buildable, maxFrames:Int): ScheduleSimulationBuildResult = {
     if (isBuildableNow(buildable)) {
-      return new ScheduleSimulationBuildResult(
-        Some(new SimulationEvent(
-          buildable,
-          frame,
-          frame + buildable.frames)))
+      val event = new SimulationEvent(buildable, frame, frame + buildable.frames)
+      val future = disposableCopy
+      future.eventQueue.add(event)
+      if (future.allFutureEventsAreBuildableOnTime) {
+        return new ScheduleSimulationBuildResult(Some(event))
+      }
     }
   
-    val nextInterestingFrame =
-      List(
-        frame + framesBeforeMinerals(buildable),
-        frame + framesBeforeGas(buildable),
-        (eventQueue.map(_.frameStart) .filter(isInTheFuture) ++ List(never)).min,
-        (eventQueue.map(_.frameEnd)   .filter(isInTheFuture) ++ List(never)).min
-      )
-      .filter(isInTheFuture)
-      .min
-    
-    if (nextInterestingFrame > maxFrames)
+    val nextFrame = nextInterestingFrame(Some(buildable))
+    if (nextFrame > maxFrames)
       return new ScheduleSimulationBuildResult(
         None,
         unmetPrerequisites(buildable))
     
     val nextState = if (isDisposableCopy) this else disposableCopy
-    nextState.fastForward(nextInterestingFrame)
+    nextState.fastForward(nextFrame)
     nextState.tryBuilding(buildable, maxFrames)
   }
   
-  def fastForward(nextFrame:Int) {
+  def allFutureEventsAreBuildableOnTime:Boolean = {
+    while(nextInterestingFrame() < never)
+      if ( ! fastForward(nextInterestingFrame(), testIntegrity = true))
+        return false
+    return true
+  }
+  
+  def nextInterestingFrame(buildable:Option[Buildable] = None):Int = {
+    List(
+      buildable.map(frame + framesBeforeMinerals (_)).getOrElse(never),
+      buildable.map(frame + framesBeforeGas      (_)).getOrElse(never),
+      (eventQueue.map(_.frameStart) .filter(isInTheFuture) ++ List(never)).min,
+      (eventQueue.map(_.frameEnd)   .filter(isInTheFuture) ++ List(never)).min
+    )
+    .filter(isInTheFuture)
+    .min
+  }
+  
+  def fastForward(nextFrame:Int, testIntegrity:Boolean = false):Boolean = {
     minerals  += ((nextFrame - frame) * mineralsPerFrame ).toInt
     gas       += ((nextFrame - frame) * gasPerFrame      ).toInt
     frame     = nextFrame
-    val eventsStarting = eventQueue.filter(_.frameStart == frame)
-    val eventsEnding   = eventQueue.filter(_.frameEnd   == frame)
-    eventsStarting.foreach(startEvent)
-    eventsEnding.foreach(endEvent)
-    eventsEnding.foreach(eventQueue.remove)
+    
+    var allEventsStillBuildable = true
+    eventsStarting.foreach(event => {
+      if (testIntegrity) allEventsStillBuildable &&= isBuildableNow(event.buildable)
+      startEvent(event)
+    })
+    val eventsNowEnding   = eventsEnding
+    eventsNowEnding.foreach(endEvent)
+    eventsNowEnding.foreach(eventQueue.remove)
+    
+    allEventsStillBuildable
   }
+  
+  def eventsStarting : Iterable[SimulationEvent] = eventQueue.filter(_.frameStart == frame)
+  def eventsEnding   : Iterable[SimulationEvent] = eventQueue.filter(_.frameEnd   == frame)
   
   ///////////////////////////////////
   // Mutating the simulation state //

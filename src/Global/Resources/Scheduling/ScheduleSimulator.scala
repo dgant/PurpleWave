@@ -7,8 +7,8 @@ import scala.collection.mutable
 
 object ScheduleSimulator {
 
-  val maxDepthBuildables = 20
-  val maxDepthFrames = 24 * 60 * 3
+  val maxDepthBuildables = 30
+  val maxDepthFrames = 24 * 60 * 5
   
   def simulate:ScheduleSimulationResult = {
     val currentState = ScheduleSimulationStateBuilder.build
@@ -26,6 +26,8 @@ object ScheduleSimulator {
         val buildEvent = build.buildEvent.get
         eventsPlanned += buildEvent
         currentState.eventQueue.add(buildEvent)
+        //Kind of a hack: Reserve resources, but not units (because I haven't figured out how to reserve units yet)
+        currentState.spendResources(buildEvent.buildable)
         index += 1
       }
       else if (build.unmetPrerequisites.nonEmpty) {
@@ -39,6 +41,7 @@ object ScheduleSimulator {
   
     new ScheduleSimulationResult(
       eventsPlanned,
+      currentState.eventQueue,
       buildablesImpossible)
   }
   

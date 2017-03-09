@@ -93,6 +93,7 @@ class Economy {
   }
   
   def mineralIncomePerMinute(workers:Int, bases:Int):Double = {
+    if (bases < 1) return 0
     mineralIncomePerMinuteInOneBase(workers/bases) * bases
   }
   
@@ -127,6 +128,7 @@ class Economy {
   }
   
   def gasIncomePerMinute(workers:Int, bases:Int):Double = {
+    if (bases < 1) return 0
     gasIncomePerMinute(workers/bases) * bases
   }
   

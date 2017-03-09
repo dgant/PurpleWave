@@ -7,6 +7,9 @@ import scala.collection.mutable
 
 object ScheduleSimulator {
 
+  val maxDepthBuildables = 20
+  val maxDepthFrames = 24 * 60 * 3
+  
   def simulate:ScheduleSimulationResult = {
     val currentState = ScheduleSimulationStateBuilder.build
     var buildableQueue = With.scheduler.queue.toArray
@@ -14,10 +17,10 @@ object ScheduleSimulator {
     val buildablesImpossible = new mutable.ListBuffer[Buildable]
   
     var index = 0
-    while (index < buildableQueue.size) {
+    while (index < buildableQueue.size && index < maxDepthBuildables) {
       
       val nextBuildable = buildableQueue(index)
-      val build = currentState.tryBuilding(nextBuildable)
+      val build = currentState.tryBuilding(nextBuildable, maxDepthFrames + With.game.getFrameCount)
   
       if (build.buildEvent.isDefined) {
         val buildEvent = build.buildEvent.get

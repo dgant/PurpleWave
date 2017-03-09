@@ -63,7 +63,7 @@ class ScheduleSimulationState(
     rate: Double):Int = {
     if (current >= needed)               return 0
     if (current <  needed && rate <= 0)  return never
-    Math.max(0, (needed - current)/rate).toInt
+    Math.max(0, Math.ceil((needed - current)/rate)).toInt
   }
   
   def unmetPrerequisites(buildable: Buildable): Iterable[Buildable] = {
@@ -90,14 +90,14 @@ class ScheduleSimulationState(
     output
   }
   
-  def mineralsPerFrame  : Double  = With.economy.mineralIncomePerMinute (numberOfMiners,   numberOfBases) / 24.0 / 60.0
-  def gasPerFrame       : Double  = With.economy.gasIncomePerMinute     (numberOfDrillers, numberOfBases) / 24.0 / 60.0
+  def mineralsPerFrame : Double  = With.economy.mineralIncomePerMinute (numberOfMiners,   numberOfBases) / 24.0 / 60.0
+  def gasPerFrame      : Double  = With.economy.gasIncomePerMinute     (numberOfDrillers, numberOfBases) / 24.0 / 60.0
   
   def numberOfType(unitType: UnitType):Int = unitsAvailable.get(unitType).getOrElse(0)
-  def numberOfBases: Int = List(UnitType.Terran_Command_Center, UnitType.Protoss_Nexus, UnitType.Zerg_Hatchery, UnitType.Zerg_Lair, UnitType.Zerg_Hive).map(numberOfType).sum
-  def numberOfWorkers: Int = List(UnitType.Terran_SCV, UnitType.Protoss_Probe, UnitType.Zerg_Drone).map(numberOfType).sum
-  def numberOfMiners: Int = Math.max(0, numberOfWorkers - numberOfDrillers)
-  def numberOfDrillers: Int = Math.min(
+  def numberOfBases     : Int = List(UnitType.Terran_Command_Center, UnitType.Protoss_Nexus, UnitType.Zerg_Hatchery, UnitType.Zerg_Lair, UnitType.Zerg_Hive).map(numberOfType).sum
+  def numberOfWorkers   : Int = List(UnitType.Terran_SCV, UnitType.Protoss_Probe, UnitType.Zerg_Drone).map(numberOfType).sum
+  def numberOfMiners    : Int = Math.max(0, numberOfWorkers - numberOfDrillers)
+  def numberOfDrillers  : Int = Math.min(
     3 * List(UnitType.Terran_Refinery, UnitType.Protoss_Assimilator, UnitType.Zerg_Extractor).map(numberOfType).sum,
     numberOfWorkers / 3)
   
@@ -110,7 +110,7 @@ class ScheduleSimulationState(
   
   def isInTheFuture (someFrame: Int):Boolean = someFrame > frame
   
-  def tryBuilding(buildable: Buildable): ScheduleSimulationBuildResult = {
+  def tryBuilding(buildable: Buildable, maxFrames:Int): ScheduleSimulationBuildResult = {
     if (isBuildableNow(buildable)) {
       return new ScheduleSimulationBuildResult(
         Some(new SimulationEvent(
@@ -129,14 +129,14 @@ class ScheduleSimulationState(
       .filter(isInTheFuture)
       .min
     
-    if (nextInterestingFrame == never)
+    if (nextInterestingFrame > maxFrames)
       return new ScheduleSimulationBuildResult(
         None,
         unmetPrerequisites(buildable))
     
     val nextState = if (isDisposableCopy) this else disposableCopy
     nextState.fastForward(nextInterestingFrame)
-    nextState.tryBuilding(buildable)
+    nextState.tryBuilding(buildable, maxFrames)
   }
   
   def fastForward(nextFrame:Int) {

@@ -53,7 +53,7 @@ class ScheduleSimulationState(
       var unmet = false
       unmet ||= buildable.techOption    .exists(tech    => ! techsOwned.contains(tech))
       unmet ||= buildable.upgradeOption .exists(upgrade => upgradeLevels.getOrElse(upgrade, 0) < buildable.upgradeLevel)
-      unmet ||= buildable.unitOption    .exists(unit    => units(unit) > unitsAvailable(unit))
+      unmet ||= buildable.unitOption    .exists(unit    => unitsAvailable.getOrElse(unit, 0) < units(unit))
       if (unmet) output.append(buildable)
     })
     

@@ -1,5 +1,6 @@
 package Global.Resources.Scheduling
 
+import Startup.With
 import Types.Buildable.Buildable
 
 class SimulationEvent(
@@ -12,6 +13,6 @@ class SimulationEvent(
   override def compare(that: SimulationEvent): Int = frameEnd.compare(that.frameEnd)
   
   override def toString: String = {
-    buildable + ": " + frameStart + " to " + frameEnd
+    buildable + ": " + (frameStart - With.game.getFrameCount) + " to " + (frameEnd - With.game.getFrameCount)
   }
 }

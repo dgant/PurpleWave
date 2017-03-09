@@ -105,7 +105,7 @@ class Bot() extends DefaultBWListener {
   
   override def onEnd(isWinner: Boolean) {
     try {
-      With.logger.debug(if (isWinner) "Looks like we won. Good game!" else "Good game! Let's pretend this never happened.")
+      With.logger.debug(if (isWinner) "Good game! I still think you're beautiful." else "Good game! Let's pretend this never happened.")
       With.logger.onEnd
       BWTA.cleanMemory()
     }

@@ -16,9 +16,10 @@ class ScheduleSimulationState(
   var unitsAvailable      : mutable.HashMap[UnitType, Int],
   var techsOwned          : mutable.Set[TechType],
   var upgradeLevels       : mutable.Map[UpgradeType, Int],
-  val eventQueue          : mutable.PriorityQueue[SimulationEvent]) {
+  val eventQueue          : mutable.PriorityQueue[SimulationEvent],
+  val isDisposableCopy    : Boolean = false) {
 
-  override def clone:ScheduleSimulationState =
+  def disposableCopy:ScheduleSimulationState =
     new ScheduleSimulationState(
       frame,
       minerals,
@@ -28,7 +29,8 @@ class ScheduleSimulationState(
       unitsAvailable.clone,
       techsOwned.clone,
       upgradeLevels.clone,
-      eventQueue.clone)
+      eventQueue.clone,
+      isDisposableCopy = true)
   
   //////////////////////////////////////
   // Features of the simulation state //
@@ -42,15 +44,15 @@ class ScheduleSimulationState(
   
   def framesBeforeMinerals(buildable: Buildable):Int = framesBeforeResource(
     buildable,
-    minerals,
-    buildable.minerals,
-    mineralsPerFrame)
+    current = minerals,
+    needed  = buildable.minerals,
+    rate    = mineralsPerFrame)
   
   def framesBeforeGas(buildable: Buildable):Int = framesBeforeResource(
     buildable,
-    gas,
-    buildable.gas,
-    gasPerFrame)
+    current = gas,
+    needed  = buildable.gas,
+    rate    = gasPerFrame)
   
   def framesBeforeResource(
     buildable: Buildable,
@@ -99,18 +101,19 @@ class ScheduleSimulationState(
         Some(new SimulationEvent(buildable, frame, frame + buildable.frames)))
     }
     val nextInterestingFrame = List(
-      framesBeforeMinerals(buildable),
-      framesBeforeGas(buildable),
+      frame + framesBeforeMinerals(buildable),
+      frame + framesBeforeGas(buildable),
       eventQueue.headOption.map(_.frameEnd).getOrElse(Int.MaxValue))
-      .filter(_ > 0)
+      .filter(_ > frame)
       .min
     
     if (nextInterestingFrame == Int.MaxValue)
       return new ScheduleSimulationBuildResult(
         None,
         unmetPrerequisites(buildable))
-    fastForward(nextInterestingFrame)
-    build(buildable)
+    val nextState = if (isDisposableCopy) this else disposableCopy
+    nextState.fastForward(nextInterestingFrame)
+    nextState.build(buildable)
   }
   
   def fastForward(nextFrame:Int) {
@@ -154,7 +157,7 @@ class ScheduleSimulationState(
     //TODO: Don't add builder back if it's consumed
     //TODO: Try to account for travel time
     buildable.buildersOccupied.foreach(builder => {
-      unitsAvailable(builder.unit) -= 1
+      unitsAvailable.put(builder.unit, -1 + unitsAvailable.getOrElse(builder.unit, 0))
       eventQueue.enqueue(new SimulationEvent(builder, frame, frame + buildable.frames, isImplicit = true))
     })
   }

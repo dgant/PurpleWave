@@ -10,7 +10,7 @@ class SimulationEvent(
   val isImplicit:Boolean = false)
     extends Ordered[SimulationEvent] {
   
-  override def compare(that: SimulationEvent): Int = frameEnd.compare(that.frameEnd)
+  override def compare(that: SimulationEvent): Int = that.frameEnd.compare(frameEnd)
   
   override def toString: String = {
     buildable +

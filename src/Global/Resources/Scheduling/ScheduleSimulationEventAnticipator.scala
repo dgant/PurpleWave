@@ -6,9 +6,6 @@ import Types.UnitInfo.FriendlyUnitInfo
 
 object ScheduleSimulationEventAnticipator {
   
-  //BIG TODO:
-  //We need IMPLICIT to tell us whether to add to owned units or just available units
-  
   def anticipate:Iterable[SimulationEvent] = {
     With.units.ours.flatten(unit => {
       List(

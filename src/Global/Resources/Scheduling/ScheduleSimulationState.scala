@@ -1,6 +1,7 @@
 package Global.Resources.Scheduling
 
-import Types.Buildable.Buildable
+import Startup.With
+import Types.Buildable.{Buildable, BuildableUnit}
 import bwapi.{TechType, UnitType, UpgradeType}
 
 import scala.collection.mutable
@@ -14,41 +15,67 @@ class ScheduleSimulationState(
   var unitsOwned          : mutable.HashMap[UnitType, Int],
   var unitsAvailable      : mutable.HashMap[UnitType, Int],
   var techsOwned          : mutable.Set[TechType],
-  var upgradeLevels       : mutable.Map[UpgradeType, Int]) {
-  
-  val futureEvents = new ScheduleSimulationEventQueue
-  
-  ////////////////////////////////////////
-  // Understanding the simulation state //
-  ////////////////////////////////////////
+  var upgradeLevels       : mutable.Map[UpgradeType, Int],
+  val eventQueue          : mutable.PriorityQueue[SimulationEvent]) {
 
-  def isBuildableEventually(buildable:Buildable):Boolean = {
-    (hasMineralRequirements(buildable) || mineralsPerFrame > 0) &&
-    (hasGasRequirements(buildable)     || gasPerFrame      > 0) &&
-    (hasPrerequisites(buildable)       || false) //TODO: See if prerequisites will be built
-  }
+  override def clone:ScheduleSimulationState =
+    new ScheduleSimulationState(
+      frame,
+      minerals,
+      gas,
+      supplyAvailable,
+      unitsOwned.clone,
+      unitsAvailable.clone,
+      techsOwned.clone,
+      upgradeLevels.clone,
+      eventQueue.clone)
   
-  def projectStartFrame(buildable: Buildable):Int = {
-    Math.max(framesBeforeMinerals(buildable.minerals), framesBeforeGas(buildable.gas))
-  }
+  //////////////////////////////////////
+  // Features of the simulation state //
+  //////////////////////////////////////
   
-  def hasMineralRequirements(buildable:Buildable) : Boolean = buildable.minerals <= minerals
-  def hasGasRequirements(buildable:Buildable)     : Boolean = buildable.gas <= gas
-  
-  def hasPrerequisites(buildable:Buildable):Boolean = {
-    buildable.supplyRequired <= supplyAvailable &&
+  def isBuildableNow(buildable: Buildable):Boolean = {
+    framesBeforeMinerals(buildable) == 0 &&
+    framesBeforeGas(buildable)      == 0 &&
     unmetPrerequisites(buildable).isEmpty
   }
   
-  def prerequisites(buildable: Buildable):Iterable[Buildable] = {
-    buildable.requirements ++ buildable.buildersOccupied
+  def framesBeforeMinerals(buildable: Buildable):Int = framesBeforeResource(
+    buildable,
+    minerals,
+    buildable.minerals,
+    mineralsPerFrame)
+  
+  def framesBeforeGas(buildable: Buildable):Int = framesBeforeResource(
+    buildable,
+    gas,
+    buildable.gas,
+    gasPerFrame)
+  
+  def framesBeforeResource(
+    buildable: Buildable,
+    current: Int,
+    needed: Int,
+    rate: Double):Int = {
+    if (current >= needed)               return 0
+    if (current <  needed && rate <= 0)  return Int.MaxValue
+    Math.max(0, (needed - current)/rate).toInt
   }
   
   def unmetPrerequisites(buildable: Buildable): Iterable[Buildable] = {
-    val output = new ListBuffer[Buildable]
-    val units = new mutable.HashMap[UnitType, Int]
+    unmetSupplyPrerequisites(buildable) ++ unmetBuildablePrerequisites(buildable)
+  }
   
-    prerequisites(buildable).foreach(buildable => {
+  def unmetSupplyPrerequisites(buildable: Buildable): Iterable[Buildable] = {
+    val supplyType = With.game.self.getRace.getSupplyProvider
+    (0 to (buildable.supplyRequired - supplyAvailable) / supplyType.supplyProvided)
+      .map(i => new BuildableUnit(supplyType))
+  }
+  
+  def unmetBuildablePrerequisites(buildable: Buildable): Iterable[Buildable] = {
+    val output = new ListBuffer[Buildable]
+    val units  = new mutable.HashMap[UnitType, Int]
+    (buildable.requirements ++ buildable.buildersOccupied).foreach(buildable => {
       buildable.unitOption.foreach(unit => units.put(unit, 1 + units.getOrElse(unit, 0)))
       var unmet = false
       unmet ||= buildable.techOption    .exists(tech    => ! techsOwned.contains(tech))
@@ -56,66 +83,47 @@ class ScheduleSimulationState(
       unmet ||= buildable.unitOption    .exists(unit    => unitsAvailable.getOrElse(unit, 0) < units(unit))
       if (unmet) output.append(buildable)
     })
-    
     output
   }
   
   def mineralsPerFrame  : Double  = 0.25 //TODO
   def gasPerFrame       : Double  = 0.25 //TODO
   
-  //Note that this linear project doesn't account for any additional workers we gain in the meantime
-  def framesBeforeMinerals(target:Int):Int  = Math.ceil((target - minerals) / mineralsPerFrame).toInt
-  def framesBeforeGas(target:Int):Int       = Math.ceil((target - gas) / gasPerFrame).toInt
+  ////////////////////////////
+  // Running the simulation //
+  ////////////////////////////
   
-  ///////////////////////////////////
-  // Mutating the simulation state //
-  ///////////////////////////////////
-  
-  def stepForward() {
-    if (futureEvents.isEmpty) throw new Exception("Attempting to run past end of simulation")
-    val nextEvent = futureEvents.dequeue()
-    val frameDifferential = nextEvent.frameEnd - frame
-    minerals += (frameDifferential * mineralsPerFrame).toInt
-    gas      += (frameDifferential * gasPerFrame).toInt
-    finishBuilding(nextEvent.buildable, nextEvent.isImplicit)
-    frame += frameDifferential
+  def build(buildable: Buildable): ScheduleSimulationBuildResult = {
+    if (isBuildableNow(buildable)) {
+      return new ScheduleSimulationBuildResult(
+        Some(new SimulationEvent(buildable, frame, frame + buildable.frames)))
+    }
+    val nextInterestingFrame = List(
+      framesBeforeMinerals(buildable),
+      framesBeforeGas(buildable),
+      eventQueue.headOption.map(_.frameEnd).getOrElse(Int.MaxValue))
+      .filter(_ > 0)
+      .min
+    
+    if (nextInterestingFrame == Int.MaxValue)
+      return new ScheduleSimulationBuildResult(
+        None,
+        unmetPrerequisites(buildable))
+    fastForward(nextInterestingFrame)
+    build(buildable)
   }
   
-  //Queue building at its projected start frame
-  //Reserve only the resources necessary to reserve, based on when we expect to start the building
-  def startBuilding(buildable:Buildable):SimulationEvent = {
-    val frameStart  = projectStartFrame(buildable)
-    reserveResources(buildable, frameStart)
-    reserveBuilders(buildable, frameStart)
-    enqueueBuildable(buildable, frameStart)
+  def fastForward(nextFrame:Int) {
+    minerals  += ((nextFrame - frame) * mineralsPerFrame).toInt
+    gas       += ((nextFrame - frame) * gasPerFrame).toInt
+    frame     = nextFrame
+    while (eventQueue.headOption.exists(_.frameEnd <= frame)) applyEvent(eventQueue.dequeue())
   }
   
-  def reserveResources(buildable:Buildable, startFrame:Int) {
-    val framesInFuture = startFrame - frame
-    minerals -= Math.max(0, buildable.minerals - mineralsPerFrame * framesInFuture).toInt
-    gas      -= Math.max(0, buildable.minerals - gasPerFrame * framesInFuture).toInt
-    supplyAvailable -= buildable.supplyRequired
-  }
-  
-  def reserveBuilders(buildable:Buildable, startFrame:Int) {
-    //TODO: Don't add builder back if it's consumed
-    //TODO: Try to account for travel time
-    buildable.buildersOccupied.foreach(builder => {
-      unitsAvailable(builder.unit) -= 1
-      futureEvents.enqueue(new SimulationEvent(builder, startFrame, startFrame + buildable.frames, isImplicit = true))
-    })
-  }
-  
-  def enqueueBuildable(buildable: Buildable, startFrame:Int):SimulationEvent = {
-    buildable.buildersConsumed.foreach(builder => unitsOwned(builder.unit) -= 1)
-    val output = new SimulationEvent(buildable, startFrame, startFrame + buildable.frames)
-    futureEvents.enqueue(output)
-    output
-  }
-  
-  def finishBuilding(buildable: Buildable, isImplicit: Boolean) {
+  def applyEvent(event: SimulationEvent) {
+    val buildable = event.buildable
     supplyAvailable += buildable.supplyProvided
-    buildable.unitOption.filterNot(x => isImplicit).foreach(addOwnedUnit)
+    if ( ! event.isImplicit) buildable.unitOption.foreach(addOwnedUnit)
     buildable.unitOption.foreach(addAvailableUnit)
     buildable.techOption.foreach(addTech)
     buildable.upgradeOption.foreach(addUpgrade(_, buildable.upgradeLevel))
@@ -125,4 +133,36 @@ class ScheduleSimulationState(
   def addAvailableUnit(unitType: UnitType)            = unitsAvailable.put(unitType, 1 + unitsAvailable.getOrElse(unitType, 0))
   def addTech(techType: TechType)                     = techsOwned.add(techType)
   def addUpgrade(upgradeType: UpgradeType, level:Int) = upgradeLevels.put(upgradeType, level)
+  
+  ///////////////////////////////////
+  // Mutating the simulation state //
+  ///////////////////////////////////
+  
+  def startBuilding(buildable:Buildable):SimulationEvent = {
+    spendResources(buildable)
+    reserveBuilders(buildable)
+    enqueue(buildable)
+  }
+  
+  def spendResources(buildable:Buildable) {
+    minerals        -= buildable.minerals
+    gas             -= buildable.minerals
+    supplyAvailable -= buildable.supplyRequired
+  }
+  
+  def reserveBuilders(buildable:Buildable) {
+    //TODO: Don't add builder back if it's consumed
+    //TODO: Try to account for travel time
+    buildable.buildersOccupied.foreach(builder => {
+      unitsAvailable(builder.unit) -= 1
+      eventQueue.enqueue(new SimulationEvent(builder, frame, frame + buildable.frames, isImplicit = true))
+    })
+  }
+  
+  def enqueue(buildable: Buildable):SimulationEvent = {
+    buildable.buildersConsumed.foreach(builder => unitsOwned(builder.unit) -= 1)
+    val output = new SimulationEvent(buildable, frame, frame + buildable.frames)
+    eventQueue.enqueue(output)
+    output
+  }
 }

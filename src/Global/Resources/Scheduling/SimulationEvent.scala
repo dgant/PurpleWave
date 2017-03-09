@@ -13,6 +13,15 @@ class SimulationEvent(
   override def compare(that: SimulationEvent): Int = frameEnd.compare(that.frameEnd)
   
   override def toString: String = {
-    buildable + ": " + (frameStart - With.game.getFrameCount) + " to " + (frameEnd - With.game.getFrameCount)
+    buildable +
+      ": " +
+      formatTime(frameStart) +
+      " to " +
+      formatTime(frameEnd)
+  }
+  
+  def formatTime(time:Int):String = {
+    val relativeTime = time - With.game.getFrameCount
+    if (relativeTime < 0) "Now" else relativeTime.toString
   }
 }

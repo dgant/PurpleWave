@@ -15,7 +15,7 @@ object ScheduleSimulationStateBuilder {
     val upgradesOwned   = UpgradeTypes.all.map(upgrade => (upgrade, With.game.self.getUpgradeLevel(upgrade))).toMap
     val upgradesOwnedMutable: mutable.Map[UpgradeType, Int] = upgradesOwned.map(identity)(breakOut)
   
-    val output = new ScheduleSimulationState(
+    new ScheduleSimulationState(
       frame           = With.game.getFrameCount,
       minerals        = With.game.self.minerals,
       gas             = With.game.self.gas,
@@ -23,11 +23,8 @@ object ScheduleSimulationStateBuilder {
       unitsOwned      = unitsOwned,
       unitsAvailable  = unitsAvailable,
       techsOwned      = techsOwned,
-      upgradeLevels   = upgradesOwnedMutable)
-    
-    ScheduleSimulationEventAnticipator.anticipate.foreach(output.futureEvents.enqueue)
-    
-    output
+      upgradeLevels   = upgradesOwnedMutable,
+      eventQueue      = ScheduleSimulationEventAnticipator.anticipate.to[mutable.PriorityQueue])
   }
   
   def unitCount(requireAvailable:Boolean):collection.mutable.HashMap[UnitType, Int] = {
@@ -38,6 +35,7 @@ object ScheduleSimulationStateBuilder {
         .map(pair => (pair._1, pair._2.size)).toSeq: _*)
   }
   
+  //TODO: This should agree with the EventAnticipator
   def isAvailable(unit:FriendlyUnitInfo):Boolean = {
     unit.complete && ! macroOrders.contains(unit.order)
   }

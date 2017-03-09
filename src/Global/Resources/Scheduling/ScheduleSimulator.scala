@@ -3,50 +3,40 @@ package Global.Resources.Scheduling
 import Startup.With
 import Types.Buildable.Buildable
 
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable
 
 object ScheduleSimulator {
 
-  def simulate:Iterable[SimulationEvent] = {
-    
-    //Model the current macro state
-    val state = ScheduleSimulationStateBuilder.build
-    
-    //Create a copy of the explicit build queue
-    var queue = With.scheduler.queue.toArray
-    
-    //Start aggregating simulation events
-    val output = new ListBuffer[SimulationEvent]
+  def simulate:ScheduleSimulationResult = {
+    val currentState = ScheduleSimulationStateBuilder.build
+    var buildableQueue = With.scheduler.queue.toArray
+    val eventsPlanned = new mutable.PriorityQueue[SimulationEvent]
+    val buildablesImpossible = new mutable.ListBuffer[Buildable]
   
-    //For each buildable in the queue
     var index = 0
-    while (index < queue.size) {
+    while (index < buildableQueue.size) {
       
-      val next = queue(index)
+      val nextBuildable = buildableQueue(index)
+      val build = currentState.build(nextBuildable)
   
-      if (state.isBuildableEventually(next)) {
-        // Enqueue it when it's first possible
-        //
-        output += state.startBuilding(next)
+      if (build.buildable.isDefined) {
+        eventsPlanned += currentState.startBuilding(nextBuildable)
         index += 1
       }
-      // Otherwise, the item has unmet requirements and will thus never be buildable
-      //
+      else if (build.unmetPrerequisites.nonEmpty) {
+        buildableQueue = insertAt(buildableQueue, build.unmetPrerequisites, index)
+      }
       else {
-        // Then insert the unmet requirements ahead of it in the queue
-        // Prerequisites + additionalsupply
-        //
-        // TODO
-  
-        // Evaluate again at the same index -- delete this once we're actually doing the insertion
+        buildablesImpossible += nextBuildable
         index += 1
       }
     }
-    
-    output
+  
+    new ScheduleSimulationResult(
+      eventsPlanned,
+      buildablesImpossible)
   }
   
-  def insertAt(queue:Array[Buildable], insertion:Buildable, index:Int):Array[Buildable] = {
-    queue.take(index) ++ List(insertion) ++ queue.drop(index)
-  }
+  def insertAt(queue:Array[Buildable], insertions:Iterable[Buildable], index:Int):Array[Buildable] =
+    queue.take(index) ++ insertions ++ queue.drop(index)
 }

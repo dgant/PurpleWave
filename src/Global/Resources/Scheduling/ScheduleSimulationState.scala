@@ -67,25 +67,37 @@ class ScheduleSimulationState(
   }
   
   def unmetPrerequisites(buildable: Buildable): Iterable[Buildable] = {
-    unmetSupplyPrerequisites(buildable) ++ unmetBuildablePrerequisites(buildable)
+    unmetSupply(buildable) ++ unmetRequirements(buildable) ++ unmetBuilders(buildable)
   }
   
-  def unmetSupplyPrerequisites(buildable: Buildable): Iterable[Buildable] = {
+  def unmetSupply(buildable: Buildable): Iterable[Buildable] = {
     val supplyType = With.game.self.getRace.getSupplyProvider
     (0 until Math.max(0, (buildable.supplyRequired - supplyAvailable) / supplyType.supplyProvided))
       .map(i => new BuildableUnit(supplyType))
   }
   
-  def unmetBuildablePrerequisites(buildable: Buildable): Iterable[Buildable] = {
+  def unmetRequirements(buildable: Buildable): Iterable[Buildable] = {
     val output = new ListBuffer[Buildable]
     val units  = new mutable.HashMap[UnitType, Int]
-    (buildable.requirements ++ buildable.buildersOccupied).foreach(buildable => {
-      buildable.unitOption.foreach(unit => units.put(unit, 1 + units.getOrElse(unit, 0)))
+    buildable.requirements.foreach(requirement => {
+      requirement.unitOption.foreach(unit => units.put(unit, 1 + units.getOrElse(unit, 0)))
       var unmet = false
-      unmet ||= buildable.techOption    .exists(tech    => ! techsOwned.contains(tech))
-      unmet ||= buildable.upgradeOption .exists(upgrade => upgradeLevels.getOrElse(upgrade, 0) < buildable.upgradeLevel)
-      unmet ||= buildable.unitOption    .exists(unit    => unitsAvailable.getOrElse(unit, 0)   < units(unit))
-      if (unmet) output.append(buildable)
+      unmet ||= requirement.techOption    .exists(tech    => ! techsOwned.contains(tech))
+      unmet ||= requirement.upgradeOption .exists(upgrade => upgradeLevels.getOrElse(upgrade, 0) < requirement.upgradeLevel)
+      unmet ||= requirement.unitOption    .exists(unit    => unitsOwned.getOrElse(unit, 0)       < units(unit))
+      if (unmet) output.append(requirement)
+    })
+    output
+  }
+  
+  def unmetBuilders(buildable: Buildable): Iterable[Buildable] = {
+    val output = new ListBuffer[Buildable]
+    val buildersRequired  = new mutable.HashMap[UnitType, Int]
+    buildable.buildersOccupied.foreach(builder => {
+      builder.unitOption.foreach(unit => buildersRequired.put(unit, 1 + buildersRequired.getOrElse(unit, 0)))
+      var unmet = false
+      unmet ||= builder.unitOption.exists(unit => unitsAvailable.getOrElse(unit, 0) < buildersRequired(unit))
+      if (unmet) output.append(builder)
     })
     output
   }
@@ -174,6 +186,10 @@ class ScheduleSimulationState(
   // Mutating the simulation state //
   ///////////////////////////////////
   
+  def startInitialEvent(event:SimulationEvent) {
+    reserveBuilders(event.buildable)
+  }
+  
   def startEvent(event: SimulationEvent) {
     spendResources(event.buildable)
     reserveBuilders(event.buildable)
@@ -191,7 +207,7 @@ class ScheduleSimulationState(
   
   def spendResources(buildable: Buildable) {
     minerals        -= buildable.minerals
-    gas             -= buildable.minerals
+    gas             -= buildable.gas
     supplyAvailable -= buildable.supplyRequired
   }
   

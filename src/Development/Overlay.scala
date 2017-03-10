@@ -166,17 +166,17 @@ object Overlay {
     With.game.drawTextScreen(150, 85, "Simulated queue")
     _drawTable(150, 100, With.scheduler.simulationResults.suggestedEvents
       .toList
+      .sortBy(_.buildable.toString)
       .sortBy(_.frameStart)
       .sortBy(_.frameEnd)
-      .sortBy(_.buildable.toString)
       .take(20)
       .map(event => List(event.toString.split("\\s+")(0), _reframe(event.frameStart), _reframe(event.frameEnd))))
     With.game.drawTextScreen(300, 85, "Simulated events")
     _drawTable(300, 100, With.scheduler.simulationResults.simulatedEvents
       .toList
+      .sortBy(_.buildable.toString)
       .sortBy(_.frameStart)
       .sortBy(_.frameEnd)
-      .sortBy(_.buildable.toString)
       .take(20)
       .map(event => List(event.toString.split("\\s+")(0), _reframe(event.frameStart), _reframe(event.frameEnd))))
     With.game.drawTextScreen(500, 85, "Unbuildable")

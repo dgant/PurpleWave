@@ -31,7 +31,7 @@ class Scheduler {
   def onFrame() {
     _requests.keySet.diff(_recentlyUpdated).foreach(_requests.remove)
     _recentlyUpdated.clear()
-    simulationResults = ScheduleSimulator.simulate
+    //simulationResults = ScheduleSimulator.simulate
   }
   
   def _isFulfilled(

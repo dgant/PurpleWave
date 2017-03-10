@@ -15,23 +15,65 @@ class ProtossVsProtoss extends Parallel {
   
   description.set("Protoss vs Protoss")
   
-  val _threeGateGoons = List[Buildable] (
+  //http://wiki.teamliquid.net/starcraft/4_Gate_Goon_(vs._Protoss)
+  val _fourGateGoons = List[Buildable] (
     new BuildableUnit(UnitType.Protoss_Nexus),
-    new BuildableUnit(UnitType.Protoss_Pylon),
-    new BuildableUnit(UnitType.Protoss_Gateway),
-    new BuildableUnit(UnitType.Protoss_Pylon),
-    new BuildableUnit(UnitType.Protoss_Cybernetics_Core),
-    new BuildableUnit(UnitType.Protoss_Assimilator),
-    new BuildableUnit(UnitType.Protoss_Gateway),
-    new BuildableUnit(UnitType.Protoss_Gateway),
-    new BuildableUpgrade(UpgradeType.Singularity_Charge),
-    new BuildableUnit(UnitType.Protoss_Nexus),
-    new BuildableUnit(UnitType.Protoss_Gateway),
-    new BuildableUnit(UnitType.Protoss_Gateway),
-    new BuildableUnit(UnitType.Protoss_Assimilator)
+    new BuildableUnit(UnitType.Protoss_Probe),
+    new BuildableUnit(UnitType.Protoss_Probe),
+    new BuildableUnit(UnitType.Protoss_Probe),
+    new BuildableUnit(UnitType.Protoss_Probe),
+    new BuildableUnit(UnitType.Protoss_Probe),
+    new BuildableUnit(UnitType.Protoss_Probe),
+    new BuildableUnit(UnitType.Protoss_Probe),
+    new BuildableUnit(UnitType.Protoss_Probe),
+    new BuildableUnit(UnitType.Protoss_Pylon), //8
+    new BuildableUnit(UnitType.Protoss_Probe),
+    new BuildableUnit(UnitType.Protoss_Probe),
+    new BuildableUnit(UnitType.Protoss_Gateway), //10
+    new BuildableUnit(UnitType.Protoss_Probe),
+    new BuildableUnit(UnitType.Protoss_Probe),
+    new BuildableUnit(UnitType.Protoss_Pylon), //12
+    new BuildableUnit(UnitType.Protoss_Probe),
+    new BuildableUnit(UnitType.Protoss_Zealot), //13
+    new BuildableUnit(UnitType.Protoss_Probe),
+    new BuildableUnit(UnitType.Protoss_Assimilator), //16
+    new BuildableUnit(UnitType.Protoss_Probe),
+    new BuildableUnit(UnitType.Protoss_Cybernetics_Core), //17
+    new BuildableUnit(UnitType.Protoss_Probe),
+    new BuildableUnit(UnitType.Protoss_Zealot), //18
+    new BuildableUnit(UnitType.Protoss_Probe),
+    new BuildableUnit(UnitType.Protoss_Probe),
+    new BuildableUnit(UnitType.Protoss_Pylon), //22
+    new BuildableUnit(UnitType.Protoss_Probe),
+    new BuildableUnit(UnitType.Protoss_Dragoon), //23
+    new BuildableUnit(UnitType.Protoss_Probe),
+    new BuildableUpgrade(UpgradeType.Singularity_Charge), //26
+    new BuildableUnit(UnitType.Protoss_Probe),
+    new BuildableUnit(UnitType.Protoss_Dragoon), //27
+    new BuildableUnit(UnitType.Protoss_Probe),
+    new BuildableUnit(UnitType.Protoss_Probe),
+    new BuildableUnit(UnitType.Protoss_Gateway), //31
+    new BuildableUnit(UnitType.Protoss_Gateway), //31
+    new BuildableUnit(UnitType.Protoss_Gateway), //31
+    new BuildableUnit(UnitType.Protoss_Dragoon), //31
+    new BuildableUnit(UnitType.Protoss_Pylon), //33
+    new BuildableUnit(UnitType.Protoss_Dragoon), //33
+    new BuildableUnit(UnitType.Protoss_Dragoon),
+    new BuildableUnit(UnitType.Protoss_Dragoon),
+    new BuildableUnit(UnitType.Protoss_Dragoon),
+    new BuildableUnit(UnitType.Protoss_Pylon), //33
+    new BuildableUnit(UnitType.Protoss_Dragoon), //33
+    new BuildableUnit(UnitType.Protoss_Dragoon),
+    new BuildableUnit(UnitType.Protoss_Dragoon),
+    new BuildableUnit(UnitType.Protoss_Dragoon),
+    new BuildableUnit(UnitType.Protoss_Nexus)
   )
   
   val _lateGame = List[Buildable] (
+    new BuildableUnit(UnitType.Protoss_Nexus),
+    new BuildableUnit(UnitType.Protoss_Gateway),
+    new BuildableUnit(UnitType.Protoss_Gateway),
+    new BuildableUnit(UnitType.Protoss_Assimilator),
     new BuildableUnit(UnitType.Protoss_Nexus),
     new BuildableUnit(UnitType.Protoss_Gateway),
     new BuildableUnit(UnitType.Protoss_Gateway),
@@ -48,9 +90,10 @@ class ProtossVsProtoss extends Parallel {
   )
   
   children.set(List(
+    new ScheduleBuildOrder { buildables.set(_fourGateGoons) },
+    new BuildPylonsContinuously,
     new BuildWorkersContinuously,
     new TrainGatewayUnitsContinuously,
-    new ScheduleBuildOrder { buildables.set(_threeGateGoons) },
     new ScheduleBuildOrder { buildables.set(_lateGame) },
     new FollowBuildOrder,
     new DefeatWorkerHarass,

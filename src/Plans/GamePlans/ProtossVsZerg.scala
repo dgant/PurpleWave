@@ -1,7 +1,7 @@
 package Plans.GamePlans
 
 import Plans.Army.{Attack, DefendChoke}
-import Plans.Compound.{Parallel, IfThenElse}
+import Plans.Compound.{IfThenElse, Parallel}
 import Plans.Defense.DefeatWorkerHarass
 import Plans.Information.ScoutAt
 import Plans.Macro.Automatic._
@@ -60,35 +60,7 @@ class ProtossVsZerg extends Parallel {
     new BuildableUnit(UnitType.Protoss_Probe), //36
     new BuildableUnit(UnitType.Protoss_Pylon), //37
     new BuildableUnit(UnitType.Protoss_Zealot), //37
-    new BuildableUnit(UnitType.Protoss_Zealot) //39
-  )
-  
-  val _lateGame = List[Buildable] (
-    new BuildableUnit(UnitType.Protoss_Nexus),
-    new BuildableUnit(UnitType.Protoss_Gateway),
-    new BuildableUnit(UnitType.Protoss_Gateway),
-    new BuildableUnit(UnitType.Protoss_Gateway),
-    new BuildableUnit(UnitType.Protoss_Forge),
-    new BuildableUpgrade(UpgradeType.Protoss_Ground_Weapons, 1),
-    new BuildableUnit(UnitType.Protoss_Nexus),
-    new BuildableUnit(UnitType.Protoss_Citadel_of_Adun),
-    new BuildableUnit(UnitType.Protoss_Gateway),
-    new BuildableUnit(UnitType.Protoss_Gateway),
-    new BuildableUnit(UnitType.Protoss_Gateway),
-    new BuildableUpgrade(UpgradeType.Leg_Enhancements),
-    new BuildableUnit(UnitType.Protoss_Nexus),
-    new BuildableUnit(UnitType.Protoss_Forge),
-    new BuildableUnit(UnitType.Protoss_Templar_Archives),
-    new BuildableUpgrade(UpgradeType.Protoss_Ground_Weapons, 2),
-    new BuildableUpgrade(UpgradeType.Protoss_Ground_Armor, 1),
-    new BuildableUpgrade(UpgradeType.Protoss_Ground_Weapons, 3),
-    new BuildableUnit(UnitType.Protoss_Nexus),
-    new BuildableUpgrade(UpgradeType.Protoss_Ground_Armor, 2),
-    new BuildableUpgrade(UpgradeType.Protoss_Ground_Armor, 3),
-    new BuildableUnit(UnitType.Protoss_Gateway),
-    new BuildableUnit(UnitType.Protoss_Gateway),
-    new BuildableUnit(UnitType.Protoss_Gateway),
-    new BuildableUnit(UnitType.Protoss_Gateway),
+    new BuildableUnit(UnitType.Protoss_Zealot), //39
     new BuildableUnit(UnitType.Protoss_Nexus)
   )
   
@@ -96,8 +68,9 @@ class ProtossVsZerg extends Parallel {
     new ScheduleBuildOrder { buildables.set(_oneBaseSpeedlot) },
     new BuildPylonsContinuously,
     new BuildWorkersContinuously,
-    new TrainGatewayUnitsContinuously,
-    new ScheduleBuildOrder { buildables.set(_lateGame) },
+    new TrainContinuously(UnitType.Protoss_Scout),
+    new TrainContinuously(UnitType.Protoss_Zealot),
+    new ScheduleBuildOrder { buildables.set(MassScoutLateGame.build) },
     new FollowBuildOrder,
     new DefeatWorkerHarass,
     new ScoutAt(20),

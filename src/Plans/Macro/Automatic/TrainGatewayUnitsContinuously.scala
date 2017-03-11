@@ -8,7 +8,7 @@ class TrainGatewayUnitsContinuously extends AbstractBuildContinuously {
   
   override def _totalRequired:Int =
     With.units.ours.filter(_.complete)
-      .count(unit => List(UnitType.Protoss_Gateway, UnitType.Protoss_Zealot, UnitType.Protoss_Dragoon, UnitType.Hero_Dark_Templar).contains(unit.utype))
+      .count(unit => List(UnitType.Protoss_Gateway, UnitType.Protoss_Zealot, UnitType.Protoss_Dragoon, UnitType.Protoss_Dark_Templar).contains(unit.utype))
   
   override def _newBuild:Buildable = new BuildableUnit(_nextUnitType)
   

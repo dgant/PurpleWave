@@ -21,7 +21,7 @@ class MovementProfile(
       weigh(  mobility    (intent, candidate) / 10  , preferMobility),
       weigh(  highGround  (intent, candidate)       , preferHighGround),
       weigh(  grouping    (intent, candidate) / 100 , preferGrouping),
-      weigh(  enemyDamage (intent, candidate) / 100 , -avoidDamage),
+      weigh(  enemyDamage (intent, candidate) / 10 , -avoidDamage),
       weigh(  traffic     (intent, candidate)       , -avoidTraffic),
       weigh(  visibility  (intent, candidate)       , -avoidVision),
       weigh(  detection   (intent, candidate)       , -avoidDetection)
@@ -29,9 +29,8 @@ class MovementProfile(
     .product
   
   //TODO: Consolidate with TargetProfile
-  def weigh(value:Double, weight:Double):Double = normalize(Math.pow(value, weight))
+  def weigh(value:Double, weight:Double):Double = Math.pow(value, weight)
   def unboolify(value:Boolean)                  = if (value) 2 else 1
-  def normalize(value:Double)                   = Math.min(Math.max(0.000001, value), 1000000)
   
   def travel(intent: Intention, candidate: TilePosition): Double = {
     val before = With.paths.groundDistance(intent.unit.tileCenter, intent.destination)

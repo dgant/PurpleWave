@@ -25,9 +25,8 @@ class TargetProfile(
   }
   
   //TODO: Consolidate with MovementProfile
-  def weigh(value:Double, weight:Double):Double = normalize(Math.pow(value, weight))
+  def weigh(value:Double, weight:Double):Double = Math.pow(value, weight)
   def unboolify(value:Boolean)                  = if (value) 2 else 1
-  def normalize(value:Double)                   = Math.min(Math.max(0.000001, value), 1000000)
   
   def inRange(intent:Intention, target:UnitInfo):Double = {
     unboolify(intent.unit.distanceFromEdge(target) <= intent.unit.range)

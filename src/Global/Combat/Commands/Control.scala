@@ -31,7 +31,7 @@ object Control extends Command {
     preferMobility    = 0.75,
     preferHighGround  = 0.5,
     preferGrouping    = 0.5,
-    avoidDamage       = 4,
+    avoidDamage       = 2,
     avoidTraffic      = 1,
     avoidVision       = 0,
     avoidDetection    = 0

@@ -44,6 +44,7 @@ class BuildPylonsContinuously extends TrainContinuously(UnitType.Protoss_Pylon) 
     val additionalDepotsRequired          = Math.ceil((supplyUsedWhenDepotWouldFinish - currentSupplyOfNexus) / supplyPerDepot).toInt
     val pylonsRequired                    = Math.max(0, additionalDepotsRequired)
   
-    return pylonsRequired
+    //Hack
+    return Math.min(pylonsRequired, With.units.ours.count(_.utype == pylon) + 2)
   }
 }

@@ -17,14 +17,14 @@ class MovementProfile(
   
   override def evaluate(intent: Intention, candidate: TilePosition): Double =
     List(
-      weigh(  travel      (intent, candidate), preferTravel),
-      weigh(  mobility    (intent, candidate), preferMobility),
-      weigh(  highGround  (intent, candidate), preferHighGround),
-      weigh(  grouping    (intent, candidate), preferGrouping),
-      weigh(  enemyDamage (intent, candidate), -avoidDamage),
-      weigh(  traffic     (intent, candidate), -avoidTraffic),
-      weigh(  visibility  (intent, candidate), -avoidVision),
-      weigh(  detection   (intent, candidate), -avoidDetection)
+      weigh(  travel      (intent, candidate)       , preferTravel),
+      weigh(  mobility    (intent, candidate) / 10  , preferMobility),
+      weigh(  highGround  (intent, candidate)       , preferHighGround),
+      weigh(  grouping    (intent, candidate) / 100 , preferGrouping),
+      weigh(  enemyDamage (intent, candidate) / 100 , -avoidDamage),
+      weigh(  traffic     (intent, candidate)       , -avoidTraffic),
+      weigh(  visibility  (intent, candidate)       , -avoidVision),
+      weigh(  detection   (intent, candidate)       , -avoidDetection)
     )
     .product
   

@@ -4,7 +4,7 @@ import Plans.Army.{Attack, DefendChoke}
 import Plans.Compound.{IfThenElse, Parallel}
 import Plans.Defense.DefeatWorkerHarass
 import Plans.Information.ScoutAt
-import Plans.Macro.Automatic._
+import Plans.Macro.Automatic.{BuildPylonsContinuously, _}
 import Plans.Macro.Build.{FollowBuildOrder, ScheduleBuildOrder}
 import Plans.Macro.UnitCount.{SupplyAtLeast, UnitCountAtLeast}
 import Strategies.UnitMatchers.UnitMatchWarriors
@@ -101,6 +101,7 @@ class ProtossVsTerran extends Parallel {
     new IfThenElse {
       predicate.set(new SupplyAtLeast { quantity.set(74) })
       whenTrue.set(new Parallel { children.set(List(
+        new BuildPylonsContinuously,
         new BuildWorkersContinuously,
         new TrainGatewayUnitsContinuously,
         new ScheduleBuildOrder { buildables.set(_lateGame) }

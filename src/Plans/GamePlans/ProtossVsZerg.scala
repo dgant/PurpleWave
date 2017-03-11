@@ -56,6 +56,7 @@ class ProtossVsZerg extends Parallel {
   )
   
   children.set(List(
+    new BuildPylonsContinuously,
     new BuildWorkersContinuously,
     new TrainGatewayUnitsContinuously,
     new ScheduleBuildOrder { buildables.set(_twoGateExpand) },

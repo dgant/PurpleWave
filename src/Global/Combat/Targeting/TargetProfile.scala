@@ -7,6 +7,7 @@ class TargetProfile(
   preferInRange     : Double = 1,
   preferValue       : Double = 1,
   preferFocus       : Double = 1,
+  preferDps         : Double = 1,
   avoidHealth       : Double = 1,
   avoidDistance     : Double = 1)
     extends EvaluateTarget {
@@ -16,6 +17,7 @@ class TargetProfile(
       weigh( inRange  (intent, target), preferInRange),
       weigh( value    (intent, target), preferValue),
       weigh( focus    (intent, target), preferFocus),
+      weigh( dps      (intent, target), preferDps),
       weigh( health   (intent, target), -avoidHealth),
       weigh( distance (intent, target), -avoidDistance)
     )
@@ -37,6 +39,10 @@ class TargetProfile(
   
   def focus(intent:Intention, target:UnitInfo):Double = {
     With.grids.friendlyGroundStrength.get(target.tileCenter)
+  }
+  
+  def dps(intent:Intention, target:UnitInfo):Double = {
+    target.groundDps
   }
   
   def health(intent:Intention, target:UnitInfo):Double = {

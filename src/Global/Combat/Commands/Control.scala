@@ -8,34 +8,39 @@ import Utilities.Enrichment.EnrichPosition._
 object Control extends Command {
   
   def execute(intent: Intention) {
-    
+  
+    val targets = Targets.get(intent)
     if (intent.unit.cooldownRemaining < With.game.getRemainingLatencyFrames) {
-      val targets = Targets.get(intent)
       val target = EvaluateTargets.best(intent, defaultTargetProfile, targets)
       if (target.isDefined) {
         With.commander.attack(intent.unit, target.get)
         return
       }
     }
-    val tile = EvaluatePositions.best(intent, defaultMovementProfile)
-    With.commander.move(intent.unit, tile.centerPixel)
+    if (targets.isEmpty) {
+      With.commander.move(intent.unit, intent.destination.centerPixel)
+    }
+    else {
+      val tile = EvaluatePositions.best(intent, defaultMovementProfile)
+      With.commander.move(intent.unit, tile.centerPixel)
+    }
   }
   
   val defaultMovementProfile = new MovementProfile(
     preferTravel      = 1,
-    preferMobility    = 1,
-    preferHighGround  = 1,
-    preferGrouping    = 1,
-    avoidDamage       = 1,
+    preferMobility    = 0.5,
+    preferHighGround  = 0,
+    preferGrouping    = 2,
+    avoidDamage       = 4,
     avoidTraffic      = 1,
     avoidVision       = 0,
     avoidDetection    = 0
   )
   
   val defaultTargetProfile = new TargetProfile(
-    preferInRange     = 1,
-    preferValue       = 1,
-    preferFocus       = 1,
-    avoidHealth       = 1,
+    preferInRange     = 3,
+    preferValue       = 2,
+    preferFocus       = 2,
+    avoidHealth       = 2,
     avoidDistance     = 1)
 }

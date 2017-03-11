@@ -5,7 +5,7 @@ import bwapi.UnitType
 
 import scala.collection.JavaConverters._
 
-class BuildableUnit(val unit: UnitType) extends Buildable {
+case class BuildableUnit(val unit: UnitType) extends Buildable {
   
   override def unitOption       : Option[UnitType]  = Some(unit)
   override def unitsProduced    : Int               = if (unit.isTwoUnitsInOneEgg) 2 else 1

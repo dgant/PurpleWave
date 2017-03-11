@@ -21,7 +21,7 @@ class PositionSimpleBuilding(
     if (buildingType.isRefinery) return _positionRefinery
     else if (buildingType.isTownHall) return _positionTownHall
     
-    val maxMargin = if (buildingType == UnitType.Protoss_Pylon) 4 else 1
+    val maxMargin = if (buildingType == UnitType.Protoss_Pylon) 3 else 1
   
     var output:Option[TilePosition] = None
     (maxMargin to 0 by -1).foreach(margin =>

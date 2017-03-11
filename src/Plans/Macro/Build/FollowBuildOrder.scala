@@ -3,24 +3,46 @@ package Plans.Macro.Build
 import Plans.Plan
 import Startup.With
 import Types.Buildable.Buildable
+import Utilities.Caching.Cache
 
 import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 
 class FollowBuildOrder extends Plan {
   
   description.set("Follow a build order")
   
+  val _plans = new mutable.HashMap[Buildable, ListBuffer[Plan]]
   var _queue:Iterable[Buildable] = List.empty
-  val _plans = new mutable.HashMap[Buildable, Plan]
   
-  override def getChildren: Iterable[Plan] = _queue.flatMap(_plans.get)
+  val _getChildrenCache = new Cache[Iterable[Plan]](1, () => _getChildren)
+  override def getChildren: Iterable[Plan] = _getChildrenCache.get
+  def _getChildren: Iterable[Plan] = {
+    val indexByBuild = new mutable.HashMap[Buildable, Int]
+    _plans.keys.foreach(build => indexByBuild.put(build, 0))
+    _queue.map(build => {
+      val output = _plans(build)(indexByBuild(build))
+      indexByBuild(build) += 1
+      output
+    })
+  }
   
   override def onFrame() {
-    _plans.filter(_._2.isComplete).keys.foreach(_plans.remove)
-    _queue = With.scheduler.queue
+    //Remove complete plans
+    _plans.values.foreach(plans => plans.indices.foreach(i =>
+      while (i < plans.size && plans(i).isComplete) plans.remove(i)))
   
-    val buildsThatNeedPlans = _queue.filterNot(_plans.contains)
-    buildsThatNeedPlans.foreach(order => _plans(order) = _buildPlan(order))
+    //Add plans to match number of builds we need
+    _queue = With.scheduler.queue
+    val buildsNeeded = _queue.groupBy(x => x).map(group => (group._1, group._2.size))
+    buildsNeeded.keys.foreach(build => {
+      if ( ! _plans.contains(build)) _plans.put(build, new ListBuffer[Plan])
+      while (_plans(build).size < buildsNeeded(build)) {
+        _plans(build).append(_buildPlan(build))
+      }
+      //Consider removing excess plans
+    })
+    
     getChildren.foreach(_.onFrame())
   }
   

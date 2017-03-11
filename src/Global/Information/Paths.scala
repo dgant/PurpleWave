@@ -11,7 +11,7 @@ class Paths {
   //Cache ground distances with a LRU (Least-recently used) cache
   //This is a low number; let's increase it after we make sure _limitCacheSize works
   val _impossiblyLargeDistance = Int.MaxValue / 1000
-  val _maxCacheSize = 50000
+  val _maxCacheSize = 10000 //Max we'll ever need to cache: 256 * 256 = 65536 so maybe this is silly
   val _distanceCache = new mutable.HashMap[(TilePosition, TilePosition), Int]
   val _distanceAge = new mutable.HashMap[(TilePosition, TilePosition), Int]
   
@@ -38,15 +38,6 @@ class Paths {
   def _cacheDistance(request:(TilePosition, TilePosition)) {
     val distance = BWTA.getGroundDistance(request._1, request._2)
     _distanceCache.put(request, distance.toInt)
-    /*
-    if (With.grids.walkability.get(request._1) && With.grids.walkability.get(request._2)) {
-      val distance = BWTA.getGroundDistance(request._1, request._2)
-      _distanceCache.put(request, distance.toInt)
-    }
-    else {
-      _distanceCache.put(request, _impossiblyLargeDistance)
-    }
-    */
   }
   
   def _limitCacheSize() {

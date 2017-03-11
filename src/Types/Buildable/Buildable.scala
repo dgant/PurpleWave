@@ -2,7 +2,7 @@ package Types.Buildable
 
 import bwapi.{TechType, UnitType, UpgradeType}
 
-abstract class Buildable{
+abstract class Buildable() {
   
   def unitOption      : Option[UnitType]    = None
   def unitsProduced   : Int                 = 0

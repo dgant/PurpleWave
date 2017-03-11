@@ -3,7 +3,7 @@ package Types.Buildable
 import Development.TypeDescriber
 import bwapi.{UpgradeType, UnitType}
 
-class BuildableUpgrade(upgrade:UpgradeType, level:Int=1) extends Buildable {
+case class BuildableUpgrade(upgrade:UpgradeType, level:Int=1) extends Buildable {
   
   override def upgradeOption    : Option[UpgradeType]   = Some(upgrade)
   override def upgradeLevel     : Int                   = level

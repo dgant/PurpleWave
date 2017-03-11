@@ -28,9 +28,9 @@ object Control extends Command {
   
   val defaultMovementProfile = new MovementProfile(
     preferTravel      = 1,
-    preferMobility    = 0.5,
-    preferHighGround  = 0,
-    preferGrouping    = 2,
+    preferMobility    = 0.75,
+    preferHighGround  = 0.5,
+    preferGrouping    = 0.5,
     avoidDamage       = 4,
     avoidTraffic      = 1,
     avoidVision       = 0,

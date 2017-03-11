@@ -3,7 +3,7 @@ package Types.Buildable
 import Development.TypeDescriber
 import bwapi.{TechType, UnitType}
 
-class BuildableTech(tech: TechType) extends Buildable {
+case class BuildableTech(tech: TechType) extends Buildable {
   
   override def techOption       : Option[TechType]  = Some(tech)
   override def toString         : String            = TypeDescriber.tech(tech)

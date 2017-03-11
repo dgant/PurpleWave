@@ -79,6 +79,7 @@ object Overlay {
   
   def _drawGrids() {
     _drawGrid(With.grids.enemyGroundStrength, 0, 0)
+    _drawGrid(With.grids.friendlyGroundStrength, 0, 1)
   }
   
   def _drawGrid[T](map:Grid[T], offsetX:Int=0, offsetY:Int=0) {

@@ -7,12 +7,12 @@ import Utilities.Caching.Cache
 
 abstract class AbstractBuildContinuously extends Plan {
   
-  def _buildsRequired:Int
+  def _totalRequired:Int
   def _newBuild:Buildable
   
-  override def isComplete:Boolean = buildsRequired == 0
-  override def onFrame() = With.scheduler.request(this, (0 to buildsRequired).map(i => _newBuild))
+  override def isComplete:Boolean = totalRequired == 0
+  override def onFrame() = With.scheduler.request(this, (0 until totalRequired).map(i => _newBuild))
   
-  def buildsRequired:Int = _buildsRequiredCache.get
-  val _buildsRequiredCache = new Cache(1, () => _buildsRequired)
+  def totalRequired:Int = _totalRequiredCache.get
+  val _totalRequiredCache = new Cache(1, () => _totalRequired)
 }

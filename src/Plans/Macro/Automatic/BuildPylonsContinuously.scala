@@ -5,7 +5,7 @@ import bwapi.UnitType
 
 class BuildPylonsContinuously extends TrainContinuously(UnitType.Protoss_Pylon) {
   
-  override def buildsRequired: Int = {
+  override def _totalRequired: Int = {
   
     // Remember! BWAPI doubles all supply numbers (so that Zerglings can each cost 1)
     //
@@ -28,21 +28,20 @@ class BuildPylonsContinuously extends TrainContinuously(UnitType.Protoss_Pylon) 
     //   #1 Supply that is/will be provided by units that exist
     //   #2 Supply that will be provided by plans for which we haven't started building
   
-    val supplyPerDepot        = With.game.self.getRace.getSupplyProvider.supplyProvided
-    val currentSupplyOfUnits  = With.units.ours.toSeq.map(_.utype.supplyProvided).sum
-    //val currentSupplyPlanned  = currentSupplyOfUnits + currentSupplyOfPlans
-    //val currentSupplyDeficit  = With.game.self.supplyUsed - currentSupplyPlanned
-    val currentSupplyUsed     = With.game.self.supplyUsed
-    val unitSpendingRatio     = 1.0
-    val costPerUnitSupply     = 50.0
-    val depotCompletionFrames = With.game.self.getRace.getSupplyProvider.buildTime + 24 * 4 //Add a few seconds to account for builder transit time
-    val incomePerMinute       = With.economy.ourMineralIncomePerMinute + With.economy.ourGasIncomePerMinute
-    val incomePerFrame        = incomePerMinute / 60.0 / 24.0
-    val supplyUsedPerFrame    = incomePerFrame * unitSpendingRatio / costPerUnitSupply
+    val pylon                     = UnitType.Protoss_Pylon
+    val supplyPerDepot            = With.game.self.getRace.getSupplyProvider.supplyProvided
+    val currentSupplyOfNexus      = With.units.ours.filter(_.utype != pylon).toSeq.map(_.utype.supplyProvided).sum
+    val currentSupplyUsed         = With.game.self.supplyUsed
+    val unitSpendingRatio         = 0.5
+    val costPerUnitSupply         = 25.0
+    val depotCompletionFrames     = pylon.buildTime + 24 * 4 //Add a few seconds to account for builder transit time
+    val incomePerMinute           = With.economy.ourMineralIncomePerMinute + With.economy.ourGasIncomePerMinute
+    val incomePerFrame            = incomePerMinute / 60.0 / 24.0
+    val supplyUsedPerFrame        = incomePerFrame * unitSpendingRatio / costPerUnitSupply
   
     val supplySpentBeforeDepotCompletion  = supplyUsedPerFrame * depotCompletionFrames
-    val supplyDeficitWhenDepotWouldFinish = currentSupplyUsed + supplySpentBeforeDepotCompletion - currentSupplyOfUnits
-    val additionalDepotsRequired          = Math.ceil(supplyDeficitWhenDepotWouldFinish / supplyPerDepot).toInt
+    val supplyUsedWhenDepotWouldFinish    = currentSupplyUsed + supplySpentBeforeDepotCompletion
+    val additionalDepotsRequired          = Math.ceil((supplyUsedWhenDepotWouldFinish - currentSupplyOfNexus) / supplyPerDepot).toInt
     val pylonsRequired                    = Math.max(0, additionalDepotsRequired)
   
     return pylonsRequired

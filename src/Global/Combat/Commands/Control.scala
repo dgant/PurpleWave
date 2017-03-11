@@ -1,45 +1,41 @@
 package Global.Combat.Commands
+import Global.Combat.Movement.{EvaluatePositions, MovementProfile}
+import Global.Combat.Targeting.{EvaluateTargets, TargetProfile, Targets}
 import Startup.With
 import Types.Intents.Intention
+import Utilities.Enrichment.EnrichPosition._
 
 object Control extends Command {
   
   def execute(intent: Intention) {
-    val unit = intent.unit
     
-    intent.battle = With.battles.all.find(_.us.units.contains(unit))
-  
-    if (intent.battle.isEmpty) {
-      Pillage.execute(intent)
-    } else if (unit.cloaked && ! intent.battle.get.enemy.units.exists(_.utype.isDetector)) {
-      Engage.execute(intent)
-    } else {
-      
-      val distanceFromBase    = if (With.geography.ourBases.nonEmpty) With.geography.ourBases.map(base => With.paths.groundDistance(unit.tileCenter, base.centerTile)).min.toDouble else 0.0
-      val desperation         = Math.max(1, 32.0 * 12 / distanceFromBase)
-      val groupStrengthUs     = 0.01 + intent.battle.get.us.strength
-      val groupStrengthEnemy  = 0.01 + intent.battle.get.enemy.strength
-      val localStrengthUs     = 0.01 + With.grids.friendlyGroundStrength.get(unit.position.toTilePosition)
-      val localStrengthEnemy  = 0.01 + With.grids.enemyGroundStrength.get(unit.position.toTilePosition)
-      val groupConfidence     = groupStrengthUs / groupStrengthEnemy
-      val localConfidence     = localStrengthUs / localStrengthEnemy
-      val healthConfidence    = 0.5 + 0.5 * unit.totalHealth / unit.maxTotalHealth
-      val localMotivation     = intent.motivation * desperation * healthConfidence  * groupConfidence * localConfidence
-  
-      intent.motivation = localMotivation
-      
-      if (intent.motivation < 0.5) {
-        Flee.execute(intent)
-      }
-      else if (intent.motivation < 0.75) {
-        Approach.execute(intent)
-      }
-      else if (intent.motivation < 1) {
-        Skirt.execute(intent)
-      }
-      else {
-        Engage.execute(intent)
+    if (intent.unit.cooldownRemaining < With.game.getRemainingLatencyFrames) {
+      val targets = Targets.get(intent)
+      val target = EvaluateTargets.best(intent, defaultTargetProfile, targets)
+      if (target.isDefined) {
+        With.commander.attack(intent.unit, target.get)
+        return
       }
     }
+    val tile = EvaluatePositions.best(intent, defaultMovementProfile)
+    With.commander.move(intent.unit, tile.centerPixel)
   }
+  
+  val defaultMovementProfile = new MovementProfile(
+    preferTravel      = 1,
+    preferMobility    = 1,
+    preferHighGround  = 1,
+    preferGrouping    = 1,
+    avoidDamage       = 1,
+    avoidTraffic      = 1,
+    avoidVision       = 0,
+    avoidDetection    = 0
+  )
+  
+  val defaultTargetProfile = new TargetProfile(
+    preferInRange     = 1,
+    preferValue       = 1,
+    preferFocus       = 1,
+    avoidHealth       = 1,
+    avoidDistance     = 1)
 }

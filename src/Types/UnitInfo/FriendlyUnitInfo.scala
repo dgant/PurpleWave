@@ -20,6 +20,9 @@ class FriendlyUnitInfo(_baseUnit:bwapi.Unit) extends UnitInfo(_baseUnit) {
   override def flying                     : Boolean             = baseUnit.isFlying
   override def visible                    : Boolean             = baseUnit.isVisible
   override def cloaked                    : Boolean             = baseUnit.isCloaked
+  override def detected                   : Boolean             = baseUnit.isDetected
+  override def morphing                   : Boolean             = baseUnit.isMorphing
+  override def invincible                 : Boolean             = baseUnit.isInvincible
   override def top                        : Int                 = baseUnit.getTop
   override def left                       : Int                 = baseUnit.getLeft
   override def right                      : Int                 = baseUnit.getRight

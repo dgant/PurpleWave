@@ -4,8 +4,7 @@ import Global.Combat.Commands.Command
 import Startup.With
 import Types.Intents.Intention
 import Types.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import bwapi.{Position, TilePosition}
-import Utilities.Enrichment.EnrichPosition._
+import bwapi.Position
 
 import scala.collection.mutable
 
@@ -27,40 +26,16 @@ class Commander {
     _intentions = new mutable.HashMap[FriendlyUnitInfo, Intention]
   }
   
-  def attack(command:Command, unit:FriendlyUnitInfo, target:UnitInfo) {
-    _recordCommand(unit, command)
-    if (target.visible) {
-      unit.baseUnit.attack(target.baseUnit)
-      _sleep(unit, true)
-    } else {
-      attack(command, unit, target.position)
-    }
-  }
-  
-  def attack(command:Command, unit:FriendlyUnitInfo, tilePosition:TilePosition) {
-    attack(command, unit, tilePosition.toPosition)
-  }
-  
-  def attack(command:Command, unit:FriendlyUnitInfo, position:Position) {
-    _recordCommand(unit, command)
-    //Workers don't fight when they patrol
-    if ( ! unit.utype.isWorker && With.game.isVisible(position.tileNearest)) {
-      unit.baseUnit.patrol(position)
-    }
-    else {
-      unit.baseUnit.attack(position)
-    }
+  def attack(unit:FriendlyUnitInfo, target:UnitInfo) {
+    //_recordCommand(unit, command)
+    unit.baseUnit.attack(target.baseUnit)
     _sleep(unit, true)
   }
   
-  def move(command:Command, unit:FriendlyUnitInfo, position:Position) {
-    _recordCommand(unit, command)
+  def move(unit:FriendlyUnitInfo, position:Position) {
+    //_recordCommand(unit, command)
     unit.baseUnit.move(position)
     _sleep(unit, false)
-  }
-  
-  def move(command:Command, unit:FriendlyUnitInfo, tilePosition:TilePosition) {
-    move(command, unit, tilePosition.centerPixel)
   }
   
   def _sleep(unit:FriendlyUnitInfo, startedAttacking:Boolean = false) {

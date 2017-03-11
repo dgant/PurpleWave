@@ -8,6 +8,7 @@ class Grids {
   val enemyGroundStrength = new GridEnemyGroundStrength
   val friendlyGroundStrength = new GridFriendlyGroundStrength
   val enemyVision = new GridEnemyVision
+  val enemyDetection = new GridEnemyDetection
   val altitudeBonus = new GridAltitudeBonus
   val buildability = new GridBuildability
   val walkability = new GridWalkability

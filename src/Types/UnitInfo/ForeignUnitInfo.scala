@@ -20,6 +20,9 @@ class ForeignUnitInfo(_baseUnit:bwapi.Unit) extends UnitInfo (_baseUnit) {
   var _complete           = false
   var _flying             = false
   var _cloaked            = false
+  var _detected           = false
+  var _morphing           = false
+  var _invincible         = false
   var _top                = 0
   var _left               = 0
   var _right              = 0
@@ -45,6 +48,9 @@ class ForeignUnitInfo(_baseUnit:bwapi.Unit) extends UnitInfo (_baseUnit) {
     _complete           = unit.isCompleted
     _flying             = unit.isFlying
     _cloaked            = unit.isCloaked
+    _detected           = unit.isDetected
+    _morphing           = unit.isMorphing
+    _invincible         = unit.isInvincible
     _top                = unit.getTop
     _left               = unit.getLeft
     _right              = unit.getRight
@@ -61,26 +67,29 @@ class ForeignUnitInfo(_baseUnit:bwapi.Unit) extends UnitInfo (_baseUnit) {
     _possiblyStillThere = false
   }
   
-  override def alive: Boolean = _alive
-  override def id: Int = _id
-  override def lastSeen: Int = _lastSeen
-  override def possiblyStillThere:Boolean = _possiblyStillThere
-  override def player: Player = _player
-  override def position: Position = _position
-  override def walkPosition: WalkPosition = position.toWalkPosition
-  override def tileTopLeft: TilePosition = _tileTopleft
-  override def hitPoints: Int = _hitPoints
-  override def shieldPoints: Int = _shieldPoints
-  override def utype: UnitType = if (_unitType == UnitType.Terran_Siege_Tank_Tank_Mode) UnitType.Terran_Siege_Tank_Siege_Mode else _unitType //isMorphing?!
-  override def complete: Boolean = _complete
-  override def flying: Boolean = _flying
-  override def visible: Boolean = lastSeen >= With.game.getFrameCount
-  override def cloaked: Boolean = _cloaked
-  override def top:Int = _top
-  override def left:Int = _left
-  override def right:Int = _right
-  override def bottom:Int = _bottom
-  override def mineralsLeft: Int = if (isMinerals) _resources else 0
-  override def gasLeft: Int = if (isGas) _resources else 0
-  override def initialResources = _initialResources
+  override def alive                : Boolean         = _alive
+  override def id                   : Int             = _id
+  override def lastSeen             : Int             = _lastSeen
+  override def possiblyStillThere   : Boolean         = _possiblyStillThere
+  override def player               : Player          = _player
+  override def position             : Position        = _position
+  override def walkPosition         : WalkPosition    = position.toWalkPosition
+  override def tileTopLeft          : TilePosition    = _tileTopleft
+  override def hitPoints            : Int             = _hitPoints
+  override def shieldPoints         : Int             = _shieldPoints
+  override def utype                : UnitType        = if (_unitType == UnitType.Terran_Siege_Tank_Tank_Mode && (morphing || ! visible)) UnitType.Terran_Siege_Tank_Siege_Mode else _unitType
+  override def complete             : Boolean         = _complete
+  override def flying               : Boolean         = _flying
+  override def visible              : Boolean         = lastSeen >= With.game.getFrameCount
+  override def cloaked              : Boolean         = _cloaked
+  override def detected             : Boolean         = _detected
+  override def morphing             : Boolean         = _morphing
+  override def invincible           : Boolean         = _invincible
+  override def top                  : Int             = _top
+  override def left                 : Int             = _left
+  override def right                : Int             = _right
+  override def bottom               : Int             = _bottom
+  override def mineralsLeft         : Int             = if (isMinerals) _resources else 0
+  override def gasLeft              : Int             = if (isGas) _resources else 0
+  override def initialResources     : Int             = _initialResources
 }

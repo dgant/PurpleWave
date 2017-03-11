@@ -1,27 +1,26 @@
-package Global.Combat.Heuristics
+package Global.Combat.Movement
 
 import Geometry.Shapes.Circle
 import Startup.With
-import Types.UnitInfo.FriendlyUnitInfo
+import Types.Intents.Intention
 import Utilities.Enrichment.EnrichPosition._
 import bwapi.TilePosition
 
 object EvaluatePositions {
   
-  def bestPosition(unit:FriendlyUnitInfo, evaluator:EvaluatePosition, searchRange:Int = 2):TilePosition = {
+  def best(intent:Intention, evaluator:EvaluatePosition, searchRange:Int = 3):TilePosition = {
     
     val candidates =
       Circle.points(searchRange)
-        .map(unit.tileCenter.add)
+        .map(intent.unit.tileCenter.add)
         .filter(_.isValid)
         .filter(With.grids.walkability.get)
   
     if (candidates.isEmpty) {
       //Weird. unit is nowhere near a walkable position
-      With.logger.warn("Unit appears to be in a totally unwalkable area")
-      return unit.tileCenter
+      return intent.unit.tileCenter
     }
     
-    return candidates.maxBy(evaluator.evaluate)
+    return candidates.maxBy(tile => evaluator.evaluate(intent, tile))
   }
 }

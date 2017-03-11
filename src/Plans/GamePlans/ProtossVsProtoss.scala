@@ -15,14 +15,6 @@ class ProtossVsProtoss extends Parallel {
   
   description.set("Protoss vs Protoss")
   
-  val _testBuild = List[Buildable] (
-    new BuildableUnit(UnitType.Protoss_Nexus),
-    new BuildableUnit(UnitType.Protoss_Gateway),
-    new BuildableUnit(UnitType.Protoss_Gateway),
-    new BuildableUnit(UnitType.Protoss_Cybernetics_Core),
-    new BuildableUnit(UnitType.Protoss_Assimilator),
-    new BuildableUnit(UnitType.Protoss_Nexus))
-  
   //http://wiki.teamliquid.net/starcraft/4_Gate_Goon_(vs._Protoss)
   val _fourGateGoons = List[Buildable] (
     new BuildableUnit(UnitType.Protoss_Nexus),
@@ -98,11 +90,10 @@ class ProtossVsProtoss extends Parallel {
   )
   
   children.set(List(
-    //new ScheduleBuildOrder { buildables.set(_fourGateGoons) },
+    new ScheduleBuildOrder { buildables.set(_fourGateGoons) },
     new BuildPylonsContinuously,
     new BuildWorkersContinuously,
     new TrainGatewayUnitsContinuously,
-    new ScheduleBuildOrder { buildables.set(_testBuild) },
     new ScheduleBuildOrder { buildables.set(_lateGame) },
     new FollowBuildOrder,
     new DefeatWorkerHarass,

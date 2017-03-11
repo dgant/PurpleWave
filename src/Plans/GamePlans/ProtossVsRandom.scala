@@ -1,5 +1,5 @@
 package Plans.GamePlans
 
-class ProtossVsRandom extends ProtossVsZerg {
+class ProtossVsRandom extends ProtossVsProtoss {
   description.set("Protoss vs Random")
 }

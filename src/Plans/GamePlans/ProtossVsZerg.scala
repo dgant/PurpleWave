@@ -15,20 +15,52 @@ class ProtossVsZerg extends Parallel {
   
   description.set("Protoss vs Zerg")
   
-  val _twoGateExpand = List[Buildable] (
+  // http://wiki.teamliquid.net/starcraft/One_Base_Speedzeal_(vs._Zerg)
+  val _oneBaseSpeedlot = List[Buildable] (
     new BuildableUnit(UnitType.Protoss_Nexus),
-    new BuildableUnit(UnitType.Protoss_Pylon),
-    new BuildableUnit(UnitType.Protoss_Gateway),
-    new BuildableUnit(UnitType.Protoss_Gateway),
-    new BuildableUnit(UnitType.Protoss_Gateway),
-    new BuildableUnit(UnitType.Protoss_Nexus),
-    new BuildableUnit(UnitType.Protoss_Cybernetics_Core),
-    new BuildableUnit(UnitType.Protoss_Assimilator),
-    new BuildableUnit(UnitType.Protoss_Gateway),
-    new BuildableUnit(UnitType.Protoss_Gateway),
-    new BuildableUnit(UnitType.Protoss_Gateway),
-    new BuildableUnit(UnitType.Protoss_Gateway),
-    new BuildableUpgrade(UpgradeType.Singularity_Charge)
+    new BuildableUnit(UnitType.Protoss_Probe),
+    new BuildableUnit(UnitType.Protoss_Probe),
+    new BuildableUnit(UnitType.Protoss_Probe),
+    new BuildableUnit(UnitType.Protoss_Probe),
+    new BuildableUnit(UnitType.Protoss_Probe),
+    new BuildableUnit(UnitType.Protoss_Probe),
+    new BuildableUnit(UnitType.Protoss_Probe),
+    new BuildableUnit(UnitType.Protoss_Probe),
+    new BuildableUnit(UnitType.Protoss_Pylon), //8
+    new BuildableUnit(UnitType.Protoss_Probe),
+    new BuildableUnit(UnitType.Protoss_Probe),
+    new BuildableUnit(UnitType.Protoss_Gateway), //10
+    new BuildableUnit(UnitType.Protoss_Probe),
+    new BuildableUnit(UnitType.Protoss_Probe),
+    new BuildableUnit(UnitType.Protoss_Assimilator), //12
+    new BuildableUnit(UnitType.Protoss_Probe),
+    new BuildableUnit(UnitType.Protoss_Zealot), //13
+    new BuildableUnit(UnitType.Protoss_Probe),
+    new BuildableUnit(UnitType.Protoss_Pylon), //16
+    new BuildableUnit(UnitType.Protoss_Probe),
+    new BuildableUnit(UnitType.Protoss_Zealot), //17
+    new BuildableUnit(UnitType.Protoss_Probe),
+    new BuildableUnit(UnitType.Protoss_Cybernetics_Core), //20
+    new BuildableUnit(UnitType.Protoss_Probe),
+    new BuildableUnit(UnitType.Protoss_Zealot), //21
+    new BuildableUnit(UnitType.Protoss_Pylon), //23
+    new BuildableUnit(UnitType.Protoss_Probe),
+    new BuildableUnit(UnitType.Protoss_Probe),
+    new BuildableUnit(UnitType.Protoss_Dragoon), //25
+    new BuildableUnit(UnitType.Protoss_Citadel_of_Adun), //27
+    new BuildableUnit(UnitType.Protoss_Probe),
+    new BuildableUnit(UnitType.Protoss_Probe),
+    new BuildableUnit(UnitType.Protoss_Gateway), //29
+    new BuildableUnit(UnitType.Protoss_Zealot), //29
+    new BuildableUnit(UnitType.Protoss_Pylon), //31
+    new BuildableUnit(UnitType.Protoss_Probe),
+    new BuildableUpgrade(UpgradeType.Leg_Enhancements), //32
+    new BuildableUnit(UnitType.Protoss_Zealot), //32
+    new BuildableUnit(UnitType.Protoss_Zealot), //34
+    new BuildableUnit(UnitType.Protoss_Probe), //36
+    new BuildableUnit(UnitType.Protoss_Pylon), //37
+    new BuildableUnit(UnitType.Protoss_Zealot), //37
+    new BuildableUnit(UnitType.Protoss_Zealot) //39
   )
   
   val _lateGame = List[Buildable] (
@@ -52,20 +84,25 @@ class ProtossVsZerg extends Parallel {
     new BuildableUpgrade(UpgradeType.Protoss_Ground_Weapons, 3),
     new BuildableUnit(UnitType.Protoss_Nexus),
     new BuildableUpgrade(UpgradeType.Protoss_Ground_Armor, 2),
-    new BuildableUpgrade(UpgradeType.Protoss_Ground_Armor, 3)
+    new BuildableUpgrade(UpgradeType.Protoss_Ground_Armor, 3),
+    new BuildableUnit(UnitType.Protoss_Gateway),
+    new BuildableUnit(UnitType.Protoss_Gateway),
+    new BuildableUnit(UnitType.Protoss_Gateway),
+    new BuildableUnit(UnitType.Protoss_Gateway),
+    new BuildableUnit(UnitType.Protoss_Nexus)
   )
   
   children.set(List(
+    new ScheduleBuildOrder { buildables.set(_oneBaseSpeedlot) },
     new BuildPylonsContinuously,
     new BuildWorkersContinuously,
     new TrainGatewayUnitsContinuously,
-    new ScheduleBuildOrder { buildables.set(_twoGateExpand) },
     new ScheduleBuildOrder { buildables.set(_lateGame) },
     new FollowBuildOrder,
     new DefeatWorkerHarass,
     new ScoutAt(20),
     new IfThenElse {
-      predicate.set(new UnitCountAtLeast { quantity.set(10); unitMatcher.set(UnitMatchWarriors) })
+      predicate.set(new UnitCountAtLeast { quantity.set(9); unitMatcher.set(UnitMatchWarriors) })
       whenFalse.set(new DefendChoke)
       whenTrue.set(new Attack)
     },

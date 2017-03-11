@@ -35,6 +35,7 @@ class Bot() extends DefaultBWListener {
       With.gameplan = new WinTheGame
       With.history = new History
       With.intelligence = new Intelligence
+      With.latency = new Latency
       With.grids = new Grids
       With.paths = new Paths
       With.prioritizer = new Prioritizer
@@ -53,16 +54,20 @@ class Bot() extends DefaultBWListener {
 
   override def onFrame() {
     try {
-      With.units.onFrame()
-      With.grids.onFrame()
-      With.battles.onFrame()
-      With.economy.onFrame()
-      With.bank.onFrame()
-      With.recruiter.onFrame()
-      With.prioritizer.onFrame()
-      With.gameplan.onFrame()
-      With.scheduler.onFrame()
-      With.commander.onFrame()
+      With.latency.onFrame()
+
+      if (With.latency.shouldRun) {
+        With.units.onFrame()
+        With.grids.onFrame()
+        With.battles.onFrame()
+        With.economy.onFrame()
+        With.bank.onFrame()
+        With.recruiter.onFrame()
+        With.prioritizer.onFrame()
+        With.gameplan.onFrame()
+        With.scheduler.onFrame()
+        With.commander.onFrame()
+      }
       With.camera.onFrame()
       Overlay.onFrame()
       _considerSurrender

@@ -10,7 +10,7 @@ import Utilities.Enrichment.EnrichPosition._
 
 abstract class GridStrength extends GridInt {
   
-  val _limitUpdates = new Limiter(4, _update)
+  val _limitUpdates = new Limiter(12, _update)
   override def update() {
     _limitUpdates.act()
   }

@@ -19,6 +19,7 @@ class Grids {
     enemyGroundStrength.update()
     friendlyGroundStrength.update()
     enemyVision.update()
+    enemyDetection.update()
     altitudeBonus.update()
     buildability.update()
     walkability.update()

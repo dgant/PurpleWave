@@ -9,7 +9,7 @@ import Utilities.Enrichment.EnrichUnitType._
 
 class GridWalkability extends GridBoolean {
   
-  val limitUpdates = new Limiter(24 * 60, _update)
+  val limitUpdates = new Limiter(24 * 15, _update)
   override def update() {
     limitUpdates.act()
   }

@@ -1,6 +1,6 @@
 package Plans.Army
 
-import Global.Combat.Commands.Control
+import Global.Combat.Commands.DefaultBehavior
 import Plans.Allocation.LockUnits
 import Plans.Plan
 import Startup.With
@@ -22,7 +22,7 @@ class ControlPosition extends Plan {
     
     units.get.onFrame()
     if (units.get.isComplete) {
-      units.get.units.foreach(fighter => With.commander.intend(new Intention(this, fighter, Control, targetPosition.get)))
+      units.get.units.foreach(fighter => With.commander.intend(new Intention(this, fighter, DefaultBehavior, targetPosition.get)))
     }
   }
 }

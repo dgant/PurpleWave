@@ -1,6 +1,6 @@
 package Plans.Information
 
-import Global.Combat.Commands.Control
+import Global.Combat.Commands.DefaultBehavior
 import Plans.Allocation.LockUnits
 import Plans.Plan
 import Startup.With
@@ -32,7 +32,7 @@ class FindEnemyBase extends Plan {
   }
   
   def _orderScout(scout:FriendlyUnitInfo) =
-    With.commander.intend(new Intention(this, scout, Control, _getNextScoutingPosition))
+    With.commander.intend(new Intention(this, scout, DefaultBehavior, _getNextScoutingPosition))
   
   def _getNextScoutingPosition:TilePosition = {
     With.intelligence.leastScoutedBases

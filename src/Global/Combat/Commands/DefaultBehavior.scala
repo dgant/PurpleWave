@@ -5,7 +5,7 @@ import Startup.With
 import Types.Intents.Intention
 import Utilities.Enrichment.EnrichPosition._
 
-object Control extends Command {
+object DefaultBehavior extends Behavior {
   
   def execute(intent: Intention) {
   
@@ -27,11 +27,11 @@ object Control extends Command {
   }
   
   val defaultMovementProfile = new MovementProfile(
-    preferTravel      = 1,
-    preferMobility    = 0.75,
-    preferHighGround  = 0.5,
-    preferGrouping    = 0.5,
-    avoidDamage       = 2,
+    preferTravel      = 0.2,
+    preferMobility    = 1,
+    preferHighGround  = 0.2,
+    preferGrouping    = 1,
+    avoidDamage       = 3,
     avoidTraffic      = 1,
     avoidVision       = 0,
     avoidDetection    = 0

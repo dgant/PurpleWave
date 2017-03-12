@@ -2,6 +2,6 @@ package Global.Combat.Commands
 
 import Types.Intents.Intention
 
-trait Command {
+trait Behavior {
   def execute(intent:Intention)
 }

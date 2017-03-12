@@ -1,6 +1,6 @@
 package Global.Combat
 
-import Global.Combat.Commands.Command
+import Global.Combat.Commands.Behavior
 import Startup.With
 import Types.Intents.Intention
 import Types.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -52,7 +52,7 @@ class Commander {
     _isAwake(intent.unit)
   }
   
-  def _recordCommand(unit:FriendlyUnitInfo, command:Command) {
+  def _recordCommand(unit:FriendlyUnitInfo, command:Behavior) {
     if (With.configuration.enableOverlayUnits) {
       _lastCommands.put(unit, command.getClass.getSimpleName.replace("$", ""))
     }

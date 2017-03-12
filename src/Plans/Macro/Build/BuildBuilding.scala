@@ -1,7 +1,7 @@
 package Plans.Macro.Build
 
 import Development.TypeDescriber
-import Global.Combat.Commands.Control
+import Global.Combat.Commands.DefaultBehavior
 import Plans.Allocation.{LockCurrencyForUnit, LockUnits}
 import Plans.Plan
 import Startup.With
@@ -70,7 +70,7 @@ class BuildBuilding(val buildingType:UnitType) extends Plan {
         new Intention(
           this,
           unit,
-          Control,
+          DefaultBehavior,
           _position.map(_.add(1, 1)).headOption.getOrElse(unit.position.toTilePosition))))
     }
   }
@@ -88,7 +88,7 @@ class BuildBuilding(val buildingType:UnitType) extends Plan {
         if (builder.distance(_position.get) < 32 * 6) {
           builder.baseUnit.build(buildingType, _position.get)
         } else {
-          With.commander.intend(new Intention(this, builder, Control, _position.get))
+          With.commander.intend(new Intention(this, builder, DefaultBehavior, _position.get))
         }
       }
     }

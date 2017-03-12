@@ -103,8 +103,9 @@ class ProtossVsTerran extends Parallel {
       whenTrue.set(new Parallel { children.set(List(
         new BuildPylonsContinuously,
         new BuildWorkersContinuously,
+        new TrainContinuously(UnitType.Protoss_Scout),
         new TrainGatewayUnitsContinuously,
-        new ScheduleBuildOrder { buildables.set(_lateGame) }
+        new ScheduleBuildOrder { buildables.set(MassScoutLateGame.build) }
       ))})
     },
     new FollowBuildOrder,

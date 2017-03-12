@@ -61,7 +61,9 @@ class ProtossVsZerg extends Parallel {
     new BuildableUnit(UnitType.Protoss_Pylon), //37
     new BuildableUnit(UnitType.Protoss_Zealot), //37
     new BuildableUnit(UnitType.Protoss_Zealot), //39
-    new BuildableUnit(UnitType.Protoss_Nexus)
+    new BuildableUnit(UnitType.Protoss_Nexus),
+    new BuildableUnit(UnitType.Protoss_Gateway),
+    new BuildableUnit(UnitType.Protoss_Gateway)
   )
   
   children.set(List(

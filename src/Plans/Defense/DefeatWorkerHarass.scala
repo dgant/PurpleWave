@@ -1,6 +1,6 @@
 package Plans.Defense
 
-import Global.Combat.Commands.Control
+import Global.Combat.Commands.DefaultBehavior
 import Plans.Allocation.LockUnits
 import Plans.Plan
 import Startup.With
@@ -34,7 +34,7 @@ class DefeatWorkerHarass extends Plan {
     _defenders.values.foreach(defenders => {
       defenders.onFrame
       if (defenders.isComplete) {
-        defenders.units.foreach(defender => With.commander.intend(new Intention(this, defender, Control, defender.tileCenter)))
+        defenders.units.foreach(defender => With.commander.intend(new Intention(this, defender, DefaultBehavior, defender.tileCenter)))
       }
     })
   }

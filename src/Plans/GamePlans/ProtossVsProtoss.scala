@@ -74,6 +74,7 @@ class ProtossVsProtoss extends Parallel {
     new JustOnce { child.set(new ScheduleBuildOrder { buildables.set(_fourGateGoons) }) },
     new BuildPylonsContinuously,
     new BuildWorkersContinuously,
+    new TrainContinuously(UnitType.Protoss_Scout),
     new TrainContinuously(UnitType.Protoss_Zealot),
     new ScheduleBuildOrder { buildables.set(MassScoutLateGame.build) },
     new FollowBuildOrder,

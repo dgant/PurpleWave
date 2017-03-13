@@ -32,6 +32,7 @@ case object EnrichUnitType {
     }
     
     def totalCost: Int = { unitType.mineralPrice + unitType.gasPrice }
+    def orderable:Boolean = ! Set(UnitType.Protoss_Interceptor, UnitType.Protoss_Scarab).contains(unitType)
     def isMinerals:Boolean = unitType.isMineralField
     def isGas:Boolean = List(UnitType.Resource_Vespene_Geyser, UnitType.Terran_Refinery, UnitType.Protoss_Assimilator, UnitType.Zerg_Extractor).contains(unitType)
     def isTownHall:Boolean = Set(

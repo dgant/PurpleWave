@@ -52,10 +52,11 @@ class PositionSimpleBuilding(
   }
   
   def _positionTownHall:Option[TilePosition] = {
-    val candidates = With.geography.townHallPositions.filter(basePosition => {
-      val rectangle = new TileRectangle(basePosition, basePosition.add(buildingType.tileSize))
-      With.units.all.filter(_.utype.isBuilding).forall( ! _.tileArea.intersects(rectangle))
-    })
+    val candidates = With.geography.townHallPositions
+      .filter(basePosition => {
+        val rectangle = new TileRectangle(basePosition, basePosition.add(buildingType.tileSize))
+        With.units.all.filter(_.utype.isBuilding).forall( ! _.tileArea.intersects(rectangle))
+      })
   
     return if (candidates.isEmpty)
       None

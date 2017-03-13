@@ -93,6 +93,7 @@ class GatherMinerals extends Plan {
       if (worker.isCarryingMinerals || worker.isCarryingGas) {
         //Can't spam return cargo
         if (worker.command.getUnitCommandType != UnitCommandType.Return_Cargo || ! worker.isMoving) {
+          //TODO: Krasi0 recommends right clicking CC instead; may stop them from getting stuck
           worker.baseUnit.returnCargo()
         }
       }

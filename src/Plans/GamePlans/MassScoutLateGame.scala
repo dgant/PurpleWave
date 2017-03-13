@@ -26,8 +26,8 @@ object MassScoutLateGame {
     new BuildableUpgrade(UpgradeType.Protoss_Air_Armor, 2),
     new BuildableUnit(UnitType.Protoss_Nexus),
     new BuildableUnit(UnitType.Protoss_Assimilator),
-    new BuildableUnit(UnitType.Protoss_Stargate),
-    new BuildableUnit(UnitType.Protoss_Stargate),
+    new BuildableUnit(UnitType.Protoss_Gateway),
+    new BuildableUnit(UnitType.Protoss_Gateway),
     new BuildableUnit(UnitType.Protoss_Stargate),
     new BuildableUnit(UnitType.Protoss_Stargate)
   )

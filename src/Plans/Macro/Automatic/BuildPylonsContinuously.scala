@@ -32,9 +32,9 @@ class BuildPylonsContinuously extends TrainContinuously(UnitType.Protoss_Pylon) 
     val supplyPerDepot            = With.game.self.getRace.getSupplyProvider.supplyProvided
     val currentSupplyOfNexus      = With.units.ours.filter(_.utype != pylon).toSeq.map(_.utype.supplyProvided).sum
     val currentSupplyUsed         = With.game.self.supplyUsed
-    val unitSpendingRatio         = 0.5
+    val unitSpendingRatio         = 0.75
     val costPerUnitSupply         = 25.0
-    val depotCompletionFrames     = pylon.buildTime + 24 * 4 //Add a few seconds to account for builder transit time
+    val depotCompletionFrames     = pylon.buildTime + 24 * 8 //Add a few seconds to account for builder transit time
     val incomePerMinute           = With.economy.ourMineralIncomePerMinute + With.economy.ourGasIncomePerMinute
     val incomePerFrame            = incomePerMinute / 60.0 / 24.0
     val supplyUsedPerFrame        = incomePerFrame * unitSpendingRatio / costPerUnitSupply
@@ -44,7 +44,6 @@ class BuildPylonsContinuously extends TrainContinuously(UnitType.Protoss_Pylon) 
     val additionalDepotsRequired          = Math.ceil((supplyUsedWhenDepotWouldFinish - currentSupplyOfNexus) / supplyPerDepot).toInt
     val pylonsRequired                    = Math.max(0, additionalDepotsRequired)
   
-    //Hack
-    return Math.min(pylonsRequired, With.units.ours.count(_.utype == pylon) + 2)
+    return pylonsRequired
   }
 }

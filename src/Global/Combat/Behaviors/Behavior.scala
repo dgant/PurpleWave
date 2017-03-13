@@ -1,4 +1,4 @@
-package Global.Combat.Commands
+package Global.Combat.Behaviors
 
 import Types.Intents.Intention
 

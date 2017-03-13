@@ -12,5 +12,5 @@ class DefendChoke extends ControlPosition {
   units.get.unitMatcher.set(UnitMatchWarriors)
   units.get.unitCounter.set(UnitCountEverything)
   
-  override def drawOverlay() =position.get.find.map(p => With.game.drawCircleMap(p.centerPixel, 64, Color.Green))
+  override def drawOverlay() = position.get.find.map(p => With.game.drawCircleMap(p.centerPixel, 64, Color.Green))
 }

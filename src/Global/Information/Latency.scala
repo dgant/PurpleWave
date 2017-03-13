@@ -16,7 +16,8 @@ class Latency {
     var shouldWeRun =
       With.game.getFrameCount < 5 * With.game.getLatencyFrames ||
       With.game.getRemainingLatencyFrames == Math.max(minTurnSize, minRemainingLatencyFrames) ||
-      With.game.getFrameCount - lastRunFrame > With.game.getLatencyFrames
+      With.game.getFrameCount - lastRunFrame > With.game.getLatencyFrames ||
+      With.game.isPaused
     if (shouldWeRun) lastRunFrame = With.game.getFrameCount
     shouldWeRun
   }

@@ -19,7 +19,9 @@ class ForeignUnitInfo(_baseUnit:bwapi.Unit) extends UnitInfo (_baseUnit) {
   var _unitType           = UnitType.None
   var _complete           = false
   var _flying             = false
+  var _visible            = false
   var _cloaked            = false
+  var _burrowed           = false
   var _detected           = false
   var _morphing           = false
   var _invincible         = false
@@ -47,7 +49,9 @@ class ForeignUnitInfo(_baseUnit:bwapi.Unit) extends UnitInfo (_baseUnit) {
     _unitType           = unit.getType
     _complete           = unit.isCompleted
     _flying             = unit.isFlying
+    _visible            = unit.isVisible
     _cloaked            = unit.isCloaked
+    _burrowed           = unit.isBurrowed
     _detected           = unit.isDetected
     _morphing           = unit.isMorphing
     _invincible         = unit.isInvincible
@@ -80,8 +84,9 @@ class ForeignUnitInfo(_baseUnit:bwapi.Unit) extends UnitInfo (_baseUnit) {
   override def utype                : UnitType        = if (_unitType == UnitType.Terran_Siege_Tank_Tank_Mode && (morphing || ! visible)) UnitType.Terran_Siege_Tank_Siege_Mode else _unitType
   override def complete             : Boolean         = _complete
   override def flying               : Boolean         = _flying
-  override def visible              : Boolean         = lastSeen >= With.game.getFrameCount
+  override def visible              : Boolean         = _visible
   override def cloaked              : Boolean         = _cloaked
+  override def burrowed             : Boolean         = _burrowed
   override def detected             : Boolean         = _detected
   override def morphing             : Boolean         = _morphing
   override def invincible           : Boolean         = _invincible

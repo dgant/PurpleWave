@@ -36,7 +36,9 @@ class FollowBuildOrder extends Plan {
     _queue = With.scheduler.queue
     val buildsNeeded = _queue.groupBy(x => x).map(group => (group._1, group._2.size))
     buildsNeeded.keys.foreach(build => {
-      if ( ! _plans.contains(build)) _plans.put(build, new ListBuffer[Plan])
+      if ( ! _plans.contains(build)) {
+        _plans.put(build, new ListBuffer[Plan])
+      }
       while (_plans(build).size < buildsNeeded(build)) {
         _plans(build).append(_buildPlan(build))
       }

@@ -22,6 +22,7 @@ abstract class UnitInfo (var baseUnit:bwapi.Unit) {
   def flying:Boolean
   def visible:Boolean
   def cloaked:Boolean
+  def burrowed:Boolean
   def detected:Boolean
   def morphing:Boolean
   def invincible:Boolean

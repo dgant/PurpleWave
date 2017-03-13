@@ -5,7 +5,6 @@ import Types.Buildable.{Buildable, BuildableUnit}
 import bwapi.{TechType, UnitType, UpgradeType}
 
 import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
 
 class ScheduleSimulationState(
   var frame               : Int,
@@ -16,7 +15,7 @@ class ScheduleSimulationState(
   var unitsAvailable      : mutable.HashMap[UnitType, Int],
   var techsOwned          : mutable.Set[TechType],
   var upgradeLevels       : mutable.Map[UpgradeType, Int],
-  val eventQueue          : mutable.Set[SimulationEvent],
+  val eventQueue          : mutable.SortedSet[SimulationEvent],
   val isDisposableCopy    : Boolean = false) {
 
   def disposableCopy:ScheduleSimulationState =
@@ -46,21 +45,21 @@ class ScheduleSimulationState(
   
   def framesBeforeMinerals(buildable: Buildable):Int = framesBeforeResource(
     buildable,
-    current = minerals,
-    needed  = buildable.minerals,
-    rate    = mineralsPerFrame)
+    current     = minerals,
+    needed      = buildable.minerals,
+    rate        = mineralsPerFrame)
   
   def framesBeforeGas(buildable: Buildable):Int = framesBeforeResource(
     buildable,
-    current = gas,
-    needed  = buildable.gas,
-    rate    = gasPerFrame)
+    current     = gas,
+    needed      = buildable.gas,
+    rate        = gasPerFrame)
   
   def framesBeforeResource(
-    buildable: Buildable,
-    current: Int,
-    needed: Int,
-    rate: Double):Int = {
+    buildable:  Buildable,
+    current:    Int,
+    needed:     Int,
+    rate:       Double):Int = {
     if (current >= needed)               return 0
     if (current <  needed && rate <= 0)  return never
     Math.max(0, Math.ceil((needed - current)/rate)).toInt
@@ -77,36 +76,37 @@ class ScheduleSimulationState(
   }
   
   def unmetRequirements(buildable: Buildable): Iterable[Buildable] = {
-    val output = new ListBuffer[Buildable]
     val units  = new mutable.HashMap[UnitType, Int]
-    buildable.requirements.foreach(requirement => {
-      requirement.unitOption.foreach(unit => units.put(unit, 1 + units.getOrElse(unit, 0)))
-      var unmet = false
-      unmet ||= requirement.techOption    .exists(tech    => ! techsOwned.contains(tech))
-      unmet ||= requirement.upgradeOption .exists(upgrade => upgradeLevels.getOrElse(upgrade, 0) < requirement.upgradeLevel)
-      unmet ||= requirement.unitOption    .exists(unit    => unitsOwned.getOrElse(unit, 0)       < units(unit))
-      if (unmet) output.append(requirement)
-    })
-    output
+    buildable.requirements
+      .map(requirement => {
+        requirement.unitOption.foreach(unit => units.put(unit, 1 + units.getOrElse(unit, 0)))
+        var unmet = false
+        unmet ||= requirement.techOption    .exists(tech    => ! techsOwned.contains(tech))
+        unmet ||= requirement.upgradeOption .exists(upgrade => upgradeLevels.getOrElse(upgrade, 0)  < requirement.upgradeLevel)
+        unmet ||= requirement.unitOption    .exists(unit    => owned(unit) < units(unit))
+        if (unmet) Some(requirement) else None
+      })
+      .filter(_.isDefined)
+      .map(_.get)
   }
   
   def unmetBuilders(buildable: Buildable): Iterable[Buildable] = {
-    val output = new ListBuffer[Buildable]
     val buildersRequired  = new mutable.HashMap[UnitType, Int]
-    buildable.buildersOccupied.foreach(builder => {
-      builder.unitOption.foreach(unit => buildersRequired.put(unit, 1 + buildersRequired.getOrElse(unit, 0)))
-      var unmet = false
-      unmet ||= builder.unitOption.exists(unit => unitsAvailable.getOrElse(unit, 0) < buildersRequired(unit))
-      if (unmet) output.append(builder)
-    })
-    output
+    buildable.buildersOccupied
+      .map(builder => {
+        builder.unitOption.foreach(unit => buildersRequired.put(unit, 1 + buildersRequired.getOrElse(unit, 0)))
+        if (builder.unitOption.exists(unit => available(unit) < buildersRequired(unit)))
+          Some(builder) else None
+      })
+      .filter(_.isDefined)
+      .map(_.get)
   }
   
   def mineralsPerFrame : Double  = With.economy.mineralIncomePerMinute (numberOfMiners,   numberOfBases) / 24.0 / 60.0
   def gasPerFrame      : Double  = With.economy.gasIncomePerMinute     (numberOfDrillers, numberOfBases) / 24.0 / 60.0
   
-  def owned(unitType: UnitType)     : Int = unitsOwned      .get(unitType).getOrElse(0)
-  def available(unitType: UnitType) : Int = unitsAvailable  .get(unitType).getOrElse(0)
+  def owned     (unitType: UnitType) : Int = unitsOwned      .get(unitType).getOrElse(0)
+  def available (unitType: UnitType) : Int = unitsAvailable  .get(unitType).getOrElse(0)
   def numberOfBases     : Int = List(UnitType.Terran_Command_Center, UnitType.Protoss_Nexus, UnitType.Zerg_Hatchery, UnitType.Zerg_Lair, UnitType.Zerg_Hive).map(owned).sum
   def numberOfWorkers   : Int = List(UnitType.Terran_SCV, UnitType.Protoss_Probe, UnitType.Zerg_Drone).map(available).sum
   def numberOfMiners    : Int = Math.max(0, numberOfWorkers - numberOfDrillers)
@@ -121,33 +121,30 @@ class ScheduleSimulationState(
   // Running the simulation //
   ////////////////////////////
   
-  def isInTheFuture (someFrame: Int):Boolean = someFrame > frame
+  def isInTheFuture(someFrame: Int):Boolean = someFrame > frame
   
-  def tryBuilding(buildable: Buildable, maxFrames:Int): ScheduleSimulationBuildResult = {
+  def simulateBuilding(buildable: Buildable, maxFrames:Int): ScheduleSimulationBuildResult = {
     if (isBuildableNow(buildable)) {
       val event = new SimulationEvent(buildable, frame, frame + buildable.frames)
-      val future = disposableCopy
-      future.eventQueue.add(event)
-      if (future.allFutureEventsAreBuildableOnTime) {
+      val futureWithThisEvent = disposableCopy
+      futureWithThisEvent.eventQueue.add(event)
+      if (futureWithThisEvent.allEventsStillBuildableOnTime) {
         return new ScheduleSimulationBuildResult(Some(event))
       }
     }
   
     val nextFrame = nextInterestingFrame(Some(buildable))
-    if (nextFrame > maxFrames)
-      return new ScheduleSimulationBuildResult(
-        None,
-        unmetPrerequisites(buildable))
+    if (nextFrame > maxFrames) return new ScheduleSimulationBuildResult(None, exceededSearchDepth = true)
     
     val nextState = if (isDisposableCopy) this else disposableCopy
     nextState.fastForward(nextFrame)
-    nextState.tryBuilding(buildable, maxFrames)
+    nextState.simulateBuilding(buildable, maxFrames)
   }
   
-  def allFutureEventsAreBuildableOnTime:Boolean = {
+  def allEventsStillBuildableOnTime:Boolean = {
+    if ( ! eventsStarting.forall(event => isBuildableNow(event.buildable))) return false
     while(nextInterestingFrame() < never)
-      if ( ! fastForward(nextInterestingFrame(), testIntegrity = true))
-        return false
+      if ( ! fastForward(nextInterestingFrame(), testIntegrity = true)) return false
     return true
   }
   
@@ -172,7 +169,7 @@ class ScheduleSimulationState(
       if (testIntegrity) allEventsStillBuildable &&= isBuildableNow(event.buildable)
       startEvent(event)
     })
-    val eventsNowEnding   = eventsEnding
+    val eventsNowEnding = eventsEnding
     eventsNowEnding.foreach(endEvent)
     eventsNowEnding.foreach(eventQueue.remove)
     
@@ -224,8 +221,8 @@ class ScheduleSimulationState(
     buildable.buildersConsumed.foreach(builder => unitsOwned(builder.unit) -= 1)
   }
   
-  def addOwnedUnit(unitType: UnitType)                = unitsOwned.put     (unitType, 1 + unitsOwned.getOrElse(unitType, 0))
-  def addAvailableUnit(unitType: UnitType)            = unitsAvailable.put (unitType, 1 + unitsAvailable.getOrElse(unitType, 0))
+  def addOwnedUnit(unitType: UnitType)                = unitsOwned.put     (unitType, 1 + owned(unitType))
+  def addAvailableUnit(unitType: UnitType)            = unitsAvailable.put (unitType, 1 + available(unitType))
   def addTech(techType: TechType)                     = techsOwned.add     (techType)
   def addUpgrade(upgradeType: UpgradeType, level:Int) = upgradeLevels.put  (upgradeType, level)
 }

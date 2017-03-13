@@ -11,14 +11,14 @@ class Configuration {
   var cameraDynamicSpeedMin       = 30
   var cameraDynamicSpeedMax       = 0
   
-  var enableOverlay               = false
+  var enableOverlay               = true
   var enableOverlayBattles        = false
   var enableOverlayEconomy        = false
   var enableOverlayGrids          = false
   var enableOverlayPlans          = false
   var enableOverlayResources      = false
-  var enableOverlayScheduler      = false
-  var enableOverlayTerrain        = true
+  var enableOverlayScheduler      = true
+  var enableOverlayTerrain        = false
   var enableOverlayTrackedUnits   = false
-  var enableOverlayUnits          = true
+  var enableOverlayUnits          = false
 }

@@ -1,6 +1,6 @@
 package Plans.Information
 
-import Global.Combat.Commands.DefaultBehavior
+import Global.Combat.Behaviors.DefaultBehavior
 import Plans.Allocation.LockUnits
 import Plans.Plan
 import Startup.With

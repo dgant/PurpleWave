@@ -1,7 +1,7 @@
 package Plans.Macro.Build
 
 import Development.TypeDescriber
-import Global.Combat.Commands.DefaultBehavior
+import Global.Combat.Behaviors.DefaultBehavior
 import Plans.Allocation.{LockCurrencyForUnit, LockUnits}
 import Plans.Plan
 import Startup.With

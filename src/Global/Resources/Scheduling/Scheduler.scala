@@ -31,7 +31,7 @@ class Scheduler {
   def onFrame() {
     _requests.keySet.diff(_recentlyUpdated).foreach(_requests.remove)
     _recentlyUpdated.clear()
-    //simulationResults = ScheduleSimulator.simulate
+    simulationResults = ScheduleSimulator.simulate
   }
   
   def _isFulfilled(
@@ -39,7 +39,7 @@ class Scheduler {
     unitsWanted:mutable.HashMap[UnitType, Int],
     unitsActual:Map[UnitType, Int]):Boolean = {
     if (buildable.upgradeOption.nonEmpty) {
-      return With.game.self.getUpgradeLevel(buildable.upgradeOption.get) >= buildable.upgradeLevel
+      return With.game.self .getUpgradeLevel(buildable.upgradeOption.get) >= buildable.upgradeLevel
     }
     else if (buildable.techOption.nonEmpty) {
       return With.game.self.hasResearched(buildable.techOption.get)

@@ -1,10 +1,10 @@
 package Global.Combat
 
-import Global.Combat.Commands.Behavior
+import Global.Combat.Behaviors.Behavior
 import Startup.With
 import Types.Intents.Intention
 import Types.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import bwapi.Position
+import bwapi.{Position, UnitType}
 
 import scala.collection.mutable
 
@@ -35,6 +35,24 @@ class Commander {
   def move(unit:FriendlyUnitInfo, position:Position) {
     //_recordCommand(unit, command)
     unit.baseUnit.move(position)
+    _sleep(unit, false)
+  }
+  
+  def gather(unit:FriendlyUnitInfo, resource:UnitInfo) {
+    //_recordCommand(unit, command)
+    unit.baseUnit.gather(resource.baseUnit)
+    _sleep(unit, false)
+  }
+  
+  def buildScarab(unit:FriendlyUnitInfo) {
+    //_recordCommand(unit, command)
+    unit.baseUnit.build(UnitType.Protoss_Scarab)
+    _sleep(unit, false)
+  }
+  
+  def buildInterceptor(unit:FriendlyUnitInfo) {
+    //_recordCommand(unit, command)
+    unit.baseUnit.build(UnitType.Protoss_Interceptor)
     _sleep(unit, false)
   }
   

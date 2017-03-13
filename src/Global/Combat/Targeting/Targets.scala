@@ -11,6 +11,6 @@ object Targets {
       .filter(_.alive)
       .filter(_.visible)
       .filterNot(_.invincible)
-      .filter(target => target.detected || ! target.cloaked)
+      .filter(target => target.detected || ( ! target.cloaked && ! target.burrowed ))
   }
 }

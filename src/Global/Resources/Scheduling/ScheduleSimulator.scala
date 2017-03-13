@@ -7,8 +7,8 @@ import scala.collection.mutable
 
 object ScheduleSimulator {
 
-  val maxDepthBuildables = 30
-  val maxDepthFrames = 24 * 60 * 5
+  val maxDepthBuildables = 200
+  val maxDepthFrames = 24 * 60 * 2
   
   def simulate:ScheduleSimulationResult = {
     val currentState = ScheduleSimulationStateBuilder.build
@@ -20,18 +20,22 @@ object ScheduleSimulator {
     while (index < buildableQueue.size && index < maxDepthBuildables) {
       
       val nextBuildable = buildableQueue(index)
-      val build = currentState.tryBuilding(nextBuildable, maxDepthFrames + With.game.getFrameCount)
+      val build = currentState.simulateBuilding(nextBuildable, maxDepthFrames + With.game.getFrameCount)
   
       if (build.buildEvent.isDefined) {
         val buildEvent = build.buildEvent.get
         eventsPlanned += buildEvent
         currentState.eventQueue.add(buildEvent)
         //Kind of a hack: Reserve resources, but not units (because I haven't figured out how to reserve units yet)
-        currentState.spendResources(buildEvent.buildable)
+        currentState.spendResources(buildEvent.buildable) //We should delete this, right? Because the simulation will spend them again whenn we process the event start
         index += 1
       }
       else if (build.unmetPrerequisites.nonEmpty) {
         buildableQueue = insertAt(buildableQueue, build.unmetPrerequisites, index)
+      }
+      else if ( ! build.exceededSearchDepth) {
+        //We timed out, which is fine.
+        index += 1
       }
       else {
         buildablesImpossible += nextBuildable

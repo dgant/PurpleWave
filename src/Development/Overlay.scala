@@ -172,21 +172,27 @@ object Overlay {
       .sortBy(_.frameEnd)
       .take(20)
       .map(event => List(event.toString.split("\\s+")(0), _reframe(event.frameStart), _reframe(event.frameEnd))))
-    With.game.drawTextScreen(300, 85, "Simulated events")
-    _drawTable(300, 100, With.scheduler.simulationResults.simulatedEvents
+    With.game.drawTextScreen(300, 85, "Started")
+    _drawTable(300, 100, With.scheduler.simulationResults.simulatedEvents.filter(e => e.frameStart == 0 && ! e.isImplicit)
       .toList
       .sortBy(_.buildable.toString)
       .sortBy(_.frameStart)
       .sortBy(_.frameEnd)
       .take(20)
       .map(event => List(event.toString.split("\\s+")(0), _reframe(event.frameStart), _reframe(event.frameEnd))))
-    With.game.drawTextScreen(500, 85, "Unbuildable")
-    With.game.drawTextScreen(500, 100, With.scheduler.simulationResults.unbuildable.map(_.toString).mkString("\n"))
+    With.game.drawTextScreen(500, 85, "All")
+    _drawTable(500, 100, With.scheduler.simulationResults.simulatedEvents
+      .toList
+      .sortBy(_.buildable.toString)
+      .sortBy(_.frameStart)
+      .sortBy(_.frameEnd)
+      .take(20)
+      .map(event => List(event.toString.split("\\s+")(0), _reframe(event.frameStart), _reframe(event.frameEnd))))
   }
   
   def _reframe(frameAbsolute:Int):String = {
-    val reframed = frameAbsolute - With.game.getFrameCount
-    if (reframed <= 0) "Started" else reframed.toString
+    val reframed = (frameAbsolute - With.game.getFrameCount)/24
+    if (reframed < 0) "Started" else reframed.toString
   }
   
   def _drawTable(startX:Int, startY:Int, cells:Iterable[Iterable[String]]) {

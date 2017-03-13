@@ -22,6 +22,7 @@ class FriendlyUnitInfo(_baseUnit:bwapi.Unit) extends UnitInfo(_baseUnit) {
   override def cloaked                    : Boolean             = baseUnit.isCloaked
   override def detected                   : Boolean             = baseUnit.isDetected
   override def morphing                   : Boolean             = baseUnit.isMorphing
+  override def burrowed                   : Boolean             = baseUnit.isBurrowed
   override def invincible                 : Boolean             = baseUnit.isInvincible
   override def top                        : Int                 = baseUnit.getTop
   override def left                       : Int                 = baseUnit.getLeft
@@ -34,7 +35,10 @@ class FriendlyUnitInfo(_baseUnit:bwapi.Unit) extends UnitInfo(_baseUnit) {
   def isMoving                            : Boolean             = baseUnit.isMoving
   def command                             : UnitCommand         = baseUnit.getLastCommand
   def cooldownRemaining                   : Int                 = Math.max(baseUnit.getGroundWeaponCooldown, baseUnit.getAirWeaponCooldown)
-  def onCooldown                          : Boolean             = cooldownRemaining > 0
+  def onCooldown                          : Boolean             = cooldownRemaining > 0 || ! canFight
+  def energy                              : Int                 = baseUnit.getEnergy
+  def scarabs                             : Int                 = baseUnit.getScarabCount
+  def interceptors                        : Int                 = baseUnit.getInterceptorCount
   def getBuildUnit                        : Option[UnitInfo]    = With.units.getUnit(baseUnit.getBuildUnit)
   def trainingQueue                       : Iterable[UnitType]  = baseUnit.getTrainingQueue.asScala
   def teching                             : TechType            = baseUnit.getTech

@@ -29,8 +29,9 @@ class MovementProfile(
     .product
   
   //TODO: Consolidate with TargetProfile
-  def weigh(value:Double, weight:Double):Double = Math.pow(value, weight)
+  def weigh(value:Double, weight:Double):Double = Math.pow(normalize(value), weight)
   def unboolify(value:Boolean)                  = if (value) 2 else 1
+  def normalize(value:Double)                   = Math.max(0, value)
   
   def travel(intent: Intention, candidate: TilePosition): Double = {
     val before = With.paths.groundDistance(intent.unit.tileCenter, intent.destination)

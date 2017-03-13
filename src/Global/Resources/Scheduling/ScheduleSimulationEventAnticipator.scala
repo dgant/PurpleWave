@@ -9,10 +9,7 @@ object ScheduleSimulationEventAnticipator {
   def anticipate:Iterable[SimulationEvent] = {
     With.units.ours.toList.flatten(unit => {
       List(
-        getUnitCompletion(unit, false, unit.framesBeforeBecomingComplete),
-        getUnitCompletion(unit, true,  unit.framesBeforeBuildeeComplete),
-        getUnitCompletion(unit, true,  unit.framesBeforeTechComplete),
-        getUnitCompletion(unit, true,  unit.framesBeforeUpgradeComplete),
+        getUnitCompletion(unit, unit.framesBeforeBecomingComplete),
         getTechCompletion(unit),
         getUpgradeCompletion(unit)
       ).flatten
@@ -21,11 +18,10 @@ object ScheduleSimulationEventAnticipator {
   
   def getUnitCompletion(
    unit:FriendlyUnitInfo,
-   describesFreedomOfExistingUnit:Boolean,
    timeLeft:Int):
       Iterable[SimulationEvent] = {
     if (timeLeft <= 0) return List.empty
-    List(buildEvent(new BuildableUnit(unit.utype), timeLeft, describesFreedomOfExistingUnit))
+    List(buildEvent(new BuildableUnit(unit.utype), timeLeft))
   }
   
   def getTechCompletion(unit:FriendlyUnitInfo): Iterable[SimulationEvent] = {
@@ -44,12 +40,10 @@ object ScheduleSimulationEventAnticipator {
   
   def buildEvent(
     buildable:Buildable,
-    framesLeft:Int,
-    describesFreedomOfExistingUnit:Boolean = false)
+    framesLeft:Int)
       :SimulationEvent =
     new SimulationEvent(
       buildable,
       -1,
-      With.game.getFrameCount + framesLeft,
-      describesFreedomOfExistingUnit = describesFreedomOfExistingUnit)
+      With.game.getFrameCount + framesLeft)
 }

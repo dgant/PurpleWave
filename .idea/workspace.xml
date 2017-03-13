@@ -30,18 +30,18 @@
       <file leaf-file-name="ScheduleSimulationEventAnticipator.scala" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Global/Resources/Scheduling/ScheduleSimulationEventAnticipator.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="624">
-              <caret line="51" column="9" lean-forward="true" selection-start-line="51" selection-start-column="9" selection-end-line="51" selection-end-column="9" />
+            <state relative-caret-position="143">
+              <caret line="11" column="38" lean-forward="false" selection-start-line="11" selection-start-column="38" selection-end-line="11" selection-end-column="38" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Overlay.scala" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Overlay.scala" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Development/Overlay.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="221">
-              <caret line="176" column="60" lean-forward="false" selection-start-line="176" selection-start-column="60" selection-end-line="176" selection-end-column="60" />
+            <state relative-caret-position="150">
+              <caret line="176" column="57" lean-forward="false" selection-start-line="176" selection-start-column="57" selection-end-line="176" selection-end-column="57" />
               <folding />
             </state>
           </provider>
@@ -50,8 +50,8 @@
       <file leaf-file-name="ScheduleSimulator.scala" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Global/Resources/Scheduling/ScheduleSimulator.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="207">
-              <caret line="21" column="0" lean-forward="false" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
+            <state relative-caret-position="189">
+              <caret line="21" column="10" lean-forward="false" selection-start-line="21" selection-start-column="10" selection-end-line="21" selection-end-column="10" />
               <folding />
             </state>
           </provider>
@@ -67,11 +67,21 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ScheduleSimulationState.scala" pinned="false" current-in-tab="false">
+      <file leaf-file-name="ScheduleSimulationState.scala" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Global/Resources/Scheduling/ScheduleSimulationState.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="211">
-              <caret line="34" column="37" lean-forward="true" selection-start-line="34" selection-start-column="37" selection-end-line="34" selection-end-column="37" />
+            <state relative-caret-position="200">
+              <caret line="110" column="33" lean-forward="true" selection-start-line="110" selection-start-column="33" selection-end-line="110" selection-end-column="33" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="SimulationEvent.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Global/Resources/Scheduling/SimulationEvent.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="130">
+              <caret line="10" column="52" lean-forward="false" selection-start-line="10" selection-start-column="52" selection-end-line="10" selection-end-column="52" />
               <folding />
             </state>
           </provider>
@@ -90,8 +100,8 @@
       <file leaf-file-name="ScheduleSimulationStateBuilder.scala" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Global/Resources/Scheduling/ScheduleSimulationStateBuilder.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="299">
-              <caret line="23" column="64" lean-forward="false" selection-start-line="23" selection-start-column="64" selection-end-line="23" selection-end-column="64" />
+            <state relative-caret-position="156">
+              <caret line="12" column="75" lean-forward="true" selection-start-line="12" selection-start-column="75" selection-end-line="12" selection-end-column="75" />
               <folding />
             </state>
           </provider>
@@ -110,7 +120,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>Chok</find>
       <find>Red</find>
       <find>Green</find>
       <find>Workers</find>
@@ -140,6 +149,7 @@
       <find>templar</find>
       <find>implicit</find>
       <find>reframe</find>
+      <find>isInside</find>
     </findStrings>
     <replaceStrings>
       <replace>{  _mirror</replace>
@@ -204,13 +214,13 @@
         <option value="$PROJECT_DIR$/src/Global/Resources/Scheduling/Scheduler.scala" />
         <option value="$PROJECT_DIR$/src/Global/Information/Latency.scala" />
         <option value="$PROJECT_DIR$/src/Global/Resources/Scheduling/ScheduleSimulationBuildResult.scala" />
-        <option value="$PROJECT_DIR$/src/Global/Resources/Scheduling/SimulationEvent.scala" />
-        <option value="$PROJECT_DIR$/src/Global/Resources/Scheduling/ScheduleSimulationStateBuilder.scala" />
         <option value="$PROJECT_DIR$/src/Global/Combat/Movement/MovementProfile.scala" />
         <option value="$PROJECT_DIR$/src/Development/Logger.scala" />
+        <option value="$PROJECT_DIR$/src/Global/Resources/Scheduling/ScheduleSimulator.scala" />
+        <option value="$PROJECT_DIR$/src/Global/Resources/Scheduling/ScheduleSimulationStateBuilder.scala" />
         <option value="$PROJECT_DIR$/src/Global/Resources/Scheduling/ScheduleSimulationEventAnticipator.scala" />
         <option value="$PROJECT_DIR$/src/Global/Resources/Scheduling/ScheduleSimulationState.scala" />
-        <option value="$PROJECT_DIR$/src/Global/Resources/Scheduling/ScheduleSimulator.scala" />
+        <option value="$PROJECT_DIR$/src/Global/Resources/Scheduling/SimulationEvent.scala" />
         <option value="$PROJECT_DIR$/src/Development/Overlay.scala" />
       </list>
     </option>
@@ -749,7 +759,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="1596" y="68" width="1368" height="776" extended-state="6" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4473684" sideWeight="0.488125" order="6" side_tool="false" content_ui="tabs" />
@@ -761,10 +771,10 @@
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.0" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Problems" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32894737" sideWeight="0.4970588" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Run with VisualVM" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32894737" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.61519605" sideWeight="0.49411765" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.36988303" sideWeight="0.49411765" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.20514706" sideWeight="0.49117646" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.27794117" sideWeight="0.49117646" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Debug with VisualVM" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32748538" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -824,12 +834,12 @@
       <breakpoints-dialog>
         <breakpoints-dialog />
       </breakpoints-dialog>
-      <option name="time" value="1220" />
+      <option name="time" value="1224" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="Application">
         <watch expression="buildEvent" />
-        <watch expression="anticipate" language="Scala" />
+        <watch expression="ScheduleSimulationEventAnticipator.anticipate" language="Scala" />
       </configuration>
     </watches-manager>
   </component>
@@ -1138,14 +1148,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Global/Resources/Scheduling/SimulationEvent.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="234">
-          <caret line="18" column="69" lean-forward="false" selection-start-line="18" selection-start-column="69" selection-end-line="18" selection-end-column="69" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Global/Combat/Movement/MovementProfile.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="351">
@@ -1178,14 +1180,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Global/Resources/Scheduling/ScheduleSimulationStateBuilder.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="299">
-          <caret line="23" column="64" lean-forward="false" selection-start-line="23" selection-start-column="64" selection-end-line="23" selection-end-column="64" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Development/Logger.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="158">
@@ -1202,22 +1196,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Global/Resources/Scheduling/ScheduleSimulationState.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="211">
-          <caret line="34" column="37" lean-forward="true" selection-start-line="34" selection-start-column="37" selection-end-line="34" selection-end-column="37" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Global/Resources/Scheduling/ScheduleSimulationEventAnticipator.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="624">
-          <caret line="51" column="9" lean-forward="true" selection-start-line="51" selection-start-column="9" selection-end-line="51" selection-end-column="9" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Startup/Bot.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="457">
@@ -1226,18 +1204,50 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Global/Resources/Scheduling/ScheduleSimulator.scala">
+    <entry file="file://$PROJECT_DIR$/src/Global/Resources/Scheduling/ScheduleSimulationStateBuilder.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="207">
-          <caret line="21" column="0" lean-forward="false" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
+        <state relative-caret-position="156">
+          <caret line="12" column="75" lean-forward="true" selection-start-line="12" selection-start-column="75" selection-end-line="12" selection-end-column="75" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Global/Resources/Scheduling/SimulationEvent.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="130">
+          <caret line="10" column="52" lean-forward="false" selection-start-line="10" selection-start-column="52" selection-end-line="10" selection-end-column="52" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Development/Overlay.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="176" column="60" lean-forward="false" selection-start-line="176" selection-start-column="60" selection-end-line="176" selection-end-column="60" />
+        <state relative-caret-position="150">
+          <caret line="176" column="57" lean-forward="false" selection-start-line="176" selection-start-column="57" selection-end-line="176" selection-end-column="57" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Global/Resources/Scheduling/ScheduleSimulator.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="189">
+          <caret line="21" column="10" lean-forward="false" selection-start-line="21" selection-start-column="10" selection-end-line="21" selection-end-column="10" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Global/Resources/Scheduling/ScheduleSimulationEventAnticipator.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="143">
+          <caret line="11" column="38" lean-forward="false" selection-start-line="11" selection-start-column="38" selection-end-line="11" selection-end-column="38" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Global/Resources/Scheduling/ScheduleSimulationState.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="200">
+          <caret line="110" column="33" lean-forward="true" selection-start-line="110" selection-start-column="33" selection-end-line="110" selection-end-column="33" />
           <folding />
         </state>
       </provider>

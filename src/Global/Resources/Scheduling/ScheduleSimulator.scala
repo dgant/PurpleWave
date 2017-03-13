@@ -14,7 +14,7 @@ object ScheduleSimulator {
     val currentState = ScheduleSimulationStateBuilder.build
     var buildablesRequested = With.scheduler.queue.toArray
     val buildablesImpossible = new mutable.HashSet[Buildable]
-    val eventsPlanned = new mutable.HashSet[SimulationEvent]
+    val eventsPlanned = new mutable.PriorityQueue[SimulationEvent]
     
     var index = 0
     while (index < buildablesRequested.size && index < maxDepthBuildables) {

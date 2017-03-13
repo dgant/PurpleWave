@@ -198,8 +198,8 @@ class ScheduleSimulationState(
   private def endEvent(event: SimulationEvent) {
     val buildable = event.buildable
     supplyAvailable += buildable.supplyProvided
-    if ( ! event.describesFreedomOfExistingUnit) buildable.unitOption.foreach(addOwnedUnit)
-    buildable.unitOption.foreach(addAvailableUnit)
+    buildable.unitOption.foreach(addUnitOwned)
+    buildable.unitOption.foreach(addUnitAvailable)
     buildable.techOption.foreach(addTech)
     buildable.upgradeOption.foreach(addUpgrade(_, buildable.upgradeLevel))
   }
@@ -211,20 +211,18 @@ class ScheduleSimulationState(
   }
   
   private def reserveBuilders(buildable: Buildable) {
-    //TODO: Don't add builder back if it's consumed
     //TODO: Try to account for travel time
-    buildable.buildersOccupied.foreach(builder => {
-      unitsAvailable.put(builder.unit, -1 + unitsAvailable.getOrElse(builder.unit, 0))
-      eventQueue.add(new SimulationEvent(builder, frame, frame + buildable.frames, describesFreedomOfExistingUnit = true))
-    })
+    buildable.buildersOccupied.map(_.unit).foreach(subtractUnitAvailable)
   }
   
   private def spendBuilders(buildable: Buildable) {
-    buildable.buildersConsumed.foreach(builder => unitsOwned(builder.unit) -= 1)
+    buildable.buildersConsumed.map(_.unit).foreach(subtractUnitOwned)
   }
   
-  private def addOwnedUnit(unitType: UnitType)                = unitsOwned.put     (unitType, 1 + owned(unitType))
-  private def addAvailableUnit(unitType: UnitType)            = unitsAvailable.put (unitType, 1 + available(unitType))
+  private def subtractUnitOwned(unitType: UnitType)           = unitsOwned.put     (unitType, -1 + owned(unitType))
+  private def subtractUnitAvailable(unitType: UnitType)       = unitsAvailable.put (unitType, -1 + available(unitType))
+  private def addUnitOwned(unitType: UnitType)                = unitsOwned.put     (unitType,  1 + owned(unitType))
+  private def addUnitAvailable(unitType: UnitType)            = unitsAvailable.put (unitType,  1 + available(unitType))
   private def addTech(techType: TechType)                     = techsOwned.add     (techType)
   private def addUpgrade(upgradeType: UpgradeType, level:Int) = upgradeLevels.put  (upgradeType, level)
 }

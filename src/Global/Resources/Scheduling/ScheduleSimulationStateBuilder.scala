@@ -24,7 +24,7 @@ object ScheduleSimulationStateBuilder {
       eventQueue      = ScheduleSimulationEventAnticipator.anticipate.to[mutable.SortedSet])
     
     //This should happen in stable order! The alternative is flickering
-    output.eventQueue.foreach(output.startInitialEvent)
+    output.eventQueue.foreach(output.assumeEvent)
     output
   }
   

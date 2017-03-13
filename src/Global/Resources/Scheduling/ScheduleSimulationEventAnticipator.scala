@@ -49,7 +49,7 @@ object ScheduleSimulationEventAnticipator {
       :SimulationEvent =
     new SimulationEvent(
       buildable,
-      0,
+      -1,
       With.game.getFrameCount + framesLeft,
       describesFreedomOfExistingUnit = describesFreedomOfExistingUnit)
 }

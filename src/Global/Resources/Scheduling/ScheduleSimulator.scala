@@ -7,37 +7,42 @@ import scala.collection.mutable
 
 object ScheduleSimulator {
 
-  val maxDepthBuildables = 200
+  val maxDepthBuildables = 50
   val maxDepthFrames = 24 * 60 * 2
   
   def simulate:ScheduleSimulationResult = {
     val currentState = ScheduleSimulationStateBuilder.build
-    var buildableQueue = With.scheduler.queue.toArray
+    var buildablesRequested = With.scheduler.queue.toArray
+    val buildablesImpossible = new mutable.HashSet[Buildable]
     val eventsPlanned = new mutable.HashSet[SimulationEvent]
-    val buildablesImpossible = new mutable.ListBuffer[Buildable]
-  
+    
     var index = 0
-    while (index < buildableQueue.size && index < maxDepthBuildables) {
+    while (index < buildablesRequested.size && index < maxDepthBuildables) {
       
-      val nextBuildable = buildableQueue(index)
-      val build = currentState.tryBuilding(nextBuildable, maxDepthFrames + With.game.getFrameCount)
+      val nextBuildable = buildablesRequested(index)
+      index += 1
+      
+      if (buildablesImpossible.contains(nextBuildable)) {
+        //We already know we can't build this, so don't waste time trying :)
+      }
+      else
+      {
+        val build = currentState.tryBuilding(nextBuildable, maxDepthFrames + With.game.getFrameCount)
   
-      if (build.buildEvent.isDefined) {
-        val buildEvent = build.buildEvent.get
-        eventsPlanned += buildEvent
-        currentState.startEvent(buildEvent)
-        index += 1
-      }
-      else if (build.unmetPrerequisites.nonEmpty) {
-        buildableQueue = insertAt(buildableQueue, build.unmetPrerequisites, index)
-      }
-      else if ( ! build.exceededSearchDepth) {
-        //We timed out, which is fine.
-        index += 1
-      }
-      else {
-        buildablesImpossible += nextBuildable
-        index += 1
+        if (build.buildEvent.isDefined) {
+          val buildEvent = build.buildEvent.get
+          eventsPlanned += buildEvent
+          currentState.assumeEvent(buildEvent)
+    
+        }
+        else if (build.unmetPrerequisites.nonEmpty) {
+          buildablesRequested = insertAt(buildablesRequested, build.unmetPrerequisites, index)
+          index -= 1
+        }
+        else if ( ! build.exceededSearchDepth) {
+          buildablesImpossible.add(nextBuildable)
+        }
+        //Otherwise, the build was impossible.
       }
     }
   

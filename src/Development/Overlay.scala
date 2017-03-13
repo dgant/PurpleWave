@@ -164,17 +164,17 @@ object Overlay {
     
     With.game.drawTextScreen(0, 85, "Build queue")
     _drawTable(0, 100, With.scheduler.queue.take(20).map(buildable => List(buildable.toString)))
-    With.game.drawTextScreen(150, 85, "Simulated queue")
+    With.game.drawTextScreen(150, 85, "Next to build")
     _drawTable(150, 100, With.scheduler.simulationResults.suggestedEvents
       .toList
       .sortBy(_.buildable.toString)
-      .sortBy(_.frameStart)
       .sortBy(_.frameEnd)
+      .sortBy(_.frameStart)
       .take(20)
       .map(event => List(event.toString.split("\\s+")(0), _reframe(event.frameStart), _reframe(event.frameEnd))))
     With.game.drawTextScreen(300, 85, "Started")
     _drawTable(300, 100, With.scheduler.simulationResults.simulatedEvents
-      .filter(e => e.frameStart == 0 && ! e.describesFreedomOfExistingUnit)
+      .filter(e => e.frameStart < With.game.getFrameCount && ! e.describesFreedomOfExistingUnit)
       .toList
       .sortBy(_.buildable.toString)
       .sortBy(_.frameStart)

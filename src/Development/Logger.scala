@@ -12,7 +12,7 @@ class Logger {
   
   val _logMessages = new ListBuffer[String]
   
-  def onEnd() {
+  def flush() {
     val opponents = With.game.getPlayers.asScala
       .filter(_ != With.game.self)
       .filter(_ != With.game.neutral)

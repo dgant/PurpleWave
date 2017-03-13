@@ -21,7 +21,7 @@ class MovementProfile(
       weigh(  mobility    (intent, candidate) / 10  , preferMobility),
       weigh(  highGround  (intent, candidate)       , preferHighGround),
       weigh(  grouping    (intent, candidate) / 100 , preferGrouping),
-      weigh(  enemyDamage (intent, candidate) / 10 , -avoidDamage),
+      weigh(  enemyDamage (intent, candidate) / 100 , -avoidDamage),
       weigh(  traffic     (intent, candidate)       , -avoidTraffic),
       weigh(  visibility  (intent, candidate)       , -avoidVision),
       weigh(  detection   (intent, candidate)       , -avoidDetection)

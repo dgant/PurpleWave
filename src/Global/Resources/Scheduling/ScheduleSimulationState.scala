@@ -123,26 +123,25 @@ class ScheduleSimulationState(
   
   def isInTheFuture(someFrame: Int):Boolean = someFrame > frame
   
-  def simulateBuilding(buildable: Buildable, maxFrames:Int): ScheduleSimulationBuildResult = {
+  def tryBuilding(buildable: Buildable, maxFrames:Int): TryBuildingResult = {
     if (isBuildableNow(buildable)) {
       val event = new SimulationEvent(buildable, frame, frame + buildable.frames)
       val futureWithThisEvent = disposableCopy
       futureWithThisEvent.eventQueue.add(event)
       if (futureWithThisEvent.allEventsStillBuildableOnTime) {
-        return new ScheduleSimulationBuildResult(Some(event))
+        return new TryBuildingResult(Some(event))
       }
     }
   
     val nextFrame = nextInterestingFrame(Some(buildable))
-    if (nextFrame > maxFrames) return new ScheduleSimulationBuildResult(None, exceededSearchDepth = true)
+    if (nextFrame > maxFrames) return new TryBuildingResult(None, exceededSearchDepth = true)
     
     val nextState = if (isDisposableCopy) this else disposableCopy
     nextState.fastForward(nextFrame)
-    nextState.simulateBuilding(buildable, maxFrames)
+    nextState.tryBuilding(buildable, maxFrames)
   }
   
   def allEventsStillBuildableOnTime:Boolean = {
-    if ( ! eventsStarting.forall(event => isBuildableNow(event.buildable))) return false
     while(nextInterestingFrame() < never)
       if ( ! fastForward(nextInterestingFrame(), testIntegrity = true)) return false
     return true

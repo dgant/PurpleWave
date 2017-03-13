@@ -20,14 +20,12 @@ object ScheduleSimulator {
     while (index < buildableQueue.size && index < maxDepthBuildables) {
       
       val nextBuildable = buildableQueue(index)
-      val build = currentState.simulateBuilding(nextBuildable, maxDepthFrames + With.game.getFrameCount)
+      val build = currentState.tryBuilding(nextBuildable, maxDepthFrames + With.game.getFrameCount)
   
       if (build.buildEvent.isDefined) {
         val buildEvent = build.buildEvent.get
         eventsPlanned += buildEvent
-        currentState.eventQueue.add(buildEvent)
-        //Kind of a hack: Reserve resources, but not units (because I haven't figured out how to reserve units yet)
-        currentState.spendResources(buildEvent.buildable) //We should delete this, right? Because the simulation will spend them again whenn we process the event start
+        currentState.startEvent(buildEvent)
         index += 1
       }
       else if (build.unmetPrerequisites.nonEmpty) {

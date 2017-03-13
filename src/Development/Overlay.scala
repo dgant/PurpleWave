@@ -173,15 +173,17 @@ object Overlay {
       .take(20)
       .map(event => List(event.toString.split("\\s+")(0), _reframe(event.frameStart), _reframe(event.frameEnd))))
     With.game.drawTextScreen(300, 85, "Started")
-    _drawTable(300, 100, With.scheduler.simulationResults.simulatedEvents.filter(e => e.frameStart == 0 && ! e.describesFreedomOfExistingUnit)
+    _drawTable(300, 100, With.scheduler.simulationResults.simulatedEvents
+      .filter(e => e.frameStart == 0 && ! e.describesFreedomOfExistingUnit)
       .toList
       .sortBy(_.buildable.toString)
       .sortBy(_.frameStart)
       .sortBy(_.frameEnd)
       .take(20)
       .map(event => List(event.toString.split("\\s+")(0), _reframe(event.frameStart), _reframe(event.frameEnd))))
-    With.game.drawTextScreen(500, 85, "All")
+    With.game.drawTextScreen(500, 85, "In Use")
     _drawTable(500, 100, With.scheduler.simulationResults.simulatedEvents
+      .filter(_.describesFreedomOfExistingUnit)
       .toList
       .sortBy(_.buildable.toString)
       .sortBy(_.frameStart)

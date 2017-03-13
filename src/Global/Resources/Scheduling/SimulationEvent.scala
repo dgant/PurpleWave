@@ -7,9 +7,9 @@ class SimulationEvent(
   val buildable:Buildable,
   val frameStart:Int,
   val frameEnd:Int,
-  val isImplicit:Boolean = false) extends Comparable[SimulationEvent] {
+  val describesFreedomOfExistingUnit:Boolean = false) extends Comparable[SimulationEvent] {
   
-  override def toString: String = buildable.toString + (if (isImplicit) "*" else "")
+  override def toString: String = buildable.toString + (if (describesFreedomOfExistingUnit) "*" else "")
   
   def formatTime(time:Int):String = {
     val relativeTime = time - With.game.getFrameCount

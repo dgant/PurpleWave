@@ -196,7 +196,7 @@ class ScheduleSimulationState(
   def endEvent(event: SimulationEvent) {
     val buildable = event.buildable
     supplyAvailable += buildable.supplyProvided
-    if ( ! event.isImplicit) buildable.unitOption.foreach(addOwnedUnit)
+    if ( ! event.describesFreedomOfExistingUnit) buildable.unitOption.foreach(addOwnedUnit)
     buildable.unitOption.foreach(addAvailableUnit)
     buildable.techOption.foreach(addTech)
     buildable.upgradeOption.foreach(addUpgrade(_, buildable.upgradeLevel))
@@ -213,7 +213,7 @@ class ScheduleSimulationState(
     //TODO: Try to account for travel time
     buildable.buildersOccupied.foreach(builder => {
       unitsAvailable.put(builder.unit, -1 + unitsAvailable.getOrElse(builder.unit, 0))
-      eventQueue.add(new SimulationEvent(builder, frame, frame + buildable.frames, isImplicit = true))
+      eventQueue.add(new SimulationEvent(builder, frame, frame + buildable.frames, describesFreedomOfExistingUnit = true))
     })
   }
   

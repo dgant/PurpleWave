@@ -9,7 +9,7 @@ import scala.collection.mutable
 object ScheduleSimulationEventAnticipator {
   
   def anticipate:mutable.HashSet[SimulationEvent] = {
-    With.units.ours.flatten(unit => {
+    With.units.ours.view.flatten(unit => {
       List(
         getUnitCompletion(unit, false, unit.framesBeforeBecomingComplete),
         getUnitCompletion(unit, true,  unit.framesBeforeBuildeeComplete),
@@ -23,12 +23,12 @@ object ScheduleSimulationEventAnticipator {
   }
   
   def getUnitCompletion(
-    unit:FriendlyUnitInfo,
-    implicitEvent:Boolean,
-    timeLeft:Int):
+   unit:FriendlyUnitInfo,
+   describesFreedomOfExistingUnit:Boolean,
+   timeLeft:Int):
       Iterable[SimulationEvent] = {
     if (timeLeft <= 0) return List.empty
-    List(buildEvent(new BuildableUnit(unit.utype), timeLeft, implicitEvent))
+    List(buildEvent(new BuildableUnit(unit.utype), timeLeft, describesFreedomOfExistingUnit))
   }
   
   def getTechCompletion(unit:FriendlyUnitInfo): Iterable[SimulationEvent] = {
@@ -41,14 +41,18 @@ object ScheduleSimulationEventAnticipator {
     val timeLeft = unit.framesBeforeUpgradeComplete
     if (timeLeft <= 0) return List.empty
     val upgrade = unit.upgrading
-    val level = With.game.self.getUpgradeLevel(upgrade)
+    val level = 1 + With.game.self.getUpgradeLevel(upgrade)
     List(buildEvent(new BuildableUpgrade(upgrade, level), timeLeft))
   }
   
-  def buildEvent(buildable:Buildable, framesLeft:Int, implicitEvent:Boolean = false):SimulationEvent =
+  def buildEvent(
+    buildable:Buildable,
+    framesLeft:Int,
+    describesFreedomOfExistingUnit:Boolean = false)
+      :SimulationEvent =
     new SimulationEvent(
       buildable,
       0,
       With.game.getFrameCount + framesLeft,
-      isImplicit = implicitEvent)
+      describesFreedomOfExistingUnit = describesFreedomOfExistingUnit)
 }

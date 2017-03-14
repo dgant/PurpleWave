@@ -5,19 +5,16 @@ import Global.Combat.Battle.BattleMetrics
 import Startup.With
 import Types.UnitInfo.UnitInfo
 import Utilities.Caching.Limiter
-import bwapi.TilePosition
 import Utilities.Enrichment.EnrichPosition._
+import bwapi.TilePosition
 
 abstract class GridStrength extends GridInt {
-  
-  val _limitUpdates = new Limiter(12, _update)
-  override def update() {
-    _limitUpdates.act()
-  }
   
   val rangeMargin = 48
   val framesToLookAhead = 48
   
+  val _limitUpdates = new Limiter(1, _update)
+  override def update() = _limitUpdates.act()
   def _update() {
     reset()
     _getUnits.foreach(unit => {

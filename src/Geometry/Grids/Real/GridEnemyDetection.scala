@@ -8,7 +8,7 @@ import Utilities.Enrichment.EnrichPosition._
 
 class GridEnemyDetection extends GridBoolean {
   
-  val _limitUpdates = new Limiter(24, _update)
+  val _limitUpdates = new Limiter(1, _update)
   override def update() = _limitUpdates.act()
   def _update() {
     reset()

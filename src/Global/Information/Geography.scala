@@ -5,7 +5,7 @@ import Geometry._
 import Startup.With
 import Types.Geography.{Base, Zone, ZoneEdge}
 import Types.UnitInfo.{ForeignUnitInfo, UnitInfo}
-import Utilities.Caching.{Cache, CacheForever, Limiter}
+import Utilities.Caching.{Cache, CacheForever, Limiter, LimiterBase}
 import Utilities.Enrichment.EnrichPosition._
 import Utilities.Enrichment.EnrichUnitType._
 import bwapi.{TilePosition, UnitType}
@@ -21,7 +21,7 @@ class Geography {
     _zoneCache.get
   }
   val _zoneCache = new CacheForever[Iterable[Zone]](() => _zones)
-  val _zoneLimiter = new Limiter(24 * 10, _updateZones)
+  val _zoneLimiter = new Limiter(10, _updateZones)
   def _zones:Iterable[Zone] = {
     //Build zones
     val zonesByRegionCenter = BWTA.getRegions.asScala.map(region =>

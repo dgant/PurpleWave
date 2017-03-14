@@ -21,13 +21,12 @@ class Scheduler {
     _recentlyUpdated.add(requester)
   }
   
-  val _updateQueueLimiter = new Limiter(24, () => _updateQueue)
   def onFrame() = {
     _requests.keySet.diff(_recentlyUpdated).foreach(_requests.remove)
     _recentlyUpdated.clear()
     _updateQueueLimiter.act()
   }
-  
+  val _updateQueueLimiter = new Limiter(2, () => _updateQueue)
   def _updateQueue() {
     val unitsWanted = new mutable.HashMap[UnitType, Int]
     val unitsActual = With.units.ours.groupBy(_.utype).mapValues(_.size)

@@ -2,18 +2,7 @@ package Utilities.Caching
 
 import Startup.With
 
-class Limiter(
-  frameLimit: Int,
-  action:() => Unit) {
-  
-  var _lastAction = Int.MinValue
-  
-  def act() {
-    if (With.game.getFrameCount > _lastAction + frameLimit) {
-      action()
-      _lastAction = With.game.getFrameCount + _jitter
-    }
-  }
-  
-  def _jitter:Int = if (frameLimit > 1) CacheRandom.random.nextInt(2) else 0
+class Limiter(frameDelayScale:Int, action:() => Unit) extends LimiterBase(action) {
+  protected def frameDelay:Int = With.performance.frameDelay(frameDelayScale) + jitter
+  private def jitter:Int = CacheRandom.random.nextInt(2)
 }

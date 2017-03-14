@@ -7,7 +7,7 @@ import Utilities.Enrichment.EnrichPosition._
 
 class GridMobility extends GridInt {
   
-  val limitUpdates = new Limiter(24 * 60, _update)
+  val limitUpdates = new Limiter(5, _update)
   override def update() = limitUpdates.act()
   def _update() {
     reset()

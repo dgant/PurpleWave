@@ -26,7 +26,7 @@ class GatherMinerals extends Plan {
   val _lastOrderFrame = new mutable.HashMap[FriendlyUnitInfo, Int] {
     override def default(key: FriendlyUnitInfo): Int = { put(key, Int.MinValue); this(key) }}
   
-  val _limitResetAssignments = new Limiter(24 * 5, _resetAssignments)
+  val _limitResetAssignments = new Limiter(4, _resetAssignments)
   override def onFrame() {
     miners.onFrame()
     _limitResetAssignments.act()

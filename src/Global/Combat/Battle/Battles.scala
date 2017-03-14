@@ -3,7 +3,7 @@ package Global.Combat.Battle
 import Geometry.Clustering
 import Startup.With
 import Types.UnitInfo.UnitInfo
-import Utilities.Caching.Limiter
+import Utilities.Caching.{Limiter, LimiterBase}
 import Utilities.Enrichment.EnrichPosition._
 
 import scala.collection.mutable
@@ -12,7 +12,7 @@ class Battles {
   
   val all = new mutable.HashSet[Battle]
   
-  val _limitUpdates = new Limiter(12, _update)
+  val _limitUpdates = new Limiter(2, _update)
   def onFrame() = {}// _limitUpdates.act()
   
   def update(battle:Battle) {

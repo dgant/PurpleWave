@@ -15,12 +15,12 @@ class Configuration {
   var enableOverlay               = false
   var enableOverlayBattles        = false
   var enableOverlayEconomy        = false
-  var enableOverlayFrameLength    = true
   var enableOverlayGrids          = false
+  var enableOverlayPerformance    = true
   var enableOverlayPlans          = false
   var enableOverlayResources      = false
   var enableOverlayScheduler      = false
   var enableOverlayTerrain        = false
-  var enableOverlayTrackedUnits   = true
+  var enableOverlayTrackedUnits   = false
   var enableOverlayUnits          = false
 }

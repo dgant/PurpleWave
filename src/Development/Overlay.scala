@@ -18,9 +18,9 @@ object Overlay {
       With.game.setTextSize(bwapi.Text.Size.Enum.Small)
       if (With.configuration.enableOverlayBattles)        _drawBattles()
       if (With.configuration.enableOverlayEconomy)        _drawEconomy()
-      if (With.configuration.enableOverlayFrameLength)    _drawFrameLength()
       if (With.configuration.enableOverlayGrids)          _drawGrids()
       if (With.configuration.enableOverlayUnits)          _drawUnits()
+      if (With.configuration.enableOverlayPerformance)    _drawPerformance()
       if (With.configuration.enableOverlayPlans)          _drawPlans()
       if (With.configuration.enableOverlayResources)      _drawResources()
       if (With.configuration.enableOverlayScheduler)      _drawScheduler()
@@ -78,12 +78,6 @@ object Overlay {
     With.game.drawTextScreen(550, 5, values.mkString("\n"))
   }
   
-  def _drawFrameLength() {
-    With.game.drawTextScreen(250, 5, With.performance.meanFrameLength + "ms avg")
-    With.game.drawTextScreen(300, 5, With.performance.maxFrameLength  + "ms max")
-    With.game.drawTextScreen(350, 5, With.performance.frameDelay(1)   + "-frame caching")
-  }
-  
   def _drawGrids() {
     _drawGrid(With.grids.enemyGroundStrength, 0, 0)
     _drawGrid(With.grids.friendlyGroundStrength, 0, 1)
@@ -93,6 +87,12 @@ object Overlay {
     map.positions
       .filter(tilePosition => map.get(tilePosition) != 0 &&  map.get(tilePosition) != false)
       .foreach(tilePosition => With.game.drawTextMap(tilePosition.toPosition.add(offsetX*16, offsetY*13), map.repr(map.get(tilePosition))))
+  }
+  
+  def _drawPerformance() {
+    With.game.drawTextScreen(250, 5, With.performance.meanFrameLength + "ms avg")
+    With.game.drawTextScreen(300, 5, With.performance.maxFrameLength  + "ms max")
+    With.game.drawTextScreen(350, 5, With.performance.frameDelay(1)   + "-frame caching")
   }
   
   def _drawPlans() {

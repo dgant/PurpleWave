@@ -5,6 +5,7 @@ class Configuration {
   
   var enableStdOut                = false
   var enableChat                  = true
+  var enableLatencyCompensation   = false
   
   var enableCamera                = false
   var cameraDynamicSpeed          = false

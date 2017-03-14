@@ -31,6 +31,37 @@ class ScheduleSimulationState(
       eventQueue.clone,
       isDisposableCopy = true)
   
+  //////////////////////
+  // Public interface //
+  //////////////////////
+  
+  def assumeEvent(event:SimulationEvent) {
+    eventQueue.add(event)
+    
+    if      (event.frameStart <  frame) reserveBuilders(event.buildable)
+    else if (event.frameStart == frame) startEvent(event)
+  }
+  
+  def tryBuilding(buildable: Buildable, maxFrames:Int): TryBuildingResult = {
+    if (isBuildableNow(buildable)) {
+      val event = new SimulationEvent(buildable, frame, frame + buildable.frames)
+      val futureWithThisEvent = disposableCopy
+      futureWithThisEvent.eventQueue.add(event)
+      if (futureWithThisEvent.allEventsStillBuildableOnTime) {
+        return new TryBuildingResult(Some(event))
+      }
+    }
+  
+    val nextFrame = nextInterestingFrame(Some(buildable))
+    if (nextFrame > maxFrames) {
+      return new TryBuildingResult(None, exceededSearchDepth = true)
+    }
+    
+    val nextState = if (isDisposableCopy) this else disposableCopy
+    nextState.tryFastForward(nextFrame)
+    nextState.tryBuilding(buildable, maxFrames)
+  }
+  
   ///////////////////////////////////
   // Features of the current state //
   ///////////////////////////////////
@@ -123,24 +154,6 @@ class ScheduleSimulationState(
   
   private def isInTheFuture(someFrame: Int):Boolean = someFrame > frame
   
-  def tryBuilding(buildable: Buildable, maxFrames:Int): TryBuildingResult = {
-    if (isBuildableNow(buildable)) {
-      val event = new SimulationEvent(buildable, frame, frame + buildable.frames)
-      val futureWithThisEvent = disposableCopy
-      futureWithThisEvent.eventQueue.add(event)
-      if (futureWithThisEvent.allEventsStillBuildableOnTime) {
-        return new TryBuildingResult(Some(event))
-      }
-    }
-  
-    val nextFrame = nextInterestingFrame(Some(buildable))
-    if (nextFrame > maxFrames) return new TryBuildingResult(None, exceededSearchDepth = true)
-    
-    val nextState = if (isDisposableCopy) this else disposableCopy
-    nextState.tryFastForward(nextFrame)
-    nextState.tryBuilding(buildable, maxFrames)
-  }
-  
   private def allEventsStillBuildableOnTime:Boolean = {
     while(nextInterestingFrame() < never)
       if ( ! tryFastForward(nextInterestingFrame(), testIntegrity = true)) return false
@@ -164,14 +177,13 @@ class ScheduleSimulationState(
     frame     = nextFrame
     
     var allEventsStillBuildable = true
+    val eventsNowEnding = eventsEnding
+    eventsNowEnding.foreach(endEvent)
+    eventsNowEnding.foreach(eventQueue.remove)
     eventsStarting.foreach(event => {
       if (testIntegrity) allEventsStillBuildable &&= isBuildableNow(event.buildable)
       startEvent(event)
     })
-    val eventsNowEnding = eventsEnding
-    eventsNowEnding.foreach(endEvent)
-    eventsNowEnding.foreach(eventQueue.remove)
-    
     allEventsStillBuildable
   }
   
@@ -181,13 +193,6 @@ class ScheduleSimulationState(
   ///////////////////////////////////
   // Mutating the simulation state //
   ///////////////////////////////////
-  
-  def assumeEvent(event:SimulationEvent) {
-    eventQueue.add(event)
-    
-    if      (event.frameStart <  frame) reserveBuilders(event.buildable)
-    else if (event.frameStart == frame) startEvent(event)
-  }
   
   private def startEvent(event: SimulationEvent) {
     spendResources(event.buildable)
@@ -200,6 +205,7 @@ class ScheduleSimulationState(
     supplyAvailable += buildable.supplyProvided
     buildable.unitOption.foreach(addUnitOwned)
     buildable.unitOption.foreach(addUnitAvailable)
+    buildable.buildersOccupied.foreach(builder => addUnitAvailable(builder.unit))
     buildable.techOption.foreach(addTech)
     buildable.upgradeOption.foreach(addUpgrade(_, buildable.upgradeLevel))
   }

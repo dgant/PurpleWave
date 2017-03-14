@@ -2,7 +2,7 @@ package Types.Buildable
 
 import bwapi.{TechType, UnitType, UpgradeType}
 
-abstract class Buildable() {
+abstract class Buildable {
   
   def unitOption      : Option[UnitType]    = None
   def unitsProduced   : Int                 = 0
@@ -17,18 +17,35 @@ abstract class Buildable() {
   
   def requirements:Iterable[Buildable] = List.empty
   def buildersOccupied:Iterable[BuildableUnit] = List.empty
-  def buildersConsumed:Iterable[BuildableUnit] = {
-    //BuildableUnit accounts for lair/hive upgrade
-    buildersOccupied
-      .filter(unitType => List(
-        UnitType.Protoss_High_Templar,
-        UnitType.Protoss_Dark_Templar,
-        UnitType.Zerg_Larva,
-        UnitType.Zerg_Drone,
-        UnitType.Zerg_Hydralisk,
-        UnitType.Zerg_Mutalisk,
-        UnitType.Zerg_Creep_Colony,
-        UnitType.Zerg_Lair
-      ).contains(unitType))
-  }
+  def buildersBorrowed:Iterable[BuildableUnit] = buildersOccupied.filterNot (b => consumesBuilders.contains(b.unit))
+  def buildersConsumed:Iterable[BuildableUnit] = buildersOccupied.filter    (b => consumesBuilders.contains(b.unit))
+  
+  //Greater Spire is omitted as a hack since the Spire is still useful in the interim
+  private val consumesBuilders = Set(
+    UnitType.Protoss_Archon,
+    UnitType.Protoss_Dark_Archon,
+    UnitType.Zerg_Drone,
+    UnitType.Zerg_Zergling,
+    UnitType.Zerg_Hydralisk,
+    UnitType.Zerg_Mutalisk,
+    UnitType.Zerg_Ultralisk,
+    UnitType.Zerg_Queen,
+    UnitType.Zerg_Defiler,
+    UnitType.Zerg_Guardian,
+    UnitType.Zerg_Devourer,
+    UnitType.Zerg_Hatchery,
+    UnitType.Zerg_Lair,
+    UnitType.Zerg_Hive,
+    UnitType.Zerg_Extractor,
+    UnitType.Zerg_Spawning_Pool,
+    UnitType.Zerg_Hydralisk_Den,
+    UnitType.Zerg_Evolution_Chamber,
+    UnitType.Zerg_Queens_Nest,
+    UnitType.Zerg_Ultralisk_Cavern,
+    UnitType.Zerg_Defiler_Mound,
+    UnitType.Zerg_Spire,
+    UnitType.Zerg_Creep_Colony,
+    UnitType.Zerg_Sunken_Colony,
+    UnitType.Zerg_Spore_Colony
+  )
 }

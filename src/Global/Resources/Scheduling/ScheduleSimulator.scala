@@ -42,7 +42,11 @@ object ScheduleSimulator {
         else if ( ! build.exceededSearchDepth) {
           buildablesImpossible.add(nextBuildable)
         }
-        //Otherwise, the build was impossible.
+        else {
+          //Otherwise, the build was impossible.
+          val placeToPutDebugBreakpoint = 123
+        }
+        
       }
     }
   

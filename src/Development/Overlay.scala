@@ -190,7 +190,7 @@ object Overlay {
   
   def _reframe(frameAbsolute:Int):String = {
     val reframed = (frameAbsolute - With.game.getFrameCount)/24
-    if (reframed < 0) "Started" else reframed.toString
+    if (reframed <= 0) "Started" else reframed.toString
   }
   
   def _drawTable(startX:Int, startY:Int, cells:Iterable[Iterable[String]]) {

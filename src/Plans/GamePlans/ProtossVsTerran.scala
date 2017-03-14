@@ -17,6 +17,7 @@ class ProtossVsTerran extends Parallel {
   
   //Via http://wiki.teamliquid.net/starcraft/14_Nexus_(vs._Terran)
   val _13Nexus = List[Buildable] (
+    new BuildableUnit(UnitType.Zerg_Queen), //0
     new BuildableUnit(UnitType.Protoss_Nexus), //0
     new BuildableUnit(UnitType.Protoss_Probe),
     new BuildableUnit(UnitType.Protoss_Probe),

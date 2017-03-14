@@ -20,6 +20,7 @@ case class BuildableUnit(val unit: UnitType) extends Buildable {
     List.fill(unit.whatBuilds.second)(unit.whatBuilds.first).map(new BuildableUnit(_))
   }
   override def requirements: Iterable[BuildableUnit] = {
-    unit.requiredUnits.asScala.flatten(pair => List.fill(pair._2)(pair._1)).map(new BuildableUnit(_))
+    unit.requiredUnits.asScala.flatten(pair => List.fill(pair._2)(pair._1)).map(new BuildableUnit(_)) ++
+      (if(unit.requiresPsi) List(new BuildableUnit(UnitType.Protoss_Pylon)) else List.empty)
   }
 }

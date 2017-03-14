@@ -9,11 +9,11 @@ import scala.collection.mutable
 
 class ForeignUnitTracker {
   
-  val _foreignUnitsById = new mutable.HashMap[Int, ForeignUnitInfo].empty
-  var _foreignUnits:Set[ForeignUnitInfo] = new HashSet[ForeignUnitInfo]
-  var _enemyUnits:Set[ForeignUnitInfo] = new HashSet[ForeignUnitInfo]
-  var _neutralUnits:Set[ForeignUnitInfo] = new HashSet[ForeignUnitInfo]
-  var _bannedEnemyUnitIds:Set[Int] = new HashSet[Int]
+  val _foreignUnitsById                            = new mutable.HashMap[Int, ForeignUnitInfo].empty
+  var _foreignUnits         : Set[ForeignUnitInfo] = new HashSet[ForeignUnitInfo]
+  var _enemyUnits           : Set[ForeignUnitInfo] = new HashSet[ForeignUnitInfo]
+  var _neutralUnits         : Set[ForeignUnitInfo] = new HashSet[ForeignUnitInfo]
+  var _bannedEnemyUnitIds   : Set[Int]             = new HashSet[Int]
   
   def neutralUnits:Set[ForeignUnitInfo] = _neutralUnits
   def enemyUnits:Set[ForeignUnitInfo] = _enemyUnits
@@ -48,7 +48,7 @@ class ForeignUnitTracker {
   
     //Could speed things up by diffing instead of recreating these
     _foreignUnits = _foreignUnitsById.values.toSet
-    _enemyUnits = _foreignUnits.filter(_.player.isEnemy(With.game.self))
+    _enemyUnits   = _foreignUnits.filter(_.player.isEnemy(With.game.self))
     _neutralUnits = _foreignUnits.filter(_.player.isNeutral)
   }
   
@@ -89,8 +89,9 @@ class ForeignUnitTracker {
     } else {
       //Well, if it can't move, it must be dead. Like a building that burned down or was otherwise destroyed
       _remove(unit)
-      //TODO: Count that unit as dead in the score
+      unit._alive = false
     }
+    //TODO: Score tracking should count the unit as dead
   }
   
   def _remove(unit:ForeignUnitInfo) {

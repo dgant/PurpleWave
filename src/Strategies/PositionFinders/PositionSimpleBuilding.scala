@@ -17,6 +17,10 @@ class PositionSimpleBuilding(
   
   def _find: Option[TilePosition] = {
     
+    //Short-circuits for performance
+    if (buildingType.requiresPsi && ! With.units.ours.exists(_.utype == UnitType.Protoss_Pylon)) {
+      return None
+    }
     if (_cache.lastValue.isDefined && _cache.lastValue.get.isDefined) {
       val lastPosition = _cache.lastValue.get.get
       

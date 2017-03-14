@@ -20,16 +20,17 @@ class Performance {
     frameTimes(With.game.getFrameCount % framesToTrack) = millisecondDifference
   
     if (With.game.getFrameCount % framesPerPerformanceTweak == 0) {
-      if (meanFrameLength > 60) {
+      if (meanFrameLength > 15 || maxFrameLength > 50) {
         currentFrameDelay += 1
       }  else {
         currentFrameDelay -= 1
       }
-      currentFrameDelay = Math.max(2,  currentFrameDelay)
+      currentFrameDelay = Math.max(12,  currentFrameDelay)
       currentFrameDelay = Math.min(96, currentFrameDelay)
     }
   }
   
+  def maxFrameLength:Long = frameTimes.max
   def meanFrameLength:Long = frameTimes.sum / framesToTrack
   def frameDelay(size:Int):Int = currentFrameDelay
 }

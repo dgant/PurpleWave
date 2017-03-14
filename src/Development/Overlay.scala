@@ -79,8 +79,8 @@ object Overlay {
   }
   
   def _drawFrameLength() {
-    With.game.drawTextScreen(550, 0, With.performance.meanFrameLength + " ms/f")
-    With.game.drawTextScreen(600, 0, With.performance.frameDelay(1) + " base cache delay")
+    With.game.drawTextScreen(300, 5, With.performance.meanFrameLength + " ms/f")
+    With.game.drawTextScreen(350, 5, With.performance.frameDelay(1) + " base cache delay")
   }
   
   def _drawGrids() {

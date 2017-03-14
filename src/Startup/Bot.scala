@@ -1,6 +1,6 @@
 package Startup
 
-import Development.{AutoCamera, Configuration, Logger, Overlay}
+import Development._
 import Global.Resources._
 import Global.Combat.Commander
 import Global.Combat.Battle.Battles
@@ -38,6 +38,7 @@ class Bot() extends DefaultBWListener {
       With.latency = new Latency
       With.grids = new Grids
       With.paths = new Paths
+      With.performance = new Performance
       With.prioritizer = new Prioritizer
       With.recruiter = new Recruiter
       With.scheduler = new Scheduler
@@ -54,11 +55,10 @@ class Bot() extends DefaultBWListener {
 
   override def onFrame() {
     try {
+      With.performance.startCounting()
       With.latency.onFrame()
 
       if (With.latency.shouldRun) {
-        With.performance.startCounting()
-        
         With.units.onFrame()
         With.grids.onFrame()
         With.battles.onFrame()

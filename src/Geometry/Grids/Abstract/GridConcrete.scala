@@ -12,7 +12,7 @@ abstract class GridConcrete[T] extends Grid[T] {
   def _defaultValue:T
   def repr(value:T):String
   def reset()                                  = indices.foreach(_positions(_) = _defaultValue)
-  def initialize()                             = if ( ! _initialized) { onInitialization(); _initialized = true }
+  final def initialize()                       = if ( ! _initialized) { onInitialization(); _initialized = true }
   def onInitialization()                       {}
   def indices:Iterable[Int]                    = _positions.indices
   def points:Iterable[(Int, Int)]              = indices.map(i => (x(i), y(i)))

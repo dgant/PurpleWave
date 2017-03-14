@@ -23,10 +23,10 @@ object ScheduleSimulator {
       val nextBuildable = buildablesRequested(index)
       index += 1
       
-      if (buildablesRequested.length >= maxQueueOutput ) {
+      if (eventsPlanned.length >= maxQueueOutput ) {
         //Stop calculating here
       }
-      if (buildablesImpossible.contains(nextBuildable)) {
+      else if (buildablesImpossible.contains(nextBuildable)) {
         //We already know we can't build this, so don't waste time trying :)
       }
       else

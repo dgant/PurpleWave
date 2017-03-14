@@ -18,7 +18,7 @@ class PositionSimpleBuilding(
   def _find: Option[TilePosition] = {
     val home = With.geography.home
     
-    if (buildingType.isRefinery) return _positionRefinery
+    if (buildingType.isRefinery)      return _positionRefinery
     else if (buildingType.isTownHall) return _positionTownHall
     
     val maxMargin = if (buildingType == UnitType.Protoss_Pylon && With.units.ours.count(_.utype == buildingType) < 4) 3 else 1

@@ -4,7 +4,7 @@ import Startup.With
 
 class Latency {
   
-  val minTurnSize = 3
+  val minTurnSize = 2
   var lastRunFrame = 0
   var minRemainingLatencyFrames:Int = With.game.getLatencyFrames
   

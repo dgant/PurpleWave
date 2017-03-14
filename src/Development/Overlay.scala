@@ -196,7 +196,7 @@ object Overlay {
   }
   
   def _reframe(frameAbsolute:Int):String = {
-    val reframed = (frameAbsolute - With.game.frame)/24
+    val reframed = (frameAbsolute - With.frame)/24
     if (reframed <= 0) "Started" else reframed.toString
   }
   

@@ -8,6 +8,7 @@ import Global.Information.UnitAbstraction.Units
 import Global.Information._
 import Global.Resources.Scheduling.Scheduler
 import Plans.GamePlans.WinTheGame
+import bwapi.Player
 
 object With {
   var game:bwapi.Game = null

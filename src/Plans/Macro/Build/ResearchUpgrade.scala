@@ -15,7 +15,7 @@ class ResearchUpgrade(upgradeType: UpgradeType, level: Int) extends Plan {
     unitCounter.set(UnitCountOne)
   }
   
-  override def isComplete: Boolean = { With.game.self.getUpgradeLevel(upgradeType) >= level }
+  override def isComplete: Boolean = With.self.getUpgradeLevel(upgradeType) >= level
   override def getChildren: Iterable[Plan] = List (currency, researcher)
   
   override def onFrame() {

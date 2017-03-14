@@ -11,7 +11,6 @@ class GridMobility extends GridInt {
   override def update() = limitUpdates.act()
   def _update() {
     reset()
-    With.grids.walkableUnits.update()
     
     val distanceMax = 3
   

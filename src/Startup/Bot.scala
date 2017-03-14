@@ -138,8 +138,8 @@ class Bot() extends DefaultBWListener {
   }
   
   def _considerSurrender() = {
-    if (With.game.self.supplyUsed == 0
-      && With.game.self.minerals < 50
+    if (With.self.supplyUsed == 0
+      && With.self.minerals < 50
       && With.units.enemy.exists(_.utype.isWorker)
       && With.units.enemy.exists(_.utype.isResourceDepot)) {
       With.game.sendText("Good game! Let's pretend this never happened.")

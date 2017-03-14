@@ -2,25 +2,24 @@ package Global.Resources.Scheduling
 
 import Startup.With
 import Types.BwapiTypes.{TechTypes, UpgradeTypes}
-import bwapi.{UnitType, UpgradeType}
+import bwapi.UnitType
 
 import scala.collection.{breakOut, mutable}
 
 object ScheduleSimulationStateBuilder {
   def build:ScheduleSimulationState = {
-    val techsOwned      = TechTypes.all.filter(With.game.self.hasResearched).to[mutable.HashSet]
-    val upgradesOwned   = UpgradeTypes.all.map(upgrade => (upgrade, With.game.self.getUpgradeLevel(upgrade))).toMap
-    val upgradesOwnedMutable: mutable.Map[UpgradeType, Int] = upgradesOwned.map(identity)(breakOut)
+    val techsOwned    = TechTypes.all.filter(With.self.hasResearched).to[mutable.HashSet]
+    val upgradesOwned = UpgradeTypes.all.map(upgrade => (upgrade, With.self.getUpgradeLevel(upgrade))).toMap
   
     val output = new ScheduleSimulationState(
       frame           = With.frame,
-      minerals        = With.game.self.minerals,
-      gas             = With.game.self.gas,
-      supplyAvailable = With.game.self.supplyTotal - With.game.self.supplyUsed,
+      minerals        = With.self.minerals,
+      gas             = With.self.gas,
+      supplyAvailable = With.self.supplyTotal - With.self.supplyUsed,
       unitsOwned      = unitCount,
       unitsAvailable  = unitCount,
       techsOwned      = techsOwned,
-      upgradeLevels   = upgradesOwnedMutable,
+      upgradeLevels   = upgradesOwned.map(identity)(breakOut),
       eventQueue      = ScheduleSimulationEventAnticipator.anticipate.to[mutable.SortedSet])
     
     //This should happen in stable order! The alternative is flickering

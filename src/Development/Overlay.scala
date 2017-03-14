@@ -90,6 +90,7 @@ object Overlay {
   }
   
   def _drawPerformance() {
+    With.game.drawTextScreen(200, 5, With.latency.minTurnSize         + " frames/turn")
     With.game.drawTextScreen(250, 5, With.performance.meanFrameLength + "ms avg")
     With.game.drawTextScreen(300, 5, With.performance.maxFrameLength  + "ms max")
     With.game.drawTextScreen(350, 5, With.performance.frameDelay(1)   + "-frame caching")
@@ -296,7 +297,7 @@ object Overlay {
   
   def _getPlayerColor(player:Player):Color = {
     if (player.isNeutral) Color.Grey
-    else if (player.isEnemy(With.game.self)) Color.Red
+    else if (player.isEnemy(With.self)) Color.Red
     else Color.Blue
   }
 }

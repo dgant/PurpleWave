@@ -15,7 +15,7 @@ class ResearchTech(techType: TechType) extends Plan {
     unitMatcher.set(new UnitMatchType(techType.whatResearches))
   }
   
-  override def isComplete: Boolean = With.game.self.hasResearched(techType)
+  override def isComplete: Boolean = With.self.hasResearched(techType)
   override def getChildren: Iterable[Plan] = List (currency, researcher)
   
   override def onFrame() {

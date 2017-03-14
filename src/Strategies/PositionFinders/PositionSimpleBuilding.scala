@@ -40,7 +40,7 @@ class PositionSimpleBuilding(
       .filter(_.isGas)
       .filter(gas =>
         With.geography.bases.exists(base =>
-          base.zone.owner == With.game.self &&
+          base.zone.owner == With.self &&
           base.harvestingArea.contains(gas.tileCenter)))
       .map(_.tileTopLeft)
     

@@ -71,7 +71,7 @@ class Geography {
     })
   
   def bases:Iterable[Base] = zones.flatten(_.bases)
-  def ourBases:Iterable[Base] = bases.filter(_.zone.owner == With.game.self)
+  def ourBases:Iterable[Base] = bases.filter(_.zone.owner == With.self)
   def ourBaseHalls:Iterable[UnitInfo] = ourBases.filter(_.townHall.isDefined).map(_.townHall.get)
   def ourHarvestingAreas:Iterable[TileRectangle] = ourBases.map(_.harvestingArea)
   

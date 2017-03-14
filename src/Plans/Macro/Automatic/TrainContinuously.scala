@@ -11,8 +11,8 @@ class TrainContinuously(var unitType:UnitType = UnitType.None) extends AbstractB
     val now = With.units.ours.count(_.utype == unitType)
     val capacity = List(
       With.units.ours.filter(_.complete).count(_.utype == unitType.whatBuilds.first) * unitType.whatBuilds.second,
-      With.game.self.minerals / Math.max(1, unitType.mineralPrice),
-      With.game.self.gas / Math.max(1, unitType.gasPrice)
+      With.self.minerals / Math.max(1, unitType.mineralPrice),
+      With.self.gas / Math.max(1, unitType.gasPrice)
     )
     .min
     now + capacity

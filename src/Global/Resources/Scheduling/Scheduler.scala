@@ -45,10 +45,10 @@ class Scheduler {
     unitsWanted:mutable.HashMap[UnitType, Int],
     unitsActual:Map[UnitType, Int]):Boolean = {
     if (buildable.upgradeOption.nonEmpty) {
-      return With.game.self .getUpgradeLevel(buildable.upgradeOption.get) >= buildable.upgradeLevel
+      return With.self .getUpgradeLevel(buildable.upgradeOption.get) >= buildable.upgradeLevel
     }
     else if (buildable.techOption.nonEmpty) {
-      return With.game.self.hasResearched(buildable.techOption.get)
+      return With.self.hasResearched(buildable.techOption.get)
     }
     else {
       val unitType = buildable.unitOption.get

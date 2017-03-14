@@ -45,7 +45,7 @@ class ForeignUnitTracker {
   
     //Could speed things up by diffing instead of recreating these
     _foreignUnits = _foreignUnitsById.values.toSet
-    _enemyUnits   = _foreignUnits.filter(_.player.isEnemy(With.game.self))
+    _enemyUnits   = _foreignUnits.filter(_.player.isEnemy(With.self))
     _neutralUnits = _foreignUnits.filter(_.player.isNeutral)
   
     _limitInvalidatePositions.act()
@@ -73,7 +73,7 @@ class ForeignUnitTracker {
   }
   
   def _flagGhostUnits() {
-    val ghostUnits = With.game.getAllUnits.asScala.filter(_.getPlayer.isEnemy(With.game.self))
+    val ghostUnits = With.game.getAllUnits.asScala.filter(_.getPlayer.isEnemy(With.self))
     _bannedEnemyUnitIds = ghostUnits.map(_.getID).toSet
     if (ghostUnits.nonEmpty) {
       With.logger.warn("Found ghost units at start of game:")
@@ -120,6 +120,6 @@ class ForeignUnitTracker {
     
     if (With.units.invalidUnitTypes.contains(unit.getType)) return false
     if ( ! unit.exists) return false
-    unit.getPlayer.isEnemy(With.game.self) || unit.getPlayer.isNeutral
+    unit.getPlayer.isEnemy(With.self) || unit.getPlayer.isNeutral
   }
 }

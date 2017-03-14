@@ -6,7 +6,7 @@ class BuildWorkersContinuously  extends TrainContinuously {
   
   description.set("Build bases when we're about saturated")
   
-  unitType = With.game.self.getRace.getWorker
+  unitType = With.self.getRace.getWorker
   
   override def _totalRequired:Int = {
     List(

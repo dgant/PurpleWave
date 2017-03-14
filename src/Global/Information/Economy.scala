@@ -25,11 +25,11 @@ class Economy {
   }
   
   def ourActualTotalMinerals:Integer = {
-    With.game.self.gatheredMinerals
+    With.self.gatheredMinerals
   }
   
   def ourActualTotalGas:Integer = {
-    With.game.self.gatheredGas
+    With.self.gatheredGas
   }
   
   def ourActiveHarvesters:Iterable[FriendlyUnitInfo] = {
@@ -98,8 +98,8 @@ class Economy {
   
   def mineralIncomePerMinuteInOneBase(workers:Int):Double = {
     val racialMultiplier =
-      if (With.game.self.getRace == Race.Protoss) 1.18f else
-      if (With.game.self.getRace == Race.Zerg)    1.05f else
+      if (With.self.getRace == Race.Protoss) 1.18f else
+      if (With.self.getRace == Race.Zerg)    1.05f else
                                                   1.0f
     racialMultiplier * (
       if(workers <= 9 * 1.0) workers * 57 else

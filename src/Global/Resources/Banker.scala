@@ -21,9 +21,9 @@ class Banker {
   }
   
   def recountResources() {
-    _mineralsLeft  = With.game.self.minerals
-    _gasLeft       = With.game.self.gas
-    _supplyLeft    = With.game.self.supplyTotal - With.game.self.supplyUsed
+    _mineralsLeft  = With.self.minerals
+    _gasLeft       = With.self.gas
+    _supplyLeft    = With.self.supplyTotal - With.self.supplyUsed
     getPrioritizedRequests.foreach(_queueBuyer)
   }
   

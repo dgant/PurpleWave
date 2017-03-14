@@ -29,9 +29,9 @@ class BuildPylonsContinuously extends TrainContinuously(UnitType.Protoss_Pylon) 
     //   #2 Supply that will be provided by plans for which we haven't started building
   
     val pylon                     = UnitType.Protoss_Pylon
-    val supplyPerDepot            = With.game.self.getRace.getSupplyProvider.supplyProvided
+    val supplyPerDepot            = With.self.getRace.getSupplyProvider.supplyProvided
     val currentSupplyOfNexus      = With.units.ours.filter(_.utype != pylon).toSeq.map(_.utype.supplyProvided).sum
-    val currentSupplyUsed         = With.game.self.supplyUsed
+    val currentSupplyUsed         = With.self.supplyUsed
     val unitSpendingRatio         = 0.75
     val costPerUnitSupply         = 25.0
     val depotCompletionFrames     = pylon.buildTime + 24 * 8 //Add a few seconds to account for builder transit time

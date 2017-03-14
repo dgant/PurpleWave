@@ -22,7 +22,7 @@ class FriendlyUnitTracker {
     //Important to remember: bwapi.Units are not persisted frame-to-frame
     //So we do all our comparisons by ID, rather than by object
     
-    val friendlyUnitsNew                = With.game.self.getUnits.asScala.filter(_isValidFriendlyUnit).map(unit => (unit.getID, unit)).toMap
+    val friendlyUnitsNew                = With.self.getUnits.asScala.filter(_isValidFriendlyUnit).map(unit => (unit.getID, unit)).toMap
     val friendlyUnitsOld                = _friendlyUnitsById
     val friendlyIdsNew                  = friendlyUnitsNew.keySet
     val friendlyIdsOld                  = friendlyUnitsOld.keySet
@@ -40,7 +40,7 @@ class FriendlyUnitTracker {
     
     //Could speed things up by diffing instead of recreating these
     _friendlyUnits = _friendlyUnitsById.values.toSet
-    _ourUnits = _friendlyUnits.filter(_.player == With.game.self)
+    _ourUnits = _friendlyUnits.filter(_.player == With.self)
   }
   
   def onUnitDestroy(unit:bwapi.Unit) {
@@ -71,6 +71,6 @@ class FriendlyUnitTracker {
   def _isValidFriendlyUnit(unit:bwapi.Unit):Boolean ={
     if (With.units.invalidUnitTypes.contains(unit.getType)) return false
     if ( ! unit.exists) return false
-    unit.getPlayer == With.game.self || unit.getPlayer.isAlly(With.game.self())
+    unit.getPlayer == With.self || unit.getPlayer.isAlly(With.self)
   }
 }

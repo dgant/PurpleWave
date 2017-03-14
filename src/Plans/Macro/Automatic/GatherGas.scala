@@ -28,7 +28,7 @@ class GatherGas extends Plan {
   
   def _idealMinerCount:Int = {
     //TODO: Stop taking guys off gas if we're saturated on minerals
-    if (With.game.self.gas > Math.max(200, With.game.self.minerals)) {
+    if (With.self.gas > Math.max(200, With.self.minerals)) {
       return 0
     }
     var maxDrillers = 3 * _ourRefineries.size

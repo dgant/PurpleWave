@@ -9,7 +9,7 @@ class ForeignUnitInfo(_baseUnit:bwapi.Unit) extends UnitInfo (_baseUnit) {
   var _possiblyStillThere = false
   var _alive              = false
   var _lastSeen           = 0
-  var _player             = With.game.self
+  var _player             = With.self
   var _position           = new Position(0,0)
   var _walkPosition       = new WalkPosition(0,0)
   var _tileTopleft        = new TilePosition(0,0)

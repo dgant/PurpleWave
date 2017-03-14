@@ -1,5 +1,6 @@
 package Plans.GamePlans
 
+import Plans.Army.Defend
 import Plans.Compound.Parallel
 import Plans.Defense.DefeatWorkerHarass
 import Plans.Information.SwitchEnemyRace
@@ -17,6 +18,7 @@ class ProtossGamePlan extends Parallel {
     new FollowBuildOrder,
     new DefeatWorkerHarass,
     new GatherGas,
-    new GatherMinerals
+    new GatherMinerals,
+    new Defend
   ))
 }

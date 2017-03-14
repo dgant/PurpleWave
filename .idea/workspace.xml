@@ -27,101 +27,41 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="GatherGas.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Plans/Macro/Automatic/GatherGas.scala">
+      <file leaf-file-name="ProtossGamePlan.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Plans/GamePlans/ProtossGamePlan.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="162">
-              <caret line="30" column="43" lean-forward="false" selection-start-line="30" selection-start-column="43" selection-end-line="30" selection-end-column="43" />
+            <state relative-caret-position="221">
+              <caret line="17" column="27" lean-forward="true" selection-start-line="17" selection-start-column="27" selection-end-line="17" selection-end-column="27" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="TrainContinuously.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Plans/Macro/Automatic/TrainContinuously.scala">
+      <file leaf-file-name="ProtossVsTerran.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Plans/GamePlans/ProtossVsTerran.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="182">
-              <caret line="14" column="11" lean-forward="false" selection-start-line="14" selection-start-column="11" selection-end-line="14" selection-end-column="11" />
+            <state relative-caret-position="269">
+              <caret line="107" column="16" lean-forward="false" selection-start-line="107" selection-start-column="16" selection-end-line="107" selection-end-column="16" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="TrainGatewayUnitsContinuously.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Plans/Macro/Automatic/TrainGatewayUnitsContinuously.scala">
+      <file leaf-file-name="ProtossVsProtoss.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Plans/GamePlans/ProtossVsProtoss.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="72">
-              <caret line="20" column="109" lean-forward="false" selection-start-line="20" selection-start-column="109" selection-end-line="20" selection-end-column="109" />
+            <state relative-caret-position="217">
+              <caret line="72" column="62" lean-forward="true" selection-start-line="72" selection-start-column="62" selection-end-line="72" selection-end-column="62" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ResearchTech.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Plans/Macro/Build/ResearchTech.scala">
+      <file leaf-file-name="ProtossVsZerg.scala" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/Plans/GamePlans/ProtossVsZerg.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="59">
-              <caret line="17" column="42" lean-forward="false" selection-start-line="17" selection-start-column="42" selection-end-line="17" selection-end-column="42" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ResearchUpgrade.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Plans/Macro/Build/ResearchUpgrade.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="59">
-              <caret line="17" column="42" lean-forward="false" selection-start-line="17" selection-start-column="42" selection-end-line="17" selection-end-column="42" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="SupplyAtLeast.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Plans/Macro/UnitCount/SupplyAtLeast.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="84">
-              <caret line="13" column="9" lean-forward="false" selection-start-line="13" selection-start-column="9" selection-end-line="13" selection-end-column="9" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Bot.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Startup/Bot.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="72">
-              <caret line="141" column="14" lean-forward="false" selection-start-line="141" selection-start-column="14" selection-end-line="141" selection-end-column="14" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="PositionSimpleBuilding.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Strategies/PositionFinders/PositionSimpleBuilding.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="67">
-              <caret line="42" column="34" lean-forward="false" selection-start-line="42" selection-start-column="34" selection-end-line="42" selection-end-column="34" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ForeignUnitInfo.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Types/UnitInfo/ForeignUnitInfo.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="67">
-              <caret line="11" column="33" lean-forward="false" selection-start-line="11" selection-start-column="33" selection-end-line="11" selection-end-column="33" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="UnitInfo.scala" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/Types/UnitInfo/UnitInfo.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="205">
-              <caret line="28" column="21" lean-forward="false" selection-start-line="28" selection-start-column="21" selection-end-line="28" selection-end-column="21" />
+            <state relative-caret-position="282">
+              <caret line="73" column="71" lean-forward="false" selection-start-line="73" selection-start-column="71" selection-end-line="73" selection-end-column="71" />
               <folding />
             </state>
           </provider>
@@ -194,10 +134,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/Geometry/Grids/Abstract/GridUnits.scala" />
-        <option value="$PROJECT_DIR$/src/Plans/Macro/Automatic/GatherMinerals.scala" />
-        <option value="$PROJECT_DIR$/src/Geometry/Grids/Real/GridEnemyDetection.scala" />
-        <option value="$PROJECT_DIR$/src/Geometry/Grids/Real/GridEnemyVision.scala" />
         <option value="$PROJECT_DIR$/src/Global/Combat/Battle/Battles.scala" />
         <option value="$PROJECT_DIR$/src/Utilities/Caching/CacheForever.scala" />
         <option value="$PROJECT_DIR$/src/Geometry/Grids/Abstract/GridConcrete.scala" />
@@ -245,6 +181,10 @@
         <option value="$PROJECT_DIR$/src/Strategies/PositionFinders/PositionSimpleBuilding.scala" />
         <option value="$PROJECT_DIR$/src/Types/UnitInfo/ForeignUnitInfo.scala" />
         <option value="$PROJECT_DIR$/src/Types/UnitInfo/UnitInfo.scala" />
+        <option value="$PROJECT_DIR$/src/Plans/GamePlans/ProtossGamePlan.scala" />
+        <option value="$PROJECT_DIR$/src/Plans/GamePlans/ProtossVsTerran.scala" />
+        <option value="$PROJECT_DIR$/src/Plans/GamePlans/ProtossVsProtoss.scala" />
+        <option value="$PROJECT_DIR$/src/Plans/GamePlans/ProtossVsZerg.scala" />
       </list>
     </option>
   </component>
@@ -390,24 +330,6 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="PurpleWave1" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="PurpleWave1" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Development" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -745,38 +667,6 @@
     </watches-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/Plans/GamePlans/ProtossVsTerran.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="247">
-          <caret line="34" column="46" lean-forward="true" selection-start-line="34" selection-start-column="46" selection-end-line="34" selection-end-column="46" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$PROJECT_DIR$/lib/bwmirror_v2_5.jar!/bwapi/Player.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="12">
-          <caret line="311" column="27" lean-forward="false" selection-start-line="311" selection-start-column="27" selection-end-line="311" selection-end-column="27" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://C:/Program Files/Java/jdk1.8.0_121/src.zip!/java/lang/Class.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="12">
-          <caret line="529" column="26" lean-forward="false" selection-start-line="529" selection-start-column="26" selection-end-line="529" selection-end-column="26" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$PROJECT_DIR$/lib/bwmirror_v2_5.jar!/bwapi/Game.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="100">
-          <caret line="1059" column="27" lean-forward="false" selection-start-line="1059" selection-start-column="27" selection-end-line="1059" selection-end-column="27" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Global/Resources/Recruiter.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="81">
@@ -917,14 +807,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="26">
           <caret line="2" column="34" lean-forward="false" selection-start-line="2" selection-start-column="34" selection-end-line="2" selection-end-column="34" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Plans/GamePlans/ProtossGamePlan.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="130">
-          <caret line="10" column="0" lean-forward="true" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -1147,8 +1029,48 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Types/UnitInfo/UnitInfo.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="205">
-          <caret line="28" column="21" lean-forward="false" selection-start-line="28" selection-start-column="21" selection-end-line="28" selection-end-column="21" />
+        <state relative-caret-position="23">
+          <caret line="26" column="20" lean-forward="true" selection-start-line="26" selection-start-column="20" selection-end-line="26" selection-end-column="20" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Plans/GamePlans/ProtossGamePlan.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="221">
+          <caret line="17" column="27" lean-forward="true" selection-start-line="17" selection-start-column="27" selection-end-line="17" selection-end-column="27" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Plans/GamePlans/ProtossVsProtoss.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="217">
+          <caret line="72" column="62" lean-forward="true" selection-start-line="72" selection-start-column="62" selection-end-line="72" selection-end-column="62" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Plans/GamePlans/ProtossVsTerran.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="269">
+          <caret line="107" column="16" lean-forward="false" selection-start-line="107" selection-start-column="16" selection-end-line="107" selection-end-column="16" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Plans/GamePlans/ProtossVsRandom.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="13">
+          <caret line="1" column="0" lean-forward="true" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Plans/GamePlans/ProtossVsZerg.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="282">
+          <caret line="73" column="71" lean-forward="false" selection-start-line="73" selection-start-column="71" selection-end-line="73" selection-end-column="71" />
           <folding />
         </state>
       </provider>

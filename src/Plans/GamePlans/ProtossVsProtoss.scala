@@ -1,11 +1,10 @@
 package Plans.GamePlans
 
 import Plans.Army.{Attack, DefendChoke}
-import Plans.Compound.{IfThenElse, JustOnce, Parallel}
-import Plans.Defense.DefeatWorkerHarass
+import Plans.Compound.{IfThenElse, Parallel}
 import Plans.Information.ScoutAt
 import Plans.Macro.Automatic._
-import Plans.Macro.Build.{FollowBuildOrder, ScheduleBuildOrder}
+import Plans.Macro.Build.ScheduleBuildOrder
 import Plans.Macro.UnitCount.UnitCountAtLeast
 import Strategies.UnitMatchers.UnitMatchWarriors
 import Types.Buildable.{Buildable, BuildableUnit, BuildableUpgrade}
@@ -71,20 +70,17 @@ class ProtossVsProtoss extends Parallel {
   
   
   children.set(List(
-    new JustOnce { child.set(new ScheduleBuildOrder { buildables.set(_fourGateGoons) }) },
+    new ScheduleBuildOrder { buildables.set(_fourGateGoons) },
     new BuildPylonsContinuously,
     new BuildWorkersContinuously,
     new TrainContinuously(UnitType.Protoss_Scout),
     new TrainContinuously(UnitType.Protoss_Zealot),
     new ScheduleBuildOrder { buildables.set(MassScoutLateGame.build) },
-    new FollowBuildOrder,
-    new DefeatWorkerHarass,
     new ScoutAt(20),
     new IfThenElse {
       predicate.set(new UnitCountAtLeast { quantity.set(6); unitMatcher.set(UnitMatchWarriors) })
       whenFalse.set(new DefendChoke)
       whenTrue.set(new Attack)
-    },
-    new GatherGas,
-    new GatherMinerals))
+    }
+  ))
 }

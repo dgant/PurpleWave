@@ -2,10 +2,9 @@ package Plans.GamePlans
 
 import Plans.Army.{Attack, DefendChoke}
 import Plans.Compound.{IfThenElse, Parallel}
-import Plans.Defense.DefeatWorkerHarass
 import Plans.Information.ScoutAt
 import Plans.Macro.Automatic.{BuildPylonsContinuously, _}
-import Plans.Macro.Build.{FollowBuildOrder, ScheduleBuildOrder}
+import Plans.Macro.Build.ScheduleBuildOrder
 import Plans.Macro.UnitCount.{SupplyAtLeast, UnitCountAtLeast}
 import Strategies.UnitMatchers.UnitMatchWarriors
 import Types.Buildable.{Buildable, BuildableUnit, BuildableUpgrade}
@@ -109,14 +108,11 @@ class ProtossVsTerran extends Parallel {
         new ScheduleBuildOrder { buildables.set(MassScoutLateGame.build) }
       ))})
     },
-    new FollowBuildOrder,
-    new DefeatWorkerHarass,
     new ScoutAt(28),
     new IfThenElse {
       predicate.set(new UnitCountAtLeast { quantity.set(3); unitMatcher.set(UnitMatchWarriors) })
       whenFalse.set(new DefendChoke)
       whenTrue.set(new Attack)
-    },
-    new GatherGas,
-    new GatherMinerals))
+    }
+  ))
 }

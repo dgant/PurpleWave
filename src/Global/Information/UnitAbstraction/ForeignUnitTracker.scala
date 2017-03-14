@@ -2,6 +2,7 @@ package Global.Information.UnitAbstraction
 
 import Startup.With
 import Types.UnitInfo.ForeignUnitInfo
+import Utilities.Caching.Limiter
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable.HashSet
@@ -20,6 +21,7 @@ class ForeignUnitTracker {
   def get(someUnit:bwapi.Unit):Option[ForeignUnitInfo] = get(someUnit.getID)
   def get(id:Int):Option[ForeignUnitInfo] = _foreignUnitsById.get(id)
   
+  val _limitInvalidatePositions = new Limiter(1, _invalidatePositions)
   def onFrame() {
     _initialize()
     
@@ -30,16 +32,11 @@ class ForeignUnitTracker {
     val foreignUnitsOld           = _foreignUnitsById
     val foreignIdsNew             = foreignUnitsNew.keySet
     val foreignIdsOld             = foreignUnitsOld.keySet
-    val unitsToAdd                = foreignIdsNew.diff(foreignIdsOld).map(foreignUnitsNew)
-    val unitsToUpdate             = foreignIdsNew.intersect(foreignIdsOld).map(foreignUnitsNew)
-    val unitsToInvalidatePosition = foreignIdsOld.diff(foreignIdsNew)
-      .map(foreignUnitsOld)
-      .filter(_.possiblyStillThere) //This check is important! It makes the O(n^2) filter at the end O(n)
-      .filter(unitInfo => unitInfo.tileArea.tiles.forall(With.game.isVisible)) //Can we check fewer tiles?
+    val unitsToAdd                = foreignIdsNew.diff      (foreignIdsOld).map(foreignUnitsNew)
+    val unitsToUpdate             = foreignIdsNew.intersect (foreignIdsOld).map(foreignUnitsNew)
     
     unitsToAdd.foreach(_add)
     unitsToUpdate.foreach(unit => _foreignUnitsById(unit.getID).update(unit))
-    unitsToInvalidatePosition.foreach(_updateMissing)
   
     //Remove no-longer-valid units
     //Whoops, foreignUnitsNew already lacks these units. Maybe this step isn't necessary
@@ -50,6 +47,16 @@ class ForeignUnitTracker {
     _foreignUnits = _foreignUnitsById.values.toSet
     _enemyUnits   = _foreignUnits.filter(_.player.isEnemy(With.game.self))
     _neutralUnits = _foreignUnits.filter(_.player.isNeutral)
+  
+    _limitInvalidatePositions.act()
+  }
+  
+  def _invalidatePositions() {
+    _foreignUnits
+      .filter(_.possiblyStillThere)
+      .filterNot(_.visible)
+      .filter(unitInfo => unitInfo.tileArea.tiles.forall(With.game.isVisible))
+      .foreach(_updateMissing)
   }
   
   def onUnitDestroy(unit:bwapi.Unit) {
@@ -89,7 +96,6 @@ class ForeignUnitTracker {
     } else {
       //Well, if it can't move, it must be dead. Like a building that burned down or was otherwise destroyed
       _remove(unit)
-      unit._alive = false
     }
     //TODO: Score tracking should count the unit as dead
   }

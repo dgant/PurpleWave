@@ -58,7 +58,7 @@ abstract class UnitInfo (var baseUnit:bwapi.Unit) {
   def tileCenter                                  : TilePosition            = position.toTilePosition
   def hypotenuse                                  : Double                  = utype.width * 1.41421356
   def tileArea                                    : TileRectangle           = new TileRectangle(tileTopLeft, new Position(right, bottom).tileIncluding.add(1, 1))
-  def distanceFromEdge(otherUnit:UnitInfo)            : Double                  = distance(otherUnit) - hypotenuse - otherUnit.hypotenuse //Improve by counting angle
+  def distanceFromEdge(otherUnit:UnitInfo)        : Double                  = distance(otherUnit) - hypotenuse - otherUnit.hypotenuse //Improve by counting angle
   def distance(otherUnit:UnitInfo)                : Double                  = distance(otherUnit.position)
   def distance(otherPosition:Position)            : Double                  = position.getDistance(otherPosition)
   def distance(otherPosition:TilePosition)        : Double                  = distance(otherPosition.toPosition)

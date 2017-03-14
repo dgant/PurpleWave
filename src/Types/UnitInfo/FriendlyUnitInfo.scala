@@ -1,22 +1,31 @@
 package Types.UnitInfo
 import Startup.With
+import Utilities.Caching.CacheFrame
 import Utilities.Enrichment.EnrichPosition._
 import bwapi._
 
 import scala.collection.JavaConverters._
 
 class FriendlyUnitInfo(_baseUnit:bwapi.Unit) extends UnitInfo(_baseUnit) {
+  val _cacheUnitType  = new CacheFrame[UnitType]      (() =>  _baseUnit.getType)
+  val _cachePlayer    = new CacheFrame[Player]        (() =>  _baseUnit.getPlayer)
+  val _cachePosition  = new CacheFrame[Position]      (() =>  _baseUnit.getPosition)
+  val _cacheTile      = new CacheFrame[TilePosition]  (() =>  _baseUnit.getTilePosition)
+  val _cacheCompleted = new CacheFrame[Boolean]       (() =>  _baseUnit.isCompleted)
+  val _cacheExists    = new CacheFrame[Boolean]       (() =>  _baseUnit.exists)
+  val _cacheId        = new CacheFrame[Int]           (() =>  _baseUnit.getID)
+  
   override def lastSeen                   : Int                 = With.game.getFrameCount
   override def possiblyStillThere         : Boolean             = true
-  override def alive                      : Boolean             = baseUnit.exists
-  override def player                     : Player              = baseUnit.getPlayer
-  override def position                   : Position            = baseUnit.getPosition
+  override def alive                      : Boolean             = _cacheExists.get
+  override def player                     : Player              = _cachePlayer.get
+  override def position                   : Position            = _cachePosition.get
   override def walkPosition               : WalkPosition        = position.toWalkPosition
-  override def tileTopLeft                : TilePosition        = baseUnit.getTilePosition
+  override def tileTopLeft                : TilePosition        = _cacheTile.get
   override def hitPoints                  : Int                 = baseUnit.getHitPoints
   override def shieldPoints               : Int                 = baseUnit.getShields
-  override def utype                      : UnitType            = baseUnit.getType
-  override def complete                   : Boolean             = baseUnit.isCompleted
+  override def utype                      : UnitType            = _cacheUnitType.get
+  override def complete                   : Boolean             = _cacheCompleted.get
   override def flying                     : Boolean             = baseUnit.isFlying
   override def visible                    : Boolean             = baseUnit.isVisible
   override def cloaked                    : Boolean             = baseUnit.isCloaked

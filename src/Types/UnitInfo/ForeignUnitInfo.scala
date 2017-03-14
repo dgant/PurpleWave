@@ -9,7 +9,6 @@ class ForeignUnitInfo(_baseUnit:bwapi.Unit) extends UnitInfo (_baseUnit) {
   var _possiblyStillThere = false
   var _alive              = false
   var _lastSeen           = 0
-  var _id                 = 0
   var _player             = With.game.self
   var _position           = new Position(0,0)
   var _walkPosition       = new WalkPosition(0,0)
@@ -39,7 +38,6 @@ class ForeignUnitInfo(_baseUnit:bwapi.Unit) extends UnitInfo (_baseUnit) {
     _alive              = true
     _possiblyStillThere = true
     _lastSeen           = With.game.getFrameCount
-    _id                 = unit.getID
     _player             = unit.getPlayer
     _position           = unit.getPosition
     _walkPosition       = _position.toWalkPosition

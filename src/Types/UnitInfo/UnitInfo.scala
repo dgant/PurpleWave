@@ -2,13 +2,15 @@ package Types.UnitInfo
 
 import Geometry.TileRectangle
 import Startup.With
-import bwapi._
-import Utilities.Enrichment.EnrichUnitType._
 import Utilities.Enrichment.EnrichPosition._
+import Utilities.Enrichment.EnrichUnitType._
+import bwapi._
 
 abstract class UnitInfo (var baseUnit:bwapi.Unit) {
+  val _id = baseUnit.getID
+  
   def alive:Boolean
-  def id:Int = baseUnit.getID
+  def id:Int = _id
   def lastSeen:Int
   def possiblyStillThere:Boolean
   def player:Player

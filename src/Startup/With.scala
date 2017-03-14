@@ -1,6 +1,6 @@
 package Startup
 
-import Development.{AutoCamera, Configuration, Logger}
+import Development.{AutoCamera, Configuration, Logger, Performance}
 import Global.Resources._
 import Global.Combat.Commander
 import Global.Combat.Battle.Battles
@@ -18,14 +18,15 @@ object With {
   var battles:Battles = null
   var commander:Commander = null
   var economy:Economy = null
+  var grids:Grids = null
   var history:History = null
   var intelligence:Intelligence = null
   var geography:Geography = null
   var gameplan:WinTheGame = null
   var latency:Latency = null
   var logger:Logger = null
-  var grids:Grids = null
   var paths:Paths = null
+  var performance:Performance = null
   var prioritizer:Prioritizer = null
   var recruiter:Recruiter = null
   var scheduler:Scheduler = null

@@ -3,7 +3,7 @@ package Plans.Macro.Build
 import Plans.Plan
 import Startup.With
 import Types.Buildable.Buildable
-import Utilities.Caching.Cache
+import Utilities.Caching.CacheFrame
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -15,7 +15,7 @@ class FollowBuildOrder extends Plan {
   val _plans = new mutable.HashMap[Buildable, ListBuffer[Plan]]
   var _queue:Iterable[Buildable] = List.empty
   
-  val _getChildrenCache = new Cache[Iterable[Plan]](1, () => _getChildren)
+  val _getChildrenCache = new CacheFrame[Iterable[Plan]](() => _getChildren)
   override def getChildren: Iterable[Plan] = _getChildrenCache.get
   def _getChildren: Iterable[Plan] = {
     val indexByBuild = new mutable.HashMap[Buildable, Int]
@@ -33,7 +33,7 @@ class FollowBuildOrder extends Plan {
       while (i < plans.size && plans(i).isComplete) plans.remove(i)))
   
     //Add plans to match number of builds we need
-    _queue = With.scheduler.queue.map(_.buildable)
+    _queue = With.scheduler.queue.filter(_.frameStart <= With.game.getFrameCount).map(_.buildable)
     val buildsNeeded = _queue.groupBy(x => x).map(group => (group._1, group._2.size))
     buildsNeeded.keys.foreach(build => {
       if ( ! _plans.contains(build)) {

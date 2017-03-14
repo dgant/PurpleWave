@@ -1,6 +1,6 @@
 package Development
 
-import Geometry.Grids.Abstract.Grid
+import Geometry.Grids.Abstract.GridConcrete
 import Geometry.TileRectangle
 import Global.Combat.Battle.Battle
 import Plans.Allocation.{LockCurrency, LockUnits}
@@ -18,6 +18,7 @@ object Overlay {
       With.game.setTextSize(bwapi.Text.Size.Enum.Small)
       if (With.configuration.enableOverlayBattles)        _drawBattles()
       if (With.configuration.enableOverlayEconomy)        _drawEconomy()
+      if (With.configuration.enableOverlayFrameLength)    _drawFrameLength()
       if (With.configuration.enableOverlayGrids)          _drawGrids()
       if (With.configuration.enableOverlayUnits)          _drawUnits()
       if (With.configuration.enableOverlayPlans)          _drawPlans()
@@ -77,12 +78,17 @@ object Overlay {
     With.game.drawTextScreen(550, 5, values.mkString("\n"))
   }
   
+  def _drawFrameLength() {
+    With.game.drawTextScreen(550, 0, With.performance.meanFrameLength + " ms/f")
+    With.game.drawTextScreen(600, 0, With.performance.frameDelay(1) + " base cache delay")
+  }
+  
   def _drawGrids() {
     _drawGrid(With.grids.enemyGroundStrength, 0, 0)
     _drawGrid(With.grids.friendlyGroundStrength, 0, 1)
   }
   
-  def _drawGrid[T](map:Grid[T], offsetX:Int=0, offsetY:Int=0) {
+  def _drawGrid[T](map:GridConcrete[T], offsetX:Int=0, offsetY:Int=0) {
     map.positions
       .filter(tilePosition => map.get(tilePosition) != 0 &&  map.get(tilePosition) != false)
       .foreach(tilePosition => With.game.drawTextMap(tilePosition.toPosition.add(offsetX*16, offsetY*13), map.repr(map.get(tilePosition))))

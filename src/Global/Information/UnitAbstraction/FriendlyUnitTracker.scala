@@ -2,7 +2,6 @@ package Global.Information.UnitAbstraction
 
 import Startup.With
 import Types.UnitInfo.FriendlyUnitInfo
-import bwapi.UnitType
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable.HashSet
@@ -70,7 +69,7 @@ class FriendlyUnitTracker {
   }
   
   def _isValidFriendlyUnit(unit:bwapi.Unit):Boolean ={
-    if (List(UnitType.None, UnitType.Unknown).contains(unit.getType)) return false
+    if (With.units.invalidUnitTypes.contains(unit.getType)) return false
     if ( ! unit.exists) return false
     unit.getPlayer == With.game.self || unit.getPlayer.isAlly(With.game.self())
   }

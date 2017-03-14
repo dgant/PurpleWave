@@ -4,7 +4,7 @@ import java.text.DecimalFormat
 
 import bwapi.TilePosition
 
-class GridDouble extends Grid[Double] {
+class GridDouble extends GridConcrete[Double] {
   
   override val _positions: Array[Double] = Array.fill(_width * _height)(_defaultValue)
   override def _defaultValue:Double = 0d

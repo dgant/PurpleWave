@@ -5,7 +5,7 @@ import Geometry.TileRectangle
 import Startup.With
 import Types.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, UnitInfo}
 import Utilities.Enrichment.EnrichPosition._
-import bwapi.Position
+import bwapi.{Position, UnitType}
 
 import scala.collection.JavaConverters._
 
@@ -13,6 +13,13 @@ class Units {
   
   val _friendlyUnitTracker = new FriendlyUnitTracker
   val _foreignUnitTracker = new ForeignUnitTracker
+  
+  val invalidUnitTypes = Set(
+    UnitType.Protoss_Scarab,
+    UnitType.Protoss_Interceptor,
+    UnitType.None,
+    UnitType.Unknown
+  )
   
   def get(id:Int):Option[UnitInfo]              = _friendlyUnitTracker.get(id).orElse(_foreignUnitTracker.get(id))
   def getUnit(unit:bwapi.Unit):Option[UnitInfo] = if (unit == null) None else get(unit.getID)

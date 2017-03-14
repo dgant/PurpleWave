@@ -14,7 +14,7 @@ object EvaluatePositions {
       Circle.points(searchRange)
         .map(intent.unit.tileCenter.add)
         .filter(_.isValid)
-        .filter(With.grids.walkability.get)
+        .filter(With.grids.walkable.get)
   
     if (candidates.isEmpty) {
       //Weird. unit is nowhere near a walkable position

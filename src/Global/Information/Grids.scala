@@ -10,8 +10,11 @@ class Grids {
   val enemyVision = new GridEnemyVision
   val enemyDetection = new GridEnemyDetection
   val altitudeBonus = new GridAltitudeBonus
-  val buildability = new GridBuildability
-  val walkability = new GridWalkability
+  val buildable = new GridBuildable
+  val buildableTerrain = new GridBuildableTerrain
+  val walkable = new GridWalkable
+  val walkableTerran = new GridWalkableTerrain
+  val walkableUnits = new GridWalkableUnits
   val mobility = new GridMobility
   
   def onFrame() {
@@ -21,8 +24,11 @@ class Grids {
     enemyVision.update()
     enemyDetection.update()
     altitudeBonus.update()
-    buildability.update()
-    walkability.update()
+    buildable.update()
+    buildableTerrain.update()
+    walkable.update()
+    walkableTerran.update()
+    walkableUnits.update()
     mobility.update()
   }
 }

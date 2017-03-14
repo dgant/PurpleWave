@@ -3,7 +3,7 @@ package Plans.Macro.Automatic
 import Plans.Plan
 import Startup.With
 import Types.Buildable.Buildable
-import Utilities.Caching.Cache
+import Utilities.Caching.CacheFrame
 
 abstract class AbstractBuildContinuously extends Plan {
   
@@ -14,5 +14,5 @@ abstract class AbstractBuildContinuously extends Plan {
   override def onFrame() = With.scheduler.request(this, (0 until totalRequired).map(i => _newBuild))
   
   def totalRequired:Int = _totalRequiredCache.get
-  val _totalRequiredCache = new Cache(1, () => _totalRequired)
+  val _totalRequiredCache = new CacheFrame(() => _totalRequired)
 }

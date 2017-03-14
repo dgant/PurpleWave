@@ -1,11 +1,11 @@
 package Geometry.Grids.Real
 
-import Geometry.Grids.Abstract.Grid
+import Geometry.Grids.Abstract.GridConcrete
 import bwapi.TilePosition
 
 import scala.collection.mutable
 
-abstract class GridItems[T] extends Grid[mutable.HashSet[T]] {
+abstract class GridItems[T] extends GridConcrete[mutable.HashSet[T]] {
   
   override val _positions: Array[mutable.HashSet[T]]    = Array.fill(_width * _height)(_defaultValue)
   override def _defaultValue: mutable.HashSet[T]        = mutable.HashSet.empty

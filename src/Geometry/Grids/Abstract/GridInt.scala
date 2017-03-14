@@ -2,7 +2,7 @@ package Geometry.Grids.Abstract
 
 import bwapi.TilePosition
 
-class GridInt extends Grid[Int] {
+class GridInt extends GridConcrete[Int] {
   
   override val _positions: Array[Int] = Array.fill(_width * _height)(_defaultValue)
   override def _defaultValue:Int = 0

@@ -5,7 +5,7 @@ import bwapi.TilePosition
 
 class PositionEnemyBase extends PositionFinder {
   
-  val _cache = new Cache[Option[TilePosition]](24 * 3, () => _find)
+  val _cache = new Cache[Option[TilePosition]](3, () => _find)
   
   override def find: Option[TilePosition] = _cache.get
   

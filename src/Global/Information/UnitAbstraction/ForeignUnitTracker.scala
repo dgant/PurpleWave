@@ -2,7 +2,6 @@ package Global.Information.UnitAbstraction
 
 import Startup.With
 import Types.UnitInfo.ForeignUnitInfo
-import bwapi.UnitType
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable.HashSet
@@ -112,7 +111,7 @@ class ForeignUnitTracker {
     //This check filters out the weird ghost units that BWAPI gives us at the start of a game
     if (!unit.isVisible) return false
     
-    if (List(UnitType.None, UnitType.Unknown).contains(unit.getType)) return false
+    if (With.units.invalidUnitTypes.contains(unit.getType)) return false
     if ( ! unit.exists) return false
     unit.getPlayer.isEnemy(With.game.self) || unit.getPlayer.isNeutral
   }

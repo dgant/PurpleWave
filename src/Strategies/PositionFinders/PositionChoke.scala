@@ -7,7 +7,7 @@ import bwapi.TilePosition
 
 class PositionChoke extends PositionFinder {
   
-  val _cachedChoke = new Cache[Option[TilePosition]](24, () => _recalculate)
+  val _cachedChoke = new Cache[Option[TilePosition]](1, () => _recalculate)
   
   override def find: Option[TilePosition] = _cachedChoke.get
   

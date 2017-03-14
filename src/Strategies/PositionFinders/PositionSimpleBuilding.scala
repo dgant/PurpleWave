@@ -3,15 +3,15 @@ package Strategies.PositionFinders
 import Geometry.TileRectangle
 import Startup.With
 import Utilities.Caching.Cache
-import Utilities.Enrichment.EnrichUnitType._
 import Utilities.Enrichment.EnrichPosition._
+import Utilities.Enrichment.EnrichUnitType._
 import bwapi.{TilePosition, UnitType}
 
 class PositionSimpleBuilding(
   val buildingType:UnitType)
     extends PositionFinder {
   
-  val _cache = new Cache[Option[TilePosition]](24 * 2, () => _find)
+  val _cache = new Cache[Option[TilePosition]](2, () => _find)
   
   override def find: Option[TilePosition] = _cache.get
   

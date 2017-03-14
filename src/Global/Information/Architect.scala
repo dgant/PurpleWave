@@ -111,7 +111,7 @@ class Architect {
     exclusions.filter(_.intersects(buildingArea)).isEmpty &&
     _rectangleIsBuildable(buildingArea, buildingType, hypotheticalPylon) &&
     _rectangleContainsOnlyAWorker(marginArea) &&
-    marginArea.tiles.forall(With.grids.walkability.get)
+    marginArea.tiles.forall(With.grids.walkable.get)
   }
   
   def _rectangleContainsOnlyAWorker(rectangle: TileRectangle):Boolean = {
@@ -123,7 +123,7 @@ class Architect {
   
   def _rectangleIsBuildable(area: TileRectangle, buildingType: UnitType, hypotheticalPylon: Option[TilePosition] = None):Boolean = {
     area.tiles.forall(tile =>
-      With.grids.buildability.get(tile) &&
+      With.grids.buildable.get(tile) &&
         (( ! buildingType.requiresPsi())   || With.game.hasPower(tile) || hypotheticalPylon.exists(pylon => Pylon.powers(pylon, tile))) &&
         (( ! buildingType.requiresCreep()) || With.game.hasCreep(tile)))
   }

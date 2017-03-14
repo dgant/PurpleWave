@@ -76,7 +76,7 @@ class Geography {
   def ourHarvestingAreas:Iterable[TileRectangle] = ourBases.map(_.harvestingArea)
   
   def home:TilePosition = _cacheHome.get
-  val _cacheHome = new Cache[TilePosition](24, () => _calculateHome)
+  val _cacheHome = new Cache[TilePosition](5, () => _calculateHome)
   def _calculateHome:TilePosition =
     ourBases.toList
       .sortBy( ! _.isStartLocation).map(_.centerTile)
@@ -94,7 +94,7 @@ class Geography {
   }
   
   def townHallPositions:Iterable[TilePosition] = _basePositionsCache.get
-  val _basePositionsCache = new Cache[Iterable[TilePosition]](24 * 60, () => _calculateBasePositions)
+  val _basePositionsCache = new Cache[Iterable[TilePosition]](5, () => _calculateBasePositions)
   val _resourceClusterCache = new CacheForever[Iterable[Iterable[ForeignUnitInfo]]](() => _getResourceClusters)
   val _resourceExclusionCache = new CacheForever[Iterable[TileRectangle]](() => _getExclusions)
   def _getResourceClusters:Iterable[Iterable[ForeignUnitInfo]] = Clustering.group[ForeignUnitInfo](_getResources, 32 * 12, true, (unit) => unit.position).values

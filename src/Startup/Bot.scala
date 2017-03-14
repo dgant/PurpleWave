@@ -57,7 +57,6 @@ class Bot() extends DefaultBWListener {
     try {
       With.performance.startCounting()
       With.latency.onFrame()
-
       if (With.latency.shouldRun) {
         With.units.onFrame()
         With.grids.onFrame()
@@ -69,9 +68,10 @@ class Bot() extends DefaultBWListener {
         With.gameplan.onFrame()
         With.scheduler.onFrame()
         With.commander.onFrame()
-  
-        With.performance.stopCounting()
       }
+      With.performance.stopCounting()
+      
+      
       With.camera.onFrame()
       Overlay.onFrame()
       _considerSurrender

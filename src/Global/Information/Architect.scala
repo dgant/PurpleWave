@@ -20,7 +20,7 @@ class Architect {
       .points(searchRadius)
       .view
       .map(center.add)
-      .find(position => _canBuild(buildingType, position, margin, exclusions))
+      .find(position => canBuild(buildingType, position, margin, exclusions))
   }
   
   // Try to place a collection of buildings
@@ -69,7 +69,7 @@ class Architect {
     
     val nextBuilding = buildingTypes.head
     
-    if (_canBuild(nextBuilding, searchPoint, margin, exclusions, hypotheticalPylon)) {
+    if (canBuild(nextBuilding, searchPoint, margin, exclusions, hypotheticalPylon)) {
       val newHypotheticalPylon = if (nextBuilding == UnitType.Protoss_Pylon) Some(searchPoint) else hypotheticalPylon
       val newExclusions = exclusions ++ List(new TileRectangle(searchPoint, searchPoint.add(nextBuilding.tileSize)))
       
@@ -93,7 +93,7 @@ class Architect {
     None
   }
   
-  def _canBuild(
+  def canBuild(
     buildingType:       UnitType,
     tile:               TilePosition,
     margin:             Integer                 = 0,
@@ -114,7 +114,7 @@ class Architect {
     marginArea.tiles.forall(With.grids.walkable.get)
   }
   
-  def _rectangleContainsOnlyAWorker(rectangle: TileRectangle):Boolean = {
+  private def _rectangleContainsOnlyAWorker(rectangle: TileRectangle):Boolean = {
     val trespassingUnits = With.units.inRectangle(rectangle).filterNot(_.flying)
     trespassingUnits.size <= 1 &&
       trespassingUnits.forall(_.utype.isWorker) &&

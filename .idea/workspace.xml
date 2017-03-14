@@ -27,41 +27,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="FollowBuildOrder.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Plans/Macro/Build/FollowBuildOrder.scala">
+      <file leaf-file-name="PositionSimpleBuilding.scala" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/Strategies/PositionFinders/PositionSimpleBuilding.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="297">
-              <caret line="47" column="0" lean-forward="false" selection-start-line="47" selection-start-column="0" selection-end-line="47" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Game.class" pinned="false" current-in-tab="false">
-        <entry file="jar://$PROJECT_DIR$/lib/bwmirror_v2_5.jar!/bwapi/Game.class">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="216">
-              <caret line="1059" column="27" lean-forward="false" selection-start-line="1059" selection-start-column="27" selection-end-line="1059" selection-end-column="27" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Mirror.class" pinned="false" current-in-tab="false">
-        <entry file="jar://$PROJECT_DIR$/lib/bwmirror_v2_5.jar!/bwapi/Mirror.class">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="533">
-              <caret line="41" column="23" lean-forward="false" selection-start-line="41" selection-start-column="23" selection-end-line="41" selection-end-column="23" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="UnitType.class" pinned="false" current-in-tab="false">
-        <entry file="jar://$PROJECT_DIR$/lib/bwmirror_v2_5.jar!/bwapi/UnitType.class">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="220">
-              <caret line="621" column="32" lean-forward="false" selection-start-line="621" selection-start-column="32" selection-end-line="621" selection-end-column="32" />
+            <state relative-caret-position="366">
+              <caret line="58" column="29" lean-forward="true" selection-start-line="58" selection-start-column="29" selection-end-line="58" selection-end-column="29" />
               <folding />
             </state>
           </provider>
@@ -70,58 +40,18 @@
       <file leaf-file-name="Architect.scala" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Global/Information/Architect.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="213">
-              <caret line="22" column="12" lean-forward="false" selection-start-line="22" selection-start-column="12" selection-end-line="22" selection-end-column="12" />
+            <state relative-caret-position="106">
+              <caret line="95" column="13" lean-forward="false" selection-start-line="95" selection-start-column="13" selection-end-line="95" selection-end-column="13" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="LockUnits.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Plans/Allocation/LockUnits.scala">
+      <file leaf-file-name="CacheBase.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Utilities/Caching/CacheBase.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="492">
-              <caret line="41" column="16" lean-forward="false" selection-start-line="41" selection-start-column="16" selection-end-line="41" selection-end-column="16" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Unit.class" pinned="false" current-in-tab="false">
-        <entry file="jar://$PROJECT_DIR$/lib/bwmirror_v2_5.jar!/bwapi/Unit.class">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="220">
-              <caret line="2156" column="27" lean-forward="false" selection-start-line="2156" selection-start-column="27" selection-end-line="2156" selection-end-column="27" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Class.java" pinned="false" current-in-tab="false">
-        <entry file="jar://C:/Program Files/Java/jdk1.8.0_121/src.zip!/java/lang/Class.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="398">
-              <caret line="529" column="26" lean-forward="false" selection-start-line="529" selection-start-column="26" selection-end-line="529" selection-end-column="26" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="TilePosition.class" pinned="false" current-in-tab="true">
-        <entry file="jar://$PROJECT_DIR$/lib/bwmirror_v2_5.jar!/bwapi/TilePosition.class">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="403">
-              <caret line="31" column="26" lean-forward="false" selection-start-line="31" selection-start-column="26" selection-end-line="31" selection-end-column="26" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="PositionSimpleBuilding.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Strategies/PositionFinders/PositionSimpleBuilding.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="117">
-              <caret line="14" column="2" lean-forward="true" selection-start-line="14" selection-start-column="2" selection-end-line="14" selection-end-column="2" />
+            <state relative-caret-position="91">
+              <caret line="7" column="6" lean-forward="false" selection-start-line="7" selection-start-column="6" selection-end-line="7" selection-end-column="15" />
               <folding />
             </state>
           </provider>
@@ -207,11 +137,9 @@
         <option value="$PROJECT_DIR$/src/Geometry/Grids/Real/GridBuildability.scala" />
         <option value="$PROJECT_DIR$/src/Global/Information/Grids.scala" />
         <option value="$PROJECT_DIR$/src/Geometry/Grids/Real/GridBuildable.scala" />
-        <option value="$PROJECT_DIR$/src/Global/Information/Architect.scala" />
         <option value="$PROJECT_DIR$/src/Development/performance.scala" />
         <option value="$PROJECT_DIR$/src/Startup/With.scala" />
         <option value="$PROJECT_DIR$/src/Development/Configuration.scala" />
-        <option value="$PROJECT_DIR$/src/Utilities/Caching/CacheBase.scala" />
         <option value="$PROJECT_DIR$/src/Utilities/Caching/CachePerFrame.scala" />
         <option value="$PROJECT_DIR$/src/Utilities/Caching/Cache.scala" />
         <option value="$PROJECT_DIR$/src/Global/Information/Intelligence.scala" />
@@ -241,6 +169,8 @@
         <option value="$PROJECT_DIR$/src/Geometry/Grids/Abstract/GridConcrete.scala" />
         <option value="$PROJECT_DIR$/src/Development/Performance.scala" />
         <option value="$PROJECT_DIR$/src/Startup/Bot.scala" />
+        <option value="$PROJECT_DIR$/src/Utilities/Caching/CacheBase.scala" />
+        <option value="$PROJECT_DIR$/src/Global/Information/Architect.scala" />
         <option value="$PROJECT_DIR$/src/Strategies/PositionFinders/PositionSimpleBuilding.scala" />
       </list>
     </option>
@@ -416,7 +346,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="project.structure.last.edited" value="Project" />
+    <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
@@ -578,7 +508,7 @@
     <configuration default="false" name="PurpleWave" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="Startup.Main" />
       <option name="VM_PARAMETERS" value="" />
-      <option name="PROGRAM_PARAMETERS" value="-agentlib:hprof=file=$PROJECT_DIR$/../hprof.txt,cpu=times" />
+      <option name="PROGRAM_PARAMETERS" value="-J-Djava.security.policy=all.policy -J-Djava.rmi.server.hostname=localhost:20000 -Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.port=20000 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false" />
       <option name="WORKING_DIRECTORY" value="file://C:/Program Files (x86)/StarCraft" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
       <option name="ALTERNATIVE_JRE_PATH" value="C:/Program Files (x86)/Java/jre1.8.0_121" />
@@ -643,7 +573,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="1596" y="68" width="1368" height="776" extended-state="6" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4473684" sideWeight="0.488125" order="6" side_tool="false" content_ui="tabs" />
@@ -658,7 +588,7 @@
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3508772" sideWeight="0.49411765" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.45367646" sideWeight="0.49117646" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24415205" sideWeight="0.49117646" order="13" side_tool="false" content_ui="tabs" />
       <window_info id="Debug with VisualVM" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32748538" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -969,14 +899,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Utilities/Caching/CacheBase.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="260">
-          <caret line="20" column="34" lean-forward="true" selection-start-line="20" selection-start-column="34" selection-end-line="20" selection-end-column="34" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Utilities/Caching/CacheFrame.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="26">
@@ -1105,14 +1027,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Strategies/PositionFinders/PositionSimpleBuilding.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="117">
-          <caret line="14" column="2" lean-forward="true" selection-start-line="14" selection-start-column="2" selection-end-line="14" selection-end-column="2" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$PROJECT_DIR$/lib/bwmirror_v2_5.jar!/bwapi/Mirror.class">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="533">
@@ -1129,18 +1043,34 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Global/Information/Architect.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="213">
-          <caret line="22" column="12" lean-forward="false" selection-start-line="22" selection-start-column="12" selection-end-line="22" selection-end-column="12" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$PROJECT_DIR$/lib/bwmirror_v2_5.jar!/bwapi/TilePosition.class">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="403">
           <caret line="31" column="26" lean-forward="false" selection-start-line="31" selection-start-column="26" selection-end-line="31" selection-end-column="26" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Utilities/Caching/CacheBase.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="91">
+          <caret line="7" column="6" lean-forward="false" selection-start-line="7" selection-start-column="6" selection-end-line="7" selection-end-column="15" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Global/Information/Architect.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="106">
+          <caret line="95" column="13" lean-forward="false" selection-start-line="95" selection-start-column="13" selection-end-line="95" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Strategies/PositionFinders/PositionSimpleBuilding.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="366">
+          <caret line="58" column="29" lean-forward="true" selection-start-line="58" selection-start-column="29" selection-end-line="58" selection-end-column="29" />
           <folding />
         </state>
       </provider>

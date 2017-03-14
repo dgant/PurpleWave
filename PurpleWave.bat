@@ -1,0 +1,1 @@
+"C:\Program Files (x86)\Java\jre1.8.0_121\bin\java.exe" -d32 -cp $SCALA_HOME/lib/scala-library.jar -jar ./out/artifacts/PurpleWave.jar Startup.Main -Duser.dir="C:\Program Files (x86)\Starcraft" -Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.port=20000 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false 

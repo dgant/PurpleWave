@@ -16,24 +16,18 @@ class PositionSimpleBuilding(
   override def find: Option[TilePosition] = _cache.get
   
   def _find: Option[TilePosition] = {
-    val home = With.geography.home
+    
+    if (_cache.lastValue.isDefined && _cache.lastValue.get.isDefined) {
+      val lastPosition = _cache.lastValue.get.get
+      
+      if (With.architect.canBuild(buildingType, lastPosition, maxMargin, exclusions)) {
+        return Some(lastPosition)
+      }
+    }
     
     if (buildingType.isRefinery)      return _positionRefinery
     else if (buildingType.isTownHall) return _positionTownHall
-    
-    val maxMargin = if (buildingType == UnitType.Protoss_Pylon && With.units.ours.count(_.utype == buildingType) < 4) 3 else 1
-  
-    var output:Option[TilePosition] = None
-    (maxMargin to 0 by -1).foreach(margin =>
-      output = output.orElse(
-        With.architect.placeBuilding(
-        buildingType,
-        home,
-        margin = margin,
-        searchRadius = 50,
-        exclusions = With.geography.bases.map(_.harvestingArea))))
-    
-    output
+    else                              return _positionBuilding
   }
   
   def _positionRefinery:Option[TilePosition] = {
@@ -44,11 +38,9 @@ class PositionSimpleBuilding(
         With.geography.bases.exists(base =>
           base.zone.owner == With.game.self &&
           base.harvestingArea.contains(gas.tileCenter)))
+      .map(_.tileTopLeft)
     
-    return if (candidates.isEmpty)
-      None
-    else
-      Some(candidates.minBy(_.tileTopLeft.getDistance(With.geography.home)).tileTopLeft)
+    if (candidates.isEmpty) None else Some(candidates.minBy(_.tileDistance(With.geography.home)))
   }
   
   def _positionTownHall:Option[TilePosition] = {
@@ -58,8 +50,32 @@ class PositionSimpleBuilding(
         With.units.all.filter(_.utype.isBuilding).forall( ! _.tileArea.intersects(rectangle))
       })
   
-    return if (candidates.isEmpty)
-      None
-    else Some(candidates.minBy(With.paths.groundDistance(_, With.geography.home)))
+    if (candidates.isEmpty) None else Some(candidates.minBy(With.paths.groundDistance(_, With.geography.home)))
   }
+  
+  def _positionBuilding:Option[TilePosition] = {
+    var output:Option[TilePosition] = None
+    (maxMargin to 0 by -1).foreach(margin =>
+      output = output.orElse(
+        With.architect.placeBuilding(
+          buildingType,
+          With.geography.home,
+          margin = margin,
+          searchRadius = 50,
+          exclusions = exclusions)))
+    output
+  }
+  
+  def maxMargin:Int = {
+    if (buildingType.isRefinery)
+      0
+    else if (buildingType.isTownHall)
+      0
+    else if (buildingType == UnitType.Protoss_Pylon && With.units.ours.count(_.utype == buildingType) < 4)
+      3
+    else
+      1
+  }
+    
+  def exclusions:Iterable[TileRectangle] = With.geography.bases.map(_.harvestingArea)
 }

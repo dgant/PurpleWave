@@ -2,10 +2,8 @@ package Global.Information
 
 import Geometry.TileRectangle
 import Startup.With
-import Types.UnitInfo.UnitInfo
+import Types.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import bwapi.Race
-
-import scala.collection.JavaConverters._
 
 class Economy {
   
@@ -34,19 +32,19 @@ class Economy {
     With.game.self.gatheredGas
   }
   
-  def ourActiveHarvesters:Iterable[bwapi.Unit] = {
+  def ourActiveHarvesters:Iterable[FriendlyUnitInfo] = {
     With.geography.ourHarvestingAreas.flatten(ourActiveHarvesters)
   }
   
-  def ourActiveMiners:Iterable[bwapi.Unit] = {
+  def ourActiveMiners:Iterable[FriendlyUnitInfo] = {
     With.geography.ourHarvestingAreas.flatten(ourActiveMiners)
   }
   
-  def ourActiveDrillers:Iterable[bwapi.Unit] = {
+  def ourActiveDrillers:Iterable[FriendlyUnitInfo] = {
     With.geography.ourHarvestingAreas.flatten(ourActiveDrillers)
   }
   
-  def ourActiveHarvesters(harvestingArea:TileRectangle):Iterable[bwapi.Unit] = {
+  def ourActiveHarvesters(harvestingArea:TileRectangle):Iterable[FriendlyUnitInfo] = {
     With.units.inRectangle(harvestingArea).flatten(_.friendly)
       //This is a slightly dubious filter.
       // 1. There are several associated UnitCommandTypes, including ReturnCargo
@@ -55,11 +53,11 @@ class Economy {
       .filter(worker => worker.isGatheringMinerals || worker.isGatheringGas)
   }
   
-  def ourActiveMiners(miningArea:TileRectangle):Iterable[bwapi.Unit] = {
+  def ourActiveMiners(miningArea:TileRectangle):Iterable[FriendlyUnitInfo] = {
     ourActiveHarvesters(miningArea).filter(_.isGatheringMinerals)
   }
   
-  def ourActiveDrillers(miningArea:TileRectangle):Iterable[bwapi.Unit] = {
+  def ourActiveDrillers(miningArea:TileRectangle):Iterable[FriendlyUnitInfo] = {
     ourActiveHarvesters(miningArea).filter(_.isGatheringGas)
   }
   

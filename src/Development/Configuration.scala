@@ -12,7 +12,7 @@ class Configuration {
   var cameraDynamicSpeedMin       = 30
   var cameraDynamicSpeedMax       = 0
   
-  var enableOverlay               = true
+  var enableOverlay               = false
   var enableOverlayBattles        = false
   var enableOverlayEconomy        = false
   var enableOverlayFrameLength    = true

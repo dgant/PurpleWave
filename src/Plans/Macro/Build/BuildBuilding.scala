@@ -71,7 +71,7 @@ class BuildBuilding(val buildingType:UnitType) extends Plan {
           this,
           unit,
           DefaultBehavior,
-          _position.map(_.add(1, 1)).headOption.getOrElse(unit.position.toTilePosition))))
+          _position.map(_.add(1, 1)).headOption.getOrElse(unit.pixel.toTilePosition))))
     }
   }
   

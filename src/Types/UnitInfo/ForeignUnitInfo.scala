@@ -74,8 +74,8 @@ class ForeignUnitInfo(_baseUnit:bwapi.Unit) extends UnitInfo (_baseUnit) {
   override def lastSeen             : Int             = _lastSeen
   override def possiblyStillThere   : Boolean         = _possiblyStillThere
   override def player               : Player          = _player
-  override def position             : Position        = _position
-  override def walkPosition         : WalkPosition    = position.toWalkPosition
+  override def pixel             : Position        = _position
+  override def walkPosition         : WalkPosition    = pixel.toWalkPosition
   override def tileTopLeft          : TilePosition    = _tileTopleft
   override def hitPoints            : Int             = _hitPoints
   override def shieldPoints         : Int             = _shieldPoints

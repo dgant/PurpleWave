@@ -44,7 +44,7 @@ class GatherGas extends Plan {
       .foreach(refinery =>
         (1 to 3).foreach(i => {
           if (availableDrillers.nonEmpty) {
-            val driller = availableDrillers.minBy(_.position.getApproxDistance(refinery.position))
+            val driller = availableDrillers.minBy(_.pixel.getApproxDistance(refinery.pixel))
             availableDrillers.remove(driller)
             if ( ! driller.isGatheringGas || driller.distance(refinery) > 32 * 8) {
               driller.baseUnit.gather(refinery.baseUnit)

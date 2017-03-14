@@ -55,7 +55,7 @@ class GatherMinerals extends Plan {
     while (unassignedWorkers.nonEmpty) {
       _minerals.foreach(mineral => {
         if (unassignedWorkers.nonEmpty) {
-          val worker = unassignedWorkers.minBy(_.position.getDistance(mineral.position))
+          val worker = unassignedWorkers.minBy(_.pixel.getDistance(mineral.pixel))
           _workersByMineral(mineral).add(worker)
           _mineralByWorker.put(worker, mineral)
           unassignedWorkers.remove(worker)
@@ -85,7 +85,7 @@ class GatherMinerals extends Plan {
   def _orderWorker(worker:FriendlyUnitInfo) {
     if (worker.isGatheringMinerals) {
       _mineralByWorker.get(worker).foreach(mineral => {
-        if (mineral.position.getDistance(worker.position) > 32 * 12) {
+        if (mineral.pixel.getDistance(worker.pixel) > 32 * 12) {
           _gather(worker, mineral)
         }
       })

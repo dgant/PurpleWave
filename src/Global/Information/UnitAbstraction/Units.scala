@@ -40,7 +40,7 @@ class Units {
       .points(tileRadius)
       .map(tile.add)
       .flatten(With.grids.units.get)
-      .filter(_.position.pixelDistanceSquared(position) <= range * range)
+      .filter(_.pixel.pixelDistanceSquared(position) <= range * range)
   }
   
   def inRectangle(topLeftInclusive:Position, bottomRightExclusive:Position):Iterable[UnitInfo] = {
@@ -48,10 +48,10 @@ class Units {
         .tiles
         .flatten(With.grids.units.get)
         .filter(unit =>
-          unit.position.getX >= topLeftInclusive.getX &&
-          unit.position.getY >= topLeftInclusive.getY &&
-          unit.position.getX < bottomRightExclusive.getX &&
-          unit.position.getY < bottomRightExclusive.getY)
+          unit.pixel.getX >= topLeftInclusive.getX &&
+          unit.pixel.getY >= topLeftInclusive.getY &&
+          unit.pixel.getX < bottomRightExclusive.getX &&
+          unit.pixel.getY < bottomRightExclusive.getY)
   }
   
   def inRectangle(rectangle:TileRectangle):Iterable[UnitInfo] = {

@@ -62,7 +62,7 @@ class Geography {
   def _updateZones() =
     _zoneCache.get.flatten(_.bases).foreach(base => {
       val townHall = With.units.buildings.filter(_.utype.isTownHall)
-        .filter(townHall => base.zone.region.getPolygon.isInside(townHall.position))
+        .filter(townHall => base.zone.region.getPolygon.isInside(townHall.pixel))
         .toList
         .sortBy(_.distance(base.townHallArea.midpoint))
         .headOption
@@ -97,13 +97,13 @@ class Geography {
   val _basePositionsCache = new Cache[Iterable[TilePosition]](5, () => _calculateBasePositions)
   val _resourceClusterCache = new CacheForever[Iterable[Iterable[ForeignUnitInfo]]](() => _getResourceClusters)
   val _resourceExclusionCache = new CacheForever[Iterable[TileRectangle]](() => _getExclusions)
-  def _getResourceClusters:Iterable[Iterable[ForeignUnitInfo]] = Clustering.group[ForeignUnitInfo](_getResources, 32 * 12, true, (unit) => unit.position).values
+  def _getResourceClusters:Iterable[Iterable[ForeignUnitInfo]] = Clustering.group[ForeignUnitInfo](_getResources, 32 * 12, true, (unit) => unit.pixel).values
   def _getExclusions:Iterable[TileRectangle] = _getResources.map(_getExclusion)
   def _getExclusion(unit:ForeignUnitInfo):TileRectangle = new TileRectangle(unit.tileTopLeft.subtract(3, 3), unit.tileTopLeft.add(unit.utype.tileSize).add(3, 3))
   def _getResources:Iterable[ForeignUnitInfo] = With.units.neutral.filter(unit => unit.isMinerals || unit.isGas).filter(_.baseUnit.getInitialResources > 0)
   def _calculateBasePositions:Iterable[TilePosition] = _resourceClusterCache.get.flatMap(_findBasePosition)
   def _findBasePosition(resources:Iterable[ForeignUnitInfo]):Option[TilePosition] = {
-    val centroid = resources.map(_.position).centroid
+    val centroid = resources.map(_.pixel).centroid
     val centroidTile = centroid.toTilePosition
     val searchRadius = 10
     val candidates = Circle.points(searchRadius).map(centroidTile.add).filter(_isLegalBasePosition)

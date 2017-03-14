@@ -39,12 +39,12 @@ object Overlay {
     With.game.drawLineMap(battle.focus, battle.us.vanguard, Color.Blue)
     With.game.drawLineMap(battle.focus, battle.enemy.vanguard, Color.Red)
     With.game.drawBoxMap(
-      battle.us.units.map(_.position).minBound,
-      battle.us.units.map(_.position).maxBound,
+      battle.us.units.map(_.pixel).minBound,
+      battle.us.units.map(_.pixel).maxBound,
       Color.Blue)
     With.game.drawBoxMap(
-      battle.enemy.units.map(_.position).minBound,
-      battle.enemy.units.map(_.position).maxBound,
+      battle.enemy.units.map(_.pixel).minBound,
+      battle.enemy.units.map(_.pixel).maxBound,
       Color.Red)
     _drawTextLabel(
       List(battle.us.strength/100 + " - " + battle.enemy.strength/100),
@@ -110,7 +110,7 @@ object Overlay {
     With.units.ours
       .filter(unit => Debugger.highlitUnits.contains(unit))
       .foreach(unit =>
-      With.game.drawCircleMap(unit.position, 32, Color.Orange))
+      With.game.drawCircleMap(unit.pixel, 32, Color.Orange))
     With.units.ours
       .filterNot(_.command.getUnitCommandType == UnitCommandType.None)
       .foreach(unit => _drawTextLabel(
@@ -119,7 +119,7 @@ object Overlay {
           With.commander._lastIntentions.get(unit).map(intent => intent.plan.toString).getOrElse(""),
           With.commander._lastCommands.get(unit).getOrElse(""),
           unit.command.getUnitCommandType.toString),
-        unit.position,
+        unit.pixel,
         drawBackground = false))
   }
   
@@ -220,12 +220,12 @@ object Overlay {
   def _drawTrackedUnit(trackedUnit:ForeignUnitInfo) {
     if (trackedUnit._possiblyStillThere && ! trackedUnit.visible) {
       With.game.drawCircleMap(
-        trackedUnit.position,
+        trackedUnit.pixel,
         trackedUnit.utype.width / 2,
         _getPlayerColor(trackedUnit.player))
       _drawTextLabel(
         List(TypeDescriber.unit(trackedUnit.utype)),
-        trackedUnit.position,
+        trackedUnit.pixel,
         drawBackground = true,
         _getPlayerColor(trackedUnit.player))
     }

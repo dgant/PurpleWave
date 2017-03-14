@@ -17,7 +17,7 @@ abstract class UnitInfo (var baseUnit:bwapi.Unit) {
   def lastSeen:Int
   def possiblyStillThere:Boolean
   def player:Player
-  def position:Position
+  def pixel:Position
   def walkPosition:WalkPosition
   def tileTopLeft:TilePosition
   def hitPoints:Int
@@ -41,8 +41,8 @@ abstract class UnitInfo (var baseUnit:bwapi.Unit) {
   
   def canFight                                    : Boolean                 = complete && utype.canAttack || List(UnitType.Protoss_Carrier, UnitType.Protoss_Reaver, UnitType.Terran_Bunker).contains(utype)
   def impactsCombat                               : Boolean                 = canFight || List(UnitType.Terran_Medic).contains(utype) //This ignores spellcasters
-  def x                                           : Int                     = position.getX
-  def y                                           : Int                     = position.getY
+  def x                                           : Int                     = pixel.getX
+  def y                                           : Int                     = pixel.getY
   def attackFrames                                : Int                     = 8 + (if (List(UnitType.Protoss_Dragoon, UnitType.Zerg_Devourer).contains(utype)) 6 else 0)
   def isOurs                                      : Boolean                 = player == With.self
   def isFriendly                                  : Boolean                 = isOurs || player.isAlly(With.self)
@@ -60,15 +60,15 @@ abstract class UnitInfo (var baseUnit:bwapi.Unit) {
   def isMinerals                                  : Boolean                 = utype.isMinerals
   def isGas                                       : Boolean                 = utype.isGas
   def isResource                                  : Boolean                 = isMinerals || isGas
-  def tileCenter                                  : TilePosition            = position.toTilePosition
+  def tileCenter                                  : TilePosition            = pixel.toTilePosition
   def hypotenuse                                  : Double                  = utype.width * 1.41421356
   def tileArea                                    : TileRectangle           = new TileRectangle(tileTopLeft, new Position(right, bottom).tileIncluding.add(1, 1))
   def distanceFromEdge(otherUnit:UnitInfo)        : Double                  = distance(otherUnit) - hypotenuse - otherUnit.hypotenuse //Improve by counting angle
-  def distance(otherUnit:UnitInfo)                : Double                  = distance(otherUnit.position)
-  def distance(otherPosition:Position)            : Double                  = position.getDistance(otherPosition)
+  def distance(otherUnit:UnitInfo)                : Double                  = distance(otherUnit.pixel)
+  def distance(otherPosition:Position)            : Double                  = pixel.getDistance(otherPosition)
   def distance(otherPosition:TilePosition)        : Double                  = distance(otherPosition.toPosition)
-  def distanceSquared(otherUnit:UnitInfo)         : Double                  = distanceSquared(otherUnit.position)
-  def distanceSquared(otherPosition:Position)     : Double                  = position.pixelDistanceSquared(otherPosition)
+  def distanceSquared(otherUnit:UnitInfo)         : Double                  = distanceSquared(otherUnit.pixel)
+  def distanceSquared(otherPosition:Position)     : Double                  = pixel.pixelDistanceSquared(otherPosition)
   def distanceSquared(otherPosition:TilePosition) : Double                  = distance(otherPosition.toPosition)
   
 }

@@ -20,7 +20,7 @@ abstract class GridStrength extends GridInt {
     _getUnits.foreach(unit => {
       val strength = BattleMetrics.evaluate(unit)
       val latencyFrames = With.game.getLatencyFrames
-      val tilePosition = unit.position.toTilePosition //position.toTilePosition uses the unit's center rather than its top-left corner
+      val tilePosition = unit.pixel.toTilePosition //position.toTilePosition uses the unit's center rather than its top-left corner
       val rangeFull = unit.range
       val rangeZero = unit.range + rangeMargin + (unit.utype.topSpeed * (framesToLookAhead + latencyFrames)).toInt
       if (strength > 0) {

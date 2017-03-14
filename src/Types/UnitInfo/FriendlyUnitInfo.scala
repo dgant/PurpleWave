@@ -20,8 +20,8 @@ class FriendlyUnitInfo(_baseUnit:bwapi.Unit) extends UnitInfo(_baseUnit) {
   override def possiblyStillThere         : Boolean                   = true
   override def alive                      : Boolean                   = _cacheExists.get
   override def player                     : Player                    = _cachePlayer.get
-  override def position                   : Position                  = _cachePosition.get
-  override def walkPosition               : WalkPosition              = position.toWalkPosition
+  override def pixel                   : Position                  = _cachePosition.get
+  override def walkPosition               : WalkPosition              = pixel.toWalkPosition
   override def tileTopLeft                : TilePosition              = _cacheTile.get
   override def hitPoints                  : Int                       = baseUnit.getHitPoints
   override def shieldPoints               : Int                       = baseUnit.getShields

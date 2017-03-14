@@ -8,13 +8,14 @@ import scala.collection.mutable
 object ScheduleSimulator {
 
   val maxDepthBuildables = 50
+  val maxQueueOutput = 15
   val maxDepthFrames = 24 * 60 * 2
   
-  def simulate:ScheduleSimulationResult = {
+  def simulate(buildQueue:Iterable[Buildable]):ScheduleSimulationResult = {
     val currentState = ScheduleSimulationStateBuilder.build
-    var buildablesRequested = With.scheduler.queue.toArray
+    var buildablesRequested = buildQueue.toArray
     val buildablesImpossible = new mutable.HashSet[Buildable]
-    val eventsPlanned = new mutable.PriorityQueue[SimulationEvent]
+    val eventsPlanned = new mutable.PriorityQueue[BuildEvent]
     
     var index = 0
     while (index < buildablesRequested.size && index < maxDepthBuildables) {
@@ -22,6 +23,9 @@ object ScheduleSimulator {
       val nextBuildable = buildablesRequested(index)
       index += 1
       
+      if (buildablesRequested.length >= maxQueueOutput ) {
+        //Stop calculating here
+      }
       if (buildablesImpossible.contains(nextBuildable)) {
         //We already know we can't build this, so don't waste time trying :)
       }

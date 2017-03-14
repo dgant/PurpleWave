@@ -3,10 +3,10 @@ package Global.Resources.Scheduling
 import Startup.With
 import Types.Buildable.Buildable
 
-class SimulationEvent(
+class BuildEvent(
   val buildable:Buildable,
   val frameStart:Int,
-  val frameEnd:Int) extends Comparable[SimulationEvent] {
+  val frameEnd:Int) extends Comparable[BuildEvent] {
   
   override def toString: String = buildable.toString
   
@@ -16,7 +16,7 @@ class SimulationEvent(
   }
   
   //Not strictly necessary, but helps keep the simulation more stable
-  override def compareTo(other: SimulationEvent): Int = {
+  override def compareTo(other: BuildEvent): Int = {
     val start = frameStart.compareTo(other.frameStart)
     if (start != 0) return start
     return frameEnd.compareTo(other.frameEnd)

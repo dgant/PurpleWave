@@ -3,6 +3,7 @@ package Global.Resources.Scheduling
 import Plans.Plan
 import Startup.With
 import Types.Buildable.Buildable
+import Utilities.Caching.Limiter
 import bwapi.UnitType
 
 import scala.collection.mutable
@@ -11,28 +12,34 @@ class Scheduler {
   
   val _requests = new mutable.HashMap[Plan, Iterable[Buildable]]
   val _recentlyUpdated = new mutable.HashSet[Plan]
-  
   var simulationResults:ScheduleSimulationResult = new ScheduleSimulationResult(List.empty, List.empty, List.empty)
+  
+  def queue:Iterable[BuildEvent] = simulationResults.suggestedEvents
   
   def request(requester:Plan, buildables: Iterable[Buildable]) {
     _requests.put(requester, buildables)
     _recentlyUpdated.add(requester)
   }
   
-  def queue:Iterable[Buildable] = {
+  val _updateQueueLimiter = new Limiter(24, () => _updateQueue)
+  def onFrame() = {
+    _requests.keySet.diff(_recentlyUpdated).foreach(_requests.remove)
+    _recentlyUpdated.clear()
+    _updateQueueLimiter.act()
+  }
+  
+  def _updateQueue() {
     val unitsWanted = new mutable.HashMap[UnitType, Int]
     val unitsActual = With.units.ours.groupBy(_.utype).mapValues(_.size)
-    _requests.keys.toList
+    val rawQueue = _requests.keys.toList
       .sortBy(With.prioritizer.getPriority)
       .flatten(_requests)
       .filterNot(buildable => _isFulfilled(buildable, unitsWanted, unitsActual))
+  
+    simulationResults = ScheduleSimulator.simulate(rawQueue)
   }
   
-  def onFrame() {
-    _requests.keySet.diff(_recentlyUpdated).foreach(_requests.remove)
-    _recentlyUpdated.clear()
-    simulationResults = ScheduleSimulator.simulate
-  }
+  
   
   def _isFulfilled(
     buildable:Buildable,

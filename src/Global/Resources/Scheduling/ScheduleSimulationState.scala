@@ -7,16 +7,16 @@ import bwapi.{TechType, UnitType, UpgradeType}
 import scala.collection.mutable
 
 class ScheduleSimulationState(
-  var frame               : Int,
-  var minerals            : Int,
-  var gas                 : Int,
-  var supplyAvailable     : Int,
-  var unitsOwned          : mutable.HashMap[UnitType, Int],
-  var unitsAvailable      : mutable.HashMap[UnitType, Int],
-  var techsOwned          : mutable.Set[TechType],
-  var upgradeLevels       : mutable.Map[UpgradeType, Int],
-  val eventQueue          : mutable.SortedSet[SimulationEvent],
-  val isDisposableCopy    : Boolean = false) {
+                               var frame               : Int,
+                               var minerals            : Int,
+                               var gas                 : Int,
+                               var supplyAvailable     : Int,
+                               var unitsOwned          : mutable.HashMap[UnitType, Int],
+                               var unitsAvailable      : mutable.HashMap[UnitType, Int],
+                               var techsOwned          : mutable.Set[TechType],
+                               var upgradeLevels       : mutable.Map[UpgradeType, Int],
+                               val eventQueue          : mutable.SortedSet[BuildEvent],
+                               val isDisposableCopy    : Boolean = false) {
   
   private def disposableCopy:ScheduleSimulationState =
     new ScheduleSimulationState(
@@ -35,7 +35,7 @@ class ScheduleSimulationState(
   // Public interface //
   //////////////////////
   
-  def assumeEvent(event:SimulationEvent) {
+  def assumeEvent(event:BuildEvent) {
     eventQueue.add(event)
     
     if      (event.frameStart <  frame) reserveBuilders(event.buildable)
@@ -44,7 +44,7 @@ class ScheduleSimulationState(
   
   def tryBuilding(buildable: Buildable, maxFrames:Int): TryBuildingResult = {
     if (isBuildableNow(buildable)) {
-      val event = new SimulationEvent(buildable, frame, frame + buildable.frames)
+      val event = new BuildEvent(buildable, frame, frame + buildable.frames)
       val futureWithThisEvent = disposableCopy
       futureWithThisEvent.eventQueue.add(event)
       if (futureWithThisEvent.allEventsStillBuildableOnTime) {
@@ -145,8 +145,8 @@ class ScheduleSimulationState(
     3 * List(UnitType.Terran_Refinery, UnitType.Protoss_Assimilator, UnitType.Zerg_Extractor).map(available).sum,
     numberOfWorkers / 3)
   
-  private def nextEventByStart : SimulationEvent = eventQueue.minBy(_.frameStart)
-  private def nextEventByEnd   : SimulationEvent = eventQueue.minBy(_.frameEnd)
+  private def nextEventByStart : BuildEvent = eventQueue.minBy(_.frameStart)
+  private def nextEventByEnd   : BuildEvent = eventQueue.minBy(_.frameEnd)
   
   ////////////////////////////
   // Running the simulation //
@@ -187,20 +187,20 @@ class ScheduleSimulationState(
     allEventsStillBuildable
   }
   
-  private def eventsStarting : Iterable[SimulationEvent] = eventQueue.filter(_.frameStart == frame)
-  private def eventsEnding   : Iterable[SimulationEvent] = eventQueue.filter(_.frameEnd   == frame)
+  private def eventsStarting : Iterable[BuildEvent] = eventQueue.filter(_.frameStart == frame)
+  private def eventsEnding   : Iterable[BuildEvent] = eventQueue.filter(_.frameEnd   == frame)
   
   ///////////////////////////////////
   // Mutating the simulation state //
   ///////////////////////////////////
   
-  private def startEvent(event: SimulationEvent) {
+  private def startEvent(event: BuildEvent) {
     spendResources(event.buildable)
     reserveBuilders(event.buildable)
     spendBuilders(event.buildable)
   }
   
-  private def endEvent(event: SimulationEvent) {
+  private def endEvent(event: BuildEvent) {
     val buildable = event.buildable
     supplyAvailable += buildable.supplyProvided
     buildable.unitOption.foreach(addUnitOwned)

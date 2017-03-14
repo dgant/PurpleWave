@@ -6,7 +6,7 @@ import Types.UnitInfo.FriendlyUnitInfo
 
 object ScheduleSimulationEventAnticipator {
   
-  def anticipate:Iterable[SimulationEvent] = {
+  def anticipate:Iterable[BuildEvent] = {
     With.units.ours.toList.flatten(unit => {
       List(
         getUnitCompletion(unit, unit.framesBeforeBecomingComplete),
@@ -16,21 +16,19 @@ object ScheduleSimulationEventAnticipator {
     })
   }
   
-  def getUnitCompletion(
-   unit:FriendlyUnitInfo,
-   timeLeft:Int):
-      Iterable[SimulationEvent] = {
+  def getUnitCompletion(unit:FriendlyUnitInfo, timeLeft:Int):
+      Iterable[BuildEvent] = {
     if (timeLeft <= 0) return List.empty
     List(buildEvent(new BuildableUnit(unit.utype), timeLeft))
   }
   
-  def getTechCompletion(unit:FriendlyUnitInfo): Iterable[SimulationEvent] = {
+  def getTechCompletion(unit:FriendlyUnitInfo): Iterable[BuildEvent] = {
     val timeLeft = unit.framesBeforeTechComplete
     if (timeLeft <= 0) return List.empty
     List(buildEvent(new BuildableTech(unit.teching), timeLeft))
   }
   
-  def getUpgradeCompletion(unit:FriendlyUnitInfo): Iterable[SimulationEvent] = {
+  def getUpgradeCompletion(unit:FriendlyUnitInfo): Iterable[BuildEvent] = {
     val timeLeft = unit.framesBeforeUpgradeComplete
     if (timeLeft <= 0) return List.empty
     val upgrade = unit.upgrading
@@ -38,12 +36,6 @@ object ScheduleSimulationEventAnticipator {
     List(buildEvent(new BuildableUpgrade(upgrade, level), timeLeft))
   }
   
-  def buildEvent(
-    buildable:Buildable,
-    framesLeft:Int)
-      :SimulationEvent =
-    new SimulationEvent(
-      buildable,
-      -1,
-      With.game.getFrameCount + framesLeft)
+  def buildEvent(buildable:Buildable, framesLeft:Int):BuildEvent =
+    new BuildEvent(buildable, -1, With.game.getFrameCount + framesLeft)
 }

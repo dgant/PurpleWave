@@ -7,9 +7,9 @@ abstract class LimiterBase(action:() => Unit) {
   private var nextAction = 0
   
   def act() {
-    if (With.game.getFrameCount >= nextAction) {
+    if (With.frame >= nextAction) {
       action()
-      nextAction = With.game.getFrameCount + frameDelay
+      nextAction = With.frame + frameDelay
     }
   }
   

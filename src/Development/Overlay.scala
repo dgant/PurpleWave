@@ -181,7 +181,7 @@ object Overlay {
       .map(event => List(event.toString.split("\\s+")(0), _reframe(event.frameStart), _reframe(event.frameEnd))))
     With.game.drawTextScreen(300, 85, "Started")
     _drawTable(300, 100, With.scheduler.simulationResults.simulatedEvents
-      .filter(e => e.frameStart < With.game.getFrameCount)
+      .filter(e => e.frameStart < With.frame)
       .toList
       .sortBy(_.buildable.toString)
       .sortBy(_.frameStart)
@@ -196,7 +196,7 @@ object Overlay {
   }
   
   def _reframe(frameAbsolute:Int):String = {
-    val reframed = (frameAbsolute - With.game.getFrameCount)/24
+    val reframed = (frameAbsolute - With.game.frame)/24
     if (reframed <= 0) "Started" else reframed.toString
   }
   

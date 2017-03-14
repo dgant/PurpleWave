@@ -31,4 +31,7 @@ object With {
   var recruiter:Recruiter = null
   var scheduler:Scheduler = null
   var units: Units = null
+  
+  var self:Player = null
+  var frame = 0
 }

@@ -76,8 +76,8 @@ class BuildBuilding(val buildingType:UnitType) extends Plan {
   }
   
   def _orderToBuild(builder:FriendlyUnitInfo) {
-    if (_lastOrderFrame < With.game.getFrameCount - 24) {
-      _lastOrderFrame = With.game.getFrameCount
+    if (_lastOrderFrame < With.frame - 24) {
+      _lastOrderFrame = With.frame
       
       if ( ! _position.exists(p => With.game.canBuildHere(p, buildingType, builder.baseUnit))) {
         _position = buildingPlacer.find

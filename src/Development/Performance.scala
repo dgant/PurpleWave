@@ -16,9 +16,9 @@ class Performance {
   
   def stopCounting() {
     val millisecondDifference = System.currentTimeMillis - millisecondsBefore
-    frameTimes(With.game.getFrameCount % framesToTrack) = millisecondDifference
+    frameTimes(With.frame % framesToTrack) = millisecondDifference
   
-    if (With.game.getFrameCount % framesToTrack == 0) {
+    if (With.frame % framesToTrack == 0) {
       if (meanFrameLength > 20 || maxFrameLength > 75) {
         currentFrameDelay += 1
       } else {

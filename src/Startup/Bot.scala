@@ -15,35 +15,37 @@ class Bot() extends DefaultBWListener {
 
   override def onStart() {
     try {
+      With.self = With.game.self()
       With.configuration = new Configuration
       With.logger = new Logger
+      
       With.logger.debug("Loading BWTA.")
       BWTA.readMap()
       BWTA.analyze()
-      //Not sure if these help
+      //These may not be necessary since BWTA2 doesn't seem to work in BWMirror
       BWTA.computeDistanceTransform()
       BWTA.buildChokeNodes()
       With.logger.debug("BWTA analysis complete.")
       
-      With.architect = new Architect
-      With.bank = new Banker
-      With.camera = new AutoCamera
-      With.battles = new Battles
-      With.commander = new Commander
-      With.economy = new Economy
-      With.geography = new Geography
-      With.gameplan = new WinTheGame
-      With.history = new History
+      With.architect    = new Architect
+      With.bank         = new Banker
+      With.camera       = new AutoCamera
+      With.battles      = new Battles
+      With.commander    = new Commander
+      With.economy      = new Economy
+      With.geography    = new Geography
+      With.gameplan     = new WinTheGame
+      With.history      = new History
       With.intelligence = new Intelligence
-      With.latency = new Latency
-      With.grids = new Grids
-      With.paths = new Paths
-      With.performance = new Performance
-      With.prioritizer = new Prioritizer
-      With.recruiter = new Recruiter
-      With.scheduler = new Scheduler
-      With.units = new Units
-      
+      With.latency      = new Latency
+      With.grids        = new Grids
+      With.paths        = new Paths
+      With.performance  = new Performance
+      With.prioritizer  = new Prioritizer
+      With.recruiter    = new Recruiter
+      With.scheduler    = new Scheduler
+      With.units        = new Units
+
       With.game.enableFlag(1)
       With.game.setLocalSpeed(With.configuration.gameSpeed)
       With.game.setLatCom(With.configuration.enableLatencyCompensation)
@@ -55,6 +57,7 @@ class Bot() extends DefaultBWListener {
 
   override def onFrame() {
     try {
+      With.frame = With.game.getFrameCount
       With.performance.startCounting()
       With.latency.onFrame()
       if (With.latency.shouldRun) {
@@ -70,7 +73,6 @@ class Bot() extends DefaultBWListener {
         With.commander.onFrame()
       }
       With.performance.stopCounting()
-      
       
       With.camera.onFrame()
       Overlay.onFrame()

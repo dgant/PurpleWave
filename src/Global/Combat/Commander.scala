@@ -59,11 +59,11 @@ class Commander {
   def _sleep(unit:FriendlyUnitInfo, startedAttacking:Boolean = false) {
     val baseDelay = With.game.getRemainingLatencyFrames
     val attackDelay = if (startedAttacking) unit.attackFrames else 0
-    _nextOrderFrame.put(unit, baseDelay + attackDelay + With.game.getFrameCount)
+    _nextOrderFrame.put(unit, baseDelay + attackDelay + With.frame)
   }
   
   def _isAwake(unit:FriendlyUnitInfo):Boolean = {
-    _nextOrderFrame(unit) < With.game.getFrameCount
+    _nextOrderFrame(unit) < With.frame
   }
   
   def _isAwake(intent:Intention):Boolean = {

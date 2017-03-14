@@ -11,7 +11,7 @@ class BuildEvent(
   override def toString: String = buildable.toString
   
   def formatTime(time:Int):String = {
-    val relativeTime = time - With.game.getFrameCount
+    val relativeTime = time - With.frame
     if (relativeTime < 0) "Now" else relativeTime.toString
   }
   

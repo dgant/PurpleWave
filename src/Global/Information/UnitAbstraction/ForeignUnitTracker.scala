@@ -66,7 +66,7 @@ class ForeignUnitTracker {
   def _initialize() {
     //BWAPI seems to start some games returning enemy units that don't make any sense.
     //This will let us catch them while debugging until we figure this out for good
-    if (With.game.getFrameCount == 0) {
+    if (With.frame == 0) {
       _flagGhostUnits()
       _trackStaticUnits()
     }

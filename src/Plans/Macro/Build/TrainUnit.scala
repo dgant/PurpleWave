@@ -88,6 +88,6 @@ class TrainUnit(val traineeType:UnitType) extends Plan {
     _trainer = Some(trainer)
     currency.isSpent = true
     trainer.baseUnit.train(traineeType)
-    lastOrderFrame = With.game.getFrameCount
+    lastOrderFrame = With.frame
   }
 }

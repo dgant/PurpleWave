@@ -15,7 +15,7 @@ class FriendlyUnitInfo(_baseUnit:bwapi.Unit) extends UnitInfo(_baseUnit) {
   val _cacheExists    = new CacheFrame[Boolean]       (() =>  _baseUnit.exists)
   val _cacheId        = new CacheFrame[Int]           (() =>  _baseUnit.getID)
   
-  override def lastSeen                   : Int                 = With.game.getFrameCount
+  override def lastSeen                   : Int                 = With.frame
   override def possiblyStillThere         : Boolean             = true
   override def alive                      : Boolean             = _cacheExists.get
   override def player                     : Player              = _cachePlayer.get

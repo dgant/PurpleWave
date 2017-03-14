@@ -31,7 +31,7 @@ object ScheduleSimulator {
       }
       else
       {
-        val build = currentState.tryBuilding(nextBuildable, maxDepthFrames + With.game.getFrameCount)
+        val build = currentState.tryBuilding(nextBuildable, maxDepthFrames + With.frame)
   
         if (build.buildEvent.isDefined) {
           val buildEvent = build.buildEvent.get

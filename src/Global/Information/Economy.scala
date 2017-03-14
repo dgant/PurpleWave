@@ -16,14 +16,14 @@ class Economy {
   val samplingRate = 24
   var _lastFrame = 0
   def onFrame() = {
-    val frameDiff = With.game.getFrameCount - _lastFrame
+    val frameDiff = With.frame - _lastFrame
     //Don't change estimate while paused
     if (frameDiff > samplingRate) {
       
       ourEstimatedTotalMinerals += frameDiff * ourMineralIncomePerMinute.toDouble / (24.0 * 60)
       ourEstimatedTotalGas      += frameDiff * ourGasIncomePerMinute.toDouble / (24.0 * 60)
     }
-    _lastFrame = With.game.getFrameCount
+    _lastFrame = With.frame
   }
   
   def ourActualTotalMinerals:Integer = {

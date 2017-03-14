@@ -37,5 +37,5 @@ object ScheduleSimulationEventAnticipator {
   }
   
   def buildEvent(buildable:Buildable, framesLeft:Int):BuildEvent =
-    new BuildEvent(buildable, -1, With.game.getFrameCount + framesLeft)
+    new BuildEvent(buildable, -1, With.frame + framesLeft)
 }

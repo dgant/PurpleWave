@@ -37,7 +37,7 @@ class ForeignUnitInfo(_baseUnit:bwapi.Unit) extends UnitInfo (_baseUnit) {
     baseUnit = unit
     _alive              = true
     _possiblyStillThere = true
-    _lastSeen           = With.game.getFrameCount
+    _lastSeen           = With.frame
     _player             = unit.getPlayer
     _position           = unit.getPosition
     _walkPosition       = _position.toWalkPosition

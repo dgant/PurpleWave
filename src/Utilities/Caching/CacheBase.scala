@@ -10,12 +10,12 @@ abstract class CacheBase[T](recalculator:() => T) {
   def get:T = {
     if (cacheHasExpired) {
       lastValue = Some(recalculateAsNeeded)
-      nextUpdateFrame = With.game.getFrameCount + nextCacheDelay
+      nextUpdateFrame = With.frame + nextCacheDelay
     }
     lastValue.get
   }
   
-  private def cacheHasExpired:Boolean = nextUpdateFrame <= With.game.getFrameCount
+  private def cacheHasExpired:Boolean = nextUpdateFrame <= With.frame
   private def recalculateAsNeeded:T = recalculator.apply()
   
   protected def nextCacheDelay:Int

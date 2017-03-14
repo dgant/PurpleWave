@@ -13,7 +13,7 @@ object ScheduleSimulationStateBuilder {
     val upgradesOwnedMutable: mutable.Map[UpgradeType, Int] = upgradesOwned.map(identity)(breakOut)
   
     val output = new ScheduleSimulationState(
-      frame           = With.game.getFrameCount,
+      frame           = With.frame,
       minerals        = With.game.self.minerals,
       gas             = With.game.self.gas,
       supplyAvailable = With.game.self.supplyTotal - With.game.self.supplyUsed,

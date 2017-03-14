@@ -24,7 +24,7 @@ class Paths {
     if ( ! _distanceCache.contains(request)) {
       _cacheDistance(request)
     }
-    _distanceAge.put(request, With.game.getFrameCount)
+    _distanceAge.put(request, With.frame)
     val result = _distanceCache(request)
     _limitCacheSize()
     
@@ -42,7 +42,7 @@ class Paths {
   
   def _limitCacheSize() {
     if (_distanceCache.keys.size > _maxCacheSize) {
-      val cutoff = With.game.getFrameCount - 24 * 60
+      val cutoff = With.frame - 24 * 60
       _distanceAge.filter(_._2 < cutoff).foreach(pair => {
         _distanceCache.remove(pair._1)
         _distanceAge.remove(pair._1)

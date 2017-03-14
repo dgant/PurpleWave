@@ -9,6 +9,9 @@ import bwapi._
 abstract class UnitInfo (var baseUnit:bwapi.Unit) {
   val _id = baseUnit.getID
   
+  def friendly:Option[FriendlyUnitInfo] = None
+  def foreign:Option[ForeignUnitInfo] = None
+  
   def alive:Boolean
   def id:Int = _id
   def lastSeen:Int

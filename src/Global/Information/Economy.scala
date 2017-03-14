@@ -47,7 +47,7 @@ class Economy {
   }
   
   def ourActiveHarvesters(harvestingArea:TileRectangle):Iterable[bwapi.Unit] = {
-    With.game.getUnitsInRectangle(harvestingArea.startPosition, harvestingArea.endPosition).asScala
+    With.units.inRectangle(harvestingArea).flatten(_.friendly)
       //This is a slightly dubious filter.
       // 1. There are several associated UnitCommandTypes, including ReturnCargo
       // 2. We could also check the current ORDER, which cycles between things like "MiningMinerals" and "MoveToMinerals"

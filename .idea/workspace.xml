@@ -27,71 +27,61 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="FollowBuildOrder.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Plans/Macro/Build/FollowBuildOrder.scala">
+      <file leaf-file-name="Economy.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Global/Information/Economy.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="68">
-              <caret line="35" column="67" lean-forward="false" selection-start-line="35" selection-start-column="67" selection-end-line="35" selection-end-column="67" />
+            <state relative-caret-position="155">
+              <caret line="49" column="62" lean-forward="true" selection-start-line="49" selection-start-column="62" selection-end-line="49" selection-end-column="62" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="TrainUnit.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Plans/Macro/Build/TrainUnit.scala">
+      <file leaf-file-name="ForeignUnitTracker.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Global/Information/UnitAbstraction/ForeignUnitTracker.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="87">
-              <caret line="90" column="31" lean-forward="false" selection-start-line="90" selection-start-column="31" selection-end-line="90" selection-end-column="31" />
+            <state relative-caret-position="77">
+              <caret line="69" column="23" lean-forward="true" selection-start-line="69" selection-start-column="23" selection-end-line="69" selection-end-column="23" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Bot.scala" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/Startup/Bot.scala">
+      <file leaf-file-name="Grids.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Global/Information/Grids.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="68">
-              <caret line="15" column="16" lean-forward="false" selection-start-line="15" selection-start-column="16" selection-end-line="15" selection-end-column="16" />
+            <state relative-caret-position="96">
+              <caret line="12" column="24" lean-forward="true" selection-start-line="12" selection-start-column="24" selection-end-line="12" selection-end-column="24" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Overlay.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Development/Overlay.scala">
+      <file leaf-file-name="GridBuildableTerrain.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Geometry/Grids/Real/GridBuildableTerrain.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="111">
-              <caret line="198" column="41" lean-forward="false" selection-start-line="198" selection-start-column="41" selection-end-line="198" selection-end-column="41" />
+            <state relative-caret-position="104">
+              <caret line="8" column="3" lean-forward="true" selection-start-line="8" selection-start-column="3" selection-end-line="8" selection-end-column="3" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="LimiterBase.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Utilities/Caching/LimiterBase.scala">
+      <file leaf-file-name="Geography.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Global/Information/Geography.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="99">
-              <caret line="14" column="2" lean-forward="true" selection-start-line="14" selection-start-column="2" selection-end-line="14" selection-end-column="2" />
+            <state relative-caret-position="164">
+              <caret line="115" column="61" lean-forward="false" selection-start-line="115" selection-start-column="61" selection-end-line="115" selection-end-column="61" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="With.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Startup/With.scala">
+      <file leaf-file-name="ScheduleSimulationState.scala" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/Global/Resources/Scheduling/ScheduleSimulationState.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="216">
-              <caret line="35" column="11" lean-forward="false" selection-start-line="35" selection-start-column="11" selection-end-line="35" selection-end-column="11" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ForeignUnitInfo.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Types/UnitInfo/ForeignUnitInfo.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="68">
-              <caret line="39" column="36" lean-forward="false" selection-start-line="39" selection-start-column="36" selection-end-line="39" selection-end-column="36" />
+            <state relative-caret-position="145">
+              <caret line="187" column="3" lean-forward="true" selection-start-line="187" selection-start-column="3" selection-end-line="187" selection-end-column="3" />
               <folding />
             </state>
           </provider>
@@ -100,28 +90,18 @@
       <file leaf-file-name="FriendlyUnitInfo.scala" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Types/UnitInfo/FriendlyUnitInfo.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="68">
-              <caret line="17" column="76" lean-forward="false" selection-start-line="17" selection-start-column="76" selection-end-line="17" selection-end-column="76" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="BuildBuilding.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Plans/Macro/Build/BuildBuilding.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="81">
-              <caret line="79" column="34" lean-forward="false" selection-start-line="79" selection-start-column="34" selection-end-line="79" selection-end-column="34" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="CacheBase.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Utilities/Caching/CacheBase.scala">
-          <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="133">
-              <caret line="17" column="69" lean-forward="false" selection-start-line="17" selection-start-column="69" selection-end-line="17" selection-end-column="69" />
+              <caret line="16" column="2" lean-forward="true" selection-start-line="16" selection-start-column="2" selection-end-line="16" selection-end-column="2" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="UnitInfo.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Types/UnitInfo/UnitInfo.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="143">
+              <caret line="11" column="23" lean-forward="false" selection-start-line="11" selection-start-column="23" selection-end-line="11" selection-end-column="23" />
               <folding />
             </state>
           </provider>
@@ -140,10 +120,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>-&gt;</find>
-      <find>getTilePosition</find>
-      <find>radius</find>
-      <find>tileBottom</find>
       <find>Failed to place</find>
       <find>Siege_Tank</find>
       <find>isDefined</find>
@@ -170,6 +146,10 @@
       <find>Perfor</find>
       <find>complete</find>
       <find>getFrameCount</find>
+      <find>getUnitsInRectangle</find>
+      <find>getAllUnits</find>
+      <find>isBuildable</find>
+      <find>getPosition</find>
     </findStrings>
     <replaceStrings>
       <replace>{  _mirror</replace>
@@ -187,6 +167,9 @@
       <replace>Walk</replace>
       <replace>Upgrade</replace>
     </replaceStrings>
+    <dirStrings>
+      <dir>C:\prog\PurpleWave1</dir>
+    </dirStrings>
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
@@ -212,19 +195,15 @@
         <option value="$PROJECT_DIR$/src/Geometry/Grids/Real/GridEnemyVision.scala" />
         <option value="$PROJECT_DIR$/src/Geometry/Grids/Real/GridMobility.scala" />
         <option value="$PROJECT_DIR$/src/Global/Combat/Battle/Battles.scala" />
-        <option value="$PROJECT_DIR$/src/Global/Information/Geography.scala" />
         <option value="$PROJECT_DIR$/src/Utilities/Caching/CacheForever.scala" />
-        <option value="$PROJECT_DIR$/src/Geometry/Grids/Real/GridBuildableTerrain.scala" />
         <option value="$PROJECT_DIR$/src/Geometry/Grids/Abstract/GridConcrete.scala" />
         <option value="$PROJECT_DIR$/src/Global/Information/Architect.scala" />
         <option value="$PROJECT_DIR$/src/Strategies/PositionFinders/PositionSimpleBuilding.scala" />
         <option value="$PROJECT_DIR$/src/Development/Configuration.scala" />
         <option value="$PROJECT_DIR$/src/Types/Buildable/BuildableUnit.scala" />
         <option value="$PROJECT_DIR$/src/Geometry/Grids/Real/GridWalkableUnits.scala" />
-        <option value="$PROJECT_DIR$/src/Types/UnitInfo/UnitInfo.scala" />
         <option value="$PROJECT_DIR$/src/Development/Performance.scala" />
         <option value="$PROJECT_DIR$/src/Global/Combat/Commander.scala" />
-        <option value="$PROJECT_DIR$/src/Global/Information/Economy.scala" />
         <option value="$PROJECT_DIR$/src/Global/Information/Latency.scala" />
         <option value="$PROJECT_DIR$/src/Global/Information/Paths.scala" />
         <option value="$PROJECT_DIR$/src/Global/Information/UnitAbstraction/ForeignUnitTracker.scala" />
@@ -236,12 +215,16 @@
         <option value="$PROJECT_DIR$/src/Plans/Macro/Build/FollowBuildOrder.scala" />
         <option value="$PROJECT_DIR$/src/Plans/Macro/Build/TrainUnit.scala" />
         <option value="$PROJECT_DIR$/src/Types/UnitInfo/ForeignUnitInfo.scala" />
-        <option value="$PROJECT_DIR$/src/Types/UnitInfo/FriendlyUnitInfo.scala" />
         <option value="$PROJECT_DIR$/src/Utilities/Caching/CacheBase.scala" />
         <option value="$PROJECT_DIR$/src/Utilities/Caching/LimiterBase.scala" />
         <option value="$PROJECT_DIR$/src/Startup/Bot.scala" />
         <option value="$PROJECT_DIR$/src/Development/Overlay.scala" />
         <option value="$PROJECT_DIR$/src/Startup/With.scala" />
+        <option value="$PROJECT_DIR$/src/Types/UnitInfo/UnitInfo.scala" />
+        <option value="$PROJECT_DIR$/src/Types/UnitInfo/FriendlyUnitInfo.scala" />
+        <option value="$PROJECT_DIR$/src/Global/Information/Economy.scala" />
+        <option value="$PROJECT_DIR$/src/Geometry/Grids/Real/GridBuildableTerrain.scala" />
+        <option value="$PROJECT_DIR$/src/Global/Information/Geography.scala" />
       </list>
     </option>
   </component>
@@ -577,8 +560,8 @@
     </configuration>
     <configuration default="false" name="PurpleWave" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="Startup.Main" />
-      <option name="VM_PARAMETERS" value="" />
-      <option name="PROGRAM_PARAMETERS" value="-J-Djava.security.policy=all.policy -J-Djava.rmi.server.hostname=localhost:20000 -Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.port=20000 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false" />
+      <option name="VM_PARAMETERS" value="-J-Djava.security.policy=all.policy -J-Djava.rmi.server.hostname=localhost:20000 -Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.port=20000 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false" />
+      <option name="PROGRAM_PARAMETERS" value="" />
       <option name="WORKING_DIRECTORY" value="file://C:/Program Files (x86)/StarCraft" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
       <option name="ALTERNATIVE_JRE_PATH" value="C:/Program Files (x86)/Java/jre1.8.0_121" />
@@ -643,7 +626,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="1596" y="68" width="1368" height="776" extended-state="6" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4473684" sideWeight="0.488125" order="6" side_tool="false" content_ui="tabs" />
@@ -652,10 +635,10 @@
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.12573099" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24779412" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.16838235" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Problems" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32894737" sideWeight="0.4970588" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Run with VisualVM" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32894737" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.28362572" sideWeight="0.49411765" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25438598" sideWeight="0.49411765" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.28070176" sideWeight="0.49117646" order="13" side_tool="false" content_ui="tabs" />
@@ -742,14 +725,6 @@
     </watches-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/Global/Information/Geography.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="111">
-          <caret line="23" column="25" lean-forward="false" selection-start-line="23" selection-start-column="25" selection-end-line="23" selection-end-column="25" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Utilities/Caching/CacheFrame.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="26">
@@ -762,14 +737,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="78">
           <caret line="6" column="0" lean-forward="true" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Geometry/Grids/Real/GridBuildableTerrain.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="65">
-          <caret line="5" column="41" lean-forward="false" selection-start-line="5" selection-start-column="41" selection-end-line="5" selection-end-column="41" />
           <folding />
         </state>
       </provider>
@@ -846,14 +813,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Global/Resources/Scheduling/ScheduleSimulationState.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="104">
-          <caret line="139" column="41" lean-forward="false" selection-start-line="139" selection-start-column="41" selection-end-line="139" selection-end-column="41" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$PROJECT_DIR$/lib/bwmirror_v2_5.jar!/bwapi/TilePosition.class">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="102">
@@ -882,14 +841,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="78">
           <caret line="6" column="70" lean-forward="false" selection-start-line="6" selection-start-column="70" selection-end-line="6" selection-end-column="70" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Global/Information/Grids.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="109">
-          <caret line="16" column="31" lean-forward="false" selection-start-line="16" selection-start-column="31" selection-end-line="16" selection-end-column="31" />
           <folding />
         </state>
       </provider>
@@ -982,14 +933,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Types/UnitInfo/UnitInfo.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="117">
-          <caret line="9" column="5" lean-forward="false" selection-start-line="9" selection-start-column="2" selection-end-line="9" selection-end-column="5" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Development/Performance.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="60">
@@ -1006,14 +949,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Global/Information/Economy.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="25" column="27" lean-forward="false" selection-start-line="25" selection-start-column="27" selection-end-line="25" selection-end-column="27" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Global/Information/Latency.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="73">
@@ -1026,14 +961,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="60">
           <caret line="44" column="29" lean-forward="false" selection-start-line="44" selection-start-column="29" selection-end-line="44" selection-end-column="29" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Global/Information/UnitAbstraction/ForeignUnitTracker.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="68">
-          <caret line="68" column="18" lean-forward="false" selection-start-line="68" selection-start-column="18" selection-end-line="68" selection-end-column="18" />
           <folding />
         </state>
       </provider>
@@ -1072,7 +999,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Plans/Macro/Build/BuildBuilding.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="81">
+        <state relative-caret-position="158">
           <caret line="79" column="34" lean-forward="false" selection-start-line="79" selection-start-column="34" selection-end-line="79" selection-end-column="34" />
           <folding />
         </state>
@@ -1102,17 +1029,9 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Types/UnitInfo/FriendlyUnitInfo.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="68">
-          <caret line="17" column="76" lean-forward="false" selection-start-line="17" selection-start-column="76" selection-end-line="17" selection-end-column="76" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Utilities/Caching/CacheBase.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="133">
+        <state relative-caret-position="221">
           <caret line="17" column="69" lean-forward="false" selection-start-line="17" selection-start-column="69" selection-end-line="17" selection-end-column="69" />
           <folding />
         </state>
@@ -1120,7 +1039,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Utilities/Caching/LimiterBase.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="99">
+        <state relative-caret-position="182">
           <caret line="14" column="2" lean-forward="true" selection-start-line="14" selection-start-column="2" selection-end-line="14" selection-end-column="2" />
           <folding />
         </state>
@@ -1136,7 +1055,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Startup/With.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="216">
+        <state relative-caret-position="455">
           <caret line="35" column="11" lean-forward="false" selection-start-line="35" selection-start-column="11" selection-end-line="35" selection-end-column="11" />
           <folding />
         </state>
@@ -1144,8 +1063,72 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Startup/Bot.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="68">
-          <caret line="15" column="16" lean-forward="false" selection-start-line="15" selection-start-column="16" selection-end-line="15" selection-end-column="16" />
+        <state relative-caret-position="133">
+          <caret line="62" column="26" lean-forward="false" selection-start-line="62" selection-start-column="26" selection-end-line="62" selection-end-column="26" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Types/UnitInfo/UnitInfo.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="143">
+          <caret line="11" column="23" lean-forward="false" selection-start-line="11" selection-start-column="23" selection-end-line="11" selection-end-column="23" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Types/UnitInfo/FriendlyUnitInfo.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="133">
+          <caret line="16" column="2" lean-forward="true" selection-start-line="16" selection-start-column="2" selection-end-line="16" selection-end-column="2" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Global/Information/Economy.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="155">
+          <caret line="49" column="62" lean-forward="true" selection-start-line="49" selection-start-column="62" selection-end-line="49" selection-end-column="62" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Global/Information/UnitAbstraction/ForeignUnitTracker.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="77">
+          <caret line="69" column="23" lean-forward="true" selection-start-line="69" selection-start-column="23" selection-end-line="69" selection-end-column="23" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Global/Information/Grids.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="96">
+          <caret line="12" column="24" lean-forward="true" selection-start-line="12" selection-start-column="24" selection-end-line="12" selection-end-column="24" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Geometry/Grids/Real/GridBuildableTerrain.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="104">
+          <caret line="8" column="3" lean-forward="true" selection-start-line="8" selection-start-column="3" selection-end-line="8" selection-end-column="3" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Global/Information/Geography.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="164">
+          <caret line="115" column="61" lean-forward="false" selection-start-line="115" selection-start-column="61" selection-end-line="115" selection-end-column="61" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Global/Resources/Scheduling/ScheduleSimulationState.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="145">
+          <caret line="187" column="3" lean-forward="true" selection-start-line="187" selection-start-column="3" selection-end-line="187" selection-end-column="3" />
           <folding />
         </state>
       </provider>

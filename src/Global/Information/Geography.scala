@@ -5,7 +5,7 @@ import Geometry._
 import Startup.With
 import Types.Geography.{Base, Zone, ZoneEdge}
 import Types.UnitInfo.{ForeignUnitInfo, UnitInfo}
-import Utilities.Caching.{Cache, CacheForever, Limiter, LimiterBase}
+import Utilities.Caching.{Cache, CacheForever, Limiter}
 import Utilities.Enrichment.EnrichPosition._
 import Utilities.Enrichment.EnrichUnitType._
 import bwapi.{TilePosition, UnitType}
@@ -113,6 +113,6 @@ class Geography {
   def _isLegalBasePosition(position:TilePosition):Boolean = {
     val exclusions = _resourceExclusionCache.get
     val buildingArea = new TileRectangle(position, position.add(UnitType.Zerg_Hatchery.tileSize))
-    buildingArea.tiles.forall(With.game.isBuildable) && exclusions.forall( ! _.intersects(buildingArea))
+    buildingArea.tiles.forall(With.grids.buildableTerrain.get) && exclusions.forall( ! _.intersects(buildingArea))
   }
 }

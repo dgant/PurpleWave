@@ -7,9 +7,9 @@ import scala.collection.mutable
 
 object ScheduleSimulator {
 
-  val maxDepthBuildables = 50
-  val maxQueueOutput = 15
-  val maxDepthFrames = 24 * 60 * 2
+  val maxDepthBuildables = 100
+  val maxQueueOutput = 20
+  val maxDepthFrames = 24 * 60 * 4
   
   def simulate(buildQueue:Iterable[Buildable]):ScheduleSimulationResult = {
     val currentState = ScheduleSimulationStateBuilder.build

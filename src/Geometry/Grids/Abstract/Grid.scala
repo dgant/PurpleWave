@@ -5,8 +5,8 @@ import bwapi.TilePosition
 
 abstract class Grid[T] {
   
-  val _width = With.game.mapWidth
-  val _height = With.game.mapHeight
+  val _width = With.mapWidth
+  val _height = With.mapHeight
   
   def update()                                 = {}
   def valid(i:Int):Boolean                     = i > 0 && i < _width * _height

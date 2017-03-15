@@ -16,6 +16,8 @@ class Bot() extends DefaultBWListener {
   override def onStart() {
     try {
       With.self = With.game.self()
+      With.mapWidth = With.game.mapWidth
+      With.mapHeight = With.game.mapHeight
       With.configuration = new Configuration
       With.logger = new Logger
       

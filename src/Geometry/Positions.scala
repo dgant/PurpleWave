@@ -4,11 +4,11 @@ import Startup.With
 import bwapi.{Position, TilePosition}
 
 object Positions {
-  val middle = new Position(
-    With.game.mapWidth * 32 / 2,
-    With.game.mapHeight * 32 / 2)
+  def middle = new Position(
+    With.mapWidth * 32 / 2,
+    With.mapHeight * 32 / 2)
   
-  val tileMiddle = new TilePosition(
-      With.game.mapWidth / 2,
-      With.game.mapHeight / 2)
+  def tileMiddle = new TilePosition(
+      With.mapWidth / 2,
+      With.mapHeight / 2)
 }

@@ -1,6 +1,7 @@
 package Utilities.Enrichment
 
 import Geometry.{Point, Positions, TileRectangle}
+import Startup.With
 import bwapi.{Position, TilePosition, WalkPosition}
 
 case object EnrichPosition {
@@ -54,6 +55,14 @@ case object EnrichPosition {
   }
   
   implicit class EnrichedPosition(position:Position) {
+    //Checking position validity is a frequent operation,
+    //but going through BWAPI via BWMirror has a lot of overhead
+    def valid:Boolean = {
+      position.getX >= 0 &&
+      position.getY >= 0 &&
+      position.getX < With.mapWidth * 32 &&
+      position.getY < With.mapHeight * 32
+    }
     def toWalkPosition:WalkPosition = {
       new WalkPosition(position.getX / 4, position.getY / 4)
     }
@@ -133,6 +142,14 @@ case object EnrichPosition {
   }
   
   implicit class EnrichedTilePosition(position:TilePosition) {
+    //Checking position validity is a frequent operation,
+    //but going through BWAPI via BWMirror has a lot of overhead
+    def valid:Boolean = {
+      position.getX >= 0 &&
+      position.getY >= 0 &&
+      position.getX < With.mapWidth &&
+      position.getY < With.mapHeight
+    }
     def add(dx:Int, dy:Int):TilePosition = {
       new TilePosition(position.getX + dx, position.getY + dy)
     }

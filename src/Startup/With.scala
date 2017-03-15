@@ -35,4 +35,6 @@ object With {
   
   var self:Player = null
   var frame = 0
+  var mapWidth = 0
+  var mapHeight = 0
 }

@@ -107,7 +107,7 @@ class Architect {
       buildingArea.startInclusive.subtract(margin, margin),
       buildingArea.endExclusive.add(margin, margin))
     
-    buildingArea.tiles.forall(_.isValid) &&
+    buildingArea.tiles.forall(_.valid) &&
     exclusions.filter(_.intersects(buildingArea)).isEmpty &&
     _rectangleIsBuildable(buildingArea, buildingType, hypotheticalPylon) &&
     _rectangleContainsOnlyAWorker(marginArea) &&

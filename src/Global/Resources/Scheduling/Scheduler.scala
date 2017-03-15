@@ -16,7 +16,9 @@ class Scheduler {
   private val recentlyUpdated = new mutable.HashSet[Plan]
   
   var simulationResults:ScheduleSimulationResult = new ScheduleSimulationResult(List.empty, List.empty, List.empty)
-  var queue:Iterable[BuildEvent] = simulationResults.suggestedEvents
+  
+  var queueOriginal   : Iterable[Buildable]   = List.empty
+  def queueOptimized  : Iterable[BuildEvent]  = simulationResults.suggestedEvents
   
   def request(requester:Plan, requests: Iterable[BuildRequest]) {
     requestsByPlan.put(requester, requests)
@@ -32,12 +34,12 @@ class Scheduler {
   private def updateQueue() {
     val unitsWanted = new CountMap[UnitType]
     val unitsActual:CountMap[UnitType] = CountMapper.make(With.units.ours.groupBy(_.utype).mapValues(_.size))
-    val rawQueue = requestsByPlan.keys.toList
+    queueOriginal = requestsByPlan.keys.toList
       .sortBy(With.prioritizer.getPriority)
       .flatten(requestsByPlan)
       .flatten(buildable => getUnfulfilledBuildables(buildable, unitsWanted, unitsActual))
     
-    simulationResults = ScheduleSimulator.simulate(rawQueue)
+    simulationResults = ScheduleSimulator.simulate(queueOriginal)
   }
   
   private def getUnfulfilledBuildables(
@@ -58,12 +60,13 @@ class Scheduler {
     }
     else {
       val unitType = request.buildable.unitOption.get
-      
-      unitsWanted.put(unitType, request.add + unitsWanted.getOrElse(unitType, 0))
+      unitsWanted.add(unitType, request.add)
       unitsWanted.put(unitType, Math.max(request.require, unitsWanted(unitType)))
-      
-      if (unitsWanted(unitType) > unitsActual(unitType))
-        return List(0 until unitsWanted(unitType) - unitsActual(unitType)).map(i => request.buildable)
+      val difference = unitsWanted(unitType) - unitsActual(unitType)
+      if (difference > 0) {
+        val buildables = (0 until difference).map(i => request.buildable)
+        return buildables
+      }
       else
         return List.empty
     }

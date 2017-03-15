@@ -2,7 +2,7 @@ package Debugging.Visualization
 
 import Debugging.TypeDescriber
 import Startup.With
-import BWMirrorProxy.UnitInfo.ForeignUnitInfo
+import ProxyBwapi.UnitInfo.ForeignUnitInfo
 
 object VisualizeUnitsForeign {
   

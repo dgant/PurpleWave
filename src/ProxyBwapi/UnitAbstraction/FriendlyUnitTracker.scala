@@ -1,7 +1,7 @@
-package BWMirrorProxy.UnitAbstraction
+package ProxyBwapi.UnitAbstraction
 
 import Startup.With
-import BWMirrorProxy.UnitInfo.FriendlyUnitInfo
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable.HashSet

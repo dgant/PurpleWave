@@ -2,7 +2,7 @@ package Information.Geography
 
 import Geometry.TileRectangle
 import Startup.With
-import BWMirrorProxy.UnitInfo.UnitInfo
+import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.{Player, Position, TilePosition}
 import bwta.{Chokepoint, Region}
 import Utilities.TypeEnrichment.EnrichPosition._

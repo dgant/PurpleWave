@@ -5,7 +5,7 @@ import Planning.Plan
 import Startup.With
 import Planning.Composition.UnitCountEverything
 import Planning.Composition.UnitMatchers.UnitMatchWorker
-import BWMirrorProxy.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Performance.Caching.Limiter
 import bwapi.UnitCommandType
 

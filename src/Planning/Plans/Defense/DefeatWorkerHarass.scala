@@ -9,7 +9,7 @@ import Planning.Composition.UnitCounters.UnitCountBetween
 import Planning.Composition.UnitMatchers.UnitMatchWorker
 import Planning.Composition.UnitPreferences.UnitPreferClose
 import Micro.Intentions.Intention
-import BWMirrorProxy.UnitInfo.UnitInfo
+import ProxyBwapi.UnitInfo.UnitInfo
 
 import scala.collection.mutable
 

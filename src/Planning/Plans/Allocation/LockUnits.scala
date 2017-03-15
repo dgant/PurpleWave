@@ -7,7 +7,7 @@ import Planning.Composition.{Property, UnitCountEverything}
 import Planning.Composition.UnitCounters.UnitCounter
 import Planning.Composition.UnitMatchers.{UnitMatchAnything, UnitMatcher}
 import Planning.Composition.UnitPreferences.{UnitPreferAnything, UnitPreference}
-import BWMirrorProxy.UnitInfo.FriendlyUnitInfo
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 import scala.collection.mutable
 

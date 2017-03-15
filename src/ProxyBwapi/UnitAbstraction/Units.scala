@@ -1,9 +1,9 @@
-package BWMirrorProxy.UnitAbstraction
+package ProxyBwapi.UnitAbstraction
 
 import Geometry.Shapes.Circle
 import Geometry.TileRectangle
 import Startup.With
-import BWMirrorProxy.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, UnitInfo}
+import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, UnitInfo}
 import Utilities.TypeEnrichment.EnrichPosition._
 import bwapi.{Position, UnitType}
 

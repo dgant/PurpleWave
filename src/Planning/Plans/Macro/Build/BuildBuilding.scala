@@ -11,7 +11,7 @@ import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Composition.UnitPreferences.UnitPreferClose
 import Micro.Intentions.Intention
-import BWMirrorProxy.UnitInfo.FriendlyUnitInfo
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.TypeEnrichment.EnrichPosition._
 import bwapi.{Position, Race, TilePosition, UnitType}
 

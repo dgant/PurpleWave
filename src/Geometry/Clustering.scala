@@ -1,7 +1,7 @@
 package Geometry
 
 import Startup.With
-import BWMirrorProxy.UnitInfo.UnitInfo
+import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.TypeEnrichment.EnrichPosition._
 import bwapi.Position
 

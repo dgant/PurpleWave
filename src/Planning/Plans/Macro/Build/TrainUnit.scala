@@ -6,7 +6,7 @@ import Planning.Plan
 import Startup.With
 import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Composition.UnitMatchers.UnitMatchType
-import BWMirrorProxy.UnitInfo.FriendlyUnitInfo
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import bwapi.UnitType
 
 class TrainUnit(val traineeType:UnitType) extends Plan {

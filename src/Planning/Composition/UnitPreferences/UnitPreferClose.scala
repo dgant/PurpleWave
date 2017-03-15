@@ -1,7 +1,7 @@
 package Planning.Composition.UnitPreferences
 
 import Planning.Composition.PositionFinders.{PositionCenter, PositionFinder}
-import BWMirrorProxy.UnitInfo.FriendlyUnitInfo
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Planning.Composition.Property
 import Utilities.TypeEnrichment.EnrichPosition._
 

@@ -1,6 +1,6 @@
 package Planning.Composition.UnitPreferences
 
-import BWMirrorProxy.UnitInfo.FriendlyUnitInfo
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 trait UnitPreference {
   def preference(unit:FriendlyUnitInfo):Double

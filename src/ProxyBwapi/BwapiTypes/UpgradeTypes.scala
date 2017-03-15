@@ -1,4 +1,4 @@
-package BWMirrorProxy.BwapiTypes
+package ProxyBwapi.BwapiTypes
 
 import bwapi.UpgradeType
 

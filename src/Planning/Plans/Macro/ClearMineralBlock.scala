@@ -2,7 +2,7 @@ package Planning.Plans.Macro
 
 import Planning.Plan
 import Startup.With
-import BWMirrorProxy.UnitInfo.UnitInfo
+import ProxyBwapi.UnitInfo.UnitInfo
 
 class ClearMineralBlock extends Plan {
   

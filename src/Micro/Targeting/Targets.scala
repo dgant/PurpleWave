@@ -2,7 +2,7 @@ package Micro.Targeting
 
 import Startup.With
 import Micro.Intentions.Intention
-import BWMirrorProxy.UnitInfo.UnitInfo
+import ProxyBwapi.UnitInfo.UnitInfo
 
 object Targets {
   def get(intent:Intention):Iterable[UnitInfo] = {

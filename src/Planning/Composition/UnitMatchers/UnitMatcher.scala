@@ -1,6 +1,6 @@
 package Planning.Composition.UnitMatchers
 
-import BWMirrorProxy.UnitInfo.FriendlyUnitInfo
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 trait UnitMatcher {
   def accept(unit:FriendlyUnitInfo): Boolean

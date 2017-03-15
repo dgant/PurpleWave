@@ -1,6 +1,6 @@
 package Planning.Composition.UnitMatchers
 
-import BWMirrorProxy.UnitInfo.FriendlyUnitInfo
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import bwapi.UnitType
 
 class UnitMatchIncompleteBuilding(unitType:UnitType) extends UnitMatchType(unitType) {

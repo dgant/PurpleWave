@@ -4,7 +4,7 @@ import Micro.Battles.Battle
 import Micro.Behaviors.Behavior
 import Planning.Plan
 import Startup.With
-import BWMirrorProxy.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import bwapi.TilePosition
 
 class Intention(

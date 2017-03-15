@@ -1,7 +1,7 @@
-package BWMirrorProxy.UnitAbstraction
+package ProxyBwapi.UnitAbstraction
 
 import Startup.With
-import BWMirrorProxy.UnitInfo.ForeignUnitInfo
+import ProxyBwapi.UnitInfo.ForeignUnitInfo
 import Performance.Caching.Limiter
 
 import scala.collection.JavaConverters._

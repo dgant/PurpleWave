@@ -2,7 +2,7 @@ package Macro.Allocation
 
 import Planning.Plans.Allocation.LockUnits
 import Startup.With
-import BWMirrorProxy.UnitInfo.FriendlyUnitInfo
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 import scala.collection.mutable
 

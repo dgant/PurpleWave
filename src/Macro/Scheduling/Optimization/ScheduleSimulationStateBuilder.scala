@@ -1,6 +1,6 @@
 package Macro.Scheduling.Optimization
 
-import BWMirrorProxy.BwapiTypes.{TechTypes, UpgradeTypes}
+import ProxyBwapi.BwapiTypes.{TechTypes, UpgradeTypes}
 import Startup.With
 import Utilities.CountMap
 import bwapi.UnitType

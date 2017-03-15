@@ -1,4 +1,4 @@
-package BWMirrorProxy.UnitInfo
+package ProxyBwapi.UnitInfo
 
 import Geometry.TileRectangle
 import Startup.With

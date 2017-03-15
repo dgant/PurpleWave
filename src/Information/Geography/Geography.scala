@@ -1,6 +1,6 @@
 package Information.Geography
 
-import BWMirrorProxy.UnitInfo.{ForeignUnitInfo, UnitInfo}
+import ProxyBwapi.UnitInfo.{ForeignUnitInfo, UnitInfo}
 import Geometry.Shapes.Circle
 import Geometry._
 import Performance.Caching.{Cache, CacheForever, Limiter}

@@ -1,6 +1,6 @@
 package Planning.Composition.UnitCounters
 
-import BWMirrorProxy.UnitInfo.FriendlyUnitInfo
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 trait UnitCounter {
   

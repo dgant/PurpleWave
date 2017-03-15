@@ -2,7 +2,7 @@ package Information
 
 import Geometry.TileRectangle
 import Startup.With
-import BWMirrorProxy.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import bwapi.Race
 
 class Economy {

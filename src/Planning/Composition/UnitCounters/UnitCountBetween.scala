@@ -1,6 +1,6 @@
 package Planning.Composition.UnitCounters
 
-import BWMirrorProxy.UnitInfo.FriendlyUnitInfo
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Planning.Composition.Property
 
 class UnitCountBetween(originalMinimum:Int = 0, originalMaximum:Int = 1) extends UnitCounter {

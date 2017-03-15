@@ -1,6 +1,6 @@
 package Macro.Scheduling.Optimization
 
-import BWMirrorProxy.UnitInfo.FriendlyUnitInfo
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Macro.Buildables.{Buildable, BuildableTech, BuildableUnit, BuildableUpgrade}
 import Macro.Scheduling.BuildEvent
 import Startup.With

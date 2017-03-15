@@ -2,7 +2,7 @@ package Debugging
 
 import Planning.Plan
 import Startup.With
-import BWMirrorProxy.UnitInfo.UnitInfo
+import ProxyBwapi.UnitInfo.UnitInfo
 
 import scala.collection.mutable
 

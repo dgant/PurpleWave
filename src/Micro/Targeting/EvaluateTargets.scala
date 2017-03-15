@@ -1,7 +1,7 @@
 package Micro.Targeting
 
 import Micro.Intentions.Intention
-import BWMirrorProxy.UnitInfo.UnitInfo
+import ProxyBwapi.UnitInfo.UnitInfo
 
 object EvaluateTargets {
   

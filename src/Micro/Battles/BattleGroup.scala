@@ -1,7 +1,7 @@
 package Micro.Battles
 
 import Geometry.Positions
-import BWMirrorProxy.UnitInfo.UnitInfo
+import ProxyBwapi.UnitInfo.UnitInfo
 
 import scala.collection.mutable
 

@@ -1,6 +1,6 @@
 package Micro
 
-import BWMirrorProxy.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Micro.Behaviors.Behavior
 import Micro.Intentions.Intention
 import Startup.With

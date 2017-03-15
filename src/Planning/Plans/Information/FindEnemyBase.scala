@@ -9,7 +9,7 @@ import Planning.Composition.UnitCounters.UnitCountExactly
 import Planning.Composition.UnitMatchers.UnitMatchMobile
 import Planning.Composition.UnitPreferences.UnitPreferClose
 import Micro.Intentions.Intention
-import BWMirrorProxy.UnitInfo.FriendlyUnitInfo
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Planning.Composition.Property
 import bwapi.TilePosition
 

@@ -1,7 +1,7 @@
 package Micro.Battles
 
 import Startup.With
-import BWMirrorProxy.UnitInfo.UnitInfo
+import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.{Position, UnitType}
 import Utilities.TypeEnrichment.EnrichPosition._
 import Utilities.TypeEnrichment.EnrichUnitType._

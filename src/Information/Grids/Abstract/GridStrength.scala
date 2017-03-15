@@ -3,7 +3,7 @@ package Information.Grids.Abstract
 import Geometry.Shapes.Circle
 import Micro.Battles.BattleMetrics
 import Startup.With
-import BWMirrorProxy.UnitInfo.UnitInfo
+import ProxyBwapi.UnitInfo.UnitInfo
 import Performance.Caching.Limiter
 import Utilities.TypeEnrichment.EnrichPosition._
 import bwapi.TilePosition

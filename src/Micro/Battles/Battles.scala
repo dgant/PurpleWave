@@ -1,6 +1,6 @@
 package Micro.Battles
 
-import BWMirrorProxy.UnitInfo.UnitInfo
+import ProxyBwapi.UnitInfo.UnitInfo
 import Geometry.Clustering
 import Performance.Caching.Limiter
 import Startup.With

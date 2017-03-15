@@ -1,4 +1,4 @@
-package BWMirrorProxy.UnitInfo
+package ProxyBwapi.UnitInfo
 import Startup.With
 import Performance.Caching.CacheFrame
 import Utilities.TypeEnrichment.EnrichPosition._

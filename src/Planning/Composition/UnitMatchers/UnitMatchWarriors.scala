@@ -1,6 +1,6 @@
 package Planning.Composition.UnitMatchers
 
-import BWMirrorProxy.UnitInfo.FriendlyUnitInfo
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.TypeEnrichment.EnrichUnitType._
 
 object UnitMatchWarriors extends UnitMatcher {

@@ -3,7 +3,7 @@ package Startup
 import Debugging.{Visualization, _}
 import Macro.Allocation._
 import Micro.Battles.Battles
-import BWMirrorProxy.UnitAbstraction.Units
+import ProxyBwapi.UnitAbstraction.Units
 import Information.Grids.Grids
 import Information.Geography.Geography
 import Information._

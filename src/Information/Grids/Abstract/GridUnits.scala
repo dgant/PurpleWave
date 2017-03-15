@@ -2,7 +2,7 @@ package Information.Grids.Abstract
 
 import Information.Grids.Concrete.GridItems
 import Startup.With
-import BWMirrorProxy.UnitInfo.UnitInfo
+import ProxyBwapi.UnitInfo.UnitInfo
 import Performance.Caching.Limiter
 import bwapi.TilePosition
 

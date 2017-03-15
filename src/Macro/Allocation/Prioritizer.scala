@@ -8,8 +8,10 @@ import scala.collection.mutable
 class Prioritizer {
   
   private val priorities = new mutable.HashMap[Plan, Integer]
+  var nextPriority = 0
   
   def onFrame() {
+    nextPriority = 0
     priorities.clear()
     prioritizeTree(With.gameplan)
   }
@@ -19,7 +21,6 @@ class Prioritizer {
   }
   
   private def prioritizeTree(plan:Plan) {
-    var nextPriority = 0
     if ( ! priorities.contains(plan)) {
       priorities.put(plan, nextPriority)
       nextPriority += 1

@@ -33,13 +33,10 @@ class Scheduler {
   }
   private val updateQueueLimiter = new Limiter(2, () => updateQueue())
   private def updateQueue() {
+    val requestQueue = requestsByPlan.keys.toList.sortBy(With.prioritizer.getPriority).flatten(requestsByPlan)
     val unitsWanted = new CountMap[UnitType]
     val unitsActual:CountMap[UnitType] = CountMapper.make(With.units.ours.groupBy(_.utype).mapValues(_.size))
-    queueOriginal = requestsByPlan.keys.toList
-      .sortBy(With.prioritizer.getPriority)
-      .flatten(requestsByPlan)
-      .flatten(buildable => getUnfulfilledBuildables(buildable, unitsWanted, unitsActual))
-    
+    queueOriginal = requestQueue.flatten(buildable => getUnfulfilledBuildables(buildable, unitsWanted, unitsActual))
     simulationResults = ScheduleSimulator.simulate(queueOriginal)
   }
   

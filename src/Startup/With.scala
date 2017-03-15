@@ -1,13 +1,17 @@
 package Startup
 
-import Development.{AutoCamera, Configuration, Logger, Performance}
-import Global.Resources._
-import Global.Combat.Commander
-import Global.Combat.Battle.Battles
-import Global.Information.UnitAbstraction.Units
-import Global.Information._
-import Global.Resources.Scheduling.Scheduler
-import Plans.GamePlans.WinTheGame
+import Debugging.{AutoCamera, Configuration, Logger, Performance}
+import Macro.Allocation._
+import Micro.Battles.Battles
+import BWMirrorProxy.UnitAbstraction.Units
+import Information.Grids.Grids
+import Information.Geography.Geography
+import Information._
+import Macro.Scheduling.Scheduler
+import Planning.Plans.GamePlans.WinTheGame
+import Macro.Architect
+import Micro.{Commander, Paths}
+import _root_.Performance.Latency
 import bwapi.Player
 
 object With {

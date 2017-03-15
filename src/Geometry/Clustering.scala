@@ -1,8 +1,8 @@
 package Geometry
 
 import Startup.With
-import Types.UnitInfo.UnitInfo
-import Utilities.Enrichment.EnrichPosition._
+import BWMirrorProxy.UnitInfo.UnitInfo
+import Utilities.TypeEnrichment.EnrichPosition._
 import bwapi.Position
 
 import scala.collection.mutable

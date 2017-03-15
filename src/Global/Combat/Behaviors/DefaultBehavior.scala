@@ -44,9 +44,9 @@ object DefaultBehavior extends Behavior {
   
   val defaultMovementProfile = new MovementProfile(
     preferTravel      = 0,
-    preferMobility    = 1,
+    preferMobility    = 2,
     preferHighGround  = 0,
-    preferGrouping    = 0,
+    preferGrouping    = 0.1,
     avoidDamage       = 1,
     avoidTraffic      = 0.25,
     avoidVision       = 0,

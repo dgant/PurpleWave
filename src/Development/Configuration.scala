@@ -21,6 +21,6 @@ class Configuration {
   var enableOverlayResources      = false
   var enableOverlayScheduler      = true
   var enableOverlayTerrain        = false
-  var enableOverlayTrackedUnits   = false
-  var enableOverlayUnits          = false
+  var enableOverlayTrackedUnits   = true
+  var enableOverlayUnits          = true
 }

@@ -1,11 +1,10 @@
 package Plans.GamePlans
 
 import Plans.Army.Attack
-import Plans.Compound.{IfThenElse, Parallel}
+import Plans.Compound.Parallel
 import Plans.Information.ScoutAt
-import Plans.Macro.Automatic.{BuildPylonsContinuously, _}
+import Plans.Macro.Automatic._
 import Plans.Macro.Build.ScheduleBuildOrder
-import Plans.Macro.UnitCount.SupplyAtLeast
 import Types.BuildRequest.{BuildRequest, RequestUnitAnother, RequestUnitAnotherOne, RequestUpgrade}
 import bwapi.{UnitType, UpgradeType}
 
@@ -14,7 +13,7 @@ class ProtossVsTerran extends Parallel {
   description.set("Protoss vs Terran")
   
   //Via http://wiki.teamliquid.net/starcraft/14_Nexus_(vs._Terran)
-  val _13Nexus = List[BuildRequest] (
+  val _14Nexus = List[BuildRequest] (
     new RequestUnitAnotherOne(UnitType.Protoss_Nexus), //0
     new RequestUnitAnother(8, UnitType.Protoss_Probe),
     new RequestUnitAnotherOne(UnitType.Protoss_Pylon), //8
@@ -85,17 +84,12 @@ class ProtossVsTerran extends Parallel {
   )
   
   children.set(List(
-    new ScheduleBuildOrder { buildables.set(_13Nexus) },
-    new IfThenElse {
-      predicate.set(new SupplyAtLeast { quantity.set(74) })
-      whenTrue.set(new Parallel { children.set(List(
-        new BuildPylonsContinuously,
-        new BuildWorkersContinuously,
-        new TrainContinuously(UnitType.Protoss_Reaver),
-        new TrainGatewayUnitsContinuously,
-        new ScheduleBuildOrder { buildables.set(_lateGame) }
-      ))})
-    },
+    new ScheduleBuildOrder { buildables.set(_14Nexus) },
+    new BuildWorkersContinuously,
+    new TrainContinuously(UnitType.Protoss_Reaver),
+    new TrainContinuously(UnitType.Protoss_Dragoon),
+    new TrainContinuously(UnitType.Protoss_Zealot),
+    new ScheduleBuildOrder { buildables.set(_lateGame) },
     new ScoutAt(28),
     new Attack
   ))

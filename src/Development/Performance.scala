@@ -24,7 +24,7 @@ class Performance {
       } else {
         currentFrameDelay -= 1
       }
-      currentFrameDelay = Math.max(12,  currentFrameDelay)
+      currentFrameDelay = Math.max(6,  currentFrameDelay)
       currentFrameDelay = Math.min(72, currentFrameDelay)
     }
   }

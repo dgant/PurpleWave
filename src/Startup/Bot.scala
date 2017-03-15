@@ -1,6 +1,6 @@
 package Startup
 
-import Development._
+import Development.{Overlay, _}
 import Global.Resources._
 import Global.Combat.Commander
 import Global.Combat.Battle.Battles
@@ -77,7 +77,7 @@ class Bot() extends DefaultBWListener {
       With.performance.stopCounting()
       
       With.camera.onFrame()
-      Overlay.onFrame()
+      Overlay.Overlay.onFrame()
       _considerSurrender
     }
     catch {

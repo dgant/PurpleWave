@@ -5,7 +5,7 @@ import Startup.With
 object DrawScreen {
   
   def header(x:Int, text:String) = {
-    With.game.drawTextScreen(0, 5, text)
+    With.game.drawTextScreen(x, 5, text)
   }
   
   def table(startX:Int, startY:Int, cells:Iterable[Iterable[String]]) {

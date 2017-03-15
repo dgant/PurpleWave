@@ -2,6 +2,7 @@ package Global.Resources.Scheduling
 
 import Startup.With
 import Types.Buildable.{Buildable, BuildableUnit}
+import Utilities.CountMap
 import bwapi.{TechType, UnitType, UpgradeType}
 
 import scala.collection.mutable
@@ -11,8 +12,8 @@ class ScheduleSimulationState(
                                var minerals            : Int,
                                var gas                 : Int,
                                var supplyAvailable     : Int,
-                               var unitsOwned          : mutable.HashMap[UnitType, Int],
-                               var unitsAvailable      : mutable.HashMap[UnitType, Int],
+                               var unitsOwned          : CountMap[UnitType],
+                               var unitsAvailable      : CountMap[UnitType],
                                var techsOwned          : mutable.Set[TechType],
                                var upgradeLevels       : mutable.Map[UpgradeType, Int],
                                val eventQueue          : mutable.SortedSet[BuildEvent],
@@ -107,10 +108,10 @@ class ScheduleSimulationState(
   }
   
   private def unmetRequirements(buildable: Buildable): Iterable[Buildable] = {
-    val units  = new mutable.HashMap[UnitType, Int]
+    val units  = new CountMap[UnitType]
     buildable.requirements
       .map(requirement => {
-        requirement.unitOption.foreach(unit => units.put(unit, 1 + units.getOrElse(unit, 0)))
+        requirement.unitOption.foreach(units.addOne)
         var unmet = false
         unmet ||= requirement.techOption    .exists(tech    => ! techsOwned.contains(tech))
         unmet ||= requirement.upgradeOption .exists(upgrade => upgradeLevels.getOrElse(upgrade, 0)  < requirement.upgradeLevel)
@@ -122,10 +123,10 @@ class ScheduleSimulationState(
   }
   
   private def unmetBuilders(buildable: Buildable): Iterable[Buildable] = {
-    val buildersRequired  = new mutable.HashMap[UnitType, Int]
+    val buildersRequired  = new CountMap[UnitType]
     buildable.buildersOccupied
       .map(builder => {
-        builder.unitOption.foreach(unit => buildersRequired.put(unit, 1 + buildersRequired.getOrElse(unit, 0)))
+        builder.unitOption.foreach(buildersRequired.addOne)
         if (builder.unitOption.exists(unit => available(unit) < buildersRequired(unit)))
           Some(builder) else None
       })
@@ -203,11 +204,11 @@ class ScheduleSimulationState(
   private def endEvent(event: BuildEvent) {
     val buildable = event.buildable
     supplyAvailable += buildable.supplyProvided
-    buildable.unitOption.foreach(addUnitOwned)
-    buildable.unitOption.foreach(addUnitAvailable)
-    buildable.buildersOccupied.foreach(builder => addUnitAvailable(builder.unit))
-    buildable.techOption.foreach(addTech)
-    buildable.upgradeOption.foreach(addUpgrade(_, buildable.upgradeLevel))
+    buildable.unitOption.foreach(unitType => unitsOwned.add(unitType, buildable.unitsProduced))
+    buildable.unitOption.foreach(unitType => unitsAvailable.add(unitType, buildable.unitsProduced))
+    buildable.buildersOccupied.map(_.unit).foreach(unitsAvailable.addOne)
+    buildable.techOption.foreach(techsOwned.add)
+    buildable.upgradeOption.foreach(upgradeLevels.put(_, buildable.upgradeLevel))
   }
   
   private def spendResources(buildable: Buildable) {
@@ -218,17 +219,10 @@ class ScheduleSimulationState(
   
   private def reserveBuilders(buildable: Buildable) {
     //TODO: Try to account for travel time
-    buildable.buildersOccupied.map(_.unit).foreach(subtractUnitAvailable)
+    buildable.buildersOccupied.map(_.unit).foreach(unitsAvailable.subtractOne)
   }
   
   private def spendBuilders(buildable: Buildable) {
-    buildable.buildersConsumed.map(_.unit).foreach(subtractUnitOwned)
+    buildable.buildersConsumed.map(_.unit).foreach(unitsOwned.subtractOne)
   }
-  
-  private def subtractUnitOwned(unitType: UnitType)           = unitsOwned.put     (unitType, -1 + owned(unitType))
-  private def subtractUnitAvailable(unitType: UnitType)       = unitsAvailable.put (unitType, -1 + available(unitType))
-  private def addUnitOwned(unitType: UnitType)                = unitsOwned.put     (unitType,  1 + owned(unitType))
-  private def addUnitAvailable(unitType: UnitType)            = unitsAvailable.put (unitType,  1 + available(unitType))
-  private def addTech(techType: TechType)                     = techsOwned.add     (techType)
-  private def addUpgrade(upgradeType: UpgradeType, level:Int) = upgradeLevels.put  (upgradeType, level)
 }

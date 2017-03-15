@@ -4,6 +4,7 @@ import Global.Combat.Behaviors.Behavior
 import Startup.With
 import Types.Intents.Intention
 import Types.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import Utilities.CountMap
 import bwapi.{Position, UnitType}
 
 import scala.collection.mutable
@@ -11,7 +12,7 @@ import scala.collection.mutable
 class Commander {
   
   var _intentions = new mutable.HashMap[FriendlyUnitInfo, Intention]
-  val _nextOrderFrame = new mutable.HashMap[FriendlyUnitInfo, Int] { override def default(key: FriendlyUnitInfo): Int = 0 }
+  val _nextOrderFrame = new CountMap[FriendlyUnitInfo]
   val _lastCommands = new mutable.HashMap[FriendlyUnitInfo, String]
   var _lastIntentions = new mutable.HashMap[FriendlyUnitInfo, Intention]
   

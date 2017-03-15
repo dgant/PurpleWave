@@ -2,6 +2,7 @@ package Global.Resources.Scheduling
 
 import Startup.With
 import Types.BwapiTypes.{TechTypes, UpgradeTypes}
+import Utilities.CountMap
 import bwapi.UnitType
 
 import scala.collection.{breakOut, mutable}
@@ -27,10 +28,11 @@ object ScheduleSimulationStateBuilder {
     output
   }
   
-  def unitCount:collection.mutable.HashMap[UnitType, Int] = {
-    collection.mutable.HashMap(
-      With.units.ours
-        .groupBy(_.utype)
-        .map(pair => (pair._1, pair._2.size)).toSeq: _*)
+  def unitCount:CountMap[UnitType] = {
+    val output = new CountMap[UnitType]
+    With.units.ours
+      .groupBy(_.utype)
+      .foreach(pair => output.put(pair._1, pair._2.size))
+    output
   }
 }

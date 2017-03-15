@@ -4,6 +4,7 @@ import Plans.Plan
 import Startup.With
 import Types.BuildRequest.BuildRequest
 import Utilities.Caching.Limiter
+import Utilities.CountMap
 import bwapi.UnitType
 
 import scala.collection.mutable
@@ -28,7 +29,7 @@ class Scheduler {
   }
   val _updateQueueLimiter = new Limiter(2, () => _updateQueue)
   def _updateQueue() {
-    val unitsWanted = new mutable.HashMap[UnitType, Int]
+    val unitsWanted = new CountMap[UnitType]
     val unitsActual = With.units.ours.groupBy(_.utype).mapValues(_.size)
     val rawQueue = _requests.keys.toList
       .sortBy(With.prioritizer.getPriority)
@@ -41,7 +42,7 @@ class Scheduler {
   
   def _isFulfilled(
     request:BuildRequest,
-    unitsWanted:mutable.HashMap[UnitType, Int],
+    unitsWanted:CountMap[UnitType],
     unitsActual:Map[UnitType, Int]):Boolean = {
     if (request.buildable.upgradeOption.nonEmpty) {
       return With.self .getUpgradeLevel(request.buildable.upgradeOption.get) >= request.buildable.upgradeLevel

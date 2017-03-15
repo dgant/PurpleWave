@@ -1,11 +1,11 @@
 package Macro.Scheduling
 
-import Planning.Plan
-import Startup.With
 import Macro.BuildRequests.BuildRequest
 import Macro.Buildables.Buildable
-import Macro.Scheduling.Optimization.{ScheduleSimulationResult, ScheduleSimulator}
+import Macro.Scheduling.Optimization.ScheduleSimulationResult
 import Performance.Caching.Limiter
+import Planning.Plan
+import Startup.With
 import Utilities.{CountMap, CountMapper}
 import bwapi.UnitType
 
@@ -37,7 +37,7 @@ class Scheduler {
     val unitsWanted = new CountMap[UnitType]
     val unitsActual:CountMap[UnitType] = CountMapper.make(With.units.ours.groupBy(_.utype).mapValues(_.size))
     queueOriginal = requestQueue.flatten(buildable => getUnfulfilledBuildables(buildable, unitsWanted, unitsActual))
-    simulationResults = ScheduleSimulator.simulate(queueOriginal)
+    //simulationResults = ScheduleSimulator.simulate(queueOriginal)
   }
   
   private def getUnfulfilledBuildables(

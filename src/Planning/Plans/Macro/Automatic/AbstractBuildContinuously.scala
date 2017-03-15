@@ -11,9 +11,9 @@ abstract class AbstractBuildContinuously extends Plan {
   protected def totalRequiredRecalculate:Int
   protected def unitType:UnitType
   
-  override def isComplete:Boolean = totalRequired == 0
-  override def onFrame() = With.scheduler.request(this, List(new RequestUnitAtLeast(totalRequired, unitType)))
+  override def isComplete:Boolean = toBuild == 0
+  override def onFrame() = With.scheduler.request(this, List(new RequestUnit(toBuild, unitType)))
   
-  protected def totalRequired:Int = totalRequiredCache.get
+  protected def toBuild:Int = totalRequiredCache.get
   private val totalRequiredCache = new CacheFrame(() => totalRequiredRecalculate)
 }

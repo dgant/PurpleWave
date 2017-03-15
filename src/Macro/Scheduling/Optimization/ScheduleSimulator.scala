@@ -10,7 +10,7 @@ object ScheduleSimulator {
 
   val maxDepthBuildables = 100
   val maxQueueOutput = 20
-  val maxDepthFrames = 24 * 60 * 4
+  val maxDepthFrames = 24 * 60 * 5
   
   def simulate(buildQueue:Iterable[Buildable]):ScheduleSimulationResult = {
     val currentState = ScheduleSimulationStateBuilder.build
@@ -44,12 +44,11 @@ object ScheduleSimulator {
           buildablesRequested = insertAt(buildablesRequested, build.unmetPrerequisites, index)
           index -= 1
         }
-        else if ( ! build.exceededSearchDepth) {
+        else if (build.exceededSearchDepth) {
           buildablesImpossible.add(nextBuildable)
         }
         else {
-          //Otherwise, the build was impossible.
-          val placeToPutDebugBreakpoint = 123
+          buildablesImpossible.add(nextBuildable)
         }
         
       }

@@ -2,7 +2,7 @@ package Planning.Plans.Macro.Automatic
 
 import Startup.With
 
-class BuildWorkersContinuously  extends TrainContinuously {
+class TrainWorkersContinuously extends TrainContinuously {
   
   description.set("Build bases when we're about saturated")
   

@@ -68,7 +68,7 @@ class ProtossVsZerg extends Parallel {
   children.set(List(
     new ScheduleBuildOrder { buildables.set(_oneBaseSpeedlot) },
     new BuildPylonsContinuously,
-    new BuildWorkersContinuously,
+    new TrainWorkersContinuously,
     new TrainContinuously(UnitType.Protoss_Scout),
     new TrainContinuously(UnitType.Protoss_Zealot),
     new ScheduleBuildOrder { buildables.set(MassScoutLateGame.build) },

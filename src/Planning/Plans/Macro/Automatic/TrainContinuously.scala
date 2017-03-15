@@ -16,5 +16,4 @@ class TrainContinuously(var unitTypeToTrain:UnitType = UnitType.None) extends Ab
     .min
     now + capacity
   }
-    
 }

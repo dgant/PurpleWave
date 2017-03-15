@@ -9,16 +9,16 @@ import bwapi.{TechType, UnitType, UpgradeType}
 import scala.collection.mutable
 
 class ScheduleSimulationState(
-                               var frame               : Int,
-                               var minerals            : Int,
-                               var gas                 : Int,
-                               var supplyAvailable     : Int,
-                               var unitsOwned          : CountMap[UnitType],
-                               var unitsAvailable      : CountMap[UnitType],
-                               var techsOwned          : mutable.Set[TechType],
-                               var upgradeLevels       : mutable.Map[UpgradeType, Int],
-                               val eventQueue          : mutable.SortedSet[BuildEvent],
-                               val isDisposableCopy    : Boolean = false) {
+  var frame               : Int,
+  var minerals            : Int,
+  var gas                 : Int,
+  var supplyAvailable     : Int,
+  var unitsOwned          : CountMap[UnitType],
+  var unitsAvailable      : CountMap[UnitType],
+  var techsOwned          : mutable.Set[TechType],
+  var upgradeLevels       : mutable.Map[UpgradeType, Int],
+  val eventQueue          : mutable.SortedSet[BuildEvent],
+  val isDisposableCopy    : Boolean = false) {
   
   private def disposableCopy:ScheduleSimulationState =
     new ScheduleSimulationState(
@@ -56,7 +56,7 @@ class ScheduleSimulationState(
   
     val nextFrame = nextInterestingFrame(Some(buildable))
     if (nextFrame > maxFrames) {
-      return new TryBuildingResult(None, exceededSearchDepth = true)
+      return new TryBuildingResult(None, unmetPrerequisites(buildable), exceededSearchDepth = true)
     }
     
     val nextState = if (isDisposableCopy) this else disposableCopy
@@ -138,8 +138,8 @@ class ScheduleSimulationState(
   private def mineralsPerFrame : Double  = With.economy.mineralIncomePerMinute (numberOfMiners,   numberOfBases) / 24.0 / 60.0
   private def gasPerFrame      : Double  = With.economy.gasIncomePerMinute     (numberOfDrillers, numberOfBases) / 24.0 / 60.0
   
-  private def owned     (unitType: UnitType) : Int = unitsOwned      .get(unitType).getOrElse(0)
-  private def available (unitType: UnitType) : Int = unitsAvailable  .get(unitType).getOrElse(0)
+  private def owned     (unitType: UnitType) : Int = unitsOwned     (unitType)
+  private def available (unitType: UnitType) : Int = unitsAvailable (unitType)
   private def numberOfBases     : Int = List(UnitType.Terran_Command_Center, UnitType.Protoss_Nexus, UnitType.Zerg_Hatchery, UnitType.Zerg_Lair, UnitType.Zerg_Hive).map(owned).sum
   private def numberOfWorkers   : Int = List(UnitType.Terran_SCV, UnitType.Protoss_Probe, UnitType.Zerg_Drone).map(available).sum
   private def numberOfMiners    : Int = Math.max(0, numberOfWorkers - numberOfDrillers)

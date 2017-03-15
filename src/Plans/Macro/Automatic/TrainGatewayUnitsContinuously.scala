@@ -1,7 +1,6 @@
 package Plans.Macro.Automatic
 
 import Startup.With
-import Types.Buildable.{Buildable, BuildableUnit}
 import bwapi.{UnitType, UpgradeType}
 
 class TrainGatewayUnitsContinuously extends AbstractBuildContinuously {
@@ -10,7 +9,7 @@ class TrainGatewayUnitsContinuously extends AbstractBuildContinuously {
     With.units.ours.filter(_.complete)
       .count(unit => List(UnitType.Protoss_Gateway, UnitType.Protoss_Zealot, UnitType.Protoss_Dragoon, UnitType.Protoss_Dark_Templar).contains(unit.utype))
   
-  override def _newBuild:Buildable = new BuildableUnit(_nextUnitType)
+  override def _unitType:UnitType = _nextUnitType
   
   def _nextUnitType:UnitType = {
     val haveLegSpeed          = With.self.getUpgradeLevel(UpgradeType.Leg_Enhancements) > 0

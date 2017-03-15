@@ -1,12 +1,11 @@
 package Plans.Macro.Automatic
 
 import Startup.With
-import Types.Buildable.{Buildable, BuildableUnit}
 import bwapi.UnitType
 
 class TrainContinuously(var unitType:UnitType = UnitType.None) extends AbstractBuildContinuously {
   
-  override def _newBuild:Buildable = new BuildableUnit(unitType)
+  override def _unitType:UnitType = unitType
   override def _totalRequired:Int = {
     val now = With.units.ours.count(_.utype == unitType)
     val capacity = List(

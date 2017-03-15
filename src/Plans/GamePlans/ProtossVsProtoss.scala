@@ -7,7 +7,7 @@ import Plans.Macro.Automatic._
 import Plans.Macro.Build.ScheduleBuildOrder
 import Plans.Macro.UnitCount.UnitCountAtLeast
 import Strategies.UnitMatchers.UnitMatchWarriors
-import Types.Buildable.{Buildable, BuildableUnit, BuildableUpgrade}
+import Types.BuildRequest.{BuildRequest, RequestUnitAnotherOne, RequestUpgrade}
 import bwapi.{UnitType, UpgradeType}
 
 class ProtossVsProtoss extends Parallel {
@@ -15,59 +15,58 @@ class ProtossVsProtoss extends Parallel {
   description.set("Protoss vs Protoss")
   
   //http://wiki.teamliquid.net/starcraft/4_Gate_Goon_(vs._Protoss)
-  val _fourGateGoons = List[Buildable] (
-    new BuildableUnit(UnitType.Protoss_Nexus),
-    new BuildableUnit(UnitType.Protoss_Probe),
-    new BuildableUnit(UnitType.Protoss_Probe),
-    new BuildableUnit(UnitType.Protoss_Probe),
-    new BuildableUnit(UnitType.Protoss_Probe),
-    new BuildableUnit(UnitType.Protoss_Probe),
-    new BuildableUnit(UnitType.Protoss_Probe),
-    new BuildableUnit(UnitType.Protoss_Probe),
-    new BuildableUnit(UnitType.Protoss_Probe),
-    new BuildableUnit(UnitType.Protoss_Pylon), //8
-    new BuildableUnit(UnitType.Protoss_Probe),
-    new BuildableUnit(UnitType.Protoss_Probe),
-    new BuildableUnit(UnitType.Protoss_Gateway), //10
-    new BuildableUnit(UnitType.Protoss_Probe),
-    new BuildableUnit(UnitType.Protoss_Probe),
-    new BuildableUnit(UnitType.Protoss_Pylon), //12
-    new BuildableUnit(UnitType.Protoss_Probe),
-    new BuildableUnit(UnitType.Protoss_Zealot), //13
-    new BuildableUnit(UnitType.Protoss_Probe),
-    new BuildableUnit(UnitType.Protoss_Assimilator), //16
-    new BuildableUnit(UnitType.Protoss_Probe),
-    new BuildableUnit(UnitType.Protoss_Cybernetics_Core), //17
-    new BuildableUnit(UnitType.Protoss_Probe),
-    new BuildableUnit(UnitType.Protoss_Zealot), //18
-    new BuildableUnit(UnitType.Protoss_Probe),
-    new BuildableUnit(UnitType.Protoss_Probe),
-    new BuildableUnit(UnitType.Protoss_Pylon), //22
-    new BuildableUnit(UnitType.Protoss_Probe),
-    new BuildableUnit(UnitType.Protoss_Dragoon), //23
-    new BuildableUnit(UnitType.Protoss_Probe),
-    new BuildableUpgrade(UpgradeType.Singularity_Charge), //26
-    new BuildableUnit(UnitType.Protoss_Probe),
-    new BuildableUnit(UnitType.Protoss_Dragoon), //27
-    new BuildableUnit(UnitType.Protoss_Probe),
-    new BuildableUnit(UnitType.Protoss_Probe),
-    new BuildableUnit(UnitType.Protoss_Gateway), //31
-    new BuildableUnit(UnitType.Protoss_Gateway), //31
-    new BuildableUnit(UnitType.Protoss_Gateway), //31
-    new BuildableUnit(UnitType.Protoss_Dragoon), //31
-    new BuildableUnit(UnitType.Protoss_Pylon), //33
-    new BuildableUnit(UnitType.Protoss_Dragoon), //33
-    new BuildableUnit(UnitType.Protoss_Dragoon),
-    new BuildableUnit(UnitType.Protoss_Dragoon),
-    new BuildableUnit(UnitType.Protoss_Dragoon),
-    new BuildableUnit(UnitType.Protoss_Pylon), //33
-    new BuildableUnit(UnitType.Protoss_Dragoon), //33
-    new BuildableUnit(UnitType.Protoss_Dragoon),
-    new BuildableUnit(UnitType.Protoss_Dragoon),
-    new BuildableUnit(UnitType.Protoss_Dragoon),
-    new BuildableUnit(UnitType.Protoss_Nexus)
+  val _fourGateGoons = List[BuildRequest] (
+    new RequestUnitAnotherOne(UnitType.Protoss_Nexus),
+    new RequestUnitAnotherOne(UnitType.Protoss_Probe),
+    new RequestUnitAnotherOne(UnitType.Protoss_Probe),
+    new RequestUnitAnotherOne(UnitType.Protoss_Probe),
+    new RequestUnitAnotherOne(UnitType.Protoss_Probe),
+    new RequestUnitAnotherOne(UnitType.Protoss_Probe),
+    new RequestUnitAnotherOne(UnitType.Protoss_Probe),
+    new RequestUnitAnotherOne(UnitType.Protoss_Probe),
+    new RequestUnitAnotherOne(UnitType.Protoss_Probe),
+    new RequestUnitAnotherOne(UnitType.Protoss_Pylon), //8
+    new RequestUnitAnotherOne(UnitType.Protoss_Probe),
+    new RequestUnitAnotherOne(UnitType.Protoss_Probe),
+    new RequestUnitAnotherOne(UnitType.Protoss_Gateway), //10
+    new RequestUnitAnotherOne(UnitType.Protoss_Probe),
+    new RequestUnitAnotherOne(UnitType.Protoss_Probe),
+    new RequestUnitAnotherOne(UnitType.Protoss_Pylon), //12
+    new RequestUnitAnotherOne(UnitType.Protoss_Probe),
+    new RequestUnitAnotherOne(UnitType.Protoss_Zealot), //13
+    new RequestUnitAnotherOne(UnitType.Protoss_Probe),
+    new RequestUnitAnotherOne(UnitType.Protoss_Assimilator), //16
+    new RequestUnitAnotherOne(UnitType.Protoss_Probe),
+    new RequestUnitAnotherOne(UnitType.Protoss_Cybernetics_Core), //17
+    new RequestUnitAnotherOne(UnitType.Protoss_Probe),
+    new RequestUnitAnotherOne(UnitType.Protoss_Zealot), //18
+    new RequestUnitAnotherOne(UnitType.Protoss_Probe),
+    new RequestUnitAnotherOne(UnitType.Protoss_Probe),
+    new RequestUnitAnotherOne(UnitType.Protoss_Pylon), //22
+    new RequestUnitAnotherOne(UnitType.Protoss_Probe),
+    new RequestUnitAnotherOne(UnitType.Protoss_Dragoon), //23
+    new RequestUnitAnotherOne(UnitType.Protoss_Probe),
+    new RequestUpgrade(UpgradeType.Singularity_Charge), //26
+    new RequestUnitAnotherOne(UnitType.Protoss_Probe),
+    new RequestUnitAnotherOne(UnitType.Protoss_Dragoon), //27
+    new RequestUnitAnotherOne(UnitType.Protoss_Probe),
+    new RequestUnitAnotherOne(UnitType.Protoss_Probe),
+    new RequestUnitAnotherOne(UnitType.Protoss_Gateway), //31
+    new RequestUnitAnotherOne(UnitType.Protoss_Gateway), //31
+    new RequestUnitAnotherOne(UnitType.Protoss_Gateway), //31
+    new RequestUnitAnotherOne(UnitType.Protoss_Dragoon), //31
+    new RequestUnitAnotherOne(UnitType.Protoss_Pylon), //33
+    new RequestUnitAnotherOne(UnitType.Protoss_Dragoon), //33
+    new RequestUnitAnotherOne(UnitType.Protoss_Dragoon),
+    new RequestUnitAnotherOne(UnitType.Protoss_Dragoon),
+    new RequestUnitAnotherOne(UnitType.Protoss_Dragoon),
+    new RequestUnitAnotherOne(UnitType.Protoss_Pylon), //33
+    new RequestUnitAnotherOne(UnitType.Protoss_Dragoon), //33
+    new RequestUnitAnotherOne(UnitType.Protoss_Dragoon),
+    new RequestUnitAnotherOne(UnitType.Protoss_Dragoon),
+    new RequestUnitAnotherOne(UnitType.Protoss_Dragoon),
+    new RequestUnitAnotherOne(UnitType.Protoss_Nexus)
   )
-  
   
   children.set(List(
     new ScheduleBuildOrder { buildables.set(_fourGateGoons) },

@@ -1,34 +1,34 @@
 package Plans.GamePlans
 
-import Types.Buildable.{Buildable, BuildableUnit, BuildableUpgrade}
+import Types.BuildRequest.{BuildRequest, RequestUnitAnotherOne, RequestUpgrade}
 import bwapi.{UnitType, UpgradeType}
 
 object MassScoutLateGame {
-  val build = List[Buildable] (
-    new BuildableUnit(UnitType.Protoss_Assimilator),
-    new BuildableUnit(UnitType.Protoss_Stargate),
-    new BuildableUnit(UnitType.Protoss_Stargate),
-    new BuildableUnit(UnitType.Protoss_Nexus),
-    new BuildableUnit(UnitType.Protoss_Assimilator),
-    new BuildableUpgrade(UpgradeType.Protoss_Air_Weapons, 1),
-    new BuildableUnit(UnitType.Protoss_Stargate),
-    new BuildableUnit(UnitType.Protoss_Stargate),
-    new BuildableUnit(UnitType.Protoss_Nexus),
-    new BuildableUnit(UnitType.Protoss_Assimilator),
-    new BuildableUpgrade(UpgradeType.Protoss_Air_Armor, 1),
-    new BuildableUnit(UnitType.Protoss_Stargate),
-    new BuildableUnit(UnitType.Protoss_Stargate),
-    new BuildableUnit(UnitType.Protoss_Nexus),
-    new BuildableUnit(UnitType.Protoss_Assimilator),
-    new BuildableUnit(UnitType.Protoss_Fleet_Beacon),
-    new BuildableUpgrade(UpgradeType.Protoss_Air_Weapons, 2),
-    new BuildableUpgrade(UpgradeType.Gravitic_Thrusters),
-    new BuildableUpgrade(UpgradeType.Protoss_Air_Armor, 2),
-    new BuildableUnit(UnitType.Protoss_Nexus),
-    new BuildableUnit(UnitType.Protoss_Assimilator),
-    new BuildableUnit(UnitType.Protoss_Gateway),
-    new BuildableUnit(UnitType.Protoss_Gateway),
-    new BuildableUnit(UnitType.Protoss_Stargate),
-    new BuildableUnit(UnitType.Protoss_Stargate)
+  val build = List[BuildRequest] (
+    new RequestUnitAnotherOne(UnitType.Protoss_Assimilator),
+    new RequestUnitAnotherOne(UnitType.Protoss_Stargate),
+    new RequestUnitAnotherOne(UnitType.Protoss_Stargate),
+    new RequestUnitAnotherOne(UnitType.Protoss_Nexus),
+    new RequestUnitAnotherOne(UnitType.Protoss_Assimilator),
+    new RequestUpgrade(UpgradeType.Protoss_Air_Weapons, 1),
+    new RequestUnitAnotherOne(UnitType.Protoss_Stargate),
+    new RequestUnitAnotherOne(UnitType.Protoss_Stargate),
+    new RequestUnitAnotherOne(UnitType.Protoss_Nexus),
+    new RequestUnitAnotherOne(UnitType.Protoss_Assimilator),
+    new RequestUpgrade(UpgradeType.Protoss_Air_Armor, 1),
+    new RequestUnitAnotherOne(UnitType.Protoss_Stargate),
+    new RequestUnitAnotherOne(UnitType.Protoss_Stargate),
+    new RequestUnitAnotherOne(UnitType.Protoss_Nexus),
+    new RequestUnitAnotherOne(UnitType.Protoss_Assimilator),
+    new RequestUnitAnotherOne(UnitType.Protoss_Fleet_Beacon),
+    new RequestUpgrade(UpgradeType.Protoss_Air_Weapons, 2),
+    new RequestUpgrade(UpgradeType.Gravitic_Thrusters),
+    new RequestUpgrade(UpgradeType.Protoss_Air_Armor, 2),
+    new RequestUnitAnotherOne(UnitType.Protoss_Nexus),
+    new RequestUnitAnotherOne(UnitType.Protoss_Assimilator),
+    new RequestUnitAnotherOne(UnitType.Protoss_Gateway),
+    new RequestUnitAnotherOne(UnitType.Protoss_Gateway),
+    new RequestUnitAnotherOne(UnitType.Protoss_Stargate),
+    new RequestUnitAnotherOne(UnitType.Protoss_Stargate)
   )
 }

@@ -2,16 +2,17 @@ package Plans.Macro.Automatic
 
 import Plans.Plan
 import Startup.With
-import Types.Buildable.Buildable
+import Types.BuildRequest.RequestUnitAtLeast
 import Utilities.Caching.CacheFrame
+import bwapi.UnitType
 
 abstract class AbstractBuildContinuously extends Plan {
   
   def _totalRequired:Int
-  def _newBuild:Buildable
+  def _unitType:UnitType
   
   override def isComplete:Boolean = totalRequired == 0
-  override def onFrame() = With.scheduler.request(this, (0 until totalRequired).map(i => _newBuild))
+  override def onFrame() = With.scheduler.request(this, List(new RequestUnitAtLeast(totalRequired, _unitType)))
   
   def totalRequired:Int = _totalRequiredCache.get
   val _totalRequiredCache = new CacheFrame(() => _totalRequired)

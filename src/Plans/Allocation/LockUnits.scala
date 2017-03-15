@@ -21,11 +21,13 @@ class LockUnits extends Plan {
   var isSatisfied:Boolean = false
   
   description.set(
-    if(isComplete) units
+    if(isComplete)
+      units
       .groupBy(_.utype)
       .map(pair => TypeDescriber.unit(pair._1) + " " + pair._2.size)
       .mkString(", ")
-    else "")
+    else
+      "")
   
   override def isComplete: Boolean = isSatisfied
   override def onFrame() = With.recruiter.add(this)

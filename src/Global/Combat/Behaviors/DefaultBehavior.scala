@@ -47,7 +47,7 @@ object DefaultBehavior extends Behavior {
     preferMobility    = 1,
     preferHighGround  = 0,
     preferGrouping    = 0,
-    avoidDamage       = 2,
+    avoidDamage       = 1,
     avoidTraffic      = 0.25,
     avoidVision       = 0,
     avoidDetection    = 0

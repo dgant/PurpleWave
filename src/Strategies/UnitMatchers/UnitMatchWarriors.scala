@@ -8,7 +8,7 @@ object UnitMatchWarriors extends UnitMatcher {
     unit.complete &&
       unit.impactsCombat &&
       unit.utype.canMove &&
-      ! unit.utype.isWorker &&
-      ! unit.utype.orderable
+      unit.utype.orderable &&
+      ! unit.utype.isWorker
   }
 }

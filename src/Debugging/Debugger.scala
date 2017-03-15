@@ -8,11 +8,11 @@ import scala.collection.mutable
 
 object Debugger {
   
-  def plans:Iterable[Plan] = _flatten(With.gameplan)
+  def plans:Iterable[Plan] = flatten(With.gameplan)
   
   def planDescriptions:Iterable[String] = plans.map(plan => plan.toString)
   
-  def _flatten(plan:Plan):Iterable[Plan] = List(plan) ++ plan.getChildren.flatten(_flatten)
+  private def flatten(plan:Plan):Iterable[Plan] = List(plan) ++ plan.getChildren.flatten(flatten)
   
   val highlitUnits = new mutable.HashSet[UnitInfo]
   def toggleHighlight(unit:UnitInfo) {

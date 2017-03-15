@@ -82,7 +82,7 @@ class Bot() extends DefaultBWListener {
       
       With.camera.onFrame()
       Visualization.Visualization.onFrame()
-      _considerSurrender
+      considerSurrender
     }
     catch {
       case exception:Exception =>
@@ -143,7 +143,7 @@ class Bot() extends DefaultBWListener {
     }
   }
   
-  def _considerSurrender() = {
+  private def considerSurrender() = {
     if (With.self.supplyUsed == 0
       && With.self.minerals < 50
       && With.units.enemy.exists(_.utype.isWorker)

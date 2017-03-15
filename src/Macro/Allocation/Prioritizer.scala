@@ -7,25 +7,23 @@ import scala.collection.mutable
 
 class Prioritizer {
   
-  val _priorities = new mutable.HashMap[Plan, Integer]
-  
-  var _nextPriority = 0
+  private val priorities = new mutable.HashMap[Plan, Integer]
   
   def onFrame() {
-    _priorities.clear()
-    _nextPriority = 0
-    _prioritizeRecurisvely(With.gameplan)
+    priorities.clear()
+    prioritizeTree(With.gameplan)
   }
   
   def getPriority(plan:Plan):Integer = {
-    _priorities.getOrElse(plan, Integer.MAX_VALUE)
+    priorities.getOrElse(plan, Integer.MAX_VALUE)
   }
   
-  def _prioritizeRecurisvely(plan:Plan) {
-    if ( ! _priorities.contains(plan)) {
-      _priorities.put(plan, _nextPriority)
-      _nextPriority += 1
-      plan.getChildren.foreach(_prioritizeRecurisvely)
+  private def prioritizeTree(plan:Plan) {
+    var nextPriority = 0
+    if ( ! priorities.contains(plan)) {
+      priorities.put(plan, nextPriority)
+      nextPriority += 1
+      plan.getChildren.foreach(prioritizeTree)
     }
   }
 }

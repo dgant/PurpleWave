@@ -24,7 +24,7 @@ class Banker {
     _mineralsLeft  = With.self.minerals
     _gasLeft       = With.self.gas
     _supplyLeft    = With.self.supplyTotal - With.self.supplyUsed
-    getPrioritizedRequests.foreach(_queueBuyer)
+    getPrioritizedRequests.foreach(queueBuyer)
   }
   
   def add(request:LockCurrency) {
@@ -38,8 +38,8 @@ class Banker {
     recountResources()
   }
   
-  def _queueBuyer(request:LockCurrency) {
-    request.isSatisfied = request.isSpent || _isAvailableNow(request)
+  private def queueBuyer(request:LockCurrency) {
+    request.isSatisfied = request.isSpent || isAvailableNow(request)
     
     if ( ! request.isSpent) {
       _mineralsLeft -= request.minerals
@@ -48,7 +48,7 @@ class Banker {
     }
   }
   
-  def _isAvailableNow(request:LockCurrency): Boolean = {
+  private def isAvailableNow(request:LockCurrency): Boolean = {
     (request.minerals == 0  ||  _mineralsLeft  >= request.minerals) &&
     (request.gas      == 0  ||  _gasLeft       >= request.gas)      &&
     (request.supply   == 0  ||  _supplyLeft    >= request.supply)

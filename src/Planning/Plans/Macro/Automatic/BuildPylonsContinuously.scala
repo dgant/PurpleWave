@@ -5,7 +5,7 @@ import bwapi.UnitType
 
 class BuildPylonsContinuously extends TrainContinuously(UnitType.Protoss_Pylon) {
   
-  override def _totalRequired: Int = {
+  override protected def totalRequiredRecalculate: Int = {
   
     // Remember! BWAPI doubles all supply numbers (so that Zerglings can each cost 1)
     //

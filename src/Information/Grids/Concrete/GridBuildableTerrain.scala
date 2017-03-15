@@ -5,6 +5,6 @@ import Startup.With
 
 class GridBuildableTerrain extends GridBoolean {
   override def onInitialization() {
-    positions.foreach(tilePosition => set(tilePosition, With.game.isBuildable(tilePosition)))
+    tiles.foreach(tile => set(tile, With.game.isBuildable(tile)))
   }
 }

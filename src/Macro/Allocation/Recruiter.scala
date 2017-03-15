@@ -7,38 +7,37 @@ import BWMirrorProxy.UnitInfo.FriendlyUnitInfo
 import scala.collection.mutable
 
 class Recruiter {
-  val _requestByUnit:mutable.HashMap[FriendlyUnitInfo, LockUnits] = mutable.HashMap.empty
-  val _unassignedUnits:mutable.Set[FriendlyUnitInfo] = mutable.Set.empty
-  val _unitsByRequest:mutable.HashMap[LockUnits, mutable.Set[FriendlyUnitInfo]] = mutable.HashMap.empty
-  val _updatedRequests:mutable.Set[LockUnits] = mutable.Set.empty
+  private val requestByUnit   : mutable.HashMap[FriendlyUnitInfo, LockUnits]              = mutable.HashMap.empty
+  private val unassignedUnits : mutable.Set[FriendlyUnitInfo]                             = mutable.Set.empty
+  private val unitsByRequest  : mutable.HashMap[LockUnits, mutable.Set[FriendlyUnitInfo]] = mutable.HashMap.empty
+  private val updatedRequests : mutable.Set[LockUnits]                                    = mutable.Set.empty
 
   def onFrame() {
     // Free units held by inactive requests
-    _unitsByRequest.keySet.diff(_updatedRequests).foreach(_forgetRequest)
-    _updatedRequests.clear()
+    unitsByRequest.keySet.diff(updatedRequests).foreach(forgetRequest)
+    updatedRequests.clear()
     
     // Remove dead units
-    _requestByUnit.keys.filterNot(_isEligible).foreach(_unassign)
-    _unassignedUnits.filterNot(_isEligible).foreach(_unassignedUnits.remove)
+    requestByUnit.keys.filterNot(isEligible).foreach(unassign)
+    unassignedUnits.filterNot(isEligible).foreach(unassignedUnits.remove)
     
     // Add new units
     With.units.ours
-      .filter(_isEligible)
-      .toSet
-      .diff(_unassignedUnits ++ _requestByUnit.keys)
-      .foreach(_unassignedUnits.add)
+      .filter(isEligible)
+      .diff(unassignedUnits ++ requestByUnit.keys)
+      .foreach(unassignedUnits.add)
     
     //If we suspect any bugginess, enable this
-    //_test
+    //test
   }
   
-  def _isEligible(unit:FriendlyUnitInfo):Boolean = {
+  private def isEligible(unit:FriendlyUnitInfo):Boolean = {
     unit.alive && unit.complete
   }
   
-  def _test {
-    _unitsByRequest.foreach(pair1 =>
-      _unitsByRequest.foreach(pair2 =>
+  private def test {
+    unitsByRequest.foreach(pair1 =>
+      unitsByRequest.foreach(pair2 =>
         if (pair1 != pair2) {
           val intersection = pair1._2.intersect(pair2._2)
           if (intersection.nonEmpty) {
@@ -49,37 +48,37 @@ class Recruiter {
   }
   
   def onUnitDestroyed(unit:FriendlyUnitInfo) {
-    _unassign(unit)
-    _unassignedUnits.remove(unit)
+    unassign(unit)
+    unassignedUnits.remove(unit)
   }
   
   def add(request: LockUnits) {
     //This lock is already up to date. Chill.
-    if (_updatedRequests.contains(request)) {
+    if (updatedRequests.contains(request)) {
       //  return
     }
   
-    _updatedRequests.add(request)
-    _unitsByRequest(request) = _unitsByRequest.getOrElse(request, mutable.Set.empty)
-    _tryToSatisfy(request)
+    updatedRequests.add(request)
+    unitsByRequest(request) = unitsByRequest.getOrElse(request, mutable.Set.empty)
+    tryToSatisfy(request)
   }
   
-  def _tryToSatisfy(request: LockUnits) {
+  private def tryToSatisfy(request: LockUnits) {
     
     // Offer batches of buildersOccupied for the request to choose.
     //   Batch 0: Units not assigned
     //   Batch 1+: Units assigned to weaker-priority requests
     //
-    val assignedToLowerPriority = _unitsByRequest.keys
+    val assignedToLowerPriority = unitsByRequest.keys
       .filter(otherRequest =>
         With.prioritizer.getPriority(request) <
           With.prioritizer.getPriority(otherRequest))
       .map(getUnits)
     
-    val requiredUnits = request.offerUnits(Iterable(_unassignedUnits) ++ assignedToLowerPriority)
+    val requiredUnits = request.offerUnits(Iterable(unassignedUnits) ++ assignedToLowerPriority)
 
     if (requiredUnits == None) {
-      _forgetRequest(request)
+      forgetRequest(request)
     }
     else {
   
@@ -91,30 +90,30 @@ class Recruiter {
       val unitsObsolete = unitsBefore.diff(unitsAfter)
       val unitsNew = unitsAfter.diff(unitsBefore)
       
-      unitsObsolete.foreach(_unassign)
-      unitsNew.foreach(_unassign)
-      unitsNew.foreach(_assign(_, request))
+      unitsObsolete.foreach(unassign)
+      unitsNew.foreach(unassign)
+      unitsNew.foreach(assign(_, request))
     }
   }
   
-  def _forgetRequest(request: LockUnits) {
-    _unitsByRequest.get(request).foreach(_.foreach(_unassign))
-    _unitsByRequest.remove(request)
+  private def forgetRequest(request: LockUnits) {
+    unitsByRequest.get(request).foreach(_.foreach(unassign))
+    unitsByRequest.remove(request)
   }
   
-  def _assign(unit:FriendlyUnitInfo, request:LockUnits) {
-    _requestByUnit(unit) = request
-    _unitsByRequest(request).add(unit)
-    _unassignedUnits.remove(unit)
+  private def assign(unit:FriendlyUnitInfo, request:LockUnits) {
+    requestByUnit(unit) = request
+    unitsByRequest(request).add(unit)
+    unassignedUnits.remove(unit)
   }
   
-  def _unassign(unit:FriendlyUnitInfo) {
-    _unassignedUnits.add(unit)
-    _requestByUnit.get(unit).foreach(request => _unitsByRequest.get(request).foreach(_.remove(unit)))
-    _requestByUnit.remove(unit)
+  private def unassign(unit:FriendlyUnitInfo) {
+    unassignedUnits.add(unit)
+    requestByUnit.get(unit).foreach(request => unitsByRequest.get(request).foreach(_.remove(unit)))
+    requestByUnit.remove(unit)
   }
   
   def getUnits(request: LockUnits):Set[FriendlyUnitInfo] = {
-    _unitsByRequest.getOrElse(request, mutable.Set.empty).toSet
+    unitsByRequest.getOrElse(request, mutable.Set.empty).toSet
   }
 }

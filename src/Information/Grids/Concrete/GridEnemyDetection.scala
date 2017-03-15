@@ -8,9 +8,9 @@ import Utilities.TypeEnrichment.EnrichPosition._
 
 class GridEnemyDetection extends GridBoolean {
   
-  val _limitUpdates = new Limiter(1, _update)
-  override def update() = _limitUpdates.act()
-  def _update() {
+  override def update() = updateLimiter.act()
+  val updateLimiter = new Limiter(1, updateCalculations)
+  private def updateCalculations() {
     reset()
     With.units.enemy
       .filter(_.possiblyStillThere)

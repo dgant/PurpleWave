@@ -14,9 +14,9 @@ object VisualizeUnitsOurs {
       .filterNot(_.command.getUnitCommandType == UnitCommandType.None)
       .foreach(unit => DrawMap.labelBox(
         List(
-          With.commander._lastIntentions.get(unit).map(intent => (intent.motivation * 100).toInt.toString).getOrElse(""),
-          With.commander._lastIntentions.get(unit).map(intent => intent.plan.toString).getOrElse(""),
-          With.commander._lastCommands.get(unit).getOrElse(""),
+          With.commander.lastIntentions.get(unit).map(intent => (intent.motivation * 100).toInt.toString).getOrElse(""),
+          With.commander.lastIntentions.get(unit).map(intent => intent.plan.toString).getOrElse(""),
+          With.commander.lastCommands.get(unit).getOrElse(""),
           unit.command.getUnitCommandType.toString),
         unit.pixel,
         drawBackground = false))

@@ -11,30 +11,28 @@ class PositionSimpleBuilding(
   val buildingType:UnitType)
     extends PositionFinder {
   
-  val _cache = new Cache[Option[TilePosition]](2, () => _find)
-  
-  override def find: Option[TilePosition] = _cache.get
-  
-  def _find: Option[TilePosition] = {
+  override def find: Option[TilePosition] = findCache.get
+  private val findCache = new Cache[Option[TilePosition]](2, () => findRecalculate)
+  private def findRecalculate: Option[TilePosition] = {
     
     //Short-circuits for performance
     if (buildingType.requiresPsi && ! With.units.ours.exists(_.utype == UnitType.Protoss_Pylon)) {
       return None
     }
-    if (_cache.lastValue.isDefined && _cache.lastValue.get.isDefined) {
-      val lastPosition = _cache.lastValue.get.get
+    if (findCache.lastValue.isDefined && findCache.lastValue.get.isDefined) {
+      val lastPosition = findCache.lastValue.get.get
       
       if (With.architect.canBuild(buildingType, lastPosition, maxMargin, exclusions)) {
         return Some(lastPosition)
       }
     }
     
-    if (buildingType.isRefinery)      return _positionRefinery
-    else if (buildingType.isTownHall) return _positionTownHall
-    else                              return _positionBuilding
+    if (buildingType.isRefinery)      return positionRefinery
+    else if (buildingType.isTownHall) return positionTownHall
+    else                              return positionBuilding
   }
   
-  def _positionRefinery:Option[TilePosition] = {
+  private def positionRefinery:Option[TilePosition] = {
     
     val candidates = With.units.neutral
       .filter(_.isGas)
@@ -47,7 +45,7 @@ class PositionSimpleBuilding(
     if (candidates.isEmpty) None else Some(candidates.minBy(_.tileDistance(With.geography.home)))
   }
   
-  def _positionTownHall:Option[TilePosition] = {
+  private def positionTownHall:Option[TilePosition] = {
     val candidates = With.geography.townHallPositions
       .filter(basePosition => {
         val rectangle = new TileRectangle(basePosition, basePosition.add(buildingType.tileSize))
@@ -57,7 +55,7 @@ class PositionSimpleBuilding(
     if (candidates.isEmpty) None else Some(candidates.minBy(With.paths.groundDistance(_, With.geography.home)))
   }
   
-  def _positionBuilding:Option[TilePosition] = {
+  private def positionBuilding:Option[TilePosition] = {
     var output:Option[TilePosition] = None
     (maxMargin to 0 by -1).foreach(margin =>
       output = output.orElse(

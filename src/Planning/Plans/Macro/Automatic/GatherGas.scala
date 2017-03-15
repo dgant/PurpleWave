@@ -11,34 +11,34 @@ import scala.collection.mutable
 
 class GatherGas extends Plan {
   
-  val unitCounter = new UnitCountBetween(1, 3)
-  val drillers = new LockUnits
+  private val unitCounter = new UnitCountBetween(1, 3)
+  private val drillers = new LockUnits
   drillers.unitMatcher.set(UnitMatchWorker)
   drillers.unitCounter.set(unitCounter)
   
   override def getChildren: Iterable[Plan] = List(drillers)
   
   override def onFrame() {
-    unitCounter.maximum.set(_idealMinerCount)
+    unitCounter.maximum.set(idealMinerCount)
     drillers.onFrame()
-    _orderWorkers()
+    orderWorkers()
   }
   
-  def _ourRefineries:Iterable[FriendlyUnitInfo] = With.units.ours.filter(unit => unit.complete && unit.isGas)
+  private def ourRefineries:Iterable[FriendlyUnitInfo] = With.units.ours.filter(unit => unit.complete && unit.isGas)
   
-  def _idealMinerCount:Int = {
+  private def idealMinerCount:Int = {
     //TODO: Stop taking guys off gas if we're saturated on minerals
     if (With.self.gas > Math.max(200, With.self.minerals)) {
       return 0
     }
-    var maxDrillers = 3 * _ourRefineries.size
+    var maxDrillers = 3 * ourRefineries.size
     maxDrillers = Math.min(maxDrillers, With.units.ours.filter(unit => unit.complete && unit.utype.isWorker).size / 3)
     maxDrillers
   }
   
-  def _orderWorkers() {
+  private def orderWorkers() {
     val availableDrillers = new mutable.HashSet[FriendlyUnitInfo] ++= drillers.units
-    _ourRefineries
+    ourRefineries
       .toList
       .sortBy(-_.gasLeft)
       .foreach(refinery =>

@@ -7,11 +7,9 @@ import bwapi.TilePosition
 
 class PositionChoke extends PositionFinder {
   
-  val _cachedChoke = new Cache[Option[TilePosition]](1, () => _recalculate)
-  
-  override def find: Option[TilePosition] = _cachedChoke.get
-  
-  def _recalculate:Option[TilePosition] = {
+  override def find: Option[TilePosition] = findCache.get
+  val findCache = new Cache[Option[TilePosition]](1, () => findRecalculate)
+  private def findRecalculate:Option[TilePosition] = {
     
     val home = With.geography.home
     val chokes = With.geography.ourBases.flatten(_.zone.edges.map(_.chokepoint)).map(_.getCenter.toTilePosition)

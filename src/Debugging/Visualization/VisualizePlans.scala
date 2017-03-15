@@ -6,24 +6,24 @@ import Startup.With
 
 object VisualizePlans {
   def render() {
-    DrawScreen.header(5, _describePlanTree(With.gameplan, 0, 0))
-    _drawPlansRecursively(With.gameplan)
+    DrawScreen.header(5, describePlanTree(With.gameplan, 0, 0))
+    drawPlansRecursively(With.gameplan)
   }
   
-  def _drawPlansRecursively(plan:Plan) {
+  private def drawPlansRecursively(plan:Plan) {
     plan.drawOverlay()
-    plan.getChildren.foreach(_drawPlansRecursively)
+    plan.getChildren.foreach(drawPlansRecursively)
   }
   
-  def _describePlanTree(plan:Plan, childOrder:Integer, depth:Integer):String = {
-    if (_isRelevant(plan)) {
-      (_describePlan(plan, childOrder, depth)
-        ++ plan.getChildren.zipWithIndex.map(x => _describePlanTree(x._1, x._2, depth + 1)))
+  private def describePlanTree(plan:Plan, childOrder:Integer, depth:Integer):String = {
+    if (isRelevant(plan)) {
+      (describePlan(plan, childOrder, depth)
+        ++ plan.getChildren.zipWithIndex.map(x => describePlanTree(x._1, x._2, depth + 1)))
         .mkString("")
     } else ""
   }
   
-  def _describePlan(plan:Plan, childOrder:Integer, depth:Integer):String = {
+  private def describePlan(plan:Plan, childOrder:Integer, depth:Integer):String = {
     val checkbox = if (plan.isComplete) "X " else "  "
     val spacer = "  " * depth
     val leftColumn =
@@ -37,7 +37,7 @@ object VisualizePlans {
     leftColumn + " " * Math.max(0, 45 - leftColumn.length) + "\n"
   }
   
-  def _isRelevant(plan:Plan):Boolean = {
-    plan.getChildren.exists(child => _isRelevant(child) || ((child.isInstanceOf[LockCurrency] || child.isInstanceOf[LockUnits]) && child.isComplete))
+  private def isRelevant(plan:Plan):Boolean = {
+    plan.getChildren.exists(child => isRelevant(child) || ((child.isInstanceOf[LockCurrency] || child.isInstanceOf[LockUnits]) && child.isComplete))
   }
 }

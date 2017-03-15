@@ -7,11 +7,11 @@ import BWMirrorProxy.UnitInfo.ForeignUnitInfo
 object VisualizeUnitsForeign {
   
   def render() {
-    With.units.enemy.foreach(_drawTrackedUnit)
-    With.units.neutral.foreach(_drawTrackedUnit)
+    With.units.enemy.foreach(drawTrackedUnit)
+    With.units.neutral.foreach(drawTrackedUnit)
   }
   
-  def _drawTrackedUnit(trackedUnit:ForeignUnitInfo) {
+  private def drawTrackedUnit(trackedUnit:ForeignUnitInfo) {
     if (trackedUnit._possiblyStillThere && ! trackedUnit.visible) {
       DrawMap.circle(
         trackedUnit.pixel,

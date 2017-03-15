@@ -11,7 +11,7 @@ object VisualizeGrids {
   }
   
   private def renderGrid[T](map:GridArray[T], offsetX:Int=0, offsetY:Int=0) {
-    map.positions
+    map.tiles
       .filter(tilePosition => map.get(tilePosition) != map.defaultValue)
       .foreach(tilePosition => DrawMap.text(
         tilePosition.toPosition.add(offsetX*16, offsetY*13),

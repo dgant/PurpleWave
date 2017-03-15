@@ -10,7 +10,7 @@ import scala.collection.mutable.ListBuffer
 
 class Logger {
   
-  val _logMessages = new ListBuffer[String]
+  private val logMessages = new ListBuffer[String]
   
   def flush() {
     val opponents = With.game.getPlayers.asScala
@@ -23,16 +23,28 @@ class Logger {
     val filename = "bwapi-data/write/" + filenameRaw.replaceAll("[^A-Za-z0-9 \\-\\.]", "") + ".log.txt";
     val file = new File(filename)
     val printWriter = new PrintWriter(file)
-    printWriter.write(_logMessages.distinct.mkString("\n"))
+    printWriter.write(logMessages.distinct.mkString("\n"))
     printWriter.close()
   }
   
   def onException(exception: Exception) {
-    _logMessages.append(_formatException(exception))
-    debug(_formatException(exception))
+    logMessages.append(formatException(exception))
+    debug(formatException(exception))
   }
   
-  def _log(message:String) {
+  def debug(message:String) {
+    log(message)
+  }
+  
+  def warn(message:String) {
+    log(message)
+  }
+  
+  def error(message:String) {
+    log(message)
+  }
+  
+  private def log(message:String) {
     if (With.configuration.enableStdOut) {
       System.out.println(message)
     }
@@ -41,22 +53,10 @@ class Logger {
       With.game.sendText(message)
     }
     
-    _logMessages.append(message)
-  }
-
-  def debug(message:String) {
-    _log(message)
+    logMessages.append(message)
   }
   
-  def warn(message:String) {
-    _log(message)
-  }
-  
-  def error(message:String) {
-    _log(message)
-  }
-  
-  def _formatException(exception: Exception):String = {
+  private def formatException(exception: Exception):String = {
       exception.getClass.getSimpleName + "\n" +
       exception.getMessage + "\n"
       exception.getStackTrace.map(stackElement => {

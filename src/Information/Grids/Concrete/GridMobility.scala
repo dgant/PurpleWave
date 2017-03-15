@@ -7,14 +7,14 @@ import Utilities.TypeEnrichment.EnrichPosition._
 
 class GridMobility extends GridInt {
   
-  val limitUpdates = new Limiter(5, _update)
-  override def update() = limitUpdates.act()
-  def _update() {
+  override def update() = updateLimiter.act()
+  private val updateLimiter = new Limiter(5, updateCalculations)
+  private def updateCalculations() {
     reset()
     
     val distanceMax = 3
   
-    positions
+    tiles
       .filter(With.grids.walkable.get)
       .foreach(ourPosition =>
         (-1 to 1).foreach(my =>

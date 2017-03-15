@@ -15,9 +15,9 @@ import scala.collection.mutable
 
 class DefeatWorkerHarass extends Plan {
   
-  val _defenders = new mutable.HashMap[UnitInfo, LockUnits]
+  private val defenders = new mutable.HashMap[UnitInfo, LockUnits]
   
-  override def getChildren: Iterable[Plan] = _defenders.values
+  override def getChildren: Iterable[Plan] = defenders.values
   
   override def onFrame() {
     
@@ -29,9 +29,9 @@ class DefeatWorkerHarass extends Plan {
       .filter(! _.flying)
       .toSet
     
-    _defenders.keySet.diff(intruders).foreach(_defenders.remove)
-    intruders.diff(_defenders.keySet).foreach(_defendFromEnemy)
-    _defenders.values.foreach(defenders => {
+    defenders.keySet.diff(intruders).foreach(defenders.remove)
+    intruders.diff(defenders.keySet).foreach(defendFromEnemy)
+    defenders.values.foreach(defenders => {
       defenders.onFrame
       if (defenders.isComplete) {
         defenders.units.foreach(defender => With.commander.intend(new Intention(this, defender, DefaultBehavior, defender.tileCenter)))
@@ -39,9 +39,9 @@ class DefeatWorkerHarass extends Plan {
     })
   }
   
-  def _defendFromEnemy(enemy:UnitInfo) {
-    if ( ! _defenders.contains(enemy)) {
-      _defenders.put(enemy, new LockUnits {
+  private def defendFromEnemy(enemy:UnitInfo) {
+    if ( ! defenders.contains(enemy)) {
+      defenders.put(enemy, new LockUnits {
         unitMatcher.set(UnitMatchWorker)
         unitPreference.set(new UnitPreferClose { positionFinder.set(new PositionSpecific(enemy.tileCenter)) })
         unitCounter.set(new UnitCountBetween(1, 2))

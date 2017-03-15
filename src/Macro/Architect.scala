@@ -53,12 +53,12 @@ class Architect {
       .points(searchRadius)
       .view
       .map(center.add)
-      .map(searchPoint => _tryThing(searchPoint, buildingTypes, margin, searchRadius, exclusions, hypotheticalPylon))
+      .map(searchPoint => tryBuilding(searchPoint, buildingTypes, margin, searchRadius, exclusions, hypotheticalPylon))
       .find(_.isDefined)
       .getOrElse(None)
   }
   
-  def _tryThing(
+  private def tryBuilding(
     searchPoint:        TilePosition,
     buildingTypes:      Iterable[UnitType],
     margin:             Integer                 = 0,
@@ -109,19 +109,19 @@ class Architect {
     
     buildingArea.tiles.forall(_.valid) &&
     exclusions.filter(_.intersects(buildingArea)).isEmpty &&
-    _rectangleIsBuildable(buildingArea, buildingType, hypotheticalPylon) &&
-    _rectangleContainsOnlyAWorker(marginArea) &&
+    rectangleIsBuildable(buildingArea, buildingType, hypotheticalPylon) &&
+    rectangleContainsOnlyAWorker(marginArea) &&
     marginArea.tiles.forall(With.grids.walkable.get)
   }
   
-  private def _rectangleContainsOnlyAWorker(rectangle: TileRectangle):Boolean = {
+  private def rectangleContainsOnlyAWorker(rectangle: TileRectangle):Boolean = {
     val trespassingUnits = With.units.inRectangle(rectangle).filterNot(_.flying)
     trespassingUnits.size <= 1 &&
       trespassingUnits.forall(_.utype.isWorker) &&
       trespassingUnits.forall(_.isOurs)
   }
   
-  def _rectangleIsBuildable(area: TileRectangle, buildingType: UnitType, hypotheticalPylon: Option[TilePosition] = None):Boolean = {
+  private def rectangleIsBuildable(area: TileRectangle, buildingType: UnitType, hypotheticalPylon: Option[TilePosition] = None):Boolean = {
     area.tiles.forall(tile =>
       With.grids.buildable.get(tile) &&
         (( ! buildingType.requiresPsi())   || With.game.hasPower(tile) || hypotheticalPylon.exists(pylon => Pylon.powers(pylon, tile))) &&

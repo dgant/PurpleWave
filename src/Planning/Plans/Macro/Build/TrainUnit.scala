@@ -17,13 +17,13 @@ class TrainUnit(val traineeType:UnitType) extends Plan {
     unitCounter.set(UnitCountOne)
   }
   
-  var _trainer:Option[FriendlyUnitInfo] = None
-  var _trainee:Option[FriendlyUnitInfo] = None
-  var lastOrderFrame = 0
+  private var trainer:Option[FriendlyUnitInfo] = None
+  private var trainee:Option[FriendlyUnitInfo] = None
+  private var lastOrderFrame = 0
   
   description.set("Train a " + TypeDescriber.unit(traineeType))
   
-  override def isComplete: Boolean = _trainee.exists(p => p.alive && p.complete)
+  override def isComplete: Boolean = trainee.exists(p => p.alive && p.complete)
   override def getChildren: Iterable[Plan] = List(currency, trainerPlan)
   override def onFrame() {
     if (isComplete) { return }
@@ -35,16 +35,16 @@ class TrainUnit(val traineeType:UnitType) extends Plan {
       return
     }
   
-    trainerPlan.units.headOption.foreach(_requireTraining)
+    trainerPlan.units.headOption.foreach(requireTraining)
   }
   
-  def _reset() {
+  private def reset() {
     currency.isSpent = false
-    _trainer = None
-    _trainee = None
+    trainer = None
+    trainee = None
   }
   
-  def _requireTraining(trainer:FriendlyUnitInfo) {
+  private def requireTraining(newTrainer:FriendlyUnitInfo) {
     
     // Training?	Ordered?	Unit?	Then
     // ---------- --------- ----- ----
@@ -54,23 +54,23 @@ class TrainUnit(val traineeType:UnitType) extends Plan {
     // No		      No		    -	    Order
     // No		      Yes		    -	    Order (again; unexpected, but stuff happens)
     
-    if ( ! _trainer.contains(trainer)) {
-      _reset()
+    if ( ! trainer.contains(newTrainer)) {
+      reset()
     }
     
-    val isTraining = ! trainer.trainingQueue.isEmpty
-    val ordered = _trainer.nonEmpty
+    val isTraining = newTrainer.trainingQueue.nonEmpty
+    val ordered = trainer.nonEmpty
     
     if (isTraining) {
       if (ordered) {
-        //TODO: Make sure we verify that the worker is *not complete* so, say, a wraith floating over a Startport doesn't get linked
+        //TODO: Make sure we verify that the worker is *not complete* so, say, a wraith floating over a Starport doesn't get linked
         
         //Note that it's possible for a building to briefly have a worker type in the queue with no worker created.
-        _trainee = With.units.ours
+        trainee = With.units.ours
           .filter(u =>
             u.utype == traineeType &&
-            u.x == trainer.x &&
-            u.y == trainer.y &&
+            u.x == newTrainer.x &&
+            u.y == newTrainer.y &&
             ! u.complete)
           .headOption
         
@@ -80,14 +80,14 @@ class TrainUnit(val traineeType:UnitType) extends Plan {
       }
     }
     else {
-      _orderUnit(trainer)
+      orderUnit(newTrainer)
     }
   }
   
-  def _orderUnit(trainer:FriendlyUnitInfo) {
-    _trainer = Some(trainer)
+  private def orderUnit(newTrainer:FriendlyUnitInfo) {
+    trainer = Some(newTrainer)
     currency.isSpent = true
-    trainer.baseUnit.train(traineeType)
+    newTrainer.baseUnit.train(traineeType)
     lastOrderFrame = With.frame
   }
 }

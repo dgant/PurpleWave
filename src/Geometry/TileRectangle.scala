@@ -33,10 +33,10 @@ class TileRectangle(
   }
   
   def intersects(otherRectangle: TileRectangle):Boolean = {
-    _intersects(otherRectangle) || otherRectangle._intersects(this)
+    containsRectangle(otherRectangle) || otherRectangle.containsRectangle(this)
   }
   
-  def _intersects(otherRectangle:TileRectangle):Boolean = {
+  private def containsRectangle(otherRectangle:TileRectangle):Boolean = {
     contains(otherRectangle.startInclusive) ||
     contains(otherRectangle.endExclusive.subtract(1, 1)) ||
     contains(otherRectangle.startInclusive.getX, otherRectangle.endExclusive.getY - 1) ||

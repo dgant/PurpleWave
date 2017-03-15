@@ -8,12 +8,12 @@ import bwapi.UnitType
 
 abstract class AbstractBuildContinuously extends Plan {
   
-  def _totalRequired:Int
-  def _unitType:UnitType
+  protected def totalRequiredRecalculate:Int
+  protected def unitType:UnitType
   
   override def isComplete:Boolean = totalRequired == 0
-  override def onFrame() = With.scheduler.request(this, List(new RequestUnitAtLeast(totalRequired, _unitType)))
+  override def onFrame() = With.scheduler.request(this, List(new RequestUnitAtLeast(totalRequired, unitType)))
   
-  def totalRequired:Int = _totalRequiredCache.get
-  val _totalRequiredCache = new CacheFrame(() => _totalRequired)
+  protected def totalRequired:Int = totalRequiredCache.get
+  private val totalRequiredCache = new CacheFrame(() => totalRequiredRecalculate)
 }

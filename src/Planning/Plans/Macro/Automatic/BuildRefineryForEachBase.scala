@@ -4,9 +4,9 @@ import Startup.With
 
 class BuildRefineryForEachBase extends TrainContinuously {
   
-  description.set("Build bases when we're about saturated")
+  description.set("Build a refinery for each base")
   
-  unitType = With.self.getRace.getRefinery
+  unitTypeToTrain = With.self.getRace.getRefinery
   
-  override def _totalRequired:Int = With.economy.ourMiningBases.size
+  override protected def totalRequiredRecalculate:Int = With.economy.ourMiningBases.size
 }

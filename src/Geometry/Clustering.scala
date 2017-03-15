@@ -24,7 +24,7 @@ object Clustering {
     extractPosition:(T) => Position)
       :mutable.HashMap[T, mutable.HashSet[T]] = {
     
-    val neighborsByUnit = _mapUnitsToNeighbors(things, radius, extractPosition)
+    val neighborsByUnit = mapUnitsToNeighbors(things, radius, extractPosition)
     val unitLeaders = new mutable.HashMap[T, T]
     val groupsByLeader = new mutable.HashMap[T, mutable.HashSet[T]] {
       override def default(key: T):mutable.HashSet[T] = {
@@ -44,7 +44,7 @@ object Clustering {
     return groupsByLeader
   }
   
-  def _mapUnitsToNeighbors[T](
+  private def mapUnitsToNeighbors[T](
     things:Iterable[T],
     radius:Int,
     extractPosition:(T) => Position)

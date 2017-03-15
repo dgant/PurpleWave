@@ -6,10 +6,10 @@ import Startup.With
 class GridAltitudeBonus extends GridDouble {
   
   override def onInitialization() {
-    positions.foreach(position => set(position, _getBonus(With.game.getGroundHeight(position))))
+    tiles.foreach(position => set(position, getBonus(With.game.getGroundHeight(position))))
   }
   
-  def _getBonus(altitude:Int):Double = {
+  private def getBonus(altitude:Int):Double = {
     //http://wiki.teamliquid.net/starcraft/Terrain_Features#High_Ground
     val multiplier = 1.9
     return altitude match {

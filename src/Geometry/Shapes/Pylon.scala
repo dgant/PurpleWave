@@ -8,8 +8,8 @@ object Pylon {
   //https://github.com/tscmoo/tsc-bwai/blob/6c93fd0877da55b101c8b48a8ac5d7bce60561f6/src/pylons.h
   
   def powers(pylon:TilePosition, target:TilePosition):Boolean = {
-    val x = _normalize(pylon.getX - target.getX)
-    val y = _normalize(pylon.getY - target.getY)
+    val x = normalize(pylon.getX - target.getX)
+    val y = normalize(pylon.getY - target.getY)
     
     return y match {
       case 0 => x < 7 && x > 1
@@ -20,7 +20,7 @@ object Pylon {
     }
   }
   
-  def _normalize(value:Int):Int = {
+  private def normalize(value:Int):Int = {
     if (value < 0) -value else value - 1
   }
 }

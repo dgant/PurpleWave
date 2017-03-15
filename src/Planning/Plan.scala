@@ -10,9 +10,9 @@ class Plan {
   def onFrame() = {}
   def drawOverlay() = {}
   
-  override def toString: String = _getRealName + (if (description.get == "") "" else ": " + description.get)
+  override def toString: String = getRealName + (if (description.get == "") "" else ": " + description.get)
   
-  def _getRealName:String = {
+  private def getRealName:String = {
     val name = getClass.getSimpleName
     if (name.contains("$anon$")) "" else name
   }

@@ -3,15 +3,15 @@ package Planning.Plans.Macro.Automatic
 import Startup.With
 import bwapi.UnitType
 
-class TrainContinuously(var unitType:UnitType = UnitType.None) extends AbstractBuildContinuously {
+class TrainContinuously(var unitTypeToTrain:UnitType = UnitType.None) extends AbstractBuildContinuously {
   
-  override def _unitType:UnitType = unitType
-  override def _totalRequired:Int = {
-    val now = With.units.ours.count(_.utype == unitType)
+  override protected def unitType:UnitType = unitTypeToTrain
+  override protected def totalRequiredRecalculate:Int = {
+    val now = With.units.ours.count(_.utype == unitTypeToTrain)
     val capacity = List(
-      With.units.ours.filter(_.complete).count(_.utype == unitType.whatBuilds.first) * unitType.whatBuilds.second,
-      With.self.minerals / Math.max(1, unitType.mineralPrice),
-      With.self.gas / Math.max(1, unitType.gasPrice)
+      With.units.ours.filter(_.complete).count(_.utype == unitTypeToTrain.whatBuilds.first) * unitTypeToTrain.whatBuilds.second,
+      With.self.minerals / Math.max(1, unitTypeToTrain.mineralPrice),
+      With.self.gas / Math.max(1, unitTypeToTrain.gasPrice)
     )
     .min
     now + capacity

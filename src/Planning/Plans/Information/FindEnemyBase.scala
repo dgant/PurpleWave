@@ -28,13 +28,13 @@ class FindEnemyBase extends Plan {
   
   override def onFrame() {
     scouts.get.onFrame()
-    scouts.get.units.foreach(_orderScout)
+    scouts.get.units.foreach(orderScout)
   }
   
-  def _orderScout(scout:FriendlyUnitInfo) =
-    With.commander.intend(new Intention(this, scout, DefaultBehavior, _getNextScoutingPosition))
+  private def orderScout(scout:FriendlyUnitInfo) =
+    With.commander.intend(new Intention(this, scout, DefaultBehavior, getNextScoutingPosition))
   
-  def _getNextScoutingPosition:TilePosition = {
+  private def getNextScoutingPosition:TilePosition = {
     With.intelligence.leastScoutedBases
       .filter(base => With.paths.exists(With.geography.home, base)) //BWTA.isConnected could also help
       .head

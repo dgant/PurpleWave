@@ -10,26 +10,26 @@ import bwapi.TilePosition
 
 abstract class GridStrength extends GridInt {
   
-  val rangeMargin = 48
-  val framesToLookAhead = 48
+  private val rangeMargin = 48
+  private val framesToLookAhead = 48
   
-  val _limitUpdates = new Limiter(1, _update)
-  override def update() = _limitUpdates.act()
-  def _update() {
+  private val limitUpdates = new Limiter(1, updateCalculation)
+  override def update() = limitUpdates.act()
+  private def updateCalculation() {
     reset()
-    _getUnits.foreach(unit => {
+    getUnits.foreach(unit => {
       val strength = BattleMetrics.evaluate(unit)
       val latencyFrames = With.game.getLatencyFrames
       val tilePosition = unit.pixel.toTilePosition //position.toTilePosition uses the unit's center rather than its top-left corner
       val rangeFull = unit.range
       val rangeZero = unit.range + rangeMargin + (unit.utype.topSpeed * (framesToLookAhead + latencyFrames)).toInt
       if (strength > 0) {
-        _populate(tilePosition, rangeFull, rangeZero, strength)
+        populate(tilePosition, rangeFull, rangeZero, strength)
       }
     })
   }
   
-  def _populate(tile:TilePosition, distanceFull:Int, distanceZero:Int, strength:Int) {
+  private def populate(tile:TilePosition, distanceFull:Int, distanceZero:Int, strength:Int) {
     Circle.points(distanceZero/32).foreach(point => {
       val nearbyTile = tile.add(point)
       val distance = Math.sqrt(32 * 32 * point.lengthSquared)
@@ -38,5 +38,5 @@ abstract class GridStrength extends GridInt {
     })
   }
   
-  def _getUnits:Iterable[UnitInfo]
+  protected def getUnits:Iterable[UnitInfo]
 }

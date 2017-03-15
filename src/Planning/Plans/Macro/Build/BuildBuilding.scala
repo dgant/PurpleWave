@@ -26,70 +26,70 @@ class BuildBuilding(val buildingType:UnitType) extends Plan {
     unitPreference.set(new UnitPreferClose { positionFinder.set(buildingPlacer)})
   }
   
-  var _builder:Option[FriendlyUnitInfo] = None
-  var _building:Option[FriendlyUnitInfo] = None
-  var _position:Option[TilePosition] = None
-  var _lastOrderFrame = Integer.MIN_VALUE
+  private var builder:Option[FriendlyUnitInfo] = None
+  private var building:Option[FriendlyUnitInfo] = None
+  private var position:Option[TilePosition] = None
+  private var lastOrderFrame = Integer.MIN_VALUE
     
   description.set("Build a " + TypeDescriber.unit(buildingType))
   
   override def getChildren: Iterable[Plan] = List(currencyPlan, builderPlan)
   override def isComplete: Boolean =
-    _building.exists(building => building.complete || (building.alive && buildingType.getRace == Race.Protoss))
+    building.exists(building => building.complete || (building.alive && buildingType.getRace == Race.Protoss))
   
-  def startedBuilding:Boolean = _building.isDefined
+  def startedBuilding:Boolean = building.isDefined
   
   override def onFrame() {
     if (isComplete) return
   
-    _building = With.units.ours
+    building = With.units.ours
       .filter(unit => unit.utype == buildingType)
-      .filter(unit => _position.exists(_ == unit.tileTopLeft))
+      .filter(unit => position.exists(_ == unit.tileTopLeft))
       .headOption
   
-    currencyPlan.isSpent = _building.isDefined
+    currencyPlan.isSpent = building.isDefined
   
     currencyPlan.onFrame()
     if (currencyPlan.isComplete) {
       builderPlan.onFrame()
       if (builderPlan.isComplete) {
-        _builder = builderPlan.units.headOption
-        if (_building.isDefined) {
+        builder = builderPlan.units.headOption
+        if (building.isDefined) {
           if (buildingType.getRace == Race.Terran) {
-            _builder.foreach(_.baseUnit.rightClick(_building.get.baseUnit))
+            builder.foreach(_.baseUnit.rightClick(building.get.baseUnit))
           }
         }
         else {
-          _builder.foreach(_orderToBuild)
+          builder.foreach(orderToBuild)
         }
       }
     }
     else if (builderPlan.isComplete) {
       //If the builder is available to us but we're not ready to build, let's just send it where it needs to go
-      _position = buildingPlacer.find
+      position = buildingPlacer.find
       builderPlan.units.foreach(unit => With.commander.intend(
         new Intention(
           this,
           unit,
           DefaultBehavior,
-          _position.map(_.add(1, 1)).headOption.getOrElse(unit.pixel.toTilePosition))))
+          position.map(_.add(1, 1)).headOption.getOrElse(unit.pixel.toTilePosition))))
     }
   }
   
-  def _orderToBuild(builder:FriendlyUnitInfo) {
-    if (_lastOrderFrame < With.frame - 24) {
-      _lastOrderFrame = With.frame
+  private def orderToBuild(builder:FriendlyUnitInfo) {
+    if (lastOrderFrame < With.frame - 24) {
+      lastOrderFrame = With.frame
       
-      if ( ! _position.exists(p => With.game.canBuildHere(p, buildingType, builder.baseUnit))) {
-        _position = buildingPlacer.find
+      if ( ! position.exists(p => With.game.canBuildHere(p, buildingType, builder.baseUnit))) {
+        position = buildingPlacer.find
       }
   
-      if (_position.nonEmpty)  {
+      if (position.nonEmpty)  {
         // This avoids trying to build in fog of war
-        if (builder.distance(_position.get) < 32 * 6) {
-          builder.baseUnit.build(buildingType, _position.get)
+        if (builder.distance(position.get) < 32 * 6) {
+          builder.baseUnit.build(buildingType, position.get)
         } else {
-          With.commander.intend(new Intention(this, builder, DefaultBehavior, _position.get))
+          With.commander.intend(new Intention(this, builder, DefaultBehavior, position.get))
         }
       }
     }
@@ -97,7 +97,7 @@ class BuildBuilding(val buildingType:UnitType) extends Plan {
   
   override def drawOverlay() {
     if (isComplete) return
-    _position.foreach(position => {
+    position.foreach(position => {
       DrawMap.box(
         position.toPosition,
         new Position(

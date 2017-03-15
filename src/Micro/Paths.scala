@@ -10,42 +10,42 @@ class Paths {
   
   //Cache ground distances with a LRU (Least-recently used) cache
   //This is a low number; let's increase it after we make sure _limitCacheSize works
-  val _impossiblyLargeDistance = Int.MaxValue / 1000
-  val _maxCacheSize = 10000 //Max we'll ever need to cache: 256 * 256 = 65536 so maybe this is silly
-  val _distanceCache = new mutable.HashMap[(TilePosition, TilePosition), Int]
-  val _distanceAge = new mutable.HashMap[(TilePosition, TilePosition), Int]
+  private val impossiblyLargeDistance = Int.MaxValue / 1000
+  private val maxCacheSize = 10000 //Max we'll ever need to cache: 256 * 256 = 65536 so maybe this is silly
+  private val distanceCache = new mutable.HashMap[(TilePosition, TilePosition), Int]
+  private val distanceAge = new mutable.HashMap[(TilePosition, TilePosition), Int]
   
   def exists(origin:TilePosition, destination: TilePosition):Boolean = {
-    groundDistance(origin, destination) < _impossiblyLargeDistance
+    groundDistance(origin, destination) < impossiblyLargeDistance
   }
   
   def groundDistance(origin:TilePosition, destination:TilePosition):Int = {
     val request = (origin, destination)
-    if ( ! _distanceCache.contains(request)) {
-      _cacheDistance(request)
+    if ( ! distanceCache.contains(request)) {
+      cacheDistance(request)
     }
-    _distanceAge.put(request, With.frame)
-    val result = _distanceCache(request)
-    _limitCacheSize()
+    distanceAge.put(request, With.frame)
+    val result = distanceCache(request)
+    limitCacheSize()
     
     if (result < 0) {
-      return _impossiblyLargeDistance
+      return impossiblyLargeDistance
     }
     
     result
   }
   
-  def _cacheDistance(request:(TilePosition, TilePosition)) {
+  private def cacheDistance(request:(TilePosition, TilePosition)) {
     val distance = BWTA.getGroundDistance(request._1, request._2)
-    _distanceCache.put(request, distance.toInt)
+    distanceCache.put(request, distance.toInt)
   }
   
-  def _limitCacheSize() {
-    if (_distanceCache.keys.size > _maxCacheSize) {
+  private def limitCacheSize() {
+    if (distanceCache.keys.size > maxCacheSize) {
       val cutoff = With.frame - 24 * 60
-      _distanceAge.filter(_._2 < cutoff).foreach(pair => {
-        _distanceCache.remove(pair._1)
-        _distanceAge.remove(pair._1)
+      distanceAge.filter(_._2 < cutoff).foreach(pair => {
+        distanceCache.remove(pair._1)
+        distanceAge.remove(pair._1)
       })
     }
   }

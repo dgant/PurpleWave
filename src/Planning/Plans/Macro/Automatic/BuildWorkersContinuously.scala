@@ -6,11 +6,11 @@ class BuildWorkersContinuously  extends TrainContinuously {
   
   description.set("Build bases when we're about saturated")
   
-  unitType = With.self.getRace.getWorker
+  unitTypeToTrain = With.self.getRace.getWorker
   
-  override def _totalRequired:Int = {
+  override protected def totalRequiredRecalculate:Int = {
     List(
-      With.units.ours.count(_.utype.isWorker) + With.units.ours.count(_.utype == unitType.whatBuilds.first),
+      With.units.ours.count(_.utype.isWorker) + With.units.ours.count(_.utype == unitTypeToTrain.whatBuilds.first),
       With.economy.ourMiningBases.size * 24,
       72).min
   }

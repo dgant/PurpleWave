@@ -13,13 +13,13 @@ class Configuration {
   var cameraDynamicSpeedMax             = 0
   
   var enableVisualization               = true
-  var enableVisualizationBattles        = false
-  var enableVisualizationEconomy        = false
-  var enableVisualizationGrids          = false
+  var enableVisualizationBattles        = true
+  var enableVisualizationEconomy        = true
+  var enableVisualizationGrids          = true
   var enableVisualizationPerformance    = true
   var enableVisualizationPlans          = false
-  var enableVisualizationResources      = false
-  var enableVisualizationScheduler      = true
+  var enableVisualizationResources      = true
+  var enableVisualizationScheduler      = false
   var enableVisualizationGeography      = false
   var enableVisualizationUnitsForeign   = true
   var enableVisualizationUnitsOurs      = true

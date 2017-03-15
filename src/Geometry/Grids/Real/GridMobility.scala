@@ -15,7 +15,7 @@ class GridMobility extends GridInt {
     val distanceMax = 3
   
     positions
-      .filter(With.grids.walkableUnits.get)
+      .filter(With.grids.walkable.get)
       .foreach(ourPosition =>
         (-1 to 1).foreach(my =>
           (-1 to 1).foreach(mx => {

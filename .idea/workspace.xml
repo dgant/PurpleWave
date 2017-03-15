@@ -27,8 +27,8 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="Draw.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Development/Overlay/Draw.scala">
+      <file leaf-file-name="DrawMap.scala" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/Development/Visualization/DrawMap.scala">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="468">
               <caret line="54" column="40" lean-forward="false" selection-start-line="54" selection-start-column="40" selection-end-line="54" selection-end-column="40" />
@@ -37,91 +37,51 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="DrawEconomy.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Development/Overlay/DrawEconomy.scala">
+      <file leaf-file-name="DrawScreen.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Development/Visualization/DrawScreen.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="26">
+              <caret line="2" column="6" lean-forward="false" selection-start-line="2" selection-start-column="6" selection-end-line="2" selection-end-column="6" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="VisualizeScheduler.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Development/Visualization/VisualizeScheduler.scala">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="52">
-              <caret line="4" column="13" lean-forward="true" selection-start-line="4" selection-start-column="13" selection-end-line="4" selection-end-column="13" />
+              <caret line="4" column="23" lean-forward="false" selection-start-line="4" selection-start-column="23" selection-end-line="4" selection-end-column="23" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="DrawGrids.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Development/Overlay/DrawGrids.scala">
+      <file leaf-file-name="Visualization.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Development/Visualization/Visualization.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="52">
-              <caret line="4" column="44" lean-forward="false" selection-start-line="4" selection-start-column="44" selection-end-line="4" selection-end-column="44" />
+            <state relative-caret-position="117">
+              <caret line="9" column="47" lean-forward="true" selection-start-line="9" selection-start-column="47" selection-end-line="9" selection-end-column="47" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="DrawUnitsOurs.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Development/Overlay/DrawUnitsOurs.scala">
+      <file leaf-file-name="Configuration.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Development/Configuration.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="52">
-              <caret line="4" column="37" lean-forward="true" selection-start-line="4" selection-start-column="37" selection-end-line="4" selection-end-column="37" />
+            <state relative-caret-position="312">
+              <caret line="24" column="40" lean-forward="false" selection-start-line="24" selection-start-column="40" selection-end-line="24" selection-end-column="40" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="DrawPerformance.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Development/Overlay/DrawPerformance.scala">
+      <file leaf-file-name="VisualizeGrids.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Development/Visualization/VisualizeGrids.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="156">
-              <caret line="12" column="0" lean-forward="true" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="DrawPlans.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Development/Overlay/DrawPlans.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="507">
-              <caret line="41" column="3" lean-forward="false" selection-start-line="41" selection-start-column="3" selection-end-line="41" selection-end-column="3" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="DrawTerrain.scala" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/Development/Overlay/DrawTerrain.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="65">
-              <caret line="5" column="44" lean-forward="false" selection-start-line="5" selection-start-column="44" selection-end-line="5" selection-end-column="44" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="DrawResources.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Development/Overlay/DrawResources.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="247">
-              <caret line="19" column="0" lean-forward="true" selection-start-line="19" selection-start-column="0" selection-end-line="19" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="DrawScheduler.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Development/Overlay/DrawScheduler.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="52">
-              <caret line="4" column="18" lean-forward="false" selection-start-line="4" selection-start-column="18" selection-end-line="4" selection-end-column="18" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="DrawTrackedUnits.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Development/Overlay/DrawTrackedUnits.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="91">
-              <caret line="7" column="2" lean-forward="false" selection-start-line="7" selection-start-column="2" selection-end-line="7" selection-end-column="2" />
+            <state relative-caret-position="78">
+              <caret line="6" column="7" lean-forward="false" selection-start-line="6" selection-start-column="7" selection-end-line="6" selection-end-column="7" />
               <folding />
             </state>
           </provider>
@@ -140,7 +100,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>frameCou</find>
       <find>&gt; frame</find>
       <find>isBuilda</find>
       <find>Grid</find>
@@ -170,6 +129,7 @@
       <find>mapWidth</find>
       <find>getPlayer</find>
       <find>_drawTextLabel</find>
+      <find>enableOverlay</find>
     </findStrings>
     <replaceStrings>
       <replace>{  _mirror</replace>
@@ -190,6 +150,7 @@
       <replace>RequestUp</replace>
       <replace>RequestUnitAnotherOne</replace>
       <replace>Draw.label</replace>
+      <replace>enableVisualization</replace>
     </replaceStrings>
     <dirStrings>
       <dir>C:\prog\PurpleWave1</dir>
@@ -198,11 +159,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/Types/BuildRequest/BuildRequestTech.scala" />
-        <option value="$PROJECT_DIR$/src/Types/BuildRequest/BuildRequestResearch.scala" />
-        <option value="$PROJECT_DIR$/src/Types/BuildRequest/BuildUnitAtLeast.scala" />
-        <option value="$PROJECT_DIR$/src/Types/BuildRequest/BuildUnitAnotherOne.scala" />
-        <option value="$PROJECT_DIR$/src/Types/BuildRequest/BuildUnitAnother.scala" />
         <option value="$PROJECT_DIR$/src/Types/BuildRequest/BuildRequest.scala" />
         <option value="$PROJECT_DIR$/src/Types/BuildRequest/RequestUpgradeAtLeast.scala" />
         <option value="$PROJECT_DIR$/src/Types/BuildRequest/RequestUpgradeAnotherOne.scala" />
@@ -234,7 +190,6 @@
         <option value="$PROJECT_DIR$/src/Development/Performance.scala" />
         <option value="$PROJECT_DIR$/src/Global/Combat/Behaviors/DefaultBehavior.scala" />
         <option value="$PROJECT_DIR$/src/Plans/GamePlans/ProtossVsTerran.scala" />
-        <option value="$PROJECT_DIR$/src/Development/Configuration.scala" />
         <option value="$PROJECT_DIR$/src/Development/Overlay.scala" />
         <option value="$PROJECT_DIR$/src/Development/Draw.scala" />
         <option value="$PROJECT_DIR$/src/Development/Overlay/DrawBattles.scala" />
@@ -249,6 +204,12 @@
         <option value="$PROJECT_DIR$/src/Development/Overlay/DrawTrackedUnits.scala" />
         <option value="$PROJECT_DIR$/src/Development/Overlay/DrawGrids.scala" />
         <option value="$PROJECT_DIR$/src/Development/Overlay/DrawTerrain.scala" />
+        <option value="$PROJECT_DIR$/src/Development/Overlay/DrawMap.scala" />
+        <option value="$PROJECT_DIR$/src/Development/Visualization/VisualizeScheduler.scala" />
+        <option value="$PROJECT_DIR$/src/Development/Visualization/DrawScreen.scala" />
+        <option value="$PROJECT_DIR$/src/Development/Visualization/VisualizeGrids.scala" />
+        <option value="$PROJECT_DIR$/src/Development/Visualization/Visualization.scala" />
+        <option value="$PROJECT_DIR$/src/Development/Configuration.scala" />
       </list>
     </option>
   </component>
@@ -565,7 +526,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="Overlay" />
+              <option name="myItemId" value="Visualization" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -898,14 +859,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/Global/Resources/Scheduling/ScheduleSimulator.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="156">
-          <caret line="12" column="2" lean-forward="true" selection-start-line="12" selection-start-column="2" selection-end-line="12" selection-end-column="2" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Global/Resources/Scheduling/Scheduler.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="161">
@@ -1178,14 +1131,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Development/Configuration.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="130">
-          <caret line="10" column="41" lean-forward="true" selection-start-line="10" selection-start-column="41" selection-end-line="10" selection-end-column="41" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Plans/GamePlans/ProtossVsTerran.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="154">
@@ -1194,7 +1139,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Development/Overlay/DrawBattles.scala">
+    <entry file="file://$PROJECT_DIR$/src/Development/Visualization/VisualizeBattles.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="338">
           <caret line="26" column="15" lean-forward="true" selection-start-line="26" selection-start-column="15" selection-end-line="26" selection-end-column="15" />
@@ -1202,7 +1147,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Development/Overlay/DrawEconomy.scala">
+    <entry file="file://$PROJECT_DIR$/src/Development/Visualization/VisualizeEconomy.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="52">
           <caret line="4" column="13" lean-forward="true" selection-start-line="4" selection-start-column="13" selection-end-line="4" selection-end-column="13" />
@@ -1218,7 +1163,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Development/Overlay/DrawUnitsOurs.scala">
+    <entry file="file://$PROJECT_DIR$/src/Development/Visualization/VisualizeUnitsOurs.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="52">
           <caret line="4" column="37" lean-forward="true" selection-start-line="4" selection-start-column="37" selection-end-line="4" selection-end-column="37" />
@@ -1226,7 +1171,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Development/Overlay/DrawPerformance.scala">
+    <entry file="file://$PROJECT_DIR$/src/Development/Visualization/VisualizePerformance.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="156">
           <caret line="12" column="0" lean-forward="true" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
@@ -1234,7 +1179,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Development/Overlay/DrawPlans.scala">
+    <entry file="file://$PROJECT_DIR$/src/Development/Visualization/VisualizePlans.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="507">
           <caret line="41" column="3" lean-forward="false" selection-start-line="41" selection-start-column="3" selection-end-line="41" selection-end-column="3" />
@@ -1242,15 +1187,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Development/Overlay/Draw.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="468">
-          <caret line="54" column="40" lean-forward="false" selection-start-line="54" selection-start-column="40" selection-end-line="54" selection-end-column="40" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Development/Overlay/DrawResources.scala">
+    <entry file="file://$PROJECT_DIR$/src/Development/Visualization/VisualizeResources.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="247">
           <caret line="19" column="0" lean-forward="true" selection-start-line="19" selection-start-column="0" selection-end-line="19" selection-end-column="0" />
@@ -1258,34 +1195,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Development/Overlay/DrawScheduler.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="52">
-          <caret line="4" column="18" lean-forward="false" selection-start-line="4" selection-start-column="18" selection-end-line="4" selection-end-column="18" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Development/Overlay/DrawTrackedUnits.scala">
+    <entry file="file://$PROJECT_DIR$/src/Development/Visualization/VisualizeUnitsForeign.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="91">
           <caret line="7" column="2" lean-forward="false" selection-start-line="7" selection-start-column="2" selection-end-line="7" selection-end-column="2" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Development/Overlay/DrawGrids.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="52">
-          <caret line="4" column="44" lean-forward="false" selection-start-line="4" selection-start-column="44" selection-end-line="4" selection-end-column="44" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Development/Overlay/Overlay.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="247">
-          <caret line="19" column="3" lean-forward="false" selection-start-line="19" selection-start-column="3" selection-end-line="19" selection-end-column="3" />
           <folding />
         </state>
       </provider>
@@ -1298,10 +1211,58 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Development/Overlay/DrawTerrain.scala">
+    <entry file="file://$PROJECT_DIR$/src/Development/Visualization/VisualizeGeography.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="65">
-          <caret line="5" column="44" lean-forward="false" selection-start-line="5" selection-start-column="44" selection-end-line="5" selection-end-column="44" />
+        <state relative-caret-position="104">
+          <caret line="8" column="2" lean-forward="false" selection-start-line="8" selection-start-column="2" selection-end-line="8" selection-end-column="2" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Development/Visualization/VisualizeScheduler.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="52">
+          <caret line="4" column="23" lean-forward="false" selection-start-line="4" selection-start-column="23" selection-end-line="4" selection-end-column="23" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Development/Visualization/DrawScreen.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="26">
+          <caret line="2" column="6" lean-forward="false" selection-start-line="2" selection-start-column="6" selection-end-line="2" selection-end-column="6" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Development/Visualization/VisualizeGrids.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="78">
+          <caret line="6" column="7" lean-forward="false" selection-start-line="6" selection-start-column="7" selection-end-line="6" selection-end-column="7" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Development/Visualization/Visualization.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="117">
+          <caret line="9" column="47" lean-forward="true" selection-start-line="9" selection-start-column="47" selection-end-line="9" selection-end-column="47" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Development/Configuration.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="312">
+          <caret line="24" column="40" lean-forward="false" selection-start-line="24" selection-start-column="40" selection-end-line="24" selection-end-column="40" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Development/Visualization/DrawMap.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="468">
+          <caret line="54" column="40" lean-forward="false" selection-start-line="54" selection-start-column="40" selection-end-line="54" selection-end-column="40" />
           <folding />
         </state>
       </provider>

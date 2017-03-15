@@ -71,7 +71,7 @@ class Commander {
   }
   
   def _recordCommand(unit:FriendlyUnitInfo, command:Behavior) {
-    if (With.configuration.enableOverlayUnits) {
+    if (With.configuration.enableVisualizationUnitsOurs) {
       _lastCommands.put(unit, command.getClass.getSimpleName.replace("$", ""))
     }
   }

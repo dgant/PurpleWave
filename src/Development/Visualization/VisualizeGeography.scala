@@ -1,24 +1,25 @@
-package Development.Overlay
+package Development.Visualization
 
 import Startup.With
 import bwapi.Color
 import scala.collection.JavaConverters._
 import Utilities.Enrichment.EnrichPosition._
 
-object DrawTerrain {
-  def draw() {
+object VisualizeGeography {
+  
+  def render() {
     With.geography.zones.foreach(zone => {
-      Draw.polygonPositions(zone.region.getPolygon.getPoints.asScala)
+      DrawMap.polygonPositions(zone.region.getPolygon.getPoints.asScala)
       With.game.drawLineMap(
         zone.region.getPolygon.getPoints.asScala.head,
         zone.region.getPolygon.getPoints.asScala.last,
         bwapi.Color.Brown)
-      Draw.label(
+      DrawMap.label(
         List(zone.region.getCenter.toString, zone.region.getCenter.toTilePosition.toString, zone.owner.getName),
         zone.region.getCenter)
       
       zone.edges.foreach(edge => {
-        Draw.label(
+        DrawMap.label(
           List(edge.zones.map(_.centroid.toString).mkString(" -> ")),
           edge.chokepoint.getCenter)
         With.game.drawCircleMap(edge.chokepoint.getCenter, edge.chokepoint.getWidth.toInt/2, Color.Purple)
@@ -26,13 +27,13 @@ object DrawTerrain {
       })
       
       zone.bases.foreach(base => {
-        Draw.tileRectangle(base.harvestingArea, Color.Cyan)
-        Draw.tileRectangle(base.townHallArea, Color.Yellow)
-        Draw.label(
+        DrawMap.tileRectangle(base.harvestingArea, Color.Cyan)
+        DrawMap.tileRectangle(base.townHallArea, Color.Yellow)
+        DrawMap.label(
           List(base.zone.owner.getName, if (base.isStartLocation) "Start location" else ""),
           base.townHallArea.startInclusive.topLeftPixel,
           true,
-          Draw.playerColor(base.zone.owner))
+          DrawMap.playerColor(base.zone.owner))
       })
     })
   }

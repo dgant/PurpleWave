@@ -1,6 +1,6 @@
 package Startup
 
-import Development.{Overlay, _}
+import Development.{Visualization, _}
 import Global.Resources._
 import Global.Combat.Commander
 import Global.Combat.Battle.Battles
@@ -77,7 +77,7 @@ class Bot() extends DefaultBWListener {
       With.performance.stopCounting()
       
       With.camera.onFrame()
-      Overlay.Overlay.onFrame()
+      Visualization.Visualization.onFrame()
       _considerSurrender
     }
     catch {
@@ -133,7 +133,7 @@ class Bot() extends DefaultBWListener {
     text match {
       case "c" => With.configuration.enableCamera = ! With.configuration.enableCamera
       case "f" => With.game.setLocalSpeed(10000)
-      case "o" => With.configuration.enableOverlay = ! With.configuration.enableOverlay
+      case "o" => With.configuration.enableVisualization = ! With.configuration.enableVisualization
       case "slow" => With.game.setLocalSpeed(48)
       case "fast" => With.game.setLocalSpeed(0)
     }

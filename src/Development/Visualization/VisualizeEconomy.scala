@@ -1,9 +1,9 @@
-package Development.Overlay
+package Development.Visualization
 
 import Startup.With
 
-object DrawEconomy {
-  def draw() {
+object VisualizeEconomy {
+  def render() {
     val labels = List(
       "Active miners:",
       "Active drillers:",

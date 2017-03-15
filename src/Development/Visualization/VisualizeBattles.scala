@@ -1,12 +1,12 @@
-package Development.Overlay
+package Development.Visualization
 
 import Global.Combat.Battle.Battle
 import Startup.With
 import bwapi.Color
 import Utilities.Enrichment.EnrichPosition._
 
-object DrawBattles {
-  def draw = With.battles.all.foreach(_drawBattle)
+object VisualizeBattles {
+  def render = With.battles.all.foreach(_drawBattle)
   
   def _drawBattle(battle:Battle) {
     //if (battle.enemy.strength * battle.us.strength == 0) return
@@ -24,7 +24,7 @@ object DrawBattles {
       battle.enemy.units.map(_.pixel).minBound,
       battle.enemy.units.map(_.pixel).maxBound,
       Color.Red)
-    Draw.label(
+    DrawMap.label(
       List(battle.us.strength/100 + " - " + battle.enemy.strength/100),
       battle.focus,
       drawBackground = true,

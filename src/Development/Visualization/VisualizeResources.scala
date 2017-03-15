@@ -1,9 +1,9 @@
-package Development.Overlay
+package Development.Visualization
 
 import Startup.With
 
-object DrawResources {
-  def draw() {
+object VisualizeResources {
+  def render() {
     With.game.drawTextScreen(
       305,
       5,

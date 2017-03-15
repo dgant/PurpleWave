@@ -1,9 +1,9 @@
-package Development.Overlay
+package Development.Visualization
 
 import Startup.With
 
-object DrawPerformance {
-  def draw() {
+object VisualizePerformance {
+  def render() {
     With.game.drawTextScreen(125, 5, With.latency.minTurnSize         + " frames/turn")
     With.game.drawTextScreen(200, 5, With.performance.meanFrameLength + "ms avg")
     With.game.drawTextScreen(275, 5, With.performance.maxFrameLength  + "ms max")

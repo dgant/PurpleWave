@@ -1,26 +1,26 @@
 package Development
 
 class Configuration {
-  var gameSpeed                   = 0
+  var gameSpeed                         = 0
   
-  var enableStdOut                = false
-  var enableChat                  = true
-  var enableLatencyCompensation   = false
+  var enableStdOut                      = false
+  var enableChat                        = true
+  var enableLatencyCompensation         = false
   
-  var enableCamera                = false
-  var cameraDynamicSpeed          = false
-  var cameraDynamicSpeedMin       = 30
-  var cameraDynamicSpeedMax       = 0
+  var enableCamera                      = false
+  var cameraDynamicSpeed                = false
+  var cameraDynamicSpeedMin             = 30
+  var cameraDynamicSpeedMax             = 0
   
-  var enableOverlay               = true
-  var enableOverlayBattles        = false
-  var enableOverlayEconomy        = false
-  var enableOverlayGrids          = false
-  var enableOverlayPerformance    = true
-  var enableOverlayPlans          = false
-  var enableOverlayResources      = false
-  var enableOverlayScheduler      = true
-  var enableOverlayTerrain        = false
-  var enableOverlayTrackedUnits   = true
-  var enableOverlayUnits          = true
+  var enableVisualization               = true
+  var enableVisualizationBattles        = false
+  var enableVisualizationEconomy        = false
+  var enableVisualizationGrids          = false
+  var enableVisualizationPerformance    = true
+  var enableVisualizationPlans          = false
+  var enableVisualizationResources      = false
+  var enableVisualizationScheduler      = true
+  var enableVisualizationGeography      = false
+  var enableVisualizationUnitsForeign   = true
+  var enableVisualizationUnitsOurs      = true
 }

@@ -1,11 +1,11 @@
-package Development.Overlay
+package Development.Visualization
 
 import Plans.Allocation.{LockCurrency, LockUnits}
 import Plans.Plan
 import Startup.With
 
-object DrawPlans {
-  def draw() {
+object VisualizePlans {
+  def render() {
     With.game.drawTextScreen(5, 5, _describePlanTree(With.gameplan, 0, 0))
     _drawPlansRecursively(With.gameplan)
   }

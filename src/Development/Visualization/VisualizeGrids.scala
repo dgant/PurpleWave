@@ -1,11 +1,11 @@
-package Development.Overlay
+package Development.Visualization
 
 import Geometry.Grids.Abstract.GridConcrete
 import Startup.With
 import Utilities.Enrichment.EnrichPosition._
 
-object DrawGrids {
-  def draw() {
+object VisualizeGrids {
+  def render() {
     _drawGrid(With.grids.enemyGroundStrength, 0, 0)
     _drawGrid(With.grids.friendlyGroundStrength, 0, 1)
   }

@@ -1,10 +1,10 @@
-package Development.Overlay
+package Development.Visualization
 
 import Geometry.TileRectangle
 import Startup.With
 import bwapi.{Color, Player, Position}
 
-object Draw {
+object DrawMap {
   def label(
       textLines:Iterable[String],
       position:Position,

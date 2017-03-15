@@ -4,9 +4,8 @@ import Startup.With
 
 object VisualizeResources {
   def render() {
-    With.game.drawTextScreen(
+    DrawScreen.header(
       305,
-      5,
       With.bank.getPrioritizedRequests
         .take(8)
         .map(r =>

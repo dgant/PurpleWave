@@ -4,6 +4,10 @@ import Startup.With
 
 object DrawScreen {
   
+  def header(x:Int, text:String) = {
+    With.game.drawTextScreen(0, 5, text)
+  }
+  
   def table(startX:Int, startY:Int, cells:Iterable[Iterable[String]]) {
     cells.zipWithIndex.foreach(pair => tableRow(startX, startY, pair._2, pair._1))
   }

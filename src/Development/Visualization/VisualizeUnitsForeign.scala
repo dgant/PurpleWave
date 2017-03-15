@@ -18,7 +18,7 @@ object VisualizeUnitsForeign {
         trackedUnit.utype.width / 2,
         DrawMap.playerColor(trackedUnit.player))
       DrawMap.label(
-        List(TypeDescriber.unit(trackedUnit.utype)),
+        TypeDescriber.unit(trackedUnit.utype),
         trackedUnit.pixel,
         drawBackground = true,
         DrawMap.playerColor(trackedUnit.player))

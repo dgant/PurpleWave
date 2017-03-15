@@ -4,9 +4,9 @@ import Startup.With
 
 object VisualizePerformance {
   def render() {
-    With.game.drawTextScreen(125, 5, With.latency.minTurnSize         + " frames/turn")
-    With.game.drawTextScreen(200, 5, With.performance.meanFrameLength + "ms avg")
-    With.game.drawTextScreen(275, 5, With.performance.maxFrameLength  + "ms max")
-    With.game.drawTextScreen(350, 5, With.performance.frameDelay(1)   + "-frame caching")
+    DrawScreen.header(125, With.latency.minTurnSize         + " frames/turn")
+    DrawScreen.header(200, With.performance.meanFrameLength + "ms avg")
+    DrawScreen.header(275, With.performance.maxFrameLength  + "ms max")
+    DrawScreen.header(350, With.performance.frameDelay(1)   + " cache duration")
   }
 }

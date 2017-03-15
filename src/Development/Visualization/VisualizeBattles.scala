@@ -22,8 +22,11 @@ object VisualizeBattles {
       battle.enemy.units.map(_.pixel).minBound,
       battle.enemy.units.map(_.pixel).maxBound,
       Color.Red)
-    DrawMap.label(
-      List(battle.us.strength/100 + " - " + battle.enemy.strength/100),
+    DrawMap.labelBox(
+      List(
+        (battle.us.strength/100).toString,
+        (battle.enemy.strength/100).toString
+      ),
       battle.focus,
       drawBackground = true,
       backgroundColor = Color.Brown)

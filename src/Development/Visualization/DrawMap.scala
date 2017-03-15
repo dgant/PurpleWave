@@ -36,6 +36,14 @@ object DrawMap {
   }
   
   def label(
+    text:String,
+    position:Position,
+    drawBackground:Boolean = false,
+    backgroundColor:Color = Color.Grey) {
+    labelBox(List(text), position, drawBackground, backgroundColor)
+  }
+  
+  def labelBox(
       textLines:Iterable[String],
       position:Position,
       drawBackground:Boolean = false,

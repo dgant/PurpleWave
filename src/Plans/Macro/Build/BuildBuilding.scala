@@ -1,6 +1,7 @@
 package Plans.Macro.Build
 
 import Development.TypeDescriber
+import Development.Visualization.DrawMap
 import Global.Combat.Behaviors.DefaultBehavior
 import Plans.Allocation.{LockCurrencyForUnit, LockUnits}
 import Plans.Plan
@@ -94,17 +95,20 @@ class BuildBuilding(val buildingType:UnitType) extends Plan {
     }
   }
   
-  override def drawOverlay(): Unit = {
+  override def drawOverlay() {
     if (isComplete) return
     _position.foreach(position => {
-      With.game.drawBoxMap(
+      DrawMap.box(
         position.toPosition,
         new Position(
           32 * (position.getX + buildingType.tileWidth),
           32 * (position.getY + buildingType.tileHeight)),
-        bwapi.Color.Green)
-      With.game.drawTextMap(
+        DrawMap.playerColor(With.self))
+      DrawMap.label(
+        "Building a " + buildingType.toString,
         position.toPosition,
-        "Building a " + buildingType.toString)})
+        drawBackground = true,
+        DrawMap.playerColor(With.self))
+    })
   }
 }

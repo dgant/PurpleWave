@@ -17,12 +17,15 @@ object VisualizeGeography {
         zone.region.getPolygon.getPoints.asScala.last,
         bwapi.Color.Brown)
       
-      DrawMap.label(
-        List(zone.region.getCenter.toString, zone.region.getCenter.toTilePosition.toString, zone.owner.getName),
+      DrawMap.labelBox(
+        List(
+          zone.region.getCenter.toString,
+          zone.region.getCenter.toTilePosition.toString,
+          zone.owner.getName),
         zone.region.getCenter)
       
       zone.edges.foreach(edge => {
-        DrawMap.label(
+        DrawMap.labelBox(
           List(edge.zones.map(_.centroid.toString).mkString(" -> ")),
           edge.chokepoint.getCenter)
         DrawMap.circle(edge.chokepoint.getCenter, edge.chokepoint.getWidth.toInt/2, Color.Purple)
@@ -32,7 +35,7 @@ object VisualizeGeography {
       zone.bases.foreach(base => {
         DrawMap.tileRectangle(base.harvestingArea, Color.Cyan)
         DrawMap.tileRectangle(base.townHallArea, Color.Yellow)
-        DrawMap.label(
+        DrawMap.labelBox(
           List(base.zone.owner.getName, if (base.isStartLocation) "Start location" else ""),
           base.townHallArea.startInclusive.topLeftPixel,
           true,

@@ -6,8 +6,8 @@ import bwapi.TilePosition
 
 class GridDouble extends GridConcrete[Double] {
   
-  override val _positions: Array[Double] = Array.fill(_width * _height)(_defaultValue)
-  override def _defaultValue:Double = 0d
+  override val _positions: Array[Double] = Array.fill(_width * _height)(defaultValue)
+  override def defaultValue:Double = 0d
   
   val formatter = new DecimalFormat("#.##")
   override def repr(value: Double):String = formatter.format(value)

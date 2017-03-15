@@ -4,8 +4,8 @@ import bwapi.TilePosition
 
 class GridInt extends GridConcrete[Int] {
   
-  override val _positions: Array[Int] = Array.fill(_width * _height)(_defaultValue)
-  override def _defaultValue:Int = 0
+  override val _positions: Array[Int] = Array.fill(_width * _height)(defaultValue)
+  override def defaultValue:Int = 0
   override def repr(value: Int) = value.toString
   
   def add(i:Int, value:Int):Unit                = if (valid(i)) _positions(i) += value

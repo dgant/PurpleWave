@@ -2,9 +2,39 @@ package Development.Visualization
 
 import Geometry.TileRectangle
 import Startup.With
+import Utilities.Caching.CacheFrame
 import bwapi.{Color, Player, Position}
+import Utilities.Enrichment.EnrichPosition._
 
 object DrawMap {
+  
+  def text(
+    origin:Position,
+    text:String) {
+    With.game.drawTextMap(origin, text)
+  }
+  
+  def line(
+    start:Position,
+    end:Position,
+    color:Color = Color.Grey) = {
+    With.game.drawLineMap(start, end, color)
+  }
+  
+  def box(
+    start:Position,
+    end:Position,
+    color:Color = Color.Grey) = {
+    With.game.drawBoxMap(start, end, color)
+  }
+  
+  def circle(
+    center:Position,
+    radius:Int,
+    color:Color = Color.Grey) {
+    With.game.drawCircleMap(center, radius, color)
+  }
+  
   def label(
       textLines:Iterable[String],
       position:Position,
@@ -33,7 +63,6 @@ object DrawMap {
       textY,
       textLines.mkString("\n"))
   }
-
   
   def tileRectangle(rectangle:TileRectangle, color:Color) {
     With.game.drawBoxMap(rectangle.startPosition, rectangle.endPosition, color)
@@ -50,15 +79,10 @@ object DrawMap {
     else Color.Blue
   }
   
-  
-  def table(startX:Int, startY:Int, cells:Iterable[Iterable[String]]) {
-    cells.zipWithIndex.foreach(pair => tableRow(startX, startY, pair._2, pair._1))
-  }
-  
-  def tableRow(startX:Int, startY:Int, rowIndex:Int, row:Iterable[String]) {
-    row.zipWithIndex.foreach(pair => With.game.drawTextScreen(
-      startX + pair._2 * 50,
-      startY + rowIndex * 13,
-      pair._1))
-  }
+  def viewport:TileRectangle = viewportCache.get
+  private val viewportCache = new CacheFrame[TileRectangle](() => viewportRecalculate)
+  private def viewportRecalculate:TileRectangle =
+    new TileRectangle(
+      With.game.getScreenPosition.toTilePosition,
+      With.game.getScreenPosition.toTilePosition.add(640/32, 480/32))
 }

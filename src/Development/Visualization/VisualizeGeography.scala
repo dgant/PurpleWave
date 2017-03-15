@@ -9,11 +9,14 @@ object VisualizeGeography {
   
   def render() {
     With.geography.zones.foreach(zone => {
+      
       DrawMap.polygonPositions(zone.region.getPolygon.getPoints.asScala)
-      With.game.drawLineMap(
+      
+      DrawMap.line(
         zone.region.getPolygon.getPoints.asScala.head,
         zone.region.getPolygon.getPoints.asScala.last,
         bwapi.Color.Brown)
+      
       DrawMap.label(
         List(zone.region.getCenter.toString, zone.region.getCenter.toTilePosition.toString, zone.owner.getName),
         zone.region.getCenter)
@@ -22,8 +25,8 @@ object VisualizeGeography {
         DrawMap.label(
           List(edge.zones.map(_.centroid.toString).mkString(" -> ")),
           edge.chokepoint.getCenter)
-        With.game.drawCircleMap(edge.chokepoint.getCenter, edge.chokepoint.getWidth.toInt/2, Color.Purple)
-        With.game.drawLineMap(edge.chokepoint.getSides.first, edge.chokepoint.getSides.second, Color.Purple)
+        DrawMap.circle(edge.chokepoint.getCenter, edge.chokepoint.getWidth.toInt/2, Color.Purple)
+        DrawMap.line(edge.chokepoint.getSides.first, edge.chokepoint.getSides.second, Color.Purple)
       })
       
       zone.bases.foreach(base => {

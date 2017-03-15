@@ -6,7 +6,7 @@ import Utilities.Caching.Limiter
 
 class GridWalkableUnits extends GridBoolean {
   
-  override def _defaultValue:Boolean = true
+  override def defaultValue:Boolean = true
   val limitUpdates = new Limiter(5, _update)
   override def update() = limitUpdates.act()
   def _update() {

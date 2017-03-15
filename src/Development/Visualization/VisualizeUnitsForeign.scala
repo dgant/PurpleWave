@@ -13,7 +13,7 @@ object VisualizeUnitsForeign {
   
   def _drawTrackedUnit(trackedUnit:ForeignUnitInfo) {
     if (trackedUnit._possiblyStillThere && ! trackedUnit.visible) {
-      With.game.drawCircleMap(
+      DrawMap.circle(
         trackedUnit.pixel,
         trackedUnit.utype.width / 2,
         DrawMap.playerColor(trackedUnit.player))

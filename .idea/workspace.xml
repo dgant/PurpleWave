@@ -27,101 +27,101 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="ResearchUpgrade.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Planning/Plans/Macro/Build/ResearchUpgrade.scala">
+      <file leaf-file-name="Techs.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/Techs/Techs.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="289">
-              <caret line="36" column="72" lean-forward="false" selection-start-line="36" selection-start-column="72" selection-end-line="36" selection-end-column="72" />
+            <state relative-caret-position="91">
+              <caret line="7" column="19" lean-forward="true" selection-start-line="7" selection-start-column="19" selection-end-line="7" selection-end-column="19" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ResearchTech.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Planning/Plans/Macro/Build/ResearchTech.scala">
+      <file leaf-file-name="Tech.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/Techs/Tech.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="155">
-              <caret line="17" column="70" lean-forward="false" selection-start-line="17" selection-start-column="70" selection-end-line="17" selection-end-column="70" />
+            <state relative-caret-position="78">
+              <caret line="6" column="20" lean-forward="false" selection-start-line="6" selection-start-column="20" selection-end-line="6" selection-end-column="20" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="TrainUnit.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Planning/Plans/Macro/Build/TrainUnit.scala">
+      <file leaf-file-name="Upgrades.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/Upgrades/Upgrades.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="509">
-              <caret line="89" column="46" lean-forward="false" selection-start-line="89" selection-start-column="46" selection-end-line="89" selection-end-column="46" />
+            <state relative-caret-position="91">
+              <caret line="7" column="22" lean-forward="true" selection-start-line="7" selection-start-column="22" selection-end-line="7" selection-end-column="22" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="BuildableTech.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Macro/Buildables/BuildableTech.scala">
+      <file leaf-file-name="Upgrade.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/Upgrades/Upgrade.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="247">
-              <caret line="19" column="29" lean-forward="false" selection-start-line="19" selection-start-column="29" selection-end-line="19" selection-end-column="59" />
+            <state relative-caret-position="78">
+              <caret line="6" column="23" lean-forward="false" selection-start-line="6" selection-start-column="23" selection-end-line="6" selection-end-column="23" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="BuildableUpgrade.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Macro/Buildables/BuildableUpgrade.scala">
+      <file leaf-file-name="Bot.scala" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/Startup/Bot.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="263">
-              <caret line="22" column="53" lean-forward="false" selection-start-line="22" selection-start-column="53" selection-end-line="22" selection-end-column="53" />
+            <state relative-caret-position="145">
+              <caret line="44" column="37" lean-forward="true" selection-start-line="44" selection-start-column="37" selection-end-line="44" selection-end-column="37" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="BattleMetrics.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Micro/Battles/BattleMetrics.scala">
+      <file leaf-file-name="UnitClasses.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/UnitClass/UnitClasses.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="168">
-              <caret line="32" column="65" lean-forward="true" selection-start-line="32" selection-start-column="65" selection-end-line="32" selection-end-column="65" />
+            <state relative-caret-position="117">
+              <caret line="9" column="91" lean-forward="false" selection-start-line="9" selection-start-column="91" selection-end-line="9" selection-end-column="91" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="DefaultBehavior.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Micro/Behaviors/DefaultBehavior.scala">
+      <file leaf-file-name="Protoss.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/UnitClass/Protoss.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="252">
-              <caret line="26" column="4" lean-forward="true" selection-start-line="26" selection-start-column="4" selection-end-line="26" selection-end-column="4" />
+            <state relative-caret-position="119">
+              <caret line="21" column="27" lean-forward="false" selection-start-line="21" selection-start-column="27" selection-end-line="21" selection-end-column="27" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="PositionSimpleBuilding.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Planning/Composition/PositionFinders/PositionSimpleBuilding.scala">
+      <file leaf-file-name="UnitClass.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/UnitClass/UnitClass.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="263">
-              <caret line="75" column="26" lean-forward="false" selection-start-line="75" selection-start-column="26" selection-end-line="75" selection-end-column="26" />
+            <state relative-caret-position="91">
+              <caret line="118" column="30" lean-forward="true" selection-start-line="118" selection-start-column="30" selection-end-line="118" selection-end-column="30" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="RequestUpgrade.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Macro/BuildRequests/RequestUpgrade.scala">
+      <file leaf-file-name="CacheBase.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Performance/Caching/CacheBase.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="65">
-              <caret line="5" column="42" lean-forward="false" selection-start-line="5" selection-start-column="42" selection-end-line="5" selection-end-column="42" />
+            <state relative-caret-position="228">
+              <caret line="18" column="38" lean-forward="false" selection-start-line="18" selection-start-column="38" selection-end-line="18" selection-end-column="38" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ProtossVsProtoss.scala" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/Planning/Plans/GamePlans/ProtossVsProtoss.scala">
+      <file leaf-file-name="ProtossGamePlan.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Planning/Plans/GamePlans/ProtossGamePlan.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="444">
-              <caret line="76" column="36" lean-forward="false" selection-start-line="76" selection-start-column="36" selection-end-line="76" selection-end-column="36" />
+            <state relative-caret-position="133">
+              <caret line="11" column="8" lean-forward="false" selection-start-line="11" selection-start-column="8" selection-end-line="11" selection-end-column="8" />
               <folding />
             </state>
           </provider>
@@ -140,12 +140,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>isBuildable</find>
-      <find>getPosition</find>
-      <find>bwapi.U</find>
-      <find>game.self</find>
-      <find>getFrameCount</find>
-      <find>Performance</find>
       <find>BuildableUpgrade</find>
       <find>BuildableUp</find>
       <find>BuildableUnit</find>
@@ -170,6 +164,12 @@
       <find>TechType</find>
       <find>Race</find>
       <find>UnitType.Protoss_</find>
+      <find>case object</find>
+      <find>UnitClass</find>
+      <find>Unit</find>
+      <find>Class</find>
+      <find>Tech</find>
+      <find>val</find>
     </findStrings>
     <replaceStrings>
       <replace>{  _mirror</replace>
@@ -185,7 +185,6 @@
       <replace>Property[Int]</replace>
       <replace>UnitInfo</replace>
       <replace>Walk</replace>
-      <replace>Upgrade</replace>
       <replace>RequestUpgrade</replace>
       <replace>RequestUp</replace>
       <replace>RequestUnitAnotherOne</replace>
@@ -197,6 +196,11 @@
       <replace>private var</replace>
       <replace>position</replace>
       <replace>UnitClass</replace>
+      <replace>val</replace>
+      <replace>UnitClasses.get</replace>
+      <replace>Tech</replace>
+      <replace>Upgrade</replace>
+      <replace>def</replace>
     </replaceStrings>
     <dirStrings>
       <dir>C:\prog\PurpleWave1</dir>
@@ -205,10 +209,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/ProxyBwapi/Class/Classes.scala" />
-        <option value="$PROJECT_DIR$/src/ProxyBwapi/Techs/Techs.scala" />
-        <option value="$PROJECT_DIR$/src/ProxyBwapi/Class/Class.scala" />
-        <option value="$PROJECT_DIR$/src/Planning/Plans/Macro/Automatic/BuildPylonsContinuously.scala" />
         <option value="$PROJECT_DIR$/src/ProxyBwapi/Class/Protoss/Probe.scala" />
         <option value="$PROJECT_DIR$/src/ProxyBwapi/Class/Protoss/Protoss.scala" />
         <option value="$PROJECT_DIR$/src/ProxyBwapi/Class/Protoss.scala" />
@@ -218,20 +218,13 @@
         <option value="$PROJECT_DIR$/src/Geometry/Shapes/Pylon.scala" />
         <option value="$PROJECT_DIR$/src/Geometry/Shapes/PylonRadius.scala" />
         <option value="$PROJECT_DIR$/src/Information/Intelligence.scala" />
-        <option value="$PROJECT_DIR$/src/Information/Geography/Geography.scala" />
-        <option value="$PROJECT_DIR$/src/Macro/Architect.scala" />
         <option value="$PROJECT_DIR$/src/Information/History.scala" />
         <option value="$PROJECT_DIR$/src/Startup/With.scala" />
         <option value="$PROJECT_DIR$/src/Startup/Bot.scala" />
-        <option value="$PROJECT_DIR$/src/ProxyBwapi/UnitInfo/UnitInfo.scala" />
         <option value="$PROJECT_DIR$/src/ProxyBwapi/UnitInfo/ForeignUnitInfo.scala" />
-        <option value="$PROJECT_DIR$/src/Macro/Buildables/BuildableUnit.scala" />
         <option value="$PROJECT_DIR$/src/Macro/BuildRequests/RequestUnitAnotherOne.scala" />
         <option value="$PROJECT_DIR$/src/Macro/BuildRequests/RequestUnitAtLeast.scala" />
         <option value="$PROJECT_DIR$/src/Debugging/TypeDescriber.scala" />
-        <option value="$PROJECT_DIR$/src/Macro/Buildables/Buildable.scala" />
-        <option value="$PROJECT_DIR$/src/ProxyBwapi/Techs/Tech.scala" />
-        <option value="$PROJECT_DIR$/src/ProxyBwapi/Upgrades/Upgrade.scala" />
         <option value="$PROJECT_DIR$/src/Macro/BuildRequests/RequestTech.scala" />
         <option value="$PROJECT_DIR$/src/Planning/Composition/UnitMatchers/UnitMatchType.scala" />
         <option value="$PROJECT_DIR$/src/Planning/Plans/Allocation/LockCurrencyForTech.scala" />
@@ -243,7 +236,6 @@
         <option value="$PROJECT_DIR$/src/Macro/Scheduling/Scheduler.scala" />
         <option value="$PROJECT_DIR$/src/Planning/Composition/UnitMatchers/UnitMatchIncompleteBuilding.scala" />
         <option value="$PROJECT_DIR$/src/Planning/Plans/Allocation/LockCurrencyForUnit.scala" />
-        <option value="$PROJECT_DIR$/src/ProxyBwapi/UnitClass/UnitClass.scala" />
         <option value="$PROJECT_DIR$/src/Planning/Plans/Macro/Build/BuildBuilding.scala" />
         <option value="$PROJECT_DIR$/src/Planning/Plans/Allocation/LockCurrencyForUpgrade.scala" />
         <option value="$PROJECT_DIR$/src/Planning/Plans/Macro/Build/ResearchTech.scala" />
@@ -251,11 +243,23 @@
         <option value="$PROJECT_DIR$/src/Macro/Buildables/BuildableTech.scala" />
         <option value="$PROJECT_DIR$/src/Macro/Buildables/BuildableUpgrade.scala" />
         <option value="$PROJECT_DIR$/src/Micro/Battles/BattleMetrics.scala" />
-        <option value="$PROJECT_DIR$/src/Planning/Composition/PositionFinders/PositionSimpleBuilding.scala" />
-        <option value="$PROJECT_DIR$/src/Micro/Behaviors/DefaultBehavior.scala" />
         <option value="$PROJECT_DIR$/src/Planning/Plans/Macro/Build/ResearchUpgrade.scala" />
         <option value="$PROJECT_DIR$/src/Macro/BuildRequests/RequestUpgrade.scala" />
+        <option value="$PROJECT_DIR$/src/Information/Geography/Geography.scala" />
+        <option value="$PROJECT_DIR$/src/ProxyBwapi/UnitInfo/UnitInfo.scala" />
+        <option value="$PROJECT_DIR$/src/Macro/Buildables/Buildable.scala" />
+        <option value="$PROJECT_DIR$/src/Macro/Buildables/BuildableUnit.scala" />
+        <option value="$PROJECT_DIR$/src/Micro/Behaviors/DefaultBehavior.scala" />
+        <option value="$PROJECT_DIR$/src/Planning/Composition/PositionFinders/PositionSimpleBuilding.scala" />
+        <option value="$PROJECT_DIR$/src/Macro/Architect.scala" />
         <option value="$PROJECT_DIR$/src/Planning/Plans/GamePlans/ProtossVsProtoss.scala" />
+        <option value="$PROJECT_DIR$/src/ProxyBwapi/UnitClass/UnitClasses.scala" />
+        <option value="$PROJECT_DIR$/src/ProxyBwapi/UnitClass/Protoss.scala" />
+        <option value="$PROJECT_DIR$/src/ProxyBwapi/Techs/Techs.scala" />
+        <option value="$PROJECT_DIR$/src/ProxyBwapi/Upgrades/Upgrades.scala" />
+        <option value="$PROJECT_DIR$/src/ProxyBwapi/UnitClass/UnitClass.scala" />
+        <option value="$PROJECT_DIR$/src/ProxyBwapi/Techs/Tech.scala" />
+        <option value="$PROJECT_DIR$/src/ProxyBwapi/Upgrades/Upgrade.scala" />
       </list>
     </option>
   </component>
@@ -435,32 +439,6 @@
             <PATH_ELEMENT>
               <option name="myItemId" value="UnitClass" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="PurpleWave1" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="PurpleWave1" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ProxyBwapi" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="UnitClass" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Protoss.scala" />
-              <option name="myItemType" value="org.jetbrains.plugins.scala.components.ScalaDefsProjectViewProvider$ScalaFileTreeNode" />
             </PATH_ELEMENT>
           </PATH>
           <PATH>
@@ -808,7 +786,7 @@
     <editor active="true" />
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.28362572" sideWeight="0.488125" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.54385966" sideWeight="0.488125" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3874269" sideWeight="0.5088235" order="8" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -820,7 +798,7 @@
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3611111" sideWeight="0.49411765" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2733918" sideWeight="0.49117646" order="13" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.41081873" sideWeight="0.49117646" order="13" side_tool="false" content_ui="tabs" />
       <window_info id="Debug with VisualVM" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32748538" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -874,6 +852,12 @@
           <properties />
           <option name="timeStamp" value="1275" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="scala-line">
+          <url>file://$PROJECT_DIR$/src/Startup/Bot.scala</url>
+          <line>59</line>
+          <properties />
+          <option name="timeStamp" value="1282" />
+        </line-breakpoint>
         <breakpoint enabled="true" type="java-exception">
           <properties class="java.lang.StackOverflowError" package="java.lang" />
           <option name="timeStamp" value="1031" />
@@ -882,73 +866,15 @@
       <breakpoints-dialog>
         <breakpoints-dialog />
       </breakpoints-dialog>
-      <option name="time" value="1276" />
+      <option name="time" value="1283" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="Application">
         <watch expression="With.frame" language="Scala" />
-        <watch expression="With.self.supplyUsed" language="Scala" />
-        <watch expression="With.self.supplyTotal" language="Scala" />
       </configuration>
     </watches-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/Techs/Techs.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="104">
-          <caret line="8" column="0" lean-forward="true" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Planning/Plans/Macro/Automatic/BuildPylonsContinuously.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-179">
-          <caret line="7" column="2" lean-forward="false" selection-start-line="7" selection-start-column="2" selection-end-line="7" selection-end-column="2" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/UnitClass/UnitClasses.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="52">
-          <caret line="4" column="7" lean-forward="false" selection-start-line="4" selection-start-column="7" selection-end-line="4" selection-end-column="7" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/UnitClass/UnitTypes.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="247">
-          <caret line="187" column="21" lean-forward="false" selection-start-line="187" selection-start-column="21" selection-end-line="187" selection-end-column="21" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Planning/Plans/GamePlans/ProtossVsTerran.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="39">
-          <caret line="3" column="2" lean-forward="false" selection-start-line="3" selection-start-column="2" selection-end-line="3" selection-end-column="38" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Planning/Plans/GamePlans/ProtossVsZerg.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="39">
-          <caret line="3" column="34" lean-forward="false" selection-start-line="3" selection-start-column="34" selection-end-line="3" selection-end-column="34" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/UnitClass/Protoss.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="52">
-          <caret line="4" column="67" lean-forward="true" selection-start-line="4" selection-start-column="67" selection-end-line="4" selection-end-column="67" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Macro/BuildRequests/RequestUnitAnother.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="78">
@@ -973,22 +899,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Information/Geography/Geography.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="263">
-          <caret line="110" column="27" lean-forward="false" selection-start-line="110" selection-start-column="27" selection-end-line="110" selection-end-column="27" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Macro/Architect.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="340">
-          <caret line="133" column="70" lean-forward="true" selection-start-line="133" selection-start-column="70" selection-end-line="133" selection-end-column="70" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Information/History.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="169">
@@ -1005,14 +915,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Startup/Bot.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="263">
-          <caret line="37" column="21" lean-forward="false" selection-start-line="37" selection-start-column="21" selection-end-line="37" selection-end-column="21" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Information/Intelligence.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="68">
@@ -1025,14 +927,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="299">
           <caret line="89" column="65" lean-forward="true" selection-start-line="89" selection-start-column="65" selection-end-line="89" selection-end-column="65" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Macro/Buildables/BuildableUnit.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="234">
-          <caret line="18" column="3" lean-forward="true" selection-start-line="18" selection-start-column="3" selection-end-line="18" selection-end-column="3" />
           <folding />
         </state>
       </provider>
@@ -1057,38 +951,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="275">
           <caret line="22" column="29" lean-forward="true" selection-start-line="22" selection-start-column="29" selection-end-line="22" selection-end-column="29" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Macro/Buildables/Buildable.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="41">
-          <caret line="6" column="24" lean-forward="false" selection-start-line="6" selection-start-column="24" selection-end-line="6" selection-end-column="24" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/UnitInfo/UnitInfo.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="315">
-          <caret line="70" column="63" lean-forward="true" selection-start-line="70" selection-start-column="63" selection-end-line="70" selection-end-column="63" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/Techs/Tech.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="234">
-          <caret line="18" column="0" lean-forward="true" selection-start-line="18" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/Upgrades/Upgrade.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="195">
-          <caret line="15" column="85" lean-forward="false" selection-start-line="15" selection-start-column="85" selection-end-line="15" selection-end-column="85" />
           <folding />
         </state>
       </provider>
@@ -1181,14 +1043,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/UnitClass/UnitClass.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="178">
-          <caret line="89" column="28" lean-forward="true" selection-start-line="89" selection-start-column="28" selection-end-line="89" selection-end-column="28" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Planning/Plans/Macro/Build/BuildBuilding.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="148">
@@ -1253,22 +1107,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Micro/Behaviors/DefaultBehavior.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="252">
-          <caret line="26" column="4" lean-forward="true" selection-start-line="26" selection-start-column="4" selection-end-line="26" selection-end-column="4" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Planning/Composition/PositionFinders/PositionSimpleBuilding.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="263">
-          <caret line="75" column="26" lean-forward="false" selection-start-line="75" selection-start-column="26" selection-end-line="75" selection-end-column="26" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Planning/Plans/Macro/Build/ResearchUpgrade.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="289">
@@ -1293,10 +1131,154 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/UnitInfo/UnitInfo.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="148">
+          <caret line="45" column="92" lean-forward="false" selection-start-line="45" selection-start-column="92" selection-end-line="45" selection-end-column="92" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Macro/Buildables/Buildable.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="130">
+          <caret line="10" column="32" lean-forward="false" selection-start-line="10" selection-start-column="32" selection-end-line="10" selection-end-column="32" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Macro/Buildables/BuildableUnit.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="21" column="51" lean-forward="false" selection-start-line="21" selection-start-column="51" selection-end-line="21" selection-end-column="51" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Micro/Behaviors/DefaultBehavior.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="89">
+          <caret line="18" column="29" lean-forward="false" selection-start-line="18" selection-start-column="29" selection-end-line="18" selection-end-column="29" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Planning/Composition/PositionFinders/PositionSimpleBuilding.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="85">
+          <caret line="75" column="29" lean-forward="false" selection-start-line="75" selection-start-column="29" selection-end-line="75" selection-end-column="37" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Macro/Architect.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="52">
+          <caret line="4" column="29" lean-forward="false" selection-start-line="4" selection-start-column="29" selection-end-line="4" selection-end-column="29" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/Planning/Plans/GamePlans/ProtossVsProtoss.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="444">
-          <caret line="76" column="36" lean-forward="false" selection-start-line="76" selection-start-column="36" selection-end-line="76" selection-end-column="36" />
+        <state relative-caret-position="247">
+          <caret line="19" column="41" lean-forward="true" selection-start-line="19" selection-start-column="41" selection-end-line="19" selection-end-column="41" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Information/Geography/Geography.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="65">
+          <caret line="5" column="35" lean-forward="true" selection-start-line="5" selection-start-column="35" selection-end-line="5" selection-end-column="35" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$PROJECT_DIR$/lib/bwmirror_v2_5.jar!/bwapi/UnitType.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="126">
+          <caret line="583" column="34" lean-forward="false" selection-start-line="583" selection-start-column="34" selection-end-line="583" selection-end-column="34" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Planning/Plans/GamePlans/ProtossGamePlan.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="133">
+          <caret line="11" column="8" lean-forward="false" selection-start-line="11" selection-start-column="8" selection-end-line="11" selection-end-column="8" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/UnitClass/Protoss.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="119">
+          <caret line="21" column="27" lean-forward="false" selection-start-line="21" selection-start-column="27" selection-end-line="21" selection-end-column="27" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/UnitClass/UnitClasses.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="117">
+          <caret line="9" column="91" lean-forward="false" selection-start-line="9" selection-start-column="91" selection-end-line="9" selection-end-column="91" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Performance/Caching/CacheBase.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="228">
+          <caret line="18" column="38" lean-forward="false" selection-start-line="18" selection-start-column="38" selection-end-line="18" selection-end-column="38" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/UnitClass/UnitClass.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="91">
+          <caret line="118" column="30" lean-forward="true" selection-start-line="118" selection-start-column="30" selection-end-line="118" selection-end-column="30" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/Techs/Techs.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="91">
+          <caret line="7" column="19" lean-forward="true" selection-start-line="7" selection-start-column="19" selection-end-line="7" selection-end-column="19" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/Techs/Tech.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="78">
+          <caret line="6" column="20" lean-forward="false" selection-start-line="6" selection-start-column="20" selection-end-line="6" selection-end-column="20" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/Upgrades/Upgrades.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="91">
+          <caret line="7" column="22" lean-forward="true" selection-start-line="7" selection-start-column="22" selection-end-line="7" selection-end-column="22" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/Upgrades/Upgrade.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="78">
+          <caret line="6" column="23" lean-forward="false" selection-start-line="6" selection-start-column="23" selection-end-line="6" selection-end-column="23" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Startup/Bot.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="145">
+          <caret line="44" column="37" lean-forward="true" selection-start-line="44" selection-start-column="37" selection-end-line="44" selection-end-column="37" />
           <folding />
         </state>
       </provider>

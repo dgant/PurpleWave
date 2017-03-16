@@ -2,7 +2,7 @@ package Planning.Composition.PositionFinders
 
 import Geometry.TileRectangle
 import Performance.Caching.Cache
-import ProxyBwapi.UnitClass.{Pylon, UnitClass}
+import ProxyBwapi.UnitClass.{Protoss, UnitClass}
 import Startup.With
 import Utilities.TypeEnrichment.EnrichPosition._
 import bwapi.{TilePosition, UnitType}
@@ -73,7 +73,7 @@ class PositionSimpleBuilding(
       0
     else if (buildingType.isTownHall)
       0
-    else if (buildingType == Pylon && With.units.ours.count(_.utype == buildingType) < 4)
+    else if (buildingType == Protoss.Pylon && With.units.ours.count(_.utype == buildingType) < 4)
       3
     else
       1

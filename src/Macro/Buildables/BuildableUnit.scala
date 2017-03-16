@@ -1,7 +1,7 @@
 package Macro.Buildables
 
 import Debugging.TypeDescriber
-import ProxyBwapi.UnitClass.{Pylon, UnitClass}
+import ProxyBwapi.UnitClass._
 
 case class BuildableUnit(val unit: UnitClass) extends Buildable {
   
@@ -19,6 +19,6 @@ case class BuildableUnit(val unit: UnitClass) extends Buildable {
   }
   override def requirements: Iterable[BuildableUnit] = {
     unit.requiredUnits.flatten(pair => List.fill(pair._2)(pair._1)).map(new BuildableUnit(_)) ++
-      (if(unit.requiresPsi) List(new BuildableUnit(Pylon)) else List.empty)
+      (if(unit.requiresPsi) List(new BuildableUnit(Protoss.Pylon)) else List.empty)
   }
 }

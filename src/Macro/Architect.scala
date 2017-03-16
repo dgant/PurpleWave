@@ -2,7 +2,7 @@ package Macro
 
 import Geometry.Shapes.{PylonRadius, Spiral}
 import Geometry.TileRectangle
-import ProxyBwapi.UnitClass.{Pylon, UnitClass}
+import ProxyBwapi.UnitClass._
 import Startup.With
 import Utilities.TypeEnrichment.EnrichPosition._
 import bwapi.TilePosition
@@ -71,7 +71,7 @@ class Architect {
     val nextBuilding = buildingTypes.head
     
     if (canBuild(nextBuilding, searchPoint, margin, exclusions, hypotheticalPylon)) {
-      val newHypotheticalPylon = if (nextBuilding == Pylon) Some(searchPoint) else hypotheticalPylon
+      val newHypotheticalPylon = if (nextBuilding == Protoss.Pylon) Some(searchPoint) else hypotheticalPylon
       val newExclusions = exclusions ++ List(new TileRectangle(searchPoint, searchPoint.add(nextBuilding.tileSize)))
       
       if (buildingTypes.size == 1) {

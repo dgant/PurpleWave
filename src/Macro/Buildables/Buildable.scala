@@ -1,7 +1,7 @@
 package Macro.Buildables
 
 import ProxyBwapi.Techs.Tech
-import ProxyBwapi.UnitClass.{Archon, DarkArchon, UnitClass}
+import ProxyBwapi.UnitClass._
 import ProxyBwapi.Upgrades.Upgrade
 
 abstract class Buildable {
@@ -24,7 +24,7 @@ abstract class Buildable {
   
   //Greater Spire is omitted as a hack since the Spire is still useful in the interim
   private val consumesBuilders = Set(
-    Archon,
-    DarkArchon
+    Protoss.Archon,
+    Protoss.DarkArchon
   )
 }

@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans
 
-import Macro.BuildRequests.{BuildRequest, RequestUnitAnotherOne, RequestUpgrade}
+import Macro.BuildRequests.{BuildRequest, RequestUnitAnother, RequestUnitAnotherOne, RequestUpgrade}
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plans.Army.{Attack, DefendChoke}
 import Planning.Plans.Compound.{IfThenElse, Parallel}
@@ -17,56 +17,47 @@ class ProtossVsProtoss extends Parallel {
   
   //http://wiki.teamliquid.net/starcraft/4_Gate_Goon_(vs._Protoss)
   val _fourGateGoons = List[BuildRequest] (
-    new RequestUnitAnotherOne(Nexus),
-    new RequestUnitAnotherOne(Probe),
-    new RequestUnitAnotherOne(Probe),
-    new RequestUnitAnotherOne(Probe),
-    new RequestUnitAnotherOne(Probe),
-    new RequestUnitAnotherOne(Probe),
-    new RequestUnitAnotherOne(Probe),
-    new RequestUnitAnotherOne(Probe),
-    new RequestUnitAnotherOne(Probe),
-    new RequestUnitAnotherOne(Pylon), //8
-    new RequestUnitAnotherOne(Probe),
-    new RequestUnitAnotherOne(Probe),
-    new RequestUnitAnotherOne(Gateway), //10
-    new RequestUnitAnotherOne(Probe),
-    new RequestUnitAnotherOne(Probe),
-    new RequestUnitAnotherOne(Pylon), //12
-    new RequestUnitAnotherOne(Probe),
-    new RequestUnitAnotherOne(Zealot), //13
-    new RequestUnitAnotherOne(Probe),
-    new RequestUnitAnotherOne(Assimilator), //16
-    new RequestUnitAnotherOne(Probe),
-    new RequestUnitAnotherOne(CyberneticsCore), //17
-    new RequestUnitAnotherOne(Probe),
-    new RequestUnitAnotherOne(Zealot), //18
-    new RequestUnitAnotherOne(Probe),
-    new RequestUnitAnotherOne(Probe),
-    new RequestUnitAnotherOne(Pylon), //22
-    new RequestUnitAnotherOne(Probe),
-    new RequestUnitAnotherOne(Dragoon), //23
-    new RequestUnitAnotherOne(Probe),
+    new RequestUnitAnotherOne(Protoss.Nexus),
+    new RequestUnitAnother(8, Protoss.Probe),
+    new RequestUnitAnotherOne(Protoss.Pylon), //8
+    new RequestUnitAnother(2, Protoss.Probe),
+    new RequestUnitAnotherOne(Protoss.Gateway), //10
+    new RequestUnitAnother(2, Protoss.Probe),
+    new RequestUnitAnotherOne(Protoss.Pylon), //12
+    new RequestUnitAnotherOne(Protoss.Probe),
+    new RequestUnitAnotherOne(Protoss.Zealot), //13
+    new RequestUnitAnotherOne(Protoss.Probe),
+    new RequestUnitAnotherOne(Protoss.Assimilator), //16
+    new RequestUnitAnotherOne(Protoss.Probe),
+    new RequestUnitAnotherOne(Protoss.CyberneticsCore), //17
+    new RequestUnitAnotherOne(Protoss.Probe),
+    new RequestUnitAnotherOne(Protoss.Zealot), //18
+    new RequestUnitAnotherOne(Protoss.Probe),
+    new RequestUnitAnotherOne(Protoss.Probe),
+    new RequestUnitAnotherOne(Protoss.Pylon), //22
+    new RequestUnitAnotherOne(Protoss.Probe),
+    new RequestUnitAnotherOne(Protoss.Dragoon), //23
+    new RequestUnitAnotherOne(Protoss.Probe),
     new RequestUpgrade(Upgrades.get(UpgradeType.Singularity_Charge)), //26
-    new RequestUnitAnotherOne(Probe),
-    new RequestUnitAnotherOne(Dragoon), //27
-    new RequestUnitAnotherOne(Probe),
-    new RequestUnitAnotherOne(Probe),
-    new RequestUnitAnotherOne(Gateway), //31
-    new RequestUnitAnotherOne(Gateway), //31
-    new RequestUnitAnotherOne(Gateway), //31
-    new RequestUnitAnotherOne(Dragoon), //31
-    new RequestUnitAnotherOne(Pylon), //33
-    new RequestUnitAnotherOne(Dragoon), //33
-    new RequestUnitAnotherOne(Dragoon),
-    new RequestUnitAnotherOne(Dragoon),
-    new RequestUnitAnotherOne(Dragoon),
-    new RequestUnitAnotherOne(Pylon), //33
-    new RequestUnitAnotherOne(Dragoon), //33
-    new RequestUnitAnotherOne(Dragoon),
-    new RequestUnitAnotherOne(Dragoon),
-    new RequestUnitAnotherOne(Dragoon),
-    new RequestUnitAnotherOne(Nexus)
+    new RequestUnitAnotherOne(Protoss.Probe),
+    new RequestUnitAnotherOne(Protoss.Dragoon), //27
+    new RequestUnitAnotherOne(Protoss.Probe),
+    new RequestUnitAnotherOne(Protoss.Probe),
+    new RequestUnitAnotherOne(Protoss.Gateway), //31
+    new RequestUnitAnotherOne(Protoss.Gateway), //31
+    new RequestUnitAnotherOne(Protoss.Gateway), //31
+    new RequestUnitAnotherOne(Protoss.Dragoon), //31
+    new RequestUnitAnotherOne(Protoss.Pylon), //33
+    new RequestUnitAnotherOne(Protoss.Dragoon), //33
+    new RequestUnitAnotherOne(Protoss.Dragoon),
+    new RequestUnitAnotherOne(Protoss.Dragoon),
+    new RequestUnitAnotherOne(Protoss.Dragoon),
+    new RequestUnitAnotherOne(Protoss.Pylon), //33
+    new RequestUnitAnotherOne(Protoss.Dragoon), //33
+    new RequestUnitAnotherOne(Protoss.Dragoon),
+    new RequestUnitAnotherOne(Protoss.Dragoon),
+    new RequestUnitAnotherOne(Protoss.Dragoon),
+    new RequestUnitAnotherOne(Protoss.Nexus)
   )
   
   children.set(List(

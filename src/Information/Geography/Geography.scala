@@ -3,7 +3,7 @@ package Information.Geography
 import Geometry.Shapes.Circle
 import Geometry._
 import Performance.Caching.{Cache, CacheForever, Limiter}
-import ProxyBwapi.UnitClass.Nexus
+import ProxyBwapi.UnitClass.Protoss
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, UnitInfo}
 import Startup.With
 import Utilities.TypeEnrichment.EnrichPosition._
@@ -35,7 +35,7 @@ class Geography {
     
     //Build bases
     val allBases = townHallPositions.map(townHallPosition => {
-      val townHallArea = Nexus.area.add(townHallPosition)
+      val townHallArea = Protoss.Nexus.area.add(townHallPosition)
       new Base(
         zonesByRegionCenter.values
           .find(_.region.getPolygon.isInside(townHallPosition.toPosition))
@@ -112,7 +112,7 @@ class Geography {
   }
   private def isLegalBasePosition(position:TilePosition):Boolean = {
     val exclusions = resourceExclusionCache.get
-    val buildingArea = new TileRectangle(position, position.add(Nexus.tileSize))
+    val buildingArea = new TileRectangle(position, position.add(Protoss.Nexus.tileSize))
     buildingArea.tiles.forall(With.grids.buildableTerrain.get) && exclusions.forall( ! _.intersects(buildingArea))
   }
 }

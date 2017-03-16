@@ -10,5 +10,6 @@
 out/
 src/META-INF
 .idea/artifacts
+.idea/workspace.xml
 bwapi-data/
 bin/

@@ -15,11 +15,11 @@ class Configuration {
   var enableVisualization               = true
   var enableVisualizationBattles        = false
   var enableVisualizationEconomy        = false
-  var enableVisualizationGrids          = false
+  var enableVisualizationGrids          = true
   var enableVisualizationPerformance    = true
   var enableVisualizationPlans          = false
   var enableVisualizationResources      = false
-  var enableVisualizationScheduler      = true
+  var enableVisualizationScheduler      = false
   var enableVisualizationGeography      = false
   var enableVisualizationUnitsForeign   = false
   var enableVisualizationUnitsOurs      = false

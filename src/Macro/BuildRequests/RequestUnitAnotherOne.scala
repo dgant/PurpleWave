@@ -1,8 +1,8 @@
 package Macro.BuildRequests
 
 import Macro.Buildables.BuildableUnit
-import bwapi.UnitType
+import ProxyBwapi.UnitClass.UnitClass
 
-case class RequestUnitAnotherOne(unitType: UnitType) extends BuildRequest(new BuildableUnit(unitType)) {
+case class RequestUnitAnotherOne(unitClass: UnitClass) extends BuildRequest(new BuildableUnit(unitClass)) {
   override def add: Int = 1
 }

@@ -2,9 +2,12 @@ package Macro.Scheduling.Optimization
 
 import Macro.Buildables.{Buildable, BuildableUnit}
 import Macro.Scheduling.BuildEvent
+import ProxyBwapi.Techs.Tech
+import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
+import ProxyBwapi.Upgrades.Upgrade
 import Startup.With
 import Utilities.CountMap
-import bwapi.{TechType, UnitType, UpgradeType}
+import bwapi.UnitType
 
 import scala.collection.mutable
 
@@ -13,10 +16,10 @@ class ScheduleSimulationState(
   var minerals            : Int,
   var gas                 : Int,
   var supplyAvailable     : Int,
-  var unitsOwned          : CountMap[UnitType],
-  var unitsAvailable      : CountMap[UnitType],
-  var techsOwned          : mutable.Set[TechType],
-  var upgradeLevels       : mutable.Map[UpgradeType, Int],
+  var unitsOwned          : CountMap[UnitClass],
+  var unitsAvailable      : CountMap[UnitClass],
+  var techsOwned          : mutable.Set[Tech],
+  var upgradeLevels       : mutable.Map[Upgrade, Int],
   val eventQueue          : mutable.SortedSet[BuildEvent],
   val isDisposableCopy    : Boolean = false) {
   
@@ -103,13 +106,13 @@ class ScheduleSimulationState(
   }
   
   private def unmetSupply(buildable: Buildable): Iterable[Buildable] = {
-    val supplyType = With.self.getRace.getSupplyProvider
+    val supplyType = UnitClasses.get(With.self.getRace.getSupplyProvider)
     (0 until Math.max(0, (buildable.supplyRequired - supplyAvailable) / supplyType.supplyProvided))
       .map(i => new BuildableUnit(supplyType))
   }
   
   private def unmetRequirements(buildable: Buildable): Iterable[Buildable] = {
-    val units  = new CountMap[UnitType]
+    val units  = new CountMap[UnitClass]
     buildable.requirements
       .map(requirement => {
         requirement.unitOption.foreach(units.addOne)
@@ -124,7 +127,7 @@ class ScheduleSimulationState(
   }
   
   private def unmetBuilders(buildable: Buildable): Iterable[Buildable] = {
-    val buildersRequired  = new CountMap[UnitType]
+    val buildersRequired  = new CountMap[UnitClass]
     buildable.buildersOccupied
       .map(builder => {
         builder.unitOption.foreach(buildersRequired.addOne)
@@ -138,14 +141,12 @@ class ScheduleSimulationState(
   private def mineralsPerFrame : Double  = With.economy.mineralIncomePerMinute (numberOfMiners,   numberOfBases) / 24.0 / 60.0
   private def gasPerFrame      : Double  = With.economy.gasIncomePerMinute     (numberOfDrillers, numberOfBases) / 24.0 / 60.0
   
-  private def owned     (unitType: UnitType) : Int = unitsOwned     (unitType)
-  private def available (unitType: UnitType) : Int = unitsAvailable (unitType)
-  private def numberOfBases     : Int = List(UnitType.Terran_Command_Center, UnitType.Protoss_Nexus, UnitType.Zerg_Hatchery, UnitType.Zerg_Lair, UnitType.Zerg_Hive).map(owned).sum
-  private def numberOfWorkers   : Int = List(UnitType.Terran_SCV, UnitType.Protoss_Probe, UnitType.Zerg_Drone).map(available).sum
+  private def owned     (unitType: UnitClass) : Int = unitsOwned     (unitType)
+  private def available (unitType: UnitClass) : Int = unitsAvailable (unitType)
+  private def numberOfBases     : Int = List(UnitType.Terran_Command_Center, UnitType.Protoss_Nexus, UnitType.Zerg_Hatchery, UnitType.Zerg_Lair, UnitType.Zerg_Hive).map(UnitClasses.get).map(owned).sum
+  private def numberOfWorkers   : Int = List(UnitType.Terran_SCV, UnitType.Protoss_Probe, UnitType.Zerg_Drone).map(UnitClasses.get).map(available).sum
   private def numberOfMiners    : Int = Math.max(0, numberOfWorkers - numberOfDrillers)
-  private def numberOfDrillers  : Int = Math.min(
-    3 * List(UnitType.Terran_Refinery, UnitType.Protoss_Assimilator, UnitType.Zerg_Extractor).map(available).sum,
-    numberOfWorkers / 3)
+  private def numberOfDrillers  : Int = Math.min(numberOfWorkers / 3, 3 * List(UnitType.Terran_Refinery, UnitType.Protoss_Assimilator, UnitType.Zerg_Extractor).map(UnitClasses.get).map(available).sum)
   
   private def nextEventByStart : BuildEvent = eventQueue.minBy(_.frameStart)
   private def nextEventByEnd   : BuildEvent = eventQueue.minBy(_.frameEnd)

@@ -1,8 +1,8 @@
 package Macro.BuildRequests
 
 import Macro.Buildables.BuildableUnit
-import bwapi.UnitType
+import ProxyBwapi.UnitClass.UnitClass
 
-case class RequestUnitAtLeast(quantity:Int, unitType: UnitType) extends BuildRequest(new BuildableUnit(unitType)) {
+case class RequestUnitAtLeast(quantity:Int, unitClass: UnitClass) extends BuildRequest(new BuildableUnit(unitClass)) {
   override def require: Int = quantity
 }

@@ -1,13 +1,14 @@
 package Information.Geography
 
-import ProxyBwapi.UnitInfo.{ForeignUnitInfo, UnitInfo}
 import Geometry.Shapes.Circle
 import Geometry._
 import Performance.Caching.{Cache, CacheForever, Limiter}
+import ProxyBwapi.UnitClass.Nexus
+import ProxyBwapi.UnitInfo.{ForeignUnitInfo, UnitInfo}
 import Startup.With
 import Utilities.TypeEnrichment.EnrichPosition._
 import Utilities.TypeEnrichment.EnrichUnitType._
-import bwapi.{TilePosition, UnitType}
+import bwapi.TilePosition
 import bwta.BWTA
 
 import scala.collection.JavaConverters._
@@ -34,7 +35,7 @@ class Geography {
     
     //Build bases
     val allBases = townHallPositions.map(townHallPosition => {
-      val townHallArea = UnitType.Terran_Command_Center.area.add(townHallPosition)
+      val townHallArea = Nexus.area.add(townHallPosition)
       new Base(
         zonesByRegionCenter.values
           .find(_.region.getPolygon.isInside(townHallPosition.toPosition))
@@ -111,7 +112,7 @@ class Geography {
   }
   private def isLegalBasePosition(position:TilePosition):Boolean = {
     val exclusions = resourceExclusionCache.get
-    val buildingArea = new TileRectangle(position, position.add(UnitType.Zerg_Hatchery.tileSize))
+    val buildingArea = new TileRectangle(position, position.add(Nexus.tileSize))
     buildingArea.tiles.forall(With.grids.buildableTerrain.get) && exclusions.forall( ! _.intersects(buildingArea))
   }
 }

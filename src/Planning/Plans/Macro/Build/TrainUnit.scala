@@ -6,14 +6,14 @@ import Planning.Plan
 import Startup.With
 import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Composition.UnitMatchers.UnitMatchType
+import ProxyBwapi.UnitClass.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import bwapi.UnitType
 
-class TrainUnit(val traineeType:UnitType) extends Plan {
+class TrainUnit(val traineeType:UnitClass) extends Plan {
   
   val currency = new LockCurrencyForUnit(traineeType)
   val trainerPlan = new LockUnits {
-    unitMatcher.set(new UnitMatchType(traineeType.whatBuilds.first))
+    unitMatcher.set(new UnitMatchType(traineeType.whatBuilds._1))
     unitCounter.set(UnitCountOne)
   }
   
@@ -87,7 +87,7 @@ class TrainUnit(val traineeType:UnitType) extends Plan {
   private def orderUnit(newTrainer:FriendlyUnitInfo) {
     trainer = Some(newTrainer)
     currency.isSpent = true
-    newTrainer.baseUnit.train(traineeType)
+    newTrainer.baseUnit.train(traineeType.base)
     lastOrderFrame = With.frame
   }
 }

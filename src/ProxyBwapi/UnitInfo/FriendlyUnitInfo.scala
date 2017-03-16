@@ -1,13 +1,16 @@
 package ProxyBwapi.UnitInfo
-import Startup.With
 import Performance.Caching.CacheFrame
+import ProxyBwapi.Techs.{Tech, Techs}
+import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
+import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
+import Startup.With
 import Utilities.TypeEnrichment.EnrichPosition._
 import bwapi._
 
 import scala.collection.JavaConverters._
 
 class FriendlyUnitInfo(_baseUnit:bwapi.Unit) extends UnitInfo(_baseUnit) {
-  val _cacheUnitType  = new CacheFrame[UnitType]      (() =>  _baseUnit.getType)
+  val _cacheClass     = new CacheFrame[UnitClass]     (() =>  UnitClasses.get(_baseUnit.getType))
   val _cachePlayer    = new CacheFrame[Player]        (() =>  _baseUnit.getPlayer)
   val _cachePosition  = new CacheFrame[Position]      (() =>  _baseUnit.getPosition)
   val _cacheTile      = new CacheFrame[TilePosition]  (() =>  _baseUnit.getTilePosition)
@@ -20,12 +23,12 @@ class FriendlyUnitInfo(_baseUnit:bwapi.Unit) extends UnitInfo(_baseUnit) {
   override def possiblyStillThere         : Boolean                   = true
   override def alive                      : Boolean                   = _cacheExists.get
   override def player                     : Player                    = _cachePlayer.get
-  override def pixel                   : Position                  = _cachePosition.get
+  override def pixel                      : Position                  = _cachePosition.get
   override def walkPosition               : WalkPosition              = pixel.toWalkPosition
   override def tileTopLeft                : TilePosition              = _cacheTile.get
   override def hitPoints                  : Int                       = baseUnit.getHitPoints
   override def shieldPoints               : Int                       = baseUnit.getShields
-  override def utype                      : UnitType                  = _cacheUnitType.get
+  override def utype                      : UnitClass                 = _cacheClass.get
   override def complete                   : Boolean                   = _cacheCompleted.get
   override def flying                     : Boolean                   = baseUnit.isFlying
   override def visible                    : Boolean                   = baseUnit.isVisible
@@ -51,8 +54,8 @@ class FriendlyUnitInfo(_baseUnit:bwapi.Unit) extends UnitInfo(_baseUnit) {
   def interceptors                        : Int                       = baseUnit.getInterceptorCount
   def getBuildUnit                        : Option[UnitInfo]          = With.units.getUnit(baseUnit.getBuildUnit)
   def trainingQueue                       : Iterable[UnitType]        = baseUnit.getTrainingQueue.asScala
-  def teching                             : TechType                  = baseUnit.getTech
-  def upgrading                           : UpgradeType               = baseUnit.getUpgrade
+  def teching                             : Tech                      = Techs.get(baseUnit.getTech)
+  def upgrading                           : Upgrade                   = Upgrades.get(baseUnit.getUpgrade)
   def order                               : Order                     = baseUnit.getOrder
   def framesBeforeBecomingComplete        : Int                       = baseUnit.getRemainingBuildTime
   def framesBeforeBuildeeComplete         : Int                       = baseUnit.getRemainingTrainTime

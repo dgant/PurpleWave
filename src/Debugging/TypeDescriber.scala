@@ -1,10 +1,12 @@
 package Debugging
 
-import bwapi.{TechType, UnitType, UpgradeType}
+import ProxyBwapi.Techs.Tech
+import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.Upgrades.Upgrade
 
 object TypeDescriber {
-  def unit(unitType:UnitType):String =
-    unitType.toString
+  def unit(unitClass: UnitClass):String =
+    unitClass.base.toString
       .replace("Terran_", "")
       .replace("Zerg_", "")
       .replace("Protoss_", "")
@@ -13,11 +15,11 @@ object TypeDescriber {
       .replace("Special_", "")
       .replaceAll("_", " ")
   
-  def tech(techType:TechType):String =
-    techType.toString
+  def tech(techType:Tech):String =
+    techType.base.toString
     .replaceAll("_", " ")
   
-  def upgrade(upgradeType:UpgradeType):String =
-    upgradeType.toString
+  def upgrade(upgradeType:Upgrade):String =
+    upgradeType.base.toString
       .replaceAll("_", " ")
 }

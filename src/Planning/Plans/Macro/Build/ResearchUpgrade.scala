@@ -5,9 +5,10 @@ import Planning.Plan
 import Startup.With
 import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Composition.UnitMatchers.UnitMatchType
+import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
 import bwapi.UpgradeType
 
-class ResearchUpgrade(upgradeType: UpgradeType, level: Int) extends Plan {
+class ResearchUpgrade(upgradeType: Upgrade, level: Int) extends Plan {
   
   val currency = new LockCurrencyForUpgrade(upgradeType, level)
   val researcher = new LockUnits {
@@ -15,7 +16,7 @@ class ResearchUpgrade(upgradeType: UpgradeType, level: Int) extends Plan {
     unitCounter.set(UnitCountOne)
   }
   
-  override def isComplete: Boolean = With.self.getUpgradeLevel(upgradeType) >= level
+  override def isComplete: Boolean = With.self.getUpgradeLevel(upgradeType.base) >= level
   override def getChildren: Iterable[Plan] = List (currency, researcher)
   
   override def onFrame() {
@@ -33,8 +34,8 @@ class ResearchUpgrade(upgradeType: UpgradeType, level: Int) extends Plan {
     if (researcherUnit.upgrading == upgradeType) {
       currency.isSpent = true
     }
-    else if (researcherUnit.upgrading == UpgradeType.None) {
-      researcherUnit.baseUnit.upgrade(upgradeType)
+    else if (researcherUnit.upgrading == Upgrades.get(UpgradeType.None)) {
+      researcherUnit.baseUnit.upgrade(upgradeType.base)
       currency.isSpent = true
     }
   }

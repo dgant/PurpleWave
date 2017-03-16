@@ -33,7 +33,7 @@ object ScheduleSimulationEventAnticipator {
     val timeLeft = unit.framesBeforeUpgradeComplete
     if (timeLeft <= 0) return List.empty
     val upgrade = unit.upgrading
-    val level = 1 + With.self.getUpgradeLevel(upgrade)
+    val level = 1 + With.self.getUpgradeLevel(upgrade.base)
     List(buildEvent(new BuildableUpgrade(upgrade, level), timeLeft))
   }
   

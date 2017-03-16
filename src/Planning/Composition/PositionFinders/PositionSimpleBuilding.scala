@@ -1,14 +1,14 @@
 package Planning.Composition.PositionFinders
 
 import Geometry.TileRectangle
-import Startup.With
 import Performance.Caching.Cache
+import ProxyBwapi.UnitClass.{Pylon, UnitClass}
+import Startup.With
 import Utilities.TypeEnrichment.EnrichPosition._
-import Utilities.TypeEnrichment.EnrichUnitType._
 import bwapi.{TilePosition, UnitType}
 
 class PositionSimpleBuilding(
-  val buildingType:UnitType)
+  val buildingType:UnitClass)
     extends PositionFinder {
   
   override def find: Option[TilePosition] = findCache.get
@@ -73,7 +73,7 @@ class PositionSimpleBuilding(
       0
     else if (buildingType.isTownHall)
       0
-    else if (buildingType == UnitType.Protoss_Pylon && With.units.ours.count(_.utype == buildingType) < 4)
+    else if (buildingType == Pylon && With.units.ours.count(_.utype == buildingType) < 4)
       3
     else
       1

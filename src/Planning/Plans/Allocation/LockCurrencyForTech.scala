@@ -1,9 +1,9 @@
 package Planning.Plans.Allocation
 
-import bwapi.{TechType}
+import ProxyBwapi.Techs.Tech
 
-class LockCurrencyForTech(techType: TechType)
+class LockCurrencyForTech(tech: Tech)
   extends LockCurrency {
-    minerals = techType.mineralPrice()
-    gas = techType.gasPrice()
+    minerals = tech.mineralPrice
+    gas = tech.gasPrice
 }

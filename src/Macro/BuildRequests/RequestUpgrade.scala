@@ -1,6 +1,6 @@
 package Macro.BuildRequests
 
 import Macro.Buildables.BuildableUpgrade
-import bwapi.UpgradeType
+import ProxyBwapi.Upgrades.Upgrade
 
-case class RequestUpgrade(upgrade: UpgradeType, level:Int = 1) extends BuildRequest(new BuildableUpgrade(upgrade, level))
+case class RequestUpgrade(upgrade: Upgrade, level:Int = 1) extends BuildRequest(new BuildableUpgrade(upgrade, level))

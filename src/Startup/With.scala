@@ -14,6 +14,8 @@ import Micro.{Commander, Paths}
 import _root_.Performance.Latency
 import bwapi.Player
 
+import scala.collection.mutable
+
 object With {
   var game:bwapi.Game = null
   var architect:Architect = null
@@ -24,7 +26,6 @@ object With {
   var commander:Commander = null
   var economy:Economy = null
   var grids:Grids = null
-  var history:History = null
   var intelligence:Intelligence = null
   var geography:Geography = null
   var gameplan:WinTheGame = null

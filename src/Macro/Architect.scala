@@ -1,15 +1,16 @@
 package Macro
 
-import Geometry.Shapes.{Pylon, Spiral}
+import Geometry.Shapes.{PylonRadius, Spiral}
 import Geometry.TileRectangle
+import ProxyBwapi.UnitClass.{Pylon, UnitClass}
 import Startup.With
 import Utilities.TypeEnrichment.EnrichPosition._
-import bwapi.{TilePosition, UnitType}
+import bwapi.TilePosition
 
 class Architect {
   
   def placeBuilding(
-    buildingType: UnitType,
+    buildingType: UnitClass,
     center:       TilePosition,
     margin:       Integer = 0,
     searchRadius: Integer = 20,
@@ -25,7 +26,7 @@ class Architect {
   
   // Try to place a collection of buildings
   def placeBuildings(
-    buildingTypes:      Iterable[UnitType],
+    buildingTypes:      Iterable[UnitClass],
     center:             TilePosition,
     margin:             Integer                 = 0,
     searchRadius:       Integer                 = 20,
@@ -60,7 +61,7 @@ class Architect {
   
   private def tryBuilding(
     searchPoint:        TilePosition,
-    buildingTypes:      Iterable[UnitType],
+    buildingTypes:      Iterable[UnitClass],
     margin:             Integer                 = 0,
     searchRadius:       Integer                 = 20,
     exclusions:         Iterable[TileRectangle] = List.empty,
@@ -70,7 +71,7 @@ class Architect {
     val nextBuilding = buildingTypes.head
     
     if (canBuild(nextBuilding, searchPoint, margin, exclusions, hypotheticalPylon)) {
-      val newHypotheticalPylon = if (nextBuilding == UnitType.Protoss_Pylon) Some(searchPoint) else hypotheticalPylon
+      val newHypotheticalPylon = if (nextBuilding == Pylon) Some(searchPoint) else hypotheticalPylon
       val newExclusions = exclusions ++ List(new TileRectangle(searchPoint, searchPoint.add(nextBuilding.tileSize)))
       
       if (buildingTypes.size == 1) {
@@ -94,7 +95,7 @@ class Architect {
   }
   
   def canBuild(
-    buildingType:       UnitType,
+    buildingType:       UnitClass,
     tile:               TilePosition,
     margin:             Integer                 = 0,
     exclusions:         Iterable[TileRectangle] = List.empty,
@@ -121,10 +122,15 @@ class Architect {
       trespassingUnits.forall(_.isOurs)
   }
   
-  private def rectangleIsBuildable(area: TileRectangle, buildingType: UnitType, hypotheticalPylon: Option[TilePosition] = None):Boolean = {
+  private def rectangleIsBuildable(
+    area: TileRectangle,
+    buildingType: UnitClass,
+    hypotheticalPylon:
+    Option[TilePosition] = None)
+  :Boolean = {
     area.tiles.forall(tile =>
       With.grids.buildable.get(tile) &&
-        (( ! buildingType.requiresPsi())   || With.game.hasPower(tile) || hypotheticalPylon.exists(pylon => Pylon.powers(pylon, tile))) &&
-        (( ! buildingType.requiresCreep()) || With.game.hasCreep(tile)))
+        (( ! buildingType.requiresPsi)   || With.game.hasPower(tile) || hypotheticalPylon.exists(pylon => PylonRadius.powers(pylon, tile))) &&
+        (( ! buildingType.requiresCreep) || With.game.hasCreep(tile)))
   }
 }

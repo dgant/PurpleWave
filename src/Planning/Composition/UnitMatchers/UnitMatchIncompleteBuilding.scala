@@ -1,9 +1,9 @@
 package Planning.Composition.UnitMatchers
 
+import ProxyBwapi.UnitClass.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import bwapi.UnitType
 
-class UnitMatchIncompleteBuilding(unitType:UnitType) extends UnitMatchType(unitType) {
+class UnitMatchIncompleteBuilding(unitType:UnitClass) extends UnitMatchType(unitType) {
   override def accept(unit: FriendlyUnitInfo): Boolean = {
     unit.utype == unitType &&
       ! unit.complete &&

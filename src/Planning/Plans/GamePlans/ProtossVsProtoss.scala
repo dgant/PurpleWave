@@ -7,7 +7,9 @@ import Planning.Plans.Compound.{IfThenElse, Parallel}
 import Planning.Plans.Information.ScoutAt
 import Planning.Plans.Macro.Build.ScheduleBuildOrder
 import Planning.Plans.Macro.UnitCount.UnitCountAtLeast
-import bwapi.{UnitType, UpgradeType}
+import ProxyBwapi.UnitClass._
+import ProxyBwapi.Upgrades.Upgrades
+import bwapi.UpgradeType
 
 class ProtossVsProtoss extends Parallel {
   
@@ -15,65 +17,64 @@ class ProtossVsProtoss extends Parallel {
   
   //http://wiki.teamliquid.net/starcraft/4_Gate_Goon_(vs._Protoss)
   val _fourGateGoons = List[BuildRequest] (
-    new RequestUnitAnotherOne(UnitType.Protoss_Nexus),
-    new RequestUnitAnotherOne(UnitType.Protoss_Probe),
-    new RequestUnitAnotherOne(UnitType.Protoss_Probe),
-    new RequestUnitAnotherOne(UnitType.Protoss_Probe),
-    new RequestUnitAnotherOne(UnitType.Protoss_Probe),
-    new RequestUnitAnotherOne(UnitType.Protoss_Probe),
-    new RequestUnitAnotherOne(UnitType.Protoss_Probe),
-    new RequestUnitAnotherOne(UnitType.Protoss_Probe),
-    new RequestUnitAnotherOne(UnitType.Protoss_Probe),
-    new RequestUnitAnotherOne(UnitType.Protoss_Pylon), //8
-    new RequestUnitAnotherOne(UnitType.Protoss_Probe),
-    new RequestUnitAnotherOne(UnitType.Protoss_Probe),
-    new RequestUnitAnotherOne(UnitType.Protoss_Gateway), //10
-    new RequestUnitAnotherOne(UnitType.Protoss_Probe),
-    new RequestUnitAnotherOne(UnitType.Protoss_Probe),
-    new RequestUnitAnotherOne(UnitType.Protoss_Pylon), //12
-    new RequestUnitAnotherOne(UnitType.Protoss_Probe),
-    new RequestUnitAnotherOne(UnitType.Protoss_Zealot), //13
-    new RequestUnitAnotherOne(UnitType.Protoss_Probe),
-    new RequestUnitAnotherOne(UnitType.Protoss_Assimilator), //16
-    new RequestUnitAnotherOne(UnitType.Protoss_Probe),
-    new RequestUnitAnotherOne(UnitType.Protoss_Cybernetics_Core), //17
-    new RequestUnitAnotherOne(UnitType.Protoss_Probe),
-    new RequestUnitAnotherOne(UnitType.Protoss_Zealot), //18
-    new RequestUnitAnotherOne(UnitType.Protoss_Probe),
-    new RequestUnitAnotherOne(UnitType.Protoss_Probe),
-    new RequestUnitAnotherOne(UnitType.Protoss_Pylon), //22
-    new RequestUnitAnotherOne(UnitType.Protoss_Probe),
-    new RequestUnitAnotherOne(UnitType.Protoss_Dragoon), //23
-    new RequestUnitAnotherOne(UnitType.Protoss_Probe),
-    new RequestUpgrade(UpgradeType.Singularity_Charge), //26
-    new RequestUnitAnotherOne(UnitType.Protoss_Probe),
-    new RequestUnitAnotherOne(UnitType.Protoss_Dragoon), //27
-    new RequestUnitAnotherOne(UnitType.Protoss_Probe),
-    new RequestUnitAnotherOne(UnitType.Protoss_Probe),
-    new RequestUnitAnotherOne(UnitType.Protoss_Gateway), //31
-    new RequestUnitAnotherOne(UnitType.Protoss_Gateway), //31
-    new RequestUnitAnotherOne(UnitType.Protoss_Gateway), //31
-    new RequestUnitAnotherOne(UnitType.Protoss_Dragoon), //31
-    new RequestUnitAnotherOne(UnitType.Protoss_Pylon), //33
-    new RequestUnitAnotherOne(UnitType.Protoss_Dragoon), //33
-    new RequestUnitAnotherOne(UnitType.Protoss_Dragoon),
-    new RequestUnitAnotherOne(UnitType.Protoss_Dragoon),
-    new RequestUnitAnotherOne(UnitType.Protoss_Dragoon),
-    new RequestUnitAnotherOne(UnitType.Protoss_Pylon), //33
-    new RequestUnitAnotherOne(UnitType.Protoss_Dragoon), //33
-    new RequestUnitAnotherOne(UnitType.Protoss_Dragoon),
-    new RequestUnitAnotherOne(UnitType.Protoss_Dragoon),
-    new RequestUnitAnotherOne(UnitType.Protoss_Dragoon),
-    new RequestUnitAnotherOne(UnitType.Protoss_Nexus)
+    new RequestUnitAnotherOne(Nexus),
+    new RequestUnitAnotherOne(Probe),
+    new RequestUnitAnotherOne(Probe),
+    new RequestUnitAnotherOne(Probe),
+    new RequestUnitAnotherOne(Probe),
+    new RequestUnitAnotherOne(Probe),
+    new RequestUnitAnotherOne(Probe),
+    new RequestUnitAnotherOne(Probe),
+    new RequestUnitAnotherOne(Probe),
+    new RequestUnitAnotherOne(Pylon), //8
+    new RequestUnitAnotherOne(Probe),
+    new RequestUnitAnotherOne(Probe),
+    new RequestUnitAnotherOne(Gateway), //10
+    new RequestUnitAnotherOne(Probe),
+    new RequestUnitAnotherOne(Probe),
+    new RequestUnitAnotherOne(Pylon), //12
+    new RequestUnitAnotherOne(Probe),
+    new RequestUnitAnotherOne(Zealot), //13
+    new RequestUnitAnotherOne(Probe),
+    new RequestUnitAnotherOne(Assimilator), //16
+    new RequestUnitAnotherOne(Probe),
+    new RequestUnitAnotherOne(CyberneticsCore), //17
+    new RequestUnitAnotherOne(Probe),
+    new RequestUnitAnotherOne(Zealot), //18
+    new RequestUnitAnotherOne(Probe),
+    new RequestUnitAnotherOne(Probe),
+    new RequestUnitAnotherOne(Pylon), //22
+    new RequestUnitAnotherOne(Probe),
+    new RequestUnitAnotherOne(Dragoon), //23
+    new RequestUnitAnotherOne(Probe),
+    new RequestUpgrade(Upgrades.get(UpgradeType.Singularity_Charge)), //26
+    new RequestUnitAnotherOne(Probe),
+    new RequestUnitAnotherOne(Dragoon), //27
+    new RequestUnitAnotherOne(Probe),
+    new RequestUnitAnotherOne(Probe),
+    new RequestUnitAnotherOne(Gateway), //31
+    new RequestUnitAnotherOne(Gateway), //31
+    new RequestUnitAnotherOne(Gateway), //31
+    new RequestUnitAnotherOne(Dragoon), //31
+    new RequestUnitAnotherOne(Pylon), //33
+    new RequestUnitAnotherOne(Dragoon), //33
+    new RequestUnitAnotherOne(Dragoon),
+    new RequestUnitAnotherOne(Dragoon),
+    new RequestUnitAnotherOne(Dragoon),
+    new RequestUnitAnotherOne(Pylon), //33
+    new RequestUnitAnotherOne(Dragoon), //33
+    new RequestUnitAnotherOne(Dragoon),
+    new RequestUnitAnotherOne(Dragoon),
+    new RequestUnitAnotherOne(Dragoon),
+    new RequestUnitAnotherOne(Nexus)
   )
   
   children.set(List(
     new ScheduleBuildOrder { buildables.set(_fourGateGoons) },
     //new BuildPylonsContinuously,
     //new TrainProbesContinuously,
-    //new TrainContinuously(UnitType.Protoss_Scout),
-    //new TrainContinuously(UnitType.Protoss_Zealot),
-    new ScheduleBuildOrder { buildables.set(MassScoutLateGame.build) },
+    //new TrainContinuously(Scout),
+    //new TrainContinuously(Zealot),
     new ScoutAt(20),
     new IfThenElse {
       predicate.set(new UnitCountAtLeast { quantity.set(6); unitMatcher.set(UnitMatchWarriors) })

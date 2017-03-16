@@ -1,22 +1,22 @@
 package Micro.Behaviors
+import Micro.Intentions.Intention
 import Micro.Movement.{EvaluatePositions, MovementProfile}
 import Micro.Targeting.{EvaluateTargets, TargetingProfile, Targets}
+import ProxyBwapi.UnitClass.{Carrier, Reaver}
 import Startup.With
-import Micro.Intentions.Intention
 import Utilities.TypeEnrichment.EnrichPosition._
-import bwapi.UnitType
 
 object DefaultBehavior extends Behavior {
   
   def execute(intent: Intention) {
   
-    if (intent.unit.utype == UnitType.Protoss_Reaver
+    if (intent.unit.utype == Reaver
       && intent.unit.trainingQueue.isEmpty
       && intent.unit.scarabs < 5) {
       With.commander.buildScarab(intent.unit)
       return
     }
-    if (intent.unit.utype == UnitType.Protoss_Carrier
+    if (intent.unit.utype == Carrier
       && intent.unit.trainingQueue.isEmpty
       && intent.unit.interceptors < 8) {
       With.commander.buildInterceptor(intent.unit)

@@ -1,17 +1,17 @@
 package Macro.Scheduling.Optimization
 
-import ProxyBwapi.Techs.TechTypes
-import ProxyBwapi.Upgrades.UpgradeTypes
+import ProxyBwapi.Techs.{TechTypes, Techs}
+import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.Upgrades.{UpgradeTypes, Upgrades}
 import Startup.With
 import Utilities.CountMap
-import bwapi.UnitType
 
 import scala.collection.{breakOut, mutable}
 
 object ScheduleSimulationStateBuilder {
   def build:ScheduleSimulationState = {
-    val techsOwned    = TechTypes.all.filter(With.self.hasResearched).to[mutable.HashSet]
-    val upgradesOwned = UpgradeTypes.all.map(upgrade => (upgrade, With.self.getUpgradeLevel(upgrade))).toMap
+    val techsOwned    = TechTypes.all.filter(With.self.hasResearched).map(Techs.get).to[mutable.HashSet]
+    val upgradesOwned = UpgradeTypes.all.map(upgrade => (Upgrades.get(upgrade), With.self.getUpgradeLevel(upgrade))).toMap
   
     val output = new ScheduleSimulationState(
       frame           = With.frame,
@@ -29,8 +29,8 @@ object ScheduleSimulationStateBuilder {
     output
   }
   
-  def unitCount:CountMap[UnitType] = {
-    val output = new CountMap[UnitType]
+  def unitCount:CountMap[UnitClass] = {
+    val output = new CountMap[UnitClass]
     With.units.ours
       .groupBy(_.utype)
       .foreach(pair => output.put(pair._1, pair._2.size))

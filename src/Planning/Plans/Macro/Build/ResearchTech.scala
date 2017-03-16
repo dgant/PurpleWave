@@ -1,21 +1,21 @@
 package Planning.Plans.Macro.Build
 
-import Planning.Plans.Allocation.{LockCurrencyForTech, LockUnits}
-import Planning.Plan
-import Startup.With
 import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Composition.UnitMatchers.UnitMatchType
-import bwapi.TechType
+import Planning.Plan
+import Planning.Plans.Allocation.{LockCurrencyForTech, LockUnits}
+import ProxyBwapi.Techs.{NoTech, Tech}
+import Startup.With
 
-class ResearchTech(techType: TechType) extends Plan {
+class ResearchTech(tech: Tech) extends Plan {
   
-  val currency = new LockCurrencyForTech(techType)
+  val currency = new LockCurrencyForTech(tech)
   val researcher = new LockUnits {
     unitCounter.set(UnitCountOne)
-    unitMatcher.set(new UnitMatchType(techType.whatResearches))
+    unitMatcher.set(new UnitMatchType(tech.whatResearches))
   }
   
-  override def isComplete: Boolean = With.self.hasResearched(techType)
+  override def isComplete: Boolean = With.self.hasResearched(tech.base)
   override def getChildren: Iterable[Plan] = List (currency, researcher)
   
   override def onFrame() {
@@ -30,11 +30,11 @@ class ResearchTech(techType: TechType) extends Plan {
     }
     
     val researcherUnit = researcher.units.head
-    if (researcherUnit.teching == techType) {
+    if (researcherUnit.teching == tech) {
       currency.isSpent = true
     }
-    else if (researcherUnit.teching == TechType.None) {
-      researcherUnit.baseUnit.research(techType)
+    else if (researcherUnit.teching == NoTech) {
+      researcherUnit.baseUnit.research(tech.base)
       currency.isSpent = true
     }
   }

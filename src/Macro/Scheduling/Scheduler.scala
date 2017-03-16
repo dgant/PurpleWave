@@ -5,9 +5,9 @@ import Macro.Buildables.Buildable
 import Macro.Scheduling.Optimization.ScheduleSimulationResult
 import Performance.Caching.Limiter
 import Planning.Plan
+import ProxyBwapi.UnitClass.UnitClass
 import Startup.With
 import Utilities.{CountMap, CountMapper}
-import bwapi.UnitType
 
 import scala.collection.mutable
 
@@ -34,24 +34,24 @@ class Scheduler {
   private val updateQueueLimiter = new Limiter(2, () => updateQueue())
   private def updateQueue() {
     val requestQueue = requestsByPlan.keys.toList.sortBy(With.prioritizer.getPriority).flatten(requestsByPlan)
-    val unitsWanted = new CountMap[UnitType]
-    val unitsActual:CountMap[UnitType] = CountMapper.make(With.units.ours.groupBy(_.utype).mapValues(_.size))
+    val unitsWanted = new CountMap[UnitClass]
+    val unitsActual:CountMap[UnitClass] = CountMapper.make(With.units.ours.groupBy(_.utype).mapValues(_.size))
     queueOriginal = requestQueue.flatten(buildable => getUnfulfilledBuildables(buildable, unitsWanted, unitsActual))
     //simulationResults = ScheduleSimulator.simulate(queueOriginal)
   }
   
   private def getUnfulfilledBuildables(
     request:BuildRequest,
-    unitsWanted:CountMap[UnitType],
-    unitsActual:CountMap[UnitType]):Iterable[Buildable] = {
+    unitsWanted:CountMap[UnitClass],
+    unitsActual:CountMap[UnitClass]):Iterable[Buildable] = {
     if (request.buildable.upgradeOption.nonEmpty) {
-      if(With.self .getUpgradeLevel(request.buildable.upgradeOption.get) >= request.buildable.upgradeLevel)
+      if(With.self.getUpgradeLevel(request.buildable.upgradeOption.get.base) >= request.buildable.upgradeLevel)
         return List(request.buildable)
       else
         return None
     }
     else if (request.buildable.techOption.nonEmpty) {
-      if (With.self.hasResearched(request.buildable.techOption.get))
+      if (With.self.hasResearched(request.buildable.techOption.get.base))
         return List(request.buildable)
       else
         return None

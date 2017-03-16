@@ -1,5 +1,6 @@
 package ProxyBwapi.UnitInfo
 
+import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
 import Startup.With
 import Utilities.TypeEnrichment.EnrichPosition._
 import bwapi._
@@ -15,7 +16,7 @@ class ForeignUnitInfo(_baseUnit:bwapi.Unit) extends UnitInfo (_baseUnit) {
   var _tileTopleft        = new TilePosition(0,0)
   var _hitPoints          = 0
   var _shieldPoints       = 0
-  var _unitType           = UnitType.None
+  var _class           = UnitClasses.get(UnitType.None)
   var _complete           = false
   var _flying             = false
   var _visible            = false
@@ -44,7 +45,7 @@ class ForeignUnitInfo(_baseUnit:bwapi.Unit) extends UnitInfo (_baseUnit) {
     _tileTopleft        = unit.getTilePosition
     _hitPoints          = unit.getHitPoints
     _shieldPoints       = unit.getShields
-    _unitType           = unit.getType
+    _class           = UnitClasses.get(unit.getType)
     _complete           = unit.isCompleted
     _flying             = unit.isFlying
     _visible            = unit.isVisible
@@ -74,12 +75,12 @@ class ForeignUnitInfo(_baseUnit:bwapi.Unit) extends UnitInfo (_baseUnit) {
   override def lastSeen             : Int             = _lastSeen
   override def possiblyStillThere   : Boolean         = _possiblyStillThere
   override def player               : Player          = _player
-  override def pixel             : Position        = _position
+  override def pixel                : Position        = _position
   override def walkPosition         : WalkPosition    = pixel.toWalkPosition
   override def tileTopLeft          : TilePosition    = _tileTopleft
   override def hitPoints            : Int             = _hitPoints
   override def shieldPoints         : Int             = _shieldPoints
-  override def utype                : UnitType        = if (_unitType == UnitType.Terran_Siege_Tank_Tank_Mode && (morphing || ! visible)) UnitType.Terran_Siege_Tank_Siege_Mode else _unitType
+  override def utype                : UnitClass       = _class//TODO: Re-add siege tank logic = if (_unitType == UnitType.Terran_Siege_Tank_Tank_Mode && (morphing || ! visible)) UnitType.Terran_Siege_Tank_Siege_Mode else _unitType
   override def complete             : Boolean         = _complete
   override def flying               : Boolean         = _flying
   override def visible              : Boolean         = _visible

@@ -1,8 +1,8 @@
 package Planning.Plans.Allocation
 
-import bwapi.UpgradeType
+import ProxyBwapi.Upgrades.Upgrade
 
-class LockCurrencyForUpgrade(upgradeType: UpgradeType, level:Int)
+class LockCurrencyForUpgrade(upgradeType: Upgrade, level:Int)
   extends LockCurrency {
     minerals = upgradeType.mineralPrice(level)
     gas = upgradeType.gasPrice(level)

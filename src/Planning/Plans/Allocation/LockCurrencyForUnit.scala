@@ -1,10 +1,10 @@
 package Planning.Plans.Allocation
 
-import bwapi.UnitType
+import ProxyBwapi.UnitClass.UnitClass
 
-class LockCurrencyForUnit(unitType: UnitType)
+class LockCurrencyForUnit(unitType: UnitClass)
   extends LockCurrency {
-  minerals = unitType.mineralPrice()
-  gas = unitType.gasPrice()
-  supply = unitType.supplyRequired()
+  minerals = unitType.mineralPrice
+  gas = unitType.gasPrice
+  supply = unitType.supplyRequired
 }

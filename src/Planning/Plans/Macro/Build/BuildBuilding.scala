@@ -3,26 +3,27 @@ package Planning.Plans.Macro.Build
 import Debugging.TypeDescriber
 import Debugging.Visualization.DrawMap
 import Micro.Behaviors.DefaultBehavior
-import Planning.Plans.Allocation.{LockCurrencyForUnit, LockUnits}
-import Planning.Plan
-import Startup.With
+import Micro.Intentions.Intention
 import Planning.Composition.PositionFinders.PositionSimpleBuilding
 import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Composition.UnitPreferences.UnitPreferClose
-import Micro.Intentions.Intention
+import Planning.Plan
+import Planning.Plans.Allocation.{LockCurrencyForUnit, LockUnits}
+import ProxyBwapi.UnitClass.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Startup.With
 import Utilities.TypeEnrichment.EnrichPosition._
-import bwapi.{Position, Race, TilePosition, UnitType}
+import bwapi.{Position, Race, TilePosition}
 
-class BuildBuilding(val buildingType:UnitType) extends Plan {
+class BuildBuilding(val buildingType:UnitClass) extends Plan {
   
   val buildingPlacer = new PositionSimpleBuilding(buildingType)
   val currencyPlan = new LockCurrencyForUnit(buildingType)
   val builderPlan = new LockUnits {
     description.set("Get a builder")
     unitCounter.set(UnitCountOne)
-    unitMatcher.set(new UnitMatchType(buildingType.whatBuilds.first))
+    unitMatcher.set(new UnitMatchType(buildingType.whatBuilds._1))
     unitPreference.set(new UnitPreferClose { positionFinder.set(buildingPlacer)})
   }
   
@@ -79,15 +80,11 @@ class BuildBuilding(val buildingType:UnitType) extends Plan {
   private def orderToBuild(builder:FriendlyUnitInfo) {
     if (lastOrderFrame < With.frame - 24) {
       lastOrderFrame = With.frame
-      
-      if ( ! position.exists(p => With.game.canBuildHere(p, buildingType, builder.baseUnit))) {
-        position = buildingPlacer.find
-      }
-  
+      position = buildingPlacer.find
       if (position.nonEmpty)  {
         // This avoids trying to build in fog of war
         if (builder.distance(position.get) < 32 * 6) {
-          builder.baseUnit.build(buildingType, position.get)
+          builder.baseUnit.build(buildingType.base, position.get)
         } else {
           With.commander.intend(new Intention(this, builder, DefaultBehavior, position.get))
         }

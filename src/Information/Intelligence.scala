@@ -3,7 +3,6 @@ package Information
 import Startup.With
 import ProxyBwapi.UnitInfo.ForeignUnitInfo
 import Performance.Caching.Cache
-import Utilities.TypeEnrichment.EnrichUnitType._
 import bwapi.TilePosition
 
 import scala.collection.JavaConverters._

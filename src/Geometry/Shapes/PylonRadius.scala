@@ -2,7 +2,7 @@ package Geometry.Shapes
 
 import bwapi.TilePosition
 
-object Pylon {
+object PylonRadius {
   
   //Handy reference:
   //https://github.com/tscmoo/tsc-bwai/blob/6c93fd0877da55b101c8b48a8ac5d7bce60561f6/src/pylons.h

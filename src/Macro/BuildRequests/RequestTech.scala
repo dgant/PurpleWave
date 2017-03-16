@@ -1,6 +1,6 @@
 package Macro.BuildRequests
 
 import Macro.Buildables.BuildableTech
-import bwapi.TechType
+import ProxyBwapi.Techs.Tech
 
-case class RequestTech(techType: TechType) extends BuildRequest(new BuildableTech(techType))
+case class RequestTech(tech: Tech) extends BuildRequest(new BuildableTech(tech))

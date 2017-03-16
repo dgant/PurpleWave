@@ -1,16 +1,16 @@
 package Startup
 
 import Debugging.{Visualization, _}
-import Macro.Allocation._
-import Micro.Battles.Battles
-import ProxyBwapi.UnitTracking.UnitTracker
-import Information.Grids.Grids
 import Information.Geography.Geography
+import Information.Grids.Grids
 import Information._
-import Macro.Scheduling.Scheduler
-import Planning.Plans.GamePlans.WinTheGame
+import Macro.Allocation._
 import Macro.Architect
+import Macro.Scheduling.Scheduler
+import Micro.Battles.Battles
 import Micro.{Commander, Paths}
+import Planning.Plans.GamePlans.WinTheGame
+import ProxyBwapi.UnitTracking.UnitTracker
 import _root_.Performance.Latency
 import bwapi.DefaultBWListener
 import bwta.BWTA
@@ -41,7 +41,6 @@ class Bot() extends DefaultBWListener {
       With.economy      = new Economy
       With.geography    = new Geography
       With.gameplan     = new WinTheGame
-      With.history      = new History
       With.intelligence = new Intelligence
       With.latency      = new Latency
       With.grids        = new Grids
@@ -104,7 +103,6 @@ class Bot() extends DefaultBWListener {
   override def onUnitDestroy(unit: bwapi.Unit) {
     try {
       With.units.onUnitDestroy(unit)
-      With.history.onUnitDestroy(unit)
     }
     catch { case exception:Exception =>
       val dontLoseTheExceptionWhileDebugging = exception

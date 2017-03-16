@@ -5,7 +5,7 @@ import Performance.Caching.Cache
 import ProxyBwapi.UnitClass.{Protoss, UnitClass}
 import Startup.With
 import Utilities.TypeEnrichment.EnrichPosition._
-import bwapi.{TilePosition, UnitType}
+import bwapi.TilePosition
 
 class PositionSimpleBuilding(
   val buildingType:UnitClass)
@@ -16,7 +16,7 @@ class PositionSimpleBuilding(
   private def findRecalculate: Option[TilePosition] = {
     
     //Short-circuits for performance
-    if (buildingType.requiresPsi && ! With.units.ours.exists(_.utype == UnitType.Protoss_Pylon)) {
+    if (buildingType.requiresPsi && ! With.units.ours.exists(_.utype == Protoss.Pylon)) {
       return None
     }
     if (findCache.lastValue.isDefined && findCache.lastValue.get.isDefined) {

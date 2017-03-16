@@ -57,10 +57,10 @@ class Scheduler {
         return None
     }
     else {
-      val unitType = request.buildable.unitOption.get
-      unitsWanted.add(unitType, request.add)
-      unitsWanted.put(unitType, Math.max(request.require, unitsWanted(unitType)))
-      val difference = unitsWanted(unitType) - unitsActual(unitType)
+      val unit = request.buildable.unitOption.get
+      unitsWanted.add(unit, request.add)
+      unitsWanted.put(unit, Math.max(request.require, unitsWanted(unit)))
+      val difference = unitsWanted(unit) - unitsActual(unit)
       if (difference > 0) {
         val buildables = (0 until difference).map(i => request.buildable)
         return buildables

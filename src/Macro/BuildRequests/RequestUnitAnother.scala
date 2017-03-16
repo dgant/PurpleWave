@@ -2,8 +2,7 @@ package Macro.BuildRequests
 
 import Macro.Buildables.BuildableUnit
 import ProxyBwapi.UnitClass.UnitClass
-import bwapi.UnitType
 
-case class RequestUnitAnother(quantity:Int, unitType: UnitClass) extends BuildRequest(new BuildableUnit(unitType)) {
+case class RequestUnitAnother(quantity:Int, unit: UnitClass) extends BuildRequest(new BuildableUnit(unit)) {
   override def add: Int = quantity
 }

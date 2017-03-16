@@ -1,11 +1,12 @@
 package Micro
 
-import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Micro.Behaviors.Behavior
 import Micro.Intentions.Intention
+import ProxyBwapi.Races.Protoss
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Startup.With
 import Utilities.CountMap
-import bwapi.{Position, UnitType}
+import bwapi.Position
 
 import scala.collection.mutable
 
@@ -48,13 +49,13 @@ class Commander {
   
   def buildScarab(unit:FriendlyUnitInfo) {
     //_recordCommand(unit, command)
-    unit.baseUnit.build(UnitType.Protoss_Scarab)
+    unit.baseUnit.build(Protoss.Scarab.baseType)
     sleep(unit, false)
   }
   
   def buildInterceptor(unit:FriendlyUnitInfo) {
     //_recordCommand(unit, command)
-    unit.baseUnit.build(UnitType.Protoss_Interceptor)
+    unit.baseUnit.build(Protoss.Interceptor.baseType)
     sleep(unit, false)
   }
   

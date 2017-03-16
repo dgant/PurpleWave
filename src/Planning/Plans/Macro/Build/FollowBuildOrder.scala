@@ -51,11 +51,11 @@ class FollowBuildOrder extends Plan {
   
   private def buildPlan(buildable:Buildable):Plan = {
     if (buildable.unitOption.nonEmpty) {
-      val unitType = buildable.unitOption.get
-      if (unitType.isBuilding) {
-        return new BuildBuilding(unitType)
+      val unitClass = buildable.unitOption.get
+      if (unitClass.isBuilding) {
+        return new BuildBuilding(unitClass)
       } else {
-        return new TrainUnit(unitType)
+        return new TrainUnit(unitClass)
       }
     }
     if (buildable.techOption.nonEmpty) {

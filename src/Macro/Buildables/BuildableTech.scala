@@ -3,7 +3,6 @@ package Macro.Buildables
 import Debugging.TypeDescriber
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClass.UnitClasses
-import bwapi.UnitType
 
 case class BuildableTech(tech: Tech) extends Buildable {
   
@@ -17,7 +16,7 @@ case class BuildableTech(tech: Tech) extends Buildable {
     List(new BuildableUnit(tech.whatResearches))
   }
   override def requirements: Iterable[BuildableUnit] = {
-    if (tech.requiredUnit != UnitClasses.get(UnitType.None)) {
+    if (tech.requiredUnit != UnitClasses.None) {
       List(new BuildableUnit(tech.requiredUnit))
     }
     else {

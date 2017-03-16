@@ -1,7 +1,7 @@
 package ProxyBwapi.UnitInfo
 
 import Geometry.TileRectangle
-import ProxyBwapi.Races.Protoss
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitClass.UnitClass
 import Startup.With
 import Utilities.TypeEnrichment.EnrichPosition._
@@ -40,11 +40,11 @@ abstract class UnitInfo (var baseUnit:bwapi.Unit) {
   def gasLeft:Int = 0
   def initialResources: Int = 0
   
-  def canFight                                    : Boolean                 = complete && utype.canAttack || List(UnitType.Protoss_Carrier, UnitType.Protoss_Reaver, UnitType.Terran_Bunker).contains(utype)
-  def impactsCombat                               : Boolean                 = canFight || List(UnitType.Terran_Medic).contains(utype) //This ignores spellcasters
+  def canFight                                    : Boolean                 = complete && utype.canAttack || List(Protoss.Carrier, Protoss.Reaver, Terran.Bunker).contains(utype)
+  def impactsCombat                               : Boolean                 = canFight || List(Terran.Medic).contains(utype) //This ignores spellcasters
   def x                                           : Int                     = pixel.getX
   def y                                           : Int                     = pixel.getY
-  def attackFrames                                : Int                     = 8 + (if (List(Protoss.Dragoon /*, Devourer */).contains(utype)) 6 else 0)
+  def attackFrames                                : Int                     = 8 + (if (List(Protoss.Dragoon, Zerg.Devourer).contains(utype)) 6 else 0)
   def isOurs                                      : Boolean                 = player == With.self
   def isFriendly                                  : Boolean                 = isOurs || player.isAlly(With.self)
   def isEnemy                                     : Boolean                 = player.isEnemy(With.self)

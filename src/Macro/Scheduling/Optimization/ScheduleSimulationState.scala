@@ -2,12 +2,12 @@ package Macro.Scheduling.Optimization
 
 import Macro.Buildables.{Buildable, BuildableUnit}
 import Macro.Scheduling.BuildEvent
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
 import ProxyBwapi.Upgrades.Upgrade
 import Startup.With
 import Utilities.CountMap
-import bwapi.UnitType
 
 import scala.collection.mutable
 
@@ -141,12 +141,12 @@ class ScheduleSimulationState(
   private def mineralsPerFrame : Double  = With.economy.mineralIncomePerMinute (numberOfMiners,   numberOfBases) / 24.0 / 60.0
   private def gasPerFrame      : Double  = With.economy.gasIncomePerMinute     (numberOfDrillers, numberOfBases) / 24.0 / 60.0
   
-  private def owned     (unitType: UnitClass) : Int = unitsOwned     (unitType)
-  private def available (unitType: UnitClass) : Int = unitsAvailable (unitType)
-  private def numberOfBases     : Int = List(UnitType.Terran_Command_Center, UnitType.Protoss_Nexus, UnitType.Zerg_Hatchery, UnitType.Zerg_Lair, UnitType.Zerg_Hive).map(UnitClasses.get).map(owned).sum
-  private def numberOfWorkers   : Int = List(UnitType.Terran_SCV, UnitType.Protoss_Probe, UnitType.Zerg_Drone).map(UnitClasses.get).map(available).sum
+  private def owned     (unit: UnitClass) : Int = unitsOwned     (unit)
+  private def available (unit: UnitClass) : Int = unitsAvailable (unit)
+  private def numberOfBases     : Int = List(Terran.CommandCenter, Protoss.Nexus, Zerg.Hatchery, Zerg.Lair, Zerg.Hive).map(owned).sum
+  private def numberOfWorkers   : Int = List(Terran.SCV, Protoss.Probe, Zerg.Drone).map(available).sum
   private def numberOfMiners    : Int = Math.max(0, numberOfWorkers - numberOfDrillers)
-  private def numberOfDrillers  : Int = Math.min(numberOfWorkers / 3, 3 * List(UnitType.Terran_Refinery, UnitType.Protoss_Assimilator, UnitType.Zerg_Extractor).map(UnitClasses.get).map(available).sum)
+  private def numberOfDrillers  : Int = Math.min(numberOfWorkers / 3, 3 * List(Terran.Refinery, Protoss.Assimilator, Zerg.Extractor).map(available).sum)
   
   private def nextEventByStart : BuildEvent = eventQueue.minBy(_.frameStart)
   private def nextEventByEnd   : BuildEvent = eventQueue.minBy(_.frameEnd)
@@ -206,8 +206,8 @@ class ScheduleSimulationState(
   private def endEvent(event: BuildEvent) {
     val buildable = event.buildable
     supplyAvailable += buildable.supplyProvided
-    buildable.unitOption.foreach(unitType => unitsOwned.add(unitType, buildable.unitsProduced))
-    buildable.unitOption.foreach(unitType => unitsAvailable.add(unitType, buildable.unitsProduced))
+    buildable.unitOption.foreach(unit => unitsOwned.add(unit, buildable.unitsProduced))
+    buildable.unitOption.foreach(unit => unitsAvailable.add(unit, buildable.unitsProduced))
     buildable.buildersOccupied.map(_.unit).foreach(unitsAvailable.addOne)
     buildable.techOption.foreach(techsOwned.add)
     buildable.upgradeOption.foreach(upgradeLevels.put(_, buildable.upgradeLevel))

@@ -6,7 +6,7 @@ import ProxyBwapi.Upgrades.Upgrade
 
 object TypeDescriber {
   def unit(unitClass: UnitClass):String =
-    unitClass.base.toString
+    unitClass.baseType.toString
       .replace("Terran_", "")
       .replace("Zerg_", "")
       .replace("Protoss_", "")

@@ -1,10 +1,10 @@
 package Micro.Battles
 
-import ProxyBwapi.UnitClass.UnitClasses
+import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.UnitInfo
 import Startup.With
 import Utilities.TypeEnrichment.EnrichPosition._
-import bwapi.{Position, UnitType}
+import bwapi.Position
 
 object BattleMetrics {
   
@@ -29,8 +29,8 @@ object BattleMetrics {
     //Fails to account for upgrades (including range upgrades)
     //Fails to account for medics
   
-    if (unit.utype == UnitClasses.get(UnitType.Terran_Bunker)) {
-      dps = 4 * UnitClasses.get(UnitType.Terran_Marine).groundDps
+    if (unit.utype == Terran.Bunker) {
+      dps = 4 * Terran.Marine.groundDps
     }
     
     val highGroundBonus =  With.grids.altitudeBonus.get(unit.tileCenter)

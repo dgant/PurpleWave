@@ -1,7 +1,6 @@
 package Planning.Composition.UnitMatchers
 
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Utilities.TypeEnrichment.EnrichUnitType._
 
 object UnitMatchWarriors extends UnitMatcher {
   override def accept(unit: FriendlyUnitInfo):Boolean = {

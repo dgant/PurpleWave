@@ -7,7 +7,6 @@ import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, UnitInfo}
 import Startup.With
 import Utilities.TypeEnrichment.EnrichPosition._
-import Utilities.TypeEnrichment.EnrichUnitType._
 import bwapi.TilePosition
 import bwta.BWTA
 

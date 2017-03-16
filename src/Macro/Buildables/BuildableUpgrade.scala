@@ -3,7 +3,6 @@ package Macro.Buildables
 import Debugging.TypeDescriber
 import ProxyBwapi.UnitClass.UnitClasses
 import ProxyBwapi.Upgrades.Upgrade
-import bwapi.UnitType
 
 case class BuildableUpgrade(upgrade:Upgrade, level:Int=1) extends Buildable {
   
@@ -20,7 +19,7 @@ case class BuildableUpgrade(upgrade:Upgrade, level:Int=1) extends Buildable {
   
   override def requirements: Iterable[BuildableUnit] = {
     val requirement = upgrade.whatsRequired(upgradeLevel)
-    if (requirement != UnitClasses.get(UnitType.None)) {
+    if (requirement != UnitClasses.None) {
       List(new BuildableUnit(requirement))
     }
     else {

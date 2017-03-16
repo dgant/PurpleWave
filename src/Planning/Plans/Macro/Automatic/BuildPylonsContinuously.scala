@@ -1,7 +1,7 @@
 package Planning.Plans.Macro.Automatic
 
+import ProxyBwapi.Races.Protoss
 import Startup.With
-import bwapi.UnitType
 
 class BuildPylonsContinuously  {
   
@@ -28,7 +28,7 @@ class BuildPylonsContinuously  {
     //   #1 Supply that is/will be provided by units that exist
     //   #2 Supply that will be provided by plans for which we haven't started building
   
-    val pylon                     = UnitType.Protoss_Pylon
+    val pylon                     = Protoss.Pylon
     val supplyPerDepot            = With.self.getRace.getSupplyProvider.supplyProvided
     val currentSupplyOfNexus      = With.units.ours.filter(_.utype != pylon).toSeq.map(_.utype.supplyProvided).sum
     val currentSupplyUsed         = With.self.supplyUsed

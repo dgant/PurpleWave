@@ -87,7 +87,7 @@ class TrainUnit(val traineeType:UnitClass) extends Plan {
   private def orderUnit(newTrainer:FriendlyUnitInfo) {
     trainer = Some(newTrainer)
     currency.isSpent = true
-    newTrainer.baseUnit.train(traineeType.base)
+    newTrainer.baseUnit.train(traineeType.baseType)
     lastOrderFrame = With.frame
   }
 }

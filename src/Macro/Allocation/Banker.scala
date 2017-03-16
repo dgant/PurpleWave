@@ -6,35 +6,35 @@ import Startup.With
 import scala.collection.mutable
 
 class Banker {
-  var _mineralsLeft = 0
-  var _gasLeft = 0
-  var _supplyLeft = 0
-  val _requests = new mutable.HashSet[LockCurrency]()
+  private var mineralsLeft  = 0
+  private var gasLeft       = 0
+  private var supplyLeft    = 0
+  private val requests      = new mutable.HashSet[LockCurrency]()
   
   def onFrame() {
-    _requests.clear()
+    requests.clear()
     recountResources()
   }
   
-  def getPrioritizedRequests:Iterable[LockCurrency] = {
-    _requests.toSeq.sortBy(With.prioritizer.getPriority(_))
+  def prioritizedRequests:Iterable[LockCurrency] = {
+    requests.toSeq.sortBy(With.prioritizer.getPriority(_))
   }
   
-  def recountResources() {
-    _mineralsLeft  = With.self.minerals
-    _gasLeft       = With.self.gas
-    _supplyLeft    = With.self.supplyTotal - With.self.supplyUsed
-    getPrioritizedRequests.foreach(queueBuyer)
+  private def recountResources() {
+    mineralsLeft  = With.self.minerals
+    gasLeft       = With.self.gas
+    supplyLeft    = With.self.supplyTotal - With.self.supplyUsed
+    prioritizedRequests.foreach(queueBuyer)
   }
   
   def add(request:LockCurrency) {
-    _requests.add(request)
+    requests.add(request)
     recountResources()
   }
   
   def remove(request:LockCurrency) {
     request.isSatisfied = false
-    _requests.remove(request)
+    requests.remove(request)
     recountResources()
   }
   
@@ -42,15 +42,15 @@ class Banker {
     request.isSatisfied = request.isSpent || isAvailableNow(request)
     
     if ( ! request.isSpent) {
-      _mineralsLeft -= request.minerals
-      _gasLeft      -= request.gas
-      _supplyLeft   -= request.supply
+      mineralsLeft -= request.minerals
+      gasLeft      -= request.gas
+      supplyLeft   -= request.supply
     }
   }
   
   private def isAvailableNow(request:LockCurrency): Boolean = {
-    (request.minerals == 0  ||  _mineralsLeft  >= request.minerals) &&
-    (request.gas      == 0  ||  _gasLeft       >= request.gas)      &&
-    (request.supply   == 0  ||  _supplyLeft    >= request.supply)
+    (request.minerals == 0  ||  mineralsLeft  >= request.minerals) &&
+    (request.gas      == 0  ||  gasLeft       >= request.gas)      &&
+    (request.supply   == 0  ||  supplyLeft    >= request.supply)
   }
 }

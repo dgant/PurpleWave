@@ -6,7 +6,7 @@ object VisualizeResources {
   def render() {
     DrawScreen.header(
       305,
-      With.bank.getPrioritizedRequests
+      With.bank.prioritizedRequests
         .take(8)
         .map(r =>
           (if (r.isSatisfied) "X " else "  ") ++

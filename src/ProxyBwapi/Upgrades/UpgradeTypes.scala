@@ -1,4 +1,4 @@
-package ProxyBwapi.BwapiTypes
+package ProxyBwapi.Upgrades
 
 import bwapi.UpgradeType
 

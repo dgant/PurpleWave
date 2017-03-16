@@ -1,13 +1,12 @@
 package Planning.Plans.GamePlans
 
+import Macro.BuildRequests.{BuildRequest, RequestUnitAnotherOne, RequestUpgrade}
+import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plans.Army.{Attack, DefendChoke}
 import Planning.Plans.Compound.{IfThenElse, Parallel}
 import Planning.Plans.Information.ScoutAt
-import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.Build.ScheduleBuildOrder
 import Planning.Plans.Macro.UnitCount.UnitCountAtLeast
-import Planning.Composition.UnitMatchers.UnitMatchWarriors
-import Macro.BuildRequests.{BuildRequest, RequestUnitAnotherOne, RequestUpgrade}
 import bwapi.{UnitType, UpgradeType}
 
 class ProtossVsZerg extends Parallel {
@@ -67,10 +66,10 @@ class ProtossVsZerg extends Parallel {
   
   children.set(List(
     new ScheduleBuildOrder { buildables.set(_oneBaseSpeedlot) },
-    new BuildPylonsContinuously,
-    new TrainWorkersContinuously,
-    new TrainContinuously(UnitType.Protoss_Scout),
-    new TrainContinuously(UnitType.Protoss_Zealot),
+    //new BuildPylonsContinuously,
+    //new TrainProbesContinuously,
+    //new TrainContinuously(UnitType.Protoss_Scout),
+    //new TrainContinuously(UnitType.Protoss_Zealot),
     new ScheduleBuildOrder { buildables.set(MassScoutLateGame.build) },
     new ScoutAt(20),
     new IfThenElse {

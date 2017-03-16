@@ -4,7 +4,6 @@ import Macro.BuildRequests._
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.Parallel
 import Planning.Plans.Information.ScoutAt
-import Planning.Plans.Macro.Automatic.{BuildPylonsContinuously, TrainWorkersContinuously, TrainContinuously}
 import Planning.Plans.Macro.Build.ScheduleBuildOrder
 import bwapi.{UnitType, UpgradeType}
 
@@ -85,12 +84,12 @@ class ProtossVsTerran extends Parallel {
   
   children.set(List(
     new ScheduleBuildOrder { buildables.set(_14Nexus) },
-    new TrainWorkersContinuously,
-    new BuildPylonsContinuously,
-    new TrainContinuously(UnitType.Protoss_Carrier),
-    new TrainContinuously(UnitType.Protoss_Reaver),
-    new TrainContinuously(UnitType.Protoss_Dragoon),
-    new TrainContinuously(UnitType.Protoss_Zealot),
+    //new TrainProbesContinuously,
+    //new BuildPylonsContinuously,
+    //new TrainContinuously(UnitType.Protoss_Carrier),
+    //new TrainContinuously(UnitType.Protoss_Reaver),
+    //new TrainContinuously(UnitType.Protoss_Dragoon),
+    //new TrainContinuously(UnitType.Protoss_Zealot),
     new ScheduleBuildOrder { buildables.set(_lateGame) },
     new ScoutAt(28),
     new Attack

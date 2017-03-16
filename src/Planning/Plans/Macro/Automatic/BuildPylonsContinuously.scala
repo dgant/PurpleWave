@@ -3,9 +3,9 @@ package Planning.Plans.Macro.Automatic
 import Startup.With
 import bwapi.UnitType
 
-class BuildPylonsContinuously extends TrainContinuously(UnitType.Protoss_Pylon) {
+class BuildPylonsContinuously  {
   
-  override protected def totalRequiredRecalculate: Int = {
+  def totalRequiredRecalculate: Int = {
   
     // Remember! BWAPI doubles all supply numbers (so that Zerglings can each cost 1)
     //

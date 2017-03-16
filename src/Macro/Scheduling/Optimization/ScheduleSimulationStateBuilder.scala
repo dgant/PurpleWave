@@ -1,6 +1,7 @@
 package Macro.Scheduling.Optimization
 
-import ProxyBwapi.BwapiTypes.{TechTypes, UpgradeTypes}
+import ProxyBwapi.Techs.TechTypes
+import ProxyBwapi.Upgrades.UpgradeTypes
 import Startup.With
 import Utilities.CountMap
 import bwapi.UnitType

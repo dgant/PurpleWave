@@ -1,4 +1,4 @@
-package ProxyBwapi.UnitAbstraction
+package ProxyBwapi.UnitTracking
 
 import Geometry.Shapes.Circle
 import Geometry.TileRectangle
@@ -9,7 +9,7 @@ import bwapi.{Position, UnitType}
 
 import scala.collection.JavaConverters._
 
-class Units {
+class UnitTracker {
   
   private val friendlyUnitTracker = new FriendlyUnitTracker
   private val foreignUnitTracker = new ForeignUnitTracker

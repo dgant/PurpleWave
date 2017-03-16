@@ -3,7 +3,7 @@ package Startup
 import Debugging.{Visualization, _}
 import Macro.Allocation._
 import Micro.Battles.Battles
-import ProxyBwapi.UnitAbstraction.Units
+import ProxyBwapi.UnitTracking.UnitTracker
 import Information.Grids.Grids
 import Information.Geography.Geography
 import Information._
@@ -50,7 +50,7 @@ class Bot() extends DefaultBWListener {
       With.prioritizer  = new Prioritizer
       With.recruiter    = new Recruiter
       With.scheduler    = new Scheduler
-      With.units        = new Units
+      With.units        = new UnitTracker
 
       With.game.enableFlag(1)
       With.game.setLocalSpeed(With.configuration.gameSpeed)

@@ -1,4 +1,4 @@
-package ProxyBwapi.UnitAbstraction
+package ProxyBwapi.UnitTracking
 
 import Startup.With
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo

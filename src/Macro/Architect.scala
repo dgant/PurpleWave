@@ -108,7 +108,7 @@ class Architect {
       buildingArea.endExclusive.add(margin, margin))
     
     buildingArea.tiles.forall(_.valid) &&
-    exclusions.filter(_.intersects(buildingArea)).isEmpty &&
+    exclusions.forall( ! _.intersects(buildingArea)) &&
     rectangleIsBuildable(buildingArea, buildingType, hypotheticalPylon) &&
     rectangleContainsOnlyAWorker(marginArea) &&
     marginArea.tiles.forall(With.grids.walkable.get)

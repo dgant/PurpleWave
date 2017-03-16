@@ -3,7 +3,7 @@ package Startup
 import Debugging.{AutoCamera, Configuration, Logger, Performance}
 import Macro.Allocation._
 import Micro.Battles.Battles
-import ProxyBwapi.UnitAbstraction.Units
+import ProxyBwapi.UnitTracking.UnitTracker
 import Information.Grids.Grids
 import Information.Geography.Geography
 import Information._
@@ -35,7 +35,7 @@ object With {
   var prioritizer:Prioritizer = null
   var recruiter:Recruiter = null
   var scheduler:Scheduler = null
-  var units: Units = null
+  var units: UnitTracker = null
   
   var self:Player = null
   var frame = 0

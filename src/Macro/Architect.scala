@@ -2,6 +2,7 @@ package Macro
 
 import Geometry.Shapes.{PylonRadius, Spiral}
 import Geometry.TileRectangle
+import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClass._
 import Startup.With
 import Utilities.TypeEnrichment.EnrichPosition._

@@ -1,7 +1,8 @@
 package ProxyBwapi.UnitInfo
 
 import Geometry.TileRectangle
-import ProxyBwapi.UnitClass.{Protoss, UnitClass}
+import ProxyBwapi.Races.Protoss
+import ProxyBwapi.UnitClass.UnitClass
 import Startup.With
 import Utilities.TypeEnrichment.EnrichPosition._
 import bwapi._

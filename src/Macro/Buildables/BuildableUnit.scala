@@ -1,6 +1,7 @@
 package Macro.Buildables
 
 import Debugging.TypeDescriber
+import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClass._
 
 case class BuildableUnit(val unit: UnitClass) extends Buildable {

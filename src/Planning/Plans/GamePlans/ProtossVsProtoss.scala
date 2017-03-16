@@ -7,6 +7,7 @@ import Planning.Plans.Compound.{IfThenElse, Parallel}
 import Planning.Plans.Information.ScoutAt
 import Planning.Plans.Macro.Build.ScheduleBuildOrder
 import Planning.Plans.Macro.UnitCount.UnitCountAtLeast
+import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClass._
 import ProxyBwapi.Upgrades.Upgrades
 import bwapi.UpgradeType

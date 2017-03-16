@@ -1,0 +1,41 @@
+package ProxyBwapi.Races
+
+import ProxyBwapi.UnitClass.UnitClasses
+import bwapi.UnitType
+
+object Terran {
+  def SCV                 = UnitClasses.get(UnitType.Terran_SCV)
+  def Marine              = UnitClasses.get(UnitType.Terran_Marine)
+  def Firebat             = UnitClasses.get(UnitType.Terran_Firebat)
+  def Medic               = UnitClasses.get(UnitType.Terran_Medic)
+  def Ghost               = UnitClasses.get(UnitType.Terran_Ghost)
+  def Vulture             = UnitClasses.get(UnitType.Terran_Vulture)
+  def SpiderMine          = UnitClasses.get(UnitType.Terran_Vulture_Spider_Mine)
+  def Goliath             = UnitClasses.get(UnitType.Terran_Goliath)
+  def SiegeTankUnsieged   = UnitClasses.get(UnitType.Terran_Siege_Tank_Tank_Mode)
+  def SiegeTankSieged     = UnitClasses.get(UnitType.Terran_Siege_Tank_Siege_Mode)
+  def Wraith              = UnitClasses.get(UnitType.Terran_Wraith)
+  def Dropship            = UnitClasses.get(UnitType.Terran_Dropship)
+  def Valkyrie            = UnitClasses.get(UnitType.Terran_Valkyrie)
+  def ScienceVessel       = UnitClasses.get(UnitType.Terran_Science_Vessel)
+  def Battlecruiser       = UnitClasses.get(UnitType.Terran_Battlecruiser)
+  def NuclearMissile      = UnitClasses.get(UnitType.Terran_Nuclear_Missile)
+  def CommandCenter       = UnitClasses.get(UnitType.Terran_Command_Center)
+  def SupplyDepot         = UnitClasses.get(UnitType.Terran_Supply_Depot)
+  def Refinery            = UnitClasses.get(UnitType.Terran_Refinery)
+  def Barracks            = UnitClasses.get(UnitType.Terran_Barracks)
+  def Academy             = UnitClasses.get(UnitType.Terran_Academy)
+  def Bunker              = UnitClasses.get(UnitType.Terran_Bunker)
+  def EngineeringBay      = UnitClasses.get(UnitType.Terran_Engineering_Bay)
+  def MissileTurret       = UnitClasses.get(UnitType.Terran_Missile_Turret)
+  def Factory             = UnitClasses.get(UnitType.Terran_Factory)
+  def MachineShop         = UnitClasses.get(UnitType.Terran_Machine_Shop)
+  def Starport            = UnitClasses.get(UnitType.Terran_Starport)
+  def ControlTower        = UnitClasses.get(UnitType.Terran_Control_Tower)
+  def Armory              = UnitClasses.get(UnitType.Terran_Armory)
+  def ScienceFacility     = UnitClasses.get(UnitType.Terran_Science_Facility)
+  def CovertOps           = UnitClasses.get(UnitType.Terran_Covert_Ops)
+  def PhysicsLab          = UnitClasses.get(UnitType.Terran_Physics_Lab)
+  def Comsat              = UnitClasses.get(UnitType.Terran_Comsat_Station)
+  def NuclearSilo         = UnitClasses.get(UnitType.Terran_Nuclear_Silo)
+}

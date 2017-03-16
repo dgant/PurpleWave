@@ -2,7 +2,8 @@ package Planning.Composition.PositionFinders
 
 import Geometry.TileRectangle
 import Performance.Caching.Cache
-import ProxyBwapi.UnitClass.{Protoss, UnitClass}
+import ProxyBwapi.Races.Protoss
+import ProxyBwapi.UnitClass.UnitClass
 import Startup.With
 import Utilities.TypeEnrichment.EnrichPosition._
 import bwapi.TilePosition

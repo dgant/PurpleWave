@@ -3,7 +3,7 @@ package Information.Geography
 import Geometry.Shapes.Circle
 import Geometry._
 import Performance.Caching.{Cache, CacheForever, Limiter}
-import ProxyBwapi.UnitClass.Protoss
+import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, UnitInfo}
 import Startup.With
 import Utilities.TypeEnrichment.EnrichPosition._

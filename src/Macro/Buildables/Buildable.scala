@@ -1,5 +1,6 @@
 package Macro.Buildables
 
+import ProxyBwapi.Races.Protoss
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClass._
 import ProxyBwapi.Upgrades.Upgrade

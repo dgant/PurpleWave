@@ -6,7 +6,7 @@ import bwapi.UnitType
 
 import scala.collection.JavaConverters._
 
-case class Class(base:UnitType) {
+case class Clazz(base:UnitType) {
   val abilities             = base.abilities.asScala.map(Techs.get)
   val acceleration          = base.acceleration
   val armorUpgrade          = Upgrades.get(base.armorUpgrade)

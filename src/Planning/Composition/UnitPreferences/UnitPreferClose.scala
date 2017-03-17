@@ -11,7 +11,7 @@ class UnitPreferClose extends UnitPreference {
   
   override def preference(unit: FriendlyUnitInfo): Double = {
     positionFinder.get.find
-      .map(position => position.centerPixel.getDistance(unit.pixelCenter))
+      .map(position => position.pixelCenter.getDistance(unit.pixelCenter))
       .getOrElse(0)
   }
 }

@@ -10,38 +10,34 @@ object BehaviorDefault extends Behavior {
   
   def execute(intent: Intention) {
   
+    val targets = Targets.get(intent)
+    
     if (intent.unit.unitClass == Protoss.Reaver
       && intent.unit.trainingQueue.isEmpty
-      && intent.unit.scarabs < 5) {
-      With.commander.buildScarab(intent.unit)
-      return
+      && intent.unit.scarabs < (if(targets.isEmpty) 5 else 1)) {
+      return With.commander.buildScarab(intent)
     }
     if (intent.unit.unitClass == Protoss.Carrier
       && intent.unit.trainingQueue.isEmpty
-      && intent.unit.interceptors < 8) {
-      With.commander.buildInterceptor(intent.unit)
-      return
+      && intent.unit.interceptors < (if(targets.isEmpty) 8 else 1)) {
+      return With.commander.buildInterceptor(intent)
     }
-  
-    val targets = Targets.get(intent)
     
     if (intent.unit.cooldownRemaining < With.game.getRemainingLatencyFrames) {
       val target = EvaluateTargets.best(intent, defaultTargetProfile, targets)
       if (target.isDefined) {
-        With.commander.attack(intent.unit, target.get)
-        return
+        return With.commander.attack(intent, target.get)
       }
     }
     
     if (intent.destination.isDefined) {
       if (targets.isEmpty) {
-        With.commander.move(intent.unit, intent.destination.get.centerPixel)
-        return
+        return With.commander.move(intent, intent.destination.get.pixelCenter)
       }
     }
     
     val tile = EvaluatePositions.best(intent, defaultMovementProfile)
-    With.commander.move(intent.unit, tile.centerPixel)
+    return With.commander.move(intent, tile.pixelCenter)
   }
   
   val defaultMovementProfile = new MovementProfile (

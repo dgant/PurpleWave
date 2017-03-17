@@ -24,12 +24,12 @@ class FriendlyUnitInfo(friendlyBaseUnit:bwapi.Unit) extends UnitInfo(friendlyBas
   override def possiblyStillThere         : Boolean                   = true
   override def alive                      : Boolean                   = _cacheExists.get
   override def player                     : Player                    = _cachePlayer.get
-  override def pixelCenter                      : Position                  = _cachePosition.get
+  override def pixelCenter                : Position                  = _cachePosition.get
   override def walkPosition               : WalkPosition              = pixelCenter.toWalkPosition
   override def tileTopLeft                : TilePosition              = _cacheTile.get
   override def hitPoints                  : Int                       = baseUnit.getHitPoints
   override def shieldPoints               : Int                       = baseUnit.getShields
-  override def unitClass                      : UnitClass                 = _cacheClass.get
+  override def unitClass                  : UnitClass                 = _cacheClass.get
   override def complete                   : Boolean                   = _cacheCompleted.get
   override def flying                     : Boolean                   = baseUnit.isFlying
   override def visible                    : Boolean                   = baseUnit.isVisible

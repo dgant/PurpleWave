@@ -29,5 +29,5 @@ class Base(
   var townHall:Option[UnitInfo] = None
   def tile:TilePosition = townHallArea.startInclusive
   def centerTile:TilePosition = townHallArea.midpoint
-  def centerPixel:Position = townHallArea.midpoint.centerPixel
+  def centerPixel:Position = townHallArea.midpoint.pixelCenter
 }

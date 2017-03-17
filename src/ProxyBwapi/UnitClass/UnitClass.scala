@@ -1,6 +1,7 @@
 package ProxyBwapi.UnitClass
 
 import Geometry.TileRectangle
+import Micro.Behaviors.{Behavior, BehaviorBuilding, BehaviorDefault, BehaviorWorker}
 import Performance.Caching.CacheForever
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.Techs.Techs
@@ -135,6 +136,12 @@ case class UnitClass(val baseType:UnitType) {
       new TilePosition(0, 0),
       baseType.tileSize)
   def tiles:Iterable[TilePosition] = area.tiles
+  
+  def behavior:Behavior = {
+    if (isWorker) BehaviorWorker
+    else if (isBuilding) BehaviorBuilding
+    else BehaviorDefault
+  }
   
   override def toString:String =
     baseType.toString

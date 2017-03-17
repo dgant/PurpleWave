@@ -1,11 +1,13 @@
 package Micro
 
 import Micro.Behaviors.Behavior
+import Micro.Intentions.Intention
 import ProxyBwapi.Races.Protoss
+import ProxyBwapi.UnitClass.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Startup.With
 import Utilities.CountMap
-import bwapi.Position
+import bwapi.{Position, TilePosition}
 
 import scala.collection.mutable
 
@@ -28,35 +30,63 @@ class Commander {
     nextOrderFrame(unit) < With.frame
   }
   
-  def attack(unit:FriendlyUnitInfo, target:UnitInfo) {
-    unit.baseUnit.attack(target.baseUnit)
-    sleep(unit, true)
+  def attack(intent:Intention, target:UnitInfo) {
+    intent.unit.baseUnit.attack(target.baseUnit)
+    sleepAttack(intent.unit)
   }
   
-  def move(unit:FriendlyUnitInfo, position:Position) {
-    unit.baseUnit.move(position)
-    sleep(unit, false)
+  def move(intent:Intention, position:Position) {
+    intent.unit.baseUnit.move(position)
+    sleepMove(intent.unit)
   }
   
-  def gather(unit:FriendlyUnitInfo, resource:UnitInfo) {
-    unit.baseUnit.gather(resource.baseUnit)
-    sleep(unit, false)
+  def gather(intent:Intention, resource:UnitInfo) {
+    if (intent.unit.command.getTarget != resource.baseUnit) {
+      //TODO: Return cargo (via right click, per Krasi0's suggestion)
+      
+      //Gather or right-click?
+      intent.unit.baseUnit.rightClick(resource.baseUnit)
+      sleepMove(intent.unit)
+    }
   }
   
-  def buildScarab(unit:FriendlyUnitInfo) {
-    unit.baseUnit.build(Protoss.Scarab.baseType)
-    sleep(unit, false)
+  def build(intent:Intention, unitClass:UnitClass) {
+    intent.unit.baseUnit.build(unitClass.baseType)
+    sleepBuild(intent.unit)
   }
   
-  def buildInterceptor(unit:FriendlyUnitInfo) {
-    unit.baseUnit.build(Protoss.Interceptor.baseType)
-    sleep(unit, false)
+  def build(intent:Intention, unitClass:UnitClass, tile:TilePosition) {
+    intent.unit.baseUnit.build(unitClass.baseType, tile)
+    sleepBuild(intent.unit)
   }
   
-  private def sleep(unit:FriendlyUnitInfo, startedAttacking:Boolean = false) {
+  def buildScarab(intent:Intention) {
+    intent.unit.baseUnit.build(Protoss.Scarab.baseType)
+    sleepMove(intent.unit)
+  }
+  
+  def buildInterceptor(intent:Intention) {
+    intent.unit.baseUnit.build(Protoss.Interceptor.baseType)
+    sleepMove(intent.unit)
+  }
+  
+  private def sleepMove(unit:FriendlyUnitInfo) {
+    sleep(unit, 0)
+  }
+  
+  private def sleepAttack(unit:FriendlyUnitInfo) {
+    sleep(unit, unit.attackFrames)
+  }
+  
+  private def sleepBuild(unit:FriendlyUnitInfo) {
+    //Arbitrary.
+    sleep(unit, With.latency.minTurnSize * 2)
+  }
+  
+  private def sleep(unit:FriendlyUnitInfo, extraDelay:Int) {
+    //TODO: Revisit. Should we use turn size?
     val baseDelay = With.game.getRemainingLatencyFrames
-    val attackDelay = if (startedAttacking) unit.attackFrames else 0
-    nextOrderFrame.put(unit, baseDelay + attackDelay + With.frame)
+    nextOrderFrame.put(unit, With.frame + baseDelay + extraDelay)
   }
   
   private def recordCommand(unit:FriendlyUnitInfo, command:Behavior) {

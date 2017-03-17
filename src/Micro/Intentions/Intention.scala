@@ -1,6 +1,6 @@
 package Micro.Intentions
 
-import Micro.Behaviors.{Behavior, BehaviorDefault}
+import Micro.Behaviors.Behavior
 import Planning.Plan
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClass.UnitClass
@@ -10,7 +10,7 @@ import bwapi.TilePosition
 
 class Intention(val plan:Plan, val unit:FriendlyUnitInfo) {
   
-  var behavior    : Behavior              = BehaviorDefault
+  var behavior    : Behavior              = unit.unitClass.behavior
   var destination : Option[TilePosition]  = None
   var toGather    : Option[UnitInfo]      = None
   var toBuild     : Option[UnitClass]     = None

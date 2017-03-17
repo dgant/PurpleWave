@@ -31,13 +31,13 @@ class ControlPosition extends Plan {
     
     position.get.find.map(tile => {
       DrawMap.circle(
-        tile.centerPixel,
+        tile.pixelCenter,
         64,
         DrawMap.playerColor(With.self))
       
       DrawMap.label(
         description.get,
-        tile.centerPixel,
+        tile.pixelCenter,
         drawBackground = true,
         DrawMap.playerColor(With.self))
     })

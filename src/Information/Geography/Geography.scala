@@ -38,10 +38,10 @@ class Geography {
       new Base(
         zonesByRegionCenter.values
           .find(_.region.getPolygon.isInside(townHallPosition.toPosition))
-          .getOrElse(zonesByRegionCenter.values.minBy(_.region.getCenter.pixelDistance(townHallPosition.centerPixel))),
+          .getOrElse(zonesByRegionCenter.values.minBy(_.region.getCenter.distancePixels(townHallPosition.pixelCenter))),
         townHallArea,
         getHarvestingArea(townHallArea),
-        With.game.getStartLocations.asScala.exists(_.tileDistance(townHallPosition) < 6))
+        With.game.getStartLocations.asScala.exists(_.distanceTile(townHallPosition) < 6))
     })
     
     //Populate zones with bases
@@ -85,7 +85,7 @@ class Geography {
   
   def getHarvestingArea(townHallArea:TileRectangle):TileRectangle = {
     val resources = With.units
-      .inRadius(townHallArea.midpoint.centerPixel, 32 * 10)
+      .inRadius(townHallArea.midpoint.pixelCenter, 32 * 10)
       .filter(_.isResource)
       .map(_.tileArea)
     

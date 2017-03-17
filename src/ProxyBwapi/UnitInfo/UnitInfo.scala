@@ -48,19 +48,19 @@ abstract class UnitInfo (var baseUnit:bwapi.Unit) {
   def isOurs                                      : Boolean                 = player == With.self
   def isFriendly                                  : Boolean                 = isOurs || player.isAlly(With.self)
   def isEnemy                                     : Boolean                 = player.isEnemy(With.self)
+  def isEnemyOf(otherUnit:UnitInfo)               : Boolean                 = player.isEnemy(otherUnit.player)
   def isMelee                                     : Boolean                 = range <= 32
   def isDetector                                  : Boolean                 = unitClass.isDetector
+  def isMinerals                                  : Boolean                 = unitClass.isMinerals
+  def isGas                                       : Boolean                 = unitClass.isGas
+  def isResource                                  : Boolean                 = isMinerals || isGas
   def totalHealth                                 : Int                     = hitPoints + shieldPoints
   def maxTotalHealth                              : Int                     = unitClass.maxHitPoints + unitClass.maxShields
   def rangeAir                                    : Int                     = unitClass.airWeapon.maxRange
   def rangeGround                                 : Int                     = unitClass.groundWeapon.maxRange
   def range                                       : Int                     = Math.max(rangeAir, rangeGround)
-  def enemyOf(otherUnit:UnitInfo)                 : Boolean                 = player.isEnemy(otherUnit.player)
   def groundDps                                   : Int                     = if (canFight) unitClass.groundDps else 0
   def totalCost                                   : Int                     = unitClass.totalCost
-  def isMinerals                                  : Boolean                 = unitClass.isMinerals
-  def isGas                                       : Boolean                 = unitClass.isGas
-  def isResource                                  : Boolean                 = isMinerals || isGas
   def tileCenter                                  : TilePosition            = pixelCenter.toTilePosition
   def hypotenuse                                  : Double                  = unitClass.width * 1.41421356
   def tileArea                                    : TileRectangle           = new TileRectangle(tileTopLeft, new Position(right, bottom).tileIncluding.add(1, 1))
@@ -69,7 +69,8 @@ abstract class UnitInfo (var baseUnit:bwapi.Unit) {
   def distance(otherPosition:Position)            : Double                  = pixelCenter.getDistance(otherPosition)
   def distance(otherPosition:TilePosition)        : Double                  = distance(otherPosition.toPosition)
   def distanceSquared(otherUnit:UnitInfo)         : Double                  = distanceSquared(otherUnit.pixelCenter)
-  def distanceSquared(otherPosition:Position)     : Double                  = pixelCenter.pixelDistanceSquared(otherPosition)
+  def distanceSquared(otherPosition:Position)     : Double                  = pixelCenter.distancePixelsSquared(otherPosition)
   def distanceSquared(otherPosition:TilePosition) : Double                  = distance(otherPosition.toPosition)
-  
+  def inRadius(radius:Int)                        : Set[UnitInfo]           = With.units.inRadius(pixelCenter, radius)
+  def enemiesInRange                              : Set[UnitInfo]           = With.units.inRadius(pixelCenter, range + 96).filter(unit => isEnemyOf(unit) && distanceFromEdge(unit) <= range)
 }

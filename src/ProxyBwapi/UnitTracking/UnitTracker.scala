@@ -33,14 +33,15 @@ class UnitTracker {
     units.asScala.flatMap(getUnit).toList
   }
   
-  def inRadius(position:Position, range:Int):Iterable[UnitInfo] = {
+  def inRadius(position:Position, range:Int):Set[UnitInfo] = {
     val tileRadius = range / 32 + 1
     val tile = position.tileIncluding
     Circle
       .points(tileRadius)
       .map(tile.add)
       .flatten(With.grids.units.get)
-      .filter(_.pixelCenter.pixelDistanceSquared(position) <= range * range)
+      .toSet
+      .filter(_.pixelCenter.distancePixelsSquared(position) <= range * range)
   }
   
   def inRectangle(topLeftInclusive:Position, bottomRightExclusive:Position):Iterable[UnitInfo] = {

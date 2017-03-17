@@ -90,10 +90,10 @@ case object EnrichPosition {
     def midpoint(otherPosition:Position):Position = {
       add(otherPosition).divide(2)
     }
-    def pixelDistance(otherPosition:Position):Double = {
-      Math.sqrt(pixelDistanceSquared(otherPosition))
+    def distancePixels(otherPosition:Position):Double = {
+      Math.sqrt(distancePixelsSquared(otherPosition))
     }
-    def pixelDistanceSquared(otherPosition:Position):Int = {
+    def distancePixelsSquared(otherPosition:Position):Int = {
       val dx = position.getX - otherPosition.getX
       val dy = position.getY - otherPosition.getY
       dx * dx + dy * dy
@@ -131,10 +131,10 @@ case object EnrichPosition {
     def midpoint(otherPosition:WalkPosition):WalkPosition = {
       add(otherPosition).divide(2)
     }
-    def walkDistance(otherPosition:WalkPosition):Double = {
-      Math.sqrt(walkDistanceSquared(otherPosition))
+    def distanceWalk(otherPosition:WalkPosition):Double = {
+      Math.sqrt(distanceWalkSquared(otherPosition))
     }
-    def walkDistanceSquared(otherPosition:WalkPosition):Int = {
+    def distanceWalkSquared(otherPosition:WalkPosition):Int = {
       val dx = position.getX - otherPosition.getX
       val dy = position.getY - otherPosition.getY
       dx * dx + dy * dy
@@ -174,10 +174,10 @@ case object EnrichPosition {
     def midpoint(otherPosition:TilePosition):TilePosition = {
       add(otherPosition).divide(2)
     }
-    def tileDistance(otherPosition:TilePosition):Double = {
-      Math.sqrt(tileDistanceSquared(otherPosition))
+    def distanceTile(otherPosition:TilePosition):Double = {
+      Math.sqrt(distanceTileSquared(otherPosition))
     }
-    def tileDistanceSquared(otherPosition:TilePosition):Int = {
+    def distanceTileSquared(otherPosition:TilePosition):Int = {
       val dx = position.getX - otherPosition.getX
       val dy = position.getY - otherPosition.getY
       dx * dx + dy * dy
@@ -188,7 +188,7 @@ case object EnrichPosition {
     def bottomRightPixel:Position = {
       position.toPosition.add(31, 31)
     }
-    def centerPixel:Position = {
+    def pixelCenter:Position = {
       position.toPosition.add(16, 16)
     }
     def toWalkPosition:WalkPosition = {

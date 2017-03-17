@@ -43,7 +43,7 @@ class PositionSimpleBuilding(
           base.harvestingArea.contains(gas.tileCenter)))
       .map(_.tileTopLeft)
     
-    if (candidates.isEmpty) None else Some(candidates.minBy(_.tileDistance(With.geography.home)))
+    if (candidates.isEmpty) None else Some(candidates.minBy(_.distanceTile(With.geography.home)))
   }
   
   private def positionTownHall:Option[TilePosition] = {

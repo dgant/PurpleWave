@@ -53,10 +53,7 @@ class BuildBuilding(val buildingType:UnitClass) extends Plan {
     
     tile = if (building.isDefined) tile else buildingPlacer.find
     
-    if (tile.isEmpty) {
-      With.logger.warn("Failed to place a " + buildingType)
-      return
-    }
+    if (tile.isEmpty) return
   
     //TODO: Terran: Complete incomplete buildings
     //TODO: Protoss: Don't onFrame the builder if it's a warping Protoss building

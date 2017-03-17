@@ -68,7 +68,7 @@ class BuildBuilding(val buildingType:UnitClass) extends Plan {
     else if (builderPlan.isComplete) {
       //If the builder is available to us but we're not ready to build, let's just send it where it needs to go
       position = buildingPlacer.find
-      builderPlan.units.foreach(unit => With.commander.intend(
+      builderPlan.units.foreach(unit => With.executor.intend(
         new Intention(
           this,
           unit,
@@ -86,7 +86,7 @@ class BuildBuilding(val buildingType:UnitClass) extends Plan {
         if (builder.distance(position.get) < 32 * 6) {
           builder.baseUnit.build(buildingType.baseType, position.get)
         } else {
-          With.commander.intend(new Intention(this, builder, DefaultBehavior, position.get))
+          With.executor.intend(new Intention(this, builder, DefaultBehavior, position.get))
         }
       }
     }

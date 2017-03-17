@@ -18,7 +18,7 @@ class Defend extends Plan {
     val destination = attackers.minBy(_.distance(With.geography.home)).tileCenter
     units.get.onFrame()
     if (units.get.isComplete) {
-      units.get.units.foreach(fighter => With.commander.intend(new Intention(this, fighter, DefaultBehavior, destination)))
+      units.get.units.foreach(fighter => With.executor.intend(new Intention(this, fighter, DefaultBehavior, destination)))
     }
   }
 }

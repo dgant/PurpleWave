@@ -99,7 +99,7 @@ class Geography {
   private def getResourceClusters:Iterable[Iterable[ForeignUnitInfo]] = Clustering.group[ForeignUnitInfo](getResources, 32 * 12, true, (unit) => unit.pixel).values
   private def getExclusions:Iterable[TileRectangle] = getResources.map(getExclusion)
   private def getExclusion(unit:ForeignUnitInfo):TileRectangle = new TileRectangle(unit.tileTopLeft.subtract(3, 3), unit.tileTopLeft.add(unit.utype.tileSize).add(3, 3))
-  private def getResources:Iterable[ForeignUnitInfo] = With.units.neutral.filter(unit => unit.isMinerals || unit.isGas).filter(_.baseUnit.getInitialResources > 0)
+  private def getResources:Iterable[ForeignUnitInfo] = With.units.neutral.filter(unit => unit.isMinerals || unit.isGas).filter(_.initialResources > 0)
   private def townHallPositionCalculate:Iterable[TilePosition] = resourceClusterCache.get.flatMap(findBasePosition)
   private def findBasePosition(resources:Iterable[ForeignUnitInfo]):Option[TilePosition] = {
     val centroid = resources.map(_.pixel).centroid

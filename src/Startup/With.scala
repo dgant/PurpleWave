@@ -1,20 +1,18 @@
 package Startup
 
 import Debugging.{AutoCamera, Configuration, Logger, Performance}
-import Macro.Allocation._
-import Micro.Battles.Battles
-import ProxyBwapi.UnitTracking.UnitTracker
-import Information.Grids.Grids
 import Information.Geography.Geography
+import Information.Grids.Grids
 import Information._
-import Macro.Scheduling.Scheduler
-import Planning.Plans.GamePlans.WinTheGame
+import Macro.Allocation._
 import Macro.Architect
-import Micro.{Commander, Paths}
-import _root_.Performance.Latency
+import Macro.Scheduling.Scheduler
+import Micro.Battles.Battles
+import Micro.{Executor, Commander, Paths}
+import Planning.Plans.GamePlans.WinTheGame
+import ProxyBwapi.UnitTracking.UnitTracker
+import Performance.Latency
 import bwapi.Player
-
-import scala.collection.mutable
 
 object With {
   var game:bwapi.Game = null
@@ -23,6 +21,7 @@ object With {
   var camera:AutoCamera = null
   var configuration:Configuration = null
   var battles:Battles = null
+  var executor:Executor = null
   var commander:Commander = null
   var economy:Economy = null
   var grids:Grids = null
@@ -42,4 +41,8 @@ object With {
   var frame = 0
   var mapWidth = 0
   var mapHeight = 0
+  
+  def onFrame() {
+    frame = With.game.getFrameCount
+  }
 }

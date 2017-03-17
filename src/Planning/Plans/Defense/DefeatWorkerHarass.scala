@@ -34,7 +34,7 @@ class DefeatWorkerHarass extends Plan {
     defenders.values.foreach(defenders => {
       defenders.onFrame
       if (defenders.isComplete) {
-        defenders.units.foreach(defender => With.commander.intend(new Intention(this, defender, DefaultBehavior, defender.tileCenter)))
+        defenders.units.foreach(defender => With.executor.intend(new Intention(this, defender, DefaultBehavior, defender.tileCenter)))
       }
     })
   }

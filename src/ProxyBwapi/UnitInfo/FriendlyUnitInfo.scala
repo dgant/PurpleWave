@@ -1,4 +1,5 @@
 package ProxyBwapi.UnitInfo
+
 import Performance.Caching.CacheFrame
 import ProxyBwapi.Techs.{Tech, Techs}
 import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
@@ -9,14 +10,14 @@ import bwapi._
 
 import scala.collection.JavaConverters._
 
-class FriendlyUnitInfo(_baseUnit:bwapi.Unit) extends UnitInfo(_baseUnit) {
-  val _cacheClass     = new CacheFrame[UnitClass]     (() =>  UnitClasses.get(_baseUnit.getType))
-  val _cachePlayer    = new CacheFrame[Player]        (() =>  _baseUnit.getPlayer)
-  val _cachePosition  = new CacheFrame[Position]      (() =>  _baseUnit.getPosition)
-  val _cacheTile      = new CacheFrame[TilePosition]  (() =>  _baseUnit.getTilePosition)
-  val _cacheCompleted = new CacheFrame[Boolean]       (() =>  _baseUnit.isCompleted)
-  val _cacheExists    = new CacheFrame[Boolean]       (() =>  _baseUnit.exists)
-  val _cacheId        = new CacheFrame[Int]           (() =>  _baseUnit.getID)
+class FriendlyUnitInfo(friendlyBaseUnit:bwapi.Unit) extends UnitInfo(friendlyBaseUnit) {
+  val _cacheClass     = new CacheFrame[UnitClass]     (() =>  UnitClasses.get(baseUnit.getType))
+  val _cachePlayer    = new CacheFrame[Player]        (() =>  baseUnit.getPlayer)
+  val _cachePosition  = new CacheFrame[Position]      (() =>  baseUnit.getPosition)
+  val _cacheTile      = new CacheFrame[TilePosition]  (() =>  baseUnit.getTilePosition)
+  val _cacheCompleted = new CacheFrame[Boolean]       (() =>  baseUnit.isCompleted)
+  val _cacheExists    = new CacheFrame[Boolean]       (() =>  baseUnit.exists)
+  val _cacheId        = new CacheFrame[Int]           (() =>  baseUnit.getID)
   
   override def friendly                   : Option[FriendlyUnitInfo]  = Some(this)
   override def lastSeen                   : Int                       = With.frame

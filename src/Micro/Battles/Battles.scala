@@ -12,7 +12,7 @@ class Battles {
   
   val all = new mutable.HashSet[Battle]
   
-  def onFrame() = {} // updateLimiter.act()
+  def onFrame() = updateLimiter.act()
   private val updateLimiter = new Limiter(2, update)
   private def update(battle:Battle) {
     val groups = List(battle.us, battle.enemy)

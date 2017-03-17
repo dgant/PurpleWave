@@ -8,7 +8,7 @@ import Macro.Allocation._
 import Macro.Architect
 import Macro.Scheduling.Scheduler
 import Micro.Battles.Battles
-import Micro.{Commander, Paths}
+import Micro.{Executor, Commander, Paths}
 import Planning.Plans.GamePlans.WinTheGame
 import ProxyBwapi.UnitTracking.UnitTracker
 import _root_.Performance.Latency
@@ -37,8 +37,9 @@ class Bot() extends DefaultBWListener {
       With.bank         = new Banker
       With.camera       = new AutoCamera
       With.battles      = new Battles
-      With.commander    = new Commander
+      With.executor     = new Executor
       With.economy      = new Economy
+      With.commander    = new Commander
       With.geography    = new Geography
       With.gameplan     = new WinTheGame
       With.intelligence = new Intelligence
@@ -62,10 +63,12 @@ class Bot() extends DefaultBWListener {
 
   override def onFrame() {
     try {
-      With.frame = With.game.getFrameCount
+      With.onFrame()
       With.performance.startCounting()
       With.latency.onFrame()
       if (With.latency.shouldRun) {
+        
+        //Gather information
         With.units.onFrame()
         With.grids.onFrame()
         With.battles.onFrame()
@@ -73,9 +76,14 @@ class Bot() extends DefaultBWListener {
         With.bank.onFrame()
         With.recruiter.onFrame()
         With.prioritizer.onFrame()
+        
+        //Make decisions
         With.gameplan.onFrame()
         With.scheduler.onFrame()
+        
+        //Act on decisions
         With.commander.onFrame()
+        With.executor.onFrame()
       }
       With.performance.stopCounting()
       
@@ -134,10 +142,11 @@ class Bot() extends DefaultBWListener {
   override def onSendText(text: String) {
     text match {
       case "c" => With.configuration.enableCamera = ! With.configuration.enableCamera
-      case "f" => With.game.setLocalSpeed(10000)
-      case "o" => With.configuration.enableVisualization = ! With.configuration.enableVisualization
-      case "slow" => With.game.setLocalSpeed(48)
-      case "fast" => With.game.setLocalSpeed(0)
+      case "v" => With.configuration.enableVisualization = ! With.configuration.enableVisualization
+      case "1" => With.game.setLocalSpeed(10000)
+      case "2" => With.game.setLocalSpeed(60)
+      case "3" => With.game.setLocalSpeed(30)
+      case "4" => With.game.setLocalSpeed(0)
     }
   }
   

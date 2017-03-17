@@ -3,7 +3,6 @@ import Micro.Intentions.Intention
 import Micro.Movement.{EvaluatePositions, MovementProfile}
 import Micro.Targeting.{EvaluateTargets, TargetingProfile, Targets}
 import ProxyBwapi.Races.Protoss
-import ProxyBwapi.UnitClass._
 import Startup.With
 import Utilities.TypeEnrichment.EnrichPosition._
 

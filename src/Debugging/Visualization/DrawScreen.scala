@@ -5,17 +5,21 @@ import Startup.With
 object DrawScreen {
   
   def header(x:Int, text:String) = {
-    With.game.drawTextScreen(x, 5, text)
+    column(x, 5, text)
   }
   
-  def table(startX:Int, startY:Int, cells:Iterable[Iterable[String]]) {
-    cells.zipWithIndex.foreach(pair => tableRow(startX, startY, pair._2, pair._1))
+  def column(x:Int, y:Int, text:String) {
+    With.game.drawTextScreen(x, y, text)
   }
   
-  def tableRow(startX:Int, startY:Int, rowIndex:Int, row:Iterable[String]) {
+  def table(x:Int, y:Int, cells:Iterable[Iterable[String]]) {
+    cells.zipWithIndex.foreach(pair => tableRow(x, y, pair._2, pair._1))
+  }
+  
+  def tableRow(x:Int, y:Int, rowIndex:Int, row:Iterable[String]) {
     row.zipWithIndex.foreach(pair => With.game.drawTextScreen(
-      startX + pair._2 * 50,
-      startY + rowIndex * 13,
+      x + pair._2 * 50,
+      y + rowIndex * 13,
       pair._1))
   }
 }

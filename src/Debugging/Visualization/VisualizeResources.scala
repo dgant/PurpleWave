@@ -4,8 +4,9 @@ import Startup.With
 
 object VisualizeResources {
   def render() {
-    DrawScreen.header(
+    DrawScreen.column(
       305,
+      31,
       With.bank.prioritizedRequests
         .take(8)
         .map(r =>

@@ -50,7 +50,7 @@ object DrawMap {
       backgroundColor:Color = Color.Grey) {
     val horizontalMargin = 2
     val estimatedTextWidth = (9 * textLines.map(_.size).max) / 2
-    val boxWidth = estimatedTextWidth + 2 * horizontalMargin
+    val boxWidth = estimatedTextWidth + (if (estimatedTextWidth > 0) 2 * horizontalMargin else 0)
     val boxHeight = 11 * textLines.size
     val textX = position.getX - boxWidth/2
     val textY = position.getY - boxHeight/2

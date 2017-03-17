@@ -8,9 +8,7 @@ import Startup.With
 import Utilities.TypeEnrichment.EnrichPosition._
 import bwapi.TilePosition
 
-class PositionSimpleBuilding(
-  val buildingType:UnitClass)
-    extends PositionFinder {
+class PositionSimpleBuilding(val buildingType:UnitClass) extends PositionFinder {
   
   override def find: Option[TilePosition] = findCache.get
   private val findCache = new Cache[Option[TilePosition]](2, () => findRecalculate)

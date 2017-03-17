@@ -7,6 +7,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import scala.collection.mutable
 
 class Recruiter {
+  
   private val requestByUnit   : mutable.HashMap[FriendlyUnitInfo, LockUnits]              = mutable.HashMap.empty
   private val unassignedUnits : mutable.Set[FriendlyUnitInfo]                             = mutable.Set.empty
   private val unitsByRequest  : mutable.HashMap[LockUnits, mutable.Set[FriendlyUnitInfo]] = mutable.HashMap.empty

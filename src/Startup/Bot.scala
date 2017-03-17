@@ -51,6 +51,7 @@ class Bot() extends DefaultBWListener {
       With.recruiter    = new Recruiter
       With.scheduler    = new Scheduler
       With.units        = new UnitTracker
+      With.zoner        = new Zoner
 
       With.game.enableFlag(1)
       With.game.setLocalSpeed(With.configuration.gameSpeed)
@@ -73,6 +74,7 @@ class Bot() extends DefaultBWListener {
         With.grids.onFrame()
         With.battles.onFrame()
         With.economy.onFrame()
+        With.zoner.onFrame()
         With.bank.onFrame()
         With.recruiter.onFrame()
         With.prioritizer.onFrame()

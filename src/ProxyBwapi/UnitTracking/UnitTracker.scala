@@ -44,22 +44,24 @@ class UnitTracker {
       .filter(_.pixelCenter.distancePixelsSquared(position) <= range * range)
   }
   
-  def inRectangle(topLeftInclusive:Position, bottomRightExclusive:Position):Iterable[UnitInfo] = {
+  def inRectangle(topLeftInclusive:Position, bottomRightExclusive:Position):Set[UnitInfo] = {
     new TileRectangle(topLeftInclusive.tileIncluding, bottomRightExclusive.tileIncluding)
-        .tiles
-        .flatten(With.grids.units.get)
-        .filter(unit =>
-          unit.pixelCenter.getX >= topLeftInclusive.getX &&
-          unit.pixelCenter.getY >= topLeftInclusive.getY &&
-          unit.pixelCenter.getX < bottomRightExclusive.getX &&
-          unit.pixelCenter.getY < bottomRightExclusive.getY)
+      .tiles
+      .flatten(With.grids.units.get)
+      .filter(unit =>
+        unit.pixelCenter.getX >= topLeftInclusive.getX &&
+        unit.pixelCenter.getY >= topLeftInclusive.getY &&
+        unit.pixelCenter.getX < bottomRightExclusive.getX &&
+        unit.pixelCenter.getY < bottomRightExclusive.getY)
+      .toSet
   }
   
-  def inRectangle(rectangle:TileRectangle):Iterable[UnitInfo] = {
+  def inRectangle(rectangle:TileRectangle):Set[UnitInfo] = {
     rectangle
       .tiles
-        .flatten(With.grids.units.get)
-        .filter(unit => rectangle.contains(unit.tileCenter))
+      .flatten(With.grids.units.get)
+      .filter(unit => rectangle.contains(unit.tileCenter))
+      .toSet
   }
   
   def onFrame() {

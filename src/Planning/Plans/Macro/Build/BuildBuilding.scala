@@ -7,21 +7,22 @@ import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Composition.UnitPreferences.UnitPreferClose
 import Planning.Plan
-import Planning.Plans.Allocation.{LockCurrencyForUnit, LockUnits}
+import Planning.Plans.Allocation.{LockArea, LockCurrencyForUnit, LockUnits}
 import ProxyBwapi.UnitClass.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Startup.With
 import Utilities.TypeEnrichment.EnrichPosition._
-import bwapi.TilePosition
+import bwapi.{Race, TilePosition}
 
-class BuildBuilding(val buildingType:UnitClass) extends Plan {
+class BuildBuilding(val buildingClass:UnitClass) extends Plan {
   
-  val buildingPlacer = new PositionSimpleBuilding(buildingType)
-  val currencyLock = new LockCurrencyForUnit(buildingType)
+  val buildingPlacer = new PositionSimpleBuilding(buildingClass)
+  val areaLock = new LockArea
+  val currencyLock = new LockCurrencyForUnit(buildingClass)
   val builderLock = new LockUnits {
     description.set("Get a builder")
     unitCounter.set(UnitCountOne)
-    unitMatcher.set(new UnitMatchType(buildingType.whatBuilds._1))
+    unitMatcher.set(new UnitMatchType(buildingClass.whatBuilds._1))
     unitPreference.set(new UnitPreferClose { positionFinder.set(buildingPlacer)})
   }
   
@@ -29,9 +30,9 @@ class BuildBuilding(val buildingType:UnitClass) extends Plan {
   private var building:Option[FriendlyUnitInfo] = None
   private var tile:Option[TilePosition] = None
     
-  description.set("Build a " + buildingType)
+  description.set("Build a " + buildingClass)
   
-  override def getChildren: Iterable[Plan] = List(currencyLock, builderLock)
+  override def getChildren: Iterable[Plan] = List(currencyLock, areaLock, builderLock)
   override def isComplete: Boolean = building.exists(building => building.complete)
   
   def startedBuilding:Boolean = building.isDefined
@@ -48,41 +49,49 @@ class BuildBuilding(val buildingType:UnitClass) extends Plan {
     
     if (building.isEmpty && tile.isDefined)
       building = With.units.ours
-        .filter(unit => unit.unitClass == buildingType && unit.tileTopLeft == tile.get)
+        .filter(unit => unit.unitClass == buildingClass && unit.tileTopLeft == tile.get)
         .headOption
     
     tile = if (building.isDefined) tile else buildingPlacer.find
     
     if (tile.isEmpty) return
   
+    areaLock.area = buildingClass.area.add(tile.get)
+  
     //TODO: Terran: Complete incomplete buildings
-    //TODO: Protoss: Don't onFrame the builder if it's a warping Protoss building
-    //TODO: Zerg: the builder becomes the building!
   
     currencyLock.isSpent = building.isDefined
     currencyLock.onFrame()
     if (currencyLock.isComplete) {
-      builderLock.onFrame()
+      areaLock.onFrame()
+      if (areaLock.isComplete) {
+        
+      if (building.isEmpty || buildingClass.getRace == Race.Terran) {
+        builderLock.onFrame()
+      }
+      
       if (building.isEmpty) {
         builderLock.units.foreach(
           unit => With.executor.intend(
             new Intention(this, unit) {
-              toBuild = Some(buildingType)
+              toBuild = Some(buildingClass)
               destination = tile
             }))
+        }
       }
     }
   }
   
   override def drawOverlay() {
     if (isComplete) return
-    if (tile.isEmpty) return
+    if ( ! tile.isDefined) return
+    if ( ! areaLock.isComplete) return
     DrawMap.box(
-      buildingType.area.startInclusive.add(tile.get).topLeftPixel,
-      buildingType.area.endExclusive.add(tile.get).topLeftPixel,
+      buildingClass.area.startInclusive.add(tile.get).topLeftPixel,
+      buildingClass.area.endExclusive.add(tile.get).topLeftPixel,
       DrawMap.playerColor(With.self))
     DrawMap.label(
-      "Building a " + buildingType.toString,
+      "Building a " + buildingClass.toString,
       tile.get.toPosition,
       drawBackground = true,
       DrawMap.playerColor(With.self))

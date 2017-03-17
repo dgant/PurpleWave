@@ -19,7 +19,7 @@ class FindEnemyBase extends Plan {
   val scouts = new Property[LockUnits](new LockUnits {
     unitCounter.set(new UnitCountExactly(1))
     unitMatcher.set(UnitMatchMobile)
-    unitPreference.set(new UnitPreferClose { positionFinder.set(new PositionCenter) })
+    unitPreference.set(new UnitPreferClose { positionFinder.set(PositionCenter) })
   })
   
   override def isComplete: Boolean = With.intelligence.mostBaselikeEnemyBuilding.nonEmpty

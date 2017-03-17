@@ -7,7 +7,7 @@ import Utilities.TypeEnrichment.EnrichPosition._
 
 class UnitPreferClose extends UnitPreference {
   
-  val positionFinder = new Property[PositionFinder](new PositionCenter)
+  val positionFinder = new Property[PositionFinder](PositionCenter)
   
   override def preference(unit: FriendlyUnitInfo): Double = {
     positionFinder.get.find

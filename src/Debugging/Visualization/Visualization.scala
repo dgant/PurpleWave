@@ -16,6 +16,7 @@ object Visualization {
       if (With.configuration.enableVisualizationScheduler)      VisualizeScheduler    .render
       if (With.configuration.enableVisualizationUnitsForeign)   VisualizeUnitsForeign .render
       if (With.configuration.enableVisualizationUnitsOurs)      VisualizeUnitsOurs    .render
+      if (With.configuration.enableVisualizationZones)          VisualizeZones        .render
     }
   }
 }

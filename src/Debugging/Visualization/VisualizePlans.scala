@@ -6,7 +6,7 @@ import Startup.With
 
 object VisualizePlans {
   def render() {
-    DrawScreen.header(5, describePlanTree(With.gameplan, 0, 0))
+    DrawScreen.column(5, 31, describePlanTree(With.gameplan, 0, 0))
     drawPlansRecursively(With.gameplan)
   }
   

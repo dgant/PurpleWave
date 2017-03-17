@@ -11,7 +11,7 @@ object BehaviorWorker extends Behavior {
     
     if (enemiesInRange.isEmpty) {
       if (intent.toBuild.isDefined) {
-        if (intent.unit.pixelCenter.distancePixels(intent.destination.get.pixelCenter) < 6) {
+        if (intent.unit.pixelCenter.distancePixels(intent.destination.get.pixelCenter) < 32 * 4) {
           return With.commander.build(intent, intent.toBuild.get, intent.destination.get)
         }
       }

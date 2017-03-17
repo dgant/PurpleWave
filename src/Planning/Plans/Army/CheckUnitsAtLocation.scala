@@ -9,7 +9,7 @@ import Planning.Composition.UnitMatchers.{UnitMatchAnything, UnitMatcher}
 class CheckUnitsAtLocation extends Plan {
   
   val quantity        = new Property[Int](1)
-  val positionFinder  = new Property[PositionFinder](new PositionCenter)
+  val positionFinder  = new Property[PositionFinder](PositionCenter)
   val unitMatcher     = new Property[UnitMatcher](UnitMatchAnything)
   val range           = new Property[Int](32)
   

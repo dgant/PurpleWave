@@ -24,7 +24,7 @@ class UnitTracker {
   def get(id:Int):Option[UnitInfo]              = friendlyUnitTracker.get(id).orElse(foreignUnitTracker.get(id))
   def getUnit(unit:bwapi.Unit):Option[UnitInfo] = if (unit == null) None else get(unit.getID)
   def all:Set[UnitInfo]                         = ours ++ enemy ++ neutral
-  def buildings:Set[UnitInfo]                   = all.filter(_.utype.isBuilding)
+  def buildings:Set[UnitInfo]                   = all.filter(_.unitClass.isBuilding)
   def ours:Set[FriendlyUnitInfo]                = friendlyUnitTracker.ourUnits
   def enemy:Set[ForeignUnitInfo]                = foreignUnitTracker.enemyUnits
   def neutral:Set[ForeignUnitInfo]              = foreignUnitTracker.neutralUnits
@@ -40,7 +40,7 @@ class UnitTracker {
       .points(tileRadius)
       .map(tile.add)
       .flatten(With.grids.units.get)
-      .filter(_.pixel.pixelDistanceSquared(position) <= range * range)
+      .filter(_.pixelCenter.pixelDistanceSquared(position) <= range * range)
   }
   
   def inRectangle(topLeftInclusive:Position, bottomRightExclusive:Position):Iterable[UnitInfo] = {
@@ -48,10 +48,10 @@ class UnitTracker {
         .tiles
         .flatten(With.grids.units.get)
         .filter(unit =>
-          unit.pixel.getX >= topLeftInclusive.getX &&
-          unit.pixel.getY >= topLeftInclusive.getY &&
-          unit.pixel.getX < bottomRightExclusive.getX &&
-          unit.pixel.getY < bottomRightExclusive.getY)
+          unit.pixelCenter.getX >= topLeftInclusive.getX &&
+          unit.pixelCenter.getY >= topLeftInclusive.getY &&
+          unit.pixelCenter.getX < bottomRightExclusive.getX &&
+          unit.pixelCenter.getY < bottomRightExclusive.getY)
   }
   
   def inRectangle(rectangle:TileRectangle):Iterable[UnitInfo] = {

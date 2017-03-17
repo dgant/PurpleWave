@@ -143,18 +143,18 @@ class Bot() extends DefaultBWListener {
     text match {
       case "c" => With.configuration.enableCamera = ! With.configuration.enableCamera
       case "v" => With.configuration.enableVisualization = ! With.configuration.enableVisualization
-      case "1" => With.game.setLocalSpeed(10000)
-      case "2" => With.game.setLocalSpeed(60)
-      case "3" => With.game.setLocalSpeed(30)
-      case "4" => With.game.setLocalSpeed(0)
+      case "1" => With.game.setLocalSpeed(10000)  ; With.configuration.enableCamera = false
+      case "2" => With.game.setLocalSpeed(60)     ; With.configuration.enableCamera = false
+      case "3" => With.game.setLocalSpeed(30)     ; With.configuration.enableCamera = false
+      case "4" => With.game.setLocalSpeed(0)      ; With.configuration.enableCamera = false
     }
   }
   
   private def considerSurrender() = {
     if (With.self.supplyUsed == 0
       && With.self.minerals < 50
-      && With.units.enemy.exists(_.utype.isWorker)
-      && With.units.enemy.exists(_.utype.isResourceDepot)) {
+      && With.units.enemy.exists(_.unitClass.isWorker)
+      && With.units.enemy.exists(_.unitClass.isResourceDepot)) {
       With.game.sendText("Good game! Let's pretend this never happened.")
       With.game.leaveGame()
     }

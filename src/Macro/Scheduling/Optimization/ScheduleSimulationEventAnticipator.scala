@@ -20,7 +20,7 @@ object ScheduleSimulationEventAnticipator {
   def getUnitCompletion(unit:FriendlyUnitInfo, timeLeft:Int):
       Iterable[BuildEvent] = {
     if (timeLeft <= 0) return List.empty
-    List(buildEvent(new BuildableUnit(unit.utype), timeLeft))
+    List(buildEvent(new BuildableUnit(unit.unitClass), timeLeft))
   }
   
   def getTechCompletion(unit:FriendlyUnitInfo): Iterable[BuildEvent] = {

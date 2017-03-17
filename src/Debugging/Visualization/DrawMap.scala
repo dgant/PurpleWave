@@ -73,7 +73,7 @@ object DrawMap {
   }
   
   def tileRectangle(rectangle:TileRectangle, color:Color) {
-    With.game.drawBoxMap(rectangle.startPosition, rectangle.endPosition, color)
+    With.game.drawBoxMap(rectangle.startPixel, rectangle.endPixel, color)
   }
   
   def polygonPositions(points:Iterable[Position], color:bwapi.Color = bwapi.Color.Brown) {

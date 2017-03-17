@@ -1,13 +1,12 @@
 package Macro.Buildables
 
-import Debugging.TypeDescriber
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClass.UnitClasses
 
 case class BuildableTech(tech: Tech) extends Buildable {
   
   override def techOption       : Option[Tech]      = Some(tech)
-  override def toString         : String            = TypeDescriber.tech(tech)
+  override def toString         : String            = tech.toString
   override def minerals         : Int               = tech.mineralPrice
   override def gas              : Int               = tech.gasPrice
   override def frames           : Int               = tech.researchTime

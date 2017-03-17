@@ -1,93 +1,71 @@
 package Planning.Plans.Macro.Build
 
-import Debugging.TypeDescriber
-import Planning.Plans.Allocation.{LockCurrencyForUnit, LockUnits}
-import Planning.Plan
-import Startup.With
+import Debugging.Visualization.DrawMap
+import Micro.Intentions.Intention
 import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Composition.UnitMatchers.UnitMatchType
+import Planning.Plan
+import Planning.Plans.Allocation.{LockCurrencyForUnit, LockUnits}
 import ProxyBwapi.UnitClass.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Startup.With
 
-class TrainUnit(val traineeType:UnitClass) extends Plan {
+class TrainUnit(val traineeClass:UnitClass) extends Plan {
   
-  val currency = new LockCurrencyForUnit(traineeType)
-  val trainerPlan = new LockUnits {
-    unitMatcher.set(new UnitMatchType(traineeType.whatBuilds._1))
+  val currencyLock = new LockCurrencyForUnit(traineeClass)
+  val trainerLock = new LockUnits {
+    unitMatcher.set(new UnitMatchType(traineeClass.whatBuilds._1))
     unitCounter.set(UnitCountOne)
   }
   
   private var trainer:Option[FriendlyUnitInfo] = None
   private var trainee:Option[FriendlyUnitInfo] = None
-  private var lastOrderFrame = 0
   
-  description.set("Train a " + TypeDescriber.unit(traineeType))
+  description.set("Train a " + traineeClass)
   
   override def isComplete: Boolean = trainee.exists(p => p.alive && p.complete)
-  override def getChildren: Iterable[Plan] = List(currency, trainerPlan)
+  override def getChildren: Iterable[Plan] = List(currencyLock, trainerLock)
+  
   override def onFrame() {
-    if (isComplete) { return }
-    
-    getChildren.foreach(_.onFrame())
+    if (isComplete) return
   
-    //Require all the resources
-    if (!getChildren.forall(_.isComplete)) {
-      return
+    // Trainee dead? Forget we had one.
+    // Have a trainer but no trainee? Check for trainee.
+    
+    trainee = trainee.filter(_.alive)
+    
+    if (trainer.isDefined && trainee.isEmpty) {
+      trainee = With.units.ours
+        .filter(unit =>
+          ! unit.complete
+            && unit.unitClass == traineeClass
+            && unit.x == trainer.get.x
+            && unit.y == trainer.get.y)
+        .headOption
     }
   
-    trainerPlan.units.headOption.foreach(requireTraining)
-  }
-  
-  private def reset() {
-    currency.isSpent = false
-    trainer = None
-    trainee = None
-  }
-  
-  private def requireTraining(newTrainer:FriendlyUnitInfo) {
-    
-    // Training?	Ordered?	Unit?	Then
-    // ---------- --------- ----- ----
-    // Yes		    No		    -	    Wait
-    // Yes		    Yes		    Yes	  Wait
-    // Yes		    Yes		    No	  Wait (Unit should appear eventually)
-    // No		      No		    -	    Order
-    // No		      Yes		    -	    Order (again; unexpected, but stuff happens)
-    
-    if ( ! trainer.contains(newTrainer)) {
-      reset()
-    }
-    
-    val isTraining = newTrainer.trainingQueue.nonEmpty
-    val ordered = trainer.nonEmpty
-    
-    if (isTraining) {
-      if (ordered) {
-        //TODO: Make sure we verify that the worker is *not complete* so, say, a wraith floating over a Starport doesn't get linked
-        
-        //Note that it's possible for a building to briefly have a worker type in the queue with no worker created.
-        trainee = With.units.ours
-          .filter(u =>
-            u.utype == traineeType &&
-            u.x == newTrainer.x &&
-            u.y == newTrainer.y &&
-            ! u.complete)
-          .headOption
-        
-        //There seems to be a 1+ frame delay between the queue getting started
-        //and the incomplete worker being created.
-        //So don't freak out if the worker doesn't show up right away
+    currencyLock.isSpent = trainee.isDefined
+    currencyLock.onFrame()
+    if (currencyLock.isComplete) {
+      trainerLock.onFrame()
+      trainer = trainerLock.units.headOption
+      if (trainee.isEmpty && trainer.isDefined) {
+        With.executor.intend(new Intention(this, trainer.get) { toBuild = Some(traineeClass) })
       }
     }
-    else {
-      orderUnit(newTrainer)
-    }
   }
   
-  private def orderUnit(newTrainer:FriendlyUnitInfo) {
-    trainer = Some(newTrainer)
-    currency.isSpent = true
-    newTrainer.baseUnit.train(traineeType.baseType)
-    lastOrderFrame = With.frame
+  override def drawOverlay() {
+    if (isComplete) return
+    if (trainer.isEmpty) return
+    DrawMap.box(
+      trainer.get.tileArea.startPixel,
+      trainer.get.tileArea.endPixel,
+      DrawMap.playerColor(With.self))
+    DrawMap.label(
+      description.get,
+      trainer.get.pixelCenter,
+      drawBackground = true,
+      DrawMap.playerColor(With.self))
   }
 }

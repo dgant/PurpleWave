@@ -1,16 +1,15 @@
 package Planning.Plans.Information
 
-import Micro.Behaviors.DefaultBehavior
-import Planning.Plans.Allocation.LockUnits
-import Planning.Plan
-import Startup.With
+import Micro.Intentions.Intention
 import Planning.Composition.PositionFinders.PositionCenter
+import Planning.Composition.Property
 import Planning.Composition.UnitCounters.UnitCountExactly
 import Planning.Composition.UnitMatchers.UnitMatchMobile
 import Planning.Composition.UnitPreferences.UnitPreferClose
-import Micro.Intentions.Intention
+import Planning.Plan
+import Planning.Plans.Allocation.LockUnits
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Planning.Composition.Property
+import Startup.With
 import bwapi.TilePosition
 
 class FindEnemyBase extends Plan {
@@ -19,7 +18,7 @@ class FindEnemyBase extends Plan {
   
   val scouts = new Property[LockUnits](new LockUnits {
     unitCounter.set(new UnitCountExactly(1))
-    unitMatcher.set(new UnitMatchMobile)
+    unitMatcher.set(UnitMatchMobile)
     unitPreference.set(new UnitPreferClose { positionFinder.set(new PositionCenter) })
   })
   
@@ -32,7 +31,7 @@ class FindEnemyBase extends Plan {
   }
   
   private def orderScout(scout:FriendlyUnitInfo) =
-    With.executor.intend(new Intention(this, scout, DefaultBehavior, getNextScoutingPosition))
+    With.executor.intend(new Intention(this, scout) { destination = Some(getNextScoutingPosition) })
   
   private def getNextScoutingPosition:TilePosition = {
     With.intelligence.leastScoutedBases

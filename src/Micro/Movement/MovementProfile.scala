@@ -34,13 +34,15 @@ class MovementProfile(
   def normalize(value:Double)                   = Math.max(0, value)
   
   def travel(intent: Intention, candidate: TilePosition): Double = {
-    val before = With.paths.groundDistance(intent.unit.tileCenter, intent.destination)
-    val after = With.paths.groundDistance(candidate,               intent.destination)
+    if (intent.destination.isEmpty) return unboolify(false)
+    
+    val before = With.paths.groundDistance(intent.unit.tileCenter, intent.destination.get)
+    val after = With.paths.groundDistance(candidate,               intent.destination.get)
     unboolify(after < before)
   }
   
   def traffic(intent: Intention, candidate: TilePosition): Double = {
-    (With.grids.units.get(candidate) -- List(intent.unit)).map(_.utype.width).sum
+    (With.grids.units.get(candidate) -- List(intent.unit)).map(_.unitClass.width).sum
   }
   
   def mobility(intent: Intention, candidate: TilePosition): Double = {

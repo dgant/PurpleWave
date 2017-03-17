@@ -1,13 +1,13 @@
 package Planning.Plans.Macro.Automatic
 
-import Planning.Plans.Allocation.LockUnits
-import Planning.Plan
-import Startup.With
+import Micro.Intentions.Intention
+import Performance.Caching.Limiter
 import Planning.Composition.UnitCountEverything
 import Planning.Composition.UnitMatchers.UnitMatchWorker
+import Planning.Plan
+import Planning.Plans.Allocation.LockUnits
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Performance.Caching.Limiter
-import bwapi.UnitCommandType
+import Startup.With
 
 import scala.collection.mutable
 
@@ -55,7 +55,7 @@ class GatherMinerals extends Plan {
     while (unassignedWorkers.nonEmpty) {
       minerals.foreach(mineral => {
         if (unassignedWorkers.nonEmpty) {
-          val worker = unassignedWorkers.minBy(_.pixel.getDistance(mineral.pixel))
+          val worker = unassignedWorkers.minBy(_.pixelCenter.getDistance(mineral.pixelCenter))
           workersByMineral(mineral).add(worker)
           mineralByWorker.put(worker, mineral)
           unassignedWorkers.remove(worker)
@@ -85,23 +85,16 @@ class GatherMinerals extends Plan {
   private def orderWorker(worker:FriendlyUnitInfo) {
     if (worker.isGatheringMinerals) {
       mineralByWorker.get(worker).foreach(mineral => {
-        if (mineral.pixel.getDistance(worker.pixel) > 32 * 12) {
+        if (mineral.pixelCenter.getDistance(worker.pixelCenter) > 32 * 12) {
           gather(worker, mineral)
         }
       })
     } else {
-      if (worker.isCarryingMinerals || worker.isCarryingGas) {
-        //Can't spam return cargo
-        if (worker.command.getUnitCommandType != UnitCommandType.Return_Cargo || ! worker.isMoving) {
-          //TODO: Krasi0 recommends right clicking CC instead; may stop them from getting stuck
-          worker.baseUnit.returnCargo()
-        }
-      }
-      else {
-        mineralByWorker.get(worker).foreach(mineral => gather(worker, mineral))
-      }
+      mineralByWorker.get(worker).foreach(mineral => gather(worker, mineral))
     }
   }
   
-  private def gather(worker:FriendlyUnitInfo, mineral:UnitInfo) = worker.baseUnit.gather(mineral.baseUnit)
+  private def gather(worker:FriendlyUnitInfo, mineral:UnitInfo) = {
+    With.executor.intend(new Intention(this, worker) { toGather = Some(mineral) })
+  }
 }

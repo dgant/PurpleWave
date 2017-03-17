@@ -17,7 +17,7 @@ class PositionSimpleBuilding(
   private def findRecalculate: Option[TilePosition] = {
     
     //Short-circuits for performance
-    if (buildingType.requiresPsi && ! With.units.ours.exists(_.utype == Protoss.Pylon)) {
+    if (buildingType.requiresPsi && ! With.units.ours.exists(_.unitClass == Protoss.Pylon)) {
       return None
     }
     if (findCache.lastValue.isDefined && findCache.lastValue.get.isDefined) {
@@ -50,7 +50,7 @@ class PositionSimpleBuilding(
     val candidates = With.geography.townHallPositions
       .filter(basePosition => {
         val rectangle = new TileRectangle(basePosition, basePosition.add(buildingType.tileSize))
-        With.units.all.filter(_.utype.isBuilding).forall( ! _.tileArea.intersects(rectangle))
+        With.units.all.filter(_.unitClass.isBuilding).forall( ! _.tileArea.intersects(rectangle))
       })
   
     if (candidates.isEmpty) None else Some(candidates.minBy(With.paths.groundDistance(_, With.geography.home)))
@@ -74,7 +74,7 @@ class PositionSimpleBuilding(
       0
     else if (buildingType.isTownHall)
       0
-    else if (buildingType == Protoss.Pylon && With.units.ours.count(_.utype == buildingType) < 4)
+    else if (buildingType == Protoss.Pylon && With.units.ours.count(_.unitClass == buildingType) < 4)
       3
     else
       1

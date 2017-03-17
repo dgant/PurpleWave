@@ -43,11 +43,11 @@ class TileRectangle(
     contains(otherRectangle.endExclusive.getX - 1, otherRectangle.startInclusive.getY)
   }
   
-  def startPosition:Position = {
+  def startPixel:Position = {
     startInclusive.toPosition
   }
   
-  def endPosition:Position = {
+  def endPixel:Position = {
     endExclusive.toPosition.subtract(1, 1)
   }
   

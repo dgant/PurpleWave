@@ -32,7 +32,7 @@ object ScheduleSimulationStateBuilder {
   def unitCount:CountMap[UnitClass] = {
     val output = new CountMap[UnitClass]
     With.units.ours
-      .groupBy(_.utype)
+      .groupBy(_.unitClass)
       .foreach(pair => output.put(pair._1, pair._2.size))
     output
   }

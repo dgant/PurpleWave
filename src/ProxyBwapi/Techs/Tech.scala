@@ -16,4 +16,6 @@ case class Tech(val base:TechType) {
   def targetsPosition = new CacheForever(() => base.targetsPosition).get
   def targetsUnits    = new CacheForever(() => base.targetsUnit).get
   def whatResearches  = new CacheForever(() => UnitClasses.get(base.whatResearches)).get
+  
+  override def toString:String = base.toString.replaceAll("_", " ")
 }

@@ -23,8 +23,8 @@ class Battles {
     groups.foreach(group => {
       group.center          = BattleMetrics.center(group)
     })
-    battle.us.vanguard    = battle.us.units.minBy(_.pixel.pixelDistanceSquared(battle.enemy.center)).pixel
-    battle.enemy.vanguard = battle.enemy.units.minBy(_.pixel.pixelDistanceSquared(battle.us.center)).pixel
+    battle.us.vanguard    = battle.us.units.minBy(_.pixelCenter.pixelDistanceSquared(battle.enemy.center)).pixelCenter
+    battle.enemy.vanguard = battle.enemy.units.minBy(_.pixelCenter.pixelDistanceSquared(battle.us.center)).pixelCenter
     groups.foreach(group => group.strength = BattleMetrics.evaluate(group, battle))
   }
   

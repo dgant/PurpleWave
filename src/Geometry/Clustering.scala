@@ -14,7 +14,7 @@ object Clustering {
     radius:Int,
     limitRegion:Boolean = false)
       :mutable.HashMap[UnitInfo, mutable.HashSet[UnitInfo]] = {
-    group(units, radius, limitRegion, (u) => u.pixel)
+    group(units, radius, limitRegion, (u) => u.pixelCenter)
   }
   
   def group[T](

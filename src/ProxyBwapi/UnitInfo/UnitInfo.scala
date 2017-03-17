@@ -18,12 +18,12 @@ abstract class UnitInfo (var baseUnit:bwapi.Unit) {
   def lastSeen:Int
   def possiblyStillThere:Boolean
   def player:Player
-  def pixel:Position
+  def pixelCenter:Position
   def walkPosition:WalkPosition
   def tileTopLeft:TilePosition
   def hitPoints:Int
   def shieldPoints:Int
-  def utype:UnitClass
+  def unitClass:UnitClass
   def complete:Boolean
   def flying:Boolean
   def visible:Boolean
@@ -40,36 +40,36 @@ abstract class UnitInfo (var baseUnit:bwapi.Unit) {
   def gasLeft:Int = 0
   def initialResources: Int = 0
   
-  def canFight                                    : Boolean                 = complete && utype.canAttack || List(Protoss.Carrier, Protoss.Reaver, Terran.Bunker).contains(utype)
-  def impactsCombat                               : Boolean                 = canFight || List(Terran.Medic).contains(utype) //This ignores spellcasters
-  def x                                           : Int                     = pixel.getX
-  def y                                           : Int                     = pixel.getY
-  def attackFrames                                : Int                     = 8 + (if (List(Protoss.Dragoon, Zerg.Devourer).contains(utype)) 6 else 0)
+  def canFight                                    : Boolean                 = complete && unitClass.canAttack || List(Protoss.Carrier, Protoss.Reaver, Terran.Bunker).contains(unitClass)
+  def impactsCombat                               : Boolean                 = canFight || List(Terran.Medic).contains(unitClass) //This ignores spellcasters
+  def x                                           : Int                     = pixelCenter.getX
+  def y                                           : Int                     = pixelCenter.getY
+  def attackFrames                                : Int                     = 8 + (if (List(Protoss.Dragoon, Zerg.Devourer).contains(unitClass)) 6 else 0)
   def isOurs                                      : Boolean                 = player == With.self
   def isFriendly                                  : Boolean                 = isOurs || player.isAlly(With.self)
   def isEnemy                                     : Boolean                 = player.isEnemy(With.self)
   def isMelee                                     : Boolean                 = range <= 32
-  def isDetector                                  : Boolean                 = utype.isDetector
+  def isDetector                                  : Boolean                 = unitClass.isDetector
   def totalHealth                                 : Int                     = hitPoints + shieldPoints
-  def maxTotalHealth                              : Int                     = utype.maxHitPoints + utype.maxShields
-  def rangeAir                                    : Int                     = utype.airWeapon.maxRange
-  def rangeGround                                 : Int                     = utype.groundWeapon.maxRange
+  def maxTotalHealth                              : Int                     = unitClass.maxHitPoints + unitClass.maxShields
+  def rangeAir                                    : Int                     = unitClass.airWeapon.maxRange
+  def rangeGround                                 : Int                     = unitClass.groundWeapon.maxRange
   def range                                       : Int                     = Math.max(rangeAir, rangeGround)
   def enemyOf(otherUnit:UnitInfo)                 : Boolean                 = player.isEnemy(otherUnit.player)
-  def groundDps                                   : Int                     = if (canFight) utype.groundDps else 0
-  def totalCost                                   : Int                     = utype.totalCost
-  def isMinerals                                  : Boolean                 = utype.isMinerals
-  def isGas                                       : Boolean                 = utype.isGas
+  def groundDps                                   : Int                     = if (canFight) unitClass.groundDps else 0
+  def totalCost                                   : Int                     = unitClass.totalCost
+  def isMinerals                                  : Boolean                 = unitClass.isMinerals
+  def isGas                                       : Boolean                 = unitClass.isGas
   def isResource                                  : Boolean                 = isMinerals || isGas
-  def tileCenter                                  : TilePosition            = pixel.toTilePosition
-  def hypotenuse                                  : Double                  = utype.width * 1.41421356
+  def tileCenter                                  : TilePosition            = pixelCenter.toTilePosition
+  def hypotenuse                                  : Double                  = unitClass.width * 1.41421356
   def tileArea                                    : TileRectangle           = new TileRectangle(tileTopLeft, new Position(right, bottom).tileIncluding.add(1, 1))
   def distanceFromEdge(otherUnit:UnitInfo)        : Double                  = distance(otherUnit) - hypotenuse - otherUnit.hypotenuse //Improve by counting angle
-  def distance(otherUnit:UnitInfo)                : Double                  = distance(otherUnit.pixel)
-  def distance(otherPosition:Position)            : Double                  = pixel.getDistance(otherPosition)
+  def distance(otherUnit:UnitInfo)                : Double                  = distance(otherUnit.pixelCenter)
+  def distance(otherPosition:Position)            : Double                  = pixelCenter.getDistance(otherPosition)
   def distance(otherPosition:TilePosition)        : Double                  = distance(otherPosition.toPosition)
-  def distanceSquared(otherUnit:UnitInfo)         : Double                  = distanceSquared(otherUnit.pixel)
-  def distanceSquared(otherPosition:Position)     : Double                  = pixel.pixelDistanceSquared(otherPosition)
+  def distanceSquared(otherUnit:UnitInfo)         : Double                  = distanceSquared(otherUnit.pixelCenter)
+  def distanceSquared(otherPosition:Position)     : Double                  = pixelCenter.pixelDistanceSquared(otherPosition)
   def distanceSquared(otherPosition:TilePosition) : Double                  = distance(otherPosition.toPosition)
   
 }

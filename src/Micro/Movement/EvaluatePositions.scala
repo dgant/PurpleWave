@@ -21,7 +21,6 @@ object EvaluatePositions {
       return intent.unit.tileCenter
     }
     
-    
     return candidates.maxBy(tile => evaluator.evaluate(intent, tile))
   }
 }

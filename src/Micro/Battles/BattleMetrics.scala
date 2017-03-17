@@ -9,12 +9,12 @@ import bwapi.Position
 object BattleMetrics {
   
   def vanguard(group:BattleGroup, otherGroup:BattleGroup):Position = {
-    group.units.minBy(_.distanceSquared(otherGroup.center)).pixel
+    group.units.minBy(_.distanceSquared(otherGroup.center)).pixelCenter
   }
   
   def center(group:BattleGroup):Position = {
-    val airCenter = group.units.view.map(_.pixel).centroid
-    group.units.view.map(_.pixel).minBy(_.pixelDistanceSquared(airCenter))
+    val airCenter = group.units.view.map(_.pixelCenter).centroid
+    group.units.view.map(_.pixelCenter).minBy(_.pixelDistanceSquared(airCenter))
   }
   
   def evaluate(group:BattleGroup, battle:Battle):Int = {
@@ -29,7 +29,7 @@ object BattleMetrics {
     //Fails to account for upgrades (including range upgrades)
     //Fails to account for medics
   
-    if (unit.utype == Terran.Bunker) {
+    if (unit.unitClass == Terran.Bunker) {
       dps = 4 * Terran.Marine.groundDps
     }
     

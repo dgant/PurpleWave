@@ -1,6 +1,5 @@
 package Macro.Buildables
 
-import Debugging.TypeDescriber
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClass._
 
@@ -8,7 +7,7 @@ case class BuildableUnit(val unit: UnitClass) extends Buildable {
   
   override def unitOption       : Option[UnitClass]   = Some(unit)
   override def unitsProduced    : Int                 = if (unit.isTwoUnitsInOneEgg) 2 else 1
-  override def toString         : String              = TypeDescriber.unit(unit)
+  override def toString         : String              = unit.toString
   override def minerals         : Int                 = unit.mineralPrice
   override def gas              : Int                 = unit.gasPrice
   override def supplyRequired   : Int                 = unit.supplyRequired

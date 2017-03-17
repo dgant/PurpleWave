@@ -16,4 +16,6 @@ case class Upgrade(val base:UpgradeType) {
   def upgradeTimeFactor   = new CacheForever(() => base.upgradeTimeFactor).get
   def whatsRequired       = new CacheForever(() => levels.map(i => (i, UnitClasses.get(base.whatsRequired(i)))).toMap).get
   def whatUpgrades        = new CacheForever(() => UnitClasses.get(base.whatUpgrades)).get
+  
+  override def toString:String = base.toString.replaceAll("_", " ")
 }

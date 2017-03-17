@@ -1,5 +1,6 @@
 package Planning.Plans.Macro.Automatic
 
+import Micro.Intentions.Intention
 import Planning.Plans.Allocation.LockUnits
 import Planning.Plan
 import Startup.With
@@ -32,7 +33,7 @@ class GatherGas extends Plan {
       return 0
     }
     var maxDrillers = 3 * ourRefineries.size
-    maxDrillers = Math.min(maxDrillers, With.units.ours.filter(unit => unit.complete && unit.utype.isWorker).size / 3)
+    maxDrillers = Math.min(maxDrillers, With.units.ours.filter(unit => unit.complete && unit.unitClass.isWorker).size / 3)
     maxDrillers
   }
   
@@ -44,10 +45,10 @@ class GatherGas extends Plan {
       .foreach(refinery =>
         (1 to 3).foreach(i => {
           if (availableDrillers.nonEmpty) {
-            val driller = availableDrillers.minBy(_.pixel.getApproxDistance(refinery.pixel))
+            val driller = availableDrillers.minBy(_.pixelCenter.getApproxDistance(refinery.pixelCenter))
             availableDrillers.remove(driller)
             if ( ! driller.isGatheringGas || driller.distance(refinery) > 32 * 8) {
-              driller.baseUnit.gather(refinery.baseUnit)
+              With.executor.intend(new Intention(this, driller) { toGather = Some(refinery) })
             }}}))
   }
 }

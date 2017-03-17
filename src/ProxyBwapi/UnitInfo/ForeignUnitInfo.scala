@@ -75,12 +75,12 @@ class ForeignUnitInfo(_baseUnit:bwapi.Unit) extends UnitInfo (_baseUnit) {
   override def lastSeen             : Int             = _lastSeen
   override def possiblyStillThere   : Boolean         = _possiblyStillThere
   override def player               : Player          = _player
-  override def pixel                : Position        = _position
-  override def walkPosition         : WalkPosition    = pixel.toWalkPosition
+  override def pixelCenter                : Position        = _position
+  override def walkPosition         : WalkPosition    = pixelCenter.toWalkPosition
   override def tileTopLeft          : TilePosition    = _tileTopleft
   override def hitPoints            : Int             = _hitPoints
   override def shieldPoints         : Int             = _shieldPoints
-  override def utype                : UnitClass       = _class//TODO: Re-add siege tank logic = if (_unitType == UnitType.Terran_Siege_Tank_Tank_Mode && (morphing || ! visible)) UnitType.Terran_Siege_Tank_Siege_Mode else _unitType
+  override def unitClass                : UnitClass       = _class//TODO: Re-add siege tank logic = if (_unitType == UnitType.Terran_Siege_Tank_Tank_Mode && (morphing || ! visible)) UnitType.Terran_Siege_Tank_Siege_Mode else _unitType
   override def complete             : Boolean         = _complete
   override def flying               : Boolean         = _flying
   override def visible              : Boolean         = _visible

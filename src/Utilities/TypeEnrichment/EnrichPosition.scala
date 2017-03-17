@@ -185,6 +185,9 @@ case object EnrichPosition {
     def topLeftPixel:Position = {
       position.toPosition
     }
+    def bottomRightPixel:Position = {
+      position.toPosition.add(31, 31)
+    }
     def centerPixel:Position = {
       position.toPosition.add(16, 16)
     }

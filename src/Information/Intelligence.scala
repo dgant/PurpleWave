@@ -16,18 +16,18 @@ class Intelligence {
   def enemyBases:Option[TilePosition] =
     With.units.enemy
       .toList
-      .filter(_.utype.isBuilding)
+      .filter(_.unitClass.isBuilding)
       .filter(! _.flying)
-      .filter(_.utype.isTownHall)
+      .filter(_.unitClass.isTownHall)
       .map(_.tileTopLeft)
       .headOption
   
   def mostBaselikeEnemyBuilding:Option[ForeignUnitInfo] = {
     With.units.enemy
       .toList
-      .filter(unit => unit.utype.isBuilding)
-      .sortBy(unit => unit.utype.isFlyer)
-      .sortBy(unit => unit.utype.isTownHall)
+      .filter(unit => unit.unitClass.isBuilding)
+      .sortBy(unit => unit.unitClass.isFlyer)
+      .sortBy(unit => unit.unitClass.isTownHall)
       .headOption
   }
   

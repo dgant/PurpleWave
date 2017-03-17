@@ -15,12 +15,12 @@ object VisualizeBattles {
     DrawMap.line(battle.focus, battle.us.vanguard, Color.Blue)
     DrawMap.line(battle.focus, battle.enemy.vanguard, Color.Red)
     DrawMap.box(
-      battle.us.units.map(_.pixel).minBound,
-      battle.us.units.map(_.pixel).maxBound,
+      battle.us.units.map(_.pixelCenter).minBound,
+      battle.us.units.map(_.pixelCenter).maxBound,
       Color.Blue)
     DrawMap.box(
-      battle.enemy.units.map(_.pixel).minBound,
-      battle.enemy.units.map(_.pixel).maxBound,
+      battle.enemy.units.map(_.pixelCenter).minBound,
+      battle.enemy.units.map(_.pixelCenter).maxBound,
       Color.Red)
     DrawMap.labelBox(
       List(

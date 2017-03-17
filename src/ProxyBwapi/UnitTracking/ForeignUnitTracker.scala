@@ -90,7 +90,7 @@ class ForeignUnitTracker {
   }
   
   private def updateMissing(unit:ForeignUnitInfo) {
-    if (unit.utype.canMove) {
+    if (unit.unitClass.canMove) {
       unit.invalidatePosition()
     } else {
       //Well, if it can't move, it must be dead. Like a building that burned down or was otherwise destroyed

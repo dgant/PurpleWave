@@ -6,17 +6,17 @@ import ProxyBwapi.Races.Protoss
 import Startup.With
 import Utilities.TypeEnrichment.EnrichPosition._
 
-object DefaultBehavior extends Behavior {
+object BehaviorDefault extends Behavior {
   
   def execute(intent: Intention) {
   
-    if (intent.unit.utype == Protoss.Reaver
+    if (intent.unit.unitClass == Protoss.Reaver
       && intent.unit.trainingQueue.isEmpty
       && intent.unit.scarabs < 5) {
       With.commander.buildScarab(intent.unit)
       return
     }
-    if (intent.unit.utype == Protoss.Carrier
+    if (intent.unit.unitClass == Protoss.Carrier
       && intent.unit.trainingQueue.isEmpty
       && intent.unit.interceptors < 8) {
       With.commander.buildInterceptor(intent.unit)
@@ -33,16 +33,18 @@ object DefaultBehavior extends Behavior {
       }
     }
     
-    if (targets.isEmpty) {
-      With.commander.move(intent.unit, intent.destination.centerPixel)
+    if (intent.destination.isDefined) {
+      if (targets.isEmpty) {
+        With.commander.move(intent.unit, intent.destination.get.centerPixel)
+        return
+      }
     }
-    else {
-      val tile = EvaluatePositions.best(intent, defaultMovementProfile)
-      With.commander.move(intent.unit, tile.centerPixel)
-    }
+    
+    val tile = EvaluatePositions.best(intent, defaultMovementProfile)
+    With.commander.move(intent.unit, tile.centerPixel)
   }
   
-  val defaultMovementProfile = new MovementProfile(
+  val defaultMovementProfile = new MovementProfile (
     preferTravel      = 0,
     preferMobility    = 2,
     preferHighGround  = 0,

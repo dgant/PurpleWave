@@ -1,42 +1,37 @@
 package Planning.Plans.Macro.Build
 
-import Planning.Plans.Allocation._
-import Planning.Plan
-import Startup.With
+import Micro.Intentions.Intention
 import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Composition.UnitMatchers.UnitMatchType
-import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
-import bwapi.UpgradeType
+import Planning.Plan
+import Planning.Plans.Allocation._
+import ProxyBwapi.Upgrades.Upgrade
+import Startup.With
 
-class ResearchUpgrade(upgradeType: Upgrade, level: Int) extends Plan {
+class ResearchUpgrade(upgrade: Upgrade, level: Int) extends Plan {
   
-  val currency = new LockCurrencyForUpgrade(upgradeType, level)
-  val researcher = new LockUnits {
-    unitMatcher.set(new UnitMatchType(upgradeType.whatUpgrades))
+  val currency = new LockCurrencyForUpgrade(upgrade, level)
+  val upgraders = new LockUnits {
     unitCounter.set(UnitCountOne)
+    unitMatcher.set(new UnitMatchType(upgrade.whatUpgrades))
   }
   
-  override def isComplete: Boolean = With.self.getUpgradeLevel(upgradeType.base) >= level
-  override def getChildren: Iterable[Plan] = List (currency, researcher)
+  description.set("Upgrade " + upgrade + " " + level)
+  
+  override def isComplete: Boolean = With.self.getMaxUpgradeLevel(upgrade.base) >= level
+  override def getChildren: Iterable[Plan] = List (currency, upgraders)
   
   override def onFrame() {
+    if (isComplete) return
+    
     currency.onFrame()
-    if ( ! currency.isComplete) {
-      return
-    }
+    if (! currency.isComplete) return
     
-    researcher.onFrame()
-    if ( ! researcher.isComplete || researcher.units.isEmpty) {
-      return
-    }
-    
-    val researcherUnit = researcher.units.head
-    if (researcherUnit.upgrading == upgradeType) {
-      currency.isSpent = true
-    }
-    else if (researcherUnit.upgrading == Upgrades.get(UpgradeType.None)) {
-      researcherUnit.baseUnit.upgrade(upgradeType.base)
-      currency.isSpent = true
-    }
+    currency.isSpent = false
+    upgraders.onFrame()
+    upgraders.units.foreach(upgrader => {
+      currency.isSpent = upgrader.upgrading == upgrade
+      With.executor.intend(new Intention(this, upgrader) { toUpgrade = Some(upgrade) })
+    })
   }
 }

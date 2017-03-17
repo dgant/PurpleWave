@@ -16,7 +16,7 @@ class GridEnemyDetection extends GridBoolean {
       .filter(_.possiblyStillThere)
       .filter(_.isDetector)
       .foreach(u => {
-      Circle.points(u.utype.sightRange / 32)
+      Circle.points(u.unitClass.sightRange / 32)
         .map(u.tileCenter.add)
         .foreach(set(_, true))
     })

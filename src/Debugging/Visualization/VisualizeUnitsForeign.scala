@@ -1,6 +1,5 @@
 package Debugging.Visualization
 
-import Debugging.TypeDescriber
 import Startup.With
 import ProxyBwapi.UnitInfo.ForeignUnitInfo
 
@@ -14,12 +13,12 @@ object VisualizeUnitsForeign {
   private def drawTrackedUnit(trackedUnit:ForeignUnitInfo) {
     if (trackedUnit._possiblyStillThere && ! trackedUnit.visible) {
       DrawMap.circle(
-        trackedUnit.pixel,
-        trackedUnit.utype.width / 2,
+        trackedUnit.pixelCenter,
+        trackedUnit.unitClass.width / 2,
         DrawMap.playerColor(trackedUnit.player))
       DrawMap.label(
-        TypeDescriber.unit(trackedUnit.utype),
-        trackedUnit.pixel,
+        trackedUnit.unitClass.toString,
+        trackedUnit.pixelCenter,
         drawBackground = true,
         DrawMap.playerColor(trackedUnit.player))
     }

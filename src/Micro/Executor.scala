@@ -14,10 +14,9 @@ class Executor {
   def intend(intention:Intention) = intentions.put(intention.unit, intention)
   
   def onFrame() {
-    val awakeIntentions = intentions.filter(pair => With.commander.readyForCommand(pair._1))
-    awakeIntentions.foreach(pair => pair._2.command.execute(pair._2))
-    lastIntentions --= lastIntentions.keys.filterNot(_.alive)
-    awakeIntentions.foreach(pair => lastIntentions.put(pair._1, pair._2))
+    val awakeIntentions = intentions.values.filter(intent => With.commander.readyForCommand(intent.unit))
+    awakeIntentions.foreach(intent => intent.behavior.execute(intent))
+    lastIntentions = intentions
     intentions = new mutable.HashMap[FriendlyUnitInfo, Intention]
   }
 }

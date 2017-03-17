@@ -30,7 +30,7 @@ class BuildPylonsContinuously  {
   
     val pylon                     = Protoss.Pylon
     val supplyPerDepot            = With.self.getRace.getSupplyProvider.supplyProvided
-    val currentSupplyOfNexus      = With.units.ours.filter(_.utype != pylon).toSeq.map(_.utype.supplyProvided).sum
+    val currentSupplyOfNexus      = With.units.ours.filter(_.unitClass != pylon).toSeq.map(_.unitClass.supplyProvided).sum
     val currentSupplyUsed         = With.self.supplyUsed
     val unitSpendingRatio         = 0.75
     val costPerUnitSupply         = 25.0

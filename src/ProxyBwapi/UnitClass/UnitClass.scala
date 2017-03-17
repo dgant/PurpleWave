@@ -135,4 +135,14 @@ case class UnitClass(val baseType:UnitType) {
       new TilePosition(0, 0),
       baseType.tileSize)
   def tiles:Iterable[TilePosition] = area.tiles
+  
+  override def toString:String =
+    baseType.toString
+      .replace("Terran_", "")
+      .replace("Zerg_", "")
+      .replace("Protoss_", "")
+      .replace("Neutral_", "")
+      .replace("Resource_", "")
+      .replace("Special_", "")
+      .replaceAll("_", " ")
 }

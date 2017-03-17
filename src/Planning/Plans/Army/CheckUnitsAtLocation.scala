@@ -18,7 +18,7 @@ class CheckUnitsAtLocation extends Plan {
       .filter(unitMatcher.get.accept)
       .filter(unit =>
         positionFinder.get.find.exists(position =>
-          position.toPosition.getDistance(unit.pixel) < range.get))
+          position.toPosition.getDistance(unit.pixelCenter) < range.get))
       .size >= quantity.get
   }
 }

@@ -9,16 +9,15 @@ object VisualizeUnitsOurs {
     With.units.ours
       .filter(unit => Debugger.highlitUnits.contains(unit))
       .foreach(unit =>
-        DrawMap.circle(unit.pixel, 32, Color.Orange))
+        DrawMap.circle(unit.pixelCenter, 32, Color.Orange))
     With.units.ours
       .filterNot(_.command.getUnitCommandType == UnitCommandType.None)
       .foreach(unit => DrawMap.labelBox(
         List(
-          With.executor.lastIntentions.get(unit).map(intent => (intent.motivation * 100).toInt.toString).getOrElse(""),
           With.executor.lastIntentions.get(unit).map(intent => intent.plan.toString).getOrElse(""),
           With.commander.lastCommands.get(unit).getOrElse(""),
           unit.command.getUnitCommandType.toString),
-        unit.pixel,
+        unit.pixelCenter,
         drawBackground = false))
   }
 }

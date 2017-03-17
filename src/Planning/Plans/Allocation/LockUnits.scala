@@ -1,6 +1,5 @@
 package Planning.Plans.Allocation
 
-import Debugging.TypeDescriber
 import Planning.Plan
 import Startup.With
 import Planning.Composition.{Property, UnitCountEverything}
@@ -22,8 +21,8 @@ class LockUnits extends Plan {
   description.set(
     if(isComplete)
       units
-      .groupBy(_.utype)
-      .map(pair => TypeDescriber.unit(pair._1) + " " + pair._2.size)
+      .groupBy(_.unitClass)
+      .map(pair => pair._1 + " " + pair._2.size)
       .mkString(", ")
     else
       "")

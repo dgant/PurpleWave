@@ -14,7 +14,7 @@ class Configuration {
   
   var enableVisualization               = true
   var enableVisualizationBattles        = true
-  var enableVisualizationEconomy        = true
+  var enableVisualizationEconomy        = false
   var enableVisualizationGrids          = false
   var enableVisualizationPerformance    = true
   var enableVisualizationPlans          = false
@@ -22,6 +22,6 @@ class Configuration {
   var enableVisualizationScheduler      = false
   var enableVisualizationGeography      = false
   var enableVisualizationUnitsForeign   = false
-  var enableVisualizationUnitsOurs      = false
+  var enableVisualizationUnitsOurs      = true
   var enableVisualizationZones          = false
 }

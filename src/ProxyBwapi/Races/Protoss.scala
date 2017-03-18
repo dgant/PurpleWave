@@ -45,7 +45,7 @@ object Protoss {
   def DragoonRange        = Upgrades.get(UpgradeType.Singularity_Charge)
   def ZealotLegs          = Upgrades.get(UpgradeType.Leg_Enhancements)
   def ShuttleSpeed        = Upgrades.get(UpgradeType.Gravitic_Drive)
-  def ReaverDamage        = Upgrades.get(UpgradeType.Scarab_Damage)
+  def ScarabDamage        = Upgrades.get(UpgradeType.Scarab_Damage)
   def ReaverCapacity      = Upgrades.get(UpgradeType.Reaver_Capacity)
   def ObserverSpeed       = Upgrades.get(UpgradeType.Gravitic_Boosters)
   def ObserverVisionRange = Upgrades.get(UpgradeType.Sensor_Array)

@@ -14,7 +14,7 @@ class ProtossVsProtoss extends Parallel {
   
   description.set("Protoss vs Protoss")
   
-  //http://wiki.teamliquid.net/starcraft/4_Gate_Goon_(vs._Protoss)
+  // http://wiki.teamliquid.net/starcraft/4_Gate_Goon_(vs._Protoss)
   val _fourGateGoons = List[BuildRequest] (
     new RequestUnitAnotherOne(Protoss.Nexus),
     new RequestUnitAnother(8, Protoss.Probe),
@@ -67,6 +67,7 @@ class ProtossVsProtoss extends Parallel {
     new RequestUnitAtLeast(1, Protoss.RoboticsSupportBay),
     new RequestUnitAtLeast(3, Protoss.Nexus),
     new RequestUnitAtLeast(3, Protoss.Assimilator),
+    new RequestUpgrade(Protoss.ScarabDamage),
     new RequestUnitAtLeast(3, Protoss.RoboticsFacility),
     new RequestUnitAtLeast(4, Protoss.Nexus),
     new RequestUnitAtLeast(4, Protoss.RoboticsFacility),

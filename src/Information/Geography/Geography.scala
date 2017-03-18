@@ -92,8 +92,9 @@ class Geography {
     (List(townHallArea) ++ resources).boundary
   }
   
+  //TODO: This is super duper slow right now.
   def townHallPositions:Iterable[TilePosition] = townHallPositionCache.get
-  private val townHallPositionCache = new Cache[Iterable[TilePosition]](5, () => townHallPositionCalculate)
+  private val townHallPositionCache = new Cache[Iterable[TilePosition]](20, () => townHallPositionCalculate)
   private val resourceClusterCache = new CacheForever[Iterable[Iterable[ForeignUnitInfo]]](() => getResourceClusters)
   private val resourceExclusionCache = new CacheForever[Iterable[TileRectangle]](() => getExclusions)
   private def getResourceClusters:Iterable[Iterable[ForeignUnitInfo]] = Clustering.group[ForeignUnitInfo](getResources, 32 * 12, true, (unit) => unit.pixelCenter).values

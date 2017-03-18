@@ -1,6 +1,6 @@
 package Planning.Plans.Macro.Automatic
 
-import Macro.BuildRequests.RequestUnitAnother
+import Macro.BuildRequests.RequestUnitAtLeast
 import Planning.Plan
 import ProxyBwapi.UnitClass.UnitClass
 import Startup.With
@@ -10,7 +10,12 @@ class TrainContinuously(unitClass: UnitClass) extends Plan {
   override def onFrame() {
     if ( ! canBuild) return
     
-    With.scheduler.request(this, List(new RequestUnitAnother(Math.min(buildCapacity, maxDesirable), unitClass)))
+    With.scheduler.request(this, List(
+      new RequestUnitAtLeast(
+        Math.min(
+          maxDesirable,
+          With.units.ours.count(_.unitClass == unitClass) + buildCapacity),
+        unitClass)))
   }
   
   protected def canBuild:Boolean = {

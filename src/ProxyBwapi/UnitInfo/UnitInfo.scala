@@ -44,7 +44,6 @@ abstract class UnitInfo (var baseUnit:bwapi.Unit) {
   def impactsCombat                               : Boolean                 = alive && complete && (unitClass.canAttack || unitClass.isSpellcaster || alsoImpactsCombat.contains(unitClass))
   def x                                           : Int                     = pixelCenter.getX
   def y                                           : Int                     = pixelCenter.getY
-  def attackFrames                                : Int                     = 8 + (if (List(Protoss.Dragoon, Zerg.Devourer).contains(unitClass)) 6 else 0)
   def isOurs                                      : Boolean                 = player == With.self
   def isFriendly                                  : Boolean                 = isOurs || player.isAlly(With.self)
   def isEnemy                                     : Boolean                 = player.isEnemy(With.self)
@@ -74,4 +73,10 @@ abstract class UnitInfo (var baseUnit:bwapi.Unit) {
   def distanceSquared(otherPosition:TilePosition) : Double                  = distance(otherPosition.toPosition)
   def inRadius(radius:Int)                        : Set[UnitInfo]           = With.units.inRadius(pixelCenter, radius)
   def enemiesInRange                              : Set[UnitInfo]           = With.units.inRadius(pixelCenter, range + 96).filter(unit => isEnemyOf(unit) && distanceFromEdge(unit) <= range)
+  
+  def attackFrames: Int = {
+    val baseRate = 8
+    val slowAttack = (if (List(Protoss.Dragoon, Zerg.Devourer).contains(unitClass)) 6 else 0)
+    baseRate + slowAttack
+  }
 }

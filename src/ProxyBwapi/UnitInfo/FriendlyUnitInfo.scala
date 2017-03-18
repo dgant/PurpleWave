@@ -1,6 +1,6 @@
 package ProxyBwapi.UnitInfo
 
-import Performance.Caching.CacheFrame
+import Performance.Caching.{Cache, CacheFrame}
 import ProxyBwapi.Techs.{Tech, Techs}
 import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
 import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
@@ -11,8 +11,8 @@ import bwapi._
 import scala.collection.JavaConverters._
 
 class FriendlyUnitInfo(friendlyBaseUnit:bwapi.Unit) extends UnitInfo(friendlyBaseUnit) {
-  val _cacheClass     = new CacheFrame[UnitClass]     (() =>  UnitClasses.get(baseUnit.getType))
-  val _cachePlayer    = new CacheFrame[Player]        (() =>  baseUnit.getPlayer)
+  val _cacheClass     = new Cache[UnitClass]          (5,  () =>  UnitClasses.get(baseUnit.getType))
+  val _cachePlayer    = new Cache[Player]             (10, () =>  baseUnit.getPlayer)
   val _cachePosition  = new CacheFrame[Position]      (() =>  baseUnit.getPosition)
   val _cacheTile      = new CacheFrame[TilePosition]  (() =>  baseUnit.getTilePosition)
   val _cacheCompleted = new CacheFrame[Boolean]       (() =>  baseUnit.isCompleted)

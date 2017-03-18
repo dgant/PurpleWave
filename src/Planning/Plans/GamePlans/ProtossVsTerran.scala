@@ -41,28 +41,34 @@ class ProtossVsTerran extends Parallel {
     new RequestUnitAtLeast(6,   Protoss.Dragoon)
   )
   
-  val _lateGame = List[BuildRequest] (
+  val _massGateway = List[BuildRequest] (
+    
+  )
+  
+  val _carriersLate = List[BuildRequest] (
     new RequestUnitAtLeast(3, Protoss.Nexus),
+    new RequestUnitAtLeast(3, Protoss.Assimilator),
     new RequestUnitAtLeast(8, Protoss.Dragoon),
     new RequestUnitAtLeast(1, Protoss.Stargate),
     new RequestUnitAtLeast(3, Protoss.Gateway),
     new RequestUnitAtLeast(1, Protoss.FleetBeacon),
-    new RequestUnitAtLeast(2, Protoss.Stargate),
-    new RequestUnitAtLeast(3, Protoss.Assimilator),
+    new RequestUnitAtLeast(3, Protoss.Stargate),
+    new RequestUpgrade(       Protoss.CarrierCapacity),
     new RequestUnitAtLeast(4, Protoss.Nexus),
     new RequestUnitAtLeast(4, Protoss.Assimilator),
-    new RequestUpgrade(Protoss.AirWeapons, 1),
-    new RequestUnitAtLeast(4, Protoss.Stargate),
-    new RequestUpgrade(Protoss.AirWeapons, 2),
+    new RequestUnitAtLeast(2, Protoss.CyberneticsCore),
+    new RequestUnitAtLeast(5, Protoss.Stargate),
     new RequestUnitAtLeast(5, Protoss.Nexus),
     new RequestUnitAtLeast(5, Protoss.Assimilator),
-    new RequestUnitAtLeast(5, Protoss.Stargate),
-    new RequestUpgrade(Protoss.AirWeapons, 3),
+    new RequestUpgrade(       Protoss.AirWeapons, 1),
+    new RequestUpgrade(       Protoss.AirArmor, 1),
+    new RequestUnitAtLeast(7, Protoss.Stargate),
+    new RequestUpgrade(       Protoss.AirWeapons, 2),
+    new RequestUpgrade(       Protoss.AirArmor, 2),
     new RequestUnitAtLeast(6, Protoss.Nexus),
     new RequestUnitAtLeast(6, Protoss.Assimilator),
-    new RequestUpgrade(Protoss.AirArmor, 1),
-    new RequestUpgrade(Protoss.AirArmor, 2),
-    new RequestUpgrade(Protoss.AirArmor, 3)
+    new RequestUpgrade(       Protoss.AirWeapons, 3),
+    new RequestUpgrade(       Protoss.AirArmor, 3)
   )
   
   children.set(List(
@@ -70,8 +76,9 @@ class ProtossVsTerran extends Parallel {
     new BuildPylonsContinuously,
     new TrainProbesContinuously,
     new TrainContinuously(Protoss.Carrier),
+    new TrainContinuously(Protoss.Scout),
     new TrainContinuously(Protoss.Zealot),
-    new ScheduleBuildOrder { buildables.set(_lateGame) },
+    new ScheduleBuildOrder { buildables.set(_carriersLate) },
     new ScoutAt(20),
     new IfThenElse {
       predicate.set(new UnitCountAtLeast { quantity.set(6); unitMatcher.set(UnitMatchWarriors) })

@@ -27,3 +27,7 @@ PurpleWave is built directly on BWAPI, but is designed to be easily adapted for 
 ## Building on top of PurpleWave
 
 PurpleWave is in early stage development and is thus changing rapidly. As such, it may be difficult to build a different bot based on it right now. As the API stabilizes, I'll provide more information.
+
+## License
+
+PurpleWave is published under the MIT License.

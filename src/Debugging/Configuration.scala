@@ -12,7 +12,7 @@ class Configuration {
   var cameraDynamicSpeedSlowest         = 30
   var cameraDynamicSpeedFastest         = 0
   
-  var enableVisualization               = true
+  var enableVisualization               = false
   var enableVisualizationBattles        = true
   var enableVisualizationEconomy        = false
   var enableVisualizationGrids          = false

@@ -1,5 +1,83 @@
 package Planning.Plans.GamePlans
 
-class ProtossVsZerg extends ProtossVsTerran {
+import Macro.BuildRequests.{BuildRequest, RequestUnitAnotherOne, RequestUnitAtLeast, RequestUpgrade}
+import Planning.Composition.UnitMatchers.UnitMatchWarriors
+import Planning.Plans.Army.{Attack, DefendChoke}
+import Planning.Plans.Compound.{IfThenElse, Parallel}
+import Planning.Plans.Information.ScoutAt
+import Planning.Plans.Macro.Automatic.{BuildPylonsContinuously, TrainContinuously, TrainProbesContinuously}
+import Planning.Plans.Macro.BuildOrders.ScheduleBuildOrder
+import Planning.Plans.Macro.UnitCount.UnitCountAtLeast
+import ProxyBwapi.Races.Protoss
+
+class ProtossVsZerg extends Parallel {
+  
   description.set("Protoss vs Zerg")
+  
+  // http://wiki.teamliquid.net/starcraft/Protoss_vs._Zerg_Guide#Branch_II:_Two_Gateways
+  val _13Nexus = List[BuildRequest] (
+    new RequestUnitAnotherOne(Protoss.Nexus),
+    new RequestUnitAtLeast(8,   Protoss.Probe),
+    new RequestUnitAtLeast(1,   Protoss.Pylon),
+    new RequestUnitAtLeast(10,  Protoss.Probe),
+    new RequestUnitAtLeast(1,   Protoss.Gateway),
+    new RequestUnitAtLeast(12,  Protoss.Probe),
+    new RequestUnitAtLeast(2,   Protoss.Gateway),
+    new RequestUnitAtLeast(13,  Protoss.Probe),
+    new RequestUnitAtLeast(1,   Protoss.Zealot),
+    new RequestUnitAtLeast(14,  Protoss.Probe),
+    new RequestUnitAtLeast(2,   Protoss.Pylon),
+    new RequestUnitAtLeast(15,  Protoss.Probe),
+    new RequestUnitAtLeast(3,   Protoss.Zealot)
+  )
+  
+  val _twoBase = List[BuildRequest] (
+    new RequestUnitAtLeast(2, Protoss.Nexus),
+    new RequestUnitAtLeast(1, Protoss.Assimilator),
+    new RequestUnitAtLeast(1, Protoss.CyberneticsCore),
+    new RequestUnitAtLeast(2, Protoss.Assimilator),
+    new RequestUnitAtLeast(1, Protoss.Stargate),
+    new RequestUnitAtLeast(1, Protoss.RoboticsFacility),
+    new RequestUnitAtLeast(1, Protoss.RoboticsSupportBay),
+    new RequestUpgrade(       Protoss.DragoonRange),
+    new RequestUnitAtLeast(3, Protoss.Nexus),
+    new RequestUnitAtLeast(3, Protoss.Assimilator),
+    new RequestUnitAtLeast(4, Protoss.Gateway),
+    new RequestUnitAtLeast(2, Protoss.RoboticsFacility),
+    new RequestUnitAtLeast(4, Protoss.Nexus),
+    new RequestUnitAtLeast(6, Protoss.Gateway),
+    new RequestUnitAtLeast(4, Protoss.Assimilator),
+    new RequestUnitAtLeast(1, Protoss.CitadelOfAdun),
+    new RequestUnitAtLeast(1, Protoss.Forge),
+    new RequestUpgrade(       Protoss.ZealotLegs),
+    new RequestUpgrade(       Protoss.GroundWeapons, 1),
+    new RequestUnitAtLeast(5, Protoss.Nexus),
+    new RequestUnitAtLeast(8, Protoss.Gateway),
+    new RequestUnitAtLeast(5, Protoss.Assimilator),
+    new RequestUnitAtLeast(1, Protoss.TemplarArchives),
+    new RequestUnitAtLeast(3, Protoss.DarkTemplar),
+    new RequestUpgrade(       Protoss.GroundWeapons, 2),
+    new RequestUnitAtLeast(6, Protoss.Nexus),
+    new RequestUnitAtLeast(6, Protoss.Assimilator),
+    new RequestUpgrade(       Protoss.GroundWeapons, 3)
+  )
+  
+  val _enoughZealots = List[BuildRequest] (new RequestUnitAtLeast(8, Protoss.Zealot))
+  
+  children.set(List(
+    new ScheduleBuildOrder { buildables.set(_13Nexus) },
+    new BuildPylonsContinuously,
+    new TrainProbesContinuously,
+    new TrainContinuously(Protoss.Reaver),
+    new TrainContinuously(Protoss.Corsair),
+    new TrainContinuously(Protoss.Dragoon),
+    new ScheduleBuildOrder { buildables.set(_enoughZealots) },
+    new ScheduleBuildOrder { buildables.set(_twoBase) },
+    new ScoutAt(20),
+    new IfThenElse {
+      predicate.set(new UnitCountAtLeast { quantity.set(6); unitMatcher.set(UnitMatchWarriors) })
+      whenFalse.set(new DefendChoke)
+      whenTrue.set(new Attack)
+    }
+  ))
 }

@@ -44,9 +44,17 @@ class Commander {
   
   def gather(intent:Intention, resource:UnitInfo) {
     if (intent.unit.command.getTarget != resource.baseUnit) {
-      //TODO: Return cargo (via right click, per Krasi0's suggestion)
       
-      //Gather or right-click?
+      if (intent.unit.isCarryingGas || intent.unit.isCarryingMinerals) {
+        val townHalls = With.units.ours.filter(_.unitClass.isTownHall).filter(_.complete)
+        if (townHalls.nonEmpty) {
+          val nearestTownHall = townHalls.minBy(townHall => With.paths.groundDistance(intent.unit.tileCenter, townHall.tileCenter))
+          intent.unit.baseUnit.rightClick(nearestTownHall.baseUnit)
+          sleepReturnCargo(intent.unit)
+          return
+        }
+      }
+      
       intent.unit.baseUnit.rightClick(resource.baseUnit)
       sleepMove(intent.unit)
     }
@@ -91,6 +99,11 @@ class Commander {
   private def sleepBuild(unit:FriendlyUnitInfo) {
     //Arbitrary.
     sleep(unit, With.latency.minTurnSize * 2)
+  }
+  
+  private def sleepReturnCargo(unit:FriendlyUnitInfo) {
+    //Arbitrary
+    sleep(unit, 24)
   }
   
   private def sleep(unit:FriendlyUnitInfo, extraDelay:Int) {

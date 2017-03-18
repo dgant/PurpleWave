@@ -8,9 +8,6 @@ import Planning.Plans.Information.ScoutAt
 import Planning.Plans.Macro.Build.ScheduleBuildOrder
 import Planning.Plans.Macro.UnitCount.UnitCountAtLeast
 import ProxyBwapi.Races.Protoss
-import ProxyBwapi.UnitClass._
-import ProxyBwapi.Upgrades.Upgrades
-import bwapi.UpgradeType
 
 class ProtossVsProtoss extends Parallel {
   
@@ -39,7 +36,7 @@ class ProtossVsProtoss extends Parallel {
     new RequestUnitAnotherOne(Protoss.Probe),
     new RequestUnitAnotherOne(Protoss.Dragoon), //23
     new RequestUnitAnotherOne(Protoss.Probe),
-    new RequestUpgrade(Upgrades.get(UpgradeType.Singularity_Charge)), //26
+    new RequestUpgrade(Protoss.DragoonRange), //26
     new RequestUnitAnotherOne(Protoss.Probe),
     new RequestUnitAnotherOne(Protoss.Dragoon), //27
     new RequestUnitAnotherOne(Protoss.Probe),

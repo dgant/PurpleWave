@@ -45,24 +45,26 @@ class Scheduler {
     unitsWanted:CountMap[UnitClass],
     unitsActual:CountMap[UnitClass]):Iterable[Buildable] = {
     if (request.buildable.upgradeOption.nonEmpty) {
-      if(With.self.getUpgradeLevel(request.buildable.upgradeOption.get.base) >= request.buildable.upgradeLevel)
+      if(With.self.getUpgradeLevel(request.buildable.upgradeOption.get.baseType) >= request.buildable.upgradeLevel)
         return List(request.buildable)
       else
         return None
     }
     else if (request.buildable.techOption.nonEmpty) {
-      if (With.self.hasResearched(request.buildable.techOption.get.base))
+      if (With.self.hasResearched(request.buildable.techOption.get.baseType))
         return List(request.buildable)
       else
         return None
     }
     else {
       val unit = request.buildable.unitOption.get
+      val differenceBefore = Math.max(0, unitsWanted(unit) - unitsActual(unit))
       unitsWanted.add(unit, request.add)
       unitsWanted.put(unit, Math.max(request.require, unitsWanted(unit)))
-      val difference = unitsWanted(unit) - unitsActual(unit)
-      if (difference > 0) {
-        val buildables = (0 until difference).map(i => request.buildable)
+      val differenceAfter = unitsWanted(unit) - unitsActual(unit)
+      val differenceChange = differenceAfter - differenceBefore
+      if (differenceChange > 0) {
+        val buildables = (0 until differenceChange).map(i => request.buildable)
         return buildables
       }
       else

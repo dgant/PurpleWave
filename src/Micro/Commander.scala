@@ -3,8 +3,10 @@ package Micro
 import Micro.Behaviors.Behavior
 import Micro.Intentions.Intention
 import ProxyBwapi.Races.Protoss
+import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClass.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import ProxyBwapi.Upgrades.Upgrade
 import Startup.With
 import Utilities.CountMap
 import bwapi.{Position, TilePosition}
@@ -58,6 +60,14 @@ class Commander {
   def build(intent:Intention, unitClass:UnitClass, tile:TilePosition) {
     intent.unit.baseUnit.build(unitClass.baseType, tile)
     sleepBuild(intent.unit)
+  }
+  
+  def tech(intent:Intention, tech: Tech) {
+    intent.unit.baseUnit.research(tech.baseType)
+  }
+  
+  def upgrade(intent:Intention, upgrade: Upgrade) {
+    intent.unit.baseUnit.upgrade(upgrade.baseType)
   }
   
   def buildScarab(intent:Intention) {

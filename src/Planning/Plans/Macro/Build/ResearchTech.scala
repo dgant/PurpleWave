@@ -18,7 +18,7 @@ class ResearchTech(tech: Tech) extends Plan {
   
   description.set("Tech " + tech)
   
-  override def isComplete: Boolean = With.self.hasResearched(tech.base)
+  override def isComplete: Boolean = With.self.hasResearched(tech.baseType)
   override def getChildren: Iterable[Plan] = List (currency, techers)
   
   override def onFrame() {

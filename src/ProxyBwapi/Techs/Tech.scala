@@ -4,18 +4,18 @@ import Performance.Caching.CacheForever
 import ProxyBwapi.UnitClass.UnitClasses
 import bwapi.TechType
 
-case class Tech(val base:TechType) {
-  def energyCost      = new CacheForever(() => base.energyCost).get
-  def getOrder        = new CacheForever(() => base.getOrder).get
-  def gasPrice        = new CacheForever(() => base.gasPrice).get
-  def getRace         = new CacheForever(() => base.getRace).get
-  def getWeapon       = new CacheForever(() => base.getWeapon).get
-  def mineralPrice    = new CacheForever(() => base.mineralPrice).get
-  def researchTime    = new CacheForever(() => base.researchTime).get
-  def requiredUnit    = new CacheForever(() => UnitClasses.get(base.requiredUnit)).get
-  def targetsPosition = new CacheForever(() => base.targetsPosition).get
-  def targetsUnits    = new CacheForever(() => base.targetsUnit).get
-  def whatResearches  = new CacheForever(() => UnitClasses.get(base.whatResearches)).get
+case class Tech(val baseType:TechType) {
+  def energyCost      = new CacheForever(() => baseType.energyCost).get
+  def getOrder        = new CacheForever(() => baseType.getOrder).get
+  def gasPrice        = new CacheForever(() => baseType.gasPrice).get
+  def getRace         = new CacheForever(() => baseType.getRace).get
+  def getWeapon       = new CacheForever(() => baseType.getWeapon).get
+  def mineralPrice    = new CacheForever(() => baseType.mineralPrice).get
+  def researchTime    = new CacheForever(() => baseType.researchTime).get
+  def requiredUnit    = new CacheForever(() => UnitClasses.get(baseType.requiredUnit)).get
+  def targetsPosition = new CacheForever(() => baseType.targetsPosition).get
+  def targetsUnits    = new CacheForever(() => baseType.targetsUnit).get
+  def whatResearches  = new CacheForever(() => UnitClasses.get(baseType.whatResearches)).get
   
-  override def toString:String = base.toString.replaceAll("_", " ")
+  override def toString:String = baseType.toString.replaceAll("_", " ")
 }

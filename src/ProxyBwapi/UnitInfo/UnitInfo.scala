@@ -40,8 +40,8 @@ abstract class UnitInfo (var baseUnit:bwapi.Unit) {
   def gasLeft:Int = 0
   def initialResources: Int = 0
   
-  def canFight                                    : Boolean                 = complete && unitClass.canAttack || List(Protoss.Carrier, Protoss.Reaver, Terran.Bunker).contains(unitClass)
-  def impactsCombat                               : Boolean                 = canFight || List(Terran.Medic).contains(unitClass) //This ignores spellcasters
+  val alsoImpactsCombat = Set(Terran.Bunker, Protoss.ShieldBattery)
+  def impactsCombat                               : Boolean                 = alive && complete && (unitClass.canAttack || unitClass.isSpellcaster || alsoImpactsCombat.contains(unitClass))
   def x                                           : Int                     = pixelCenter.getX
   def y                                           : Int                     = pixelCenter.getY
   def attackFrames                                : Int                     = 8 + (if (List(Protoss.Dragoon, Zerg.Devourer).contains(unitClass)) 6 else 0)
@@ -59,7 +59,8 @@ abstract class UnitInfo (var baseUnit:bwapi.Unit) {
   def rangeAir                                    : Int                     = unitClass.airWeapon.maxRange
   def rangeGround                                 : Int                     = unitClass.groundWeapon.maxRange
   def range                                       : Int                     = Math.max(rangeAir, rangeGround)
-  def groundDps                                   : Int                     = if (canFight) unitClass.groundDps else 0
+  def airDps                                      : Double                  = unitClass.airDps
+  def groundDps                                   : Double                  = unitClass.groundDps
   def totalCost                                   : Int                     = unitClass.totalCost
   def tileCenter                                  : TilePosition            = pixelCenter.toTilePosition
   def hypotenuse                                  : Double                  = unitClass.width * 1.41421356

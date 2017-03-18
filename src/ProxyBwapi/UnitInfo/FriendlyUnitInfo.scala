@@ -49,7 +49,7 @@ class FriendlyUnitInfo(friendlyBaseUnit:bwapi.Unit) extends UnitInfo(friendlyBas
   def isMoving                            : Boolean                   = baseUnit.isMoving
   def command                             : UnitCommand               = baseUnit.getLastCommand
   def cooldownRemaining                   : Int                       = Math.max(baseUnit.getGroundWeaponCooldown, baseUnit.getAirWeaponCooldown)
-  def onCooldown                          : Boolean                   = cooldownRemaining > 0 || ! canFight
+  def onCooldown                          : Boolean                   = cooldownRemaining > 0 || ! unitClass.canAttack
   def energy                              : Int                       = baseUnit.getEnergy
   def scarabs                             : Int                       = baseUnit.getScarabCount
   def interceptors                        : Int                       = baseUnit.getInterceptorCount

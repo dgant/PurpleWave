@@ -12,17 +12,23 @@ class Battles {
   
   val all = new mutable.HashSet[Battle]
   
+  def unit(unit:UnitInfo):Option[Battle] = {
+    None
+  }
+  
   def onFrame() = updateLimiter.act()
   private val updateLimiter = new Limiter(2, update)
+  private def update() {
+    defineBattles()
+    all.foreach(update)
+    all.filterNot(isValid).foreach(all.remove)
+  }
+  
   private def update(battle:Battle) {
     val groups = List(battle.us, battle.enemy)
     groups.foreach(group => group.units.filterNot(_.alive).foreach(group.units.remove))
-    if ( ! isValid(battle)) {
-      return
-    }
-    groups.foreach(group => {
-      group.center          = BattleMetrics.center(group)
-    })
+    if ( ! isValid(battle)) return
+    groups.foreach(group => group.center = BattleMetrics.center(group))
     battle.us.vanguard    = battle.us.units.minBy(_.pixelCenter.distancePixelsSquared(battle.enemy.center)).pixelCenter
     battle.enemy.vanguard = battle.enemy.units.minBy(_.pixelCenter.distancePixelsSquared(battle.us.center)).pixelCenter
     groups.foreach(group => group.strength = BattleMetrics.evaluate(group, battle))
@@ -32,23 +38,17 @@ class Battles {
     battle.us.units.nonEmpty && battle.enemy.units.nonEmpty
   }
   
-  private def update() {
-    defineBattles()
-    all.foreach(update)
-    all.filterNot(isValid).foreach(all.remove)
-  }
-  
   private def defineBattles() {
-    val battleRange = 32 * 16
-    val ourClusters = Clustering.groupUnits(getFighters(With.units.ours), battleRange).values
+    val battleRange   = 32 * 16
+    val ourClusters   = Clustering.groupUnits(getFighters(With.units.ours),  battleRange).values
     val enemyClusters = Clustering.groupUnits(getFighters(With.units.enemy), battleRange).values
-    val ourGroups = ourClusters.map(group => new BattleGroup(group))
-    val enemyGroups = enemyClusters.map(group => new BattleGroup(group))
+    val ourGroups     = ourClusters  .map(group => new BattleGroup(group))
+    val enemyGroups   = enemyClusters.map(group => new BattleGroup(group))
     assignBattles(ourGroups, enemyGroups)
   }
   
   private def getFighters(units:Iterable[UnitInfo]):Iterable[UnitInfo] = {
-    units.filter(u => u.possiblyStillThere && u.canFight)
+    units.filter(u => u.possiblyStillThere && u.alive && u.impactsCombat)
   }
   
   private def assignBattles(

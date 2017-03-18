@@ -1,11 +1,12 @@
 package Planning.Plans.GamePlans
 
-import Macro.BuildRequests.{BuildRequest, RequestUnitAnother, RequestUnitAnotherOne, RequestUpgrade}
+import Macro.BuildRequests._
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plans.Army.{Attack, DefendChoke}
 import Planning.Plans.Compound.{IfThenElse, Parallel}
 import Planning.Plans.Information.ScoutAt
-import Planning.Plans.Macro.Build.ScheduleBuildOrder
+import Planning.Plans.Macro.Automatic.{BuildPylonsContinuously, TrainContinuously, TrainProbesContinuously}
+import Planning.Plans.Macro.BuildOrders.ScheduleBuildOrder
 import Planning.Plans.Macro.UnitCount.UnitCountAtLeast
 import ProxyBwapi.Races.Protoss
 
@@ -58,12 +59,28 @@ class ProtossVsProtoss extends Parallel {
     new RequestUnitAnotherOne(Protoss.Nexus)
   )
   
+  val _twoBaseBuild = List[BuildRequest] (
+    new RequestUnitAtLeast(4, Protoss.Gateway),
+    new RequestUnitAtLeast(1, Protoss.RoboticsFacility),
+    new RequestUnitAtLeast(6, Protoss.Gateway),
+    new RequestUnitAtLeast(1, Protoss.RoboticsSupportBay),
+    new RequestUnitAtLeast(3, Protoss.Nexus),
+    new RequestUnitAtLeast(3, Protoss.RoboticsFacility),
+    new RequestUnitAtLeast(4, Protoss.Nexus),
+    new RequestUnitAtLeast(4, Protoss.RoboticsFacility),
+    new RequestUnitAtLeast(8, Protoss.Gateway),
+    new RequestUnitAtLeast(5, Protoss.Nexus),
+    new RequestUnitAtLeast(12, Protoss.Gateway)
+  )
+  
   children.set(List(
     new ScheduleBuildOrder { buildables.set(_fourGateGoons) },
-    //new BuildPylonsContinuously,
-    //new TrainProbesContinuously,
-    //new TrainContinuously(Scout),
-    //new TrainContinuously(Zealot),
+    new BuildPylonsContinuously,
+    new TrainProbesContinuously,
+    new TrainContinuously(Protoss.Reaver),
+    new TrainContinuously(Protoss.Dragoon),
+    new TrainContinuously(Protoss.Zealot),
+    new ScheduleBuildOrder { buildables.set(_twoBaseBuild) },
     new ScoutAt(20),
     new IfThenElse {
       predicate.set(new UnitCountAtLeast { quantity.set(6); unitMatcher.set(UnitMatchWarriors) })

@@ -26,13 +26,14 @@ class ForeignUnitTracker {
     
     //Important to remember: bwapi.Units are not persisted frame-to-frame
     //So we do all our comparisons by ID, rather than by object
-    
-    val foreignUnitsNew           = With.game.getAllUnits.asScala.filter(isValidForeignUnit).map(unit => (unit.getID, unit)).toMap
-    val foreignUnitsOld           = foreignUnitsById
-    val foreignIdsNew             = foreignUnitsNew.keySet
-    val foreignIdsOld             = foreignUnitsOld.keySet
-    val unitsToAdd                = foreignIdsNew.diff      (foreignIdsOld).map(foreignUnitsNew)
-    val unitsToUpdate             = foreignIdsNew.intersect (foreignIdsOld).map(foreignUnitsNew)
+  
+    val foreignUnitsKnown         = foreignUnitsById
+    val foreignUnitsVisible       = With.game.getAllUnits.asScala.filter(isValidForeignUnit).map(unit => (unit.getID, unit)).toMap
+    val foreignIdsKnown           = foreignUnitsKnown.keySet
+    val foreignIdsVisible         = foreignUnitsVisible.keySet
+    val unitsToAdd                = foreignIdsVisible.diff      (foreignIdsKnown)   .map(foreignUnitsVisible)
+    val unitsToUpdate             = foreignIdsVisible.intersect (foreignIdsKnown)   .map(foreignUnitsVisible)
+    val unitsToFlagInvisible      = foreignIdsKnown.diff        (foreignIdsVisible) .map(foreignUnitsById)
     
     unitsToAdd.foreach(add)
     unitsToUpdate.foreach(unit => foreignUnitsById(unit.getID).update(unit))
@@ -47,6 +48,7 @@ class ForeignUnitTracker {
     enemyUnits   = foreignUnits.filter(_.player.isEnemy(With.self))
     neutralUnits = foreignUnits.filter(_.player.isNeutral)
   
+    unitsToFlagInvisible.foreach(_._visible = false)
     limitInvalidatePositions.act()
   }
   

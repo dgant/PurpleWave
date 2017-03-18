@@ -17,11 +17,11 @@ class Configuration {
   var enableVisualizationEconomy        = false
   var enableVisualizationGrids          = false
   var enableVisualizationPerformance    = true
-  var enableVisualizationPlans          = true
+  var enableVisualizationPlans          = false
   var enableVisualizationResources      = false
   var enableVisualizationScheduler      = false
   var enableVisualizationGeography      = false
   var enableVisualizationUnitsForeign   = true
   var enableVisualizationUnitsOurs      = true
-  var enableVisualizationZones          = true
+  var enableVisualizationZones          = false
 }

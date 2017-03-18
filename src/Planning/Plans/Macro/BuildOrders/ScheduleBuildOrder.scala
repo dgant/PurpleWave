@@ -1,9 +1,9 @@
-package Planning.Plans.Macro.Build
+package Planning.Plans.Macro.BuildOrders
 
-import Planning.Plan
-import Startup.With
 import Macro.BuildRequests.BuildRequest
 import Planning.Composition.Property
+import Planning.Plan
+import Startup.With
 
 class ScheduleBuildOrder extends Plan {
   

@@ -45,7 +45,7 @@ class Scheduler {
     unitsWanted:CountMap[UnitClass],
     unitsActual:CountMap[UnitClass]):Iterable[Buildable] = {
     if (request.buildable.upgradeOption.nonEmpty) {
-      if(With.self.getUpgradeLevel(request.buildable.upgradeOption.get.baseType) >= request.buildable.upgradeLevel)
+      if(With.self.getUpgradeLevel(request.buildable.upgradeOption.get.baseType) < request.buildable.upgradeLevel)
         return List(request.buildable)
       else
         return None

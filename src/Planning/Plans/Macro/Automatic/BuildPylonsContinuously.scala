@@ -1,9 +1,17 @@
 package Planning.Plans.Macro.Automatic
 
+import Macro.BuildRequests.RequestUnitAtLeast
+import Planning.Plan
 import ProxyBwapi.Races.Protoss
 import Startup.With
 
-class BuildPylonsContinuously  {
+class BuildPylonsContinuously extends Plan {
+  
+  description.set("Builds Pylons just-in-time to prevent supply block")
+  
+  override def onFrame() {
+    With.scheduler.request(this, List(new RequestUnitAtLeast(totalRequiredRecalculate, Protoss.Pylon)))
+  }
   
   def totalRequiredRecalculate: Int = {
   

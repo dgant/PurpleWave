@@ -4,7 +4,7 @@ import Planning.Plans.Army.Defend
 import Planning.Plans.Compound.Parallel
 import Planning.Plans.Information.SwitchEnemyRace
 import Planning.Plans.Macro.Automatic.{GatherGas, GatherMinerals}
-import Planning.Plans.Macro.Build.FollowBuildOrder
+import Planning.Plans.Macro.BuildOrders.FollowBuildOrder
 
 class ProtossGamePlan extends Parallel {
   children.set(List(

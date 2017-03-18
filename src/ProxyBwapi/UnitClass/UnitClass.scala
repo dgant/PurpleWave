@@ -12,85 +12,164 @@ import bwapi.{DamageType, TilePosition, UnitType}
 import scala.collection.JavaConverters._
 
 case class UnitClass(val baseType:UnitType) {
-  def abilities             = new CacheForever(() => baseType.abilities.asScala.map(Techs.get)).get
-  def acceleration          = new CacheForever(() => baseType.acceleration).get
-  def armorUpgrade          = new CacheForever(() => Upgrades.get(baseType.armorUpgrade)).get
-  def buildScore            = new CacheForever(() => baseType.buildScore).get
-  def buildTime             = new CacheForever(() => baseType.buildTime).get
-  def canAttack             = new CacheForever(() => baseType.canAttack).get
-  def canBuildAddon         = new CacheForever(() => baseType.canBuildAddon).get
-  def canMove               = new CacheForever(() => baseType.canMove).get
-  def canProduce            = new CacheForever(() => baseType.canProduce).get
-  def cloakingTech          = new CacheForever(() => Techs.get(baseType.cloakingTech)).get
-  def destroyScore          = new CacheForever(() => baseType.destroyScore).get
-  def dimensionDown         = new CacheForever(() => baseType.dimensionDown).get
-  def dimensionLeft         = new CacheForever(() => baseType.dimensionLeft).get
-  def dimensionRight        = new CacheForever(() => baseType.dimensionRight).get
-  def dimensionUp           = new CacheForever(() => baseType.dimensionUp).get
-  def gasPrice              = new CacheForever(() => baseType.gasPrice).get
-  def haltDistance          = new CacheForever(() => baseType.haltDistance).get
-  def permanentlyCloaked    = new CacheForever(() => baseType.hasPermanentCloak).get
-  def height                = new CacheForever(() => baseType.height).get
-  def isAddon               = new CacheForever(() => baseType.isAddon).get
-  def isBeacon              = new CacheForever(() => baseType.isBeacon).get
-  def isBuilding            = new CacheForever(() => baseType.isBuilding).get
-  def isBurrowable          = new CacheForever(() => baseType.isBurrowable).get
-  def isCloakable           = new CacheForever(() => baseType.isCloakable).get
-  def isCritter             = new CacheForever(() => baseType.isCritter).get
-  def isDetector            = new CacheForever(() => baseType.isDetector).get
-  def isFlagBeacon          = new CacheForever(() => baseType.isFlagBeacon).get
-  def isFlyer               = new CacheForever(() => baseType.isFlyer).get
-  def isFlyingBuilding      = new CacheForever(() => baseType.isFlyingBuilding).get
-  def isHero                = new CacheForever(() => baseType.isHero).get
-  def isInvincible          = new CacheForever(() => baseType.isInvincible).get
-  def isMechanical          = new CacheForever(() => baseType.isMechanical).get
-  def isMineralField        = new CacheForever(() => baseType.isMineralField).get
-  def isNeutral             = new CacheForever(() => baseType.isNeutral).get
-  def isOrganic             = new CacheForever(() => baseType.isOrganic).get
-  def isPowerup             = new CacheForever(() => baseType.isPowerup).get
-  def isRefinery            = new CacheForever(() => baseType.isRefinery).get
-  def isResourcesContainer  = new CacheForever(() => baseType.isResourceContainer).get
-  def isResourceDepot       = new CacheForever(() => baseType.isResourceDepot).get
-  def isRobotic             = new CacheForever(() => baseType.isRobotic).get
-  def isSpecialBuilding     = new CacheForever(() => baseType.isSpecialBuilding).get
-  def isSpell               = new CacheForever(() => baseType.isSpell).get
-  def isSpellcaster         = new CacheForever(() => baseType.isSpellcaster).get
-  def isTwoUnitsInOneEgg    = new CacheForever(() => baseType.isTwoUnitsInOneEgg).get
-  def isWorker              = new CacheForever(() => baseType.isWorker).get
-  def maxAirHits            = new CacheForever(() => baseType.maxAirHits).get
-  def maxEnergy             = new CacheForever(() => baseType.maxEnergy).get
-  def maxGroundHits         = new CacheForever(() => baseType.maxGroundHits).get
-  def maxHitPoints          = new CacheForever(() => baseType.maxHitPoints).get
-  def maxShields            = new CacheForever(() => baseType.maxShields).get
-  def mineralPrice          = new CacheForever(() => baseType.mineralPrice).get
-  def producesCreep         = new CacheForever(() => baseType.producesCreep).get
-  def producesLarva         = new CacheForever(() => baseType.producesLarva).get
-  def regeneratesHP         = new CacheForever(() => baseType.regeneratesHP).get
-  def requiredTech          = new CacheForever(() => Techs.get(baseType.requiredTech)).get
-  def requiredUnits         = new CacheForever(() => baseType.requiredUnits.asScala.map(pair => (UnitClasses.get(pair._1), pair._2))).get
-  def requiresCreep         = new CacheForever(() => baseType.requiresCreep).get
-  def requiresPsi           = new CacheForever(() => baseType.requiresPsi).get
-  def researchesWhat        = new CacheForever(() => baseType.researchesWhat.asScala.map(Techs.get)).get
-  def seekRange             = new CacheForever(() => baseType.seekRange).get
-  def sightRange            = new CacheForever(() => baseType.sightRange).get
-  def size                  = new CacheForever(() => baseType.size).get
-  def spaceProvided         = new CacheForever(() => baseType.spaceProvided).get
-  def spaceRequired         = new CacheForever(() => baseType.spaceRequired).get
-  def supplyProvided        = new CacheForever(() => baseType.supplyProvided).get
-  def supplyRequired        = new CacheForever(() => baseType.supplyRequired).get
-  def tileHeight            = new CacheForever(() => baseType.tileHeight).get
-  def tileSize              = new CacheForever(() => baseType.tileSize).get
-  def tileWidth             = new CacheForever(() => baseType.tileWidth).get
-  def topSpeed              = new CacheForever(() => baseType.topSpeed).get
-  def turnRadius            = new CacheForever(() => baseType.turnRadius).get
-  def upgrades              = new CacheForever(() => baseType.upgrades.asScala.map(Upgrades.get)).get
-  def upgradesWhat          = new CacheForever(() => baseType.upgradesWhat.asScala.map(Upgrades.get)).get
-  def whatBuilds            = new CacheForever(() => new Pair(UnitClasses.get(baseType.whatBuilds.first), baseType.whatBuilds.second)).get
-  def width                 = new CacheForever(() => baseType.width).get
-  def getRace               = new CacheForever(() => baseType.getRace).get
-  def airWeapon             = new CacheForever(() => baseType.airWeapon).get
-  def groundWeapon          = new CacheForever(() => baseType.groundWeapon).get
-  def asString              = new CacheForever(() => baseType.toString).get
+  private val abilitiesCache             = new CacheForever(() => baseType.abilities.asScala.map(Techs.get))
+  private val accelerationCache          = new CacheForever(() => baseType.acceleration)
+  private val armorUpgradeCache          = new CacheForever(() => Upgrades.get(baseType.armorUpgrade))
+  private val buildScoreCache            = new CacheForever(() => baseType.buildScore)
+  private val buildTimeCache             = new CacheForever(() => baseType.buildTime)
+  private val canAttackCache             = new CacheForever(() => baseType.canAttack)
+  private val canBuildAddonCache         = new CacheForever(() => baseType.canBuildAddon)
+  private val canMoveCache               = new CacheForever(() => baseType.canMove)
+  private val canProduceCache            = new CacheForever(() => baseType.canProduce)
+  private val cloakingTechCache          = new CacheForever(() => Techs.get(baseType.cloakingTech))
+  private val destroyScoreCache          = new CacheForever(() => baseType.destroyScore)
+  private val dimensionDownCache         = new CacheForever(() => baseType.dimensionDown)
+  private val dimensionLeftCache         = new CacheForever(() => baseType.dimensionLeft)
+  private val dimensionRightCache        = new CacheForever(() => baseType.dimensionRight)
+  private val dimensionUpCache           = new CacheForever(() => baseType.dimensionUp)
+  private val gasPriceCache              = new CacheForever(() => baseType.gasPrice)
+  private val haltDistanceCache          = new CacheForever(() => baseType.haltDistance)
+  private val permanentlyCloakedCache    = new CacheForever(() => baseType.hasPermanentCloak)
+  private val heightCache                = new CacheForever(() => baseType.height)
+  private val isAddonCache               = new CacheForever(() => baseType.isAddon)
+  private val isBeaconCache              = new CacheForever(() => baseType.isBeacon)
+  private val isBuildingCache            = new CacheForever(() => baseType.isBuilding)
+  private val isBurrowableCache          = new CacheForever(() => baseType.isBurrowable)
+  private val isCloakableCache           = new CacheForever(() => baseType.isCloakable)
+  private val isCritterCache             = new CacheForever(() => baseType.isCritter)
+  private val isDetectorCache            = new CacheForever(() => baseType.isDetector)
+  private val isFlagBeaconCache          = new CacheForever(() => baseType.isFlagBeacon)
+  private val isFlyerCache               = new CacheForever(() => baseType.isFlyer)
+  private val isFlyingBuildingCache      = new CacheForever(() => baseType.isFlyingBuilding)
+  private val isHeroCache                = new CacheForever(() => baseType.isHero)
+  private val isInvincibleCache          = new CacheForever(() => baseType.isInvincible)
+  private val isMechanicalCache          = new CacheForever(() => baseType.isMechanical)
+  private val isMineralFieldCache        = new CacheForever(() => baseType.isMineralField)
+  private val isNeutralCache             = new CacheForever(() => baseType.isNeutral)
+  private val isOrganicCache             = new CacheForever(() => baseType.isOrganic)
+  private val isPowerupCache             = new CacheForever(() => baseType.isPowerup)
+  private val isRefineryCache            = new CacheForever(() => baseType.isRefinery)
+  private val isResourceContainerCache   = new CacheForever(() => baseType.isResourceContainer)
+  private val isResourceDepotCache       = new CacheForever(() => baseType.isResourceDepot)
+  private val isRoboticCache             = new CacheForever(() => baseType.isRobotic)
+  private val isSpecialBuildingCache     = new CacheForever(() => baseType.isSpecialBuilding)
+  private val isSpellCache               = new CacheForever(() => baseType.isSpell)
+  private val isSpellcasterCache         = new CacheForever(() => baseType.isSpellcaster)
+  private val isTwoUnitsInOneEggCache    = new CacheForever(() => baseType.isTwoUnitsInOneEgg)
+  private val isWorkerCache              = new CacheForever(() => baseType.isWorker)
+  private val maxAirHitsCache            = new CacheForever(() => baseType.maxAirHits)
+  private val maxEnergyCache             = new CacheForever(() => baseType.maxEnergy)
+  private val maxGroundHitsCache         = new CacheForever(() => baseType.maxGroundHits)
+  private val maxHitPointsCache          = new CacheForever(() => baseType.maxHitPoints)
+  private val maxShieldsCache            = new CacheForever(() => baseType.maxShields)
+  private val mineralPriceCache          = new CacheForever(() => baseType.mineralPrice)
+  private val producesCreepCache         = new CacheForever(() => baseType.producesCreep)
+  private val producesLarvaCache         = new CacheForever(() => baseType.producesLarva)
+  private val regeneratesHPCache         = new CacheForever(() => baseType.regeneratesHP)
+  private val requiredTechCache          = new CacheForever(() => Techs.get(baseType.requiredTech))
+  private val requiredUnitsCache         = new CacheForever(() => baseType.requiredUnits.asScala.map(pair => (UnitClasses.get(pair._1), pair._2)))
+  private val requiresCreepCache         = new CacheForever(() => baseType.requiresCreep)
+  private val requiresPsiCache           = new CacheForever(() => baseType.requiresPsi)
+  private val researchesWhatCache        = new CacheForever(() => baseType.researchesWhat.asScala.map(Techs.get))
+  private val seekRangeCache             = new CacheForever(() => baseType.seekRange)
+  private val sightRangeCache            = new CacheForever(() => baseType.sightRange)
+  private val sizeCache                  = new CacheForever(() => baseType.size)
+  private val spaceProvidedCache         = new CacheForever(() => baseType.spaceProvided)
+  private val spaceRequiredCache         = new CacheForever(() => baseType.spaceRequired)
+  private val supplyProvidedCache        = new CacheForever(() => baseType.supplyProvided)
+  private val supplyRequiredCache        = new CacheForever(() => baseType.supplyRequired)
+  private val tileHeightCache            = new CacheForever(() => baseType.tileHeight)
+  private val tileSizeCache              = new CacheForever(() => baseType.tileSize)
+  private val tileWidthCache             = new CacheForever(() => baseType.tileWidth)
+  private val topSpeedCache              = new CacheForever(() => baseType.topSpeed)
+  private val turnRadiusCache            = new CacheForever(() => baseType.turnRadius)
+  private val upgradesCache              = new CacheForever(() => baseType.upgrades.asScala.map(Upgrades.get))
+  private val upgradesWhatCache          = new CacheForever(() => baseType.upgradesWhat.asScala.map(Upgrades.get))
+  private val whatBuildsCache            = new CacheForever(() => new Pair(UnitClasses.get(baseType.whatBuilds.first), baseType.whatBuilds.second))
+  private val widthCache                 = new CacheForever(() => baseType.width)
+  private val getRaceCache               = new CacheForever(() => baseType.getRace)
+  private val airWeaponCache             = new CacheForever(() => baseType.airWeapon)
+  private val groundWeaponCache          = new CacheForever(() => baseType.groundWeapon)
+  private val asStringCache              = new CacheForever(() => baseType.toString)
+  
+  def abilities             = abilitiesCache.get
+  def acceleration          = accelerationCache.get
+  def armorUpgrade          = armorUpgradeCache.get
+  def buildScore            = buildScoreCache.get
+  def buildTime             = buildTimeCache.get
+  def canAttack             = canAttackCache.get
+  def canBuildAddon         = canBuildAddonCache.get
+  def canMove               = canMoveCache.get
+  def canProduce            = canProduceCache.get
+  def cloakingTech          = cloakingTechCache.get
+  def destroyScore          = destroyScoreCache.get
+  def dimensionDown         = dimensionDownCache.get
+  def dimensionLeft         = dimensionLeftCache.get
+  def dimensionRight        = dimensionRightCache.get
+  def dimensionUp           = dimensionUpCache.get
+  def gasPrice              = gasPriceCache.get
+  def haltDistance          = haltDistanceCache.get
+  def permanentlyCloaked    = permanentlyCloakedCache.get
+  def height                = heightCache.get
+  def isAddon               = isAddonCache.get
+  def isBeacon              = isBeaconCache.get
+  def isBuilding            = isBuildingCache.get
+  def isBurrowaable         = isBurrowableCache.get
+  def isCloakable           = isCloakableCache.get
+  def isCritter             = isCritterCache.get
+  def isDetector            = isDetectorCache.get
+  def isFlagBeacon          = isFlagBeaconCache.get
+  def isFlyer               = isFlyerCache.get
+  def isFlyingBuilding      = isFlyingBuildingCache.get
+  def isHero                = isHeroCache.get
+  def isInvincible          = isInvincibleCache.get
+  def isMechanical          = isMechanicalCache.get
+  def isMineralField        = isMineralFieldCache.get
+  def isNeutral             = isNeutralCache.get
+  def isOrganic             = isOrganicCache.get
+  def isPowerup             = isPowerupCache.get
+  def isRefinery            = isRefineryCache.get
+  def isResourceContainer   = isResourceContainerCache.get
+  def isResourceDepot       = isResourceDepotCache.get
+  def isRobotic             = isRoboticCache.get
+  def isSpecialBuilding     = isSpecialBuildingCache.get
+  def isSpell               = isSpellCache.get
+  def isSpellcaster         = isSpellcasterCache.get
+  def isTwoUnitsInOneEgg    = isTwoUnitsInOneEggCache.get
+  def isWorker              = isWorkerCache.get
+  def maxAirHits            = maxAirHitsCache.get
+  def maxEnergy             = maxEnergyCache.get
+  def maxHitPoints          = maxHitPointsCache.get
+  def maxGroundHits         = maxGroundHitsCache.get
+  def maxShields            = maxShieldsCache.get
+  def mineralPrice          = mineralPriceCache.get
+  def producesCreep         = producesCreepCache.get
+  def producesLarva         = producesLarvaCache.get
+  def regeneratesHP         = regeneratesHPCache.get
+  def requiredTech          = requiredTechCache.get
+  def requiredUnits         = requiredUnitsCache.get
+  def requiresCreep         = requiresCreepCache.get
+  def requiresPsi           = requiresPsiCache.get
+  def researchesWhat        = researchesWhatCache.get
+  def seekRange             = seekRangeCache.get
+  def sightRange            = sightRangeCache.get
+  def size                  = sizeCache.get
+  def spaceProvided         = spaceProvidedCache.get
+  def spaceRequired         = spaceRequiredCache.get
+  def supplyProvided        = supplyProvidedCache.get
+  def supplyRequired        = supplyRequiredCache.get
+  def tileHeight            = tileHeightCache.get
+  def tileSize              = tileSizeCache.get
+  def tileWidth             = tileWidthCache.get
+  def topSpeed              = topSpeedCache.get
+  def turnRadius            = turnRadiusCache.get
+  def upgrades              = upgradesCache.get
+  def whatBuilds            = whatBuildsCache.get
+  def width                 = widthCache.get
+  def getRace               = getRaceCache.get
+  def airWeapon             = airWeaponCache.get
+  def groundWeapon          = groundWeaponCache.get
+  def asString              = asStringCache.get
   
   //////////////////////////////////
   // Formerly from EnrichUnitType //

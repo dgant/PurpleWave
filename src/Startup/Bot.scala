@@ -58,6 +58,7 @@ class Bot() extends DefaultBWListener {
       With.game.setLatCom(With.configuration.enableLatencyCompensation)
     }
     catch { case exception:Exception =>
+      val dontLoseTheExceptionWhileDebugging = exception
       val dontLoseTheStackTraceWhileDebugging = exception.getStackTrace
       With.logger.onException(exception)}
   }

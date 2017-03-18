@@ -7,6 +7,7 @@ import bwapi.TilePosition
 class MovementProfile(
   var preferTravel      : Double = 0,
   var preferSpot        : Double = 0,
+  var preferSitAtRange  : Double = 0,
   var preferMobility    : Double = 0,
   var preferHighGround  : Double = 0,
   var preferGrouping    : Double = 0,
@@ -21,6 +22,7 @@ class MovementProfile(
     List(
       weigh(  travel      (intent, candidate)       , preferTravel),
       weigh(  spot        (intent, candidate)       , preferSpot),
+      weigh(  sitAtRange  (intent, candidate) / 10  , preferSitAtRange),
       weigh(  mobility    (intent, candidate) / 10  , preferMobility),
       weigh(  highGround  (intent, candidate)       , preferHighGround),
       weigh(  grouping    (intent, candidate) / 100 , preferGrouping),
@@ -32,14 +34,22 @@ class MovementProfile(
     )
     .product
   
+  //TODO: Could performance optimize by not actually evaluating if weight is 0
   //TODO: Consolidate with TargetProfile
   def weigh(value:Double, weight:Double):Double = Math.pow(normalize(value), weight)
   def unboolify(value:Boolean)                  = if (value) 2 else 1
   def normalize(value:Double)                   = Math.min(Math.max(0.01, value), 1000000)
   
-  def travel(intent: Intention, candidate: TilePosition):Double = distance(intent, candidate, 32 * 3)
+  def travel(intent: Intention, candidate: TilePosition):Double = distance(intent, candidate, 32 * 6)
   
   def spot(intent: Intention, candidate: TilePosition):Double = distance(intent, candidate, 32 * 1)
+  
+  def sitAtRange(intent: Intention, candidate: TilePosition): Double = {
+    if (intent.targets.isEmpty) return 1
+    
+    val minDistance = intent.targets.map(_.tileCenter.getDistance(candidate)).min
+    Math.abs(minDistance - intent.unit.range)
+  }
   
   def distance(intent: Intention, candidate: TilePosition, margin: Int): Double = {
     if (intent.destination.isEmpty) return unboolify(false)

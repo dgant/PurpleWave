@@ -5,17 +5,32 @@ import ProxyBwapi.UnitClass.UnitClasses
 import bwapi.TechType
 
 case class Tech(val baseType:TechType) {
-  def energyCost      = new CacheForever(() => baseType.energyCost).get
-  def getOrder        = new CacheForever(() => baseType.getOrder).get
-  def gasPrice        = new CacheForever(() => baseType.gasPrice).get
-  def getRace         = new CacheForever(() => baseType.getRace).get
-  def getWeapon       = new CacheForever(() => baseType.getWeapon).get
-  def mineralPrice    = new CacheForever(() => baseType.mineralPrice).get
-  def researchTime    = new CacheForever(() => baseType.researchTime).get
-  def requiredUnit    = new CacheForever(() => UnitClasses.get(baseType.requiredUnit)).get
-  def targetsPosition = new CacheForever(() => baseType.targetsPosition).get
-  def targetsUnits    = new CacheForever(() => baseType.targetsUnit).get
-  def whatResearches  = new CacheForever(() => UnitClasses.get(baseType.whatResearches)).get
   
-  override def toString:String = baseType.toString.replaceAll("_", " ")
+  private val energyCostCache      = new CacheForever(() => baseType.energyCost)
+  private val getOrderCache        = new CacheForever(() => baseType.getOrder)
+  private val gasPriceCache        = new CacheForever(() => baseType.gasPrice)
+  private val getRaceCache         = new CacheForever(() => baseType.getRace)
+  private val getWeaponCache       = new CacheForever(() => baseType.getWeapon)
+  private val mineralPriceCache    = new CacheForever(() => baseType.mineralPrice)
+  private val researchTimeCache    = new CacheForever(() => baseType.researchTime)
+  private val requiredUnitCache    = new CacheForever(() => UnitClasses.get(baseType.requiredUnit))
+  private val targetsPositionCache = new CacheForever(() => baseType.targetsPosition)
+  private val targetsUnitsCache    = new CacheForever(() => baseType.targetsUnit)
+  private val whatResearchesCache  = new CacheForever(() => UnitClasses.get(baseType.whatResearches))
+  private val asStringCache        = new CacheForever(() => baseType.toString.replaceAll("_", " "))
+  
+  def energyCost      = energyCostCache.get
+  def getOrder        = getOrderCache.get
+  def gasPrice        = gasPriceCache.get
+  def getRace         = getRaceCache.get
+  def getWeapon       = getWeaponCache.get
+  def mineralPrice    = mineralPriceCache.get
+  def researchTime    = researchTimeCache.get
+  def requiredUnit    = requiredUnitCache.get
+  def targetsPosition = targetsPositionCache.get
+  def targetsUnits    = targetsUnitsCache.get
+  def whatResearches  = whatResearchesCache.get
+  def asString        = asStringCache.get
+  
+  override def toString:String = asString
 }

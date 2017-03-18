@@ -31,7 +31,7 @@ object BehaviorDefault extends Behavior {
   val normalMovement = new MovementProfile (
     preferTravel      = 1,
     preferSpot        = 0.25,
-    preferMobility    = 0,
+    preferMobility    = 0.25,
     preferHighGround  = 0.5,
     preferGrouping    = 0.1,
     preferRandom      = 0.25,
@@ -56,9 +56,9 @@ object BehaviorDefault extends Behavior {
   
   val defaultTargetProfile = new TargetingProfile(
     preferInRange     = 2,
-    preferValue       = 1,
+    preferValue       = 0.25,
     preferFocus       = 1,
-    preferDps         = 2,
+    preferDps         = 3,
     avoidHealth       = 3,
     avoidDistance     = 1)
 }

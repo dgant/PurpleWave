@@ -14,14 +14,14 @@ class Configuration {
   
   var enableVisualization               = true
   var enableVisualizationBattles        = true
-  var enableVisualizationEconomy        = false
+  var enableVisualizationEconomy        = true
   var enableVisualizationGrids          = false
   var enableVisualizationPerformance    = true
-  var enableVisualizationPlans          = true
+  var enableVisualizationPlans          = false
   var enableVisualizationResources      = false
   var enableVisualizationScheduler      = false
   var enableVisualizationGeography      = false
-  var enableVisualizationUnitsForeign   = true
+  var enableVisualizationUnitsForeign   = false
   var enableVisualizationUnitsOurs      = true
   var enableVisualizationZones          = false
 }

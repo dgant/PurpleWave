@@ -30,23 +30,25 @@ object BehaviorDefault extends Behavior {
   
   val normalMovement = new MovementProfile (
     preferTravel      = 1,
+    preferSpot        = 0.25,
     preferMobility    = 0,
-    preferHighGround  = 0,
-    preferGrouping    = 0.2,
-    preferRandom      = 0.1,
+    preferHighGround  = 0.5,
+    preferGrouping    = 0.1,
+    preferRandom      = 0.25,
     avoidDamage       = 0,
-    avoidTraffic      = 0.5,
-    avoidVision       = 0.1,
+    avoidTraffic      = 0.75,
+    avoidVision       = 0,
     avoidDetection    = 0
   )
   
   val combatMovement = new MovementProfile (
-    preferTravel      = 0.5,
+    preferTravel      = 0.25,
+    preferSpot        = 0,
     preferMobility    = 2,
     preferHighGround  = 1,
     preferGrouping    = 1,
-    preferRandom      = 0.25,
-    avoidDamage       = 3,
+    preferRandom      = 0.1,
+    avoidDamage       = 2,
     avoidTraffic      = 1,
     avoidVision       = 0,
     avoidDetection    = 0

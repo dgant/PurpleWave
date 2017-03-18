@@ -90,6 +90,7 @@ case class UnitClass(val baseType:UnitType) {
   def getRace               = new CacheForever(() => baseType.getRace).get
   def airWeapon             = new CacheForever(() => baseType.airWeapon).get
   def groundWeapon          = new CacheForever(() => baseType.groundWeapon).get
+  def asString              = new CacheForever(() => baseType.toString).get
   
   //////////////////////////////////
   // Formerly from EnrichUnitType //
@@ -135,7 +136,7 @@ case class UnitClass(val baseType:UnitType) {
   def area:TileRectangle =
     new TileRectangle(
       new TilePosition(0, 0),
-      baseType.tileSize)
+      tileSize)
   def tiles:Iterable[TilePosition] = area.tiles
   
   def behavior:Behavior = {
@@ -147,7 +148,7 @@ case class UnitClass(val baseType:UnitType) {
   }
   
   override def toString:String =
-    baseType.toString
+    asString
       .replace("Terran_", "")
       .replace("Zerg_", "")
       .replace("Protoss_", "")

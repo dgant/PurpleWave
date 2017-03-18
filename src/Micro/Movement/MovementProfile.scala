@@ -6,6 +6,7 @@ import bwapi.TilePosition
 
 class MovementProfile(
   var preferTravel      : Double = 0,
+  var preferSpot        : Double = 0,
   var preferMobility    : Double = 0,
   var preferHighGround  : Double = 0,
   var preferGrouping    : Double = 0,
@@ -19,6 +20,7 @@ class MovementProfile(
   override def evaluate(intent: Intention, candidate: TilePosition): Double =
     List(
       weigh(  travel      (intent, candidate)       , preferTravel),
+      weigh(  spot        (intent, candidate)       , preferSpot),
       weigh(  mobility    (intent, candidate) / 10  , preferMobility),
       weigh(  highGround  (intent, candidate)       , preferHighGround),
       weigh(  grouping    (intent, candidate) / 100 , preferGrouping),
@@ -35,11 +37,15 @@ class MovementProfile(
   def unboolify(value:Boolean)                  = if (value) 2 else 1
   def normalize(value:Double)                   = Math.min(Math.max(0.01, value), 1000000)
   
-  def travel(intent: Intention, candidate: TilePosition): Double = {
+  def travel(intent: Intention, candidate: TilePosition):Double = distance(intent, candidate, 32 * 3)
+  
+  def spot(intent: Intention, candidate: TilePosition):Double = distance(intent, candidate, 32 * 1)
+  
+  def distance(intent: Intention, candidate: TilePosition, margin: Int): Double = {
     if (intent.destination.isEmpty) return unboolify(false)
     
-    val before = With.paths.groundDistance(intent.unit.tileCenter, intent.destination.get)
-    val after = With.paths.groundDistance(candidate,               intent.destination.get)
+    val before = Math.max(0, With.paths.groundDistance(intent.unit.tileCenter, intent.destination.get) - margin)
+    val after  = Math.max(0, With.paths.groundDistance(candidate,              intent.destination.get) - margin)
     unboolify(after < before)
   }
   
@@ -63,7 +69,7 @@ class MovementProfile(
   }
   
   def random(intent:Intention, candidate: TilePosition): Double = {
-    val randomVariation = 0.2
+    val randomVariation = 1.0
     (1 - randomVariation) + randomVariation * MovementRandom.random.nextDouble
   }
   

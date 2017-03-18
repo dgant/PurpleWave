@@ -1,37 +1,23 @@
 package Micro.Behaviors
 import Micro.Intentions.Intention
 import Micro.Movement.{EvaluatePositions, MovementProfile}
-import Micro.Targeting.{EvaluateTargets, TargetingProfile, Targets}
-import ProxyBwapi.Races.Protoss
+import Micro.Targeting.{EvaluateTargets, TargetingProfile}
 import Startup.With
 import Utilities.TypeEnrichment.EnrichPosition._
 
 object BehaviorDefault extends Behavior {
   
   def execute(intent: Intention) {
-  
-    val targets = Targets.get(intent)
-    
-    if (intent.unit.unitClass == Protoss.Reaver
-      && intent.unit.trainingQueue.isEmpty
-      && intent.unit.scarabs < (if(targets.isEmpty) 5 else 1)) {
-      return With.commander.buildScarab(intent)
-    }
-    if (intent.unit.unitClass == Protoss.Carrier
-      && intent.unit.trainingQueue.isEmpty
-      && intent.unit.interceptors < (if(targets.isEmpty) 8 else 1)) {
-      return With.commander.buildInterceptor(intent)
-    }
     
     if (intent.unit.cooldownRemaining < With.game.getRemainingLatencyFrames) {
-      val target = EvaluateTargets.best(intent, defaultTargetProfile, targets)
+      val target = EvaluateTargets.best(intent, defaultTargetProfile, intent.targets)
       if (target.isDefined) {
         return With.commander.attack(intent, target.get)
       }
     }
     
     if (intent.destination.isDefined) {
-      if (targets.isEmpty) {
+      if (intent.targets.isEmpty) {
         return With.commander.move(intent, intent.destination.get.pixelCenter)
       }
     }
@@ -42,11 +28,11 @@ object BehaviorDefault extends Behavior {
   
   val defaultMovementProfile = new MovementProfile (
     preferTravel      = 0,
-    preferMobility    = 2,
+    preferMobility    = 1,
     preferHighGround  = 0,
-    preferGrouping    = 0.1,
+    preferGrouping    = 0,
     avoidDamage       = 1,
-    avoidTraffic      = 0.25,
+    avoidTraffic      = 0,
     avoidVision       = 0,
     avoidDetection    = 0
   )
@@ -56,6 +42,6 @@ object BehaviorDefault extends Behavior {
     preferValue       = 1,
     preferFocus       = 1,
     preferDps         = 2,
-    avoidHealth       = 2,
+    avoidHealth       = 3,
     avoidDistance     = 1)
 }

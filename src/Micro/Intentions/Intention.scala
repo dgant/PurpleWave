@@ -1,6 +1,7 @@
 package Micro.Intentions
 
 import Micro.Behaviors.Behavior
+import Micro.Targeting.Targets
 import Planning.Plan
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClass.UnitClass
@@ -16,4 +17,10 @@ class Intention(val plan:Plan, val unit:FriendlyUnitInfo) {
   var toBuild     : Option[UnitClass]     = None
   var toTech      : Option[Tech]          = None
   var toUpgrade   : Option[Upgrade]       = None
+  
+  private var targetCache: Option[Set[UnitInfo]] = None
+  def targets: Set[UnitInfo] = {
+    if (targetCache == None) targetCache = Targets.get(this)
+    targetCache.get
+  }
 }

@@ -5,7 +5,7 @@ import Micro.Intentions.Intention
 import ProxyBwapi.UnitInfo.UnitInfo
 
 object Targets {
-  def get(intent:Intention):Iterable[UnitInfo] = {
+  def get(intent:Intention):Set[UnitInfo] = {
     With.units.inRadius(intent.unit.pixelCenter, intent.unit.range + 32 * 8)
       .filter(intent.unit.isEnemyOf)
       .filter(_.alive)

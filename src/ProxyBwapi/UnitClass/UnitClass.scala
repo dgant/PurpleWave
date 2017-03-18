@@ -1,9 +1,10 @@
 package ProxyBwapi.UnitClass
 
 import Geometry.TileRectangle
+import Micro.Behaviors.Protoss.{BehaviorCarrier, BehaviorReaver}
 import Micro.Behaviors.{Behavior, BehaviorBuilding, BehaviorDefault, BehaviorWorker}
 import Performance.Caching.CacheForever
-import ProxyBwapi.Races.Terran
+import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.Techs.Techs
 import ProxyBwapi.Upgrades.Upgrades
 import bwapi.{DamageType, TilePosition, UnitType}
@@ -138,8 +139,10 @@ case class UnitClass(val baseType:UnitType) {
   def tiles:Iterable[TilePosition] = area.tiles
   
   def behavior:Behavior = {
-    if (isWorker) BehaviorWorker
-    else if (isBuilding) BehaviorBuilding
+    if      (isWorker)                BehaviorWorker
+    else if (isBuilding)              BehaviorBuilding
+    else if (this == Protoss.Reaver)  BehaviorReaver
+    else if (this == Protoss.Carrier) BehaviorCarrier
     else BehaviorDefault
   }
   

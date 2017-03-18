@@ -9,6 +9,7 @@ class MovementProfile(
   var preferMobility    : Double = 0,
   var preferHighGround  : Double = 0,
   var preferGrouping    : Double = 0,
+  var preferRandom      : Double = 0,
   var avoidDamage       : Double = 0,
   var avoidTraffic      : Double = 0,
   var avoidVision       : Double = 0,
@@ -21,6 +22,7 @@ class MovementProfile(
       weigh(  mobility    (intent, candidate) / 10  , preferMobility),
       weigh(  highGround  (intent, candidate)       , preferHighGround),
       weigh(  grouping    (intent, candidate) / 100 , preferGrouping),
+      weigh(  random      (intent, candidate)       , preferRandom),
       weigh(  enemyDamage (intent, candidate) / 100 , -avoidDamage),
       weigh(  traffic     (intent, candidate)       , -avoidTraffic),
       weigh(  visibility  (intent, candidate)       , -avoidVision),
@@ -31,7 +33,7 @@ class MovementProfile(
   //TODO: Consolidate with TargetProfile
   def weigh(value:Double, weight:Double):Double = Math.pow(normalize(value), weight)
   def unboolify(value:Boolean)                  = if (value) 2 else 1
-  def normalize(value:Double)                   = Math.max(0, value)
+  def normalize(value:Double)                   = Math.min(Math.max(0.01, value), 1000000)
   
   def travel(intent: Intention, candidate: TilePosition): Double = {
     if (intent.destination.isEmpty) return unboolify(false)
@@ -42,7 +44,10 @@ class MovementProfile(
   }
   
   def traffic(intent: Intention, candidate: TilePosition): Double = {
-    (With.grids.units.get(candidate) -- List(intent.unit)).map(_.unitClass.width).sum
+    With.grids.units.get(candidate)
+      .filter(_ == intent.unit)
+      .filter(_.flying)
+      .map(_.unitClass.width).sum
   }
   
   def mobility(intent: Intention, candidate: TilePosition): Double = {
@@ -55,6 +60,11 @@ class MovementProfile(
   
   def grouping(intent: Intention, candidate: TilePosition): Double = {
     With.grids.friendlyGroundStrength.get(candidate)
+  }
+  
+  def random(intent:Intention, candidate: TilePosition): Double = {
+    val randomVariation = 0.2
+    (1 - randomVariation) + randomVariation * MovementRandom.random.nextDouble
   }
   
   def highGround(intent: Intention, candidate: TilePosition): Double = {

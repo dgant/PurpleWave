@@ -44,7 +44,7 @@ class TrainUnit(val traineeClass:UnitClass) extends Plan {
         .headOption
     }
   
-    currencyLock.isSpent = trainee.isDefined
+    currencyLock.isSpent = trainee.isDefined || trainer.exists(_.trainingQueue.headOption.exists(_ == traineeClass))
     currencyLock.onFrame()
     if (currencyLock.isComplete) {
       trainerLock.onFrame()

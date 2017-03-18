@@ -1,7 +1,7 @@
 package Debugging
 
 class Configuration {
-  var gameSpeed                         = 10
+  var gameSpeed                         = 0
   
   var enableStdOut                      = false
   var enableChat                        = true
@@ -17,7 +17,7 @@ class Configuration {
   var enableVisualizationEconomy        = false
   var enableVisualizationGrids          = false
   var enableVisualizationPerformance    = true
-  var enableVisualizationPlans          = false
+  var enableVisualizationPlans          = true
   var enableVisualizationResources      = false
   var enableVisualizationScheduler      = false
   var enableVisualizationGeography      = false

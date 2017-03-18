@@ -18,7 +18,7 @@ class ResearchUpgrade(upgrade: Upgrade, level: Int) extends Plan {
   
   description.set("Upgrade " + upgrade + " " + level)
   
-  override def isComplete: Boolean = With.self.getMaxUpgradeLevel(upgrade.baseType) >= level
+  override def isComplete: Boolean = With.self.getUpgradeLevel(upgrade.baseType) >= level
   override def getChildren: Iterable[Plan] = List (currency, upgraders)
   
   override def onFrame() {

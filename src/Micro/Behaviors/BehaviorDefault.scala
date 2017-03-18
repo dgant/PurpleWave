@@ -17,22 +17,37 @@ object BehaviorDefault extends Behavior {
     }
     
     if (intent.destination.isDefined) {
-      if (intent.targets.isEmpty) {
+      if (intent.targets.isEmpty && intent.destination.get.distanceTile(intent.unit.tileCenter) > 12) {
         return With.commander.move(intent, intent.destination.get.pixelCenter)
       }
     }
     
-    val tile = EvaluatePositions.best(intent, defaultMovementProfile)
+    val movementProfile = if (intent.targets.isEmpty) normalMovement else combatMovement
+    
+    val tile = EvaluatePositions.best(intent, movementProfile)
     return With.commander.move(intent, tile.pixelCenter)
   }
   
-  val defaultMovementProfile = new MovementProfile (
-    preferTravel      = 0,
-    preferMobility    = 1,
+  val normalMovement = new MovementProfile (
+    preferTravel      = 1,
+    preferMobility    = 0,
     preferHighGround  = 0,
-    preferGrouping    = 0,
-    avoidDamage       = 1,
-    avoidTraffic      = 0,
+    preferGrouping    = 0.2,
+    preferRandom      = 0.1,
+    avoidDamage       = 0,
+    avoidTraffic      = 0.5,
+    avoidVision       = 0.1,
+    avoidDetection    = 0
+  )
+  
+  val combatMovement = new MovementProfile (
+    preferTravel      = 0.5,
+    preferMobility    = 2,
+    preferHighGround  = 1,
+    preferGrouping    = 1,
+    preferRandom      = 0.25,
+    avoidDamage       = 3,
+    avoidTraffic      = 1,
     avoidVision       = 0,
     avoidDetection    = 0
   )

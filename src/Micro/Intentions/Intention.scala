@@ -20,7 +20,7 @@ class Intention(val plan:Plan, val unit:FriendlyUnitInfo) {
   
   private var targetCache: Option[Set[UnitInfo]] = None
   def targets: Set[UnitInfo] = {
-    if (targetCache == None) targetCache = Targets.get(this)
+    if (targetCache == None) targetCache = Some(Targets.get(this))
     targetCache.get
   }
 }

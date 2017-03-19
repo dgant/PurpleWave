@@ -55,11 +55,6 @@ abstract class UnitInfo (var baseUnit:bwapi.Unit) {
   def isResource                                  : Boolean                 = isMinerals || isGas
   def totalHealth                                 : Int                     = hitPoints + shieldPoints
   def maxTotalHealth                              : Int                     = unitClass.maxHitPoints + unitClass.maxShields
-  def rangeAir                                    : Int                     = unitClass.airWeapon.maxRange
-  def rangeGround                                 : Int                     = unitClass.groundWeapon.maxRange
-  def range                                       : Int                     = Math.max(rangeAir, rangeGround)
-  def airDps                                      : Double                  = unitClass.airDps
-  def groundDps                                   : Double                  = unitClass.groundDps
   def totalCost                                   : Int                     = unitClass.totalCost
   def tileCenter                                  : TilePosition            = pixelCenter.toTilePosition
   def hypotenuse                                  : Double                  = unitClass.width * 1.41421356
@@ -74,6 +69,31 @@ abstract class UnitInfo (var baseUnit:bwapi.Unit) {
   def inRadius(radius:Int)                        : Set[UnitInfo]           = With.units.inRadius(pixelCenter, radius)
   def enemiesInRange                              : Set[UnitInfo]           = With.units.inRadius(pixelCenter, range + 96).filter(unit => isEnemyOf(unit) && distanceFromEdge(unit) <= range)
   
+  def rangeAir    : Int = unitClass.airWeapon.maxRange
+  def rangeGround : Int = unitClass.groundWeapon.maxRange
+  def range       : Int = Math.max(rangeAir, rangeGround)
+  def interceptors: Int = 8
+  
+  def airDps: Double = {
+    if (unitClass == Protoss.Carrier) {
+      return interceptors * Protoss.Interceptor.airDps
+    }
+    unitClass.airDps
+  }
+  
+  def groundDps: Double = {
+    if (unitClass == Protoss.Carrier) {
+      return interceptors * Protoss.Interceptor.groundDps
+    }
+    if (unitClass == Protoss.Reaver) {
+      //TODO: Improve this
+      return Protoss.Scarab.groundDamage
+    }
+    unitClass.groundDps
+  }
+  
+  def attacksAir:Boolean    = airDps > 0
+  def attacksGround:Boolean = groundDps > 0
   def attackFrames: Int = {
     val baseRate = 8
     val slowAttack = (if (List(Protoss.Dragoon, Zerg.Devourer).contains(unitClass)) 6 else 0)

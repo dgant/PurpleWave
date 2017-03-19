@@ -40,7 +40,7 @@ class MovementProfile(
   def unboolify(value:Boolean)                  = if (value) 2 else 1
   def normalize(value:Double)                   = Math.min(Math.max(0.01, value), 1000000)
   
-  def travel(intent: Intention, candidate: TilePosition):Double = distance(intent, candidate, 32 * 6)
+  def travel(intent: Intention, candidate: TilePosition):Double = distance(intent, candidate, 32 * 8)
   
   def spot(intent: Intention, candidate: TilePosition):Double = distance(intent, candidate, 32 * 1)
   

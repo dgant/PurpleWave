@@ -52,7 +52,6 @@ class FriendlyUnitInfo(friendlyBaseUnit:bwapi.Unit) extends UnitInfo(friendlyBas
   def onCooldown                          : Boolean                   = cooldownRemaining > 0 || ! unitClass.canAttack
   def energy                              : Int                       = baseUnit.getEnergy
   def scarabs                             : Int                       = baseUnit.getScarabCount
-  def interceptors                        : Int                       = baseUnit.getInterceptorCount
   def getBuildUnit                        : Option[UnitInfo]          = With.units.getUnit(baseUnit.getBuildUnit)
   def trainingQueue                       : Iterable[UnitType]        = baseUnit.getTrainingQueue.asScala
   def teching                             : Tech                      = Techs.get(baseUnit.getTech)
@@ -62,4 +61,5 @@ class FriendlyUnitInfo(friendlyBaseUnit:bwapi.Unit) extends UnitInfo(friendlyBas
   def framesBeforeBuildeeComplete         : Int                       = baseUnit.getRemainingTrainTime
   def framesBeforeTechComplete            : Int                       = baseUnit.getRemainingResearchTime
   def framesBeforeUpgradeComplete         : Int                       = baseUnit.getRemainingUpgradeTime
+  override def interceptors               : Int                       = baseUnit.getInterceptorCount
 }

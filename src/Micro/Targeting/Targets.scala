@@ -12,5 +12,7 @@ object Targets {
       .filter(_.visible)
       .filterNot(_.invincible)
       .filter(target => target.detected || ( ! target.cloaked && ! target.burrowed ))
+      .filterNot(target =>   target.flying && ! intent.unit.attacksAir)
+      .filterNot(target => ! target.flying && ! intent.unit.attacksGround)
   }
 }

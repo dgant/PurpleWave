@@ -9,9 +9,8 @@ import scala.collection.mutable
 class Paths {
   
   //Cache ground distances with a LRU (Least-recently used) cache
-  //This is a low number; let's increase it after we make sure _limitCacheSize works
+  private val maxCacheSize = 100000
   private val impossiblyLargeDistance = Int.MaxValue / 1000
-  private val maxCacheSize = 10000 //Max we'll ever need to cache: 256 * 256 = 65536 so maybe this is silly
   private val distanceCache = new mutable.HashMap[(TilePosition, TilePosition), Int]
   private val distanceAge = new mutable.HashMap[(TilePosition, TilePosition), Int]
   

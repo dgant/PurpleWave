@@ -55,7 +55,7 @@ class GatherMinerals extends Plan {
     while (unassignedWorkers.nonEmpty) {
       minerals.foreach(mineral => {
         if (unassignedWorkers.nonEmpty) {
-          val worker = unassignedWorkers.minBy(_.pixelCenter.getDistance(mineral.pixelCenter))
+          val worker = unassignedWorkers.minBy(candidate => With.paths.groundDistance(candidate.tileCenter, mineral.tileCenter))
           workersByMineral(mineral).add(worker)
           mineralByWorker.put(worker, mineral)
           unassignedWorkers.remove(worker)

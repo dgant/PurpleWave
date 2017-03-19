@@ -69,6 +69,8 @@ abstract class UnitInfo (var baseUnit:bwapi.Unit) {
   def inRadius(radius:Int)                        : Set[UnitInfo]           = With.units.inRadius(pixelCenter, radius)
   def enemiesInRange                              : Set[UnitInfo]           = With.units.inRadius(pixelCenter, range + 96).filter(unit => isEnemyOf(unit) && distanceFromEdge(unit) <= range)
   
+  override def toString:String = unitClass.toString + " " + tileCenter.toString
+  
   def rangeAir    : Int = unitClass.airWeapon.maxRange
   def rangeGround : Int = unitClass.groundWeapon.maxRange
   def range       : Int = Math.max(rangeAir, rangeGround)

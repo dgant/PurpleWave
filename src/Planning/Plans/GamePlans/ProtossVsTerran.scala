@@ -41,8 +41,34 @@ class ProtossVsTerran extends Parallel {
     new RequestUnitAtLeast(6,   Protoss.Dragoon)
   )
   
-  val _massGateway = List[BuildRequest] (
+  val _fourBaseGateway = List[BuildRequest] (
+    new RequestUnitAtLeast(3,   Protoss.Nexus),
+    new RequestUnitAtLeast(4,   Protoss.Gateway),
+    new RequestUnitAtLeast(3,   Protoss.Assimilator),
+    new RequestUnitAtLeast(6,   Protoss.Gateway),
     
+    new RequestUnitAtLeast(4,   Protoss.Nexus),
+    new RequestUnitAtLeast(3,   Protoss.CitadelOfAdun),
+    new RequestUnitAtLeast(4,   Protoss.Assimilator),
+    new RequestUnitAtLeast(8,   Protoss.Gateway),
+    new RequestUpgrade(         Protoss.ZealotLegs),
+    new RequestUnitAtLeast(12,  Protoss.Gateway),
+    
+    new RequestUnitAtLeast(5,   Protoss.Nexus),
+    new RequestUnitAtLeast(15,  Protoss.Gateway),
+    new RequestUnitAtLeast(5,   Protoss.Assimilator),
+    new RequestUnitAtLeast(2,   Protoss.Forge),
+    
+    new RequestUnitAtLeast(6,   Protoss.Nexus),
+    new RequestUpgrade(         Protoss.GroundWeapons, 1),
+    new RequestUpgrade(         Protoss.GroundArmor,   1),
+    new RequestUnitAtLeast(6,   Protoss.Assimilator),
+    new RequestUpgrade(         Protoss.GroundWeapons, 2),
+    new RequestUpgrade(         Protoss.GroundArmor,   2),
+    new RequestUnitAtLeast(7,   Protoss.Nexus),
+    new RequestUpgrade(         Protoss.GroundWeapons, 3),
+    new RequestUpgrade(         Protoss.GroundArmor,   3),
+    new RequestUnitAtLeast(7,   Protoss.Assimilator)
   )
   
   val _carriersLate = List[BuildRequest] (

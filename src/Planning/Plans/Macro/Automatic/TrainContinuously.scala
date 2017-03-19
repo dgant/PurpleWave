@@ -14,7 +14,7 @@ class TrainContinuously(unitClass: UnitClass) extends Plan {
       new RequestUnitAtLeast(
         Math.min(
           maxDesirable,
-          With.units.ours.count(_.unitClass == unitClass) + buildCapacity),
+          buildCapacity + With.units.ours.count(unit => unit.alive && unit.complete && unit.unitClass == unitClass)),
         unitClass)))
   }
   

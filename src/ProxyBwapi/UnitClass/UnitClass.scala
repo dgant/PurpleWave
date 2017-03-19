@@ -179,9 +179,9 @@ case class UnitClass(val baseType:UnitType) {
   def airDamage:Double = {
     val typeMultiplier = if (concussiveOrExplosive.contains(baseType.groundWeapon.damageType)) 0.75 else 1.0
     typeMultiplier *
-      baseType.maxGroundHits *
-      baseType.groundWeapon.damageFactor *
-      baseType.groundWeapon.damageAmount
+      baseType.maxAirHits *
+      baseType.airWeapon.damageFactor *
+      baseType.airWeapon.damageAmount
   }
   def groundDamage:Double = {
     val typeMultiplier = if (concussiveOrExplosive.contains(baseType.groundWeapon.damageType)) 0.75 else 1.0
@@ -190,8 +190,8 @@ case class UnitClass(val baseType:UnitType) {
       baseType.groundWeapon.damageFactor *
       baseType.groundWeapon.damageAmount
   }
-  def airDps: Double = airDamage * 24 / (2 + baseType.airWeapon.damageCooldown).toDouble
-  def groundDps: Double = groundDamage * 24 / (2 + baseType.groundWeapon.damageCooldown).toDouble
+  def airDps    : Double = airDamage    * 24 / (2 + baseType.airWeapon.damageCooldown).toDouble
+  def groundDps : Double = groundDamage * 24 / (2 + baseType.groundWeapon.damageCooldown).toDouble
   
   //Range is from unit edge, so we account for the diagonal width of the unit
   // 7/5 ~= sqrt(2)

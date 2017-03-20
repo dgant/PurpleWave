@@ -53,4 +53,17 @@ object MovementProfiles {
     avoidTraffic      = 0,
     avoidVision       = 0,
     avoidDetection    = 0)
+  
+  val corsair = new MovementProfile (
+    preferTravel      = 1,
+    preferSpot        = 0,
+    preferSitAtRange  = 0,
+    preferMobility    = 0,
+    preferHighGround  = 0.25,
+    preferGrouping    = 0.25,
+    preferRandom      = 0.5,
+    avoidDamage       = 4,
+    avoidTraffic      = 0,
+    avoidVision       = 0.25,
+    avoidDetection    = 0)
 }

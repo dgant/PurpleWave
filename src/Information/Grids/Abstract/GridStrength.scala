@@ -2,9 +2,8 @@ package Information.Grids.Abstract
 
 import Geometry.Shapes.Circle
 import Micro.Battles.BattleMetrics
-import Startup.With
 import ProxyBwapi.UnitInfo.UnitInfo
-import Performance.Caching.Limiter
+import Startup.With
 import Utilities.TypeEnrichment.EnrichPosition._
 import bwapi.TilePosition
 
@@ -13,10 +12,8 @@ abstract class GridStrength extends GridInt {
   private val rangeMargin = 48
   private val framesToLookAhead = 48
   
-  private val limitUpdates = new Limiter(1, updateCalculation)
-  override def update() = limitUpdates.act()
-  private def updateCalculation() {
-    reset()
+  override def update(relevantTiles:Iterable[TilePosition]) {
+    reset(relevantTiles)
     getUnits.foreach(unit => {
       val strength = BattleMetrics.evaluate(unit)
       val latencyFrames = With.game.getLatencyFrames

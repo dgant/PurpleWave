@@ -15,7 +15,7 @@ class Configuration {
   var enableVisualization               = false
   var enableVisualizationBattles        = false
   var enableVisualizationEconomy        = false
-  var enableVisualizationGrids          = false
+  var enableVisualizationGrids          = true
   var enableVisualizationPerformance    = true
   var enableVisualizationPlans          = false
   var enableVisualizationResources      = false

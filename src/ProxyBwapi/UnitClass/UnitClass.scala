@@ -1,7 +1,7 @@
 package ProxyBwapi.UnitClass
 
 import Geometry.TileRectangle
-import Micro.Behaviors.Protoss.{BehaviorCarrier, BehaviorReaver}
+import Micro.Behaviors.Protoss.{BehaviorCarrier, BehaviorCorsair, BehaviorDarkTemplar, BehaviorReaver}
 import Micro.Behaviors.{Behavior, BehaviorBuilding, BehaviorDefault, BehaviorWorker}
 import Performance.Caching.CacheForever
 import ProxyBwapi.Races.{Neutral, Protoss, Terran, Zerg}
@@ -239,10 +239,13 @@ case class UnitClass(val baseType:UnitType) {
   def area:TileRectangle = new TileRectangle(new TilePosition(0, 0), tileSize)
   
   def behavior:Behavior = {
-    if      (isWorker)                BehaviorWorker
-    else if (isBuilding)              BehaviorBuilding
-    else if (this == Protoss.Reaver)  BehaviorReaver
-    else if (this == Protoss.Carrier) BehaviorCarrier
+    if      (isWorker)                    BehaviorWorker
+    else if (isBuilding)                  BehaviorBuilding
+    else if (this == Protoss.Reaver)      BehaviorReaver
+    else if (this == Protoss.Carrier)     BehaviorCarrier
+    else if (this == Protoss.Corsair)     BehaviorCorsair
+    else if (this == Protoss.Scout)       BehaviorCorsair
+    else if (this == Protoss.DarkTemplar) BehaviorDarkTemplar
     else BehaviorDefault
   }
   

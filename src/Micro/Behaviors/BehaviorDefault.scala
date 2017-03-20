@@ -1,7 +1,7 @@
 package Micro.Behaviors
 import Micro.Intentions.Intention
-import Micro.Movement.{EvaluatePositions, MovementProfile}
-import Micro.Targeting.{EvaluateTargets, TargetingProfile}
+import Micro.Movement.EvaluatePositions
+import Micro.Targeting.EvaluateTargets
 import Startup.With
 import Utilities.TypeEnrichment.EnrichPosition._
 
@@ -25,7 +25,7 @@ object BehaviorDefault extends Behavior {
       }
     }
     
-    val movementProfile = if (intent.targets.isEmpty) intent.normalMovement else intent.combatMovement
+    val movementProfile = if (intent.targets.isEmpty) intent.movementProfileNormal else intent.movementProfileCombat
     
     val tile = EvaluatePositions.best(intent, movementProfile)
     return With.commander.move(intent, tile.pixelCenter)

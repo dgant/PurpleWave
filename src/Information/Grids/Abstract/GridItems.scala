@@ -10,8 +10,8 @@ abstract class GridItems[T] extends GridArray[mutable.HashSet[T]] {
   override def defaultValue: mutable.HashSet[T] = mutable.HashSet.empty
   override def repr(value: mutable.HashSet[T]): String  = value.size.toString
   
-  override def update() {
-    reset()
+  override def update(relevantTiles:Iterable[TilePosition]) {
+    reset(relevantTiles)
     getUnits.foreach(item => getTiles(item).foreach(tile => get(tile).add(item)))
   }
   

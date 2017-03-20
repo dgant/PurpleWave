@@ -8,7 +8,7 @@ abstract class Grid[T] {
   val _width = With.mapWidth
   val _height = With.mapHeight
   
-  def update()                                 = {}
+  def update(tiles:Iterable[TilePosition])     = {}
   def valid(i:Int):Boolean                     = i > 0 && i < _width * _height
   def i(tileX:Int, tileY:Int)                  = tileX + tileY * _width
   def x(i:Int):Int                             = i % _width

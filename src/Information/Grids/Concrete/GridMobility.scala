@@ -1,23 +1,15 @@
 package Information.Grids.Concrete
 
-import Geometry.Shapes.Square
 import Information.Grids.Abstract.GridInt
-import Performance.Caching.Limiter
 import Startup.With
 import Utilities.TypeEnrichment.EnrichPosition._
+import bwapi.TilePosition
 
 class GridMobility extends GridInt {
   
-  override def update() = updateLimiter.act()
-  private val updateLimiter = new Limiter(3, updateCalculations)
-  private def updateCalculations() {
+  override def update(relevantTiles:Iterable[TilePosition]) {
     val distanceMax = 3
-    
-    //This is the most expensive grid to update, so limit updates to relevant tiles
-    val nearbyPoints = Square.points(4).toList
-    val tilesWeCareAbout = With.units.all.filterNot(_.flying).flatten(unit => nearbyPoints.map(unit.tileCenter.add))
-  
-    tilesWeCareAbout
+    relevantTiles
       .foreach(tile => {
         var tileMobility = 0
         if (With.grids.walkable.get(tile)) {

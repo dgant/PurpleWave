@@ -3,12 +3,11 @@ package Micro.Behaviors.Protoss
 import Micro.Behaviors.{Behavior, BehaviorDefault, MovementProfiles}
 import Micro.Intentions.Intention
 
-object BehaviorDarkTemplar extends Behavior {
-  
+object BehaviorCorsair extends Behavior {
   def execute(intent: Intention) {
-    intent.movementProfileCombat = MovementProfiles.darkTemplar
-    intent.movementProfileNormal = MovementProfiles.darkTemplar
-  
+    intent.movementProfileCombat = MovementProfiles.corsair
+    intent.movementProfileNormal = MovementProfiles.corsair
+    
     BehaviorDefault.execute(intent)
   }
 }

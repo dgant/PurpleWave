@@ -1,17 +1,15 @@
 package Information.Grids.Concrete
 
-import Information.Grids.Abstract.GridBoolean
 import Geometry.Shapes.Circle
+import Information.Grids.Abstract.GridBoolean
 import Startup.With
-import Performance.Caching.Limiter
 import Utilities.TypeEnrichment.EnrichPosition._
+import bwapi.TilePosition
 
 class GridEnemyDetection extends GridBoolean {
   
-  override def update() = updateLimiter.act()
-  val updateLimiter = new Limiter(1, updateCalculations)
-  private def updateCalculations() {
-    reset()
+  override def update(relevantTiles:Iterable[TilePosition]) {
+    reset(relevantTiles)
     With.units.enemy
       .filter(_.possiblyStillThere)
       .filter(_.isDetector)

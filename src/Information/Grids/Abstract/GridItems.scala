@@ -1,6 +1,5 @@
-package Information.Grids.Concrete
+package Information.Grids.Abstract
 
-import Information.Grids.Abstract.GridArray
 import bwapi.TilePosition
 
 import scala.collection.mutable

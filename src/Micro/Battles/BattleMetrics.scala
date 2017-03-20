@@ -22,7 +22,7 @@ object BattleMetrics {
   }
   
   def evaluate(unit:UnitInfo):Int = {
-    var dps = unit.groundDps
+    var dps = unit.unitClass.groundDps
     
     //Fails to account for casters
     //Fails to account for carriers/reavers
@@ -33,6 +33,7 @@ object BattleMetrics {
       dps = 4 * Terran.Marine.groundDps
     }
     
+    //Altitude/doodad misses only apply to ranged units
     val highGroundBonus =  With.grids.altitudeBonus.get(unit.tileCenter)
     val visibilityBonus = if (unit.visible) 1 else highGroundBonus
     val combatEfficacy = dps * Math.pow(unit.totalHealth, 1.2) * highGroundBonus * visibilityBonus
@@ -42,7 +43,7 @@ object BattleMetrics {
   def evaluate(unit:UnitInfo, position:Position):Int = {
     val distanceDropoff = 16.0
     val distanceCutoff = 32.0 * 4
-    val distance = Math.max(0, unit.distance(position) - unit.range)
+    val distance = Math.max(0, unit.distance(position) - unit.unitClass.maxAirGroundRange)
     val distanceFactor = Math.max(0.0, Math.min(1.0, (distanceCutoff + distanceDropoff - distance ) / distanceCutoff))
     
     //Shortcut

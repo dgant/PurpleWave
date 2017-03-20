@@ -1,6 +1,6 @@
 package Macro
 
-import Geometry.Shapes.{PylonRadius, Spiral}
+import Geometry.Shapes.Spiral
 import Geometry.TileRectangle
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClass._
@@ -111,6 +111,7 @@ class Architect {
     
     buildingArea.tiles.forall(_.valid) &&
     exclusions.forall( ! _.intersects(buildingArea)) &&
+    rectangleHasRequiredPsi(buildingArea, buildingType) &&
     rectangleIsBuildable(buildingArea, buildingType, hypotheticalPylon) &&
     rectangleContainsOnlyAWorker(marginArea) &&
     marginArea.tiles.forall(With.grids.walkable.get)
@@ -123,15 +124,17 @@ class Architect {
       trespassingUnits.forall(_.isOurs)
   }
   
+  private def rectangleHasRequiredPsi(buildingArea:TileRectangle, buildingType:UnitClass):Boolean = {
+    ! buildingType.requiresPsi || With.game.hasPower(buildingArea.startInclusive, buildingType.baseType)
+  }
+  
   private def rectangleIsBuildable(
     area: TileRectangle,
     buildingType: UnitClass,
     hypotheticalPylon:
     Option[TilePosition] = None)
   :Boolean = {
-    area.tiles.forall(tile =>
-      With.grids.buildable.get(tile) &&
-        (( ! buildingType.requiresPsi)   || With.game.hasPower(tile) || hypotheticalPylon.exists(pylon => PylonRadius.powers(pylon, tile))) &&
-        (( ! buildingType.requiresCreep) || With.game.hasCreep(tile)))
+    //HypotheticalPylon temporarily disabled
+    area.tiles.forall(tile => With.grids.buildable.get(tile))
   }
 }

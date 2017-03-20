@@ -48,7 +48,7 @@ class MovementProfile(
     if (intent.targets.isEmpty) return 1
     
     val minDistance = intent.targets.map(_.tileCenter.getDistance(candidate)).min
-    Math.abs(minDistance - intent.unit.range)
+    Math.abs(minDistance - intent.unit.unitClass.maxAirGroundRange)
   }
   
   def distance(intent: Intention, candidate: TilePosition, margin: Int): Double = {

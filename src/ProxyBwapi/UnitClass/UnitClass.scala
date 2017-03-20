@@ -4,7 +4,7 @@ import Geometry.TileRectangle
 import Micro.Behaviors.Protoss.{BehaviorCarrier, BehaviorReaver}
 import Micro.Behaviors.{Behavior, BehaviorBuilding, BehaviorDefault, BehaviorWorker}
 import Performance.Caching.CacheForever
-import ProxyBwapi.Races.{Protoss, Terran}
+import ProxyBwapi.Races.{Neutral, Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Techs
 import ProxyBwapi.Upgrades.Upgrades
 import bwapi.{DamageType, TilePosition, UnitType}
@@ -175,48 +175,68 @@ case class UnitClass(val baseType:UnitType) {
   // Formerly from EnrichUnitType //
   //////////////////////////////////
   
+  
+  def isMelee: Boolean = groundRange <= 32
+  
+  //TODO: Explosive is 50/75/100
+  //But Concussive is 25/50/100, not 50/75/100 !!!
+  
   private val concussiveOrExplosive = List(DamageType.Concussive, DamageType.Explosive)
   def airDamage:Double = {
-    val typeMultiplier = if (concussiveOrExplosive.contains(baseType.groundWeapon.damageType)) 0.75 else 1.0
+    if (this == Protoss.Carrier) {
+      return Protoss.Interceptor.airDamage * 6
+    }
+    val typeMultiplier = if (concussiveOrExplosive.contains(groundWeapon.damageType)) 0.75 else 1.0
     typeMultiplier *
-      baseType.maxAirHits *
-      baseType.airWeapon.damageFactor *
-      baseType.airWeapon.damageAmount
+      maxAirHits *
+      airWeapon.damageFactor *
+      airWeapon.damageAmount
   }
   def groundDamage:Double = {
-    val typeMultiplier = if (concussiveOrExplosive.contains(baseType.groundWeapon.damageType)) 0.75 else 1.0
+    if (this == Protoss.Carrier) {
+      return Protoss.Interceptor.airDamage * 6
+    }
+    if (this == Protoss.Reaver) {
+      return Protoss.Scarab.groundDamage
+    }
+    val typeMultiplier = if (concussiveOrExplosive.contains(groundWeapon.damageType)) 0.75 else 1.0
     typeMultiplier *
-      baseType.maxGroundHits *
-      baseType.groundWeapon.damageFactor *
-      baseType.groundWeapon.damageAmount
+      maxGroundHits *
+      groundWeapon.damageFactor *
+      groundWeapon.damageAmount
   }
-  def airDps    : Double = airDamage    * 24 / (2 + baseType.airWeapon.damageCooldown).toDouble
-  def groundDps : Double = groundDamage * 24 / (2 + baseType.groundWeapon.damageCooldown).toDouble
+  def airCooldown:Int = airWeapon.damageCooldown()
+  def groundCooldown:Int = {
+    //Necessary according to Skynet: https://github.com/Laccolith/skynet/blob/399018f41b49fbb55a0ea32142117e97e9d2f9ae/Skynet/Unit.cpp#L1092
+    if (this == Protoss.Reaver) return 60
+    return groundWeapon.damageCooldown
+  }
+  def airDps    : Double = airDamage    * 24 / (2 + airWeapon.damageCooldown).toDouble
+  def groundDps : Double = groundDamage * 24 / (2 + groundWeapon.damageCooldown).toDouble
+  def attacksGround:Boolean = groundDamage > 0
+  def attacksAir:Boolean = airDamage > 0
   
   //Range is from unit edge, so we account for the diagonal width of the unit
   // 7/5 ~= sqrt(2)
-  def range:Int = {
-    if (this == Terran.Bunker) return Terran.Marine.range
-    def range = List(baseType.groundWeapon.maxRange, baseType.airWeapon.maxRange).max
-    range + baseType.width * 7 / 5
+  
+  def groundRange:Int = {
+    if (this == Terran.Bunker) return Terran.Marine.groundRange + 32
+    groundWeapon.maxRange
+  }
+  def airRange:Int = {
+    if (this == Terran.Bunker) return Terran.Marine.airRange + 32
+    airWeapon.maxRange
+  }
+  def maxAirGroundRange:Int = {
+    Math.max(groundRange, airRange)
   }
   
-  def totalCost: Int = { baseType.mineralPrice + baseType.gasPrice }
-  def orderable:Boolean = ! Set(UnitType.Protoss_Interceptor, UnitType.Protoss_Scarab).contains(baseType)
-  def isMinerals:Boolean = baseType.isMineralField
-  def isGas:Boolean = List(UnitType.Resource_Vespene_Geyser, UnitType.Terran_Refinery, UnitType.Protoss_Assimilator, UnitType.Zerg_Extractor).contains(baseType)
-  def isTownHall:Boolean = Set(
-    UnitType.Terran_Command_Center,
-    UnitType.Protoss_Nexus,
-    UnitType.Zerg_Hatchery,
-    UnitType.Zerg_Lair,
-    UnitType.Zerg_Hive
-  ).contains(baseType)
-  def area:TileRectangle =
-    new TileRectangle(
-      new TilePosition(0, 0),
-      tileSize)
-  def tiles:Iterable[TilePosition] = area.tiles
+  def totalCost: Int = mineralPrice + gasPrice
+  def orderable:Boolean = ! isSpell && ! Set(Protoss.Interceptor, Protoss.Scarab, Terran.SpiderMine).contains(this)
+  def isMinerals:Boolean = isMineralField
+  def isGas:Boolean = List(Neutral.Geyser, Terran.Refinery, Protoss.Assimilator, Zerg.Extractor).contains(this)
+  def isTownHall:Boolean = Set(Terran.CommandCenter, Protoss.Nexus, Zerg.Hatchery, Zerg.Lair, Zerg.Hive).contains(this)
+  def area:TileRectangle = new TileRectangle(new TilePosition(0, 0), tileSize)
   
   def behavior:Behavior = {
     if      (isWorker)                BehaviorWorker

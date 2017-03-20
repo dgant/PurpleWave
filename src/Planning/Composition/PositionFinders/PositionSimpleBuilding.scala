@@ -11,11 +11,11 @@ import bwapi.TilePosition
 class PositionSimpleBuilding(val buildingType:UnitClass) extends PositionFinder {
   
   override def find: Option[TilePosition] = findCache.get
-  private val findCache = new Cache[Option[TilePosition]](2, () => findRecalculate)
+  private val findCache = new Cache[Option[TilePosition]](4, () => findRecalculate)
   private def findRecalculate: Option[TilePosition] = {
     
     //Short-circuits for performance
-    if (buildingType.requiresPsi && ! With.units.ours.exists(_.unitClass == Protoss.Pylon)) {
+    if (buildingType.requiresPsi && ! With.units.ours.filter(_.complete).exists(_.unitClass == Protoss.Pylon)) {
       return None
     }
     if (findCache.lastValue.isDefined && findCache.lastValue.get.isDefined) {

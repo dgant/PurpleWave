@@ -41,16 +41,20 @@ class ProtossVsZerg extends Parallel {
     new RequestUnitAtLeast(1, Protoss.RoboticsFacility),
     new RequestUpgrade(       Protoss.DragoonRange),
     new RequestUnitAtLeast(1, Protoss.RoboticsSupportBay),
+    
     new RequestUnitAtLeast(3, Protoss.Nexus),
     new RequestUnitAtLeast(3, Protoss.Assimilator),
     new RequestUnitAtLeast(2, Protoss.RoboticsFacility),
+    new RequestUnitAtLeast(5, Protoss.Gateway),
+    
     new RequestUnitAtLeast(4, Protoss.Nexus),
-    new RequestUnitAtLeast(6, Protoss.Gateway),
     new RequestUnitAtLeast(4, Protoss.Assimilator),
     new RequestUnitAtLeast(1, Protoss.CitadelOfAdun),
+    new RequestUnitAtLeast(8, Protoss.Gateway),
     new RequestUnitAtLeast(1, Protoss.Forge),
     new RequestUpgrade(       Protoss.ZealotLegs),
     new RequestUpgrade(       Protoss.GroundWeapons, 1),
+    
     new RequestUnitAtLeast(5, Protoss.Nexus),
     new RequestUnitAtLeast(8, Protoss.Gateway),
     new RequestUnitAtLeast(5, Protoss.Assimilator),

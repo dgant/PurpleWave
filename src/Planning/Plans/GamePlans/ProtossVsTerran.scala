@@ -76,25 +76,45 @@ class ProtossVsTerran extends Parallel {
     new RequestUnitAtLeast(3, Protoss.Assimilator),
     new RequestUnitAtLeast(8, Protoss.Dragoon),
     new RequestUnitAtLeast(1, Protoss.Stargate),
-    new RequestUnitAtLeast(3, Protoss.Gateway),
+    new RequestUnitAtLeast(4, Protoss.Gateway),
     new RequestUnitAtLeast(1, Protoss.FleetBeacon),
     new RequestUnitAtLeast(3, Protoss.Stargate),
     new RequestUpgrade(       Protoss.CarrierCapacity),
+    
     new RequestUnitAtLeast(4, Protoss.Nexus),
     new RequestUnitAtLeast(4, Protoss.Assimilator),
+    new RequestUnitAtLeast(1, Protoss.CitadelOfAdun),
+    new RequestUnitAtLeast(2, Protoss.Forge),
     new RequestUnitAtLeast(2, Protoss.CyberneticsCore),
-    new RequestUnitAtLeast(5, Protoss.Stargate),
+    
+    
     new RequestUnitAtLeast(5, Protoss.Nexus),
     new RequestUnitAtLeast(5, Protoss.Assimilator),
+    new RequestUnitAtLeast(8, Protoss.Gateway),
+    new RequestUnitAtLeast(5, Protoss.Stargate),
     new RequestUpgrade(       Protoss.AirWeapons, 1),
     new RequestUpgrade(       Protoss.AirArmor, 1),
-    new RequestUnitAtLeast(7, Protoss.Stargate),
-    new RequestUpgrade(       Protoss.AirWeapons, 2),
-    new RequestUpgrade(       Protoss.AirArmor, 2),
+    new RequestUpgrade(       Protoss.GroundWeapons, 1),
+    new RequestUpgrade(       Protoss.GroundArmor, 1),
+    
     new RequestUnitAtLeast(6, Protoss.Nexus),
     new RequestUnitAtLeast(6, Protoss.Assimilator),
+    new RequestUnitAtLeast(7, Protoss.Stargate),
+    new RequestUnitAtLeast(15, Protoss.Gateway),
+    new RequestUpgrade(       Protoss.AirWeapons, 2),
+    new RequestUpgrade(       Protoss.AirArmor, 2),
+    new RequestUpgrade(       Protoss.GroundWeapons, 2),
+    new RequestUpgrade(       Protoss.GroundArmor, 2),
+  
+    new RequestUnitAtLeast(7, Protoss.Nexus),
+    new RequestUnitAtLeast(7, Protoss.Assimilator),
     new RequestUpgrade(       Protoss.AirWeapons, 3),
-    new RequestUpgrade(       Protoss.AirArmor, 3)
+    new RequestUpgrade(       Protoss.AirArmor, 3),
+    new RequestUpgrade(       Protoss.GroundWeapons, 3),
+    new RequestUpgrade(       Protoss.GroundArmor, 3),
+    
+    new RequestUnitAtLeast(8, Protoss.Nexus),
+    new RequestUnitAtLeast(8, Protoss.Assimilator)
   )
   
   children.set(List(

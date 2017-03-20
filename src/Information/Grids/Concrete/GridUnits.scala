@@ -1,9 +1,9 @@
-package Information.Grids.Abstract
+package Information.Grids.Concrete
 
-import Information.Grids.Concrete.GridItems
-import Startup.With
-import ProxyBwapi.UnitInfo.UnitInfo
+import Information.Grids.Abstract.GridItems
 import Performance.Caching.Limiter
+import ProxyBwapi.UnitInfo.UnitInfo
+import Startup.With
 import bwapi.TilePosition
 
 class GridUnits extends GridItems[UnitInfo] {

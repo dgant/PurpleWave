@@ -1,6 +1,6 @@
 package Micro.Intentions
 
-import Micro.Behaviors.Behavior
+import Micro.Behaviors.{Behavior, MovementProfiles, TargetingProfiles}
 import Micro.Targeting.Targets
 import Planning.Plan
 import ProxyBwapi.Techs.Tech
@@ -23,4 +23,8 @@ class Intention(val plan:Plan, val unit:FriendlyUnitInfo) {
     if (targetCache == None) targetCache = Some(Targets.get(this))
     targetCache.get
   }
+ 
+  var movementProfileCombat = MovementProfiles.defaultCombat
+  var movementProfileNormal = MovementProfiles.defaultNormal
+  var targetProfile = TargetingProfiles.default
 }

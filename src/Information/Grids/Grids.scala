@@ -1,29 +1,28 @@
 package Information.Grids
 
-import Information.Grids.Abstract.GridUnits
-import Information.Grids.Concrete._
+import Information.Grids.Concrete.{GridUnits, _}
 
 class Grids {
-  val units = new GridUnits
-  val enemyGroundStrength = new GridEnemyGroundStrength
-  val friendlyGroundStrength = new GridFriendlyGroundStrength
-  val enemyVision = new GridEnemyVision
-  val enemyDetection = new GridEnemyDetection
   val altitudeBonus = new GridAltitudeBonus
   val buildable = new GridBuildable
   val buildableTerrain = new GridBuildableTerrain
+  val enemyDetection = new GridEnemyDetection
+  val enemyGroundStrength = new GridEnemyGroundStrength
+  val enemyVision = new GridEnemyVision
+  val friendlyGroundStrength = new GridFriendlyGroundStrength
+  val mobility = new GridMobility
+  val units = new GridUnits
   val walkable = new GridWalkable
   val walkableTerran = new GridWalkableTerrain
   val walkableUnits = new GridWalkableUnits
-  val mobility = new GridMobility
   
   def onFrame() {
-    units.update()
-    enemyGroundStrength.update()
-    friendlyGroundStrength.update()
-    enemyVision.update()
-    enemyDetection.update()
     altitudeBonus.update()
+    units.update()
+    enemyDetection.update()
+    enemyGroundStrength.update()
+    enemyVision.update()
+    friendlyGroundStrength.update()
     buildable.update()
     buildableTerrain.update()
     walkable.update()

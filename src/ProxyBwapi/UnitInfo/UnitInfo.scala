@@ -1,7 +1,7 @@
 package ProxyBwapi.UnitInfo
 
 import Geometry.TileRectangle
-import ProxyBwapi.Races.{Protoss, Terran, Zerg}
+import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitClass.UnitClass
 import Startup.With
 import Utilities.TypeEnrichment.EnrichPosition._
@@ -48,7 +48,6 @@ abstract class UnitInfo (var baseUnit:bwapi.Unit) {
   def isFriendly                                  : Boolean                 = isOurs || player.isAlly(With.self)
   def isEnemy                                     : Boolean                 = player.isEnemy(With.self)
   def isEnemyOf(otherUnit:UnitInfo)               : Boolean                 = player.isEnemy(otherUnit.player)
-  def isMelee                                     : Boolean                 = range <= 32
   def isDetector                                  : Boolean                 = unitClass.isDetector
   def isMinerals                                  : Boolean                 = unitClass.isMinerals
   def isGas                                       : Boolean                 = unitClass.isGas
@@ -67,38 +66,15 @@ abstract class UnitInfo (var baseUnit:bwapi.Unit) {
   def distanceSquared(otherPosition:Position)     : Double                  = pixelCenter.distancePixelsSquared(otherPosition)
   def distanceSquared(otherPosition:TilePosition) : Double                  = distance(otherPosition.toPosition)
   def inRadius(radius:Int)                        : Set[UnitInfo]           = With.units.inRadius(pixelCenter, radius)
-  def enemiesInRange                              : Set[UnitInfo]           = With.units.inRadius(pixelCenter, range + 96).filter(unit => isEnemyOf(unit) && distanceFromEdge(unit) <= range)
+  def enemiesInRange                              : Set[UnitInfo]           = With.units.inRadius(pixelCenter, unitClass.maxAirGroundRange + 96).filter(unit => isEnemyOf(unit) && distanceFromEdge(unit) <= unitClass.maxAirGroundRange)
   
   override def toString:String = unitClass.toString + " " + tileCenter.toString
   
-  def rangeAir    : Int = unitClass.airWeapon.maxRange
-  def rangeGround : Int = unitClass.groundWeapon.maxRange
-  def range       : Int = Math.max(rangeAir, rangeGround)
-  def interceptors: Int = 8
+  def interceptors : Int = 8
   
-  def airDps: Double = {
-    if (unitClass == Protoss.Carrier) {
-      return interceptors * Protoss.Interceptor.airDps
-    }
-    unitClass.airDps
-  }
-  
-  def groundDps: Double = {
-    if (unitClass == Protoss.Carrier) {
-      return interceptors * Protoss.Interceptor.groundDps
-    }
-    if (unitClass == Protoss.Reaver) {
-      //TODO: Improve this
-      return Protoss.Scarab.groundDamage
-    }
-    unitClass.groundDps
-  }
-  
-  def attacksAir:Boolean    = airDps > 0
-  def attacksGround:Boolean = groundDps > 0
   def attackFrames: Int = {
-    val baseRate = 8
-    val slowAttack = (if (List(Protoss.Dragoon, Zerg.Devourer).contains(unitClass)) 6 else 0)
-    baseRate + slowAttack
+    // Really important to get these right
+    // Via https://github.com/tscmoo/tsc-bwai/blame/master/src/unit_controls.h#L1571
+    if (unitClass == Protoss.Dragoon) 5 else 2
   }
 }

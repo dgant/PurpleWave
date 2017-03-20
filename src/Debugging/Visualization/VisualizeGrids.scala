@@ -1,12 +1,11 @@
 package Debugging.Visualization
 
 import Information.Grids.Abstract.GridArray
-import Startup.With
 import Utilities.TypeEnrichment.EnrichPosition._
 
 object VisualizeGrids {
   def render() {
-    renderGrid(With.grids.mobility, 0, 0)
+    //renderGrid(With.grids.psi, 0, 0)
     //renderGrid(With.grids.enemyGroundStrength, 0, 1)
   }
   

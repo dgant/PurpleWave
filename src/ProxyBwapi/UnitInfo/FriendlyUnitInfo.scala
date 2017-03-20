@@ -48,6 +48,7 @@ class FriendlyUnitInfo(friendlyBaseUnit:bwapi.Unit) extends UnitInfo(friendlyBas
   def isGatheringGas                      : Boolean                   = baseUnit.isGatheringGas
   def isMoving                            : Boolean                   = baseUnit.isMoving
   def command                             : UnitCommand               = baseUnit.getLastCommand
+  def commandFram                         : Int                       = baseUnit.getLastCommandFrame
   def cooldownRemaining                   : Int                       = Math.max(baseUnit.getGroundWeaponCooldown, baseUnit.getAirWeaponCooldown)
   def onCooldown                          : Boolean                   = cooldownRemaining > 0 || ! unitClass.canAttack
   def energy                              : Int                       = baseUnit.getEnergy

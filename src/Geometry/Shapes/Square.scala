@@ -4,7 +4,7 @@ import Geometry.Point
 
 object Square {
   
-  def points(width:Int):Iterable[Point] = Rectangle.points(width, width)
+  def points(width:Int):Iterable[Point] = Rectangle.pointsFromCenter(width, width)
   
   def pointsDownAndRight(count:Int):Iterable[Point] =
     (0 until count).flatten(dy =>

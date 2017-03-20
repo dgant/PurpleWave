@@ -75,6 +75,8 @@ abstract class UnitInfo (var baseUnit:bwapi.Unit) {
   def attackFrames: Int = {
     // Really important to get these right
     // Via https://github.com/tscmoo/tsc-bwai/blame/master/src/unit_controls.h#L1571
-    if (unitClass == Protoss.Dragoon) 5 else 2
+    if      (unitClass == Protoss.Dragoon) 5
+    else if (unitClass == Protoss.Carrier) 48
+    else 2
   }
 }

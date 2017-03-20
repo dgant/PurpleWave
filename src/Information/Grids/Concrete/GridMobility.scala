@@ -19,7 +19,7 @@ class GridMobility extends GridInt {
               (1 to distanceMax).foreach(distance =>
                 if (doContinue) {
                   val nextPosition = tile.add(mx * distance, my * distance)
-                  doContinue = With.grids.walkableUnits.get(nextPosition)
+                  doContinue = With.grids.walkable.get(nextPosition)
                   if (doContinue) {
                     tileMobility += 1
                   }

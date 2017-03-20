@@ -43,9 +43,9 @@ class Grids {
   }
   
   def relevantTiles = relevantTilesCache.get
-  private val relevantTilesCache = new CacheFrame[List[TilePosition]](() => relevantTilesRecalculate)
-  private def relevantTilesRecalculate:List[TilePosition] = {
-    val nearbyPoints = Square.points(4).toList
-    With.units.ours.flatten(unit => nearbyPoints.map(unit.tileCenter.add)).toList
+  private val relevantTilesCache = new CacheFrame[Set[TilePosition]](() => relevantTilesRecalculate)
+  private def relevantTilesRecalculate:Set[TilePosition] = {
+    val nearbyPoints = Square.points(18).toList
+    With.units.ours.flatten(unit => nearbyPoints.map(unit.tileCenter.add))
   }
 }

@@ -21,8 +21,9 @@ class TargetingProfile(
     .product
   }
   
+  //TODO: Don't even calculate the value if the weight is 0
   //TODO: Consolidate with MovementProfile
-  def weigh(value:Double, weight:Double):Double = Math.pow(normalize(value), weight)
+  def weigh(value:Double, weight:Double):Double = if (weight == 0) 1 else Math.pow(normalize(value), weight)
   def unboolify(value:Boolean)                  = if (value) 2 else 1
   def normalize(value:Double)                   = Math.min(Math.max(0.01, value), 1000000)
   

@@ -1,78 +1,25 @@
 package Information.Geography
 
-import Geometry.Shapes.Circle
 import Geometry._
-import Performance.Caching.{Cache, CacheForever, Limiter}
-import ProxyBwapi.Races.Protoss
-import ProxyBwapi.UnitInfo.{ForeignUnitInfo, UnitInfo}
+import Information.Geography.Types.{Base, Zone}
+import Performance.Caching.Cache
+import ProxyBwapi.UnitInfo.UnitInfo
 import Startup.With
 import Utilities.TypeEnrichment.EnrichPosition._
 import bwapi.TilePosition
-import bwta.BWTA
-
-import scala.collection.JavaConverters._
-import scala.collection.mutable.ListBuffer
 
 class Geography {
   
-  def zones:Iterable[Zone] = {
-    zoneUpdateLimiter.act()
-    zoneCache.get
-  }
-  private val zoneCache = new CacheForever[Iterable[Zone]](() => zoneCalculate)
-  private val zoneUpdateLimiter = new Limiter(10, updateZones)
-  private def zoneCalculate:Iterable[Zone] = {
-    //Build zones
-    val zonesByRegionCenter = BWTA.getRegions.asScala.map(region =>
-      (region.getCenter,
-      new Zone(
-        region.getCenter.toTilePosition,
-        region,
-        new ListBuffer[Base],
-        new ListBuffer[ZoneEdge])))
-      .toMap
-    
-    //Build bases
-    val allBases = townHallPositions.map(townHallPosition => {
-      val townHallArea = Protoss.Nexus.area.add(townHallPosition)
-      new Base(
-        zonesByRegionCenter.values
-          .find(_.region.getPolygon.isInside(townHallPosition.toPosition))
-          .getOrElse(zonesByRegionCenter.values.minBy(_.region.getCenter.distancePixels(townHallPosition.pixelCenter))),
-        townHallArea,
-        getHarvestingArea(townHallArea),
-        With.game.getStartLocations.asScala.exists(_.distanceTile(townHallPosition) < 6))
-    })
-    
-    //Populate zones with bases
-    allBases.foreach(base => base.zone.bases += base)
-    
-    //Add edges
-    val edges = BWTA.getChokepoints.asScala.map(choke =>
-      new ZoneEdge(
-        choke,
-        List(choke.getRegions.first, choke.getRegions.second)
-          .map(region => zonesByRegionCenter(region.getCenter))))
-    
-    edges.foreach(edge => edge.zones.foreach(zone => zone.edges += edge))
-    
-    return zonesByRegionCenter.values
-  }
-  private def updateZones() =
-    zoneCache.get.flatten(_.bases).foreach(base => {
-      val townHall = With.units.buildings.filter(_.unitClass.isTownHall)
-        .filter(townHall => base.zone.region.getPolygon.isInside(townHall.pixelCenter))
-        .toList
-        .sortBy(_.distance(base.townHallArea.midpoint))
-        .headOption
-      base.townHall = townHall
-      base.zone.owner = townHall.map(_.player).headOption.getOrElse(With.game.neutral)
-    })
+  private val baseCalculator = new Bases
+  private val townHallPositionCalculator = new TownHallPositions
   
-  def bases:Iterable[Base] = zones.flatten(_.bases)
-  def ourBases:Iterable[Base] = bases.filter(_.zone.owner == With.self)
-  def ourBaseHalls:Iterable[UnitInfo] = ourBases.filter(_.townHall.isDefined).map(_.townHall.get)
-  def ourHarvestingAreas:Iterable[TileRectangle] = ourBases.map(_.harvestingArea)
+  def townHallPositions = townHallPositionCalculator.townHallPositions
+  def zones:Iterable[Zone] = baseCalculator.zones
+  
+  def bases               : Iterable[Base]          = baseCalculator.zones.flatten(_.bases)
+  def ourBases            : Iterable[Base]          = bases.filter(_.zone.owner == With.self)
+  def ourBaseHalls        : Iterable[UnitInfo]      = ourBases.filter(_.townHall.isDefined).map(_.townHall.get)
+  def ourHarvestingAreas  : Iterable[TileRectangle] = ourBases.map(_.harvestingArea)
   
   def home:TilePosition = homeCache.get
   private val homeCache = new Cache[TilePosition](5, () => homeCalculate)
@@ -90,29 +37,5 @@ class Geography {
       .map(_.tileArea)
     
     (List(townHallArea) ++ resources).boundary
-  }
-  
-  //TODO: This is super duper slow right now.
-  def townHallPositions:Iterable[TilePosition] = townHallPositionCache.get
-  private val townHallPositionCache = new Cache[Iterable[TilePosition]](20, () => townHallPositionCalculate)
-  private val resourceClusterCache = new CacheForever[Iterable[Iterable[ForeignUnitInfo]]](() => getResourceClusters)
-  private val resourceExclusionCache = new CacheForever[Iterable[TileRectangle]](() => getExclusions)
-  private def getResourceClusters:Iterable[Iterable[ForeignUnitInfo]] = Clustering.group[ForeignUnitInfo](getResources, 32 * 12, true, (unit) => unit.pixelCenter).values
-  private def getExclusions:Iterable[TileRectangle] = getResources.map(getExclusion)
-  private def getExclusion(unit:ForeignUnitInfo):TileRectangle = new TileRectangle(unit.tileTopLeft.subtract(3, 3), unit.tileTopLeft.add(unit.unitClass.tileSize).add(3, 3))
-  private def getResources:Iterable[ForeignUnitInfo] = With.units.neutral.filter(unit => unit.isMinerals || unit.isGas).filter(_.initialResources > 0)
-  private def townHallPositionCalculate:Iterable[TilePosition] = resourceClusterCache.get.flatMap(findBasePosition)
-  private def findBasePosition(resources:Iterable[ForeignUnitInfo]):Option[TilePosition] = {
-    val centroid = resources.map(_.pixelCenter).centroid
-    val centroidTile = centroid.toTilePosition
-    val searchRadius = 10
-    val candidates = Circle.points(searchRadius).map(centroidTile.add).filter(isLegalBasePosition)
-    if (candidates.isEmpty) return None
-    Some(candidates.minBy(_.toPosition.add(64, 48).getDistance(centroid)))
-  }
-  private def isLegalBasePosition(position:TilePosition):Boolean = {
-    val exclusions = resourceExclusionCache.get
-    val buildingArea = new TileRectangle(position, position.add(Protoss.Nexus.tileSize))
-    buildingArea.tiles.forall(With.grids.buildableTerrain.get) && exclusions.forall( ! _.intersects(buildingArea))
   }
 }

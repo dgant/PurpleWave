@@ -1,9 +1,8 @@
 package Debugging.Visualization
 
 import Startup.With
-import bwapi.Color
+
 import scala.collection.JavaConverters._
-import Utilities.TypeEnrichment.EnrichPosition._
 
 object VisualizeGeography {
   

@@ -8,11 +8,18 @@ object VisualizeVectorUnits {
   
   def render() {
     With.game.drawBoxScreen(0, 0, 1500, 1200, Color.Black, true)
-    With.units.all.filter(unit => unit.alive && unit.possiblyStillThere).foreach(renderUnit)
+    
+    With.units.all
+      .filter(unit =>
+        unit.alive &&
+        unit.possiblyStillThere &&
+        (unit.complete || unit.unitClass.isBuilding))
+      .foreach(renderUnit)
+    
     With.game.setTextSize(bwapi.Text.Size.Enum.Large)
     With.game.drawTextScreen(10, 5, With.game.self.getName + " vs. " + With.game.enemy.getName)
     With.game.setTextSize(bwapi.Text.Size.Enum.Default)
-    With.game.drawTextScreen(10, 30, "This game is being displayed in PurpleWave Arcade Vision")
+    With.game.drawTextScreen(10, 30, "PurpleWave is displaying this game in Arcade Happy Vision")
     With.game.setTextSize(bwapi.Text.Size.Enum.Small)
   }
   
@@ -26,6 +33,7 @@ object VisualizeVectorUnits {
     val left = unit.left
     val right = unit.right
     val middle = (unit.left + unit.right)/2
+    val top    = flyingBonus + unit.top
     val bottom = flyingBonus + unit.bottom
     val waist  = flyingBonus + unit.top + unit.unitClass.height / 4
     val apex   = flyingBonus + unit.top - unit.unitClass.height / 4
@@ -48,7 +56,7 @@ object VisualizeVectorUnits {
       color)
     DrawMap.line(
       new Position(leftPerspective, waist),
-      new Position(left, unit.bottom),
+      new Position(left, bottom),
       color)
     DrawMap.line(
       new Position(rightPerspective, waist),
@@ -60,13 +68,15 @@ object VisualizeVectorUnits {
       color)
     DrawMap.label(unit.unitClass.toString, new Position(middle, unit.bottom + 9))
 
-    val eyeLeft         = left  + unit.unitClass.width / 3
-    val eyeRight        = right - unit.unitClass.width / 3
-    val eyeLevel        = unit.top + unit.unitClass.height / 2
+    val eyeLeft         = left  + unit.unitClass.width * 5 / 12
+    val eyeRight        = right - unit.unitClass.width * 5 / 12
+    val eyeLevel        = flyingBonus + top + unit.unitClass.height / 2
+    val mouthLeft       = left  + unit.unitClass.width / 3
+    val mouthRight      = right - unit.unitClass.width / 3
     val mouthAngleLeft  = left  + unit.unitClass.width * 5 / 12
     val mouthAngleRight = right - unit.unitClass.width * 5 / 12
-    var mouthTop        = unit.top + unit.unitClass.height * 6 / 10
-    var mouthBottom     = unit.top + unit.unitClass.height * 7 / 10
+    var mouthTop        = top + unit.unitClass.height * 6 / 10
+    var mouthBottom     = top + unit.unitClass.height * 7 / 10
     
     if (unit.unitClass.canAttack && ! unit.unitClass.isWorker) {
       var swap = mouthBottom
@@ -77,7 +87,7 @@ object VisualizeVectorUnits {
     DrawMap.box(new Position(eyeLeft-1, eyeLevel-1), new Position(eyeLeft,    eyeLevel), color)
     DrawMap.box(new Position(eyeRight,  eyeLevel-1), new Position(eyeRight+1, eyeLevel), color)
     DrawMap.line(
-      new Position(eyeLeft, mouthTop),
+      new Position(mouthLeft, mouthTop),
       new Position(mouthAngleLeft, mouthBottom),
       color)
     DrawMap.line(
@@ -85,7 +95,7 @@ object VisualizeVectorUnits {
       new Position(mouthAngleRight, mouthBottom),
       color)
     DrawMap.line(
-      new Position(eyeRight, mouthTop),
+      new Position(mouthRight, mouthTop),
       new Position(mouthAngleRight, mouthBottom),
       color)
   }

@@ -16,6 +16,7 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
     base = unit
     updateTracking()
     updateHealth()
+    updateCombat()
     updateGeometry()
     updateMovement()
     updateOrders()
@@ -86,8 +87,19 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
   // Combat //
   ////////////
   
-  def airWeaponCooldownLeft     : Int = base.getAirWeaponCooldown
-  def groundWeaponCooldownLeft  : Int = base.getGroundWeaponCooldown
+  private def updateCombat() {
+    _attackAnimationHappening = base.isAttackFrame
+    _airWeaponCooldownLeft    = base.getAirWeaponCooldown
+    _groundWeaponCooldownLeft = base.getGroundWeaponCooldown
+  }
+  
+  var _attackAnimationHappening : Boolean = false
+  var _airWeaponCooldownLeft    : Int = 0
+  var _groundWeaponCooldownLeft : Int = 0
+  
+  def attackAnimationHappening  : Boolean = _attackAnimationHappening
+  def airWeaponCooldownLeft     : Int     = base.getAirWeaponCooldown
+  def groundWeaponCooldownLeft  : Int     = base.getGroundWeaponCooldown
   
   //////////////
   // Geometry //

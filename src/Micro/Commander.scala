@@ -118,9 +118,9 @@ class Commander {
     sleep(unit, 8)
   }
   
-  private def sleep(unit:FriendlyUnitInfo, extraDelay:Int) {
-    val baseDelay = With.game.getRemainingLatencyFrames
-    nextOrderFrame.put(unit, With.frame + baseDelay + extraDelay)
+  private def sleep(unit:FriendlyUnitInfo, requiredDelay:Int) {
+    Math.max(With.latency.turnSize, requiredDelay)
+    nextOrderFrame.put(unit, With.frame + requiredDelay)
   }
   
   private def recordCommand(unit:FriendlyUnitInfo, command:Behavior) {

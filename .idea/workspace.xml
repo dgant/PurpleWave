@@ -27,71 +27,101 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="DrawMap.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Debugging/Visualization/DrawMap.scala">
+      <file leaf-file-name="TargetingProfile.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Micro/Targeting/TargetingProfile.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="287">
-              <caret line="65" column="24" lean-forward="true" selection-start-line="65" selection-start-column="24" selection-end-line="65" selection-end-column="24" />
+            <state relative-caret-position="544">
+              <caret line="55" column="71" lean-forward="true" selection-start-line="55" selection-start-column="71" selection-end-line="55" selection-end-column="71" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="UnitInfo.scala" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Configuration.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Debugging/Configuration.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="351">
+              <caret line="27" column="30" lean-forward="true" selection-start-line="27" selection-start-column="6" selection-end-line="27" selection-end-column="30" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="BehaviorDefault.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Micro/Behaviors/BehaviorDefault.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="117">
+              <caret line="9" column="34" lean-forward="false" selection-start-line="9" selection-start-column="34" selection-end-line="9" selection-end-column="34" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="BehaviorDragoon.scala" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/Micro/Behaviors/BehaviorDragoon.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="247">
+              <caret line="19" column="37" lean-forward="false" selection-start-line="19" selection-start-column="37" selection-end-line="19" selection-end-column="37" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="UnitClass.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/UnitClass/UnitClass.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="249">
+              <caret line="242" column="78" lean-forward="true" selection-start-line="242" selection-start-column="78" selection-end-line="242" selection-end-column="78" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Commander.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Micro/Commander.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="431">
+              <caret line="121" column="50" lean-forward="true" selection-start-line="121" selection-start-column="50" selection-end-line="121" selection-end-column="50" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Latency.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Performance/Latency.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="312">
+              <caret line="24" column="46" lean-forward="true" selection-start-line="24" selection-start-column="46" selection-end-line="24" selection-end-column="46" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="VisualizePerformance.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Debugging/Visualization/VisualizePerformance.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="91">
+              <caret line="7" column="60" lean-forward="false" selection-start-line="7" selection-start-column="60" selection-end-line="7" selection-end-column="60" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="UnitInfo.scala" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/UnitInfo/UnitInfo.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="329">
-              <caret line="72" column="17" lean-forward="true" selection-start-line="72" selection-start-column="17" selection-end-line="72" selection-end-column="17" />
+            <state relative-caret-position="366">
+              <caret line="85" column="44" lean-forward="false" selection-start-line="85" selection-start-column="44" selection-end-line="85" selection-end-column="44" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="With.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Startup/With.scala">
+      <file leaf-file-name="ForeignUnitInfo.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/UnitInfo/ForeignUnitInfo.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="387">
-              <caret line="42" column="33" lean-forward="false" selection-start-line="42" selection-start-column="33" selection-end-line="42" selection-end-column="33" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Bot.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Startup/Bot.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="178">
-              <caret line="21" column="9" lean-forward="true" selection-start-line="21" selection-start-column="9" selection-end-line="21" selection-end-column="9" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="AutoCamera.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Debugging/AutoCamera.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="195">
-              <caret line="15" column="86" lean-forward="false" selection-start-line="15" selection-start-column="86" selection-end-line="15" selection-end-column="86" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Main.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Startup/Main.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="52">
-              <caret line="4" column="4" lean-forward="false" selection-start-line="4" selection-start-column="4" selection-end-line="4" selection-end-column="4" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Listener.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Startup/Listener.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="159">
-              <caret line="20" column="67" lean-forward="false" selection-start-line="20" selection-start-column="67" selection-end-line="20" selection-end-column="67" />
+            <state relative-caret-position="273">
+              <caret line="96" column="5" lean-forward="false" selection-start-line="96" selection-start-column="5" selection-end-line="96" selection-end-column="5" />
               <folding />
             </state>
           </provider>
@@ -110,7 +140,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>townHall</find>
       <find>islega</find>
       <find>Drago</find>
       <find>Dragoon</find>
@@ -140,6 +169,7 @@
       <find>isEnemy</find>
       <find>enemyOf</find>
       <find>enemy</find>
+      <find>isAttackFrame</find>
     </findStrings>
     <replaceStrings>
       <replace>Property[Int]</replace>
@@ -181,9 +211,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/Micro/Intentions/Intention.scala" />
-        <option value="$PROJECT_DIR$/src/Micro/Targeting/EvaluateTargets.scala" />
-        <option value="$PROJECT_DIR$/src/Micro/Behaviors/Protoss/BehaviorCarrier.scala" />
         <option value="$PROJECT_DIR$/src/Micro/Behaviors/Protoss/BehaviorCorsair.scala" />
         <option value="$PROJECT_DIR$/src/Micro/Behaviors/Protoss/BehaviorDarkTemplar.scala" />
         <option value="$PROJECT_DIR$/src/Information/Grids/Abstract/Grid.scala" />
@@ -206,40 +233,43 @@
         <option value="$PROJECT_DIR$/src/Information/Geography/TownHallPositions.scala" />
         <option value="$PROJECT_DIR$/src/Geometry/TileRectangle.scala" />
         <option value="$PROJECT_DIR$/src/Micro/Movement/MovementProfile.scala" />
-        <option value="$PROJECT_DIR$/src/ProxyBwapi/UnitClass/UnitClass.scala" />
         <option value="$PROJECT_DIR$/src/Micro/Targeting/TargetingProfile.scala" />
         <option value="$PROJECT_DIR$/src/Micro/Behaviors/TargetingProfiles.scala" />
         <option value="$PROJECT_DIR$/src/Micro/Behaviors/MovementProfiles.scala" />
         <option value="$PROJECT_DIR$/src/ProxyBwapi/UnitTracking/UnitTracker.scala" />
         <option value="$PROJECT_DIR$/src/Information/Grids/Concrete/GridEnemyDetection.scala" />
-        <option value="$PROJECT_DIR$/src/Micro/Behaviors/BehaviorDefault.scala" />
         <option value="$PROJECT_DIR$/src/Planning/Composition/PositionFinders/PositionSimpleBuilding.scala" />
-        <option value="$PROJECT_DIR$/src/Micro/Commander.scala" />
         <option value="$PROJECT_DIR$/src/Planning/Plans/Macro/Automatic/GatherGas.scala" />
         <option value="$PROJECT_DIR$/src/Planning/Plans/Macro/Automatic/GatherMinerals.scala" />
-        <option value="$PROJECT_DIR$/src/ProxyBwapi/UnitInfo/FriendlyUnitProxy.scala" />
-        <option value="$PROJECT_DIR$/src/ProxyBwapi/UnitInfo/UnitProxy.scala" />
-        <option value="$PROJECT_DIR$/src/ProxyBwapi/UnitInfo/UnitInfo.scala" />
         <option value="$PROJECT_DIR$/src/Debugging/Visualization/VisualizeUnitsForeign.scala" />
         <option value="$PROJECT_DIR$/src/Information/Economy.scala" />
         <option value="$PROJECT_DIR$/src/ProxyBwapi/UnitInfo/FriendlyUnitInfo.scala" />
-        <option value="$PROJECT_DIR$/src/Debugging/Configuration.scala" />
         <option value="$PROJECT_DIR$/src/Information/Grids/Grids.scala" />
         <option value="$PROJECT_DIR$/src/ProxyBwapi/UnitTracking/ForeignUnitTracker.scala" />
-        <option value="$PROJECT_DIR$/src/ProxyBwapi/UnitInfo/ForeignUnitInfo.scala" />
         <option value="$PROJECT_DIR$/src/Information/Geography/TownHallPositionCalculator.scala" />
         <option value="$PROJECT_DIR$/src/Information/Geography/Geography.scala" />
         <option value="$PROJECT_DIR$/src/Startup/With.scala" />
         <option value="$PROJECT_DIR$/src/Startup/Bot.scala" />
         <option value="$PROJECT_DIR$/src/Debugging/Visualization/DrawMap.scala" />
+        <option value="$PROJECT_DIR$/src/Micro/Behaviors/BehaviorDefault.scala" />
+        <option value="$PROJECT_DIR$/src/ProxyBwapi/UnitInfo/UnitProxy.scala" />
+        <option value="$PROJECT_DIR$/src/ProxyBwapi/UnitInfo/FriendlyUnitProxy.scala" />
+        <option value="$PROJECT_DIR$/src/Debugging/Configuration.scala" />
+        <option value="$PROJECT_DIR$/src/ProxyBwapi/UnitInfo/UnitInfo.scala" />
+        <option value="$PROJECT_DIR$/src/Micro/Behaviors/BehaviorDragoon.scala" />
+        <option value="$PROJECT_DIR$/src/ProxyBwapi/UnitClass/UnitClass.scala" />
+        <option value="$PROJECT_DIR$/src/Performance/Latency.scala" />
+        <option value="$PROJECT_DIR$/src/Debugging/Visualization/VisualizePerformance.scala" />
+        <option value="$PROJECT_DIR$/src/Micro/Commander.scala" />
+        <option value="$PROJECT_DIR$/src/ProxyBwapi/UnitInfo/ForeignUnitInfo.scala" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="-4" />
-    <option name="y" value="-4" />
-    <option name="width" value="1608" />
-    <option name="height" value="908" />
+    <option name="x" value="1596" />
+    <option name="y" value="68" />
+    <option name="width" value="1368" />
+    <option name="height" value="776" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -406,6 +436,28 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="Targeting" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="PurpleWave1" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="PurpleWave1" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Micro" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Behaviors" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -707,23 +759,23 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-4" y="-4" width="1608" height="908" extended-state="6" />
+    <frame x="1596" y="68" width="1368" height="776" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.23161764" sideWeight="0.488125" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.23099415" sideWeight="0.488125" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3874269" sideWeight="0.5088235" order="8" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.12573099" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.195625" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.23014706" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Problems" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32894737" sideWeight="0.4970588" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Run with VisualVM" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32894737" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.34068626" sideWeight="0.49411765" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3406433" sideWeight="0.49411765" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.38357842" sideWeight="0.49117646" order="13" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.45760235" sideWeight="0.49117646" order="13" side_tool="false" content_ui="tabs" />
       <window_info id="Debug with VisualVM" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32748538" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -806,33 +858,11 @@
     </watches-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/Information/Grids/Concrete/GridEnemyVision.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="260">
-          <caret line="20" column="1" lean-forward="true" selection-start-line="20" selection-start-column="1" selection-end-line="20" selection-end-column="1" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Information/Grids/Concrete/GridWalkableUnits.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="17" column="1" lean-forward="true" selection-start-line="17" selection-start-column="1" selection-end-line="17" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Debugging/Visualization/VisualizeGrids.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="247">
-          <caret line="19" column="3" lean-forward="true" selection-start-line="19" selection-start-column="3" selection-end-line="19" selection-end-column="3" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Micro/Behaviors/Protoss/BehaviorCorsair.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="91">
           <caret line="7" column="55" lean-forward="true" selection-start-line="7" selection-start-column="55" selection-end-line="7" selection-end-column="55" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -883,14 +913,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Micro/Battles/Battle.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="104">
-          <caret line="8" column="2" lean-forward="false" selection-start-line="8" selection-start-column="2" selection-end-line="8" selection-end-column="2" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Micro/Battles/Battles.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="249">
@@ -911,14 +933,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="132">
           <caret line="66" column="41" lean-forward="true" selection-start-line="66" selection-start-column="41" selection-end-line="66" selection-end-column="41" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/UnitClass/UnitClass.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="158">
-          <caret line="233" column="46" lean-forward="true" selection-start-line="233" selection-start-column="46" selection-end-line="233" selection-end-column="46" />
           <folding />
         </state>
       </provider>
@@ -947,14 +961,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Micro/Targeting/TargetingProfile.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="522">
-          <caret line="55" column="113" lean-forward="true" selection-start-line="55" selection-start-column="113" selection-end-line="55" selection-end-column="113" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Micro/Behaviors/Protoss/BehaviorCarrier.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="169">
@@ -979,26 +985,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Micro/Behaviors/BehaviorDefault.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="157">
-          <caret line="13" column="32" lean-forward="false" selection-start-line="13" selection-start-column="20" selection-end-line="13" selection-end-column="32" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Planning/Composition/PositionFinders/PositionSimpleBuilding.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="157">
           <caret line="36" column="32" lean-forward="true" selection-start-line="36" selection-start-column="32" selection-end-line="36" selection-end-column="32" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Micro/Commander.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="144">
-          <caret line="55" column="33" lean-forward="true" selection-start-line="55" selection-start-column="33" selection-end-line="55" selection-end-column="33" />
           <folding />
         </state>
       </provider>
@@ -1015,22 +1005,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="498">
           <caret line="85" column="35" lean-forward="true" selection-start-line="85" selection-start-column="35" selection-end-line="85" selection-end-column="35" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/UnitInfo/FriendlyUnitProxy.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="416">
-          <caret line="32" column="6" lean-forward="false" selection-start-line="32" selection-start-column="6" selection-end-line="32" selection-end-column="6" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/UnitInfo/UnitProxy.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="198">
-          <caret line="43" column="26" lean-forward="false" selection-start-line="43" selection-start-column="26" selection-end-line="43" selection-end-column="26" />
           <folding />
         </state>
       </provider>
@@ -1063,14 +1037,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="174">
           <caret line="63" column="43" lean-forward="true" selection-start-line="63" selection-start-column="43" selection-end-line="63" selection-end-column="43" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Debugging/Configuration.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="208">
-          <caret line="16" column="46" lean-forward="false" selection-start-line="16" selection-start-column="46" selection-end-line="16" selection-end-column="46" />
           <folding />
         </state>
       </provider>
@@ -1123,14 +1089,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/UnitInfo/ForeignUnitInfo.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="191">
-          <caret line="62" column="3" lean-forward="true" selection-start-line="62" selection-start-column="3" selection-end-line="62" selection-end-column="3" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Information/Geography/TownHallPositionCalculator.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="130">
@@ -1149,7 +1107,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Startup/With.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="387">
+        <state relative-caret-position="431">
           <caret line="42" column="33" lean-forward="false" selection-start-line="42" selection-start-column="33" selection-end-line="42" selection-end-column="33" />
           <folding />
         </state>
@@ -1165,7 +1123,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Startup/Listener.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="159">
+        <state relative-caret-position="260">
           <caret line="20" column="67" lean-forward="false" selection-start-line="20" selection-start-column="67" selection-end-line="20" selection-end-column="67" />
           <folding />
         </state>
@@ -1195,10 +1153,106 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/Micro/Battles/Battle.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="104">
+          <caret line="8" column="2" lean-forward="true" selection-start-line="8" selection-start-column="2" selection-end-line="8" selection-end-column="2" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/UnitInfo/UnitProxy.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="107">
+          <caret line="36" column="38" lean-forward="false" selection-start-line="36" selection-start-column="38" selection-end-line="36" selection-end-column="38" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/UnitInfo/FriendlyUnitProxy.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="559">
+          <caret line="43" column="6" lean-forward="true" selection-start-line="43" selection-start-column="6" selection-end-line="43" selection-end-column="30" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/UnitInfo/UnitInfo.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="329">
-          <caret line="72" column="17" lean-forward="true" selection-start-line="72" selection-start-column="17" selection-end-line="72" selection-end-column="17" />
+        <state relative-caret-position="366">
+          <caret line="85" column="44" lean-forward="false" selection-start-line="85" selection-start-column="44" selection-end-line="85" selection-end-column="44" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Micro/Targeting/TargetingProfile.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="544">
+          <caret line="55" column="71" lean-forward="true" selection-start-line="55" selection-start-column="71" selection-end-line="55" selection-end-column="71" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Debugging/Configuration.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="351">
+          <caret line="27" column="30" lean-forward="true" selection-start-line="27" selection-start-column="6" selection-end-line="27" selection-end-column="30" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Micro/Behaviors/BehaviorDefault.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="117">
+          <caret line="9" column="34" lean-forward="false" selection-start-line="9" selection-start-column="34" selection-end-line="9" selection-end-column="34" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/UnitClass/UnitClass.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="249">
+          <caret line="242" column="78" lean-forward="true" selection-start-line="242" selection-start-column="78" selection-end-line="242" selection-end-column="78" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Performance/Latency.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="312">
+          <caret line="24" column="46" lean-forward="true" selection-start-line="24" selection-start-column="46" selection-end-line="24" selection-end-column="46" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Debugging/Visualization/VisualizePerformance.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="91">
+          <caret line="7" column="60" lean-forward="false" selection-start-line="7" selection-start-column="60" selection-end-line="7" selection-end-column="60" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Micro/Commander.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="431">
+          <caret line="121" column="50" lean-forward="true" selection-start-line="121" selection-start-column="50" selection-end-line="121" selection-end-column="50" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/UnitInfo/ForeignUnitInfo.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="273">
+          <caret line="96" column="5" lean-forward="false" selection-start-line="96" selection-start-column="5" selection-end-line="96" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Micro/Behaviors/BehaviorDragoon.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="247">
+          <caret line="19" column="37" lean-forward="false" selection-start-line="19" selection-start-column="37" selection-end-line="19" selection-end-column="37" />
           <folding />
         </state>
       </provider>

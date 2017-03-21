@@ -211,6 +211,8 @@ case class UnitClass(val baseType:UnitType) {
     if (this == Protoss.Reaver) return 60
     return groundWeapon.damageCooldown
   }
+  
+  //The extra 2+ is to account for the 1-3 frame random variation in cooldown
   def airDps    : Double = airDamage    * 24 / (2 + airWeapon.damageCooldown).toDouble
   def groundDps : Double = groundDamage * 24 / (2 + groundWeapon.damageCooldown).toDouble
   def attacksGround:Boolean = groundDamage > 0

@@ -81,9 +81,9 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
     // The question:
     // If we order this unit to attack, how many frames after issuing an order (and waiting on latency) before it can attack again?
     //
-    // Via https://github.com/tscmoo/tsc-bwai/blame/master/src/unit_controls.h#L1571
-    
-    if      (unitClass == Protoss.Dragoon) 5
+    // This is also important for preventing the Goon Stop bug. See BehaviorDragoon for details.
+    //
+    if      (unitClass == Protoss.Dragoon) 8
     else if (unitClass == Protoss.Carrier) 48
     else 2
   }

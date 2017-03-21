@@ -1,7 +1,7 @@
 package ProxyBwapi.UnitInfo
 
 import ProxyBwapi.UnitClass.UnitClass
-import bwapi.{Player, Position, TilePosition, WalkPosition}
+import bwapi.{Player, Position, TilePosition}
 
 abstract class UnitProxy(var base:bwapi.Unit) {
     
@@ -34,6 +34,7 @@ abstract class UnitProxy(var base:bwapi.Unit) {
   // Combat //
   ////////////
   
+  def attackAnimationHappening:Boolean
   def airWeaponCooldownLeft:Int
   def groundWeaponCooldownLeft:Int
   

@@ -24,4 +24,6 @@ class Configuration {
   var enableVisualizationUnitsForeign   = true
   var enableVisualizationUnitsOurs      = false
   var enableVisualizationZones          = false
+  
+  var enableGoonStopProtection          = false
 }

@@ -35,7 +35,7 @@ class GatherMinerals extends Plan {
   
   val resetAssignmentsLimiter = new Limiter(4, resetAssignments)
   private def resetAssignments() {
-    val allMinerals = With.units.neutral.filter(_.isMinerals)
+    val allMinerals = With.units.neutral.filter(_.unitClass.isMinerals)
     val completeBases = With.geography.ourBases.filter(_.townHall.exists(_.complete))
     mineralByWorker.clear()
     workersByMineral.clear()
@@ -43,7 +43,7 @@ class GatherMinerals extends Plan {
     
     //Long-distance mining
     if (minerals.isEmpty) {
-      minerals = allMinerals.toList.sortBy(_.distance(With.geography.home))
+      minerals = allMinerals.toList.sortBy(_.tileDistance(With.geography.home))
     }
   }
   
@@ -55,7 +55,7 @@ class GatherMinerals extends Plan {
     while (unassignedWorkers.nonEmpty) {
       minerals.foreach(mineral => {
         if (unassignedWorkers.nonEmpty) {
-          val worker = unassignedWorkers.minBy(candidate => With.paths.groundDistance(candidate.tileCenter, mineral.tileCenter))
+          val worker = unassignedWorkers.minBy(candidate => With.paths.groundPixels(candidate.tileCenter, mineral.tileCenter))
           workersByMineral(mineral).add(worker)
           mineralByWorker.put(worker, mineral)
           unassignedWorkers.remove(worker)
@@ -83,7 +83,7 @@ class GatherMinerals extends Plan {
   }
   
   private def orderWorker(worker:FriendlyUnitInfo) {
-    if (worker.isGatheringMinerals) {
+    if (worker.gatheringMinerals) {
       mineralByWorker.get(worker).foreach(mineral => {
         if (mineral.pixelCenter.getDistance(worker.pixelCenter) > 32 * 12) {
           gather(worker, mineral)

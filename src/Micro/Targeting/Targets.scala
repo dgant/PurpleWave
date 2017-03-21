@@ -7,7 +7,7 @@ import ProxyBwapi.UnitInfo.UnitInfo
 
 object Targets {
   def get(intent:Intention):Set[UnitInfo] = {
-    With.units.inRadius(intent.unit.pixelCenter, intent.unit.unitClass.maxAirGroundRange + 32 * 8)
+    With.units.inPixelRadius(intent.unit.pixelCenter, intent.unit.unitClass.maxAirGroundRange + 32 * 8)
       .filter(intent.unit.isEnemyOf)
       .filter(_.alive)
       .filter(_.visible)

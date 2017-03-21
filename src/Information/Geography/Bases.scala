@@ -30,7 +30,7 @@ class Bases {
     
     //Build bases
     val allBases = With.geography.townHallPositions.map(townHallPosition => {
-      val townHallArea = Protoss.Nexus.area.add(townHallPosition)
+      val townHallArea = Protoss.Nexus.tileArea.add(townHallPosition)
       new Base(
         zonesByRegionCenter.values
           .find(_.region.getPolygon.isInside(townHallPosition.toPosition))
@@ -59,7 +59,7 @@ class Bases {
       val townHall = With.units.buildings.filter(_.unitClass.isTownHall)
         .filter(townHall => base.zone.region.getPolygon.isInside(townHall.pixelCenter))
         .toList
-        .sortBy(_.distance(base.townHallArea.midpoint))
+        .sortBy(_.tileDistance(base.townHallArea.midpoint))
         .headOption
       base.townHall = townHall
       base.zone.owner = townHall.map(_.player).getOrElse(With.game.neutral)

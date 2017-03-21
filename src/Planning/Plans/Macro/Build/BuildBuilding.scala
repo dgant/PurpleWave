@@ -56,7 +56,7 @@ class BuildBuilding(val buildingClass:UnitClass) extends Plan {
     
     if (tile.isEmpty) return
   
-    areaLock.area = buildingClass.area.add(tile.get)
+    areaLock.area = buildingClass.tileArea.add(tile.get)
   
     //TODO: Terran: Complete incomplete buildings
   
@@ -87,8 +87,8 @@ class BuildBuilding(val buildingClass:UnitClass) extends Plan {
     if ( ! tile.isDefined) return
     if ( ! areaLock.isComplete) return
     DrawMap.box(
-      buildingClass.area.startInclusive.add(tile.get).topLeftPixel,
-      buildingClass.area.endExclusive.add(tile.get).topLeftPixel,
+      buildingClass.tileArea.startInclusive.add(tile.get).topLeftPixel,
+      buildingClass.tileArea.endExclusive.add(tile.get).topLeftPixel,
       DrawMap.playerColor(With.self))
     DrawMap.label(
       "Building a " + buildingClass.toString,

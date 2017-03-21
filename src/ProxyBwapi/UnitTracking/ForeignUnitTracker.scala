@@ -12,10 +12,10 @@ class ForeignUnitTracker {
   
   private val foreignUnitsById = new mutable.HashMap[Int, ForeignUnitInfo].empty
   
-  var foreignUnits         : Set[ForeignUnitInfo] = new HashSet[ForeignUnitInfo]
-  var enemyUnits           : Set[ForeignUnitInfo] = new HashSet[ForeignUnitInfo]
-  var neutralUnits         : Set[ForeignUnitInfo] = new HashSet[ForeignUnitInfo]
-  var bannedEnemyUnitIds   : Set[Int]             = new HashSet[Int]
+  var foreignUnits    : Set[ForeignUnitInfo] = new HashSet[ForeignUnitInfo]
+  var enemyUnits      : Set[ForeignUnitInfo] = new HashSet[ForeignUnitInfo]
+  var neutralUnits    : Set[ForeignUnitInfo] = new HashSet[ForeignUnitInfo]
+  var enemyGhostUnits : Set[Int]             = new HashSet[Int]
   
   def get(someUnit:bwapi.Unit):Option[ForeignUnitInfo] = get(someUnit.getID)
   def get(id:Int):Option[ForeignUnitInfo] = foreignUnitsById.get(id)
@@ -24,16 +24,22 @@ class ForeignUnitTracker {
   def onFrame() {
     initialize()
     
+    //Frame 0 is funky because BWAPI reveals all neutral units with limited information.
+    //Let's ignore it.
+    if (With.frame == 0) {
+      return
+    }
+    
     //Important to remember: bwapi.Units are not persisted frame-to-frame
     //So we do all our comparisons by ID, rather than by object
   
-    val foreignUnitsKnown         = foreignUnitsById
-    val foreignUnitsVisible       = With.game.getAllUnits.asScala.filter(isValidForeignUnit).map(unit => (unit.getID, unit)).toMap
-    val foreignIdsKnown           = foreignUnitsKnown.keySet
-    val foreignIdsVisible         = foreignUnitsVisible.keySet
-    val unitsToAdd                = foreignIdsVisible.diff      (foreignIdsKnown)   .map(foreignUnitsVisible)
-    val unitsToUpdate             = foreignIdsVisible.intersect (foreignIdsKnown)   .map(foreignUnitsVisible)
-    val unitsToFlagInvisible      = foreignIdsKnown.diff        (foreignIdsVisible) .map(foreignUnitsById)
+    val foreignUnitsKnown     = foreignUnitsById
+    val foreignUnitsVisible   = With.game.getAllUnits.asScala.filter(isValidForeignUnit).map(unit => (unit.getID, unit)).toMap
+    val foreignIdsKnown       = foreignUnitsKnown.keySet
+    val foreignIdsVisible     = foreignUnitsVisible.keySet
+    val unitsToAdd            = foreignIdsVisible.diff      (foreignIdsKnown)   .map(foreignUnitsVisible)
+    val unitsToUpdate         = foreignIdsVisible.intersect (foreignIdsKnown)   .map(foreignUnitsVisible)
+    val unitsToFlagInvisible  = foreignIdsKnown.diff        (foreignIdsVisible) .map(foreignUnitsById)
     
     unitsToAdd.foreach(add)
     unitsToUpdate.foreach(unit => foreignUnitsById(unit.getID).update(unit))
@@ -48,8 +54,12 @@ class ForeignUnitTracker {
     enemyUnits   = foreignUnits.filter(_.player.isEnemy(With.self))
     neutralUnits = foreignUnits.filter(_.player.isNeutral)
   
-    unitsToFlagInvisible.foreach(_._visible = false)
+    unitsToFlagInvisible.foreach(_.flagInvisible)
     limitInvalidatePositions.act()
+  }
+  
+  def onUnitDestroy(unit:bwapi.Unit) {
+    foreignUnitsById.get(unit.getID).foreach(remove)
   }
   
   private def invalidatePositions() {
@@ -60,13 +70,7 @@ class ForeignUnitTracker {
       .foreach(updateMissing)
   }
   
-  def onUnitDestroy(unit:bwapi.Unit) {
-    foreignUnitsById.get(unit.getID).foreach(remove)
-  }
-  
   private def initialize() {
-    //BWAPI seems to start some games returning enemy units that don't make any sense.
-    //This will let us catch them while debugging until we figure this out for good
     if (With.frame == 0) {
       flagGhostUnits()
       trackStaticUnits()
@@ -74,31 +78,29 @@ class ForeignUnitTracker {
   }
   
   private def flagGhostUnits() {
+    //At the start of the game BWAPI sometimes gives us enemy units that don't make any sense.
     val ghostUnits = With.game.getAllUnits.asScala.filter(_.getPlayer.isEnemy(With.self))
-    bannedEnemyUnitIds = ghostUnits.map(_.getID).toSet
+    enemyGhostUnits = ghostUnits.map(_.getID).toSet
     if (ghostUnits.nonEmpty) {
       With.logger.warn("Found ghost units at start of game:")
       ghostUnits.map(u => u.getType + ", " + u.getPlayer.getName + " " + u.getPosition).foreach(With.logger.warn)
     }
   }
   
-  private def trackStaticUnits() {
+  private def trackStaticUnits() = {
     With.game.getStaticNeutralUnits.asScala.foreach(add)
   }
   
   private def add(unit:bwapi.Unit) {
     val knownUnit = new ForeignUnitInfo(unit)
-    foreignUnitsById.put(knownUnit.id, new ForeignUnitInfo(unit))
+    knownUnit.update(unit)
+    foreignUnitsById.put(knownUnit.id, knownUnit)
   }
   
   private def updateMissing(unit:ForeignUnitInfo) {
-    if (unit.unitClass.canMove) {
-      unit.invalidatePosition()
-    } else {
-      //Well, if it can't move, it must be dead. Like a building that burned down or was otherwise destroyed
-      remove(unit)
-    }
-    //TODO: Score tracking should count the unit as dead
+    
+    //Well, if it can't move, it must be dead. Like a building that burned down or was otherwise destroyed.
+    if (unit.unitClass.canMove) unit.flagMissing() else remove(unit)
   }
   
   private def remove(unit:ForeignUnitInfo) {

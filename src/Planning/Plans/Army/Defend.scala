@@ -12,9 +12,9 @@ class Defend extends Plan {
   
   override def getChildren: Iterable[Plan] = List(units.get)
   override def onFrame() {
-    val attackers = With.units.enemy.filter(_.distance(With.geography.home) < 32 * 40)
+    val attackers = With.units.enemy.filter(_.tileDistance(With.geography.home) < 32 * 40)
     if (attackers.isEmpty) return
-    val placeToDefend = attackers.minBy(_.distance(With.geography.home)).tileCenter
+    val placeToDefend = attackers.minBy(_.tileDistance(With.geography.home)).tileCenter
     units.get.onFrame()
     if (units.get.isComplete) {
       units.get.units.foreach(fighter => With.executor.intend(new Intention(this, fighter) { destination = Some(placeToDefend) }))

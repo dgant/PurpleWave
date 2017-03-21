@@ -12,16 +12,19 @@ class Battles {
   
   val all = new mutable.HashSet[Battle]
   
-  def unit(unit:UnitInfo):Option[Battle] = {
-    None
-  }
+  val byUnit = new mutable.HashMap[UnitInfo, Battle]
   
   def onFrame() = updateLimiter.act()
   private val updateLimiter = new Limiter(2, update)
   private def update() {
+    byUnit.clear()
     defineBattles()
     all.foreach(update)
     all.filterNot(isValid).foreach(all.remove)
+    all.foreach(battle => {
+      battle.enemy.units.foreach(unit => byUnit.put(unit, battle))
+      battle.us   .units.foreach(unit => byUnit.put(unit, battle))
+    })
   }
   
   private def update(battle:Battle) {
@@ -39,7 +42,7 @@ class Battles {
   }
   
   private def defineBattles() {
-    val battleRange   = 32 * 16
+    val battleRange   = 32 * 18
     val ourClusters   = Clustering.groupUnits(getFighters(With.units.ours),  battleRange).values
     val enemyClusters = Clustering.groupUnits(getFighters(With.units.enemy), battleRange).values
     val ourGroups     = ourClusters  .map(group => new BattleGroup(group))

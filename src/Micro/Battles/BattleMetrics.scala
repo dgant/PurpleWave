@@ -9,7 +9,7 @@ import bwapi.Position
 object BattleMetrics {
   
   def vanguard(group:BattleGroup, otherGroup:BattleGroup):Position = {
-    group.units.minBy(_.distanceSquared(otherGroup.center)).pixelCenter
+    group.units.minBy(_.pixelDistanceSquared(otherGroup.center)).pixelCenter
   }
   
   def center(group:BattleGroup):Position = {
@@ -43,7 +43,7 @@ object BattleMetrics {
   def evaluate(unit:UnitInfo, position:Position):Int = {
     val distanceDropoff = 16.0
     val distanceCutoff = 32.0 * 4
-    val distance = Math.max(0, unit.distance(position) - unit.unitClass.maxAirGroundRange)
+    val distance = Math.max(0, unit.pixelDistance(position) - unit.unitClass.maxAirGroundRange)
     val distanceFactor = Math.max(0.0, Math.min(1.0, (distanceCutoff + distanceDropoff - distance ) / distanceCutoff))
     
     //Shortcut

@@ -98,7 +98,7 @@ class Bot() extends DefaultBWListener {
       case exception:Exception =>
         val dontLoseTheExceptionWhileDebugging = exception
         val dontLoseTheStackTraceWhileDebugging = exception.getStackTrace
-        With.logger.onException(exception)
+         With.logger.onException(exception)
     }
   }
 

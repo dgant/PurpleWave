@@ -1,9 +1,8 @@
 package Micro.Movement
 
-import Startup.With
 import Micro.Intentions.Intention
+import Startup.With
 import bwapi.TilePosition
-import Utilities.TypeEnrichment.EnrichPosition._
 
 class MovementProfile(
   var preferTravel      : Double = 0,
@@ -65,8 +64,7 @@ class MovementProfile(
   }
   
   def getDistance(intent: Intention, origin:TilePosition, destination:TilePosition):Double = {
-    if (intent.unit.flying) origin.pixelCenter.distancePixels(destination.pixelCenter)
-    else                    With.paths.groundDistance(intent.unit.tileCenter, destination)
+    intent.unit.travelPixels(destination)
   }
   
   def traffic(intent: Intention, candidate: TilePosition): Double = {

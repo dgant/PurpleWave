@@ -15,10 +15,10 @@ class Paths {
   private val distanceAge = new mutable.HashMap[(TilePosition, TilePosition), Int]
   
   def exists(origin:TilePosition, destination: TilePosition):Boolean = {
-    groundDistance(origin, destination) < impossiblyLargeDistance
+    groundPixels(origin, destination) < impossiblyLargeDistance
   }
   
-  def groundDistance(origin:TilePosition, destination:TilePosition):Int = {
+  def groundPixels(origin:TilePosition, destination:TilePosition):Int = {
     val request = (origin, destination)
     if ( ! distanceCache.contains(request)) {
       cacheDistance(request)

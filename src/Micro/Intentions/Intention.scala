@@ -26,5 +26,5 @@ class Intention(val plan:Plan, val unit:FriendlyUnitInfo) {
  
   var movementProfileCombat = MovementProfiles.defaultCombat
   var movementProfileNormal = MovementProfiles.defaultNormal
-  var targetProfile = TargetingProfiles.default
+  var targetProfile = TargetingProfiles.ranged
 }

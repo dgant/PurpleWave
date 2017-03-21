@@ -6,7 +6,7 @@ object MovementProfiles {
   
   val defaultCombat = new MovementProfile (
     preferTravel      = 0.2,
-    preferSpot        = 0,
+    preferSpot        = 0.2,
     preferSitAtRange  = 1.5,
     preferMobility    = 2,
     preferHighGround  = 0.5,

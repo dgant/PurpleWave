@@ -11,7 +11,7 @@ object VisualizeUnitsForeign {
   }
   
   private def drawTrackedUnit(trackedUnit:ForeignUnitInfo) {
-    if (trackedUnit._possiblyStillThere && ! trackedUnit.visible) {
+    if (trackedUnit.possiblyStillThere && ! trackedUnit.visible) {
       DrawMap.circle(
         trackedUnit.pixelCenter,
         trackedUnit.unitClass.width / 2,

@@ -50,15 +50,15 @@ class Economy {
       // 1. There are several associated UnitCommandTypes, including ReturnCargo
       // 2. We could also check the current ORDER, which cycles between things like "MiningMinerals" and "MoveToMinerals"
       // This will work for now, but will likely break when we start trying to micro harvesters
-      .filter(worker => worker.isGatheringMinerals || worker.isGatheringGas)
+      .filter(worker => worker.gatheringMinerals || worker.gatheringGas)
   }
   
   def ourActiveMiners(miningArea:TileRectangle):Iterable[FriendlyUnitInfo] = {
-    ourActiveHarvesters(miningArea).filter(_.isGatheringMinerals)
+    ourActiveHarvesters(miningArea).filter(_.gatheringMinerals)
   }
   
   def ourActiveDrillers(miningArea:TileRectangle):Iterable[FriendlyUnitInfo] = {
-    ourActiveHarvesters(miningArea).filter(_.isGatheringGas)
+    ourActiveHarvesters(miningArea).filter(_.gatheringGas)
   }
   
   def ourMineralIncomePerMinute:Integer = {

@@ -16,6 +16,11 @@ class TileRectangle(
       startInclusive.add(x, y),
       endExclusive.add(x, y))
   
+  def expand(x:Int, y:Int):TileRectangle =
+    new TileRectangle(
+      startInclusive.add(-x, -y),
+      endExclusive  .add( x,  y))
+  
   def add(tilePosition:TilePosition):TileRectangle =
     add(tilePosition.getX, tilePosition.getY)
   

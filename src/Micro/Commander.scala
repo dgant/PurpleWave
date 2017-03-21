@@ -36,8 +36,8 @@ class Commander {
   
   def attack(intent:Intention, target:UnitInfo) {
     if (intent.unit.command.getUnitCommandType != UnitCommandType.Attack_Unit
-     || intent.unit.command.getTarget != target.baseUnit) {
-      intent.unit.baseUnit.attack(target.baseUnit)
+     || intent.unit.command.getTarget != target.base) {
+      intent.unit.base.attack(target.base)
     }
     sleepAttack(intent.unit)
   }
@@ -46,57 +46,57 @@ class Commander {
     //According to https://github.com/tscmoo/tsc-bwai/commit/ceb13344f5994d28d6b601cef126f264ca97426b
     //ordering moves to the exact same destination causes Brood War to not recalculate the path.
     //Better to recalculate the path a few times to prevent units getting stuck
-    intent.unit.baseUnit.move(position.add(
+    intent.unit.base.move(position.add(
       MovementRandom.random.nextInt(5) - 2,
       MovementRandom.random.nextInt(5) - 2))
     sleepMove(intent.unit)
   }
   
   def gather(intent:Intention, resource:UnitInfo) {
-    if (intent.unit.command.getTarget != resource.baseUnit) {
-      if (intent.unit.isCarryingGas || intent.unit.isCarryingMinerals) {
+    if (intent.unit.command.getTarget != resource.base) {
+      if (intent.unit.carryingGas || intent.unit.carryingMinerals) {
         val townHalls = With.units.ours.filter(_.unitClass.isTownHall).filter(_.complete)
         if (townHalls.nonEmpty) {
-          val nearestTownHall = townHalls.minBy(townHall => With.paths.groundDistance(resource.tileCenter, townHall.tileCenter))
-          intent.unit.baseUnit.rightClick(nearestTownHall.baseUnit)
+          val nearestTownHall = townHalls.minBy(townHall => With.paths.groundPixels(resource.tileCenter, townHall.tileCenter))
+          intent.unit.base.rightClick(nearestTownHall.base)
           sleepReturnCargo(intent.unit)
           return
         }
       }
       
-      intent.unit.baseUnit.rightClick(resource.baseUnit)
+      intent.unit.base.rightClick(resource.base)
       sleepMove(intent.unit)
     }
   }
   
   def build(intent:Intention, unitClass:UnitClass) {
-    intent.unit.baseUnit.build(unitClass.baseType)
+    intent.unit.base.build(unitClass.baseType)
     sleepBuild(intent.unit)
   }
   
   def build(intent:Intention, unitClass:UnitClass, tile:TilePosition) {
-    if (intent.unit.distance(tile) > 32 * 5) {
+    if (intent.unit.tileDistance(tile) > 32 * 5) {
       return move(intent, tile.pixelCenter)
     }
-    intent.unit.baseUnit.build(unitClass.baseType, tile)
+    intent.unit.base.build(unitClass.baseType, tile)
     sleepBuild(intent.unit)
   }
   
   def tech(intent:Intention, tech: Tech) {
-    intent.unit.baseUnit.research(tech.baseType)
+    intent.unit.base.research(tech.baseType)
   }
   
   def upgrade(intent:Intention, upgrade: Upgrade) {
-    intent.unit.baseUnit.upgrade(upgrade.baseType)
+    intent.unit.base.upgrade(upgrade.baseType)
   }
   
   def buildScarab(intent:Intention) {
-    intent.unit.baseUnit.build(Protoss.Scarab.baseType)
+    intent.unit.base.build(Protoss.Scarab.baseType)
     sleepMove(intent.unit)
   }
   
   def buildInterceptor(intent:Intention) {
-    intent.unit.baseUnit.build(Protoss.Interceptor.baseType)
+    intent.unit.base.build(Protoss.Interceptor.baseType)
     sleepMove(intent.unit)
   }
   
@@ -105,7 +105,7 @@ class Commander {
   }
   
   private def sleepAttack(unit:FriendlyUnitInfo) {
-    sleep(unit, unit.attackFrames)
+    sleep(unit, unit.requiredAttackDelay)
   }
   
   private def sleepBuild(unit:FriendlyUnitInfo) {

@@ -23,8 +23,8 @@ class PositionChoke extends PositionFinder {
     val furthestStartPosition = With.geography.bases.filter(_.isStartLocation).map(_.tile).maxBy(home.distanceTile)
     val possibleChokes = chokes.filter(choke =>
       bases.forall(base =>
-        With.paths.groundDistance(furthestStartPosition, choke) <
-        With.paths.groundDistance(furthestStartPosition, base)))
+        With.paths.groundPixels(furthestStartPosition, choke) <
+        With.paths.groundPixels(furthestStartPosition, base)))
     
     if (possibleChokes.isEmpty) return Some(bases.minBy(Positions.tileMiddle.distanceTile))
     

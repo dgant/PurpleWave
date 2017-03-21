@@ -21,8 +21,8 @@ class UnitTracker {
     UnitType.Unknown
   )
   
-  def get(id:Int):Option[UnitInfo]              = friendlyUnitTracker.get(id).orElse(foreignUnitTracker.get(id))
-  def getUnit(unit:bwapi.Unit):Option[UnitInfo] = if (unit == null) None else get(unit.getID)
+  def getId(id:Int):Option[UnitInfo]              = friendlyUnitTracker.get(id).orElse(foreignUnitTracker.get(id))
+  def get(unit:bwapi.Unit):Option[UnitInfo] = if (unit == null) None else getId(unit.getID)
   def all:Set[UnitInfo]                         = ours ++ enemy ++ neutral
   def buildings:Set[UnitInfo]                   = all.filter(_.unitClass.isBuilding)
   def ours:Set[FriendlyUnitInfo]                = friendlyUnitTracker.ourUnits
@@ -30,10 +30,10 @@ class UnitTracker {
   def neutral:Set[ForeignUnitInfo]              = foreignUnitTracker.neutralUnits
   
   private def remap(units:java.util.List[bwapi.Unit]):Iterable[UnitInfo] = {
-    units.asScala.flatMap(getUnit).toList
+    units.asScala.flatMap(get).toList
   }
   
-  def inRadius(position:Position, range:Int):Set[UnitInfo] = {
+  def inPixelRadius(position:Position, range:Int):Set[UnitInfo] = {
     val tileRadius = range / 32 + 1
     val tile = position.tileIncluding
     Circle

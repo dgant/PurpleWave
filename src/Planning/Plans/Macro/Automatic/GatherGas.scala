@@ -25,7 +25,7 @@ class GatherGas extends Plan {
     orderWorkers()
   }
   
-  private def ourRefineries:Iterable[FriendlyUnitInfo] = With.units.ours.filter(unit => unit.complete && unit.isGas)
+  private def ourRefineries:Iterable[FriendlyUnitInfo] = With.units.ours.filter(unit => unit.complete && unit.unitClass.isGas)
   
   private def idealMinerCount:Int = {
     //TODO: Stop taking guys off gas if we're saturated on minerals
@@ -47,7 +47,7 @@ class GatherGas extends Plan {
           if (availableDrillers.nonEmpty) {
             val driller = availableDrillers.minBy(_.pixelCenter.getApproxDistance(refinery.pixelCenter))
             availableDrillers.remove(driller)
-            if ( ! driller.isGatheringGas || driller.distance(refinery) > 32 * 8) {
+            if ( ! driller.gatheringGas || driller.pixelDistance(refinery) > 32 * 8) {
               With.executor.intend(new Intention(this, driller) { toGather = Some(refinery) })
             }}}))
   }

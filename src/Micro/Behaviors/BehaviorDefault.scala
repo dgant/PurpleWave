@@ -11,7 +11,7 @@ object BehaviorDefault extends Behavior {
   
     val target = EvaluateTargets.best(intent, intent.targetProfile, intent.targets)
     
-    if (intent.unit.cooldownRemaining < With.game.getRemainingLatencyFrames) {
+    if (intent.unit.cooldownLeft < With.game.getRemainingLatencyFrames) {
       if (target.isDefined) {
         return With.commander.attack(intent, target.get)
       }
@@ -19,7 +19,7 @@ object BehaviorDefault extends Behavior {
     
     if (intent.destination.isDefined) {
       if (intent.targets.isEmpty &&
-        intent.unit.inRadius(32 * 2).filterNot(_.isOurs).isEmpty && //Path around neutral buildings
+        intent.unit.inPixelRadius(32 * 2).filterNot(_.isOurs).isEmpty && //Path around neutral buildings
         intent.destination.get.distanceTile(intent.unit.tileCenter) > 12) {
         return With.commander.move(intent, intent.destination.get.pixelCenter)
       }

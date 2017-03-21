@@ -231,12 +231,15 @@ case class UnitClass(val baseType:UnitType) {
     Math.max(groundRange, airRange)
   }
   
+  def isResource:Boolean = isMinerals || isGas
+  
+  def totalHealth:Int = maxHitPoints + maxShields
   def totalCost: Int = mineralPrice + gasPrice
   def orderable:Boolean = ! isSpell && ! Set(Protoss.Interceptor, Protoss.Scarab, Terran.SpiderMine).contains(this)
   def isMinerals:Boolean = isMineralField
   def isGas:Boolean = List(Neutral.Geyser, Terran.Refinery, Protoss.Assimilator, Zerg.Extractor).contains(this)
   def isTownHall:Boolean = Set(Terran.CommandCenter, Protoss.Nexus, Zerg.Hatchery, Zerg.Lair, Zerg.Hive).contains(this)
-  def area:TileRectangle = new TileRectangle(new TilePosition(0, 0), tileSize)
+  def tileArea:TileRectangle = new TileRectangle(new TilePosition(0, 0), tileSize)
   
   def behavior:Behavior = {
     if      (isWorker)                    BehaviorWorker

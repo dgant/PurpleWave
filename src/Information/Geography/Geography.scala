@@ -11,9 +11,10 @@ import bwapi.TilePosition
 class Geography {
   
   private val baseCalculator = new Bases
-  private val townHallPositionCalculator = new TownHallPositions
+  private val townHallPositionCalculator = new TownHallPositionCalculator
   
-  def townHallPositions = townHallPositionCalculator.townHallPositions
+  def townHallPositions = townHallPositionCalculator.calculate
+  
   def zones:Iterable[Zone] = baseCalculator.zones
   
   def bases               : Iterable[Base]          = baseCalculator.zones.flatten(_.bases)
@@ -32,8 +33,8 @@ class Geography {
   
   def getHarvestingArea(townHallArea:TileRectangle):TileRectangle = {
     val resources = With.units
-      .inRadius(townHallArea.midpoint.pixelCenter, 32 * 10)
-      .filter(_.isResource)
+      .inPixelRadius(townHallArea.midpoint.pixelCenter, 32 * 10)
+      .filter(_.unitClass.isResource)
       .map(_.tileArea)
     
     (List(townHallArea) ++ resources).boundary

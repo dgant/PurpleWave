@@ -31,7 +31,7 @@ object MovementProfiles {
   
   val darkTemplar = new MovementProfile (
     preferTravel      = 1,
-    preferSpot        = 0,
+    preferSpot        = .25,
     preferSitAtRange  = 2,
     preferMobility    = 0,
     preferHighGround  = 0,
@@ -44,7 +44,7 @@ object MovementProfiles {
   
   val carrier = new MovementProfile (
     preferTravel      = 1,
-    preferSpot        = 0,
+    preferSpot        = 0.25,
     preferSitAtRange  = 0,
     preferMobility    = 0,
     preferHighGround  = 0.25,
@@ -57,7 +57,7 @@ object MovementProfiles {
   
   val corsair = new MovementProfile (
     preferTravel      = 1,
-    preferSpot        = 0,
+    preferSpot        = 0.25,
     preferSitAtRange  = 0,
     preferMobility    = 0,
     preferHighGround  = 0,

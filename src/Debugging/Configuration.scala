@@ -13,17 +13,22 @@ class Configuration {
   var cameraDynamicSpeedFastest         = 0
   
   var enableVisualization               = true
-  var enableVisualizationBattles        = true
+  var enableVisualizationBases          = false
+  var enableVisualizationBattles        = false
+  var enableVisualizationBullets        = true
+  var enableVisualizationChokepoints    = false
   var enableVisualizationEconomy        = false
   var enableVisualizationGrids          = false
-  var enableVisualizationPerformance    = true
+  var enableVisualizationPerformance    = false
   var enableVisualizationPlans          = false
   var enableVisualizationResources      = false
   var enableVisualizationScheduler      = false
-  var enableVisualizationGeography      = false
+  var enableVisualizationGeography      = true
+  var enableVisualizationTextOnly       = false
   var enableVisualizationUnitsForeign   = false
   var enableVisualizationUnitsOurs      = false
+  var enableVisualizationVectorUnits    = true
   var enableVisualizationZones          = false
   
-  var enableGoonStopProtection          = false
+  var enableGoonStopProtection          = true
 }

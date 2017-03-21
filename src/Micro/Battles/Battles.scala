@@ -17,6 +17,7 @@ class Battles {
   def onFrame() = updateLimiter.act()
   private val updateLimiter = new Limiter(2, update)
   private def update() {
+    return
     byUnit.clear()
     defineBattles()
     all.foreach(update)

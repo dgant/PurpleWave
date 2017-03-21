@@ -2,7 +2,7 @@ package ProxyBwapi.UnitClass
 
 import Geometry.TileRectangle
 import Micro.Behaviors.Protoss.{BehaviorCarrier, BehaviorCorsair, BehaviorDarkTemplar, BehaviorReaver}
-import Micro.Behaviors.{Behavior, BehaviorBuilding, BehaviorDefault, BehaviorWorker}
+import Micro.Behaviors._
 import Performance.Caching.CacheForever
 import ProxyBwapi.Races.{Neutral, Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Techs
@@ -235,7 +235,7 @@ case class UnitClass(val baseType:UnitType) {
   
   def isResource:Boolean = isMinerals || isGas
   
-  def totalHealth:Int = maxHitPoints + maxShields
+  def maxTotalHealth:Int = maxHitPoints + maxShields
   def totalCost: Int = mineralPrice + gasPrice
   def orderable:Boolean = ! isSpell && ! Set(Protoss.Interceptor, Protoss.Scarab, Terran.SpiderMine).contains(this)
   def isMinerals:Boolean = isMineralField
@@ -246,11 +246,13 @@ case class UnitClass(val baseType:UnitType) {
   def behavior:Behavior = {
     if      (isWorker)                    BehaviorWorker
     else if (isBuilding)                  BehaviorBuilding
-    else if (this == Protoss.Reaver)      BehaviorReaver
     else if (this == Protoss.Carrier)     BehaviorCarrier
     else if (this == Protoss.Corsair)     BehaviorCorsair
-    else if (this == Protoss.Scout)       BehaviorCorsair
     else if (this == Protoss.DarkTemplar) BehaviorDarkTemplar
+    else if (this == Protoss.Dragoon)     BehaviorDragoon
+    else if (this == Protoss.Reaver)      BehaviorReaver
+    else if (this == Protoss.Scout)       BehaviorCorsair
+    
     else BehaviorDefault
   }
   

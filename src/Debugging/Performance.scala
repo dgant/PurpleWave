@@ -7,7 +7,7 @@ class Performance {
   private val frameTimes = Array.fill(framesToTrack)(1l)
   
   private var millisecondsBefore = 0l
-  private var currentFrameDelay = 12
+  private var currentFrameDelay = 24
   private var lastFrameDelayUpdate = 0
   
   def startCounting() {

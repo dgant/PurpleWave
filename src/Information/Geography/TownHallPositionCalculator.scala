@@ -8,18 +8,23 @@ import Startup.With
 import Utilities.TypeEnrichment.EnrichPosition._
 import bwapi.TilePosition
 
-class TownHallPositionCalculator {
+object TownHallPositionCalculator {
   
-  def calculate:List[TilePosition] = clusteredResourcePatches.flatMap(bestTownHallTile).toList
+  def calculate:List[TilePosition] = {
+    clusteredResourcePatches.flatMap(bestTownHallTile).toList
+  }
   
-  private def clusteredResourcePatches:Iterable[Iterable[ForeignUnitInfo]] =
+  private def clusteredResourcePatches:Iterable[Iterable[ForeignUnitInfo]] = {
     Clustering.group[ForeignUnitInfo](
       resourcePatches,
       32 * 12,
       true,
       (unit) => unit.pixelCenter).values
+  }
   
-  private def resourcePatches = With.units.neutral.filter(_.initialResources > 0)
+  private def resourcePatches = {
+    With.units.neutral.filter(_.initialResources > 0)
+  }
   
   private def bestTownHallTile(resources:Iterable[ForeignUnitInfo]):Option[TilePosition] = {
     val centroid = resources.map(_.pixelCenter).centroid

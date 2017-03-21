@@ -24,12 +24,6 @@ class ForeignUnitTracker {
   def onFrame() {
     initialize()
     
-    //Frame 0 is funky because BWAPI reveals all neutral units with limited information.
-    //Let's ignore it.
-    if (With.frame == 0) {
-      return
-    }
-    
     //Important to remember: bwapi.Units are not persisted frame-to-frame
     //So we do all our comparisons by ID, rather than by object
   

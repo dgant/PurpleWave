@@ -55,7 +55,9 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
     _complete               = base.isCompleted
     _defensiveMatrixPoints  = base.getDefenseMatrixPoints
     _hitPoints              = base.getHitPoints
+    _initialResources       = base.getInitialResources
     _invincible             = base.isInvincible
+    _resourcesLeft          = base.getResources
     _shieldPoints           = base.getShields
     _unitClass              = UnitClasses.get(base.getType)
   }

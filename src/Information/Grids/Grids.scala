@@ -21,7 +21,7 @@ class Grids {
   val walkableTerran = new GridWalkableTerrain
   val walkableUnits = new GridWalkableUnits
   
-  def onFrame = limitUpdates.act()
+  def onFrame() = limitUpdates.act()
   val limitUpdates = new Limiter(1, () => update)
   def update() {
     val tiles = relevantTiles

@@ -2,7 +2,7 @@ package Information.Geography
 
 import Geometry._
 import Information.Geography.Types.{Base, Zone}
-import Performance.Caching.Cache
+import Performance.Caching.{Cache, CacheForever}
 import ProxyBwapi.UnitInfo.UnitInfo
 import Startup.With
 import Utilities.TypeEnrichment.EnrichPosition._
@@ -11,13 +11,12 @@ import bwapi.TilePosition
 class Geography {
   
   private val baseCalculator = new Bases
-  private val townHallPositionCalculator = new TownHallPositionCalculator
   
-  def townHallPositions = townHallPositionCalculator.calculate
-  
+  val townHallPositionCache = new CacheForever(() => TownHallPositionCalculator.calculate)
+  def townHallPositions = townHallPositionCache.get
   def zones:Iterable[Zone] = baseCalculator.zones
   
-  def bases               : Iterable[Base]          = baseCalculator.zones.flatten(_.bases)
+  def bases               : Iterable[Base]          = zones.flatten(_.bases)
   def ourBases            : Iterable[Base]          = bases.filter(_.zone.owner == With.self)
   def ourBaseHalls        : Iterable[UnitInfo]      = ourBases.filter(_.townHall.isDefined).map(_.townHall.get)
   def ourHarvestingAreas  : Iterable[TileRectangle] = ourBases.map(_.harvestingArea)

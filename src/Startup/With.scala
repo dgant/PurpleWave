@@ -39,6 +39,9 @@ object With {
   var zoner: Zoner = null
   
   var self:Player = null
+  var neutral:Player = null
+  var enemies:List[Player] = null
+  
   var frame = 0
   var mapWidth = 0
   var mapHeight = 0

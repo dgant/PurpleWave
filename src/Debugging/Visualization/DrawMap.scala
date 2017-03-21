@@ -82,8 +82,8 @@ object DrawMap {
   }
   
   def playerColor(player:Player):Color = {
-    if (player.isNeutral) Color.Grey
-    else if (player.isEnemy(With.self)) Color.Red
+    if (player == With.neutral) Color.Grey
+    else if (With.enemies.contains(player)) Color.Red
     else Color.Blue
   }
   

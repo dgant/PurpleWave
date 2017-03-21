@@ -14,12 +14,16 @@ import ProxyBwapi.UnitTracking.UnitTracker
 import _root_.Performance.Latency
 import bwapi.DefaultBWListener
 import bwta.BWTA
+import scala.collection.JavaConverters._
 
 class Bot() extends DefaultBWListener {
 
   override def onStart() {
     try {
-      With.self = With.game.self()
+      With.self = With.game.self
+      With.neutral = With.game.neutral
+      With.enemies = With.game.enemies.asScala.toList
+      
       With.mapWidth = With.game.mapWidth
       With.mapHeight = With.game.mapHeight
       With.configuration = new Configuration

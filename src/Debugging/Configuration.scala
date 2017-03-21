@@ -21,7 +21,7 @@ class Configuration {
   var enableVisualizationResources      = false
   var enableVisualizationScheduler      = false
   var enableVisualizationGeography      = false
-  var enableVisualizationUnitsForeign   = true
+  var enableVisualizationUnitsForeign   = false
   var enableVisualizationUnitsOurs      = false
   var enableVisualizationZones          = false
   

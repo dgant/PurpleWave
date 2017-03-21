@@ -83,9 +83,9 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
     //
     // This is also important for preventing the Goon Stop bug. See BehaviorDragoon for details.
     //
-    if      (unitClass == Protoss.Dragoon) 8
+    if      (unitClass == Protoss.Dragoon) 10
     else if (unitClass == Protoss.Carrier) 48
-    else 2
+    else                                   4
   }
   
   /////////////

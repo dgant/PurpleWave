@@ -12,14 +12,15 @@ class Configuration {
   var cameraDynamicSpeedSlowest         = 30
   var cameraDynamicSpeedFastest         = 0
   
-  var enableVisualization               = false
+  var enableVisualization               = true
   var enableVisualizationBases          = false
   var enableVisualizationBattles        = false
   var enableVisualizationBullets        = false
   var enableVisualizationChokepoints    = false
   var enableVisualizationEconomy        = false
   var enableVisualizationGrids          = false
-  var enableVisualizationPerformance    = true
+  var enableVisualizationTileHeuristics = true
+  var enableVisualizationPerformance    = false
   var enableVisualizationPlans          = false
   var enableVisualizationResources      = false
   var enableVisualizationScheduler      = false
@@ -31,10 +32,4 @@ class Configuration {
   var enableVisualizationZones          = false
   
   var enableGoonStopProtection          = true
-  
-  if (enableVisualizationVectorUnits) {
-    enableVisualization = true
-    enableVisualizationBullets = true
-    enableVisualizationGeography = true
-  }
 }

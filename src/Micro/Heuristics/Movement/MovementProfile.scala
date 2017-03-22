@@ -1,20 +1,8 @@
 package Micro.Heuristics.Movement
 
-import Micro.Heuristics.HeuristicMath
-import Micro.Heuristics.TileHeuristics.{TileHeuristic, TileHeuristicDestinationHere, TileHeuristicDestinationNearby}
+import Micro.Heuristics.TileHeuristics.{TileHeuristicDestinationHere, TileHeuristicDestinationNearby}
 import Micro.Intentions.Intention
-import bwapi.TilePosition
-
-private class WeightedTileHeuristic(val heuristic: TileHeuristic, val weight:Double) {
-  
-  def weigh(intent:Intention, candidate:TilePosition):Double = {
-    if (weight == 0)
-      1
-    else
-      Math.pow(HeuristicMath.normalize(heuristic.evaluate(intent, candidate)), weight)
-  }
-  
-}
+import bwapi.{Color, TilePosition}
 
 class MovementProfile(
   var preferTravel      : Double = 0,
@@ -32,18 +20,18 @@ class MovementProfile(
   
   def evaluate(intent: Intention, candidate: TilePosition): Double =
     List(
-      new WeightedTileHeuristic(TileHeuristicDestinationNearby, preferTravel),
-      new WeightedTileHeuristic(TileHeuristicDestinationHere,   preferSpot),
-      new WeightedTileHeuristic(TileHeuristicDestinationHere,   preferSitAtRange),
-      new WeightedTileHeuristic(TileHeuristicDestinationHere,   preferMobility),
-      new WeightedTileHeuristic(TileHeuristicDestinationHere,   preferHighGround),
-      new WeightedTileHeuristic(TileHeuristicDestinationHere,   preferGrouping),
-      new WeightedTileHeuristic(TileHeuristicDestinationHere,   preferMoving),
-      new WeightedTileHeuristic(TileHeuristicDestinationHere,   preferRandom),
-      new WeightedTileHeuristic(TileHeuristicDestinationHere,   -avoidDamage),
-      new WeightedTileHeuristic(TileHeuristicDestinationHere,   -avoidTraffic),
-      new WeightedTileHeuristic(TileHeuristicDestinationHere,   -avoidVision),
-      new WeightedTileHeuristic(TileHeuristicDestinationHere,   -avoidDetection)
+      new WeightedTileHeuristic(TileHeuristicDestinationNearby, preferTravel,       Color.Grey),
+      new WeightedTileHeuristic(TileHeuristicDestinationHere,   preferSpot,         Color.Black),
+      new WeightedTileHeuristic(TileHeuristicDestinationHere,   preferSitAtRange,   Color.Orange),
+      new WeightedTileHeuristic(TileHeuristicDestinationHere,   preferMobility,     Color.Green),
+      new WeightedTileHeuristic(TileHeuristicDestinationHere,   preferHighGround,   Color.Cyan),
+      new WeightedTileHeuristic(TileHeuristicDestinationHere,   preferGrouping,     Color.Purple),
+      new WeightedTileHeuristic(TileHeuristicDestinationHere,   preferMoving,       Color.Brown),
+      new WeightedTileHeuristic(TileHeuristicDestinationHere,   preferRandom,       Color.Yellow),
+      new WeightedTileHeuristic(TileHeuristicDestinationHere,   -avoidDamage,       Color.Red),
+      new WeightedTileHeuristic(TileHeuristicDestinationHere,   -avoidTraffic,      Color.Blue),
+      new WeightedTileHeuristic(TileHeuristicDestinationHere,   -avoidVision,       Color.Teal),
+      new WeightedTileHeuristic(TileHeuristicDestinationHere,   -avoidDetection,    Color.White)
     )
     .map(_.weigh(intent, candidate))
     .product

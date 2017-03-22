@@ -6,7 +6,7 @@ import bwapi.Color
 import Utilities.EnrichPosition._
 
 object VisualizeBattles {
-  def render = With.battles.all.foreach(drawBattle)
+  def render() = With.battles.all.foreach(drawBattle)
   
   private def drawBattle(battle:Battle) {
     DrawMap.circle(battle.focus, 8, Color.Brown)

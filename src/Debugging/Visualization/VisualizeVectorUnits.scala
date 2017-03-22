@@ -8,7 +8,6 @@ import Utilities.EnrichPosition._
 object VisualizeVectorUnits {
   
   def render() {
-    With.game.drawBoxScreen(0, 0, 1500, 1200, Color.Black, true)
     
     With.units.all
       .filter(unit =>
@@ -17,14 +16,6 @@ object VisualizeVectorUnits {
         (unit.complete || unit.unitClass.isBuilding))
       .foreach(renderUnit)
     
-    With.game.setTextSize(bwapi.Text.Size.Enum.Large)
-    With.game.drawBoxScreen   (5,      5,      5 + 20, 5 + 20,        DrawMap.playerColor(With.self),       true)
-    With.game.drawBoxScreen   (5,      5 + 25, 5 + 20, 5 + 20 + 25,   DrawMap.playerColor(With.game.enemy), true)
-    With.game.drawTextScreen  (5 + 25, 5,                             With.game.self.getName + " vs. ")
-    With.game.drawTextScreen  (5 + 25, 5 + 25,                        With.game.enemy.getName)
-    With.game.setTextSize(bwapi.Text.Size.Enum.Default)
-    With.game.drawTextScreen  (5,      5 + 50,                   "PurpleWave is displaying this game in Arcade Happy Vision!")
-    With.game.setTextSize(bwapi.Text.Size.Enum.Small)
     With.game.drawTextScreen(408, 4, "Candy: ")
     With.game.drawTextScreen(481, 4, "Soda: ")
     With.game.drawTextScreen(541, 4, "Friends: ")

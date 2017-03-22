@@ -4,7 +4,7 @@ import ProxyBwapi.UnitInfo.UnitInfo
 import Geometry.Clustering
 import Performance.Caching.Limiter
 import Startup.With
-import Utilities.TypeEnrichment.EnrichPosition._
+import Utilities.EnrichPosition._
 
 import scala.collection.mutable
 

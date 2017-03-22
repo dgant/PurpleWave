@@ -1,7 +1,7 @@
 package Micro.Intentions
 
 import Micro.Behaviors.{Behavior, MovementProfiles, TargetingProfiles}
-import Micro.Targeting.Targets
+import Micro.Heuristics.Targeting.Targets
 import Planning.Plan
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClass.UnitClass

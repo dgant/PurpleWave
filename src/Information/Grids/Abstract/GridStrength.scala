@@ -4,7 +4,7 @@ import Geometry.Shapes.Circle
 import Micro.Battles.BattleMetrics
 import ProxyBwapi.UnitInfo.UnitInfo
 import Startup.With
-import Utilities.TypeEnrichment.EnrichPosition._
+import Utilities.EnrichPosition._
 import bwapi.TilePosition
 
 abstract class GridStrength extends GridDouble {

@@ -5,7 +5,7 @@ import Performance.Caching.Cache
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClass.UnitClass
 import Startup.With
-import Utilities.TypeEnrichment.EnrichPosition._
+import Utilities.EnrichPosition._
 import bwapi.TilePosition
 
 class PositionSimpleBuilding(val buildingType:UnitClass) extends PositionFinder {

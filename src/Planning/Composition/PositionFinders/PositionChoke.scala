@@ -1,33 +1,36 @@
 package Planning.Composition.PositionFinders
-import Geometry.Positions
-import Startup.With
 import Performance.Caching.Cache
-import Utilities.TypeEnrichment.EnrichPosition._
+import Startup.With
+import Utilities.EnrichPosition._
 import bwapi.TilePosition
 
 class PositionChoke extends PositionFinder {
   
   override def find: Option[TilePosition] = findCache.get
-  val findCache = new Cache[Option[TilePosition]](1, () => findRecalculate)
+  val findCache = new Cache[Option[TilePosition]](3, () => findRecalculate)
   private def findRecalculate:Option[TilePosition] = {
     
     val home = With.geography.home
-    val chokes = With.geography.ourBases.flatten(_.zone.edges.map(_.chokepoint)).map(_.getCenter.toTilePosition)
+    val ourExposedChokes = With.geography.zones
+      .filter(_.owner == With.self)
+      .flatten(_.edges)
+      .filter(edge => edge.zones.exists(_.owner != With.self))
     
-    if (chokes.isEmpty) return Some(home)
+    if (ourExposedChokes.isEmpty) return Some(home)
     
-    val bases =
-      if (With.geography.ourBases.nonEmpty) With.geography.ourBases.map(_.tile)
-      else List(home)
+    val furthestStartPosition = With.geography.bases.filter(_.isStartLocation).map(_.tile).maxBy(home.distanceTileSquared)
     
-    val furthestStartPosition = With.geography.bases.filter(_.isStartLocation).map(_.tile).maxBy(home.distanceTile)
-    val possibleChokes = chokes.filter(choke =>
-      bases.forall(base =>
-        With.paths.groundPixels(furthestStartPosition, choke) <
-        With.paths.groundPixels(furthestStartPosition, base)))
+    val mostExposedChoke = ourExposedChokes
+      .minBy(choke => With.paths.groundPixels(
+        choke.chokepoint.getCenter.toTilePosition,
+        home))
     
-    if (possibleChokes.isEmpty) return Some(bases.minBy(Positions.tileMiddle.distanceTile))
+    val ourSideOfTheMostExposedChoke =
+      List(
+        mostExposedChoke.chokepoint.getSides.first.toTilePosition,
+        mostExposedChoke.chokepoint.getSides.second.toTilePosition)
+      .minBy(chokeSide => With.paths.groundPixels(chokeSide, home))
     
-    Some(possibleChokes.minBy(home.distanceTile))
+    return Some(ourSideOfTheMostExposedChoke)
   }
 }

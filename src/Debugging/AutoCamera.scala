@@ -3,7 +3,7 @@ package Debugging
 import Geometry.Positions
 import Startup.With
 import bwapi.Position
-import Utilities.TypeEnrichment.EnrichPosition._
+import Utilities.EnrichPosition._
 
 class AutoCamera {
   

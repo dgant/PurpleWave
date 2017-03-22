@@ -4,7 +4,7 @@ import Geometry.Shapes.Circle
 import Geometry.TileRectangle
 import Startup.With
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, UnitInfo}
-import Utilities.TypeEnrichment.EnrichPosition._
+import Utilities.EnrichPosition._
 import bwapi.{Position, UnitType}
 
 import scala.collection.JavaConverters._

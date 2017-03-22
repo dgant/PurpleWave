@@ -1,4 +1,4 @@
-package Micro.Targeting
+package Micro.Heuristics.Targeting
 
 import Micro.Intentions.Intention
 import ProxyBwapi.UnitInfo.UnitInfo

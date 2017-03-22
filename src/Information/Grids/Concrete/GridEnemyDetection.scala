@@ -3,7 +3,7 @@ package Information.Grids.Concrete
 import Geometry.Shapes.Circle
 import Information.Grids.Abstract.GridBoolean
 import Startup.With
-import Utilities.TypeEnrichment.EnrichPosition._
+import Utilities.EnrichPosition._
 import bwapi.TilePosition
 
 class GridEnemyDetection extends GridBoolean {

@@ -3,7 +3,7 @@ package ProxyBwapi.UnitInfo
 import Geometry.TileRectangle
 import ProxyBwapi.Races.{Protoss, Terran}
 import Startup.With
-import Utilities.TypeEnrichment.EnrichPosition._
+import Utilities.EnrichPosition._
 import bwapi._
 
 abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {

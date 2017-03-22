@@ -1,9 +1,9 @@
 package Micro.Behaviors
 import Micro.Intentions.Intention
-import Micro.Movement.EvaluatePositions
-import Micro.Targeting.EvaluateTargets
+import Micro.Heuristics.Movement.EvaluatePositions
+import Micro.Heuristics.Targeting.EvaluateTargets
 import Startup.With
-import Utilities.TypeEnrichment.EnrichPosition._
+import Utilities.EnrichPosition._
 
 object BehaviorDefault extends Behavior {
   

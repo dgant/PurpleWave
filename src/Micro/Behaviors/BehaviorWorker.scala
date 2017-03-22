@@ -5,6 +5,8 @@ import Startup.With
 object BehaviorWorker extends Behavior {
   
   def execute(intent: Intention) {
+    
+    intent.movementProfileNormal = MovementProfiles.worker
   
     if (intent.toBuild.isDefined) {
       return With.commander.build(intent, intent.toBuild.get, intent.destination.get)

@@ -2,7 +2,7 @@ package Geometry
 
 import Startup.With
 import ProxyBwapi.UnitInfo.UnitInfo
-import Utilities.TypeEnrichment.EnrichPosition._
+import Utilities.EnrichPosition._
 import bwapi.Position
 
 import scala.collection.mutable

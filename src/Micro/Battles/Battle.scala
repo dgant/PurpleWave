@@ -1,7 +1,7 @@
 package Micro.Battles
 
 import bwapi.Position
-import Utilities.TypeEnrichment.EnrichPosition._
+import Utilities.EnrichPosition._
 
 class Battle(
   val us    : BattleGroup,

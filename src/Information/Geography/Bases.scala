@@ -5,7 +5,7 @@ import Performance.Caching.{CacheForever, Limiter}
 import ProxyBwapi.Races.Protoss
 import Startup.With
 import bwta.BWTA
-import Utilities.TypeEnrichment.EnrichPosition._
+import Utilities.EnrichPosition._
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ListBuffer
 

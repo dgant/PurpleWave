@@ -2,16 +2,15 @@ package Micro
 
 import Micro.Behaviors.Behavior
 import Micro.Intentions.Intention
-import Micro.Movement.MovementRandom
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClass.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import ProxyBwapi.Upgrades.Upgrade
 import Startup.With
-import Utilities.CountMap
+import Utilities.{CountMap, RandomState}
 import bwapi.{Position, TilePosition, UnitCommandType}
-import Utilities.TypeEnrichment.EnrichPosition._
+import Utilities.EnrichPosition._
 
 import scala.collection.mutable
 
@@ -47,8 +46,8 @@ class Commander {
     //ordering moves to the exact same destination causes Brood War to not recalculate the path.
     //Better to recalculate the path a few times to prevent units getting stuck
     intent.unit.base.move(position.add(
-      MovementRandom.random.nextInt(5) - 2,
-      MovementRandom.random.nextInt(5) - 2))
+      RandomState.random.nextInt(5) - 2,
+      RandomState.random.nextInt(5) - 2))
     sleepMove(intent.unit)
   }
   
@@ -101,7 +100,7 @@ class Commander {
   }
   
   private def sleepMove(unit:FriendlyUnitInfo) {
-    sleep(unit, 0)
+    sleep(unit, 4)
   }
   
   private def sleepAttack(unit:FriendlyUnitInfo) {

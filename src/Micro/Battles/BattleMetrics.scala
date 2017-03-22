@@ -3,7 +3,7 @@ package Micro.Battles
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.UnitInfo
 import Startup.With
-import Utilities.TypeEnrichment.EnrichPosition._
+import Utilities.EnrichPosition._
 import bwapi.Position
 
 object BattleMetrics {

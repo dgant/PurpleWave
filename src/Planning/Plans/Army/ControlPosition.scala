@@ -7,7 +7,7 @@ import Planning.Composition.Property
 import Planning.Plan
 import Planning.Plans.Allocation.LockUnits
 import Startup.With
-import Utilities.TypeEnrichment.EnrichPosition._
+import Utilities.EnrichPosition._
 
 class ControlPosition extends Plan {
   

@@ -5,7 +5,7 @@ import Information.Geography.Types.{Base, Zone}
 import Performance.Caching.{Cache, CacheForever}
 import ProxyBwapi.UnitInfo.UnitInfo
 import Startup.With
-import Utilities.TypeEnrichment.EnrichPosition._
+import Utilities.EnrichPosition._
 import bwapi.TilePosition
 
 class Geography {

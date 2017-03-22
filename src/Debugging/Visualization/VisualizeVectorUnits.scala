@@ -3,7 +3,7 @@ package Debugging.Visualization
 import ProxyBwapi.UnitInfo.UnitInfo
 import Startup.With
 import bwapi.{Color, Position}
-import Utilities.TypeEnrichment.EnrichPosition._
+import Utilities.EnrichPosition._
 
 object VisualizeVectorUnits {
   
@@ -38,7 +38,7 @@ object VisualizeVectorUnits {
     
     val verticalBonus =
       if (unit.flying) 24
-      else if (isActiveBuilding) (Math.sin(animationFrame/8) * 6).toInt
+      else if (isActiveBuilding) (Math.sin(animationFrame/8) * 4).toInt
       else 0
     
     val horizontalBonus = 0

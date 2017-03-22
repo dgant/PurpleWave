@@ -11,7 +11,7 @@ import Planning.Plans.Allocation.{LockArea, LockCurrencyForUnit, LockUnits}
 import ProxyBwapi.UnitClass.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Startup.With
-import Utilities.TypeEnrichment.EnrichPosition._
+import Utilities.EnrichPosition._
 import bwapi.{Race, TilePosition}
 
 class BuildBuilding(val buildingClass:UnitClass) extends Plan {

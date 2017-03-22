@@ -1,7 +1,7 @@
 package Debugging.Visualization
 
 import Startup.With
-import Utilities.TypeEnrichment.EnrichPosition._
+import Utilities.EnrichPosition._
 import bwapi.Color
 
 object VisualizeBases {

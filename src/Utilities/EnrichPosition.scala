@@ -1,4 +1,4 @@
-package Utilities.TypeEnrichment
+package Utilities
 
 import Geometry.{Point, Positions, TileRectangle}
 import Startup.With

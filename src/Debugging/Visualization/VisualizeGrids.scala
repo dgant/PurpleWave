@@ -2,7 +2,7 @@ package Debugging.Visualization
 
 import Information.Grids.Abstract.GridArray
 import Startup.With
-import Utilities.TypeEnrichment.EnrichPosition._
+import Utilities.EnrichPosition._
 
 object VisualizeGrids {
   def render() {

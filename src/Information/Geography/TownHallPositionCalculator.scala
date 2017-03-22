@@ -5,7 +5,7 @@ import Geometry.{Clustering, TileRectangle}
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.ForeignUnitInfo
 import Startup.With
-import Utilities.TypeEnrichment.EnrichPosition._
+import Utilities.EnrichPosition._
 import bwapi.TilePosition
 
 object TownHallPositionCalculator {

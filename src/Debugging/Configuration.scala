@@ -12,23 +12,29 @@ class Configuration {
   var cameraDynamicSpeedSlowest         = 30
   var cameraDynamicSpeedFastest         = 0
   
-  var enableVisualization               = true
+  var enableVisualization               = false
   var enableVisualizationBases          = false
   var enableVisualizationBattles        = false
-  var enableVisualizationBullets        = true
+  var enableVisualizationBullets        = false
   var enableVisualizationChokepoints    = false
   var enableVisualizationEconomy        = false
   var enableVisualizationGrids          = false
-  var enableVisualizationPerformance    = false
+  var enableVisualizationPerformance    = true
   var enableVisualizationPlans          = false
   var enableVisualizationResources      = false
   var enableVisualizationScheduler      = false
-  var enableVisualizationGeography      = true
+  var enableVisualizationGeography      = false
   var enableVisualizationTextOnly       = false
   var enableVisualizationUnitsForeign   = false
   var enableVisualizationUnitsOurs      = false
-  var enableVisualizationVectorUnits    = true
+  var enableVisualizationVectorUnits    = false
   var enableVisualizationZones          = false
   
   var enableGoonStopProtection          = true
+  
+  if (enableVisualizationVectorUnits) {
+    enableVisualization = true
+    enableVisualizationBullets = true
+    enableVisualizationGeography = true
+  }
 }

@@ -1,14 +1,14 @@
-package Micro.Movement
+package Micro.Heuristics.Movement
 
 import Geometry.Shapes.Circle
 import Startup.With
 import Micro.Intentions.Intention
-import Utilities.TypeEnrichment.EnrichPosition._
+import Utilities.EnrichPosition._
 import bwapi.TilePosition
 
 object EvaluatePositions {
   
-  def best(intent:Intention, evaluator:EvaluatePosition, searchRange:Int = 3):TilePosition = {
+  def best(intent:Intention, profile:MovementProfile, searchRange:Int = 4):TilePosition = {
     
     val candidates =
       Circle.points(searchRange)
@@ -21,6 +21,6 @@ object EvaluatePositions {
       return intent.unit.tileCenter
     }
     
-    return candidates.maxBy(tile => evaluator.evaluate(intent, tile))
+    return candidates.maxBy(tile => profile.evaluate(intent, tile))
   }
 }

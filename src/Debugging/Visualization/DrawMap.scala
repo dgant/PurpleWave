@@ -4,7 +4,7 @@ import Geometry.TileRectangle
 import Startup.With
 import Performance.Caching.CacheFrame
 import bwapi.{Color, Player, Position}
-import Utilities.TypeEnrichment.EnrichPosition._
+import Utilities.EnrichPosition._
 
 object DrawMap {
   

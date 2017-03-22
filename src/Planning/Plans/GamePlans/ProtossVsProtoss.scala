@@ -60,7 +60,6 @@ class ProtossVsProtoss extends Parallel {
   )
   
   val _twoBaseBuild = List[BuildRequest] (
-    new RequestUnitAtLeast(4, Protoss.Gateway),
     new RequestUnitAtLeast(2, Protoss.Assimilator),
     new RequestUnitAtLeast(1, Protoss.RoboticsFacility),
     new RequestUnitAtLeast(6, Protoss.Gateway),

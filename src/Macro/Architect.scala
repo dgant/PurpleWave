@@ -5,7 +5,7 @@ import Geometry.TileRectangle
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClass._
 import Startup.With
-import Utilities.TypeEnrichment.EnrichPosition._
+import Utilities.EnrichPosition._
 import bwapi.TilePosition
 
 class Architect {

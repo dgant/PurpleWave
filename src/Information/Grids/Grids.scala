@@ -5,7 +5,7 @@ import Information.Grids.Concrete.{GridUnits, _}
 import Performance.Caching.{CacheFrame, Limiter}
 import Startup.With
 import bwapi.TilePosition
-import Utilities.TypeEnrichment.EnrichPosition._
+import Utilities.EnrichPosition._
 
 class Grids {
   val altitudeBonus = new GridAltitudeBonus

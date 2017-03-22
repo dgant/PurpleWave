@@ -3,7 +3,7 @@ package Information.Geography.Types
 import Geometry.TileRectangle
 import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.{Position, TilePosition}
-import Utilities.TypeEnrichment.EnrichPosition._
+import Utilities.EnrichPosition._
 
 class Base(
   val zone:Zone,

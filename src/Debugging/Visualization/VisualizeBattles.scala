@@ -3,7 +3,7 @@ package Debugging.Visualization
 import Micro.Battles.Battle
 import Startup.With
 import bwapi.Color
-import Utilities.TypeEnrichment.EnrichPosition._
+import Utilities.EnrichPosition._
 
 object VisualizeBattles {
   def render = With.battles.all.foreach(drawBattle)

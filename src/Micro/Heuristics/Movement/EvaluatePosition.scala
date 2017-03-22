@@ -1,4 +1,4 @@
-package Micro.Movement
+package Micro.Heuristics.Movement
 
 import Micro.Intentions.Intention
 import bwapi.TilePosition

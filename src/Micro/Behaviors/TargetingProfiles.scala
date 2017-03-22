@@ -1,6 +1,6 @@
 package Micro.Behaviors
 
-import Micro.Targeting.TargetingProfile
+import Micro.Heuristics.Targeting.TargetingProfile
 
 object TargetingProfiles {
   

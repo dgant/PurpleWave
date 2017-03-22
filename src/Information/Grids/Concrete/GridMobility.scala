@@ -2,7 +2,7 @@ package Information.Grids.Concrete
 
 import Information.Grids.Abstract.GridInt
 import Startup.With
-import Utilities.TypeEnrichment.EnrichPosition._
+import Utilities.EnrichPosition._
 import bwapi.TilePosition
 
 class GridMobility extends GridInt {

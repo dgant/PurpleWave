@@ -12,6 +12,7 @@ abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
   val _cacheTile      = new CacheFrame[TilePosition]  (() =>  base.getTilePosition)
   val _cacheCompleted = new CacheFrame[Boolean]       (() =>  base.isCompleted)
   val _cacheExists    = new CacheFrame[Boolean]       (() =>  base.exists)
+  val _cacheSelected  = new CacheFrame[Boolean]       (() =>  base.isSelected)
   val _cacheId        = new CacheFrame[Int]           (() =>  base.getID)
   
   ///////////////////
@@ -127,7 +128,7 @@ abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
   def carryingMinerals    : Boolean = base.isCarryingMinerals
   def carryingGas         : Boolean = base.isCarryingGas
   def powered             : Boolean = base.isPowered
-  def selected            : Boolean = base.isSelected
+  def selected            : Boolean = _cacheSelected.get
   def targetable          : Boolean = base.isTargetable
   def underAttack         : Boolean = base.isUnderAttack
   def underDarkSwarm      : Boolean = base.isUnderDarkSwarm

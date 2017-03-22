@@ -1,9 +1,10 @@
-package Debugging.Visualization
+package Debugging.Visualization.Views
 
+import Debugging.Visualization.Rendering.DrawMap
 import Micro.Battles.Battle
 import Startup.With
-import bwapi.Color
 import Utilities.EnrichPosition._
+import bwapi.Color
 
 object VisualizeBattles {
   def render() = With.battles.all.foreach(drawBattle)

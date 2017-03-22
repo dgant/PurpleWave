@@ -1,5 +1,6 @@
 package Startup
 
+import Debugging.Visualization.Data.MovementHeuristicViews
 import Debugging.{AutoCamera, Configuration, Logger, Performance}
 import Information.Geography.Geography
 import Information.Grids.Grids
@@ -8,10 +9,10 @@ import Macro.Allocation._
 import Macro.Architect
 import Macro.Scheduling.Scheduler
 import Micro.Battles.Battles
-import Micro.{Executor, Commander, Paths}
+import Micro.{Commander, Executor, Paths}
 import Planning.Plans.GamePlans.WinTheGame
 import ProxyBwapi.UnitTracking.UnitTracker
-import Performance.Latency
+import _root_.Performance.Latency
 import bwapi.Player
 
 object With {
@@ -35,6 +36,7 @@ object With {
   var prioritizer:Prioritizer = null
   var recruiter:Recruiter = null
   var scheduler:Scheduler = null
+  var movementHeuristicViews:MovementHeuristicViews = null
   var units: UnitTracker = null
   var zoner: Zoner = null
   

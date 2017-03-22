@@ -1,5 +1,6 @@
-package Debugging.Visualization
+package Debugging.Visualization.Views
 
+import Debugging.Visualization.Rendering.DrawMap
 import Information.Grids.Abstract.GridArray
 import Startup.With
 import Utilities.EnrichPosition._

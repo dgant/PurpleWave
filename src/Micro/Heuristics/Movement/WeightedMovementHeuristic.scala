@@ -1,13 +1,13 @@
 package Micro.Heuristics.Movement
 
-
-import Debugging.Visualization.VisualizeTileHeuristics
+import Debugging.Visualization.Data.MovementHeuristicView
 import Micro.Heuristics.HeuristicMath
 import Micro.Heuristics.TileHeuristics.TileHeuristic
 import Micro.Intentions.Intention
+import Startup.With
 import bwapi.{Color, TilePosition}
 
-class WeightedTileHeuristic(
+class WeightedMovementHeuristic(
   val heuristic : TileHeuristic,
   val weight    : Double,
   val color     : Color = Color.Grey) {
@@ -21,7 +21,7 @@ class WeightedTileHeuristic(
         Math.pow(HeuristicMath.normalize(heuristic.evaluate(intent, candidate)), weight)
   
     if (intent.unit.selected) {
-      VisualizeTileHeuristics.render(intent, candidate, result, color)
+      With.movementHeuristicViews.add(new MovementHeuristicView(this, intent, candidate))
     }
     
     return result

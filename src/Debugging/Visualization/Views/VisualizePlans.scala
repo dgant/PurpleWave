@@ -1,7 +1,8 @@
-package Debugging.Visualization
+package Debugging.Visualization.Views
 
-import Planning.Plans.Allocation.{LockCurrency, LockUnits}
+import Debugging.Visualization.Rendering.DrawScreen
 import Planning.Plan
+import Planning.Plans.Allocation.{LockCurrency, LockUnits}
 import Startup.With
 
 object VisualizePlans {

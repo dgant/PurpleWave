@@ -1,5 +1,6 @@
 package Startup
 
+import Debugging.Visualization.Data.MovementHeuristicViews
 import Debugging.{Visualization, _}
 import Information.Geography.Geography
 import Information.Grids.Grids
@@ -8,12 +9,13 @@ import Macro.Allocation._
 import Macro.Architect
 import Macro.Scheduling.Scheduler
 import Micro.Battles.Battles
-import Micro.{Executor, Commander, Paths}
+import Micro.{Commander, Executor, Paths}
 import Planning.Plans.GamePlans.WinTheGame
 import ProxyBwapi.UnitTracking.UnitTracker
 import _root_.Performance.Latency
 import bwapi.DefaultBWListener
 import bwta.BWTA
+
 import scala.collection.JavaConverters._
 
 class Bot() extends DefaultBWListener {
@@ -37,25 +39,26 @@ class Bot() extends DefaultBWListener {
       BWTA.buildChokeNodes()
       With.logger.debug("BWTA analysis complete.")
       
-      With.architect    = new Architect
-      With.bank         = new Banker
-      With.camera       = new AutoCamera
-      With.battles      = new Battles
-      With.executor     = new Executor
-      With.economy      = new Economy
-      With.commander    = new Commander
-      With.geography    = new Geography
-      With.gameplan     = new WinTheGame
-      With.intelligence = new Intelligence
-      With.latency      = new Latency
-      With.grids        = new Grids
-      With.paths        = new Paths
-      With.performance  = new Performance
-      With.prioritizer  = new Prioritizer
-      With.recruiter    = new Recruiter
-      With.scheduler    = new Scheduler
-      With.units        = new UnitTracker
-      With.zoner        = new Zoner
+      With.architect              = new Architect
+      With.bank                   = new Banker
+      With.camera                 = new AutoCamera
+      With.battles                = new Battles
+      With.executor               = new Executor
+      With.economy                = new Economy
+      With.commander              = new Commander
+      With.geography              = new Geography
+      With.gameplan               = new WinTheGame
+      With.intelligence           = new Intelligence
+      With.latency                = new Latency
+      With.grids                  = new Grids
+      With.paths                  = new Paths
+      With.performance            = new Performance
+      With.prioritizer            = new Prioritizer
+      With.recruiter              = new Recruiter
+      With.scheduler              = new Scheduler
+      With.movementHeuristicViews = new MovementHeuristicViews
+      With.units                  = new UnitTracker
+      With.zoner                  = new Zoner
 
       With.game.enableFlag(1)
       With.game.setLocalSpeed(With.configuration.gameSpeed)

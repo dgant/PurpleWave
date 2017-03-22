@@ -1,6 +1,7 @@
-package Debugging.Visualization
+package Debugging.Visualization.Views
 
 import Debugging.Debugger
+import Debugging.Visualization.Rendering.DrawMap
 import Startup.With
 import bwapi.{Color, UnitCommandType}
 

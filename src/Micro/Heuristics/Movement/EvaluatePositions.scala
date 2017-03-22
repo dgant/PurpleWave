@@ -10,6 +10,8 @@ object EvaluatePositions {
   
   def best(intent:Intention, profile:MovementProfile, searchRange:Int = 4):TilePosition = {
     
+    With.movementHeuristicViews.reset(intent.unit)
+    
     val candidates =
       Circle.points(searchRange)
         .map(intent.unit.tileCenter.add)

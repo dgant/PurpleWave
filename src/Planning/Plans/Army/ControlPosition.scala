@@ -1,6 +1,6 @@
 package Planning.Plans.Army
 
-import Debugging.Visualization.DrawMap
+import Debugging.Visualization.Rendering.DrawMap
 import Micro.Intentions.Intention
 import Planning.Composition.PositionFinders.{PositionEnemyBase, PositionFinder}
 import Planning.Composition.Property

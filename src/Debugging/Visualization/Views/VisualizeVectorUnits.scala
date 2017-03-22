@@ -1,9 +1,10 @@
-package Debugging.Visualization
+package Debugging.Visualization.Views
 
+import Debugging.Visualization.Rendering.DrawMap
 import ProxyBwapi.UnitInfo.UnitInfo
 import Startup.With
-import bwapi.{Color, Position}
 import Utilities.EnrichPosition._
+import bwapi.{Color, Position}
 
 object VisualizeVectorUnits {
   

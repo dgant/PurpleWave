@@ -1,10 +1,10 @@
-package Debugging.Visualization
+package Debugging.Visualization.Rendering
 
 import Geometry.TileRectangle
-import Startup.With
 import Performance.Caching.CacheFrame
-import bwapi.{Color, Player, Position}
+import Startup.With
 import Utilities.EnrichPosition._
+import bwapi.{Color, Player, Position}
 
 object DrawMap {
   

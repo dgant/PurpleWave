@@ -1,4 +1,4 @@
-package Debugging.Visualization
+package Debugging.Visualization.Rendering
 
 import Startup.With
 

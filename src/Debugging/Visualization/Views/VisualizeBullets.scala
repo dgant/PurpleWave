@@ -1,7 +1,9 @@
-package Debugging.Visualization
+package Debugging.Visualization.Views
 
+import Debugging.Visualization.Rendering.DrawMap
 import Startup.With
 import Utilities.EnrichPosition._
+
 import scala.collection.JavaConverters._
 
 object VisualizeBullets {

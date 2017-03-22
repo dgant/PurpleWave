@@ -1,5 +1,6 @@
-package Debugging.Visualization
+package Debugging.Visualization.Views
 
+import Debugging.Visualization.Rendering.DrawMap
 import Startup.With
 
 object VisualizeTextOnly {

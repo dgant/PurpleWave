@@ -20,18 +20,18 @@ class MovementProfile(
   
   def evaluate(intent: Intention, candidate: TilePosition): Double =
     List(
-      new WeightedTileHeuristic(TileHeuristicDestinationNearby, preferTravel,       Color.Grey),
-      new WeightedTileHeuristic(TileHeuristicDestinationHere,   preferSpot,         Color.Black),
-      new WeightedTileHeuristic(TileHeuristicEnemyAtMaxRange,   preferSitAtRange,   Color.Orange),
-      new WeightedTileHeuristic(TileHeuristicMobility,          preferMobility,     Color.Green),
-      new WeightedTileHeuristic(TileHeuristicHighGround,        preferHighGround,   Color.Cyan),
-      new WeightedTileHeuristic(TileHeuristicRegrouping,        preferGrouping,     Color.Purple),
-      new WeightedTileHeuristic(TileHeuristicKeepMoving,        preferMoving,       Color.Brown),
-      new WeightedTileHeuristic(TileHeuristicRandom,            preferRandom,       Color.Yellow),
-      new WeightedTileHeuristic(TileHeuristicExposureToDamage,  -avoidDamage,       Color.Red),
-      new WeightedTileHeuristic(TileHeuristicTraffic,           -avoidTraffic,      Color.Blue),
-      new WeightedTileHeuristic(TileHeuristicEnemyVision,       -avoidVision,       Color.Teal),
-      new WeightedTileHeuristic(TileHeuristicEnemyDetection,    -avoidDetection,    Color.White)
+      new WeightedMovementHeuristic(TileHeuristicDestinationNearby, preferTravel,       Color.Grey),
+      new WeightedMovementHeuristic(TileHeuristicDestinationHere,   preferSpot,         Color.Black),
+      new WeightedMovementHeuristic(TileHeuristicEnemyAtMaxRange,   preferSitAtRange,   Color.Orange),
+      new WeightedMovementHeuristic(TileHeuristicMobility,          preferMobility,     Color.Green),
+      new WeightedMovementHeuristic(TileHeuristicHighGround,        preferHighGround,   Color.Cyan),
+      new WeightedMovementHeuristic(TileHeuristicRegrouping,        preferGrouping,     Color.Purple),
+      new WeightedMovementHeuristic(TileHeuristicKeepMoving,        preferMoving,       Color.Brown),
+      new WeightedMovementHeuristic(TileHeuristicRandom,            preferRandom,       Color.Yellow),
+      new WeightedMovementHeuristic(TileHeuristicExposureToDamage,  -avoidDamage,       Color.Red),
+      new WeightedMovementHeuristic(TileHeuristicTraffic,           -avoidTraffic,      Color.Blue),
+      new WeightedMovementHeuristic(TileHeuristicEnemyVision,       -avoidVision,       Color.Teal),
+      new WeightedMovementHeuristic(TileHeuristicEnemyDetection,    -avoidDetection,    Color.White)
     )
     .map(_.weigh(intent, candidate))
     .product

@@ -1,5 +1,6 @@
-package Debugging.Visualization
+package Debugging.Visualization.Views
 
+import Debugging.Visualization.Rendering.DrawMap
 import Planning.Plan
 import Planning.Plans.Allocation.LockArea
 import Startup.With

@@ -2,33 +2,39 @@ package Debugging.Visualization.Views
 
 import Debugging.Visualization.Data.MovementHeuristicView
 import Debugging.Visualization.Rendering.DrawMap
-import Micro.Heuristics.HeuristicMath
 import Startup.With
+import Utilities.EnrichPosition._
+
+import scala.collection.mutable.ListBuffer
 
 object VisualizeMovementHeuristics {
   
-  var magnification = 1.0
-  val denominator = Math.log(HeuristicMath.heuristicMaximum)
-  
   def render() {
     With.movementHeuristicViews.cleanup()
-    With.movementHeuristicViews.get.flatten.foreach(render)
+    With.movementHeuristicViews.get.foreach(renderUnit)
   }
   
-  def render(view:MovementHeuristicView) {
+  def renderUnit(views:ListBuffer[MovementHeuristicView]) {
+    views.groupBy(_.heuristic).foreach(group => renderUnitHeuristic(group._2))
+  }
   
-    val valueBase = view.heuristic.weigh(view.intent, view.candidate)
-    val valueScale = if (valueBase >= 1.0) valueBase else 1.0 / valueBase
-    
-    if (valueScale <= 1.0) {
+  def renderUnitHeuristic(views:ListBuffer[MovementHeuristicView]) {
+    val maxEvaluation = views.map(_.evaluation).max
+    if (maxEvaluation == 0) {
       return
     }
     
-    val center = view.intent.unit.tileCenter
-    val circleRadius = 15.0 * magnification * Math.log(valueScale) / denominator
-    
-    if (circleRadius > 1.0) {
-      DrawMap.circle(view.candidate.toPosition, circleRadius.toInt, view.heuristic.color)
-    }
+    views.foreach(view => {
+      
+      // We want to offset the centerpoint slightly for each heuristic
+      // so very discrete heuristics (especially booleans) don't completely ovelap
+      
+      val offsetX = (view.heuristic.color.hashCode)     % 5 - 2
+      val offsetY = (view.heuristic.color.hashCode / 2) % 5 - 2
+      val center = view.candidate.pixelCenter.add(offsetX, offsetY)
+      val radius = 14.0 * view.evaluation / maxEvaluation
+  
+      DrawMap.circle(center, radius.toInt, view.heuristic.color)
+    })
   }
 }

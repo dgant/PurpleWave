@@ -5,8 +5,7 @@ import Micro.Intentions.Intention
 import bwapi.TilePosition
 
 class MovementHeuristicView(
-  val heuristic : WeightedMovementHeuristic,
-  val intent    : Intention,
-  val candidate : TilePosition) {
-  
-}
+  val heuristic   : WeightedMovementHeuristic,
+  val intent      : Intention,
+  val candidate   : TilePosition,
+  val evaluation  : Double)

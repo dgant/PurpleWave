@@ -24,7 +24,7 @@ class MovementHeuristicViews {
     }
   }
   
-  def get:Iterable[Iterable[MovementHeuristicView]] = viewsByUnitId.values
+  def get:Iterable[ListBuffer[MovementHeuristicView]] = viewsByUnitId.values
   
   def cleanup() = {
     viewsByUnitId.keys.filterNot(With.units.alive).foreach(viewsByUnitId.remove)

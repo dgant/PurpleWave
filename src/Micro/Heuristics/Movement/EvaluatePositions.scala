@@ -27,11 +27,12 @@ object EvaluatePositions {
     val weightedHeuristics = profile.heuristics
     
     //Debug heuristics on selected units
+    //Yes, this re-weighs everything for the selected unit(s) as a development shortcut.
     if (intent.unit.selected) {
       candidates.foreach(candidate =>
         weightedHeuristics.foreach(weightedHeuristic =>
           With.movementHeuristicViews.add(
-            new MovementHeuristicView(weightedHeuristic, intent, candidate))))
+            new MovementHeuristicView(weightedHeuristic, intent, candidate, weightedHeuristic.weigh(intent, candidate)))))
     }
     
     return candidates.maxBy(candidate =>weightedHeuristics.map(_.weigh(intent, candidate)).product)

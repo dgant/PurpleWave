@@ -8,7 +8,7 @@ object TileHeuristicExposureToDamage extends TileHeuristic {
   
   override def evaluate(intent: Intention, candidate: TilePosition): Double = {
   
-    With.grids.enemyStrength.get(candidate) / 100.0
+    Math.max(1.0, With.grids.enemyStrength.get(candidate) / 100.0)
     
   }
   

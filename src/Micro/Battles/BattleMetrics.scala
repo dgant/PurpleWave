@@ -17,38 +17,38 @@ object BattleMetrics {
     group.units.view.map(_.pixelCenter).minBy(_.distancePixelsSquared(airCenter))
   }
   
-  def evaluate(group:BattleGroup, battle:Battle):Int = {
-    group.units.view.map(evaluate).sum
+  def contextualDesire(battle:Battle):Double = {
+    var desire = 1.0
+    val zone = With.geography.zones.filter(_.region.getPolygon.isInside(battle.enemy.vanguard))
+    
+    if (zone.exists(_.owner == With.self)) desire *= 2
+    
+    return desire
   }
   
-  def evaluate(unit:UnitInfo):Int = {
+  def estimateStrength(group:BattleGroup, battle:Battle):Double = {
+    group.units.view.map(estimateStrength).sum
+  }
+  
+  def estimateStrength(unit:UnitInfo):Double = {
     var dps = unit.unitClass.groundDps
     
     //Fails to account for casters
-    //Fails to account for carriers/reavers
     //Fails to account for upgrades (including range upgrades)
-    //Fails to account for medics
-  
-    if (unit.unitClass == Terran.Bunker) {
-      dps = 4 * Terran.Marine.groundDps
-    }
+    
+    if (unit.unitClass == Terran.Medic) dps = 18.6
     
     //Altitude/doodad misses only apply to ranged units
     val highGroundBonus =  With.grids.altitudeBonus.get(unit.tileCenter)
-    val visibilityBonus = if (unit.visible) 1 else highGroundBonus
-    val combatEfficacy = dps * Math.pow(unit.totalHealth, 1.2) * highGroundBonus * visibilityBonus
-    Math.max(0, combatEfficacy).toInt
+    val combatEfficacy = dps * Math.pow(unit.totalHealth, 1.2) * highGroundBonus
+    Math.max(0, combatEfficacy)
   }
   
-  def evaluate(unit:UnitInfo, position:Position):Int = {
+  def estimateStrength(unit:UnitInfo, position:Position):Double = {
     val distanceDropoff = 16.0
     val distanceCutoff = 32.0 * 4
     val distance = Math.max(0, unit.pixelDistance(position) - unit.unitClass.maxAirGroundRange)
     val distanceFactor = Math.max(0.0, Math.min(1.0, (distanceCutoff + distanceDropoff - distance ) / distanceCutoff))
-    
-    //Shortcut
-    if (distanceFactor == 0) return 0
-    
-    (distanceFactor * evaluate(unit)).toInt
+    distanceFactor * estimateStrength(unit)
   }
 }

@@ -54,6 +54,9 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   // Combat //
   ////////////
   
+  def airDps    : Double = unitClass.groundDps
+  def groundDps : Double = unitClass.groundDps
+  
   def totalHealth: Int = hitPoints + shieldPoints + defensiveMatrixPoints
   def interceptors: Int = 8
   def scarabs: Int = 5
@@ -83,7 +86,7 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
     //
     // This is also important for preventing the Goon Stop bug. See BehaviorDragoon for details.
     //
-    if      (unitClass == Protoss.Dragoon) 10
+    if      (unitClass == Protoss.Dragoon) 8
     else if (unitClass == Protoss.Carrier) 48
     else                                   4
   }

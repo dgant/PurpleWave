@@ -88,18 +88,24 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
   ////////////
   
   private def updateCombat() {
+    _attacking                = base.isAttacking
+    _attackStarting           = base.isStartingAttack
     _attackAnimationHappening = base.isAttackFrame
     _airWeaponCooldownLeft    = base.getAirWeaponCooldown
     _groundWeaponCooldownLeft = base.getGroundWeaponCooldown
   }
   
+  var _attacking                : Boolean = false
+  var _attackStarting           : Boolean = false
   var _attackAnimationHappening : Boolean = false
   var _airWeaponCooldownLeft    : Int = 0
   var _groundWeaponCooldownLeft : Int = 0
   
+  def attacking                 : Boolean = _attacking
+  def attackStarting            : Boolean = _attackStarting
   def attackAnimationHappening  : Boolean = _attackAnimationHappening
-  def airWeaponCooldownLeft     : Int     = base.getAirWeaponCooldown
-  def groundWeaponCooldownLeft  : Int     = base.getGroundWeaponCooldown
+  def airWeaponCooldownLeft     : Int     = _airWeaponCooldownLeft
+  def groundWeaponCooldownLeft  : Int     = _groundWeaponCooldownLeft
   
   //////////////
   // Geometry //

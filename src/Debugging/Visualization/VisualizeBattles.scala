@@ -24,8 +24,8 @@ object VisualizeBattles {
       Color.Red)
     DrawMap.labelBox(
       List(
-        (battle.us.strength/100).toString,
-        (battle.enemy.strength/100).toString
+        (battle.us.strength/100).toInt.toString,
+        (battle.enemy.strength/100).toInt.toString
       ),
       battle.focus,
       drawBackground = true,

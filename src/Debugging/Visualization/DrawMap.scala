@@ -34,7 +34,8 @@ object DrawMap {
   def circle(
     center:Position,
     radius:Int,
-    color:Color = Color.Grey) {
+    color:Color = Color.Grey,
+    solid:Boolean = false) {
     if (irrelevant(
       List(
         center,
@@ -42,7 +43,7 @@ object DrawMap {
         center.add(-radius, radius),
         center.add(radius, -radius),
         center.add(-radius, -radius)))) return
-    With.game.drawCircleMap(center, radius, color)
+    With.game.drawCircleMap(center, radius, color, solid)
   }
   
   def label(

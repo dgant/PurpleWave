@@ -15,8 +15,6 @@ class UnitTracker {
   private val foreignUnitTracker = new ForeignUnitTracker
   
   val invalidUnitTypes = Set(
-    UnitType.Protoss_Scarab,
-    UnitType.Protoss_Interceptor,
     UnitType.None,
     UnitType.Unknown
   )

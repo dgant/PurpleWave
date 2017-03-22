@@ -7,7 +7,7 @@ import Utilities.TypeEnrichment.EnrichPosition._
 object VisualizeGrids {
   def render() {
     //renderGrid(With.grids.psi, 0, 0)
-    renderGrid(With.grids.enemyGroundStrength, 0, 0)
+    renderGrid(With.grids.enemyStrength, 0, 0)
     renderGrid(With.grids.mobility, 0, 1)
   }
   

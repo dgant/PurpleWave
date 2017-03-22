@@ -1,6 +1,7 @@
 package Macro.Allocation
 
 import Planning.Plans.Allocation.LockUnits
+import ProxyBwapi.Races.{Protoss, Terran}
 import Startup.With
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -32,8 +33,11 @@ class Recruiter {
     //test
   }
   
+  val ineligibleUnits = Set(Protoss.Interceptor, Protoss.Scarab, Terran.SpiderMine)
   private def isEligible(unit:FriendlyUnitInfo):Boolean = {
-    unit.alive && unit.complete
+    unit.alive &&
+    unit.complete &&
+    ! ineligibleUnits.contains(unit.unitClass)
   }
   
   private def test {

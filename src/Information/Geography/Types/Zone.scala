@@ -11,4 +11,6 @@ class Zone(
   val region:Region,
   val bases:ListBuffer[Base],
   val edges:ListBuffer[ZoneEdge],
-  var owner:Player = With.game.neutral)
+  var owner:Player = With.game.neutral) {
+  
+}

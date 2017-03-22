@@ -41,6 +41,8 @@ abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
   // Combat //
   ////////////
   
+  def attacking                 : Boolean = base.isAttacking
+  def attackStarting            : Boolean = base.isStartingAttack
   def attackAnimationHappening  : Boolean = base.isAttackFrame
   def airWeaponCooldownLeft     : Int     = base.getAirWeaponCooldown
   def groundWeaponCooldownLeft  : Int     = base.getGroundWeaponCooldown

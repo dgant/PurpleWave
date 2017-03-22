@@ -9,11 +9,27 @@ object BehaviorDefault extends Behavior {
   
   def execute(intent: Intention) {
   
-    val target = EvaluateTargets.best(intent, intent.targetProfile, intent.targets)
+    if (intent.unit.selected) {
+      val putADebugBreakpointHere = true
+    }
     
-    if (intent.unit.cooldownLeft < With.game.getRemainingLatencyFrames) {
-      if (target.isDefined) {
-        return With.commander.attack(intent, target.get)
+    if (intent.unit.attackStarting || intent.unit.attackAnimationHappening) {
+      return
+    }
+    
+    val desireToFight = getDesireToFight(intent)
+    
+    if (desireToFight < 1.0) {
+      intent.destination = Some(With.geography.home)
+    }
+    
+    if (desireToFight > 0.75) {
+      val target = EvaluateTargets.best(intent, intent.targetProfile, intent.targets)
+  
+      if (intent.unit.cooldownLeft < With.game.getRemainingLatencyFrames) {
+        if (target.isDefined) {
+          return With.commander.attack(intent, target.get)
+        }
       }
     }
     
@@ -29,5 +45,16 @@ object BehaviorDefault extends Behavior {
     
     val tile = EvaluatePositions.best(intent, movementProfile)
     return With.commander.move(intent, tile.pixelCenter)
+  }
+  
+  def getDesireToFight(intent:Intention):Double = {
+    val strengthOurs  = With.grids.friendlyStrength.get(intent.unit.tileCenter)
+    val strengthEnemy = With.grids.enemyStrength.get(intent.unit.tileCenter)
+    val strengthRatioOverall =
+      With.battles.byUnit.get(intent.unit)
+        .map(battle => battle.us.strength / battle.enemy.strength)
+        .getOrElse(1.0)
+    
+    return strengthRatioOverall * strengthOurs / strengthEnemy
   }
 }

@@ -184,7 +184,10 @@ case class UnitClass(val baseType:UnitType) {
   private val concussiveOrExplosive = List(DamageType.Concussive, DamageType.Explosive)
   def airDamage:Double = {
     if (this == Protoss.Carrier) {
-      return Protoss.Interceptor.airDamage * 6
+      return Protoss.Interceptor.airDamage * 8
+    }
+    if (this == Terran.Bunker) {
+      return Terran.Marine.airDamage * 4
     }
     val typeMultiplier = if (concussiveOrExplosive.contains(groundWeapon.damageType)) 0.75 else 1.0
     typeMultiplier *
@@ -194,11 +197,15 @@ case class UnitClass(val baseType:UnitType) {
   }
   def groundDamage:Double = {
     if (this == Protoss.Carrier) {
-      return Protoss.Interceptor.airDamage * 6
+      return Protoss.Interceptor.groundDamage * 8
     }
     if (this == Protoss.Reaver) {
       return Protoss.Scarab.groundDamage
     }
+    if (this == Terran.Bunker) {
+      return Terran.Marine.groundDamage * 4
+    }
+    
     val typeMultiplier = if (concussiveOrExplosive.contains(groundWeapon.damageType)) 0.75 else 1.0
     typeMultiplier *
       maxGroundHits *

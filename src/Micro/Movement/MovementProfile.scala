@@ -4,6 +4,8 @@ import Micro.Intentions.Intention
 import Startup.With
 import bwapi.TilePosition
 
+import Utilities.TypeEnrichment.EnrichPosition._
+
 class MovementProfile(
   var preferTravel      : Double = 0,
   var preferSpot        : Double = 0,
@@ -11,6 +13,7 @@ class MovementProfile(
   var preferMobility    : Double = 0,
   var preferHighGround  : Double = 0,
   var preferGrouping    : Double = 0,
+  var preferMoving      : Double = 0,
   var preferRandom      : Double = 0,
   var avoidDamage       : Double = 0,
   var avoidTraffic      : Double = 0,
@@ -26,6 +29,7 @@ class MovementProfile(
       weigh(intent, candidate,  mobility,     preferMobility),
       weigh(intent, candidate,  highGround,   preferHighGround),
       weigh(intent, candidate,  grouping,     preferGrouping),
+      weigh(intent, candidate,  moving,       preferMoving),
       weigh(intent, candidate,  random,       preferRandom),
       weigh(intent, candidate,  enemyDamage,  -avoidDamage),
       weigh(intent, candidate,  traffic,      -avoidTraffic),
@@ -70,9 +74,10 @@ class MovementProfile(
   def traffic(intent: Intention, candidate: TilePosition): Double = {
     if (intent.unit.flying) 1 else
       With.grids.units.get(candidate)
-        .filter(_ == intent.unit)
-        .filter(_.flying)
-        .map(_.unitClass.width).sum
+        .filterNot(_ == intent.unit)
+        .filterNot(_.flying)
+        .map(_.unitClass.width)
+        .sum
   }
   
   def mobility(intent: Intention, candidate: TilePosition): Double = {
@@ -81,11 +86,15 @@ class MovementProfile(
   }
   
   def enemyDamage(intent: Intention, candidate: TilePosition): Double = {
-    With.grids.enemyGroundStrength.get(candidate) / 100.0
+    With.grids.enemyStrength.get(candidate) / 100.0
   }
   
   def grouping(intent: Intention, candidate: TilePosition): Double = {
-    With.grids.friendlyGroundStrength.get(candidate)  / 100.0
+    With.grids.friendlyStrength.get(candidate)  / 100.0
+  }
+  
+  def moving(intent:Intention, candidate:TilePosition):Double = {
+    intent.unit.pixelDistance(candidate.pixelCenter)
   }
   
   def random(intent:Intention, candidate: TilePosition): Double = {

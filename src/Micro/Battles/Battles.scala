@@ -11,13 +11,11 @@ import scala.collection.mutable
 class Battles {
   
   val all = new mutable.HashSet[Battle]
-  
   val byUnit = new mutable.HashMap[UnitInfo, Battle]
   
   def onFrame() = updateLimiter.act()
-  private val updateLimiter = new Limiter(2, update)
+  private val updateLimiter = new Limiter(3, update)
   private def update() {
-    return
     byUnit.clear()
     defineBattles()
     all.foreach(update)
@@ -35,7 +33,7 @@ class Battles {
     groups.foreach(group => group.center = BattleMetrics.center(group))
     battle.us.vanguard    = battle.us.units.minBy(_.pixelCenter.distancePixelsSquared(battle.enemy.center)).pixelCenter
     battle.enemy.vanguard = battle.enemy.units.minBy(_.pixelCenter.distancePixelsSquared(battle.us.center)).pixelCenter
-    groups.foreach(group => group.strength = BattleMetrics.evaluate(group, battle))
+    groups.foreach(group => group.strength = BattleMetrics.estimateStrength(group, battle))
   }
   
   def isValid(battle:Battle):Boolean = {

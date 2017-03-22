@@ -25,8 +25,8 @@ object VisualizeVectorUnits {
     With.game.setTextSize(bwapi.Text.Size.Enum.Default)
     With.game.drawTextScreen  (5,      5 + 50,                   "PurpleWave is displaying this game in Arcade Happy Vision!")
     With.game.setTextSize(bwapi.Text.Size.Enum.Small)
-    With.game.drawTextScreen(410, 4, "Candy: ")
-    With.game.drawTextScreen(482, 4, "Soda: ")
+    With.game.drawTextScreen(408, 4, "Candy: ")
+    With.game.drawTextScreen(481, 4, "Soda: ")
     With.game.drawTextScreen(540, 4, "Friends: ")
   }
   

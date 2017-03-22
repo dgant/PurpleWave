@@ -50,8 +50,8 @@
       <file leaf-file-name="VisualizeVectorUnits.scala" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Debugging/Visualization/VisualizeVectorUnits.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="170">
-              <caret line="133" column="96" lean-forward="false" selection-start-line="133" selection-start-column="96" selection-end-line="133" selection-end-column="96" />
+            <state relative-caret-position="131">
+              <caret line="28" column="32" lean-forward="false" selection-start-line="28" selection-start-column="32" selection-end-line="28" selection-end-column="32" />
               <folding />
             </state>
           </provider>
@@ -1301,8 +1301,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Debugging/Visualization/VisualizeVectorUnits.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="170">
-          <caret line="133" column="96" lean-forward="false" selection-start-line="133" selection-start-column="96" selection-end-line="133" selection-end-column="96" />
+        <state relative-caret-position="131">
+          <caret line="28" column="32" lean-forward="false" selection-start-line="28" selection-start-column="32" selection-end-line="28" selection-end-column="32" />
           <folding />
         </state>
       </provider>

@@ -116,13 +116,15 @@ object DrawMap {
   }
   
   def irrelevant(points:Iterable[Position]):Boolean = {
-    points.forall(irrelevant)
+    points.exists(irrelevant)
   }
   def irrelevant(point:Position):Boolean = {
-    point.getX < viewportStart.getX - 64 ||
-    point.getX > viewportEnd.getX + 64 ||
-    point.getY < viewportStart.getY - 64 ||
-    point.getY > viewportEnd.getY + 64
+    val buffer = 32 * 4
+    ! point.valid ||
+    point.getX < viewportStart.getX - buffer ||
+    point.getX > viewportEnd.getX   + buffer ||
+    point.getY < viewportStart.getY - buffer ||
+    point.getY > viewportEnd.getY   + buffer
   }
 
   //TODO: This shouldn't live in a singleton!

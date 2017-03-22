@@ -19,8 +19,9 @@ class UnitTracker {
     UnitType.Unknown
   )
   
-  def getId(id:Int):Option[UnitInfo]              = friendlyUnitTracker.get(id).orElse(foreignUnitTracker.get(id))
-  def get(unit:bwapi.Unit):Option[UnitInfo] = if (unit == null) None else getId(unit.getID)
+  def alive(id:Int):Boolean                     = getId(id).exists(_.alive)
+  def getId(id:Int):Option[UnitInfo]            = friendlyUnitTracker.get(id).orElse(foreignUnitTracker.get(id))
+  def get(unit:bwapi.Unit):Option[UnitInfo]     = if (unit == null) None else getId(unit.getID)
   def all:Set[UnitInfo]                         = ours ++ enemy ++ neutral
   def buildings:Set[UnitInfo]                   = all.filter(_.unitClass.isBuilding)
   def ours:Set[FriendlyUnitInfo]                = friendlyUnitTracker.ourUnits

@@ -8,26 +8,27 @@ import scala.collection.mutable.ListBuffer
 
 class MovementHeuristicViews {
   
-  private val views = new mutable.HashMap[UnitInfo, ListBuffer[MovementHeuristicView]]
+  private val viewsByUnitId = new mutable.HashMap[Int, ListBuffer[MovementHeuristicView]]
   
   def reset(unit:UnitInfo) {
-    if (enabled) views.get(unit).foreach(_.clear())
+    if (enabled) viewsByUnitId.remove(unit.id)
   }
   
   def add(view:MovementHeuristicView) {
-    
     if (enabled) {
-      if ( !views.contains(view.intent.unit)) {
-        views.put(view.intent.unit, new ListBuffer)
+      if ( ! viewsByUnitId.contains(view.intent.unit.id)) {
+        viewsByUnitId.put(view.intent.unit.id, new ListBuffer[MovementHeuristicView])
       }
       
-      views(view.intent.unit).append(view)
+      viewsByUnitId(view.intent.unit.id).append(view)
     }
   }
   
-  def get:Iterable[Iterable[MovementHeuristicView]] = views.values
+  def get:Iterable[Iterable[MovementHeuristicView]] = viewsByUnitId.values
   
-  def cleanup() = views.keys.filterNot(_.alive).foreach(views.remove)
+  def cleanup() = {
+    viewsByUnitId.keys.filterNot(With.units.alive).foreach(viewsByUnitId.remove)
+  }
   
   def enabled:Boolean = With.configuration.enableVisualization && With.configuration.enableVisualizationMovementHeuristics
 }

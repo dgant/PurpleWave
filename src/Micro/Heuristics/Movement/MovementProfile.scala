@@ -1,8 +1,7 @@
 package Micro.Heuristics.Movement
 
 import Micro.Heuristics.TileHeuristics._
-import Micro.Intentions.Intention
-import bwapi.{Color, TilePosition}
+import bwapi.Color
 
 class MovementProfile(
   var preferTravel      : Double = 0,
@@ -18,7 +17,7 @@ class MovementProfile(
   var avoidVision       : Double = 0,
   var avoidDetection    : Double = 0) {
   
-  def evaluate(intent: Intention, candidate: TilePosition): Double =
+  def heuristics: Iterable[WeightedMovementHeuristic] =
     List(
       new WeightedMovementHeuristic(TileHeuristicDestinationNearby, preferTravel,       Color.Grey),
       new WeightedMovementHeuristic(TileHeuristicDestinationHere,   preferSpot,         Color.Black),
@@ -33,6 +32,4 @@ class MovementProfile(
       new WeightedMovementHeuristic(TileHeuristicEnemyVision,       -avoidVision,       Color.Teal),
       new WeightedMovementHeuristic(TileHeuristicEnemyDetection,    -avoidDetection,    Color.White)
     )
-    .map(_.weigh(intent, candidate))
-    .product
 }

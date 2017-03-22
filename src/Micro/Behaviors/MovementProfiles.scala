@@ -11,7 +11,7 @@ object MovementProfiles {
     preferMobility    = 0.5,
     preferHighGround  = 0.5,
     preferGrouping    = 0.25,
-    preferRandom      = 0.25,
+    preferRandom      = 0.05,
     avoidDamage       = 2,
     avoidTraffic      = 1.5)
   
@@ -20,12 +20,12 @@ object MovementProfiles {
     preferSpot        = 1,
     preferHighGround  = 0.25,
     preferRandom      = 0.25,
-    preferMoving      = 0.25,
+    preferMoving      = 0.1,
     avoidTraffic      = 2)
   
   val worker = new MovementProfile (
     preferSpot        = 3,
-    preferRandom      = 0.5,
+    preferRandom      = 0.1,
     avoidDamage       = 3)
   
   val darkTemplar = new MovementProfile (

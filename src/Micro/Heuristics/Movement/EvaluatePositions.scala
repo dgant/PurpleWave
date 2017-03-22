@@ -1,5 +1,6 @@
 package Micro.Heuristics.Movement
 
+import Debugging.Visualization.Data.MovementHeuristicView
 import Geometry.Shapes.Circle
 import Startup.With
 import Micro.Intentions.Intention
@@ -16,13 +17,23 @@ object EvaluatePositions {
       Circle.points(searchRange)
         .map(intent.unit.tileCenter.add)
         .filter(_.valid)
-        .filter(With.grids.walkable.get)
+        .filter(intent.unit.canTraverse)
   
     if (candidates.isEmpty) {
       //Weird. unit is nowhere near a walkable position
       return intent.unit.tileCenter
     }
+  
+    val weightedHeuristics = profile.heuristics
     
-    return candidates.maxBy(tile => profile.evaluate(intent, tile))
+    //Debug heuristics on selected units
+    if (intent.unit.selected) {
+      candidates.foreach(candidate =>
+        weightedHeuristics.foreach(weightedHeuristic =>
+          With.movementHeuristicViews.add(
+            new MovementHeuristicView(weightedHeuristic, intent, candidate))))
+    }
+    
+    return candidates.maxBy(candidate =>weightedHeuristics.map(_.weigh(intent, candidate)).product)
   }
 }

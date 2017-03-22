@@ -27,7 +27,7 @@ object VisualizeVectorUnits {
     With.game.setTextSize(bwapi.Text.Size.Enum.Small)
     With.game.drawTextScreen(408, 4, "Candy: ")
     With.game.drawTextScreen(481, 4, "Soda: ")
-    With.game.drawTextScreen(540, 4, "Friends: ")
+    With.game.drawTextScreen(541, 4, "Friends: ")
   }
   
   def renderUnit(unit:UnitInfo) {
@@ -48,17 +48,19 @@ object VisualizeVectorUnits {
     val top               = verticalBonus + unit.top
     val bottom            = verticalBonus + unit.bottom
     val middle            = (left + right)/2
-    val leftPerspective   = left   + unit.unitClass.width / 8
-    val rightPerspective  = right  - unit.unitClass.width / 8
+    val farLeft           = left    - unit.unitClass.width / 8
+    val farRight          = right   +  unit.unitClass.width / 8
+    val leftPerspective   = left    //+ unit.unitClass.width / 8
+    val rightPerspective  = right   //- unit.unitClass.width / 8
     val waist             = top + unit.unitClass.height / 4
     val apex              = top - unit.unitClass.height / 4
     
     DrawMap.line(
-      new Position(left, bottom),
+      new Position(farLeft, bottom),
       new Position(middle, apex),
       color)
     DrawMap.line(
-      new Position(right, bottom),
+      new Position(farRight, bottom),
       new Position(middle, apex),
       color)
     DrawMap.line(
@@ -71,15 +73,15 @@ object VisualizeVectorUnits {
       color)
     DrawMap.line(
       new Position(leftPerspective, waist),
-      new Position(left, bottom),
+      new Position(farLeft, bottom),
       color)
     DrawMap.line(
       new Position(rightPerspective, waist),
-      new Position(right, bottom),
+      new Position(farRight, bottom),
       color)
     DrawMap.line(
-      new Position(unit.left, bottom),
-      new Position(right, bottom),
+      new Position(farLeft, bottom),
+      new Position(farRight, bottom),
       color)
     DrawMap.label(
       unit.unitClass.toString
@@ -114,12 +116,12 @@ object VisualizeVectorUnits {
     }
     
     if (unit.complete) {
-      if (unit.totalHealth < unit.unitClass.maxTotalHealth * 3 / 4) {
+      if (unit.totalHealth < unit.unitClass.maxTotalHealth / 2) {
         val swap = mouthBottom
         mouthBottom = mouthTop
         mouthTop = swap
       }
-      else if (unit.totalHealth < unit.unitClass.maxTotalHealth / 2) {
+      else if (unit.totalHealth < unit.unitClass.maxTotalHealth * 3 / 4) {
         val mouthMiddle = (mouthBottom + mouthTop)/2
         mouthTop = mouthMiddle
         mouthBottom = mouthMiddle

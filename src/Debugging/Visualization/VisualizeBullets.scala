@@ -11,15 +11,22 @@ object VisualizeBullets {
       .filter(_.isVisible)
       .filter(_.exists)
       .foreach(bullet => {
-        With.game.drawBoxMap(
+        DrawMap.circle(
           bullet.getPosition.add(-2, -2),
-          bullet.getPosition.add(2, 2),
+          2,
           DrawMap.playerColor(bullet.getPlayer),
           true)
-        With.game.drawLineMap(
-          bullet.getPosition,
-          bullet.getPosition.add( -bullet.getVelocityX.toInt, -bullet.getVelocityY.toInt),
-          DrawMap.playerColor(bullet.getPlayer))
+        DrawMap.circle(
+          bullet.getPosition.add(2, -2),
+          2,
+          DrawMap.playerColor(bullet.getPlayer),
+          true)
+        DrawMap.triangle(
+          bullet.getPosition.add(-4, -1),
+          bullet.getPosition.add(4, -1),
+          bullet.getPosition.add(0, 3),
+          DrawMap.playerColor(bullet.getPlayer),
+          true)
       })
   }
 }

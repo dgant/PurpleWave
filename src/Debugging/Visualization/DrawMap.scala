@@ -26,9 +26,10 @@ object DrawMap {
   def box(
     start:Position,
     end:Position,
-    color:Color = Color.Grey) {
+    color:Color = Color.Grey,
+    solid:Boolean = false) {
     if (irrelevant(List(start, end))) return
-    With.game.drawBoxMap(start, end, color)
+    With.game.drawBoxMap(start, end, color, solid)
   }
   
   def circle(
@@ -44,6 +45,16 @@ object DrawMap {
         center.add(radius, -radius),
         center.add(-radius, -radius)))) return
     With.game.drawCircleMap(center, radius, color, solid)
+  }
+  
+  def triangle(
+    position1:Position,
+    position2:Position,
+    position3:Position,
+    color:Color = Color.Grey,
+    solid: Boolean = false) {
+    if (irrelevant(List(position1, position2, position3))) return
+    With.game.drawTriangleMap(position1, position2, position3, color, solid)
   }
   
   def label(
@@ -113,7 +124,8 @@ object DrawMap {
     point.getY < viewportStart.getY - 64 ||
     point.getY > viewportEnd.getY + 64
   }
-  
+
+  //TODO: This shouldn't live in a singleton!
   def viewportStart:Position = viewportStartCache.get
   def viewportEnd:Position = viewportEndCache.get
   private val viewportStartCache = new CacheFrame[Position](() => viewportStartRecalculate)

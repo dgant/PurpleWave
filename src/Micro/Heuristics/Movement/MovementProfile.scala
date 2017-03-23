@@ -19,16 +19,16 @@ class MovementProfile(
   
   def heuristics: Iterable[WeightedMovementHeuristic] =
     List(
-      new WeightedMovementHeuristic(TileHeuristicDestinationNearby, preferTravel,       Color.Grey),
+      new WeightedMovementHeuristic(TileHeuristicDestinationNearby, preferTravel,       Color.Brown),
       new WeightedMovementHeuristic(TileHeuristicDestinationHere,   preferSpot,         Color.Black),
       new WeightedMovementHeuristic(TileHeuristicEnemyAtMaxRange,   preferSitAtRange,   Color.Orange),
       new WeightedMovementHeuristic(TileHeuristicMobility,          preferMobility,     Color.Green),
       new WeightedMovementHeuristic(TileHeuristicHighGround,        preferHighGround,   Color.Cyan),
       new WeightedMovementHeuristic(TileHeuristicRegrouping,        preferGrouping,     Color.Purple),
-      new WeightedMovementHeuristic(TileHeuristicKeepMoving,        preferMoving,       Color.Brown),
-      new WeightedMovementHeuristic(TileHeuristicRandom,            preferRandom,       Color.Yellow),
+      new WeightedMovementHeuristic(TileHeuristicKeepMoving,        preferMoving,       Color.Blue),
+      new WeightedMovementHeuristic(TileHeuristicRandom,            preferRandom,       Color.Grey),
       new WeightedMovementHeuristic(TileHeuristicExposureToDamage,  -avoidDamage,       Color.Red),
-      new WeightedMovementHeuristic(TileHeuristicTraffic,           -avoidTraffic,      Color.Blue),
+      new WeightedMovementHeuristic(TileHeuristicTraffic,           -avoidTraffic,      Color.Orange),
       new WeightedMovementHeuristic(TileHeuristicEnemyVision,       -avoidVision,       Color.Teal),
       new WeightedMovementHeuristic(TileHeuristicEnemyDetection,    -avoidDetection,    Color.White)
     )

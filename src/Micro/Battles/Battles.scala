@@ -50,7 +50,7 @@ class Battles {
   }
   
   private def getFighters(units:Iterable[UnitInfo]):Iterable[UnitInfo] = {
-    units.filter(u => u.possiblyStillThere && u.alive && u.impactsCombat)
+    units.filter(u => u.possiblyStillThere && u.alive && u.helpsInCombat)
   }
   
   private def assignBattles(

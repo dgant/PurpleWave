@@ -104,8 +104,8 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
   def attacking                 : Boolean = _attacking
   def attackStarting            : Boolean = _attackStarting
   def attackAnimationHappening  : Boolean = _attackAnimationHappening
-  def airWeaponCooldownLeft     : Int     = _airWeaponCooldownLeft
-  def groundWeaponCooldownLeft  : Int     = _groundWeaponCooldownLeft
+  def airCooldownLeft     : Int     = _airWeaponCooldownLeft
+  def groundCooldownLeft  : Int     = _groundWeaponCooldownLeft
   
   //////////////
   // Geometry //

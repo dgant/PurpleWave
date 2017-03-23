@@ -1,7 +1,8 @@
 package Micro.Intentions
 
 import Micro.Behaviors.{Behavior, MovementProfiles, TargetingProfiles}
-import Micro.Heuristics.Targeting.Targets
+import Micro.Heuristics.Targeting.{Targets, Threats}
+import Performance.Caching.CacheForever
 import Planning.Plan
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClass.UnitClass
@@ -13,18 +14,19 @@ class Intention(val plan:Plan, val unit:FriendlyUnitInfo) {
   
   var behavior    : Behavior              = unit.unitClass.behavior
   var destination : Option[TilePosition]  = None
+  var toAttack    : Option[UnitInfo]      = None
   var toGather    : Option[UnitInfo]      = None
   var toBuild     : Option[UnitClass]     = None
   var toTech      : Option[Tech]          = None
   var toUpgrade   : Option[Upgrade]       = None
   
-  private var targetCache: Option[Set[UnitInfo]] = None
-  def targets: Set[UnitInfo] = {
-    if (targetCache == None) targetCache = Some(Targets.get(this))
-    targetCache.get
-  }
+  private val targetCache = new CacheForever[Set[UnitInfo]](() => Targets.get(this))
+  private val threatCache = new CacheForever[Set[UnitInfo]](() => Threats.get(this))
+  
+  def targets: Set[UnitInfo] = targetCache.get
+  def threats: Set[UnitInfo] = threatCache.get
  
   var movementProfileCombat = MovementProfiles.defaultCombat
   var movementProfileNormal = MovementProfiles.defaultNormal
-  var targetProfile = TargetingProfiles.ranged
+  var targetProfile         = TargetingProfiles.default
 }

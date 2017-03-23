@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans
 
 import Macro.BuildRequests._
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
-import Planning.Plans.Army.{Attack, DefendChoke}
+import Planning.Plans.Army.{Attack, Defend}
 import Planning.Plans.Compound.{IfThenElse, Parallel}
 import Planning.Plans.Information.ScoutAt
 import Planning.Plans.Macro.Automatic.{BuildPylonsContinuously, TrainContinuously, TrainProbesContinuously}
@@ -88,7 +88,7 @@ class ProtossVsProtoss extends Parallel {
     new ScoutAt(20),
     new IfThenElse {
       predicate.set(new UnitCountAtLeast { quantity.set(6); unitMatcher.set(UnitMatchWarriors) })
-      whenFalse.set(new DefendChoke)
+      whenFalse.set(new Defend)
       whenTrue.set(new Attack)
     }
   ))

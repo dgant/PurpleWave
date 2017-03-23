@@ -1,7 +1,7 @@
 package ProxyBwapi.UnitInfo
 
 import Geometry.TileRectangle
-import ProxyBwapi.Races.{Protoss, Terran}
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Startup.With
 import Utilities.EnrichPosition._
 import bwapi._
@@ -17,8 +17,8 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   // Health //
   ////////////
   
-  def mineralsLeft      : Int = if (unitClass.isMinerals) resourcesLeft else 0
-  def gasLeft           : Int = if (unitClass.isGas)      resourcesLeft else 0
+  def mineralsLeft  : Int = if (unitClass.isMinerals) resourcesLeft else 0
+  def gasLeft       : Int = if (unitClass.isGas)      resourcesLeft else 0
   
   //////////////
   // Geometry //
@@ -27,55 +27,60 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   def x: Int = pixelCenter.getX
   def y: Int = pixelCenter.getY
   
-  def walkPosition:WalkPosition = pixelCenter.toWalkPosition
-  def hypotenuse: Double = unitClass.width * 1.41421356
   def tileCenter: TilePosition = pixelCenter.toTilePosition
   def tileArea: TileRectangle = unitClass.tileArea.add(tileTopLeft)
   
-  def canTraverse(tile:TilePosition):Boolean = flying || With.grids.walkable.get(tile)
-  
-  //Could improve this by counting angle or using the native BWAPI method
-  def pixelsFromEdge(otherUnit:UnitInfo) : Double = pixelDistance(otherUnit) - hypotenuse - otherUnit.hypotenuse
-  
-  def pixelDistance(otherPosition:Position)        : Double = pixelCenter.getDistance(otherPosition)
-  def pixelDistance(otherUnit:UnitInfo)            : Double = pixelDistance(otherUnit.pixelCenter)
-  def tileDistance(otherPosition:TilePosition)     : Double = pixelDistance(otherPosition.toPosition)
-  def pixelDistanceSquared(otherUnit:UnitInfo)     : Double = pixelDistanceSquared(otherUnit.pixelCenter)
-  def pixelDistanceSquared(otherPixel:Position)    : Double = pixelCenter.distancePixelsSquared(otherPixel)
-  def tileDistanceSquared (otherTile:TilePosition) : Double = pixelDistance(otherTile.toPosition)
-  
-  def travelPixels(destination:TilePosition): Double = travelPixels(tileCenter, destination)
-  
+  def canTraverse(tile:TilePosition)                : Boolean = flying || With.grids.walkable.get(tile)
+  def pixelsFromEdge(otherUnit:UnitInfo)            : Double  = pixelDistance(otherUnit) - unitClass.hypotenuse - otherUnit.unitClass.hypotenuse
+  def pixelDistance(otherPosition:Position)         : Double  = pixelCenter.getDistance(otherPosition)
+  def pixelDistance(otherUnit:UnitInfo)             : Double  = pixelDistance(otherUnit.pixelCenter)
+  def tileDistance(otherPosition:TilePosition)      : Double  = pixelDistance(otherPosition.toPosition)
+  def pixelDistanceSquared(otherUnit:UnitInfo)      : Double  = pixelDistanceSquared(otherUnit.pixelCenter)
+  def pixelDistanceSquared(otherPixel:Position)     : Double  = pixelCenter.distancePixelsSquared(otherPixel)
+  def tileDistanceSquared (otherTile:TilePosition)  : Double  = pixelDistance(otherTile.toPosition)
+  def travelPixels(destination:TilePosition)        : Double  = travelPixels(tileCenter, destination)
   def travelPixels(origin:TilePosition, destination:TilePosition): Double =
     if (flying)
       origin.pixelCenter.distancePixels(destination.pixelCenter)
     else
-      With.paths.groundPixels(tileCenter, destination)
+      With.paths.groundPixels(origin, destination)
   
   ////////////
   // Combat //
   ////////////
   
-  def airDps    : Double = unitClass.groundDps
-  def groundDps : Double = unitClass.groundDps
+  def cooldownLeft:Int = Math.max(airCooldownLeft, groundCooldownLeft)
+  def airDps: Double = unitClass.groundDps
+  def groundDps: Double = unitClass.groundDps
   
   def totalHealth: Int = hitPoints + shieldPoints + defensiveMatrixPoints
+  def fractionalHealth:Double = totalHealth / unitClass.maxTotalHealth
   def interceptors: Int = 8
   def scarabs: Int = 5
   
   def inPixelRadius(pixelRadius:Int): Set[UnitInfo] = With.units.inPixelRadius(pixelCenter, pixelRadius)
   
-  //TODO: Account for ground/flying
-  def enemiesInRange: Set[UnitInfo] =
-    With.units
-      .inPixelRadius(pixelCenter, unitClass.maxAirGroundRange + 96)
-      .filter(pixelsFromEdge(_) <= unitClass.maxAirGroundRange)
-      .filter(isEnemyOf)
-  
   def canDoAnything:Boolean = alive && complete && ! stasised && ! maelstrommed //And lockdown
   def canAttack:Boolean = canDoAnything && unitClass.canAttack
-  def canAttack(otherUnit:UnitInfo):Boolean = canAttack && (if (otherUnit.flying) unitClass.attacksAir else unitClass.attacksGround)
-  def impactsCombat: Boolean = canDoAnything && (canAttack || unitClass.isSpellcaster || Set(Terran.Bunker, Terran.Medic).contains(unitClass))
+  
+  def canAttack(otherUnit:UnitInfo):Boolean =
+    canAttack &&
+    otherUnit.alive &&
+    otherUnit.totalHealth > 0 &&
+      otherUnit.visible &&
+    (otherUnit.detected || ! otherUnit.cloaked || ! otherUnit.burrowed) &&
+    ! otherUnit.invincible &&
+    ! otherUnit.stasised &&
+    (if (otherUnit.flying) unitClass.attacksAir else unitClass.attacksGround)
+  
+  def canAttackRightNow:Boolean =
+    canAttack &&
+    cooldownLeft < With.latency.framesRemaining &&
+    (unitClass != Protoss.Carrier || interceptors > 0) &&
+    (unitClass != Protoss.Reaver  || scarabs > 0) &&
+    (unitClass != Zerg.Lurker     || burrowed)
+  
+  def helpsInCombat: Boolean = canDoAnything && (canAttack || unitClass.isSpellcaster || Set(Terran.Bunker, Terran.Medic).contains(unitClass))
   
   def requiredAttackDelay: Int = {
     // The question:
@@ -87,6 +92,13 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
     else if (unitClass == Protoss.Carrier) 48
     else                                   4
   }
+  
+  def attackableEnemiesInRange: Set[UnitInfo] =
+    With.units
+      .inPixelRadius(pixelCenter, unitClass.maxAirGroundRange + 96)
+      .filter(pixelsFromEdge(_) <= unitClass.maxAirGroundRange)
+      .filter(isEnemyOf)
+      .filter(canAttack)
   
   /////////////
   // Players //

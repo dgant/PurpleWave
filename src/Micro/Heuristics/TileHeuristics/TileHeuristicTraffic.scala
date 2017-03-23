@@ -11,17 +11,17 @@ object TileHeuristicTraffic extends TileHeuristic {
   override def evaluate(intent: Intention, candidate: TilePosition): Double = {
   
     if (intent.unit.flying) 1.0 else
-      1.0 + scaling *
+      1.7 + scaling *
       List(
-        measureTraffic(intent,   1.0, candidate),
-        measureTraffic(intent,  0.25, candidate.add(-1,  0)),
-        measureTraffic(intent,  0.25, candidate.add( 1,  0)),
-        measureTraffic(intent,  0.25, candidate.add( 0, -1)),
-        measureTraffic(intent,  0.25, candidate.add( 0,  1)),
-        measureTraffic(intent, 0.125, candidate.add(-1, -1)),
-        measureTraffic(intent, 0.125, candidate.add(-1,  1)),
-        measureTraffic(intent, 0.125, candidate.add( 1, -1)),
-        measureTraffic(intent, 0.125, candidate.add( 1,  1))
+        measureTraffic(intent, 0.5, candidate),
+        measureTraffic(intent, 0.2, candidate.add(-1,  0)),
+        measureTraffic(intent, 0.2, candidate.add( 1,  0)),
+        measureTraffic(intent, 0.2, candidate.add( 0, -1)),
+        measureTraffic(intent, 0.2, candidate.add( 0,  1)),
+        measureTraffic(intent, 0.1, candidate.add(-1, -1)),
+        measureTraffic(intent, 0.1, candidate.add(-1,  1)),
+        measureTraffic(intent, 0.1, candidate.add( 1, -1)),
+        measureTraffic(intent, 0.1, candidate.add( 1,  1))
       ).sum
   }
   
@@ -30,9 +30,10 @@ object TileHeuristicTraffic extends TileHeuristic {
     With.grids.units.get(tile)
       .filterNot(_ == intent.unit)
       .filterNot(_.flying)
-      .map(unit =>
-        Math.max(32.0, unit.unitClass.width) *
-        Math.max(32.0, unit.unitClass.height))
+      .filterNot(_.unitClass.isBuilding)
+      .map(neighbor =>
+        Math.min(32.0, neighbor.unitClass.width) *
+        Math.min(32.0, neighbor.unitClass.height))
       .sum
   }
   

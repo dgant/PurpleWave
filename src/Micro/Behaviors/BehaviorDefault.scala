@@ -8,46 +8,21 @@ import Utilities.EnrichPosition._
 object BehaviorDefault extends Behavior {
   
   def execute(intent: Intention) {
-  
-    if (intent.unit.selected) {
-      val putADebugBreakpointHere = true
-    }
-    
-    if (intent.unit.attackStarting || intent.unit.attackAnimationHappening) {
-      return
-    }
-    
-    val desireToFight = getDesireToFight(intent)
-    
-    if (desireToFight < 1.0) {
-      intent.destination = Some(With.geography.home)
-    }
-    
-    if (desireToFight > 0.75) {
-      val target = EvaluateTargets.best(intent, intent.targetProfile, intent.targets)
-  
-      if (intent.unit.cooldownLeft < With.game.getRemainingLatencyFrames) {
-        if (target.isDefined) {
-          return With.commander.attack(intent, target.get)
-        }
-      }
-    }
-    
-    if (intent.destination.isDefined) {
-      if (intent.targets.isEmpty &&
-        intent.unit.inPixelRadius(32 * 2).filterNot(_.isOurs).isEmpty && //Path around neutral buildings
-        intent.destination.get.distanceTile(intent.unit.tileCenter) > 12) {
-        return With.commander.move(intent, intent.destination.get.pixelCenter)
-      }
-    }
-    
-    val movementProfile = if (intent.targets.isEmpty) intent.movementProfileNormal else intent.movementProfileCombat
-    
-    val tile = EvaluatePositions.best(intent, movementProfile)
-    return With.commander.move(intent, tile.pixelCenter)
+    if (uninterruptible(intent)) return
+    debugPauseOnSelectedUnit(intent)
+    considerFleeing(intent)
+    pickTarget(intent)
+    attack(intent) || move(intent)
   }
   
-  def getDesireToFight(intent:Intention):Double = {
+  def debugPauseOnSelectedUnit(intent:Intention) = if (intent.unit.selected) {
+    val putADebugBreakpointHere = true
+  }
+  
+  def considerFleeing(intent:Intention) =  if (desireToFight(intent) < 1.0) intent.destination = Some(With.geography.home)
+  def uninterruptible(intent:Intention):Boolean = intent.unit.attackStarting || intent.unit.attackAnimationHappening
+  
+  def desireToFight(intent:Intention):Double = {
     val strengthOurs  = With.grids.friendlyStrength.get(intent.unit.tileCenter)
     val strengthEnemy = With.grids.enemyStrength.get(intent.unit.tileCenter)
     val strengthRatioOverall =
@@ -55,6 +30,23 @@ object BehaviorDefault extends Behavior {
         .map(battle => battle.us.strength / battle.enemy.strength)
         .getOrElse(1.0)
     
-    return strengthRatioOverall * strengthOurs / strengthEnemy
+    strengthRatioOverall * strengthOurs / strengthEnemy
+  }
+  
+  def pickTarget(intent:Intention) = intent.toAttack = intent.toAttack.orElse(EvaluateTargets.best(intent, intent.targetProfile, intent.targets))
+  
+  def attack(intent:Intention):Boolean = {
+    if (intent.unit.canAttackRightNow && intent.toAttack.isDefined) {
+      With.commander.attack(intent, intent.toAttack.get)
+      return true
+    }
+    false
+  }
+  
+  def move(intent:Intention):Boolean = {
+    val movementProfile = if (intent.targets.isEmpty && intent.threats.isEmpty) intent.movementProfileNormal else intent.movementProfileCombat
+    val tile = EvaluatePositions.best(intent, movementProfile)
+    With.commander.move(intent, tile.pixelCenter)
+    true
   }
 }

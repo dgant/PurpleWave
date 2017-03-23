@@ -14,11 +14,11 @@ class Configuration {
   
   var enableVisualization                   = true
   var enableVisualizationBases              = false
-  var enableVisualizationBattles            = true
+  var enableVisualizationBattles            = false
   var enableVisualizationBullets            = false
   var enableVisualizationChokepoints        = false
   var enableVisualizationEconomy            = false
-  var enableVisualizationGrids              = true
+  var enableVisualizationGrids              = false
   var enableVisualizationMovementHeuristics = true
   var enableVisualizationPerformance        = false
   var enableVisualizationPlans              = false

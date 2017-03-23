@@ -9,15 +9,17 @@ object Visualization {
       With.game.setTextSize(bwapi.Text.Size.Enum.Small)
   
       if (With.configuration.enableVisualizationVectorUnits) {
-        VisualizeBlackScreen.render("Retro Arcade Happy Vision")
+        VisualizeBlackScreen.render()
         VisualizeGeography.render()
         VisualizeVectorUnits.render()
         VisualizeBullets.render()
+        VisualizeBlackScreenOverlay.render("Retro Arcade Happy Vision")
       }
       else if (With.configuration.enableVisualizationTextOnly) {
-        VisualizeBlackScreen.render("Work-Friendly Console Vision")
+        VisualizeBlackScreen.render()
         VisualizeTextOnly.render()
         VisualizeGeography.render()
+        VisualizeBlackScreenOverlay.render("Work-Friendly Retro Console Vision")
       }
       
       if (With.configuration.enableVisualizationBattles)            VisualizeBattles              .render()

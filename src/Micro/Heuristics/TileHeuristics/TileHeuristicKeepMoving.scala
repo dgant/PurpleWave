@@ -8,7 +8,7 @@ object TileHeuristicKeepMoving extends TileHeuristic {
   
   override def evaluate(intent: Intention, candidate: TilePosition): Double = {
   
-    intent.unit.pixelDistance(candidate.pixelCenter)
+    32.0 + intent.unit.pixelDistance(candidate.pixelCenter)
     
   }
   

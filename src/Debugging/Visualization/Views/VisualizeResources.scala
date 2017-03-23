@@ -14,7 +14,8 @@ object VisualizeResources {
           (if (r.isSatisfied) "X " else "  ") ++
             (if (r.minerals > 0)  r.minerals  .toString ++ "m " else "") ++
             (if (r.gas      > 0)  r.gas       .toString ++ "g " else "") ++
-            (if (r.supply   > 0)  r.supply    .toString ++ "s " else ""))
+            (if (r.supply   > 0)  r.supply    .toString ++ "s " else "") ++
+            r.toString)
         .mkString("\n"))
   }
 }

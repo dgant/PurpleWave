@@ -22,9 +22,6 @@ class FriendlyUnitInfo(base:bwapi.Unit) extends FriendlyUnitProxy(base) {
   override def interceptors : Int = base.getInterceptorCount
   override def scarabs      : Int = base.getScarabCount
   
-  def cooldownLeft : Int      = Math.max(base.getGroundWeaponCooldown, base.getAirWeaponCooldown)
-  def onCooldown   : Boolean  = cooldownLeft > 0 || ! unitClass.canAttack
-  
   //////////////
   // Geometry //
   //////////////
@@ -41,6 +38,8 @@ class FriendlyUnitInfo(base:bwapi.Unit) extends FriendlyUnitProxy(base) {
   ////////////////
   // Visibility //
   ////////////////
+  
+  override def detected = With.grids.enemyDetection.get(tileCenter)
   
   //////////////
   // Movement //

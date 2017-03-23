@@ -4,6 +4,7 @@ import Debugging.Visualization.Rendering.DrawMap
 import Micro.Intentions.Intention
 import Planning.Composition.PositionFinders.{PositionEnemyBase, PositionFinder}
 import Planning.Composition.Property
+import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
 import Planning.Plans.Allocation.LockUnits
 import Startup.With
@@ -11,7 +12,7 @@ import Utilities.EnrichPosition._
 
 class Hunt extends Plan {
   
-  val hunters = new Property[LockUnits](new LockUnits)
+  val hunters = new Property[LockUnits](new LockUnits { unitMatcher.set(UnitMatchWarriors) })
   var position = new Property[PositionFinder](new PositionEnemyBase)
   
   override def getChildren: Iterable[Plan] = List(hunters.get)

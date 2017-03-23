@@ -9,12 +9,11 @@ object TileHeuristicEnemyAtMaxRange extends TileHeuristic {
   
   override def evaluate(intent: Intention, candidate: TilePosition): Double = {
     val us = intent.unit
-    val threats = intent.targets.filter(target => target.unitClass.groundDamage + target.unitClass.airDamage > 0)
-    val kiteableEnemies = threats.filter(isKiteable(intent.unit, _))
+    val kiteableEnemies = intent.threats.filter(isKiteable(intent.unit, _))
     
-    if (threats.isEmpty) return 1.0
+    if (intent.threats.isEmpty) return 1.0
     
-    val nearestThreat = threats.minBy(effectiveDistance(us, _))
+    val nearestThreat = intent.threats.minBy(effectiveDistance(us, _))
     
     if ( ! isKiteable(us, nearestThreat)) return 1.0
     

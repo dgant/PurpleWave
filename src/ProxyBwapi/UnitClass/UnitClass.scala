@@ -171,9 +171,7 @@ case class UnitClass(val baseType:UnitType) {
   def groundWeapon          = groundWeaponCache.get
   def asString              = asStringCache.get
   
-  //////////////////////////////////
-  // Formerly from EnrichUnitType //
-  //////////////////////////////////
+  def hypotenuse = Math.sqrt(width * width + height * height)
   
   //Don't use this for Dark Swarm -- just use a fixed set of units
   def isMelee: Boolean = groundRange <= 32 && ! isWorker
@@ -182,12 +180,8 @@ case class UnitClass(val baseType:UnitType) {
   //But Concussive is 25/50/100, not 50/75/100 !!!
   private val concussiveOrExplosive = List(DamageType.Concussive, DamageType.Explosive)
   def airDamage:Double = {
-    if (this == Protoss.Carrier) {
-      return Protoss.Interceptor.airDamage * 8
-    }
-    if (this == Terran.Bunker) {
-      return Terran.Marine.airDamage * 4
-    }
+    if (this == Protoss.Carrier)  return Protoss.Interceptor.airDamage * 8
+    if (this == Terran.Bunker)    return Terran.Marine.airDamage * 4
     val typeMultiplier = if (concussiveOrExplosive.contains(groundWeapon.damageType)) 0.75 else 1.0
     typeMultiplier *
       maxAirHits *
@@ -195,15 +189,9 @@ case class UnitClass(val baseType:UnitType) {
       airWeapon.damageAmount
   }
   def groundDamage:Double = {
-    if (this == Protoss.Carrier) {
-      return Protoss.Interceptor.groundDamage * 8
-    }
-    if (this == Protoss.Reaver) {
-      return Protoss.Scarab.groundDamage
-    }
-    if (this == Terran.Bunker) {
-      return Terran.Marine.groundDamage * 4
-    }
+    if (this == Protoss.Carrier) return Protoss.Interceptor.groundDamage * 8
+    if (this == Protoss.Reaver)  return Protoss.Scarab.groundDamage
+    if (this == Terran.Bunker)   return Terran.Marine.groundDamage * 4
     
     val typeMultiplier = if (concussiveOrExplosive.contains(groundWeapon.damageType)) 0.75 else 1.0
     typeMultiplier *

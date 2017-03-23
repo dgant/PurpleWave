@@ -14,6 +14,9 @@ abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
   val _cacheExists    = new CacheFrame[Boolean]       (() =>  base.exists)
   val _cacheSelected  = new CacheFrame[Boolean]       (() =>  base.isSelected)
   val _cacheId        = new CacheFrame[Int]           (() =>  base.getID)
+  val _cachedFlying   = new CacheFrame[Boolean]       (() =>  base.isFlying)
+  val _cachedStasised = new CacheFrame[Boolean]       (() =>  base.isStasised)
+  
   
   ///////////////////
   // Tracking info //
@@ -45,8 +48,8 @@ abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
   def attacking                 : Boolean = base.isAttacking
   def attackStarting            : Boolean = base.isStartingAttack
   def attackAnimationHappening  : Boolean = base.isAttackFrame
-  def airWeaponCooldownLeft     : Int     = base.getAirWeaponCooldown
-  def groundWeaponCooldownLeft  : Int     = base.getGroundWeaponCooldown
+  def airCooldownLeft     : Int     = base.getAirWeaponCooldown
+  def groundCooldownLeft  : Int     = base.getGroundWeaponCooldown
   
   //////////////
   // Geometry //
@@ -107,11 +110,11 @@ abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
   def angle         : Double  = base.getAngle
   def braking       : Boolean = base.isBraking
   def ensnared      : Boolean = base.isEnsnared
-  def flying        : Boolean = base.isFlying
+  def flying        : Boolean = _cachedFlying.get
   def lifted        : Boolean = base.isLifted
   def maelstrommed  : Boolean = base.isMaelstrommed
   def sieged        : Boolean = base.isSieged
-  def stasised      : Boolean = base.isStasised
+  def stasised      : Boolean = _cachedStasised.get
   def stimmed       : Boolean = base.isStimmed
   def stuck         : Boolean = base.isStuck
   def velocityX     : Double  = base.getVelocityX

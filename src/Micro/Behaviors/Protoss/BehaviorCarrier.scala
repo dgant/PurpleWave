@@ -11,7 +11,8 @@ object BehaviorCarrier extends Behavior {
     intent.movementProfileCombat = MovementProfiles.carrier
     intent.movementProfileNormal = MovementProfiles.carrier
     
-    if (intent.unit.trainingQueue.isEmpty && intent.unit.interceptors < (if(intent.targets.isEmpty) 8 else 2)) {
+    //This will be stupid if we don't have the capacity upgrade
+    if (intent.unit.trainingQueue.isEmpty && intent.unit.interceptors < 8) {
       return With.commander.buildInterceptor(intent)
     }
     

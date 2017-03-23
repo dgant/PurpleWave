@@ -37,8 +37,8 @@ abstract class UnitProxy(var base:bwapi.Unit) {
   def attacking:Boolean
   def attackStarting:Boolean
   def attackAnimationHappening:Boolean
-  def airWeaponCooldownLeft:Int
-  def groundWeaponCooldownLeft:Int
+  def airCooldownLeft:Int
+  def groundCooldownLeft:Int
   
   //////////////
   // Geometry //

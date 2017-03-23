@@ -3,13 +3,14 @@ package Planning.Plans.Army
 import Micro.Intentions.Intention
 import Planning.Composition.PositionFinders.{PositionChoke, PositionFinder}
 import Planning.Composition.Property
+import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
 import Planning.Plans.Allocation.LockUnits
 import Startup.With
 
 class Defend extends Plan {
   
-  val units = new Property[LockUnits](new LockUnits)
+  val units = new Property[LockUnits](new LockUnits { unitMatcher.set(UnitMatchWarriors) })
   val defaultPosition = new Property[PositionFinder](new PositionChoke)
   
   override def getChildren: Iterable[Plan] = List(units.get)

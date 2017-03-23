@@ -8,6 +8,7 @@ import Planning.Composition.{Property, UnitCountEverything}
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 
 class Attack extends IfThenElse {
+  
   val attackers = new Property[LockUnits](new LockUnits { unitMatcher.set(UnitMatchWarriors); unitCounter.set(UnitCountEverything)})
   
   predicate.set(new FoundEnemyBase)

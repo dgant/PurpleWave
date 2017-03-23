@@ -1,8 +1,8 @@
 package Planning.Plans.GamePlans
 
 import Macro.BuildRequests._
-import Planning.Composition.UnitMatchers.UnitMatchWarriors
-import Planning.Plans.Army.{Attack, DefendChoke}
+import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors}
+import Planning.Plans.Army.{Attack, Defend, Hunt}
 import Planning.Plans.Compound.{IfThenElse, Parallel}
 import Planning.Plans.Information.ScoutAt
 import Planning.Plans.Macro.Automatic.{BuildPylonsContinuously, TrainContinuously, TrainProbesContinuously}
@@ -132,9 +132,11 @@ class ProtossVsTerran extends Parallel {
     new TrainContinuously(Protoss.Zealot),
     new ScheduleBuildOrder { buildables.set(_carriersLate) },
     new ScoutAt(20),
+    new Hunt { hunters.get.unitMatcher.set(new UnitMatchType(Protoss.Scout)) },
+    new Hunt { hunters.get.unitMatcher.set(new UnitMatchType(Protoss.Carrier)) },
     new IfThenElse {
       predicate.set(new UnitCountAtLeast { quantity.set(6); unitMatcher.set(UnitMatchWarriors) })
-      whenFalse.set(new DefendChoke)
+      whenFalse.set(new Defend)
       whenTrue.set(new Attack)
     }
   ))

@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans
 
 import Macro.BuildRequests.{BuildRequest, RequestUnitAnotherOne, RequestUnitAtLeast, RequestUpgrade}
 import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors}
-import Planning.Plans.Army.{Attack, DefendChoke, Hunt}
+import Planning.Plans.Army.{Attack, Defend, Hunt}
 import Planning.Plans.Compound.{IfThenElse, Parallel}
 import Planning.Plans.Information.ScoutAt
 import Planning.Plans.Macro.Automatic.{BuildPylonsContinuously, TrainContinuously, TrainProbesContinuously}
@@ -82,11 +82,11 @@ class ProtossVsZerg extends Parallel {
     new ScheduleBuildOrder { buildables.set(_enoughZealots) },
     new ScheduleBuildOrder { buildables.set(_twoBase) },
     new ScoutAt(20),
+    new Hunt { hunters.get.unitMatcher.set(new UnitMatchType(Protoss.Corsair)) },
     new IfThenElse {
       predicate.set(new UnitCountAtLeast { quantity.set(8); unitMatcher.set(UnitMatchWarriors) })
-      whenFalse.set(new DefendChoke)
+      whenFalse.set(new Defend)
       whenTrue.set(new Attack)
-    },
-    new Hunt { hunters.get.unitMatcher.set(new UnitMatchType(Protoss.Corsair)) }
+    }
   ))
 }

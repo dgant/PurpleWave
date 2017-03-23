@@ -15,6 +15,8 @@ object VisualizeVectorUnits {
         unit.alive &&
         unit.possiblyStillThere &&
         (unit.complete || unit.unitClass.isBuilding))
+      .toList
+      .sortBy(_.y)
       .foreach(renderUnit)
     
     With.game.drawTextScreen(408, 4, "Candy: ")
@@ -30,7 +32,7 @@ object VisualizeVectorUnits {
     
     val verticalBonus =
       if (unit.flying) 24
-      else if (isActiveBuilding) (Math.sin(animationFrame/8) * 4).toInt
+      else if (isActiveBuilding) (Math.sin(animationFrame/8) * 6).toInt
       else 0
     
     val horizontalBonus = 0
@@ -41,39 +43,26 @@ object VisualizeVectorUnits {
     val bottom            = verticalBonus + unit.bottom
     val middle            = (left + right)/2
     val farLeft           = left    - unit.unitClass.width / 8
-    val farRight          = right   +  unit.unitClass.width / 8
+    val farRight          = right   + unit.unitClass.width / 8
     val leftPerspective   = left    //+ unit.unitClass.width / 8
     val rightPerspective  = right   //- unit.unitClass.width / 8
     val waist             = top + unit.unitClass.height / 4
     val apex              = top - unit.unitClass.height / 4
-    
-    DrawMap.line(
+  
+    drawSolidTriangle(
       new Position(farLeft, bottom),
-      new Position(middle, apex),
-      color)
-    DrawMap.line(
       new Position(farRight, bottom),
       new Position(middle, apex),
       color)
-    DrawMap.line(
+    drawSolidTriangle(
+      new Position(farLeft, bottom),
       new Position(leftPerspective, waist),
       new Position(middle, apex),
       color)
-    DrawMap.line(
+    drawSolidTriangle(
+      new Position(farRight, bottom),
       new Position(rightPerspective, waist),
       new Position(middle, apex),
-      color)
-    DrawMap.line(
-      new Position(leftPerspective, waist),
-      new Position(farLeft, bottom),
-      color)
-    DrawMap.line(
-      new Position(rightPerspective, waist),
-      new Position(farRight, bottom),
-      color)
-    DrawMap.line(
-      new Position(farLeft, bottom),
-      new Position(farRight, bottom),
       color)
     DrawMap.label(
       unit.unitClass.toString
@@ -157,6 +146,11 @@ object VisualizeVectorUnits {
     if (unit.carryingGas) {
       DrawMap.circle(unit.pixelCenter.add(-10, 0), 4, Color.Green, true)
     }
+  }
+  
+  def drawSolidTriangle(p1:Position, p2:Position, p3:Position, foreground:Color, background:Color = Color.Black) {
+    DrawMap.triangle(p1, p2, p3, background, true)
+    DrawMap.triangle(p1, p2, p3, foreground, false)
   }
 }
 

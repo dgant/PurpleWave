@@ -1,17 +1,16 @@
 package Micro.Heuristics.Targeting
 
-import Startup.With
 import Micro.Intentions.Intention
-import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.UnitInfo
+import Startup.With
 
-object Targets {
+object Threats {
   def get(intent:Intention):Set[UnitInfo] = {
     With.units.inPixelRadius(
-        intent.unit.pixelCenter,
-        32 * 15)
-      .filter(intent.unit.canAttack)
+      intent.unit.pixelCenter,
+      32 * 18)
+      .filter(_.canAttack(intent.unit))
       .filter(intent.unit.isEnemyOf)
-      .filterNot(_.unitClass == Zerg.Larva)
+      
   }
 }

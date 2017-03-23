@@ -1,6 +1,7 @@
 package Performance
 
 import Startup.With
+import Performance.Caching.CacheFrame
 
 class Latency {
   
@@ -10,6 +11,9 @@ class Latency {
   def onFrame() {
     minRemainingLatencyFrames = Math.min(minRemainingLatencyFrames, With.game.getRemainingLatencyFrames)
   }
+  
+  private val remainingFramesCache = new CacheFrame(() => With.game.getRemainingLatencyFrames)
+  def framesRemaining:Int = remainingFramesCache.get
   
   def turnSize:Int = {
     //This doesn't accurately track changes to latency settings during the game.

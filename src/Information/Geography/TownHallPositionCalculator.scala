@@ -23,7 +23,7 @@ object TownHallPositionCalculator {
   }
   
   private def resourcePatches = {
-    With.units.neutral.filter(_.initialResources > 0)
+    With.units.neutral.filter(unit => unit.unitClass.isGas || unit.unitClass.isMinerals && unit.initialResources > 0)
   }
   
   private def bestTownHallTile(resources:Iterable[ForeignUnitInfo]):Option[TilePosition] = {

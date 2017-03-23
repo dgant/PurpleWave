@@ -14,7 +14,7 @@ class Architect {
     buildingType: UnitClass,
     center:       TilePosition,
     margin:       Integer = 0,
-    searchRadius: Integer = 20,
+    searchRadius: Integer = 40,
     exclusions:   Iterable[TileRectangle] = List.empty)
       :Option[TilePosition] = {
   

@@ -8,7 +8,7 @@ object TileHeuristicRandom extends TileHeuristic {
   
   override def evaluate(intent: Intention, candidate: TilePosition): Double = {
   
-    RandomState.random.nextDouble
+    1.0 + RandomState.random.nextDouble
     
   }
   

@@ -8,7 +8,7 @@ object MovementProfiles {
     preferTravel      = 0.5,
     preferSpot        = 0.5,
     preferSitAtRange  = 2,
-    preferMobility    = 0.5,
+    preferMobility    = 0.75,
     preferHighGround  = 0.5,
     preferGrouping    = 0.25,
     preferRandom      = 0.05,
@@ -19,8 +19,8 @@ object MovementProfiles {
     preferTravel      = 1,
     preferSpot        = 1,
     preferHighGround  = 0.25,
-    preferRandom      = 0.25,
-    preferMoving      = 0.1,
+    preferRandom      = 0.5,
+    preferMoving      = 0.25,
     avoidTraffic      = 2)
   
   val worker = new MovementProfile (

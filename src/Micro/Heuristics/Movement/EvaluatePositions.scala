@@ -9,7 +9,7 @@ import bwapi.TilePosition
 
 object EvaluatePositions {
   
-  def best(intent:Intention, profile:MovementProfile, searchRange:Int = 4):TilePosition = {
+  def best(intent:Intention, profile:MovementProfile, searchRange:Int = 3):TilePosition = {
     
     With.movementHeuristicViews.reset(intent.unit)
     

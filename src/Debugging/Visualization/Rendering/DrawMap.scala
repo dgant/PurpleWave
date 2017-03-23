@@ -103,9 +103,8 @@ object DrawMap {
   }
   
   def polygonPositions(points:Iterable[Position], color:bwapi.Color = bwapi.Color.Brown) {
-    if (irrelevant(points)) return
-    points.reduce((p1, p2) => { With.game.drawLineMap(p1, p2, color); p2 })
-    With.game.drawLineMap(points.head, points.last, color)
+    points.reduce((p1, p2) => { line(p1, p2, color); p2 })
+    line(points.head, points.last, color)
   }
   
   def playerColor(player:Player):Color = {

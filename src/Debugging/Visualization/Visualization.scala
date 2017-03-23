@@ -10,8 +10,8 @@ object Visualization {
   
       if (With.configuration.enableVisualizationVectorUnits) {
         VisualizeBlackScreen.render("Retro Arcade Happy Vision")
-        VisualizeVectorUnits.render()
         VisualizeGeography.render()
+        VisualizeVectorUnits.render()
         VisualizeBullets.render()
       }
       else if (With.configuration.enableVisualizationTextOnly) {

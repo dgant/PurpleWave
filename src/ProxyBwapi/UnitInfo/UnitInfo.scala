@@ -72,15 +72,10 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
       .filter(pixelsFromEdge(_) <= unitClass.maxAirGroundRange)
       .filter(isEnemyOf)
   
-  def impactsCombat: Boolean =
-    alive &&
-    complete &&
-    ! stasised &&
-    ! maelstrommed &&
-    ! underDisruptionWeb &&
-     (unitClass.canAttack ||
-      unitClass.isSpellcaster ||
-       Set(Terran.Bunker, Protoss.ShieldBattery).contains(unitClass))
+  def canDoAnything:Boolean = alive && complete && ! stasised && ! maelstrommed //And lockdown
+  def canAttack:Boolean = canDoAnything && unitClass.canAttack
+  def canAttack(otherUnit:UnitInfo):Boolean = canAttack && (if (otherUnit.flying) unitClass.attacksAir else unitClass.attacksGround)
+  def impactsCombat: Boolean = canDoAnything && (canAttack || unitClass.isSpellcaster || Set(Terran.Bunker, Terran.Medic).contains(unitClass))
   
   def requiredAttackDelay: Int = {
     // The question:

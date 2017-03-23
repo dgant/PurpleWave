@@ -14,12 +14,12 @@ class Configuration {
   
   var enableVisualization                   = true
   var enableVisualizationBases              = false
-  var enableVisualizationBattles            = false
+  var enableVisualizationBattles            = true
   var enableVisualizationBullets            = false
   var enableVisualizationChokepoints        = false
   var enableVisualizationEconomy            = false
-  var enableVisualizationGrids              = false
-  var enableVisualizationMovementHeuristics = false
+  var enableVisualizationGrids              = true
+  var enableVisualizationMovementHeuristics = true
   var enableVisualizationPerformance        = false
   var enableVisualizationPlans              = false
   var enableVisualizationResources          = false
@@ -28,7 +28,7 @@ class Configuration {
   var enableVisualizationTextOnly           = false
   var enableVisualizationUnitsForeign       = false
   var enableVisualizationUnitsOurs          = false
-  var enableVisualizationVectorUnits        = true
+  var enableVisualizationVectorUnits        = false
   var enableVisualizationZones              = false
   
   var enableGoonStopProtection          = true

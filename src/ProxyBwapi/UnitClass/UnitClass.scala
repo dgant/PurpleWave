@@ -175,11 +175,11 @@ case class UnitClass(val baseType:UnitType) {
   // Formerly from EnrichUnitType //
   //////////////////////////////////
   
-  def isMelee: Boolean = groundRange <= 32
+  //Don't use this for Dark Swarm -- just use a fixed set of units
+  def isMelee: Boolean = groundRange <= 32 && ! isWorker
   
   //TODO: Explosive is 50/75/100
   //But Concussive is 25/50/100, not 50/75/100 !!!
-  
   private val concussiveOrExplosive = List(DamageType.Concussive, DamageType.Explosive)
   def airDamage:Double = {
     if (this == Protoss.Carrier) {

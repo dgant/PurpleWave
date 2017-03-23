@@ -51,7 +51,18 @@ class PositionSimpleBuilding(val buildingType:UnitClass) extends PositionFinder 
         With.units.all.filter(_.unitClass.isBuilding).forall( ! _.tileArea.intersects(rectangle))
       })
   
-    if (candidates.isEmpty) None else Some(candidates.minBy(With.paths.groundPixels(_, With.geography.home)))
+    if (candidates.isEmpty) return None
+      Some(candidates.minBy(candidate =>
+        With.geography.zones
+          .filter(_.owner == With.self)
+          .map(zone => With.paths.groundPixels(zone.centroid, candidate))
+          .sum
+        -
+        With.geography.zones
+          .filter(zone => With.enemies.contains(zone.owner))
+          .map(zone => With.paths.groundPixels(zone.centroid, candidate))
+          .sum
+      ))
   }
   
   private def positionBuilding:Option[TilePosition] = {

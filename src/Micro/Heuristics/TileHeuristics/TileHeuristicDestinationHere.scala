@@ -12,10 +12,9 @@ object TileHeuristicDestinationHere extends TileHeuristic {
     val before = intent.unit.travelPixels(intent.unit.tileCenter,  intent.destination.get)
     val after  = intent.unit.travelPixels(candidate,               intent.destination.get)
   
-    if (before < 32 * 1 || after < 32 * 1) {
-      return 1.0
-    }
-    
+    val threshold = 32.0 * 1.0
+    if (before < threshold || after < threshold) return 1.0
+  
     return before/after
   }
   

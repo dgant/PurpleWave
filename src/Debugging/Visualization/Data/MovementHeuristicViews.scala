@@ -27,7 +27,7 @@ class MovementHeuristicViews {
   def get:Iterable[ListBuffer[MovementHeuristicView]] = viewsByUnitId.values
   
   def cleanup() = {
-    viewsByUnitId.keys.filterNot(With.units.alive).foreach(viewsByUnitId.remove)
+    viewsByUnitId.keys.filterNot(id => With.units.getId(id).exists(_.selected)).foreach(viewsByUnitId.remove)
   }
   
   def enabled:Boolean = With.configuration.enableVisualization && With.configuration.enableVisualizationMovementHeuristics

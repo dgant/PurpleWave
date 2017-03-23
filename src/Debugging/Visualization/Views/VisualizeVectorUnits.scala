@@ -81,7 +81,9 @@ object VisualizeVectorUnits {
         .replaceAll("Mineral", "Candy")
         .replaceAll("Assimilator", "Soda Assimilator")
         .replaceAll("Extractor", "Soda Extractor")
-        .replaceAll("Refinery", "Soda Refinery"),
+        .replaceAll("Refinery", "Soda Refinery")
+        .replaceAll("Critter Rhynadon", "Snuggles the Rhino")
+        .replaceAll("Critter Ursadon", "Cupcake Cuddlemonster"),
       new Position(middle, bottom + 9))
 
     val eyeLeft         = middle  + unit.unitClass.width  / 5

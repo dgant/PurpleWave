@@ -175,7 +175,6 @@ case class UnitClass(val baseType:UnitType) {
   // Formerly from EnrichUnitType //
   //////////////////////////////////
   
-  
   def isMelee: Boolean = groundRange <= 32
   
   //TODO: Explosive is 50/75/100

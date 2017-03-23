@@ -14,6 +14,7 @@ class Grids {
   val enemyDetection = new GridEnemyDetection
   val enemyStrength = new GridEnemyStrength
   val enemyVision = new GridEnemyVision
+  val friendlyVision = new GridFriendlyVision
   val friendlyStrength = new GridFriendlyStrength
   val mobility = new GridMobility
   val units = new GridUnits
@@ -33,6 +34,7 @@ class Grids {
       enemyStrength,
       enemyVision,
       friendlyStrength,
+      friendlyVision,
       buildable,
       buildableTerrain,
       walkable,

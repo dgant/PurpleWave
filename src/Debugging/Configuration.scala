@@ -12,24 +12,24 @@ class Configuration {
   var cameraDynamicSpeedSlowest         = 30
   var cameraDynamicSpeedFastest         = 0
   
-  var enableVisualization               = true
-  var enableVisualizationBases          = false
-  var enableVisualizationBattles        = false
-  var enableVisualizationBullets        = false
-  var enableVisualizationChokepoints    = false
-  var enableVisualizationEconomy        = false
-  var enableVisualizationGrids          = false
-  var enableVisualizationMovementHeuristics = true
-  var enableVisualizationPerformance    = false
-  var enableVisualizationPlans          = false
-  var enableVisualizationResources      = false
-  var enableVisualizationScheduler      = false
-  var enableVisualizationGeography      = false
-  var enableVisualizationTextOnly       = false
-  var enableVisualizationUnitsForeign   = false
-  var enableVisualizationUnitsOurs      = false
-  var enableVisualizationVectorUnits    = false
-  var enableVisualizationZones          = false
+  var enableVisualization                   = true
+  var enableVisualizationBases              = false
+  var enableVisualizationBattles            = false
+  var enableVisualizationBullets            = false
+  var enableVisualizationChokepoints        = false
+  var enableVisualizationEconomy            = false
+  var enableVisualizationGrids              = false
+  var enableVisualizationMovementHeuristics = false
+  var enableVisualizationPerformance        = false
+  var enableVisualizationPlans              = false
+  var enableVisualizationResources          = false
+  var enableVisualizationScheduler          = false
+  var enableVisualizationGeography          = false
+  var enableVisualizationTextOnly           = false
+  var enableVisualizationUnitsForeign       = false
+  var enableVisualizationUnitsOurs          = false
+  var enableVisualizationVectorUnits        = true
+  var enableVisualizationZones              = false
   
   var enableGoonStopProtection          = true
 }

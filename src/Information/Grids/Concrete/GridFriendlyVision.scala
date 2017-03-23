@@ -4,7 +4,7 @@ import Information.Grids.Abstract.GridVision
 import ProxyBwapi.UnitInfo.UnitInfo
 import Startup.With
 
-class GridEnemyVision extends GridVision {
+class GridFriendlyVision extends GridVision {
   
-  override def units: Iterable[UnitInfo] = With.units.enemy
+  override def units: Iterable[UnitInfo] = With.units.ours
 }

@@ -7,7 +7,8 @@ import bwapi.Color
 object VisualizeBlackScreen {
   
   def render(visionLabel:String) {
-    With.game.drawBoxScreen(0, 0, 1500, 1200, Color.Grey, true)
+    With.game.drawBoxScreen(0, 0, 1500, 1200, Color.Black, true)
+    //With.grids.friendlyVision.tiles
   
     With.game.setTextSize(bwapi.Text.Size.Enum.Large)
     With.game.drawBoxScreen   (5,      5,      5 + 20, 5 + 20,        DrawMap.playerColor(With.self),       true)

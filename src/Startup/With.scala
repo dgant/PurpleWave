@@ -1,6 +1,6 @@
 package Startup
 
-import Debugging.Visualization.Data.MovementHeuristicViews
+import Debugging.Visualization.Data.{MovementHeuristicViews, Viewport}
 import Debugging.{AutoCamera, Configuration, Logger, Performance}
 import Information.Geography.Geography
 import Information.Grids.Grids
@@ -38,6 +38,7 @@ object With {
   var scheduler:Scheduler = null
   var movementHeuristicViews:MovementHeuristicViews = null
   var units: UnitTracker = null
+  var viewport: Viewport = null
   var zoner: Zoner = null
   
   var self:Player = null

@@ -48,7 +48,7 @@ object VisualizeMovementHeuristics {
     
     val relativeScale = (ourScale - 1.0) / (maxScale - 1.0)
     val minRadius = Math.min(4.0, relativeScale)
-    val radiusMultiplier = Math.min(11.0, 11.0 * relativeScale) / views.map(_.evaluation).max
+    val radiusMultiplier = Math.min(11.0, 11.0 * relativeScale / views.map(view => normalize(view.evaluation)).max)
     
     views.foreach(view => {
       
@@ -62,7 +62,7 @@ object VisualizeMovementHeuristics {
       // Boolean spread: Max 6.0, min 0.0
       // Tiny spread: Max < 6.0, min 0.0
       val center = view.candidate.pixelCenter.add(offsetX, offsetY)
-      val radius = minRadius + radiusMultiplier * view.evaluation
+      val radius = minRadius + radiusMultiplier * normalize(view.evaluation)
       if (radius > 1.0) {
         DrawMap.circle(center, radius.toInt, view.heuristic.color)
       }

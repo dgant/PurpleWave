@@ -1,6 +1,6 @@
 package Startup
 
-import Debugging.Visualization.Data.MovementHeuristicViews
+import Debugging.Visualization.Data.{MovementHeuristicViews, Viewport}
 import Debugging.{Visualization, _}
 import Information.Geography.Geography
 import Information.Grids.Grids
@@ -58,6 +58,7 @@ class Bot() extends DefaultBWListener {
       With.scheduler              = new Scheduler
       With.movementHeuristicViews = new MovementHeuristicViews
       With.units                  = new UnitTracker
+      With.viewport               = new Viewport
       With.zoner                  = new Zoner
 
       With.game.enableFlag(1)

@@ -27,51 +27,81 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="VisualizeMovementHeuristics.scala" pinned="false" current-in-tab="false">
+      <file leaf-file-name="VisualizeMovementHeuristics.scala" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Debugging/Visualization/Views/VisualizeMovementHeuristics.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="239">
-              <caret line="36" column="23" lean-forward="false" selection-start-line="36" selection-start-column="23" selection-end-line="36" selection-end-column="23" />
+            <state relative-caret-position="213">
+              <caret line="51" column="4" lean-forward="true" selection-start-line="51" selection-start-column="4" selection-end-line="51" selection-end-column="4" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Targets.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Micro/Heuristics/Targeting/Targets.scala">
+      <file leaf-file-name="DrawMap.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Debugging/Visualization/Rendering/DrawMap.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="117">
-              <caret line="9" column="36" lean-forward="true" selection-start-line="9" selection-start-column="36" selection-end-line="9" selection-end-column="36" />
+            <state relative-caret-position="213">
+              <caret line="126" column="3" lean-forward="false" selection-start-line="126" selection-start-column="3" selection-end-line="126" selection-end-column="3" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MovementProfile.scala" pinned="false" current-in-tab="true">
+      <file leaf-file-name="With.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Startup/With.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="261">
+              <caret line="40" column="31" lean-forward="false" selection-start-line="40" selection-start-column="31" selection-end-line="40" selection-end-column="31" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Bot.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Startup/Bot.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="247">
+              <caret line="60" column="48" lean-forward="false" selection-start-line="60" selection-start-column="48" selection-end-line="60" selection-end-column="48" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Viewport.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Debugging/Visualization/Data/Viewport.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="91">
+              <caret line="7" column="0" lean-forward="true" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="TileHeuristicDestinationNearby.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Micro/Heuristics/TileHeuristics/TileHeuristicDestinationNearby.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="143">
+              <caret line="11" column="72" lean-forward="false" selection-start-line="11" selection-start-column="72" selection-end-line="11" selection-end-column="72" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MovementHeuristicViews.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Debugging/Visualization/Data/MovementHeuristicViews.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="260">
+              <caret line="26" column="9" lean-forward="false" selection-start-line="26" selection-start-column="6" selection-end-line="26" selection-end-column="9" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MovementProfile.scala" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Micro/Heuristics/Movement/MovementProfile.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="166">
-              <caret line="28" column="19" lean-forward="false" selection-start-line="28" selection-start-column="19" selection-end-line="28" selection-end-column="19" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="WeightedMovementHeuristic.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Micro/Heuristics/Movement/WeightedMovementHeuristic.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="234">
-              <caret line="18" column="35" lean-forward="false" selection-start-line="18" selection-start-column="35" selection-end-line="18" selection-end-column="35" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="TileHeuristicEnemyAtMaxRange.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Micro/Heuristics/TileHeuristics/TileHeuristicEnemyAtMaxRange.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="166">
-              <caret line="14" column="35" lean-forward="true" selection-start-line="14" selection-start-column="35" selection-end-line="14" selection-end-column="35" />
+            <state relative-caret-position="179">
+              <caret line="29" column="54" lean-forward="false" selection-start-line="29" selection-start-column="54" selection-end-line="29" selection-end-column="54" />
               <folding />
             </state>
           </provider>
@@ -80,18 +110,18 @@
       <file leaf-file-name="EvaluatePositions.scala" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Micro/Heuristics/Movement/EvaluatePositions.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="226">
-              <caret line="36" column="4" lean-forward="true" selection-start-line="36" selection-start-column="4" selection-end-line="36" selection-end-column="4" />
+            <state relative-caret-position="174">
+              <caret line="32" column="8" lean-forward="false" selection-start-line="32" selection-start-column="8" selection-end-line="32" selection-end-column="8" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MovementProfiles.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Micro/Behaviors/MovementProfiles.scala">
+      <file leaf-file-name="FriendlyUnitProxy.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/UnitInfo/FriendlyUnitProxy.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="247">
-              <caret line="22" column="28" lean-forward="false" selection-start-line="22" selection-start-column="28" selection-end-line="22" selection-end-column="28" />
+            <state relative-caret-position="200">
+              <caret line="130" column="38" lean-forward="false" selection-start-line="130" selection-start-column="38" selection-end-line="130" selection-end-column="38" />
               <folding />
             </state>
           </provider>
@@ -137,10 +167,10 @@
       <find>Bunker</find>
       <find>Scarab</find>
       <find>Left</find>
-      <find>selected</find>
       <find>selece</find>
       <find>Ghost</find>
       <find>Found ghost units</find>
+      <find>selected</find>
     </findStrings>
     <replaceStrings>
       <replace>Walk</replace>
@@ -182,8 +212,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/Micro/Movement/Heuristics/TileHeuristics/TileHeuristicRandom.scala" />
-        <option value="$PROJECT_DIR$/src/Micro/Movement/Heuristics/TileHeuristics/TileHeuristicHighGround.scala" />
         <option value="$PROJECT_DIR$/src/Micro/Movement/Heuristics/TileHeuristics/TileHeuristicMobility.scala" />
         <option value="$PROJECT_DIR$/src/Micro/Movement/Heuristics/TileHeuristics/TileHeuristicRegrouping.scala" />
         <option value="$PROJECT_DIR$/src/Micro/Movement/Heuristics/TileHeuristics/TileHeuristicKeepMoving.scala" />
@@ -211,14 +239,11 @@
         <option value="$PROJECT_DIR$/src/Debugging/Visualization/Data/TileHeuristicView.scala" />
         <option value="$PROJECT_DIR$/src/Debugging/Visualization/Data/TileHeuristics.scala" />
         <option value="$PROJECT_DIR$/src/Debugging/Visualization/Data/TileHeuristicViews.scala" />
-        <option value="$PROJECT_DIR$/src/Startup/With.scala" />
-        <option value="$PROJECT_DIR$/src/Startup/Bot.scala" />
         <option value="$PROJECT_DIR$/src/Micro/Heuristics/Movement/WeightedTileHeuristic.scala" />
         <option value="$PROJECT_DIR$/src/Debugging/Visualization/Visualization.scala" />
         <option value="$PROJECT_DIR$/src/Debugging/Visualization/Views/VisualizeTileHeuristics.scala" />
         <option value="$PROJECT_DIR$/src/Micro/Heuristics/TileHeuristics/TileHeuristicTraffic.scala" />
         <option value="$PROJECT_DIR$/src/ProxyBwapi/UnitInfo/UnitInfo.scala" />
-        <option value="$PROJECT_DIR$/src/Debugging/Visualization/Rendering/DrawMap.scala" />
         <option value="$PROJECT_DIR$/src/ProxyBwapi/UnitTracking/UnitTracker.scala" />
         <option value="$PROJECT_DIR$/src/Micro/Heuristics/Movement/WeightedMovementHeuristic.scala" />
         <option value="$PROJECT_DIR$/src/Micro/Heuristics/Movement/MovementProfile.scala" />
@@ -232,6 +257,11 @@
         <option value="$PROJECT_DIR$/src/Micro/Heuristics/HeuristicMath.scala" />
         <option value="$PROJECT_DIR$/src/Micro/Behaviors/MovementProfiles.scala" />
         <option value="$PROJECT_DIR$/src/Micro/Heuristics/Movement/EvaluatePositions.scala" />
+        <option value="$PROJECT_DIR$/src/Micro/Heuristics/TileHeuristics/TileHeuristicDestinationNearby.scala" />
+        <option value="$PROJECT_DIR$/src/Debugging/Visualization/Data/Viewport.scala" />
+        <option value="$PROJECT_DIR$/src/Startup/With.scala" />
+        <option value="$PROJECT_DIR$/src/Startup/Bot.scala" />
+        <option value="$PROJECT_DIR$/src/Debugging/Visualization/Rendering/DrawMap.scala" />
         <option value="$PROJECT_DIR$/src/Debugging/Visualization/Views/VisualizeMovementHeuristics.scala" />
       </list>
     </option>
@@ -652,7 +682,7 @@
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3406433" sideWeight="0.49411765" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.47076023" sideWeight="0.49117646" order="13" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.47076023" sideWeight="0.49117646" order="13" side_tool="false" content_ui="tabs" />
       <window_info id="Debug with VisualVM" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32748538" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -672,31 +702,31 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="scala-line">
           <url>file://$PROJECT_DIR$/src/Startup/Bot.scala</url>
-          <line>148</line>
+          <line>149</line>
           <properties />
           <option name="timeStamp" value="670" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="scala-line">
           <url>file://$PROJECT_DIR$/src/Startup/Bot.scala</url>
-          <line>117</line>
+          <line>118</line>
           <properties />
           <option name="timeStamp" value="1007" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="scala-line">
           <url>file://$PROJECT_DIR$/src/Startup/Bot.scala</url>
-          <line>127</line>
+          <line>128</line>
           <properties />
           <option name="timeStamp" value="1008" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="scala-line">
           <url>file://$PROJECT_DIR$/src/Startup/Bot.scala</url>
-          <line>136</line>
+          <line>137</line>
           <properties />
           <option name="timeStamp" value="1009" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="scala-line">
           <url>file://$PROJECT_DIR$/src/Startup/Bot.scala</url>
-          <line>107</line>
+          <line>108</line>
           <properties />
           <option name="timeStamp" value="1219" />
         </line-breakpoint>
@@ -708,7 +738,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="scala-line">
           <url>file://$PROJECT_DIR$/src/Startup/Bot.scala</url>
-          <line>69</line>
+          <line>70</line>
           <properties />
           <option name="timeStamp" value="1282" />
         </line-breakpoint>
@@ -718,11 +748,17 @@
           <properties />
           <option name="timeStamp" value="1290" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="scala-line">
+          <url>file://$PROJECT_DIR$/src/Debugging/Visualization/Rendering/DrawMap.scala</url>
+          <line>45</line>
+          <properties />
+          <option name="timeStamp" value="1444" />
+        </line-breakpoint>
       </breakpoints>
       <breakpoints-dialog>
         <breakpoints-dialog />
       </breakpoints-dialog>
-      <option name="time" value="1436" />
+      <option name="time" value="1447" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="Application">
@@ -732,22 +768,6 @@
     </watches-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/Planning/Plans/Army/Defend.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="164">
-          <caret line="23" column="71" lean-forward="true" selection-start-line="23" selection-start-column="71" selection-end-line="23" selection-end-column="71" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Micro/Behaviors/BehaviorDefault.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="13">
-          <caret line="1" column="0" lean-forward="false" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Micro/Commander.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="103">
@@ -776,14 +796,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="173">
           <caret line="20" column="23" lean-forward="false" selection-start-line="20" selection-start-column="23" selection-end-line="20" selection-end-column="23" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/UnitInfo/FriendlyUnitInfo.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="117">
-          <caret line="9" column="27" lean-forward="false" selection-start-line="9" selection-start-column="27" selection-end-line="9" selection-end-column="27" />
           <folding />
         </state>
       </provider>
@@ -924,14 +936,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Startup/With.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="325">
-          <caret line="38" column="51" lean-forward="false" selection-start-line="38" selection-start-column="29" selection-end-line="38" selection-end-column="51" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$PROJECT_DIR$/lib/bwmirror_v2_5.jar!/bwapi/Game.class">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="137">
@@ -956,14 +960,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Debugging/Visualization/Rendering/DrawMap.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="65">
-          <caret line="103" column="3" lean-forward="true" selection-start-line="103" selection-start-column="3" selection-end-line="103" selection-end-column="3" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$PROJECT_DIR$/lib/bwmirror_v2_5.jar!/bwapi/Unit.class">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="137">
@@ -972,26 +968,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/UnitInfo/FriendlyUnitProxy.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="137">
-          <caret line="109" column="32" lean-forward="false" selection-start-line="109" selection-start-column="32" selection-end-line="109" selection-end-column="32" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Micro/Heuristics/TileHeuristics/TileHeuristicTraffic.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="39">
           <caret line="3" column="19" lean-forward="true" selection-start-line="3" selection-start-column="19" selection-end-line="3" selection-end-column="19" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Startup/Bot.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="137">
-          <caret line="100" column="6" lean-forward="false" selection-start-line="100" selection-start-column="6" selection-end-line="100" selection-end-column="6" />
           <folding />
         </state>
       </provider>
@@ -1016,14 +996,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Debugging/Visualization/Data/MovementHeuristicViews.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="230">
-          <caret line="26" column="29" lean-forward="false" selection-start-line="26" selection-start-column="29" selection-end-line="26" selection-end-column="29" />
           <folding />
         </state>
       </provider>
@@ -1116,26 +1088,90 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Micro/Heuristics/Movement/EvaluatePositions.scala">
+    <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/UnitInfo/FriendlyUnitInfo.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="226">
-          <caret line="36" column="4" lean-forward="true" selection-start-line="36" selection-start-column="4" selection-end-line="36" selection-end-column="4" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Debugging/Visualization/Views/VisualizeMovementHeuristics.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="239">
-          <caret line="36" column="23" lean-forward="false" selection-start-line="36" selection-start-column="23" selection-end-line="36" selection-end-column="23" />
+        <state relative-caret-position="117">
+          <caret line="9" column="53" lean-forward="false" selection-start-line="9" selection-start-column="53" selection-end-line="9" selection-end-column="53" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Micro/Heuristics/Movement/MovementProfile.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="166">
-          <caret line="28" column="19" lean-forward="false" selection-start-line="28" selection-start-column="19" selection-end-line="28" selection-end-column="19" />
+        <state relative-caret-position="179">
+          <caret line="29" column="54" lean-forward="false" selection-start-line="29" selection-start-column="54" selection-end-line="29" selection-end-column="54" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/UnitInfo/FriendlyUnitProxy.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="200">
+          <caret line="130" column="38" lean-forward="false" selection-start-line="130" selection-start-column="38" selection-end-line="130" selection-end-column="38" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Debugging/Visualization/Data/MovementHeuristicViews.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="260">
+          <caret line="26" column="9" lean-forward="false" selection-start-line="26" selection-start-column="6" selection-end-line="26" selection-end-column="9" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Micro/Heuristics/TileHeuristics/TileHeuristicDestinationNearby.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="143">
+          <caret line="11" column="72" lean-forward="false" selection-start-line="11" selection-start-column="72" selection-end-line="11" selection-end-column="72" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Micro/Heuristics/Movement/EvaluatePositions.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="174">
+          <caret line="32" column="8" lean-forward="false" selection-start-line="32" selection-start-column="8" selection-end-line="32" selection-end-column="8" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Debugging/Visualization/Data/Viewport.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="91">
+          <caret line="7" column="0" lean-forward="true" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Startup/With.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="261">
+          <caret line="40" column="31" lean-forward="false" selection-start-line="40" selection-start-column="31" selection-end-line="40" selection-end-column="31" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Startup/Bot.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="247">
+          <caret line="60" column="48" lean-forward="false" selection-start-line="60" selection-start-column="48" selection-end-line="60" selection-end-column="48" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Debugging/Visualization/Rendering/DrawMap.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="213">
+          <caret line="126" column="3" lean-forward="false" selection-start-line="126" selection-start-column="3" selection-end-line="126" selection-end-column="3" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Debugging/Visualization/Views/VisualizeMovementHeuristics.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="213">
+          <caret line="51" column="4" lean-forward="true" selection-start-line="51" selection-start-column="4" selection-end-line="51" selection-end-column="4" />
           <folding />
         </state>
       </provider>

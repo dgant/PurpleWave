@@ -1,7 +1,6 @@
 package Debugging.Visualization.Rendering
 
 import Geometry.TileRectangle
-import Performance.Caching.CacheFrame
 import Startup.With
 import Utilities.EnrichPosition._
 import bwapi.{Color, Player, Position}
@@ -121,17 +120,9 @@ object DrawMap {
   def irrelevant(point:Position):Boolean = {
     val buffer = 32 * 4
     ! point.valid ||
-    point.getX < viewportStart.getX - buffer ||
-    point.getX > viewportEnd.getX   + buffer ||
-    point.getY < viewportStart.getY - buffer ||
-    point.getY > viewportEnd.getY   + buffer
+    point.getX < With.viewport.start  .getX - buffer ||
+    point.getX > With.viewport.end    .getX + buffer ||
+    point.getY < With.viewport.start  .getY - buffer ||
+    point.getY > With.viewport.end    .getY + buffer
   }
-
-  //TODO: This shouldn't live in a singleton!
-  def viewportStart:Position = viewportStartCache.get
-  def viewportEnd:Position = viewportEndCache.get
-  private val viewportStartCache = new CacheFrame[Position](() => viewportStartRecalculate)
-  private val viewportEndCache = new CacheFrame[Position](() => viewportEndRecalculate)
-  private def viewportStartRecalculate:Position = With.game.getScreenPosition
-  private def viewportEndRecalculate:Position   = With.game.getScreenPosition.add(2*640, 2*480)
 }

@@ -1,5 +1,6 @@
 package ProxyBwapi.UnitInfo
 
+import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
 import Startup.With
 import bwapi._
@@ -14,14 +15,22 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
   
   def update(unit:bwapi.Unit) {
     base = unit
-    updateTracking()
-    updateHealth()
-    updateCombat()
-    updateGeometry()
-    updateMovement()
-    updateOrders()
-    updateVisibility()
-    updateStatuses()
+    
+    if (unitClass == Terran.SpiderMine) {
+      //Speculative performance optimization.
+      updateTracking()
+      _hitPoints = base.getHitPoints
+      _pixelCenter = base.getPosition
+    } else {
+      updateTracking()
+      updateHealth()
+      updateCombat()
+      updateGeometry()
+      updateMovement()
+      updateOrders()
+      updateVisibility()
+      updateStatuses()
+    }
   }
   
   ///////////////////

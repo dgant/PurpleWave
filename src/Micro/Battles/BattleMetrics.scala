@@ -19,7 +19,7 @@ object BattleMetrics {
   
   def contextualDesire(battle:Battle):Double = {
     var desire = 1.0
-    val zone = With.geography.zones.filter(_.region.getPolygon.isInside(battle.enemy.vanguard))
+    val zone = With.geography.zones.filter(_.bwtaRegion.getPolygon.isInside(battle.enemy.vanguard))
     
     if (zone.exists(_.owner == With.self)) desire *= 2
     

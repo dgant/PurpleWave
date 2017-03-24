@@ -8,7 +8,7 @@ import Startup.With
 import Utilities.EnrichPosition._
 import bwapi.TilePosition
 
-object TownHallPositionCalculator {
+object CalculateBasePositions {
   
   def calculate:List[TilePosition] = {
     clusteredResourcePatches.flatMap(bestTownHallTile).toList
@@ -36,9 +36,7 @@ object TownHallPositionCalculator {
   }
   
   private def isLegalTownHallTile(candidate:TilePosition):Boolean = {
-  
     val buildingArea = Protoss.Nexus.tileArea.add(candidate)
-    
     val exclusions =
       resourcePatches
         .map(resourcePatch => new TileRectangle(

@@ -27,8 +27,9 @@ class Bases {
   }
   
   private def updateTownHall(base: Base) {
-    val townHall = With.units.buildings.filter(_.unitClass.isTownHall)
-      .filter(townHall => base.zone.region.getPolygon.isInside(townHall.pixelCenter))
+    val townHall = With.units.buildings
+      .filter(_.unitClass.isTownHall)
+      .filter(townHall => base.zone.contains(townHall.pixelCenter))
       .toList
       .sortBy(_.tileDistance(base.townHallArea.midpoint))
       .headOption
@@ -36,8 +37,12 @@ class Bases {
     base.zone.owner = townHall.map(_.player).getOrElse(With.game.neutral)
   }
   
-  private def updateMinerals(base: Base) {
-    
+  private def updateResources(base: Base) {
+    base.minerals = base.mineralUnits.filter(_.alive).map(_.mineralsLeft).sum
+    base.gas      = With.units.all
+      .filter(unit => unit.unitClass.isGas && base.zone.contains(unit.pixelCenter))
+      .map(_.gasLeft)
+      .sum
   }
   
 }

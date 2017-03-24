@@ -3,6 +3,7 @@ package Micro.Battles
 import ProxyBwapi.UnitInfo.UnitInfo
 import Geometry.Clustering
 import Performance.Caching.Limiter
+import ProxyBwapi.Races.{Protoss, Terran}
 import Startup.With
 import Utilities.EnrichPosition._
 
@@ -50,7 +51,12 @@ class Battles {
   }
   
   private def getFighters(units:Iterable[UnitInfo]):Iterable[UnitInfo] = {
-    units.filter(u => u.possiblyStillThere && u.alive && u.helpsInCombat)
+    units.filter(u => u.possiblyStillThere
+      && u.alive
+      && u.helpsInCombat
+      && u.unitClass != Terran.SpiderMine
+      && u.unitClass != Protoss.Interceptor
+      && u.unitClass != Protoss.Scarab)
   }
   
   private def assignBattles(

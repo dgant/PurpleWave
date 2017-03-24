@@ -9,7 +9,11 @@ import bwapi.TilePosition
 
 object EvaluatePositions {
   
-  def best(intent:Intention, profile:MovementProfile, searchRange:Int = 3):TilePosition = {
+  def best(
+    intent:Intention,
+    profile:MovementProfile,
+    searchRange:Int = 3)
+      :TilePosition = {
     
     With.movementHeuristicViews.reset(intent.unit)
     
@@ -20,7 +24,7 @@ object EvaluatePositions {
         .filter(intent.unit.canTraverse)
   
     if (candidates.isEmpty) {
-      //Weird. unit is nowhere near a walkable position
+      //Weird. unit is nowhere near a traversible position
       return intent.unit.tileCenter
     }
   
@@ -35,6 +39,6 @@ object EvaluatePositions {
             new MovementHeuristicView(weightedHeuristic, intent, candidate, weightedHeuristic.weigh(intent, candidate)))))
     }
     
-    return candidates.maxBy(candidate =>weightedHeuristics.map(_.weigh(intent, candidate)).product)
+    candidates.maxBy(candidate => weightedHeuristics.map(_.weigh(intent, candidate)).product)
   }
 }

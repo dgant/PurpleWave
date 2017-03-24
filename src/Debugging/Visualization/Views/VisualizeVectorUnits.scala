@@ -16,6 +16,7 @@ object VisualizeVectorUnits {
         unit.possiblyStillThere &&
         (unit.complete || unit.unitClass.isBuilding))
       .toList
+      .sortBy( ! _.flying)
       .sortBy(_.y)
       .foreach(renderUnit)
     
@@ -72,7 +73,8 @@ object VisualizeVectorUnits {
         .replaceAll("Extractor", "Soda Extractor")
         .replaceAll("Refinery", "Soda Refinery")
         .replaceAll("Critter Rhynadon", "Snuggles the Rhino")
-        .replaceAll("Critter Ursadon", "Cupcake Cuddlemonster"),
+        .replaceAll("Critter Ursadon", "Cupcake Cuddlemonster")
+        .replaceAll("Critter Kakaru", "Flying Dumpling"),
       new Position(middle, bottom + 9))
 
     val eyeLeft         = middle  + unit.unitClass.width  / 5

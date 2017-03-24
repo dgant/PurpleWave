@@ -7,12 +7,14 @@ object EvaluateTargets {
   
   def best(
     intent:Intention,
-    evaluator:EvaluateTarget,
-    targets:Iterable[UnitInfo])
+    profile:TargetingProfile,
+    candidates:Iterable[UnitInfo])
       :Option[UnitInfo] = {
     
-    if (targets.isEmpty) return None
+    if (candidates.isEmpty) return None
     
-    Some(targets.maxBy(target => evaluator.evaluate(intent, target)))
+    //TODO: Compare best candidate to "how about we just don't attack, at all?"
+    
+    Some(candidates.maxBy(candidate => profile.weightedHeuristics.map(_.weigh(intent, candidate)).product))
   }
 }

@@ -93,10 +93,12 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
     else                                   4
   }
   
+  def inRangeToAttack(otherUnit:UnitInfo):Boolean = pixelsFromEdge(otherUnit) <= unitClass.maxAirGroundRange
+  
   def attackableEnemiesInRange: Set[UnitInfo] =
     With.units
-      .inPixelRadius(pixelCenter, unitClass.maxAirGroundRange + 96)
-      .filter(pixelsFromEdge(_) <= unitClass.maxAirGroundRange)
+      .inPixelRadius(pixelCenter, unitClass.maxAirGroundRange + 32)
+      .filter(inRangeToAttack)
       .filter(isEnemyOf)
       .filter(canAttack)
   

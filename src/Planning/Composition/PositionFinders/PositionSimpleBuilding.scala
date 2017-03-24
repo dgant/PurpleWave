@@ -59,7 +59,7 @@ class PositionSimpleBuilding(val buildingType:UnitClass) extends PositionFinder 
           .sum
         -
         With.geography.zones
-          .filter(zone => With.enemies.contains(zone.owner))
+          .filter(zone => zone.owner != With.self && zone.owner != With.neutral)
           .map(zone => With.paths.groundPixels(zone.centroid, candidate))
           .sum
       ))

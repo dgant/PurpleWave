@@ -10,7 +10,7 @@ class GridWalkableTerrain extends GridBoolean {
     tiles.foreach(tilePosition => set(
       tilePosition,
       Square.pointsDownAndRight(4)
-        .map(tilePosition.toWalkPosition.add)
+        .map(tilePosition.topLeftWalkPosition.add)
         .forall(With.game.isWalkable)))
   }
 }

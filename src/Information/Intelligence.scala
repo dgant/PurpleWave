@@ -1,17 +1,11 @@
 package Information
 
-import Startup.With
-import ProxyBwapi.UnitInfo.ForeignUnitInfo
 import Performance.Caching.Cache
+import ProxyBwapi.UnitInfo.ForeignUnitInfo
+import Startup.With
 import bwapi.TilePosition
 
-import scala.collection.JavaConverters._
-
 class Intelligence {
-  
-  def unexploredStartLocations():Iterable[TilePosition] = {
-    With.game.getStartLocations.asScala.filterNot(With.game.isExplored)
-  }
   
   def enemyBases:Option[TilePosition] =
     With.units.enemy

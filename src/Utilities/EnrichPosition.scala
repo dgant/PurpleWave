@@ -63,9 +63,6 @@ case object EnrichPosition {
       position.getX < With.mapWidth * 32 &&
       position.getY < With.mapHeight * 32
     }
-    def toWalkPosition:WalkPosition = {
-      new WalkPosition(position.getX / 4, position.getY / 4)
-    }
     def add(dx:Int, dy:Int):Position = {
       new Position(position.getX + dx, position.getY + dy)
     }
@@ -87,6 +84,12 @@ case object EnrichPosition {
     def divide(scale:Int):Position = {
       new Position(position.getX / scale, position.getY / scale)
     }
+    def project(destination:Position, pixels:Double):Position = {
+      val distance = distancePixels(destination)
+      if (distance == 0) return position
+      val delta = destination.subtract(position)
+      delta.multiply((pixels/distance).toInt).add(position)
+    }
     def midpoint(otherPosition:Position):Position = {
       add(otherPosition).divide(2)
     }
@@ -104,40 +107,11 @@ case object EnrichPosition {
     def tileNearest:TilePosition = {
       position.add(16, 16).toTilePosition
     }
-  }
-  
-  implicit class EnrichedWalkPosition(position:WalkPosition) {
-    def add(dx:Int, dy:Int):WalkPosition = {
-      new WalkPosition(position.getX + dx, position.getY + dy)
+    def toPoint:Point = {
+      new Point(position.getX, position.getY)
     }
-    def add(point:Point):WalkPosition = {
-      add(point.x, point.y)
-    }
-    def add(otherPosition:WalkPosition):WalkPosition = {
-      add(otherPosition.getX, otherPosition.getY)
-    }
-    def subtract(dx:Int, dy:Int):WalkPosition = {
-      add(-dx, -dy)
-    }
-    def subtract(otherPosition:WalkPosition):WalkPosition = {
-      subtract(otherPosition.getX, otherPosition.getY)
-    }
-    def multiply(scale:Int):WalkPosition = {
-      new WalkPosition(scale * position.getX, scale * position.getY)
-    }
-    def divide(scale:Int):WalkPosition = {
-      new WalkPosition(position.getX / scale, position.getY / scale)
-    }
-    def midpoint(otherPosition:WalkPosition):WalkPosition = {
-      add(otherPosition).divide(2)
-    }
-    def distanceWalk(otherPosition:WalkPosition):Double = {
-      Math.sqrt(distanceWalkSquared(otherPosition))
-    }
-    def distanceWalkSquared(otherPosition:WalkPosition):Int = {
-      val dx = position.getX - otherPosition.getX
-      val dy = position.getY - otherPosition.getY
-      dx * dx + dy * dy
+    def toWalkPosition:WalkPosition = {
+      new WalkPosition(position.getX / 4, position.getY / 4)
     }
   }
   
@@ -191,8 +165,43 @@ case object EnrichPosition {
     def pixelCenter:Position = {
       position.toPosition.add(16, 16)
     }
-    def toWalkPosition:WalkPosition = {
+    def topLeftWalkPosition:WalkPosition = {
       new WalkPosition(position.getX * 4, position.getY * 4)
+    }
+  }
+  
+  implicit class EnrichedWalkPosition(position:WalkPosition) {
+    def add(dx:Int, dy:Int):WalkPosition = {
+      new WalkPosition(position.getX + dx, position.getY + dy)
+    }
+    def add(point:Point):WalkPosition = {
+      add(point.x, point.y)
+    }
+    def add(otherPosition:WalkPosition):WalkPosition = {
+      add(otherPosition.getX, otherPosition.getY)
+    }
+    def subtract(dx:Int, dy:Int):WalkPosition = {
+      add(-dx, -dy)
+    }
+    def subtract(otherPosition:WalkPosition):WalkPosition = {
+      subtract(otherPosition.getX, otherPosition.getY)
+    }
+    def multiply(scale:Int):WalkPosition = {
+      new WalkPosition(scale * position.getX, scale * position.getY)
+    }
+    def divide(scale:Int):WalkPosition = {
+      new WalkPosition(position.getX / scale, position.getY / scale)
+    }
+    def midpoint(otherPosition:WalkPosition):WalkPosition = {
+      add(otherPosition).divide(2)
+    }
+    def distanceWalk(otherPosition:WalkPosition):Double = {
+      Math.sqrt(distanceWalkSquared(otherPosition))
+    }
+    def distanceWalkSquared(otherPosition:WalkPosition):Int = {
+      val dx = position.getX - otherPosition.getX
+      val dy = position.getY - otherPosition.getY
+      dx * dx + dy * dy
     }
   }
 }

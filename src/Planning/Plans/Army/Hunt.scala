@@ -18,7 +18,7 @@ class Hunt extends Plan {
   override def getChildren: Iterable[Plan] = List(hunters.get)
   override def onFrame() {
     
-    val targetPosition = position.get.find
+    val targetPosition = position.get.find.orElse(With.intelligence.leastScoutedBases.headOption)
     
     if (targetPosition.isEmpty) return
     

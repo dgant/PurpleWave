@@ -28,5 +28,9 @@ class Intelligence {
   def leastScoutedBases():Iterable[TilePosition] = leastScoutedBasesCache.get
   private val leastScoutedBasesCache = new Cache(2, () => leastScoutedBasesCalculate)
   private def leastScoutedBasesCalculate:Iterable[TilePosition] =
-    With.geography.bases.toList.sortBy( ! _.isStartLocation).sortBy(base => With.game.isExplored(base.centerTile)).map(_.centerTile)
+    With.geography.bases
+      .toList
+      .sortBy( ! _.isStartLocation)
+      .sortBy(base => With.game.isExplored(base.townHallRectangle.midpoint))
+      .map(_.townHallRectangle.midpoint)
 }

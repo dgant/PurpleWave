@@ -16,9 +16,7 @@ class Zone(
   private val polygon = bwtaRegion.getPolygon
   
   val centroid = bwtaRegion.getCenter
-  
-  def contains(pixel:Position):Boolean = boundary.contains(pixel.toTilePosition) && polygon.isInside(pixel)
-  
   var owner:Player = With.game.neutral
   
+  def contains(pixel:Position):Boolean = boundary.contains(pixel.toTilePosition) && polygon.isInside(pixel)
 }

@@ -74,7 +74,7 @@ class GatherMinerals extends Plan {
   }
   
   private def sortMinerals() {
-    val townHalls = With.geography.bases.filter(_.townHall.exists(_.complete)).map(_.centerTile)
+    val townHalls = With.geography.bases.flatMap(_.townHall).filter(_.complete).map(_.tileCenter)
     if (townHalls.isEmpty) return
     minerals
       .sortBy(mineral => -mineral.mineralsLeft)
@@ -85,9 +85,7 @@ class GatherMinerals extends Plan {
   private def orderWorker(worker:FriendlyUnitInfo) {
     if (worker.gatheringMinerals) {
       mineralByWorker.get(worker).foreach(mineral => {
-        if (mineral.pixelCenter.getDistance(worker.pixelCenter) > 32 * 12) {
-          gather(worker, mineral)
-        }
+        if (mineral.pixelCenter.getDistance(worker.pixelCenter) > 32 * 12) gather(worker, mineral)
       })
     } else {
       mineralByWorker.get(worker).foreach(mineral => gather(worker, mineral))

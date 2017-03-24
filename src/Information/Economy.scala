@@ -137,6 +137,6 @@ class Economy {
   
   def ourMiningBases:Iterable[UnitInfo] = {
     //TODO: Don't count macro hatches or bases without minerals
-    With.geography.ourBaseHalls
+    With.geography.ourTownHalls
   }
 }

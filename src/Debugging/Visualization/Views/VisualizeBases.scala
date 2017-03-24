@@ -12,10 +12,10 @@ object VisualizeBases {
       
       zone.bases.foreach(base => {
         DrawMap.tileRectangle(base.harvestingArea, Color.Cyan)
-        DrawMap.tileRectangle(base.townHallArea, Color.Yellow)
+        DrawMap.tileRectangle(base.townHallRectangle, Color.Yellow)
         DrawMap.labelBox(
           List(base.zone.owner.getName, if (base.isStartLocation) "Start location" else ""),
-          base.townHallArea.startInclusive.topLeftPixel,
+          base.townHallRectangle.startInclusive.topLeftPixel,
           true,
           DrawMap.playerColor(base.zone.owner))
       })

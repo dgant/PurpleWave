@@ -11,12 +11,12 @@ import bwta.{BWTA, Chokepoint, Region}
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ListBuffer
 
-object BuildZones {
+object ZoneBuilder {
   
   def build:Iterable[Zone] = {
-    val zones         = BWTA.getRegions.asScala.map(buildZone)
-    val edges         = BWTA.getChokepoints.asScala.map(choke => buildEdge(choke, zones))
-    val bases         = CalculateBasePositions.calculate.map(townHallPosition => buildBase(townHallPosition, zones))
+    val zones = BWTA.getRegions.asScala.map(buildZone)
+    val edges = BWTA.getChokepoints.asScala.map(choke => buildEdge(choke, zones))
+    val bases = CalculateBasePositions.calculate.map(townHallPosition => buildBase(townHallPosition, zones))
   
     bases.foreach(base => base.zone.bases += base)
     edges.foreach(edge => edge.zones.foreach(zone => zone.edges += edge))
@@ -44,7 +44,6 @@ object BuildZones {
         .find(_.contains(townHallPosition.toPosition))
         .getOrElse(zones.minBy(_.centroid.distancePixels(townHallPosition.pixelCenter))),
       townHallArea,
-      With.geography.getHarvestingArea(townHallArea),
       With.game.getStartLocations.asScala.exists(_.distanceTile(townHallPosition) < 6))
   }
   

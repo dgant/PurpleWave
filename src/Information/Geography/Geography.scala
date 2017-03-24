@@ -5,35 +5,23 @@ import Information.Geography.Types.{Base, Zone}
 import Performance.Caching.Cache
 import ProxyBwapi.UnitInfo.UnitInfo
 import Startup.With
-import Utilities.EnrichPosition._
 import bwapi.TilePosition
 
 class Geography {
   
-  private val baseCalculator = new Bases
-  def zones:Iterable[Zone] = baseCalculator.zones
-  
+  private val baseCalculator = new ZoneUpdater
+  def zones               : Iterable[Zone]          = ZoneBuilder.build
   def bases               : Iterable[Base]          = zones.flatten(_.bases)
   def ourBases            : Iterable[Base]          = bases.filter(_.zone.owner == With.self)
-  def ourBaseHalls        : Iterable[UnitInfo]      = ourBases.filter(_.townHall.isDefined).map(_.townHall.get)
+  def ourTownHalls        : Iterable[UnitInfo]      = ourBases.flatMap(_.townHall)
   def ourHarvestingAreas  : Iterable[TileRectangle] = ourBases.map(_.harvestingArea)
   
   def home:TilePosition = homeCache.get
-  private val homeCache = new Cache[TilePosition](5, () => homeCalculate)
-  private def homeCalculate:TilePosition =
-    ourBases.toList
+  private val homeCache = new Cache(5, () =>
+    ourBases
+      .toList
       .sortBy( ! _.isStartLocation)
-      .map(_.centerTile)
       .headOption
-      .getOrElse(With.units.ours.view.filter(_.unitClass.isBuilding).map(_.tileCenter).headOption
+      .map(_.townHallRectangle.startInclusive)
       .getOrElse(Positions.tileMiddle))
-  
-  def getHarvestingArea(townHallArea:TileRectangle):TileRectangle = {
-    val resources = With.units
-      .inPixelRadius(townHallArea.midpoint.pixelCenter, 32 * 10)
-      .filter(_.unitClass.isResource)
-      .map(_.tileArea)
-    
-    (List(townHallArea) ++ resources).boundary
-  }
 }

@@ -16,7 +16,7 @@ object VisualizeVectorUnits {
         unit.possiblyStillThere &&
         (unit.complete || unit.unitClass.isBuilding))
       .toList
-      .sortBy( ! _.flying)
+      .sortBy(_.flying)
       .sortBy(_.y)
       .foreach(renderUnit)
     

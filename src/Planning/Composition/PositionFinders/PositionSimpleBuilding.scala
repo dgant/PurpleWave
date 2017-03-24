@@ -46,7 +46,7 @@ class PositionSimpleBuilding(val buildingType:UnitClass) extends PositionFinder 
   
   private def positionTownHall:Option[TilePosition] = {
     val candidates = With.geography.bases
-      .map(base => base.townHallArea)
+      .map(base => base.townHallRectangle)
       .filter(baseRectangle => {
         With.units.all.filter(_.unitClass.isBuilding).forall( ! _.tileArea.intersects(baseRectangle))
       })

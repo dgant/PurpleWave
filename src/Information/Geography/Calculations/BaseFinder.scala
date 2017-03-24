@@ -1,4 +1,4 @@
-package Information.Geography
+package Information.Geography.Calculations
 
 import Geometry.Shapes.Circle
 import Geometry.{Clustering, TileRectangle}
@@ -8,7 +8,7 @@ import Startup.With
 import Utilities.EnrichPosition._
 import bwapi.TilePosition
 
-object CalculateBasePositions {
+object BaseFinder {
   
   def calculate:List[TilePosition] = {
     clusteredResourcePatches.flatMap(bestTownHallTile).toList
@@ -43,7 +43,7 @@ object CalculateBasePositions {
           resourcePatch.tileTopLeft.subtract(3, 3),
           resourcePatch.tileTopLeft.add(3, 3).add(resourcePatch.unitClass.tileSize)))
     
-    buildingArea.tiles.forall(With.grids.buildableTerrain.get) &&
+    buildingArea.tiles.forall(With.game.isBuildable) &&
       ! resourcePatches.view.map(resourcePatch => resourcePatch.tileArea.expand(3, 3)).exists(buildingArea.intersects)
   }
 }

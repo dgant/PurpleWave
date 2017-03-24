@@ -1,22 +1,13 @@
-package Information.Geography
+package Information.Geography.Calculations
 
 import Information.Geography.Types.{Base, Zone}
-import Performance.Caching.{CacheForever, Limiter}
 import Startup.With
 import Utilities.EnrichPosition._
 
-class ZoneUpdater {
+object ZoneUpdater {
   
-  def zones:Iterable[Zone] = {
-    zoneUpdateLimiter.act()
-    zoneCache.get
-  }
-  
-  private val zoneCache = new CacheForever[Iterable[Zone]](() => ZoneBuilder.build)
-  private val zoneUpdateLimiter = new Limiter(2, updateZones)
-  
-  private def updateZones() = {
-    zoneCache.get.foreach(updateZone)
+  def update() = {
+    With.geography.zones.foreach(updateZone)
   }
   
   private def updateZone(zone:Zone) {

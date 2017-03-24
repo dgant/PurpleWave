@@ -1,4 +1,4 @@
-package Information.Geography
+package Information.Geography.Calculations
 
 import Geometry.TileRectangle
 import Information.Geography.Types.{Base, Zone, ZoneEdge}
@@ -16,7 +16,7 @@ object ZoneBuilder {
   def build:Iterable[Zone] = {
     val zones = BWTA.getRegions.asScala.map(buildZone)
     val edges = BWTA.getChokepoints.asScala.map(choke => buildEdge(choke, zones))
-    val bases = CalculateBasePositions.calculate.map(townHallPosition => buildBase(townHallPosition, zones))
+    val bases = BaseFinder.calculate.map(townHallPosition => buildBase(townHallPosition, zones))
   
     bases.foreach(base => base.zone.bases += base)
     edges.foreach(edge => edge.zones.foreach(zone => zone.edges += edge))

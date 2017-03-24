@@ -78,9 +78,12 @@ class Bot() extends DefaultBWListener {
       With.latency.onFrame()
       if (With.latency.shouldRun) {
         
-        //Gather information
+        //Observe
         With.units.onFrame()
+        With.geography.onFrame()
         With.grids.onFrame()
+        
+        //Orient
         With.battles.onFrame()
         With.economy.onFrame()
         With.zoner.onFrame()
@@ -88,11 +91,11 @@ class Bot() extends DefaultBWListener {
         With.recruiter.onFrame()
         With.prioritizer.onFrame()
         
-        //Make decisions
+        //Decide
         With.gameplan.onFrame()
         With.scheduler.onFrame()
         
-        //Act on decisions
+        //Act
         With.commander.onFrame()
         With.executor.onFrame()
       }

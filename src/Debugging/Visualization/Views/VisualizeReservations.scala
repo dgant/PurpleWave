@@ -1,10 +1,10 @@
 package Debugging.Visualization.Views
 
+import Debugging.Visualization.Colors
 import Debugging.Visualization.Rendering.DrawMap
 import Planning.Plan
 import Planning.Plans.Allocation.LockArea
 import Startup.With
-import bwapi.Color
 
 object VisualizeReservations {
   
@@ -17,11 +17,11 @@ object VisualizeReservations {
   
   def renderZone(plan:Plan, lock:LockArea) {
     if ( ! lock.isComplete) return
-    DrawMap.tileRectangle(lock.area, Color.Red)
+    DrawMap.tileRectangle(lock.area, Colors.DarkRed)
     DrawMap.labelBox(
       List("Reserved by", plan.toString),
       lock.area.midpoint.toPosition,
       drawBackground = true,
-      backgroundColor = Color.Red)
+      backgroundColor = Colors.DarkRed)
   }
 }

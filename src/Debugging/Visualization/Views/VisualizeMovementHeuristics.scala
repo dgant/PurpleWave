@@ -1,10 +1,10 @@
 package Debugging.Visualization.Views
 
+import Debugging.Visualization.Colors
 import Debugging.Visualization.Data.MovementHeuristicView
 import Debugging.Visualization.Rendering.DrawMap
 import Startup.With
 import Utilities.EnrichPosition._
-import bwapi.Color
 
 import scala.collection.mutable.ListBuffer
 
@@ -17,14 +17,14 @@ object VisualizeMovementHeuristics {
   
   def renderUnit(views:ListBuffer[MovementHeuristicView]) {
     views.head.intent.destination.foreach(destination => {
-      DrawMap.circle(destination.pixelCenter, 32, Color.Brown)
-      DrawMap.line(destination.pixelCenter, views.head.intent.unit.pixelCenter, Color.Brown)
+      DrawMap.circle(destination.pixelCenter, 32, Colors.MediumGreen)
+      DrawMap.line(destination.pixelCenter, views.head.intent.unit.pixelCenter, Colors.MediumGreen)
       DrawMap.label("Destination", destination.pixelCenter.add(0, 32))
       
     })
     views.head.intent.toAttack.foreach(attackee => {
-      DrawMap.circle(attackee.pixelCenter, 32, Color.Red)
-      DrawMap.line(attackee.pixelCenter, views.head.intent.unit.pixelCenter, Color.Red)
+      DrawMap.circle(attackee.pixelCenter, 32, Colors.MediumOrange)
+      DrawMap.line(attackee.pixelCenter, views.head.intent.unit.pixelCenter, Colors.MediumOrange)
       DrawMap.label("Target", attackee.pixelCenter.add(0, 32))
     })
     

@@ -23,5 +23,5 @@ class Intelligence {
     With.geography.bases
       .toList
       .sortBy( ! _.isStartLocation)
-      .sortBy(_.lastScouted))
+      .sortBy(_.lastScoutedFrame))
 }

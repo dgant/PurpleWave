@@ -10,12 +10,14 @@ object VisualizeGeography {
   def render() {
     With.geography.zones.foreach(zone => {
       
-      DrawMap.polygonPositions(zone.bwtaRegion.getPolygon.getPoints.asScala)
+      DrawMap.polygonPositions(
+        zone.bwtaRegion.getPolygon.getPoints.asScala,
+        DrawMap.playerColorDark(zone.owner))
       
       DrawMap.line(
         zone.bwtaRegion.getPolygon.getPoints.asScala.head,
         zone.bwtaRegion.getPolygon.getPoints.asScala.last,
-        bwapi.Color.Brown)
+        DrawMap.playerColorDark(zone.owner))
     })
   }
 }

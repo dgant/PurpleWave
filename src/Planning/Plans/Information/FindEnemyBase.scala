@@ -31,11 +31,11 @@ class FindEnemyBase extends Plan {
   }
   
   private def orderScout(scout:FriendlyUnitInfo) =
-    With.executor.intend(new Intention(this, scout) { destination = Some(getNextScoutingPosition) })
+    With.executor.intend(new Intention(this, scout) { destination = getNextScoutingPosition })
   
-  private def getNextScoutingPosition:TilePosition =
+  private def getNextScoutingPosition:Option[TilePosition] =
     With.intelligence.leastScoutedBases
       .map(_.townHallRectangle.midpoint)
       .filter(base => With.paths.exists(With.geography.home, base))
-      .head
+      .headOption
 }

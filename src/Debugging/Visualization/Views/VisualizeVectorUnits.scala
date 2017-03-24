@@ -1,5 +1,6 @@
 package Debugging.Visualization.Views
 
+import Debugging.Visualization.Colors
 import Debugging.Visualization.Rendering.DrawMap
 import ProxyBwapi.UnitInfo.UnitInfo
 import Startup.With
@@ -27,7 +28,7 @@ object VisualizeVectorUnits {
   
   def renderUnit(unit:UnitInfo) {
     
-    val color = DrawMap.playerColor(unit.player)
+    val color = DrawMap.playerColorNeon(unit.player)
     val isActiveBuilding = unit.friendly.nonEmpty && unit.friendly.get.trainingQueue.size > 0
     val animationFrame = unit.left + unit.top + With.frame
     
@@ -143,10 +144,10 @@ object VisualizeVectorUnits {
       color)
     
     if (unit.carryingMinerals) {
-      DrawMap.circle(unit.pixelCenter.add(-10, 0), 4, Color.Cyan, true)
+      DrawMap.circle(unit.pixelCenter.add(-10, 0), 4, Colors.NeonTeal, true)
     }
     if (unit.carryingGas) {
-      DrawMap.circle(unit.pixelCenter.add(-10, 0), 4, Color.Green, true)
+      DrawMap.circle(unit.pixelCenter.add(-10, 0), 4, Colors.NeonGreen, true)
     }
   }
   

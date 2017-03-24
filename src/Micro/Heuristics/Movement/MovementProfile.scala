@@ -1,7 +1,7 @@
 package Micro.Heuristics.Movement
 
+import Debugging.Visualization.Colors
 import Micro.Heuristics.TileHeuristics._
-import bwapi.Color
 
 class MovementProfile(
   var preferTravel      : Double = 0,
@@ -19,17 +19,17 @@ class MovementProfile(
   
   def heuristics: Iterable[WeightedMovementHeuristic] =
     List(
-      new WeightedMovementHeuristic(TileHeuristicDestinationNearby, preferTravel,       Color.Brown),
-      new WeightedMovementHeuristic(TileHeuristicDestinationHere,   preferSpot,         Color.Black),
-      new WeightedMovementHeuristic(TileHeuristicEnemyAtMaxRange,   preferSitAtRange,   Color.Orange),
-      new WeightedMovementHeuristic(TileHeuristicMobility,          preferMobility,     Color.Green),
-      new WeightedMovementHeuristic(TileHeuristicHighGround,        preferHighGround,   Color.Cyan),
-      new WeightedMovementHeuristic(TileHeuristicRegrouping,        preferGrouping,     Color.Purple),
-      new WeightedMovementHeuristic(TileHeuristicKeepMoving,        preferMoving,       Color.Blue),
-      new WeightedMovementHeuristic(TileHeuristicRandom,            preferRandom,       Color.Grey),
-      new WeightedMovementHeuristic(TileHeuristicExposureToDamage,  -avoidDamage,       Color.Red),
-      new WeightedMovementHeuristic(TileHeuristicTraffic,           -avoidTraffic,      Color.Orange),
-      new WeightedMovementHeuristic(TileHeuristicEnemyVision,       -avoidVision,       Color.Teal),
-      new WeightedMovementHeuristic(TileHeuristicEnemyDetection,    -avoidDetection,    Color.White)
+      new WeightedMovementHeuristic(TileHeuristicDestinationNearby, preferTravel,       Colors.MediumGreen),
+      new WeightedMovementHeuristic(TileHeuristicDestinationHere,   preferSpot,         Colors.BrightGreen),
+      new WeightedMovementHeuristic(TileHeuristicEnemyAtMaxRange,   preferSitAtRange,   Colors.MediumRed),
+      new WeightedMovementHeuristic(TileHeuristicMobility,          preferMobility,     Colors.MediumOrange),
+      new WeightedMovementHeuristic(TileHeuristicHighGround,        preferHighGround,   Colors.DarkBlue),
+      new WeightedMovementHeuristic(TileHeuristicRegrouping,        preferGrouping,     Colors.BrightViolet),
+      new WeightedMovementHeuristic(TileHeuristicKeepMoving,        preferMoving,       Colors.MediumBlue),
+      new WeightedMovementHeuristic(TileHeuristicRandom,            preferRandom,       Colors.DarkGray),
+      new WeightedMovementHeuristic(TileHeuristicExposureToDamage,  -avoidDamage,       Colors.BrightRed),
+      new WeightedMovementHeuristic(TileHeuristicTraffic,           -avoidTraffic,      Colors.BrightOrange),
+      new WeightedMovementHeuristic(TileHeuristicEnemyVision,       -avoidVision,       Colors.MediumGray),
+      new WeightedMovementHeuristic(TileHeuristicEnemyDetection,    -avoidDetection,    Colors.BrightGray)
     )
 }

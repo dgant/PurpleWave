@@ -1,5 +1,6 @@
 package Micro.Heuristics.Movement
 
+import Debugging.Visualization.Colors
 import Micro.Heuristics.HeuristicMath
 import Micro.Heuristics.TileHeuristics.TileHeuristic
 import Micro.Intentions.Intention
@@ -8,7 +9,7 @@ import bwapi.{Color, TilePosition}
 class WeightedMovementHeuristic(
   val heuristic : TileHeuristic,
   val weight    : Double,
-  val color     : Color = Color.Grey) {
+  val color     : Color = Colors.DefaultGray) {
   
   def weigh(intent:Intention, candidate:TilePosition):Double = {
     

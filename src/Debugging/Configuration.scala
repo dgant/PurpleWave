@@ -1,8 +1,12 @@
 package Debugging
 
 class Configuration {
-  var gameSpeed                         = 0
   
+  var enableGoonStopProtection  = true
+  var enablePathRecalculation   = false
+  var enableHeuristicTravel     = false
+  
+  var gameSpeed                         = 0
   var enableStdOut                      = false
   var enableChat                        = true
   var enableLatencyCompensation         = false
@@ -16,22 +20,18 @@ class Configuration {
   var enableVisualizationBases              = true
   var enableVisualizationBattles            = true
   var enableVisualizationBullets            = false
-  var enableVisualizationChokepoints        = false
+  var enableVisualizationChokepoints        = true
   var enableVisualizationEconomy            = false
   var enableVisualizationGrids              = false
   var enableVisualizationMovementHeuristics = true
-  var enableVisualizationPerformance        = false
+  var enableVisualizationPerformance        = true
   var enableVisualizationPlans              = false
   var enableVisualizationResources          = false
   var enableVisualizationScheduler          = false
-  var enableVisualizationGeography          = false
+  var enableVisualizationGeography          = true
   var enableVisualizationTextOnly           = false
-  var enableVisualizationUnitsForeign       = false
-  var enableVisualizationUnitsOurs          = false
+  var enableVisualizationUnitsForeign       = true
+  var enableVisualizationUnitsOurs          = true
   var enableVisualizationVectorUnits        = false
-  var enableVisualizationReservations              = true
-  
-  var enableGoonStopProtection  = true
-  var enablePathRecalculation   = false
-  var enableHeuristicTravel     = false
+  var enableVisualizationReservations       = true
 }

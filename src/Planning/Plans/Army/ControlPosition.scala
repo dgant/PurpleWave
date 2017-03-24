@@ -33,13 +33,13 @@ class ControlPosition extends Plan {
       DrawMap.circle(
         tile.pixelCenter,
         64,
-        DrawMap.playerColor(With.self))
+        DrawMap.playerColorDark(With.self))
       
       DrawMap.label(
         description.get,
         tile.pixelCenter,
         drawBackground = true,
-        DrawMap.playerColor(With.self))
+        DrawMap.playerColorDark(With.self))
     })
   }
 }

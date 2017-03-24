@@ -16,12 +16,12 @@ object VisualizeUnitsForeign {
       DrawMap.circle(
         trackedUnit.pixelCenter,
         trackedUnit.unitClass.width / 2,
-        DrawMap.playerColor(trackedUnit.player))
+        DrawMap.playerColorDark(trackedUnit.player))
       DrawMap.label(
         trackedUnit.unitClass.toString,
         trackedUnit.pixelCenter,
         drawBackground = true,
-        DrawMap.playerColor(trackedUnit.player))
+        DrawMap.playerColorDark(trackedUnit.player))
     }
   }
 }

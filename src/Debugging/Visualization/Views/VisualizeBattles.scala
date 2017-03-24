@@ -1,28 +1,31 @@
 package Debugging.Visualization.Views
 
+import Debugging.Visualization.Colors
 import Debugging.Visualization.Rendering.DrawMap
 import Micro.Battles.Battle
 import Startup.With
 import Utilities.EnrichPosition._
-import bwapi.Color
 
 object VisualizeBattles {
   def render() = With.battles.all.foreach(drawBattle)
   
   private def drawBattle(battle:Battle) {
-    DrawMap.circle(battle.focus, 8, Color.Brown)
-    DrawMap.circle(battle.us.vanguard, 8, Color.Blue)
-    DrawMap.circle(battle.enemy.vanguard, 8, Color.Red)
-    DrawMap.line(battle.focus, battle.us.vanguard, Color.Blue)
-    DrawMap.line(battle.focus, battle.enemy.vanguard, Color.Red)
+    val ourColor    = DrawMap.playerColorDark(With.self)
+    val enemyColor  = DrawMap.playerColorDark(With.enemies.headOption.get)
+    val neutralColor = Colors.DarkOrange
+    DrawMap.circle(battle.focus,          8, neutralColor)
+    DrawMap.circle(battle.us.vanguard,    8, ourColor)
+    DrawMap.circle(battle.enemy.vanguard, 8, enemyColor)
+    DrawMap.line(battle.focus, battle.us.vanguard,    ourColor)
+    DrawMap.line(battle.focus, battle.enemy.vanguard, enemyColor)
     DrawMap.box(
       battle.us.units.map(_.pixelCenter).minBound,
       battle.us.units.map(_.pixelCenter).maxBound,
-      Color.Blue)
+      ourColor)
     DrawMap.box(
       battle.enemy.units.map(_.pixelCenter).minBound,
       battle.enemy.units.map(_.pixelCenter).maxBound,
-      Color.Red)
+      enemyColor)
     DrawMap.labelBox(
       List(
         (battle.us.strength/100).toInt.toString,
@@ -30,6 +33,6 @@ object VisualizeBattles {
       ),
       battle.focus,
       drawBackground = true,
-      backgroundColor = Color.Brown)
+      backgroundColor = neutralColor)
   }
 }

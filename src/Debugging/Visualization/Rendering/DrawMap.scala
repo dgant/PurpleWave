@@ -1,5 +1,6 @@
 package Debugging.Visualization.Rendering
 
+import Debugging.Visualization.Colors
 import Geometry.TileRectangle
 import Startup.With
 import Utilities.EnrichPosition._
@@ -17,25 +18,25 @@ object DrawMap {
   def line(
     start:Position,
     end:Position,
-    color:Color = Color.Grey) {
+    color:Color = Colors.DefaultGray) {
     if (irrelevant(List(start, end))) return
     With.game.drawLineMap(start, end, color)
   }
   
   def box(
-    start:Position,
-    end:Position,
-    color:Color = Color.Grey,
-    solid:Boolean = false) {
+           start:Position,
+           end:Position,
+           color:Color = Colors.DefaultGray,
+           solid:Boolean = false) {
     if (irrelevant(List(start, end))) return
     With.game.drawBoxMap(start, end, color, solid)
   }
   
   def circle(
-    center:Position,
-    radius:Int,
-    color:Color = Color.Grey,
-    solid:Boolean = false) {
+              center:Position,
+              radius:Int,
+              color:Color = Colors.DefaultGray,
+              solid:Boolean = false) {
     if (irrelevant(
       List(
         center,
@@ -47,11 +48,11 @@ object DrawMap {
   }
   
   def triangle(
-    position1:Position,
-    position2:Position,
-    position3:Position,
-    color:Color = Color.Grey,
-    solid: Boolean = false) {
+                position1:Position,
+                position2:Position,
+                position3:Position,
+                color:Color = Colors.DefaultGray,
+                solid: Boolean = false) {
     if (irrelevant(List(position1, position2, position3))) return
     With.game.drawTriangleMap(position1, position2, position3, color, solid)
   }
@@ -60,7 +61,7 @@ object DrawMap {
     text:String,
     position:Position,
     drawBackground:Boolean = false,
-    backgroundColor:Color = Color.Grey) {
+    backgroundColor:Color = Colors.DefaultGray) {
     if (irrelevant(position)) return
     labelBox(List(text), position, drawBackground, backgroundColor)
   }
@@ -69,7 +70,7 @@ object DrawMap {
       textLines:Iterable[String],
       position:Position,
       drawBackground:Boolean = false,
-      backgroundColor:Color = Color.Grey) {
+      backgroundColor:Color = Colors.DefaultGray) {
     
     if (irrelevant(position)) return
     
@@ -102,15 +103,21 @@ object DrawMap {
     With.game.drawBoxMap(rectangle.startPixel, rectangle.endPixel, color)
   }
   
-  def polygonPositions(points:Iterable[Position], color:bwapi.Color = bwapi.Color.Brown) {
+  def polygonPositions(points:Iterable[Position], color:Color = Colors.DefaultGray) {
     points.reduce((p1, p2) => { line(p1, p2, color); p2 })
     line(points.head, points.last, color)
   }
   
-  def playerColor(player:Player):Color = {
-    if      (player == With.self)     Color.Purple
-    else if (player == With.neutral)  Color.Cyan
-    else                              Color.Red
+  def playerColorDark(player:Player):Color = {
+    if      (player == With.self)     Colors.DarkViolet
+    else if (player == With.neutral)  Colors.DarkGray
+    else                              Colors.DarkRed
+  }
+  
+  def playerColorNeon(player:Player):Color = {
+    if      (player == With.self)     Colors.NeonViolet
+    else if (player == With.neutral)  Colors.NeonTeal
+    else                              Colors.NeonRed
   }
   
   def irrelevant(points:Iterable[Position]):Boolean = {

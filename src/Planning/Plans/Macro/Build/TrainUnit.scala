@@ -12,6 +12,8 @@ import Startup.With
 
 class TrainUnit(val traineeClass:UnitClass) extends Plan {
   
+  description.set("Train a " + traineeClass)
+  
   val currencyLock = new LockCurrencyForUnit(traineeClass)
   val trainerLock = new LockUnits {
     unitMatcher.set(new UnitMatchType(traineeClass.whatBuilds._1))
@@ -20,8 +22,6 @@ class TrainUnit(val traineeClass:UnitClass) extends Plan {
   
   private var trainer:Option[FriendlyUnitInfo] = None
   private var trainee:Option[FriendlyUnitInfo] = None
-  
-  description.set("Train a " + traineeClass)
   
   override def isComplete: Boolean = trainee.exists(p => p.alive && p.complete)
   override def getChildren: Iterable[Plan] = List(currencyLock, trainerLock)
@@ -61,11 +61,11 @@ class TrainUnit(val traineeClass:UnitClass) extends Plan {
     DrawMap.box(
       trainer.get.tileArea.startPixel,
       trainer.get.tileArea.endPixel,
-      DrawMap.playerColor(With.self))
+      DrawMap.playerColorDark(With.self))
     DrawMap.label(
       description.get,
       trainer.get.pixelCenter,
       drawBackground = true,
-      DrawMap.playerColor(With.self))
+      DrawMap.playerColorDark(With.self))
   }
 }

@@ -16,18 +16,18 @@ object VisualizeBullets {
         DrawMap.circle(
           bullet.getPosition.add(-2, -2),
           2,
-          DrawMap.playerColor(bullet.getPlayer),
+          DrawMap.playerColorDark(bullet.getPlayer),
           true)
         DrawMap.circle(
           bullet.getPosition.add(2, -2),
           2,
-          DrawMap.playerColor(bullet.getPlayer),
+          DrawMap.playerColorDark(bullet.getPlayer),
           true)
         DrawMap.triangle(
           bullet.getPosition.add(-4, -1),
           bullet.getPosition.add(4, -1),
           bullet.getPosition.add(0, 3),
-          DrawMap.playerColor(bullet.getPlayer),
+          DrawMap.playerColorDark(bullet.getPlayer),
           true)
       })
   }

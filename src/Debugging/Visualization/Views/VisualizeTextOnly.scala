@@ -8,7 +8,7 @@ object VisualizeTextOnly {
   def render() {
     
     With.units.all.filter(_.visible).filter(u => u.complete || u.unitClass.isBuilding).foreach(unit => {
-      val color = DrawMap.playerColor(unit.player)
+      val color = DrawMap.playerColorDark(unit.player)
       val text = List(
         unit.player.getName,
         unit.unitClass.toString,

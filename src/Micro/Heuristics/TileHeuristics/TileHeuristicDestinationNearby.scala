@@ -12,10 +12,10 @@ object TileHeuristicDestinationNearby extends TileHeuristic {
     //TODO: This is overloading the concept of "go to place" and "be in reasonable order for combat"
     val range = intent.unit.unitClass.maxAirGroundRange
     
-    val before = intent.unit.travelPixels(intent.unit.tileCenter,  intent.destination.get) - range
-    val after  = intent.unit.travelPixels(candidate,               intent.destination.get) - range
+    val before = intent.unit.travelPixels(intent.unit.tileCenter,  intent.destination.get)
+    val after  = intent.unit.travelPixels(candidate,               intent.destination.get)
     
-    val threshold = 32.0 * 4.0
+    val threshold = 32.0 * 8.0 + range
     if (before < threshold || after < threshold) return 1.0
   
     return before/after

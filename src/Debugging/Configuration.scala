@@ -31,5 +31,7 @@ class Configuration {
   var enableVisualizationVectorUnits        = false
   var enableVisualizationZones              = false
   
-  var enableGoonStopProtection          = true
+  var enableGoonStopProtection  = true
+  var enablePathRecalculation   = false
+  var enableHeuristicTravel     = false
 }

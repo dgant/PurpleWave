@@ -44,9 +44,15 @@ object BehaviorDefault extends Behavior {
   }
   
   def move(intent:Intention):Boolean = {
-    val movementProfile = if (intent.targets.isEmpty && intent.threats.isEmpty) intent.movementProfileNormal else intent.movementProfileCombat
-    val tile = EvaluatePositions.best(intent, movementProfile)
-    With.commander.move(intent, tile.pixelCenter)
+    val tileToMove =
+      if (intent.threats.nonEmpty || intent.targets.nonEmpty)
+        EvaluatePositions.best(intent, intent.movementProfileNormal)
+      else if (With.configuration.enableHeuristicTravel)
+        EvaluatePositions.best(intent, intent.movementProfileCombat)
+      else
+        intent.destination.getOrElse(intent.unit.tileCenter)
+    
+    With.commander.move(intent, tileToMove.pixelCenter)
     true
   }
 }

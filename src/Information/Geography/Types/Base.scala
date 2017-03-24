@@ -16,4 +16,5 @@ class Base(
   
   var mineralsLeft  = 0
   var gasLeft       = 0
+  var lastScouted   = 0
 }

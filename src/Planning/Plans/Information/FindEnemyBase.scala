@@ -22,7 +22,7 @@ class FindEnemyBase extends Plan {
     unitPreference.set(new UnitPreferClose { positionFinder.set(PositionCenter) })
   })
   
-  override def isComplete: Boolean = With.intelligence.mostBaselikeEnemyBuilding.nonEmpty
+  override def isComplete: Boolean = With.geography.enemyBases.nonEmpty
   override def getChildren: Iterable[Plan] = List(scouts.get)
   
   override def onFrame() {
@@ -33,9 +33,9 @@ class FindEnemyBase extends Plan {
   private def orderScout(scout:FriendlyUnitInfo) =
     With.executor.intend(new Intention(this, scout) { destination = Some(getNextScoutingPosition) })
   
-  private def getNextScoutingPosition:TilePosition = {
+  private def getNextScoutingPosition:TilePosition =
     With.intelligence.leastScoutedBases
-      .filter(base => With.paths.exists(With.geography.home, base)) //BWTA.isConnected could also help
+      .map(_.townHallRectangle.midpoint)
+      .filter(base => With.paths.exists(With.geography.home, base))
       .head
-  }
 }

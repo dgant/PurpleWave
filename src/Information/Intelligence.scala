@@ -1,36 +1,27 @@
 package Information
 
-import Performance.Caching.Cache
-import ProxyBwapi.UnitInfo.ForeignUnitInfo
+import Information.Geography.Types.Base
+import Performance.Caching.CacheFrame
 import Startup.With
 import bwapi.TilePosition
 
 class Intelligence {
   
-  def enemyBases:Option[TilePosition] =
+  def mostBaselikeEnemyPosition:TilePosition = mostBaselikeEnemyPositionCache.get
+  val mostBaselikeEnemyPositionCache = new CacheFrame(() =>
     With.units.enemy
       .toList
-      .filter(_.unitClass.isBuilding)
-      .filter(! _.flying)
-      .filter(_.unitClass.isTownHall)
-      .map(_.tileTopLeft)
+      .filterNot(_.flying)
+      .sortBy(unit => ! unit.unitClass.isBuilding)
+      .sortBy(unit => ! unit.unitClass.isTownHall)
+      .map(_.tileCenter)
       .headOption
+      .getOrElse(leastScoutedBases.head.townHallRectangle.midpoint))
   
-  def mostBaselikeEnemyBuilding:Option[ForeignUnitInfo] = {
-    With.units.enemy
-      .toList
-      .filter(unit => unit.unitClass.isBuilding)
-      .sortBy(unit => unit.unitClass.isFlyer)
-      .sortBy(unit => unit.unitClass.isTownHall)
-      .headOption
-  }
-  
-  def leastScoutedBases():Iterable[TilePosition] = leastScoutedBasesCache.get
-  private val leastScoutedBasesCache = new Cache(2, () => leastScoutedBasesCalculate)
-  private def leastScoutedBasesCalculate:Iterable[TilePosition] =
+  def leastScoutedBases:Iterable[Base] = leastScoutedBasesCache.get
+  private val leastScoutedBasesCache = new CacheFrame(() =>
     With.geography.bases
       .toList
       .sortBy( ! _.isStartLocation)
-      .sortBy(base => With.game.isExplored(base.townHallRectangle.midpoint))
-      .map(_.townHallRectangle.midpoint)
+      .sortBy(_.lastScouted))
 }

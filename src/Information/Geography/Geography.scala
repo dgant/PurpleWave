@@ -30,6 +30,7 @@ class Geography {
   
   def onFrame() {
     zoneUpdateLimiter.act()
+    bases.filter(base => With.game.isVisible(base.townHallRectangle.midpoint)).foreach(base => base.lastScouted = With.frame)
   }
   
   private val zoneCache         = new CacheForever(() => ZoneBuilder.build)

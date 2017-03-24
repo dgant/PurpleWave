@@ -18,16 +18,14 @@ class Hunt extends Plan {
   override def getChildren: Iterable[Plan] = List(hunters.get)
   override def onFrame() {
     
-    val targetPosition = position.get.find.orElse(With.intelligence.leastScoutedBases.headOption)
-    
-    if (targetPosition.isEmpty) return
+    val targetPosition = position.get.find.getOrElse(With.intelligence.leastScoutedBases.head.townHallRectangle.midpoint)
     
     hunters.get.onFrame()
     if (hunters.get.isComplete) {
       hunters.get.units.foreach(fighter => {
         val targets = With.units.enemy.filter(fighter.canAttack)
         val targetDestination = if(targets.isEmpty) targetPosition else targets.minBy(_.pixelDistanceSquared(fighter)).tileCenter
-        With.executor.intend(new Intention(this, fighter) { destination = targetPosition })
+        With.executor.intend(new Intention(this, fighter) { destination = Some(targetPosition) })
       })
     }
   }

@@ -40,18 +40,78 @@
       <file leaf-file-name="Geography.scala" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Information/Geography/Geography.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="416">
-              <caret line="32" column="3" lean-forward="true" selection-start-line="32" selection-start-column="3" selection-end-line="32" selection-end-column="3" />
+            <state relative-caret-position="364">
+              <caret line="28" column="39" lean-forward="true" selection-start-line="28" selection-start-column="39" selection-end-line="28" selection-end-column="39" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="PositionChoke.scala" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Intelligence.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Information/Intelligence.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="260">
+              <caret line="20" column="6" lean-forward="false" selection-start-line="20" selection-start-column="6" selection-end-line="20" selection-end-column="6" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="FindEnemyBase.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Planning/Plans/Information/FindEnemyBase.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="351">
+              <caret line="27" column="26" lean-forward="false" selection-start-line="27" selection-start-column="26" selection-end-line="27" selection-end-column="26" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Hunt.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Planning/Plans/Army/Hunt.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="314">
+              <caret line="29" column="5" lean-forward="true" selection-start-line="29" selection-start-column="5" selection-end-line="29" selection-end-column="5" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="FoundEnemyBase.scala" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/Planning/Plans/Information/FoundEnemyBase.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="143">
+              <caret line="11" column="80" lean-forward="true" selection-start-line="11" selection-start-column="80" selection-end-line="11" selection-end-column="80" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="PositionEnemyBase.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Planning/Composition/PositionFinders/PositionEnemyBase.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="91">
+              <caret line="7" column="2" lean-forward="false" selection-start-line="7" selection-start-column="2" selection-end-line="7" selection-end-column="2" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Base.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Information/Geography/Types/Base.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="234">
+              <caret line="18" column="23" lean-forward="false" selection-start-line="18" selection-start-column="23" selection-end-line="18" selection-end-column="23" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="PositionChoke.scala" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Planning/Composition/PositionFinders/PositionChoke.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="390">
-              <caret line="30" column="60" lean-forward="true" selection-start-line="30" selection-start-column="60" selection-end-line="30" selection-end-column="60" />
+            <state relative-caret-position="195">
+              <caret line="15" column="23" lean-forward="true" selection-start-line="15" selection-start-column="23" selection-end-line="15" selection-end-column="23" />
               <folding />
             </state>
           </provider>
@@ -62,56 +122,6 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="91">
               <caret line="7" column="2" lean-forward="false" selection-start-line="7" selection-start-column="2" selection-end-line="7" selection-end-column="70" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ScoutAt.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Planning/Plans/Information/ScoutAt.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="195">
-              <caret line="15" column="33" lean-forward="true" selection-start-line="5" selection-start-column="32" selection-end-line="15" selection-end-column="33" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ZoneEdge.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Information/Geography/Types/ZoneEdge.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="182">
-              <caret line="14" column="89" lean-forward="false" selection-start-line="14" selection-start-column="89" selection-end-line="14" selection-end-column="89" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="VisualizeChokepoints.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Debugging/Visualization/Views/VisualizeChokepoints.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="195">
-              <caret line="15" column="79" lean-forward="true" selection-start-line="15" selection-start-column="79" selection-end-line="15" selection-end-column="79" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="VisualizeBases.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Debugging/Visualization/Views/VisualizeBases.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="91">
-              <caret line="7" column="7" lean-forward="false" selection-start-line="7" selection-start-column="7" selection-end-line="7" selection-end-column="7" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Configuration.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Debugging/Configuration.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="195">
-              <caret line="15" column="20" lean-forward="false" selection-start-line="15" selection-start-column="20" selection-end-line="15" selection-end-column="20" />
               <folding />
             </state>
           </provider>
@@ -201,16 +211,12 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/Micro/Heuristics/Targeting/WeightedTargetingHeuristic.scala" />
-        <option value="$PROJECT_DIR$/src/Micro/Heuristics/Movement/WeightedMovementHeuristic.scala" />
-        <option value="$PROJECT_DIR$/src/Micro/Heuristics/Targeting/TargetingProfile.scala" />
         <option value="$PROJECT_DIR$/src/Micro/Heuristics/Targeting/EvaluateTargets.scala" />
         <option value="$PROJECT_DIR$/src/Micro/Heuristics/UnitHeuristics/UnitHeuristicHealth.scala" />
         <option value="$PROJECT_DIR$/src/Micro/Heuristics/UnitHeuristics/UnitHeuristicDamagePerSecond.scala" />
         <option value="$PROJECT_DIR$/src/Micro/Heuristics/UnitHeuristics/UnitHeuristicFiringPosition.scala" />
         <option value="$PROJECT_DIR$/src/Micro/Heuristics/UnitHeuristics/UnitHeuristicDistance.scala" />
         <option value="$PROJECT_DIR$/src/Utilities/EnrichPosition.scala" />
-        <option value="$PROJECT_DIR$/src/Planning/Plans/Army/Hunt.scala" />
         <option value="$PROJECT_DIR$/src/Information/Geography/ConstructZones.scala" />
         <option value="$PROJECT_DIR$/src/Information/Geography/TownHallPositionCalculator.scala" />
         <option value="$PROJECT_DIR$/src/Micro/Battles/Battles.scala" />
@@ -221,8 +227,6 @@
         <option value="$PROJECT_DIR$/src/Debugging/Visualization/Views/VisualizeVectorUnits.scala" />
         <option value="$PROJECT_DIR$/src/Information/Geography/Bases.scala" />
         <option value="$PROJECT_DIR$/src/Information/Geography/ZoneBuilder.scala" />
-        <option value="$PROJECT_DIR$/src/Information/Geography/Types/Base.scala" />
-        <option value="$PROJECT_DIR$/src/Information/Intelligence.scala" />
         <option value="$PROJECT_DIR$/src/Planning/Plans/Macro/Automatic/GatherMinerals.scala" />
         <option value="$PROJECT_DIR$/src/Startup/Bot.scala" />
         <option value="$PROJECT_DIR$/src/Information/Geography/ZoneUpdater.scala" />
@@ -250,8 +254,14 @@
         <option value="$PROJECT_DIR$/src/Planning/Plans/GamePlans/ProtossGamePlan.scala" />
         <option value="$PROJECT_DIR$/src/Planning/Plans/Macro/RemoveMineralBlockAt.scala" />
         <option value="$PROJECT_DIR$/src/Planning/Plans/Macro/RemoveMineralBlocks.scala" />
-        <option value="$PROJECT_DIR$/src/Information/Geography/Geography.scala" />
         <option value="$PROJECT_DIR$/src/Planning/Composition/PositionFinders/PositionChoke.scala" />
+        <option value="$PROJECT_DIR$/src/Information/Geography/Geography.scala" />
+        <option value="$PROJECT_DIR$/src/Information/Geography/Types/Base.scala" />
+        <option value="$PROJECT_DIR$/src/Information/Intelligence.scala" />
+        <option value="$PROJECT_DIR$/src/Planning/Composition/PositionFinders/PositionEnemyBase.scala" />
+        <option value="$PROJECT_DIR$/src/Planning/Plans/Information/FindEnemyBase.scala" />
+        <option value="$PROJECT_DIR$/src/Planning/Plans/Army/Hunt.scala" />
+        <option value="$PROJECT_DIR$/src/Planning/Plans/Information/FoundEnemyBase.scala" />
       </list>
     </option>
   </component>
@@ -693,7 +703,7 @@
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.42251462" sideWeight="0.49411765" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.43128654" sideWeight="0.49117646" order="13" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.12280702" sideWeight="0.49117646" order="13" side_tool="false" content_ui="tabs" />
       <window_info id="Debug with VisualVM" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32748538" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -773,14 +783,6 @@
     </watches-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/Micro/Heuristics/UnitHeuristics/UnitHeuristicFiringPosition.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="91">
-          <caret line="7" column="74" lean-forward="false" selection-start-line="7" selection-start-column="74" selection-end-line="7" selection-end-column="74" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Micro/Heuristics/UnitHeuristics/UnitHeuristicValue.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="117">
@@ -825,22 +827,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="182">
           <caret line="14" column="62" lean-forward="true" selection-start-line="14" selection-start-column="62" selection-end-line="14" selection-end-column="62" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Planning/Plans/Army/Hunt.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="253">
-          <caret line="20" column="97" lean-forward="true" selection-start-line="20" selection-start-column="97" selection-end-line="20" selection-end-column="97" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Planning/Plans/Information/FindEnemyBase.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="116">
-          <caret line="24" column="55" lean-forward="false" selection-start-line="24" selection-start-column="55" selection-end-line="24" selection-end-column="55" />
           <folding />
         </state>
       </provider>
@@ -917,14 +903,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Information/Geography/Types/Base.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="65">
-          <caret line="5" column="6" lean-forward="false" selection-start-line="5" selection-start-column="6" selection-end-line="5" selection-end-column="6" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://C:/Program Files (x86)/scala/lib/scala-library.jar!/scala/collection/immutable/List.class">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="94">
@@ -937,22 +915,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="52">
           <caret line="4" column="4" lean-forward="false" selection-start-line="4" selection-start-column="4" selection-end-line="4" selection-end-column="4" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Information/Intelligence.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="173">
-          <caret line="30" column="24" lean-forward="true" selection-start-line="30" selection-start-column="3" selection-end-line="30" selection-end-column="24" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Planning/Composition/PositionFinders/PositionEnemyBase.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="169">
-          <caret line="13" column="31" lean-forward="false" selection-start-line="13" selection-start-column="31" selection-end-line="13" selection-end-column="31" />
           <folding />
         </state>
       </provider>
@@ -1160,6 +1122,22 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/Planning/Composition/PositionFinders/PositionChoke.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="15" column="23" lean-forward="true" selection-start-line="15" selection-start-column="23" selection-end-line="15" selection-end-column="23" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Information/Geography/Types/Base.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="234">
+          <caret line="18" column="23" lean-forward="false" selection-start-line="18" selection-start-column="23" selection-end-line="18" selection-end-column="23" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/Planning/Plans/Macro/RemoveMineralBlocks.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="169">
@@ -1170,16 +1148,48 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Information/Geography/Geography.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="416">
-          <caret line="32" column="3" lean-forward="true" selection-start-line="32" selection-start-column="3" selection-end-line="32" selection-end-column="3" />
+        <state relative-caret-position="364">
+          <caret line="28" column="39" lean-forward="true" selection-start-line="28" selection-start-column="39" selection-end-line="28" selection-end-column="39" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Planning/Composition/PositionFinders/PositionChoke.scala">
+    <entry file="file://$PROJECT_DIR$/src/Planning/Composition/PositionFinders/PositionEnemyBase.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="390">
-          <caret line="30" column="60" lean-forward="true" selection-start-line="30" selection-start-column="60" selection-end-line="30" selection-end-column="60" />
+        <state relative-caret-position="91">
+          <caret line="7" column="2" lean-forward="false" selection-start-line="7" selection-start-column="2" selection-end-line="7" selection-end-column="2" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Information/Intelligence.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="260">
+          <caret line="20" column="6" lean-forward="false" selection-start-line="20" selection-start-column="6" selection-end-line="20" selection-end-column="6" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Planning/Plans/Information/FindEnemyBase.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="351">
+          <caret line="27" column="26" lean-forward="false" selection-start-line="27" selection-start-column="26" selection-end-line="27" selection-end-column="26" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Planning/Plans/Army/Hunt.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="314">
+          <caret line="29" column="5" lean-forward="true" selection-start-line="29" selection-start-column="5" selection-end-line="29" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Planning/Plans/Information/FoundEnemyBase.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="143">
+          <caret line="11" column="80" lean-forward="true" selection-start-line="11" selection-start-column="80" selection-end-line="11" selection-end-column="80" />
           <folding />
         </state>
       </provider>

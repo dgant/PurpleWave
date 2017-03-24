@@ -13,8 +13,8 @@ class Configuration {
   var cameraDynamicSpeedFastest         = 0
   
   var enableVisualization                   = true
-  var enableVisualizationBases              = false
-  var enableVisualizationBattles            = false
+  var enableVisualizationBases              = true
+  var enableVisualizationBattles            = true
   var enableVisualizationBullets            = false
   var enableVisualizationChokepoints        = false
   var enableVisualizationEconomy            = false
@@ -29,7 +29,7 @@ class Configuration {
   var enableVisualizationUnitsForeign       = false
   var enableVisualizationUnitsOurs          = false
   var enableVisualizationVectorUnits        = false
-  var enableVisualizationZones              = false
+  var enableVisualizationReservations              = true
   
   var enableGoonStopProtection  = true
   var enablePathRecalculation   = false

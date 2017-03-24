@@ -81,7 +81,7 @@ class ProtossVsZerg extends Parallel {
     new TrainContinuously(Protoss.Dragoon),
     new ScheduleBuildOrder { buildables.set(_enoughZealots) },
     new ScheduleBuildOrder { buildables.set(_twoBase) },
-    new ScoutAt(20),
+    new ScoutAt(10),
     new Hunt { hunters.get.unitMatcher.set(new UnitMatchType(Protoss.Corsair)) },
     new IfThenElse {
       predicate.set(new UnitCountAtLeast { quantity.set(8); unitMatcher.set(UnitMatchWarriors) })

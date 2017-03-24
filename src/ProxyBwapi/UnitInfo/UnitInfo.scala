@@ -41,7 +41,7 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   def travelPixels(destination:TilePosition)        : Double  = travelPixels(tileCenter, destination)
   def travelPixels(origin:TilePosition, destination:TilePosition): Double =
     if (flying)
-      origin.pixelCenter.distancePixels(destination.pixelCenter)
+      origin.pixelCenter.pixelDistance(destination.pixelCenter)
     else
       With.paths.groundPixels(origin, destination)
   

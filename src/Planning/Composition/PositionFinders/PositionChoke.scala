@@ -25,9 +25,9 @@ class PositionChoke extends PositionFinder {
     
     val mostExposedChoke = ourExposedChokes
       .minBy(choke => With.paths.groundPixels(
-        choke.chokepoint.getCenter.toTilePosition,
+        choke.centerPixel.toTilePosition,
         home))
     
-    return Some(mostExposedChoke.chokepoint.getCenter.toTilePosition)
+    return Some(mostExposedChoke.centerPixel.toTilePosition)
   }
 }

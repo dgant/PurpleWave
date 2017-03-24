@@ -12,8 +12,10 @@ class Geography {
   
   def zones               : Iterable[Zone]          = zoneCache.get
   def bases               : Iterable[Base]          = zones.flatten(_.bases)
-  def ourBases            : Iterable[Base]          = bases.filter(_.zone.owner == With.self)
-  def enemyBases          : Iterable[Base]          = bases.filterNot(base => List(With.self, With.neutral).contains(base.zone.owner))
+  def ourZones            : Iterable[Zone]          = zones.filter(_.owner == With.self)
+  def ourBases            : Iterable[Base]          = ourZones.flatten(_.bases)
+  def enemyZones          : Iterable[Zone]          = zones.filterNot(zone => List(With.self, With.neutral).contains(zone.owner))
+  def enemyBases          : Iterable[Base]          = enemyZones.flatten(_.bases)
   def ourTownHalls        : Iterable[UnitInfo]      = ourBases.flatMap(_.townHall)
   def ourHarvestingAreas  : Iterable[TileRectangle] = ourBases.map(_.harvestingArea)
   

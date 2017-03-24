@@ -24,25 +24,30 @@ object ZoneBuilder {
     return zones
   }
   
-  def buildZone(region:Region):Zone =
+  def buildZone(region:Region):Zone = {
+    val polygon = region.getPolygon
+    val tileArea = new TileRectangle(
+      new Position(
+        polygon.getPoints.asScala.map(_.getX).min,
+        polygon.getPoints.asScala.map(_.getY).min).toTilePosition,
+      new Position(
+        polygon.getPoints.asScala.map(_.getX).max,
+        polygon.getPoints.asScala.map(_.getY).max).toTilePosition)
+    val tiles = tileArea.tiles.filter(tile => polygon.isInside(tile.pixelCenter)).toSet
     new Zone(
       region,
-      new TileRectangle(
-        new Position(
-          region.getPolygon.getPoints.asScala.map(_.getX).min,
-          region.getPolygon.getPoints.asScala.map(_.getY).min).toTilePosition,
-        new Position(
-          region.getPolygon.getPoints.asScala.map(_.getX).max,
-          region.getPolygon.getPoints.asScala.map(_.getY).max).toTilePosition),
+      tileArea,
+      tiles,
       new ListBuffer[Base],
       new ListBuffer[ZoneEdge])
+  }
   
   def buildBase(townHallPosition:TilePosition, zones:Iterable[Zone]):Base = {
     val townHallArea = Protoss.Nexus.tileArea.add(townHallPosition)
     new Base(
       zones
         .find(_.contains(townHallPosition.toPosition))
-        .getOrElse(zones.minBy(_.centroid.distancePixels(townHallPosition.pixelCenter))),
+        .getOrElse(zones.minBy(_.centroid.pixelDistance(townHallPosition.pixelCenter))),
       townHallArea,
       With.game.getStartLocations.asScala.exists(_.distanceTile(townHallPosition) < 6))
   }

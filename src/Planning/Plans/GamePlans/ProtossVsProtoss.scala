@@ -85,7 +85,7 @@ class ProtossVsProtoss extends Parallel {
     new TrainContinuously(Protoss.Dragoon),
     new TrainContinuously(Protoss.Zealot),
     new ScheduleBuildOrder { buildables.set(_twoBaseBuild) },
-    new ScoutAt(20),
+    new ScoutAt(10),
     new IfThenElse {
       predicate.set(new UnitCountAtLeast { quantity.set(6); unitMatcher.set(UnitMatchWarriors) })
       whenFalse.set(new Defend)

@@ -36,7 +36,7 @@ object Visualization {
       if (With.configuration.enableVisualizationMovementHeuristics) VisualizeMovementHeuristics   .render()
       if (With.configuration.enableVisualizationUnitsForeign)       VisualizeUnitsForeign         .render()
       if (With.configuration.enableVisualizationUnitsOurs)          VisualizeUnitsOurs            .render()
-      if (With.configuration.enableVisualizationZones)              VisualizeZones                .render()
+      if (With.configuration.enableVisualizationReservations)       VisualizeReservations         .render()
     }
   }
 }

@@ -6,7 +6,7 @@ import Planning.Plans.Allocation.LockArea
 import Startup.With
 import bwapi.Color
 
-object VisualizeZones {
+object VisualizeReservations {
   
   def render() = renderPlan(With.gameplan)
   

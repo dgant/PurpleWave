@@ -12,8 +12,8 @@ object VisualizeChokepoints {
       zone.edges.foreach(edge => {
         DrawMap.labelBox(
           List(edge.zones.map(_.centroid.toString).mkString(" -> ")),
-          edge.chokepoint.getCenter)
-        DrawMap.circle(edge.chokepoint.getCenter, edge.chokepoint.getWidth.toInt / 2, Color.Purple)
+          edge.centerPixel)
+        DrawMap.circle(edge.centerPixel, edge.radiusPixels.toInt, Color.Purple)
       })
     })
   }

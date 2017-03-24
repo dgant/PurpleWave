@@ -138,7 +138,7 @@ class ProtossVsTerran extends Parallel {
     new TrainContinuously(Protoss.Carrier),
     new TrainContinuously(Protoss.Zealot),
     new ScheduleBuildOrder { buildables.set(_lateGame) },
-    new ScoutAt(20),
+    new ScoutAt(10),
     new Hunt { hunters.get.unitMatcher.set(new UnitMatchType(Protoss.Scout)) },
     new Hunt { hunters.get.unitMatcher.set(new UnitMatchType(Protoss.Carrier)) },
     new IfThenElse {

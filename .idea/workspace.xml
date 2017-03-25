@@ -27,11 +27,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="ZoneUpdater.scala" pinned="false" current-in-tab="false">
+      <file leaf-file-name="ZoneUpdater.scala" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Information/Geography/Calculations/ZoneUpdater.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="153">
-              <caret line="43" column="71" lean-forward="false" selection-start-line="43" selection-start-column="71" selection-end-line="43" selection-end-column="71" />
+            <state relative-caret-position="229">
+              <caret line="37" column="114" lean-forward="true" selection-start-line="37" selection-start-column="114" selection-end-line="37" selection-end-column="114" />
               <folding />
             </state>
           </provider>
@@ -57,11 +57,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="GatherMinerals.scala" pinned="false" current-in-tab="true">
+      <file leaf-file-name="GatherMinerals.scala" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Planning/Plans/Macro/Automatic/GatherMinerals.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="589">
-              <caret line="87" column="98" lean-forward="false" selection-start-line="87" selection-start-column="98" selection-end-line="87" selection-end-column="98" />
+            <state relative-caret-position="251">
+              <caret line="61" column="29" lean-forward="true" selection-start-line="61" selection-start-column="29" selection-end-line="61" selection-end-column="29" />
               <folding />
             </state>
           </provider>
@@ -261,8 +261,8 @@
         <option value="$PROJECT_DIR$/src/Planning/Composition/PositionFinders/PositionSimpleBuilding.scala" />
         <option value="$PROJECT_DIR$/src/Information/Geography/Types/Zone.scala" />
         <option value="$PROJECT_DIR$/src/Information/Geography/Calculations/ZoneBuilder.scala" />
-        <option value="$PROJECT_DIR$/src/Information/Geography/Calculations/ZoneUpdater.scala" />
         <option value="$PROJECT_DIR$/src/Planning/Plans/Macro/RemoveMineralBlocks.scala" />
+        <option value="$PROJECT_DIR$/src/Information/Geography/Calculations/ZoneUpdater.scala" />
       </list>
     </option>
   </component>
@@ -1104,14 +1104,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Information/Geography/Calculations/ZoneUpdater.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
-          <caret line="43" column="71" lean-forward="false" selection-start-line="43" selection-start-column="71" selection-end-line="43" selection-end-column="71" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/UnitClass/UnitClass.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="192">
@@ -1130,8 +1122,16 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Planning/Plans/Macro/Automatic/GatherMinerals.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="589">
-          <caret line="87" column="98" lean-forward="false" selection-start-line="87" selection-start-column="98" selection-end-line="87" selection-end-column="98" />
+        <state relative-caret-position="251">
+          <caret line="61" column="29" lean-forward="true" selection-start-line="61" selection-start-column="29" selection-end-line="61" selection-end-column="29" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Information/Geography/Calculations/ZoneUpdater.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="229">
+          <caret line="37" column="114" lean-forward="true" selection-start-line="37" selection-start-column="114" selection-end-line="37" selection-end-column="114" />
           <folding />
         </state>
       </provider>

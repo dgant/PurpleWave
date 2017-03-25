@@ -35,7 +35,7 @@ object ZoneUpdater {
   
   private def updateResources(base: Base) {
     base.minerals = With.units.neutral
-      .filter(unit => unit.unitClass.isMinerals && base.zone.contains(unit.pixelCenter))
+      .filter(unit => unit.unitClass.isMinerals && base.zone.contains(unit.pixelCenter) && unit.mineralsLeft > 24)
       .toSet
     base.gas = With.units.all
       .filter(unit => unit.unitClass.isGas && base.zone.contains(unit.pixelCenter))

@@ -19,7 +19,7 @@ object BehaviorDefault extends Behavior {
     val putADebugBreakpointHere = true
   }
   
-  def considerFleeing(intent:Intention) =  if (desireToFight(intent) < 1.0) intent.destination = Some(With.geography.home)
+  def considerFleeing(intent:Intention) = if (desireToFight(intent) < 1.0) intent.destination = Some(With.geography.home)
   def uninterruptible(intent:Intention):Boolean = intent.unit.attackStarting || intent.unit.attackAnimationHappening
   
   def desireToFight(intent:Intention):Double = {
@@ -46,9 +46,9 @@ object BehaviorDefault extends Behavior {
   def move(intent:Intention):Boolean = {
     val tileToMove =
       if (intent.threats.nonEmpty || intent.targets.nonEmpty)
-        EvaluatePositions.best(intent, intent.movementProfileNormal)
-      else if (With.configuration.enableHeuristicTravel)
         EvaluatePositions.best(intent, intent.movementProfileCombat)
+      else if (With.configuration.enableHeuristicTravel)
+        EvaluatePositions.best(intent, intent.movementProfileNormal)
       else
         intent.destination.getOrElse(intent.unit.tileCenter)
     

@@ -5,8 +5,9 @@ import Micro.Heuristics.Movement.MovementProfile
 object MovementProfiles {
   
   val defaultCombat = new MovementProfile (
-    preferTravel      = 2.0,
+    preferTravel      = 1.0,
     preferSitAtRange  = 1.0,
+    preferTarget      = 1.0,
     preferMobility    = 1.0,
     preferGrouping    = 0.1,
     avoidDamage       = 0.5,
@@ -20,7 +21,7 @@ object MovementProfiles {
     avoidTraffic      = 0.1)
   
   val worker = new MovementProfile (
-    preferSpot        = 3.0,
+    preferSpot        = 2.5,
     preferRandom      = 0.05,
     avoidDamage       = 1.0)
   

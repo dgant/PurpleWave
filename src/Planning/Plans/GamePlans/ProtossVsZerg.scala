@@ -32,6 +32,7 @@ class ProtossVsZerg extends Parallel {
   )
   
   val _twoBase = List[BuildRequest] (
+    new RequestUnitAtLeast(3,   Protoss.Gateway),
     new RequestUnitAtLeast(2,   Protoss.Nexus),
     new RequestUnitAtLeast(1,   Protoss.Assimilator),
     new RequestUnitAtLeast(1,   Protoss.CyberneticsCore),
@@ -84,7 +85,7 @@ class ProtossVsZerg extends Parallel {
     new ScoutAt(10),
     new Hunt { hunters.get.unitMatcher.set(new UnitMatchType(Protoss.Corsair)) },
     new IfThenElse {
-      predicate.set(new UnitCountAtLeast { quantity.set(8); unitMatcher.set(UnitMatchWarriors) })
+      predicate.set(new UnitCountAtLeast { quantity.set(20); unitMatcher.set(UnitMatchWarriors) })
       whenFalse.set(new Defend)
       whenTrue.set(new Attack)
     }

@@ -6,7 +6,9 @@ object Spiral {
   
   //Via http://stackoverflow.com/questions/3706219/algorithm-for-iterating-over-an-outward-spiral-on-a-discrete-2d-grid-from-the-or
   
-  def points[T](radius:Integer = 20):Iterable[Point] = {
+  def points:Iterable[Point] = points(20)
+  
+  def points(radius:Integer):Iterable[Point] = {
     
     var dx = 1
     var dy = 0

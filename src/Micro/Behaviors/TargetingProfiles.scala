@@ -8,7 +8,7 @@ object TargetingProfiles {
     preferInRange     = 1,
     preferValue       = 0.5,
     preferDps         = 0.5,
-    avoidHealth       = 2,
+    avoidHealth       = 1,
     avoidDistance     = 2,
-    avoidDistraction  = 0.25)
+    avoidDistraction  = 0)
 }

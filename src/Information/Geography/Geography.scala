@@ -10,6 +10,7 @@ import bwapi.TilePosition
 
 class Geography {
   
+  val mapArea             : TileRectangle           = new TileRectangle(new TilePosition(0, 0), new TilePosition(With.mapWidth, With.mapHeight))
   def zones               : Iterable[Zone]          = zoneCache.get
   def bases               : Iterable[Base]          = zones.flatten(_.bases)
   def ourZones            : Iterable[Zone]          = zones.filter(_.owner == With.self)

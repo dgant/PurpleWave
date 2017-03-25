@@ -121,7 +121,7 @@ object DrawMap {
   }
   
   def irrelevant(points:Iterable[Position]):Boolean = {
-    points.exists(irrelevant)
+    points.forall(irrelevant)
   }
   def irrelevant(point:Position):Boolean = {
     val buffer = 32 * 4

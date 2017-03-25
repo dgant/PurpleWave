@@ -11,6 +11,8 @@ import Utilities.EnrichPosition._
 
 class ControlPosition extends Plan {
   
+  description.set("Control a position")
+  
   val units = new Property[LockUnits](new LockUnits)
   var position = new Property[PositionFinder](new PositionEnemyBase)
   

@@ -127,7 +127,11 @@ class ProtossVsTerran extends Parallel {
     new RequestUpgrade(       Protoss.GroundArmor, 3),
     
     new RequestUnitAtLeast(8, Protoss.Nexus),
-    new RequestUnitAtLeast(8, Protoss.Assimilator)
+    new RequestUnitAtLeast(8, Protoss.Assimilator),
+    new RequestUnitAtLeast(9, Protoss.Nexus),
+    new RequestUnitAtLeast(9, Protoss.Assimilator),
+    new RequestUnitAtLeast(10, Protoss.Nexus),
+    new RequestUnitAtLeast(10, Protoss.Assimilator)
   )
   
   children.set(List(
@@ -142,7 +146,7 @@ class ProtossVsTerran extends Parallel {
     new Hunt { hunters.get.unitMatcher.set(new UnitMatchType(Protoss.Scout)) },
     new Hunt { hunters.get.unitMatcher.set(new UnitMatchType(Protoss.Carrier)) },
     new IfThenElse {
-      predicate.set(new UnitCountAtLeast { quantity.set(6); unitMatcher.set(UnitMatchWarriors) })
+      predicate.set(new UnitCountAtLeast { quantity.set(20); unitMatcher.set(UnitMatchWarriors) })
       whenFalse.set(new Defend)
       whenTrue.set(new Attack)
     }

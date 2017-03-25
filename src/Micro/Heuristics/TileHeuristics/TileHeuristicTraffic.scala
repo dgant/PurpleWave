@@ -11,7 +11,7 @@ object TileHeuristicTraffic extends TileHeuristic {
   override def evaluate(intent: Intention, candidate: TilePosition): Double = {
   
     if (intent.unit.flying) 1.0 else
-      1.7 + scaling *
+      1.7 +
       List(
         measureTraffic(intent, 0.5, candidate),
         measureTraffic(intent, 0.2, candidate.add(-1,  0)),
@@ -25,8 +25,14 @@ object TileHeuristicTraffic extends TileHeuristic {
       ).sum
   }
   
-  def measureTraffic(intent:Intention, multiplier:Double, tile:TilePosition):Double = {
+  def measureTraffic(
+    intent:Intention,
+    multiplier:Double,
+    tile:TilePosition)
+  :Double = {
+    
     multiplier *
+    scaling *
     With.grids.units.get(tile)
       .filterNot(_ == intent.unit)
       .filterNot(_.flying)

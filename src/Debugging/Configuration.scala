@@ -2,10 +2,10 @@ package Debugging
 
 class Configuration {
   
-  val combatStickinessLeash = 48
+  val combatStickinessLeash     = 64
   var enableGoonStopProtection  = true
   var enablePathRecalculation   = false
-  var enableHeuristicTravel     = false
+  var enableHeuristicTravel     = true
   
   var gameSpeed                         = 0
   var enableStdOut                      = false

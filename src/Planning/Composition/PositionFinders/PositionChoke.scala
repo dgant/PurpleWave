@@ -1,7 +1,6 @@
 package Planning.Composition.PositionFinders
 import Performance.Caching.Cache
 import Startup.With
-import Utilities.EnrichPosition._
 import bwapi.TilePosition
 
 class PositionChoke extends PositionFinder {
@@ -18,13 +17,8 @@ class PositionChoke extends PositionFinder {
     
     if (ourExposedChokes.isEmpty) return Some(home)
     
-    val furthestStartPosition = With.geography.bases
-      .filter(_.isStartLocation)
-      .map(_.townHallRectangle.startInclusive)
-      .maxBy(home.distanceTileSquared)
-    
     val mostExposedChoke = ourExposedChokes
-      .minBy(choke => With.paths.groundPixels(
+      .maxBy(choke => With.paths.groundPixels(
         choke.centerPixel.toTilePosition,
         home))
     

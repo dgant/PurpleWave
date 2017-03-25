@@ -5,10 +5,10 @@ import Micro.Heuristics.Targeting.TargetingProfile
 object TargetingProfiles {
   
   val default = new TargetingProfile(
-    preferInRange     = 1,
-    preferValue       = 0.5,
-    preferDps         = 0.5,
-    avoidHealth       = 1,
-    avoidDistance     = 2,
+    preferInRange     = 2,
+    preferValue       = 0.25,
+    preferDps         = 0.75,
+    avoidHealth       = 0.75,
+    avoidDistance     = 1,
     avoidDistraction  = 0)
 }

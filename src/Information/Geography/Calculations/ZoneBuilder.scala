@@ -26,7 +26,14 @@ object ZoneBuilder {
     With.geography.mapArea.tiles
       .filterNot(tile => zones.exists(_.contains(tile)))
       .foreach(tile => {
-        Spiral.points.view.map(point => zones.find(_.contains(tile.add(point))))
+        var doContinue = true
+        Spiral.points.view.foreach(point => {
+          val nearbyZone = zones.find(_.contains(tile.add(point)))
+          if (nearbyZone.isDefined) {
+            nearbyZone.get.tiles.add(tile)
+            doContinue = false
+          }
+        })
       })
     return zones
   }

@@ -46,6 +46,7 @@ class PositionSimpleBuilding(val buildingType:UnitClass) extends PositionFinder 
   
   private def positionTownHall:Option[TilePosition] = {
     val candidates = With.geography.bases
+      .filterNot(_.zone.island)
       .filter(base => base.gasLeft > 0 || With.geography.ourBases.size >= 2)
       .map(base => base.townHallRectangle)
       .filter(baseRectangle => {

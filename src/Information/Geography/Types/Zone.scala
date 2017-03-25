@@ -19,6 +19,7 @@ class Zone(
   val centroid = bwtaRegion.getCenter
   var owner:Player = With.game.neutral
   val points:Iterable[Position] = bwtaRegion.getPolygon.getPoints.asScala.toList
+  val island:Boolean = ! With.game.getStartLocations.asScala.exists(startTile => With.paths.exists(centroid.toTilePosition, startTile))
   
   def contains(tile:TilePosition):Boolean = boundary.contains(tile) && tiles.contains(tile)
   def contains(pixel:Position):Boolean = contains(pixel.toTilePosition)

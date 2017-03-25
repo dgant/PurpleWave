@@ -46,6 +46,7 @@ class PositionSimpleBuilding(val buildingType:UnitClass) extends PositionFinder 
   
   private def positionTownHall:Option[TilePosition] = {
     val candidates = With.geography.bases
+      .filter(base => base.gasLeft > 0 || With.geography.ourBases.size >= 2)
       .map(base => base.townHallRectangle)
       .filter(baseRectangle => {
         With.units.all.filter(_.unitClass.isBuilding).forall( ! _.tileArea.intersects(baseRectangle))
@@ -55,7 +56,7 @@ class PositionSimpleBuilding(val buildingType:UnitClass) extends PositionFinder 
     if (candidates.isEmpty) return None
     Some(candidates
       .minBy(candidate =>
-        1* With.geography.zones
+        1 * With.geography.zones
           .filter(_.owner == With.self)
           .map(zone => With.paths.groundPixels(zone.centroid.toTilePosition, candidate))
           .sum

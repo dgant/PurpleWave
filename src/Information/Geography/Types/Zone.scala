@@ -15,8 +15,6 @@ class Zone(
   val bases:ListBuffer[Base],
   val edges:ListBuffer[ZoneEdge]) {
   
-  private val polygon = bwtaRegion.getPolygon
-  
   val centroid = bwtaRegion.getCenter
   var owner:Player = With.game.neutral
   val points:Iterable[Position] = bwtaRegion.getPolygon.getPoints.asScala.toList

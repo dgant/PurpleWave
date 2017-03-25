@@ -33,7 +33,12 @@ object ZoneBuilder {
       new Position(
         polygon.getPoints.asScala.map(_.getX).max,
         polygon.getPoints.asScala.map(_.getY).max).toTilePosition)
-    val tiles = tileArea.tiles.filter(tile => polygon.isInside(tile.pixelCenter)).toSet
+    val tiles = tileArea.tiles
+      .filter(tile => {
+        val tileRegion = BWTA.getRegion(tile)
+        tileRegion != null && tileRegion.getCenter == region.getCenter
+      })
+      .toSet
     new Zone(
       region,
       tileArea,

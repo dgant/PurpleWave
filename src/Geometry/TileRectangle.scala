@@ -23,7 +23,8 @@ class TileRectangle(
   
   def add(tilePosition:TilePosition):TileRectangle =
     add(tilePosition.getX, tilePosition.getY)
-  
+
+  def midPixel:Position = startPixel.midpoint(endPixel)
   def midpoint:TilePosition = startInclusive.midpoint(endExclusive)
   
   def contains(x:Int, y:Int):Boolean = {

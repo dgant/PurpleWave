@@ -3,7 +3,6 @@ package Debugging.Visualization.Views
 import Debugging.Visualization.Colors
 import Debugging.Visualization.Rendering.DrawMap
 import Startup.With
-import Utilities.EnrichPosition._
 
 object VisualizeBases {
   
@@ -19,9 +18,11 @@ object VisualizeBases {
             if (base.isStartLocation) "Start location" else "",
             "Minerals left: " + base.mineralsLeft,
             "Gas left:      " + base.gasLeft,
-            if (base.lastScoutedFrame == With.frame) "" else "Last scouted " + (With.frame - base.lastScoutedFrame) + " frames ago"
+            if (base.lastScoutedFrame == With.frame) ""
+            else if (base.lastScoutedFrame <= 0) "Never scouted"
+            else "Last scouted " + (With.frame - base.lastScoutedFrame) + " frames ago"
           ),
-          base.townHallRectangle.midpoint.pixelCenter,
+          base.townHallRectangle.midPixel,
           true,
           DrawMap.playerColorDark(base.zone.owner))
       })

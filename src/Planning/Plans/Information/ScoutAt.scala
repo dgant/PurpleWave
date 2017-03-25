@@ -9,7 +9,7 @@ class ScoutAt(minimumSupply:Int) extends IfThenElse {
   
   predicate.set(
     new And { children.set(List(
-      new SupplyAtLeast { quantity.set(minimumSupply/2) },
+      new SupplyAtLeast { quantity.set(minimumSupply*2) },
       new Not { child.set(new FoundEnemyBase) }
     ))})
     

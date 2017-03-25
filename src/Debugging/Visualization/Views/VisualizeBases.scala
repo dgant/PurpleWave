@@ -19,7 +19,7 @@ object VisualizeBases {
             if (base.isStartLocation) "Start location" else "",
             "Minerals left: " + base.mineralsLeft,
             "Gas left:      " + base.gasLeft,
-            if (base.lastScoutedFrame == With.frame) "" else "Last scouted " + (With.frame - base.lastScoutedFrame) + " frames ago",
+            if (base.lastScoutedFrame == With.frame) "" else "Last scouted " + (With.frame - base.lastScoutedFrame) + " frames ago"
           ),
           base.townHallRectangle.midpoint.pixelCenter,
           true,

@@ -40,8 +40,8 @@ object ZoneUpdater {
     base.gas = With.units.all
       .filter(unit => unit.unitClass.isGas && base.zone.contains(unit.pixelCenter))
   
-    base.mineralsLeft   = base.minerals.filter(_.alive).map(_.mineralsLeft).sum
-    base.gasLeft        = base.gas.filter(_.alive).map(_.mineralsLeft).sum
+    base.mineralsLeft   = base.minerals.filter(_.alive).toList.map(_.mineralsLeft).sum
+    base.gasLeft        = base.gas.filter(_.alive).toList.map(_.mineralsLeft).sum
     base.harvestingArea = (List(base.townHallRectangle) ++ (base.minerals ++ base.gas).map(_.tileArea)).boundary
   }
 }

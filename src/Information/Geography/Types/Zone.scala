@@ -6,6 +6,7 @@ import bwapi.{Player, Position, TilePosition}
 import bwta.Region
 
 import scala.collection.mutable.ListBuffer
+import scala.collection.JavaConverters._
 
 class Zone(
   val bwtaRegion:Region,
@@ -18,6 +19,7 @@ class Zone(
   
   val centroid = bwtaRegion.getCenter
   var owner:Player = With.game.neutral
+  val points:Iterable[Position] = bwtaRegion.getPolygon.getPoints.asScala.toList
   
   def contains(pixel:Position):Boolean = boundary.contains(pixel.toTilePosition) && tiles.contains(pixel.toTilePosition)
 }

@@ -15,7 +15,7 @@ class Grids {
   val mobility = new GridMobility
   val units = new GridUnits
   val walkable = new GridWalkable
-  val walkableTerran = new GridWalkableTerrain
+  val walkableTerrain = new GridWalkableTerrain
   val walkableUnits = new GridWalkableUnits
   
   val updateFrequency = 1
@@ -34,7 +34,7 @@ class Grids {
       buildable,
       buildableTerrain,
       walkable,
-      walkableTerran,
+      walkableTerrain,
       walkableUnits,
       mobility
     ).foreach(_.update())

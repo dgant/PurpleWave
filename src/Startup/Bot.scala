@@ -3,13 +3,14 @@ package Startup
 import Debugging.Visualization.Data.{MovementHeuristicViews, Viewport}
 import Debugging.{Visualization, _}
 import Information.Geography.Geography
+import Information.Geography.Pathfinding.Paths
 import Information.Grids.Grids
 import Information._
 import Macro.Allocation._
 import Macro.Architect
 import Macro.Scheduling.Scheduler
 import Micro.Battles.Battles
-import Micro.{Commander, Executor, Paths}
+import Micro.{Commander, Executor}
 import Planning.Plans.GamePlans.WinTheGame
 import ProxyBwapi.UnitTracking.UnitTracker
 import _root_.Performance.Latency

@@ -1,6 +1,7 @@
 package Utilities
 
 import Geometry.{Point, Positions, TileRectangle}
+import Information.Geography.Types.Zone
 import Startup.With
 import bwapi.{Position, TilePosition, WalkPosition}
 
@@ -54,17 +55,17 @@ case object EnrichPosition {
     }
   }
   
-  implicit class EnrichedPosition(position:Position) {
+  implicit class EnrichedPosition(pixel:Position) {
     //Checking position validity is a frequent operation,
     //but going through BWAPI via BWMirror has a lot of overhead
     def valid:Boolean = {
-      position.getX >= 0 &&
-      position.getY >= 0 &&
-      position.getX < With.mapWidth * 32 &&
-      position.getY < With.mapHeight * 32
+      pixel.getX >= 0 &&
+      pixel.getY >= 0 &&
+      pixel.getX < With.mapWidth * 32 &&
+      pixel.getY < With.mapHeight * 32
     }
     def add(dx:Int, dy:Int):Position = {
-      new Position(position.getX + dx, position.getY + dy)
+      new Position(pixel.getX + dx, pixel.getY + dy)
     }
     def add (point:Point):Position = {
       add(point.x, point.y)
@@ -79,94 +80,100 @@ case object EnrichPosition {
       subtract(otherPosition.getX, otherPosition.getY)
     }
     def multiply(scale:Int):Position = {
-      new Position(scale * position.getX, scale * position.getY)
+      new Position(scale * pixel.getX, scale * pixel.getY)
     }
     def divide(scale:Int):Position = {
-      new Position(position.getX / scale, position.getY / scale)
+      new Position(pixel.getX / scale, pixel.getY / scale)
     }
     def project(destination:Position, pixels:Double):Position = {
       val distance = pixelDistance(destination)
-      if (distance == 0) return position
-      val delta = destination.subtract(position)
-      delta.multiply((pixels/distance).toInt).add(position)
+      if (distance == 0) return pixel
+      val delta = destination.subtract(pixel)
+      delta.multiply((pixels/distance).toInt).add(pixel)
     }
-    def midpoint(otherPosition:Position):Position = {
-      add(otherPosition).divide(2)
+    def midpoint(otherPixel:Position):Position = {
+      add(otherPixel).divide(2)
     }
-    def pixelDistance(otherPosition:Position):Double = {
-      Math.sqrt(distancePixelsSquared(otherPosition))
+    def pixelDistance(otherPixel:Position):Double = {
+      Math.sqrt(distancePixelsSquared(otherPixel))
     }
     def distancePixelsSquared(otherPosition:Position):Int = {
-      val dx = position.getX - otherPosition.getX
-      val dy = position.getY - otherPosition.getY
+      val dx = pixel.getX - otherPosition.getX
+      val dy = pixel.getY - otherPosition.getY
       dx * dx + dy * dy
     }
     def tileIncluding:TilePosition = {
-      position.toTilePosition
+      pixel.toTilePosition
     }
     def tileNearest:TilePosition = {
-      position.add(16, 16).toTilePosition
+      pixel.add(16, 16).toTilePosition
     }
     def toPoint:Point = {
-      new Point(position.getX, position.getY)
+      new Point(pixel.getX, pixel.getY)
     }
     def toWalkPosition:WalkPosition = {
-      new WalkPosition(position.getX / 4, position.getY / 4)
+      new WalkPosition(pixel.getX / 4, pixel.getY / 4)
+    }
+    def zone:Zone = {
+      With.geography.zoneByTile(tileIncluding)
     }
   }
   
-  implicit class EnrichedTilePosition(position:TilePosition) {
+  implicit class EnrichedTilePosition(tile:TilePosition) {
     //Checking position validity is a frequent operation,
     //but going through BWAPI via BWMirror has a lot of overhead
     def valid:Boolean = {
-      position.getX >= 0 &&
-      position.getY >= 0 &&
-      position.getX < With.mapWidth &&
-      position.getY < With.mapHeight
+      tile.getX >= 0 &&
+      tile.getY >= 0 &&
+      tile.getX < With.mapWidth &&
+      tile.getY < With.mapHeight
     }
     def add(dx:Int, dy:Int):TilePosition = {
-      new TilePosition(position.getX + dx, position.getY + dy)
+      new TilePosition(tile.getX + dx, tile.getY + dy)
     }
     def add (point:Point):TilePosition = {
       add(point.x, point.y)
     }
-    def add(otherPosition:TilePosition):TilePosition = {
-      add(otherPosition.getX, otherPosition.getY)
+    def add(otherTile:TilePosition):TilePosition = {
+      add(otherTile.getX, otherTile.getY)
     }
     def subtract(dx:Int, dy:Int):TilePosition = {
       add(-dx, -dy)
     }
-    def subtract(otherPosition:TilePosition):TilePosition = {
-      subtract(otherPosition.getX, otherPosition.getY)
+    def subtract(otherTile:TilePosition):TilePosition = {
+      subtract(otherTile.getX, otherTile.getY)
     }
     def multiply(scale:Int):TilePosition = {
-      new TilePosition(scale * position.getX, scale * position.getY)
+      new TilePosition(scale * tile.getX, scale * tile.getY)
     }
     def divide(scale:Int):TilePosition = {
-      new TilePosition(position.getX / scale, position.getY / scale)
+      new TilePosition(tile.getX / scale, tile.getY / scale)
     }
     def midpoint(otherPosition:TilePosition):TilePosition = {
       add(otherPosition).divide(2)
     }
-    def distanceTile(otherPosition:TilePosition):Double = {
-      Math.sqrt(distanceTileSquared(otherPosition))
+    def distanceTile(otherTile:TilePosition):Double = {
+      Math.sqrt(distanceTileSquared(otherTile))
     }
-    def distanceTileSquared(otherPosition:TilePosition):Int = {
-      val dx = position.getX - otherPosition.getX
-      val dy = position.getY - otherPosition.getY
+    def distanceTileSquared(otherTile:TilePosition):Int = {
+      val dx = tile.getX - otherTile.getX
+      val dy = tile.getY - otherTile.getY
       dx * dx + dy * dy
     }
     def topLeftPixel:Position = {
-      position.toPosition
+      tile.toPosition
     }
     def bottomRightPixel:Position = {
-      position.toPosition.add(31, 31)
+      tile.toPosition.add(31, 31)
     }
     def pixelCenter:Position = {
-      position.toPosition.add(16, 16)
+      tile.toPosition.add(16, 16)
     }
     def topLeftWalkPosition:WalkPosition = {
-      new WalkPosition(position.getX * 4, position.getY * 4)
+      new WalkPosition(tile.getX * 4, tile.getY * 4)
+    }
+    def zone:Zone = {
+      With.geography.zoneByTile(tile)
     }
   }
   

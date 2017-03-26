@@ -1,27 +1,29 @@
-package Micro
+package Information.Geography.Pathfinding
 
 import Startup.With
 import bwapi.TilePosition
 import bwta.BWTA
 
 import scala.collection.mutable
+import Utilities.EnrichPosition._
 
 class Paths {
   
   //Cache ground distances with a LRU (Least-recently used) cache
   private val maxCacheSize = 100000
-  private val impossiblyLargeDistance = Int.MaxValue / 1000
   private val distanceCache = new mutable.HashMap[(TilePosition, TilePosition), Int]
   private val distanceAge = new mutable.HashMap[(TilePosition, TilePosition), Int]
   
-  def exists(origin:TilePosition, destination: TilePosition):Boolean = {
-    groundPixels(origin, destination) < impossiblyLargeDistance
+  val impossiblyLargeDistance = Int.MaxValue / 1000
+  
+  def exists(origin:TilePosition, destination: TilePosition, requireBwta:Boolean = false):Boolean = {
+    groundPixels(origin, destination, requireBwta) < impossiblyLargeDistance
   }
   
-  def groundPixels(origin:TilePosition, destination:TilePosition):Int = {
+  def groundPixels(origin:TilePosition, destination:TilePosition, requireBwta:Boolean = false):Int = {
     val request = (origin, destination)
     if ( ! distanceCache.contains(request)) {
-      cacheDistance(request)
+      calculateDistance(request, requireBwta)
     }
     distanceAge.put(request, With.frame)
     val result = distanceCache(request)
@@ -34,8 +36,13 @@ class Paths {
     result
   }
   
-  private def cacheDistance(request:(TilePosition, TilePosition)) {
-    val distance = BWTA.getGroundDistance(request._1, request._2)
+  private def calculateDistance(request:(TilePosition, TilePosition), requireBwta:Boolean) {
+    val distance =
+      if (With.configuration.enableFastGroundDistance && With.frame > 0 && ! requireBwta)
+        PathFinder.roughGroundDistance(request._1.pixelCenter, request._2.pixelCenter)
+      else
+        BWTA.getGroundDistance(request._1, request._2)
+    
     distanceCache.put(request, distance.toInt)
   }
   

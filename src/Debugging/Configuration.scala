@@ -6,6 +6,7 @@ class Configuration {
   var enableGoonStopProtection  = true
   var enablePathRecalculation   = false
   var enableHeuristicTravel     = true
+  var enableFastGroundDistance  = true
   
   var gameSpeed                         = 0
   var enableStdOut                      = false

@@ -19,13 +19,13 @@ class Performance {
     frameTimes(With.frame % framesToTrack) = millisecondDifference
   
     if (With.frame % framesToTrack == 0) {
-      if (meanFrameLength > 20 || maxFrameLength > 80) {
+      if (meanFrameLength > 20) {
         currentFrameDelay += 1
       } else {
         currentFrameDelay -= 1
       }
       currentFrameDelay = Math.max(6,  currentFrameDelay)
-      currentFrameDelay = Math.min(72, currentFrameDelay)
+      currentFrameDelay = Math.min(48, currentFrameDelay)
     }
   }
   

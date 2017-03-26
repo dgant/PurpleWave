@@ -2,6 +2,7 @@ package Planning.Composition.PositionFinders
 import Performance.Caching.Cache
 import Startup.With
 import bwapi.TilePosition
+import Utilities.EnrichPosition._
 
 class PositionChoke extends PositionFinder {
   
@@ -11,7 +12,9 @@ class PositionChoke extends PositionFinder {
     
     val home = With.geography.home
     val ourExposedChokes = With.geography.zones
-      .filter(_.owner == With.self)
+      .filter(zone =>
+        zone.owner == With.self ||
+        With.executor.lastIntentions.values.exists(i => i.toBuild.nonEmpty && i.destination.exists(_.zone == zone)))
       .flatten(_.edges)
       .filter(edge => edge.zones.exists(_.owner != With.self))
     

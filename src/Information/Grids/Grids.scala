@@ -22,8 +22,10 @@ class Grids {
   val walkableTerran = new GridWalkableTerrain
   val walkableUnits = new GridWalkableUnits
   
+  val updateFrequency = 1
+  
   def onFrame() = limitUpdates.act()
-  val limitUpdates = new Limiter(1, () => update)
+  val limitUpdates = new Limiter(updateFrequency, () => update)
   def update() {
     val tiles =
       if (With.units.ours.size > With.configuration.gridUpdateOptimizationUnitLimit)
@@ -49,7 +51,7 @@ class Grids {
   }
   
   def relevantTiles = relevantTilesCache.get
-  private val relevantTilesCache = new Cache[Set[TilePosition]](2, () => relevantTilesRecalculate)
+  private val relevantTilesCache = new Cache[Set[TilePosition]](updateFrequency, () => relevantTilesRecalculate)
   private def relevantTilesRecalculate:Set[TilePosition] = {
     val nearbyPoints = Square.points(18).toList
     With.units.ours.flatten(unit => nearbyPoints.map(unit.tileCenter.add))

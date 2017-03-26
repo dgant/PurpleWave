@@ -32,7 +32,6 @@ class ProtossVsZerg extends Parallel {
   )
   
   val _twoBase = List[BuildRequest] (
-    new RequestUnitAtLeast(3,   Protoss.Gateway),
     new RequestUnitAtLeast(2,   Protoss.Nexus),
     new RequestUnitAtLeast(1,   Protoss.Assimilator),
     new RequestUnitAtLeast(1,   Protoss.CyberneticsCore),

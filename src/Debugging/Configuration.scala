@@ -5,7 +5,7 @@ class Configuration {
   val combatStickinessLeash           = 64
   var enableGoonStopProtection        = true
   var enablePathRecalculation         = false
-  var enableHeuristicTravel           = true
+  var enableHeuristicTravel           = false
   var enableFastGroundDistance        = false
   var gridUpdateOptimizationUnitLimit = 50
   

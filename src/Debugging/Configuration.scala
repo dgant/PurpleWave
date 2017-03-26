@@ -24,7 +24,7 @@ class Configuration {
   var enableVisualizationBullets            = false
   var enableVisualizationChokepoints        = true
   var enableVisualizationEconomy            = false
-  var enableVisualizationGrids              = true
+  var enableVisualizationGrids              = false
   var enableVisualizationMovementHeuristics = true
   var enableVisualizationPerformance        = true
   var enableVisualizationPlans              = false

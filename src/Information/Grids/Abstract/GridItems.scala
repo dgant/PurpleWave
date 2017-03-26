@@ -6,9 +6,15 @@ import scala.collection.mutable
 
 abstract class GridItems[T] extends GridArray[mutable.HashSet[T]] {
   
-  override protected val values: Array[mutable.HashSet[T]] = Array.fill(width * height)(defaultValue)
+  private val empty = Array.fill(width * height)(defaultValue)
+  
+  override protected var values: Array[mutable.HashSet[T]] = Array.fill(width * height)(defaultValue)
   override def defaultValue: mutable.HashSet[T] = mutable.HashSet.empty
   override def repr(value: mutable.HashSet[T]): String  = value.size.toString
+  
+  override def reset() {
+    values = empty.clone()
+  }
   
   override def update() {
     reset()

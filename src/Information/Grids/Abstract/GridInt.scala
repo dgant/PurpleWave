@@ -4,8 +4,7 @@ import bwapi.TilePosition
 
 class GridInt extends GridArray[Int] {
   
-  override protected val values: Array[Int] = Array.fill(width * height)(defaultValue)
-  
+  override protected var values: Array[Int] = Array.fill(width * height)(defaultValue)
   override def defaultValue:Int = 0
   override def repr(value: Int) = value.toString
   

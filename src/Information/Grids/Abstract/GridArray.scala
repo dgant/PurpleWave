@@ -5,7 +5,7 @@ import bwapi.TilePosition
 
 abstract class GridArray[T] extends Grid[T] {
   
-  protected val values:Array[T]
+  protected var values:Array[T]
   private var initialized = false
   
   def defaultValue:T

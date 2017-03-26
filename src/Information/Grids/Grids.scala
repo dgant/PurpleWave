@@ -25,7 +25,11 @@ class Grids {
   def onFrame() = limitUpdates.act()
   val limitUpdates = new Limiter(1, () => update)
   def update() {
-    val tiles = relevantTiles
+    val tiles =
+      if (With.units.ours.size > With.configuration.gridUpdateOptimizationUnitLimit)
+        With.geography.allTiles
+      else
+        relevantTiles
     
     List(
       altitudeBonus,

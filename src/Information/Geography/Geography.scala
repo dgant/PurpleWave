@@ -14,6 +14,7 @@ import scala.collection.mutable
 class Geography {
   
   val mapArea             : TileRectangle           = new TileRectangle(new TilePosition(0, 0), new TilePosition(With.mapWidth, With.mapHeight))
+  val allTiles            : Iterable[TilePosition]  = mapArea.tiles
   def zones               : Iterable[Zone]          = zoneCache.get
   def bases               : Iterable[Base]          = zones.flatten(_.bases)
   def ourZones            : Iterable[Zone]          = zones.filter(_.owner == With.self)

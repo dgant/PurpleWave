@@ -23,7 +23,7 @@ object ZoneBuilder {
     bases.foreach(base => base.zone.bases += base)
     edges.foreach(edge => edge.zones.foreach(zone => zone.edges += edge))
     
-    With.geography.mapArea.tiles
+    With.geography.allTiles
       .filterNot(tile => zones.exists(_.contains(tile)))
       .foreach(tile => {
         var doContinue = true

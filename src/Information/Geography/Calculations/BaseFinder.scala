@@ -13,27 +13,11 @@ import scala.collection.mutable
 
 object BaseFinder {
   
-  def calculate:Set[TilePosition] = {
+  def calculate:Iterable[TilePosition] = {
   
     //Find base positions
     val allHalls = clusteredResourcePatches.flatMap(bestTownHallTile).to[mutable.Set]
-    
-    //Remove conflicting/overlapping positions
-    //O(n^3) but we only do it once
-    
-    allHalls.foreach(hall => {
-      val conflictingHalls = List(hall) ++ allHalls.filter(otherHall => otherHall != hall && otherHall.distanceTile(hall) < 8)
-      //Take the hall which is closest to a heyser
-      val preferredHall = conflictingHalls
-        .sortBy(With.game.getStartLocations.asScala.contains)
-        .sortBy(hall => With.units.neutral
-          .filter(_.unitClass.isGas)
-          .map(_.tileDistance(hall))
-          .min)
-      conflictingHalls.filterNot(_ == preferredHall).foreach(allHalls.remove)
-    })
-    
-    allHalls
+    return removeConflictingBases(allHalls)
   }
   
   private def clusteredResourcePatches:Iterable[Iterable[ForeignUnitInfo]] = {
@@ -67,5 +51,32 @@ object BaseFinder {
     
     buildingArea.tiles.forall(With.game.isBuildable) &&
       ! resourcePatches.view.map(resourcePatch => resourcePatch.tileArea.expand(3, 3)).exists(buildingArea.intersects)
+  }
+  
+  private def removeConflictingBases(halls:mutable.Set[TilePosition]):Iterable[TilePosition] = {
+  
+    val basesToRemove = new mutable.HashSet[TilePosition]
+    
+    //Remove conflicting/overlapping positions
+    //O(n^3) but we only do it once
+    halls.foreach(hall =>
+      if ( ! basesToRemove.contains(hall)) {
+        val conflictingHalls =
+          List(hall) ++
+          halls
+            .filterNot(basesToRemove.contains)
+            .filter(otherHall => otherHall != hall && otherHall.distanceTile(hall) < 8)
+        
+        //Take the hall which is closest to a geyser
+        val preferredHall = conflictingHalls
+          .sortBy(With.game.getStartLocations.asScala.contains)
+          .sortBy(hall => With.units.neutral
+            .filter(_.unitClass.isGas)
+            .map(_.tileDistance(hall))
+            .min)
+        basesToRemove -- conflictingHalls.filterNot(_ == preferredHall)
+      })
+    
+    halls.filterNot(basesToRemove.contains)
   }
 }

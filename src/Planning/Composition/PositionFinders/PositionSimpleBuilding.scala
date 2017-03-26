@@ -33,12 +33,9 @@ class PositionSimpleBuilding(val buildingType:UnitClass) extends PositionFinder 
   
   private def positionRefinery:Option[TilePosition] = {
     
-    val candidates = With.units.neutral
-      .filter(_.unitClass.isGas)
-      .filter(gas =>
-        With.geography.bases.exists(base =>
-          base.zone.owner == With.self &&
-          base.harvestingArea.contains(gas.tileCenter)))
+    val candidates = With.geography.ourBases
+      .flatten(_.gas)
+      .filter(_.isNeutral)
       .map(_.tileTopLeft)
     
     if (candidates.isEmpty) None else Some(candidates.minBy(_.distanceTile(With.geography.home)))

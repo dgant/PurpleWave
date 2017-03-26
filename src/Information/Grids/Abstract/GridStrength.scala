@@ -9,8 +9,8 @@ import bwapi.TilePosition
 
 abstract class GridStrength extends GridDouble {
   
-  private val rangeMargin = 48
-  private val framesToLookAhead = 48
+  private val rangeMargin = 32
+  private val framesToLookAhead = 24
   
   override def update(relevantTiles:Iterable[TilePosition]) {
     reset(relevantTiles)

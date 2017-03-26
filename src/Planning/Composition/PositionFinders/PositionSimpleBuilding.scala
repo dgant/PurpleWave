@@ -46,9 +46,7 @@ class PositionSimpleBuilding(val buildingType:UnitClass) extends PositionFinder 
       .filterNot(_.zone.island)
       .filter(base => base.gasLeft > 0 || With.geography.ourBases.size >= 2)
       .map(base => base.townHallRectangle)
-      .filter(baseRectangle => {
-        With.units.all.filter(_.unitClass.isBuilding).forall( ! _.tileArea.intersects(baseRectangle))
-      })
+      .filter(baseRectangle => baseRectangle.tiles.forall(With.grids.buildable.get))
       .map(_.startInclusive)
   
     if (candidates.isEmpty) return None

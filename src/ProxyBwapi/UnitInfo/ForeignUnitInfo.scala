@@ -1,5 +1,6 @@
 package ProxyBwapi.UnitInfo
 
+import Performance.Caching.Limiter
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
 import Startup.With
@@ -15,14 +16,13 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
   
   def update(unit:bwapi.Unit) {
     base = unit
-    
-    if (unitClass == Terran.SpiderMine) {
-      //Speculative performance optimization.
-      updateTracking()
-      _hitPoints = base.getHitPoints
-      _pixelCenter = base.getPosition
-    } else {
-      updateTracking()
+    updateTimeSensitiveInformation()
+    limitMostUpdates.act()
+  }
+  
+  private val limitMostUpdates = new Limiter(1, () => {
+    updateTracking()
+    if (unitClass != Terran.SpiderMine) {
       updateHealth()
       updateCombat()
       updateGeometry()
@@ -31,17 +31,24 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
       updateVisibility()
       updateStatuses()
     }
-  }
+  })
   
   ///////////////////
   // Tracking info //
   ///////////////////
   
-  private def updateTracking() {
+  private def updateTimeSensitiveInformation() {
     _lastSeen           = With.frame
-    _player             = base.getPlayer
     _possiblyStillThere = true
-    _unitClass          = UnitClasses.get(base.getType)
+    _hitPoints          = base.getHitPoints
+    _shieldPoints       = base.getShields
+    _pixelCenter        = base.getPosition
+    _tileTopLeft        = base.getTilePosition
+  }
+  
+  private def updateTracking() {
+    _player     = base.getPlayer
+    _unitClass  = UnitClasses.get(base.getType)
   }
   
   private var _lastSeen           : Int       = 0
@@ -69,6 +76,7 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
     _invincible             = base.isInvincible
     _resourcesLeft          = base.getResources
     _shieldPoints           = base.getShields
+    _plagued                = base.isPlagued
     _unitClass              = UnitClasses.get(base.getType)
   }
   

@@ -21,12 +21,14 @@ object ZoneUpdater {
   }
   
   private def updateTownHall(base: Base) {
-    base.townHall = With.units.buildings
-      .filter(_.unitClass.isTownHall)
+    base.townHall = None
+    val townHalls = With.units.buildings
+      .filter(unit => unit.unitClass.isTownHall && unit.tileCenter.zone == base.zone)
       .filter(townHall => base.zone.contains(townHall.pixelCenter))
-      .toList
-      .sortBy(_.tileDistance(base.townHallRectangle.midpoint))
-      .headOption
+    
+    if (townHalls.nonEmpty) {
+      base.townHall = Some(townHalls.minBy(_.tileDistance(base.townHallRectangle.midpoint)))
+    }
   }
   
   private def updateOwner(base: Base) {

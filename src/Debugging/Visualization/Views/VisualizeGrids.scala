@@ -7,11 +7,11 @@ import Utilities.EnrichPosition._
 
 object VisualizeGrids {
   def render() {
-    renderGrid(With.grids.enemyStrength, 0, 0)
+    renderGrid(With.grids.friendlyStrength, 0, 0)
   }
   
   private def renderGrid[T](map:GridArray[T], offsetX:Int=0, offsetY:Int=0) {
-    With.grids.relevantTiles
+    With.geography.allTiles
       .filter(tilePosition => map.get(tilePosition) != map.defaultValue)
       .foreach(tilePosition => DrawMap.text(
         tilePosition.toPosition.add(offsetX*16, offsetY*13),

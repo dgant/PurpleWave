@@ -4,12 +4,11 @@ import Geometry.Shapes.Circle
 import Information.Grids.Abstract.GridBoolean
 import Startup.With
 import Utilities.EnrichPosition._
-import bwapi.TilePosition
 
 class GridEnemyDetection extends GridBoolean {
   
-  override def update(relevantTiles:Iterable[TilePosition]) {
-    reset(relevantTiles)
+  override def update() {
+    reset()
     With.units.enemy
       .filter(_.possiblyStillThere)
       .filter(_.unitClass.isDetector)

@@ -7,7 +7,6 @@ class Configuration {
   var enablePathRecalculation         = false
   var enableHeuristicTravel           = false
   var enableFastGroundDistance        = false
-  var gridUpdateOptimizationUnitLimit = 50
   
   var gameSpeed                         = 0
   var enableStdOut                      = false
@@ -25,7 +24,7 @@ class Configuration {
   var enableVisualizationBullets            = false
   var enableVisualizationChokepoints        = true
   var enableVisualizationEconomy            = false
-  var enableVisualizationGrids              = false
+  var enableVisualizationGrids              = true
   var enableVisualizationMovementHeuristics = true
   var enableVisualizationPerformance        = true
   var enableVisualizationPlans              = false

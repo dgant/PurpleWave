@@ -2,14 +2,13 @@ package Information.Grids.Concrete
 
 import Information.Grids.Abstract.GridBoolean
 import Startup.With
-import bwapi.TilePosition
 
 class GridWalkableUnits extends GridBoolean {
   
   override def defaultValue:Boolean = true
   
-  override def update(relevantTiles:Iterable[TilePosition]) {
-    reset(relevantTiles)
+  override def update() {
+    reset()
     With.units.buildings
       .filter( ! _.flying)
       .foreach(building => building.tileArea.tiles

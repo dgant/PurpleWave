@@ -18,8 +18,8 @@ abstract class GridStrength extends GridDouble {
         24,
         2 * (With.latency.minRemainingLatencyFrames + With.performance.frameDelay(With.grids.updateFrequency))))
   
-  override def update(relevantTiles:Iterable[TilePosition]) {
-    reset(relevantTiles)
+  override def update() {
+    reset()
     getUnits.foreach(unit => {
       val strength = BattleMetrics.estimateStrength(unit)
       val latencyFrames = With.game.getLatencyFrames

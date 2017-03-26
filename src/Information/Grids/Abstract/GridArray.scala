@@ -8,11 +8,21 @@ abstract class GridArray[T] extends Grid[T] {
   protected val values:Array[T]
   private var initialized = false
   
-  override def update(tiles:Iterable[TilePosition]) = initialize()
-  
   def defaultValue:T
   def repr(value:T):String
-  def reset(relevantTiles:Iterable[TilePosition]) = relevantTiles.foreach(tile => set(tile, defaultValue))
+  
+  def reset() = {
+    val default = defaultValue
+    val length = width * height
+    
+    //Use a while-loop because in Scala they are much faster than for-loops
+    var i = 0
+    while (i < length) {
+      values(i) = default
+      i += 1
+    }
+  }
+  
   final def initialize()                          = if ( ! initialized) { onInitialization(); initialized = true }
   def onInitialization()                          {}
   def indices:Iterable[Int]                       = values.indices

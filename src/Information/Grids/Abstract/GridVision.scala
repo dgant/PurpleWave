@@ -3,12 +3,11 @@ package Information.Grids.Abstract
 import Geometry.Shapes.Circle
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.EnrichPosition._
-import bwapi.TilePosition
 
 abstract class GridVision extends GridBoolean {
   
-  override def update(relevantTiles:Iterable[TilePosition]) {
-    reset(relevantTiles)
+  override def update() {
+    reset()
     units
       .filter(_.possiblyStillThere)
       .foreach(u => {

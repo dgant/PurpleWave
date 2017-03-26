@@ -3,13 +3,12 @@ package Information.Grids.Concrete
 import Information.Grids.Abstract.GridInt
 import Startup.With
 import Utilities.EnrichPosition._
-import bwapi.TilePosition
 
 class GridMobility extends GridInt {
   
-  override def update(relevantTiles:Iterable[TilePosition]) {
+  override def update() {
     val distanceMax = 3
-    relevantTiles
+    With.geography.allTiles
       .foreach(tile => {
         var tileMobility = 0
         if (With.grids.walkable.get(tile)) {

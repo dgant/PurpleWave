@@ -6,7 +6,8 @@ import bwapi.TilePosition
 
 class GridDouble extends GridArray[Double] {
   
-  override val values: Array[Double] = Array.fill(_width * _height)(defaultValue)
+  override protected val values: Array[Double] = Array.fill(width * height)(defaultValue)
+  
   override def defaultValue:Double = 0d
   
   val formatter = new DecimalFormat("#.##")

@@ -1,11 +1,7 @@
 package Information.Grids
 
-import Geometry.Shapes.Square
 import Information.Grids.Concrete.{GridUnits, _}
-import Performance.Caching.{Cache, Limiter}
-import Startup.With
-import Utilities.EnrichPosition._
-import bwapi.TilePosition
+import Performance.Caching.Limiter
 
 class Grids {
   val altitudeBonus = new GridAltitudeBonus
@@ -27,12 +23,6 @@ class Grids {
   def onFrame() = limitUpdates.act()
   val limitUpdates = new Limiter(updateFrequency, () => update)
   def update() {
-    val tiles =
-      if (With.units.ours.size > With.configuration.gridUpdateOptimizationUnitLimit)
-        With.geography.allTiles
-      else
-        relevantTiles
-    
     List(
       altitudeBonus,
       units,
@@ -47,13 +37,6 @@ class Grids {
       walkableTerran,
       walkableUnits,
       mobility
-    ).foreach(_.update(tiles))
-  }
-  
-  def relevantTiles = relevantTilesCache.get
-  private val relevantTilesCache = new Cache[Set[TilePosition]](updateFrequency, () => relevantTilesRecalculate)
-  private def relevantTilesRecalculate:Set[TilePosition] = {
-    val nearbyPoints = Square.points(18).toList
-    With.units.ours.flatten(unit => nearbyPoints.map(unit.tileCenter.add))
+    ).foreach(_.update())
   }
 }

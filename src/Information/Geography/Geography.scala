@@ -23,7 +23,13 @@ class Geography {
   def ourTownHalls        : Iterable[UnitInfo]      = ourBases.flatMap(_.townHall)
   def ourHarvestingAreas  : Iterable[TileRectangle] = ourBases.map(_.harvestingArea)
   
-  def zoneByTile(tile:TilePosition):Zone = buildZonesByTile.get(tile).getOrElse(zones.minBy(_.centroid.pixelDistance(tile.pixelCenter)))
+  def zoneByTile(tile:TilePosition):Zone = zonesByTileCache.get.get(tile).getOrElse(zones.minBy(_.centroid.pixelDistance(tile.pixelCenter)))
+  private val zonesByTileCache = new CacheForever(() => zonesByTileBuild)
+  private def zonesByTileBuild:Map[TilePosition, Zone] = {
+    val output = new mutable.HashMap[TilePosition, Zone]
+    zones.foreach(zone => zone.tiles.foreach(tile => output.put(tile, zone)))
+    output.toMap
+  }
   
   def home:TilePosition = homeCache.get
   private val homeCache = new Cache(5, () =>
@@ -40,13 +46,5 @@ class Geography {
   }
   
   private val zoneCache         = new CacheForever(() => ZoneBuilder.build)
-  private val zoneByTile        = new CacheForever(() => buildZonesByTile)
   private val zoneUpdateLimiter = new Limiter(2, () => ZoneUpdater.update())
-  
-  
-  private def buildZonesByTile:Map[TilePosition, Zone] = {
-    val output = new mutable.HashMap[TilePosition, Zone]
-    zones.foreach(zone => zone.tiles.foreach(tile => output.put(tile, zone)))
-    output.toMap
-  }
 }

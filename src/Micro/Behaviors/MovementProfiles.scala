@@ -25,6 +25,7 @@ object MovementProfiles {
   val worker = new MovementProfile (
     preferSpot        = 2.5,
     preferRandom      = 0.05,
+    preferMoving      = 0.05,
     avoidDamage       = 1.0)
   
   val darkTemplar = new MovementProfile (

@@ -44,23 +44,24 @@ class Commander {
   def move(intent:Intention, position:Position) {
     
     //Make melee units sticky
-    val destination = intent.toAttack
+    val stickyMeleeTarget = intent.toAttack
       .map(_.pixelCenter)
       .filter(targetPosition =>
         targetPosition.pixelDistance(position) < With.configuration.combatStickinessLeash
         && intent.unit.unitClass.maxAirGroundRange <= With.configuration.combatStickinessLeash)
-      .getOrElse(position)
+    
+    if (stickyMeleeTarget.isDefined) return attack(intent, intent.toAttack.get)
     
     //According to https://github.com/tscmoo/tsc-bwai/commit/ceb13344f5994d28d6b601cef126f264ca97426b
     //ordering moves to the exact same destination causes Brood War to not recalculate the path.
     //Better to recalculate the path a few times to prevent units getting stuck
     if (With.configuration.enablePathRecalculation) {
-      intent.unit.base.move(destination.add(
+      intent.unit.base.move(intent.destination.get.pixelCenter.add(
         RandomState.random.nextInt(5) - 2,
         RandomState.random.nextInt(5) - 2))
     }
     else {
-      intent.unit.base.move(destination)
+      intent.unit.base.move(intent.destination.get.pixelCenter)
     }
     sleepMove(intent.unit)
   }

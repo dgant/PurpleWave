@@ -51,17 +51,17 @@ class BuildBuilding(val buildingClass:UnitClass) extends Plan {
       building = With.units.ours
         .filter(unit => unit.unitClass == buildingClass && unit.tileTopLeft == tile.get)
         .headOption
+  
+    currencyLock.isSpent = building.isDefined
+    currencyLock.onFrame()
     
     tile = if (building.isDefined) tile else buildingPlacer.find
-    
     if (tile.isEmpty) return
   
     areaLock.area = buildingClass.tileArea.add(tile.get)
   
     //TODO: Terran: Complete incomplete buildings
-  
-    currencyLock.isSpent = building.isDefined
-    currencyLock.onFrame()
+    
     if (currencyLock.isComplete) {
       areaLock.onFrame()
       if (areaLock.isComplete) {

@@ -19,19 +19,14 @@ class ProtossVsZerg extends Parallel {
     new RequestUnitAnotherOne(Protoss.Nexus),
     new RequestUnitAtLeast(8,   Protoss.Probe),
     new RequestUnitAtLeast(1,   Protoss.Pylon),
-    new RequestUnitAtLeast(10,  Protoss.Probe),
+    new RequestUnitAtLeast(10,   Protoss.Probe),
     new RequestUnitAtLeast(1,   Protoss.Gateway),
-    new RequestUnitAtLeast(12,  Protoss.Probe),
-    new RequestUnitAtLeast(2,   Protoss.Gateway),
-    new RequestUnitAtLeast(13,  Protoss.Probe),
-    new RequestUnitAtLeast(1,   Protoss.Zealot),
-    new RequestUnitAtLeast(14,  Protoss.Probe),
-    new RequestUnitAtLeast(2,   Protoss.Pylon),
-    new RequestUnitAtLeast(15,  Protoss.Probe),
-    new RequestUnitAtLeast(3,   Protoss.Zealot)
+    new RequestUnitAtLeast(12,   Protoss.Probe),
+    new RequestUnitAtLeast(1,   Protoss.Gateway)
   )
   
   val _twoBase = List[BuildRequest] (
+    new RequestUnitAtLeast(3,   Protoss.Gateway),
     new RequestUnitAtLeast(2,   Protoss.Nexus),
     new RequestUnitAtLeast(1,   Protoss.Assimilator),
     new RequestUnitAtLeast(1,   Protoss.CyberneticsCore),
@@ -67,10 +62,12 @@ class ProtossVsZerg extends Parallel {
     new RequestUnitAtLeast(6,   Protoss.Nexus),
     new RequestUnitAtLeast(6,   Protoss.Assimilator),
     new RequestUnitAtLeast(12,  Protoss.Gateway),
-    new RequestUpgrade(         Protoss.GroundWeapons, 3)
+    new RequestUpgrade(         Protoss.GroundWeapons, 3),
+    new RequestUnitAtLeast(7,   Protoss.Nexus),
+    new RequestUnitAtLeast(7,   Protoss.Assimilator),
+    new RequestUnitAtLeast(8,   Protoss.Nexus),
+    new RequestUnitAtLeast(8,   Protoss.Assimilator)
   )
-  
-  val _enoughZealots = List[BuildRequest] (new RequestUnitAtLeast(10, Protoss.Zealot))
   
   children.set(List(
     new ScheduleBuildOrder { buildables.set(_oneBaseTwoGate) },
@@ -78,13 +75,16 @@ class ProtossVsZerg extends Parallel {
     new TrainProbesContinuously,
     new TrainContinuously(Protoss.Reaver),
     new TrainContinuously(Protoss.Corsair),
-    new TrainContinuously(Protoss.Dragoon),
-    new ScheduleBuildOrder { buildables.set(_enoughZealots) },
+    new IfThenElse {
+      predicate.set(new UnitCountAtLeast { quantity.set(14); unitMatcher.set(new UnitMatchType(Protoss.Zealot)) })
+      whenFalse.set(new TrainContinuously(Protoss.Zealot))
+      whenTrue.set(new TrainContinuously(Protoss.Dragoon))
+    },
     new ScheduleBuildOrder { buildables.set(_twoBase) },
     new ScoutAt(10),
     new Hunt { hunters.get.unitMatcher.set(new UnitMatchType(Protoss.Corsair)) },
     new IfThenElse {
-      predicate.set(new UnitCountAtLeast { quantity.set(20); unitMatcher.set(UnitMatchWarriors) })
+      predicate.set(new UnitCountAtLeast { quantity.set(12); unitMatcher.set(UnitMatchWarriors) })
       whenFalse.set(new Defend)
       whenTrue.set(new Attack)
     }

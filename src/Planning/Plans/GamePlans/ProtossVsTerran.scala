@@ -46,7 +46,7 @@ class ProtossVsTerran extends Parallel {
     new RequestUnitAtLeast(6,   Protoss.Gateway),
     new RequestUnitAtLeast(3,   Protoss.Assimilator),
     new RequestUnitAtLeast(1,   Protoss.CitadelOfAdun),
-    new RequestUnitAtLeast(9,   Protoss.Gateway),
+    new RequestUnitAtLeast(10,   Protoss.Gateway),
     new RequestUpgrade(         Protoss.ZealotLegs),
     
     new RequestUnitAtLeast(4,   Protoss.Nexus),

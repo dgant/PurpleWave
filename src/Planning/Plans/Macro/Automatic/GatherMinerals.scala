@@ -27,11 +27,6 @@ class GatherMinerals extends Plan {
     override def default(key: FriendlyUnitInfo): Int = { put(key, Int.MinValue); this(key) }}
   
   override def onFrame() {
-    
-    /*
-    New formula
-     */
-    
     miners.onFrame()
     resetAssignmentsLimiter.act()
     assignWorkers()

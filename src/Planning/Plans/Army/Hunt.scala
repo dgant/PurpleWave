@@ -12,6 +12,8 @@ import Utilities.EnrichPosition._
 
 class Hunt extends Plan {
   
+  description.set("Find some stray units to kill")
+  
   val hunters = new Property[LockUnits](new LockUnits { unitMatcher.set(UnitMatchWarriors) })
   var position = new Property[PositionFinder](new PositionEnemyBase)
   

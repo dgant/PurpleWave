@@ -12,9 +12,11 @@ abstract class GridStrength extends GridDouble {
   private val rangeMargin = 32
   
   private def framesToLookAhead =
-    Math.max(
-      24,
-      With.latency.minRemainingLatencyFrames + With.performance.frameDelay(With.grids.updateFrequency))
+    Math.min(
+      24 * 3,
+      Math.max(
+        24,
+        2 * (With.latency.minRemainingLatencyFrames + With.performance.frameDelay(With.grids.updateFrequency))))
   
   override def update(relevantTiles:Iterable[TilePosition]) {
     reset(relevantTiles)

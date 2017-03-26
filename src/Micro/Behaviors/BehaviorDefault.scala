@@ -36,13 +36,19 @@ object BehaviorDefault extends Behavior {
   def pickTarget(intent:Intention) = intent.toAttack = intent.toAttack.orElse(EvaluateTargets.best(intent, intent.targetProfile, intent.targets))
   
   def attack(intent:Intention):Boolean = {
+    val willingToFight = desireToFight(intent) > 0.75
     if (
       intent.unit.canAttackRightNow &&
       intent.toAttack.isDefined &&
-      (desireToFight(intent) > 0.5 || intent.toAttack.exists(intent.unit.inRangeToAttack))) {
+        (willingToFight ||
+          (intent.toAttack.exists(intent.unit.inRangeToAttack)
+          && ! intent.unit.flying))) {
       With.commander.attack(intent, intent.toAttack.get)
       return true
     }
+    
+    if ( ! willingToFight) intent.toAttack = None
+    
     false
   }
   

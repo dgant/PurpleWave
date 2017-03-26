@@ -52,16 +52,23 @@ class Commander {
     
     if (stickyMeleeTarget.isDefined) return attack(intent, intent.toAttack.get)
     
+    val flyingOvershoot = 128.0
+    var destination = position
+    if (intent.unit.flying && intent.unit.pixelDistance(position) < flyingOvershoot) {
+      //Send flying units further to maximize acceleration
+      destination = intent.unit.pixelCenter.project(position, flyingOvershoot)
+    }
+    
     //According to https://github.com/tscmoo/tsc-bwai/commit/ceb13344f5994d28d6b601cef126f264ca97426b
     //ordering moves to the exact same destination causes Brood War to not recalculate the path.
     //Better to recalculate the path a few times to prevent units getting stuck
     if (With.configuration.enablePathRecalculation) {
-      intent.unit.base.move(intent.destination.get.pixelCenter.add(
+      intent.unit.base.move(destination.add(
         RandomState.random.nextInt(5) - 2,
         RandomState.random.nextInt(5) - 2))
     }
     else {
-      intent.unit.base.move(intent.destination.get.pixelCenter)
+      intent.unit.base.move(destination)
     }
     sleepMove(intent.unit)
   }
@@ -78,6 +85,7 @@ class Commander {
         }
       }
       
+      //This will fail if we've never seen the resource before
       intent.unit.base.rightClick(resource.base)
       sleepMove(intent.unit)
     }

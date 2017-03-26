@@ -10,5 +10,5 @@ object TargetingProfiles {
     preferDps         = 0.75,
     avoidHealth       = 0.75,
     avoidDistance     = 1.25,
-    avoidDistraction  = 0.0)
+    avoidDistraction  = 0)
 }

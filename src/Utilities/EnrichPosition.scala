@@ -82,6 +82,9 @@ case object EnrichPosition {
     def multiply(scale:Int):Position = {
       new Position(scale * pixel.getX, scale * pixel.getY)
     }
+    def multiply(scale:Double):Position = {
+      new Position((scale * pixel.getX).toInt, (scale * pixel.getY).toInt)
+    }
     def divide(scale:Int):Position = {
       new Position(pixel.getX / scale, pixel.getY / scale)
     }
@@ -89,7 +92,7 @@ case object EnrichPosition {
       val distance = pixelDistance(destination)
       if (distance == 0) return pixel
       val delta = destination.subtract(pixel)
-      delta.multiply((pixels/distance).toInt).add(pixel)
+      delta.multiply(pixels/distance).add(pixel)
     }
     def midpoint(otherPixel:Position):Position = {
       add(otherPixel).divide(2)

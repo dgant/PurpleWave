@@ -19,19 +19,18 @@ class ProtossVsZerg extends Parallel {
     new RequestUnitAnotherOne(Protoss.Nexus),
     new RequestUnitAtLeast(8,   Protoss.Probe),
     new RequestUnitAtLeast(1,   Protoss.Pylon),
-    new RequestUnitAtLeast(10,   Protoss.Probe),
+    new RequestUnitAtLeast(10,  Protoss.Probe),
     new RequestUnitAtLeast(1,   Protoss.Gateway),
-    new RequestUnitAtLeast(12,   Protoss.Probe),
-    new RequestUnitAtLeast(1,   Protoss.Gateway)
+    new RequestUnitAtLeast(12,  Protoss.Probe),
+    new RequestUnitAtLeast(2,   Protoss.Gateway)
   )
   
   val _twoBase = List[BuildRequest] (
+    new RequestUnitAtLeast(1,   Protoss.Assimilator),
     new RequestUnitAtLeast(3,   Protoss.Gateway),
     new RequestUnitAtLeast(2,   Protoss.Nexus),
-    new RequestUnitAtLeast(1,   Protoss.Assimilator),
     new RequestUnitAtLeast(1,   Protoss.CyberneticsCore),
     new RequestUnitAtLeast(2,   Protoss.Assimilator),
-    new RequestUnitAtLeast(3,   Protoss.Gateway),
     new RequestUnitAtLeast(1,   Protoss.Stargate),
     new RequestUnitAtLeast(1,   Protoss.RoboticsFacility),
     new RequestUnitAtLeast(1,   Protoss.RoboticsSupportBay),
@@ -55,8 +54,6 @@ class ProtossVsZerg extends Parallel {
     new RequestUnitAtLeast(8,   Protoss.Gateway),
     new RequestUnitAtLeast(5,   Protoss.Assimilator),
     new RequestUnitAtLeast(2,   Protoss.RoboticsFacility),
-    new RequestUnitAtLeast(1,   Protoss.TemplarArchives),
-    new RequestUnitAtLeast(3,   Protoss.DarkTemplar),
     new RequestUpgrade(         Protoss.GroundWeapons, 2),
     
     new RequestUnitAtLeast(6,   Protoss.Nexus),
@@ -84,7 +81,7 @@ class ProtossVsZerg extends Parallel {
     new ScoutAt(10),
     new Hunt { hunters.get.unitMatcher.set(new UnitMatchType(Protoss.Corsair)) },
     new IfThenElse {
-      predicate.set(new UnitCountAtLeast { quantity.set(12); unitMatcher.set(UnitMatchWarriors) })
+      predicate.set(new UnitCountAtLeast { quantity.set(25); unitMatcher.set(UnitMatchWarriors) })
       whenFalse.set(new Defend)
       whenTrue.set(new Attack)
     }

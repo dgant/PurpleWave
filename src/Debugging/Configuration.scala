@@ -2,7 +2,7 @@ package Debugging
 
 class Configuration {
   
-  val combatStickinessLeash           = 64
+  val combatStickinessLeash           = 48
   var enableGoonStopProtection        = true
   var enablePathRecalculation         = false
   var enableHeuristicTravel           = false
@@ -28,7 +28,7 @@ class Configuration {
   var enableVisualizationMovementHeuristics = true
   var enableVisualizationPerformance        = true
   var enableVisualizationPlans              = false
-  var enableVisualizationResources          = true
+  var enableVisualizationResources          = false
   var enableVisualizationScheduler          = false
   var enableVisualizationGeography          = true
   var enableVisualizationTextOnly           = false

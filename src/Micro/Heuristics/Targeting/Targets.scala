@@ -12,6 +12,6 @@ object Targets {
         32 * 15)
       .filter(intent.unit.canAttack)
       .filter(intent.unit.isEnemyOf)
-      .filterNot(_.unitClass == Zerg.Larva)
+      .filterNot(target => List(Zerg.Larva, Zerg.Egg).contains(target.unitClass))
   }
 }

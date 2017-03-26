@@ -10,7 +10,10 @@ object UnitHeuristicDistraction extends UnitHeuristic{
   
     if (intent.destination.isEmpty) return 1.0
   
-    HeuristicMath.unboolify(candidate.travelPixels(intent.destination.get) > intent.unit.travelPixels(intent.destination.get))
+    HeuristicMath.unboolify(
+      candidate.travelPixels(intent.destination.get)
+      - intent.unit.travelPixels(intent.destination.get)
+      > intent.unit.unitClass.maxAirGroundRange)
       
   }
   

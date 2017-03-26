@@ -67,7 +67,7 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
     canAttack &&
     otherUnit.alive &&
     otherUnit.totalHealth > 0 &&
-      otherUnit.visible &&
+    otherUnit.visible &&
     (otherUnit.detected || ! otherUnit.cloaked || ! otherUnit.burrowed) &&
     ! otherUnit.invincible &&
     ! otherUnit.stasised &&

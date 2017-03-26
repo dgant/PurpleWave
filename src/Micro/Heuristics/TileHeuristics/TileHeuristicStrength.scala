@@ -7,9 +7,15 @@ import bwapi.TilePosition
 object TileHeuristicStrength extends TileHeuristic {
   
   override def evaluate(intent: Intention, candidate: TilePosition): Double = {
-  
-    Math.max(1.0/100.0, Math.min(100.0, With.grids.friendlyStrength.get(candidate) / With.grids.enemyStrengthStrength.get(candidate)))
     
+    val max = 3.0
+    val min = 1.0/max
+    
+    val ourStrength   = With.grids.friendlyStrength.get(candidate)
+    val enemyStrength = With.grids.enemyStrength.get(candidate)
+    
+    if (enemyStrength == 0) return if (ourStrength == 0) 1.0 else max
+    if (ourStrength == 0)   return min
+    else return ourStrength / enemyStrength
   }
-  
 }

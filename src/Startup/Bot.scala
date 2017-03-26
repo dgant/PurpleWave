@@ -31,13 +31,11 @@ class Bot() extends DefaultBWListener {
       With.configuration = new Configuration
       With.logger = new Logger
       
-      With.logger.debug("Loading BWTA.")
       BWTA.readMap()
       BWTA.analyze()
       //These may not be necessary since BWTA2 doesn't seem to work in BWMirror
       BWTA.computeDistanceTransform()
       BWTA.buildChokeNodes()
-      With.logger.debug("BWTA analysis complete.")
       
       With.architect              = new Architect
       With.bank                   = new Banker

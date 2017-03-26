@@ -8,10 +8,32 @@ import Startup.With
 import Utilities.EnrichPosition._
 import bwapi.TilePosition
 
+import scala.collection.JavaConverters._
+import scala.collection.mutable
+
 object BaseFinder {
   
-  def calculate:List[TilePosition] = {
-    clusteredResourcePatches.flatMap(bestTownHallTile).toList
+  def calculate:Set[TilePosition] = {
+  
+    //Find base positions
+    val allHalls = clusteredResourcePatches.flatMap(bestTownHallTile).to[mutable.Set]
+    
+    //Remove conflicting/overlapping positions
+    //O(n^3) but we only do it once
+    
+    allHalls.foreach(hall => {
+      val conflictingHalls = List(hall) ++ allHalls.filter(otherHall => otherHall != hall && otherHall.distanceTile(hall) < 8)
+      //Take the hall which is closest to a heyser
+      val preferredHall = conflictingHalls
+        .sortBy(With.game.getStartLocations.asScala.contains)
+        .sortBy(hall => With.units.neutral
+          .filter(_.unitClass.isGas)
+          .map(_.tileDistance(hall))
+          .min)
+      conflictingHalls.filterNot(_ == preferredHall).foreach(allHalls.remove)
+    })
+    
+    allHalls
   }
   
   private def clusteredResourcePatches:Iterable[Iterable[ForeignUnitInfo]] = {

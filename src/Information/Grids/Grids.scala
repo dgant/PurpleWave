@@ -2,10 +2,10 @@ package Information.Grids
 
 import Geometry.Shapes.Square
 import Information.Grids.Concrete.{GridUnits, _}
-import Performance.Caching.{CacheFrame, Limiter}
+import Performance.Caching.{Cache, Limiter}
 import Startup.With
-import bwapi.TilePosition
 import Utilities.EnrichPosition._
+import bwapi.TilePosition
 
 class Grids {
   val altitudeBonus = new GridAltitudeBonus
@@ -45,7 +45,7 @@ class Grids {
   }
   
   def relevantTiles = relevantTilesCache.get
-  private val relevantTilesCache = new CacheFrame[Set[TilePosition]](() => relevantTilesRecalculate)
+  private val relevantTilesCache = new Cache[Set[TilePosition]](2, () => relevantTilesRecalculate)
   private def relevantTilesRecalculate:Set[TilePosition] = {
     val nearbyPoints = Square.points(18).toList
     With.units.ours.flatten(unit => nearbyPoints.map(unit.tileCenter.add))

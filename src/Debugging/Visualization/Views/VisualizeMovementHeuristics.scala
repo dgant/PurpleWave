@@ -60,8 +60,8 @@ object VisualizeMovementHeuristics {
           bestView.heuristic.color))
     
     val relativeScale = (ourScale - 1.0) / (maxScale - 1.0)
-    val minRadius = Math.min(4.0, relativeScale)
-    val radiusMultiplier = Math.min(11.0, 11.0 * relativeScale / views.map(view => normalize(view.evaluation)).max)
+    val minRadius = Math.min(3.0, relativeScale)
+    val radiusMultiplier = Math.min(12.0, 12.0 * relativeScale / views.map(view => normalize(view.evaluation)).max)
     
     views.foreach(view => {
       

@@ -10,7 +10,7 @@ object MovementProfiles {
     preferSitAtRange  = 0.5,
     preferTarget      = 1.0,
     preferMobility    = 0.50,
-    preferStrength    = 0.25,
+    preferStrength    = 0.50,
     avoidDamage       = 0.25,
     avoidTraffic      = 0.75)
   

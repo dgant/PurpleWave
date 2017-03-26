@@ -18,7 +18,7 @@ object VisualizeBases {
             if (base.isStartLocation) "Start location" else "",
             "Minerals left: " + base.mineralsLeft,
             "Gas left:      " + base.gasLeft,
-            if (base.lastScoutedFrame == With.frame) ""
+            if (base.lastScoutedFrame <= With.frame+ 24 ) ""
             else if (base.lastScoutedFrame <= 0) "Never scouted"
             else "Last scouted " + (With.frame - base.lastScoutedFrame) + " frames ago"
           ),

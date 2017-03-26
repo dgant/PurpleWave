@@ -1,5 +1,6 @@
 package Information.Geography.Pathfinding
 
+import Information.Geography.Types.Zone
 import Startup.With
 import Utilities.EnrichPosition._
 import bwapi.Position
@@ -36,7 +37,6 @@ object PathFinder {
   }
   
   //Doesn't work
-  /*
   def roughGroundDistance2(
     from:Position,
     to:Position,
@@ -64,11 +64,10 @@ object PathFinder {
     return horizonEdges
       .map(edge =>
         from.pixelDistance(edge.centerPixel) +
-        roughGroundDistance(
+          roughGroundDistance2(
           edge.centerPixel,
           to,
           explored ++ List(zoneFrom)))
       .min
   }
-  */
 }

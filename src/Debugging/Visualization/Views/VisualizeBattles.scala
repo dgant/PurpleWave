@@ -31,7 +31,7 @@ object VisualizeBattles {
         (battle.us.strength/100).toInt.toString,
         (battle.enemy.strength/100).toInt.toString
       ),
-      battle.focus,
+      battle.us.vanguard.add(0, 16),
       drawBackground = true,
       backgroundColor = neutralColor)
   }

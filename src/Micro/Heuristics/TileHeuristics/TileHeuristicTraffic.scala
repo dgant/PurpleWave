@@ -11,17 +11,17 @@ object TileHeuristicTraffic extends TileHeuristic {
   override def evaluate(intent: Intention, candidate: TilePosition): Double = {
   
     if (intent.unit.flying) 1.0 else
-      1.7 +
+      1.1 +
       List(
         measureTraffic(intent, 0.5, candidate),
-        measureTraffic(intent, 0.2, candidate.add(-1,  0)),
-        measureTraffic(intent, 0.2, candidate.add( 1,  0)),
-        measureTraffic(intent, 0.2, candidate.add( 0, -1)),
-        measureTraffic(intent, 0.2, candidate.add( 0,  1)),
-        measureTraffic(intent, 0.1, candidate.add(-1, -1)),
-        measureTraffic(intent, 0.1, candidate.add(-1,  1)),
-        measureTraffic(intent, 0.1, candidate.add( 1, -1)),
-        measureTraffic(intent, 0.1, candidate.add( 1,  1))
+        measureTraffic(intent, 0.1, candidate.add(-1,  0)),
+        measureTraffic(intent, 0.1, candidate.add( 1,  0)),
+        measureTraffic(intent, 0.1, candidate.add( 0, -1)),
+        measureTraffic(intent, 0.1, candidate.add( 0,  1)),
+        measureTraffic(intent, 0.05, candidate.add(-1, -1)),
+        measureTraffic(intent, 0.05, candidate.add(-1,  1)),
+        measureTraffic(intent, 0.05, candidate.add( 1, -1)),
+        measureTraffic(intent, 0.05, candidate.add( 1,  1))
       ).sum
   }
   

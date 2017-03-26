@@ -30,28 +30,58 @@
       <file leaf-file-name="MovementProfiles.scala" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Micro/Behaviors/MovementProfiles.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="190">
-              <caret line="38" column="2" lean-forward="true" selection-start-line="38" selection-start-column="2" selection-end-line="38" selection-end-column="2" />
+            <state relative-caret-position="312">
+              <caret line="24" column="28" lean-forward="true" selection-start-line="24" selection-start-column="28" selection-end-line="24" selection-end-column="28" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Bot.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Startup/Bot.scala">
+      <file leaf-file-name="Visualization.scala" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/Debugging/Visualization/Visualization.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="260">
-              <caret line="47" column="50" lean-forward="true" selection-start-line="47" selection-start-column="50" selection-end-line="47" selection-end-column="50" />
+            <state relative-caret-position="125">
+              <caret line="23" column="2" lean-forward="true" selection-start-line="23" selection-start-column="2" selection-end-line="23" selection-end-column="2" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="BaseFinder.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Information/Geography/Calculations/BaseFinder.scala">
+      <file leaf-file-name="UnitClass.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/UnitClass/UnitClass.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="186">
-              <caret line="34" column="62" lean-forward="false" selection-start-line="34" selection-start-column="51" selection-end-line="34" selection-end-column="62" />
+            <state relative-caret-position="104">
+              <caret line="8" column="49" lean-forward="false" selection-start-line="8" selection-start-column="49" selection-end-line="8" selection-end-column="49" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="UnitClassProxy.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/UnitClass/UnitClassProxy.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="182">
+              <caret line="14" column="46" lean-forward="false" selection-start-line="14" selection-start-column="46" selection-end-line="14" selection-end-column="46" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="TileHeuristicTraffic.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Micro/Heuristics/TileHeuristics/TileHeuristicTraffic.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="169">
+              <caret line="18" column="59" lean-forward="true" selection-start-line="18" selection-start-column="59" selection-end-line="18" selection-end-column="59" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="BuildPylonsContinuously.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Planning/Plans/Macro/Automatic/BuildPylonsContinuously.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="112">
+              <caret line="44" column="61" lean-forward="false" selection-start-line="44" selection-start-column="61" selection-end-line="44" selection-end-column="61" />
               <folding />
             </state>
           </provider>
@@ -60,18 +90,8 @@
       <file leaf-file-name="MovementProfile.scala" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Micro/Heuristics/Movement/MovementProfile.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="208">
-              <caret line="22" column="53" lean-forward="false" selection-start-line="22" selection-start-column="53" selection-end-line="22" selection-end-column="53" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="TileHeuristicDestinationNearby.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Micro/Heuristics/TileHeuristics/TileHeuristicDestinationNearby.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="156">
-              <caret line="12" column="44" lean-forward="true" selection-start-line="12" selection-start-column="44" selection-end-line="12" selection-end-column="44" />
+            <state relative-caret-position="39">
+              <caret line="18" column="39" lean-forward="true" selection-start-line="18" selection-start-column="39" selection-end-line="18" selection-end-column="39" />
               <folding />
             </state>
           </provider>
@@ -80,48 +100,28 @@
       <file leaf-file-name="TileHeuristicStrength.scala" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Micro/Heuristics/TileHeuristics/TileHeuristicStrength.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="182">
-              <caret line="14" column="63" lean-forward="true" selection-start-line="14" selection-start-column="63" selection-end-line="14" selection-end-column="63" />
+            <state relative-caret-position="221">
+              <caret line="17" column="38" lean-forward="true" selection-start-line="17" selection-start-column="38" selection-end-line="17" selection-end-column="38" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Targets.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Micro/Heuristics/Targeting/Targets.scala">
+      <file leaf-file-name="Paths.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Micro/Paths.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="156">
-              <caret line="12" column="30" lean-forward="true" selection-start-line="12" selection-start-column="30" selection-end-line="12" selection-end-column="30" />
+            <state relative-caret-position="160">
+              <caret line="19" column="2" lean-forward="true" selection-start-line="19" selection-start-column="2" selection-end-line="19" selection-end-column="2" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="UnitInfo.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/UnitInfo/UnitInfo.scala">
+      <file leaf-file-name="VisualizeBattles.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Debugging/Visualization/Views/VisualizeBattles.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="197">
-              <caret line="71" column="29" lean-forward="true" selection-start-line="71" selection-start-column="29" selection-end-line="71" selection-end-column="29" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="EvaluatePositions.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Micro/Heuristics/Movement/EvaluatePositions.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="203">
-              <caret line="20" column="32" lean-forward="true" selection-start-line="20" selection-start-column="32" selection-end-line="20" selection-end-column="32" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="BehaviorDefault.scala" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/Micro/Behaviors/BehaviorDefault.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="262">
-              <caret line="29" column="82" lean-forward="false" selection-start-line="29" selection-start-column="82" selection-end-line="29" selection-end-column="82" />
+            <state relative-caret-position="194">
+              <caret line="25" column="53" lean-forward="true" selection-start-line="25" selection-start-column="53" selection-end-line="25" selection-end-column="53" />
               <folding />
             </state>
           </provider>
@@ -141,11 +141,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>max</find>
-      <find>to</find>
-      <find>X</find>
-      <find>Bunker</find>
-      <find>Scarab</find>
       <find>Left</find>
       <find>selece</find>
       <find>Ghost</find>
@@ -171,11 +166,13 @@
       <find>self.minerals</find>
       <find>isCarryingGas</find>
       <find>carryingGas</find>
+      <find>maxRange</find>
+      <find>air</find>
+      <find>Cache</find>
+      <find>def g</find>
+      <find>=</find>
     </findStrings>
     <replaceStrings>
-      <replace>Draw.label</replace>
-      <replace>enableVisualization</replace>
-      <replace>PurpleWave</replace>
       <replace>reframe</replace>
       <replace>private def</replace>
       <replace>private var</replace>
@@ -203,6 +200,9 @@
       <replace>Bright</replace>
       <replace>Colors.MediumGray</replace>
       <replace>Neon</replace>
+      <replace>ground</replace>
+      <replace>def rawG</replace>
+      <replace>=</replace>
     </replaceStrings>
     <dirStrings>
       <dir>C:\prog\PurpleWave1</dir>
@@ -212,11 +212,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/Planning/Plans/Macro/RemoveMineralBlockAt.scala" />
-        <option value="$PROJECT_DIR$/src/Information/Geography/Types/Base.scala" />
-        <option value="$PROJECT_DIR$/src/Information/Intelligence.scala" />
-        <option value="$PROJECT_DIR$/src/Debugging/Visualization/Views/VisualizeBattles.scala" />
-        <option value="$PROJECT_DIR$/src/Debugging/Visualization/Views/VisualizeChokepoints.scala" />
         <option value="$PROJECT_DIR$/src/Planning/Plans/Information/FindEnemyBase.scala" />
         <option value="$PROJECT_DIR$/src/Debugging/Visualization/Views/VisualizeMovementHeuristics.scala" />
         <option value="$PROJECT_DIR$/src/Debugging/Visualization/Views/VisualizeReservations.scala" />
@@ -248,7 +243,6 @@
         <option value="$PROJECT_DIR$/src/Debugging/Visualization/Colors.scala" />
         <option value="$PROJECT_DIR$/src/Information/Geography/Calculations/ZoneBuilder.scala" />
         <option value="$PROJECT_DIR$/src/Information/Geography/Geography.scala" />
-        <option value="$PROJECT_DIR$/src/Micro/Heuristics/TileHeuristics/TileHeuristicTraffic.scala" />
         <option value="$PROJECT_DIR$/src/Planning/Composition/PositionFinders/PositionChoke.scala" />
         <option value="$PROJECT_DIR$/src/Micro/Behaviors/TargetingProfiles.scala" />
         <option value="$PROJECT_DIR$/src/Debugging/Configuration.scala" />
@@ -258,11 +252,17 @@
         <option value="$PROJECT_DIR$/src/Information/Grids/Abstract/GridStrength.scala" />
         <option value="$PROJECT_DIR$/src/Planning/Composition/PositionFinders/PositionSimpleBuilding.scala" />
         <option value="$PROJECT_DIR$/src/Micro/Heuristics/Movement/MovementProfile.scala" />
-        <option value="$PROJECT_DIR$/src/Micro/Behaviors/MovementProfiles.scala" />
         <option value="$PROJECT_DIR$/src/Startup/Bot.scala" />
-        <option value="$PROJECT_DIR$/src/Micro/Heuristics/TileHeuristics/TileHeuristicStrength.scala" />
         <option value="$PROJECT_DIR$/src/ProxyBwapi/UnitInfo/UnitInfo.scala" />
         <option value="$PROJECT_DIR$/src/Micro/Behaviors/BehaviorDefault.scala" />
+        <option value="$PROJECT_DIR$/src/Debugging/Visualization/Views/VisualizeBattles.scala" />
+        <option value="$PROJECT_DIR$/src/Planning/Plans/Macro/Automatic/BuildPylonsContinuously.scala" />
+        <option value="$PROJECT_DIR$/src/Micro/Heuristics/TileHeuristics/TileHeuristicTraffic.scala" />
+        <option value="$PROJECT_DIR$/src/Micro/Heuristics/TileHeuristics/TileHeuristicStrength.scala" />
+        <option value="$PROJECT_DIR$/src/ProxyBwapi/UnitClass/UnitClass.scala" />
+        <option value="$PROJECT_DIR$/src/ProxyBwapi/UnitClass/UnitClassProxy.scala" />
+        <option value="$PROJECT_DIR$/src/Micro/Behaviors/MovementProfiles.scala" />
+        <option value="$PROJECT_DIR$/src/Debugging/Visualization/Visualization.scala" />
       </list>
     </option>
   </component>
@@ -335,6 +335,46 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="PurpleWave1" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="PurpleWave1" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ProxyBwapi" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="PurpleWave1" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="PurpleWave1" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ProxyBwapi" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="UnitClass" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -587,11 +627,11 @@
       <recent name="UnitMatching" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="ProxyBwapi.UnitClass" />
       <recent name="Micro.Heuristics.TileHeuristics" />
       <recent name="Planning.Plans.Macro.Automatic" />
       <recent name="Micro.Heuristics.Targeting" />
       <recent name="Micro.Heuristics.UnitHeuristics" />
-      <recent name="Debugging.Visualization.Views" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\prog\PurpleWave1\lib" />
@@ -820,7 +860,7 @@
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.42251462" sideWeight="0.49411765" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.4093567" sideWeight="0.49117646" order="13" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.4093567" sideWeight="0.49117646" order="13" side_tool="false" content_ui="tabs" />
       <window_info id="Debug with VisualVM" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32748538" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -886,12 +926,6 @@
           <properties />
           <option name="timeStamp" value="1290" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" type="scala-line">
-          <url>file://$PROJECT_DIR$/src/Micro/Behaviors/BehaviorDefault.scala</url>
-          <line>42</line>
-          <properties />
-          <option name="timeStamp" value="1475" />
-        </line-breakpoint>
       </breakpoints>
       <breakpoints-dialog>
         <breakpoints-dialog />
@@ -906,46 +940,6 @@
     </watches-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/Debugging/Visualization/Views/VisualizeBattles.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="64">
-          <caret line="12" column="40" lean-forward="false" selection-start-line="12" selection-start-column="40" selection-end-line="12" selection-end-column="40" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Debugging/Visualization/Rendering/DrawMap.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="403">
-          <caret line="126" column="23" lean-forward="true" selection-start-line="126" selection-start-column="23" selection-end-line="126" selection-end-column="23" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Micro/Behaviors/BehaviorWorker.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="17" column="4" lean-forward="true" selection-start-line="17" selection-start-column="4" selection-end-line="17" selection-end-column="4" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Information/Grids/Concrete/GridUnits.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="104">
-          <caret line="8" column="0" lean-forward="false" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Information/Grids/Concrete/GridEnemyStrength.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="78">
-          <caret line="6" column="37" lean-forward="false" selection-start-line="6" selection-start-column="37" selection-end-line="6" selection-end-column="37" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Planning/Plans/Information/ScoutAt.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="195">
@@ -1090,14 +1084,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Micro/Paths.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="466">
-          <caret line="49" column="3" lean-forward="true" selection-start-line="49" selection-start-column="3" selection-end-line="49" selection-end-column="3" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Information/Geography/Calculations/ZoneUpdater.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="254">
@@ -1118,14 +1104,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="195">
           <caret line="24" column="2" lean-forward="true" selection-start-line="24" selection-start-column="2" selection-end-line="24" selection-end-column="2" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Micro/Heuristics/TileHeuristics/TileHeuristicTraffic.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="143">
-          <caret line="32" column="4" lean-forward="true" selection-start-line="32" selection-start-column="4" selection-end-line="32" selection-end-column="4" />
           <folding />
         </state>
       </provider>
@@ -1166,14 +1144,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="182">
           <caret line="14" column="93" lean-forward="true" selection-start-line="14" selection-start-column="93" selection-end-line="14" selection-end-column="93" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/UnitClass/UnitClass.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="184">
-          <caret line="192" column="81" lean-forward="true" selection-start-line="192" selection-start-column="81" selection-end-line="192" selection-end-column="81" />
           <folding />
         </state>
       </provider>
@@ -1250,14 +1220,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Micro/Heuristics/Movement/MovementProfile.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="208">
-          <caret line="22" column="53" lean-forward="false" selection-start-line="22" selection-start-column="53" selection-end-line="22" selection-end-column="53" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Information/Geography/Calculations/BaseFinder.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="186">
@@ -1270,22 +1232,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="260">
           <caret line="47" column="50" lean-forward="true" selection-start-line="47" selection-start-column="50" selection-end-line="47" selection-end-column="50" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Micro/Behaviors/MovementProfiles.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="190">
-          <caret line="38" column="2" lean-forward="true" selection-start-line="38" selection-start-column="2" selection-end-line="38" selection-end-column="2" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Micro/Heuristics/TileHeuristics/TileHeuristicStrength.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="182">
-          <caret line="14" column="63" lean-forward="true" selection-start-line="14" selection-start-column="63" selection-end-line="14" selection-end-column="63" />
           <folding />
         </state>
       </provider>
@@ -1308,8 +1254,96 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Micro/Behaviors/BehaviorDefault.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="262">
-          <caret line="29" column="82" lean-forward="false" selection-start-line="29" selection-start-column="82" selection-end-line="29" selection-end-column="82" />
+        <state relative-caret-position="119">
+          <caret line="42" column="4" lean-forward="false" selection-start-line="42" selection-start-column="4" selection-end-line="42" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Debugging/Visualization/Views/VisualizeBattles.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="194">
+          <caret line="25" column="53" lean-forward="true" selection-start-line="25" selection-start-column="53" selection-end-line="25" selection-end-column="53" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Micro/Heuristics/TileHeuristics/TileHeuristicTraffic.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="169">
+          <caret line="18" column="59" lean-forward="true" selection-start-line="18" selection-start-column="59" selection-end-line="18" selection-end-column="59" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Planning/Plans/Macro/Automatic/BuildPylonsContinuously.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="112">
+          <caret line="44" column="61" lean-forward="false" selection-start-line="44" selection-start-column="61" selection-end-line="44" selection-end-column="61" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Micro/Heuristics/TileHeuristics/TileHeuristicStrength.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="221">
+          <caret line="17" column="38" lean-forward="true" selection-start-line="17" selection-start-column="38" selection-end-line="17" selection-end-column="38" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Micro/Paths.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="160">
+          <caret line="19" column="2" lean-forward="true" selection-start-line="19" selection-start-column="2" selection-end-line="19" selection-end-column="2" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/UnitClass/UnitTypeProxy.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="26">
+          <caret line="2" column="6" lean-forward="false" selection-start-line="2" selection-start-column="6" selection-end-line="2" selection-end-column="6" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/UnitClass/UnitClass.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="104">
+          <caret line="8" column="49" lean-forward="false" selection-start-line="8" selection-start-column="49" selection-end-line="8" selection-end-column="49" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/UnitClass/UnitClassProxy.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="182">
+          <caret line="14" column="46" lean-forward="false" selection-start-line="14" selection-start-column="46" selection-end-line="14" selection-end-column="46" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Micro/Heuristics/Movement/MovementProfile.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="39">
+          <caret line="18" column="39" lean-forward="true" selection-start-line="18" selection-start-column="39" selection-end-line="18" selection-end-column="39" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Micro/Behaviors/MovementProfiles.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="312">
+          <caret line="24" column="28" lean-forward="true" selection-start-line="24" selection-start-column="28" selection-end-line="24" selection-end-column="28" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Debugging/Visualization/Visualization.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="125">
+          <caret line="23" column="2" lean-forward="true" selection-start-line="23" selection-start-column="2" selection-end-line="23" selection-end-column="2" />
           <folding />
         </state>
       </provider>

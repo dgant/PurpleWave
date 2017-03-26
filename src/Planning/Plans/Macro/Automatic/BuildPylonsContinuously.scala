@@ -40,9 +40,9 @@ class BuildPylonsContinuously extends Plan {
     val supplyPerDepot            = With.self.getRace.getSupplyProvider.supplyProvided
     val currentSupplyOfNexus      = With.units.ours.filter(_.unitClass != pylon).toSeq.map(_.unitClass.supplyProvided).sum
     val currentSupplyUsed         = With.self.supplyUsed
-    val unitSpendingRatio         = 1.0 //An exaggeration, but we were getting supply blocked too often
+    val unitSpendingRatio         = 0.75 //An exaggeration, but we were getting supply blocked too often
     val costPerUnitSupply         = 25.0
-    val depotCompletionFrames     = pylon.buildTime + 24 * 8 //Add a few seconds to account for builder transit time
+    val depotCompletionFrames     = pylon.buildTime + 24 * 10 //Add a few seconds to account for builder transit time (and Pylon finishing time)
     val incomePerMinute           = With.economy.ourMineralIncomePerMinute + With.economy.ourGasIncomePerMinute
     val incomePerFrame            = incomePerMinute / 60.0 / 24.0
     val supplyUsedPerFrame        = incomePerFrame * unitSpendingRatio / costPerUnitSupply

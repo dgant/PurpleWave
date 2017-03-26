@@ -16,6 +16,6 @@ object TileHeuristicStrength extends TileHeuristic {
     
     if (enemyStrength == 0) return if (ourStrength == 0) 1.0 else max
     if (ourStrength == 0)   return min
-    else return ourStrength / enemyStrength
+    else                    return Math.min(max, Math.max(min, ourStrength / enemyStrength))
   }
 }

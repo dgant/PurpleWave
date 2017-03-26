@@ -31,7 +31,7 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   def tileArea: TileRectangle = unitClass.tileArea.add(tileTopLeft)
   
   def canTraverse(tile:TilePosition)                : Boolean = flying || With.grids.walkable.get(tile)
-  def pixelsFromEdge(otherUnit:UnitInfo)            : Double  = pixelDistance(otherUnit) - unitClass.hypotenuse - otherUnit.unitClass.hypotenuse
+  def pixelsFromEdge(otherUnit:UnitInfo)            : Double  = pixelDistance(otherUnit) - unitClass.radialHypotenuse - otherUnit.unitClass.radialHypotenuse
   def pixelDistance(otherPosition:Position)         : Double  = pixelCenter.getDistance(otherPosition)
   def pixelDistance(otherUnit:UnitInfo)             : Double  = pixelDistance(otherUnit.pixelCenter)
   def tileDistance(otherPosition:TilePosition)      : Double  = pixelDistance(otherPosition.toPosition)

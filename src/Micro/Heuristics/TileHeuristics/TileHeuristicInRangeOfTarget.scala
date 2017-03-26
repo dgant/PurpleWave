@@ -12,8 +12,8 @@ object TileHeuristicInRangeOfTarget extends TileHeuristic {
     if (intent.toAttack.isEmpty) return 1.0
     
     HeuristicMath.unboolify(intent.toAttack.get.pixelDistance(candidate.pixelCenter) <
-      intent.unit.unitClass.hypotenuse +
-      intent.toAttack.get.unitClass.hypotenuse +
+      intent.unit.unitClass.radialHypotenuse +
+      intent.toAttack.get.unitClass.radialHypotenuse +
       intent.unit.unitClass.maxAirGroundRange)
   }
 }

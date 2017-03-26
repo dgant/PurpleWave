@@ -8,7 +8,7 @@ import bwapi.{DamageType, TilePosition, UnitType}
 
 case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
   
-  def hypotenuse = Math.sqrt(width * width + height * height)
+  def radialHypotenuse = Math.sqrt(width.toDouble * width.toDouble + height.toDouble * height.toDouble)/2.0
   
   //Don't use this for Dark Swarm -- just use a fixed set of units
   def isMelee: Boolean = groundRange <= 32 && ! isWorker

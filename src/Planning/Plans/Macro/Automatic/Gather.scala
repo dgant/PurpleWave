@@ -102,13 +102,20 @@ class Gather extends Plan {
           .map(_.size)
           .getOrElse(0))).toMap
     
+    private val mineralsByZone =
+      With.geography.ourZones
+        .map(zone =>
+          (zone,
+            zone.bases.flatten(base =>
+              base.minerals.toList.sortBy(_.pixelDistance(base.townHallRectangle.midPixel)))))
+        .toMap
+    
     def addWorkerToMinerals(worker:FriendlyUnitInfo) {
       if (safeMinerals.isEmpty) return
       val currentZone = worker.pixelCenter.zone
       var candidate:Option[UnitInfo] = None
-      val currentZoneMinerals = currentZone.bases.filter(_.townHall.exists(_.complete)).flatten(_.minerals).filter(safeMinerals.contains)
-      if (currentZoneMinerals.nonEmpty) {
-        candidate = Some(currentZoneMinerals.maxBy(needPerMineral(_)))
+      if (mineralsByZone.get(currentZone).exists(_.nonEmpty)) {
+        candidate = Some(mineralsByZone(currentZone).maxBy(needPerMineral(_)))
       }
       else {
         candidate = Some(safeMinerals.minBy(mineral => needPerMineral(mineral)))

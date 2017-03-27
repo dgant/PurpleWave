@@ -8,7 +8,6 @@ import Planning.Plans.Allocation.LockUnits
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Startup.With
 
-import Utilities.EnrichPosition._
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
@@ -27,11 +26,12 @@ class Gather extends Plan {
     workers.onFrame()
     
     val allWorkers    = workers.units
-    val allMinerals   = With.geography.ourBases.flatten(base => base.minerals).toSet
-    val allGas        = With.geography.ourBases.flatten(base => base.gas).filter(gas => gas.complete && gas.isOurs).toSet
+    val allMinerals   = With.geography.ourBases.flatten(base => base.minerals).filter(_.alive).toSet
+    val allGas        = With.geography.ourBases.flatten(base => base.gas).filter(gas => gas.complete && gas.isOurs && gas.alive).toSet
     val allResources  = (allMinerals ++ allGas)
     
     //Remove dead/unassigned units
+    resourceByWorker.values.filterNot(workersByResource.contains).foreach(unassignResource)
     resourceByWorker.keySet.diff(allWorkers).foreach(unassignWorker)
     workersByResource.keySet.filterNot(_.alive).foreach(unassignResource)
     
@@ -88,7 +88,7 @@ class Gather extends Plan {
     workersPerMineral : Double,
     workersPerGas     : Double) {
     
-    private val needPerMineral  = new mutable.HashMap[UnitInfo, Double] ++
+    private val needPerMineral = new mutable.HashMap[UnitInfo, Double] ++
       safeMinerals
         .map(mineral => (mineral,
           workersPerMineral - workersByResource.get(mineral)
@@ -102,45 +102,35 @@ class Gather extends Plan {
           .map(_.size)
           .getOrElse(0))).toMap
     
-    private val mineralsByZone =
+    private val safeMineralsByZone =
       With.geography.ourZones
         .map(zone =>
           (zone,
             zone.bases.flatten(base =>
-              base.minerals.toList.sortBy(_.pixelDistance(base.townHallRectangle.midPixel)))))
+              base.minerals
+                .filter(safeMinerals.contains)
+                .toList
+                .sortBy(_.pixelDistance(base.townHallRectangle.midPixel)))))
         .toMap
     
     def addWorkerToMinerals(worker:FriendlyUnitInfo) {
       if (safeMinerals.isEmpty) return
-      val currentZone = worker.pixelCenter.zone
-      var candidate:Option[UnitInfo] = None
-      if (mineralsByZone.get(currentZone).exists(_.nonEmpty)) {
-        candidate = Some(mineralsByZone(currentZone).maxBy(needPerMineral(_)))
-      }
-      else {
-        candidate = Some(safeMinerals.minBy(mineral => needPerMineral(mineral)))
-      }
-      if (candidate.nonEmpty) {
-        assignWorker(worker, candidate.get)
-        needPerMineral(candidate.get) -= 1
-      }
+      val mineral = safeMinerals
+        .toList
+        .sortBy(_.pixelDistanceSquared(worker.pixelCenter))
+        .maxBy(needPerMineral)
+      assignWorker(worker, mineral)
+      needPerMineral(mineral) -= 1
     }
   
     def addWorkerToGas(worker:FriendlyUnitInfo) {
       if (safeGas.isEmpty) return
-      val currentZone = worker.pixelCenter.zone
-      var candidate:Option[UnitInfo] = None
-      val currentZoneGas = currentZone.bases.filter(_.townHall.exists(_.complete)).flatten(_.gas).filter(gas => gas.complete && safeGas.contains(gas))
-      if (currentZoneGas.nonEmpty) {
-        candidate = Some(currentZoneGas.maxBy(needPerGas(_)))
-      }
-      else {
-        candidate = Some(safeGas.minBy(Gas => needPerGas(Gas)))
-      }
-      if (candidate.nonEmpty) {
-        assignWorker(worker, candidate.get)
-        needPerGas(candidate.get) -= 1
-      }
+      val gas = safeGas
+        .toList
+        .sortBy(_.pixelDistanceSquared(worker.pixelCenter))
+        .maxBy(needPerGas)
+      assignWorker(worker, gas)
+      needPerGas(gas) -= 1
     }
   }
   

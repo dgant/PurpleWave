@@ -75,27 +75,17 @@ class Commander {
   
   def gather(intent:Intention, resource:UnitInfo) {
     if (intent.unit.carryingMinerals || intent.unit.carryingGas) {
-      if (intent.unit.gatheringGas || intent.unit.gatheringMinerals) {}
-      else {
+      if ( ! intent.unit.gatheringGas && ! intent.unit.gatheringMinerals) {
         intent.unit.base.returnCargo
         sleepReturnCargo(intent.unit)
       }
     }
+    // The logic of "If we're not carrying resources, spam gather until the unit's target is the intended resource"
+    // produces mineral locking, in which workers mine more efficiently because exactly 2 miners saturate a mineral patch.
     else if ( ! intent.unit.target.exists(_ == resource)) {
-      //TMP: Disabled
-      if (false) {
-        if (intent.unit.carryingGas || intent.unit.carryingMinerals) {
-          val townHalls = With.units.ours.filter(_.unitClass.isTownHall).filter(_.complete)
-          if (townHalls.nonEmpty) {
-            val nearestTownHall = townHalls.minBy(townHall => With.paths.groundPixels(resource.tileCenter, townHall.tileCenter))
-            intent.unit.base.rightClick(nearestTownHall.base)
-            sleepReturnCargo(intent.unit)
-            return
-          }
-        }
-      }
       
-      //TODO: This will fail if we've never seen the resource before
+      // TODO: This will fail if we've never seen the resource before, as with some long-distance mining situations.
+      // In that case we should order units to move to the destination first.
       intent.unit.base.gather(resource.base)
     }
   }

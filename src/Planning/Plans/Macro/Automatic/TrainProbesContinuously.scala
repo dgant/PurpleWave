@@ -5,5 +5,7 @@ import Startup.With
 
 class TrainProbesContinuously extends TrainContinuously(Protoss.Probe) {
   
-  override def maxDesirable: Int = Math.min(75, With.economy.ourMiningBases.size * 25)
+  override def maxDesirable: Int = Math.min(
+    75,
+    2 * With.geography.ourBases.toList.map(base => base.minerals.size).sum)
 }

@@ -2,7 +2,7 @@ package ProxyBwapi.UnitInfo
 import Performance.Caching.{Cache, CacheFrame}
 import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
 import Startup.With
-import bwapi.{Player, Position, TilePosition, UnitCommand}
+import bwapi._
 
 abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
   
@@ -68,6 +68,10 @@ abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
   
   def gatheringMinerals : Boolean = base.isGatheringMinerals
   def gatheringGas      : Boolean = base.isGatheringGas
+  
+  def target      : Option[UnitInfo]  = { val target = base.getTarget; if (target == null) None else With.units.getId(target.getID) }
+  def order       : Order             = base.getOrder
+  def orderTarget : Option[UnitInfo]  = { val target = base.getOrderTarget; if (target == null) None else With.units.getId(target.getID) }
   
   /*
   def attacking:Boolean

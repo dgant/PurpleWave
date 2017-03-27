@@ -74,8 +74,14 @@ class Commander {
   }
   
   def gather(intent:Intention, resource:UnitInfo) {
-    val command = intent.unit.command
-    if (command.getUnitCommandType != UnitCommandType.Right_Click_Unit || command.getTarget == null || command.getTarget.getID != resource.id) {
+    if (intent.unit.carryingMinerals || intent.unit.carryingGas) {
+      if (intent.unit.gatheringGas || intent.unit.gatheringMinerals) {}
+      else {
+        intent.unit.base.returnCargo
+        sleepReturnCargo(intent.unit)
+      }
+    }
+    else if ( ! intent.unit.target.exists(_ == resource)) {
       //TMP: Disabled
       if (false) {
         if (intent.unit.carryingGas || intent.unit.carryingMinerals) {
@@ -90,7 +96,7 @@ class Commander {
       }
       
       //TODO: This will fail if we've never seen the resource before
-      intent.unit.base.rightClick(resource.base)
+      intent.unit.base.gather(resource.base)
     }
   }
   

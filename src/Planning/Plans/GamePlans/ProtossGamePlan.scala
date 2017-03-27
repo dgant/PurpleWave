@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans
 import Planning.Plans.Army.Defend
 import Planning.Plans.Compound.Parallel
 import Planning.Plans.Information.SwitchEnemyRace
-import Planning.Plans.Macro.Automatic.{GatherGas, GatherMinerals}
+import Planning.Plans.Macro.Automatic.Gather
 import Planning.Plans.Macro.BuildOrders.FollowBuildOrder
 import Planning.Plans.Macro.RemoveMineralBlockAt
 
@@ -17,8 +17,7 @@ class ProtossGamePlan extends Parallel {
     },
     new FollowBuildOrder,
     new RemoveMineralBlockAt(30),
-    new GatherGas,
-    new GatherMinerals,
+    new Gather,
     new Defend
   ))
 }

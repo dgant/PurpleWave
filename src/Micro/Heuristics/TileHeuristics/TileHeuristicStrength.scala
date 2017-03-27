@@ -8,7 +8,7 @@ object TileHeuristicStrength extends TileHeuristic {
   
   override def evaluate(intent: Intention, candidate: TilePosition): Double = {
     
-    val max = 3.0
+    val max = 2.0
     val min = 1.0/max
     
     val ourStrength   = With.grids.friendlyStrength.get(candidate)

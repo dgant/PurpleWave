@@ -106,7 +106,7 @@ class Gather extends Plan {
       if (safeMinerals.isEmpty) return
       val currentZone = worker.pixelCenter.zone
       var candidate:Option[UnitInfo] = None
-      val currentZoneMinerals = currentZone.bases.filter(_.townHall.exists(_.complete)).flatten(_.minerals)
+      val currentZoneMinerals = currentZone.bases.filter(_.townHall.exists(_.complete)).flatten(_.minerals).filter(safeMinerals.contains)
       if (currentZoneMinerals.nonEmpty) {
         candidate = Some(currentZoneMinerals.maxBy(needPerMineral(_)))
       }
@@ -122,8 +122,8 @@ class Gather extends Plan {
     def addWorkerToGas(worker:FriendlyUnitInfo) {
       if (safeGas.isEmpty) return
       val currentZone = worker.pixelCenter.zone
-      var candidate = currentZone.bases.filter(_.townHall.exists(_.complete)).flatten(_.gas).filter(gas => gas.complete && safeGas.contains(gas)).headOption
-      val currentZoneGas = currentZone.bases.filter(_.townHall.exists(_.complete)).flatten(_.gas).filter(_.complete)
+      var candidate:Option[UnitInfo] = None
+      val currentZoneGas = currentZone.bases.filter(_.townHall.exists(_.complete)).flatten(_.gas).filter(gas => gas.complete && safeGas.contains(gas))
       if (currentZoneGas.nonEmpty) {
         candidate = Some(currentZoneGas.maxBy(needPerGas(_)))
       }

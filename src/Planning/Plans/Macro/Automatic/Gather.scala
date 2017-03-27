@@ -28,7 +28,7 @@ class Gather extends Plan {
     
     val allWorkers    = workers.units
     val allMinerals   = With.geography.ourBases.flatten(base => base.minerals).toSet
-    val allGas        = With.geography.ourBases.flatten(base => base.gas).filter(_.isOurs).toSet
+    val allGas        = With.geography.ourBases.flatten(base => base.gas).filter(gas => gas.complete && gas.isOurs).toSet
     val allResources  = (allMinerals ++ allGas)
     
     //Remove dead/unassigned units
@@ -58,7 +58,7 @@ class Gather extends Plan {
     val workersForGas       = List(safeGas.size * 3, allWorkers.size/3, if(haveEnoughGas) 0 else 200).min
     val workersForMinerals  = allWorkers.size - workersForGas
     val workersPerMineral   = Math.min(2.0, workersForMinerals.toDouble / safeMinerals.size)
-    val workersPerGas       = workersForGas.toDouble / safeGas.size
+    val workersPerGas       = if (safeGas.size == 0) 0 else workersForGas.toDouble / safeGas.size
     val workersOnGas        = safeGas.toList.map(gas => workersByResource.get(gas).map(_.size).getOrElse(0)).sum
     
     //Figure out which resources can lose workers, and which need them
@@ -70,7 +70,7 @@ class Gather extends Plan {
   
     //Assign the unassigned workers
     //TODO: Occasionally include inefficiently assigned workers for reassignment
-    val unassignedWorkers       = resourceByWorker.keySet.diff(allWorkers)
+    val unassignedWorkers       = allWorkers.diff(resourceByWorker.keySet)
     val numberToAddToGas        = Math.max(0, workersForGas - workersOnGas)
     val workersToAddToGas       = unassignedWorkers.take(numberToAddToGas)
     val workersToAddToMinerals  = unassignedWorkers.drop(numberToAddToGas)
@@ -105,8 +105,12 @@ class Gather extends Plan {
     def addWorkerToMinerals(worker:FriendlyUnitInfo) {
       if (safeMinerals.isEmpty) return
       val currentZone = worker.pixelCenter.zone
-      var candidate = currentZone.bases.filter(_.townHall.exists(_.complete)).flatten(_.minerals).filter(safeMinerals.contains).headOption
-      if (candidate.isEmpty) {
+      var candidate:Option[UnitInfo] = None
+      val currentZoneMinerals = currentZone.bases.filter(_.townHall.exists(_.complete)).flatten(_.minerals)
+      if (currentZoneMinerals.nonEmpty) {
+        candidate = Some(currentZoneMinerals.maxBy(needPerMineral(_)))
+      }
+      else {
         candidate = Some(safeMinerals.minBy(mineral => needPerMineral(mineral)))
       }
       if (candidate.nonEmpty) {
@@ -118,9 +122,13 @@ class Gather extends Plan {
     def addWorkerToGas(worker:FriendlyUnitInfo) {
       if (safeGas.isEmpty) return
       val currentZone = worker.pixelCenter.zone
-      var candidate = currentZone.bases.filter(_.townHall.exists(_.complete)).flatten(_.gas).filter(safeGas.contains).headOption
-      if (candidate.isEmpty) {
-        candidate = Some(safeGas.minBy(mineral => needPerMineral(mineral)))
+      var candidate = currentZone.bases.filter(_.townHall.exists(_.complete)).flatten(_.gas).filter(gas => gas.complete && safeGas.contains(gas)).headOption
+      val currentZoneGas = currentZone.bases.filter(_.townHall.exists(_.complete)).flatten(_.gas).filter(_.complete)
+      if (currentZoneGas.nonEmpty) {
+        candidate = Some(currentZoneGas.maxBy(needPerGas(_)))
+      }
+      else {
+        candidate = Some(safeGas.minBy(Gas => needPerGas(Gas)))
       }
       if (candidate.nonEmpty) {
         assignWorker(worker, candidate.get)

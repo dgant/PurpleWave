@@ -12,7 +12,7 @@ object BehaviorWorker extends Behavior {
       return With.commander.build(intent, intent.toBuild.get, intent.destination.get)
     }
   
-    if (intent.toGather.isDefined && intent.unit.attackableEnemiesInRange.isEmpty) {
+    if (intent.toGather.isDefined) {
       return With.commander.gather(intent, intent.toGather.get)
     }
     

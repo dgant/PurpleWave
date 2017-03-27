@@ -74,20 +74,23 @@ class Commander {
   }
   
   def gather(intent:Intention, resource:UnitInfo) {
-    if (intent.unit.command.getTarget != resource.base) {
-      if (intent.unit.carryingGas || intent.unit.carryingMinerals) {
-        val townHalls = With.units.ours.filter(_.unitClass.isTownHall).filter(_.complete)
-        if (townHalls.nonEmpty) {
-          val nearestTownHall = townHalls.minBy(townHall => With.paths.groundPixels(resource.tileCenter, townHall.tileCenter))
-          intent.unit.base.rightClick(nearestTownHall.base)
-          sleepReturnCargo(intent.unit)
-          return
+    val command = intent.unit.command
+    if (command.getUnitCommandType != UnitCommandType.Right_Click_Unit || command.getTarget == null || command.getTarget.getID != resource.id) {
+      //TMP: Disabled
+      if (false) {
+        if (intent.unit.carryingGas || intent.unit.carryingMinerals) {
+          val townHalls = With.units.ours.filter(_.unitClass.isTownHall).filter(_.complete)
+          if (townHalls.nonEmpty) {
+            val nearestTownHall = townHalls.minBy(townHall => With.paths.groundPixels(resource.tileCenter, townHall.tileCenter))
+            intent.unit.base.rightClick(nearestTownHall.base)
+            sleepReturnCargo(intent.unit)
+            return
+          }
         }
       }
       
-      //This will fail if we've never seen the resource before
+      //TODO: This will fail if we've never seen the resource before
       intent.unit.base.rightClick(resource.base)
-      sleepMove(intent.unit)
     }
   }
   

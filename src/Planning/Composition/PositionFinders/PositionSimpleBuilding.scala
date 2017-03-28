@@ -66,13 +66,18 @@ class PositionSimpleBuilding(val buildingType:UnitClass) extends PositionFinder 
   private def positionBuilding:Option[TilePosition] = {
     var output:Option[TilePosition] = None
     (maxMargin to 0 by -1).foreach(margin =>
-      output = output.orElse(
-        With.architect.placeBuilding(
-          buildingType,
-          With.geography.home,
-          margin = margin,
-          searchRadius = 20,
-          exclusions = exclusions)))
+      With.geography.ourBases
+        .toList
+        .sortBy( - _.mineralsLeft)
+        .map(_.townHallRectangle.midpoint)
+        .foreach(base =>
+          output = output.orElse(
+            With.architect.placeBuilding(
+              buildingType,
+              base,
+              margin = margin,
+              searchRadius = 20,
+              exclusions = exclusions))))
     output
   }
   

@@ -15,6 +15,33 @@ class ProtossVsProtoss extends Parallel {
   description.set("Protoss vs Protoss")
   
   // http://wiki.teamliquid.net/starcraft/4_Gate_Goon_(vs._Protoss)
+  
+  
+  val _fourGateGoonsSimplifiedStart = List[BuildRequest] (
+    new RequestUnitAnotherOne(Protoss.Nexus),
+    new RequestUnitAnother(8, Protoss.Probe),
+    new RequestUnitAnotherOne(Protoss.Pylon), //8
+    new RequestUnitAnother(2, Protoss.Probe),
+    new RequestUnitAnotherOne(Protoss.Gateway), //10
+    new RequestUnitAnother(2, Protoss.Probe),
+    new RequestUnitAnotherOne(Protoss.Pylon), //12
+    new RequestUnitAnotherOne(Protoss.Probe),
+    new RequestUnitAnotherOne(Protoss.Zealot), //13
+    new RequestUnitAnotherOne(Protoss.Probe),
+    new RequestUnitAnotherOne(Protoss.Assimilator), //16
+    new RequestUnitAnotherOne(Protoss.Probe),
+    new RequestUnitAnotherOne(Protoss.CyberneticsCore), //17
+    new RequestUnitAnotherOne(Protoss.Probe)
+  )
+  
+  val _fourGateGoonsSimplified = List[BuildRequest] (
+    new RequestUpgrade(Protoss.DragoonRange),
+    new RequestUnitAnotherOne(Protoss.Gateway),
+    new RequestUnitAnotherOne(Protoss.Gateway),
+    new RequestUnitAnotherOne(Protoss.Gateway),
+    new RequestUnitAnotherOne(Protoss.Nexus)
+  )
+    
   val _fourGateGoons = List[BuildRequest] (
     new RequestUnitAnotherOne(Protoss.Nexus),
     new RequestUnitAnother(8, Protoss.Probe),
@@ -78,12 +105,13 @@ class ProtossVsProtoss extends Parallel {
   )
   
   children.set(List(
-    new ScheduleBuildOrder { buildables.set(_fourGateGoons) },
+    new ScheduleBuildOrder { buildables.set(_fourGateGoonsSimplifiedStart) },
     new BuildPylonsContinuously,
     new TrainProbesContinuously,
     new TrainContinuously(Protoss.Reaver),
     new TrainContinuously(Protoss.Dragoon),
     new TrainContinuously(Protoss.Zealot),
+    new ScheduleBuildOrder { buildables.set(_fourGateGoonsSimplified) },
     new ScheduleBuildOrder { buildables.set(_twoBaseBuild) },
     new ScoutAt(10),
     new IfThenElse {

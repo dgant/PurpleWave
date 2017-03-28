@@ -52,14 +52,12 @@ class PositionSimpleBuilding(val buildingType:UnitClass) extends PositionFinder 
     if (candidates.isEmpty) return None
     Some(candidates
       .minBy(candidate =>
-        1 * With.geography.zones
-          .filter(_.owner == With.self)
-          .map(zone => With.paths.groundPixels(zone.centroid.toTilePosition, candidate))
+        1 * With.geography.ourBases
+          .map(base => With.paths.groundPixels(base.townHallRectangle.midpoint, candidate))
           .sum
         -
-        2 * With.geography.zones
-          .filter(zone => zone.owner != With.self && zone.owner != With.neutral)
-          .map(zone => With.paths.groundPixels(zone.centroid.toTilePosition, candidate))
+        2 * With.geography.enemyBases
+          .map(base => With.paths.groundPixels(base.townHallRectangle.midpoint, candidate))
           .sum))
   }
   

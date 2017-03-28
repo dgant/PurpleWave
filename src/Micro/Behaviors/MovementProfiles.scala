@@ -11,8 +11,8 @@ object MovementProfiles {
     preferTarget      = 0.50,
     preferMobility    = 0.50,
     preferStrength    = 0.50,
-    avoidDamage       = 0.75,
-    avoidTraffic      = 0.5)
+    avoidDamage       = 0.50,
+    avoidTraffic      = 0.25)
   
   val defaultNormal = new MovementProfile (
     preferTravel      = 1.0,

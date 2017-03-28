@@ -43,7 +43,7 @@ object ZoneBuilder {
       .flatMap(neighborTile => candidates.view.filter(candidate => candidate.tiles.contains(neighborTile)).headOption)
       .headOption
     matchingZone
-      .getOrElse(With.geography.zones.minBy(_.centroid.pixelDistance(tile.pixelCenter)))
+      .getOrElse(zones.minBy(_.centroid.pixelDistance(tile.pixelCenter)))
       .tiles
       .add(tile)
   }

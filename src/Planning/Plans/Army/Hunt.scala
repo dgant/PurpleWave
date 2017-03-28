@@ -26,7 +26,14 @@ class Hunt extends Plan {
     if (hunters.get.isComplete) {
       hunters.get.units.foreach(fighter => {
         val targets = With.units.enemy.filter(fighter.canAttack)
-        val targetDestination = if(targets.isEmpty) targetPosition else targets.minBy(_.pixelDistanceSquared(fighter)).tileCenter
+        val targetDestination =
+          if(targets.isEmpty)
+            targetPosition
+          else
+            targets.minBy(candidate =>
+              candidate.pixelDistanceSquared(fighter)
+            + candidate.pixelDistanceSquared(With.geography.home.pixelCenter)).tileCenter
+        
         With.executor.intend(new Intention(this, fighter) { destination = Some(targetPosition) })
       })
     }

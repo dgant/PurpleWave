@@ -19,13 +19,23 @@ class ControlPosition extends Plan {
   override def getChildren: Iterable[Plan] = List(units.get)
   override def onFrame() {
     
-    val targetPosition = position.get.find
+    var targetPosition = position.get.find.get
     
-    if (targetPosition.isEmpty) return
+    val ourBases = With.geography.ourBases.map(_.townHallRectangle.midPixel)
+    val infiltrators = With.units.enemy
+      .filter(e =>
+        e.canAttack &&
+        ourBases.exists(base =>
+          targetPosition.pixelCenter.pixelDistance(e.pixelCenter) <
+          targetPosition.pixelCenter.pixelDistance(base)))
+        
+    if (infiltrators.nonEmpty) {
+      targetPosition = infiltrators.map(_.tileCenter).minBy(_.tileDistance(With.geography.home))
+    }
     
     units.get.onFrame()
     if (units.get.isComplete) {
-      units.get.units.foreach(fighter => With.executor.intend(new Intention(this, fighter) { destination = targetPosition }))
+      units.get.units.foreach(fighter => With.executor.intend(new Intention(this, fighter) { destination = Some(targetPosition) }))
     }
   }
   

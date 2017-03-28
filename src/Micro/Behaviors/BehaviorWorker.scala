@@ -13,6 +13,7 @@ object BehaviorWorker extends Behavior {
     }
   
     if (intent.toGather.isDefined) {
+      //TODO: Test this against heuristics when threats exist, so that we don't blindly transfer workers into a fight
       return With.commander.gather(intent, intent.toGather.get)
     }
     

@@ -65,7 +65,7 @@ object BaseFinder {
           List(hall) ++
           halls
             .filterNot(basesToRemove.contains)
-            .filter(otherHall => otherHall != hall && otherHall.distanceTile(hall) < 8)
+            .filter(otherHall => otherHall != hall && otherHall.tileDistance(hall) < 8)
         
         //Take the hall which is closest to a geyser
         val preferredHall = conflictingHalls

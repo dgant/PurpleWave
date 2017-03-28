@@ -38,7 +38,7 @@ class PositionSimpleBuilding(val buildingType:UnitClass) extends PositionFinder 
       .filter(_.isNeutral)
       .map(_.tileTopLeft)
     
-    if (candidates.isEmpty) None else Some(candidates.minBy(_.distanceTile(With.geography.home)))
+    if (candidates.isEmpty) None else Some(candidates.minBy(_.tileDistance(With.geography.home)))
   }
   
   private def positionTownHall:Option[TilePosition] = {
@@ -52,13 +52,14 @@ class PositionSimpleBuilding(val buildingType:UnitClass) extends PositionFinder 
     if (candidates.isEmpty) return None
     Some(candidates
       .minBy(candidate =>
-        1 * With.geography.ourBases
+        1.0 * With.geography.ourBases
           .map(base => With.paths.groundPixels(base.townHallRectangle.midpoint, candidate))
           .sum
         -
-        2 * With.geography.enemyBases
+        0.5 * With.geography.enemyBases
           .map(base => With.paths.groundPixels(base.townHallRectangle.midpoint, candidate))
-          .sum))
+          .sum
+      ))
   }
   
   private def positionBuilding:Option[TilePosition] = {

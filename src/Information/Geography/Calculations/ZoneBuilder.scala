@@ -69,7 +69,7 @@ object ZoneBuilder {
         .find(_.contains(townHallPosition.toPosition))
         .getOrElse(zones.minBy(_.centroid.pixelDistance(townHallPosition.pixelCenter))),
       townHallArea,
-      With.game.getStartLocations.asScala.exists(_.distanceTile(townHallPosition) < 6))
+      With.game.getStartLocations.asScala.exists(_.tileDistance(townHallPosition) < 6))
   }
   
   def buildEdge(choke: Chokepoint, zones:Iterable[Zone]):ZoneEdge =

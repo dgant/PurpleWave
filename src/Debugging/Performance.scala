@@ -3,7 +3,7 @@ package Debugging
 import Startup.With
 
 class Performance {
-  private val framesToTrack = 24 * 6
+  private val framesToTrack = 24 * 1
   private val frameTimes = Array.fill(framesToTrack)(1l)
   
   private var millisecondsBefore = 0l
@@ -19,10 +19,10 @@ class Performance {
     frameTimes(With.frame % framesToTrack) = millisecondDifference
   
     if (With.frame % framesToTrack == 0) {
-      if (meanFrameLength > 20) {
-        currentFrameDelay += 1
+      if (meanFrameLength > 20 || maxFrameLength > 80) {
+        currentFrameDelay += 2
       } else {
-        currentFrameDelay -= 1
+        currentFrameDelay -= 2
       }
       currentFrameDelay = Math.max(6,  currentFrameDelay)
       currentFrameDelay = Math.min(48, currentFrameDelay)

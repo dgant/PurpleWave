@@ -155,7 +155,7 @@ case object EnrichPosition {
     def midpoint(otherPosition:TilePosition):TilePosition = {
       add(otherPosition).divide(2)
     }
-    def distanceTile(otherTile:TilePosition):Double = {
+    def tileDistance(otherTile:TilePosition):Double = {
       Math.sqrt(distanceTileSquared(otherTile))
     }
     def distanceTileSquared(otherTile:TilePosition):Int = {

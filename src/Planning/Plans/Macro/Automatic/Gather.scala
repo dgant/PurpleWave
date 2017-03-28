@@ -29,10 +29,8 @@ class Gather extends Plan {
     val allMinerals   = ourActiveBases.flatten(base => base.minerals).filter(_.alive).toSet
     val allGas        = ourActiveBases.flatten(base => base.gas).filter(gas => gas.isOurs  && gas.complete && gas.alive).toSet
     val allResources  = (allMinerals ++ allGas)
-    
-    //Remove dead/unassigned units
-    resourceByWorker.keySet.diff(allWorkers).foreach(unassignWorker)
-    workersByResource.keySet.filterNot(_.alive).foreach(unassignResource)
+  
+    removeUnavailableUnits(allWorkers)
     
     //Remove dangerous resources
     var safeMinerals  = allMinerals   .filter(safe)
@@ -80,7 +78,13 @@ class Gather extends Plan {
     allWorkers.foreach(order)
   }
   
-  def distributeWorkers (
+  private def removeUnavailableUnits(allWorkers: Set[FriendlyUnitInfo]) = {
+    //Remove dead/unassigned units
+    resourceByWorker.keySet.diff(allWorkers).foreach(unassignWorker)
+    workersByResource.keySet.filterNot(_.alive).foreach(unassignResource)
+  }
+  
+  def distributeWorkers(
     safeMinerals            : Set[UnitInfo],
     safeGas                 : Set[UnitInfo],
     workersPerMineral       : Double,

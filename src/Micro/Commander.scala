@@ -51,11 +51,11 @@ class Commander {
         && intent.unit.unitClass.maxAirGroundRange <= With.configuration.combatStickinessLeash)
     
     if (stickyMeleeTarget.isDefined) return attack(intent, intent.toAttack.get)
-    
+  
+    //Send flying units past their destination to maximize acceleration
     val flyingOvershoot = 128.0
     var destination = position
     if (intent.unit.flying && intent.unit.pixelDistance(position) < flyingOvershoot) {
-      //Send flying units further to maximize acceleration
       destination = intent.unit.pixelCenter.project(position, flyingOvershoot)
     }
     

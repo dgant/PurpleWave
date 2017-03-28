@@ -20,13 +20,13 @@ class Intention(val plan:Plan, val unit:FriendlyUnitInfo) {
   var toTech      : Option[Tech]          = None
   var toUpgrade   : Option[Upgrade]       = None
   
-  private val targetCache = new CacheForever[Set[UnitInfo]](() => Targets.get(this))
-  private val threatCache = new CacheForever[Set[UnitInfo]](() => Threats.get(this))
-  
   def targets: Set[UnitInfo] = targetCache.get
   def threats: Set[UnitInfo] = threatCache.get
  
   var movementProfileCombat = MovementProfiles.defaultCombat
   var movementProfileNormal = MovementProfiles.defaultNormal
   var targetProfile         = TargetingProfiles.default
+  
+  private val targetCache = new CacheForever[Set[UnitInfo]](() => Targets.get(this))
+  private val threatCache = new CacheForever[Set[UnitInfo]](() => Threats.get(this))
 }

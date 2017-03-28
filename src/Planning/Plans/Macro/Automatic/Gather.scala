@@ -1,5 +1,6 @@
 package Planning.Plans.Macro.Automatic
 
+import Information.Geography.Types.Base
 import Micro.Intentions.Intention
 import Planning.Composition.UnitCountEverything
 import Planning.Composition.UnitMatchers.UnitMatchWorker
@@ -17,28 +18,57 @@ class Gather extends Plan {
     unitCounter.set(UnitCountEverything)
   }
   
-  val resourceByWorker = new mutable.HashMap[FriendlyUnitInfo, UnitInfo]
-  val workersByResource = new mutable.HashMap[UnitInfo, mutable.HashSet[FriendlyUnitInfo]]
+  private val resourceByWorker  = new mutable.HashMap[FriendlyUnitInfo, UnitInfo]
+  private val workersByResource = new mutable.HashMap[UnitInfo, mutable.HashSet[FriendlyUnitInfo]]
+  
+  private var ourActiveBases          : Iterable[Base]        = List.empty
+  private var allWorkers              : Set[FriendlyUnitInfo] = Set.empty
+  private var allMinerals             : Set[UnitInfo]         = Set.empty
+  private var allGas                  : Set[UnitInfo]         = Set.empty
+  private var allResources            : Set[UnitInfo]         = Set.empty
+  private var safeMinerals            : Set[UnitInfo]         = Set.empty
+  private var safeGas                 : Set[UnitInfo]         = Set.empty
+  private var safeResources           : Set[UnitInfo]         = Set.empty
+  private var haveEnoughGas           : Boolean               = false
+  private var workersForGas           : Int                   = 0
+  private var workersForMinerals      : Int                   = 0
+  private var workersPerMineral       : Double                = 0.0
+  private var workersPerGas           : Double                = 0.0
+  private var workersOnGas            : Int                   = 0
+  private var unassignedWorkers       : Set[FriendlyUnitInfo] = Set.empty
+  private var numberToAddToGas        : Int                   = 0
+  private var workersToAddToGas       : Set[FriendlyUnitInfo] = Set.empty
+  private var workersToAddToMinerals  : Set[FriendlyUnitInfo] = Set.empty
   
   override def onFrame() {
     
-    workers.onFrame()
-    
-    val ourActiveBases = With.geography.ourBases.filter(_.townHall.exists(_.complete))
-    val allWorkers    = workers.units
-    val allMinerals   = ourActiveBases.flatten(base => base.minerals).filter(_.alive).toSet
-    val allGas        = ourActiveBases.flatten(base => base.gas).filter(gas => gas.isOurs  && gas.complete && gas.alive).toSet
-    val allResources  = (allMinerals ++ allGas)
+    updateWorkerInformation()
+    updateResourceInformation()
+    decideLongDistanceMining()
+    removeUnavailableWorkers()
+    removeUnavailableResources()
+    decideIdealWorkerDistribution()
+    distributeUnassignedWorkers()
+    orderAllWorkers()
+  }
   
-    removeUnavailableUnits(allWorkers)
-    
-    //Remove dangerous resources
-    var safeMinerals  = allMinerals   .filter(safe)
-    val safeGas       = allGas        .filter(safe)
-    val safeResources = allResources  .filter(safe)
-    workersByResource.keySet.diff(safeResources).foreach(unassignResource)
-    
-    //Long-distance mining
+  private def updateWorkerInformation() = {
+    workers.onFrame()
+    allWorkers = workers.units
+  }
+  
+  private def updateResourceInformation() = {
+    ourActiveBases  = With.geography.ourBases.filter(_.townHall.exists(_.complete))
+    allMinerals     = ourActiveBases.flatten(base => base.minerals).filter(_.alive).toSet
+    allGas          = ourActiveBases.flatten(base => base.gas).filter(gas => gas.isOurs && gas.complete && gas.alive).toSet
+    safeMinerals    = allMinerals.filter(safe)
+    safeGas         = allGas.filter(safe)
+    if (safeMinerals.isEmpty) safeMinerals = allMinerals
+    if (safeGas.isEmpty) safeGas = allGas
+    safeResources = (safeMinerals ++ safeGas)
+  }
+  
+  private def decideLongDistanceMining() = {
     if (safeMinerals.size < 7) {
       val allSafeMinerals = With.units.neutral.filter(_.unitClass.isMinerals).filter(safe)
       if (allSafeMinerals.nonEmpty) {
@@ -49,48 +79,32 @@ class Gather extends Plan {
           .toSet
       }
     }
-    
-    //Figure out the ideal worker distribution
-    val haveEnoughGas       = With.self.gas >= Math.max(400, With.self.minerals)
-    val workersForGas       = List(safeGas.size * 3, allWorkers.size/3, if(haveEnoughGas) 0 else 200).min
-    val workersForMinerals  = allWorkers.size - workersForGas
-    val workersPerMineral   = Math.min(2.0, workersForMinerals.toDouble / safeMinerals.size)
-    val workersPerGas       = if (safeGas.size == 0) 0 else workersForGas.toDouble / safeGas.size
-    val workersOnGas        = safeGas.toList.map(gas => workersByResource.get(gas).map(_.size).getOrElse(0)).sum
-  
-    //Assign the unassigned workers
-    //TODO: Occasionally include inefficiently assigned workers for reassignment
-    val unassignedWorkers       = allWorkers.diff(resourceByWorker.keySet)
-    val numberToAddToGas        = Math.max(0, workersForGas - workersOnGas)
-    val workersToAddToGas       = unassignedWorkers.take(numberToAddToGas)
-    val workersToAddToMinerals  = unassignedWorkers.drop(numberToAddToGas)
-  
-    //Figure out which resources can lose workers, and which need them
-    distributeWorkers (
-      safeMinerals,
-      safeGas,
-      workersPerMineral,
-      workersPerGas,
-      workersToAddToMinerals,
-      workersToAddToGas)
-  
-    //Order workers
-    allWorkers.foreach(order)
   }
   
-  private def removeUnavailableUnits(allWorkers: Set[FriendlyUnitInfo]) = {
-    //Remove dead/unassigned units
+  private def removeUnavailableWorkers() = {
     resourceByWorker.keySet.diff(allWorkers).foreach(unassignWorker)
-    workersByResource.keySet.filterNot(_.alive).foreach(unassignResource)
   }
   
-  def distributeWorkers(
-    safeMinerals            : Set[UnitInfo],
-    safeGas                 : Set[UnitInfo],
-    workersPerMineral       : Double,
-    workersPerGas           : Double,
-    workersToAddToMinerals  : Set[FriendlyUnitInfo],
-    workersToAddToGas       : Set[FriendlyUnitInfo]) {
+  private def removeUnavailableResources() = {
+    workersByResource.keySet.diff(safeResources).foreach(unassignResource)
+  }
+  
+  private def decideIdealWorkerDistribution() {
+    haveEnoughGas       = With.self.gas >= Math.max(400, With.self.minerals)
+    workersForGas       = List(safeGas.size * 3, allWorkers.size/3, if(haveEnoughGas) 0 else 200).min
+    workersForMinerals  = allWorkers.size - workersForGas
+    workersPerMineral   = Math.min(2.0, workersForMinerals.toDouble / safeMinerals.size)
+    workersPerGas       = if (safeGas.size == 0) 0 else workersForGas.toDouble / safeGas.size
+    workersOnGas        = safeGas.toList.map(gas => workersByResource.get(gas).map(_.size).getOrElse(0)).sum
+  
+    //TODO: Occasionally include inefficiently assigned workers for reassignment
+    unassignedWorkers       = allWorkers.diff(resourceByWorker.keySet)
+    numberToAddToGas        = Math.max(0, workersForGas - workersOnGas)
+    workersToAddToGas       = unassignedWorkers.take(numberToAddToGas)
+    workersToAddToMinerals  = unassignedWorkers.drop(numberToAddToGas)
+  }
+  
+  private def distributeUnassignedWorkers() {
     
     val needPerMineral = new mutable.HashMap[UnitInfo, Double] ++
       safeMinerals
@@ -141,7 +155,11 @@ class Gather extends Plan {
     }
   }
   
-  def assignWorker(worker:FriendlyUnitInfo, resource:UnitInfo) {
+  private def orderAllWorkers() {
+    allWorkers.foreach(order)
+  }
+  
+  private def assignWorker(worker:FriendlyUnitInfo, resource:UnitInfo) {
     unassignWorker(worker)
     if ( ! workersByResource.contains(resource)) {
       workersByResource.put(resource, new mutable.HashSet)
@@ -150,24 +168,25 @@ class Gather extends Plan {
     resourceByWorker.put(worker, resource)
   }
   
-  def unassignWorker(worker:FriendlyUnitInfo) {
+  private def unassignWorker(worker:FriendlyUnitInfo) {
     resourceByWorker.get(worker).foreach(resource => workersByResource.get(resource).foreach(_.remove(worker)))
     resourceByWorker.remove(worker)
   }
   
-  def unassignResource(resource:UnitInfo) {
+  private def unassignResource(resource:UnitInfo) {
     if (workersByResource.contains(resource)) {
       workersByResource(resource).foreach(unassignWorker)
       workersByResource.remove(resource)
     }
   }
   
-  def safe(resource:UnitInfo):Boolean = {
-    With.grids.enemyStrength.get(resource.tileCenter) == 0
+  private def safe(resource:UnitInfo):Boolean = {
+    //Strength units are HP * HP / Sec -- this is about the DPS of two SCVs
+    With.grids.enemyStrength.get(resource.tileCenter) < 2 * 8 * 60
   }
   
-  def order(worker:FriendlyUnitInfo) {
-    //If there's no resource for them to gather, this just produces default behavior
+  private def order(worker:FriendlyUnitInfo) {
+    //If there's no resource for them to gather, this just produces default behavior. Great!
     With.executor.intend(new Intention(this, worker) { toGather = resourceByWorker.get(worker) })
   }
 }

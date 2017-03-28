@@ -21,27 +21,28 @@ class Gather extends Plan {
   private val resourceByWorker  = new mutable.HashMap[FriendlyUnitInfo, UnitInfo]
   private val workersByResource = new mutable.HashMap[UnitInfo, mutable.HashSet[FriendlyUnitInfo]]
   
-  private var ourActiveBases          : Iterable[Base]        = List.empty
-  private var allWorkers              : Set[FriendlyUnitInfo] = Set.empty
-  private var allMinerals             : Set[UnitInfo]         = Set.empty
-  private var allGas                  : Set[UnitInfo]         = Set.empty
-  private var allResources            : Set[UnitInfo]         = Set.empty
-  private var safeMinerals            : Set[UnitInfo]         = Set.empty
-  private var safeGas                 : Set[UnitInfo]         = Set.empty
-  private var safeResources           : Set[UnitInfo]         = Set.empty
-  private var haveEnoughGas           : Boolean               = false
-  private var workersForGas           : Int                   = 0
-  private var workersForMinerals      : Int                   = 0
-  private var workersPerMineral       : Double                = 0.0
-  private var workersPerGas           : Double                = 0.0
-  private var workersOnGas            : Int                   = 0
-  private var unassignedWorkers       : Set[FriendlyUnitInfo] = Set.empty
-  private var numberToAddToGas        : Int                   = 0
-  private var workersToAddToGas       : Set[FriendlyUnitInfo] = Set.empty
-  private var workersToAddToMinerals  : Set[FriendlyUnitInfo] = Set.empty
+  private var ourActiveBases          : Iterable[Base]                    = List.empty
+  private var allWorkers              : Set[FriendlyUnitInfo]             = Set.empty
+  private var allMinerals             : Set[UnitInfo]                     = Set.empty
+  private var allGas                  : Set[UnitInfo]                     = Set.empty
+  private var allResources            : Set[UnitInfo]                     = Set.empty
+  private var safeMinerals            : Set[UnitInfo]                     = Set.empty
+  private var safeGas                 : Set[UnitInfo]                     = Set.empty
+  private var safeResources           : Set[UnitInfo]                     = Set.empty
+  private var haveEnoughGas           : Boolean                           = false
+  private var workersForGas           : Int                               = 0
+  private var workersForMinerals      : Int                               = 0
+  private var workersPerMineral       : Double                            = 0.0
+  private var workersPerGas           : Double                            = 0.0
+  private var workersOnGas            : Int                               = 0
+  private var unassignedWorkers       : Set[FriendlyUnitInfo]             = Set.empty
+  private var numberToAddToGas        : Int                               = 0
+  private var workersToAddToMinerals  : Set[FriendlyUnitInfo]             = Set.empty
+  private var workersToAddToGas       : Set[FriendlyUnitInfo]             = Set.empty
+  private var needPerMineral          : mutable.Map[UnitInfo, Double]     = mutable.HashMap.empty
+  private var needPerGas              : mutable.Map[UnitInfo, Double]     = mutable.HashMap.empty
   
   override def onFrame() {
-    
     updateWorkerInformation()
     updateResourceInformation()
     decideLongDistanceMining()
@@ -63,8 +64,8 @@ class Gather extends Plan {
     allGas          = ourActiveBases.flatten(base => base.gas).filter(gas => gas.isOurs && gas.complete && gas.alive).toSet
     safeMinerals    = allMinerals.filter(safe)
     safeGas         = allGas.filter(safe)
-    if (safeMinerals.isEmpty) safeMinerals = allMinerals
-    if (safeGas.isEmpty) safeGas = allGas
+    if (safeMinerals.isEmpty) safeMinerals  = allMinerals
+    if (safeGas.isEmpty)      safeGas       = allGas
     safeResources = (safeMinerals ++ safeGas)
   }
   
@@ -97,6 +98,20 @@ class Gather extends Plan {
     workersPerGas       = if (safeGas.size == 0) 0 else workersForGas.toDouble / safeGas.size
     workersOnGas        = safeGas.toList.map(gas => workersByResource.get(gas).map(_.size).getOrElse(0)).sum
   
+    needPerMineral = new mutable.HashMap[UnitInfo, Double] ++
+      safeMinerals
+        .map(mineral => (mineral,
+          workersPerMineral - workersByResource.get(mineral)
+            .map(_.size)
+            .getOrElse(0)))
+        .toMap
+  
+    needPerGas = new mutable.HashMap[UnitInfo, Double] ++
+      safeGas.map(gas => (gas,
+        workersPerGas - workersByResource.get(gas)
+          .map(_.size)
+          .getOrElse(0))).toMap
+    
     //TODO: Occasionally include inefficiently assigned workers for reassignment
     unassignedWorkers       = allWorkers.diff(resourceByWorker.keySet)
     numberToAddToGas        = Math.max(0, workersForGas - workersOnGas)
@@ -105,54 +120,28 @@ class Gather extends Plan {
   }
   
   private def distributeUnassignedWorkers() {
-    
-    val needPerMineral = new mutable.HashMap[UnitInfo, Double] ++
-      safeMinerals
-        .map(mineral => (mineral,
-          workersPerMineral - workersByResource.get(mineral)
-            .map(_.size)
-            .getOrElse(0)))
-        .toMap
-    
-    val needPerGas = new mutable.HashMap[UnitInfo, Double] ++
-      safeGas.map(gas => (gas,
-        workersPerGas - workersByResource.get(gas)
-          .map(_.size)
-          .getOrElse(0))).toMap
-    
-    val safeMineralsByZone =
-      With.geography.ourZones
-        .map(zone =>
-          (zone,
-            zone.bases.flatten(base =>
-              base.minerals
-                .filter(safeMinerals.contains)
-                .toList
-                .sortBy(_.pixelDistance(base.townHallRectangle.midPixel)))))
-        .toMap
-  
     workersToAddToMinerals.foreach(addWorkerToMinerals)
     workersToAddToGas.foreach(addWorkerToGas)
+  }
   
-    def addWorkerToMinerals(worker:FriendlyUnitInfo) {
-      if (safeMinerals.isEmpty) return
-      val mineral = safeMinerals
-        .toList
-        .sortBy(_.pixelDistanceSquared(worker.pixelCenter))
-        .maxBy(needPerMineral)
-      assignWorker(worker, mineral)
-      needPerMineral(mineral) -= 1
-    }
-  
-    def addWorkerToGas(worker:FriendlyUnitInfo) {
-      if (safeGas.isEmpty) return
-      val gas = safeGas
-        .toList
-        .sortBy(_.pixelDistanceSquared(worker.pixelCenter))
-        .maxBy(needPerGas)
-      assignWorker(worker, gas)
-      needPerGas(gas) -= 1
-    }
+  private def addWorkerToMinerals(worker:FriendlyUnitInfo) {
+    if (safeMinerals.isEmpty) return
+    val mineral = safeMinerals
+      .toList
+      .sortBy(_.pixelDistanceSquared(worker.pixelCenter))
+      .maxBy(needPerMineral)
+    assignWorker(worker, mineral)
+    needPerMineral(mineral) -= 1
+  }
+
+  private def addWorkerToGas(worker:FriendlyUnitInfo) {
+    if (safeGas.isEmpty) return
+    val gas = safeGas
+      .toList
+      .sortBy(_.pixelDistanceSquared(worker.pixelCenter))
+      .maxBy(needPerGas)
+    assignWorker(worker, gas)
+    needPerGas(gas) -= 1
   }
   
   private def orderAllWorkers() {
@@ -181,12 +170,12 @@ class Gather extends Plan {
   }
   
   private def safe(resource:UnitInfo):Boolean = {
-    //Strength units are HP * HP / Sec -- this is about the DPS of two SCVs
+    //Strength units are HP * HP / Sec -- so this is about the DPS of two SCVs
     With.grids.enemyStrength.get(resource.tileCenter) < 2 * 8 * 60
   }
   
   private def order(worker:FriendlyUnitInfo) {
-    //If there's no resource for them to gather, this just produces default behavior. Great!
+    //If there's no resource for them to gather, that's fine; they'll follow default behavior and be generally useful
     With.executor.intend(new Intention(this, worker) { toGather = resourceByWorker.get(worker) })
   }
 }

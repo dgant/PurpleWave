@@ -83,7 +83,6 @@ class Commander {
     // The logic of "If we're not carrying resources, spam gather until the unit's target is the intended resource"
     // produces mineral locking, in which workers mine more efficiently because exactly 2 miners saturate a mineral patch.
     else if ( ! intent.unit.target.exists(_ == resource)) {
-      
       // TODO: This will fail if we've never seen the resource before, as with some long-distance mining situations.
       // In that case we should order units to move to the destination first.
       intent.unit.base.gather(resource.base)

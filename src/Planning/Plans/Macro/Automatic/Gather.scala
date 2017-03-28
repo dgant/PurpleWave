@@ -9,7 +9,6 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Startup.With
 
 import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
 
 class Gather extends Plan {
 
@@ -19,26 +18,26 @@ class Gather extends Plan {
   }
   
   val resourceByWorker = new mutable.HashMap[FriendlyUnitInfo, UnitInfo]
-  val workersByResource = new mutable.HashMap[UnitInfo, ListBuffer[FriendlyUnitInfo]]
+  val workersByResource = new mutable.HashMap[UnitInfo, mutable.HashSet[FriendlyUnitInfo]]
   
   override def onFrame() {
     
     workers.onFrame()
     
+    val ourActiveBases = With.geography.ourBases.filter(_.townHall.exists(_.complete))
     val allWorkers    = workers.units
-    val allMinerals   = With.geography.ourBases.flatten(base => base.minerals).filter(_.alive).toSet
-    val allGas        = With.geography.ourBases.flatten(base => base.gas).filter(gas => gas.complete && gas.isOurs && gas.alive).toSet
+    val allMinerals   = ourActiveBases.flatten(base => base.minerals).filter(_.alive).toSet
+    val allGas        = ourActiveBases.flatten(base => base.gas).filter(gas => gas.isOurs  && gas.complete && gas.alive).toSet
     val allResources  = (allMinerals ++ allGas)
     
     //Remove dead/unassigned units
-    resourceByWorker.values.filterNot(workersByResource.contains).foreach(unassignResource)
     resourceByWorker.keySet.diff(allWorkers).foreach(unassignWorker)
     workersByResource.keySet.filterNot(_.alive).foreach(unassignResource)
     
     //Remove dangerous resources
-    var safeMinerals  = allMinerals.filter(safe)
-    val safeGas       = allGas.filter(safe)
-    val safeResources = allResources.filter(safe)
+    var safeMinerals  = allMinerals   .filter(safe)
+    val safeGas       = allGas        .filter(safe)
+    val safeResources = allResources  .filter(safe)
     workersByResource.keySet.diff(safeResources).foreach(unassignResource)
     
     //Long-distance mining
@@ -60,13 +59,6 @@ class Gather extends Plan {
     val workersPerMineral   = Math.min(2.0, workersForMinerals.toDouble / safeMinerals.size)
     val workersPerGas       = if (safeGas.size == 0) 0 else workersForGas.toDouble / safeGas.size
     val workersOnGas        = safeGas.toList.map(gas => workersByResource.get(gas).map(_.size).getOrElse(0)).sum
-    
-    //Figure out which resources can lose workers, and which need them
-    val workerDistribution = new WorkerDistribution(
-      safeMinerals,
-      safeGas,
-      workersPerMineral,
-      workersPerGas)
   
     //Assign the unassigned workers
     //TODO: Occasionally include inefficiently assigned workers for reassignment
@@ -74,21 +66,29 @@ class Gather extends Plan {
     val numberToAddToGas        = Math.max(0, workersForGas - workersOnGas)
     val workersToAddToGas       = unassignedWorkers.take(numberToAddToGas)
     val workersToAddToMinerals  = unassignedWorkers.drop(numberToAddToGas)
-    
-    workersToAddToMinerals.foreach(workerDistribution.addWorkerToMinerals)
-    workersToAddToGas.foreach(workerDistribution.addWorkerToGas)
+  
+    //Figure out which resources can lose workers, and which need them
+    distributeWorkers (
+      safeMinerals,
+      safeGas,
+      workersPerMineral,
+      workersPerGas,
+      workersToAddToMinerals,
+      workersToAddToGas)
   
     //Order workers
     allWorkers.foreach(order)
   }
   
-  private class WorkerDistribution(
-    safeMinerals      : Set[UnitInfo],
-    safeGas           : Set[UnitInfo],
-    workersPerMineral : Double,
-    workersPerGas     : Double) {
+  def distributeWorkers (
+    safeMinerals            : Set[UnitInfo],
+    safeGas                 : Set[UnitInfo],
+    workersPerMineral       : Double,
+    workersPerGas           : Double,
+    workersToAddToMinerals  : Set[FriendlyUnitInfo],
+    workersToAddToGas       : Set[FriendlyUnitInfo]) {
     
-    private val needPerMineral = new mutable.HashMap[UnitInfo, Double] ++
+    val needPerMineral = new mutable.HashMap[UnitInfo, Double] ++
       safeMinerals
         .map(mineral => (mineral,
           workersPerMineral - workersByResource.get(mineral)
@@ -96,13 +96,13 @@ class Gather extends Plan {
             .getOrElse(0)))
         .toMap
     
-    private val needPerGas = new mutable.HashMap[UnitInfo, Double] ++
+    val needPerGas = new mutable.HashMap[UnitInfo, Double] ++
       safeGas.map(gas => (gas,
         workersPerGas - workersByResource.get(gas)
           .map(_.size)
           .getOrElse(0))).toMap
     
-    private val safeMineralsByZone =
+    val safeMineralsByZone =
       With.geography.ourZones
         .map(zone =>
           (zone,
@@ -112,7 +112,10 @@ class Gather extends Plan {
                 .toList
                 .sortBy(_.pixelDistance(base.townHallRectangle.midPixel)))))
         .toMap
-    
+  
+    workersToAddToMinerals.foreach(addWorkerToMinerals)
+    workersToAddToGas.foreach(addWorkerToGas)
+  
     def addWorkerToMinerals(worker:FriendlyUnitInfo) {
       if (safeMinerals.isEmpty) return
       val mineral = safeMinerals
@@ -134,20 +137,25 @@ class Gather extends Plan {
     }
   }
   
+  def assignWorker(worker:FriendlyUnitInfo, resource:UnitInfo) {
+    unassignWorker(worker)
+    if ( ! workersByResource.contains(resource)) {
+      workersByResource.put(resource, new mutable.HashSet)
+    }
+    workersByResource(resource).add(worker)
+    resourceByWorker.put(worker, resource)
+  }
+  
   def unassignWorker(worker:FriendlyUnitInfo) {
-    resourceByWorker.get(worker).foreach(workersByResource.remove)
+    resourceByWorker.get(worker).foreach(resource => workersByResource(resource).remove(worker))
     resourceByWorker.remove(worker)
   }
   
   def unassignResource(resource:UnitInfo) {
-    workersByResource.get(resource).foreach(workers => workers.foreach(resourceByWorker.remove))
-    workersByResource.remove(resource)
-  }
-  
-  def assignWorker(worker:FriendlyUnitInfo, resource:UnitInfo) {
-    if ( ! workersByResource.contains(resource)) workersByResource.put(resource, ListBuffer.empty)
-    workersByResource(resource).append(worker)
-    resourceByWorker.put(worker, resource)
+    if (workersByResource.contains(resource)) {
+      workersByResource(resource).foreach(unassignWorker)
+      workersByResource.remove(resource)
+    }
   }
   
   def safe(resource:UnitInfo):Boolean = {

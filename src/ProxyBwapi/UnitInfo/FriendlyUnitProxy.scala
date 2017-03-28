@@ -6,6 +6,9 @@ import bwapi._
 
 abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
   
+  override def equals(obj: Any): Boolean = obj.isInstanceOf[FriendlyUnitProxy] && obj.asInstanceOf[FriendlyUnitProxy].id == id
+  override def hashCode(): Int = id.hashCode
+  
   val _cacheClass     = new Cache[UnitClass]          (5,  () =>  UnitClasses.get(base.getType))
   val _cachePlayer    = new Cache[Player]             (10, () =>  base.getPlayer)
   val _cachePixel     = new CacheFrame[Position]      (() =>  base.getPosition)
@@ -16,7 +19,6 @@ abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
   val _cacheId        = new CacheFrame[Int]           (() =>  base.getID)
   val _cachedFlying   = new CacheFrame[Boolean]       (() =>  base.isFlying)
   val _cachedStasised = new CacheFrame[Boolean]       (() =>  base.isStasised)
-  
   
   ///////////////////
   // Tracking info //
@@ -48,8 +50,8 @@ abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
   def attacking                 : Boolean = base.isAttacking
   def attackStarting            : Boolean = base.isStartingAttack
   def attackAnimationHappening  : Boolean = base.isAttackFrame
-  def airCooldownLeft     : Int     = base.getAirWeaponCooldown
-  def groundCooldownLeft  : Int     = base.getGroundWeaponCooldown
+  def airCooldownLeft           : Int     = base.getAirWeaponCooldown
+  def groundCooldownLeft        : Int     = base.getGroundWeaponCooldown
   
   //////////////
   // Geometry //

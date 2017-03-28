@@ -5,12 +5,13 @@ import Startup.With
 import bwapi.{Player, Position, TilePosition}
 import bwta.Region
 
-import scala.collection.mutable.ListBuffer
 import scala.collection.JavaConverters._
 import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 
 class Zone(
   val bwtaRegion:Region,
+  val groundHeight:Int,
   val boundary:TileRectangle,
   val tiles:mutable.Set[TilePosition],
   val bases:ListBuffer[Base],

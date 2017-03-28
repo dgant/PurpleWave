@@ -58,7 +58,7 @@ class Bot() extends DefaultBWListener {
       With.movementHeuristicViews = new MovementHeuristicViews
       With.units                  = new UnitTracker
       With.viewport               = new Viewport
-      With.zoner                  = new Zoner
+      With.reservations                  = new Reservations
 
       With.game.enableFlag(1)
       With.game.setLocalSpeed(With.configuration.gameSpeed)
@@ -85,7 +85,7 @@ class Bot() extends DefaultBWListener {
         //Orient
         With.battles.onFrame()
         With.economy.onFrame()
-        With.zoner.onFrame()
+        With.reservations.onFrame()
         With.bank.onFrame()
         With.recruiter.onFrame()
         With.prioritizer.onFrame()

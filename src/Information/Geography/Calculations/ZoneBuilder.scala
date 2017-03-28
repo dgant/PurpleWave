@@ -22,20 +22,30 @@ object ZoneBuilder {
   
     bases.foreach(base => base.zone.bases += base)
     edges.foreach(edge => edge.zones.foreach(zone => zone.edges += edge))
+    ensureAllTilesAreAssignedToAZone(zones)
     
+    return zones
+  }
+  
+  def ensureAllTilesAreAssignedToAZone(zones:Iterable[Zone]) = {
     With.geography.allTiles
       .filterNot(tile => zones.exists(_.contains(tile)))
-      .foreach(tile => {
-        var doContinue = true
-        Spiral.points.view.foreach(point => {
-          val nearbyZone = zones.find(_.contains(tile.add(point)))
-          if (nearbyZone.isDefined) {
-            nearbyZone.get.tiles.add(tile)
-            doContinue = false
-          }
-        })
-      })
-    return zones
+      .foreach(tile => assignTile(tile, zones))
+  }
+  
+  def assignTile(tile:TilePosition, zones:Iterable[Zone]) = {
+    val groundHeight = With.game.getGroundHeight(tile)
+    val candidates = zones.filter(_.groundHeight == groundHeight)
+    val matchingZone = Spiral
+      .points(5)
+      .view
+      .map(tile.add)
+      .flatMap(neighborTile => candidates.view.filter(candidate => candidate.tiles.contains(neighborTile)).headOption)
+      .headOption
+    matchingZone
+      .getOrElse(With.geography.zones.minBy(_.centroid.pixelDistance(tile.pixelCenter)))
+      .tiles
+      .add(tile)
   }
   
   def buildZone(region:Region):Zone = {
@@ -54,8 +64,10 @@ object ZoneBuilder {
         tileRegion != null && tileRegion.getCenter == region.getCenter
       })
       .toSet
+    val groundHeight = tiles.headOption.map(With.game.getGroundHeight).getOrElse(1)
     new Zone(
       region,
+      groundHeight,
       tileArea,
       tiles,
       new ListBuffer[Base],

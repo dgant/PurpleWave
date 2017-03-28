@@ -40,7 +40,7 @@ object With {
   var movementHeuristicViews:MovementHeuristicViews = null
   var units: UnitTracker = null
   var viewport: Viewport = null
-  var zoner: Zoner = null
+  var reservations: Reservations = null
   
   var self:Player = null
   var neutral:Player = null

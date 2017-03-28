@@ -5,7 +5,7 @@ import Planning.Plan
 
 import scala.collection.mutable
 
-class Zoner {
+class Reservations {
   
   private val requestsUpdated = new mutable.HashSet[Plan]
   val requestedAreas = new mutable.HashMap[Plan, TileRectangle]

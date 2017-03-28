@@ -13,5 +13,5 @@ class LockArea extends Plan {
   private var isSatisfied = false
   
   override def isComplete:Boolean = isSatisfied
-  override def onFrame() = isSatisfied = With.zoner.request(this, area)
+  override def onFrame() = isSatisfied = With.reservations.request(this, area)
 }

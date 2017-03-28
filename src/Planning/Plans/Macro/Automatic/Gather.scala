@@ -147,7 +147,7 @@ class Gather extends Plan {
   }
   
   def unassignWorker(worker:FriendlyUnitInfo) {
-    resourceByWorker.get(worker).foreach(resource => workersByResource(resource).remove(worker))
+    resourceByWorker.get(worker).foreach(resource => workersByResource.get(resource).foreach(_.remove(worker)))
     resourceByWorker.remove(worker)
   }
   

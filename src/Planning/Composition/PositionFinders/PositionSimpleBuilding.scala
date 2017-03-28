@@ -71,7 +71,7 @@ class PositionSimpleBuilding(val buildingType:UnitClass) extends PositionFinder 
           buildingType,
           With.geography.home,
           margin = margin,
-          searchRadius = 50,
+          searchRadius = 20,
           exclusions = exclusions)))
     output
   }

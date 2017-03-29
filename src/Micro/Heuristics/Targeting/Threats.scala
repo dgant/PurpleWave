@@ -9,6 +9,7 @@ object Threats {
     With.units.inPixelRadius(
       intent.unit.pixelCenter,
       32 * 18)
+      .filter(_.possiblyStillThere)
       .filter(_.canAttack(intent.unit))
       .filter(intent.unit.isEnemyOf)
       

@@ -18,5 +18,5 @@ class Attack extends IfThenElse {
   
   predicate.set(new FoundEnemyBase)
   whenFalse.set(new FindEnemyBase { scouts.inherit(attackers) })
-  whenTrue.set(new ControlPosition { units.inherit(attackers); position.set(new PositionEnemyBase) })
+  whenTrue.set(new ControlPosition { units.inherit(attackers); position.set(new PositionEnemyBase); description.inherit(this.description) })YES
 }

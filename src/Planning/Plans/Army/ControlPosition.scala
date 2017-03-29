@@ -24,6 +24,7 @@ class ControlPosition extends Plan {
     val ourBases = With.geography.ourBases.map(_.townHallRectangle.midPixel)
     val infiltrators = With.units.enemy
       .filter(e =>
+        e.possiblyStillThere &&
         e.canAttack &&
         ourBases.exists(base =>
           targetPosition.pixelCenter.pixelDistance(e.pixelCenter) <

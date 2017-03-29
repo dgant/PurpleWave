@@ -10,6 +10,7 @@ object Targets {
     With.units.inPixelRadius(
         intent.unit.pixelCenter,
         32 * 15)
+      .filter(_.possiblyStillThere)
       .filter(intent.unit.canAttack)
       .filter(intent.unit.isEnemyOf)
       .filterNot(target => List(Zerg.Larva, Zerg.Egg).contains(target.unitClass))

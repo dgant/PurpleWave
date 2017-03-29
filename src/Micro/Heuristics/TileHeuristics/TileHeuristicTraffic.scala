@@ -34,6 +34,7 @@ object TileHeuristicTraffic extends TileHeuristic {
     multiplier *
     scaling *
     With.grids.units.get(tile)
+      .filter(_.possiblyStillThere)
       .filterNot(_ == intent.unit)
       .filterNot(_.flying)
       .filterNot(_.unitClass.isBuilding)

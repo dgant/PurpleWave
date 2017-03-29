@@ -20,7 +20,10 @@ object VisualizeBases {
             "Gas left:     " + base.gasLeft,
             if (base.lastScoutedFrame <= With.frame+ 24 ) ""
             else if (base.lastScoutedFrame <= 0) "Never scouted"
-            else "Last scouted " + (With.frame - base.lastScoutedFrame) + " frames ago"
+            else "Last scouted " + (With.frame - base.lastScoutedFrame) + " frames ago",
+            VisualizeBattles.formatStrength(With.battles.byZone(zone).us.strength)
+              + " vs "
+              + VisualizeBattles.formatStrength(With.battles.byZone(zone).enemy.strength)
           ),
           base.townHallRectangle.midPixel,
           true,

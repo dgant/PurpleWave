@@ -1,6 +1,5 @@
 package Debugging.Visualization.Views
 
-import Debugging.Visualization.Colors
 import Debugging.Visualization.Rendering.DrawMap
 import Information.Battles.Battle
 import Startup.With
@@ -8,7 +7,13 @@ import Utilities.EnrichPosition._
 import bwapi.Color
 
 object VisualizeBattles {
-  def render() = With.battles.local.foreach(drawBattle)
+  def render() = {
+    With.game.drawTextScreen(438, 18, "Total strength:")
+    With.game.drawTextScreen(521, 18, formatStrength(With.battles.global.us.strength))
+    With.game.drawTextScreen(589, 18, formatStrength(With.battles.global.enemy.strength))
+  }
+  
+  def formatStrength(strength:Double):String = (strength/1000).toInt.toString
   
   private def drawBattle(battle:Battle) {
     val ourColor    = DrawMap.playerColorDark(With.self)
@@ -28,10 +33,7 @@ object VisualizeBattles {
       battle.enemy.units.map(_.pixelCenter).maxBound,
       enemyColor)
     DrawMap.labelBox(
-      List(
-        (battle.us.strength/100).toInt.toString,
-        (battle.enemy.strength/100).toInt.toString
-      ),
+      List(formatStrength(battle.us.strength), formatStrength(battle.enemy.strength)),
       battle.us.vanguard.add(0, 16),
       drawBackground = true,
       backgroundColor = neutralColor)

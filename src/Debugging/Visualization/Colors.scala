@@ -22,7 +22,7 @@ object Colors {
     }
   }
   
-  private def hv(h:Int, v:Int):Color = hsv(h, 200, v)
+  private def hv(h:Int, v:Int):Color = hsv(h, 220, v)
   
   private val red = 0
   private val orange = 32
@@ -33,7 +33,7 @@ object Colors {
   private val indigo = 192
   private val violet = 224
   
-  private val dark = 96
+  private val dark = 128
   private val medium = 160
   private val bright = 224
   private val neon = 255

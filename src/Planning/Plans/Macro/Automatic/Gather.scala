@@ -2,6 +2,7 @@ package Planning.Plans.Macro.Automatic
 
 import Information.Geography.Types.Base
 import Micro.Intentions.Intention
+import Performance.Caching.Limiter
 import Planning.Composition.UnitCountEverything
 import Planning.Composition.UnitMatchers.UnitMatchWorker
 import Planning.Plan
@@ -69,15 +70,14 @@ class Gather extends Plan {
     safeResources = (safeMinerals ++ safeGas)
   }
   
-  private def decideLongDistanceMining() = {
+  private def decideLongDistanceMining() {
     if (safeMinerals.size < 7) {
       val allSafeMinerals = With.units.neutral.filter(_.unitClass.isMinerals).filter(safe)
       if (allSafeMinerals.nonEmpty) {
-        safeMinerals = allSafeMinerals
+        safeMinerals ++= allSafeMinerals
           .toList
           .sortBy(mineral => With.paths.groundPixels(mineral.tileCenter, With.geography.home))
           .take(7)
-          .toSet
       }
     }
   }
@@ -97,7 +97,7 @@ class Gather extends Plan {
     workersPerMineral   = Math.min(2.0, workersForMinerals.toDouble / safeMinerals.size)
     workersPerGas       = if (safeGas.size == 0) 0 else workersForGas.toDouble / safeGas.size
     workersOnGas        = safeGas.toList.map(gas => workersByResource.get(gas).map(_.size).getOrElse(0)).sum
-  
+    
     needPerMineral = new mutable.HashMap[UnitInfo, Double] ++
       safeMinerals
         .map(mineral => (mineral,
@@ -111,12 +111,21 @@ class Gather extends Plan {
         workersPerGas - workersByResource.get(gas)
           .map(_.size)
           .getOrElse(0))).toMap
+  
+    unassignSupersaturatingWorkersLimiter.act()
     
-    //TODO: Occasionally include inefficiently assigned workers for reassignment
     unassignedWorkers       = allWorkers.diff(resourceByWorker.keySet)
     numberToAddToGas        = Math.max(0, workersForGas - workersOnGas)
     workersToAddToGas       = unassignedWorkers.take(numberToAddToGas)
     workersToAddToMinerals  = unassignedWorkers.drop(numberToAddToGas)
+  }
+  
+  val unassignSupersaturatingWorkersLimiter = new Limiter(5, () => unassignSupersaturatingWorkers)
+  def unassignSupersaturatingWorkers() {
+    safeMinerals
+      .filter(needPerMineral(_) > 2.0)
+      .foreach(workersByResource.get(_)
+        .foreach(_.drop(2).foreach(unassignWorker)))
   }
   
   private def distributeUnassignedWorkers() {

@@ -104,11 +104,10 @@ class Bot() extends DefaultBWListener {
       Visualization.Visualization.onFrame()
       considerSurrender
     }
-    catch {
-      case exception:Exception =>
-        val dontLoseTheExceptionWhileDebugging = exception
-        val dontLoseTheStackTraceWhileDebugging = exception.getStackTrace
-         With.logger.onException(exception)
+    catch { case exception:Exception =>
+      val dontLoseTheExceptionWhileDebugging = exception
+      val dontLoseTheStackTraceWhileDebugging = exception.getStackTrace
+      With.logger.onException(exception)
     }
   }
 

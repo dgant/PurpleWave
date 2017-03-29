@@ -54,11 +54,12 @@ class Battles {
   private def buildBattlesLocal() {
     if (combatantsEnemy.isEmpty) return
     val margin = 18
+    val framesToLookAhead = 2 * With.performance.frameDelay(delayLength)
     val unassigned = mutable.HashSet.empty ++ combatantsOurs ++ combatantsEnemy
     val clusters = new ListBuffer[mutable.HashSet[UnitInfo]]
     while (unassigned.nonEmpty) {
       val newCluster = new mutable.HashSet[UnitInfo]
-      assignToCluster(unassigned.head, newCluster, unassigned)
+      assignToCluster(unassigned.head, newCluster, unassigned, framesToLookAhead)
       clusters.append(newCluster)
     }
     local =
@@ -82,20 +83,20 @@ class Battles {
   }
   
   def assignToCluster(
-    unit        : UnitInfo,
-    cluster     : mutable.Set[UnitInfo],
-    unassigned  : mutable.Set[UnitInfo]) {
-    val framesUntilNextUpdate = With.performance.frameDelay(delayLength)
+    unit                  : UnitInfo,
+    cluster               : mutable.Set[UnitInfo],
+    unassigned            : mutable.Set[UnitInfo],
+    framesUntilNextUpdate : Int) {
     cluster.add(unit)
     unassigned.remove(unit)
     unit
       .inTileRadius(maxDistanceTiles)
-      .filterNot(unassigned.contains)
+      .filter(unassigned.contains)
       .filter(otherUnit =>
         unit.pixelsFromEdge(otherUnit) <= Math.max(
           unit.pixelReach(2 * framesUntilNextUpdate),
-          otherUnit.pixelReach(framesUntilNextUpdate)))
-      .foreach(otherUnit => assignToCluster(unit, cluster, unassigned))
+          otherUnit.pixelReach(2 * framesUntilNextUpdate)))
+      .foreach(otherUnit => assignToCluster(unit, cluster, unassigned, framesUntilNextUpdate))
   }
 
   def upcastOurs  (units:Set[FriendlyUnitInfo]) : Set[UnitInfo] = units.map(_.asInstanceOf[UnitInfo])

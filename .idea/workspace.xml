@@ -30,8 +30,8 @@
       <file leaf-file-name="Battles.scala" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Micro/Battles/Battles.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="199">
-              <caret line="23" column="59" lean-forward="true" selection-start-line="23" selection-start-column="59" selection-end-line="23" selection-end-column="59" />
+            <state relative-caret-position="236">
+              <caret line="65" column="49" lean-forward="true" selection-start-line="65" selection-start-column="49" selection-end-line="65" selection-end-column="49" />
               <folding />
             </state>
           </provider>
@@ -141,7 +141,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>WeightedMovement</find>
       <find>hsv.</find>
       <find>Medium</find>
       <find>Bright</find>
@@ -171,6 +170,7 @@
       <find>###</find>
       <find>####</find>
       <find>canattack</find>
+      <find>adHoc</find>
     </findStrings>
     <replaceStrings>
       <replace>UnitClass</replace>
@@ -1223,8 +1223,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Micro/Battles/Battles.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="199">
-          <caret line="23" column="59" lean-forward="true" selection-start-line="23" selection-start-column="59" selection-end-line="23" selection-end-column="59" />
+        <state relative-caret-position="236">
+          <caret line="65" column="49" lean-forward="true" selection-start-line="65" selection-start-column="49" selection-end-line="65" selection-end-column="49" />
           <folding />
         </state>
       </provider>

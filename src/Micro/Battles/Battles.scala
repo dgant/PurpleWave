@@ -11,14 +11,14 @@ import scala.collection.mutable.ListBuffer
 
 class Battles {
   
-  private val delayLength = 2
+  private val delayLength = 1
   
   private var combatantsOurs  : Set[FriendlyUnitInfo] = Set.empty
   private var combatantsEnemy : Set[ForeignUnitInfo]  = Set.empty
-  private var global          : Battle                = null
-  private var byZone          : Map[Zone, Battle]     = Map.empty
+          var global          : Battle                = null
+          var byZone          : Map[Zone, Battle]     = Map.empty
           var byUnit          : Map[UnitInfo, Battle] = Map.empty
-          var allAdHoc        : List[Battle]          = List.empty
+          var allLocal        : List[Battle]          = List.empty
   
   def onFrame() = updateLimiter.act()
   private val updateLimiter = new Limiter(delayLength, update)
@@ -27,7 +27,7 @@ class Battles {
     combatantsEnemy = With.units.enemy.filter(unit => unit.helpsInCombat && unit.possiblyStillThere)
     buildBattleGlobal()
     buildBattlesByZone()
-    buildBattlesAdHoc()
+    buildBattlesLocal()
   }
   
   private def buildBattleGlobal() {
@@ -49,17 +49,17 @@ class Battles {
       .toMap
   }
   
-  private def buildBattlesAdHoc() {
+  private def buildBattlesLocal() {
     if (combatantsEnemy.isEmpty) return
     val margin = 18
     val unassigned = mutable.HashSet.empty ++ combatantsOurs ++ combatantsEnemy
     val clusters = new ListBuffer[mutable.HashSet[UnitInfo]]
     while (unassigned.nonEmpty) {
       val newCluster = new mutable.HashSet[UnitInfo]
-      extendCluster(unassigned.head, newCluster, unassigned)
+      assignToCluster(unassigned.head, newCluster, unassigned)
       clusters.append(newCluster)
     }
-    allAdHoc =
+    allLocal =
       clusters
         .map(cluster =>
           new Battle(
@@ -71,7 +71,7 @@ class Battles {
         .toList
   }
   
-  def extendCluster(
+  def assignToCluster(
     unit        : UnitInfo,
     cluster     : mutable.Set[UnitInfo],
     unassigned  : mutable.Set[UnitInfo]) {
@@ -85,7 +85,7 @@ class Battles {
         unit.pixelsFromEdge(otherUnit) <= Math.max(
           unit.pixelReach(framesAhead),
           otherUnit.pixelReach(framesAhead)))
-      .foreach(otherUnit => extendCluster(unit, cluster, unassigned))
+      .foreach(otherUnit => assignToCluster(unit, cluster, unassigned))
   }
 
   def upcastOurs  (units:Set[FriendlyUnitInfo]) : Set[UnitInfo] = units.map(_.asInstanceOf[UnitInfo])

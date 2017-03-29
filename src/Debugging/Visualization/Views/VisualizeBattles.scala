@@ -11,6 +11,7 @@ object VisualizeBattles {
     With.game.drawTextScreen(438, 18, "Total strength:")
     With.game.drawTextScreen(521, 18, formatStrength(With.battles.global.us.strength))
     With.game.drawTextScreen(589, 18, formatStrength(With.battles.global.enemy.strength))
+    With.battles.local.foreach(drawBattle)
   }
   
   def formatStrength(strength:Double):String = (strength/1000).toInt.toString

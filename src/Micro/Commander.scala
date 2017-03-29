@@ -23,7 +23,6 @@ import scala.collection.mutable
 class Commander {
   
   private val nextOrderFrame = new CountMap[FriendlyUnitInfo]
-  val lastCommands = new mutable.HashMap[FriendlyUnitInfo, String]
   
   def onFrame() {
     nextOrderFrame.keySet.filterNot(_.alive).foreach(nextOrderFrame.remove)
@@ -141,11 +140,5 @@ class Commander {
   private def sleep(unit:FriendlyUnitInfo, requiredDelay:Int) {
     Math.max(With.latency.turnSize, requiredDelay)
     nextOrderFrame.put(unit, With.frame + requiredDelay)
-  }
-  
-  private def recordCommand(unit:FriendlyUnitInfo, command:Behavior) {
-    if (With.configuration.enableVisualizationUnitsOurs) {
-      lastCommands.put(unit, command.getClass.getSimpleName.replace("$", ""))
-    }
   }
 }

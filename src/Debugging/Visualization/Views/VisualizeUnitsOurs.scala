@@ -14,7 +14,6 @@ object VisualizeUnitsOurs {
         DrawMap.labelBox(
           List(
             intent.map(intent => intent.plan.toString).getOrElse(""),
-            With.commander.lastCommands.get(unit).getOrElse(""),
             unit.command.getUnitCommandType.toString),
           unit.pixelCenter,
           drawBackground = false)

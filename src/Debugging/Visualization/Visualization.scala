@@ -37,8 +37,6 @@ object Visualization {
       if (With.configuration.enableVisualizationPlans)              VisualizePlans                .render()
       if (With.configuration.enableVisualizationResources)          VisualizeResources            .render()
       if (With.configuration.enableVisualizationScheduler)          VisualizeScheduler            .render()
-      
-      
     }
   }
 }

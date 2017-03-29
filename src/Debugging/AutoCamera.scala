@@ -12,8 +12,8 @@ class AutoCamera {
   def onFrame() {
     if ( ! With.configuration.enableCamera) { return }
     
-    if (With.battles.allLocal.nonEmpty) {
-      focus = With.battles.allLocal.toList.sortBy(_.focus.getDistance(focus)).maxBy(b => b.enemy.strength * b.us.strength).us.vanguard
+    if (With.battles.local.nonEmpty) {
+      focus = With.battles.local.toList.sortBy(_.focus.getDistance(focus)).maxBy(b => b.enemy.strength * b.us.strength).us.vanguard
       setCameraSpeed(With.configuration.cameraDynamicSpeedSlowest)
     } else if (With.units.ours.nonEmpty) {
       focus = With.units.ours.minBy(_.pixelDistanceSquared(Positions.middle)).pixelCenter

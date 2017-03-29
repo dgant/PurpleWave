@@ -12,13 +12,14 @@ import scala.collection.mutable.ListBuffer
 class Battles {
   
   private val delayLength = 1
+  private val maxDistanceTiles = 15
   
   private var combatantsOurs  : Set[FriendlyUnitInfo] = Set.empty
   private var combatantsEnemy : Set[ForeignUnitInfo]  = Set.empty
           var global          : Battle                = null
           var byZone          : Map[Zone, Battle]     = Map.empty
           var byUnit          : Map[UnitInfo, Battle] = Map.empty
-          var allLocal        : List[Battle]          = List.empty
+          var local           : List[Battle]          = List.empty
   
   def onFrame() = updateLimiter.act()
   private val updateLimiter = new Limiter(delayLength, update)
@@ -28,6 +29,7 @@ class Battles {
     buildBattleGlobal()
     buildBattlesByZone()
     buildBattlesLocal()
+    BattleEvaluator.assess(local ++ byZone.values :+ global)
   }
   
   private def buildBattleGlobal() {
@@ -59,7 +61,7 @@ class Battles {
       assignToCluster(unassigned.head, newCluster, unassigned)
       clusters.append(newCluster)
     }
-    allLocal =
+    local =
       clusters
         .map(cluster =>
           new Battle(
@@ -69,22 +71,30 @@ class Battles {
           battle.us.units.nonEmpty &&
           battle.enemy.units.nonEmpty)
         .toList
+    byUnit = local
+      .flatten(battle =>
+        List(
+          battle.us.units,
+          battle.enemy.units)
+        .flatten
+        .map(unit => (unit, battle)))
+      .toMap
   }
   
   def assignToCluster(
     unit        : UnitInfo,
     cluster     : mutable.Set[UnitInfo],
     unassigned  : mutable.Set[UnitInfo]) {
-    val framesAhead = With.performance.frameDelay(delayLength)
+    val framesUntilNextUpdate = With.performance.frameDelay(delayLength)
     cluster.add(unit)
     unassigned.remove(unit)
     unit
-      .inTileRadius(15)
+      .inTileRadius(maxDistanceTiles)
       .filterNot(unassigned.contains)
       .filter(otherUnit =>
         unit.pixelsFromEdge(otherUnit) <= Math.max(
-          unit.pixelReach(framesAhead),
-          otherUnit.pixelReach(framesAhead)))
+          unit.pixelReach(2 * framesUntilNextUpdate),
+          otherUnit.pixelReach(framesUntilNextUpdate)))
       .foreach(otherUnit => assignToCluster(unit, cluster, unassigned))
   }
 

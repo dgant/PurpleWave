@@ -8,7 +8,7 @@ import Utilities.EnrichPosition._
 import bwapi.Color
 
 object VisualizeBattles {
-  def render() = With.battles.allLocal.foreach(drawBattle)
+  def render() = With.battles.local.foreach(drawBattle)
   
   private def drawBattle(battle:Battle) {
     val ourColor    = DrawMap.playerColorDark(With.self)

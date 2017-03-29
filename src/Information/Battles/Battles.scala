@@ -60,12 +60,11 @@ class Battles {
     val horizon = new mutable.HashSet[UnitInfo]
     while (unassigned.nonEmpty) {
       val nextCluster = new mutable.HashSet[UnitInfo]
-      val firstUnit = unassigned.head
-      unassigned.remove(firstUnit)
-      horizon.add(firstUnit)
+      horizon.add(unassigned.head)
       while (horizon.nonEmpty) {
         val nextUnit = horizon.head
         horizon.remove(nextUnit)
+        unassigned.remove(nextUnit)
         nextCluster.add(nextUnit)
         horizon ++= nextUnit
           .inTileRadius(maxDistanceTiles)

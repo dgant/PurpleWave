@@ -27,11 +27,21 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="Gather.scala" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Gather.scala" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Planning/Plans/Macro/Automatic/Gather.scala">
           <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="217">
+              <caret line="130" column="15" lean-forward="false" selection-start-line="130" selection-start-column="15" selection-end-line="130" selection-end-column="15" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Configuration.scala" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/Debugging/Configuration.scala">
+          <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="87">
-              <caret line="120" column="70" lean-forward="true" selection-start-line="120" selection-start-column="70" selection-end-line="120" selection-end-column="70" />
+              <caret line="8" column="44" lean-forward="false" selection-start-line="8" selection-start-column="44" selection-end-line="8" selection-end-column="44" />
               <folding />
             </state>
           </provider>
@@ -202,7 +212,6 @@
         <option value="$PROJECT_DIR$/src/Geometry/Shapes/PylonRadius.scala" />
         <option value="$PROJECT_DIR$/src/Planning/Plans/Macro/RemoveMineralBlockAt.scala" />
         <option value="$PROJECT_DIR$/src/Planning/Composition/PositionFinders/PositionSimpleBuilding.scala" />
-        <option value="$PROJECT_DIR$/src/Debugging/Configuration.scala" />
         <option value="$PROJECT_DIR$/src/Micro/Commander.scala" />
         <option value="$PROJECT_DIR$/src/Micro/Behaviors/BehaviorWorker.scala" />
         <option value="$PROJECT_DIR$/src/Micro/Behaviors/BehaviorDefault.scala" />
@@ -233,6 +242,7 @@
         <option value="$PROJECT_DIR$/src/Information/Battles/Battles.scala" />
         <option value="$PROJECT_DIR$/src/Micro/Behaviors/MovementProfiles.scala" />
         <option value="$PROJECT_DIR$/src/Planning/Plans/Macro/Automatic/Gather.scala" />
+        <option value="$PROJECT_DIR$/src/Debugging/Configuration.scala" />
       </list>
     </option>
   </component>
@@ -992,14 +1002,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Debugging/Configuration.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="273">
-          <caret line="21" column="50" lean-forward="true" selection-start-line="21" selection-start-column="50" selection-end-line="21" selection-end-column="50" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/UnitInfo/FriendlyUnitInfo.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="117">
@@ -1090,8 +1092,16 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Planning/Plans/Macro/Automatic/Gather.scala">
       <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="217">
+          <caret line="130" column="15" lean-forward="false" selection-start-line="130" selection-start-column="15" selection-end-line="130" selection-end-column="15" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Debugging/Configuration.scala">
+      <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="87">
-          <caret line="120" column="70" lean-forward="true" selection-start-line="120" selection-start-column="70" selection-end-line="120" selection-end-column="70" />
+          <caret line="8" column="44" lean-forward="false" selection-start-line="8" selection-start-column="44" selection-end-line="8" selection-end-column="44" />
           <folding />
         </state>
       </provider>

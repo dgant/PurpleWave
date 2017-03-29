@@ -1,4 +1,4 @@
-package Micro.Battles
+package Information.Battles
 
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.UnitInfo

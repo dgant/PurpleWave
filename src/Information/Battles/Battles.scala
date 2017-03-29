@@ -1,4 +1,4 @@
-package Micro.Battles
+package Information.Battles
 
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, UnitInfo}
 import Information.Geography.Types.Zone

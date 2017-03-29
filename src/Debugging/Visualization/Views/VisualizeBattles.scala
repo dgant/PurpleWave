@@ -2,7 +2,7 @@ package Debugging.Visualization.Views
 
 import Debugging.Visualization.Colors
 import Debugging.Visualization.Rendering.DrawMap
-import Micro.Battles.Battle
+import Information.Battles.Battle
 import Startup.With
 import Utilities.EnrichPosition._
 import bwapi.Color

@@ -1,4 +1,4 @@
-package Micro.Battles
+package Information.Battles
 
 import bwapi.Position
 import Utilities.EnrichPosition._

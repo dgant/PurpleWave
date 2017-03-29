@@ -1,4 +1,4 @@
-package Micro.Battles
+package Information.Battles
 
 import Geometry.Positions
 import ProxyBwapi.UnitInfo.UnitInfo

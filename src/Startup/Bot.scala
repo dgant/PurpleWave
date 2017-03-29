@@ -9,7 +9,7 @@ import Information._
 import Macro.Allocation._
 import Macro.Architect
 import Macro.Scheduling.Scheduler
-import Micro.Battles.Battles
+import Information.Battles.Battles
 import Micro.{Commander, Executor}
 import Planning.Plans.GamePlans.WinTheGame
 import ProxyBwapi.UnitTracking.UnitTracker

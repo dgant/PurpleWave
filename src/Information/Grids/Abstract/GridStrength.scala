@@ -1,7 +1,7 @@
 package Information.Grids.Abstract
 
 import Geometry.Shapes.Circle
-import Micro.Battles.BattleMetrics
+import Information.Battles.BattleMetrics
 import ProxyBwapi.UnitInfo.UnitInfo
 import Startup.With
 import Utilities.EnrichPosition._

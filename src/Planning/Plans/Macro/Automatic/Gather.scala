@@ -19,6 +19,8 @@ class Gather extends Plan {
     unitCounter.set(UnitCountEverything)
   }
   
+  private val mineralSaturationRatio = 2.0
+  
   private val resourceByWorker  = new mutable.HashMap[FriendlyUnitInfo, UnitInfo]
   private val workersByResource = new mutable.HashMap[UnitInfo, mutable.HashSet[FriendlyUnitInfo]]
   
@@ -94,14 +96,13 @@ class Gather extends Plan {
     haveEnoughGas       = With.self.gas >= Math.max(400, With.self.minerals)
     workersForGas       = List(safeGas.size * 3, allWorkers.size/3, if(haveEnoughGas) 0 else 200).min
     workersForMinerals  = allWorkers.size - workersForGas
-    workersPerMineral   = Math.min(2.0, workersForMinerals.toDouble / safeMinerals.size)
     workersPerGas       = if (safeGas.size == 0) 0 else workersForGas.toDouble / safeGas.size
     workersOnGas        = safeGas.toList.map(gas => workersByResource.get(gas).map(_.size).getOrElse(0)).sum
     
     needPerMineral = new mutable.HashMap[UnitInfo, Double] ++
       safeMinerals
         .map(mineral => (mineral,
-          workersPerMineral - workersByResource.get(mineral)
+          mineralSaturationRatio - workersByResource.get(mineral)
             .map(_.size)
             .getOrElse(0)))
         .toMap
@@ -122,10 +123,9 @@ class Gather extends Plan {
   
   val unassignSupersaturatingWorkersLimiter = new Limiter(5, () => unassignSupersaturatingWorkers)
   def unassignSupersaturatingWorkers() {
-    safeMinerals
-      .filter(needPerMineral(_) > 2.0)
-      .foreach(workersByResource.get(_)
-        .foreach(_.drop(2).foreach(unassignWorker)))
+    val supersaturatedMinerals = safeMinerals.filter(needPerMineral(_) < 0)
+    val supersaturationWorkerGroups = supersaturatedMinerals.flatten(workersByResource.get)
+    supersaturationWorkerGroups.foreach(_.drop(2).foreach(unassignWorker))
   }
   
   private def distributeUnassignedWorkers() {

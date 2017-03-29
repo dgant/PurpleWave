@@ -96,7 +96,7 @@ class Battles {
         unit.pixelsFromEdge(otherUnit) <= Math.max(
           unit.pixelReach(2 * framesUntilNextUpdate),
           otherUnit.pixelReach(2 * framesUntilNextUpdate)))
-      .foreach(otherUnit => assignToCluster(unit, cluster, unassigned, framesUntilNextUpdate))
+      .foreach(otherUnit => assignToCluster(otherUnit, cluster, unassigned, framesUntilNextUpdate))
   }
 
   def upcastOurs  (units:Set[FriendlyUnitInfo]) : Set[UnitInfo] = units.map(_.asInstanceOf[UnitInfo])

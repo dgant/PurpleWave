@@ -3,9 +3,7 @@ package Micro.Battles
 import Geometry.Positions
 import ProxyBwapi.UnitInfo.UnitInfo
 
-import scala.collection.mutable
-
-class BattleGroup(val units:mutable.HashSet[UnitInfo]) {
+class BattleGroup(val units:Set[UnitInfo]) {
   
   var strength = 0.0
   var vanguard = Positions.middle

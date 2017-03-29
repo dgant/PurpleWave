@@ -5,14 +5,15 @@ import Debugging.Visualization.Rendering.DrawMap
 import Micro.Battles.Battle
 import Startup.With
 import Utilities.EnrichPosition._
+import bwapi.Color
 
 object VisualizeBattles {
-  def render() = With.battles.all.foreach(drawBattle)
+  def render() = With.battles.allAdHoc.foreach(drawBattle)
   
   private def drawBattle(battle:Battle) {
     val ourColor    = DrawMap.playerColorDark(With.self)
     val enemyColor  = DrawMap.playerColorDark(With.enemies.headOption.get)
-    val neutralColor = Colors.DarkOrange
+    val neutralColor = Color.Black
     DrawMap.circle(battle.focus,          8, neutralColor)
     DrawMap.circle(battle.us.vanguard,    8, ourColor)
     DrawMap.circle(battle.enemy.vanguard, 8, enemyColor)

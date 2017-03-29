@@ -58,7 +58,8 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   def interceptors: Int = 8
   def scarabs: Int = 5
   
-  def inPixelRadius(pixelRadius:Int): Set[UnitInfo] = With.units.inPixelRadius(pixelCenter, pixelRadius)
+  def inTileRadius(tiles:Int)   : Set[UnitInfo] = With.units.inTileRadius(tileCenter, tiles)
+  def inPixelRadius(pixels:Int) : Set[UnitInfo] = With.units.inPixelRadius(pixelCenter, pixels)
   
   def canDoAnything:Boolean = alive && complete && ! stasised && ! maelstrommed //And lockdown
   def canAttack:Boolean = canDoAnything && unitClass.canAttack
@@ -92,6 +93,9 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
     else if (unitClass == Protoss.Carrier) 48
     else                                   4
   }
+  
+  // The range of this unit's potential impact at a distance in the future
+  def pixelReach(framesAhead:Int):Double = unitClass.maxAirGroundRange + unitClass.topSpeed * framesAhead
   
   def inRangeToAttack(otherUnit:UnitInfo):Boolean = pixelsFromEdge(otherUnit) <= unitClass.maxAirGroundRange
   

@@ -1,83 +1,93 @@
 package Micro.Battles
 
-import ProxyBwapi.UnitInfo.UnitInfo
-import Geometry.Clustering
+import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, UnitInfo}
+import Information.Geography.Types.Zone
 import Performance.Caching.Limiter
-import ProxyBwapi.Races.{Protoss, Terran}
 import Startup.With
 import Utilities.EnrichPosition._
 
 import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 
 class Battles {
   
-  val all = new mutable.HashSet[Battle]
-  val byUnit = new mutable.HashMap[UnitInfo, Battle]
+  private val delayLength = 2
+  
+  private var combatantsOurs  : Set[FriendlyUnitInfo] = Set.empty
+  private var combatantsEnemy : Set[ForeignUnitInfo]  = Set.empty
+  private var global          : Battle                = null
+  private var byZone          : Map[Zone, Battle]     = Map.empty
+          var byUnit          : Map[UnitInfo, Battle] = Map.empty
+          var allAdHoc        : List[Battle]          = List.empty
   
   def onFrame() = updateLimiter.act()
-  private val updateLimiter = new Limiter(3, update)
+  private val updateLimiter = new Limiter(delayLength, update)
   private def update() {
-    byUnit.clear()
-    defineBattles()
-    all.foreach(update)
-    all.filterNot(isValid).foreach(all.remove)
-    all.foreach(battle => {
-      battle.enemy.units.foreach(unit => byUnit.put(unit, battle))
-      battle.us   .units.foreach(unit => byUnit.put(unit, battle))
-    })
+    combatantsOurs  = With.units.ours .filter(unit => unit.helpsInCombat)
+    combatantsEnemy = With.units.enemy.filter(unit => unit.helpsInCombat && unit.possiblyStillThere)
+    buildBattleGlobal()
+    buildBattlesByZone()
+    buildBattlesAdHoc()
   }
   
-  private def update(battle:Battle) {
-    val groups = List(battle.us, battle.enemy)
-    groups.foreach(group => group.units.filterNot(_.alive).foreach(group.units.remove))
-    if ( ! isValid(battle)) return
-    groups.foreach(group => group.center = BattleMetrics.center(group))
-    battle.us.vanguard    = battle.us.units.minBy(_.pixelCenter.distancePixelsSquared(battle.enemy.center)).pixelCenter
-    battle.enemy.vanguard = battle.enemy.units.minBy(_.pixelCenter.distancePixelsSquared(battle.us.center)).pixelCenter
-    groups.foreach(group => group.strength = BattleMetrics.estimateStrength(group, battle))
+  private def buildBattleGlobal() {
+    global = new Battle(
+      new BattleGroup(upcastOurs(combatantsOurs)),
+      new BattleGroup(upcastEnemy(combatantsEnemy)))
   }
   
-  def isValid(battle:Battle):Boolean = {
-    battle.us.units.nonEmpty && battle.enemy.units.nonEmpty
+  private def buildBattlesByZone() {
+    val combatantsOursByZone  = combatantsOurs .groupBy(_.tileCenter.zone)
+    val combatantsEnemyByZone = combatantsEnemy.groupBy(_.tileCenter.zone)
+    byZone = With.geography.zones
+      .map(zone => (
+        zone,
+        new Battle(
+          new BattleGroup(upcastOurs(combatantsOursByZone .getOrElse(zone, Set.empty))),
+          new BattleGroup(upcastEnemy(combatantsEnemyByZone.getOrElse(zone, Set.empty)))
+        )))
+      .toMap
   }
   
-  private def defineBattles() {
-    val battleRange   = 32 * 18
-    val ourClusters   = Clustering.groupUnits(getFighters(With.units.ours),  battleRange).values
-    val enemyClusters = Clustering.groupUnits(getFighters(With.units.enemy), battleRange).values
-    val ourGroups     = ourClusters  .map(group => new BattleGroup(group))
-    val enemyGroups   = enemyClusters.map(group => new BattleGroup(group))
-    assignBattles(ourGroups, enemyGroups)
+  private def buildBattlesAdHoc() {
+    if (combatantsEnemy.isEmpty) return
+    val margin = 18
+    val unassigned = mutable.HashSet.empty ++ combatantsOurs ++ combatantsEnemy
+    val clusters = new ListBuffer[mutable.HashSet[UnitInfo]]
+    while (unassigned.nonEmpty) {
+      val newCluster = new mutable.HashSet[UnitInfo]
+      extendCluster(unassigned.head, newCluster, unassigned)
+      clusters.append(newCluster)
+    }
+    allAdHoc =
+      clusters
+        .map(cluster =>
+          new Battle(
+            new BattleGroup(cluster.filter(_.isOurs).toSet),
+            new BattleGroup(cluster.filter(_.isEnemy).toSet)))
+        .filter(battle =>
+          battle.us.units.nonEmpty &&
+          battle.enemy.units.nonEmpty)
+        .toList
   }
   
-  private def getFighters(units:Iterable[UnitInfo]):Iterable[UnitInfo] = {
-    units.filter(u => u.possiblyStillThere
-      && u.alive
-      && u.helpsInCombat
-      && u.unitClass != Terran.SpiderMine
-      && u.unitClass != Protoss.Interceptor
-      && u.unitClass != Protoss.Scarab)
+  def extendCluster(
+    unit        : UnitInfo,
+    cluster     : mutable.Set[UnitInfo],
+    unassigned  : mutable.Set[UnitInfo]) {
+    val framesAhead = With.performance.frameDelay(delayLength)
+    cluster.add(unit)
+    unassigned.remove(unit)
+    unit
+      .inTileRadius(15)
+      .filterNot(unassigned.contains)
+      .filter(otherUnit =>
+        unit.pixelsFromEdge(otherUnit) <= Math.max(
+          unit.pixelReach(framesAhead),
+          otherUnit.pixelReach(framesAhead)))
+      .foreach(otherUnit => extendCluster(unit, cluster, unassigned))
   }
-  
-  private def assignBattles(
-    ourGroups:Iterable[BattleGroup],
-    theirGroups:Iterable[BattleGroup]) {
-    
-    all.clear()
-  
-    if (theirGroups.isEmpty) return
-    
-    (ourGroups ++ theirGroups).foreach(group => group.center = BattleMetrics.center(group))
-    
-    ourGroups
-      .groupBy(ourGroup => theirGroups.minBy(_.center.distancePixelsSquared(ourGroup.center)))
-      .map(pair => new Battle(mergeGroups(pair._2), pair._1))
-      .foreach(all.add)
-  }
-  
-  private def mergeGroups(groups:Iterable[BattleGroup]):BattleGroup = {
-    val output = new BattleGroup(new mutable.HashSet)
-    groups.foreach(output.units ++= _.units)
-    output
-  }
+
+  def upcastOurs  (units:Set[FriendlyUnitInfo]) : Set[UnitInfo] = units.map(_.asInstanceOf[UnitInfo])
+  def upcastEnemy (units:Set[ForeignUnitInfo])  : Set[UnitInfo] = units.map(_.asInstanceOf[UnitInfo])
 }

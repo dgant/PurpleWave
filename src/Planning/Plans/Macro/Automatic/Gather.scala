@@ -71,13 +71,13 @@ class Gather extends Plan {
   }
   
   private def decideLongDistanceMining() {
-    if (safeMinerals.size < 7) {
+    if (safeMinerals.size < 9) {
       val allSafeMinerals = With.units.neutral.filter(_.unitClass.isMinerals).filter(safe)
       if (allSafeMinerals.nonEmpty) {
         safeMinerals ++= allSafeMinerals
           .toList
           .sortBy(mineral => With.paths.groundPixels(mineral.tileCenter, With.geography.home))
-          .take(7)
+          .take(9)
       }
     }
   }

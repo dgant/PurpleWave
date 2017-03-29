@@ -85,8 +85,7 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
     else if (this == Protoss.Dragoon)     BehaviorDragoon
     else if (this == Protoss.Reaver)      BehaviorReaver
     else if (this == Protoss.Scout)       BehaviorCorsair
-    
-    else BehaviorDefault
+    else                                  BehaviorDefault
   }
   
   override def toString:String =
@@ -96,6 +95,7 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
       .replace("Protoss_", "")
       .replace("Neutral_", "")
       .replace("Resource_", "")
+      .replace("Critter_", "")
       .replace("Special_", "")
       .replaceAll("_", " ")
 }

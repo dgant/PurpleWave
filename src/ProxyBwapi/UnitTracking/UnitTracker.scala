@@ -5,7 +5,7 @@ import Geometry.TileRectangle
 import Startup.With
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, UnitInfo}
 import Utilities.EnrichPosition._
-import bwapi.{Position, UnitType}
+import bwapi.{Position, TilePosition, UnitType}
 
 import scala.collection.JavaConverters._
 
@@ -32,15 +32,16 @@ class UnitTracker {
     units.asScala.flatMap(get).toList
   }
   
-  def inPixelRadius(position:Position, range:Int):Set[UnitInfo] = {
-    val tileRadius = range / 32 + 1
-    val tile = position.tileIncluding
+  def inTileRadius(tile:TilePosition, tiles:Int):Set[UnitInfo] = {
     Circle
-      .points(tileRadius)
+      .points(tiles)
       .map(tile.add)
       .flatten(With.grids.units.get)
       .toSet
-      .filter(_.pixelCenter.distancePixelsSquared(position) <= range * range)
+  }
+  
+  def inPixelRadius(pixel:Position, pixels:Int):Set[UnitInfo] = {
+    inTileRadius(pixel.tileNearest, pixels / 32 + 1).filter(_.pixelCenter.distancePixelsSquared(pixel) <= pixels * pixels)
   }
   
   def inRectangle(topLeftInclusive:Position, bottomRightExclusive:Position):Set[UnitInfo] = {

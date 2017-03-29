@@ -6,14 +6,14 @@ object MovementProfiles {
   
   val defaultCombat = new MovementProfile (
     preferTravel      = 1.25,
-    preferSpot        = 1.00,
+    preferSpot        = 0.75,
     preferSitAtRange  = 0.50,
     preferTarget      = 0.50,
     preferMobility    = 0.50,
     preferStrength    = 0.10,
     preferRandom      = 0.05,
     preferMoving      = 0.05,
-    avoidDamage       = 0.50,
+    avoidDamage       = 0.75,
     avoidTraffic      = 0.25)
   
   val defaultNormal = new MovementProfile (

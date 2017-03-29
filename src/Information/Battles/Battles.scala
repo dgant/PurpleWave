@@ -57,13 +57,15 @@ class Battles {
     val framesToLookAhead = 2 * With.performance.frameDelay(delayLength)
     val unassigned = mutable.HashSet.empty ++ combatantsOurs ++ combatantsEnemy
     val clusters = new ListBuffer[mutable.HashSet[UnitInfo]]
-    val horizon = new mutable.HashSet[UnitInfo] { unassigned.head }
+    val horizon = new mutable.HashSet[UnitInfo]
     while (unassigned.nonEmpty) {
       val nextCluster = new mutable.HashSet[UnitInfo]
+      val firstUnit = unassigned.head
+      unassigned.remove(firstUnit)
+      horizon.add(firstUnit)
       while (horizon.nonEmpty) {
         val nextUnit = horizon.head
         horizon.remove(nextUnit)
-        unassigned.remove(nextUnit)
         nextCluster.add(nextUnit)
         horizon ++= nextUnit
           .inTileRadius(maxDistanceTiles)

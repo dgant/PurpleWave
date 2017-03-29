@@ -14,6 +14,10 @@ object PathFinder {
     val fromZone = from.zone
     val toZone = to.zone
     
+    if (fromZone == toZone) {
+      return from.pixelDistance(to)
+    }
+    
     if ( ! With.paths.exists(
       fromZone.centroid.tileIncluding,
       toZone.centroid.tileIncluding,

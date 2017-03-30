@@ -19,8 +19,8 @@ class MovementProfile(
   
   def heuristics: Iterable[WeightedMovementHeuristic] =
     List(
-      new WeightedMovementHeuristic(TileHeuristicDestinationNearby, preferTravel,       Colors.MediumGreen),
-      new WeightedMovementHeuristic(TileHeuristicDestinationHere,   preferSpot,         Colors.BrightGreen),
+      new WeightedMovementHeuristic(TileHeuristicDestinationApproximate, preferTravel,       Colors.MediumGreen),
+      new WeightedMovementHeuristic(TileHeuristicDestinationExact,   preferSpot,         Colors.BrightGreen),
       new WeightedMovementHeuristic(TileHeuristicEnemyAtMaxRange,   preferSitAtRange,   Colors.MediumRed),
       new WeightedMovementHeuristic(TileHeuristicInRangeOfTarget,   preferTarget,       Colors.BrightBlue),
       new WeightedMovementHeuristic(TileHeuristicMobility,          preferMobility,     Colors.MediumOrange),

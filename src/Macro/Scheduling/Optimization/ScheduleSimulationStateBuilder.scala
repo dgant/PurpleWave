@@ -15,9 +15,9 @@ object ScheduleSimulationStateBuilder {
   
     val output = new ScheduleSimulationState(
       frame           = With.frame,
-      minerals        = With.self.minerals,
-      gas             = With.self.gas,
-      supplyAvailable = With.self.supplyTotal - With.self.supplyUsed,
+      minerals        = With.minerals,
+      gas             = With.gas,
+      supplyAvailable = With.supplyTotal - With.supplyUsed,
       unitsOwned      = unitCount,
       unitsAvailable  = unitCount,
       techsOwned      = techsOwned,

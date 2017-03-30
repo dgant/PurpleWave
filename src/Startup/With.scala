@@ -49,8 +49,16 @@ object With {
   var frame = 0
   var mapWidth = 0
   var mapHeight = 0
+  var minerals = 0
+  var gas = 0
+  var supplyUsed = 0
+  var supplyTotal = 0
   
   def onFrame() {
     frame = With.game.getFrameCount
+    minerals = With.self.minerals
+    gas = With.self.gas
+    supplyUsed = With.self.supplyUsed
+    supplyTotal = With.self.supplyTotal
   }
 }

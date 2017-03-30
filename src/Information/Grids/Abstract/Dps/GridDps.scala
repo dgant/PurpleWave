@@ -47,7 +47,7 @@ abstract class GridDps extends GridDouble {
             val nearbyTile = unit.tileCenter.add(point)
             var adjustedDps = dps
             if (distancePenalty > 0) {
-              adjustedDps -= distancePenalty * point.lengthSquared * 32.0 * 32.0 / (pixelReachMax * pixelReachMax)
+              adjustedDps -= adjustedDps * distancePenalty * point.lengthSquared * 32.0 * 32.0 / (pixelReachMax * pixelReachMax)
             }
             if(movementPenalty > 0 && point.lengthSquared * 32.0 * 32.0 < pixelRangeMax  * pixelRangeMax) {
               adjustedDps *= movementPenalty

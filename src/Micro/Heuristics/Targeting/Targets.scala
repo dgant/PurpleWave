@@ -11,7 +11,7 @@ object Targets {
         intent.unit.pixelCenter,
         32 * 15)
       .filter(_.possiblyStillThere)
-      .filter(intent.unit.canAttackThisFrame)
+      .filter(intent.unit.canAttackThisSecond)
       .filter(intent.unit.isEnemyOf)
       .filterNot(target => List(Zerg.Larva, Zerg.Egg).contains(target.unitClass))
   }

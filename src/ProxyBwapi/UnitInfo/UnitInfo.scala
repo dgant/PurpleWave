@@ -72,12 +72,8 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
     (unitClass != Protoss.Reaver  || scarabs > 0) &&
     (unitClass != Zerg.Lurker     || burrowed)
   
-  def canAttackThisFrame:Boolean =
+  def canAttackThisSecond(otherUnit:UnitInfo):Boolean =
     canAttackThisSecond &&
-    cooldownLeft < With.latency.framesRemaining
-  
-  def canAttackThisFrame(otherUnit:UnitInfo):Boolean =
-    canAttackThisFrame &&
       otherUnit.alive &&
       otherUnit.totalHealth > 0 &&
       otherUnit.visible &&
@@ -86,6 +82,9 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
       ! otherUnit.stasised &&
       (if (otherUnit.flying) unitClass.attacksAir else unitClass.attacksGround)
   
+  def canAttackThisFrame:Boolean =
+    canAttackThisSecond &&
+    cooldownLeft < With.latency.framesRemaining
   
   def requiredAttackDelay: Int = {
     // The question:
@@ -113,7 +112,7 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
       .inPixelRadius(pixelCenter, unitClass.maxAirGroundRange + 32)
       .filter(inRangeToAttack)
       .filter(isEnemyOf)
-      .filter(canAttackThisFrame)
+      .filter(canAttackThisSecond)
   
   /////////////
   // Players //

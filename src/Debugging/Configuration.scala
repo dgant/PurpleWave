@@ -2,7 +2,7 @@ package Debugging
 
 class Configuration {
   
-  
+  val combatMovementPenalty           = 0.5
   val combatCooldownPenalty           = 0.75
   val combatStickinessLeash           = 64
   var enableGoonStopProtection        = true
@@ -20,7 +20,7 @@ class Configuration {
   var cameraDynamicSpeedSlowest         = 30
   var cameraDynamicSpeedFastest         = 0
   
-  var enableVisualization                   = true
+  var enableVisualization                   = false
   var enableVisualizationBases              = true
   var enableVisualizationBattles            = true
   var enableVisualizationBullets            = false

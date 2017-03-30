@@ -13,7 +13,7 @@ abstract class GridDps extends GridDouble {
     
     reset()
     
-    val framesToLookAhead = 2 * With.performance.frameDelay(With.grids.frameDelayScale)
+    val framesToLookAhead = Math.max(48, 2 * With.performance.frameDelay(With.grids.frameDelayScale))
     
     getUnits.foreach(unit => {
       var dps = if (air) unit.unitClass.airDps else unit.unitClass.groundDps

@@ -1,5 +1,6 @@
 package Micro.Heuristics.TileHeuristics
 
+import Micro.Heuristics.HeuristicMath
 import Micro.Intentions.Intention
 import bwapi.TilePosition
 
@@ -11,11 +12,8 @@ object TileHeuristicDestinationHere extends TileHeuristic {
   
     val before = intent.unit.travelPixels(intent.unit.tileCenter,  intent.destination.get)
     val after  = intent.unit.travelPixels(candidate,               intent.destination.get)
-  
-    val threshold = 32.0 * 1.0
-    if (before < threshold || after < threshold) return 1.0
-  
-    return before/after
+    
+    return HeuristicMath.unboolify(before < after)
   }
   
 }

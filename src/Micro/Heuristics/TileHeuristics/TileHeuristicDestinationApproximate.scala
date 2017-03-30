@@ -11,6 +11,6 @@ object TileHeuristicDestinationApproximate extends TileHeuristic {
     val before = intent.unit.travelPixels(intent.unit.tileCenter,  intent.destination.get)
     val after  = intent.unit.travelPixels(candidate,               intent.destination.get)
   
-    return HeuristicMath.unboolify(before < after)
+    return HeuristicMath.unboolify(after < before)
   }
 }

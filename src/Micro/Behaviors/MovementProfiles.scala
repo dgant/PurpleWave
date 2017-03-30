@@ -5,14 +5,14 @@ import Micro.Heuristics.Movement.MovementProfile
 object MovementProfiles {
   
   val defaultCombat = new MovementProfile (
-    preferTravel      = 0.30,
-    preferSitAtRange  = 0.70,
+    preferTravel      = 0.80,
+    preferSitAtRange  = 0.80,
     preferTarget      = 0.50,
-    preferMobility    = 0.70,
-    preferRandom      = 0.05,
-    preferMoving      = 0.05,
-    avoidDamage       = 0.80,
-    avoidTraffic      = 0.30)
+    preferMobility    = 0.30,
+    preferRandom      = 0.02,
+    preferMoving      = 0.02,
+    avoidDamage       = 1.20,
+    avoidTraffic      = 0.50)
   
   val defaultNormal = new MovementProfile (
     preferTravel      = 1.0,

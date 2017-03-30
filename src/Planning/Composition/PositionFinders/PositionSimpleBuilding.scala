@@ -56,7 +56,7 @@ class PositionSimpleBuilding(val buildingType:UnitClass) extends PositionFinder 
           .map(base => With.paths.groundPixels(base.townHallRectangle.midpoint, candidate))
           .sum
         -
-        0.5 * With.geography.enemyBases
+        0.75 * With.geography.enemyBases
           .map(base => With.paths.groundPixels(base.townHallRectangle.midpoint, candidate))
           .sum
       ))

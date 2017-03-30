@@ -25,7 +25,7 @@ class Hunt extends Plan {
     hunters.get.onFrame()
     if (hunters.get.isComplete) {
       hunters.get.units.foreach(fighter => {
-        val targets = With.units.enemy.filter(fighter.canAttack)
+        val targets = With.units.enemy.filter(fighter.canAttackRightNow)
         val targetDestination =
           if(targets.isEmpty)
             targetPosition

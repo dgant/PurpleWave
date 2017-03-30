@@ -1,7 +1,7 @@
 package Information.Grids.Concrete
 
 import Geometry.Shapes.Circle
-import Information.Grids.Abstract.GridBoolean
+import Information.Grids.Abstract.ArrayTypes.GridBoolean
 import Startup.With
 import Utilities.EnrichPosition._
 

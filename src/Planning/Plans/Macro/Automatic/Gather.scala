@@ -179,8 +179,9 @@ class Gather extends Plan {
   }
   
   private def safe(resource:UnitInfo):Boolean = {
-    //Strength units are HP * HP / Sec -- so this is about the DPS of two SCVs
-    With.grids.enemyStrength.get(resource.tileCenter) < 2 * 8 * 60
+    With.battles.byZone
+      .get(With.geography.zoneByTile(resource.tileCenter))
+      .forall(zone => zone.us.strength >= zone.enemy.strength)
   }
   
   private def order(worker:FriendlyUnitInfo) {

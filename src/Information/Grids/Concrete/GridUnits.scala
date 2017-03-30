@@ -1,6 +1,6 @@
 package Information.Grids.Concrete
 
-import Information.Grids.Abstract.GridItems
+import Information.Grids.Abstract.ArrayTypes.GridItems
 import ProxyBwapi.UnitInfo.UnitInfo
 import Startup.With
 import bwapi.TilePosition

@@ -1,7 +1,7 @@
 package ProxyBwapi.UnitInfo
 
 import Geometry.TileRectangle
-import ProxyBwapi.Races.{Protoss, Terran, Zerg}
+import ProxyBwapi.Races.{Protoss, Zerg}
 import Startup.With
 import Utilities.EnrichPosition._
 import bwapi._
@@ -50,38 +50,38 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   ////////////
   
   def cooldownLeft:Int = Math.max(airCooldownLeft, groundCooldownLeft)
-  def airDps: Double = unitClass.groundDps
-  def groundDps: Double = unitClass.groundDps
-  
   def totalHealth: Int = hitPoints + shieldPoints + defensiveMatrixPoints
-  def fractionalHealth:Double = totalHealth / unitClass.maxTotalHealth
+  def fractionalHealth:Double = totalHealth.toDouble / unitClass.maxTotalHealth
   def interceptors: Int = 8
   def scarabs: Int = 5
   
   def inTileRadius(tiles:Int)   : Set[UnitInfo] = With.units.inTileRadius(tileCenter, tiles)
   def inPixelRadius(pixels:Int) : Set[UnitInfo] = With.units.inPixelRadius(pixelCenter, pixels)
   
-  def canDoAnything:Boolean = alive && complete && ! stasised && ! maelstrommed //And lockdown
-  def canAttack:Boolean = canDoAnything && unitClass.canAttack
-  
-  def canAttack(otherUnit:UnitInfo):Boolean =
-    canAttack &&
-    otherUnit.alive &&
-    otherUnit.totalHealth > 0 &&
-    otherUnit.visible &&
-    (otherUnit.detected || ! otherUnit.cloaked || ! otherUnit.burrowed) &&
-    ! otherUnit.invincible &&
-    ! otherUnit.stasised &&
-    (if (otherUnit.flying) unitClass.attacksAir else unitClass.attacksGround)
+  def canDoAnythingRightNow:Boolean =
+    alive &&
+    complete &&
+    ! stasised &&
+    ! maelstrommed
+    //And lockdown
   
   def canAttackRightNow:Boolean =
-    canAttack &&
+    canAttackRightNow &&
+    canDoAnythingRightNow &&
     cooldownLeft < With.latency.framesRemaining &&
     (unitClass != Protoss.Carrier || interceptors > 0) &&
     (unitClass != Protoss.Reaver  || scarabs > 0) &&
     (unitClass != Zerg.Lurker     || burrowed)
   
-  def helpsInCombat: Boolean = canDoAnything && (canAttack || unitClass.isSpellcaster || Set(Terran.Bunker, Terran.Medic).contains(unitClass))
+  def canAttackRightNow(otherUnit:UnitInfo):Boolean =
+    canAttackRightNow &&
+      otherUnit.alive &&
+      otherUnit.totalHealth > 0 &&
+      otherUnit.visible &&
+      (otherUnit.detected || ! otherUnit.cloaked || ! otherUnit.burrowed) &&
+      ! otherUnit.invincible &&
+      ! otherUnit.stasised &&
+      (if (otherUnit.flying) unitClass.attacksAir else unitClass.attacksGround)
   
   def requiredAttackDelay: Int = {
     // The question:
@@ -95,7 +95,12 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   }
   
   // The range of this unit's potential impact at a distance in the future
-  def pixelReach(framesAhead:Int):Double = unitClass.maxAirGroundRange + unitClass.topSpeed * framesAhead
+  def pixelRangeAir                             : Double = unitClass.airRange
+  def pixelRangeGround                          : Double = unitClass.groundRange
+  def pixelReachTravel    (framesAhead  : Int)  : Double = unitClass.topSpeed * framesAhead
+  def pixelReachAir       (framesAhead  : Int)  : Double = pixelReachTravel(framesAhead) + pixelRangeAir
+  def pixelReachGround    (framesAhead  : Int)  : Double = pixelReachTravel(framesAhead) + pixelRangeGround
+  def pixelReachDamage    (framesAhead  : Int)  : Double = Math.max(pixelReachAir(framesAhead), pixelReachGround(framesAhead))
   
   def inRangeToAttack(otherUnit:UnitInfo):Boolean = pixelsFromEdge(otherUnit) <= unitClass.maxAirGroundRange
   
@@ -104,7 +109,7 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
       .inPixelRadius(pixelCenter, unitClass.maxAirGroundRange + 32)
       .filter(inRangeToAttack)
       .filter(isEnemyOf)
-      .filter(canAttack)
+      .filter(canAttackRightNow)
   
   /////////////
   // Players //

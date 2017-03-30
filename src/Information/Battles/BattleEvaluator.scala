@@ -9,7 +9,6 @@ object BattleEvaluator {
   }
   
   def update(battle:Battle) {
-    
     if (battle.happening) {
       battle.groups.foreach(group => {
         val otherGroup = battle.groups.filterNot(_ == group).head

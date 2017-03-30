@@ -1,0 +1,44 @@
+package Information.Grids.Abstract.Dps
+
+import Geometry.Shapes.Circle
+import Information.Grids.Abstract.ArrayTypes.GridDouble
+import ProxyBwapi.Races.Terran
+import ProxyBwapi.UnitInfo.UnitInfo
+import Startup.With
+import Utilities.EnrichPosition._
+
+abstract class GridDps extends GridDouble {
+  
+  override def update() {
+    
+    reset()
+    
+    val framesToLookAhead = 2 * With.performance.frameDelay(With.grids.frameDelayScale)
+    
+    getUnits.foreach(unit => {
+      var dps = if (air) unit.unitClass.airDps else unit.unitClass.groundDps
+      if (dps > 0.0) {
+        var pixelReachMax = if (air) unit.pixelReachAir(framesToLookAhead) else unit.pixelReachGround(framesToLookAhead)
+        var pixelRangeMax = if (air) unit.pixelRangeAir else unit.pixelRangeGround
+        var pixelRangeMin = unit.unitClass.rawGroundMinRange
+        
+        //Assume invisible siege tanks are sieged
+        if ( ! unit.isOurs && ! unit.visible && unit.unitClass == Terran.SiegeTankUnsieged) {
+          dps             = Math.max(dps,           Terran.SiegeTankSieged.groundDps)
+          pixelReachMax   = Math.max(pixelReachMax, Terran.SiegeTankSieged.groundRange)
+          pixelRangeMax   = Math.max(pixelRangeMax, Terran.SiegeTankSieged.groundRange)
+        }
+  
+        Circle
+          .points((pixelReachMax/32).toInt)
+          .foreach(point => {
+            val nearbyTile = unit.tileCenter.add(point)
+            add(nearbyTile, dps)
+          })
+      }
+    })
+  }
+  
+  protected val air:Boolean
+  protected def getUnits:Iterable[UnitInfo]
+}

@@ -1,6 +1,7 @@
 package Information.Grids.Abstract
 
 import Geometry.Shapes.Circle
+import Information.Grids.Abstract.ArrayTypes.GridBoolean
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.EnrichPosition._
 

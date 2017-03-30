@@ -1,6 +1,6 @@
 package Information.Grids.Concrete
 
-import Information.Grids.Abstract.GridInt
+import Information.Grids.Abstract.ArrayTypes.GridInt
 import Startup.With
 import Utilities.EnrichPosition._
 

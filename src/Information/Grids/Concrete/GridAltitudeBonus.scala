@@ -1,6 +1,6 @@
 package Information.Grids.Concrete
 
-import Information.Grids.Abstract.GridDouble
+import Information.Grids.Abstract.ArrayTypes.GridDouble
 import Startup.With
 
 class GridAltitudeBonus extends GridDouble {

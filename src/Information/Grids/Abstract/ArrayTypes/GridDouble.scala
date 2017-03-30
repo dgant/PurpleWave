@@ -1,4 +1,4 @@
-package Information.Grids.Abstract
+package Information.Grids.Abstract.ArrayTypes
 
 import java.text.DecimalFormat
 

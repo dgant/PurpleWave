@@ -1,4 +1,4 @@
-package Information.Grids.Abstract
+package Information.Grids.Abstract.ArrayTypes
 
 class GridBoolean extends GridArray[Boolean] {
   

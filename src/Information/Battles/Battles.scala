@@ -24,8 +24,8 @@ class Battles {
   def onFrame() = updateLimiter.act()
   private val updateLimiter = new Limiter(delayLength, update)
   private def update() {
-    combatantsOurs  = With.units.ours .filter(unit => unit.helpsInCombat)
-    combatantsEnemy = With.units.enemy.filter(unit => unit.helpsInCombat && unit.possiblyStillThere)
+    combatantsOurs  = With.units.ours .filter(unit => unit.unitClass.helpsInCombat)
+    combatantsEnemy = With.units.enemy.filter(unit => unit.unitClass.helpsInCombat && unit.possiblyStillThere)
     buildBattleGlobal()
     buildBattlesByZone()
     buildBattlesLocal()
@@ -71,8 +71,8 @@ class Battles {
           .filter(unassigned.contains)
           .filter(otherUnit =>
             nextUnit.pixelsFromEdge(otherUnit) <= Math.max(
-              nextUnit.pixelReach(framesToLookAhead),
-              otherUnit.pixelReach(framesToLookAhead)))
+              nextUnit.pixelReachDamage(framesToLookAhead),
+              otherUnit.pixelReachDamage(framesToLookAhead)))
       }
       clusters.append(nextCluster)
     }

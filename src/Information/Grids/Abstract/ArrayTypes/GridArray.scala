@@ -1,5 +1,6 @@
-package Information.Grids.Abstract
+package Information.Grids.Abstract.ArrayTypes
 
+import Information.Grids.Abstract.Grid
 import bwapi.TilePosition
 
 

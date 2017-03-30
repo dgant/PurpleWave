@@ -23,14 +23,9 @@ object BehaviorDefault extends Behavior {
   def uninterruptible(intent:Intention):Boolean = intent.unit.attackStarting || intent.unit.attackAnimationHappening
   
   def desireToFight(intent:Intention):Double = {
-    val strengthOurs  = 1.0 + With.grids.friendlyStrength.get(intent.unit.tileCenter)
-    val strengthEnemy = 1.0 + With.grids.enemyStrength.get(intent.unit.tileCenter)
-    val strengthRatioOverall =
-      With.battles.byUnit.get(intent.unit)
-        .map(battle => (1.0 + battle.us.strength) / (1.0 + battle.enemy.strength))
-        .getOrElse(1.0)
-    
-    strengthRatioOverall * strengthOurs / strengthEnemy
+    With.battles.byUnit.get(intent.unit)
+      .map(battle => (1.0 + battle.us.strength) / (1.0 + battle.enemy.strength))
+      .getOrElse(1.0)
   }
   
   def pickTarget(intent:Intention) = intent.toAttack = intent.toAttack.orElse(EvaluateTargets.best(intent, intent.targetProfile, intent.targets))

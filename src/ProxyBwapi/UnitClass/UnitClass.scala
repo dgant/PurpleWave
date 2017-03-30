@@ -53,6 +53,8 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
   def attacksGround : Boolean = effectiveGroundDamage > 0
   def attacksAir    : Boolean = effectiveAirDamage    > 0
   
+  def helpsInCombat:Boolean = canAttack || isSpellcaster || Set(Terran.Bunker, Terran.Medic).contains(this)
+  
   //Range is from unit edge, so we account for the diagonal width of the unit
   // 7/5 ~= sqrt(2)
   def groundRange:Int = {

@@ -1,6 +1,6 @@
 package Information.Grids.Concrete
 
-import Information.Grids.Abstract.GridBoolean
+import Information.Grids.Abstract.ArrayTypes.GridBoolean
 import Startup.With
 
 class GridBuildableTerrain extends GridBoolean {

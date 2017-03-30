@@ -1,7 +1,7 @@
 package Information.Grids.Concrete
 
-import Information.Grids.Abstract.GridBoolean
 import Geometry.Shapes.Square
+import Information.Grids.Abstract.ArrayTypes.GridBoolean
 import Startup.With
 import Utilities.EnrichPosition._
 

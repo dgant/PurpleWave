@@ -10,10 +10,9 @@ object MovementProfiles {
     preferSitAtRange  = 0.70,
     preferTarget      = 0.50,
     preferMobility    = 0.70,
-    preferStrength    = 0.10,
     preferRandom      = 0.05,
     preferMoving      = 0.05,
-    avoidDamage       = 0.50,
+    avoidDamage       = 0.60,
     avoidTraffic      = 0.30)
   
   val defaultNormal = new MovementProfile (
@@ -21,7 +20,6 @@ object MovementProfiles {
     preferSpot        = 0.10,
     preferRandom      = 0.05,
     preferMoving      = 0.05,
-    preferStrength    = 0.05,
     avoidTraffic      = 0.75)
   
   val worker = new MovementProfile (
@@ -39,13 +37,11 @@ object MovementProfiles {
   val carrier = new MovementProfile (
     preferTravel      = 2.0,
     preferSitAtRange  = 2.0,
-    preferStrength    = 0.1,
     avoidDamage       = 1.0)
   
   val corsair = new MovementProfile (
     preferTravel      = 2.0,
     preferTarget      = 1.0,
-    preferStrength    = 0.05,
     preferRandom      = 0.2,
     avoidDamage       = 1.5)
 }

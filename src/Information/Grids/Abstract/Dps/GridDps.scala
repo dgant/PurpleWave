@@ -29,6 +29,7 @@ abstract class GridDps extends GridDouble {
           pixelRangeMax   = Math.max(pixelRangeMax, Terran.SiegeTankSieged.groundRange)
         }
         
+        val distancePenalty = With.configuration.combatDistancePenalty
         val movementPenalty = With.configuration.combatMovementPenalty
         val cooldownPenalty = With.configuration.combatCooldownPenalty
         
@@ -44,11 +45,13 @@ abstract class GridDps extends GridDouble {
           .points((pixelReachMax/32).toInt)
           .foreach(point => {
             val nearbyTile = unit.tileCenter.add(point)
-            val adjustedDps =
-              if(movementPenalty > 0 && point.lengthSquared * 32.0 * 32.0 < pixelRangeMax  * pixelRangeMax)
-                dps * movementPenalty
-              else
-                dps
+            var adjustedDps = dps
+            if (distancePenalty > 0) {
+              adjustedDps -= distancePenalty * point.lengthSquared * 32.0 * 32.0 / (pixelReachMax * pixelReachMax)
+            }
+            if(movementPenalty > 0 && point.lengthSquared * 32.0 * 32.0 < pixelRangeMax  * pixelRangeMax) {
+              adjustedDps *= movementPenalty
+            }
             add(nearbyTile, adjustedDps)
           })
       }

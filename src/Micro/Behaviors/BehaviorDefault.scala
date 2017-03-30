@@ -49,9 +49,9 @@ object BehaviorDefault extends Behavior {
   def move(intent:Intention):Boolean = {
     val tileToMove =
       if (intent.threats.nonEmpty || intent.targets.nonEmpty)
-        EvaluatePositions.best(intent, intent.movementProfileCombat)
+        EvaluatePositions.best(intent, intent.movementProfileCombat, 3)
       else if (With.configuration.enableHeuristicTravel)
-        EvaluatePositions.best(intent, intent.movementProfileNormal)
+        EvaluatePositions.best(intent, intent.movementProfileNormal, 2)
       else
         intent.destination.getOrElse(intent.unit.tileCenter)
     

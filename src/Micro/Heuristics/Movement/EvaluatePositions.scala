@@ -12,7 +12,7 @@ object EvaluatePositions {
   def best(
     intent:Intention,
     profile:MovementProfile,
-    searchRange:Int = 2)
+    searchRange:Int)
       :TilePosition = {
     
     With.movementHeuristicViews.reset(intent.unit)

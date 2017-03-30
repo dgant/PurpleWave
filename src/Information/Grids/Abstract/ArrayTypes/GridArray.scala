@@ -24,15 +24,15 @@ abstract class GridArray[T] extends Grid[T] {
     }
   }
   
-  final def initialize()                          = if ( ! initialized) { onInitialization(); initialized = true }
-  override def update()                           = initialize()
-  def onInitialization()                          {}
-  def indices:Iterable[Int]                       = values.indices
-  def points:Iterable[(Int, Int)]                 = indices.map(i => (x(i), y(i)))
-  def tiles:Iterable[TilePosition]                = indices.map(i => new TilePosition(x(i), y(i)))
-  def get(i:Int):T                                = if (valid(i)) values(i) else defaultValue
-  def set(i:Int, value:T):Unit                    = if (valid(i)) values(i) = value
-  def set(tileX:Int, tileY:Int, value:T):Unit     = set(i(tileX, tileY), value)
-  def set(position:TilePosition, value:T):Unit    = set(i(position.getX, position.getY), value)
+  final def initialize()                                  = if ( ! initialized) { onInitialization(); initialized = true }
+  override def update()                                   = initialize()
+  def onInitialization() {}
+  def indices:Iterable[Int]                               = values.indices
+  def points:Iterable[(Int, Int)]                         = indices.map(i => (x(i), y(i)))
+  def tiles:Iterable[TilePosition]                        = indices.map(i => new TilePosition(x(i), y(i)))
+  def get(i:Int):T                                        = if (valid(i)) values(i) else defaultValue
+  def set(i:Int, value:T):Unit                            = if (valid(i)) values(i) = value
+  def set(tileX:Int, tileY:Int, value:T):Unit             = set(i(tileX, tileY), value)
+  def set(position:TilePosition, value:T):Unit            = set(i(position.getX, position.getY), value)
 }
 

@@ -65,16 +65,19 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
     ! maelstrommed
     //And lockdown
   
-  def canAttackRightNow:Boolean =
-    canAttackRightNow &&
+  def canAttackThisSecond:Boolean =
+    unitClass.canAttack &&
     canDoAnythingRightNow &&
-    cooldownLeft < With.latency.framesRemaining &&
     (unitClass != Protoss.Carrier || interceptors > 0) &&
     (unitClass != Protoss.Reaver  || scarabs > 0) &&
     (unitClass != Zerg.Lurker     || burrowed)
   
-  def canAttackRightNow(otherUnit:UnitInfo):Boolean =
-    canAttackRightNow &&
+  def canAttackThisFrame:Boolean =
+    canAttackThisSecond &&
+    cooldownLeft < With.latency.framesRemaining
+  
+  def canAttackThisFrame(otherUnit:UnitInfo):Boolean =
+    canAttackThisFrame &&
       otherUnit.alive &&
       otherUnit.totalHealth > 0 &&
       otherUnit.visible &&
@@ -82,6 +85,7 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
       ! otherUnit.invincible &&
       ! otherUnit.stasised &&
       (if (otherUnit.flying) unitClass.attacksAir else unitClass.attacksGround)
+  
   
   def requiredAttackDelay: Int = {
     // The question:
@@ -109,7 +113,7 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
       .inPixelRadius(pixelCenter, unitClass.maxAirGroundRange + 32)
       .filter(inRangeToAttack)
       .filter(isEnemyOf)
-      .filter(canAttackRightNow)
+      .filter(canAttackThisFrame)
   
   /////////////
   // Players //

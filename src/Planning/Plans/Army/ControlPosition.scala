@@ -14,18 +14,18 @@ class ControlPosition extends Plan {
   description.set("Control a position")
   
   val units = new Property[LockUnits](new LockUnits)
-  var position = new Property[PositionFinder](new PositionEnemyBase)
+  var positionToControl = new Property[PositionFinder](new PositionEnemyBase)
   
   override def getChildren: Iterable[Plan] = List(units.get)
   override def onFrame() {
     
-    var targetPosition = position.get.find.get
+    var targetPosition = positionToControl.get.find.get
     
     val ourBases = With.geography.ourBases.map(_.townHallRectangle.midPixel)
     val infiltrators = With.units.enemy
       .filter(e =>
         e.possiblyStillThere &&
-        e.canAttackRightNow &&
+        e.canAttackThisFrame &&
         ourBases.exists(base =>
           targetPosition.pixelCenter.pixelDistance(e.pixelCenter) <
           targetPosition.pixelCenter.pixelDistance(base)))
@@ -42,7 +42,7 @@ class ControlPosition extends Plan {
   
   override def drawOverlay() {
     
-    position.get.find.map(tile => {
+    positionToControl.get.find.map(tile => {
       DrawMap.circle(
         tile.pixelCenter,
         64,

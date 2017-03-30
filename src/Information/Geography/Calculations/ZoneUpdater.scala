@@ -32,7 +32,7 @@ object ZoneUpdater {
   }
   
   private def updateOwner(base: Base) {
-    base.zone.owner = base.townHall.map(_.player).getOrElse(With.game.neutral)
+    base.zone.owner = base.townHall.map(_.player).getOrElse(With.neutral)
   }
   
   private def updateResources(base: Base) {

@@ -10,7 +10,7 @@ object Threats {
       intent.unit.pixelCenter,
       32 * 18)
       .filter(_.possiblyStillThere)
-      .filter(_.canAttackRightNow(intent.unit))
+      .filter(_.canAttackThisFrame(intent.unit))
       .filter(intent.unit.isEnemyOf)
       
   }

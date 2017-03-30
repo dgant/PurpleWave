@@ -5,7 +5,6 @@ import java.util.Calendar
 
 import Startup.With
 
-import scala.collection.JavaConverters._
 import scala.collection.mutable.ListBuffer
 
 class Logger {
@@ -13,9 +12,7 @@ class Logger {
   private val logMessages = new ListBuffer[String]
   
   def flush() {
-    val opponents = With.game.getPlayers.asScala
-      .filter(_ != With.self)
-      .filter(_ != With.game.neutral)
+    val opponents = With.enemies
       .map(_.getName)
       .mkString("-")
     

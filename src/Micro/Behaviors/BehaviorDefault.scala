@@ -33,7 +33,7 @@ object BehaviorDefault extends Behavior {
   def attack(intent:Intention):Boolean = {
     val willingToFight = desireToFight(intent) > 0.5
     if (
-      intent.unit.canAttackRightNow &&
+      intent.unit.canAttackThisFrame &&
       intent.toAttack.isDefined &&
         (willingToFight ||
           (intent.toAttack.exists(intent.unit.inRangeToAttack)

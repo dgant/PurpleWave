@@ -2,6 +2,8 @@ package Debugging
 
 class Configuration {
   
+  
+  val combatCooldownPenalty           = 0.75
   val combatStickinessLeash           = 64
   var enableGoonStopProtection        = true
   var enablePathRecalculation         = false

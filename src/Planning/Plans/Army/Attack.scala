@@ -9,6 +9,7 @@ import Planning.Composition.UnitMatchers.UnitMatchWarriors
 
 class Attack extends IfThenElse {
   
+  val attack = this
   description.set("Attack a position")
   
   val attackers = new Property[LockUnits](new LockUnits {
@@ -18,5 +19,9 @@ class Attack extends IfThenElse {
   
   predicate.set(new FoundEnemyBase)
   whenFalse.set(new FindEnemyBase { scouts.inherit(attackers) })
-  whenTrue.set(new ControlPosition { units.inherit(attackers); position.set(new PositionEnemyBase); description.inherit(this.description) })
+  whenTrue.set(new ControlPosition {
+    units.inherit(attackers);
+    positionToControl.set(new PositionEnemyBase);
+    description.inherit(attack.description)
+  })
 }

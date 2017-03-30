@@ -18,7 +18,7 @@ class Zone(
   val edges:ListBuffer[ZoneEdge]) {
   
   val centroid = bwtaRegion.getCenter
-  var owner:Player = With.game.neutral
+  var owner:Player = With.neutral
   val points:Iterable[Position] = bwtaRegion.getPolygon.getPoints.asScala.toList
   val island:Boolean = ! With.game.getStartLocations.asScala.exists(startTile => With.paths.exists(centroid.toTilePosition, startTile))
   

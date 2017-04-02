@@ -2,6 +2,7 @@ package Debugging
 
 class Configuration {
   
+  val combatEvaluationDistanceTiles   = 16
   val combatDistancePenalty           = 0.25
   val combatMovementPenalty           = 0.5
   val combatCooldownPenalty           = 0.75

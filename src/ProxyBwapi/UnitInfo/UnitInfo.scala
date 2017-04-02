@@ -66,8 +66,8 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
     //And lockdown
   
   def canAttackThisSecond:Boolean =
-    unitClass.canAttack &&
     canDoAnythingRightNow &&
+    unitClass.canAttack &&
     (unitClass != Protoss.Carrier || interceptors > 0) &&
     (unitClass != Protoss.Reaver  || scarabs > 0) &&
     (unitClass != Zerg.Lurker     || burrowed)

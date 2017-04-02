@@ -12,7 +12,6 @@ import scala.collection.mutable.ListBuffer
 class Battles {
   
   private val delayLength = 1
-  private val maxDistanceTiles = 15
   
   private var combatantsOurs  : Set[FriendlyUnitInfo] = Set.empty
   private var combatantsEnemy : Set[ForeignUnitInfo]  = Set.empty
@@ -53,7 +52,6 @@ class Battles {
   
   private def buildBattlesLocal() {
     if (combatantsEnemy.isEmpty) return
-    val margin = 18
     val framesToLookAhead = 2 * With.performance.frameDelay(delayLength)
     val unassigned = mutable.HashSet.empty ++ combatantsOurs ++ combatantsEnemy
     val clusters = new ListBuffer[mutable.HashSet[UnitInfo]]
@@ -67,7 +65,7 @@ class Battles {
         unassigned.remove(nextUnit)
         nextCluster.add(nextUnit)
         horizon ++= nextUnit
-          .inTileRadius(maxDistanceTiles)
+          .inTileRadius(With.configuration.combatEvaluationDistanceTiles)
           .filter(unassigned.contains)
           .filter(otherUnit =>
             nextUnit.pixelsFromEdge(otherUnit) <= Math.max(

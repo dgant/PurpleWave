@@ -177,7 +177,7 @@ class UnitClassProxy(val baseType:UnitType) {
   def upgrades                  = upgradesCache.get
   def whatBuilds                = whatBuildsCache.get
   def width                     = widthCache.get
-  def getRace                   = getRaceCache.get
+  def race                   = getRaceCache.get
   def rawAirDamage              = airDamageCache.get
   def rawAirDamageBonus         = airDamageBonusCache.get
   def rawAirDamageCooldown      = airDamageCooldownCache.get

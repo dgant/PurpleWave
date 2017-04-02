@@ -32,6 +32,7 @@ object Protoss {
   def CyberneticsCore     = UnitClasses.get(UnitType.Protoss_Cybernetics_Core)
   def RoboticsFacility    = UnitClasses.get(UnitType.Protoss_Robotics_Facility)
   def RoboticsSupportBay  = UnitClasses.get(UnitType.Protoss_Robotics_Support_Bay)
+  def Observatory         = UnitClasses.get(UnitType.Protoss_Observatory)
   def Stargate            = UnitClasses.get(UnitType.Protoss_Stargate)
   def FleetBeacon         = UnitClasses.get(UnitType.Protoss_Fleet_Beacon)
   def CitadelOfAdun       = UnitClasses.get(UnitType.Protoss_Citadel_of_Adun)

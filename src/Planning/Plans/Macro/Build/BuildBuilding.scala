@@ -66,7 +66,7 @@ class BuildBuilding(val buildingClass:UnitClass) extends Plan {
       areaLock.onFrame()
       if (areaLock.isComplete) {
         
-      if (building.isEmpty || buildingClass.getRace == Race.Terran) {
+      if (building.isEmpty || buildingClass.race == Race.Terran) {
         builderLock.onFrame()
       }
       

@@ -116,16 +116,16 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
   def isTerran  : Boolean = race == Race.Terran
   def isZerg    : Boolean = race == Race.Zerg
   
-  def buildTechPrerequisite     : Tech            = requiredTech
-  def buildUnitsPrerequisite    : List[UnitClass] = buildUnitsPrerequisiteCache.get
+  def buildTechEnabling     : Tech            = requiredTech
+  def buildUnitsEnabling    : List[UnitClass] = buildUnitsEnablingCache.get
   def buildUnitsBorrowed        : List[UnitClass] = buildUnitsBorrowedCache.get
   def buildUnitsSpent           : List[UnitClass] = buildUnitsSpentCache.get
   
-  private val buildUnitsPrerequisiteCache = new CacheForever(() => buildUnitsPrerequisiteCalculate)
+  private val buildUnitsEnablingCache = new CacheForever(() => buildUnitsEnablingCalculate)
   private val buildUnitsBorrowedCache = new CacheForever(() => buildUnitsBorrowedCalculate)
   private val buildUnitsSpentCache = new CacheForever(() => buildUnitsSpentCalculate)
   
-  private def buildUnitsPrerequisiteCalculate: List[UnitClass] = {
+  private def buildUnitsEnablingCalculate: List[UnitClass] = {
     
     val output = new ListBuffer[UnitClass]
     
@@ -181,7 +181,17 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
     addBuildUnitIf(output, Zerg.Defiler,                Zerg.DefilerMound)
     addBuildUnitIf(output, Zerg.Guardian,               Zerg.GreaterSpire)
     addBuildUnitIf(output, Zerg.Devourer,               Zerg.GreaterSpire)
+    addBuildUnitIf(output, Zerg.SporeColony,            Zerg.EvolutionChamber)
     addBuildUnitIf(output, Zerg.SunkenColony,           Zerg.SpawningPool)
+    addBuildUnitIf(output, Zerg.HydraliskDen,           Zerg.SpawningPool)
+    addBuildUnitIf(output, Zerg.Lair,                   Zerg.SpawningPool)
+    addBuildUnitIf(output, Zerg.Spire,                  Zerg.Lair)
+    addBuildUnitIf(output, Zerg.QueensNest,             Zerg.Lair)
+    addBuildUnitIf(output, Zerg.Hive,                   Zerg.QueensNest)
+    addBuildUnitIf(output, Zerg.UltraliskCavern,        Zerg.Hive)
+    addBuildUnitIf(output, Zerg.DefilerMound,           Zerg.Hive)
+    addBuildUnitIf(output, Zerg.GreaterSpire,           Zerg.Hive)
+    addBuildUnitIf(output, Zerg.NydusCanal,             Zerg.Hive)
     
     output.toList
   }
@@ -231,6 +241,7 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
   
     // Pop quiz: What's the only Zerg unit that trains from a building?
     addBuildUnitIf(output, Zerg.InfestedTerran,         Zerg.InfestedCommandCenter)
+    addBuildUnitIf(output, Zerg.InfestedCommandCenter,  Zerg.Queen)
     
     output.toList
   }

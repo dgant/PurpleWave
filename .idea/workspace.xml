@@ -32,8 +32,8 @@
           <file leaf-file-name="UnitClass.scala" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/UnitClass/UnitClass.scala">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-424">
-                  <caret line="216" column="4" lean-forward="true" selection-start-line="216" selection-start-column="4" selection-end-line="216" selection-end-column="4" />
+                <state relative-caret-position="1058">
+                  <caret line="243" column="67" lean-forward="false" selection-start-line="243" selection-start-column="67" selection-end-line="243" selection-end-column="67" />
                   <folding />
                 </state>
               </provider>
@@ -99,7 +99,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>=</find>
       <find>mineralIncomePer</find>
       <find>zone</find>
       <find>all</find>
@@ -129,9 +128,9 @@
       <find>18</find>
       <find>buildUnitPrerequisitesCache.get</find>
       <find>Prerequisites</find>
+      <find>Prerequisite</find>
     </findStrings>
     <replaceStrings>
-      <replace>def</replace>
       <replace>private val</replace>
       <replace>)</replace>
       <replace>var _</replace>
@@ -161,6 +160,7 @@
       <replace>WithoutBoundsCheck</replace>
       <replace>buildUnitPrere</replace>
       <replace>Borrowed</replace>
+      <replace>Enabling</replace>
     </replaceStrings>
     <dirStrings>
       <dir>C:\prog\PurpleWave1</dir>
@@ -1377,8 +1377,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/ProxyBwapi/UnitClass/UnitClass.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-424">
-          <caret line="216" column="4" lean-forward="true" selection-start-line="216" selection-start-column="4" selection-end-line="216" selection-end-column="4" />
+        <state relative-caret-position="1058">
+          <caret line="243" column="67" lean-forward="false" selection-start-line="243" selection-start-column="67" selection-end-line="243" selection-end-column="67" />
           <folding />
         </state>
       </provider>

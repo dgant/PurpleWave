@@ -5,7 +5,7 @@ import Planning.Plan
 import ProxyBwapi.Races.Protoss
 import Startup.With
 
-class BuildPylonsContinuously extends Plan {
+class BuildEnoughPylons extends Plan {
   
   description.set("Builds Pylons just-in-time to prevent supply block")
   
@@ -35,14 +35,13 @@ class BuildPylonsContinuously extends Plan {
     // What a mess. Fortunately, there's a better way to break it down:
     //   #1 Supply that is/will be provided by units that exist
     //   #2 Supply that will be provided by plans for which we haven't started building
-  
-    val pylon                     = Protoss.Pylon
+    
     val supplyPerDepot            = With.self.getRace.getSupplyProvider.supplyProvided
-    val currentSupplyOfNexus      = With.units.ours.filter(_.unitClass != pylon).toSeq.map(_.unitClass.supplyProvided).sum
+    val currentSupplyOfNexus      = With.units.ours.filter(_.unitClass != Protoss.Pylon).toSeq.map(_.unitClass.supplyProvided).sum
     val currentSupplyUsed         = With.self.supplyUsed
-    val unitSpendingRatio         = 0.75 //An exaggeration, but we were getting supply blocked too often
-    val costPerUnitSupply         = 25.0
-    val depotCompletionFrames     = pylon.buildTime + 24 * 10 //Add a few seconds to account for builder transit time (and Pylon finishing time)
+    val unitSpendingRatio         = if (With.geography.ourBases.size < 3) 0.5 else 0.75 //This is the metric that needs the most improvement
+    val costPerUnitSupply         = 50.0 / 2 //Assume 50 minerals = 1 supply (then divide by two because 1 supply = 2 BWAPI supply)
+    val depotCompletionFrames     = Protoss.Pylon.buildTime + 24 * 5 //Add a few seconds to account for builder transit time (and Pylon finishing time)
     val incomePerMinute           = With.economy.ourMineralIncomePerMinute + With.economy.ourGasIncomePerMinute
     val incomePerFrame            = incomePerMinute / 60.0 / 24.0
     val supplyUsedPerFrame        = incomePerFrame * unitSpendingRatio / costPerUnitSupply

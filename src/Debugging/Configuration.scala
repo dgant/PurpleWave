@@ -22,18 +22,18 @@ class Configuration {
   var cameraDynamicSpeedSlowest         = 30
   var cameraDynamicSpeedFastest         = 0
   
-  var enableVisualization                   = false
+  var enableVisualization                   = true
   var enableVisualizationBases              = true
   var enableVisualizationBattles            = true
   var enableVisualizationBullets            = false
   var enableVisualizationChokepoints        = true
   var enableVisualizationEconomy            = false
-  var enableVisualizationGrids              = true
+  var enableVisualizationGrids              = false
   var enableVisualizationMovementHeuristics = true
   var enableVisualizationPerformance        = true
   var enableVisualizationPlans              = false
-  var enableVisualizationResources          = false
-  var enableVisualizationScheduler          = false
+  var enableVisualizationResources          = true
+  var enableVisualizationScheduler          = true
   var enableVisualizationGeography          = true
   var enableVisualizationTextOnly           = false
   var enableVisualizationUnitsForeign       = true

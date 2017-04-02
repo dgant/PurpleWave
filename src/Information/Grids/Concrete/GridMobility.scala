@@ -1,12 +1,15 @@
 package Information.Grids.Concrete
 
 import Information.Grids.Abstract.ArrayTypes.GridInt
+import Performance.Caching.Limiter
 import Startup.With
 import Utilities.EnrichPosition._
 
 class GridMobility extends GridInt {
   
-  override def update() {
+  val limitUpdates = new Limiter(20, () => updateRecalculate)
+  override def update() = limitUpdates.act
+  def updateRecalculate() {
     val distanceMax = 3
     With.geography.allTiles
       .filter(With.grids.walkableTerrain.get)

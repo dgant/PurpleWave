@@ -2,8 +2,8 @@ package ProxyBwapi.UnitTracking
 
 import Geometry.Shapes.Circle
 import Geometry.TileRectangle
-import Startup.With
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, UnitInfo}
+import Startup.With
 import Utilities.EnrichPosition._
 import bwapi.{Position, TilePosition, UnitType}
 
@@ -35,8 +35,7 @@ class UnitTracker {
   def inTileRadius(tile:TilePosition, tiles:Int):Set[UnitInfo] = {
     Circle
       .points(tiles)
-      .map(tile.add)
-      .flatten(With.grids.units.get)
+      .flatten(point => With.grids.units.get(tile.add(point)))
       .toSet
   }
   
@@ -47,22 +46,21 @@ class UnitTracker {
   def inRectangle(topLeftInclusive:Position, bottomRightExclusive:Position):Set[UnitInfo] = {
     new TileRectangle(topLeftInclusive.tileIncluding, bottomRightExclusive.tileIncluding)
       .tiles
-      .flatten(With.grids.units.get)
-      .filter(unit =>
-        unit.pixelCenter.getX >= topLeftInclusive.getX &&
-        unit.pixelCenter.getY >= topLeftInclusive.getY &&
-        unit.pixelCenter.getX < bottomRightExclusive.getX &&
-        unit.pixelCenter.getY < bottomRightExclusive.getY)
+      .flatten(tile => With.grids.units
+        .get(tile)
+        .filter(unit =>
+          unit.pixelCenter.getX >= topLeftInclusive.getX &&
+          unit.pixelCenter.getY >= topLeftInclusive.getY &&
+          unit.pixelCenter.getX < bottomRightExclusive.getX &&
+          unit.pixelCenter.getY < bottomRightExclusive.getY))
       .toSet
   }
   
-  def inRectangle(rectangle:TileRectangle):Set[UnitInfo] = {
+  def inRectangle(rectangle:TileRectangle):Set[UnitInfo] =
     rectangle
       .tiles
-      .flatten(With.grids.units.get)
-      .filter(unit => rectangle.contains(unit.tileCenter))
+      .flatten(tile => With.grids.units.get(tile).filter(unit => rectangle.contains(unit.tileCenter)))
       .toSet
-  }
   
   def onFrame() {
     friendlyUnitTracker.onFrame()

@@ -5,7 +5,7 @@ import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors}
 import Planning.Plans.Army.{Attack, Defend, Hunt}
 import Planning.Plans.Compound.{IfThenElse, Parallel}
 import Planning.Plans.Information.ScoutAt
-import Planning.Plans.Macro.Automatic.{BuildPylonsContinuously, TrainContinuously, TrainProbesContinuously}
+import Planning.Plans.Macro.Automatic.{BuildEnoughPylons, TrainContinuously, TrainProbesContinuously}
 import Planning.Plans.Macro.BuildOrders.ScheduleBuildOrder
 import Planning.Plans.Macro.UnitCount.UnitCountAtLeast
 import ProxyBwapi.Races.Protoss
@@ -136,7 +136,7 @@ class ProtossVsTerran extends Parallel {
   
   children.set(List(
     new ScheduleBuildOrder { buildables.set(_13Nexus) },
-    new BuildPylonsContinuously,
+    new BuildEnoughPylons,
     new TrainProbesContinuously,
     new TrainContinuously(Protoss.Reaver),
     new TrainContinuously(Protoss.Carrier),

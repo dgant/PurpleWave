@@ -21,8 +21,8 @@ class Grids {
   val dpsEnemyGroundExplosive   = new GridDpsEnemyGroundExplosive
   val dpsEnemyGroundNormal      = new GridDpsEnemyGroundNormal
   val enemyVision               = new GridEnemyVision
-  val gridPsi2x2and3x2          = new GridPsi2x2and3x2
-  val gridPsi4x3                = new GridPsi4x3
+  val psi2x2and3x2          = new GridPsi2x2and3x2
+  val psi4x3                = new GridPsi4x3
   val mobility                  = new GridMobility
   val units                     = new GridUnits
   val walkable                  = new GridWalkable
@@ -44,8 +44,8 @@ class Grids {
       dpsEnemyGroundNormal,
       enemyDetection,
       enemyVision,
-      gridPsi2x2and3x2,
-      gridPsi4x3,
+      psi2x2and3x2,
+      psi4x3,
       buildable,
       buildableTerrain,
       walkable,

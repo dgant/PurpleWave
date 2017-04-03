@@ -61,7 +61,7 @@
         <entry file="file://$PROJECT_DIR$/src/Information/Grids/Grids.scala">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="205">
-              <caret line="29" column="55" lean-forward="true" selection-start-line="29" selection-start-column="55" selection-end-line="29" selection-end-column="55" />
+              <caret line="29" column="55" lean-forward="false" selection-start-line="29" selection-start-column="55" selection-end-line="29" selection-end-column="55" />
               <folding />
             </state>
           </provider>
@@ -77,11 +77,21 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="GridPsi4x3.scala" pinned="false" current-in-tab="true">
+      <file leaf-file-name="GridPsi4x3.scala" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Information/Grids/Construction/GridPsi4x3.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="312">
-              <caret line="24" column="14" lean-forward="false" selection-start-line="24" selection-start-column="14" selection-end-line="24" selection-end-column="14" />
+            <state relative-caret-position="338">
+              <caret line="26" column="0" lean-forward="true" selection-start-line="26" selection-start-column="0" selection-end-line="26" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Architect.scala" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/Macro/Architect.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="326">
+              <caret line="122" column="54" lean-forward="true" selection-start-line="122" selection-start-column="54" selection-end-line="122" selection-end-column="54" />
               <folding />
             </state>
           </provider>
@@ -182,7 +192,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/Planning/Composition/PositionFinders/Buildings/PositionRefinery.scala" />
         <option value="$PROJECT_DIR$/src/Planning/Composition/PositionFinders/Tactics/PositionChoke.scala" />
         <option value="$PROJECT_DIR$/src/Planning/Composition/PositionFinders/Tactics/PositionEnemyBase.scala" />
         <option value="$PROJECT_DIR$/src/Planning/Composition/PositionFinders/Generic/PositionMiddle.scala" />
@@ -233,6 +242,7 @@
         <option value="$PROJECT_DIR$/src/Information/Grids/Construction/AbstractGridPsi.scala" />
         <option value="$PROJECT_DIR$/src/Information/Grids/Construction/GridPsi2x2and3x2.scala" />
         <option value="$PROJECT_DIR$/src/Information/Grids/Construction/GridPsi4x3.scala" />
+        <option value="$PROJECT_DIR$/src/Macro/Architect.scala" />
       </list>
     </option>
   </component>
@@ -1045,14 +1055,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Macro/Architect.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="224">
-          <caret line="124" column="3" lean-forward="true" selection-start-line="124" selection-start-column="3" selection-end-line="124" selection-end-column="3" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Information/Grids/Movement/GridWalkable.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -1184,7 +1186,7 @@
     <entry file="file://$PROJECT_DIR$/src/Information/Grids/Grids.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="205">
-          <caret line="29" column="55" lean-forward="true" selection-start-line="29" selection-start-column="55" selection-end-line="29" selection-end-column="55" />
+          <caret line="29" column="55" lean-forward="false" selection-start-line="29" selection-start-column="55" selection-end-line="29" selection-end-column="55" />
           <folding />
         </state>
       </provider>
@@ -1223,8 +1225,16 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Information/Grids/Construction/GridPsi4x3.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="312">
-          <caret line="24" column="14" lean-forward="false" selection-start-line="24" selection-start-column="14" selection-end-line="24" selection-end-column="14" />
+        <state relative-caret-position="338">
+          <caret line="26" column="0" lean-forward="true" selection-start-line="26" selection-start-column="0" selection-end-line="26" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Macro/Architect.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="326">
+          <caret line="122" column="54" lean-forward="true" selection-start-line="122" selection-start-column="54" selection-end-line="122" selection-end-column="54" />
           <folding />
         </state>
       </provider>

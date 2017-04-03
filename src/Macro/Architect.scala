@@ -125,7 +125,9 @@ class Architect {
   }
   
   private def rectangleHasRequiredPsi(buildingArea:TileRectangle, buildingType:UnitClass):Boolean = {
-    ! buildingType.requiresPsi || With.game.hasPower(buildingArea.startInclusive, buildingType.baseType)
+    ( ! buildingType.requiresPsi) ||
+    (buildingType.width == 4 && With.grids.psi4x3.get(buildingArea.startInclusive)) ||
+    (buildingType.width <  4 && With.grids.psi2x2and3x2.get(buildingArea.startInclusive))
   }
   
   private def rectangleIsBuildable(

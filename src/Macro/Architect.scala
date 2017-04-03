@@ -11,23 +11,22 @@ import bwapi.TilePosition
 class Architect {
   
   def placeBuilding(
-    buildingType: UnitClass,
-    center:       TilePosition,
-    margin:       Integer = 0,
-    searchRadius: Integer = 40,
-    exclusions:   Iterable[TileRectangle] = List.empty)
+    buildingClass:  UnitClass,
+    center:         TilePosition,
+    margin:         Integer = 0,
+    searchRadius:   Integer = 40,
+    exclusions:     Iterable[TileRectangle] = List.empty)
       :Option[TilePosition] = {
   
     Spiral
       .points(searchRadius)
       .view
       .map(center.add)
-      .find(position => canBuild(buildingType, position, margin, exclusions))
+      .find(position => canBuild(buildingClass, position, margin, exclusions))
   }
   
-  // Try to place a collection of buildings
   def placeBuildings(
-    buildingTypes:      Iterable[UnitClass],
+    buildingClasses:    Iterable[UnitClass],
     center:             TilePosition,
     margin:             Integer                 = 0,
     searchRadius:       Integer                 = 20,
@@ -55,32 +54,32 @@ class Architect {
       .points(searchRadius)
       .view
       .map(center.add)
-      .map(searchPoint => tryBuilding(searchPoint, buildingTypes, margin, searchRadius, exclusions, hypotheticalPylon))
+      .map(searchPoint => tryBuilding(searchPoint, buildingClasses, margin, searchRadius, exclusions, hypotheticalPylon))
       .find(_.isDefined)
       .getOrElse(None)
   }
   
   private def tryBuilding(
     searchPoint:        TilePosition,
-    buildingTypes:      Iterable[UnitClass],
+    buildingClasses:    Iterable[UnitClass],
     margin:             Integer                 = 0,
     searchRadius:       Integer                 = 20,
     exclusions:         Iterable[TileRectangle] = List.empty,
     hypotheticalPylon:  Option[TilePosition]    = None)
       :Option[Iterable[TilePosition]] = {
     
-    val nextBuilding = buildingTypes.head
+    val nextBuilding = buildingClasses.head
     
     if (canBuild(nextBuilding, searchPoint, margin, exclusions, hypotheticalPylon)) {
       val newHypotheticalPylon = if (nextBuilding == Protoss.Pylon) Some(searchPoint) else hypotheticalPylon
       val newExclusions = exclusions ++ List(new TileRectangle(searchPoint, searchPoint.add(nextBuilding.tileSize)))
       
-      if (buildingTypes.size == 1) {
+      if (buildingClasses.size == 1) {
         return Some(List(searchPoint))
       }
       
       val rest = placeBuildings(
-        buildingTypes.drop(1),
+        buildingClasses.drop(1),
         searchPoint,
         margin,
         searchRadius,
@@ -96,26 +95,21 @@ class Architect {
   }
   
   def canBuild(
-    buildingType:       UnitClass,
+    buildingClass:      UnitClass,
     tileTopleft:        TilePosition,
     margin:             Integer                 = 0,
     exclusions:         Iterable[TileRectangle] = List.empty,
     hypotheticalPylon:  Option[TilePosition]    = None)
       :Boolean = {
   
-    val buildingArea = new TileRectangle(
-      tileTopleft,
-      tileTopleft.add(buildingType.tileSize))
-    
-    val marginArea = new TileRectangle(
-      buildingArea.startInclusive.subtract(margin, margin),
-      buildingArea.endExclusive.add(margin, margin))
+    val buildingArea = buildingClass.tileArea.add(tileTopleft)
+    val marginArea = buildingArea.expand(margin, margin)
   
-    tileHasRequiredPsi(tileTopleft, buildingType) &&
-    marginArea.tiles.forall(With.grids.walkable.get)
-    rectangleIsBuildable(buildingArea, buildingType, hypotheticalPylon) &&
+    tileHasRequiredPsi(tileTopleft, buildingClass) &&
+    marginArea.tiles.forall(With.grids.walkable.get) &&
+    rectangleIsBuildable(buildingArea, buildingClass, hypotheticalPylon) &&
     buildingArea.tiles.forall(_.valid) &&
-    exclusions.forall( ! _.intersects(buildingArea)) &&
+    exclusions.forall( ! _.intersects(marginArea)) &&
     rectangleContainsOnlyAWorker(marginArea)
   }
   

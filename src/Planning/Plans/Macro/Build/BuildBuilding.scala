@@ -31,7 +31,7 @@ class BuildBuilding(val buildingClass:UnitClass) extends Plan {
     
   description.set("Build a " + buildingClass)
   
-  override def isComplete: Boolean = building.exists(building => building.complete)
+  override def isComplete: Boolean = building.exists(b => b.alive && b.complete)
   
   def startedBuilding:Boolean = building.isDefined
   
@@ -41,9 +41,9 @@ class BuildBuilding(val buildingClass:UnitClass) extends Plan {
     building = building.filter(_.alive)
     
     if (building.isEmpty && orderedTile.isDefined) {
-        building = With.units.ours
-          .filter(unit => unit.unitClass == buildingClass && unit.tileTopLeft == orderedTile.get)
-          .headOption
+      building = With.units.ours
+        .filter(unit => unit.unitClass == buildingClass && unit.tileTopLeft == orderedTile.get)
+        .headOption
     }
   
     currencyLock.isSpent = building.isDefined
@@ -52,10 +52,10 @@ class BuildBuilding(val buildingClass:UnitClass) extends Plan {
   
     if (building.isEmpty) {
       buildingPlacer.find.foreach(
-      buildingTile => {
-        areaLock.area = Some(buildingClass.tileArea.add(buildingTile))
-        areaLock.acquire(this)
-      })
+        buildingTile => {
+          areaLock.area = Some(buildingClass.tileArea.add(buildingTile))
+          areaLock.acquire(this)
+        })
     }
     
     if (areaLock.satisfied) {

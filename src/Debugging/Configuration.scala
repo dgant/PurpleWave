@@ -19,7 +19,7 @@ class Configuration {
   var enableVisualizationChokepoints        = true
   var enableVisualizationEconomy            = false
   var enableVisualizationGeography          = true
-  var enableVisualizationGrids              = true
+  var enableVisualizationGrids              = false
   var enableVisualizationMovementHeuristics = true
   var enableVisualizationPerformance        = true
   var enableVisualizationPlans              = false

@@ -120,16 +120,16 @@ class Architect {
       trespassingUnits.forall(_.isOurs)
   }
   
-  private def tileHasRequiredPsi(tileTopleft:TilePosition, buildingType:UnitClass):Boolean = {
-    ( ! buildingType.requiresPsi) ||
-    (buildingType.width == 4 && With.grids.psi4x3.get(tileTopleft)) ||
-    (buildingType.width <  4 && With.grids.psi2x2and3x2.get(tileTopleft))
+  private def tileHasRequiredPsi(tileTopleft:TilePosition, buildingClass:UnitClass):Boolean = {
+    ( ! buildingClass.requiresPsi) ||
+    (buildingClass.tileWidth == 4 && With.grids.psi4x3.get(tileTopleft)) ||
+    (buildingClass.tileWidth <  4 && With.grids.psi2x2and3x2.get(tileTopleft))
   }
   
   private def rectangleIsBuildable(
-    area: TileRectangle,
-    buildingType: UnitClass,
-    hypotheticalPylon: Option[TilePosition] = None)
+    area:               TileRectangle,
+    buildingClass:      UnitClass,
+    hypotheticalPylon:  Option[TilePosition] = None)
   :Boolean = {
     //HypotheticalPylon temporarily disabled
     area.tiles.forall(tile => With.grids.buildable.get(tile))

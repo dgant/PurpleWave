@@ -13,7 +13,7 @@ class Configuration {
   var enableFastGroundDistance        = true
   
   var enableVisualization                   = true
-  var enableVisualizationBases              = true
+  var enableVisualizationBases              = false
   var enableVisualizationBattles            = true
   var enableVisualizationBullets            = false
   var enableVisualizationChokepoints        = true

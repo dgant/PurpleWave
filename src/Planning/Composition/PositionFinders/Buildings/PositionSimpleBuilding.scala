@@ -29,7 +29,7 @@ class PositionSimpleBuilding(val buildingClass:UnitClass) extends PositionFinder
       0
     else if (buildingClass.isTownHall)
       0
-    else if (buildingClass == Protoss.Pylon && With.units.ours.count(_.unitClass == buildingClass) < 6)
+    else if (buildingClass == Protoss.Pylon && With.units.ours.count(_.unitClass == buildingClass) < 4)
       3
     else
       1

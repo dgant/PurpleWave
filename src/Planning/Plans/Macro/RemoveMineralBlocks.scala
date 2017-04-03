@@ -7,7 +7,7 @@ import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Composition.UnitMatchers.UnitMatchWorker
 import Planning.Composition.UnitPreferences.UnitPreferClose
 import Planning.Plan
-import Planning.Plans.Allocation.LockUnits
+import Planning.Composition.ResourceLocks.LockUnits
 import Startup.With
 
 class RemoveMineralBlocks extends Plan {
@@ -28,7 +28,7 @@ class RemoveMineralBlocks extends Plan {
     
     val mineral = ourMineralBlocks.head
     miners.get.unitPreference.set(new UnitPreferClose { positionFinder.set(new PositionSpecific(mineral.tileCenter)) } )
-    miners.get.onFrame()
+    miners.get.acquire(this)
     miners.get.units.foreach(unit => With.executor.intend(new Intention(this, unit) { toGather = Some(mineral) }))
   }
 }

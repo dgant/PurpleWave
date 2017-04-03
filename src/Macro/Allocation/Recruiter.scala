@@ -1,6 +1,6 @@
 package Macro.Allocation
 
-import Planning.Plans.Allocation.LockUnits
+import Planning.Composition.ResourceLocks.LockUnits
 import ProxyBwapi.Races.{Protoss, Terran}
 import Startup.With
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -75,8 +75,8 @@ class Recruiter {
     //
     val assignedToLowerPriority = unitsByRequest.keys
       .filter(otherRequest =>
-        With.prioritizer.getPriority(request) <
-          With.prioritizer.getPriority(otherRequest))
+        With.prioritizer.getPriority(request.owner) <
+          With.prioritizer.getPriority(otherRequest.owner))
       .map(getUnits)
     
     val requiredUnits = request.offerUnits(Iterable(unassignedUnits) ++ assignedToLowerPriority)

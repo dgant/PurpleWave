@@ -1,4 +1,4 @@
-package Planning.Plans.Allocation
+package Planning.Composition.ResourceLocks
 
 import Planning.Plan
 import Startup.With
@@ -10,25 +10,25 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 import scala.collection.mutable
 
-class LockUnits extends Plan {
+class LockUnits extends ResourceLock {
   
   val unitMatcher = new Property[UnitMatcher](UnitMatchAnything)
   val unitPreference = new Property[UnitPreference](UnitPreferAnything)
   val unitCounter = new Property[UnitCounter](UnitCountEverything)
   
+  var owner:Plan = null
+  
   var isSatisfied:Boolean = false
-  
-  description.set(
-    if(isComplete)
-      units
-      .groupBy(_.unitClass)
-      .map(pair => pair._1 + " " + pair._2.size)
-      .mkString(", ")
-    else
-      "")
-  
   override def isComplete: Boolean = isSatisfied
-  override def onFrame() = With.recruiter.add(this)
+  override def acquire(plan:Plan) = {
+    owner = plan
+    With.recruiter.add(this)
+  }
+  
+  override def release() {
+    throw new NotImplementedError
+  }
+  
   def units:Set[FriendlyUnitInfo] = With.recruiter.getUnits(this)
   
   def offerUnits(candidates:Iterable[Iterable[FriendlyUnitInfo]]):Option[Iterable[FriendlyUnitInfo]] = {
@@ -45,4 +45,6 @@ class LockUnits extends Plan {
     isSatisfied = unitCounter.get.accept(desiredUnits)
     if (isSatisfied) Some(desiredUnits) else None
   }
+  
+  
 }

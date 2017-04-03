@@ -4,7 +4,7 @@ import Micro.Intentions.Intention
 import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Plan
-import Planning.Plans.Allocation._
+import Planning.Composition.ResourceLocks._
 import ProxyBwapi.Upgrades.Upgrade
 import Startup.With
 
@@ -19,16 +19,15 @@ class ResearchUpgrade(upgrade: Upgrade, level: Int) extends Plan {
   description.set("Upgrade " + upgrade + " " + level)
   
   override def isComplete: Boolean = With.self.getUpgradeLevel(upgrade.baseType) >= level
-  override def getChildren: Iterable[Plan] = List (currency, upgraders)
   
   override def onFrame() {
     if (isComplete) return
     
-    currency.onFrame()
+    currency.acquire(this)
     if (! currency.isComplete) return
     
     currency.isSpent = false
-    upgraders.onFrame()
+    upgraders.acquire(this)
     upgraders.units.foreach(upgrader => {
       currency.isSpent = upgrader.upgrading == upgrade
       With.executor.intend(new Intention(this, upgrader) { toUpgrade = Some(upgrade) })

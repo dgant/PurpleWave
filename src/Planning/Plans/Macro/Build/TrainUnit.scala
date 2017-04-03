@@ -5,7 +5,7 @@ import Micro.Intentions.Intention
 import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Plan
-import Planning.Plans.Allocation.{LockCurrencyForUnit, LockUnits}
+import Planning.Composition.ResourceLocks.{LockCurrencyForUnit, LockUnits}
 import ProxyBwapi.UnitClass.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Startup.With
@@ -24,7 +24,6 @@ class TrainUnit(val traineeClass:UnitClass) extends Plan {
   private var trainee:Option[FriendlyUnitInfo] = None
   
   override def isComplete: Boolean = trainee.exists(p => p.alive && p.complete)
-  override def getChildren: Iterable[Plan] = List(currencyLock, trainerLock)
   
   override def onFrame() {
     if (isComplete) return
@@ -45,9 +44,9 @@ class TrainUnit(val traineeClass:UnitClass) extends Plan {
     }
   
     currencyLock.isSpent = trainee.isDefined || trainer.exists(_.trainingQueue.headOption.exists(_ == traineeClass))
-    currencyLock.onFrame()
+    currencyLock.acquire(this)
     if (currencyLock.isComplete) {
-      trainerLock.onFrame()
+      trainerLock.acquire(this)
       trainer = trainerLock.units.headOption
       if (trainee.isEmpty && trainer.isDefined) {
         With.executor.intend(new Intention(this, trainer.get) { toBuild = Some(traineeClass) })

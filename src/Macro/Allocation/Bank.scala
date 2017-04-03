@@ -1,11 +1,11 @@
 package Macro.Allocation
 
-import Planning.Plans.Allocation.LockCurrency
+import Planning.Composition.ResourceLocks.LockCurrency
 import Startup.With
 
 import scala.collection.mutable
 
-class Banker {
+class Bank {
   private var mineralsLeft  = 0
   private var gasLeft       = 0
   private var supplyLeft    = 0
@@ -17,7 +17,18 @@ class Banker {
   }
   
   def prioritizedRequests:Iterable[LockCurrency] = {
-    requests.toSeq.sortBy(With.prioritizer.getPriority(_))
+    requests.toList.sortBy(request => With.prioritizer.getPriority(request.owner))
+  }
+  
+  def request(request:LockCurrency) {
+    requests.add(request)
+    recountResources()
+  }
+  
+  def release(request:LockCurrency) {
+    request.isSatisfied = false
+    requests.remove(request)
+    recountResources()
   }
   
   private def recountResources() {
@@ -25,17 +36,6 @@ class Banker {
     gasLeft       = With.gas
     supplyLeft    = With.supplyTotal - With.supplyUsed
     prioritizedRequests.foreach(queueBuyer)
-  }
-  
-  def add(request:LockCurrency) {
-    requests.add(request)
-    recountResources()
-  }
-  
-  def remove(request:LockCurrency) {
-    request.isSatisfied = false
-    requests.remove(request)
-    recountResources()
   }
   
   private def queueBuyer(request:LockCurrency) {

@@ -19,7 +19,7 @@ import bwapi.Player
 object With {
   var game:bwapi.Game = null
   var architect:Architect = null
-  var bank:Banker = null
+  var bank:Bank = null
   var camera:AutoCamera = null
   var configuration:Configuration = null
   var battles:Battles = null

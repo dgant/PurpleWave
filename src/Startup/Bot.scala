@@ -39,7 +39,7 @@ class Bot() extends DefaultBWListener {
       BWTA.buildChokeNodes()
       
       With.architect              = new Architect
-      With.bank                   = new Banker
+      With.bank                   = new Bank
       With.camera                 = new AutoCamera
       With.battles                = new Battles
       With.executor               = new Executor

@@ -7,7 +7,7 @@ import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Composition.UnitPreferences.UnitPreferClose
 import Planning.Plan
-import Planning.Plans.Allocation.{LockArea, LockCurrencyForUnit, LockUnits}
+import Planning.Composition.ResourceLocks.{LockArea, LockCurrencyForUnit, LockUnits}
 import ProxyBwapi.UnitClass.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Startup.With
@@ -31,7 +31,6 @@ class BuildBuilding(val buildingClass:UnitClass) extends Plan {
     
   description.set("Build a " + buildingClass)
   
-  override def getChildren: Iterable[Plan] = List(currencyLock, areaLock, builderLock)
   override def isComplete: Boolean = building.exists(building => building.complete)
   
   def startedBuilding:Boolean = building.isDefined
@@ -51,17 +50,17 @@ class BuildBuilding(val buildingClass:UnitClass) extends Plan {
       buildingPlacer.find.foreach(
       buildingTile => {
         areaLock.area = buildingClass.tileArea.add(buildingTile)
-        areaLock.onFrame()
+        areaLock.acquire(this)
       })
     }
   
     currencyLock.isSpent = building.isDefined
-    currencyLock.onFrame()
+    currencyLock.acquire(this)
     
     if (currencyLock.isComplete && areaLock.isComplete) {
         
       if (building.isEmpty || buildingClass.race == Race.Terran) {
-        builderLock.onFrame()
+        builderLock.acquire(this)
       }
       
       if (building.isEmpty && builderLock.isComplete) {

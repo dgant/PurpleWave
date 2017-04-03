@@ -2,7 +2,6 @@ package Debugging.Visualization.Views
 
 import Debugging.Visualization.Rendering.DrawScreen
 import Planning.Plan
-import Planning.Plans.Allocation.{LockCurrency, LockUnits}
 import Startup.With
 
 object VisualizePlans {
@@ -38,7 +37,5 @@ object VisualizePlans {
     leftColumn + " " * Math.max(0, 45 - leftColumn.length) + "\n"
   }
   
-  private def isRelevant(plan:Plan):Boolean = {
-    plan.getChildren.exists(child => isRelevant(child) || ((child.isInstanceOf[LockCurrency] || child.isInstanceOf[LockUnits]) && child.isComplete))
-  }
+  private def isRelevant(plan:Plan):Boolean = true
 }

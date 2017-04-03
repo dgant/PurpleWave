@@ -7,7 +7,7 @@ import Planning.Composition.UnitCounters.UnitCountExactly
 import Planning.Composition.UnitMatchers.UnitMatchMobile
 import Planning.Composition.UnitPreferences.UnitPreferClose
 import Planning.Plan
-import Planning.Plans.Allocation.LockUnits
+import Planning.Composition.ResourceLocks.LockUnits
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Startup.With
 import bwapi.TilePosition
@@ -23,10 +23,9 @@ class FindEnemyBase extends Plan {
   })
   
   override def isComplete: Boolean = With.geography.enemyBases.nonEmpty
-  override def getChildren: Iterable[Plan] = List(scouts.get)
   
   override def onFrame() {
-    scouts.get.onFrame()
+    scouts.get.acquire(this)
     scouts.get.units.foreach(orderScout)
   }
   

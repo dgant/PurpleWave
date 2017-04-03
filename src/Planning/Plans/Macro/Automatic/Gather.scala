@@ -6,7 +6,7 @@ import Performance.Caching.Limiter
 import Planning.Composition.UnitCountEverything
 import Planning.Composition.UnitMatchers.UnitMatchWorker
 import Planning.Plan
-import Planning.Plans.Allocation.LockUnits
+import Planning.Composition.ResourceLocks.LockUnits
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Startup.With
 
@@ -57,7 +57,7 @@ class Gather extends Plan {
   }
   
   private def updateWorkerInformation() = {
-    workers.onFrame()
+    workers.acquire(this)
     allWorkers = workers.units
   }
   

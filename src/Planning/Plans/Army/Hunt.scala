@@ -7,7 +7,7 @@ import Planning.Composition.PositionFinders.Tactics.PositionEnemyBase
 import Planning.Composition.Property
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
-import Planning.Plans.Allocation.LockUnits
+import Planning.Composition.ResourceLocks.LockUnits
 import Startup.With
 import Utilities.EnrichPosition._
 
@@ -18,12 +18,11 @@ class Hunt extends Plan {
   val hunters = new Property[LockUnits](new LockUnits { unitMatcher.set(UnitMatchWarriors) })
   var position = new Property[PositionFinder](new PositionEnemyBase)
   
-  override def getChildren: Iterable[Plan] = List(hunters.get)
   override def onFrame() {
     
     val targetPosition = position.get.find.getOrElse(With.intelligence.mostBaselikeEnemyPosition)
     
-    hunters.get.onFrame()
+    hunters.get.acquire(this)
     if (hunters.get.isComplete) {
       hunters.get.units.foreach(fighter => {
         val targets = With.units.enemy.filter(fighter.canAttackThisSecond)

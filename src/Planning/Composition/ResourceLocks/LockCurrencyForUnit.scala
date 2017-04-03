@@ -1,10 +1,8 @@
-package Planning.Plans.Allocation
+package Planning.Composition.ResourceLocks
 
 import ProxyBwapi.UnitClass.UnitClass
 
 class LockCurrencyForUnit(unitClass: UnitClass) extends LockCurrency {
-  
-  description.set(unitClass.toString)
   
   minerals  = unitClass.mineralPrice
   gas       = unitClass.gasPrice

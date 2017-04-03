@@ -6,7 +6,7 @@ import Planning.Composition.PositionFinders.PositionFinder
 import Planning.Composition.PositionFinders.Tactics.PositionEnemyBase
 import Planning.Composition.Property
 import Planning.Plan
-import Planning.Plans.Allocation.LockUnits
+import Planning.Composition.ResourceLocks.LockUnits
 import Startup.With
 import Utilities.EnrichPosition._
 
@@ -17,7 +17,6 @@ class ControlPosition extends Plan {
   val units = new Property[LockUnits](new LockUnits)
   var positionToControl = new Property[PositionFinder](new PositionEnemyBase)
   
-  override def getChildren: Iterable[Plan] = List(units.get)
   override def onFrame() {
     
     var targetPosition = positionToControl.get.find.get
@@ -35,7 +34,7 @@ class ControlPosition extends Plan {
       targetPosition = infiltrators.map(_.tileCenter).minBy(_.tileDistance(With.geography.home))
     }
     
-    units.get.onFrame()
+    units.get.acquire(this)
     if (units.get.isComplete) {
       units.get.units.foreach(fighter => With.executor.intend(new Intention(this, fighter) { destination = Some(targetPosition) }))
     }

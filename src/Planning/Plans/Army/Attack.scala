@@ -1,7 +1,7 @@
 package Planning.Plans.Army
 
 import Planning.Composition.PositionFinders.Tactics.PositionEnemyBase
-import Planning.Plans.Allocation.LockUnits
+import Planning.Composition.ResourceLocks.LockUnits
 import Planning.Plans.Compound.IfThenElse
 import Planning.Plans.Information.{FindEnemyBase, FoundEnemyBase}
 import Planning.Composition.{Property, UnitCountEverything}

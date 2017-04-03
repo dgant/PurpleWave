@@ -4,7 +4,7 @@ import Planning.Plan
 
 trait ResourceLock {
   
-  def isComplete:Boolean
+  def satisfied:Boolean
   def acquire(plan:Plan)
   def release()
 }

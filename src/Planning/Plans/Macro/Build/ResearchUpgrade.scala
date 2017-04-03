@@ -24,7 +24,7 @@ class ResearchUpgrade(upgrade: Upgrade, level: Int) extends Plan {
     if (isComplete) return
     
     currency.acquire(this)
-    if (! currency.isComplete) return
+    if (! currency.satisfied) return
     
     currency.isSpent = false
     upgraders.acquire(this)

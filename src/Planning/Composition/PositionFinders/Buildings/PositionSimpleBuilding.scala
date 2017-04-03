@@ -1,7 +1,6 @@
 package Planning.Composition.PositionFinders.Buildings
 
 import Geometry.TileRectangle
-import Performance.Caching.Cache
 import Planning.Composition.PositionFinders.PositionFinder
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClass.UnitClass
@@ -10,31 +9,22 @@ import bwapi.TilePosition
 
 class PositionSimpleBuilding(val buildingClass:UnitClass) extends PositionFinder {
   
-  def find: Option[TilePosition] = findCache.get
+  private var lastTile:Option[TilePosition] = None
   
-  private val findCache = new Cache(1, () => recalculate)
-  
-  def recalculate: Option[TilePosition] = {
-    
-    //Short circuit for performance
-    if (buildingClass.requiresPsi && ! With.units.ours.filter(_.complete).exists(_.unitClass == Protoss.Pylon)) {
-      return None
-    }
-  
-    if (stillValid) findCache.get else requestTile
+  def find: Option[TilePosition] = {
+    lastTile = if (lastTileValid) lastTile else requestTile
+    lastTile
   }
   
-  def stillValid:Boolean = {
-    if (findCache.lastValue.isEmpty || findCache.lastValue.get.isEmpty) return false
-    val tile = findCache.lastValue.get.get
-    With.architect.canBuild(
-      buildingClass,
-      tile,
-      maxMargin,
-      exclusions)
-  }
+  def lastTileValid:Boolean =
+    lastTile.exists(tile =>
+      With.architect.canBuild(
+        buildingClass,
+        tile,
+        maxMargin,
+        exclusions))
   
-  def maxMargin:Int = {
+  def maxMargin:Int =
     if (buildingClass.isRefinery)
       0
     else if (buildingClass.isTownHall)
@@ -43,14 +33,19 @@ class PositionSimpleBuilding(val buildingClass:UnitClass) extends PositionFinder
       3
     else
       1
-  }
   
   def exclusions:Iterable[TileRectangle] = {
     With.geography.bases.map(_.harvestingArea) ++
-    With.reservations.requestedAreas.values
+    With.realEstate.reserved
   }
   
   def requestTile:Option[TilePosition] = {
+    
+    // Performance optimization:
+    // Don't waste time looking for a place to put a Gateway when we have no Pylons.
+    if (buildingClass.requiresPsi && ! With.units.ours.filter(_.complete).exists(_.unitClass == Protoss.Pylon)) {
+      return None
+    }
     
     var output:Option[TilePosition] = None
     

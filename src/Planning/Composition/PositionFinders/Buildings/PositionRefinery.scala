@@ -19,7 +19,7 @@ object PositionRefinery extends PositionFinder {
       .map(_.tileArea)
     
     candidateAreas
-      .filter(With.reservations.available)
+      .filter(With.realEstate.available)
       .map(_.startInclusive)
       .headOption
   }

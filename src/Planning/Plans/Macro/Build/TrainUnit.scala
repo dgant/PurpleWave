@@ -45,7 +45,7 @@ class TrainUnit(val traineeClass:UnitClass) extends Plan {
   
     currencyLock.isSpent = trainee.isDefined || trainer.exists(_.trainingQueue.headOption.exists(_ == traineeClass))
     currencyLock.acquire(this)
-    if (currencyLock.isComplete) {
+    if (currencyLock.satisfied) {
       trainerLock.acquire(this)
       trainer = trainerLock.units.headOption
       if (trainee.isEmpty && trainer.isDefined) {

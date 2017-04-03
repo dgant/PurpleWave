@@ -2,7 +2,7 @@ package Debugging
 
 class Configuration {
   
-  val combatEvaluationDistanceTiles   = 16
+  val combatEvaluationDistanceTiles   = 15
   val combatDistancePenalty           = 0.25
   val combatMovementPenalty           = 0.5
   val combatCooldownPenalty           = 0.75
@@ -11,6 +11,25 @@ class Configuration {
   var enablePathRecalculation         = false
   var enableHeuristicTravel           = false
   var enableFastGroundDistance        = true
+  
+  var enableVisualization                   = true
+  var enableVisualizationBases              = true
+  var enableVisualizationBattles            = true
+  var enableVisualizationBullets            = false
+  var enableVisualizationChokepoints        = true
+  var enableVisualizationEconomy            = false
+  var enableVisualizationGeography          = true
+  var enableVisualizationGrids              = false
+  var enableVisualizationMovementHeuristics = true
+  var enableVisualizationPerformance        = true
+  var enableVisualizationPlans              = false
+  var enableVisualizationResources          = true
+  var enableVisualizationRealEstate         = true
+  var enableVisualizationScheduler          = true
+  var enableVisualizationTextOnly           = false
+  var enableVisualizationUnitsForeign       = true
+  var enableVisualizationUnitsOurs          = true
+  var enableVisualizationVectorUnits        = false
   
   var gameSpeed                         = 0
   var enableStdOut                      = false
@@ -21,23 +40,4 @@ class Configuration {
   var cameraDynamicSpeed                = false
   var cameraDynamicSpeedSlowest         = 30
   var cameraDynamicSpeedFastest         = 0
-  
-  var enableVisualization                   = true
-  var enableVisualizationBases              = true
-  var enableVisualizationBattles            = true
-  var enableVisualizationBullets            = false
-  var enableVisualizationChokepoints        = true
-  var enableVisualizationEconomy            = false
-  var enableVisualizationGrids              = false
-  var enableVisualizationMovementHeuristics = true
-  var enableVisualizationPerformance        = true
-  var enableVisualizationPlans              = false
-  var enableVisualizationResources          = true
-  var enableVisualizationScheduler          = true
-  var enableVisualizationGeography          = true
-  var enableVisualizationTextOnly           = false
-  var enableVisualizationUnitsForeign       = true
-  var enableVisualizationUnitsOurs          = true
-  var enableVisualizationVectorUnits        = false
-  var enableVisualizationReservations       = true
 }

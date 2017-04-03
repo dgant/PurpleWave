@@ -57,13 +57,13 @@ class BuildBuilding(val buildingClass:UnitClass) extends Plan {
     currencyLock.isSpent = building.isDefined
     currencyLock.acquire(this)
     
-    if (currencyLock.isComplete && areaLock.isComplete) {
+    if (currencyLock.satisfied && areaLock.satisfied) {
         
       if (building.isEmpty || buildingClass.race == Race.Terran) {
         builderLock.acquire(this)
       }
       
-      if (building.isEmpty && builderLock.isComplete) {
+      if (building.isEmpty && builderLock.satisfied) {
         orderedTile = Some(areaLock.area.startInclusive)
         With.executor.intend(
           new Intention(this, builderLock.units.head) {
@@ -77,7 +77,7 @@ class BuildBuilding(val buildingClass:UnitClass) extends Plan {
   override def drawOverlay() {
     if (isComplete) return
     if ( ! orderedTile.isDefined) return
-    if ( ! areaLock.isComplete) return
+    if ( ! areaLock.satisfied) return
     DrawMap.box(
       buildingClass.tileArea.startInclusive.add(orderedTile.get).topLeftPixel,
       buildingClass.tileArea.endExclusive.add(orderedTile.get).topLeftPixel,

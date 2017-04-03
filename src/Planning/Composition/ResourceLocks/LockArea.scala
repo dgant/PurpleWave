@@ -11,13 +11,15 @@ class LockArea extends ResourceLock {
   
   private var isSatisfied = false
   
-  override def isComplete:Boolean = isSatisfied
+  override def satisfied:Boolean = isSatisfied
+  
   override def acquire(plan: Plan) = {
     owner = plan
-    isSatisfied = With.reservations.request(plan, area)
+    isSatisfied = With.realEstate.request(this)
   }
   
-  override def release {
-    throw new NotImplementedError
+  override def release() {
+    With.realEstate.release(this)
+    isSatisfied = false
   }
 }

@@ -17,7 +17,7 @@ object PositionTownHall extends PositionFinder {
       .map(base => base.townHallArea)
       .filter(townHallArea =>
         townHallArea.tiles.forall(With.grids.buildable.get) &&
-        With.reservations.available(townHallArea))
+        With.realEstate.available(townHallArea))
       .map(_.startInclusive)
   
     if (candidates.isEmpty) return None

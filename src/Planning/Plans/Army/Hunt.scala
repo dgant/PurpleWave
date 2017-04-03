@@ -23,7 +23,7 @@ class Hunt extends Plan {
     val targetPosition = position.get.find.getOrElse(With.intelligence.mostBaselikeEnemyPosition)
     
     hunters.get.acquire(this)
-    if (hunters.get.isComplete) {
+    if (hunters.get.satisfied) {
       hunters.get.units.foreach(fighter => {
         val targets = With.units.enemy.filter(fighter.canAttackThisSecond)
         val targetDestination =

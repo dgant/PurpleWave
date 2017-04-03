@@ -28,7 +28,7 @@ object Visualization {
       if (With.configuration.enableVisualizationMovementHeuristics) VisualizeMovementHeuristics   .render()
       if (With.configuration.enableVisualizationUnitsForeign)       VisualizeUnitsForeign         .render()
       if (With.configuration.enableVisualizationUnitsOurs)          VisualizeUnitsOurs            .render()
-      if (With.configuration.enableVisualizationReservations)       VisualizeReservations         .render()
+      if (With.configuration.enableVisualizationRealEstate)         VisualizeRealEstate           .render()
       if (With.configuration.enableVisualizationBattles)            VisualizeBattles              .render()
       if (With.configuration.enableVisualizationBases)              VisualizeBases                .render()
       if (With.configuration.enableVisualizationBullets)            VisualizeBullets              .render()

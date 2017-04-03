@@ -12,7 +12,7 @@ class LockCurrency extends ResourceLock {
   var isSatisfied = false
   var owner:Plan  = null
   
-  override def isComplete:Boolean = isSatisfied
+  override def satisfied:Boolean = isSatisfied
   override def acquire(plan:Plan) {
     owner = plan
     With.bank.request(this)

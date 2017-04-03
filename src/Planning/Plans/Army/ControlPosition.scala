@@ -35,7 +35,7 @@ class ControlPosition extends Plan {
     }
     
     units.get.acquire(this)
-    if (units.get.isComplete) {
+    if (units.get.satisfied) {
       units.get.units.foreach(fighter => With.executor.intend(new Intention(this, fighter) { destination = Some(targetPosition) }))
     }
   }

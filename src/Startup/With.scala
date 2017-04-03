@@ -35,12 +35,12 @@ object With {
   var paths:Paths = null
   var performance:Performance = null
   var prioritizer:Prioritizer = null
+  var realEstate:RealEstate = null
   var recruiter:Recruiter = null
   var scheduler:Scheduler = null
   var movementHeuristicViews:MovementHeuristicViews = null
   var units: UnitTracker = null
-  var viewport: Viewport = null
-  var reservations: Reservations = null
+  var viewport:Viewport = null
   
   var self:Player = null
   var neutral:Player = null

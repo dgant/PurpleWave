@@ -24,7 +24,7 @@ class ResearchTech(tech: Tech) extends Plan {
     if (isComplete) return
     
     currency.acquire(this)
-    if (! currency.isComplete) return
+    if (! currency.satisfied) return
   
     currency.isSpent = false
     techers.acquire(this)

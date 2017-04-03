@@ -8,10 +8,8 @@ import Utilities.EnrichPosition._
 
 object VisualizeGrids {
   def render() {
-    renderGridArray(With.grids.dpsEnemyAirNormal,       0, 0)
-    renderGridArray(With.grids.dpsEnemyAirExplosive,    1, 0)
-    renderGridArray(With.grids.dpsEnemyGroundNormal,    0, 1)
-    renderGridArray(With.grids.dpsEnemyGroundExplosive, 1, 1)
+    renderGridArray(With.grids.psi2x2and3x2,  0, 0)
+    renderGridArray(With.grids.psi4x3,        0, 1)
   }
   
   private def renderGridArray[T](map:AbstractGridArray[T], offsetX:Int=0, offsetY:Int=0) {

@@ -6,7 +6,7 @@ import Startup.With
 object VisualizeResources {
   def render() {
     DrawScreen.column(
-      305,
+      455,
       31,
       With.bank.prioritizedRequests
         .take(20)

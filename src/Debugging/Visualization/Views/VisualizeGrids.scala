@@ -1,8 +1,8 @@
 package Debugging.Visualization.Views
 
 import Debugging.Visualization.Rendering.DrawMap
-import Information.Grids.Abstract.ArrayTypes.GridArray
-import Information.Grids.Abstract.Grid
+import Information.Grids.ArrayTypes.AbstractGridArray
+import Information.Grids.AbstractGrid
 import Startup.With
 import Utilities.EnrichPosition._
 
@@ -14,7 +14,7 @@ object VisualizeGrids {
     renderGridArray(With.grids.dpsEnemyGroundExplosive, 1, 1)
   }
   
-  private def renderGridArray[T](map:GridArray[T], offsetX:Int=0, offsetY:Int=0) {
+  private def renderGridArray[T](map:AbstractGridArray[T], offsetX:Int=0, offsetY:Int=0) {
     With.geography.allTiles
       .filterNot(tilePosition => map.get(tilePosition) == map.defaultValue)
       .foreach(tilePosition => DrawMap.text(
@@ -22,7 +22,7 @@ object VisualizeGrids {
         map.repr(map.get(tilePosition))))
   }
   
-  private def renderGrid[T](map:Grid[T], offsetX:Int=0, offsetY:Int=0) {
+  private def renderGrid[T](map:AbstractGrid[T], offsetX:Int=0, offsetY:Int=0) {
     With.geography.allTiles
       .foreach(tilePosition => DrawMap.text(
         tilePosition.toPosition.add(offsetX*16, offsetY*13),

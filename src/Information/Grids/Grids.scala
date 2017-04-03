@@ -1,10 +1,9 @@
 package Information.Grids
 
-import Information.Grids.Concrete.Construction.{GridBuildable, GridBuildableTerrain}
-import Information.Grids.Concrete.Dps._
-import Information.Grids.Concrete.Movement.{GridMobility, GridWalkable, GridWalkableTerrain, GridWalkableUnits}
-import Information.Grids.Concrete.Vision.{GridAltitudeBonus, GridEnemyDetection, GridEnemyVision}
-import Information.Grids.Concrete.{GridUnits, _}
+import Information.Grids.Construction.{GridBuildable, GridBuildableTerrain, GridPsi2x2and3x2, GridPsi4x3}
+import Information.Grids.Dps._
+import Information.Grids.Movement.{GridMobility, GridWalkable, GridWalkableTerrain, GridWalkableUnits}
+import Information.Grids.Vision.{GridAltitudeBonus, GridEnemyDetection, GridEnemyVision}
 import Performance.Caching.Limiter
 
 class Grids {
@@ -22,6 +21,8 @@ class Grids {
   val dpsEnemyGroundExplosive   = new GridDpsEnemyGroundExplosive
   val dpsEnemyGroundNormal      = new GridDpsEnemyGroundNormal
   val enemyVision               = new GridEnemyVision
+  val gridPsi2x2and3x2          = new GridPsi2x2and3x2
+  val gridPsi4x3                = new GridPsi4x3
   val mobility                  = new GridMobility
   val units                     = new GridUnits
   val walkable                  = new GridWalkable
@@ -35,14 +36,16 @@ class Grids {
     List(
       altitudeBonus,
       units,
-      enemyDetection,
       dpsEnemyAirConcussive,
       dpsEnemyAirExplosive,
       dpsEnemyAirNormal,
       dpsEnemyGroundConcussive,
       dpsEnemyGroundExplosive,
       dpsEnemyGroundNormal,
+      enemyDetection,
       enemyVision,
+      gridPsi2x2and3x2,
+      gridPsi4x3,
       buildable,
       buildableTerrain,
       walkable,

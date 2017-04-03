@@ -2,7 +2,7 @@ package Planning.Plans.Macro.Build
 
 import Debugging.Visualization.Rendering.DrawMap
 import Micro.Intentions.Intention
-import Planning.Composition.PositionFinders.PositionSimpleBuilding
+import Planning.Composition.PositionFinders.Buildings.PositionArbitraryBuilding
 import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Composition.UnitPreferences.UnitPreferClose
@@ -16,19 +16,18 @@ import bwapi.{Race, TilePosition}
 
 class BuildBuilding(val buildingClass:UnitClass) extends Plan {
   
-  val buildingPlacer = new PositionSimpleBuilding(buildingClass)
+  val buildingPlacer = new PositionArbitraryBuilding(buildingClass)
   val areaLock = new LockArea
   val currencyLock = new LockCurrencyForUnit(buildingClass)
   val builderLock = new LockUnits {
     description.set("Get a builder")
     unitCounter.set(UnitCountOne)
     unitMatcher.set(new UnitMatchType(buildingClass.whatBuilds._1))
-    unitPreference.set(new UnitPreferClose { positionFinder.set(buildingPlacer)})
+    unitPreference.set(new UnitPreferClose { positionFinder.set(buildingPlacer) })
   }
-  
   private var builder:Option[FriendlyUnitInfo] = None
   private var building:Option[FriendlyUnitInfo] = None
-  private var tile:Option[TilePosition] = None
+  private var orderedTile:Option[TilePosition] = None
     
   description.set("Build a " + buildingClass)
   
@@ -40,59 +39,53 @@ class BuildBuilding(val buildingClass:UnitClass) extends Plan {
   override def onFrame() {
     if (isComplete) return
     
-    // Building dead? Forget we had one.
-    // Have a position but no building? Check for buildings.
-    // Started building? Don't change position.
-    // No building? Update the position.
-    
     building = building.filter(_.alive)
     
-    if (building.isEmpty && tile.isDefined)
-      building = With.units.ours
-        .filter(unit => unit.unitClass == buildingClass && unit.tileTopLeft == tile.get)
-        .headOption
+    if (building.isEmpty && orderedTile.isDefined) {
+        building = With.units.ours
+          .filter(unit => unit.unitClass == buildingClass && unit.tileTopLeft == orderedTile.get)
+          .headOption
+    }
+  
+    if (building.isEmpty) {
+      buildingPlacer.find.foreach(
+      buildingTile => {
+        areaLock.area = buildingClass.tileArea.add(buildingTile)
+        areaLock.onFrame()
+      })
+    }
   
     currencyLock.isSpent = building.isDefined
     currencyLock.onFrame()
     
-    tile = if (building.isDefined) tile else buildingPlacer.find
-    if (tile.isEmpty) return
-  
-    areaLock.area = buildingClass.tileArea.add(tile.get)
-  
-    //TODO: Terran: Complete incomplete buildings
-    
-    if (currencyLock.isComplete) {
-      areaLock.onFrame()
-      if (areaLock.isComplete) {
+    if (currencyLock.isComplete && areaLock.isComplete) {
         
       if (building.isEmpty || buildingClass.race == Race.Terran) {
         builderLock.onFrame()
       }
       
-      if (building.isEmpty) {
-        builderLock.units.foreach(
-          unit => With.executor.intend(
-            new Intention(this, unit) {
-              toBuild = Some(buildingClass)
-              destination = tile
-            }))
-        }
+      if (building.isEmpty && builderLock.isComplete) {
+        orderedTile = Some(areaLock.area.startInclusive)
+        With.executor.intend(
+          new Intention(this, builderLock.units.head) {
+            toBuild = Some(buildingClass)
+            destination = orderedTile
+          })
       }
     }
   }
   
   override def drawOverlay() {
     if (isComplete) return
-    if ( ! tile.isDefined) return
+    if ( ! orderedTile.isDefined) return
     if ( ! areaLock.isComplete) return
     DrawMap.box(
-      buildingClass.tileArea.startInclusive.add(tile.get).topLeftPixel,
-      buildingClass.tileArea.endExclusive.add(tile.get).topLeftPixel,
+      buildingClass.tileArea.startInclusive.add(orderedTile.get).topLeftPixel,
+      buildingClass.tileArea.endExclusive.add(orderedTile.get).topLeftPixel,
       DrawMap.playerColorDark(With.self))
     DrawMap.label(
       "Building a " + buildingClass.toString,
-      tile.get.toPosition,
+      orderedTile.get.toPosition,
       drawBackground = true,
       DrawMap.playerColorDark(With.self))
   }

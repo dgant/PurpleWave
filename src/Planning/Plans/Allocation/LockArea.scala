@@ -4,7 +4,7 @@ import Geometry.{Positions, TileRectangle}
 import Planning.Plan
 import Startup.With
 
-class LockArea extends Plan {
+class LockArea() extends Plan {
   
   description.set("Reserve an area")
   

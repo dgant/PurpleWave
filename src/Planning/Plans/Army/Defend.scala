@@ -1,6 +1,6 @@
 package Planning.Plans.Army
 
-import Planning.Composition.PositionFinders.PositionChoke
+import Planning.Composition.PositionFinders.Tactics.PositionChoke
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 
 class Defend extends ControlPosition {

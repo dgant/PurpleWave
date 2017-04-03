@@ -16,7 +16,7 @@ class Intelligence {
       .sortBy(unit => ! unit.unitClass.isTownHall)
       .map(_.tileCenter)
       .headOption
-      .getOrElse(leastScoutedBases.head.townHallRectangle.midpoint))
+      .getOrElse(leastScoutedBases.head.townHallArea.midpoint))
   
   def leastScoutedBases:Iterable[Base] = leastScoutedBasesCache.get
   private val leastScoutedBasesCache = new CacheFrame(() =>

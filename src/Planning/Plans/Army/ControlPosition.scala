@@ -2,7 +2,8 @@ package Planning.Plans.Army
 
 import Debugging.Visualization.Rendering.DrawMap
 import Micro.Intentions.Intention
-import Planning.Composition.PositionFinders.{PositionEnemyBase, PositionFinder}
+import Planning.Composition.PositionFinders.PositionFinder
+import Planning.Composition.PositionFinders.Tactics.PositionEnemyBase
 import Planning.Composition.Property
 import Planning.Plan
 import Planning.Plans.Allocation.LockUnits
@@ -21,7 +22,7 @@ class ControlPosition extends Plan {
     
     var targetPosition = positionToControl.get.find.get
     
-    val ourBases = With.geography.ourBases.map(_.townHallRectangle.midPixel)
+    val ourBases = With.geography.ourBases.map(_.townHallArea.midPixel)
     val infiltrators = With.units.enemy
       .filter(e =>
         e.possiblyStillThere &&

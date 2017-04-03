@@ -48,8 +48,8 @@ class BuildEnoughPylons extends Plan {
   
     val supplySpentBeforeDepotCompletion  = supplyUsedPerFrame * depotCompletionFrames
     val supplyUsedWhenDepotWouldFinish    = currentSupplyUsed + supplySpentBeforeDepotCompletion
-    val additionalDepotsRequired          = Math.ceil((supplyUsedWhenDepotWouldFinish - currentSupplyOfNexus) / supplyPerDepot).toInt
-    val pylonsRequired                    = Math.max(0, additionalDepotsRequired)
+    val totalPylonsRequired               = Math.ceil((supplyUsedWhenDepotWouldFinish - currentSupplyOfNexus) / supplyPerDepot).toInt
+    val pylonsRequired                    = Math.max(0, totalPylonsRequired)
   
     return pylonsRequired
   }

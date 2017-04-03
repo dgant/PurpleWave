@@ -33,12 +33,11 @@ class Recruiter {
     //test
   }
   
-  val ineligibleUnits = Set(Protoss.Interceptor, Protoss.Scarab, Terran.SpiderMine)
-  private def isEligible(unit:FriendlyUnitInfo):Boolean = {
+  val ineligibleClasses = Set(Protoss.Interceptor, Protoss.Scarab, Terran.SpiderMine)
+  private def isEligible(unit:FriendlyUnitInfo):Boolean =
     unit.alive &&
     unit.complete &&
-    ! ineligibleUnits.contains(unit.unitClass)
-  }
+    ! ineligibleClasses.contains(unit.unitClass)
   
   private def test {
     unitsByRequest.foreach(pair1 =>

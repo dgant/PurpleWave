@@ -3,7 +3,7 @@ package Geometry
 import bwapi.{Position, TilePosition}
 import Utilities.EnrichPosition._
 
-class TileRectangle(
+case class TileRectangle(
  val startInclusive:TilePosition,
  val endExclusive:TilePosition) {
   

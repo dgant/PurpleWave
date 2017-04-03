@@ -9,7 +9,7 @@ object VisualizeResources {
       305,
       31,
       With.bank.prioritizedRequests
-        .take(8)
+        .take(20)
         .map(r =>
           (if (r.isSatisfied) "X " else "  ") ++
             (if (r.minerals > 0)  r.minerals  .toString ++ "m " else "") ++

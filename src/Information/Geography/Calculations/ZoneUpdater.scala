@@ -27,7 +27,7 @@ object ZoneUpdater {
       .filter(townHall => base.zone.contains(townHall.pixelCenter))
     
     if (townHalls.nonEmpty) {
-      base.townHall = Some(townHalls.minBy(_.tileDistance(base.townHallRectangle.midpoint)))
+      base.townHall = Some(townHalls.minBy(_.tileDistance(base.townHallArea.midpoint)))
     }
   }
   
@@ -44,6 +44,6 @@ object ZoneUpdater {
   
     base.mineralsLeft   = base.minerals.filter(_.alive).toList.map(_.mineralsLeft).sum
     base.gasLeft        = base.gas.filter(_.alive).toList.map(_.gasLeft).sum
-    base.harvestingArea = (List(base.townHallRectangle) ++ (base.minerals ++ base.gas).map(_.tileArea)).boundary
+    base.harvestingArea = (List(base.townHallArea) ++ (base.minerals ++ base.gas).map(_.tileArea)).boundary
   }
 }

@@ -1,7 +1,7 @@
 package Planning.Plans.Macro
 
 import Micro.Intentions.Intention
-import Planning.Composition.PositionFinders.PositionSpecific
+import Planning.Composition.PositionFinders.Generic.PositionSpecific
 import Planning.Composition.Property
 import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Composition.UnitMatchers.UnitMatchWorker

@@ -30,6 +30,10 @@ class Reservations {
     return approved
   }
   
+  def available(rectangle:TileRectangle):Boolean = {
+    ! requestedAreas.values.exists(_.intersects(rectangle))
+  }
+  
   def remove(plan:Plan) {
     requestsUpdated.remove(plan)
     requestedAreas.remove(plan)

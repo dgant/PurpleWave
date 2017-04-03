@@ -1,13 +1,14 @@
 package Planning.Composition.UnitPreferences
 
-import Planning.Composition.PositionFinders.{PositionCenter, PositionFinder}
+import Planning.Composition.PositionFinders.Generic.PositionMiddle
+import Planning.Composition.PositionFinders.PositionFinder
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Planning.Composition.Property
 import Utilities.EnrichPosition._
 
 class UnitPreferClose extends UnitPreference {
   
-  val positionFinder = new Property[PositionFinder](PositionCenter)
+  val positionFinder = new Property[PositionFinder](PositionMiddle)
   
   override def preference(unit: FriendlyUnitInfo): Double = {
     positionFinder.get.find

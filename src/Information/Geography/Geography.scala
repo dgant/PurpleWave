@@ -45,12 +45,12 @@ class Geography {
       .toList
       .sortBy( ! _.isStartLocation)
       .headOption
-      .map(_.townHallRectangle.startInclusive)
+      .map(_.townHallArea.startInclusive)
       .getOrElse(Positions.tileMiddle))
   
   def onFrame() {
     zoneUpdateLimiter.act()
-    bases.filter(base => With.game.isVisible(base.townHallRectangle.midpoint)).foreach(base => base.lastScoutedFrame = With.frame)
+    bases.filter(base => With.game.isVisible(base.townHallArea.midpoint)).foreach(base => base.lastScoutedFrame = With.frame)
   }
   
   private val zoneCache         = new CacheForever(() => ZoneBuilder.build)

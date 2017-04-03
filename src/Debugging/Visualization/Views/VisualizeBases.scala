@@ -11,7 +11,7 @@ object VisualizeBases {
       
       zone.bases.foreach(base => {
         DrawMap.tileRectangle(base.harvestingArea,    Colors.DarkGreen)
-        DrawMap.tileRectangle(base.townHallRectangle, DrawMap.playerColorDark(base.zone.owner))
+        DrawMap.tileRectangle(base.townHallArea, DrawMap.playerColorDark(base.zone.owner))
         DrawMap.labelBox(
           List(
             base.zone.owner.getName,
@@ -25,7 +25,7 @@ object VisualizeBases {
               + " vs "
               + VisualizeBattles.formatStrength(With.battles.byZone(zone).enemy.strength)
           ),
-          base.townHallRectangle.midPixel,
+          base.townHallArea.midPixel,
           true,
           DrawMap.playerColorDark(base.zone.owner))
       })

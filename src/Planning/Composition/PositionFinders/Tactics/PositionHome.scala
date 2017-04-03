@@ -1,5 +1,6 @@
-package Planning.Composition.PositionFinders
+package Planning.Composition.PositionFinders.Tactics
 
+import Planning.Composition.PositionFinders.PositionFinder
 import Startup.With
 import bwapi.TilePosition
 

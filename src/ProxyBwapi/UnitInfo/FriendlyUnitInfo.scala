@@ -1,9 +1,9 @@
 package ProxyBwapi.UnitInfo
 
 import ProxyBwapi.Techs.{Tech, Techs}
+import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
 import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
 import Startup.With
-import bwapi._
 
 import scala.collection.JavaConverters._
 
@@ -30,10 +30,10 @@ class FriendlyUnitInfo(base:bwapi.Unit) extends FriendlyUnitProxy(base) {
   // Orders //
   ////////////
   
-  def getBuildUnit  : Option[UnitInfo]   = With.units.get(base.getBuildUnit)
-  def trainingQueue : Iterable[UnitType] = base.getTrainingQueue.asScala
-  def teching       : Tech               = Techs.get(base.getTech)
-  def upgrading     : Upgrade            = Upgrades.get(base.getUpgrade)
+  def getBuildUnit  : Option[UnitInfo]    = With.units.get(base.getBuildUnit)
+  def trainingQueue : Iterable[UnitClass] = base.getTrainingQueue.asScala.map(UnitClasses.get)
+  def teching       : Tech                = Techs.get(base.getTech)
+  def upgrading     : Upgrade             = Upgrades.get(base.getUpgrade)
   
   ////////////////
   // Visibility //

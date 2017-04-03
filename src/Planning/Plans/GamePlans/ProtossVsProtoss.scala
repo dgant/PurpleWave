@@ -5,7 +5,7 @@ import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plans.Army.{Attack, Defend}
 import Planning.Plans.Compound.{IfThenElse, Parallel}
 import Planning.Plans.Information.ScoutAt
-import Planning.Plans.Macro.Automatic.{BuildEnoughPylons, TrainContinuously, TrainProbesContinuously}
+import Planning.Plans.Macro.Automatic.{BuildEnoughPylons, TrainContinuously, TrainGatewayUnitsContinuously, TrainProbesContinuously}
 import Planning.Plans.Macro.BuildOrders.ScheduleBuildOrder
 import Planning.Plans.Macro.UnitCount.UnitCountAtLeast
 import ProxyBwapi.Races.Protoss
@@ -20,11 +20,11 @@ class ProtossVsProtoss extends Parallel {
   val _fourGateGoonsSimplifiedStart = List[BuildRequest] (
     new RequestUnitAnotherOne(Protoss.Nexus),
     new RequestUnitAnother(8, Protoss.Probe),
-    new RequestUnitAnotherOne(Protoss.Pylon), //8
+    new RequestUnitAtLeast(1, Protoss.Pylon), //8
     new RequestUnitAnother(2, Protoss.Probe),
-    new RequestUnitAnotherOne(Protoss.Gateway), //10
+    new RequestUnitAtLeast(1, Protoss.Gateway), //8
     new RequestUnitAnother(2, Protoss.Probe),
-    new RequestUnitAnotherOne(Protoss.Pylon), //12
+    new RequestUnitAtLeast(2, Protoss.Pylon), //8
     new RequestUnitAnotherOne(Protoss.Probe),
     new RequestUnitAnotherOne(Protoss.Zealot), //13
     new RequestUnitAnotherOne(Protoss.Probe),
@@ -34,7 +34,7 @@ class ProtossVsProtoss extends Parallel {
     new RequestUnitAnotherOne(Protoss.Probe)
   )
   
-  val _fourGateGoonsSimplified = List[BuildRequest] (
+  val _fourGateGoonsSimplifiedEnd = List[BuildRequest] (
     new RequestUpgrade(Protoss.DragoonRange),
     new RequestUnitAtLeast(4, Protoss.Gateway),
     new RequestUnitAnotherOne(Protoss.Nexus)
@@ -107,9 +107,8 @@ class ProtossVsProtoss extends Parallel {
     new BuildEnoughPylons,
     new TrainProbesContinuously,
     new TrainContinuously(Protoss.Reaver),
-    new TrainContinuously(Protoss.Dragoon),
-    new TrainContinuously(Protoss.Zealot),
-    new ScheduleBuildOrder { buildables.set(_fourGateGoonsSimplified) },
+    new TrainGatewayUnitsContinuously,
+    new ScheduleBuildOrder { buildables.set(_fourGateGoonsSimplifiedEnd) },
     new ScheduleBuildOrder { buildables.set(_twoBaseBuild) },
     new ScoutAt(10),
     new IfThenElse {

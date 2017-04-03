@@ -1,4 +1,4 @@
-package Information.Grids.Concrete
+package Information.Grids.Concrete.Construction
 
 import Information.Grids.Abstract.ArrayTypes.GridBoolean
 import Startup.With

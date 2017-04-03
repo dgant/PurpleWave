@@ -1,4 +1,4 @@
-package Information.Grids.Concrete
+package Information.Grids.Concrete.Vision
 
 import Geometry.Shapes.Circle
 import Information.Grids.Abstract.ArrayTypes.GridBoolean

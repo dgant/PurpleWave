@@ -1,6 +1,9 @@
 package Information.Grids
 
+import Information.Grids.Concrete.Construction.{GridBuildable, GridBuildableTerrain}
 import Information.Grids.Concrete.Dps._
+import Information.Grids.Concrete.Movement.{GridMobility, GridWalkable, GridWalkableTerrain, GridWalkableUnits}
+import Information.Grids.Concrete.Vision.{GridAltitudeBonus, GridEnemyDetection, GridEnemyVision}
 import Information.Grids.Concrete.{GridUnits, _}
 import Performance.Caching.Limiter
 

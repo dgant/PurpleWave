@@ -1,4 +1,4 @@
-package Information.Grids.Concrete
+package Information.Grids.Concrete.Movement
 
 import Geometry.Shapes.Square
 import Information.Grids.Abstract.ArrayTypes.GridBoolean

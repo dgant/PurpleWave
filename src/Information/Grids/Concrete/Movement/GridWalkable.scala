@@ -1,4 +1,4 @@
-package Information.Grids.Concrete
+package Information.Grids.Concrete.Movement
 
 import Information.Grids.Abstract.Grid
 import Startup.With

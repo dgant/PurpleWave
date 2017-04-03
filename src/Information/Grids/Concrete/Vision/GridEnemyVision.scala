@@ -1,4 +1,4 @@
-package Information.Grids.Concrete
+package Information.Grids.Concrete.Vision
 
 import Information.Grids.Abstract.GridVision
 import ProxyBwapi.UnitInfo.UnitInfo

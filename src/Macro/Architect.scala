@@ -97,24 +97,26 @@ class Architect {
   
   def canBuild(
     buildingType:       UnitClass,
-    tile:               TilePosition,
+    tileTopleft:        TilePosition,
     margin:             Integer                 = 0,
     exclusions:         Iterable[TileRectangle] = List.empty,
     hypotheticalPylon:  Option[TilePosition]    = None)
       :Boolean = {
   
-    val buildingArea = new TileRectangle(tile, tile.add(buildingType.tileSize))
+    val buildingArea = new TileRectangle(
+      tileTopleft,
+      tileTopleft.add(buildingType.tileSize))
     
     val marginArea = new TileRectangle(
       buildingArea.startInclusive.subtract(margin, margin),
       buildingArea.endExclusive.add(margin, margin))
-    
+  
+    tileHasRequiredPsi(tileTopleft, buildingType) &&
+    marginArea.tiles.forall(With.grids.walkable.get)
+    rectangleIsBuildable(buildingArea, buildingType, hypotheticalPylon) &&
     buildingArea.tiles.forall(_.valid) &&
     exclusions.forall( ! _.intersects(buildingArea)) &&
-    rectangleHasRequiredPsi(buildingArea, buildingType) &&
-    rectangleIsBuildable(buildingArea, buildingType, hypotheticalPylon) &&
-    rectangleContainsOnlyAWorker(marginArea) &&
-    marginArea.tiles.forall(With.grids.walkable.get)
+    rectangleContainsOnlyAWorker(marginArea)
   }
   
   private def rectangleContainsOnlyAWorker(rectangle: TileRectangle):Boolean = {
@@ -124,17 +126,16 @@ class Architect {
       trespassingUnits.forall(_.isOurs)
   }
   
-  private def rectangleHasRequiredPsi(buildingArea:TileRectangle, buildingType:UnitClass):Boolean = {
+  private def tileHasRequiredPsi(tileTopleft:TilePosition, buildingType:UnitClass):Boolean = {
     ( ! buildingType.requiresPsi) ||
-    (buildingType.width == 4 && With.grids.psi4x3.get(buildingArea.startInclusive)) ||
-    (buildingType.width <  4 && With.grids.psi2x2and3x2.get(buildingArea.startInclusive))
+    (buildingType.width == 4 && With.grids.psi4x3.get(tileTopleft)) ||
+    (buildingType.width <  4 && With.grids.psi2x2and3x2.get(tileTopleft))
   }
   
   private def rectangleIsBuildable(
     area: TileRectangle,
     buildingType: UnitClass,
-    hypotheticalPylon:
-    Option[TilePosition] = None)
+    hypotheticalPylon: Option[TilePosition] = None)
   :Boolean = {
     //HypotheticalPylon temporarily disabled
     area.tiles.forall(tile => With.grids.buildable.get(tile))

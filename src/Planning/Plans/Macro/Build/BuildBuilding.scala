@@ -46,25 +46,26 @@ class BuildBuilding(val buildingClass:UnitClass) extends Plan {
           .headOption
     }
   
+    currencyLock.isSpent = building.isDefined
+    currencyLock.acquire(this)
+    if ( ! currencyLock.satisfied) return
+  
     if (building.isEmpty) {
       buildingPlacer.find.foreach(
       buildingTile => {
-        areaLock.area = buildingClass.tileArea.add(buildingTile)
+        areaLock.area = Some(buildingClass.tileArea.add(buildingTile))
         areaLock.acquire(this)
       })
     }
-  
-    currencyLock.isSpent = building.isDefined
-    currencyLock.acquire(this)
     
-    if (currencyLock.satisfied && areaLock.satisfied) {
+    if (areaLock.satisfied) {
         
       if (building.isEmpty || buildingClass.race == Race.Terran) {
         builderLock.acquire(this)
       }
       
       if (building.isEmpty && builderLock.satisfied) {
-        orderedTile = Some(areaLock.area.startInclusive)
+        orderedTile = Some(areaLock.area.get.startInclusive)
         With.executor.intend(
           new Intention(this, builderLock.units.head) {
             toBuild = Some(buildingClass)

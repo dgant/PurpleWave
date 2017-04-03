@@ -15,7 +15,7 @@ class RealEstate {
   
   def request(lock:LockArea): Boolean = {
     requests.remove(lock)
-    val approved = available(lock.area)
+    val approved = lock.area.isDefined && available(lock.area.get)
     
     if (approved) {
       requests.add(lock)
@@ -25,10 +25,10 @@ class RealEstate {
   }
   
   def available(rectangle:TileRectangle):Boolean = {
-    ! requests.exists(_.area.intersects(rectangle))
+    ! requests.exists(_.area.get.intersects(rectangle))
   }
   
-  def reserved:Iterable[TileRectangle] = requests.map(_.area)
+  def reserved:Iterable[TileRectangle] = requests.map(_.area.get)
   
   def release(lock:LockArea) {
     requests.remove(lock)

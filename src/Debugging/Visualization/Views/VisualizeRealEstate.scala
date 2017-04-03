@@ -11,11 +11,13 @@ object VisualizeRealEstate {
   
   def renderArea(lock:LockArea) {
     if ( ! lock.satisfied) return
-    DrawMap.tileRectangle(lock.area, Colors.DarkRed)
-    DrawMap.labelBox(
-      List("Reserved by", lock.owner.toString),
-      lock.area.midpoint.toPosition,
-      drawBackground = true,
-      backgroundColor = Colors.DarkRed)
+    lock.area.foreach(rectangle => {
+      DrawMap.tileRectangle(rectangle, Colors.DarkRed)
+      DrawMap.labelBox(
+        List("Reserved by", lock.owner.toString),
+        rectangle.midpoint.toPosition,
+        drawBackground = true,
+        backgroundColor = Colors.DarkRed)
+    })
   }
 }

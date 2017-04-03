@@ -1,12 +1,12 @@
 package Planning.Composition.ResourceLocks
 
-import Geometry.{Positions, TileRectangle}
+import Geometry.TileRectangle
 import Planning.Plan
 import Startup.With
 
 class LockArea extends ResourceLock {
   
-  var area = new TileRectangle(Positions.tileMiddle, Positions.tileMiddle)
+  var area:Option[TileRectangle] = None
   var owner:Plan = null
   
   private var isSatisfied = false

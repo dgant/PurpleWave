@@ -24,15 +24,14 @@ case class TileRectangle(
   def add(tilePosition:TilePosition):TileRectangle =
     add(tilePosition.getX, tilePosition.getY)
 
-  def midPixel:Position = startPixel.midpoint(endPixel)
-  def midpoint:TilePosition = startInclusive.midpoint(endExclusive)
+  def midPixel  : Position     = startPixel.midpoint(endPixel)
+  def midpoint  : TilePosition = startInclusive.midpoint(endExclusive)
   
-  def contains(x:Int, y:Int):Boolean = {
+  def contains(x:Int, y:Int):Boolean =
     x >= startInclusive.getX &&
     y >= startInclusive.getY &&
     x < endExclusive.getX &&
     y < endExclusive.getY
-  }
   
   def contains(point:TilePosition):Boolean = {
     contains(point.getX, point.getY)
@@ -49,18 +48,18 @@ case class TileRectangle(
     contains(otherRectangle.endExclusive.getX - 1, otherRectangle.startInclusive.getY)
   }
   
-  def startPixel:Position = {
-    startInclusive.toPosition
-  }
+  def startPixel  : Position =  startInclusive.toPosition
+  def endPixel    : Position = endExclusive.toPosition.subtract(1, 1)
   
-  def endPixel:Position = {
-    endExclusive.toPosition.subtract(1, 1)
-  }
-  
+  private var cachedTiles:Iterable[TilePosition] = null
   def tiles:Iterable[TilePosition] = {
-    (startInclusive.getX until endExclusive.getX).flatten(x =>
-      (startInclusive.getY until endExclusive.getY).map(y =>
-        new TilePosition(x, y)
-      ))
+    if (cachedTiles == null) {
+      cachedTiles =
+        (startInclusive.getX until endExclusive.getX).flatten(x =>
+          (startInclusive.getY until endExclusive.getY).map(y =>
+            new TilePosition(x, y)
+          ))
+    }
+    cachedTiles
   }
 }

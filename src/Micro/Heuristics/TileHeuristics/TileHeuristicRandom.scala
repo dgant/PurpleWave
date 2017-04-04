@@ -1,6 +1,6 @@
 package Micro.Heuristics.TileHeuristics
 
-import Micro.Intentions.Intention
+import Micro.Intent.Intention
 import Utilities.RandomState
 import bwapi.TilePosition
 

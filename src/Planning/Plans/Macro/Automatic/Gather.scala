@@ -1,7 +1,7 @@
 package Planning.Plans.Macro.Automatic
 
 import Information.Geography.Types.Base
-import Micro.Intentions.Intention
+import Micro.Intent.Intention
 import Performance.Caching.Limiter
 import Planning.Composition.UnitCountEverything
 import Planning.Composition.UnitMatchers.UnitMatchWorker

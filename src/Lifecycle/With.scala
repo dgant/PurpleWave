@@ -10,12 +10,14 @@ import Macro.Allocation._
 import Macro.Architect
 import Macro.Scheduling.Scheduler
 import Information.Battles.Battles
-import Micro.{Commander, Executor}
+import Micro.Intent.Commander
+import Micro.State.Executor
 import Planning.Plans.GamePlans.WinTheGame
 import ProxyBwapi.UnitTracking.UnitTracker
 import _root_.Performance.Latency
 import bwapi.Player
 import bwta.BWTA
+
 import scala.collection.JavaConverters._
 
 object With {

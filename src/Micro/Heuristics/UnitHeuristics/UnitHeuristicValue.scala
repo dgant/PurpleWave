@@ -1,6 +1,6 @@
 package Micro.Heuristics.UnitHeuristics
 
-import Micro.Intentions.Intention
+import Micro.Intent.Intention
 import ProxyBwapi.UnitInfo.UnitInfo
 
 object UnitHeuristicValue extends UnitHeuristic{

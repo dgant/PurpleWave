@@ -2,7 +2,7 @@ package Micro.Heuristics.Targeting
 
 import Micro.Heuristics.HeuristicMath
 import Micro.Heuristics.UnitHeuristics.UnitHeuristic
-import Micro.Intentions.Intention
+import Micro.Intent.Intention
 import ProxyBwapi.UnitInfo.UnitInfo
 
 class WeightedUnitHeuristic(

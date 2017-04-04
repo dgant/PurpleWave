@@ -1,7 +1,7 @@
 package Micro.Behaviors.Protoss
 
 import Micro.Behaviors.{Behavior, BehaviorDefault}
-import Micro.Intentions.Intention
+import Micro.Intent.Intention
 import Lifecycle.With
 
 object BehaviorReaver extends Behavior {

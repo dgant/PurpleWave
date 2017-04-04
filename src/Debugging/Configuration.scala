@@ -16,16 +16,16 @@ class Configuration {
   var enableVisualizationBases              = false
   var enableVisualizationBattles            = true
   var enableVisualizationBullets            = false
-  var enableVisualizationChokepoints        = true
+  var enableVisualizationChokepoints        = false
   var enableVisualizationEconomy            = false
   var enableVisualizationGeography          = true
   var enableVisualizationGrids              = false
   var enableVisualizationMovementHeuristics = true
   var enableVisualizationPerformance        = true
   var enableVisualizationPlans              = false
-  var enableVisualizationResources          = true
+  var enableVisualizationResources          = false
   var enableVisualizationRealEstate         = true
-  var enableVisualizationScheduler          = true
+  var enableVisualizationScheduler          = false
   var enableVisualizationTextOnly           = false
   var enableVisualizationUnitsForeign       = true
   var enableVisualizationUnitsOurs          = true
@@ -41,4 +41,6 @@ class Configuration {
   var cameraDynamicSpeed                = false
   var cameraDynamicSpeedSlowest         = 30
   var cameraDynamicSpeedFastest         = 0
+  var viewportWidth                     = 640 * 2
+  var viewportHeight                    = 480 * 2
 }

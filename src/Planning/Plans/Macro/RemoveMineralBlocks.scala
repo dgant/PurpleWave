@@ -1,6 +1,6 @@
 package Planning.Plans.Macro
 
-import Micro.Intentions.Intention
+import Micro.Intent.Intention
 import Planning.Composition.PositionFinders.Generic.PositionSpecific
 import Planning.Composition.Property
 import Planning.Composition.UnitCounters.UnitCountOne

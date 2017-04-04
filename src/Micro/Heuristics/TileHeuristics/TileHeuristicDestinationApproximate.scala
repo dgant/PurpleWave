@@ -1,6 +1,6 @@
 package Micro.Heuristics.TileHeuristics
 import Micro.Heuristics.HeuristicMath
-import Micro.Intentions.Intention
+import Micro.Intent.Intention
 import bwapi.TilePosition
 
 object TileHeuristicDestinationApproximate extends TileHeuristic {

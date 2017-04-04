@@ -1,6 +1,6 @@
 package Micro.Heuristics.Targeting
 
-import Micro.Intentions.Intention
+import Micro.Intent.Intention
 import ProxyBwapi.UnitInfo.UnitInfo
 
 object EvaluateTargets {

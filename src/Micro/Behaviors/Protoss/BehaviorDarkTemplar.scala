@@ -1,7 +1,7 @@
 package Micro.Behaviors.Protoss
 
 import Micro.Behaviors.{Behavior, BehaviorDefault, MovementProfiles}
-import Micro.Intentions.Intention
+import Micro.Intent.Intention
 
 object BehaviorDarkTemplar extends Behavior {
   

@@ -1,6 +1,6 @@
 package Micro.Behaviors
 
-import Micro.Intentions.Intention
+import Micro.Intent.Intention
 
 trait Behavior {
   def execute(intent:Intention)

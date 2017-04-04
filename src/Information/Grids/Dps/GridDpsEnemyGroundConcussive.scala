@@ -7,6 +7,6 @@ class GridDpsEnemyGroundConcussive extends AbstractGridDpsEnemy {
   
   override protected val air: Boolean = false
   override protected def getUnits: Iterable[UnitInfo] =
-    super.getUnits.filter(_.unitClass.rawAirDamageType == DamageType.Concussive)
+    super.getUnits.filter(_.unitClass.rawGroundDamageType == DamageType.Concussive)
   
 }

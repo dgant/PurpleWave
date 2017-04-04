@@ -3,16 +3,26 @@ package Debugging.Visualization.Views
 import Debugging.Visualization.Data.MovementHeuristicView
 import Debugging.Visualization.Rendering.DrawMap
 import Lifecycle.With
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.EnrichPosition._
-
-import scala.collection.mutable.ListBuffer
 
 object VisualizeMovementHeuristics {
   
-  def render() {
+  def render {
+    var highlightUnit:Option[FriendlyUnitInfo] = None
+    
+    if ( ! With.units.ours.exists(_.selected))
+      
+    highlightUnit = With.executor.states
+      .find(state => With.viewport.contains(state.unit.pixelCenter))
+      .map(_.unit)
+    
+    With.executor.states
+      .filter(state => (highlightUnit.contains(state.unit) || state.unit.selected) && state.movementHeuristics.nonEmpty)
+      .foreach(state => renderUnit(state.movementHeuristics))
   }
   
-  def renderUnit(views:ListBuffer[MovementHeuristicView]) {
+  def renderUnit(views:Iterable[MovementHeuristicView]) {
     val heuristicGroups = views.groupBy(_.heuristic)
     
     val scales = heuristicGroups.map(group => scale(group._2))
@@ -23,14 +33,14 @@ object VisualizeMovementHeuristics {
     heuristicGroups.foreach(group => renderUnitHeuristic(group._2, maxScale))
   }
   
-  def scale(views:ListBuffer[MovementHeuristicView]):Double = {
+  def scale(views:Iterable[MovementHeuristicView]):Double = {
     val rawScale = views.map(_.evaluation).max / views.map(_.evaluation).min
     return normalize(rawScale)
   }
   
   def normalize(value:Double):Double = if (value < 1.0) 1.0/value else value
   
-  def renderUnitHeuristic(views:ListBuffer[MovementHeuristicView], maxScale:Double) {
+  def renderUnitHeuristic(views:Iterable[MovementHeuristicView], maxScale:Double) {
     val ourScale = scale(views)
     if (ourScale <= 1.0) return
   

@@ -25,11 +25,7 @@ class PositionSimpleBuilding(val buildingClass:UnitClass) extends PositionFinder
         exclusions))
   
   def maxMargin:Int =
-    if (buildingClass.isRefinery)
-      0
-    else if (buildingClass.isTownHall)
-      0
-    else if (buildingClass == Protoss.Pylon && With.units.ours.count(_.unitClass == buildingClass) < 4)
+    if (buildingClass == Protoss.Pylon && With.units.ours.count(_.unitClass == buildingClass) < 4)
       3
     else
       1
@@ -49,7 +45,7 @@ class PositionSimpleBuilding(val buildingClass:UnitClass) extends PositionFinder
     
     var output:Option[TilePosition] = None
     
-    (maxMargin to 0 by -1)
+    (maxMargin to 1 by -1)
       .foreach(margin =>
         With.geography.ourBases
           .toList

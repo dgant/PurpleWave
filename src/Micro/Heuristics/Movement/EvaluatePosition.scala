@@ -1,6 +1,6 @@
 package Micro.Heuristics.Movement
 
-import Micro.Intentions.Intention
+import Micro.Intent.Intention
 import bwapi.TilePosition
 
 trait EvaluatePosition {

@@ -1,7 +1,9 @@
 package Micro.Heuristics.Movement
 
+import Debugging.Visualization.Data.MovementHeuristicView
 import Geometry.Shapes.Circle
-import Micro.Intentions.Intention
+import Lifecycle.With
+import Micro.Intent.Intention
 import Utilities.EnrichPosition._
 import bwapi.TilePosition
 
@@ -28,13 +30,11 @@ object EvaluatePositions {
     
     //Debug heuristics on selected units
     //Yes, this re-weighs everything for the selected unit(s) as a development shortcut.
-    if (intent.unit.selected) {
-      /*
-      candidates.foreach(candidate =>
-        weightedHeuristics.foreach(weightedHeuristic =>
-          With.movementHeuristicViews.add(
-            new MovementHeuristicView(weightedHeuristic, intent, candidate, weightedHeuristic.weigh(intent, candidate)))))
-            */
+    if (With.configuration.enableVisualizationMovementHeuristics) {
+      With.executor.getState(intent.unit).movementHeuristics =
+        candidates.flatten(candidate =>
+          weightedHeuristics.map(weightedHeuristic =>
+            new MovementHeuristicView(weightedHeuristic, intent, candidate, weightedHeuristic.weigh(intent, candidate))))
     }
     
     candidates.maxBy(candidate => weightedHeuristics.map(_.weigh(intent, candidate)).product)

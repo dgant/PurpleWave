@@ -1,7 +1,7 @@
 package Planning.Plans.Army
 
 import Debugging.Visualization.Rendering.DrawMap
-import Micro.Intentions.Intention
+import Micro.Intent.Intention
 import Planning.Composition.PositionFinders.PositionFinder
 import Planning.Composition.PositionFinders.Tactics.PositionEnemyBase
 import Planning.Composition.Property

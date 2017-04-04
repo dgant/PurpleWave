@@ -3,7 +3,7 @@ package Micro.Heuristics.Movement
 import Debugging.Visualization.Colors
 import Micro.Heuristics.HeuristicMath
 import Micro.Heuristics.TileHeuristics.TileHeuristic
-import Micro.Intentions.Intention
+import Micro.Intent.Intention
 import bwapi.{Color, TilePosition}
 
 class WeightedMovementHeuristic(

@@ -1,18 +1,14 @@
-package Micro
+package Micro.Intent
 
-import Micro.Behaviors.Behavior
-import Micro.Intentions.Intention
+import Lifecycle.With
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClass.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import ProxyBwapi.Upgrades.Upgrade
-import Lifecycle.With
-import Utilities.{CountMap, RandomState}
 import Utilities.EnrichPosition._
+import Utilities.{CountMap, RandomState}
 import bwapi.{Position, TilePosition, UnitCommandType}
-
-import scala.collection.mutable
 
 // Commander is responsible for issuing unit commands
 // in a way that Brood War handles gracefully.

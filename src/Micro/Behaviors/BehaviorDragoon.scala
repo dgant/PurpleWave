@@ -1,5 +1,5 @@
 package Micro.Behaviors
-import Micro.Intentions.Intention
+import Micro.Intent.Intention
 import Lifecycle.With
 
 object BehaviorDragoon extends Behavior {

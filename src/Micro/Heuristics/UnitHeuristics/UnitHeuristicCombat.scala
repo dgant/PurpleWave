@@ -1,7 +1,7 @@
 package Micro.Heuristics.UnitHeuristics
 
 import Micro.Heuristics.HeuristicMath
-import Micro.Intentions.Intention
+import Micro.Intent.Intention
 import ProxyBwapi.UnitInfo.UnitInfo
 
 object UnitHeuristicCombat extends UnitHeuristic{

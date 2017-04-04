@@ -1,4 +1,4 @@
-package Micro.Intentions
+package Micro.Intent
 
 import Micro.Behaviors.{Behavior, MovementProfiles, TargetingProfiles}
 import Micro.Heuristics.Targeting.{Targets, Threats}

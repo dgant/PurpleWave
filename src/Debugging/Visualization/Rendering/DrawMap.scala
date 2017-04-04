@@ -123,12 +123,8 @@ object DrawMap {
   def irrelevant(points:Iterable[Position]):Boolean = {
     points.forall(irrelevant)
   }
-  def irrelevant(point:Position):Boolean = {
+  def irrelevant(pixel:Position):Boolean = {
     val buffer = 32 * 4
-    ! point.valid ||
-    point.getX < With.viewport.start  .getX - buffer ||
-    point.getX > With.viewport.end    .getX + buffer ||
-    point.getY < With.viewport.start  .getY - buffer ||
-    point.getY > With.viewport.end    .getY + buffer
+    ! pixel.valid || ! With.viewport.contains(pixel)
   }
 }

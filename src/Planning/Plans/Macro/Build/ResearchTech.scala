@@ -1,6 +1,6 @@
 package Planning.Plans.Macro.Build
 
-import Micro.Intentions.Intention
+import Micro.Intent.Intention
 import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Plan

@@ -1,6 +1,6 @@
 package Planning.Plans.Information
 
-import Micro.Intentions.Intention
+import Micro.Intent.Intention
 import Planning.Composition.PositionFinders.Generic.PositionMiddle
 import Planning.Composition.Property
 import Planning.Composition.UnitCounters.UnitCountExactly

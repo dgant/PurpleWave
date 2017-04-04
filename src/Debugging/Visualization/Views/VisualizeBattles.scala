@@ -25,13 +25,15 @@ object VisualizeBattles {
     DrawMap.circle(battle.enemy.vanguard, 8, enemyColor)
     DrawMap.line(battle.focus, battle.us.vanguard,    ourColor)
     DrawMap.line(battle.focus, battle.enemy.vanguard, enemyColor)
+    val topLeft = (battle.us.units ++ battle.enemy.units).map(_.pixelCenter).minBound.subtract(16, 16)
+    val bottomRight = (battle.us.units ++ battle.enemy.units).map(_.pixelCenter).maxBound.add(16, 16)
     DrawMap.box(
-      (battle.us.units ++ battle.enemy.units).map(_.pixelCenter).minBound.subtract(16, 16),
-      (battle.us.units ++ battle.enemy.units).map(_.pixelCenter).maxBound.add(16, 16),
+      topLeft,
+      bottomRight,
       neutralColor)
     DrawMap.labelBox(
       List(formatStrength(battle.us.strength), formatStrength(battle.enemy.strength)),
-      battle.us.vanguard.add(0, 16),
+      bottomRight,
       drawBackground = true,
       backgroundColor = neutralColor)
   }

@@ -10,7 +10,7 @@ class GridDpsEnemyToUnit {
     tile:TilePosition,
     unitClass: UnitClass): Double = {
   
-    var normal      = 1.0
+    val normal      = 1.0
     var concussive  = 1.0
     var explosive   = 1.0
   

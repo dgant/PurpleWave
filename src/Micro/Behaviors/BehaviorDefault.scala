@@ -52,10 +52,8 @@ object BehaviorDefault extends Behavior {
         EvaluatePositions.best(intent, intent.movementProfileCombat, 3)
       else if (With.configuration.enableHeuristicTravel)
         EvaluatePositions.best(intent, intent.movementProfileNormal, 2)
-      else {
-        
+      else
         intent.destination.getOrElse(intent.unit.tileCenter)
-      }
         
     
     With.commander.move(intent, tileToMove.pixelCenter)

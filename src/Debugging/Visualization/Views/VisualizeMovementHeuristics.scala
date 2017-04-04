@@ -8,7 +8,7 @@ import Utilities.EnrichPosition._
 
 object VisualizeMovementHeuristics {
   
-  def render {
+  def render() {
     var highlightUnit:Option[FriendlyUnitInfo] = None
     
     if ( ! With.units.ours.exists(_.selected))

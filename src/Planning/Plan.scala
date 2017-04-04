@@ -13,7 +13,8 @@ class Plan {
   override def toString: String =
     if (getRealName == "")
       description.get
-    else getRealName + (if (description.get == "") "" else ": " + description.get)
+    else
+      if (description.get == "") getRealName else description.get
   
   private def getRealName:String = {
     val name = getClass.getSimpleName

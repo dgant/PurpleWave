@@ -26,13 +26,9 @@ object VisualizeBattles {
     DrawMap.line(battle.focus, battle.us.vanguard,    ourColor)
     DrawMap.line(battle.focus, battle.enemy.vanguard, enemyColor)
     DrawMap.box(
-      battle.us.units.map(_.pixelCenter).minBound,
-      battle.us.units.map(_.pixelCenter).maxBound,
-      ourColor)
-    DrawMap.box(
-      battle.enemy.units.map(_.pixelCenter).minBound,
-      battle.enemy.units.map(_.pixelCenter).maxBound,
-      enemyColor)
+      (battle.us.units ++ battle.enemy.units).map(_.pixelCenter).minBound.subtract(16, 16),
+      (battle.us.units ++ battle.enemy.units).map(_.pixelCenter).maxBound.add(16, 16),
+      neutralColor)
     DrawMap.labelBox(
       List(formatStrength(battle.us.strength), formatStrength(battle.enemy.strength)),
       battle.us.vanguard.add(0, 16),

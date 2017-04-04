@@ -1,9 +1,8 @@
 package Debugging.Visualization.Views
 
-import Debugging.Visualization.Colors
 import Debugging.Visualization.Data.MovementHeuristicView
 import Debugging.Visualization.Rendering.DrawMap
-import Startup.With
+import Lifecycle.With
 import Utilities.EnrichPosition._
 
 import scala.collection.mutable.ListBuffer
@@ -11,23 +10,9 @@ import scala.collection.mutable.ListBuffer
 object VisualizeMovementHeuristics {
   
   def render() {
-    With.movementHeuristicViews.cleanup()
-    With.movementHeuristicViews.get.foreach(renderUnit)
   }
   
   def renderUnit(views:ListBuffer[MovementHeuristicView]) {
-    views.head.intent.destination.foreach(destination => {
-      DrawMap.circle(destination.pixelCenter, 32, Colors.MediumGreen)
-      DrawMap.line(destination.pixelCenter, views.head.intent.unit.pixelCenter, Colors.MediumGreen)
-      DrawMap.label("Destination", destination.pixelCenter.add(0, 32))
-      
-    })
-    views.head.intent.toAttack.foreach(attackee => {
-      DrawMap.circle(attackee.pixelCenter, 32, Colors.MediumOrange)
-      DrawMap.line(attackee.pixelCenter, views.head.intent.unit.pixelCenter, Colors.MediumOrange)
-      DrawMap.label("Target", attackee.pixelCenter.add(0, 32))
-    })
-    
     val heuristicGroups = views.groupBy(_.heuristic)
     
     val scales = heuristicGroups.map(group => scale(group._2))

@@ -8,7 +8,7 @@ import Planning.Composition.UnitMatchers.UnitMatchWorker
 import Planning.Composition.UnitPreferences.UnitPreferClose
 import Planning.Plan
 import Planning.Composition.ResourceLocks.LockUnits
-import Startup.With
+import Lifecycle.With
 
 class RemoveMineralBlocks extends Plan {
   

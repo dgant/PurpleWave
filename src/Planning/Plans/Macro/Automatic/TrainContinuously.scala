@@ -3,7 +3,7 @@ package Planning.Plans.Macro.Automatic
 import Macro.BuildRequests.RequestUnitAtLeast
 import Planning.Plan
 import ProxyBwapi.UnitClass.UnitClass
-import Startup.With
+import Lifecycle.With
 
 class TrainContinuously(unitClass: UnitClass) extends Plan {
   

@@ -5,6 +5,7 @@
 *.class
 *.zip
 
+.idea/workspace.xml
 out/
 src/META-INF
 bwapi-data/

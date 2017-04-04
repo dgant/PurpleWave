@@ -1,7 +1,7 @@
 package Information.Geography.Calculations
 
 import Information.Geography.Types.{Base, Zone}
-import Startup.With
+import Lifecycle.With
 import Utilities.EnrichPosition._
 
 object ZoneUpdater {

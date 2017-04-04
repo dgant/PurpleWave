@@ -8,7 +8,7 @@ import Planning.Plan
 import Planning.Composition.ResourceLocks.{LockCurrencyForUnit, LockUnits}
 import ProxyBwapi.UnitClass.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Startup.With
+import Lifecycle.With
 
 class TrainUnit(val traineeClass:UnitClass) extends Plan {
   

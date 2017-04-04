@@ -1,7 +1,7 @@
 package Debugging.Visualization.Data
 
 import Performance.Caching.CacheFrame
-import Startup.With
+import Lifecycle.With
 import bwapi.Position
 
 import Utilities.EnrichPosition._

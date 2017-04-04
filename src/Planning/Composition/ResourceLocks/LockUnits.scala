@@ -1,7 +1,7 @@
 package Planning.Composition.ResourceLocks
 
 import Planning.Plan
-import Startup.With
+import Lifecycle.With
 import Planning.Composition.{Property, UnitCountEverything}
 import Planning.Composition.UnitCounters.UnitCounter
 import Planning.Composition.UnitMatchers.{UnitMatchAnything, UnitMatcher}

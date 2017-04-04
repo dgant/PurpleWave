@@ -1,7 +1,7 @@
 package Information.Grids.Movement
 
 import Information.Grids.ArrayTypes.AbstractGridBoolean
-import Startup.With
+import Lifecycle.With
 
 class GridWalkableUnits extends AbstractGridBoolean {
   

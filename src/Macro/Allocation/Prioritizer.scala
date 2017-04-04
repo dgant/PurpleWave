@@ -1,7 +1,7 @@
 package Macro.Allocation
 
 import Planning.Plan
-import Startup.With
+import Lifecycle.With
 
 import scala.collection.mutable
 

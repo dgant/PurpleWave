@@ -4,7 +4,7 @@ import Geometry.Shapes.Circle
 import Information.Grids.ArrayTypes.AbstractGridDouble
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.UnitInfo
-import Startup.With
+import Lifecycle.With
 import Utilities.EnrichPosition._
 
 abstract class AbstractGridDps extends AbstractGridDouble {

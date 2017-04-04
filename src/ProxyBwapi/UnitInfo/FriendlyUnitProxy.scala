@@ -1,7 +1,7 @@
 package ProxyBwapi.UnitInfo
 import Performance.Caching.{Cache, CacheFrame}
 import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
-import Startup.With
+import Lifecycle.With
 import bwapi._
 
 abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {

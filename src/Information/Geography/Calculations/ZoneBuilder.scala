@@ -4,7 +4,7 @@ import Geometry.Shapes.Spiral
 import Geometry.TileRectangle
 import Information.Geography.Types.{Base, Zone, ZoneEdge}
 import ProxyBwapi.Races.Protoss
-import Startup.With
+import Lifecycle.With
 import Utilities.EnrichPosition._
 import bwapi.{Position, TilePosition}
 import bwta.{BWTA, Chokepoint, Region}

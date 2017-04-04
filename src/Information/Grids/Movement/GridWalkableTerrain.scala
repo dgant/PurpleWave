@@ -2,7 +2,7 @@ package Information.Grids.Movement
 
 import Geometry.Shapes.Square
 import Information.Grids.ArrayTypes.AbstractGridBoolean
-import Startup.With
+import Lifecycle.With
 import Utilities.EnrichPosition._
 
 class GridWalkableTerrain extends AbstractGridBoolean {

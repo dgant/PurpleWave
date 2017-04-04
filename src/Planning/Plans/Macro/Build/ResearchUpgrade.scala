@@ -6,7 +6,7 @@ import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Plan
 import Planning.Composition.ResourceLocks._
 import ProxyBwapi.Upgrades.Upgrade
-import Startup.With
+import Lifecycle.With
 
 class ResearchUpgrade(upgrade: Upgrade, level: Int) extends Plan {
   

@@ -1,6 +1,6 @@
 package Micro.Behaviors
 import Micro.Intentions.Intention
-import Startup.With
+import Lifecycle.With
 
 object BehaviorBuilding extends Behavior {
   

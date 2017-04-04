@@ -3,7 +3,7 @@ package Macro.Scheduling.Optimization
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Macro.Buildables.{Buildable, BuildableTech, BuildableUnit, BuildableUpgrade}
 import Macro.Scheduling.BuildEvent
-import Startup.With
+import Lifecycle.With
 
 object ScheduleSimulationEventAnticipator {
   

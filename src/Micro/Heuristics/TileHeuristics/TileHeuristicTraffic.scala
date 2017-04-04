@@ -1,7 +1,7 @@
 package Micro.Heuristics.TileHeuristics
 
 import Micro.Intentions.Intention
-import Startup.With
+import Lifecycle.With
 import bwapi.TilePosition
 import Utilities.EnrichPosition._
 object TileHeuristicTraffic extends TileHeuristic {

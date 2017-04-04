@@ -2,7 +2,7 @@ package Macro.Scheduling.Optimization
 
 import Macro.Buildables.Buildable
 import Macro.Scheduling.BuildEvent
-import Startup.With
+import Lifecycle.With
 
 import scala.collection.mutable
 

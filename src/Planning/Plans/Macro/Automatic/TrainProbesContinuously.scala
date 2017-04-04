@@ -1,7 +1,7 @@
 package Planning.Plans.Macro.Automatic
 
 import ProxyBwapi.Races.Protoss
-import Startup.With
+import Lifecycle.With
 
 class TrainProbesContinuously extends TrainContinuously(Protoss.Probe) {
   

@@ -1,6 +1,6 @@
 package Micro.Heuristics.Targeting
 
-import Startup.With
+import Lifecycle.With
 import Micro.Intentions.Intention
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.UnitInfo

@@ -1,7 +1,7 @@
 package Debugging.Visualization.Views
 
 import Debugging.Visualization.Rendering.DrawMap
-import Startup.With
+import Lifecycle.With
 
 object VisualizeChokepoints {
   

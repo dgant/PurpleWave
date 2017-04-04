@@ -3,7 +3,7 @@ package ProxyBwapi.UnitInfo
 import Performance.Caching.Limiter
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
-import Startup.With
+import Lifecycle.With
 import bwapi._
 
 class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {

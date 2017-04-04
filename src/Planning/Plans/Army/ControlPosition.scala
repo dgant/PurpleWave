@@ -7,7 +7,7 @@ import Planning.Composition.PositionFinders.Tactics.PositionEnemyBase
 import Planning.Composition.Property
 import Planning.Plan
 import Planning.Composition.ResourceLocks.LockUnits
-import Startup.With
+import Lifecycle.With
 import Utilities.EnrichPosition._
 
 class ControlPosition extends Plan {

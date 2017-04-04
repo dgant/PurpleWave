@@ -1,7 +1,7 @@
 package Debugging
 
 import Geometry.Positions
-import Startup.With
+import Lifecycle.With
 import bwapi.Position
 import Utilities.EnrichPosition._
 

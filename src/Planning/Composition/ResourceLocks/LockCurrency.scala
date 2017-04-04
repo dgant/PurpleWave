@@ -1,6 +1,6 @@
 package Planning.Composition.ResourceLocks
 
-import Startup.With
+import Lifecycle.With
 import Planning.Plan
 
 class LockCurrency extends ResourceLock {

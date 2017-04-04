@@ -3,7 +3,7 @@ package Debugging.Visualization.Views
 import Debugging.Visualization.Rendering.DrawMap
 import Information.Grids.ArrayTypes.AbstractGridArray
 import Information.Grids.AbstractGrid
-import Startup.With
+import Lifecycle.With
 import Utilities.EnrichPosition._
 
 object VisualizeGrids {

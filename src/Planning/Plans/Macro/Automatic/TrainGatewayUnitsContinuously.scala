@@ -3,7 +3,7 @@ package Planning.Plans.Macro.Automatic
 import Macro.BuildRequests.{BuildRequest, RequestUnitAnother, RequestUnitAnotherOne}
 import Planning.Plan
 import ProxyBwapi.Races.Protoss
-import Startup.With
+import Lifecycle.With
 
 import scala.collection.mutable.ListBuffer
 

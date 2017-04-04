@@ -1,7 +1,7 @@
 package Information.Geography.Pathfinding
 
 import Information.Geography.Types.Zone
-import Startup.With
+import Lifecycle.With
 import Utilities.EnrichPosition._
 import bwapi.Position
 

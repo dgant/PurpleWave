@@ -2,7 +2,7 @@ package Macro.Allocation
 
 import Planning.Composition.ResourceLocks.LockUnits
 import ProxyBwapi.Races.{Protoss, Terran}
-import Startup.With
+import Lifecycle.With
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 import scala.collection.mutable

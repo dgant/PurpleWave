@@ -2,7 +2,7 @@ package Debugging.Visualization.Views
 
 import Debugging.Visualization.Rendering.DrawScreen
 import Planning.Plan
-import Startup.With
+import Lifecycle.With
 
 object VisualizePlans {
   def render() {

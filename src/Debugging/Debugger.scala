@@ -1,7 +1,7 @@
 package Debugging
 
 import Planning.Plan
-import Startup.With
+import Lifecycle.With
 
 object Debugger {
   

@@ -3,7 +3,7 @@ package Planning.Plans.Macro.Automatic
 import Macro.BuildRequests.RequestUnitAtLeast
 import Planning.Plan
 import ProxyBwapi.Races.Protoss
-import Startup.With
+import Lifecycle.With
 
 class BuildEnoughPylons extends Plan {
   

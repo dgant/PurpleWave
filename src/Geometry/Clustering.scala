@@ -1,6 +1,6 @@
 package Geometry
 
-import Startup.With
+import Lifecycle.With
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.EnrichPosition._
 import bwapi.Position

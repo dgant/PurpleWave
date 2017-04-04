@@ -4,7 +4,7 @@ import Geometry.TileRectangle
 import Planning.Composition.PositionFinders.PositionFinder
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClass.UnitClass
-import Startup.With
+import Lifecycle.With
 import bwapi.TilePosition
 
 class PositionSimpleBuilding(val buildingClass:UnitClass) extends PositionFinder {

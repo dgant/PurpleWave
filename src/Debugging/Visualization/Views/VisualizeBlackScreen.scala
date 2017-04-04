@@ -1,6 +1,6 @@
 package Debugging.Visualization.Views
 
-import Startup.With
+import Lifecycle.With
 import bwapi.Color
 
 object VisualizeBlackScreen {

@@ -2,7 +2,7 @@ package Micro
 
 import Micro.Intentions.Intention
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Startup.With
+import Lifecycle.With
 
 import scala.collection.mutable
 

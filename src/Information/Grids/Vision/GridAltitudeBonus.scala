@@ -1,7 +1,7 @@
 package Information.Grids.Vision
 
 import Information.Grids.ArrayTypes.AbstractGridDouble
-import Startup.With
+import Lifecycle.With
 
 class GridAltitudeBonus extends AbstractGridDouble {
   

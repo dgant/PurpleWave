@@ -2,7 +2,7 @@ package Information
 
 import Information.Geography.Types.Base
 import Performance.Caching.CacheFrame
-import Startup.With
+import Lifecycle.With
 import bwapi.TilePosition
 
 class Intelligence {

@@ -2,7 +2,7 @@ package Debugging.Visualization.Rendering
 
 import Debugging.Visualization.Colors
 import Geometry.TileRectangle
-import Startup.With
+import Lifecycle.With
 import Utilities.EnrichPosition._
 import bwapi.{Color, Player, Position}
 

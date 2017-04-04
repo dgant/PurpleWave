@@ -2,7 +2,7 @@ package Planning.Plans.Army
 
 import Planning.Composition.PositionFinders.Generic.PositionMiddle
 import Planning.Plan
-import Startup.With
+import Lifecycle.With
 import Planning.Composition.PositionFinders.PositionFinder
 import Planning.Composition.Property
 import Planning.Composition.UnitMatchers.{UnitMatchAnything, UnitMatcher}

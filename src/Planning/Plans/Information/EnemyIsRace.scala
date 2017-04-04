@@ -1,7 +1,7 @@
 package Planning.Plans.Information
 
 import Planning.Plan
-import Startup.With
+import Lifecycle.With
 import bwapi.Race
 
 import scala.collection.JavaConverters._

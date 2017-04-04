@@ -1,6 +1,6 @@
 package Debugging
 
-import Startup.With
+import Lifecycle.With
 
 class Performance {
   private val framesToTrack = 24 * 1

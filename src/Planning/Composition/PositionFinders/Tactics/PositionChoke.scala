@@ -2,7 +2,7 @@ package Planning.Composition.PositionFinders.Tactics
 
 import Performance.Caching.Cache
 import Planning.Composition.PositionFinders.PositionFinder
-import Startup.With
+import Lifecycle.With
 import Utilities.EnrichPosition._
 import bwapi.TilePosition
 

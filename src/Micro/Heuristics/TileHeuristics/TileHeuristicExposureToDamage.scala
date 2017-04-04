@@ -1,7 +1,7 @@
 package Micro.Heuristics.TileHeuristics
 
 import Micro.Intentions.Intention
-import Startup.With
+import Lifecycle.With
 import bwapi.TilePosition
 
 object TileHeuristicExposureToDamage extends TileHeuristic {

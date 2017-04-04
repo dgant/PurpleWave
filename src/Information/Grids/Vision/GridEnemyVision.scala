@@ -1,7 +1,7 @@
 package Information.Grids.Vision
 
 import ProxyBwapi.UnitInfo.UnitInfo
-import Startup.With
+import Lifecycle.With
 
 class GridEnemyVision extends AbstractGridVision {
   

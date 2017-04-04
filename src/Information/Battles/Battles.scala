@@ -3,7 +3,7 @@ package Information.Battles
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, UnitInfo}
 import Information.Geography.Types.Zone
 import Performance.Caching.Limiter
-import Startup.With
+import Lifecycle.With
 import Utilities.EnrichPosition._
 
 import scala.collection.mutable

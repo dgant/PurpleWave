@@ -32,6 +32,7 @@ class Configuration {
   var enableVisualizationVectorUnits        = false
   
   var gameSpeed                         = 0
+  var enableSurrendering                = true
   var enableStdOut                      = false
   var enableChat                        = true
   var enableLatencyCompensation         = false

@@ -8,7 +8,7 @@ import Planning.Composition.Property
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
 import Planning.Composition.ResourceLocks.LockUnits
-import Startup.With
+import Lifecycle.With
 import Utilities.EnrichPosition._
 
 class Hunt extends Plan {

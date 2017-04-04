@@ -2,7 +2,7 @@ package Micro.Heuristics.TileHeuristics
 
 import Micro.Intentions.Intention
 import Micro.Heuristics.HeuristicMath
-import Startup.With
+import Lifecycle.With
 import bwapi.TilePosition
 
 object TileHeuristicEnemyVision extends TileHeuristic {

@@ -3,7 +3,7 @@ package Debugging
 import java.io.{File, PrintWriter}
 import java.util.Calendar
 
-import Startup.With
+import Lifecycle.With
 
 import scala.collection.mutable.ListBuffer
 

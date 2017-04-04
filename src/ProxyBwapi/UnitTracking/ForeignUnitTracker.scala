@@ -1,6 +1,6 @@
 package ProxyBwapi.UnitTracking
 
-import Startup.With
+import Lifecycle.With
 import ProxyBwapi.UnitInfo.ForeignUnitInfo
 import Performance.Caching.Limiter
 

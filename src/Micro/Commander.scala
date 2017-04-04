@@ -7,7 +7,7 @@ import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClass.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import ProxyBwapi.Upgrades.Upgrade
-import Startup.With
+import Lifecycle.With
 import Utilities.{CountMap, RandomState}
 import Utilities.EnrichPosition._
 import bwapi.{Position, TilePosition, UnitCommandType}

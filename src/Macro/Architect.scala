@@ -4,7 +4,7 @@ import Geometry.Shapes.Spiral
 import Geometry.TileRectangle
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClass._
-import Startup.With
+import Lifecycle.With
 import Utilities.EnrichPosition._
 import bwapi.TilePosition
 

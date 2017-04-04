@@ -3,7 +3,7 @@ package Debugging.Visualization.Views
 import Debugging.Visualization.Colors
 import Debugging.Visualization.Rendering.DrawMap
 import ProxyBwapi.UnitInfo.UnitInfo
-import Startup.With
+import Lifecycle.With
 import Utilities.EnrichPosition._
 import bwapi.{Color, Position}
 

@@ -2,7 +2,7 @@ package Information.Battles
 
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.UnitInfo
-import Startup.With
+import Lifecycle.With
 import Utilities.EnrichPosition._
 import bwapi.Position
 

@@ -2,7 +2,7 @@ package Information.Grids
 
 import Information.Grids.ArrayTypes.AbstractGridSet
 import ProxyBwapi.UnitInfo.UnitInfo
-import Startup.With
+import Lifecycle.With
 import bwapi.TilePosition
 
 class GridUnits extends AbstractGridSet[UnitInfo] {

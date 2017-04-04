@@ -9,7 +9,7 @@ import Planning.Composition.UnitPreferences.UnitPreferClose
 import Planning.Plan
 import Planning.Composition.ResourceLocks.LockUnits
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Startup.With
+import Lifecycle.With
 import bwapi.TilePosition
 
 class FindEnemyBase extends Plan {

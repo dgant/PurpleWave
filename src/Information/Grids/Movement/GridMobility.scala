@@ -2,7 +2,7 @@ package Information.Grids.Movement
 
 import Information.Grids.ArrayTypes.AbstractGridInt
 import Performance.Caching.Limiter
-import Startup.With
+import Lifecycle.With
 import Utilities.EnrichPosition._
 
 class GridMobility extends AbstractGridInt {

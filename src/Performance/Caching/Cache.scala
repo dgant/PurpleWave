@@ -1,6 +1,6 @@
 package Performance.Caching
 
-import Startup.With
+import Lifecycle.With
 
 class Cache[T](
   frameDelayScale:Int,

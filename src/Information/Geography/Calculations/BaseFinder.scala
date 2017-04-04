@@ -4,7 +4,7 @@ import Geometry.Shapes.Circle
 import Geometry.{Clustering, TileRectangle}
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.ForeignUnitInfo
-import Startup.With
+import Lifecycle.With
 import Utilities.EnrichPosition._
 import bwapi.TilePosition
 

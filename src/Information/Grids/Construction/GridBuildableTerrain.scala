@@ -1,7 +1,7 @@
 package Information.Grids.Construction
 
 import Information.Grids.ArrayTypes.AbstractGridBoolean
-import Startup.With
+import Lifecycle.With
 
 class GridBuildableTerrain extends AbstractGridBoolean {
   override def onInitialization() {

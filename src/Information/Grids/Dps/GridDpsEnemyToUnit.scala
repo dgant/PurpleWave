@@ -1,7 +1,7 @@
 package Information.Grids.Dps
 
 import ProxyBwapi.UnitClass.UnitClass
-import Startup.With
+import Lifecycle.With
 import bwapi.{TilePosition, UnitSizeType}
 
 class GridDpsEnemyToUnit {

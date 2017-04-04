@@ -2,7 +2,7 @@ package Planning.Composition.ResourceLocks
 
 import Geometry.TileRectangle
 import Planning.Plan
-import Startup.With
+import Lifecycle.With
 
 class LockArea extends ResourceLock {
   

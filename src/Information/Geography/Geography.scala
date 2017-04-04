@@ -5,7 +5,7 @@ import Information.Geography.Calculations.{ZoneBuilder, ZoneUpdater}
 import Information.Geography.Types.{Base, Zone}
 import Performance.Caching.{Cache, CacheForever, Limiter}
 import ProxyBwapi.UnitInfo.UnitInfo
-import Startup.With
+import Lifecycle.With
 import bwapi.TilePosition
 import Utilities.EnrichPosition._
 

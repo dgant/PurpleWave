@@ -1,6 +1,6 @@
 package Information.Geography.Pathfinding
 
-import Startup.With
+import Lifecycle.With
 import bwapi.TilePosition
 import bwta.BWTA
 

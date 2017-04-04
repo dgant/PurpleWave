@@ -2,7 +2,7 @@ package Information.Grids.Vision
 
 import Geometry.Shapes.Circle
 import Information.Grids.ArrayTypes.AbstractGridBoolean
-import Startup.With
+import Lifecycle.With
 import Utilities.EnrichPosition._
 
 class GridEnemyDetection extends AbstractGridBoolean {

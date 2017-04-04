@@ -6,7 +6,7 @@ import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
 import ProxyBwapi.Upgrades.Upgrade
-import Startup.With
+import Lifecycle.With
 import Utilities.CountMap
 
 import scala.collection.mutable

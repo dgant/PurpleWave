@@ -1,7 +1,7 @@
 package Debugging.Visualization
 
 import Debugging.Visualization.Views._
-import Startup.With
+import Lifecycle.With
 
 object Visualization {
   def onFrame() {

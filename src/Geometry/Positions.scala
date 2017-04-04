@@ -1,6 +1,6 @@
 package Geometry
 
-import Startup.With
+import Lifecycle.With
 import bwapi.{Position, TilePosition}
 
 object Positions {

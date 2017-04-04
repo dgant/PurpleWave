@@ -2,7 +2,7 @@ package Utilities
 
 import Geometry.{Point, Positions, TileRectangle}
 import Information.Geography.Types.Zone
-import Startup.With
+import Lifecycle.With
 import bwapi.{Position, TilePosition, WalkPosition}
 
 case object EnrichPosition {

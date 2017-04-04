@@ -2,7 +2,7 @@ package Planning.Plans.Macro.UnitCount
 
 import Planning.Composition.Property
 import Planning.Plan
-import Startup.With
+import Lifecycle.With
 import Planning.Composition.UnitMatchers.{UnitMatchAnything, UnitMatcher}
 
 class UnitCountAtLeast extends Plan {

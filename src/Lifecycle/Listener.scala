@@ -1,4 +1,4 @@
-package Startup
+package Lifecycle
 
 import bwapi.{BWEventListener, Player}
 

@@ -1,7 +1,7 @@
 package Debugging.Visualization.Views
 
 import Debugging.Visualization.Rendering.DrawScreen
-import Startup.With
+import Lifecycle.With
 
 object VisualizeEconomy {
   def render() {

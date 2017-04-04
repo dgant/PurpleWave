@@ -8,7 +8,7 @@ import Planning.Composition.UnitMatchers.UnitMatchWorker
 import Planning.Plan
 import Planning.Composition.ResourceLocks.LockUnits
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Startup.With
+import Lifecycle.With
 
 import scala.collection.mutable
 

@@ -1,6 +1,6 @@
 package Information.Grids
 
-import Startup.With
+import Lifecycle.With
 import bwapi.TilePosition
 
 abstract class AbstractGrid[T] {

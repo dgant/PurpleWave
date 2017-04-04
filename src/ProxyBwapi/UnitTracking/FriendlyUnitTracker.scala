@@ -1,6 +1,6 @@
 package ProxyBwapi.UnitTracking
 
-import Startup.With
+import Lifecycle.With
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 import scala.collection.JavaConverters._

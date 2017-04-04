@@ -3,7 +3,7 @@ package Debugging.Visualization.Views
 import Debugging.Visualization.Colors
 import Debugging.Visualization.Rendering.DrawMap
 import Planning.Composition.ResourceLocks.LockArea
-import Startup.With
+import Lifecycle.With
 
 object VisualizeRealEstate {
   

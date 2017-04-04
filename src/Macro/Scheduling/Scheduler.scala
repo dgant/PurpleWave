@@ -6,7 +6,7 @@ import Macro.Scheduling.Optimization.ScheduleSimulationResult
 import Performance.Caching.Limiter
 import Planning.Plan
 import ProxyBwapi.UnitClass.UnitClass
-import Startup.With
+import Lifecycle.With
 import Utilities.{CountMap, CountMapper}
 
 import scala.collection.mutable

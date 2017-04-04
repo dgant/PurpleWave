@@ -3,7 +3,7 @@ package Macro.Scheduling.Optimization
 import ProxyBwapi.Techs.{TechTypes, Techs}
 import ProxyBwapi.UnitClass.UnitClass
 import ProxyBwapi.Upgrades.{UpgradeTypes, Upgrades}
-import Startup.With
+import Lifecycle.With
 import Utilities.CountMap
 
 import scala.collection.{breakOut, mutable}

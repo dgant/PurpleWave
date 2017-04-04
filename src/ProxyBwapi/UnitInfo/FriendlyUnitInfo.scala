@@ -3,7 +3,7 @@ package ProxyBwapi.UnitInfo
 import ProxyBwapi.Techs.{Tech, Techs}
 import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
 import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
-import Startup.With
+import Lifecycle.With
 
 import scala.collection.JavaConverters._
 

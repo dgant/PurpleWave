@@ -2,7 +2,7 @@ package Micro.Behaviors.Protoss
 
 import Micro.Behaviors.{Behavior, BehaviorDefault, MovementProfiles}
 import Micro.Intentions.Intention
-import Startup.With
+import Lifecycle.With
 
 object BehaviorCarrier extends Behavior {
   

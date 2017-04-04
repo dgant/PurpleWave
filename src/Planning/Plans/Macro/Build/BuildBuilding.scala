@@ -10,7 +10,7 @@ import Planning.Plan
 import Planning.Composition.ResourceLocks.{LockArea, LockCurrencyForUnit, LockUnits}
 import ProxyBwapi.UnitClass.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Startup.With
+import Lifecycle.With
 import Utilities.EnrichPosition._
 import bwapi.{Race, TilePosition}
 

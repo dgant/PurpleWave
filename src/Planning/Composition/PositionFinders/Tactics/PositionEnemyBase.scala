@@ -1,7 +1,7 @@
 package Planning.Composition.PositionFinders.Tactics
 
 import Planning.Composition.PositionFinders.PositionFinder
-import Startup.With
+import Lifecycle.With
 import bwapi.TilePosition
 
 class PositionEnemyBase extends PositionFinder {

@@ -6,7 +6,7 @@ import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Plan
 import Planning.Composition.ResourceLocks.{LockCurrencyForTech, LockUnits}
 import ProxyBwapi.Techs.Tech
-import Startup.With
+import Lifecycle.With
 
 class ResearchTech(tech: Tech) extends Plan {
   

@@ -4,7 +4,7 @@ import Macro.Buildables.Buildable
 import Performance.Caching.CacheFrame
 import Planning.Plan
 import Planning.Plans.Macro.Build.{BuildBuilding, ResearchTech, ResearchUpgrade, TrainUnit}
-import Startup.With
+import Lifecycle.With
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer

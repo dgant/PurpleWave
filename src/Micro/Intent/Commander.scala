@@ -29,11 +29,19 @@ class Commander {
   }
   
   def attack(intent:Intention, target:UnitInfo) {
-    if (intent.unit.command.getUnitCommandType != UnitCommandType.Attack_Unit
-     || intent.unit.command.getTarget != target.base) {
-      intent.unit.base.attack(target.base)
+    
+    val currentlyAttackingTarget =
+      intent.unit.command.getUnitCommandType == UnitCommandType.Attack_Unit &&
+      intent.unit.command.getTarget == target.base
+    
+    if ( ! currentlyAttackingTarget) {
+      if (target.visible) {
+        intent.unit.base.attack(target.base)
+        sleepAttack(intent.unit)
+      } else {
+        move(intent, target.pixelCenter)
+      }
     }
-    sleepAttack(intent.unit)
   }
   
   def move(intent:Intention, position:Position) {

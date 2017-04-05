@@ -1,5 +1,6 @@
 package Micro.Heuristics.Targeting
 
+import Lifecycle.With
 import Micro.Intent.Intention
 import ProxyBwapi.UnitInfo.UnitInfo
 
@@ -13,7 +14,9 @@ object EvaluateTargets {
     
     if (candidates.isEmpty) return None
     
-    //TODO: Compare best candidate to "how about we just don't attack, at all?"
+    if (With.configuration.visualizeHeuristicTargeting) {
+      //With.executor.getState(intent.unit).targetHeuristics =
+    }
     
     Some(candidates.maxBy(candidate => profile.weightedHeuristics.map(_.weigh(intent, candidate)).product))
   }

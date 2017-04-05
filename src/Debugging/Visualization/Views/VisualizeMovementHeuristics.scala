@@ -1,30 +1,35 @@
 package Debugging.Visualization.Views
 
-import Debugging.Visualization.Data.MovementHeuristicView
 import Debugging.Visualization.Rendering.DrawMap
 import Lifecycle.With
+import Micro.Heuristics.MovementHeuristics.MovementHeuristicResult
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.EnrichPosition._
 
 object VisualizeMovementHeuristics {
   
   def render() {
-    var highlightUnit:Option[FriendlyUnitInfo] = None
     
-    if ( ! With.units.ours.exists(_.selected))
-      
-    highlightUnit = With.executor.states
-      .find(state => With.viewport.contains(state.unit.pixelCenter))
-      .map(_.unit)
+    var focus:Iterable[FriendlyUnitInfo] = With.units.ours.filter(unit => unit.selected && eligible(unit))
     
-    With.executor.states
-      .filter(state => (highlightUnit.contains(state.unit) || state.unit.selected) && state.movementHeuristics.nonEmpty)
-      .foreach(state => renderUnit(state.movementHeuristics))
+    if (focus.isEmpty) {
+      focus = With.executor.states
+        .filter(state => state.movementHeuristicResults.nonEmpty && eligible(state.unit))
+        .map(_.unit)
+        .headOption
+    }
+    
+    focus.foreach(unit => renderUnit(With.executor.getState(unit).movementHeuristicResults))
   }
   
-  def renderUnit(views:Iterable[MovementHeuristicView]) {
-    val heuristicGroups = views.groupBy(_.heuristic)
+  private def eligible(unit:FriendlyUnitInfo):Boolean = {
+    unit.alive && With.viewport.contains(unit.pixelCenter)
+  }
+  
+  def renderUnit(results:Iterable[MovementHeuristicResult]) {
+    if (results.isEmpty) return
     
+    val heuristicGroups = results.groupBy(_.heuristic)
     val scales = heuristicGroups.map(group => scale(group._2))
     val maxScale = scales.max
     if (maxScale == 1.0) {
@@ -33,46 +38,46 @@ object VisualizeMovementHeuristics {
     heuristicGroups.foreach(group => renderUnitHeuristic(group._2, maxScale))
   }
   
-  def scale(views:Iterable[MovementHeuristicView]):Double = {
-    val rawScale = views.map(_.evaluation).max / views.map(_.evaluation).min
+  def scale(results:Iterable[MovementHeuristicResult]):Double = {
+    val rawScale = results.map(_.evaluation).max / results.map(_.evaluation).min
     return normalize(rawScale)
   }
   
   def normalize(value:Double):Double = if (value < 1.0) 1.0/value else value
   
-  def renderUnitHeuristic(views:Iterable[MovementHeuristicView], maxScale:Double) {
-    val ourScale = scale(views)
+  def renderUnitHeuristic(results:Iterable[MovementHeuristicResult], maxScale:Double) {
+    val ourScale = scale(results)
     if (ourScale <= 1.0) return
   
     //Draw line to best tile(s)
-    val bestEvaluation = views.map(view => normalize(view.evaluation)).max
-    views
+    val bestEvaluation = results.map(view => normalize(view.evaluation)).max
+    results
       .filter(view => normalize(view.evaluation) == bestEvaluation)
       .foreach(bestView =>
         DrawMap.line(
           bestView.intent.unit.pixelCenter,
           bestView.candidate.pixelCenter,
-          bestView.heuristic.color))
+          bestView.color))
     
     val relativeScale = (ourScale - 1.0) / (maxScale - 1.0)
     val minRadius = Math.min(3.0, relativeScale)
-    val radiusMultiplier = Math.min(12.0, 12.0 * relativeScale / views.map(view => normalize(view.evaluation)).max)
+    val radiusMultiplier = Math.min(12.0, 12.0 * relativeScale / results.map(view => normalize(view.evaluation)).max)
     
-    views.foreach(view => {
+    results.foreach(result => {
       
       // We want to offset the centerpoint slightly for each heuristic
       // so very discrete heuristics (especially booleans) don't completely ovelap
-      val offsetX = (view.heuristic.color.hashCode)     % 5 - 2
-      val offsetY = (view.heuristic.color.hashCode / 2) % 5 - 2
+      val offsetX = (result.color.hashCode)     % 5 - 2
+      val offsetY = (result.color.hashCode / 2) % 5 - 2
       
       // Use the radius to show which heuristics have the biggest spread of values, and where
       // Big spread: Max 15.0, min 3.0
       // Boolean spread: Max 6.0, min 0.0
       // Tiny spread: Max < 6.0, min 0.0
-      val center = view.candidate.pixelCenter.add(offsetX, offsetY)
-      val radius = minRadius + radiusMultiplier * normalize(view.evaluation)
+      val center = result.candidate.pixelCenter.add(offsetX, offsetY)
+      val radius = minRadius + radiusMultiplier * normalize(result.evaluation)
       if (radius > 1.0) {
-        DrawMap.circle(center, radius.toInt, view.heuristic.color)
+        DrawMap.circle(center, radius.toInt, result.color)
       }
     })
   }

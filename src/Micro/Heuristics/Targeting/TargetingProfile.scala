@@ -1,5 +1,5 @@
 package Micro.Heuristics.Targeting
-import Micro.Heuristics.UnitHeuristics._
+import Micro.Heuristics.TargetHeuristics._
 
 class TargetingProfile(
   var preferInRange     : Double = 0,
@@ -10,16 +10,16 @@ class TargetingProfile(
   var avoidDistance     : Double = 0,
   var avoidDistraction  : Double = 0) {
   
-  def weightedHeuristics: Iterable[WeightedUnitHeuristic] = {
+  def weightedHeuristics: Iterable[TargetHeuristicWeight] = {
     List(
-      new WeightedUnitHeuristic(UnitHeuristicInRange,         preferInRange),
-      new WeightedUnitHeuristic(UnitHeuristicValue,           preferValue),
-      new WeightedUnitHeuristic(UnitHeuristicCombat,          preferCombat),
-      new WeightedUnitHeuristic(UnitHeuristicDamagePerSecond, preferDps),
-      new WeightedUnitHeuristic(UnitHeuristicHealth,          -avoidHealth),
-      new WeightedUnitHeuristic(UnitHeuristicDistance,        -avoidDistance),
-      new WeightedUnitHeuristic(UnitHeuristicDistraction,     -avoidDistraction)
-      //new WeightedUnitHeuristic(UnitHeuristicFiringPosition,  preferDps),
+      new TargetHeuristicWeight(TargetHeuristicInRange,         preferInRange),
+      new TargetHeuristicWeight(TargetHeuristicValue,           preferValue),
+      new TargetHeuristicWeight(TargetHeuristicCombat,          preferCombat),
+      new TargetHeuristicWeight(TargetHeuristicDamagePerSecond, preferDps),
+      new TargetHeuristicWeight(TargetHeuristicHealth,          -avoidHealth),
+      new TargetHeuristicWeight(TargetHeuristicDistance,        -avoidDistance),
+      new TargetHeuristicWeight(TargetHeuristicDistraction,     -avoidDistraction)
+      //new TargetHeuristicWeight(UnitHeuristicFiringPosition,  preferDps),
     )
   }
 }

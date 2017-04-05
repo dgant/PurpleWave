@@ -1,6 +1,6 @@
 package Lifecycle
 
-import Debugging.Visualization.Data.Viewport
+import Debugging.Visualization.Viewport
 import Debugging.{AutoCamera, Configuration, Logger, Performance}
 import Information.Geography.Geography
 import Information.Geography.Pathfinding.Paths

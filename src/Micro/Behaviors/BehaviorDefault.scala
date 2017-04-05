@@ -1,6 +1,6 @@
 package Micro.Behaviors
 import Micro.Intent.Intention
-import Micro.Heuristics.Movement.EvaluatePositions
+import Micro.Heuristics.Movement.EvaluateMoves
 import Micro.Heuristics.Targeting.EvaluateTargets
 import Lifecycle.With
 import Utilities.EnrichPosition._
@@ -8,19 +8,29 @@ import Utilities.EnrichPosition._
 object BehaviorDefault extends Behavior {
   
   def execute(intent: Intention) {
-    if (uninterruptible(intent)) return
-    debugPauseOnSelectedUnit(intent)
+    if ( ! readyForOrders(intent)) return
     considerFleeing(intent)
     pickTarget(intent)
     attack(intent) || move(intent)
   }
   
-  def debugPauseOnSelectedUnit(intent:Intention) = if (intent.unit.selected) {
-    val putADebugBreakpointHere = true
+  def considerFleeing(intent:Intention) {
+    if (desireToFight(intent) < 1.0 && intent.threats.nonEmpty) {
+      intent.destination = Some(With.geography.home)
+    }
   }
   
-  def considerFleeing(intent:Intention) = if (desireToFight(intent) < 1.0) intent.destination = Some(With.geography.home)
-  def uninterruptible(intent:Intention):Boolean = intent.unit.attackStarting || intent.unit.attackAnimationHappening
+  def readyForOrders(intent:Intention):Boolean = {
+    ! intent.unit.attackStarting && ! intent.unit.attackAnimationHappening
+  }
+  
+  def willingToShootAtAll: Boolean = {
+    true
+  }
+  
+  def willingToTakeFreeShots: Boolean = {
+    true
+  }
   
   def desireToFight(intent:Intention):Double = {
     With.battles.byUnit.get(intent.unit)
@@ -49,12 +59,11 @@ object BehaviorDefault extends Behavior {
   def move(intent:Intention):Boolean = {
     val tileToMove =
       if (intent.threats.nonEmpty || intent.targets.nonEmpty)
-        EvaluatePositions.best(intent, intent.movementProfileCombat, 3)
+        EvaluateMoves.best(intent, intent.movementProfileCombat, 3)
       else if (With.configuration.enableHeuristicTravel)
-        EvaluatePositions.best(intent, intent.movementProfileNormal, 2)
+        EvaluateMoves.best(intent, intent.movementProfileNormal, 2)
       else
         intent.destination.getOrElse(intent.unit.tileCenter)
-        
     
     With.commander.move(intent, tileToMove.pixelCenter)
     true

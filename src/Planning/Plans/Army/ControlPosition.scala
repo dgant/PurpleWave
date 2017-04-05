@@ -27,8 +27,8 @@ class ControlPosition extends Plan {
         e.possiblyStillThere &&
         e.canAttackThisFrame &&
         ourBases.exists(base =>
-          targetPosition.pixelCenter.pixelDistance(e.pixelCenter) <
-          targetPosition.pixelCenter.pixelDistance(base)))
+          e.travelPixels(base.tileIncluding) <
+          e.travelPixels(base.tileIncluding, targetPosition)))
         
     if (infiltrators.nonEmpty) {
       targetPosition = infiltrators.map(_.tileCenter).minBy(_.tileDistance(With.geography.home))
@@ -36,6 +36,8 @@ class ControlPosition extends Plan {
     
     units.get.acquire(this)
     if (units.get.satisfied) {
+      //TODO: Dispatch only units capable of fighting an infiltrator
+      
       units.get.units.foreach(fighter => With.executor.intend(new Intention(this, fighter) { destination = Some(targetPosition) }))
     }
   }

@@ -2,9 +2,15 @@ package Information.Grids.Dps
 
 import ProxyBwapi.UnitClass.UnitClass
 import Lifecycle.With
+import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.{TilePosition, UnitSizeType}
 
 class GridDpsEnemyToUnit {
+  
+  def get(
+   tile:TilePosition,
+   unit: UnitInfo): Double =
+    get(tile, unit.unitClass)
   
   def get(
     tile:TilePosition,

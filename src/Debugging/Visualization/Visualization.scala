@@ -5,38 +5,38 @@ import Lifecycle.With
 
 object Visualization {
   def onFrame() {
-    if (With.configuration.enableVisualization) {
+    if (With.configuration.visualize) {
       With.game.setTextSize(bwapi.Text.Size.Enum.Small)
   
-      if (With.configuration.enableVisualizationVectorUnits) {
+      if (With.configuration.visualizeVectorUnits) {
         VisualizeBlackScreen.render()
         VisualizeGeography.render()
         VisualizeVectorUnits.render()
         VisualizeBullets.render()
         VisualizeBlackScreenOverlay.render("Retro Arcade Happy Vision")
       }
-      else if (With.configuration.enableVisualizationTextOnly) {
+      else if (With.configuration.visualizeTextOnly) {
         VisualizeBlackScreen.render()
         VisualizeTextOnly.render()
         VisualizeGeography.render()
         VisualizeBlackScreenOverlay.render("Work-Friendly Retro Console Vision")
       }
   
-      if (With.configuration.enableVisualizationGeography)          VisualizeGeography            .render()
-      if (With.configuration.enableVisualizationChokepoints)        VisualizeChokepoints          .render()
-      if (With.configuration.enableVisualizationRealEstate)         VisualizeRealEstate           .render()
-      if (With.configuration.enableVisualizationGrids)              VisualizeGrids                .render()
-      if (With.configuration.enableVisualizationBases)              VisualizeBases                .render()
-      if (With.configuration.enableVisualizationBattles)            VisualizeBattles              .render()
-      if (With.configuration.enableVisualizationUnitsForeign)       VisualizeUnitsForeign         .render()
-      if (With.configuration.enableVisualizationUnitsOurs)          VisualizeUnitsOurs            .render()
-      if (With.configuration.enableVisualizationMovementHeuristics) VisualizeMovementHeuristics   .render()
-      if (With.configuration.enableVisualizationBullets)            VisualizeBullets              .render()
-      if (With.configuration.enableVisualizationEconomy)            VisualizeEconomy              .render()
-      if (With.configuration.enableVisualizationPerformance)        VisualizePerformance          .render()
-      if (With.configuration.enableVisualizationPlans)              VisualizePlans                .render()
-      if (With.configuration.enableVisualizationResources)          VisualizeResources            .render()
-      if (With.configuration.enableVisualizationScheduler)          VisualizeScheduler            .render()
+      if (With.configuration.visualizeGeography)          VisualizeGeography            .render()
+      if (With.configuration.visualizeChokepoints)        VisualizeChokepoints          .render()
+      if (With.configuration.visualizeRealEstate)         VisualizeRealEstate           .render()
+      if (With.configuration.visualizeGrids)              VisualizeGrids                .render()
+      if (With.configuration.visualizeBases)              VisualizeBases                .render()
+      if (With.configuration.visualizeBattles)            VisualizeBattles              .render()
+      if (With.configuration.visualizeUnitsForeign)       VisualizeUnitsForeign         .render()
+      if (With.configuration.visualizeUnitsOurs)          VisualizeUnitsOurs            .render()
+      if (With.configuration.visualizeHeuristicMovement) VisualizeMovementHeuristics   .render()
+      if (With.configuration.visualizeBullets)            VisualizeBullets              .render()
+      if (With.configuration.visualizeEconomy)            VisualizeEconomy              .render()
+      if (With.configuration.visualizePerformance)        VisualizePerformance          .render()
+      if (With.configuration.visualizePlans)              VisualizePlans                .render()
+      if (With.configuration.visualizeResources)          VisualizeResources            .render()
+      if (With.configuration.visualizeScheduler)          VisualizeScheduler            .render()
       
     }
   }

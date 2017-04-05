@@ -55,6 +55,13 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   def interceptors: Int = 8
   def scarabs: Int = 5
   
+  def airRange    : Double = unitClass.airRange
+  def groundRange : Double = unitClass.groundRange
+  def airDps      : Double = unitClass.airDps
+  def groundDps   : Double = unitClass.groundDps
+  def range (otherUnit:UnitInfo) : Double = if (otherUnit.flying) airRange   else groundRange
+  def dps   (otherUnit:UnitInfo) : Double = if (otherUnit.flying) airDps     else groundDps
+  
   def inTileRadius(tiles:Int)   : Set[UnitInfo] = With.units.inTileRadius(tileCenter, tiles)
   def inPixelRadius(pixels:Int) : Set[UnitInfo] = With.units.inPixelRadius(pixelCenter, pixels)
   

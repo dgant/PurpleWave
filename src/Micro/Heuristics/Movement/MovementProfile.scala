@@ -1,35 +1,52 @@
 package Micro.Heuristics.Movement
 
 import Debugging.Visualization.Colors
-import Micro.Heuristics.TileHeuristics._
+import Micro.Heuristics.MovementHeuristics._
 
 class MovementProfile(
-  var preferTravel      : Double = 0,
-  var preferSpot        : Double = 0,
-  var preferSitAtRange  : Double = 0,
-  var preferTarget      : Double = 0,
-  var preferMobility    : Double = 0,
-  var preferHighGround  : Double = 0,
-  var preferMoving      : Double = 0,
-  var preferRandom      : Double = 0,
-  var avoidDamage       : Double = 0,
-  var avoidTraffic      : Double = 0,
-  var avoidVision       : Double = 0,
-  var avoidDetection    : Double = 0) {
+  val preferTravel      : Double = 0,
+  val preferSpot        : Double = 0,
+  val preferSitAtRange  : Double = 0,
+  val preferTarget      : Double = 0,
+  val preferMobility    : Double = 0,
+  val preferHighGround  : Double = 0,
+  val preferMoving      : Double = 0,
+  val preferRandom      : Double = 0,
+  val avoidDamage       : Double = 0,
+  val avoidTraffic      : Double = 0,
+  val avoidVision       : Double = 0,
+  val avoidDetection    : Double = 0) {
   
-  def heuristics: Iterable[WeightedMovementHeuristic] =
+  def weightedHeuristics: Iterable[MovementHeuristicWeight] =
     List(
-      new WeightedMovementHeuristic(TileHeuristicDestinationApproximate,  preferTravel,       Colors.MediumGreen),
-      new WeightedMovementHeuristic(TileHeuristicDestinationExact,        preferSpot,         Colors.NeonGreen),
-      new WeightedMovementHeuristic(TileHeuristicEnemyAtMaxRange,         preferSitAtRange,   Colors.MediumRed),
-      new WeightedMovementHeuristic(TileHeuristicInRangeOfTarget,         preferTarget,       Colors.BrightBlue),
-      new WeightedMovementHeuristic(TileHeuristicMobility,                preferMobility,     Colors.MediumOrange),
-      new WeightedMovementHeuristic(TileHeuristicHighGround,              preferHighGround,   Colors.DarkBlue),
-      new WeightedMovementHeuristic(TileHeuristicKeepMoving,              preferMoving,       Colors.MediumBlue),
-      new WeightedMovementHeuristic(TileHeuristicRandom,                  preferRandom,       Colors.DarkGray),
-      new WeightedMovementHeuristic(TileHeuristicExposureToDamage,        -avoidDamage,       Colors.NeonRed),
-      new WeightedMovementHeuristic(TileHeuristicTraffic,                 -avoidTraffic,      Colors.NeonYellow),
-      new WeightedMovementHeuristic(TileHeuristicEnemyVision,             -avoidVision,       Colors.MediumGray),
-      new WeightedMovementHeuristic(TileHeuristicEnemyDetection,          -avoidDetection,    Colors.White)
+      new MovementHeuristicWeight(MovementHeuristicDestinationApproximate,  preferTravel,       Colors.MediumGreen),
+      new MovementHeuristicWeight(MovementHeuristicDestinationExact,        preferSpot,         Colors.NeonGreen),
+      new MovementHeuristicWeight(MovementHeuristicEnemyAtMaxRange,         preferSitAtRange,   Colors.MediumRed),
+      new MovementHeuristicWeight(MovementHeuristicInRangeOfTarget,         preferTarget,       Colors.BrightBlue),
+      new MovementHeuristicWeight(MovementHeuristicMobility,                preferMobility,     Colors.MediumOrange),
+      new MovementHeuristicWeight(MovementHeuristicHighGround,              preferHighGround,   Colors.DarkBlue),
+      new MovementHeuristicWeight(MovementHeuristicKeepMoving,              preferMoving,       Colors.MediumBlue),
+      new MovementHeuristicWeight(MovementHeuristicRandom,                  preferRandom,       Colors.DarkGray),
+      new MovementHeuristicWeight(MovementHeuristicExposureToDamage,        -avoidDamage,       Colors.NeonRed),
+      new MovementHeuristicWeight(MovementHeuristicTraffic,                 -avoidTraffic,      Colors.NeonYellow),
+      new MovementHeuristicWeight(MovementHeuristicEnemyVision,             -avoidVision,       Colors.MediumGray),
+      new MovementHeuristicWeight(MovementHeuristicEnemyDetection,          -avoidDetection,    Colors.White)
     )
+  
+  def adjustBy(other:MovementProfile):MovementProfile = {
+    new MovementProfile(
+      preferTravel        = preferTravel            + other.preferTravel,
+      preferSpot          = preferSpot              + other.preferSpot,
+      preferSitAtRange    = preferSitAtRange        + other.preferSitAtRange,
+      preferTarget        = preferTarget            + other.preferTarget,
+      preferMobility      = preferMobility          + other.preferMobility,
+      preferHighGround    = preferHighGround        + other.preferHighGround,
+      preferMoving        = preferMoving            + other.preferMoving,
+      preferRandom        = preferRandom            + other.preferRandom,
+      avoidDamage         = avoidDamage             + other.avoidDamage,
+      avoidTraffic        = avoidTraffic            + other.avoidTraffic,
+      avoidVision         = avoidVision             + other.avoidVision,
+      avoidDetection      = avoidDetection          + other.avoidDetection
+    )
+  }
 }

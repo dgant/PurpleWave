@@ -1,7 +1,6 @@
 package Micro.Intent
 
 import Micro.Behaviors.{Behavior, MovementProfiles, TargetingProfiles}
-import Micro.Heuristics.Targeting.{Targets, Threats}
 import Performance.Caching.CacheForever
 import Planning.Plan
 import ProxyBwapi.Techs.Tech
@@ -19,6 +18,9 @@ class Intention(val plan:Plan, val unit:FriendlyUnitInfo) {
   var toBuild     : Option[UnitClass]     = None
   var toTech      : Option[Tech]          = None
   var toUpgrade   : Option[Upgrade]       = None
+  
+  var leash         : Int     = Int.MaxValue
+  var desireToFight : Double  = 1.0
   
   def targets: Set[UnitInfo] = targetCache.get
   def threats: Set[UnitInfo] = threatCache.get

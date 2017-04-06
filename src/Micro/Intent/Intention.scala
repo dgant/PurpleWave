@@ -19,6 +19,7 @@ class Intention(val plan:Plan, val unit:FriendlyUnitInfo) {
   var toAttack    : Option[UnitInfo]      = None
   var toGather    : Option[UnitInfo]      = None
   var toBuild     : Option[UnitClass]     = None
+  var toTrain     : Option[UnitClass]     = None
   var toTech      : Option[Tech]          = None
   var toUpgrade   : Option[Upgrade]       = None
   
@@ -28,7 +29,7 @@ class Intention(val plan:Plan, val unit:FriendlyUnitInfo) {
   def targets: Set[UnitInfo] = targetCache.get
   def threats: Set[UnitInfo] = threatCache.get
  
-  var movementProfile = MovementProfiles.defaultCombat
+  var movementProfile = MovementProfiles.default
   var targetProfile         = TargetingProfiles.default
   
   private val targetCache = new CacheForever[Set[UnitInfo]](() => Targets.get(this))

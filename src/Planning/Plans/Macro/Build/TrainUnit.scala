@@ -49,7 +49,7 @@ class TrainUnit(val traineeClass:UnitClass) extends Plan {
       trainerLock.acquire(this)
       trainer = trainerLock.units.headOption
       if (trainee.isEmpty && trainer.isDefined) {
-        With.executor.intend(new Intention(this, trainer.get) { toBuild = Some(traineeClass) })
+        With.executor.intend(new Intention(this, trainer.get) { toTrain = Some(traineeClass) })
       }
     }
   }

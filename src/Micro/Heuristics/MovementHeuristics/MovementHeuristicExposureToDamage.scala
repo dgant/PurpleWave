@@ -8,7 +8,7 @@ object MovementHeuristicExposureToDamage extends MovementHeuristic {
   
   override def evaluate(intent: Intention, candidate: TilePosition): Double = {
   
-    Math.min(200.0, Math.max(1.0, With.grids.dpsEnemy.get(candidate, intent.unit.unitClass)))
+    Math.min(200.0, Math.max(1.0, With.grids.dpsEnemy.get(candidate, intent.unit)))
     
   }
   

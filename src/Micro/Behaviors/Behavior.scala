@@ -14,7 +14,7 @@ object Behavior {
   
     Gather.perform(intent)  ||
     Build.perform(intent)   ||
-    Perform.perform(intent) ||
+    Produce.perform(intent) ||
     Flee.perform(intent)    ||
     Pursue.perform(intent)  ||
     Poke.perform(intent)    ||

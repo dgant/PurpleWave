@@ -2,13 +2,13 @@ package Micro.Actions
 import Lifecycle.With
 import Micro.Intent.Intention
 
-object Perform extends Action {
+object Produce extends Action {
   
   override def perform(intent: Intention): Boolean = {
     
     if (intent.unit.trainingQueue.isEmpty) {
-      if (intent.toBuild.isDefined) {
-        With.commander.build(intent, intent.toBuild.get)
+      if (intent.toTrain.isDefined) {
+        With.commander.build(intent, intent.toTrain.get)
         return true
       }
       if (intent.toTech.isDefined) {

@@ -14,8 +14,7 @@ class MovementProfile(
   val preferRandom      : Double = 0,
   val avoidDamage       : Double = 0,
   val avoidTraffic      : Double = 0,
-  val avoidVision       : Double = 0,
-  val avoidDetection    : Double = 0) {
+  val avoidVision       : Double = 0) {
   
   def weightedHeuristics: Iterable[MovementHeuristicWeight] =
     List(
@@ -29,8 +28,7 @@ class MovementProfile(
       new MovementHeuristicWeight(MovementHeuristicRandom,                  preferRandom,       Colors.DarkGray),
       new MovementHeuristicWeight(MovementHeuristicExposureToDamage,        -avoidDamage,       Colors.NeonRed),
       new MovementHeuristicWeight(MovementHeuristicTraffic,                 -avoidTraffic,      Colors.NeonYellow),
-      new MovementHeuristicWeight(MovementHeuristicEnemyVision,             -avoidVision,       Colors.MediumGray),
-      new MovementHeuristicWeight(MovementHeuristicEnemyDetection,          -avoidDetection,    Colors.White)
+      new MovementHeuristicWeight(MovementHeuristicEnemyVision,             -avoidVision,       Colors.MediumGray)
     )
   
   def adjustBy(other:MovementProfile):MovementProfile = {
@@ -45,8 +43,7 @@ class MovementProfile(
       preferRandom        = preferRandom            + other.preferRandom,
       avoidDamage         = avoidDamage             + other.avoidDamage,
       avoidTraffic        = avoidTraffic            + other.avoidTraffic,
-      avoidVision         = avoidVision             + other.avoidVision,
-      avoidDetection      = avoidDetection          + other.avoidDetection
+      avoidVision         = avoidVision             + other.avoidVision
     )
   }
 }

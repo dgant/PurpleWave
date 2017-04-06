@@ -1,8 +1,8 @@
 package Micro.Heuristics.Movement
 
-import Geometry.Shapes.Circle
+import Mathematics.Shapes.Circle
 import Lifecycle.With
-import Micro.Heuristics.General.HeuristicMath
+import Mathematics.Heuristics.HeuristicMath
 import Micro.Heuristics.MovementHeuristics.MovementHeuristicResult
 import Micro.Intent.Intention
 import Utilities.EnrichPosition._

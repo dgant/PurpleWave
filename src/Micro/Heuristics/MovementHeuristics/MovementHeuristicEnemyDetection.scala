@@ -2,7 +2,7 @@ package Micro.Heuristics.MovementHeuristics
 
 import Micro.Intent.Intention
 import Lifecycle.With
-import Micro.Heuristics.General.HeuristicMath
+import Mathematics.Heuristics.HeuristicMath
 import bwapi.TilePosition
 
 object MovementHeuristicEnemyDetection extends MovementHeuristic {

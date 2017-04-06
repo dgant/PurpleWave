@@ -1,6 +1,6 @@
 package Information.Grids.Dps
 
-import Geometry.Shapes.Circle
+import Mathematics.Shapes.Circle
 import Information.Grids.ArrayTypes.AbstractGridDouble
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.UnitInfo

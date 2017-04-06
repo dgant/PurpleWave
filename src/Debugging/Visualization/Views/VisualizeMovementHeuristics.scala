@@ -2,7 +2,7 @@ package Debugging.Visualization.Views
 
 import Debugging.Visualization.Rendering.DrawMap
 import Lifecycle.With
-import Micro.Heuristics.General.HeuristicMath
+import Mathematics.Heuristics.HeuristicMath
 import Micro.Heuristics.MovementHeuristics.MovementHeuristicResult
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.EnrichPosition._
@@ -56,11 +56,11 @@ object VisualizeMovementHeuristics {
     val bestEvaluation = results.map(view => normalize(view.evaluation)).max
     results
       .filter(view => normalize(view.evaluation) == bestEvaluation)
-      .foreach(bestView =>
+      .foreach(bestResult =>
         DrawMap.line(
-          bestView.intent.unit.pixelCenter,
-          bestView.candidate.pixelCenter,
-          bestView.color))
+          bestResult.context.unit.pixelCenter,
+          bestResult.candidate.pixelCenter,
+          bestResult.color))
     
     val relativeScale = (ourScale - 1.0) / (maxScale - 1.0)
     val minRadius = Math.min(3.0, relativeScale)

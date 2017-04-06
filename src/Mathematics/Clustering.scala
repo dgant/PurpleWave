@@ -1,4 +1,4 @@
-package Geometry
+package Mathematics
 
 import Lifecycle.With
 import ProxyBwapi.UnitInfo.UnitInfo

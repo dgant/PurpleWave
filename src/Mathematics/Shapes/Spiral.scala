@@ -1,6 +1,6 @@
-package Geometry.Shapes
+package Mathematics.Shapes
 
-import Geometry.Point
+import Mathematics.Positions.Point
 
 object Spiral {
   

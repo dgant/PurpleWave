@@ -1,10 +1,11 @@
 package Information.Geography.Calculations
 
-import Geometry.Shapes.Circle
-import Geometry.{Clustering, TileRectangle}
+import Mathematics.Shapes.Circle
+import Mathematics.Clustering
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.ForeignUnitInfo
 import Lifecycle.With
+import Mathematics.Positions.TileRectangle
 import Utilities.EnrichPosition._
 import bwapi.TilePosition
 

@@ -1,8 +1,8 @@
 package Debugging.Visualization.Rendering
 
 import Debugging.Visualization.Colors
-import Geometry.TileRectangle
 import Lifecycle.With
+import Mathematics.Positions.TileRectangle
 import Utilities.EnrichPosition._
 import bwapi.{Color, Player, Position}
 

@@ -1,11 +1,12 @@
 package Information.Geography
 
-import Geometry._
+import Mathematics.{Positions, _}
 import Information.Geography.Calculations.{ZoneBuilder, ZoneUpdater}
 import Information.Geography.Types.{Base, Zone}
 import Performance.Caching.{Cache, CacheForever, Limiter}
 import ProxyBwapi.UnitInfo.UnitInfo
 import Lifecycle.With
+import Mathematics.Positions.TileRectangle
 import bwapi.TilePosition
 import Utilities.EnrichPosition._
 
@@ -46,7 +47,7 @@ class Geography {
       .sortBy( ! _.isStartLocation)
       .headOption
       .map(_.townHallArea.startInclusive)
-      .getOrElse(Positions.tileMiddle))
+      .getOrElse(Positions.Positions.tileMiddle))
   
   def onFrame() {
     zoneUpdateLimiter.act()

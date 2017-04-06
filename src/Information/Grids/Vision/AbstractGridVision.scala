@@ -1,6 +1,6 @@
 package Information.Grids.Vision
 
-import Geometry.Shapes.Circle
+import Mathematics.Shapes.Circle
 import Information.Grids.ArrayTypes.AbstractGridBoolean
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.EnrichPosition._

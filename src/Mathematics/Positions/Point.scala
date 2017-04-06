@@ -1,4 +1,4 @@
-package Geometry
+package Mathematics.Positions
 
 import bwapi.{Position, TilePosition}
 

@@ -1,6 +1,7 @@
 package Micro.Heuristics.MovementHeuristics
 
-import Micro.Heuristics.General.MicroHeuristic
+import Mathematics.Heuristics.Heuristic
+import Micro.Intent.Intention
 import bwapi.TilePosition
 
-abstract class MovementHeuristic extends MicroHeuristic[TilePosition]
+abstract class MovementHeuristic extends Heuristic[Intention, TilePosition]

@@ -1,6 +1,6 @@
 package Information.Grids.Movement
 
-import Geometry.Shapes.Square
+import Mathematics.Shapes.Square
 import Information.Grids.ArrayTypes.AbstractGridBoolean
 import Lifecycle.With
 import Utilities.EnrichPosition._

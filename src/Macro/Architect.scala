@@ -1,10 +1,10 @@
 package Macro
 
-import Geometry.Shapes.Spiral
-import Geometry.TileRectangle
+import Mathematics.Shapes.Spiral
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClass._
 import Lifecycle.With
+import Mathematics.Positions.TileRectangle
 import Utilities.EnrichPosition._
 import bwapi.TilePosition
 

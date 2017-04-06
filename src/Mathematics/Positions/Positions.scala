@@ -1,4 +1,4 @@
-package Geometry
+package Mathematics.Positions
 
 import Lifecycle.With
 import bwapi.{Position, TilePosition}

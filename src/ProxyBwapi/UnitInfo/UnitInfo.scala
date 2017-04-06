@@ -1,8 +1,8 @@
 package ProxyBwapi.UnitInfo
 
-import Geometry.TileRectangle
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Lifecycle.With
+import Mathematics.Positions.TileRectangle
 import Utilities.EnrichPosition._
 import bwapi._
 

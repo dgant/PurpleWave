@@ -1,7 +1,7 @@
 package Information.Geography.Types
 
-import Geometry.TileRectangle
 import Lifecycle.With
+import Mathematics.Positions.TileRectangle
 import bwapi.{Player, Position, TilePosition}
 import bwta.Region
 

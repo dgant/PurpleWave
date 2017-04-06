@@ -1,6 +1,6 @@
 package Micro.Heuristics.TargetHeuristics
 
-import Micro.Heuristics.General.HeuristicMath
+import Mathematics.Heuristics.HeuristicMath
 import Micro.Intent.Intention
 import ProxyBwapi.UnitInfo.UnitInfo
 

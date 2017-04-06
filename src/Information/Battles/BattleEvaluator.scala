@@ -1,6 +1,6 @@
 package Information.Battles
 
-import Geometry.Positions
+import Mathematics.Positions.Positions
 
 object BattleEvaluator {
   

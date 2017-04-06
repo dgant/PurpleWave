@@ -1,10 +1,10 @@
 package Information.Geography.Calculations
 
-import Geometry.Shapes.Spiral
-import Geometry.TileRectangle
+import Mathematics.Shapes.Spiral
 import Information.Geography.Types.{Base, Zone, ZoneEdge}
 import ProxyBwapi.Races.Protoss
 import Lifecycle.With
+import Mathematics.Positions.TileRectangle
 import Utilities.EnrichPosition._
 import bwapi.{Position, TilePosition}
 import bwta.{BWTA, Chokepoint, Region}

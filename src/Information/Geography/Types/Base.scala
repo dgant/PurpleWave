@@ -1,6 +1,6 @@
 package Information.Geography.Types
 
-import Geometry.TileRectangle
+import Mathematics.Positions.TileRectangle
 import ProxyBwapi.UnitInfo.UnitInfo
 
 class Base(

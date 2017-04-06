@@ -1,6 +1,6 @@
 package Information.Grids.Vision
 
-import Geometry.Shapes.Circle
+import Mathematics.Shapes.Circle
 import Information.Grids.ArrayTypes.AbstractGridBoolean
 import Lifecycle.With
 import Utilities.EnrichPosition._

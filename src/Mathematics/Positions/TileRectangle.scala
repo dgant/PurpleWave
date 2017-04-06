@@ -1,7 +1,7 @@
-package Geometry
+package Mathematics.Positions
 
-import bwapi.{Position, TilePosition}
 import Utilities.EnrichPosition._
+import bwapi.{Position, TilePosition}
 
 case class TileRectangle(
  val startInclusive:TilePosition,

@@ -1,17 +1,17 @@
 package Micro.Heuristics.MovementHeuristics
 
-import Micro.Heuristics.General.{MicroHeuristic, MicroHeuristicResult}
+import Mathematics.Heuristics.{Heuristic, HeuristicResult}
 import Micro.Intent.Intention
 import bwapi.TilePosition
 
 class MovementHeuristicResult (
-  heuristic   : MicroHeuristic[TilePosition],
-  intent      : Intention,
-  candidate   : TilePosition,
-  evaluation  : Double,
-  val color   : bwapi.Color)
+                                heuristic   : Heuristic[Intention, TilePosition],
+                                intent      : Intention,
+                                candidate   : TilePosition,
+                                evaluation  : Double,
+                                val color   : bwapi.Color)
 
-  extends MicroHeuristicResult (
+  extends HeuristicResult (
     heuristic,
     intent,
     candidate,

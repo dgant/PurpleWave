@@ -1,4 +1,4 @@
-package Geometry.Shapes
+package Mathematics.Shapes
 
 import bwapi.TilePosition
 

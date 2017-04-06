@@ -1,8 +1,8 @@
 package Planning.Composition.ResourceLocks
 
-import Geometry.TileRectangle
 import Planning.Plan
 import Lifecycle.With
+import Mathematics.Positions.TileRectangle
 
 class LockArea extends ResourceLock {
   

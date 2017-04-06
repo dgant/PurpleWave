@@ -1,6 +1,6 @@
 package Micro.Heuristics.MovementHeuristics
 import Lifecycle.With
-import Micro.Heuristics.General.HeuristicMath
+import Mathematics.Heuristics.HeuristicMath
 import Micro.Intent.Intention
 import bwapi.TilePosition
 

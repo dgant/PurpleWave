@@ -1,9 +1,9 @@
 package ProxyBwapi.UnitTracking
 
-import Geometry.Shapes.Circle
-import Geometry.TileRectangle
+import Mathematics.Shapes.Circle
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, UnitInfo}
 import Lifecycle.With
+import Mathematics.Positions.TileRectangle
 import Utilities.EnrichPosition._
 import bwapi.{Position, TilePosition, UnitType}
 

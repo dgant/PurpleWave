@@ -1,7 +1,7 @@
 package Micro.Heuristics.TargetHeuristics
 
 import Debugging.Visualization.Colors
-import Micro.Heuristics.General.MicroHeuristicWeight
+import Mathematics.Heuristics.HeuristicWeight
 import bwapi.Color
 
 class TargetHeuristicWeight(
@@ -9,6 +9,6 @@ class TargetHeuristicWeight(
   weight    : Double,
   val color : Color = Colors.DefaultGray)
 
-    extends MicroHeuristicWeight(heuristic, weight) {
+  extends HeuristicWeight(heuristic, weight) {
   
 }

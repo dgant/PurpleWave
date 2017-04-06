@@ -1,7 +1,7 @@
 package Information
 
-import Geometry.TileRectangle
 import Lifecycle.With
+import Mathematics.Positions.TileRectangle
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import bwapi.Race
 

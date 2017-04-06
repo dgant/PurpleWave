@@ -1,6 +1,7 @@
 package Micro.State
 
 import Lifecycle.With
+import Micro.Behaviors.Behavior
 import Micro.Intent.Intention
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -26,7 +27,7 @@ class Executor {
     stateByUnit
       .values
       .filter(state => With.commander.readyForCommand(state.unit))
-      .foreach(state => state.intent.behavior.execute(state.intent))
+      .foreach(state => Behavior.execute(state.intent))
   }
   
   def getState(unit:FriendlyUnitInfo):ExecutionState = {

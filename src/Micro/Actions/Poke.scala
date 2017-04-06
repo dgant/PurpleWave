@@ -13,7 +13,6 @@ object Poke extends Action {
         intent.targets.filter(intent.unit.inRangeToAttack)))
   
     false
-    
   }
   
 }

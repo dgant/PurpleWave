@@ -7,7 +7,6 @@ class Configuration {
   val combatMovementPenalty           = 0.5
   val combatCooldownPenalty           = 0.75
   val combatStickinessLeash           = 64
-  var enableGoonStopProtection        = true
   var enablePathRecalculation         = false
   var enableFastGroundDistance        = true
   

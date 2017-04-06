@@ -93,21 +93,6 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
   def tileArea:TileRectangle = new TileRectangle(new TilePosition(0, 0), tileSize)
   def isTownHall:Boolean = isTownHallCache.get
   private val isTownHallCache = new CacheForever(() => List(Terran.CommandCenter, Protoss.Nexus, Zerg.Hatchery, Zerg.Lair, Zerg.Hive).contains(this))
-  //////////////
-  // Behavior //
-  //////////////
-  
-  def behavior:Behavior = {
-    if      (isWorker)                    BehaviorWorker
-    else if (isBuilding)                  BehaviorBuilding
-    else if (this == Protoss.Carrier)     BehaviorCarrier
-    else if (this == Protoss.Corsair)     BehaviorCorsair
-    else if (this == Protoss.DarkTemplar) BehaviorDarkTemplar
-    else if (this == Protoss.Dragoon)     BehaviorDragoon
-    else if (this == Protoss.Reaver)      BehaviorReaver
-    else if (this == Protoss.Scout)       BehaviorCorsair
-    else                                  BehaviorDefault
-  }
   
   ///////////
   // Macro //

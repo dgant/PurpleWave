@@ -21,8 +21,8 @@ class Grids {
   val dpsEnemyGroundExplosive   = new GridDpsEnemyGroundExplosive
   val dpsEnemyGroundNormal      = new GridDpsEnemyGroundNormal
   val enemyVision               = new GridEnemyVision
-  val psi2x2and3x2          = new GridPsi2x2and3x2
-  val psi4x3                = new GridPsi4x3
+  val psi2x2and3x2              = new GridPsi2x2and3x2
+  val psi4x3                    = new GridPsi4x3
   val mobility                  = new GridMobility
   val units                     = new GridUnits
   val walkable                  = new GridWalkable
@@ -30,28 +30,45 @@ class Grids {
   val walkableUnits             = new GridWalkableUnits
   val dpsEnemy                  = new GridDpsEnemyToUnit
   
-  def onFrame() = limitUpdates.act()
-  val limitUpdates = new Limiter(frameDelayScale, () => update)
-  def update() {
+  // Updating grids is the spikiest thing we do, performance-wise
+  // So we split the grid updates into batches so no one frame gets too long.
+  private val updateBatches = Array(
+    List(
+      psi2x2and3x2,
+      psi4x3,
+      walkable,
+      walkableTerrain,
+      walkableUnits,
+      buildable,
+      buildableTerrain
+    ),
+    List(
+      units
+    ),
     List(
       altitudeBonus,
-      units,
+      enemyDetection,
+      enemyVision
+    ),
+    List(
+      mobility //The most expensive by far
+    ),
+    List(
       dpsEnemyAirConcussive,
       dpsEnemyAirExplosive,
       dpsEnemyAirNormal,
       dpsEnemyGroundConcussive,
       dpsEnemyGroundExplosive,
-      dpsEnemyGroundNormal,
-      enemyDetection,
-      enemyVision,
-      psi2x2and3x2,
-      psi4x3,
-      buildable,
-      buildableTerrain,
-      walkable,
-      walkableTerrain,
-      walkableUnits,
-      mobility
-    ).foreach(_.update())
+      dpsEnemyGroundNormal
+    )
+  )
+  
+  private var lastBatchUpdated = 0
+  def onFrame() = limitUpdates.act()
+  val limitUpdates = new Limiter(1, () => update)
+  
+  def update() {
+    lastBatchUpdated = (lastBatchUpdated + 1) % updateBatches.size
+    updateBatches(lastBatchUpdated).foreach(_.update())
   }
 }

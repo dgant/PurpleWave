@@ -2,7 +2,7 @@ package Micro.Actions
 import Micro.Heuristics.Targeting.EvaluateTargets
 import Micro.Intent.Intention
 
-object Pursue extends Action {
+object Poke extends Action {
   
   override def perform(intent: Intention): Boolean = {
   
@@ -10,9 +10,10 @@ object Pursue extends Action {
       intent.toAttack.orElse(EvaluateTargets.best(
         intent,
         intent.targetProfile,
-        intent.targets))
-    
+        intent.targets.filter(intent.unit.inRangeToAttack)))
+  
     false
+    
   }
   
 }

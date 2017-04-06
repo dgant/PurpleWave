@@ -1,7 +1,7 @@
 package Micro.Intent
 
 import Lifecycle.With
-import Micro.Behaviors.{Behavior, MovementProfiles, TargetingProfiles}
+import Micro.Behaviors.{MovementProfiles, TargetingProfiles}
 import Micro.State.ExecutionState
 import Performance.Caching.CacheForever
 import Planning.Plan
@@ -15,7 +15,6 @@ class Intention(val plan:Plan, val unit:FriendlyUnitInfo) {
   
   def state:ExecutionState = With.executor.getState(unit)
   
-  var behavior    : Behavior              = unit.unitClass.behavior
   var destination : Option[TilePosition]  = None
   var toAttack    : Option[UnitInfo]      = None
   var toGather    : Option[UnitInfo]      = None

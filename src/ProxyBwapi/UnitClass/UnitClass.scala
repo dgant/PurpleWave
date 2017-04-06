@@ -1,9 +1,6 @@
 package ProxyBwapi.UnitClass
 
 import Mathematics.Positions.TileRectangle
-import Micro.Behaviors.General.{BehaviorBuilding, BehaviorWorker}
-import Micro.Behaviors.Protoss._
-import Micro.Behaviors._
 import Performance.Caching.CacheForever
 import ProxyBwapi.Races.{Neutral, Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Tech

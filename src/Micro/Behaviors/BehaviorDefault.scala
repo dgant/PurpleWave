@@ -1,6 +1,6 @@
 package Micro.Behaviors
 import Lifecycle.With
-import Micro.Actions.{Attack, Flee, Move, Pursue}
+import Micro.Actions._
 import Micro.Intent.Intention
 
 object BehaviorDefault extends Behavior {
@@ -14,6 +14,7 @@ object BehaviorDefault extends Behavior {
     
     Flee.perform(intent)    ||
     Pursue.perform(intent)  ||
+    Poke.perform(intent)    ||
     Attack.perform(intent)  ||
     Move.perform(intent)
   }

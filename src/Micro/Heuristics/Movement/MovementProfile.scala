@@ -31,7 +31,7 @@ class MovementProfile(
       new MovementHeuristicWeight(MovementHeuristicEnemyVision,             -avoidVision,       Colors.MediumGray)
     )
   
-  def adjustBy(other:MovementProfile):MovementProfile = {
+  def adjustedBy(other:MovementProfile):MovementProfile = {
     new MovementProfile(
       preferTravel        = preferTravel            + other.preferTravel,
       preferSpot          = preferSpot              + other.preferSpot,

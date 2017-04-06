@@ -8,8 +8,7 @@ object BehaviorCarrier extends Behavior {
   
   override def execute(intent: Intention) {
     
-    intent.movementProfileCombat = MovementProfiles.carrier
-    intent.movementProfileNormal = MovementProfiles.carrier
+    intent.movementProfile = MovementProfiles.carrier
     
     //This will be stupid if we don't have the capacity upgrade
     if (intent.unit.trainingQueue.isEmpty && intent.unit.interceptors < 8) {

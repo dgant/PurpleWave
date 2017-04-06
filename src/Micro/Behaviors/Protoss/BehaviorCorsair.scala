@@ -5,9 +5,10 @@ import Micro.Intent.Intention
 
 object BehaviorCorsair extends Behavior {
   def execute(intent: Intention) {
-    intent.movementProfileCombat = MovementProfiles.corsair
-    intent.movementProfileNormal = MovementProfiles.corsair
+    
+    intent.movementProfile = MovementProfiles.corsair
     
     BehaviorDefault.execute(intent)
+    
   }
 }

@@ -6,9 +6,10 @@ import Micro.Intent.Intention
 object BehaviorDarkTemplar extends Behavior {
   
   def execute(intent: Intention) {
-    intent.movementProfileCombat = MovementProfiles.darkTemplar
-    intent.movementProfileNormal = MovementProfiles.darkTemplar
+    
+    intent.movementProfile = MovementProfiles.darkTemplar
   
     BehaviorDefault.execute(intent)
+    
   }
 }

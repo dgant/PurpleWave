@@ -1,6 +1,8 @@
-package Micro.Behaviors
-import Micro.Intent.Intention
+package Micro.Behaviors.Protoss
+
 import Lifecycle.With
+import Micro.Behaviors.{Behavior, BehaviorDefault}
+import Micro.Intent.Intention
 
 object BehaviorDragoon extends Behavior {
   
@@ -23,6 +25,7 @@ object BehaviorDragoon extends Behavior {
    */
   
   def execute(intent: Intention) {
+    
     if (With.configuration.enableGoonStopProtection && intent.unit.attackAnimationHappening) {
       return
     }

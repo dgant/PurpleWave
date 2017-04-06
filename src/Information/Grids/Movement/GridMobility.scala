@@ -7,7 +7,7 @@ import Utilities.EnrichPosition._
 
 class GridMobility extends AbstractGridInt {
   
-  val limitUpdates = new Limiter(20, () => updateRecalculate)
+  val limitUpdates = new Limiter(100, () => updateRecalculate)
   override def update() = limitUpdates.act
   def updateRecalculate() {
     val distanceMax = 3

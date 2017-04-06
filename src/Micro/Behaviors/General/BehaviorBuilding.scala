@@ -1,6 +1,8 @@
-package Micro.Behaviors
-import Micro.Intent.Intention
+package Micro.Behaviors.General
+
 import Lifecycle.With
+import Micro.Behaviors.Behavior
+import Micro.Intent.Intention
 
 object BehaviorBuilding extends Behavior {
   

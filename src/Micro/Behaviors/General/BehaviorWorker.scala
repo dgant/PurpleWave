@@ -1,12 +1,12 @@
-package Micro.Behaviors
-import Micro.Intent.Intention
+package Micro.Behaviors.General
+
 import Lifecycle.With
+import Micro.Behaviors.{Behavior, BehaviorDefault}
+import Micro.Intent.Intention
 
 object BehaviorWorker extends Behavior {
   
   def execute(intent: Intention) {
-    
-    intent.movementProfileNormal = MovementProfiles.worker
   
     if (intent.toBuild.isDefined) {
       return With.commander.build(intent, intent.toBuild.get, intent.destination.get)

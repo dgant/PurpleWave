@@ -38,6 +38,6 @@ object EvaluateMoves {
               weightedHeuristic.color)))
     }
     
-    HeuristicMath.weigh(intent, profile.weightedHeuristics, candidates)
+    HeuristicMath.calculateBest(intent, profile.weightedHeuristics, candidates)
   }
 }

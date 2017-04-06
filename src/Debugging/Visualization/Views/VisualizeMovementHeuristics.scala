@@ -2,6 +2,7 @@ package Debugging.Visualization.Views
 
 import Debugging.Visualization.Rendering.DrawMap
 import Lifecycle.With
+import Micro.Heuristics.General.HeuristicMath
 import Micro.Heuristics.MovementHeuristics.MovementHeuristicResult
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.EnrichPosition._
@@ -23,7 +24,9 @@ object VisualizeMovementHeuristics {
   }
   
   private def eligible(unit:FriendlyUnitInfo):Boolean = {
-    unit.alive && With.viewport.contains(unit.pixelCenter)
+    return unit.alive &&
+      With.executor.getState(unit).movingHeuristically &&
+      With.viewport.contains(unit.pixelCenter)
   }
   
   def renderUnit(results:Iterable[MovementHeuristicResult]) {
@@ -32,7 +35,7 @@ object VisualizeMovementHeuristics {
     val heuristicGroups = results.groupBy(_.heuristic)
     val scales = heuristicGroups.map(group => scale(group._2))
     val maxScale = scales.max
-    if (maxScale == 1.0) {
+    if (maxScale == HeuristicMath.default) {
       return
     }
     heuristicGroups.foreach(group => renderUnitHeuristic(group._2, maxScale))

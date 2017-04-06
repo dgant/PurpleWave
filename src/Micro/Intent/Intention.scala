@@ -1,6 +1,8 @@
 package Micro.Intent
 
+import Lifecycle.With
 import Micro.Behaviors.{Behavior, MovementProfiles, TargetingProfiles}
+import Micro.State.ExecutionState
 import Performance.Caching.CacheForever
 import Planning.Plan
 import ProxyBwapi.Techs.Tech
@@ -10,6 +12,8 @@ import ProxyBwapi.Upgrades.Upgrade
 import bwapi.TilePosition
 
 class Intention(val plan:Plan, val unit:FriendlyUnitInfo) {
+  
+  def state:ExecutionState = With.executor.getState(unit)
   
   var behavior    : Behavior              = unit.unitClass.behavior
   var destination : Option[TilePosition]  = None
@@ -25,8 +29,7 @@ class Intention(val plan:Plan, val unit:FriendlyUnitInfo) {
   def targets: Set[UnitInfo] = targetCache.get
   def threats: Set[UnitInfo] = threatCache.get
  
-  var movementProfileCombat = MovementProfiles.defaultCombat
-  var movementProfileNormal = MovementProfiles.defaultNormal
+  var movementProfile = MovementProfiles.defaultCombat
   var targetProfile         = TargetingProfiles.default
   
   private val targetCache = new CacheForever[Set[UnitInfo]](() => Targets.get(this))

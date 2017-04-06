@@ -1,71 +1,24 @@
 package Micro.Behaviors
-import Micro.Intent.Intention
-import Micro.Heuristics.Movement.EvaluateMoves
-import Micro.Heuristics.Targeting.EvaluateTargets
 import Lifecycle.With
-import Utilities.EnrichPosition._
+import Micro.Actions.{Attack, Flee, Move, Pursue}
+import Micro.Intent.Intention
 
 object BehaviorDefault extends Behavior {
   
   def execute(intent: Intention) {
     if ( ! readyForOrders(intent)) return
-    considerFleeing(intent)
-    pickTarget(intent)
-    attack(intent) || move(intent)
-  }
-  
-  def considerFleeing(intent:Intention) {
-    if (desireToFight(intent) < 1.0 && intent.threats.nonEmpty) {
-      intent.destination = Some(With.geography.home)
-    }
+    
+    intent.desireToFight = With.battles.byUnit.get(intent.unit)
+      .map(battle => (1.0 + battle.us.strength) / (1.0 + battle.enemy.strength))
+      .getOrElse(1.0)
+    
+    Flee.perform(intent)    ||
+    Pursue.perform(intent)  ||
+    Attack.perform(intent)  ||
+    Move.perform(intent)
   }
   
   def readyForOrders(intent:Intention):Boolean = {
     ! intent.unit.attackStarting && ! intent.unit.attackAnimationHappening
-  }
-  
-  def willingToShootAtAll: Boolean = {
-    true
-  }
-  
-  def willingToTakeFreeShots: Boolean = {
-    true
-  }
-  
-  def desireToFight(intent:Intention):Double = {
-    With.battles.byUnit.get(intent.unit)
-      .map(battle => (1.0 + battle.us.strength) / (1.0 + battle.enemy.strength))
-      .getOrElse(1.0)
-  }
-  
-  def pickTarget(intent:Intention) = intent.toAttack = intent.toAttack.orElse(EvaluateTargets.best(intent, intent.targetProfile, intent.targets))
-  
-  def attack(intent:Intention):Boolean = {
-    val willingToFight = desireToFight(intent) > 0.5
-    if (
-      intent.unit.canAttackThisFrame &&
-      intent.toAttack.isDefined &&
-        (willingToFight ||
-          (intent.toAttack.exists(intent.unit.inRangeToAttack)
-          && ! intent.unit.flying))) {
-      With.commander.attack(intent, intent.toAttack.get)
-      return true
-    }
-    
-    if ( ! willingToFight) intent.toAttack = None
-    false
-  }
-  
-  def move(intent:Intention):Boolean = {
-    val tileToMove =
-      if (intent.threats.nonEmpty || intent.targets.nonEmpty)
-        EvaluateMoves.best(intent, intent.movementProfileCombat, 3)
-      else if (With.configuration.enableHeuristicTravel)
-        EvaluateMoves.best(intent, intent.movementProfileNormal, 2)
-      else
-        intent.destination.getOrElse(intent.unit.tileCenter)
-    
-    With.commander.move(intent, tileToMove.pixelCenter)
-    true
   }
 }

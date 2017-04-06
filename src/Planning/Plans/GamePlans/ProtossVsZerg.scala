@@ -31,34 +31,40 @@ class ProtossVsZerg extends Parallel {
     new RequestUnitAtLeast(2,   Protoss.Assimilator),
     new RequestUnitAtLeast(1,   Protoss.CyberneticsCore),
     new RequestUnitAtLeast(1,   Protoss.Stargate),
-    new RequestUnitAtLeast(1,   Protoss.RoboticsFacility),
-    new RequestUnitAtLeast(1,   Protoss.RoboticsSupportBay),
+    new RequestUnitAtLeast(1,   Protoss.Forge),
+    new RequestUnitAtLeast(1,   Protoss.CitadelOfAdun),
+    new RequestUpgrade(         Protoss.ZealotLegs),
+    new RequestUpgrade(         Protoss.GroundWeapons, 1),
     
     new RequestUnitAtLeast(3,   Protoss.Nexus),
-    new RequestUnitAtLeast(1,   Protoss.CitadelOfAdun),
+    new RequestUnitAtLeast(2,   Protoss.PhotonCannon),
+    new RequestUnitAtLeast(1,   Protoss.RoboticsFacility),
     new RequestUnitAtLeast(3,   Protoss.Assimilator),
     new RequestUpgrade(         Protoss.DragoonRange),
-    new RequestUpgrade(         Protoss.ZealotLegs),
-    new RequestUnitAtLeast(6,   Protoss.Gateway),
-    new RequestUnitAtLeast(1,   Protoss.TemplarArchives),
-    new RequestUnitAtLeast(3,   Protoss.DarkTemplar),
+    new RequestUnitAtLeast(1,   Protoss.RoboticsSupportBay),
+    new RequestUnitAtLeast(5,   Protoss.Gateway),
+    new RequestUnitAtLeast(4,   Protoss.PhotonCannon),
     
     new RequestUnitAtLeast(4,   Protoss.Nexus),
     new RequestUnitAtLeast(2,   Protoss.RoboticsFacility),
     new RequestUnitAtLeast(4,   Protoss.Assimilator),
+    new RequestUnitAtLeast(1,   Protoss.TemplarArchives),
+    new RequestUnitAtLeast(2,   Protoss.Forge),
+    new RequestUnitAtLeast(7,   Protoss.PhotonCannon),
+    new RequestUpgrade(         Protoss.GroundWeapons, 2),
+    new RequestUpgrade(         Protoss.GroundArmor, 2),
+    new RequestUnitAtLeast(3,   Protoss.DarkTemplar),
     new RequestUnitAtLeast(8,   Protoss.Gateway),
-    new RequestUnitAtLeast(1,   Protoss.Forge),
     
     new RequestUnitAtLeast(5,   Protoss.Nexus),
-    new RequestUnitAtLeast(8,   Protoss.Gateway),
+    new RequestUnitAtLeast(10,  Protoss.Gateway),
     new RequestUnitAtLeast(5,   Protoss.Assimilator),
-    new RequestUpgrade(         Protoss.GroundWeapons, 1),
+    new RequestUpgrade(         Protoss.GroundWeapons, 3),
+    new RequestUpgrade(         Protoss.GroundArmor, 3),
     
     new RequestUnitAtLeast(6,   Protoss.Nexus),
-    new RequestUnitAtLeast(6,   Protoss.Assimilator),
-    new RequestUpgrade(         Protoss.GroundWeapons, 2),
     new RequestUnitAtLeast(12,  Protoss.Gateway),
-    new RequestUpgrade(         Protoss.GroundWeapons, 3),
+    new RequestUnitAtLeast(6,   Protoss.Assimilator),
     
     new RequestUnitAtLeast(7,   Protoss.Nexus),
     new RequestUnitAtLeast(7,   Protoss.Assimilator),
@@ -74,7 +80,7 @@ class ProtossVsZerg extends Parallel {
     new TrainContinuously(Protoss.Reaver),
     new TrainContinuously(Protoss.Corsair),
     new IfThenElse {
-      predicate.set(new UnitCountAtLeast { quantity.set(14); unitMatcher.set(new UnitMatchType(Protoss.Zealot)) })
+      predicate.set(new UnitCountAtLeast { quantity.set(10); unitMatcher.set(new UnitMatchType(Protoss.Zealot)) })
       whenFalse.set(new TrainContinuously(Protoss.Zealot))
       whenTrue.set(new TrainContinuously(Protoss.Dragoon))
     },
@@ -82,7 +88,7 @@ class ProtossVsZerg extends Parallel {
     new ScoutAt(10),
     new Attack{ attackers.get.unitMatcher.set(new UnitMatchType(Protoss.Corsair)) },
     new IfThenElse {
-      predicate.set(new UnitCountAtLeast { quantity.set(25); unitMatcher.set(UnitMatchWarriors) })
+      predicate.set(new UnitCountAtLeast { quantity.set(16); unitMatcher.set(UnitMatchWarriors) })
       whenFalse.set(new Defend)
       whenTrue.set(new Attack)
     }

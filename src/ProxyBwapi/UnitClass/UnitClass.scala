@@ -1,7 +1,8 @@
 package ProxyBwapi.UnitClass
 
 import Geometry.TileRectangle
-import Micro.Behaviors.Protoss.{BehaviorCarrier, BehaviorCorsair, BehaviorDarkTemplar, BehaviorReaver}
+import Micro.Behaviors.General.{BehaviorBuilding, BehaviorWorker}
+import Micro.Behaviors.Protoss._
 import Micro.Behaviors._
 import Performance.Caching.CacheForever
 import ProxyBwapi.Races.{Neutral, Protoss, Terran, Zerg}
@@ -89,9 +90,9 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
   def orderable:Boolean = ! isSpell && ! Set(Protoss.Interceptor, Protoss.Scarab, Terran.SpiderMine).contains(this)
   def isMinerals:Boolean = isMineralField
   def isGas:Boolean = List(Neutral.Geyser, Terran.Refinery, Protoss.Assimilator, Zerg.Extractor).contains(this)
-  def isTownHall:Boolean = Set(Terran.CommandCenter, Protoss.Nexus, Zerg.Hatchery, Zerg.Lair, Zerg.Hive).contains(this)
   def tileArea:TileRectangle = new TileRectangle(new TilePosition(0, 0), tileSize)
-  
+  def isTownHall:Boolean = isTownHallCache.get
+  private val isTownHallCache = new CacheForever(() => Set(Terran.CommandCenter, Protoss.Nexus, Zerg.Hatchery, Zerg.Lair, Zerg.Hive).contains(this))
   //////////////
   // Behavior //
   //////////////

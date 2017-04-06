@@ -62,9 +62,17 @@ class Commander {
       destination = intent.unit.pixelCenter.project(position, flyingOvershoot)
     }
     
-    //According to https://github.com/tscmoo/tsc-bwai/commit/ceb13344f5994d28d6b601cef126f264ca97426b
-    //ordering moves to the exact same destination causes Brood War to not recalculate the path.
-    //Better to recalculate the path a few times to prevent units getting stuck
+    // According to https://github.com/tscmoo/tsc-bwai/commit/ceb13344f5994d28d6b601cef126f264ca97426b
+    // ordering moves to the exact same destination causes Brood War to not recalculate the path.
+    //
+    // That means that if the unit got confused while executing the original order, it will remain confused.
+    // Issuing an order to a slightly different position can cause Brood War to recalculate the path and un-stick the unit.
+    //
+    // However, this recalculation can itslef sometimes cause units to get stuck on obstacles.
+    // Specifically, units tend to get stuck on buildings this way.
+    // The neutral buildings on Roadrunner frequently cause this.
+    //
+    // So we'll try to get the best of both worlds, and recalculate paths *occasionally*
     if (With.configuration.enablePathRecalculation) {
       intent.unit.base.move(destination.add(
         RandomState.random.nextInt(5) - 2,

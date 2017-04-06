@@ -1,8 +1,8 @@
 package Mathematics.Heuristics
 
-class HeuristicWeight[TContext, TCandidate](
-                                                   val heuristic : Heuristic[TContext, TCandidate],
-                                                   val weight    : Double) {
+class HeuristicWeight[TContext, TCandidate] (
+  val heuristic : Heuristic[TContext, TCandidate],
+  val weight    : Double) {
   
   def weigh(context:TContext, candidate:TCandidate):Double = {
     

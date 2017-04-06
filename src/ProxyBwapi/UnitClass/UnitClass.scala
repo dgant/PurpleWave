@@ -5,7 +5,7 @@ import Micro.Behaviors.General.{BehaviorBuilding, BehaviorWorker}
 import Micro.Behaviors.Protoss._
 import Micro.Behaviors._
 import Performance.Caching.CacheForever
-import ProxyBwapi.Races.{Protoss, Terran, Zerg}
+import ProxyBwapi.Races.{Neutral, Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Tech
 import bwapi.{DamageType, Race, TilePosition, UnitType}
 
@@ -18,7 +18,6 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
   //////////////
   
   def radialHypotenuse = Math.sqrt(width.toDouble * width.toDouble + height.toDouble * height.toDouble)/2.0
-  
   
   ////////////
   // Combat //
@@ -89,10 +88,11 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
   def totalCost: Int = mineralPrice + gasPrice
   def orderable:Boolean = ! isSpell && ! Set(Protoss.Interceptor, Protoss.Scarab, Terran.SpiderMine).contains(this)
   def isMinerals:Boolean = isMineralField
-  def isGas:Boolean = isResource && ! isMinerals
+  def isGas:Boolean = isGasCache.get
+  private val isGasCache = new CacheForever(() => List(Neutral.Geyser, Terran.Refinery, Protoss.Assimilator, Zerg.Extractor).contains(this))
   def tileArea:TileRectangle = new TileRectangle(new TilePosition(0, 0), tileSize)
   def isTownHall:Boolean = isTownHallCache.get
-  private val isTownHallCache = new CacheForever(() => Set(Terran.CommandCenter, Protoss.Nexus, Zerg.Hatchery, Zerg.Lair, Zerg.Hive).contains(this))
+  private val isTownHallCache = new CacheForever(() => List(Terran.CommandCenter, Protoss.Nexus, Zerg.Hatchery, Zerg.Lair, Zerg.Hive).contains(this))
   //////////////
   // Behavior //
   //////////////

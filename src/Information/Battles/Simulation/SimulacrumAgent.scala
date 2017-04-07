@@ -1,7 +1,7 @@
 package Information.Battles.Simulation
 
 import Information.Battles.Simulation.Construction.{BattleSimulation, BattleSimulationGroup, Simulacrum}
-import Information.Battles.Simulation.Strategies.{BattleStrategyFleeWounded, BattleStrategyMovement}
+import Information.Battles.Simulation.Strategies.{BattleStrategyFleeWounded, BattleStrategyFocusAirOrGround, BattleStrategyMovement}
 import Utilities.EnrichPosition._
 import bwapi.Position
 
@@ -76,16 +76,25 @@ class SimulacrumAgent(
   private def doAttack() {
     val targetsInRange = getTargetsInRange
     if (targetsInRange.nonEmpty) {
-      val target = targetsInRange.minBy(_.totalLife)
-      val damage = thisUnit.unit.damageAgainst(target.unit, target.shields)
-      thisUnit.attackCooldown = thisUnit.unit.cooldownAgainst(target.unit)
-      thisUnit.moveCooldown = Math.min(thisUnit.attackCooldown, 8)
-      target.shields -= damage
-      if (target.shields < 0) {
-        target.hitPoints += target.shields
-        target.shields = 0
-      }
+      val target =
+        if (thisGroup.strategy.focusAirOrGround == BattleStrategyFocusAirOrGround.FocusAir) {
+          val flyersInRange = targetsInRange.filter(_.unit.flying)
+          if (flyersInRange.nonEmpty) lowestHealthTarget(flyersInRange) else lowestHealthTarget(targetsInRange)
+        }
+        else if (thisGroup.strategy.focusAirOrGround == BattleStrategyFocusAirOrGround.FocusGround) {
+          val groundInRange = targetsInRange.filterNot(_.unit.flying)
+          if (groundInRange.nonEmpty) lowestHealthTarget(groundInRange) else lowestHealthTarget(targetsInRange)
+        }
+        else {
+          lowestHealthTarget(targetsInRange)
+        }
+    
+      dealDamage(target)
     }
+  }
+  
+  private def lowestHealthTarget(targets:Iterable[Simulacrum]):Simulacrum = {
+    targets.minBy(_.totalLife)
   }
   
   private def doCharge() {
@@ -104,6 +113,17 @@ class SimulacrumAgent(
           threat.pixel.getDistance(thisUnit.pixel),
           Math.max(0, threat.pixel.project(thisUnit.pixel, threat.unit.rangeAgainst(thisUnit.unit)).getDistance(thisUnit.pixel))))
       moveAwayFrom(closestThreat.pixel)
+    }
+  }
+  
+  private def dealDamage(target:Simulacrum) {
+    val damage = thisUnit.unit.damageAgainst(target.unit, target.shields)
+    thisUnit.attackCooldown = thisUnit.unit.cooldownAgainst(target.unit)
+    thisUnit.moveCooldown = Math.min(thisUnit.attackCooldown, 8)
+    target.shields -= damage
+    if (target.shields < 0) {
+      target.hitPoints += target.shields
+      target.shields = 0
     }
   }
   

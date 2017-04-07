@@ -1,5 +1,6 @@
 package Information.Battles.Simulation.Construction
 
+import Information.Battles.Simulation.BattleSimulator
 import Information.Battles.Simulation.Strategies.BattleStrategyFleeWounded.BattleStrategyFleeWounded
 import Information.Battles.Simulation.Strategies.BattleStrategyFocusAirOrGround.BattleStrategyFocusAirOrGround
 import Information.Battles.Simulation.Strategies.BattleStrategyMovement.BattleStrategyMovement
@@ -17,7 +18,7 @@ object BattleSimulationBuilder {
     
     ourGroupStrategyVariants.flatten(ourGroupStrategyVariant =>
       enemyGroupStrategyVariants.map(enemyGroupStrategyVariant =>
-        new BattleSimulation(
+        buildSimulation(
           ourGroupStrategyVariant,
           enemyGroupStrategyVariant)))
   }
@@ -76,5 +77,33 @@ object BattleSimulationBuilder {
             )))))
     
     strategyPermutations.map(strategy => new BattleSimulationGroup(thisGroup, strategy))
+  }
+  
+  def buildSimulation(ourGroup:BattleSimulationGroup, enemyGroup:BattleSimulationGroup):BattleSimulation = {
+    instructWorkers(ourGroup)
+    instructWorkers(enemyGroup)
+    new BattleSimulation(ourGroup, enemyGroup)
+  }
+  
+  def instructWorkers(group:BattleSimulationGroup) {
+    var workersNotMining = 0
+    val workers = group.units.filter(_.unit.unitClass.worker)
+    
+    if (group.strategy.workersFighting == BattleStrategyWorkers.Flee) {
+      workersNotMining = workers.size
+      workers.foreach(worker => { worker.fleeing = true; worker.fighting = false })
+    }
+    else if (group.strategy.workersFighting == BattleStrategyWorkers.None) {
+      workers.toList.foreach(_.fighting = false)
+    }
+    else if (group.strategy.workersFighting == BattleStrategyWorkers.HalfFight) {
+      workersNotMining = workers.size / 2
+      workers.toList.sortBy(-_.totalLife).take(workersNotMining).foreach(_.fighting = false)
+    }
+    else {
+      workersNotMining = workers.size
+    }
+    
+    group.lostValue += BattleSimulator.costOfNotMining(workersNotMining)
   }
 }

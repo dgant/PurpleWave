@@ -7,6 +7,10 @@ object BattleSimulator {
   
   val maxFrames = 24 * 10
   
+  // Loose, based on the values in the BOSS paper:
+  // http://www.aaai.org/ocs/index.php/AIIDE/AIIDE11/paper/viewFile/4078/4407
+  def costOfNotMining(workers:Int):Int = workers * maxFrames / 20
+  
   def simulate(battle:Battle):Iterable[BattleSimulation] = {
     val simulations = BattleSimulationBuilder.build(battle)
     simulations.foreach(runSimulation)

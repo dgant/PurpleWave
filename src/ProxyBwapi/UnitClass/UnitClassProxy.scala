@@ -149,7 +149,7 @@ class UnitClassProxy(val baseType:UnitType) {
   def isSpell                   = isSpellCache.get
   def isSpellcaster             = isSpellcasterCache.get
   def isTwoUnitsInOneEgg        = isTwoUnitsInOneEggCache.get
-  def isWorker                  = isWorkerCache.get
+  def worker                  = isWorkerCache.get
   def maxAirHits                = maxAirHitsCache.get
   def maxEnergy                 = maxEnergyCache.get
   def maxHitPoints              = maxHitPointsCache.get

@@ -20,9 +20,6 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
   // Combat //
   ////////////
   
-  //Don't use this for Dark Swarm -- for that, just use the fixed list of units
-  def isMelee: Boolean = groundRange <= 32 && ! isWorker
-  
   //TODO: Explosive is 50/75/100
   //But Concussive is 25/50/100, not 50/75/100 !!!
   private val concussiveOrExplosive = List(DamageType.Concussive, DamageType.Explosive)

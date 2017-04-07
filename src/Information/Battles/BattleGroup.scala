@@ -10,5 +10,4 @@ class BattleGroup(val units:Set[UnitInfo]) {
   var center:Position = Positions.middle
   
   var strength      : Double = 0.0
-  var desireToFight : Double = 1.0
 }

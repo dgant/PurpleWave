@@ -1,4 +1,4 @@
-package Information.Battles.Simulator
+package Information.Battles.Simulation
 
 import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.Position

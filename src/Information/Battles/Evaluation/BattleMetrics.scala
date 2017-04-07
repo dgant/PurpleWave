@@ -1,8 +1,9 @@
-package Information.Battles
+package Information.Battles.Evaluation
 
+import Information.Battles.{Battle, BattleGroup}
+import Lifecycle.With
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.UnitInfo
-import Lifecycle.With
 import Utilities.EnrichPosition._
 import bwapi.Position
 

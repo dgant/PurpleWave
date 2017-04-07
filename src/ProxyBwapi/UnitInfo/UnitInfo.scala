@@ -52,6 +52,8 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   // Combat //
   ////////////
   
+  def melee:Boolean = unitClass.maxAirGroundRange <= 32 * 2
+  
   def armorHealth:Int = unitClass.armor
   def armorShield: Int = 0
   def cooldownLeft:Int = Math.max(airCooldownLeft, groundCooldownLeft)

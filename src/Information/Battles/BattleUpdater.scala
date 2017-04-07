@@ -1,9 +1,10 @@
 package Information.Battles
 
-import Information.Battles.Simulator.BattleSimulator
+import Information.Battles.Evaluation.BattleMetrics
+import Information.Battles.Simulation.BattleSimulator
 import Mathematics.Positions.Positions
 
-object BattleEvaluator {
+object BattleUpdater {
   
   def assess(battles:Iterable[Battle]) {
     battles.foreach(update)
@@ -17,8 +18,6 @@ object BattleEvaluator {
       })
   
       val simulation = BattleSimulator.simulate(battle)
-      battle.ourLosses = simulation.ourLostValue
-      battle.enemyLosses = simulation.enemyLostValue
       
     }
     else {

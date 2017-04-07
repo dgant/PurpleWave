@@ -28,7 +28,7 @@ class Battles {
     buildBattleGlobal()
     buildBattlesByZone()
     buildBattlesLocal()
-    BattleEvaluator.assess(local ++ byZone.values :+ global)
+    BattleUpdater.assess(local ++ byZone.values :+ global)
   }
   
   private def buildBattleGlobal() {

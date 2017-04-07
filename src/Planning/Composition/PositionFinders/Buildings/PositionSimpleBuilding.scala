@@ -49,7 +49,7 @@ class PositionSimpleBuilding(val buildingClass:UnitClass) extends PositionFinder
       .foreach(margin =>
         With.geography.ourBases
           .toList
-          .sortBy( - _.mineralsLeft)
+          .sortBy(base => - base.mineralsLeft * base.zone.area)
           .map(_.townHallArea.midpoint)
           .foreach(tile =>
             output = output.orElse(

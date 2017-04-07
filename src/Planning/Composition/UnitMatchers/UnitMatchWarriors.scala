@@ -7,5 +7,5 @@ object UnitMatchWarriors extends UnitMatcher {
     unit.unitClass.helpsInCombat &&
     unit.unitClass.canMove &&
     unit.unitClass.orderable &&
-    ! unit.unitClass.isWorker
+    ! unit.unitClass.worker
 }

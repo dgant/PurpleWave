@@ -45,6 +45,7 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
     else
       With.paths.groundPixels(origin, destination)
   
+  def canMove:Boolean = canDoAnythingThisFrame && unitClass.canMove
   def topSpeed:Double = unitClass.topSpeed
   
   ////////////
@@ -100,7 +101,7 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   def inTileRadius(tiles:Int)   : Set[UnitInfo] = With.units.inTileRadius(tileCenter, tiles)
   def inPixelRadius(pixels:Int) : Set[UnitInfo] = With.units.inPixelRadius(pixelCenter, pixels)
   
-  def canDoAnythingRightNow:Boolean =
+  def canDoAnythingThisFrame:Boolean =
     alive &&
     complete &&
     ! stasised &&
@@ -108,7 +109,7 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
     //And lockdown
   
   def canAttackThisSecond:Boolean =
-    canDoAnythingRightNow &&
+    canDoAnythingThisFrame &&
     unitClass.canAttack &&
     (unitClass != Protoss.Carrier || interceptors > 0) &&
     (unitClass != Protoss.Reaver  || scarabs > 0) &&

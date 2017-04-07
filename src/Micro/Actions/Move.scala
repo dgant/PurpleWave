@@ -9,6 +9,8 @@ object Move extends Action {
   
   override def perform(intent: Intention): Boolean = {
     
+    if ( ! intent.unit.canMove) return false
+    
     intent.state.movingHeuristically = intent.threats.nonEmpty || intent.targets.nonEmpty
     
     val tileToMove =

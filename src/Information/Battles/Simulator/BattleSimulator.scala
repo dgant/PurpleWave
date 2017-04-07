@@ -46,7 +46,7 @@ object BattleSimulator {
           active.moveCooldown = Math.min(active.attackCooldown, 8)
           target.shields -= damage
           if (target.shields < 0) {
-            target.hitPoints -= target.shields
+            target.hitPoints += target.shields
             target.shields = 0
           }
         }
@@ -63,6 +63,10 @@ object BattleSimulator {
     battle.ourUnits.filterNot(_.alive).foreach(deadUnit => {
       battle.ourLostValue += value(deadUnit)
       battle.ourUnits.remove(deadUnit)
+    })
+    battle.enemyUnits.filterNot(_.alive).foreach(deadUnit => {
+      battle.enemyLostValue += value(deadUnit)
+      battle.enemyUnits.remove(deadUnit)
     })
   }
   

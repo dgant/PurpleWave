@@ -30,6 +30,7 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
       updateOrders()
       updateVisibility()
       updateStatuses()
+      fixCloakedUnits()
     }
   })
   
@@ -299,4 +300,14 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
   def underDarkSwarm     : Boolean = _underDarkSwarm
   def underDisruptionWeb : Boolean = _underDisruptionWeb
   def underStorm         : Boolean = _underStorm
+  
+  // Cloaked units show up with 0 hit points/shields.
+  // Presumably, if we've never seen them, then they're healthier than that.
+  //
+  def fixCloakedUnits() {
+    if (alive && cloaked && hitPoints == 0) {
+      _hitPoints = unitClass.maxHitPoints
+      _shieldPoints = unitClass.maxShields
+    }
+  }
 }

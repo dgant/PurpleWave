@@ -2,7 +2,7 @@ package Mathematics.Positions
 
 import bwapi.{Position, TilePosition}
 
-class Point(val x:Int, val y:Int) {
+case class Point(val x:Int, val y:Int) {
   def position:Position = new Position(x, y)
   def tile:TilePosition = new TilePosition(x, y)
   def length:Double = Math.sqrt(lengthSquared)

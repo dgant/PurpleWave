@@ -15,6 +15,8 @@ class Intention(val plan:Plan, val unit:FriendlyUnitInfo) {
   
   def state:ExecutionState = With.executor.getState(unit)
   
+  var executed:Boolean = false
+  
   var destination : Option[TilePosition]  = None
   var toAttack    : Option[UnitInfo]      = None
   var toGather    : Option[UnitInfo]      = None

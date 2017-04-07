@@ -18,6 +18,7 @@ abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
   val _cacheSelected  = new CacheFrame[Boolean]       (() =>  base.isSelected)
   val _cacheId        = new CacheFrame[Int]           (() =>  base.getID)
   val _cachedFlying   = new CacheFrame[Boolean]       (() =>  base.isFlying)
+  val _cachedCloaked  = new CacheFrame[Boolean]       (() =>  base.isCloaked)
   val _cachedStasised = new CacheFrame[Boolean]       (() =>  base.isStasised)
   
   ///////////////////
@@ -104,7 +105,7 @@ abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
   ////////////////
   
   def burrowed  : Boolean = base.isBurrowed
-  def cloaked   : Boolean = base.isCloaked
+  def cloaked   : Boolean = _cachedCloaked.get
   def detected  : Boolean = base.isDetected
   def visible   : Boolean = base.isVisible
   

@@ -8,10 +8,13 @@ object Behavior {
   def execute(intent: Intention) {
     if ( ! readyForOrders(intent)) return
     
+    intent.executed = true
+    
     intent.desireToFight = With.battles.byUnit.get(intent.unit)
       .map(battle => (1.0 + battle.us.strength) / (1.0 + battle.enemy.strength))
       .getOrElse(1.0)
   
+    Reload.perform(intent)  ||
     Gather.perform(intent)  ||
     Build.perform(intent)   ||
     Produce.perform(intent) ||

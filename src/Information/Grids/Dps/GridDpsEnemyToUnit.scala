@@ -17,7 +17,6 @@ class GridDpsEnemyToUnit {
     //TODO: Account for shields taking full damage
     //TODO: Account for armor
   
-    val normal      = 1.0
     var concussive  = 1.0
     var explosive   = 1.0
   
@@ -32,12 +31,12 @@ class GridDpsEnemyToUnit {
       concussive = 0.25
     }
     
-    if (unit.unitClass.isFlyer)
-      normal      * With.grids.dpsEnemyAirNormal.get(tile) +
+    if (unit.flying)
+                    With.grids.dpsEnemyAirNormal.get(tile) +
       explosive   * With.grids.dpsEnemyAirExplosive.get(tile) +
       concussive  * With.grids.dpsEnemyAirConcussive.get(tile)
     else
-      normal      * With.grids.dpsEnemyGroundNormal.get(tile) +
+                    With.grids.dpsEnemyGroundNormal.get(tile) +
       explosive   * With.grids.dpsEnemyGroundExplosive.get(tile) +
       concussive  * With.grids.dpsEnemyGroundConcussive.get(tile)
   }

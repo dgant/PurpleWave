@@ -6,11 +6,13 @@ object Pursue extends Action {
   
   override def perform(intent: Intention): Boolean = {
   
-    intent.toAttack =
-      intent.toAttack.orElse(EvaluateTargets.best(
-        intent,
-        intent.targetProfile,
-        intent.targets))
+    if (intent.desireToFight >= 1.0) {
+      intent.toAttack =
+        intent.toAttack.orElse(EvaluateTargets.best(
+          intent,
+          intent.targetProfile,
+          intent.targets))
+    }
     
     false
   }

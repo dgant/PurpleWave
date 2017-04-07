@@ -13,5 +13,4 @@ object MovementProfiles {
     preferMoving      = 0.03,
     avoidDamage       = 1.00,
     avoidTraffic      = 0.70)
-  
 }

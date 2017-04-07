@@ -25,7 +25,7 @@ class Performance {
         currentFrameDelay -= 2
       }
       currentFrameDelay = Math.max(currentFrameDelay, With.latency.turnSize)
-      currentFrameDelay = Math.min(currentFrameDelay, currentFrameDelay)
+      currentFrameDelay = Math.min(currentFrameDelay, 24 * 4)
     }
   }
   

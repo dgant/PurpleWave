@@ -6,11 +6,14 @@ object Poke extends Action {
   
   override def perform(intent: Intention): Boolean = {
   
-    intent.toAttack =
-      intent.toAttack.orElse(EvaluateTargets.best(
-        intent,
-        intent.targetProfile,
-        intent.targets.filter(intent.unit.inRangeToAttack)))
+    if (intent.desireToFight > 0.25) {
+      intent.toAttack =
+        intent.toAttack.orElse(EvaluateTargets.best(
+          intent,
+          intent.targetProfile,
+          intent.targets.filter(target =>
+            intent.unit.inRangeToAttack(target))))
+    }
   
     false
   }

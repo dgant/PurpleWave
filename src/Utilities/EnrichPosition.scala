@@ -18,6 +18,16 @@ case object EnrichPosition {
       new Position(
         positions.view.map(_.getX).max,
         positions.view.map(_.getY).max)}
+    def bottomLeftBound:Position = {
+      if (positions.isEmpty) return Positions.Positions.middle
+      new Position(
+        positions.view.map(_.getX).min,
+        positions.view.map(_.getY).max)}
+    def topRightBound:Position = {
+      if (positions.isEmpty) return Positions.Positions.middle
+      new Position(
+        positions.view.map(_.getX).max,
+        positions.view.map(_.getY).min)}
     def centroid:Position = {
       if (positions.isEmpty) return Positions.Positions.middle
       new Position(

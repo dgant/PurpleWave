@@ -32,7 +32,7 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
     if (this == Terran.Bunker)        return Terran.Marine.effectiveAirDamage * 4
     val typeMultiplier = if (concussiveOrExplosive.contains(rawAirDamageType)) 0.75 else 1.0
     typeMultiplier *
-      rawMaxAirHits *
+      maxAirHits *
       rawAirDamageFactor *
       rawAirDamage
   }

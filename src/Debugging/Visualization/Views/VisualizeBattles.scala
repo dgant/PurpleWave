@@ -26,7 +26,10 @@ object VisualizeBattles {
     DrawMap.line(battle.focus, battle.us.vanguard,    ourColor)
     DrawMap.line(battle.focus, battle.enemy.vanguard, enemyColor)
     val topLeft = (battle.us.units ++ battle.enemy.units).map(_.pixelCenter).minBound.subtract(16, 16)
+    val bottomLeft = (battle.us.units ++ battle.enemy.units).map(_.pixelCenter).bottomLeftBound.add(16, 16)
     val bottomRight = (battle.us.units ++ battle.enemy.units).map(_.pixelCenter).maxBound.add(16, 16)
+    val winnerStrengthColor = if (battle.us.strength >= battle.enemy.strength)  ourColor else enemyColor
+    val winnerValueColor    = if (battle.ourLosses  <   battle.enemyLosses)     ourColor else enemyColor
     DrawMap.box(
       topLeft,
       bottomRight,
@@ -35,6 +38,11 @@ object VisualizeBattles {
       List(formatStrength(battle.us.strength), formatStrength(battle.enemy.strength)),
       bottomRight,
       drawBackground = true,
-      backgroundColor = neutralColor)
+      backgroundColor = winnerStrengthColor)
+    DrawMap.labelBox(
+      List(battle.ourLosses.toString, battle.enemyLosses.toString),
+      bottomLeft,
+      drawBackground = true,
+      backgroundColor = winnerValueColor)
   }
 }

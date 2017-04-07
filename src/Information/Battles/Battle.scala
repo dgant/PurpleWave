@@ -10,4 +10,7 @@ class Battle(
   def focus:Position = us.vanguard.midpoint(enemy.vanguard)
   def groups:Iterable[BattleGroup] = List(us, enemy)
   def happening:Boolean = us.units.nonEmpty && enemy.units.nonEmpty
+  
+  var ourLosses   : Int = 0
+  var enemyLosses : Int = 0
 }

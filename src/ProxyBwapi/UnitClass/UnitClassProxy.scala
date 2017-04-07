@@ -10,6 +10,7 @@ import scala.collection.JavaConverters._
 class UnitClassProxy(val baseType:UnitType) {
   private val abilitiesCache              = new CacheForever(() => baseType.abilities.asScala.map(Techs.get))
   private val accelerationCache           = new CacheForever(() => baseType.acceleration)
+  private val armorCache                  = new CacheForever(() => baseType.armor)
   private val armorUpgradeCache           = new CacheForever(() => Upgrades.get(baseType.armorUpgrade))
   private val buildScoreCache             = new CacheForever(() => baseType.buildScore)
   private val buildTimeCache              = new CacheForever(() => baseType.buildTime)
@@ -79,7 +80,7 @@ class UnitClassProxy(val baseType:UnitType) {
   private val tileWidthCache              = new CacheForever(() => baseType.tileWidth)
   private val topSpeedCache               = new CacheForever(() => baseType.topSpeed)
   private val turnRadiusCache             = new CacheForever(() => baseType.turnRadius)
-  private val upgradesCache               =  new CacheForever(() => baseType.upgrades.asScala.map(Upgrades.get))
+  private val upgradesCache               = new CacheForever(() => baseType.upgrades.asScala.map(Upgrades.get))
   private val upgradesWhatCache           = new CacheForever(() => baseType.upgradesWhat.asScala.map(Upgrades.get))
   private val whatBuildsCache             = new CacheForever(() => new Pair(UnitClasses.get(baseType.whatBuilds.first), baseType.whatBuilds.second))
   private val widthCache                  = new CacheForever(() => baseType.width)
@@ -105,6 +106,7 @@ class UnitClassProxy(val baseType:UnitType) {
   
   def abilities                 = abilitiesCache.get
   def acceleration              = accelerationCache.get
+  def armor                     = armorCache.get
   def armorUpgrade              = armorUpgradeCache.get
   def buildScore                = buildScoreCache.get
   def buildTime                 = buildTimeCache.get
@@ -148,7 +150,7 @@ class UnitClassProxy(val baseType:UnitType) {
   def isSpellcaster             = isSpellcasterCache.get
   def isTwoUnitsInOneEgg        = isTwoUnitsInOneEggCache.get
   def isWorker                  = isWorkerCache.get
-  def rawMaxAirHits                = maxAirHitsCache.get
+  def maxAirHits                = maxAirHitsCache.get
   def maxEnergy                 = maxEnergyCache.get
   def maxHitPoints              = maxHitPointsCache.get
   def maxGroundHits             = maxGroundHitsCache.get

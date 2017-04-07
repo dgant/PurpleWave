@@ -1,4 +1,4 @@
-package Information.Battles.Simulation
+package Information.Battles.Simulation.Construction
 
 import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.Position
@@ -10,6 +10,11 @@ class Simulacrum(val unit:UnitInfo) {
   var attackCooldown : Int      = unit.cooldownLeft
   var moveCooldown   : Int      = Math.min(8, unit.cooldownLeft) //Rough approximation
   
+  var fighting:Boolean = true
+  var fleeing:Boolean = false
+  
   def totalLife : Int     = hitPoints + shields
   def alive     : Boolean = totalLife > 0
+  def readyToAttack : Boolean = attackCooldown == 0
+  def readyToMove   : Boolean = moveCooldown == 0
 }

@@ -1,4 +1,4 @@
-package Information.Battles.Simulation
+package Information.Battles.Simulation.Strategies
 
 object BattleStrategyFleeWounded extends Enumeration {
   type BattleStrategyFleeWounded = Value

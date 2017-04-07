@@ -1,4 +1,4 @@
-package Information.Battles.Simulation
+package Information.Battles.Simulation.Strategies
 
 object BattleStrategyMovement extends Enumeration {
   type BattleStrategyMovement = Value

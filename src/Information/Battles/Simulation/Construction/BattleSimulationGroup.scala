@@ -1,6 +1,7 @@
-package Information.Battles.Simulation
+package Information.Battles.Simulation.Construction
 
 import Information.Battles.BattleGroup
+import Information.Battles.Simulation.Strategies.BattleStrategy
 
 import scala.collection.mutable
 

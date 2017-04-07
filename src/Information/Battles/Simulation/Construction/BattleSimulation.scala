@@ -1,4 +1,4 @@
-package Information.Battles.Simulation
+package Information.Battles.Simulation.Construction
 
 class BattleSimulation(
   val us    : BattleSimulationGroup,

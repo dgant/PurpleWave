@@ -121,6 +121,7 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
     addBuildUnitIf(output, Terran.SiegeTankUnsieged,    Terran.MachineShop)
     addBuildUnitIf(output, Terran.Valkyrie,             Terran.Armory)
     addBuildUnitIf(output, Terran.ScienceVessel,        Terran.ScienceFacility)
+    addBuildUnitIf(output, Terran.Dropship,             Terran.ControlTower)
     addBuildUnitIf(output, Terran.ScienceVessel,        Terran.ControlTower)
     addBuildUnitIf(output, Terran.Battlecruiser,        Terran.ControlTower)
     addBuildUnitIf(output, Terran.Battlecruiser,        Terran.PhysicsLab)

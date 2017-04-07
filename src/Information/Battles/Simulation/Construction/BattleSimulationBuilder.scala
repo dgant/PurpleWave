@@ -1,9 +1,10 @@
-package Information.Battles.Simulation
+package Information.Battles.Simulation.Construction
 
-import Information.Battles.Simulation.BattleStrategyFleeWounded.BattleStrategyFleeWounded
-import Information.Battles.Simulation.BattleStrategyFocusAirOrGround.BattleStrategyFocusAirOrGround
-import Information.Battles.Simulation.BattleStrategyMovement.BattleStrategyMovement
-import Information.Battles.Simulation.BattleStrategyWorkersFighting.BattleStrategyWorkersFighting
+import Information.Battles.Simulation.Strategies.BattleStrategyFleeWounded.BattleStrategyFleeWounded
+import Information.Battles.Simulation.Strategies.BattleStrategyFocusAirOrGround.BattleStrategyFocusAirOrGround
+import Information.Battles.Simulation.Strategies.BattleStrategyMovement.BattleStrategyMovement
+import Information.Battles.Simulation.Strategies.BattleStrategyWorkers.BattleStrategyWorkers
+import Information.Battles.Simulation.Strategies._
 import Information.Battles.{Battle, BattleGroup}
 
 import scala.collection.mutable.ListBuffer
@@ -25,7 +26,7 @@ object BattleSimulationBuilder {
     val strategiesMovement          = new ListBuffer[BattleStrategyMovement]
     val strategiesFleeWounded       = new ListBuffer[BattleStrategyFleeWounded]
     val strategiesFocusAirOrGround  = new ListBuffer[BattleStrategyFocusAirOrGround]
-    val strategiesWorkersFighting   = new ListBuffer[BattleStrategyWorkersFighting]
+    val strategiesWorkersFighting   = new ListBuffer[BattleStrategyWorkers]
     
     val thisCanMove = thisGroup.units.exists(_.canMove)
     val thatCanMove = thatGroup.units.exists(_.canMove)
@@ -55,11 +56,13 @@ object BattleSimulationBuilder {
     }
     
     val workerCount = thisGroup.units.count(_.unitClass.worker)
-    strategiesWorkersFighting :+ BattleStrategyWorkersFighting.None
-    if (workerCount > 0)
-      strategiesWorkersFighting :+ BattleStrategyWorkersFighting.All
+    strategiesWorkersFighting :+ BattleStrategyWorkers.None
+    if (workerCount > 0) {
+      strategiesWorkersFighting :+ BattleStrategyWorkers.AllFight
+      strategiesWorkersFighting :+ BattleStrategyWorkers.Flee
+    }
     if (workerCount > 3)
-      strategiesWorkersFighting :+ BattleStrategyWorkersFighting.Half
+      strategiesWorkersFighting :+ BattleStrategyWorkers.HalfFight
     
     val strategyPermutations =
       strategiesFleeWounded.flatten(strategyFleeWounded =>

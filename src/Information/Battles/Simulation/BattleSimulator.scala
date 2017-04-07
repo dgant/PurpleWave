@@ -1,12 +1,10 @@
 package Information.Battles.Simulation
 
 import Information.Battles.Battle
-import Utilities.EnrichPosition._
+import Information.Battles.Simulation.Construction.{BattleSimulation, BattleSimulationBuilder, BattleSimulationGroup, Simulacrum}
 
 object BattleSimulator {
-
-  val chargingPenalty = 0.6 //What fraction of top speed units are likely to get
-  val movementFrames = 4
+  
   val maxFrames = 24 * 10
   
   def simulate(battle:Battle):Iterable[BattleSimulation] = {
@@ -20,44 +18,21 @@ object BattleSimulator {
   }
   
   private def step(battle: BattleSimulation) {
-    attackOrMove(battle, battle.us,     battle.enemy)
-    attackOrMove(battle, battle.enemy,  battle.us)
-    removeDeadUnits(battle.us)
-    removeDeadUnits(battle.enemy)
-    reduceCooldown(battle.us)
-    reduceCooldown(battle.enemy)
+    updateAgents    (battle, battle.us,     battle.enemy)
+    updateAgents    (battle, battle.enemy,  battle.us)
+    removeDeadUnits (battle.us)
+    removeDeadUnits (battle.enemy)
+    reduceCooldown  (battle.us)
+    reduceCooldown  (battle.enemy)
   }
   
-  private def attackOrMove(
+  private def updateAgents (
     battle    : BattleSimulation,
-    attackers : BattleSimulationGroup,
-    defenders : BattleSimulationGroup) {
-    attackers.units
-      .filter(attacker => attacker.attackCooldown == 0 || attacker.moveCooldown == 0)
-      .foreach(attacker => {
-        val targets = defenders.units.filter(defender =>
-          attacker.unit.canAttackThisSecond(defender.unit))
-        val targetsInRange = targets.filter(passive =>
-          attacker.unit.rangeAgainst(passive.unit) >= attacker.pixel.getDistance(passive.pixel))
-        
-        if (targetsInRange.nonEmpty) {
-          val target = targetsInRange.minBy(_.totalLife)
-          val damage = attacker.unit.damageAgainst(target.unit, target.shields)
-          attacker.attackCooldown = attacker.unit.cooldownAgainst(target.unit)
-          attacker.moveCooldown = Math.min(attacker.attackCooldown, 8)
-          target.shields -= damage
-          if (target.shields < 0) {
-            target.hitPoints += target.shields
-            target.shields = 0
-          }
-        }
-        else if (targets.nonEmpty) {
-          val target = targets.minBy(_.pixel.getDistance(attacker.pixel))
-          attacker.pixel = attacker.pixel.project(target.pixel, attacker.unit.topSpeed * chargingPenalty * (1 + movementFrames))
-          attacker.attackCooldown = movementFrames
-          attacker.moveCooldown = movementFrames
-        }
-      })
+    thisGroup : BattleSimulationGroup,
+    thatGroup : BattleSimulationGroup) {
+    thisGroup.units
+      .filter(thisUnit => thisUnit.readyToAttack || thisUnit.readyToMove)
+      .foreach(thisUnit => new SimulacrumAgent(thisUnit, thisGroup, thatGroup, battle).act)
   }
   
   private def removeDeadUnits(group:BattleSimulationGroup) {

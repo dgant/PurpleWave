@@ -111,30 +111,33 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
     ! maelstrommed
     //And lockdown
   
-  def canAttackThisSecond:Boolean =
+  def canBeAttackedThisFrame:Boolean = canBeAttackedThisFrameCache.get
+  private val canBeAttackedThisFrameCache = new CacheFrame(() =>
+      alive &&
+      totalHealth > 0 &&
+      visible &&
+      ! invincible &&
+      ! stasised)
+  
+  def canAttackThisSecond:Boolean = canAttackThisSecondCache.get
+  private val canAttackThisSecondCache = new CacheFrame(() =>
     canDoAnythingThisFrame &&
     unitClass.canAttack &&
-      (if (isCarrierReaverOrLurkerCache.get)
-        (unitClass != Protoss.Carrier || interceptors > 0) &&
-        (unitClass != Protoss.Reaver  || scarabs > 0) &&
-        (unitClass != Zerg.Lurker     || burrowed)
-      else true)
+    (if (isCarrierReaverOrLurkerCache.get)
+      (unitClass != Protoss.Carrier || interceptors > 0) &&
+      (unitClass != Protoss.Reaver  || scarabs > 0) &&
+      (unitClass != Zerg.Lurker     || burrowed)
+    else true))
   
   private val isCarrierReaverOrLurkerCache = new CacheFrame(() => List(Protoss.Carrier, Protoss.Reaver, Zerg.Lurker).contains(this))
   
   def canAttackThisSecond(enemy:UnitInfo):Boolean =
     canAttackThisSecond &&
-      enemy.alive &&
-      enemy.totalHealth > 0 &&
-      enemy.visible &&
-      (enemy.detected || ! enemy.cloaked || ! enemy.burrowed) &&
-      ! enemy.invincible &&
-      ! enemy.stasised &&
-      (if (enemy.flying) unitClass.attacksAir else unitClass.attacksGround)
+    enemy.canBeAttackedThisFrame &&
+    (enemy.detected || ! enemy.cloaked || ! enemy.burrowed) &&
+    (if (enemy.flying) unitClass.attacksAir else unitClass.attacksGround)
   
-  def canAttackThisFrame:Boolean =
-    canAttackThisSecond &&
-    cooldownLeft < With.latency.framesRemaining
+  def canAttackThisFrame:Boolean = canAttackThisSecond && cooldownLeft < With.latency.framesRemaining
   
   def requiredAttackDelay: Int = {
     // The question:

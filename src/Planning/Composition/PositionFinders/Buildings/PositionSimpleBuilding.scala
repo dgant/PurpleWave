@@ -26,7 +26,7 @@ class PositionSimpleBuilding(val buildingClass:UnitClass) extends PositionFinder
   
   def maxMargin:Int =
     if (buildingClass == Protoss.Pylon && With.units.ours.count(_.unitClass == buildingClass) < 4)
-      3
+      1
     else
       1
   

@@ -1,7 +1,7 @@
 package Information.Battles.Simulation.Construction
 
 import Information.Battles.Simulation.BattleSimulator
-import Information.Battles.Simulation.Strategies.BattleStrategyFleeWounded.BattleStrategyFleeWounded
+import Information.Battles.Simulation.Strategies.BattleStrategyWounded.BattleStrategyWounded
 import Information.Battles.Simulation.Strategies.BattleStrategyFocusAirOrGround.BattleStrategyFocusAirOrGround
 import Information.Battles.Simulation.Strategies.BattleStrategyMovement.BattleStrategyMovement
 import Information.Battles.Simulation.Strategies.BattleStrategyWorkers.BattleStrategyWorkers
@@ -13,8 +13,16 @@ import scala.collection.mutable.ListBuffer
 object BattleSimulationBuilder {
   
   def build(battle:Battle):Iterable[BattleSimulation] = {
+    
     val ourGroupStrategyVariants = buildGroupStrategies(battle.us, battle.enemy)
-    val enemyGroupStrategyVariants = buildGroupStrategies(battle.enemy, battle.us)
+    
+    // It'd be helpful to consider all enemy group strategies and assume they pick the best,
+    // but we can't afford to run that many simulations.
+    val enemyGroupStrategyVariants = List(new BattleSimulationGroup(battle.enemy, new BattleStrategy(
+      BattleStrategyWounded.None,
+      BattleStrategyFocusAirOrGround.Nothing,
+      BattleStrategyMovement.Charge,
+      BattleStrategyWorkers.Ignore)))
     
     ourGroupStrategyVariants.flatten(ourGroupStrategyVariant =>
       enemyGroupStrategyVariants.map(enemyGroupStrategyVariant =>
@@ -25,7 +33,7 @@ object BattleSimulationBuilder {
   
   def buildGroupStrategies(thisGroup:BattleGroup, thatGroup:BattleGroup):Iterable[BattleSimulationGroup] = {
     val strategiesMovement          = new ListBuffer[BattleStrategyMovement]
-    val strategiesFleeWounded       = new ListBuffer[BattleStrategyFleeWounded]
+    val strategiesFleeWounded       = new ListBuffer[BattleStrategyWounded]
     val strategiesFocusAirOrGround  = new ListBuffer[BattleStrategyFocusAirOrGround]
     val strategiesWorkersFighting   = new ListBuffer[BattleStrategyWorkers]
     
@@ -44,11 +52,11 @@ object BattleSimulationBuilder {
       strategiesMovement += BattleStrategyMovement.Dont
     }
     
-    strategiesFleeWounded += BattleStrategyFleeWounded.None
+    strategiesFleeWounded += BattleStrategyWounded.None
     if (thisCanMove)
-      strategiesFleeWounded += BattleStrategyFleeWounded.Any
+      strategiesFleeWounded += BattleStrategyWounded.Flee
     if (thisCanMove && thisGroup.units.exists(_.melee) && thisGroup.units.exists(! _.melee))
-      strategiesFleeWounded += BattleStrategyFleeWounded.Ranged
+      strategiesFleeWounded += BattleStrategyWounded.FleeRanged
     
     strategiesFocusAirOrGround += BattleStrategyFocusAirOrGround.Nothing
     if (thatGroup.units.exists(_.flying) && thatGroup.units.exists( ! _.flying)) {
@@ -57,7 +65,7 @@ object BattleSimulationBuilder {
     }
     
     val workerCount = thisGroup.units.count(_.unitClass.worker)
-    strategiesWorkersFighting += BattleStrategyWorkers.None
+    strategiesWorkersFighting += BattleStrategyWorkers.Ignore
     if (workerCount > 0) {
       strategiesWorkersFighting += BattleStrategyWorkers.AllFight
       strategiesWorkersFighting += BattleStrategyWorkers.Flee
@@ -79,6 +87,13 @@ object BattleSimulationBuilder {
     strategyPermutations.map(strategy => new BattleSimulationGroup(thisGroup, strategy))
   }
   
+  def trimEnemyStrategies(variants:Iterable[BattleSimulationGroup]):Iterable[BattleSimulationGroup] = {
+    variants.filter(variant =>
+      variant.strategy.workersFighting == BattleStrategyWorkers.Ignore &&
+      variant.strategy.focusAirOrGround == BattleStrategyFocusAirOrGround.Nothing &&
+      variant.strategy.fleeWounded == BattleStrategyWounded.None)
+  }
+  
   def buildSimulation(ourGroup:BattleSimulationGroup, enemyGroup:BattleSimulationGroup):BattleSimulation = {
     instructWorkers(ourGroup)
     instructWorkers(enemyGroup)
@@ -93,7 +108,7 @@ object BattleSimulationBuilder {
       workersNotMining = workers.size
       workers.foreach(worker => { worker.fleeing = true; worker.fighting = false })
     }
-    else if (group.strategy.workersFighting == BattleStrategyWorkers.None) {
+    else if (group.strategy.workersFighting == BattleStrategyWorkers.Ignore) {
       workers.toList.foreach(_.fighting = false)
     }
     else if (group.strategy.workersFighting == BattleStrategyWorkers.HalfFight) {

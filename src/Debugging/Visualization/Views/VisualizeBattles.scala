@@ -13,19 +13,20 @@ object VisualizeBattles {
     With.game.drawTextScreen(521, 18, formatStrength(With.battles.global.us.strength))
     With.game.drawTextScreen(589, 18, formatStrength(With.battles.global.enemy.strength))
     With.battles.local.foreach(drawBattle)
-    
-    With.battles.local
-      .filter(battle => battle.simulations.nonEmpty && With.viewport.contains(battle.focus))
-      .flatten(_.bestSimulationResult)
-      .foreach(drawBattleReport)
+    val battlesWithSimulations = With.battles.local.filter(_.simulations.nonEmpty)
+    if (battlesWithSimulations.nonEmpty) {
+      
+      drawBattleReport(
+        With.battles.local.minBy(battle => battle.focus.getDistance(With.viewport.center)).bestSimulationResult.get)
+    }
   }
   
   def formatStrength(strength:Double):String = (strength/1000).toInt.toString
   
   private def drawBattle(battle:Battle) {
-    val ourColor    = DrawMap.playerColorDark(With.self)
-    val enemyColor  = DrawMap.playerColorDark(With.enemies.head)
-    val neutralColor = Color.Black
+    val ourColor      = DrawMap.playerColorDark(With.self)
+    val enemyColor    = DrawMap.playerColorDark(With.enemies.head)
+    val neutralColor  = Color.Black
     DrawMap.circle(battle.focus,          8, neutralColor)
     DrawMap.circle(battle.us.vanguard,    8, ourColor)
     DrawMap.circle(battle.enemy.vanguard, 8, enemyColor)
@@ -61,10 +62,11 @@ object VisualizeBattles {
       List(
         List(name),
         List("Losses:",   group.lostValue.toString),
-        List("Flee?",     group.strategy.fleeWounded.toString),
-        List("Focus?",    group.strategy.focusAirOrGround.toString),
-        List("Move?",     group.strategy.movement.toString),
-        List("Workers?",  group.strategy.workersFighting.toString)
+        List("Move:",     group.strategy.movement.toString),
+        List("Focus:",    group.strategy.focusAirOrGround.toString),
+        List("Workers:",  group.strategy.workersFighting.toString),
+        List("Wounded:",  group.strategy.fleeWounded.toString)
+        
       ))
   }
 }

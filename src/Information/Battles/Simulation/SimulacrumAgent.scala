@@ -1,8 +1,7 @@
 package Information.Battles.Simulation
 
 import Information.Battles.Simulation.Construction.{BattleSimulation, BattleSimulationGroup, Simulacrum}
-import Information.Battles.Simulation.Strategies.{BattleStrategyFleeWounded, BattleStrategyFocusAirOrGround, BattleStrategyMovement}
-import Performance.Caching.CacheForever
+import Information.Battles.Simulation.Strategies.{BattleStrategyWounded, BattleStrategyFocusAirOrGround, BattleStrategyMovement}
 import Utilities.EnrichPosition._
 import bwapi.Position
 
@@ -29,9 +28,9 @@ class SimulacrumAgent(
       thisUnit.fleeing ||=
         thisUnit.totalLife <= Math.min(20, thisUnit.unit.unitClass.maxTotalHealth / 3) &&
         (
-          thisGroup.strategy.fleeWounded == BattleStrategyFleeWounded.Any ||
+          thisGroup.strategy.fleeWounded == BattleStrategyWounded.Flee ||
           (
-            thisGroup.strategy.fleeWounded == BattleStrategyFleeWounded.Ranged &&
+            thisGroup.strategy.fleeWounded == BattleStrategyWounded.FleeRanged &&
             ! thisUnit.unit.melee
           )
         )
@@ -66,7 +65,7 @@ class SimulacrumAgent(
       thisUnit.readyToMove &&
       thisUnit.fighting &&
       thisGroup.strategy.movement == BattleStrategyMovement.Kite) {
-      if (targetsInRange.get.isEmpty) {
+      if (targetsInRange.isEmpty) {
         doCharge()
       }
       else {
@@ -76,18 +75,18 @@ class SimulacrumAgent(
   }
   
   private def doAttack() {
-    if (targetsInRange.get.nonEmpty) {
+    if (thisUnit.readyToAttack && thisUnit.fighting && targetsInRange.nonEmpty) {
       val target =
         if (thisGroup.strategy.focusAirOrGround == BattleStrategyFocusAirOrGround.Air) {
-          val flyersInRange = targetsInRange.get.filter(_.unit.flying)
-          if (flyersInRange.nonEmpty) lowestHealthTarget(flyersInRange) else lowestHealthTarget(targetsInRange.get)
+          val flyersInRange = targetsInRange.filter(_.unit.flying)
+          if (flyersInRange.nonEmpty) lowestHealthTarget(flyersInRange) else lowestHealthTarget(targetsInRange)
         }
         else if (thisGroup.strategy.focusAirOrGround == BattleStrategyFocusAirOrGround.Ground) {
-          val groundInRange = targetsInRange.get.filterNot(_.unit.flying)
-          if (groundInRange.nonEmpty) lowestHealthTarget(groundInRange) else lowestHealthTarget(targetsInRange.get)
+          val groundInRange = targetsInRange.filterNot(_.unit.flying)
+          if (groundInRange.nonEmpty) lowestHealthTarget(groundInRange) else lowestHealthTarget(targetsInRange)
         }
         else {
-          lowestHealthTarget(targetsInRange.get)
+          lowestHealthTarget(targetsInRange)
         }
     
       dealDamage(target)
@@ -99,8 +98,8 @@ class SimulacrumAgent(
   }
   
   private def doCharge() {
-    if (targets.get.nonEmpty) {
-      val target = targets.get.minBy(_.pixel.getDistance(thisUnit.pixel))
+    if (targets.nonEmpty) {
+      val target = targets.minBy(_.pixel.getDistance(thisUnit.pixel))
       moveTowards(target.pixel)
     }
   }
@@ -141,10 +140,10 @@ class SimulacrumAgent(
     thisUnit.moveCooldown = movementFrames
   }
   
-  private val targets = new CacheForever(() => thatGroup.units.filter(defender => thisUnit.unit.canAttackThisSecond(defender.unit)))
-  private val targetsInRange = new CacheForever(() =>
-    targets.get.filter(target =>
+  private lazy val targets = thatGroup.units.filter(defender => thisUnit.unit.canAttackThisSecond(defender.unit))
+  private lazy val targetsInRange =
+    targets.filter(target =>
       thisUnit.unit.rangeAgainst(target.unit) >=
-        thisUnit.pixel.getDistance(target.pixel))
+        thisUnit.pixel.getDistance(target.pixel)
   )
 }

@@ -8,15 +8,12 @@ abstract class CacheBase[T](recalculator:() => T) {
   var lastValue:Option[T] = None
   
   def get:T = {
-    if (cacheHasExpired) {
-      lastValue = Some(recalculateAsNeeded)
+    if (nextUpdateFrame <= With.frame) {
+      lastValue = Some(recalculator.apply())
       nextUpdateFrame = With.frame + nextCacheDelay
     }
     lastValue.get
   }
-  
-  private def cacheHasExpired:Boolean = nextUpdateFrame <= With.frame
-  private def recalculateAsNeeded:T = recalculator.apply()
   
   protected def nextCacheDelay:Int
 }

@@ -7,8 +7,9 @@ import bwapi.Position
 
 class Viewport {
   
-  def start : Position = startCache.get
-  def end   : Position = endcache.get
+  def start   : Position = startCache.get
+  def end     : Position = endcache.get
+  def center  : Position = start.midpoint(end)
   
   def contains(pixel:Position):Boolean = {
     pixel.getX >= start.getX  &&

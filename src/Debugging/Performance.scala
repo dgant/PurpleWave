@@ -3,7 +3,7 @@ package Debugging
 import Lifecycle.With
 
 class Performance {
-  private val framesToTrack = 12
+  private val framesToTrack = 24 * 3
   private val frameTimes = Array.fill(framesToTrack)(1l)
   
   private var millisecondsBefore = 0l
@@ -19,13 +19,13 @@ class Performance {
     frameTimes(With.frame % framesToTrack) = millisecondDifference
   
     if (With.frame % framesToTrack == 0) {
-      if (meanFrameLength > 20 || maxFrameLength > 50) {
-        currentFrameDelay += 8
+      if (meanFrameLength > 20 || maxFrameLength > 60) {
+        currentFrameDelay += 4
       } else {
-        currentFrameDelay -= 2
+        currentFrameDelay -= 1
       }
       currentFrameDelay = Math.max(currentFrameDelay, With.latency.turnSize)
-      currentFrameDelay = Math.min(currentFrameDelay, 24 * 4)
+      currentFrameDelay = Math.min(currentFrameDelay, 12)
     }
   }
   

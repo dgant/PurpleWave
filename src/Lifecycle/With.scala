@@ -13,6 +13,7 @@ import Information.Battles.Battles
 import Micro.Intent.Commander
 import Micro.State.Executor
 import Planning.Plans.GamePlans.WinTheGame
+import ProxyBwapi.ProxyBWMirror
 import ProxyBwapi.UnitTracking.UnitTracker
 import _root_.Performance.Latency
 import bwapi.Player
@@ -38,6 +39,7 @@ object With {
   var logger        : Logger        = null
   var paths         : Paths         = null
   var performance   : Performance   = null
+  var proxy         : ProxyBWMirror = null
   var prioritizer   : Prioritizer   = null
   var realEstate    : RealEstate    = null
   var recruiter     : Recruiter     = null
@@ -67,6 +69,7 @@ object With {
   
   def onStart() {
     With.self                   = With.game.self
+    With.proxy                  = new ProxyBWMirror
     With.neutral                = With.game.neutral
     With.enemies                = With.game.enemies.asScala.toList
     With.mapWidth               = With.game.mapWidth

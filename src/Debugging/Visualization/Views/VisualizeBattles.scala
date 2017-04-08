@@ -1,6 +1,6 @@
 package Debugging.Visualization.Views
 
-import Debugging.Visualization.Rendering.DrawMap
+import Debugging.Visualization.Rendering.{DrawMap, DrawScreen}
 import Information.Battles.Battle
 import Information.Battles.Simulation.Construction.{BattleSimulation, BattleSimulationGroup}
 import Lifecycle.With
@@ -49,23 +49,22 @@ object VisualizeBattles {
   private def drawBattleReport(battle:BattleSimulation) {
     
     val winner = if (battle.us.lostValue <= battle.enemy.lostValue) With.self else With.enemies.head
-    With.game.drawBoxScreen(new Position(0, 25), new Position(150, 50), DrawMap.playerColorDark(winner))
-    With.game.drawTextScreen(new Position(50, 31), "Advantage: " + winner.getName)
-    With.game.drawBoxScreen(new Position(0, 50), new Position(75, 125), DrawMap.playerColorDark(With.self))
-    With.game.drawBoxScreen(new Position(75, 50), new Position(150, 125), DrawMap.playerColorDark(With.enemies.head))
-    drawPlayerReport(battle.us,     new Position(0, 50))
-    drawPlayerReport(battle.enemy,  new Position(75, 50))
+    With.game.drawTextScreen(new Position(5, 31), "Advantage: " + winner.getName)
+    drawPlayerReport(battle.us,     With.self.getName,          new Position(5, 50))
+    drawPlayerReport(battle.enemy,  With.enemies.head.getName,  new Position(130, 50))
   }
   
-  private def drawPlayerReport(group: BattleSimulationGroup, origin:Position) {
-    With.game.drawTextScreen(
-      origin,
+  private def drawPlayerReport(group: BattleSimulationGroup, name:String, origin:Position) {
+    DrawScreen.table(
+      origin.getX,
+      origin.getY,
       List(
-        "Losses:  " + group.lostValue,
-        "Flee?    " + group.strategy.fleeWounded.toString,
-        "Focus?   " + group.strategy.focusAirOrGround,
-        "Move?    " + group.strategy.movement,
-        "Workers? " + group.strategy.workersFighting
-      ).mkString("\n"))
+        List(name),
+        List("Losses:",   group.lostValue.toString),
+        List("Flee?",     group.strategy.fleeWounded.toString),
+        List("Focus?",    group.strategy.focusAirOrGround.toString),
+        List("Move?",     group.strategy.movement.toString),
+        List("Workers?",  group.strategy.workersFighting.toString)
+      ))
   }
 }

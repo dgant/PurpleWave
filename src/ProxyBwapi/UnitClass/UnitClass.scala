@@ -23,7 +23,10 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
   //TODO: Explosive is 50/75/100
   //But Concussive is 25/50/100, not 50/75/100 !!!
   private val concussiveOrExplosive = List(DamageType.Concussive, DamageType.Explosive)
-  def effectiveAirDamage:Double = {
+  
+  def effectiveAirDamage:Double = effectiveAirDamageCache.get
+  private val effectiveAirDamageCache = new CacheForever(() => effectiveAirDamageRecalculate)
+  private def effectiveAirDamageRecalculate:Double = {
     if (this == Protoss.Carrier)      return Protoss.Interceptor.effectiveAirDamage * 8
     if (this == Protoss.Interceptor)  return 0
     if (this == Terran.Bunker)        return Terran.Marine.effectiveAirDamage * 4
@@ -33,8 +36,9 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
       rawAirDamageFactor *
       rawAirDamage
   }
-  
-  def effectiveGroundDamage:Double = {
+  def effectiveGroundDamage:Double = effectiveGroundDamageCache.get
+  private val effectiveGroundDamageCache = new CacheForever(() => effectiveGroundDamageRecalculate)
+  private def effectiveGroundDamageRecalculate:Double = {
     if (this == Protoss.Carrier)      return Protoss.Interceptor.effectiveGroundDamage * 8
     if (this == Protoss.Interceptor)  return 0
     if (this == Protoss.Reaver)       return Protoss.Scarab.effectiveGroundDamage
@@ -65,14 +69,12 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
   
   //Range is from unit edge, so we account for the diagonal width of the unit
   // 7/5 ~= sqrt(2)
-  def groundRange:Int = {
-    if (this == Terran.Bunker) return Terran.Marine.groundRange + 32
-    rawGroundRange
-  }
-  def airRange:Int = {
-    if (this == Terran.Bunker) return Terran.Marine.airRange + 32
-    rawAirRange
-  }
+  def groundRange:Int = groundRangeCache.get 
+  private def groundRangeCache = new CacheForever(() => if (this == Terran.Bunker) Terran.Marine.groundRange + 32 else rawGroundRange)
+  
+  def airRange:Int = airRangeCache.get
+  private def airRangeCache = new CacheForever(() => if (this == Terran.Bunker) Terran.Marine.airRange + 32 else rawAirRange)
+  
   def maxAirGroundRange:Int = {
     Math.max(groundRange, airRange)
   }
@@ -284,14 +286,16 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
   // Debugging //
   ///////////////
   
-  override def toString:String =
-    asString
-      .replace("Terran_", "")
-      .replace("Zerg_", "")
-      .replace("Protoss_", "")
-      .replace("Neutral_", "")
-      .replace("Resource_", "")
-      .replace("Critter_", "")
-      .replace("Special_", "")
-      .replaceAll("_", " ")
+  val toStringCache = new CacheForever(() => asString
+    .replace("Terran_", "")
+    .replace("Zerg_", "")
+    .replace("Protoss_", "")
+    .replace("Neutral_", "")
+    .replace("Resource_", "")
+    .replace("Critter_", "")
+    .replace("Special_", "")
+    .replaceAll("_", " "))
+  
+  override def toString:String = toStringCache.get
+    
 }

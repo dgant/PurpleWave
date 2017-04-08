@@ -1,8 +1,9 @@
 package ProxyBwapi.UnitInfo
 
-import ProxyBwapi.Races.{Protoss, Zerg}
 import Lifecycle.With
 import Mathematics.Positions.TileRectangle
+import Performance.Caching.CacheFrame
+import ProxyBwapi.Races.{Protoss, Zerg}
 import Utilities.EnrichPosition._
 import bwapi._
 
@@ -113,9 +114,13 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   def canAttackThisSecond:Boolean =
     canDoAnythingThisFrame &&
     unitClass.canAttack &&
-    (unitClass != Protoss.Carrier || interceptors > 0) &&
-    (unitClass != Protoss.Reaver  || scarabs > 0) &&
-    (unitClass != Zerg.Lurker     || burrowed)
+      (if (isCarrierReaverOrLurkerCache.get)
+        (unitClass != Protoss.Carrier || interceptors > 0) &&
+        (unitClass != Protoss.Reaver  || scarabs > 0) &&
+        (unitClass != Zerg.Lurker     || burrowed)
+      else true)
+  
+  private val isCarrierReaverOrLurkerCache = new CacheFrame(() => List(Protoss.Carrier, Protoss.Reaver, Zerg.Lurker).contains(this))
   
   def canAttackThisSecond(enemy:UnitInfo):Boolean =
     canAttackThisSecond &&

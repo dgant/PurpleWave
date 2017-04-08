@@ -50,10 +50,10 @@ object BattleSimulationBuilder {
     if (thisCanMove && thisGroup.units.exists(_.melee) && thisGroup.units.exists(! _.melee))
       strategiesFleeWounded += BattleStrategyFleeWounded.Ranged
     
-    strategiesFocusAirOrGround += BattleStrategyFocusAirOrGround.FocusNeitherAirNorGround
+    strategiesFocusAirOrGround += BattleStrategyFocusAirOrGround.Nothing
     if (thatGroup.units.exists(_.flying) && thatGroup.units.exists( ! _.flying)) {
-      strategiesFocusAirOrGround += BattleStrategyFocusAirOrGround.FocusAir
-      strategiesFocusAirOrGround += BattleStrategyFocusAirOrGround.FocusGround
+      strategiesFocusAirOrGround += BattleStrategyFocusAirOrGround.Air
+      strategiesFocusAirOrGround += BattleStrategyFocusAirOrGround.Ground
     }
     
     val workerCount = thisGroup.units.count(_.unitClass.worker)

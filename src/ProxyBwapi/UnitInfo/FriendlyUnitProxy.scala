@@ -35,17 +35,21 @@ abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
   
   def alive                 : Boolean   = cacheExists.get
   def complete              : Boolean   = cacheCompleted.get
-  def defensiveMatrixPoints : Int       = base.getDefenseMatrixPoints
+  def defensiveMatrixPoints : Int       = getDefenseMatrixPointsCache.get
   def hitPoints             : Int       = getHitPointsCache.get
-  def initialResources      : Int       = base.getInitialResources
-  def invincible            : Boolean   = base.isInvincible
-  def resourcesLeft         : Int       = base.getResources
+  def initialResources      : Int       = getInitialResourcesCache.get
+  def invincible            : Boolean   = isInvincibleCache.get
+  def resourcesLeft         : Int       = getResourcesCache.get
   def shieldPoints          : Int       = getShieldsCache.get
   def unitClass             : UnitClass = cacheClass.get
   def plagued               : Boolean   = base.isPlagued
   
-  private val getHitPointsCache = new CacheFrame(() => base.getHitPoints)
-  private val getShieldsCache = new CacheFrame(() => base.getShields)
+  private val getDefenseMatrixPointsCache   = new CacheFrame(() => base.getDefenseMatrixPoints)
+  private val getHitPointsCache             = new CacheFrame(() => base.getHitPoints)
+  private val getInitialResourcesCache      = new CacheFrame(() => base.getInitialResources)
+  private val isInvincibleCache             = new CacheFrame(() => base.isInvincible)
+  private val getResourcesCache             = new CacheFrame(() => base.getResources)
+  private val getShieldsCache               = new CacheFrame(() => base.getShields)
   
   ////////////
   // Combat //
@@ -110,7 +114,9 @@ abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
   def burrowed  : Boolean = base.isBurrowed
   def cloaked   : Boolean = cachedCloaked.get
   def detected  : Boolean = base.isDetected
-  def visible   : Boolean = base.isVisible
+  def visible   : Boolean = isVisibleCache.get
+  
+  private val isVisibleCache = new CacheFrame(() => base.isVisible)
   
   //////////////
   // Movement //

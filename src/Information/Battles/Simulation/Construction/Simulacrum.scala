@@ -10,11 +10,11 @@ class Simulacrum(val unit:UnitInfo) {
   var attackCooldown : Int      = unit.cooldownLeft
   var moveCooldown   : Int      = Math.min(8, unit.cooldownLeft) //Rough approximation
   
-  var fighting:Boolean = true
-  var fleeing:Boolean = false
+  var fleeing   : Boolean = false
+  var fighting  : Boolean = true
   
-  def totalLife : Int     = hitPoints + shields
-  def alive     : Boolean = totalLife > 0
+  def totalLife     : Int     = hitPoints + shields
+  def alive         : Boolean = totalLife > 0
   def readyToAttack : Boolean = attackCooldown == 0
   def readyToMove   : Boolean = moveCooldown == 0
 }

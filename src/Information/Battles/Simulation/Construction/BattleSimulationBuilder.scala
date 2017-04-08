@@ -64,7 +64,7 @@ object BattleSimulationBuilder {
       strategiesFocusAirOrGround += BattleStrategyFocusAirOrGround.Ground
     }
     
-    val workerCount = thisGroup.units.count(_.unitClass.worker)
+    val workerCount = thisGroup.units.count(_.unitClass.isWorker)
     strategiesWorkersFighting += BattleStrategyWorkers.Ignore
     if (workerCount > 0) {
       strategiesWorkersFighting += BattleStrategyWorkers.AllFight
@@ -102,7 +102,7 @@ object BattleSimulationBuilder {
   
   def instructWorkers(group:BattleSimulationGroup) {
     var workersNotMining = 0
-    val workers = group.units.filter(_.unit.unitClass.worker)
+    val workers = group.units.filter(_.unit.unitClass.isWorker)
     
     if (group.strategy.workersFighting == BattleStrategyWorkers.Flee) {
       workersNotMining = workers.size
@@ -113,7 +113,7 @@ object BattleSimulationBuilder {
     }
     else if (group.strategy.workersFighting == BattleStrategyWorkers.HalfFight) {
       workersNotMining = workers.size / 2
-      workers.toList.sortBy(-_.totalLife).take(workersNotMining).foreach(_.fighting = false)
+      workers.toList.sortBy(_.totalLife).take(workersNotMining).foreach(_.fighting = false)
     }
     else {
       workersNotMining = workers.size

@@ -116,7 +116,7 @@ class Architect {
   private def rectangleContainsOnlyAWorker(rectangle: TileRectangle):Boolean = {
     val trespassingUnits = With.units.inRectangle(rectangle).filterNot(_.flying)
     trespassingUnits.size <= 1 &&
-      trespassingUnits.forall(_.unitClass.worker) &&
+      trespassingUnits.forall(_.unitClass.isWorker) &&
       trespassingUnits.forall(_.isOurs)
   }
   

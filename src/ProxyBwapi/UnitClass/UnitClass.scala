@@ -1,7 +1,6 @@
 package ProxyBwapi.UnitClass
 
 import Mathematics.Positions.TileRectangle
-import Performance.Caching.CacheForever
 import ProxyBwapi.Races.{Neutral, Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Tech
 import bwapi.{DamageType, Race, TilePosition, UnitType}
@@ -9,6 +8,18 @@ import bwapi.{DamageType, Race, TilePosition, UnitType}
 import scala.collection.mutable.ListBuffer
 
 case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
+  
+  lazy val asStringNeat = asString
+    .replace("Terran_", "")
+    .replace("Zerg_", "")
+    .replace("Protoss_", "")
+    .replace("Neutral_", "")
+    .replace("Resource_", "")
+    .replace("Critter_", "")
+    .replace("Special_", "")
+    .replaceAll("_", " ")
+  
+  override def toString:String = asStringNeat
   
   //////////////
   // Geometry //
@@ -24,88 +35,70 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
   //But Concussive is 25/50/100, not 50/75/100 !!!
   private val concussiveOrExplosive = List(DamageType.Concussive, DamageType.Explosive)
   
-  def effectiveAirDamage:Double = effectiveAirDamageCache.get
-  private val effectiveAirDamageCache = new CacheForever(() => effectiveAirDamageRecalculate)
-  private def effectiveAirDamageRecalculate:Double = {
-    if (this == Protoss.Carrier)      return Protoss.Interceptor.effectiveAirDamage * 8
-    if (this == Protoss.Interceptor)  return 0
-    if (this == Terran.Bunker)        return Terran.Marine.effectiveAirDamage * 4
-    val typeMultiplier = if (concussiveOrExplosive.contains(rawAirDamageType)) 0.75 else 1.0
-    typeMultiplier *
+  lazy val effectiveAirDamage:Double =
+    if      (this == Protoss.Carrier)      Protoss.Interceptor.effectiveAirDamage * 8
+    else if (this == Protoss.Interceptor)  0
+    else if (this == Terran.Bunker)        Terran.Marine.effectiveAirDamage * 4
+    else (if (concussiveOrExplosive.contains(rawAirDamageType)) 0.75 else 1.0) *
       maxAirHits *
       rawAirDamageFactor *
       rawAirDamage
-  }
-  def effectiveGroundDamage:Double = effectiveGroundDamageCache.get
-  private val effectiveGroundDamageCache = new CacheForever(() => effectiveGroundDamageRecalculate)
-  private def effectiveGroundDamageRecalculate:Double = {
-    if (this == Protoss.Carrier)      return Protoss.Interceptor.effectiveGroundDamage * 8
-    if (this == Protoss.Interceptor)  return 0
-    if (this == Protoss.Reaver)       return Protoss.Scarab.effectiveGroundDamage
-    if (this == Terran.Bunker)        return Terran.Marine.effectiveGroundDamage * 4
+  
+  lazy val effectiveGroundDamage:Double =
+    if      (this == Protoss.Carrier)       (Protoss.Interceptor.effectiveGroundDamage * 8)
+    else if (this == Protoss.Interceptor)   0
+    else if (this == Protoss.Reaver)        Protoss.Scarab.effectiveGroundDamage
+    else if (this == Terran.Bunker)         Terran.Marine.effectiveGroundDamage * 4
+    else (if (concussiveOrExplosive.contains(rawGroundDamageType)) 0.75 else 1.0) *
+      maxGroundHits *
+      rawGroundDamageFactor *
+      rawGroundDamage
     
     val typeMultiplier = if (concussiveOrExplosive.contains(rawGroundDamageType)) 0.75 else 1.0
     typeMultiplier *
       maxGroundHits *
       rawGroundDamageFactor *
       rawGroundDamage
-  }
   
-  def airDamageCooldown:Int = rawAirDamageCooldown
-  def groundDamageCooldown:Int = {
+  lazy val airDamageCooldown:Int = rawAirDamageCooldown
+  lazy val groundDamageCooldown:Int =
     //Necessary according to Skynet: https://github.com/Laccolith/skynet/blob/399018f41b49fbb55a0ea32142117e97e9d2f9ae/Skynet/Unit.cpp#L1092
-    if (this == Protoss.Reaver) return 60
-    return rawGroundDamageCooldown
-  }
+    if (this == Protoss.Reaver) 60 else rawGroundDamageCooldown
   
   //The extra 2+ is to account for the 1-3 frame random variation in cooldown
-  def airDps    : Double = effectiveAirDamage    * 24 / (2 + airDamageCooldown).toDouble
-  def groundDps : Double = effectiveGroundDamage * 24 / (2 + groundDamageCooldown).toDouble
+  lazy val airDps    : Double = effectiveAirDamage    * 24 / (2 + airDamageCooldown).toDouble
+  lazy val groundDps : Double = effectiveGroundDamage * 24 / (2 + groundDamageCooldown).toDouble
   
-  def attacksGround : Boolean = effectiveGroundDamage > 0
-  def attacksAir    : Boolean = effectiveAirDamage    > 0
+  lazy val attacksGround : Boolean = effectiveGroundDamage > 0
+  lazy val attacksAir    : Boolean = effectiveAirDamage    > 0
   
-  def helpsInCombat:Boolean = canAttack || isSpellcaster || Set(Terran.Bunker, Terran.Medic).contains(this)
+  lazy val helpsInCombat:Boolean = canAttack || isSpellcaster || Set(Terran.Bunker, Terran.Medic).contains(this)
   
-  //Range is from unit edge, so we account for the diagonal width of the unit
-  // 7/5 ~= sqrt(2)
-  def groundRange:Int = groundRangeCache.get 
-  private def groundRangeCache = new CacheForever(() => if (this == Terran.Bunker) Terran.Marine.groundRange + 32 else rawGroundRange)
+  lazy val groundRange        : Int = if (this == Terran.Bunker) Terran.Marine.groundRange  + 32 else rawGroundRange
+  lazy val airRange           : Int = if (this == Terran.Bunker) Terran.Marine.airRange     + 32 else rawAirRange
+  lazy val maxAirGroundRange  : Int = Math.max(groundRange, airRange)
   
-  def airRange:Int = airRangeCache.get
-  private def airRangeCache = new CacheForever(() => if (this == Terran.Bunker) Terran.Marine.airRange + 32 else rawAirRange)
-  
-  def maxAirGroundRange:Int = {
-    Math.max(groundRange, airRange)
-  }
-  
-  def isResource:Boolean = isMinerals || isGas
-  def maxTotalHealth:Int = maxHitPoints + maxShields
-  def totalCost: Int = mineralPrice + gasPrice
-  def orderable:Boolean = ! isSpell && ! Set(Protoss.Interceptor, Protoss.Scarab, Terran.SpiderMine).contains(this)
-  def isMinerals:Boolean = isMineralField
-  def isGas:Boolean = isGasCache.get
-  private val isGasCache = new CacheForever(() => List(Neutral.Geyser, Terran.Refinery, Protoss.Assimilator, Zerg.Extractor).contains(this))
-  def tileArea:TileRectangle = new TileRectangle(new TilePosition(0, 0), tileSize)
-  def isTownHall:Boolean = isTownHallCache.get
-  private val isTownHallCache = new CacheForever(() => List(Terran.CommandCenter, Protoss.Nexus, Zerg.Hatchery, Zerg.Lair, Zerg.Hive).contains(this))
+  lazy val isResource:Boolean = isMinerals || isGas
+  lazy val maxTotalHealth:Int = maxHitPoints + maxShields
+  lazy val totalCost: Int = mineralPrice + gasPrice
+  lazy val orderable:Boolean = ! isSpell && ! Set(Protoss.Interceptor, Protoss.Scarab, Terran.SpiderMine).contains(this)
+  lazy val isMinerals:Boolean = isMineralField
+  lazy val isGas:Boolean = List(Neutral.Geyser, Terran.Refinery, Protoss.Assimilator, Zerg.Extractor).contains(this)
+  lazy val tileArea:TileRectangle = new TileRectangle(new TilePosition(0, 0), tileSize)
+  lazy val isTownHall:Boolean = List(Terran.CommandCenter, Protoss.Nexus, Zerg.Hatchery, Zerg.Lair, Zerg.Hive).contains(this)
   
   ///////////
   // Macro //
   ///////////
   
-  def isProtoss : Boolean = race == Race.Protoss
-  def isTerran  : Boolean = race == Race.Terran
-  def isZerg    : Boolean = race == Race.Zerg
+  lazy val isProtoss : Boolean = race == Race.Protoss
+  lazy val isTerran  : Boolean = race == Race.Terran
+  lazy val isZerg    : Boolean = race == Race.Zerg
   
-  def buildTechEnabling     : Tech            = requiredTech
-  def buildUnitsEnabling    : List[UnitClass] = buildUnitsEnablingCache.get
-  def buildUnitsBorrowed    : List[UnitClass] = buildUnitsBorrowedCache.get
-  def buildUnitsSpent       : List[UnitClass] = buildUnitsSpentCache.get
-  
-  private val buildUnitsEnablingCache = new CacheForever(() => buildUnitsEnablingCalculate)
-  private val buildUnitsBorrowedCache = new CacheForever(() => buildUnitsBorrowedCalculate)
-  private val buildUnitsSpentCache = new CacheForever(() => buildUnitsSpentCalculate)
+  lazy val buildTechEnabling     : Tech            = requiredTech
+  lazy val buildUnitsEnabling    : List[UnitClass] = buildUnitsEnablingCalculate
+  lazy val buildUnitsBorrowed    : List[UnitClass] = buildUnitsBorrowedCalculate
+  lazy val buildUnitsSpent       : List[UnitClass] = buildUnitsSpentCalculate
   
   private def buildUnitsEnablingCalculate: List[UnitClass] = {
     
@@ -281,21 +274,4 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
   private def addBuildUnitIf(classes:ListBuffer[UnitClass], ifThisClass:UnitClass, thenAddThatClass:UnitClass) {
     addBuildUnitIf(classes, this == ifThisClass, thenAddThatClass)
   }
-  
-  ///////////////
-  // Debugging //
-  ///////////////
-  
-  val toStringCache = new CacheForever(() => asString
-    .replace("Terran_", "")
-    .replace("Zerg_", "")
-    .replace("Protoss_", "")
-    .replace("Neutral_", "")
-    .replace("Resource_", "")
-    .replace("Critter_", "")
-    .replace("Special_", "")
-    .replaceAll("_", " "))
-  
-  override def toString:String = toStringCache.get
-    
 }

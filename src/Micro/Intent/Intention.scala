@@ -3,7 +3,6 @@ package Micro.Intent
 import Lifecycle.With
 import Micro.Behaviors.{MovementProfiles, TargetingProfiles}
 import Micro.State.ExecutionState
-import Performance.Caching.CacheForever
 import Planning.Plan
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClass.UnitClass
@@ -28,12 +27,11 @@ class Intention(val plan:Plan, val unit:FriendlyUnitInfo) {
   var leash         : Int     = Int.MaxValue
   var desireToFight : Double  = 1.0
   
-  def targets: Set[UnitInfo] = targetCache.get
-  def threats: Set[UnitInfo] = threatCache.get
+  lazy val targets = Targets.get(this)
+  lazy val threats = Threats.get(this)
  
   var movementProfile = MovementProfiles.default
-  var targetProfile         = TargetingProfiles.default
+  var targetProfile   = TargetingProfiles.default
   
-  private val targetCache = new CacheForever[Set[UnitInfo]](() => Targets.get(this))
-  private val threatCache = new CacheForever[Set[UnitInfo]](() => Threats.get(this))
+  
 }

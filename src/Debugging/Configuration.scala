@@ -36,7 +36,7 @@ class Configuration {
   var enableChat                        = true
   var enableLatencyCompensation         = false
   
-  var enableCamera                      = false
+  var enableCamera                      = true
   var cameraDynamicSpeed                = false
   var cameraDynamicSpeedSlowest         = 30
   var cameraDynamicSpeedFastest         = 0

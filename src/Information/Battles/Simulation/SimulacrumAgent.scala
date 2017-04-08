@@ -23,7 +23,7 @@ class SimulacrumAgent(
   }
   
   private def updateFleeing() {
-    if (thisUnit.readyToMove || thisUnit.readyToAttack && ! thisUnit.fleeing) {
+    if ( ! thisUnit.fleeing && (thisUnit.readyToMove || thisUnit.readyToAttack)) {
       thisUnit.fleeing ||= thisGroup.strategy.movement == BattleStrategyMovement.Flee
       thisUnit.fleeing ||=
         thisUnit.totalLife <= Math.min(20, thisUnit.unit.unitClass.maxTotalHealth / 3) &&
@@ -35,8 +35,9 @@ class SimulacrumAgent(
           )
         )
       thisUnit.fleeing &&= thatGroup.units.exists(_.unit.canAttackThisSecond(thisUnit.unit))
-      thisUnit.fighting &&= ! thisUnit.fleeing
+      
     }
+    if (thisUnit.fleeing) thisUnit.fighting = false
   }
   
   private def considerAttacking() {
@@ -61,11 +62,8 @@ class SimulacrumAgent(
   }
   
   private def considerKiting() {
-    if (
-      thisUnit.readyToMove &&
-      thisUnit.fighting &&
-      thisGroup.strategy.movement == BattleStrategyMovement.Kite) {
-      if (targetsInRange.isEmpty) {
+    if (thisUnit.readyToMove && thisGroup.strategy.movement == BattleStrategyMovement.Kite) {
+      if (thisUnit.fighting && targetsInRange.isEmpty) {
         doCharge()
       }
       else {

@@ -1,7 +1,7 @@
 package Information.Battles.Simulation
 
 import Information.Battles.Simulation.Construction.{BattleSimulation, BattleSimulationGroup, Simulacrum}
-import Information.Battles.Simulation.Tactics.{TacticWounded, TacticFocusAirOrGround, TacticMovement}
+import Information.Battles.Simulation.Tactics.{TacticWounded, TacticFocus, TacticMovement}
 import Utilities.EnrichPosition._
 import bwapi.Position
 
@@ -24,13 +24,13 @@ class SimulacrumAgent(
   
   private def updateFleeing() {
     if ( ! thisUnit.fleeing && (thisUnit.readyToMove || thisUnit.readyToAttack)) {
-      thisUnit.fleeing ||= thisGroup.strategy.movement == TacticMovement.Flee
+      thisUnit.fleeing ||= thisGroup.tactics.movement == TacticMovement.Flee
       thisUnit.fleeing ||=
         thisUnit.totalLife <= Math.min(20, thisUnit.unit.unitClass.maxTotalHealth / 3) &&
         (
-          thisGroup.strategy.fleeWounded == TacticWounded.Flee ||
+          thisGroup.tactics.fleeWounded == TacticWounded.Flee ||
           (
-            thisGroup.strategy.fleeWounded == TacticWounded.FleeRanged &&
+            thisGroup.tactics.fleeWounded == TacticWounded.FleeRanged &&
             ! thisUnit.unit.melee
           )
         )
@@ -56,13 +56,13 @@ class SimulacrumAgent(
     if (
       thisUnit.readyToMove &&
       thisUnit.fighting &&
-      thisGroup.strategy.movement == TacticMovement.Charge) {
+      thisGroup.tactics.movement == TacticMovement.Charge) {
       doCharge()
     }
   }
   
   private def considerKiting() {
-    if (thisUnit.readyToMove && thisGroup.strategy.movement == TacticMovement.Kite) {
+    if (thisUnit.readyToMove && thisGroup.tactics.movement == TacticMovement.Kite) {
       if (thisUnit.fighting && targetsInRange.isEmpty) {
         doCharge()
       }
@@ -78,11 +78,11 @@ class SimulacrumAgent(
       thisUnit.fighting &&
       targetsInRange.nonEmpty) {
       val target =
-        if (thisGroup.strategy.focusAirOrGround == TacticFocusAirOrGround.Air) {
+        if (thisGroup.tactics.focusAirOrGround == TacticFocus.Air) {
           val flyersInRange = targetsInRange.filter(_.unit.flying)
           if (flyersInRange.nonEmpty) lowestHealthTarget(flyersInRange) else lowestHealthTarget(targetsInRange)
         }
-        else if (thisGroup.strategy.focusAirOrGround == TacticFocusAirOrGround.Ground) {
+        else if (thisGroup.tactics.focusAirOrGround == TacticFocus.Ground) {
           val groundInRange = targetsInRange.filterNot(_.unit.flying)
           if (groundInRange.nonEmpty) lowestHealthTarget(groundInRange) else lowestHealthTarget(targetsInRange)
         }
@@ -132,11 +132,13 @@ class SimulacrumAgent(
   }
   
   private def moveTowards(destination:Position) {
-    move(destination, chargingSpeedRatio)
+    move(destination, chargingSpeedRatio, thisUnit.pixel.getDistance(destination))
   }
   
-  private def move(destination:Position, multiplier:Double) {
-    thisUnit.pixel = thisUnit.pixel.project(destination, multiplier * thisUnit.unit.topSpeed * (1 + movementFrames))
+  private def move(destination:Position, multiplier:Double, maxDistance:Double = 1000.0) {
+    thisUnit.pixel = thisUnit.pixel.project(destination, Math.min(
+      maxDistance,
+      multiplier * thisUnit.unit.topSpeed * (1 + movementFrames)))
     thisUnit.attackCooldown = movementFrames
     thisUnit.moveCooldown = movementFrames
   }

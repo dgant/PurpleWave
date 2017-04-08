@@ -1,10 +1,10 @@
 package Information.Battles.Simulation.Construction
 
 import Information.Battles.Simulation.BattleSimulator
-import Information.Battles.Simulation.Tactics.TacticWounded.BattleStrategyWounded
-import Information.Battles.Simulation.Tactics.TacticFocusAirOrGround.BattleStrategyFocusAirOrGround
-import Information.Battles.Simulation.Tactics.TacticMovement.BattleStrategyMovement
-import Information.Battles.Simulation.Tactics.TacticWorkers.BattleStrategyWorkers
+import Information.Battles.Simulation.Tactics.TacticWounded.TacticWounded
+import Information.Battles.Simulation.Tactics.TacticFocus.TacticFocus
+import Information.Battles.Simulation.Tactics.TacticMovement.TacticMovement
+import Information.Battles.Simulation.Tactics.TacticWorkers.TacticWorkers
 import Information.Battles.Simulation.Tactics._
 import Information.Battles.{Battle, BattleGroup}
 
@@ -14,70 +14,60 @@ object BattleSimulationBuilder {
   
   def build(battle:Battle):Iterable[BattleSimulation] = {
     
-    val ourGroupStrategyVariants = buildGroupStrategies(battle.us, battle.enemy)
-    
-    // It'd be helpful to consider all enemy group strategies and assume they pick the best,
-    // but we can't afford to run that many simulations.
-    val enemyGroupStrategyVariants = List(new BattleSimulationGroup(battle.enemy, new Tactic(
-      TacticWounded.Ignore,
-      TacticFocusAirOrGround.Nothing,
-      TacticMovement.Charge,
-      TacticWorkers.Ignore)))
-    
-    ourGroupStrategyVariants.flatten(ourGroupStrategyVariant =>
-      enemyGroupStrategyVariants.map(enemyGroupStrategyVariant =>
-        buildSimulation(
-          ourGroupStrategyVariant,
-          enemyGroupStrategyVariant)))
+    val ourTacticsVariants = buildOurTacticVariants(battle.us, battle.enemy)
+  
+    buildOurTacticVariants(battle.us, battle.enemy).flatten(ourTactics =>
+      buildEnemyTacticVariants(battle.enemy, battle.us).map(enemyTactics =>
+        buildSimulation(ourTactics, enemyTactics)))
   }
   
-  def buildGroupStrategies(thisGroup:BattleGroup, thatGroup:BattleGroup):Iterable[BattleSimulationGroup] = {
-    val strategiesMovement          = new ListBuffer[BattleStrategyMovement]
-    val strategiesFleeWounded       = new ListBuffer[BattleStrategyWounded]
-    val strategiesFocusAirOrGround  = new ListBuffer[BattleStrategyFocusAirOrGround]
-    val strategiesWorkersFighting   = new ListBuffer[BattleStrategyWorkers]
+  def buildOurTacticVariants(thisGroup:BattleGroup, thatGroup:BattleGroup):Iterable[BattleSimulationGroup] = {
+    val tacticsMovement          = new ListBuffer[TacticMovement]
+    val tacticsFleeWounded       = new ListBuffer[TacticWounded]
+    val tacticsFocusAirOrGround  = new ListBuffer[TacticFocus]
+    val tacticsWorkersFighting   = new ListBuffer[TacticWorkers]
     
     val thisCanMove = thisGroup.units.exists(_.canMove)
     val thatCanMove = thatGroup.units.exists(_.canMove)
     
     if (thisCanMove) {
-      strategiesMovement += TacticMovement.Charge
-      strategiesMovement += TacticMovement.Flee
+      tacticsMovement += TacticMovement.Charge
+      tacticsMovement += TacticMovement.Flee
       
       if (thatCanMove) {
-        strategiesMovement += TacticMovement.Kite
+        tacticsMovement += TacticMovement.Kite
       }
     }
-    if (strategiesMovement.isEmpty) {
-      strategiesMovement += TacticMovement.Ignore
+    if (tacticsMovement.isEmpty) {
+      tacticsMovement += TacticMovement.Ignore
     }
     
-    strategiesFleeWounded += TacticWounded.Ignore
+    tacticsFleeWounded += TacticWounded.Ignore
     if (thisCanMove)
-      strategiesFleeWounded += TacticWounded.Flee
+      tacticsFleeWounded += TacticWounded.Flee
     if (thisCanMove && thisGroup.units.exists(_.melee) && thisGroup.units.exists(! _.melee))
-      strategiesFleeWounded += TacticWounded.FleeRanged
+      tacticsFleeWounded += TacticWounded.FleeRanged
     
-    strategiesFocusAirOrGround += TacticFocusAirOrGround.Nothing
+    tacticsFocusAirOrGround += TacticFocus.Nothing
     if (thatGroup.units.exists(_.flying) && thatGroup.units.exists( ! _.flying)) {
-      strategiesFocusAirOrGround += TacticFocusAirOrGround.Air
-      strategiesFocusAirOrGround += TacticFocusAirOrGround.Ground
+      tacticsFocusAirOrGround += TacticFocus.Air
+      tacticsFocusAirOrGround += TacticFocus.Ground
     }
     
     val workerCount = thisGroup.units.count(_.unitClass.isWorker)
-    strategiesWorkersFighting += TacticWorkers.Ignore
+    tacticsWorkersFighting += TacticWorkers.Ignore
     if (workerCount > 0) {
-      strategiesWorkersFighting += TacticWorkers.AllFight
-      strategiesWorkersFighting += TacticWorkers.Flee
+      tacticsWorkersFighting += TacticWorkers.AllFight
+      tacticsWorkersFighting += TacticWorkers.Flee
     }
     if (workerCount > 3)
-      strategiesWorkersFighting += TacticWorkers.HalfFight
+      tacticsWorkersFighting += TacticWorkers.HalfFight
     
     val strategyPermutations =
-      strategiesFleeWounded.flatten(strategyFleeWounded =>
-        strategiesFocusAirOrGround.flatten(strategyFocusAirOrGround =>
-          strategiesMovement.flatten(strategyMovement =>
-            strategiesWorkersFighting.map(strategyWorkersFighting => new Tactic(
+      tacticsFleeWounded.flatten(strategyFleeWounded =>
+        tacticsFocusAirOrGround.flatten(strategyFocusAirOrGround =>
+          tacticsMovement.flatten(strategyMovement =>
+            tacticsWorkersFighting.map(strategyWorkersFighting => new Tactics(
               strategyFleeWounded,
               strategyFocusAirOrGround,
               strategyMovement,
@@ -87,11 +77,19 @@ object BattleSimulationBuilder {
     strategyPermutations.map(strategy => new BattleSimulationGroup(thisGroup, strategy))
   }
   
-  def trimEnemyStrategies(variants:Iterable[BattleSimulationGroup]):Iterable[BattleSimulationGroup] = {
+  def buildEnemyTacticVariants(thisGroup:BattleGroup, thatGroup:BattleGroup):Iterable[BattleSimulationGroup] = {
+    List(new BattleSimulationGroup(thisGroup, new Tactics(
+      TacticWounded.Ignore,
+      TacticFocus.Nothing,
+      TacticMovement.Charge,
+      TacticWorkers.Ignore)))
+  }
+  
+  def trimEnemytactics(variants:Iterable[BattleSimulationGroup]):Iterable[BattleSimulationGroup] = {
     variants.filter(variant =>
-      variant.strategy.workersFighting == TacticWorkers.Ignore &&
-      variant.strategy.focusAirOrGround == TacticFocusAirOrGround.Nothing &&
-      variant.strategy.fleeWounded == TacticWounded.Ignore)
+      variant.tactics.workersFighting == TacticWorkers.Ignore &&
+      variant.tactics.focusAirOrGround == TacticFocus.Nothing &&
+      variant.tactics.fleeWounded == TacticWounded.Ignore)
   }
   
   def buildSimulation(ourGroup:BattleSimulationGroup, enemyGroup:BattleSimulationGroup):BattleSimulation = {
@@ -104,14 +102,14 @@ object BattleSimulationBuilder {
     var workersNotMining = 0
     val workers = group.units.filter(_.unit.unitClass.isWorker)
     
-    if (group.strategy.workersFighting == TacticWorkers.Flee) {
+    if (group.tactics.workersFighting == TacticWorkers.Flee) {
       workersNotMining = workers.size
       workers.foreach(worker => { worker.fleeing = true; worker.fighting = false })
     }
-    else if (group.strategy.workersFighting == TacticWorkers.Ignore) {
+    else if (group.tactics.workersFighting == TacticWorkers.Ignore) {
       workers.toList.foreach(_.fighting = false)
     }
-    else if (group.strategy.workersFighting == TacticWorkers.HalfFight) {
+    else if (group.tactics.workersFighting == TacticWorkers.HalfFight) {
       workersNotMining = workers.size / 2
       workers.toList.sortBy(_.totalLife).take(workersNotMining).foreach(_.fighting = false)
     }

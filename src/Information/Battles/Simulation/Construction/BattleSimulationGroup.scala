@@ -1,11 +1,11 @@
 package Information.Battles.Simulation.Construction
 
 import Information.Battles.BattleGroup
-import Information.Battles.Simulation.Tactics.Tactic
+import Information.Battles.Simulation.Tactics.Tactics
 
 import scala.collection.mutable.ListBuffer
 
-class BattleSimulationGroup(battleGroup:BattleGroup, val strategy: Tactic) {
+class BattleSimulationGroup(battleGroup:BattleGroup, val tactics: Tactics) {
   
   val units: ListBuffer[Simulacrum] =
     new ListBuffer[Simulacrum] ++

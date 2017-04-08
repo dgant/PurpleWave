@@ -1,6 +1,6 @@
 package Information.Battles.Simulation.Tactics
 
 object TacticMovement extends Enumeration {
-  type BattleStrategyMovement = Value
+  type TacticMovement = Value
   val Ignore, Charge, Kite, Flee = Value
 }

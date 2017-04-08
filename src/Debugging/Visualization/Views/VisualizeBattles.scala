@@ -62,11 +62,13 @@ object VisualizeBattles {
       List(
         List(name),
         List("Losses:",   group.lostValue.toString),
-        List("Move:",     group.strategy.movement.toString),
-        List("Focus:",    group.strategy.focusAirOrGround.toString),
-        List("Workers:",  group.strategy.workersFighting.toString),
-        List("Wounded:",  group.strategy.fleeWounded.toString)
-        
-      ))
+        List("Move:",     group.tactics.movement.toString),
+        List("Focus:",    group.tactics.focusAirOrGround.toString),
+        List("Workers:",  group.tactics.workersFighting.toString),
+        List("Wounded:",  group.tactics.fleeWounded.toString),
+        List(),
+        List("Survivors:")
+      )
+      ++ group.units.groupBy(_.unit.unitClass).map(u => List(u._1.toString, u._2.size.toString)))
   }
 }

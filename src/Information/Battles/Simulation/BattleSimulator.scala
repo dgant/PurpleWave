@@ -5,11 +5,12 @@ import Information.Battles.Simulation.Construction.{BattleSimulation, BattleSimu
 
 object BattleSimulator {
   
+  var frame = 0
   val maxFrames = 24 * 10
   
-  // Loose, based on the values in the BOSS paper:
+  // Loosely, based on the values in the BOSS paper:
   // http://www.aaai.org/ocs/index.php/AIIDE/AIIDE11/paper/viewFile/4078/4407
-  def costOfNotMining(workers:Int):Int = workers * maxFrames / 20
+  def costPerSecondOfNotMining(workers:Int):Int = workers
   
   def simulate(battle:Battle):Iterable[BattleSimulation] = {
     val simulations = BattleSimulationBuilder.build(battle)
@@ -18,7 +19,9 @@ object BattleSimulator {
   }
   
   private def runSimulation(simulation: BattleSimulation) {
-    for(frame <- 0 until maxFrames) step(simulation)
+    for(frame <- 0 until maxFrames)
+      if (simulation.us.units.nonEmpty && simulation.enemy.units.nonEmpty)
+        step(simulation)
   }
   
   private def step(battle: BattleSimulation) {
@@ -28,6 +31,9 @@ object BattleSimulator {
     removeDeadUnits (battle.enemy)
     reduceCooldown  (battle.us)
     reduceCooldown  (battle.enemy)
+    costOfWar       (battle.us)
+    costOfWar       (battle.enemy)
+    frame += 1
   }
   
   private def updateAgents (
@@ -42,7 +48,7 @@ object BattleSimulator {
   private def removeDeadUnits(group:BattleSimulationGroup) {
     group.units.filterNot(_.alive).foreach(deadUnit => {
       group.lostValue += value(deadUnit)
-      group.units.remove(deadUnit)
+      group.units -= deadUnit
     })
   }
   
@@ -57,5 +63,9 @@ object BattleSimulator {
       simulacrum.attackCooldown = Math.max(0, simulacrum.attackCooldown - 1)
       simulacrum.moveCooldown   = Math.max(0, simulacrum.moveCooldown   - 1)
     })
+  }
+  
+  private def costOfWar(group:BattleSimulationGroup) {
+    if (frame % 24 == 0) group.lostValue += group.lostValuePerSecond
   }
 }

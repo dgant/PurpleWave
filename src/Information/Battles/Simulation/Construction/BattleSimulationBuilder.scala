@@ -33,37 +33,37 @@ object BattleSimulationBuilder {
     val thatCanMove = thatGroup.units.exists(_.canMove)
     
     if (thisCanMove) {
-      strategiesMovement :+ BattleStrategyMovement.Charge
-      strategiesMovement :+ BattleStrategyMovement.Flee
+      strategiesMovement += BattleStrategyMovement.Charge
+      strategiesMovement += BattleStrategyMovement.Flee
       
       if (thatCanMove) {
-        strategiesMovement :+ BattleStrategyMovement.Kite
+        strategiesMovement += BattleStrategyMovement.Kite
       }
     }
     if (strategiesMovement.isEmpty) {
-      strategiesMovement :+ BattleStrategyMovement.Dont
+      strategiesMovement += BattleStrategyMovement.Dont
     }
     
-    strategiesFleeWounded :+ BattleStrategyFleeWounded.None
+    strategiesFleeWounded += BattleStrategyFleeWounded.None
     if (thisCanMove)
-      strategiesFleeWounded :+ BattleStrategyFleeWounded.Any
+      strategiesFleeWounded += BattleStrategyFleeWounded.Any
     if (thisCanMove && thisGroup.units.exists(_.melee) && thisGroup.units.exists(! _.melee))
-      strategiesFleeWounded :+ BattleStrategyFleeWounded.Ranged
+      strategiesFleeWounded += BattleStrategyFleeWounded.Ranged
     
-    strategiesFocusAirOrGround :+ BattleStrategyFocusAirOrGround.FocusNeitherAirNorGround
+    strategiesFocusAirOrGround += BattleStrategyFocusAirOrGround.FocusNeitherAirNorGround
     if (thatGroup.units.exists(_.flying) && thatGroup.units.exists( ! _.flying)) {
-      strategiesFocusAirOrGround :+ BattleStrategyFocusAirOrGround.FocusAir
-      strategiesFocusAirOrGround :+ BattleStrategyFocusAirOrGround.FocusGround
+      strategiesFocusAirOrGround += BattleStrategyFocusAirOrGround.FocusAir
+      strategiesFocusAirOrGround += BattleStrategyFocusAirOrGround.FocusGround
     }
     
     val workerCount = thisGroup.units.count(_.unitClass.worker)
-    strategiesWorkersFighting :+ BattleStrategyWorkers.None
+    strategiesWorkersFighting += BattleStrategyWorkers.None
     if (workerCount > 0) {
-      strategiesWorkersFighting :+ BattleStrategyWorkers.AllFight
-      strategiesWorkersFighting :+ BattleStrategyWorkers.Flee
+      strategiesWorkersFighting += BattleStrategyWorkers.AllFight
+      strategiesWorkersFighting += BattleStrategyWorkers.Flee
     }
     if (workerCount > 3)
-      strategiesWorkersFighting :+ BattleStrategyWorkers.HalfFight
+      strategiesWorkersFighting += BattleStrategyWorkers.HalfFight
     
     val strategyPermutations =
       strategiesFleeWounded.flatten(strategyFleeWounded =>
@@ -104,6 +104,6 @@ object BattleSimulationBuilder {
       workersNotMining = workers.size
     }
     
-    group.lostValue += BattleSimulator.costOfNotMining(workersNotMining)
+    group.lostValuePerSecond += BattleSimulator.costPerSecondOfNotMining(workersNotMining)
   }
 }

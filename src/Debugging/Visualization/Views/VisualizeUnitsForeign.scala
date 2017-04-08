@@ -12,7 +12,8 @@ object VisualizeUnitsForeign {
   }
   
   private def drawTrackedUnit(trackedUnit:ForeignUnitInfo) {
-    if (trackedUnit.possiblyStillThere && ! trackedUnit.visible) {
+    if (trackedUnit.possiblyStillThere) {
+      if ((trackedUnit.cloaked && ! trackedUnit.detected) || ! trackedUnit.visible) {
       DrawMap.circle(
         trackedUnit.pixelCenter,
         trackedUnit.unitClass.width / 2,
@@ -22,6 +23,7 @@ object VisualizeUnitsForeign {
         trackedUnit.pixelCenter,
         drawBackground = true,
         DrawMap.playerColorDark(trackedUnit.player))
+      }
     }
   }
 }

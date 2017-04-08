@@ -11,8 +11,8 @@ class SimulacrumAgent(
   thatGroup : BattleSimulationGroup,
   battle    : BattleSimulation) {
   
-  val chargingPenalty = 0.6 //What fraction of top speed units are likely to get
-  val movementFrames = 4
+  val chargingSpeedRatio = 0.75 //What fraction of top speed charging units are likely to get
+  val movementFrames = 8
   
   def act() {
     updateFleeing()
@@ -75,7 +75,10 @@ class SimulacrumAgent(
   }
   
   private def doAttack() {
-    if (thisUnit.readyToAttack && thisUnit.fighting && targetsInRange.nonEmpty) {
+    if (
+      thisUnit.readyToAttack &&
+      thisUnit.fighting &&
+      targetsInRange.nonEmpty) {
       val target =
         if (thisGroup.strategy.focusAirOrGround == BattleStrategyFocusAirOrGround.Air) {
           val flyersInRange = targetsInRange.filter(_.unit.flying)
@@ -131,7 +134,7 @@ class SimulacrumAgent(
   }
   
   private def moveTowards(destination:Position) {
-    move(destination, chargingPenalty)
+    move(destination, chargingSpeedRatio)
   }
   
   private def move(destination:Position, multiplier:Double) {

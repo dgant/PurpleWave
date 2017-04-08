@@ -11,6 +11,6 @@ object MovementProfiles {
     preferMobility    = 1.00,
     preferRandom      = 0.05,
     preferMoving      = 0.05,
-    avoidDamage       = 2.00,
-    avoidTraffic      = 1.00)
+    avoidDamage       = 1.25,
+    avoidTraffic      = 1.25)
 }

@@ -2,8 +2,8 @@ package Planning.Plans.Army
 
 import Debugging.Visualization.Rendering.DrawMap
 import Micro.Intent.Intention
-import Planning.Composition.PositionFinders.PositionFinder
-import Planning.Composition.PositionFinders.Tactics.PositionEnemyBase
+import Planning.Composition.PositionFinders.TileFinder
+import Planning.Composition.PositionFinders.Tactics.TileEnemyBase
 import Planning.Composition.Property
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
@@ -16,7 +16,7 @@ class Hunt extends Plan {
   description.set("Find some stray units to kill")
   
   val hunters = new Property[LockUnits](new LockUnits { unitMatcher.set(UnitMatchWarriors) })
-  var position = new Property[PositionFinder](new PositionEnemyBase)
+  var position = new Property[TileFinder](new TileEnemyBase)
   
   override def onFrame() {
     

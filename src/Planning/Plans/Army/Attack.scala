@@ -1,6 +1,6 @@
 package Planning.Plans.Army
 
-import Planning.Composition.PositionFinders.Tactics.PositionEnemyBase
+import Planning.Composition.PositionFinders.Tactics.TileEnemyBase
 import Planning.Composition.ResourceLocks.LockUnits
 import Planning.Plans.Compound.IfThenElse
 import Planning.Plans.Information.{FindEnemyBase, FoundEnemyBase}
@@ -21,7 +21,7 @@ class Attack extends IfThenElse {
   whenFalse.set(new FindEnemyBase { scouts.inherit(attackers) })
   whenTrue.set(new ControlPosition {
     units.inherit(attackers);
-    positionToControl.set(new PositionEnemyBase);
+    positionToControl.set(new TileEnemyBase);
     description.inherit(attack.description)
   })
 }

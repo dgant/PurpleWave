@@ -1,10 +1,10 @@
 package Planning.Composition.PositionFinders.Generic
 
 import Mathematics.Positions.Positions
-import Planning.Composition.PositionFinders.PositionFinder
+import Planning.Composition.PositionFinders.TileFinder
 import bwapi.TilePosition
 
-object PositionMiddle extends PositionFinder {
+object TileMiddle extends TileFinder {
   
   override def find(): Option[TilePosition] = Some(Positions.tileMiddle)
 }

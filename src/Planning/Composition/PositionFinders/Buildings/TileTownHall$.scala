@@ -1,11 +1,11 @@
 package Planning.Composition.PositionFinders.Buildings
 
-import Planning.Composition.PositionFinders.PositionFinder
+import Planning.Composition.PositionFinders.TileFinder
 import Lifecycle.With
 import bwapi.TilePosition
 
 
-object PositionTownHall extends PositionFinder {
+object TileTownHall$ extends TileFinder {
   
   def find: Option[TilePosition] = {
   

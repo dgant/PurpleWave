@@ -1,12 +1,12 @@
 package Planning.Composition.PositionFinders.Tactics
 
 import Performance.Caching.Cache
-import Planning.Composition.PositionFinders.PositionFinder
+import Planning.Composition.PositionFinders.TileFinder
 import Lifecycle.With
 import Utilities.EnrichPosition._
 import bwapi.TilePosition
 
-class PositionChoke extends PositionFinder {
+class TileChoke extends TileFinder {
   
   override def find: Option[TilePosition] = findCache.get
   val findCache = new Cache[Option[TilePosition]](3, () => findRecalculate)

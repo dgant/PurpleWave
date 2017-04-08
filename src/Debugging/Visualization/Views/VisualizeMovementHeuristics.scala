@@ -70,8 +70,8 @@ object VisualizeMovementHeuristics {
       
       // We want to offset the centerpoint slightly for each heuristic
       // so very discrete heuristics (especially booleans) don't completely ovelap
-      val offsetX = (result.color.hashCode)     % 5 - 2
-      val offsetY = (result.color.hashCode / 2) % 5 - 2
+      val offsetX = (result.color.hashCode)     % 3 - 1
+      val offsetY = (result.color.hashCode / 2) % 3 - 1
       
       // Use the radius to show which heuristics have the biggest spread of values, and where
       // Big spread: Max 15.0, min 3.0

@@ -1,7 +1,7 @@
 package Planning.Plans.Information
 
 import Micro.Intent.Intention
-import Planning.Composition.PositionFinders.Generic.PositionMiddle
+import Planning.Composition.PositionFinders.Generic.TileMiddle
 import Planning.Composition.Property
 import Planning.Composition.UnitCounters.UnitCountExactly
 import Planning.Composition.UnitMatchers.UnitMatchMobile
@@ -19,7 +19,7 @@ class FindEnemyBase extends Plan {
   val scouts = new Property[LockUnits](new LockUnits {
     unitCounter.set(new UnitCountExactly(1))
     unitMatcher.set(UnitMatchMobile)
-    unitPreference.set(new UnitPreferClose { positionFinder.set(PositionMiddle) })
+    unitPreference.set(new UnitPreferClose { positionFinder.set(TileMiddle) })
   })
   
   override def isComplete: Boolean = With.geography.enemyBases.nonEmpty

@@ -1,13 +1,13 @@
 package Planning.Composition.PositionFinders.Buildings
 
-import Planning.Composition.PositionFinders.PositionFinder
+import Planning.Composition.PositionFinders.TileFinder
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClass.UnitClass
 import Lifecycle.With
 import Mathematics.Positions.TileRectangle
 import bwapi.TilePosition
 
-class PositionSimpleBuilding(val buildingClass:UnitClass) extends PositionFinder {
+class TileSimpleBuilding(val buildingClass:UnitClass) extends TileFinder {
   
   private var lastTile:Option[TilePosition] = None
   

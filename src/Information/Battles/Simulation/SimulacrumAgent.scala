@@ -15,6 +15,7 @@ class SimulacrumAgent(
   val movementFrames = 8
   
   def act() {
+    if (!thisUnit.readyToAttack && !thisUnit.readyToMove) return
     updateFleeing()
     considerFleeing()
     considerAttacking()
@@ -23,7 +24,7 @@ class SimulacrumAgent(
   }
   
   private def updateFleeing() {
-    if ( ! thisUnit.fleeing && (thisUnit.readyToMove || thisUnit.readyToAttack)) {
+    if ( ! thisUnit.fleeing) {
       thisUnit.fleeing ||= thisGroup.tactics.movement == TacticMovement.Flee
       thisUnit.fleeing ||=
         thisUnit.totalLife <= Math.min(20, thisUnit.unit.unitClass.maxTotalHealth / 3) &&
@@ -34,8 +35,7 @@ class SimulacrumAgent(
             ! thisUnit.unit.melee
           )
         )
-      thisUnit.fleeing &&= thatGroup.units.exists(_.unit.canAttackThisSecond(thisUnit.unit))
-      
+      thisUnit.fleeing &&= threats.nonEmpty
     }
     if (thisUnit.fleeing) thisUnit.fighting = false
   }
@@ -53,10 +53,7 @@ class SimulacrumAgent(
   }
   
   private def considerCharging() {
-    if (
-      thisUnit.readyToMove &&
-      thisUnit.fighting &&
-      thisGroup.tactics.movement == TacticMovement.Charge) {
+    if (thisUnit.readyToMove && thisUnit.fighting && thisGroup.tactics.movement == TacticMovement.Charge) {
       doCharge()
     }
   }
@@ -66,7 +63,7 @@ class SimulacrumAgent(
       if (thisUnit.fighting && targetsInRange.isEmpty) {
         doCharge()
       }
-      else {
+      else if (threats.nonEmpty) {
         doFlee()
       }
     }
@@ -106,7 +103,6 @@ class SimulacrumAgent(
   }
   
   private def doFlee() {
-    val threats = thatGroup.units.filter(_.unit.canAttackThisSecond(thisUnit.unit))
     if (threats.nonEmpty) {
       val closestThreat = threats.minBy(threat =>
         Math.min(
@@ -142,11 +138,16 @@ class SimulacrumAgent(
     thisUnit.attackCooldown = movementFrames
     thisUnit.moveCooldown = movementFrames
   }
-  
-  private lazy val targets = thatGroup.units.filter(defender => thisUnit.unit.canAttackThisSecond(defender.unit))
+
+  private lazy val threats = thatGroup.units.filter(_.canAttack(thisUnit))
+  private lazy val targets = thatGroup.units.filter(thisUnit.canAttack(_))
   private lazy val targetsInRange =
     targets.filter(target =>
-      thisUnit.unit.rangeAgainst(target.unit) >=
+      thisUnit.rangeAgainst(target) >=
         thisUnit.pixel.getDistance(target.pixel)
   )
+  private lazy val threatsInRange =
+    threats.filter(threat =>
+      threat.rangeAgainst(thisUnit) >=
+        threat.pixel.getDistance(thisUnit.pixel))
 }

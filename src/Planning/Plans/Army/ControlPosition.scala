@@ -2,8 +2,8 @@ package Planning.Plans.Army
 
 import Debugging.Visualization.Rendering.DrawMap
 import Micro.Intent.Intention
-import Planning.Composition.PositionFinders.PositionFinder
-import Planning.Composition.PositionFinders.Tactics.PositionEnemyBase
+import Planning.Composition.PositionFinders.TileFinder
+import Planning.Composition.PositionFinders.Tactics.TileEnemyBase
 import Planning.Composition.Property
 import Planning.Plan
 import Planning.Composition.ResourceLocks.LockUnits
@@ -15,7 +15,7 @@ class ControlPosition extends Plan {
   description.set("Control a position")
   
   val units = new Property[LockUnits](new LockUnits)
-  var positionToControl = new Property[PositionFinder](new PositionEnemyBase)
+  var positionToControl = new Property[TileFinder](new TileEnemyBase)
   
   override def onFrame() {
     

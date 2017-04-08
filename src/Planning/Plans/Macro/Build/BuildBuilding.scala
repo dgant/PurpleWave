@@ -2,7 +2,7 @@ package Planning.Plans.Macro.Build
 
 import Debugging.Visualization.Rendering.DrawMap
 import Micro.Intent.Intention
-import Planning.Composition.PositionFinders.Buildings.PositionArbitraryBuilding
+import Planning.Composition.PositionFinders.Buildings.TileArbitraryBuilding
 import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Composition.UnitPreferences.UnitPreferClose
@@ -16,7 +16,7 @@ import bwapi.{Race, TilePosition}
 
 class BuildBuilding(val buildingClass:UnitClass) extends Plan {
   
-  val buildingPlacer = new PositionArbitraryBuilding(buildingClass)
+  val buildingPlacer = new TileArbitraryBuilding(buildingClass)
   val areaLock = new LockArea
   val currencyLock = new LockCurrencyForUnit(buildingClass)
   val builderLock = new LockUnits {

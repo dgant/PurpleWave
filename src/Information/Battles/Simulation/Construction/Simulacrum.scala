@@ -27,6 +27,6 @@ class Simulacrum(val unit:UnitInfo) {
   def readyToMove   : Boolean = moveCooldown == 0
   
   // This logic is duplicated from other sources because this version is reallt fast
-  def rangeAgainst(enemy:Simulacrum) = if (enemy.flying) rangeAir else rangeGround - radialHypotenuse - enemy.radialHypotenuse
-  def canAttack(enemy:Simulacrum):Boolean = if (enemy.flying) attacksAir else attacksGround
+  def rangeAgainst  (enemy:Simulacrum)  : Double   = (if (enemy.flying) rangeAir else rangeGround) - radialHypotenuse - enemy.radialHypotenuse
+  def canAttack     (enemy:Simulacrum)  : Boolean  = if (enemy.flying) attacksAir else attacksGround
 }

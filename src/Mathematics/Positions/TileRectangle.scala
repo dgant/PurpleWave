@@ -4,8 +4,8 @@ import Utilities.EnrichPosition._
 import bwapi.{Position, TilePosition}
 
 case class TileRectangle(
- val startInclusive:TilePosition,
- val endExclusive:TilePosition) {
+ val startInclusive : TilePosition,
+ val endExclusive   : TilePosition) {
   
   if (endExclusive.getX < startInclusive.getX || endExclusive.getY < startInclusive.getY) {
     throw new Exception("Created an invalid (non-normalized) rectangle")
@@ -51,7 +51,7 @@ case class TileRectangle(
   lazy val startPixel : Position = startInclusive.toPosition
   lazy val endPixel   : Position = endExclusive.toPosition.subtract(1, 1)
   
-  lazy val tiles:Iterable[TilePosition] =
+  lazy val tiles: Iterable[TilePosition] =
     for (x <- startInclusive.getX until endExclusive.getX; y <- startInclusive.getY until endExclusive.getY)
       yield new TilePosition(x, y)
 }

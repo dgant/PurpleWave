@@ -50,6 +50,7 @@ object BattleSimulator {
     group.units
       .foreach(unit =>
         if ( ! unit.alive) {
+          group.lostUnits += unit
           group.lostValue += value(unit)
           group.units -= unit
         })

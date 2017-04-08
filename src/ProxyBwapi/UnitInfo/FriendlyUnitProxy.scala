@@ -111,11 +111,12 @@ abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
   // Visibility //
   ////////////////
   
-  def burrowed  : Boolean = base.isBurrowed
+  def burrowed  : Boolean = isBurrowedCache.get
   def cloaked   : Boolean = cachedCloaked.get
   def detected  : Boolean = base.isDetected
   def visible   : Boolean = isVisibleCache.get
   
+  private val isBurrowedCache = new CacheFrame(() => base.isBurrowed)
   private val isVisibleCache = new CacheFrame(() => base.isVisible)
   
   //////////////

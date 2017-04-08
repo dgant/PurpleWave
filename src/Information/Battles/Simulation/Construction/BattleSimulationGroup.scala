@@ -11,6 +11,7 @@ class BattleSimulationGroup(battleGroup:BattleGroup, val tactics: Tactics) {
     new ListBuffer[Simulacrum] ++
     battleGroup.units.filter(_.unitClass.helpsInCombat).map(unit => new Simulacrum(unit))
   
-  var lostValue:Int = 0
-  var lostValuePerSecond:Int = 0
+  var lostUnits           : ListBuffer[Simulacrum] = ListBuffer.empty
+  var lostValue           : Int = 0
+  var lostValuePerSecond  : Int = 0
 }

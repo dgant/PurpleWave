@@ -24,8 +24,8 @@ case class TileRectangle(
   def add(tilePosition:TilePosition):TileRectangle =
     add(tilePosition.getX, tilePosition.getY)
 
-  def midPixel  : Position     = startPixel.midpoint(endPixel)
-  def midpoint  : TilePosition = startInclusive.midpoint(endExclusive)
+  lazy val midPixel : Position     = startPixel.midpoint(endPixel)
+  lazy val midpoint : TilePosition = startInclusive.midpoint(endExclusive)
   
   def contains(x:Int, y:Int):Boolean =
     x >= startInclusive.getX &&
@@ -48,18 +48,10 @@ case class TileRectangle(
     contains(otherRectangle.endExclusive.getX - 1, otherRectangle.startInclusive.getY)
   }
   
-  def startPixel  : Position =  startInclusive.toPosition
-  def endPixel    : Position = endExclusive.toPosition.subtract(1, 1)
+  lazy val startPixel : Position = startInclusive.toPosition
+  lazy val endPixel   : Position = endExclusive.toPosition.subtract(1, 1)
   
-  private var cachedTiles:Iterable[TilePosition] = null
-  def tiles:Iterable[TilePosition] = {
-    if (cachedTiles == null) {
-      cachedTiles =
-        (startInclusive.getX until endExclusive.getX).flatten(x =>
-          (startInclusive.getY until endExclusive.getY).map(y =>
-            new TilePosition(x, y)
-          ))
-    }
-    cachedTiles
-  }
+  lazy val tiles:Iterable[TilePosition] =
+    for (x <- startInclusive.getX until endExclusive.getX; y <- startInclusive.getY until endExclusive.getY)
+      yield new TilePosition(x, y)
 }

@@ -1,11 +1,11 @@
 package Information.Battles.Simulation.Construction
 
 import Information.Battles.Simulation.BattleSimulator
-import Information.Battles.Simulation.Strategies.BattleStrategyWounded.BattleStrategyWounded
-import Information.Battles.Simulation.Strategies.BattleStrategyFocusAirOrGround.BattleStrategyFocusAirOrGround
-import Information.Battles.Simulation.Strategies.BattleStrategyMovement.BattleStrategyMovement
-import Information.Battles.Simulation.Strategies.BattleStrategyWorkers.BattleStrategyWorkers
-import Information.Battles.Simulation.Strategies._
+import Information.Battles.Simulation.Tactics.TacticWounded.BattleStrategyWounded
+import Information.Battles.Simulation.Tactics.TacticFocusAirOrGround.BattleStrategyFocusAirOrGround
+import Information.Battles.Simulation.Tactics.TacticMovement.BattleStrategyMovement
+import Information.Battles.Simulation.Tactics.TacticWorkers.BattleStrategyWorkers
+import Information.Battles.Simulation.Tactics._
 import Information.Battles.{Battle, BattleGroup}
 
 import scala.collection.mutable.ListBuffer
@@ -18,11 +18,11 @@ object BattleSimulationBuilder {
     
     // It'd be helpful to consider all enemy group strategies and assume they pick the best,
     // but we can't afford to run that many simulations.
-    val enemyGroupStrategyVariants = List(new BattleSimulationGroup(battle.enemy, new BattleStrategy(
-      BattleStrategyWounded.None,
-      BattleStrategyFocusAirOrGround.Nothing,
-      BattleStrategyMovement.Charge,
-      BattleStrategyWorkers.Ignore)))
+    val enemyGroupStrategyVariants = List(new BattleSimulationGroup(battle.enemy, new Tactic(
+      TacticWounded.Ignore,
+      TacticFocusAirOrGround.Nothing,
+      TacticMovement.Charge,
+      TacticWorkers.Ignore)))
     
     ourGroupStrategyVariants.flatten(ourGroupStrategyVariant =>
       enemyGroupStrategyVariants.map(enemyGroupStrategyVariant =>
@@ -41,43 +41,43 @@ object BattleSimulationBuilder {
     val thatCanMove = thatGroup.units.exists(_.canMove)
     
     if (thisCanMove) {
-      strategiesMovement += BattleStrategyMovement.Charge
-      strategiesMovement += BattleStrategyMovement.Flee
+      strategiesMovement += TacticMovement.Charge
+      strategiesMovement += TacticMovement.Flee
       
       if (thatCanMove) {
-        strategiesMovement += BattleStrategyMovement.Kite
+        strategiesMovement += TacticMovement.Kite
       }
     }
     if (strategiesMovement.isEmpty) {
-      strategiesMovement += BattleStrategyMovement.Dont
+      strategiesMovement += TacticMovement.Ignore
     }
     
-    strategiesFleeWounded += BattleStrategyWounded.None
+    strategiesFleeWounded += TacticWounded.Ignore
     if (thisCanMove)
-      strategiesFleeWounded += BattleStrategyWounded.Flee
+      strategiesFleeWounded += TacticWounded.Flee
     if (thisCanMove && thisGroup.units.exists(_.melee) && thisGroup.units.exists(! _.melee))
-      strategiesFleeWounded += BattleStrategyWounded.FleeRanged
+      strategiesFleeWounded += TacticWounded.FleeRanged
     
-    strategiesFocusAirOrGround += BattleStrategyFocusAirOrGround.Nothing
+    strategiesFocusAirOrGround += TacticFocusAirOrGround.Nothing
     if (thatGroup.units.exists(_.flying) && thatGroup.units.exists( ! _.flying)) {
-      strategiesFocusAirOrGround += BattleStrategyFocusAirOrGround.Air
-      strategiesFocusAirOrGround += BattleStrategyFocusAirOrGround.Ground
+      strategiesFocusAirOrGround += TacticFocusAirOrGround.Air
+      strategiesFocusAirOrGround += TacticFocusAirOrGround.Ground
     }
     
     val workerCount = thisGroup.units.count(_.unitClass.isWorker)
-    strategiesWorkersFighting += BattleStrategyWorkers.Ignore
+    strategiesWorkersFighting += TacticWorkers.Ignore
     if (workerCount > 0) {
-      strategiesWorkersFighting += BattleStrategyWorkers.AllFight
-      strategiesWorkersFighting += BattleStrategyWorkers.Flee
+      strategiesWorkersFighting += TacticWorkers.AllFight
+      strategiesWorkersFighting += TacticWorkers.Flee
     }
     if (workerCount > 3)
-      strategiesWorkersFighting += BattleStrategyWorkers.HalfFight
+      strategiesWorkersFighting += TacticWorkers.HalfFight
     
     val strategyPermutations =
       strategiesFleeWounded.flatten(strategyFleeWounded =>
         strategiesFocusAirOrGround.flatten(strategyFocusAirOrGround =>
           strategiesMovement.flatten(strategyMovement =>
-            strategiesWorkersFighting.map(strategyWorkersFighting => new BattleStrategy(
+            strategiesWorkersFighting.map(strategyWorkersFighting => new Tactic(
               strategyFleeWounded,
               strategyFocusAirOrGround,
               strategyMovement,
@@ -89,9 +89,9 @@ object BattleSimulationBuilder {
   
   def trimEnemyStrategies(variants:Iterable[BattleSimulationGroup]):Iterable[BattleSimulationGroup] = {
     variants.filter(variant =>
-      variant.strategy.workersFighting == BattleStrategyWorkers.Ignore &&
-      variant.strategy.focusAirOrGround == BattleStrategyFocusAirOrGround.Nothing &&
-      variant.strategy.fleeWounded == BattleStrategyWounded.None)
+      variant.strategy.workersFighting == TacticWorkers.Ignore &&
+      variant.strategy.focusAirOrGround == TacticFocusAirOrGround.Nothing &&
+      variant.strategy.fleeWounded == TacticWounded.Ignore)
   }
   
   def buildSimulation(ourGroup:BattleSimulationGroup, enemyGroup:BattleSimulationGroup):BattleSimulation = {
@@ -104,14 +104,14 @@ object BattleSimulationBuilder {
     var workersNotMining = 0
     val workers = group.units.filter(_.unit.unitClass.isWorker)
     
-    if (group.strategy.workersFighting == BattleStrategyWorkers.Flee) {
+    if (group.strategy.workersFighting == TacticWorkers.Flee) {
       workersNotMining = workers.size
       workers.foreach(worker => { worker.fleeing = true; worker.fighting = false })
     }
-    else if (group.strategy.workersFighting == BattleStrategyWorkers.Ignore) {
+    else if (group.strategy.workersFighting == TacticWorkers.Ignore) {
       workers.toList.foreach(_.fighting = false)
     }
-    else if (group.strategy.workersFighting == BattleStrategyWorkers.HalfFight) {
+    else if (group.strategy.workersFighting == TacticWorkers.HalfFight) {
       workersNotMining = workers.size / 2
       workers.toList.sortBy(_.totalLife).take(workersNotMining).foreach(_.fighting = false)
     }

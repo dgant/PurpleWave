@@ -1,7 +1,7 @@
 package Information.Battles.Simulation
 
 import Information.Battles.Simulation.Construction.{BattleSimulation, BattleSimulationGroup, Simulacrum}
-import Information.Battles.Simulation.Strategies.{BattleStrategyWounded, BattleStrategyFocusAirOrGround, BattleStrategyMovement}
+import Information.Battles.Simulation.Tactics.{TacticWounded, TacticFocusAirOrGround, TacticMovement}
 import Utilities.EnrichPosition._
 import bwapi.Position
 
@@ -24,13 +24,13 @@ class SimulacrumAgent(
   
   private def updateFleeing() {
     if ( ! thisUnit.fleeing && (thisUnit.readyToMove || thisUnit.readyToAttack)) {
-      thisUnit.fleeing ||= thisGroup.strategy.movement == BattleStrategyMovement.Flee
+      thisUnit.fleeing ||= thisGroup.strategy.movement == TacticMovement.Flee
       thisUnit.fleeing ||=
         thisUnit.totalLife <= Math.min(20, thisUnit.unit.unitClass.maxTotalHealth / 3) &&
         (
-          thisGroup.strategy.fleeWounded == BattleStrategyWounded.Flee ||
+          thisGroup.strategy.fleeWounded == TacticWounded.Flee ||
           (
-            thisGroup.strategy.fleeWounded == BattleStrategyWounded.FleeRanged &&
+            thisGroup.strategy.fleeWounded == TacticWounded.FleeRanged &&
             ! thisUnit.unit.melee
           )
         )
@@ -41,7 +41,7 @@ class SimulacrumAgent(
   }
   
   private def considerAttacking() {
-    if (thisUnit.readyToAttack && thisUnit.fighting && ! thisUnit.fleeing) {
+    if (thisUnit.readyToAttack && thisUnit.fighting) {
       doAttack()
     }
   }
@@ -56,13 +56,13 @@ class SimulacrumAgent(
     if (
       thisUnit.readyToMove &&
       thisUnit.fighting &&
-      thisGroup.strategy.movement == BattleStrategyMovement.Charge) {
+      thisGroup.strategy.movement == TacticMovement.Charge) {
       doCharge()
     }
   }
   
   private def considerKiting() {
-    if (thisUnit.readyToMove && thisGroup.strategy.movement == BattleStrategyMovement.Kite) {
+    if (thisUnit.readyToMove && thisGroup.strategy.movement == TacticMovement.Kite) {
       if (thisUnit.fighting && targetsInRange.isEmpty) {
         doCharge()
       }
@@ -78,11 +78,11 @@ class SimulacrumAgent(
       thisUnit.fighting &&
       targetsInRange.nonEmpty) {
       val target =
-        if (thisGroup.strategy.focusAirOrGround == BattleStrategyFocusAirOrGround.Air) {
+        if (thisGroup.strategy.focusAirOrGround == TacticFocusAirOrGround.Air) {
           val flyersInRange = targetsInRange.filter(_.unit.flying)
           if (flyersInRange.nonEmpty) lowestHealthTarget(flyersInRange) else lowestHealthTarget(targetsInRange)
         }
-        else if (thisGroup.strategy.focusAirOrGround == BattleStrategyFocusAirOrGround.Ground) {
+        else if (thisGroup.strategy.focusAirOrGround == TacticFocusAirOrGround.Ground) {
           val groundInRange = targetsInRange.filterNot(_.unit.flying)
           if (groundInRange.nonEmpty) lowestHealthTarget(groundInRange) else lowestHealthTarget(targetsInRange)
         }

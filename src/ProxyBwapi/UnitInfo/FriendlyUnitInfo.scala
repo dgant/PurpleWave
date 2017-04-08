@@ -4,6 +4,7 @@ import ProxyBwapi.Techs.{Tech, Techs}
 import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
 import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
 import Lifecycle.With
+import Performance.Caching.CacheFrame
 
 import scala.collection.JavaConverters._
 

@@ -41,15 +41,18 @@ object BattleSimulator {
     thisGroup : BattleSimulationGroup,
     thatGroup : BattleSimulationGroup) {
     thisGroup.units
-      .filter(thisUnit => thisUnit.readyToAttack || thisUnit.readyToMove)
-      .foreach(thisUnit => new SimulacrumAgent(thisUnit, thisGroup, thatGroup, battle).act)
+      .foreach(thisUnit =>
+        if (thisUnit.readyToAttack || thisUnit.readyToMove)
+        new SimulacrumAgent(thisUnit, thisGroup, thatGroup, battle).act)
   }
   
   private def removeDeadUnits(group:BattleSimulationGroup) {
-    group.units.filterNot(_.alive).foreach(deadUnit => {
-      group.lostValue += value(deadUnit)
-      group.units -= deadUnit
-    })
+    group.units
+      .foreach(unit =>
+        if ( ! unit.alive) {
+          group.lostValue += value(unit)
+          group.units -= unit
+        })
   }
   
   private def value(unit:Simulacrum):Int = {

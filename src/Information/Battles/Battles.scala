@@ -68,7 +68,7 @@ class Battles {
           .inTileRadius(With.configuration.combatEvaluationDistanceTiles)
           .filter(unassigned.contains)
           .filter(otherUnit =>
-            nextUnit.pixelsFromEdgeSlow(otherUnit) <= Math.max(
+            nextUnit.pixelsFromEdgeFast(otherUnit) <= Math.max(
               nextUnit.pixelReachDamage(framesToLookAhead),
               otherUnit.pixelReachDamage(framesToLookAhead)))
       }

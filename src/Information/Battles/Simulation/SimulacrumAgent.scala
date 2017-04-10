@@ -129,7 +129,7 @@ class SimulacrumAgent(
   }
   
   private def moveTowards(destination:Position) {
-    move(destination, chargingSpeedRatio, thisUnit.pixel.pixelDistanceSlow(destination))
+    move(destination, chargingSpeedRatio, thisUnit.pixel.pixelDistanceFast(destination))
   }
   
   private def move(destination:Position, multiplier:Double, maxDistance:Double = 1000.0) {

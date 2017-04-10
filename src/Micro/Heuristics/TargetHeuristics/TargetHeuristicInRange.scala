@@ -8,7 +8,7 @@ object TargetHeuristicInRange extends TargetHeuristic{
   
   override def evaluate(intent: Intention, candidate: UnitInfo): Double = {
     
-    HeuristicMath.fromBoolean(intent.unit.inRangeToAttack(candidate))
+    HeuristicMath.fromBoolean(intent.unit.inRangeToAttackFast(candidate))
     
   }
   

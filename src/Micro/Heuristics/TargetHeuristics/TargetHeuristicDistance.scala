@@ -9,6 +9,6 @@ object TargetHeuristicDistance extends TargetHeuristic{
     
     Math.max(
       intent.unit.rangeAgainst(candidate),
-      intent.unit.pixelsFromEdgeSlow(candidate) - intent.unit.unitClass.maxAirGroundRange)
+      intent.unit.pixelsFromEdgeFast(candidate) - intent.unit.unitClass.maxAirGroundRange)
   }
 }

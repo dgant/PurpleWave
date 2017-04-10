@@ -33,12 +33,15 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   
   def canTraverse(tile:TilePosition)                : Boolean = flying || With.grids.walkable.get(tile)
   def pixelsFromEdgeSlow(enemy:UnitInfo)            : Double  = pixelDistanceSlow(enemy) - unitClass.radialHypotenuse - enemy.unitClass.radialHypotenuse
+  def pixelsFromEdgeFast(enemy:UnitInfo)            : Double  = pixelDistanceFast(enemy) - unitClass.radialHypotenuse - enemy.unitClass.radialHypotenuse
   def pixelDistanceSlow(otherPixel:Position)        : Double  = pixelCenter.pixelDistanceSlow(otherPixel)
   def pixelDistanceSlow(enemy:UnitInfo)             : Double  = pixelDistanceSlow(enemy.pixelCenter)
+  def pixelDistanceFast(otherPixel:Position)        : Double  = pixelCenter.pixelDistanceFast(otherPixel)
+  def pixelDistanceFast(enemy:UnitInfo)             : Double  = pixelDistanceFast(enemy.pixelCenter)
   def pixelDistanceSquared(enemy:UnitInfo)          : Double  = pixelDistanceSquared(enemy.pixelCenter)
   def pixelDistanceSquared(otherPixel:Position)     : Double  = pixelCenter.pixelDistanceSquared(otherPixel)
-  def tileDistanceSlow(otherPosition:TilePosition)  : Double  = pixelDistanceSlow(otherPosition.toPosition)
-  def tileDistanceSquared (otherTile:TilePosition)  : Double  = pixelDistanceSlow(otherTile.toPosition)
+  def tileDistanceSlow(otherTile:TilePosition)      : Double  = tileDistanceSlow(otherTile)
+  def tileDistanceSquared (otherTile:TilePosition)  : Double  = tileDistanceSquared(otherTile)
   def travelPixels(destination:TilePosition)        : Double  = travelPixels(tileCenter, destination)
   def travelPixels(origin:TilePosition, destination:TilePosition): Double =
     if (flying)
@@ -158,14 +161,8 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   def pixelReachGround    (framesAhead  : Int)  : Double = pixelReachTravel(framesAhead) + pixelRangeGround
   def pixelReachDamage    (framesAhead  : Int)  : Double = Math.max(pixelReachAir(framesAhead), pixelReachGround(framesAhead))
   
-  def inRangeToAttack(enemy:UnitInfo):Boolean = pixelsFromEdgeSlow(enemy) <= unitClass.maxAirGroundRange
-  
-  def attackableEnemiesInRange: Set[UnitInfo] =
-    With.units
-      .inPixelRadius(pixelCenter, unitClass.maxAirGroundRange + 32)
-      .filter(inRangeToAttack)
-      .filter(isEnemyOf)
-      .filter(canAttackThisSecond)
+  def inRangeToAttackSlow(enemy:UnitInfo):Boolean = pixelsFromEdgeSlow(enemy) <= unitClass.maxAirGroundRange
+  def inRangeToAttackFast(enemy:UnitInfo):Boolean = pixelsFromEdgeFast(enemy) <= unitClass.maxAirGroundRange
   
   /////////////
   // Players //

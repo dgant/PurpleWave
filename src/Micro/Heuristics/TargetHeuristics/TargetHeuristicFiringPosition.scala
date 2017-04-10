@@ -13,7 +13,7 @@ object TargetHeuristicFiringPosition extends TargetHeuristic{
       intent.unit.pixelCenter
         .project(
           candidate.pixelCenter,
-          Math.max(0, intent.unit.pixelsFromEdgeSlow(candidate) - intent.unit.rangeAgainst(candidate)))
+          Math.max(0, intent.unit.pixelsFromEdgeFast(candidate) - intent.unit.rangeAgainst(candidate)))
         .tileIncluding
     
     val dpsExposure = With.grids.dpsEnemy.get(firingPosition, intent.unit)

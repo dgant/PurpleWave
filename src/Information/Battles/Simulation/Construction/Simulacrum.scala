@@ -2,6 +2,7 @@ package Information.Battles.Simulation.Construction
 
 import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.Position
+import Utilities.EnrichPosition._
 
 class Simulacrum(val unit:UnitInfo) {
   
@@ -26,7 +27,8 @@ class Simulacrum(val unit:UnitInfo) {
   def readyToAttack : Boolean = attackCooldown == 0
   def readyToMove   : Boolean = moveCooldown == 0
   
-  // This logic is duplicated from other sources because this version is reallt fast
-  def rangeAgainst  (enemy:Simulacrum)  : Double   = (if (enemy.flying) rangeAir else rangeGround) - radialHypotenuse - enemy.radialHypotenuse
-  def canAttack     (enemy:Simulacrum)  : Boolean  = if (enemy.flying) attacksAir else attacksGround
+  // This logic is duplicated from other sources because this version is much faster
+  def rangeAgainst    (enemy:Simulacrum)  : Double  = (if (enemy.flying) rangeAir else rangeGround) - radialHypotenuse - enemy.radialHypotenuse
+  def canAttack       (enemy:Simulacrum)  : Boolean = if (enemy.flying) attacksAir else attacksGround
+  def inRangeToAttack (enemy:Simulacrum)  : Boolean = Math.pow(rangeAgainst(enemy), 2) >= pixel.pixelDistanceSquared(enemy.pixel)
 }

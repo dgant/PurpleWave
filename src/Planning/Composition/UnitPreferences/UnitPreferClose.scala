@@ -12,7 +12,7 @@ class UnitPreferClose extends UnitPreference {
   
   override def preference(unit: FriendlyUnitInfo): Double = {
     positionFinder.get.find
-      .map(tile => tile.pixelCenter.pixelDistanceSlow(unit.pixelCenter))
+      .map(tile => tile.pixelCenter.pixelDistanceFast(unit.pixelCenter))
       .getOrElse(0)
   }
 }

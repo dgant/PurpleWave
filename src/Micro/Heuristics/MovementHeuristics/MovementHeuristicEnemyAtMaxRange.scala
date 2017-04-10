@@ -20,7 +20,7 @@ object MovementHeuristicEnemyAtMaxRange extends MovementHeuristic {
     //Evaluate the absolute difference between our range and the enemy's distance from the candidate
     Math.max(
       1.0,
-      1.0 / Math.abs(us.unitClass.maxAirGroundRange - nearestThreat.pixelDistanceSlow(candidate.pixelCenter)))
+      1.0 / Math.abs(us.unitClass.maxAirGroundRange - nearestThreat.pixelDistanceFast(candidate.pixelCenter)))
   }
   
   def isKiteable(us:UnitInfo, enemy: UnitInfo):Boolean = {
@@ -28,6 +28,6 @@ object MovementHeuristicEnemyAtMaxRange extends MovementHeuristic {
   }
   
   def effectiveDistance(us:UnitInfo, enemy:UnitInfo):Double = {
-    enemy.pixelDistanceSlow(us) - enemy.unitClass.maxAirGroundRange
+    enemy.pixelDistanceFast(us) - enemy.unitClass.maxAirGroundRange
   }
 }

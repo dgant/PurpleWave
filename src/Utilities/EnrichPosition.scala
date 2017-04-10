@@ -112,6 +112,12 @@ case object EnrichPosition {
     def pixelDistanceSlow(otherPixel:Position):Double = {
       Math.sqrt(pixelDistanceSquared(otherPixel))
     }
+    def pixelDistanceFast(otherPixel:Position):Double = {
+      //Octagonal distance
+      val dx = Math.abs(pixel.getX - otherPixel.getX)
+      val dy = Math.abs(pixel.getY - otherPixel.getY)
+      Math.max(dx, dy) + Math.min(dx, dy) * 0.414213562
+    }
     def pixelDistanceSquared(otherPosition:Position):Int = {
       val dx = pixel.getX - otherPosition.getX
       val dy = pixel.getY - otherPosition.getY

@@ -39,7 +39,7 @@ object BaseFinder {
     val searchRadius = 10
     val candidates = Circle.points(searchRadius).map(centroidTile.add).filter(isLegalTownHallTile)
     if (candidates.isEmpty) return None
-    Some(candidates.minBy(_.toPosition.add(64, 48).pixelDistanceSlow(centroid)))
+    Some(candidates.minBy(_.toPosition.add(64, 48).pixelDistanceFast(centroid)))
   }
   
   private def isLegalTownHallTile(candidate:TilePosition):Boolean = {

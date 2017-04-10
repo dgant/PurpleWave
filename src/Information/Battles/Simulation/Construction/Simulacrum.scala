@@ -7,6 +7,7 @@ import Utilities.EnrichPosition._
 class Simulacrum(val unit:UnitInfo) {
   
   val flying            : Boolean   = unit.flying
+  val topSpeed          : Double    = unit.topSpeed
   val attacksAir        : Boolean   = unit.unitClass.attacksAir
   val attacksGround     : Boolean   = unit.unitClass.attacksGround
   val rangeAir          : Double    = unit.unitClass.airRange
@@ -25,10 +26,11 @@ class Simulacrum(val unit:UnitInfo) {
   def totalLife     : Int     = hitPoints + shields
   def alive         : Boolean = totalLife > 0
   def readyToAttack : Boolean = attackCooldown == 0
-  def readyToMove   : Boolean = moveCooldown == 0
+  def readyToMove   : Boolean = canMove && moveCooldown == 0
   
   // This logic is duplicated from other sources because this version is much faster
-  def rangeAgainst    (enemy:Simulacrum)  : Double  = (if (enemy.flying) rangeAir else rangeGround) - radialHypotenuse - enemy.radialHypotenuse
+  def canMove                             : Boolean = topSpeed > 0
   def canAttack       (enemy:Simulacrum)  : Boolean = if (enemy.flying) attacksAir else attacksGround
+  def rangeAgainst    (enemy:Simulacrum)  : Double  = (if (enemy.flying) rangeAir else rangeGround) - radialHypotenuse - enemy.radialHypotenuse
   def inRangeToAttack (enemy:Simulacrum)  : Boolean = Math.pow(rangeAgainst(enemy), 2) >= pixel.pixelDistanceSquared(enemy.pixel)
 }

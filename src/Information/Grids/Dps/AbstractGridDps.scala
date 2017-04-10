@@ -2,12 +2,19 @@ package Information.Grids.Dps
 
 import Mathematics.Shapes.Circle
 import Information.Grids.ArrayTypes.AbstractGridDouble
-import ProxyBwapi.Races.Terran
+import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.UnitInfo
 import Lifecycle.With
 import Utilities.EnrichPosition._
 
 abstract class AbstractGridDps extends AbstractGridDouble {
+  
+  //Range is calculated from unit edge to unit edge.
+  //Let's make sure we account for the hypotenuse of even a fat target like a Dragoon
+  private lazy val assumedTargetRadialHypotenuse = Protoss.Dragoon.radialHypotenuse
+  
+  //We want to know about the damage in the next tile over
+  private lazy val safetyRange = 16.0
   
   override def update() {
     
@@ -18,8 +25,8 @@ abstract class AbstractGridDps extends AbstractGridDouble {
     getUnits.foreach(unit => {
       var dps = if (air) unit.unitClass.airDps else unit.unitClass.groundDps
       if (dps > 0.0) {
-        var pixelReachMax = unit.unitClass.radialHypotenuse + (if (air) unit.pixelReachAir(framesToLookAhead) else unit.pixelReachGround(framesToLookAhead))
-        var pixelRangeMax = unit.unitClass.radialHypotenuse + (if (air) unit.pixelRangeAir else unit.pixelRangeGround)
+        var pixelReachMax = if (air) unit.pixelReachAir(framesToLookAhead) else unit.pixelReachGround(framesToLookAhead)
+        var pixelRangeMax = if (air) unit.pixelRangeAir else unit.pixelRangeGround
         var pixelRangeMin = unit.unitClass.rawGroundMinRange
         
         //Assume invisible siege tanks are sieged
@@ -29,6 +36,11 @@ abstract class AbstractGridDps extends AbstractGridDouble {
           pixelRangeMax   = Math.max(pixelRangeMax, Terran.SiegeTankSieged.groundRange)
         }
         
+        //Account for edge-to-edge distance
+        val margin = safetyRange + assumedTargetRadialHypotenuse + unit.unitClass.radialHypotenuse
+        pixelReachMax += margin
+        pixelRangeMax += margin
+  
         val distancePenalty = With.configuration.combatDistancePenalty
         val movementPenalty = With.configuration.combatMovementPenalty
         val cooldownPenalty = With.configuration.combatCooldownPenalty

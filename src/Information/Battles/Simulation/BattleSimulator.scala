@@ -6,7 +6,7 @@ import Information.Battles.Simulation.Construction.{BattleSimulation, BattleSimu
 object BattleSimulator {
   
   var frame = 0
-  val maxFrames = 24 * 8
+  val maxFrames = 24 * 4
   
   // Loosely, based on the values in the BOSS paper:
   // http://www.aaai.org/ocs/index.php/AIIDE/AIIDE11/paper/viewFile/4078/4407

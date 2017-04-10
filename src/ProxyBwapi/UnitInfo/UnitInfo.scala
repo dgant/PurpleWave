@@ -123,12 +123,15 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   def canAttackThisSecond:Boolean = canAttackThisSecondCache.get
   private val canAttackThisSecondCache = new CacheFrame(() =>
     canDoAnythingThisFrame &&
-    unitClass.canAttack &&
-    (if (isCarrierReaverOrLurkerCache.get)
-      (unitClass != Protoss.Carrier || interceptors > 0) &&
-      (unitClass != Protoss.Reaver  || scarabs > 0) &&
-      (unitClass != Zerg.Lurker     || burrowed)
-    else true))
+    (
+      unitClass.canAttack ||
+      (
+        isCarrierReaverOrLurkerCache.get &&
+        (unitClass != Protoss.Carrier || interceptors > 0) &&
+        (unitClass != Protoss.Reaver  || scarabs > 0) &&
+        (unitClass != Zerg.Lurker     || burrowed)
+      )
+    ))
   
   private val isCarrierReaverOrLurkerCache = new CacheFrame(() => List(Protoss.Carrier, Protoss.Reaver, Zerg.Lurker).contains(this))
   
@@ -159,8 +162,8 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   def pixelReachGround    (framesAhead  : Int)  : Double = pixelReachTravel(framesAhead) + pixelRangeGround
   def pixelReachDamage    (framesAhead  : Int)  : Double = Math.max(pixelReachAir(framesAhead), pixelReachGround(framesAhead))
   
-  def inRangeToAttackSlow(enemy:UnitInfo):Boolean = pixelsFromEdgeSlow(enemy) <= unitClass.maxAirGroundRange
-  def inRangeToAttackFast(enemy:UnitInfo):Boolean = pixelsFromEdgeFast(enemy) <= unitClass.maxAirGroundRange
+  def inRangeToAttackSlow(enemy:UnitInfo):Boolean = pixelsFromEdgeSlow(enemy) <= rangeAgainst(enemy)
+  def inRangeToAttackFast(enemy:UnitInfo):Boolean = pixelsFromEdgeFast(enemy) <= rangeAgainst(enemy)
   
   /////////////
   // Players //

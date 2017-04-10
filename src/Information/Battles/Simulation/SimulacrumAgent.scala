@@ -24,7 +24,7 @@ class SimulacrumAgent(
   }
   
   private def updateFleeing() {
-    if ( ! thisUnit.fleeing) {
+    if (thisUnit.canMove && ! thisUnit.fleeing) {
       thisUnit.fleeing ||= thisGroup.tactics.movement == TacticMovement.Flee
       thisUnit.fleeing ||=
         thisUnit.totalLife <= Math.min(20, thisUnit.unit.unitClass.maxTotalHealth / 3) &&
@@ -135,7 +135,7 @@ class SimulacrumAgent(
   private def move(destination:Position, multiplier:Double, maxDistance:Double = 1000.0) {
     thisUnit.pixel = thisUnit.pixel.project(destination, Math.min(
       maxDistance,
-      multiplier * thisUnit.unit.topSpeed * (1 + movementFrames)))
+      multiplier * thisUnit.topSpeed * (1 + movementFrames)))
     thisUnit.attackCooldown = movementFrames
     thisUnit.moveCooldown = movementFrames
   }

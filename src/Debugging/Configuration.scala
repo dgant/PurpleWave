@@ -30,16 +30,16 @@ class Configuration {
   var visualizeUnitsOurs          = true
   var visualizeVectorUnits        = false
   
-  var gameSpeed                         = 0
-  var enableSurrendering                = true
-  var enableStdOut                      = false
-  var enableChat                        = true
-  var enableLatencyCompensation         = false
+  var gameSpeed                   = 0
+  var enableSurrendering          = true
+  var enableStdOut                = false
+  var enableChat                  = true
+  var enableLatencyCompensation   = false
   
-  var enableCamera                      = true
-  var cameraDynamicSpeed                = false
-  var cameraDynamicSpeedSlowest         = 30
-  var cameraDynamicSpeedFastest         = 0
-  var viewportWidth                     = 640 * 2
-  var viewportHeight                    = 480 * 2
+  var enableCamera                = false
+  var cameraDynamicSpeed          = false
+  var cameraDynamicSpeedSlowest   = 30
+  var cameraDynamicSpeedFastest   = 0
+  var viewportWidth               = 640 * 2
+  var viewportHeight              = 480 * 2
 }

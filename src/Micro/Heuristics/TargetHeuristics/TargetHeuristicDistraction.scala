@@ -11,10 +11,7 @@ object TargetHeuristicDistraction extends TargetHeuristic{
     if (intent.destination.isEmpty) return 1.0
   
     HeuristicMath.fromBoolean(
-      candidate.travelPixels(intent.destination.get)
-      - intent.unit.travelPixels(intent.destination.get)
-      > intent.unit.unitClass.maxAirGroundRange)
-      
+      candidate.travelPixels(intent.destination.get) >
+      intent.unit.travelPixels(intent.destination.get))
   }
-  
 }

@@ -4,13 +4,12 @@ import Micro.Intent.Intention
 
 object Gather extends Action {
   
+  override def allowed(intent: Intention) = {
+    intent.toGather.isDefined
+  }
+  
   override def perform(intent: Intention): Boolean = {
-    
-    if (intent.toGather.isDefined) {
-      With.commander.gather(intent, intent.toGather.get)
-      return true
-    }
-    
-    false
+    With.commander.gather(intent, intent.toGather.get)
+    true
   }
 }

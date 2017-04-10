@@ -6,11 +6,7 @@ import ProxyBwapi.UnitInfo.UnitInfo
 
 object EvaluateTargets {
   
-  def best(
-    intent:Intention,
-    profile:TargetingProfile,
-    candidates:Iterable[UnitInfo])
-      :Option[UnitInfo] = {
+  def best(intent:Intention, candidates:Iterable[UnitInfo]):Option[UnitInfo] = {
     
     if (candidates.isEmpty) return None
     
@@ -18,6 +14,6 @@ object EvaluateTargets {
       //With.executor.getState(intent.unit).targetHeuristics =
     }
     
-    Some(candidates.maxBy(candidate => profile.weightedHeuristics.map(_.weigh(intent, candidate)).product))
+    Some(candidates.maxBy(candidate => intent.targetProfile.weightedHeuristics.map(_.weigh(intent, candidate)).product))
   }
 }

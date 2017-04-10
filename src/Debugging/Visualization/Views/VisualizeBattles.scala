@@ -17,7 +17,7 @@ object VisualizeBattles {
     if (battlesWithSimulations.nonEmpty) {
       
       drawBattleReport(
-        With.battles.local.minBy(battle => battle.focus.getDistance(With.viewport.center)).bestSimulationResult.get)
+        With.battles.local.minBy(battle => battle.focus.pixelDistance(With.viewport.center)).bestSimulationResult.get)
     }
   }
   
@@ -64,8 +64,8 @@ object VisualizeBattles {
         List("Losses:",   group.lostValue.toString),
         List("Move:",     group.tactics.movement.toString),
         List("Focus:",    group.tactics.focusAirOrGround.toString),
-        List("Workers:",  group.tactics.workersFighting.toString),
-        List("Wounded:",  group.tactics.fleeWounded.toString),
+        List("Workers:",  group.tactics.workers.toString),
+        List("Wounded:",  group.tactics.wounded.toString),
         List(),
         List("Losses:")
       )

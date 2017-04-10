@@ -87,9 +87,9 @@ object BattleSimulationBuilder {
   
   def trimEnemytactics(variants:Iterable[BattleSimulationGroup]):Iterable[BattleSimulationGroup] = {
     variants.filter(variant =>
-      variant.tactics.workersFighting == TacticWorkers.Ignore &&
+      variant.tactics.workers == TacticWorkers.Ignore &&
       variant.tactics.focusAirOrGround == TacticFocus.Nothing &&
-      variant.tactics.fleeWounded == TacticWounded.Ignore)
+      variant.tactics.wounded == TacticWounded.Ignore)
   }
   
   def buildSimulation(ourGroup:BattleSimulationGroup, enemyGroup:BattleSimulationGroup):BattleSimulation = {
@@ -102,14 +102,14 @@ object BattleSimulationBuilder {
     var workersNotMining = 0
     val workers = group.units.filter(_.unit.unitClass.isWorker)
     
-    if (group.tactics.workersFighting == TacticWorkers.Flee) {
+    if (group.tactics.workers == TacticWorkers.Flee) {
       workersNotMining = workers.size
       workers.foreach(worker => { worker.fleeing = true; worker.fighting = false })
     }
-    else if (group.tactics.workersFighting == TacticWorkers.Ignore) {
+    else if (group.tactics.workers == TacticWorkers.Ignore) {
       workers.toList.foreach(_.fighting = false)
     }
-    else if (group.tactics.workersFighting == TacticWorkers.HalfFight) {
+    else if (group.tactics.workers == TacticWorkers.HalfFight) {
       workersNotMining = workers.size / 2
       workers.toList.sortBy(_.totalLife).take(workersNotMining).foreach(_.fighting = false)
     }

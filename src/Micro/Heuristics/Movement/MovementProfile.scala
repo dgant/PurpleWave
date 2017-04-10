@@ -4,22 +4,22 @@ import Debugging.Visualization.Colors
 import Micro.Heuristics.MovementHeuristics._
 
 class MovementProfile(
-  val preferTravel      : Double = 0,
-  val preferSpot        : Double = 0,
-  val preferSitAtRange  : Double = 0,
-  val preferTarget      : Double = 0,
-  val preferMobility    : Double = 0,
-  val preferHighGround  : Double = 0,
-  val preferMoving      : Double = 0,
-  val preferRandom      : Double = 0,
-  val avoidDamage       : Double = 0,
-  val avoidTraffic      : Double = 0,
-  val avoidVision       : Double = 0) {
+  var preferDestination : Double = 0,
+  var preferOrigin      : Double = 0,
+  var preferSitAtRange  : Double = 0,
+  var preferTarget      : Double = 0,
+  var preferMobility    : Double = 0,
+  var preferHighGround  : Double = 0,
+  var preferMoving      : Double = 0,
+  var preferRandom      : Double = 0,
+  var avoidDamage       : Double = 0,
+  var avoidTraffic      : Double = 0,
+  var avoidVision       : Double = 0) {
   
   def weightedHeuristics: Iterable[MovementHeuristicWeight] =
     List(
-      new MovementHeuristicWeight(MovementHeuristicDestinationApproximate,  preferTravel,       Colors.MediumGreen),
-      new MovementHeuristicWeight(MovementHeuristicDestinationExact,        preferSpot,         Colors.NeonGreen),
+      new MovementHeuristicWeight(MovementHeuristicDestination,             preferDestination,  Colors.MediumGreen),
+      new MovementHeuristicWeight(MovementHeuristicOrigin,                  preferOrigin,         Colors.NeonGreen),
       new MovementHeuristicWeight(MovementHeuristicEnemyAtMaxRange,         preferSitAtRange,   Colors.MediumRed),
       new MovementHeuristicWeight(MovementHeuristicInRangeOfTarget,         preferTarget,       Colors.BrightBlue),
       new MovementHeuristicWeight(MovementHeuristicMobility,                preferMobility,     Colors.MediumOrange),
@@ -31,19 +31,17 @@ class MovementProfile(
       new MovementHeuristicWeight(MovementHeuristicEnemyVision,             -avoidVision,       Colors.MediumGray)
     )
   
-  def adjustedBy(other:MovementProfile):MovementProfile = {
-    new MovementProfile(
-      preferTravel        = preferTravel            + other.preferTravel,
-      preferSpot          = preferSpot              + other.preferSpot,
-      preferSitAtRange    = preferSitAtRange        + other.preferSitAtRange,
-      preferTarget        = preferTarget            + other.preferTarget,
-      preferMobility      = preferMobility          + other.preferMobility,
-      preferHighGround    = preferHighGround        + other.preferHighGround,
-      preferMoving        = preferMoving            + other.preferMoving,
-      preferRandom        = preferRandom            + other.preferRandom,
-      avoidDamage         = avoidDamage             + other.avoidDamage,
-      avoidTraffic        = avoidTraffic            + other.avoidTraffic,
-      avoidVision         = avoidVision             + other.avoidVision
-    )
+  def combine(other:MovementProfile) {
+    preferDestination   += other.preferDestination
+    preferOrigin        += other.preferOrigin
+    preferSitAtRange    += other.preferSitAtRange
+    preferTarget        += other.preferTarget
+    preferMobility      += other.preferMobility
+    preferHighGround    += other.preferHighGround
+    preferMoving        += other.preferMoving
+    preferRandom        += other.preferRandom
+    avoidDamage         += other.avoidDamage
+    avoidTraffic        += other.avoidTraffic
+    avoidVision         += other.avoidVision
   }
 }

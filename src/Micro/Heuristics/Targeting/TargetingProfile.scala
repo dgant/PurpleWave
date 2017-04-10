@@ -22,4 +22,14 @@ class TargetingProfile(
       //new TargetHeuristicWeight(UnitHeuristicFiringPosition,  preferDps),
     )
   }
+  
+  def combined(other:TargetingProfile) {
+    preferInRange     += other.preferInRange
+    preferValue       += other.preferValue
+    preferCombat      += other.preferCombat
+    preferDps         += other.preferDps
+    avoidHealth       += other.avoidHealth
+    avoidDistance     += other.avoidDistance
+    avoidDistraction  += other.avoidDistraction
+  }
 }

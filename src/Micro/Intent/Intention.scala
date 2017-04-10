@@ -1,5 +1,6 @@
 package Micro.Intent
 
+import Information.Battles.Simulation.Tactics.Tactics
 import Lifecycle.With
 import Micro.Behaviors.{MovementProfiles, TargetingProfiles}
 import Micro.State.ExecutionState
@@ -13,9 +14,11 @@ import bwapi.TilePosition
 class Intention(val plan:Plan, val unit:FriendlyUnitInfo) {
   
   def state:ExecutionState = With.executor.getState(unit)
+  def tactics:Option[Tactics] = With.battles.byUnit.get(unit).flatMap(b => b.bestSimulationResult.map(s => s.us.tactics))
   
   var executed:Boolean = false
   
+  var origin      : TilePosition          = With.geography.home
   var destination : Option[TilePosition]  = None
   var toAttack    : Option[UnitInfo]      = None
   var toGather    : Option[UnitInfo]      = None
@@ -23,15 +26,12 @@ class Intention(val plan:Plan, val unit:FriendlyUnitInfo) {
   var toTrain     : Option[UnitClass]     = None
   var toTech      : Option[Tech]          = None
   var toUpgrade   : Option[Upgrade]       = None
-  
-  var leash         : Int     = Int.MaxValue
-  var desireToFight : Double  = 1.0
+  var leash       : Option[Int]           = None
+  var canAttack   : Boolean               = true
   
   lazy val targets = Targets.get(this)
   lazy val threats = Threats.get(this)
  
   var movementProfile = MovementProfiles.default
   var targetProfile   = TargetingProfiles.default
-  
-  
 }

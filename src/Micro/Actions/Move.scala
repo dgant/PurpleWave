@@ -7,10 +7,11 @@ import Utilities.EnrichPosition._
 
 object Move extends Action {
   
+  override def allowed(intent: Intention) = {
+    intent.unit.canMove
+  }
+  
   override def perform(intent: Intention): Boolean = {
-    
-    if ( ! intent.unit.canMove) return false
-    
     intent.state.movingHeuristically = intent.threats.nonEmpty || intent.targets.nonEmpty
     
     val tileToMove =
@@ -22,5 +23,4 @@ object Move extends Action {
     With.commander.move(intent, tileToMove.pixelCenter)
     true
   }
-  
 }

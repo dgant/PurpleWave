@@ -29,9 +29,9 @@ class SimulacrumAgent(
       thisUnit.fleeing ||=
         thisUnit.totalLife <= Math.min(20, thisUnit.unit.unitClass.maxTotalHealth / 3) &&
         (
-          thisGroup.tactics.fleeWounded == TacticWounded.Flee ||
+          thisGroup.tactics.wounded == TacticWounded.Flee ||
           (
-            thisGroup.tactics.fleeWounded == TacticWounded.FleeRanged &&
+            thisGroup.tactics.wounded == TacticWounded.FleeRanged &&
             ! thisUnit.unit.melee
           )
         )
@@ -97,7 +97,7 @@ class SimulacrumAgent(
   
   private def doCharge() {
     if (targets.nonEmpty) {
-      val target = targets.minBy(_.pixel.getDistance(thisUnit.pixel))
+      val target = targets.minBy(_.pixel.pixelDistance(thisUnit.pixel))
       moveTowards(target.pixel)
     }
   }
@@ -107,7 +107,7 @@ class SimulacrumAgent(
       val closestThreat = threats.minBy(threat =>
         Math.min(
           threat.pixel.getDistance(thisUnit.pixel),
-          Math.max(0, threat.pixel.project(thisUnit.pixel, threat.unit.rangeAgainst(thisUnit.unit)).getDistance(thisUnit.pixel))))
+          Math.max(0, threat.pixel.project(thisUnit.pixel, threat.unit.rangeAgainst(thisUnit.unit)).pixelDistance(thisUnit.pixel))))
       moveAwayFrom(closestThreat.pixel)
     }
   }
@@ -128,7 +128,7 @@ class SimulacrumAgent(
   }
   
   private def moveTowards(destination:Position) {
-    move(destination, chargingSpeedRatio, thisUnit.pixel.getDistance(destination))
+    move(destination, chargingSpeedRatio, thisUnit.pixel.pixelDistance(destination))
   }
   
   private def move(destination:Position, multiplier:Double, maxDistance:Double = 1000.0) {
@@ -141,6 +141,6 @@ class SimulacrumAgent(
 
   private lazy val threats = thatGroup.units.view.filter(_.canAttack(thisUnit))
   private lazy val targets = thatGroup.units.view.filter(thisUnit.canAttack(_))
-  private lazy val targetsInRange = for (target <- targets if thisUnit.rangeAgainst(target) >= thisUnit.pixel.getDistance(target.pixel)) yield target
-  private lazy val threatsInRange = for (threat <- threats if threat.rangeAgainst(thisUnit) >= threat.pixel.getDistance(thisUnit.pixel)) yield threat
+  private lazy val targetsInRange = for (target <- targets if thisUnit.rangeAgainst(target) >= thisUnit.pixel.pixelDistance(target.pixel)) yield target
+  private lazy val threatsInRange = for (threat <- threats if threat.rangeAgainst(thisUnit) >= threat.pixel.pixelDistance(thisUnit.pixel)) yield threat
 }

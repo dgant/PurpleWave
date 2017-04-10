@@ -1,21 +1,20 @@
 package Micro.Heuristics.MovementHeuristics
-
+import Lifecycle.With
+import Mathematics.Heuristics.HeuristicMath
 import Micro.Intent.Intention
 import bwapi.TilePosition
 
-object MovementHeuristicDestinationExact extends MovementHeuristic {
+object MovementHeuristicDestination extends MovementHeuristic {
   
   override def evaluate(intent: Intention, candidate: TilePosition): Double = {
   
-    if (intent.destination.isEmpty) return 1.0
-  
+    if (intent.destination.isEmpty) return HeuristicMath.default
+    
     val before = intent.unit.travelPixels(intent.unit.tileCenter,  intent.destination.get)
     val after  = intent.unit.travelPixels(candidate,               intent.destination.get)
+    
+    if (before < With.configuration.combatEvaluationDistanceTiles) return HeuristicMath.default
   
-    val threshold = 32.0 * 3.0
-    if (before < threshold || after < threshold) return 1.0
-  
-    return before/after
+    return HeuristicMath.fromBoolean(after < before)
   }
-  
 }

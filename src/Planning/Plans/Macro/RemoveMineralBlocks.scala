@@ -10,6 +10,8 @@ import Planning.Plan
 import Planning.Composition.ResourceLocks.LockUnits
 import Lifecycle.With
 
+import Utilities.EnrichPosition._
+
 class RemoveMineralBlocks extends Plan {
   
   description.set("Remove nearby mineral blocks")
@@ -22,7 +24,7 @@ class RemoveMineralBlocks extends Plan {
     val ourEdges = With.geography.ourZones.flatten(_.edges)
     val ourMineralBlocks = With.units.neutral
       .filter(unit => unit.unitClass.isMinerals && unit.mineralsLeft <= 24)
-      .filter(unit => ourEdges.exists(edge => edge.contains(unit.pixelCenter) || edge.centerPixel.getDistance(unit.pixelCenter) < 32.0 * 3))
+      .filter(unit => ourEdges.exists(edge => edge.contains(unit.pixelCenter) || edge.centerPixel.pixelDistance(unit.pixelCenter) < 32.0 * 3))
     
     if (ourMineralBlocks.isEmpty) return
     

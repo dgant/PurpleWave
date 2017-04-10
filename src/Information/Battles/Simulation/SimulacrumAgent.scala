@@ -139,8 +139,8 @@ class SimulacrumAgent(
     thisUnit.moveCooldown = movementFrames
   }
 
-  private lazy val threats = thatGroup.units.view.filter(_.canAttack(thisUnit))
-  private lazy val targets = thatGroup.units.view.filter(thisUnit.canAttack(_))
+  private lazy val threats = thatGroup.units.filter(_.canAttack(thisUnit))
+  private lazy val targets = thatGroup.units.filter(thisUnit.canAttack(_))
   private lazy val targetsInRange = for (target <- targets if thisUnit.rangeAgainst(target) >= thisUnit.pixel.pixelDistance(target.pixel)) yield target
   private lazy val threatsInRange = for (threat <- threats if threat.rangeAgainst(thisUnit) >= threat.pixel.pixelDistance(thisUnit.pixel)) yield threat
 }

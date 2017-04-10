@@ -2,7 +2,7 @@ package Debugging
 
 class Configuration {
   
-  val combatEvaluationDistanceTiles   = 15
+  val combatEvaluationDistanceTiles   = 18
   val combatDistancePenalty           = 0.25
   val combatMovementPenalty           = 0.5
   val combatCooldownPenalty           = 0.75
@@ -10,7 +10,7 @@ class Configuration {
   var enablePathRecalculation         = false
   var enableFastGroundDistance        = true
   
-  var visualize                   = true
+  var visualize                   = false
   var visualizeBases              = false
   var visualizeBattles            = true
   var visualizeBullets            = false

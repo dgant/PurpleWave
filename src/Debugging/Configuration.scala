@@ -10,7 +10,7 @@ class Configuration {
   var enablePathRecalculation         = false
   var enableFastGroundDistance        = true
   
-  var visualize                   = false
+  var visualize                   = true
   var visualizeBases              = false
   var visualizeBattles            = true
   var visualizeBullets            = false
@@ -36,7 +36,7 @@ class Configuration {
   var enableChat                  = true
   var enableLatencyCompensation   = false
   
-  var enableCamera                = false
+  var enableCamera                = true
   var cameraDynamicSpeed          = false
   var cameraDynamicSpeedSlowest   = 30
   var cameraDynamicSpeedFastest   = 0

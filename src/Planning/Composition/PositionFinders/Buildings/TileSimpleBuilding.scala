@@ -11,8 +11,17 @@ class TileSimpleBuilding(val buildingClass:UnitClass) extends TileFinder {
   
   private var lastTile:Option[TilePosition] = None
   
+  private var lastFailure = 0
+  
   def find: Option[TilePosition] = {
-    lastTile = if (lastTileValid) lastTile else requestTile
+    if (With.frame > 24 * 60 * 5 || lastFailure < With.frame - 24 * 5) {
+      lastTile = if (lastTileValid) lastTile else requestTile
+    }
+    
+    if (lastTile == None) {
+      lastFailure = With.frame
+    }
+    
     lastTile
   }
   
@@ -25,8 +34,8 @@ class TileSimpleBuilding(val buildingClass:UnitClass) extends TileFinder {
         exclusions))
   
   def maxMargin:Int =
-    if (buildingClass == Protoss.Pylon && With.units.ours.count(_.unitClass == buildingClass) < 4)
-      1
+    if (buildingClass == Protoss.Pylon && With.units.ours.count(_.unitClass == buildingClass) < 3)
+      4
     else
       1
   

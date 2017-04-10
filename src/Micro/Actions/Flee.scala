@@ -2,10 +2,12 @@ package Micro.Actions
 import Information.Battles.Simulation.Tactics.{TacticMovement, TacticWorkers, TacticWounded}
 import Micro.Behaviors.MovementProfiles
 import Micro.Intent.Intention
+import Planning.Yolo
 
 object Flee extends Action {
   
   override def allowed(intent: Intention): Boolean = {
+    Yolo.disabled &&
     intent.unit.canMove &&
     (
       (intent.tactics.exists(_.movement == TacticMovement.Flee))                                            ||
@@ -16,7 +18,7 @@ object Flee extends Action {
   }
   
   override def perform(intent: Intention): Boolean = {
-    intent.movementProfile.combine(MovementProfiles.flee)
+    intent.movementProfile = MovementProfiles.flee
     intent.toGather = None
     intent.canAttack = false
     false

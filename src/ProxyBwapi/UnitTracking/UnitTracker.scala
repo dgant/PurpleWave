@@ -57,7 +57,7 @@ class UnitTracker {
   
   private def inTilesNonDistinct(tiles:Iterable[TilePosition]):ListBuffer[UnitInfo] = {
     val output = new ListBuffer[UnitInfo]
-    tiles.foreach(tile => With.grids.units.get(tile).foreach(unit => output.append(unit)))
+    tiles.foreach(tile => output ++= With.grids.units.get(tile))
     output
   }
   

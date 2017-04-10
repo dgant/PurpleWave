@@ -34,11 +34,9 @@ object BattleSimulationBuilder {
       tacticsMovement += TacticMovement.Charge
       tacticsMovement += TacticMovement.Flee
       
-      /*
       if (thatCanMove) {
         tacticsMovement += TacticMovement.Kite
       }
-      */
     }
     if (tacticsMovement.isEmpty) {
       tacticsMovement += TacticMovement.Ignore

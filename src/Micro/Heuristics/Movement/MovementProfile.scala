@@ -10,6 +10,7 @@ class MovementProfile(
   var preferTarget      : Double = 0,
   var preferMobility    : Double = 0,
   var preferHighGround  : Double = 0,
+  var preferAttackSpeed : Double = 0,
   var preferMoving      : Double = 0,
   var preferRandom      : Double = 0,
   var avoidDamage       : Double = 0,
@@ -19,11 +20,12 @@ class MovementProfile(
   def weightedHeuristics: Iterable[MovementHeuristicWeight] =
     List(
       new MovementHeuristicWeight(MovementHeuristicDestination,             preferDestination,  Colors.MediumGreen),
-      new MovementHeuristicWeight(MovementHeuristicOrigin,                  preferOrigin,         Colors.NeonGreen),
+      new MovementHeuristicWeight(MovementHeuristicOrigin,                  preferOrigin,       Colors.NeonGreen),
       new MovementHeuristicWeight(MovementHeuristicEnemyAtMaxRange,         preferSitAtRange,   Colors.MediumRed),
       new MovementHeuristicWeight(MovementHeuristicInRangeOfTarget,         preferTarget,       Colors.BrightBlue),
       new MovementHeuristicWeight(MovementHeuristicMobility,                preferMobility,     Colors.MediumOrange),
       new MovementHeuristicWeight(MovementHeuristicHighGround,              preferHighGround,   Colors.DarkBlue),
+      new MovementHeuristicWeight(MovementHeuristicAttackSpeed,             preferAttackSpeed,  Colors.BrightViolet),
       new MovementHeuristicWeight(MovementHeuristicKeepMoving,              preferMoving,       Colors.MediumBlue),
       new MovementHeuristicWeight(MovementHeuristicRandom,                  preferRandom,       Colors.DarkGray),
       new MovementHeuristicWeight(MovementHeuristicExposureToDamage,        -avoidDamage,       Colors.NeonRed),
@@ -38,6 +40,7 @@ class MovementProfile(
     preferTarget        += other.preferTarget
     preferMobility      += other.preferMobility
     preferHighGround    += other.preferHighGround
+    preferAttackSpeed   += other.preferAttackSpeed
     preferMoving        += other.preferMoving
     preferRandom        += other.preferRandom
     avoidDamage         += other.avoidDamage

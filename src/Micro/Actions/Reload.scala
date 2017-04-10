@@ -11,7 +11,10 @@ object Reload extends Action {
   
   override def perform(intent: Intention): Boolean = {
   
-    if (intent.unit.unitClass == Protoss.Reaver && intent.unit.scarabs < (if(intent.targets.isEmpty) 5 else 1)) {
+    //Repetition of scarab count is a performance optimization to avoid recalculating targets needlessly
+    if (intent.unit.unitClass == Protoss.Reaver
+      && intent.unit.scarabs < 5
+      && intent.unit.scarabs < (if(intent.targets.isEmpty) 5 else 1)) {
       With.commander.buildScarab(intent)
       return true
     }

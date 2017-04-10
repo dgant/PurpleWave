@@ -11,5 +11,4 @@ object MovementHeuristicHighGround extends MovementHeuristic {
     With.grids.altitudeBonus.get(candidate)
     
   }
-  
 }

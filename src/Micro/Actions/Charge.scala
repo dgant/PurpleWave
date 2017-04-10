@@ -7,9 +7,9 @@ import Planning.Yolo
 object Charge extends Action {
   
   override def allowed(intent: Intention): Boolean = {
-    Yolo.enabled ||
+    intent.unit.canMove &&
     (
-      intent.unit.canMove && intent.tactics.exists(_.movement == TacticMovement.Charge)
+      Yolo.enabled || intent.tactics.exists(_.movement == TacticMovement.Charge)
     )
   }
   

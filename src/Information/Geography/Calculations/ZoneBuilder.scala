@@ -43,7 +43,7 @@ object ZoneBuilder {
       .flatMap(neighborTile => candidates.view.filter(candidate => candidate.tiles.contains(neighborTile)).headOption)
       .headOption
     matchingZone
-      .getOrElse(zones.minBy(_.centroid.pixelDistance(tile.pixelCenter)))
+      .getOrElse(zones.minBy(_.centroid.pixelDistanceSlow(tile.pixelCenter)))
       .tiles
       .add(tile)
   }
@@ -79,7 +79,7 @@ object ZoneBuilder {
     new Base(
       zones
         .find(_.contains(townHallPosition.toPosition))
-        .getOrElse(zones.minBy(_.centroid.pixelDistance(townHallPosition.pixelCenter))),
+        .getOrElse(zones.minBy(_.centroid.pixelDistanceSlow(townHallPosition.pixelCenter))),
       townHallArea,
       With.game.getStartLocations.asScala.exists(_.tileDistance(townHallPosition) < 6))
   }

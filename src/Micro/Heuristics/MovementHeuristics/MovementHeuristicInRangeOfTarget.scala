@@ -11,9 +11,12 @@ object MovementHeuristicInRangeOfTarget extends MovementHeuristic {
   
     if (intent.toAttack.isEmpty) return 1.0
     
-    HeuristicMath.fromBoolean(intent.toAttack.get.pixelDistance(candidate.pixelCenter) <
-      intent.unit.unitClass.radialHypotenuse +
-      intent.toAttack.get.unitClass.radialHypotenuse +
-      intent.unit.unitClass.maxAirGroundRange)
+    HeuristicMath.fromBoolean(
+      intent.toAttack.get.pixelDistanceSquared(candidate.pixelCenter) <
+      Math.pow(
+        intent.unit.unitClass.radialHypotenuse +
+        intent.toAttack.get.unitClass.radialHypotenuse +
+        intent.unit.unitClass.maxAirGroundRange,
+        2))
   }
 }

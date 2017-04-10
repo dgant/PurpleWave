@@ -29,7 +29,7 @@ object ZoneUpdater {
         base.zone.contains(unit.pixelCenter))
     
     if (townHalls.nonEmpty) {
-      base.townHall = Some(townHalls.minBy(_.tileDistance(base.townHallArea.midpoint)))
+      base.townHall = Some(townHalls.minBy(_.tileDistanceSquared(base.townHallArea.midpoint)))
     }
   }
   

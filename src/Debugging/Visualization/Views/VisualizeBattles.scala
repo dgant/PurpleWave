@@ -17,7 +17,7 @@ object VisualizeBattles {
     if (battlesWithSimulations.nonEmpty) {
       
       drawBattleReport(
-        With.battles.local.minBy(battle => battle.focus.pixelDistance(With.viewport.center)).bestSimulationResult.get)
+        With.battles.local.minBy(battle => battle.focus.pixelDistanceSquared(With.viewport.center)).bestSimulationResult.get)
     }
   }
   

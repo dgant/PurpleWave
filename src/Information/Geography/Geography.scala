@@ -32,7 +32,7 @@ class Geography {
         val zone = zones
           .filter(_.tiles.contains(key))
           .headOption
-          .getOrElse(zones.minBy(_.centroid.pixelDistance(key.pixelCenter)))
+          .getOrElse(zones.minBy(_.centroid.pixelDistanceSlow(key.pixelCenter)))
         put(key, zone)
         zone
       }

@@ -97,7 +97,7 @@ class SimulacrumAgent(
   
   private def doCharge() {
     if (targets.nonEmpty) {
-      val target = targets.minBy(_.pixel.pixelDistance(thisUnit.pixel))
+      val target = targets.minBy(_.pixel.pixelDistanceSquared(thisUnit.pixel))
       moveTowards(target.pixel)
     }
   }
@@ -107,7 +107,8 @@ class SimulacrumAgent(
       val closestThreat = threats.minBy(threat =>
         Math.min(
           threat.pixel.getDistance(thisUnit.pixel),
-          Math.max(0, threat.pixel.project(thisUnit.pixel, threat.unit.rangeAgainst(thisUnit.unit)).pixelDistance(thisUnit.pixel))))
+          Math.max(0, threat.pixel.project(thisUnit.pixel, threat.unit.rangeAgainst(thisUnit.unit))
+        .pixelDistanceSquared(thisUnit.pixel))))
       moveAwayFrom(closestThreat.pixel)
     }
   }
@@ -128,7 +129,7 @@ class SimulacrumAgent(
   }
   
   private def moveTowards(destination:Position) {
-    move(destination, chargingSpeedRatio, thisUnit.pixel.pixelDistance(destination))
+    move(destination, chargingSpeedRatio, thisUnit.pixel.pixelDistanceSlow(destination))
   }
   
   private def move(destination:Position, multiplier:Double, maxDistance:Double = 1000.0) {
@@ -141,6 +142,6 @@ class SimulacrumAgent(
 
   private lazy val threats = thatGroup.units.filter(_.canAttack(thisUnit))
   private lazy val targets = thatGroup.units.filter(thisUnit.canAttack(_))
-  private lazy val targetsInRange = for (target <- targets if thisUnit.rangeAgainst(target) >= thisUnit.pixel.pixelDistance(target.pixel)) yield target
-  private lazy val threatsInRange = for (threat <- threats if threat.rangeAgainst(thisUnit) >= threat.pixel.pixelDistance(thisUnit.pixel)) yield threat
+  private lazy val targetsInRange = for (target <- targets if Math.pow(thisUnit.rangeAgainst(target), 2) >= thisUnit.pixel.pixelDistanceSquared(target.pixel)) yield target
+  private lazy val threatsInRange = for (threat <- threats if Math.pow(threat.rangeAgainst(thisUnit), 2) >= threat.pixel.pixelDistanceSquared(thisUnit.pixel)) yield threat
 }

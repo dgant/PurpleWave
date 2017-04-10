@@ -50,7 +50,7 @@ class Commander {
     val stickyMeleeTarget = intent.toAttack
       .map(_.pixelCenter)
       .filter(targetPosition =>
-        targetPosition.pixelDistance(position) < With.configuration.combatStickinessLeash
+        targetPosition.pixelDistanceSquared(position) < Math.pow(With.configuration.combatStickinessLeash, 2)
         && intent.unit.unitClass.maxAirGroundRange <= With.configuration.combatStickinessLeash)
     
     if (stickyMeleeTarget.isDefined) return attack(intent, intent.toAttack.get)
@@ -58,7 +58,7 @@ class Commander {
     //Send flying units past their destination to maximize acceleration
     val flyingOvershoot = 128.0
     var destination = position
-    if (intent.unit.flying && intent.unit.pixelDistance(position) < flyingOvershoot) {
+    if (intent.unit.flying && intent.unit.pixelDistanceSquared(position) < Math.pow(flyingOvershoot, 2)) {
       destination = intent.unit.pixelCenter.project(position, flyingOvershoot)
     }
     
@@ -106,7 +106,7 @@ class Commander {
   }
   
   def build(intent:Intention, unitClass:UnitClass, tile:TilePosition) {
-    if (intent.unit.tileDistance(tile) > 32 * 5) {
+    if (intent.unit.tileDistanceSquared(tile) > Math.pow(32 * 5, 2)) {
       return move(intent, tile.pixelCenter)
     }
     intent.unit.base.build(unitClass.baseType, tile)

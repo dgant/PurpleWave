@@ -14,7 +14,7 @@ object BattleUpdater {
     if (battle.happening) {
       battle.groups.foreach(group => {
         val otherGroup = battle.groups.filterNot(_ == group).head
-        group.vanguard = group.units.minBy(unit => otherGroup.units.map(unit.pixelDistance).min).pixelCenter
+        group.vanguard = group.units.minBy(unit => otherGroup.units.map(unit.pixelDistanceSquared).min).pixelCenter
       })
   
       battle.simulations = BattleSimulator.simulate(battle)

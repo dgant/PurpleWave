@@ -24,7 +24,7 @@ class RemoveMineralBlocks extends Plan {
     val ourEdges = With.geography.ourZones.flatten(_.edges)
     val ourMineralBlocks = With.units.neutral
       .filter(unit => unit.unitClass.isMinerals && unit.mineralsLeft <= 24)
-      .filter(unit => ourEdges.exists(edge => edge.contains(unit.pixelCenter) || edge.centerPixel.pixelDistance(unit.pixelCenter) < 32.0 * 3))
+      .filter(unit => ourEdges.exists(edge => edge.contains(unit.pixelCenter) || edge.centerPixel.pixelDistanceSquared(unit.pixelCenter) < Math.pow(32.0 * 3, 2)))
     
     if (ourMineralBlocks.isEmpty) return
     

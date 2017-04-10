@@ -32,17 +32,17 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   def tileArea: TileRectangle = unitClass.tileArea.add(tileTopLeft)
   
   def canTraverse(tile:TilePosition)                : Boolean = flying || With.grids.walkable.get(tile)
-  def pixelsFromEdge(enemy:UnitInfo)                : Double  = pixelDistance(enemy) - unitClass.radialHypotenuse - enemy.unitClass.radialHypotenuse
-  def pixelDistance(otherPosition:Position)         : Double  = pixelCenter.pixelDistance(otherPosition)
-  def pixelDistance(enemy:UnitInfo)                 : Double  = pixelDistance(enemy.pixelCenter)
-  def tileDistance(otherPosition:TilePosition)      : Double  = pixelDistance(otherPosition.toPosition)
+  def pixelsFromEdgeSlow(enemy:UnitInfo)            : Double  = pixelDistanceSlow(enemy) - unitClass.radialHypotenuse - enemy.unitClass.radialHypotenuse
+  def pixelDistanceSlow(otherPixel:Position)        : Double  = pixelCenter.pixelDistanceSlow(otherPixel)
+  def pixelDistanceSlow(enemy:UnitInfo)             : Double  = pixelDistanceSlow(enemy.pixelCenter)
   def pixelDistanceSquared(enemy:UnitInfo)          : Double  = pixelDistanceSquared(enemy.pixelCenter)
-  def pixelDistanceSquared(otherPixel:Position)     : Double  = pixelCenter.distancePixelsSquared(otherPixel)
-  def tileDistanceSquared (otherTile:TilePosition)  : Double  = pixelDistance(otherTile.toPosition)
+  def pixelDistanceSquared(otherPixel:Position)     : Double  = pixelCenter.pixelDistanceSquared(otherPixel)
+  def tileDistanceSlow(otherPosition:TilePosition)  : Double  = pixelDistanceSlow(otherPosition.toPosition)
+  def tileDistanceSquared (otherTile:TilePosition)  : Double  = pixelDistanceSlow(otherTile.toPosition)
   def travelPixels(destination:TilePosition)        : Double  = travelPixels(tileCenter, destination)
   def travelPixels(origin:TilePosition, destination:TilePosition): Double =
     if (flying)
-      origin.pixelCenter.pixelDistance(destination.pixelCenter)
+      origin.pixelCenter.pixelDistanceSlow(destination.pixelCenter)
     else
       With.paths.groundPixels(origin, destination)
   
@@ -158,7 +158,7 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   def pixelReachGround    (framesAhead  : Int)  : Double = pixelReachTravel(framesAhead) + pixelRangeGround
   def pixelReachDamage    (framesAhead  : Int)  : Double = Math.max(pixelReachAir(framesAhead), pixelReachGround(framesAhead))
   
-  def inRangeToAttack(enemy:UnitInfo):Boolean = pixelsFromEdge(enemy) <= unitClass.maxAirGroundRange
+  def inRangeToAttack(enemy:UnitInfo):Boolean = pixelsFromEdgeSlow(enemy) <= unitClass.maxAirGroundRange
   
   def attackableEnemiesInRange: Set[UnitInfo] =
     With.units

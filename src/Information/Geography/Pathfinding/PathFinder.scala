@@ -15,7 +15,7 @@ object PathFinder {
     val toZone = to.zone
     
     if (fromZone == toZone) {
-      return from.pixelDistance(to)
+      return from.pixelDistanceSlow(to)
     }
     
     if ( ! With.paths.exists(
@@ -30,8 +30,8 @@ object PathFinder {
     
     fromEdgeTiles.map(fromEdgeTile =>
       toEdgeTiles.map(toEdgeTile =>
-        from.pixelDistance(fromEdgeTile.pixelCenter) +
-          to.pixelDistance(  toEdgeTile.pixelCenter) +
+        from.pixelDistanceSlow(fromEdgeTile.pixelCenter) +
+          to.pixelDistanceSlow(  toEdgeTile.pixelCenter) +
         With.paths.groundPixels(
           fromEdgeTile,
           toEdgeTile,
@@ -59,15 +59,15 @@ object PathFinder {
         zoneContainingPixel
     
     //If we're already here, return the straight-line distance
-    if (zoneFrom == to.zone || to.zone.edges.exists(edge => edge.centerPixel.pixelDistance(to) <= edge.radiusPixels))
-      return from.pixelDistance(to)
+    if (zoneFrom == to.zone || to.zone.edges.exists(edge => edge.centerPixel.pixelDistanceSlow(to) <= edge.radiusPixels))
+      return from.pixelDistanceSlow(to)
     
     val horizonEdges = zoneFrom.edges.filter(edge => edge.zones.exists(otherZone => otherZone != this && ! explored.contains(otherZone)))
     if (horizonEdges.isEmpty) return Double.PositiveInfinity
     
     return horizonEdges
       .map(edge =>
-        from.pixelDistance(edge.centerPixel) +
+        from.pixelDistanceSlow(edge.centerPixel) +
           roughGroundDistance2(
           edge.centerPixel,
           to,

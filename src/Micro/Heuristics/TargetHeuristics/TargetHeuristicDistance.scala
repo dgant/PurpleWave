@@ -7,8 +7,8 @@ object TargetHeuristicDistance extends TargetHeuristic{
   
   override def evaluate(intent: Intention, candidate: UnitInfo): Double = {
     
-    Math.max(8.0, intent.unit.pixelsFromEdge(candidate) - intent.unit.unitClass.maxAirGroundRange)
-      
+    Math.max(
+      intent.unit.rangeAgainst(candidate),
+      intent.unit.pixelsFromEdgeSlow(candidate) - intent.unit.unitClass.maxAirGroundRange)
   }
-  
 }

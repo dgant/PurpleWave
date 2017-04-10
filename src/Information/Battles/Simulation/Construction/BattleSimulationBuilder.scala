@@ -34,34 +34,46 @@ object BattleSimulationBuilder {
       tacticsMovement += TacticMovement.Charge
       tacticsMovement += TacticMovement.Flee
       
+      /*
       if (thatCanMove) {
         tacticsMovement += TacticMovement.Kite
       }
+      */
     }
     if (tacticsMovement.isEmpty) {
       tacticsMovement += TacticMovement.Ignore
     }
     
+    /*
     tacticsFleeWounded += TacticWounded.Ignore
     if (thisCanMove)
       tacticsFleeWounded += TacticWounded.Flee
+      */
+    tacticsFleeWounded += TacticWounded.Flee
+    
+    /*
     if (thisCanMove && thisGroup.units.exists(_.melee) && thisGroup.units.exists(! _.melee))
       tacticsFleeWounded += TacticWounded.FleeRanged
+      */
     
     tacticsFocusAirOrGround += TacticFocus.Nothing
+    /*
     if (thatGroup.units.exists(_.flying) && thatGroup.units.exists( ! _.flying)) {
       tacticsFocusAirOrGround += TacticFocus.Air
       tacticsFocusAirOrGround += TacticFocus.Ground
     }
+    */
     
     val workerCount = thisGroup.units.count(_.unitClass.isWorker)
     tacticsWorkersFighting += TacticWorkers.Ignore
+    /*
     if (workerCount > 0) {
       tacticsWorkersFighting += TacticWorkers.AllFight
       tacticsWorkersFighting += TacticWorkers.Flee
     }
     if (workerCount > 3)
       tacticsWorkersFighting += TacticWorkers.HalfFight
+    */
     
     val strategyPermutations =
       tacticsFleeWounded.flatten(strategyFleeWounded =>

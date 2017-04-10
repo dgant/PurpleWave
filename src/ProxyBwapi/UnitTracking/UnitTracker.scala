@@ -40,7 +40,7 @@ class UnitTracker {
   }
   
   def inPixelRadius(pixel:Position, pixels:Int):Set[UnitInfo] = {
-    inTileRadius(pixel.tileNearest, pixels / 32 + 1).filter(_.pixelCenter.distancePixelsSquared(pixel) <= pixels * pixels)
+    inTileRadius(pixel.tileNearest, pixels / 32 + 1).filter(_.pixelCenter.pixelDistanceSquared(pixel) <= pixels * pixels)
   }
   
   def inRectangle(topLeftInclusive:Position, bottomRightExclusive:Position):Set[UnitInfo] = {

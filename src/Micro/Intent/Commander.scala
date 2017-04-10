@@ -106,7 +106,7 @@ class Commander {
   }
   
   def build(intent:Intention, unitClass:UnitClass, tile:TilePosition) {
-    if (intent.unit.tileDistanceSquared(tile) > Math.pow(32 * 5, 2)) {
+    if (intent.unit.pixelDistanceSquared(tile.pixelCenter) > Math.pow(32.0 * 5.0, 2)) {
       return move(intent, tile.pixelCenter)
     }
     intent.unit.base.build(unitClass.baseType, tile)

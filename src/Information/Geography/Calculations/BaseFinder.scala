@@ -39,7 +39,7 @@ object BaseFinder {
     val searchRadius = 10
     val candidates = Circle.points(searchRadius).map(centroidTile.add).filter(isLegalTownHallTile)
     if (candidates.isEmpty) return None
-    Some(candidates.minBy(_.toPosition.add(64, 48).pixelDistanceFast(centroid)))
+    Some(candidates.minBy(_.toPosition.add(64, 48).pixelDistanceSlow(centroid)))
   }
   
   private def isLegalTownHallTile(candidate:TilePosition):Boolean = {
@@ -73,7 +73,7 @@ object BaseFinder {
           .sortBy(With.game.getStartLocations.asScala.contains)
           .sortBy(hall => With.units.neutral
             .filter(_.unitClass.isGas)
-            .map(_.tileDistanceSlow(hall))
+            .map(_.pixelDistanceFast(hall.pixelCenter))
             .min)
         basesToRemove -- conflictingHalls.filterNot(_ == preferredHall)
       })

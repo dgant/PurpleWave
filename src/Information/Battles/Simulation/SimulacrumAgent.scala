@@ -142,6 +142,6 @@ class SimulacrumAgent(
 
   private lazy val threats = thatGroup.units.filter(_.canAttack(thisUnit))
   private lazy val targets = thatGroup.units.filter(thisUnit.canAttack(_))
-  private lazy val targetsInRange = for (target <- targets if Math.pow(thisUnit.rangeAgainst(target), 2) >= thisUnit.pixel.pixelDistanceSquared(target.pixel)) yield target
+  private lazy val targetsInRange = for (target <- targets if thisUnit.inRangeToAttack(target)) yield target
   private lazy val threatsInRange = for (threat <- threats if Math.pow(threat.rangeAgainst(thisUnit), 2) >= threat.pixel.pixelDistanceSquared(thisUnit.pixel)) yield threat
 }

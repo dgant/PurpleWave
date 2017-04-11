@@ -16,14 +16,14 @@ object VisualizeGrids {
     With.geography.allTiles
       .filterNot(tilePosition => map.get(tilePosition) == map.defaultValue)
       .foreach(tilePosition => DrawMap.text(
-        tilePosition.toPosition.add(offsetX*16, offsetY*13),
+        tilePosition.topLeftPixel.add(offsetX*16, offsetY*13),
         map.repr(map.get(tilePosition))))
   }
   
   private def renderGrid[T](map:AbstractGrid[T], offsetX:Int=0, offsetY:Int=0) {
     With.geography.allTiles
       .foreach(tilePosition => DrawMap.text(
-        tilePosition.toPosition.add(offsetX*16, offsetY*13),
+        tilePosition.topLeftPixel.add(offsetX*16, offsetY*13),
         map.get(tilePosition).toString))
   }
 }

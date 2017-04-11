@@ -125,10 +125,10 @@ case object EnrichPosition {
       dx * dx + dy * dy
     }
     def tileIncluding:TilePosition = {
-      pixel.toTilePosition
+      new TilePosition(pixel.getX/32, pixel.getY/32)
     }
     def tileNearest:TilePosition = {
-      pixel.add(16, 16).toTilePosition
+      pixel.add(16, 16).tileIncluding
     }
     def toPoint:Point = {
       new Point(pixel.getX, pixel.getY)
@@ -183,13 +183,13 @@ case object EnrichPosition {
       dx * dx + dy * dy
     }
     def topLeftPixel:Position = {
-      tile.toPosition
+      new Position(tile.getX * 32, tile.getY * 32)
     }
     def bottomRightPixel:Position = {
-      tile.toPosition.add(31, 31)
+      new Position(tile.getX * 32 + 31, tile.getY * 32 + 31)
     }
     def pixelCenter:Position = {
-      tile.toPosition.add(16, 16)
+      new Position(tile.getX * 32 + 15, tile.getY * 32 + 15)
     }
     def topLeftWalkPosition:WalkPosition = {
       new WalkPosition(tile.getX * 4, tile.getY * 4)

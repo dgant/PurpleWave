@@ -55,11 +55,13 @@ class Battles {
       byUnit = Map.empty
       return
     }
-    val searchMargin = 32.0 * 2
+    
     val framesToLookAhead = Math.max(12, 2 * With.performance.frameDelay(delayLength))
     val unassigned = mutable.HashSet.empty ++ combatantsOurs ++ combatantsEnemy
     val clusters = new ListBuffer[mutable.HashSet[UnitInfo]]
     val horizon = new mutable.HashSet[UnitInfo]
+    val searchMarginTiles = 2
+    val searchRadius = searchMarginTiles + Math.min(With.configuration.combatEvaluationDistanceTiles, unassigned.map(_.pixelReachTotal(framesToLookAhead)).max/32 + 1)
     while (unassigned.nonEmpty) {
       val nextCluster = new mutable.HashSet[UnitInfo]
       horizon.add(unassigned.head)
@@ -73,10 +75,10 @@ class Battles {
           .filter(unassigned.contains)
           .filter(otherUnit =>
             nextUnit.pixelsFromEdgeFast(otherUnit) <=
-              searchMargin +
+              32.0 * searchMarginTiles +
               Math.max(
-                nextUnit.pixelReachDamage(framesToLookAhead),
-                otherUnit.pixelReachDamage(framesToLookAhead)))
+                nextUnit.pixelReachTotal(framesToLookAhead),
+                otherUnit.pixelReachTotal(framesToLookAhead)))
       }
       clusters.append(nextCluster)
     }

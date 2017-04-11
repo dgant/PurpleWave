@@ -15,7 +15,7 @@ object VisualizeRealEstate {
       DrawMap.tileRectangle(rectangle, Colors.DarkRed)
       DrawMap.labelBox(
         List("Reserved by", lock.owner.toString),
-        rectangle.midpoint.toPosition,
+        rectangle.midPixel,
         drawBackground = true,
         backgroundColor = Colors.DarkRed)
     })

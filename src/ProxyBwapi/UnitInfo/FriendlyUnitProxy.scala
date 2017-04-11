@@ -4,7 +4,7 @@ import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
 import Lifecycle.With
 import bwapi._
 
-import
+import scala.collection.JavaConverters._
 
 abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
   

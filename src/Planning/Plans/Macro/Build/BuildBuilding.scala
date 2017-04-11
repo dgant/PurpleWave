@@ -85,7 +85,7 @@ class BuildBuilding(val buildingClass:UnitClass) extends Plan {
       DrawMap.playerColorDark(With.self))
     DrawMap.label(
       "Building a " + buildingClass.toString,
-      orderedTile.get.toPosition,
+      orderedTile.get.topLeftPixel,
       drawBackground = true,
       DrawMap.playerColorDark(With.self))
   }

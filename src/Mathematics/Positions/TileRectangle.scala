@@ -48,8 +48,8 @@ case class TileRectangle(
     contains(otherRectangle.endExclusive.getX - 1, otherRectangle.startInclusive.getY)
   }
   
-  lazy val startPixel : Position = startInclusive.toPosition
-  lazy val endPixel   : Position = endExclusive.toPosition.subtract(1, 1)
+  lazy val startPixel : Position = startInclusive.topLeftPixel
+  lazy val endPixel   : Position = endExclusive.topLeftPixel.subtract(1, 1)
   
   lazy val tiles: Iterable[TilePosition] =
     for (x <- startInclusive.getX until endExclusive.getX; y <- startInclusive.getY until endExclusive.getY)

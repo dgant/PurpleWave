@@ -36,8 +36,8 @@ object Clustering {
         groupsByLeader(thing).add(thing)
         groupsByLeader(thing) ++= neighborsByUnit(thing).filter(neighbor =>
           ! limitRegion ||
-            With.grids.altitudeBonus.get(extractPosition(thing).toTilePosition) ==
-            With.grids.altitudeBonus.get(extractPosition(neighbor).toTilePosition))
+            With.grids.altitudeBonus.get(extractPosition(thing).tileIncluding) ==
+            With.grids.altitudeBonus.get(extractPosition(neighbor).tileIncluding))
         groupsByLeader(thing).foreach(groupMember => unitLeaders.put(groupMember, thing))
       }})
     

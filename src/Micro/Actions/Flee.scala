@@ -19,9 +19,14 @@ object Flee extends Action {
   }
   
   override def perform(intent: Intention): Boolean = {
-    intent.movementProfile = MovementProfiles.flee
-    intent.toGather = None
-    intent.canAttack = false
+    
+    //If workers are fleeing to another base, let them
+    if ( ! intent.toGather.exists(_.pixelDistanceSquared(intent.unit.pixelCenter) > 32.0 * 12)) {
+      intent.movementProfile = MovementProfiles.flee
+      intent.toGather = None
+      intent.canAttack = false
+    }
+    
     false
   }
   

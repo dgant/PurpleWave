@@ -102,7 +102,7 @@ class Commander {
       }
       else {
         move(intent, resource.pixelCenter)
-        sleepMove()
+        sleepMove(intent.unit)
       }
     }
   }

@@ -26,9 +26,9 @@ class TileChoke extends TileFinder {
     
     val mostExposedChoke = ourExposedChokes.minBy(choke =>
       With.paths.groundPixels(
-        choke.centerPixel.toTilePosition,
+        choke.centerPixel.tileIncluding,
         With.intelligence.mostBaselikeEnemyPosition))
     
-    return Some(mostExposedChoke.centerPixel.toTilePosition)
+    return Some(mostExposedChoke.centerPixel.tileIncluding)
   }
 }

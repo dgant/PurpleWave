@@ -53,10 +53,10 @@ object ZoneBuilder {
     val tileArea = new TileRectangle(
       new Position(
         polygon.getPoints.asScala.map(_.getX).min,
-        polygon.getPoints.asScala.map(_.getY).min).toTilePosition,
+        polygon.getPoints.asScala.map(_.getY).min).tileIncluding,
       new Position(
         polygon.getPoints.asScala.map(_.getX).max,
-        polygon.getPoints.asScala.map(_.getY).max).toTilePosition)
+        polygon.getPoints.asScala.map(_.getY).max).tileIncluding)
     val tiles = new mutable.HashSet[TilePosition]
     tiles ++= tileArea.tiles
       .filter(tile => {
@@ -78,7 +78,7 @@ object ZoneBuilder {
     val townHallArea = Protoss.Nexus.tileArea.add(townHallPosition)
     new Base(
       zones
-        .find(_.contains(townHallPosition.toPosition))
+        .find(_.contains(townHallPosition.pixelCenter))
         .getOrElse(zones.minBy(_.centroid.pixelDistanceFast(townHallPosition.pixelCenter))),
       townHallArea,
       With.game.getStartLocations.asScala.exists(_.tileDistance(townHallPosition) < 6))

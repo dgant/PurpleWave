@@ -108,7 +108,6 @@ class Architect {
     tileHasRequiredPsi(tileTopleft, buildingClass) &&
     marginArea.tiles.forall(tile => tile.valid && With.grids.walkable.get(tile)) &&
     rectangleIsBuildable(buildingArea, buildingClass, hypotheticalPylon) &&
-    buildingArea.tiles.forall(_.valid) &&
     exclusions.forall( ! _.intersects(marginArea)) &&
     rectangleContainsOnlyAWorker(marginArea)
   }

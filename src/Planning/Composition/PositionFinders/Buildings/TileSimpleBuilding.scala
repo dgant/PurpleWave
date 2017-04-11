@@ -15,7 +15,11 @@ class TileSimpleBuilding(val buildingClass:UnitClass) extends TileFinder {
   
   def find: Option[TilePosition] = {
     //Don't lag out due to lack of pylon space
-    if (With.frame < 24 * 60 * 3 || lastFailure < With.frame - 24 * 5) {
+    if (buildingClass.requiresPsi && ! With.units.ours.exists(u => u.complete && u.unitClass == Protoss.Pylon)) {
+      return None
+    }
+    
+    if (With.frame < 24 * 60 * 3 || lastFailure < With.frame - 24 * 10) {
       lastTile = if (lastTileValid) lastTile else requestTile
       if (lastTile == None) {
         lastFailure = With.frame

@@ -5,7 +5,7 @@ import Lifecycle.With
 import bwapi.TilePosition
 
 
-object TileTownHall$ extends TileFinder {
+object TileTownHall extends TileFinder {
   
   def find: Option[TilePosition] = {
   

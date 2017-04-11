@@ -2,6 +2,7 @@ package Lifecycle
 
 import Debugging.Visualization.Viewport
 import Debugging.{AutoCamera, Configuration, Logger, Performance}
+import Information.Battles.Battles
 import Information.Geography.Geography
 import Information.Geography.Pathfinding.Paths
 import Information.Grids.Grids
@@ -9,11 +10,9 @@ import Information._
 import Macro.Allocation._
 import Macro.Architect
 import Macro.Scheduling.Scheduler
-import Information.Battles.Battles
 import Micro.Intent.Commander
 import Micro.State.Executor
 import Planning.Plans.GamePlans.WinTheGame
-import Planning.Yolo
 import ProxyBwapi.ProxyBWMirror
 import ProxyBwapi.UnitTracking.UnitTracker
 import _root_.Performance.Latency

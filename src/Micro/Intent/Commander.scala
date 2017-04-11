@@ -74,14 +74,15 @@ class Commander {
     //
     // So we'll try to get the best of both worlds, and recalculate paths *occasionally*
     if (With.configuration.enablePathRecalculation) {
-      intent.unit.base.move(destination.add(
+      destination = destination.add(
         RandomState.random.nextInt(5) - 2,
-        RandomState.random.nextInt(5) - 2))
+        RandomState.random.nextInt(5) - 2)
     }
-    else {
+    
+    if (intent.unit.pixelDistanceFast(destination) > 7) {
       intent.unit.base.move(destination)
+      sleepMove(intent.unit)
     }
-    sleepMove(intent.unit)
   }
   
   def gather(intent:Intention, resource:UnitInfo) {

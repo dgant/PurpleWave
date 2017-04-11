@@ -13,8 +13,8 @@ class TileArbitraryBuilding(val buildingClass:UnitClass) extends TileFinder {
   val tileSimpleBuilding = new TileSimpleBuilding(buildingClass)
   
   def recalculate: Option[TilePosition] = {
-    if      (buildingClass.isRefinery)  return TileRefinery$.find
-    else if (buildingClass.isTownHall)  return TileTownHall$.find
+    if      (buildingClass.isRefinery)  return TileRefinery.find
+    else if (buildingClass.isTownHall)  return TileTownHall.find
     else                                return tileSimpleBuilding.find
   }
 }

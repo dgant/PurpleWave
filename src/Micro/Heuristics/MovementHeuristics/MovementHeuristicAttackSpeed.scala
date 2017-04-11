@@ -14,7 +14,7 @@ object MovementHeuristicAttackSpeed extends MovementHeuristic {
     if (intent.unit.cooldownLeft == 0) return HeuristicMath.default
     
     val relevantUnits = List(Terran.Marine, Terran.Ghost, Protoss.Zealot, Protoss.Dragoon, Zerg.Hydralisk)
-    if ( ! relevantUnits.contains(intent.unit.unitClass)) HeuristicMath.default
+    if ( ! relevantUnits.contains(intent.unit.unitClass)) return HeuristicMath.default
     
     HeuristicMath.fromBoolean(intent.unit.tileTopLeft == candidate)
   }

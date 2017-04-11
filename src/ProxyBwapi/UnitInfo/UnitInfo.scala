@@ -12,7 +12,7 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   def friendly  : Option[FriendlyUnitInfo]  = None
   def foreign   : Option[ForeignUnitInfo]   = None
   
-  override def toString:String = unitClass.toString + " " + tileIncluding.toString
+  override def toString:String = unitClass.toString + " " + tileIncludingCenter.toString
   
   ////////////
   // Health //
@@ -28,19 +28,20 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   def x: Int = pixelCenter.getX
   def y: Int = pixelCenter.getY
   
-  def tileIncluding: TilePosition = pixelCenter.tileIncluding
+  def tileIncludingCenter: TilePosition = pixelCenter.tileIncluding
   def tileArea: TileRectangle = unitClass.tileArea.add(tileTopLeft)
   
+  
   def canTraverse(tile:TilePosition)                : Boolean = flying || With.grids.walkable.get(tile)
-  def pixelsFromEdgeSlow(enemy:UnitInfo)            : Double  = pixelDistanceSlow(enemy) - unitClass.radialHypotenuse - enemy.unitClass.radialHypotenuse
-  def pixelsFromEdgeFast(enemy:UnitInfo)            : Double  = pixelDistanceFast(enemy) - unitClass.radialHypotenuse - enemy.unitClass.radialHypotenuse
+  def pixelsFromEdgeSlow(otherUnit:UnitInfo)        : Double  = pixelDistanceSlow(otherUnit) - unitClass.radialHypotenuse - otherUnit.unitClass.radialHypotenuse
+  def pixelsFromEdgeFast(otherUnit:UnitInfo)        : Double  = pixelDistanceFast(otherUnit) - unitClass.radialHypotenuse - otherUnit.unitClass.radialHypotenuse
   def pixelDistanceSlow(otherPixel:Position)        : Double  = pixelCenter.pixelDistanceSlow(otherPixel)
-  def pixelDistanceSlow(enemy:UnitInfo)             : Double  = pixelDistanceSlow(enemy.pixelCenter)
+  def pixelDistanceSlow(otherUnit:UnitInfo)         : Double  = pixelDistanceSlow(otherUnit.pixelCenter)
   def pixelDistanceFast(otherPixel:Position)        : Double  = pixelCenter.pixelDistanceFast(otherPixel)
-  def pixelDistanceFast(enemy:UnitInfo)             : Double  = pixelDistanceFast(enemy.pixelCenter)
-  def pixelDistanceSquared(enemy:UnitInfo)          : Double  = pixelDistanceSquared(enemy.pixelCenter)
+  def pixelDistanceFast(otherUnit:UnitInfo)         : Double  = pixelDistanceFast(otherUnit.pixelCenter)
+  def pixelDistanceSquared(otherUnit:UnitInfo)      : Double  = pixelDistanceSquared(otherUnit.pixelCenter)
   def pixelDistanceSquared(otherPixel:Position)     : Double  = pixelCenter.pixelDistanceSquared(otherPixel)
-  def travelPixels(destination:TilePosition)        : Double  = travelPixels(tileIncluding, destination)
+  def travelPixels(destination:TilePosition)        : Double  = travelPixels(tileIncludingCenter, destination)
   def travelPixels(origin:TilePosition, destination:TilePosition): Double =
     if (flying)
       origin.pixelCenter.pixelDistanceSlow(destination.pixelCenter)
@@ -49,6 +50,7 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   
   def canMove:Boolean = canDoAnythingThisFrame && unitClass.canMove
   def topSpeed:Double = unitClass.topSpeed
+  def project(framesToLookAhead:Int):Position = pixelCenter.add((velocityX * framesToLookAhead).toInt, (velocityY * framesToLookAhead).toInt)
   
   ////////////
   // Combat //
@@ -104,7 +106,7 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
     damageToHealth + damageToShields
   }
   
-  def inTileRadius(tiles:Int)   : Set[UnitInfo] = With.units.inTileRadius(tileIncluding, tiles)
+  def inTileRadius(tiles:Int)   : Set[UnitInfo] = With.units.inTileRadius(tileIncludingCenter, tiles)
   def inPixelRadius(pixels:Int) : Set[UnitInfo] = With.units.inPixelRadius(pixelCenter, pixels)
   
   def canDoAnythingThisFrame:Boolean =

@@ -32,7 +32,7 @@ class Hunt extends Plan {
           else
             targets.minBy(candidate =>
               candidate.pixelDistanceSquared(fighter)
-            + candidate.pixelDistanceSquared(With.geography.home.pixelCenter)).tileIncluding
+            + candidate.pixelDistanceSquared(With.geography.home.pixelCenter)).tileIncludingCenter
         
         With.executor.intend(new Intention(this, fighter) { destination = Some(targetPosition) })
       })

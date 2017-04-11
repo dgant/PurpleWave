@@ -1,8 +1,8 @@
 package Micro.Heuristics.Movement
 
-import Mathematics.Shapes.Circle
 import Lifecycle.With
 import Mathematics.Heuristics.HeuristicMath
+import Mathematics.Positions.Point
 import Micro.Heuristics.MovementHeuristics.MovementHeuristicResult
 import Micro.Intent.Intention
 import Utilities.EnrichPosition._
@@ -10,20 +10,43 @@ import bwapi.TilePosition
 
 object EvaluateMoves {
   
+  val points = List(
+    new Point(-1, -2),
+    new Point( 0, -2),
+    new Point( 1, -2),
+    new Point(-2, -1),
+    new Point(-1, -1),
+    new Point( 0, -1),
+    new Point( 1, -1),
+    new Point( 2, -1),
+    new Point(-2,  0),
+    new Point(-1,  0),
+    new Point( 0,  0),
+    new Point( 1,  0),
+    new Point( 2,  0),
+    new Point(-2,  1),
+    new Point(-1,  1),
+    new Point( 0,  1),
+    new Point( 1,  1),
+    new Point( 2,  1),
+    new Point(-1,  2),
+    new Point( 0,  2),
+    new Point( 1,  2)
+  )
+  
   def best(
     intent:Intention,
-    profile:MovementProfile,
-    searchRange:Int)
+    profile:MovementProfile)
       :TilePosition = {
     
     val candidates =
-      Circle.points(searchRange)
-        .map(intent.unit.tileIncluding.add)
+      points
+        .map(intent.unit.tileIncludingCenter.add)
         .filter(_.valid)
         .filter(intent.unit.canTraverse)
   
     if (candidates.isEmpty) {
-      return intent.unit.tileIncluding
+      return intent.unit.tileIncludingCenter
     }
     
     if (With.configuration.visualizeHeuristicMovement) {

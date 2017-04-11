@@ -60,8 +60,11 @@ abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
   def attacking                 : Boolean = base.isAttacking
   def attackStarting            : Boolean = base.isStartingAttack
   def attackAnimationHappening  : Boolean = base.isAttackFrame
-  def airCooldownLeft           : Int     = base.getAirWeaponCooldown
-  def groundCooldownLeft        : Int     = base.getGroundWeaponCooldown
+  def airCooldownLeft           : Int     = airCooldownLeftCache.get
+  def groundCooldownLeft        : Int     = groundCooldownLeftCache.get
+  
+  private val airCooldownLeftCache = new CacheFrame(() => base.getAirWeaponCooldown)
+  private val groundCooldownLeftCache = new CacheFrame(() => base.getGroundWeaponCooldown)
   
   //////////////
   // Geometry //
@@ -81,9 +84,11 @@ abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
   def gatheringMinerals : Boolean = base.isGatheringMinerals
   def gatheringGas      : Boolean = base.isGatheringGas
   
-  def target      : Option[UnitInfo]  = { val target = base.getTarget; if (target == null) None else With.units.getId(target.getID) }
+  def target      : Option[UnitInfo]  = targetCache.get
   def order       : Order             = base.getOrder
   def orderTarget : Option[UnitInfo]  = { val target = base.getOrderTarget; if (target == null) None else With.units.getId(target.getID) }
+  
+  private val targetCache = new CacheFrame(() => { val target = base.getTarget; if (target == null) None else With.units.getId(target.getID) })
   
   /*
   def attacking:Boolean
@@ -108,7 +113,10 @@ abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
   
   def command:UnitCommand = base.getLastCommand
   def commandFrame:Int = base.getLastCommandFrame
-  def trainingQueue: Iterable[UnitClass] = base.getTrainingQueue.asScala.map(UnitClasses.get)
+  def trainingQueue: Iterable[UnitClass] = trainingQueueCache.get
+  
+  private val trainingQueueCache = new CacheFrame(() => base.getTrainingQueue.asScala.map(UnitClasses.get))
+  
   ////////////////
   // Visibility //
   ////////////////
@@ -148,8 +156,8 @@ abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
   def beingGathered       : Boolean = base.isBeingGathered
   def beingHealed         : Boolean = base.isBeingHealed
   def blind               : Boolean = base.isBlind
-  def carryingMinerals    : Boolean = base.isCarryingMinerals
-  def carryingGas         : Boolean = base.isCarryingGas
+  def carryingMinerals    : Boolean = carryingMineralsCache.get
+  def carryingGas         : Boolean = carryingGasCache.get
   def powered             : Boolean = base.isPowered
   def selected            : Boolean = cacheSelected.get
   def targetable          : Boolean = base.isTargetable
@@ -157,4 +165,7 @@ abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
   def underDarkSwarm      : Boolean = base.isUnderDarkSwarm
   def underDisruptionWeb  : Boolean = base.isUnderDisruptionWeb
   def underStorm          : Boolean = base.isUnderStorm
+  
+  private val carryingMineralsCache = new CacheFrame(() => base.isCarryingMinerals)
+  private val carryingGasCache = new CacheFrame(() => base.isCarryingGas)
 }

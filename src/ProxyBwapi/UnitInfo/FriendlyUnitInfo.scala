@@ -35,7 +35,7 @@ class FriendlyUnitInfo(base:bwapi.Unit) extends FriendlyUnitProxy(base) {
   // Visibility //
   ////////////////
   
-  override def detected = With.grids.enemyDetection.get(tileIncluding)
+  override def detected = With.grids.enemyDetection.get(tileIncludingCenter)
   
   //////////////
   // Movement //

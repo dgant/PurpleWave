@@ -25,7 +25,7 @@ object ZoneUpdater {
     val townHalls = With.units.buildings
       .filter(unit =>
         unit.unitClass.isTownHall &&
-        unit.tileIncluding.zone == base.zone &&
+        unit.tileIncludingCenter.zone == base.zone &&
         base.zone.contains(unit.pixelCenter))
     
     if (townHalls.nonEmpty) {

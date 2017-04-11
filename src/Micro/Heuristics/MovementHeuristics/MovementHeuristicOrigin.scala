@@ -11,7 +11,7 @@ object MovementHeuristicOrigin extends MovementHeuristic {
   
     if (intent.destination.isEmpty) return HeuristicMath.default
   
-    val before = intent.unit.travelPixels(intent.unit.tileIncluding,  intent.origin)
+    val before = intent.unit.travelPixels(intent.unit.tileIncludingCenter,  intent.origin)
     val after  = intent.unit.travelPixels(candidate,               intent.origin)
   
     if (before < With.configuration.combatEvaluationDistanceTiles) return HeuristicMath.default

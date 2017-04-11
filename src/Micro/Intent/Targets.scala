@@ -13,7 +13,7 @@ object Targets {
     if ( ! intent.unit.canAttackThisSecond) return Set.empty
     
     With.units.inTileRadius(
-      intent.unit.tileIncluding,
+      intent.unit.tileIncludingCenter,
       With.configuration.combatEvaluationDistanceTiles)
       .filter(target =>
         target.possiblyStillThere &&

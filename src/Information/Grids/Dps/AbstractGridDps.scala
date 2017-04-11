@@ -56,7 +56,7 @@ abstract class AbstractGridDps extends AbstractGridDouble {
         Circle
           .points((pixelReachMax/32).toInt)
           .foreach(point => {
-            val nearbyTile = unit.tileIncluding.add(point)
+            val nearbyTile = unit.tileIncludingCenter.add(point)
             if (nearbyTile.valid) {
               var adjustedDps = dps
               if (distancePenalty > 0) {

@@ -13,7 +13,7 @@ abstract class AbstractGridVision extends AbstractGridBoolean {
       .filter(_.possiblyStillThere)
       .foreach(u => {
       Circle.points(u.unitClass.sightRange / 32)
-        .map(u.tileIncluding.add)
+        .map(u.tileIncludingCenter.add)
         .foreach(set(_, true))
     })
   }

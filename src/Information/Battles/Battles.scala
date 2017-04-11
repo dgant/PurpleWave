@@ -38,8 +38,8 @@ class Battles {
   }
   
   private def buildBattlesByZone() {
-    val combatantsOursByZone  = combatantsOurs .groupBy(_.tileIncluding.zone)
-    val combatantsEnemyByZone = combatantsEnemy.groupBy(_.tileIncluding.zone)
+    val combatantsOursByZone  = combatantsOurs .groupBy(_.tileIncludingCenter.zone)
+    val combatantsEnemyByZone = combatantsEnemy.groupBy(_.tileIncludingCenter.zone)
     byZone = With.geography.zones
       .map(zone => (
         zone,

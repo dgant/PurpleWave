@@ -11,12 +11,12 @@ class Plan {
   def drawOverlay() = {}
   
   override def toString: String =
-    if (getRealName == "")
+    if (realName == "")
       description.get
     else
-      if (description.get == "") getRealName else description.get
+      if (description.get == "") realName else description.get
   
-  private def getRealName:String = {
+  lazy val realName:String = {
     val name = getClass.getSimpleName
     if (name.contains("$anon$")) "" else name
   }

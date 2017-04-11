@@ -87,6 +87,6 @@ object VisualizeBattles {
         .groupBy(_.unit.unitClass)
         .toList
         .sortBy(_._1.toString)
-        .map(u => List(u._1.toString, u._2.size.toString)))
+        .map(u => List(u._2.size.toString, u._1.toString)))
   }
 }

@@ -16,9 +16,9 @@ object Move extends Action {
     
     val tileToMove =
       if (intent.state.movingHeuristically)
-        EvaluateMoves.best(intent, intent.movementProfile, 3)
+        EvaluateMoves.best(intent, intent.movementProfile)
       else
-        intent.destination.getOrElse(intent.unit.tileIncluding)
+        intent.destination.getOrElse(intent.unit.tileIncludingCenter)
     
     With.commander.move(intent, tileToMove.pixelCenter)
     true

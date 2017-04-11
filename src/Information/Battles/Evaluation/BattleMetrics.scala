@@ -38,7 +38,7 @@ object BattleMetrics {
     if (unit.unitClass == Terran.Medic) dps = 18.6
     
     //Altitude/doodad misses only apply to ranged units
-    val highGroundBonus =  With.grids.altitudeBonus.get(unit.tileIncluding)
+    val highGroundBonus =  With.grids.altitudeBonus.get(unit.tileIncludingCenter)
     val combatEfficacy = dps * Math.pow(unit.totalHealth, 1.2) * highGroundBonus
     Math.max(0, combatEfficacy)
   }

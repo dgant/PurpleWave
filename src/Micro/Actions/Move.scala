@@ -18,7 +18,7 @@ object Move extends Action {
       if (intent.state.movingHeuristically)
         EvaluateMoves.best(intent, intent.movementProfile, 3)
       else
-        intent.destination.getOrElse(intent.unit.tileCenter)
+        intent.destination.getOrElse(intent.unit.tileIncluding)
     
     With.commander.move(intent, tileToMove.pixelCenter)
     true

@@ -14,7 +14,7 @@ class GridEnemyDetection extends AbstractGridBoolean {
       .filter(_.unitClass.isDetector)
       .foreach(u => {
       Circle.points(u.unitClass.sightRange / 32)
-        .map(u.tileCenter.add)
+        .map(u.tileIncluding.add)
         .foreach(set(_, true))
     })
   }

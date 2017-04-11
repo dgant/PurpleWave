@@ -14,7 +14,8 @@ object Flee extends Action {
       (intent.tactics.exists(_.wounded  == TacticWounded.Flee)       && wounded(intent))                    ||
       (intent.tactics.exists(_.wounded  == TacticWounded.FleeRanged) && wounded(intent) && ranged(intent))  ||
       (intent.tactics.exists(_.workers  == TacticWorkers.Flee)       && worker(intent))
-    )
+    ) &&
+    intent.threats.nonEmpty
   }
   
   override def perform(intent: Intention): Boolean = {

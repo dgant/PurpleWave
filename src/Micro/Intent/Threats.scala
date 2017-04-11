@@ -7,7 +7,7 @@ object Threats {
   
   def get(intent:Intention):Set[UnitInfo] =
     With.units.inTileRadius(
-      intent.unit.tileCenter,
+      intent.unit.tileIncluding,
       With.configuration.combatEvaluationDistanceTiles)
       .filter(threat =>
         threat.possiblyStillThere &&

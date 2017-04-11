@@ -106,7 +106,7 @@ class Architect {
     val marginArea = buildingArea.expand(margin, margin)
   
     tileHasRequiredPsi(tileTopleft, buildingClass) &&
-    marginArea.tiles.forall(With.grids.walkable.get) &&
+    marginArea.tiles.forall(tile => tile.valid && With.grids.walkable.get(tile)) &&
     rectangleIsBuildable(buildingArea, buildingClass, hypotheticalPylon) &&
     buildingArea.tiles.forall(_.valid) &&
     exclusions.forall( ! _.intersects(marginArea)) &&
@@ -132,6 +132,6 @@ class Architect {
     hypotheticalPylon:  Option[TilePosition] = None)
   :Boolean = {
     //HypotheticalPylon temporarily disabled
-    area.tiles.forall(tile => With.grids.buildable.get(tile))
+    area.tiles.forall(tile => tile.valid && With.grids.buildable.get(tile))
   }
 }

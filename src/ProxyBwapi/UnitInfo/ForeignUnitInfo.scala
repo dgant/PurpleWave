@@ -62,6 +62,8 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
   def possiblyStillThere : Boolean    = _possiblyStillThere
   def unitClass          : UnitClass  = _unitClass
   
+  def lastSeenWithin(frames: Int) = With.frame - _lastSeen < frames
+  
   ////////////
   // Health //
   ////////////

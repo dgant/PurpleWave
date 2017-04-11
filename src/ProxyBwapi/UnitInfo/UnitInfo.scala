@@ -12,7 +12,7 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   def friendly  : Option[FriendlyUnitInfo]  = None
   def foreign   : Option[ForeignUnitInfo]   = None
   
-  override def toString:String = unitClass.toString + " " + tileCenter.toString
+  override def toString:String = unitClass.toString + " " + tileIncluding.toString
   
   ////////////
   // Health //
@@ -28,7 +28,7 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   def x: Int = pixelCenter.getX
   def y: Int = pixelCenter.getY
   
-  def tileCenter: TilePosition = pixelCenter.toTilePosition
+  def tileIncluding: TilePosition = pixelCenter.tileIncluding
   def tileArea: TileRectangle = unitClass.tileArea.add(tileTopLeft)
   
   def canTraverse(tile:TilePosition)                : Boolean = flying || With.grids.walkable.get(tile)
@@ -40,7 +40,7 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   def pixelDistanceFast(enemy:UnitInfo)             : Double  = pixelDistanceFast(enemy.pixelCenter)
   def pixelDistanceSquared(enemy:UnitInfo)          : Double  = pixelDistanceSquared(enemy.pixelCenter)
   def pixelDistanceSquared(otherPixel:Position)     : Double  = pixelCenter.pixelDistanceSquared(otherPixel)
-  def travelPixels(destination:TilePosition)        : Double  = travelPixels(tileCenter, destination)
+  def travelPixels(destination:TilePosition)        : Double  = travelPixels(tileIncluding, destination)
   def travelPixels(origin:TilePosition, destination:TilePosition): Double =
     if (flying)
       origin.pixelCenter.pixelDistanceSlow(destination.pixelCenter)
@@ -80,7 +80,9 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
       unitClass.rawGroundDamageFactor * unitClass.maxGroundHits
     
   def damageTypeAgainst(enemy:UnitInfo): DamageType = if (enemy.flying) unitClass.rawAirDamageType else unitClass.rawGroundDamageType
-  def damageScaleAgainst(enemy:UnitInfo): Double = damageTypeAgainst(enemy) match {
+  def damageScaleAgainst(enemy:UnitInfo): Double =
+    if (enemy.shieldPoints > 5) 1.0 else
+    damageTypeAgainst(enemy) match {
     case DamageType.Concussive => enemy.unitClass.size match {
       case UnitSizeType.Large   => 0.25
       case UnitSizeType.Medium  => 0.5
@@ -102,7 +104,7 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
     damageToHealth + damageToShields
   }
   
-  def inTileRadius(tiles:Int)   : Set[UnitInfo] = With.units.inTileRadius(tileCenter, tiles)
+  def inTileRadius(tiles:Int)   : Set[UnitInfo] = With.units.inTileRadius(tileIncluding, tiles)
   def inPixelRadius(pixels:Int) : Set[UnitInfo] = With.units.inPixelRadius(pixelCenter, pixels)
   
   def canDoAnythingThisFrame:Boolean =

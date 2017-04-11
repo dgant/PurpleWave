@@ -1,12 +1,8 @@
 package ProxyBwapi.UnitInfo
 
-import ProxyBwapi.Techs.{Tech, Techs}
-import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
-import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
 import Lifecycle.With
-import Performance.Caching.CacheFrame
-
-import scala.collection.JavaConverters._
+import ProxyBwapi.Techs.{Tech, Techs}
+import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
 
 class FriendlyUnitInfo(base:bwapi.Unit) extends FriendlyUnitProxy(base) {
   
@@ -32,7 +28,6 @@ class FriendlyUnitInfo(base:bwapi.Unit) extends FriendlyUnitProxy(base) {
   ////////////
   
   def getBuildUnit  : Option[UnitInfo]    = With.units.get(base.getBuildUnit)
-  def trainingQueue : Iterable[UnitClass] = base.getTrainingQueue.asScala.map(UnitClasses.get)
   def teching       : Tech                = Techs.get(base.getTech)
   def upgrading     : Upgrade             = Upgrades.get(base.getUpgrade)
   
@@ -40,7 +35,7 @@ class FriendlyUnitInfo(base:bwapi.Unit) extends FriendlyUnitProxy(base) {
   // Visibility //
   ////////////////
   
-  override def detected = With.grids.enemyDetection.get(tileCenter)
+  override def detected = With.grids.enemyDetection.get(tileIncluding)
   
   //////////////
   // Movement //

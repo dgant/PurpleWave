@@ -8,7 +8,7 @@ object MovementHeuristicKeepMoving extends MovementHeuristic {
   
   override def evaluate(intent: Intention, candidate: TilePosition): Double = {
   
-    HeuristicMath.fromBoolean(intent.unit.tileCenter != candidate)
+    HeuristicMath.fromBoolean(intent.unit.tileIncluding != candidate)
     
   }
   

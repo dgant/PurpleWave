@@ -18,12 +18,12 @@ object EvaluateMoves {
     
     val candidates =
       Circle.points(searchRange)
-        .map(intent.unit.tileCenter.add)
+        .map(intent.unit.tileIncluding.add)
         .filter(_.valid)
         .filter(intent.unit.canTraverse)
   
     if (candidates.isEmpty) {
-      return intent.unit.tileCenter
+      return intent.unit.tileIncluding
     }
     
     if (With.configuration.visualizeHeuristicMovement) {

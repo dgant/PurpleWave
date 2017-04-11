@@ -29,7 +29,7 @@ class RemoveMineralBlocks extends Plan {
     if (ourMineralBlocks.isEmpty) return
     
     val mineral = ourMineralBlocks.head
-    miners.get.unitPreference.set(new UnitPreferClose { positionFinder.set(new TileSpecific(mineral.tileCenter)) } )
+    miners.get.unitPreference.set(new UnitPreferClose { positionFinder.set(new TileSpecific(mineral.tileIncluding)) } )
     miners.get.acquire(this)
     miners.get.units.foreach(unit => With.executor.intend(new Intention(this, unit) { toGather = Some(mineral) }))
   }

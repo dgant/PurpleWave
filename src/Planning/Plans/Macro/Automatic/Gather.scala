@@ -78,7 +78,7 @@ class Gather extends Plan {
       if (allSafeMinerals.nonEmpty) {
         safeMinerals ++= allSafeMinerals
           .toList
-          .sortBy(mineral => With.paths.groundPixels(mineral.tileCenter, With.geography.home))
+          .sortBy(mineral => With.paths.groundPixels(mineral.tileIncluding, With.geography.home))
           .take(9)
       }
     }
@@ -180,7 +180,7 @@ class Gather extends Plan {
   
   private def safe(resource:UnitInfo):Boolean = {
     With.battles.byZone
-      .get(With.geography.zoneByTile(resource.tileCenter))
+      .get(With.geography.zoneByTile(resource.tileIncluding))
       .forall(zone => zone.us.strength >= zone.enemy.strength)
   }
   

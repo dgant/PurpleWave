@@ -38,8 +38,8 @@ class Battles {
   }
   
   private def buildBattlesByZone() {
-    val combatantsOursByZone  = combatantsOurs .groupBy(_.tileCenter.zone)
-    val combatantsEnemyByZone = combatantsEnemy.groupBy(_.tileCenter.zone)
+    val combatantsOursByZone  = combatantsOurs .groupBy(_.tileIncluding.zone)
+    val combatantsEnemyByZone = combatantsEnemy.groupBy(_.tileIncluding.zone)
     byZone = With.geography.zones
       .map(zone => (
         zone,
@@ -51,8 +51,12 @@ class Battles {
   }
   
   private def buildBattlesLocal() {
-    if (combatantsEnemy.isEmpty) return
-    val framesToLookAhead = 2 * With.performance.frameDelay(delayLength)
+    if (combatantsEnemy.isEmpty) {
+      byUnit = Map.empty
+      return
+    }
+    val searchMargin = 32.0 * 2
+    val framesToLookAhead = Math.max(12, 2 * With.performance.frameDelay(delayLength))
     val unassigned = mutable.HashSet.empty ++ combatantsOurs ++ combatantsEnemy
     val clusters = new ListBuffer[mutable.HashSet[UnitInfo]]
     val horizon = new mutable.HashSet[UnitInfo]
@@ -68,9 +72,11 @@ class Battles {
           .inTileRadius(With.configuration.combatEvaluationDistanceTiles)
           .filter(unassigned.contains)
           .filter(otherUnit =>
-            nextUnit.pixelsFromEdgeFast(otherUnit) <= Math.max(
-              nextUnit.pixelReachDamage(framesToLookAhead),
-              otherUnit.pixelReachDamage(framesToLookAhead)))
+            nextUnit.pixelsFromEdgeFast(otherUnit) <=
+              searchMargin +
+              Math.max(
+                nextUnit.pixelReachDamage(framesToLookAhead),
+                otherUnit.pixelReachDamage(framesToLookAhead)))
       }
       clusters.append(nextCluster)
     }

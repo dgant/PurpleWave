@@ -4,6 +4,7 @@ import Debugging.Visualization.Rendering.{DrawMap, DrawScreen}
 import Information.Battles.Battle
 import Information.Battles.Simulation.Construction.{BattleSimulation, BattleSimulationGroup}
 import Lifecycle.With
+import Planning.Yolo
 import Utilities.EnrichPosition._
 import bwapi.{Color, Position}
 
@@ -17,7 +18,13 @@ object VisualizeBattles {
     if (battlesWithSimulations.nonEmpty) {
       
       drawBattleReport(
-        With.battles.local.minBy(battle => battle.focus.pixelDistanceSquared(With.viewport.center)).bestSimulationResult.get)
+        With.battles.local
+          .minBy(battle => battle.focus.pixelDistanceSquared(With.viewport.center))
+          .bestSimulationResult
+          .get)
+    }
+    if (Yolo.enabled && With.frame / 24 % 2 == 0) {
+      With.game.drawTextScreen(5, 5, "YOLO")
     }
   }
   

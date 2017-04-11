@@ -2,7 +2,7 @@ package Debugging
 
 class Configuration {
   
-  val combatEvaluationDistanceTiles   = 18
+  val combatEvaluationDistanceTiles   = 15
   val combatDistancePenalty           = 0.25
   val combatMovementPenalty           = 0.5
   val combatCooldownPenalty           = 0.75
@@ -36,7 +36,7 @@ class Configuration {
   var enableChat                  = true
   var enableLatencyCompensation   = false
   
-  var enableCamera                = true
+  var enableCamera                = false
   var cameraDynamicSpeed          = false
   var cameraDynamicSpeedSlowest   = 30
   var cameraDynamicSpeedFastest   = 0

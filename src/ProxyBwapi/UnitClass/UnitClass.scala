@@ -274,4 +274,7 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
   private def addBuildUnitIf(classes:ListBuffer[UnitClass], ifThisClass:UnitClass, thenAddThatClass:UnitClass) {
     addBuildUnitIf(classes, this == ifThisClass, thenAddThatClass)
   }
+  
+  lazy val mineralValue : Int = mineralPrice + buildUnitsSpent.map(_.mineralValue).sum
+  lazy val gasValue     : Int = mineralPrice + buildUnitsSpent.map(_.gasValue).sum
 }

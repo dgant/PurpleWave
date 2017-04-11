@@ -14,7 +14,7 @@ class Intelligence {
       .filterNot(_.flying)
       .sortBy(unit => ! unit.unitClass.isBuilding)
       .sortBy(unit => ! unit.unitClass.isTownHall)
-      .map(_.tileCenter)
+      .map(_.tileIncluding)
       .headOption
       .getOrElse(leastScoutedBases.head.townHallArea.midpoint))
   

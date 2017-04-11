@@ -4,6 +4,8 @@ import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
 import Lifecycle.With
 import bwapi._
 
+import
+
 abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
   
   override def equals(obj: Any): Boolean = obj.isInstanceOf[FriendlyUnitProxy] && obj.asInstanceOf[FriendlyUnitProxy].id == id
@@ -106,7 +108,7 @@ abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
   
   def command:UnitCommand = base.getLastCommand
   def commandFrame:Int = base.getLastCommandFrame
-  
+  def trainingQueue: Iterable[UnitClass] = base.getTrainingQueue.asScala.map(UnitClasses.get)
   ////////////////
   // Visibility //
   ////////////////

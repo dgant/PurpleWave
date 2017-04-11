@@ -37,7 +37,12 @@ object BaseFinder {
     val centroid = resources.map(_.pixelCenter).centroid
     val centroidTile = centroid.toTilePosition
     val searchRadius = 10
-    val candidates = Circle.points(searchRadius).map(centroidTile.add).filter(isLegalTownHallTile)
+    val candidates =
+      Circle
+        .points(searchRadius)
+        .map(centroidTile.add)
+        .filter(isLegalTownHallTile)
+        .filter(tile => With.geography.zoneByTile(tile) == With.geography.zoneByTile(resources.head))
     if (candidates.isEmpty) return None
     Some(candidates.minBy(_.toPosition.add(64, 48).pixelDistanceSlow(centroid)))
   }

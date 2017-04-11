@@ -14,12 +14,12 @@ class TileSimpleBuilding(val buildingClass:UnitClass) extends TileFinder {
   private var lastFailure = 0
   
   def find: Option[TilePosition] = {
-    if (With.frame > 24 * 60 * 5 || lastFailure < With.frame - 24 * 5) {
+    //Don't lag out due to lack of pylon space
+    if (With.frame < 24 * 60 * 3 || lastFailure < With.frame - 24 * 5) {
       lastTile = if (lastTileValid) lastTile else requestTile
-    }
-    
-    if (lastTile == None) {
-      lastFailure = With.frame
+      if (lastTile == None) {
+        lastFailure = With.frame
+      }
     }
     
     lastTile

@@ -11,7 +11,7 @@ class Bank {
   private var supplyLeft    = 0
   private val requests      = new mutable.HashSet[LockCurrency]()
   
-  def onFrame() {
+  def update() {
     requests.clear()
     recountResources()
   }

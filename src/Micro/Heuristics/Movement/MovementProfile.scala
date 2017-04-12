@@ -1,6 +1,6 @@
 package Micro.Heuristics.Movement
 
-import Debugging.Visualization.Colors
+import Debugging.Visualizations.Colors
 import Micro.Heuristics.MovementHeuristics._
 
 class MovementProfile(

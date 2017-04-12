@@ -15,12 +15,12 @@ class SwitchEnemyRace extends Plan {
   
   override def getChildren: Iterable[Plan] = Vector(terran.get, protoss.get, zerg.get, random.get)
   
-  override def onFrame() =
+  override def update() =
     With.game.enemies.asScala.headOption.foreach(
       _.getRace match {
-        case Race.Terran    => terran.get.onFrame()
-        case Race.Protoss   => protoss.get.onFrame()
-        case Race.Zerg      => zerg.get.onFrame()
-        case _              => random.get.onFrame()
+        case Race.Terran    => terran.get.update()
+        case Race.Protoss   => protoss.get.update()
+        case Race.Zerg      => zerg.get.update()
+        case _              => random.get.update()
       })
 }

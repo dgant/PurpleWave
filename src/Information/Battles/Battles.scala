@@ -19,10 +19,8 @@ class Battles {
           var byZone          : Map[Zone, Battle]     = Map.empty
           var byUnit          : Map[UnitInfo, Battle] = Map.empty
           var local           : Vector[Battle]          = Vector.empty
-  
-  def onFrame() = updateLimiter.act()
-  private val updateLimiter = new Limiter(delayLength, update)
-  private def update() {
+
+  def update() {
     combatantsOurs  = With.units.ours .filter(unit => unit.unitClass.helpsInCombat)
     combatantsEnemy = With.units.enemy.filter(unit => unit.unitClass.helpsInCombat && unit.possiblyStillThere)
     buildBattleGlobal()

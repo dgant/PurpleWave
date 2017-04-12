@@ -1,6 +1,6 @@
 package ProxyBwapi.Players
 
-import Debugging.Visualization.Colors
+import Debugging.Visualizations.Colors
 import bwapi.Player
 
 case class PlayerInfo(basePlayer:Player) extends PlayerProxy(basePlayer) {

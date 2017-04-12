@@ -26,11 +26,14 @@ class Scheduler {
     recentlyUpdated.add(requester)
   }
   
-  def onFrame() = {
+  def update() = {
     requestsByPlan.keySet.diff(recentlyUpdated).foreach(requestsByPlan.remove)
+    
+    //TODO: This needs to go elsewhere when we go async!
     recentlyUpdated.clear()
     updateQueueLimiter.act()
   }
+  
   private val updateQueueLimiter = new Limiter(2, () => updateQueue())
   private def updateQueue() {
     val requestQueue = requestsByPlan.keys.toVector.sortBy(With.prioritizer.getPriority).flatten(requestsByPlan)

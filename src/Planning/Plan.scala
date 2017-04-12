@@ -7,7 +7,7 @@ class Plan {
   
   def isComplete:Boolean = false
   def getChildren:Iterable[Plan] = Vector.empty
-  def onFrame() = {}
+  def update() = {}
   def drawOverlay() = {}
   
   override def toString: String =

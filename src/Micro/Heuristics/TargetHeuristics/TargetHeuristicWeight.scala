@@ -1,6 +1,6 @@
 package Micro.Heuristics.TargetHeuristics
 
-import Debugging.Visualization.Colors
+import Debugging.Visualizations.Colors
 import Mathematics.Heuristics.HeuristicWeight
 import bwapi.Color
 

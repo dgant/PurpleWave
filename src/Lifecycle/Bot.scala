@@ -1,6 +1,7 @@
 package Lifecycle
 
-import Debugging.{Visualization, _}
+import Debugging.Visualizations.Visualization
+import Debugging._
 import bwapi.DefaultBWListener
 
 class Bot() extends DefaultBWListener {
@@ -20,34 +21,10 @@ class Bot() extends DefaultBWListener {
       With.onFrame()
       With.performance.startCounting()
       With.latency.onFrame()
-      if (With.latency.shouldRun) {
-        
-        //Observe
-        With.units.onFrame()
-        With.geography.onFrame()
-        With.grids.onFrame()
-        
-        //Orient
-        With.battles.onFrame()
-        With.economy.onFrame()
-        With.realEstate.onFrame()
-        With.bank.onFrame()
-        With.recruiter.onFrame()
-        With.prioritizer.onFrame()
-        
-        //Decide
-        With.gameplan.onFrame()
-        With.scheduler.onFrame()
-        
-        //Act
-        With.commander.onFrame()
-        With.executor.onFrame()
-      }
-      With.performance.stopCounting()
-      
+      With.systems.onFrame()
       With.camera.onFrame()
-      Visualization.Visualization.onFrame()
-      Manners.onFrame()
+      Visualization.onFrame()
+      With.performance.stopCounting()
     }
     catch { case exception:Exception =>
       val dontLoseTheExceptionWhileDebugging = exception
@@ -96,6 +73,6 @@ class Bot() extends DefaultBWListener {
   }
   
   override def onSendText(text: String) {
-   KeyboardCommands.onSendText(text)
+    KeyboardCommands.onSendText(text)
   }
 }

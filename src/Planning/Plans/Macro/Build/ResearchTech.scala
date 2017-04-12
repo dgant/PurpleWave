@@ -20,7 +20,7 @@ class ResearchTech(tech: Tech) extends Plan {
   
   override def isComplete: Boolean = With.self.hasResearched(tech)
   
-  override def onFrame() {
+  override def update() {
     if (isComplete) return
     
     currency.acquire(this)

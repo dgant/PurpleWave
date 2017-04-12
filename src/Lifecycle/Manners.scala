@@ -2,7 +2,7 @@ package Lifecycle
 
 object Manners {
   
-  def onFrame() {
+  def run() {
     if (With.configuration.enableSurrendering
       && With.self.supplyUsed == 0
       && With.self.minerals < 50

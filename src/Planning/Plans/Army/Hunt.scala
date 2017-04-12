@@ -1,6 +1,6 @@
 package Planning.Plans.Army
 
-import Debugging.Visualization.Rendering.DrawMap
+import Debugging.Visualizations.Rendering.DrawMap
 import Micro.Intent.Intention
 import Planning.Composition.PositionFinders.TileFinder
 import Planning.Composition.PositionFinders.Tactics.TileEnemyBase
@@ -18,7 +18,7 @@ class Hunt extends Plan {
   val hunters = new Property[LockUnits](new LockUnits { unitMatcher.set(UnitMatchWarriors) })
   var position = new Property[TileFinder](new TileEnemyBase)
   
-  override def onFrame() {
+  override def update() {
     
     val targetPosition = position.get.find.getOrElse(With.intelligence.mostBaselikeEnemyPosition)
     

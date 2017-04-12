@@ -1,6 +1,6 @@
 package Planning.Plans.Macro.Build
 
-import Debugging.Visualization.Rendering.DrawMap
+import Debugging.Visualizations.Rendering.DrawMap
 import Micro.Intent.Intention
 import Planning.Composition.PositionFinders.Buildings.TileArbitraryBuilding
 import Planning.Composition.UnitCounters.UnitCountOne
@@ -35,7 +35,7 @@ class BuildBuilding(val buildingClass:UnitClass) extends Plan {
   
   def startedBuilding:Boolean = building.isDefined
   
-  override def onFrame() {
+  override def update() {
     if (isComplete) return
     
     building = building.filter(_.alive)

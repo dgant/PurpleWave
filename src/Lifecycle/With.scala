@@ -1,7 +1,7 @@
 package Lifecycle
 
-import Debugging.Visualization.Viewport
-import Debugging.{AutoCamera, Configuration, Logger, Performance}
+import Debugging.Visualizations.Viewport
+import Debugging.{AutoCamera, Configuration, Logger}
 import Information.Battles.Battles
 import Information.Geography.Geography
 import Information.Geography.Pathfinding.Paths
@@ -16,7 +16,7 @@ import Planning.Plans.GamePlans.WinTheGame
 import ProxyBwapi.Players.{PlayerInfo, Players}
 import ProxyBwapi.ProxyBWMirror
 import ProxyBwapi.UnitTracking.UnitTracker
-import _root_.Performance.Latency
+import _root_.Performance.{Latency, PerformanceMonitor, SystemQueue}
 import bwta.BWTA
 
 import scala.collection.JavaConverters._
@@ -38,25 +38,26 @@ object With {
   var latency       : Latency       = null
   var logger        : Logger        = null
   var paths         : Paths         = null
-  var performance   : Performance   = null
+  var performance   : PerformanceMonitor   = null
   var proxy         : ProxyBWMirror = null
   var prioritizer   : Prioritizer   = null
   var realEstate    : RealEstate    = null
   var recruiter     : Recruiter     = null
   var scheduler     : Scheduler     = null
+  var systems       : SystemQueue       = null
   var units         : UnitTracker   = null
   var viewport      : Viewport      = null
   
   var self    : PlayerInfo         = null
   var neutral : PlayerInfo         = null
-  var enemies : Vector[PlayerInfo]   = null
+  var enemies : Vector[PlayerInfo] = null
   
   var frame       : Int = 0
   var mapWidth    : Int = 0
   var mapHeight   : Int = 0
   
   def onFrame() {
-    frame         = With.game.getFrameCount
+    frame = With.game.getFrameCount
   }
   
   def onStart() {
@@ -82,11 +83,12 @@ object With {
     With.intelligence           = new Intelligence
     With.latency                = new Latency
     With.paths                  = new Paths
-    With.performance            = new Performance
+    With.performance            = new PerformanceMonitor
     With.prioritizer            = new Prioritizer
     With.realEstate             = new RealEstate
     With.recruiter              = new Recruiter
     With.scheduler              = new Scheduler
+    With.systems                = new SystemQueue
     With.units                  = new UnitTracker
     With.viewport               = new Viewport
   

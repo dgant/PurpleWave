@@ -61,7 +61,7 @@ class UnitTracker {
     output
   }
   
-  def onFrame() {
+  def update() {
     friendlyUnitTracker.onFrame()
     foreignUnitTracker.onFrame()
   }

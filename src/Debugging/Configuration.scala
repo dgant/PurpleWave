@@ -6,9 +6,10 @@ class Configuration {
   val combatDistancePenalty           = 0.25
   val combatMovementPenalty           = 0.5
   val combatCooldownPenalty           = 0.75
-  val combatStickinessLeash           = 64
-  var enablePathRecalculation         = false
+  val combatStickinessLeash           = 0
   var enableFastGroundDistance        = true
+  var enablePathRecalculation         = true
+  var pathRecalculationDelayFrames    = 240
   
   var visualize                   = true
   var visualizeBases              = false
@@ -36,10 +37,21 @@ class Configuration {
   var enableChat                  = true
   var enableLatencyCompensation   = false
   
-  var enableCamera                = false
+  var camera                      = false
   var cameraDynamicSpeed          = false
   var cameraDynamicSpeedSlowest   = 30
   var cameraDynamicSpeedFastest   = 0
   var viewportWidth               = 640 * 2
   var viewportHeight              = 480 * 2
+  
+  var maxFrameMilliseconds = 80
+  
+  var urgencyManners      = 1
+  var urgencyEconomy      = 2
+  var urgencyBattles      = 3
+  var urgencyGeography    = 4
+  var urgencyPlanning     = 6
+  var urgencyMicro        = 7
+  var urgencyGrids        = 8
+  var urgencyUnitTracking = 10
 }

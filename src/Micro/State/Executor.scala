@@ -17,7 +17,7 @@ class Executor {
     getState(intention.unit).intent = intention
   }
   
-  def onFrame() {
+  def run() {
     
     stateByUnit
       .keys

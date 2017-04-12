@@ -7,7 +7,7 @@ import Lifecycle.With
 
 class TrainContinuously(unitClass: UnitClass) extends Plan {
   
-  override def onFrame() {
+  override def update() {
     if ( ! canBuild) return
     
     With.scheduler.request(this, Vector(

@@ -13,7 +13,7 @@ class Economy {
   
   val samplingRate = 24
   var _lastFrame = 0
-  def onFrame() = {
+  def update() = {
     val frameDiff = With.frame - _lastFrame
     //Don't change estimate while paused
     if (frameDiff > samplingRate) {

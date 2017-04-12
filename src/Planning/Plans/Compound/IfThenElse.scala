@@ -18,11 +18,11 @@ class IfThenElse(
   override def getChildren: Iterable[Plan] = Vector(predicate.get, whenTrue.get, whenFalse.get)
   override def isComplete: Boolean = predicate.get.isComplete && whenTrue.get.isComplete
   
-  override def onFrame() {
-    predicate.get.onFrame()
+  override def update() {
+    predicate.get.update()
     if (predicate.get.isComplete)
-      whenTrue.get.onFrame()
+      whenTrue.get.update()
     else
-      whenFalse.get.onFrame()
+      whenFalse.get.update()
   }
 }

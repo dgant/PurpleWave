@@ -10,7 +10,7 @@ class AutoCamera {
   var focus:Position = Positions.middle
   
   def onFrame() {
-    if ( ! With.configuration.enableCamera) { return }
+    if ( ! With.configuration.camera) { return }
     
     if (With.battles.local.nonEmpty) {
       focus = With.battles.local.toVector.sortBy(_.focus.pixelDistanceFast(focus)).maxBy(b => b.enemy.strength * b.us.strength).us.vanguard

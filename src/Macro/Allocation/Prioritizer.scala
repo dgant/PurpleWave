@@ -10,7 +10,7 @@ class Prioritizer {
   private val priorities = new mutable.HashMap[Plan, Integer]
   var nextPriority = 0
   
-  def onFrame() {
+  def update() {
     nextPriority = 0
     priorities.clear()
     prioritizeTree(With.gameplan)

@@ -47,7 +47,7 @@ class Geography {
       .map(_.townHallArea.startInclusive)
       .getOrElse(Positions.Positions.tileMiddle))
   
-  def onFrame() {
+  def update() {
     zoneUpdateLimiter.act()
     bases.filter(base => With.game.isVisible(base.townHallArea.midpoint)).foreach(base => base.lastScoutedFrame = With.frame)
   }

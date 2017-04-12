@@ -13,11 +13,11 @@ class JustOnce(initialChild:Plan = new Plan) extends Plan {
   
   override def isComplete: Boolean = _everCompleted
   override def getChildren: Iterable[Plan] = Vector(child.get)
-  override def onFrame() {
+  override def update() {
     _everCompleted ||= child.get.isComplete
     
     if ( ! isComplete) {
-      child.get.onFrame()
+      child.get.update()
     }
   }
 }

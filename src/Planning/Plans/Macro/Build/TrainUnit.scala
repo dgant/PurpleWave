@@ -1,6 +1,6 @@
 package Planning.Plans.Macro.Build
 
-import Debugging.Visualization.Rendering.DrawMap
+import Debugging.Visualizations.Rendering.DrawMap
 import Micro.Intent.Intention
 import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Composition.UnitMatchers.UnitMatchType
@@ -25,7 +25,7 @@ class TrainUnit(val traineeClass:UnitClass) extends Plan {
   
   override def isComplete: Boolean = trainee.exists(p => p.alive && p.complete)
   
-  override def onFrame() {
+  override def update() {
     if (isComplete) return
   
     // Trainee dead? Forget we had one.

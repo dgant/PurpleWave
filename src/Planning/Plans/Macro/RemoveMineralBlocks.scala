@@ -20,7 +20,7 @@ class RemoveMineralBlocks extends Plan {
   miners.get.unitMatcher.set(UnitMatchWorker)
   miners.get.unitCounter.set(UnitCountOne)
   
-  override def onFrame() {
+  override def update() {
     val ourEdges = With.geography.ourZones.flatten(_.edges)
     val ourMineralBlocks = With.units.neutral
       .filter(unit => unit.unitClass.isMinerals && unit.mineralsLeft <= 24)

@@ -6,8 +6,8 @@ import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClass.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import ProxyBwapi.Upgrades.Upgrade
+import Utilities.CountMap
 import Utilities.EnrichPosition._
-import Utilities.{CountMap, RandomState}
 import bwapi.{Position, TilePosition, UnitCommandType}
 
 // Commander is responsible for issuing unit commands
@@ -20,7 +20,7 @@ class Commander {
   
   private val nextOrderFrame = new CountMap[FriendlyUnitInfo]
   
-  def onFrame() {
+  def run() {
     nextOrderFrame.keySet.filterNot(_.alive).foreach(nextOrderFrame.remove)
   }
   
@@ -74,9 +74,7 @@ class Commander {
     //
     // So we'll try to get the best of both worlds, and recalculate paths *occasionally*
     if (With.configuration.enablePathRecalculation) {
-      destination = destination.add(
-        RandomState.random.nextInt(5) - 2,
-        RandomState.random.nextInt(5) - 2)
+      destination = destination.add((With.frame / With.configuration.pathRecalculationDelayFrames) % 3 - 1, 0)
     }
     
     if (intent.unit.pixelDistanceFast(destination) > 7) {

@@ -30,7 +30,7 @@ class FollowBuildOrder extends Plan {
     })
   }
   
-  override def onFrame() {
+  override def update() {
     //Remove complete plans
     plans.values.foreach(plans => plans.indices.foreach(i =>
       while (i < plans.size && plans(i).isComplete) plans.remove(i)))
@@ -49,7 +49,7 @@ class FollowBuildOrder extends Plan {
       //Consider removing excess plans
     })
     
-    getChildren.foreach(_.onFrame())
+    getChildren.foreach(_.update())
   }
   
   private def buildPlan(buildable:Buildable):Plan = {

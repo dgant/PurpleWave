@@ -9,7 +9,7 @@ class RealEstate {
   
   val requests = new mutable.HashSet[LockArea]
   
-  def onFrame() {
+  def update() {
     requests.clear()
   }
   

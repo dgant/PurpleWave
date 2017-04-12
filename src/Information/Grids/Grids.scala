@@ -4,7 +4,6 @@ import Information.Grids.Construction.{GridBuildable, GridBuildableTerrain, Grid
 import Information.Grids.Dps._
 import Information.Grids.Movement.{GridMobility, GridWalkable, GridWalkableTerrain, GridWalkableUnits}
 import Information.Grids.Vision.{GridAltitudeBonus, GridEnemyDetection, GridEnemyVision}
-import Performance.Caching.Limiter
 
 class Grids {
   
@@ -64,8 +63,6 @@ class Grids {
   )
   
   private var lastBatchUpdated = 0
-  def onFrame() = limitUpdates.act()
-  val limitUpdates = new Limiter(1, () => update)
   
   def update() {
     lastBatchUpdated = (lastBatchUpdated + 1) % updateBatches.size

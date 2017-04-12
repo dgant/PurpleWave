@@ -24,7 +24,7 @@ class FindEnemyBase extends Plan {
   
   override def isComplete: Boolean = With.geography.enemyBases.nonEmpty
   
-  override def onFrame() {
+  override def update() {
     scouts.get.acquire(this)
     scouts.get.units.foreach(orderScout)
   }

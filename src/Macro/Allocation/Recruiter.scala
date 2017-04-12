@@ -14,7 +14,7 @@ class Recruiter {
   private val unitsByRequest  : mutable.HashMap[LockUnits, mutable.Set[FriendlyUnitInfo]] = mutable.HashMap.empty
   private val updatedRequests : mutable.Set[LockUnits]                                    = mutable.Set.empty
 
-  def onFrame() {
+  def update() {
     // Free units held by inactive requests
     unitsByRequest.keySet.diff(updatedRequests).foreach(forgetRequest)
     updatedRequests.clear()

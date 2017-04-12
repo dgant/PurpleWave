@@ -9,7 +9,7 @@ class BuildEnoughPylons extends Plan {
   
   description.set("Builds Pylons just-in-time to prevent supply block")
   
-  override def onFrame() {
+  override def update() {
     With.scheduler.request(this, Vector(new RequestUnitAtLeast(totalRequiredRecalculate, Protoss.Pylon)))
   }
   

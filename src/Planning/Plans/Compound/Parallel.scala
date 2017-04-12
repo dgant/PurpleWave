@@ -6,5 +6,5 @@ class Parallel(initialChildren:Plan*) extends AbstractAll(initialChildren: _*) {
   
   description.set("Do in parallel")
   
-  override def onFrame() = getChildren.foreach(_.onFrame())
+  override def update() = getChildren.foreach(_.update())
 }

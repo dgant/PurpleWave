@@ -10,5 +10,5 @@ class Not(initialChild:Plan = new Plan) extends Plan {
   val child = new Property[Plan](initialChild)
   
   override def isComplete: Boolean = ! child.get.isComplete
-  override def onFrame() = child.get.onFrame()
+  override def update() = child.get.update()
 }

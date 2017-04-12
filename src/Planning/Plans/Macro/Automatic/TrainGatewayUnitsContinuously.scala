@@ -9,7 +9,7 @@ import scala.collection.mutable.ListBuffer
 
 class TrainGatewayUnitsContinuously extends Plan {
   
-  override def onFrame() {
+  override def update() {
     val gateways = With.units.ours.filter(u => u.alive && u.complete && u.unitClass == Protoss.Gateway)
     
     val requests = new ListBuffer[BuildRequest]

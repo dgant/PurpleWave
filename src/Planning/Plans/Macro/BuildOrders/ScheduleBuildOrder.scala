@@ -11,5 +11,5 @@ class ScheduleBuildOrder(initialBuildables:Seq[BuildRequest] = Vector.empty) ext
   
   val buildables = new Property[Seq[BuildRequest]](initialBuildables)
   
-  override def onFrame() = With.scheduler.request(this, buildables.get)
+  override def update() = With.scheduler.request(this, buildables.get)
 }

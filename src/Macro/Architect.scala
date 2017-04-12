@@ -102,9 +102,10 @@ class Architect {
     hypotheticalPylon:  Option[TilePosition]    = None)
       :Boolean = {
   
-    val buildingArea = buildingClass.tileArea.add(tileTopleft)
-    val marginArea = buildingArea.expand(margin, margin)
+    lazy val buildingArea = buildingClass.tileArea.add(tileTopleft)
+    lazy val marginArea = buildingArea.expand(margin, margin)
   
+    With.grids.buildable.get(tileTopleft) &&
     tileHasRequiredPsi(tileTopleft, buildingClass) &&
     marginArea.tiles.forall(tile => tile.valid && With.grids.walkable.get(tile)) &&
     rectangleIsBuildable(buildingArea, buildingClass, hypotheticalPylon) &&
@@ -131,6 +132,6 @@ class Architect {
     hypotheticalPylon:  Option[TilePosition] = None)
   :Boolean = {
     //HypotheticalPylon temporarily disabled
-    area.tiles.forall(tile => tile.valid && With.grids.buildable.get(tile))
+    area.tiles.forall(tile => With.grids.buildable.get(tile))
   }
 }

@@ -103,18 +103,18 @@ class ProtossVsProtoss extends Parallel {
   )
   
   children.set(Vector(
-    new ScheduleBuildOrder { buildables.set(_fourGateGoonsSimplifiedStart) },
+    new ScheduleBuildOrder(_fourGateGoonsSimplifiedStart),
     new BuildEnoughPylons,
     new TrainProbesContinuously,
     new TrainContinuously(Protoss.Reaver),
     new TrainGatewayUnitsContinuously,
-    new ScheduleBuildOrder { buildables.set(_fourGateGoonsSimplifiedEnd) },
-    new ScheduleBuildOrder { buildables.set(_twoBaseBuild) },
+    new ScheduleBuildOrder(_fourGateGoonsSimplifiedEnd),
+    new ScheduleBuildOrder(_twoBaseBuild),
     new ScoutAt(10),
-    new IfThenElse {
-      predicate.set(new UnitCountAtLeast { quantity.set(6); unitMatcher.set(UnitMatchWarriors) })
-      whenFalse.set(new Defend)
-      whenTrue.set(new Attack)
-    }
+    new IfThenElse(
+      new UnitCountAtLeast(6, UnitMatchWarriors),
+      new Defend,
+      new Attack
+    )
   ))
 }

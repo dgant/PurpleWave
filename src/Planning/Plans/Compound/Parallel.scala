@@ -1,6 +1,8 @@
 package Planning.Plans.Compound
 
-class Parallel extends AbstractAll {
+import Planning.Plan
+
+class Parallel(initialChildren:Plan*) extends AbstractAll(initialChildren: _*) {
   
   description.set("Do in parallel")
   

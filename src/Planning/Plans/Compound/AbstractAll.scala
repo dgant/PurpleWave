@@ -3,9 +3,9 @@ package Planning.Plans.Compound
 import Planning.Composition.Property
 import Planning.Plan
 
-abstract class AbstractAll extends Plan {
+abstract class AbstractAll(initialChildren:Plan*) extends Plan {
   
-  val children = new Property[Vector[Plan]](Vector.empty)
+  val children = new Property[Vector[Plan]](initialChildren.toVector)
   
   override def isComplete:Boolean = getChildren.forall(_.isComplete)
   

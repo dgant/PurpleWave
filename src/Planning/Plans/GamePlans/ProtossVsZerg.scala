@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans
 import Macro.BuildRequests.{BuildRequest, RequestUnitAnotherOne, RequestUnitAtLeast, RequestUpgrade}
 import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors}
 import Planning.Plans.Army.{Attack, Defend}
-import Planning.Plans.Compound.{IfThenElse, Parallel}
+import Planning.Plans.Compound.{And, IfThenElse, Parallel}
 import Planning.Plans.Information.ScoutAt
 import Planning.Plans.Macro.Automatic.{BuildEnoughPylons, TrainContinuously, TrainProbesContinuously}
 import Planning.Plans.Macro.BuildOrders.ScheduleBuildOrder
@@ -28,17 +28,18 @@ class ProtossVsZerg extends Parallel {
   val _twoBase = Vector[BuildRequest] (
     new RequestUnitAtLeast(2,   Protoss.Nexus),
     new RequestUnitAtLeast(3,   Protoss.Gateway),
-    new RequestUnitAtLeast(2,   Protoss.Assimilator),
     new RequestUnitAtLeast(1,   Protoss.CyberneticsCore),
+    new RequestUnitAtLeast(2,   Protoss.Assimilator),
     new RequestUnitAtLeast(1,   Protoss.Stargate),
     new RequestUnitAtLeast(1,   Protoss.Forge),
     new RequestUnitAtLeast(1,   Protoss.CitadelOfAdun),
     new RequestUpgrade(         Protoss.ZealotLegs),
     new RequestUpgrade(         Protoss.GroundWeapons, 1),
+    new RequestUnitAtLeast(2,   Protoss.PhotonCannon),
     
     new RequestUnitAtLeast(3,   Protoss.Nexus),
-    new RequestUnitAtLeast(2,   Protoss.PhotonCannon),
     new RequestUnitAtLeast(1,   Protoss.RoboticsFacility),
+    new RequestUnitAtLeast(4,   Protoss.PhotonCannon),
     new RequestUnitAtLeast(3,   Protoss.Assimilator),
     new RequestUpgrade(         Protoss.DragoonRange),
     new RequestUnitAtLeast(1,   Protoss.RoboticsSupportBay),
@@ -74,23 +75,30 @@ class ProtossVsZerg extends Parallel {
   )
   
   children.set(Vector(
-    new ScheduleBuildOrder { buildables.set(_oneBaseTwoGate) },
+    new ScheduleBuildOrder(_oneBaseTwoGate),
     new BuildEnoughPylons,
     new TrainProbesContinuously,
     new TrainContinuously(Protoss.Reaver),
     new TrainContinuously(Protoss.Corsair),
-    new IfThenElse {
-      predicate.set(new UnitCountAtLeast { quantity.set(10); unitMatcher.set(new UnitMatchType(Protoss.Zealot)) })
-      whenFalse.set(new TrainContinuously(Protoss.Zealot))
-      whenTrue.set(new TrainContinuously(Protoss.Dragoon))
-    },
-    new ScheduleBuildOrder { buildables.set(_twoBase) },
+    new IfThenElse(
+      new And(
+        new UnitCountAtLeast(1, new UnitMatchType(Protoss.CyberneticsCore)),
+        new UnitCountAtLeast(1, new UnitMatchType(Protoss.Assimilator))
+      ),
+      new IfThenElse (
+        new UnitCountAtLeast(5, new UnitMatchType(Protoss.Zealot)),
+        new TrainContinuously(Protoss.Zealot),
+        new TrainContinuously(Protoss.Dragoon)
+      ),
+      new TrainContinuously(Protoss.Zealot)
+    ),
+    new ScheduleBuildOrder(_twoBase),
     new ScoutAt(10),
     new Attack{ attackers.get.unitMatcher.set(new UnitMatchType(Protoss.Corsair)) },
-    new IfThenElse {
-      predicate.set(new UnitCountAtLeast { quantity.set(16); unitMatcher.set(UnitMatchWarriors) })
-      whenFalse.set(new Defend)
-      whenTrue.set(new Attack)
-    }
+    new IfThenElse(
+      new UnitCountAtLeast(12, UnitMatchWarriors),
+      new Defend,
+      new Attack
+    )
   ))
 }

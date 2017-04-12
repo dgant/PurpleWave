@@ -137,20 +137,19 @@ class ProtossVsTerran extends Parallel {
   )
   
   children.set(Vector(
-    new ScheduleBuildOrder { buildables.set(_13Nexus) },
+    new ScheduleBuildOrder(_13Nexus),
     new BuildEnoughPylons,
     new TrainProbesContinuously,
     new TrainContinuously(Protoss.Reaver),
     new TrainContinuously(Protoss.Carrier),
     new TrainContinuously(Protoss.Zealot),
-    new ScheduleBuildOrder { buildables.set(_lateGame) },
+    new ScheduleBuildOrder(_lateGame),
     new ScoutAt(10),
     new Hunt { hunters.get.unitMatcher.set(new UnitMatchType(Protoss.Scout)) },
     new Hunt { hunters.get.unitMatcher.set(new UnitMatchType(Protoss.Carrier)) },
-    new IfThenElse {
-      predicate.set(new UnitCountAtLeast { quantity.set(20); unitMatcher.set(UnitMatchWarriors) })
-      whenFalse.set(new Defend)
-      whenTrue.set(new Attack)
-    }
+    new IfThenElse(
+      new UnitCountAtLeast(8, UnitMatchWarriors),
+      new Defend,
+      new Attack)
   ))
 }

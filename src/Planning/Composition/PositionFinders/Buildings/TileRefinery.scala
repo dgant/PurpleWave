@@ -10,7 +10,7 @@ object TileRefinery extends TileFinder {
   def find: Option[TilePosition] = {
     
     val candidateAreas = With.geography.ourBases
-      .toList
+      .toVector
       .sortBy( ! _.townHall.exists(_.complete))
       .sortBy( - _.gasLeft)
       .view

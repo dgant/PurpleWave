@@ -17,7 +17,7 @@ class Bank {
   }
   
   def prioritizedRequests:Iterable[LockCurrency] = {
-    requests.toList.sortBy(request => With.prioritizer.getPriority(request.owner))
+    requests.toVector.sortBy(request => With.prioritizer.getPriority(request.owner))
   }
   
   def request(request:LockCurrency) {

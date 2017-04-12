@@ -3,7 +3,7 @@ package ProxyBwapi.Upgrades
 import bwapi.UpgradeType
 
 object UpgradeTypes {
-  val all = List(
+  val all = Vector(
     UpgradeType.Adrenal_Glands,
     UpgradeType.Anabolic_Synthesis,
     UpgradeType.Antennae,

@@ -13,16 +13,16 @@ case class BuildableUpgrade(upgrade:Upgrade, level:Int=1) extends Buildable {
   override def frames           : Int                   = upgrade.upgradeTime(upgradeLevel)
       
   override def buildersOccupied: Iterable[BuildableUnit] = {
-    List(new BuildableUnit(upgrade.whatUpgrades))
+    Vector(new BuildableUnit(upgrade.whatUpgrades))
   }
   
   override def requirements: Iterable[BuildableUnit] = {
     val requirement = upgrade.whatsRequired(upgradeLevel)
     if (requirement != UnitClasses.None) {
-      List(new BuildableUnit(requirement))
+      Vector(new BuildableUnit(requirement))
     }
     else {
-      List.empty
+      Vector.empty
     }
   }
 }

@@ -8,7 +8,7 @@ import Planning.Plans.Macro.BuildOrders.FollowBuildOrder
 import Planning.Plans.Macro.RemoveMineralBlockAt
 
 class ProtossGamePlan extends Parallel {
-  children.set(List(
+  children.set(Vector(
     new SwitchEnemyRace {
       terran  .set(new ProtossVsTerran)
       protoss .set(new ProtossVsProtoss)

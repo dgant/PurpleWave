@@ -12,7 +12,7 @@ class JustOnce extends Plan {
   var _everCompleted:Boolean = false
   
   override def isComplete: Boolean = { _everCompleted }
-  override def getChildren: Iterable[Plan] = { List(child.get) }
+  override def getChildren: Iterable[Plan] = { Vector(child.get) }
   override def onFrame() {
     _everCompleted = _everCompleted || child.get.isComplete
     

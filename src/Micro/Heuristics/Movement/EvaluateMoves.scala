@@ -10,7 +10,7 @@ import bwapi.TilePosition
 
 object EvaluateMoves {
   
-  val points = List(
+  val points = Vector(
     new Point(-1, -2),
     new Point( 0, -2),
     new Point( 1, -2),

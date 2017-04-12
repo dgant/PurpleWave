@@ -15,7 +15,7 @@ class Architect {
     center:         TilePosition,
     margin:         Integer = 0,
     searchRadius:   Integer = 40,
-    exclusions:     Iterable[TileRectangle] = List.empty)
+    exclusions:     Iterable[TileRectangle] = Vector.empty)
       :Option[TilePosition] = {
   
     Spiral
@@ -30,11 +30,11 @@ class Architect {
     center:             TilePosition,
     margin:             Integer                 = 0,
     searchRadius:       Integer                 = 20,
-    exclusions:         Iterable[TileRectangle] = List.empty,
+    exclusions:         Iterable[TileRectangle] = Vector.empty,
     hypotheticalPylon:  Option[TilePosition]    = None)
       :Option[Iterable[TilePosition]] = {
     
-    val exclusions:List[TileRectangle] = List.empty
+    val exclusions:Vector[TileRectangle] = Vector.empty
     
     //For each point
     //  Try to find a place for the first building
@@ -64,7 +64,7 @@ class Architect {
     buildingClasses:    Iterable[UnitClass],
     margin:             Integer                 = 0,
     searchRadius:       Integer                 = 20,
-    exclusions:         Iterable[TileRectangle] = List.empty,
+    exclusions:         Iterable[TileRectangle] = Vector.empty,
     hypotheticalPylon:  Option[TilePosition]    = None)
       :Option[Iterable[TilePosition]] = {
     
@@ -72,10 +72,10 @@ class Architect {
     
     if (canBuild(nextBuilding, searchPoint, margin, exclusions, hypotheticalPylon)) {
       val newHypotheticalPylon = if (nextBuilding == Protoss.Pylon) Some(searchPoint) else hypotheticalPylon
-      val newExclusions = exclusions ++ List(new TileRectangle(searchPoint, searchPoint.add(nextBuilding.tileSize)))
+      val newExclusions = exclusions ++ Vector(new TileRectangle(searchPoint, searchPoint.add(nextBuilding.tileSize)))
       
       if (buildingClasses.size == 1) {
-        return Some(List(searchPoint))
+        return Some(Vector(searchPoint))
       }
       
       val rest = placeBuildings(
@@ -98,7 +98,7 @@ class Architect {
     buildingClass:      UnitClass,
     tileTopleft:        TilePosition,
     margin:             Integer                 = 0,
-    exclusions:         Iterable[TileRectangle] = List.empty,
+    exclusions:         Iterable[TileRectangle] = Vector.empty,
     hypotheticalPylon:  Option[TilePosition]    = None)
       :Boolean = {
   

@@ -15,7 +15,7 @@ class ProtossVsTerran extends Parallel {
   description.set("Protoss vs Terran")
   
   // http://wiki.teamliquid.net/starcraft/14_Nexus_(vs._Terran)
-  val _13Nexus = List[BuildRequest] (
+  val _13Nexus = Vector[BuildRequest] (
     new RequestUnitAnotherOne(Protoss.Nexus),
     new RequestUnitAtLeast(8,   Protoss.Probe),
     new RequestUnitAtLeast(1,   Protoss.Pylon),
@@ -41,7 +41,7 @@ class ProtossVsTerran extends Parallel {
     new RequestUnitAtLeast(6,   Protoss.Dragoon)
   )
   
-  val _lateGame = List[BuildRequest] (
+  val _lateGame = Vector[BuildRequest] (
     new RequestUnitAtLeast(2,   Protoss.Assimilator),
     new RequestUnitAtLeast(1,   Protoss.CitadelOfAdun),
     new RequestUnitAtLeast(1,   Protoss.RoboticsFacility),
@@ -81,7 +81,7 @@ class ProtossVsTerran extends Parallel {
     new RequestUpgrade(         Protoss.GroundArmor,   3)
   )
   
-  val _carriersLate = List[BuildRequest] (
+  val _carriersLate = Vector[BuildRequest] (
     new RequestUnitAtLeast(3,   Protoss.Nexus),
     new RequestUnitAtLeast(3,   Protoss.Assimilator),
     new RequestUnitAtLeast(8,   Protoss.Dragoon),
@@ -136,7 +136,7 @@ class ProtossVsTerran extends Parallel {
     new RequestUnitAtLeast(10, Protoss.Assimilator)
   )
   
-  children.set(List(
+  children.set(Vector(
     new ScheduleBuildOrder { buildables.set(_13Nexus) },
     new BuildEnoughPylons,
     new TrainProbesContinuously,

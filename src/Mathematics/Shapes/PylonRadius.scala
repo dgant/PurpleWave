@@ -23,7 +23,7 @@ object PylonRadius {
         normalize(point.x - 8),
         normalize(point.y - 5))
     )
-    .toList
+    .toVector
   
   def powers(pylon:TilePosition, target:TilePosition):Boolean = {
     isInRadius(

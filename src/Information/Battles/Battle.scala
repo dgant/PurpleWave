@@ -10,10 +10,10 @@ class Battle(
   val us    : BattleGroup,
   val enemy : BattleGroup) {
   
-  var simulations: Iterable[BattleSimulation] = List.empty
+  var simulations: Iterable[BattleSimulation] = Vector.empty
   
   def focus     : Position = us.vanguard.midpoint(enemy.vanguard)
-  def groups    : Iterable[BattleGroup] = List(us, enemy)
+  def groups    : Iterable[BattleGroup] = Vector(us, enemy)
   def happening : Boolean =
     us.units.nonEmpty &&
     enemy.units.nonEmpty &&
@@ -26,7 +26,7 @@ class Battle(
   // Go for best value, but tiebreak by preferring to fight! (And to keep mining)
   private val bestSimulationResultCache = new CacheFrame(() =>
     simulations
-      .toList
+      .toVector
       .sortBy(simulation => simulation.us.tactics.workers   != TacticWounded.Ignore)
       .sortBy(simulation => simulation.us.tactics.wounded   != TacticWounded.Ignore)
       .sortBy(simulation => simulation.us.tactics.movement  != TacticMovement.Kite)

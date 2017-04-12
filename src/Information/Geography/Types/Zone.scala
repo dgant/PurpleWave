@@ -22,7 +22,7 @@ class Zone(
   val centroid = bwtaRegion.getCenter
   var owner:PlayerInfo = With.neutral
   val area:Double = bwtaRegion.getPolygon.getArea
-  val points:Iterable[Position] = bwtaRegion.getPolygon.getPoints.asScala.toList
+  val points:Iterable[Position] = bwtaRegion.getPolygon.getPoints.asScala.toVector
   val island:Boolean = ! With.game.getStartLocations.asScala.exists(startTile => With.paths.exists(centroid.tileIncluding, startTile))
   
   def contains(tile:TilePosition):Boolean = boundary.contains(tile) && tiles.contains(tile)

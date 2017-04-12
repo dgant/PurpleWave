@@ -13,7 +13,7 @@ object VisualizeBases {
         DrawMap.tileRectangle(base.harvestingArea,    Colors.DarkGreen)
         DrawMap.tileRectangle(base.townHallArea,      base.zone.owner.colorDark)
         DrawMap.labelBox(
-          List(
+          Vector(
             base.zone.owner.name,
             if (base.isStartLocation) "Start location" else "",
             "Minerals left: " + base.mineralsLeft,

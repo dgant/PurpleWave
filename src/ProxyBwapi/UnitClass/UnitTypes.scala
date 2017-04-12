@@ -3,7 +3,7 @@ package ProxyBwapi.UnitClass
 import bwapi.UnitType
 
 object UnitTypes {
-  val all = List(
+  val all = Vector(
     UnitType.Terran_Marine,
     UnitType.Terran_Ghost,
     UnitType.Terran_Vulture,

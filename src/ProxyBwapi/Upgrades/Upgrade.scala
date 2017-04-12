@@ -5,7 +5,7 @@ import bwapi.UpgradeType
 
 case class Upgrade(val baseType:UpgradeType) {
 
-  lazy val levels               = (1 to baseType.maxRepeats).toList
+  lazy val levels               = (1 to baseType.maxRepeats).toVector
   lazy val getRace              = baseType.getRace
   lazy val mineralPriceFactor   = baseType.mineralPriceFactor
   lazy val gasPriceFactor       = baseType.gasPriceFactor

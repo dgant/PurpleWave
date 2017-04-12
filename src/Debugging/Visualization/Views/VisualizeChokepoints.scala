@@ -12,7 +12,7 @@ object VisualizeChokepoints {
       zone.edges.foreach(edge => {
         
         DrawMap.labelBox(
-          List(
+          Vector(
             edge.zones.map(_.centroid.toString).mkString(" -> ")
           ),
           edge.centerPixel)

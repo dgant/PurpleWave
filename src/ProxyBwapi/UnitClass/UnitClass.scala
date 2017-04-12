@@ -33,7 +33,7 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
   
   //TODO: Explosive is 50/75/100
   //But Concussive is 25/50/100, not 50/75/100 !!!
-  private val concussiveOrExplosive = List(DamageType.Concussive, DamageType.Explosive)
+  private val concussiveOrExplosive = Vector(DamageType.Concussive, DamageType.Explosive)
   
   lazy val effectiveAirDamage:Double =
     if      (this == Protoss.Carrier)      Protoss.Interceptor.effectiveAirDamage * 8
@@ -83,9 +83,9 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
   lazy val totalCost: Int = mineralPrice + gasPrice
   lazy val orderable:Boolean = ! isSpell && ! Set(Protoss.Interceptor, Protoss.Scarab, Terran.SpiderMine).contains(this)
   lazy val isMinerals:Boolean = isMineralField
-  lazy val isGas:Boolean = List(Neutral.Geyser, Terran.Refinery, Protoss.Assimilator, Zerg.Extractor).contains(this)
+  lazy val isGas:Boolean = Vector(Neutral.Geyser, Terran.Refinery, Protoss.Assimilator, Zerg.Extractor).contains(this)
   lazy val tileArea:TileRectangle = new TileRectangle(new TilePosition(0, 0), tileSize)
-  lazy val isTownHall:Boolean = List(Terran.CommandCenter, Protoss.Nexus, Zerg.Hatchery, Zerg.Lair, Zerg.Hive).contains(this)
+  lazy val isTownHall:Boolean = Vector(Terran.CommandCenter, Protoss.Nexus, Zerg.Hatchery, Zerg.Lair, Zerg.Hive).contains(this)
   
   ///////////
   // Macro //
@@ -96,11 +96,11 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
   lazy val isZerg    : Boolean = race == Race.Zerg
   
   lazy val buildTechEnabling     : Tech            = requiredTech
-  lazy val buildUnitsEnabling    : List[UnitClass] = buildUnitsEnablingCalculate
-  lazy val buildUnitsBorrowed    : List[UnitClass] = buildUnitsBorrowedCalculate
-  lazy val buildUnitsSpent       : List[UnitClass] = buildUnitsSpentCalculate
+  lazy val buildUnitsEnabling    : Vector[UnitClass] = buildUnitsEnablingCalculate
+  lazy val buildUnitsBorrowed    : Vector[UnitClass] = buildUnitsBorrowedCalculate
+  lazy val buildUnitsSpent       : Vector[UnitClass] = buildUnitsSpentCalculate
   
-  private def buildUnitsEnablingCalculate: List[UnitClass] = {
+  private def buildUnitsEnablingCalculate: Vector[UnitClass] = {
     
     val output = new ListBuffer[UnitClass]
     
@@ -169,10 +169,10 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
     addBuildUnitIf(output, Zerg.GreaterSpire,           Zerg.Hive)
     addBuildUnitIf(output, Zerg.NydusCanal,             Zerg.Hive)
     
-    output.toList
+    output.toVector
   }
   
-  private def buildUnitsBorrowedCalculate: List[UnitClass] = {
+  private def buildUnitsBorrowedCalculate: Vector[UnitClass] = {
     
     val output = new ListBuffer[UnitClass]
   
@@ -219,10 +219,10 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
     addBuildUnitIf(output, Zerg.InfestedTerran,         Zerg.InfestedCommandCenter)
     addBuildUnitIf(output, Zerg.InfestedCommandCenter,  Zerg.Queen)
     
-    output.toList
+    output.toVector
   }
   
-  private def buildUnitsSpentCalculate: List[UnitClass] = {
+  private def buildUnitsSpentCalculate: Vector[UnitClass] = {
   
     val output = new ListBuffer[UnitClass]
   
@@ -264,7 +264,7 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
     addBuildUnitIf(output, Zerg.SunkenColony,           Zerg.CreepColony)
     addBuildUnitIf(output, Zerg.SporeColony,            Zerg.SporeColony)
   
-    output.toList
+    output.toVector
   }
   
   private def addBuildUnitIf(classes:ListBuffer[UnitClass], predicate:Boolean, thenAddThatClass:UnitClass) {

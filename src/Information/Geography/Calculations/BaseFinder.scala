@@ -68,7 +68,7 @@ object BaseFinder {
     halls.foreach(hall =>
       if ( ! basesToRemove.contains(hall)) {
         val conflictingHalls =
-          List(hall) ++
+          Vector(hall) ++
           halls
             .filterNot(basesToRemove.contains)
             .filter(otherHall => otherHall != hall && otherHall.tileDistance(hall) < 8)

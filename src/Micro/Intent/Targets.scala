@@ -6,7 +6,7 @@ import ProxyBwapi.UnitInfo.UnitInfo
 
 object Targets {
   
-  val ineligibleClasses = List(Zerg.Larva, Zerg.Egg)
+  val ineligibleClasses = Vector(Zerg.Larva, Zerg.Egg)
   
   def get(intent:Intention):Set[UnitInfo] = {
     

@@ -24,7 +24,7 @@ class Gather extends Plan {
   private val resourceByWorker  = new mutable.HashMap[FriendlyUnitInfo, UnitInfo]
   private val workersByResource = new mutable.HashMap[UnitInfo, mutable.HashSet[FriendlyUnitInfo]]
   
-  private var ourActiveBases          : Iterable[Base]                    = List.empty
+  private var ourActiveBases          : Iterable[Base]                    = Vector.empty
   private var allWorkers              : Set[FriendlyUnitInfo]             = Set.empty
   private var allMinerals             : Set[UnitInfo]                     = Set.empty
   private var allGas                  : Set[UnitInfo]                     = Set.empty
@@ -77,7 +77,7 @@ class Gather extends Plan {
       val allSafeMinerals = With.units.neutral.filter(_.unitClass.isMinerals).filter(safe)
       if (allSafeMinerals.nonEmpty) {
         safeMinerals ++= allSafeMinerals
-          .toList
+          .toVector
           .sortBy(mineral => With.paths.groundPixels(mineral.tileIncludingCenter, With.geography.home))
           .take(9)
       }
@@ -94,10 +94,10 @@ class Gather extends Plan {
   
   private def decideIdealWorkerDistribution() {
     haveEnoughGas       = With.self.gas >= Math.max(400, With.self.minerals)
-    workersForGas       = List(safeGas.size * 3, allWorkers.size/3, if(haveEnoughGas) 0 else 200).min
+    workersForGas       = Vector(safeGas.size * 3, allWorkers.size/3, if(haveEnoughGas) 0 else 200).min
     workersForMinerals  = allWorkers.size - workersForGas
     workersPerGas       = if (safeGas.size == 0) 0 else workersForGas.toDouble / safeGas.size
-    workersOnGas        = safeGas.toList.map(gas => workersByResource.get(gas).map(_.size).getOrElse(0)).sum
+    workersOnGas        = safeGas.toVector.map(gas => workersByResource.get(gas).map(_.size).getOrElse(0)).sum
     
     needPerMineral = new mutable.HashMap[UnitInfo, Double] ++
       safeMinerals
@@ -136,7 +136,7 @@ class Gather extends Plan {
   private def addWorkerToMinerals(worker:FriendlyUnitInfo) {
     if (safeMinerals.isEmpty) return
     val mineral = safeMinerals
-      .toList
+      .toVector
       .sortBy(_.pixelDistanceSquared(worker.pixelCenter))
       .maxBy(needPerMineral)
     assignWorker(worker, mineral)
@@ -146,7 +146,7 @@ class Gather extends Plan {
   private def addWorkerToGas(worker:FriendlyUnitInfo) {
     if (safeGas.isEmpty) return
     val gas = safeGas
-      .toList
+      .toVector
       .sortBy(_.pixelDistanceSquared(worker.pixelCenter))
       .maxBy(needPerGas)
     assignWorker(worker, gas)

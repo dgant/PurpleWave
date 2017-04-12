@@ -137,7 +137,7 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
       )
     ))
   
-  private val isCarrierReaverOrLurkerCache = new CacheFrame(() => List(Protoss.Carrier, Protoss.Reaver, Zerg.Lurker).contains(this))
+  private val isCarrierReaverOrLurkerCache = new CacheFrame(() => Vector(Protoss.Carrier, Protoss.Reaver, Zerg.Lurker).contains(this))
   
   def canAttackThisSecond(enemy:UnitInfo):Boolean =
     canAttackThisSecond &&

@@ -36,8 +36,8 @@ class UnitTracker {
   
   def neutral: Set[ForeignUnitInfo] = foreignUnitTracker.neutralUnits
   
-  private def remap(units: java.util.List[bwapi.Unit]): Iterable[UnitInfo] = {
-    units.asScala.flatMap(get).toList
+  private def remap(units: java.util.Vector[bwapi.Unit]): Iterable[UnitInfo] = {
+    units.asScala.flatMap(get).toVector
   }
   
   def inTileRadius(tile: TilePosition, tiles: Int): Set[UnitInfo] = {

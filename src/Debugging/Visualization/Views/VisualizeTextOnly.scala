@@ -9,7 +9,7 @@ object VisualizeTextOnly {
     
     With.units.all.filter(_.visible).filter(u => u.complete || u.unitClass.isBuilding).foreach(unit => {
       val color = unit.player.colorDark
-      val text = List(
+      val text = Vector(
         unit.player.name,
         unit.unitClass.toString,
         if (unit.player == With.neutral) "" else unit.totalHealth.toString + "/" + unit.unitClass.maxTotalHealth,

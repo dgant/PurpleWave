@@ -9,5 +9,5 @@ object Debugger {
   
   def planDescriptions:Iterable[String] = plans.map(plan => plan.toString)
   
-  private def flatten(plan:Plan):Iterable[Plan] = List(plan) ++ plan.getChildren.flatten(flatten)
+  private def flatten(plan:Plan):Iterable[Plan] = Vector(plan) ++ plan.getChildren.flatten(flatten)
 }

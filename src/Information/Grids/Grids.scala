@@ -33,7 +33,7 @@ class Grids {
   // Updating grids is the spikiest thing we do, performance-wise
   // So we split the grid updates into batches so no one frame gets too long.
   private val updateBatches = Array(
-    List(
+    Vector(
       psi2x2and3x2,
       psi4x3,
       walkable,
@@ -42,18 +42,18 @@ class Grids {
       buildable,
       buildableTerrain
     ),
-    List(
+    Vector(
       units
     ),
-    List(
+    Vector(
       altitudeBonus,
       enemyDetection,
       enemyVision
     ),
-    List(
+    Vector(
       mobility //The most expensive by far
     ),
-    List(
+    Vector(
       dpsEnemyAirConcussive,
       dpsEnemyAirExplosive,
       dpsEnemyAirNormal,

@@ -88,7 +88,7 @@ object BattleSimulationBuilder {
   }
   
   def buildEnemyTacticVariants(thisGroup:BattleGroup, thatGroup:BattleGroup):Iterable[BattleSimulationGroup] = {
-    List(new BattleSimulationGroup(thisGroup, new Tactics(
+    Vector(new BattleSimulationGroup(thisGroup, new Tactics(
       TacticWounded.Ignore,
       TacticFocus.Nothing,
       TacticMovement.Charge,
@@ -117,11 +117,11 @@ object BattleSimulationBuilder {
       workers.foreach(worker => { worker.fleeing = true; worker.fighting = false })
     }
     else if (group.tactics.workers == TacticWorkers.Ignore) {
-      workers.toList.foreach(_.fighting = false)
+      workers.toVector.foreach(_.fighting = false)
     }
     else if (group.tactics.workers == TacticWorkers.HalfFight) {
       workersNotMining = workers.size / 2
-      workers.toList.sortBy(_.totalLife).take(workersNotMining).foreach(_.fighting = false)
+      workers.toVector.sortBy(_.totalLife).take(workersNotMining).foreach(_.fighting = false)
     }
     else {
       workersNotMining = workers.size

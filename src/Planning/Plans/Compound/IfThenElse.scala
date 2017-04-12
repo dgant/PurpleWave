@@ -11,7 +11,7 @@ class IfThenElse extends Plan {
   val whenTrue  = new Property[Plan](new Plan)
   val whenFalse = new Property[Plan](new Plan)
   
-  override def getChildren: Iterable[Plan] = List(predicate.get, whenTrue.get, whenFalse.get)
+  override def getChildren: Iterable[Plan] = Vector(predicate.get, whenTrue.get, whenFalse.get)
   override def isComplete: Boolean = predicate.get.isComplete && whenTrue.get.isComplete
   
   override def onFrame() {

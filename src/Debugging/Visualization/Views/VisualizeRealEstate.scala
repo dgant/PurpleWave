@@ -14,7 +14,7 @@ object VisualizeRealEstate {
     lock.area.foreach(rectangle => {
       DrawMap.tileRectangle(rectangle, Colors.DarkRed)
       DrawMap.labelBox(
-        List("Reserved by", lock.owner.toString),
+        Vector("Reserved by", lock.owner.toString),
         rectangle.midPixel,
         drawBackground = true,
         backgroundColor = Colors.DarkRed)

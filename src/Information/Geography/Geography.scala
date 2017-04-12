@@ -20,7 +20,7 @@ class Geography {
   def bases               : Iterable[Base]          = zones.flatten(_.bases)
   def ourZones            : Iterable[Zone]          = zones.filter(_.owner == With.self)
   def ourBases            : Iterable[Base]          = ourZones.flatten(_.bases)
-  def enemyZones          : Iterable[Zone]          = zones.filterNot(zone => List(With.self, With.neutral).contains(zone.owner))
+  def enemyZones          : Iterable[Zone]          = zones.filterNot(zone => Vector(With.self, With.neutral).contains(zone.owner))
   def enemyBases          : Iterable[Base]          = enemyZones.flatten(_.bases)
   def ourTownHalls        : Iterable[UnitInfo]      = ourBases.flatMap(_.townHall)
   def ourHarvestingAreas  : Iterable[TileRectangle] = ourBases.map(_.harvestingArea)
@@ -41,7 +41,7 @@ class Geography {
   def home:TilePosition = homeCache.get
   private val homeCache = new Cache(5, () =>
     ourBases
-      .toList
+      .toVector
       .sortBy( ! _.isStartLocation)
       .headOption
       .map(_.townHallArea.startInclusive)

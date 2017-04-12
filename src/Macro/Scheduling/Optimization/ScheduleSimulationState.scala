@@ -143,10 +143,10 @@ class ScheduleSimulationState(
   
   private def owned     (unit: UnitClass) : Int = unitsOwned     (unit)
   private def available (unit: UnitClass) : Int = unitsAvailable (unit)
-  private def numberOfBases     : Int = List(Terran.CommandCenter, Protoss.Nexus, Zerg.Hatchery, Zerg.Lair, Zerg.Hive).map(owned).sum
-  private def numberOfWorkers   : Int = List(Terran.SCV, Protoss.Probe, Zerg.Drone).map(available).sum
+  private def numberOfBases     : Int = Vector(Terran.CommandCenter, Protoss.Nexus, Zerg.Hatchery, Zerg.Lair, Zerg.Hive).map(owned).sum
+  private def numberOfWorkers   : Int = Vector(Terran.SCV, Protoss.Probe, Zerg.Drone).map(available).sum
   private def numberOfMiners    : Int = Math.max(0, numberOfWorkers - numberOfDrillers)
-  private def numberOfDrillers  : Int = Math.min(numberOfWorkers / 3, 3 * List(Terran.Refinery, Protoss.Assimilator, Zerg.Extractor).map(available).sum)
+  private def numberOfDrillers  : Int = Math.min(numberOfWorkers / 3, 3 * Vector(Terran.Refinery, Protoss.Assimilator, Zerg.Extractor).map(available).sum)
   
   private def nextEventByStart : BuildEvent = eventQueue.minBy(_.frameStart)
   private def nextEventByEnd   : BuildEvent = eventQueue.minBy(_.frameEnd)
@@ -164,11 +164,11 @@ class ScheduleSimulationState(
   }
   
   private def nextInterestingFrame(buildable:Option[Buildable] = None):Int = {
-    List(
+    Vector(
       buildable.map(frame + framesBeforeMinerals (_)).getOrElse(never),
       buildable.map(frame + framesBeforeGas      (_)).getOrElse(never),
-      (eventQueue.map(_.frameStart) .filter(isInTheFuture) ++ List(never)).min,
-      (eventQueue.map(_.frameEnd)   .filter(isInTheFuture) ++ List(never)).min
+      (eventQueue.map(_.frameStart) .filter(isInTheFuture) ++ Vector(never)).min,
+      (eventQueue.map(_.frameEnd)   .filter(isInTheFuture) ++ Vector(never)).min
     )
     .filter(isInTheFuture)
     .min

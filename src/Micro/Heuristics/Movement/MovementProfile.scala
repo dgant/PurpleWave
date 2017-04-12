@@ -18,7 +18,7 @@ class MovementProfile(
   var avoidVision       : Double = 0) {
   
   def weightedHeuristics: Iterable[MovementHeuristicWeight] =
-    List(
+    Vector(
       new MovementHeuristicWeight(MovementHeuristicDestination,             preferDestination,  Colors.MediumGreen),
       new MovementHeuristicWeight(MovementHeuristicOrigin,                  preferOrigin,       Colors.NeonGreen),
       new MovementHeuristicWeight(MovementHeuristicEnemyAtMaxRange,         preferSitAtRange,   Colors.MediumRed),

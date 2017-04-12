@@ -19,7 +19,7 @@ object DrawMap {
     start:Position,
     end:Position,
     color:Color = Colors.DefaultGray) {
-    if (irrelevant(List(start, end))) return
+    if (irrelevant(Vector(start, end))) return
     With.game.drawLineMap(start, end, color)
   }
   
@@ -28,7 +28,7 @@ object DrawMap {
            end:Position,
            color:Color = Colors.DefaultGray,
            solid:Boolean = false) {
-    if (irrelevant(List(start, end))) return
+    if (irrelevant(Vector(start, end))) return
     With.game.drawBoxMap(start, end, color, solid)
   }
   
@@ -38,7 +38,7 @@ object DrawMap {
               color:Color = Colors.DefaultGray,
               solid:Boolean = false) {
     if (irrelevant(
-      List(
+      Vector(
         center,
         center.add(radius, radius),
         center.add(-radius, radius),
@@ -53,7 +53,7 @@ object DrawMap {
                 position3:Position,
                 color:Color = Colors.DefaultGray,
                 solid: Boolean = false) {
-    if (irrelevant(List(position1, position2, position3))) return
+    if (irrelevant(Vector(position1, position2, position3))) return
     With.game.drawTriangleMap(position1, position2, position3, color, solid)
   }
   
@@ -63,7 +63,7 @@ object DrawMap {
     drawBackground:Boolean = false,
     backgroundColor:Color = Colors.DefaultGray) {
     if (irrelevant(position)) return
-    labelBox(List(text), position, drawBackground, backgroundColor)
+    labelBox(Vector(text), position, drawBackground, backgroundColor)
   }
   
   def labelBox(
@@ -99,7 +99,7 @@ object DrawMap {
   }
   
   def tileRectangle(rectangle:TileRectangle, color:Color) {
-    if (irrelevant(List(rectangle.startPixel, rectangle.endPixel))) return
+    if (irrelevant(Vector(rectangle.startPixel, rectangle.endPixel))) return
     With.game.drawBoxMap(rectangle.startPixel, rectangle.endPixel, color)
   }
   

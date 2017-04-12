@@ -8,7 +8,7 @@ class ScoutAt(minimumSupply:Int) extends IfThenElse {
   description.set("Send a scout at a specific supply count")
   
   predicate.set(
-    new And { children.set(List(
+    new And { children.set(Vector(
       new SupplyAtLeast { quantity.set(minimumSupply*2) },
       new Not { child.set(new FoundEnemyBase) }
     ))})

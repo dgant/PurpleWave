@@ -12,7 +12,7 @@ class TargetingProfile(
   var avoidDistraction  : Double = 0) {
   
   def weightedHeuristics: Iterable[TargetHeuristicWeight] = {
-    List(
+    Vector(
       new TargetHeuristicWeight(TargetHeuristicInRange,         preferInRange),
       new TargetHeuristicWeight(TargetHeuristicValue,           preferValue),
       new TargetHeuristicWeight(TargetHeuristicCombat,          preferCombat),

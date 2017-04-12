@@ -49,7 +49,7 @@ object With {
   
   var self    : PlayerInfo         = null
   var neutral : PlayerInfo         = null
-  var enemies : List[PlayerInfo]   = null
+  var enemies : Vector[PlayerInfo]   = null
   
   var frame       : Int = 0
   var mapWidth    : Int = 0
@@ -63,7 +63,7 @@ object With {
     With.proxy                  = new ProxyBWMirror
     With.self                   = Players.get(With.game.self)
     With.neutral                = Players.get(With.game.neutral)
-    With.enemies                = With.game.enemies.asScala.map(Players.get).toList
+    With.enemies                = With.game.enemies.asScala.map(Players.get).toVector
     With.mapWidth               = With.game.mapWidth
     With.mapHeight              = With.game.mapHeight
     With.configuration          = new Configuration

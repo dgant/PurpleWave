@@ -16,9 +16,9 @@ class Scheduler {
   private val requestsByPlan = new mutable.HashMap[Plan, Iterable[BuildRequest]]
   private val recentlyUpdated = new mutable.HashSet[Plan]
   
-  var simulationResults:ScheduleSimulationResult = new ScheduleSimulationResult(List.empty, List.empty, List.empty)
+  var simulationResults:ScheduleSimulationResult = new ScheduleSimulationResult(Vector.empty, Vector.empty, Vector.empty)
   
-  var queueOriginal   : Iterable[Buildable]   = List.empty
+  var queueOriginal   : Iterable[Buildable]   = Vector.empty
   def queueOptimized  : Iterable[BuildEvent]  = simulationResults.suggestedEvents
   
   def request(requester:Plan, requests: Iterable[BuildRequest]) {
@@ -33,7 +33,7 @@ class Scheduler {
   }
   private val updateQueueLimiter = new Limiter(2, () => updateQueue())
   private def updateQueue() {
-    val requestQueue = requestsByPlan.keys.toList.sortBy(With.prioritizer.getPriority).flatten(requestsByPlan)
+    val requestQueue = requestsByPlan.keys.toVector.sortBy(With.prioritizer.getPriority).flatten(requestsByPlan)
     val unitsWanted = new CountMap[UnitClass]
     val unitsActual:CountMap[UnitClass] = CountMapper.make(With.units.ours.filter(u => u.alive && u.complete).groupBy(_.unitClass).mapValues(_.size))
     queueOriginal = requestQueue.flatten(buildable => getUnfulfilledBuildables(buildable, unitsWanted, unitsActual))
@@ -46,13 +46,13 @@ class Scheduler {
     unitsActual:CountMap[UnitClass]):Iterable[Buildable] = {
     if (request.buildable.upgradeOption.nonEmpty) {
       if(With.self.getUpgradeLevel(request.buildable.upgradeOption.get) < request.buildable.upgradeLevel)
-        return List(request.buildable)
+        return Vector(request.buildable)
       else
         return None
     }
     else if (request.buildable.techOption.nonEmpty) {
       if (With.self.hasResearched(request.buildable.techOption.get))
-        return List(request.buildable)
+        return Vector(request.buildable)
       else
         return None
     }
@@ -68,7 +68,7 @@ class Scheduler {
         return buildables
       }
       else
-        return List.empty
+        return Vector.empty
     }
   }
 }

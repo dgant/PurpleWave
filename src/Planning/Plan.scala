@@ -6,7 +6,7 @@ class Plan {
   val description = new Property[String]("")
   
   def isComplete:Boolean = false
-  def getChildren:Iterable[Plan] = List.empty
+  def getChildren:Iterable[Plan] = Vector.empty
   def onFrame() = {}
   def drawOverlay() = {}
   

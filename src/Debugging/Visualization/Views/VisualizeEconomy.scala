@@ -5,7 +5,7 @@ import Lifecycle.With
 
 object VisualizeEconomy {
   def render() {
-    val labels = List(
+    val labels = Vector(
       "Active miners:",
       "Active drillers:",
       "Minerals per minute:",
@@ -15,7 +15,7 @@ object VisualizeEconomy {
       "Total minerals (real):",
       "Total gas (real):"
     )
-    val values = List(
+    val values = Vector(
       With.economy.ourActiveMiners.size,
       With.economy.ourActiveDrillers.size,
       With.economy.ourMineralIncomePerMinute,

@@ -16,7 +16,7 @@ class FollowBuildOrder extends Plan {
   private val maxToFollow = 25
   
   private val plans = new mutable.HashMap[Buildable, ListBuffer[Plan]]
-  private var queue:Iterable[Buildable] = List.empty
+  private var queue:Iterable[Buildable] = Vector.empty
   
   override def getChildren: Iterable[Plan] = getChildrenCache.get
   private val getChildrenCache = new CacheFrame[Iterable[Plan]](() => getChildrenRecalculate)

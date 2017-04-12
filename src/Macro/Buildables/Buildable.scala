@@ -18,8 +18,8 @@ abstract class Buildable {
   def supplyRequired  : Int = 0
   def supplyProvided  : Int = 0
   
-  def requirements:Iterable[Buildable] = List.empty
-  def buildersOccupied:Iterable[BuildableUnit] = List.empty
+  def requirements:Iterable[Buildable] = Vector.empty
+  def buildersOccupied:Iterable[BuildableUnit] = Vector.empty
   def buildersBorrowed:Iterable[BuildableUnit] = buildersOccupied.filterNot (b => consumesBuilders.contains(b.unit))
   def buildersConsumed:Iterable[BuildableUnit] = buildersOccupied.filter    (b => consumesBuilders.contains(b.unit))
   

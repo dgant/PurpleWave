@@ -10,7 +10,7 @@ class TrainContinuously(unitClass: UnitClass) extends Plan {
   override def onFrame() {
     if ( ! canBuild) return
     
-    With.scheduler.request(this, List(
+    With.scheduler.request(this, Vector(
       new RequestUnitAtLeast(
         Math.min(
           maxDesirable,
@@ -24,7 +24,7 @@ class TrainContinuously(unitClass: UnitClass) extends Plan {
   }
   
   protected def buildCapacity:Int = {
-    List(
+    Vector(
       With.units.ours.count(_.unitClass == unitClass.whatBuilds._1),
       if (unitClass.supplyRequired == 0) 400 else (400 - With.self.supplyUsed) / unitClass.supplyRequired
       //if (unitClass.mineralPrice <= 0) Int.MaxValue else With.minerals / unitClass.mineralPrice,

@@ -18,7 +18,7 @@ class Battles {
           var global          : Battle                = null
           var byZone          : Map[Zone, Battle]     = Map.empty
           var byUnit          : Map[UnitInfo, Battle] = Map.empty
-          var local           : List[Battle]          = List.empty
+          var local           : Vector[Battle]          = Vector.empty
   
   def onFrame() = updateLimiter.act()
   private val updateLimiter = new Limiter(delayLength, update)
@@ -91,10 +91,10 @@ class Battles {
         .filter(battle =>
           battle.us.units.nonEmpty &&
           battle.enemy.units.nonEmpty)
-        .toList
+        .toVector
     byUnit = local
       .flatten(battle =>
-        List(
+        Vector(
           battle.us.units,
           battle.enemy.units)
         .flatten

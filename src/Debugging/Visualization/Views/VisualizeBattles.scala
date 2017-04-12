@@ -48,7 +48,7 @@ object VisualizeBattles {
       bottomRight,
       neutralColor)
     DrawMap.labelBox(
-      List(formatStrength(battle.us.strength), formatStrength(battle.enemy.strength)),
+      Vector(formatStrength(battle.us.strength), formatStrength(battle.enemy.strength)),
       bottomRight,
       drawBackground = true,
       backgroundColor = winnerStrengthColor)
@@ -66,27 +66,27 @@ object VisualizeBattles {
     DrawScreen.table(
       origin.getX,
       origin.getY,
-      List(
-        List(name),
-        List("Losses:",   group.lostValue.toString),
-        List("Move:",     group.tactics.movement.toString),
-        List("Focus:",    group.tactics.focusAirOrGround.toString),
-        List("Workers:",  group.tactics.workers.toString),
-        List("Wounded:",  group.tactics.wounded.toString),
-        List(),
-        List("Losses:")
+      Vector(
+        Vector(name),
+        Vector("Losses:",   group.lostValue.toString),
+        Vector("Move:",     group.tactics.movement.toString),
+        Vector("Focus:",    group.tactics.focusAirOrGround.toString),
+        Vector("Workers:",  group.tactics.workers.toString),
+        Vector("Wounded:",  group.tactics.wounded.toString),
+        Vector(),
+        Vector("Losses:")
       )
       ++ group.lostUnits
         .groupBy(_.unit.unitClass)
-        .toList
+        .toVector
         .sortBy(_._1.toString)
-        .map(u => List(u._1.toString, u._2.size.toString))
-      ++ List(List.empty)
-      ++ List(List("Survivors:"))
+        .map(u => Vector(u._1.toString, u._2.size.toString))
+      ++ Vector(Vector.empty)
+      ++ Vector(Vector("Survivors:"))
       ++ group.units
         .groupBy(_.unit.unitClass)
-        .toList
+        .toVector
         .sortBy(_._1.toString)
-        .map(u => List(u._2.size.toString, u._1.toString)))
+        .map(u => Vector(u._2.size.toString, u._1.toString)))
   }
 }

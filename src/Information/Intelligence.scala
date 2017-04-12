@@ -10,7 +10,7 @@ class Intelligence {
   def mostBaselikeEnemyPosition:TilePosition = mostBaselikeEnemyPositionCache.get
   val mostBaselikeEnemyPositionCache = new CacheFrame(() =>
     With.units.enemy
-      .toList
+      .toVector
       .filterNot(_.flying)
       .sortBy(unit => ! unit.unitClass.isBuilding)
       .sortBy(unit => ! unit.unitClass.isTownHall)
@@ -21,7 +21,7 @@ class Intelligence {
   def leastScoutedBases:Iterable[Base] = leastScoutedBasesCache.get
   private val leastScoutedBasesCache = new CacheFrame(() =>
     With.geography.bases
-      .toList
+      .toVector
       .sortBy( ! _.isStartLocation)
       .sortBy(_.lastScoutedFrame))
 }

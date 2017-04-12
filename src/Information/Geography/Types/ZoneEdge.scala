@@ -10,7 +10,7 @@ class ZoneEdge(
   
   val centerPixel   = chokepoint.getCenter
   val radiusPixels  = chokepoint.getWidth / 2
-  val sidePixels    = List(chokepoint.getSides.first, chokepoint.getSides.second)
+  val sidePixels    = Vector(chokepoint.getSides.first, chokepoint.getSides.second)
   
   def contains(pixel:Position):Boolean = centerPixel.pixelDistanceFast(pixel) <= radiusPixels
 }

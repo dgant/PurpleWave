@@ -71,7 +71,7 @@ object PathFinder {
           roughGroundDistance2(
           edge.centerPixel,
           to,
-          explored ++ List(zoneFrom)))
+          explored ++ Vector(zoneFrom)))
       .min
   }
 }

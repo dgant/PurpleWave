@@ -3,7 +3,7 @@ package ProxyBwapi.Techs
 import bwapi.TechType
 
 object TechTypes {
-  val all = List(
+  val all = Vector(
     TechType.Archon_Warp,
     TechType.Burrowing,
     TechType.Cloaking_Field,

@@ -61,7 +61,7 @@ class TileSimpleBuilding(val buildingClass:UnitClass) extends TileFinder {
     (maxMargin to 1 by -1)
       .foreach(margin =>
         With.geography.ourBases
-          .toList
+          .toVector
           .sortBy(base => - base.mineralsLeft * base.zone.area)
           .map(_.townHallArea.midpoint)
           .foreach(tile =>

@@ -16,7 +16,7 @@ object Behavior {
     ! intent.unit.attackStarting && ! intent.unit.attackAnimationHappening
   }
   
-  val actions = List(
+  val actions = Vector(
     Flee,
     Kite,
     Pursue,

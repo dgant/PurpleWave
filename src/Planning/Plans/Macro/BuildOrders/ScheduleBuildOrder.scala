@@ -9,7 +9,7 @@ class ScheduleBuildOrder extends Plan {
   
   description.set("Schedule a fixed build order")
   
-  val buildables = new Property[Iterable[BuildRequest]](List.empty)
+  val buildables = new Property[Iterable[BuildRequest]](Vector.empty)
   
   override def onFrame() = With.scheduler.request(this, buildables.get)
 }

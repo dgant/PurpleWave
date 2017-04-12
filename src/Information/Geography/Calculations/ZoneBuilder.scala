@@ -87,7 +87,7 @@ object ZoneBuilder {
   def buildEdge(choke: Chokepoint, zones:Iterable[Zone]):ZoneEdge =
     new ZoneEdge(
       choke,
-      List(
+      Vector(
         choke.getRegions.first,
         choke.getRegions.second)
       .map(region => zones.find(_.centroid == region.getCenter).get))

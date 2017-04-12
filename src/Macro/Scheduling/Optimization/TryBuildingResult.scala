@@ -5,5 +5,5 @@ import Macro.Scheduling.BuildEvent
 
 class TryBuildingResult(
   val buildEvent:Option[BuildEvent],
-  val unmetPrerequisites:Iterable[Buildable] = List.empty,
+  val unmetPrerequisites:Iterable[Buildable] = Vector.empty,
   val exceededSearchDepth:Boolean = false)

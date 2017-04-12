@@ -15,7 +15,7 @@ class ProtossVsZerg extends Parallel {
   description.set("Protoss vs Zerg")
   
   // http://wiki.teamliquid.net/starcraft/Protoss_vs._Zerg_Guide#Branch_II:_Two_Gateways
-  val _oneBaseTwoGate = List[BuildRequest] (
+  val _oneBaseTwoGate = Vector[BuildRequest] (
     new RequestUnitAnotherOne(Protoss.Nexus),
     new RequestUnitAtLeast(8,   Protoss.Probe),
     new RequestUnitAtLeast(1,   Protoss.Pylon),
@@ -25,7 +25,7 @@ class ProtossVsZerg extends Parallel {
     new RequestUnitAtLeast(2,   Protoss.Gateway)
   )
   
-  val _twoBase = List[BuildRequest] (
+  val _twoBase = Vector[BuildRequest] (
     new RequestUnitAtLeast(2,   Protoss.Nexus),
     new RequestUnitAtLeast(3,   Protoss.Gateway),
     new RequestUnitAtLeast(2,   Protoss.Assimilator),
@@ -73,7 +73,7 @@ class ProtossVsZerg extends Parallel {
     new RequestUnitAtLeast(8,   Protoss.Assimilator)
   )
   
-  children.set(List(
+  children.set(Vector(
     new ScheduleBuildOrder { buildables.set(_oneBaseTwoGate) },
     new BuildEnoughPylons,
     new TrainProbesContinuously,

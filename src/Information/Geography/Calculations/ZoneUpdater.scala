@@ -44,8 +44,8 @@ object ZoneUpdater {
     base.gas = With.units.all
       .filter(unit => unit.unitClass.isGas && base.zone.contains(unit.pixelCenter))
   
-    base.mineralsLeft   = base.minerals.filter(_.alive).toList.map(_.mineralsLeft).sum
-    base.gasLeft        = base.gas.filter(_.alive).toList.map(_.gasLeft).sum
-    base.harvestingArea = (List(base.townHallArea) ++ (base.minerals ++ base.gas).map(_.tileArea)).boundary
+    base.mineralsLeft   = base.minerals.filter(_.alive).toVector.map(_.mineralsLeft).sum
+    base.gasLeft        = base.gas.filter(_.alive).toVector.map(_.gasLeft).sum
+    base.harvestingArea = (Vector(base.townHallArea) ++ (base.minerals ++ base.gas).map(_.tileArea)).boundary
   }
 }

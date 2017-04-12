@@ -45,14 +45,14 @@ class Configuration {
   var viewportWidth               = 640 * 2
   var viewportHeight              = 480 * 2
   
-  var maxFrameMilliseconds = 80
+  var maxFrameMilliseconds = 25
   
-  var urgencyManners      = 1
-  var urgencyEconomy      = 2
-  var urgencyBattles      = 3
-  var urgencyGeography    = 4
-  var urgencyPlanning     = 6
-  var urgencyMicro        = 7
-  var urgencyGrids        = 8
-  var urgencyUnitTracking = 10
+  var urgencyManners        = 1
+  var urgencyEconomy        = 2
+  var urgencyBattles        = 3
+  var urgencyGeography      = 4
+  var urgencyPlanning       = 6
+  var urgencyMicro          = 7
+  var urgencyGrids          = 8
+  var urgencyUnitTracking   = 10
 }

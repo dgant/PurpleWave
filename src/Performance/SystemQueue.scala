@@ -6,14 +6,18 @@ import Performance.Systems._
 class SystemQueue {
   
   val systems = Vector(
+    new SystemLatency,
     new SystemUnitTracking,
     new SystemGeography,
     new SystemGrids,
-    new SystemBattles,
+    new SystemBattleClassify,
+    new SystemBattleAssess,
     new SystemEconomy,
     new SystemPlanning,
     new SystemMicro,
-    new SystemManners
+    new SystemManners,
+    new SystemCamera,
+    new SystemVisualizations
   )
   
   def onFrame() {
@@ -23,10 +27,15 @@ class SystemQueue {
       var definitelyRunNextSystem = true
       systems
         .sortBy(system => - system.urgency * system.framesSinceRunning)
+        .sortBy(system => system.skippable)
         .foreach(system =>
-          if (definitelyRunNextSystem  || With.performance.millisecondsLeftThisFrame > system.runMillisecondsMax) {
-            definitelyRunNextSystem = false
+          if (definitelyRunNextSystem || ! system.skippable || With.performance.millisecondsLeftThisFrame > system.runMillisecondsMax) {
+            if (system.skippable) {
+              definitelyRunNextSystem  = false
+            }
             system.run()
+          } else {
+            system.skip()
           })
     }
   }

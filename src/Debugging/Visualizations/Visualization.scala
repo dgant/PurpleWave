@@ -4,7 +4,7 @@ import Debugging.Visualizations.Views._
 import Lifecycle.With
 
 object Visualization {
-  def onFrame() {
+  def render() {
     if (With.configuration.visualize) {
       With.game.setTextSize(bwapi.Text.Size.Enum.Small)
   

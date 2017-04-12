@@ -2,11 +2,11 @@ package Performance.Systems
 
 import Lifecycle.With
 
-class SystemBattles extends AbstractSystem {
+class SystemBattleAssess extends AbstractSystem {
   
   override def urgency: Int = With.configuration.urgencyBattles
   
   override protected def onRun() {
-    With.battles.update()
+    With.battles.assess()
   }
 }

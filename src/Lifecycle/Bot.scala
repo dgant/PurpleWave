@@ -1,6 +1,5 @@
 package Lifecycle
 
-import Debugging.Visualizations.Visualization
 import Debugging._
 import bwapi.DefaultBWListener
 
@@ -20,10 +19,7 @@ class Bot() extends DefaultBWListener {
     try {
       With.performance.startFrame()
       With.onFrame()
-      With.latency.onFrame()
       With.systems.onFrame()
-      With.camera.onFrame()
-      Visualization.onFrame()
       With.performance.endFrame()
     }
     catch { case exception:Exception =>

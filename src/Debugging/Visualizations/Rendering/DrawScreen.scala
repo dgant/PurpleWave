@@ -17,9 +17,10 @@ object DrawScreen {
   }
   
   def tableRow(x:Int, y:Int, rowIndex:Int, row:Iterable[String]) {
-    row.zipWithIndex.foreach(pair => With.game.drawTextScreen(
-      x + pair._2 * 50,
-      y + rowIndex * 13,
-      pair._1))
+    row.zipWithIndex.foreach(pair =>
+      With.game.drawTextScreen(
+        x + pair._2 * 60,
+        y + rowIndex * 13,
+        pair._1))
   }
 }

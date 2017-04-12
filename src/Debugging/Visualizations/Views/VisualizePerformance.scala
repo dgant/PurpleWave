@@ -17,13 +17,14 @@ object VisualizePerformance {
   }
   
   def renderDetails() {
-    val headers = Vector("System", "Last run", "Total runs", "Avg ms", "Max ms")
+    val headers = Vector("System", "Last run", "Total runs", "Total skips", "Avg ms", "Max ms")
     val body = With.systems.systems
-      .sortBy(_.getClass.getSimpleName)
+      .sortBy(_.getClass.getSimpleName + "  ")
       .map(system => Vector(
         system.getClass.getSimpleName.replace("System", ""),
         system.framesSinceRunning.toString,
         system.totalRuns.toString,
+        system.totalSkips.toString,
         system.runMillisecondsMean.toString,
         system.runMillisecondsMax.toString
       ))

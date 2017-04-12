@@ -1,9 +1,8 @@
 package Information.Battles
 
-import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, UnitInfo}
 import Information.Geography.Types.Zone
-import Performance.Caching.Limiter
 import Lifecycle.With
+import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, UnitInfo}
 import Utilities.EnrichPosition._
 
 import scala.collection.mutable
@@ -19,13 +18,16 @@ class Battles {
           var byZone          : Map[Zone, Battle]     = Map.empty
           var byUnit          : Map[UnitInfo, Battle] = Map.empty
           var local           : Vector[Battle]          = Vector.empty
-
-  def update() {
+  
+  def classify() {
     combatantsOurs  = With.units.ours .filter(unit => unit.unitClass.helpsInCombat)
     combatantsEnemy = With.units.enemy.filter(unit => unit.unitClass.helpsInCombat && unit.possiblyStillThere)
     buildBattleGlobal()
     buildBattlesByZone()
     buildBattlesLocal()
+  }
+  
+  def assess() {
     BattleUpdater.assess(local ++ byZone.values :+ global)
   }
   

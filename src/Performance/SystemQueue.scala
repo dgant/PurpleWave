@@ -7,6 +7,7 @@ class SystemQueue {
   
   val systems = Vector(
     new SystemUnitTracking,
+    new SystemGeography,
     new SystemGrids,
     new SystemBattles,
     new SystemEconomy,

@@ -12,16 +12,17 @@ class Configuration {
   var pathRecalculationDelayFrames    = 240
   
   var visualize                   = true
-  var visualizeBases              = false
+  var visualizeBases              = true
   var visualizeBattles            = true
   var visualizeBullets            = false
   var visualizeChokepoints        = true
   var visualizeEconomy            = false
-  var visualizeGeography          = false
+  var visualizeGeography          = true
   var visualizeGrids              = false
   var visualizeHeuristicMovement  = true
   var visualizeHeuristicTargeting = true
   var visualizePerformance        = true
+  var visualizePerformanceDetails = true
   var visualizePlans              = false
   var visualizeResources          = false
   var visualizeRealEstate         = true

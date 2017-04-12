@@ -10,7 +10,10 @@ object VisualizePerformance {
     DrawScreen.header(200, With.performance.meanFrameMilliseconds + "ms avg")
     DrawScreen.header(275, With.performance.maxFrameMilliseconds  + "ms max")
     DrawScreen.header(350, With.performance.cacheLength(1)        + " cache duration")
-    renderDetails()
+    
+    if (With.configuration.visualizePerformanceDetails) {
+      renderDetails()
+    }
   }
   
   def renderDetails() {

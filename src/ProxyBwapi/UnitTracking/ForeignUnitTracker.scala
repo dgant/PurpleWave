@@ -3,6 +3,7 @@ package ProxyBwapi.UnitTracking
 import Lifecycle.With
 import ProxyBwapi.UnitInfo.ForeignUnitInfo
 import Performance.Caching.Limiter
+import ProxyBwapi.Players.Players
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable.HashSet
@@ -45,7 +46,7 @@ class ForeignUnitTracker {
   
     //Could speed things up by diffing instead of recreating these
     foreignUnits = foreignUnitsById.values.toSet
-    enemyUnits   = foreignUnits.filter(_.player.isEnemy(With.self))
+    enemyUnits   = foreignUnits.filter(_.player.isEnemy)
     neutralUnits = foreignUnits.filter(_.player.isNeutral)
   
     unitsToFlagInvisible.foreach(_.flagInvisible)
@@ -73,7 +74,7 @@ class ForeignUnitTracker {
   
   private def flagGhostUnits() {
     //At the start of the game BWAPI sometimes gives us enemy units that don't make any sense.
-    val ghostUnits = With.game.getAllUnits.asScala.filter(_.getPlayer.isEnemy(With.self))
+    val ghostUnits = With.game.getAllUnits.asScala.filter(unit => Players.get(unit.getPlayer).isEnemy)
     enemyGhostUnits = ghostUnits.map(_.getID).toSet
     if (ghostUnits.nonEmpty) {
       With.logger.warn("Found ghost units at start of game:")
@@ -117,6 +118,6 @@ class ForeignUnitTracker {
     
     if (With.units.invalidUnitTypes.contains(unit.getType)) return false
     if ( ! unit.exists) return false
-    unit.getPlayer.isEnemy(With.self) || unit.getPlayer.isNeutral
+    Players.get(unit.getPlayer).isEnemy || Players.get(unit.getPlayer).isNeutral
   }
 }

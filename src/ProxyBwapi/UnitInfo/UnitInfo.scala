@@ -174,10 +174,9 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   // Players //
   /////////////
   
-  def isOurs     : Boolean = player == With.self
-  def isNeutral  : Boolean = player == With.neutral
-  def isFriendly : Boolean = isOurs || player.isAlly(With.self)
-  def isEnemy    : Boolean = player.isEnemy(With.self)
-  
-  def isEnemyOf(enemy:UnitInfo): Boolean = player.isEnemy(enemy.player)
+  def isOurs     : Boolean = player.isUs
+  def isNeutral  : Boolean = player.isNeutral
+  def isFriendly : Boolean = player.isAlly || isOurs
+  def isEnemy    : Boolean = player.isEnemy
+  def isEnemyOf(otherUnit:UnitInfo): Boolean = (isFriendly && otherUnit.isEnemy) || (isEnemy && otherUnit.isFriendly)
 }

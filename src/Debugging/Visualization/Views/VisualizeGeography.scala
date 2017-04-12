@@ -10,12 +10,12 @@ object VisualizeGeography {
       
       DrawMap.polygonPositions(
         zone.points,
-        DrawMap.playerColorDark(zone.owner))
+        zone.owner.colorDark)
       
       DrawMap.line(
         zone.points.head,
         zone.points.last,
-        DrawMap.playerColorDark(zone.owner))
+        zone.owner.colorDark)
     })
   }
 }

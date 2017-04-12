@@ -36,7 +36,7 @@ class BuildEnoughPylons extends Plan {
     //   #1 Supply that is/will be provided by units that exist
     //   #2 Supply that will be provided by plans for which we haven't started building
     
-    val supplyPerDepot            = With.self.getRace.getSupplyProvider.supplyProvided
+    val supplyPerDepot            = With.self.race.getSupplyProvider.supplyProvided
     val currentSupplyOfNexus      = With.units.ours.filter(_.unitClass != Protoss.Pylon).toSeq.map(_.unitClass.supplyProvided).sum
     val currentSupplyUsed         = With.self.supplyUsed
     val unitSpendingRatio         = if (With.geography.ourBases.size < 3) 0.5 else 0.75 //This is the metric that needs the most improvement

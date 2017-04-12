@@ -60,11 +60,11 @@ class TrainUnit(val traineeClass:UnitClass) extends Plan {
     DrawMap.box(
       trainer.get.tileArea.startPixel,
       trainer.get.tileArea.endPixel,
-      DrawMap.playerColorDark(With.self))
+      With.self.colorDark)
     DrawMap.label(
       description.get,
       trainer.get.pixelCenter,
       drawBackground = true,
-      DrawMap.playerColorDark(With.self))
+      With.self.colorDark)
   }
 }

@@ -45,13 +45,13 @@ class Hunt extends Plan {
       DrawMap.circle(
         tile.pixelCenter,
         64,
-        DrawMap.playerColorDark(With.self))
+        With.self.colorDark)
       
       DrawMap.label(
         description.get,
         tile.pixelCenter,
         drawBackground = true,
-        DrawMap.playerColorDark(With.self))
+        With.self.colorDark)
     })
   }
 }

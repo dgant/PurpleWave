@@ -108,18 +108,6 @@ object DrawMap {
     line(points.head, points.last, color)
   }
   
-  def playerColorDark(player:Player):Color = {
-    if      (player == With.self)     Colors.DarkViolet
-    else if (player == With.neutral)  Colors.DarkGray
-    else                              Colors.DarkRed
-  }
-  
-  def playerColorNeon(player:Player):Color = {
-    if      (player == With.self)     Colors.NeonViolet
-    else if (player == With.neutral)  Colors.NeonTeal
-    else                              Colors.NeonRed
-  }
-  
   def irrelevant(points:Iterable[Position]):Boolean = {
     points.forall(irrelevant)
   }

@@ -4,6 +4,7 @@ import Performance.Caching.Limiter
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
 import Lifecycle.With
+import ProxyBwapi.Players.{PlayerInfo, Players}
 import bwapi._
 
 class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
@@ -48,17 +49,17 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
   }
   
   private def updateTracking() {
-    _player     = base.getPlayer
+    _player     = Players.get(base.getPlayer)
     _unitClass  = UnitClasses.get(base.getType)
   }
   
-  private var _lastSeen           : Int       = 0
-  private var _player             : Player    = null
-  private var _possiblyStillThere : Boolean   = false
-  private var _unitClass          : UnitClass = UnitClasses.None
+  private var _lastSeen           : Int         = 0
+  private var _player             : PlayerInfo  = null
+  private var _possiblyStillThere : Boolean     = false
+  private var _unitClass          : UnitClass   = UnitClasses.None
   
   def lastSeen           : Int        = _lastSeen
-  def player             : Player     = _player
+  def player             : PlayerInfo = _player
   def possiblyStillThere : Boolean    = _possiblyStillThere
   def unitClass          : UnitClass  = _unitClass
   

@@ -82,11 +82,11 @@ class BuildBuilding(val buildingClass:UnitClass) extends Plan {
     DrawMap.box(
       buildingClass.tileArea.startInclusive.add(orderedTile.get).topLeftPixel,
       buildingClass.tileArea.endExclusive.add(orderedTile.get).topLeftPixel,
-      DrawMap.playerColorDark(With.self))
+      With.self.colorDark)
     DrawMap.label(
       "Building a " + buildingClass.toString,
       orderedTile.get.topLeftPixel,
       drawBackground = true,
-      DrawMap.playerColorDark(With.self))
+      With.self.colorDark)
   }
 }

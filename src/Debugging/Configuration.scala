@@ -11,10 +11,10 @@ class Configuration {
   var enableFastGroundDistance        = true
   
   var visualize                   = true
-  var visualizeBases              = false
+  var visualizeBases              = true
   var visualizeBattles            = true
   var visualizeBullets            = false
-  var visualizeChokepoints        = false
+  var visualizeChokepoints        = true
   var visualizeEconomy            = false
   var visualizeGeography          = true
   var visualizeGrids              = false

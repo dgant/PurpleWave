@@ -13,10 +13,10 @@ import Macro.Scheduling.Scheduler
 import Micro.Intent.Commander
 import Micro.State.Executor
 import Planning.Plans.GamePlans.WinTheGame
+import ProxyBwapi.Players.{PlayerInfo, Players}
 import ProxyBwapi.ProxyBWMirror
 import ProxyBwapi.UnitTracking.UnitTracker
 import _root_.Performance.Latency
-import bwapi.Player
 import bwta.BWTA
 
 import scala.collection.JavaConverters._
@@ -47,31 +47,23 @@ object With {
   var units         : UnitTracker   = null
   var viewport      : Viewport      = null
   
-  var self    : Player        = null
-  var neutral : Player        = null
-  var enemies : List[Player]  = null
+  var self    : PlayerInfo         = null
+  var neutral : PlayerInfo         = null
+  var enemies : List[PlayerInfo]   = null
   
   var frame       : Int = 0
   var mapWidth    : Int = 0
   var mapHeight   : Int = 0
-  var minerals    : Int = 0
-  var gas         : Int = 0
-  var supplyUsed  : Int = 0
-  var supplyTotal : Int = 0
   
   def onFrame() {
     frame         = With.game.getFrameCount
-    minerals      = With.self.minerals
-    gas           = With.self.gas
-    supplyUsed    = With.self.supplyUsed
-    supplyTotal   = With.self.supplyTotal
   }
   
   def onStart() {
-    With.self                   = With.game.self
     With.proxy                  = new ProxyBWMirror
-    With.neutral                = With.game.neutral
-    With.enemies                = With.game.enemies.asScala.toList
+    With.self                   = Players.get(With.game.self)
+    With.neutral                = Players.get(With.game.neutral)
+    With.enemies                = With.game.enemies.asScala.map(Players.get).toList
     With.mapWidth               = With.game.mapWidth
     With.mapHeight              = With.game.mapHeight
     With.configuration          = new Configuration

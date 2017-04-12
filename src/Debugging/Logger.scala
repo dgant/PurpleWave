@@ -13,7 +13,7 @@ class Logger {
   
   def flush() {
     val opponents = With.enemies
-      .map(_.getName)
+      .map(_.name)
       .mkString("-")
     
     val filenameRaw = (opponents + "-" + Calendar.getInstance.getTime.toString)

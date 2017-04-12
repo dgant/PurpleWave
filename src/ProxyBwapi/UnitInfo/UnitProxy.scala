@@ -1,7 +1,8 @@
 package ProxyBwapi.UnitInfo
 
+import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.UnitClass.UnitClass
-import bwapi.{Player, Position, TilePosition}
+import bwapi.{Position, TilePosition}
 
 abstract class UnitProxy(var base:bwapi.Unit) {
     
@@ -11,7 +12,7 @@ abstract class UnitProxy(var base:bwapi.Unit) {
   // Tracking info //
   ///////////////////
   
-  def player:Player
+  def player:PlayerInfo
   def lastSeen:Int
   def possiblyStillThere:Boolean
   

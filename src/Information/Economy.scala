@@ -98,9 +98,9 @@ class Economy {
   
   def mineralIncomePerMinuteInOneBase(workers:Int):Double = {
     val racialMultiplier =
-      if (With.self.getRace == Race.Protoss) 1.18f else
-      if (With.self.getRace == Race.Zerg)    1.05f else
-                                                  1.0f
+      if (With.self.race == Race.Protoss) 1.18f else
+      if (With.self.race == Race.Zerg)    1.05f else
+                                          1.0f
     racialMultiplier * (
       if(workers <= 9 * 1.0) workers * 57 else
       if(workers <= 9 * 1.3) workers * 53 else

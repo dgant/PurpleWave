@@ -42,16 +42,31 @@ case class TileRectangle(
   }
   
   private def containsRectangle(otherRectangle:TileRectangle):Boolean = {
-    contains(otherRectangle.startInclusive) ||
-    contains(otherRectangle.endExclusive.subtract(1, 1)) ||
-    contains(otherRectangle.startInclusive.getX, otherRectangle.endExclusive.getY - 1) ||
+    contains(otherRectangle.startInclusive)                                             ||
+    contains(otherRectangle.endExclusive.subtract(1, 1))                                ||
+    contains(otherRectangle.startInclusive.getX, otherRectangle.endExclusive.getY - 1)  ||
     contains(otherRectangle.endExclusive.getX - 1, otherRectangle.startInclusive.getY)
   }
   
   lazy val startPixel : Position = startInclusive.topLeftPixel
   lazy val endPixel   : Position = endExclusive.topLeftPixel.subtract(1, 1)
   
-  lazy val tiles: Iterable[TilePosition] =
-    for (x <- startInclusive.getX until endExclusive.getX; y <- startInclusive.getY until endExclusive.getY)
-      yield new TilePosition(x, y)
+  lazy val tiles: Array[TilePosition] = {
+    // Scala while-loops are way faster than for-loops because they don't create Range objects
+    val startX = startInclusive.getX
+    val startY = startInclusive.getY
+    val sizeX = endExclusive.getX - startX
+    val sizeY = endExclusive.getY - startY
+    val output = new Array[TilePosition](sizeX * sizeY)
+    var x = 0
+    while (x < sizeX) {
+      var y = 0
+      while (y < sizeY) {
+        output(x + sizeX * y) = new TilePosition(startX + x, startY + y)
+        y += 1
+      }
+      x += 1
+    }
+    output
+  }
 }

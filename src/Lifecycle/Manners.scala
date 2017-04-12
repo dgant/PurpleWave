@@ -5,7 +5,7 @@ object Manners {
   def onFrame() {
     if (With.configuration.enableSurrendering
       && With.self.supplyUsed == 0
-      && With.minerals < 50
+      && With.self.minerals < 50
       && With.units.enemy.exists(_.unitClass.isWorker)
       && With.units.enemy.exists(_.unitClass.isResourceDepot)) {
       With.game.sendText("Good game! Let's pretend this never happened.")

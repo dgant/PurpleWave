@@ -28,7 +28,7 @@ object VisualizeVectorUnits {
   
   def renderUnit(unit:UnitInfo) {
     
-    val color = DrawMap.playerColorNeon(unit.player)
+    val color = unit.player.colorNeon
     val isActiveBuilding = unit.friendly.nonEmpty && unit.friendly.get.trainingQueue.size > 0
     val animationFrame = unit.left + unit.top + With.frame
     

@@ -11,10 +11,10 @@ object VisualizeBases {
       
       zone.bases.foreach(base => {
         DrawMap.tileRectangle(base.harvestingArea,    Colors.DarkGreen)
-        DrawMap.tileRectangle(base.townHallArea, DrawMap.playerColorDark(base.zone.owner))
+        DrawMap.tileRectangle(base.townHallArea,      base.zone.owner.colorDark)
         DrawMap.labelBox(
           List(
-            base.zone.owner.getName,
+            base.zone.owner.name,
             if (base.isStartLocation) "Start location" else "",
             "Minerals left: " + base.mineralsLeft,
             "Gas left:     " + base.gasLeft,
@@ -27,7 +27,7 @@ object VisualizeBases {
           ),
           base.townHallArea.midPixel,
           true,
-          DrawMap.playerColorDark(base.zone.owner))
+          base.zone.owner.colorDark)
       })
     })
   }

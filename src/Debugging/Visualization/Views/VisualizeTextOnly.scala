@@ -8,9 +8,9 @@ object VisualizeTextOnly {
   def render() {
     
     With.units.all.filter(_.visible).filter(u => u.complete || u.unitClass.isBuilding).foreach(unit => {
-      val color = DrawMap.playerColorDark(unit.player)
+      val color = unit.player.colorDark
       val text = List(
-        unit.player.getName,
+        unit.player.name,
         unit.unitClass.toString,
         if (unit.player == With.neutral) "" else unit.totalHealth.toString + "/" + unit.unitClass.maxTotalHealth,
         if (unit.complete) "" else "In progress"

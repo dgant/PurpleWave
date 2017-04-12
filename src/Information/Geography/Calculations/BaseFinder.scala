@@ -47,6 +47,7 @@ object BaseFinder {
   }
   
   private def isLegalTownHallTile(candidate:TilePosition):Boolean = {
+    if ( ! candidate.valid) return false
     val buildingArea = Protoss.Nexus.tileArea.add(candidate)
     val exclusions =
       resourcePatches

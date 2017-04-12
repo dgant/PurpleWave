@@ -31,8 +31,8 @@ object VisualizeBattles {
   def formatStrength(strength:Double):String = (strength/1000).toInt.toString
   
   private def drawBattle(battle:Battle) {
-    val ourColor      = DrawMap.playerColorDark(With.self)
-    val enemyColor    = DrawMap.playerColorDark(With.enemies.head)
+    val ourColor      = With.self.colorDark
+    val enemyColor    = With.enemies.head.colorDark
     val neutralColor  = Color.Black
     DrawMap.circle(battle.focus,          8, neutralColor)
     DrawMap.circle(battle.us.vanguard,    8, ourColor)
@@ -57,9 +57,9 @@ object VisualizeBattles {
   private def drawBattleReport(battle:BattleSimulation) {
     
     val winner = if (battle.us.lostValue <= battle.enemy.lostValue) With.self else With.enemies.head
-    With.game.drawTextScreen(new Position(5, 31), "Advantage: " + winner.getName)
-    drawPlayerReport(battle.us,     With.self.getName,          new Position(5, 50))
-    drawPlayerReport(battle.enemy,  With.enemies.head.getName,  new Position(130, 50))
+    With.game.drawTextScreen(new Position(5, 31), "Advantage: " + winner.name)
+    drawPlayerReport(battle.us,     With.self.name,         new Position(5, 50))
+    drawPlayerReport(battle.enemy,  With.enemies.head.name, new Position(130, 50))
   }
   
   private def drawPlayerReport(group: BattleSimulationGroup, name:String, origin:Position) {

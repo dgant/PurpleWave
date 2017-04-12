@@ -1,6 +1,7 @@
 package ProxyBwapi.UnitTracking
 
 import Lifecycle.With
+import ProxyBwapi.Players.Players
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 import scala.collection.JavaConverters._
@@ -21,7 +22,7 @@ class FriendlyUnitTracker {
     //Important to remember: bwapi.Units are not persisted frame-to-frame
     //So we do all our comparisons by ID, rather than by object
     
-    val friendlyUnitsNew                = With.self.getUnits.asScala.filter(isValidFriendlyUnit).map(unit => (unit.getID, unit)).toMap
+    val friendlyUnitsNew                = With.self.rawUnits.filter(isValidFriendlyUnit).map(unit => (unit.getID, unit)).toMap
     val friendlyUnitsOld                = friendlyUnitsById
     val friendlyIdsNew                  = friendlyUnitsNew.keySet
     val friendlyIdsOld                  = friendlyUnitsOld.keySet
@@ -70,6 +71,6 @@ class FriendlyUnitTracker {
   private def isValidFriendlyUnit(unit:bwapi.Unit):Boolean ={
     if (With.units.invalidUnitTypes.contains(unit.getType)) return false
     if ( ! unit.exists) return false
-    unit.getPlayer == With.self || unit.getPlayer.isAlly(With.self)
+    Players.get(unit.getPlayer).isFriendly
   }
 }

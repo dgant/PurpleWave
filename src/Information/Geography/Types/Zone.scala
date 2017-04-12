@@ -2,14 +2,14 @@ package Information.Geography.Types
 
 import Lifecycle.With
 import Mathematics.Positions.TileRectangle
-import bwapi.{Player, Position, TilePosition}
+import ProxyBwapi.Players.PlayerInfo
+import Utilities.EnrichPosition._
+import bwapi.{Position, TilePosition}
 import bwta.Region
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
-
-import Utilities.EnrichPosition._
 
 class Zone(
   val bwtaRegion:Region,
@@ -20,7 +20,7 @@ class Zone(
   val edges:ListBuffer[ZoneEdge]) {
   
   val centroid = bwtaRegion.getCenter
-  var owner:Player = With.neutral
+  var owner:PlayerInfo = With.neutral
   val area:Double = bwtaRegion.getPolygon.getArea
   val points:Iterable[Position] = bwtaRegion.getPolygon.getPoints.asScala.toList
   val island:Boolean = ! With.game.getStartLocations.asScala.exists(startTile => With.paths.exists(centroid.tileIncluding, startTile))

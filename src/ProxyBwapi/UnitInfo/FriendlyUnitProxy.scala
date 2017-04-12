@@ -2,6 +2,7 @@ package ProxyBwapi.UnitInfo
 import Performance.Caching.{Cache, CacheFrame}
 import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
 import Lifecycle.With
+import ProxyBwapi.Players.{PlayerInfo, Players}
 import bwapi._
 
 import scala.collection.JavaConverters._
@@ -12,7 +13,7 @@ abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
   override def hashCode(): Int = id.hashCode
   
   val cacheClass     = new Cache[UnitClass]          (5,  () =>  UnitClasses.get(base.getType))
-  val cachePlayer    = new Cache[Player]             (10, () =>  base.getPlayer)
+  val cachePlayer    = new Cache[PlayerInfo]         (10, () =>  Players.get(base.getPlayer))
   val cachePixel     = new CacheFrame[Position]      (() =>  base.getPosition)
   val cacheTile      = new CacheFrame[TilePosition]  (() =>  base.getTilePosition)
   val cacheCompleted = new CacheFrame[Boolean]       (() =>  base.isCompleted)
@@ -27,7 +28,7 @@ abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
   // Tracking info //
   ///////////////////
   
-  def player:Player = cachePlayer.get
+  def player:PlayerInfo = cachePlayer.get
   def lastSeen:Int = With.frame
   def possiblyStillThere:Boolean = alive
   

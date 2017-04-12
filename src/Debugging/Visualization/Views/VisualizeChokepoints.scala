@@ -20,7 +20,7 @@ object VisualizeChokepoints {
         DrawMap.circle(
           edge.centerPixel,
           edge.radiusPixels.toInt,
-          DrawMap.playerColorDark(zone.owner))
+          zone.owner.colorDark)
       })
       
     })

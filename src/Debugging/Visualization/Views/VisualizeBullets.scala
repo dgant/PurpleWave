@@ -2,6 +2,7 @@ package Debugging.Visualization.Views
 
 import Debugging.Visualization.Rendering.DrawMap
 import Lifecycle.With
+import ProxyBwapi.Players.Players
 import Utilities.EnrichPosition._
 
 import scala.collection.JavaConverters._
@@ -16,18 +17,18 @@ object VisualizeBullets {
         DrawMap.circle(
           bullet.getPosition.add(-2, -2),
           2,
-          DrawMap.playerColorDark(bullet.getPlayer),
+          Players.get(bullet.getPlayer).colorDark,
           true)
         DrawMap.circle(
           bullet.getPosition.add(2, -2),
           2,
-          DrawMap.playerColorDark(bullet.getPlayer),
+          Players.get(bullet.getPlayer).colorDark,
           true)
         DrawMap.triangle(
           bullet.getPosition.add(-4, -1),
           bullet.getPosition.add(4, -1),
           bullet.getPosition.add(0, 3),
-          DrawMap.playerColorDark(bullet.getPlayer),
+          Players.get(bullet.getPlayer).colorDark,
           true)
       })
   }

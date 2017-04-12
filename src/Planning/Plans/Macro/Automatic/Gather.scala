@@ -93,7 +93,7 @@ class Gather extends Plan {
   }
   
   private def decideIdealWorkerDistribution() {
-    haveEnoughGas       = With.gas >= Math.max(400, With.minerals)
+    haveEnoughGas       = With.self.gas >= Math.max(400, With.self.minerals)
     workersForGas       = List(safeGas.size * 3, allWorkers.size/3, if(haveEnoughGas) 0 else 200).min
     workersForMinerals  = allWorkers.size - workersForGas
     workersPerGas       = if (safeGas.size == 0) 0 else workersForGas.toDouble / safeGas.size

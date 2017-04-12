@@ -6,7 +6,7 @@ class SystemGrids extends AbstractSystem {
   
   override def urgency: Int = With.configuration.urgencyGrids
   
-  override protected def onRun(): Unit = {
+  override protected def onRun() {
     With.grids.update()
   }
 }

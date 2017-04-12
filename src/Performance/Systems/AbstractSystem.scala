@@ -6,7 +6,8 @@ import scala.collection.mutable
 
 abstract class AbstractSystem {
   
-  private var lastRunFrame:Int = -1
+  private var lastRunFrame  : Int = -1
+  private var totalRunCount : Int = 0
   
   final val runtimeMilliseconds = new mutable.Queue[Long]
   final val runtimesToTrack = 30
@@ -14,14 +15,16 @@ abstract class AbstractSystem {
   def urgency:Int
   protected def onRun()
   
-  final def framesSinceRunning = With.frame - lastRunFrame
+  final def framesSinceRunning = Math.max(1, With.frame - lastRunFrame)
+  final def totalRuns = totalRunCount
   
-  final def run {
-    lastRunFrame = With.frame
+  final def run() {
     val millisecondsBefore = System.currentTimeMillis()
     onRun()
     val millisecondsAfter = System.currentTimeMillis()
     recordRunDuration(millisecondsAfter - millisecondsBefore)
+    lastRunFrame = With.frame
+    totalRunCount += 1
   }
   
   final def recordRunDuration(millisecondsDuration:Long) {
@@ -31,12 +34,12 @@ abstract class AbstractSystem {
     }
   }
   
-  final def maxRunMilliseconds:Long = {
+  final def runMillisecondsMax:Long = {
     if (runtimeMilliseconds.isEmpty) return 0
     runtimeMilliseconds.max
   }
   
-  final def averageRunMilliseconds:Long = {
+  final def runMillisecondsMean:Long = {
     if (runtimeMilliseconds.isEmpty) return 0
     runtimeMilliseconds.sum / runtimeMilliseconds.size
   }

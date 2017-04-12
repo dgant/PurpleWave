@@ -6,7 +6,7 @@ class SystemEconomy extends AbstractSystem {
   
   override def urgency: Int = With.configuration.urgencyEconomy
   
-  override protected def onRun(): Unit = {
+  override protected def onRun() {
     With.economy.update()
   }
 }

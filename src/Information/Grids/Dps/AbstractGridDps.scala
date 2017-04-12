@@ -20,7 +20,7 @@ abstract class AbstractGridDps extends AbstractGridDouble {
     
     reset()
     
-    val framesToLookAhead = 24 + With.performance.frameDelay(With.grids.frameDelayScale)
+    val framesToLookAhead = 24 + With.performance.cacheLength(With.grids.frameDelayScale)
     
     getUnits.foreach(unit => {
       var dps = if (air) unit.unitClass.airDps else unit.unitClass.groundDps

@@ -54,7 +54,7 @@ class Battles {
       return
     }
     
-    val framesToLookAhead = Math.max(12, 2 * With.performance.frameDelay(delayLength))
+    val framesToLookAhead = Math.max(12, 2 * With.performance.cacheLength(delayLength))
     val unassigned = mutable.HashSet.empty ++ combatantsOurs ++ combatantsEnemy
     val clusters = new ListBuffer[mutable.HashSet[UnitInfo]]
     val horizon = new mutable.HashSet[UnitInfo]

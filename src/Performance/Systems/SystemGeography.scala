@@ -6,7 +6,7 @@ class SystemGeography extends AbstractSystem {
   
   override def urgency: Int = With.configuration.urgencyGeography
   
-  override protected def onRun(): Unit = {
+  override protected def onRun() {
    With.geography.update()
   }
 }

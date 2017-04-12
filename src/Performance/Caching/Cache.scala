@@ -7,5 +7,5 @@ class Cache[T](
   recalculator:() => T)
   extends CacheBase[T](recalculator) {
   
-  protected def nextCacheDelay:Int = With.performance.frameDelay(frameDelayScale) + CacheRandom.random.nextInt(2)
+  protected def nextCacheDelay:Int = With.performance.cacheLength(frameDelayScale) + CacheRandom.random.nextInt(2)
 }

@@ -18,13 +18,13 @@ class Bot() extends DefaultBWListener {
 
   override def onFrame() {
     try {
+      With.performance.startFrame()
       With.onFrame()
-      With.performance.startCounting()
       With.latency.onFrame()
       With.systems.onFrame()
       With.camera.onFrame()
       Visualization.onFrame()
-      With.performance.stopCounting()
+      With.performance.endFrame()
     }
     catch { case exception:Exception =>
       val dontLoseTheExceptionWhileDebugging = exception

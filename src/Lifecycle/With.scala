@@ -22,31 +22,31 @@ import bwta.BWTA
 import scala.collection.JavaConverters._
 
 object With {
-  var game          : bwapi.Game    = null
-  var architect     : Architect     = null
-  var bank          : Bank          = null
-  var camera        : AutoCamera    = null
-  var configuration : Configuration = null
-  var battles       : Battles       = null
-  var executor      : Executor      = null
-  var commander     : Commander     = null
-  var economy       : Economy       = null
-  var grids         : Grids         = null
-  var intelligence  : Intelligence  = null
-  var geography     : Geography     = null
-  var gameplan      : WinTheGame    = null
-  var latency       : Latency       = null
-  var logger        : Logger        = null
-  var paths         : Paths         = null
-  var performance   : PerformanceMonitor   = null
-  var proxy         : ProxyBWMirror = null
-  var prioritizer   : Prioritizer   = null
-  var realEstate    : RealEstate    = null
-  var recruiter     : Recruiter     = null
-  var scheduler     : Scheduler     = null
-  var systems       : SystemQueue       = null
-  var units         : UnitTracker   = null
-  var viewport      : Viewport      = null
+  var game          : bwapi.Game          = null
+  var architect     : Architect           = null
+  var bank          : Bank                = null
+  var camera        : AutoCamera          = null
+  var configuration : Configuration       = null
+  var battles       : Battles             = null
+  var executor      : Executor            = null
+  var commander     : Commander           = null
+  var economy       : Economy             = null
+  var grids         : Grids               = null
+  var intelligence  : Intelligence        = null
+  var geography     : Geography           = null
+  var gameplan      : WinTheGame          = null
+  var latency       : Latency             = null
+  var logger        : Logger              = null
+  var paths         : Paths               = null
+  var performance   : PerformanceMonitor  = null
+  var proxy         : ProxyBWMirror       = null
+  var prioritizer   : Prioritizer         = null
+  var realEstate    : RealEstate          = null
+  var recruiter     : Recruiter           = null
+  var scheduler     : Scheduler           = null
+  var systems       : SystemQueue         = null
+  var units         : UnitTracker         = null
+  var viewport      : Viewport            = null
   
   var self    : PlayerInfo         = null
   var neutral : PlayerInfo         = null

@@ -8,32 +8,36 @@ class PerformanceMonitor {
   private val frameTimes = Array.fill(framesToTrack)(1l)
   
   private var millisecondsBefore = 0l
-  private var currentFrameDelay = 24
+  private var currentCacheLength = 24
   private var lastFrameDelayUpdate = 0
   
-  def startCounting() {
+  def startFrame() {
     millisecondsBefore = System.currentTimeMillis()
   }
   
-  def stopCounting() {
+  def endFrame() {
     val millisecondDifference = millisecondsThisFrame
     frameTimes(With.frame % framesToTrack) = millisecondDifference
+    updateFrameDelay()
+  }
   
+  private def updateFrameDelay() = {
     if (With.frame % framesToTrack == 0) {
-      if (meanFrameLength > 20 || maxFrameLength > 60) {
-        currentFrameDelay += 4
+      if (meanFrameMilliseconds > 20 || maxFrameMilliseconds > 60) {
+        currentCacheLength += 4
       } else {
-        currentFrameDelay -= 1
+        currentCacheLength -= 1
       }
-      currentFrameDelay = Math.max(currentFrameDelay, With.latency.turnSize)
-      currentFrameDelay = Math.min(currentFrameDelay, 12)
+      currentCacheLength = Math.max(currentCacheLength, With.latency.turnSize)
+      currentCacheLength = Math.min(currentCacheLength, 12)
     }
   }
   
-  def millisecondsLeft = With.configuration.maxFrameMilliseconds - millisecondsThisFrame
-  def millisecondsThisFrame = System.currentTimeMillis - millisecondsBefore
+  def millisecondsLeftThisFrame = Math.max(0, With.configuration.maxFrameMilliseconds - millisecondsThisFrame)
+  def millisecondsThisFrame     = Math.max(0, System.currentTimeMillis - millisecondsBefore)
   
-  def maxFrameLength:Long = frameTimes.max
-  def meanFrameLength:Long = frameTimes.sum / framesToTrack
-  def frameDelay(size:Int):Int = currentFrameDelay
+  def maxFrameMilliseconds  : Long = frameTimes.max
+  def meanFrameMilliseconds : Long = frameTimes.sum / framesToTrack
+  
+  def cacheLength(size:Int):Int = currentCacheLength
 }

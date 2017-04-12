@@ -6,22 +6,27 @@ import Performance.Systems._
 class SystemQueue {
   
   val systems = Vector(
+    new SystemUnitTracking,
+    new SystemGrids,
     new SystemBattles,
     new SystemEconomy,
-    new SystemGrids,
-    new SystemManners,
-    new SystemMicro,
     new SystemPlanning,
-    new SystemUnitTracking
+    new SystemMicro,
+    new SystemManners
   )
+  
   def onFrame() {
-    systems.sortBy(system => - system.urgency * system.framesSinceRunning)
-    
-    systems
-      .foreach(system =>
-        if (With.frame == 0
-          ||system == systems.head
-          || With.performance.millisecondsLeft > system.maxRunMilliseconds)
-          system.run)
+    if (With.frame == 0) {
+      systems.foreach(_.run())
+    } else {
+      var definitelyRunNextSystem = true
+      systems
+        .sortBy(system => - system.urgency * system.framesSinceRunning)
+        .foreach(system =>
+          if (definitelyRunNextSystem  || With.performance.millisecondsLeftThisFrame > system.runMillisecondsMax) {
+            definitelyRunNextSystem = false
+            system.run()
+          })
+    }
   }
 }

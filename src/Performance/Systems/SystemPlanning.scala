@@ -6,7 +6,7 @@ class SystemPlanning extends AbstractSystem {
   
   override def urgency: Int = With.configuration.urgencyPlanning
   
-  override protected def onRun(): Unit = {
+  override protected def onRun() {
     With.realEstate.update()
     With.bank.update()
     With.recruiter.update()

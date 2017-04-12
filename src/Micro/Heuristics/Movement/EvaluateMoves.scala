@@ -50,7 +50,7 @@ object EvaluateMoves {
     }
     
     if (With.configuration.visualizeHeuristicMovement) {
-      With.executor.getState(intent.unit).movementHeuristicResults =
+      intent.state.movementHeuristicResults =
         candidates.flatten(candidate =>
           profile.weightedHeuristics.map(weightedHeuristic =>
             new MovementHeuristicResult(

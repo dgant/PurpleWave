@@ -14,6 +14,8 @@ class ControlPosition extends Plan {
   
   description.set("Control a position")
   
+  val infiltrationRadius = 32.0 * 25
+  
   val units = new Property[LockUnits](new LockUnits)
   var positionToControl = new Property[TileFinder](new TileEnemyBase)
   
@@ -27,6 +29,7 @@ class ControlPosition extends Plan {
         e.possiblyStillThere &&
         e.canAttackThisFrame &&
         ourBases.exists(base =>
+          e.travelPixels(base.tileIncluding) < infiltrationRadius &&
           e.travelPixels(base.tileIncluding) <
           e.travelPixels(base.tileIncluding, targetPosition)))
         

@@ -20,6 +20,7 @@ object Move extends Action {
       else
         intent.destination.getOrElse(intent.unit.tileIncludingCenter)
     
+    intent.state.movement = Some(tileToMove)
     With.commander.move(intent, tileToMove.pixelCenter)
     true
   }

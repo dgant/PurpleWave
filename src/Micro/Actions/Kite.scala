@@ -15,7 +15,9 @@ object Kite extends Action {
   }
   
   override def perform(intent: Intention): Boolean = {
+    
     val framesToLookAhead = 8//Math.max(24, 2 * With.performance.frameDelay(1))
+    
     //This interpretation of kiting doesn't quite line up with the battle simulator, which may cause unintended behavior.
     if (intent.threats.exists(threat =>
       threat.pixelDistanceSquared(intent.unit) < threat.project(framesToLookAhead).pixelDistanceSquared(intent.unit.pixelCenter) &&

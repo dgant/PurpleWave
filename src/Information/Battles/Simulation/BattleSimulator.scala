@@ -57,9 +57,11 @@ object BattleSimulator {
   }
   
   private def value(unit:Simulacrum):Int = {
-    2 * unit.unit.unitClass.mineralValue +
-    3 * unit.unit.unitClass.gasValue +
-    (if (unit.unit.unitClass.isWorker) 50 else 0)
+    (if (unit.unit.unitClass.isWorker) 2 else 1) *
+    (
+      2 * unit.unit.unitClass.mineralValue +
+      3 * unit.unit.unitClass.gasValue
+    )
   }
   
   private def reduceCooldown(group:BattleSimulationGroup) {

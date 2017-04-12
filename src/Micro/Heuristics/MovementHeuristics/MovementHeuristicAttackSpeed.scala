@@ -11,6 +11,7 @@ object MovementHeuristicAttackSpeed extends MovementHeuristic {
   
   override def evaluate(intent: Intention, candidate: TilePosition): Double = {
     
+    if ( ! intent.canAttack) return HeuristicMath.default
     if (intent.unit.cooldownLeft == 0) return HeuristicMath.default
     
     val relevantUnits = Vector(Terran.Marine, Terran.Ghost, Protoss.Zealot, Protoss.Dragoon, Zerg.Hydralisk)

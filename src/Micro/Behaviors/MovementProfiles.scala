@@ -20,8 +20,9 @@ object MovementProfiles {
   
   def kite =  new MovementProfile(
     preferDestination = 0.50,
+    preferOrigin      = 0.50,
     preferSitAtRange  = 1.25,
-    preferMobility    = 0.50,
+    preferMobility    = 1.00,
     preferHighGround  = 0.25,
     preferAttackSpeed = 1.25,
     avoidDamage       = 1.50,
@@ -29,7 +30,7 @@ object MovementProfiles {
   
   def flee =  new MovementProfile(
     preferOrigin      = 1.00,
-    preferMobility    = 0.50,
+    preferMobility    = 1.00,
     preferHighGround  = 0.25,
     avoidDamage       = 2.50,
     avoidTraffic      = 1.00)

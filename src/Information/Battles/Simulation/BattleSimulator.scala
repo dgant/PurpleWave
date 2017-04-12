@@ -7,6 +7,9 @@ object BattleSimulator {
   
   val maxFrames = 24 * 5
   
+  //If a unit takes damage, how much do we care compared to its total value?
+  val damageCostRatio = 3
+  
   // Loosely, based on the values in the BOSS paper:
   // http://www.aaai.org/ocs/index.php/AIIDE/AIIDE11/paper/viewFile/4078/4407
   def costPerSecondOfNotMining(workers:Int):Int = workers
@@ -18,20 +21,20 @@ object BattleSimulator {
   }
   
   private def runSimulation(simulation: BattleSimulation) {
-    for(frame <- 0 until maxFrames)
-      if (simulation.us.units.nonEmpty && simulation.enemy.units.nonEmpty)
-        step(simulation, frame)
+    while(simulation.frames < maxFrames && simulation.us.units.nonEmpty && simulation.enemy.units.nonEmpty)
+      step(simulation)
+    tallyLosses(simulation, simulation.us)
+    tallyLosses(simulation, simulation.enemy)
   }
   
-  private def step(battle: BattleSimulation, frame:Int) {
+  private def step(battle: BattleSimulation) {
     updateAgents    (battle, battle.us,     battle.enemy)
     updateAgents    (battle, battle.enemy,  battle.us)
     removeDeadUnits (battle.us)
     removeDeadUnits (battle.enemy)
     reduceCooldown  (battle.us)
     reduceCooldown  (battle.enemy)
-    costOfWar       (battle.us,     frame)
-    costOfWar       (battle.enemy,  frame)
+    battle.frames += 1
   }
   
   private def updateAgents (
@@ -49,7 +52,6 @@ object BattleSimulator {
       .foreach(unit =>
         if ( ! unit.alive) {
           group.lostUnits += unit
-          group.lostValue += value(unit)
           group.units -= unit
         })
   }
@@ -67,7 +69,11 @@ object BattleSimulator {
     })
   }
   
-  private def costOfWar(group:BattleSimulationGroup, frame:Int) {
-    if (frame % 24 == 0) group.lostValue += group.lostValuePerSecond
+  private def tallyLosses(battle:BattleSimulation, group:BattleSimulationGroup) {
+    group.lostValue =
+      (group.lostValuePerSecond * battle.frames) / 24 +
+      group.lostUnits.map(value).sum +
+      group.units.map(unit => value(unit) * unit.damageTaken / unit.unit.unitClass.maxTotalHealth).sum / damageCostRatio
+    
   }
 }

@@ -117,6 +117,7 @@ class SimulacrumAgent(
     val damage = thisUnit.unit.damageAgainst(target.unit, target.shields)
     thisUnit.attackCooldown = thisUnit.unit.cooldownAgainst(target.unit)
     thisUnit.moveCooldown = Math.min(thisUnit.attackCooldown, 8)
+    target.damageTaken += damage
     target.shields -= damage
     if (target.shields < 0) {
       target.hitPoints += target.shields

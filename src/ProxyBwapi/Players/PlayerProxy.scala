@@ -18,13 +18,13 @@ abstract class PlayerProxy(base:Player) {
   lazy val  isNeutral   : Boolean = base.isNeutral
   lazy val  isAlly      : Boolean = base.isAlly(With.game.self)
   lazy val  isEnemy     : Boolean = base.isEnemy(With.game.self)
-  lazy val  supplyUsed  : Int     = base.supplyUsed
-  lazy val  supplyTotal : Int     = base.supplyTotal
   
   def gas               = gasCache.get
   def minerals          = mineralsCache.get
   def gatheredGas       = gatheredGasCache.get
   def gatheredMinerals  = gatheredMineralsCache.get
+  def supplyUsed        = supplyUsedCache.get
+  def supplyTotal       = supplyTotalCache.get
   def rawUnits          = unitsCache.get
   
   def getUpgradeLevel(upgrade: Upgrade):Int = {
@@ -49,6 +49,8 @@ abstract class PlayerProxy(base:Player) {
   private val mineralsCache           = new CacheFrame(() => base.minerals)
   private val gatheredGasCache        = new CacheFrame(() => base.gatheredGas)
   private val gatheredMineralsCache   = new CacheFrame(() => base.gatheredMinerals)
+  private val supplyUsedCache         = new CacheFrame(() => base.supplyUsed)
+  private val supplyTotalCache        = new CacheFrame(() => base.supplyTotal)
   private val unitsCache              = new CacheFrame(() => base.getUnits.asScala)
   private val upgradeLevelCaches      = new mutable.HashMap[Upgrade, CacheFrame[Int]]
   private val techsResearchedCaches   = new mutable.HashMap[Tech, CacheFrame[Boolean]]

@@ -6,19 +6,24 @@ import scala.collection.mutable
 
 abstract class AbstractGridVector[T] extends AbstractGridArray[mutable.ArrayBuffer[T]] {
   
-  private val empty = Array.fill(width * height)(defaultValue)
-  
-  override protected var values: Array[mutable.ArrayBuffer[T]] = Array.fill(width * height)(defaultValue)
+  override protected var values = Array.fill(length) { defaultValue }
   override def defaultValue: mutable.ArrayBuffer[T] = new mutable.ArrayBuffer
   override def repr(value: mutable.ArrayBuffer[T]): String  = value.size.toString
   
+  private val populatedTiles = new mutable.HashSet[Tile]
+  
   override def reset() {
-    values = empty.clone
+    populatedTiles.foreach(tile => get(tile).clear())
+    populatedTiles.clear()
   }
   
   override def update() {
     reset()
-    getObjects.foreach(item => get(getTile(item)).append(item))
+    getObjects.foreach(item => {
+      val tile = getTile(item)
+      populatedTiles.add(tile)
+      get(tile).append(item)
+    })
   }
   
   protected def getTile(item: T): Tile

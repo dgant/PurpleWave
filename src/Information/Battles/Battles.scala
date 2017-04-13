@@ -82,10 +82,10 @@ class Battles {
         exploredTiles += nextTile
         
         val nextUnits = With.grids.units.get(nextTile).filter(_ != firstUnit)
-        unassigned  --= nextUnits
-        nextCluster ++= nextUnits
         
         if (nextUnits.nonEmpty) {
+          unassigned  --= nextUnits
+          nextCluster ++= nextUnits
           horizonTiles ++=
             Circle.points(searchRadiusTiles)
             .map(nextTile.add)

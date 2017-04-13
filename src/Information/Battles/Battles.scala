@@ -61,21 +61,21 @@ class Battles {
     val unassigned = mutable.HashSet.empty ++ combatantsOurs ++ combatantsEnemy
     val clusters = new ArrayBuffer[ArrayBuffer[UnitInfo]]
     
-    val exploredTiles = new mutable.BitSet
-    val horizonTiles = new mutable.BitSet
+    val exploredTiles = new mutable.HashSet[Tile]
+    val horizonTiles = new mutable.HashSet[Tile]
     //val searchMarginTiles = 2
     val searchRadiusTiles = With.configuration.combatEvaluationDistanceTiles //searchMarginTiles + Math.min(With.configuration.combatEvaluationDistanceTiles, unassigned.map(_.pixelReachTotal(framesToLookAhead)).max/32 + 1)
     
     while (unassigned.nonEmpty) {
       
       val nextCluster = new ArrayBuffer[UnitInfo]
-      horizonTiles.add(unassigned.head.tileIncludingCenter.i)
+      horizonTiles.add(unassigned.head.tileIncludingCenter)
       
       while (horizonTiles.nonEmpty) {
         
         val nextTile = horizonTiles.head
-        exploredTiles.add(nextTile)
         horizonTiles.remove(nextTile)
+        exploredTiles.add(nextTile)
         
         val nextUnits = With.grids.units.get(nextTile)
         nextUnits.foreach(unassigned.remove)
@@ -84,9 +84,8 @@ class Battles {
         if (nextUnits.nonEmpty) {
           horizonTiles ++=
             Circle.points(searchRadiusTiles)
-            .map(point => new Tile(nextTile).add(point))
-            .filterNot(tile => exploredTiles.contains(tile.i))
-            .map(_.i)
+            .map(nextTile.add)
+            .filterNot(exploredTiles.contains)
         }
       }
       

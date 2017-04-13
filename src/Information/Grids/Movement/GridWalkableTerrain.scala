@@ -10,6 +10,6 @@ class GridWalkableTerrain extends AbstractGridBoolean {
       Tile,
       Square.pointsDownAndRight(4)
         .map(Tile.topLeftWalkPixel.add)
-        .forall(walkTile =>With.game.isWalkable(walkTile.bwapi))))
+        .forall(walkTile => With.game.isWalkable(walkTile.bwapi))))
   }
 }

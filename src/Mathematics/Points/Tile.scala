@@ -12,6 +12,9 @@ case class Tile(argX:Int, argY:Int) extends AbstractPoint(argX, argY) {
   
   def bwapi:TilePosition = new TilePosition(x, y)
   
+  override def equals(other: scala.Any): Boolean = hashCode == other.hashCode && other.isInstanceOf[Tile]
+  override def hashCode(): Int = i
+  
   def valid:Boolean = {
     x >= 0 &&
     y >= 0 &&

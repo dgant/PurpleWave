@@ -12,9 +12,9 @@ case class Pixel(val x:Int, val y:Int) {
   
   def valid:Boolean = {
     x >= 0 &&
-      y >= 0 &&
-      x < With.mapWidth * 32 &&
-      y < With.mapHeight * 32
+    y >= 0 &&
+    x < With.mapWidth * 32 &&
+    y < With.mapHeight * 32
   }
   def add(dx:Int, dy:Int):Pixel = {
     new Pixel(x + dx, y + dy)

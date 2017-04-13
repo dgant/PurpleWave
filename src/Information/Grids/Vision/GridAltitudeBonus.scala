@@ -6,7 +6,7 @@ import Lifecycle.With
 class GridAltitudeBonus extends AbstractGridDouble {
   
   override def onInitialization() {
-    tiles.foreach(position => set(position, getBonus(With.game.getGroundHeight(position))))
+    tiles.foreach(tile => set(tile, getBonus(With.game.getGroundHeight(tile.bwapi))))
   }
   
   private def getBonus(altitude:Int):Double = {

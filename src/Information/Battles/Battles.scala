@@ -2,11 +2,12 @@ package Information.Battles
 
 import Information.Geography.Types.Zone
 import Lifecycle.With
+import Mathematics.Pixels.Tile
+import Mathematics.Shapes.Circle
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, UnitInfo}
-import Utilities.EnrichPixel._
 
 import scala.collection.mutable
-import scala.collection.mutable.{ArrayBuffer, ListBuffer}
+import scala.collection.mutable.ArrayBuffer
 
 class Battles {
   
@@ -63,26 +64,32 @@ class Battles {
     val exploredTiles = new mutable.BitSet
     val horizonTiles = new mutable.BitSet
     //val searchMarginTiles = 2
-    val searchRadius = With.configuration.combatEvaluationDistanceTiles //searchMarginTiles + Math.min(With.configuration.combatEvaluationDistanceTiles, unassigned.map(_.pixelReachTotal(framesToLookAhead)).max/32 + 1)
+    val searchRadiusTiles = With.configuration.combatEvaluationDistanceTiles //searchMarginTiles + Math.min(With.configuration.combatEvaluationDistanceTiles, unassigned.map(_.pixelReachTotal(framesToLookAhead)).max/32 + 1)
+    
     while (unassigned.nonEmpty) {
+      
       val nextCluster = new ArrayBuffer[UnitInfo]
       horizonTiles.add(unassigned.head.tileIncludingCenter.i)
+      
       while (horizonTiles.nonEmpty) {
+        
         val nextTile = horizonTiles.head
         exploredTiles.add(nextTile)
         horizonTiles.remove(nextTile)
-        unassigned.remove(nextTile)
-        nextCluster.add(nextTile)
-        horizonTiles ++= nextTile
-          .inTileRadius(With.configuration.combatEvaluationDistanceTiles)
-          .filter(unassigned.contains)
-          .filter(otherUnit =>
-            nextTile.pixelsFromEdgeFast(otherUnit) <=
-              32.0 * searchMarginTiles +
-              Math.max(
-                nextTile.pixelReachTotal(framesToLookAhead),
-                otherUnit.pixelReachTotal(framesToLookAhead)))
+        
+        val nextUnits = With.grids.units.get(nextTile)
+        nextUnits.foreach(unassigned.remove)
+        nextCluster ++= nextUnits
+        
+        if (nextUnits.nonEmpty) {
+          horizonTiles ++=
+            Circle.points(searchRadiusTiles)
+            .map(point => new Tile(nextTile).add(point))
+            .filterNot(tile => exploredTiles.contains(tile.i))
+            .map(_.i)
+        }
       }
+      
       clusters.append(nextCluster)
     }
     local =

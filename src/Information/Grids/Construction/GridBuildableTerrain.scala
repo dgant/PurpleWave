@@ -5,6 +5,6 @@ import Lifecycle.With
 
 class GridBuildableTerrain extends AbstractGridBoolean {
   override def onInitialization() {
-    tiles.foreach(tile => set(tile, With.game.isBuildable(tile)))
+    tiles.foreach(tile => set(tile, With.game.isBuildable(tile.bwapi)))
   }
 }

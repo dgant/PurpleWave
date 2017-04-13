@@ -7,8 +7,11 @@ import bwapi.TilePosition
 
 case class Tile(argX:Int, argY:Int) extends AbstractPoint(argX, argY) {
   
+  def this(i:Int) = this(i % With.mapWidth, i / With.mapWidth )
   def this(tilePosition:TilePosition) = this(tilePosition.getX, tilePosition.getY)
+  
   def bwapi:TilePosition = new TilePosition(x, y)
+  
   def valid:Boolean = {
     x >= 0 &&
     y >= 0 &&

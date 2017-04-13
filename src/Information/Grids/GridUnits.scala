@@ -7,6 +7,6 @@ import ProxyBwapi.UnitInfo.UnitInfo
 
 class GridUnits extends AbstractGridVector[UnitInfo] {
   
-  override protected def getObjects: Iterable[UnitInfo] = With.units.all
+  override protected def getObjects: Traversable[UnitInfo] = With.units.all
   override protected def getTile(item: UnitInfo): Tile = item.tileIncludingCenter
 }

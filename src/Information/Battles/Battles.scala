@@ -58,34 +58,38 @@ class Battles {
     }
     
     val framesToLookAhead = Math.max(12, 2 * With.performance.cacheLength(delayLength))
+    //val searchMarginTiles = 2
+    val searchRadiusTiles = With.configuration.combatEvaluationDistanceTiles //searchMarginTiles + Math.min(With.configuration.combatEvaluationDistanceTiles, unassigned.map(_.pixelReachTotal(framesToLookAhead)).max/32 + 1)
+    
     val unassigned = mutable.HashSet.empty ++ combatantsOurs ++ combatantsEnemy
     val clusters = new ArrayBuffer[ArrayBuffer[UnitInfo]]
     
     val exploredTiles = new mutable.HashSet[Tile]
-    val horizonTiles = new mutable.HashSet[Tile]
-    //val searchMarginTiles = 2
-    val searchRadiusTiles = With.configuration.combatEvaluationDistanceTiles //searchMarginTiles + Math.min(With.configuration.combatEvaluationDistanceTiles, unassigned.map(_.pixelReachTotal(framesToLookAhead)).max/32 + 1)
+    val horizonTiles  = new mutable.HashSet[Tile]
     
     while (unassigned.nonEmpty) {
-      
+  
+      val firstUnit = unassigned.head
       val nextCluster = new ArrayBuffer[UnitInfo]
-      horizonTiles.add(unassigned.head.tileIncludingCenter)
+      unassigned  -= firstUnit
+      nextCluster += firstUnit
+      horizonTiles.add(firstUnit.tileIncludingCenter)
       
       while (horizonTiles.nonEmpty) {
         
         val nextTile = horizonTiles.head
-        horizonTiles.remove(nextTile)
-        exploredTiles.add(nextTile)
+        horizonTiles  -= nextTile
+        exploredTiles += nextTile
         
-        val nextUnits = With.grids.units.get(nextTile)
-        nextUnits.foreach(unassigned.remove)
+        val nextUnits = With.grids.units.get(nextTile).filter(_ != firstUnit)
+        unassigned  --= nextUnits
         nextCluster ++= nextUnits
         
         if (nextUnits.nonEmpty) {
           horizonTiles ++=
             Circle.points(searchRadiusTiles)
             .map(nextTile.add)
-            .filterNot(exploredTiles.contains)
+            .filter(tile => tile.valid && ! exploredTiles.contains(tile))
         }
       }
       

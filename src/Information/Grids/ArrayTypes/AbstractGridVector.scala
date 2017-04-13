@@ -9,11 +9,11 @@ abstract class AbstractGridVector[T] extends AbstractGridArray[mutable.ArrayBuff
   private val empty = Array.fill(width * height)(defaultValue)
   
   override protected var values: Array[mutable.ArrayBuffer[T]] = Array.fill(width * height)(defaultValue)
-  override def defaultValue: mutable.ArrayBuffer[T] = mutable.ArrayBuffer.empty
+  override def defaultValue: mutable.ArrayBuffer[T] = new mutable.ArrayBuffer
   override def repr(value: mutable.ArrayBuffer[T]): String  = value.size.toString
   
   override def reset() {
-    values = empty.clone()
+    values = empty.clone
   }
   
   override def update() {

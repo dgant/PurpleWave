@@ -2,7 +2,7 @@ package Information.Geography.Calculations
 
 import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
-import Utilities.EnrichPosition._
+import Utilities.EnrichPixel._
 
 object ZoneUpdater {
   

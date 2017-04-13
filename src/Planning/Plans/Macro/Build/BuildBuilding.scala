@@ -2,7 +2,7 @@ package Planning.Plans.Macro.Build
 
 import Debugging.Visualizations.Rendering.DrawMap
 import Micro.Intent.Intention
-import Planning.Composition.PositionFinders.Buildings.TileArbitraryBuilding
+import Planning.Composition.PixelFinders.Buildings.TileArbitraryBuilding
 import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Composition.UnitPreferences.UnitPreferClose
@@ -11,8 +11,8 @@ import Planning.Composition.ResourceLocks.{LockArea, LockCurrencyForUnit, LockUn
 import ProxyBwapi.UnitClass.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Lifecycle.With
-import Utilities.EnrichPosition._
-import bwapi.{Race, TilePosition}
+import Mathematics.Pixels.Tile
+import bwapi.Race
 
 class BuildBuilding(val buildingClass:UnitClass) extends Plan {
   
@@ -27,7 +27,7 @@ class BuildBuilding(val buildingClass:UnitClass) extends Plan {
   }
   private var builder:Option[FriendlyUnitInfo] = None
   private var building:Option[FriendlyUnitInfo] = None
-  private var orderedTile:Option[TilePosition] = None
+  private var orderedTile:Option[Tile] = None
     
   description.set("Build a " + buildingClass)
   

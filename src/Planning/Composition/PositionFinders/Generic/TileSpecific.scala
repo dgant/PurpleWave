@@ -1,8 +1,8 @@
-package Planning.Composition.PositionFinders.Generic
+package Planning.Composition.PixelFinders.Generic
 
-import Planning.Composition.PositionFinders.TileFinder
-import bwapi.TilePosition
+import Mathematics.Pixels.Tile
+import Planning.Composition.PixelFinders.TileFinder
 
-case class TileSpecific(val position:TilePosition) extends TileFinder {
-  override def find(): Option[TilePosition] = Some(position)
+case class TileSpecific(val position:Tile) extends TileFinder {
+  override def find(): Option[Tile] = Some(position)
 }

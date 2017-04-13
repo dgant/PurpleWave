@@ -1,6 +1,6 @@
 package Mathematics.Shapes
 
-import bwapi.TilePosition
+import Mathematics.Pixels.Tile
 
 object PylonRadius {
   
@@ -25,10 +25,10 @@ object PylonRadius {
     )
     .toVector
   
-  def powers(pylon:TilePosition, target:TilePosition):Boolean = {
+  def powers(pylon:Tile, target:Tile):Boolean = {
     isInRadius(
-      normalize(pylon.getX - target.getX),
-      normalize(pylon.getY - target.getY))
+      normalize(pylon.x - target.x),
+      normalize(pylon.y - target.y))
   }
   
   def isInRadius(x:Int, y:Int):Boolean = y match {

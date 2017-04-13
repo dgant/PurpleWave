@@ -2,41 +2,40 @@ package Debugging.Visualizations.Rendering
 
 import Debugging.Visualizations.Colors
 import Lifecycle.With
-import Mathematics.Positions.TileRectangle
-import Utilities.EnrichPosition._
-import bwapi.{Color, Player, Position}
+import Mathematics.Pixels.{Pixel, TileRectangle}
+import bwapi.Color
 
 object DrawMap {
   
   def text(
-    origin:Position,
+    origin:Pixel,
     text:String) {
     if (irrelevant(origin)) return
-    With.game.drawTextMap(origin, text)
+    With.game.drawTextMap(origin.bwapi, text)
   }
   
   def line(
-    start:Position,
-    end:Position,
+    start:Pixel,
+    end:Pixel,
     color:Color = Colors.DefaultGray) {
     if (irrelevant(Vector(start, end))) return
-    With.game.drawLineMap(start, end, color)
+    With.game.drawLineMap(start.bwapi, end.bwapi, color)
   }
   
   def box(
-           start:Position,
-           end:Position,
-           color:Color = Colors.DefaultGray,
-           solid:Boolean = false) {
+    start:Pixel,
+    end:Pixel,
+    color:Color = Colors.DefaultGray,
+    solid:Boolean = false) {
     if (irrelevant(Vector(start, end))) return
-    With.game.drawBoxMap(start, end, color, solid)
+    With.game.drawBoxMap(start.bwapi, end.bwapi, color, solid)
   }
   
   def circle(
-              center:Position,
-              radius:Int,
-              color:Color = Colors.DefaultGray,
-              solid:Boolean = false) {
+    center:Pixel,
+    radius:Int,
+    color:Color = Colors.DefaultGray,
+    solid:Boolean = false) {
     if (irrelevant(
       Vector(
         center,
@@ -44,22 +43,22 @@ object DrawMap {
         center.add(-radius, radius),
         center.add(radius, -radius),
         center.add(-radius, -radius)))) return
-    With.game.drawCircleMap(center, radius, color, solid)
+    With.game.drawCircleMap(center.bwapi, radius, color, solid)
   }
   
   def triangle(
-                position1:Position,
-                position2:Position,
-                position3:Position,
-                color:Color = Colors.DefaultGray,
-                solid: Boolean = false) {
+    position1:Pixel,
+    position2:Pixel,
+    position3:Pixel,
+    color:Color = Colors.DefaultGray,
+    solid: Boolean = false) {
     if (irrelevant(Vector(position1, position2, position3))) return
-    With.game.drawTriangleMap(position1, position2, position3, color, solid)
+    With.game.drawTriangleMap(position1.bwapi, position2.bwapi, position3.bwapi, color, solid)
   }
   
   def label(
     text:String,
-    position:Position,
+    position:Pixel,
     drawBackground:Boolean = false,
     backgroundColor:Color = Colors.DefaultGray) {
     if (irrelevant(position)) return
@@ -68,7 +67,7 @@ object DrawMap {
   
   def labelBox(
       textLines:Iterable[String],
-      position:Position,
+      position:Pixel,
       drawBackground:Boolean = false,
       backgroundColor:Color = Colors.DefaultGray) {
     
@@ -78,8 +77,8 @@ object DrawMap {
     val estimatedTextWidth = (9 * textLines.map(_.size).max) / 2
     val boxWidth = estimatedTextWidth + (if (estimatedTextWidth > 0) 2 * horizontalMargin else 0)
     val boxHeight = 11 * textLines.size
-    val textX = position.getX - boxWidth/2
-    val textY = position.getY - boxHeight/2
+    val textX = position.x - boxWidth/2
+    val textY = position.y - boxHeight/2
     val boxX = textX - horizontalMargin
     val boxY = textY
     
@@ -100,18 +99,18 @@ object DrawMap {
   
   def tileRectangle(rectangle:TileRectangle, color:Color) {
     if (irrelevant(Vector(rectangle.startPixel, rectangle.endPixel))) return
-    With.game.drawBoxMap(rectangle.startPixel, rectangle.endPixel, color)
+    With.game.drawBoxMap(rectangle.startPixel.bwapi, rectangle.endPixel.bwapi, color)
   }
   
-  def polygonPositions(points:Iterable[Position], color:Color = Colors.DefaultGray) {
+  def polygonPixels(points:Iterable[Pixel], color:Color = Colors.DefaultGray) {
     points.reduce((p1, p2) => { line(p1, p2, color); p2 })
     line(points.head, points.last, color)
   }
   
-  def irrelevant(points:Iterable[Position]):Boolean = {
+  def irrelevant(points:Iterable[Pixel]):Boolean = {
     points.forall(irrelevant)
   }
-  def irrelevant(pixel:Position):Boolean = {
+  def irrelevant(pixel:Pixel):Boolean = {
     val buffer = 32 * 4
     ! pixel.valid || ! With.viewport.contains(pixel)
   }

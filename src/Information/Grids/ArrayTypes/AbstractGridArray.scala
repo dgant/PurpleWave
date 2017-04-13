@@ -1,7 +1,7 @@
 package Information.Grids.ArrayTypes
 
 import Information.Grids.AbstractGrid
-import bwapi.TilePosition
+import Mathematics.Pixels.Tile
 
 
 abstract class AbstractGridArray[T] extends AbstractGrid[T] {
@@ -24,15 +24,15 @@ abstract class AbstractGridArray[T] extends AbstractGrid[T] {
     }
   }
   
-  final def initialize()                                  = if ( ! initialized) { onInitialization(); initialized = true }
-  override def update()                                   = initialize()
+  final def initialize()                          = if ( ! initialized) { onInitialization(); initialized = true }
+  override def update()                           = initialize()
   def onInitialization() {}
-  def indices:Iterable[Int]                               = values.indices
-  def points:Iterable[(Int, Int)]                         = indices.map(i => (x(i), y(i)))
-  def tiles:Iterable[TilePosition]                        = indices.map(i => new TilePosition(x(i), y(i)))
-  def get(i:Int):T                                        = if (valid(i)) values(i) else defaultValue
-  def set(i:Int, value:T):Unit                            = if (valid(i)) values(i) = value
-  def set(tileX:Int, tileY:Int, value:T):Unit             = set(i(tileX, tileY), value)
-  def set(position:TilePosition, value:T):Unit            = set(i(position.getX, position.getY), value)
+  def indices:Iterable[Int]                       = values.indices
+  def points:Iterable[(Int, Int)]                 = indices.map(i => (x(i), y(i)))
+  def tiles:Iterable[Tile]                        = indices.map(i => new Tile(x(i), y(i)))
+  def get(i:Int):T                                = if (valid(i)) values(i) else defaultValue
+  def set(i:Int, value:T):Unit                    = if (valid(i)) values(i) = value
+  def set(tileX:Int, tileY:Int, value:T):Unit     = set(i(tileX, tileY), value)
+  def set(position:Tile, value:T):Unit            = set(i(position.x, position.y), value)
 }
 

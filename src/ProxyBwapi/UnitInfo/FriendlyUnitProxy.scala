@@ -2,6 +2,7 @@ package ProxyBwapi.UnitInfo
 import Performance.Caching.{Cache, CacheFrame}
 import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
 import Lifecycle.With
+import Mathematics.Pixels.{Pixel, Tile}
 import ProxyBwapi.Players.{PlayerInfo, Players}
 import bwapi._
 
@@ -12,17 +13,17 @@ abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
   override def equals(obj: Any): Boolean = obj.isInstanceOf[FriendlyUnitProxy] && obj.asInstanceOf[FriendlyUnitProxy].id == id
   override def hashCode(): Int = id.hashCode
   
-  val cacheClass     = new Cache[UnitClass]          (5,  () =>  UnitClasses.get(base.getType))
-  val cachePlayer    = new Cache[PlayerInfo]         (10, () =>  Players.get(base.getPlayer))
-  val cachePixel     = new CacheFrame[Position]      (() =>  base.getPosition)
-  val cacheTile      = new CacheFrame[TilePosition]  (() =>  base.getTilePosition)
-  val cacheCompleted = new CacheFrame[Boolean]       (() =>  base.isCompleted)
-  val cacheExists    = new CacheFrame[Boolean]       (() =>  base.exists)
-  val cacheSelected  = new CacheFrame[Boolean]       (() =>  base.isSelected)
-  val cacheId        = new CacheFrame[Int]           (() =>  base.getID)
-  val cachedFlying   = new CacheFrame[Boolean]       (() =>  base.isFlying)
-  val cachedCloaked  = new CacheFrame[Boolean]       (() =>  base.isCloaked)
-  val cachedStasised = new CacheFrame[Boolean]       (() =>  base.isStasised)
+  val cacheClass     = new Cache[UnitClass]     (5,  () =>  UnitClasses.get(base.getType))
+  val cachePlayer    = new Cache[PlayerInfo]    (10, () =>  Players.get(base.getPlayer))
+  val cachePixel     = new CacheFrame[Pixel]    (() =>  new Pixel(base.getPosition))
+  val cacheTile      = new CacheFrame[Tile]     (() =>  new Tile(base.getTilePosition))
+  val cacheCompleted = new CacheFrame[Boolean]  (() =>  base.isCompleted)
+  val cacheExists    = new CacheFrame[Boolean]  (() =>  base.exists)
+  val cacheSelected  = new CacheFrame[Boolean]  (() =>  base.isSelected)
+  val cacheId        = new CacheFrame[Int]      (() =>  base.getID)
+  val cachedFlying   = new CacheFrame[Boolean]  (() =>  base.isFlying)
+  val cachedCloaked  = new CacheFrame[Boolean]  (() =>  base.isCloaked)
+  val cachedStasised = new CacheFrame[Boolean]  (() =>  base.isStasised)
   
   ///////////////////
   // Tracking info //
@@ -71,12 +72,12 @@ abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
   // Geometry //
   //////////////
   
-  def pixelCenter : Position      = cachePixel.get
-  def tileTopLeft : TilePosition  = cacheTile.get
-  def top         : Int           = base.getTop
-  def left        : Int           = base.getLeft
-  def right       : Int           = base.getRight
-  def bottom      : Int           = base.getBottom
+  def pixelCenter : Pixel = cachePixel.get
+  def tileTopLeft : Tile  = cacheTile.get
+  def top         : Int   = base.getTop
+  def left        : Int   = base.getLeft
+  def right       : Int   = base.getRight
+  def bottom      : Int   = base.getBottom
   
   ////////////
   // Orders //
@@ -96,7 +97,7 @@ abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
   def attackFrame:Boolean
   def constructing:Boolean
   def following:Boolean
-  def holdingPosition:Boolean
+  def holdingPixel:Boolean
   def idle:Boolean
   def interruptible:Boolean
   def morphing:Boolean

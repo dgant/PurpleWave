@@ -1,19 +1,18 @@
-package Planning.Composition.PositionFinders.Buildings
+package Planning.Composition.PixelFinders.Buildings
 
-import Planning.Composition.PositionFinders.TileFinder
+import Planning.Composition.PixelFinders.TileFinder
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClass.UnitClass
 import Lifecycle.With
-import Mathematics.Positions.TileRectangle
-import bwapi.TilePosition
+import Mathematics.Pixels.{Tile, TileRectangle}
 
 class TileSimpleBuilding(val buildingClass:UnitClass) extends TileFinder {
   
-  private var lastTile:Option[TilePosition] = None
+  private var lastTile:Option[Tile] = None
   
   private var lastFailure = 0
   
-  def find: Option[TilePosition] = {
+  def find: Option[Tile] = {
     //Don't lag out due to lack of pylon space
     if (buildingClass.requiresPsi && ! With.units.ours.exists(u => u.complete && u.unitClass == Protoss.Pylon)) {
       return None
@@ -48,7 +47,7 @@ class TileSimpleBuilding(val buildingClass:UnitClass) extends TileFinder {
     With.realEstate.reserved
   }
   
-  def requestTile:Option[TilePosition] = {
+  def requestTile:Option[Tile] = {
     
     // Performance optimization:
     // Don't waste time looking for a place to put a Gateway when we have no Pylons.
@@ -56,7 +55,7 @@ class TileSimpleBuilding(val buildingClass:UnitClass) extends TileFinder {
       return None
     }
     
-    var output:Option[TilePosition] = None
+    var output:Option[Tile] = None
     
     (maxMargin to 1 by -1)
       .foreach(margin =>

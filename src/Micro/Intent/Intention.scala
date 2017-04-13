@@ -2,6 +2,7 @@ package Micro.Intent
 
 import Information.Battles.Simulation.Tactics.Tactics
 import Lifecycle.With
+import Mathematics.Pixels.Tile
 import Micro.Behaviors.{MovementProfiles, TargetingProfiles}
 import Micro.State.ExecutionState
 import Planning.Plan
@@ -9,7 +10,6 @@ import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClass.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import ProxyBwapi.Upgrades.Upgrade
-import bwapi.TilePosition
 
 class Intention(val plan:Plan, val unit:FriendlyUnitInfo) {
   
@@ -18,16 +18,16 @@ class Intention(val plan:Plan, val unit:FriendlyUnitInfo) {
   
   var executed:Boolean = false
   
-  var origin      : TilePosition          = With.geography.home
-  var destination : Option[TilePosition]  = None
-  var toAttack    : Option[UnitInfo]      = None
-  var toGather    : Option[UnitInfo]      = None
-  var toBuild     : Option[UnitClass]     = None
-  var toTrain     : Option[UnitClass]     = None
-  var toTech      : Option[Tech]          = None
-  var toUpgrade   : Option[Upgrade]       = None
-  var leash       : Option[Int]           = None
-  var canAttack   : Boolean               = true
+  var origin      : Tile              = With.geography.home
+  var destination : Option[Tile]      = None
+  var toAttack    : Option[UnitInfo]  = None
+  var toGather    : Option[UnitInfo]  = None
+  var toBuild     : Option[UnitClass] = None
+  var toTrain     : Option[UnitClass] = None
+  var toTech      : Option[Tech]      = None
+  var toUpgrade   : Option[Upgrade]   = None
+  var leash       : Option[Int]       = None
+  var canAttack   : Boolean           = true
   
   lazy val targets = Targets.get(this)
   lazy val threats = Threats.get(this)

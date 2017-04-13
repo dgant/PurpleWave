@@ -4,8 +4,8 @@ import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
 import ProxyBwapi.UnitInfo.UnitInfo
 import Lifecycle.With
-import Utilities.EnrichPosition._
-import bwapi.{Color, Position}
+import Mathematics.Pixels.Pixel
+import bwapi.Color
 
 object VisualizeVectorUnits {
   
@@ -52,19 +52,19 @@ object VisualizeVectorUnits {
     val apex              = top - unit.unitClass.height / 4
   
     drawSolidTriangle(
-      new Position(farLeft, bottom),
-      new Position(farRight, bottom),
-      new Position(middle, apex),
+      new Pixel(farLeft, bottom),
+      new Pixel(farRight, bottom),
+      new Pixel(middle, apex),
       color)
     drawSolidTriangle(
-      new Position(farLeft, bottom),
-      new Position(leftPerspective, waist),
-      new Position(middle, apex),
+      new Pixel(farLeft, bottom),
+      new Pixel(leftPerspective, waist),
+      new Pixel(middle, apex),
       color)
     drawSolidTriangle(
-      new Position(farRight, bottom),
-      new Position(rightPerspective, waist),
-      new Position(middle, apex),
+      new Pixel(farRight, bottom),
+      new Pixel(rightPerspective, waist),
+      new Pixel(middle, apex),
       color)
     DrawMap.label(
       unit.unitClass.toString
@@ -76,7 +76,7 @@ object VisualizeVectorUnits {
         .replaceAll("Critter Rhynadon", "Snuggles the Rhino")
         .replaceAll("Critter Ursadon", "Cupcake Cuddlemonster")
         .replaceAll("Critter Kakaru", "Flying Dumpling"),
-      new Position(middle, bottom + 9))
+      new Pixel(middle, bottom + 9))
 
     val eyeLeft         = middle  + unit.unitClass.width  / 5
     val eyeRight        = middle  - unit.unitClass.width  / 5
@@ -92,12 +92,12 @@ object VisualizeVectorUnits {
       val foreheadLow   = eyeLevel - unit.unitClass.height / 8
       val foreheadHigh  = eyeLevel - unit.unitClass.height / 4
       DrawMap.line(
-        new Position(mouthLeft, foreheadHigh),
-        new Position(middle,    foreheadLow),
+        new Pixel(mouthLeft, foreheadHigh),
+        new Pixel(middle,    foreheadLow),
         color)
       DrawMap.line(
-        new Position(mouthRight,  foreheadHigh),
-        new Position(middle,      foreheadLow),
+        new Pixel(mouthRight,  foreheadHigh),
+        new Pixel(middle,      foreheadLow),
         color)
     }
     
@@ -115,32 +115,32 @@ object VisualizeVectorUnits {
     }
     
     if (unit.complete) {
-      DrawMap.box(new Position(eyeLeft-1,  eyeLevel-1), new Position(eyeLeft+1,  eyeLevel+1), color, true)
-      DrawMap.box(new Position(eyeRight-1, eyeLevel-1), new Position(eyeRight+1, eyeLevel+1), color, true)
+      DrawMap.box(new Pixel(eyeLeft-1,  eyeLevel-1), new Pixel(eyeLeft+1,  eyeLevel+1), color, true)
+      DrawMap.box(new Pixel(eyeRight-1, eyeLevel-1), new Pixel(eyeRight+1, eyeLevel+1), color, true)
     }
     else {
-      DrawMap.line(new Position(eyeLeft-1,  eyeLevel+1),  new Position(eyeLeft+1,  eyeLevel+1), color)
-      DrawMap.line(new Position(eyeLeft-1,  eyeLevel+1),  new Position(eyeLeft-3,  eyeLevel-1), color)
-      DrawMap.line(new Position(eyeLeft+1,  eyeLevel+1),  new Position(eyeLeft+3,  eyeLevel-1), color)
-      DrawMap.line(new Position(eyeRight-1, eyeLevel+1),  new Position(eyeRight+1, eyeLevel+1), color)
-      DrawMap.line(new Position(eyeRight-1, eyeLevel+1),  new Position(eyeRight-3, eyeLevel-1), color)
-      DrawMap.line(new Position(eyeRight+1, eyeLevel+1),  new Position(eyeRight+3, eyeLevel-1), color)
+      DrawMap.line(new Pixel(eyeLeft-1,  eyeLevel+1),  new Pixel(eyeLeft+1,  eyeLevel+1), color)
+      DrawMap.line(new Pixel(eyeLeft-1,  eyeLevel+1),  new Pixel(eyeLeft-3,  eyeLevel-1), color)
+      DrawMap.line(new Pixel(eyeLeft+1,  eyeLevel+1),  new Pixel(eyeLeft+3,  eyeLevel-1), color)
+      DrawMap.line(new Pixel(eyeRight-1, eyeLevel+1),  new Pixel(eyeRight+1, eyeLevel+1), color)
+      DrawMap.line(new Pixel(eyeRight-1, eyeLevel+1),  new Pixel(eyeRight-3, eyeLevel-1), color)
+      DrawMap.line(new Pixel(eyeRight+1, eyeLevel+1),  new Pixel(eyeRight+3, eyeLevel-1), color)
       
-      DrawMap.text(new Position(right, top), "Z")
-      (1 to (1 + animationFrame/16 % 4)).foreach(i => DrawMap.text(new Position(right + i * 6, top - i * 2), "z"))
+      DrawMap.text(new Pixel(right, top), "Z")
+      (1 to (1 + animationFrame/16 % 4)).foreach(i => DrawMap.text(new Pixel(right + i * 6, top - i * 2), "z"))
     }
     
     DrawMap.line(
-      new Position(mouthLeft, mouthTop),
-      new Position(mouthAngleLeft, mouthBottom),
+      new Pixel(mouthLeft, mouthTop),
+      new Pixel(mouthAngleLeft, mouthBottom),
       color)
     DrawMap.line(
-      new Position(mouthAngleLeft, mouthBottom),
-      new Position(mouthAngleRight, mouthBottom),
+      new Pixel(mouthAngleLeft, mouthBottom),
+      new Pixel(mouthAngleRight, mouthBottom),
       color)
     DrawMap.line(
-      new Position(mouthRight, mouthTop),
-      new Position(mouthAngleRight, mouthBottom),
+      new Pixel(mouthRight, mouthTop),
+      new Pixel(mouthAngleRight, mouthBottom),
       color)
     
     if (unit.carryingMinerals) {
@@ -151,7 +151,7 @@ object VisualizeVectorUnits {
     }
   }
   
-  def drawSolidTriangle(p1:Position, p2:Position, p3:Position, foreground:Color, background:Color = Color.Black) {
+  def drawSolidTriangle(p1:Pixel, p2:Pixel, p3:Pixel, foreground:Color, background:Color = Color.Black) {
     DrawMap.triangle(p1, p2, p3, background, true)
     DrawMap.triangle(p1, p2, p3, foreground, false)
   }

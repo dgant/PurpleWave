@@ -3,14 +3,14 @@ package Information.Grids.Movement
 import Mathematics.Shapes.Square
 import Information.Grids.ArrayTypes.AbstractGridBoolean
 import Lifecycle.With
-import Utilities.EnrichPosition._
+import Utilities.EnrichPixel._
 
 class GridWalkableTerrain extends AbstractGridBoolean {
   override def onInitialization() {
-    tiles.foreach(tilePosition => set(
-      tilePosition,
+    tiles.foreach(Tile => set(
+      Tile,
       Square.pointsDownAndRight(4)
-        .map(tilePosition.topLeftWalkPosition.add)
+        .map(Tile.topLeftWalkPixel.add)
         .forall(With.game.isWalkable)))
   }
 }

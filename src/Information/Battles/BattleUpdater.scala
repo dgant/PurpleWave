@@ -2,7 +2,7 @@ package Information.Battles
 
 import Information.Battles.Evaluation.BattleMetrics
 import Information.Battles.Simulation.BattleSimulator
-import Mathematics.Positions.Positions
+import Mathematics.Pixels.Points
 
 object BattleUpdater {
   
@@ -20,7 +20,7 @@ object BattleUpdater {
       battle.simulations = BattleSimulator.simulate(battle)
     }
     else {
-      battle.groups.foreach(group => group.vanguard = group.units.headOption.map(_.pixelCenter).getOrElse(Positions.middle))
+      battle.groups.foreach(group => group.vanguard = group.units.headOption.map(_.pixelCenter).getOrElse(Points.middle))
     }
     battle.groups.foreach(group => group.strength = BattleMetrics.estimateStrength(group, battle))
   }

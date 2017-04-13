@@ -1,13 +1,13 @@
 package Planning.Plans.Army
 
-import Planning.Composition.PositionFinders.Generic.TileMiddle
+import Planning.Composition.PixelFinders.Generic.TileMiddle
 import Planning.Plan
 import Lifecycle.With
-import Planning.Composition.PositionFinders.TileFinder
+import Planning.Composition.PixelFinders.TileFinder
 import Planning.Composition.Property
 import Planning.Composition.UnitMatchers.{UnitMatchAnything, UnitMatcher}
 
-import Utilities.EnrichPosition._
+import Utilities.EnrichPixel._
 
 class CheckUnitsAtLocation extends Plan {
   

@@ -1,13 +1,12 @@
 package Information.Battles
 
-import Mathematics.Positions.Positions
+import Mathematics.Pixels.{Pixel, Points}
 import ProxyBwapi.UnitInfo.UnitInfo
-import bwapi.Position
 
 class BattleGroup(val units:Set[UnitInfo]) {
   
-  var vanguard:Position = Positions.middle
-  var center:Position = Positions.middle
+  var vanguard:Pixel = Points.middle
+  var center:Pixel = Points.middle
   
   var strength      : Double = 0.0
 }

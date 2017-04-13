@@ -1,12 +1,12 @@
 package Micro.Heuristics.MovementHeuristics
 
 import Mathematics.Heuristics.HeuristicMath
+import Mathematics.Pixels.Tile
 import Micro.Intent.Intention
-import bwapi.TilePosition
 
 object MovementHeuristicKeepMoving extends MovementHeuristic {
   
-  override def evaluate(intent: Intention, candidate: TilePosition): Double = {
+  override def evaluate(intent: Intention, candidate: Tile): Double = {
   
     HeuristicMath.fromBoolean(intent.unit.tileIncludingCenter != candidate)
     

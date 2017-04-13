@@ -3,7 +3,7 @@ package Information.Grids.Vision
 import Mathematics.Shapes.Circle
 import Information.Grids.ArrayTypes.AbstractGridBoolean
 import ProxyBwapi.UnitInfo.UnitInfo
-import Utilities.EnrichPosition._
+import Utilities.EnrichPixel._
 
 abstract class AbstractGridVision extends AbstractGridBoolean {
   

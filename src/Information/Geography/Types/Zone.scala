@@ -1,10 +1,8 @@
 package Information.Geography.Types
 
 import Lifecycle.With
-import Mathematics.Positions.TileRectangle
+import Mathematics.Pixels.{Pixel, Tile, TileRectangle}
 import ProxyBwapi.Players.PlayerInfo
-import Utilities.EnrichPosition._
-import bwapi.{Position, TilePosition}
 import bwta.Region
 
 import scala.collection.JavaConverters._
@@ -15,16 +13,16 @@ class Zone(
   val bwtaRegion:Region,
   val groundHeight:Int,
   val boundary:TileRectangle,
-  val tiles:mutable.Set[TilePosition],
+  val tiles:mutable.Set[Tile],
   val bases:ListBuffer[Base],
   val edges:ListBuffer[ZoneEdge]) {
   
-  val centroid = bwtaRegion.getCenter
+  val centroid = new Pixel(bwtaRegion.getCenter)
   var owner:PlayerInfo = With.neutral
   val area:Double = bwtaRegion.getPolygon.getArea
-  val points:Iterable[Position] = bwtaRegion.getPolygon.getPoints.asScala.toVector
-  val island:Boolean = ! With.game.getStartLocations.asScala.exists(startTile => With.paths.exists(centroid.tileIncluding, startTile))
+  val points:Iterable[Pixel] = bwtaRegion.getPolygon.getPoints.asScala.map(new Pixel(_)).toVector
+  val island:Boolean = ! With.game.getStartLocations.asScala.map(new Tile(_)).exists(startTile => With.paths.exists(centroid.tileIncluding, startTile))
   
-  def contains(tile:TilePosition):Boolean = boundary.contains(tile) && tiles.contains(tile)
-  def contains(pixel:Position):Boolean = contains(pixel.tileIncluding)
+  def contains(tile:Tile):Boolean = boundary.contains(tile) && tiles.contains(tile)
+  def contains(pixel:Pixel):Boolean = contains(pixel.tileIncluding)
 }

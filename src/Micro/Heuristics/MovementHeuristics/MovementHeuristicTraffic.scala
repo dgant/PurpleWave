@@ -1,13 +1,13 @@
 package Micro.Heuristics.MovementHeuristics
 
 import Lifecycle.With
+import Mathematics.Pixels.Tile
 import Micro.Intent.Intention
-import bwapi.TilePosition
 object MovementHeuristicTraffic extends MovementHeuristic {
   
   val scaling = 1.0 / 32.0 / 32.0
   
-  override def evaluate(intent: Intention, candidate: TilePosition): Double = {
+  override def evaluate(intent: Intention, candidate: Tile): Double = {
   
     if (intent.unit.flying) 1.0 else measureTraffic(intent, 1.0, candidate)
   }
@@ -15,7 +15,7 @@ object MovementHeuristicTraffic extends MovementHeuristic {
   def measureTraffic(
     intent:Intention,
     multiplier:Double,
-    tile:TilePosition)
+    tile:Tile)
   :Double = {
     
     multiplier *

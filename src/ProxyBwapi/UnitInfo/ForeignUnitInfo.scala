@@ -1,11 +1,11 @@
 package ProxyBwapi.UnitInfo
 
+import Lifecycle.With
+import Mathematics.Pixels.{Pixel, Tile}
 import Performance.Caching.Limiter
+import ProxyBwapi.Players.{PlayerInfo, Players}
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
-import Lifecycle.With
-import ProxyBwapi.Players.{PlayerInfo, Players}
-import bwapi._
 
 class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
   
@@ -44,8 +44,8 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
     _possiblyStillThere = true
     _hitPoints          = base.getHitPoints
     _shieldPoints       = base.getShields
-    _pixelCenter        = base.getPosition
-    _tileTopLeft        = base.getTilePosition
+    _pixelCenter        = new Pixel(base.getPosition)
+    _tileTopLeft        = new Tile(base.getTilePosition)
   }
   
   private def updateTracking() {
@@ -133,27 +133,27 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
   //////////////
   
   private def updateGeometry() {
-    _pixelCenter  = base.getPosition
-    _tileTopLeft  = base.getTilePosition
+    _pixelCenter  = new Pixel(base.getPosition)
+    _tileTopLeft  = new Tile(base.getTilePosition)
     _top          = base.getTop
     _left         = base.getLeft
     _right        = base.getRight
     _bottom       = base.getBottom
   }
   
-  private var _pixelCenter : Position      = new Position(0, 0)
-  private var _tileTopLeft : TilePosition  = new TilePosition(0, 0)
-  private var _top         : Int           = 0
-  private var _left        : Int           = 0
-  private var _right       : Int           = 0
-  private var _bottom      : Int           = 0
+  private var _pixelCenter : Pixel  = new Pixel(0, 0)
+  private var _tileTopLeft : Tile   = new Tile(0, 0)
+  private var _top         : Int    = 0
+  private var _left        : Int    = 0
+  private var _right       : Int    = 0
+  private var _bottom      : Int    = 0
   
-  def pixelCenter : Position      = _pixelCenter
-  def tileTopLeft : TilePosition  = _tileTopLeft
-  def top         : Int           = _top
-  def left        : Int           = _left
-  def right       : Int           = _right
-  def bottom      : Int           = _bottom
+  def pixelCenter : Pixel   = _pixelCenter
+  def tileTopLeft : Tile    = _tileTopLeft
+  def top         : Int     = _top
+  def left        : Int     = _left
+  def right       : Int     = _right
+  def bottom      : Int     = _bottom
   
   ////////////
   // Orders //
@@ -175,7 +175,7 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
   def attackFrame:Boolean
   def constructing:Boolean
   def following:Boolean
-  def holdingPosition:Boolean
+  def holdingPixel:Boolean
   def idle:Boolean
   def interruptible:Boolean
   def morphing:Boolean

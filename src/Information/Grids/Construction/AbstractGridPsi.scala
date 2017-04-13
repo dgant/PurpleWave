@@ -4,8 +4,8 @@ import Information.Grids.ArrayTypes.AbstractGridBoolean
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Lifecycle.With
-import Mathematics.Positions.Point
-import Utilities.EnrichPosition._
+import Mathematics.Pixels.Point
+import Utilities.EnrichPixel._
 
 abstract class AbstractGridPsi extends AbstractGridBoolean {
   

@@ -1,7 +1,7 @@
 package Information.Grids
 
 import Lifecycle.With
-import bwapi.TilePosition
+import Mathematics.Pixels.Tile
 
 abstract class AbstractGrid[T] {
   
@@ -16,5 +16,5 @@ abstract class AbstractGrid[T] {
   def y(i:Int):Int                  = i / width
   def get(i:Int):T
   def get(tileX:Int, tileY:Int):T   = get(i(tileX, tileY))
-  def get(tile: TilePosition):T     = get(i(tile.getX, tile.getY))
+  def get(tile: Tile):T             = get(i(tile.x, tile.y))
 }

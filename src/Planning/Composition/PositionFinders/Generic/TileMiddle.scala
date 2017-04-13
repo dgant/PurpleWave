@@ -1,10 +1,9 @@
-package Planning.Composition.PositionFinders.Generic
+package Planning.Composition.PixelFinders.Generic
 
-import Mathematics.Positions.Positions
-import Planning.Composition.PositionFinders.TileFinder
-import bwapi.TilePosition
+import Mathematics.Pixels.{Points, Tile}
+import Planning.Composition.PixelFinders.TileFinder
 
 object TileMiddle extends TileFinder {
   
-  override def find(): Option[TilePosition] = Some(Positions.tileMiddle)
+  override def find(): Option[Tile] = Some(Points.tileMiddle)
 }

@@ -23,7 +23,7 @@ class TargetingProfile(
       new TargetHeuristicWeight(TargetHeuristicHealth,          -avoidHealth),
       new TargetHeuristicWeight(TargetHeuristicDistance,        -avoidDistance),
       new TargetHeuristicWeight(TargetHeuristicDistraction,     -avoidDistraction)
-      //new TargetHeuristicWeight(UnitHeuristicFiringPosition,  preferDps),
+      //new TargetHeuristicWeight(UnitHeuristicFiringPixel,  preferDps),
     )
   }
 }

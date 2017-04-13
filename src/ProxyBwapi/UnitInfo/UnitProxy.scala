@@ -1,8 +1,8 @@
 package ProxyBwapi.UnitInfo
 
+import Mathematics.Pixels.{Pixel, Tile}
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.UnitClass.UnitClass
-import bwapi.{Position, TilePosition}
 
 abstract class UnitProxy(var base:bwapi.Unit) {
     
@@ -45,8 +45,8 @@ abstract class UnitProxy(var base:bwapi.Unit) {
   // Geometry //
   //////////////
   
-  def pixelCenter:Position
-  def tileTopLeft:TilePosition
+  def pixelCenter:Pixel
+  def tileTopLeft:Tile
   def top:Int
   def left:Int
   def right:Int
@@ -63,7 +63,7 @@ abstract class UnitProxy(var base:bwapi.Unit) {
   def attackFrame:Boolean
   def constructing:Boolean
   def following:Boolean
-  def holdingPosition:Boolean
+  def holdingPixel:Boolean
   def idle:Boolean
   def interruptible:Boolean
   def morphing:Boolean

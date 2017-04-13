@@ -5,7 +5,7 @@ import Lifecycle.With
 import Mathematics.Heuristics.HeuristicMath
 import Micro.Heuristics.MovementHeuristics.MovementHeuristicResult
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Utilities.EnrichPosition._
+import Utilities.EnrichPixel._
 
 object VisualizeMovementHeuristics {
   

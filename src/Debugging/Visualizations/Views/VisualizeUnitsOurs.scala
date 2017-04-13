@@ -5,7 +5,7 @@ import Debugging.Visualizations.Rendering.DrawMap
 import Lifecycle.With
 import Micro.State.ExecutionState
 
-import Utilities.EnrichPosition._
+import Utilities.EnrichPixel._
 
 object VisualizeUnitsOurs {
   

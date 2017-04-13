@@ -1,5 +1,6 @@
 package ProxyBwapi.UnitClass
 
+import Mathematics.Pixels.Tile
 import ProxyBwapi.Techs.Techs
 import ProxyBwapi.Upgrades.Upgrades
 import bwapi.UnitType
@@ -75,7 +76,7 @@ class UnitClassProxy(val baseType:UnitType) {
   lazy val supplyProvided           = baseType.supplyProvided
   lazy val supplyRequired           = baseType.supplyRequired
   lazy val tileHeight               = baseType.tileHeight
-  lazy val tileSize                 = baseType.tileSize
+  lazy val tileSize                 = new Tile(baseType.tileSize)
   lazy val tileWidth                = baseType.tileWidth
   lazy val topSpeed                 = baseType.topSpeed
   lazy val turnRadius               = baseType.turnRadius

@@ -1,11 +1,11 @@
-package Planning.Composition.PositionFinders.Tactics
+package Planning.Composition.PixelFinders.Tactics
 
-import Planning.Composition.PositionFinders.TileFinder
+import Planning.Composition.PixelFinders.TileFinder
 import Lifecycle.With
-import bwapi.TilePosition
+import Mathematics.Pixels.Tile
 
 class TileEnemyBase extends TileFinder {
   
-  override def find: Option[TilePosition] = Some(With.intelligence.mostBaselikeEnemyPosition)
+  override def find: Option[Tile] = Some(With.intelligence.mostBaselikeEnemyPixel)
   
 }

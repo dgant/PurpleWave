@@ -3,8 +3,7 @@ package Information.Battles
 import Information.Geography.Types.Zone
 import Lifecycle.With
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, UnitInfo}
-import Utilities.EnrichPosition._
-import bwapi.TilePosition
+import Utilities.EnrichPixel._
 
 import scala.collection.mutable
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}

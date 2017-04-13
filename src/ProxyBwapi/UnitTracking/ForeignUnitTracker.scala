@@ -21,7 +21,7 @@ class ForeignUnitTracker {
   def get(someUnit:bwapi.Unit):Option[ForeignUnitInfo] = get(someUnit.getID)
   def get(id:Int):Option[ForeignUnitInfo] = foreignUnitsById.get(id)
   
-  private val limitInvalidatePositions = new Limiter(1, invalidatePositions)
+  private val limitInvalidatePixels = new Limiter(1, invalidatePixels)
   def onFrame() {
     initialize()
     
@@ -50,18 +50,18 @@ class ForeignUnitTracker {
     neutralUnits = foreignUnits.filter(_.player.isNeutral)
   
     unitsToFlagInvisible.foreach(_.flagInvisible)
-    limitInvalidatePositions.act()
+    limitInvalidatePixels.act()
   }
   
   def onUnitDestroy(unit:bwapi.Unit) {
     foreignUnitsById.get(unit.getID).foreach(remove)
   }
   
-  private def invalidatePositions() {
+  private def invalidatePixels() {
     foreignUnits
       .filter(_.possiblyStillThere)
       .filterNot(_.visible)
-      .filter(unitInfo => unitInfo.tileArea.tiles.forall(With.game.isVisible))
+      .filter(unitInfo => unitInfo.tileArea.tiles.forall(tile => With.game.isVisible(tile.bwapi)))
       .foreach(updateMissing)
   }
   

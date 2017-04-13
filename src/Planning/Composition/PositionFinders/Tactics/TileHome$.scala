@@ -1,10 +1,10 @@
-package Planning.Composition.PositionFinders.Tactics
+package Planning.Composition.PixelFinders.Tactics
 
-import Planning.Composition.PositionFinders.TileFinder
+import Planning.Composition.PixelFinders.TileFinder
 import Lifecycle.With
-import bwapi.TilePosition
+import Mathematics.Pixels.Tile
 
 object TileHome$ extends TileFinder {
   
-  override def find(): Option[TilePosition] = Some(With.geography.home)
+  override def find(): Option[Tile] = Some(With.geography.home)
 }

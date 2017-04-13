@@ -3,7 +3,7 @@ import Lifecycle.With
 import Micro.Heuristics.Movement.EvaluateMoves
 import Micro.Intent.Intention
 
-import Utilities.EnrichPosition._
+import Utilities.EnrichPixel._
 
 object Move extends Action {
   

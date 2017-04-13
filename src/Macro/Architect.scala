@@ -1,22 +1,20 @@
 package Macro
 
+import Lifecycle.With
+import Mathematics.Pixels.{Tile, TileRectangle}
 import Mathematics.Shapes.Spiral
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClass._
-import Lifecycle.With
-import Mathematics.Positions.TileRectangle
-import Utilities.EnrichPosition._
-import bwapi.TilePosition
 
 class Architect {
   
   def placeBuilding(
     buildingClass:  UnitClass,
-    center:         TilePosition,
+    center:         Tile,
     margin:         Integer = 0,
     searchRadius:   Integer = 40,
     exclusions:     Iterable[TileRectangle] = Vector.empty)
-      :Option[TilePosition] = {
+      : Option[Tile] = {
   
     Spiral
       .points(searchRadius)
@@ -27,12 +25,12 @@ class Architect {
   
   def placeBuildings(
     buildingClasses:    Iterable[UnitClass],
-    center:             TilePosition,
+    center:             Tile,
     margin:             Integer                 = 0,
     searchRadius:       Integer                 = 20,
     exclusions:         Iterable[TileRectangle] = Vector.empty,
-    hypotheticalPylon:  Option[TilePosition]    = None)
-      :Option[Iterable[TilePosition]] = {
+    hypotheticalPylon:  Option[Tile]    = None)
+      :Option[Iterable[Tile]] = {
     
     val exclusions:Vector[TileRectangle] = Vector.empty
     
@@ -60,13 +58,13 @@ class Architect {
   }
   
   private def tryBuilding(
-    searchPoint:        TilePosition,
+    searchPoint:        Tile,
     buildingClasses:    Iterable[UnitClass],
     margin:             Integer                 = 0,
     searchRadius:       Integer                 = 20,
     exclusions:         Iterable[TileRectangle] = Vector.empty,
-    hypotheticalPylon:  Option[TilePosition]    = None)
-      :Option[Iterable[TilePosition]] = {
+    hypotheticalPylon:  Option[Tile]    = None)
+      :Option[Iterable[Tile]] = {
     
     val nextBuilding = buildingClasses.head
     
@@ -96,10 +94,10 @@ class Architect {
   
   def canBuild(
     buildingClass:      UnitClass,
-    tileTopleft:        TilePosition,
+    tileTopleft:        Tile,
     margin:             Integer                 = 0,
     exclusions:         Iterable[TileRectangle] = Vector.empty,
-    hypotheticalPylon:  Option[TilePosition]    = None)
+    hypotheticalPylon:  Option[Tile]    = None)
       :Boolean = {
   
     lazy val buildingArea = buildingClass.tileArea.add(tileTopleft)
@@ -120,7 +118,7 @@ class Architect {
       trespassingUnits.forall(_.isOurs)
   }
   
-  private def tileHasRequiredPsi(tileTopleft:TilePosition, buildingClass:UnitClass):Boolean = {
+  private def tileHasRequiredPsi(tileTopleft:Tile, buildingClass:UnitClass):Boolean = {
     ( ! buildingClass.requiresPsi) ||
     (buildingClass.tileWidth == 4 && With.grids.psi4x3.get(tileTopleft)) ||
     (buildingClass.tileWidth <  4 && With.grids.psi2x2and3x2.get(tileTopleft))
@@ -129,7 +127,7 @@ class Architect {
   private def rectangleIsBuildable(
     area:               TileRectangle,
     buildingClass:      UnitClass,
-    hypotheticalPylon:  Option[TilePosition] = None)
+    hypotheticalPylon:  Option[Tile] = None)
   :Boolean = {
     //HypotheticalPylon temporarily disabled
     area.tiles.forall(tile => With.grids.buildable.get(tile))

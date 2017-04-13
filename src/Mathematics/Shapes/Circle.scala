@@ -1,6 +1,6 @@
 package Mathematics.Shapes
 
-import Mathematics.Positions.Point
+import Mathematics.Pixels.Point
 
 import scala.collection.mutable
 

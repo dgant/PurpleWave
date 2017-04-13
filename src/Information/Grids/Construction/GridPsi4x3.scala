@@ -1,6 +1,6 @@
 package Information.Grids.Construction
 
-import Mathematics.Positions.Point
+import Mathematics.Pixels.Point
 
 class GridPsi4x3 extends AbstractGridPsi {
   

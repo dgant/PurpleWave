@@ -1,7 +1,7 @@
 package Planning.Plans.Information
 
 import Micro.Intent.Intention
-import Planning.Composition.PositionFinders.Generic.TileMiddle
+import Planning.Composition.PixelFinders.Generic.TileMiddle
 import Planning.Composition.Property
 import Planning.Composition.UnitCounters.UnitCountExactly
 import Planning.Composition.UnitMatchers.UnitMatchMobile
@@ -10,7 +10,7 @@ import Planning.Plan
 import Planning.Composition.ResourceLocks.LockUnits
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Lifecycle.With
-import bwapi.TilePosition
+import Mathematics.Pixels.Tile
 
 class FindEnemyBase extends Plan {
   
@@ -30,9 +30,9 @@ class FindEnemyBase extends Plan {
   }
   
   private def orderScout(scout:FriendlyUnitInfo) =
-    With.executor.intend(new Intention(this, scout) { destination = getNextScoutingPosition })
+    With.executor.intend(new Intention(this, scout) { destination = getNextScoutingPixel })
   
-  private def getNextScoutingPosition:Option[TilePosition] =
+  private def getNextScoutingPixel:Option[Tile] =
     With.intelligence.leastScoutedBases
       .map(_.townHallArea.midpoint)
       .filter(base => With.paths.exists(With.geography.home, base))

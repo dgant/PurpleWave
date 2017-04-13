@@ -4,9 +4,7 @@ import Mathematics.Shapes.Spiral
 import Information.Geography.Types.{Base, Zone, ZoneEdge}
 import ProxyBwapi.Races.Protoss
 import Lifecycle.With
-import Mathematics.Positions.TileRectangle
-import Utilities.EnrichPosition._
-import bwapi.{Position, TilePosition}
+import Mathematics.Pixels.{Pixel, Tile, TileRectangle}
 import bwta.{BWTA, Chokepoint, Region}
 
 import scala.collection.JavaConverters._
@@ -18,7 +16,7 @@ object ZoneBuilder {
   def build:Iterable[Zone] = {
     val zones = BWTA.getRegions.asScala.map(buildZone)
     val edges = BWTA.getChokepoints.asScala.map(choke => buildEdge(choke, zones))
-    val bases = BaseFinder.calculate.map(townHallPosition => buildBase(townHallPosition, zones))
+    val bases = BaseFinder.calculate.map(townHallPixel => buildBase(townHallPixel, zones))
   
     bases.foreach(base => base.zone.bases += base)
     edges.foreach(edge => edge.zones.foreach(zone => zone.edges += edge))
@@ -33,8 +31,8 @@ object ZoneBuilder {
       .foreach(tile => assignTile(tile, zones))
   }
   
-  def assignTile(tile:TilePosition, zones:Iterable[Zone]) = {
-    val groundHeight = With.game.getGroundHeight(tile)
+  def assignTile(tile:Tile, zones:Iterable[Zone]) = {
+    val groundHeight = With.game.getGroundHeight(tile.bwapi)
     val candidates = zones.filter(_.groundHeight == groundHeight)
     val matchingZone = Spiral
       .points(5)
@@ -51,20 +49,20 @@ object ZoneBuilder {
   def buildZone(region:Region):Zone = {
     val polygon = region.getPolygon
     val tileArea = new TileRectangle(
-      new Position(
+      new Pixel(
         polygon.getPoints.asScala.map(_.getX).min,
         polygon.getPoints.asScala.map(_.getY).min).tileIncluding,
-      new Position(
+      new Pixel(
         polygon.getPoints.asScala.map(_.getX).max,
         polygon.getPoints.asScala.map(_.getY).max).tileIncluding)
-    val tiles = new mutable.HashSet[TilePosition]
+    val tiles = new mutable.HashSet[Tile]
     tiles ++= tileArea.tiles
       .filter(tile => {
-        val tileRegion = BWTA.getRegion(tile)
+        val tileRegion = BWTA.getRegion(tile.bwapi)
         tileRegion != null && tileRegion.getCenter == region.getCenter
       })
       .toSet
-    val groundHeight = tiles.headOption.map(With.game.getGroundHeight).getOrElse(1)
+    val groundHeight = tiles.headOption.map(tile => With.game.getGroundHeight(tile.bwapi)).getOrElse(1)
     new Zone(
       region,
       groundHeight,
@@ -74,14 +72,14 @@ object ZoneBuilder {
       new ListBuffer[ZoneEdge])
   }
   
-  def buildBase(townHallPosition:TilePosition, zones:Iterable[Zone]):Base = {
-    val townHallArea = Protoss.Nexus.tileArea.add(townHallPosition)
+  def buildBase(townHallPixel:Tile, zones:Iterable[Zone]):Base = {
+    val townHallArea = Protoss.Nexus.tileArea.add(townHallPixel)
     new Base(
       zones
-        .find(_.contains(townHallPosition.pixelCenter))
-        .getOrElse(zones.minBy(_.centroid.pixelDistanceFast(townHallPosition.pixelCenter))),
+        .find(_.contains(townHallPixel.pixelCenter))
+        .getOrElse(zones.minBy(_.centroid.pixelDistanceFast(townHallPixel.pixelCenter))),
       townHallArea,
-      With.game.getStartLocations.asScala.exists(_.tileDistance(townHallPosition) < 6))
+      With.game.getStartLocations.asScala.map(new Tile(_)).exists(_.tileDistance(townHallPixel) < 6))
   }
   
   def buildEdge(choke: Chokepoint, zones:Iterable[Zone]):ZoneEdge =

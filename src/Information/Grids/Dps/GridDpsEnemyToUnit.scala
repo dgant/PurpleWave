@@ -1,13 +1,14 @@
 package Information.Grids.Dps
 
 import Lifecycle.With
+import Mathematics.Pixels.Tile
 import ProxyBwapi.UnitInfo.UnitInfo
-import bwapi.{TilePosition, UnitSizeType}
+import bwapi.UnitSizeType
 
 class GridDpsEnemyToUnit {
   
   def get(
-   tile:TilePosition,
+   tile:Tile,
    unit: UnitInfo): Double = {
     
     if ((unit.cloaked || unit.burrowed) && ! With.grids.enemyDetection.get(tile)) {

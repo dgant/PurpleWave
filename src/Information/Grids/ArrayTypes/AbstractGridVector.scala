@@ -1,6 +1,6 @@
 package Information.Grids.ArrayTypes
 
-import bwapi.TilePosition
+import Mathematics.Pixels.Tile
 
 import scala.collection.mutable
 
@@ -21,6 +21,6 @@ abstract class AbstractGridVector[T] extends AbstractGridArray[mutable.ArrayBuff
     getObjects.foreach(item => get(getTile(item)).append(item))
   }
   
-  protected def getTile(item: T): TilePosition
+  protected def getTile(item: T): Tile
   protected def getObjects: Traversable[T]
 }

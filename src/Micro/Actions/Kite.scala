@@ -4,7 +4,7 @@ import Micro.Behaviors.MovementProfiles
 import Micro.Intent.Intention
 import Planning.Yolo
 
-import Utilities.EnrichPosition._
+import Utilities.EnrichPixel._
 
 object Kite extends Action {
   

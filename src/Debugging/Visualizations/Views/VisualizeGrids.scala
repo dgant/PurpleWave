@@ -4,7 +4,7 @@ import Debugging.Visualizations.Rendering.DrawMap
 import Information.Grids.ArrayTypes.AbstractGridArray
 import Information.Grids.AbstractGrid
 import Lifecycle.With
-import Utilities.EnrichPosition._
+import Utilities.EnrichPixel._
 
 object VisualizeGrids {
   def render() {
@@ -14,16 +14,16 @@ object VisualizeGrids {
   
   private def renderGridArray[T](map:AbstractGridArray[T], offsetX:Int=0, offsetY:Int=0) {
     With.geography.allTiles
-      .filterNot(tilePosition => map.get(tilePosition) == map.defaultValue)
-      .foreach(tilePosition => DrawMap.text(
-        tilePosition.topLeftPixel.add(offsetX*16, offsetY*13),
-        map.repr(map.get(tilePosition))))
+      .filterNot(Tile => map.get(Tile) == map.defaultValue)
+      .foreach(Tile => DrawMap.text(
+        Tile.topLeftPixel.add(offsetX*16, offsetY*13),
+        map.repr(map.get(Tile))))
   }
   
   private def renderGrid[T](map:AbstractGrid[T], offsetX:Int=0, offsetY:Int=0) {
     With.geography.allTiles
-      .foreach(tilePosition => DrawMap.text(
-        tilePosition.topLeftPixel.add(offsetX*16, offsetY*13),
-        map.get(tilePosition).toString))
+      .foreach(Tile => DrawMap.text(
+        Tile.topLeftPixel.add(offsetX*16, offsetY*13),
+        map.get(Tile).toString))
   }
 }

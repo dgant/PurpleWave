@@ -2,9 +2,8 @@ package Information.Battles
 
 import Information.Battles.Simulation.Construction.BattleSimulation
 import Information.Battles.Simulation.Tactics.{TacticMovement, TacticWounded}
+import Mathematics.Pixels.Pixel
 import Performance.Caching.CacheFrame
-import bwapi.Position
-import Utilities.EnrichPosition._
 
 class Battle(
   val us    : BattleGroup,
@@ -12,7 +11,7 @@ class Battle(
   
   var simulations: Iterable[BattleSimulation] = Vector.empty
   
-  def focus     : Position = us.vanguard.midpoint(enemy.vanguard)
+  def focus     : Pixel = us.vanguard.midpoint(enemy.vanguard)
   def groups    : Iterable[BattleGroup] = Vector(us, enemy)
   def happening : Boolean =
     us.units.nonEmpty &&

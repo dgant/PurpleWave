@@ -1,11 +1,10 @@
 package ProxyBwapi.UnitTracking
 
 import Lifecycle.With
-import Mathematics.Positions.TileRectangle
+import Mathematics.Pixels.{Pixel, Tile, TileRectangle}
 import Mathematics.Shapes.Circle
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, UnitInfo}
-import Utilities.EnrichPosition._
-import bwapi.{Position, TilePosition, UnitType}
+import bwapi.UnitType
 
 import scala.collection.JavaConverters._
 
@@ -39,11 +38,11 @@ class UnitTracker {
     units.asScala.flatMap(get).toVector
   }
   
-  def inTileRadius(tile: TilePosition, tiles: Int): Traversable[UnitInfo] = {
+  def inTileRadius(tile: Tile, tiles: Int): Traversable[UnitInfo] = {
     inTiles(Circle.points(tiles).map(tile.add))
   }
   
-  def inPixelRadius(pixel: Position, pixels: Int): Traversable[UnitInfo] = {
+  def inPixelRadius(pixel: Pixel, pixels: Int): Traversable[UnitInfo] = {
     val tile = pixel.tileIncluding
     inTiles(Circle.points(pixels / 32 + 1).map(tile.add))
       .filter(_.pixelCenter.pixelDistanceSquared(pixel) <= pixels * pixels)
@@ -53,7 +52,7 @@ class UnitTracker {
     inTiles(rectangle.tiles).toSet
   }
   
-  private def inTiles(tiles:Traversable[TilePosition]):Traversable[UnitInfo] = {
+  private def inTiles(tiles:Traversable[Tile]):Traversable[UnitInfo] = {
     tiles.flatten(tile => With.grids.units.get(tile))
   }
   

@@ -1,14 +1,14 @@
 package Micro.Intent
 
 import Lifecycle.With
+import Mathematics.Pixels.{Pixel, Tile}
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClass.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import ProxyBwapi.Upgrades.Upgrade
 import Utilities.CountMap
-import Utilities.EnrichPosition._
-import bwapi.{Position, TilePosition, UnitCommandType}
+import bwapi.UnitCommandType
 
 // Commander is responsible for issuing unit commands
 // in a way that Brood War handles gracefully.
@@ -44,13 +44,13 @@ class Commander {
     }
   }
   
-  def move(intent:Intention, position:Position) {
+  def move(intent:Intention, position:Pixel) {
     
     //Make melee units sticky
     val stickyMeleeTarget = intent.toAttack
       .map(_.pixelCenter)
-      .filter(targetPosition =>
-        targetPosition.pixelDistanceSquared(position) < Math.pow(With.configuration.combatStickinessLeash, 2)
+      .filter(targetPixel =>
+        targetPixel.pixelDistanceSquared(position) < Math.pow(With.configuration.combatStickinessLeash, 2)
         && intent.unit.unitClass.maxAirGroundRange <= With.configuration.combatStickinessLeash)
     
     if (stickyMeleeTarget.isDefined) return attack(intent, intent.toAttack.get)
@@ -78,7 +78,7 @@ class Commander {
     }
     
     if (intent.unit.pixelDistanceFast(destination) > 7) {
-      intent.unit.base.move(destination)
+      intent.unit.base.move(destination.bwapi)
       sleepMove(intent.unit)
     }
   }
@@ -110,11 +110,11 @@ class Commander {
     sleepBuild(intent.unit)
   }
   
-  def build(intent:Intention, unitClass:UnitClass, tile:TilePosition) {
+  def build(intent:Intention, unitClass:UnitClass, tile:Tile) {
     if (intent.unit.pixelDistanceSquared(tile.pixelCenter) > Math.pow(32.0 * 5.0, 2)) {
       return move(intent, tile.pixelCenter)
     }
-    intent.unit.base.build(unitClass.baseType, tile)
+    intent.unit.base.build(unitClass.baseType, tile.bwapi)
     sleepBuild(intent.unit)
   }
   

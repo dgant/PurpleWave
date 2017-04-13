@@ -1,10 +1,9 @@
 package ProxyBwapi.UnitInfo
 
 import Lifecycle.With
-import Mathematics.Positions.TileRectangle
+import Mathematics.Pixels.{Pixel, Tile, TileRectangle}
 import Performance.Caching.CacheFrame
 import ProxyBwapi.Races.{Protoss, Zerg}
-import Utilities.EnrichPosition._
 import bwapi._
 
 abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
@@ -25,24 +24,24 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   // Geometry //
   //////////////
   
-  def x: Int = pixelCenter.getX
-  def y: Int = pixelCenter.getY
+  def x: Int = pixelCenter.x
+  def y: Int = pixelCenter.y
   
-  def tileIncludingCenter: TilePosition = pixelCenter.tileIncluding
+  def tileIncludingCenter: Tile = pixelCenter.tileIncluding
   def tileArea: TileRectangle = unitClass.tileArea.add(tileTopLeft)
   
   
-  def canTraverse(tile:TilePosition)                : Boolean = flying || With.grids.walkable.get(tile)
+  def canTraverse(tile:Tile)                : Boolean = flying || With.grids.walkable.get(tile)
   def pixelsFromEdgeSlow(otherUnit:UnitInfo)        : Double  = pixelDistanceSlow(otherUnit) - unitClass.radialHypotenuse - otherUnit.unitClass.radialHypotenuse
   def pixelsFromEdgeFast(otherUnit:UnitInfo)        : Double  = pixelDistanceFast(otherUnit) - unitClass.radialHypotenuse - otherUnit.unitClass.radialHypotenuse
-  def pixelDistanceSlow(otherPixel:Position)        : Double  = pixelCenter.pixelDistanceSlow(otherPixel)
+  def pixelDistanceSlow(otherPixel:Pixel)        : Double  = pixelCenter.pixelDistanceSlow(otherPixel)
   def pixelDistanceSlow(otherUnit:UnitInfo)         : Double  = pixelDistanceSlow(otherUnit.pixelCenter)
-  def pixelDistanceFast(otherPixel:Position)        : Double  = pixelCenter.pixelDistanceFast(otherPixel)
+  def pixelDistanceFast(otherPixel:Pixel)        : Double  = pixelCenter.pixelDistanceFast(otherPixel)
   def pixelDistanceFast(otherUnit:UnitInfo)         : Double  = pixelDistanceFast(otherUnit.pixelCenter)
   def pixelDistanceSquared(otherUnit:UnitInfo)      : Double  = pixelDistanceSquared(otherUnit.pixelCenter)
-  def pixelDistanceSquared(otherPixel:Position)     : Double  = pixelCenter.pixelDistanceSquared(otherPixel)
-  def travelPixels(destination:TilePosition)        : Double  = travelPixels(tileIncludingCenter, destination)
-  def travelPixels(origin:TilePosition, destination:TilePosition): Double =
+  def pixelDistanceSquared(otherPixel:Pixel)     : Double  = pixelCenter.pixelDistanceSquared(otherPixel)
+  def travelPixels(destination:Tile)        : Double  = travelPixels(tileIncludingCenter, destination)
+  def travelPixels(origin:Tile, destination:Tile): Double =
     if (flying)
       origin.pixelCenter.pixelDistanceSlow(destination.pixelCenter)
     else
@@ -50,7 +49,7 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   
   def canMove:Boolean = canDoAnythingThisFrame && unitClass.canMove
   def topSpeed:Double = unitClass.topSpeed
-  def project(framesToLookAhead:Int):Position = pixelCenter.add((velocityX * framesToLookAhead).toInt, (velocityY * framesToLookAhead).toInt)
+  def project(framesToLookAhead:Int):Pixel = pixelCenter.add((velocityX * framesToLookAhead).toInt, (velocityY * framesToLookAhead).toInt)
   
   ////////////
   // Combat //

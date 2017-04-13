@@ -1,13 +1,13 @@
-package Planning.Composition.PositionFinders.Buildings
+package Planning.Composition.PixelFinders.Buildings
 
-import Planning.Composition.PositionFinders.TileFinder
+import Planning.Composition.PixelFinders.TileFinder
 import Lifecycle.With
-import bwapi.TilePosition
+import Mathematics.Pixels.Tile
 
 
 object TileRefinery extends TileFinder {
   
-  def find: Option[TilePosition] = {
+  def find: Option[Tile] = {
     
     val candidateAreas = With.geography.ourBases
       .toVector

@@ -8,7 +8,7 @@ object VisualizeGeography {
   def render() {
     With.geography.zones.foreach(zone => {
       
-      DrawMap.polygonPositions(
+      DrawMap.polygonPixels(
         zone.points,
         zone.owner.colorDark)
       

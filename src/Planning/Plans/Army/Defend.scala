@@ -1,9 +1,9 @@
 package Planning.Plans.Army
 
-import Planning.Composition.PositionFinders.Tactics.TileChoke
+import Planning.Composition.PixelFinders.Tactics.TileChoke
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 
-class Defend extends ControlPosition {
+class Defend extends ControlPixel {
   
   description.set("Defend a position")
   

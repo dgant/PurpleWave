@@ -1,13 +1,12 @@
 package Micro.Heuristics.MovementHeuristics
 
 import Mathematics.Heuristics.HeuristicMath
+import Mathematics.Pixels.Tile
 import Micro.Intent.Intention
-import Utilities.EnrichPosition._
-import bwapi.TilePosition
 
 object MovementHeuristicInRangeOfTarget extends MovementHeuristic {
   
-  override def evaluate(intent: Intention, candidate: TilePosition): Double = {
+  override def evaluate(intent: Intention, candidate: Tile): Double = {
   
     if (intent.toAttack.isEmpty) return 1.0
     

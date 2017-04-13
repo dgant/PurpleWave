@@ -2,14 +2,14 @@ package Information.Geography.Pathfinding
 
 import Information.Geography.Types.Zone
 import Lifecycle.With
-import Utilities.EnrichPosition._
-import bwapi.Position
+import Mathematics.Pixels.Pixel
+import Utilities.EnrichPixel._
 
 object PathFinder {
   
   def roughGroundDistance(
-    from:Position,
-    to:Position):Double = {
+    from:Pixel,
+    to:Pixel):Double = {
     
     val fromZone = from.zone
     val toZone = to.zone
@@ -42,8 +42,8 @@ object PathFinder {
   
   //Doesn't work
   def roughGroundDistance2(
-    from:Position,
-    to:Position,
+    from:Pixel,
+    to:Pixel,
     explored:Set[Zone] = Set.empty):Double = {
     
     val zoneTo = to.zone

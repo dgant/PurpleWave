@@ -2,8 +2,8 @@ package Debugging.Visualizations.Views
 
 import Debugging.Visualizations.Rendering.DrawMap
 import Lifecycle.With
+import Mathematics.Pixels.Pixel
 import ProxyBwapi.Players.Players
-import Utilities.EnrichPosition._
 
 import scala.collection.JavaConverters._
 
@@ -15,19 +15,19 @@ object VisualizeBullets {
       .filter(_.exists)
       .foreach(bullet => {
         DrawMap.circle(
-          bullet.getPosition.add(-2, -2),
+          new Pixel(bullet.getPosition).add(-2, -2),
           2,
           Players.get(bullet.getPlayer).colorDark,
           true)
         DrawMap.circle(
-          bullet.getPosition.add(2, -2),
+          new Pixel(bullet.getPosition).add(2, -2),
           2,
           Players.get(bullet.getPlayer).colorDark,
           true)
         DrawMap.triangle(
-          bullet.getPosition.add(-4, -1),
-          bullet.getPosition.add(4, -1),
-          bullet.getPosition.add(0, 3),
+          new Pixel(bullet.getPosition).add(-4, -1),
+          new Pixel(bullet.getPosition).add(4, -1),
+          new Pixel(bullet.getPosition).add(0, 3),
           Players.get(bullet.getPlayer).colorDark,
           true)
       })

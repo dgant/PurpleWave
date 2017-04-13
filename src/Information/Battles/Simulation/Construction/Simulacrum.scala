@@ -1,8 +1,7 @@
 package Information.Battles.Simulation.Construction
 
+import Mathematics.Pixels.Pixel
 import ProxyBwapi.UnitInfo.UnitInfo
-import bwapi.Position
-import Utilities.EnrichPosition._
 
 class Simulacrum(val unit:UnitInfo) {
   
@@ -14,12 +13,12 @@ class Simulacrum(val unit:UnitInfo) {
   val rangeGround       : Double    = unit.unitClass.groundRange
   val radialHypotenuse  : Double    = unit.unitClass.radialHypotenuse
   
-  var damageTaken       : Int      = 0
-  var pixel             : Position = unit.pixelCenter
-  var hitPoints         : Int      = unit.hitPoints
-  var shields           : Int      = unit.shieldPoints
-  var attackCooldown    : Int      = unit.cooldownLeft
-  var moveCooldown      : Int      = Math.min(8, unit.cooldownLeft) //Rough approximation
+  var damageTaken       : Int       = 0
+  var pixel             : Pixel     = unit.pixelCenter
+  var hitPoints         : Int       = unit.hitPoints
+  var shields           : Int       = unit.shieldPoints
+  var attackCooldown    : Int       = unit.cooldownLeft
+  var moveCooldown      : Int       = Math.min(8, unit.cooldownLeft) //Rough approximation
   
   var fleeing   : Boolean = false
   var fighting  : Boolean = true

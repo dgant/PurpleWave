@@ -3,19 +3,17 @@ package Information.Geography
 import Information.Geography.Calculations.{ZoneBuilder, ZoneUpdater}
 import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
-import Mathematics.Positions
-import Mathematics.Positions.TileRectangle
+import Mathematics.Pixels
+import Mathematics.Pixels.{Tile, TileRectangle}
 import Performance.Caching.{Cache, Limiter}
 import ProxyBwapi.UnitInfo.UnitInfo
-import Utilities.EnrichPosition._
-import bwapi.TilePosition
 
 import scala.collection.mutable
 
 class Geography {
   
-  val mapArea             : TileRectangle           = new TileRectangle(new TilePosition(0, 0), new TilePosition(With.mapWidth, With.mapHeight))
-  val allTiles            : Iterable[TilePosition]  = mapArea.tiles
+  val mapArea             : TileRectangle           = new TileRectangle(new Tile(0, 0), new Tile(With.mapWidth, With.mapHeight))
+  val allTiles            : Iterable[Tile]          = mapArea.tiles
   lazy val zones          : Iterable[Zone]          = ZoneBuilder.build
   def bases               : Iterable[Base]          = zones.flatten(_.bases)
   def ourZones            : Iterable[Zone]          = zones.filter(_.owner == With.self)
@@ -25,10 +23,10 @@ class Geography {
   def ourTownHalls        : Iterable[UnitInfo]      = ourBases.flatMap(_.townHall)
   def ourHarvestingAreas  : Iterable[TileRectangle] = ourBases.map(_.harvestingArea)
   
-  def zoneByTile(tile:TilePosition):Zone = zonesByTileCache(tile)
+  def zoneByTile(tile:Tile):Zone = zonesByTileCache(tile)
   private lazy val zonesByTileCache =
-    new mutable.HashMap[TilePosition, Zone] {
-      override def default(key: TilePosition): Zone = {
+    new mutable.HashMap[Tile, Zone] {
+      override def default(key: Tile): Zone = {
         val zone = zones
           .filter(_.tiles.contains(key))
           .headOption
@@ -38,18 +36,18 @@ class Geography {
       }
     }
   
-  def home:TilePosition = homeCache.get
+  def home:Tile = homeCache.get
   private val homeCache = new Cache(5, () =>
     ourBases
       .toVector
       .sortBy( ! _.isStartLocation)
       .headOption
       .map(_.townHallArea.startInclusive)
-      .getOrElse(Positions.Positions.tileMiddle))
+      .getOrElse(Pixels.Points.tileMiddle))
   
   def update() {
     zoneUpdateLimiter.act()
-    bases.filter(base => With.game.isVisible(base.townHallArea.midpoint)).foreach(base => base.lastScoutedFrame = With.frame)
+    bases.filter(base => With.game.isVisible(base.townHallArea.midpoint.bwapi)).foreach(base => base.lastScoutedFrame = With.frame)
   }
   
   private val zoneUpdateLimiter = new Limiter(2, () => ZoneUpdater.update())

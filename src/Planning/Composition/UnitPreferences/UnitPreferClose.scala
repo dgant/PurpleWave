@@ -1,10 +1,10 @@
 package Planning.Composition.UnitPreferences
 
-import Planning.Composition.PositionFinders.Generic.TileMiddle
-import Planning.Composition.PositionFinders.TileFinder
+import Planning.Composition.PixelFinders.Generic.TileMiddle
+import Planning.Composition.PixelFinders.TileFinder
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Planning.Composition.Property
-import Utilities.EnrichPosition._
+import Utilities.EnrichPixel._
 
 class UnitPreferClose extends UnitPreference {
   

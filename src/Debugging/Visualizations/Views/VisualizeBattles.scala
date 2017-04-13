@@ -4,9 +4,10 @@ import Debugging.Visualizations.Rendering.{DrawMap, DrawScreen}
 import Information.Battles.Battle
 import Information.Battles.Simulation.Construction.{BattleSimulation, BattleSimulationGroup}
 import Lifecycle.With
+import Mathematics.Pixels.Pixel
 import Planning.Yolo
-import Utilities.EnrichPosition._
-import bwapi.{Color, Position}
+import Utilities.EnrichPixel._
+import bwapi.Color
 
 object VisualizeBattles {
   def render() = {
@@ -57,15 +58,15 @@ object VisualizeBattles {
   private def drawBattleReport(battle:BattleSimulation) {
     
     val winner = if (battle.us.lostValue <= battle.enemy.lostValue) With.self else With.enemies.head
-    With.game.drawTextScreen(new Position(5, 31), "Advantage: " + winner.name)
-    drawPlayerReport(battle.us,     With.self.name,         new Position(5, 50))
-    drawPlayerReport(battle.enemy,  With.enemies.head.name, new Position(130, 50))
+    With.game.drawTextScreen(new Pixel(5, 31).bwapi, "Advantage: " + winner.name)
+    drawPlayerReport(battle.us,     With.self.name,         new Pixel(5, 50))
+    drawPlayerReport(battle.enemy,  With.enemies.head.name, new Pixel(130, 50))
   }
   
-  private def drawPlayerReport(group: BattleSimulationGroup, name:String, origin:Position) {
+  private def drawPlayerReport(group: BattleSimulationGroup, name:String, origin:Pixel) {
     DrawScreen.table(
-      origin.getX,
-      origin.getY,
+      origin.x,
+      origin.y,
       Vector(
         Vector(name),
         Vector("Losses:",   group.lostValue.toString),

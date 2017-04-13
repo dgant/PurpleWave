@@ -1,9 +1,8 @@
 package Mathematics
 
 import Lifecycle.With
+import Mathematics.Pixels.Pixel
 import ProxyBwapi.UnitInfo.UnitInfo
-import Utilities.EnrichPosition._
-import bwapi.Position
 
 import scala.collection.mutable
 
@@ -21,10 +20,10 @@ object Clustering {
     things:Iterable[T],
     radius:Int,
     limitRegion:Boolean = false,
-    extractPosition:(T) => Position)
+    extractPixel:(T) => Pixel)
       :mutable.HashMap[T, mutable.HashSet[T]] = {
     
-    val neighborsByUnit = mapUnitsToNeighbors(things, radius, extractPosition)
+    val neighborsByUnit = mapUnitsToNeighbors(things, radius, extractPixel)
     val unitLeaders = new mutable.HashMap[T, T]
     val groupsByLeader = new mutable.HashMap[T, mutable.HashSet[T]] {
       override def default(key: T):mutable.HashSet[T] = {
@@ -36,8 +35,8 @@ object Clustering {
         groupsByLeader(thing).add(thing)
         groupsByLeader(thing) ++= neighborsByUnit(thing).filter(neighbor =>
           ! limitRegion ||
-            With.grids.altitudeBonus.get(extractPosition(thing).tileIncluding) ==
-            With.grids.altitudeBonus.get(extractPosition(neighbor).tileIncluding))
+            With.grids.altitudeBonus.get(extractPixel(thing).tileIncluding) ==
+            With.grids.altitudeBonus.get(extractPixel(neighbor).tileIncluding))
         groupsByLeader(thing).foreach(groupMember => unitLeaders.put(groupMember, thing))
       }})
     
@@ -47,12 +46,12 @@ object Clustering {
   private def mapUnitsToNeighbors[T](
     things:Iterable[T],
     radius:Int,
-    extractPosition:(T) => Position)
+    extractPixel:(T) => Pixel)
       :Map[T, Iterable[T]] = {
     
     val radiusSquared = radius * radius
     
     //Yes, this includes the unit itself
-    things.map(thing => (thing, things.filter(extractPosition(_).pixelDistanceSquared(extractPosition(thing)) <= radiusSquared))).toMap
+    things.map(thing => (thing, things.filter(extractPixel(_).pixelDistanceSquared(extractPixel(thing)) <= radiusSquared))).toMap
   }
 }

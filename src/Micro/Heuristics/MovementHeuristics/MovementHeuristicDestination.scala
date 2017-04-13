@@ -1,12 +1,12 @@
 package Micro.Heuristics.MovementHeuristics
 import Lifecycle.With
 import Mathematics.Heuristics.HeuristicMath
+import Mathematics.Pixels.Tile
 import Micro.Intent.Intention
-import bwapi.TilePosition
 
 object MovementHeuristicDestination extends MovementHeuristic {
   
-  override def evaluate(intent: Intention, candidate: TilePosition): Double = {
+  override def evaluate(intent: Intention, candidate: Tile): Double = {
   
     if (intent.destination.isEmpty) return HeuristicMath.default
     

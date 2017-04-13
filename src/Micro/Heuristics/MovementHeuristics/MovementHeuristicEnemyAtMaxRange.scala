@@ -1,13 +1,12 @@
 package Micro.Heuristics.MovementHeuristics
 
+import Mathematics.Pixels.Tile
 import Micro.Intent.Intention
 import ProxyBwapi.UnitInfo.UnitInfo
-import bwapi.TilePosition
-import Utilities.EnrichPosition._
 
 object MovementHeuristicEnemyAtMaxRange extends MovementHeuristic {
   
-  override def evaluate(intent: Intention, candidate: TilePosition): Double = {
+  override def evaluate(intent: Intention, candidate: Tile): Double = {
     val us = intent.unit
     val kiteableEnemies = intent.threats.filter(isKiteable(intent.unit, _))
     

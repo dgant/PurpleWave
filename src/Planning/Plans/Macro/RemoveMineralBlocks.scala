@@ -1,7 +1,7 @@
 package Planning.Plans.Macro
 
 import Micro.Intent.Intention
-import Planning.Composition.PositionFinders.Generic.TileSpecific
+import Planning.Composition.PixelFinders.Generic.TileSpecific
 import Planning.Composition.Property
 import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Composition.UnitMatchers.UnitMatchWorker
@@ -10,7 +10,7 @@ import Planning.Plan
 import Planning.Composition.ResourceLocks.LockUnits
 import Lifecycle.With
 
-import Utilities.EnrichPosition._
+import Utilities.EnrichPixel._
 
 class RemoveMineralBlocks extends Plan {
   

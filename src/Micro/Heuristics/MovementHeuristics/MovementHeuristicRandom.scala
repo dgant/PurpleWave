@@ -1,12 +1,12 @@
 package Micro.Heuristics.MovementHeuristics
 
+import Mathematics.Pixels.Tile
 import Micro.Intent.Intention
 import Utilities.RandomState
-import bwapi.TilePosition
 
 object MovementHeuristicRandom extends MovementHeuristic {
   
-  override def evaluate(intent: Intention, candidate: TilePosition): Double = {
+  override def evaluate(intent: Intention, candidate: Tile): Double = {
   
     1.0 + RandomState.random.nextDouble
     

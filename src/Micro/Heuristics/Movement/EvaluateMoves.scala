@@ -2,11 +2,9 @@ package Micro.Heuristics.Movement
 
 import Lifecycle.With
 import Mathematics.Heuristics.HeuristicMath
-import Mathematics.Positions.Point
+import Mathematics.Pixels.{Point, Tile}
 import Micro.Heuristics.MovementHeuristics.MovementHeuristicResult
 import Micro.Intent.Intention
-import Utilities.EnrichPosition._
-import bwapi.TilePosition
 
 object EvaluateMoves {
   
@@ -37,7 +35,7 @@ object EvaluateMoves {
   def best(
     intent:Intention,
     profile:MovementProfile)
-      :TilePosition = {
+      : Tile = {
     
     val candidates =
       points

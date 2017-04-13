@@ -1,9 +1,9 @@
-package Planning.Composition.PositionFinders
+package Planning.Composition.PixelFinders
 
-import bwapi.TilePosition
+import Mathematics.Pixels.Tile
 
 trait TileFinder {
   
-  def find:Option[TilePosition]
+  def find:Option[Tile]
   
 }

@@ -1,9 +1,9 @@
 package Information.Battles.Simulation
 
 import Information.Battles.Simulation.Construction.{BattleSimulation, BattleSimulationGroup, Simulacrum}
-import Information.Battles.Simulation.Tactics.{TacticWounded, TacticFocus, TacticMovement}
-import Utilities.EnrichPosition._
-import bwapi.Position
+import Information.Battles.Simulation.Tactics.{TacticFocus, TacticMovement, TacticWounded}
+import Mathematics.Pixels.Pixel
+import Utilities.EnrichPixel._
 
 class SimulacrumAgent(
   thisUnit  : Simulacrum,
@@ -106,7 +106,7 @@ class SimulacrumAgent(
     if (threats.nonEmpty) {
       val closestThreat = threats.minBy(threat =>
         Math.min(
-          threat.pixel.getDistance(thisUnit.pixel),
+          threat.pixel.pixelDistanceFast(thisUnit.pixel),
           Math.max(0, threat.pixel.project(thisUnit.pixel, threat.unit.rangeAgainst(thisUnit.unit))
         .pixelDistanceSquared(thisUnit.pixel))))
       moveAwayFrom(closestThreat.pixel)
@@ -125,15 +125,15 @@ class SimulacrumAgent(
     }
   }
   
-  private def moveAwayFrom(destination:Position) {
+  private def moveAwayFrom(destination:Pixel) {
     move(destination, -1.0)
   }
   
-  private def moveTowards(destination:Position) {
+  private def moveTowards(destination:Pixel) {
     move(destination, chargingSpeedRatio, thisUnit.pixel.pixelDistanceFast(destination))
   }
   
-  private def move(destination:Position, multiplier:Double, maxDistance:Double = 1000.0) {
+  private def move(destination:Pixel, multiplier:Double, maxDistance:Double = 1000.0) {
     thisUnit.pixel = thisUnit.pixel.project(destination, Math.min(
       maxDistance,
       multiplier * thisUnit.topSpeed * (1 + movementFrames)))

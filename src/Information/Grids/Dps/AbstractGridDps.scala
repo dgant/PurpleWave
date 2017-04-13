@@ -5,7 +5,7 @@ import Information.Grids.ArrayTypes.AbstractGridDouble
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.UnitInfo
 import Lifecycle.With
-import Utilities.EnrichPosition._
+import Utilities.EnrichPixel._
 
 abstract class AbstractGridDps extends AbstractGridDouble {
   

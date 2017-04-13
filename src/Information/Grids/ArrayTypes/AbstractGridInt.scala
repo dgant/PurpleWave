@@ -1,6 +1,6 @@
 package Information.Grids.ArrayTypes
 
-import bwapi.TilePosition
+import Mathematics.Pixels.Tile
 
 class AbstractGridInt extends AbstractGridArray[Int] {
   
@@ -10,5 +10,5 @@ class AbstractGridInt extends AbstractGridArray[Int] {
   
   def add(i:Int, value:Int):Unit                = if (valid(i)) values(i) += value
   def add(tileX:Int, tileY:Int, value:Int):Unit = add(i(tileX, tileY), value)
-  def add(tile:TilePosition, value:Int):Unit    = add(i(tile.getX, tile.getY), value)
+  def add(tile:Tile, value:Int):Unit    = add(i(tile.x, tile.y), value)
 }

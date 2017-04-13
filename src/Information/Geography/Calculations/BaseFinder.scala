@@ -5,16 +5,15 @@ import Mathematics.Clustering
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.ForeignUnitInfo
 import Lifecycle.With
-import Mathematics.Positions.TileRectangle
-import Utilities.EnrichPosition._
-import bwapi.TilePosition
+import Mathematics.Pixels.{Tile, TileRectangle}
+import Utilities.EnrichPixel._
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 object BaseFinder {
   
-  def calculate:Iterable[TilePosition] = {
+  def calculate:Iterable[Tile] = {
   
     //Find base positions
     val allHalls = clusteredResourcePatches.flatMap(bestTownHallTile).to[mutable.Set]
@@ -33,7 +32,7 @@ object BaseFinder {
     With.units.neutral.filter(unit => unit.unitClass.isGas || unit.unitClass.isMinerals && unit.initialResources > 0)
   }
   
-  private def bestTownHallTile(resources:Iterable[ForeignUnitInfo]):Option[TilePosition] = {
+  private def bestTownHallTile(resources:Iterable[ForeignUnitInfo]):Option[Tile] = {
     val centroid = resources.map(_.pixelCenter).centroid
     val centroidTile = centroid.tileIncluding
     val searchRadius = 10
@@ -46,7 +45,7 @@ object BaseFinder {
     Some(candidates.minBy(_.topLeftPixel.add(64, 48).pixelDistanceSlow(centroid)))
   }
   
-  private def isLegalTownHallTile(candidate:TilePosition):Boolean = {
+  private def isLegalTownHallTile(candidate:Tile):Boolean = {
     if ( ! candidate.valid) return false
     val buildingArea = Protoss.Nexus.tileArea.add(candidate)
     val exclusions =
@@ -55,13 +54,13 @@ object BaseFinder {
           resourcePatch.tileTopLeft.subtract(3, 3),
           resourcePatch.tileTopLeft.add(3, 3).add(resourcePatch.unitClass.tileSize)))
     
-    buildingArea.tiles.forall(With.game.isBuildable) &&
+    buildingArea.tiles.forall(tile => With.game.isBuildable(tile.bwapi)) &&
       ! resourcePatches.view.map(resourcePatch => resourcePatch.tileArea.expand(3, 3)).exists(buildingArea.intersects)
   }
   
-  private def removeConflictingBases(halls:mutable.Set[TilePosition]):Iterable[TilePosition] = {
+  private def removeConflictingBases(halls:mutable.Set[Tile]):Iterable[Tile] = {
   
-    val basesToRemove = new mutable.HashSet[TilePosition]
+    val basesToRemove = new mutable.HashSet[Tile]
     
     //Remove conflicting/overlapping positions
     //O(n^3) but we only do it once

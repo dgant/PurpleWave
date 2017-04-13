@@ -2,25 +2,25 @@ package Information.Battles.Evaluation
 
 import Information.Battles.{Battle, BattleGroup}
 import Lifecycle.With
+import Mathematics.Pixels.Pixel
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.UnitInfo
-import Utilities.EnrichPosition._
-import bwapi.Position
+import Utilities.EnrichPixel._
 
 object BattleMetrics {
   
-  def vanguard(group:BattleGroup, otherGroup:BattleGroup):Position = {
+  def vanguard(group:BattleGroup, otherGroup:BattleGroup):Pixel = {
     group.units.minBy(_.pixelDistanceSquared(otherGroup.center)).pixelCenter
   }
   
-  def center(group:BattleGroup):Position = {
+  def center(group:BattleGroup):Pixel = {
     val airCenter = group.units.view.map(_.pixelCenter).centroid
     group.units.view.map(_.pixelCenter).minBy(_.pixelDistanceSquared(airCenter))
   }
   
   def contextualDesire(battle:Battle):Double = {
     var desire = 1.0
-    val zone = With.geography.zones.filter(_.bwtaRegion.getPolygon.isInside(battle.enemy.vanguard))
+    val zone = With.geography.zones.filter(_.bwtaRegion.getPolygon.isInside(battle.enemy.vanguard.bwapi))
     if (zone.exists(_.owner == With.self)) desire *= 2
     return desire
   }
@@ -43,7 +43,7 @@ object BattleMetrics {
     Math.max(0, combatEfficacy)
   }
   
-  def estimateStrength(unit:UnitInfo, position:Position):Double = {
+  def estimateStrength(unit:UnitInfo, position:Pixel):Double = {
     val distanceDropoff = 16.0
     val distanceCutoff  = 32.0 * 4
     val distance        = Math.max(0, unit.pixelDistanceFast(position) - unit.unitClass.maxAirGroundRange)

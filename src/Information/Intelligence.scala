@@ -3,12 +3,12 @@ package Information
 import Information.Geography.Types.Base
 import Performance.Caching.CacheFrame
 import Lifecycle.With
-import bwapi.TilePosition
+import Mathematics.Pixels.Tile
 
 class Intelligence {
   
-  def mostBaselikeEnemyPosition:TilePosition = mostBaselikeEnemyPositionCache.get
-  val mostBaselikeEnemyPositionCache = new CacheFrame(() =>
+  def mostBaselikeEnemyPixel:Tile = mostBaselikeEnemyPixelCache.get
+  val mostBaselikeEnemyPixelCache = new CacheFrame(() =>
     With.units.enemy
       .toVector
       .filterNot(_.flying)

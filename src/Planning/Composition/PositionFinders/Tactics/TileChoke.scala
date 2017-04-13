@@ -1,16 +1,16 @@
-package Planning.Composition.PositionFinders.Tactics
+package Planning.Composition.PixelFinders.Tactics
 
 import Performance.Caching.Cache
-import Planning.Composition.PositionFinders.TileFinder
+import Planning.Composition.PixelFinders.TileFinder
 import Lifecycle.With
-import Utilities.EnrichPosition._
-import bwapi.TilePosition
+import Mathematics.Pixels.Tile
+import Utilities.EnrichPixel._
 
 class TileChoke extends TileFinder {
   
-  override def find: Option[TilePosition] = findCache.get
-  val findCache = new Cache[Option[TilePosition]](3, () => findRecalculate)
-  private def findRecalculate:Option[TilePosition] = {
+  override def find: Option[Tile] = findCache.get
+  val findCache = new Cache[Option[Tile]](3, () => findRecalculate)
+  private def findRecalculate:Option[Tile] = {
     
     val home = With.geography.home
     val ourExposedChokes = With.geography.zones
@@ -27,7 +27,7 @@ class TileChoke extends TileFinder {
     val mostExposedChoke = ourExposedChokes.minBy(choke =>
       With.paths.groundPixels(
         choke.centerPixel.tileIncluding,
-        With.intelligence.mostBaselikeEnemyPosition))
+        With.intelligence.mostBaselikeEnemyPixel))
     
     return Some(mostExposedChoke.centerPixel.tileIncluding)
   }

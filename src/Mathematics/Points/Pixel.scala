@@ -19,11 +19,11 @@ case class Pixel(val x:Int, val y:Int) {
   def add(dx:Int, dy:Int):Pixel = {
     new Pixel(x + dx, y + dy)
   }
-  def add (point:Point):Pixel = {
+  def add(point:Point):Pixel = {
     add(point.x, point.y)
   }
-  def add(otherPixel:Pixel):Pixel = {
-    add(otherPixel.x, otherPixel.y)
+  def add(pixel:Pixel):Pixel = {
+    add(pixel.x, pixel.y)
   }
   def subtract(dx:Int, dy:Int):Pixel = {
     add(-dx, -dy)
@@ -47,22 +47,22 @@ case class Pixel(val x:Int, val y:Int) {
     val delta = destination.subtract(this)
     delta.multiply(pixels/distance).add(this)
   }
-  def midpoint(otherPixel:Pixel):Pixel = {
-    add(otherPixel).divide(2)
+  def midpoint(pixel:Pixel):Pixel = {
+    add(pixel).divide(2)
   }
-  def pixelDistanceSlow(otherPixel:Pixel):Double = {
-    Math.sqrt(pixelDistanceSquared(otherPixel))
+  def pixelDistanceSlow(pixel:Pixel):Double = {
+    Math.sqrt(pixelDistanceSquared(pixel))
   }
-  def pixelDistanceFast(otherPixel:Pixel):Double = {
+  def pixelDistanceFast(pixel:Pixel):Double = {
     // Octagonal distance
     // https://en.wikibooks.org/wiki/Algorithms/Distance_approximations#Octagonal
-    val dx = Math.abs(x - otherPixel.x)
-    val dy = Math.abs(y - otherPixel.y)
+    val dx = Math.abs(x - pixel.x)
+    val dy = Math.abs(y - pixel.y)
     0.941256 * Math.max(dx, dy) + Math.min(dx, dy) * 0.414213562
   }
-  def pixelDistanceSquared(otherPixel:Pixel):Int = {
-    val dx = x - otherPixel.x
-    val dy = y - otherPixel.y
+  def pixelDistanceSquared(pixel:Pixel):Int = {
+    val dx = x - pixel.x
+    val dy = y - pixel.y
     dx * dx + dy * dy
   }
   def tileIncluding:Tile = {

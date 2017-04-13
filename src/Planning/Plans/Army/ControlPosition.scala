@@ -34,7 +34,7 @@ class ControlPixel extends Plan {
           e.travelPixels(base.tileIncluding, targetPixel)))
         
     if (infiltrators.nonEmpty) {
-      targetPixel = infiltrators.map(_.tileIncludingCenter).minBy(_.tileDistance(With.geography.home))
+      targetPixel = infiltrators.map(_.tileIncludingCenter).minBy(_.tileDistanceSlow(With.geography.home))
     }
     
     units.get.acquire(this)

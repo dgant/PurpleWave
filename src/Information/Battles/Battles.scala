@@ -88,8 +88,11 @@ class Battles {
           nextCluster ++= nextUnits
           horizonTiles ++=
             Circle.points(searchRadiusTiles)
-            .map(nextTile.add)
-            .filter(tile => tile.valid && ! exploredTiles.contains(tile))
+              .map(nextTile.add)
+              .filter(tile =>
+                tile.valid &&
+                ! exploredTiles.contains(tile) &&
+                With.grids.units.get(tile).nonEmpty)
         }
       }
       

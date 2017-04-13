@@ -5,7 +5,7 @@ import ProxyBwapi.UnitInfo.UnitInfo
 
 object Threats {
   
-  def get(intent:Intention):Set[UnitInfo] =
+  def get(intent:Intention):Vector[UnitInfo] =
     With.units.inTileRadius(
       intent.unit.tileIncludingCenter,
       With.configuration.combatEvaluationDistanceTiles)
@@ -14,4 +14,5 @@ object Threats {
         With.frame - threat.lastSeen < 24 * 60 &&
         threat.isEnemyOf(intent.unit) &&
         threat.canAttackThisSecond(intent.unit))
+    .toVector
 }

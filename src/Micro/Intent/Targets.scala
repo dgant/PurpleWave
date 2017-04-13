@@ -8,9 +8,9 @@ object Targets {
   
   val ineligibleClasses = Vector(Zerg.Larva, Zerg.Egg)
   
-  def get(intent:Intention):Set[UnitInfo] = {
+  def get(intent:Intention):Vector[UnitInfo] = {
     
-    if ( ! intent.unit.canAttackThisSecond) return Set.empty
+    if ( ! intent.unit.canAttackThisSecond) return Vector.empty
     
     With.units.inTileRadius(
       intent.unit.tileIncludingCenter,
@@ -21,5 +21,6 @@ object Targets {
         target.isEnemyOf(intent.unit) &&
         intent.unit.canAttackThisSecond(target) &&
         ! ineligibleClasses.contains(target.unitClass))
+      .toVector
   }
 }

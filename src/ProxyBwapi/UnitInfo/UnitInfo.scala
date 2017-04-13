@@ -106,8 +106,8 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
     damageToHealth + damageToShields
   }
   
-  def inTileRadius(tiles:Int)   : Set[UnitInfo] = With.units.inTileRadius(tileIncludingCenter, tiles)
-  def inPixelRadius(pixels:Int) : Set[UnitInfo] = With.units.inPixelRadius(pixelCenter, pixels)
+  def inTileRadius(tiles:Int)   : Traversable[UnitInfo] = With.units.inTileRadius(tileIncludingCenter, tiles)
+  def inPixelRadius(pixels:Int) : Traversable[UnitInfo] = With.units.inPixelRadius(pixelCenter, pixels)
   
   def canDoAnythingThisFrame:Boolean =
     alive &&

@@ -1,14 +1,13 @@
 package ProxyBwapi.UnitTracking
 
-import Mathematics.Shapes.Circle
-import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, UnitInfo}
 import Lifecycle.With
 import Mathematics.Positions.TileRectangle
+import Mathematics.Shapes.Circle
+import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, UnitInfo}
 import Utilities.EnrichPosition._
 import bwapi.{Position, TilePosition, UnitType}
 
 import scala.collection.JavaConverters._
-import scala.collection.mutable.ListBuffer
 
 class UnitTracker {
   
@@ -40,25 +39,22 @@ class UnitTracker {
     units.asScala.flatMap(get).toVector
   }
   
-  def inTileRadius(tile: TilePosition, tiles: Int): Set[UnitInfo] = {
-    inTilesNonDistinct(Circle.points(tiles).map(tile.add)).toSet
+  def inTileRadius(tile: TilePosition, tiles: Int): Traversable[UnitInfo] = {
+    inTiles(Circle.points(tiles).map(tile.add))
   }
   
-  def inPixelRadius(pixel: Position, pixels: Int): Set[UnitInfo] = {
+  def inPixelRadius(pixel: Position, pixels: Int): Traversable[UnitInfo] = {
     val tile = pixel.tileIncluding
-    inTilesNonDistinct(Circle.points(pixels / 32 + 1).map(tile.add))
+    inTiles(Circle.points(pixels / 32 + 1).map(tile.add))
       .filter(_.pixelCenter.pixelDistanceSquared(pixel) <= pixels * pixels)
-      .toSet
   }
   
-  def inRectangle(rectangle: TileRectangle): Set[UnitInfo] = {
-    inTilesNonDistinct(rectangle.tiles).toSet
+  def inRectangle(rectangle: TileRectangle): Traversable[UnitInfo] = {
+    inTiles(rectangle.tiles).toSet
   }
   
-  private def inTilesNonDistinct(tiles:Iterable[TilePosition]):ListBuffer[UnitInfo] = {
-    val output = new ListBuffer[UnitInfo]
-    tiles.foreach(tile => output ++= With.grids.units.get(tile))
-    output
+  private def inTiles(tiles:Traversable[TilePosition]):Traversable[UnitInfo] = {
+    tiles.flatten(tile => With.grids.units.get(tile))
   }
   
   def update() {

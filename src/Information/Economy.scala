@@ -44,7 +44,7 @@ class Economy {
     With.geography.ourHarvestingAreas.flatten(ourActiveDrillers)
   }
   
-  def ourActiveHarvesters(harvestingArea:TileRectangle):Iterable[FriendlyUnitInfo] = {
+  def ourActiveHarvesters(harvestingArea:TileRectangle):Traversable[FriendlyUnitInfo] = {
     With.units.inRectangle(harvestingArea).flatten(_.friendly)
       //This is a slightly dubious filter.
       // 1. There are several associated UnitCommandTypes, including ReturnCargo
@@ -53,11 +53,11 @@ class Economy {
       .filter(worker => worker.gatheringMinerals || worker.gatheringGas)
   }
   
-  def ourActiveMiners(miningArea:TileRectangle):Iterable[FriendlyUnitInfo] = {
+  def ourActiveMiners(miningArea:TileRectangle):Traversable[FriendlyUnitInfo] = {
     ourActiveHarvesters(miningArea).filter(_.gatheringMinerals)
   }
   
-  def ourActiveDrillers(miningArea:TileRectangle):Iterable[FriendlyUnitInfo] = {
+  def ourActiveDrillers(miningArea:TileRectangle):Traversable[FriendlyUnitInfo] = {
     ourActiveHarvesters(miningArea).filter(_.gatheringGas)
   }
   

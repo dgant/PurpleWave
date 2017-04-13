@@ -1,12 +1,12 @@
 package Information.Grids
 
-import Information.Grids.ArrayTypes.AbstractGridSet
-import ProxyBwapi.UnitInfo.UnitInfo
+import Information.Grids.ArrayTypes.AbstractGridVector
 import Lifecycle.With
+import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.TilePosition
 
-class GridUnits extends AbstractGridSet[UnitInfo] {
+class GridUnits extends AbstractGridVector[UnitInfo] {
   
-  override protected def getTiles(unitInfo: UnitInfo):Iterable[TilePosition] = unitInfo.tileArea.tiles
-  override protected def getUnits: Iterable[UnitInfo] = With.units.all
+  override protected def getObjects: Iterable[UnitInfo] = With.units.all
+  override protected def getTile(item: UnitInfo): TilePosition = item.tileIncludingCenter
 }

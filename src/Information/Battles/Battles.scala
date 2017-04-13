@@ -4,9 +4,10 @@ import Information.Geography.Types.Zone
 import Lifecycle.With
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, UnitInfo}
 import Utilities.EnrichPosition._
+import bwapi.TilePosition
 
 import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 
 class Battles {
   
@@ -17,7 +18,7 @@ class Battles {
           var global          : Battle                = null
           var byZone          : Map[Zone, Battle]     = Map.empty
           var byUnit          : Map[UnitInfo, Battle] = Map.empty
-          var local           : Vector[Battle]          = Vector.empty
+          var local           : Vector[Battle]        = Vector.empty
   
   def classify() {
     combatantsOurs  = With.units.ours .filter(unit => unit.unitClass.helpsInCombat)
@@ -58,26 +59,29 @@ class Battles {
     
     val framesToLookAhead = Math.max(12, 2 * With.performance.cacheLength(delayLength))
     val unassigned = mutable.HashSet.empty ++ combatantsOurs ++ combatantsEnemy
-    val clusters = new ListBuffer[mutable.HashSet[UnitInfo]]
-    val horizon = new mutable.HashSet[UnitInfo]
-    val searchMarginTiles = 2
-    val searchRadius = searchMarginTiles + Math.min(With.configuration.combatEvaluationDistanceTiles, unassigned.map(_.pixelReachTotal(framesToLookAhead)).max/32 + 1)
+    val clusters = new ArrayBuffer[ArrayBuffer[UnitInfo]]
+    
+    val exploredTiles = new mutable.BitSet
+    val horizonTiles = new mutable.BitSet
+    //val searchMarginTiles = 2
+    val searchRadius = With.configuration.combatEvaluationDistanceTiles //searchMarginTiles + Math.min(With.configuration.combatEvaluationDistanceTiles, unassigned.map(_.pixelReachTotal(framesToLookAhead)).max/32 + 1)
     while (unassigned.nonEmpty) {
-      val nextCluster = new mutable.HashSet[UnitInfo]
-      horizon.add(unassigned.head)
-      while (horizon.nonEmpty) {
-        val nextUnit = horizon.head
-        horizon.remove(nextUnit)
-        unassigned.remove(nextUnit)
-        nextCluster.add(nextUnit)
-        horizon ++= nextUnit
+      val nextCluster = new ArrayBuffer[UnitInfo]
+      horizonTiles.add(unassigned.head.tileIncludingCenter.i)
+      while (horizonTiles.nonEmpty) {
+        val nextTile = horizonTiles.head
+        exploredTiles.add(nextTile)
+        horizonTiles.remove(nextTile)
+        unassigned.remove(nextTile)
+        nextCluster.add(nextTile)
+        horizonTiles ++= nextTile
           .inTileRadius(With.configuration.combatEvaluationDistanceTiles)
           .filter(unassigned.contains)
           .filter(otherUnit =>
-            nextUnit.pixelsFromEdgeFast(otherUnit) <=
+            nextTile.pixelsFromEdgeFast(otherUnit) <=
               32.0 * searchMarginTiles +
               Math.max(
-                nextUnit.pixelReachTotal(framesToLookAhead),
+                nextTile.pixelReachTotal(framesToLookAhead),
                 otherUnit.pixelReachTotal(framesToLookAhead)))
       }
       clusters.append(nextCluster)

@@ -150,6 +150,9 @@ case object EnrichPosition {
       tile.getX < With.mapWidth &&
       tile.getY < With.mapHeight
     }
+    def i:Int = {
+      tile.getX + With.mapWidth * tile.getY
+    }
     def add(dx:Int, dy:Int):TilePosition = {
       new TilePosition(tile.getX + dx, tile.getY + dy)
     }

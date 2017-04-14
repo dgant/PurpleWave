@@ -2,9 +2,10 @@ package Information.Grids.Construction
 
 import Information.Grids.ArrayTypes.AbstractGridBoolean
 import Lifecycle.With
+import Mathematics.Pixels.Tile
 
 class GridBuildableTerrain extends AbstractGridBoolean {
   override def onInitialization() {
-    tiles.foreach(tile => set(tile, With.game.isBuildable(tile.bwapi)))
+    indices.foreach(i => set(i, With.game.isBuildable(new Tile(i).bwapi)))
   }
 }

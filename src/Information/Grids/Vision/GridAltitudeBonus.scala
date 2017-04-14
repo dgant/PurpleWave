@@ -2,11 +2,12 @@ package Information.Grids.Vision
 
 import Information.Grids.ArrayTypes.AbstractGridDouble
 import Lifecycle.With
+import Mathematics.Pixels.Tile
 
 class GridAltitudeBonus extends AbstractGridDouble {
   
   override def onInitialization() {
-    tiles.foreach(tile => set(tile, getBonus(With.game.getGroundHeight(tile.bwapi))))
+    indices.foreach(i => set(i, getBonus(With.game.getGroundHeight(new Tile(i).bwapi))))
   }
   
   private def getBonus(altitude:Int):Double = {

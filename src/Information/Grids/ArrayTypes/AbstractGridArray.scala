@@ -3,7 +3,6 @@ package Information.Grids.ArrayTypes
 import Information.Grids.AbstractGrid
 import Mathematics.Pixels.Tile
 
-
 abstract class AbstractGridArray[T] extends AbstractGrid[T] {
   
   protected var values:Array[T]
@@ -14,7 +13,6 @@ abstract class AbstractGridArray[T] extends AbstractGrid[T] {
   
   def reset() = {
     val default = defaultValue
-    val length = width * height
     
     //Use a while-loop because in Scala they are much faster than for-loops
     var i = 0
@@ -28,11 +26,9 @@ abstract class AbstractGridArray[T] extends AbstractGrid[T] {
   override def update()                           = initialize()
   def onInitialization() {}
   def indices:Iterable[Int]                       = values.indices
-  def points:Iterable[(Int, Int)]                 = indices.map(i => (x(i), y(i)))
-  def tiles:Iterable[Tile]                        = indices.map(i => new Tile(x(i), y(i)))
+  def tiles:Iterable[Tile]                        = indices.map(i => new Tile(i))
   def get(i:Int):T                                = if (valid(i)) values(i) else defaultValue
   def set(i:Int, value:T):Unit                    = if (valid(i)) values(i) = value
-  def set(tileX:Int, tileY:Int, value:T):Unit     = set(i(tileX, tileY), value)
-  def set(position:Tile, value:T):Unit            = set(i(position.x, position.y), value)
+  def set(tile:Tile, value:T):Unit                = set(tile.i, value)
 }
 

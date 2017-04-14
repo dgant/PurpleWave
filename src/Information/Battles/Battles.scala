@@ -26,10 +26,7 @@ class Battles {
     replaceBattleGlobal()
     replaceBattleByZone()
     replaceBattlesLocal()
-  }
-  
-  def assess() {
-    BattleUpdater.assess(local ++ byZone.values :+ global)
+    (local ++ byZone.values :+ global).foreach(BattleUpdater.updateVanguards)
   }
   
   private def replaceBattleGlobal() {
@@ -67,7 +64,8 @@ class Battles {
     }
     val localNew = buildBattlesLocal
     localNew.foreach(adoptExistingLocalBattleMetrics)
-    byUnit = localNew
+    local = localNew
+    byUnit = local
       .flatten(battle =>
         Vector(
           battle.us.units,

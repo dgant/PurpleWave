@@ -7,15 +7,28 @@ class AutoCamera {
   
   var focus:Pixel = Points.middle
   
+  private var lastJumpFrame = -240
+  
   def onFrame() {
-    if ( ! With.configuration.camera) { return }
     
+    if ( ! With.configuration.camera) { return }
+  
+    var newFocus = focus
+  
     if (With.battles.local.nonEmpty) {
-      focus = With.battles.local.toVector.sortBy(_.focus.pixelDistanceFast(focus)).maxBy(b => b.enemy.strength * b.us.strength).us.vanguard
+      newFocus = With.battles.local.toVector.sortBy(_.focus.pixelDistanceFast(focus)).maxBy(b => b.enemy.strength * b.us.strength).us.vanguard
       setCameraSpeed(With.configuration.cameraDynamicSpeedSlowest)
     } else if (With.units.ours.nonEmpty) {
-      focus = With.units.ours.minBy(_.pixelDistanceSquared(Points.middle)).pixelCenter
+      newFocus = With.units.ours.toList
+        .filter(_.canMove)
+        .minBy(_.pixelDistanceSquared(With.intelligence.mostBaselikeEnemyPixel.pixelCenter))
+        .pixelCenter
       setCameraSpeed(With.configuration.cameraDynamicSpeedFastest)
+    }
+  
+    if (focus.pixelDistanceFast(newFocus) < 96.0 || With.frame - lastJumpFrame > 48 ) {
+      focus = newFocus
+      lastJumpFrame = With.frame
     }
     
     With.game.setScreenPosition(focus.subtract(320, 200).bwapi)

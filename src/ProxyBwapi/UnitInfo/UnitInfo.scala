@@ -129,12 +129,14 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
     val damageOnHit = if (enemy.flying) unitClass.rawAirDamage else unitClass.rawGroundDamage
     val damageScale = damageScaleAgainst(enemy)
     val damageToShields = Math.max(0, Math.min(enemy.shieldPoints, hits * (damageOnHit - enemy.armorShield)))
-    val damageToHealth = Math.max(0, hits * (damageOnHit - enemy.armorHealth) - damageToShields)
+    val damageToHealth  = Math.max(0, hits * (damageOnHit - enemy.armorHealth) - damageToShields)
+    
+    //Note that Armor can't reduce damage below 0.5
     damageToHealth + damageToShields
   }
   
-  def inTileRadius(tiles:Int)   : Traversable[UnitInfo] = With.units.inTileRadius(tileIncludingCenter, tiles)
-  def inPixelRadius(pixels:Int) : Traversable[UnitInfo] = With.units.inPixelRadius(pixelCenter, pixels)
+  def inTileRadius  (tiles:Int)  : Traversable[UnitInfo] = With.units.inTileRadius(tileIncludingCenter, tiles)
+  def inPixelRadius (pixels:Int) : Traversable[UnitInfo] = With.units.inPixelRadius(pixelCenter, pixels)
   
   def canDoAnythingThisFrame:Boolean =
     alive &&
@@ -157,14 +159,11 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
     (
       unitClass.canAttack ||
       (
-        isCarrierReaverOrLurkerCache.get &&
         ( ! is(Protoss.Carrier) || interceptors > 0) &&
         ( ! is(Protoss.Reaver)  || scarabs > 0) &&
         ( ! is(Zerg.Lurker)     || burrowed)
       )
     ))
-  
-  private val isCarrierReaverOrLurkerCache = new CacheFrame(() => Vector(Protoss.Carrier, Protoss.Reaver, Zerg.Lurker).contains(this))
   
   def canAttackThisSecond(enemy:UnitInfo):Boolean =
     canAttackThisSecond &&
@@ -185,12 +184,11 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
     else                          4
   }
   
-  // The range of this unit's potential impact at a distance in the future
-  def pixelReachTravel    (framesAhead  : Int)  : Double = unitClass.topSpeed * framesAhead
-  def pixelReachAir       (framesAhead  : Int)  : Double = pixelReachTravel(framesAhead) + pixelRangeAir
-  def pixelReachGround    (framesAhead  : Int)  : Double = pixelReachTravel(framesAhead) + pixelRangeGround
-  def pixelReachMax       (framesAhead  : Int)  : Double = Math.max(pixelReachAir(framesAhead), pixelReachGround(framesAhead))
-  def pixelReachAgainst   (framesAhead  : Int, enemy:UnitInfo): Double = if (enemy.flying) pixelReachAir(framesAhead) else pixelReachGround(framesAhead)
+  def pixelImpactTravel   (framesAhead  : Int)  : Double = unitClass.topSpeed * framesAhead
+  def pixelImpactAir      (framesAhead  : Int)  : Double = pixelImpactTravel(framesAhead) + pixelRangeAir
+  def pixelImpactGround   (framesAhead  : Int)  : Double = pixelImpactTravel(framesAhead) + pixelRangeGround
+  def pixelImpactMax      (framesAhead  : Int)  : Double = Math.max(pixelImpactAir(framesAhead), pixelImpactGround(framesAhead))
+  def pixelImpactAgainst  (framesAhead  : Int, enemy:UnitInfo): Double = if (enemy.flying) pixelImpactAir(framesAhead) else pixelImpactGround(framesAhead)
   
   def inRangeToAttackSlow(enemy:UnitInfo):Boolean = pixelsFromEdgeSlow(enemy) <= rangeAgainst(enemy)
   def inRangeToAttackFast(enemy:UnitInfo):Boolean = pixelsFromEdgeFast(enemy) <= rangeAgainst(enemy)

@@ -24,7 +24,7 @@ abstract class AbstractGridDps extends AbstractGridDouble {
     getUnits.foreach(unit => {
       var dps = if (air) unit.unitClass.airDps else unit.unitClass.groundDps
       if (dps > 0.0) {
-        var pixelReachMax = if (air) unit.pixelReachAir(framesToLookAhead) else unit.pixelReachGround(framesToLookAhead)
+        var pixelReachMax = if (air) unit.pixelImpactAir(framesToLookAhead) else unit.pixelImpactGround(framesToLookAhead)
         var pixelRangeMax = if (air) unit.pixelRangeAir else unit.pixelRangeGround
         var pixelRangeMin = unit.unitClass.rawGroundMinRange
         

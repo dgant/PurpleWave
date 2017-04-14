@@ -21,7 +21,7 @@ object Kite extends Action {
     //This interpretation of kiting doesn't quite line up with the battle simulator, which may cause unintended behavior.
     if (intent.threats.exists(threat =>
       threat.pixelDistanceSquared(intent.unit) < threat.project(framesToLookAhead).pixelDistanceSquared(intent.unit.pixelCenter) &&
-      threat.pixelReachAgainst(framesToLookAhead, intent.unit) <= threat.pixelDistanceFast(intent.unit))) {
+      threat.pixelImpactAgainst(framesToLookAhead, intent.unit) <= threat.pixelDistanceFast(intent.unit))) {
       return Flee.perform(intent)
     }
     if (intent.threats.forall(threat => threat.rangeAgainst(intent.unit) >= intent.unit.rangeAgainst(threat))) {

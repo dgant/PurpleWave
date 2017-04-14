@@ -1,21 +1,17 @@
 package Information.Battles.Evaluation
 
-import Information.Battles.{Battle, BattleGroup}
+import Information.Battles.Types.{Battle, BattleGroup}
 import Lifecycle.With
 import Mathematics.Pixels.Pixel
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.UnitInfo
-import Utilities.EnrichPixel._
 
-object BattleMetrics {
+object BattleEvaluator {
   
-  def vanguard(group:BattleGroup, otherGroup:BattleGroup):Pixel = {
-    group.units.minBy(_.pixelDistanceSquared(otherGroup.center)).pixelCenter
-  }
-  
-  def center(group:BattleGroup):Pixel = {
-    val airCenter = group.units.view.map(_.pixelCenter).centroid
-    group.units.view.map(_.pixelCenter).minBy(_.pixelDistanceSquared(airCenter))
+  def run() {
+    With.battles.all.foreach(battle =>
+      battle.groups.foreach(group =>
+        group.strength = BattleEvaluator.estimateStrength(group, battle)))
   }
   
   def contextualDesire(battle:Battle):Double = {

@@ -1,8 +1,9 @@
-package Performance.Systems
+package Performance.Tasks.Global
 
 import Debugging.Visualizations.Visualization
+import Performance.Tasks.AbstractTask
 
-class SystemVisualizations extends AbstractSystem {
+class TaskVisualizations extends AbstractTask {
   
   override def skippable  : Boolean = false
   

@@ -1,7 +1,7 @@
 package Information.Battles.Simulation.Construction
 
-import Information.Battles.BattleGroup
 import Information.Battles.Simulation.Tactics.Tactics
+import Information.Battles.Types.BattleGroup
 
 import scala.collection.mutable.ListBuffer
 

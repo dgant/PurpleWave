@@ -1,10 +1,10 @@
-package Performance.Systems
+package Performance.Tasks
 
 import Lifecycle.With
 
 import scala.collection.mutable
 
-abstract class AbstractSystem {
+abstract class AbstractTask {
   
   private var lastRunFrame    : Int = -1
   private var totalRunCount   : Int = 0
@@ -15,6 +15,7 @@ abstract class AbstractSystem {
   
   def urgency   : Int     = 1
   def skippable : Boolean = true
+  
   protected def onRun()
   
   final def framesSinceRunning = Math.max(1, With.frame - lastRunFrame)
@@ -35,7 +36,7 @@ abstract class AbstractSystem {
   }
   
   final def recordRunDuration(millisecondsDuration:Long) {
-    runtimeMilliseconds.enqueue(millisecondsDuration)
+    runtimeMilliseconds.enqueue(Math.max(0L, millisecondsDuration))
     while (runtimeMilliseconds.size > runtimesToTrack) {
       runtimeMilliseconds.dequeue()
     }

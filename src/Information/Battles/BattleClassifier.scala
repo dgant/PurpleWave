@@ -1,5 +1,6 @@
 package Information.Battles
 
+import Information.Battles.Types.{Battle, BattleGroup}
 import Information.Geography.Types.Zone
 import Lifecycle.With
 import Mathematics.Pixels.Tile
@@ -9,16 +10,17 @@ import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, UnitInfo}
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
-class Battles {
-  
-  private val delayLength = 1
+class BattleClassifier {
   
   private var combatantsOurs  : Set[FriendlyUnitInfo] = Set.empty
   private var combatantsEnemy : Set[ForeignUnitInfo]  = Set.empty
-          var global          : Battle                = null
-          var byZone          : Map[Zone, Battle]     = Map.empty
-          var byUnit          : Map[UnitInfo, Battle] = Map.empty
-          var local           : Vector[Battle]        = Vector.empty
+  
+  var global  : Battle                = null
+  var byZone  : Map[Zone, Battle]     = Map.empty
+  var byUnit  : Map[UnitInfo, Battle] = Map.empty
+  var local   : Vector[Battle]        = Vector.empty
+  
+  def all:Traversable[Battle] = local ++ byZone.values :+ global
   
   def classify() {
     combatantsOurs  = With.units.ours .filter(unit => unit.unitClass.helpsInCombat)
@@ -26,7 +28,7 @@ class Battles {
     replaceBattleGlobal()
     replaceBattleByZone()
     replaceBattlesLocal()
-    (local ++ byZone.values :+ global).foreach(BattleUpdater.updateVanguards)
+    all.foreach(BattleUpdater.updateBattle)
   }
   
   private def replaceBattleGlobal() {
@@ -83,19 +85,32 @@ class Battles {
   }
   
   private def buildBattlesLocal:Vector[Battle] = {
-    val framesToLookAhead = Math.max(12, 2 * With.performance.cacheLength(delayLength))
+    val clusters = clusterUnits()
+    clusters
+      .map(cluster =>
+        new Battle(
+          new BattleGroup(cluster.filter(_.isOurs).toSet),
+          new BattleGroup(cluster.filter(_.isEnemy).toSet)))
+      .filter(battle =>
+        battle.us.units.nonEmpty &&
+          battle.enemy.units.nonEmpty)
+      .toVector
+  }
   
-    val unassigned = mutable.HashSet.empty ++ combatantsOurs ++ combatantsEnemy
+  private def clusterUnits():ArrayBuffer[ArrayBuffer[UnitInfo]] = {
+  
+    val unassignedUnits = mutable.HashSet.empty ++ combatantsOurs ++ combatantsEnemy
+    
     val clusters = new ArrayBuffer[ArrayBuffer[UnitInfo]]
   
     val exploredTiles = new mutable.HashSet[Tile]
     val horizonTiles  = new mutable.HashSet[Tile]
   
-    while (unassigned.nonEmpty) {
+    while (unassignedUnits.nonEmpty) {
     
-      val firstUnit = unassigned.head
+      val firstUnit = unassignedUnits.head
       val nextCluster = new ArrayBuffer[UnitInfo]
-      unassigned  -= firstUnit
+      unassignedUnits  -= firstUnit
       nextCluster += firstUnit
       horizonTiles.add(firstUnit.tileIncludingCenter)
     
@@ -108,7 +123,7 @@ class Battles {
         val nextUnits = With.grids.units.get(nextTile).filter(_ != firstUnit)
       
         if (nextUnits.nonEmpty) {
-          unassigned  --= nextUnits
+          unassignedUnits  --= nextUnits
           nextCluster ++= nextUnits
           horizonTiles ++=
             Circle.points(With.configuration.combatEvaluationDistanceTiles)
@@ -122,15 +137,8 @@ class Battles {
     
       clusters.append(nextCluster)
     }
+    
     clusters
-      .map(cluster =>
-        new Battle(
-          new BattleGroup(cluster.filter(_.isOurs).toSet),
-          new BattleGroup(cluster.filter(_.isEnemy).toSet)))
-      .filter(battle =>
-        battle.us.units.nonEmpty &&
-          battle.enemy.units.nonEmpty)
-      .toVector
   }
   
   def adoptMetrics(oldBattle:Battle, newBattle:Battle) {

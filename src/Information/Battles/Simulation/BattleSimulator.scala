@@ -1,7 +1,8 @@
 package Information.Battles.Simulation
 
-import Information.Battles.Battle
 import Information.Battles.Simulation.Construction.{BattleSimulation, BattleSimulationBuilder, BattleSimulationGroup, Simulacrum}
+import Information.Battles.Types.Battle
+import Lifecycle.With
 
 object BattleSimulator {
   
@@ -10,9 +11,18 @@ object BattleSimulator {
   //If a unit takes damage, how much do we care compared to its total value?
   val damageCostRatio = 3
   
-  // Loosely, based on the values in the BOSS paper:
+  // Loosely based on the values in the BOSS paper:
   // http://www.aaai.org/ocs/index.php/AIIDE/AIIDE11/paper/viewFile/4078/4407
-  def costPerSecondOfNotMining(workers:Int):Int = workers
+  //
+  // Workers mine about 1 mineral per second.
+  // We use a value of 2 minerals per second because workers lose mining time when returning from combat.
+  def costPerSecondOfNotMining(workers:Int):Int = workers * 2
+  
+  def run() {
+    With.battles.all
+      .filter(_.happening)
+      .foreach(battle => battle.simulations = simulate(battle))
+  }
   
   def simulate(battle:Battle):Iterable[BattleSimulation] = {
     val simulations = BattleSimulationBuilder.build(battle)
@@ -21,7 +31,7 @@ object BattleSimulator {
   }
   
   private def runSimulation(simulation: BattleSimulation) {
-    while(simulation.frames < maxFrames && simulation.us.units.nonEmpty && simulation.enemy.units.nonEmpty)
+    while(simulation.frameDuration < maxFrames && simulation.us.units.nonEmpty && simulation.enemy.units.nonEmpty)
       step(simulation)
     tallyLosses(simulation, simulation.us)
     tallyLosses(simulation, simulation.enemy)
@@ -34,7 +44,7 @@ object BattleSimulator {
     removeDeadUnits (battle.enemy)
     reduceCooldown  (battle.us)
     reduceCooldown  (battle.enemy)
-    battle.frames += 1
+    battle.frameDuration += 1
   }
   
   private def updateAgents (
@@ -73,7 +83,7 @@ object BattleSimulator {
   
   private def tallyLosses(battle:BattleSimulation, group:BattleSimulationGroup) {
     group.lostValue =
-      (group.lostValuePerSecond * battle.frames) / 24 +
+      (group.lostValuePerSecond * battle.frameDuration) / 24 +
       group.lostUnits.map(value).sum +
       group.units.map(unit => value(unit) * unit.damageTaken / unit.unit.unitClass.maxTotalHealth).sum / damageCostRatio
     

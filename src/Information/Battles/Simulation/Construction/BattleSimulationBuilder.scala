@@ -6,7 +6,7 @@ import Information.Battles.Simulation.Tactics.TacticFocus.TacticFocus
 import Information.Battles.Simulation.Tactics.TacticMovement.TacticMovement
 import Information.Battles.Simulation.Tactics.TacticWorkers.TacticWorkers
 import Information.Battles.Simulation.Tactics._
-import Information.Battles.{Battle, BattleGroup}
+import Information.Battles.Types.{Battle, BattleGroup}
 
 import scala.collection.mutable.ListBuffer
 

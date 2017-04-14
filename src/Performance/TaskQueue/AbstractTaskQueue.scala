@@ -1,31 +1,18 @@
-package Performance
+package Performance.TaskQueue
 
 import Lifecycle.With
-import Performance.Systems._
+import Performance.Tasks.AbstractTask
 
-class SystemQueue {
+abstract class AbstractTaskQueue {
   
-  val systems = Vector(
-    new SystemLatency,
-    new SystemUnitTracking,
-    new SystemGeography,
-    new SystemGrids,
-    new SystemBattleClassify,
-    new SystemBattleAssess,
-    new SystemEconomy,
-    new SystemPlanning,
-    new SystemMicro,
-    new SystemManners,
-    new SystemCamera,
-    new SystemVisualizations
-  )
+  val tasks:Vector[AbstractTask]
   
-  def onFrame() {
+  def run() {
     if (With.frame == 0) {
-      systems.foreach(_.run())
+      tasks.foreach(_.run())
     } else {
       var definitelyRunNextSystem = true
-      systems
+      tasks
         .sortBy(system => - system.urgency * system.framesSinceRunning)
         .sortBy(system => system.skippable)
         .foreach(system =>

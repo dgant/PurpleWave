@@ -1,4 +1,4 @@
-package Information.Battles
+package Information.Battles.Types
 
 import Information.Battles.Simulation.Construction.BattleSimulation
 import Information.Battles.Simulation.Tactics.{TacticMovement, TacticWounded}

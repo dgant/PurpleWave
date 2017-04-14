@@ -1,20 +1,16 @@
 package Information.Battles
 
-import Information.Battles.Evaluation.BattleMetrics
-import Information.Battles.Simulation.BattleSimulator
+import Information.Battles.Types.Battle
 import Lifecycle.With
 import Mathematics.Pixels.Points
 
 object BattleUpdater {
   
   def run() {
-    val allBattles = With.battles.local ++ With.battles.byZone.values :+ With.battles.global
-    allBattles.foreach(updateVanguards)
-    allBattles.foreach(evaluate)
-    With.battles.local.foreach(simulate)
+    With.battles.all.foreach(updateBattle)
   }
   
-  def updateVanguards(battle:Battle) {
+  def updateBattle(battle:Battle) {
     if (battle.happening) {
       battle.groups.foreach(group => {
         val otherGroup = battle.groups.filterNot(_ == group).head
@@ -23,16 +19,6 @@ object BattleUpdater {
     }
     else {
       battle.groups.foreach(group => group.vanguard = group.units.headOption.map(_.pixelCenter).getOrElse(Points.middle))
-    }
-  }
-  
-  def evaluate(battle:Battle) {
-    battle.groups.foreach(group => group.strength = BattleMetrics.estimateStrength(group, battle))
-  }
-  
-  def simulate(battle:Battle) {
-    if (battle.happening) {
-      battle.simulations = BattleSimulator.simulate(battle)
     }
   }
 }

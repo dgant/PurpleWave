@@ -1,8 +1,9 @@
-package Performance.Systems
+package Performance.Tasks.Global
 
 import Lifecycle.With
+import Performance.Tasks.AbstractTask
 
-class SystemLatency extends AbstractSystem {
+class TaskLatency extends AbstractTask {
   
   override def skippable: Boolean = false
   

@@ -1,8 +1,9 @@
-package Performance.Systems
+package Performance.Tasks.Global
 
 import Lifecycle.With
+import Performance.Tasks.AbstractTask
 
-class SystemPlanning extends AbstractSystem {
+class TaskPlanning extends AbstractTask {
   
   override def urgency: Int = With.configuration.urgencyPlanning
   

@@ -1,11 +1,10 @@
 package Information.Grids.Dps
 
-import Mathematics.Shapes.Circle
 import Information.Grids.ArrayTypes.AbstractGridDouble
+import Lifecycle.With
+import Mathematics.Shapes.Circle
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.UnitInfo
-import Lifecycle.With
-import Utilities.EnrichPixel._
 
 abstract class AbstractGridDps extends AbstractGridDouble {
   
@@ -20,7 +19,7 @@ abstract class AbstractGridDps extends AbstractGridDouble {
     
     reset()
     
-    val framesToLookAhead = 24 + With.performance.cacheLength(With.grids.frameDelayScale)
+    val framesToLookAhead = 24
     
     getUnits.foreach(unit => {
       var dps = if (air) unit.unitClass.airDps else unit.unitClass.groundDps

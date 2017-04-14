@@ -2,7 +2,7 @@ package Lifecycle
 
 import Debugging.Visualizations.Viewport
 import Debugging.{AutoCamera, Configuration, Logger}
-import Information.Battles.Battles
+import Information.Battles.BattleClassifier
 import Information.Geography.Geography
 import Information.Geography.Pathfinding.Paths
 import Information.Grids.Grids
@@ -12,11 +12,12 @@ import Macro.Architect
 import Macro.Scheduling.Scheduler
 import Micro.Intent.Commander
 import Micro.State.Executor
+import Performance.TaskQueue.{AbstractTaskQueue, TaskQueueGlobal}
 import Planning.Plans.GamePlans.WinTheGame
 import ProxyBwapi.Players.{PlayerInfo, Players}
 import ProxyBwapi.ProxyBWMirror
 import ProxyBwapi.UnitTracking.UnitTracker
-import _root_.Performance.{Latency, PerformanceMonitor, SystemQueue}
+import _root_.Performance.{Latency, PerformanceMonitor}
 import bwta.BWTA
 
 import scala.collection.JavaConverters._
@@ -27,7 +28,7 @@ object With {
   var bank          : Bank                = null
   var camera        : AutoCamera          = null
   var configuration : Configuration       = null
-  var battles       : Battles             = null
+  var battles       : BattleClassifier             = null
   var executor      : Executor            = null
   var commander     : Commander           = null
   var economy       : Economy             = null
@@ -44,7 +45,7 @@ object With {
   var realEstate    : RealEstate          = null
   var recruiter     : Recruiter           = null
   var scheduler     : Scheduler           = null
-  var systems       : SystemQueue         = null
+  var tasks       : AbstractTaskQueue         = null
   var units         : UnitTracker         = null
   var viewport      : Viewport            = null
   
@@ -72,7 +73,7 @@ object With {
     initializeBWTA()
     With.architect              = new Architect
     With.bank                   = new Bank
-    With.battles                = new Battles
+    With.battles                = new BattleClassifier
     With.camera                 = new AutoCamera
     With.economy                = new Economy
     With.executor               = new Executor
@@ -88,7 +89,7 @@ object With {
     With.realEstate             = new RealEstate
     With.recruiter              = new Recruiter
     With.scheduler              = new Scheduler
-    With.systems                = new SystemQueue
+    With.tasks                  = new TaskQueueGlobal
     With.units                  = new UnitTracker
     With.viewport               = new Viewport
   

@@ -1,4 +1,4 @@
-package Information.Battles
+package Information.Battles.Types
 
 import Mathematics.Pixels.{Pixel, Points}
 import ProxyBwapi.UnitInfo.UnitInfo

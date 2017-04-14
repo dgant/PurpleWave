@@ -7,8 +7,6 @@ import Information.Grids.Vision.{GridAltitudeBonus, GridEnemyDetection, GridEnem
 
 class Grids {
   
-  val frameDelayScale = 1
-  
   val altitudeBonus             = new GridAltitudeBonus
   val buildable                 = new GridBuildable
   val buildableTerrain          = new GridBuildableTerrain
@@ -28,44 +26,4 @@ class Grids {
   val walkableTerrain           = new GridWalkableTerrain
   val walkableUnits             = new GridWalkableUnits
   val dpsEnemy                  = new GridDpsEnemyToUnit
-  
-  // Updating grids is the spikiest thing we do, performance-wise
-  // So we split the grid updates into batches so no one frame gets too long.
-  private val updateBatches = Array(
-    Vector(
-      psi2x2and3x2,
-      psi4x3,
-      walkable,
-      walkableTerrain,
-      walkableUnits,
-      buildable,
-      buildableTerrain
-    ),
-    Vector(
-      units
-    ),
-    Vector(
-      altitudeBonus,
-      enemyDetection,
-      enemyVision
-    ),
-    Vector(
-      mobility //The most expensive by far
-    ),
-    Vector(
-      dpsEnemyAirConcussive,
-      dpsEnemyAirExplosive,
-      dpsEnemyAirNormal,
-      dpsEnemyGroundConcussive,
-      dpsEnemyGroundExplosive,
-      dpsEnemyGroundNormal
-    )
-  )
-  
-  private var lastBatchUpdated = 0
-  
-  def update() {
-    lastBatchUpdated = (lastBatchUpdated + 1) % updateBatches.size
-    updateBatches(lastBatchUpdated).foreach(_.update())
-  }
 }

@@ -19,10 +19,10 @@ object VisualizePerformance {
   def renderDetails() {
     val title = Vector("Cutoff: ", With.configuration.maxFrameMilliseconds + "ms")
     val headers = Vector("System", "Last run", "Total runs", "Total skips", "Avg ms", "Max ms")
-    val body = With.systems.systems
+    val body = With.tasks.tasks
       .sortBy(_.getClass.getSimpleName + "  ")
       .map(system => Vector(
-        system.getClass.getSimpleName.replace("System", ""),
+        system.getClass.getSimpleName.replace("Task", ""),
         system.framesSinceRunning.toString,
         system.totalRuns.toString,
         system.totalSkips.toString,

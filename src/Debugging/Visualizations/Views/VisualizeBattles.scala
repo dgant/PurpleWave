@@ -1,8 +1,8 @@
 package Debugging.Visualizations.Views
 
 import Debugging.Visualizations.Rendering.{DrawMap, DrawScreen}
-import Information.Battles.Battle
 import Information.Battles.Simulation.Construction.{BattleSimulation, BattleSimulationGroup}
+import Information.Battles.Types.Battle
 import Lifecycle.With
 import Mathematics.Pixels.Pixel
 import Planning.Yolo

@@ -19,7 +19,7 @@ class Bot() extends DefaultBWListener {
     try {
       With.performance.startFrame()
       With.onFrame()
-      With.systems.onFrame()
+      With.tasks.run()
       With.performance.endFrame()
     }
     catch { case exception:Exception =>

@@ -6,7 +6,7 @@ import Performance.Tasks.AbstractTask
 
 class TaskGrids extends AbstractTask {
   
-  override def urgency: Int = With.configuration.urgencyGrids
+  urgency = With.configuration.urgencyGrids
   
   private val taskQueue = new TaskQueueGrids
   

@@ -5,7 +5,7 @@ import Performance.Tasks.AbstractTask
 
 class TaskBattleClassify extends AbstractTask {
   
-  override def urgency: Int = With.configuration.urgencyBattles
+  urgency = With.configuration.urgencyBattles
   
   override protected def onRun() {
     With.battles.classify()

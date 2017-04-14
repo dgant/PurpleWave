@@ -5,7 +5,7 @@ import Performance.Tasks.AbstractTask
 
 class TaskPlanning extends AbstractTask {
   
-  override def urgency: Int = With.configuration.urgencyPlanning
+  urgency = With.configuration.urgencyPlanning
   
   override protected def onRun() {
     With.realEstate.update()

@@ -5,7 +5,7 @@ import Performance.Tasks.AbstractTask
 
 class TaskMicro extends AbstractTask {
   
-  override def urgency: Int = With.configuration.urgencyMicro
+  urgency = With.configuration.urgencyMicro
   
   override protected def onRun() {
     With.commander.run()

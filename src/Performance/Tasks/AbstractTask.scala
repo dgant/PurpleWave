@@ -13,7 +13,7 @@ abstract class AbstractTask {
   final val runtimeMilliseconds = new mutable.Queue[Long]
   final val runtimesToTrack = 30
   
-  def urgency   : Int     = 1
+  var urgency   : Int     = 1
   def skippable : Boolean = true
   
   protected def onRun()

@@ -6,7 +6,7 @@ import Performance.Tasks.AbstractTask
 
 class TaskBattleSimulate extends AbstractTask {
   
-  override def urgency: Int = With.configuration.urgencyBattles
+  urgency = With.configuration.urgencyBattles
   
   override protected def onRun() {
     BattleSimulator.run()

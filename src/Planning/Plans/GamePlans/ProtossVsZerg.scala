@@ -33,8 +33,8 @@ class ProtossVsZerg extends Parallel {
     new RequestUnitAtLeast(1,   Protoss.Stargate),
     new RequestUnitAtLeast(1,   Protoss.Forge),
     new RequestUnitAtLeast(1,   Protoss.CitadelOfAdun),
-    new RequestUpgrade(         Protoss.ZealotLegs),
-    new RequestUpgrade(         Protoss.GroundWeapons, 1),
+    new RequestUpgrade(         Protoss.ZealotSpeed),
+    new RequestUpgrade(         Protoss.GroundDamage, 1),
     new RequestUnitAtLeast(2,   Protoss.PhotonCannon),
     
     new RequestUnitAtLeast(3,   Protoss.Nexus),
@@ -52,7 +52,7 @@ class ProtossVsZerg extends Parallel {
     new RequestUnitAtLeast(1,   Protoss.TemplarArchives),
     new RequestUnitAtLeast(2,   Protoss.Forge),
     new RequestUnitAtLeast(7,   Protoss.PhotonCannon),
-    new RequestUpgrade(         Protoss.GroundWeapons, 2),
+    new RequestUpgrade(         Protoss.GroundDamage, 2),
     new RequestUpgrade(         Protoss.GroundArmor, 2),
     new RequestUnitAtLeast(3,   Protoss.DarkTemplar),
     new RequestUnitAtLeast(8,   Protoss.Gateway),
@@ -60,7 +60,7 @@ class ProtossVsZerg extends Parallel {
     new RequestUnitAtLeast(5,   Protoss.Nexus),
     new RequestUnitAtLeast(10,  Protoss.Gateway),
     new RequestUnitAtLeast(5,   Protoss.Assimilator),
-    new RequestUpgrade(         Protoss.GroundWeapons, 3),
+    new RequestUpgrade(         Protoss.GroundDamage, 3),
     new RequestUpgrade(         Protoss.GroundArmor, 3),
     
     new RequestUnitAtLeast(6,   Protoss.Nexus),

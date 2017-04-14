@@ -3,7 +3,6 @@ package Information.Battles.Simulation
 import Information.Battles.Simulation.Construction.{BattleSimulation, BattleSimulationGroup, Simulacrum}
 import Information.Battles.Simulation.Tactics.{TacticFocus, TacticMovement, TacticWounded}
 import Mathematics.Pixels.Pixel
-import Utilities.EnrichPixel._
 
 class SimulacrumAgent(
   thisUnit  : Simulacrum,

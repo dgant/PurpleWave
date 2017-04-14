@@ -33,22 +33,31 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   def tileIncludingCenter: Tile = pixelCenter.tileIncluding
   def tileArea: TileRectangle = unitClass.tileArea.add(tileTopLeft)
   
+  def pixelRangeAir: Double =
+    unitClass.airRange +
+      (if (is(Protoss.Dragoon)  && player.getUpgradeLevel(Protoss.DragoonRange) > 0) 64.0 else 0.0)
+      //TODO: Other types
   
-  def canTraverse(tile:Tile)                        : Boolean = flying || With.grids.walkable.get(tile)
-  def pixelsFromEdgeSlow(otherUnit:UnitInfo)        : Double  = pixelDistanceSlow(otherUnit) - unitClass.radialHypotenuse - otherUnit.unitClass.radialHypotenuse
-  def pixelsFromEdgeFast(otherUnit:UnitInfo)        : Double  = pixelDistanceFast(otherUnit) - unitClass.radialHypotenuse - otherUnit.unitClass.radialHypotenuse
-  def pixelDistanceSlow(otherPixel:Pixel)        : Double  = pixelCenter.pixelDistanceSlow(otherPixel)
-  def pixelDistanceSlow(otherUnit:UnitInfo)         : Double  = pixelDistanceSlow(otherUnit.pixelCenter)
-  def pixelDistanceFast(otherPixel:Pixel)        : Double  = pixelCenter.pixelDistanceFast(otherPixel)
-  def pixelDistanceFast(otherUnit:UnitInfo)         : Double  = pixelDistanceFast(otherUnit.pixelCenter)
-  def pixelDistanceSquared(otherUnit:UnitInfo)      : Double  = pixelDistanceSquared(otherUnit.pixelCenter)
-  def pixelDistanceSquared(otherPixel:Pixel)     : Double  = pixelCenter.pixelDistanceSquared(otherPixel)
-  def travelPixels(destination:Tile)        : Double  = travelPixels(tileIncludingCenter, destination)
-  def travelPixels(origin:Tile, destination:Tile): Double =
+  def pixelRangeGround: Double =
+    unitClass.groundRange +
+      (if (is(Protoss.Dragoon)  && player.getUpgradeLevel(Protoss.DragoonRange) > 0) 64.0 else 0.0)
+      //TODO: Other types
+  
+  def canTraverse           (tile:        Tile)     : Boolean = flying || With.grids.walkable.get(tile)
+  def pixelsFromEdgeSlow    (otherUnit:   UnitInfo) : Double  = pixelDistanceSlow(otherUnit) - unitClass.radialHypotenuse - otherUnit.unitClass.radialHypotenuse
+  def pixelsFromEdgeFast    (otherUnit:   UnitInfo) : Double  = pixelDistanceFast(otherUnit) - unitClass.radialHypotenuse - otherUnit.unitClass.radialHypotenuse
+  def pixelDistanceSlow     (otherPixel:  Pixel)    : Double  = pixelCenter.pixelDistanceSlow(otherPixel)
+  def pixelDistanceSlow     (otherUnit:   UnitInfo) : Double  = pixelDistanceSlow(otherUnit.pixelCenter)
+  def pixelDistanceFast     (otherPixel:  Pixel)    : Double  = pixelCenter.pixelDistanceFast(otherPixel)
+  def pixelDistanceFast     (otherUnit:   UnitInfo) : Double  = pixelDistanceFast(otherUnit.pixelCenter)
+  def pixelDistanceSquared  (otherUnit:   UnitInfo) : Double  = pixelDistanceSquared(otherUnit.pixelCenter)
+  def pixelDistanceSquared  (otherPixel:  Pixel)    : Double  = pixelCenter.pixelDistanceSquared(otherPixel)
+  def travelPixels          (destination: Tile)     : Double  = travelPixels(tileIncludingCenter, destination)
+  def travelPixels          (from: Tile,  to: Tile) : Double  =
     if (flying)
-      origin.pixelCenter.pixelDistanceSlow(destination.pixelCenter)
+      from.pixelCenter.pixelDistanceSlow(to.pixelCenter)
     else
-      With.paths.groundPixels(origin, destination)
+      With.paths.groundPixels(from, to)
   
   def canMove:Boolean = canDoAnythingThisFrame && unitClass.canMove
   def topSpeed:Double = unitClass.topSpeed
@@ -60,41 +69,29 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   
   def melee:Boolean = unitClass.maxAirGroundRange <= 32 * 2
   
-  def armorHealth:Int = unitClass.armor
-  def armorShield: Int = 0
+  def armorHealth : Int = unitClass.armor + player.getUpgradeLevel(unitClass.armorUpgrade)
+  def armorShield : Int = 0               + player.getUpgradeLevel(Protoss.Shields)
+  
   def cooldownLeft:Int = Math.max(airCooldownLeft, groundCooldownLeft)
   def totalHealth: Int = hitPoints + shieldPoints + defensiveMatrixPoints
   def fractionalHealth:Double = totalHealth.toDouble / unitClass.maxTotalHealth
-  def interceptors: Int = 8
-  def scarabs: Int = 5
   
-  def airRange: Double = {
-    unitClass.airRange +
-      (if (is(Protoss.Dragoon)  && player.getUpgradeLevel(Protoss.DragoonRange) > 0) 64.0 else 0.0)
-      //TODO: Other types
-      //(if (is(Terran.Marine)    && player.getUpgradeLevel(Terran.) > 0) 32.0 else 0.0) +
-  }
+  def interceptors  : Int = 8
+  def scarabs       : Int = 5
   
-  def groundRange: Double = {
-    unitClass.groundRange +
-      (if (is(Protoss.Dragoon)  && player.getUpgradeLevel(Protoss.DragoonRange) > 0) 64.0 else 0.0)
-    //TODO: Other types
-  }
+  def airDps    : Double = unitClass.airDps
+  def groundDps : Double = unitClass.groundDps
   
-  def airDps      : Double = unitClass.airDps
-  def groundDps   : Double = unitClass.groundDps
-  
-  def cooldownAgainst(enemy:UnitInfo): Int = if (enemy.flying) airCooldownLeft else groundCooldownLeft
-  def rangeAgainst(enemy:UnitInfo): Double = if (enemy.flying) airRange else groundRange
-  def dpsAgainst(enemy:UnitInfo): Double = if (enemy.flying) airDps else groundDps
-  
-  def attacksAgainst (enemy:UnitInfo) : Int =
+  def cooldownAgainst   (enemy:UnitInfo)  : Int         = if (enemy.flying) airCooldownLeft             else groundCooldownLeft
+  def rangeAgainst      (enemy:UnitInfo)  : Double      = if (enemy.flying) pixelRangeAir               else pixelRangeGround
+  def damageTypeAgainst (enemy:UnitInfo)  : DamageType  = if (enemy.flying) unitClass.rawAirDamageType  else unitClass.rawGroundDamageType
+  def dpsAgainst        (enemy:UnitInfo)  : Double      = if (enemy.flying) airDps                      else groundDps
+  def attacksAgainst    (enemy:UnitInfo)  : Int =
     if (enemy.flying)
       unitClass.rawAirDamageFactor * unitClass.maxAirHits
     else
       unitClass.rawGroundDamageFactor * unitClass.maxGroundHits
-    
-  def damageTypeAgainst(enemy:UnitInfo): DamageType = if (enemy.flying) unitClass.rawAirDamageType else unitClass.rawGroundDamageType
+  
   def damageScaleAgainst(enemy:UnitInfo): Double =
     if (enemy.shieldPoints > 5) 1.0 else
     damageTypeAgainst(enemy) match {
@@ -110,6 +107,7 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
     }
     case _ => 1.0
   }
+  
   def damageAgainst(enemy:UnitInfo, enemyShields:Int = 0) : Int = {
     val hits = attacksAgainst(enemy)
     val damageOnHit = if (enemy.flying) unitClass.rawAirDamage else unitClass.rawGroundDamage
@@ -172,12 +170,10 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   }
   
   // The range of this unit's potential impact at a distance in the future
-  def pixelRangeAir                             : Double = unitClass.airRange
-  def pixelRangeGround                          : Double = unitClass.groundRange
   def pixelReachTravel    (framesAhead  : Int)  : Double = unitClass.topSpeed * framesAhead
   def pixelReachAir       (framesAhead  : Int)  : Double = pixelReachTravel(framesAhead) + pixelRangeAir
   def pixelReachGround    (framesAhead  : Int)  : Double = pixelReachTravel(framesAhead) + pixelRangeGround
-  def pixelReachTotal     (framesAhead  : Int)  : Double = Math.max(pixelReachAir(framesAhead), pixelReachGround(framesAhead))
+  def pixelReachMax       (framesAhead  : Int)  : Double = Math.max(pixelReachAir(framesAhead), pixelReachGround(framesAhead))
   def pixelReachAgainst   (framesAhead  : Int, enemy:UnitInfo): Double = if (enemy.flying) pixelReachAir(framesAhead) else pixelReachGround(framesAhead)
   
   def inRangeToAttackSlow(enemy:UnitInfo):Boolean = pixelsFromEdgeSlow(enemy) <= rangeAgainst(enemy)

@@ -1,7 +1,9 @@
 package ProxyBwapi.Races
 
+import ProxyBwapi.Techs.Techs
 import ProxyBwapi.UnitClass.UnitClasses
-import bwapi.UnitType
+import ProxyBwapi.Upgrades.Upgrades
+import bwapi.{TechType, UnitType, UpgradeType}
 
 object Zerg {
   def Drone                 = UnitClasses.get(UnitType.Zerg_Drone)
@@ -39,6 +41,29 @@ object Zerg {
   def DefilerMound          = UnitClasses.get(UnitType.Zerg_Defiler_Mound)
   def NydusCanal            = UnitClasses.get(UnitType.Zerg_Nydus_Canal)
   def InfestedCommandCenter = UnitClasses.get(UnitType.Zerg_Infested_Command_Center)
-  
-  
+  def ZerglingAttackSpeed   = Upgrades.get(UpgradeType.Adrenal_Glands)
+  def UltraliskSpeed        = Upgrades.get(UpgradeType.Anabolic_Synthesis)
+  def OverlordVisionRange   = Upgrades.get(UpgradeType.Antennae)
+  def UltraliskArmor        = Upgrades.get(UpgradeType.Chitinous_Plating)
+  def QueenEnergy           = Upgrades.get(UpgradeType.Gamete_Meiosis)
+  def HydraliskRange        = Upgrades.get(UpgradeType.Grooved_Spines)
+  def ZerglingSpeed         = Upgrades.get(UpgradeType.Metabolic_Boost)
+  def DefilerEnergy         = Upgrades.get(UpgradeType.Metasynaptic_Node)
+  def HydraliskSpeed        = Upgrades.get(UpgradeType.Muscular_Augments)
+  def OverlordSpeed         = Upgrades.get(UpgradeType.Pneumatized_Carapace)
+  def OverlordDrops         = Upgrades.get(UpgradeType.Ventral_Sacs)
+  def GroundArmor           = Upgrades.get(UpgradeType.Zerg_Carapace)
+  def GroundRangeDamage     = Upgrades.get(UpgradeType.Zerg_Missile_Attacks)
+  def GroundMeleeDamage     = Upgrades.get(UpgradeType.Zerg_Melee_Attacks)
+  def AirDamage             = Upgrades.get(UpgradeType.Zerg_Flyer_Attacks)
+  def AirArmor              = Upgrades.get(UpgradeType.Zerg_Flyer_Carapace)
+  def Burrow                = Techs.get(TechType.Burrowing)
+  def Consume               = Techs.get(TechType.Consume)
+  def DarkSwarm             = Techs.get(TechType.Dark_Swarm)
+  def Ensnare               = Techs.get(TechType.Ensnare)
+  def InfestCommandCenter   = Techs.get(TechType.Infestation)
+  def LurkerMorph           = Techs.get(TechType.Lurker_Aspect)
+  def Parasite              = Techs.get(TechType.Parasite)
+  def Plague                = Techs.get(TechType.Plague)
+  def SpawnBroodlings       = Techs.get(TechType.Spawn_Broodlings)
 }

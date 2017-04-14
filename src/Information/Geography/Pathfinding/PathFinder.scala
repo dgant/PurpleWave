@@ -3,13 +3,10 @@ package Information.Geography.Pathfinding
 import Information.Geography.Types.Zone
 import Lifecycle.With
 import Mathematics.Pixels.Pixel
-import Utilities.EnrichPixel._
 
 object PathFinder {
   
-  def roughGroundDistance(
-    from:Pixel,
-    to:Pixel):Double = {
+  def roughGroundDistance(from:Pixel, to:Pixel):Double = {
     
     val fromZone = from.zone
     val toZone = to.zone

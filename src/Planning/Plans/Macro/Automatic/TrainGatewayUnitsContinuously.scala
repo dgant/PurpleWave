@@ -10,7 +10,7 @@ import scala.collection.mutable.ListBuffer
 class TrainGatewayUnitsContinuously extends Plan {
   
   override def update() {
-    val gateways = With.units.ours.filter(u => u.alive && u.complete && u.unitClass == Protoss.Gateway)
+    val gateways = With.units.ours.filter(u => u.alive && u.complete && u.is(Protoss.Gateway))
     
     val requests = new ListBuffer[BuildRequest]
     
@@ -21,7 +21,7 @@ class TrainGatewayUnitsContinuously extends Plan {
     
     val capacity = Math.max(0, gateways.size - requests.size)
     val dragoons =
-      if (With.units.ours.exists(u => u.alive && u.complete && u.unitClass == Protoss.CyberneticsCore))
+      if (With.units.ours.exists(u => u.alive && u.complete && u.is(Protoss.CyberneticsCore)))
         Math.min(capacity, With.self.gas / 50)
       else 0
     val zealots   = Math.max(0, capacity - dragoons)

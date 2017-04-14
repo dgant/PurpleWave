@@ -14,7 +14,7 @@ class TileSimpleBuilding(val buildingClass:UnitClass) extends TileFinder {
   
   def find: Option[Tile] = {
     //Don't lag out due to lack of pylon space
-    if (buildingClass.requiresPsi && ! With.units.ours.exists(u => u.complete && u.unitClass == Protoss.Pylon)) {
+    if (buildingClass.requiresPsi && ! With.units.ours.exists(u => u.complete && u.is(Protoss.Pylon))) {
       return None
     }
     
@@ -37,7 +37,7 @@ class TileSimpleBuilding(val buildingClass:UnitClass) extends TileFinder {
         exclusions))
   
   def maxMargin:Int =
-    if (buildingClass == Protoss.Pylon && With.units.ours.count(_.unitClass == buildingClass) < 3)
+    if (buildingClass == Protoss.Pylon && With.units.ours.count(_.is(buildingClass)) < 3)
       4
     else
       1
@@ -51,7 +51,7 @@ class TileSimpleBuilding(val buildingClass:UnitClass) extends TileFinder {
     
     // Performance optimization:
     // Don't waste time looking for a place to put a Gateway when we have no Pylons.
-    if (buildingClass.requiresPsi && ! With.units.ours.filter(_.complete).exists(_.unitClass == Protoss.Pylon)) {
+    if (buildingClass.requiresPsi && ! With.units.ours.filter(_.complete).exists(_.is(Protoss.Pylon))) {
       return None
     }
     

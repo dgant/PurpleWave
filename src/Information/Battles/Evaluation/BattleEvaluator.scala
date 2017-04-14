@@ -31,7 +31,7 @@ object BattleEvaluator {
     //Fails to account for casters
     //Fails to account for upgrades (including range upgrades)
     
-    if (unit.unitClass == Terran.Medic) dps = 18.6
+    if (unit.is(Terran.Medic)) dps = 18.6
     
     //Altitude/doodad misses only apply to ranged units
     val highGroundBonus =  With.grids.altitudeBonus.get(unit.tileIncludingCenter)

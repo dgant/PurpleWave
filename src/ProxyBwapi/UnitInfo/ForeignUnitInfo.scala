@@ -23,7 +23,7 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
   
   private val limitMostUpdates = new Limiter(1, () => {
     updateTracking()
-    if (unitClass != Terran.SpiderMine) {
+    if ( ! is(Terran.SpiderMine)) {
       updateHealth()
       updateCombat()
       updateGeometry()

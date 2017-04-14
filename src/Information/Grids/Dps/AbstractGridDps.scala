@@ -29,7 +29,7 @@ abstract class AbstractGridDps extends AbstractGridDouble {
         var pixelRangeMin = unit.unitClass.rawGroundMinRange
         
         //Assume invisible siege tanks are sieged
-        if ( ! unit.isOurs && ! unit.visible && unit.unitClass == Terran.SiegeTankUnsieged) {
+        if ( ! unit.isOurs && ! unit.visible && unit.is(Terran.SiegeTankUnsieged)) {
           dps             = Math.max(dps,           Terran.SiegeTankSieged.groundDps)
           pixelReachMax   = Math.max(pixelReachMax, Terran.SiegeTankSieged.groundRange)
           pixelRangeMax   = Math.max(pixelRangeMax, Terran.SiegeTankSieged.groundRange)

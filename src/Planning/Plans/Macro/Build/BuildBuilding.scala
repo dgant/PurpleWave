@@ -42,7 +42,7 @@ class BuildBuilding(val buildingClass:UnitClass) extends Plan {
     
     if (building.isEmpty && orderedTile.isDefined) {
       building = With.units.ours
-        .filter(unit => unit.unitClass == buildingClass && unit.tileTopLeft == orderedTile.get)
+        .filter(unit => unit.is(buildingClass) && unit.tileTopLeft == orderedTile.get)
         .headOption
     }
   

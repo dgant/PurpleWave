@@ -1,11 +1,10 @@
 package Information.Grids.Construction
 
 import Information.Grids.ArrayTypes.AbstractGridBoolean
-import ProxyBwapi.Races.Protoss
-import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Lifecycle.With
 import Mathematics.Pixels.Point
-import Utilities.EnrichPixel._
+import ProxyBwapi.Races.Protoss
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 abstract class AbstractGridPsi extends AbstractGridBoolean {
   
@@ -24,5 +23,5 @@ abstract class AbstractGridPsi extends AbstractGridBoolean {
   }
   
   val psiPoints:Array[Point]
-  def pylons:Set[FriendlyUnitInfo] = With.units.ours.filter(unit => unit.alive && unit.complete && unit.unitClass == Protoss.Pylon)
+  def pylons:Set[FriendlyUnitInfo] = With.units.ours.filter(unit => unit.alive && unit.complete && unit.is(Protoss.Pylon))
 }

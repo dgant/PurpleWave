@@ -25,7 +25,7 @@ class TrainContinuously(unitClass: UnitClass) extends Plan {
   
   protected def buildCapacity:Int = {
     Vector(
-      With.units.ours.count(_.unitClass == unitClass.whatBuilds._1),
+      With.units.ours.count(_.is(unitClass.whatBuilds._1)),
       if (unitClass.supplyRequired == 0) 400 else (400 - With.self.supplyUsed) / unitClass.supplyRequired
       //if (unitClass.mineralPrice <= 0) Int.MaxValue else With.minerals / unitClass.mineralPrice,
       //if (unitClass.gasPrice     <= 0) Int.MaxValue else With.minerals / unitClass.gasPrice

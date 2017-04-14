@@ -4,6 +4,7 @@ import Lifecycle.With
 import Mathematics.Pixels.{Pixel, Tile, TileRectangle}
 import Performance.Caching.CacheFrame
 import ProxyBwapi.Races.{Protoss, Zerg}
+import ProxyBwapi.UnitClass.UnitClass
 import bwapi._
 
 abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
@@ -12,6 +13,8 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   def foreign   : Option[ForeignUnitInfo]   = None
   
   override def toString:String = unitClass.toString + " " + tileIncludingCenter.toString
+  
+  def is(unitClasses:UnitClass*):Boolean = unitClasses.exists(_ == unitClass)
   
   ////////////
   // Health //
@@ -31,7 +34,7 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   def tileArea: TileRectangle = unitClass.tileArea.add(tileTopLeft)
   
   
-  def canTraverse(tile:Tile)                : Boolean = flying || With.grids.walkable.get(tile)
+  def canTraverse(tile:Tile)                        : Boolean = flying || With.grids.walkable.get(tile)
   def pixelsFromEdgeSlow(otherUnit:UnitInfo)        : Double  = pixelDistanceSlow(otherUnit) - unitClass.radialHypotenuse - otherUnit.unitClass.radialHypotenuse
   def pixelsFromEdgeFast(otherUnit:UnitInfo)        : Double  = pixelDistanceFast(otherUnit) - unitClass.radialHypotenuse - otherUnit.unitClass.radialHypotenuse
   def pixelDistanceSlow(otherPixel:Pixel)        : Double  = pixelCenter.pixelDistanceSlow(otherPixel)
@@ -65,7 +68,10 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   def interceptors: Int = 8
   def scarabs: Int = 5
   
-  def airRange    : Double = unitClass.airRange
+  def airRange: Double = {
+    unitClass.airRange
+    //+ if ()
+  }
   def groundRange : Double = unitClass.groundRange
   def airDps      : Double = unitClass.airDps
   def groundDps   : Double = unitClass.groundDps
@@ -130,9 +136,9 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
       unitClass.canAttack ||
       (
         isCarrierReaverOrLurkerCache.get &&
-        (unitClass != Protoss.Carrier || interceptors > 0) &&
-        (unitClass != Protoss.Reaver  || scarabs > 0) &&
-        (unitClass != Zerg.Lurker     || burrowed)
+        ( ! is(Protoss.Carrier) || interceptors > 0) &&
+        ( ! is(Protoss.Reaver)  || scarabs > 0) &&
+        ( ! is(Zerg.Lurker)     || burrowed)
       )
     ))
   
@@ -152,9 +158,9 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
     //
     // This is also important for preventing the Goon Stop bug. See BehaviorDragoon for details.
     //
-    if      (unitClass == Protoss.Dragoon) 8
-    else if (unitClass == Protoss.Carrier) 48
-    else                                   4
+    if      (is(Protoss.Dragoon)) 8
+    else if (is(Protoss.Carrier)) 48
+    else                          4
   }
   
   // The range of this unit's potential impact at a distance in the future

@@ -37,7 +37,7 @@ class BuildEnoughPylons extends Plan {
     //   #2 Supply that will be provided by plans for which we haven't started building
     
     val supplyPerDepot            = With.self.race.getSupplyProvider.supplyProvided
-    val currentSupplyOfNexus      = With.units.ours.filter(_.unitClass != Protoss.Pylon).toSeq.map(_.unitClass.supplyProvided).sum
+    val currentSupplyOfNexus      = With.units.ours.filter( ! _.is(Protoss.Pylon)).toSeq.map(_.unitClass.supplyProvided).sum
     val currentSupplyUsed         = With.self.supplyUsed
     val unitSpendingRatio         = if (With.geography.ourBases.size < 3) 0.5 else 0.75 //This is the metric that needs the most improvement
     val costPerUnitSupply         = 50.0 / 2 //Assume 50 minerals = 1 supply (then divide by two because 1 supply = 2 BWAPI supply)

@@ -44,6 +44,7 @@ object Terran {
   def MedicEnergy           = Upgrades.get(UpgradeType.Caduceus_Reactor)
   def GoliathAirRange       = Upgrades.get(UpgradeType.Charon_Boosters)
   def BattlecruiserEnergy   = Upgrades.get(UpgradeType.Colossus_Reactor)
+  def VultureSpeed          = Upgrades.get(UpgradeType.Ion_Thrusters)
   def GhostEnergy           = Upgrades.get(UpgradeType.Moebius_Reactor)
   def GhostVisionRange      = Upgrades.get(UpgradeType.Ocular_Implants)
   def BioArmor              = Upgrades.get(UpgradeType.Terran_Infantry_Armor)

@@ -3,7 +3,7 @@ package ProxyBwapi.UnitInfo
 import Lifecycle.With
 import Mathematics.Pixels.{Pixel, Tile, TileRectangle}
 import Performance.Caching.CacheFrame
-import ProxyBwapi.Races.{Protoss, Zerg}
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitClass.UnitClass
 import bwapi._
 
@@ -35,13 +35,16 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   
   def pixelRangeAir: Double =
     unitClass.airRange +
-      (if (is(Protoss.Dragoon)  && player.getUpgradeLevel(Protoss.DragoonRange) > 0) 64.0 else 0.0)
-      //TODO: Other types
+      (if (is(Terran.Marine)    && player.getUpgradeLevel(Terran.MarineRange)     > 0)  32.0 else 0.0)
+      (if (is(Terran.Goliath)   && player.getUpgradeLevel(Terran.GoliathAirRange) > 0)  96.0 else 0.0)
+      (if (is(Protoss.Dragoon)  && player.getUpgradeLevel(Protoss.DragoonRange)   > 0)  64.0 else 0.0)
+      (if (is(Zerg.Hydralisk)   && player.getUpgradeLevel(Zerg.HydraliskRange)    > 0)  32.0 else 0.0)
   
   def pixelRangeGround: Double =
     unitClass.groundRange +
-      (if (is(Protoss.Dragoon)  && player.getUpgradeLevel(Protoss.DragoonRange) > 0) 64.0 else 0.0)
-      //TODO: Other types
+      (if (is(Terran.Marine)    && player.getUpgradeLevel(Terran.MarineRange)     > 0)  32.0 else 0.0)
+      (if (is(Protoss.Dragoon)  && player.getUpgradeLevel(Protoss.DragoonRange)   > 0)  64.0 else 0.0)
+      (if (is(Zerg.Hydralisk)   && player.getUpgradeLevel(Zerg.HydraliskRange)    > 0)  32.0 else 0.0)
   
   def canTraverse           (tile:        Tile)     : Boolean = flying || With.grids.walkable.get(tile)
   def pixelsFromEdgeSlow    (otherUnit:   UnitInfo) : Double  = pixelDistanceSlow(otherUnit) - unitClass.radialHypotenuse - otherUnit.unitClass.radialHypotenuse
@@ -60,7 +63,20 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
       With.paths.groundPixels(from, to)
   
   def canMove:Boolean = canDoAnythingThisFrame && unitClass.canMove
-  def topSpeed:Double = unitClass.topSpeed
+  
+  def topSpeed:Double =
+    unitClass.topSpeed + (if (
+      (is(Terran.Vulture)   && player.getUpgradeLevel(Terran.VultureSpeed)    > 0) ||
+      (is(Protoss.Observer) && player.getUpgradeLevel(Protoss.ObserverSpeed)  > 0) ||
+      (is(Protoss.Scout)    && player.getUpgradeLevel(Protoss.ScoutSpeed)     > 0) ||
+      (is(Protoss.Shuttle)  && player.getUpgradeLevel(Protoss.ShuttleSpeed)   > 0) ||
+      (is(Protoss.Zealot)   && player.getUpgradeLevel(Protoss.ZealotSpeed)    > 0) ||
+      (is(Zerg.Overlord)    && player.getUpgradeLevel(Zerg.OverlordSpeed)     > 0) ||
+      (is(Zerg.Zergling)    && player.getUpgradeLevel(Zerg.ZerglingSpeed)     > 0) ||
+      (is(Zerg.Hydralisk)   && player.getUpgradeLevel(Zerg.HydraliskSpeed)    > 0) ||
+      (is(Zerg.Ultralisk)   && player.getUpgradeLevel(Zerg.UltraliskSpeed)    > 0))
+      unitClass.topSpeed/2.0 else 0.0)
+  
   def project(framesToLookAhead:Int):Pixel = pixelCenter.add((velocityX * framesToLookAhead).toInt, (velocityY * framesToLookAhead).toInt)
   
   ////////////

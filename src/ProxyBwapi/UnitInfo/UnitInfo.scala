@@ -69,10 +69,18 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   def scarabs: Int = 5
   
   def airRange: Double = {
-    unitClass.airRange
-    //+ if ()
+    unitClass.airRange +
+      (if (is(Protoss.Dragoon)  && player.getUpgradeLevel(Protoss.DragoonRange) > 0) 64.0 else 0.0)
+      //TODO: Other types
+      //(if (is(Terran.Marine)    && player.getUpgradeLevel(Terran.) > 0) 32.0 else 0.0) +
   }
-  def groundRange : Double = unitClass.groundRange
+  
+  def groundRange: Double = {
+    unitClass.groundRange +
+      (if (is(Protoss.Dragoon)  && player.getUpgradeLevel(Protoss.DragoonRange) > 0) 64.0 else 0.0)
+    //TODO: Other types
+  }
+  
   def airDps      : Double = unitClass.airDps
   def groundDps   : Double = unitClass.groundDps
   

@@ -12,7 +12,6 @@ object Flee extends Action {
     (
       (intent.tactics.exists(_.movement == TacticMovement.Flee))                                            ||
       (intent.tactics.exists(_.wounded  == TacticWounded.Flee)       && wounded(intent))                    ||
-      (intent.tactics.exists(_.wounded  == TacticWounded.FleeRanged) && wounded(intent) && ranged(intent))  ||
       (intent.tactics.exists(_.workers  == TacticWorkers.Flee)       && worker(intent))
     ) &&
     intent.threats.nonEmpty
@@ -32,10 +31,6 @@ object Flee extends Action {
   
   def wounded(intent:Intention):Boolean = {
     intent.unit.totalHealth < Math.min(20, intent.unit.totalHealth / 3)
-  }
-  
-  def ranged(intent:Intention):Boolean = {
-    intent.unit.unitClass.maxAirGroundRange > 20
   }
   
   def worker(intent:Intention):Boolean = {

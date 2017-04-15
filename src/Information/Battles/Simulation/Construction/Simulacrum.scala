@@ -12,6 +12,10 @@ class Simulacrum(val unit:UnitInfo) {
   val rangeAir          : Double    = unit.unitClass.airRange
   val rangeGround       : Double    = unit.unitClass.groundRange
   val radialHypotenuse  : Double    = unit.unitClass.radialHypotenuse
+  val woundedThreshold  : Int       = Math.min(20, unit.unitClass.maxTotalHealth / 3)
+  
+  var target: Option[Simulacrum] = None
+  var threat: Option[Simulacrum] = None
   
   var damageTaken       : Int       = 0
   var pixel             : Pixel     = unit.pixelCenter
@@ -32,5 +36,5 @@ class Simulacrum(val unit:UnitInfo) {
   def canMove                             : Boolean = topSpeed > 0
   def canAttack       (enemy:Simulacrum)  : Boolean = if (enemy.flying) attacksAir else attacksGround
   def rangeAgainst    (enemy:Simulacrum)  : Double  = (if (enemy.flying) rangeAir else rangeGround) - radialHypotenuse - enemy.radialHypotenuse
-  def inRangeToAttack (enemy:Simulacrum)  : Boolean = Math.pow(rangeAgainst(enemy), 2) >= pixel.pixelDistanceSquared(enemy.pixel)
+  def inRangeToAttack (enemy:Simulacrum)  : Boolean = rangeAgainst(enemy) * rangeAgainst(enemy) >= pixel.pixelDistanceSquared(enemy.pixel)
 }

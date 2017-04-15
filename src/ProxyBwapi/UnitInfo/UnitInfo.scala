@@ -33,18 +33,20 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   def tileIncludingCenter: Tile = pixelCenter.tileIncluding
   def tileArea: TileRectangle = unitClass.tileArea.add(tileTopLeft)
   
-  def pixelRangeAir: Double =
+  def pixelRangeAir: Double = pixelRangeAirCache.get
+  private val pixelRangeAirCache = new CacheFrame(() =>
     unitClass.airRange +
       (if (is(Terran.Marine)    && player.getUpgradeLevel(Terran.MarineRange)     > 0)  32.0 else 0.0) +
       (if (is(Terran.Goliath)   && player.getUpgradeLevel(Terran.GoliathAirRange) > 0)  96.0 else 0.0) +
       (if (is(Protoss.Dragoon)  && player.getUpgradeLevel(Protoss.DragoonRange)   > 0)  64.0 else 0.0) +
-      (if (is(Zerg.Hydralisk)   && player.getUpgradeLevel(Zerg.HydraliskRange)    > 0)  32.0 else 0.0)
+      (if (is(Zerg.Hydralisk)   && player.getUpgradeLevel(Zerg.HydraliskRange)    > 0)  32.0 else 0.0) )
   
-  def pixelRangeGround: Double =
+  def pixelRangeGround: Double = pixelRangeGroundCache.get
+  private val pixelRangeGroundCache = new CacheFrame(() =>
     unitClass.groundRange +
       (if (is(Terran.Marine)    && player.getUpgradeLevel(Terran.MarineRange)     > 0)  32.0 else 0.0) +
       (if (is(Protoss.Dragoon)  && player.getUpgradeLevel(Protoss.DragoonRange)   > 0)  64.0 else 0.0) +
-      (if (is(Zerg.Hydralisk)   && player.getUpgradeLevel(Zerg.HydraliskRange)    > 0)  32.0 else 0.0)
+      (if (is(Zerg.Hydralisk)   && player.getUpgradeLevel(Zerg.HydraliskRange)    > 0)  32.0 else 0.0))
   
   def canTraverse           (tile:        Tile)     : Boolean = flying || With.grids.walkable.get(tile)
   def pixelsFromEdgeSlow    (otherUnit:   UnitInfo) : Double  = pixelDistanceSlow(otherUnit) - unitClass.radialHypotenuse - otherUnit.unitClass.radialHypotenuse

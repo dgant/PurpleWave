@@ -12,8 +12,8 @@ import scala.collection.mutable.ArrayBuffer
 
 class BattleClassifier {
   
-  private var combatantsOurs  : Set[FriendlyUnitInfo] = Set.empty
-  private var combatantsEnemy : Set[ForeignUnitInfo]  = Set.empty
+  private var combatantsOurs  : Vector[FriendlyUnitInfo] = Vector.empty
+  private var combatantsEnemy : Vector[ForeignUnitInfo]  = Vector.empty
   
   var global  : Battle                = null
   var byZone  : Map[Zone, Battle]     = Map.empty
@@ -23,8 +23,8 @@ class BattleClassifier {
   def all:Traversable[Battle] = local ++ byZone.values :+ global
   
   def classify() {
-    combatantsOurs  = With.units.ours .filter(unit => unit.unitClass.helpsInCombat)
-    combatantsEnemy = With.units.enemy.filter(unit => unit.unitClass.helpsInCombat && unit.possiblyStillThere)
+    combatantsOurs  = With.units.ours .toVector.filter(unit => unit.unitClass.helpsInCombat)
+    combatantsEnemy = With.units.enemy.toVector.filter(unit => unit.unitClass.helpsInCombat && unit.possiblyStillThere)
     replaceBattleGlobal()
     replaceBattleByZone()
     replaceBattlesLocal()
@@ -49,8 +49,8 @@ class BattleClassifier {
       .map(zone => (
         zone,
         new Battle(
-          new BattleGroup(upcastOurs  (combatantsOursByZone .getOrElse(zone, Set.empty))),
-          new BattleGroup(upcastEnemy (combatantsEnemyByZone.getOrElse(zone, Set.empty)))
+          new BattleGroup(upcastOurs  (combatantsOursByZone .getOrElse(zone, Vector.empty))),
+          new BattleGroup(upcastEnemy (combatantsEnemyByZone.getOrElse(zone, Vector.empty)))
         )))
       .toMap
     
@@ -90,8 +90,8 @@ class BattleClassifier {
     clusters
       .map(cluster =>
         new Battle(
-          new BattleGroup(cluster.filter(_.isOurs).toSet),
-          new BattleGroup(cluster.filter(_.isEnemy).toSet)))
+          new BattleGroup(cluster.filter(_.isOurs).toVector),
+          new BattleGroup(cluster.filter(_.isEnemy).toVector)))
       .filter(battle =>
         battle.us.units.nonEmpty &&
           battle.enemy.units.nonEmpty)
@@ -124,16 +124,17 @@ class BattleClassifier {
         exploredTiles +=  nextTile
       
         val nextUnits = With.grids.units.get(nextTile).filter(_ != firstUnit)
-      
         unassignedUnits   --= nextUnits
         nextCluster       ++= nextUnits
-        horizonTiles ++=
-          Circle.points(With.configuration.combatEvaluationDistanceTiles)
-            .map(nextTile.add)
-            .filter(tile =>
-              tile.valid &&
-                ! exploredTiles.contains(tile) &&
-                With.grids.units.get(tile).nonEmpty)
+        
+        Circle.points(With.configuration.combatEvaluationDistanceTiles)
+          .foreach(point => {
+            val tile = nextTile.add(point)
+            if (tile.valid
+              && ! exploredTiles.contains(tile)
+              && With.grids.units.get(tile).nonEmpty)
+              horizonTiles += tile
+          })
       }
     
       clusters.append(nextCluster)
@@ -148,6 +149,6 @@ class BattleClassifier {
     newBattle.simulations    = oldBattle.simulations
   }
 
-  def upcastOurs  (units:Set[FriendlyUnitInfo]) : Set[UnitInfo] = units.map(_.asInstanceOf[UnitInfo])
-  def upcastEnemy (units:Set[ForeignUnitInfo])  : Set[UnitInfo] = units.map(_.asInstanceOf[UnitInfo])
+  def upcastOurs  (units:Vector[FriendlyUnitInfo]) : Vector[UnitInfo] = units.map(_.asInstanceOf[UnitInfo])
+  def upcastEnemy (units:Vector[ForeignUnitInfo])  : Vector[UnitInfo] = units.map(_.asInstanceOf[UnitInfo])
 }

@@ -9,7 +9,7 @@ class GridMobility extends AbstractGridInt {
   val limitUpdates = new Limiter(100, () => updateRecalculate)
   override def update() = limitUpdates.act
   def updateRecalculate() {
-    val distanceMax = 3
+    val distanceMax = 2
     indices
       .filter(With.grids.walkableTerrain.get)
       .foreach(i => {

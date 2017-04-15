@@ -11,7 +11,7 @@ class Configuration {
   var enablePathRecalculation         = true
   var pathRecalculationDelayFrames    = 240
   
-  var visualize                   = true
+  var visualize                   = false
   var visualizeBases              = false
   var visualizeBattles            = true
   var visualizeBullets            = false

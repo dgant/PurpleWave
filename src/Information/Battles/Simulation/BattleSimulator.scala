@@ -86,6 +86,5 @@ object BattleSimulator {
       (group.lostValuePerSecond * battle.frameDuration) / 24 +
       group.lostUnits.map(value).sum +
       group.units.map(unit => value(unit) * unit.damageTaken / unit.unit.unitClass.maxTotalHealth).sum / damageCostRatio
-    
   }
 }

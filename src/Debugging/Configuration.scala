@@ -12,12 +12,12 @@ class Configuration {
   var pathRecalculationDelayFrames    = 240
   
   var visualize                   = true
-  var visualizeBases              = true
+  var visualizeBases              = false
   var visualizeBattles            = true
   var visualizeBullets            = false
-  var visualizeChokepoints        = true
+  var visualizeChokepoints        = false
   var visualizeEconomy            = false
-  var visualizeGeography          = true
+  var visualizeGeography          = false
   var visualizeGrids              = false
   var visualizeHeuristicMovement  = true
   var visualizeHeuristicTargeting = true
@@ -25,7 +25,7 @@ class Configuration {
   var visualizePerformanceDetails = true
   var visualizePlans              = false
   var visualizeResources          = false
-  var visualizeRealEstate         = true
+  var visualizeRealEstate         = false
   var visualizeScheduler          = false
   var visualizeTextOnly           = false
   var visualizeUnitsForeign       = true
@@ -38,7 +38,7 @@ class Configuration {
   var enableChat                  = true
   var enableLatencyCompensation   = false
   
-  var camera                      = true
+  var camera                      = false
   var cameraDynamicSpeed          = false
   var cameraDynamicSpeedSlowest   = 30
   var cameraDynamicSpeedFastest   = 0

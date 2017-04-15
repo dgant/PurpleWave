@@ -61,6 +61,7 @@ class BattleClassifier {
   
   private def replaceBattlesLocal() {
     if (combatantsEnemy.isEmpty) {
+      local = Vector.empty
       byUnit = Map.empty
       return
     }
@@ -108,31 +109,31 @@ class BattleClassifier {
   
     while (unassignedUnits.nonEmpty) {
     
-      val firstUnit = unassignedUnits.head
+      val firstUnit   = unassignedUnits.head
+      
       val nextCluster = new ArrayBuffer[UnitInfo]
-      unassignedUnits  -= firstUnit
-      nextCluster += firstUnit
+      unassignedUnits   -= firstUnit
+      nextCluster       += firstUnit
+      
       horizonTiles.add(firstUnit.tileIncludingCenter)
     
       while (horizonTiles.nonEmpty) {
       
         val nextTile = horizonTiles.head
-        horizonTiles  -= nextTile
-        exploredTiles += nextTile
+        horizonTiles  -=  nextTile
+        exploredTiles +=  nextTile
       
         val nextUnits = With.grids.units.get(nextTile).filter(_ != firstUnit)
       
-        if (nextUnits.nonEmpty) {
-          unassignedUnits  --= nextUnits
-          nextCluster ++= nextUnits
-          horizonTiles ++=
-            Circle.points(With.configuration.combatEvaluationDistanceTiles)
-              .map(nextTile.add)
-              .filter(tile =>
-                tile.valid &&
-                  ! exploredTiles.contains(tile) &&
-                  With.grids.units.get(tile).nonEmpty)
-        }
+        unassignedUnits   --= nextUnits
+        nextCluster       ++= nextUnits
+        horizonTiles ++=
+          Circle.points(With.configuration.combatEvaluationDistanceTiles)
+            .map(nextTile.add)
+            .filter(tile =>
+              tile.valid &&
+                ! exploredTiles.contains(tile) &&
+                With.grids.units.get(tile).nonEmpty)
       }
     
       clusters.append(nextCluster)

@@ -1,15 +1,13 @@
 package Debugging.Visualizations.Views
 
 import Debugging.Visualizations.Rendering.DrawMap
-import Information.Grids.ArrayTypes.AbstractGridArray
 import Information.Grids.AbstractGrid
+import Information.Grids.ArrayTypes.AbstractGridArray
 import Lifecycle.With
-import Utilities.EnrichPixel._
 
 object VisualizeGrids {
   def render() {
-    renderGridArray(With.grids.psi2x2and3x2,  0, 0)
-    renderGridArray(With.grids.psi4x3,        0, 1)
+    renderGridArray(With.grids.mobility,  0, 0)
   }
   
   private def renderGridArray[T](map:AbstractGridArray[T], offsetX:Int=0, offsetY:Int=0) {

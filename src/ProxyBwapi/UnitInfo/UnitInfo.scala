@@ -85,8 +85,9 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   
   def melee:Boolean = unitClass.maxAirGroundRange <= 32 * 2
   
-  def armorHealth : Int = unitClass.armor + player.getUpgradeLevel(unitClass.armorUpgrade)
-  def armorShield : Int = if(unitClass.maxShields > 0) player.getUpgradeLevel(Protoss.Shields) else 0
+  //TODO: Account for upgrades. Make sure to handle case where unit has no armor upgrades
+  def armorHealth : Int = unitClass.armor // if (player.getUpgradeLevel(unitClass.armorUpgrade)
+  def armorShield : Int = 0 //if(unitClass.maxShields > 0) player.getUpgradeLevel(Protoss.Shields) else 0
   
   def totalHealth: Int = hitPoints + shieldPoints + defensiveMatrixPoints
   def fractionalHealth:Double = totalHealth.toDouble / unitClass.maxTotalHealth

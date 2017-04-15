@@ -3,8 +3,6 @@ import Lifecycle.With
 import Micro.Heuristics.Movement.EvaluateMoves
 import Micro.Intent.Intention
 
-import Utilities.EnrichPixel._
-
 object Move extends Action {
   
   override def allowed(intent: Intention) = {
@@ -12,15 +10,18 @@ object Move extends Action {
   }
   
   override def perform(intent: Intention): Boolean = {
-    intent.state.movingHeuristically = intent.threats.nonEmpty || intent.targets.nonEmpty
-    
+    val moveHeuristically = intent.threats.nonEmpty || intent.targets.nonEmpty
     val tileToMove =
-      if (intent.state.movingHeuristically)
+      if (moveHeuristically)
         EvaluateMoves.best(intent, intent.movementProfile)
       else
         intent.destination.getOrElse(intent.unit.tileIncludingCenter)
     
     intent.state.movement = Some(tileToMove)
+    if (moveHeuristically) {
+      intent.state.movedHeuristicallyFrame = With.frame
+    }
+    
     With.commander.move(intent, tileToMove.pixelCenter)
     true
   }

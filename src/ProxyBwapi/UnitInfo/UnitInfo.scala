@@ -35,15 +35,15 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   
   def pixelRangeAir: Double =
     unitClass.airRange +
-      (if (is(Terran.Marine)    && player.getUpgradeLevel(Terran.MarineRange)     > 0)  32.0 else 0.0)
-      (if (is(Terran.Goliath)   && player.getUpgradeLevel(Terran.GoliathAirRange) > 0)  96.0 else 0.0)
-      (if (is(Protoss.Dragoon)  && player.getUpgradeLevel(Protoss.DragoonRange)   > 0)  64.0 else 0.0)
+      (if (is(Terran.Marine)    && player.getUpgradeLevel(Terran.MarineRange)     > 0)  32.0 else 0.0) +
+      (if (is(Terran.Goliath)   && player.getUpgradeLevel(Terran.GoliathAirRange) > 0)  96.0 else 0.0) +
+      (if (is(Protoss.Dragoon)  && player.getUpgradeLevel(Protoss.DragoonRange)   > 0)  64.0 else 0.0) +
       (if (is(Zerg.Hydralisk)   && player.getUpgradeLevel(Zerg.HydraliskRange)    > 0)  32.0 else 0.0)
   
   def pixelRangeGround: Double =
     unitClass.groundRange +
-      (if (is(Terran.Marine)    && player.getUpgradeLevel(Terran.MarineRange)     > 0)  32.0 else 0.0)
-      (if (is(Protoss.Dragoon)  && player.getUpgradeLevel(Protoss.DragoonRange)   > 0)  64.0 else 0.0)
+      (if (is(Terran.Marine)    && player.getUpgradeLevel(Terran.MarineRange)     > 0)  32.0 else 0.0) +
+      (if (is(Protoss.Dragoon)  && player.getUpgradeLevel(Protoss.DragoonRange)   > 0)  64.0 else 0.0) +
       (if (is(Zerg.Hydralisk)   && player.getUpgradeLevel(Zerg.HydraliskRange)    > 0)  32.0 else 0.0)
   
   def canTraverse           (tile:        Tile)     : Boolean = flying || With.grids.walkable.get(tile)
@@ -86,9 +86,8 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   def melee:Boolean = unitClass.maxAirGroundRange <= 32 * 2
   
   def armorHealth : Int = unitClass.armor + player.getUpgradeLevel(unitClass.armorUpgrade)
-  def armorShield : Int = 0               + player.getUpgradeLevel(Protoss.Shields)
+  def armorShield : Int = if(unitClass.maxShields > 0) player.getUpgradeLevel(Protoss.Shields) else 0
   
-  def cooldownLeft:Int = Math.max(airCooldownLeft, groundCooldownLeft)
   def totalHealth: Int = hitPoints + shieldPoints + defensiveMatrixPoints
   def fractionalHealth:Double = totalHealth.toDouble / unitClass.maxTotalHealth
   
@@ -98,6 +97,7 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   def airDps    : Double = unitClass.airDps
   def groundDps : Double = unitClass.groundDps
   
+  def cooldownLeft                        : Int         = Math.max(airCooldownLeft, groundCooldownLeft)
   def cooldownAgainst   (enemy:UnitInfo)  : Int         = if (enemy.flying) airCooldownLeft             else groundCooldownLeft
   def rangeAgainst      (enemy:UnitInfo)  : Double      = if (enemy.flying) pixelRangeAir               else pixelRangeGround
   def damageTypeAgainst (enemy:UnitInfo)  : DamageType  = if (enemy.flying) unitClass.rawAirDamageType  else unitClass.rawGroundDamageType
@@ -126,13 +126,13 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   
   def damageAgainst(enemy:UnitInfo, enemyShields:Int = 0) : Int = {
     val hits = attacksAgainst(enemy)
+    //TODO: Only subtract shield armor if there are shields
+    //TODO: Use the damageScale! Or get this truth from somewhere else
     val damageOnHit = if (enemy.flying) unitClass.rawAirDamage else unitClass.rawGroundDamage
     val damageScale = damageScaleAgainst(enemy)
     val damageToShields = Math.max(0, Math.min(enemy.shieldPoints, hits * (damageOnHit - enemy.armorShield)))
-    val damageToHealth  = Math.max(0, hits * (damageOnHit - enemy.armorHealth) - damageToShields)
-    
-    //Note that Armor can't reduce damage below 0.5
-    damageToHealth + damageToShields
+    val damageToHealth  = Math.max(0, damageScale * hits * (damageOnHit - enemy.armorHealth) - damageToShields)
+    damageToHealth.toInt + damageToShields //Edge case: Armor can't reduce damage below 0.5
   }
   
   def inTileRadius  (tiles:Int)  : Traversable[UnitInfo] = With.units.inTileRadius(tileIncludingCenter, tiles)

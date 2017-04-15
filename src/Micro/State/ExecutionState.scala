@@ -12,10 +12,10 @@ class ExecutionState(val unit: FriendlyUnitInfo) {
   var intent: Intention = new Intention(With.gameplan, unit)
 
   var movement                  : Option[Tile] = None
-  var movingHeuristically       : Boolean = false
+  var movedHeuristicallyFrame   : Int = 0
   var movementHeuristicResults  : Iterable[MovementHeuristicResult] = Vector.empty
   
-  var target                    : Option[UnitInfo] = None
-  var targetingHeuristically    : Boolean = false
-  var targetHeuristicResults    : Iterable[TargetHeuristicResult]   = Vector.empty
+  var target                      : Option[UnitInfo] = None
+  var targetedHeuristicallyFrame  : Int = 0
+  var targetHeuristicResults      : Iterable[TargetHeuristicResult]   = Vector.empty
 }

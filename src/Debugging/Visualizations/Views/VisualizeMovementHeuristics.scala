@@ -3,9 +3,9 @@ package Debugging.Visualizations.Views
 import Debugging.Visualizations.Rendering.DrawMap
 import Lifecycle.With
 import Mathematics.Heuristics.HeuristicMath
+import Mathematics.Pixels.Pixel
 import Micro.Heuristics.MovementHeuristics.MovementHeuristicResult
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Utilities.EnrichPixel._
 
 object VisualizeMovementHeuristics {
   
@@ -23,11 +23,15 @@ object VisualizeMovementHeuristics {
     focus.foreach(unit => renderUnit(With.executor.getState(unit).movementHeuristicResults))
   }
   
-  private def eligible(unit:FriendlyUnitInfo):Boolean = {
-    return unit.alive &&
-      With.executor.getState(unit).movingHeuristically &&
+  private def eligible(unit:FriendlyUnitInfo):Boolean =
+    unit.alive &&
+      (With.frame - With.executor.getState(unit).movedHeuristicallyFrame) < 24 &&
       With.viewport.contains(unit.pixelCenter)
-  }
+  
+  def scale(results:Iterable[MovementHeuristicResult]):Double =
+    normalize(results.map(_.evaluation).max / results.map(_.evaluation).min)
+  
+  def normalize(value:Double):Double = if (value < 1.0) 1.0/value else value
   
   def renderUnit(results:Iterable[MovementHeuristicResult]) {
     if (results.isEmpty) return
@@ -35,53 +39,65 @@ object VisualizeMovementHeuristics {
     val heuristicGroups = results.groupBy(_.heuristic)
     val scales = heuristicGroups.map(group => scale(group._2))
     val maxScale = scales.max
-    if (maxScale == HeuristicMath.default) {
-      return
-    }
-    heuristicGroups.foreach(group => renderUnitHeuristic(group._2, maxScale))
+    if (maxScale == HeuristicMath.default) return
+    val activeGroups = heuristicGroups.map(_._2).filterNot(group => group.forall(_.evaluation == group.head.evaluation))
+    activeGroups.foreach(group => renderUnitHeuristic(group, maxScale))
+    renderLegend(activeGroups)
   }
-  
-  def scale(results:Iterable[MovementHeuristicResult]):Double = {
-    val rawScale = results.map(_.evaluation).max / results.map(_.evaluation).min
-    return normalize(rawScale)
-  }
-  
-  def normalize(value:Double):Double = if (value < 1.0) 1.0/value else value
   
   def renderUnitHeuristic(results:Iterable[MovementHeuristicResult], maxScale:Double) {
-    val ourScale = scale(results)
-    if (ourScale <= 1.0) return
-  
-    //Draw line to best tile(s)
-    val bestEvaluation = results.map(view => normalize(view.evaluation)).max
+    val ourScale          = scale(results)
+    val relativeScale     = ourScale / maxScale
+    val evaluationExtreme = results.maxBy(result => Math.abs(HeuristicMath.default - result.evaluation)).evaluation
+    
     results
-      .filter(view => normalize(view.evaluation) == bestEvaluation)
-      .foreach(bestResult =>
-        DrawMap.line(
-          bestResult.context.unit.pixelCenter,
-          bestResult.candidate.pixelCenter,
-          bestResult.color))
+      .filter(_.evaluation != HeuristicMath.default)
+      .foreach(result => {
+        // We want to offset the centerpoint slightly for each heuristic
+        // so very discrete heuristics (especially booleans) don't completely ovelap
+        val offsetX = (result.color.hashCode)     % 3 - 1
+        val offsetY = (result.color.hashCode / 3) % 3 - 1
+        
+        val center = result.candidate.pixelCenter.add(offsetX, offsetY)
+        val radius = 3 + (12.0 * relativeScale * normalize(result.evaluation) / normalize(evaluationExtreme)).toInt
+        if (result.evaluation > 1.0) {
+          DrawMap.circle(center, radius.toInt, result.color)
+        }
+        else if (result.evaluation < 1.0) {
+          DrawMap.line(
+            center.add(-radius, -radius),
+            center.add(radius, radius),
+            result.color)
+          DrawMap.line(
+            center.add(radius, -radius),
+            center.add(-radius, radius),
+            result.color)
+        }
+      })
+  }
+  
+  def renderLegend(groups:Iterable[Iterable[MovementHeuristicResult]]) {
+    val descendingScale = groups
+      .toVector
+      .sortBy(scale)
+      .reverse
     
-    val relativeScale = (ourScale - 1.0) / (maxScale - 1.0)
-    val minRadius = Math.min(3.0, relativeScale)
-    val radiusMultiplier = Math.min(12.0, 12.0 * relativeScale / results.map(view => normalize(view.evaluation)).max)
-    
-    results.foreach(result => {
-      
-      // We want to offset the centerpoint slightly for each heuristic
-      // so very discrete heuristics (especially booleans) don't completely ovelap
-      val offsetX = (result.color.hashCode)     % 3 - 1
-      val offsetY = (result.color.hashCode / 2) % 3 - 1
-      
-      // Use the radius to show which heuristics have the biggest spread of values, and where
-      // Big spread: Max 15.0, min 3.0
-      // Boolean spread: Max 6.0, min 0.0
-      // Tiny spread: Max < 6.0, min 0.0
-      val center = result.candidate.pixelCenter.add(offsetX, offsetY)
-      val radius = minRadius + radiusMultiplier * normalize(result.evaluation)
-      if (radius > 1.0) {
-        DrawMap.circle(center, radius.toInt, result.color)
-      }
-    })
+    descendingScale.zipWithIndex.foreach { case (group, index) => renderLegendKey(group, index) }
+  }
+  
+  def renderLegendKey(group:Iterable[MovementHeuristicResult], order:Int) {
+    val left = 5
+    val top = 200
+    val rowHeight = 11
+    val rowMargin = 2
+    val boxStart = new Pixel(left, top + (rowHeight + rowMargin) * order)
+    With.game.drawBoxScreen(
+      boxStart.bwapi,
+      boxStart.add(rowHeight, rowHeight).bwapi,
+      group.head.color,
+      true)
+    With.game.drawTextScreen(
+      boxStart.add(rowHeight + 4, 0).bwapi,
+      group.head.heuristic.getClass.getSimpleName.replace("MovementHeuristic", "").replace("$", ""))
   }
 }

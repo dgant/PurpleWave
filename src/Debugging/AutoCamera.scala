@@ -20,8 +20,9 @@ class AutoCamera {
       setCameraSpeed(With.configuration.cameraDynamicSpeedSlowest)
     } else if (With.units.ours.nonEmpty) {
       newFocus = With.units.ours.toList
-        .sortBy(_.canMove)
         .sortBy(_.pixelDistanceSquared(With.intelligence.mostBaselikeEnemyPixel.pixelCenter))
+        .sortBy( ! _.canAttackThisSecond)
+        .sortBy( ! _.canMove)
         .head
         .pixelCenter
       setCameraSpeed(With.configuration.cameraDynamicSpeedFastest)

@@ -32,6 +32,6 @@ object MovementProfiles {
     preferOrigin      = 1.00,
     preferMobility    = 1.00,
     preferHighGround  = 0.25,
-    avoidDamage       = 2.50,
+    avoidDamage       = 1.50,
     avoidTraffic      = 1.00)
 }

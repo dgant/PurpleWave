@@ -10,9 +10,9 @@ object Flee extends Action {
     Yolo.disabled &&
     intent.unit.canMove &&
     (
-      (intent.tactics.exists(_.movement == TacticMovement.Flee))                                            ||
-      (intent.tactics.exists(_.wounded  == TacticWounded.Flee)       && wounded(intent))                    ||
-      (intent.tactics.exists(_.workers  == TacticWorkers.Flee)       && worker(intent))
+      (intent.tactics.exists(_.movement == TacticMovement.Flee))                      ||
+      (intent.tactics.exists(_.wounded  == TacticWounded.Flee)    && wounded(intent)) ||
+      (intent.tactics.exists(_.workers  == TacticWorkers.Flee)    && worker(intent))
     ) &&
     intent.threats.nonEmpty
   }

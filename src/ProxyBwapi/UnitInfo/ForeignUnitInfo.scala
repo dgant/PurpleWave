@@ -6,6 +6,7 @@ import Performance.Caching.Limiter
 import ProxyBwapi.Players.{PlayerInfo, Players}
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
+import bwapi.Position
 
 class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
   
@@ -160,15 +161,29 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
   ////////////
   
   private def updateOrders() {
-    _gatheringMinerals = base.isGatheringMinerals
-    _gatheringGas = base.isGatheringGas
+    _target               = base.getTarget
+    _targetPosition       = base.getTargetPosition
+    _orderTarget          = base.getOrderTarget
+    _orderTargetPosition  = base.getOrderTargetPosition
+    _gatheringMinerals    = base.isGatheringMinerals
+    _gatheringGas         = base.isGatheringGas
   }
   
-  private var _gatheringMinerals : Boolean = false
-  private var _gatheringGas      : Boolean = false
+  private var _target               : bwapi.Unit  = null
+  private var _targetPosition       : Position    = Position.None
+  private var _orderTarget          : bwapi.Unit  = null
+  private var _orderTargetPosition  : Position    = Position.None
+  private var _gatheringMinerals    : Boolean     = false
+  private var _gatheringGas         : Boolean     = false
   
-  def gatheringMinerals : Boolean = base.isGatheringMinerals
-  def gatheringGas      : Boolean = base.isGatheringGas
+  private val badPositions = Vector(Position.Invalid, Position.None, Position.Unknown, null)
+  def target              : Option[UnitInfo]  = if (_target == null) None else With.units.get(_target)
+  def targetPosition      : Option[Pixel]     = if (badPositions.contains(_targetPosition)) None else Some(new Pixel(_targetPosition))
+  def orderTarget         : Option[UnitInfo]  = (if (_target == null) None else With.units.get(_orderTarget))
+  def orderTargetPosition : Option[Pixel]     = if (badPositions.contains(_orderTargetPosition)) None else Some(new Pixel(_orderTargetPosition))
+  
+  def gatheringMinerals   : Boolean = base.isGatheringMinerals
+  def gatheringGas        : Boolean = base.isGatheringGas
   
   /*
   def attacking:Boolean

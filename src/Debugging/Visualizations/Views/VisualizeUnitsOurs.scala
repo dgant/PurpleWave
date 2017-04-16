@@ -31,5 +31,15 @@ object VisualizeUnitsOurs {
     if (state.intent.toGather.isDefined) {
       DrawMap.line(state.unit.pixelCenter, state.intent.toGather.get.pixelCenter, Colors.DarkGreen)
     }
+    val targetUnit = state.unit.target.orElse(state.unit.orderTarget)
+    if (targetUnit.nonEmpty) {
+      DrawMap.line(state.unit.pixelCenter, targetUnit.get.pixelCenter, state.unit.player.colorNeon)
+    }
+    else {
+      val targetPosition = state.unit.targetPosition.orElse(state.unit.orderTargetPosition)
+      if (targetPosition.nonEmpty) {
+        DrawMap.line(state.unit.pixelCenter, targetPosition.get, state.unit.player.colorDark)
+      }
+    }
   }
 }

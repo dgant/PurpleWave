@@ -11,18 +11,29 @@ object VisualizeUnitsForeign {
     With.units.neutral.foreach(drawTrackedUnit)
   }
   
-  private def drawTrackedUnit(trackedUnit:ForeignUnitInfo) {
-    if (trackedUnit.possiblyStillThere) {
-      if (((trackedUnit.cloaked || trackedUnit.burrowed) && ! trackedUnit.detected) || ! trackedUnit.visible) {
-      DrawMap.circle(
-        trackedUnit.pixelCenter,
-        trackedUnit.unitClass.width / 2,
-        trackedUnit.player.colorDark)
-      DrawMap.label(
-        trackedUnit.unitClass.toString,
-        trackedUnit.pixelCenter,
-        drawBackground = true,
-        trackedUnit.player.colorDark)
+  private def drawTrackedUnit(unit:ForeignUnitInfo) {
+    if (unit.possiblyStillThere) {
+      if (((unit.cloaked || unit.burrowed) && ! unit.detected) || ! unit.visible) {
+        DrawMap.circle(
+          unit.pixelCenter,
+          unit.unitClass.width / 2,
+          unit.player.colorDark)
+        DrawMap.label(
+          unit.unitClass.toString,
+          unit.pixelCenter,
+          drawBackground = true,
+          unit.player.colorDark)
+      } else {
+        val targetUnit = unit.target.orElse(unit.orderTarget)
+        if (targetUnit.nonEmpty) {
+          DrawMap.line(unit.pixelCenter, targetUnit.get.pixelCenter, unit.player.colorNeon)
+        }
+        else {
+          val targetPosition = unit.targetPosition.orElse(unit.orderTargetPosition)
+          if (targetPosition.nonEmpty) {
+            DrawMap.line(unit.pixelCenter, targetPosition.get, unit.player.colorDark)
+          }
+        }
       }
     }
   }

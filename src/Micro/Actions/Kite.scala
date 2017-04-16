@@ -4,8 +4,6 @@ import Micro.Behaviors.MovementProfiles
 import Micro.Intent.Intention
 import Planning.Yolo
 
-import Utilities.EnrichPixel._
-
 object Kite extends Action {
   
   override def allowed(intent: Intention): Boolean = {
@@ -20,7 +18,6 @@ object Kite extends Action {
     
     //This interpretation of kiting doesn't quite line up with the battle simulator, which may cause unintended behavior.
     if (intent.threats.exists(threat =>
-      threat.
       threat.pixelDistanceSquared(intent.unit) < threat.project(framesToLookAhead).pixelDistanceSquared(intent.unit.pixelCenter) &&
       threat.pixelImpactAgainst(framesToLookAhead, intent.unit) <= threat.pixelDistanceFast(intent.unit))) {
       return Flee.perform(intent)

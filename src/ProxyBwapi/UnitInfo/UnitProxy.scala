@@ -58,6 +58,10 @@ abstract class UnitProxy(var base:bwapi.Unit) {
   
   def gatheringMinerals:Boolean
   def gatheringGas:Boolean
+  
+  def target:Option[UnitInfo]
+  def targetPosition:Option[Pixel]
+  
   /*
   def attacking:Boolean
   def attackFrame:Boolean

@@ -18,7 +18,7 @@ class Configuration {
   var visualizeChokepoints        = false
   var visualizeEconomy            = false
   var visualizeGeography          = false
-  var visualizeGrids              = false
+  var visualizeGrids              = true
   var visualizeHeuristicMovement  = true
   var visualizeHeuristicTargeting = true
   var visualizePerformance        = true

@@ -29,7 +29,8 @@ class SimulacrumAgent(
   //////////////////
   
   def act() {
-    if (!thisUnit.readyToAttack && !thisUnit.readyToMove) return
+    if ( ! thisUnit.alive) return
+    if ( ! thisUnit.readyToAttack && ! thisUnit.readyToMove) return
     updateThreat()
     updateTarget()
     updateFleeing()
@@ -100,31 +101,57 @@ class SimulacrumAgent(
     if (thisUnit.threat.exists( ! _.alive)) {
       thisUnit.threat = None
     }
-    if (thatGroup.units.exists(validThreat)) {
-      thisUnit.threat = Some(thatGroup.units.minBy(threat =>
+    if (thisUnit.threat.isEmpty) {
+      //Goal: We want to find the nearest threat.
+      //The obvious way to do that is using minBy(). But minBy, like most Scala generics, causes boxing of primitives.
+      //Primitive boxing is a huge, huge expense that we need to avoid in battle simulation.
+      //So let's do this the old-school way!
+      //And yes, Scala while-loops are way faster than for-loops.
+      var bestScore = Int.MaxValue
+      var i = 0
+      while (i < thatGroup.units.size) {
+        val threat = thatGroup.units(i)
         if (validThreat(threat)) {
-          thisUnit.pixel.pixelDistanceSquared(threat.pixel)
-        } else 99999))
+          val score = thisUnit.pixel.pixelDistanceSquared(threat.pixel)
+          if (score < bestScore) {
+            bestScore = score
+            thisUnit.threat = Some(threat)
+          }
+        }
+        i += 1
+      }
     }
   }
   
   private def updateTarget() {
-    if (!thisUnit.fighting) {
+    if ( ! thisUnit.fighting) {
       thisUnit.target = None
       return
     }
-    if (thisUnit.target.exists(!_.alive)) {
+    if (thisUnit.target.exists( ! _.alive)) {
       thisUnit.target = None
     }
     if (thisUnit.target.isEmpty) {
-      if (thatGroup.units.exists(validTarget)) {
-        thisUnit.target = Some(thatGroup.units.minBy(target =>
-          if (validTarget(target)) {
-            thisUnit.pixel.pixelDistanceSquared(target.pixel) *
-              (if (   target.flying && thisGroup.tactics.focusAirOrGround == TacticFocus.Air)     1 else wrongFocusPenalty) *
-              (if ( ! target.flying && thisGroup.tactics.focusAirOrGround == TacticFocus.Ground)  1 else wrongFocusPenalty) /
-              target.totalLife
-          } else Int.MaxValue))
+      //Goal: We want to find the best target.
+      //The obvious way to do that is using minBy(). But minBy, like most Scala generics, causes boxing of primitives.
+      //Primitive boxing is a huge, huge expense that we need to avoid in battle simulation.
+      //So let's do this the old-school way!
+      //And yes, Scala while-loops are way faster than for-loops.
+      var bestScore = Int.MaxValue
+      var i = 0
+      while (i < thatGroup.units.size) {
+        val target = thatGroup.units(i)
+        if (validTarget(target)) {
+          val score = thisUnit.pixel.pixelDistanceSquared(target.pixel) *
+            (if (   target.flying && thisGroup.tactics.focusAirOrGround == TacticFocus.Air)     1 else wrongFocusPenalty) *
+            (if ( ! target.flying && thisGroup.tactics.focusAirOrGround == TacticFocus.Ground)  1 else wrongFocusPenalty) /
+            target.totalLife
+          if (score < bestScore) {
+            bestScore = score
+            thisUnit.target = Some(target)
+          }
+        }
+        i += 1
       }
     }
   }

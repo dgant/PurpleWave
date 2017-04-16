@@ -40,8 +40,6 @@ object BattleSimulator {
   private def step(battle: BattleSimulation) {
     updateAgents    (battle, battle.us,     battle.enemy)
     updateAgents    (battle, battle.enemy,  battle.us)
-    removeDeadUnits (battle.us)
-    removeDeadUnits (battle.enemy)
     reduceCooldown  (battle.us)
     reduceCooldown  (battle.enemy)
     battle.frameDuration += 1
@@ -53,17 +51,8 @@ object BattleSimulator {
     thatGroup : BattleSimulationGroup) {
     thisGroup.units
       .foreach(thisUnit =>
-        if (thisUnit.readyToAttack || thisUnit.readyToMove)
+        if (thisUnit.alive && (thisUnit.readyToAttack || thisUnit.readyToMove))
         new SimulacrumAgent(thisUnit, thisGroup, thatGroup, battle).act)
-  }
-  
-  private def removeDeadUnits(group:BattleSimulationGroup) {
-    group.units
-      .foreach(unit =>
-        if ( ! unit.alive) {
-          group.lostUnits += unit
-          group.units -= unit
-        })
   }
   
   private def value(unit:Simulacrum):Int = {
@@ -82,6 +71,7 @@ object BattleSimulator {
   }
   
   private def tallyLosses(battle:BattleSimulation, group:BattleSimulationGroup) {
+    group.lostUnits = group.units.filterNot(_.alive)
     group.lostValue =
       (group.lostValuePerSecond * battle.frameDuration) / 24 +
       group.lostUnits.map(value).sum +

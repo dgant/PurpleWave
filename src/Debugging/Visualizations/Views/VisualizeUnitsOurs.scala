@@ -36,7 +36,7 @@ object VisualizeUnitsOurs {
       DrawMap.line(state.unit.pixelCenter, targetUnit.get.pixelCenter, state.unit.player.colorNeon)
     }
     else {
-      val targetPosition = state.unit.targetPosition.orElse(state.unit.orderTargetPosition)
+      val targetPosition = state.unit.targetPixel.orElse(state.unit.orderTargetPixel)
       if (targetPosition.nonEmpty) {
         DrawMap.line(state.unit.pixelCenter, targetPosition.get, state.unit.player.colorDark)
       }

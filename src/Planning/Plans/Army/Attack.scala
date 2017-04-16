@@ -10,7 +10,7 @@ import Planning.Composition.UnitMatchers.UnitMatchWarriors
 class Attack extends IfThenElse {
   
   val attack = this
-  description.set("Attack a position")
+  description.set("Attack somewhere")
   
   val attackers = new Property[LockUnits](new LockUnits {
     unitMatcher.set(UnitMatchWarriors);

@@ -86,10 +86,12 @@ abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
   def gatheringMinerals : Boolean = base.isGatheringMinerals
   def gatheringGas      : Boolean = base.isGatheringGas
   
-  def target          : Option[UnitInfo]  = targetCache.get
-  def targetPosition  : Option[Pixel]     = { val position = base.getTargetPosition; if (Vector(Position.Invalid, Position.None, Position.Unknown).contains(position)) None else Some(new Pixel(position)) }
-  def order           : Order             = base.getOrder
-  def orderTarget     : Option[UnitInfo]  = { val target = base.getOrderTarget; if (target == null) None else With.units.getId(target.getID) }
+  private val badPositions = Vector(Position.Invalid, Position.None, Position.Unknown)
+  def target            : Option[UnitInfo]  = targetCache.get
+  def targetPixel       : Option[Pixel]     = { val position = base.getTargetPosition; if (badPositions.contains(position)) None else Some(new Pixel(position)) }
+  def order             : Order             = base.getOrder
+  def orderTarget       : Option[UnitInfo]  = { val target = base.getOrderTarget; if (target == null) None else With.units.getId(target.getID) }
+  def orderTargetPixel  : Option[Pixel]     = { val position = base.getOrderTargetPosition; if (badPositions.contains(position)) None else Some(new Pixel(position)) }
   
   private val targetCache = new CacheFrame(() => { val target = base.getTarget; if (target == null) None else With.units.getId(target.getID) })
   

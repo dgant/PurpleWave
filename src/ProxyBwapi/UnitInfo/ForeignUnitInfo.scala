@@ -178,9 +178,9 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
   
   private val badPositions = Vector(Position.Invalid, Position.None, Position.Unknown, null)
   def target              : Option[UnitInfo]  = if (_target == null) None else With.units.get(_target)
-  def targetPosition      : Option[Pixel]     = if (badPositions.contains(_targetPosition)) None else Some(new Pixel(_targetPosition))
+  def targetPixel      : Option[Pixel]     = if (badPositions.contains(_targetPosition)) None else Some(new Pixel(_targetPosition))
   def orderTarget         : Option[UnitInfo]  = (if (_target == null) None else With.units.get(_orderTarget))
-  def orderTargetPosition : Option[Pixel]     = if (badPositions.contains(_orderTargetPosition)) None else Some(new Pixel(_orderTargetPosition))
+  def orderTargetPixel : Option[Pixel]     = if (badPositions.contains(_orderTargetPosition)) None else Some(new Pixel(_orderTargetPosition))
   
   def gatheringMinerals   : Boolean = base.isGatheringMinerals
   def gatheringGas        : Boolean = base.isGatheringGas

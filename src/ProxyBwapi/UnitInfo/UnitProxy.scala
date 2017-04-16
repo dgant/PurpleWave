@@ -60,7 +60,9 @@ abstract class UnitProxy(var base:bwapi.Unit) {
   def gatheringGas:Boolean
   
   def target:Option[UnitInfo]
-  def targetPosition:Option[Pixel]
+  def targetPixel:Option[Pixel]
+  def orderTarget:Option[UnitInfo]
+  def orderTargetPixel:Option[Pixel]
   
   /*
   def attacking:Boolean

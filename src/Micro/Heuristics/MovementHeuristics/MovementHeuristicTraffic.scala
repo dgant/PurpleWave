@@ -12,16 +12,33 @@ object MovementHeuristicTraffic extends MovementHeuristic {
   
     if (intent.unit.flying) return HeuristicMath.default
     
+    val m0 = 1.00
+    val m1 = 0.80
+    val m2 = 0.70
+    val m3 = 0.50
+    
     Vector(
-      measureTraffic(intent, 1.00, candidate),
-      measureTraffic(intent, 0.75, candidate.add(-1,  0)),
-      measureTraffic(intent, 0.75, candidate.add( 1,  0)),
-      measureTraffic(intent, 0.75, candidate.add( 0, -1)),
-      measureTraffic(intent, 0.75, candidate.add( 0, -1)),
-      measureTraffic(intent, 0.50, candidate.add(-1, -1)),
-      measureTraffic(intent, 0.50, candidate.add( 1, -1)),
-      measureTraffic(intent, 0.50, candidate.add(-1,  1)),
-      measureTraffic(intent, 0.50, candidate.add( 1,  1))
+      measureTraffic(intent, m0, candidate),
+      measureTraffic(intent, m1, candidate.add(-1,  0)),
+      measureTraffic(intent, m1, candidate.add( 1,  0)),
+      measureTraffic(intent, m1, candidate.add( 0, -1)),
+      measureTraffic(intent, m1, candidate.add( 0, -1)),
+      measureTraffic(intent, m2, candidate.add(-1, -1)),
+      measureTraffic(intent, m2, candidate.add( 1, -1)),
+      measureTraffic(intent, m2, candidate.add(-1,  1)),
+      measureTraffic(intent, m2, candidate.add( 1,  1)),
+      measureTraffic(intent, m3, candidate.add(-2, -1)),
+      measureTraffic(intent, m3, candidate.add(-2,  0)),
+      measureTraffic(intent, m3, candidate.add(-2,  1)),
+      measureTraffic(intent, m3, candidate.add( 2, -1)),
+      measureTraffic(intent, m3, candidate.add( 2,  0)),
+      measureTraffic(intent, m3, candidate.add( 2,  1)),
+      measureTraffic(intent, m3, candidate.add(-1, -2)),
+      measureTraffic(intent, m3, candidate.add( 0, -2)),
+      measureTraffic(intent, m3, candidate.add( 1, -2)),
+      measureTraffic(intent, m3, candidate.add(-1,  2)),
+      measureTraffic(intent, m3, candidate.add( 0,  2)),
+      measureTraffic(intent, m3, candidate.add( 1,  2))
     ).sum
   }
   

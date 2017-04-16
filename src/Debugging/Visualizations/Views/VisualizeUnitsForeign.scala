@@ -29,7 +29,7 @@ object VisualizeUnitsForeign {
           DrawMap.line(unit.pixelCenter, targetUnit.get.pixelCenter, unit.player.colorNeon)
         }
         else {
-          val targetPosition = unit.targetPosition.orElse(unit.orderTargetPosition)
+          val targetPosition = unit.targetPixel.orElse(unit.orderTargetPixel)
           if (targetPosition.nonEmpty) {
             DrawMap.line(unit.pixelCenter, targetPosition.get, unit.player.colorDark)
           }

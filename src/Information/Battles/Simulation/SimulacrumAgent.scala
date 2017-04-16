@@ -66,7 +66,7 @@ class SimulacrumAgent(
   // Execute orders //
   ////////////////////
   
-  private def doAttack()  = if (thisUnit.readyToAttack) thisUnit.target.foreach(dealDamage(_))
+  private def doAttack()  = if (thisUnit.readyToAttack) thisUnit.target.foreach(target => if (thisUnit.inRangeToAttack(target)) dealDamage(target))
   private def doCharge()  = if (thisUnit.readyToMove)   thisUnit.target.foreach(target => moveTowards(target.pixel))
   private def doFlee()    = if (thisUnit.readyToMove)   thisUnit.threat.foreach(threat => moveAwayFrom(threat.pixel))
   

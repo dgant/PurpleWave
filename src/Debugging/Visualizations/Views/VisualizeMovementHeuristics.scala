@@ -25,7 +25,7 @@ object VisualizeMovementHeuristics {
   
   private def eligible(unit:FriendlyUnitInfo):Boolean =
     unit.alive &&
-      (With.frame - With.executor.getState(unit).movedHeuristicallyFrame) < 24 &&
+      (With.frame - With.executor.getState(unit).movedHeuristicallyFrame) < 48 &&
       With.viewport.contains(unit.pixelCenter)
   
   def scale(results:Iterable[MovementHeuristicResult]):Double =

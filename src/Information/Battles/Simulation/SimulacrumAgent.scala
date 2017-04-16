@@ -51,8 +51,7 @@ class SimulacrumAgent(
   private def considerAttacking() = if (thisUnit.readyToAttack  && thisUnit.fighting) doAttack()
   private def considerFleeing()   = if (thisUnit.readyToMove    && thisUnit.fleeing)  doFlee()
   private def considerCharging()  = if (thisUnit.readyToMove    && thisUnit.fighting && thisGroup.tactics.movement == TacticMovement.Charge) doCharge()
-  
-  private def considerKiting() = if (thisUnit.readyToMove && thisGroup.tactics.movement == TacticMovement.Kite) {
+  private def considerKiting()    = if (thisUnit.readyToMove    && thisGroup.tactics.movement == TacticMovement.Kite) {
     //TODO: If target is out of range
     if (thisUnit.fighting && thisUnit.target.exists(target => ! thisUnit.inRangeToAttack(target))) {
       doCharge()
@@ -98,14 +97,14 @@ class SimulacrumAgent(
   /////////////////////
   
   private def updateThreat() {
-    if (thisUnit.threat.exists(!_.alive)) {
+    if (thisUnit.threat.exists( ! _.alive)) {
       thisUnit.threat = None
     }
     if (thatGroup.units.exists(validThreat)) {
       thisUnit.threat = Some(thatGroup.units.minBy(threat =>
         if (validThreat(threat)) {
           thisUnit.pixel.pixelDistanceSquared(threat.pixel)
-        } else Int.MaxValue))
+        } else 99999))
     }
   }
   

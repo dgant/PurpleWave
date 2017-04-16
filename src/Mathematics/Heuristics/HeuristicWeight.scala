@@ -10,7 +10,7 @@ class HeuristicWeight[TContext, TCandidate] (
       if (weight == 0)
         HeuristicMath.default
       else
-        Math.pow(HeuristicMath.normalize(heuristic.evaluate(context, candidate)), weight)
+        Math.pow(HeuristicMath.clamp(heuristic.evaluate(context, candidate)), weight)
     
     return result
   }

@@ -57,6 +57,7 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   def pixelDistanceFast     (otherUnit:   UnitInfo) : Double  = pixelDistanceFast(otherUnit.pixelCenter)
   def pixelDistanceSquared  (otherUnit:   UnitInfo) : Double  = pixelDistanceSquared(otherUnit.pixelCenter)
   def pixelDistanceSquared  (otherPixel:  Pixel)    : Double  = pixelCenter.pixelDistanceSquared(otherPixel)
+  def travelPixels          (destination: Pixel)    : Double  = travelPixels(tileIncludingCenter, destination.tileIncluding)
   def travelPixels          (destination: Tile)     : Double  = travelPixels(tileIncludingCenter, destination)
   def travelPixels          (from: Tile,  to: Tile) : Double  =
     if (flying)

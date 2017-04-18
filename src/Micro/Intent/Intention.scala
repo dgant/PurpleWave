@@ -18,7 +18,7 @@ class Intention(val plan:Plan, val unit:FriendlyUnitInfo) {
   
   var executed:Boolean = false
   
-  var origin      : Tile              = With.geography.home
+  var origin      : Tile              = if (With.geography.ourBases.nonEmpty) With.geography.ourBases.map(_.heart).minBy(unit.travelPixels) else With.geography.home
   var destination : Option[Tile]      = None
   var toAttack    : Option[UnitInfo]  = None
   var toGather    : Option[UnitInfo]  = None

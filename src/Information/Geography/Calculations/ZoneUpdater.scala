@@ -47,5 +47,6 @@ object ZoneUpdater {
     base.mineralsLeft   = base.minerals.filter(_.alive).toVector.map(_.mineralsLeft).sum
     base.gasLeft        = base.gas.filter(_.alive).toVector.map(_.gasLeft).sum
     base.harvestingArea = (Vector(base.townHallArea) ++ (base.minerals ++ base.gas).map(_.tileArea)).boundary
+    base.heart          = base.harvestingArea.midpoint
   }
 }

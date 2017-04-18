@@ -37,6 +37,7 @@ class ProtossVsProtoss extends Parallel {
   val _fourGateGoonsSimplifiedEnd = Vector[BuildRequest] (
     new RequestUpgrade(Protoss.DragoonRange),
     new RequestUnitAtLeast(4, Protoss.Gateway),
+    new RequestUnitAtLeast(6, Protoss.Dragoon),
     new RequestUnitAnotherOne(Protoss.Nexus)
   )
     

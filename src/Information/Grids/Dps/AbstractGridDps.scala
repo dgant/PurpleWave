@@ -19,7 +19,7 @@ abstract class AbstractGridDps extends AbstractGridDouble {
     
     reset()
     
-    val framesToLookAhead = 24
+    val framesToLookAhead = 18
     val cooldownPenalty = With.configuration.dpsGridCooldownPenalty
     val distancePenalty = With.configuration.dpsGridDistancePenalty
     val movementPenalty = With.configuration.dpsGridMovementPenalty
@@ -55,8 +55,8 @@ abstract class AbstractGridDps extends AbstractGridDouble {
         }
   
         val tileCenter = unit.project(framesToLookAhead).tileIncluding
-        val distancePenaltyRatio = Math.pow(32.0 * pixelImpactMax, 2)
-        val movementPenaltyRatio = Math.pow(32.0 * pixelRangeMax, 2)
+        val distancePenaltyRatio = Math.pow(32.0 / pixelImpactMax, 2)
+        val movementPenaltyRatio = Math.pow(32.0 / pixelRangeMax, 2)
         
         Circle
           .points((pixelImpactMax/32).toInt)

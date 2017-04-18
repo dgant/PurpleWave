@@ -6,10 +6,10 @@ import Lifecycle.With
 
 object BattleSimulator {
   
-  val maxFrames = 24 * 5
+  val maxFrames = 24 * 6
   
   //If a unit takes damage, how much do we care compared to its total value?
-  val damageCostRatio = 3
+  val damageCostRatio = 4
   
   // Loosely based on the values in the BOSS paper:
   // http://www.aaai.org/ocs/index.php/AIIDE/AIIDE11/paper/viewFile/4078/4407

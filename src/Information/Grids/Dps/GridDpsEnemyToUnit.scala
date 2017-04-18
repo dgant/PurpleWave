@@ -15,13 +15,15 @@ class GridDpsEnemyToUnit {
       return 0.0
     }
     
-    //TODO: Account for shields taking full damage
     //TODO: Account for armor
-  
+    
     var concussive  = 1.0
     var explosive   = 1.0
   
-    if (unit.unitClass.size == UnitSizeType.Small) {
+    if (unit.shieldPoints > 0) {
+      // Everything deals full damage
+    }
+    else if (unit.unitClass.size == UnitSizeType.Small) {
       explosive = 0.5
     }
     else if (unit.unitClass.size == UnitSizeType.Medium) {

@@ -64,7 +64,7 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
     else
       With.paths.groundPixels(from, to)
   
-  def canMove:Boolean = canDoAnythingThisFrame && unitClass.canMove
+  def canMoveThisFrame:Boolean = unitClass.canMove && canDoAnythingThisFrame && ! burrowed
   
   def topSpeed:Double =
     unitClass.topSpeed + (if (
@@ -88,8 +88,8 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   def melee:Boolean = unitClass.maxAirGroundRange <= 32 * 2
   
   //TODO: Account for upgrades. Make sure to handle case where unit has no armor upgrades
-  def armorHealth : Int = unitClass.armor // if (player.getUpgradeLevel(unitClass.armorUpgrade)
-  def armorShield : Int = 0 //if(unitClass.maxShields > 0) player.getUpgradeLevel(Protoss.Shields) else 0
+  def armorHealth: Int = unitClass.armor // if (player.getUpgradeLevel(unitClass.armorUpgrade)
+  def armorShield: Int = 0 //if(unitClass.maxShields > 0) player.getUpgradeLevel(Protoss.Shields) else 0
   
   def totalHealth: Int = hitPoints + shieldPoints + defensiveMatrixPoints
   def fractionalHealth:Double = totalHealth.toDouble / unitClass.maxTotalHealth
@@ -187,7 +187,7 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
     else                          4
   }
   
-  def pixelImpactTravel   (framesAhead  : Int)  : Double = unitClass.topSpeed * framesAhead
+  def pixelImpactTravel   (framesAhead  : Int)  : Double = if (canMoveThisFrame) unitClass.topSpeed * framesAhead else 0.0
   def pixelImpactAir      (framesAhead  : Int)  : Double = pixelImpactTravel(framesAhead) + pixelRangeAir
   def pixelImpactGround   (framesAhead  : Int)  : Double = pixelImpactTravel(framesAhead) + pixelRangeGround
   def pixelImpactMax      (framesAhead  : Int)  : Double = Math.max(pixelImpactAir(framesAhead), pixelImpactGround(framesAhead))

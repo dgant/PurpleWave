@@ -27,8 +27,8 @@ object BattleSimulationBuilder {
     val tacticsFocusAirOrGround  = new ListBuffer[TacticFocus]
     val tacticsWorkersFighting   = new ListBuffer[TacticWorkers]
     
-    val thisCanMove = thisGroup.units.exists(_.canMove)
-    val thatCanMove = thatGroup.units.exists(_.canMove)
+    val thisCanMove = thisGroup.units.exists(_.canMoveThisFrame)
+    val thatCanMove = thatGroup.units.exists(_.canMoveThisFrame)
     
     if (thisCanMove) {
       tacticsMovement += TacticMovement.Charge

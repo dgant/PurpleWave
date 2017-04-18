@@ -8,7 +8,7 @@ object Flee extends Action {
   
   override def allowed(intent: Intention): Boolean = {
     Yolo.disabled &&
-    intent.unit.canMove &&
+    intent.unit.canMoveThisFrame &&
     (
       (intent.tactics.exists(_.movement == TacticMovement.Flee))                      ||
       (intent.tactics.exists(_.wounded  == TacticWounded.Flee)    && wounded(intent)) ||

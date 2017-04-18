@@ -22,7 +22,7 @@ class AutoCamera {
       newFocus = With.units.ours.toList
         .sortBy(_.pixelDistanceSquared(With.intelligence.mostBaselikeEnemyPixel.pixelCenter))
         .sortBy( ! _.canAttackThisSecond)
-        .sortBy( ! _.canMove)
+        .sortBy( ! _.canMoveThisFrame)
         .head
         .pixelCenter
       setCameraSpeed(With.configuration.cameraDynamicSpeedFastest)

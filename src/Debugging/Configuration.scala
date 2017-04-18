@@ -3,9 +3,9 @@ package Debugging
 class Configuration {
   
   val combatEvaluationDistanceTiles   = 15
-  val combatDistancePenalty           = 0.25
-  val combatMovementPenalty           = 0.5
-  val combatCooldownPenalty           = 0.75
+  val dpsGridDistancePenalty          = 0.25
+  val dpsGridMovementPenalty          = 0.5
+  val dpsGridCooldownPenalty          = 0.25
   val combatStickinessLeash           = 0
   var enableFastGroundDistance        = true
   var enablePathRecalculation         = true

@@ -6,7 +6,7 @@ import Micro.Intent.Intention
 object Move extends Action {
   
   override def allowed(intent: Intention) = {
-    intent.unit.canMove
+    intent.unit.canMoveThisFrame
   }
   
   override def perform(intent: Intention): Boolean = {

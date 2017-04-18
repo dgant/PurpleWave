@@ -19,7 +19,7 @@ abstract class AbstractGridDps extends AbstractGridDouble {
     
     reset()
     
-    val framesToLookAhead = 18
+    val framesToLookAhead = 24
     val cooldownPenalty = With.configuration.dpsGridCooldownPenalty
     val distancePenalty = With.configuration.dpsGridDistancePenalty
     val movementPenalty = With.configuration.dpsGridMovementPenalty
@@ -63,10 +63,12 @@ abstract class AbstractGridDps extends AbstractGridDouble {
           .foreach(point => {
             val nearbyTile = tileCenter.add(point)
             if (nearbyTile.valid) {
-              var adjustedDps = dps
-              adjustedDps *= 1.0 - distancePenalty * point.lengthSquared * distancePenaltyRatio
-              adjustedDps *= 1.0 - movementPenalty * point.lengthSquared * movementPenaltyRatio
-              add(nearbyTile, adjustedDps)
+              val adjustedDps = dps -
+                distancePenalty * point.lengthSquared * distancePenaltyRatio -
+                movementPenalty * point.lengthSquared * movementPenaltyRatio
+              if (adjustedDps > 0) {
+                add(nearbyTile, adjustedDps)
+              }
             }
           })
       }

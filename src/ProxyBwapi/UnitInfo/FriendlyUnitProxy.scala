@@ -144,6 +144,7 @@ abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
   def ensnared      : Boolean = base.isEnsnared
   def flying        : Boolean = cachedFlying.get
   def lifted        : Boolean = base.isLifted
+  def lockedDown    : Boolean = cachedIsLockedDown.get
   def maelstrommed  : Boolean = cachedIsMaelstrommed.get
   def sieged        : Boolean = base.isSieged
   def stasised      : Boolean = cachedStasised.get
@@ -152,7 +153,9 @@ abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
   def velocityX     : Double  = base.getVelocityX
   def velocityY     : Double  = base.getVelocityY
   
+  private val cachedIsLockedDown = new CacheFrame(() => base.isLockedDown)
   private val cachedIsMaelstrommed = new CacheFrame(() => base.isMaelstrommed)
+  
   //////////////
   // Statuses //
   //////////////

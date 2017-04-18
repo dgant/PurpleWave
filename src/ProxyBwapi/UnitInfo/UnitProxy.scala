@@ -100,6 +100,7 @@ abstract class UnitProxy(var base:bwapi.Unit) {
   def ensnared:Boolean
   def flying:Boolean
   def lifted:Boolean
+  def lockedDown:Boolean
   def maelstrommed:Boolean
   def sieged:Boolean
   def stasised:Boolean

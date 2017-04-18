@@ -7,11 +7,9 @@ import bwapi.UnitSizeType
 
 class GridDpsEnemyToUnit {
   
-  def get(
-   tile:Tile,
-   unit: UnitInfo): Double = {
+  def get(tile:Tile, unit: UnitInfo): Double = {
     
-    if ((unit.cloaked || unit.burrowed) && ! With.grids.enemyDetection.get(tile)) {
+    if (unit.effectivelyCloaked) {
       return 0.0
     }
     

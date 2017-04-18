@@ -67,7 +67,9 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   
   def canMoveThisFrame:Boolean = unitClass.canMove && canDoAnythingThisFrame && ! burrowed
   
-  def topSpeed:Double =
+  def topSpeed:Double = topSpeedCache.get
+  private val topSpeedCache = new CacheFrame(() =>
+    stimBonus * (
     unitClass.topSpeed + (if (
       (is(Terran.Vulture)   && player.getUpgradeLevel(Terran.VultureSpeed)    > 0) ||
       (is(Protoss.Observer) && player.getUpgradeLevel(Protoss.ObserverSpeed)  > 0) ||
@@ -78,7 +80,7 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
       (is(Zerg.Zergling)    && player.getUpgradeLevel(Zerg.ZerglingSpeed)     > 0) ||
       (is(Zerg.Hydralisk)   && player.getUpgradeLevel(Zerg.HydraliskSpeed)    > 0) ||
       (is(Zerg.Ultralisk)   && player.getUpgradeLevel(Zerg.UltraliskSpeed)    > 0))
-      unitClass.topSpeed/2.0 else 0.0)
+      unitClass.topSpeed/2.0 else 0.0)))
   
   def project(framesToLookAhead:Int):Pixel = pixelCenter.add((velocityX * framesToLookAhead).toInt, (velocityY * framesToLookAhead).toInt)
   
@@ -98,15 +100,18 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   def interceptors  : Int = 8
   def scarabs       : Int = 5
   
-  def airDps    : Double = unitClass.airDps
-  def groundDps : Double = unitClass.groundDps
+  def stimBonus:Int = if (stimmed) 2 else 1
   
-  def cooldownLeft                        : Int         = Math.max(airCooldownLeft, groundCooldownLeft)
-  def cooldownAgainst   (enemy:UnitInfo)  : Int         = if (enemy.flying) airCooldownLeft             else groundCooldownLeft
-  def rangeAgainst      (enemy:UnitInfo)  : Double      = if (enemy.flying) pixelRangeAir               else pixelRangeGround
-  def damageTypeAgainst (enemy:UnitInfo)  : DamageType  = if (enemy.flying) unitClass.rawAirDamageType  else unitClass.rawGroundDamageType
-  def dpsAgainst        (enemy:UnitInfo)  : Double      = if (enemy.flying) airDps                      else groundDps
-  def attacksAgainst    (enemy:UnitInfo)  : Int =
+  def airDps    : Double = stimBonus * unitClass.airDps
+  def groundDps : Double = stimBonus * unitClass.groundDps
+  
+  def cooldownLeft                          : Int         = Math.max(airCooldownLeft, groundCooldownLeft)
+  def cooldownLeftAgainst (enemy:UnitInfo)  : Int         =  if (enemy.flying) airCooldownLeft                else groundCooldownLeft
+  def cooldownAgainst     (enemy:UnitInfo)  : Int         = (if (enemy.flying) unitClass.rawAirDamageCooldown else unitClass.rawGroundDamageCooldown) / stimBonus
+  def rangeAgainst        (enemy:UnitInfo)  : Double      =  if (enemy.flying) pixelRangeAir                  else pixelRangeGround
+  def damageTypeAgainst   (enemy:UnitInfo)  : DamageType  =  if (enemy.flying) unitClass.rawAirDamageType     else unitClass.rawGroundDamageType
+  
+  def attacksAgainst      (enemy:UnitInfo)  : Int =
     if (enemy.flying)
       unitClass.rawAirDamageFactor * unitClass.maxAirHits
     else
@@ -135,19 +140,26 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
     val damageOnHit = if (enemy.flying) unitClass.rawAirDamage else unitClass.rawGroundDamage
     val damageScale = damageScaleAgainst(enemy)
     val damageToShields = Math.max(0, Math.min(enemy.shieldPoints, hits * (damageOnHit - enemy.armorShield)))
-    val damageToHealth  = Math.max(0, damageScale * hits * (damageOnHit - enemy.armorHealth) - damageToShields)
-    damageToHealth.toInt + damageToShields //Edge case: Armor can't reduce damage below 0.5
+    val damageToHealth  = Math.max(0, damageScale * (hits * (damageOnHit - enemy.armorHealth) - damageToShields))
+    Math.max(1, damageToHealth.toInt + damageToShields)
+  }
+  
+  def dpsAgainst(enemy:UnitInfo): Double = {
+    val cooldownVs = cooldownAgainst(enemy)
+    if (cooldownVs == 0) return 0.0
+    damageAgainst(enemy) * 24.0 / cooldownVs
   }
   
   def inTileRadius  (tiles:Int)  : Traversable[UnitInfo] = With.units.inTileRadius(tileIncludingCenter, tiles)
   def inPixelRadius (pixels:Int) : Traversable[UnitInfo] = With.units.inPixelRadius(pixelCenter, pixels)
   
-  def canDoAnythingThisFrame:Boolean =
+  def canDoAnythingThisFrame:Boolean = canDoAnythingThisFrameCache.get
+  private val canDoAnythingThisFrameCache = new CacheFrame(() =>
     alive &&
     complete &&
     ! stasised &&
-    ! maelstrommed
-    //And lockdown
+    ! maelstrommed &&
+    ! lockedDown)
   
   def canBeAttackedThisFrame:Boolean = canBeAttackedThisFrameCache.get
   private val canBeAttackedThisFrameCache = new CacheFrame(() =>
@@ -172,7 +184,7 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   def canAttackThisSecond(enemy:UnitInfo):Boolean =
     canAttackThisSecond &&
     enemy.canBeAttackedThisFrame &&
-    (enemy.detected || ! enemy.cloaked || ! enemy.burrowed) &&
+    ! enemy.effectivelyCloaked &&
     (if (enemy.flying) unitClass.attacksAir else unitClass.attacksGround)
   
   def canAttackThisFrame:Boolean = canAttackThisSecond && cooldownLeft < With.latency.framesRemaining
@@ -188,7 +200,7 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
     else                          4
   }
   
-  def pixelImpactTravel   (framesAhead  : Int)  : Double = if (canMoveThisFrame) unitClass.topSpeed * framesAhead else 0.0
+  def pixelImpactTravel   (framesAhead  : Int)  : Double = if (canMoveThisFrame) topSpeed * framesAhead  else 0.0
   def pixelImpactAir      (framesAhead  : Int)  : Double = pixelImpactTravel(framesAhead) + pixelRangeAir
   def pixelImpactGround   (framesAhead  : Int)  : Double = pixelImpactTravel(framesAhead) + pixelRangeGround
   def pixelImpactMax      (framesAhead  : Int)  : Double = Math.max(pixelImpactAir(framesAhead), pixelImpactGround(framesAhead))
@@ -196,6 +208,17 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   
   def inRangeToAttackSlow(enemy:UnitInfo):Boolean = pixelsFromEdgeSlow(enemy) <= rangeAgainst(enemy)
   def inRangeToAttackFast(enemy:UnitInfo):Boolean = pixelsFromEdgeFast(enemy) <= rangeAgainst(enemy)
+  
+  /////////////
+  // Players //
+  /////////////
+  
+  def effectivelyCloaked:Boolean =
+    (burrowed || cloaked) && (
+      if (isFriendly) ! With.grids.enemyDetection.get(tileIncludingCenter)
+      else            detected
+    )
+      
   
   /////////////
   // Players //

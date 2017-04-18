@@ -234,6 +234,7 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
     _ensnared     = base.isEnsnared
     _flying       = base.isFlying
     _lifted       = base.isLifted
+    _lockedDown   = base.isLockedDown
     _maelstrommed = base.isMaelstrommed
     _sieged       = base.isSieged
     _stasised     = base.isStasised
@@ -243,19 +244,20 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
     _velocityY    = base.getVelocityY
   }
   
-  private var _accelerating  : Boolean  = false
-  private var _angle         : Double   = 0.0
-  private var _braking       : Boolean  = false
-  private var _ensnared      : Boolean  = false
-  private var _flying        : Boolean  = false
-  private var _lifted        : Boolean  = false
-  private var _maelstrommed  : Boolean  = false
-  private var _sieged        : Boolean  = false
-  private var _stasised      : Boolean  = false
-  private var _stimmed       : Boolean  = false
-  private var _stuck         : Boolean  = false
-  private var _velocityX     : Double   = 0.0
-  private var _velocityY     : Double   = 0.0
+  private var _accelerating   : Boolean  = false
+  private var _angle          : Double   = 0.0
+  private var _braking        : Boolean  = false
+  private var _ensnared       : Boolean  = false
+  private var _flying         : Boolean  = false
+  private var _lifted         : Boolean  = false
+  private var _lockedDown     : Boolean = false
+  private var _maelstrommed   : Boolean  = false
+  private var _sieged         : Boolean  = false
+  private var _stasised       : Boolean  = false
+  private var _stimmed        : Boolean  = false
+  private var _stuck          : Boolean  = false
+  private var _velocityX      : Double   = 0.0
+  private var _velocityY      : Double   = 0.0
   
   def accelerating  : Boolean = _accelerating
   def angle         : Double  = _angle
@@ -263,6 +265,7 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
   def ensnared      : Boolean = _ensnared
   def flying        : Boolean = _flying
   def lifted        : Boolean = _lifted
+  def lockedDown    : Boolean = _lockedDown
   def maelstrommed  : Boolean = _maelstrommed
   def sieged        : Boolean = _sieged
   def stasised      : Boolean = _stasised

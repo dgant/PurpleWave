@@ -6,7 +6,7 @@ class Configuration {
   val dpsGridDistancePenalty          = 0.25
   val dpsGridMovementPenalty          = 0.5
   val dpsGridCooldownPenalty          = 0.25
-  val combatStickinessLeash           = 0
+  val combatStickinessLeash           = 64.0
   var enableFastGroundDistance        = true
   var enablePathRecalculation         = true
   var pathRecalculationDelayFrames    = 240

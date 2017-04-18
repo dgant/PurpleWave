@@ -51,7 +51,7 @@ class Commander {
       .map(_.pixelCenter)
       .filter(targetPixel =>
         targetPixel.pixelDistanceSquared(position) < Math.pow(With.configuration.combatStickinessLeash, 2)
-        && intent.unit.unitClass.maxAirGroundRange <= With.configuration.combatStickinessLeash)
+        && intent.unit.pixelRangeGround <= With.configuration.combatStickinessLeash)
     
     if (stickyMeleeTarget.isDefined) return attack(intent, intent.toAttack.get)
   

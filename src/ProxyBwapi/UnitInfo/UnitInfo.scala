@@ -216,7 +216,7 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   def effectivelyCloaked:Boolean =
     (burrowed || cloaked) && (
       if (isFriendly) ! With.grids.enemyDetection.get(tileIncludingCenter)
-      else            detected
+      else            ! detected
     )
       
   

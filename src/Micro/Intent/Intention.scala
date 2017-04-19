@@ -1,6 +1,6 @@
 package Micro.Intent
 
-import Information.Battles.Simulation.Tactics.Tactics
+import Information.Battles.Types.TacticsOptions
 import Lifecycle.With
 import Mathematics.Pixels.Tile
 import Micro.Behaviors.{MovementProfiles, TargetingProfiles}
@@ -14,7 +14,7 @@ import ProxyBwapi.Upgrades.Upgrade
 class Intention(val plan:Plan, val unit:FriendlyUnitInfo) {
   
   def state:ExecutionState = With.executor.getState(unit)
-  def tactics:Option[Tactics] = With.battles.byUnit.get(unit).flatMap(b => b.bestSimulationResult.map(s => s.us.tactics))
+  def tactics:Option[TacticsOptions] = With.battles.byUnit.get(unit).flatMap(b => b.bestSimulationResult.map(s => s.us.tactics))
   
   var executed:Boolean = false
   

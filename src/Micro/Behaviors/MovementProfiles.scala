@@ -22,16 +22,16 @@ object MovementProfiles {
     preferDestination = 0.50,
     preferOrigin      = 0.50,
     preferSitAtRange  = 1.25,
-    preferMobility    = 1.00,
+    preferMobility    = 1.25,
     preferHighGround  = 0.25,
     preferAttackSpeed = 1.25,
-    avoidDamage       = 1.50,
+    avoidDamage       = 1.75,
     avoidTraffic      = 1.50)
   
   def flee =  new MovementProfile(
     preferOrigin      = 1.00,
-    preferMobility    = 1.00,
+    preferMobility    = 1.25,
     preferHighGround  = 0.25,
-    avoidDamage       = 1.50,
+    avoidDamage       = 1.75,
     avoidTraffic      = 1.25)
 }

@@ -1,6 +1,5 @@
 package Information.Geography.Pathfinding
 
-import Information.Geography.Types.Zone
 import Lifecycle.With
 import Mathematics.Pixels.Pixel
 
@@ -22,8 +21,8 @@ object PathFinder {
       return With.paths.impossiblyLargeDistance
     }
     
-    val fromEdgeTiles  = fromZone.edges.map(_.centerPixel.tileIncluding)
-    val toEdgeTiles    =   toZone.edges.map(_.centerPixel.tileIncluding)
+    val fromEdgeTiles = fromZone.edges.map(_.centerPixel.tileIncluding)
+    val toEdgeTiles   =   toZone.edges.map(_.centerPixel.tileIncluding)
     
     fromEdgeTiles.map(fromEdgeTile =>
       toEdgeTiles.map(toEdgeTile =>
@@ -34,41 +33,6 @@ object PathFinder {
           toEdgeTile,
           requireBwta = true))
         .min)
-      .min
-  }
-  
-  //Doesn't work
-  def roughGroundDistance2(
-    from:Pixel,
-    to:Pixel,
-    explored:Set[Zone] = Set.empty):Double = {
-    
-    val zoneTo = to.zone
-    val zoneContainingPixel = from.zone
-    val zoneFrom:Zone =
-      if (explored.contains(zoneContainingPixel))
-        zoneContainingPixel
-          .edges
-          .find(_.centerPixel == from).get
-          .zones
-          .find(_ != zoneContainingPixel).get
-      else
-        zoneContainingPixel
-    
-    //If we're already here, return the straight-line distance
-    if (zoneFrom == to.zone || to.zone.edges.exists(edge => edge.centerPixel.pixelDistanceSlow(to) <= edge.radiusPixels))
-      return from.pixelDistanceSlow(to)
-    
-    val horizonEdges = zoneFrom.edges.filter(edge => edge.zones.exists(otherZone => otherZone != this && ! explored.contains(otherZone)))
-    if (horizonEdges.isEmpty) return Double.PositiveInfinity
-    
-    return horizonEdges
-      .map(edge =>
-        from.pixelDistanceSlow(edge.centerPixel) +
-          roughGroundDistance2(
-          edge.centerPixel,
-          to,
-          explored ++ Vector(zoneFrom)))
       .min
   }
 }

@@ -20,24 +20,19 @@ class ProtossVsProtoss extends Parallel {
   val _fourGateGoonsSimplifiedStart = Vector[BuildRequest] (
     new RequestUnitAnotherOne(Protoss.Nexus),
     new RequestUnitAnother(8, Protoss.Probe),
-    new RequestUnitAtLeast(1, Protoss.Pylon), //8
+    new RequestUnitAtLeast(1, Protoss.Pylon),
     new RequestUnitAnother(2, Protoss.Probe),
-    new RequestUnitAtLeast(1, Protoss.Gateway), //8
+    new RequestUnitAtLeast(1, Protoss.Gateway),
     new RequestUnitAnother(2, Protoss.Probe),
-    new RequestUnitAtLeast(2, Protoss.Pylon), //8
-    new RequestUnitAnotherOne(Protoss.Probe),
-    new RequestUnitAnotherOne(Protoss.Zealot), //13
-    new RequestUnitAnotherOne(Protoss.Probe),
-    new RequestUnitAnotherOne(Protoss.Assimilator), //16
-    new RequestUnitAnotherOne(Protoss.Probe),
-    new RequestUnitAnotherOne(Protoss.CyberneticsCore), //17
-    new RequestUnitAnotherOne(Protoss.Probe)
+    new RequestUnitAtLeast(1, Protoss.Gateway)
   )
   
   val _fourGateGoonsSimplifiedEnd = Vector[BuildRequest] (
+    new RequestUnitAtLeast(1, Protoss.Assimilator),
+    new RequestUnitAtLeast(1, Protoss.CyberneticsCore),
     new RequestUpgrade(Protoss.DragoonRange),
-    new RequestUnitAtLeast(4, Protoss.Gateway),
-    new RequestUnitAtLeast(6, Protoss.Dragoon),
+    new RequestUnitAtLeast(1, Protoss.RoboticsFacility),
+    new RequestUnitAtLeast(1, Protoss.RoboticsSupportBay),
     new RequestUnitAnotherOne(Protoss.Nexus)
   )
     

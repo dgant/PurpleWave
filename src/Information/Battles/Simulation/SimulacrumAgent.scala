@@ -1,14 +1,10 @@
 package Information.Battles.Simulation
 
 import Information.Battles.Simulation.Construction.{BattleSimulation, BattleSimulationGroup, Simulacrum}
-import Information.Battles.Simulation.Tactics.{TacticFocus, TacticMovement, TacticWounded}
+import Information.Battles.Types.Tactics
 import Mathematics.Pixels.Pixel
 
-class SimulacrumAgent(
-  thisUnit  : Simulacrum,
-  thisGroup : BattleSimulationGroup,
-  thatGroup : BattleSimulationGroup,
-  battle    : BattleSimulation) {
+object SimulacrumAgent {
   
   // SimulacrumAgent.act() is probably the most-frequently called function in the codebase.
   // So it needs to be performant. Like, really, really performant.
@@ -19,85 +15,30 @@ class SimulacrumAgent(
   // * Slow UnitInfo calls (range checks, canAttack checks, etc.)
   // * Expensive math (Square roots)
   
-  val chargingSpeedRatio = 0.75
+  private val chargingSpeedRatio = 0.75
   //What fraction of top speed charging units are likely to get
-  val movementFrames = 8
-  val wrongFocusPenalty = 10
+  private val movementFrames = 8
+  private val wrongFocusPenalty = 10
   
   //////////////////
   // Update state //
   //////////////////
   
-  def act() {
+  def act(
+    thisUnit  : Simulacrum,
+    thisGroup : BattleSimulationGroup,
+    thatGroup : BattleSimulationGroup,
+    battle    : BattleSimulation) {
+    
     if ( ! thisUnit.alive) return
-    if ( ! thisUnit.readyToAttack && ! thisUnit.readyToMove) return
-    updateThreat()
-    updateTarget()
-    updateFleeing()
-    considerFleeing()
-    considerAttacking()
-    considerCharging()
-    considerKiting()
-  }
+    thisUnit.attackCooldown = Math.max(0, thisUnit.attackCooldown - 1)
+    thisUnit.moveCooldown   = Math.max(0, thisUnit.moveCooldown   - 1)
+    if (! thisUnit.readyToAttack && ! thisUnit.readyToMove) return
+    
+    ///////////////////
+    // Update threat //
+    ///////////////////
   
-  private def updateFleeing() {
-    if (thisUnit.canMove && ! thisUnit.fleeing) {
-      thisUnit.fleeing ||= (thisGroup.tactics.movement == TacticMovement.Flee)
-      thisUnit.fleeing ||= (thisGroup.tactics.wounded == TacticWounded.Flee && thisUnit.totalLife <= thisUnit.woundedThreshold)
-      thisUnit.fleeing &&= thisUnit.threat.nonEmpty
-    }
-    if (thisUnit.fleeing) thisUnit.fighting = false
-  }
-  
-  private def considerAttacking() = if (thisUnit.readyToAttack  && thisUnit.fighting) doAttack()
-  private def considerFleeing()   = if (thisUnit.readyToMove    && thisUnit.fleeing)  doFlee()
-  private def considerCharging()  = if (thisUnit.readyToMove    && thisUnit.fighting && thisGroup.tactics.movement == TacticMovement.Charge) doCharge()
-  private def considerKiting()    = if (thisUnit.readyToMove    && thisGroup.tactics.movement == TacticMovement.Kite) {
-    //TODO: If target is out of range
-    if (thisUnit.fighting && thisUnit.target.exists(target => ! thisUnit.inRangeToAttack(target))) {
-      doCharge()
-    }
-    else if (thisUnit.threat.nonEmpty) {
-      doFlee()
-    }
-  }
-  
-  ////////////////////
-  // Execute orders //
-  ////////////////////
-  
-  private def doAttack()  = if (thisUnit.readyToAttack) thisUnit.target.foreach(target => if (thisUnit.inRangeToAttack(target)) dealDamage(target))
-  private def doCharge()  = if (thisUnit.readyToMove)   thisUnit.target.foreach(target => moveTowards(target.pixel))
-  private def doFlee()    = if (thisUnit.readyToMove)   thisUnit.threat.foreach(threat => moveAwayFrom(threat.pixel))
-  
-  private def dealDamage(target: Simulacrum) {
-    val damage = thisUnit.unit.damageAgainst(target.unit, target.shields)
-    thisUnit.attackCooldown = thisUnit.unit.cooldownLeftAgainst(target.unit)
-    thisUnit.moveCooldown   = Math.min(thisUnit.attackCooldown, 8)
-    target.damageTaken  += damage
-    target.shields      -= damage
-    if (target.shields < 0) {
-      target.hitPoints += target.shields
-      target.shields = 0
-    }
-  }
-  
-  private def moveAwayFrom(destination: Pixel)  = move(destination, -1.0)
-  private def moveTowards(destination: Pixel)   = move(destination, chargingSpeedRatio, thisUnit.pixel.pixelDistanceFast(destination))
-  
-  private def move(destination: Pixel, multiplier: Double, maxDistance: Double = 1000.0) {
-    thisUnit.pixel = thisUnit.pixel.project(destination, Math.min(
-      maxDistance,
-      multiplier * thisUnit.topSpeed * (1 + movementFrames)))
-    thisUnit.attackCooldown = movementFrames
-    thisUnit.moveCooldown   = movementFrames
-  }
-  
-  /////////////////////
-  // Targets/threats //
-  /////////////////////
-  
-  private def updateThreat() {
     if (thisUnit.threat.exists( ! _.alive)) {
       thisUnit.threat = None
     }
@@ -111,7 +52,7 @@ class SimulacrumAgent(
       var i = 0
       while (i < thatGroup.units.size) {
         val threat = thatGroup.units(i)
-        if (validThreat(threat)) {
+        if (validThreat(thisUnit, threat)) {
           val score = thisUnit.pixel.pixelDistanceSquared(threat.pixel)
           if (score < bestScore) {
             bestScore = score
@@ -121,9 +62,11 @@ class SimulacrumAgent(
         i += 1
       }
     }
-  }
   
-  private def updateTarget() {
+    ///////////////////
+    // Update target //
+    ///////////////////
+  
     if ( ! thisUnit.fighting) {
       thisUnit.target = None
       return
@@ -141,10 +84,10 @@ class SimulacrumAgent(
       var i = 0
       while (i < thatGroup.units.size) {
         val target = thatGroup.units(i)
-        if (validTarget(target)) {
+        if (validTarget(thisUnit, target)) {
           val score = thisUnit.pixel.pixelDistanceSquared(target.pixel) *
-            (if (   target.flying && thisGroup.tactics.focusAirOrGround == TacticFocus.Air)     1 else wrongFocusPenalty) *
-            (if ( ! target.flying && thisGroup.tactics.focusAirOrGround == TacticFocus.Ground)  1 else wrongFocusPenalty) /
+            (if (   target.flying && thisGroup.tactics.has(Tactics.FocusAir))     1 else wrongFocusPenalty) *
+            (if ( ! target.flying && thisGroup.tactics.has(Tactics.FocusGround))  1 else wrongFocusPenalty) /
             target.totalLife
           if (score < bestScore) {
             bestScore = score
@@ -154,8 +97,106 @@ class SimulacrumAgent(
         i += 1
       }
     }
+  
+    //////////////////////////////
+    // Update fight/flee status //
+    //////////////////////////////
+  
+    if (thisUnit.canMove && ! thisUnit.fleeing) {
+      thisUnit.fleeing ||= (thisGroup.tactics.has(Tactics.MovementFlee))
+      thisUnit.fleeing ||= (thisGroup.tactics.has(Tactics.WoundedFlee) && thisUnit.totalLife <= thisUnit.woundedThreshold)
+      thisUnit.fleeing &&= thisUnit.threat.nonEmpty
+    }
+    thisUnit.fighting &&= ! thisUnit.fleeing
+  
+    ////////////////////////
+    // Consider attacking //
+    ////////////////////////
+  
+    if (thisUnit.readyToAttack && thisUnit.fighting) {
+      doAttack(thisUnit)
+      return
+    }
+  
+    /////////////////////////////////////////////////////////////////////////////
+    // Shortcut: If the unit doesn't want to attack, and can't move, then quit //
+    //                                                                         //
+    // Everything afterwards assumes that the unit is ready to move.           //
+    /////////////////////////////////////////////////////////////////////////////
+    
+    if ( ! thisUnit.readyToMove) {
+      return
+    }
+  
+    //////////////////////
+    // Consider fleeing //
+    //////////////////////
+  
+    if (thisUnit.fleeing) {
+      doFlee(thisUnit)
+      return
+    }
+  
+    ///////////////////////
+    // Consider charging //
+    ///////////////////////
+
+    else if (thisUnit.fighting && thisGroup.tactics.has(Tactics.MovementCharge)) {
+      doCharge(thisUnit)
+      return
+    }
+  
+    /////////////////////
+    // Consider kiting //
+    /////////////////////
+
+    else if (thisGroup.tactics.has(Tactics.MovementKite)) {
+      if (thisUnit.fighting && thisUnit.target.exists(target => ! thisUnit.inRangeToAttack(target))) {
+        doCharge(thisUnit)
+        return
+      }
+      else if (thisUnit.threat.nonEmpty) {
+        doFlee(thisUnit)
+        return
+      }
+    }
   }
   
-  def validTarget(target: Simulacrum) = target.alive && thisUnit.canAttack(target)
-  def validThreat(threat: Simulacrum) = threat.alive && threat.canAttack(thisUnit)
+  ////////////////////
+  // Execute orders //
+  ////////////////////
+  
+  @inline private def doAttack(thisUnit:Simulacrum)  = if (thisUnit.readyToAttack) thisUnit.target.foreach(target => if (thisUnit.inRangeToAttack(target)) dealDamage(thisUnit, target))
+  @inline private def doCharge(thisUnit:Simulacrum)  = if (thisUnit.readyToMove)   thisUnit.target.foreach(target => moveTowards(thisUnit,  target.pixel))
+  @inline private def doFlee(thisUnit:Simulacrum)    = if (thisUnit.readyToMove)   thisUnit.threat.foreach(threat => moveAwayFrom(thisUnit, threat.pixel))
+  
+  @inline private def dealDamage(thisUnit:Simulacrum, target: Simulacrum) {
+    val damage = thisUnit.unit.damageAgainst(target.unit, target.shields)
+    thisUnit.attackCooldown = thisUnit.unit.cooldownLeftAgainst(target.unit)
+    thisUnit.moveCooldown   = Math.min(thisUnit.attackCooldown, 8)
+    target.damageTaken  += damage
+    target.shields      -= damage
+    if (target.shields < 0) {
+      target.hitPoints += target.shields
+      target.shields = 0
+    }
+  }
+  
+  @inline private def moveAwayFrom(thisUnit:Simulacrum, destination: Pixel) {
+    move(thisUnit, destination, -1.0)
+  }
+  @inline private def moveTowards(thisUnit:Simulacrum, destination: Pixel) {
+    move(thisUnit, destination, chargingSpeedRatio, thisUnit.pixel.pixelDistanceFast(destination))
+  }
+  
+  @inline private def move(thisUnit:Simulacrum, destination: Pixel, multiplier: Double, maxDistance: Double = 1000.0) {
+    thisUnit.pixel = thisUnit.pixel.project(destination, Math.min(
+      maxDistance,
+      multiplier * thisUnit.topSpeed * (1 + movementFrames)))
+    thisUnit.attackCooldown = movementFrames
+    thisUnit.moveCooldown   = movementFrames
+  }
+  
+  @inline def validTarget(thisUnit:Simulacrum, target: Simulacrum) = target.alive && thisUnit.canAttack(target)
+  @inline def validThreat(thisUnit:Simulacrum, threat: Simulacrum) = threat.alive && threat.canAttack(thisUnit)
 }

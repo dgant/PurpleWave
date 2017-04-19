@@ -3,13 +3,10 @@ package Information.Grids.Movement
 import Information.Grids.ArrayTypes.AbstractGridInt
 import Lifecycle.With
 import Mathematics.Shapes.Circle
-import Performance.Caching.Limiter
 
 class GridMobility extends AbstractGridInt {
   
-  val limitUpdates = new Limiter(100, () => updateRecalculate)
-  override def update() = limitUpdates.act
-  def updateRecalculate() {
+  override def update() = {
     val tilesToUpdate = With.units.ours
       .filter(_.canMoveThisFrame)
       .map(_.tileIncludingCenter)
@@ -31,7 +28,7 @@ class GridMobility extends AbstractGridInt {
               var distance = 1
               while (doContinue && distance <= distanceMax) {
                 val nextTile = tile.add(mx * distance, my * distance)
-                doContinue = nextTile.valid && With.grids.walkable.get(nextTile)
+                doContinue = nextTile.valid && With.grids.walkable.get(nextTile.i)
                 if (doContinue) tileMobility += 1
                 distance += 1
               }

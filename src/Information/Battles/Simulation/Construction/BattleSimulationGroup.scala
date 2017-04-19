@@ -1,11 +1,10 @@
 package Information.Battles.Simulation.Construction
 
-import Information.Battles.Simulation.Tactics.Tactics
-import Information.Battles.Types.BattleGroup
+import Information.Battles.Types.{BattleGroup, TacticsOptions}
 
 import scala.collection.mutable.ArrayBuffer
 
-class BattleSimulationGroup(battleGroup:BattleGroup, val tactics: Tactics) {
+class BattleSimulationGroup(battleGroup:BattleGroup, val tactics: TacticsOptions) {
   
   val units: ArrayBuffer[Simulacrum] =
     new ArrayBuffer[Simulacrum] ++

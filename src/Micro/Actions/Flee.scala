@@ -1,5 +1,5 @@
 package Micro.Actions
-import Information.Battles.Simulation.Tactics.{TacticMovement, TacticWorkers, TacticWounded}
+import Information.Battles.Types.Tactics
 import Micro.Behaviors.MovementProfiles
 import Micro.Intent.Intention
 import Planning.Yolo
@@ -10,10 +10,11 @@ object Flee extends Action {
     Yolo.disabled &&
     intent.unit.canMoveThisFrame &&
     (
-      (intent.tactics.exists(_.movement == TacticMovement.Flee))                      ||
-      (intent.tactics.exists(_.wounded  == TacticWounded.Flee)    && wounded(intent)) ||
-      (intent.tactics.exists(_.workers  == TacticWorkers.Flee)    && worker(intent))
+       intent.tactics.exists(_.has(Tactics.MovementFlee))                     ||
+      (intent.tactics.exists(_.has(Tactics.WoundedFlee))  && wounded(intent)) ||
+      (intent.tactics.exists(_.has(Tactics.WorkersFlee))  && worker(intent))
     ) &&
+    intent.unit.tileIncludingCenter.zone != intent.origin.zone &&
     intent.threats.nonEmpty
   }
   

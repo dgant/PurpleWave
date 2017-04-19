@@ -2,7 +2,7 @@ package Debugging.Visualizations.Views
 
 import Debugging.Visualizations.Rendering.{DrawMap, DrawScreen}
 import Information.Battles.Simulation.Construction.{BattleSimulation, BattleSimulationGroup}
-import Information.Battles.Types.Battle
+import Information.Battles.Types.{Battle, Tactics, TacticsOptions}
 import Lifecycle.With
 import Mathematics.Pixels.Pixel
 import Planning.Yolo
@@ -69,10 +69,10 @@ object VisualizeBattles {
       Vector(
         Vector(name),
         Vector("Losses:",   group.lostValue.toString),
-        Vector("Move:",     group.tactics.movement.toString),
-        Vector("Focus:",    group.tactics.focusAirOrGround.toString),
-        Vector("Workers:",  group.tactics.workers.toString),
-        Vector("Wounded:",  group.tactics.wounded.toString),
+        Vector("Move:",     getMove(group.tactics)),
+        Vector("Focus:",    getFocus(group.tactics)),
+        Vector("Workers:",  getWorkers(group.tactics)),
+        Vector("Wounded:",  getWounded(group.tactics)),
         Vector(),
         Vector("Losses:")
       )
@@ -88,5 +88,30 @@ object VisualizeBattles {
         .toVector
         .sortBy(_._1.toString)
         .map(u => Vector(u._2.size.toString, u._1.toString)))
+  }
+  
+  private def getMove(tactics:TacticsOptions):String = {
+    if (tactics.has(Tactics.MovementCharge))  return "Charge"
+    if (tactics.has(Tactics.MovementKite))    return "Kite"
+    if (tactics.has(Tactics.MovementFlee))    return "Flee"
+    return "-"
+  }
+  
+  private def getFocus(tactics:TacticsOptions):String = {
+    if (tactics.has(Tactics.FocusAir))    return "Air"
+    if (tactics.has(Tactics.FocusGround)) return "Ground"
+    return "-"
+  }
+  
+  private def getWounded(tactics:TacticsOptions):String = {
+    if (tactics.has(Tactics.WoundedFlee))  return "Flee"
+    return "-"
+  }
+  
+  private def getWorkers(tactics:TacticsOptions):String = {
+    if (tactics.has(Tactics.WorkersFightAll))   return "Fight (All)"
+    if (tactics.has(Tactics.WorkersFightHalf))  return "Fight (Half)"
+    if (tactics.has(Tactics.WorkersFlee))       return "Flee"
+    return "-"
   }
 }

@@ -1,5 +1,5 @@
 package Micro.Actions
-import Information.Battles.Simulation.Tactics.TacticMovement
+import Information.Battles.Types.Tactics
 import Micro.Behaviors.MovementProfiles
 import Micro.Intent.Intention
 import Planning.Yolo
@@ -9,7 +9,7 @@ object Charge extends Action {
   override def allowed(intent: Intention): Boolean = {
     intent.unit.canMoveThisFrame &&
     (
-      Yolo.enabled || intent.tactics.exists(_.movement == TacticMovement.Charge)
+      Yolo.enabled || intent.tactics.exists(_.has(Tactics.MovementCharge))
     )
   }
   

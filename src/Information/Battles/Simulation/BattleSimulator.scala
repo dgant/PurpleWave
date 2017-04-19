@@ -31,17 +31,21 @@ object BattleSimulator {
   }
   
   private def runSimulation(simulation: BattleSimulation) {
-    while(simulation.frameDuration < maxFrames && simulation.us.units.nonEmpty && simulation.enemy.units.nonEmpty)
+    
+    while(
+      simulation.frameDuration < maxFrames
+      && simulation.us.units.nonEmpty
+      && simulation.enemy.units.nonEmpty) {
       step(simulation)
+    }
+    
     tallyLosses(simulation, simulation.us)
     tallyLosses(simulation, simulation.enemy)
   }
   
   private def step(battle: BattleSimulation) {
-    updateAgents    (battle, battle.us,     battle.enemy)
-    updateAgents    (battle, battle.enemy,  battle.us)
-    reduceCooldown  (battle.us)
-    reduceCooldown  (battle.enemy)
+    updateAgents(battle, battle.us,     battle.enemy)
+    updateAgents(battle, battle.enemy,  battle.us)
     battle.frameDuration += 1
   }
   
@@ -49,25 +53,12 @@ object BattleSimulator {
     battle    : BattleSimulation,
     thisGroup : BattleSimulationGroup,
     thatGroup : BattleSimulationGroup) {
-    thisGroup.units
-      .foreach(thisUnit =>
-        if (thisUnit.alive && (thisUnit.readyToAttack || thisUnit.readyToMove))
-        new SimulacrumAgent(thisUnit, thisGroup, thatGroup, battle).act)
-  }
-  
-  private def value(unit:Simulacrum):Int = {
-    (if (unit.unit.unitClass.isWorker) 2 else 1) *
-    (
-      2 * unit.unit.unitClass.mineralValue +
-      3 * unit.unit.unitClass.gasValue
-    )
-  }
-  
-  private def reduceCooldown(group:BattleSimulationGroup) {
-    group.units.foreach(simulacrum => {
-      simulacrum.attackCooldown = Math.max(0, simulacrum.attackCooldown - 1)
-      simulacrum.moveCooldown   = Math.max(0, simulacrum.moveCooldown   - 1)
-    })
+    
+    var i = 0
+    while (i < thisGroup.units.size) {
+      SimulacrumAgent.act(thisGroup.units(i), thisGroup, thatGroup, battle)
+      i += 1
+    }
   }
   
   private def tallyLosses(battle:BattleSimulation, group:BattleSimulationGroup) {
@@ -76,5 +67,13 @@ object BattleSimulator {
       (group.lostValuePerSecond * battle.frameDuration) / 24 +
       group.lostUnits.map(value).sum +
       group.units.map(unit => value(unit) * unit.damageTaken / unit.unit.unitClass.maxTotalHealth).sum / damageCostRatio
+  }
+  
+  private def value(unit:Simulacrum):Int = {
+    (if (unit.unit.unitClass.isWorker) 2 else 1) *
+      (
+        2 * unit.unit.unitClass.mineralValue +
+        3 * unit.unit.unitClass.gasValue
+      )
   }
 }

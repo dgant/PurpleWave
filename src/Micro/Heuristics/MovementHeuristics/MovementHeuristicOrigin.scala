@@ -1,5 +1,6 @@
 package Micro.Heuristics.MovementHeuristics
 
+import Lifecycle.With
 import Mathematics.Heuristics.HeuristicMath
 import Mathematics.Pixels.Tile
 import Micro.Intent.Intention
@@ -8,7 +9,8 @@ object MovementHeuristicOrigin extends MovementHeuristic {
   
   override def evaluate(intent: Intention, candidate: Tile): Double = {
     
-    if (intent.unit.tileIncludingCenter.zone.bases.nonEmpty) return HeuristicMath.default
+    val zone = intent.unit.tileIncludingCenter.zone
+    if (zone.bases.nonEmpty && zone.owner == With.self) return HeuristicMath.default
   
     val candidateDistance = intent.unit.tileIncludingCenter.pixelCenter.pixelDistanceFast(candidate.pixelCenter) - 24
     

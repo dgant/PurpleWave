@@ -23,10 +23,10 @@ class WorkersDefend extends Plan {
   override def update() {
     matchWorkers.specificUnits =
       With.battles.local.flatten(battle =>
-        if (battle.bestSimulationResult.exists(_.us.tactics.has(Tactics.Workers.FightAll))) {
+        if (battle.consensusTactics.has(Tactics.Workers.FightAll)) {
           battleUnits(battle)
         }
-        else if (battle.bestSimulationResult.exists(_.us.tactics.has(Tactics.Workers.FightHalf))) {
+        else if (battle.consensusTactics.has(Tactics.Workers.FightHalf)) {
           //Hacky, because it ignores whether we'll actually get these units
           //Better would be to use a preference and a counter
           val workers = battleUnits(battle)
@@ -36,7 +36,7 @@ class WorkersDefend extends Plan {
           Vector.empty
         }).toSet
     
-    workers.release()
+    //workers.release()
     workers.acquire(this)
     workers.units.foreach(worker => With.executor.intend(new Intention(this, worker)))
   }

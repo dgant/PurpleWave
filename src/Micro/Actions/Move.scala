@@ -1,6 +1,6 @@
 package Micro.Actions
 import Lifecycle.With
-import Micro.Heuristics.Movement.EvaluateMoves
+import Micro.Heuristics.Movement.EvaluateTiles
 import Micro.Intent.Intention
 
 object Move extends Action {
@@ -13,7 +13,7 @@ object Move extends Action {
     val moveHeuristically = intent.threats.nonEmpty || intent.targets.nonEmpty
     val tileToMove =
       if (moveHeuristically)
-        EvaluateMoves.best(intent, intent.movementProfile)
+        EvaluateTiles.best(intent, intent.movementProfile)
       else
         intent.destination.getOrElse(intent.unit.tileIncludingCenter)
     

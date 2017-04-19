@@ -11,19 +11,28 @@ abstract class AbstractTaskQueue {
     if (With.frame == 0) {
       tasks.foreach(_.run())
     } else {
-      var definitelyRunNextSystem = true
+      var definitelyRunNextTask = true
       tasks
         .sortBy(system => - system.urgency * system.framesSinceRunning)
         .sortBy(system => system.skippable)
-        .foreach(system =>
-          if (definitelyRunNextSystem || ! system.skippable || With.performance.millisecondsLeftThisFrame > system.runMillisecondsMax) {
-            if (system.skippable) {
-              definitelyRunNextSystem  = false
-            }
-            system.run()
-          } else {
-            system.skip()
-          })
+        
+      //Ordinarily we'd do foreach() but that swallows exceptions and I don't understand why
+      var i = 0
+      while (i < tasks.length) {
+        val task = tasks(i)
+        if (definitelyRunNextTask       ||
+          ! task.skippable              ||
+          task.framesSinceRunning > 24  ||
+          With.performance.millisecondsLeftThisFrame > task.runMillisecondsMax) {
+          if (task.skippable) {
+            definitelyRunNextTask = false
+          }
+          task.run()
+        } else {
+          task.skip()
+        }
+        i += 1
+      }
     }
   }
 }

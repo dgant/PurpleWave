@@ -1,14 +1,13 @@
 package Planning.Plans.Army
 
 import Debugging.Visualizations.Rendering.DrawMap
-import Micro.Intent.Intention
-import Planning.Composition.PixelFinders.TileFinder
-import Planning.Composition.PixelFinders.Tactics.TileEnemyBase
-import Planning.Composition.Property
-import Planning.Plan
-import Planning.Composition.ResourceLocks.LockUnits
 import Lifecycle.With
-import Utilities.EnrichPixel._
+import Micro.Intent.Intention
+import Planning.Composition.PixelFinders.Tactics.TileEnemyBase
+import Planning.Composition.PixelFinders.TileFinder
+import Planning.Composition.Property
+import Planning.Composition.ResourceLocks.LockUnits
+import Planning.Plan
 
 class ControlPixel extends Plan {
   
@@ -27,7 +26,7 @@ class ControlPixel extends Plan {
     val infiltrators = With.units.enemy
       .filter(e =>
         e.possiblyStillThere &&
-        e.canAttackThisFrame &&
+        e.canAttackThisSecond &&
         ourBases.exists(base =>
           e.travelPixels(base.tileIncluding) < infiltrationRadius &&
           e.travelPixels(base.tileIncluding) <

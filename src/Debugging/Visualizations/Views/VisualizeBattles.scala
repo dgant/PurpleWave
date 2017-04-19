@@ -18,11 +18,8 @@ object VisualizeBattles {
     val battlesWithSimulations = With.battles.local.filter(_.simulations.nonEmpty)
     if (battlesWithSimulations.nonEmpty) {
       
-      drawBattleReport(
-        battlesWithSimulations
-          .minBy(battle => battle.focus.pixelDistanceSquared(With.viewport.center))
-          .bestSimulationResult
-          .get)
+      val battle = battlesWithSimulations.minBy(battle => battle.focus.pixelDistanceSquared(With.viewport.center))
+      drawBattleReport(battle.simulations.minBy(_.us.tactics == battle.consensusTactics))
     }
     if (Yolo.enabled && With.frame / 24 % 2 == 0) {
       With.game.drawTextScreen(5, 5, "YOLO")

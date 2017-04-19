@@ -99,13 +99,11 @@ class BattleClassifier {
   }
   
   private def clusterUnits():ArrayBuffer[ArrayBuffer[UnitInfo]] = {
-  
-    val unassignedUnits = mutable.HashSet.empty ++ combatantsOurs ++ combatantsEnemy
     
-    val clusters = new ArrayBuffer[ArrayBuffer[UnitInfo]]
-  
-    val exploredTiles = new mutable.HashSet[Tile]
-    val horizonTiles  = new mutable.HashSet[Tile]
+    val unassignedUnits = mutable.HashSet.empty ++ combatantsOurs ++ combatantsEnemy
+    val clusters        = new ArrayBuffer[ArrayBuffer[UnitInfo]]
+    val exploredTiles   = new mutable.HashSet[Tile]
+    val horizonTiles    = new mutable.HashSet[Tile]
   
     while (unassignedUnits.nonEmpty) {
     
@@ -127,6 +125,7 @@ class BattleClassifier {
         unassignedUnits   --= nextUnits
         nextCluster       ++= nextUnits
         
+        //Note that this includes non-combatants!
         Circle.points(With.configuration.combatEvaluationDistanceTiles)
           .foreach(point => {
             val tile = nextTile.add(point)

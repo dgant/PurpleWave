@@ -1,5 +1,6 @@
 package Information.Battles.Types
 
+import Information.Battles.Evaluation.BattleEvaluation
 import Information.Battles.Simulation.Construction.BattleSimulation
 import Mathematics.Pixels.Pixel
 import Performance.Caching.CacheFrame
@@ -8,27 +9,21 @@ class Battle(
   val us    : BattleGroup,
   val enemy : BattleGroup) {
   
-  var simulations: Iterable[BattleSimulation] = Vector.empty
+  us.battle       = this
+  enemy.battle    = this
+  us.opponent     = enemy
+  enemy.opponent  = us
   
-  def focus     : Pixel = us.vanguard.midpoint(enemy.vanguard)
-  def groups    : Iterable[BattleGroup] = Vector(us, enemy)
-  def happening : Boolean =
-    us.units.nonEmpty &&
-    enemy.units.nonEmpty &&
-    (us.units.exists(_.canAttackThisSecond) ||
-    enemy.units.exists(_.canAttackThisSecond))
+  def focus: Pixel = us.vanguard.midpoint(enemy.vanguard)
+  def groups: Iterable[BattleGroup] = Vector(us, enemy)
+  def happening: Boolean = us.units.nonEmpty && enemy.units.nonEmpty && (us.units.exists(_.canAttackThisSecond) || enemy.units.exists(_.canAttackThisSecond))
   
-  def bestSimulationResult:Option[BattleSimulation] = bestSimulationResultCache.get
+  var evaluations: Vector[BattleEvaluation] = Vector.empty
+  var simulations: Vector[BattleSimulation] = Vector.empty
   
-  // Pick the "best" simulation result
-  // Go for best value, but tiebreak by preferring to fight! (And to keep mining)
-  private val bestSimulationResultCache = new CacheFrame(() =>
-    simulations
-      .toVector
-      .sortBy(simulation => ! simulation.us.tactics.has(Tactics.Workers.Ignore))
-      .sortBy(simulation => ! simulation.us.tactics.has(Tactics.Wounded.Fight))
-      .sortBy(simulation => simulation.us.tactics.has(Tactics.Movement.Kite))
-      .sortBy(simulation => simulation.us.tactics.has(Tactics.Movement.Charge))
-      .sortBy(simulation => simulation.us.lostValue - simulation.enemy.lostValue)
-      .headOption)
+  def consensusTactics:TacticsOptions = consensusTacticsCache.get
+  private val consensusTacticsCache = new CacheFrame(() => {
+    //Very TODO
+    us.tacticsAvailable.head
+  })
 }

@@ -24,7 +24,7 @@ object BattleSimulator {
       .foreach(battle => battle.simulations = simulate(battle))
   }
   
-  def simulate(battle:Battle):Iterable[BattleSimulation] = {
+  def simulate(battle:Battle):Vector[BattleSimulation] = {
     val simulations = BattleSimulationBuilder.build(battle)
     simulations.foreach(runSimulation)
     simulations

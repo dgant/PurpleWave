@@ -9,4 +9,6 @@ class MovementHeuristicWeight (
   weight    : Double,
   val color : Color = Colors.DefaultGray)
 
-  extends HeuristicWeight(heuristic, weight)
+  extends HeuristicWeight(
+    heuristic,
+    weight)

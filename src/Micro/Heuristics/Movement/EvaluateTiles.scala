@@ -6,7 +6,7 @@ import Mathematics.Pixels.{Point, Tile}
 import Micro.Heuristics.MovementHeuristics.MovementHeuristicResult
 import Micro.Intent.Intention
 
-object EvaluateMoves {
+object EvaluateTiles {
   
   val points = Vector(
     new Point(-1, -2),

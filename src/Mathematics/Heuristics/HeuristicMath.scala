@@ -10,9 +10,9 @@ object HeuristicMath {
   def fromBoolean(value:Boolean):Double = if (value) 2.0 else 1.0
   def clamp(value:Double):Double = Math.min(heuristicMaximum, Math.max(heuristicMinimum, value))
   
-  def calculateBest[TContext, TCandidate](
+  def calculateBest[TContext, TCandidate, THeuristic, THeuristicWeight <: HeuristicWeight[TContext, TCandidate]](
     context       : TContext,
-    heuristics    : Iterable[HeuristicWeight[TContext, TCandidate]],
+    heuristics    : Iterable[THeuristicWeight],
     candidates    : Iterable[TCandidate]):TCandidate = {
     
     candidates.maxBy(candidate =>

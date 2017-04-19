@@ -9,7 +9,7 @@ object Charge extends Action {
   override def allowed(intent: Intention): Boolean = {
     intent.unit.canMoveThisFrame &&
     (
-      Yolo.enabled || intent.tactics.exists(_.has(Tactics.MovementCharge))
+      Yolo.enabled || intent.tactics.exists(_.has(Tactics.Movement.Charge))
     )
   }
   

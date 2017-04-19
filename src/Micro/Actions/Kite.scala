@@ -10,7 +10,7 @@ object Kite extends Action {
   override def allowed(intent: Intention): Boolean = {
     Yolo.disabled &&
     intent.unit.canMoveThisFrame &&
-    intent.tactics.exists(_.has(Tactics.MovementKite))
+    intent.tactics.exists(_.has(Tactics.Movement.Kite))
   }
   
   override def perform(intent: Intention): Boolean = {

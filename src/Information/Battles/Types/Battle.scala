@@ -25,10 +25,10 @@ class Battle(
   private val bestSimulationResultCache = new CacheFrame(() =>
     simulations
       .toVector
-      .sortBy(simulation => ! simulation.us.tactics.has(Tactics.WorkersIgnore))
-      .sortBy(simulation => ! simulation.us.tactics.has(Tactics.WoundedFight))
-      .sortBy(simulation => simulation.us.tactics.has(Tactics.MovementKite))
-      .sortBy(simulation => simulation.us.tactics.has(Tactics.MovementCharge))
+      .sortBy(simulation => ! simulation.us.tactics.has(Tactics.Workers.Ignore))
+      .sortBy(simulation => ! simulation.us.tactics.has(Tactics.Wounded.Fight))
+      .sortBy(simulation => simulation.us.tactics.has(Tactics.Movement.Kite))
+      .sortBy(simulation => simulation.us.tactics.has(Tactics.Movement.Charge))
       .sortBy(simulation => simulation.us.lostValue - simulation.enemy.lostValue)
       .headOption)
 }

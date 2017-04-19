@@ -10,9 +10,9 @@ object Flee extends Action {
     Yolo.disabled &&
     intent.unit.canMoveThisFrame &&
     (
-       intent.tactics.exists(_.has(Tactics.MovementFlee))                     ||
-      (intent.tactics.exists(_.has(Tactics.WoundedFlee))  && wounded(intent)) ||
-      (intent.tactics.exists(_.has(Tactics.WorkersFlee))  && worker(intent))
+       intent.tactics.exists(_.has(Tactics.Movement.Flee))                     ||
+      (intent.tactics.exists(_.has(Tactics.Wounded.Flee))  && wounded(intent)) ||
+      (intent.tactics.exists(_.has(Tactics.Workers.Flee))  && worker(intent))
     ) &&
     intent.unit.tileIncludingCenter.zone != intent.origin.zone &&
     intent.threats.nonEmpty

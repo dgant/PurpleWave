@@ -27,36 +27,36 @@ object BattleSimulationBuilder {
     val thatCanMove = thatGroup.units.exists(_.canMoveThisFrame)
     
     if (thisCanMove) {
-      tacticsMovement += Tactics.MovementCharge
-      tacticsMovement += Tactics.MovementFlee
+      tacticsMovement += Tactics.Movement.Charge
+      tacticsMovement += Tactics.Movement.Flee
       
       if (thatCanMove) {
-        tacticsMovement += Tactics.MovementKite
+        tacticsMovement += Tactics.Movement.Kite
       }
     }
     if (tacticsMovement.isEmpty) {
-      tacticsMovement += Tactics.MovementNone
+      tacticsMovement += Tactics.Movement.None
     }
 
-    tacticsWounded += Tactics.WoundedFight
+    tacticsWounded += Tactics.Wounded.Fight
     if (thisCanMove) {
-      tacticsWounded += Tactics.WoundedFlee
+      tacticsWounded += Tactics.Wounded.Flee
     }
     
-    tacticsFocus += Tactics.FocusNone
+    tacticsFocus += Tactics.Focus.None
     if (thatGroup.units.exists(_.flying) && thatGroup.units.exists( ! _.flying)) {
-      tacticsFocus += Tactics.FocusAir
-      tacticsFocus += Tactics.FocusGround
+      tacticsFocus += Tactics.Focus.Air
+      tacticsFocus += Tactics.Focus.Ground
     }
     
     val workerCount = thisGroup.units.count(_.unitClass.isWorker)
-    tacticsWorkers += Tactics.WorkersIgnore
+    tacticsWorkers += Tactics.Workers.Ignore
     if (workerCount > 0) {
-      tacticsWorkers += Tactics.WorkersFightAll
-      tacticsWorkers += Tactics.WorkersFlee
+      tacticsWorkers += Tactics.Workers.FightAll
+      tacticsWorkers += Tactics.Workers.Flee
     }
     if (workerCount > 3) {
-      tacticsWorkers += Tactics.WorkersFightHalf
+      tacticsWorkers += Tactics.Workers.FightHalf
     }
     
     val tacticsPermutations =
@@ -77,10 +77,10 @@ object BattleSimulationBuilder {
   
   def buildEnemyTacticVariants(thisGroup:BattleGroup, thatGroup:BattleGroup):Iterable[BattleSimulationGroup] = {
     val tactics = new TacticsOptions
-    tactics.add(Tactics.MovementCharge)
-    tactics.add(Tactics.FocusNone)
-    tactics.add(Tactics.WoundedFight)
-    tactics.add(Tactics.WorkersIgnore)
+    tactics.add(Tactics.Movement.Charge)
+    tactics.add(Tactics.Focus.None)
+    tactics.add(Tactics.Wounded.Fight)
+    tactics.add(Tactics.Workers.Ignore)
     Vector(new BattleSimulationGroup(thisGroup, tactics))
   }
   
@@ -94,18 +94,18 @@ object BattleSimulationBuilder {
     var workersNotMining = 0
     val workers = group.units.filter(_.unit.unitClass.isWorker)
     
-    if (group.tactics.has(Tactics.WorkersFlee)) {
+    if (group.tactics.has(Tactics.Workers.Flee)) {
       workersNotMining = workers.size
       workers.foreach(worker => { worker.fleeing = true; worker.fighting = false })
     }
-    else if (group.tactics.has(Tactics.WorkersIgnore)) {
+    else if (group.tactics.has(Tactics.Workers.Ignore)) {
       workers.toVector.foreach(_.fighting = false)
     }
-    else if (group.tactics.has(Tactics.WorkersFightHalf)) {
+    else if (group.tactics.has(Tactics.Workers.FightHalf)) {
       workersNotMining = workers.size / 2
       workers.toVector.sortBy(_.totalLife).take(workersNotMining).foreach(_.fighting = false)
     }
-    else if (group.tactics.has(Tactics.WorkersFightAll)) {
+    else if (group.tactics.has(Tactics.Workers.FightAll)) {
       workersNotMining = workers.size
     }
     

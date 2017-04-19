@@ -91,27 +91,27 @@ object VisualizeBattles {
   }
   
   private def getMove(tactics:TacticsOptions):String = {
-    if (tactics.has(Tactics.MovementCharge))  return "Charge"
-    if (tactics.has(Tactics.MovementKite))    return "Kite"
-    if (tactics.has(Tactics.MovementFlee))    return "Flee"
+    if (tactics.has(Tactics.Movement.Charge))  return "Charge"
+    if (tactics.has(Tactics.Movement.Kite))    return "Kite"
+    if (tactics.has(Tactics.Movement.Flee))    return "Flee"
     return "-"
   }
   
   private def getFocus(tactics:TacticsOptions):String = {
-    if (tactics.has(Tactics.FocusAir))    return "Air"
-    if (tactics.has(Tactics.FocusGround)) return "Ground"
+    if (tactics.has(Tactics.Focus.Air))    return "Air"
+    if (tactics.has(Tactics.Focus.Ground)) return "Ground"
     return "-"
   }
   
   private def getWounded(tactics:TacticsOptions):String = {
-    if (tactics.has(Tactics.WoundedFlee))  return "Flee"
+    if (tactics.has(Tactics.Wounded.Flee))  return "Flee"
     return "-"
   }
   
   private def getWorkers(tactics:TacticsOptions):String = {
-    if (tactics.has(Tactics.WorkersFightAll))   return "Fight (All)"
-    if (tactics.has(Tactics.WorkersFightHalf))  return "Fight (Half)"
-    if (tactics.has(Tactics.WorkersFlee))       return "Flee"
+    if (tactics.has(Tactics.Workers.FightAll))   return "Fight (All)"
+    if (tactics.has(Tactics.Workers.FightHalf))  return "Fight (Half)"
+    if (tactics.has(Tactics.Workers.Flee))       return "Flee"
     return "-"
   }
 }

@@ -86,8 +86,8 @@ object SimulacrumAgent {
         val target = thatGroup.units(i)
         if (validTarget(thisUnit, target)) {
           val score = thisUnit.pixel.pixelDistanceSquared(target.pixel) *
-            (if (   target.flying && thisGroup.tactics.has(Tactics.FocusAir))     1 else wrongFocusPenalty) *
-            (if ( ! target.flying && thisGroup.tactics.has(Tactics.FocusGround))  1 else wrongFocusPenalty) /
+            (if (   target.flying && thisGroup.tactics.has(Tactics.Focus.Air))     1 else wrongFocusPenalty) *
+            (if ( ! target.flying && thisGroup.tactics.has(Tactics.Focus.Ground))  1 else wrongFocusPenalty) /
             target.totalLife
           if (score < bestScore) {
             bestScore = score
@@ -103,8 +103,8 @@ object SimulacrumAgent {
     //////////////////////////////
   
     if (thisUnit.canMove && ! thisUnit.fleeing) {
-      thisUnit.fleeing ||= (thisGroup.tactics.has(Tactics.MovementFlee))
-      thisUnit.fleeing ||= (thisGroup.tactics.has(Tactics.WoundedFlee) && thisUnit.totalLife <= thisUnit.woundedThreshold)
+      thisUnit.fleeing ||= (thisGroup.tactics.has(Tactics.Movement.Flee))
+      thisUnit.fleeing ||= (thisGroup.tactics.has(Tactics.Wounded.Flee) && thisUnit.totalLife <= thisUnit.woundedThreshold)
       thisUnit.fleeing &&= thisUnit.threat.nonEmpty
     }
     thisUnit.fighting &&= ! thisUnit.fleeing
@@ -141,7 +141,7 @@ object SimulacrumAgent {
     // Consider charging //
     ///////////////////////
 
-    else if (thisUnit.fighting && thisGroup.tactics.has(Tactics.MovementCharge)) {
+    else if (thisUnit.fighting && thisGroup.tactics.has(Tactics.Movement.Charge)) {
       doCharge(thisUnit)
       return
     }
@@ -150,7 +150,7 @@ object SimulacrumAgent {
     // Consider kiting //
     /////////////////////
 
-    else if (thisGroup.tactics.has(Tactics.MovementKite)) {
+    else if (thisGroup.tactics.has(Tactics.Movement.Kite)) {
       if (thisUnit.fighting && thisUnit.target.exists(target => ! thisUnit.inRangeToAttack(target))) {
         doCharge(thisUnit)
         return

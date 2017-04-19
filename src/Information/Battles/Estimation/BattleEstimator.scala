@@ -1,4 +1,4 @@
-package Information.Battles.Evaluation
+package Information.Battles.Estimation
 
 import Information.Battles.Types.{Battle, BattleGroup}
 import Lifecycle.With
@@ -6,12 +6,12 @@ import Mathematics.Pixels.Pixel
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.UnitInfo
 
-object BattleEvaluator {
+object BattleEstimator {
   
   def run() {
     With.battles.all.foreach(battle =>
       battle.groups.foreach(group =>
-        group.strength = BattleEvaluator.estimateStrength(group, battle)))
+        group.strength = BattleEstimator.estimateStrength(group, battle)))
   }
   
   def contextualDesire(battle:Battle):Double = {

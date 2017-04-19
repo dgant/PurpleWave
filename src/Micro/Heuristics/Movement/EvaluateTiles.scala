@@ -32,10 +32,7 @@ object EvaluateTiles {
     new Point( 1,  2)
   )
   
-  def best(
-    intent:Intention,
-    profile:MovementProfile)
-      : Tile = {
+  def best(intent:Intention, profile:MovementProfile): Tile = {
     
     val candidates =
       points

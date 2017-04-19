@@ -84,6 +84,9 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   
   def project(framesToLookAhead:Int):Pixel = pixelCenter.add((velocityX * framesToLookAhead).toInt, (velocityY * framesToLookAhead).toInt)
   
+  def inTileRadius  (tiles:Int)  : Traversable[UnitInfo] = With.units.inTileRadius(tileIncludingCenter, tiles)
+  def inPixelRadius (pixels:Int) : Traversable[UnitInfo] = With.units.inPixelRadius(pixelCenter, pixels)
+  
   ////////////
   // Combat //
   ////////////
@@ -105,17 +108,25 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   def airDps    : Double = stimBonus * unitClass.airDps
   def groundDps : Double = stimBonus * unitClass.groundDps
   
+  def attacksAgainstGround: Int = {
+    var output = unitClass.groundDamageFactorRaw * unitClass.maxGroundHitsRaw
+    //if() is just to avoid slow is() calls
+    if (output == 0) {
+      if (is(Protoss.Reaver)) output = 1
+      //TODO: Carrier = N attacks, but not Nx damage
+      //TODO: Bunker = 4 attacks, but not 4x damage
+    }
+    output
+  }
+    
+  def attacksAgainstAir     : Int = unitClass.airDamageFactorRaw    * unitClass.maxAirHitsRaw
+  
   def cooldownLeft                          : Int         = Math.max(airCooldownLeft, groundCooldownLeft)
   def cooldownLeftAgainst (enemy:UnitInfo)  : Int         =  if (enemy.flying) airCooldownLeft                else groundCooldownLeft
-  def cooldownAgainst     (enemy:UnitInfo)  : Int         = (if (enemy.flying) unitClass.rawAirDamageCooldown else unitClass.rawGroundDamageCooldown) / stimBonus
+  def cooldownAgainst     (enemy:UnitInfo)  : Int         = (if (enemy.flying) unitClass.airDamageCooldown    else unitClass.groundDamageCooldown) / stimBonus
   def rangeAgainst        (enemy:UnitInfo)  : Double      =  if (enemy.flying) pixelRangeAir                  else pixelRangeGround
-  def damageTypeAgainst   (enemy:UnitInfo)  : DamageType  =  if (enemy.flying) unitClass.rawAirDamageType     else unitClass.rawGroundDamageType
-  
-  def attacksAgainst      (enemy:UnitInfo)  : Int =
-    if (enemy.flying)
-      unitClass.rawAirDamageFactor * unitClass.maxAirHits
-    else
-      unitClass.rawGroundDamageFactor * unitClass.maxGroundHits
+  def damageTypeAgainst   (enemy:UnitInfo)  : DamageType  =  if (enemy.flying) unitClass.airDamageTypeRaw     else unitClass.groundDamageTypeRaw
+  def attacksAgainst      (enemy:UnitInfo)  : Int         =  if (enemy.flying) attacksAgainstAir              else attacksAgainstGround
   
   def damageScaleAgainst(enemy:UnitInfo): Double =
     if (enemy.shieldPoints > 5) 1.0 else
@@ -135,11 +146,9 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   
   def damageAgainst(enemy:UnitInfo, enemyShields:Int = 0) : Int = {
     val hits = attacksAgainst(enemy)
-    //TODO: Only subtract shield armor if there are shields
-    //TODO: Use the damageScale! Or get this truth from somewhere else
-    val damageOnHit = if (enemy.flying) unitClass.rawAirDamage else unitClass.rawGroundDamage
+    val damageOnHit = if (enemy.flying) unitClass.effectiveAirDamage else unitClass.effectiveGroundDamage
     val damageScale = damageScaleAgainst(enemy)
-    val damageToShields = Math.max(0, Math.min(enemy.shieldPoints, hits * (damageOnHit - enemy.armorShield)))
+    val damageToShields = if (enemy.shieldPoints > 0) Math.max(0, Math.min(enemy.shieldPoints, hits * (damageOnHit - enemy.armorShield))) else 0
     val damageToHealth  = Math.max(0, damageScale * (hits * (damageOnHit - enemy.armorHealth) - damageToShields))
     Math.max(1, damageToHealth.toInt + damageToShields)
   }
@@ -149,9 +158,6 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
     if (cooldownVs == 0) return 0.0
     damageAgainst(enemy) * 24.0 / cooldownVs
   }
-  
-  def inTileRadius  (tiles:Int)  : Traversable[UnitInfo] = With.units.inTileRadius(tileIncludingCenter, tiles)
-  def inPixelRadius (pixels:Int) : Traversable[UnitInfo] = With.units.inPixelRadius(pixelCenter, pixels)
   
   def canDoAnythingThisFrame:Boolean = canDoAnythingThisFrameCache.get
   private val canDoAnythingThisFrameCache = new CacheFrame(() =>
@@ -209,16 +215,15 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   def inRangeToAttackSlow(enemy:UnitInfo):Boolean = pixelsFromEdgeSlow(enemy) <= rangeAgainst(enemy)
   def inRangeToAttackFast(enemy:UnitInfo):Boolean = pixelsFromEdgeFast(enemy) <= rangeAgainst(enemy)
   
-  /////////////
-  // Players //
-  /////////////
+  ////////////////
+  // Visibility //
+  ////////////////
   
   def effectivelyCloaked:Boolean =
     (burrowed || cloaked) && (
       if (isFriendly) ! With.grids.enemyDetection.get(tileIncludingCenter)
       else            ! detected
     )
-      
   
   /////////////
   // Players //

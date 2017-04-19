@@ -25,11 +25,11 @@ abstract class AbstractGridDps extends AbstractGridDouble {
     val movementPenalty = With.configuration.dpsGridMovementPenalty
     
     getUnits.foreach(unit => {
-      var dps = if (air) unit.unitClass.airDps else unit.unitClass.groundDps
+      var dps = if (air) unit.airDps else unit.groundDps
       if (dps > 0.0) {
         var pixelImpactMax  = if (air) unit.pixelImpactAir(framesToLookAhead) else unit.pixelImpactGround(framesToLookAhead)
         var pixelRangeMax   = if (air) unit.pixelRangeAir else unit.pixelRangeGround
-        var pixelRangeMin   = unit.unitClass.rawGroundMinRange
+        var pixelRangeMin   = unit.unitClass.groundMinRangeRaw
         
         //Assume invisible siege tanks are sieged
         if ( ! unit.isOurs && ! unit.visible && unit.is(Terran.SiegeTankUnsieged)) {

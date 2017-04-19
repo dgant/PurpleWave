@@ -6,7 +6,7 @@ object TargetHeuristicDamagePerSecond extends TargetHeuristic{
   
   override def evaluate(intent: Intention, candidate: UnitInfo): Double = {
     
-    Math.max(candidate.unitClass.groundDps, candidate.unitClass.airDps)
+    Math.max(candidate.groundDps, candidate.airDps)
     
   }
   

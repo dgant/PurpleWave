@@ -7,6 +7,6 @@ class GridDpsEnemyAirExplosive extends AbstractGridDpsEnemy {
   
   override protected val air: Boolean = true
   override protected def getUnits: Iterable[UnitInfo] =
-    super.getUnits.filter(_.unitClass.rawAirDamageType == DamageType.Explosive)
+    super.getUnits.filter(_.unitClass.airDamageTypeRaw == DamageType.Explosive)
   
 }

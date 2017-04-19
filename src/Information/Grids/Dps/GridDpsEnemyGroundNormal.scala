@@ -8,6 +8,6 @@ class GridDpsEnemyGroundNormal extends AbstractGridDpsEnemy {
   val unacceptableDamageTypes = Vector(DamageType.Concussive, DamageType.Explosive)
   override protected val air: Boolean = false
   override protected def getUnits: Iterable[UnitInfo] =
-    super.getUnits.filterNot(u => unacceptableDamageTypes.contains(u.unitClass.rawGroundDamageType))
+    super.getUnits.filterNot(u => unacceptableDamageTypes.contains(u.unitClass.groundDamageTypeRaw))
   
 }

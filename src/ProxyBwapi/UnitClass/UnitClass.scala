@@ -3,7 +3,7 @@ package ProxyBwapi.UnitClass
 import Mathematics.Pixels.{Tile, TileRectangle}
 import ProxyBwapi.Races.{Neutral, Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Tech
-import bwapi.{DamageType, Race, UnitType}
+import bwapi.{Race, UnitType}
 
 import scala.collection.mutable.ListBuffer
 
@@ -31,39 +31,29 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
   // Combat //
   ////////////
   
-  //TODO: Explosive is 50/75/100
-  //But Concussive is 25/50/100, not 50/75/100 !!!
-  private val concussiveOrExplosive = Vector(DamageType.Concussive, DamageType.Explosive)
-  
-  lazy val effectiveAirDamage:Double =
+  lazy val effectiveAirDamage:Int =
     if      (this == Protoss.Carrier)      Protoss.Interceptor.effectiveAirDamage * 8
     else if (this == Protoss.Interceptor)  0
     else if (this == Terran.Bunker)        Terran.Marine.effectiveAirDamage * 4
-    else (if (concussiveOrExplosive.contains(rawAirDamageType)) 0.75 else 1.0) *
-      maxAirHits *
-      rawAirDamageFactor *
-      rawAirDamage
+    else                                   airDamageRaw
   
-  lazy val effectiveGroundDamage:Double =
-    if      (this == Protoss.Carrier)       (Protoss.Interceptor.effectiveGroundDamage * 8)
-    else if (this == Protoss.Interceptor)   0
-    else if (this == Protoss.Reaver)        Protoss.Scarab.effectiveGroundDamage
-    else if (this == Terran.Bunker)         Terran.Marine.effectiveGroundDamage * 4
-    else (if (concussiveOrExplosive.contains(rawGroundDamageType)) 0.75 else 1.0) *
-      maxGroundHits *
-      rawGroundDamageFactor *
-      rawGroundDamage
+  lazy val effectiveGroundDamage:Int =
+    if (this == Terran.Bunker)         Terran.Marine.effectiveGroundDamage * 4 else
+    if (this == Protoss.Carrier)       (Protoss.Interceptor.effectiveGroundDamage * 8) else
+    if (this == Protoss.Interceptor)   0 else
+    if (this == Protoss.Reaver)        Protoss.Scarab.effectiveGroundDamage
+    else                               groundDamageRaw
+  
+  lazy val airDamageCooldown:Int =
+    if (this == Terran.Bunker)   Terran.Marine.airDamageCooldown else
+    if (this == Protoss.Carrier) Protoss.Interceptor.airDamageCooldown else
+    airDamageCooldownRaw
     
-    val typeMultiplier = if (concussiveOrExplosive.contains(rawGroundDamageType)) 0.75 else 1.0
-    typeMultiplier *
-      maxGroundHits *
-      rawGroundDamageFactor *
-      rawGroundDamage
-  
-  lazy val airDamageCooldown:Int = rawAirDamageCooldown
   lazy val groundDamageCooldown:Int =
-    //Necessary according to Skynet: https://github.com/Laccolith/skynet/blob/399018f41b49fbb55a0ea32142117e97e9d2f9ae/Skynet/Unit.cpp#L1092
-    if (this == Protoss.Reaver) 60 else rawGroundDamageCooldown
+    if (this == Terran.Bunker)   Terran.Marine.groundDamageCooldown else
+    if (this == Protoss.Carrier) Protoss.Interceptor.groundDamageCooldown else
+    if (this == Protoss.Reaver) 60 else
+    groundDamageCooldownRaw
   
   //The extra 2+ is to account for the 1-3 frame random variation in cooldown
   lazy val airDps    : Double = effectiveAirDamage    * 24 / (2 + airDamageCooldown).toDouble
@@ -74,8 +64,8 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
   
   lazy val helpsInCombat:Boolean = canAttack || isSpellcaster || Set(Terran.Bunker, Terran.Medic).contains(this)
   
-  lazy val groundRange        : Int = if (this == Terran.Bunker) Terran.Marine.groundRange  + 32 else if (this == Protoss.Reaver) 32 * 8 else rawGroundRange
-  lazy val airRange           : Int = if (this == Terran.Bunker) Terran.Marine.airRange     + 32 else rawAirRange
+  lazy val groundRange        : Int = if (this == Terran.Bunker) Terran.Marine.groundRange  + 32 else if (this == Protoss.Reaver) 32 * 8 else groundRangeRaw
+  lazy val airRange           : Int = if (this == Terran.Bunker) Terran.Marine.airRange     + 32 else airRangeRaw
   lazy val maxAirGroundRange  : Int = Math.max(groundRange, airRange)
   
   lazy val isResource:Boolean = isMinerals || isGas
@@ -95,10 +85,10 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
   lazy val isTerran  : Boolean = race == Race.Terran
   lazy val isZerg    : Boolean = race == Race.Zerg
   
-  lazy val buildTechEnabling     : Tech            = requiredTech
-  lazy val buildUnitsEnabling    : Vector[UnitClass] = buildUnitsEnablingCalculate
-  lazy val buildUnitsBorrowed    : Vector[UnitClass] = buildUnitsBorrowedCalculate
-  lazy val buildUnitsSpent       : Vector[UnitClass] = buildUnitsSpentCalculate
+  lazy val buildTechEnabling     : Tech               = requiredTech
+  lazy val buildUnitsEnabling    : Vector[UnitClass]  = buildUnitsEnablingCalculate
+  lazy val buildUnitsBorrowed    : Vector[UnitClass]  = buildUnitsBorrowedCalculate
+  lazy val buildUnitsSpent       : Vector[UnitClass]  = buildUnitsSpentCalculate
   
   private def buildUnitsEnablingCalculate: Vector[UnitClass] = {
     

@@ -19,7 +19,7 @@ object BattleSimulator {
   def costPerSecondOfNotMining(workers:Int):Int = workers * 2
   
   def run() {
-    With.battles.all
+    With.battles.local
       .filter(_.happening)
       .foreach(battle => battle.simulations = simulate(battle))
   }

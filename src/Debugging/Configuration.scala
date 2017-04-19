@@ -3,7 +3,7 @@ package Debugging
 class Configuration {
   
   val combatEvaluationDistanceTiles   = 15
-  val dpsGridDistancePenalty          = 0.25
+  val dpsGridDistancePenalty          = 0.5
   val dpsGridMovementPenalty          = 0.5
   val dpsGridCooldownPenalty          = 0.25
   val combatStickinessLeash           = 64.0

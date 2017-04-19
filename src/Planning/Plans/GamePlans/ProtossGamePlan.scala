@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans
 
-import Planning.Plans.Army.Defend
+import Planning.Plans.Army.{Defend, WorkersDefend}
 import Planning.Plans.Compound.Parallel
 import Planning.Plans.Information.SwitchEnemyRace
 import Planning.Plans.Macro.Automatic.Gather
@@ -17,6 +17,7 @@ class ProtossGamePlan extends Parallel {
     },
     new FollowBuildOrder,
     new RemoveMineralBlockAt(30),
+    new WorkersDefend,
     new Gather,
     new Defend
   ))

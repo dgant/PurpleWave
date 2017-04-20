@@ -38,8 +38,8 @@ class Configuration {
   var enableChat                  = true
   var enableLatencyCompensation   = false
   
-  var camera                      = false
-  var cameraDynamicSpeed          = false
+  var camera                      = true
+  var cameraDynamicSpeed          = true
   var cameraDynamicSpeedSlowest   = 30
   var cameraDynamicSpeedFastest   = 0
   var viewportWidth               = 640 * 2

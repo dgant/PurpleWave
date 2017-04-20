@@ -3,11 +3,20 @@ package Debugging.Visualizations
 import Lifecycle.With
 import Mathematics.Pixels.Pixel
 import Performance.Caching.CacheFrame
+
 class Viewport {
   
   def start   : Pixel = startCache.get
   def end     : Pixel = endcache.get
   def center  : Pixel = start.midpoint(end)
+  
+  def centerOn(pixel:Pixel) {
+    With.game.setScreenPosition(
+      pixel.subtract(
+        With.configuration.viewportWidth,
+        With.configuration.viewportHeight)
+      .bwapi)
+  }
   
   def contains(pixel:Pixel):Boolean = {
     pixel.x >= start.x  &&

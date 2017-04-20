@@ -1,7 +1,7 @@
-package Information.Battles.Simulation
+package Information.Battles.Simulation.Execution
 
-import Information.Battles.Simulation.Construction.{BattleSimulation, BattleSimulationBuilder, BattleSimulationGroup, Simulacrum}
-import Information.Battles.Types.Battle
+import Information.Battles.BattleTypes.Battle
+import Information.Battles.Simulation.Construction.{BattleSimulation, BattleSimulationBuilder, BattleSimulationGroup}
 import Lifecycle.With
 
 object BattleSimulator {
@@ -65,15 +65,7 @@ object BattleSimulator {
     group.lostUnits = group.units.filterNot(_.alive)
     group.lostValue =
       (group.lostValuePerSecond * battle.frameDuration) / 24 +
-      group.lostUnits.map(value).sum +
-      group.units.map(unit => value(unit) * unit.damageTaken / unit.unit.unitClass.maxTotalHealth).sum / damageCostRatio
-  }
-  
-  private def value(unit:Simulacrum):Int = {
-    (if (unit.unit.unitClass.isWorker) 2 else 1) *
-      (
-        2 * unit.unit.unitClass.mineralValue +
-        3 * unit.unit.unitClass.gasValue
-      )
+      group.lostUnits.map(_.unit.subjectiveValue).sum +
+      group.units.map(unit => unit.unit.subjectiveValue * unit.damageTaken / unit.unit.unitClass.maxTotalHealth).sum / damageCostRatio
   }
 }

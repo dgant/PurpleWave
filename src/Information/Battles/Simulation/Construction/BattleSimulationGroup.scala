@@ -1,6 +1,7 @@
 package Information.Battles.Simulation.Construction
 
-import Information.Battles.Types.{BattleGroup, TacticsOptions}
+import Information.Battles.BattleTypes.BattleGroup
+import Information.Battles.TacticsTypes.TacticsOptions
 
 import scala.collection.mutable.ArrayBuffer
 

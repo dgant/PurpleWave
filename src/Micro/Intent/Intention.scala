@@ -1,6 +1,6 @@
 package Micro.Intent
 
-import Information.Battles.Types.TacticsOptions
+import Information.Battles.TacticsTypes.TacticsOptions
 import Lifecycle.With
 import Mathematics.Pixels.Tile
 import Micro.Behaviors.{MovementProfiles, TargetingProfiles}

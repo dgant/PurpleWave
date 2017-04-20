@@ -1,49 +1,222 @@
 package Information.Battles.Estimation
 
-import Information.Battles.Types.{Battle, BattleGroup}
+import Information.Battles.BattleTypes.{Battle, BattleGroup}
+import Information.Battles.TacticsTypes.{Tactics, TacticsOptions, TacticsOptionsDefault}
 import Lifecycle.With
-import Mathematics.Pixels.Pixel
+import Mathematics.PurpleMath
+import ProxyBwapi.Engine.Damage
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.UnitInfo
+import bwapi.UnitSizeType
+
+import scala.collection.mutable
 
 object BattleEstimator {
   
   def run() {
-    With.battles.all.foreach(battle =>
-      battle.groups.foreach(group =>
-        group.strength = BattleEstimator.estimateStrength(group, battle)))
+    With.battles.all.foreach(estimate)
   }
   
-  def contextualDesire(battle:Battle):Double = {
-    var desire = 1.0
-    val zone = With.geography.zones.filter(_.bwtaRegion.getPolygon.isInside(battle.enemy.vanguard.bwapi))
-    if (zone.exists(_.owner == With.self)) desire *= 2
-    return desire
+  def estimate(battle:Battle) {
+    battle.estimations = battle.us.tacticsAvailable.map(ourTactics => estimateWithTactics(battle, ourTactics, new TacticsOptionsDefault))
   }
   
-  def estimateStrength(group:BattleGroup, battle:Battle):Double = {
-    group.units.view.map(estimateStrength).sum
-  }
+  def estimateWithTactics(battle:Battle, tacticsUs:TacticsOptions, tacticsEnemy:TacticsOptions):BattleEstimation = {
   
-  def estimateStrength(unit:UnitInfo):Double = {
-    var dps = unit.unitClass.groundDps
+    val fightDuration = 24 * (
+      (if (tacticsUs    .has(Tactics.Movement.Charge))  4 else 0) +
+      (if (tacticsEnemy .has(Tactics.Movement.Charge))  4 else 0) +
+      (if (tacticsUs    .has(Tactics.Movement.Kite))    2 else 0) +
+      (if (tacticsEnemy .has(Tactics.Movement.Kite))    2 else 0))
     
-    //Fails to account for casters
-    //Fails to account for upgrades (including range upgrades)
+    var damageToUs          = 0.0
+    var damageToEnemy       = 0.0
     
-    if (unit.is(Terran.Medic)) dps = 18.6
+    val participantsUs      = buildParticipants(battle, battle.us, battle.enemy, tacticsUs, tacticsEnemy, fightDuration)
+    val participantsEnemy   = buildParticipants(battle, battle.enemy, battle.us, tacticsEnemy, tacticsUs, fightDuration)
     
-    //Altitude/doodad misses only apply to ranged units
-    val highGroundBonus =  With.grids.altitudeBonus.get(unit.tileIncludingCenter)
-    val combatEfficacy = dps * Math.pow(unit.totalHealth, 1.2) * highGroundBonus
-    Math.max(0, combatEfficacy)
+    if (participantsUs.nonEmpty && participantsEnemy.nonEmpty) {
+      val damageSpreadUs      = participantsUs.size
+      val damageSpreadEnemy   = participantsEnemy.size
+      
+      val damageDealtByUs     = newDamageMap
+      val damageDealtByEnemy  = newDamageMap
+      
+      participantsUs    .foreach(dealDamage(_, damageDealtByUs))
+      participantsEnemy .foreach(dealDamage(_, damageDealtByEnemy))
+      
+      damageToUs    = participantsUs    .map(costOfDamage(_, damageDealtByEnemy)).sum / participantsUs.size
+      damageToEnemy = participantsEnemy .map(costOfDamage(_, damageDealtByEnemy)).sum / participantsEnemy.size
+    }
+      
+    new BattleEstimation(
+      battle,
+      tacticsUs,
+      damageToUs,
+      damageToEnemy)
   }
   
-  def estimateStrength(unit:UnitInfo, position:Pixel):Double = {
-    val distanceDropoff = 16.0
-    val distanceCutoff  = 32.0 * 4
-    val distance        = Math.max(0, unit.pixelDistanceFast(position) - unit.unitClass.maxAirGroundRange)
-    val distanceFactor  = Math.max(0.0, Math.min(1.0, (distanceCutoff + distanceDropoff - distance ) / distanceCutoff))
-    distanceFactor * estimateStrength(unit)
+  private type DamageMap = mutable.HashMap[VulnerabilityProfile, Double]
+  
+  private def newDamageMap:DamageMap = {
+    val output = new mutable.HashMap[VulnerabilityProfile, Double]
+    output(VulnerabilityProfile(false,  UnitSizeType.Small))  = 0
+    output(VulnerabilityProfile(false,  UnitSizeType.Medium)) = 0
+    output(VulnerabilityProfile(false,  UnitSizeType.Large))  = 0
+    output(VulnerabilityProfile(true,   UnitSizeType.Small))  = 0
+    output(VulnerabilityProfile(true,   UnitSizeType.Medium)) = 0
+    output(VulnerabilityProfile(true,   UnitSizeType.Large))  = 0
+    output
+  }
+  
+  private def dealDamage(attacker:Participant, damageMap:DamageMap) {
+    damageMap(new VulnerabilityProfile(false, UnitSizeType.Small))    = attacker.involvement * attacker.dpsGroundSmall
+    damageMap(new VulnerabilityProfile(false, UnitSizeType.Medium))   = attacker.involvement * attacker.dpsGroundMedium
+    damageMap(new VulnerabilityProfile(false, UnitSizeType.Large))    = attacker.involvement * attacker.dpsGroundLarge
+    damageMap(new VulnerabilityProfile(true,  UnitSizeType.Small))    = attacker.involvement * attacker.dpsAirSmall
+    damageMap(new VulnerabilityProfile(true,  UnitSizeType.Medium))   = attacker.involvement * attacker.dpsAirMedium
+    damageMap(new VulnerabilityProfile(true,  UnitSizeType.Large))    = attacker.involvement * attacker.dpsAirLarge
+  }
+  
+  private def costOfDamage(defender:Participant, damageMap:DamageMap):Double = {
+    damageMap(defender.vulnerabilityProfile) * defender.exposure * defender.valueRatio
+  }
+  
+  private case class VulnerabilityProfile(flying: Boolean, size: UnitSizeType)
+  
+  private class Participant(
+    val dpsGroundSmall        : Double,
+    val dpsGroundMedium       : Double,
+    val dpsGroundLarge        : Double,
+    val dpsAirSmall           : Double,
+    val dpsAirMedium          : Double,
+    val dpsAirLarge           : Double,
+    val involvement           : Double,
+    val exposure              : Double,
+    val vulnerabilityProfile  : VulnerabilityProfile,
+    val valueRatio            : Double)
+  
+  private def buildParticipants(
+    battle        : Battle,
+    groupThis     : BattleGroup,
+    groupThat     : BattleGroup,
+    tacticsThis   : TacticsOptions,
+    tacticsThat   : TacticsOptions,
+    fightDuration : Int)
+      : Vector[Participant] = {
+    
+    val enemyRangeMean    = Math.max(32.0, PurpleMath.mean(groupThat.units.filter(_.canAttackThisSecond).map(_.pixelRangeMax)))
+    val flyerValue        = groupThat.units.filter(_.flying).map(_.subjectiveValue).sum.toDouble
+    val groundValue       = groupThat.units.filter(! _.flying).map(_.subjectiveValue).sum.toDouble
+    val enemyGroundRatio  = if (groundValue + flyerValue == 0) 1.0 else groundValue / (flyerValue + groundValue)
+    
+    groupThis.units
+      //Irrelevant units are only participating if their team is abandoning them
+      .filter(unit => unit.alive && (tacticsThis.has(Tactics.Movement.Flee) || unit.unitClass.helpsInCombat))
+      .map(unit => buildParticipant(
+        battle,
+        unit,
+        enemyRangeMean,
+        enemyGroundRatio,
+        tacticsThis,
+        tacticsThat,
+        fightDuration))
+  }
+  
+  private def buildParticipant(
+    battle            : Battle,
+    unit              : UnitInfo,
+    enemyRangeMean    : Double,
+    enemyGroundRatio  : Double,
+    tacticsThis       : TacticsOptions,
+    tacticsThat       : TacticsOptions,
+    fightDuration     : Int)
+      : Participant = {
+    
+    val canAttack                   = unit.canAttackThisSecond
+    val attacksGround               = unit.unitClass.attacksGround
+    val attacksAir                  = unit.unitClass.attacksAir
+    val damageTypeGround            = unit.unitClass.groundDamageTypeRaw
+    val damageTypeAir               = unit.unitClass.airDamageTypeRaw
+    val dpsGround                   = unit.groundDps
+    val dpsAir                      = unit.airDps
+    val vulnerabilityProfile               = new VulnerabilityProfile(unit.flying, unit.unitClass.size)
+    val value                       = unit.unitClass.mineralValue * 3.0 + unit.unitClass.gasValue * 2.0
+    val valueRatio                  = value * 2 / (unit.totalHealth + unit.unitClass.maxTotalHealth)
+    
+    val distanceFactor              = 32.0 * 4.0 //How far from the focus renders a unit irrelevant
+    val isFighting                  = isFighter(unit, tacticsThis)
+    val isCharging                  = isFighting && tacticsThis.has(Tactics.Movement.Charge)
+    val isFleeing                   = isFleer(unit, tacticsThis)
+    val currentDistanceFromFocus    = unit.pixelDistanceFast(battle.focus)
+    val targetDistanceFromFocus     = if (isFighting) unit.pixelRangeMax else Terran.SiegeTankSieged.maxAirGroundRange
+    
+    val involvementDistanceInitial  = Math.max(0.0, currentDistanceFromFocus - unit.pixelRangeMax)
+    val involvementDistanceFinal    = Math.max(targetDistanceFromFocus, involvementDistanceInitial - unit.topSpeed * fightDuration)
+    val involvementCap              = if (isCharging) 1.0 else if (isFighting) 0.75 else 0.0
+    val involvement                 = Math.min(involvementCap, Math.max(0.0, 1.0 - (involvementDistanceInitial + involvementDistanceFinal) / 2.0 / distanceFactor))
+    
+    val exposureDistanceInitial     = Math.max(0.0, currentDistanceFromFocus - enemyRangeMean)
+    val exposureDistanceFinal       = if (isFleeing) exposureDistanceInitial + unit.topSpeed * fightDuration else involvementDistanceFinal
+    val exposureCap                 = Math.max(involvementCap, 0.5)
+    val exposure                    = Math.min(exposureCap, Math.max(0.0, 1.0 - (exposureDistanceInitial + exposureDistanceFinal) / 2.0 / distanceFactor)  )
+
+    val attackGround      = unit.groundDps  > 0 && ! tacticsThis.has(Tactics.Focus.Air)
+    val attackAir         = unit.airDps     > 0 && ! tacticsThis.has(Tactics.Focus.Ground)
+    val damageFocusGround = if (attackGround && attackAir)       enemyGroundRatio else if (attackGround)  1.0 else 0.0
+    val damageFocusAir    = if (attackGround && attackAir) 1.0 - enemyGroundRatio else if (attackAir)     1.0 else 0.0
+    val dpsGroundSmall    = if (isFighting) damageFocusGround * unit.groundDps  * Damage.scaleBySize(unit.unitClass.groundDamageTypeRaw,  UnitSizeType.Small)   else 0.0
+    val dpsGroundMedium   = if (isFighting) damageFocusGround * unit.groundDps  * Damage.scaleBySize(unit.unitClass.groundDamageTypeRaw,  UnitSizeType.Medium)  else 0.0
+    val dpsGroundLarge    = if (isFighting) damageFocusGround * unit.groundDps  * Damage.scaleBySize(unit.unitClass.groundDamageTypeRaw,  UnitSizeType.Large)   else 0.0
+    val dpsAirSmall       = if (isFighting) damageFocusAir    * unit.airDps     * Damage.scaleBySize(unit.unitClass.airDamageTypeRaw,     UnitSizeType.Small)   else 0.0
+    val dpsAirMedium      = if (isFighting) damageFocusAir    * unit.airDps     * Damage.scaleBySize(unit.unitClass.airDamageTypeRaw,     UnitSizeType.Medium)  else 0.0
+    val dpsAirLarge       = if (isFighting) damageFocusAir    * unit.airDps     * Damage.scaleBySize(unit.unitClass.airDamageTypeRaw,     UnitSizeType.Large)   else 0.0
+    
+    new Participant(
+      dpsGroundSmall,
+      dpsGroundMedium,
+      dpsGroundLarge,
+      dpsAirSmall,
+      dpsAirMedium,
+      dpsAirLarge,
+      involvement,
+      exposure,
+      vulnerabilityProfile,
+      valueRatio)
+  }
+  
+  private def meanSpeed(units:Traversable[UnitInfo]):Double = {
+    PurpleMath.mean(units.filter(unit => unit.alive && unit.canMoveThisFrame).map(_.topSpeed))
+  }
+  
+  //Hacky way to implement the "fight with half of all workers" tactic
+  //And yes, this is static statefulness (which we try to avoid) but of a hopefully innocuous kind.
+  private var acceptNextWorker:Boolean = false
+  
+  private def isFighter(unit:UnitInfo, tactics:TacticsOptions):Boolean = {
+    if ( ! unit.alive) return false
+    if (unit.unitClass.isWorker) {
+      if (tactics.has(Tactics.Workers.FightAll)) {
+        return true
+      }
+      if (tactics.has(Tactics.Workers.FightHalf)) {
+        acceptNextWorker = ! acceptNextWorker
+        return acceptNextWorker
+      }
+      return false
+    }
+    if (unit.wounded && tactics.has(Tactics.Wounded.Flee)) {
+      return false
+    }
+    if (tactics.has(Tactics.Movement.Flee)) {
+      return false
+    }
+    unit.unitClass.helpsInCombat
+  }
+  
+  private def isFleer(unit:UnitInfo, tactics:TacticsOptions):Boolean = {
+    unit.canMoveThisFrame &&
+      ! isFighter(unit, tactics) &&
+      ( ! unit.unitClass.isWorker || tactics.has(Tactics.Workers.Flee))
   }
 }

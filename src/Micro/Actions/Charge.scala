@@ -1,5 +1,5 @@
 package Micro.Actions
-import Information.Battles.Types.Tactics
+import Information.Battles.TacticsTypes.Tactics
 import Micro.Behaviors.MovementProfiles
 import Micro.Intent.Intention
 import Planning.Yolo

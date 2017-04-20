@@ -1,6 +1,6 @@
 package Information.Battles
 
-import Information.Battles.Types.{Battle, BattleGroup}
+import Information.Battles.BattleTypes.{Battle, BattleGroup}
 import Information.Geography.Types.Zone
 import Lifecycle.With
 import Mathematics.Pixels.Tile

@@ -1,8 +1,9 @@
-package Information.Battles.Types
+package Information.Battles.BattleTypes
 
 import Information.Battles.Estimation.BattleEstimation
 import Information.Battles.EvaluateTactics
 import Information.Battles.Simulation.Construction.BattleSimulation
+import Information.Battles.TacticsTypes.TacticsOptions
 import Mathematics.Pixels.Pixel
 import Performance.Caching.CacheFrame
 

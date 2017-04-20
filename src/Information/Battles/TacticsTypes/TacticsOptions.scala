@@ -1,4 +1,4 @@
-package Information.Battles.Types
+package Information.Battles.TacticsTypes
 
 class TacticsOptions(private var options:Int = 0) {
   

@@ -1,7 +1,8 @@
 package Information.Battles
 
 import Information.Battles.Heuristics.{TacticsHeuristicEstimatedStrength, TacticsHeuristicSimulatedLosses, TacticsHeuristicWeight}
-import Information.Battles.Types.{Battle, TacticsOptions}
+import Information.Battles.BattleTypes.Battle
+import Information.Battles.TacticsTypes.TacticsOptions
 import Mathematics.Heuristics.HeuristicMath
 
 object EvaluateTactics {

@@ -1,6 +1,7 @@
-package Information.Battles.Types
+package Information.Battles.BattleTypes
 
-import Information.Battles.Types.Tactics.Tactic
+import Information.Battles.TacticsTypes.Tactics.Tactic
+import Information.Battles.TacticsTypes.{Tactics, TacticsOptions}
 import Mathematics.Pixels.{Pixel, Points}
 import ProxyBwapi.UnitInfo.UnitInfo
 
@@ -29,13 +30,18 @@ class BattleGroup(val units:Vector[UnitInfo]) {
             output.add(wounded)
             output
           }))))
+      .filterNot(output =>
+        (output.has(Tactics.Movement.Kite) && output.has(Tactics.Workers.FightAll))   ||
+        (output.has(Tactics.Movement.Kite) && output.has(Tactics.Workers.FightHalf))  ||
+        (output.has(Tactics.Movement.Flee) && output.has(Tactics.Workers.FightAll))   ||
+        (output.has(Tactics.Movement.Flee) && output.has(Tactics.Workers.FightHalf))  ||
+        (output.has(Tactics.Movement.Kite) && output.has(Tactics.Wounded.Fight)))
   
   lazy val tacticsAvailableMovement:Vector[Tactic] = {
     val output = new ArrayBuffer[Tactic]
     if (mobile) {
       output += Tactics.Movement.Charge
       output += Tactics.Movement.Flee
-    
       if (opponent.mobile) {
         output += Tactics.Movement.Kite
       }

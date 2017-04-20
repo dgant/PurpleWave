@@ -1,6 +1,6 @@
 package Information.Battles.Simulation.Construction
 
-import Information.Battles.Types.TacticsOptions
+import Information.Battles.TacticsTypes.TacticsOptions
 import Lifecycle.With
 
 class BattleSimulation(

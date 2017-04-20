@@ -1,6 +1,6 @@
 package Information.Battles
 
-import Information.Battles.Types.Battle
+import Information.Battles.BattleTypes.Battle
 import Lifecycle.With
 import Mathematics.Pixels.Points
 

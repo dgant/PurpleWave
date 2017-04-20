@@ -1,6 +1,6 @@
 package Performance.Tasks.Global
 
-import Information.Battles.Simulation.BattleSimulator
+import Information.Battles.Simulation.Execution.BattleSimulator
 import Lifecycle.With
 import Performance.Tasks.AbstractTask
 

@@ -3,6 +3,7 @@ package ProxyBwapi.UnitInfo
 import Lifecycle.With
 import Mathematics.Pixels.{Pixel, Tile, TileRectangle}
 import Performance.Caching.CacheFrame
+import ProxyBwapi.Engine.Damage
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitClass.UnitClass
 import bwapi._
@@ -22,6 +23,14 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   
   def mineralsLeft  : Int = if (unitClass.isMinerals) resourcesLeft else 0
   def gasLeft       : Int = if (unitClass.isGas)      resourcesLeft else 0
+  
+  def wounded:Boolean = totalHealth < Math.min(20, unitClass.maxTotalHealth/3)
+  
+  ///////////////
+  // Economics //
+  ///////////////
+  
+  def subjectiveValue: Int = unitClass.subjectiveValue + scarabs * Protoss.Scarab.subjectiveValue + interceptors * Protoss.Interceptor.subjectiveValue
   
   //////////////
   // Geometry //
@@ -47,6 +56,8 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
       (if (is(Terran.Marine)    && player.getUpgradeLevel(Terran.MarineRange)     > 0)  32.0 else 0.0) +
       (if (is(Protoss.Dragoon)  && player.getUpgradeLevel(Protoss.DragoonRange)   > 0)  64.0 else 0.0) +
       (if (is(Zerg.Hydralisk)   && player.getUpgradeLevel(Zerg.HydraliskRange)    > 0)  32.0 else 0.0))
+  
+  def pixelRangeMax:Double = Math.max(pixelRangeAir, pixelRangeGround)
   
   def canTraverse           (tile:        Tile)     : Boolean = flying || With.grids.walkable.get(tile)
   def pixelsFromEdgeSlow    (otherUnit:   UnitInfo) : Double  = pixelDistanceSlow(otherUnit) - unitClass.radialHypotenuse - otherUnit.unitClass.radialHypotenuse
@@ -119,7 +130,7 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
     output
   }
     
-  def attacksAgainstAir     : Int = unitClass.airDamageFactorRaw    * unitClass.maxAirHitsRaw
+  def attacksAgainstAir: Int = unitClass.airDamageFactorRaw    * unitClass.maxAirHitsRaw
   
   def cooldownLeft                          : Int         = Math.max(airCooldownLeft, groundCooldownLeft)
   def cooldownLeftAgainst (enemy:UnitInfo)  : Int         =  if (enemy.flying) airCooldownLeft                else groundCooldownLeft
@@ -129,20 +140,14 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   def attacksAgainst      (enemy:UnitInfo)  : Int         =  if (enemy.flying) attacksAgainstAir              else attacksAgainstGround
   
   def damageScaleAgainst(enemy:UnitInfo): Double =
-    if (enemy.shieldPoints > 5) 1.0 else
-    damageTypeAgainst(enemy) match {
-    case DamageType.Concussive => enemy.unitClass.size match {
-      case UnitSizeType.Large   => 0.25
-      case UnitSizeType.Medium  => 0.5
-      case _                    => 1.0
-    }
-    case DamageType.Explosive => enemy.unitClass.size match {
-      case UnitSizeType.Small   => 0.5
-      case UnitSizeType.Medium  => 0.75
-      case _                    => 1.0
-    }
-    case _ => 1.0
-  }
+    if (enemy.flying && airDps > 0)
+      if (enemy.shieldPoints > 5) 1.0
+      else Damage.scaleBySize(unitClass.airDamageTypeRaw, enemy.unitClass.size)
+    else if (groundDps > 0)
+      if (enemy.shieldPoints > 5) 1.0
+      else Damage.scaleBySize(unitClass.groundDamageTypeRaw, enemy.unitClass.size)
+    else
+      0.0
   
   def damageAgainst(enemy:UnitInfo, enemyShields:Int = 0) : Int = {
     val hits = attacksAgainst(enemy)

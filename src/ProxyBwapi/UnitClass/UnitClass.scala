@@ -265,6 +265,7 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
     addBuildUnitIf(classes, this == ifThisClass, thenAddThatClass)
   }
   
-  lazy val mineralValue : Int = mineralPrice + buildUnitsSpent.map(_.mineralValue).sum
-  lazy val gasValue     : Int = mineralPrice + buildUnitsSpent.map(_.gasValue).sum
+  lazy val mineralValue     : Int = mineralPrice + buildUnitsSpent.map(_.mineralValue).sum
+  lazy val gasValue         : Int = mineralPrice + buildUnitsSpent.map(_.gasValue).sum
+  lazy val subjectiveValue  : Int = (3 * mineralValue + 2 * gasValue) * (if(isWorker) 2 else 1)
 }

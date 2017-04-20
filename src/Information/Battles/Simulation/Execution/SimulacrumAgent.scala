@@ -1,7 +1,7 @@
-package Information.Battles.Simulation
+package Information.Battles.Simulation.Execution
 
 import Information.Battles.Simulation.Construction.{BattleSimulation, BattleSimulationGroup, Simulacrum}
-import Information.Battles.Types.Tactics
+import Information.Battles.TacticsTypes.Tactics
 import Mathematics.Pixels.Pixel
 
 object SimulacrumAgent {

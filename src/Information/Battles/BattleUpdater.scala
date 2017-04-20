@@ -13,8 +13,7 @@ object BattleUpdater {
   def updateBattle(battle:Battle) {
     if (battle.happening) {
       battle.groups.foreach(group => {
-        val otherGroup = battle.groups.filterNot(_ == group).head
-        group.vanguard = group.units.minBy(unit => otherGroup.units.map(unit.pixelDistanceSquared).min).pixelCenter
+        group.vanguard = group.units.minBy(unit => group.opponent.units.map(unit.pixelDistanceSquared).min).pixelCenter
       })
     }
     else {

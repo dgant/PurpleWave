@@ -58,31 +58,35 @@ object BattleEstimator {
   
   private type DamageMap = mutable.HashMap[VulnerabilityProfile, Double]
   
+  private val small = 0
+  private val medium = 1
+  private val large = 2
+  
   private def newDamageMap:DamageMap = {
     val output = new mutable.HashMap[VulnerabilityProfile, Double]
-    output(VulnerabilityProfile(false,  UnitSizeType.Small))  = 0
-    output(VulnerabilityProfile(false,  UnitSizeType.Medium)) = 0
-    output(VulnerabilityProfile(false,  UnitSizeType.Large))  = 0
-    output(VulnerabilityProfile(true,   UnitSizeType.Small))  = 0
-    output(VulnerabilityProfile(true,   UnitSizeType.Medium)) = 0
-    output(VulnerabilityProfile(true,   UnitSizeType.Large))  = 0
+    output(VulnerabilityProfile(false,  small))  = 0
+    output(VulnerabilityProfile(false,  medium)) = 0
+    output(VulnerabilityProfile(false,  large))  = 0
+    output(VulnerabilityProfile(true,   small))  = 0
+    output(VulnerabilityProfile(true,   medium)) = 0
+    output(VulnerabilityProfile(true,   large))  = 0
     output
   }
   
   private def dealDamage(attacker:Participant, damageMap:DamageMap) {
-    damageMap(new VulnerabilityProfile(false, UnitSizeType.Small))    = attacker.involvement * attacker.dpsGroundSmall
-    damageMap(new VulnerabilityProfile(false, UnitSizeType.Medium))   = attacker.involvement * attacker.dpsGroundMedium
-    damageMap(new VulnerabilityProfile(false, UnitSizeType.Large))    = attacker.involvement * attacker.dpsGroundLarge
-    damageMap(new VulnerabilityProfile(true,  UnitSizeType.Small))    = attacker.involvement * attacker.dpsAirSmall
-    damageMap(new VulnerabilityProfile(true,  UnitSizeType.Medium))   = attacker.involvement * attacker.dpsAirMedium
-    damageMap(new VulnerabilityProfile(true,  UnitSizeType.Large))    = attacker.involvement * attacker.dpsAirLarge
+    damageMap(new VulnerabilityProfile(false, small))    = attacker.involvement * attacker.dpsGroundSmall
+    damageMap(new VulnerabilityProfile(false, medium))   = attacker.involvement * attacker.dpsGroundMedium
+    damageMap(new VulnerabilityProfile(false, large))    = attacker.involvement * attacker.dpsGroundLarge
+    damageMap(new VulnerabilityProfile(true,  small))    = attacker.involvement * attacker.dpsAirSmall
+    damageMap(new VulnerabilityProfile(true,  medium))   = attacker.involvement * attacker.dpsAirMedium
+    damageMap(new VulnerabilityProfile(true,  large))    = attacker.involvement * attacker.dpsAirLarge
   }
   
   private def costOfDamage(defender:Participant, damageMap:DamageMap):Double = {
     damageMap(defender.vulnerabilityProfile) * defender.exposure * defender.valueRatio
   }
   
-  private case class VulnerabilityProfile(flying: Boolean, size: UnitSizeType)
+  private case class VulnerabilityProfile(flying: Boolean, size: Int)
   
   private class Participant(
     val dpsGroundSmall        : Double,
@@ -140,7 +144,7 @@ object BattleEstimator {
     val damageTypeAir               = unit.unitClass.airDamageTypeRaw
     val dpsGround                   = unit.groundDps
     val dpsAir                      = unit.airDps
-    val vulnerabilityProfile        = new VulnerabilityProfile(unit.flying, unit.unitClass.size)
+    val vulnerabilityProfile        = new VulnerabilityProfile(unit.flying, sizeTypeToInt(unit.unitClass.size))
     val value                       = unit.unitClass.mineralValue * 3.0 + unit.unitClass.gasValue * 2.0
     val valueRatio                  = value * 2 / (unit.totalHealth + unit.unitClass.maxTotalHealth)
     
@@ -184,6 +188,13 @@ object BattleEstimator {
       vulnerabilityProfile,
       valueRatio)
   }
+  
+  private def sizeTypeToInt(sizeType:UnitSizeType):Int =
+    sizeType match {
+      case UnitSizeType.Small => small
+      case UnitSizeType.Large => large
+      case _                  => medium
+    }
   
   private def meanSpeed(units:Traversable[UnitInfo]):Double = {
     PurpleMath.mean(units.filter(unit => unit.alive && unit.canMoveThisFrame).map(_.topSpeed))

@@ -7,7 +7,9 @@ class AutoCamera {
   
   var focus:Pixel = Points.middle
   
+  private val refocusLimit = 48
   private var lastJumpFrame = -240
+  private val tween
   
   def onFrame() {
     
@@ -24,11 +26,11 @@ class AutoCamera {
         .sortBy( ! _.canAttackThisSecond)
         .sortBy( ! _.canMoveThisFrame)
         .head
-        .pixelCenter
+        .project(refocusLimit)
       setCameraSpeed(With.configuration.cameraDynamicSpeedFastest)
     }
   
-    if (focus.pixelDistanceFast(newFocus) < 96.0 || With.frame - lastJumpFrame > 48 ) {
+    if (focus.pixelDistanceFast(newFocus) < 96.0 || With.frame - lastJumpFrame > refocusLimit ) {
       focus = newFocus
       lastJumpFrame = With.frame
     }

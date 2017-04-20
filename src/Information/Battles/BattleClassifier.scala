@@ -143,9 +143,10 @@ class BattleClassifier {
   }
   
   def adoptMetrics(oldBattle:Battle, newBattle:Battle) {
-    newBattle.us.strength    = oldBattle.us.strength
-    newBattle.enemy.strength = oldBattle.enemy.strength
-    newBattle.simulations    = oldBattle.simulations
+    newBattle.us.strength     = oldBattle.us.strength
+    newBattle.enemy.strength  = oldBattle.enemy.strength
+    newBattle.simulations     = oldBattle.simulations
+    newBattle.estimations     = oldBattle.estimations
   }
 
   def upcastOurs  (units:Vector[FriendlyUnitInfo]) : Vector[UnitInfo] = units.map(_.asInstanceOf[UnitInfo])

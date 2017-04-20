@@ -54,9 +54,9 @@ class UnitClassProxy(val baseType:UnitType) {
   lazy val isSpellcaster            = baseType.isSpellcaster
   lazy val isTwoUnitsInOneEgg       = baseType.isTwoUnitsInOneEgg
   lazy val isWorker                 = baseType.isWorker
-  lazy val maxAirHitsRaw               = baseType.maxAirHits
+  lazy val maxAirHitsRaw            = baseType.maxAirHits
   lazy val maxEnergy                = baseType.maxEnergy
-  lazy val maxGroundHitsRaw            = baseType.maxGroundHits
+  lazy val maxGroundHitsRaw         = baseType.maxGroundHits
   lazy val maxHitPoints             = baseType.maxHitPoints
   lazy val maxShields               = baseType.maxShields
   lazy val mineralPrice             = baseType.mineralPrice

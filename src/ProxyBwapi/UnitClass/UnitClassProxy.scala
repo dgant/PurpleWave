@@ -3,7 +3,7 @@ package ProxyBwapi.UnitClass
 import Mathematics.Pixels.Tile
 import ProxyBwapi.Techs.Techs
 import ProxyBwapi.Upgrades.Upgrades
-import bwapi.UnitType
+import bwapi.{UnitSizeType, UnitType}
 
 import scala.collection.JavaConverters._
 
@@ -70,7 +70,7 @@ class UnitClassProxy(val baseType:UnitType) {
   lazy val researchesWhat           = baseType.researchesWhat.asScala.map(Techs.get)
   lazy val seekRange                = baseType.seekRange
   lazy val sightRange               = baseType.sightRange
-  lazy val size                     = baseType.size
+  lazy val size                     = getSize
   lazy val spaceProvided            = baseType.spaceProvided
   lazy val spaceRequired            = baseType.spaceRequired
   lazy val supplyProvided           = baseType.supplyProvided
@@ -103,4 +103,40 @@ class UnitClassProxy(val baseType:UnitType) {
   lazy val groundMinRangeRaw        = baseType.groundWeapon.minRange
   lazy val groundRangeRaw           = baseType.groundWeapon.maxRange
   lazy val asString                 = baseType.toString
+  
+  // .size is broken in BWMirror. This is a manual replacement.
+  // Data via http://classic.battle.net/scc/GS/damage.shtml
+  def getSize:UnitSizeType = {
+    if (Vector(
+      UnitType.Terran_SCV,
+      UnitType.Terran_Marine,
+      UnitType.Terran_Firebat,
+      UnitType.Terran_Medic,
+      UnitType.Protoss_Probe,
+      UnitType.Protoss_Zealot,
+      UnitType.Protoss_High_Templar,
+      UnitType.Protoss_Dark_Templar,
+      UnitType.Protoss_Observer,
+      UnitType.Protoss_Interceptor,
+      UnitType.Zerg_Larva,
+      UnitType.Zerg_Drone,
+      UnitType.Zerg_Zergling,
+      UnitType.Zerg_Infested_Terran,
+      UnitType.Zerg_Broodling,
+      UnitType.Zerg_Scourge,
+      UnitType.Zerg_Mutalisk
+    ).contains(baseType))
+      UnitSizeType.Small
+    else if (Vector(
+      UnitType.Terran_Vulture,
+      UnitType.Protoss_Corsair,
+      UnitType.Zerg_Hydralisk,
+      UnitType.Zerg_Defiler,
+      UnitType.Zerg_Queen,
+      UnitType.Zerg_Lurker
+    ).contains(baseType))
+      UnitSizeType.Medium
+    else
+      UnitSizeType.Large
+  }
 }

@@ -9,7 +9,7 @@ class AutoCamera {
   
   private val refocusLimit = 48
   private var lastJumpFrame = -240
-  private val tween
+  //private val tween
   
   def onFrame() {
     

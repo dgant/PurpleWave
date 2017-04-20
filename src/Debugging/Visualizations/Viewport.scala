@@ -13,8 +13,8 @@ class Viewport {
   def centerOn(pixel:Pixel) {
     With.game.setScreenPosition(
       pixel.subtract(
-        With.configuration.viewportWidth,
-        With.configuration.viewportHeight)
+        With.configuration.cameraViewportWidth  / 2,
+        With.configuration.cameraViewportHeight / 2)
       .bwapi)
   }
   
@@ -29,5 +29,5 @@ class Viewport {
   private val endcache    = new CacheFrame[Pixel](() => endRecalculate)
   
   private def startRecalculate  : Pixel = new Pixel(With.game.getScreenPosition)
-  private def endRecalculate    : Pixel = start.add(With.configuration.viewportWidth, With.configuration.viewportHeight)
+  private def endRecalculate    : Pixel = start.add(With.configuration.conservativeViewportWidth, With.configuration.conservativeViewportHeight)
 }

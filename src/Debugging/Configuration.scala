@@ -42,8 +42,10 @@ class Configuration {
   var cameraDynamicSpeed          = true
   var cameraDynamicSpeedSlowest   = 30
   var cameraDynamicSpeedFastest   = 0
-  var viewportWidth               = 640 * 2
-  var viewportHeight              = 480 * 2
+  var cameraViewportWidth         = 640
+  var cameraViewportHeight        = 362
+  var conservativeViewportWidth   = 640 + cameraViewportWidth
+  var conservativeViewportHeight  = 480 + cameraViewportHeight
   
   var maxFrameMilliseconds = 25
   

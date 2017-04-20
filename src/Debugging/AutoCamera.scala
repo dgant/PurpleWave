@@ -2,48 +2,49 @@ package Debugging
 
 import Lifecycle.With
 import Mathematics.Pixels.{Pixel, Points}
+import ProxyBwapi.UnitInfo.UnitInfo
 
 class AutoCamera {
   
-  var origin  : Pixel = Points.middle
-  var focus   : Pixel = Points.middle
+  private var tweenFrom: Pixel = Points.middle
+  private var focus = Points.middle
   
-  private val refocusLimit = 48
+  private val refocusLimit = 96
   private var focusFrame = -240
-  private val tweenFrames = 12
+  private val tweenFrames = 24
+  private var focusUnit:UnitInfo = null
   
   def onFrame() {
     
     if ( ! With.configuration.camera) { return }
+    
+    val battles = With.battles.local.filter(_.happening)
   
-    var newFocus = focus
+    if (battles.nonEmpty) {
+      
+      val battle = battles.maxBy(b => b.enemy.strength * b.us.strength)
   
-    if (With.battles.local.nonEmpty) {
-      
-      moveFocus(With.battles.local
-        .sortBy(_.focus.pixelDistanceFast(focus))
-        .maxBy(b => b.enemy.strength * b.us.strength).us.vanguard)
-      
       setCameraSpeed(With.configuration.cameraDynamicSpeedSlowest)
+      focusOn(battle.us.units.minBy(_.pixelDistanceSquared(battle.us.vanguard)))
+        
     } else if (With.units.ours.nonEmpty) {
-      
-      moveFocus(With.units.ours.toList
+  
+      setCameraSpeed(With.configuration.cameraDynamicSpeedFastest)
+      focusOn(With.units.ours.toList
         .sortBy(_.pixelDistanceSquared(With.intelligence.mostBaselikeEnemyPixel.pixelCenter))
         .sortBy( ! _.canAttackThisSecond)
         .sortBy( ! _.canMoveThisFrame)
-        .head
-        .project(refocusLimit))
-      
-      setCameraSpeed(With.configuration.cameraDynamicSpeedFastest)
+        .head)
     }
     
     tween()
   }
   
-  def moveFocus(to:Pixel) {
+  def focusOn(unit:UnitInfo) {
+    if (With.frame - focusFrame < refocusLimit) return
+    focusUnit = unit
     focusFrame = With.frame
-    origin = With.viewport.center
-    focus = to
+    tweenFrom = focus
   }
   
   def setCameraSpeed(speed:Int) {
@@ -53,8 +54,11 @@ class AutoCamera {
   }
   
   def tween() {
-    val tweenFraction = Math.sqrt(Math.max(0.0, Math.min(1.0, (With.frame - focusFrame).toDouble/tweenFrames)))
-    val tweenPoint    = origin.project(focus, origin.pixelDistanceSlow(focus) * tweenFraction)
-    With.viewport.centerOn(tweenPoint)
+    if (focusUnit != null && focusUnit.alive) {
+      focus = focusUnit.pixelCenter
+      val tweenFraction = Math.max(0.0, Math.min(1.0, (With.frame - focusFrame + 1).toDouble/tweenFrames))
+      val tweenPoint    = tweenFrom.project(focus, tweenFrom.pixelDistanceSlow(focus) * tweenFraction)
+      With.viewport.centerOn(tweenPoint)
+    }
   }
 }

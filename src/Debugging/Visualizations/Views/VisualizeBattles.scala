@@ -3,6 +3,7 @@ package Debugging.Visualizations.Views
 import Debugging.Visualizations.Rendering.{DrawMap, DrawScreen}
 import Information.Battles.Simulation.Construction.{BattleSimulation, BattleSimulationGroup}
 import Information.Battles.BattleTypes.Battle
+import Information.Battles.Estimation.BattleEstimation
 import Information.Battles.TacticsTypes.{Tactics, TacticsOptions}
 import Lifecycle.With
 import Mathematics.Pixels.Pixel
@@ -16,11 +17,14 @@ object VisualizeBattles {
     With.game.drawTextScreen(521, 18, formatStrength(With.battles.global.us.strength))
     With.game.drawTextScreen(589, 18, formatStrength(With.battles.global.enemy.strength))
     With.battles.local.foreach(drawBattle)
-    val battlesWithSimulations = With.battles.local.filter(_.simulations.nonEmpty)
-    if (battlesWithSimulations.nonEmpty) {
-      
-      val battle = battlesWithSimulations.minBy(battle => battle.focus.pixelDistanceSquared(With.viewport.center))
-      drawBattleReport(battle.simulations.minBy(_.us.tactics == battle.consensusTactics))
+    val localBattles = With.battles.local.filter(_.happening)
+    if (localBattles.nonEmpty) {
+      val battle = localBattles.minBy(battle => battle.focus.pixelDistanceSquared(With.viewport.center))
+      val tactics = battle.consensusTactics
+      val simulation = battle.simulation(tactics)
+      val estimation = battle.estimation(tactics)
+      simulation.foreach(drawSimulationReport)
+      estimation.foreach(drawEstimationReport)
     }
     if (Yolo.enabled && With.frame / 24 % 2 == 0) {
       With.game.drawTextScreen(5, 5, "YOLO")
@@ -52,12 +56,18 @@ object VisualizeBattles {
       backgroundColor = winnerStrengthColor)
   }
   
-  private def drawBattleReport(battle:BattleSimulation) {
-    
-    val winner = if (battle.us.lostValue <= battle.enemy.lostValue) With.self else With.enemies.head
+  private def drawSimulationReport(simulation:BattleSimulation) {
+    val winner = if (simulation.us.lostValue <= simulation.enemy.lostValue) With.self else With.enemies.head
     With.game.drawTextScreen(new Pixel(5, 31).bwapi, "Advantage: " + winner.name)
-    drawPlayerReport(battle.us,     With.self.name,         new Pixel(5, 50))
-    drawPlayerReport(battle.enemy,  With.enemies.head.name, new Pixel(130, 50))
+    drawPlayerReport(simulation.us,     With.self.name,         new Pixel(5, 50))
+    drawPlayerReport(simulation.enemy,  With.enemies.head.name, new Pixel(130, 50))
+  }
+  
+  private def drawEstimationReport(estimation:BattleEstimation) {
+    With.game.setTextSize(bwapi.Text.Size.Enum.Large)
+    With.game.drawTextScreen(50, 255, "+" + estimation.damageToEnemy)
+    With.game.drawTextScreen(50, 315, "-" + estimation.damageToUs)
+    With.game.setTextSize(bwapi.Text.Size.Enum.Small)
   }
   
   private def drawPlayerReport(group: BattleSimulationGroup, name:String, origin:Pixel) {

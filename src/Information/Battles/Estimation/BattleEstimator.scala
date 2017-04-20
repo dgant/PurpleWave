@@ -14,7 +14,7 @@ import scala.collection.mutable
 object BattleEstimator {
   
   def run() {
-    With.battles.all.foreach(estimate)
+    With.battles.local.filter(_.happening).foreach(estimate)
   }
   
   def estimate(battle:Battle) {
@@ -140,7 +140,7 @@ object BattleEstimator {
     val damageTypeAir               = unit.unitClass.airDamageTypeRaw
     val dpsGround                   = unit.groundDps
     val dpsAir                      = unit.airDps
-    val vulnerabilityProfile               = new VulnerabilityProfile(unit.flying, unit.unitClass.size)
+    val vulnerabilityProfile        = new VulnerabilityProfile(unit.flying, unit.unitClass.size)
     val value                       = unit.unitClass.mineralValue * 3.0 + unit.unitClass.gasValue * 2.0
     val valueRatio                  = value * 2 / (unit.totalHealth + unit.unitClass.maxTotalHealth)
     

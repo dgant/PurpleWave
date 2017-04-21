@@ -78,7 +78,7 @@ object EvaluatePixels {
     
     val pixelsOrthogonal =
       (0 until 256 by 32).flatten(angle =>
-        Vector(144.0, 80.0, 62.0)
+        Vector(80.0, 62.0)
           .map(distance => startingPixel.radiate(angle, distance))
           .find(targetPixel =>
             With.grids.walkable.get(targetPixel.tileIncluding) && targetPixel.zone == startingZone))

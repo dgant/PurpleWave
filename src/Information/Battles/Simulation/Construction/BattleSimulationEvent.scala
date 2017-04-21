@@ -5,12 +5,12 @@ import Debugging.Visualizations.Rendering.DrawMap
 import Mathematics.Pixels.Pixel
 
 abstract class BattleSimulationEvent(
-  frame : Int,
-  unit  : Simulacrum) {
+  val frame : Int,
+  val unit  : Simulacrum) {
   
   val description:String
-  override def toString: String = description
   def draw()
+  override def toString: String = description
 }
 
 class BattleSimulationEventMove(
@@ -20,7 +20,7 @@ class BattleSimulationEventMove(
   val to        : Pixel)
     extends BattleSimulationEvent(argFrame, argUnit) {
   
-  val description = argUnit.toString + " moves to " + to
+  val description = frame + ": " + unit + " moves to " + to
   
   override def draw = DrawMap.arrow(from, to, Colors.MediumGray)
 }
@@ -31,7 +31,7 @@ class BattleSimulationEventAttacks(
   val target    : Simulacrum)
   extends BattleSimulationEvent(argFrame, argUnit) {
   
-  val description = argUnit.toString + " attacks " + target
+  val description = frame + ": " + unit + " attacks " + target
   
   val from = argUnit.pixel
   val to = target.pixel
@@ -53,7 +53,7 @@ class BattleSimulationEventTargets(
   
   val from = argUnit.pixel
   val to = target.pixel
-  val description = argUnit.toString + " targets " + target
+  val description = frame + ": " + unit + " targets " + target
   
   override def draw = DrawMap.arrow(from, to, Colors.DarkRed)
 }
@@ -66,7 +66,7 @@ class BattleSimulationEventFears(
   
   val from = argUnit.pixel
   val to = threat.pixel
-  val description = argUnit.toString + " fears " + threat
+  val description = frame + ": " + unit + " fears " + threat
   
   override def draw = DrawMap.arrow(from, to, Colors.DarkBlue)
 }

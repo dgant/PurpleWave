@@ -47,6 +47,16 @@ case class Pixel(val x:Int, val y:Int) {
     val delta = destination.subtract(this)
     delta.multiply(pixels/distance).add(this)
   }
+  private val angleToRadians = 2.0 * Math.PI / 256.0
+  def radiate(angle:Int, pixels:Double):Pixel = {
+    // According to JohnJ, Brood War understands 256 angles
+    // The BWAPI interface reduces this to a double (radians) with the cartesian origin (pointing right)
+    // We'll use 256 (to match the engine behavior) and the BWAPI origin
+    val radians = angleToRadians * angle
+    add(
+      (pixels * Math.cos(radians)).toInt,
+      (pixels * Math.sin(radians)).toInt)
+  }
   def midpoint(pixel:Pixel):Pixel = {
     add(pixel).divide(2)
   }

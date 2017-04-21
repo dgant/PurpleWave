@@ -26,6 +26,7 @@ class Simulacrum(val unit:UnitInfo) {
   
   var fleeing   : Boolean = false
   var fighting  : Boolean = true
+  var ignoring  : Boolean = false
   
   def totalLife     : Int     = hitPoints + shields
   def alive         : Boolean = totalLife > 0
@@ -39,11 +40,11 @@ class Simulacrum(val unit:UnitInfo) {
   def inRangeToAttack (enemy:Simulacrum)  : Boolean = rangeAgainst(enemy) * rangeAgainst(enemy) >= pixel.pixelDistanceSquared(enemy.pixel)
 
   override def toString:String = (
-    pixel.toString
-    + " "
-    + unit.unitClass.toString
-    + (if (alive) " (" + hitPoints + (if(shields > 0) "+" + shields else "") + "/" + unit.unitClass.maxTotalHealth + ")" else " (DEAD)")
+    unit.unitClass.toString
+    + " #"
+    + unit.id
+    + (if (alive) " (" + totalLife + "/" + unit.unitClass.maxTotalHealth + ")" else " (DEAD)")
     + (if (fleeing) " (Fleeing)" else "")
-    + (if (fighting) " (Fighting)" else "")
+    + (if (ignoring) " (Ignoring)" else "")
     )
 }

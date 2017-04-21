@@ -10,19 +10,53 @@ abstract class BattleSimulationEvent(
   
   val description:String
   def draw()
-  override def toString: String = description
+  override def toString: String = description.replaceAllLiterally("Pixel", "")
 }
 
-class BattleSimulationEventMove(
+class BattleSimulationEventFlee(
+  argFrame  : Int,
+  argUnit   : Simulacrum)
+  extends BattleSimulationEvent(argFrame, argUnit) {
+  
+  val description = frame + ": " + unit + " decides to flee"
+  
+  override def draw = {}
+}
+
+class BattleSimulationEventFight(
+  argFrame  : Int,
+  argUnit   : Simulacrum)
+  extends BattleSimulationEvent(argFrame, argUnit) {
+  
+  val description = frame + ": " + unit + " decides to fight"
+  
+  override def draw = {}
+}
+
+class BattleSimulationEventMoveTowards(
       argFrame  : Int,
       argUnit   : Simulacrum,
   val from      : Pixel,
-  val to        : Pixel)
+  val to        : Pixel,
+  val towards   : Pixel)
     extends BattleSimulationEvent(argFrame, argUnit) {
   
-  val description = frame + ": " + unit + " moves to " + to
+  val description = frame + ": " + unit + " charges from " + from + " to " + to + " towards " + towards
   
-  override def draw = DrawMap.arrow(from, to, Colors.MediumGray)
+  override def draw = DrawMap.arrow(from, to, unit.unit.player.colorNeon)
+}
+
+class BattleSimulationEventMoveAway(
+      argFrame  : Int,
+      argUnit   : Simulacrum,
+  val from      : Pixel,
+  val to        : Pixel,
+  val towards   : Pixel)
+  extends BattleSimulationEvent(argFrame, argUnit) {
+  
+  val description = frame + ": " + unit + " flees from " + from + " to " + to + " towards " + towards
+  
+  override def draw = DrawMap.arrow(from, to, unit.unit.player.colorDark)
 }
 
 class BattleSimulationEventAttacks(

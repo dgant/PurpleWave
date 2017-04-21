@@ -31,6 +31,7 @@ object SimulacrumAgent {
     battle          : BattleSimulation) {
     
     if ( ! thisUnit.alive) return
+    if (thisUnit.ignoring) return
     thisUnit.attackCooldown = Math.max(0, thisUnit.attackCooldown - 1)
     thisUnit.moveCooldown   = Math.max(0, thisUnit.moveCooldown   - 1)
     if (! thisUnit.readyToAttack && ! thisUnit.readyToMove) return
@@ -108,12 +109,24 @@ object SimulacrumAgent {
     // Update fight/flee status //
     //////////////////////////////
   
+    val fleeingBefore   = thisUnit.fleeing
+    val fightingBefore  = thisUnit.fighting
+    
     if (thisUnit.canMove && ! thisUnit.fleeing) {
       thisUnit.fleeing ||= (thisGroup.tactics.has(Tactics.Movement.Flee))
       thisUnit.fleeing ||= (thisGroup.tactics.has(Tactics.Wounded.Flee) && thisUnit.totalLife <= thisUnit.woundedThreshold)
       thisUnit.fleeing &&= thisUnit.threat.nonEmpty
     }
     thisUnit.fighting &&= ! thisUnit.fleeing
+    
+    if (battle.doLog) {
+      if (thisUnit.fleeing && ! fleeingBefore) {
+        battle.events.append(new BattleSimulationEventFlee(battle.frameDuration, thisUnit))
+      }
+      if (thisUnit.fighting && ! fightingBefore) {
+        battle.events.append(new BattleSimulationEventFight(battle.frameDuration, thisUnit))
+      }
+    }
   
     ////////////////////////
     // Consider attacking //
@@ -196,17 +209,24 @@ object SimulacrumAgent {
   }
   
   @inline private def moveAwayFrom(thisUnit:Simulacrum, destination: Pixel, battle: BattleSimulation) {
-    move(thisUnit, destination, battle, -1.0)
+    val from = thisUnit.pixel
+    move(thisUnit, destination, -1.0)
+    if (battle.doLog) {
+      battle.events.append(new BattleSimulationEventMoveAway(battle.frameDuration, thisUnit, from, thisUnit.pixel, destination))
+    }
   }
   
   @inline private def moveTowards(thisUnit:Simulacrum, destination: Pixel, battle: BattleSimulation) {
-    move(thisUnit, destination, battle, chargingSpeedRatio, thisUnit.pixel.pixelDistanceFast(destination))
+    val from = thisUnit.pixel
+    move(thisUnit, destination, chargingSpeedRatio, thisUnit.pixel.pixelDistanceFast(destination))
+    if (battle.doLog) {
+      battle.events.append(new BattleSimulationEventMoveTowards(battle.frameDuration, thisUnit, from, thisUnit.pixel, destination))
+    }
   }
   
   @inline private def move(
     thisUnit    : Simulacrum,
     destination : Pixel,
-    battle      : BattleSimulation,
     multiplier  : Double,
     maxDistance : Double = 1000.0) {
     val from = thisUnit.pixel
@@ -215,10 +235,6 @@ object SimulacrumAgent {
       multiplier * thisUnit.topSpeed * (1 + movementFrames)))
     thisUnit.attackCooldown = movementFrames
     thisUnit.moveCooldown   = movementFrames
-    
-    if (battle.doLog) {
-      battle.events.append(new BattleSimulationEventMove(battle.frameDuration, thisUnit, from, thisUnit.pixel))
-    }
   }
   
   @inline def validTarget(thisUnit:Simulacrum, target: Simulacrum) = target.alive && thisUnit.canAttack(target)

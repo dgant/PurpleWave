@@ -64,7 +64,11 @@ class BattleGroup(val units:Vector[UnitInfo]) {
   lazy val tacticsAvailableFocus:Vector[Tactic] = {
     val output = new ArrayBuffer[Tactic]
     output += Tactics.Focus.None
-    if (opponent.units.exists(_.flying) && opponent.units.exists( ! _.flying)) {
+    if (
+      opponent.units.exists(_.flying) &&
+      opponent.units.exists( ! _.flying) &&
+      units.exists(_.unitClass.attacksGround) &&
+      units.exists(_.unitClass.attacksAir)) {
       output += Tactics.Focus.Air
       output += Tactics.Focus.Ground
     }

@@ -35,7 +35,7 @@ object BattleSimulationBuilder {
       workers.foreach(worker => { worker.fleeing = true; worker.fighting = false })
     }
     else if (group.tactics.has(Tactics.Workers.Ignore)) {
-      workers.toVector.foreach(_.fighting = false)
+      workers.toVector.foreach(worker => {worker.fighting = false; worker.ignoring = true})
     }
     else if (group.tactics.has(Tactics.Workers.FightHalf)) {
       workersNotMining = workers.size / 2

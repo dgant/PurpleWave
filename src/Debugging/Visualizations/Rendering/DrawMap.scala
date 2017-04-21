@@ -29,7 +29,11 @@ object DrawMap {
     if (irrelevant(Vector(start, end))) return
     
     line(start, end, color)
-    //TODO: Arrow-yness
+    
+    //Crummy arrowhead drawn from circles
+    circle(end, 2, color, solid = true)
+    circle(start.project(end, start.pixelDistanceSlow(end) - 2), 3, color, solid = true)
+    circle(start.project(end, start.pixelDistanceSlow(end) - 4), 4, color, solid = true)
   }
   
   def box(

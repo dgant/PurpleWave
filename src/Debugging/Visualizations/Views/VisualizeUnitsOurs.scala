@@ -21,7 +21,7 @@ object VisualizeUnitsOurs {
       state.unit.pixelCenter.add(0, +7),
       drawBackground = false)
     if (state.movingTo.isDefined) {
-      DrawMap.line(state.unit.pixelCenter, state.movingTo.get, Colors.DarkGray)
+      DrawMap.line(state.unit.pixelCenter, state.movingTo.get, Colors.MediumGray)
     }
     if (state.target.isDefined) {
       DrawMap.line(state.unit.pixelCenter, state.intent.toAttack.get.pixelCenter, Colors.BrightRed)

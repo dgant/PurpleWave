@@ -31,7 +31,7 @@ class Configuration {
   var visualizeSimulation         = true
   var visualizeTextOnly           = false
   var visualizeUnitsForeign       = true
-  var visualizeUnitsOurs          = true
+  var visualizeUnitsOurs          = false
   var visualizeVectorUnits        = false
   
   var gameSpeed                   = 0

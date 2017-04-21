@@ -42,11 +42,8 @@ class Simulacrum(val unit:UnitInfo) {
     pixel.toString
     + " "
     + unit.unitClass.toString
-    + " "
-    + (if (alive) "(" + hitPoints + (if(shields > 0) " +" + shields else "") + "/" + unit.unitClass.maxTotalHealth + ")" else "(DEAD)")
-    + " "
-    + (if (fleeing) "(Fleeing)" else "")
-    + " "
-    + (if (fighting) "(Fighting)" else "")
+    + (if (alive) " (" + hitPoints + (if(shields > 0) "+" + shields else "") + "/" + unit.unitClass.maxTotalHealth + ")" else " (DEAD)")
+    + (if (fleeing) " (Fleeing)" else "")
+    + (if (fighting) " (Fighting)" else "")
     )
 }

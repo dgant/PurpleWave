@@ -92,7 +92,7 @@ object BattleEstimator {
     damageMap(defender.vulnerabilityProfile) * defender.exposure * defender.valueRatio
   }
   
-  private case class VulnerabilityProfile(flying: Boolean, size: Int)
+  case class VulnerabilityProfile(flying: Boolean, size: Int)
   
   class Participant(
     val dpsGroundSmall        : Double,

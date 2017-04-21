@@ -1,6 +1,6 @@
 package Information.Battles.Simulation.Execution
 
-import Information.Battles.Simulation.Construction.{BattleSimulation, BattleSimulationGroup, Simulacrum}
+import Information.Battles.Simulation.Construction._
 import Information.Battles.TacticsTypes.Tactics
 import Mathematics.Pixels.Pixel
 
@@ -25,10 +25,10 @@ object SimulacrumAgent {
   //////////////////
   
   def act(
-    thisUnit  : Simulacrum,
-    thisGroup : BattleSimulationGroup,
-    thatGroup : BattleSimulationGroup,
-    battle    : BattleSimulation) {
+    thisUnit        : Simulacrum,
+    thisGroup       : BattleSimulationGroup,
+    thatGroup       : BattleSimulationGroup,
+    battle          : BattleSimulation) {
     
     if ( ! thisUnit.alive) return
     thisUnit.attackCooldown = Math.max(0, thisUnit.attackCooldown - 1)
@@ -57,6 +57,9 @@ object SimulacrumAgent {
           if (score < bestScore) {
             bestScore = score
             thisUnit.threat = Some(threat)
+            if (battle.doLog) {
+              battle.events.append(new BattleSimulationEventFears(battle.frameDuration, thisUnit, threat))
+            }
           }
         }
         i += 1
@@ -92,6 +95,9 @@ object SimulacrumAgent {
           if (score < bestScore) {
             bestScore = score
             thisUnit.target = Some(target)
+            if (battle.doLog) {
+              battle.events.append(new BattleSimulationEventFears(battle.frameDuration, thisUnit, target))
+            }
           }
         }
         i += 1
@@ -114,7 +120,7 @@ object SimulacrumAgent {
     ////////////////////////
   
     if (thisUnit.readyToAttack && thisUnit.fighting) {
-      doAttack(thisUnit)
+      doAttack(thisUnit, battle)
       return
     }
   
@@ -133,7 +139,7 @@ object SimulacrumAgent {
     //////////////////////
   
     if (thisUnit.fleeing) {
-      doFlee(thisUnit)
+      doFlee(thisUnit, battle)
       return
     }
   
@@ -142,7 +148,7 @@ object SimulacrumAgent {
     ///////////////////////
 
     else if (thisUnit.fighting && thisGroup.tactics.has(Tactics.Movement.Charge)) {
-      doCharge(thisUnit)
+      doCharge(thisUnit, battle)
       return
     }
   
@@ -152,11 +158,11 @@ object SimulacrumAgent {
 
     else if (thisGroup.tactics.has(Tactics.Movement.Kite)) {
       if (thisUnit.fighting && thisUnit.target.exists(target => ! thisUnit.inRangeToAttack(target))) {
-        doCharge(thisUnit)
+        doCharge(thisUnit, battle)
         return
       }
       else if (thisUnit.threat.nonEmpty) {
-        doFlee(thisUnit)
+        doFlee(thisUnit, battle)
         return
       }
     }
@@ -166,11 +172,16 @@ object SimulacrumAgent {
   // Execute orders //
   ////////////////////
   
-  @inline private def doAttack(thisUnit:Simulacrum)  = if (thisUnit.readyToAttack) thisUnit.target.foreach(target => if (thisUnit.inRangeToAttack(target)) dealDamage(thisUnit, target))
-  @inline private def doCharge(thisUnit:Simulacrum)  = if (thisUnit.readyToMove)   thisUnit.target.foreach(target => moveTowards(thisUnit,  target.pixel))
-  @inline private def doFlee(thisUnit:Simulacrum)    = if (thisUnit.readyToMove)   thisUnit.threat.foreach(threat => moveAwayFrom(thisUnit, threat.pixel))
+  @inline private def doAttack(thisUnit:Simulacrum, battle:BattleSimulation) =
+    if (thisUnit.readyToAttack) thisUnit.target.foreach(target => if (thisUnit.inRangeToAttack(target)) dealDamage(thisUnit, target, battle))
   
-  @inline private def dealDamage(thisUnit:Simulacrum, target: Simulacrum) {
+  @inline private def doCharge(thisUnit:Simulacrum, battle:BattleSimulation) =
+    if (thisUnit.readyToMove) thisUnit.target.foreach(target => moveTowards(thisUnit,  target.pixel, battle))
+  
+  @inline private def doFlee(thisUnit:Simulacrum, battle:BattleSimulation) =
+    if (thisUnit.readyToMove) thisUnit.threat.foreach(threat => moveAwayFrom(thisUnit, threat.pixel, battle))
+  
+  @inline private def dealDamage(thisUnit:Simulacrum, target: Simulacrum, battle: BattleSimulation) {
     val damage = thisUnit.unit.damageAgainst(target.unit, target.shields)
     thisUnit.attackCooldown = thisUnit.unit.cooldownLeftAgainst(target.unit)
     thisUnit.moveCooldown   = Math.min(thisUnit.attackCooldown, 8)
@@ -180,21 +191,35 @@ object SimulacrumAgent {
       target.hitPoints += target.shields
       target.shields = 0
     }
+    if (battle.doLog) {
+      battle.events.append(new BattleSimulationEventAttacks(battle.frameDuration, thisUnit, target))
+    }
   }
   
-  @inline private def moveAwayFrom(thisUnit:Simulacrum, destination: Pixel) {
-    move(thisUnit, destination, -1.0)
-  }
-  @inline private def moveTowards(thisUnit:Simulacrum, destination: Pixel) {
-    move(thisUnit, destination, chargingSpeedRatio, thisUnit.pixel.pixelDistanceFast(destination))
+  @inline private def moveAwayFrom(thisUnit:Simulacrum, destination: Pixel, battle: BattleSimulation) {
+    move(thisUnit, destination, battle, -1.0)
   }
   
-  @inline private def move(thisUnit:Simulacrum, destination: Pixel, multiplier: Double, maxDistance: Double = 1000.0) {
+  @inline private def moveTowards(thisUnit:Simulacrum, destination: Pixel, battle: BattleSimulation) {
+    move(thisUnit, destination, battle, chargingSpeedRatio, thisUnit.pixel.pixelDistanceFast(destination))
+  }
+  
+  @inline private def move(
+    thisUnit    : Simulacrum,
+    destination : Pixel,
+    battle      : BattleSimulation,
+    multiplier  : Double,
+    maxDistance : Double = 1000.0) {
+    val from = thisUnit.pixel
     thisUnit.pixel = thisUnit.pixel.project(destination, Math.min(
       maxDistance,
       multiplier * thisUnit.topSpeed * (1 + movementFrames)))
     thisUnit.attackCooldown = movementFrames
     thisUnit.moveCooldown   = movementFrames
+    
+    if (battle.doLog) {
+      battle.events.append(new BattleSimulationEventMove(battle.frameDuration, thisUnit, from, thisUnit.pixel))
+    }
   }
   
   @inline def validTarget(thisUnit:Simulacrum, target: Simulacrum) = target.alive && thisUnit.canAttack(target)

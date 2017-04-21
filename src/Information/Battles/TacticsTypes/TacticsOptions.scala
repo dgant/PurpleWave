@@ -14,7 +14,7 @@ class TacticsOptions(private var options:Int = 0) {
     new TacticsOptions(options | other.options)
   }
   
-  override def toString(): String = {
+  override def toString: String = {
     val names = Map(
       Tactics.Movement.None     -> "Movement: None",
       Tactics.Movement.Charge   -> "Movement: Charge",
@@ -30,7 +30,7 @@ class TacticsOptions(private var options:Int = 0) {
       Tactics.Workers.FightAll  -> "Workers: Fight (All)",
       Tactics.Workers.FightHalf -> "Workers: Fight (Half)"
     )
-    return names.get(options).getOrElse(options.toString)
+    names.filter(namePair => has(namePair._1)).mkString(", ")
   }
   
   override def hashCode(): Int = options

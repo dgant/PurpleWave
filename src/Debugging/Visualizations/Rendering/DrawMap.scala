@@ -22,6 +22,16 @@ object DrawMap {
     With.game.drawLineMap(start.bwapi, end.bwapi, color)
   }
   
+  def arrow(
+    start:Pixel,
+    end:Pixel,
+    color:Color = Colors.DefaultGray) {
+    if (irrelevant(Vector(start, end))) return
+    
+    line(start, end, color)
+    //TODO: Arrow-yness
+  }
+  
   def box(
     start:Pixel,
     end:Pixel,

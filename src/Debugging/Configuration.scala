@@ -28,6 +28,7 @@ class Configuration {
   var visualizeResources          = false
   var visualizeRealEstate         = false
   var visualizeScheduler          = false
+  var visualizeSimulation         = true
   var visualizeTextOnly           = false
   var visualizeUnitsForeign       = true
   var visualizeUnitsOurs          = true

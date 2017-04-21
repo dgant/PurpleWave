@@ -61,6 +61,7 @@ object VisualizeBattles {
     With.game.drawTextScreen(new Pixel(5, 31).bwapi, "Advantage: " + winner.name)
     drawPlayerReport(simulation.us,     With.self.name,         new Pixel(5, 50))
     drawPlayerReport(simulation.enemy,  With.enemies.head.name, new Pixel(130, 50))
+    simulation.events.foreach(_.draw())
   }
   
   private def drawEstimationReport(estimation:BattleEstimation) {

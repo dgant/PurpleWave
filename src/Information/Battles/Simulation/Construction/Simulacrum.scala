@@ -37,4 +37,16 @@ class Simulacrum(val unit:UnitInfo) {
   def canAttack       (enemy:Simulacrum)  : Boolean = if (enemy.flying) attacksAir else attacksGround
   def rangeAgainst    (enemy:Simulacrum)  : Double  = (if (enemy.flying) rangeAir else rangeGround) - radialHypotenuse - enemy.radialHypotenuse
   def inRangeToAttack (enemy:Simulacrum)  : Boolean = rangeAgainst(enemy) * rangeAgainst(enemy) >= pixel.pixelDistanceSquared(enemy.pixel)
+
+  override def toString:String = (
+    pixel.toString
+    + " "
+    + unit.unitClass.toString
+    + " "
+    + (if (alive) "(" + hitPoints + (if(shields > 0) " +" + shields else "") + "/" + unit.unitClass.maxTotalHealth + ")" else "(DEAD)")
+    + " "
+    + (if (fleeing) "(Fleeing)" else "")
+    + " "
+    + (if (fighting) "(Fighting)" else "")
+    )
 }

@@ -29,34 +29,40 @@ object BattleEstimator {
       (if (tacticsUs    .has(Tactics.Movement.Kite))    2 else 0) +
       (if (tacticsEnemy .has(Tactics.Movement.Kite))    2 else 0))
     
-    var damageToUs          = 0.0
-    var damageToEnemy       = 0.0
+    var damageDealtToUs          = 0.0
+    var damageDealtToEnemy       = 0.0
     
     val participantsUs      = buildParticipants(battle, battle.us, battle.enemy, tacticsUs, tacticsEnemy, fightDuration)
     val participantsEnemy   = buildParticipants(battle, battle.enemy, battle.us, tacticsEnemy, tacticsUs, fightDuration)
     
-    if (participantsUs.nonEmpty && participantsEnemy.nonEmpty) {
-      val damageSpreadUs      = participantsUs.size
-      val damageSpreadEnemy   = participantsEnemy.size
-      
-      val damageDealtByUs     = newDamageMap
-      val damageDealtByEnemy  = newDamageMap
-      
-      participantsUs    .foreach(dealDamage(_, damageDealtByUs))
-      participantsEnemy .foreach(dealDamage(_, damageDealtByEnemy))
-      
-      damageToUs    = participantsUs    .map(costOfDamage(_, damageDealtByEnemy)).sum / participantsUs.size
-      damageToEnemy = participantsEnemy .map(costOfDamage(_, damageDealtByEnemy)).sum / participantsEnemy.size
+    if (participantsUs.isEmpty || participantsEnemy.isEmpty) {
+      return new BattleEstimation(battle, tacticsUs, 0, 0, participantsUs, participantsEnemy, newDamageMap, newDamageMap)
     }
+    
+    val damageSpreadUs      = participantsUs.size
+    val damageSpreadEnemy   = participantsEnemy.size
+    
+    val damageDealtByUs     = newDamageMap
+    val damageDealtByEnemy  = newDamageMap
+    
+    participantsUs    .foreach(dealDamage(_, damageDealtByUs))
+    participantsEnemy .foreach(dealDamage(_, damageDealtByEnemy))
+    
+    damageDealtToUs    = participantsUs    .map(costOfDamage(_, damageDealtByEnemy)).sum / participantsUs.size
+    damageDealtToEnemy = participantsEnemy .map(costOfDamage(_, damageDealtByEnemy)).sum / participantsEnemy.size
       
     new BattleEstimation(
       battle,
       tacticsUs,
-      damageToUs,
-      damageToEnemy)
+      damageDealtToUs,
+      damageDealtToEnemy,
+      participantsUs,
+      participantsEnemy,
+      damageDealtByUs,
+      damageDealtByEnemy)
   }
   
-  private type DamageMap = mutable.HashMap[VulnerabilityProfile, Double]
+  type DamageMap = mutable.HashMap[VulnerabilityProfile, Double]
   
   private val small = 0
   private val medium = 1
@@ -88,7 +94,7 @@ object BattleEstimator {
   
   private case class VulnerabilityProfile(flying: Boolean, size: Int)
   
-  private class Participant(
+  class Participant(
     val dpsGroundSmall        : Double,
     val dpsGroundMedium       : Double,
     val dpsGroundLarge        : Double,

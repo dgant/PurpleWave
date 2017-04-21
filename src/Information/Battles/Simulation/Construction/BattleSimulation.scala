@@ -3,6 +3,8 @@ package Information.Battles.Simulation.Construction
 import Information.Battles.TacticsTypes.TacticsOptions
 import Lifecycle.With
 
+import scala.collection.mutable.ArrayBuffer
+
 class BattleSimulation(
   val us    : BattleSimulationGroup,
   val enemy : BattleSimulationGroup) {
@@ -12,4 +14,7 @@ class BattleSimulation(
   
   var frameDuration = 0
   val frameCreated = With.frame
+  
+  val doLog = With.configuration.visualizeSimulation
+  val events = new ArrayBuffer[BattleSimulationEvent]
 }

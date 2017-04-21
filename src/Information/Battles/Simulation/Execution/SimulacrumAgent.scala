@@ -57,12 +57,12 @@ object SimulacrumAgent {
           if (score < bestScore) {
             bestScore = score
             thisUnit.threat = Some(threat)
-            if (battle.doLog) {
-              battle.events.append(new BattleSimulationEventFears(battle.frameDuration, thisUnit, threat))
-            }
           }
         }
         i += 1
+      }
+      if (battle.doLog && thisUnit.threat.nonEmpty) {
+        battle.events.append(new BattleSimulationEventFears(battle.frameDuration, thisUnit, thisUnit.threat.get))
       }
     }
   
@@ -95,12 +95,12 @@ object SimulacrumAgent {
           if (score < bestScore) {
             bestScore = score
             thisUnit.target = Some(target)
-            if (battle.doLog) {
-              battle.events.append(new BattleSimulationEventFears(battle.frameDuration, thisUnit, target))
-            }
           }
         }
         i += 1
+      }
+      if (battle.doLog && thisUnit.target.nonEmpty) {
+        battle.events.append(new BattleSimulationEventTargets(battle.frameDuration, thisUnit, thisUnit.target.get))
       }
     }
   
@@ -121,7 +121,6 @@ object SimulacrumAgent {
   
     if (thisUnit.readyToAttack && thisUnit.fighting) {
       doAttack(thisUnit, battle)
-      return
     }
   
     /////////////////////////////////////////////////////////////////////////////

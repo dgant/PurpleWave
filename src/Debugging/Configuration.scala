@@ -21,7 +21,7 @@ class Configuration {
   var visualizeGrids              = false
   var visualizeHeuristicMovement  = true
   var visualizeHeuristicTargeting = true
-  var visualizePerformance        = true
+  var visualizePerformance        = false
   var visualizePerformanceDetails = true
   var visualizePlans              = false
   var visualizeResources          = false

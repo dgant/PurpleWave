@@ -1,15 +1,14 @@
 package Planning.Plans.Army
 
 import Debugging.Visualizations.Rendering.DrawMap
+import Lifecycle.With
 import Micro.Intent.Intention
-import Planning.Composition.PixelFinders.TileFinder
 import Planning.Composition.PixelFinders.Tactics.TileEnemyBase
+import Planning.Composition.PixelFinders.TileFinder
 import Planning.Composition.Property
+import Planning.Composition.ResourceLocks.LockUnits
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
-import Planning.Composition.ResourceLocks.LockUnits
-import Lifecycle.With
-import Utilities.EnrichPixel._
 
 class Hunt extends Plan {
   
@@ -20,7 +19,7 @@ class Hunt extends Plan {
   
   override def update() {
     
-    val targetPixel = position.get.find.getOrElse(With.intelligence.mostBaselikeEnemyPixel)
+    val targetTile = position.get.find.getOrElse(With.intelligence.mostBaselikeEnemyTile)
     
     hunters.get.acquire(this)
     if (hunters.get.satisfied) {
@@ -28,13 +27,13 @@ class Hunt extends Plan {
         val targets = With.units.enemy.filter(fighter.canAttackThisSecond)
         val targetDestination =
           if(targets.isEmpty)
-            targetPixel
+            targetTile
           else
             targets.minBy(candidate =>
               candidate.pixelDistanceSquared(fighter)
             + candidate.pixelDistanceSquared(With.geography.home.pixelCenter)).tileIncludingCenter
         
-        With.executor.intend(new Intention(this, fighter) { destination = Some(targetPixel) })
+        With.executor.intend(new Intention(this, fighter) { destination = Some(targetTile.pixelCenter) })
       })
     }
   }

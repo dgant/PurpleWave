@@ -59,18 +59,19 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   
   def pixelRangeMax:Double = Math.max(pixelRangeAir, pixelRangeGround)
   
-  def canTraverse           (tile:        Tile)     : Boolean = flying || With.grids.walkable.get(tile)
-  def pixelsFromEdgeSlow    (otherUnit:   UnitInfo) : Double  = pixelDistanceSlow(otherUnit) - unitClass.radialHypotenuse - otherUnit.unitClass.radialHypotenuse
-  def pixelsFromEdgeFast    (otherUnit:   UnitInfo) : Double  = pixelDistanceFast(otherUnit) - unitClass.radialHypotenuse - otherUnit.unitClass.radialHypotenuse
-  def pixelDistanceSlow     (otherPixel:  Pixel)    : Double  = pixelCenter.pixelDistanceSlow(otherPixel)
-  def pixelDistanceSlow     (otherUnit:   UnitInfo) : Double  = pixelDistanceSlow(otherUnit.pixelCenter)
-  def pixelDistanceFast     (otherPixel:  Pixel)    : Double  = pixelCenter.pixelDistanceFast(otherPixel)
-  def pixelDistanceFast     (otherUnit:   UnitInfo) : Double  = pixelDistanceFast(otherUnit.pixelCenter)
-  def pixelDistanceSquared  (otherUnit:   UnitInfo) : Double  = pixelDistanceSquared(otherUnit.pixelCenter)
-  def pixelDistanceSquared  (otherPixel:  Pixel)    : Double  = pixelCenter.pixelDistanceSquared(otherPixel)
-  def travelPixels          (destination: Pixel)    : Double  = travelPixels(tileIncludingCenter, destination.tileIncluding)
-  def travelPixels          (destination: Tile)     : Double  = travelPixels(tileIncludingCenter, destination)
-  def travelPixels          (from: Tile,  to: Tile) : Double  =
+  def canTraverse           (tile:        Tile)       : Boolean = flying || With.grids.walkable.get(tile)
+  def pixelsFromEdgeSlow    (otherUnit:   UnitInfo)   : Double  = pixelDistanceSlow(otherUnit) - unitClass.radialHypotenuse - otherUnit.unitClass.radialHypotenuse
+  def pixelsFromEdgeFast    (otherUnit:   UnitInfo)   : Double  = pixelDistanceFast(otherUnit) - unitClass.radialHypotenuse - otherUnit.unitClass.radialHypotenuse
+  def pixelDistanceSlow     (otherPixel:  Pixel)      : Double  = pixelCenter.pixelDistanceSlow(otherPixel)
+  def pixelDistanceSlow     (otherUnit:   UnitInfo)   : Double  = pixelDistanceSlow(otherUnit.pixelCenter)
+  def pixelDistanceFast     (otherPixel:  Pixel)      : Double  = pixelCenter.pixelDistanceFast(otherPixel)
+  def pixelDistanceFast     (otherUnit:   UnitInfo)   : Double  = pixelDistanceFast(otherUnit.pixelCenter)
+  def pixelDistanceSquared  (otherUnit:   UnitInfo)   : Double  = pixelDistanceSquared(otherUnit.pixelCenter)
+  def pixelDistanceSquared  (otherPixel:  Pixel)      : Double  = pixelCenter.pixelDistanceSquared(otherPixel)
+  def travelPixels          (destination: Pixel)      : Double  = travelPixels(pixelCenter, destination)
+  def travelPixels          (destination: Tile)       : Double  = travelPixels(tileIncludingCenter, destination)
+  def travelPixels          (from: Pixel, to: Pixel)  : Double  = travelPixels(from.tileIncluding, to.tileIncluding)
+  def travelPixels          (from: Tile,  to: Tile)   : Double  =
     if (flying)
       from.pixelCenter.pixelDistanceSlow(to.pixelCenter)
     else

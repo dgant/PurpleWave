@@ -7,8 +7,8 @@ import Mathematics.Pixels.Tile
 
 class Intelligence {
   
-  def mostBaselikeEnemyPixel:Tile = mostBaselikeEnemyPixelCache.get
-  val mostBaselikeEnemyPixelCache = new CacheFrame(() =>
+  def mostBaselikeEnemyTile:Tile = mostBaselikeEnemyTileCache.get
+  val mostBaselikeEnemyTileCache = new CacheFrame(() =>
     With.units.enemy
       .toVector
       .filterNot(_.flying)

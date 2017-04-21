@@ -31,7 +31,7 @@ class AutoCamera {
   
       setCameraSpeed(With.configuration.cameraDynamicSpeedFastest)
       focusOn(With.units.ours.toList
-        .sortBy(_.pixelDistanceSquared(With.intelligence.mostBaselikeEnemyPixel.pixelCenter))
+        .sortBy(_.pixelDistanceSquared(With.intelligence.mostBaselikeEnemyTile.pixelCenter))
         .sortBy( ! _.canAttackThisSecond)
         .sortBy( ! _.canMoveThisFrame)
         .head)

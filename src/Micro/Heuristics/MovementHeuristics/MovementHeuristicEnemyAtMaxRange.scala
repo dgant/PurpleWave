@@ -1,12 +1,12 @@
 package Micro.Heuristics.MovementHeuristics
 
-import Mathematics.Pixels.Tile
+import Mathematics.Pixels.Pixel
 import Micro.Intent.Intention
 import ProxyBwapi.UnitInfo.UnitInfo
 
 object MovementHeuristicEnemyAtMaxRange extends MovementHeuristic {
   
-  override def evaluate(intent: Intention, candidate: Tile): Double = {
+  override def evaluate(intent: Intention, candidate: Pixel): Double = {
     val us = intent.unit
     val kiteableEnemies = intent.threats.filter(isKiteable(intent.unit, _))
     
@@ -19,7 +19,7 @@ object MovementHeuristicEnemyAtMaxRange extends MovementHeuristic {
     //Evaluate the absolute difference between our range and the enemy's distance from the candidate
     Math.max(
       1.0,
-      1.0 / Math.abs(us.unitClass.maxAirGroundRange - nearestThreat.pixelDistanceFast(candidate.pixelCenter)))
+      1.0 / Math.abs(us.unitClass.maxAirGroundRange - nearestThreat.pixelDistanceFast(candidate)))
   }
   
   def isKiteable(us:UnitInfo, enemy: UnitInfo):Boolean = {

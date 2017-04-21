@@ -1,6 +1,6 @@
 package Micro.Actions
 import Lifecycle.With
-import Micro.Heuristics.Movement.EvaluateTiles
+import Micro.Heuristics.Movement.EvaluatePixels
 import Micro.Intent.Intention
 
 object Move extends Action {
@@ -11,18 +11,18 @@ object Move extends Action {
   
   override def perform(intent: Intention): Boolean = {
     val moveHeuristically = intent.threats.nonEmpty || intent.targets.nonEmpty
-    val tileToMove =
+    val pixelToMove =
       if (moveHeuristically)
-        EvaluateTiles.best(intent, intent.movementProfile)
+        EvaluatePixels.best(intent, intent.movementProfile)
       else
-        intent.destination.getOrElse(intent.unit.tileIncludingCenter)
+        intent.destination.getOrElse(intent.unit.pixelCenter)
     
-    intent.state.movement = Some(tileToMove)
+    intent.state.movingTo = Some(pixelToMove)
     if (moveHeuristically) {
       intent.state.movedHeuristicallyFrame = With.frame
     }
     
-    With.commander.move(intent, tileToMove.pixelCenter)
+    With.commander.move(intent, pixelToMove)
     true
   }
 }

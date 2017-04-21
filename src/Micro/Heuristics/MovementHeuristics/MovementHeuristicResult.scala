@@ -1,13 +1,13 @@
 package Micro.Heuristics.MovementHeuristics
 
 import Mathematics.Heuristics.{Heuristic, HeuristicResult}
-import Mathematics.Pixels.Tile
+import Mathematics.Pixels.Pixel
 import Micro.Intent.Intention
 
 class MovementHeuristicResult (
-  heuristic   : Heuristic[Intention, Tile],
+  heuristic   : Heuristic[Intention, Pixel],
   intent      : Intention,
-  candidate   : Tile,
+  candidate   : Pixel,
   evaluation  : Double,
   val color   : bwapi.Color)
 

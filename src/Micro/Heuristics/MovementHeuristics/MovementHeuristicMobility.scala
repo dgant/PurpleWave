@@ -1,15 +1,14 @@
 package Micro.Heuristics.MovementHeuristics
 
-import Micro.Intent.Intention
 import Lifecycle.With
-import Mathematics.Pixels.Tile
+import Mathematics.Pixels.Pixel
+import Micro.Intent.Intention
 
 object MovementHeuristicMobility extends MovementHeuristic {
   
-  override def evaluate(intent: Intention, candidate: Tile): Double = {
+  override def evaluate(intent: Intention, candidate: Pixel): Double = {
   
-    if (intent.unit.flying) 1 else
-      With.grids.mobility.get(candidate) / 10.0
+    if (intent.unit.flying) 1 else With.grids.mobility.get(candidate.tileIncluding) / 10.0
     
   }
   

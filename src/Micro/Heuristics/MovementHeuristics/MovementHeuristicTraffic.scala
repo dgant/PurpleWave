@@ -2,13 +2,13 @@ package Micro.Heuristics.MovementHeuristics
 
 import Lifecycle.With
 import Mathematics.Heuristics.HeuristicMath
-import Mathematics.Pixels.Tile
+import Mathematics.Pixels.{Pixel, Tile}
 import Micro.Intent.Intention
 object MovementHeuristicTraffic extends MovementHeuristic {
   
   val scaling = 1.0 / 32.0 / 32.0
   
-  override def evaluate(intent: Intention, candidate: Tile): Double = {
+  override def evaluate(intent: Intention, candidate: Pixel): Double = {
   
     if (intent.unit.flying) return HeuristicMath.default
     
@@ -17,28 +17,30 @@ object MovementHeuristicTraffic extends MovementHeuristic {
     val m2 = 0.70
     val m3 = 0.50
     
+    val tile = candidate.tileIncluding
+    
     Vector(
-      measureTraffic(intent, m0, candidate),
-      measureTraffic(intent, m1, candidate.add(-1,  0)),
-      measureTraffic(intent, m1, candidate.add( 1,  0)),
-      measureTraffic(intent, m1, candidate.add( 0, -1)),
-      measureTraffic(intent, m1, candidate.add( 0, -1)),
-      measureTraffic(intent, m2, candidate.add(-1, -1)),
-      measureTraffic(intent, m2, candidate.add( 1, -1)),
-      measureTraffic(intent, m2, candidate.add(-1,  1)),
-      measureTraffic(intent, m2, candidate.add( 1,  1)),
-      measureTraffic(intent, m3, candidate.add(-2, -1)),
-      measureTraffic(intent, m3, candidate.add(-2,  0)),
-      measureTraffic(intent, m3, candidate.add(-2,  1)),
-      measureTraffic(intent, m3, candidate.add( 2, -1)),
-      measureTraffic(intent, m3, candidate.add( 2,  0)),
-      measureTraffic(intent, m3, candidate.add( 2,  1)),
-      measureTraffic(intent, m3, candidate.add(-1, -2)),
-      measureTraffic(intent, m3, candidate.add( 0, -2)),
-      measureTraffic(intent, m3, candidate.add( 1, -2)),
-      measureTraffic(intent, m3, candidate.add(-1,  2)),
-      measureTraffic(intent, m3, candidate.add( 0,  2)),
-      measureTraffic(intent, m3, candidate.add( 1,  2))
+      measureTraffic(intent, m0, tile),
+      measureTraffic(intent, m1, tile.add(-1,  0)),
+      measureTraffic(intent, m1, tile.add( 1,  0)),
+      measureTraffic(intent, m1, tile.add( 0, -1)),
+      measureTraffic(intent, m1, tile.add( 0, -1)),
+      measureTraffic(intent, m2, tile.add(-1, -1)),
+      measureTraffic(intent, m2, tile.add( 1, -1)),
+      measureTraffic(intent, m2, tile.add(-1,  1)),
+      measureTraffic(intent, m2, tile.add( 1,  1)),
+      measureTraffic(intent, m3, tile.add(-2, -1)),
+      measureTraffic(intent, m3, tile.add(-2,  0)),
+      measureTraffic(intent, m3, tile.add(-2,  1)),
+      measureTraffic(intent, m3, tile.add( 2, -1)),
+      measureTraffic(intent, m3, tile.add( 2,  0)),
+      measureTraffic(intent, m3, tile.add( 2,  1)),
+      measureTraffic(intent, m3, tile.add(-1, -2)),
+      measureTraffic(intent, m3, tile.add( 0, -2)),
+      measureTraffic(intent, m3, tile.add( 1, -2)),
+      measureTraffic(intent, m3, tile.add(-1,  2)),
+      measureTraffic(intent, m3, tile.add( 0,  2)),
+      measureTraffic(intent, m3, tile.add( 1,  2))
     ).sum
   }
   

@@ -20,7 +20,7 @@ class ControlPixel extends Plan {
   
   override def update() {
     
-    var targetPixel = positionToControl.get.find.get
+    var targetTile = positionToControl.get.find.get
     
     val ourBases = With.geography.ourBases.map(_.townHallArea.midPixel)
     val infiltrators = With.units.enemy
@@ -30,17 +30,17 @@ class ControlPixel extends Plan {
         ourBases.exists(base =>
           e.travelPixels(base.tileIncluding) < infiltrationRadius &&
           e.travelPixels(base.tileIncluding) <
-          e.travelPixels(base.tileIncluding, targetPixel)))
+          e.travelPixels(base.tileIncluding, targetTile)))
         
     if (infiltrators.nonEmpty) {
-      targetPixel = infiltrators.map(_.tileIncludingCenter).minBy(_.tileDistanceSlow(With.geography.home))
+      targetTile = infiltrators.map(_.tileIncludingCenter).minBy(_.tileDistanceSlow(With.geography.home))
     }
     
     units.get.acquire(this)
     if (units.get.satisfied) {
       //TODO: Dispatch only units capable of fighting an infiltrator
       
-      units.get.units.foreach(fighter => With.executor.intend(new Intention(this, fighter) { destination = Some(targetPixel) }))
+      units.get.units.foreach(fighter => With.executor.intend(new Intention(this, fighter) { destination = Some(targetTile.pixelCenter) }))
     }
   }
   

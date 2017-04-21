@@ -69,7 +69,8 @@ class BuildBuilding(val buildingClass:UnitClass) extends Plan {
         With.executor.intend(
           new Intention(this, builderLock.units.head) {
             toBuild = Some(buildingClass)
-            destination = orderedTile
+            toBuildTile = orderedTile
+            destination = Some(orderedTile.get.pixelCenter)
           })
       }
     }

@@ -6,6 +6,6 @@ import Mathematics.Pixels.Tile
 
 class TileEnemyBase extends TileFinder {
   
-  override def find: Option[Tile] = Some(With.intelligence.mostBaselikeEnemyPixel)
+  override def find: Option[Tile] = Some(With.intelligence.mostBaselikeEnemyTile)
   
 }

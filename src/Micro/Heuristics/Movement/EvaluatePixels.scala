@@ -2,11 +2,11 @@ package Micro.Heuristics.Movement
 
 import Lifecycle.With
 import Mathematics.Heuristics.HeuristicMath
-import Mathematics.Pixels.{Point, Tile}
+import Mathematics.Pixels.{Pixel, Point}
 import Micro.Heuristics.MovementHeuristics.MovementHeuristicResult
 import Micro.Intent.Intention
 
-object EvaluateTiles {
+object EvaluatePixels {
   
   val points = Vector(
     new Point(-1, -2),
@@ -32,16 +32,17 @@ object EvaluateTiles {
     new Point( 1,  2)
   )
   
-  def best(intent:Intention, profile:MovementProfile): Tile = {
+  def best(intent:Intention, profile:MovementProfile): Pixel = {
     
     val candidates =
       points
         .map(intent.unit.tileIncludingCenter.add)
         .filter(_.valid)
         .filter(intent.unit.canTraverse)
+        .map(_.pixelCenter)
   
     if (candidates.isEmpty) {
-      return intent.unit.tileIncludingCenter
+      return intent.unit.pixelCenter
     }
     
     if (With.configuration.visualizeHeuristicMovement) {

@@ -33,8 +33,8 @@ object Colors {
   private val indigo = 192
   private val violet = 224
   
-  private val dark = 96
-  private val medium = 128
+  private val dark = 128
+  private val medium = 160
   private val bright = 192
   private val neon = 255
     

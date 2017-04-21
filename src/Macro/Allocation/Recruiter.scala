@@ -16,7 +16,7 @@ class Recruiter {
 
   def update() {
     // Free units held by inactive requests
-    unitsByRequest.keySet.diff(updatedRequests).foreach(forgetRequest)
+    unitsByRequest.keySet.diff(updatedRequests).foreach(remove)
     updatedRequests.clear()
     
     // Remove dead units
@@ -82,7 +82,7 @@ class Recruiter {
     val requiredUnits = request.offerUnits(Iterable(unassignedUnits) ++ assignedToLowerPriority)
 
     if (requiredUnits == None) {
-      forgetRequest(request)
+      remove(request)
     }
     else {
   
@@ -100,7 +100,7 @@ class Recruiter {
     }
   }
   
-  private def forgetRequest(request: LockUnits) {
+  def remove(request: LockUnits) {
     unitsByRequest.get(request).foreach(_.foreach(unassign))
     unitsByRequest.remove(request)
   }

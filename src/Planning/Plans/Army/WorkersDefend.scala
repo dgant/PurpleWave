@@ -37,7 +37,7 @@ class WorkersDefend extends Plan {
           Vector.empty
         }).toSet
     
-    //workers.release()
+    workers.release()
     workers.acquire(this)
     workers.units.foreach(worker => With.executor.intend(new Intention(this, worker)))
   }

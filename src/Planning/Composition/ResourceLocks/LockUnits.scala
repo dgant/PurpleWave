@@ -26,7 +26,7 @@ class LockUnits extends ResourceLock {
   }
   
   override def release() {
-    throw new NotImplementedError
+    With.recruiter.remove(this)
   }
   
   def units:Set[FriendlyUnitInfo] = With.recruiter.getUnits(this)

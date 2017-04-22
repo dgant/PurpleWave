@@ -1,13 +1,14 @@
 package ProxyBwapi.Players
 
 import Lifecycle.With
+import Mathematics.Pixels.Tile
 import Performance.Caching.CacheFrame
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.Upgrades.Upgrade
 import bwapi.{Player, Race}
 
-import scala.collection.mutable
 import scala.collection.JavaConverters._
+import scala.collection.mutable
 
 abstract class PlayerProxy(base:Player) {
   
@@ -18,6 +19,7 @@ abstract class PlayerProxy(base:Player) {
   lazy val  isNeutral   : Boolean = base.isNeutral
   lazy val  isAlly      : Boolean = base.isAlly(With.game.self)
   lazy val  isEnemy     : Boolean = base.isEnemy(With.game.self)
+  lazy val  startTile   : Tile    = new Tile(base.getStartLocation)
   
   def gas               = gasCache.get
   def minerals          = mineralsCache.get

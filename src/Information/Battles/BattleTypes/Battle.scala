@@ -28,7 +28,6 @@ class Battle(
   
   def consensusTactics:TacticsOptions = consensusTacticsCache.get
   private val consensusTacticsCache = new CacheFrame(() => {
-    //Very TODO
     EvaluateTactics.best(this)
   })
 }

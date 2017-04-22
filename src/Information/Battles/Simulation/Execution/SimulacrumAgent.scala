@@ -71,14 +71,10 @@ object SimulacrumAgent {
     // Update target //
     ///////////////////
   
-    if ( ! thisUnit.fighting) {
-      thisUnit.target = None
-      return
-    }
     if (thisUnit.target.exists( ! _.alive)) {
       thisUnit.target = None
     }
-    if (thisUnit.target.isEmpty) {
+    if (thisUnit.target.isEmpty && thisUnit.fighting) {
       //Goal: We want to find the best target.
       //The obvious way to do that is using minBy(). But minBy, like most Scala generics, causes boxing of primitives.
       //Primitive boxing is a huge, huge expense that we need to avoid in battle simulation.
@@ -195,7 +191,7 @@ object SimulacrumAgent {
   
   @inline private def dealDamage(thisUnit:Simulacrum, target: Simulacrum, battle: BattleSimulation) {
     val damage = thisUnit.unit.damageAgainst(target.unit, target.shields)
-    thisUnit.attackCooldown = thisUnit.unit.cooldownLeftAgainst(target.unit)
+    thisUnit.attackCooldown = thisUnit.unit.cooldownAgainst(target.unit)
     thisUnit.moveCooldown   = Math.min(thisUnit.attackCooldown, 8)
     target.damageTaken      += damage
     target.shields          -= damage

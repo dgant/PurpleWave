@@ -49,7 +49,7 @@ class Configuration {
   var conservativeViewportWidth   = 640 + cameraViewportWidth
   var conservativeViewportHeight  = 480 + cameraViewportHeight
   
-  var maxFrameMilliseconds  = 75
+  var maxFrameMilliseconds  = 25
   
   var urgencyManners        = 1
   var urgencyEconomy        = 2

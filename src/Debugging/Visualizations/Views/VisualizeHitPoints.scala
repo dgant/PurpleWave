@@ -17,7 +17,7 @@ object VisualizeHitPoints {
     if (unit.invincible) return
     
     val width       = Math.min(48, Math.max(unit.unitClass.width / 2, 18))
-    val height      = 2
+    val height      = 4
     val denominator = unit.unitClass.maxTotalHealth + (if (unit.defensiveMatrixPoints > 0) width * 250 else 0)
     val widthHpMax  = width * unit.unitClass.maxHitPoints             / denominator
     val widthShMax  = width * unit.unitClass.maxShields               / denominator

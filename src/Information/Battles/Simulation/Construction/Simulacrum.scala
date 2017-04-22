@@ -1,5 +1,6 @@
 package Information.Battles.Simulation.Construction
 
+import Lifecycle.With
 import Mathematics.Pixels.Pixel
 import ProxyBwapi.UnitInfo.UnitInfo
 
@@ -40,7 +41,8 @@ class Simulacrum(val unit:UnitInfo) {
   def inRangeToAttack (enemy:Simulacrum)  : Boolean = rangeAgainst(enemy) * rangeAgainst(enemy) >= pixel.pixelDistanceSquared(enemy.pixel)
 
   override def toString:String = (
-    unit.unitClass.toString
+    (if (unit.player == With.self) "our " else "")
+    + unit.unitClass.toString
     + " #"
     + unit.id
     + (if (alive) " (" + totalLife + "/" + unit.unitClass.maxTotalHealth + ")" else " (DEAD)")

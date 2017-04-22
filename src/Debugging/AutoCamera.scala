@@ -7,7 +7,7 @@ import ProxyBwapi.UnitInfo.UnitInfo
 class AutoCamera {
   
   private var tweenFrom: Pixel = Points.middle
-  private var focus = With.self.startTile
+  private var focus = With.self.startTile.pixelCenter
   
   private val refocusLimit = 96
   private var focusFrame = -240

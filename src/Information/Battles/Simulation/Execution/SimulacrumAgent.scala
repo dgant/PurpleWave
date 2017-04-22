@@ -207,7 +207,7 @@ object SimulacrumAgent {
   @inline private def moveAwayFrom(thisUnit:Simulacrum, destination: Pixel, battle: BattleSimulation) {
     val from = thisUnit.pixel
     move(thisUnit, destination, -1.0)
-    if (battle.doLog) {
+    if (battle.doLog && from != thisUnit.pixel) {
       battle.events.append(new BattleSimulationEventMoveAway(battle.frameDuration, thisUnit, from, thisUnit.pixel, destination))
     }
   }
@@ -215,7 +215,7 @@ object SimulacrumAgent {
   @inline private def moveTowards(thisUnit:Simulacrum, destination: Pixel, battle: BattleSimulation) {
     val from = thisUnit.pixel
     move(thisUnit, destination, chargingSpeedRatio, thisUnit.pixel.pixelDistanceFast(destination))
-    if (battle.doLog) {
+    if (battle.doLog && from != thisUnit.pixel) {
       battle.events.append(new BattleSimulationEventMoveTowards(battle.frameDuration, thisUnit, from, thisUnit.pixel, destination))
     }
   }
@@ -226,9 +226,7 @@ object SimulacrumAgent {
     multiplier  : Double,
     maxDistance : Double = 1000.0) {
     val from = thisUnit.pixel
-    thisUnit.pixel = thisUnit.pixel.project(destination, Math.min(
-      maxDistance,
-      multiplier * thisUnit.topSpeed * (1 + movementFrames)))
+    thisUnit.pixel = thisUnit.pixel.project(destination, Math.min(maxDistance, multiplier * thisUnit.topSpeed * (1 + movementFrames)))
     thisUnit.attackCooldown = movementFrames
     thisUnit.moveCooldown   = movementFrames
   }

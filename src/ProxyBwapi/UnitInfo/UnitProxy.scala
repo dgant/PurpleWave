@@ -35,6 +35,9 @@ abstract class UnitProxy(var base:bwapi.Unit) {
   // Combat //
   ////////////
   
+  def interceptors:Int
+  def scarabs:Int
+  
   def attacking:Boolean
   def attackStarting:Boolean
   def attackAnimationHappening:Boolean

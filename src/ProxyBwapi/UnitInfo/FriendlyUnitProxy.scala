@@ -59,12 +59,17 @@ abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
   // Combat //
   ////////////
   
+  def interceptors : Int = interceptorCountCache.get
+  def scarabs      : Int = scarabCountCache.get
+  
   def attacking                 : Boolean = base.isAttacking
   def attackStarting            : Boolean = base.isStartingAttack
   def attackAnimationHappening  : Boolean = base.isAttackFrame
   def airCooldownLeft           : Int     = airCooldownLeftCache.get
   def groundCooldownLeft        : Int     = groundCooldownLeftCache.get
   
+  private val interceptorCountCache = new CacheFrame(() => base.getInterceptorCount)
+  private val scarabCountCache = new CacheFrame(() => base.getScarabCount)
   private val airCooldownLeftCache = new CacheFrame(() => base.getAirWeaponCooldown)
   private val groundCooldownLeftCache = new CacheFrame(() => base.getGroundWeaponCooldown)
   
@@ -148,11 +153,12 @@ abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
   def maelstrommed  : Boolean = cachedIsMaelstrommed.get
   def sieged        : Boolean = base.isSieged
   def stasised      : Boolean = cachedStasised.get
-  def stimmed       : Boolean = base.isStimmed
+  def stimmed       : Boolean = cachedIsStimmed.get
   def stuck         : Boolean = base.isStuck
   def velocityX     : Double  = base.getVelocityX
   def velocityY     : Double  = base.getVelocityY
   
+  private val cachedIsStimmed = new CacheFrame(() => base.isStimmed)
   private val cachedIsLockedDown = new CacheFrame(() => base.isLockedDown)
   private val cachedIsMaelstrommed = new CacheFrame(() => base.isMaelstrommed)
   

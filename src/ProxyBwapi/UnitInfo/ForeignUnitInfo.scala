@@ -4,7 +4,7 @@ import Lifecycle.With
 import Mathematics.Pixels.{Pixel, Tile}
 import Performance.Caching.Limiter
 import ProxyBwapi.Players.{PlayerInfo, Players}
-import ProxyBwapi.Races.Terran
+import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
 import bwapi.Position
 
@@ -108,6 +108,9 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
   ////////////
   // Combat //
   ////////////
+  
+  def interceptors  : Int = if (is(Protoss.Carrier))  8 else 0
+  def scarabs       : Int = if (is(Protoss.Reaver))   5 else 0
   
   private def updateCombat() {
     _attacking                = base.isAttacking

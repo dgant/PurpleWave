@@ -12,13 +12,6 @@ class FriendlyUnitInfo(base:bwapi.Unit) extends FriendlyUnitProxy(base) {
   // Health //
   ////////////
   
-  ////////////
-  // Combat //
-  ////////////
-  
-  override def interceptors : Int = base.getInterceptorCount
-  override def scarabs      : Int = base.getScarabCount
-  
   //////////////
   // Geometry //
   //////////////

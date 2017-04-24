@@ -15,7 +15,8 @@ object EvaluateTactics {
     new TacticsHeuristicWeight(TacticsHeuristicSimulatedSurvivorsEnemy, -1.0),
     new TacticsHeuristicWeight(TacticsHeuristicSimulatedLossesOurs,     -1.0),
     new TacticsHeuristicWeight(TacticsHeuristicEstimatedDamageOurs,     -1.0),
-    new TacticsHeuristicWeight(TacticsHeuristicFleeingWhenDefending,    -1.0)
+    new TacticsHeuristicWeight(TacticsHeuristicFleeingWhenDefending,    -1.0),
+    new TacticsHeuristicWeight(TacticsHeuristicWorkersSallying,         -1.0)
   )
   
   def best(battle:Battle):TacticsOptions = {

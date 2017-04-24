@@ -13,7 +13,7 @@ class Configuration {
   
   var visualize                   = true
   var visualizeBases              = false
-  var visualizeBattles            = false
+  var visualizeBattles            = true
   var visualizeBullets            = false
   var visualizeChokepoints        = false
   var visualizeEconomy            = false
@@ -49,7 +49,7 @@ class Configuration {
   var conservativeViewportWidth   = 640 + cameraViewportWidth
   var conservativeViewportHeight  = 480 + cameraViewportHeight
   
-  var maxFrameMilliseconds  = 20
+  var maxFrameMilliseconds  = 60
   
   var urgencyManners        = 1
   var urgencyEconomy        = 1

@@ -9,7 +9,7 @@ object EvaluateTactics {
   
   private val heuristicWeights = Vector(
     new TacticsHeuristicWeight(TacticsHeuristicEstimatedStrength, 1.0),
-    new TacticsHeuristicWeight(TacticsHeuristicSimulatedLosses,   1.0)
+    new TacticsHeuristicWeight(TacticsHeuristicSimulatedLosses,   -1.0)
   )
   
   def best(battle:Battle):TacticsOptions = {

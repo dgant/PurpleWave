@@ -31,9 +31,9 @@ object DrawMap {
     line(start, end, color)
     
     //Crummy arrowhead drawn from circles
-    circle(end, 2, color, solid = true)
-    circle(start.project(end, start.pixelDistanceSlow(end) - 2), 3, color, solid = true)
-    circle(start.project(end, start.pixelDistanceSlow(end) - 4), 4, color, solid = true)
+    circle(end, 1, color, solid = true)
+    circle(start.project(end, start.pixelDistanceSlow(end) - 3), 2, color, solid = true)
+    circle(start.project(end, start.pixelDistanceSlow(end) - 5), 3, color, solid = true)
   }
   
   def box(

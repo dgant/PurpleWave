@@ -23,12 +23,18 @@ class BattleClassifier {
   def all:Traversable[Battle] = local ++ byZone.values :+ global
   
   def classify() {
-    combatantsOurs  = With.units.ours .toVector.filter(unit => unit.unitClass.helpsInCombat)
-    combatantsEnemy = With.units.enemy.toVector.filter(unit => unit.unitClass.helpsInCombat && unit.possiblyStillThere)
+    combatantsOurs  = With.units.ours .toVector.filter(isCombatant)
+    combatantsEnemy = With.units.enemy.toVector.filter(isCombatant)
     replaceBattleGlobal()
     replaceBattleByZone()
     replaceBattlesLocal()
     all.foreach(BattleUpdater.updateBattle)
+  }
+  
+  def isCombatant(unit:UnitInfo):Boolean = {
+    (unit.complete || unit.unitClass.isBeacon) &&
+      unit.unitClass.helpsInCombat &&
+      unit.possiblyStillThere
   }
   
   private def replaceBattleGlobal() {

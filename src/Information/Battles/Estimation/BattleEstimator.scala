@@ -39,9 +39,6 @@ object BattleEstimator {
       return new BattleEstimation(battle, tacticsUs, 0, 0, participantsUs, participantsEnemy, newDamageMap, newDamageMap)
     }
     
-    val damageSpreadUs      = participantsUs.size
-    val damageSpreadEnemy   = participantsEnemy.size
-    
     val damageDealtByUs     = newDamageMap
     val damageDealtByEnemy  = newDamageMap
     
@@ -49,7 +46,7 @@ object BattleEstimator {
     participantsEnemy .foreach(dealDamage(_, damageDealtByEnemy))
     
     damageDealtToUs    = participantsUs    .map(costOfDamage(_, damageDealtByEnemy)).sum / participantsUs.size
-    damageDealtToEnemy = participantsEnemy .map(costOfDamage(_, damageDealtByEnemy)).sum / participantsEnemy.size
+    damageDealtToEnemy = participantsEnemy .map(costOfDamage(_, damageDealtByUs   )).sum / participantsEnemy.size
       
     new BattleEstimation(
       battle,
@@ -62,11 +59,11 @@ object BattleEstimator {
       damageDealtByEnemy)
   }
   
-  type DamageMap = mutable.HashMap[VulnerabilityProfile, Double]
-  
   private val small = 0
   private val medium = 1
   private val large = 2
+  
+  type DamageMap = mutable.HashMap[VulnerabilityProfile, Double]
   
   private def newDamageMap:DamageMap = {
     val output = new mutable.HashMap[VulnerabilityProfile, Double]
@@ -95,6 +92,7 @@ object BattleEstimator {
   case class VulnerabilityProfile(flying: Boolean, size: Int)
   
   class Participant(
+    val unit                  : UnitInfo,
     val dpsGroundSmall        : Double,
     val dpsGroundMedium       : Double,
     val dpsGroundLarge        : Double,
@@ -154,7 +152,7 @@ object BattleEstimator {
     val value                       = unit.unitClass.mineralValue * 3.0 + unit.unitClass.gasValue * 2.0
     val valueRatio                  = value * 2 / (unit.totalHealth + unit.unitClass.maxTotalHealth)
     
-    val distanceFactor              = 32.0 * 4.0 //How far from the focus renders a unit irrelevant
+    val distanceFactor              = 32.0 * 5.0 //How far from the focus renders a unit irrelevant
     val isFighting                  = isFighter(unit, tacticsThis)
     val isCharging                  = isFighting && tacticsThis.has(Tactics.Movement.Charge)
     val isFleeing                   = isFleer(unit, tacticsThis)
@@ -175,14 +173,15 @@ object BattleEstimator {
     val attackAir         = unit.airDps     > 0 && ! tacticsThis.has(Tactics.Focus.Ground)
     val damageFocusGround = if (attackGround && attackAir)       enemyGroundRatio else if (attackGround)  1.0 else 0.0
     val damageFocusAir    = if (attackGround && attackAir) 1.0 - enemyGroundRatio else if (attackAir)     1.0 else 0.0
-    val dpsGroundSmall    = if (isFighting) damageFocusGround * unit.groundDps  * Damage.scaleBySize(unit.unitClass.groundDamageTypeRaw,  UnitSizeType.Small)   else 0.0
-    val dpsGroundMedium   = if (isFighting) damageFocusGround * unit.groundDps  * Damage.scaleBySize(unit.unitClass.groundDamageTypeRaw,  UnitSizeType.Medium)  else 0.0
-    val dpsGroundLarge    = if (isFighting) damageFocusGround * unit.groundDps  * Damage.scaleBySize(unit.unitClass.groundDamageTypeRaw,  UnitSizeType.Large)   else 0.0
-    val dpsAirSmall       = if (isFighting) damageFocusAir    * unit.airDps     * Damage.scaleBySize(unit.unitClass.airDamageTypeRaw,     UnitSizeType.Small)   else 0.0
-    val dpsAirMedium      = if (isFighting) damageFocusAir    * unit.airDps     * Damage.scaleBySize(unit.unitClass.airDamageTypeRaw,     UnitSizeType.Medium)  else 0.0
-    val dpsAirLarge       = if (isFighting) damageFocusAir    * unit.airDps     * Damage.scaleBySize(unit.unitClass.airDamageTypeRaw,     UnitSizeType.Large)   else 0.0
+    val dpsGroundSmall    = if (isFighting) damageFocusGround * dpsGround * Damage.scaleBySize(unit.unitClass.groundDamageTypeRaw,  UnitSizeType.Small)   else 0.0
+    val dpsGroundMedium   = if (isFighting) damageFocusGround * dpsGround * Damage.scaleBySize(unit.unitClass.groundDamageTypeRaw,  UnitSizeType.Medium)  else 0.0
+    val dpsGroundLarge    = if (isFighting) damageFocusGround * dpsGround * Damage.scaleBySize(unit.unitClass.groundDamageTypeRaw,  UnitSizeType.Large)   else 0.0
+    val dpsAirSmall       = if (isFighting) damageFocusAir    * dpsAir    * Damage.scaleBySize(unit.unitClass.airDamageTypeRaw,     UnitSizeType.Small)   else 0.0
+    val dpsAirMedium      = if (isFighting) damageFocusAir    * dpsAir    * Damage.scaleBySize(unit.unitClass.airDamageTypeRaw,     UnitSizeType.Medium)  else 0.0
+    val dpsAirLarge       = if (isFighting) damageFocusAir    * dpsAir    * Damage.scaleBySize(unit.unitClass.airDamageTypeRaw,     UnitSizeType.Large)   else 0.0
     
     new Participant(
+      unit,
       dpsGroundSmall,
       dpsGroundMedium,
       dpsGroundLarge,

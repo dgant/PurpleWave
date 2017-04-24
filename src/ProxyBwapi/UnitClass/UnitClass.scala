@@ -56,13 +56,13 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
     groundDamageCooldownRaw
   
   //The extra 2+ is to account for the 1-3 frame random variation in cooldown
-  lazy val airDps    : Double = effectiveAirDamage    * 24 / (2 + airDamageCooldown).toDouble
-  lazy val groundDps : Double = effectiveGroundDamage * 24 / (2 + groundDamageCooldown).toDouble
+  lazy val airDps    : Double = airDamageFactorRaw    * maxAirHitsRaw     * effectiveAirDamage    * 24 / (2 + airDamageCooldown).toDouble
+  lazy val groundDps : Double = groundDamageFactorRaw * maxGroundHitsRaw  * effectiveGroundDamage * 24 / (2 + groundDamageCooldown).toDouble
   
   lazy val attacksGround : Boolean = effectiveGroundDamage > 0
   lazy val attacksAir    : Boolean = effectiveAirDamage    > 0
   
-  lazy val helpsInCombat:Boolean = canAttack || isSpellcaster || Set(Terran.Bunker, Terran.Medic).contains(this)
+  lazy val helpsInCombat:Boolean = canAttack || isSpellcaster || Set(Terran.Bunker).contains(this)
   
   lazy val groundRange        : Int = if (this == Terran.Bunker) Terran.Marine.groundRange  + 32 else if (this == Protoss.Reaver) 32 * 8 else groundRangeRaw
   lazy val airRange           : Int = if (this == Terran.Bunker) Terran.Marine.airRange     + 32 else airRangeRaw
@@ -267,5 +267,5 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
   
   lazy val mineralValue     : Int = mineralPrice + buildUnitsSpent.map(_.mineralValue).sum
   lazy val gasValue         : Int = mineralPrice + buildUnitsSpent.map(_.gasValue).sum
-  lazy val subjectiveValue  : Int = (3 * mineralValue + 2 * gasValue) * (if(isWorker) 2 else 1)
+  lazy val subjectiveValue  : Int = (2 * mineralValue + 3 * gasValue) * (if(isWorker) 2 else 1)
 }

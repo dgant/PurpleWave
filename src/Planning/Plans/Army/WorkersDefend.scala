@@ -24,10 +24,10 @@ class WorkersDefend extends Plan {
   override def update() {
     matchWorkers.specificUnits =
       With.battles.local.flatten(battle =>
-        if (battle.consensusTactics.has(Tactics.Workers.FightAll)) {
+        if (battle.bestTactics.has(Tactics.Workers.FightAll)) {
           battleUnits(battle)
         }
-        else if (battle.consensusTactics.has(Tactics.Workers.FightHalf)) {
+        else if (battle.bestTactics.has(Tactics.Workers.FightHalf)) {
           //Hacky, because it ignores whether we'll actually get these units
           //Better would be to use a preference and a counter
           val workers = battleUnits(battle)

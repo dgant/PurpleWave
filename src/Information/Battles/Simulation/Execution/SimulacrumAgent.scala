@@ -19,6 +19,8 @@ object SimulacrumAgent {
   //What fraction of top speed charging units are likely to get
   private val movementFrames = 8
   private val wrongFocusPenalty = 10
+  private val nonCombatantPenalty = 5
+  private val focusFireBonus = 2
   
   //////////////////
   // Update state //
@@ -40,7 +42,7 @@ object SimulacrumAgent {
     // Update threat //
     ///////////////////
   
-    if (thisUnit.threat.exists( ! _.alive)) {
+    if (thisUnit.threat.exists(threat => ! threat.alive || threat.target.exists(_ != thisUnit))) {
       thisUnit.threat = None
     }
     if (thisUnit.threat.isEmpty) {
@@ -53,7 +55,7 @@ object SimulacrumAgent {
       var i = 0
       while (i < thatGroup.units.size) {
         val threat = thatGroup.units(i)
-        if (validThreat(thisUnit, threat)) {
+        if (threat.alive && threat.canAttack(thisUnit) && ! threat.target.exists(_ != thisUnit)) {
           val score = thisUnit.pixel.pixelDistanceSquared(threat.pixel)
           if (score < bestScore) {
             bestScore = score
@@ -62,9 +64,7 @@ object SimulacrumAgent {
         }
         i += 1
       }
-      if (battle.doLog && thisUnit.threat.nonEmpty) {
-        battle.events.append(new BattleSimulationEventFears(battle.frameDuration, thisUnit, thisUnit.threat.get))
-      }
+      
     }
   
     ///////////////////
@@ -87,7 +87,9 @@ object SimulacrumAgent {
         if (validTarget(thisUnit, target)) {
           val score = thisUnit.pixel.pixelDistanceSquared(target.pixel) *
             (if (   target.flying && thisGroup.tactics.has(Tactics.Focus.Air))     1 else wrongFocusPenalty) *
-            (if ( ! target.flying && thisGroup.tactics.has(Tactics.Focus.Ground))  1 else wrongFocusPenalty) /
+            (if ( ! target.flying && thisGroup.tactics.has(Tactics.Focus.Ground))  1 else wrongFocusPenalty) *
+            (if (target.threat.exists(targetThreat => targetThreat.target.exists(_ == target))) 1 else focusFireBonus) *
+            (if (   target.fighting) 1 else nonCombatantPenalty)
             target.totalLife
           if (score < bestScore) {
             bestScore = score
@@ -232,5 +234,4 @@ object SimulacrumAgent {
   }
   
   @inline def validTarget(thisUnit:Simulacrum, target: Simulacrum) = target.alive && thisUnit.canAttack(target)
-  @inline def validThreat(thisUnit:Simulacrum, threat: Simulacrum) = threat.alive && threat.canAttack(thisUnit)
 }

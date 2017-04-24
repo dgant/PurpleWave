@@ -12,6 +12,7 @@ class BattleSimulationGroup(battleGroup:BattleGroup, val tactics: TacticsOptions
     battleGroup.units
       .filter(_.unitClass.helpsInCombat)
       .map(unit => new Simulacrum(unit))
+      .sortBy(simulacrum => simulacrum.pixel.pixelDistanceSquared(battleGroup.vanguard))
   
   var lostUnits           : ArrayBuffer[Simulacrum] = ArrayBuffer.empty
   var lostValue           : Int = 0

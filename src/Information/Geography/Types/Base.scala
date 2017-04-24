@@ -1,6 +1,7 @@
 package Information.Geography.Types
 
 import Mathematics.Pixels.{Tile, TileRectangle}
+import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.UnitInfo.UnitInfo
 
 class Base(
@@ -19,4 +20,6 @@ class Base(
   var lastScoutedFrame  = 0
   
   var heart:Tile = harvestingArea.midpoint
+  
+  def owner:PlayerInfo = zone.owner
 }

@@ -26,7 +26,7 @@ class Simulacrum(val unit:UnitInfo) {
   var moveCooldown      : Int       = Math.min(8, unit.cooldownLeft) //Rough approximation
   
   var fleeing   : Boolean = false
-  var fighting  : Boolean = true
+  var fighting  : Boolean = unit.unitClass.helpsInCombat
   var ignoring  : Boolean = false
   
   def totalLife     : Int     = hitPoints + shields

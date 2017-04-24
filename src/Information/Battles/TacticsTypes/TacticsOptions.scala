@@ -15,7 +15,7 @@ class TacticsOptions(private var options:Int = 0) {
   }
   
   override def toString: String = {
-    val names = Map(
+    val names = Vector(
       Tactics.Movement.None     -> "Movement: None",
       Tactics.Movement.Charge   -> "Movement: Charge",
       Tactics.Movement.Kite     -> "Movement: Kite",

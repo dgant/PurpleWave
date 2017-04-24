@@ -22,12 +22,12 @@ object BattleEstimator {
   }
   
   def estimateWithTactics(battle:Battle, tacticsUs:TacticsOptions, tacticsEnemy:TacticsOptions):BattleEstimation = {
-  
+    
     val fightDuration = 24 * (
-      (if (tacticsUs    .has(Tactics.Movement.Charge))  4 else 0) +
-      (if (tacticsEnemy .has(Tactics.Movement.Charge))  4 else 0) +
-      (if (tacticsUs    .has(Tactics.Movement.Kite))    2 else 0) +
-      (if (tacticsEnemy .has(Tactics.Movement.Kite))    2 else 0))
+      (if (tacticsUs    .has(Tactics.Movement.Charge))  4 else 1) +
+      (if (tacticsEnemy .has(Tactics.Movement.Charge))  4 else 1) +
+      (if (tacticsUs    .has(Tactics.Movement.Kite))    2 else 1) +
+      (if (tacticsEnemy .has(Tactics.Movement.Kite))    2 else 1))
     
     var damageDealtToUs          = 0.0
     var damageDealtToEnemy       = 0.0
@@ -77,12 +77,12 @@ object BattleEstimator {
   }
   
   private def dealDamage(attacker:Participant, damageMap:DamageMap) {
-    damageMap(new VulnerabilityProfile(false, small))    = attacker.involvement * attacker.dpsGroundSmall
-    damageMap(new VulnerabilityProfile(false, medium))   = attacker.involvement * attacker.dpsGroundMedium
-    damageMap(new VulnerabilityProfile(false, large))    = attacker.involvement * attacker.dpsGroundLarge
-    damageMap(new VulnerabilityProfile(true,  small))    = attacker.involvement * attacker.dpsAirSmall
-    damageMap(new VulnerabilityProfile(true,  medium))   = attacker.involvement * attacker.dpsAirMedium
-    damageMap(new VulnerabilityProfile(true,  large))    = attacker.involvement * attacker.dpsAirLarge
+    damageMap(new VulnerabilityProfile(false, small))    += attacker.involvement * attacker.dpsGroundSmall
+    damageMap(new VulnerabilityProfile(false, medium))   += attacker.involvement * attacker.dpsGroundMedium
+    damageMap(new VulnerabilityProfile(false, large))    += attacker.involvement * attacker.dpsGroundLarge
+    damageMap(new VulnerabilityProfile(true,  small))    += attacker.involvement * attacker.dpsAirSmall
+    damageMap(new VulnerabilityProfile(true,  medium))   += attacker.involvement * attacker.dpsAirMedium
+    damageMap(new VulnerabilityProfile(true,  large))    += attacker.involvement * attacker.dpsAirLarge
   }
   
   private def costOfDamage(defender:Participant, damageMap:DamageMap):Double = {

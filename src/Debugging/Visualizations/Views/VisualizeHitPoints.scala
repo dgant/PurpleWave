@@ -33,7 +33,7 @@ object VisualizeHitPoints {
     val xStartDm    = xStartSh + widthShMax
     
     val colorHp = Colors.BrightGreen
-    val colorSh = Colors.BrightTeal
+    val colorSh = Colors.BrightBlue
     val colorDm = Colors.BrightViolet
     
     DrawMap.box(new Pixel(xStartDm, yStart), new Pixel(xStartDm+widthDmMax, yEnd), colorDm, solid = false)

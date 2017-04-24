@@ -1,10 +1,12 @@
 package Micro.Heuristics.Movement
 
+import Information.Geography.Types.Zone
 import Lifecycle.With
 import Mathematics.Heuristics.HeuristicMath
 import Mathematics.Pixels.{Pixel, Point}
 import Micro.Heuristics.MovementHeuristics.MovementHeuristicResult
 import Micro.Intent.Intention
+import ProxyBwapi.UnitInfo.UnitInfo
 
 object EvaluatePixels {
   
@@ -52,7 +54,7 @@ object EvaluatePixels {
               weightedHeuristic.color)))
     }
     
-    HeuristicMath.calculateBest(intent, profile.weightedHeuristics, candidates)
+    HeuristicMath.best(intent, profile.weightedHeuristics, candidates)
   }
   
   def getCandidates(intent:Intention):Vector[Pixel] = {
@@ -80,16 +82,36 @@ object EvaluatePixels {
       (0 until 256 by 32).flatten(angle =>
         Vector(80.0, 62.0)
           .map(distance => startingPixel.radiate(angle, distance))
-          .find(targetPixel =>
-            With.grids.walkable.get(targetPixel.tileIncluding) && targetPixel.zone == startingZone))
+          .find(targetPixel => acceptable(intent.unit, targetPixel, startingPixel, startingZone)))
     
     val pixelsDiagonal =
       (16 until 256 by 32).flatten(angle =>
         Vector(62.0, 32.0)
           .map(distance => startingPixel.radiate(angle, distance))
-          .find(targetPixel =>
-            With.grids.walkable.get(targetPixel.tileIncluding) && targetPixel.zone == startingZone))
+          .find(targetPixel => acceptable(intent.unit, targetPixel, startingPixel, startingZone)))
    
     Vector(startingPixel) ++ pixelsOrthogonal ++ pixelsDiagonal
   }
+  
+  def acceptable(
+    unit:UnitInfo,
+    candidate:Pixel,
+    startingPixel:Pixel,
+    startingZone:Zone)
+      :Boolean = {
+    
+    if ( ! candidate.valid) return false
+    if (unit.flying) return true
+    if ( ! With.grids.walkable.get(candidate.tileIncluding)) return false
+    
+    val candidateZone = candidate.zone
+    if (startingZone == candidateZone) return true
+    
+    startingZone.edges.exists(
+      edge => edge.zones.exists(_ == candidateZone)
+      &&
+        candidate.pixelDistanceFast(startingPixel) * 2 >
+        candidate.pixelDistanceFast(edge.centerPixel) + startingPixel.pixelDistanceFast(edge.centerPixel))
+  }
+  
 }

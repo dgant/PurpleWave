@@ -14,7 +14,6 @@ object Flee extends Action {
       (intent.tactics.exists(_.has(Tactics.Wounded.Flee))  && wounded(intent)) ||
       (intent.tactics.exists(_.has(Tactics.Workers.Flee))  && worker(intent))
     ) &&
-    intent.unit.tileIncludingCenter.zone != intent.origin.zone &&
     intent.threats.nonEmpty
   }
   

@@ -20,11 +20,12 @@ object VisualizeBattles {
     val localBattles = With.battles.local.filter(_.happening)
     if (localBattles.nonEmpty) {
       val battle = localBattles.minBy(battle => battle.focus.pixelDistanceSquared(With.viewport.center))
-      val tactics = battle.consensusTactics
+      val tactics = battle.bestTactics
       val simulation = battle.simulation(tactics)
       val estimation = battle.estimation(tactics)
       simulation.foreach(drawSimulationReport)
       estimation.foreach(drawEstimationReport)
+      drawTacticsHeuristics(battle)
     }
     if (Yolo.enabled && With.frame / 24 % 2 == 0) {
       With.game.drawTextScreen(5, 5, "YOLO")
@@ -122,5 +123,19 @@ object VisualizeBattles {
     if (tactics.has(Tactics.Workers.FightHalf))  return "Fight (Half)"
     if (tactics.has(Tactics.Workers.Flee))       return "Flee"
     return "-"
+  }
+  
+  private def drawTacticsHeuristics(battle:Battle) {
+    if (battle.tacticsHeuristicResults.isEmpty) return
+    
+    val heuristicsTable = Vector(Vector("Value", "Tactics")) ++
+      battle.tacticsHeuristicResults.map(r => Vector(
+        r.evaluation.toString,
+        r.candidate.getClass.getSimpleName.replace("TacticsHeuristic", "")))
+    DrawScreen.table(5, 250, heuristicsTable)
+    
+    val tacticsTable = Vector(battle.rankedTactics.map(_.toString))
+    DrawScreen.table(255, 250, tacticsTable)
+    
   }
 }

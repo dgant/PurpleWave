@@ -14,7 +14,7 @@ import ProxyBwapi.Upgrades.Upgrade
 class Intention(val plan:Plan, val unit:FriendlyUnitInfo) {
   
   def state:ExecutionState = With.executor.getState(unit)
-  def tactics:Option[TacticsOptions] = With.battles.byUnit.get(unit).map(b => b.consensusTactics)
+  def tactics:Option[TacticsOptions] = With.battles.byUnit.get(unit).map(b => b.bestTactics)
   
   var executed:Boolean = false
   

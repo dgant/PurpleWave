@@ -23,7 +23,7 @@ object VisualizePerformance {
       .sortBy(_.getClass.getSimpleName + "  ")
       .map(system => Vector(
         system.getClass.getSimpleName.replace("Task", ""),
-        system.framesSinceRunning.toString,
+        "X" * Math.min(10, Math.max(0, system.framesSinceRunning - 1)),
         system.totalRuns.toString,
         system.totalSkips.toString,
         system.runMillisecondsMean.toString,

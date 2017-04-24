@@ -52,11 +52,11 @@ class Configuration {
   var maxFrameMilliseconds  = 25
   
   var urgencyManners        = 1
-  var urgencyEconomy        = 2
-  var urgencyBattles        = 3
-  var urgencyGeography      = 4
-  var urgencyPlanning       = 6
-  var urgencyMicro          = 7
-  var urgencyGrids          = 8
+  var urgencyEconomy        = 1
+  var urgencyGeography      = 1
+  var urgencyPlanning       = 2
+  var urgencyBattles        = 5
+  var urgencyGrids          = 5
   var urgencyUnitTracking   = 10
+  var urgencyMicro          = 30
 }

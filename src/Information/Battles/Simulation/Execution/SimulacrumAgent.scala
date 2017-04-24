@@ -20,7 +20,7 @@ object SimulacrumAgent {
   private val movementFrames = 8
   private val wrongFocusPenalty = 10
   private val nonCombatantPenalty = 5
-  private val focusFireBonus = 2
+  private val focusFireBonus = 3
   
   //////////////////
   // Update state //

@@ -130,12 +130,11 @@ object VisualizeBattles {
     
     val heuristicsTable = Vector(Vector("Value", "Tactics")) ++
       battle.tacticsHeuristicResults.map(r => Vector(
-        r.evaluation.toString,
+        "%.2f".format(r.evaluation),
         r.candidate.getClass.getSimpleName.replace("TacticsHeuristic", "")))
     DrawScreen.table(5, 250, heuristicsTable)
     
-    val tacticsTable = Vector(battle.rankedTactics.map(_.toString))
-    DrawScreen.table(255, 250, tacticsTable)
+    With.game.drawTextScreen(255, 250, battle.rankedTactics.map(tactic => tactic.toString).mkString("\n"))
     
   }
 }

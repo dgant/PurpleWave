@@ -112,8 +112,8 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   def totalHealth: Int = hitPoints + shieldPoints + defensiveMatrixPoints
   def fractionalHealth:Double = totalHealth.toDouble / unitClass.maxTotalHealth
   
-  def interceptors  : Int = 8
-  def scarabs       : Int = 5
+  def interceptors  : Int = if (is(Protoss.Carrier))  8 else 0
+  def scarabs       : Int = if (is(Protoss.Reaver))   5 else 0
   
   def stimBonus:Int = if (stimmed) 2 else 1
   

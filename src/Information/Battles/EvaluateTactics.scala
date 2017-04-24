@@ -18,11 +18,17 @@ object EvaluateTactics {
     new TacticsHeuristicWeight(TacticsHeuristicFleeingWhenDefending,    -1.0)
   )
   
+  def best(battle:Battle):TacticsOptions = {
+    val candidates = battle.us.tacticsAvailable
+  
+    HeuristicMath.best(battle, heuristicWeights, candidates)
+  }
+  
   def sort(battle:Battle):Vector[TacticsOptions] = {
     
     val candidates = battle.us.tacticsAvailable
-  
-    if (With.configuration.visualizeBattles) {
+    
+    if (With.configuration.visualize && With.configuration.visualizeBattles) {
       battle.tacticsHeuristicResults =
         candidates.flatten(candidate =>
           heuristicWeights.map(heuristicWeight =>

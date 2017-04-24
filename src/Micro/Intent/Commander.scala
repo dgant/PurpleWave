@@ -137,7 +137,7 @@ class Commander {
   }
   
   private def sleepMove(unit:FriendlyUnitInfo) {
-    sleep(unit, 4)
+    sleep(unit, 2)
   }
   
   private def sleepAttack(unit:FriendlyUnitInfo) {

@@ -29,6 +29,8 @@ class Battle(
   def simulation(tactics:TacticsOptions):Option[BattleSimulation] = simulations.find(_.tactics == tactics)
   
   def bestTactics:TacticsOptions = rankedTactics.head
+  private val bestTacticsCache = new CacheFrame(() => EvaluateTactics.best(this))
+  
   def rankedTactics:Vector[TacticsOptions] = rankedTacticsCache.get
   private val rankedTacticsCache = new CacheFrame(() => EvaluateTactics.sort(this))
 }

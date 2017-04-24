@@ -11,7 +11,7 @@ abstract class AbstractTask {
   private var totalSkipCount  : Int = 0
   
   final val runtimeMilliseconds = new mutable.Queue[Long]
-  final val runtimesToTrack = 30
+  final val runtimesToTrack = 10
   
   var urgency   : Int     = 1
   def skippable : Boolean = true
@@ -23,9 +23,9 @@ abstract class AbstractTask {
   final def totalSkips = totalSkipCount
   
   final def run() {
-    val millisecondsBefore = System.currentTimeMillis()
+    val millisecondsBefore = System.nanoTime() / 1000000
     onRun()
-    val millisecondsAfter = System.currentTimeMillis()
+    val millisecondsAfter = System.nanoTime() / 1000000
     recordRunDuration(millisecondsAfter - millisecondsBefore)
     lastRunFrame = With.frame
     totalRunCount += 1

@@ -1,11 +1,13 @@
 package Planning.Plans.GamePlans
 
 import Macro.BuildRequests._
+import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Plans.Army.Attack
-import Planning.Plans.Compound.Parallel
+import Planning.Plans.Compound.{IfThenElse, Or, Parallel}
 import Planning.Plans.Information.ScoutAt
 import Planning.Plans.Macro.Automatic.{BuildEnoughPylons, TrainContinuously, TrainGatewayUnitsContinuously, TrainProbesContinuously}
 import Planning.Plans.Macro.BuildOrders.ScheduleBuildOrder
+import Planning.Plans.Macro.UnitCount.UnitsExactly
 import ProxyBwapi.Races.Protoss
 
 class ProtossVsProtoss extends Parallel {
@@ -15,11 +17,18 @@ class ProtossVsProtoss extends Parallel {
   // http://wiki.teamliquid.net/starcraft/4_Gate_Goon_(vs._Protoss)
   
   
-  val _buildStart = Vector[BuildRequest] (
+  val _nineNineTwoGate = Vector[BuildRequest] (
     new RequestUnitAtLeast(1, Protoss.Nexus),
-    new RequestUnitAnother(9, Protoss.Probe),
+    new RequestUnitAtLeast(9, Protoss.Probe),
     new RequestUnitAtLeast(1, Protoss.Pylon),
-    new RequestUnitAtLeast(2, Protoss.Gateway)
+    new RequestUnitAtLeast(2, Protoss.Gateway),
+    new RequestUnitAtLeast(11, Protoss.Probe)
+  )
+  
+  val _earlyZealots = Vector[BuildRequest] (
+    new RequestUnitAtLeast(1, Protoss.Zealot),
+    new RequestUnitAtLeast(2, Protoss.Pylon),
+    new RequestUnitAtLeast(2, Protoss.Zealot)
   )
   
   val _buildMiddle = Vector[BuildRequest] (
@@ -31,8 +40,17 @@ class ProtossVsProtoss extends Parallel {
     new RequestUnitAtLeast(2, Protoss.Nexus)
   )
   
-  val _twoBaseBuild = Vector[BuildRequest] (
-    new RequestUnitAtLeast(2, Protoss.Assimilator),
+  val _firstExpansion = Vector[BuildRequest] (
+    new RequestUnitAtLeast(2, Protoss.Nexus),
+    new RequestUnitAtLeast(2, Protoss.Assimilator)
+  )
+  
+  val _reaverTech = Vector[BuildRequest] (
+    new RequestUnitAtLeast(1, Protoss.RoboticsFacility),
+    new RequestUnitAtLeast(1, Protoss.RoboticsSupportBay)
+  )
+  
+  val _lateGame = Vector[BuildRequest] (
     new RequestUnitAtLeast(1, Protoss.RoboticsFacility),
     new RequestUnitAtLeast(6, Protoss.Gateway),
     new RequestUnitAtLeast(1, Protoss.RoboticsSupportBay),
@@ -50,13 +68,27 @@ class ProtossVsProtoss extends Parallel {
   )
   
   children.set(Vector(
-    new ScheduleBuildOrder(_buildStart),
+    new ScheduleBuildOrder(_nineNineTwoGate),
+    new IfThenElse(
+      new Or(
+        new UnitsExactly(0, new UnitMatchType(Protoss.CyberneticsCore)),
+        new UnitsExactly(0, new UnitMatchType(Protoss.Assimilator))
+      ),
+      new ScheduleBuildOrder(_earlyZealots)
+    ),
     new BuildEnoughPylons,
     new TrainProbesContinuously,
     new TrainContinuously(Protoss.Reaver),
     new TrainGatewayUnitsContinuously,
-    new ScheduleBuildOrder(_buildMiddle),
-    new ScheduleBuildOrder(_twoBaseBuild),
+    new IfThenElse(
+      new UnitsExactly(6, new UnitMatchType(Protoss.Dragoon)),
+      new ScheduleBuildOrder(_firstExpansion)
+    ),
+    new ScheduleBuildOrder(_reaverTech),
+    new IfThenElse(
+      new UnitsExactly(2, new UnitMatchType(Protoss.Nexus)),
+      new ScheduleBuildOrder(_lateGame)
+    ),
     new ScoutAt(9),
     new Attack
   ))

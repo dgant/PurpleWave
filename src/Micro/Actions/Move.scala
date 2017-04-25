@@ -10,6 +10,7 @@ object Move extends Action {
   }
   
   override def perform(intent: Intention): Boolean = {
+    
     val moveHeuristically = intent.threats.nonEmpty || intent.targets.nonEmpty
     val pixelToMove =
       if (moveHeuristically)

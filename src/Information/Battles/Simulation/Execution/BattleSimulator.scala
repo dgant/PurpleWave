@@ -6,7 +6,7 @@ import Lifecycle.With
 
 object BattleSimulator {
   
-  val maxFrames = 24 * 8
+  val maxFrames = 24 * 4
   
   //If a unit takes damage, how much do we care compared to its total value?
   val damageCostRatio = 4
@@ -20,7 +20,7 @@ object BattleSimulator {
   
   def run() {
     With.battles.local
-      .filter(_.happening)
+      .filter(battle => battle.happening && battle.us.units.size + battle.enemy.units.size < With.configuration.battleSimulatorUnitLimit)
       .foreach(battle => battle.simulations = simulate(battle))
   }
   

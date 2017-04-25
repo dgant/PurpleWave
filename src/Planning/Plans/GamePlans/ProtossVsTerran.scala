@@ -7,7 +7,7 @@ import Planning.Plans.Compound.{IfThenElse, Parallel}
 import Planning.Plans.Information.ScoutAt
 import Planning.Plans.Macro.Automatic.{BuildEnoughPylons, TrainContinuously, TrainProbesContinuously}
 import Planning.Plans.Macro.BuildOrders.ScheduleBuildOrder
-import Planning.Plans.Macro.UnitCount.UnitCountAtLeast
+import Planning.Plans.Macro.UnitCount.UnitsAtLeast
 import ProxyBwapi.Races.Protoss
 
 class ProtossVsTerran extends Parallel {
@@ -52,10 +52,11 @@ class ProtossVsTerran extends Parallel {
     new RequestUnitAtLeast(3,   Protoss.Nexus),
     new RequestUnitAtLeast(6,   Protoss.Gateway),
     new RequestUnitAtLeast(3,   Protoss.Assimilator),
-    new RequestUnitAtLeast(10,   Protoss.Gateway),
+    new RequestUnitAtLeast(8,   Protoss.Gateway),
+    new RequestUnitAtLeast(10,  Protoss.Dragoon),
     
     new RequestUnitAtLeast(4,   Protoss.Nexus),
-    new RequestUnitAtLeast(12,  Protoss.Gateway),
+    new RequestUnitAtLeast(10,  Protoss.Gateway),
     new RequestUnitAtLeast(4,   Protoss.Assimilator),
     new RequestUnitAtLeast(2,   Protoss.Forge),
     
@@ -66,74 +67,19 @@ class ProtossVsTerran extends Parallel {
     new RequestUnitAtLeast(6,   Protoss.Nexus),
     new RequestUnitAtLeast(12,  Protoss.Dragoon),
     new RequestUpgrade(         Protoss.GroundDamage,   1),
-    new RequestUpgrade(         Protoss.GroundArmor,   1),
+    new RequestUpgrade(         Protoss.GroundArmor,    1),
     new RequestUnitAtLeast(18,  Protoss.Gateway),
     
     new RequestUnitAtLeast(7,   Protoss.Nexus),
     new RequestUnitAtLeast(7,   Protoss.Assimilator),
     new RequestUnitAtLeast(15,  Protoss.Dragoon),
     new RequestUpgrade(         Protoss.GroundDamage,   2),
-    new RequestUpgrade(         Protoss.GroundArmor,   2),
+    new RequestUpgrade(         Protoss.GroundArmor,    2),
   
     new RequestUnitAtLeast(8,   Protoss.Nexus),
     new RequestUnitAtLeast(8,   Protoss.Assimilator),
     new RequestUpgrade(         Protoss.GroundDamage,   3),
-    new RequestUpgrade(         Protoss.GroundArmor,   3)
-  )
-  
-  val _carriersLate = Vector[BuildRequest] (
-    new RequestUnitAtLeast(3,   Protoss.Nexus),
-    new RequestUnitAtLeast(3,   Protoss.Assimilator),
-    new RequestUnitAtLeast(8,   Protoss.Dragoon),
-    new RequestUnitAtLeast(1,   Protoss.Stargate),
-    new RequestUnitAtLeast(4,   Protoss.Gateway),
-    new RequestUnitAtLeast(1,   Protoss.FleetBeacon),
-    new RequestUnitAtLeast(2,   Protoss.Stargate),
-    new RequestUpgrade(         Protoss.CarrierCapacity),
-    
-    new RequestUnitAtLeast(4,   Protoss.Nexus),
-    new RequestUnitAtLeast(4,   Protoss.Assimilator),
-    new RequestUnitAtLeast(1,   Protoss.CitadelOfAdun),
-    new RequestUnitAtLeast(12,  Protoss.Dragoon),
-    new RequestUnitAtLeast(10,  Protoss.Gateway),
-    new RequestUpgrade(         Protoss.ZealotSpeed),
-    
-    new RequestUnitAtLeast(5,   Protoss.Nexus),
-    new RequestUnitAtLeast(5,   Protoss.Assimilator),
-    new RequestUnitAtLeast(1,   Protoss.TemplarArchives),
-    new RequestUnitAtLeast(1,   Protoss.RoboticsFacility),
-    new RequestUnitAtLeast(1,   Protoss.DarkTemplar),
-    new RequestUnitAtLeast(1,   Protoss.RoboticsSupportBay),
-    new RequestUnitAtLeast(3,   Protoss.DarkTemplar),
-    
-    new RequestUnitAtLeast(6,   Protoss.Nexus),
-    new RequestUnitAtLeast(6,   Protoss.Assimilator),
-    new RequestUnitAtLeast(2,   Protoss.CyberneticsCore),
-    new RequestUnitAtLeast(4,   Protoss.Stargate),
-    new RequestUnitAtLeast(2,   Protoss.Forge),
-    new RequestUpgrade(         Protoss.AirDamage,    1),
-    new RequestUpgrade(         Protoss.AirArmor,     1),
-    new RequestUpgrade(         Protoss.GroundDamage, 1),
-    new RequestUpgrade(         Protoss.GroundArmor,  1),
-    new RequestUnitAtLeast(10,  Protoss.Gateway),
-    new RequestUpgrade(         Protoss.AirDamage,    2),
-    new RequestUpgrade(         Protoss.AirArmor,     2),
-    new RequestUpgrade(         Protoss.GroundDamage, 2),
-    new RequestUpgrade(         Protoss.GroundArmor,  2),
-  
-    new RequestUnitAtLeast(7, Protoss.Nexus),
-    new RequestUnitAtLeast(7, Protoss.Assimilator),
-    new RequestUpgrade(       Protoss.AirDamage,      3),
-    new RequestUpgrade(       Protoss.AirArmor,       3),
-    new RequestUpgrade(       Protoss.GroundDamage,   3),
-    new RequestUpgrade(       Protoss.GroundArmor,    3),
-    
-    new RequestUnitAtLeast(8, Protoss.Nexus),
-    new RequestUnitAtLeast(8, Protoss.Assimilator),
-    new RequestUnitAtLeast(9, Protoss.Nexus),
-    new RequestUnitAtLeast(9, Protoss.Assimilator),
-    new RequestUnitAtLeast(10, Protoss.Nexus),
-    new RequestUnitAtLeast(10, Protoss.Assimilator)
+    new RequestUpgrade(         Protoss.GroundArmor,    3)
   )
   
   children.set(Vector(
@@ -148,7 +94,7 @@ class ProtossVsTerran extends Parallel {
     new Hunt { hunters.get.unitMatcher.set(new UnitMatchType(Protoss.Scout)) },
     new Hunt { hunters.get.unitMatcher.set(new UnitMatchType(Protoss.Carrier)) },
     new IfThenElse(
-      new UnitCountAtLeast(8, UnitMatchWarriors),
+      new UnitsAtLeast(8, UnitMatchWarriors),
       new Defend,
       new Attack)
   ))

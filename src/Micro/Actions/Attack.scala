@@ -6,18 +6,19 @@ import Micro.Intent.Intention
 object Attack extends Action {
   
   override def allowed(intent: Intention): Boolean = {
-    intent.canAttack && intent.unit.canAttackThisFrame
+    intent.canAttack
   }
   
   override def perform(intent: Intention): Boolean = {
+    
     intent.toAttack = intent.toAttack.orElse(EvaluateTargets.best(intent, intent.targets))
     
-    if (intent.toAttack.isEmpty) {
-      return false
+    if (intent.toAttack.nonEmpty && intent.unit.canAttackThisFrame) {
+      With.commander.attack(intent, intent.toAttack.get)
+      return true
     }
     
-    With.commander.attack(intent, intent.toAttack.get)
-    true
+    false
   }
   
 }

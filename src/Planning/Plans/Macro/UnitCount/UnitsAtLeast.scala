@@ -5,7 +5,7 @@ import Planning.Plan
 import Lifecycle.With
 import Planning.Composition.UnitMatchers.{UnitMatchAnything, UnitMatcher}
 
-class UnitCountAtLeast(
+class UnitsAtLeast(
   initialQuantity:Int = 0,
   initialMatcher:UnitMatcher = UnitMatchAnything) extends Plan {
   

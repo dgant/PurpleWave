@@ -67,8 +67,8 @@ object VisualizeBattles {
   
   private def drawEstimationReport(estimation:BattleEstimation) {
     With.game.setTextSize(bwapi.Text.Size.Enum.Large)
-    With.game.drawTextScreen(255, 50, "+" + estimation.damageToEnemy.toInt)
-    With.game.drawTextScreen(255, 75, "-" + estimation.damageToUs.toInt)
+    With.game.drawTextScreen(255, 50, "+" + 10 * estimation.damageToEnemy.toInt)
+    With.game.drawTextScreen(255, 75, "-" + 10 * estimation.damageToUs.toInt)
     With.game.setTextSize(bwapi.Text.Size.Enum.Small)
   }
   

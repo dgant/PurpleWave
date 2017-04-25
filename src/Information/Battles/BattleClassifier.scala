@@ -106,7 +106,7 @@ class BattleClassifier {
   
   private def clusterUnits():ArrayBuffer[ArrayBuffer[UnitInfo]] = {
     
-    val unassignedUnits = (mutable.HashSet.empty ++ combatantsOurs ++ combatantsEnemy).filter(_.possiblyStillThere)
+    val unassignedUnits = mutable.HashSet.empty ++ (combatantsOurs ++ combatantsEnemy).filter(_.possiblyStillThere)
     val clusters        = new ArrayBuffer[ArrayBuffer[UnitInfo]]
     val exploredTiles   = new mutable.HashSet[Tile]
     val horizonTiles    = new mutable.HashSet[Tile]

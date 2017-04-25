@@ -25,12 +25,12 @@ class WorkersDefend extends Plan {
     matchWorkers.specificUnits =
       With.battles.local.flatten(battle =>
         if (battle.bestTactics.has(Tactics.Workers.FightAll)) {
-          battleUnits(battle)
+          battleWorkers(battle)
         }
         else if (battle.bestTactics.has(Tactics.Workers.FightHalf)) {
           //Hacky, because it ignores whether we'll actually get these units
           //Better would be to use a preference and a counter
-          val workers = battleUnits(battle)
+          val workers = battleWorkers(battle)
           workers.toVector.sortBy(_.totalHealth < 20).take(workers.size/2)
         }
         else {
@@ -42,7 +42,7 @@ class WorkersDefend extends Plan {
     workers.units.foreach(worker => With.executor.intend(new Intention(this, worker)))
   }
   
-  private def battleUnits(battle:Battle):Traversable[UnitInfo] = {
+  private def battleWorkers(battle:Battle):Traversable[UnitInfo] = {
     battle.us.units.filter(_.unitClass.isWorker)
   }
 }

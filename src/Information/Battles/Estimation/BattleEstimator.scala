@@ -152,7 +152,7 @@ object BattleEstimator {
     val value                       = unit.unitClass.mineralValue * 3.0 + unit.unitClass.gasValue * 2.0
     val valueRatio                  = value * 2 / (unit.totalHealth + unit.unitClass.maxTotalHealth)
     
-    val distanceFactor              = 32.0 * 5.0 //How far from the focus renders a unit irrelevant
+    val distanceFactor              = With.configuration.combatEvaluationDistanceTiles * 32 //How far from the focus renders a unit irrelevant
     val isFighting                  = isFighter(unit, tacticsThis)
     val isCharging                  = isFighting && tacticsThis.has(Tactics.Movement.Charge)
     val isFleeing                   = isFleer(unit, tacticsThis)

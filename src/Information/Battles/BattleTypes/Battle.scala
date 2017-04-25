@@ -5,6 +5,7 @@ import Information.Battles.EvaluateTactics
 import Information.Battles.Heuristics.TacticsHeuristicResult
 import Information.Battles.Simulation.Construction.BattleSimulation
 import Information.Battles.TacticsTypes.TacticsOptions
+import Lifecycle.With
 import Mathematics.Pixels.Pixel
 import Performance.Caching.CacheFrame
 
@@ -28,7 +29,17 @@ class Battle(
   def estimation(tactics:TacticsOptions):Option[BattleEstimation] = estimations.find(_.tactics == tactics)
   def simulation(tactics:TacticsOptions):Option[BattleSimulation] = simulations.find(_.tactics == tactics)
   
-  def bestTactics:TacticsOptions = rankedTactics.head
+  var lastBestTactics:TacticsOptions = new TacticsOptions
+  private var currentBestTactics:TacticsOptions = new TacticsOptions
+  private var lastBestTacticsUpdatedFrame = 0
+  def bestTactics:TacticsOptions = {
+    if (lastBestTacticsUpdatedFrame < With.frame) {
+      lastBestTacticsUpdatedFrame = With.frame
+      lastBestTactics = currentBestTactics
+    }
+    currentBestTactics = bestTacticsCache.get
+    currentBestTactics
+  }
   private val bestTacticsCache = new CacheFrame(() => EvaluateTactics.best(this))
   
   def rankedTactics:Vector[TacticsOptions] = rankedTacticsCache.get

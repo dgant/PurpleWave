@@ -9,12 +9,14 @@ import Mathematics.Heuristics.HeuristicMath
 object EvaluateTactics {
   
   private val heuristicWeights = Vector(
-    new TacticsHeuristicWeight(TacticsHeuristicSimulatedSurvivorsOurs,   1.0),
-    new TacticsHeuristicWeight(TacticsHeuristicSimulatedLossesEnemy,     1.0),
-    new TacticsHeuristicWeight(TacticsHeuristicEstimatedDamageEnemy,     1.0),
-    new TacticsHeuristicWeight(TacticsHeuristicSimulatedSurvivorsEnemy, -1.0),
-    new TacticsHeuristicWeight(TacticsHeuristicSimulatedLossesOurs,     -1.0),
-    new TacticsHeuristicWeight(TacticsHeuristicEstimatedDamageOurs,     -1.0),
+    //new TacticsHeuristicWeight(TacticsHeuristicSimulatedSurvivorsOurs,   1.0),
+    //new TacticsHeuristicWeight(TacticsHeuristicSimulatedLossesEnemy,     1.0),
+    new TacticsHeuristicWeight(TacticsHeuristicEstimatedDamageEnemy,     2.0),
+    new TacticsHeuristicWeight(TacticsHeuristicHysteresis,               1.50),
+    new TacticsHeuristicWeight(TacticsHeuristicKiting,                  -0.25),
+    //new TacticsHeuristicWeight(TacticsHeuristicSimulatedSurvivorsEnemy, -1.0),
+    //new TacticsHeuristicWeight(TacticsHeuristicSimulatedLossesOurs,     -1.0),
+    new TacticsHeuristicWeight(TacticsHeuristicEstimatedDamageOurs,     -2.0),
     new TacticsHeuristicWeight(TacticsHeuristicFleeingWhenDefending,    -1.0),
     new TacticsHeuristicWeight(TacticsHeuristicWorkersSallying,         -1.0)
   )

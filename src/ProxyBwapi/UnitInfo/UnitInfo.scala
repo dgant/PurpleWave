@@ -182,12 +182,10 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   private val canAttackThisSecondCache = new CacheFrame(() =>
     canDoAnythingThisFrame &&
     (
-      unitClass.canAttack ||
-      (
-        ( ! is(Protoss.Carrier) || interceptors > 0) &&
-        ( ! is(Protoss.Reaver)  || scarabs > 0) &&
-        ( ! is(Zerg.Lurker)     || burrowed)
-      )
+      unitClass.canAttack
+      || (is(Protoss.Carrier) && interceptors > 0)
+      || (is(Protoss.Reaver)  && scarabs > 0)
+      || (is(Zerg.Lurker)     && burrowed)
     ))
   
   def canAttackThisSecond(enemy:UnitInfo):Boolean =

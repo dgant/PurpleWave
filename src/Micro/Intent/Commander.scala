@@ -95,7 +95,7 @@ class Commander {
     else if ( ! intent.unit.target.exists(_ == resource)) {
       // TODO: This will fail if we've never seen the resource before, as with some long-distance mining situations.
       // In that case we should order units to move to the destination first.
-      if (resource.lastSeen > 0) {
+      if (resource.visible) {
         intent.unit.base.gather(resource.base)
       }
       else {

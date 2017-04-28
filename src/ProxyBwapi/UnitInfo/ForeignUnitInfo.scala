@@ -109,8 +109,8 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
   // Combat //
   ////////////
   
-  def interceptors  : Int = if (is(Protoss.Carrier))  8 else 0
-  def scarabs       : Int = if (is(Protoss.Reaver))   5 else 0
+  val interceptors  : Int = if (is(Protoss.Carrier))  8 else 0
+  val scarabs       : Int = if (is(Protoss.Reaver))   5 else 0
   
   private def updateCombat() {
     _attacking                = base.isAttacking

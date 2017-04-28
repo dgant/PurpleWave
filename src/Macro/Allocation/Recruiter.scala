@@ -9,24 +9,23 @@ import scala.collection.mutable
 
 class Recruiter {
   
-  private val requestByUnit   : mutable.HashMap[FriendlyUnitInfo, LockUnits]              = mutable.HashMap.empty
+  private val unitsByLock     : mutable.HashMap[LockUnits, mutable.Set[FriendlyUnitInfo]] = mutable.HashMap.empty
   private val unassignedUnits : mutable.Set[FriendlyUnitInfo]                             = mutable.Set.empty
-  private val unitsByRequest  : mutable.HashMap[LockUnits, mutable.Set[FriendlyUnitInfo]] = mutable.HashMap.empty
-  private val updatedRequests : mutable.Set[LockUnits]                                    = mutable.Set.empty
+  private val activeLocks     : mutable.Set[LockUnits]                                    = mutable.Set.empty
 
   def update() {
-    // Free units held by inactive requests
-    unitsByRequest.keySet.diff(updatedRequests).foreach(remove)
-    updatedRequests.clear()
     
-    // Remove dead units
-    requestByUnit.keys.filterNot(isEligible).foreach(unassign)
-    unassignedUnits.filterNot(isEligible).foreach(unassignedUnits.remove)
+    // Remove ineligible units
+    unitsByLock.values.foreach(_.filterNot(isEligible).foreach(unassign))
     
-    // Add new units
+    // Free units held by inactive locks
+    unitsByLock.keys.filterNot(activeLocks.contains).foreach(remove)
+    activeLocks.clear()
+    
+    // Populate unassigned units
+    unassignedUnits.clear()
     With.units.ours
-      .filter(isEligible)
-      .diff(unassignedUnits ++ requestByUnit.keys)
+      .filter(unit => isEligible(unit) && ! unitsByLock.values.exists(_.contains(unit)))
       .foreach(unassignedUnits.add)
     
     //If we suspect any bugginess, enable this
@@ -40,8 +39,9 @@ class Recruiter {
     ! ineligibleClasses.contains(unit.unitClass)
   
   private def test {
-    unitsByRequest.foreach(pair1 =>
-      unitsByRequest.foreach(pair2 =>
+    //Verify no units are shared between locks
+    unitsByLock.foreach(pair1 =>
+      unitsByLock.foreach(pair2 =>
         if (pair1 != pair2) {
           val intersection = pair1._2.intersect(pair2._2)
           if (intersection.nonEmpty) {
@@ -56,68 +56,66 @@ class Recruiter {
     unassignedUnits.remove(unit)
   }
   
-  def add(request: LockUnits) {
+  def add(lock: LockUnits) {
     //This lock is already up to date. Chill.
-    if (updatedRequests.contains(request)) {
+    if (activeLocks.contains(lock)) {
       //  return
     }
   
-    updatedRequests.add(request)
-    unitsByRequest(request) = unitsByRequest.getOrElse(request, mutable.Set.empty)
-    tryToSatisfy(request)
+    activeLocks.add(lock)
+    unitsByLock(lock) = unitsByLock.getOrElse(lock, mutable.Set.empty)
+    tryToSatisfy(lock)
   }
   
-  private def tryToSatisfy(request: LockUnits) {
+  private def tryToSatisfy(lock: LockUnits) {
     
-    // Offer batches of buildersOccupied for the request to choose.
+    // Offer batches of unit for the lock to choose.
     //   Batch 0: Units not assigned
-    //   Batch 1+: Units assigned to weaker-priority requests
+    //   Batch 1+: Units assigned to weaker-priority locks
     //
-    val assignedToLowerPriority = unitsByRequest.keys
+    val assignedToLowerPriority = unitsByLock.keys
       .filter(otherRequest =>
-        With.prioritizer.getPriority(request.owner) <
+        With.prioritizer.getPriority(lock.owner) <
           With.prioritizer.getPriority(otherRequest.owner))
       .map(getUnits)
     
-    val requiredUnits = request.offerUnits(Iterable(unassignedUnits) ++ assignedToLowerPriority)
+    val requiredUnits = lock.offerUnits(Iterable(unassignedUnits) ++ assignedToLowerPriority)
 
     if (requiredUnits == None) {
-      remove(request)
+      remove(lock)
     }
     else {
   
-      // 1. Unassign all the current buildersOccupied
-      // 2. Unassign all the required buildersOccupied
-      // 3. Assign all the required buildersOccupied
-      val unitsBefore = getUnits(request)
+      // 1. Unassign all the current unit
+      // 2. Unassign all the required unit
+      // 3. Assign all the required unit
+      val unitsBefore = getUnits(lock)
       val unitsAfter = requiredUnits.get.toSet
       val unitsObsolete = unitsBefore.diff(unitsAfter)
       val unitsNew = unitsAfter.diff(unitsBefore)
       
       unitsObsolete.foreach(unassign)
       unitsNew.foreach(unassign)
-      unitsNew.foreach(assign(_, request))
+      unitsNew.foreach(assign(_, lock))
     }
   }
   
-  def remove(request: LockUnits) {
-    unitsByRequest.get(request).foreach(_.foreach(unassign))
-    unitsByRequest.remove(request)
+  def remove(lock: LockUnits) {
+    unitsByLock.get(lock).foreach(_.foreach(unassign))
+    unitsByLock.remove(lock)
   }
   
-  private def assign(unit:FriendlyUnitInfo, request:LockUnits) {
-    requestByUnit(unit) = request
-    unitsByRequest(request).add(unit)
+  private def assign(unit:FriendlyUnitInfo, lock:LockUnits) {
+    unitsByLock(lock).add(unit)
     unassignedUnits.remove(unit)
   }
   
   private def unassign(unit:FriendlyUnitInfo) {
     unassignedUnits.add(unit)
-    requestByUnit.get(unit).foreach(request => unitsByRequest.get(request).foreach(_.remove(unit)))
-    requestByUnit.remove(unit)
+    unitsByLock.find(pair => pair._2.contains(unit)).foreach(pair => unitsByLock.remove(pair._1))
   }
   
-  def getUnits(request: LockUnits):Set[FriendlyUnitInfo] = {
-    unitsByRequest.getOrElse(request, mutable.Set.empty).toSet
+  def getUnits(lock: LockUnits):Set[FriendlyUnitInfo] = {
+    unitsByLock.get(lock).map(_.toSet).getOrElse(Set.empty)
   }
 }

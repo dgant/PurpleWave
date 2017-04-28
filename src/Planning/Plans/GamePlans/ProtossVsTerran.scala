@@ -95,7 +95,7 @@ class ProtossVsTerran extends Parallel {
     new Hunt { hunters.get.unitMatcher.set(new UnitMatchType(Protoss.Carrier)) },
     new IfThenElse(
       new UnitsAtLeast(8, UnitMatchWarriors),
-      new Defend,
-      new Attack)
+      new Attack,
+      new Defend)
   ))
 }

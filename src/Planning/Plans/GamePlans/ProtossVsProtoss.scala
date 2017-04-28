@@ -31,13 +31,10 @@ class ProtossVsProtoss extends Parallel {
     new RequestUnitAtLeast(2, Protoss.Zealot)
   )
   
-  val _buildMiddle = Vector[BuildRequest] (
+  val _dragoonTech = Vector[BuildRequest] (
     new RequestUnitAtLeast(1, Protoss.Assimilator),
     new RequestUnitAtLeast(1, Protoss.CyberneticsCore),
-    new RequestUpgrade(Protoss.DragoonRange),
-    new RequestUnitAtLeast(1, Protoss.RoboticsFacility),
-    new RequestUnitAtLeast(1, Protoss.RoboticsSupportBay),
-    new RequestUnitAtLeast(2, Protoss.Nexus)
+    new RequestUpgrade(Protoss.DragoonRange)
   )
   
   val _firstExpansion = Vector[BuildRequest] (
@@ -46,9 +43,9 @@ class ProtossVsProtoss extends Parallel {
   )
   
   val _reaverTech = Vector[BuildRequest] (
-    new RequestUnitAtLeast(1, Protoss.CyberneticsCore),
     new RequestUnitAtLeast(1, Protoss.RoboticsFacility),
-    new RequestUnitAtLeast(1, Protoss.RoboticsSupportBay)
+    new RequestUnitAtLeast(1, Protoss.RoboticsSupportBay),
+    new RequestUpgrade(Protoss.ScarabDamage)
   )
   
   val _lateGame = Vector[BuildRequest] (
@@ -57,7 +54,6 @@ class ProtossVsProtoss extends Parallel {
     new RequestUnitAtLeast(1, Protoss.RoboticsSupportBay),
     new RequestUnitAtLeast(3, Protoss.Nexus),
     new RequestUnitAtLeast(3, Protoss.Assimilator),
-    new RequestUpgrade(Protoss.ScarabDamage),
     new RequestUnitAtLeast(3, Protoss.RoboticsFacility),
     new RequestUnitAtLeast(4, Protoss.Nexus),
     new RequestUnitAtLeast(4, Protoss.RoboticsFacility),
@@ -81,13 +77,14 @@ class ProtossVsProtoss extends Parallel {
     new TrainProbesContinuously,
     new TrainContinuously(Protoss.Reaver),
     new TrainGatewayUnitsContinuously,
+    new ScheduleBuildOrder(_dragoonTech),
     new IfThenElse(
       new UnitsAtLeast(6, new UnitMatchType(Protoss.Dragoon)),
       new ScheduleBuildOrder(_firstExpansion)
     ),
     new ScheduleBuildOrder(_reaverTech),
     new IfThenElse(
-      new UnitsExactly(2, new UnitMatchType(Protoss.Nexus)),
+      new UnitsAtLeast(2, new UnitMatchType(Protoss.Nexus)),
       new ScheduleBuildOrder(_lateGame)
     ),
     new ScoutAt(9),

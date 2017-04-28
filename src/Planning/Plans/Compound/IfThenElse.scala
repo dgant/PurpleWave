@@ -5,8 +5,8 @@ import Planning.Plan
 
 class IfThenElse(
   initialPredicate : Plan = new Plan,
-  initialWhenFalse : Plan = new Plan,
-  initialWhenTrue  : Plan = new Plan)
+  initialWhenTrue  : Plan = new Plan,
+  initialWhenFalse : Plan = new Plan)
   extends Plan {
   
   description.set("If/Then/Else")

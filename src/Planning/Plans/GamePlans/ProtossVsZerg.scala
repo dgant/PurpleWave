@@ -86,9 +86,9 @@ class ProtossVsZerg extends Parallel {
         new UnitsAtLeast(1, new UnitMatchType(Protoss.Assimilator))
       ),
       new IfThenElse (
-        new UnitsAtLeast(5, new UnitMatchType(Protoss.Zealot)),
-        new TrainContinuously(Protoss.Zealot),
-        new TrainContinuously(Protoss.Dragoon)
+        new UnitsAtLeast(8, new UnitMatchType(Protoss.Zealot)),
+        new TrainContinuously(Protoss.Dragoon),
+        new TrainContinuously(Protoss.Zealot)
       ),
       new TrainContinuously(Protoss.Zealot)
     ),
@@ -97,8 +97,8 @@ class ProtossVsZerg extends Parallel {
     new Attack{ attackers.get.unitMatcher.set(new UnitMatchType(Protoss.Corsair)) },
     new IfThenElse(
       new UnitsAtLeast(12, UnitMatchWarriors),
-      new Defend,
-      new Attack
+      new Attack,
+      new Defend
     )
   ))
 }

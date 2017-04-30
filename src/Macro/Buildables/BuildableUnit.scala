@@ -1,6 +1,5 @@
 package Macro.Buildables
 
-import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClass._
 
 case class BuildableUnit(val unit: UnitClass) extends Buildable {
@@ -14,11 +13,15 @@ case class BuildableUnit(val unit: UnitClass) extends Buildable {
   override def supplyProvided   : Int                 = unit.supplyProvided
   override def frames           : Int                 = unit.buildTime
   
-  override def buildersOccupied : Iterable[BuildableUnit] = {
-    Vector.fill(unit.whatBuilds._2)(unit.whatBuilds._1).map(new BuildableUnit(_))
+  override lazy val buildersOccupied: Iterable[BuildableUnit] = {
+    unit.buildUnitsBorrowed.map(BuildableUnit)
   }
-  override def requirements: Iterable[BuildableUnit] = {
-    unit.requiredUnits.flatten(pair => Vector.fill(pair._2)(pair._1)).map(new BuildableUnit(_)) ++
-      (if(unit.requiresPsi) Vector(new BuildableUnit(Protoss.Pylon)) else Vector.empty)
+  
+  override lazy val buildersConsumed: Iterable[BuildableUnit] = {
+    unit.buildUnitsSpent.map(BuildableUnit)
+  }
+  
+  override lazy val requirements: Iterable[Buildable] = {
+    unit.buildUnitsEnabling.map(BuildableUnit) ++ unit.buildTechEnabling.map(BuildableTech)
   }
 }

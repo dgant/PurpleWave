@@ -12,11 +12,11 @@ case class BuildableTech(tech: Tech) extends Buildable {
   override def frames           : Int               = tech.researchTime
   
   override def buildersOccupied: Iterable[BuildableUnit] = {
-    Vector(new BuildableUnit(tech.whatResearches))
+    Vector(BuildableUnit(tech.whatResearches))
   }
   override def requirements: Iterable[BuildableUnit] = {
     if (tech.requiredUnit != UnitClasses.None) {
-      Vector(new BuildableUnit(tech.requiredUnit))
+      Vector(BuildableUnit(tech.requiredUnit))
     }
     else {
       Vector.empty

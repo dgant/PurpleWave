@@ -63,7 +63,7 @@ class UnitClassProxy(val baseType:UnitType) {
   lazy val producesCreep            = baseType.producesCreep
   lazy val producesLarva            = baseType.producesLarva
   lazy val regeneratesHP            = baseType.regeneratesHP
-  lazy val requiredTech             = Techs.get(baseType.requiredTech)
+  lazy val requiredTechRaw          = Techs.get(baseType.requiredTech)
   lazy val requiredUnits            = baseType.requiredUnits.asScala.map(pair => (UnitClasses.get(pair._1), pair._2))
   lazy val requiresCreep            = baseType.requiresCreep
   lazy val requiresPsi              = baseType.requiresPsi

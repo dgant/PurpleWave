@@ -2,7 +2,7 @@ package ProxyBwapi.UnitClass
 
 import Mathematics.Pixels.{Tile, TileRectangle}
 import ProxyBwapi.Races.{Neutral, Protoss, Terran, Zerg}
-import ProxyBwapi.Techs.Tech
+import ProxyBwapi.Techs.{Tech, Techs}
 import bwapi.{Race, UnitType}
 
 import scala.collection.mutable.ListBuffer
@@ -85,10 +85,17 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
   lazy val isTerran  : Boolean = race == Race.Terran
   lazy val isZerg    : Boolean = race == Race.Zerg
   
-  lazy val buildTechEnabling     : Tech               = requiredTech
+  lazy val buildTechEnabling     : Option[Tech]       = buildTechEnablingCalculate
   lazy val buildUnitsEnabling    : Vector[UnitClass]  = buildUnitsEnablingCalculate
   lazy val buildUnitsBorrowed    : Vector[UnitClass]  = buildUnitsBorrowedCalculate
   lazy val buildUnitsSpent       : Vector[UnitClass]  = buildUnitsSpentCalculate
+  
+  private def buildTechEnablingCalculate: Option[Tech] = {
+    if (requiredTechRaw == Techs.None || requiredTechRaw == Techs.Unknown)
+      None
+    else
+      Some(requiredTechRaw)
+  }
   
   private def buildUnitsEnablingCalculate: Vector[UnitClass] = {
     

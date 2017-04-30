@@ -15,25 +15,25 @@ class Configuration {
   
   var visualize                   = true
   var visualizeBases              = false
-  var visualizeBattles            = true
+  var visualizeBattles            = false
   var visualizeBullets            = false
   var visualizeChokepoints        = false
   var visualizeEconomy            = false
   var visualizeGeography          = false
   var visualizeGrids              = false
   var visualizeHitPoints          = true
-  var visualizeHeuristicMovement  = true
-  var visualizeHeuristicTargeting = true
+  var visualizeHeuristicMovement  = false
+  var visualizeHeuristicTargeting = false
   var visualizePerformance        = false
   var visualizePerformanceDetails = true
-  var visualizePlans              = false
+  var visualizePlans              = true
   var visualizeResources          = false
-  var visualizeRealEstate         = false
-  var visualizeScheduler          = false
-  var visualizeSimulation         = false
+  var visualizeRealEstate         = true
+  var visualizeScheduler          = true
+  var visualizeSimulation         = true
   var visualizeTextOnly           = false
-  var visualizeUnitsForeign       = true
-  var visualizeUnitsOurs          = true
+  var visualizeUnitsForeign       = false
+  var visualizeUnitsOurs          = false
   var visualizeVectorUnits        = false
   
   var gameSpeed                   = 0

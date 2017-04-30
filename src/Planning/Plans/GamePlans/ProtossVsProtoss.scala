@@ -35,6 +35,10 @@ class ProtossVsProtoss extends Parallel {
     RequestUpgrade(Protoss.DragoonRange)
   )
   
+  private val _thirdGateway = Vector[BuildRequest] (
+    RequestUnitAtLeast(3, Protoss.Gateway)
+  )
+  
   private val _firstExpansion = Vector[BuildRequest] (
     RequestUnitAtLeast(2, Protoss.Nexus),
     RequestUnitAtLeast(2, Protoss.Assimilator)
@@ -79,8 +83,9 @@ class ProtossVsProtoss extends Parallel {
     new TrainProbesContinuously,
     new TrainContinuously(Protoss.Reaver),
     new TrainGatewayUnitsContinuously,
-    //Third gateway in response to pressure
     new ScheduleBuildOrder(_dragoonTech),
+    //Make this reactive
+    new ScheduleBuildOrder(_thirdGateway),
     //Add response to DTs
     new ScheduleBuildOrder(_reaverTech),
     new ScheduleBuildOrder(_firstExpansion),

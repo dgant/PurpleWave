@@ -16,8 +16,8 @@ class ProtossVsZerg extends Parallel {
   
   val _twoBase = Vector[BuildRequest] (
     new RequestUnitAtLeast(3,   Protoss.Gateway),
-    new RequestUnitAtLeast(1,   Protoss.CyberneticsCore),
     new RequestUnitAtLeast(2,   Protoss.Assimilator),
+    new RequestUnitAtLeast(1,   Protoss.CyberneticsCore),
     new RequestUnitAtLeast(1,   Protoss.Stargate),
     new RequestUnitAtLeast(1,   Protoss.Forge),
     new RequestUnitAtLeast(1,   Protoss.CitadelOfAdun),
@@ -87,6 +87,7 @@ class ProtossVsZerg extends Parallel {
       )
     ),
     new ScheduleBuildOrder(ProtossBuilds.TakeNatural),
+    new ScheduleBuildOrder(_twoBase),
     new ScoutAt(10),
     new Attack { attackers.get.unitMatcher.set(new UnitMatchType(Protoss.Corsair)) },
     new IfThenElse(

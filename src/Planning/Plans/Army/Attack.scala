@@ -13,15 +13,15 @@ class Attack extends IfThenElse {
   description.set("Attack")
   
   val attackers = new Property[LockUnits](new LockUnits {
-    unitMatcher.set(UnitMatchWarriors);
+    unitMatcher.set(UnitMatchWarriors)
     unitCounter.set(UnitCountEverything)
   })
   
   predicate.set(new FoundEnemyBase)
   whenFalse.set(new FindEnemyBase { scouts.inherit(attackers) })
   whenTrue.set(new ControlPixel {
-    units.inherit(attackers);
-    positionToControl.set(new TileEnemyBase);
+    units.inherit(attackers)
+    positionToControl.set(new TileEnemyBase)
     description.inherit(attack.description)
   })
 }

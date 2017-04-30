@@ -1,38 +1,20 @@
-package Planning.Plans.GamePlans
+package Planning.Plans.GamePlans.Protoss
 
-import Macro.BuildRequests.{BuildRequest, RequestUnitAnotherOne, RequestUnitAtLeast, RequestUpgrade}
+import Macro.BuildRequests.{BuildRequest, RequestUnitAtLeast, RequestUpgrade}
 import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors}
 import Planning.Plans.Army.{Attack, Defend}
 import Planning.Plans.Compound.{And, IfThenElse, Parallel}
 import Planning.Plans.Information.ScoutAt
 import Planning.Plans.Macro.Automatic.{BuildEnoughPylons, TrainContinuously, TrainProbesContinuously}
 import Planning.Plans.Macro.BuildOrders.ScheduleBuildOrder
-import Planning.Plans.Macro.UnitCount.UnitsAtLeast
+import Planning.Plans.Macro.UnitCount.{UnitsAtLeast, UnitsExactly}
 import ProxyBwapi.Races.Protoss
 
 class ProtossVsZerg extends Parallel {
   
   description.set("Protoss vs Zerg")
   
-  val _nineNineGateways = Vector[BuildRequest] (
-    new RequestUnitAnotherOne(Protoss.Nexus),
-    new RequestUnitAtLeast(9,   Protoss.Probe),
-    new RequestUnitAtLeast(1,   Protoss.Pylon),
-    new RequestUnitAtLeast(2,   Protoss.Gateway)
-  )
-  
-  val _earlyZealots = Vector[BuildRequest] (
-    new RequestUnitAtLeast(1,   Protoss.Zealot),
-    new RequestUnitAtLeast(2,   Protoss.Pylon),
-    new RequestUnitAtLeast(2,   Protoss.Zealot)
-  )
-  
-  val _firstExpansion = Vector[BuildRequest] (
-    new RequestUnitAtLeast(2,   Protoss.Nexus),
-  )
-  
   val _twoBase = Vector[BuildRequest] (
-    new RequestUnitAtLeast(2,   Protoss.Nexus),
     new RequestUnitAtLeast(3,   Protoss.Gateway),
     new RequestUnitAtLeast(1,   Protoss.CyberneticsCore),
     new RequestUnitAtLeast(2,   Protoss.Assimilator),
@@ -81,7 +63,11 @@ class ProtossVsZerg extends Parallel {
   )
   
   children.set(Vector(
-    new ScheduleBuildOrder(_nineNineGateways),
+    new ScheduleBuildOrder(ProtossBuilds.TwoGate99),
+    new IfThenElse(
+      new UnitsExactly(0, new UnitMatchType(Protoss.CyberneticsCore)),
+      new ScheduleBuildOrder(ProtossBuilds.TwoGate99Zealots)
+    ),
     new BuildEnoughPylons,
     new TrainProbesContinuously,
     new TrainContinuously(Protoss.Reaver),
@@ -97,13 +83,12 @@ class ProtossVsZerg extends Parallel {
         new TrainContinuously(Protoss.Zealot)
       ),
       new Parallel(
-        new ScheduleBuildOrder(_earlyZealots),
         new TrainContinuously(Protoss.Zealot)
       )
     ),
-    new ScheduleBuildOrder(_twoBase),
+    new ScheduleBuildOrder(ProtossBuilds.TakeNatural),
     new ScoutAt(10),
-    new Attack{ attackers.get.unitMatcher.set(new UnitMatchType(Protoss.Corsair)) },
+    new Attack { attackers.get.unitMatcher.set(new UnitMatchType(Protoss.Corsair)) },
     new IfThenElse(
       new UnitsAtLeast(12, UnitMatchWarriors),
       new Attack,

@@ -9,10 +9,13 @@ object Threats {
     With.units.inTileRadius(
       intent.unit.tileIncludingCenter,
       With.configuration.combatEvaluationDistanceTiles)
-      .filter(threat =>
-        threat.possiblyStillThere &&
-        With.frame - threat.lastSeen < 24 * 60 &&
-        threat.isEnemyOf(intent.unit) &&
-        threat.canAttackThisSecond(intent.unit))
+      .filter(threat => valid(intent, threat))
     .toVector
+  
+  def valid(intent:Intention, threat:UnitInfo):Boolean = {
+    threat.possiblyStillThere &&
+      With.frame - threat.lastSeen < 24 * 60 &&
+      threat.isEnemyOf(intent.unit) &&
+      threat.canAttackThisSecond(intent.unit)
+  }
 }

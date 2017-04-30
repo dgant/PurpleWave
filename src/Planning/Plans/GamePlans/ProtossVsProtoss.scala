@@ -83,12 +83,9 @@ class ProtossVsProtoss extends Parallel {
     new ScheduleBuildOrder(_dragoonTech),
     //Add response to DTs
     new ScheduleBuildOrder(_reaverTech),
-    new IfThenElse(
-      //Replace with building stuff per base
-      new UnitsAtLeast(2, UnitMatchType(Protoss.Nexus)),
-      new ScheduleBuildOrder(_lateGame)
-    ),
     new ScheduleBuildOrder(_firstExpansion),
+    //Replace lateGame with building stuff per base
+    new ScheduleBuildOrder(_lateGame),
     //Expand with spare minerals
     new ScoutAt(9),
     new Attack

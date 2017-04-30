@@ -15,12 +15,15 @@ object Targets {
     With.units.inTileRadius(
       intent.unit.tileIncludingCenter,
       With.configuration.combatEvaluationDistanceTiles)
-      .filter(target =>
-        target.possiblyStillThere &&
-        With.frame - target.lastSeen < 24 * 60 &&
-        target.isEnemyOf(intent.unit) &&
-        intent.unit.canAttackThisSecond(target) &&
-        ! ineligibleClasses.contains(target.unitClass))
+      .filter(target => valid(intent, target))
       .toVector
+  }
+  
+  def valid(intent:Intention, target:UnitInfo):Boolean = {
+    target.possiblyStillThere &&
+      With.frame - target.lastSeen < 24 * 60 &&
+      target.isEnemyOf(intent.unit) &&
+      intent.unit.canAttackThisSecond(target) &&
+      ! ineligibleClasses.contains(target.unitClass)
   }
 }

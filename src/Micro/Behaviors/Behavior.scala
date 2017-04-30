@@ -17,6 +17,7 @@ object Behavior {
   }
   
   val actions = Vector(
+    Target,
     Flee,
     Kite,
     Pursue,

@@ -57,6 +57,7 @@ class ProtossVsTerran extends Parallel {
       new ScheduleBuildOrder(ProtossBuilds.TakeNatural)
     ),
     new TrainContinuously(Protoss.Dragoon),
+    new ScheduleBuildOrder(ProtossBuilds.TakeNatural),
     new ScheduleBuildOrder(_lateGame),
     new ScoutAt(10),
     new Attack

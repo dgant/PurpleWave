@@ -4,10 +4,10 @@ import Macro.BuildRequests.{BuildRequest, RequestUnitAtLeast, RequestUpgrade}
 import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors}
 import Planning.Plans.Army.{Attack, Defend}
 import Planning.Plans.Compound.{And, IfThenElse, Parallel}
-import Planning.Plans.Information.ScoutAt
+import Planning.Plans.Information.{FindExpansions, ScoutAt}
 import Planning.Plans.Macro.Automatic.{BuildEnoughPylons, TrainContinuously, TrainProbesContinuously}
 import Planning.Plans.Macro.BuildOrders.ScheduleBuildOrder
-import Planning.Plans.Macro.UnitCount.{UnitsAtLeast, UnitsExactly}
+import Planning.Plans.Macro.UnitCount.{SupplyAtLeast, UnitsAtLeast, UnitsExactly}
 import ProxyBwapi.Races.Protoss
 
 class ProtossVsZerg extends Parallel {
@@ -82,16 +82,18 @@ class ProtossVsZerg extends Parallel {
         new TrainContinuously(Protoss.Dragoon),
         new TrainContinuously(Protoss.Zealot)
       ),
-      new Parallel(
-        new TrainContinuously(Protoss.Zealot)
-      )
+      new TrainContinuously(Protoss.Zealot)
     ),
     new ScheduleBuildOrder(ProtossBuilds.TakeNatural),
     new ScheduleBuildOrder(_twoBase),
     new ScoutAt(10),
+    new IfThenElse(
+      new SupplyAtLeast(100),
+      new FindExpansions
+    ),
     new Attack { attackers.get.unitMatcher.set(new UnitMatchType(Protoss.Corsair)) },
     new IfThenElse(
-      new UnitsAtLeast(12, UnitMatchWarriors),
+      new UnitsAtLeast(5, UnitMatchWarriors),
       new Attack,
       new Defend
     )

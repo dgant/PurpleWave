@@ -4,10 +4,10 @@ import Macro.BuildRequests._
 import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{IfThenElse, Parallel}
-import Planning.Plans.Information.ScoutAt
+import Planning.Plans.Information.{FindExpansions, ScoutAt}
 import Planning.Plans.Macro.Automatic.{BuildEnoughPylons, TrainContinuously, TrainProbesContinuously}
 import Planning.Plans.Macro.BuildOrders.ScheduleBuildOrder
-import Planning.Plans.Macro.UnitCount.UnitsAtLeast
+import Planning.Plans.Macro.UnitCount.{SupplyAtLeast, UnitsAtLeast}
 import ProxyBwapi.Races.Protoss
 
 class ProtossVsTerran extends Parallel {
@@ -59,6 +59,10 @@ class ProtossVsTerran extends Parallel {
     new TrainContinuously(Protoss.Dragoon),
     new ScheduleBuildOrder(ProtossBuilds.TakeNatural),
     new ScheduleBuildOrder(_lateGame),
+    new IfThenElse(
+      new SupplyAtLeast(100),
+      new FindExpansions
+    ),
     new ScoutAt(10),
     new Attack
   ))

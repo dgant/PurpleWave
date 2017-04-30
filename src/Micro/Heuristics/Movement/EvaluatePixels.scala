@@ -89,7 +89,7 @@ object EvaluatePixels {
         Vector(62.0, 32.0)
           .map(distance => startingPixel.radiate(angle, distance))
           .find(targetPixel => acceptable(intent.unit, targetPixel, startingPixel, startingZone)))
-   
+    
     Vector(startingPixel) ++ pixelsOrthogonal ++ pixelsDiagonal
   }
   

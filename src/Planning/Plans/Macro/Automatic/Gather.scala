@@ -186,6 +186,10 @@ class Gather extends Plan {
   
   private def order(worker:FriendlyUnitInfo) {
     //If there's no resource for them to gather, that's fine; they'll follow default behavior and be generally useful
-    With.executor.intend(new Intention(this, worker) { toGather = resourceByWorker.get(worker) })
+    With.executor.intend(new Intention(this, worker) {
+      toGather    = resourceByWorker.get(worker)
+      destination = resourceByWorker.get(worker).map(_.pixelCenter)
+      origin      = resourceByWorker.get(worker).map(_.pixelCenter).getOrElse(this.origin)
+    })
   }
 }

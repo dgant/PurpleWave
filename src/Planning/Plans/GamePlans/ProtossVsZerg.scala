@@ -14,15 +14,21 @@ class ProtossVsZerg extends Parallel {
   
   description.set("Protoss vs Zerg")
   
-  // http://wiki.teamliquid.net/starcraft/Protoss_vs._Zerg_Guide#Branch_II:_Two_Gateways
-  val _oneBaseTwoGate = Vector[BuildRequest] (
+  val _nineNineGateways = Vector[BuildRequest] (
     new RequestUnitAnotherOne(Protoss.Nexus),
-    new RequestUnitAtLeast(8,   Protoss.Probe),
+    new RequestUnitAtLeast(9,   Protoss.Probe),
     new RequestUnitAtLeast(1,   Protoss.Pylon),
-    new RequestUnitAtLeast(10,  Protoss.Probe),
-    new RequestUnitAtLeast(1,   Protoss.Gateway),
-    new RequestUnitAtLeast(12,  Protoss.Probe),
     new RequestUnitAtLeast(2,   Protoss.Gateway)
+  )
+  
+  val _earlyZealots = Vector[BuildRequest] (
+    new RequestUnitAtLeast(1,   Protoss.Zealot),
+    new RequestUnitAtLeast(2,   Protoss.Pylon),
+    new RequestUnitAtLeast(2,   Protoss.Zealot)
+  )
+  
+  val _firstExpansion = Vector[BuildRequest] (
+    new RequestUnitAtLeast(2,   Protoss.Nexus),
   )
   
   val _twoBase = Vector[BuildRequest] (
@@ -75,7 +81,7 @@ class ProtossVsZerg extends Parallel {
   )
   
   children.set(Vector(
-    new ScheduleBuildOrder(_oneBaseTwoGate),
+    new ScheduleBuildOrder(_nineNineGateways),
     new BuildEnoughPylons,
     new TrainProbesContinuously,
     new TrainContinuously(Protoss.Reaver),
@@ -90,7 +96,10 @@ class ProtossVsZerg extends Parallel {
         new TrainContinuously(Protoss.Dragoon),
         new TrainContinuously(Protoss.Zealot)
       ),
-      new TrainContinuously(Protoss.Zealot)
+      new Parallel(
+        new ScheduleBuildOrder(_earlyZealots),
+        new TrainContinuously(Protoss.Zealot)
+      )
     ),
     new ScheduleBuildOrder(_twoBase),
     new ScoutAt(10),

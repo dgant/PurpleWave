@@ -7,7 +7,7 @@ object Behavior {
   def execute(intent: Intention) {
     if ( ! readyForOrders(intent)) return
   
-    actions.find(action => action.allowed(intent) && action.perform(intent))
+    intent.state.lastAction = actions.find(action => action.allowed(intent) && action.perform(intent))
   
     intent.executed = true
   }
@@ -19,10 +19,8 @@ object Behavior {
   val actions = Vector(
     Target,
     Flee,
-    Kite,
-    Pursue,
-    Kite,
     Reload,
+    Kite,
     Gather,
     Build,
     Produce,

@@ -9,12 +9,12 @@ import ProxyBwapi.UnitInfo.UnitInfo
 object VisualizeHitPoints {
   
   def render() {
-    With.units.all
-      .foreach(renderHitPoints)
+    With.units.all.foreach(renderHitPoints)
   }
   
   def renderHitPoints(unit:UnitInfo) {
     if (unit.invincible) return
+    if ( ! unit.possiblyStillThere) return
     
     val width       = Math.min(48, Math.max(unit.unitClass.width / 2, 18))
     val height      = 4

@@ -17,11 +17,11 @@ class TaskQueueGrids extends AbstractTaskQueue {
     new TaskGridEnemyDetection              { urgency = 100 },
     new TaskGridEnemyVision                 { urgency = 100 },
     new TaskGridMobility                    { urgency = 1   },
-    new TaskGridDpsEnemyGroundConcussive    { urgency = 100 },
-    new TaskGridDpsEnemyGroundExplosive     { urgency = 100 },
-    new TaskGridDpsEnemyGroundNormal        { urgency = 100 },
-    new TaskGridDpsEnemyAirConcussive       { urgency = 100 },
-    new TaskGridDpsEnemyAirExplosive        { urgency = 100 },
-    new TaskGridDpsEnemyAirNormal           { urgency = 100 }
+    new TaskGridDpsEnemyGroundConcussive    { urgency = 1000 },
+    new TaskGridDpsEnemyGroundExplosive     { urgency = 1000 },
+    new TaskGridDpsEnemyGroundNormal        { urgency = 1000 },
+    new TaskGridDpsEnemyAirConcussive       { urgency = 1000 },
+    new TaskGridDpsEnemyAirExplosive        { urgency = 1000 },
+    new TaskGridDpsEnemyAirNormal           { urgency = 1000 }
   )
 }

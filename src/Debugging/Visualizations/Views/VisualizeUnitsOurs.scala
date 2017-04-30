@@ -17,6 +17,10 @@ object VisualizeUnitsOurs {
       state.unit.pixelCenter.add(0, -7),
       drawBackground = false)
     DrawMap.label(
+      state.lastAction.map(_.name).getOrElse(""),
+      state.unit.pixelCenter.add(0, 0),
+      drawBackground = false)
+    DrawMap.label(
       state.unit.command.getUnitCommandType.toString,
       state.unit.pixelCenter.add(0, +7),
       drawBackground = false)

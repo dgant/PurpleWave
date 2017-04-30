@@ -1,6 +1,5 @@
 package Micro.Actions
 import Information.Battles.TacticsTypes.Tactics
-import Micro.Behaviors.MovementProfiles
 import Micro.Intent.Intention
 import Planning.Yolo
 import ProxyBwapi.UnitInfo.UnitInfo
@@ -19,14 +18,17 @@ object Kite extends Action {
     if (intent.threats.exists(threat =>
       isAttackingUs(intent, threat) &&
       canReachUsBeforeWeShoot(intent, threat))) {
-      return Flee.perform(intent)
+      if (Flee.consider(intent)) return true
     }
     if (intent.threats.forall(threat => outRangesUs(intent, threat))) {
-      return Flee.perform(intent)
+      if (Flee.consider(intent)) return true
     }
     
-    intent.movementProfile = MovementProfiles.kite
-    false
+    if (intent.unit.canAttackThisFrame) {
+      if (Attack.consider(intent)) return true
+    }
+    
+    Move.consider(intent)
   }
   
   def isAttackingUs(intent:Intention, threat:UnitInfo):Boolean = {

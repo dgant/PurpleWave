@@ -7,7 +7,7 @@ class Configuration {
   val dpsGridDistancePenalty          = 0.5
   val dpsGridMovementPenalty          = 0.5
   val dpsGridCooldownPenalty          = 0.25
-  val combatStickinessLeash           = 64.0
+  val combatStickinessLeash           = 0.0 //Let's get rid of this concept
   var enableFastGroundDistance        = true
   var enablePathRecalculation         = true
   var pathRecalculationDelayFrames    = 240
@@ -20,19 +20,19 @@ class Configuration {
   var visualizeEconomy            = false
   var visualizeGeography          = false
   var visualizeGrids              = false
-  var visualizeHitPoints          = false
-  var visualizeHeuristicMovement  = false
-  var visualizeHeuristicTargeting = false
+  var visualizeHitPoints          = true
+  var visualizeHeuristicMovement  = true
+  var visualizeHeuristicTargeting = true
   var visualizePerformance        = false
   var visualizePerformanceDetails = true
   var visualizePlans              = false
-  var visualizeResources          = true
+  var visualizeResources          = false
   var visualizeRealEstate         = false
-  var visualizeScheduler          = true
+  var visualizeScheduler          = false
   var visualizeSimulation         = false
   var visualizeTextOnly           = false
   var visualizeUnitsForeign       = false
-  var visualizeUnitsOurs          = false
+  var visualizeUnitsOurs          = true
   var visualizeVectorUnits        = false
   
   var gameSpeed                   = 0

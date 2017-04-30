@@ -26,7 +26,7 @@ object Flee extends Action {
       intent.canAttack = false
     }
     
-    false
+    Move.consider(intent)
   }
   
   def wounded(intent:Intention):Boolean = {

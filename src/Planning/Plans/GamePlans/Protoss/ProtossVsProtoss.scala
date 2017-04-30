@@ -4,10 +4,10 @@ import Macro.BuildRequests.{RequestUnitAtLeast, _}
 import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{IfThenElse, Or, Parallel}
-import Planning.Plans.Information.ScoutAt
+import Planning.Plans.Information.{FindExpansions, ScoutAt}
 import Planning.Plans.Macro.Automatic.{BuildEnoughPylons, TrainContinuously, TrainGatewayUnitsContinuously, TrainProbesContinuously}
 import Planning.Plans.Macro.BuildOrders.ScheduleBuildOrder
-import Planning.Plans.Macro.UnitCount.{UnitsAtLeast, UnitsExactly}
+import Planning.Plans.Macro.UnitCount.{SupplyAtLeast, UnitsAtLeast, UnitsExactly}
 import ProxyBwapi.Races.Protoss
 
 class ProtossVsProtoss extends Parallel {
@@ -66,7 +66,10 @@ class ProtossVsProtoss extends Parallel {
     new ScheduleBuildOrder(ProtossBuilds.TakeNatural),
     //Replace lateGame with building stuff per base
     new ScheduleBuildOrder(_lateGame),
-    //Expand with spare minerals
+    new IfThenElse(
+      new SupplyAtLeast(100),
+      new FindExpansions
+    ),
     new ScoutAt(9),
     new Attack
   ))

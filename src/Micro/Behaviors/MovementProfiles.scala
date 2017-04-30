@@ -18,15 +18,15 @@ object MovementProfiles {
   
   def kite =  new MovementProfile(
     preferDestination = 0.25,
-    preferOrigin      = 0.50,
+    preferOrigin      = 0.75,
     preferTarget      = 1.25,
     preferMobility    = 1.25,
-    avoidDamage       = 1.75,
+    avoidDamage       = 1.00,
     avoidTraffic      = 1.50)
   
   def flee =  new MovementProfile(
     preferOrigin      = 1.00,
     preferMobility    = 1.25,
-    avoidDamage       = 1.75,
+    avoidDamage       = 1.00,
     avoidTraffic      = 1.25)
 }

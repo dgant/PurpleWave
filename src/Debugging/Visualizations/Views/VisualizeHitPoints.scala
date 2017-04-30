@@ -27,7 +27,7 @@ object VisualizeHitPoints {
     val widthShNow  = width * unit.shieldPoints                       / denominator
     val widthDmNow  = width * unit.defensiveMatrixPoints              / denominator
   
-    val yStart      = unit.pixelCenter.y + unit.unitClass.height/2 - 12
+    val yStart      = unit.pixelCenter.y + unit.unitClass.height/2 - height
     val yEnd        = yStart + 3
     val xStart      = unit.pixelCenter.x - width/2
     val xStartHp    = xStart

@@ -19,8 +19,7 @@ object ProtossBuilds {
     RequestUnitAtLeast(1, Protoss.Assimilator),
     RequestUnitAtLeast(1, Protoss.CyberneticsCore),
     RequestUnitAtLeast(1, Protoss.RoboticsFacility),
-    RequestUnitAtLeast(1, Protoss.RoboticsSupportBay),
-    RequestUpgrade(Protoss.ScarabDamage)
+    RequestUnitAtLeast(1, Protoss.RoboticsSupportBay)
   )
   
   val TechCorsairs = Vector[BuildRequest] (
@@ -28,8 +27,16 @@ object ProtossBuilds {
     RequestUnitAtLeast(1, Protoss.Gateway),
     RequestUnitAtLeast(1, Protoss.Assimilator),
     RequestUnitAtLeast(1, Protoss.CyberneticsCore),
-    RequestUnitAtLeast(1, Protoss.Stargate),
-    RequestUpgrade(Protoss.AirDamage)
+    RequestUnitAtLeast(1, Protoss.Stargate)
+  )
+  
+  val TechDarkTemplar = Vector[BuildRequest] (
+    RequestUnitAtLeast(1, Protoss.Pylon),
+    RequestUnitAtLeast(1, Protoss.Gateway),
+    RequestUnitAtLeast(1, Protoss.Assimilator),
+    RequestUnitAtLeast(1, Protoss.CyberneticsCore),
+    RequestUnitAtLeast(1, Protoss.CitadelOfAdun),
+    RequestUnitAtLeast(1, Protoss.TemplarArchives)
   )
   
   val TakeNatural = Vector[BuildRequest] (

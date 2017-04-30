@@ -5,16 +5,18 @@ import Planning.Plan
 import ProxyBwapi.UnitClass.UnitClass
 import Lifecycle.With
 
-class TrainContinuously(unitClass: UnitClass) extends Plan {
+class TrainContinuously(unitClass: UnitClass, maximum:Int = Int.MaxValue) extends Plan {
   
   override def update() {
     if ( ! canBuild) return
     
     With.scheduler.request(this, Vector(
       new RequestUnitAtLeast(
-        Math.min(
+        List(
+          maximum,
           maxDesirable,
-          buildCapacity + With.units.ours.count(unit => unit.alive && unit.complete && unit.unitClass == unitClass)),
+          buildCapacity + With.units.ours.count(unit => unit.alive && unit.complete && unit.unitClass == unitClass))
+        .min,
         unitClass)))
   }
   
@@ -24,12 +26,15 @@ class TrainContinuously(unitClass: UnitClass) extends Plan {
   }
   
   protected def buildCapacity:Int = {
-    Vector(
-      With.units.ours.count(_.is(unitClass.whatBuilds._1)),
-      if (unitClass.supplyRequired == 0) 400 else (400 - With.self.supplyUsed) / unitClass.supplyRequired
-      //if (unitClass.mineralPrice <= 0) Int.MaxValue else With.minerals / unitClass.mineralPrice,
-      //if (unitClass.gasPrice     <= 0) Int.MaxValue else With.minerals / unitClass.gasPrice
-    ).min
+    if (
+      Vector(
+        With.units.ours.count(_.is(unitClass.whatBuilds._1)),
+        if (unitClass.supplyRequired == 0) 400 else (400 - With.self.supplyUsed) / unitClass.supplyRequired
+        //if (unitClass.mineralPrice <= 0) Int.MaxValue else With.minerals / unitClass.mineralPrice,
+        //if (unitClass.gasPrice     <= 0) Int.MaxValue else With.minerals / unitClass.gasPrice
+      ).min
+    else
+      0
   }
   
   protected def maxDesirable:Int = {

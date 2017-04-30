@@ -14,15 +14,15 @@ object VisualizeUnitsOurs {
   def renderUnitState(state: ExecutionState) {
     DrawMap.label(
       state.intent.plan.toString,
-      state.unit.pixelCenter.add(0, -7),
+      state.unit.pixelCenter.add(0, -14),
       drawBackground = false)
     DrawMap.label(
       state.lastAction.map(_.name).getOrElse(""),
-      state.unit.pixelCenter.add(0, 0),
+      state.unit.pixelCenter.add(0, -7),
       drawBackground = false)
     DrawMap.label(
       state.unit.command.getUnitCommandType.toString,
-      state.unit.pixelCenter.add(0, +7),
+      state.unit.pixelCenter.add(0, 0),
       drawBackground = false)
     if (state.movingTo.isDefined) {
       DrawMap.line(state.unit.pixelCenter, state.movingTo.get, Colors.MediumGray)

@@ -132,6 +132,7 @@ object VisualizeBattles {
       battle.tacticsHeuristicResults.map(r => Vector(
         "%.2f".format(r.evaluation),
         r.heuristic.getClass.getSimpleName.replace("TacticsHeuristic", "")))
+    
     DrawScreen.table(75, 225, heuristicsTable)
     
     With.game.drawTextScreen(255, 225, battle.rankedTactics.map(tactic => tactic.toString).mkString("\n"))

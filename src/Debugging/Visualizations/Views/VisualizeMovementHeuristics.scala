@@ -4,7 +4,6 @@ import Debugging.Visualizations.Rendering.DrawMap
 import Lifecycle.With
 import Mathematics.Heuristics.HeuristicMath
 import Mathematics.Pixels.Pixel
-import Micro.Actions.Move
 import Micro.Heuristics.MovementHeuristics.MovementHeuristicResult
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -26,8 +25,7 @@ object VisualizeMovementHeuristics {
   
   private def eligible(unit:FriendlyUnitInfo):Boolean =
     unit.alive &&
-      With.executor.getState(unit).lastAction.exists(_ == Move) &&
-      (With.frame - With.executor.getState(unit).movedHeuristicallyFrame) < 48 &&
+      (With.frame - With.executor.getState(unit).movedHeuristicallyFrame) < 24 &&
       With.viewport.contains(unit.pixelCenter)
   
   def scale(results:Iterable[MovementHeuristicResult]):Double =

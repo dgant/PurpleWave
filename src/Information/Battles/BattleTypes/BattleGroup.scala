@@ -16,6 +16,7 @@ class BattleGroup(val units:Vector[UnitInfo]) {
   var strength: Double = 0.0
   var vanguard: Pixel = Points.middle
   
+  lazy val visible:Boolean = units.exists(_.visible)
   lazy val mobile:Boolean = units.exists(_.canMoveThisFrame)
   
   lazy val tacticsAvailable:Vector[TacticsOptions] =
@@ -42,7 +43,7 @@ class BattleGroup(val units:Vector[UnitInfo]) {
     if (mobile) {
       output += Tactics.Movement.Charge
       output += Tactics.Movement.Flee
-      if (opponent.mobile) {
+      if (opponent.mobile && opponent.visible) {
         output += Tactics.Movement.Kite
       }
     }

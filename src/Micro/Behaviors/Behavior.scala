@@ -7,7 +7,7 @@ object Behavior {
   def execute(intent: Intention) {
     if ( ! readyForOrders(intent)) return
   
-    intent.state.lastAction = actions.find(action => action.allowed(intent) && action.perform(intent))
+    intent.state.lastAction = actions.find(_.consider(intent))
   
     intent.executed = true
   }

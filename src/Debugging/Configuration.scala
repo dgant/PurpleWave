@@ -11,7 +11,7 @@ class Configuration {
   var enableFastGroundDistance        = true
   var enablePathRecalculation         = true
   var pathRecalculationDelayFrames    = 240
-  var woundedThreshold                = 30
+  var woundedThreshold                = 40
   
   var visualize                   = true
   var visualizeBases              = false
@@ -32,7 +32,7 @@ class Configuration {
   var visualizeScheduler          = false
   var visualizeSimulation         = false
   var visualizeTextOnly           = false
-  var visualizeUnitsForeign       = false
+  var visualizeUnitsForeign       = true
   var visualizeUnitsOurs          = true
   var visualizeVectorUnits        = false
   

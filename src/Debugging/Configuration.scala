@@ -12,9 +12,9 @@ class Configuration {
   var enablePathRecalculation         = true
   var pathRecalculationDelayFrames    = 240
   
-  var visualize                   = false
+  var visualize                   = true
   var visualizeBases              = false
-  var visualizeBattles            = true
+  var visualizeBattles            = false
   var visualizeBullets            = false
   var visualizeChokepoints        = false
   var visualizeEconomy            = false
@@ -23,12 +23,12 @@ class Configuration {
   var visualizeHitPoints          = false
   var visualizeHeuristicMovement  = false
   var visualizeHeuristicTargeting = false
-  var visualizePerformance        = true
+  var visualizePerformance        = false
   var visualizePerformanceDetails = true
   var visualizePlans              = false
-  var visualizeResources          = false
+  var visualizeResources          = true
   var visualizeRealEstate         = false
-  var visualizeScheduler          = false
+  var visualizeScheduler          = true
   var visualizeSimulation         = false
   var visualizeTextOnly           = false
   var visualizeUnitsForeign       = false

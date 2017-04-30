@@ -11,6 +11,7 @@ class Configuration {
   var enableFastGroundDistance        = true
   var enablePathRecalculation         = true
   var pathRecalculationDelayFrames    = 240
+  var woundedThreshold                = 30
   
   var visualize                   = true
   var visualizeBases              = false

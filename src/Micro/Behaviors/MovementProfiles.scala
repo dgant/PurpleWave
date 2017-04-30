@@ -17,7 +17,7 @@ object MovementProfiles {
     avoidTraffic      = 0.25)
   
   def kite =  new MovementProfile(
-    preferDestination = 0.50,
+    preferDestination = 0.25,
     preferOrigin      = 0.50,
     preferTarget      = 1.25,
     preferMobility    = 1.25,

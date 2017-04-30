@@ -13,7 +13,7 @@ class Simulacrum(val unit:UnitInfo) {
   val rangeAir          : Double    = unit.unitClass.airRange
   val rangeGround       : Double    = unit.unitClass.groundRange
   val radialHypotenuse  : Double    = unit.unitClass.radialHypotenuse
-  val woundedThreshold  : Int       = Math.min(20, unit.unitClass.maxTotalHealth / 3)
+  val woundedThreshold  : Int       = Math.min(With.configuration.woundedThreshold, unit.unitClass.maxTotalHealth / 3)
   
   var target: Option[Simulacrum] = None
   var threat: Option[Simulacrum] = None

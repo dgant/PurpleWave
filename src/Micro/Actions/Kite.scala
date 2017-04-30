@@ -1,5 +1,6 @@
 package Micro.Actions
 import Information.Battles.TacticsTypes.Tactics
+import Micro.Behaviors.MovementProfiles
 import Micro.Intent.Intention
 import Planning.Yolo
 import ProxyBwapi.UnitInfo.UnitInfo
@@ -28,6 +29,7 @@ object Kite extends Action {
       if (Attack.consider(intent)) return true
     }
     
+    intent.movementProfile = MovementProfiles.kite
     Move.consider(intent)
   }
   

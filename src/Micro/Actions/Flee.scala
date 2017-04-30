@@ -30,7 +30,7 @@ object Flee extends Action {
   }
   
   def wounded(intent:Intention):Boolean = {
-    intent.unit.totalHealth < Math.min(20, intent.unit.totalHealth / 3)
+    intent.unit.wounded
   }
   
   def worker(intent:Intention):Boolean = {

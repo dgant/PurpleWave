@@ -15,7 +15,7 @@ object EvaluateTactics {
     new TacticsHeuristicWeight(TacticsHeuristicSimulatedLossesEnemy,     weightSimulation),
     new TacticsHeuristicWeight(TacticsHeuristicEstimatedDamageEnemy,     weightEvaluation),
     new TacticsHeuristicWeight(TacticsHeuristicHysteresis,               1.25),
-    new TacticsHeuristicWeight(TacticsHeuristicKiting,                  -0.25),
+    new TacticsHeuristicWeight(TacticsHeuristicKiting,                   0.00),
     new TacticsHeuristicWeight(TacticsHeuristicSimulatedSurvivorsEnemy, -weightSimulation),
     new TacticsHeuristicWeight(TacticsHeuristicSimulatedLossesOurs,     -weightSimulation),
     new TacticsHeuristicWeight(TacticsHeuristicEstimatedDamageOurs,     -weightEvaluation),

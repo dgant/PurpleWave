@@ -24,7 +24,7 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   def mineralsLeft  : Int = if (unitClass.isMinerals) resourcesLeft else 0
   def gasLeft       : Int = if (unitClass.isGas)      resourcesLeft else 0
   
-  def wounded:Boolean = totalHealth < Math.min(30, unitClass.maxTotalHealth/3)
+  def wounded:Boolean = totalHealth < Math.min(With.configuration.woundedThreshold, unitClass.maxTotalHealth/3)
   
   ///////////////
   // Economics //

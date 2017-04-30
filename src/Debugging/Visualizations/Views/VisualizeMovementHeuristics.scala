@@ -20,7 +20,7 @@ object VisualizeMovementHeuristics {
         .headOption
     }
     
-    focus.foreach(unit => renderUnit(With.executor.getState(unit).movementHeuristicResults))
+    focus.foreach(unit => renderUnit(unit.executionState.movementHeuristicResults))
   }
   
   private def eligible(unit:FriendlyUnitInfo):Boolean =

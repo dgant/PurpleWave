@@ -1,6 +1,7 @@
 package ProxyBwapi.UnitInfo
 
 import Lifecycle.With
+import Micro.State.ExecutionState
 import ProxyBwapi.Techs.{Tech, Techs}
 import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
 
@@ -37,6 +38,8 @@ class FriendlyUnitInfo(base:bwapi.Unit) extends FriendlyUnitProxy(base) {
   //////////////
   // Statuses //
   //////////////
+  
+  def executionState:ExecutionState = With.executor.getState(this)
   
   def framesBeforeTechComplete      : Int = base.getRemainingResearchTime
   def framesBeforeUpgradeComplete   : Int = base.getRemainingUpgradeTime

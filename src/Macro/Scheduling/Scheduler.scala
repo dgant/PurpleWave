@@ -2,7 +2,7 @@ package Macro.Scheduling
 
 import Macro.BuildRequests.BuildRequest
 import Macro.Buildables.Buildable
-import Macro.Scheduling.Optimization.ScheduleSimulationResult
+import Macro.Scheduling.Optimization.{ScheduleSimulationResult, ScheduleSimulator}
 import Performance.Caching.Limiter
 import Planning.Plan
 import ProxyBwapi.UnitClass.UnitClass
@@ -40,7 +40,7 @@ class Scheduler {
     val unitsWanted = new CountMap[UnitClass]
     val unitsActual:CountMap[UnitClass] = CountMapper.make(With.units.ours.filter(u => u.alive && u.complete).groupBy(_.unitClass).mapValues(_.size))
     queueOriginal = requestQueue.flatten(buildable => getUnfulfilledBuildables(buildable, unitsWanted, unitsActual))
-    //simulationResults = ScheduleSimulator.simulate(queueOriginal)
+    simulationResults = ScheduleSimulator.simulate(queueOriginal)
   }
   
   private def getUnfulfilledBuildables(

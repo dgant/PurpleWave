@@ -138,8 +138,8 @@ class ScheduleSimulationState(
       .map(_.get)
   }
   
-  private def mineralsPerFrame : Double  = With.economy.mineralIncomePerMinute (numberOfMiners,   numberOfBases) / 24.0 / 60.0
-  private def gasPerFrame      : Double  = With.economy.gasIncomePerMinute     (numberOfDrillers, numberOfBases) / 24.0 / 60.0
+  private def mineralsPerFrame : Double  = With.economy.genericIncomePerFrameMinerals (numberOfMiners,   numberOfBases)
+  private def gasPerFrame      : Double  = With.economy.genericIncomePerFrameGas      (numberOfDrillers, numberOfBases)
   
   private def owned     (unit: UnitClass) : Int = unitsOwned     (unit)
   private def available (unit: UnitClass) : Int = unitsAvailable (unit)
@@ -175,8 +175,8 @@ class ScheduleSimulationState(
   }
   
   private def tryFastForward(nextFrame:Int, testIntegrity:Boolean = false):Boolean = {
-    minerals  += ((nextFrame - frame) * mineralsPerFrame ).toInt
-    gas       += ((nextFrame - frame) * gasPerFrame      ).toInt
+    minerals  += ((nextFrame - frame) * mineralsPerFrame).toInt
+    gas       += ((nextFrame - frame) * gasPerFrame     ).toInt
     frame     = nextFrame
     
     var allEventsStillBuildable = true

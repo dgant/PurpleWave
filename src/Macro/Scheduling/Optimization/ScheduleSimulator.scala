@@ -41,8 +41,8 @@ object ScheduleSimulator {
     
         }
         else if (build.unmetPrerequisites.nonEmpty) {
-          buildablesRequested = insertAt(buildablesRequested, build.unmetPrerequisites, index)
           index -= 1
+          buildablesRequested = insertAt(buildablesRequested, build.unmetPrerequisites, index)
         }
         else if (build.exceededSearchDepth) {
           buildablesImpossible.add(nextBuildable)

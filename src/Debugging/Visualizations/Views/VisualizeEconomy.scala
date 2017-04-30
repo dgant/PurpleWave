@@ -18,8 +18,8 @@ object VisualizeEconomy {
     val values = Vector(
       With.economy.ourActiveMiners.size,
       With.economy.ourActiveDrillers.size,
-      With.economy.ourMineralIncomePerMinute,
-      With.economy.ourGasIncomePerMinute,
+      With.economy.ourIncomePerFrameMinerals,
+      With.economy.ourIncomePerFrameGas,
       With.economy.ourEstimatedTotalMinerals.toInt,
       With.economy.ourEstimatedTotalGas.toInt,
       With.economy.ourActualTotalMinerals,

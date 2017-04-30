@@ -18,7 +18,7 @@ class Configuration {
   var visualizeBattles            = false
   var visualizeBullets            = false
   var visualizeChokepoints        = false
-  var visualizeEconomy            = false
+  var visualizeEconomy            = true
   var visualizeGeography          = false
   var visualizeGrids              = false
   var visualizeHitPoints          = true
@@ -26,14 +26,14 @@ class Configuration {
   var visualizeHeuristicTargeting = false
   var visualizePerformance        = false
   var visualizePerformanceDetails = true
-  var visualizePlans              = true
+  var visualizePlans              = false
   var visualizeResources          = false
   var visualizeRealEstate         = true
   var visualizeScheduler          = true
   var visualizeSimulation         = true
   var visualizeTextOnly           = false
   var visualizeUnitsForeign       = false
-  var visualizeUnitsOurs          = false
+  var visualizeUnitsOurs          = true
   var visualizeVectorUnits        = false
   
   var gameSpeed                   = 0

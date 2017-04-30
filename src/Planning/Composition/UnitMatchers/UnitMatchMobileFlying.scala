@@ -1,8 +1,9 @@
 package Planning.Composition.UnitMatchers
+
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-object UnitMatchMobile extends UnitMatcher {
+object UnitMatchMobileFlying extends UnitMatcher {
   
   override def accept(unit: FriendlyUnitInfo): Boolean =
-    unit.canMoveThisFrame
+    unit.canMoveThisFrame && unit.flying
 }

@@ -5,6 +5,7 @@ import Macro.Scheduling.BuildEvent
 import Lifecycle.With
 
 import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 
 object ScheduleSimulator {
 
@@ -14,7 +15,7 @@ object ScheduleSimulator {
   
   def simulate(buildQueue:Iterable[Buildable]):ScheduleSimulationResult = {
     val currentState = ScheduleSimulationStateBuilder.build
-    var buildablesRequested = buildQueue.toArray
+    var buildablesRequested = new ArrayBuffer[Buildable] ++ buildQueue
     val buildablesImpossible = new mutable.HashSet[Buildable]
     val eventsPlanned = new mutable.PriorityQueue[BuildEvent]
     
@@ -42,7 +43,7 @@ object ScheduleSimulator {
         }
         else if (build.unmetPrerequisites.nonEmpty) {
           index -= 1
-          buildablesRequested = insertAt(buildablesRequested, build.unmetPrerequisites, index)
+          buildablesRequested.insertAll(index, build.unmetPrerequisites)
         }
         else if (build.exceededSearchDepth) {
           buildablesImpossible.add(nextBuildable)
@@ -50,7 +51,6 @@ object ScheduleSimulator {
         else {
           buildablesImpossible.add(nextBuildable)
         }
-        
       }
     }
   
@@ -59,7 +59,4 @@ object ScheduleSimulator {
       currentState.eventQueue,
       buildablesImpossible)
   }
-  
-  def insertAt(queue:Array[Buildable], insertions:Iterable[Buildable], index:Int):Array[Buildable] =
-    queue.take(index) ++ insertions ++ queue.drop(index)
 }

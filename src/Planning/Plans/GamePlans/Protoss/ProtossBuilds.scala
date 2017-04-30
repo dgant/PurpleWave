@@ -6,12 +6,16 @@ import ProxyBwapi.Races.Protoss
 object ProtossBuilds {
   
   val TechDragoons = Vector[BuildRequest] (
+    RequestUnitAtLeast(1, Protoss.Pylon),
+    RequestUnitAtLeast(1, Protoss.Gateway),
     RequestUnitAtLeast(1, Protoss.Assimilator),
     RequestUnitAtLeast(1, Protoss.CyberneticsCore),
     RequestUpgrade(Protoss.DragoonRange)
   )
   
   val TechReavers = Vector[BuildRequest] (
+    RequestUnitAtLeast(1, Protoss.Pylon),
+    RequestUnitAtLeast(1, Protoss.Gateway),
     RequestUnitAtLeast(1, Protoss.Assimilator),
     RequestUnitAtLeast(1, Protoss.CyberneticsCore),
     RequestUnitAtLeast(1, Protoss.RoboticsFacility),
@@ -20,6 +24,8 @@ object ProtossBuilds {
   )
   
   val TechCorsairs = Vector[BuildRequest] (
+    RequestUnitAtLeast(1, Protoss.Pylon),
+    RequestUnitAtLeast(1, Protoss.Gateway),
     RequestUnitAtLeast(1, Protoss.Assimilator),
     RequestUnitAtLeast(1, Protoss.CyberneticsCore),
     RequestUnitAtLeast(1, Protoss.Stargate),

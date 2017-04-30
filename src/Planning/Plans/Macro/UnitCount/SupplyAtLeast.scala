@@ -10,7 +10,5 @@ class SupplyAtLeast(defaultQuantity:Int = 0) extends Plan {
   
   val quantity = new Property[Int](defaultQuantity)
   
-  override def isComplete: Boolean = {
-    With.self.supplyUsed >= quantity.get
-  }
+  override def isComplete: Boolean = With.self.supplyUsed >= quantity.get
 }

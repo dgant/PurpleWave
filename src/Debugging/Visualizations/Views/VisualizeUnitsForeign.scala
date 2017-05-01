@@ -12,6 +12,7 @@ object VisualizeUnitsForeign {
   }
   
   private def drawTrackedUnit(unit:ForeignUnitInfo) {
+    if ( ! With.viewport.contains(unit.pixelCenter)) return
     if (unit.possiblyStillThere) {
       if (unit.effectivelyCloaked || ! unit.visible) {
         DrawMap.circle(

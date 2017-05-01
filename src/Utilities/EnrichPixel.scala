@@ -7,27 +7,27 @@ case object EnrichPixel {
   implicit class EnrichedPixelCollection(positions:Iterable[Pixel]) {
     def minBound:Pixel = {
       if (positions.isEmpty) return Pixels.Points.middle
-      new Pixel(
+      Pixel(
         positions.view.map(_.x).min,
         positions.view.map(_.y).min)}
     def maxBound:Pixel = {
       if (positions.isEmpty) return Pixels.Points.middle
-      new Pixel(
+      Pixel(
         positions.view.map(_.x).max,
         positions.view.map(_.y).max)}
     def bottomLeftBound:Pixel = {
       if (positions.isEmpty) return Pixels.Points.middle
-      new Pixel(
+      Pixel(
         positions.view.map(_.x).min,
         positions.view.map(_.y).max)}
     def topRightBound:Pixel = {
       if (positions.isEmpty) return Pixels.Points.middle
-      new Pixel(
+      Pixel(
         positions.view.map(_.x).max,
         positions.view.map(_.y).min)}
     def centroid:Pixel = {
       if (positions.isEmpty) return Pixels.Points.middle
-      new Pixel(
+      Pixel(
         positions.view.map(_.x).sum / positions.size,
         positions.view.map(_.y).sum / positions.size)
     }

@@ -3,7 +3,7 @@ package Mathematics.Pixels
 import Lifecycle.With
 
 object Points {
-  def middle = new Pixel(
+  def middle = Pixel(
     With.mapWidth * 32 / 2,
     With.mapHeight * 32 / 2)
   

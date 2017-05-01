@@ -12,6 +12,8 @@ object VisualizeUnitsOurs {
   }
   
   def renderUnitState(state: ExecutionState) {
+    if ( ! With.viewport.contains(state.unit.pixelCenter)) return
+    
     DrawMap.label(
       state.intent.plan.toString,
       state.unit.pixelCenter.add(0, -14),

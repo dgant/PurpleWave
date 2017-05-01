@@ -38,16 +38,16 @@ object VisualizeHitPoints {
     val colorSh = Colors.BrightBlue
     val colorDm = Colors.BrightViolet
   
-    DrawMap.box(new Pixel(xStart - 1, yStart - 1), new Pixel(xStart + width + 2, yEnd + 1), Color.Black, solid = true)
-    DrawMap.box(new Pixel(xStartDm, yStart), new Pixel(xStartDm+widthDmMax, yEnd), colorDm, solid = false)
-    DrawMap.box(new Pixel(xStartSh, yStart), new Pixel(xStartSh+widthShMax, yEnd), colorSh, solid = false)
-    DrawMap.box(new Pixel(xStartHp, yStart), new Pixel(xStartHp+widthHpMax, yEnd), colorHp, solid = false)
-    DrawMap.box(new Pixel(xStartDm, yStart), new Pixel(xStartDm+widthDmNow, yEnd), colorDm, solid = true)
-    DrawMap.box(new Pixel(xStartSh, yStart), new Pixel(xStartSh+widthShNow, yEnd), colorSh, solid = true)
-    DrawMap.box(new Pixel(xStartHp, yStart), new Pixel(xStartHp+widthHpNow, yEnd), colorHp, solid = true)
+    DrawMap.box(Pixel(xStart - 1, yStart - 1), Pixel(xStart + width + 2, yEnd + 1), Color.Black, solid = true)
+    DrawMap.box(Pixel(xStartDm, yStart), Pixel(xStartDm+widthDmMax, yEnd), colorDm, solid = false)
+    DrawMap.box(Pixel(xStartSh, yStart), Pixel(xStartSh+widthShMax, yEnd), colorSh, solid = false)
+    DrawMap.box(Pixel(xStartHp, yStart), Pixel(xStartHp+widthHpMax, yEnd), colorHp, solid = false)
+    DrawMap.box(Pixel(xStartDm, yStart), Pixel(xStartDm+widthDmNow, yEnd), colorDm, solid = true)
+    DrawMap.box(Pixel(xStartSh, yStart), Pixel(xStartSh+widthShNow, yEnd), colorSh, solid = true)
+    DrawMap.box(Pixel(xStartHp, yStart), Pixel(xStartHp+widthHpNow, yEnd), colorHp, solid = true)
     
     if (unit.wounded) {
-      DrawMap.box(new Pixel(xStart - 1, yStart - 1), new Pixel(xStart + width + 2, yEnd + 1), Colors.NeonRed, solid = false)
+      DrawMap.box(Pixel(xStart - 1, yStart - 1), Pixel(xStart + width + 2, yEnd + 1), Colors.NeonRed, solid = false)
     }
   }
 }

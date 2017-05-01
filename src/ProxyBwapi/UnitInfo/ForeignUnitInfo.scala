@@ -145,7 +145,7 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
     _bottom       = base.getBottom
   }
   
-  private var _pixelCenter : Pixel  = new Pixel(0, 0)
+  private var _pixelCenter : Pixel  = Pixel(0, 0)
   private var _tileTopLeft : Tile   = new Tile(0, 0)
   private var _top         : Int    = 0
   private var _left        : Int    = 0
@@ -180,9 +180,9 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
   private var _gatheringGas         : Boolean     = false
   
   private val badPositions = Vector(Position.Invalid, Position.None, Position.Unknown, null)
-  def target              : Option[UnitInfo]  = if (_target == null) None else With.units.get(_target)
+  def target           : Option[UnitInfo]  = if (_target == null) None else With.units.get(_target)
   def targetPixel      : Option[Pixel]     = if (badPositions.contains(_targetPosition)) None else Some(new Pixel(_targetPosition))
-  def orderTarget         : Option[UnitInfo]  = (if (_target == null) None else With.units.get(_orderTarget))
+  def orderTarget      : Option[UnitInfo]  = (if (_target == null) None else With.units.get(_orderTarget))
   def orderTargetPixel : Option[Pixel]     = if (badPositions.contains(_orderTargetPosition)) None else Some(new Pixel(_orderTargetPosition))
   
   def gatheringMinerals   : Boolean = base.isGatheringMinerals

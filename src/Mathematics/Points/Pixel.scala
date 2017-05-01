@@ -17,7 +17,7 @@ case class Pixel(val x:Int, val y:Int) {
     y < With.mapHeight * 32
   }
   def add(dx:Int, dy:Int):Pixel = {
-    new Pixel(x + dx, y + dy)
+    Pixel(x + dx, y + dy)
   }
   def add(point:Point):Pixel = {
     add(point.x, point.y)
@@ -32,13 +32,13 @@ case class Pixel(val x:Int, val y:Int) {
     subtract(otherPixel.x, otherPixel.y)
   }
   def multiply(scale:Int):Pixel = {
-    new Pixel(scale * x, scale * y)
+    Pixel(scale * x, scale * y)
   }
   def multiply(scale:Double):Pixel = {
-    new Pixel((scale * x).toInt, (scale * y).toInt)
+    Pixel((scale * x).toInt, (scale * y).toInt)
   }
   def divide(scale:Int):Pixel = {
-    new Pixel(x / scale, y / scale)
+    Pixel(x / scale, y / scale)
   }
   def project(destination:Pixel, pixels:Double):Pixel = {
     if (pixels == 0) return this

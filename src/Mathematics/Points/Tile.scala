@@ -61,13 +61,13 @@ case class Tile(argX:Int, argY:Int) extends AbstractPoint(argX, argY) {
     dx * dx + dy * dy
   }
   def topLeftPixel:Pixel = {
-    new Pixel(x * 32, y * 32)
+    Pixel(x * 32, y * 32)
   }
   def bottomRightPixel:Pixel = {
-    new Pixel(x * 32 + 31, y * 32 + 31)
+    Pixel(x * 32 + 31, y * 32 + 31)
   }
   def pixelCenter:Pixel = {
-    new Pixel(x * 32 + 15, y * 32 + 15)
+    Pixel(x * 32 + 15, y * 32 + 15)
   }
   def topLeftWalkPixel:WalkTile = {
     new WalkTile(x*4, y*4)

@@ -52,19 +52,19 @@ object VisualizeVectorUnits {
     val apex              = top - unit.unitClass.height / 4
   
     drawSolidTriangle(
-      new Pixel(farLeft, bottom),
-      new Pixel(farRight, bottom),
-      new Pixel(middle, apex),
+      Pixel(farLeft, bottom),
+      Pixel(farRight, bottom),
+      Pixel(middle, apex),
       color)
     drawSolidTriangle(
-      new Pixel(farLeft, bottom),
-      new Pixel(leftPerspective, waist),
-      new Pixel(middle, apex),
+      Pixel(farLeft, bottom),
+      Pixel(leftPerspective, waist),
+      Pixel(middle, apex),
       color)
     drawSolidTriangle(
-      new Pixel(farRight, bottom),
-      new Pixel(rightPerspective, waist),
-      new Pixel(middle, apex),
+      Pixel(farRight, bottom),
+      Pixel(rightPerspective, waist),
+      Pixel(middle, apex),
       color)
     DrawMap.label(
       unit.unitClass.toString
@@ -76,7 +76,7 @@ object VisualizeVectorUnits {
         .replaceAll("Critter Rhynadon", "Snuggles the Rhino")
         .replaceAll("Critter Ursadon", "Cupcake Cuddlemonster")
         .replaceAll("Critter Kakaru", "Flying Dumpling"),
-      new Pixel(middle, bottom + 9))
+      Pixel(middle, bottom + 9))
 
     val eyeLeft         = middle  + unit.unitClass.width  / 5
     val eyeRight        = middle  - unit.unitClass.width  / 5
@@ -92,12 +92,12 @@ object VisualizeVectorUnits {
       val foreheadLow   = eyeLevel - unit.unitClass.height / 8
       val foreheadHigh  = eyeLevel - unit.unitClass.height / 4
       DrawMap.line(
-        new Pixel(mouthLeft, foreheadHigh),
-        new Pixel(middle,    foreheadLow),
+        Pixel(mouthLeft, foreheadHigh),
+        Pixel(middle,    foreheadLow),
         color)
       DrawMap.line(
-        new Pixel(mouthRight,  foreheadHigh),
-        new Pixel(middle,      foreheadLow),
+        Pixel(mouthRight,  foreheadHigh),
+        Pixel(middle,      foreheadLow),
         color)
     }
     
@@ -115,32 +115,32 @@ object VisualizeVectorUnits {
     }
     
     if (unit.complete) {
-      DrawMap.box(new Pixel(eyeLeft-1,  eyeLevel-1), new Pixel(eyeLeft+1,  eyeLevel+1), color, true)
-      DrawMap.box(new Pixel(eyeRight-1, eyeLevel-1), new Pixel(eyeRight+1, eyeLevel+1), color, true)
+      DrawMap.box(Pixel(eyeLeft-1,  eyeLevel-1), Pixel(eyeLeft+1,  eyeLevel+1), color, true)
+      DrawMap.box(Pixel(eyeRight-1, eyeLevel-1), Pixel(eyeRight+1, eyeLevel+1), color, true)
     }
     else {
-      DrawMap.line(new Pixel(eyeLeft-1,  eyeLevel+1),  new Pixel(eyeLeft+1,  eyeLevel+1), color)
-      DrawMap.line(new Pixel(eyeLeft-1,  eyeLevel+1),  new Pixel(eyeLeft-3,  eyeLevel-1), color)
-      DrawMap.line(new Pixel(eyeLeft+1,  eyeLevel+1),  new Pixel(eyeLeft+3,  eyeLevel-1), color)
-      DrawMap.line(new Pixel(eyeRight-1, eyeLevel+1),  new Pixel(eyeRight+1, eyeLevel+1), color)
-      DrawMap.line(new Pixel(eyeRight-1, eyeLevel+1),  new Pixel(eyeRight-3, eyeLevel-1), color)
-      DrawMap.line(new Pixel(eyeRight+1, eyeLevel+1),  new Pixel(eyeRight+3, eyeLevel-1), color)
+      DrawMap.line(Pixel(eyeLeft-1,  eyeLevel+1),  Pixel(eyeLeft+1,  eyeLevel+1), color)
+      DrawMap.line(Pixel(eyeLeft-1,  eyeLevel+1),  Pixel(eyeLeft-3,  eyeLevel-1), color)
+      DrawMap.line(Pixel(eyeLeft+1,  eyeLevel+1),  Pixel(eyeLeft+3,  eyeLevel-1), color)
+      DrawMap.line(Pixel(eyeRight-1, eyeLevel+1),  Pixel(eyeRight+1, eyeLevel+1), color)
+      DrawMap.line(Pixel(eyeRight-1, eyeLevel+1),  Pixel(eyeRight-3, eyeLevel-1), color)
+      DrawMap.line(Pixel(eyeRight+1, eyeLevel+1),  Pixel(eyeRight+3, eyeLevel-1), color)
       
-      DrawMap.text(new Pixel(right, top), "Z")
-      (1 to (1 + animationFrame/16 % 4)).foreach(i => DrawMap.text(new Pixel(right + i * 6, top - i * 2), "z"))
+      DrawMap.text(Pixel(right, top), "Z")
+      (1 to (1 + animationFrame/16 % 4)).foreach(i => DrawMap.text(Pixel(right + i * 6, top - i * 2), "z"))
     }
     
     DrawMap.line(
-      new Pixel(mouthLeft, mouthTop),
-      new Pixel(mouthAngleLeft, mouthBottom),
+      Pixel(mouthLeft, mouthTop),
+      Pixel(mouthAngleLeft, mouthBottom),
       color)
     DrawMap.line(
-      new Pixel(mouthAngleLeft, mouthBottom),
-      new Pixel(mouthAngleRight, mouthBottom),
+      Pixel(mouthAngleLeft, mouthBottom),
+      Pixel(mouthAngleRight, mouthBottom),
       color)
     DrawMap.line(
-      new Pixel(mouthRight, mouthTop),
-      new Pixel(mouthAngleRight, mouthBottom),
+      Pixel(mouthRight, mouthTop),
+      Pixel(mouthAngleRight, mouthBottom),
       color)
     
     if (unit.carryingMinerals) {

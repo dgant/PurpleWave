@@ -1,9 +1,9 @@
 package Debugging.Visualizations.Views
 
 import Debugging.Visualizations.Rendering.{DrawMap, DrawScreen}
-import Information.Battles.Simulation.Construction.{BattleSimulation, BattleSimulationGroup}
 import Information.Battles.BattleTypes.Battle
 import Information.Battles.Estimation.BattleEstimation
+import Information.Battles.Simulation.Construction.{BattleSimulation, BattleSimulationGroup}
 import Information.Battles.TacticsTypes.{Tactics, TacticsOptions}
 import Lifecycle.With
 import Mathematics.Pixels.Pixel
@@ -23,9 +23,11 @@ object VisualizeBattles {
       val tactics = battle.bestTactics
       val simulation = battle.simulation(tactics)
       val estimation = battle.estimation(tactics)
+      With.game.drawTextScreen(5,   50, With.self.name)
+      With.game.drawTextScreen(130, 50, With.enemies.head.name)
       simulation.foreach(drawSimulationReport)
       estimation.foreach(drawEstimationReport)
-      drawTacticsHeuristics(battle)
+      drawTacticsReport(battle)
     }
     if (Yolo.enabled && With.frame / 24 % 2 == 0) {
       With.game.drawTextScreen(5, 5, "YOLO")
@@ -43,8 +45,8 @@ object VisualizeBattles {
     DrawMap.circle(battle.enemy.vanguard, 8, enemyColor)
     DrawMap.line(battle.focus, battle.us.vanguard,    ourColor)
     DrawMap.line(battle.focus, battle.enemy.vanguard, enemyColor)
-    val topLeft     = (battle.us.units ++ battle.enemy.units).map(_.pixelCenter).minBound.subtract(16, 16)
-    val bottomRight = (battle.us.units ++ battle.enemy.units).map(_.pixelCenter).maxBound.add(16, 16)
+    val topLeft       = (battle.us.units ++ battle.enemy.units).map(_.pixelCenter).minBound.subtract(16, 16)
+    val bottomRight   = (battle.us.units ++ battle.enemy.units).map(_.pixelCenter).maxBound.add(16, 16)
     val winnerStrengthColor = if (battle.us.strength >= battle.enemy.strength) ourColor else enemyColor
     DrawMap.box(
       topLeft,
@@ -59,9 +61,9 @@ object VisualizeBattles {
   
   private def drawSimulationReport(simulation:BattleSimulation) {
     val winner = if (simulation.us.lostValue <= simulation.enemy.lostValue) With.self else With.enemies.head
-    With.game.drawTextScreen(new Pixel(5, 31).bwapi, "Advantage: " + winner.name)
-    drawPlayerReport(simulation.us,     With.self.name,         new Pixel(5, 50))
-    drawPlayerReport(simulation.enemy,  With.enemies.head.name, new Pixel(130, 50))
+    With.game.drawTextScreen(Pixel(5, 31).bwapi, "Advantage: " + winner.name)
+    drawPlayerReport(simulation.us,     With.self.name,         Pixel(5,   130))
+    drawPlayerReport(simulation.enemy,  With.enemies.head.name, Pixel(130, 130))
     simulation.events.foreach(_.draw())
   }
   
@@ -76,16 +78,7 @@ object VisualizeBattles {
     DrawScreen.table(
       origin.x,
       origin.y,
-      Vector(
-        Vector(name),
-        Vector("Losses:",   group.lostValue.toString),
-        Vector("Move:",     getMove(group.tactics)),
-        Vector("Focus:",    getFocus(group.tactics)),
-        Vector("Workers:",  getWorkers(group.tactics)),
-        Vector("Wounded:",  getWounded(group.tactics)),
-        Vector(),
-        Vector("Losses:")
-      )
+      Vector(Vector("Losses:"))
       ++ group.lostUnits
         .groupBy(_.unit.unitClass)
         .toVector
@@ -125,17 +118,37 @@ object VisualizeBattles {
     return "-"
   }
   
-  private def drawTacticsHeuristics(battle:Battle) {
-    if (battle.tacticsHeuristicResults.isEmpty) return
+  private def drawTacticsReport(battle:Battle) {
+  
+    DrawScreen.table(
+      5,
+      76,
+      Vector(
+        Vector("Move:",     getMove(battle.bestTactics)),
+        Vector("Focus:",    getFocus(battle.bestTactics)),
+        Vector("Workers:",  getWorkers(battle.bestTactics)),
+        Vector("Wounded:",  getWounded(battle.bestTactics))
+      ))
     
     val heuristicsTable = Vector(Vector("Value", "Tactics")) ++
       battle.tacticsHeuristicResults.map(r => Vector(
         "%.2f".format(r.evaluation),
         r.heuristic.getClass.getSimpleName.replace("TacticsHeuristic", "")))
+    //DrawScreen.table(300, 50, heuristicsTable)
     
-    DrawScreen.table(75, 225, heuristicsTable)
-    
-    With.game.drawTextScreen(255, 225, battle.rankedTactics.map(tactic => tactic.toString).mkString("\n"))
-    
+    With.game.drawTextScreen(300, 50, battle.rankedTactics.map(tactic => tactic.toString).mkString("\n"))
+  }
+  
+  
+  private def drawTacticsReport(battle:Battle, origin:Pixel) {
+    DrawScreen.table(
+      origin.x,
+      origin.y,
+      Vector(
+        Vector("Move:",     getMove(battle.bestTactics)),
+        Vector("Focus:",    getFocus(battle.bestTactics)),
+        Vector("Workers:",  getWorkers(battle.bestTactics)),
+        Vector("Wounded:",  getWounded(battle.bestTactics))
+      ))
   }
 }

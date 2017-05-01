@@ -49,10 +49,10 @@ object ZoneBuilder {
   def buildZone(region:Region):Zone = {
     val polygon = region.getPolygon
     val tileArea = new TileRectangle(
-      new Pixel(
+      Pixel(
         polygon.getPoints.asScala.map(_.getX).min,
         polygon.getPoints.asScala.map(_.getY).min).tileIncluding,
-      new Pixel(
+      Pixel(
         polygon.getPoints.asScala.map(_.getX).max,
         polygon.getPoints.asScala.map(_.getY).max).tileIncluding)
     val tiles = new mutable.HashSet[Tile]

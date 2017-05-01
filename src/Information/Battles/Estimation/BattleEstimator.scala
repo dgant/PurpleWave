@@ -47,7 +47,11 @@ object BattleEstimator {
     
     damageDealtToUs    = participantsUs    .map(costOfDamage(_, damageDealtByEnemy)).sum / participantsUs.size
     damageDealtToEnemy = participantsEnemy .map(costOfDamage(_, damageDealtByUs   )).sum / participantsEnemy.size
-      
+  
+  
+    damageDealtToUs     += workerOpportunityCost(fightDuration, tacticsEnemy, participantsEnemy)
+    damageDealtToEnemy  += workerOpportunityCost(fightDuration, tacticsUs, participantsUs)
+    
     new BattleEstimation(
       battle,
       tacticsUs,
@@ -234,5 +238,16 @@ object BattleEstimator {
     unit.canMoveThisFrame &&
       ! isFighter(unit, tactics) &&
       ( ! unit.unitClass.isWorker || tactics.has(Tactics.Workers.Flee))
+  }
+  
+  private def workerOpportunityCost(durationFrames: Int, tactics: TacticsOptions, participants:Traversable[Participant]):Double = {
+    durationFrames *
+    2.0 *
+    participants.count(_.unit.unitClass.isWorker) * (
+      if      (tactics.has(Tactics.Workers.Flee))       1.0
+      else if (tactics.has(Tactics.Workers.FightAll))   1.0
+      else if (tactics.has(Tactics.Workers.FightHalf))  0.5
+      else                                              0.0
+    )
   }
 }

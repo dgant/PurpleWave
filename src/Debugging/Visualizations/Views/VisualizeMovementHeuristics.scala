@@ -90,7 +90,7 @@ object VisualizeMovementHeuristics {
     val top = 240
     val rowHeight = 11
     val rowMargin = 2
-    val boxStart = new Pixel(left, top + (rowHeight + rowMargin) * order)
+    val boxStart = Pixel(left, top + (rowHeight + rowMargin) * order)
     With.game.drawBoxScreen(
       boxStart.bwapi,
       boxStart.add(rowHeight, rowHeight).bwapi,

@@ -26,15 +26,12 @@ class TrainContinuously(unitClass: UnitClass, maximum:Int = Int.MaxValue) extend
   }
   
   protected def buildCapacity:Int = {
-    if (
-      Vector(
-        With.units.ours.count(_.is(unitClass.whatBuilds._1)),
-        if (unitClass.supplyRequired == 0) 400 else (400 - With.self.supplyUsed) / unitClass.supplyRequired
-        //if (unitClass.mineralPrice <= 0) Int.MaxValue else With.minerals / unitClass.mineralPrice,
-        //if (unitClass.gasPrice     <= 0) Int.MaxValue else With.minerals / unitClass.gasPrice
-      ).min
-    else
-      0
+    Vector(
+      With.units.ours.count(_.is(unitClass.whatBuilds._1)),
+      if (unitClass.supplyRequired == 0) 400 else (400 - With.self.supplyUsed) / unitClass.supplyRequired
+      //if (unitClass.mineralPrice <= 0) Int.MaxValue else With.minerals / unitClass.mineralPrice,
+      //if (unitClass.gasPrice     <= 0) Int.MaxValue else With.minerals / unitClass.gasPrice
+    ).min
   }
   
   protected def maxDesirable:Int = {

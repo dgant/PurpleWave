@@ -56,7 +56,7 @@ class ProtossVsProtoss extends Parallel {
     ),
     new BuildEnoughPylons,
     new TrainProbesContinuously,
-    new TrainContinuously(Protoss.Reaver),
+    new TrainContinuously(Protoss.Reaver, 5),
     new TrainGatewayUnitsContinuously,
     new ScheduleBuildOrder(ProtossBuilds.TechDragoons),
     //Make this reactive

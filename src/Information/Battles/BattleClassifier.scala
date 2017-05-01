@@ -132,7 +132,7 @@ class BattleClassifier {
         nextCluster       ++= nextUnits
         
         //Note that this includes non-combatants!
-        Circle.points(With.configuration.combatEvaluationDistanceTiles)
+        Circle.points(With.configuration.battleMarginTiles)
           .foreach(point => {
             val tile = nextTile.add(point)
             if (tile.valid

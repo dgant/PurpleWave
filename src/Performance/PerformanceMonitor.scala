@@ -8,7 +8,7 @@ class PerformanceMonitor {
   private val frameTimes = Array.fill(framesToTrack)(1l)
   
   private var millisecondsBefore = 0l
-  private var currentCacheLength = 24
+  private var currentCacheLength = 3
   private var lastFrameDelayUpdate = 0
   
   def startFrame() {
@@ -29,7 +29,7 @@ class PerformanceMonitor {
         currentCacheLength -= 1
       }
       currentCacheLength = Math.max(currentCacheLength, With.latency.turnSize)
-      currentCacheLength = Math.min(currentCacheLength, 12)
+      currentCacheLength = Math.min(currentCacheLength, 4)
     }
   }
   

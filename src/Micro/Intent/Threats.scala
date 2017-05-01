@@ -8,7 +8,7 @@ object Threats {
   def get(intent:Intention):Vector[UnitInfo] =
     With.units.inTileRadius(
       intent.unit.tileIncludingCenter,
-      With.configuration.combatEvaluationDistanceTiles)
+      With.configuration.battleMarginTiles)
       .filter(threat => valid(intent, threat))
     .toVector
   

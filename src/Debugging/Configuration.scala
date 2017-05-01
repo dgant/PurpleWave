@@ -2,7 +2,8 @@ package Debugging
 
 class Configuration {
   
-  val combatEvaluationDistanceTiles   = 15
+  val battleWorkerCostPerFrame        = 3.0
+  val battleMarginTiles               = 15
   val battleSimulatorUnitLimit        = 80
   val dpsGridDistancePenalty          = 0.5
   val dpsGridMovementPenalty          = 0.5
@@ -16,6 +17,7 @@ class Configuration {
   var visualize                   = true
   var visualizeBases              = false
   var visualizeBattles            = true
+  var visualizeBattleSimulation   = true
   var visualizeBullets            = false
   var visualizeChokepoints        = false
   var visualizeEconomy            = false
@@ -30,7 +32,6 @@ class Configuration {
   var visualizeResources          = false
   var visualizeRealEstate         = false
   var visualizeScheduler          = false
-  var visualizeSimulation         = false
   var visualizeTextOnly           = false
   var visualizeUnitsForeign       = true
   var visualizeUnitsOurs          = true

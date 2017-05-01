@@ -156,7 +156,7 @@ object BattleEstimator {
     val value                       = unit.unitClass.mineralValue * 3.0 + unit.unitClass.gasValue * 2.0
     val valueRatio                  = value * 2 / (unit.totalHealth + unit.unitClass.maxTotalHealth)
     
-    val distanceFactor              = With.configuration.combatEvaluationDistanceTiles * 32 //How far from the focus renders a unit irrelevant
+    val distanceFactor              = With.configuration.battleMarginTiles * 32 //How far from the focus renders a unit irrelevant
     val isFighting                  = isFighter(unit, tacticsThis)
     val isCharging                  = isFighting && tacticsThis.has(Tactics.Movement.Charge)
     val isFleeing                   = isFleer(unit, tacticsThis)
@@ -242,7 +242,7 @@ object BattleEstimator {
   
   private def workerOpportunityCost(durationFrames: Int, tactics: TacticsOptions, participants:Traversable[Participant]):Double = {
     durationFrames *
-    2.0 *
+    With.configuration.battleWorkerCostPerFrame *
     participants.count(_.unit.unitClass.isWorker) * (
       if      (tactics.has(Tactics.Workers.Flee))       1.0
       else if (tactics.has(Tactics.Workers.FightAll))   1.0

@@ -16,7 +16,7 @@ object BattleSimulator {
   //
   // Workers mine about 1 mineral per second.
   // We use a value of 2 minerals per second because workers lose mining time when returning from combat.
-  def costPerSecondOfNotMining(workers:Int):Int = workers * 2
+  def costPerFrameOfNotMining(workers:Int):Double = workers * With.configuration.battleWorkerCostPerFrame
   
   def run() {
     With.battles.local
@@ -64,7 +64,7 @@ object BattleSimulator {
   private def tallyLosses(battle:BattleSimulation, group:BattleSimulationGroup) {
     group.lostUnits = group.units.filterNot(_.alive)
     group.lostValue =
-      (group.lostValuePerSecond * battle.frameDuration) / 24 +
+      (group.lostValuePerFrame * battle.frameDuration) +
       group.lostUnits.map(_.unit.subjectiveValue).sum +
       group.units.map(unit => unit.unit.unitClass.subjectiveValue * unit.damageTaken / unit.unit.unitClass.maxTotalHealth).sum / damageCostRatio
   }

@@ -14,7 +14,7 @@ object Targets {
     
     With.units.inTileRadius(
       intent.unit.tileIncludingCenter,
-      With.configuration.combatEvaluationDistanceTiles)
+      With.configuration.battleMarginTiles)
       .filter(target => valid(intent, target))
       .toVector
   }

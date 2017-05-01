@@ -140,13 +140,13 @@ object VisualizeBattles {
   }
   
   
-  private def drawTacticsReport(battle:Battle, origin:Pixel) {
+  private def drawTacticsReport(tactics: TacticsOptions, origin:Pixel) {
     DrawScreen.table(
       origin.x,
       origin.y,
       Vector(
-        Vector("Move:",     getMove(battle.bestTactics)),
-        Vector("Focus:",    getFocus(battle.bestTactics)),
+        Vector("Move:",     getMove(tactics)),
+        Vector("Focus:",    getFocus(tactics)),
         Vector("Workers:",  getWorkers(battle.bestTactics)),
         Vector("Wounded:",  getWounded(battle.bestTactics))
       ))

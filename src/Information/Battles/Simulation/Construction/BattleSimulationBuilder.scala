@@ -45,6 +45,6 @@ object BattleSimulationBuilder {
       workersNotMining = workers.size
     }
     
-    group.lostValuePerSecond += BattleSimulator.costPerSecondOfNotMining(workersNotMining)
+    group.lostValuePerFrame += BattleSimulator.costPerFrameOfNotMining(workersNotMining)
   }
 }

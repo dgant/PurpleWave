@@ -19,6 +19,55 @@ class BattleGroup(val units:Vector[UnitInfo]) {
   lazy val visible:Boolean = units.exists(_.visible)
   lazy val mobile:Boolean = units.exists(_.canMoveThisFrame)
   
+  lazy val tacticsApparent:TacticsOptions = {
+    
+    val output = new TacticsOptions
+    
+    val visibleUnits = units.filter(_.visible)
+    
+    val meanVelocityX = if (visibleUnits.isEmpty) 0.0 else visibleUnits.map(_.velocityX).sum / visibleUnits.size
+    val meanVelocityY = if (visibleUnits.isEmpty) 0.0 else visibleUnits.map(_.velocityY).sum / visibleUnits.size
+    val destination = vanguard.add(meanVelocityX.toInt, meanVelocityY.toInt)
+    if (destination.pixelDistanceFast(opponent.vanguard) < vanguard.pixelDistanceFast(opponent.vanguard))
+      output.add(Tactics.Movement.Charge)
+    else if (destination.pixelDistanceFast(opponent.vanguard) > vanguard.pixelDistanceFast(opponent.vanguard))
+      output.add(Tactics.Movement.Flee)
+    else
+      output.add(Tactics.Movement.Kite)
+  
+    val woundedUnits = visibleUnits.filter(_.wounded)
+    val meanWoundedVelocityX = if (woundedUnits.isEmpty) 0.0 else woundedUnits.map(_.velocityX).sum / woundedUnits.size
+    val meanWoundedVelocityY = if (woundedUnits.isEmpty) 0.0 else woundedUnits.map(_.velocityY).sum / woundedUnits.size
+    val destinationWounded = vanguard.add(meanWoundedVelocityX.toInt, meanWoundedVelocityY.toInt)
+    if (destinationWounded.pixelDistanceFast(opponent.vanguard) > destination.pixelDistanceFast(opponent.vanguard))
+      output.add(Tactics.Wounded.Flee)
+    else
+      output.add(Tactics.Wounded.Fight)
+    
+    val workers = visibleUnits.filter(_.unitClass.isWorker)
+    val fightingWorkers = workers.filter(worker => worker.target.exists(target => target.isEnemyOf(worker)))
+    val fleeingWorkers = workers.filter(_.target.isEmpty)
+    if (fightingWorkers.size > workers.size * 0.8)
+      output.add(Tactics.Workers.FightAll)
+    else if (fightingWorkers.size > workers.size * 0.4)
+      output.add(Tactics.Workers.FightHalf)
+    else if (fleeingWorkers.size > workers.size * 0.5)
+      output.add(Tactics.Workers.FightHalf)
+    else
+      output.add(Tactics.Workers.Ignore)
+    
+    val attackers = visibleUnits.filter(_.attacking)
+    val attackingAir = attackers.filter(_.target.exists(_.flying))
+    if (attackingAir.size > attackers.size * 0.8)
+      output.add(Tactics.Focus.Air)
+    else if (attackingAir.size < attackers.size * 0.2)
+      output.add(Tactics.Focus.Ground)
+    else
+      output.add(Tactics.Focus.None)
+  
+    output
+  }
+  
   lazy val tacticsAvailable:Vector[TacticsOptions] =
     tacticsAvailableMovement.flatten(movement =>
       tacticsAvailableWounded.flatten(wounded =>

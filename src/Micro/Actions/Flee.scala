@@ -10,30 +10,36 @@ object Flee extends Action {
     Yolo.disabled &&
     intent.unit.canMoveThisFrame &&
     (
-       intent.tactics.exists(_.has(Tactics.Movement.Flee))                     ||
-      (intent.tactics.exists(_.has(Tactics.Wounded.Flee))  && wounded(intent)) ||
-      (intent.tactics.exists(_.has(Tactics.Workers.Flee))  && worker(intent))
+      (fightersFlee (intent)  && ! isWorker(intent))  ||
+      (workersFlee  (intent)  &&   isWorker(intent))  ||
+      (woundedFlee  (intent)  &&   isWounded(intent))
     ) &&
     intent.threats.nonEmpty
   }
   
   override def perform(intent: Intention): Boolean = {
     
-    //If workers are fleeing to another base, let them
-    if ( ! intent.toGather.exists(_.pixelDistanceSquared(intent.unit.pixelCenter) > 32.0 * 12)) {
-      intent.movementProfile = MovementProfiles.flee
-      intent.toGather = None
-      intent.canAttack = false
+    //Only stop gathering if immediately threatened and if continuing to mine isn't going to help
+    if (isWorker(intent)
+      && intent.toGather.nonEmpty
+      && ! intent.threats.exists(threat =>
+        threat.target.contains(intent.unit)
+        && threat.pixelDistanceFast(intent.unit) <= threat.pixelImpactAgainst(8, intent.unit)
+        && threat.pixelDistanceFast(intent.unit) >= threat.pixelDistanceFast(intent.toGather.get))) {
+      return false
     }
+    
+    intent.movementProfile = MovementProfiles.flee
+    intent.toGather = None
+    intent.canAttack = false
     
     Move.consider(intent)
   }
   
-  def wounded(intent:Intention):Boolean = {
-    intent.unit.wounded
-  }
-  
-  def worker(intent:Intention):Boolean = {
-    intent.unit.unitClass.isWorker
-  }
+  def fightersFlee  (intent:Intention)  : Boolean = intent.tactics.exists(_.has(Tactics.Movement.Flee))
+  def woundedFlee   (intent:Intention)  : Boolean = intent.tactics.exists(_.has(Tactics.Wounded.Flee))
+  def workersFlee   (intent:Intention)  : Boolean = intent.tactics.exists(_.has(Tactics.Workers.Flee))
+  def workersFight  (intent:Intention)  : Boolean = intent.tactics.exists(_.has(Tactics.Workers.FightAll)) || intent.tactics.exists(_.has(Tactics.Workers.FightHalf))
+  def isWounded     (intent:Intention)  : Boolean = intent.unit.wounded
+  def isWorker      (intent:Intention)  : Boolean = intent.unit.unitClass.isWorker
 }

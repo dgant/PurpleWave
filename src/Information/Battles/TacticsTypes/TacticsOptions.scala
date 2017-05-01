@@ -10,10 +10,6 @@ class TacticsOptions(private var options:Int = 0) {
     (options & tactic) > 0
   }
   
-  def merge(other:TacticsOptions):TacticsOptions = {
-    new TacticsOptions(options | other.options)
-  }
-  
   override def toString: String = {
     val names = Vector(
       Tactics.Movement.None     -> "Movement: None",

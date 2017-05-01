@@ -147,8 +147,8 @@ object VisualizeBattles {
       Vector(
         Vector("Move:",     getMove(tactics)),
         Vector("Focus:",    getFocus(tactics)),
-        Vector("Workers:",  getWorkers(battle.bestTactics)),
-        Vector("Wounded:",  getWounded(battle.bestTactics))
+        Vector("Workers:",  getWorkers(tactics)),
+        Vector("Wounded:",  getWounded(tactics))
       ))
   }
 }

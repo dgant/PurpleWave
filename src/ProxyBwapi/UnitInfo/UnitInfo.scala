@@ -128,7 +128,7 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
     output
   }
     
-  def attacksAgainstAir: Int = unitClass.airDamageFactorRaw    * unitClass.maxAirHitsRaw
+  def attacksAgainstAir: Int = unitClass.airDamageFactorRaw * unitClass.maxAirHitsRaw
   
   def cooldownLeft                          : Int         = Math.max(airCooldownLeft, groundCooldownLeft)
   def cooldownLeftAgainst (enemy:UnitInfo)  : Int         =  if (enemy.flying) airCooldownLeft                else groundCooldownLeft
@@ -197,10 +197,14 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   def canAttackThisFrame:Boolean = canAttackThisSecond && cooldownLeft < With.latency.framesRemaining
   
   def requiredAttackDelay: Int = {
+    
+    // Testing this out!
+    return 0
+    
     // The question:
     // If we order this unit to attack, how many frames after issuing an order (and waiting on latency) before it can attack again?
     //
-    // This is also important for preventing the Goon Stop bug. See BehaviorDragoon for details.
+    // See also https://docs.google.com/spreadsheets/d/1bsvPvFil-kpvEUfSG74U3E5PLSTC02JxSkiR8QdLMuw/edit#gid=0
     //
     if      (is(Protoss.Dragoon)) 8
     else if (is(Protoss.Carrier)) 48

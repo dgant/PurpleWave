@@ -1,7 +1,7 @@
 package Information.Battles.Estimation
 
 import Information.Battles.BattleTypes.{Battle, BattleGroup}
-import Information.Battles.TacticsTypes.{Tactics, TacticsOptions, TacticsOptionsDefault}
+import Information.Battles.TacticsTypes.{Tactics, TacticsOptions}
 import Lifecycle.With
 import Mathematics.PurpleMath
 import ProxyBwapi.Engine.Damage
@@ -18,7 +18,7 @@ object BattleEstimator {
   }
   
   def estimate(battle:Battle) {
-    battle.estimations = battle.us.tacticsAvailable.map(ourTactics => estimateWithTactics(battle, ourTactics, new TacticsOptionsDefault))
+    battle.estimations = battle.us.tacticsAvailable.map(ourTactics => estimateWithTactics(battle, ourTactics, battle.enemy.tacticsApparent))
   }
   
   def estimateWithTactics(battle:Battle, tacticsUs:TacticsOptions, tacticsEnemy:TacticsOptions):BattleEstimation = {

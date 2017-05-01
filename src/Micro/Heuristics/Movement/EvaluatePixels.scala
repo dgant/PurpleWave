@@ -74,23 +74,20 @@ object EvaluatePixels {
     // + The pixels in 8 orthogonal directions at 144, 80, 63 pixels (as far as we can go in the same zone)
     // + Pixels in other directions up to 63 pixels away
     //
-    
+  
     val startingPixel = intent.unit.project(With.latency.framesRemaining)
     val startingZone  = startingPixel.zone
+    val otherPixels =
+      (0 until 256 by 4)
+        .flatten(angle => {
+          val targetPixel = startingPixel.radiate(angle, 32.0)
+          if (acceptable(intent.unit, targetPixel, startingPixel, startingZone))
+            Some(targetPixel)
+          else
+            None
+        })
     
-    val pixelsOrthogonal =
-      (0 until 256 by 32).flatten(angle =>
-        Vector(80.0, 62.0)
-          .map(distance => startingPixel.radiate(angle, distance))
-          .find(targetPixel => acceptable(intent.unit, targetPixel, startingPixel, startingZone)))
-    
-    val pixelsDiagonal =
-      (16 until 256 by 32).flatten(angle =>
-        Vector(62.0, 32.0)
-          .map(distance => startingPixel.radiate(angle, distance))
-          .find(targetPixel => acceptable(intent.unit, targetPixel, startingPixel, startingZone)))
-    
-    Vector(startingPixel) ++ pixelsOrthogonal ++ pixelsDiagonal
+    Vector(startingPixel) ++ otherPixels
   }
   
   def acceptable(

@@ -1,8 +1,8 @@
 package Information.Battles.Simulation.Construction
 
-import Information.Battles.Simulation.Execution.BattleSimulator
 import Information.Battles.BattleTypes.{Battle, BattleGroup}
-import Information.Battles.TacticsTypes.{Tactics, TacticsOptionsDefault}
+import Information.Battles.Simulation.Execution.BattleSimulator
+import Information.Battles.TacticsTypes.Tactics
 
 object BattleSimulationBuilder {
   
@@ -17,7 +17,7 @@ object BattleSimulationBuilder {
   }
   
   def buildEnemyTacticVariants(enemyGroup:BattleGroup):Vector[BattleSimulationGroup] = {
-    Vector(new BattleSimulationGroup(enemyGroup, new TacticsOptionsDefault))
+    Vector(new BattleSimulationGroup(enemyGroup, enemyGroup.tacticsApparent))
   }
   
   def buildSimulation(ourGroup:BattleSimulationGroup, enemyGroup:BattleSimulationGroup):BattleSimulation = {

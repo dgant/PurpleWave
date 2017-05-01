@@ -47,12 +47,12 @@ class BattleGroup(val units:Vector[UnitInfo]) {
     val workers = visibleUnits.filter(_.unitClass.isWorker)
     val fightingWorkers = workers.filter(worker => worker.target.exists(target => target.isEnemyOf(worker)))
     val fleeingWorkers = workers.filter(_.target.isEmpty)
-    if (fightingWorkers.size > workers.size * 0.8)
+    if (fightingWorkers.size > workers.size * 0.75)
       output.add(Tactics.Workers.FightAll)
-    else if (fightingWorkers.size > workers.size * 0.4)
+    else if (fightingWorkers.size > 0)
       output.add(Tactics.Workers.FightHalf)
     else if (fleeingWorkers.size > workers.size * 0.5)
-      output.add(Tactics.Workers.FightHalf)
+      output.add(Tactics.Workers.Flee)
     else
       output.add(Tactics.Workers.Ignore)
     

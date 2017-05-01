@@ -9,7 +9,7 @@ object MovementHeuristicDestination extends MovementHeuristic {
     
     if (intent.destination.isEmpty) return HeuristicMath.default
     
-    val candidateDistance = intent.unit.tileIncludingCenter.pixelCenter.pixelDistanceFast(candidate) - 24
+    val candidateDistance = intent.unit.tileIncludingCenter.pixelCenter.pixelDistanceFast(candidate)
   
     if (candidateDistance <= 0) return HeuristicMath.default
   

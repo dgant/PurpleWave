@@ -64,7 +64,6 @@ object SimulacrumAgent {
         }
         i += 1
       }
-      
     }
   
     ///////////////////
@@ -167,7 +166,10 @@ object SimulacrumAgent {
     /////////////////////
 
     else if (thisGroup.tactics.has(Tactics.Movement.Kite)) {
-      if (thisUnit.fighting && thisUnit.target.exists(target => ! thisUnit.inRangeToAttack(target))) {
+      if (thisUnit.fighting
+        && thisUnit.target.exists(target =>
+        target.rangeAgainst(thisUnit) < thisUnit.rangeAgainst(target)
+          && ! thisUnit.inRangeToAttack(target))) {
         doCharge(thisUnit, battle)
         return
       }

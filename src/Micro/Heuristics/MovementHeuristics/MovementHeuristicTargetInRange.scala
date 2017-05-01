@@ -4,7 +4,7 @@ import Mathematics.Heuristics.HeuristicMath
 import Mathematics.Pixels.Pixel
 import Micro.Intent.Intention
 
-object MovementHeuristicInRangeOfTarget extends MovementHeuristic {
+object MovementHeuristicTargetInRange extends MovementHeuristic {
   
   override def evaluate(intent: Intention, candidate: Pixel): Double = {
   

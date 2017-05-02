@@ -2,17 +2,25 @@ package Debugging
 
 class Configuration {
   
+  // Up this for tournament play!
+  var maxFrameMilliseconds = 20
+  
+  val enableBattleSimulation          = true
+  val enableBattleEstimation          = false
+  val battleSimulationUnitLimit       = 9999
   val battleWorkerCostPerFrame        = 3.0
   val battleMarginTiles               = 15
-  val battleSimulatorUnitLimit        = 80
+  
   val dpsGridDistancePenalty          = 0.5
   val dpsGridMovementPenalty          = 0.5
   val dpsGridCooldownPenalty          = 0.25
-  val combatStickinessLeash           = 0.0 //Let's get rid of this concept
+  
+  val microFrameLookahead             = 8
+  
   var enableFastGroundDistance        = true
   var enablePathRecalculation         = true
   var pathRecalculationDelayFrames    = 240
-  var woundedThreshold                = 40
+  var woundedThresholdHealth          = 40
   
   var visualize                   = true
   var visualizeBases              = false
@@ -25,7 +33,6 @@ class Configuration {
   var visualizeGrids              = false
   var visualizeHitPoints          = true
   var visualizeHeuristicMovement  = true
-  var visualizeHeuristicTargeting = false
   var visualizePerformance        = false
   var visualizePerformanceDetails = false
   var visualizePlans              = false
@@ -34,14 +41,13 @@ class Configuration {
   var visualizeScheduler          = false
   var visualizeTextOnly           = false
   var visualizeUnitsForeign       = true
-  var visualizeUnitsOurs          = true
+  var visualizeUnitsOurs          = false
   var visualizeVectorUnits        = false
   
   var gameSpeed                   = 0
   var enableSurrendering          = true
   var enableStdOut                = false
   var enableChat                  = true
-  var enableLatencyCompensation   = false
   
   var camera                      = false
   var cameraDynamicSpeed          = false
@@ -51,8 +57,6 @@ class Configuration {
   var cameraViewportHeight        = 362
   var conservativeViewportWidth   = 640 + cameraViewportWidth
   var conservativeViewportHeight  = 480 + cameraViewportHeight
-  
-  var maxFrameMilliseconds  = 20
   
   var urgencyManners        = 1
   var urgencyEconomy        = 1

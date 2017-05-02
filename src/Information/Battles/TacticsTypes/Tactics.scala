@@ -21,10 +21,9 @@ object Tactics {
   object Movement {
     val None      = v
     val Charge    = v
-    val Kite      = v
     val Flee      = v
     
-    val values = Vector(None, Charge, Kite, Flee)
+    val values = Vector(None, Charge, Flee)
   }
   
   object Wounded {

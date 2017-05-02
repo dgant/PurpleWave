@@ -1,7 +1,6 @@
 package Micro.Heuristics.Movement
 
 import Debugging.Visualizations.Colors
-import Micro.Heuristics.MovementHeuristics._
 
 class MovementProfile(
   var preferDestination     : Double = 0,
@@ -14,11 +13,11 @@ class MovementProfile(
   
   def weightedHeuristics: Iterable[MovementHeuristicWeight] =
     Vector(
-      new MovementHeuristicWeight(MovementHeuristicDestination,             preferDestination,    Colors.MediumGreen),
+      new MovementHeuristicWeight(MovementHeuristicDestination,             preferDestination,    Colors.NeonViolet),
       new MovementHeuristicWeight(MovementHeuristicOrigin,                  preferOrigin,         Colors.NeonGreen),
-      new MovementHeuristicWeight(MovementHeuristicThreatDistance,          preferThreatDistance, Colors.NeonGreen),
-      new MovementHeuristicWeight(MovementHeuristicTargetInRange,           preferTarget,         Colors.BrightBlue),
-      new MovementHeuristicWeight(MovementHeuristicMobility,                preferMobility,       Colors.MediumOrange),
+      new MovementHeuristicWeight(MovementHeuristicThreatDistance,          preferThreatDistance, Colors.NeonOrange),
+      new MovementHeuristicWeight(MovementHeuristicTargetInRange,           preferTarget,         Colors.NeonBlue),
+      new MovementHeuristicWeight(MovementHeuristicMobility,                preferMobility,       Colors.NeonOrange),
       new MovementHeuristicWeight(MovementHeuristicExposureToDamage,        -avoidDamage,         Colors.NeonRed),
       new MovementHeuristicWeight(MovementHeuristicTraffic,                 -avoidTraffic,        Colors.NeonYellow)
     )

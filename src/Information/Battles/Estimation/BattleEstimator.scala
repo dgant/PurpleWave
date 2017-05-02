@@ -14,6 +14,7 @@ import scala.collection.mutable
 object BattleEstimator {
   
   def run() {
+    if ( ! With.configuration.enableBattleEstimation) return
     With.battles.local.filter(_.happening).foreach(estimate)
   }
   
@@ -24,10 +25,8 @@ object BattleEstimator {
   def estimateWithTactics(battle:Battle, tacticsUs:TacticsOptions, tacticsEnemy:TacticsOptions):BattleEstimation = {
     
     val fightDuration = 24 * (
-      (if (tacticsUs    .has(Tactics.Movement.Charge))  4 else 1) +
-      (if (tacticsEnemy .has(Tactics.Movement.Charge))  4 else 1) +
-      (if (tacticsUs    .has(Tactics.Movement.Kite))    2 else 1) +
-      (if (tacticsEnemy .has(Tactics.Movement.Kite))    2 else 1))
+      (if (tacticsUs    .has(Tactics.Movement.Charge))  3 else 1) +
+      (if (tacticsEnemy .has(Tactics.Movement.Charge))  3 else 1))
     
     var damageDealtToUs          = 0.0
     var damageDealtToEnemy       = 0.0
@@ -48,9 +47,8 @@ object BattleEstimator {
     damageDealtToUs    = participantsUs    .map(costOfDamage(_, damageDealtByEnemy)).sum / participantsUs.size
     damageDealtToEnemy = participantsEnemy .map(costOfDamage(_, damageDealtByUs   )).sum / participantsEnemy.size
   
-  
-    damageDealtToUs     += workerOpportunityCost(fightDuration, tacticsEnemy, participantsEnemy)
-    damageDealtToEnemy  += workerOpportunityCost(fightDuration, tacticsUs, participantsUs)
+    damageDealtToUs     += workerOpportunityCost(fightDuration, tacticsUs, participantsUs)
+    damageDealtToEnemy  += workerOpportunityCost(fightDuration, tacticsEnemy, participantsEnemy)
     
     new BattleEstimation(
       battle,

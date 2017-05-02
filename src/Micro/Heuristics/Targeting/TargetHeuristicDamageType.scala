@@ -1,4 +1,4 @@
-package Micro.Heuristics.TargetHeuristics
+package Micro.Heuristics.Targeting
 import Mathematics.Heuristics.HeuristicMath
 import Micro.Intent.Intention
 import ProxyBwapi.UnitInfo.UnitInfo

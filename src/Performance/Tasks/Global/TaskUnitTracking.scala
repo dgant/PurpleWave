@@ -7,6 +7,8 @@ class TaskUnitTracking extends AbstractTask {
   
   urgency = With.configuration.urgencyUnitTracking
   
+  override def skippable: Boolean = false
+  
   override protected def onRun() {
     With.units.update()
   }

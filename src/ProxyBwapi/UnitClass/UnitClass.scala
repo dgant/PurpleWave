@@ -31,6 +31,18 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
   // Combat //
   ////////////
   
+  lazy val framesRequiredForAttackToComplete: Int = {
+    // The question:
+    // If we order this unit to attack, for how many frames after the attack animation happens can the attack be cancelled?
+    //
+    // See also https://docs.google.com/spreadsheets/d/1bsvPvFil-kpvEUfSG74U3E5PLSTC02JxSkiR8QdLMuw/edit#gid=0
+    //
+    if      (this == Protoss.Dragoon) 5
+    else if (this == Zerg.Devourer)   7
+    else if (this == Protoss.Carrier) 24
+    else                              0
+  }
+  
   lazy val effectiveAirDamage:Int =
     if      (this == Protoss.Carrier)      Protoss.Interceptor.effectiveAirDamage * 8
     else if (this == Protoss.Interceptor)  0

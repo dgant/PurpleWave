@@ -19,8 +19,10 @@ object BattleSimulator {
   def costPerFrameOfNotMining(workers:Int):Double = workers * With.configuration.battleWorkerCostPerFrame
   
   def run() {
+    if ( ! With.configuration.enableBattleSimulation) return
+    
     With.battles.local
-      .filter(battle => battle.happening && battle.us.units.size + battle.enemy.units.size < With.configuration.battleSimulatorUnitLimit)
+      .filter(battle => battle.happening && battle.us.units.size + battle.enemy.units.size < With.configuration.battleSimulationUnitLimit)
       .foreach(battle => battle.simulations = simulate(battle))
   }
   

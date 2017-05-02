@@ -1,4 +1,4 @@
-package Micro.Heuristics.MovementHeuristics
+package Micro.Heuristics.Movement
 
 import Lifecycle.With
 import Mathematics.Heuristics.HeuristicMath

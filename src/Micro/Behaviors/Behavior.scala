@@ -22,13 +22,12 @@ object Behavior {
   }
   
   val actions = Vector(
-    Target,
     Flee,
     Reload,
-    Kite,
     Gather,
     Build,
     Produce,
+    Target,
     Attack,
     Move
   )

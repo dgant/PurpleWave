@@ -160,24 +160,6 @@ object SimulacrumAgent {
       doCharge(thisUnit, battle)
       return
     }
-  
-    /////////////////////
-    // Consider kiting //
-    /////////////////////
-
-    else if (thisGroup.tactics.has(Tactics.Movement.Kite)) {
-      if (thisUnit.fighting
-        && thisUnit.target.exists(target =>
-        target.rangeAgainst(thisUnit) < thisUnit.rangeAgainst(target)
-          && ! thisUnit.inRangeToAttack(target))) {
-        doCharge(thisUnit, battle)
-        return
-      }
-      else if (thisUnit.threat.nonEmpty) {
-        doFlee(thisUnit, battle)
-        return
-      }
-    }
   }
   
   ////////////////////
@@ -195,7 +177,7 @@ object SimulacrumAgent {
   
   @inline private def dealDamage(thisUnit:Simulacrum, target: Simulacrum, battle: BattleSimulation) {
     val damage = thisUnit.unit.damageAgainst(target.unit, target.shields)
-    thisUnit.attackCooldown = thisUnit.unit.cooldownAgainst(target.unit)
+    thisUnit.attackCooldown = thisUnit.unit.cooldownMaxAgainst(target.unit)
     thisUnit.moveCooldown   = Math.min(thisUnit.attackCooldown, 8)
     target.damageTaken      += damage
     target.shields          -= damage

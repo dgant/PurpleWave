@@ -1,4 +1,4 @@
-package Micro.Heuristics.MovementHeuristics
+package Micro.Heuristics.Movement
 
 import Mathematics.Heuristics.HeuristicMath
 import Mathematics.Pixels.Pixel
@@ -10,6 +10,6 @@ object MovementHeuristicThreatDistance extends MovementHeuristic {
   
     if (intent.threats.isEmpty) return HeuristicMath.default
     
-    intent.threats.map(threat => threat.pixelDistanceFast(candidate) - threat.rangeAgainst(intent.unit)).min
+    intent.threats.map(threat => threat.pixelDistanceFast(candidate) - threat.pixelRangeAgainst(intent.unit)).min
   }
 }

@@ -10,7 +10,8 @@ object Target extends Action {
   }
   
   override def perform(intent: Intention): Boolean = {
-    intent.toAttack = intent.toAttack.orElse(EvaluateTargets.best(intent, intent.targets))
+    val targets = if (intent.canPursue) intent.targets else intent.targetsInRange
+    intent.toAttack = intent.toAttack.orElse(EvaluateTargets.best(intent, targets))
     false
   }
 }

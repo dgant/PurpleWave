@@ -95,7 +95,6 @@ object With {
   
     With.game.enableFlag(1) //Enable unit control
     With.game.setLocalSpeed(With.configuration.gameSpeed)
-    With.game.setLatCom(With.configuration.enableLatencyCompensation)
   }
   
   def onEnd() {

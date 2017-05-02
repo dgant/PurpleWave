@@ -1,5 +1,4 @@
 package Micro.Heuristics.Targeting
-import Micro.Heuristics.TargetHeuristics._
 
 class TargetingProfile(
   var preferSame        : Double = 0.0,

@@ -22,16 +22,22 @@ object Flee extends Action {
     //Only stop gathering if immediately threatened and if continuing to mine isn't going to help
     if (isWorker(intent)
       && intent.toGather.nonEmpty
-      && ! intent.threats.exists(threat =>
-        threat.target.contains(intent.unit)
-        && threat.pixelDistanceFast(intent.unit) <= threat.pixelImpactAgainst(8, intent.unit)
-        && threat.pixelDistanceFast(intent.unit) >= threat.pixelDistanceFast(intent.toGather.get))) {
+      && intent.threatsActive.exists(threat =>
+        threat.pixelDistanceFast(intent.unit) >= threat.pixelDistanceFast(intent.toGather.get))) {
       return false
     }
     
+    val enemyFaster     = intent.threatsActive.exists(threat => threat.topSpeed > intent.unit.topSpeed)
+    val weAreFaster     = intent.threatsActive.forall(threat => threat.topSpeed < intent.unit.topSpeed)
+    val weOutrange      = intent.threatsActive.forall(threat => threat.pixelRangeAgainst(intent.unit) < intent.unit.pixelRangeAgainst(threat))
+    
     intent.movementProfile = MovementProfiles.flee
+    if (enemyFaster) {
+      //No sense running anywhere than to help
+      intent.movementProfile.preferOrigin += 2.0
+    }
     intent.toGather = None
-    intent.canAttack = false
+    intent.canPursue = weAreFaster && weOutrange
     
     Move.consider(intent)
   }

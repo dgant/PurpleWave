@@ -1,4 +1,4 @@
-package Micro.Heuristics.MovementHeuristics
+package Micro.Heuristics.Movement
 import Mathematics.Heuristics.HeuristicMath
 import Mathematics.Pixels.Pixel
 import Micro.Intent.Intention
@@ -13,8 +13,8 @@ object MovementHeuristicDestination extends MovementHeuristic {
   
     if (candidateDistance <= 0) return HeuristicMath.default
   
-    val before = intent.unit.travelPixels(intent.unit.pixelCenter,  intent.destination.get)
-    val after  = intent.unit.travelPixels(candidate,                intent.destination.get)
+    val before = intent.unit.pixelDistanceTravelling(intent.unit.pixelCenter,  intent.destination.get)
+    val after  = intent.unit.pixelDistanceTravelling(candidate,                intent.destination.get)
   
     (before - after) / candidateDistance
   }

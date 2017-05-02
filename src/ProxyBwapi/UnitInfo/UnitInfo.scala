@@ -24,7 +24,7 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   def mineralsLeft  : Int = if (unitClass.isMinerals) resourcesLeft else 0
   def gasLeft       : Int = if (unitClass.isGas)      resourcesLeft else 0
   
-  def wounded:Boolean = totalHealth < Math.min(With.configuration.woundedThreshold, unitClass.maxTotalHealth/3)
+  def wounded:Boolean = totalHealth < Math.min(With.configuration.woundedThresholdHealth, unitClass.maxTotalHealth/3)
   
   ///////////////
   // Economics //
@@ -39,8 +39,8 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   def x: Int = pixelCenter.x
   def y: Int = pixelCenter.y
   
-  def tileIncludingCenter: Tile = pixelCenter.tileIncluding
-  def tileArea: TileRectangle = unitClass.tileArea.add(tileTopLeft)
+  def tileIncludingCenter:  Tile          = pixelCenter.tileIncluding
+  def tileArea:             TileRectangle = unitClass.tileArea.add(tileTopLeft)
   
   def pixelRangeAir: Double = pixelRangeAirCache.get
   private val pixelRangeAirCache = new CacheFrame(() =>
@@ -59,30 +59,26 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   
   def pixelRangeMax:Double = Math.max(pixelRangeAir, pixelRangeGround)
   
-  def canTraverse           (tile:        Tile)       : Boolean = flying || With.grids.walkable.get(tile)
-  def pixelsFromEdgeSlow    (otherUnit:   UnitInfo)   : Double  = pixelDistanceSlow(otherUnit) - unitClass.radialHypotenuse - otherUnit.unitClass.radialHypotenuse
-  def pixelsFromEdgeFast    (otherUnit:   UnitInfo)   : Double  = pixelDistanceFast(otherUnit) - unitClass.radialHypotenuse - otherUnit.unitClass.radialHypotenuse
-  def pixelDistanceSlow     (otherPixel:  Pixel)      : Double  = pixelCenter.pixelDistanceSlow(otherPixel)
-  def pixelDistanceSlow     (otherUnit:   UnitInfo)   : Double  = pixelDistanceSlow(otherUnit.pixelCenter)
-  def pixelDistanceFast     (otherPixel:  Pixel)      : Double  = pixelCenter.pixelDistanceFast(otherPixel)
-  def pixelDistanceFast     (otherUnit:   UnitInfo)   : Double  = pixelDistanceFast(otherUnit.pixelCenter)
-  def pixelDistanceSquared  (otherUnit:   UnitInfo)   : Double  = pixelDistanceSquared(otherUnit.pixelCenter)
-  def pixelDistanceSquared  (otherPixel:  Pixel)      : Double  = pixelCenter.pixelDistanceSquared(otherPixel)
-  def travelPixels          (destination: Pixel)      : Double  = travelPixels(pixelCenter, destination)
-  def travelPixels          (destination: Tile)       : Double  = travelPixels(tileIncludingCenter, destination)
-  def travelPixels          (from: Pixel, to: Pixel)  : Double  = travelPixels(from.tileIncluding, to.tileIncluding)
-  def travelPixels          (from: Tile,  to: Tile)   : Double  =
-    if (flying)
-      from.pixelCenter.pixelDistanceSlow(to.pixelCenter)
-    else
-      With.paths.groundPixels(from, to)
+  def canTraverse             (tile:        Tile)       : Boolean = flying || With.grids.walkable.get(tile)
+  def pixelsFromEdgeSlow      (otherUnit:   UnitInfo)   : Double  = pixelDistanceSlow(otherUnit) - unitClass.radialHypotenuse - otherUnit.unitClass.radialHypotenuse
+  def pixelsFromEdgeFast      (otherUnit:   UnitInfo)   : Double  = pixelDistanceFast(otherUnit) - unitClass.radialHypotenuse - otherUnit.unitClass.radialHypotenuse
+  def pixelDistanceSlow       (otherPixel:  Pixel)      : Double  = pixelCenter.pixelDistanceSlow(otherPixel)
+  def pixelDistanceSlow       (otherUnit:   UnitInfo)   : Double  = pixelDistanceSlow(otherUnit.pixelCenter)
+  def pixelDistanceFast       (otherPixel:  Pixel)      : Double  = pixelCenter.pixelDistanceFast(otherPixel)
+  def pixelDistanceFast       (otherUnit:   UnitInfo)   : Double  = pixelDistanceFast(otherUnit.pixelCenter)
+  def pixelDistanceSquared    (otherUnit:   UnitInfo)   : Double  = pixelDistanceSquared(otherUnit.pixelCenter)
+  def pixelDistanceSquared    (otherPixel:  Pixel)      : Double  = pixelCenter.pixelDistanceSquared(otherPixel)
+  def pixelDistanceTravelling (destination: Pixel)      : Double  = pixelDistanceTravelling(pixelCenter, destination)
+  def pixelDistanceTravelling (destination: Tile)       : Double  = pixelDistanceTravelling(tileIncludingCenter, destination)
+  def pixelDistanceTravelling (from: Pixel, to: Pixel)  : Double  = pixelDistanceTravelling(from.tileIncluding, to.tileIncluding)
+  def pixelDistanceTravelling (from: Tile,  to: Tile)   : Double  = if (flying) from.pixelCenter.pixelDistanceSlow(to.pixelCenter) else With.paths.groundPixels(from, to)
   
-  def canMoveThisFrame:Boolean = unitClass.canMove && canDoAnythingThisFrame && ! burrowed
+  def canMoveThisFrame:Boolean = unitClass.canMove && topSpeed > 0 && canDoAnythingThisFrame && ! burrowed
   
   def topSpeed:Double = topSpeedCache.get
   private val topSpeedCache = new CacheFrame(() =>
     stimBonus * (
-    unitClass.topSpeed + (if (
+    unitClass.topSpeed * (if (
       (is(Terran.Vulture)   && player.getUpgradeLevel(Terran.VultureSpeed)    > 0) ||
       (is(Protoss.Observer) && player.getUpgradeLevel(Protoss.ObserverSpeed)  > 0) ||
       (is(Protoss.Scout)    && player.getUpgradeLevel(Protoss.ScoutSpeed)     > 0) ||
@@ -92,7 +88,7 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
       (is(Zerg.Zergling)    && player.getUpgradeLevel(Zerg.ZerglingSpeed)     > 0) ||
       (is(Zerg.Hydralisk)   && player.getUpgradeLevel(Zerg.HydraliskSpeed)    > 0) ||
       (is(Zerg.Ultralisk)   && player.getUpgradeLevel(Zerg.UltraliskSpeed)    > 0))
-      unitClass.topSpeed/2.0 else 0.0)))
+      1.5 else 1.0)))
   
   def project(framesToLookAhead:Int):Pixel = pixelCenter.add((velocityX * framesToLookAhead).toInt, (velocityY * framesToLookAhead).toInt)
   
@@ -132,8 +128,8 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   
   def cooldownLeft                          : Int         = Math.max(airCooldownLeft, groundCooldownLeft)
   def cooldownLeftAgainst (enemy:UnitInfo)  : Int         =  if (enemy.flying) airCooldownLeft                else groundCooldownLeft
-  def cooldownAgainst     (enemy:UnitInfo)  : Int         = (if (enemy.flying) unitClass.airDamageCooldown    else unitClass.groundDamageCooldown) / stimBonus
-  def rangeAgainst        (enemy:UnitInfo)  : Double      =  if (enemy.flying) pixelRangeAir                  else pixelRangeGround
+  def cooldownMaxAgainst  (enemy:UnitInfo)  : Int         = (if (enemy.flying) unitClass.airDamageCooldown    else unitClass.groundDamageCooldown) / stimBonus
+  def pixelRangeAgainst   (enemy:UnitInfo)  : Double      =  if (enemy.flying) pixelRangeAir                  else pixelRangeGround
   def damageTypeAgainst   (enemy:UnitInfo)  : DamageType  =  if (enemy.flying) unitClass.airDamageTypeRaw     else unitClass.groundDamageTypeRaw
   def attacksAgainst      (enemy:UnitInfo)  : Int         =  if (enemy.flying) attacksAgainstAir              else attacksAgainstGround
   
@@ -157,7 +153,7 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   }
   
   def dpsAgainst(enemy:UnitInfo): Double = {
-    val cooldownVs = cooldownAgainst(enemy)
+    val cooldownVs = cooldownMaxAgainst(enemy)
     if (cooldownVs == 0) return 0.0
     damageAgainst(enemy) * 24.0 / cooldownVs
   }
@@ -196,29 +192,25 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   
   def canAttackThisFrame:Boolean = canAttackThisSecond && cooldownLeft < With.latency.framesRemaining
   
-  def requiredAttackDelay: Int = {
-    
-    // Testing this out!
-    return 0
-    
-    // The question:
-    // If we order this unit to attack, how many frames after issuing an order (and waiting on latency) before it can attack again?
-    //
-    // See also https://docs.google.com/spreadsheets/d/1bsvPvFil-kpvEUfSG74U3E5PLSTC02JxSkiR8QdLMuw/edit#gid=0
-    //
-    if      (is(Protoss.Dragoon)) 8
-    else if (is(Protoss.Carrier)) 48
-    else                          4
+  def pixelsCovered     (framesAhead: Int): Double = if (canMoveThisFrame) topSpeed * framesAhead else 0.0
+  def pixelReachAir     (framesAhead: Int): Double = pixelsCovered(framesAhead) + pixelRangeAir
+  def pixelReachGround  (framesAhead: Int): Double = pixelsCovered(framesAhead) + pixelRangeGround
+  def pixelReachMax     (framesAhead: Int): Double = Math.max(pixelReachAir(framesAhead), pixelReachGround(framesAhead))
+  def pixelReachAgainst (framesAhead: Int, enemy:UnitInfo): Double = if (enemy.flying) pixelReachAir(framesAhead) else pixelReachGround(framesAhead)
+  
+  def inRangeToAttackSlow(enemy: UnitInfo) : Boolean = pixelsFromEdgeSlow(enemy) <= pixelRangeAgainst(enemy)
+  def inRangeToAttackFast(enemy: UnitInfo) : Boolean = pixelsFromEdgeFast(enemy) <= pixelRangeAgainst(enemy)
+  
+  def inRangeToAttackSlow(enemy: UnitInfo, framesAhead: Int) : Boolean = enemy.project(framesAhead).pixelDistanceSlow(project(framesAhead)) <= pixelRangeAgainst(enemy) + unitClass.radialHypotenuse + enemy.unitClass.radialHypotenuse
+  def inRangeToAttackFast(enemy: UnitInfo, framesAhead: Int) : Boolean = enemy.project(framesAhead).pixelDistanceFast(project(framesAhead)) <= pixelRangeAgainst(enemy) + unitClass.radialHypotenuse + enemy.unitClass.radialHypotenuse
+  
+  def framesToTravelPixels(pixels:Double):Int = if (canMoveThisFrame) Math.max(0, Math.ceil(pixels/topSpeed).toInt) else Int.MaxValue
+  def framesBeforeAttacking(enemy:UnitInfo):Int = {
+    if (canAttackThisSecond(enemy)) {
+      Math.max(cooldownLeft, framesToTravelPixels(pixelDistanceFast(enemy) - pixelRangeAgainst(enemy)))
+    }
+    else Int.MaxValue
   }
-  
-  def pixelImpactTravel   (framesAhead  : Int)  : Double = if (canMoveThisFrame) topSpeed * framesAhead  else 0.0
-  def pixelImpactAir      (framesAhead  : Int)  : Double = pixelImpactTravel(framesAhead) + pixelRangeAir
-  def pixelImpactGround   (framesAhead  : Int)  : Double = pixelImpactTravel(framesAhead) + pixelRangeGround
-  def pixelImpactMax      (framesAhead  : Int)  : Double = Math.max(pixelImpactAir(framesAhead), pixelImpactGround(framesAhead))
-  def pixelImpactAgainst  (framesAhead  : Int, enemy:UnitInfo): Double = if (enemy.flying) pixelImpactAir(framesAhead) else pixelImpactGround(framesAhead)
-  
-  def inRangeToAttackSlow(enemy:UnitInfo):Boolean = pixelsFromEdgeSlow(enemy) <= rangeAgainst(enemy)
-  def inRangeToAttackFast(enemy:UnitInfo):Boolean = pixelsFromEdgeFast(enemy) <= rangeAgainst(enemy)
   
   ////////////////
   // Visibility //

@@ -28,9 +28,9 @@ class ControlPixel extends Plan {
         e.possiblyStillThere &&
         e.canAttackThisSecond &&
         ourBases.exists(base =>
-          e.travelPixels(base.tileIncluding) < infiltrationRadius &&
-          e.travelPixels(base.tileIncluding) <
-          e.travelPixels(base.tileIncluding, targetTile)))
+          e.pixelDistanceTravelling(base.tileIncluding) < infiltrationRadius &&
+          e.pixelDistanceTravelling(base.tileIncluding) <
+          e.pixelDistanceTravelling(base.tileIncluding, targetTile)))
         
     if (infiltrators.nonEmpty) {
       targetTile = infiltrators.map(_.tileIncludingCenter).minBy(_.tileDistanceSlow(With.geography.home))

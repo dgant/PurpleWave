@@ -26,7 +26,7 @@ class Executor {
     
     stateByUnit
       .values
-      .filter(state => ! state.intent.executed && With.commander.readyForCommand(state.unit))
+      .filter(state => With.commander.readyForCommand(state.unit))
       .foreach(state => Behavior.execute(state.intent))
   }
   

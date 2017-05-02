@@ -17,6 +17,7 @@ object Charge extends Action {
     intent.movementProfile = MovementProfiles.charge
     intent.targetProfile.preferInRange = 1.0
     intent.targetProfile.avoidDistance += 1.0
+    intent.canPursue = true
     false
   }
 }

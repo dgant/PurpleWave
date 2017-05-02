@@ -21,7 +21,24 @@ class Commander {
   private val nextOrderFrame = new CountMap[FriendlyUnitInfo]
   
   def run() {
+  
+    // https://docs.google.com/spreadsheets/d/1bsvPvFil-kpvEUfSG74U3E5PLSTC02JxSkiR8QdLMuw/edit#gid=0
+    // "Dragoon, Devourer only units that can have damage halted by stop() too early"
+    //
+    // Dragoons/Devourers need extra time to finish their attack animations after they begin attacking.
+    // 5 frames for Dragoons and 7 for Devourers.
+    //
+    // So when we detect a Dragoon or Devourer attacking, we sleep it a bit longer to ensure it finishes its attack
+    With.units.ours
+      .filter(unit => unit.attackAnimationHappening && nextOrderFrame.contains(unit))
+      .foreach(unit =>
+        nextOrderFrame(unit) = Math.max(
+          nextOrderFrame(unit),
+          With.frame + unit.unitClass.framesRequiredForAttackToComplete + 1 - With.game.getLatencyFrames))
+    
     nextOrderFrame.keySet.filterNot(_.alive).foreach(nextOrderFrame.remove)
+    
+    
   }
   
   def readyForCommand(unit:FriendlyUnitInfo):Boolean = {
@@ -46,17 +63,8 @@ class Commander {
   
   def move(intent:Intention, position:Pixel) {
     
-    //Make melee units sticky
-    val stickyMeleeTarget = intent.toAttack
-      .map(_.pixelCenter)
-      .filter(targetPixel =>
-        targetPixel.pixelDistanceSquared(position) < Math.pow(With.configuration.combatStickinessLeash, 2)
-        && intent.unit.pixelRangeGround <= With.configuration.combatStickinessLeash)
-    
-    if (stickyMeleeTarget.isDefined) return attack(intent, intent.toAttack.get)
-  
     //Send flying units past their destination to maximize acceleration
-    val flyingOvershoot = 128.0
+    val flyingOvershoot = 144.0
     var destination = position
     if (intent.unit.flying && intent.unit.pixelDistanceSquared(position) < Math.pow(flyingOvershoot, 2)) {
       destination = intent.unit.pixelCenter.project(position, flyingOvershoot)
@@ -141,7 +149,7 @@ class Commander {
   }
   
   private def sleepAttack(unit:FriendlyUnitInfo) {
-    sleep(unit, unit.requiredAttackDelay)
+    sleep(unit, 2 + unit.unitClass.framesRequiredForAttackToComplete)
   }
   
   private def sleepBuild(unit:FriendlyUnitInfo) {

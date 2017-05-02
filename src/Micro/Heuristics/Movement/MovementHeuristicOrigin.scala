@@ -1,4 +1,4 @@
-package Micro.Heuristics.MovementHeuristics
+package Micro.Heuristics.Movement
 
 import Lifecycle.With
 import Mathematics.Heuristics.HeuristicMath
@@ -16,8 +16,8 @@ object MovementHeuristicOrigin extends MovementHeuristic {
     
     if (candidateDistance <= 0) return HeuristicMath.default
     
-    val before = intent.unit.travelPixels(intent.unit.pixelCenter,  intent.origin)
-    val after  = intent.unit.travelPixels(candidate,                intent.origin)
+    val before = intent.unit.pixelDistanceTravelling(intent.unit.pixelCenter,  intent.origin)
+    val after  = intent.unit.pixelDistanceTravelling(candidate,                intent.origin)
     
     (before - after) / candidateDistance
   }

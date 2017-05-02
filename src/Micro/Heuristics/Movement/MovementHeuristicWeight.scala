@@ -1,4 +1,4 @@
-package Micro.Heuristics.MovementHeuristics
+package Micro.Heuristics.Movement
 
 import Debugging.Visualizations.Colors
 import Mathematics.Heuristics.HeuristicWeight

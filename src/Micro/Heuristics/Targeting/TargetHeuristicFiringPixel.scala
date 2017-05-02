@@ -1,4 +1,4 @@
-package Micro.Heuristics.TargetHeuristics
+package Micro.Heuristics.Targeting
 
 import Lifecycle.With
 import Micro.Intent.Intention
@@ -13,7 +13,7 @@ object TargetHeuristicFiringPixel extends TargetHeuristic{
       intent.unit.pixelCenter
         .project(
           candidate.pixelCenter,
-          Math.max(0, intent.unit.pixelsFromEdgeFast(candidate) - intent.unit.rangeAgainst(candidate)))
+          Math.max(0, intent.unit.pixelsFromEdgeFast(candidate) - intent.unit.pixelRangeAgainst(candidate)))
         .tileIncluding
     
     val dpsExposure = With.grids.dpsEnemy.get(firingPixel, intent.unit)

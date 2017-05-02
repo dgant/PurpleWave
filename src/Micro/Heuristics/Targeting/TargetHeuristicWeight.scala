@@ -1,4 +1,4 @@
-package Micro.Heuristics.TargetHeuristics
+package Micro.Heuristics.Targeting
 
 import Debugging.Visualizations.Colors
 import Mathematics.Heuristics.{Heuristic, HeuristicWeight}

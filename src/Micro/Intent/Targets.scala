@@ -26,4 +26,8 @@ object Targets {
       intent.unit.canAttackThisSecond(target) &&
       ! ineligibleClasses.contains(target.unitClass)
   }
+  
+  def inRange(intent:Intention, target:UnitInfo):Boolean = {
+    intent.unit.inRangeToAttackFast(target, With.latency.framesRemaining)
+  }
 }

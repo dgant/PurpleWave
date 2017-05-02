@@ -33,7 +33,7 @@ class BattleGroup(val units:Vector[UnitInfo]) {
     else if (destination.pixelDistanceFast(opponent.vanguard) > vanguard.pixelDistanceFast(opponent.vanguard))
       output.add(Tactics.Movement.Flee)
     else
-      output.add(Tactics.Movement.Kite)
+      output.add(Tactics.Movement.None)
   
     val woundedUnits = visibleUnits.filter(_.wounded)
     val meanWoundedVelocityX = if (woundedUnits.isEmpty) 0.0 else woundedUnits.map(_.velocityX).sum / woundedUnits.size
@@ -81,24 +81,16 @@ class BattleGroup(val units:Vector[UnitInfo]) {
             output
           }))))
       .filterNot(output =>
-        (output.has(Tactics.Movement.Kite) && output.has(Tactics.Workers.FightAll))   ||
-        (output.has(Tactics.Movement.Kite) && output.has(Tactics.Workers.FightHalf))  ||
         (output.has(Tactics.Movement.Flee) && output.has(Tactics.Workers.FightAll))   ||
-        (output.has(Tactics.Movement.Flee) && output.has(Tactics.Workers.FightHalf))  ||
-        (output.has(Tactics.Movement.Kite) && output.has(Tactics.Wounded.Fight)))
+        (output.has(Tactics.Movement.Flee) && output.has(Tactics.Workers.FightHalf)))
   
   lazy val tacticsAvailableMovement:Vector[Tactic] = {
     val output = new ArrayBuffer[Tactic]
     if (mobile) {
       output += Tactics.Movement.Charge
       output += Tactics.Movement.Flee
-      if (opponent.mobile && opponent.visible) {
-        output += Tactics.Movement.Kite
-      }
     }
-    if (output.isEmpty) {
-      output += Tactics.Movement.None
-    }
+    output += Tactics.Movement.None
     output.toVector
   }
   

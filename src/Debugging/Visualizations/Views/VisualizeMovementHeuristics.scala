@@ -4,7 +4,7 @@ import Debugging.Visualizations.Rendering.DrawMap
 import Lifecycle.With
 import Mathematics.Heuristics.HeuristicMath
 import Mathematics.Pixels.Pixel
-import Micro.Heuristics.MovementHeuristics.MovementHeuristicResult
+import Micro.Heuristics.Movement.MovementHeuristicResult
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object VisualizeMovementHeuristics {
@@ -59,7 +59,7 @@ object VisualizeMovementHeuristics {
         val offsetY = (result.color.hashCode / 3) % 3 - 1
         
         val center = result.candidate.add(offsetX, offsetY)
-        val radius = 2 + (6.0 * relativeScale * normalize(result.evaluation) / normalize(evaluationExtreme)).toInt
+        val radius = 1 + (4.0 * relativeScale * normalize(result.evaluation) / normalize(evaluationExtreme)).toInt
         if (result.evaluation > 1.0) {
           DrawMap.circle(center, radius.toInt, result.color)
         }

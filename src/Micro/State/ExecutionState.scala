@@ -3,8 +3,8 @@ package Micro.State
 import Lifecycle.With
 import Mathematics.Pixels.Pixel
 import Micro.Actions.Action
-import Micro.Heuristics.MovementHeuristics.MovementHeuristicResult
-import Micro.Heuristics.TargetHeuristics.TargetHeuristicResult
+import Micro.Heuristics.Movement.MovementHeuristicResult
+import Micro.Heuristics.Targeting.TargetHeuristicResult
 import Micro.Intent.Intention
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 

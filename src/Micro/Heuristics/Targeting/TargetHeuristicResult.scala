@@ -1,4 +1,4 @@
-package Micro.Heuristics.TargetHeuristics
+package Micro.Heuristics.Targeting
 
 import Mathematics.Heuristics.{Heuristic, HeuristicResult}
 import Micro.Intent.Intention

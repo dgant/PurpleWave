@@ -13,7 +13,7 @@ object Reload extends Action {
     if (intent.unit.is(Protoss.Reaver)
       && With.self.minerals > Protoss.Scarab.mineralPrice
       && intent.unit.scarabs < 5
-      && intent.unit.scarabs < (if(intent.targets.isEmpty || intent.unit.cooldownLeft > 0) 5 else 1)
+      && intent.unit.scarabs < (if(intent.targetsInRange.isEmpty || intent.unit.cooldownLeft > 0) 5 else 1)
       && intent.unit.trainingQueue.isEmpty) {
       With.commander.buildScarab(intent)
       return true

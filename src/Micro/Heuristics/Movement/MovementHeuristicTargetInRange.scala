@@ -1,4 +1,4 @@
-package Micro.Heuristics.MovementHeuristics
+package Micro.Heuristics.Movement
 
 import Mathematics.Heuristics.HeuristicMath
 import Mathematics.Pixels.Pixel

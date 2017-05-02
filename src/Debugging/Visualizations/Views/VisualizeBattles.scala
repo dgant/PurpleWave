@@ -78,7 +78,7 @@ object VisualizeBattles {
     DrawScreen.table(
       origin.x,
       origin.y,
-      Vector(Vector("Losses:"))
+      Vector(Vector("Losses: " + group.lostValue))
       ++ group.lostUnits
         .groupBy(_.unit.unitClass)
         .toVector
@@ -95,7 +95,6 @@ object VisualizeBattles {
   
   private def getMove(tactics:TacticsOptions):String = {
     if (tactics.has(Tactics.Movement.Charge))  return "Charge"
-    if (tactics.has(Tactics.Movement.Kite))    return "Kite"
     if (tactics.has(Tactics.Movement.Flee))    return "Flee"
     return "-"
   }
@@ -120,15 +119,8 @@ object VisualizeBattles {
   
   private def drawTacticsReport(battle:Battle) {
   
-    DrawScreen.table(
-      5,
-      76,
-      Vector(
-        Vector("Move:",     getMove(battle.bestTactics)),
-        Vector("Focus:",    getFocus(battle.bestTactics)),
-        Vector("Workers:",  getWorkers(battle.bestTactics)),
-        Vector("Wounded:",  getWounded(battle.bestTactics))
-      ))
+    drawTacticsReport(battle.bestTactics,           Pixel(5, 76))
+    drawTacticsReport(battle.enemy.tacticsApparent, Pixel(155, 76))
     
     val heuristicsTable = Vector(Vector("Value", "Tactics")) ++
       battle.tacticsHeuristicResults.map(r => Vector(
@@ -138,7 +130,6 @@ object VisualizeBattles {
     
     With.game.drawTextScreen(300, 50, battle.rankedTactics.map(tactic => tactic.toString).mkString("\n"))
   }
-  
   
   private def drawTacticsReport(tactics: TacticsOptions, origin:Pixel) {
     DrawScreen.table(

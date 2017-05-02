@@ -2,8 +2,6 @@ package Information.Battles.BattleTypes
 
 import Information.Battles.Estimation.BattleEstimation
 import Information.Battles.EvaluateTactics
-import Information.Battles.Heuristics.TacticsHeuristicResult
-import Information.Battles.Simulation.Construction.BattleSimulation
 import Information.Battles.TacticsTypes.TacticsOptions
 import Lifecycle.With
 import Mathematics.Pixels.Pixel
@@ -23,11 +21,7 @@ class Battle(
   def happening: Boolean = us.units.nonEmpty && enemy.units.nonEmpty && (us.units.exists(_.canAttackThisSecond) || enemy.units.exists(_.canAttackThisSecond))
   
   var estimations: Vector[BattleEstimation] = Vector.empty
-  var simulations: Vector[BattleSimulation] = Vector.empty
-  var tacticsHeuristicResults: Vector[TacticsHeuristicResult] = Vector.empty
-  
   def estimation(tactics:TacticsOptions):Option[BattleEstimation] = estimations.find(_.tactics == tactics)
-  def simulation(tactics:TacticsOptions):Option[BattleSimulation] = simulations.find(_.tactics == tactics)
   
   var lastBestTactics:TacticsOptions = new TacticsOptions
   private var currentBestTactics:TacticsOptions = new TacticsOptions

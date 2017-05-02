@@ -151,7 +151,6 @@ class BattleClassifier {
   def adoptMetrics(oldBattle:Battle, newBattle:Battle) {
     newBattle.us.strength     = oldBattle.us.strength
     newBattle.enemy.strength  = oldBattle.enemy.strength
-    newBattle.simulations     = oldBattle.simulations
     newBattle.estimations     = oldBattle.estimations
   }
 

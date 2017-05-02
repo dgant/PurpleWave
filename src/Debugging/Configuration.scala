@@ -5,9 +5,6 @@ class Configuration {
   // Up this for tournament play!
   var maxFrameMilliseconds = 20
   
-  val enableBattleSimulation          = false
-  val enableBattleEstimation          = true
-  val battleSimulationUnitLimit       = 9999
   val battleWorkerCostPerFrame        = 0.15
   val battleMarginTiles               = 15
   
@@ -25,7 +22,6 @@ class Configuration {
   var visualize                   = true
   var visualizeBases              = false
   var visualizeBattles            = true
-  var visualizeBattleSimulation   = true
   var visualizeBattleTacticsRanks = false
   var visualizeBullets            = false
   var visualizeChokepoints        = false

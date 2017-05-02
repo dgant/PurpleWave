@@ -14,7 +14,6 @@ import scala.collection.mutable
 object BattleEstimator {
   
   def run() {
-    if ( ! With.configuration.enableBattleEstimation) return
     With.battles.local.filter(_.happening).foreach(estimate)
   }
   

@@ -3,7 +3,6 @@ package Debugging.Visualizations.Views
 import Debugging.Visualizations.Rendering.{DrawMap, DrawScreen}
 import Information.Battles.BattleTypes.Battle
 import Information.Battles.Estimation.BattleEstimation
-import Information.Battles.Simulation.Construction.{BattleSimulation, BattleSimulationGroup}
 import Information.Battles.TacticsTypes.{Tactics, TacticsOptions}
 import Lifecycle.With
 import Mathematics.Pixels.Pixel
@@ -21,11 +20,9 @@ object VisualizeBattles {
     if (localBattles.nonEmpty) {
       val battle = localBattles.minBy(battle => battle.focus.pixelDistanceSquared(With.viewport.center))
       val tactics = battle.bestTactics
-      val simulation = battle.simulation(tactics)
       val estimation = battle.estimation(tactics)
       With.game.drawTextScreen(5,   50, With.self.name)
       With.game.drawTextScreen(130, 50, With.enemies.head.name)
-      simulation.foreach(drawSimulationReport)
       estimation.foreach(drawEstimationReport)
       drawTacticsReport(battle)
     }
@@ -59,38 +56,11 @@ object VisualizeBattles {
       backgroundColor = winnerStrengthColor)
   }
   
-  private def drawSimulationReport(simulation:BattleSimulation) {
-    val winner = if (simulation.us.lostValue <= simulation.enemy.lostValue) With.self else With.enemies.head
-    With.game.drawTextScreen(Pixel(5, 31).bwapi, "Advantage: " + winner.name)
-    drawPlayerReport(simulation.us,     With.self.name,         Pixel(5,   130))
-    drawPlayerReport(simulation.enemy,  With.enemies.head.name, Pixel(130, 130))
-    simulation.events.foreach(_.draw())
-  }
-  
   private def drawEstimationReport(estimation:BattleEstimation) {
     With.game.setTextSize(bwapi.Text.Size.Enum.Large)
     With.game.drawTextScreen(255, 50, "+" + 10 * estimation.damageToEnemy.toInt)
     With.game.drawTextScreen(255, 75, "-" + 10 * estimation.damageToUs.toInt)
     With.game.setTextSize(bwapi.Text.Size.Enum.Small)
-  }
-  
-  private def drawPlayerReport(group: BattleSimulationGroup, name:String, origin:Pixel) {
-    DrawScreen.table(
-      origin.x,
-      origin.y,
-      Vector(Vector("Losses: " + group.lostValue.toInt))
-      ++ group.lostUnits
-        .groupBy(_.unit.unitClass)
-        .toVector
-        .sortBy(_._1.toString)
-        .map(u => Vector(u._1.toString, u._2.size.toString))
-      ++ Vector(Vector.empty)
-      ++ Vector(Vector("Survivors:"))
-      ++ group.units
-        .groupBy(_.unit.unitClass)
-        .toVector
-        .sortBy(_._1.toString)
-        .map(u => Vector(u._2.size.toString, u._1.toString)))
   }
   
   private def getMove(tactics:TacticsOptions):String = {

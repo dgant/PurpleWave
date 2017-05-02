@@ -2,7 +2,7 @@ package Information.Battles.Heuristics
 
 import Information.Battles.BattleTypes.Battle
 import Information.Battles.TacticsTypes.TacticsOptions
-import Mathematics.Heuristics.HeuristicMath
+import Mathematics.Heuristics.HeuristicMathMultiplicative
 
 object TacticsHeuristicEstimatedDamageEnemy extends TacticsHeuristic {
   
@@ -10,7 +10,7 @@ object TacticsHeuristicEstimatedDamageEnemy extends TacticsHeuristic {
     
     val estimation = context.estimation(candidate)
     
-    if (estimation.isEmpty) return HeuristicMath.default
+    if (estimation.isEmpty) return HeuristicMathMultiplicative.default
   
     estimation.get.damageToEnemy
   }

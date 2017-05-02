@@ -1,49 +1,31 @@
 package Information.Battles
 
 import Information.Battles.BattleTypes.Battle
-import Information.Battles.Heuristics._
 import Information.Battles.TacticsTypes.TacticsOptions
-import Lifecycle.With
-import Mathematics.Heuristics.HeuristicMath
 
 object EvaluateTactics {
   
   private val weightSimulation = 1.0
-  private val weightEvaluation = 1.0
-  private val heuristicWeights = Vector(
-    new TacticsHeuristicWeight(TacticsHeuristicSimulatedSurvivorsOurs,   weightSimulation),
-    new TacticsHeuristicWeight(TacticsHeuristicSimulatedLossesEnemy,     weightSimulation),
-    new TacticsHeuristicWeight(TacticsHeuristicEstimatedDamageEnemy,     weightEvaluation),
-    new TacticsHeuristicWeight(TacticsHeuristicHysteresis,               1.75),
-    new TacticsHeuristicWeight(TacticsHeuristicWoundedFlee,              0.50),
-    new TacticsHeuristicWeight(TacticsHeuristicSimulatedSurvivorsEnemy, -weightSimulation),
-    new TacticsHeuristicWeight(TacticsHeuristicSimulatedLossesOurs,     -weightSimulation),
-    new TacticsHeuristicWeight(TacticsHeuristicEstimatedDamageOurs,     -weightEvaluation),
-    new TacticsHeuristicWeight(TacticsHeuristicFleeingWhenDefending,    -0.5),
-    new TacticsHeuristicWeight(TacticsHeuristicWorkersSallying,         -1.0)
-  )
+  private val weightEstimation = 1.0
   
   def best(battle:Battle):TacticsOptions = {
-    val candidates = battle.us.tacticsAvailable
-  
-    HeuristicMath.best(battle, heuristicWeights, candidates)
+    battle.us.tacticsAvailable.minBy(tactics => evaluate(battle, tactics))
   }
   
   def sort(battle:Battle):Vector[TacticsOptions] = {
-    
-    val candidates = battle.us.tacticsAvailable
-    
-    if (With.configuration.visualize && With.configuration.visualizeBattles) {
-      battle.tacticsHeuristicResults =
-        candidates.flatten(candidate =>
-          heuristicWeights.map(heuristicWeight =>
-            new TacticsHeuristicResult(
-              heuristicWeight.heuristic,
-              battle,
-              candidate,
-              heuristicWeight.weigh(battle, candidate))))
-    }
+    battle.us.tacticsAvailable.sortBy(tactics => evaluate(battle, tactics))
+  }
   
-    HeuristicMath.sort(battle, heuristicWeights, candidates)
+  def evaluate(battle:Battle, tactics: TacticsOptions):Double = {
+    
+    val damageToUs =
+      weightSimulation * battle.simulation(tactics).map(_.us.lostValue).sum +
+      weightEstimation * battle.estimation(tactics).map(_.damageToUs).sum
+    
+    val damageToEnemy =
+      weightSimulation * battle.simulation(tactics).map(_.enemy.lostValue).sum +
+      weightEstimation * battle.estimation(tactics).map(_.damageToEnemy).sum
+    
+    damageToUs - damageToEnemy
   }
 }

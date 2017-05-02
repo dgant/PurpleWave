@@ -2,7 +2,7 @@ package Debugging.Visualizations.Views
 
 import Debugging.Visualizations.Rendering.DrawMap
 import Lifecycle.With
-import Mathematics.Heuristics.HeuristicMath
+import Mathematics.Heuristics.HeuristicMathMultiplicative
 import Mathematics.Pixels.Pixel
 import Micro.Heuristics.Movement.MovementHeuristicResult
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -39,7 +39,7 @@ object VisualizeMovementHeuristics {
     val heuristicGroups = results.groupBy(_.heuristic)
     val scales = heuristicGroups.map(group => scale(group._2))
     val maxScale = scales.max
-    if (maxScale == HeuristicMath.default) return
+    if (maxScale == HeuristicMathMultiplicative.default) return
     val activeGroups = heuristicGroups.map(_._2).filterNot(group => group.forall(_.evaluation == group.head.evaluation))
     activeGroups.foreach(group => renderUnitHeuristic(group, maxScale))
     renderLegend(activeGroups)
@@ -48,10 +48,10 @@ object VisualizeMovementHeuristics {
   def renderUnitHeuristic(results:Iterable[MovementHeuristicResult], maxScale:Double) {
     val ourScale          = scale(results)
     val relativeScale     = ourScale / maxScale
-    val evaluationExtreme = results.maxBy(result => Math.abs(HeuristicMath.default - result.evaluation)).evaluation
+    val evaluationExtreme = results.maxBy(result => Math.abs(HeuristicMathMultiplicative.default - result.evaluation)).evaluation
     
     results
-      .filter(_.evaluation != HeuristicMath.default)
+      .filter(_.evaluation != HeuristicMathMultiplicative.default)
       .foreach(result => {
         // We want to offset the centerpoint slightly for each heuristic
         // so very discrete heuristics (especially booleans) don't completely ovelap

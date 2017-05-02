@@ -9,6 +9,6 @@ object EvaluateTargets {
     
     if (candidates.isEmpty) return None
     
-    Some(candidates.maxBy(candidate => intent.targetProfile.weightedHeuristics.map(_.weigh(intent, candidate)).product))
+    Some(candidates.maxBy(candidate => intent.targetProfile.weightedHeuristics.map(_.weighMultiplicatively(intent, candidate)).product))
   }
 }

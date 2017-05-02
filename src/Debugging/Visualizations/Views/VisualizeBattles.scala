@@ -123,11 +123,6 @@ object VisualizeBattles {
     drawTacticsReport(battle.enemy.tacticsApparent, Pixel(155, 76))
     
     if (With.configuration.visualizeBattleTacticsRanks) {
-      val heuristicsTable = Vector(Vector("Value", "Tactics")) ++
-        battle.tacticsHeuristicResults.map(r => Vector(
-          "%.2f".format(r.evaluation),
-          r.heuristic.getClass.getSimpleName.replace("TacticsHeuristic", "")))
-    
       With.game.drawTextScreen(300, 50, battle.rankedTactics.map(tactic => tactic.toString).mkString("\n"))
     }
   }

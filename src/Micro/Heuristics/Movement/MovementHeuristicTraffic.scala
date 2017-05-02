@@ -1,7 +1,7 @@
 package Micro.Heuristics.Movement
 
 import Lifecycle.With
-import Mathematics.Heuristics.HeuristicMath
+import Mathematics.Heuristics.HeuristicMathMultiplicative
 import Mathematics.Pixels.{Pixel, Tile}
 import Micro.Intent.Intention
 object MovementHeuristicTraffic extends MovementHeuristic {
@@ -10,7 +10,7 @@ object MovementHeuristicTraffic extends MovementHeuristic {
   
   override def evaluate(intent: Intention, candidate: Pixel): Double = {
   
-    if (intent.unit.flying) return HeuristicMath.default
+    if (intent.unit.flying) return HeuristicMathMultiplicative.default
     
     val m0 = 1.00
     val m1 = 0.80

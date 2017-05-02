@@ -1,7 +1,7 @@
 package Information.Battles.Heuristics
 import Information.Battles.BattleTypes.Battle
 import Information.Battles.TacticsTypes.TacticsOptions
-import Mathematics.Heuristics.HeuristicMath
+import Mathematics.Heuristics.HeuristicMathMultiplicative
 
 object TacticsHeuristicSimulatedLossesOurs extends TacticsHeuristic {
   
@@ -9,7 +9,7 @@ object TacticsHeuristicSimulatedLossesOurs extends TacticsHeuristic {
     
     val simulation = context.simulation(candidate)
     
-    if (simulation.isEmpty) return HeuristicMath.default
+    if (simulation.isEmpty) return HeuristicMathMultiplicative.default
   
     simulation.get.us.lostValue
   }

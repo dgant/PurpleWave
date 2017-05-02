@@ -1,6 +1,6 @@
 package Micro.Heuristics.Targeting
 
-import Mathematics.Heuristics.HeuristicMath
+import Mathematics.Heuristics.HeuristicMathMultiplicative
 import Micro.Intent.Intention
 import ProxyBwapi.UnitInfo.UnitInfo
 
@@ -8,7 +8,7 @@ object TargetHeuristicCombat extends TargetHeuristic {
   
   override def evaluate(intent: Intention, candidate: UnitInfo): Double = {
     
-    HeuristicMath.fromBoolean(candidate.unitClass.helpsInCombat)
+    HeuristicMathMultiplicative.fromBoolean(candidate.unitClass.helpsInCombat)
     
   }
   

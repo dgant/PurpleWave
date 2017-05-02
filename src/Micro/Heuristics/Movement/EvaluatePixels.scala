@@ -2,7 +2,7 @@ package Micro.Heuristics.Movement
 
 import Information.Geography.Types.Zone
 import Lifecycle.With
-import Mathematics.Heuristics.HeuristicMath
+import Mathematics.Heuristics.HeuristicMathMultiplicative
 import Mathematics.Pixels.Pixel
 import Micro.Intent.Intention
 import ProxyBwapi.UnitInfo.UnitInfo
@@ -25,11 +25,11 @@ object EvaluatePixels {
               weightedHeuristic.heuristic,
               intent,
               candidate,
-              weightedHeuristic.weigh(intent, candidate),
+              weightedHeuristic.weighMultiplicatively(intent, candidate),
               weightedHeuristic.color)))
     }
     
-    HeuristicMath.best(intent, profile.weightedHeuristics, candidates)
+    HeuristicMathMultiplicative.best(intent, profile.weightedHeuristics, candidates)
   }
   
   def getCandidates(intent:Intention):Vector[Pixel] = {

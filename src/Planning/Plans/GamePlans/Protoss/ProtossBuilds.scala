@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Protoss
 
-import Macro.BuildRequests.{BuildRequest, RequestUnitAnotherOne, RequestUnitAtLeast, RequestUpgrade}
+import Macro.BuildRequests.{BuildRequest, RequestUnitAtLeast, RequestUpgrade}
 import ProxyBwapi.Races.Protoss
 
 object ProtossBuilds {
@@ -95,7 +95,7 @@ object ProtossBuilds {
   )
   
   val Nexus12 = Vector[BuildRequest] (
-    new RequestUnitAnotherOne(Protoss.Nexus),
+    new RequestUnitAtLeast(1,   Protoss.Nexus),
     new RequestUnitAtLeast(8,   Protoss.Probe),
     new RequestUnitAtLeast(1,   Protoss.Pylon),
     new RequestUnitAtLeast(12,  Protoss.Probe),

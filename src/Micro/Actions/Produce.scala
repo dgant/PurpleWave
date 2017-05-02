@@ -12,14 +12,17 @@ object Produce extends Action {
     
     if (intent.toTrain.isDefined) {
       With.commander.build(intent, intent.toTrain.get)
+      intent.toTrain = None //Avoid repeating the build
       return true
     }
     if (intent.toTech.isDefined) {
       With.commander.tech(intent, intent.toTech.get)
+      intent.toTech = None //Avoid repeating the build
       return true
     }
     if (intent.toUpgrade.isDefined) {
       With.commander.upgrade(intent, intent.toUpgrade.get)
+      intent.toUpgrade = None //Avoid repeating the build
       return true
     }
     

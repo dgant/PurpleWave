@@ -42,13 +42,13 @@ class ProtossVsProtoss extends Parallel {
   )
   
   children.set(Vector(
-    new ScheduleBuildOrder(ProtossBuilds.TwoGate99),
+    new ScheduleBuildOrder(ProtossBuilds.TwoGate1012),
     new IfThenElse(
       new Or(
         new UnitsExactly(0, UnitMatchType(Protoss.CyberneticsCore)),
         new UnitsExactly(0, UnitMatchType(Protoss.Assimilator))
       ),
-      new ScheduleBuildOrder(ProtossBuilds.TwoGate99Zealots)
+      new ScheduleBuildOrder(ProtossBuilds.TwoGate1012Zealots)
     ),
     new IfThenElse(
       new UnitsAtLeast(6, UnitMatchType(Protoss.Dragoon)),

@@ -27,9 +27,10 @@ object Flee extends Action {
       return false
     }
     
-    val enemyFaster     = intent.threatsActive.exists(threat => threat.topSpeed > intent.unit.topSpeed)
-    val weAreFaster     = intent.threatsActive.forall(threat => threat.topSpeed < intent.unit.topSpeed)
-    val weOutrange      = intent.threatsActive.forall(threat => threat.pixelRangeAgainst(intent.unit) < intent.unit.pixelRangeAgainst(threat))
+    val enemyFaster = intent.threatsActive.exists(threat => threat.topSpeed > intent.unit.topSpeed)
+    val weAreFaster = intent.threatsActive.forall(threat => threat.topSpeed < intent.unit.topSpeed)
+    val weOutrange  = intent.threatsActive.forall(threat => threat.pixelRangeAgainst(intent.unit) < intent.unit.pixelRangeAgainst(threat))
+    val threatsFar  = weOutrange && intent.threatsActive.forall(_.framesBeforeAttacking(intent.unit) > 0)
     
     intent.movementProfile = MovementProfiles.flee
     if (enemyFaster) {
@@ -37,6 +38,7 @@ object Flee extends Action {
       intent.movementProfile.preferOrigin += 2.0
     }
     intent.toGather = None
+    intent.canAttack = enemyFaster || threatsFar
     intent.canPursue = weAreFaster && weOutrange
     
     Move.consider(intent)

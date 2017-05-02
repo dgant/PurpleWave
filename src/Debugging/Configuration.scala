@@ -5,7 +5,7 @@ class Configuration {
   // Up this for tournament play!
   var maxFrameMilliseconds = 20
   
-  val enableBattleSimulation          = true
+  val enableBattleSimulation          = false
   val enableBattleEstimation          = true
   val battleSimulationUnitLimit       = 9999
   val battleWorkerCostPerFrame        = 0.15

@@ -78,7 +78,7 @@ object VisualizeBattles {
     DrawScreen.table(
       origin.x,
       origin.y,
-      Vector(Vector("Losses: " + group.lostValue))
+      Vector(Vector("Losses: " + group.lostValue.toInt))
       ++ group.lostUnits
         .groupBy(_.unit.unitClass)
         .toVector

@@ -90,7 +90,9 @@ class BattleGroup(val units:Vector[UnitInfo]) {
       output += Tactics.Movement.Charge
       output += Tactics.Movement.Flee
     }
-    output += Tactics.Movement.None
+    else {
+      output += Tactics.Movement.None
+    }
     output.toVector
   }
   

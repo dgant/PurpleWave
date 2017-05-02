@@ -21,27 +21,14 @@ class Commander {
   private val nextOrderFrame = new CountMap[FriendlyUnitInfo]
   
   def run() {
-  
-    // https://docs.google.com/spreadsheets/d/1bsvPvFil-kpvEUfSG74U3E5PLSTC02JxSkiR8QdLMuw/edit#gid=0
-    // "Dragoon, Devourer only units that can have damage halted by stop() too early"
-    //
-    // Dragoons/Devourers need extra time to finish their attack animations after they begin attacking.
-    // 5 frames for Dragoons and 7 for Devourers.
-    //
-    // So when we detect a Dragoon or Devourer attacking, we sleep it a bit longer to ensure it finishes its attack
-    With.units.ours
-      .filter(unit => unit.attackAnimationHappening && nextOrderFrame.contains(unit))
-      .foreach(unit =>
-        nextOrderFrame(unit) = Math.max(
-          nextOrderFrame(unit),
-          With.frame + unit.unitClass.framesRequiredForAttackToComplete + 1 - With.latency.minRemainingLatencyFrames))
-    
     nextOrderFrame.keySet.filterNot(_.alive).foreach(nextOrderFrame.remove)
-    
-    
   }
   
-  def readyForCommand(unit:FriendlyUnitInfo):Boolean = {
+  def eligibleForResleeping(unit: FriendlyUnitInfo):Boolean = {
+    nextOrderFrame.contains(unit) && (unit.attackAnimationHappening || unit.attackStarting)
+  }
+  
+  def readyForCommand(unit: FriendlyUnitInfo):Boolean = {
     nextOrderFrame(unit) < With.frame
   }
   

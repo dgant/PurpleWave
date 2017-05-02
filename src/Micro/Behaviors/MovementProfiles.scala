@@ -7,7 +7,7 @@ object MovementProfiles {
   def default = new MovementProfile(
     preferDestination     = 1.00,
     preferOrigin          = 0.25,
-    preferMobility        = 0.25,
+    preferMobility        = 0.50,
     preferThreatDistance  = 0.50,
     preferTarget          = 2.00,
     avoidTraffic          = 0.25,
@@ -15,9 +15,9 @@ object MovementProfiles {
   
   def charge = new MovementProfile(
     preferDestination     = 1.00,
-    preferOrigin          = 0.10,
-    preferMobility        = 0.25,
-    preferThreatDistance  = 0.25,
+    preferOrigin          = 0.25,
+    preferMobility        = 0.50,
+    preferThreatDistance  = 0.50,
     preferTarget          = 2.00,
     avoidTraffic          = 0.25,
     avoidDamage           = 0.25)

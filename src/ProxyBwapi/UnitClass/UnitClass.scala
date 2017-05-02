@@ -36,9 +36,11 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
     // If we order this unit to attack, for how many frames after the attack animation happens can the attack be cancelled?
     //
     // See also https://docs.google.com/spreadsheets/d/1bsvPvFil-kpvEUfSG74U3E5PLSTC02JxSkiR8QdLMuw/edit#gid=0
+    // and https://github.com/Cmccrave/McRave/blob/d9816ebd82f0bf88401f70f400b6517217a1b6a2/UnitManager.cpp#L55
     //
-    if      (this == Protoss.Dragoon) 5
-    else if (this == Zerg.Devourer)   7
+    if      (this == Protoss.Dragoon) 9
+    else if (this == Protoss.Reaver)  1
+    else if (this == Zerg.Devourer)   10
     else if (this == Protoss.Carrier) 24
     else                              0
   }

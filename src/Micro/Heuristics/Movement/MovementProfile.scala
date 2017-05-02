@@ -17,7 +17,7 @@ class MovementProfile(
       new MovementHeuristicWeight(MovementHeuristicOrigin,                  preferOrigin,         Colors.NeonGreen),
       new MovementHeuristicWeight(MovementHeuristicThreatDistance,          preferThreatDistance, Colors.NeonOrange),
       new MovementHeuristicWeight(MovementHeuristicTargetInRange,           preferTarget,         Colors.NeonBlue),
-      new MovementHeuristicWeight(MovementHeuristicMobility,                preferMobility,       Colors.NeonOrange),
+      new MovementHeuristicWeight(MovementHeuristicMobility,                preferMobility,       Colors.NeonTeal),
       new MovementHeuristicWeight(MovementHeuristicExposureToDamage,        -avoidDamage,         Colors.NeonRed),
       new MovementHeuristicWeight(MovementHeuristicTraffic,                 -avoidTraffic,        Colors.NeonYellow)
     )

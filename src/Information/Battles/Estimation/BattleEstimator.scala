@@ -25,13 +25,13 @@ object BattleEstimator {
   def estimateWithTactics(battle:Battle, tacticsUs:TacticsOptions, tacticsEnemy:TacticsOptions):BattleEstimation = {
     
     val fightDuration = 24 * (
-      (if (tacticsUs    .has(Tactics.Movement.Charge))  3 else 1) +
-      (if (tacticsEnemy .has(Tactics.Movement.Charge))  3 else 1) +
+      (if (tacticsUs    .has(Tactics.Movement.Charge))  4 else 1) +
+      (if (tacticsEnemy .has(Tactics.Movement.Charge))  4 else 1) +
       (if (tacticsUs    .has(Tactics.Movement.None))    2 else 1) +
       (if (tacticsEnemy .has(Tactics.Movement.None))    2 else 1))
     
-    var damageDealtToUs          = 0.0
-    var damageDealtToEnemy       = 0.0
+    var damageDealtToUs    = 0.0
+    var damageDealtToEnemy = 0.0
     
     val participantsUs      = buildParticipants(battle, battle.us, battle.enemy, tacticsUs, tacticsEnemy, fightDuration)
     val participantsEnemy   = buildParticipants(battle, battle.enemy, battle.us, tacticsEnemy, tacticsUs, fightDuration)
@@ -170,7 +170,7 @@ object BattleEstimator {
     
     val exposureDistanceInitial     = Math.max(0.0, currentDistanceFromFocus - enemyRangeMean)
     val exposureDistanceFinal       = if (isFleeing) exposureDistanceInitial + unit.topSpeed * fightDuration else involvementDistanceFinal
-    val exposureCap                 = Math.max(involvementCap, 0.5)
+    val exposureCap                 = Math.max(involvementCap, 0.25)
     val exposure                    = Math.min(exposureCap, Math.max(0.0, 1.0 - (exposureDistanceInitial + exposureDistanceFinal) / 2.0 / distanceFactor)  )
 
     val attackGround      = unit.groundDps  > 0 && ! tacticsThis.has(Tactics.Focus.Air)

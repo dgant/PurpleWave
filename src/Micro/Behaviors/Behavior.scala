@@ -1,7 +1,7 @@
 package Micro.Behaviors
+import Lifecycle.With
 import Micro.Actions._
 import Micro.Intent.Intention
-import ProxyBwapi.Races.Protoss
 
 object Behavior {
   
@@ -18,7 +18,9 @@ object Behavior {
     //
     // "Dragoon, Devourer only units that can have damage by stop() too early"
     //
-    ! (intent.unit.attackStarting || (intent.unit.attackAnimationHappening && intent.unit.is(Protoss.Dragoon)))
+    if (intent.unit.attackStarting) return false
+    if (intent.unit.attackAnimationHappening && intent.unit.unitClass.framesRequiredForAttackToComplete > 0) return false
+    intent.unit.cooldownLeft == 0 || With.frame > intent.unit.commandFrame + intent.unit.unitClass.framesRequiredForAttackToComplete - With.latency.framesRemaining
   }
   
   val actions = Vector(

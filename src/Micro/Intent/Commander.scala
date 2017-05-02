@@ -34,7 +34,7 @@ class Commander {
       .foreach(unit =>
         nextOrderFrame(unit) = Math.max(
           nextOrderFrame(unit),
-          With.frame + unit.unitClass.framesRequiredForAttackToComplete + 1 - With.game.getLatencyFrames))
+          With.frame + unit.unitClass.framesRequiredForAttackToComplete + 1 - With.latency.minRemainingLatencyFrames))
     
     nextOrderFrame.keySet.filterNot(_.alive).foreach(nextOrderFrame.remove)
     

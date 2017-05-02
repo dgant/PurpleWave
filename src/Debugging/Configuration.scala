@@ -6,9 +6,9 @@ class Configuration {
   var maxFrameMilliseconds = 20
   
   val enableBattleSimulation          = true
-  val enableBattleEstimation          = false
+  val enableBattleEstimation          = true
   val battleSimulationUnitLimit       = 9999
-  val battleWorkerCostPerFrame        = 3.0
+  val battleWorkerCostPerFrame        = 0.15
   val battleMarginTiles               = 15
   
   val dpsGridDistancePenalty          = 0.5
@@ -26,6 +26,7 @@ class Configuration {
   var visualizeBases              = false
   var visualizeBattles            = true
   var visualizeBattleSimulation   = true
+  var visualizeBattleTacticsRanks = false
   var visualizeBullets            = false
   var visualizeChokepoints        = false
   var visualizeEconomy            = false

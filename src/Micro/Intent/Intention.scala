@@ -30,7 +30,7 @@ class Intention(val plan:Plan, val unit:FriendlyUnitInfo) {
   var toUpgrade   : Option[Upgrade]   = None
   var leash       : Option[Int]       = None
   var canAttack   : Boolean           = true
-  var canPursue   : Boolean           = false
+  var canPursue   : Boolean           = true
   
   def targets        = targetsCache.get
   def targetsInRange = targetsInRangeCache.get

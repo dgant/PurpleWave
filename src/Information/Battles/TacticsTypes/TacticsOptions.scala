@@ -25,7 +25,7 @@ class TacticsOptions(private var options:Int = 0) {
       Tactics.Workers.FightAll  -> "Workers: Fight (All)",
       Tactics.Workers.FightHalf -> "Workers: Fight (Half)"
     )
-    names.filter(namePair => has(namePair._1)).map("[" + _._2 + "]").mkString(" ")
+    names.filter(namePair => has(namePair._1)).map("[" + _._2 + "]").mkString(" ").replaceAllLiterally("[] ","")
   }
   
   override def hashCode(): Int = options

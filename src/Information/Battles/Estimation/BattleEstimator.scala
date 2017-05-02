@@ -26,7 +26,9 @@ object BattleEstimator {
     
     val fightDuration = 24 * (
       (if (tacticsUs    .has(Tactics.Movement.Charge))  3 else 1) +
-      (if (tacticsEnemy .has(Tactics.Movement.Charge))  3 else 1))
+      (if (tacticsEnemy .has(Tactics.Movement.Charge))  3 else 1) +
+      (if (tacticsUs    .has(Tactics.Movement.None))    2 else 1) +
+      (if (tacticsEnemy .has(Tactics.Movement.None))    2 else 1))
     
     var damageDealtToUs          = 0.0
     var damageDealtToEnemy       = 0.0

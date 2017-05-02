@@ -6,20 +6,21 @@ object MovementProfiles {
   
   def default = new MovementProfile(
     preferDestination     = 1.00,
-    preferOrigin          = 0.50,
-    preferMobility        = 0.50,
-    preferThreatDistance  = 0.25,
-    preferTarget          = 0.25,
-    avoidTraffic          = 0.50,
+    preferOrigin          = 0.25,
+    preferMobility        = 0.25,
+    preferThreatDistance  = 0.50,
+    preferTarget          = 2.00,
+    avoidTraffic          = 0.25,
     avoidDamage           = 0.50)
   
   def charge = new MovementProfile(
     preferDestination     = 1.00,
-    preferOrigin          = 0.25,
+    preferOrigin          = 0.10,
     preferMobility        = 0.25,
     preferThreatDistance  = 0.25,
     preferTarget          = 2.00,
-    avoidTraffic          = 0.25)
+    avoidTraffic          = 0.25,
+    avoidDamage           = 0.25)
   
   def flee = new MovementProfile(
     preferOrigin          = 1.00,

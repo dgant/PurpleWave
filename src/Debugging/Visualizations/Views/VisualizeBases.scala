@@ -8,8 +8,12 @@ object VisualizeBases {
   
   def render() {
     With.geography.zones.foreach(zone => {
-      
+  
+      val battle = With.battles.byZone(zone)
+      val estimation = battle.estimation
       zone.bases.foreach(base => {
+        
+        
         DrawMap.tileRectangle(base.harvestingArea,    Colors.DarkGreen)
         DrawMap.tileRectangle(base.townHallArea,      base.zone.owner.colorDark)
         DrawMap.labelBox(
@@ -21,9 +25,10 @@ object VisualizeBases {
             if (base.lastScoutedFrame <= With.frame+ 24 ) ""
             else if (base.lastScoutedFrame <= 0) "Never scouted"
             else "Last scouted " + (With.frame - base.lastScoutedFrame) + " frames ago",
-            VisualizeBattles.formatStrength(With.battles.byZone(zone).us.strength)
-              + " vs "
-              + VisualizeBattles.formatStrength(With.battles.byZone(zone).enemy.strength)
+            "+" +
+              VisualizeBattles.formatGain(estimation.costToEnemy)
+              + " vs -"
+              + VisualizeBattles.formatGain(estimation.costToUs)
           ),
           base.townHallArea.midPixel,
           true,

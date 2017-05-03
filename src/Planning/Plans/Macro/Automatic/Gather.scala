@@ -181,7 +181,7 @@ class Gather extends Plan {
   private def safe(resource:UnitInfo):Boolean = {
     With.battles.byZone
       .get(With.geography.zoneByTile(resource.tileIncludingCenter))
-      .forall(zone => zone.us.strength >= zone.enemy.strength)
+      .forall(zoneBattle => zoneBattle.estimation.netCost >= 0)
   }
   
   private def order(worker:FriendlyUnitInfo) {

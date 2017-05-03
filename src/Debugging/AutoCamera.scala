@@ -22,7 +22,7 @@ class AutoCamera {
   
     if (battles.nonEmpty) {
       
-      val battle = battles.maxBy(b => b.enemy.strength * b.us.strength)
+      val battle = battles.maxBy(b => b.enemy.units.size * b.us.units.size)
   
       setCameraSpeed(With.configuration.cameraDynamicSpeedSlowest)
       focusOn(battle.us.units.minBy(_.pixelDistanceSquared(battle.us.vanguard)))

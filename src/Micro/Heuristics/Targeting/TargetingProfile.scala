@@ -22,7 +22,6 @@ class TargetingProfile(
       new TargetHeuristicWeight(TargetHeuristicHealth,          -avoidHealth),
       new TargetHeuristicWeight(TargetHeuristicDistance,        -avoidDistance),
       new TargetHeuristicWeight(TargetHeuristicDistraction,     -avoidDistraction)
-      //new TargetHeuristicWeight(UnitHeuristicFiringPixel,  preferDps),
     )
   }
 }

@@ -1,15 +1,41 @@
 package Information.Battles.Estimation
 
 import Information.Battles.BattleTypes.Battle
-import Information.Battles.Estimation.BattleEstimator.{DamageMap, Participant}
-import Information.Battles.TacticsTypes.TacticsOptions
+import Information.Battles.TacticsTypes.{TacticsDefault, TacticsOptions}
+import ProxyBwapi.UnitInfo.UnitInfo
+
+import scala.collection.mutable
 
 class BattleEstimation(
-  val battle              : Battle,
-  val tactics             : TacticsOptions,
-  val damageToUs          : Double,
-  val damageToEnemy       : Double,
-  val participantsUs      : Vector[Participant],
-  val participantsEnemy   : Vector[Participant],
-  val damageDealtByUs     : DamageMap,
-  val damageDealtByEnemy  : DamageMap)
+  val tacticsUs     : TacticsOptions = TacticsDefault.get,
+  val tacticsEnemy  : TacticsOptions = TacticsDefault.get)
+  extends BattleEstimationCalculator {
+  
+  def addUnits(battle:Battle) {
+    battle.us.units.foreach(addUnit)
+    battle.enemy.units.foreach(addUnit)
+  }
+  
+  def addUnit(unit:UnitInfo) {
+    units.put(unit, new BattleEstimationUnit(unit))
+    avatar(unit).add(units(unit))
+  }
+  
+  def removeUnit(unit:UnitInfo) {
+    avatar(unit).remove(units(unit))
+    units.remove(unit)
+  }
+  
+  def updateUnit(unit:UnitInfo) {
+    removeUnit(unit)
+    addUnit(unit)
+  }
+  
+  private def avatar(unit:UnitInfo):BattleEstimationUnit = {
+    if (unit.isFriendly) avatarUs else avatarEnemy
+  }
+  
+  private val units = new mutable.HashMap[UnitInfo, BattleEstimationUnit]
+  val avatarUs    = new BattleEstimationUnit
+  val avatarEnemy = new BattleEstimationUnit
+}

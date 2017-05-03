@@ -12,8 +12,6 @@ class BattleGroup(val units:Vector[UnitInfo]) {
   // These should be populated immediately after construction.
   var battle:Battle = _
   var opponent:BattleGroup = _
-  
-  var strength: Double = 0.0
   var vanguard: Pixel = Points.middle
   
   lazy val visible:Boolean = units.exists(_.visible)

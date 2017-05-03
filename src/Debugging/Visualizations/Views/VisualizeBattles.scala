@@ -2,7 +2,7 @@ package Debugging.Visualizations.Views
 
 import Debugging.Visualizations.Rendering.{DrawMap, DrawScreen}
 import Information.Battles.BattleTypes.Battle
-import Information.Battles.Estimation.BattleEstimation
+import Information.Battles.Estimation.BattleEstimationResult
 import Information.Battles.TacticsTypes.{Tactics, TacticsOptions}
 import Lifecycle.With
 import Mathematics.Pixels.Pixel
@@ -12,9 +12,9 @@ import bwapi.Color
 
 object VisualizeBattles {
   def render() = {
-    With.game.drawTextScreen(438, 18, "Total strength:")
-    With.game.drawTextScreen(521, 18, formatStrength(With.battles.global.us.strength))
-    With.game.drawTextScreen(589, 18, formatStrength(With.battles.global.enemy.strength))
+    With.game.drawTextScreen(438, 18, "Armies:")
+    With.game.drawTextScreen(521, 18, "+" + formatGain(With.battles.global.estimation.costToEnemy))
+    With.game.drawTextScreen(589, 18, "-" + formatGain(With.battles.global.estimation.costToUs))
     With.battles.local.foreach(drawBattle)
     val localBattles = With.battles.local.filter(_.happening)
     if (localBattles.nonEmpty) {
@@ -31,7 +31,7 @@ object VisualizeBattles {
     }
   }
   
-  def formatStrength(strength:Double):String = (strength/1000).toInt.toString
+  def formatGain(strength:Double):String = (strength/1000).toInt.toString
   
   private def drawBattle(battle:Battle) {
     val ourColor      = With.self.colorDark
@@ -44,22 +44,22 @@ object VisualizeBattles {
     DrawMap.line(battle.focus, battle.enemy.vanguard, enemyColor)
     val topLeft       = (battle.us.units ++ battle.enemy.units).map(_.pixelCenter).minBound.subtract(16, 16)
     val bottomRight   = (battle.us.units ++ battle.enemy.units).map(_.pixelCenter).maxBound.add(16, 16)
-    val winnerStrengthColor = if (battle.us.strength >= battle.enemy.strength) ourColor else enemyColor
+    val winnerStrengthColor = if (battle.estimation.costToEnemy >=  battle.estimation.costToUs) ourColor else enemyColor
     DrawMap.box(
       topLeft,
       bottomRight,
       neutralColor)
     DrawMap.labelBox(
-      Vector(formatStrength(battle.us.strength), formatStrength(battle.enemy.strength)),
+      Vector((battle.estimation.netCost).toInt.toString),
       battle.focus.add(24, 0),
       drawBackground = true,
       backgroundColor = winnerStrengthColor)
   }
   
-  private def drawEstimationReport(estimation:BattleEstimation) {
+  private def drawEstimationReport(estimation:BattleEstimationResult) {
     With.game.setTextSize(bwapi.Text.Size.Enum.Large)
-    With.game.drawTextScreen(255, 50, "+" + 10 * estimation.damageToEnemy.toInt)
-    With.game.drawTextScreen(255, 75, "-" + 10 * estimation.damageToUs.toInt)
+    With.game.drawTextScreen(255, 50, "+" + 10 * estimation.costToEnemy.toInt)
+    With.game.drawTextScreen(255, 75, "-" + 10 * estimation.costToUs.toInt)
     With.game.setTextSize(bwapi.Text.Size.Enum.Small)
   }
   

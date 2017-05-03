@@ -5,10 +5,9 @@ object Tactics {
   /*
   The obvious question is, why is this not just an enumeration?
   
-  That's because Tactics are used extensively in battle simulation, which is very performance sensitive,
-  and Scala enum comparisons are a little slower than necessary
-  
-   */
+  That's because Tactics are (well, were) used extensively in battle simulation, which is very performance sensitive,
+  and Scala enum comparisons are a little slower than necessary.
+  */
   
   type Tactic = Int
   

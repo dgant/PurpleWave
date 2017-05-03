@@ -1,6 +1,6 @@
 package Information.Battles.BattleTypes
 
-import Information.Battles.Estimation.BattleEstimation
+import Information.Battles.Estimation.{BattleEstimation, BattleEstimationResult}
 import Information.Battles.EvaluateTactics
 import Information.Battles.TacticsTypes.TacticsOptions
 import Lifecycle.With
@@ -21,7 +21,8 @@ class Battle(
   def happening: Boolean = us.units.nonEmpty && enemy.units.nonEmpty && (us.units.exists(_.canAttackThisSecond) || enemy.units.exists(_.canAttackThisSecond))
   
   var estimations: Vector[BattleEstimation] = Vector.empty
-  def estimation(tactics:TacticsOptions):Option[BattleEstimation] = estimations.find(_.tactics == tactics)
+  def estimation(tactics:TacticsOptions):Option[BattleEstimationResult] = estimations.find(_.tacticsUs == tactics).map(_.result)
+  def estimation:BattleEstimationResult = estimation(bestTactics).getOrElse(new BattleEstimationResult)
   
   var lastBestTactics:TacticsOptions = new TacticsOptions
   private var currentBestTactics:TacticsOptions = new TacticsOptions

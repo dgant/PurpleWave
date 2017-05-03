@@ -110,9 +110,13 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   
   def stimBonus:Int = if (stimmed) 2 else 1
   
+  def attacksGround : Boolean = unitClass.attacksGround
+  def attacksAir    : Boolean = unitClass.attacksAir
+  
   def airDps    : Double = stimBonus * unitClass.airDps
   def groundDps : Double = stimBonus * unitClass.groundDps
   
+  def attacksAgainstAir: Int = unitClass.airDamageFactorRaw * unitClass.maxAirHitsRaw
   def attacksAgainstGround: Int = {
     var output = unitClass.groundDamageFactorRaw * unitClass.maxGroundHitsRaw
     //if() is just to avoid slow is() calls
@@ -123,15 +127,14 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
     }
     output
   }
-    
-  def attacksAgainstAir: Int = unitClass.airDamageFactorRaw * unitClass.maxAirHitsRaw
   
   def cooldownLeft                          : Int         = Math.max(airCooldownLeft, groundCooldownLeft)
-  def cooldownLeftAgainst (enemy:UnitInfo)  : Int         =  if (enemy.flying) airCooldownLeft                else groundCooldownLeft
-  def cooldownMaxAgainst  (enemy:UnitInfo)  : Int         = (if (enemy.flying) unitClass.airDamageCooldown    else unitClass.groundDamageCooldown) / stimBonus
-  def pixelRangeAgainst   (enemy:UnitInfo)  : Double      =  if (enemy.flying) pixelRangeAir                  else pixelRangeGround
-  def damageTypeAgainst   (enemy:UnitInfo)  : DamageType  =  if (enemy.flying) unitClass.airDamageTypeRaw     else unitClass.groundDamageTypeRaw
-  def attacksAgainst      (enemy:UnitInfo)  : Int         =  if (enemy.flying) attacksAgainstAir              else attacksAgainstGround
+  def coolDownMaxAir                        : Int         = unitClass.airDamageCooldown     / stimBonus
+  def coolDownMaxGround                     : Int         = unitClass.groundDamageCooldown  / stimBonus
+  def cooldownMaxAgainst  (enemy:UnitInfo)  : Int         = if (enemy.flying) coolDownMaxAir                else coolDownMaxGround
+  def pixelRangeAgainst   (enemy:UnitInfo)  : Double      = if (enemy.flying) pixelRangeAir                 else pixelRangeGround
+  def damageTypeAgainst   (enemy:UnitInfo)  : DamageType  = if (enemy.flying) unitClass.airDamageTypeRaw    else unitClass.groundDamageTypeRaw
+  def attacksAgainst      (enemy:UnitInfo)  : Int         = if (enemy.flying) attacksAgainstAir             else attacksAgainstGround
   
   def damageScaleAgainst(enemy:UnitInfo): Double =
     if (enemy.flying && airDps > 0)
@@ -143,9 +146,13 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
     else
       0.0
   
+  def damageOnHitBeforeArmorGround : Int = unitClass.effectiveGroundDamage //Plus upgrades! Note that the base method accounts for multiple hits (ie interceptors, bunker) and needs revision for this to be accurately used vs armor
+  def damageOnHitBeforeArmorAir    : Int = unitClass.effectiveAirDamage    //Plus upgrades! Note that the base method accounts for multiple hits (ie interceptors, bunker) and needs revision for this to be accurately used vs armor
+  def damageOnHitBeforeArmor(enemy:UnitInfo):Int = if(enemy.flying) damageOnHitBeforeArmorAir else damageOnHitBeforeArmorGround
+  
   def damageAgainst(enemy:UnitInfo, enemyShields:Int = 0) : Int = {
     val hits = attacksAgainst(enemy)
-    val damageOnHit = if (enemy.flying) unitClass.effectiveAirDamage else unitClass.effectiveGroundDamage
+    val damageOnHit = damageOnHitBeforeArmor(enemy:UnitInfo)
     val damageScale = damageScaleAgainst(enemy)
     val damageToShields = if (enemy.shieldPoints > 0) Math.max(0, Math.min(enemy.shieldPoints, hits * (damageOnHit - enemy.armorShield))) else 0
     val damageToHealth  = Math.max(0, damageScale * (hits * (damageOnHit - enemy.armorHealth) - damageToShields))

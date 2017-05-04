@@ -1,6 +1,7 @@
 package Information.Battles.Estimation
 
-import Information.Battles.TacticsTypes.{Tactics, TacticsOptions}
+import Information.Battles.BattleTypes.Battle
+import Information.Battles.TacticsTypes.{Tactics, TacticsDefault, TacticsOptions}
 import Lifecycle.With
 import ProxyBwapi.Engine.Damage
 import ProxyBwapi.UnitInfo.UnitInfo
@@ -36,9 +37,6 @@ class BattleEstimationUnit {
   var dpfAirConcussiveUnfocused     = 0.0
   var dpfAirExplosiveUnfocused      = 0.0
   var dpfAirNormalUnfocused         = 0.0
-  var speedPixelsPerFrame           = 0.0
-  var rangePixelsAir                = 0.0
-  var rangePixelsGround             = 0.0
   var attacksGround                 = 0.0
   var attacksAir                    = 0.0
   var subjectiveValue               = 0.0
@@ -46,8 +44,18 @@ class BattleEstimationUnit {
   var totalHealth                   = 0.0
   var totalFlyers                   = 0.0
   var totalUnits                    = 0.0
+  var speedPixelsPerFrame           = 0.0
+  var rangePixelsAir                = 0.0
+  var rangePixelsGround             = 0.0
+  var pixelsFromFocus            = 0.0
   
-  def this(unit:UnitInfo, tactics:TacticsOptions) {
+  
+  def this(
+    unit              : UnitInfo,
+    tactics           : TacticsOptions = TacticsDefault.get,
+    battle            : Option[Battle] = None,
+    considerGeometry  : Boolean) {
+    
     this()
     
     val fighting      = isFighter(unit, tactics)
@@ -74,9 +82,6 @@ class BattleEstimationUnit {
     dpfAirConcussiveUnfocused       = dpfAirConcussiveFocused     * unfocusedPenalty(unit:UnitInfo)
     dpfAirExplosiveUnfocused        = dpfAirExplosiveFocused      * unfocusedPenalty(unit:UnitInfo)
     dpfAirNormalUnfocused           = dpfAirNormalFocused         * unfocusedPenalty(unit:UnitInfo)
-    speedPixelsPerFrame             = unit.topSpeed
-    rangePixelsAir                  = unit.pixelRangeAir
-    rangePixelsGround               = unit.pixelRangeGround
     attacksGround                   = if (unit.attacksGround) 1.0 else 0.0
     attacksAir                      = if (unit.attacksAir)    1.0 else 0.0
     subjectiveValue                 = unit.unitClass.subjectiveValue
@@ -84,6 +89,10 @@ class BattleEstimationUnit {
     totalHealth                     = unit.totalHealth
     totalFlyers                     = if (unit.flying) 1.0 else 0.0
     totalUnits                      = 1.0
+    speedPixelsPerFrame             = unit.topSpeed
+    rangePixelsAir                  = unit.pixelRangeAir
+    rangePixelsGround               = unit.pixelRangeGround
+    pixelsFromFocus                 = battle.map(theBattle => unit.pixelDistanceTravelling(theBattle.focus)).sum
   }
   
   def add(that:BattleEstimationUnit) {
@@ -105,9 +114,6 @@ class BattleEstimationUnit {
     dpfAirConcussiveUnfocused       += that.dpfAirConcussiveUnfocused
     dpfAirExplosiveUnfocused        += that.dpfAirExplosiveUnfocused
     dpfAirNormalUnfocused           += that.dpfAirNormalUnfocused
-    speedPixelsPerFrame             += that.speedPixelsPerFrame
-    rangePixelsAir                  += that.rangePixelsAir
-    rangePixelsGround               += that.rangePixelsGround
     attacksGround                   += that.attacksGround
     attacksAir                      += that.attacksAir
     subjectiveValue                 += that.subjectiveValue
@@ -115,6 +121,10 @@ class BattleEstimationUnit {
     totalHealth                     += that.totalHealth
     totalFlyers                     += that.totalFlyers
     totalUnits                      += that.totalUnits
+    speedPixelsPerFrame             += that.speedPixelsPerFrame
+    rangePixelsAir                  += that.rangePixelsAir
+    rangePixelsGround               += that.rangePixelsGround
+    pixelsFromFocus              += that.pixelsFromFocus
   }
   
   def remove(that:BattleEstimationUnit) {
@@ -136,9 +146,6 @@ class BattleEstimationUnit {
     dpfAirConcussiveUnfocused       -= that.dpfAirConcussiveUnfocused
     dpfAirExplosiveUnfocused        -= that.dpfAirExplosiveUnfocused
     dpfAirNormalUnfocused           -= that.dpfAirNormalUnfocused
-    speedPixelsPerFrame             -= that.speedPixelsPerFrame
-    rangePixelsAir                  -= that.rangePixelsAir
-    rangePixelsGround               -= that.rangePixelsGround
     attacksGround                   -= that.attacksGround
     attacksAir                      -= that.attacksAir
     subjectiveValue                 -= that.subjectiveValue
@@ -146,6 +153,10 @@ class BattleEstimationUnit {
     totalHealth                     -= that.totalHealth
     totalFlyers                     -= that.totalFlyers
     totalUnits                      -= that.totalUnits
+    speedPixelsPerFrame             -= that.speedPixelsPerFrame
+    rangePixelsAir                  -= that.rangePixelsAir
+    rangePixelsGround               -= that.rangePixelsGround
+    pixelsFromFocus              -= that.pixelsFromFocus
   }
   
   private def unfocusedPenalty(unit:UnitInfo):Double = if (unit.attacksAir && unit.attacksGround) 0.0 else 1.0

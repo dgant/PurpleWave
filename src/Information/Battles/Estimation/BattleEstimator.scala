@@ -16,7 +16,7 @@ object BattleEstimator {
       battle.estimations =
         battle.us.tacticsAvailable.map(tacticsUs => {
           val tacticsEnemy = battle.enemy.tacticsApparent
-          val estimation = new BattleEstimation(tacticsUs, tacticsEnemy)
+          val estimation = new BattleEstimation(tacticsUs, tacticsEnemy, Some(battle), considerGeometry = true)
           estimation.addUnits(battle)
           estimation.recalculate()
           estimation
@@ -25,7 +25,7 @@ object BattleEstimator {
   
   def recalculateZones() {
     With.battles.byZone.values.foreach(battle => {
-      val estimation = new BattleEstimation(TacticsDefault.get, TacticsDefault.get)
+      val estimation = new BattleEstimation(TacticsDefault.get, TacticsDefault.get, Some(battle), considerGeometry = false)
       estimation.addUnits(battle)
       estimation.recalculate()
       battle.estimations = Vector(estimation)
@@ -34,7 +34,7 @@ object BattleEstimator {
   
   def recalculateGlobal() {
     val battle = With.battles.global
-    val estimation = new BattleEstimation(TacticsDefault.get, TacticsDefault.get)
+    val estimation = new BattleEstimation(TacticsDefault.get, TacticsDefault.get, Some(battle), considerGeometry = false)
     estimation.addUnits(battle)
     estimation.recalculate()
     battle.estimations = Vector(estimation)

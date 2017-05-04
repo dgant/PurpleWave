@@ -13,6 +13,7 @@ class BattleGroup(val units:Vector[UnitInfo]) {
   var battle:Battle = _
   var opponent:BattleGroup = _
   var vanguard: Pixel = Points.middle
+  var centroid: Pixel = Points.middle
   
   lazy val visible:Boolean = units.exists(_.visible)
   lazy val mobile:Boolean = units.exists(_.canMoveThisFrame)

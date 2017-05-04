@@ -44,7 +44,7 @@ object Flee extends Action {
   
     //If we're not kiting, and we have a clear path home, then skip heuristic movement and just go.
     if ( ! intent.canAttack) {
-      val ourDistanceToOrigin = intent.unit.pixelDistanceTravelling(intent.origin)
+      val ourDistanceToOrigin = intent.unit.pixelDistanceTravelling(intent.origin) - 32.0
       if (intent.threatsActive.forall(threat =>
         if (intent.unit.flying)
           threat.pixelDistanceFast(intent.origin) >= ourDistanceToOrigin //Don't retreat directly over the enmy!

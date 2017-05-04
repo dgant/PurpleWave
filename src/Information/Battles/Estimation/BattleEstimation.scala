@@ -7,12 +7,14 @@ import ProxyBwapi.UnitInfo.UnitInfo
 import scala.collection.mutable
 
 class BattleEstimation(
-  val tacticsUs : TacticsOptions,
-  val tacticsEnemy  : TacticsOptions)
+  val tacticsUs         : TacticsOptions,
+  val tacticsEnemy      : TacticsOptions,
+  val battle            : Option[Battle],
+  val considerGeometry  : Boolean)
     extends BattleEstimationCalculator {
   
-  private val unitsOurs = new mutable.HashMap[UnitInfo, BattleEstimationUnit]
-  private val unitsEnemy = new mutable.HashMap[UnitInfo, BattleEstimationUnit]
+  private val unitsOurs   = new mutable.HashMap[UnitInfo, BattleEstimationUnit]
+  private val unitsEnemy  = new mutable.HashMap[UnitInfo, BattleEstimationUnit]
   
   val avatarUs = new BattleEstimationUnit
   val avatarEnemy = new BattleEstimationUnit
@@ -24,11 +26,11 @@ class BattleEstimation(
   
   def addUnit(unit: UnitInfo) {
     if (unit.isFriendly) {
-      unitsOurs.put(unit, new BattleEstimationUnit(unit, tacticsUs))
+      unitsOurs.put(unit, new BattleEstimationUnit(unit, tacticsUs, battle, considerGeometry))
       avatarUs.add(unitsOurs(unit))
     }
     else {
-      unitsEnemy.put(unit, new BattleEstimationUnit(unit, tacticsEnemy))
+      unitsEnemy.put(unit, new BattleEstimationUnit(unit, tacticsEnemy, battle, considerGeometry))
       avatarEnemy.add(unitsEnemy(unit))
     }
   }

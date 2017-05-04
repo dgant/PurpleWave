@@ -33,7 +33,7 @@ class Commander {
   
   def attack(intent:Intention, target:UnitInfo) {
     if (target.visible) {
-      if (intent.unit.target == target && intent.unit.commandFrame < With.frame - 24) {
+      if (intent.unit.target != target || intent.unit.commandFrame < With.frame - 24) {
         intent.unit.base.attack(target.base)
       }
       sleepAttack(intent.unit)
@@ -42,13 +42,32 @@ class Commander {
     }
   }
   
-  def move(intent:Intention, position:Pixel) {
+  def move(intent:Intention, to:Pixel) {
     
     //Send flying units past their destination to maximize acceleration
     val flyingOvershoot = 144.0
-    var destination = position
-    if (intent.unit.flying && intent.unit.pixelDistanceSquared(position) < Math.pow(flyingOvershoot, 2)) {
-      destination = intent.unit.pixelCenter.project(position, flyingOvershoot)
+    var destination = to
+    if (intent.unit.flying && intent.unit.pixelDistanceSquared(to) < Math.pow(flyingOvershoot, 2)) {
+      val overshoot = intent.unit.pixelCenter.project(to, flyingOvershoot)
+      if (overshoot.valid) destination = overshoot
+    }
+    
+    // Mineral walk!
+    if (intent.unit.unitClass.isWorker) {
+      val from = intent.unit.pixelCenter
+      val fromZone = from.zone
+      val toZone = to.zone
+      val walkableMineral = toZone.bases
+        .flatten(_.minerals)
+        .find(mineral =>
+          mineral.visible && (
+            toZone != fromZone ||
+            Math.abs(from.degreesTo(to) - from.degreesTo(mineral.pixelCenter)) < 30))
+      if (walkableMineral.isDefined) {
+        intent.unit.base.gather(walkableMineral.get.base)
+        sleepMove(intent.unit)
+        return
+      }
     }
     
     // According to https://github.com/tscmoo/tsc-bwai/commit/ceb13344f5994d28d6b601cef126f264ca97426b

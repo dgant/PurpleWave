@@ -7,6 +7,7 @@ import Lifecycle.With
 object EvaluateTactics {
   
   def best(battle:Battle):TacticsOptions = {
+    if (battle.estimations.isEmpty) return battle.lastBestTactics
     battle.estimations.map(_.tacticsUs).minBy(tactics => evaluate(battle, tactics))
   }
   

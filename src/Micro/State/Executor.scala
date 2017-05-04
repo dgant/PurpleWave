@@ -18,6 +18,7 @@ class Executor {
   }
   
   def run() {
+    if ( ! With.latency.isLastFrameOfTurn) return
     
     stateByUnit
       .keys

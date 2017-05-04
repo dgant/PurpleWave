@@ -20,7 +20,7 @@ class Latency {
     1 + Math.max(0, With.game.getLatencyFrames - minRemainingLatencyFrames)
   }
   
-  def shouldRun:Boolean = {
+  def isLastFrameOfTurn:Boolean = {
     val shouldWeRun =
       With.frame == 0 ||
       With.game.getRemainingLatencyFrames == minRemainingLatencyFrames ||

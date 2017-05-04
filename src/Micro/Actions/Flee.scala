@@ -39,16 +39,22 @@ object Flee extends Action {
       intent.movementProfile.preferOrigin += 2.0
     }
     intent.toGather = None
-    intent.canAttack = enemyFaster || threatsFar
+    intent.canAttack = (enemyFaster || threatsFar) && intent.unit.cooldownLeft < With.latency.framesRemaining
     intent.canPursue = weAreFaster && weOutrange
-    
-    val ourDistanceToOrigin = intent.unit.pixelDistanceTravelling(intent.origin)
-    //Using travel distance for us and real distance for the enemy is intentional;
-    //we don't want Mutalisks retreating over Marines, for example, just because the Marines have further to walk.
-    if (intent.threatsActive.forall(_.pixelDistanceFast(intent.origin) >= ourDistanceToOrigin)) {
-      With.commander.move(intent, intent.origin)
-      return true
+  
+    //If we're not kiting, and we have a clear path home, then skip heuristic movement and just go.
+    if ( ! intent.canAttack) {
+      val ourDistanceToOrigin = intent.unit.pixelDistanceTravelling(intent.origin)
+      if (intent.threatsActive.forall(threat =>
+        if (intent.unit.flying)
+          threat.pixelDistanceFast(intent.origin) >= ourDistanceToOrigin //Don't retreat directly over the enmy!
+        else
+          threat.pixelDistanceTravelling(intent.origin) >= ourDistanceToOrigin)) {
+        With.commander.move(intent, intent.origin)
+        return true
+      }
     }
+    
     Move.consider(intent)
   }
   

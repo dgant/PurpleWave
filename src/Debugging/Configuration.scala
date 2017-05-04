@@ -5,7 +5,7 @@ class Configuration {
   // Up this for tournament play!
   var maxFrameMilliseconds = 20
   
-  val battleWorkerCostPerFrame        = 0.15
+  val battleWorkerCostPerFrame        = 0.25
   val battleMarginTiles               = 15
   
   val dpsGridDistancePenalty          = 0.5

@@ -43,7 +43,9 @@ object Flee extends Action {
     intent.canPursue = weAreFaster && weOutrange
     
     val ourDistanceToOrigin = intent.unit.pixelDistanceTravelling(intent.origin)
-    if (intent.threatsActive.forall(_.pixelDistanceTravelling(intent.origin) >= ourDistanceToOrigin)) {
+    //Using travel distance for us and real distance for the enemy is intentional;
+    //we don't want Mutalisks retreating over Marines, for example, just because the Marines have further to walk.
+    if (intent.threatsActive.forall(_.pixelDistanceFast(intent.origin) >= ourDistanceToOrigin)) {
       With.commander.move(intent, intent.origin)
       return true
     }

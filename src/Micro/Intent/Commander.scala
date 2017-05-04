@@ -33,7 +33,9 @@ class Commander {
   
   def attack(intent:Intention, target:UnitInfo) {
     if (target.visible) {
-      intent.unit.base.attack(target.base)
+      if (intent.unit.target == target && intent.unit.commandFrame < With.frame - 24) {
+        intent.unit.base.attack(target.base)
+      }
       sleepAttack(intent.unit)
     } else {
       move(intent, target.pixelCenter)

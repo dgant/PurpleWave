@@ -20,7 +20,7 @@ class Configuration {
   var woundedThresholdHealth          = 40
   
   var visualize                   = true
-  var visualizeBases              = false
+  var visualizeBases              = true
   var visualizeBattles            = true
   var visualizeBattleTacticsRanks = false
   var visualizeBullets            = false
@@ -38,7 +38,7 @@ class Configuration {
   var visualizeScheduler          = false
   var visualizeTextOnly           = false
   var visualizeUnitsForeign       = true
-  var visualizeUnitsOurs          = false
+  var visualizeUnitsOurs          = true
   var visualizeVectorUnits        = false
   
   var gameSpeed                   = 0

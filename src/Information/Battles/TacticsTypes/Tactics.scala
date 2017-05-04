@@ -26,6 +26,7 @@ object Tactics {
   }
   
   object Wounded {
+    val None  = v
     val Fight = v
     val Flee  = v
     

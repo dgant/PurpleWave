@@ -1,5 +1,6 @@
 package Micro.Actions
 import Information.Battles.TacticsTypes.Tactics
+import Lifecycle.With
 import Micro.Behaviors.MovementProfiles
 import Micro.Intent.Intention
 import Planning.Yolo
@@ -41,6 +42,11 @@ object Flee extends Action {
     intent.canAttack = enemyFaster || threatsFar
     intent.canPursue = weAreFaster && weOutrange
     
+    val ourDistanceToOrigin = intent.unit.pixelDistanceTravelling(intent.origin)
+    if (intent.threatsActive.forall(_.pixelDistanceTravelling(intent.origin) >= ourDistanceToOrigin)) {
+      With.commander.move(intent, intent.origin)
+      return true
+    }
     Move.consider(intent)
   }
   

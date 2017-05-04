@@ -79,6 +79,7 @@ class BattleGroup(val units:Vector[UnitInfo]) {
             output
           }))))
       .filterNot(output =>
+        (output.has(Tactics.Movement.Flee) && output.has(Tactics.Wounded.Fight))      ||
         (output.has(Tactics.Movement.Flee) && output.has(Tactics.Workers.FightAll))   ||
         (output.has(Tactics.Movement.Flee) && output.has(Tactics.Workers.FightHalf)))
   
@@ -96,9 +97,11 @@ class BattleGroup(val units:Vector[UnitInfo]) {
   
   lazy val tacticsAvailableWounded:Vector[Tactic] = {
     val output = new ArrayBuffer[Tactic]
-    output += Tactics.Wounded.Fight
-    if (mobile) {
+    if (units.exists(unit => unit.wounded && unit.canMoveThisFrame)) {
+      output += Tactics.Wounded.Fight
       output += Tactics.Wounded.Flee
+    } else {
+      output += Tactics.Wounded.None
     }
     output.toVector
   }

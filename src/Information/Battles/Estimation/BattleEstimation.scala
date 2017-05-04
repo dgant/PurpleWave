@@ -1,15 +1,15 @@
 package Information.Battles.Estimation
 
 import Information.Battles.BattleTypes.Battle
-import Information.Battles.TacticsTypes.{TacticsDefault, TacticsOptions}
+import Information.Battles.TacticsTypes.TacticsOptions
 import ProxyBwapi.UnitInfo.UnitInfo
 
 import scala.collection.mutable
 
 class BattleEstimation(
-  val tacticsUs     : TacticsOptions = TacticsDefault.get,
-  val tacticsEnemy  : TacticsOptions = TacticsDefault.get)
-  extends BattleEstimationCalculator {
+  val tacticsUs : TacticsOptions,
+  val tacticsEnemy  : TacticsOptions)
+    extends BattleEstimationCalculator {
   
   private val unitsOurs = new mutable.HashMap[UnitInfo, BattleEstimationUnit]
   private val unitsEnemy = new mutable.HashMap[UnitInfo, BattleEstimationUnit]

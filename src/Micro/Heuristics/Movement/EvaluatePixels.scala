@@ -34,7 +34,7 @@ object EvaluatePixels {
   
   def getCandidates(intent:Intention):Vector[Pixel] = {
 
-    val startingPixel = intent.unit.project(With.latency.framesRemaining)
+    val startingPixel = intent.unit.pixelCenter
     val startingZone  = startingPixel.zone
     val otherPixels =
       (0 until 256 by 2)

@@ -58,16 +58,18 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
     if (this == Protoss.Reaver)        Protoss.Scarab.effectiveGroundDamage
     else                               groundDamageRaw
   
+  private def cooldownZeroBecomesInfinity(cooldown:Int):Int = if (cooldown == 0) Int.MaxValue else cooldown
+  
   lazy val airDamageCooldown:Int =
     if (this == Terran.Bunker)   Terran.Marine.airDamageCooldown else
     if (this == Protoss.Carrier) Protoss.Interceptor.airDamageCooldown else
-    airDamageCooldownRaw
+    cooldownZeroBecomesInfinity(airDamageCooldownRaw)
     
   lazy val groundDamageCooldown:Int =
-    if (this == Terran.Bunker)   Terran.Marine.groundDamageCooldown else
-    if (this == Protoss.Carrier) Protoss.Interceptor.groundDamageCooldown else
-    if (this == Protoss.Reaver) 60 else
-    groundDamageCooldownRaw
+    if (this == Terran.Bunker)    Terran.Marine.groundDamageCooldown else
+    if (this == Protoss.Carrier)  Protoss.Interceptor.groundDamageCooldown else
+    if (this == Protoss.Reaver)   60 else
+    cooldownZeroBecomesInfinity(groundDamageCooldownRaw)
   
   //The extra 2+ is to account for the 1-3 frame random variation in cooldown
   lazy val airDps    : Double = airDamageFactorRaw    * maxAirHitsRaw     * effectiveAirDamage    * 24 / (2 + airDamageCooldown).toDouble

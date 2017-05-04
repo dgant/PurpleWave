@@ -129,9 +129,9 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   }
   
   def cooldownLeft                          : Int         = Math.max(airCooldownLeft, groundCooldownLeft)
-  def coolDownMaxAir                        : Int         = unitClass.airDamageCooldown     / stimBonus
-  def coolDownMaxGround                     : Int         = unitClass.groundDamageCooldown  / stimBonus
-  def cooldownMaxAgainst  (enemy:UnitInfo)  : Int         = if (enemy.flying) coolDownMaxAir                else coolDownMaxGround
+  def cooldownMaxAir                        : Int         = unitClass.airDamageCooldown     / stimBonus
+  def cooldownMaxGround                     : Int         = unitClass.groundDamageCooldown  / stimBonus
+  def cooldownMaxAgainst  (enemy:UnitInfo)  : Int         = if (enemy.flying) cooldownMaxAir                else cooldownMaxGround
   def pixelRangeAgainst   (enemy:UnitInfo)  : Double      = if (enemy.flying) pixelRangeAir                 else pixelRangeGround
   def damageTypeAgainst   (enemy:UnitInfo)  : DamageType  = if (enemy.flying) unitClass.airDamageTypeRaw    else unitClass.groundDamageTypeRaw
   def attacksAgainst      (enemy:UnitInfo)  : Int         = if (enemy.flying) attacksAgainstAir             else attacksAgainstGround

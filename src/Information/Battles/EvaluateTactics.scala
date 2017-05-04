@@ -14,6 +14,6 @@ object EvaluateTactics {
   }
   
   def evaluate(battle:Battle, tactics: TacticsOptions):Double = {
-    battle.estimation(tactics).map(_.costToUs).sum - battle.estimation(tactics).map(_.costToEnemy).sum
+    battle.estimation(tactics).map(estimation => estimation.costToUs - estimation.costToEnemy).sum
   }
 }

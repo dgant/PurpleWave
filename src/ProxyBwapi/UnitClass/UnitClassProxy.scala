@@ -3,7 +3,7 @@ package ProxyBwapi.UnitClass
 import Mathematics.Pixels.Tile
 import ProxyBwapi.Techs.Techs
 import ProxyBwapi.Upgrades.Upgrades
-import bwapi.{UnitSizeType, UnitType}
+import bwapi.{DamageType, UnitSizeType, UnitType}
 
 import scala.collection.JavaConverters._
 
@@ -70,7 +70,6 @@ class UnitClassProxy(val baseType:UnitType) {
   lazy val researchesWhat           = baseType.researchesWhat.asScala.map(Techs.get)
   lazy val seekRange                = baseType.seekRange
   lazy val sightRange               = baseType.sightRange
-  lazy val size                     = getSize
   lazy val spaceProvided            = baseType.spaceProvided
   lazy val spaceRequired            = baseType.spaceRequired
   lazy val supplyProvided           = baseType.supplyProvided
@@ -85,8 +84,9 @@ class UnitClassProxy(val baseType:UnitType) {
   lazy val whatBuilds               = new Pair(UnitClasses.get(baseType.whatBuilds.first), baseType.whatBuilds.second)
   lazy val width                    = baseType.width
   lazy val race                     = baseType.getRace
-  lazy val airWeapon                = baseType.airWeapon
-  lazy val groundWeapon             = baseType.groundWeapon
+  lazy val sizeRaw                  = size
+  lazy val airWeaponRaw             = baseType.airWeapon
+  lazy val groundWeaponRaw          = baseType.groundWeapon
   lazy val airDamageRaw             = baseType.airWeapon.damageAmount
   lazy val airDamageBonusRaw        = baseType.airWeapon.damageBonus
   lazy val airDamageCooldownRaw     = baseType.airWeapon.damageCooldown
@@ -97,7 +97,7 @@ class UnitClassProxy(val baseType:UnitType) {
   lazy val groundDamageRaw          = baseType.groundWeapon.damageAmount
   lazy val groundDamageBonusRaw     = baseType.groundWeapon.damageBonus
   lazy val groundDamageCooldownRaw  = baseType.groundWeapon.damageCooldown
-  lazy val groundDamageFactorRaw     = baseType.groundWeapon.damageFactor
+  lazy val groundDamageFactorRaw    = baseType.groundWeapon.damageFactor
   lazy val groundDamageTypeRaw      = baseType.groundWeapon.damageType
   lazy val groundExplosionTypeRaw   = baseType.groundWeapon.explosionType
   lazy val groundMinRangeRaw        = baseType.groundWeapon.minRange
@@ -106,7 +106,7 @@ class UnitClassProxy(val baseType:UnitType) {
   
   // .size is broken in BWMirror. This is a manual replacement.
   // Data via http://classic.battle.net/scc/GS/damage.shtml
-  def getSize:UnitSizeType = {
+  lazy val size:UnitSizeType = {
     if (Vector(
       UnitType.Terran_SCV,
       UnitType.Terran_Marine,
@@ -138,5 +138,49 @@ class UnitClassProxy(val baseType:UnitType) {
       UnitSizeType.Medium
     else
       UnitSizeType.Large
+  }
+  
+  lazy val groundDamageType:DamageType = {
+    if (Vector(
+      UnitType.Terran_Vulture,
+      UnitType.Terran_Ghost,
+      UnitType.Terran_Firebat
+    ).contains(baseType))
+      DamageType.Concussive
+    else if (Vector(
+      UnitType.Terran_Vulture_Spider_Mine,
+      UnitType.Terran_Siege_Tank_Siege_Mode,
+      UnitType.Terran_Siege_Tank_Tank_Mode,
+      UnitType.Zerg_Hydralisk,
+      UnitType.Zerg_Infested_Terran,
+      UnitType.Zerg_Sunken_Colony,
+      UnitType.Protoss_Dragoon,
+      UnitType.Protoss_Arbiter
+    ).contains(baseType))
+      DamageType.Explosive
+    else
+      DamageType.Normal
+  }
+  
+  lazy val airDamageType:DamageType = {
+    if (Vector(
+      UnitType.Terran_Ghost
+    ).contains(baseType))
+      DamageType.Concussive
+    else if (Vector(
+      UnitType.Terran_Goliath,
+      UnitType.Terran_Wraith,
+      UnitType.Terran_Valkyrie,
+      UnitType.Terran_Missile_Turret,
+      UnitType.Zerg_Hydralisk,
+      UnitType.Zerg_Devourer,
+      UnitType.Protoss_Dragoon,
+      UnitType.Protoss_Arbiter,
+      UnitType.Protoss_Scout,
+      UnitType.Protoss_Corsair
+    ).contains(baseType))
+      DamageType.Explosive
+    else
+      DamageType.Normal
   }
 }

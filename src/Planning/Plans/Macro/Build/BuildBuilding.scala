@@ -71,6 +71,7 @@ class BuildBuilding(val buildingClass:UnitClass) extends Plan {
             toBuild = Some(buildingClass)
             toBuildTile = orderedTile
             destination = Some(orderedTile.get.pixelCenter)
+            canAttack = false
           })
       }
     }

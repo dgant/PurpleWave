@@ -1,5 +1,7 @@
 package Information.Battles.Estimation
 
+import Information.Battles.TacticsTypes.{Tactics, TacticsOptions}
+import Lifecycle.With
 import ProxyBwapi.Engine.Damage
 import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.DamageType
@@ -40,36 +42,45 @@ class BattleEstimationUnit {
   var attacksGround                 = 0.0
   var attacksAir                    = 0.0
   var subjectiveValue               = 0.0
+  var subjectiveValueCostPerFrame   = 0.0
   var totalHealth                   = 0.0
   var totalFlyers                   = 0.0
   var totalUnits                    = 0.0
   
-  def this(unit:UnitInfo) {
+  def this(unit:UnitInfo, tactics:TacticsOptions) {
     this()
-    damageScaleGroundConcussive     = if (   unit.flying) 0.0 else Damage.scaleBySize(DamageType.Concussive, unit.unitClass.size)
-    damageScaleGroundExplosive      = if (   unit.flying) 0.0 else Damage.scaleBySize(DamageType.Explosive,  unit.unitClass.size)
-    damageScaleGroundNormal         = if (   unit.flying) 0.0 else Damage.scaleBySize(DamageType.Normal,     unit.unitClass.size)
-    damageScaleAirConcussive        = if ( ! unit.flying) 0.0 else Damage.scaleBySize(DamageType.Concussive, unit.unitClass.size)
-    damageScaleAirExplosive         = if ( ! unit.flying) 0.0 else Damage.scaleBySize(DamageType.Explosive,  unit.unitClass.size)
-    damageScaleAirNormal            = if ( ! unit.flying) 0.0 else Damage.scaleBySize(DamageType.Normal,     unit.unitClass.size)
-    dpfGroundConcussiveFocused      = (if (unit.unitClass.groundDamageTypeRaw == DamageType.Concussive) unit.damageOnHitBeforeArmorGround else 0.0) / unit.coolDownMaxGround.toDouble
-    dpfGroundExplosiveFocused       = (if (unit.unitClass.groundDamageTypeRaw == DamageType.Explosive)  unit.damageOnHitBeforeArmorGround else 0.0) / unit.coolDownMaxGround.toDouble
-    dpfGroundNormalFocused          = (if (unit.unitClass.groundDamageTypeRaw == DamageType.Normal)     unit.damageOnHitBeforeArmorGround else 0.0) / unit.coolDownMaxGround.toDouble
-    dpfAirConcussiveFocused         = (if (unit.unitClass.airDamageTypeRaw    == DamageType.Concussive) unit.damageOnHitBeforeArmorAir    else 0.0) / unit.coolDownMaxAir.toDouble
-    dpfAirExplosiveFocused          = (if (unit.unitClass.airDamageTypeRaw    == DamageType.Explosive)  unit.damageOnHitBeforeArmorAir    else 0.0) / unit.coolDownMaxAir.toDouble
-    dpfAirNormalFocused             = (if (unit.unitClass.airDamageTypeRaw    == DamageType.Normal)     unit.damageOnHitBeforeArmorAir    else 0.0) / unit.coolDownMaxAir.toDouble
+    
+    val fighting      = isFighter(unit, tactics)
+    val fleeing       = isFleer(unit, tactics)
+    val fightingBonus = if (fighting) 1.0 else 0.0
+    val fleeingBonus  = if (fleeing) 0.25 else 1.0
+    val costPerFrame  = if (unit.unitClass.isWorker && (fighting || fleeing)) With.configuration.battleWorkerCostPerFrame else 0.0
+    
+    damageScaleGroundConcussive     = fleeingBonus * (if (   unit.flying) 0.0 else Damage.scaleBySize(DamageType.Concussive, unit.unitClass.size))
+    damageScaleGroundExplosive      = fleeingBonus * (if (   unit.flying) 0.0 else Damage.scaleBySize(DamageType.Explosive,  unit.unitClass.size))
+    damageScaleGroundNormal         = fleeingBonus * (if (   unit.flying) 0.0 else Damage.scaleBySize(DamageType.Normal,     unit.unitClass.size))
+    damageScaleAirConcussive        = fleeingBonus * (if ( ! unit.flying) 0.0 else Damage.scaleBySize(DamageType.Concussive, unit.unitClass.size))
+    damageScaleAirExplosive         = fleeingBonus * (if ( ! unit.flying) 0.0 else Damage.scaleBySize(DamageType.Explosive,  unit.unitClass.size))
+    damageScaleAirNormal            = fleeingBonus * (if ( ! unit.flying) 0.0 else Damage.scaleBySize(DamageType.Normal,     unit.unitClass.size))
+    dpfGroundConcussiveFocused      = fightingBonus * (if (unit.unitClass.groundDamageType == DamageType.Concussive) unit.damageOnHitBeforeArmorGround else 0.0) / unit.cooldownMaxGround.toDouble
+    dpfGroundExplosiveFocused       = fightingBonus * (if (unit.unitClass.groundDamageType == DamageType.Explosive)  unit.damageOnHitBeforeArmorGround else 0.0) / unit.cooldownMaxGround.toDouble
+    dpfGroundNormalFocused          = fightingBonus * (if (unit.unitClass.groundDamageType == DamageType.Normal)     unit.damageOnHitBeforeArmorGround else 0.0) / unit.cooldownMaxGround.toDouble
+    dpfAirConcussiveFocused         = fightingBonus * (if (unit.unitClass.airDamageType    == DamageType.Concussive) unit.damageOnHitBeforeArmorAir    else 0.0) / unit.cooldownMaxAir.toDouble
+    dpfAirExplosiveFocused          = fightingBonus * (if (unit.unitClass.airDamageType    == DamageType.Explosive)  unit.damageOnHitBeforeArmorAir    else 0.0) / unit.cooldownMaxAir.toDouble
+    dpfAirNormalFocused             = fightingBonus * (if (unit.unitClass.airDamageType    == DamageType.Normal)     unit.damageOnHitBeforeArmorAir    else 0.0) / unit.cooldownMaxAir.toDouble
     dpfGroundConcussiveUnfocused    = dpfGroundConcussiveFocused  * unfocusedPenalty(unit:UnitInfo)
-    dpfGroundExplosiveUnfocused     = dpfGroundExplosiveUnfocused * unfocusedPenalty(unit:UnitInfo)
-    dpfGroundNormalUnfocused        = dpfGroundNormalUnfocused    * unfocusedPenalty(unit:UnitInfo)
-    dpfAirConcussiveUnfocused       = dpfAirConcussiveUnfocused   * unfocusedPenalty(unit:UnitInfo)
-    dpfAirExplosiveUnfocused        = dpfAirExplosiveUnfocused    * unfocusedPenalty(unit:UnitInfo)
-    dpfAirNormalUnfocused           = dpfAirNormalUnfocused       * unfocusedPenalty(unit:UnitInfo)
+    dpfGroundExplosiveUnfocused     = dpfGroundExplosiveFocused   * unfocusedPenalty(unit:UnitInfo)
+    dpfGroundNormalUnfocused        = dpfGroundNormalFocused      * unfocusedPenalty(unit:UnitInfo)
+    dpfAirConcussiveUnfocused       = dpfAirConcussiveFocused     * unfocusedPenalty(unit:UnitInfo)
+    dpfAirExplosiveUnfocused        = dpfAirExplosiveFocused      * unfocusedPenalty(unit:UnitInfo)
+    dpfAirNormalUnfocused           = dpfAirNormalFocused         * unfocusedPenalty(unit:UnitInfo)
     speedPixelsPerFrame             = unit.topSpeed
     rangePixelsAir                  = unit.pixelRangeAir
     rangePixelsGround               = unit.pixelRangeGround
     attacksGround                   = if (unit.attacksGround) 1.0 else 0.0
     attacksAir                      = if (unit.attacksAir)    1.0 else 0.0
     subjectiveValue                 = unit.unitClass.subjectiveValue
+    subjectiveValueCostPerFrame     = costPerFrame
     totalHealth                     = unit.totalHealth
     totalFlyers                     = if (unit.flying) 1.0 else 0.0
     totalUnits                      = 1.0
@@ -100,6 +111,7 @@ class BattleEstimationUnit {
     attacksGround                   += that.attacksGround
     attacksAir                      += that.attacksAir
     subjectiveValue                 += that.subjectiveValue
+    subjectiveValueCostPerFrame     += that.subjectiveValueCostPerFrame
     totalHealth                     += that.totalHealth
     totalFlyers                     += that.totalFlyers
     totalUnits                      += that.totalUnits
@@ -130,10 +142,41 @@ class BattleEstimationUnit {
     attacksGround                   -= that.attacksGround
     attacksAir                      -= that.attacksAir
     subjectiveValue                 -= that.subjectiveValue
+    subjectiveValueCostPerFrame     -= that.subjectiveValueCostPerFrame
     totalHealth                     -= that.totalHealth
     totalFlyers                     -= that.totalFlyers
     totalUnits                      -= that.totalUnits
   }
   
   private def unfocusedPenalty(unit:UnitInfo):Double = if (unit.attacksAir && unit.attacksGround) 0.0 else 1.0
+  
+  //Hacky way to implement the "fight with half of all workers" tactic
+  private var acceptNextWorker:Boolean = false
+  
+  private def isFighter(unit:UnitInfo, tactics:TacticsOptions):Boolean = {
+    if ( ! unit.alive) return false
+    if (unit.unitClass.isWorker) {
+      if (tactics.has(Tactics.Workers.FightAll)) {
+        return true
+      }
+      if (tactics.has(Tactics.Workers.FightHalf)) {
+        acceptNextWorker = ! acceptNextWorker
+        return acceptNextWorker
+      }
+      return false
+    }
+    if (unit.wounded && tactics.has(Tactics.Wounded.Flee)) {
+      return false
+    }
+    if (tactics.has(Tactics.Movement.Flee)) {
+      return false
+    }
+    unit.unitClass.helpsInCombat
+  }
+  
+  private def isFleer(unit:UnitInfo, tactics:TacticsOptions):Boolean = {
+    unit.canMoveThisFrame &&
+      ! isFighter(unit, tactics) &&
+      ( ! unit.unitClass.isWorker || tactics.has(Tactics.Workers.Flee))
+  }
 }

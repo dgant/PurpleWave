@@ -8,4 +8,8 @@ object PurpleMath {
     else
       values.sum / values.size
   }
+  
+  def nanToZero(value:Double):Double = {
+    if (value.isNaN) 0 else value
+  }
 }

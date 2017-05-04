@@ -8,7 +8,6 @@ import ProxyBwapi.UnitClass.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import ProxyBwapi.Upgrades.Upgrade
 import Utilities.CountMap
-import bwapi.UnitCommandType
 
 // Commander is responsible for issuing unit commands
 // in a way that Brood War handles gracefully.
@@ -33,18 +32,11 @@ class Commander {
   }
   
   def attack(intent:Intention, target:UnitInfo) {
-    
-    val currentlyAttackingTarget =
-      intent.unit.command.getUnitCommandType == UnitCommandType.Attack_Unit &&
-      intent.unit.command.getTarget == target.base
-    
-    if ( ! currentlyAttackingTarget) {
-      if (target.visible) {
-        intent.unit.base.attack(target.base)
-        sleepAttack(intent.unit)
-      } else {
-        move(intent, target.pixelCenter)
-      }
+    if (target.visible) {
+      intent.unit.base.attack(target.base)
+      sleepAttack(intent.unit)
+    } else {
+      move(intent, target.pixelCenter)
     }
   }
   

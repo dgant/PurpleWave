@@ -10,10 +10,11 @@ import scala.collection.mutable.ArrayBuffer
 class BattleGroup(val units:Vector[UnitInfo]) {
   
   // These should be populated immediately after construction.
-  var battle:Battle = _
-  var opponent:BattleGroup = _
-  var vanguard: Pixel = Points.middle
-  var centroid: Pixel = Points.middle
+  var battle    : Battle      = _
+  var opponent  : BattleGroup = _
+  var vanguard  : Pixel       = Points.middle
+  var centroid  : Pixel       = Points.middle
+  var spread    : Double      = _
   
   lazy val visible:Boolean = units.exists(_.visible)
   lazy val mobile:Boolean = units.exists(_.canMoveThisFrame)
@@ -62,7 +63,7 @@ class BattleGroup(val units:Vector[UnitInfo]) {
     else if (attackingAir.size < attackers.size * 0.2)
       output.add(Tactics.Focus.Ground)
     else
-      output.add(Tactics.Focus.None)
+      output.add(Tactics.Focus.Neither)
   
     output
   }
@@ -91,6 +92,9 @@ class BattleGroup(val units:Vector[UnitInfo]) {
       output += Tactics.Movement.Flee
       output += Tactics.Movement.Regroup
     }
+    else {
+      output += Tactics.NoTactic
+    }
     output.toVector
   }
   
@@ -100,12 +104,15 @@ class BattleGroup(val units:Vector[UnitInfo]) {
       output += Tactics.Wounded.Fight
       output += Tactics.Wounded.Flee
     }
+    else {
+      output += Tactics.NoTactic
+    }
     output.toVector
   }
   
   lazy val tacticsAvailableFocus:Vector[Tactic] = {
     val output = new ArrayBuffer[Tactic]
-    output += Tactics.Focus.None
+    output += Tactics.Focus.Neither
     if (
       opponent.units.exists(_.flying) &&
       opponent.units.exists( ! _.flying) &&
@@ -120,10 +127,13 @@ class BattleGroup(val units:Vector[UnitInfo]) {
   lazy val tacticsAvailableWorkers:Vector[Tactic] = {
     val output = new ArrayBuffer[Tactic]
     val workerCount = units.count(_.unitClass.isWorker)
-    output += Tactics.Workers.Ignore
     if (workerCount > 0) {
+      output += Tactics.Workers.Ignore
       output += Tactics.Workers.FightAll
       output += Tactics.Workers.Flee
+    }
+    else {
+      output += Tactics.NoTactic
     }
     if (workerCount > 3) {
       output += Tactics.Workers.FightHalf

@@ -17,12 +17,14 @@ object Tactics {
     nextV / 2
   }
   
+  val NoTactic = 0
+  
   object Movement {
     val Charge    = v
     val Regroup   = v
     val Flee      = v
     
-    val values = Vector(None, Charge, Regroup, Flee)
+    val values = Vector(Charge, Regroup, Flee)
   }
   
   object Wounded {
@@ -42,10 +44,10 @@ object Tactics {
   }
   
   object Focus {
-    val None    = v
+    val Neither    = v
     val Ground  = v
     val Air     = v
     
-    val values = Vector(None, Ground, Air)
+    val values = Vector(Neither, Ground, Air)
   }
 }

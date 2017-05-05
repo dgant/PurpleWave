@@ -8,6 +8,7 @@ object KeyboardCommands {
       case "q"  => breakpoint
       case "c"  => With.configuration.camera                      = ! With.configuration.camera
       case "v"  => With.configuration.visualize                   = ! With.configuration.visualize
+      case "e"  => With.configuration.camera                      = ! With.configuration.visualizeEconomy
       case "p"  => With.configuration.visualizePerformance        = ! With.configuration.visualizePerformance
       case "pd" => With.configuration.visualizePerformanceDetails = ! With.configuration.visualizePerformanceDetails
       case "r"  => With.configuration.visualizeResources          = ! With.configuration.visualizeResources

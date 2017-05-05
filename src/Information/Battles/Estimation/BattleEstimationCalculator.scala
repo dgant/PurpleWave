@@ -1,6 +1,8 @@
 package Information.Battles.Estimation
 
 import Information.Battles.TacticsTypes.{Tactics, TacticsOptions}
+import Lifecycle.With
+import Mathematics.PurpleMath
 
 abstract class BattleEstimationCalculator {
   
@@ -17,8 +19,8 @@ abstract class BattleEstimationCalculator {
     
     val frameStep   = 24
     val frames      = frameStep * 12
-    var stateUs     = new State(avatarUs,    tacticsUs,    -avatarUs.pixelsFromFocus,    0.0)
-    var stateEnemy  = new State(avatarEnemy, tacticsEnemy, avatarEnemy.pixelsFromFocus,  0.0)
+    var stateUs     = BattleEstimationCalculationState(avatarUs,    tacticsUs,    -avatarUs.pixelsFromFocus,    0.0)
+    var stateEnemy  = BattleEstimationCalculationState(avatarEnemy, tacticsEnemy, avatarEnemy.pixelsFromFocus,  0.0)
     
     // Account for dropoff in damage as units die
     // Two levers affect how this works:
@@ -41,71 +43,66 @@ abstract class BattleEstimationCalculator {
         nextStateEnemy  = dealDamage(frameStep, stateUs,    stateEnemy)
         stateUs     = nextStateUs
         stateEnemy  = nextStateEnemy
+        
+        if (With.configuration.visualizeBattles) {
+          result.statesUs     += stateUs
+          result.statesEnemy  += stateEnemy
+        }
       }
     })
     
-    result.costToEnemy  = totalCost(frames, stateEnemy)
     result.costToUs     = totalCost(frames, stateUs)
-  }
-  
-  private case class State(
-    val avatar              : BattleEstimationUnit,
-    val tactics             : TacticsOptions,
-    var x                   : Double,
-    var spread              : Double,
-    var damage              : Double = 0.0,
-    var participationGround : Double = 1.0,
-    var participationAir    : Double = 1.0) {
-    override def clone = super.clone
+    result.costToEnemy  = totalCost(frames, stateEnemy)
   }
   
   private def move(
-    frameStep     : Int,
-    stateThis     : State,
-    stateThat     : State)
-      : State = {
+    frameStep: Int,
+    stateThis: BattleEstimationCalculationState,
+    stateThat: BattleEstimationCalculationState)
+      : BattleEstimationCalculationState = {
     
-    val output = stateThis.clone.asInstanceOf[State]
+    val output = stateThis.copy()
     
     val xTarget =
-      if (stateThis.tactics.has(Tactics.Movement.Charge))
-        stateThat.x
-      else if (stateThis.tactics.has(Tactics.Movement.Flee))
-        signAway(stateThat.x, stateThis.x) * 100.0
-      else
-        stateThis.x
+      if      (stateThis.tactics.has(Tactics.Movement.Charge))  stateThat.x
+      else if (stateThis.tactics.has(Tactics.Movement.Flee))    - signTowards(stateThis.x, stateThat.x) * 100.0
+      else                                                      stateThis.x
     
-    val distanceTravelled = Math.min(stateThis.avatar.speedPixelsPerFrame * frameStep, Math.abs(xTarget - stateThis.x))
-    output.x += signAway(stateThis.x, stateThat.x) * distanceTravelled
+    val speedPixelsPerFrame = stateThis.avatar.speedPixelsPerFrame / stateThis.avatar.totalUnits
+    val distanceTravelled = Math.min(speedPixelsPerFrame * frameStep, Math.abs(xTarget - stateThis.x))
+    output.x += signTowards(stateThis.x, stateThat.x) * distanceTravelled
     
-    val distanceRegrouped = Math.min(stateThis.spread, 2 * (stateThis.avatar.speedPixelsPerFrame - distanceTravelled))
+    val distanceRegrouped = Math.max(0.0, Math.min(stateThis.spread, 2 * (speedPixelsPerFrame - distanceTravelled)))
+    output.spread -= distanceRegrouped
     
     output
   }
   
-  private def signAway(xFrom:Double, xTo:Double):Double = {
-    val sign = Math.signum(xFrom - xTo)
-    if (sign == 0) 1.0 else sign
+  private def signTowards(xFrom:Double, xTo:Double):Double = {
+    val sign = Math.signum(xTo - xFrom)
+    if (Math.abs(sign) <= 1.0) 1.0 else sign
   }
   
   private def updateParticipation(
-    stateThis: State,
-    stateThat: State) {
+    stateThis: BattleEstimationCalculationState,
+    stateThat: BattleEstimationCalculationState) {
     
-    val distance        = Math.abs(stateThis.x - stateThat.x)
-    val expectedSpread  = Math.sqrt(stateThis.avatar.totalUnits * 32.0)
-    val spreadFactor    = Math.max(1.0, expectedSpread / stateThis.spread)
-    stateThis.participationGround = spreadFactor * (distance - stateThis.avatar.rangePixelsGround)
-    stateThis.participationAir    = spreadFactor * (distance - stateThis.avatar.rangePixelsAir)
+    val distance                  = Math.abs(stateThis.x - stateThat.x)
+    val expectedSpread            = Math.sqrt(stateThis.avatar.totalUnits * 32.0)
+    val spreadFactor              = PurpleMath.clampToOne(expectedSpread / stateThis.spread)
+    stateThis.participationGround = spreadFactor * PurpleMath.nanToOne(PurpleMath.clampToOne(stateThis.avatar.rangePixelsGround / (distance - stateThis.spread)))
+    stateThis.participationAir    = spreadFactor * PurpleMath.nanToOne(PurpleMath.clampToOne(stateThis.avatar.rangePixelsAir    / (distance - stateThis.spread)))
   }
   
+  private def clampToOne(value:Double):Double = Math.max(0.0, Math.min(1.0, value))
+  
   private def dealDamage(
-    frameStep     : Int,
-    fromState     : State,
-    toState       : State)
-      : State = {
+    frameStep : Int,
+    fromState : BattleEstimationCalculationState,
+    toState   : BattleEstimationCalculationState)
+      : BattleEstimationCalculationState = {
     
-    val output = toState.clone.asInstanceOf[State]
+    val output = toState.copy()
     
     val from        = fromState.avatar
     val to          = toState.avatar
@@ -129,11 +126,11 @@ abstract class BattleEstimationCalculator {
     output
   }
   
-  def livingUnitsRatio(avatar:BattleEstimationUnit, damage:Double):Double = {
+  private def livingUnitsRatio(avatar:BattleEstimationUnit, damage:Double):Double = {
     Math.max(0.0, Math.ceil((avatar.totalHealth - damage) / avatar.totalHealth))
   }
   
-  private def totalCost(frames: Int, state:State) = {
+  private def totalCost(frames: Int, state:BattleEstimationCalculationState) = {
     state.avatar.subjectiveValueCostPerFrame * frames +
       state.avatar.subjectiveValue * state.damage / state.avatar.totalHealth
   }

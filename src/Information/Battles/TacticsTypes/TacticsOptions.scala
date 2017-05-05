@@ -14,12 +14,11 @@ class TacticsOptions(private var options:Int = 0) {
     val names = Vector(
       Tactics.Movement.Charge   -> "Movement: Charge",
       Tactics.Movement.Flee     -> "Movement: Flee",
-      Tactics.Focus.None        -> "",
+      Tactics.Movement.Regroup  -> "Movement: Regroup",
       Tactics.Focus.Air         -> "Focus: Air",
       Tactics.Focus.Ground      -> "Focus: Ground",
       Tactics.Wounded.Fight     -> "Wounded: Fight",
       Tactics.Wounded.Flee      -> "Wounded: Flee",
-      Tactics.Workers.Ignore    -> "",
       Tactics.Workers.Flee      -> "Workers: Flee",
       Tactics.Workers.FightAll  -> "Workers: Fight (All)",
       Tactics.Workers.FightHalf -> "Workers: Fight (Half)"

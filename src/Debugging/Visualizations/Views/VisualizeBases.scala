@@ -26,9 +26,9 @@ object VisualizeBases {
             else if (base.lastScoutedFrame <= 0) "Never scouted"
             else "Last scouted " + (With.frame - base.lastScoutedFrame) + " frames ago",
             "+" +
-              VisualizeBattles.formatGain(estimation.costToEnemy)
+              estimation.costToEnemy.toInt
               + " vs -"
-              + VisualizeBattles.formatGain(estimation.costToUs)
+              + estimation.costToUs.toInt
           ),
           base.townHallArea.midPixel,
           true,

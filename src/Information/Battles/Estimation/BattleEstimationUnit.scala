@@ -47,7 +47,7 @@ class BattleEstimationUnit {
   var speedPixelsPerFrame           = 0.0
   var rangePixelsAir                = 0.0
   var rangePixelsGround             = 0.0
-  var pixelsFromFocus            = 0.0
+  var pixelsFromFocus               = 0.0
   
   
   def this(

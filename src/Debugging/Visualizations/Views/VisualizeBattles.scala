@@ -1,6 +1,6 @@
 package Debugging.Visualizations.Views
 
-import Debugging.Visualizations.Colors
+import Debugging.Visualizations.{Colors, Visualization}
 import Debugging.Visualizations.Rendering.{DrawMap, DrawScreen}
 import Information.Battles.BattleTypes.Battle
 import Information.Battles.Estimation.{BattleEstimationCalculationState, BattleEstimationResult}
@@ -18,10 +18,10 @@ object VisualizeBattles {
   
   private val graphMargin         = Pixel(2, 2)
   private val graphAreaStart      = Pixel(5,  18)
-  private val graphDimensions     = Pixel(90, 180)
-  private val healthGraphStart    = graphAreaStart.add(graphMargin)
-  private val healthGraphEnd      = graphAreaStart.add(graphDimensions.x, 90).subtract(graphMargin)
-  private val positionGraphStart  = graphAreaStart.add(0, 90).add(graphMargin)
+  private val graphDimensions     = Pixel(90, 180 + 2 * Visualization.lineHeightSmall)
+  private val healthGraphStart    = graphAreaStart.add(graphMargin).add(0, Visualization.lineHeightSmall)
+  private val healthGraphEnd      = graphAreaStart.add(graphDimensions.x, 90 + Visualization.lineHeightSmall).subtract(graphMargin)
+  private val positionGraphStart  = graphAreaStart.add(0, 90 + Visualization.lineHeightSmall * 3).add(graphMargin)
   private val positionGraphEnd    = graphAreaStart.add(graphDimensions).subtract(graphMargin)
   private val tableHeader0        = Pixel(95, 18)
   private val tableHeader1        = tableHeader0.add(125, 0)
@@ -83,6 +83,9 @@ object VisualizeBattles {
     With.game.drawBoxScreen(healthGraphStart.bwapi,   healthGraphEnd.bwapi,                       Colors.DarkGray)
     With.game.drawBoxScreen(positionGraphStart.bwapi, positionGraphEnd.bwapi,                     Colors.DarkGray)
     
+    With.game.drawTextScreen(healthGraphStart   .subtract(0, Visualization.lineHeightSmall).bwapi, "Health:")
+    With.game.drawTextScreen(positionGraphStart .subtract(0, Visualization.lineHeightSmall).bwapi, "Position:")
+    
     val allStates = estimation.statesUs ++ estimation.statesEnemy
     val healthMax = Math.max(estimation.statesUs.head.avatar.totalHealth, estimation.statesEnemy.head.avatar.totalHealth)
     val xMin      = allStates.map(state => state.x - state.spread).min
@@ -107,8 +110,8 @@ object VisualizeBattles {
     while (i < states.size - 1) {
       val xBefore = healthGraphStart.x + xScale * i
       val xAfter  = healthGraphStart.x + xScale * (i + 1)
-      val yBefore = healthGraphStart.y + (states(i  ).avatar.totalHealth - states(i  ).damage) * yScale
-      val yAfter  = healthGraphStart.y +(states(i+1).avatar.totalHealth - states(i+1).damage) * yScale
+      val yBefore = healthGraphEnd.y - (states(i  ).avatar.totalHealth - states(i  ).damage) * yScale
+      val yAfter  = healthGraphEnd.y - (states(i+1).avatar.totalHealth - states(i+1).damage) * yScale
       With.game.drawLineScreen(xBefore.toInt, yBefore.toInt, xAfter.toInt, yAfter.toInt, player.colorNeon)
       i += 1
     }

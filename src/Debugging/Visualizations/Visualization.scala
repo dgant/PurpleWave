@@ -4,6 +4,9 @@ import Debugging.Visualizations.Views._
 import Lifecycle.With
 
 object Visualization {
+  
+  val lineHeightSmall = 13
+  
   def render() {
     if (With.configuration.visualize) {
       With.game.setTextSize(bwapi.Text.Size.Enum.Small)

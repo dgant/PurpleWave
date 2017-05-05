@@ -5,7 +5,7 @@ import Lifecycle.With
 object KeyboardCommands {
   def onSendText(text:String) {
     text match {
-      case "q"  => breakpoint
+      case "q"  => breakpoint()
       case "c"  => With.configuration.camera                      = ! With.configuration.camera
       case "v"  => With.configuration.visualize                   = ! With.configuration.visualize
       case "e"  => With.configuration.camera                      = ! With.configuration.visualizeEconomy
@@ -21,7 +21,7 @@ object KeyboardCommands {
     }
   }
   
-  def breakpoint {
+  def breakpoint() {
     val setABreakpointHere = 99
   }
 }

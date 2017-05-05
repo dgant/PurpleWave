@@ -7,6 +7,7 @@ class Configuration {
   
   val battleWorkerCostPerFrame        = 0.25
   val battleMarginTiles               = 15
+  val battleMarginPixels              = battleMarginTiles * 32.0
   
   val dpsGridDistancePenalty          = 0.5
   val dpsGridMovementPenalty          = 0.5

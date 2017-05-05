@@ -32,7 +32,7 @@ class BattleGroup(val units:Vector[UnitInfo]) {
     else if (destination.pixelDistanceFast(opponent.vanguard) > vanguard.pixelDistanceFast(opponent.vanguard))
       output.add(Tactics.Movement.Flee)
     else
-      output.add(Tactics.Movement.None)
+      output.add(Tactics.Movement.Regroup)
   
     val woundedUnits = visibleUnits.filter(_.wounded)
     val meanWoundedVelocityX = if (woundedUnits.isEmpty) 0.0 else woundedUnits.map(_.velocityX).sum / woundedUnits.size
@@ -89,9 +89,7 @@ class BattleGroup(val units:Vector[UnitInfo]) {
     if (mobile) {
       output += Tactics.Movement.Charge
       output += Tactics.Movement.Flee
-    }
-    else {
-      output += Tactics.Movement.None
+      output += Tactics.Movement.Regroup
     }
     output.toVector
   }
@@ -101,8 +99,6 @@ class BattleGroup(val units:Vector[UnitInfo]) {
     if (units.exists(unit => unit.wounded && unit.canMoveThisFrame)) {
       output += Tactics.Wounded.Fight
       output += Tactics.Wounded.Flee
-    } else {
-      output += Tactics.Wounded.None
     }
     output.toVector
   }

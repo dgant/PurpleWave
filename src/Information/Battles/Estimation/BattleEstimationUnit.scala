@@ -92,7 +92,7 @@ class BattleEstimationUnit {
     speedPixelsPerFrame             = unit.topSpeed
     rangePixelsAir                  = unit.pixelRangeAir
     rangePixelsGround               = unit.pixelRangeGround
-    pixelsFromFocus                 = battle.map(theBattle => unit.pixelDistanceTravelling(theBattle.focus)).sum
+    pixelsFromFocus                 = if (considerGeometry) battle.map(theBattle => unit.pixelDistanceTravelling(theBattle.focus)).sum else With.configuration.battleMarginPixels
   }
   
   def add(that:BattleEstimationUnit) {

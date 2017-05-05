@@ -18,15 +18,14 @@ object Tactics {
   }
   
   object Movement {
-    val None      = v
     val Charge    = v
+    val Regroup   = v
     val Flee      = v
     
-    val values = Vector(None, Charge, Flee)
+    val values = Vector(None, Charge, Regroup, Flee)
   }
   
   object Wounded {
-    val None  = v
     val Fight = v
     val Flee  = v
     

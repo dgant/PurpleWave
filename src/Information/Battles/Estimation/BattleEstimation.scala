@@ -79,6 +79,11 @@ class BattleEstimation(
     val frames      = frameStep * 12
     var stateUs     = BattleEstimationState(avatarUs,    tacticsUs,    -avatarUs.pixelsFromFocus    / avatarUs.totalUnits)
     var stateEnemy  = BattleEstimationState(avatarEnemy, tacticsEnemy, avatarEnemy.pixelsFromFocus  / avatarEnemy.totalUnits)
+  
+    if (With.configuration.visualizeBattles) {
+      result.statesUs     += stateUs
+      result.statesEnemy  += stateEnemy
+    }
     
     // Account for dropoff in damage as units die
     // Two levers affect how this works:

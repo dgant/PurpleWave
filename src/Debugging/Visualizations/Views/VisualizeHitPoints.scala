@@ -69,7 +69,7 @@ object VisualizeHitPoints {
       DrawMap.box(Pixel(xStart, yStartEnergy), Pixel(xStart + widthEnergyNow, yEndEnergy), Colors.BrightTeal, solid = true)
     }
     
-    if (unit.canAttackThisSecond || unit.energyMax > 0) {
+    if (widthCooldownNow > 0) {
       DrawMap.box(Pixel(xStart - 1, yStartCooldown - 1), Pixel(xStart + width + 2, yEndCooldown + 1), Color.Black, solid = true)
       if (unit.cooldownLeft > 0) {
         DrawMap.box(Pixel(xStartCooldown, yStartCooldown), Pixel(xStartCooldown + widthCooldownNow, yEndCooldown), Colors.BrightRed, solid = true)

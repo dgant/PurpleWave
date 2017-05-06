@@ -35,6 +35,11 @@ object ZoneUpdater {
   
   private def updateOwner(base: Base) {
     base.zone.owner = base.townHall.map(_.player).getOrElse(With.neutral)
+    if (base.zone.owner == With.neutral && base.lastScoutedFrame < With.frame) {
+      With.units.enemy
+        .filter(unit => ! unit.flying && unit.unitClass.isBuilding)
+        .foreach(enemyUnit => base.zone.owner = enemyUnit.player)
+    }
   }
   
   private def updateResources(base: Base) {

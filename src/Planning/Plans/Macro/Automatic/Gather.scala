@@ -179,6 +179,7 @@ class Gather extends Plan {
   }
   
   private def safe(resource:UnitInfo):Boolean = {
+    ! With.configuration.evaluateDangerousBases ||
     With.battles.byZone
       .get(With.geography.zoneByTile(resource.tileIncludingCenter))
       .forall(zoneBattle => zoneBattle.estimation.netCost >= 0)

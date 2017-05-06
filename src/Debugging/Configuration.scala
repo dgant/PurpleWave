@@ -19,6 +19,7 @@ class Configuration {
   var enablePathRecalculation         = true
   var pathRecalculationDelayFrames    = 12
   var woundedThresholdHealth          = 40
+  var evaluateDangerousBases          = false
   
   var visualize                   = true
   var visualizeBases              = true

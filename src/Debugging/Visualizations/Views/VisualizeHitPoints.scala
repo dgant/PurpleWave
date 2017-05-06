@@ -29,7 +29,7 @@ object VisualizeHitPoints {
     val widthEnergyNow        = if (unit.energyMax == 0) 0 else Math.min(width, width * unit.energy / unit.energyMax) //Min, because I haven't yet accounted for energy max upgrades
     val widthCooldownButton   = 3
     val widthCooldown         = width - 2 * widthCooldownButton - 2
-    val widthCooldownNow      = widthCooldown * Math.max(unit.cooldownLeft, unit.spellCooldownLeft) / unit.cooldownMaxAirGround //TODO: Max spell cooldown?
+    val widthCooldownNow      = widthCooldown * Math.max(unit.cooldownLeft, unit.spellCooldownLeft) / Math.max(1, unit.cooldownMaxAirGround) //TODO: Max spell cooldown?
   
     val yStartHp              = unit.pixelCenter.y + unit.unitClass.height/2 - marginTopHp
     val yEndHp                = yStartHp + 3
@@ -69,7 +69,7 @@ object VisualizeHitPoints {
       DrawMap.box(Pixel(xStart, yStartEnergy), Pixel(xStart + widthEnergyNow, yEndEnergy), Colors.BrightTeal, solid = true)
     }
     
-    if (unit.canAttackThisSecond) {
+    if (unit.canAttackThisSecond || unit.energyMax > 0) {
       DrawMap.box(Pixel(xStart - 1, yStartCooldown - 1), Pixel(xStart + width + 2, yEndCooldown + 1), Color.Black, solid = true)
       if (unit.cooldownLeft > 0) {
         DrawMap.box(Pixel(xStartCooldown, yStartCooldown), Pixel(xStartCooldown + widthCooldownNow, yEndCooldown), Colors.BrightRed, solid = true)

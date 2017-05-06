@@ -78,7 +78,6 @@ abstract class UnitProxy(var base:bwapi.Unit) {
   def repairing:Boolean
   def researching:Boolean
   def patrolling:Boolean
-  def startingAttack:Boolean
   def training:Boolean
   def upgrading:Boolean
   

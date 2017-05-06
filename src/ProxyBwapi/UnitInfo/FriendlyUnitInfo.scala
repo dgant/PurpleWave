@@ -22,14 +22,14 @@ class FriendlyUnitInfo(base:bwapi.Unit) extends FriendlyUnitProxy(base) {
   ////////////
   
   def getBuildUnit  : Option[UnitInfo]    = With.units.get(base.getBuildUnit)
-  def teching       : Tech                = Techs.get(base.getTech)
-  def upgrading     : Upgrade             = Upgrades.get(base.getUpgrade)
+  def techingType   : Tech                = Techs.get(base.getTech)
+  def upgradingType : Upgrade             = Upgrades.get(base.getUpgrade)
   
   ////////////////
   // Visibility //
   ////////////////
   
-  override def detected = With.grids.enemyDetection.get(tileIncludingCenter)
+  override def detected:Boolean = With.grids.enemyDetection.get(tileIncludingCenter)
   
   //////////////
   // Movement //

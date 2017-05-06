@@ -26,13 +26,13 @@ object ScheduleSimulationEventAnticipator {
   def getTechCompletion(unit:FriendlyUnitInfo): Iterable[BuildEvent] = {
     val timeLeft = unit.framesBeforeTechComplete
     if (timeLeft <= 0) return Vector.empty
-    Vector(buildEvent(new BuildableTech(unit.teching), timeLeft))
+    Vector(buildEvent(new BuildableTech(unit.techingType), timeLeft))
   }
   
   def getUpgradeCompletion(unit:FriendlyUnitInfo): Iterable[BuildEvent] = {
     val timeLeft = unit.framesBeforeUpgradeComplete
     if (timeLeft <= 0) return Vector.empty
-    val upgrade = unit.upgrading
+    val upgrade = unit.upgradingType
     val level = 1 + With.self.getUpgradeLevel(upgrade)
     Vector(buildEvent(new BuildableUpgrade(upgrade, level), timeLeft))
   }

@@ -185,7 +185,6 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
     _repairing            = base.isRepairing
     _researching          = base.isResearching
     _patrolling           = base.isPatrolling
-    _startingAttack       = base.isStartingAttack
     _training             = base.isTraining
     _upgrading            = base.isUpgrading
   }
@@ -216,7 +215,6 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
   private var _repairing        : Boolean = _
   private var _researching      : Boolean = _
   private var _patrolling       : Boolean = _
-  private var _startingAttack   : Boolean = _
   private var _training         : Boolean = _
   private var _upgrading        : Boolean = _
   
@@ -230,7 +228,6 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
   def repairing       : Boolean = _repairing
   def researching     : Boolean = _researching
   def patrolling      : Boolean = _patrolling
-  def startingAttack  : Boolean = _startingAttack
   def training        : Boolean = _training
   def upgrading       : Boolean = _upgrading
   

@@ -29,7 +29,7 @@ class ResearchTech(tech: Tech) extends Plan {
     currency.isSpent = false
     techers.acquire(this)
     techers.units.foreach(techer => {
-      currency.isSpent = techer.teching == tech
+      currency.isSpent = techer.techingType == tech
       With.executor.intend(new Intention(this, techer) { toTech = Some(tech) })
     })
   }

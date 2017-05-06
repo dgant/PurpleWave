@@ -1,18 +1,19 @@
 package Planning.Plans.Macro.Automatic
 
+import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, RequestUnitAnother, RequestUnitAnotherOne}
 import Planning.Plan
 import ProxyBwapi.Races.Protoss
-import Lifecycle.With
 
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.ArrayBuffer
 
 class TrainGatewayUnitsContinuously extends Plan {
   
   override def update() {
-    val gateways = With.units.ours.filter(u => u.alive && u.complete && u.is(Protoss.Gateway))
     
-    val requests = new ListBuffer[BuildRequest]
+    val gateways = With.units.ours.filter(unit => unit.aliveAndComplete && unit.is(Protoss.Gateway))
+    
+    val requests = new ArrayBuffer[BuildRequest]
     
     gateways
       .filter(_.trainingQueue.nonEmpty)
@@ -21,7 +22,7 @@ class TrainGatewayUnitsContinuously extends Plan {
     
     val capacity = Math.max(0, gateways.size - requests.size)
     val dragoons =
-      if (With.units.ours.exists(u => u.alive && u.complete && u.is(Protoss.CyberneticsCore)))
+      if (With.units.ours.exists(unit => unit.aliveAndComplete && unit.is(Protoss.CyberneticsCore)))
         Math.min(capacity, With.self.gas / 50)
       else 0
     val zealots = Math.max(0, capacity - dragoons)

@@ -15,7 +15,7 @@ class TrainContinuously(unitClass: UnitClass, maximum:Int = Int.MaxValue) extend
         List(
           maximum,
           maxDesirable,
-          buildCapacity + With.units.ours.count(unit => unit.alive && unit.complete && unit.unitClass == unitClass))
+          buildCapacity + With.units.ours.count(unit => unit.aliveAndComplete && unit.unitClass == unitClass))
         .min,
         unitClass)))
   }

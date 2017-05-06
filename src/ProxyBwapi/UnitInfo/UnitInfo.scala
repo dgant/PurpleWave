@@ -21,6 +21,8 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   // Health //
   ////////////
   
+  def aliveAndComplete:Boolean = alive && complete
+  
   def energyMax     : Int = unitClass.maxEnergy //TODO: Add upgrades
   def mineralsLeft  : Int = if (unitClass.isMinerals) resourcesLeft else 0
   def gasLeft       : Int = if (unitClass.isGas)      resourcesLeft else 0
@@ -169,15 +171,15 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   
   def canDoAnythingThisFrame:Boolean = canDoAnythingThisFrameCache.get
   private val canDoAnythingThisFrameCache = new CacheFrame(() =>
-    alive &&
-    complete &&
-    ! stasised &&
-    ! maelstrommed &&
+    aliveAndComplete  &&
+    ! stasised        &&
+    ! maelstrommed    &&
     ! lockedDown)
   
   def canBeAttackedThisFrame:Boolean = canBeAttackedThisFrameCache.get
   private val canBeAttackedThisFrameCache = new CacheFrame(() =>
       alive &&
+      (complete || unitClass.isBuilding) &&
       totalHealth > 0 &&
       visible &&
       ! invincible &&

@@ -62,9 +62,9 @@ class Gather extends Plan {
   }
   
   private def updateResourceInformation() = {
-    ourActiveBases  = With.geography.ourBases.filter(_.townHall.exists(_.complete))
+    ourActiveBases  = With.geography.ourBases.filter(_.townHall.exists(_.aliveAndComplete))
     allMinerals     = ourActiveBases.flatten(base => base.minerals).filter(_.alive).toSet
-    allGas          = ourActiveBases.flatten(base => base.gas).filter(gas => gas.isOurs && gas.complete && gas.alive).toSet
+    allGas          = ourActiveBases.flatten(base => base.gas).filter(gas => gas.isOurs && gas.aliveAndComplete).toSet
     safeMinerals    = allMinerals.filter(safe)
     safeGas         = allGas.filter(safe)
     if (safeMinerals.isEmpty) safeMinerals  = allMinerals

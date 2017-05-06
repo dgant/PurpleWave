@@ -23,7 +23,7 @@ class TrainUnit(val traineeClass:UnitClass) extends Plan {
   private var trainer:Option[FriendlyUnitInfo] = None
   private var trainee:Option[FriendlyUnitInfo] = None
   
-  override def isComplete: Boolean = trainee.exists(p => p.alive && p.complete)
+  override def isComplete: Boolean = trainee.exists(_.aliveAndComplete)
   
   override def update() {
     if (isComplete) return

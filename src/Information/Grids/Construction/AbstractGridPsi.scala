@@ -23,5 +23,5 @@ abstract class AbstractGridPsi extends AbstractGridBoolean {
   }
   
   val psiPoints:Array[Point]
-  def pylons:Set[FriendlyUnitInfo] = With.units.ours.filter(unit => unit.alive && unit.complete && unit.is(Protoss.Pylon))
+  def pylons:Set[FriendlyUnitInfo] = With.units.ours.filter(unit => unit.aliveAndComplete && unit.is(Protoss.Pylon))
 }

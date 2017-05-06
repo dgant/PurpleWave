@@ -31,7 +31,7 @@ class BuildBuilding(val buildingClass:UnitClass) extends Plan {
     
   description.set("Build a " + buildingClass)
   
-  override def isComplete: Boolean = building.exists(b => b.alive && b.complete)
+  override def isComplete: Boolean = building.exists(_.aliveAndComplete)
   
   def startedBuilding:Boolean = building.isDefined
   

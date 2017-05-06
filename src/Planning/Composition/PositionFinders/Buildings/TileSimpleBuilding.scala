@@ -13,14 +13,15 @@ class TileSimpleBuilding(val buildingClass:UnitClass) extends TileFinder {
   private var lastFailure = 0
   
   def find: Option[Tile] = {
-    //Don't lag out due to lack of pylon space
-    if (buildingClass.requiresPsi && ! With.units.ours.exists(u => u.complete && u.is(Protoss.Pylon))) {
+    
+    //Don't lag out due to lack of pylon power
+    if (buildingClass.requiresPsi && ! With.units.ours.exists(u => u.aliveAndComplete && u.is(Protoss.Pylon))) {
       return None
     }
     
     if (With.frame < 24 * 60 * 3 || lastFailure < With.frame - 24 * 10) {
       lastTile = if (lastTileValid) lastTile else requestTile
-      if (lastTile == None) {
+      if (lastTile.isEmpty) {
         lastFailure = With.frame
       }
     }
@@ -51,7 +52,7 @@ class TileSimpleBuilding(val buildingClass:UnitClass) extends TileFinder {
     
     // Performance optimization:
     // Don't waste time looking for a place to put a Gateway when we have no Pylons.
-    if (buildingClass.requiresPsi && ! With.units.ours.filter(_.complete).exists(_.is(Protoss.Pylon))) {
+    if (buildingClass.requiresPsi && ! With.units.ours.filter(_.aliveAndComplete).exists(_.is(Protoss.Pylon))) {
       return None
     }
     

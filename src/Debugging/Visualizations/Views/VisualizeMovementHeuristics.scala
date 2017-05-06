@@ -24,7 +24,7 @@ object VisualizeMovementHeuristics {
   }
   
   private def eligible(unit:FriendlyUnitInfo):Boolean =
-    unit.alive &&
+    unit.aliveAndComplete &&
       (With.frame - With.executor.getState(unit).movedHeuristicallyFrame) < 24 &&
       With.viewport.contains(unit.pixelCenter)
   

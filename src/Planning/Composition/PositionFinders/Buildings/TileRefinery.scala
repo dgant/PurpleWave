@@ -11,7 +11,7 @@ object TileRefinery extends TileFinder {
     
     val candidateAreas = With.geography.ourBases
       .toVector
-      .sortBy( ! _.townHall.exists(_.complete))
+      .sortBy( ! _.townHall.exists(_.aliveAndComplete))
       .sortBy( - _.gasLeft)
       .view
       .flatten(_.gas)

@@ -23,7 +23,7 @@ object VisualizeBattles {
   private val healthGraphEnd      = graphAreaStart.add(graphDimensions.x, 90 + Visualization.lineHeightSmall).subtract(graphMargin)
   private val positionGraphStart  = graphAreaStart.add(0, 90 + Visualization.lineHeightSmall * 3).add(graphMargin)
   private val positionGraphEnd    = graphAreaStart.add(graphDimensions).subtract(graphMargin)
-  private val tableHeader0        = Pixel(95, 18)
+  private val tableHeader0        = Pixel(100, 18)
   private val tableHeader1        = tableHeader0.add(125, 0)
   private val tableStart0         = tableHeader0.add(0, 25)
   private val tableStart1         = tableHeader1.add(0, 25)
@@ -31,7 +31,7 @@ object VisualizeBattles {
   private val army1               = Pixel(521, 18)
   private val army2               = Pixel(589, 18)
   private val yolo                = Pixel(5, 5)
-  private val tacticsRanks        = Pixel(225, 18)
+  private val tacticsRanks        = Pixel(235, 18)
   
   def render() {
     With.game.drawTextScreen(army0.bwapi, "Overall:")
@@ -77,7 +77,7 @@ object VisualizeBattles {
     With.game.drawTextScreen(tableHeader1.bwapi, "-" + estimation.costToUs.toInt)
     With.game.setTextSize(bwapi.Text.Size.Enum.Small)
     
-    if (estimation.statesUs.isEmpty) return
+    if (estimation.statesUs.size < 2) return
     
     With.game.drawBoxScreen(graphAreaStart.bwapi,     graphAreaStart.add(graphDimensions).bwapi,  Color.Black, true)
     With.game.drawBoxScreen(healthGraphStart.bwapi,   healthGraphEnd.bwapi,                       Colors.DarkGray)

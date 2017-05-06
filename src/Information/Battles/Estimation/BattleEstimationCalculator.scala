@@ -111,17 +111,17 @@ abstract class BattleEstimationCalculator {
     val airFocus    = if (fromTactics.has(Tactics.Focus.Ground)) 0.0 else if (fromTactics.has(Tactics.Focus.Air)) 1.0 else to.totalFlyers / to.totalUnits
     val groundFocus = 1.0 - airFocus
     
-    val damagePerFrame =
-      to.damageScaleGroundConcussive  * from.dpfGroundConcussiveFocused + from.dpfGroundConcussiveUnfocused * fromState.participationGround * groundFocus +
-      to.damageScaleGroundExplosive   * from.dpfGroundExplosiveFocused  + from.dpfGroundExplosiveUnfocused  * fromState.participationGround * groundFocus +
-      to.damageScaleGroundNormal      * from.dpfGroundNormalFocused     + from.dpfGroundNormalUnfocused     * fromState.participationGround * groundFocus +
-      to.damageScaleAirConcussive     * from.dpfAirConcussiveFocused    + from.dpfAirConcussiveUnfocused    * fromState.participationAir    * airFocus +
-      to.damageScaleAirExplosive      * from.dpfAirExplosiveFocused     + from.dpfAirExplosiveUnfocused     * fromState.participationAir    * airFocus +
-      to.damageScaleAirNormal         * from.dpfAirNormalFocused        + from.dpfAirNormalUnfocused        * fromState.participationAir    * airFocus
+    val damagePerFrameTimesUnits =
+      to.damageScaleGroundConcussive  * fromState.participationGround * (from.dpfGroundConcussiveFocused + from.dpfGroundConcussiveUnfocused * groundFocus) +
+      to.damageScaleGroundExplosive   * fromState.participationGround * (from.dpfGroundExplosiveFocused  + from.dpfGroundExplosiveUnfocused  * groundFocus) +
+      to.damageScaleGroundNormal      * fromState.participationGround * (from.dpfGroundNormalFocused     + from.dpfGroundNormalUnfocused     * groundFocus) +
+      to.damageScaleAirConcussive     * fromState.participationAir    * (from.dpfAirConcussiveFocused    + from.dpfAirConcussiveUnfocused    * airFocus) +
+      to.damageScaleAirExplosive      * fromState.participationAir    * (from.dpfAirExplosiveFocused     + from.dpfAirExplosiveUnfocused     * airFocus) +
+      to.damageScaleAirNormal         * fromState.participationAir    * (from.dpfAirNormalFocused        + from.dpfAirNormalUnfocused        * airFocus)
     
     output.damage += Math.min(
       to.totalHealth - toState.damage,
-      damagePerFrame * frameStep * ratioAlive)
+      damagePerFrameTimesUnits * frameStep * ratioAlive / to.totalUnits)
     
     output
   }

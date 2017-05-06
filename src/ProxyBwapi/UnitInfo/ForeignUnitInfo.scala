@@ -81,19 +81,21 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
     _invincible             = base.isInvincible
     _resourcesLeft          = base.getResources
     _shieldPoints           = base.getShields
+    _energy                 = base.getEnergy
     _plagued                = base.isPlagued
     _unitClass              = UnitClasses.get(base.getType)
   }
   
-  private var _alive                 : Boolean   = true
-  private var _complete              : Boolean   = false
-  private var _defensiveMatrixPoints : Int       = 0
-  private var _hitPoints             : Int       = 0
-  private var _initialResources      : Int       = 0
-  private var _invincible            : Boolean   = false
-  private var _resourcesLeft         : Int       = 0
-  private var _shieldPoints          : Int       = 0
-  private var _plagued               : Boolean   = false
+  private var _alive                  : Boolean   = true
+  private var _complete               : Boolean   = false
+  private var _defensiveMatrixPoints  : Int       = 0
+  private var _hitPoints              : Int       = 0
+  private var _initialResources       : Int       = 0
+  private var _invincible             : Boolean   = false
+  private var _resourcesLeft          : Int       = 0
+  private var _shieldPoints           : Int       = 0
+  private var _energy                 : Int       = 0
+  private var _plagued                : Boolean   = false
   
   def alive                 : Boolean   = _alive
   def complete              : Boolean   = _complete
@@ -103,6 +105,7 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
   def invincible            : Boolean   = _invincible
   def resourcesLeft         : Int       = _resourcesLeft
   def shieldPoints          : Int       = _shieldPoints
+  def energy                : Int       = _energy
   def plagued               : Boolean   = _plagued
   
   ////////////

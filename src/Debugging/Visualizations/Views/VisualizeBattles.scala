@@ -129,10 +129,10 @@ object VisualizeBattles {
     
     var i = 0
     while (i < states.size - 1) {
-      val xStart    = positionGraphStart.x + (xScale *  i     ).toInt
-      val xEnd      = positionGraphStart.x + (xScale * (i + 1)).toInt
-      val yMiddle0  = positionGraphStart.y + (yScale * (graphAreaStart.y + states(i  ).x - xMin)).toInt
-      val yMiddle1  = positionGraphStart.y + (yScale * (graphAreaStart.y + states(i+1).x - xMin)).toInt
+      val xStart    = graphMargin.x + positionGraphStart.x + (xScale *  i     ).toInt
+      val xEnd      = graphMargin.x + positionGraphStart.x + (xScale * (i + 1)).toInt
+      val yMiddle0  = graphMargin.y + positionGraphStart.y + (yScale * (graphAreaStart.y + states(i  ).x - xMin)).toInt
+      val yMiddle1  = graphMargin.y + positionGraphStart.y + (yScale * (graphAreaStart.y + states(i+1).x - xMin)).toInt
       val ySpread0  = (yScale * states(i  ).spread).toInt
       val ySpread1  = (yScale * states(i+1).spread).toInt
       With.game.drawLineScreen(xStart, yMiddle0 - ySpread0, xEnd, yMiddle1 - ySpread1, colorMedium)

@@ -21,6 +21,7 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   // Health //
   ////////////
   
+  def energyMax     : Int = unitClass.maxEnergy //TODO: Add upgrades
   def mineralsLeft  : Int = if (unitClass.isMinerals) resourcesLeft else 0
   def gasLeft       : Int = if (unitClass.isGas)      resourcesLeft else 0
   
@@ -131,6 +132,7 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   def cooldownLeft                          : Int         = Math.max(airCooldownLeft, groundCooldownLeft)
   def cooldownMaxAir                        : Int         = unitClass.airDamageCooldown     / stimBonus
   def cooldownMaxGround                     : Int         = unitClass.groundDamageCooldown  / stimBonus
+  def cooldownMaxAirGround                  : Int         = Math.max(cooldownMaxAir, cooldownMaxGround)
   def cooldownMaxAgainst  (enemy:UnitInfo)  : Int         = if (enemy.flying) cooldownMaxAir                else cooldownMaxGround
   def pixelRangeAgainst   (enemy:UnitInfo)  : Double      = if (enemy.flying) pixelRangeAir                 else pixelRangeGround
   def damageTypeAgainst   (enemy:UnitInfo)  : DamageType  = if (enemy.flying) unitClass.airDamageTypeRaw    else unitClass.groundDamageTypeRaw

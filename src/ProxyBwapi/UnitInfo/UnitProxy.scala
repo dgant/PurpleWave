@@ -28,6 +28,7 @@ abstract class UnitProxy(var base:bwapi.Unit) {
   def invincible:Boolean
   def resourcesLeft:Int
   def shieldPoints:Int
+  def energy:Int
   def unitClass:UnitClass
   def plagued:Boolean
   

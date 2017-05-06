@@ -60,7 +60,8 @@ class Commander {
       val walkableMineral = toZone.bases
         .flatten(_.minerals)
         .find(mineral =>
-          mineral.visible && (
+          mineral.visible && //Can't mineral walk to an invisible mineral
+          mineral.pixelsFromEdgeFast(intent.unit) > 48.0 && ( //Don't get stuck by trying to mineral walk through a mineral
             toZone != fromZone ||
             Math.abs(from.degreesTo(to) - from.degreesTo(mineral.pixelCenter)) < 30))
       if (walkableMineral.isDefined) {

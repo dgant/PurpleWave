@@ -17,37 +17,65 @@ object VisualizeHitPoints {
     if (unit.invincible) return
     if ( ! unit.possiblyStillThere) return
     
-    val width       = Math.min(48, Math.max(unit.unitClass.width / 2, 18))
-    val height      = 4
-    val denominator = unit.unitClass.maxTotalHealth + (if (unit.defensiveMatrixPoints > 0) width * 250 else 0)
-    val widthHpMax  = width * unit.unitClass.maxHitPoints             / denominator
-    val widthShMax  = width * unit.unitClass.maxShields               / denominator
-    val widthDmMax  = if (unit.defensiveMatrixPoints > 0) width * 250 / denominator else 0
-    val widthHpNow  = width * unit.hitPoints                          / denominator
-    val widthShNow  = width * unit.shieldPoints                       / denominator
-    val widthDmNow  = width * unit.defensiveMatrixPoints              / denominator
+    val width               = Math.min(48, Math.max(unit.unitClass.width / 2, 18))
+    val marginTopHp         = 4
+    val denominator         = unit.unitClass.maxTotalHealth + (if (unit.defensiveMatrixPoints > 0) width * 250 else 0)
+    val widthHpMax          = width * unit.unitClass.maxHitPoints             / denominator
+    val widthShMax          = width * unit.unitClass.maxShields               / denominator
+    val widthDmMax          = if (unit.defensiveMatrixPoints > 0) width * 250 / denominator else 0
+    val widthHpNow          = width * unit.hitPoints                          / denominator
+    val widthShNow          = width * unit.shieldPoints                       / denominator
+    val widthDmNow          = width * unit.defensiveMatrixPoints              / denominator
+    val widthEnergyNow      = Math.min(width, width * unit.energy / unit.energyMax) //Min, because I haven't yet accounted for energy max upgrades
+    val widthCooldownButton = 3
+    val widthCooldown       = width - 2 * widthCooldownButton - 2
+    val widthCooldownNow    = widthCooldown * unit.cooldownLeft / unit.cooldownMaxAirGround
   
-    val yStart      = unit.pixelCenter.y + unit.unitClass.height/2 - height
-    val yEnd        = yStart + 3
-    val xStart      = unit.pixelCenter.x - width/2
-    val xStartHp    = xStart
-    val xStartSh    = xStartHp + widthHpMax
-    val xStartDm    = xStartSh + widthShMax
+    val yStartHp            = unit.pixelCenter.y + unit.unitClass.height/2 - marginTopHp
+    val yEndHp              = yStartHp + 3
+    val yStartEnergy        = yEndHp + 2
+    val yEndEnergy          = yStartEnergy + 3
+    val yStartCooldown      = if (unit.energyMax > 0) yEndEnergy + 2 else yEndHp + 2
+    val yEndCooldown        = yStartCooldown + 3
+    val xStart              = unit.pixelCenter.x - width/2
+    val xStartSh            = xStart + widthHpMax
+    val xStartDm            = xStartSh + widthShMax
+    val xStartCooldown      = xStart + width - widthCooldown
     
     val colorHp = Colors.BrightGreen
     val colorSh = Colors.BrightBlue
     val colorDm = Colors.BrightViolet
   
-    DrawMap.box(Pixel(xStart - 1, yStart - 1), Pixel(xStart + width + 2, yEnd + 1), Color.Black, solid = true)
-    DrawMap.box(Pixel(xStartDm, yStart), Pixel(xStartDm+widthDmMax, yEnd), colorDm, solid = false)
-    DrawMap.box(Pixel(xStartSh, yStart), Pixel(xStartSh+widthShMax, yEnd), colorSh, solid = false)
-    DrawMap.box(Pixel(xStartHp, yStart), Pixel(xStartHp+widthHpMax, yEnd), colorHp, solid = false)
-    DrawMap.box(Pixel(xStartDm, yStart), Pixel(xStartDm+widthDmNow, yEnd), colorDm, solid = true)
-    DrawMap.box(Pixel(xStartSh, yStart), Pixel(xStartSh+widthShNow, yEnd), colorSh, solid = true)
-    DrawMap.box(Pixel(xStartHp, yStart), Pixel(xStartHp+widthHpNow, yEnd), colorHp, solid = true)
+    DrawMap.box(Pixel(xStart - 1, yStartHp - 1), Pixel(xStart + width + 2, yEndHp + 1), Color.Black, solid = true)
+    DrawMap.box(Pixel(xStartDm, yStartHp), Pixel(xStartDm+widthDmMax, yEndHp), colorDm, solid = false)
+    DrawMap.box(Pixel(xStartSh, yStartHp), Pixel(xStartSh+widthShMax, yEndHp), colorSh, solid = false)
+    DrawMap.box(Pixel(xStart, yStartHp), Pixel(xStart+widthHpMax, yEndHp), colorHp, solid = false)
+    DrawMap.box(Pixel(xStartDm, yStartHp), Pixel(xStartDm+widthDmNow, yEndHp), colorDm, solid = true)
+    DrawMap.box(Pixel(xStartSh, yStartHp), Pixel(xStartSh+widthShNow, yEndHp), colorSh, solid = true)
+    DrawMap.box(Pixel(xStart, yStartHp), Pixel(xStart+widthHpNow, yEndHp), colorHp, solid = true)
     
     if (unit.wounded) {
-      DrawMap.box(Pixel(xStart - 1, yStart - 1), Pixel(xStart + width + 2, yEnd + 1), Colors.NeonRed, solid = false)
+      DrawMap.box(Pixel(xStart - 1, yStartHp - 1), Pixel(xStart + width + 2, yEndHp + 1), Colors.NeonRed, solid = false)
+    }
+    
+    if (unit.energyMax > 0) {
+      DrawMap.box(Pixel(xStart - 1, yStartEnergy - 1), Pixel(xStart + width + 2, yEndEnergy + 1), Color.Black, solid = true)
+      (25 until unit.energyMax by 25).foreach(energy => {
+        val x = width * energy / unit.energyMax
+        DrawMap.line(Pixel(x, yStartEnergy), Pixel(x, yEndEnergy))
+      })
+      DrawMap.box(Pixel(xStart, yStartEnergy), Pixel(xStart + widthEnergyNow, yEndEnergy), Colors.BrightTeal, solid = true)
+    }
+    
+    if (unit.canAttackThisSecond) {
+      DrawMap.box(Pixel(xStart - 1, yStartCooldown - 1), Pixel(xStart + widthCooldown + 2, yEndCooldown + 1), Color.Black, solid = true)
+      DrawMap.box(Pixel(xStartCooldown, yStartCooldown), Pixel(xStart + widthCooldown, yEndCooldown), Colors.NeonRed, solid = true)
+      if (unit.attackStarting) {
+        DrawMap.box(Pixel(xStart, yStartCooldown), Pixel(xStart + widthCooldownButton, yEndCooldown), Colors.BrightRed, solid = true)
+      }
+      if (unit.attackAnimationHappening) {
+        DrawMap.box(Pixel(xStart + widthCooldownButton + 1, yStartCooldown), Pixel(xStart + 2 * widthCooldownButton + 1, yEndCooldown), Colors.BrightRed, solid = true)
+      }
     }
   }
 }

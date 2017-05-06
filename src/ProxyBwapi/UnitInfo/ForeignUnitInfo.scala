@@ -73,17 +73,20 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
   private def updateHealth() {
     
     //_alive is handled via flagDead()
+  
+    _unitClass              = UnitClasses.get(base.getType)
     
     _complete               = base.isCompleted
     _defensiveMatrixPoints  = base.getDefenseMatrixPoints
-    _hitPoints              = base.getHitPoints
+    _hitPoints              = if (effectivelyCloaked) if (_hitPoints == 0) _unitClass.maxHitPoints  else _hitPoints     else base.getHitPoints
+    _shieldPoints           = if (effectivelyCloaked) if (_hitPoints == 0) _unitClass.maxShields    else _shieldPoints  else base.getShields
     _initialResources       = base.getInitialResources
     _invincible             = base.isInvincible
     _resourcesLeft          = base.getResources
-    _shieldPoints           = base.getShields
+    
     _energy                 = base.getEnergy
     _plagued                = base.isPlagued
-    _unitClass              = UnitClasses.get(base.getType)
+    
   }
   
   private var _alive                  : Boolean   = true

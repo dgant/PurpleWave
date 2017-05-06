@@ -33,9 +33,7 @@ class Commander {
   
   def attack(intent:Intention, target:UnitInfo) {
     if (target.visible) {
-      if (intent.unit.target != target || intent.unit.commandFrame < With.frame - 24) {
-        intent.unit.base.attack(target.base)
-      }
+      intent.unit.base.attack(target.base)
       sleepAttack(intent.unit)
     } else {
       move(intent, target.pixelCenter)
@@ -61,7 +59,7 @@ class Commander {
         .flatten(_.minerals)
         .find(mineral =>
           mineral.visible && //Can't mineral walk to an invisible mineral
-          mineral.pixelsFromEdgeFast(intent.unit) > 48.0 && ( //Don't get stuck by trying to mineral walk through a mineral
+          mineral.pixelsFromEdgeFast(intent.unit) > 60.0 && ( //Don't get stuck by trying to mineral walk through a mineral
             toZone != fromZone ||
             Math.abs(from.degreesTo(to) - from.degreesTo(mineral.pixelCenter)) < 30))
       if (walkableMineral.isDefined) {
@@ -101,7 +99,7 @@ class Commander {
     }
     // The logic of "If we're not carrying resources, spam gather until the unit's target is the intended resource"
     // produces mineral locking, in which workers mine more efficiently because exactly 2 miners saturate a mineral patch.
-    else if ( ! intent.unit.target.exists(_ == resource)) {
+    else if ( ! intent.unit.target.contains(resource)) {
       // TODO: This will fail if we've never seen the resource before, as with some long-distance mining situations.
       // In that case we should order units to move to the destination first.
       if (resource.visible) {

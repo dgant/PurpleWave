@@ -3,7 +3,7 @@ package Debugging.Visualizations.Views
 import Debugging.Visualizations.{Colors, Visualization}
 import Debugging.Visualizations.Rendering.{DrawMap, DrawScreen}
 import Information.Battles.BattleTypes.Battle
-import Information.Battles.Estimation.{BattleEstimationCalculationState, BattleEstimationResult}
+import Information.Battles.Estimation.{BattleEstimationState, BattleEstimationResult}
 import Information.Battles.TacticsTypes.{Tactics, TacticsOptions}
 import Lifecycle.With
 import Mathematics.Pixels.Pixel
@@ -98,8 +98,8 @@ object VisualizeBattles {
   }
   
   def drawHealthGraph(
-    states: ArrayBuffer[BattleEstimationCalculationState],
-    player: PlayerInfo) {
+                       states: ArrayBuffer[BattleEstimationState],
+                       player: PlayerInfo) {
   
     val valueMax = states.head.avatar.totalHealth
     val xScale  = (healthGraphEnd.x - healthGraphStart.x - 2 * graphMargin.x) / states.size.toDouble
@@ -117,10 +117,10 @@ object VisualizeBattles {
   }
   
   def drawPositionGraph(
-    states  : ArrayBuffer[BattleEstimationCalculationState],
-    xMin    : Double,
-    xMax    : Double,
-    player  : PlayerInfo) {
+                         states  : ArrayBuffer[BattleEstimationState],
+                         xMin    : Double,
+                         xMax    : Double,
+                         player  : PlayerInfo) {
     
     val colorMedium = player.colorMedium
     val colorNeon   = player.colorNeon

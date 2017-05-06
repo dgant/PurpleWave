@@ -2,7 +2,7 @@ package Information.Battles.Estimation
 
 import Information.Battles.TacticsTypes.TacticsOptions
 
-case class BattleEstimationCalculationState (
+case class BattleEstimationState(
   val avatar              : BattleEstimationUnit,
   val tactics             : TacticsOptions,
   var x                   : Double,

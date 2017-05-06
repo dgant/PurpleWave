@@ -1,7 +1,6 @@
 package Micro.Heuristics.Targeting
 
 class TargetingProfile(
-  var preferSame        : Double = 0.0,
   var preferInRange     : Double = 0.0,
   var preferValue       : Double = 0.0,
   var preferCombat      : Double = 0.0,
@@ -13,7 +12,6 @@ class TargetingProfile(
   
   def weightedHeuristics: Iterable[TargetHeuristicWeight] = {
     Vector(
-      new TargetHeuristicWeight(TargetHeuristicSame,            preferSame),
       new TargetHeuristicWeight(TargetHeuristicInRange,         preferInRange),
       new TargetHeuristicWeight(TargetHeuristicValue,           preferValue),
       new TargetHeuristicWeight(TargetHeuristicCombat,          preferCombat),

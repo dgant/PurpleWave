@@ -69,11 +69,13 @@ abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
   def attackAnimationHappening  : Boolean = base.isAttackFrame
   def airCooldownLeft           : Int     = airCooldownLeftCache.get
   def groundCooldownLeft        : Int     = groundCooldownLeftCache.get
+  def spellCooldownLeft         : Int     = spellCooldownLeftCache.get
   
   private val interceptorCountCache = new CacheFrame(() => base.getInterceptorCount)
   private val scarabCountCache = new CacheFrame(() => base.getScarabCount)
   private val airCooldownLeftCache = new CacheFrame(() => base.getAirWeaponCooldown)
   private val groundCooldownLeftCache = new CacheFrame(() => base.getGroundWeaponCooldown)
+  private val spellCooldownLeftCache = new CacheFrame(() => base.getSpellCooldown)
   
   //////////////
   // Geometry //

@@ -18,9 +18,4 @@ object Threats {
       threat.isEnemyOf(intent.unit) &&
       threat.canAttackThisSecond(intent.unit)
   }
-  
-  def active(intent:Intention, threat:UnitInfo):Boolean = {
-    val threatTarget = threat.target.orElse(threat.orderTarget)
-    threatTarget.exists(_ == intent.unit) || threat.framesBeforeAttacking(intent.unit) <= With.configuration.microFrameLookahead
-  }
 }

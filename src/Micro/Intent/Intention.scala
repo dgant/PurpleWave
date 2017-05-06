@@ -39,7 +39,7 @@ class Intention(val plan:Plan, val unit:FriendlyUnitInfo) {
   private val targetsCache        = new CacheFrame(() => Targets.get(this))
   private val targetsInRangeCache = new CacheFrame(() => targets.filter(target => Targets.inRange(this, target)))
   private val threatsCache        = new CacheFrame(() => Threats.get(this))
-  private val threatsActiveCache  = new CacheFrame(() => threats.filter(threat => Threats.active(this, threat)))
+  private val threatsActiveCache  = new CacheFrame(() => threats.filter(_.isBeingViolentTo(unit)))
  
   var movementProfile = MovementProfiles.default
   var targetProfile   = TargetingProfiles.default

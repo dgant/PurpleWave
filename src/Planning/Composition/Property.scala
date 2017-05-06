@@ -6,7 +6,7 @@ class Property[T](default:T) {
   private var _value:T = default
   
   def get:T = {
-    if (_parent.exists(_ == this)) {
+    if (_parent.contains(this)) {
       throw new Exception("Cyclical inheritance for " + this.getClass.toString)
     }
     

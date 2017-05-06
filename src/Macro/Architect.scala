@@ -30,23 +30,9 @@ class Architect {
     searchRadius:       Integer                 = 20,
     exclusions:         Iterable[TileRectangle] = Vector.empty,
     hypotheticalPylon:  Option[Tile]    = None)
-      :Option[Iterable[Tile]] = {
+      : Option[Iterable[Tile]] = {
     
     val exclusions:Vector[TileRectangle] = Vector.empty
-    
-    //For each point
-    //  Try to find a place for the first building
-    //    If first building successful
-    //      Add that building's area to copy of exclusions
-    //      Try to find places for the remaining buildings (with exclusions)
-    //        If successful
-    //          Prepend first building to locations and return
-    //        If unsuccessful
-    //          try the next point
-    //    If first building unsuccessful
-    //      try next point
-    //  Having failed that
-    //    return None
     
     Spiral
       .points(searchRadius)
@@ -63,8 +49,8 @@ class Architect {
     margin:             Integer                 = 0,
     searchRadius:       Integer                 = 20,
     exclusions:         Iterable[TileRectangle] = Vector.empty,
-    hypotheticalPylon:  Option[Tile]    = None)
-      :Option[Iterable[Tile]] = {
+    hypotheticalPylon:  Option[Tile]            = None)
+      : Option[Iterable[Tile]] = {
     
     val nextBuilding = buildingClasses.head
     
@@ -97,11 +83,11 @@ class Architect {
     tileTopleft:        Tile,
     margin:             Integer                 = 0,
     exclusions:         Iterable[TileRectangle] = Vector.empty,
-    hypotheticalPylon:  Option[Tile]    = None)
-      :Boolean = {
+    hypotheticalPylon:  Option[Tile]            = None)
+      : Boolean = {
   
     lazy val buildingArea = buildingClass.tileArea.add(tileTopleft)
-    lazy val marginArea = buildingArea.expand(margin, margin)
+    lazy val marginArea   = buildingArea.expand(margin, margin)
   
     With.grids.buildable.get(tileTopleft) &&
     tileHasRequiredPsi(tileTopleft, buildingClass) &&
@@ -128,7 +114,7 @@ class Architect {
     area:               TileRectangle,
     buildingClass:      UnitClass,
     hypotheticalPylon:  Option[Tile] = None)
-  :Boolean = {
+      : Boolean = {
     //HypotheticalPylon temporarily disabled
     area.tiles.forall(tile => With.grids.buildable.get(tile))
   }

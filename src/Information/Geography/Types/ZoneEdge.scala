@@ -5,7 +5,7 @@ import bwta.Chokepoint
 
 class ZoneEdge(
   chokepoint: Chokepoint,
-  val zones:Iterable[Zone]) {
+  val zones:Traversable[Zone]) {
   
   val centerPixel   = new Pixel(chokepoint.getCenter)
   val radiusPixels  = chokepoint.getWidth / 2

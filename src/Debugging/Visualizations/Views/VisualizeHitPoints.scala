@@ -29,7 +29,7 @@ object VisualizeHitPoints {
     val widthEnergyNow        = if (unit.energyMax == 0) 0 else Math.min(width, width * unit.energy / unit.energyMax) //Min, because I haven't yet accounted for energy max upgrades
     val widthCooldownButton   = 3
     val widthCooldown         = width - 2 * widthCooldownButton - 2
-    val widthCooldownNow      = widthCooldown * unit.cooldownLeft / unit.cooldownMaxAirGround
+    val widthCooldownNow      = widthCooldown * Math.max(unit.cooldownLeft, unit.spellCooldownLeft) / unit.cooldownMaxAirGround //TODO: Max spell cooldown?
   
     val yStartHp              = unit.pixelCenter.y + unit.unitClass.height/2 - marginTopHp
     val yEndHp                = yStartHp + 3
@@ -49,12 +49,12 @@ object VisualizeHitPoints {
     val colorDm = Colors.BrightViolet
   
     DrawMap.box(Pixel(xStart - 1, yStartHp - 1), Pixel(xStart + width + 2, yEndHp + 1), Color.Black, solid = true)
-    DrawMap.box(Pixel(xStartDm, yStartHp), Pixel(xStartDm+widthDmMax, yEndHp), colorDm, solid = false)
-    DrawMap.box(Pixel(xStartSh, yStartHp), Pixel(xStartSh+widthShMax, yEndHp), colorSh, solid = false)
-    DrawMap.box(Pixel(xStart, yStartHp), Pixel(xStart+widthHpMax, yEndHp), colorHp, solid = false)
-    DrawMap.box(Pixel(xStartDm, yStartHp), Pixel(xStartDm+widthDmNow, yEndHp), colorDm, solid = true)
-    DrawMap.box(Pixel(xStartSh, yStartHp), Pixel(xStartSh+widthShNow, yEndHp), colorSh, solid = true)
-    DrawMap.box(Pixel(xStart, yStartHp), Pixel(xStart+widthHpNow, yEndHp), colorHp, solid = true)
+    DrawMap.box(Pixel(xStartDm, yStartHp), Pixel(xStartDm + widthDmMax, yEndHp), colorDm, solid = false)
+    DrawMap.box(Pixel(xStartSh, yStartHp), Pixel(xStartSh + widthShMax, yEndHp), colorSh, solid = false)
+    DrawMap.box(Pixel(xStart,   yStartHp), Pixel(xStart   + widthHpMax, yEndHp), colorHp, solid = false)
+    DrawMap.box(Pixel(xStartDm, yStartHp), Pixel(xStartDm + widthDmNow, yEndHp), colorDm, solid = true)
+    DrawMap.box(Pixel(xStartSh, yStartHp), Pixel(xStartSh + widthShNow, yEndHp), colorSh, solid = true)
+    DrawMap.box(Pixel(xStart,   yStartHp), Pixel(xStart   + widthHpNow, yEndHp), colorHp, solid = true)
     
     if (unit.wounded) {
       DrawMap.box(Pixel(xStart - 1, yStartHp - 1), Pixel(xStart + width + 2, yEndHp + 1), Colors.NeonRed, solid = false)

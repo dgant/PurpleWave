@@ -1,6 +1,6 @@
 package Information.Battles.Estimation
 
-import Information.Battles.BattleTypes.Battle
+import Information.Battles.BattleTypes.{Battle, BattleGroup}
 import Information.Battles.TacticsTypes.{Tactics, TacticsDefault, TacticsOptions}
 import Lifecycle.With
 import ProxyBwapi.Engine.Damage
@@ -48,12 +48,13 @@ class BattleEstimationUnit {
   var rangePixelsAir                = 0.0
   var rangePixelsGround             = 0.0
   var pixelsFromFocus               = 0.0
-  
+  var pixelsFromCentroid            = 0.0
   
   def this(
     unit              : UnitInfo,
-    tactics           : TacticsOptions = TacticsDefault.get,
-    battle            : Option[Battle] = None,
+    tactics           : TacticsOptions      = TacticsDefault.get,
+    battle            : Option[Battle]      = None,
+    battleGroup       : Option[BattleGroup] = None,
     considerGeometry  : Boolean) {
     
     this()
@@ -92,7 +93,8 @@ class BattleEstimationUnit {
     speedPixelsPerFrame             = unit.topSpeed
     rangePixelsAir                  = unit.pixelRangeAir
     rangePixelsGround               = unit.pixelRangeGround
-    pixelsFromFocus                 = if (considerGeometry) battle.map(theBattle => unit.pixelDistanceTravelling(theBattle.focus)).sum else With.configuration.battleMarginPixels
+    pixelsFromFocus                 = if (considerGeometry) battle      .map(theBattle      => Math.max(0.0, unit.pixelDistanceTravelling(theBattle.focus)         - unit.pixelRangeMax)).sum else With.configuration.battleMarginPixels
+    pixelsFromCentroid              = if (considerGeometry) battleGroup .map(theBattleGroup => Math.max(0.0, unit.pixelDistanceTravelling(theBattleGroup.centroid) - unit.pixelRangeMax)).sum else 0.0
   }
   
   def add(that:BattleEstimationUnit) {
@@ -124,7 +126,8 @@ class BattleEstimationUnit {
     speedPixelsPerFrame             += that.speedPixelsPerFrame
     rangePixelsAir                  += that.rangePixelsAir
     rangePixelsGround               += that.rangePixelsGround
-    pixelsFromFocus              += that.pixelsFromFocus
+    pixelsFromFocus                 += that.pixelsFromFocus
+    pixelsFromCentroid              += that.pixelsFromCentroid
   }
   
   def remove(that:BattleEstimationUnit) {
@@ -156,7 +159,8 @@ class BattleEstimationUnit {
     speedPixelsPerFrame             -= that.speedPixelsPerFrame
     rangePixelsAir                  -= that.rangePixelsAir
     rangePixelsGround               -= that.rangePixelsGround
-    pixelsFromFocus              -= that.pixelsFromFocus
+    pixelsFromFocus                 -= that.pixelsFromFocus
+    pixelsFromCentroid              -= that.pixelsFromCentroid
   }
   
   private def unfocusedPenalty(unit:UnitInfo):Double = if (unit.attacksAir && unit.attacksGround) 0.0 else 1.0

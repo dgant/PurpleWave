@@ -10,6 +10,6 @@ class BattleEstimationResult {
   
   def netCost:Double = costToEnemy - costToUs
   
-  val statesUs    = new ArrayBuffer[BattleEstimationCalculationState]
-  val statesEnemy = new ArrayBuffer[BattleEstimationCalculationState]
+  val statesUs    = new ArrayBuffer[BattleEstimationState]
+  val statesEnemy = new ArrayBuffer[BattleEstimationState]
 }

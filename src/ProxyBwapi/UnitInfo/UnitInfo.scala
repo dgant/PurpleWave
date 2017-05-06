@@ -15,7 +15,7 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   
   override def toString:String = unitClass.toString + " " + tileIncludingCenter.toString
   
-  def is(unitClasses:UnitClass*):Boolean = unitClasses.exists(_ == unitClass)
+  def is(unitClasses:UnitClass*):Boolean = unitClasses.contains(unitClass)
   
   ////////////
   // Health //
@@ -100,6 +100,20 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   // Combat //
   ////////////
   
+  def isBeingViolent: Boolean = target.orElse(orderTarget).exists(isEnemyOf)
+  def isBeingViolentTo(victim:UnitInfo): Boolean =
+    isEnemyOf(victim) &&
+    canAttackThisSecond(victim) && (
+      //Are we attacking the victim?
+      target.orElse(orderTarget).contains(victim) ||
+      //Are we moving towards the victim?
+      targetPixel.orElse(orderTargetPixel).exists(destination =>
+        victim.pixelDistanceFast(
+          pixelCenter.project(
+            destination,
+            Math.min(topSpeed * With.configuration.microFrameLookahead, pixelDistanceFast(victim))))
+          < pixelRangeAgainst(victim)))
+  
   def melee:Boolean = unitClass.maxAirGroundRange <= 32 * 2
   
   //TODO: Account for upgrades. Make sure to handle case where unit has no armor upgrades
@@ -132,7 +146,7 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   def cooldownLeft                          : Int         = Math.max(airCooldownLeft, groundCooldownLeft)
   def cooldownMaxAir                        : Int         = unitClass.airDamageCooldown     / stimBonus
   def cooldownMaxGround                     : Int         = unitClass.groundDamageCooldown  / stimBonus
-  def cooldownMaxAirGround                  : Int         = Math.max(cooldownMaxAir, cooldownMaxGround)
+  def cooldownMaxAirGround                  : Int         = Math.max(if (attacksAir) cooldownMaxAir else 0, if (attacksGround) cooldownMaxGround else 0)
   def cooldownMaxAgainst  (enemy:UnitInfo)  : Int         = if (enemy.flying) cooldownMaxAir                else cooldownMaxGround
   def pixelRangeAgainst   (enemy:UnitInfo)  : Double      = if (enemy.flying) pixelRangeAir                 else pixelRangeGround
   def damageTypeAgainst   (enemy:UnitInfo)  : DamageType  = if (enemy.flying) unitClass.airDamageTypeRaw    else unitClass.groundDamageTypeRaw

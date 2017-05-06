@@ -24,9 +24,9 @@ class TrainGatewayUnitsContinuously extends Plan {
       if (With.units.ours.exists(u => u.alive && u.complete && u.is(Protoss.CyberneticsCore)))
         Math.min(capacity, With.self.gas / 50)
       else 0
-    val zealots   = Math.max(0, capacity - dragoons)
-    requests.append(new RequestUnitAnother(dragoons, Protoss.Dragoon))
-    requests.append(new RequestUnitAnother(zealots, Protoss.Zealot))
+    val zealots = Math.max(0, capacity - dragoons)
+    requests.append(new RequestUnitAnother(dragoons,  Protoss.Dragoon))
+    requests.append(new RequestUnitAnother(zealots,   Protoss.Zealot))
     
     With.scheduler.request(this, requests)
   }

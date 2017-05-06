@@ -78,8 +78,8 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
     
     _complete               = base.isCompleted
     _defensiveMatrixPoints  = base.getDefenseMatrixPoints
-    _hitPoints              = if (effectivelyCloaked) if (_hitPoints == 0) _unitClass.maxHitPoints  else _hitPoints     else base.getHitPoints
     _shieldPoints           = if (effectivelyCloaked) if (_hitPoints == 0) _unitClass.maxShields    else _shieldPoints  else base.getShields
+    _hitPoints              = if (effectivelyCloaked) if (_hitPoints == 0) _unitClass.maxHitPoints  else _hitPoints     else base.getHitPoints
     _initialResources       = base.getInitialResources
     _invincible             = base.isInvincible
     _resourcesLeft          = base.getResources
@@ -124,6 +124,7 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
     _attackAnimationHappening = base.isAttackFrame
     _airWeaponCooldownLeft    = base.getAirWeaponCooldown
     _groundWeaponCooldownLeft = base.getGroundWeaponCooldown
+    _spellCooldownLeft        = base.getSpellCooldown
   }
   
   var _attacking                : Boolean = false
@@ -131,12 +132,14 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
   var _attackAnimationHappening : Boolean = false
   var _airWeaponCooldownLeft    : Int = 0
   var _groundWeaponCooldownLeft : Int = 0
+  var _spellCooldownLeft        : Int = 0
   
   def attacking                 : Boolean = _attacking
   def attackStarting            : Boolean = _attackStarting
   def attackAnimationHappening  : Boolean = _attackAnimationHappening
-  def airCooldownLeft     : Int     = _airWeaponCooldownLeft
-  def groundCooldownLeft  : Int     = _groundWeaponCooldownLeft
+  def airCooldownLeft           : Int     = _airWeaponCooldownLeft
+  def groundCooldownLeft        : Int     = _groundWeaponCooldownLeft
+  def spellCooldownLeft         : Int     =  _spellCooldownLeft
   
   //////////////
   // Geometry //

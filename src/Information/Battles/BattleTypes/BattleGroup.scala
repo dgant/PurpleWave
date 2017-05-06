@@ -28,6 +28,7 @@ class BattleGroup(val units:Vector[UnitInfo]) {
     val meanVelocityX = if (visibleUnits.isEmpty) 0.0 else visibleUnits.map(_.velocityX).sum / visibleUnits.size
     val meanVelocityY = if (visibleUnits.isEmpty) 0.0 else visibleUnits.map(_.velocityY).sum / visibleUnits.size
     val destination = vanguard.add(meanVelocityX.toInt, meanVelocityY.toInt)
+    
     if (destination.pixelDistanceFast(opponent.vanguard) < vanguard.pixelDistanceFast(opponent.vanguard))
       output.add(Tactics.Movement.Charge)
     else if (destination.pixelDistanceFast(opponent.vanguard) > vanguard.pixelDistanceFast(opponent.vanguard))
@@ -45,8 +46,8 @@ class BattleGroup(val units:Vector[UnitInfo]) {
       output.add(Tactics.Wounded.Fight)
     
     val workers = visibleUnits.filter(_.unitClass.isWorker)
-    val fightingWorkers = workers.filter(worker => worker.target.exists(target => target.isEnemyOf(worker)))
-    val fleeingWorkers = workers.filter(_.target.isEmpty)
+    val fightingWorkers = workers.filter(worker =>   worker.isBeingViolent || worker.repairing)
+    val fleeingWorkers  = workers.filter(worker => ! worker.isBeingViolent && ! worker.gathering)
     if (fightingWorkers.size > workers.size * 0.75)
       output.add(Tactics.Workers.FightAll)
     else if (fightingWorkers.size > 0)

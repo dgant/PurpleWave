@@ -54,9 +54,9 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
     _unitClass  = UnitClasses.get(base.getType)
   }
   
-  private var _lastSeen           : Int         = 0
-  private var _player             : PlayerInfo  = null
-  private var _possiblyStillThere : Boolean     = false
+  private var _lastSeen           : Int         = _
+  private var _player             : PlayerInfo  = _
+  private var _possiblyStillThere : Boolean     = _
   private var _unitClass          : UnitClass   = UnitClasses.None
   
   def lastSeen           : Int        = _lastSeen
@@ -83,22 +83,21 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
     _initialResources       = base.getInitialResources
     _invincible             = base.isInvincible
     _resourcesLeft          = base.getResources
-    
     _energy                 = base.getEnergy
     _plagued                = base.isPlagued
     
   }
   
   private var _alive                  : Boolean   = true
-  private var _complete               : Boolean   = false
-  private var _defensiveMatrixPoints  : Int       = 0
-  private var _hitPoints              : Int       = 0
-  private var _initialResources       : Int       = 0
-  private var _invincible             : Boolean   = false
-  private var _resourcesLeft          : Int       = 0
-  private var _shieldPoints           : Int       = 0
-  private var _energy                 : Int       = 0
-  private var _plagued                : Boolean   = false
+  private var _complete               : Boolean   = _
+  private var _defensiveMatrixPoints  : Int       = _
+  private var _hitPoints              : Int       = _
+  private var _initialResources       : Int       = _
+  private var _invincible             : Boolean   = _
+  private var _resourcesLeft          : Int       = _
+  private var _shieldPoints           : Int       = _
+  private var _energy                 : Int       = _
+  private var _plagued                : Boolean   = _
   
   def alive                 : Boolean   = _alive
   def complete              : Boolean   = _complete
@@ -119,7 +118,6 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
   val scarabs       : Int = if (is(Protoss.Reaver))   5 else 0
   
   private def updateCombat() {
-    _attacking                = base.isAttacking
     _attackStarting           = base.isStartingAttack
     _attackAnimationHappening = base.isAttackFrame
     _airWeaponCooldownLeft    = base.getAirWeaponCooldown
@@ -127,19 +125,17 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
     _spellCooldownLeft        = base.getSpellCooldown
   }
   
-  var _attacking                : Boolean = false
-  var _attackStarting           : Boolean = false
-  var _attackAnimationHappening : Boolean = false
-  var _airWeaponCooldownLeft    : Int = 0
-  var _groundWeaponCooldownLeft : Int = 0
-  var _spellCooldownLeft        : Int = 0
+  var _attackStarting           : Boolean = _
+  var _attackAnimationHappening : Boolean = _
+  var _airWeaponCooldownLeft    : Int     = _
+  var _groundWeaponCooldownLeft : Int     = _
+  var _spellCooldownLeft        : Int     = _
   
-  def attacking                 : Boolean = _attacking
   def attackStarting            : Boolean = _attackStarting
   def attackAnimationHappening  : Boolean = _attackAnimationHappening
   def airCooldownLeft           : Int     = _airWeaponCooldownLeft
   def groundCooldownLeft        : Int     = _groundWeaponCooldownLeft
-  def spellCooldownLeft         : Int     =  _spellCooldownLeft
+  def spellCooldownLeft         : Int     = _spellCooldownLeft
   
   //////////////
   // Geometry //
@@ -156,10 +152,10 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
   
   private var _pixelCenter : Pixel  = Pixel(0, 0)
   private var _tileTopLeft : Tile   = new Tile(0, 0)
-  private var _top         : Int    = 0
-  private var _left        : Int    = 0
-  private var _right       : Int    = 0
-  private var _bottom      : Int    = 0
+  private var _top         : Int    = _
+  private var _left        : Int    = _
+  private var _right       : Int    = _
+  private var _bottom      : Int    = _
   
   def pixelCenter : Pixel   = _pixelCenter
   def tileTopLeft : Tile    = _tileTopLeft
@@ -179,14 +175,27 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
     _orderTargetPosition  = base.getOrderTargetPosition
     _gatheringMinerals    = base.isGatheringMinerals
     _gatheringGas         = base.isGatheringGas
+    _attacking            = base.isAttacking
+    _constructing         = base.isConstructing
+    _following            = base.isFollowing
+    _holdingPosition      = base.isHoldingPosition
+    _idle                 = base.isIdle
+    _interruptible        = base.isInterruptible
+    _morphing             = base.isMorphing
+    _repairing            = base.isRepairing
+    _researching          = base.isResearching
+    _patrolling           = base.isPatrolling
+    _startingAttack       = base.isStartingAttack
+    _training             = base.isTraining
+    _upgrading            = base.isUpgrading
   }
   
-  private var _target               : bwapi.Unit  = null
+  private var _target               : bwapi.Unit  = _
   private var _targetPosition       : Position    = Position.None
-  private var _orderTarget          : bwapi.Unit  = null
+  private var _orderTarget          : bwapi.Unit  = _
   private var _orderTargetPosition  : Position    = Position.None
-  private var _gatheringMinerals    : Boolean     = false
-  private var _gatheringGas         : Boolean     = false
+  private var _gatheringMinerals    : Boolean     = _
+  private var _gatheringGas         : Boolean     = _
   
   private val badPositions = Vector(Position.Invalid, Position.None, Position.Unknown, null)
   def target           : Option[UnitInfo]  = if (_target == null) None else With.units.get(_target)
@@ -197,22 +206,33 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
   def gatheringMinerals   : Boolean = base.isGatheringMinerals
   def gatheringGas        : Boolean = base.isGatheringGas
   
-  /*
-  def attacking:Boolean
-  def attackFrame:Boolean
-  def constructing:Boolean
-  def following:Boolean
-  def holdingPixel:Boolean
-  def idle:Boolean
-  def interruptible:Boolean
-  def morphing:Boolean
-  def repairing:Boolean
-  def researching:Boolean
-  def patrolling:Boolean
-  def startingAttack:Boolean
-  def training:Boolean
-  def upgrading:Boolean
-  */
+  private var _attacking        : Boolean = _
+  private var _constructing     : Boolean = _
+  private var _following        : Boolean = _
+  private var _holdingPosition  : Boolean = _
+  private var _idle             : Boolean = _
+  private var _interruptible    : Boolean = _
+  private var _morphing         : Boolean = _
+  private var _repairing        : Boolean = _
+  private var _researching      : Boolean = _
+  private var _patrolling       : Boolean = _
+  private var _startingAttack   : Boolean = _
+  private var _training         : Boolean = _
+  private var _upgrading        : Boolean = _
+  
+  def attacking       : Boolean = _attacking
+  def constructing    : Boolean = _constructing
+  def following       : Boolean = _following
+  def holdingPosition : Boolean = _holdingPosition
+  def idle            : Boolean = _idle
+  def interruptible   : Boolean = _interruptible
+  def morphing        : Boolean = _morphing
+  def repairing       : Boolean = _repairing
+  def researching     : Boolean = _researching
+  def patrolling      : Boolean = _patrolling
+  def startingAttack  : Boolean = _startingAttack
+  def training        : Boolean = _training
+  def upgrading       : Boolean = _upgrading
   
   ////////////////
   // Visibility //
@@ -225,10 +245,10 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
     _visible  = base.isVisible
   }
   
-  private var _burrowed  : Boolean  = false
-  private var _cloaked   : Boolean  = false
-  private var _detected  : Boolean  = false
-  private var _visible   : Boolean  = false
+  private var _burrowed  : Boolean  = _
+  private var _cloaked   : Boolean  = _
+  private var _detected  : Boolean  = _
+  private var _visible   : Boolean  = _
   
   def burrowed  : Boolean = _burrowed
   def cloaked   : Boolean = _cloaked
@@ -256,20 +276,20 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
     _velocityY    = base.getVelocityY
   }
   
-  private var _accelerating   : Boolean  = false
-  private var _angle          : Double   = 0.0
-  private var _braking        : Boolean  = false
-  private var _ensnared       : Boolean  = false
-  private var _flying         : Boolean  = false
-  private var _lifted         : Boolean  = false
-  private var _lockedDown     : Boolean = false
-  private var _maelstrommed   : Boolean  = false
-  private var _sieged         : Boolean  = false
-  private var _stasised       : Boolean  = false
-  private var _stimmed        : Boolean  = false
-  private var _stuck          : Boolean  = false
-  private var _velocityX      : Double   = 0.0
-  private var _velocityY      : Double   = 0.0
+  private var _accelerating   : Boolean   = _
+  private var _angle          : Double    = _
+  private var _braking        : Boolean   = _
+  private var _ensnared       : Boolean   = _
+  private var _flying         : Boolean   = _
+  private var _lifted         : Boolean   = _
+  private var _lockedDown     : Boolean   = _
+  private var _maelstrommed   : Boolean   = _
+  private var _sieged         : Boolean   = _
+  private var _stasised       : Boolean   = _
+  private var _stimmed        : Boolean   = _
+  private var _stuck          : Boolean   = _
+  private var _velocityX      : Double    = _
+  private var _velocityY      : Double    = _
   
   def accelerating  : Boolean = _accelerating
   def angle         : Double  = _angle
@@ -306,19 +326,19 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
     _underStorm         = base.isUnderStorm
   }
   
-  private var _beingConstructed   : Boolean = false
-  private var _beingGathered      : Boolean = false
-  private var _beingHealed        : Boolean = false
-  private var _blind              : Boolean = false
-  private var _carryingMinerals   : Boolean = false
-  private var _carryingGas        : Boolean = false
-  private var _powered            : Boolean = false
-  private var _selected           : Boolean = false
-  private var _targetable         : Boolean = false
-  private var _underAttack        : Boolean = false
-  private var _underDarkSwarm     : Boolean = false
-  private var _underDisruptionWeb : Boolean = false
-  private var _underStorm         : Boolean = false
+  private var _beingConstructed   : Boolean = _
+  private var _beingGathered      : Boolean = _
+  private var _beingHealed        : Boolean = _
+  private var _blind              : Boolean = _
+  private var _carryingMinerals   : Boolean = _
+  private var _carryingGas        : Boolean = _
+  private var _powered            : Boolean = _
+  private var _selected           : Boolean = _
+  private var _targetable         : Boolean = _
+  private var _underAttack        : Boolean = _
+  private var _underDarkSwarm     : Boolean = _
+  private var _underDisruptionWeb : Boolean = _
+  private var _underStorm         : Boolean = _
   
   def beingConstructed   : Boolean = _beingConstructed
   def beingGathered      : Boolean = _beingGathered

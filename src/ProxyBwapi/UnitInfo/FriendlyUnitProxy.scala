@@ -64,18 +64,17 @@ abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
   def interceptors : Int = interceptorCountCache.get
   def scarabs      : Int = scarabCountCache.get
   
-  def attacking                 : Boolean = base.isAttacking
   def attackStarting            : Boolean = base.isStartingAttack
   def attackAnimationHappening  : Boolean = base.isAttackFrame
   def airCooldownLeft           : Int     = airCooldownLeftCache.get
   def groundCooldownLeft        : Int     = groundCooldownLeftCache.get
   def spellCooldownLeft         : Int     = spellCooldownLeftCache.get
   
-  private val interceptorCountCache = new CacheFrame(() => base.getInterceptorCount)
-  private val scarabCountCache = new CacheFrame(() => base.getScarabCount)
-  private val airCooldownLeftCache = new CacheFrame(() => base.getAirWeaponCooldown)
+  private val interceptorCountCache   = new CacheFrame(() => base.getInterceptorCount)
+  private val scarabCountCache        = new CacheFrame(() => base.getScarabCount)
+  private val airCooldownLeftCache    = new CacheFrame(() => base.getAirWeaponCooldown)
   private val groundCooldownLeftCache = new CacheFrame(() => base.getGroundWeaponCooldown)
-  private val spellCooldownLeftCache = new CacheFrame(() => base.getSpellCooldown)
+  private val spellCooldownLeftCache  = new CacheFrame(() => base.getSpellCooldown)
   
   //////////////
   // Geometry //
@@ -92,41 +91,54 @@ abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
   // Orders //
   ////////////
   
-  def gatheringMinerals : Boolean = base.isGatheringMinerals
-  def gatheringGas      : Boolean = base.isGatheringGas
+  def gatheringMinerals : Boolean = isGatheringMineralsCache.get
+  def gatheringGas      : Boolean = isGatheringGasCache.get
+  
+  private val isGatheringMineralsCache  = new CacheFrame(() => base.isGatheringMinerals)
+  private val isGatheringGasCache       = new CacheFrame(() => base.isGatheringGas)
   
   private val badPositions = Vector(Position.Invalid, Position.None, Position.Unknown)
+  
   def target            : Option[UnitInfo]  = targetCache.get
-  def targetPixel       : Option[Pixel]     = { val position = base.getTargetPosition; if (badPositions.contains(position)) None else Some(new Pixel(position)) }
+  def targetPixel       : Option[Pixel]     = targetPixelCache.get
   def order             : Order             = base.getOrder
-  def orderTarget       : Option[UnitInfo]  = { val target = base.getOrderTarget; if (target == null) None else With.units.getId(target.getID) }
-  def orderTargetPixel  : Option[Pixel]     = { val position = base.getOrderTargetPosition; if (badPositions.contains(position)) None else Some(new Pixel(position)) }
+  def orderTarget       : Option[UnitInfo]  = orderTargetCache.get
+  def orderTargetPixel  : Option[Pixel]     = orderTargetPixelCache.get
   
-  private val targetCache = new CacheFrame(() => { val target = base.getTarget; if (target == null) None else With.units.getId(target.getID) })
+  private val orderTargetCache      = new CacheFrame(() => { val target   = base.getOrderTarget;          if (target == null)                   None else With.units.getId(target.getID) })
+  private val targetCache           = new CacheFrame(() => { val target   = base.getTarget;               if (target == null)                   None else With.units.getId(target.getID) })
+  private val targetPixelCache      = new CacheFrame(() => { val position = base.getTargetPosition;       if (badPositions.contains(position))  None else Some(new Pixel(position)) })
+  private val orderTargetPixelCache = new CacheFrame(() => { val position = base.getOrderTargetPosition;  if (badPositions.contains(position))  None else Some(new Pixel(position)) })
   
-  /*
-  def attacking:Boolean
-  def attackFrame:Boolean
-  def constructing:Boolean
-  def following:Boolean
-  def holdingPixel:Boolean
-  def idle:Boolean
-  def interruptible:Boolean
-  def morphing:Boolean
-  def repairing:Boolean
-  def researching:Boolean
-  def patrolling:Boolean
-  def startingAttack:Boolean
-  def training:Boolean
-  def upgrading:Boolean
-  */
+  def attacking       : Boolean = isAttackingCache.get
+  def constructing    : Boolean = isConstructingCache.get
+  def following       : Boolean = isFollowingCache.get
+  def holdingPosition : Boolean = isHoldingPositionCache.get
+  def idle            : Boolean = isIdleCache.get
+  def interruptible   : Boolean = isInterruptibleCache.get
+  def morphing        : Boolean = isMorphingCache.get
+  def repairing       : Boolean = isRepairingCache.get
+  def researching     : Boolean = isResearchingCache.get
+  def patrolling      : Boolean = isPatrollingCache.get
+  def training        : Boolean = isTrainingCache.get
+  def upgrading       : Boolean = isUpgradingCache.get
   
-  ///////////////////
-  // Friendly only //
-  ///////////////////
+  def command       :UnitCommand  = base.getLastCommand
+  def commandFrame  :Int          = base.getLastCommandFrame
   
-  def command:UnitCommand = base.getLastCommand
-  def commandFrame:Int = base.getLastCommandFrame
+  private val isAttackingCache        = new CacheFrame(() => base.isAttacking)
+  private val isConstructingCache     = new CacheFrame(() => base.isConstructing)
+  private val isFollowingCache        = new CacheFrame(() => base.isFollowing)
+  private val isHoldingPositionCache  = new CacheFrame(() => base.isHoldingPosition)
+  private val isIdleCache             = new CacheFrame(() => base.isIdle)
+  private val isInterruptibleCache    = new CacheFrame(() => base.isInterruptible)
+  private val isMorphingCache         = new CacheFrame(() => base.isMorphing)
+  private val isRepairingCache        = new CacheFrame(() => base.isRepairing)
+  private val isResearchingCache      = new CacheFrame(() => base.isResearching)
+  private val isPatrollingCache       = new CacheFrame(() => base.isPatrolling)
+  private val isTrainingCache         = new CacheFrame(() => base.isTraining)
+  private val isUpgradingCache        = new CacheFrame(() => base.isUpgrading)
+  
   def trainingQueue: Iterable[UnitClass] = trainingQueueCache.get
   
   private val trainingQueueCache = new CacheFrame(() => base.getTrainingQueue.asScala.map(UnitClasses.get))

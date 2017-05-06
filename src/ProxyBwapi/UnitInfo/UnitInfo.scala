@@ -100,20 +100,6 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   // Combat //
   ////////////
   
-  def isBeingViolent: Boolean = target.orElse(orderTarget).exists(isEnemyOf)
-  def isBeingViolentTo(victim:UnitInfo): Boolean =
-    isEnemyOf(victim) &&
-    canAttackThisSecond(victim) && (
-      //Are we attacking the victim?
-      target.orElse(orderTarget).contains(victim) ||
-      //Are we moving towards the victim?
-      targetPixel.orElse(orderTargetPixel).exists(destination =>
-        victim.pixelDistanceFast(
-          pixelCenter.project(
-            destination,
-            Math.min(topSpeed * With.configuration.microFrameLookahead, pixelDistanceFast(victim))))
-          < pixelRangeAgainst(victim)))
-  
   def melee:Boolean = unitClass.maxAirGroundRange <= 32 * 2
   
   //TODO: Account for upgrades. Make sure to handle case where unit has no armor upgrades
@@ -234,6 +220,26 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
     }
     else Int.MaxValue
   }
+  
+  ////////////
+  // Orders //
+  ////////////
+  
+  def gathering: Boolean = gatheringMinerals || gatheringGas
+  
+  def isBeingViolent: Boolean = attacking || target.orElse(orderTarget).exists(isEnemyOf)
+  def isBeingViolentTo(victim:UnitInfo): Boolean =
+    isEnemyOf(victim) &&
+      canAttackThisSecond(victim) && (
+      //Are we attacking the victim?
+      target.orElse(orderTarget).contains(victim) ||
+        //Are we moving towards the victim?
+        targetPixel.orElse(orderTargetPixel).exists(destination =>
+          victim.pixelDistanceFast(
+            pixelCenter.project(
+              destination,
+              Math.min(topSpeed * With.configuration.microFrameLookahead, pixelDistanceFast(victim))))
+            < pixelRangeAgainst(victim)))
   
   ////////////////
   // Visibility //

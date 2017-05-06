@@ -39,7 +39,6 @@ abstract class UnitProxy(var base:bwapi.Unit) {
   def interceptors:Int
   def scarabs:Int
   
-  def attacking:Boolean
   def attackStarting:Boolean
   def attackAnimationHappening:Boolean
   def airCooldownLeft:Int
@@ -69,12 +68,10 @@ abstract class UnitProxy(var base:bwapi.Unit) {
   def orderTarget:Option[UnitInfo]
   def orderTargetPixel:Option[Pixel]
   
-  /*
   def attacking:Boolean
-  def attackFrame:Boolean
   def constructing:Boolean
   def following:Boolean
-  def holdingPixel:Boolean
+  def holdingPosition:Boolean
   def idle:Boolean
   def interruptible:Boolean
   def morphing:Boolean
@@ -84,7 +81,6 @@ abstract class UnitProxy(var base:bwapi.Unit) {
   def startingAttack:Boolean
   def training:Boolean
   def upgrading:Boolean
-  */
   
   ////////////////
   // Visibility //

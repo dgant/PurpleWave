@@ -16,22 +16,25 @@ import scala.collection.mutable.ArrayBuffer
 
 object VisualizeBattles {
   
-  private val graphMargin         = Pixel(2, 2)
-  private val graphAreaStart      = Pixel(5,  18)
-  private val graphDimensions     = Pixel(90, 180 + 3 * Visualization.lineHeightSmall)
-  private val healthGraphStart    = graphAreaStart.add(graphMargin).add(0, Visualization.lineHeightSmall)
-  private val healthGraphEnd      = graphAreaStart.add(graphDimensions.x, 90 + Visualization.lineHeightSmall).subtract(graphMargin)
-  private val positionGraphStart  = graphAreaStart.add(0, 90 + Visualization.lineHeightSmall * 3).add(graphMargin)
-  private val positionGraphEnd    = graphAreaStart.add(graphDimensions).subtract(graphMargin)
-  private val tableHeader0        = Pixel(100, 18)
-  private val tableHeader1        = tableHeader0.add(125, 0)
-  private val tableStart0         = tableHeader0.add(0, 25)
-  private val tableStart1         = tableHeader1.add(0, 25)
-  private val army0               = Pixel(438, 18)
-  private val army1               = Pixel(521, 18)
-  private val army2               = Pixel(589, 18)
-  private val yolo                = Pixel(5, 5)
-  private val tacticsRanks        = Pixel(235, 18)
+  private val graphMargin             = Pixel(2, 2)
+  private val graphDimensions         = Pixel(90, 90 + Visualization.lineHeightSmall)
+  private val healthGraphAreaStart    = Pixel(5,  18)
+  private val healthGraphAreaEnd      = healthGraphAreaStart.add(graphDimensions)
+  private val healthGraphStart        = healthGraphAreaStart.add(graphMargin).add(0, Visualization.lineHeightSmall)
+  private val healthGraphEnd          = healthGraphAreaEnd.subtract(graphMargin)
+  private val positionGraphAreaStart  = Pixel(healthGraphStart.x, healthGraphEnd.y + Visualization.lineHeightSmall)
+  private val positionGraphAreaEnd    = positionGraphAreaStart.add(graphDimensions)
+  private val positionGraphStart      = positionGraphAreaStart.add(graphMargin).add(0, Visualization.lineHeightSmall)
+  private val positionGraphEnd        = positionGraphAreaEnd.subtract(graphMargin)
+  private val tableHeader0            = Pixel(100, 18)
+  private val tableHeader1            = tableHeader0.add(125, 0)
+  private val tableStart0             = tableHeader0.add(0, 25)
+  private val tableStart1             = tableHeader1.add(0, 25)
+  private val army0                   = Pixel(438, 18)
+  private val army1                   = Pixel(521, 18)
+  private val army2                   = Pixel(589, 18)
+  private val yolo                    = Pixel(5, 5)
+  private val tacticsRanks            = Pixel(235, 18)
   
   def render() {
     With.game.drawTextScreen(army0.bwapi, "Overall:")
@@ -78,20 +81,13 @@ object VisualizeBattles {
     With.game.setTextSize(bwapi.Text.Size.Enum.Small)
     
     if (estimation.statesUs.size < 2) return
-    
-    With.game.drawBoxScreen(graphAreaStart.bwapi,     graphAreaStart.add(graphDimensions).bwapi,  Color.Black, true)
-    With.game.drawBoxScreen(healthGraphStart.bwapi,   healthGraphEnd.bwapi,                       Colors.DarkGray)
-    With.game.drawBoxScreen(positionGraphStart.bwapi, positionGraphEnd.bwapi,                     Colors.DarkGray)
-    
-    With.game.drawTextScreen(healthGraphStart   .subtract(0, Visualization.lineHeightSmall).bwapi, "Health:")
-    With.game.drawTextScreen(positionGraphStart .subtract(0, Visualization.lineHeightSmall).bwapi, "Position:")
+  
+    drawHealthGraph(estimation.statesUs,     With.self)
+    drawHealthGraph(estimation.statesEnemy,  With.enemies.head)
     
     val allStates = estimation.statesUs ++ estimation.statesEnemy
     val xMin      = allStates.map(state => state.x - state.spread).min
     val xMax      = allStates.map(state => state.x + state.spread).max
-    
-    drawHealthGraph(estimation.statesUs,     With.self)
-    drawHealthGraph(estimation.statesEnemy,  With.enemies.head)
     
     drawPositionGraph(estimation.statesUs,     xMin, xMax, With.self)
     drawPositionGraph(estimation.statesEnemy,  xMin, xMax, With.enemies.head)
@@ -100,6 +96,10 @@ object VisualizeBattles {
   def drawHealthGraph(
     states: ArrayBuffer[BattleEstimationState],
     player: PlayerInfo) {
+  
+    With.game.drawBoxScreen(healthGraphAreaStart.bwapi, healthGraphAreaEnd.bwapi,  Color.Black, true)
+    With.game.drawBoxScreen(healthGraphStart.bwapi,     healthGraphEnd.bwapi,      Colors.DarkGray)
+    With.game.drawTextScreen(healthGraphStart.subtract(0, Visualization.lineHeightSmall).bwapi, "Health:")
   
     val valueMax = states.head.avatar.totalHealth
     val xScale  = (healthGraphEnd.x - healthGraphStart.x - 2 * graphMargin.x) / (states.size - 1).toDouble
@@ -121,7 +121,11 @@ object VisualizeBattles {
     xMin    : Double,
     xMax    : Double,
     player  : PlayerInfo) {
-    
+  
+    With.game.drawBoxScreen(positionGraphAreaStart.bwapi, positionGraphAreaEnd.bwapi,  Color.Black, true)
+    With.game.drawBoxScreen(positionGraphStart.bwapi,     positionGraphEnd.bwapi,      Colors.DarkGray)
+    With.game.drawTextScreen(positionGraphStart.subtract(0, Visualization.lineHeightSmall).bwapi, "Position:")
+  
     val colorMedium = player.colorMedium
     val colorNeon   = player.colorNeon
     val xScale      = (positionGraphEnd.x - positionGraphStart.x - 2 * graphMargin.x) / (states.size - 1).toDouble
@@ -131,8 +135,8 @@ object VisualizeBattles {
     while (i < states.size - 1) {
       val xStart    = graphMargin.x + positionGraphStart.x + (xScale *  i     ).toInt
       val xEnd      = graphMargin.x + positionGraphStart.x + (xScale * (i + 1)).toInt
-      val yMiddle0  = graphMargin.y + positionGraphStart.y + (yScale * (graphAreaStart.y + states(i  ).x - xMin)).toInt
-      val yMiddle1  = graphMargin.y + positionGraphStart.y + (yScale * (graphAreaStart.y + states(i+1).x - xMin)).toInt
+      val yMiddle0  = graphMargin.y + positionGraphStart.y + (yScale * (healthGraphAreaStart.y + states(i  ).x - xMin)).toInt
+      val yMiddle1  = graphMargin.y + positionGraphStart.y + (yScale * (healthGraphAreaStart.y + states(i+1).x - xMin)).toInt
       val ySpread0  = (yScale * states(i  ).spread).toInt
       val ySpread1  = (yScale * states(i+1).spread).toInt
       With.game.drawLineScreen(xStart, yMiddle0 - ySpread0, xEnd, yMiddle1 - ySpread1, colorMedium)

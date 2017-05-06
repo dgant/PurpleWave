@@ -46,7 +46,9 @@ class Scheduler {
   private def getUnfulfilledBuildables(
     request:BuildRequest,
     unitsWanted:CountMap[UnitClass],
-    unitsActual:CountMap[UnitClass]):Iterable[Buildable] = {
+    unitsActual:CountMap[UnitClass])
+      : Iterable[Buildable] = {
+    
     if (request.buildable.upgradeOption.nonEmpty) {
       if(With.self.getUpgradeLevel(request.buildable.upgradeOption.get) < request.buildable.upgradeLevel)
         return Vector(request.buildable)
@@ -62,8 +64,8 @@ class Scheduler {
     else {
       val unit = request.buildable.unitOption.get
       val differenceBefore = Math.max(0, unitsWanted(unit) - unitsActual(unit))
-      unitsWanted.add(unit, unitsActual(unit) + request.add)
-      unitsWanted.put(unit, Math.max(request.require, unitsWanted(unit)))
+      unitsWanted.put(unit, Math.max(unitsWanted(unit), unitsActual(unit) + request.add))
+      unitsWanted.put(unit, Math.max(unitsWanted(unit), request.require))
       val differenceAfter = unitsWanted(unit) - unitsActual(unit)
       val differenceChange = differenceAfter - differenceBefore
       if (differenceChange > 0) {

@@ -98,11 +98,11 @@ object VisualizeBattles {
   }
   
   def drawHealthGraph(
-                       states: ArrayBuffer[BattleEstimationState],
-                       player: PlayerInfo) {
+    states: ArrayBuffer[BattleEstimationState],
+    player: PlayerInfo) {
   
     val valueMax = states.head.avatar.totalHealth
-    val xScale  = (healthGraphEnd.x - healthGraphStart.x - 2 * graphMargin.x) / states.size.toDouble
+    val xScale  = (healthGraphEnd.x - healthGraphStart.x - 2 * graphMargin.x) / (states.size - 1).toDouble
     val yScale  = (healthGraphEnd.y - healthGraphStart.y - 2 * graphMargin.y) / valueMax
   
     var i = 0
@@ -117,14 +117,14 @@ object VisualizeBattles {
   }
   
   def drawPositionGraph(
-                         states  : ArrayBuffer[BattleEstimationState],
-                         xMin    : Double,
-                         xMax    : Double,
-                         player  : PlayerInfo) {
+    states  : ArrayBuffer[BattleEstimationState],
+    xMin    : Double,
+    xMax    : Double,
+    player  : PlayerInfo) {
     
     val colorMedium = player.colorMedium
     val colorNeon   = player.colorNeon
-    val xScale      = (positionGraphEnd.x - positionGraphStart.x - 2 * graphMargin.x) / states.size.toDouble
+    val xScale      = (positionGraphEnd.x - positionGraphStart.x - 2 * graphMargin.x) / (states.size - 1).toDouble
     val yScale      = (positionGraphEnd.y - positionGraphStart.y - 2 * graphMargin.y) / (xMax - xMin)
     
     var i = 0

@@ -17,7 +17,7 @@ class TrainGatewayUnitsContinuously extends Plan {
     gateways
       .filter(_.trainingQueue.nonEmpty)
       .map(_.trainingQueue.head)
-      .foreach(unitInTraining => requests.append(new RequestUnitAnotherOne(unitInTraining)))
+      .foreach(unitInTraining => requests.append(RequestUnitAnotherOne(unitInTraining)))
     
     val capacity = Math.max(0, gateways.size - requests.size)
     val dragoons =
@@ -25,8 +25,8 @@ class TrainGatewayUnitsContinuously extends Plan {
         Math.min(capacity, With.self.gas / 50)
       else 0
     val zealots = Math.max(0, capacity - dragoons)
-    requests.append(new RequestUnitAnother(dragoons,  Protoss.Dragoon))
-    requests.append(new RequestUnitAnother(zealots,   Protoss.Zealot))
+    requests.append(RequestUnitAnother(dragoons,  Protoss.Dragoon))
+    requests.append(RequestUnitAnother(zealots,   Protoss.Zealot))
     
     With.scheduler.request(this, requests)
   }

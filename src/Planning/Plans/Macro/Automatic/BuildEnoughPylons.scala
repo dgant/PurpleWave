@@ -41,7 +41,7 @@ class BuildEnoughPylons extends Plan {
     val currentSupplyUsed         = With.self.supplyUsed
     val unitSpendingRatio         = if (With.geography.ourBases.size < 3) 0.5 else 0.75 //This is the metric that needs the most improvement
     val costPerUnitSupply         = 50.0 / 2 //Assume 50 minerals = 1 supply (then divide by two because 1 supply = 2 BWAPI supply)
-    val depotCompletionFrames     = Protoss.Pylon.buildTime + 24 * 5 //Add a few seconds to account for builder transit time (and Pylon finishing time)
+    val depotCompletionFrames     = Protoss.Pylon.buildFrames + 24 * 5 //Add a few seconds to account for builder transit time (and Pylon finishing time)
     val incomePerFrame            = With.economy.ourIncomePerFrameMinerals + With.economy.ourIncomePerFrameGas
     val supplyUsedPerFrame        = incomePerFrame * unitSpendingRatio / costPerUnitSupply
   

@@ -2,6 +2,7 @@ package Information.Geography.Calculations
 
 import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
+import ProxyBwapi.Races.Protoss
 import Utilities.EnrichPixel._
 
 object ZoneUpdater {
@@ -35,7 +36,7 @@ object ZoneUpdater {
   
   private def updateOwner(base: Base) {
     base.zone.owner = base.townHall.map(_.player).getOrElse(With.neutral)
-    if (base.zone.owner == With.neutral && base.lastScoutedFrame < With.frame) {
+    if (base.zone.owner == With.neutral && base.lastScoutedFrame < With.frame - Protoss.Nexus.buildFrames) {
       With.units.enemy
         .find(unit => ! unit.flying && unit.unitClass.isBuilding && unit.pixelCenter.zone == base.zone)
         .foreach(enemyUnit => base.zone.owner = enemyUnit.player)

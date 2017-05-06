@@ -4,6 +4,7 @@ import Information.Battles.BattleTypes.Battle
 import Information.Battles.TacticsTypes.{Tactics, TacticsOptions}
 import Lifecycle.With
 import Mathematics.PurpleMath
+import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
 
 import scala.collection.mutable
@@ -29,6 +30,7 @@ class BattleEstimation(
   }
   
   def addUnit(unit: UnitInfo) {
+    if ( ! eligible(unit)) return
     if (unit.isFriendly) {
       unitsOurs.put(unit, new BattleEstimationUnit(unit, tacticsUs, battle, battle.map(_.us), considerGeometry))
       avatarUs.add(unitsOurs(unit))
@@ -40,19 +42,26 @@ class BattleEstimation(
   }
   
   def removeUnit(unit: UnitInfo) {
-    if (unit.isFriendly) {
+    unitsOurs.get(unit).foreach(unitProxy => {
       avatarUs.remove(unitsOurs(unit))
       unitsOurs.remove(unit)
-    }
-    else {
+    })
+    unitsEnemy.get(unit).foreach(unitProxy => {
       avatarEnemy.remove(unitsEnemy(unit))
       unitsEnemy.remove(unit)
-    }
+    })
   }
   
   def updateUnit(unit: UnitInfo) {
     removeUnit(unit)
     addUnit(unit)
+  }
+  
+  def eligible(unit:UnitInfo):Boolean = {
+    if (unit.unitClass.isBuilding && ! unit.unitClass.helpsInCombat) return false
+    if (unit.is(Protoss.Scarab))      return false
+    if (unit.is(Protoss.Interceptor)) return false
+    true
   }
   
   /////////////////
@@ -68,8 +77,8 @@ class BattleEstimation(
     
     val frameStep   = 24
     val frames      = frameStep * 12
-    var stateUs     = BattleEstimationState(avatarUs,    tacticsUs,    -avatarUs.pixelsFromFocus,    avatarUs.pixelsFromCentroid)
-    var stateEnemy  = BattleEstimationState(avatarEnemy, tacticsEnemy, avatarEnemy.pixelsFromFocus,  avatarEnemy.pixelsFromCentroid)
+    var stateUs     = BattleEstimationState(avatarUs,    tacticsUs,    -avatarUs.pixelsFromFocus    / avatarUs.totalUnits)
+    var stateEnemy  = BattleEstimationState(avatarEnemy, tacticsEnemy, avatarEnemy.pixelsFromFocus  / avatarEnemy.totalUnits)
     
     // Account for dropoff in damage as units die
     // Two levers affect how this works:
@@ -133,8 +142,8 @@ class BattleEstimation(
   }
   
   private def updateParticipation(
-                                   stateThis: BattleEstimationState,
-                                   stateThat: BattleEstimationState) {
+    stateThis: BattleEstimationState,
+    stateThat: BattleEstimationState) {
     
     val distance                  = Math.abs(stateThis.x - stateThat.x)
     val expectedSpread            = Math.sqrt(stateThis.avatar.totalUnits * 32.0)
@@ -146,9 +155,9 @@ class BattleEstimation(
   private def clampToOne(value:Double):Double = Math.max(0.0, Math.min(1.0, value))
   
   private def dealDamage(
-                          frameStep : Int,
-                          fromState : BattleEstimationState,
-                          toState   : BattleEstimationState)
+    frameStep : Int,
+    fromState : BattleEstimationState,
+    toState   : BattleEstimationState)
       : BattleEstimationState = {
     
     val output = toState.copy()

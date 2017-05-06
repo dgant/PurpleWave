@@ -11,7 +11,7 @@ case class BuildableUnit(val unit: UnitClass) extends Buildable {
   override def gas              : Int                 = unit.gasPrice
   override def supplyRequired   : Int                 = unit.supplyRequired
   override def supplyProvided   : Int                 = unit.supplyProvided
-  override def frames           : Int                 = unit.buildTime
+  override def frames           : Int                 = unit.buildFrames
   
   override lazy val buildersOccupied: Iterable[BuildableUnit] = {
     unit.buildUnitsBorrowed.map(BuildableUnit)

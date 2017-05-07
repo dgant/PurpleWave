@@ -30,17 +30,17 @@ object Visualization {
       if (With.configuration.visualizeRealEstate)         VisualizeRealEstate           .render()
       if (With.configuration.visualizeGrids)              VisualizeGrids                .render()
       if (With.configuration.visualizeBases)              VisualizeBases                .render()
-      if (With.configuration.visualizeBattles)            VisualizeBattles              .render()
       if (With.configuration.visualizeUnitsForeign)       VisualizeUnitsForeign         .render()
       if (With.configuration.visualizeUnitsOurs)          VisualizeUnitsOurs            .render()
       if (With.configuration.visualizeHitPoints)          VisualizeHitPoints            .render()
       if (With.configuration.visualizeHeuristicMovement)  VisualizeMovementHeuristics   .render()
       if (With.configuration.visualizeBullets)            VisualizeBullets              .render()
-      if (With.configuration.visualizeEconomy)            VisualizeEconomy              .render()
-      if (With.configuration.visualizePerformance)        VisualizePerformance          .render()
       if (With.configuration.visualizePlans)              VisualizePlans                .render()
+      if (With.configuration.visualizeBattles)            VisualizeBattles              .render()
+      if (With.configuration.visualizeEconomy)            VisualizeEconomy              .render()
       if (With.configuration.visualizeResources)          VisualizeResources            .render()
       if (With.configuration.visualizeScheduler)          VisualizeScheduler            .render()
+      if (With.configuration.visualizePerformance)        VisualizePerformance          .render()
       
     }
   }

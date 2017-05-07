@@ -86,8 +86,8 @@ object VisualizeBattles {
     drawHealthGraph(estimation.statesEnemy,  With.enemies.head)
     
     val allStates = estimation.statesUs ++ estimation.statesEnemy
-    val xMin      = allStates.map(state => state.x - state.spread).min
-    val xMax      = allStates.map(state => state.x + state.spread).max
+    val xMin = allStates.map(_.x).min
+    val xMax = allStates.map(_.x).max
     
     drawPositionGraph(estimation.statesUs,     xMin, xMax, With.self)
     drawPositionGraph(estimation.statesEnemy,  xMin, xMax, With.enemies.head)
@@ -109,8 +109,8 @@ object VisualizeBattles {
     while (i < states.size - 1) {
       val xBefore = graphMargin.x + healthGraphStart.x  + xScale * i
       val xAfter  = graphMargin.x + healthGraphStart.x  + xScale * (i + 1)
-      val yBefore = graphMargin.y + healthGraphEnd.y    - (states(i  ).avatar.totalHealth - states(i  ).damage) * yScale
-      val yAfter  = graphMargin.y + healthGraphEnd.y    - (states(i+1).avatar.totalHealth - states(i+1).damage) * yScale
+      val yBefore = graphMargin.y + healthGraphEnd.y    - (states(i  ).avatar.totalHealth - states(i  ).damageReceived) * yScale
+      val yAfter  = graphMargin.y + healthGraphEnd.y    - (states(i+1).avatar.totalHealth - states(i+1).damageReceived) * yScale
       With.game.drawLineScreen(xBefore.toInt, yBefore.toInt, xAfter.toInt, yAfter.toInt, player.colorNeon)
       i += 1
     }
@@ -137,10 +137,6 @@ object VisualizeBattles {
       val xEnd      = graphMargin.x + positionGraphStart.x + (xScale * (i + 1)).toInt
       val yMiddle0  = graphMargin.y + positionGraphStart.y + (yScale * (healthGraphAreaStart.y + states(i  ).x - xMin)).toInt
       val yMiddle1  = graphMargin.y + positionGraphStart.y + (yScale * (healthGraphAreaStart.y + states(i+1).x - xMin)).toInt
-      val ySpread0  = (yScale * states(i  ).spread).toInt
-      val ySpread1  = (yScale * states(i+1).spread).toInt
-      With.game.drawLineScreen(xStart, yMiddle0 - ySpread0, xEnd, yMiddle1 - ySpread1, colorMedium)
-      With.game.drawLineScreen(xStart, yMiddle0 + ySpread0, xEnd, yMiddle1 + ySpread1, colorMedium)
       With.game.drawLineScreen(xStart, yMiddle0,            xEnd, yMiddle1,            colorNeon)
       i += 1
     }

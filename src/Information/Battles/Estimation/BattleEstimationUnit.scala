@@ -14,10 +14,8 @@ class BattleEstimationUnit {
   //TODO: Account for splash dpf
   //TODO: Account for spells
   //TODO: Account for healing
-  //TODO: Account for combat positioning
   //TODO: Account for terrain positioning
   //TODO: Account for high ground
-  //TODO: Incorporate wounded-fleeing tactics
   
   var damageScaleGroundConcussive   = 0.0
   var damageScaleGroundExplosive    = 0.0
@@ -47,8 +45,7 @@ class BattleEstimationUnit {
   var speedPixelsPerFrame           = 0.0
   var rangePixelsAir                = 0.0
   var rangePixelsGround             = 0.0
-  var pixelsFromFocus               = 0.0
-  var pixelsFromCentroid            = 0.0
+  var pixelsFromEnemy               = 0.0
   
   def this(
     unit              : UnitInfo,
@@ -62,7 +59,7 @@ class BattleEstimationUnit {
     val fighting      = isFighter(unit, tactics)
     val fleeing       = isFleer(unit, tactics)
     val fightingBonus = if (fighting) 1.0 else 0.0
-    val fleeingBonus  = if (fleeing) 0.25 else 1.0
+    val fleeingBonus  = if (fleeing)  0.2 else 1.0
     val costPerFrame  = if (unit.unitClass.isWorker && (fighting || fleeing)) With.configuration.battleWorkerCostPerFrame else 0.0
     
     damageScaleGroundConcussive     = fleeingBonus * (if (   unit.flying) 0.0 else Damage.scaleBySize(DamageType.Concussive, unit.unitClass.size))
@@ -93,8 +90,16 @@ class BattleEstimationUnit {
     speedPixelsPerFrame             = unit.topSpeed
     rangePixelsAir                  = unit.pixelRangeAir
     rangePixelsGround               = unit.pixelRangeGround
-    pixelsFromFocus                 = if (considerGeometry) battle      .map(theBattle      => Math.max(0.0, unit.pixelDistanceTravelling(theBattle.focus)         - unit.pixelRangeMax)).sum else With.configuration.battleMarginPixels
-    pixelsFromCentroid              = if (considerGeometry) battleGroup .map(theBattleGroup => Math.max(0.0, unit.pixelDistanceTravelling(theBattleGroup.centroid) - unit.pixelRangeMax)).sum else 0.0
+    pixelsFromEnemy =
+      if (considerGeometry)
+        battleGroup
+          .map(group =>
+            Math.max(
+              0.0,
+              unit.pixelDistanceTravelling(group.opponent.vanguard) - unit.pixelRangeMax))
+          .sum
+      else
+        With.configuration.battleMarginPixels
   }
   
   def add(that:BattleEstimationUnit) {
@@ -126,8 +131,7 @@ class BattleEstimationUnit {
     speedPixelsPerFrame             += that.speedPixelsPerFrame
     rangePixelsAir                  += that.rangePixelsAir
     rangePixelsGround               += that.rangePixelsGround
-    pixelsFromFocus                 += that.pixelsFromFocus
-    pixelsFromCentroid              += that.pixelsFromCentroid
+    pixelsFromEnemy                 += that.pixelsFromEnemy
   }
   
   def remove(that:BattleEstimationUnit) {
@@ -159,34 +163,29 @@ class BattleEstimationUnit {
     speedPixelsPerFrame             -= that.speedPixelsPerFrame
     rangePixelsAir                  -= that.rangePixelsAir
     rangePixelsGround               -= that.rangePixelsGround
-    pixelsFromFocus                 -= that.pixelsFromFocus
-    pixelsFromCentroid              -= that.pixelsFromCentroid
+    pixelsFromEnemy                 -= that.pixelsFromEnemy
   }
   
   private def unfocusedPenalty(unit:UnitInfo):Double = if (unit.attacksAir && unit.attacksGround) 0.0 else 1.0
   
   //Hacky way to implement the "fight with half of all workers" tactic
-  private var acceptNextWorker:Boolean = false
+  private var acceptedLastWorker:Boolean = false
   
   private def isFighter(unit:UnitInfo, tactics:TacticsOptions):Boolean = {
-    if ( ! unit.alive) return false
-    if (unit.unitClass.isWorker) {
-      if (tactics.has(Tactics.Workers.FightAll)) {
-        return true
-      }
-      if (tactics.has(Tactics.Workers.FightHalf)) {
-        acceptNextWorker = ! acceptNextWorker
-        return acceptNextWorker
-      }
-      return false
+    if ( ! unit.aliveAndComplete)
+      false
+    else if (tactics.has(Tactics.Workers.FightAll) && unit.unitClass.isWorker)
+      true
+    else if (tactics.has(Tactics.Workers.FightHalf) && unit.unitClass.isWorker) {
+      acceptedLastWorker = ! acceptedLastWorker
+      acceptedLastWorker
     }
-    if (unit.wounded && tactics.has(Tactics.Wounded.Flee)) {
-      return false
-    }
-    if (tactics.has(Tactics.Movement.Flee)) {
-      return false
-    }
-    unit.unitClass.helpsInCombat
+    else if (tactics.has(Tactics.Movement.Flee))
+      false
+    else if (tactics.has(Tactics.Wounded.Flee) && unit.wounded)
+      false
+    else
+      unit.unitClass.helpsInCombat
   }
   
   private def isFleer(unit:UnitInfo, tactics:TacticsOptions):Boolean = {

@@ -3,7 +3,6 @@ package Information.Battles.Estimation
 import Information.Battles.BattleTypes.Battle
 import Information.Battles.TacticsTypes.{Tactics, TacticsOptions}
 import Lifecycle.With
-import Mathematics.PurpleMath
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
 
@@ -75,38 +74,59 @@ class BattleEstimation(
     
     if (avatarUs.totalUnits == 0 || avatarEnemy.totalUnits == 0) return
     
-    val frameStep   = 24
-    val frames      = frameStep * 12
-    var stateUs     = BattleEstimationState(avatarUs,    tacticsUs,    -avatarUs.pixelsFromFocus    / avatarUs.totalUnits)
-    var stateEnemy  = BattleEstimationState(avatarEnemy, tacticsEnemy, avatarEnemy.pixelsFromFocus  / avatarEnemy.totalUnits)
+    // Parameters
+    //
+    // frameStep helps us account for dropoff in damage as units die.
+    // Two levers affect how this works:
+    // * how we calculate # of living units. The current calculation assumes that all damage is focus fired (an overestimate of dropoff)
+    // * frameStep, which when larger reduces the impact of dropoff. Let's choose a big one (to balance the above with an underestimate of dropoff)
+    //
+    val frameStep = 24
+    val framesMax = frameStep * 12
+    
+    // Initial state
+    //
+    val meanDistanceUs    = avatarUs.pixelsFromEnemy     / avatarUs.totalUnits
+    val meanDistanceEnemy = avatarEnemy.pixelsFromEnemy   / avatarEnemy.totalUnits
+    val xUs               = -meanDistanceUs
+    val xEnemy            = meanDistanceEnemy
+    var stateUs           = BattleEstimationState(avatarUs,    tacticsUs,    xUs,     meanDistanceUs)
+    var stateEnemy        = BattleEstimationState(avatarEnemy, tacticsEnemy, xEnemy,  meanDistanceEnemy)
   
+    updateParticipation(stateUs,     stateEnemy)
+    updateParticipation(stateEnemy,  stateUs)
     if (With.configuration.visualizeBattles) {
       result.statesUs     += stateUs
       result.statesEnemy  += stateEnemy
     }
-    
-    // Account for dropoff in damage as units die
-    // Two levers affect how this works:
-    // * how we calculate # of living units. The current calculation assumes that all damage is focus fired (an overestimate of dropoff)
-    // * frameStep, which when larger reduces the impact of dropoff. Let's choose a big one (to balance the above with an underestimate of dropoff)
-    (0 to frames by frameStep).foreach(frame => {
-      if (stateUs.damage < avatarUs.totalHealth && stateEnemy.damage < avatarEnemy.totalHealth) {
+  
+    // Run the estimation!
+    //
+    (0 to framesMax by frameStep).foreach(frame => {
+      if (
+        stateUs.damageReceived    < avatarUs.totalHealth &&
+        stateEnemy.damageReceived < avatarEnemy.totalHealth) {
         
         result.frames = frame
         
+        // 1. Move
+        //
         var nextStateUs     = move(frameStep, stateUs,     stateEnemy)
         var nextStateEnemy  = move(frameStep, stateEnemy,  stateUs)
         stateUs     = nextStateUs
         stateEnemy  = nextStateEnemy
-        
         updateParticipation(stateUs,     stateEnemy)
         updateParticipation(stateEnemy,  stateUs)
         
+        // 2. Deal damage
+        //
         nextStateUs     = dealDamage(frameStep, stateEnemy, stateUs)
         nextStateEnemy  = dealDamage(frameStep, stateUs,    stateEnemy)
         stateUs     = nextStateUs
         stateEnemy  = nextStateEnemy
         
+        // 3. Log
+        //
         if (With.configuration.visualizeBattles) {
           result.statesUs     += stateUs
           result.statesEnemy  += stateEnemy
@@ -114,8 +134,8 @@ class BattleEstimation(
       }
     })
     
-    result.costToUs     = totalCost(frames, stateUs)
-    result.costToEnemy  = totalCost(frames, stateEnemy)
+    result.costToUs     = totalCost(framesMax, stateUs)
+    result.costToEnemy  = totalCost(framesMax, stateEnemy)
   }
   
   private def move(
@@ -131,13 +151,18 @@ class BattleEstimation(
       else if (stateThis.tactics.has(Tactics.Movement.Flee))    - signTowards(stateThis.x, stateThat.x) * 100.0
       else                                                      stateThis.x
     
-    val speedPixelsPerFrame = stateThis.avatar.speedPixelsPerFrame / stateThis.avatar.totalUnits
-    val distanceTravelled = Math.min(speedPixelsPerFrame * frameStep, Math.abs(xTarget - stateThis.x))
-    output.x += signTowards(stateThis.x, stateThat.x) * distanceTravelled
+    val regroupRate =
+      if      (stateThis.tactics.has(Tactics.Movement.Charge))  0.0
+      else if (stateThis.tactics.has(Tactics.Movement.Flee))    2.0
+      else                                                      1.0
     
-    val distanceRegrouped = Math.max(0.0, Math.min(stateThis.spread, 2 * (speedPixelsPerFrame - distanceTravelled)))
-    output.spread -= distanceRegrouped
+    val direction            = signTowards(stateThis.x, stateThat.x)
+    val speedPixelsPerFrame  = stateThis.avatar.speedPixelsPerFrame / stateThis.avatar.totalUnits
+    val distanceToOpponent   = Math.abs(xTarget - stateThis.x)
+    val distanceTravelled    = Math.min(distanceToOpponent, speedPixelsPerFrame * frameStep)
     
+    output.x                += direction * distanceTravelled
+    output.pixelsRegrouped  += regroupRate * speedPixelsPerFrame
     output
   }
   
@@ -150,14 +175,12 @@ class BattleEstimation(
     stateThis: BattleEstimationState,
     stateThat: BattleEstimationState) {
     
-    val distance                  = Math.abs(stateThis.x - stateThat.x)
-    val expectedSpread            = Math.sqrt(stateThis.avatar.totalUnits * 32.0)
-    val spreadFactor              = PurpleMath.clampToOne(expectedSpread / stateThis.spread)
-    stateThis.participationGround = spreadFactor * PurpleMath.nanToOne(PurpleMath.clampToOne(stateThis.avatar.rangePixelsGround / (distance - stateThis.spread)))
-    stateThis.participationAir    = spreadFactor * PurpleMath.nanToOne(PurpleMath.clampToOne(stateThis.avatar.rangePixelsAir    / (distance - stateThis.spread)))
+    stateThis.deaths                 = deaths(stateThis.avatar, stateThis.damageReceived)
+    stateThis.arrivedGroundShooters += stateThis.pixelsRegrouped + stateThis.avatar.rangePixelsGround / stateThis.pixelsAway
+    stateThis.arrivedAirShooters    += stateThis.pixelsRegrouped + stateThis.avatar.rangePixelsAir    / stateThis.pixelsAway
+    stateThis.arrivedGroundShooters  = Math.min(stateThis.avatar.totalUnits, stateThis.arrivedGroundShooters)
+    stateThis.arrivedAirShooters     = Math.min(stateThis.avatar.totalUnits, stateThis.arrivedAirShooters)
   }
-  
-  private def clampToOne(value:Double):Double = Math.max(0.0, Math.min(1.0, value))
   
   private def dealDamage(
     frameStep : Int,
@@ -167,34 +190,41 @@ class BattleEstimation(
     
     val output = toState.copy()
     
-    val from        = fromState.avatar
-    val to          = toState.avatar
-    val fromTactics = fromState.tactics
-    val ratioAlive  = livingUnitsRatio(fromState.avatar, fromState.damage)
-    val airFocus    = if (fromTactics.has(Tactics.Focus.Ground)) 0.0 else if (fromTactics.has(Tactics.Focus.Air)) 1.0 else to.totalFlyers / to.totalUnits
+    val from    = fromState.avatar
+    val to      = toState.avatar
+    val tactics = fromState.tactics
+    
+    val airFocus    = if (tactics.has(Tactics.Focus.Ground)) 0.0 else if (tactics.has(Tactics.Focus.Air)) 1.0 else to.totalFlyers / to.totalUnits
     val groundFocus = 1.0 - airFocus
+  
+    val unitsShootingGround = Math.max(0.0, fromState.arrivedGroundShooters - fromState.deaths)
+    val unitsShootingAir    = Math.max(0.0, fromState.arrivedAirShooters    - fromState.deaths)
     
-    val damagePerFrameTimesUnits =
-      to.damageScaleGroundConcussive  * fromState.participationGround * (from.dpfGroundConcussiveFocused + from.dpfGroundConcussiveUnfocused * groundFocus) +
-        to.damageScaleGroundExplosive   * fromState.participationGround * (from.dpfGroundExplosiveFocused  + from.dpfGroundExplosiveUnfocused  * groundFocus) +
-        to.damageScaleGroundNormal      * fromState.participationGround * (from.dpfGroundNormalFocused     + from.dpfGroundNormalUnfocused     * groundFocus) +
-        to.damageScaleAirConcussive     * fromState.participationAir    * (from.dpfAirConcussiveFocused    + from.dpfAirConcussiveUnfocused    * airFocus) +
-        to.damageScaleAirExplosive      * fromState.participationAir    * (from.dpfAirExplosiveFocused     + from.dpfAirExplosiveUnfocused     * airFocus) +
-        to.damageScaleAirNormal         * fromState.participationAir    * (from.dpfAirNormalFocused        + from.dpfAirNormalUnfocused        * airFocus)
+    val damagePerFramePerUnit =
+      to.damageScaleGroundConcussive  * unitsShootingGround * (from.dpfGroundConcussiveFocused + from.dpfGroundConcussiveUnfocused * groundFocus) +
+      to.damageScaleGroundExplosive   * unitsShootingGround * (from.dpfGroundExplosiveFocused  + from.dpfGroundExplosiveUnfocused  * groundFocus) +
+      to.damageScaleGroundNormal      * unitsShootingGround * (from.dpfGroundNormalFocused     + from.dpfGroundNormalUnfocused     * groundFocus) +
+      to.damageScaleAirConcussive     * unitsShootingAir    * (from.dpfAirConcussiveFocused    + from.dpfAirConcussiveUnfocused    * airFocus) +
+      to.damageScaleAirExplosive      * unitsShootingAir    * (from.dpfAirExplosiveFocused     + from.dpfAirExplosiveUnfocused     * airFocus) +
+      to.damageScaleAirNormal         * unitsShootingAir    * (from.dpfAirNormalFocused        + from.dpfAirNormalUnfocused        * airFocus)
     
-    output.damage += Math.min(
-      to.totalHealth - toState.damage,
-      damagePerFrameTimesUnits * frameStep * ratioAlive / to.totalUnits)
-    
+    output.damageReceived += damagePerFramePerUnit * frameStep / to.totalUnits
+    output.damageReceived = Math.min(output.damageReceived, toState.avatar.totalHealth)
     output
   }
   
-  private def livingUnitsRatio(avatar:BattleEstimationUnit, damage:Double):Double = {
-    Math.max(0.0, Math.ceil((avatar.totalHealth - damage) / avatar.totalHealth))
+  
+  // Examples:
+  // 1 unit,   99 damage,  100 hp = 0 deaths
+  // 2 units,  199 damage, 200 hp = 1 death
+  // 2 units,  99 damage,  200 hp = 0 deaths
+  //
+  private def deaths(avatar:BattleEstimationUnit, damage:Double):Double = {
+    Math.min(avatar.totalUnits, Math.floor(avatar.totalUnits * damage / avatar.totalHealth))
   }
   
   private def totalCost(frames: Int, state:BattleEstimationState) = {
     state.avatar.subjectiveValueCostPerFrame * frames +
-      state.avatar.subjectiveValue * state.damage / state.avatar.totalHealth
+      state.avatar.subjectiveValue * state.damageReceived / state.avatar.totalHealth
   }
 }

@@ -28,7 +28,7 @@ object With {
   var bank          : Bank                = null
   var camera        : AutoCamera          = null
   var configuration : Configuration       = null
-  var battles       : BattleClassifier             = null
+  var battles       : BattleClassifier    = null
   var executor      : Executor            = null
   var commander     : Commander           = null
   var economy       : Economy             = null
@@ -45,7 +45,7 @@ object With {
   var realEstate    : RealEstate          = null
   var recruiter     : Recruiter           = null
   var scheduler     : Scheduler           = null
-  var tasks       : AbstractTaskQueue         = null
+  var tasks         : AbstractTaskQueue   = null
   var units         : UnitTracker         = null
   var viewport      : Viewport            = null
   
@@ -53,15 +53,17 @@ object With {
   var neutral : PlayerInfo         = null
   var enemies : Vector[PlayerInfo] = null
   
-  var frame       : Int = 0
-  var mapWidth    : Int = 0
-  var mapHeight   : Int = 0
+  var frame     : Int = 0
+  var mapWidth  : Int = 0
+  var mapHeight : Int = 0
   
   def onFrame() {
     frame = With.game.getFrameCount
   }
   
   def onStart() {
+    With.game.setLatCom(false)
+    
     With.proxy                  = new ProxyBWMirror
     With.self                   = Players.get(With.game.self)
     With.neutral                = Players.get(With.game.neutral)
@@ -92,7 +94,7 @@ object With {
     With.tasks                  = new TaskQueueGlobal
     With.units                  = new UnitTracker
     With.viewport               = new Viewport
-  
+    
     With.game.enableFlag(1) //Enable unit control
     With.game.setLocalSpeed(With.configuration.gameSpeed)
   }

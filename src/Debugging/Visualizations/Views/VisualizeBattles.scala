@@ -82,13 +82,19 @@ object VisualizeBattles {
     
     if (estimation.statesUs.size < 2) return
   
+    With.game.drawBoxScreen(healthGraphAreaStart.bwapi, healthGraphAreaEnd.bwapi,  Color.Black, true)
+    With.game.drawBoxScreen(healthGraphStart.bwapi,     healthGraphEnd.bwapi,      Colors.DarkGray)
+    With.game.drawTextScreen(healthGraphStart.subtract(0, Visualization.lineHeightSmall).bwapi, "Health:")
     drawHealthGraph(estimation.statesUs,     With.self)
     drawHealthGraph(estimation.statesEnemy,  With.enemies.head)
     
     val allStates = estimation.statesUs ++ estimation.statesEnemy
     val xMin = allStates.map(_.x).min
     val xMax = allStates.map(_.x).max
-    
+  
+    With.game.drawBoxScreen(positionGraphAreaStart.bwapi, positionGraphAreaEnd.bwapi,  Color.Black, true)
+    With.game.drawBoxScreen(positionGraphStart.bwapi,     positionGraphEnd.bwapi,      Colors.DarkGray)
+    With.game.drawTextScreen(positionGraphStart.subtract(0, Visualization.lineHeightSmall).bwapi, "Position:")
     drawPositionGraph(estimation.statesUs,     xMin, xMax, With.self)
     drawPositionGraph(estimation.statesEnemy,  xMin, xMax, With.enemies.head)
   }
@@ -96,10 +102,6 @@ object VisualizeBattles {
   def drawHealthGraph(
     states: ArrayBuffer[BattleEstimationState],
     player: PlayerInfo) {
-  
-    With.game.drawBoxScreen(healthGraphAreaStart.bwapi, healthGraphAreaEnd.bwapi,  Color.Black, true)
-    With.game.drawBoxScreen(healthGraphStart.bwapi,     healthGraphEnd.bwapi,      Colors.DarkGray)
-    With.game.drawTextScreen(healthGraphStart.subtract(0, Visualization.lineHeightSmall).bwapi, "Health:")
   
     val valueMax = states.head.avatar.totalHealth
     val xScale  = (healthGraphEnd.x - healthGraphStart.x - 2 * graphMargin.x) / (states.size - 1).toDouble
@@ -122,9 +124,7 @@ object VisualizeBattles {
     xMax    : Double,
     player  : PlayerInfo) {
   
-    With.game.drawBoxScreen(positionGraphAreaStart.bwapi, positionGraphAreaEnd.bwapi,  Color.Black, true)
-    With.game.drawBoxScreen(positionGraphStart.bwapi,     positionGraphEnd.bwapi,      Colors.DarkGray)
-    With.game.drawTextScreen(positionGraphStart.subtract(0, Visualization.lineHeightSmall).bwapi, "Position:")
+    
   
     val colorMedium = player.colorMedium
     val colorNeon   = player.colorNeon

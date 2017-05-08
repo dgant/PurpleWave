@@ -18,7 +18,7 @@ class Configuration {
   var enableYolo                      = true
   var enableFastGroundDistance        = true
   var enablePathRecalculation         = true
-  var pathRecalculationDelayFrames    = 12
+  var pathRecalculationDelayFrames    = 48
   var woundedThresholdHealth          = 40
   var evaluateDangerousBases          = false
   

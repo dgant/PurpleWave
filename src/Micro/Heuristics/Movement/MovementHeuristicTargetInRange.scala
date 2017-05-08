@@ -2,20 +2,20 @@ package Micro.Heuristics.Movement
 
 import Mathematics.Heuristics.HeuristicMathMultiplicative
 import Mathematics.Pixels.Pixel
-import Micro.Intent.Intention
+import Micro.State.ExecutionState
 
 object MovementHeuristicTargetInRange extends MovementHeuristic {
   
-  override def evaluate(intent: Intention, candidate: Pixel): Double = {
+  override def evaluate(state: ExecutionState, candidate: Pixel): Double = {
   
-    if (intent.toAttack.isEmpty) return HeuristicMathMultiplicative.default
+    if (state.toAttack.isEmpty) return HeuristicMathMultiplicative.default
     
     HeuristicMathMultiplicative.fromBoolean(
-      intent.toAttack.get.pixelDistanceSquared(candidate) <
+      state.toAttack.get.pixelDistanceSquared(candidate) <
       Math.pow(
-        intent.unit.pixelRangeAgainst(intent.toAttack.get) +
-        intent.unit.unitClass.radialHypotenuse +
-        intent.toAttack.get.unitClass.radialHypotenuse,
+        state.unit.pixelRangeAgainst(state.toAttack.get) +
+        state.unit.unitClass.radialHypotenuse +
+        state.toAttack.get.unitClass.radialHypotenuse,
         2))
   }
 }

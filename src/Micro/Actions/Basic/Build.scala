@@ -2,15 +2,16 @@ package Micro.Actions.Basic
 
 import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Intent.Intention
+import Micro.State.ExecutionState
 
 object Build extends Action {
   
-  override def allowed(intent: Intention): Boolean = {
-    intent.toBuild.isDefined
+  override def allowed(state:ExecutionState): Boolean = {
+    state.intent.toBuild.isDefined &&
+    state.intent.toBuildTile.isDefined
   }
   
-  override def perform(intent: Intention) {
-    With.commander.build(intent.unit, intent.toBuild.get, intent.toBuildTile.get)
+  override def perform(state:ExecutionState) {
+    With.commander.build(state.unit, state.intent.toBuild.get, state.intent.toBuildTile.get)
   }
 }

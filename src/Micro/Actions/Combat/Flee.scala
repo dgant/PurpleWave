@@ -2,43 +2,43 @@ package Micro.Actions.Combat
 
 import Micro.Actions.Action
 import Micro.Actions.Commands.{Reposition, Travel}
-import Micro.Intent.Intention
+import Micro.State.ExecutionState
 
 object Flee extends Action {
   
-  override def allowed(intent: Intention) = {
-    intent.unit.canMoveThisFrame &&
-    intent.threats.nonEmpty
+  override def allowed(state:ExecutionState) = {
+    state.unit.canMoveThisFrame &&
+    state.threats.nonEmpty
   }
   
-  override def perform(intent: Intention) {
+  override def perform(state:ExecutionState) {
     
-    intent.canPursue = false
-    intent.destination = Some(intent.origin)
+    state.canPursue = false
+    state.toTravel  = Some(state.origin)
   
-    val enemyFaster = intent.threatsActive.exists(threat => threat.topSpeed > intent.unit.topSpeed)
-    val weAreFaster = intent.threatsActive.forall(threat => threat.topSpeed < intent.unit.topSpeed)
+    val enemyFaster = state.threatsActive.exists(threat => threat.topSpeed > state.unit.topSpeed)
+    val weAreFaster = state.threatsActive.forall(threat => threat.topSpeed < state.unit.topSpeed)
   
     // If the enemy is faster, go straight home so we don't get caught
     if (enemyFaster) {
-      Travel.delegate(intent)
+      Travel.delegate(state)
     }
   
     //If we're faster, we can be cuter with how we retreat
     if (weAreFaster) {
-      Reposition.delegate(intent)
+      Reposition.delegate(state)
     }
   
     // If we have a clear path home, then skip heuristic movement and just go.
-    val ourDistanceToOrigin = intent.unit.pixelDistanceTravelling(intent.origin) - 32.0
-    if (intent.threatsActive.forall(threat =>
+    val ourDistanceToOrigin = state.unit.pixelDistanceTravelling(state.origin) - 32.0
+    if (state.threatsActive.forall(threat =>
       ourDistanceToOrigin <= (
-        if (intent.unit.flying) threat.pixelDistanceFast(intent.origin) //Don't retreat directly over the enmy!
-        else                    threat.pixelDistanceTravelling(intent.origin)))) {
+        if (state.unit.flying) threat.pixelDistanceFast(state.origin) //Don't retreat directly over the enmy!
+        else                    threat.pixelDistanceTravelling(state.origin)))) {
     
-      Travel.delegate(intent)
+      Travel.delegate(state)
     }
   
-    Reposition.delegate(intent)
+    Reposition.delegate(state)
   }
 }

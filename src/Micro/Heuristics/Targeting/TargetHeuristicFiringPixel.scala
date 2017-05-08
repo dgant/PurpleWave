@@ -1,24 +1,22 @@
 package Micro.Heuristics.Targeting
 
 import Lifecycle.With
-import Micro.Intent.Intention
+import Micro.State.ExecutionState
 import ProxyBwapi.UnitInfo.UnitInfo
-import Utilities.EnrichPixel._
 
 object TargetHeuristicFiringPixel extends TargetHeuristic{
   
-  override def evaluate(intent: Intention, candidate: UnitInfo): Double = {
+  override def evaluate(state: ExecutionState, candidate: UnitInfo): Double = {
     
     val firingPixel =
-      intent.unit.pixelCenter
+      state.unit.pixelCenter
         .project(
           candidate.pixelCenter,
-          Math.max(0, intent.unit.pixelsFromEdgeFast(candidate) - intent.unit.pixelRangeAgainst(candidate)))
+          Math.max(0, state.unit.pixelsFromEdgeFast(candidate) - state.unit.pixelRangeAgainst(candidate)))
         .tileIncluding
     
-    val dpsExposure = With.grids.dpsEnemy.get(firingPixel, intent.unit)
+    val dpsExposure = With.grids.dpsEnemy.get(firingPixel, state.unit)
     
     dpsExposure
   }
-  
 }

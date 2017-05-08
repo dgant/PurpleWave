@@ -2,35 +2,35 @@ package Micro.Actions.Combat
 
 import Information.Battles.TacticsTypes.Tactics
 import Micro.Actions.Action
-import Micro.Intent.Intention
+import Micro.State.ExecutionState
 import Planning.Yolo
 
 object Collaborate extends Action {
   
-  override def perform(intent: Intention) {
+  override def perform(state:ExecutionState) {
     if ( ! Yolo.active) {
-      if (retreatArmy(intent)) {
-        Kite.consider(intent)
-        Flee.consider(intent)
+      if (retreatArmy(state)) {
+        Kite.consider(state)
+        Flee.consider(state)
       }
-      if (retreatWounded(intent)) {
-        Flee.consider(intent)
+      if (retreatWounded(state)) {
+        Flee.consider(state)
       }
-      if (retreatWorker(intent)) {
-        Flee.consider(intent)
+      if (retreatWorker(state)) {
+        Flee.consider(state)
       }
     }
     
-    Charge.consider(intent)
+    Charge.consider(state)
   }
   
-  private def retreatWorker   (intent:Intention):Boolean = workersFlee  (intent)  &&   isWorker(intent)
-  private def retreatWounded  (intent:Intention):Boolean = woundedFlee  (intent)  &&   isWounded(intent)
-  private def retreatArmy     (intent:Intention):Boolean = fightersFlee (intent)  && ! isWorker(intent)
+  private def retreatWorker   (state:ExecutionState):Boolean = workersFlee  (state)  &&   isWorker(state)
+  private def retreatWounded  (state:ExecutionState):Boolean = woundedFlee  (state)  &&   isWounded(state)
+  private def retreatArmy     (state:ExecutionState):Boolean = fightersFlee (state)  && ! isWorker(state)
   
-  private def fightersFlee  (intent:Intention)  : Boolean = intent.tactics.exists(_.has(Tactics.Movement.Flee))
-  private def woundedFlee   (intent:Intention)  : Boolean = intent.tactics.exists(_.has(Tactics.Wounded.Flee))
-  private def workersFlee   (intent:Intention)  : Boolean = intent.tactics.exists(_.has(Tactics.Workers.Flee))
-  private def isWounded     (intent:Intention)  : Boolean = intent.unit.wounded
-  private def isWorker      (intent:Intention)  : Boolean = intent.unit.unitClass.isWorker
+  private def fightersFlee  (state:ExecutionState)  : Boolean = state.tactics.exists(_.has(Tactics.Movement.Flee))
+  private def woundedFlee   (state:ExecutionState)  : Boolean = state.tactics.exists(_.has(Tactics.Wounded.Flee))
+  private def workersFlee   (state:ExecutionState)  : Boolean = state.tactics.exists(_.has(Tactics.Workers.Flee))
+  private def isWounded     (state:ExecutionState)  : Boolean = state.unit.wounded
+  private def isWorker      (state:ExecutionState)  : Boolean = state.unit.unitClass.isWorker
 }

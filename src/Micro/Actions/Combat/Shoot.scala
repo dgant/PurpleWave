@@ -3,19 +3,19 @@ package Micro.Actions.Combat
 import Micro.Actions.Action
 import Micro.Actions.Commands.Attack
 import Micro.Heuristics.Targeting.EvaluateTargets
-import Micro.Intent.Intention
+import Micro.State.ExecutionState
 
 object Shoot extends Action {
   
-  override def allowed(intent: Intention): Boolean = {
-    intent.canAttack &&
-    intent.toAttack.isEmpty &&
-    intent.unit.canAttackThisFrame &&
-    intent.targetsInRange.nonEmpty
+  override def allowed(state:ExecutionState): Boolean = {
+    state.canAttack &&
+    state.toAttack.isEmpty &&
+    state.unit.canAttackThisFrame &&
+    state.targetsInRange.nonEmpty
   }
   
-  override def perform(intent: Intention) {
-    intent.toAttack = EvaluateTargets.best(intent, intent.targetsInRange.filter(_.canAttackThisSecond(intent.unit)))
-    Attack.delegate(intent)
+  override def perform(state:ExecutionState) {
+    state.toAttack = EvaluateTargets.best(state, state.targetsInRange.filter(_.canAttackThisSecond(state.unit)))
+    Attack.delegate(state)
   }
 }

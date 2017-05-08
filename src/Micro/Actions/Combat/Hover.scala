@@ -2,22 +2,22 @@ package Micro.Actions.Combat
 
 import Micro.Actions.Action
 import Micro.Actions.Commands.Reposition
-import Micro.Intent.Intention
+import Micro.State.ExecutionState
 
 object Hover extends Action {
   
-  override def allowed(intent: Intention): Boolean = (
-    intent.unit.canMoveThisFrame
-    && intent.targets.nonEmpty
-    && intent.unit.pixelRangeMax > 32 * 3.0
+  override def allowed(state:ExecutionState): Boolean = (
+    state.unit.canMoveThisFrame
+    && state.targets.nonEmpty
+    && state.unit.pixelRangeMax > 32 * 3.0
   )
   
-  override def perform(intent: Intention) {
-    intent.canAttack = false
-    val threatTargets = intent.targets.filter(_.canAttackThisSecond(intent.unit))
+  override def perform(state:ExecutionState) {
+    state.canAttack = false
+    val threatTargets = state.targets.filter(_.canAttackThisSecond(state.unit))
     if (threatTargets.nonEmpty) {
-      intent.toAttack = Some(threatTargets.minBy(target => target.pixelDistanceFast(intent.unit) - target.pixelRangeAgainst(intent.unit)))
-      Reposition.delegate(intent)
+      state.toAttack = Some(threatTargets.minBy(target => target.pixelDistanceFast(state.unit) - target.pixelRangeAgainst(state.unit)))
+      Reposition.delegate(state)
     }
     
   }

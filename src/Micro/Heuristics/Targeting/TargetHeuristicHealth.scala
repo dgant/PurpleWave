@@ -1,11 +1,11 @@
 package Micro.Heuristics.Targeting
 
-import Micro.Intent.Intention
+import Micro.State.ExecutionState
 import ProxyBwapi.UnitInfo.UnitInfo
 
 object TargetHeuristicHealth extends TargetHeuristic{
   
-  override def evaluate(intent: Intention, candidate: UnitInfo): Double = {
+  override def evaluate(state: ExecutionState, candidate: UnitInfo): Double = {
     
     candidate.totalHealth
     

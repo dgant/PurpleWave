@@ -21,7 +21,7 @@ class Executor {
     if ( ! With.latency.isLastFrameOfTurn) return
     
     stateByUnit.keys.filterNot(_.alive).foreach(stateByUnit.remove)
-    stateByUnit.values.foreach(state => Idle.consider(state.intent))
+    stateByUnit.values.foreach(state => Idle.consider(state))
   }
   
   def getState(unit:FriendlyUnitInfo):ExecutionState = {

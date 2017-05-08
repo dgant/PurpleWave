@@ -2,20 +2,20 @@ package Micro.Actions.Basic
 
 import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Intent.Intention
+import Micro.State.ExecutionState
 import ProxyBwapi.Races.Protoss
 
 object ReloadInterceptors extends Action {
   
-  override def allowed(intent: Intention): Boolean =(
-    intent.unit.is(Protoss.Carrier)
+  override def allowed(state:ExecutionState): Boolean =(
+    state.unit.is(Protoss.Carrier)
     && With.self.minerals > Protoss.Interceptor.mineralPrice
-    && intent.unit.interceptors < 8
-    && intent.unit.trainingQueue.isEmpty
+    && state.unit.interceptors < 8
+    && state.unit.trainingQueue.isEmpty
     // TODO: Stop reloading if we're about to die
   )
   
-  override def perform(intent: Intention) {
-    With.commander.buildInterceptor(intent.unit)
+  override def perform(state:ExecutionState) {
+    With.commander.buildInterceptor(state.unit)
   }
 }

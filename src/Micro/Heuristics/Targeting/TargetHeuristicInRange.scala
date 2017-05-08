@@ -1,14 +1,14 @@
 package Micro.Heuristics.Targeting
 
 import Mathematics.Heuristics.HeuristicMathMultiplicative
-import Micro.Intent.Intention
+import Micro.State.ExecutionState
 import ProxyBwapi.UnitInfo.UnitInfo
 
 object TargetHeuristicInRange extends TargetHeuristic{
   
-  override def evaluate(intent: Intention, candidate: UnitInfo): Double = {
+  override def evaluate(state: ExecutionState, candidate: UnitInfo): Double = {
     
-    HeuristicMathMultiplicative.fromBoolean(intent.unit.inRangeToAttackFast(candidate))
+    HeuristicMathMultiplicative.fromBoolean(state.unit.inRangeToAttackFast(candidate))
     
   }
   

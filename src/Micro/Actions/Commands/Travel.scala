@@ -2,18 +2,18 @@ package Micro.Actions.Commands
 
 import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Intent.Intention
+import Micro.State.ExecutionState
 
 object Travel extends Action {
   
-  override def allowed(intent: Intention) = {
-    intent.unit.canMoveThisFrame &&
-    intent.destination.isDefined
+  override def allowed(state:ExecutionState) = {
+    state.unit.canMoveThisFrame &&
+    state.toTravel.isDefined
   }
   
-  override def perform(intent: Intention) {
-    val pixelToMove = intent.destination.get
-    intent.state.movingTo = Some(pixelToMove)
-    With.commander.move(intent.unit, pixelToMove)
+  override def perform(state:ExecutionState) {
+    val pixelToMove = state.toTravel.get
+    state.movingTo = Some(pixelToMove)
+    With.commander.move(state.unit, pixelToMove)
   }
 }

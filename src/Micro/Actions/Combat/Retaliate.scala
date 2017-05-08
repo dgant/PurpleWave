@@ -3,21 +3,21 @@ package Micro.Actions.Combat
 import Micro.Actions.Action
 import Micro.Actions.Commands.Attack
 import Micro.Heuristics.Targeting.EvaluateTargets
-import Micro.Intent.Intention
+import Micro.State.ExecutionState
 
 object Retaliate extends Action {
   
-  override def allowed(intent: Intention): Boolean = {
-    intent.canAttack &&
-    intent.canPursue &&
-    intent.toAttack.isEmpty &&
-    intent.unit.canMoveThisFrame &&
-    intent.targets.nonEmpty &&
-    intent.threatsActive.nonEmpty
+  override def allowed(state:ExecutionState): Boolean = {
+    state.canAttack &&
+    state.canPursue &&
+    state.toAttack.isEmpty &&
+    state.unit.canMoveThisFrame &&
+    state.targets.nonEmpty &&
+    state.threatsActive.nonEmpty
   }
   
-  override def perform(intent: Intention) {
-    intent.toAttack = EvaluateTargets.best(intent, intent.targets.intersect(intent.threatsActive))
-    Attack.delegate(intent)
+  override def perform(state:ExecutionState) {
+    state.toAttack = EvaluateTargets.best(state, state.targets.intersect(state.threatsActive))
+    Attack.delegate(state)
   }
 }

@@ -40,7 +40,7 @@ class ControlPixel extends Plan {
     if (units.get.satisfied) {
       //TODO: Dispatch only units capable of fighting an infiltrator
       
-      units.get.units.foreach(fighter => With.executor.intend(new Intention(this, fighter) { destination = Some(targetTile.pixelCenter) }))
+      units.get.units.foreach(fighter => With.executor.intend(new Intention(this, fighter) { toTravel = Some(targetTile.pixelCenter) }))
     }
   }
   

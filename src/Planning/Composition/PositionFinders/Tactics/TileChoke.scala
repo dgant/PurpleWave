@@ -18,7 +18,7 @@ class TileChoke extends TileFinder {
         zone.owner == With.self ||
         With.executor.states.exists(state =>
           state.intent.toBuild.nonEmpty &&
-          state.intent.destination.exists(_.zone == zone)))
+          state.intent.toTravel.exists(_.zone == zone)))
       .flatten(_.edges)
       .filter(edge => edge.zones.exists(_.owner != With.self))
     

@@ -30,7 +30,7 @@ class FindEnemyBase extends Plan {
   }
   
   private def orderScout(scout:FriendlyUnitInfo) =
-    With.executor.intend(new Intention(this, scout) { destination = getNextScoutingPixel; canAttack = ! scout.unitClass.isWorker })
+    With.executor.intend(new Intention(this, scout) { toTravel = getNextScoutingPixel; canAttack = ! scout.unitClass.isWorker })
   
   private def getNextScoutingPixel:Option[Pixel] =
     With.intelligence.leastScoutedBases

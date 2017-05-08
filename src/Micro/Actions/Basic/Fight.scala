@@ -2,20 +2,20 @@ package Micro.Actions.Basic
 
 import Micro.Actions.Action
 import Micro.Actions.Combat.{Kite, Shoot, _}
-import Micro.Intent.Intention
+import Micro.State.ExecutionState
 
 object Fight extends Action {
   
-  override def allowed(intent: Intention): Boolean = {
-    intent.unit.canMoveThisFrame || intent.unit.canAttackThisFrame
+  override def allowed(state:ExecutionState): Boolean = {
+    state.unit.canMoveThisFrame || state.unit.canAttackThisFrame
   }
   
-  override def perform(intent: Intention) {
-    Collaborate.consider(intent)
-    Kite.consider(intent)
-    Shoot.consider(intent)
-    Engage.consider(intent)
-    Retaliate.consider(intent)
-    Pursue.consider(intent)
+  override def perform(state:ExecutionState) {
+    Collaborate.consider(state)
+    Kite.consider(state)
+    Shoot.consider(state)
+    Engage.consider(state)
+    Retaliate.consider(state)
+    Pursue.consider(state)
   }
 }

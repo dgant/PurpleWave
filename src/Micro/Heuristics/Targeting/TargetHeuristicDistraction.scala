@@ -1,17 +1,17 @@
 package Micro.Heuristics.Targeting
 
 import Mathematics.Heuristics.HeuristicMathMultiplicative
-import Micro.Intent.Intention
+import Micro.State.ExecutionState
 import ProxyBwapi.UnitInfo.UnitInfo
 
 object TargetHeuristicDistraction extends TargetHeuristic{
   
-  override def evaluate(intent: Intention, candidate: UnitInfo): Double = {
+  override def evaluate(state: ExecutionState, candidate: UnitInfo): Double = {
   
-    if (intent.destination.isEmpty) return 1.0
+    if (state.toTravel.isEmpty) return 1.0
   
     HeuristicMathMultiplicative.fromBoolean(
-      candidate.pixelDistanceTravelling(intent.destination.get) >
-      intent.unit.pixelDistanceTravelling(intent.destination.get))
+      candidate.pixelDistanceTravelling(state.toTravel.get) >
+      state.unit.pixelDistanceTravelling(state.toTravel.get))
   }
 }

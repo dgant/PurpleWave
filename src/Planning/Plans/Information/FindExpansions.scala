@@ -29,7 +29,7 @@ class FindExpansions extends Plan {
   }
   
   private def orderScout(scout:FriendlyUnitInfo) =
-    With.executor.intend(new Intention(this, scout) { destination = getNextScoutingPixel })
+    With.executor.intend(new Intention(this, scout) { toTravel = getNextScoutingPixel })
   
   private def getNextScoutingPixel:Option[Pixel] =
     With.intelligence.leastScoutedBases

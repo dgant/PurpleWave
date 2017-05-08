@@ -3,25 +3,25 @@ package Micro.Actions.Combat
 import Micro.Actions.Action
 import Micro.Actions.Commands.Attack
 import Micro.Heuristics.Targeting.EvaluateTargets
-import Micro.Intent.Intention
+import Micro.State.ExecutionState
 
 object Engage extends Action {
   
-  override def allowed(intent: Intention): Boolean = {
-    intent.canAttack &&
-    intent.canPursue &&
-    intent.toAttack.isEmpty &&
-    intent.unit.canMoveThisFrame &&
-    intent.targets.nonEmpty &&
+  override def allowed(state:ExecutionState): Boolean = {
+    state.canAttack &&
+    state.canPursue &&
+    state.toAttack.isEmpty &&
+    state.unit.canMoveThisFrame &&
+    state.targets.nonEmpty &&
     {
-      val zone = intent.unit.pixelCenter.zone
-      ! zone.owner.isNeutral || intent.destination.exists(_.zone == zone)
+      val zone = state.unit.pixelCenter.zone
+      ! zone.owner.isNeutral || state.toTravel.exists(_.zone == zone)
     }
   }
   
-  override def perform(intent: Intention) {
-    Shoot.delegate(intent)
-    intent.toAttack = intent.toAttack.orElse(EvaluateTargets.best(intent, intent.targets))
-    Attack.delegate(intent)
+  override def perform(state:ExecutionState) {
+    Shoot.delegate(state)
+    state.toAttack = state.toAttack.orElse(EvaluateTargets.best(state, state.targets))
+    Attack.delegate(state)
   }
 }

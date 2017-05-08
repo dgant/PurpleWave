@@ -4,31 +4,31 @@ import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Flee
 import Micro.Behaviors.MovementProfiles
-import Micro.Intent.Intention
+import Micro.State.ExecutionState
 
 object Gather extends Action {
   
-  override def allowed(intent: Intention) = {
-    intent.toGather.isDefined
+  override def allowed(state:ExecutionState) = {
+    state.intent.toGather.isDefined
   }
   
-  override def perform(intent: Intention) {
+  override def perform(state:ExecutionState) {
   
     // If we're threatened and continuing to gather won't help, respond
     if (
-      intent.threatsActive.exists(threat =>
-        threat.target.contains(intent.unit) &&
-        threat.pixelDistanceFast(intent.unit) >=
-        threat.pixelDistanceFast(intent.toGather.get))) {
+      state.threatsActive.exists(threat =>
+        threat.target.contains(state.unit) &&
+        threat.pixelDistanceFast(state.unit) >=
+        threat.pixelDistanceFast(state.toGather.get))) {
+  
+      state.movementProfile  = MovementProfiles.flee
+      state.toGather         = None
+      state.canAttack        &&= state.threatsActive.map(_.dpsAgainst(state.unit)).sum < state.unit.totalHealth
     
-      intent.movementProfile  = MovementProfiles.flee
-      intent.toGather         = None
-      intent.canAttack        &&= intent.threatsActive.map(_.dpsAgainst(intent.unit)).sum < intent.unit.totalHealth
-    
-      Flee.consider(intent)
+      Flee.consider(state)
     }
     else {
-      With.commander.gather(intent.unit, intent.toGather.get)
+      With.commander.gather(state.unit, state.toGather.get)
     }
   }
 }

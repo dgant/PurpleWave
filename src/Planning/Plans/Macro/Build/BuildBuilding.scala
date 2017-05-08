@@ -70,7 +70,7 @@ class BuildBuilding(val buildingClass:UnitClass) extends Plan {
           new Intention(this, builderLock.units.head) {
             toBuild = Some(buildingClass)
             toBuildTile = orderedTile
-            destination = Some(orderedTile.get.pixelCenter)
+            toTravel = Some(orderedTile.get.pixelCenter)
             canAttack = false
           })
       }

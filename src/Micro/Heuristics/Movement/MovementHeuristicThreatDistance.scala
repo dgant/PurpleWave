@@ -2,14 +2,14 @@ package Micro.Heuristics.Movement
 
 import Mathematics.Heuristics.HeuristicMathMultiplicative
 import Mathematics.Pixels.Pixel
-import Micro.Intent.Intention
+import Micro.State.ExecutionState
 
 object MovementHeuristicThreatDistance extends MovementHeuristic {
   
-  override def evaluate(intent: Intention, candidate: Pixel): Double = {
+  override def evaluate(state: ExecutionState, candidate: Pixel): Double = {
   
-    if (intent.threats.isEmpty) return HeuristicMathMultiplicative.default
+    if (state.threats.isEmpty) return HeuristicMathMultiplicative.default
     
-    intent.threats.map(threat => threat.dpsAgainst(intent.unit) * threat.pixelDistanceFast(candidate) - threat.pixelRangeAgainst(intent.unit)).min / 20.0
+    state.threats.map(threat => threat.dpsAgainst(state.unit) * threat.pixelDistanceFast(candidate) - threat.pixelRangeAgainst(state.unit)).min / 20.0
   }
 }

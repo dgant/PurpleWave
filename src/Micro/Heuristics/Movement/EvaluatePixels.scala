@@ -4,43 +4,43 @@ import Information.Geography.Types.Zone
 import Lifecycle.With
 import Mathematics.Heuristics.HeuristicMathMultiplicative
 import Mathematics.Pixels.Pixel
-import Micro.Intent.Intention
+import Micro.State.ExecutionState
 import ProxyBwapi.UnitInfo.UnitInfo
 
 object EvaluatePixels {
 
-  def best(intent:Intention, profile:MovementProfile): Pixel = {
+  def best(state:ExecutionState, profile:MovementProfile): Pixel = {
     
-    val candidates = getCandidates(intent)
+    val candidates = getCandidates(state)
   
     if (candidates.isEmpty) {
-      return intent.unit.pixelCenter
+      return state.unit.pixelCenter
     }
     
     if (With.configuration.visualizeHeuristicMovement) {
-      intent.state.movementHeuristicResults =
+      state.movementHeuristicResults =
         candidates.flatten(candidate =>
           profile.weightedHeuristics.map(weightedHeuristic =>
             new MovementHeuristicResult(
               weightedHeuristic.heuristic,
-              intent,
+              state,
               candidate,
-              weightedHeuristic.weighMultiplicatively(intent, candidate),
+              weightedHeuristic.weighMultiplicatively(state, candidate),
               weightedHeuristic.color)))
     }
     
-    HeuristicMathMultiplicative.best(intent, profile.weightedHeuristics, candidates)
+    HeuristicMathMultiplicative.best(state, profile.weightedHeuristics, candidates)
   }
   
-  def getCandidates(intent:Intention):Vector[Pixel] = {
+  def getCandidates(state:ExecutionState):Vector[Pixel] = {
 
-    val startingPixel = intent.unit.pixelCenter
+    val startingPixel = state.unit.pixelCenter
     val startingZone  = startingPixel.zone
     val otherPixels =
       (0 until 256 by 1)
         .flatten(angle => {
           val targetPixel = startingPixel.radiate(angle, 79.0)
-          if (acceptable(intent.unit, targetPixel, startingPixel, startingZone))
+          if (acceptable(state.unit, targetPixel, startingPixel, startingZone))
             Some(targetPixel)
           else
             None

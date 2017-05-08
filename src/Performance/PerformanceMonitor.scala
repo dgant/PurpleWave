@@ -33,7 +33,7 @@ class PerformanceMonitor {
     }
   }
   
-  def millisecondsLeftThisFrame = Math.max(0, With.configuration.maxFrameMilliseconds - millisecondsThisFrame)
+  def millisecondsLeftThisFrame = Math.max(0, With.configuration.peformanceFrameMilliseconds - millisecondsThisFrame)
   def millisecondsThisFrame     = Math.max(0, System.currentTimeMillis - millisecondsBefore)
   
   def maxFrameMilliseconds  : Long = frameTimes.max

@@ -182,6 +182,7 @@ class Commander {
   
   private def sleep(unit:FriendlyUnitInfo, requiredDelay:Int = 2) {
     val sleepUntil = Array(
+      With.configuration.performanceMinimumUnitSleep,
       With.frame + requiredDelay,
       With.frame + With.latency.turnSize,
       With.frame + With.latency.framesRemaining,

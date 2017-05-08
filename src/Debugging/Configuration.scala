@@ -2,28 +2,62 @@ package Debugging
 
 class Configuration {
   
-  // Up this for tournament play!
-  var maxFrameMilliseconds = 20
+  ///////////////
+  // Operation //
+  ///////////////
   
-  var battleWorkerCostPerFrame        = 0.25
-  var battleMarginTiles               = 15
-  var battleMarginPixels              = battleMarginTiles * 32.0
+  var gameSpeed          = 0
+  var enableSurrendering = true
+  var enableStdOut       = false // StdOut crashes bots on SSCAIT because it blocks forever
+  var enableChat         = true
   
-  var dpsGridDistancePenalty          = 0.5
-  var dpsGridMovementPenalty          = 0.5
-  var dpsGridCooldownPenalty          = 0.25
+  ///////////
+  // Micro //
+  ///////////
   
   var microFrameLookahead             = 8
-
   var enableYolo                      = true
-  var enableFastGroundDistance        = true
   var enablePathRecalculation         = true
   var pathRecalculationDelayFrames    = 48
   var woundedThresholdHealth          = 40
   var evaluateDangerousBases          = false
   
+  var dpsGridDistancePenalty          = 0.5
+  var dpsGridMovementPenalty          = 0.5
+  var dpsGridCooldownPenalty          = 0.25
+  
+  /////////////
+  // Battles //
+  /////////////
+  
+  var battleWorkerCostPerFrame  = 0.25
+  var battleMarginTiles         = 15
+  var battleMarginPixels        = battleMarginTiles * 32.0
+  var useFastGroundDistance     = true
+  
+  /////////////////
+  // Performance //
+  /////////////////
+  
+  var peformanceFrameMilliseconds = 20
+  var performanceMinimumUnitSleep = 6
+  var performanceMicroAngleStep   = 4
+  
+  var urgencyManners        = 1
+  var urgencyEconomy        = 1
+  var urgencyGeography      = 1
+  var urgencyPlanning       = 2
+  var urgencyBattles        = 5
+  var urgencyGrids          = 10
+  var urgencyUnitTracking   = 10
+  var urgencyMicro          = 100
+  
+  ///////////////////
+  // Visualization //
+  ///////////////////
+  
   var visualize                   = true
-  var visualizeBases              = true
+  var visualizeBases              = false
   var visualizeBattles            = true
   var visualizeBattleTacticsRanks = false
   var visualizeBullets            = false
@@ -32,7 +66,7 @@ class Configuration {
   var visualizeGeography          = false
   var visualizeGrids              = false
   var visualizeHitPoints          = true
-  var visualizeHeuristicMovement  = true
+  var visualizeHeuristicMovement  = false
   var visualizePerformance        = false
   var visualizePerformanceDetails = false
   var visualizePlans              = false
@@ -44,11 +78,6 @@ class Configuration {
   var visualizeUnitsOurs          = true
   var visualizeVectorUnits        = false
   
-  var gameSpeed                   = 0
-  var enableSurrendering          = true
-  var enableStdOut                = false
-  var enableChat                  = true
-  
   var camera                      = false
   var cameraDynamicSpeed          = false
   var cameraDynamicSpeedSlowest   = 30
@@ -57,13 +86,4 @@ class Configuration {
   var cameraViewportHeight        = 362
   var conservativeViewportWidth   = 640 + cameraViewportWidth
   var conservativeViewportHeight  = 480 + cameraViewportHeight
-  
-  var urgencyManners        = 1
-  var urgencyEconomy        = 1
-  var urgencyGeography      = 1
-  var urgencyPlanning       = 2
-  var urgencyBattles        = 5
-  var urgencyGrids          = 10
-  var urgencyUnitTracking   = 10
-  var urgencyMicro          = 100
 }

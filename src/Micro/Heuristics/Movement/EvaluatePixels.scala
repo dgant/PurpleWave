@@ -37,7 +37,7 @@ object EvaluatePixels {
     val startingPixel = state.unit.pixelCenter
     val startingZone  = startingPixel.zone
     val otherPixels =
-      (0 until 256 by 1)
+      (0 until 256 by With.configuration.performanceMicroAngleStep)
         .flatten(angle => {
           val targetPixel = startingPixel.radiate(angle, 79.0)
           if (acceptable(state.unit, targetPixel, startingPixel, startingZone))

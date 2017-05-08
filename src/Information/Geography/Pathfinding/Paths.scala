@@ -37,7 +37,7 @@ class Paths {
   
   private def calculateDistance(request:(Tile, Tile), requireBwta:Boolean) {
     val distance =
-      if (With.configuration.enableFastGroundDistance && With.frame > 0 && ! requireBwta)
+      if (With.configuration.useFastGroundDistance && With.frame > 0 && ! requireBwta)
         PathFinder.roughGroundDistance(request._1.pixelCenter, request._2.pixelCenter)
       else
         BWTA.getGroundDistance(request._1.bwapi, request._2.bwapi)

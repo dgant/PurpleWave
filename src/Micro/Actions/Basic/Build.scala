@@ -11,6 +11,6 @@ object Build extends Action {
   }
   
   override def perform(intent: Intention) {
-    With.commander.build(intent, intent.toBuild.get, intent.toBuildTile.get)
+    With.commander.build(intent.unit, intent.toBuild.get, intent.toBuildTile.get)
   }
 }

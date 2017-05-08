@@ -31,47 +31,46 @@ class Commander {
     nextOrderFrame(unit) < With.frame
   }
   
-  private def unready(intent: Intention):Boolean = {
-    ! ready(intent.unit)
+  private def unready(unit: FriendlyUnitInfo):Boolean = {
+    ! ready(unit)
   }
   
-  def attack(intent:Intention, target:UnitInfo) {
-    if (unready(intent)) return
+  def attack(unit:FriendlyUnitInfo, target:UnitInfo) {
+    if (unready(unit)) return
     
     if (target.visible) {
-      intent.unit.base.attack(target.base)
-      sleepAttack(intent.unit)
+      unit.base.attack(target.base)
+      sleepAttack(unit)
     } else {
-      move(intent, target.pixelCenter)
+      move(unit, target.pixelCenter)
     }
   }
   
-  def move(intent:Intention, to:Pixel) {
-    if (unready(intent)) return
+  def move(unit:FriendlyUnitInfo, to:Pixel) {
+    if (unready(unit)) return
     
     //Send flying units past their destination to maximize acceleration
     val flyingOvershoot = 144.0
     var destination = to
-    if (intent.unit.flying && intent.unit.pixelDistanceSquared(to) < Math.pow(flyingOvershoot, 2)) {
-      val overshoot = intent.unit.pixelCenter.project(to, flyingOvershoot)
+    if (unit.flying && unit.pixelDistanceSquared(to) < Math.pow(flyingOvershoot, 2)) {
+      val overshoot = unit.pixelCenter.project(to, flyingOvershoot)
       if (overshoot.valid) destination = overshoot
     }
     
     // Mineral walk!
-    if (intent.unit.unitClass.isWorker) {
-      val from = intent.unit.pixelCenter
+    if (unit.unitClass.isWorker) {
+      val from = unit.pixelCenter
       val fromZone = from.zone
       val toZone = to.zone
       val walkableMineral = toZone.bases
         .flatten(_.minerals)
         .find(mineral =>
           mineral.visible && //Can't mineral walk to an invisible mineral
-          mineral.pixelsFromEdgeFast(intent.unit) > 60.0 && ( //Don't get stuck by trying to mineral walk through a mineral
+          mineral.pixelsFromEdgeFast(unit) > 60.0 && ( //Don't get stuck by trying to mineral walk through a mineral
             toZone != fromZone ||
             Math.abs(from.degreesTo(to) - from.degreesTo(mineral.pixelCenter)) < 30))
       if (walkableMineral.isDefined) {
-        intent.unit.base.gather(walkableMineral.get.base)
-        sleepMove(intent.unit)
+        gather(unit, walkableMineral.get)
         return
       }
     }
@@ -91,79 +90,78 @@ class Commander {
       destination = destination.add((With.frame / With.configuration.pathRecalculationDelayFrames) % 3 - 1, 0)
     }
     
-    if (intent.unit.pixelDistanceFast(destination) > 7) {
-      intent.unit.base.move(destination.bwapi)
-      sleepMove(intent.unit)
+    if (unit.pixelDistanceFast(destination) > 7) {
+      unit.base.move(destination.bwapi)
+      sleep(unit)
     }
   }
   
-  def gather(intent:Intention, resource:UnitInfo) {
-    if (unready(intent)) return
+  def gather(unit:FriendlyUnitInfo, resource:UnitInfo) {
+    if (unready(unit)) return
     
-    if (intent.unit.carryingMinerals || intent.unit.carryingGas) {
-      if ( ! intent.unit.gatheringGas && ! intent.unit.gatheringMinerals) {
-        intent.unit.base.returnCargo
-        sleepReturnCargo(intent.unit)
+    if (unit.carryingMinerals || unit.carryingGas) {
+      if ( ! unit.gatheringGas && ! unit.gatheringMinerals) {
+        unit.base.returnCargo
+        sleepReturnCargo(unit)
       }
     }
+      
     // The logic of "If we're not carrying resources, spam gather until the unit's target is the intended resource"
     // produces mineral locking, in which workers mine more efficiently because exactly 2 miners saturate a mineral patch.
-    else if ( ! intent.unit.target.contains(resource)) {
-      // TODO: This will fail if we've never seen the resource before, as with some long-distance mining situations.
-      // In that case we should order units to move to the destination first.
+    //
+    else if ( ! unit.target.contains(resource)) {
       if (resource.visible) {
-        intent.unit.base.gather(resource.base)
+        unit.base.gather(resource.base)
+        sleep(unit)
       }
       else {
-        move(intent, resource.pixelCenter)
-        sleepMove(intent.unit)
+        move(unit, resource.pixelCenter)
       }
     }
   }
   
-  def build(intent:Intention, unitClass:UnitClass) {
-    if (unready(intent)) return
-    intent.unit.base.build(unitClass.baseType)
-    sleepBuild(intent.unit)
+  def build(unit:FriendlyUnitInfo, unitClass:UnitClass) {
+    if (unready(unit)) return
+    unit.base.build(unitClass.baseType)
+    sleepBuild(unit)
   }
   
-  def build(intent:Intention, unitClass:UnitClass, tile:Tile) {
-    if (unready(intent)) return
-    if (intent.unit.pixelDistanceSquared(tile.pixelCenter) > Math.pow(32.0 * 5.0, 2)) {
-      return move(intent, tile.pixelCenter)
+  def build(unit:FriendlyUnitInfo, unitClass:UnitClass, tile:Tile) {
+    if (unready(unit)) return
+    if (unit.pixelDistanceSquared(tile.pixelCenter) > Math.pow(32.0 * 5.0, 2)) {
+      move(unit, tile.pixelCenter)
+      return
     }
-    intent.unit.base.build(unitClass.baseType, tile.bwapi)
-    sleepBuild(intent.unit)
+    unit.base.build(unitClass.baseType, tile.bwapi)
+    sleepBuild(unit)
   }
   
-  def tech(intent:Intention, tech: Tech) {
-    if (unready(intent)) return
-    intent.unit.base.research(tech.baseType)
+  def tech(unit:FriendlyUnitInfo, tech: Tech) {
+    if (unready(unit)) return
+    unit.base.research(tech.baseType)
+    sleep(unit)
   }
   
-  def upgrade(intent:Intention, upgrade: Upgrade) {
-    if (unready(intent)) return
-    intent.unit.base.upgrade(upgrade.baseType)
+  def upgrade(unit:FriendlyUnitInfo, upgrade: Upgrade) {
+    if (unready(unit)) return
+    unit.base.upgrade(upgrade.baseType)
+    sleep(unit)
   }
   
-  def buildScarab(intent:Intention) {
-    if (unready(intent)) return
-    intent.unit.base.build(Protoss.Scarab.baseType)
-    sleepMove(intent.unit)
+  def buildScarab(unit:FriendlyUnitInfo) {
+    if (unready(unit)) return
+    unit.base.build(Protoss.Scarab.baseType)
+    sleep(unit)
   }
   
-  def buildInterceptor(intent:Intention) {
-    if (unready(intent)) return
-    intent.unit.base.build(Protoss.Interceptor.baseType)
-    sleepMove(intent.unit)
-  }
-  
-  private def sleepMove(unit:FriendlyUnitInfo) {
-    sleep(unit, 2)
+  def buildInterceptor(unit:FriendlyUnitInfo) {
+    if (unready(unit)) return
+    unit.base.build(Protoss.Interceptor.baseType)
+    sleep(unit)
   }
   
   private def sleepAttack(unit:FriendlyUnitInfo) {
-    sleep(unit, 2 + unit.unitClass.framesRequiredForAttackToComplete)
+    sleep(unit)
   }
   
   private def sleepBuild(unit:FriendlyUnitInfo) {
@@ -176,8 +174,11 @@ class Commander {
     sleep(unit, 8)
   }
   
-  private def sleep(unit:FriendlyUnitInfo, requiredDelay:Int) {
-    Math.max(With.latency.turnSize, requiredDelay)
-    nextOrderFrame.put(unit, With.frame + requiredDelay)
+  private def sleep(unit:FriendlyUnitInfo, requiredDelay:Int = 2) {
+    val sleepUntil = Array(
+      With.frame + requiredDelay,
+      With.frame + With.latency.turnSize,
+      nextOrderFrame(unit)).max
+    nextOrderFrame.put(unit, sleepUntil)
   }
 }

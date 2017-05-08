@@ -13,14 +13,14 @@ object Produce extends Action {
   override def perform(intent: Intention) {
     
     if (intent.toTrain.isDefined) {
-      With.commander.build(intent, intent.toTrain.get)
+      With.commander.build(intent.unit, intent.toTrain.get)
       intent.toTrain = None //Avoid building repeatedly
     }
     else if (intent.toTech.isDefined) {
-      With.commander.tech(intent, intent.toTech.get)
+      With.commander.tech(intent.unit, intent.toTech.get)
     }
     else if (intent.toUpgrade.isDefined) {
-      With.commander.upgrade(intent, intent.toUpgrade.get)
+      With.commander.upgrade(intent.unit, intent.toUpgrade.get)
     }
   }
 }

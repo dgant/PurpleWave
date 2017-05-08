@@ -27,6 +27,6 @@ object Gather extends Action {
       Flee.consider(intent)
     }
     
-    With.commander.gather(intent, intent.toGather.get)
+    With.commander.gather(intent.unit, intent.toGather.get)
   }
 }

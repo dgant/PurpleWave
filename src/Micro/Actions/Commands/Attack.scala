@@ -12,6 +12,6 @@ object Attack extends Action {
   }
   
   override def perform(intent: Intention) {
-    With.commander.attack(intent, intent.toAttack.get)
+    With.commander.attack(intent.unit, intent.toAttack.get)
   }
 }

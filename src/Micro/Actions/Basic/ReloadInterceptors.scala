@@ -16,6 +16,6 @@ object ReloadInterceptors extends Action {
   )
   
   override def perform(intent: Intention) {
-    With.commander.buildInterceptor(intent)
+    With.commander.buildInterceptor(intent.unit)
   }
 }

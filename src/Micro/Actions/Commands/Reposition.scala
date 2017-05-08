@@ -12,10 +12,9 @@ object Reposition extends Action {
   }
   
   override def perform(intent: Intention) {
-    
     val pixelToMove = EvaluatePixels.best(intent, intent.movementProfile)
     intent.state.movingTo = Some(pixelToMove)
     intent.state.movedHeuristicallyFrame = With.frame
-    With.commander.move(intent, pixelToMove)
+    With.commander.move(intent.unit, pixelToMove)
   }
 }

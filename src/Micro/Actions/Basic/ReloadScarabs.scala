@@ -21,6 +21,6 @@ object ReloadScarabs extends Action {
   )
   
   override def perform(intent: Intention) {
-    With.commander.buildScarab(intent)
+    With.commander.buildScarab(intent.unit)
   }
 }

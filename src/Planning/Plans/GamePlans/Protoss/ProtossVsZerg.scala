@@ -60,10 +60,10 @@ class ProtossVsZerg extends Parallel {
   )
   
   children.set(Vector(
-    new ScheduleBuildOrder(ProtossBuilds.TwoGate99),
+    new ScheduleBuildOrder(ProtossBuilds.OpeningTwoGate99),
     new IfThenElse(
       new UnitsExactly(0, UnitMatchType(Protoss.CyberneticsCore)),
-      new ScheduleBuildOrder(ProtossBuilds.TwoGate99Zealots)
+      new ScheduleBuildOrder(ProtossBuilds.OpeningTwoGate99Zealots)
     ),
     new BuildEnoughPylons,
     new TrainProbesContinuously,

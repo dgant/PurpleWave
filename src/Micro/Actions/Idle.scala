@@ -16,11 +16,11 @@ object Idle extends Action {
     if (intent.unit.attackStarting) {
       return false
     }
-    if (intent.unit.attackAnimationHappening && intent.unit.unitClass.framesRequiredForAttackToComplete > 0){
+    if (intent.unit.attackAnimationHappening && intent.unit.unitClass.framesRequiredForAttackToComplete > 0) {
       return false
     }
     intent.unit.cooldownLeft == 0 ||
-      With.frame > intent.unit.commandFrame + intent.unit.unitClass.framesRequiredForAttackToComplete - With.latency.framesRemaining
+      With.frame > intent.unit.commandFrame + intent.unit.unitClass.framesRequiredForAttackToComplete
   }
   
   def perform(intent: Intention) {

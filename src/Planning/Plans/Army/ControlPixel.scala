@@ -13,10 +13,10 @@ class ControlPixel extends Plan {
   
   description.set("Control a position")
   
-  val infiltrationRadius = 32.0 * 25
-  
-  val units = new Property[LockUnits](new LockUnits)
+  val units             = new Property[LockUnits](new LockUnits)
   var positionToControl = new Property[TileFinder](new TileEnemyBase)
+  
+  private val infiltrationRadius = 32.0 * 25
   
   override def update() {
     

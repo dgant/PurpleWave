@@ -49,7 +49,7 @@ class ProtossVsTerran extends Parallel {
   )
   
   children.set(Vector(
-    new ScheduleBuildOrder(ProtossBuilds.TwoGate1015),
+    new ScheduleBuildOrder(ProtossBuilds.OpeningTwoGate1015),
     new BuildEnoughPylons,
     new TrainProbesContinuously,
     new IfThenElse(

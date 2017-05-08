@@ -1,8 +1,6 @@
 package Micro.Actions.Combat
 
-import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Actions.Commands.Reposition
 import Micro.Intent.Intention
 
 object Kite extends Action {
@@ -16,7 +14,7 @@ object Kite extends Action {
   override def perform(intent: Intention) {
     
     if (intent.unit.cooldownLeft > 0) {
-      Reposition.delegate(intent)
+      Hover.delegate(intent)
       return
     }
     
@@ -25,17 +23,24 @@ object Kite extends Action {
     
     val weAreFaster   = intent.threatsActive.forall(_.topSpeed <= intent.unit.topSpeed)
     val enemyIsFaster = intent.threatsActive.exists(_.topSpeed > intent.unit.topSpeed)
-    
-    //Should really be "number of frames it takes to attack and accelerate back to top speed"
-    val framesToAttackAndResumeMovement = With.configuration.microFrameLookahead
   
+    val framesToShootAndMove = 8
     // If we can kite perfectly without taking damage (vultures/dragoons vs. slow zealots, for instance), let's try to do so.
     // This might backfire in closed spaces, by causing us to not fire when we otherwise could
-    if (weAreFaster && intent.threatsActive.exists(_.framesBeforeAttacking(intent.unit) <= framesToAttackAndResumeMovement)) {
-      Reposition.delegate(intent)
+    //
+    if (weAreFaster
+      && intent.threatsActive.exists(threat =>
+        threat.framesBeforeAttacking(intent.unit) < framesToShootAndMove ||
+        threat.pixelDistanceTravelling(intent.unit.pixelCenter) <
+          (if (intent.unit.canAttackThisSecond(threat))
+            intent.unit.pixelRangeAgainst(threat)
+          else
+            intent.unit.pixelRangeMax - 80.0))) {
+      
+      Hover.delegate(intent)
     }
-    else {
-      Engage.delegate(intent)
-    }
+    
+    
+    Engage.delegate(intent)
   }
 }

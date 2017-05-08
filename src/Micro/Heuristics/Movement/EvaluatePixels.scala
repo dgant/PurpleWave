@@ -37,9 +37,9 @@ object EvaluatePixels {
     val startingPixel = intent.unit.pixelCenter
     val startingZone  = startingPixel.zone
     val otherPixels =
-      (0 until 256 by 2)
+      (0 until 256 by 1)
         .flatten(angle => {
-          val targetPixel = startingPixel.radiate(angle, 55.0)
+          val targetPixel = startingPixel.radiate(angle, 79.0)
           if (acceptable(intent.unit, targetPixel, startingPixel, startingZone))
             Some(targetPixel)
           else

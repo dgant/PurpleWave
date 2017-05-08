@@ -3,11 +3,11 @@ package Planning.Plans.GamePlans.Protoss
 import Macro.BuildRequests.{RequestUnitAtLeast, _}
 import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Plans.Army.Attack
-import Planning.Plans.Compound.{IfThenElse, Or, Parallel}
+import Planning.Plans.Compound.{IfThenElse, Parallel}
 import Planning.Plans.Information.{FindExpansions, ScoutAt}
-import Planning.Plans.Macro.Automatic.{BuildEnoughPylons, TrainContinuously, TrainGatewayUnitsContinuously, TrainProbesContinuously}
+import Planning.Plans.Macro.Automatic.{BuildEnoughPylons, TrainContinuously, TrainProbesContinuously}
 import Planning.Plans.Macro.BuildOrders.ScheduleBuildOrder
-import Planning.Plans.Macro.UnitCount.{SupplyAtLeast, UnitsAtLeast, UnitsExactly}
+import Planning.Plans.Macro.UnitCount.{SupplyAtLeast, UnitsAtLeast}
 import ProxyBwapi.Races.Protoss
 
 class ProtossVsProtoss extends Parallel {
@@ -42,25 +42,18 @@ class ProtossVsProtoss extends Parallel {
   )
   
   children.set(Vector(
-    new ScheduleBuildOrder(ProtossBuilds.TwoGate1012),
-    new IfThenElse(
-      new Or(
-        new UnitsExactly(0, UnitMatchType(Protoss.CyberneticsCore)),
-        new UnitsExactly(0, UnitMatchType(Protoss.Assimilator))
-      ),
-      new ScheduleBuildOrder(ProtossBuilds.TwoGate1012Zealots)
-    ),
+    new ScheduleBuildOrder(ProtossBuilds.OpeningOneGateCore),
+    new BuildEnoughPylons,
+    new TrainProbesContinuously,
+    new TrainContinuously(Protoss.Reaver, 4),
+    new TrainContinuously(Protoss.Dragoon),
+    //Make this reactive
+    new ScheduleBuildOrder(_thirdGateway),
     new IfThenElse(
       new UnitsAtLeast(6, UnitMatchType(Protoss.Dragoon)),
       new ScheduleBuildOrder(ProtossBuilds.TakeNatural)
     ),
-    new BuildEnoughPylons,
-    new TrainProbesContinuously,
-    new TrainContinuously(Protoss.Reaver, 4),
-    new TrainGatewayUnitsContinuously,
     new ScheduleBuildOrder(ProtossBuilds.TechDragoons),
-    //Make this reactive
-    new ScheduleBuildOrder(_thirdGateway),
     //Add response to DTs
     new ScheduleBuildOrder(ProtossBuilds.TechReavers),
     new ScheduleBuildOrder(ProtossBuilds.TakeNatural),

@@ -1,6 +1,7 @@
 package Micro.Actions.Combat
 
 import Micro.Actions.Action
+import Micro.Actions.Commands.Attack
 import Micro.Heuristics.Targeting.EvaluateTargets
 import Micro.Intent.Intention
 
@@ -19,7 +20,8 @@ object Engage extends Action {
   }
   
   override def perform(intent: Intention) {
-    intent.toAttack = EvaluateTargets.best(intent, intent.targets)
-    //TODO: How do Zealots chase and Dragoons kite?
+    Shoot.delegate(intent)
+    intent.toAttack = intent.toAttack.orElse(EvaluateTargets.best(intent, intent.targets))
+    Attack.delegate(intent)
   }
 }

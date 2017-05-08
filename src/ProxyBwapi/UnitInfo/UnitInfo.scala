@@ -204,7 +204,7 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
     ! enemy.effectivelyCloaked &&
     (if (enemy.flying) unitClass.attacksAir else unitClass.attacksGround)
   
-  def canAttackThisFrame:Boolean = canAttackThisSecond && cooldownLeft < With.latency.framesRemaining
+  def canAttackThisFrame:Boolean = canAttackThisSecond && cooldownLeft <= With.latency.framesRemaining
   
   def pixelsCovered     (framesAhead: Int): Double = if (canMoveThisFrame) topSpeed * framesAhead else 0.0
   def pixelReachAir     (framesAhead: Int): Double = pixelsCovered(framesAhead) + pixelRangeAir
@@ -238,13 +238,13 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
       canAttackThisSecond(victim) && (
       //Are we attacking the victim?
       target.orElse(orderTarget).contains(victim) ||
-        //Are we moving towards the victim?
-        targetPixel.orElse(orderTargetPixel).exists(destination =>
-          victim.pixelDistanceFast(
-            pixelCenter.project(
-              destination,
-              Math.min(topSpeed * With.configuration.microFrameLookahead, pixelDistanceFast(victim))))
-            < pixelRangeAgainst(victim)))
+      //Are we moving towards the victim?
+      targetPixel.orElse(orderTargetPixel).exists(destination =>
+        victim.pixelDistanceFast(
+          pixelCenter.project(
+            destination,
+            Math.min(topSpeed * With.configuration.microFrameLookahead, pixelDistanceFast(victim))))
+          < pixelRangeAgainst(victim)))
   
   ////////////////
   // Visibility //

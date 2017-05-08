@@ -7,7 +7,8 @@ import Micro.Intent.Intention
 object Flee extends Action {
   
   override def allowed(intent: Intention) = {
-    intent.unit.canMoveThisFrame
+    intent.unit.canMoveThisFrame &&
+    intent.threats.nonEmpty
   }
   
   override def perform(intent: Intention) {

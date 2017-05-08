@@ -49,7 +49,7 @@ object VisualizeBattles {
       estimation.foreach(drawEstimationReport)
       drawTacticsReport(battle)
     }
-    if (Yolo.enabled && With.frame / 24 % 2 == 0) {
+    if (Yolo.active && With.frame / 24 % 2 == 0) {
       With.game.drawTextScreen(yolo.bwapi, "YOLO")
     }
   }

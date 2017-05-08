@@ -2,7 +2,7 @@ package Information
 
 import Information.Geography.Types.Base
 import Lifecycle.With
-import Micro.Actions.Gather
+import Micro.Actions.Basic.Gather
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 class Economy {

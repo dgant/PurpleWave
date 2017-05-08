@@ -27,11 +27,17 @@ class Commander {
     nextOrderFrame.contains(unit) && (unit.attackAnimationHappening || unit.attackStarting)
   }
   
-  def readyForCommand(unit: FriendlyUnitInfo):Boolean = {
+  def ready(unit: FriendlyUnitInfo):Boolean = {
     nextOrderFrame(unit) < With.frame
   }
   
+  private def unready(intent: Intention):Boolean = {
+    ! ready(intent.unit)
+  }
+  
   def attack(intent:Intention, target:UnitInfo) {
+    if (unready(intent)) return
+    
     if (target.visible) {
       intent.unit.base.attack(target.base)
       sleepAttack(intent.unit)
@@ -41,6 +47,7 @@ class Commander {
   }
   
   def move(intent:Intention, to:Pixel) {
+    if (unready(intent)) return
     
     //Send flying units past their destination to maximize acceleration
     val flyingOvershoot = 144.0
@@ -91,6 +98,8 @@ class Commander {
   }
   
   def gather(intent:Intention, resource:UnitInfo) {
+    if (unready(intent)) return
+    
     if (intent.unit.carryingMinerals || intent.unit.carryingGas) {
       if ( ! intent.unit.gatheringGas && ! intent.unit.gatheringMinerals) {
         intent.unit.base.returnCargo
@@ -113,11 +122,13 @@ class Commander {
   }
   
   def build(intent:Intention, unitClass:UnitClass) {
+    if (unready(intent)) return
     intent.unit.base.build(unitClass.baseType)
     sleepBuild(intent.unit)
   }
   
   def build(intent:Intention, unitClass:UnitClass, tile:Tile) {
+    if (unready(intent)) return
     if (intent.unit.pixelDistanceSquared(tile.pixelCenter) > Math.pow(32.0 * 5.0, 2)) {
       return move(intent, tile.pixelCenter)
     }
@@ -126,19 +137,23 @@ class Commander {
   }
   
   def tech(intent:Intention, tech: Tech) {
+    if (unready(intent)) return
     intent.unit.base.research(tech.baseType)
   }
   
   def upgrade(intent:Intention, upgrade: Upgrade) {
+    if (unready(intent)) return
     intent.unit.base.upgrade(upgrade.baseType)
   }
   
   def buildScarab(intent:Intention) {
+    if (unready(intent)) return
     intent.unit.base.build(Protoss.Scarab.baseType)
     sleepMove(intent.unit)
   }
   
   def buildInterceptor(intent:Intention) {
+    if (unready(intent)) return
     intent.unit.base.build(Protoss.Interceptor.baseType)
     sleepMove(intent.unit)
   }

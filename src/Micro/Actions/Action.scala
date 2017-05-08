@@ -1,18 +1,20 @@
 package Micro.Actions
 
+import Lifecycle.With
 import Micro.Intent.Intention
 
 abstract class Action {
   
-  def allowed(intent:Intention): Boolean
-  
-  // Return true if the unit has executed a command, and is thus done acting.
-  def perform(intent:Intention): Boolean
- 
   val name = getClass.getSimpleName.replaceAllLiterally("$", "")
   
-  def consider(intent:Intention): Boolean = {
-    if (allowed(intent)) return perform(intent)
-    false
+  protected def stillReady(intent:Intention)  : Boolean = With.commander.ready(intent.unit)
+  protected def allowed(intent:Intention)     : Boolean = true
+  protected def perform(intent:Intention)
+  
+  def consider(intent:Intention) {
+    if (stillReady(intent) && allowed(intent)) {
+      intent.state.lastAction = Some(this)
+      perform(intent)
+    }
   }
 }

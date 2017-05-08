@@ -17,8 +17,6 @@ class Intention(val plan:Plan, val unit:FriendlyUnitInfo) {
   def state:ExecutionState = unit.executionState
   def tactics:Option[TacticsOptions] = With.battles.byUnit.get(unit).map(b => b.bestTactics)
   
-  var executed:Boolean = false
-  
   var origin      : Pixel             = if (With.geography.ourBases.nonEmpty) With.geography.ourBases.map(_.heart.pixelCenter).minBy(unit.pixelDistanceTravelling) else With.geography.home.pixelCenter
   var destination : Option[Pixel]     = None
   var toAttack    : Option[UnitInfo]  = None
@@ -30,7 +28,7 @@ class Intention(val plan:Plan, val unit:FriendlyUnitInfo) {
   var toUpgrade   : Option[Upgrade]   = None
   var leash       : Option[Int]       = None
   var canAttack   : Boolean           = true
-  var canPursue   : Boolean           = true
+  var canPursue   : Boolean           = false
   
   def targets        = targetsCache.get
   def targetsInRange = targetsInRangeCache.get
@@ -39,7 +37,7 @@ class Intention(val plan:Plan, val unit:FriendlyUnitInfo) {
   private val targetsCache        = new CacheFrame(() => Targets.get(this))
   private val targetsInRangeCache = new CacheFrame(() => targets.filter(target => Targets.inRange(this, target)))
   private val threatsCache        = new CacheFrame(() => Threats.get(this))
-  private val threatsActiveCache  = new CacheFrame(() => threats.filter(_.isBeingViolentTo(unit)))
+  private val threatsActiveCache  = new CacheFrame(() => threats.filter(threat => Threats.active(this, threat)))
  
   var movementProfile = MovementProfiles.default
   var targetProfile   = TargetingProfiles.default

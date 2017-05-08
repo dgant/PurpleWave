@@ -1,7 +1,7 @@
 package Micro.State
 
 import Lifecycle.With
-import Micro.Behaviors.Behavior
+import Micro.Actions.Idle
 import Micro.Intent.Intention
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -20,15 +20,8 @@ class Executor {
   def run() {
     if ( ! With.latency.isLastFrameOfTurn) return
     
-    stateByUnit
-      .keys
-      .filterNot(_.alive)
-      .foreach(stateByUnit.remove)
-    
-    stateByUnit
-      .values
-      .filter(state => With.commander.readyForCommand(state.unit))
-      .foreach(state => Behavior.execute(state.intent))
+    stateByUnit.keys.filterNot(_.alive).foreach(stateByUnit.remove)
+    stateByUnit.values.foreach(state => Idle.consider(state.intent))
   }
   
   def getState(unit:FriendlyUnitInfo):ExecutionState = {

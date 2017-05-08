@@ -35,16 +35,16 @@ object Tactics {
   }
   
   object Workers {
-    val Ignore     = v
-    val FightAll   = v
-    val FightHalf  = v
-    val Flee       = v
+    val Ignore    = v
+    val FightAll  = v
+    val FightHalf = v
+    val Flee      = v
     
-    val values = Vector(Ignore, FightAll, FightHalf, Flee)
+    val values = Vector(Ignore, FightAll, FightHalf)
   }
   
   object Focus {
-    val Neither    = v
+    val Neither = v
     val Ground  = v
     val Air     = v
     

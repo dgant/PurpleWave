@@ -1,5 +1,7 @@
-package Micro.Actions
+package Micro.Actions.Basic
+
 import Lifecycle.With
+import Micro.Actions.Action
 import Micro.Intent.Intention
 
 object Build extends Action {
@@ -8,9 +10,7 @@ object Build extends Action {
     intent.toBuild.isDefined
   }
   
-  override def perform(intent: Intention): Boolean = {
+  override def perform(intent: Intention) {
     With.commander.build(intent, intent.toBuild.get, intent.toBuildTile.get)
-    intent.toBuild = None //Avoid repeating the build
-    true
   }
 }

@@ -5,16 +5,17 @@ class Configuration {
   // Up this for tournament play!
   var maxFrameMilliseconds = 20
   
-  val battleWorkerCostPerFrame        = 0.25
-  val battleMarginTiles               = 15
-  val battleMarginPixels              = battleMarginTiles * 32.0
+  var battleWorkerCostPerFrame        = 0.25
+  var battleMarginTiles               = 15
+  var battleMarginPixels              = battleMarginTiles * 32.0
   
-  val dpsGridDistancePenalty          = 0.5
-  val dpsGridMovementPenalty          = 0.5
-  val dpsGridCooldownPenalty          = 0.25
+  var dpsGridDistancePenalty          = 0.5
+  var dpsGridMovementPenalty          = 0.5
+  var dpsGridCooldownPenalty          = 0.25
   
-  val microFrameLookahead             = 8
-  
+  var microFrameLookahead             = 8
+
+  var enableYolo                      = true
   var enableFastGroundDistance        = true
   var enablePathRecalculation         = true
   var pathRecalculationDelayFrames    = 12

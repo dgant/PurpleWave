@@ -1,5 +1,7 @@
-package Micro.Actions
+package Micro.Actions.Basic
+
 import Lifecycle.With
+import Micro.Actions.Action
 import Micro.Intent.Intention
 
 object Produce extends Action {
@@ -8,24 +10,17 @@ object Produce extends Action {
     intent.unit.trainingQueue.isEmpty
   }
   
-  override def perform(intent: Intention): Boolean = {
+  override def perform(intent: Intention) {
     
     if (intent.toTrain.isDefined) {
       With.commander.build(intent, intent.toTrain.get)
-      intent.toTrain = None //Avoid repeating the build
-      return true
+      intent.toTrain = None //Avoid building repeatedly
     }
-    if (intent.toTech.isDefined) {
+    else if (intent.toTech.isDefined) {
       With.commander.tech(intent, intent.toTech.get)
-      intent.toTech = None //Avoid repeating the build
-      return true
     }
-    if (intent.toUpgrade.isDefined) {
+    else if (intent.toUpgrade.isDefined) {
       With.commander.upgrade(intent, intent.toUpgrade.get)
-      intent.toUpgrade = None //Avoid repeating the build
-      return true
     }
-    
-    false
   }
 }

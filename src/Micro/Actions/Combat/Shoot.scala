@@ -8,8 +8,10 @@ import Micro.Intent.Intention
 object Shoot extends Action {
   
   override def allowed(intent: Intention): Boolean = {
+    intent.canAttack &&
+    intent.toAttack.isEmpty &&
     intent.unit.canAttackThisFrame &&
-    intent.toAttack.isEmpty
+    intent.targetsInRange.nonEmpty
   }
   
   override def perform(intent: Intention) {

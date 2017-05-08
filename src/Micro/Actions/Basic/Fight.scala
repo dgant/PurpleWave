@@ -1,7 +1,7 @@
 package Micro.Actions.Basic
 
 import Micro.Actions.Action
-import Micro.Actions.Combat.{Shoot, _}
+import Micro.Actions.Combat.{Kite, Shoot, _}
 import Micro.Intent.Intention
 
 object Fight extends Action {
@@ -12,6 +12,7 @@ object Fight extends Action {
   
   override def perform(intent: Intention) {
     Collaborate.consider(intent)
+    Kite.consider(intent)
     Shoot.consider(intent)
     Pursue.consider(intent)
   }

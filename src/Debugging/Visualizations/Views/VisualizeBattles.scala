@@ -104,8 +104,8 @@ object VisualizeBattles {
     player: PlayerInfo) {
   
     val valueMax = states.head.avatar.totalHealth
-    val xScale  = (healthGraphEnd.x - healthGraphStart.x - 2 * graphMargin.x) / (states.size - 1).toDouble
-    val yScale  = (healthGraphEnd.y - healthGraphStart.y - 2 * graphMargin.y) / valueMax
+    val xScale  = (healthGraphEnd.x - healthGraphStart.x - 4 * graphMargin.x) / (states.size - 1).toDouble
+    val yScale  = (healthGraphEnd.y - healthGraphStart.y - 4 * graphMargin.y) / valueMax
   
     var i = 0
     while (i < states.size - 1) {
@@ -123,13 +123,10 @@ object VisualizeBattles {
     xMin    : Double,
     xMax    : Double,
     player  : PlayerInfo) {
-  
     
-  
-    val colorMedium = player.colorMedium
     val colorNeon   = player.colorNeon
-    val xScale      = (positionGraphEnd.x - positionGraphStart.x - 2 * graphMargin.x) / (states.size - 1).toDouble
-    val yScale      = (positionGraphEnd.y - positionGraphStart.y - 2 * graphMargin.y) / (xMax - xMin)
+    val xScale      = (positionGraphEnd.x - positionGraphStart.x - 4 * graphMargin.x) / (states.size - 1).toDouble
+    val yScale      = (positionGraphEnd.y - positionGraphStart.y - 4 * graphMargin.y) / (xMax - xMin)
     
     var i = 0
     while (i < states.size - 1) {
@@ -137,7 +134,7 @@ object VisualizeBattles {
       val xEnd      = graphMargin.x + positionGraphStart.x + (xScale * (i + 1)).toInt
       val yMiddle0  = graphMargin.y + positionGraphStart.y + (yScale * (healthGraphAreaStart.y + states(i  ).x - xMin)).toInt
       val yMiddle1  = graphMargin.y + positionGraphStart.y + (yScale * (healthGraphAreaStart.y + states(i+1).x - xMin)).toInt
-      With.game.drawLineScreen(xStart, yMiddle0,            xEnd, yMiddle1,            colorNeon)
+      With.game.drawLineScreen(xStart, yMiddle0, xEnd, yMiddle1, colorNeon)
       i += 1
     }
   }

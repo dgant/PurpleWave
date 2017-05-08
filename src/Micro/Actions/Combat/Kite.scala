@@ -14,8 +14,11 @@ object Kite extends Action {
   
   override def perform(intent: Intention) {
     
-    if (intent.unit.cooldownLeft > 0)
+    if (intent.unit.cooldownLeft > 0) {
       Reposition.delegate(intent)
+    }
+    if (intent.threatsActive.forall(_.topSpeed < intent.unit.topSpeed) && intent.threatsActive.exists(_.pixelDistanceFast())
+    
     //Else shoot?
   }
 }

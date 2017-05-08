@@ -13,7 +13,7 @@ abstract class Action {
   
   def consider(intent:Intention, giveCredit:Boolean = true) {
     if (stillReady(intent) && allowed(intent)) {
-      if (giveCredit) { intent.state.lastAction = Some(this) }
+      if (giveCredit) intent.state.lastAction = Some(this)
       perform(intent)
     }
   }

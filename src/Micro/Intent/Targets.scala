@@ -9,8 +9,8 @@ object Targets {
   val ineligibleClasses = Vector(Zerg.Larva, Zerg.Egg)
   
   def get(intent:Intention):Vector[UnitInfo] = {
-    if (intent.unit.battle.isEmpty)         return Vector.empty
     if ( ! intent.unit.canAttackThisSecond) return Vector.empty
+    if (intent.unit.battle.isEmpty && intent.unit.unitClass.isWorker) return Vector.empty //Performance shortcut
     With.units.inTileRadius(
       intent.unit.tileIncludingCenter,
       With.configuration.battleMarginTiles)
@@ -27,6 +27,6 @@ object Targets {
   }
   
   def inRange(intent:Intention, target:UnitInfo):Boolean = {
-    intent.unit.inRangeToAttackFast(target, With.latency.framesRemaining)
+    intent.unit.inRangeToAttackFast(target, With.configuration.microFrameLookahead)
   }
 }

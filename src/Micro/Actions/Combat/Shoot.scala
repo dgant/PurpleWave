@@ -15,7 +15,7 @@ object Shoot extends Action {
   }
   
   override def perform(intent: Intention) {
-    intent.toAttack = EvaluateTargets.best(intent, intent.targetsInRange)
+    intent.toAttack = EvaluateTargets.best(intent, intent.targetsInRange.filter(_.canAttackThisSecond(intent.unit)))
     Attack.delegate(intent)
   }
 }

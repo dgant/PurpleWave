@@ -164,7 +164,7 @@ class Commander {
   }
   
   private def sleepAttack(unit:FriendlyUnitInfo) {
-    sleep(unit)
+    sleep(unit, unit.unitClass.framesRequiredForAttackToComplete)
   }
   
   private def sleepBuild(unit:FriendlyUnitInfo) {
@@ -181,6 +181,7 @@ class Commander {
     val sleepUntil = Array(
       With.frame + requiredDelay,
       With.frame + With.latency.turnSize,
+      With.frame + With.latency.framesRemaining,
       nextOrderFrame(unit)).max
     nextOrderFrame.put(unit, sleepUntil)
   }

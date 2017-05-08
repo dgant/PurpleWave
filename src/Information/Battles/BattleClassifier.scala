@@ -98,9 +98,10 @@ class BattleClassifier {
         new Battle(
           new BattleGroup(cluster.filter(_.isOurs).toVector),
           new BattleGroup(cluster.filter(_.isEnemy).toVector)))
-      .filter(battle =>
+      .filter(battle => {
         battle.us.units.nonEmpty &&
-          battle.enemy.units.nonEmpty)
+        battle.enemy.units.nonEmpty
+      })
       .toVector
   }
   

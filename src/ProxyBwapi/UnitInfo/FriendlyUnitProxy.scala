@@ -64,12 +64,14 @@ abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
   def interceptors : Int = interceptorCountCache.get
   def scarabs      : Int = scarabCountCache.get
   
-  def attackStarting            : Boolean = base.isStartingAttack
-  def attackAnimationHappening  : Boolean = base.isAttackFrame
+  def attackStarting            : Boolean = isStartingAttackCache.get
+  def attackAnimationHappening  : Boolean = isAttackFrameCache.get
   def airCooldownLeft           : Int     = airCooldownLeftCache.get
   def groundCooldownLeft        : Int     = groundCooldownLeftCache.get
   def spellCooldownLeft         : Int     = spellCooldownLeftCache.get
   
+  private val isStartingAttackCache   = new CacheFrame(() => base.isStartingAttack)
+  private val isAttackFrameCache      = new CacheFrame(() => base.isAttackFrame)
   private val interceptorCountCache   = new CacheFrame(() => base.getInterceptorCount)
   private val scarabCountCache        = new CacheFrame(() => base.getScarabCount)
   private val airCooldownLeftCache    = new CacheFrame(() => base.getAirWeaponCooldown)
@@ -197,5 +199,5 @@ abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
   def underStorm          : Boolean = base.isUnderStorm
   
   private val carryingMineralsCache = new CacheFrame(() => base.isCarryingMinerals)
-  private val carryingGasCache = new CacheFrame(() => base.isCarryingGas)
+  private val carryingGasCache      = new CacheFrame(() => base.isCarryingGas)
 }

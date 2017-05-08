@@ -1,5 +1,6 @@
 package ProxyBwapi.UnitInfo
 
+import Information.Battles.BattleTypes.Battle
 import Lifecycle.With
 import Mathematics.Pixels.{Pixel, Tile, TileRectangle}
 import Performance.Caching.CacheFrame
@@ -101,6 +102,8 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   ////////////
   // Combat //
   ////////////
+  
+  def battle:Option[Battle] = With.battles.byUnit.get(this)
   
   def melee:Boolean = unitClass.maxAirGroundRange <= 32 * 2
   

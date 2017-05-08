@@ -9,9 +9,8 @@ object Targets {
   val ineligibleClasses = Vector(Zerg.Larva, Zerg.Egg)
   
   def get(intent:Intention):Vector[UnitInfo] = {
-    
+    if (intent.unit.battle.isEmpty)         return Vector.empty
     if ( ! intent.unit.canAttackThisSecond) return Vector.empty
-    
     With.units.inTileRadius(
       intent.unit.tileIncludingCenter,
       With.configuration.battleMarginTiles)

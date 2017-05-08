@@ -41,7 +41,7 @@ object VisualizeBattles {
     With.game.drawTextScreen(army1.bwapi, "+" + With.battles.global.estimation.costToEnemy.toInt)
     With.game.drawTextScreen(army2.bwapi, "-" + With.battles.global.estimation.costToUs.toInt)
     With.battles.local.foreach(drawBattle)
-    val localBattles = With.battles.local.filter(_.happening)
+    val localBattles = With.battles.local
     if (localBattles.nonEmpty) {
       val battle      = localBattles.minBy(battle => battle.focus.pixelDistanceSquared(With.viewport.center))
       val tactics     = battle.bestTactics

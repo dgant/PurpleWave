@@ -18,7 +18,7 @@ class AutoCamera {
     
     if ( ! With.configuration.camera) { return }
     
-    val battles = With.battles.local.filter(_.happening)
+    val battles = With.battles.local
   
     if (battles.nonEmpty) {
       

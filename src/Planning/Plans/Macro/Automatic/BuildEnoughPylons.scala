@@ -10,7 +10,7 @@ class BuildEnoughPylons extends Plan {
   description.set("Builds Pylons just-in-time to prevent supply block")
   
   override def update() {
-    With.scheduler.request(this, Vector(new RequestUnitAtLeast(totalRequiredRecalculate, Protoss.Pylon)))
+    With.scheduler.request(this, Vector(RequestUnitAtLeast(totalRequiredRecalculate, Protoss.Pylon)))
   }
   
   def totalRequiredRecalculate: Int = {
@@ -50,6 +50,6 @@ class BuildEnoughPylons extends Plan {
     val totalPylonsRequired               = Math.ceil((supplyUsedWhenDepotWouldFinish - currentSupplyOfNexus) / supplyPerDepot).toInt
     val pylonsRequired                    = Math.max(0, totalPylonsRequired)
   
-    return pylonsRequired
+    pylonsRequired
   }
 }

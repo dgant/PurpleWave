@@ -14,6 +14,8 @@ object Fight extends Action {
     Collaborate.consider(intent)
     Kite.consider(intent)
     Shoot.consider(intent)
+    Engage.consider(intent)
+    Retaliate.consider(intent)
     Pursue.consider(intent)
   }
 }

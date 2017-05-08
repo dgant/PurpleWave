@@ -5,19 +5,19 @@ import Micro.Actions.Commands.Attack
 import Micro.Heuristics.Targeting.EvaluateTargets
 import Micro.Intent.Intention
 
-object Pursue extends Action {
+object Retaliate extends Action {
   
   override def allowed(intent: Intention): Boolean = {
     intent.canAttack &&
     intent.canPursue &&
     intent.toAttack.isEmpty &&
     intent.unit.canMoveThisFrame &&
-    intent.targets.nonEmpty
+    intent.targets.nonEmpty &&
+    intent.threatsActive.nonEmpty
   }
   
   override def perform(intent: Intention) {
-    val pursuableTargets = intent.targets.filter(_.topSpeed < intent.unit.topSpeed)
-    intent.toAttack = EvaluateTargets.best(intent, pursuableTargets)
+    intent.toAttack = EvaluateTargets.best(intent, intent.targets.intersect(intent.threatsActive))
     Attack.delegate(intent)
   }
 }

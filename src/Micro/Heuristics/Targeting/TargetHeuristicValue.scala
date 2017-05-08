@@ -7,8 +7,7 @@ object TargetHeuristicValue extends TargetHeuristic{
   
   override def evaluate(intent: Intention, candidate: UnitInfo): Double = {
   
-    candidate.unitClass.totalCost
+    candidate.subjectiveValue
     
   }
-  
 }

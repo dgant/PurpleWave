@@ -118,6 +118,9 @@ class Commander {
         move(unit, resource.pixelCenter)
       }
     }
+    else {
+      sleep(unit)
+    }
   }
   
   def build(unit:FriendlyUnitInfo, unitClass:UnitClass) {

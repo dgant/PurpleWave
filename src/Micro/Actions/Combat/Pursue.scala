@@ -17,7 +17,5 @@ object Pursue extends Action {
     
     val pursuableTargets = intent.targets.filter(_.topSpeed < intent.unit.topSpeed)
     intent.toAttack = EvaluateTargets.best(intent, pursuableTargets)
-    
-    false
   }
 }

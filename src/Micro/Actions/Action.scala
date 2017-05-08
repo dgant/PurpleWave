@@ -11,10 +11,14 @@ abstract class Action {
   protected def allowed(intent:Intention)     : Boolean = true
   protected def perform(intent:Intention)
   
-  def consider(intent:Intention) {
+  def consider(intent:Intention, giveCredit:Boolean = true) {
     if (stillReady(intent) && allowed(intent)) {
-      intent.state.lastAction = Some(this)
+      if (giveCredit) { intent.state.lastAction = Some(this) }
       perform(intent)
     }
+  }
+  
+  def delegate(intent:Intention) {
+    consider(intent, giveCredit = false)
   }
 }

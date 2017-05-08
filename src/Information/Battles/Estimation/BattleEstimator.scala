@@ -15,11 +15,13 @@ object BattleEstimator {
     With.battles.local.foreach(battle =>
       battle.estimations =
         battle.us.tacticsAvailable.map(tacticsUs => {
-          val tacticsEnemy = battle.enemy.tacticsApparent
-          val estimation = new BattleEstimation(tacticsUs, tacticsEnemy, Some(battle), considerGeometry = true)
-          estimation.addUnits(battle)
-          estimation.recalculate()
-          estimation
+          battle.enemy.tacticsAvailable.map(tacticsEnemy => {
+            val estimation = new BattleEstimation(tacticsUs, tacticsEnemy, Some(battle), considerGeometry = true)
+            estimation.addUnits(battle)
+            estimation.recalculate()
+            estimation
+          })
+          .minBy(estimation => estimation.result.costToEnemy - estimation.result.costToUs)
         }))
   }
   

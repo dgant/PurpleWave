@@ -14,6 +14,6 @@ object Shoot extends Action {
   
   override def perform(intent: Intention) {
     intent.toAttack = EvaluateTargets.best(intent, intent.targetsInRange)
-    Attack.consider(intent)
+    Attack.delegate(intent)
   }
 }

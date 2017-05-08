@@ -15,7 +15,7 @@ object Kite extends Action {
   override def perform(intent: Intention) {
     
     if (intent.unit.cooldownLeft > 0)
-      Reposition.consider(intent)
+      Reposition.delegate(intent)
     //Else shoot?
   }
 }

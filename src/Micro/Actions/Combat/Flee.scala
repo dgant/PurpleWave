@@ -20,12 +20,12 @@ object Flee extends Action {
   
     // If the enemy is faster, go straight home so we don't get caught
     if (enemyFaster) {
-      Travel.consider(intent)
+      Travel.delegate(intent)
     }
   
     //If we're faster, we can be cuter with how we retreat
     if (weAreFaster) {
-      Reposition.consider(intent)
+      Reposition.delegate(intent)
     }
   
     // If we have a clear path home, then skip heuristic movement and just go.
@@ -35,9 +35,9 @@ object Flee extends Action {
         if (intent.unit.flying) threat.pixelDistanceFast(intent.origin) //Don't retreat directly over the enmy!
         else                    threat.pixelDistanceTravelling(intent.origin)))) {
     
-      Travel.consider(intent)
+      Travel.delegate(intent)
     }
   
-    Reposition.consider(intent)
+    Reposition.delegate(intent)
   }
 }

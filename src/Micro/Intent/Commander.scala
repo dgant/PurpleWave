@@ -104,6 +104,9 @@ class Commander {
         unit.base.returnCargo
         sleepReturnCargo(unit)
       }
+      else {
+        sleep(unit)
+      }
     }
       
     // The logic of "If we're not carrying resources, spam gather until the unit's target is the intended resource"

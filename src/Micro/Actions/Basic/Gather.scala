@@ -17,8 +17,9 @@ object Gather extends Action {
     // If we're threatened and continuing to gather won't help, respond
     if (
       intent.threatsActive.exists(threat =>
-      threat.pixelDistanceFast(intent.unit) >=
-      threat.pixelDistanceFast(intent.toGather.get))) {
+        threat.target.contains(intent.unit) &&
+        threat.pixelDistanceFast(intent.unit) >=
+        threat.pixelDistanceFast(intent.toGather.get))) {
     
       intent.movementProfile  = MovementProfiles.flee
       intent.toGather         = None

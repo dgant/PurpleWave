@@ -1,4 +1,4 @@
-package Planning.Plans.Macro.UnitCount
+package Planning.Plans.Macro.Milestones
 
 import Planning.Composition.Property
 import Planning.Plan

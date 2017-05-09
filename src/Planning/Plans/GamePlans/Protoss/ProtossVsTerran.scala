@@ -7,7 +7,7 @@ import Planning.Plans.Compound.{IfThenElse, Parallel}
 import Planning.Plans.Information.{FindExpansions, ScoutAt}
 import Planning.Plans.Macro.Automatic.{BuildEnoughPylons, TrainContinuously, TrainProbesContinuously}
 import Planning.Plans.Macro.BuildOrders.ScheduleBuildOrder
-import Planning.Plans.Macro.UnitCount.{SupplyAtLeast, UnitsAtLeast}
+import Planning.Plans.Macro.Milestones.{SupplyAtLeast, UnitsAtLeast}
 import ProxyBwapi.Races.Protoss
 
 class ProtossVsTerran extends Parallel {

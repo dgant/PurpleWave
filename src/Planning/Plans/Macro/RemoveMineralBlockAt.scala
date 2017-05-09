@@ -1,7 +1,7 @@
 package Planning.Plans.Macro
 
 import Planning.Plans.Compound.IfThenElse
-import Planning.Plans.Macro.UnitCount.SupplyAtLeast
+import Planning.Plans.Macro.Milestones.SupplyAtLeast
 
 class RemoveMineralBlockAt(minimumSupply:Int) extends IfThenElse {
   

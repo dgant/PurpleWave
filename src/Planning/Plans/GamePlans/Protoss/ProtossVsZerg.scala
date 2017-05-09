@@ -8,7 +8,7 @@ import Planning.Plans.Information.{FindExpansions, FlyoverEnemyBases, ScoutAt}
 import Planning.Plans.Macro.Automatic.{BuildEnoughPylons, TrainContinuously, TrainProbesContinuously}
 import Planning.Plans.Macro.BuildOrders.ScheduleBuildOrder
 import Planning.Plans.Macro.Reaction.EnemyThreatensMutalisks
-import Planning.Plans.Macro.UnitCount.{SupplyAtLeast, UnitsAtLeast, UnitsExactly}
+import Planning.Plans.Macro.Milestones.{SupplyAtLeast, UnitsAtLeast, UnitsExactly}
 import ProxyBwapi.Races.Protoss
 
 class ProtossVsZerg extends Parallel {

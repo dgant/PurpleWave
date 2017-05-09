@@ -1,7 +1,7 @@
 package Planning.Plans.Information
 
 import Planning.Plans.Compound.{And, IfThenElse, Not}
-import Planning.Plans.Macro.UnitCount.SupplyAtLeast
+import Planning.Plans.Macro.Milestones.SupplyAtLeast
 
 class ScoutAt(minimumSupply:Int) extends IfThenElse {
   

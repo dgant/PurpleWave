@@ -9,18 +9,26 @@ object Idle extends Action {
   
   override def allowed(state:ExecutionState):Boolean = {
     
-    // https://docs.google.com/spreadsheets/d/1bsvPvFil-kpvEUfSG74U3E5PLSTC02JxSkiR8QdLMuw/edit#gid=0
-    //
-    // "Dragoon, Devourer only units that can have damage by stop() too early"
-    //
     if (state.unit.attackStarting) {
       return false
     }
-    if (state.unit.attackAnimationHappening && state.unit.unitClass.framesRequiredForAttackToComplete > 0) {
-      return false
+  
+    // https://docs.google.com/spreadsheets/d/1bsvPvFil-kpvEUfSG74U3E5PLSTC02JxSkiR8QdLMuw/edit#gid=0
+    //
+    // "Dragoon, Devourer only units that can have damage prevented by stop() too early"
+    //
+    if (state.unit.unitClass.framesRequiredForAttackToComplete > 0) {
+      if (state.unit.attackAnimationHappening) {
+        return false
+      }
+      if (state.unit.cooldownLeft == 0) {
+        return true
+      }
+      
+      return With.frame > state.unit.commandFrame + state.unit.unitClass.framesRequiredForAttackToComplete
     }
-    state.unit.cooldownLeft == 0 ||
-      With.frame > state.unit.commandFrame + state.unit.unitClass.framesRequiredForAttackToComplete
+    
+    true
   }
   
   def perform(state:ExecutionState) {

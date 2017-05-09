@@ -22,6 +22,6 @@ object KeyboardCommands {
   }
   
   def breakpoint() {
-    val setABreakpointHere = _
+    val setABreakpointHere = 12345
   }
 }

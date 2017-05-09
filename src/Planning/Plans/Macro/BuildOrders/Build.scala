@@ -5,7 +5,9 @@ import Planning.Composition.Property
 import Planning.Plan
 import Lifecycle.With
 
-class ScheduleBuildOrder(initialBuildables:Seq[BuildRequest] = Vector.empty) extends Plan {
+class Build(initialBuildables:Seq[BuildRequest] = Vector.empty) extends Plan {
+  
+  def this(someBuildables:BuildRequest *) = this(someBuildables)
   
   description.set("Schedule a fixed build order")
   

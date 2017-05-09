@@ -3,84 +3,103 @@ package Planning.Plans.GamePlans.Protoss
 import Macro.BuildRequests.{BuildRequest, RequestUnitAtLeast, RequestUpgrade}
 import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors}
 import Planning.Plans.Army.{Attack, Defend}
-import Planning.Plans.Compound.{And, IfThenElse, Parallel}
+import Planning.Plans.Compound._
 import Planning.Plans.Information.{FindExpansions, FlyoverEnemyBases, ScoutAt}
-import Planning.Plans.Macro.Automatic.{BuildEnoughPylons, TrainContinuously, TrainProbesContinuously}
-import Planning.Plans.Macro.BuildOrders.ScheduleBuildOrder
-import Planning.Plans.Macro.Reaction.EnemyThreatensMutalisks
+import Planning.Plans.Macro.Automatic.Continuous.{BuildPylonsContinuously, TrainContinuously, TrainProbesContinuously}
+import Planning.Plans.Macro.Automatic.Gas.BuildAssimilators
+import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Milestones.{SupplyAtLeast, UnitsAtLeast, UnitsExactly}
+import Planning.Plans.Macro.Reaction.{EnemyHydralisks, EnemyMutalisks}
 import ProxyBwapi.Races.Protoss
 
 class ProtossVsZerg extends Parallel {
   
   description.set("Protoss vs Zerg")
   
-  val _twoBase = Vector[BuildRequest] (
-    new RequestUnitAtLeast(2,   Protoss.Assimilator),
-    new RequestUnitAtLeast(4,   Protoss.Gateway),
-    new RequestUnitAtLeast(1,   Protoss.Forge),
-    new RequestUnitAtLeast(1,   Protoss.CitadelOfAdun),
-    new RequestUpgrade(         Protoss.ZealotSpeed),
-    new RequestUpgrade(         Protoss.GroundDamage, 1),
-    new RequestUnitAtLeast(1,   Protoss.TemplarArchives),
+  private val lateGameBuild = Vector[BuildRequest] (
     
-    new RequestUnitAtLeast(3,   Protoss.Nexus),
-    new RequestUnitAtLeast(1,   Protoss.RoboticsFacility),
-    new RequestUnitAtLeast(4,   Protoss.PhotonCannon),
-    new RequestUnitAtLeast(3,   Protoss.Assimilator),
-    new RequestUpgrade(         Protoss.DragoonRange),
-    new RequestUnitAtLeast(1,   Protoss.RoboticsSupportBay),
-    new RequestUnitAtLeast(8,   Protoss.Gateway),
+    RequestUnitAtLeast(4,   Protoss.Gateway),
+    RequestUnitAtLeast(1,   Protoss.Forge),
+    RequestUpgrade(         Protoss.DragoonRange),
+    RequestUpgrade(         Protoss.GroundDamage, 1),
+    RequestUnitAtLeast(6,   Protoss.Gateway),
     
-    new RequestUnitAtLeast(4,   Protoss.Nexus),
-    new RequestUnitAtLeast(2,   Protoss.RoboticsFacility),
-    new RequestUnitAtLeast(4,   Protoss.Assimilator),
-    new RequestUnitAtLeast(1,   Protoss.TemplarArchives),
-    new RequestUnitAtLeast(2,   Protoss.Forge),
-    new RequestUnitAtLeast(7,   Protoss.PhotonCannon),
-    new RequestUpgrade(         Protoss.GroundDamage, 2),
-    new RequestUpgrade(         Protoss.GroundArmor, 2),
-    new RequestUnitAtLeast(8,   Protoss.Gateway),
+    RequestUnitAtLeast(3,   Protoss.Nexus),
+    RequestUnitAtLeast(1,   Protoss.TemplarArchives),
+    RequestUnitAtLeast(8,   Protoss.Gateway),
     
-    new RequestUnitAtLeast(5,   Protoss.Nexus),
-    new RequestUnitAtLeast(10,  Protoss.Gateway),
-    new RequestUnitAtLeast(5,   Protoss.Assimilator),
-    new RequestUpgrade(         Protoss.GroundDamage, 3),
-    new RequestUpgrade(         Protoss.GroundArmor, 3),
+    RequestUnitAtLeast(4,   Protoss.Nexus),
+    RequestUnitAtLeast(2,   Protoss.RoboticsFacility),
+    RequestUnitAtLeast(1,   Protoss.TemplarArchives),
+    RequestUnitAtLeast(2,   Protoss.Forge),
+    RequestUnitAtLeast(7,   Protoss.PhotonCannon),
+    RequestUpgrade(         Protoss.GroundDamage, 2),
+    RequestUpgrade(         Protoss.GroundArmor, 2),
+    RequestUnitAtLeast(8,   Protoss.Gateway),
     
-    new RequestUnitAtLeast(6,   Protoss.Nexus),
-    new RequestUnitAtLeast(12,  Protoss.Gateway),
-    new RequestUnitAtLeast(6,   Protoss.Assimilator),
+    RequestUnitAtLeast(5,   Protoss.Nexus),
+    RequestUnitAtLeast(10,  Protoss.Gateway),
+    RequestUpgrade(         Protoss.GroundDamage, 3),
+    RequestUpgrade(         Protoss.GroundArmor, 3),
     
-    new RequestUnitAtLeast(7,   Protoss.Nexus),
-    new RequestUnitAtLeast(7,   Protoss.Assimilator),
+    RequestUnitAtLeast(6,   Protoss.Nexus),
+    RequestUnitAtLeast(12,  Protoss.Gateway),
     
-    new RequestUnitAtLeast(8,   Protoss.Nexus),
-    new RequestUnitAtLeast(8,   Protoss.Assimilator)
+    RequestUnitAtLeast(7,   Protoss.Nexus),
+    RequestUnitAtLeast(8,   Protoss.Nexus)
   )
   
+  private val earlyZealotCount = 8
+  
   children.set(Vector(
-    new ScheduleBuildOrder(ProtossBuilds.OpeningTwoGate99),
+    new Build(ProtossBuilds.OpeningTwoGate99),
+  
+    new IfThenElse(
+      new UnitsAtLeast(12, UnitMatchWarriors),
+      new Build(ProtossBuilds.TakeNatural)
+    ),
+  
+    new IfThenElse(
+      new And(
+        new UnitsAtLeast(16, UnitMatchWarriors),
+        new UnitsAtLeast(1, UnitMatchType(Protoss.Corsair)),
+        new UnitsAtLeast(1, UnitMatchType(Protoss.Reaver))
+      ),
+      new Build(ProtossBuilds.TakeThirdBase)
+    ),
+    
     new IfThenElse(
       new UnitsExactly(0, UnitMatchType(Protoss.CyberneticsCore)),
-      new ScheduleBuildOrder(ProtossBuilds.OpeningTwoGate99Zealots)
+      new Build(ProtossBuilds.OpeningTwoGate99Zealots),
+      new BuildAssimilators
     ),
-    new BuildEnoughPylons,
+    
+    new BuildPylonsContinuously,
     new TrainProbesContinuously,
     new TrainContinuously(Protoss.DarkTemplar, 1),
+    
     new IfThenElse(
-      new EnemyThreatensMutalisks,
-      new Parallel(
-        new ScheduleBuildOrder(ProtossBuilds.TechCorsairs),
-        new ScheduleBuildOrder(ProtossBuilds.TechDragoons),
-        new ScheduleBuildOrder(Vector(RequestUpgrade(Protoss.AirDamage))),
-        new TrainContinuously(Protoss.Corsair, 12),
-        new TrainContinuously(Protoss.Dragoon)
-      ),
-      new TrainContinuously(Protoss.Corsair, 4)
+      new EnemyHydralisks,
+      new Build(ProtossBuilds.TechReavers)
     ),
-    new TrainContinuously(Protoss.DarkTemplar, 3),
-    new TrainContinuously(Protoss.Reaver, 3),
+    
+    new IfThenElse(
+      new EnemyMutalisks,
+      new Parallel(
+        new Build(ProtossBuilds.TechCorsairs),
+        new Build(ProtossBuilds.TechDragoons),
+        new Build(RequestUpgrade(Protoss.DragoonRange)),
+        new Build(Vector(RequestUpgrade(Protoss.AirArmor))),
+        new TrainContinuously(Protoss.Corsair, 12),
+        new TrainContinuously(Protoss.Dragoon),
+        new Build(Vector(RequestUpgrade(Protoss.AirDamage)))
+      ),
+      new TrainContinuously(Protoss.Corsair, 3)
+    ),
+    
+    new TrainContinuously(Protoss.DarkTemplar, 2),
+    new TrainContinuously(Protoss.Reaver, 2),
+    
     new IfThenElse(
       new And(
         new UnitsAtLeast(1, UnitMatchType(Protoss.CyberneticsCore)),
@@ -88,14 +107,14 @@ class ProtossVsZerg extends Parallel {
       ),
       new IfThenElse (
         new UnitsAtLeast(8, UnitMatchType(Protoss.Zealot)),
-        new TrainContinuously(Protoss.Dragoon),
-        new TrainContinuously(Protoss.Zealot)
+        new TrainContinuously(Protoss.Dragoon)
       ),
       new TrainContinuously(Protoss.Zealot)
     ),
-    new ScheduleBuildOrder(ProtossBuilds.TechCorsairs),
-    new ScheduleBuildOrder(ProtossBuilds.TakeNatural),
-    new ScheduleBuildOrder(_twoBase),
+    
+    new Build(ProtossBuilds.TechCorsairs),
+    new Build(ProtossBuilds.TechReavers),
+    new Build(lateGameBuild),
     new ScoutAt(10),
     new IfThenElse(
       new SupplyAtLeast(80),

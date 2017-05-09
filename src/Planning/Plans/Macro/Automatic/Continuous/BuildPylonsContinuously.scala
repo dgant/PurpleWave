@@ -1,11 +1,11 @@
-package Planning.Plans.Macro.Automatic
+package Planning.Plans.Macro.Automatic.Continuous
 
+import Lifecycle.With
 import Macro.BuildRequests.RequestUnitAtLeast
 import Planning.Plan
 import ProxyBwapi.Races.Protoss
-import Lifecycle.With
 
-class BuildEnoughPylons extends Plan {
+class BuildPylonsContinuously extends Plan {
   
   description.set("Builds Pylons just-in-time to prevent supply block")
   

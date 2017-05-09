@@ -4,7 +4,7 @@ import Lifecycle.With
 import Planning.Plan
 import ProxyBwapi.Races.Zerg
 
-class EnemyThreatensMutalisks extends Plan {
+class EnemyMutalisks extends Plan {
   
   description.set("Is the enemy threatening Mutalisks?")
   

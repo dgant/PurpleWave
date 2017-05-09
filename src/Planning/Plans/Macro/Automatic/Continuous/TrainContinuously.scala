@@ -1,9 +1,9 @@
-package Planning.Plans.Macro.Automatic
+package Planning.Plans.Macro.Automatic.Continuous
 
+import Lifecycle.With
 import Macro.BuildRequests.RequestUnitAtLeast
 import Planning.Plan
 import ProxyBwapi.UnitClass.UnitClass
-import Lifecycle.With
 
 class TrainContinuously(unitClass: UnitClass, maximum:Int = Int.MaxValue) extends Plan {
   

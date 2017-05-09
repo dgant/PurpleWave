@@ -1,4 +1,4 @@
-package Planning.Plans.Macro.Automatic
+package Planning.Plans.Macro.Automatic.Continuous
 
 import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, RequestUnitAnother, RequestUnitAnotherOne}

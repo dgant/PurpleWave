@@ -146,9 +146,11 @@ class BattleEstimation(
     
     val output = stateThis.copy()
     
+    val direction            = signTowards(stateThis.x, stateThat.x)
+    
     val xTarget =
-      if      (stateThis.tactics.has(Tactics.Movement.Charge))  stateThat.x
-      else if (stateThis.tactics.has(Tactics.Movement.Flee))    - signTowards(stateThis.x, stateThat.x) * 100.0
+      if      (stateThis.tactics.has(Tactics.Movement.Charge))  stateThat.x - direction * Math.max(stateThis.avatar.rangePixelsGround, stateThis.avatar.rangePixelsAir)
+      else if (stateThis.tactics.has(Tactics.Movement.Flee))    - direction * 1000.0
       else                                                      stateThis.x
     
     val regroupRate =
@@ -156,7 +158,6 @@ class BattleEstimation(
       else if (stateThis.tactics.has(Tactics.Movement.Flee))    2.0
       else                                                      1.0
     
-    val direction            = signTowards(stateThis.x, stateThat.x)
     val speedPixelsPerFrame  = stateThis.avatar.speedPixelsPerFrame / stateThis.avatar.totalUnits
     val distanceToOpponent   = Math.abs(xTarget - stateThis.x)
     val distanceTravelled    = Math.min(distanceToOpponent, speedPixelsPerFrame * frameStep)

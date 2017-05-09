@@ -7,7 +7,7 @@ import Lifecycle.With
 
 class Build(initialBuildables:Seq[BuildRequest] = Vector.empty) extends Plan {
   
-  def this(someBuildables:BuildRequest *) = this(someBuildables)
+  def this(someBuildables:BuildRequest) = this(Vector(someBuildables))
   
   description.set("Schedule a fixed build order")
   

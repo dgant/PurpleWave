@@ -1,13 +1,11 @@
 package Planning.Plans.GamePlans.Protoss
 
 import Macro.BuildRequests.{RequestUnitAtLeast, _}
-import Macro.Buildables.BuildableUnit
 import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{And, IfThenElse, Parallel}
 import Planning.Plans.Information.{FindExpansions, ScoutAt}
 import Planning.Plans.Macro.Automatic.Continuous.{BuildPylonsContinuously, TrainContinuously, TrainProbesContinuously}
-import Planning.Plans.Macro.Automatic.{BuildPylonsContinuously, TrainContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Milestones.{HaveUpgrade, SupplyAtLeast, UnitsAtLeast}
 import ProxyBwapi.Races.Protoss

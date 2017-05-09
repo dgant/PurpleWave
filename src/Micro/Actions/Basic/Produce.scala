@@ -14,7 +14,7 @@ object Produce extends Action {
     
     if (state.toTrain.isDefined) {
       With.commander.build(state.unit, state.toTrain.get)
-      state.toTrain = None //Avoid building repeatedly
+      state.intent.toTrain = None //Avoid building repeatedly
     }
     else if (state.toTech.isDefined) {
       With.commander.tech(state.unit, state.toTech.get)

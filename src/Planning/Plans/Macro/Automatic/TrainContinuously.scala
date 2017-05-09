@@ -11,7 +11,7 @@ class TrainContinuously(unitClass: UnitClass, maximum:Int = Int.MaxValue) extend
     if ( ! canBuild) return
     
     With.scheduler.request(this, Vector(
-      new RequestUnitAtLeast(
+      RequestUnitAtLeast(
         List(
           maximum,
           maxDesirable,

@@ -7,7 +7,7 @@ import Planning.Composition.PixelFinders.Tactics.TileEnemyBase
 import Planning.Composition.PixelFinders.TileFinder
 import Planning.Composition.Property
 import Planning.Composition.ResourceLocks.LockUnits
-import Planning.Plan
+import Planning.{Plan, Yolo}
 
 class ControlPixel extends Plan {
   
@@ -25,6 +25,7 @@ class ControlPixel extends Plan {
     val ourBases = With.geography.ourBases.map(_.townHallArea.midPixel)
     val infiltrators = With.units.enemy
       .filter(e =>
+        ! Yolo.active &&
         e.possiblyStillThere &&
         e.canAttackThisSecond &&
         ourBases.exists(base =>

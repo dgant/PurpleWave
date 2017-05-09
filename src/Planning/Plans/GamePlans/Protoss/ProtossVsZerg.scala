@@ -107,7 +107,8 @@ class ProtossVsZerg extends Parallel {
       ),
       new IfThenElse (
         new UnitsAtLeast(8, UnitMatchType(Protoss.Zealot)),
-        new TrainContinuously(Protoss.Dragoon)
+        new TrainContinuously(Protoss.Dragoon),
+        new TrainContinuously(Protoss.Zealot)
       ),
       new TrainContinuously(Protoss.Zealot)
     ),

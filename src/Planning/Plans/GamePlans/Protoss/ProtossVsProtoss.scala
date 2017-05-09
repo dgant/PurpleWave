@@ -46,6 +46,7 @@ class ProtossVsProtoss extends Parallel {
   )
   
   children.set(Vector(
+    
     new IfThenElse( //Emergency -- make sure we have some defense even if our economy is destroyed
       new And(
         new UnitsAtLeast(1, UnitMatchType(Protoss.Probe)),
@@ -58,9 +59,9 @@ class ProtossVsProtoss extends Parallel {
         new Build(RequestUnitAtLeast(2, Protoss.Dragoon))
       )
     ),
+    
     new Build(ProtossBuilds.OpeningOneGateCore),
-    new BuildPylonsContinuously,
-    new TrainProbesContinuously,
+    
     new IfThenElse(
       new UnitsAtLeast(8, UnitMatchType(Protoss.Dragoon)),
       new Parallel(
@@ -69,16 +70,21 @@ class ProtossVsProtoss extends Parallel {
       )
     ),
     new IfThenElse(
-      new UnitsAtLeast(2, UnitMatchType(Protoss.Reaver)),
-      new Build(RequestUpgrade(Protoss.ScarabDamage))
-    ),
-    new IfThenElse(
       new And(
         new UnitsAtLeast(10, UnitMatchType(Protoss.Dragoon)),
         new UnitsAtLeast(2, UnitMatchType(Protoss.Reaver))
       ),
       new Build(ProtossBuilds.TakeThirdBase)
     ),
+    
+    new BuildPylonsContinuously,
+    new TrainProbesContinuously,
+    
+    new IfThenElse(
+      new UnitsAtLeast(2, UnitMatchType(Protoss.Reaver)),
+      new Build(RequestUpgrade(Protoss.ScarabDamage))
+    ),
+
     new TrainContinuously(Protoss.Reaver, 4),
     new IfThenElse(
       new And(

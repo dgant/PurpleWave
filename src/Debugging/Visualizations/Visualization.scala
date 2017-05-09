@@ -11,7 +11,7 @@ object Visualization {
     if (With.configuration.visualize) {
       With.game.setTextSize(bwapi.Text.Size.Enum.Small)
   
-      if (With.configuration.visualizeVectorUnits) {
+      if (With.configuration.visualizeHappyVision) {
         VisualizeBlackScreen.render()
         VisualizeGeography.render()
         VisualizeVectorUnits.render()

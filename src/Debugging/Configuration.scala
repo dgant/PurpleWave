@@ -65,6 +65,7 @@ class Configuration {
   var visualizeEconomy            = false
   var visualizeGeography          = false
   var visualizeGrids              = false
+  var visualizeHappyVision        = false
   var visualizeHitPoints          = true
   var visualizeHeuristicMovement  = false
   var visualizePerformance        = false
@@ -76,7 +77,6 @@ class Configuration {
   var visualizeTextOnly           = false
   var visualizeUnitsForeign       = true
   var visualizeUnitsOurs          = true
-  var visualizeVectorUnits        = false
   
   var camera                      = false
   var cameraDynamicSpeed          = false

@@ -5,7 +5,7 @@ import Planning.Plans.Compound.Parallel
 import Planning.Plans.Information.SwitchEnemyRace
 import Planning.Plans.Macro.Automatic.Gather
 import Planning.Plans.Macro.BuildOrders.FollowBuildOrder
-import Planning.Plans.Macro.RemoveMineralBlockAt
+import Planning.Plans.Macro.Expansion.RemoveMineralBlockAt
 
 class ProtossGamePlan extends Parallel {
   children.set(Vector(
@@ -16,7 +16,7 @@ class ProtossGamePlan extends Parallel {
       random  .set(new ProtossVsRandom)
     },
     new FollowBuildOrder,
-    new RemoveMineralBlockAt(30),
+    new RemoveMineralBlockAt(50),
     new WorkersDefend,
     new Gather,
     new Defend

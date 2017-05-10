@@ -1,4 +1,4 @@
-package Planning.Plans.Information
+package Planning.Plans.Army
 
 import Lifecycle.With
 import Micro.Intent.Intention
@@ -9,9 +9,9 @@ import Planning.Composition.UnitMatchers.UnitMatchMobileFlying
 import Planning.Composition.UnitPreferences.UnitPreferFast
 import Planning.Plan
 
-class FlyoverEnemyBases extends Plan {
+class ControlEnemyAirspace extends Plan {
   
-  description.set("Fly over known enemy bases")
+  description.set("Fly over enemy bases")
   
   val scouts = new Property[LockUnits](new LockUnits {
     unitCounter.set(new UnitCountExactly(0))

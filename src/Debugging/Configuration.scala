@@ -26,6 +26,12 @@ class Configuration {
   var dpsGridMovementPenalty          = 0.5
   var dpsGridCooldownPenalty          = 0.25
   
+  ///////////
+  // Macro //
+  ///////////
+  
+  var maxMineralsBeforeMinedOut = 300 * 8
+  
   /////////////
   // Battles //
   /////////////
@@ -34,6 +40,8 @@ class Configuration {
   var battleMarginTiles         = 15
   var battleMarginPixels        = battleMarginTiles * 32.0
   var useFastGroundDistance     = true
+  
+  
   
   /////////////////
   // Performance //

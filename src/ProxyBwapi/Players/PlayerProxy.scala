@@ -4,30 +4,37 @@ import Lifecycle.With
 import Mathematics.Pixels.Tile
 import Performance.Caching.CacheFrame
 import ProxyBwapi.Techs.Tech
+import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
 import ProxyBwapi.Upgrades.Upgrade
-import bwapi.{Player, Race}
+import bwapi.{Player, Race, Unit}
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 abstract class PlayerProxy(base:Player) {
   
-  lazy val  id          : Int     = base.getID
-  lazy val  name        : String  = base.getName
-  lazy val  race        : Race    = base.getRace
-  lazy val  isUs        : Boolean = this == With.self
-  lazy val  isNeutral   : Boolean = base.isNeutral
-  lazy val  isAlly      : Boolean = base.isAlly(With.game.self)
-  lazy val  isEnemy     : Boolean = base.isEnemy(With.game.self)
-  lazy val  startTile   : Tile    = new Tile(base.getStartLocation)
+  lazy val id             : Int       = base.getID
+  lazy val name           : String    = base.getName
+  lazy val race           : Race      = base.getRace
+  lazy val isUs           : Boolean   = this == With.self
+  lazy val isNeutral      : Boolean   = base.isNeutral
+  lazy val isAlly         : Boolean   = base.isAlly(With.game.self)
+  lazy val isEnemy        : Boolean   = base.isEnemy(With.game.self)
+  lazy val startTile      : Tile      = new Tile(base.getStartLocation)
+  lazy val townHallClass  : UnitClass = UnitClasses.get(race.getCenter)
+  lazy val gasClass       : UnitClass = UnitClasses.get(race.getRefinery)
+  lazy val supplyClass    : UnitClass = UnitClasses.get(race.getSupplyProvider)
+  lazy val transportClass : UnitClass = UnitClasses.get(race.getTransport)
+  lazy val workerClass    : UnitClass = UnitClasses.get(race.getWorker)
   
-  def gas               = gasCache.get
-  def minerals          = mineralsCache.get
-  def gatheredGas       = gatheredGasCache.get
-  def gatheredMinerals  = gatheredMineralsCache.get
-  def supplyUsed        = supplyUsedCache.get
-  def supplyTotal       = supplyTotalCache.get
-  def rawUnits          = unitsCache.get
+  def gas               : Int = gasCache.get
+  def minerals          : Int = mineralsCache.get
+  def gatheredGas       : Int = gatheredGasCache.get
+  def gatheredMinerals  : Int = gatheredMineralsCache.get
+  def supplyUsed        : Int = supplyUsedCache.get
+  def supplyTotal       : Int = supplyTotalCache.get
+  
+  def rawUnits: mutable.Buffer[Unit] = unitsCache.get
   
   def getUpgradeLevel(upgrade: Upgrade):Int = {
     //Further optimization: Stop expiring when at max level

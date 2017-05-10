@@ -96,7 +96,7 @@ class BattleEstimationUnit {
           .map(group =>
             Math.max(
               0.0,
-              unit.pixelDistanceTravelling(group.opponent.vanguard) - unit.pixelRangeMax))
+              unit.pixelDistanceFast(group.opponent.vanguard) - unit.pixelRangeMax))
           .sum
       else
         With.configuration.battleMarginPixels

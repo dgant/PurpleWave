@@ -146,12 +146,12 @@ class BattleEstimation(
     
     val output = stateThis.copy()
     
-    val direction            = signTowards(stateThis.x, stateThat.x)
+    val direction = signTowards(stateThis.x, stateThat.x)
     
     val xTarget =
-      if      (stateThis.tactics.has(Tactics.Movement.Charge))  stateThat.x - direction * Math.max(stateThis.avatar.rangePixelsGround, stateThis.avatar.rangePixelsAir)
+      if      (stateThis.tactics.has(Tactics.Movement.Charge))  stateThat.x
       else if (stateThis.tactics.has(Tactics.Movement.Flee))    - direction * 1000.0
-      else                                                      stateThis.x
+      else                                                      stateThat.x - direction * Math.max(stateThis.avatar.rangePixelsGround, stateThis.avatar.rangePixelsAir)
     
     val regroupRate =
       if      (stateThis.tactics.has(Tactics.Movement.Charge))  0.0

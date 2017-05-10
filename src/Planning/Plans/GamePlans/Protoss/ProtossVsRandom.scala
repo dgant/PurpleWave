@@ -30,7 +30,7 @@ class ProtossVsRandom extends Parallel {
     new TrainProbesContinuously,
     new TrainGatewayUnitsContinuously,
     new Build(safeBuild),
-    new ScoutAt(7),
+    new ScoutAt(9),
     new Defend
   ))
 }

@@ -4,10 +4,10 @@ import Macro.BuildRequests.{RequestUnitAtLeast, _}
 import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{And, IfThenElse, Parallel}
-import Planning.Plans.Information.{FindExpansions, ScoutAt}
+import Planning.Plans.Information.{ScoutAt, ScoutExpansionsAt}
 import Planning.Plans.Macro.Automatic.Continuous.{BuildPylonsContinuously, TrainContinuously, TrainProbesContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Macro.Milestones.{HaveUpgrade, SupplyAtLeast, UnitsAtLeast}
+import Planning.Plans.Macro.Milestones.{HaveUpgrade, UnitsAtLeast}
 import ProxyBwapi.Races.Protoss
 
 class ProtossVsProtoss extends Parallel {
@@ -97,10 +97,7 @@ class ProtossVsProtoss extends Parallel {
     new Build(RequestUpgrade(Protoss.DragoonRange)),
     new Build(ProtossBuilds.TechReavers),
     new Build(_lateGame),
-    new IfThenElse(
-      new SupplyAtLeast(140),
-      new FindExpansions
-    ),
+    new ScoutExpansionsAt(70),
     new ScoutAt(9),
     new Attack
   ))

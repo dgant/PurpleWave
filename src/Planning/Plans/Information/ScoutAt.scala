@@ -1,7 +1,7 @@
 package Planning.Plans.Information
 
 import Planning.Plans.Compound.{And, IfThenElse, Not}
-import Planning.Plans.Macro.Milestones.SupplyAtLeast
+import Planning.Plans.Macro.Milestones.SupplyAtLeastDoubleThis
 
 class ScoutAt(minimumSupply:Int) extends IfThenElse {
   
@@ -9,7 +9,7 @@ class ScoutAt(minimumSupply:Int) extends IfThenElse {
   
   predicate.set(
     new And { children.set(Vector(
-      new SupplyAtLeast { quantity.set(minimumSupply*2) },
+      new SupplyAtLeastDoubleThis { quantity.set(minimumSupply) },
       new Not { child.set(new FoundEnemyBase) }
     ))})
     

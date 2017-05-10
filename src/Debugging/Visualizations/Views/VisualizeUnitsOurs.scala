@@ -22,6 +22,7 @@ object VisualizeUnitsOurs {
       state.lastAction.map(_.name).getOrElse(""),
       state.unit.pixelCenter.add(0, -14),
       drawBackground = false)
+    /*
     DrawMap.label(
       state.unit.command.getUnitCommandType.toString,
       state.unit.pixelCenter.add(0, -7),
@@ -30,6 +31,7 @@ object VisualizeUnitsOurs {
       state.unit.order.toString,
       state.unit.pixelCenter.add(0, 0),
       drawBackground = false)
+    */
     if (state.movingTo.isDefined) {
       DrawMap.line(state.unit.pixelCenter, state.movingTo.get, Colors.MediumGray)
     }

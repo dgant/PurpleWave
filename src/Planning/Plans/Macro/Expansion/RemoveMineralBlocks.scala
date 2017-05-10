@@ -1,16 +1,14 @@
-package Planning.Plans.Macro
+package Planning.Plans.Macro.Expansion
 
+import Lifecycle.With
 import Micro.Intent.Intention
 import Planning.Composition.PixelFinders.Generic.TileSpecific
 import Planning.Composition.Property
+import Planning.Composition.ResourceLocks.LockUnits
 import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Composition.UnitMatchers.UnitMatchWorker
 import Planning.Composition.UnitPreferences.UnitPreferClose
 import Planning.Plan
-import Planning.Composition.ResourceLocks.LockUnits
-import Lifecycle.With
-
-import Utilities.EnrichPixel._
 
 class RemoveMineralBlocks extends Plan {
   

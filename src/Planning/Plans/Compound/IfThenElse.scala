@@ -7,7 +7,7 @@ class IfThenElse(
   initialPredicate : Plan = new Plan,
   initialWhenTrue  : Plan = new Plan,
   initialWhenFalse : Plan = new Plan)
-  extends Plan {
+    extends Plan {
   
   description.set("If/Then/Else")
   

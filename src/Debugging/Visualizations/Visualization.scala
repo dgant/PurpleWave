@@ -5,7 +5,7 @@ import Lifecycle.With
 
 object Visualization {
   
-  val lineHeightSmall = 13
+  val lineHeightSmall = 9
   
   def render() {
     if (With.configuration.visualize) {

@@ -1,31 +1,25 @@
 package Debugging.Visualizations.Views
 
-import Debugging.Visualizations.{Colors, Visualization}
+import Debugging.Visualizations.Rendering.DrawScreen.GraphCurve
 import Debugging.Visualizations.Rendering.{DrawMap, DrawScreen}
+import Debugging.Visualizations.Visualization
 import Information.Battles.BattleTypes.Battle
-import Information.Battles.Estimation.{BattleEstimationState, BattleEstimationResult}
+import Information.Battles.Estimation.{BattleEstimationResult, BattleEstimationState}
 import Information.Battles.TacticsTypes.{Tactics, TacticsOptions}
 import Lifecycle.With
 import Mathematics.Pixels.Pixel
 import Planning.Yolo
-import ProxyBwapi.Players.PlayerInfo
 import Utilities.EnrichPixel._
 import bwapi.Color
-
-import scala.collection.mutable.ArrayBuffer
 
 object VisualizeBattles {
   
   private val graphMargin             = Pixel(2, 2)
-  private val graphDimensions         = Pixel(90, 90 + Visualization.lineHeightSmall)
-  private val healthGraphAreaStart    = Pixel(5,  18)
-  private val healthGraphAreaEnd      = healthGraphAreaStart.add(graphDimensions)
-  private val healthGraphStart        = healthGraphAreaStart.add(graphMargin).add(0, Visualization.lineHeightSmall)
-  private val healthGraphEnd          = healthGraphAreaEnd.subtract(graphMargin)
-  private val positionGraphAreaStart  = Pixel(healthGraphStart.x, healthGraphEnd.y + Visualization.lineHeightSmall)
-  private val positionGraphAreaEnd    = positionGraphAreaStart.add(graphDimensions)
-  private val positionGraphStart      = positionGraphAreaStart.add(graphMargin).add(0, Visualization.lineHeightSmall)
-  private val positionGraphEnd        = positionGraphAreaEnd.subtract(graphMargin)
+  private val graphWidth              = 90
+  private val graphHeight             = 90 + Visualization.lineHeightSmall
+  private val valueGraph              = graphMargin
+  private val healthGraph             = valueGraph.add(0, graphHeight + graphMargin.y)
+  private val positionGraph           = healthGraph.add(0, graphHeight + graphMargin.y)
   private val tableHeader0            = Pixel(100, 18)
   private val tableHeader1            = tableHeader0.add(125, 0)
   private val tableStart0             = tableHeader0.add(0, 25)
@@ -82,62 +76,30 @@ object VisualizeBattles {
     
     if (estimation.statesUs.size < 2) return
   
-    With.game.drawBoxScreen(healthGraphAreaStart.bwapi, healthGraphAreaEnd.bwapi,  Color.Black, true)
-    With.game.drawBoxScreen(healthGraphStart.bwapi,     healthGraphEnd.bwapi,      Colors.DarkGray)
-    With.game.drawTextScreen(healthGraphStart.subtract(0, Visualization.lineHeightSmall).bwapi, "Health:")
-    drawHealthGraph(estimation.statesUs,     With.self)
-    drawHealthGraph(estimation.statesEnemy,  With.enemies.head)
+    DrawScreen.graph(
+      valueGraph,
+      "Value:",
+      Vector(
+        new GraphCurve(With.self.colorNeon,         estimation.statesUs.map(stateValue)),
+        new GraphCurve(With.enemies.head.colorNeon, estimation.statesUs.map(stateValue))))
     
-    val allStates = estimation.statesUs ++ estimation.statesEnemy
-    val xMin = allStates.map(_.x).min
-    val xMax = allStates.map(_.x).max
-  
-    With.game.drawBoxScreen(positionGraphAreaStart.bwapi, positionGraphAreaEnd.bwapi,  Color.Black, true)
-    With.game.drawBoxScreen(positionGraphStart.bwapi,     positionGraphEnd.bwapi,      Colors.DarkGray)
-    With.game.drawTextScreen(positionGraphStart.subtract(0, Visualization.lineHeightSmall).bwapi, "Position:")
-    drawPositionGraph(estimation.statesUs,     xMin, xMax, With.self)
-    drawPositionGraph(estimation.statesEnemy,  xMin, xMax, With.enemies.head)
-  }
-  
-  def drawHealthGraph(
-    states: ArrayBuffer[BattleEstimationState],
-    player: PlayerInfo) {
-  
-    val valueMax = states.head.avatar.totalHealth
-    val xScale  = (healthGraphEnd.x - healthGraphStart.x - 4 * graphMargin.x) / (states.size - 1).toDouble
-    val yScale  = (healthGraphEnd.y - healthGraphStart.y - 4 * graphMargin.y) / valueMax
-  
-    var i = 0
-    while (i < states.size - 1) {
-      val xBefore = graphMargin.x + healthGraphStart.x  + xScale * i
-      val xAfter  = graphMargin.x + healthGraphStart.x  + xScale * (i + 1)
-      val yBefore = graphMargin.y + healthGraphEnd.y    - (states(i  ).avatar.totalHealth - states(i  ).damageReceived) * yScale
-      val yAfter  = graphMargin.y + healthGraphEnd.y    - (states(i+1).avatar.totalHealth - states(i+1).damageReceived) * yScale
-      With.game.drawLineScreen(xBefore.toInt, yBefore.toInt, xAfter.toInt, yAfter.toInt, player.colorNeon)
-      i += 1
-    }
-  }
-  
-  def drawPositionGraph(
-    states  : ArrayBuffer[BattleEstimationState],
-    xMin    : Double,
-    xMax    : Double,
-    player  : PlayerInfo) {
+    DrawScreen.graph(
+      healthGraph,
+      "Health:",
+      Vector(
+        new GraphCurve(With.self.colorNeon,         estimation.statesUs.map(stateHealth)),
+        new GraphCurve(With.enemies.head.colorNeon, estimation.statesUs.map(stateHealth))))
     
-    val colorNeon   = player.colorNeon
-    val xScale      = (positionGraphEnd.x - positionGraphStart.x - 4 * graphMargin.x) / (states.size - 1).toDouble
-    val yScale      = (positionGraphEnd.y - positionGraphStart.y - 4 * graphMargin.y) / (xMax - xMin)
-    
-    var i = 0
-    while (i < states.size - 1) {
-      val xStart    = graphMargin.x + positionGraphStart.x + (xScale *  i     ).toInt
-      val xEnd      = graphMargin.x + positionGraphStart.x + (xScale * (i + 1)).toInt
-      val yMiddle0  = graphMargin.y + positionGraphStart.y + (yScale * (healthGraphAreaStart.y + states(i  ).x - xMin)).toInt
-      val yMiddle1  = graphMargin.y + positionGraphStart.y + (yScale * (healthGraphAreaStart.y + states(i+1).x - xMin)).toInt
-      With.game.drawLineScreen(xStart, yMiddle0, xEnd, yMiddle1, colorNeon)
-      i += 1
-    }
+    DrawScreen.graph(
+      positionGraph,
+      "Position:",
+      Vector(
+        new GraphCurve(With.self.colorNeon,         estimation.statesUs.map(_.pixelsAway)),
+        new GraphCurve(With.enemies.head.colorNeon, estimation.statesUs.map(_.pixelsAway))))
   }
+  private def stateValue  (state: BattleEstimationState):Double = state.avatar.subjectiveValue * (state.avatar.totalHealth - state.damageReceived)
+  private def stateHealth (state: BattleEstimationState):Double = state.avatar.totalHealth - state.damageReceived
+  
   
   private def getMove(tactics:TacticsOptions):String = {
     if      (tactics.has(Tactics.Movement.Charge))  "Charge"

@@ -198,16 +198,19 @@ class BattleEstimation(
     val airFocus    = if (tactics.has(Tactics.Focus.Ground)) 0.0 else if (tactics.has(Tactics.Focus.Air)) 1.0 else to.totalFlyers / to.totalUnits
     val groundFocus = 1.0 - airFocus
   
-    val unitsShootingGround = Math.max(0.0, fromState.arrivedGroundShooters - fromState.deaths)
-    val unitsShootingAir    = Math.max(0.0, fromState.arrivedAirShooters    - fromState.deaths)
+    val unitsShootingAliveRatio = 1.0 - fromState.deaths / fromState.avatar.totalUnits
+    val unitsShootingGround     = unitsShootingAliveRatio * fromState.arrivedGroundShooters
+    val unitsShootingAir        = unitsShootingAliveRatio * fromState.arrivedAirShooters
+    val toDenominator           = toState.avatar.totalUnits
+    val fromDenominator         = fromState.avatar.totalUnits
     
     val damagePerFramePerUnit =
-      to.damageScaleGroundConcussive  * unitsShootingGround * (from.dpfGroundConcussiveFocused + from.dpfGroundConcussiveUnfocused * groundFocus) +
-      to.damageScaleGroundExplosive   * unitsShootingGround * (from.dpfGroundExplosiveFocused  + from.dpfGroundExplosiveUnfocused  * groundFocus) +
-      to.damageScaleGroundNormal      * unitsShootingGround * (from.dpfGroundNormalFocused     + from.dpfGroundNormalUnfocused     * groundFocus) +
-      to.damageScaleAirConcussive     * unitsShootingAir    * (from.dpfAirConcussiveFocused    + from.dpfAirConcussiveUnfocused    * airFocus) +
-      to.damageScaleAirExplosive      * unitsShootingAir    * (from.dpfAirExplosiveFocused     + from.dpfAirExplosiveUnfocused     * airFocus) +
-      to.damageScaleAirNormal         * unitsShootingAir    * (from.dpfAirNormalFocused        + from.dpfAirNormalUnfocused        * airFocus)
+      to.vulnerabilityGroundConcussive  / toDenominator * unitsShootingGround / fromDenominator * (from.dpfGroundConcussiveFocused + from.dpfGroundConcussiveUnfocused * groundFocus) +
+      to.vulnerabilityGroundExplosive   / toDenominator * unitsShootingGround / fromDenominator * (from.dpfGroundExplosiveFocused  + from.dpfGroundExplosiveUnfocused  * groundFocus) +
+      to.vulnerabilityGroundNormal      / toDenominator * unitsShootingGround / fromDenominator * (from.dpfGroundNormalFocused     + from.dpfGroundNormalUnfocused     * groundFocus) +
+      to.vulnerabilityAirConcussive     / toDenominator * unitsShootingAir    / fromDenominator * (from.dpfAirConcussiveFocused    + from.dpfAirConcussiveUnfocused    * airFocus) +
+      to.vulnerabilityAirExplosive      / toDenominator * unitsShootingAir    / fromDenominator * (from.dpfAirExplosiveFocused     + from.dpfAirExplosiveUnfocused     * airFocus) +
+      to.vulnerabilityAirNormal         / toDenominator * unitsShootingAir    / fromDenominator * (from.dpfAirNormalFocused        + from.dpfAirNormalUnfocused        * airFocus)
     
     output.damageReceived += damagePerFramePerUnit * frameStep / to.totalUnits
     output.damageReceived = Math.min(output.damageReceived, toState.avatar.totalHealth)

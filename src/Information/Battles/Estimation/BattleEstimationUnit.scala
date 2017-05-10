@@ -17,12 +17,12 @@ class BattleEstimationUnit {
   //TODO: Account for terrain positioning
   //TODO: Account for high ground
   
-  var damageScaleGroundConcussive   = 0.0
-  var damageScaleGroundExplosive    = 0.0
-  var damageScaleGroundNormal       = 0.0
-  var damageScaleAirConcussive      = 0.0
-  var damageScaleAirExplosive       = 0.0
-  var damageScaleAirNormal          = 0.0
+  var vulnerabilityGroundConcussive   = 0.0
+  var vulnerabilityGroundExplosive    = 0.0
+  var vulnerabilityGroundNormal       = 0.0
+  var vulnerabilityAirConcussive      = 0.0
+  var vulnerabilityAirExplosive       = 0.0
+  var vulnerabilityAirNormal          = 0.0
   var dpfGroundConcussiveFocused    = 0.0
   var dpfGroundExplosiveFocused     = 0.0
   var dpfGroundNormalFocused        = 0.0
@@ -62,12 +62,12 @@ class BattleEstimationUnit {
     val fleeingBonus  = if (fleeing)  0.2 else 1.0
     val costPerFrame  = if (unit.unitClass.isWorker && (fighting || fleeing)) With.configuration.battleWorkerCostPerFrame else 0.0
     
-    damageScaleGroundConcussive     = fleeingBonus * (if (   unit.flying) 0.0 else Damage.scaleBySize(DamageType.Concussive, unit.unitClass.size))
-    damageScaleGroundExplosive      = fleeingBonus * (if (   unit.flying) 0.0 else Damage.scaleBySize(DamageType.Explosive,  unit.unitClass.size))
-    damageScaleGroundNormal         = fleeingBonus * (if (   unit.flying) 0.0 else Damage.scaleBySize(DamageType.Normal,     unit.unitClass.size))
-    damageScaleAirConcussive        = fleeingBonus * (if ( ! unit.flying) 0.0 else Damage.scaleBySize(DamageType.Concussive, unit.unitClass.size))
-    damageScaleAirExplosive         = fleeingBonus * (if ( ! unit.flying) 0.0 else Damage.scaleBySize(DamageType.Explosive,  unit.unitClass.size))
-    damageScaleAirNormal            = fleeingBonus * (if ( ! unit.flying) 0.0 else Damage.scaleBySize(DamageType.Normal,     unit.unitClass.size))
+    vulnerabilityGroundConcussive   = fleeingBonus * (if (   unit.flying) 0.0 else Damage.scaleBySize(DamageType.Concussive, unit.unitClass.size))
+    vulnerabilityGroundExplosive    = fleeingBonus * (if (   unit.flying) 0.0 else Damage.scaleBySize(DamageType.Explosive,  unit.unitClass.size))
+    vulnerabilityGroundNormal       = fleeingBonus * (if (   unit.flying) 0.0 else Damage.scaleBySize(DamageType.Normal,     unit.unitClass.size))
+    vulnerabilityAirConcussive      = fleeingBonus * (if ( ! unit.flying) 0.0 else Damage.scaleBySize(DamageType.Concussive, unit.unitClass.size))
+    vulnerabilityAirExplosive       = fleeingBonus * (if ( ! unit.flying) 0.0 else Damage.scaleBySize(DamageType.Explosive,  unit.unitClass.size))
+    vulnerabilityAirNormal          = fleeingBonus * (if ( ! unit.flying) 0.0 else Damage.scaleBySize(DamageType.Normal,     unit.unitClass.size))
     dpfGroundConcussiveFocused      = fightingBonus * (if (unit.unitClass.groundDamageType == DamageType.Concussive) unit.damageOnHitBeforeArmorGround else 0.0) / unit.cooldownMaxGround.toDouble
     dpfGroundExplosiveFocused       = fightingBonus * (if (unit.unitClass.groundDamageType == DamageType.Explosive)  unit.damageOnHitBeforeArmorGround else 0.0) / unit.cooldownMaxGround.toDouble
     dpfGroundNormalFocused          = fightingBonus * (if (unit.unitClass.groundDamageType == DamageType.Normal)     unit.damageOnHitBeforeArmorGround else 0.0) / unit.cooldownMaxGround.toDouble
@@ -103,12 +103,12 @@ class BattleEstimationUnit {
   }
   
   def add(that:BattleEstimationUnit) {
-    damageScaleGroundConcussive     += that.damageScaleGroundConcussive
-    damageScaleGroundExplosive      += that.damageScaleGroundExplosive
-    damageScaleGroundNormal         += that.damageScaleGroundNormal
-    damageScaleAirConcussive        += that.damageScaleAirConcussive
-    damageScaleAirExplosive         += that.damageScaleAirExplosive
-    damageScaleAirNormal            += that.damageScaleAirNormal
+    vulnerabilityGroundConcussive     += that.vulnerabilityGroundConcussive
+    vulnerabilityGroundExplosive      += that.vulnerabilityGroundExplosive
+    vulnerabilityGroundNormal         += that.vulnerabilityGroundNormal
+    vulnerabilityAirConcussive        += that.vulnerabilityAirConcussive
+    vulnerabilityAirExplosive         += that.vulnerabilityAirExplosive
+    vulnerabilityAirNormal            += that.vulnerabilityAirNormal
     dpfGroundConcussiveFocused      += that.dpfGroundConcussiveFocused
     dpfGroundExplosiveFocused       += that.dpfGroundExplosiveFocused
     dpfGroundNormalFocused          += that.dpfGroundNormalFocused
@@ -135,12 +135,12 @@ class BattleEstimationUnit {
   }
   
   def remove(that:BattleEstimationUnit) {
-    damageScaleGroundConcussive     -= that.damageScaleGroundConcussive
-    damageScaleGroundExplosive      -= that.damageScaleGroundExplosive
-    damageScaleGroundNormal         -= that.damageScaleGroundNormal
-    damageScaleAirConcussive        -= that.damageScaleAirConcussive
-    damageScaleAirExplosive         -= that.damageScaleAirExplosive
-    damageScaleAirNormal            -= that.damageScaleAirNormal
+    vulnerabilityGroundConcussive     -= that.vulnerabilityGroundConcussive
+    vulnerabilityGroundExplosive      -= that.vulnerabilityGroundExplosive
+    vulnerabilityGroundNormal         -= that.vulnerabilityGroundNormal
+    vulnerabilityAirConcussive        -= that.vulnerabilityAirConcussive
+    vulnerabilityAirExplosive         -= that.vulnerabilityAirExplosive
+    vulnerabilityAirNormal            -= that.vulnerabilityAirNormal
     dpfGroundConcussiveFocused      -= that.dpfGroundConcussiveFocused
     dpfGroundExplosiveFocused       -= that.dpfGroundExplosiveFocused
     dpfGroundNormalFocused          -= that.dpfGroundNormalFocused

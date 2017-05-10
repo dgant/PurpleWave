@@ -2,7 +2,7 @@ package Debugging.Visualizations.Views
 
 import Debugging.Visualizations.Rendering.DrawScreen.GraphCurve
 import Debugging.Visualizations.Rendering.{DrawMap, DrawScreen}
-import Debugging.Visualizations.Visualization
+import Debugging.Visualizations.{Colors, Visualization}
 import Information.Battles.BattleTypes.Battle
 import Information.Battles.Estimation.{BattleEstimationResult, BattleEstimationState}
 import Information.Battles.TacticsTypes.{Tactics, TacticsOptions}
@@ -10,7 +10,6 @@ import Lifecycle.With
 import Mathematics.Pixels.Pixel
 import Planning.Yolo
 import Utilities.EnrichPixel._
-import bwapi.Color
 
 object VisualizeBattles {
   
@@ -51,7 +50,7 @@ object VisualizeBattles {
   private def drawBattle(battle:Battle) {
     val ourColor            = With.self.colorDark
     val enemyColor          = With.enemies.head.colorDark
-    val neutralColor        = Color.Black
+    val neutralColor        = Colors.NeonOrange
     val topLeft             = (battle.us.units ++ battle.enemy.units).map(_.pixelCenter).minBound.subtract(16, 16)
     val bottomRight         = (battle.us.units ++ battle.enemy.units).map(_.pixelCenter).maxBound.add(16, 16)
     val winnerStrengthColor = if (battle.estimation.costToEnemy >=  battle.estimation.costToUs) ourColor else enemyColor

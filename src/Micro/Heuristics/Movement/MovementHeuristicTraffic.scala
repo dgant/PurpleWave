@@ -54,7 +54,7 @@ object MovementHeuristicTraffic extends MovementHeuristic {
     scaling *
     With.grids.units.get(candidate)
     .filter(neighbor =>
-      neighbor.possiblyStillThere
+      neighbor.likelyStillThere
       && neighbor != state.unit
       && ! neighbor.flying
       && ! neighbor.unitClass.isBuilding)

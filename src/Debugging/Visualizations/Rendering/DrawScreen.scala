@@ -37,8 +37,8 @@ object DrawScreen {
     curves:   Traversable[GraphCurve],
     fixedMin: Option[Double] = None,
     fixedMax: Option[Double] = None,
-    color0:   Color = Colors.MidnightViolet,
-    color1:   Color = Colors.DeepViolet,
+    color0:   Color = Colors.DeepViolet,
+    color1:   Color = Colors.MidnightViolet,
     width:    Int = 90,
     height:   Int = 90 + Visualization.lineHeightSmall,
     margin:   Int = 2) {
@@ -50,7 +50,7 @@ object DrawScreen {
     val pointEnd          = innerBorderEnd    .subtract (margin, margin)
     
     val dataMin = curves.flatten(_.points).min
-    val dataMax = curves.flatten(_.points).min
+    val dataMax = curves.flatten(_.points).max
     val min     = Math.min(dataMin, fixedMin.getOrElse(dataMin))
     val max     = Math.max(dataMax, fixedMax.getOrElse(dataMax))
     val points  = curves.map(_.points.size).max

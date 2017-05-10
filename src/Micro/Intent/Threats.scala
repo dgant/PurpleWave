@@ -15,7 +15,7 @@ object Threats {
   }
   
   def valid(intent:Intention, threat:UnitInfo):Boolean = {
-    threat.possiblyStillThere &&
+    threat.likelyStillThere &&
       With.frame - threat.lastSeen < 24 * 60 &&
       threat.isEnemyOf(intent.unit) &&
       threat.canAttackThisSecond(intent.unit)

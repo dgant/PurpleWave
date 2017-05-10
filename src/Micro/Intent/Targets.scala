@@ -19,7 +19,7 @@ object Targets {
   }
   
   def valid(intent:Intention, target:UnitInfo):Boolean = {
-    target.possiblyStillThere &&
+    target.likelyStillThere &&
       With.frame - target.lastSeen < 24 * 60 &&
       target.isEnemyOf(intent.unit) &&
       intent.unit.canAttackThisSecond(target) &&

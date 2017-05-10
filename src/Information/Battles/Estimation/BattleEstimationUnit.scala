@@ -174,11 +174,14 @@ class BattleEstimationUnit {
   private def isFighter(unit:UnitInfo, tactics:TacticsOptions):Boolean = {
     if ( ! unit.aliveAndComplete)
       false
-    else if (tactics.has(Tactics.Workers.FightAll) && unit.unitClass.isWorker)
-      true
-    else if (tactics.has(Tactics.Workers.FightHalf) && unit.unitClass.isWorker) {
-      acceptedLastWorker = ! acceptedLastWorker
-      acceptedLastWorker
+    else if (unit.unitClass.isWorker) {
+      if (tactics.has(Tactics.Workers.FightAll) && unit.unitClass.isWorker)
+        true
+      else if (tactics.has(Tactics.Workers.FightHalf) && unit.unitClass.isWorker) {
+        acceptedLastWorker = ! acceptedLastWorker
+        acceptedLastWorker
+      }
+      else false
     }
     else if (tactics.has(Tactics.Movement.Flee))
       false

@@ -12,8 +12,6 @@ import scala.collection.mutable.ArrayBuffer
 
 class BattleClassifier {
   
-  private var combatantsOurs  : Vector[FriendlyUnitInfo] = Vector.empty
-  private var combatantsEnemy : Vector[ForeignUnitInfo]  = Vector.empty
   
   var global  : Battle                = null
   var byZone  : Map[Zone, Battle]     = Map.empty
@@ -23,33 +21,38 @@ class BattleClassifier {
   def all:Traversable[Battle] = local ++ byZone.values :+ global
   
   def classify() {
-    combatantsOurs  = With.units.ours .toVector.filter(isCombatant)
-    combatantsEnemy = With.units.enemy.toVector.filter(isCombatant)
     replaceBattleGlobal()
     replaceBattleByZone()
     replaceBattlesLocal()
     all.foreach(BattleUpdater.updateBattle)
   }
   
-  def isCombatant(unit:UnitInfo):Boolean = {
-    (unit.complete || unit.unitClass.isBuilding) &&
-      unit.unitClass.helpsInCombat &&
-      unit.possiblyStillThere
+  //TODO: Separate "likely sitll theres" based on local/zone/global
+  private def isCombatantLocal(unit:UnitInfo):Boolean = {
+    isCombatantGlobal(unit) && unit.likelyStillThere
+  }
+  
+  private def isCombatantZone(unit:UnitInfo):Boolean = {
+    isCombatantGlobal(unit) && unit.possiblyStillThere
+  }
+  
+  private def isCombatantGlobal(unit:UnitInfo):Boolean = {
+    (unit.complete || unit.unitClass.isBuilding) && unit.unitClass.helpsInCombat
   }
   
   private def replaceBattleGlobal() {
     val oldGlobal = global
     global = new Battle(
-      new BattleGroup(upcastOurs(combatantsOurs)),
-      new BattleGroup(upcastEnemy(combatantsEnemy)))
+      new BattleGroup(upcastOurs(With.units.ours.filter(isCombatantGlobal))),
+      new BattleGroup(upcastEnemy(With.units.enemy.filter(isCombatantGlobal))))
     if (oldGlobal != null) {
       adoptMetrics(oldGlobal, global)
     }
   }
   
   private def replaceBattleByZone() {
-    val combatantsOursByZone  = combatantsOurs .groupBy(_.tileIncludingCenter.zone)
-    val combatantsEnemyByZone = combatantsEnemy.groupBy(_.tileIncludingCenter.zone)
+    val combatantsOursByZone  = With.units.ours.filter(isCombatantZone).groupBy(_.tileIncludingCenter.zone)
+    val combatantsEnemyByZone = With.units.enemy.filter(isCombatantZone).groupBy(_.tileIncludingCenter.zone)
     val oldByZone = byZone
     byZone = With.geography.zones
       .map(zone => (
@@ -66,7 +69,7 @@ class BattleClassifier {
   }
   
   private def replaceBattlesLocal() {
-    if (combatantsEnemy.isEmpty) {
+    if ( ! With.units.enemy.exists(isCombatantLocal)) {
       local = Vector.empty
       byUnit = Map.empty
       return
@@ -107,7 +110,7 @@ class BattleClassifier {
   
   private def clusterUnits():ArrayBuffer[ArrayBuffer[UnitInfo]] = {
     
-    val unassignedUnits = mutable.HashSet.empty ++ (combatantsOurs ++ combatantsEnemy)
+    val unassignedUnits = mutable.HashSet.empty ++ (With.units.ours ++ With.units.enemy).filter(isCombatantLocal)
     val clusters        = new ArrayBuffer[ArrayBuffer[UnitInfo]]
     val exploredTiles   = new mutable.HashSet[Tile]
     val horizonTiles    = new mutable.HashSet[Tile]
@@ -153,6 +156,6 @@ class BattleClassifier {
     newBattle.estimations = oldBattle.estimations
   }
 
-  def upcastOurs  (units:Vector[FriendlyUnitInfo]) : Vector[UnitInfo] = units.map(_.asInstanceOf[UnitInfo])
-  def upcastEnemy (units:Vector[ForeignUnitInfo])  : Vector[UnitInfo] = units.map(_.asInstanceOf[UnitInfo])
+  def upcastOurs  (units:Traversable[FriendlyUnitInfo]) : Vector[UnitInfo] = units.map(_.asInstanceOf[UnitInfo]).toVector
+  def upcastEnemy (units:Traversable[ForeignUnitInfo])  : Vector[UnitInfo] = units.map(_.asInstanceOf[UnitInfo]).toVector
 }

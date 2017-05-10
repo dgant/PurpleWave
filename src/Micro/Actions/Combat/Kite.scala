@@ -8,6 +8,7 @@ object Kite extends Action {
   override def allowed(state:ExecutionState): Boolean = (
     state.unit.canMoveThisFrame
     && state.targets.nonEmpty
+    && state.threats.nonEmpty
     && state.unit.pixelRangeMax > 32 * 3.0
   )
   

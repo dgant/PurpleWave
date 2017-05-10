@@ -15,6 +15,7 @@ class Configuration {
   // Micro //
   ///////////
   
+  var fogPositionDuration             = 24 * 10
   var microFrameLookahead             = 8
   var enableYolo                      = true
   var enablePathRecalculation         = true

@@ -32,25 +32,29 @@ object DrawScreen {
     val points: IndexedSeq[Double])
   
   def graph(
-    start:  Pixel,
-    label:  String,
-    curves: Traversable[GraphCurve],
-    color0: Color = Colors.MidnightViolet,
-    color1: Color = Colors.DeepViolet,
-    width:  Int = 90,
-    height: Int = 90 + Visualization.lineHeightSmall,
-    margin: Int = 2) {
+    start:    Pixel,
+    label:    String,
+    curves:   Traversable[GraphCurve],
+    fixedMin: Option[Double] = None,
+    fixedMax: Option[Double] = None,
+    color0:   Color = Colors.MidnightViolet,
+    color1:   Color = Colors.DeepViolet,
+    width:    Int = 90,
+    height:   Int = 90 + Visualization.lineHeightSmall,
+    margin:   Int = 2) {
     
-    val end = start.add(width, height)
+    val end               = start.add(width, height)
     val innerBorderStart  = start             .add      (margin, margin + Visualization.lineHeightSmall)
     val innerBorderEnd    = end               .subtract (margin, margin)
     val pointStart        = innerBorderStart  .add      (margin, margin)
     val pointEnd          = innerBorderEnd    .subtract (margin, margin)
     
-    val min     = curves.flatten(_.points).min
-    val max     = curves.flatten(_.points).max
+    val dataMin = curves.flatten(_.points).min
+    val dataMax = curves.flatten(_.points).min
+    val min     = Math.min(dataMin, fixedMin.getOrElse(dataMin))
+    val max     = Math.max(dataMax, fixedMax.getOrElse(dataMax))
     val points  = curves.map(_.points.size).max
-    val scaleX  = (pointEnd.x - pointStart.x) / points
+    val scaleX  = (pointEnd.x - pointStart.x) / points.toDouble
     val scaleY  = (pointEnd.y - pointStart.y) / Math.max(1.0, max - min)
     
     With.game.drawBoxScreen(start.bwapi, end.bwapi, color0, true)

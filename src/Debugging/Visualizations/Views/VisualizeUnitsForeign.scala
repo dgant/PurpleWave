@@ -15,6 +15,7 @@ object VisualizeUnitsForeign {
     if ( ! With.viewport.contains(unit.pixelCenter)) return
     if (unit.possiblyStillThere) {
       if (unit.effectivelyCloaked || ! unit.visible) {
+        val color = if (unit.likelyStillThere) unit.player.colorDark else unit.player.colorMidnight
         DrawMap.circle(
           unit.pixelCenter,
           unit.unitClass.width / 2,

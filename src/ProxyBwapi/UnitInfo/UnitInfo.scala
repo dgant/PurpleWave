@@ -250,6 +250,10 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   // Visibility //
   ////////////////
   
+  def likelyStillThere:Boolean =
+    possiblyStillThere &&
+    ! canMoveThisFrame || lastSeen + With.configuration.fogPositionDuration > With.frame || is(Terran.SiegeTankUnsieged)
+  
   def effectivelyCloaked:Boolean =
     (burrowed || cloaked) && (
       if (isFriendly) ! With.grids.enemyDetection.get(tileIncludingCenter)

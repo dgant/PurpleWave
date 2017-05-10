@@ -7,6 +7,18 @@ case class PlayerInfo(basePlayer:Player) extends PlayerProxy(basePlayer) {
   
   def isFriendly = isUs || isAlly
   
+  lazy val colorMidnight: bwapi.Color   =
+    if      (isUs)      Colors.MidnightViolet
+    else if (isNeutral) Colors.MidnightTeal
+    else if (isAlly)    Colors.MidnightBlue
+    else                Colors.MidnightRed
+  
+  lazy val colorDeep: bwapi.Color   =
+    if      (isUs)      Colors.DeepViolet
+    else if (isNeutral) Colors.DeepTeal
+    else if (isAlly)    Colors.DeepBlue
+    else                Colors.DeepRed
+  
   lazy val colorDark: bwapi.Color   =
     if      (isUs)      Colors.DarkViolet
     else if (isNeutral) Colors.DarkTeal

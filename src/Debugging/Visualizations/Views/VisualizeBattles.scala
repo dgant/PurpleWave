@@ -26,7 +26,7 @@ object VisualizeBattles {
   private val army0                   = Pixel(438, 18)
   private val army1                   = Pixel(521, 18)
   private val army2                   = Pixel(589, 18)
-  private val yolo                    = Pixel(5, 5)
+  private val yolo                    = graphMargin.add(graphWidth + graphMargin.x, 0)
   private val tacticsRanks            = Pixel(235, 18)
   
   def render() {
@@ -80,21 +80,25 @@ object VisualizeBattles {
       "Value:",
       Vector(
         new GraphCurve(With.self.colorNeon,         estimation.statesUs.map(stateValue)),
-        new GraphCurve(With.enemies.head.colorNeon, estimation.statesUs.map(stateValue))))
+        new GraphCurve(With.enemies.head.colorNeon, estimation.statesEnemy.map(stateValue))),
+      fixedMin = Some(0))
     
     DrawScreen.graph(
       healthGraph,
       "Health:",
       Vector(
         new GraphCurve(With.self.colorNeon,         estimation.statesUs.map(stateHealth)),
-        new GraphCurve(With.enemies.head.colorNeon, estimation.statesUs.map(stateHealth))))
+        new GraphCurve(With.enemies.head.colorNeon, estimation.statesEnemy.map(stateHealth))),
+      fixedMin = Some(0))
     
     DrawScreen.graph(
       positionGraph,
       "Position:",
       Vector(
         new GraphCurve(With.self.colorNeon,         estimation.statesUs.map(_.pixelsAway)),
-        new GraphCurve(With.enemies.head.colorNeon, estimation.statesUs.map(_.pixelsAway))))
+        new GraphCurve(With.enemies.head.colorNeon, estimation.statesEnemy.map(_.pixelsAway))),
+      fixedMin = Some( - With.configuration.battleMarginPixels),
+      fixedMax = Some(   With.configuration.battleMarginPixels))
   }
   private def stateValue  (state: BattleEstimationState):Double = state.avatar.subjectiveValue * (state.avatar.totalHealth - state.damageReceived)
   private def stateHealth (state: BattleEstimationState):Double = state.avatar.totalHealth - state.damageReceived

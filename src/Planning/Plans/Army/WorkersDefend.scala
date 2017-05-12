@@ -1,6 +1,6 @@
 package Planning.Plans.Army
 
-import Information.Battles.BattleTypes.Battle
+import Information.Battles.Types.Battle
 import Lifecycle.With
 import Micro.Intent.Intention
 import Planning.Composition.ResourceLocks.LockUnits

@@ -1,4 +1,4 @@
-package Information.Battles.BattleTypes
+package Information.Battles.Types
 
 import Information.Battles.Estimation.BattleEstimation
 import Mathematics.Pixels.Pixel

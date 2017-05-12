@@ -1,5 +1,5 @@
 package Planning.Composition.UnitCounters
-import Information.Battles.BattleTypes.Battle
+import Information.Battles.Types.Battle
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 class UnitCountBattle(battle: Battle) extends UnitCounter {

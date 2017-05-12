@@ -2,7 +2,7 @@ package Debugging.Visualizations.Views
 
 import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.{Colors, Visualization}
-import Information.Battles.BattleTypes.Battle
+import Information.Battles.Types.Battle
 import Information.Battles.Estimation.BattleEstimation
 import Lifecycle.With
 import Mathematics.Pixels.Pixel

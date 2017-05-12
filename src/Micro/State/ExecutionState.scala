@@ -1,6 +1,6 @@
 package Micro.State
 
-import Information.Battles.Estimation.BattleEstimationResult
+import Information.Battles.Estimation.BattleEstimation
 import Lifecycle.With
 import Mathematics.Pixels.{Pixel, Tile}
 import Micro.Actions.Action
@@ -45,7 +45,7 @@ class ExecutionState(val unit: FriendlyUnitInfo) {
   // Suggestions //
   /////////////////
   
-  def battleEstimation:Option[BattleEstimationResult] = With.battles.byUnit.get(unit).map(_.estimation).flatten
+  def battleEstimation:Option[BattleEstimation] = With.battles.byUnit.get(unit).map(_.estimation)
   
   def origin: Pixel = originCache.get
   private val originCache = new CacheFrame(() => if (With.geography.ourBases.nonEmpty) With.geography.ourBases.map(_.heart.pixelCenter).minBy(unit.pixelDistanceTravelling) else With.geography.home.pixelCenter)

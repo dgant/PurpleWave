@@ -1,6 +1,6 @@
 package Information.Battles.Estimation
 
-import Information.Battles.BattleTypes.Battle
+import Information.Battles.Types.Battle
 import Lifecycle.With
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
@@ -106,4 +106,7 @@ class BattleEstimation(
   private def totalCost(avatar:BattleEstimationUnit, damage:Double) = {
     avatar.subjectiveValue * damage / avatar.totalHealth
   }
+  
+  def weWin   : Boolean = result.costToEnemy > result.costToUs
+  def weLose  : Boolean = result.costToEnemy < result.costToUs
 }

@@ -1,6 +1,6 @@
 package Information.Battles.Estimation
 
-import Information.Battles.BattleTypes.{Battle, BattleGroup}
+import Information.Battles.Types.{Battle, BattleGroup}
 import Lifecycle.With
 import Mathematics.PurpleMath
 import ProxyBwapi.Engine.Damage

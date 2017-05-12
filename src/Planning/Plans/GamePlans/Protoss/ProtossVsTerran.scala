@@ -93,6 +93,7 @@ class ProtossVsTerran extends Parallel {
     new BuildAssimilators,
     new TrainContinuously(Protoss.Reaver, 2),
     new TrainContinuously(Protoss.Scout,  3),
+    new BuildDragoonsUntilWeHaveZealotSpeed,
     new Build(ProtossBuilds.TakeNatural),
     new UpgradeReavers,
     new Build(lateGameBuild),

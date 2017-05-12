@@ -40,9 +40,7 @@ class Configuration {
   var battleWorkerCostPerFrame  = 0.25
   var battleMarginTiles         = 15
   var battleMarginPixels        = battleMarginTiles * 32.0
-  var useFastGroundDistance     = true
-  
-  
+  var battleEstimationFrames      = 24 * 10
   
   /////////////////
   // Performance //
@@ -51,6 +49,7 @@ class Configuration {
   var peformanceFrameMilliseconds = 20
   var performanceMinimumUnitSleep = 6
   var performanceMicroAngleStep   = 4
+  var useFastGroundDistance       = true
   
   var urgencyManners        = 1
   var urgencyEconomy        = 1

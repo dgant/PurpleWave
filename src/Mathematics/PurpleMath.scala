@@ -17,5 +17,9 @@ object PurpleMath {
     if (value.isNaN) 1.0 else value
   }
   
+  def nanToInfinity(value:Double):Double = {
+    if (value.isNaN) Double.PositiveInfinity else value
+  }
+  
   def clampToOne(value:Double):Double = Math.max(0.0, Math.min(1.0, value))
 }

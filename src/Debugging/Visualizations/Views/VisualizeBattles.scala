@@ -105,8 +105,8 @@ object VisualizeBattles {
   
   
   private def getMove(tactics:TacticsOptions):String = {
-    if      (tactics.has(Tactics.Movement.Charge))  "Charge"
-    else if (tactics.has(Tactics.Movement.Flee))    "Flee"
+    if      (tactics.has(Tactics.Movement.Advance))  "Charge"
+    else if (tactics.has(Tactics.Movement.Retreat))    "Flee"
     else                                            "-"
   }
   

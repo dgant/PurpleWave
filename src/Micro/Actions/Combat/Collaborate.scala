@@ -28,7 +28,7 @@ object Collaborate extends Action {
   private def retreatWounded  (state:ExecutionState):Boolean = woundedFlee  (state)  &&   isWounded(state)
   private def retreatArmy     (state:ExecutionState):Boolean = fightersFlee (state)  && ! isWorker(state)
   
-  private def fightersFlee  (state:ExecutionState)  : Boolean = state.tactics.exists(_.has(Tactics.Movement.Flee))
+  private def fightersFlee  (state:ExecutionState)  : Boolean = state.tactics.exists(_.has(Tactics.Movement.Retreat))
   private def woundedFlee   (state:ExecutionState)  : Boolean = state.tactics.exists(_.has(Tactics.Wounded.Flee))
   private def workersFlee   (state:ExecutionState)  : Boolean = state.tactics.exists(_.has(Tactics.Workers.Flee))
   private def isWounded     (state:ExecutionState)  : Boolean = state.unit.wounded

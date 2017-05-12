@@ -30,9 +30,9 @@ class BattleGroup(val units:Vector[UnitInfo]) {
     val destination = vanguard.add(meanVelocityX.toInt, meanVelocityY.toInt)
     
     if (destination.pixelDistanceFast(opponent.vanguard) < vanguard.pixelDistanceFast(opponent.vanguard))
-      output.add(Tactics.Movement.Charge)
+      output.add(Tactics.Movement.Advance)
     else if (destination.pixelDistanceFast(opponent.vanguard) > vanguard.pixelDistanceFast(opponent.vanguard))
-      output.add(Tactics.Movement.Flee)
+      output.add(Tactics.Movement.Retreat)
     else
       output.add(Tactics.Movement.Regroup)
   
@@ -82,15 +82,15 @@ class BattleGroup(val units:Vector[UnitInfo]) {
             output
           }))))
       .filterNot(output =>
-        (output.has(Tactics.Movement.Flee) && output.has(Tactics.Wounded.Fight))      ||
-        (output.has(Tactics.Movement.Flee) && output.has(Tactics.Workers.FightAll))   ||
-        (output.has(Tactics.Movement.Flee) && output.has(Tactics.Workers.FightHalf)))
+        (output.has(Tactics.Movement.Retreat) && output.has(Tactics.Wounded.Fight))      ||
+        (output.has(Tactics.Movement.Retreat) && output.has(Tactics.Workers.FightAll))   ||
+        (output.has(Tactics.Movement.Retreat) && output.has(Tactics.Workers.FightHalf)))
   
   lazy val tacticsAvailableMovement:Vector[Tactic] = {
     val output = new ArrayBuffer[Tactic]
     if (mobile) {
-      output += Tactics.Movement.Charge
-      output += Tactics.Movement.Flee
+      output += Tactics.Movement.Advance
+      output += Tactics.Movement.Retreat
       output += Tactics.Movement.Regroup
     }
     else {

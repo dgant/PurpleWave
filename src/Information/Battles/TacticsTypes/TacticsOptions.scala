@@ -12,8 +12,8 @@ class TacticsOptions(private var options:Int = 0) {
   
   override def toString: String = {
     val names = Vector(
-      Tactics.Movement.Charge   -> "Movement: Charge",
-      Tactics.Movement.Flee     -> "Movement: Flee",
+      Tactics.Movement.Advance   -> "Movement: Charge",
+      Tactics.Movement.Retreat     -> "Movement: Flee",
       Tactics.Movement.Regroup  -> "Movement: Regroup",
       Tactics.Focus.Air         -> "Focus: Air",
       Tactics.Focus.Ground      -> "Focus: Ground",

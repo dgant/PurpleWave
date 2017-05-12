@@ -10,7 +10,7 @@ object Charge extends Action {
   
   override def allowed(state:ExecutionState): Boolean = {
     state.unit.canMoveThisFrame &&
-    (Yolo.active || state.tactics.exists(_.has(Tactics.Movement.Charge)))
+    (Yolo.active || state.tactics.exists(_.has(Tactics.Movement.Advance)))
   }
   
   override def perform(state:ExecutionState) {

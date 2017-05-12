@@ -58,7 +58,7 @@ class Commander {
     }
     
     // Mineral walk!
-    if (unit.unitClass.isWorker) {
+    if (unit.unitClass.isWorker && ! unit.carryingResources) {
       val from = unit.pixelCenter
       val fromZone = from.zone
       val toZone = to.zone

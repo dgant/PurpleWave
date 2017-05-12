@@ -41,7 +41,7 @@ class BattleEstimationUnit {
     considerGeometry  : Boolean) {
     
     this()
-    
+  
     val pixelsAway    = if (considerGeometry && battleGroup.isDefined) unit.pixelDistanceFast(battleGroup.get.opponent.vanguard) else With.configuration.battleMarginPixels
     val framesAway    = PurpleMath.nanToInfinity(Math.max(0.0, pixelsAway - unit.pixelRangeMax) / unit.topSpeed)
     val effectiveness = Math.min(1.0, With.configuration.battleEstimationFrames / framesAway)

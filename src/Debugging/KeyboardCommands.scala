@@ -11,7 +11,6 @@ object KeyboardCommands {
         
       case "bs"   => With.configuration.visualizeBases              = ! With.configuration.visualizeBases
       case "bt"   => With.configuration.visualizeBattles            = ! With.configuration.visualizeBattles
-      case "btr"  => With.configuration.visualizeBattleTacticsRanks = ! With.configuration.visualizeBattleTacticsRanks
       case "bu"   => With.configuration.visualizeBullets            = ! With.configuration.visualizeBullets
       case "ch"   => With.configuration.visualizeChokepoints        = ! With.configuration.visualizeChokepoints
       case "e"    => With.configuration.visualizeEconomy            = ! With.configuration.visualizeEconomy

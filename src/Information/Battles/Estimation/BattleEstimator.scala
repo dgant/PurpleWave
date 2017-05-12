@@ -1,6 +1,5 @@
 package Information.Battles.Estimation
 
-import Information.Battles.TacticsTypes.TacticsDefault
 import Lifecycle.With
 
 object BattleEstimator {
@@ -12,33 +11,26 @@ object BattleEstimator {
   }
   
   def recalculateLocal() {
-    With.battles.local.foreach(battle =>
-      battle.estimations =
-        battle.us.tacticsAvailable.map(tacticsUs => {
-          battle.enemy.tacticsAvailable.map(tacticsEnemy => {
-            val estimation = new BattleEstimation(tacticsUs, tacticsEnemy, Some(battle), considerGeometry = true)
-            estimation.addUnits(battle)
-            estimation.recalculate()
-            estimation
-          })
-          .minBy(estimation => estimation.result.costToEnemy - estimation.result.costToUs)
-        }))
+    With.battles.local.foreach(battle => {
+      battle.estimation = new BattleEstimation(Some(battle), considerGeometry = true)
+      battle.estimation.addUnits(battle)
+      battle.estimation.recalculate()
+    })
   }
   
   def recalculateZones() {
     With.battles.byZone.values.foreach(battle => {
-      val estimation = new BattleEstimation(TacticsDefault.get, TacticsDefault.get, Some(battle), considerGeometry = false)
-      estimation.addUnits(battle)
-      estimation.recalculate()
-      battle.estimations = Vector(estimation)
+      battle.estimation = new BattleEstimation(Some(battle), considerGeometry = false)
+      battle.estimation.addUnits(battle)
+      battle.estimation.recalculate()
     })
   }
   
   def recalculateGlobal() {
     val battle = With.battles.global
-    val estimation = new BattleEstimation(TacticsDefault.get, TacticsDefault.get, Some(battle), considerGeometry = false)
+    val estimation = new BattleEstimation(Some(battle), considerGeometry = false)
     estimation.addUnits(battle)
-    estimation.recalculate()
-    battle.estimations = Vector(estimation)
+    battle.estimation.addUnits(battle)
+    battle.estimation.recalculate()
   }
 }

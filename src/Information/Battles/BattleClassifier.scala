@@ -153,7 +153,7 @@ class BattleClassifier {
   }
   
   def adoptMetrics(oldBattle:Battle, newBattle:Battle) {
-    newBattle.estimations = oldBattle.estimations
+    newBattle.estimation = oldBattle.estimation
   }
 
   def upcastOurs  (units:Traversable[FriendlyUnitInfo]) : Vector[UnitInfo] = units.map(_.asInstanceOf[UnitInfo]).toVector

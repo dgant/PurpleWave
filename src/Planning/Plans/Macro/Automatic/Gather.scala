@@ -182,7 +182,7 @@ class Gather extends Plan {
     ! With.configuration.evaluateDangerousBases ||
     With.battles.byZone
       .get(With.geography.zoneByTile(resource.tileIncludingCenter))
-      .forall(zoneBattle => zoneBattle.estimation.netCost >= 0)
+      .forall(zoneBattle => zoneBattle.estimation.result.netCost >= 0)
   }
   
   private def order(worker:FriendlyUnitInfo) {

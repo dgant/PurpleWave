@@ -67,7 +67,6 @@ class Configuration {
   var visualize                   = true
   var visualizeBases              = false
   var visualizeBattles            = true
-  var visualizeBattleTacticsRanks = false
   var visualizeBullets            = false
   var visualizeChokepoints        = false
   var visualizeEconomy            = false

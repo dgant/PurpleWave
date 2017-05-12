@@ -12,10 +12,8 @@ object VisualizeBases {
       val battle = With.battles.byZone(zone)
       val estimation = battle.estimation
       zone.bases.foreach(base => {
-        
-        
-        DrawMap.tileRectangle(base.harvestingArea,    Colors.DarkGreen)
-        DrawMap.tileRectangle(base.townHallArea,      base.zone.owner.colorDark)
+        DrawMap.tileRectangle(base.harvestingArea,  Colors.DarkGreen)
+        DrawMap.tileRectangle(base.townHallArea,    base.zone.owner.colorDark)
         DrawMap.labelBox(
           Vector(
             base.zone.owner.name,
@@ -26,9 +24,9 @@ object VisualizeBases {
             else if (base.lastScoutedFrame <= 0) "Never scouted"
             else "Last scouted " + (With.frame - base.lastScoutedFrame) + " frames ago",
             "+" +
-              estimation.costToEnemy.toInt
+              estimation.result.costToEnemy.toInt
               + " vs -"
-              + estimation.costToUs.toInt
+              + estimation.result.costToUs.toInt
           ),
           base.townHallArea.midPixel,
           true,

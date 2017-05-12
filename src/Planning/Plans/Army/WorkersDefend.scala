@@ -1,7 +1,6 @@
 package Planning.Plans.Army
 
 import Information.Battles.BattleTypes.Battle
-import Information.Battles.TacticsTypes.Tactics
 import Lifecycle.With
 import Micro.Intent.Intention
 import Planning.Composition.ResourceLocks.LockUnits
@@ -22,21 +21,8 @@ class WorkersDefend extends Plan {
   }
   
   override def update() {
-    matchWorkers.specificUnits =
-      With.battles.local.flatten(battle =>
-        if (battle.bestTactics.has(Tactics.Workers.FightAll)) {
-          battleWorkers(battle)
-        }
-        else if (battle.bestTactics.has(Tactics.Workers.FightHalf)) {
-          //Hacky, because it ignores whether we'll actually get these units
-          //Better would be to use a preference and a counter
-          val workers = battleWorkers(battle)
-          workers.toVector.sortBy(_.totalHealth < 20).take(workers.size/2)
-        }
-        else {
-          Vector.empty
-        }).toSet
-    
+    //Un-implemented for now while I figure out a better way to determine how many workers should fight, when, and where
+    matchWorkers.specificUnits = Set.empty
     workers.release()
     workers.acquire(this)
     workers.units.foreach(worker => With.executor.intend(new Intention(this, worker)))

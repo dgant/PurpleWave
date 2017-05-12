@@ -1,11 +1,9 @@
 package Debugging.Visualizations.Views
 
-import Debugging.Visualizations.Rendering.DrawScreen.GraphCurve
-import Debugging.Visualizations.Rendering.{DrawMap, DrawScreen}
+import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.{Colors, Visualization}
 import Information.Battles.BattleTypes.Battle
-import Information.Battles.Estimation.{BattleEstimationResult, BattleEstimationState}
-import Information.Battles.TacticsTypes.{Tactics, TacticsOptions}
+import Information.Battles.Estimation.BattleEstimation
 import Lifecycle.With
 import Mathematics.Pixels.Pixel
 import Planning.Yolo
@@ -31,16 +29,14 @@ object VisualizeBattles {
   
   def render() {
     With.game.drawTextScreen(army0.bwapi, "Overall:")
-    With.game.drawTextScreen(army1.bwapi, "+" + With.battles.global.estimation.costToEnemy.toInt)
-    With.game.drawTextScreen(army2.bwapi, "-" + With.battles.global.estimation.costToUs.toInt)
+    With.game.drawTextScreen(army1.bwapi, "+" + With.battles.global.estimation.result.costToEnemy.toInt)
+    With.game.drawTextScreen(army2.bwapi, "-" + With.battles.global.estimation.result.costToUs.toInt)
     With.battles.local.foreach(drawBattle)
     val localBattles = With.battles.local
     if (localBattles.nonEmpty) {
       val battle      = localBattles.minBy(battle => battle.focus.pixelDistanceSquared(With.viewport.center))
-      val tactics     = battle.bestTactics
-      val estimation  = battle.estimation(tactics)
-      estimation.foreach(drawEstimationReport)
-      drawTacticsReport(battle)
+      val estimation  = battle.estimation
+      drawEstimationReport(estimation)
     }
     if (Yolo.active && With.frame / 24 % 2 == 0) {
       With.game.drawTextScreen(yolo.bwapi, "YOLO")
@@ -53,7 +49,7 @@ object VisualizeBattles {
     val neutralColor        = Colors.NeonOrange
     val topLeft             = (battle.us.units ++ battle.enemy.units).map(_.pixelCenter).minBound.subtract(16, 16)
     val bottomRight         = (battle.us.units ++ battle.enemy.units).map(_.pixelCenter).maxBound.add(16, 16)
-    val winnerStrengthColor = if (battle.estimation.costToEnemy >=  battle.estimation.costToUs) ourColor else enemyColor
+    val winnerStrengthColor = if (battle.estimation.result.costToEnemy >=  battle.estimation.result.costToUs) ourColor else enemyColor
     DrawMap.circle  (battle.focus,          8,                      neutralColor)
     DrawMap.circle  (battle.us.vanguard,    8,                      ourColor)
     DrawMap.circle  (battle.enemy.vanguard, 8,                      enemyColor)
@@ -61,99 +57,19 @@ object VisualizeBattles {
     DrawMap.line    (battle.focus,          battle.enemy.vanguard,  enemyColor)
     DrawMap.box     (topLeft,               bottomRight,            neutralColor)
     DrawMap.labelBox(
-      Vector(battle.estimation.netCost.toInt.toString),
+      Vector(battle.estimation.result.netCost.toInt.toString),
       battle.focus.add(24, 0),
       drawBackground = true,
       backgroundColor = winnerStrengthColor)
   }
   
-  private def drawEstimationReport(estimation:BattleEstimationResult) {
+  private def drawEstimationReport(estimation:BattleEstimation) {
     With.game.setTextSize(bwapi.Text.Size.Enum.Large)
-    With.game.drawTextScreen(tableHeader0.bwapi, "+" + estimation.costToEnemy.toInt)
-    With.game.drawTextScreen(tableHeader1.bwapi, "-" + estimation.costToUs.toInt)
+    With.game.drawTextScreen(tableHeader0.bwapi, "+" + estimation.result.costToEnemy.toInt)
+    With.game.drawTextScreen(tableHeader1.bwapi, "-" + estimation.result.costToUs.toInt)
     With.game.setTextSize(bwapi.Text.Size.Enum.Small)
     
-    if (estimation.statesUs.size < 2) return
-  
-    DrawScreen.graph(
-      valueGraph,
-      "Value:",
-      Vector(
-        new GraphCurve(With.self.colorNeon,         estimation.statesUs.map(stateValue)),
-        new GraphCurve(With.enemies.head.colorNeon, estimation.statesEnemy.map(stateValue))),
-      fixedMin = Some(0))
     
-    DrawScreen.graph(
-      healthGraph,
-      "Health:",
-      Vector(
-        new GraphCurve(With.self.colorNeon,         estimation.statesUs.map(stateHealth)),
-        new GraphCurve(With.enemies.head.colorNeon, estimation.statesEnemy.map(stateHealth))),
-      fixedMin = Some(0))
-    
-    DrawScreen.graph(
-      positionGraph,
-      "Position:",
-      Vector(
-        new GraphCurve(With.self.colorNeon,         estimation.statesUs.map(_.pixelsAway)),
-        new GraphCurve(With.enemies.head.colorNeon, estimation.statesEnemy.map(_.pixelsAway))),
-      fixedMin = Some( - With.configuration.battleMarginPixels),
-      fixedMax = Some(   With.configuration.battleMarginPixels))
-  }
-  private def stateValue  (state: BattleEstimationState):Double = state.avatar.subjectiveValue * (state.avatar.totalHealth - state.damageReceived)
-  private def stateHealth (state: BattleEstimationState):Double = state.avatar.totalHealth - state.damageReceived
-  
-  
-  private def getMove(tactics:TacticsOptions):String = {
-    if      (tactics.has(Tactics.Movement.Advance))  "Charge"
-    else if (tactics.has(Tactics.Movement.Retreat))    "Flee"
-    else                                            "-"
-  }
-  
-  private def getFocus(tactics:TacticsOptions):String = {
-    if      (tactics.has(Tactics.Focus.Air))    "Air"
-    else if (tactics.has(Tactics.Focus.Ground)) "Ground"
-    else                                        "-"
-  }
-  
-  private def getWounded(tactics:TacticsOptions):String = {
-    if (tactics.has(Tactics.Wounded.Flee))  "Flee"
-    else                                    "-"
-  }
-  
-  private def getWorkers(tactics:TacticsOptions):String = {
-    if      (tactics.has(Tactics.Workers.FightAll))   "Fight (All)"
-    else if (tactics.has(Tactics.Workers.FightHalf))  "Fight (Half)"
-    else if (tactics.has(Tactics.Workers.Flee))       "Flee"
-    else                                              "-"
-  }
-  
-  private def drawTacticsReport(battle:Battle) {
-    drawTacticsReport(battle.bestTactics,           tableStart0, With.self.name)
-    drawTacticsReport(battle.enemy.tacticsApparent, tableStart1, With.enemies.head.name)
-    
-    if (With.configuration.visualizeBattleTacticsRanks) {
-      With.game.drawTextScreen(
-        tacticsRanks.bwapi,
-        battle.rankedTactics
-          .zipWithIndex
-          .map(pair => "#" + (pair._2 + 1) + " " + pair._1)
-          .mkString("\n"))
-    }
-  }
-  
-  private def drawTacticsReport(tactics: TacticsOptions, origin:Pixel, playerName:String) {
-    DrawScreen.table(
-      origin.x,
-      origin.y,
-      Vector(
-        Vector(playerName),
-        Vector(""),
-        Vector("Move:",     getMove(tactics)),
-        Vector("Focus:",    getFocus(tactics)),
-        Vector("Workers:",  getWorkers(tactics)),
-        Vector("Wounded:",  getWounded(tactics))
-      ))
   }
 }
 

@@ -48,16 +48,12 @@ class BattleEstimation(
     })
   }
   
-  def updateUnit(unit: UnitInfo) {
-    removeUnit(unit)
-    addUnit(unit)
-  }
-  
   def eligible(unit:UnitInfo):Boolean = {
+    if (unit.unitClass.isWorker) return false
     if (unit.unitClass.isBuilding && ! unit.unitClass.helpsInCombat) return false
     if (unit.is(Protoss.Scarab))      return false
     if (unit.is(Protoss.Interceptor)) return false
-    true
+    unit.aliveAndComplete
   }
   
   /////////////////
@@ -78,8 +74,6 @@ class BattleEstimation(
     result.deathsEnemy    = deaths(avatarEnemy,     result.damageToEnemy)
     result.costToUs       = totalCost(avatarUs,     result.damageToUs)
     result.costToEnemy    = totalCost(avatarEnemy,  result.damageToEnemy)
-    
-    result
   }
   
   private def dealDamage(from: BattleEstimationUnit, to:   BattleEstimationUnit): Double = {

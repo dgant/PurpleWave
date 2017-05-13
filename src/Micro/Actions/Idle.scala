@@ -3,7 +3,7 @@ package Micro.Actions
 import Lifecycle.With
 import Micro.Actions.Basic._
 import Micro.Actions.Commands.{Attack, Travel}
-import Micro.State.ExecutionState
+import Micro.Task.ExecutionState
 
 object Idle extends Action {
   

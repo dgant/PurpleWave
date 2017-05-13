@@ -1,7 +1,7 @@
 package Micro.Heuristics.Movement
 import Mathematics.Heuristics.HeuristicMathMultiplicative
 import Mathematics.Pixels.Pixel
-import Micro.State.ExecutionState
+import Micro.Task.ExecutionState
 
 object MovementHeuristicDestination extends MovementHeuristic {
   

@@ -2,7 +2,7 @@ package Micro.Actions.Combat
 
 import Micro.Actions.Action
 import Micro.Actions.Commands.{Reposition, Travel}
-import Micro.State.ExecutionState
+import Micro.Task.ExecutionState
 
 object Flee extends Action {
   

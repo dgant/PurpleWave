@@ -2,7 +2,7 @@ package Micro.Actions.Basic
 
 import Lifecycle.With
 import Micro.Actions.Action
-import Micro.State.ExecutionState
+import Micro.Task.ExecutionState
 import ProxyBwapi.Races.Protoss
 
 object ReloadInterceptors extends Action {

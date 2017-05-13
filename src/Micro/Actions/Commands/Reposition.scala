@@ -3,7 +3,7 @@ package Micro.Actions.Commands
 import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Heuristics.Movement.EvaluatePixels
-import Micro.State.ExecutionState
+import Micro.Task.ExecutionState
 
 object Reposition extends Action {
   

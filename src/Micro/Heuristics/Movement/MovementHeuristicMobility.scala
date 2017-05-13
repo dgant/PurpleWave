@@ -2,7 +2,7 @@ package Micro.Heuristics.Movement
 
 import Lifecycle.With
 import Mathematics.Pixels.Pixel
-import Micro.State.ExecutionState
+import Micro.Task.ExecutionState
 
 object MovementHeuristicMobility extends MovementHeuristic {
   

@@ -1,6 +1,6 @@
 package Micro.Heuristics.Targeting
 
-import Micro.State.ExecutionState
+import Micro.Task.ExecutionState
 import ProxyBwapi.UnitInfo.UnitInfo
 
 object EvaluateTargets {

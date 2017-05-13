@@ -1,9 +1,9 @@
 package ProxyBwapi.UnitTracking
 
 import Lifecycle.With
-import ProxyBwapi.UnitInfo.ForeignUnitInfo
 import Performance.Caching.Limiter
 import ProxyBwapi.Players.Players
+import ProxyBwapi.UnitInfo.ForeignUnitInfo
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable.HashSet

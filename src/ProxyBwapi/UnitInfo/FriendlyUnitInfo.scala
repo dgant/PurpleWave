@@ -1,7 +1,7 @@
 package ProxyBwapi.UnitInfo
 
 import Lifecycle.With
-import Micro.State.ExecutionState
+import Micro.Task.ExecutionState
 import ProxyBwapi.Techs.{Tech, Techs}
 import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
 

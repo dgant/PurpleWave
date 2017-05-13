@@ -2,7 +2,7 @@ package Micro.Heuristics.Movement
 
 import Mathematics.Heuristics.{Heuristic, HeuristicResult}
 import Mathematics.Pixels.Pixel
-import Micro.State.ExecutionState
+import Micro.Task.ExecutionState
 
 class MovementHeuristicResult (
     heuristic   : Heuristic[ExecutionState, Pixel],

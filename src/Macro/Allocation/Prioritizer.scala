@@ -10,6 +10,10 @@ class Prioritizer {
   private val priorities = new mutable.HashMap[Plan, Integer]
   var nextPriority = 0
   
+  def active(plan:Plan): Boolean = {
+    priorities.contains(plan)
+  }
+  
   def update() {
     nextPriority = 0
     priorities.clear()

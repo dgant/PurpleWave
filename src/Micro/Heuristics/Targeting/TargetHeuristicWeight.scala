@@ -2,7 +2,7 @@ package Micro.Heuristics.Targeting
 
 import Debugging.Visualizations.Colors
 import Mathematics.Heuristics.{Heuristic, HeuristicWeight}
-import Micro.State.ExecutionState
+import Micro.Task.ExecutionState
 import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.Color
 

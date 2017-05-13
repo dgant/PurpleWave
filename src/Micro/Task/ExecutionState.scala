@@ -1,4 +1,4 @@
-package Micro.State
+package Micro.Task
 
 import Information.Battles.Estimation.BattleEstimation
 import Lifecycle.With
@@ -23,6 +23,7 @@ class ExecutionState(val unit: FriendlyUnitInfo) {
   var intent: Intention = new Intention(With.gameplan, unit)
 
   var lastAction: Option[Action] = None
+  var lastFrame: Int = 0
   
   ///////////////
   // Decisions //
@@ -41,6 +42,7 @@ class ExecutionState(val unit: FriendlyUnitInfo) {
   
   var movementProfile : MovementProfile   = MovementProfiles.default
   var targetProfile   : TargetingProfile  = TargetingProfiles.default
+  
   /////////////////
   // Suggestions //
   /////////////////
@@ -58,8 +60,6 @@ class ExecutionState(val unit: FriendlyUnitInfo) {
   private val targetsInRangeCache = new CacheFrame(() => targets.filter(target => Targets.inRange(intent, target)))
   private val threatsCache        = new CacheFrame(() => Threats.get(intent))
   private val threatsActiveCache  = new CacheFrame(() => threats.filter(threat => Threats.active(intent, threat)))
-  
-
   
   /////////////////
   // Diagnostics //

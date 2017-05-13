@@ -3,7 +3,7 @@ package Micro.Actions.Basic
 import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Shoot
-import Micro.State.ExecutionState
+import Micro.Task.ExecutionState
 
 object Gather extends Action {
   

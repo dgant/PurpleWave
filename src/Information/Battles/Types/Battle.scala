@@ -12,10 +12,15 @@ class Battle(
   us.opponent     = enemy
   enemy.opponent  = us
   
+  var estimation:BattleEstimation = new BattleEstimation(Some(this), true)
+  
+  //////////////
+  // Features //
+  //////////////
+  
   def groups: Iterable[BattleGroup] = Vector(us, enemy)
   
-  def happening : Boolean = us.units.nonEmpty && enemy.units.nonEmpty && (us.units.exists(_.canAttackThisSecond) || enemy.units.exists(_.canAttackThisSecond))
-  def focus     : Pixel   = us.vanguard.midpoint(enemy.vanguard)
+  def happening: Boolean = us.units.nonEmpty && enemy.units.nonEmpty && (us.units.exists(_.canAttackThisSecond) || enemy.units.exists(_.canAttackThisSecond))
   
-  var estimation:BattleEstimation = new BattleEstimation(Some(this), true)
+  def focus: Pixel = us.vanguard.midpoint(enemy.vanguard)
 }

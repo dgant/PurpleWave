@@ -1,7 +1,7 @@
 package Micro.Heuristics.Targeting
 
 import Mathematics.Heuristics.HeuristicMathMultiplicative
-import Micro.State.ExecutionState
+import Micro.Task.ExecutionState
 import ProxyBwapi.UnitInfo.UnitInfo
 
 object TargetHeuristicCombat extends TargetHeuristic {

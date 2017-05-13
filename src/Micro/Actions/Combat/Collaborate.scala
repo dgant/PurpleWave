@@ -1,7 +1,7 @@
 package Micro.Actions.Combat
 
 import Micro.Actions.Action
-import Micro.State.ExecutionState
+import Micro.Task.ExecutionState
 import Planning.Yolo
 
 object Collaborate extends Action {

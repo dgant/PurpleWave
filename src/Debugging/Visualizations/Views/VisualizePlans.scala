@@ -6,7 +6,7 @@ import Lifecycle.With
 
 object VisualizePlans {
   def render() {
-    DrawScreen.column(5, 31, describePlanTree(With.gameplan, 0, 0))
+    DrawScreen.column(2, 2, describePlanTree(With.gameplan, 0, 0))
     drawPlansRecursively(With.gameplan)
   }
   
@@ -37,5 +37,5 @@ object VisualizePlans {
     leftColumn + " " * Math.max(0, 45 - leftColumn.length) + "\n"
   }
   
-  private def isRelevant(plan:Plan):Boolean = true
+  private def isRelevant(plan:Plan):Boolean = With.prioritizer.active(plan)
 }

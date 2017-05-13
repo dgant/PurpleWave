@@ -2,7 +2,7 @@ package Micro.Actions.Basic
 
 import Micro.Actions.Action
 import Micro.Actions.Combat.{Kite, Shoot, _}
-import Micro.State.ExecutionState
+import Micro.Task.ExecutionState
 
 object Fight extends Action {
   

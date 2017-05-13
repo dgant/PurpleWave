@@ -2,7 +2,7 @@ package Micro.Actions.Combat
 
 import Micro.Actions.Action
 import Micro.Actions.Commands.Reposition
-import Micro.State.ExecutionState
+import Micro.Task.ExecutionState
 
 object Hover extends Action {
   

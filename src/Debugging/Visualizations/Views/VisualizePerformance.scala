@@ -26,17 +26,18 @@ object VisualizePerformance {
   
   def renderDetails() {
     val title = Vector("Cutoff: ", With.configuration.peformanceFrameMilliseconds + "ms")
-    val headers = Vector("System", "Last run", "Total runs", "Total skips", "Avg ms", "Max ms")
+    val headers = Vector("System", "Last run", "Total runs", "Total skips", "Avg ms", "Max ms (Recent)", "Max ms (All time)")
     val body = With.tasks.tasks
       .sortBy(_.getClass.getSimpleName + "  ")
-      .map(system => Vector(
-        system.getClass.getSimpleName.replace("Task", ""),
-        "X" * Math.min(10, Math.max(0, system.framesSinceRunning - 1)),
-        system.totalRuns.toString,
-        system.totalSkips.toString,
-        system.runMillisecondsMean.toString,
-        system.runMillisecondsMax.toString
+      .map(task => Vector(
+        task.getClass.getSimpleName.replace("Task", ""),
+        "X" * Math.min(10, Math.max(0, task.framesSinceRunning - 1)),
+        task.totalRuns.toString,
+        task.totalSkips.toString,
+        task.runMillisecondsMean.toString,
+        task.runMillisecondsMaxRecent.toString,
+        task.runMillisecondsMaxRecent.toString
       ))
-    DrawScreen.table(300, 27, Vector(title) ++ Vector(headers) ++ body)
+    DrawScreen.table(250, 27, Vector(title) ++ Vector(headers) ++ body)
   }
 }

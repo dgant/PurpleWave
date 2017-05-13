@@ -6,9 +6,10 @@ import scala.collection.mutable
 
 abstract class AbstractTask {
   
-  private var lastRunFrame    : Int = -1
-  private var totalRunCount   : Int = 0
-  private var totalSkipCount  : Int = 0
+  private var lastRunFrame        : Int = -1
+  private var totalRunCount       : Int = 0
+  private var totalSkipCount      : Int = 0
+  private var maxMillisecondsEver : Long = 0
   
   final val runtimeMilliseconds = new mutable.Queue[Long]
   final val runtimesToTrack = 10
@@ -36,14 +37,19 @@ abstract class AbstractTask {
   }
   
   final def recordRunDuration(millisecondsDuration:Long) {
+    maxMillisecondsEver = Math.max(maxMillisecondsEver, millisecondsDuration)
     runtimeMilliseconds.enqueue(Math.max(0L, millisecondsDuration))
     while (runtimeMilliseconds.size > runtimesToTrack) {
       runtimeMilliseconds.dequeue()
     }
   }
   
-  final def runMillisecondsMax:Long = {
+  final def runMillisecondsMaxRecent:Long = {
     if (runtimeMilliseconds.isEmpty) return 0
+    runtimeMilliseconds.max
+  }
+  
+  final def runMillisecondsMaxAllTime:Long = {
     runtimeMilliseconds.max
   }
   

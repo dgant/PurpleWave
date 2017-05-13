@@ -3,7 +3,7 @@ package Micro.Actions.Combat
 import Micro.Actions.Action
 import Micro.Actions.Commands.Attack
 import Micro.Heuristics.Targeting.EvaluateTargets
-import Micro.State.ExecutionState
+import Micro.Task.ExecutionState
 
 object Shoot extends Action {
   

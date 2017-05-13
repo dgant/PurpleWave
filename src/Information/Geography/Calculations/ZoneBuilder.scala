@@ -33,7 +33,7 @@ object ZoneBuilder {
   
   def assignTile(tile:Tile, zones:Iterable[Zone]) = {
     val groundHeight = With.game.getGroundHeight(tile.bwapi)
-    val candidates = zones.filter(_.groundHeight == groundHeight)
+    val candidates = zones.filter(_.altitude == groundHeight)
     val matchingZone = Spiral
       .points(5)
       .view

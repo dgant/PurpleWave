@@ -14,9 +14,6 @@ object VisualizeBattles {
   private val graphMargin             = Pixel(2, 2)
   private val graphWidth              = 90
   private val graphHeight             = 90 + Visualization.lineHeightSmall
-  private val valueGraph              = graphMargin
-  private val healthGraph             = valueGraph.add(0, graphHeight + graphMargin.y)
-  private val positionGraph           = healthGraph.add(0, graphHeight + graphMargin.y)
   private val tableHeader0            = Pixel(100, 18)
   private val tableHeader1            = tableHeader0.add(125, 0)
   private val tableStart0             = tableHeader0.add(0, 25)
@@ -24,7 +21,7 @@ object VisualizeBattles {
   private val army0                   = Pixel(438, 18)
   private val army1                   = Pixel(521, 18)
   private val army2                   = Pixel(589, 18)
-  private val yolo                    = graphMargin.add(graphWidth + graphMargin.x, 0)
+  private val yolo                    = graphMargin
   private val tacticsRanks            = Pixel(235, 18)
   
   def render() {

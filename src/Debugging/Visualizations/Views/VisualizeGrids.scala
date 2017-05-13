@@ -7,7 +7,7 @@ import Lifecycle.With
 
 object VisualizeGrids {
   def render() {
-    renderGridArray(With.grids.dpsEnemyGroundNormal,  0, 0)
+    renderGridArray(With.grids.mobility,  0, 0)
   }
   
   private def renderGridArray[T](map:AbstractGridArray[T], offsetX:Int=0, offsetY:Int=0) {

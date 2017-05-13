@@ -15,6 +15,7 @@ object KeyboardCommands {
       case "ch"   => With.configuration.visualizeChokepoints        = ! With.configuration.visualizeChokepoints
       case "e"    => With.configuration.visualizeEconomy            = ! With.configuration.visualizeEconomy
       case "g"    => With.configuration.visualizeGeography          = ! With.configuration.visualizeGeography
+      case "gr"   => With.configuration.visualizeGrids              = ! With.configuration.visualizeGrids
       case "hm"   => With.configuration.visualizeHeuristicMovement  = ! With.configuration.visualizeHeuristicMovement
       case "hp"   => With.configuration.visualizeHitPoints          = ! With.configuration.visualizeHitPoints
       case "hv"   => With.configuration.visualizeHappyVision        = ! With.configuration.visualizeHappyVision

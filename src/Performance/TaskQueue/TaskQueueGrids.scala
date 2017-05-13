@@ -5,6 +5,7 @@ import Performance.Tasks.Grids._
 class TaskQueueGrids extends AbstractTaskQueue {
   
   override val tasks: Vector[AbstractTask] = Vector (
+    new TaskGridChokepoints                 { urgency = 1   },
     new TaskGridPsi2x2and3x2                { urgency = 10  },
     new TaskGridPsi4x3                      { urgency = 10  },
     new TaskGridWalkable                    { urgency = 1   },

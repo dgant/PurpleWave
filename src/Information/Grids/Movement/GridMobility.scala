@@ -19,22 +19,27 @@ class GridMobility extends AbstractGridInt {
       .foreach(tile => {
         var tileMobility = 0
         if (With.grids.walkableUnits.get(tile)) {
-          // Scala's while-loops are faster than its for-comprehensions
-          var mx = -1
-          while (mx <= 1) {
-            var my = -1
-            while (my <= 1) {
-              var doContinue = mx != 0 || my != 0
-              var distance = 1
-              while (doContinue && distance <= distanceMax) {
-                val nextTile = tile.add(mx * distance, my * distance)
-                doContinue = nextTile.valid && With.grids.walkable.get(nextTile.i)
-                if (doContinue) tileMobility += 1
-                distance += 1
+          if (With.grids.chokepoints.get(tile)) {
+            tileMobility = distanceMax * 8
+          }
+          else {
+            // Scala's while-loops are faster than its for-comprehensions
+            var mx = -1
+            while (mx <= 1) {
+              var my = -1
+              while (my <= 1) {
+                var doContinue = mx != 0 || my != 0
+                var distance = 1
+                while (doContinue && distance <= distanceMax) {
+                  val nextTile = tile.add(mx * distance, my * distance)
+                  doContinue = nextTile.valid && With.grids.walkable.get(nextTile.i)
+                  if (doContinue) tileMobility += 1
+                  distance += 1
+                }
+                my += 1
               }
-              my += 1
+              mx += 1
             }
-            mx += 1
           }
         }
         set(tile, tileMobility)

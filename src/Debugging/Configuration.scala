@@ -40,7 +40,7 @@ class Configuration {
   var battleWorkerCostPerFrame  = 0.25
   var battleMarginTiles         = 15
   var battleMarginPixels        = battleMarginTiles * 32.0
-  var battleEstimationFrames      = 24 * 10
+  var battleEstimationFrames    = 24 * 10
   
   /////////////////
   // Performance //
@@ -75,7 +75,7 @@ class Configuration {
   var visualizeHappyVision        = false
   var visualizeHitPoints          = true
   var visualizeHeuristicMovement  = false
-  var visualizePerformance        = false
+  var visualizePerformance        = true
   var visualizePerformanceDetails = false
   var visualizePlans              = false
   var visualizeResources          = false

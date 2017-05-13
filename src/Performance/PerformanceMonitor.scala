@@ -11,6 +11,15 @@ class PerformanceMonitor {
   private var currentCacheLength = 3
   private var lastFrameDelayUpdate = 0
   
+  var framesOver55    = 0
+  var framesOver1000  = 0
+  var framesOver10000 = 0
+  
+  def disqualified: Boolean =
+    framesOver55    >= 200  ||
+    framesOver1000  >= 10   ||
+    framesOver10000 >= 2
+  
   def startFrame() {
     millisecondsBefore = System.currentTimeMillis()
   }
@@ -19,6 +28,9 @@ class PerformanceMonitor {
     val millisecondDifference = millisecondsThisFrame
     frameTimes(With.frame % framesToTrack) = millisecondDifference
     updateFrameDelay()
+    if (millisecondDifference >= 55)    framesOver55    += 1
+    if (millisecondDifference >= 1000)  framesOver1000  += 1
+    if (millisecondDifference >= 10000) framesOver10000 += 1
   }
   
   private def updateFrameDelay() = {

@@ -15,11 +15,6 @@ class PerformanceMonitor {
   var framesOver1000  = 0
   var framesOver10000 = 0
   
-  def disqualified: Boolean =
-    framesOver55    >= 200  ||
-    framesOver1000  >= 10   ||
-    framesOver10000 >= 2
-  
   def startFrame() {
     millisecondsBefore = System.currentTimeMillis()
   }
@@ -52,4 +47,9 @@ class PerformanceMonitor {
   def meanFrameMilliseconds : Long = frameTimes.sum / framesToTrack
   
   def cacheLength(size:Int):Int = currentCacheLength
+  
+  def disqualified: Boolean =
+    framesOver55    >= 200  ||
+    framesOver1000  >= 10   ||
+    framesOver10000 >= 2
 }

@@ -20,7 +20,6 @@ object Engage extends Action {
   }
   
   override def perform(state:ExecutionState) {
-    Shoot.delegate(state)
     state.toAttack = state.toAttack.orElse(EvaluateTargets.best(state, state.targets))
     Attack.delegate(state)
   }

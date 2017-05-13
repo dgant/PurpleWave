@@ -11,9 +11,9 @@ object Fight extends Action {
   }
   
   override def perform(state:ExecutionState) {
+    Shoot.consider(state)
     Collaborate.consider(state)
     Kite.consider(state)
-    Shoot.consider(state)
     Engage.consider(state)
     Retaliate.consider(state)
     Pursue.consider(state)

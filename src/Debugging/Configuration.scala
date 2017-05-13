@@ -76,7 +76,7 @@ class Configuration {
   var visualizeHitPoints          = true
   var visualizeHeuristicMovement  = false
   var visualizePerformance        = true
-  var visualizePerformanceDetails = false
+  var visualizePerformanceDetails = true
   var visualizePlans              = false
   var visualizeResources          = false
   var visualizeRealEstate         = false

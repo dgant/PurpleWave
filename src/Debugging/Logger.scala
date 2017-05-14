@@ -25,6 +25,7 @@ class Logger {
   }
   
   def onException(exception: Exception) {
+    log("An exception was thrown on frame " + With.frame)
     logMessages.append(formatException(exception))
     debug(formatException(exception))
   }

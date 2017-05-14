@@ -17,6 +17,10 @@ object Idle extends Action {
     //
     // "Dragoon, Devourer only units that can have damage prevented by stop() too early"
     //
+    // According to JohnJ: "After the frame where isStartingAttack is true, it should be left alone for the next 8 frames"
+    // "I assume that frame count is in ignorance of latency, so if i issue an order before the 8 frames are up that would be executed on the first frame thereafter, i'm in the clear?"
+    // JohnJ: yeah in theory. actually in practice. I did test that.
+    //
     if (state.unit.unitClass.framesRequiredForAttackToComplete > 0) {
       if (state.unit.attackAnimationHappening) {
         return false

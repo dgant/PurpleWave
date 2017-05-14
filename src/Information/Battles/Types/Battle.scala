@@ -1,11 +1,14 @@
 package Information.Battles.Types
 
 import Information.Battles.Estimation.BattleEstimation
+import Lifecycle.With
 import Mathematics.Pixels.Pixel
 
 class Battle(
   val us    : BattleGroup,
   val enemy : BattleGroup) {
+  
+  val frameCreated = With.frame
   
   us.battle       = this
   enemy.battle    = this

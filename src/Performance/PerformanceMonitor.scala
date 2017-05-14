@@ -15,6 +15,7 @@ class PerformanceMonitor {
   var framesOver1000  = 0
   var framesOver10000 = 0
   
+  
   def startFrame() {
     millisecondsBefore = System.currentTimeMillis()
   }
@@ -42,6 +43,7 @@ class PerformanceMonitor {
   
   def millisecondsLeftThisFrame = Math.max(0, With.configuration.peformanceFrameMilliseconds - millisecondsThisFrame)
   def millisecondsThisFrame     = Math.max(0, System.currentTimeMillis - millisecondsBefore)
+  def continueRunning:Boolean   = millisecondsLeftThisFrame > 1
   
   def maxFrameMilliseconds  : Long = frameTimes.max
   def meanFrameMilliseconds : Long = frameTimes.sum / framesToTrack

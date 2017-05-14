@@ -3,12 +3,11 @@ package Micro.Task
 import Lifecycle.With
 import Micro.Actions.Idle
 import Micro.Intent.Intention
-import Performance.Batching.BatchProcessor
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 import scala.collection.mutable
 
-class Executor extends BatchProcessor[FriendlyUnitInfo] {
+class Executor {
   
   private val stateByUnit = new mutable.HashMap[FriendlyUnitInfo, ExecutionState]
   
@@ -25,19 +24,24 @@ class Executor extends BatchProcessor[FriendlyUnitInfo] {
     stateByUnit(unit)
   }
   
-  ///////////////
-  // BatchTask //
-  ///////////////
+  //////////////
+  // Batching //
+  //////////////
   
-  override protected def shouldRun(): Boolean = With.latency.isLastFrameOfTurn
+  val unitQueue = new mutable.Queue[ExecutionState]
   
-  override protected def onRun() {
+  def run() {
+    if ( ! With.latency.isLastFrameOfTurn) return
+  
     stateByUnit.keys.filterNot(_.alive).foreach(stateByUnit.remove)
-  }
-  
-  override def onPopulate(): Traversable[FriendlyUnitInfo] = stateByUnit.keys.toVector.sortBy(getState(_).lastFrame)
-  
-  override def onNext(item: FriendlyUnitInfo) {
-    Idle.consider(getState(item))
+    
+    if (unitQueue.isEmpty) {
+      unitQueue ++= stateByUnit.values.toVector.sortBy(_.lastFrame)
+    }
+    
+    while (unitQueue.nonEmpty && With.performance.continueRunning) {
+      val nextUnit = unitQueue.dequeue()
+      Idle.consider(nextUnit)
+    }
   }
 }

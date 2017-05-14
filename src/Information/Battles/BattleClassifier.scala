@@ -1,17 +1,12 @@
 package Information.Battles
 
+import Information.Battles.Clustering.BattleClustering
 import Information.Battles.Types.{Battle, BattleGroup}
 import Information.Geography.Types.Zone
 import Lifecycle.With
-import Mathematics.Pixels.Tile
-import Mathematics.Shapes.Circle
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, UnitInfo}
 
-import scala.collection.mutable
-import scala.collection.mutable.ArrayBuffer
-
 class BattleClassifier {
-  
   
   var global  : Battle                = null
   var byZone  : Map[Zone, Battle]     = Map.empty
@@ -20,16 +15,19 @@ class BattleClassifier {
   
   def all:Traversable[Battle] = local ++ byZone.values :+ global
   
+  private val clustering = new BattleClustering
+  
   def classify() {
+    clustering.enqueue(With.units.all.filter(isCombatantLocal))
+    clustering.run()
     replaceBattleGlobal()
     replaceBattleByZone()
     replaceBattlesLocal()
     all.foreach(BattleUpdater.updateBattle)
   }
   
-  //TODO: Separate "likely sitll theres" based on local/zone/global
   private def isCombatantLocal(unit:UnitInfo):Boolean = {
-    isCombatantGlobal(unit) && unit.likelyStillThere
+    ! unit.player.isNeutral && isCombatantGlobal(unit) && unit.likelyStillThere
   }
   
   private def isCombatantZone(unit:UnitInfo):Boolean = {
@@ -95,7 +93,7 @@ class BattleClassifier {
   }
   
   private def buildBattlesLocal:Vector[Battle] = {
-    val clusters = clusterUnits()
+    val clusters = clustering.clusters
     clusters
       .map(cluster =>
         new Battle(
@@ -108,54 +106,12 @@ class BattleClassifier {
       .toVector
   }
   
-  private def clusterUnits():ArrayBuffer[ArrayBuffer[UnitInfo]] = {
-    
-    val unassignedUnits = mutable.HashSet.empty ++ (With.units.ours ++ With.units.enemy).filter(isCombatantLocal)
-    val clusters        = new ArrayBuffer[ArrayBuffer[UnitInfo]]
-    val exploredTiles   = new mutable.HashSet[Tile]
-    val horizonTiles    = new mutable.HashSet[Tile]
-  
-    while (unassignedUnits.nonEmpty) {
-    
-      val firstUnit   = unassignedUnits.head
-      
-      val nextCluster = new ArrayBuffer[UnitInfo]
-      unassignedUnits   -= firstUnit
-      nextCluster       += firstUnit
-      
-      horizonTiles.add(firstUnit.tileIncludingCenter)
-    
-      while (horizonTiles.nonEmpty) {
-      
-        val nextTile = horizonTiles.head
-        horizonTiles  -=  nextTile
-        exploredTiles +=  nextTile
-      
-        val nextUnits = With.grids.units.get(nextTile).filter(_ != firstUnit)
-        unassignedUnits   --= nextUnits
-        nextCluster       ++= nextUnits
-        
-        //Note that this includes non-combatants!
-        Circle.points(With.configuration.battleMarginTiles)
-          .foreach(point => {
-            val tile = nextTile.add(point)
-            if (tile.valid
-              && ! exploredTiles.contains(tile)
-              && With.grids.units.get(tile).nonEmpty)
-              horizonTiles += tile
-          })
-      }
-    
-      clusters.append(nextCluster)
-    }
-    
-    clusters
-  }
-  
-  def adoptMetrics(oldBattle:Battle, newBattle:Battle) {
+  private def adoptMetrics(oldBattle:Battle, newBattle:Battle) {
     newBattle.estimation = oldBattle.estimation
   }
-
-  def upcastOurs  (units:Traversable[FriendlyUnitInfo]) : Vector[UnitInfo] = units.map(_.asInstanceOf[UnitInfo]).toVector
-  def upcastEnemy (units:Traversable[ForeignUnitInfo])  : Vector[UnitInfo] = units.map(_.asInstanceOf[UnitInfo]).toVector
+  
+  private def upcastOurs  (units:Traversable[FriendlyUnitInfo]) : Vector[UnitInfo] = units.map(_.asInstanceOf[UnitInfo]).toVector
+  private def upcastEnemy (units:Traversable[ForeignUnitInfo])  : Vector[UnitInfo] = units.map(_.asInstanceOf[UnitInfo]).toVector
+  
+  
 }

@@ -93,8 +93,7 @@ class BattleClassifier {
   }
   
   private def buildBattlesLocal:Vector[Battle] = {
-    val clusters = clustering.clusters
-    clusters
+    clustering.clusters
       .map(cluster =>
         new Battle(
           new BattleGroup(cluster.filter(_.isOurs).toVector),

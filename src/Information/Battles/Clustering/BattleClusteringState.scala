@@ -10,8 +10,8 @@ import scala.collection.mutable.ArrayBuffer
 
 class BattleClusteringState(units: Traversable[UnitInfo]) {
   
+          val clusters        = new ArrayBuffer[ArrayBuffer[UnitInfo]]
   private val unassignedUnits = mutable.HashSet.empty ++ units
-  private val clusters        = new ArrayBuffer[ArrayBuffer[UnitInfo]]
   private val exploredTiles   = new mutable.HashSet[Tile]
   private val horizonTiles    = new mutable.HashSet[Tile]
   

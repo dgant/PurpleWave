@@ -1,6 +1,7 @@
 package Debugging.Visualizations.Views
 
 import Debugging.Visualizations.Rendering.DrawScreen
+import Debugging.Visualizations.Visualization
 import Lifecycle.With
 
 object VisualizePerformance {
@@ -10,12 +11,12 @@ object VisualizePerformance {
     DrawScreen.header(200, With.performance.meanFrameMilliseconds + "ms avg")
     DrawScreen.header(275, With.performance.maxFrameMilliseconds  + "ms max")
     DrawScreen.header(350, With.performance.cacheLength(1)        + " cache duration")
-    With.game.drawTextScreen(185, 340, "+55ms:    " + With.performance.framesOver55)
-    With.game.drawTextScreen(255, 340, "+1000ms:  " + With.performance.framesOver1000)
-    With.game.drawTextScreen(325, 340, "+10000ms: " + With.performance.framesOver10000)
+    With.game.drawTextScreen(5, 340, "+55ms:    " + With.performance.framesOver55)
+    With.game.drawTextScreen(80, 340, "+1000ms:  " + With.performance.framesOver1000)
+    With.game.drawTextScreen(155, 340, "+10000ms: " + With.performance.framesOver10000)
     if (With.performance.disqualified) {
       With.game.setTextSize(bwapi.Text.Size.Enum.Large)
-      With.game.drawTextScreen(185, 310, "Limits exceeded")
+      With.game.drawTextScreen(5, 310, "Limits exceeded")
       With.game.setTextSize(bwapi.Text.Size.Enum.Small)
     }
     
@@ -38,6 +39,6 @@ object VisualizePerformance {
         task.runMillisecondsMaxRecent.toString,
         task.runMillisecondsMaxAllTime.toString
       ))
-    DrawScreen.table(250, 27, Vector(title) ++ Vector(headers) ++ body)
+    DrawScreen.table(5, Visualization.lineHeightSmall * 2, Vector(title) ++ Vector(headers) ++ body)
   }
 }

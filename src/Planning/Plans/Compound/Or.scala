@@ -8,5 +8,5 @@ class Or(initialChildren:Plan*) extends Parallel(initialChildren: _*) {
   
   override def isComplete: Boolean = children.get.exists(_.isComplete)
   
-  override def onUpdate() { super.update() }
+  override def onUpdate() { super.onUpdate() }
 }

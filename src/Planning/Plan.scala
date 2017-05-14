@@ -10,7 +10,7 @@ class Plan {
   def drawOverlay():Unit = {}
   
   def onUpdate() {}
-  final def update() {
+  final def update(parent:Plan) {
     onUpdate()
   }
   

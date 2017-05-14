@@ -17,7 +17,7 @@ class JustOnce(initialChild:Plan = new Plan) extends Plan {
     _everCompleted ||= child.get.isComplete
     
     if ( ! isComplete) {
-      child.get.update()
+      child.get.update(this)
     }
   }
 }

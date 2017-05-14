@@ -49,7 +49,7 @@ class FollowBuildOrder extends Plan {
       //Consider removing excess plans
     })
     
-    getChildren.foreach(_.update())
+    getChildren.foreach(_.update(this))
   }
   
   private def buildPlan(buildable:Buildable):Plan = {

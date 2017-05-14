@@ -36,6 +36,6 @@ class SwitchEnemyRace extends Plan {
       case _              => random
     }
       
-    matchupPlan.get.update()
+    matchupPlan.get.update(this)
   }
 }

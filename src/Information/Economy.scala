@@ -7,7 +7,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 class Economy {
   
-  private val incomePerFrameMinerals  = 0.040
+  private val incomePerFrameMinerals  = 0.042
   private val incomePerFrameGas       = 0.066
   
   //Should start at 50, of course but this -30 offsets the effect of starting workers all being far from minerals

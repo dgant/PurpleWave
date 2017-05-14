@@ -6,10 +6,11 @@ import scala.collection.mutable
 
 abstract class AbstractTask {
   
-  private var lastRunFrame        : Int = -1
-  private var totalRunCount       : Int = 0
-  private var totalSkipCount      : Int = 0
-  private var maxMillisecondsEver : Long = 0
+  private var lastRunFrame        : Int   = -1
+  private var totalRunCount       : Int   = 0
+  private var totalSkipCount      : Int   = 0
+  private var maxMillisecondsEver : Long  = 0
+  private var overruns            : Int   = 0
   
   final val runtimeMilliseconds = new mutable.Queue[Long]
   final val runtimesToTrack = 10
@@ -22,6 +23,7 @@ abstract class AbstractTask {
   final def framesSinceRunning = Math.max(1, With.frame - lastRunFrame)
   final def totalRuns = totalRunCount
   final def totalSkips = totalSkipCount
+  final def totalOverruns = overruns
   
   final def run() {
     val millisecondsBefore = System.nanoTime() / 1000000
@@ -43,6 +45,9 @@ abstract class AbstractTask {
     runtimeMilliseconds.enqueue(Math.max(0L, millisecondsDuration))
     while (runtimeMilliseconds.size > runtimesToTrack) {
       runtimeMilliseconds.dequeue()
+    }
+    if ( ! With.performance.continueRunning) {
+      overruns += 1
     }
   }
   

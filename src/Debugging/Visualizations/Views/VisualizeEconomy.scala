@@ -25,7 +25,7 @@ object VisualizeEconomy {
       With.economy.ourActualTotalMinerals,
       With.economy.ourActualTotalGas
     )
-    DrawScreen.column(450, 31, labels.mkString("\n"))
-    DrawScreen.column(550, 31, values.mkString("\n"))
+    DrawScreen.column(550, 31, labels.mkString("\n"))
+    DrawScreen.column(600, 31, values.mkString("\n"))
   }
 }

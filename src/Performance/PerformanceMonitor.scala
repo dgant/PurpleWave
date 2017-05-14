@@ -15,7 +15,6 @@ class PerformanceMonitor {
   var framesOver1000  = 0
   var framesOver10000 = 0
   
-  
   def startFrame() {
     millisecondsBefore = System.currentTimeMillis()
   }

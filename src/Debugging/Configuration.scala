@@ -85,7 +85,7 @@ class Configuration {
   var visualizeUnitsForeign       = true
   var visualizeUnitsOurs          = true
   
-  var camera                      = true
+  var camera                      = false
   var cameraDynamicSpeed          = false
   var cameraDynamicSpeedSlowest   = 30
   var cameraDynamicSpeedFastest   = 0

@@ -37,7 +37,9 @@ abstract class AbstractTask {
   }
   
   final def recordRunDuration(millisecondsDuration:Long) {
-    maxMillisecondsEver = Math.max(maxMillisecondsEver, millisecondsDuration)
+    if (With.frame > 1) {
+      maxMillisecondsEver = Math.max(maxMillisecondsEver, millisecondsDuration)
+    }
     runtimeMilliseconds.enqueue(Math.max(0L, millisecondsDuration))
     while (runtimeMilliseconds.size > runtimesToTrack) {
       runtimeMilliseconds.dequeue()
@@ -50,7 +52,7 @@ abstract class AbstractTask {
   }
   
   final def runMillisecondsMaxAllTime:Long = {
-    runtimeMilliseconds.max
+    maxMillisecondsEver
   }
   
   final def runMillisecondsMean:Long = {

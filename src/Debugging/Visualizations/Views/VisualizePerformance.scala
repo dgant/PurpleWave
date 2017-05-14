@@ -26,7 +26,7 @@ object VisualizePerformance {
   
   def renderDetails() {
     val title = Vector("Cutoff: ", With.configuration.peformanceFrameMilliseconds + "ms")
-    val headers = Vector("System", "Last run", "Total runs", "Total skips", "Avg ms", "Max ms (Recent)", "Max ms (All time)")
+    val headers = Vector("System", "Last run", "Total runs", "Total skips", "Avg ms", "Max (Recent)", "Max (All time)")
     val body = With.tasks.tasks
       .sortBy(_.getClass.getSimpleName + "  ")
       .map(task => Vector(
@@ -36,7 +36,7 @@ object VisualizePerformance {
         task.totalSkips.toString,
         task.runMillisecondsMean.toString,
         task.runMillisecondsMaxRecent.toString,
-        task.runMillisecondsMaxRecent.toString
+        task.runMillisecondsMaxAllTime.toString
       ))
     DrawScreen.table(250, 27, Vector(title) ++ Vector(headers) ++ body)
   }

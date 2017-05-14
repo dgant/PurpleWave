@@ -30,10 +30,13 @@ class Commander {
     // "I assume that frame count is in ignorance of latency, so if i issue an order before the 8 frames are up that would be executed on the first frame thereafter, i'm in the clear?"
     // JohnJ: yeah in theory. actually in practice. I did test that.
     //
-    // According to JohnJ's research this is the exact timing
+    // JohnJ's research says (now + 9 - frames before execution) is the exact timing
+    // That formula causes Dragoons to miss some shots, especially on consecutive attacks without moving.
+    // So I've added one more frame of delay. There may be conditions where this frame could be omitted.
+    //
     nextOrderFrame.keys
       .filter(unit => unit.attackStarting && unit.is(Protoss.Dragoon))
-      .foreach(dragoon => nextOrderFrame(dragoon) = With.frame + 9 - With.latency.framesRemaining)
+      .foreach(dragoon => nextOrderFrame(dragoon) = With.frame + 9 + 1 - With.latency.framesRemaining)
   }
   
   def eligibleForResleeping(unit: FriendlyUnitInfo):Boolean = {

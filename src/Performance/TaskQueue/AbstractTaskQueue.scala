@@ -23,7 +23,12 @@ abstract class AbstractTaskQueue {
         if (definitelyRunNextTask       ||
           ! task.skippable              ||
           task.framesSinceRunning > 24  ||
-          With.performance.millisecondsLeftThisFrame > Math.min(task.runMillisecondsMaxRecent, With.configuration.peformanceFrameMilliseconds)) {
+          With.performance.millisecondsLeftThisFrame >
+            Math.min(
+              if (With.performance.danger)  task.runMillisecondsMaxAllTime
+              else                          task.runMillisecondsMaxRecent,
+              With.configuration.peformanceFrameMilliseconds //For debugging purposes
+          )) {
           if (task.skippable) {
             definitelyRunNextTask = false
           }

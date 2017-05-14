@@ -7,10 +7,10 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 class Economy {
   
-  private val incomePerFrameMinerals  = 0.05
-  private val incomePerFrameGas       = 0.07
+  private val incomePerFrameMinerals  = 0.040
+  private val incomePerFrameGas       = 0.066
   
-  //Should be 50, but this offsets the effect of starting workers all being far from minerals
+  //Should start at 50, of course but this -30 offsets the effect of starting workers all being far from minerals
   var ourEstimatedTotalMinerals = 20.0
   var ourEstimatedTotalGas = 0.0
   
@@ -22,8 +22,8 @@ class Economy {
     _lastFrame = With.frame
   }
   
-  def ourActualTotalMinerals:Integer  = With.self.gatheredMinerals
-  def ourActualTotalGas:Integer       = With.self.gatheredGas
+  def ourActualTotalMinerals    : Integer = With.self.gatheredMinerals
+  def ourActualTotalGas         : Integer = With.self.gatheredGas
   
   def ourIncomePerFrameMinerals : Double = ourActiveMiners.size   * incomePerFrameMinerals
   def ourIncomePerFrameGas      : Double = ourActiveDrillers.size * incomePerFrameGas

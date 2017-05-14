@@ -20,7 +20,7 @@ class PerformanceMonitor {
   }
   
   def endFrame() {
-    val millisecondDifference = millisecondsThisFrame
+    val millisecondDifference = millisecondsSpentThisFrame
     frameTimes(With.frame % framesToTrack) = millisecondDifference
     updateFrameDelay()
     if (millisecondDifference >= 55)    framesOver55    += 1
@@ -40,9 +40,23 @@ class PerformanceMonitor {
     }
   }
   
-  def millisecondsLeftThisFrame = Math.max(0, With.configuration.peformanceFrameMilliseconds - millisecondsThisFrame)
-  def millisecondsThisFrame     = Math.max(0, System.currentTimeMillis - millisecondsBefore)
-  def continueRunning:Boolean   = millisecondsLeftThisFrame > 1
+  def millisecondsLeftThisFrame = {
+    Math.max(0, With.configuration.peformanceFrameMilliseconds - millisecondsSpentThisFrame)
+  }
+  
+  def millisecondsSpentThisFrame = {
+    Math.max(0, System.currentTimeMillis - millisecondsBefore)
+  }
+  
+  def continueRunning:Boolean = {
+    millisecondsLeftThisFrame > 1
+  }
+  
+  def danger:Boolean = {
+    framesOver55    > 100 ||
+    framesOver1000  > 5   ||
+    framesOver10000 > 1
+  }
   
   def maxFrameMilliseconds  : Long = frameTimes.max
   def meanFrameMilliseconds : Long = frameTimes.sum / framesToTrack

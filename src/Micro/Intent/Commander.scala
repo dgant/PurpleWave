@@ -32,7 +32,7 @@ class Commander {
     //
     // JohnJ's research says (now + 9 - frames before execution) is the exact timing
     // That formula causes Dragoons to miss some shots, especially on consecutive attacks without moving.
-    // So I've added one more frame of delay. There may be conditions where this frame could be omitted.
+    // So I've added one more frame of delay. Consecutive attacks are still sometimes missing.
     //
     nextOrderFrame.keys
       .filter(unit => unit.attackStarting && unit.is(Protoss.Dragoon))
@@ -55,7 +55,9 @@ class Commander {
     if (unready(unit)) return
     
     if (target.visible) {
-      unit.base.attack(target.base)
+      if (unit.cooldownLeft == 0 || ! unit.target.exists(_ == target)) {
+        unit.base.attack(target.base)
+      }
       sleepAttack(unit)
     } else {
       move(unit, target.pixelCenter)

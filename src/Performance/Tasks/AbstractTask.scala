@@ -37,7 +37,7 @@ abstract class AbstractTask {
   }
   
   final def recordRunDuration(millisecondsDuration:Long) {
-    if (With.frame > 1) {
+    if (With.frame > 5) {
       maxMillisecondsEver = Math.max(maxMillisecondsEver, millisecondsDuration)
     }
     runtimeMilliseconds.enqueue(Math.max(0L, millisecondsDuration))

@@ -63,6 +63,8 @@ object With {
   
   def onStart() {
     With.game.setLatCom(false)
+    With.game.enableFlag(1) //Enable unit control
+    With.game.setLocalSpeed(0)
     
     With.proxy                  = new ProxyBWMirror
     With.self                   = Players.get(With.game.self)
@@ -95,7 +97,6 @@ object With {
     With.units                  = new UnitTracker
     With.viewport               = new Viewport
     
-    With.game.enableFlag(1) //Enable unit control
     With.game.setLocalSpeed(With.configuration.gameSpeed)
   }
   

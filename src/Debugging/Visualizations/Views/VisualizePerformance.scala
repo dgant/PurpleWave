@@ -11,12 +11,12 @@ object VisualizePerformance {
     DrawScreen.header(200, With.performance.meanFrameMilliseconds + "ms avg")
     DrawScreen.header(275, With.performance.maxFrameMilliseconds  + "ms max")
     DrawScreen.header(350, With.performance.cacheLength(1)        + " cache duration")
-    With.game.drawTextScreen(5, 340, "+55ms:    " + With.performance.framesOver55)
-    With.game.drawTextScreen(80, 340, "+1000ms:  " + With.performance.framesOver1000)
-    With.game.drawTextScreen(155, 340, "+10000ms: " + With.performance.framesOver10000)
+    With.game.drawTextScreen(5, 290, "+55ms:    " + With.performance.framesOver55)
+    With.game.drawTextScreen(80, 290, "+1000ms:  " + With.performance.framesOver1000)
+    With.game.drawTextScreen(155, 290, "+10000ms: " + With.performance.framesOver10000)
     if (With.performance.disqualified) {
       With.game.setTextSize(bwapi.Text.Size.Enum.Large)
-      With.game.drawTextScreen(5, 310, "Limits exceeded")
+      With.game.drawTextScreen(5, 260, "Limits exceeded")
       With.game.setTextSize(bwapi.Text.Size.Enum.Small)
     }
     

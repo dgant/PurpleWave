@@ -9,8 +9,8 @@ import Planning.Plans.Macro.Automatic.Continuous.{BuildPylonsContinuously, Train
 import Planning.Plans.Macro.Automatic.Gas.BuildAssimilators
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expansion.WhenMinedOutExpand
-import Planning.Plans.Macro.Milestones.{UnitsAtLeast, UnitsExactly}
-import Planning.Plans.Macro.Reaction.{EnemyHydralisks, EnemyMutalisks}
+import Planning.Plans.Macro.Milestones.{UnitsAtLeast, UnitsAtMost, UnitsExactly}
+import Planning.Plans.Macro.Reaction.{EnemyHydralisks, EnemyMassMutalisks, EnemyMassZerglings, EnemyMutalisks}
 import ProxyBwapi.Races.Protoss
 
 class ProtossVsZerg extends Parallel {
@@ -22,17 +22,18 @@ class ProtossVsZerg extends Parallel {
     RequestUnitAtLeast(2,   Protoss.Nexus),
     RequestUnitAtLeast(4,   Protoss.Gateway),
     RequestUnitAtLeast(1,   Protoss.Forge),
+    RequestUnitAtLeast(1,   Protoss.CitadelOfAdun),
     RequestUpgrade(         Protoss.DragoonRange),
     RequestUpgrade(         Protoss.GroundDamage, 1),
     RequestUnitAtLeast(6,   Protoss.Gateway),
+    RequestUnitAtLeast(1,   Protoss.TemplarArchives),
     
     RequestUnitAtLeast(3,   Protoss.Nexus),
-    RequestUnitAtLeast(1,   Protoss.TemplarArchives),
-    RequestUnitAtLeast(8,   Protoss.Gateway),
+    RequestUpgrade(         Protoss.GroundDamage, 2),
+    RequestUnitAtLeast(10,  Protoss.Gateway),
+    RequestUpgrade(         Protoss.GroundDamage, 3),
     
     RequestUnitAtLeast(4,   Protoss.Nexus),
-    RequestUnitAtLeast(2,   Protoss.RoboticsFacility),
-    RequestUnitAtLeast(1,   Protoss.TemplarArchives),
     RequestUnitAtLeast(2,   Protoss.Forge),
     RequestUnitAtLeast(7,   Protoss.PhotonCannon),
     RequestUpgrade(         Protoss.GroundDamage, 2),
@@ -60,24 +61,24 @@ class ProtossVsZerg extends Parallel {
     new And(
       new UnitsAtLeast(16, UnitMatchWarriors),
       new UnitsAtLeast(1, UnitMatchType(Protoss.Corsair)),
-      new UnitsAtLeast(1, UnitMatchType(Protoss.Reaver))
+      new Or(
+        new UnitsAtLeast(1, UnitMatchType(Protoss.Reaver)),
+        new UnitsAtLeast(1, UnitMatchType(Protoss.DarkTemplar)))
     ),
     new Build(ProtossBuilds.TakeThirdBase)
   )
   
   private class BuildZealotsInitially extends IfThenElse(
     new UnitsExactly(0, UnitMatchType(Protoss.CyberneticsCore)),
-    new Build(ProtossBuilds.OpeningTwoGate99Zealots),
-    new BuildAssimilators
+    new Build(ProtossBuilds.OpeningTwoGate99Zealots)
   )
   
-  private class RespondToMutalisksWithMassCorsairs_OrJustGetAFew extends IfThenElse(
+  private class RespondToMutalisksWithMassCorsairs extends IfThenElse(
     new EnemyMutalisks,
     new Parallel(
       new Build(ProtossBuilds.TechCorsairs),
       new TrainContinuously(Protoss.Corsair, 12)
-    ),
-    new TrainContinuously(Protoss.Corsair, 3)
+    )
   )
   
   private class RespondToHydrasWithReavers_OrGetCorsairTech extends IfThenElse(
@@ -86,10 +87,17 @@ class ProtossVsZerg extends Parallel {
     new Build(ProtossBuilds.TechCorsairs)
   )
   
-  private class RespondToZerglingsWithZealots_OrTransitionToDragoons extends IfThenElse (
-    new UnitsAtLeast(8, UnitMatchType(Protoss.Zealot)),
-    new TrainGatewayUnitsContinuously,
-    new TrainContinuously(Protoss.Zealot)
+  private class BuildZealotsOrDragoons_BasedOnMutalisksAndZerglings extends IfThenElse (
+    new EnemyMassMutalisks,
+    new TrainContinuously(Protoss.Dragoon),
+    new IfThenElse(
+      new Or(
+        new EnemyMassZerglings,
+        new UnitsAtMost(8, UnitMatchType(Protoss.Zealot))
+      ),
+      new TrainContinuously(Protoss.Zealot),
+      new TrainGatewayUnitsContinuously
+    )
   )
   
   private class AttackWhenWeHaveArmy extends IfThenElse(
@@ -108,13 +116,14 @@ class ProtossVsZerg extends Parallel {
     new BuildZealotsInitially,
     new BuildPylonsContinuously,
     new TrainProbesContinuously,
-    new RespondToMutalisksWithMassCorsairs_OrJustGetAFew,
-    new TrainContinuously(Protoss.DarkTemplar, 2),
+    new BuildAssimilators,
+    new RespondToMutalisksWithMassCorsairs,
+    new TrainContinuously(Protoss.DarkTemplar, 3),
     new TrainContinuously(Protoss.Reaver, 2),
+    new TrainContinuously(Protoss.Corsair, 3),
     new RespondToHydrasWithReavers_OrGetCorsairTech,
-    new RespondToZerglingsWithZealots_OrTransitionToDragoons,
+    new BuildZealotsOrDragoons_BasedOnMutalisksAndZerglings,
     new Build(ProtossBuilds.TakeNatural),
-    new Build(ProtossBuilds.TechReavers),
     new Build(lateGameBuild),
     new ScoutAt(10),
     new ScoutExpansionsAt(40),

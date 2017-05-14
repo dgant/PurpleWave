@@ -106,6 +106,7 @@ object With {
   }
   
   private def initializeBWTA() {
+    With.logger.debug("Loading BWTA for " + With.game.mapName + " at " + With.game.mapFileName())
     BWTA.readMap()
     BWTA.analyze()
     //These may not be necessary or helpful since BWTA2 doesn't seem to work in BWMirror

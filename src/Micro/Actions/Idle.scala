@@ -1,6 +1,5 @@
 package Micro.Actions
 
-import Lifecycle.With
 import Micro.Actions.Basic._
 import Micro.Actions.Commands.{Attack, Travel}
 import Micro.Task.ExecutionState
@@ -8,31 +7,7 @@ import Micro.Task.ExecutionState
 object Idle extends Action {
   
   override def allowed(state:ExecutionState):Boolean = {
-    
-    if (state.unit.attackStarting) {
-      return false
-    }
-  
-    // https://docs.google.com/spreadsheets/d/1bsvPvFil-kpvEUfSG74U3E5PLSTC02JxSkiR8QdLMuw/edit#gid=0
-    //
-    // "Dragoon, Devourer only units that can have damage prevented by stop() too early"
-    //
-    // According to JohnJ: "After the frame where isStartingAttack is true, it should be left alone for the next 8 frames"
-    // "I assume that frame count is in ignorance of latency, so if i issue an order before the 8 frames are up that would be executed on the first frame thereafter, i'm in the clear?"
-    // JohnJ: yeah in theory. actually in practice. I did test that.
-    //
-    if (state.unit.unitClass.framesRequiredForAttackToComplete > 0) {
-      if (state.unit.attackAnimationHappening) {
-        return false
-      }
-      if (state.unit.cooldownLeft == 0) {
-        return true
-      }
-      
-      return With.frame > state.unit.commandFrame + state.unit.unitClass.framesRequiredForAttackToComplete
-    }
-    
-    true
+    ! state.unit.attackStarting
   }
   
   def perform(state:ExecutionState) {

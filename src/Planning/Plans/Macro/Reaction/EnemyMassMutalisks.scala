@@ -4,11 +4,11 @@ import Lifecycle.With
 import Planning.Plan
 import ProxyBwapi.Races.Zerg
 
-class EnemyMutalisks extends Plan {
+class EnemyMassMutalisks extends Plan {
   
   description.set("Is the enemy threatening Mutalisks?")
   
   override def isComplete: Boolean = {
-    With.units.enemy.exists(unit => unit.is(Zerg.Mutalisk))
+    With.units.enemy.count(unit => unit.is(Zerg.Mutalisk)) > 6
   }
 }

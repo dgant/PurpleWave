@@ -65,12 +65,12 @@ class Configuration {
   ///////////////////
   
   var visualize                   = true
-  var visualizeBases              = false
+  var visualizeBases              = true
   var visualizeBattles            = true
   var visualizeBullets            = false
-  var visualizeChokepoints        = false
-  var visualizeEconomy            = false
-  var visualizeGeography          = false
+  var visualizeChokepoints        = true
+  var visualizeEconomy            = true
+  var visualizeGeography          = true
   var visualizeGrids              = false
   var visualizeHappyVision        = false
   var visualizeHitPoints          = true

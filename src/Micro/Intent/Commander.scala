@@ -20,7 +20,20 @@ class Commander {
   private val nextOrderFrame = new CountMap[FriendlyUnitInfo]
   
   def run() {
-    nextOrderFrame.keySet.filterNot(_.alive).foreach(nextOrderFrame.remove)
+    nextOrderFrame.keys.filterNot(_.alive).foreach(nextOrderFrame.remove)
+  
+    // https://docs.google.com/spreadsheets/d/1bsvPvFil-kpvEUfSG74U3E5PLSTC02JxSkiR8QdLMuw/edit#gid=0
+    //
+    // "Dragoon, Devourer only units that can have damage prevented by stop() too early"
+    //
+    // According to JohnJ: "After the frame where isStartingAttack is true, it should be left alone for the next 8 frames"
+    // "I assume that frame count is in ignorance of latency, so if i issue an order before the 8 frames are up that would be executed on the first frame thereafter, i'm in the clear?"
+    // JohnJ: yeah in theory. actually in practice. I did test that.
+    //
+    // According to JohnJ's research this is the exact timing
+    nextOrderFrame.keys
+      .filter(unit => unit.attackStarting && unit.is(Protoss.Dragoon))
+      .foreach(dragoon => nextOrderFrame(dragoon) = With.frame + 9 - With.latency.framesRemaining)
   }
   
   def eligibleForResleeping(unit: FriendlyUnitInfo):Boolean = {

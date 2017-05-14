@@ -18,7 +18,7 @@ class ControlPixel extends Plan {
   
   private val infiltrationRadius = 32.0 * 25
   
-  override def update() {
+  override def onUpdate() {
     
     var targetTile = positionToControl.get.find.get
     

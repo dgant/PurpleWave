@@ -7,8 +7,12 @@ class Plan {
   
   def isComplete:Boolean = false
   def getChildren:Iterable[Plan] = Vector.empty
-  def update() = {}
-  def drawOverlay() = {}
+  def drawOverlay():Unit = {}
+  
+  def onUpdate() {}
+  final def update() {
+    onUpdate()
+  }
   
   override def toString: String =
     if (realName == "")

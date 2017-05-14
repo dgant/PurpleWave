@@ -13,5 +13,5 @@ class Build(initialBuildables:Seq[BuildRequest] = Vector.empty) extends Plan {
   
   val buildables = new Property[Seq[BuildRequest]](initialBuildables)
   
-  override def update() = With.scheduler.request(this, buildables.get)
+  override def onUpdate() = With.scheduler.request(this, buildables.get)
 }

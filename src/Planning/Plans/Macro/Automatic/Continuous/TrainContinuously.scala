@@ -7,7 +7,7 @@ import ProxyBwapi.UnitClass.UnitClass
 
 class TrainContinuously(unitClass: UnitClass, maximum:Int = Int.MaxValue) extends Plan {
   
-  override def update() {
+  override def onUpdate() {
     if ( ! canBuild) return
     
     With.scheduler.request(this, Vector(

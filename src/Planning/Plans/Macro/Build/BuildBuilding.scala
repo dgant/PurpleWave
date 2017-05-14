@@ -35,7 +35,7 @@ class BuildBuilding(val buildingClass:UnitClass) extends Plan {
   
   def startedBuilding:Boolean = building.isDefined
   
-  override def update() {
+  override def onUpdate() {
     if (isComplete) return
     
     building = building.filter(_.alive)

@@ -6,5 +6,5 @@ class And(initialChildren:Plan*) extends Serial(initialChildren: _*) {
   
   description.set("And")
   
-  override def update() { super.update() }
+  override def onUpdate() { super.update() }
 }

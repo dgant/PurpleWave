@@ -8,7 +8,7 @@ class Expand extends Plan {
   
   description.set("Expand")
   
-  override def update() {
+  override def onUpdate() {
     With.scheduler.request(this, Vector(RequestUnitAnotherOne(With.self.townHallClass)))
   }
   

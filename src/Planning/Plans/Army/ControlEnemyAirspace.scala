@@ -21,7 +21,7 @@ class ControlEnemyAirspace extends Plan {
   
   override def isComplete: Boolean = With.geography.enemyBases.nonEmpty
   
-  override def update() {
+  override def onUpdate() {
     scouts.get.unitCounter.set(new UnitCountBetween(0, With.geography.enemyBases.size))
     scouts.get.acquire(this)
     val unassignedScouts = scouts.get.units.toBuffer

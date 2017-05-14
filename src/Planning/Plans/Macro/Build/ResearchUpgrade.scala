@@ -20,7 +20,7 @@ class ResearchUpgrade(upgrade: Upgrade, level: Int) extends Plan {
   
   override def isComplete: Boolean = With.self.getUpgradeLevel(upgrade) >= level
   
-  override def update() {
+  override def onUpdate() {
     if (isComplete) return
     
     currency.acquire(this)

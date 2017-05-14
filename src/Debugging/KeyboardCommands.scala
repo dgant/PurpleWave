@@ -23,13 +23,14 @@ object KeyboardCommands {
       case "p"    => With.configuration.visualizePerformance        = ! With.configuration.visualizePerformance
       case "pd"   => With.configuration.visualizePerformanceDetails = ! With.configuration.visualizePerformanceDetails
       case "pl"   => With.configuration.visualizePlans              = ! With.configuration.visualizePlans
-      case "re"   => With.configuration.visualizeRealEstate          = ! With.configuration.visualizeRealEstate
+      case "re"   => With.configuration.visualizeRealEstate         = ! With.configuration.visualizeRealEstate
       case "r"    => With.configuration.visualizeResources          = ! With.configuration.visualizeResources
       case "s"    => With.configuration.visualizeScheduler          = ! With.configuration.visualizeScheduler
       case "1"    => With.game.setLocalSpeed(1000)   ; With.configuration.camera = false
       case "2"    => With.game.setLocalSpeed(60)     ; With.configuration.camera = false
       case "3"    => With.game.setLocalSpeed(30)     ; With.configuration.camera = false
       case "4"    => With.game.setLocalSpeed(0)      ; With.configuration.camera = false
+      case "map"  => With.logger.debug("The current map is " + With.game.mapName + ": " + With.game.mapFileName)
     }
   }
   

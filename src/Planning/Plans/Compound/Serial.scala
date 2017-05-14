@@ -6,7 +6,7 @@ class Serial(initialChildren:Plan*) extends AbstractAll(initialChildren: _*) {
   
   description.set("Do in series")
   
-  override def update() {
+  override def onUpdate() {
     var continue = true
     getChildren.foreach(child => if (continue) { child.update(); continue = child.isComplete })
   }

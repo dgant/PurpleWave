@@ -9,7 +9,7 @@ import scala.collection.mutable.ArrayBuffer
 
 class TrainGatewayUnitsContinuously extends Plan {
   
-  override def update() {
+  override def onUpdate() {
     
     val gateways = With.units.ours.filter(unit => unit.aliveAndComplete && unit.is(Protoss.Gateway))
     

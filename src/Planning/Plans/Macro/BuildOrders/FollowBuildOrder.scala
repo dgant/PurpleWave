@@ -30,7 +30,7 @@ class FollowBuildOrder extends Plan {
     })
   }
   
-  override def update() {
+  override def onUpdate() {
     //Remove complete plans
     plans.values.foreach(plans => plans.indices.foreach(i =>
       while (i < plans.size && plans(i).isComplete) plans.remove(i)))

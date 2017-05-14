@@ -45,7 +45,7 @@ class Gather extends Plan {
   private var needPerMineral          : mutable.Map[UnitInfo, Double]     = mutable.HashMap.empty
   private var needPerGas              : mutable.Map[UnitInfo, Double]     = mutable.HashMap.empty
   
-  override def update() {
+  override def onUpdate() {
     updateWorkerInformation()
     updateResourceInformation()
     decideLongDistanceMining()

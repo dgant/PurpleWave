@@ -25,7 +25,7 @@ class TrainUnit(val traineeClass:UnitClass) extends Plan {
   
   override def isComplete: Boolean = trainee.exists(_.aliveAndComplete)
   
-  override def update() {
+  override def onUpdate() {
     if (isComplete) return
   
     // Trainee dead? Forget we had one.

@@ -20,7 +20,7 @@ class WorkersDefend extends Plan {
     unitCounter.set(UnitCountEverything)
   }
   
-  override def update() {
+  override def onUpdate() {
     //Un-implemented for now while I figure out a better way to determine how many workers should fight, when, and where
     matchWorkers.specificUnits = Set.empty
     workers.release()

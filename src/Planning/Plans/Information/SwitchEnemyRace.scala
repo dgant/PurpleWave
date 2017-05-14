@@ -17,7 +17,7 @@ class SwitchEnemyRace extends Plan {
   
   private var permanentRace:Option[Race] = None
   
-  override def update() {
+  override def onUpdate() {
     
     var knownRace = permanentRace.orElse(With.enemies.headOption.map(_.race)).getOrElse(Race.Random)
     

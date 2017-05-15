@@ -46,7 +46,7 @@ abstract class AbstractTask {
     while (runtimeMilliseconds.size > runtimesToTrack) {
       runtimeMilliseconds.dequeue()
     }
-    if ( ! With.performance.continueRunning) {
+    if (With.performance.overrunning) {
       overruns += 1
     }
   }

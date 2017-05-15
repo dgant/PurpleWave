@@ -1,7 +1,6 @@
 package Macro.Allocation
 
 import Planning.Plan
-import Lifecycle.With
 
 import scala.collection.mutable
 
@@ -17,18 +16,23 @@ class Prioritizer {
   def update() {
     nextPriority = 0
     priorities.clear()
-    prioritizeTree(With.gameplan)
+    // prioritizeTree(With.gameplan)
   }
   
   def getPriority(plan:Plan):Integer = {
-    priorities.getOrElse(plan, Integer.MAX_VALUE)
+    prioritize(plan)
+    priorities(plan)
   }
   
-  private def prioritizeTree(plan:Plan) {
+  def prioritize(plan:Plan) {
     if ( ! priorities.contains(plan)) {
       priorities.put(plan, nextPriority)
       nextPriority += 1
-      plan.getChildren.foreach(prioritizeTree)
     }
+  }
+  
+  private def prioritizeTree(plan:Plan) {
+    prioritize(plan)
+    plan.getChildren.foreach(prioritizeTree)
   }
 }

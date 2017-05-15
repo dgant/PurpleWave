@@ -52,6 +52,10 @@ class PerformanceMonitor {
     millisecondsLeftThisFrame > 1
   }
   
+  def overrunning:Boolean = {
+    millisecondsSpentThisFrame >= 50
+  }
+  
   def danger:Boolean = {
     framesOver55    > 100 ||
     framesOver1000  > 5   ||

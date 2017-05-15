@@ -45,7 +45,7 @@ class ControlPixel extends Plan {
     }
   }
   
-  override def drawOverlay() {
+  override def visualize() {
     
     positionToControl.get.find.map(tile => {
       DrawMap.circle(

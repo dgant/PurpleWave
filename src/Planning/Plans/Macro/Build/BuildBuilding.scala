@@ -77,7 +77,7 @@ class BuildBuilding(val buildingClass:UnitClass) extends Plan {
     }
   }
   
-  override def drawOverlay() {
+  override def visualize() {
     if (isComplete) return
     if ( ! orderedTile.isDefined) return
     if ( ! areaLock.satisfied) return

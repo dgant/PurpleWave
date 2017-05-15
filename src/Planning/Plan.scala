@@ -1,5 +1,6 @@
 package Planning
 
+import Lifecycle.With
 import Planning.Composition.Property
 
 class Plan {
@@ -7,10 +8,11 @@ class Plan {
   
   def isComplete:Boolean = false
   def getChildren:Iterable[Plan] = Vector.empty
-  def drawOverlay():Unit = {}
+  def visualize():Unit = {}
   
   def onUpdate() {}
   final def update(parent:Plan) {
+    With.prioritizer.prioritize(this)
     onUpdate()
   }
   

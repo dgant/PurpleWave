@@ -54,7 +54,7 @@ class TrainUnit(val traineeClass:UnitClass) extends Plan {
     }
   }
   
-  override def drawOverlay() {
+  override def visualize() {
     if (isComplete) return
     if (trainer.isEmpty) return
     DrawMap.box(

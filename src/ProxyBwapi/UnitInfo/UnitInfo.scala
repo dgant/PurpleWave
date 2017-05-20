@@ -58,7 +58,7 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   private val pixelRangeGroundCache = new CacheFrame(() =>
     unitClass.groundRange +
       (if (is(Terran.Marine)    && player.getUpgradeLevel(Terran.MarineRange)     > 0)  32.0 else 0.0) +
-      (if (is(Protoss.Bunker)   && player.getUpgradeLevel(Protoss.DragoonRange)   > 0)  32.0 else 0.0) +
+      (if (is(Terran.Bunker)    && player.getUpgradeLevel(Protoss.DragoonRange)   > 0)  32.0 else 0.0) +
       (if (is(Protoss.Dragoon)  && player.getUpgradeLevel(Protoss.DragoonRange)   > 0)  64.0 else 0.0) +
       (if (is(Zerg.Hydralisk)   && player.getUpgradeLevel(Zerg.HydraliskRange)    > 0)  32.0 else 0.0))
   

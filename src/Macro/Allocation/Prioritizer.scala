@@ -14,6 +14,8 @@ class Prioritizer {
   }
   
   def update() {
+    //For debugging only!
+    val sortedPriorities = priorities.toList.sortBy(_._2)
     nextPriority = 0
     priorities.clear()
     // prioritizeTree(With.gameplan)
@@ -35,4 +37,6 @@ class Prioritizer {
     prioritize(plan)
     plan.getChildren.foreach(prioritizeTree)
   }
+  
+  override def toString: String = priorities.toVector.sortBy(_._2).map(_.toString).mkString("\n")
 }

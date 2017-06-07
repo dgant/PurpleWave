@@ -24,4 +24,6 @@ class Property[T](default:T) {
     
     _parent = Some(parent)
   }
+  
+  override def toString: String = "Property: " + get.toString
 }

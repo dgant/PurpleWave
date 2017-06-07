@@ -3,15 +3,13 @@ package Planning.Plans.Information
 import Planning.Plans.Compound.{And, IfThenElse, Not}
 import Planning.Plans.Macro.Milestones.SupplyAtLeastDoubleThis
 
-class ScoutAt(minimumSupply:Int) extends IfThenElse {
+class ScoutAt(minimumSupply:Int)
+  extends IfThenElse(
+    new And(
+      new SupplyAtLeastDoubleThis(minimumSupply),
+      new Not(new FoundEnemyBase)
+    ),
+    new FindEnemyBase) {
   
-  description.set("Send a scout at a specific supply count")
-  
-  predicate.set(
-    new And { children.set(Vector(
-      new SupplyAtLeastDoubleThis { quantity.set(minimumSupply) },
-      new Not { child.set(new FoundEnemyBase) }
-    ))})
-    
-  whenTrue.set(new FindEnemyBase)
+  description.set("Find an enemy base at " + minimumSupply + " supply")
 }

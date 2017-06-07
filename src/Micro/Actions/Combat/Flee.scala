@@ -1,5 +1,6 @@
 package Micro.Actions.Combat
 
+import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Commands.{Reposition, Travel}
 import Micro.Task.ExecutionState
@@ -8,25 +9,38 @@ object Flee extends Action {
   
   override def allowed(state:ExecutionState) = {
     state.unit.canMoveThisFrame &&
-    state.threats.nonEmpty
+    state.threats.nonEmpty &&
+    {
+      val zone = state.unit.pixelCenter.zone
+      zone.owner != With.self || zone.bases.isEmpty
+    }
   }
   
   override def perform(state:ExecutionState) {
     
     state.canPursue = false
     state.toTravel  = Some(state.origin)
+    val isBackLine = state.unit.battle.exists(battle =>
+      battle.enemy.vanguard.pixelDistanceFast(state.unit.pixelCenter) <=
+      battle.enemy.vanguard.pixelDistanceFast(battle.us.centroid))
   
-    val enemyFaster = state.threatsActive.exists(threat => threat.topSpeed > state.unit.topSpeed)
-    val weAreFaster = state.threatsActive.forall(threat => threat.topSpeed < state.unit.topSpeed)
+    if (isBackLine) {
+      Reposition.delegate(state)
+      if ( ! stillReady(state)) return
+    }
   
     // If the enemy is faster, go straight home so we don't get caught
+    val enemyFaster = state.threatsActive.exists(threat => threat.topSpeed > state.unit.topSpeed)
     if (enemyFaster) {
       Travel.delegate(state)
+      if ( ! stillReady(state)) return
     }
   
     //If we're faster, we can be cuter with how we retreat
+    val weAreFaster = state.threatsActive.forall(threat => threat.topSpeed < state.unit.topSpeed)
     if (weAreFaster) {
       Reposition.delegate(state)
+      if ( ! stillReady(state)) return
     }
   
     // If we have a clear path home, then skip heuristic movement and just go.

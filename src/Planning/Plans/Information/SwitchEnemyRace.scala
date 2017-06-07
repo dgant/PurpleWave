@@ -11,6 +11,8 @@ class SwitchEnemyRace extends Plan {
   val zerg    = new Property[Plan](new Plan)
   val random  = new Property[Plan](new Plan)
   
+  description.set("Choose race-specific plan")
+  
   override def getChildren: Iterable[Plan] = Vector(terran.get, protoss.get, zerg.get, random.get)
   
   private val mysteriousRaces = Vector(Race.Random, Race.Unknown, Race.None)

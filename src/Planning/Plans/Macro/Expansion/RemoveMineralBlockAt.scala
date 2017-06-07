@@ -3,10 +3,10 @@ package Planning.Plans.Macro.Expansion
 import Planning.Plans.Compound.IfThenElse
 import Planning.Plans.Macro.Milestones.SupplyAtLeastDoubleThis
 
-class RemoveMineralBlockAt(minimumSupply:Int) extends IfThenElse {
+class RemoveMineralBlockAt(minimumSupply:Int)
+  extends IfThenElse(
+    new SupplyAtLeastDoubleThis(minimumSupply),
+    new RemoveMineralBlocks) {
   
-  description.set("Remove a mineral block at a specific supply count")
-  
-  predicate.set(new SupplyAtLeastDoubleThis { quantity.set(minimumSupply) })
-  whenTrue.set(new RemoveMineralBlocks)
+  description.set("Remove a mineral block at " + minimumSupply + " supply")
 }

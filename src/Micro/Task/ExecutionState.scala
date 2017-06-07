@@ -52,10 +52,10 @@ class ExecutionState(val unit: FriendlyUnitInfo) {
   def origin: Pixel = originCache.get
   private val originCache = new CacheFrame(() => if (With.geography.ourBases.nonEmpty) With.geography.ourBases.map(_.heart.pixelCenter).minBy(unit.pixelDistanceTravelling) else With.geography.home.pixelCenter)
   
-  def targets        = targetsCache.get
-  def targetsInRange = targetsInRangeCache.get
-  def threats        = threatsCache.get
-  def threatsActive  = threatsActiveCache.get
+  def targets         : Vector[UnitInfo] = targetsCache.get
+  def targetsInRange  : Vector[UnitInfo] = targetsInRangeCache.get
+  def threats         : Vector[UnitInfo] = threatsCache.get
+  def threatsActive   : Vector[UnitInfo] = threatsActiveCache.get
   private val targetsCache        = new CacheFrame(() => Targets.get(intent))
   private val targetsInRangeCache = new CacheFrame(() => targets.filter(target => Targets.inRange(intent, target)))
   private val threatsCache        = new CacheFrame(() => Threats.get(intent))

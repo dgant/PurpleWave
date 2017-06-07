@@ -7,11 +7,8 @@ import Planning.Plans.Macro.Automatic.Gather
 import Planning.Plans.Macro.BuildOrders.FollowBuildOrder
 import Planning.Plans.Macro.Expansion.RemoveMineralBlockAt
 
-class ProtossGamePlan extends Parallel {
-  
-  description.set("Protoss game plan")
-  
-  children.set(Vector(
+class ProtossGamePlan
+  extends Parallel (
     new SwitchEnemyRace {
       terran  .set(new ProtossVsTerran)
       protoss .set(new ProtossVsProtoss)
@@ -23,5 +20,4 @@ class ProtossGamePlan extends Parallel {
     new WorkersDefend,
     new Gather,
     new Defend
-  ))
-}
+  )

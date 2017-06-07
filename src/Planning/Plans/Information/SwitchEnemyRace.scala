@@ -37,7 +37,7 @@ class SwitchEnemyRace extends Plan {
       case Race.Zerg      => zerg
       case _              => random
     }
-      
-    matchupPlan.get.update(this)
+  
+    delegate(matchupPlan.get)
   }
 }

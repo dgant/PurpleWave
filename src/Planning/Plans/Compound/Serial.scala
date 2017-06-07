@@ -8,6 +8,6 @@ class Serial(initialChildren:Plan*) extends AbstractAll(initialChildren: _*) {
   
   override def onUpdate() {
     var continue = true
-    getChildren.foreach(child => if (continue) { child.update(this); continue = child.isComplete })
+    getChildren.foreach(child => if (continue) { delegate(child); continue = child.isComplete })
   }
 }

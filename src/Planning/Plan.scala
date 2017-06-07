@@ -4,16 +4,23 @@ import Lifecycle.With
 import Planning.Composition.Property
 
 class Plan {
+  
+  var parent: Option[Plan] = None
   val description = new Property[String]("")
   
   def isComplete:Boolean = false
   def getChildren:Iterable[Plan] = Vector.empty
   def visualize():Unit = {}
   
-  def onUpdate() {}
-  final def update(parent:Plan) {
+  protected def onUpdate() {}
+  final def update() {
     With.prioritizer.prioritize(this)
     onUpdate()
+  }
+  
+  final def delegate(child: Plan) {
+    child.parent = Some(this)
+    child.update()
   }
   
   override def toString: String =

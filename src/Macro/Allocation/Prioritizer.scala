@@ -6,7 +6,10 @@ import scala.collection.mutable
 
 class Prioritizer {
   
-  private val priorities = new mutable.HashMap[Plan, Integer]
+  private val priorities = new mutable.HashMap[Plan, Integer] {
+    override def default(key: Plan): Integer = Integer.MAX_VALUE
+  }
+  
   var nextPriority = 0
   
   def active(plan:Plan): Boolean = {
@@ -18,11 +21,9 @@ class Prioritizer {
     val sortedPriorities = priorities.toList.sortBy(_._2)
     nextPriority = 0
     priorities.clear()
-    // prioritizeTree(With.gameplan)
   }
   
   def getPriority(plan:Plan):Integer = {
-    prioritize(plan)
     priorities(plan)
   }
   
@@ -31,11 +32,6 @@ class Prioritizer {
       priorities.put(plan, nextPriority)
       nextPriority += 1
     }
-  }
-  
-  private def prioritizeTree(plan:Plan) {
-    prioritize(plan)
-    plan.getChildren.foreach(prioritizeTree)
   }
   
   override def toString: String = priorities.toVector.sortBy(_._2).map(_.toString).mkString("\n")

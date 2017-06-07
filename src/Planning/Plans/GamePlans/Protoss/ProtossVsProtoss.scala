@@ -5,7 +5,7 @@ import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{And, IfThenElse, Parallel}
 import Planning.Plans.Information.{ScoutAt, ScoutExpansionsAt}
-import Planning.Plans.Macro.Automatic.Continuous.{BuildPylonsContinuously, TrainContinuously, TrainProbesContinuously}
+import Planning.Plans.Macro.Automatic.Continuous.{RequireSufficientPylons, TrainContinuously, TrainProbesContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Milestones.{HaveUpgrade, UnitsAtLeast}
 import ProxyBwapi.Races.Protoss
@@ -77,7 +77,7 @@ class ProtossVsProtoss extends Parallel {
       new Build(ProtossBuilds.TakeThirdBase)
     ),
     
-    new BuildPylonsContinuously,
+    new RequireSufficientPylons,
     new TrainProbesContinuously,
     
     new IfThenElse(

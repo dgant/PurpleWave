@@ -5,7 +5,7 @@ import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Plans.Army.Defend
 import Planning.Plans.Compound.{IfThenElse, Parallel}
 import Planning.Plans.Information.ScoutAt
-import Planning.Plans.Macro.Automatic.Continuous.{BuildPylonsContinuously, TrainGatewayUnitsContinuously, TrainProbesContinuously}
+import Planning.Plans.Macro.Automatic.Continuous.{RequireSufficientPylons, TrainGatewayUnitsContinuously, TrainProbesContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Milestones.UnitsExactly
 import ProxyBwapi.Races.Protoss
@@ -26,7 +26,7 @@ class ProtossVsRandom extends Parallel {
       new UnitsExactly(0, UnitMatchType(Protoss.CyberneticsCore)),
       new Build(ProtossBuilds.OpeningTwoGate1012Zealots)
     ),
-    new BuildPylonsContinuously,
+    new RequireSufficientPylons,
     new TrainProbesContinuously,
     new TrainGatewayUnitsContinuously,
     new Build(safeBuild),

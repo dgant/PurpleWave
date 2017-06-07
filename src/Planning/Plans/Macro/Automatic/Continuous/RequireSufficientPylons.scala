@@ -5,9 +5,9 @@ import Macro.BuildRequests.RequestUnitAtLeast
 import Planning.Plan
 import ProxyBwapi.Races.Protoss
 
-class BuildPylonsContinuously extends Plan {
+class RequireSufficientPylons extends Plan {
   
-  description.set("Builds Pylons just-in-time to prevent supply block")
+  description.set("Require enough pylons to avoid supply block")
   
   override def onUpdate() {
     With.scheduler.request(this, Vector(RequestUnitAtLeast(totalRequiredRecalculate, Protoss.Pylon)))

@@ -5,7 +5,7 @@ import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Plans.Army.{Attack, ControlEnemyAirspace}
 import Planning.Plans.Compound.{And, IfThenElse, Or, Parallel}
 import Planning.Plans.Information.{ScoutAt, ScoutExpansionsAt}
-import Planning.Plans.Macro.Automatic.Continuous.{BuildPylonsContinuously, TrainContinuously, TrainProbesContinuously}
+import Planning.Plans.Macro.Automatic.Continuous.{RequireSufficientPylons, TrainContinuously, TrainProbesContinuously}
 import Planning.Plans.Macro.Automatic.Gas.BuildAssimilators
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expansion.WhenMinedOutExpand
@@ -84,7 +84,7 @@ class ProtossVsTerran extends Parallel {
   children.set(Vector(
     new WhenMinedOutExpand,
     new Build(ProtossBuilds.OpeningTwoGate1015Dragoons),
-    new BuildPylonsContinuously,
+    new RequireSufficientPylons,
     new TrainProbesContinuously,
     new RespondToBioAllInWithReavers,
     new WhenSafeToTakeNatural,

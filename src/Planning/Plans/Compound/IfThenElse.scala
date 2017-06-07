@@ -19,10 +19,10 @@ class IfThenElse(
   override def isComplete: Boolean = predicate.get.isComplete && whenTrue.get.isComplete
   
   override def onUpdate() {
-    predicate.get.update(this)
+    delegate(predicate.get)
     if (predicate.get.isComplete)
-      whenTrue.get.update(this)
+      delegate(whenTrue.get)
     else
-      whenFalse.get.update(this)
+      delegate(whenFalse.get)
   }
 }

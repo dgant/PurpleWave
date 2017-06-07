@@ -5,7 +5,7 @@ import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors}
 import Planning.Plans.Army.{Attack, ControlEnemyAirspace, Defend}
 import Planning.Plans.Compound.{IfThenElse, _}
 import Planning.Plans.Information.{ScoutAt, ScoutExpansionsAt}
-import Planning.Plans.Macro.Automatic.Continuous.{BuildPylonsContinuously, TrainContinuously, TrainGatewayUnitsContinuously, TrainProbesContinuously}
+import Planning.Plans.Macro.Automatic.Continuous.{RequireSufficientPylons, TrainContinuously, TrainGatewayUnitsContinuously, TrainProbesContinuously}
 import Planning.Plans.Macro.Automatic.Gas.BuildAssimilators
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expansion.WhenMinedOutExpand
@@ -114,7 +114,7 @@ class ProtossVsZerg extends Parallel {
     new WhenSafeTakeNatural,
     new WhenSafeTakeThirdBase,
     new BuildZealotsInitially,
-    new BuildPylonsContinuously,
+    new RequireSufficientPylons,
     new TrainProbesContinuously,
     new BuildAssimilators,
     new RespondToMutalisksWithMassCorsairs,

@@ -11,10 +11,7 @@ object MovementHeuristicThreatDistance extends MovementHeuristic {
     if (state.threats.isEmpty) return HeuristicMathMultiplicative.default
     
     state.threats
-      .map(threat =>
-        threat.dpsAgainst(state.unit)
-        * threat.pixelDistanceFast(candidate)
-        - threat.pixelRangeAgainst(state.unit))
-      .min / 20.0
+      .map(threat => threat.pixelDistanceFast(candidate) - threat.pixelRangeAgainst(state.unit))
+      .min
   }
 }

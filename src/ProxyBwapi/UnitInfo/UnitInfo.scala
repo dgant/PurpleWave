@@ -213,11 +213,11 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   def pixelReachMax     (framesAhead: Int): Double = Math.max(pixelReachAir(framesAhead), pixelReachGround(framesAhead))
   def pixelReachAgainst (framesAhead: Int, enemy:UnitInfo): Double = if (enemy.flying) pixelReachAir(framesAhead) else pixelReachGround(framesAhead)
   
-  def inRangeToAttackSlow(enemy: UnitInfo) : Boolean = pixelsFromEdgeSlow(enemy) <= pixelRangeAgainst(enemy)
-  def inRangeToAttackFast(enemy: UnitInfo) : Boolean = pixelsFromEdgeFast(enemy) <= pixelRangeAgainst(enemy)
+  def inRangeToAttackSlow(enemy: UnitInfo) : Boolean = pixelsFromEdgeSlow(enemy) <= pixelRangeAgainst(enemy) + With.configuration.attackableRangeBuffer
+  def inRangeToAttackFast(enemy: UnitInfo) : Boolean = pixelsFromEdgeFast(enemy) <= pixelRangeAgainst(enemy) + With.configuration.attackableRangeBuffer
   
-  def inRangeToAttackSlow(enemy: UnitInfo, framesAhead: Int) : Boolean = enemy.project(framesAhead).pixelDistanceSlow(project(framesAhead)) <= pixelRangeAgainst(enemy) + unitClass.radialHypotenuse + enemy.unitClass.radialHypotenuse
-  def inRangeToAttackFast(enemy: UnitInfo, framesAhead: Int) : Boolean = enemy.project(framesAhead).pixelDistanceFast(project(framesAhead)) <= pixelRangeAgainst(enemy) + unitClass.radialHypotenuse + enemy.unitClass.radialHypotenuse
+  def inRangeToAttackSlow(enemy: UnitInfo, framesAhead: Int) : Boolean = enemy.project(framesAhead).pixelDistanceSlow(project(framesAhead)) <= pixelRangeAgainst(enemy) + unitClass.radialHypotenuse + enemy.unitClass.radialHypotenuse + With.configuration.attackableRangeBuffer
+  def inRangeToAttackFast(enemy: UnitInfo, framesAhead: Int) : Boolean = enemy.project(framesAhead).pixelDistanceFast(project(framesAhead)) <= pixelRangeAgainst(enemy) + unitClass.radialHypotenuse + enemy.unitClass.radialHypotenuse + With.configuration.attackableRangeBuffer
   
   def framesToTravelPixels(pixels:Double):Int = if (canMoveThisFrame) Math.max(0, Math.ceil(pixels/topSpeed).toInt) else Int.MaxValue
   def framesBeforeAttacking(enemy:UnitInfo):Int = {

@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Protoss
 
 import Macro.BuildRequests.{BuildRequest, RequestUnitAtLeast}
 import Planning.Composition.UnitMatchers.UnitMatchType
-import Planning.Plans.Army.Defend
+import Planning.Plans.Army.{ConsiderAttacking, Defend}
 import Planning.Plans.Compound.{IfThenElse, Parallel}
 import Planning.Plans.Information.ScoutAt
 import Planning.Plans.Macro.Automatic.Continuous.{RequireSufficientPylons, TrainGatewayUnitsContinuously, TrainProbesContinuously}
@@ -15,6 +15,7 @@ class ProtossVsRandom extends Parallel {
   description.set("Protoss vs Random")
   
   private val safeBuild = Vector[BuildRequest] (
+    RequestUnitAtLeast(3,   Protoss.Gateway),
     RequestUnitAtLeast(1,   Protoss.CyberneticsCore),
     RequestUnitAtLeast(1,   Protoss.Assimilator),
     RequestUnitAtLeast(4,   Protoss.Gateway)
@@ -30,7 +31,8 @@ class ProtossVsRandom extends Parallel {
     new TrainProbesContinuously,
     new TrainGatewayUnitsContinuously,
     new Build(safeBuild),
-    new ScoutAt(9),
+    new ScoutAt(7),
+    new ConsiderAttacking,
     new Defend
   ))
 }

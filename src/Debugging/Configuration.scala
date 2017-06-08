@@ -2,7 +2,6 @@ package Debugging
 
 class Configuration {
   
-  
   ///////////////
   // Operation //
   ///////////////
@@ -16,6 +15,7 @@ class Configuration {
   // Micro //
   ///////////
   
+  var attackableRangeBuffer           = 8
   var fogPositionDuration             = 24 * 99999
   var microFrameLookahead             = 8
   var enableYolo                      = true

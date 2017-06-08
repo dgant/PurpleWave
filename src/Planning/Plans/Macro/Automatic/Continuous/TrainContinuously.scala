@@ -7,6 +7,8 @@ import ProxyBwapi.UnitClass.UnitClass
 
 class TrainContinuously(unitClass: UnitClass, maximum:Int = Int.MaxValue) extends Plan {
   
+  description.set("Continuously train " + unitClass)
+  
   override def onUpdate() {
     if ( ! canBuild) return
     

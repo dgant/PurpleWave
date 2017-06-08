@@ -17,17 +17,15 @@ object EvaluatePixels {
       return state.unit.pixelCenter
     }
     
-    if (With.configuration.visualizeHeuristicMovement) {
-      state.movementHeuristicResults =
-        candidates.flatten(candidate =>
-          profile.weightedHeuristics.map(weightedHeuristic =>
-            new MovementHeuristicResult(
-              weightedHeuristic.heuristic,
-              state,
-              candidate,
-              weightedHeuristic.weighMultiplicatively(state, candidate),
-              weightedHeuristic.color)))
-    }
+    state.movementHeuristicResults =
+      candidates.flatten(candidate =>
+        profile.weightedHeuristics.map(weightedHeuristic =>
+          new MovementHeuristicResult(
+            weightedHeuristic.heuristic,
+            state,
+            candidate,
+            weightedHeuristic.weighMultiplicatively(state, candidate),
+            weightedHeuristic.color)))
     
     HeuristicMathMultiplicative.best(state, profile.weightedHeuristics, candidates)
   }

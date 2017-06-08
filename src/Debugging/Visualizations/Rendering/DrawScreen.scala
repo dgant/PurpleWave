@@ -40,11 +40,11 @@ object DrawScreen {
     color0:   Color = Colors.DeepViolet,
     color1:   Color = Colors.MidnightViolet,
     width:    Int = 90,
-    height:   Int = 90 + Visualization.lineHeightSmall,
+    height:   Int = 90 + With.visualization.lineHeightSmall,
     margin:   Int = 2) {
     
     val end               = start.add(width, height)
-    val innerBorderStart  = start             .add      (margin, margin + Visualization.lineHeightSmall)
+    val innerBorderStart  = start             .add      (margin, margin + With.visualization.lineHeightSmall)
     val innerBorderEnd    = end               .subtract (margin, margin)
     val pointStart        = innerBorderStart  .add      (margin, margin)
     val pointEnd          = innerBorderEnd    .subtract (margin, margin)

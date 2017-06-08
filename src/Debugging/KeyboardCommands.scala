@@ -1,35 +1,33 @@
 package Debugging
 
+import Debugging.Visualizations.Views.Battles.ViewBattles
+import Debugging.Visualizations.Views.Economy.ViewEconomy
+import Debugging.Visualizations.Views.Fun.{ViewHappy, ViewTextOnly}
+import Debugging.Visualizations.Views.Geography.ViewGeography
+import Debugging.Visualizations.Views.Micro.ViewMicro
+import Debugging.Visualizations.Views.Performance.ViewPerformance
+import Debugging.Visualizations.Views.Planning.ViewPlanning
 import Lifecycle.With
 
 object KeyboardCommands {
   def onSendText(text:String) {
     text match {
       case "q"    => breakpoint()
-      case "c"    => With.configuration.camera                      = ! With.configuration.camera
-      case "v"    => With.configuration.visualize                   = ! With.configuration.visualize
-      case "bs"   => With.configuration.visualizeBases              = ! With.configuration.visualizeBases
-      case "bt"   => With.configuration.visualizeBattles            = ! With.configuration.visualizeBattles
-      case "bu"   => With.configuration.visualizeBullets            = ! With.configuration.visualizeBullets
-      case "ch"   => With.configuration.visualizeChokepoints        = ! With.configuration.visualizeChokepoints
-      case "e"    => With.configuration.visualizeEconomy            = ! With.configuration.visualizeEconomy
-      case "g"    => With.configuration.visualizeGeography          = ! With.configuration.visualizeGeography
-      case "gr"   => With.configuration.visualizeGrids              = ! With.configuration.visualizeGrids
-      case "hm"   => With.configuration.visualizeHeuristicMovement  = ! With.configuration.visualizeHeuristicMovement
-      case "hp"   => With.configuration.visualizeHitPoints          = ! With.configuration.visualizeHitPoints
-      case "hv"   => With.configuration.visualizeHappyVision        = ! With.configuration.visualizeHappyVision
-      case "uf"   => With.configuration.visualizeUnitsForeign       = ! With.configuration.visualizeUnitsForeign
-      case "uo"   => With.configuration.visualizeUnitsOurs          = ! With.configuration.visualizeUnitsOurs
-      case "p"    => With.configuration.visualizePerformance        = ! With.configuration.visualizePerformance
-      case "pd"   => With.configuration.visualizePerformanceDetails = ! With.configuration.visualizePerformanceDetails
-      case "pl"   => With.configuration.visualizePlans              = ! With.configuration.visualizePlans
-      case "re"   => With.configuration.visualizeRealEstate         = ! With.configuration.visualizeRealEstate
-      case "r"    => With.configuration.visualizeResources          = ! With.configuration.visualizeResources
-      case "s"    => With.configuration.visualizeScheduler          = ! With.configuration.visualizeScheduler
-      case "1"    => With.game.setLocalSpeed(1000)   ; With.configuration.camera = false
-      case "2"    => With.game.setLocalSpeed(60)     ; With.configuration.camera = false
-      case "3"    => With.game.setLocalSpeed(30)     ; With.configuration.camera = false
-      case "4"    => With.game.setLocalSpeed(0)      ; With.configuration.camera = false
+      case "c"    => With.configuration.camera      = ! With.configuration.camera
+      case "v"    => With.configuration.visualize   = ! With.configuration.visualize
+      case "cy"   => With.configuration.cycleViews  = ! With.configuration.cycleViews
+      case "b "   => With.visualization.setView(ViewBattles)
+      case "e"    => With.visualization.setView(ViewEconomy)
+      case "g"    => With.visualization.setView(ViewGeography)
+      case "m"    => With.visualization.setView(ViewMicro)
+      case "hv"   => With.visualization.setView(ViewHappy)
+      case "to"   => With.visualization.setView(ViewTextOnly)
+      case "p"    => With.visualization.setView(ViewPerformance)
+      case "pl"   => With.visualization.setView(ViewPlanning)
+      case "1"    => With.game.setLocalSpeed(1000)  ; With.configuration.camera = false
+      case "2"    => With.game.setLocalSpeed(60)    ; With.configuration.camera = false
+      case "3"    => With.game.setLocalSpeed(30)    ; With.configuration.camera = false
+      case "4"    => With.game.setLocalSpeed(0)     ; With.configuration.camera = false
       case "map"  => With.logger.debug("The current map is " + With.game.mapName + ": " + With.game.mapFileName)
     }
   }

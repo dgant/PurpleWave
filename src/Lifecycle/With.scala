@@ -1,6 +1,6 @@
 package Lifecycle
 
-import Debugging.Visualizations.Viewport
+import Debugging.Visualizations.{Viewport, Visualization}
 import Debugging.{AutoCamera, Configuration, Logger}
 import Information.Battles.BattleClassifier
 import Information.Geography.Geography
@@ -23,35 +23,36 @@ import bwta.BWTA
 import scala.collection.JavaConverters._
 
 object With {
-  var game          : bwapi.Game          = null
-  var architect     : Architect           = null
-  var bank          : Bank                = null
-  var camera        : AutoCamera          = null
-  var configuration : Configuration       = null
-  var battles       : BattleClassifier    = null
-  var executor      : Executor            = null
-  var commander     : Commander           = null
-  var economy       : Economy             = null
-  var grids         : Grids               = null
-  var intelligence  : Intelligence        = null
-  var geography     : Geography           = null
-  var gameplan      : WinTheGame          = null
-  var latency       : Latency             = null
-  var logger        : Logger              = null
-  var paths         : Paths               = null
-  var performance   : PerformanceMonitor  = null
-  var proxy         : ProxyBWMirror       = null
-  var prioritizer   : Prioritizer         = null
-  var realEstate    : RealEstate          = null
-  var recruiter     : Recruiter           = null
-  var scheduler     : Scheduler           = null
-  var tasks         : AbstractTaskQueue   = null
-  var units         : UnitTracker         = null
-  var viewport      : Viewport            = null
+  var game          : bwapi.Game          = _
+  var architect     : Architect           = _
+  var bank          : Bank                = _
+  var camera        : AutoCamera          = _
+  var configuration : Configuration       = _
+  var battles       : BattleClassifier    = _
+  var executor      : Executor            = _
+  var commander     : Commander           = _
+  var economy       : Economy             = _
+  var grids         : Grids               = _
+  var intelligence  : Intelligence        = _
+  var geography     : Geography           = _
+  var gameplan      : WinTheGame          = _
+  var latency       : Latency             = _
+  var logger        : Logger              = _
+  var paths         : Paths               = _
+  var performance   : PerformanceMonitor  = _
+  var proxy         : ProxyBWMirror       = _
+  var prioritizer   : Prioritizer         = _
+  var realEstate    : RealEstate          = _
+  var recruiter     : Recruiter           = _
+  var scheduler     : Scheduler           = _
+  var tasks         : AbstractTaskQueue   = _
+  var units         : UnitTracker         = _
+  var viewport      : Viewport            = _
+  var visualization : Visualization       = _
   
-  var self    : PlayerInfo         = null
-  var neutral : PlayerInfo         = null
-  var enemies : Vector[PlayerInfo] = null
+  var self    : PlayerInfo         = _
+  var neutral : PlayerInfo         = _
+  var enemies : Vector[PlayerInfo] = _
   
   var frame     : Int = 0
   var mapWidth  : Int = 0
@@ -96,6 +97,7 @@ object With {
     With.tasks                  = new TaskQueueGlobal
     With.units                  = new UnitTracker
     With.viewport               = new Viewport
+    With.visualization          = new Visualization
     
     With.game.setLocalSpeed(With.configuration.gameSpeed)
   }

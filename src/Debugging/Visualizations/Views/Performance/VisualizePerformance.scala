@@ -1,7 +1,6 @@
 package Debugging.Visualizations.Views.Performance
 
 import Debugging.Visualizations.Rendering.DrawScreen
-import Debugging.Visualizations.Visualization
 import Lifecycle.With
 
 object VisualizePerformance {
@@ -20,9 +19,7 @@ object VisualizePerformance {
       With.game.setTextSize(bwapi.Text.Size.Enum.Small)
     }
     
-    if (With.configuration.visualizePerformanceDetails) {
-      renderDetails()
-    }
+    renderDetails()
   }
   
   def renderDetails() {
@@ -40,6 +37,6 @@ object VisualizePerformance {
         task.runMillisecondsMaxAllTime.toString,
         task.totalOverruns.toString
       ))
-    DrawScreen.table(5, Visualization.lineHeightSmall * 2, Vector(title) ++ Vector(headers) ++ body)
+    DrawScreen.table(5, With.visualization.lineHeightSmall * 2, Vector(title) ++ Vector(headers) ++ body)
   }
 }

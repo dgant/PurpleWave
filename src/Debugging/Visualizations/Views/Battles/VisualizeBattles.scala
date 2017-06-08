@@ -1,4 +1,4 @@
-package Debugging.Visualizations.Views.Combat
+package Debugging.Visualizations.Views.Battles
 
 import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.{Colors, Visualization}
@@ -13,7 +13,7 @@ object VisualizeBattles {
   
   private val graphMargin             = Pixel(2, 2)
   private val graphWidth              = 90
-  private val graphHeight             = 90 + Visualization.lineHeightSmall
+  private val graphHeight             = 90 + With.visualization.lineHeightSmall
   private val tableHeader0            = Pixel(100, 18)
   private val tableHeader1            = tableHeader0.add(125, 0)
   private val tableStart0             = tableHeader0.add(0, 25)

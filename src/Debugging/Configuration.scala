@@ -2,6 +2,7 @@ package Debugging
 
 class Configuration {
   
+  
   ///////////////
   // Operation //
   ///////////////
@@ -64,26 +65,17 @@ class Configuration {
   // Visualization //
   ///////////////////
   
-  var visualize                   = true
-  var visualizeBases              = true
-  var visualizeBattles            = true
-  var visualizeBullets            = false
-  var visualizeChokepoints        = true
-  var visualizeEconomy            = true
-  var visualizeGeography          = true
-  var visualizeGrids              = false
-  var visualizeHappyVision        = false
-  var visualizeHitPoints          = true
-  var visualizeHeuristicMovement  = false
-  var visualizePerformance        = true
-  var visualizePerformanceDetails = true
-  var visualizePlans              = false
-  var visualizeResources          = false
-  var visualizeRealEstate         = false
-  var visualizeScheduler          = false
-  var visualizeTextOnly           = false
-  var visualizeUnitsForeign       = true
-  var visualizeUnitsOurs          = true
+  var visualize = true
+  
+  var cycleViews         = true
+  var viewHappyVision   = false
+  var viewTextOnly      = false
+  var viewBattles       = false
+  var viewEconomy       = false
+  var viewGeography     = false
+  var viewMicro         = false
+  var viewPerformance   = false
+  var viewPlanning      = false
   
   var camera                      = false
   var cameraDynamicSpeed          = false

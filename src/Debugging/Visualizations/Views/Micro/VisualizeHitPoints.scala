@@ -58,6 +58,7 @@ object VisualizeHitPoints {
     
     if (unit.wounded) {
       DrawMap.box(Pixel(xStart - 1, yStartHp - 1), Pixel(xStart + width + 2, yEndHp + 1), Colors.NeonRed, solid = false)
+      DrawMap.circle(unit.pixelCenter, unit.unitClass.radialHypotenuse.toInt + 1, Colors.NeonRed)
     }
     
     if (unit.energyMax > 0) {

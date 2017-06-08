@@ -1,9 +1,9 @@
-package Debugging.Visualizations.Views
+package Debugging.Visualizations.Views.Geography
 
 import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
-import Planning.Composition.ResourceLocks.LockArea
 import Lifecycle.With
+import Planning.Composition.ResourceLocks.LockArea
 
 object VisualizeRealEstate {
   

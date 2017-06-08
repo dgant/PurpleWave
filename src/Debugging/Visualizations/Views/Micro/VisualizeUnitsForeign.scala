@@ -1,8 +1,8 @@
-package Debugging.Visualizations.Views
+package Debugging.Visualizations.Views.Micro
 
 import Debugging.Visualizations.Rendering.DrawMap
-import ProxyBwapi.UnitInfo.ForeignUnitInfo
 import Lifecycle.With
+import ProxyBwapi.UnitInfo.ForeignUnitInfo
 
 object VisualizeUnitsForeign {
   

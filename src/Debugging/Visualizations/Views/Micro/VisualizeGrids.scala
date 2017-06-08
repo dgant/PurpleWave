@@ -1,4 +1,4 @@
-package Debugging.Visualizations.Views
+package Debugging.Visualizations.Views.Micro
 
 import Debugging.Visualizations.Rendering.DrawMap
 import Information.Grids.AbstractGrid

@@ -1,4 +1,4 @@
-package Debugging.Visualizations.Views
+package Debugging.Visualizations.Views.Performance
 
 import Debugging.Visualizations.Rendering.DrawScreen
 import Debugging.Visualizations.Visualization

@@ -1,10 +1,10 @@
-package Debugging.Visualizations.Views
+package Debugging.Visualizations.Views.Fun
 
 import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
-import ProxyBwapi.UnitInfo.UnitInfo
 import Lifecycle.With
 import Mathematics.Pixels.Pixel
+import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.Color
 
 object VisualizeVectorUnits {

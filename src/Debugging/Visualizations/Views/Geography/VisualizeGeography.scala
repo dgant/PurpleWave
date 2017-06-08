@@ -1,4 +1,4 @@
-package Debugging.Visualizations.Views
+package Debugging.Visualizations.Views.Geography
 
 import Debugging.Visualizations.Rendering.DrawMap
 import Lifecycle.With

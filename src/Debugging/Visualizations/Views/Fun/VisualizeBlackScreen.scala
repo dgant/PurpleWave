@@ -1,4 +1,4 @@
-package Debugging.Visualizations.Views
+package Debugging.Visualizations.Views.Fun
 
 import Lifecycle.With
 import bwapi.Color

@@ -1,9 +1,9 @@
-package Debugging.Visualizations.Views
+package Debugging.Visualizations.Views.Combat
 
 import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.{Colors, Visualization}
-import Information.Battles.Types.Battle
 import Information.Battles.Estimation.BattleEstimation
+import Information.Battles.Types.Battle
 import Lifecycle.With
 import Mathematics.Pixels.Pixel
 import Planning.Yolo

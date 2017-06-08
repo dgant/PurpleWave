@@ -1,4 +1,4 @@
-package Debugging.Visualizations.Views
+package Debugging.Visualizations.Views.Economy
 
 import Debugging.Visualizations.Rendering.DrawScreen
 import Lifecycle.With

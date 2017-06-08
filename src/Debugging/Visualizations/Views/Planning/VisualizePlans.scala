@@ -1,4 +1,4 @@
-package Debugging.Visualizations.Views
+package Debugging.Visualizations.Views.Planning
 
 import Debugging.Visualizations.Visualization
 import Lifecycle.With

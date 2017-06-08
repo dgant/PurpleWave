@@ -1,5 +1,12 @@
 package Debugging.Visualizations
 
+import Debugging.Visualizations.Views.Combat.VisualizeBattles
+import Debugging.Visualizations.Views.Economy.{VisualizeEconomy, VisualizeScheduler}
+import Debugging.Visualizations.Views.Fun._
+import Debugging.Visualizations.Views.Geography.{VisualizeBases, VisualizeChokepoints, VisualizeGeography, VisualizeRealEstate}
+import Debugging.Visualizations.Views.Micro._
+import Debugging.Visualizations.Views.Performance.VisualizePerformance
+import Debugging.Visualizations.Views.Planning.{VisualizePlans, VisualizeResources}
 import Debugging.Visualizations.Views._
 import Lifecycle.With
 

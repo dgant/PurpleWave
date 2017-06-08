@@ -8,9 +8,6 @@ abstract class AbstractGridArray[T] extends AbstractGrid[T] {
   protected var values:Array[T]
   private var initialized = false
   
-  def defaultValue:T
-  def repr(value:T):String
-  
   def reset() = {
     val default = defaultValue
     

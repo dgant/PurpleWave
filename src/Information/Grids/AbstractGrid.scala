@@ -14,4 +14,6 @@ abstract class AbstractGrid[T] {
   def i(tileX:Int, tileY:Int)       = tileX + tileY * width
   def get(i:Int):T
   def get(tile: Tile):T             = get(tile.i)
+  def defaultValue:T
+  def repr(value:T):String          = value.toString
 }

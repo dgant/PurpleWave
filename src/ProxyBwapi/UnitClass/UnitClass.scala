@@ -275,7 +275,7 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
     addBuildUnitIf(output, Zerg.Lair,                   Zerg.Hatchery)
     addBuildUnitIf(output, Zerg.Hive,                   Zerg.Lair)
     addBuildUnitIf(output, Zerg.SunkenColony,           Zerg.CreepColony)
-    addBuildUnitIf(output, Zerg.SporeColony,            Zerg.SporeColony)
+    addBuildUnitIf(output, Zerg.SporeColony,            Zerg.CreepColony)
   
     output.toVector
   }

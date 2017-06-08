@@ -6,14 +6,14 @@ import Lifecycle.With
 object VisualizeScheduler {
   
   def render() {
-    With.game.drawTextScreen(25, 31, "Original queue")
-    DrawScreen.table(25, 57,
+    With.game.drawTextScreen(5, 31, "Original queue")
+    DrawScreen.table(5, 57,
       With.scheduler.queueOriginal
         .take(15)
         .map(buildable => Vector(buildable.toString)))
     
-    With.game.drawTextScreen(175, 31, "Optimized queue")
-    DrawScreen.table(175, 57,
+    With.game.drawTextScreen(135, 31, "Optimized queue")
+    DrawScreen.table(135, 57,
       With.scheduler.simulationResults.suggestedEvents
         .toVector
         .sortBy(_.buildable.toString)
@@ -25,8 +25,8 @@ object VisualizeScheduler {
           reframe(event.frameStart),
           reframe(event.frameEnd))))
     
-    With.game.drawTextScreen(325, 31, "In progress")
-    DrawScreen.table(325, 57,
+    With.game.drawTextScreen(265, 31, "In progress")
+    DrawScreen.table(265, 57,
       With.scheduler.simulationResults.simulatedEvents
         .filter(e => e.frameStart < With.frame)
         .toVector
@@ -39,8 +39,8 @@ object VisualizeScheduler {
           reframe(event.frameStart),
           reframe(event.frameEnd))))
     
-    With.game.drawTextScreen(500, 31, "Impossible")
-    DrawScreen.table(500, 57, With.scheduler.simulationResults.unbuildable
+    With.game.drawTextScreen(395, 31, "Impossible")
+    DrawScreen.table(395, 57, With.scheduler.simulationResults.unbuildable
       .toVector
       .take(15)
       .map(buildable => Vector(buildable.toString.split("\\s+")(0))))

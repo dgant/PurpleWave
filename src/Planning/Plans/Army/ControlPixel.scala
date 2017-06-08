@@ -13,7 +13,7 @@ class ControlPixel extends Plan {
   
   description.set("Control a position")
   
-  val units             = new Property[LockUnits](new LockUnits)
+  val controllers             = new Property[LockUnits](new LockUnits)
   var positionToControl = new Property[TileFinder](new TileEnemyBase)
   
   private val infiltrationRadius = 32.0 * 25
@@ -37,11 +37,11 @@ class ControlPixel extends Plan {
       targetTile = infiltrators.map(_.tileIncludingCenter).minBy(_.tileDistanceSlow(With.geography.home))
     }
     
-    units.get.acquire(this)
-    if (units.get.satisfied) {
+    controllers.get.acquire(this)
+    if (controllers.get.satisfied) {
       //TODO: Dispatch only units capable of fighting an infiltrator
       
-      units.get.units.foreach(fighter => With.executor.intend(new Intention(this, fighter) { toTravel = Some(targetTile.pixelCenter) }))
+      controllers.get.units.foreach(fighter => With.executor.intend(new Intention(this, fighter) { toTravel = Some(targetTile.pixelCenter) }))
     }
   }
   

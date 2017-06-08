@@ -257,7 +257,7 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   
   def likelyStillThere:Boolean =
     possiblyStillThere &&
-    ! canMoveThisFrame || lastSeen + With.configuration.fogPositionDuration > With.frame || is(Terran.SiegeTankUnsieged)
+    ( ! canMoveThisFrame || lastSeen + With.configuration.fogPositionDuration > With.frame || is(Terran.SiegeTankUnsieged))
   
   def effectivelyCloaked:Boolean =
     (burrowed || cloaked) && (

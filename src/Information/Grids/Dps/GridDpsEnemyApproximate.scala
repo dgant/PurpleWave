@@ -15,4 +15,6 @@ class GridDpsEnemyApproximate extends AbstractGrid[Double] {
   }
   
   override def defaultValue: Double = 0.0
+  
+  override def repr(value: Double): String = value.toInt.toString
 }

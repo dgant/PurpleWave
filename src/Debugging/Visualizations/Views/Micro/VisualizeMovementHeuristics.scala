@@ -87,8 +87,8 @@ object VisualizeMovementHeuristics {
   
   def renderLegendKey(group:Iterable[MovementHeuristicResult], order:Int) {
     val left = 5
-    val top = 240
-    val rowHeight = 11
+    val top = 5
+    val rowHeight = 15
     val rowMargin = 2
     val boxStart = Pixel(left, top + (rowHeight + rowMargin) * order)
     With.game.drawBoxScreen(
@@ -96,8 +96,10 @@ object VisualizeMovementHeuristics {
       boxStart.add(rowHeight, rowHeight).bwapi,
       group.head.color,
       true)
+    With.game.setTextSize(bwapi.Text.Size.Enum.Default)
     With.game.drawTextScreen(
       boxStart.add(rowHeight + 4, 0).bwapi,
       group.head.heuristic.getClass.getSimpleName.replace("MovementHeuristic", "").replace("$", ""))
+    With.game.setTextSize(bwapi.Text.Size.Enum.Small)
   }
 }

@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Protoss
 
 import Macro.BuildRequests.{BuildRequest, RequestUnitAtLeast, RequestUpgrade}
 import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors}
-import Planning.Plans.Army.{Attack, ControlEnemyAirspace, Defend}
+import Planning.Plans.Army.{ConsiderAttacking, ControlEnemyAirspace, Defend}
 import Planning.Plans.Compound.{IfThenElse, _}
 import Planning.Plans.Information.{ScoutAt, ScoutExpansionsAt}
 import Planning.Plans.Macro.Automatic.Continuous.{RequireSufficientPylons, TrainContinuously, TrainGatewayUnitsContinuously, TrainProbesContinuously}
@@ -102,7 +102,7 @@ class ProtossVsZerg extends Parallel {
   
   private class AttackWhenWeHaveArmy extends IfThenElse(
     new UnitsAtLeast(10, UnitMatchWarriors),
-    new Attack,
+    new ConsiderAttacking,
     new Defend
   )
   
@@ -128,7 +128,7 @@ class ProtossVsZerg extends Parallel {
     new ScoutAt(10),
     new ScoutExpansionsAt(40),
     new ControlEnemyAirspace,
-    new Attack { attackers.get.unitMatcher.set(UnitMatchType(Protoss.Corsair)) },
+    new ConsiderAttacking { attackers.get.unitMatcher.set(UnitMatchType(Protoss.Corsair)) },
     new AttackWhenWeHaveArmy
   ))
 }

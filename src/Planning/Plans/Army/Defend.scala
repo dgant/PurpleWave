@@ -7,6 +7,6 @@ class Defend extends ControlPixel {
   
   description.set("Defend a position")
   
-  units.get.unitMatcher.set(UnitMatchWarriors)
+  controllers.get.unitMatcher.set(UnitMatchWarriors)
   positionToControl.set(new TileChoke)
 }

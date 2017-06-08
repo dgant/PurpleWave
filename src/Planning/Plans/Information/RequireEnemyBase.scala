@@ -6,7 +6,4 @@ class RequireEnemyBase
   extends IfThenElse (
     new Not(new FoundEnemyBase),
     new FindEnemyBase
-  ) {
-  
-  description.set("Require a known enemy base")
-}
+  )

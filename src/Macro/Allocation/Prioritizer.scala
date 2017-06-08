@@ -12,10 +12,6 @@ class Prioritizer {
   
   var nextPriority = 0
   
-  def active(plan:Plan): Boolean = {
-    priorities.contains(plan)
-  }
-  
   def update() {
     //For debugging only!
     val sortedPriorities = priorities.toList.sortBy(_._2)
@@ -23,11 +19,15 @@ class Prioritizer {
     priorities.clear()
   }
   
-  def getPriority(plan:Plan):Integer = {
+  def isPrioritized(plan: Plan): Boolean = {
+    priorities.contains(plan)
+  }
+  
+  def getPriority(plan: Plan): Integer = {
     priorities(plan)
   }
   
-  def prioritize(plan:Plan) {
+  def prioritize(plan: Plan) {
     if ( ! priorities.contains(plan)) {
       priorities.put(plan, nextPriority)
       nextPriority += 1

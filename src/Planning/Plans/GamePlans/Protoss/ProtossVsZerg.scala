@@ -88,7 +88,13 @@ class ProtossVsZerg extends Parallel {
   )
   
   private class BuildZealotsOrDragoons_BasedOnMutalisksAndZerglings extends IfThenElse (
-    new EnemyMassMutalisks,
+    new Or (
+      new EnemyMassMutalisks,
+      new And(
+        new EnemyMutalisks,
+        new UnitsAtLeast(8, UnitMatchType(Protoss.Zealot))
+      )
+    ),
     new TrainContinuously(Protoss.Dragoon),
     new IfThenElse(
       new Or(
@@ -104,6 +110,16 @@ class ProtossVsZerg extends Parallel {
     new UnitsAtLeast(10, UnitMatchWarriors),
     new ConsiderAttacking,
     new Defend
+  )
+  
+  private class EatOverlordsUntilMutalisksArrive extends IfThenElse(
+    new EnemyMutalisks,
+    new ScoutExpansionsAt(100),
+    new Parallel(
+      new ScoutExpansionsAt(40),
+      new ControlEnemyAirspace,
+      new ConsiderAttacking { attackers.get.unitMatcher.set(UnitMatchType(Protoss.Corsair)) }
+    )
   )
   
   private val earlyZealotCount = 8
@@ -126,9 +142,7 @@ class ProtossVsZerg extends Parallel {
     new Build(ProtossBuilds.TakeNatural),
     new Build(lateGameBuild),
     new ScoutAt(10),
-    new ScoutExpansionsAt(40),
-    new ControlEnemyAirspace,
-    new ConsiderAttacking { attackers.get.unitMatcher.set(UnitMatchType(Protoss.Corsair)) },
+    new EatOverlordsUntilMutalisksArrive,
     new AttackWhenWeHaveArmy
   ))
 }

@@ -2,11 +2,7 @@ package Planning.Plans.Compound
 
 import Planning.Plan
 
-class Or(initialChildren:Plan*) extends Parallel(initialChildren: _*) {
+class Or(initialChildren: Plan*) extends Parallel(initialChildren: _*) {
   
-  description.set("And")
-  
-  override def isComplete: Boolean = children.get.exists(_.isComplete)
-  
-  override def onUpdate() { super.onUpdate() }
+  override def isComplete: Boolean = getChildren.exists(_.isComplete)
 }

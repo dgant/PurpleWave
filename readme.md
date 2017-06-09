@@ -19,7 +19,7 @@ Some of the techniques PurpleWave uses are:
 * Priority-based resource allocation
 * Build order simulation
 * Agent-based behaviors
-* Heuristic navigation and targeting with potential fields
+* Heuristic targeting and navigation with potential fields
 * Dynamic CPU performance management
 
 PurpleWave is built directly on BWAPI, but is designed to be easily adapted for Starcraft 2 AI development.

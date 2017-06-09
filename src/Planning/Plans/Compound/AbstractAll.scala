@@ -3,7 +3,7 @@ package Planning.Plans.Compound
 import Planning.Composition.Property
 import Planning.Plan
 
-abstract class AbstractAll(initialChildren:Plan*) extends Plan {
+abstract class AbstractAll(initialChildren: Plan*) extends Plan {
   
   val children = new Property[Vector[Plan]](initialChildren.toVector)
   

@@ -1,18 +1,16 @@
 package Planning.Plans.Macro.Milestones
 
-import Planning.Composition.Property
 import Planning.Plan
 import Lifecycle.With
 import Planning.Composition.UnitMatchers.{UnitMatchAnything, UnitMatcher}
 
 class UnitsAtLeast(
-  initialQuantity:Int = 0,
-  initialMatcher:UnitMatcher = UnitMatchAnything) extends Plan {
+  quantity:  Int         = 0,
+  matcher:   UnitMatcher = UnitMatchAnything)
   
-  description.set("Require a minimum unit count")
+  extends Plan {
   
-  val quantity    = new Property[Int](initialQuantity)
-  val unitMatcher = new Property[UnitMatcher](initialMatcher)
+  description.set("Require at least " + quantity + " matching units")
   
-  override def isComplete: Boolean = With.units.ours.filter(unitMatcher.get.accept).size >= quantity.get
+  override def isComplete: Boolean = With.units.ours.count(matcher.accept) >= quantity
 }

@@ -28,8 +28,7 @@ object BattleEstimator {
   
   def recalculateGlobal() {
     val battle = With.battles.global
-    val estimation = new BattleEstimation(Some(battle), considerGeometry = false)
-    estimation.addUnits(battle)
+    battle.estimation = new BattleEstimation(Some(battle), considerGeometry = false)
     battle.estimation.addUnits(battle)
     battle.estimation.recalculate()
   }

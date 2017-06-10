@@ -21,7 +21,7 @@ class ForeignUnitTracker {
   def get(someUnit:bwapi.Unit):Option[ForeignUnitInfo] = get(someUnit.getID)
   def get(id:Int):Option[ForeignUnitInfo] = foreignUnitsById.get(id)
   
-  private val limitInvalidatePixels = new Limiter(1, invalidatePixels)
+  private val limitInvalidatePixels = new Limiter(1, invalidatePositions)
   def onFrame() {
     initialize()
     
@@ -57,11 +57,12 @@ class ForeignUnitTracker {
     foreignUnitsById.get(unit.getID).foreach(remove)
   }
   
-  private def invalidatePixels() {
-    foreignUnits
-      .filter(_.possiblyStillThere)
-      .filterNot(_.visible)
-      .filter(unitInfo => unitInfo.tileArea.tiles.forall(tile => With.game.isVisible(tile.bwapi)))
+  private def invalidatePositions() {
+    foreignUnits.filter(unit =>
+      unit.possiblyStillThere
+      &&  ! unit.visible
+      &&  ( ! unit.cloaked || ! unit.burrowed || unit.detected)
+      &&  unit.tileArea.tiles.forall(tile => With.game.isVisible(tile.bwapi)))
       .foreach(updateMissing)
   }
   
@@ -93,7 +94,6 @@ class ForeignUnitTracker {
   }
   
   private def updateMissing(unit:ForeignUnitInfo) {
-    
     //Well, if it can't move, it must be dead. Like a building that burned down or was otherwise destroyed.
     if (unit.unitClass.canMove) unit.flagMissing() else remove(unit)
   }

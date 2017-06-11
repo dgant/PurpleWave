@@ -1,5 +1,6 @@
 package Debugging.Visualizations.Views.Micro
 
+import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
 import Lifecycle.With
 import Mathematics.Heuristics.HeuristicMathMultiplicative
@@ -43,6 +44,9 @@ object VisualizeMovementHeuristics {
     val activeGroups = heuristicGroups.map(_._2).filterNot(group => group.forall(_.evaluation == group.head.evaluation))
     activeGroups.foreach(group => renderUnitHeuristic(group, maxScale))
     renderLegend(activeGroups)
+    val unit = results.head.context.unit
+    DrawMap.circle(unit.pixelCenter, (unit.pixelRangeMax + unit.unitClass.radialHypotenuse).toInt, Colors.BrightOrange)
+    DrawMap.circle(unit.pixelCenter, With.configuration.battleMarginPixels.toInt, Colors.BrightRed)
   }
   
   def renderUnitHeuristic(results:Iterable[MovementHeuristicResult], maxScale:Double) {

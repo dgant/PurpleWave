@@ -5,7 +5,7 @@ import ProxyBwapi.Races.Protoss
 
 object ProtossBuilds {
   
-  val OpeningOneGateCore = Vector[BuildRequest] (
+  val OpeningOneGateCore_DragoonFirst = Vector[BuildRequest] (
     RequestUnitAtLeast(1,   Protoss.Nexus),
     RequestUnitAtLeast(8,   Protoss.Probe),
     RequestUnitAtLeast(1,   Protoss.Pylon),
@@ -17,6 +17,26 @@ object ProtossBuilds {
     RequestUnitAtLeast(1,   Protoss.CyberneticsCore),
     RequestUnitAtLeast(15,  Protoss.Probe),
     RequestUnitAtLeast(2,   Protoss.Pylon),
+    RequestUnitAtLeast(1,   Protoss.Dragoon)
+  )
+  
+  val OpeningOneGateCore_WithZealot_BeforeZealot = Vector[BuildRequest] (
+    RequestUnitAtLeast(1,   Protoss.Nexus),
+    RequestUnitAtLeast(8,   Protoss.Probe),
+    RequestUnitAtLeast(1,   Protoss.Pylon),
+    RequestUnitAtLeast(10,  Protoss.Probe),
+    RequestUnitAtLeast(1,   Protoss.Gateway),
+    RequestUnitAtLeast(12,  Protoss.Probe),
+    RequestUnitAtLeast(1,   Protoss.Assimilator),
+    RequestUnitAtLeast(13,  Protoss.Probe)
+  )
+  
+  val OpeningOneGateCore_WithZealot_AfterZealot = Vector[BuildRequest] (
+    //Expected: One zealot
+    RequestUnitAtLeast(14,  Protoss.Probe),
+    RequestUnitAtLeast(2,   Protoss.Pylon),
+    RequestUnitAtLeast(15,  Protoss.Probe),
+    RequestUnitAtLeast(1,   Protoss.CyberneticsCore),
     RequestUnitAtLeast(1,   Protoss.Dragoon)
   )
   

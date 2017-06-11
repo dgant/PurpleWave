@@ -34,7 +34,7 @@ object Kite extends Action {
         threat.framesBeforeAttacking(state.unit) < framesToShootAndMove ||
         threat.pixelDistanceTravelling(state.unit.pixelCenter) <
           (if (state.unit.canAttackThisSecond(threat))
-            state.unit.pixelRangeAgainst(threat)
+            state.unit.pixelRangeAgainstFromEdge(threat)
           else
             state.unit.pixelRangeMax - 80.0))) {
       

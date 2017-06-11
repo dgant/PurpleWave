@@ -13,7 +13,7 @@ object MovementHeuristicTargetInRange extends MovementHeuristic {
     HeuristicMathMultiplicative.fromBoolean(
       state.toAttack.get.pixelDistanceSquared(candidate) <
       Math.pow(
-        state.unit.pixelRangeAgainst(state.toAttack.get) +
+        state.unit.pixelRangeAgainstFromEdge(state.toAttack.get) +
         state.unit.unitClass.radialHypotenuse +
         state.toAttack.get.unitClass.radialHypotenuse,
         2))

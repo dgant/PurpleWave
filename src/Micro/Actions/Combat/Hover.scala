@@ -16,7 +16,7 @@ object Hover extends Action {
     state.canAttack = false
     val threatTargets = state.targets.filter(_.canAttackThisSecond(state.unit))
     if (threatTargets.nonEmpty) {
-      state.toAttack = Some(threatTargets.minBy(target => target.pixelDistanceFast(state.unit) - target.pixelRangeAgainst(state.unit)))
+      state.toAttack = Some(threatTargets.minBy(target => target.pixelDistanceFast(state.unit) - target.pixelRangeAgainstFromEdge(state.unit)))
       Reposition.delegate(state)
     }
     

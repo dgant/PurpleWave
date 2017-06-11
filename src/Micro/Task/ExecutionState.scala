@@ -6,7 +6,7 @@ import Mathematics.Pixels.{Pixel, Tile}
 import Micro.Actions.Action
 import Micro.Behaviors.{MovementProfiles, TargetingProfiles}
 import Micro.Heuristics.Movement.{MovementHeuristicResult, MovementProfile}
-import Micro.Heuristics.Targeting.{TargetHeuristicResult, TargetingProfile}
+import Micro.Heuristics.Targeting.{EvaluateTargets, TargetHeuristicResult, TargetingProfile}
 import Micro.Intent.{Intention, Targets, Threats}
 import Performance.Caching.CacheFrame
 import ProxyBwapi.Techs.Tech
@@ -52,14 +52,16 @@ class ExecutionState(val unit: FriendlyUnitInfo) {
   def origin: Pixel = originCache.get
   private val originCache = new CacheFrame(() => if (With.geography.ourBases.nonEmpty) With.geography.ourBases.map(_.heart.pixelCenter).minBy(unit.pixelDistanceTravelling) else With.geography.home.pixelCenter)
   
-  def targets         : Vector[UnitInfo] = targetsCache.get
-  def targetsInRange  : Vector[UnitInfo] = targetsInRangeCache.get
-  def threats         : Vector[UnitInfo] = threatsCache.get
-  def threatsActive   : Vector[UnitInfo] = threatsActiveCache.get
-  private val targetsCache        = new CacheFrame(() => Targets.get(intent))
-  private val targetsInRangeCache = new CacheFrame(() => targets.filter(target => Targets.inRange(intent, target)))
+  def threats         : Vector[UnitInfo]      = threatsCache.get
+  def threatsActive   : Vector[UnitInfo]      = threatsActiveCache.get
+  def targets         : Vector[UnitInfo]      = targetsCache.get
+  def targetsInRange  : Vector[UnitInfo]      = targetsInRangeCache.get
+  def targetValues    : Map[UnitInfo, Double] = targetValuesCache.get
   private val threatsCache        = new CacheFrame(() => Threats.get(intent))
   private val threatsActiveCache  = new CacheFrame(() => threats.filter(threat => Threats.active(intent, threat)))
+  private val targetsCache        = new CacheFrame(() => Targets.get(intent))
+  private val targetsInRangeCache = new CacheFrame(() => targets.filter(target => Targets.inRange(intent, target)))
+          val targetValuesCache   = new CacheFrame(() => targets.map(target => (target, EvaluateTargets.evaluate(this, target))).toMap)
   
   /////////////////
   // Diagnostics //

@@ -6,7 +6,7 @@ import Debugging.Visualizations.Views.Fun._
 import Debugging.Visualizations.Views.Geography._
 import Debugging.Visualizations.Views.Micro._
 import Debugging.Visualizations.Views.Performance.ViewPerformance
-import Debugging.Visualizations.Views.Planning.ViewPlanning
+import Debugging.Visualizations.Views.Planning.{ViewPlanning, VisualizePlansMap}
 import Debugging.Visualizations.Views.{View, ViewNothing}
 import Lifecycle.With
 
@@ -15,10 +15,7 @@ class Visualization {
   val lineHeightSmall = 9
   
   private val viewCycle = Vector(
-    ViewBattles,
     ViewEconomy,
-    ViewGeography,
-    ViewMicro,
     ViewPerformance,
     ViewPlanning
   )
@@ -33,7 +30,11 @@ class Visualization {
   def render() {
     if (With.configuration.visualize) {
       With.game.setTextSize(bwapi.Text.Size.Enum.Small)
-  
+      
+      ViewGeography.render()
+      VisualizePlansMap.render()
+      ViewMicro.render()
+      ViewBattles.render()
       view.render()
       
       if (With.configuration.cycleViews && (With.frame -lastCycle) > 24 * 8) {

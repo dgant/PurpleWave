@@ -60,7 +60,7 @@ class ProtossVsProtoss extends Parallel {
       )
     ),
     
-    new Build(ProtossBuilds.OpeningOneGateCore),
+    new Build(ProtossBuilds.OpeningOneGateCore_DragoonFirst),
     
     new IfThenElse(
       new UnitsAtLeast(8, UnitMatchType(Protoss.Dragoon)),

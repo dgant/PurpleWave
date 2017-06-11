@@ -3,18 +3,12 @@ package Debugging.Visualizations.Views.Planning
 import Lifecycle.With
 import Planning.Plan
 
-object VisualizePlans {
+object VisualizePlansScreen {
   
   def render() {
-    visualizePlansRecursively(With.gameplan)
     describePlanTree(With.gameplan, 0, 0)
       .zipWithIndex
       .foreach(pair => With.game.drawTextScreen(0, pair._2 * With.visualization.lineHeightSmall, pair._1))
-  }
-  
-  private def visualizePlansRecursively(plan: Plan) {
-    plan.visualize()
-    plan.getChildren.foreach(visualizePlansRecursively)
   }
   
   private def describePlanTree(plan: Plan, childOrder: Integer, depth: Integer): Seq[String] = {

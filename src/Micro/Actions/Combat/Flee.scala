@@ -1,5 +1,6 @@
 package Micro.Actions.Combat
 
+import Information.Geography.Types.Zone
 import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Commands.{Reposition, Travel}
@@ -7,16 +8,17 @@ import Micro.Task.ExecutionState
 
 object Flee extends Action {
   
-  override def allowed(state:ExecutionState) = {
+  override def allowed(state: ExecutionState) = {
     state.unit.canMoveThisFrame &&
-    state.threats.nonEmpty &&
-    {
-      val zone = state.unit.pixelCenter.zone
-      zone.owner != With.self || zone.bases.isEmpty
-    }
+    state.threats.exists(threat => zoneQualifies(threat.pixelCenter.zone)) &&
+    zoneQualifies(state.unit.pixelCenter.zone)
   }
   
-  override def perform(state:ExecutionState) {
+  private def zoneQualifies(zone: Zone): Boolean = {
+    zone.owner != With.self || zone.bases.isEmpty
+  }
+  
+  override def perform(state: ExecutionState) {
     
     state.canPursue = false
     state.toTravel  = Some(state.origin)

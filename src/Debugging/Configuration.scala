@@ -65,17 +65,9 @@ class Configuration {
   // Visualization //
   ///////////////////
   
-  var visualize = true
-  
-  var cycleViews         = true
-  var viewHappyVision   = false
-  var viewTextOnly      = false
-  var viewBattles       = false
-  var viewEconomy       = false
-  var viewGeography     = false
-  var viewMicro         = false
-  var viewPerformance   = false
-  var viewPlanning      = false
+  var visualize                           = true
+  var visualizationProbabilityHappyVision = 0.1
+  var visualizationProbabilityTextOnly    = 0.05
   
   var camera                      = false
   var cameraDynamicSpeed          = false

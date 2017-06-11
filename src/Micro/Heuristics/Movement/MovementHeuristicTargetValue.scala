@@ -11,10 +11,12 @@ object MovementHeuristicTargetValue extends MovementHeuristic {
     if ( ! state.canAttack)     return HeuristicMathMultiplicative.default
     if ( state.targets.isEmpty) return HeuristicMathMultiplicative.default
     
-    state.targetValues
+    val targetValues = state.targetValues
       .filter(pair =>
         pair._1.pixelDistanceFast(candidate) < state.unit.pixelRangeAgainstFromCenter(pair._1))
       .map(_._2)
-      .max
+      
+    if (targetValues.isEmpty) return HeuristicMathMultiplicative.default
+    targetValues.max
   }
 }

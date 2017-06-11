@@ -2,13 +2,15 @@ package Debugging.Visualizations
 
 import Debugging.Visualizations.Views.Battles.ViewBattles
 import Debugging.Visualizations.Views.Economy.ViewEconomy
-import Debugging.Visualizations.Views.Fun._
+import Debugging.Visualizations.Views.Fun.{ViewHappy, ViewTextOnly}
 import Debugging.Visualizations.Views.Geography._
 import Debugging.Visualizations.Views.Micro._
 import Debugging.Visualizations.Views.Performance.ViewPerformance
 import Debugging.Visualizations.Views.Planning.{ViewPlanning, VisualizePlansMap}
 import Debugging.Visualizations.Views.{View, ViewNothing}
 import Lifecycle.With
+
+import scala.util.Random
 
 class Visualization {
   
@@ -23,22 +25,39 @@ class Visualization {
   private var view: View = ViewNothing
   private var lastCycle = 0
   
+  var cycle     = true
+  var screen    = true
+  var map       = true
+  var happy     = false
+  var textOnly  = false
+  
   def setView(newView: View) {
     view = newView
   }
   
   def render() {
-    if (With.configuration.visualize) {
-      With.game.setTextSize(bwapi.Text.Size.Enum.Small)
-      
-      ViewGeography.render()
-      VisualizePlansMap.render()
-      ViewMicro.render()
-      ViewBattles.render()
-      view.render()
-      
-      if (With.configuration.cycleViews && (With.frame -lastCycle) > 24 * 8) {
-        pickNextView()
+    requireInitialization()
+    if (! With.configuration.visualize) return
+    With.game.setTextSize(bwapi.Text.Size.Enum.Small)
+    
+    if (happy) {
+      ViewHappy.render()
+    }
+    else if (textOnly) {
+      ViewTextOnly.render()
+    }
+    else {
+      if (map) {
+        ViewGeography.render()
+        VisualizePlansMap.render()
+        ViewMicro.render()
+      }
+      if (screen) {
+        ViewBattles.render()
+        view.render()
+        if (cycle && (With.frame - lastCycle) > 24 * 8) {
+          pickNextView()
+        }
       }
     }
   }
@@ -47,15 +66,17 @@ class Visualization {
   private def requireInitialization() {
     if (initialized) return
     initialized = true
-    
-    if (With.configuration.viewTextOnly)      view = ViewTextOnly
-    if (With.configuration.viewHappyVision)   view = ViewHappy
-    if (With.configuration.viewBattles)       view = ViewBattles
-    if (With.configuration.viewEconomy)       view = ViewEconomy
-    if (With.configuration.viewGeography)     view = ViewGeography
-    if (With.configuration.viewMicro)         view = ViewMicro
-    if (With.configuration.viewPerformance)   view = ViewPerformance
-    if (With.configuration.viewPlanning)      view = ViewPlanning
+    var random = Random.nextDouble()
+    random -= With.configuration.visualizationProbabilityHappyVision
+    if (random < 0) {
+      happy = true
+    }
+    else {
+      random -= With.configuration.visualizationProbabilityTextOnly
+      if (random < 0) {
+        textOnly = true
+      }
+    }
   }
   
   private def pickNextView() {

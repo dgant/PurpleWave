@@ -61,7 +61,7 @@ object Flee extends Action {
     val ourDistanceToOrigin = state.unit.pixelDistanceTravelling(state.origin) - 32.0
     if (state.threatsActive.forall(threat =>
       ourDistanceToOrigin <= (
-        if (state.unit.flying) threat.pixelDistanceFast(state.origin) //Don't retreat directly over the enmy!
+        if (state.unit.flying)  threat.pixelDistanceFast(state.origin) //Don't retreat directly over the enmy!
         else                    threat.pixelDistanceTravelling(state.origin)))) {
     
       Travel.delegate(state)

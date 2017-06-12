@@ -48,7 +48,7 @@ class BattleEstimation(
     })
   }
   
-  def eligible(unit:UnitInfo):Boolean = {
+  def eligible(unit: UnitInfo):Boolean = {
     if (unit.unitClass.isWorker) return false
     if (unit.unitClass.isBuilding && ! unit.unitClass.helpsInCombat) return false
     if (unit.is(Protoss.Scarab))      return false
@@ -76,7 +76,7 @@ class BattleEstimation(
     result.costToEnemy    = totalCost(avatarEnemy,  result.damageToEnemy)
   }
   
-  private def dealDamage(from: BattleEstimationUnit, to:   BattleEstimationUnit): Double = {
+  private def dealDamage(from: BattleEstimationUnit, to: BattleEstimationUnit): Double = {
     
     val airFocus        = to.totalFlyers / to.totalUnits
     val groundFocus     = 1.0 - airFocus
@@ -99,14 +99,14 @@ class BattleEstimation(
   // 2 units,  199 damage, 200 hp = 1 death
   // 2 units,  99 damage,  200 hp = 0 deaths
   //
-  private def deaths(avatar:BattleEstimationUnit, damage:Double):Double = {
+  private def deaths(avatar: BattleEstimationUnit, damage: Double):Double = {
     Math.min(avatar.totalUnits, Math.floor(avatar.totalUnits * damage / avatar.totalHealth))
   }
   
-  private def totalCost(avatar:BattleEstimationUnit, damage:Double) = {
+  private def totalCost(avatar: BattleEstimationUnit, damage: Double) = {
     avatar.subjectiveValue * damage / avatar.totalHealth
   }
   
-  def weWin   : Boolean = result.costToEnemy > result.costToUs
-  def weLose  : Boolean = result.costToEnemy < result.costToUs
+  def weWin   : Boolean = result.costToEnemy >  result.costToUs
+  def weLose  : Boolean = result.costToEnemy <= result.costToUs
 }

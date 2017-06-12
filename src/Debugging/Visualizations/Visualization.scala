@@ -57,12 +57,13 @@ class Visualization {
         ViewMicro.render()
       }
       if (screen) {
-        VisualizeBattles.render()
         view.render()
         if (cycle && (With.frame - lastCycle) > 24 * 8) {
           pickNextView()
         }
       }
+  
+      VisualizeBattles.render()
     }
   }
   

@@ -7,7 +7,7 @@ import Planning.Plans.Compound.{And, IfThenElse, Or, Parallel}
 import Planning.Plans.Information.{ScoutAt, ScoutExpansionsAt}
 import Planning.Plans.Macro.Automatic.Continuous.{RequireSufficientPylons, TrainContinuously, TrainProbesContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Macro.Milestones.{HaveUpgrade, UnitsAtLeast}
+import Planning.Plans.Macro.Milestones.{EnemyUnitsAtLeast, HaveUpgrade, UnitsAtLeast}
 import ProxyBwapi.Races.Protoss
 
 class ProtossVsProtoss extends Parallel {
@@ -62,6 +62,8 @@ class ProtossVsProtoss extends Parallel {
       new Or(
         new UnitsAtLeast(6, UnitMatchType(Protoss.Dragoon)),
         new UnitsAtLeast(1, UnitMatchType(Protoss.Reaver))),
+        new EnemyUnitsAtLeast(1, UnitMatchType(Protoss.PhotonCannon)),
+        new EnemyUnitsAtLeast(1, UnitMatchType(Protoss.Forge)))
       new Parallel(
         new UnitsAtLeast(2, UnitMatchType(Protoss.Zealot)),
         new Build(ProtossBuilds.TakeNatural)

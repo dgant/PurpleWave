@@ -10,7 +10,7 @@ import Planning.Plans.Information.{FindEnemyBase, FoundEnemyBase}
 
 class ConsiderAttacking
   extends IfThenElse(
-    new If(() => ! With.battles.global.estimation.weLose)) {
+    new If(() => With.battles.global.estimation.weWin || With.battles.global.estimation.result.costToUs == 0)) {
   
   val attackers = new Property[LockUnits](new LockUnits {
     unitMatcher.set(UnitMatchWarriors)

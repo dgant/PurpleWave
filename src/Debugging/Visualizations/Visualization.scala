@@ -1,6 +1,6 @@
 package Debugging.Visualizations
 
-import Debugging.Visualizations.Views.Battles.ViewBattles
+import Debugging.Visualizations.Views.Battles.VisualizeBattles
 import Debugging.Visualizations.Views.Economy.ViewEconomy
 import Debugging.Visualizations.Views.Fun.{ViewHappy, ViewTextOnly}
 import Debugging.Visualizations.Views.Geography._
@@ -57,7 +57,7 @@ class Visualization {
         ViewMicro.render()
       }
       if (screen) {
-        ViewBattles.render()
+        VisualizeBattles.render()
         view.render()
         if (cycle && (With.frame - lastCycle) > 24 * 8) {
           pickNextView()

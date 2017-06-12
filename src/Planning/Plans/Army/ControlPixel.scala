@@ -26,7 +26,7 @@ class ControlPixel extends Plan {
     val infiltrators = With.units.enemy
       .filter(e =>
         ! Yolo.active &&
-        e.likelyStillThere &&
+        e.visible &&
         e.canAttackThisSecond &&
         ourBases.exists(base =>
           e.pixelDistanceTravelling(base.tileIncluding) < infiltrationRadius &&

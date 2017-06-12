@@ -27,6 +27,7 @@ class Visualization {
   
   var cycle     = true
   var screen    = true
+  var grids     = false
   var map       = true
   var happy     = false
   var textOnly  = false
@@ -49,6 +50,9 @@ class Visualization {
     else {
       if (map) {
         ViewGeography.render()
+        if (grids) {
+          VisualizeGrids.render()
+        }
         VisualizePlansMap.render()
         ViewMicro.render()
       }

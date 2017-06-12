@@ -8,7 +8,6 @@ object MovementHeuristicTargetValue extends MovementHeuristic {
   
   override def evaluate(state: ExecutionState, candidate: Pixel): Double = {
     
-    if ( ! state.canAttack)     return HeuristicMathMultiplicative.default
     if ( state.targets.isEmpty) return HeuristicMathMultiplicative.default
     
     val targetValues = state.targetValues
@@ -17,6 +16,11 @@ object MovementHeuristicTargetValue extends MovementHeuristic {
       .map(_._2)
       
     if (targetValues.isEmpty) return HeuristicMathMultiplicative.default
-    targetValues.max
+    
+    // A Supply Depot is worth about 4E-5.
+    // This multiplier will require re-tuning if target heuristics change much.
+    val output = 100000 * targetValues.max
+    
+    output
   }
 }

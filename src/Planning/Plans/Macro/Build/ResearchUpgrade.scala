@@ -1,12 +1,12 @@
 package Planning.Plans.Macro.Build
 
+import Lifecycle.With
 import Micro.Intent.Intention
+import Planning.Composition.ResourceLocks._
 import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Plan
-import Planning.Composition.ResourceLocks._
 import ProxyBwapi.Upgrades.Upgrade
-import Lifecycle.With
 
 class ResearchUpgrade(upgrade: Upgrade, level: Int) extends Plan {
   
@@ -29,7 +29,7 @@ class ResearchUpgrade(upgrade: Upgrade, level: Int) extends Plan {
     currency.isSpent = false
     upgraders.acquire(this)
     upgraders.units.foreach(upgrader => {
-      currency.isSpent = upgrader.upgrading == upgrade
+      currency.isSpent = upgrader.upgrading
       With.executor.intend(new Intention(this, upgrader) { toUpgrade = Some(upgrade) })
     })
   }

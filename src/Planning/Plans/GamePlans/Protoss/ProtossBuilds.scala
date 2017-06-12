@@ -158,4 +158,8 @@ object ProtossBuilds {
   val TakeThirdBase = Vector[BuildRequest] (
     RequestUnitAtLeast(3, Protoss.Nexus)
   )
+  
+  val TakeFourthBase = Vector[BuildRequest] (
+    RequestUnitAtLeast(4, Protoss.Nexus)
+  )
 }

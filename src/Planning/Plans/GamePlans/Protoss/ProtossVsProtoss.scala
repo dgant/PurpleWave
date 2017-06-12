@@ -99,6 +99,9 @@ class ProtossVsProtoss extends Parallel {
     new Build(_lateGame),
     new ScoutExpansionsAt(70),
     new ScoutAt(9),
-    new ConsiderAttacking
+    new IfThenElse(
+      new HaveUpgrade(Protoss.DragoonRange),
+      new ConsiderAttacking
+    )
   ))
 }

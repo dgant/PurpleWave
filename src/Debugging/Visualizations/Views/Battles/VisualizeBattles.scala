@@ -14,7 +14,7 @@ object VisualizeBattles {
   private val graphMargin             = Pixel(2, 2)
   private val graphWidth              = 90
   private val graphHeight             = 90 + With.visualization.lineHeightSmall
-  private val tableHeader0            = Pixel(200, 300)
+  private val tableHeader0            = Pixel(220, 320)
   private val tableHeader1            = tableHeader0.add(125, 0)
   private val tableStart0             = tableHeader0.add(0, 25)
   private val tableStart1             = tableHeader1.add(0, 25)
@@ -62,8 +62,10 @@ object VisualizeBattles {
   
   private def drawEstimationReport(estimation:BattleEstimation) {
     With.game.setTextSize(bwapi.Text.Size.Enum.Large)
-    With.game.drawTextScreen(tableHeader0.bwapi, "+" + estimation.result.costToEnemy.toInt)
-    With.game.drawTextScreen(tableHeader1.bwapi, "-" + estimation.result.costToUs.toInt)
+    With.game.drawTextScreen(tableHeader0.bwapi, With.self.name)
+    With.game.drawTextScreen(tableHeader1.bwapi, With.enemies.head.name)
+    With.game.drawTextScreen(tableStart0.bwapi, "+" + estimation.result.costToEnemy.toInt)
+    With.game.drawTextScreen(tableStart1.bwapi, "-" + estimation.result.costToUs.toInt)
     With.game.setTextSize(bwapi.Text.Size.Enum.Small)
     
     

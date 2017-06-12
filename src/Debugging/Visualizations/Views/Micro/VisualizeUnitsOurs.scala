@@ -1,6 +1,5 @@
 package Debugging.Visualizations.Views.Micro
 
-import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
 import Lifecycle.With
 import Micro.Task.ExecutionState
@@ -32,6 +31,7 @@ object VisualizeUnitsOurs {
       state.unit.pixelCenter.add(0, 0),
       drawBackground = false)
     */
+    /*
     if (state.movingTo.isDefined) {
       DrawMap.line(state.unit.pixelCenter, state.movingTo.get, Colors.MediumGray)
     }
@@ -41,6 +41,7 @@ object VisualizeUnitsOurs {
     if (state.intent.toGather.isDefined) {
       DrawMap.line(state.unit.pixelCenter, state.intent.toGather.get.pixelCenter, Colors.DarkGreen)
     }
+    */
     val targetUnit = state.unit.target.orElse(state.unit.orderTarget)
     if (targetUnit.nonEmpty) {
       DrawMap.line(state.unit.pixelCenter, targetUnit.get.pixelCenter, state.unit.player.colorNeon)

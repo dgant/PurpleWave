@@ -26,6 +26,7 @@ object VisualizeUnitsForeign {
           drawBackground = true,
           unit.player.colorDark)
       } else {
+        /*
         val targetUnit = unit.target.orElse(unit.orderTarget)
         if (targetUnit.nonEmpty) {
           DrawMap.line(unit.pixelCenter, targetUnit.get.pixelCenter, unit.player.colorNeon)
@@ -36,6 +37,7 @@ object VisualizeUnitsForeign {
             DrawMap.line(unit.pixelCenter, targetPosition.get, unit.player.colorDark)
           }
         }
+        */
       }
     }
   }

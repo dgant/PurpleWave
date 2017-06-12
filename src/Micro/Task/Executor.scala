@@ -10,6 +10,7 @@ import scala.collection.mutable
 class Executor {
   
   private val stateByUnit = new mutable.HashMap[FriendlyUnitInfo, ExecutionState]
+  private var finishedExecuting = true
   
   def states: Iterable[ExecutionState] = stateByUnit.values
   
@@ -31,7 +32,7 @@ class Executor {
   val unitQueue = new mutable.Queue[ExecutionState]
   
   def run() {
-    if ( ! With.latency.isLastFrameOfTurn) return
+    if ( ! With.latency.isLastFrameOfTurn && ! finishedExecuting) return
   
     stateByUnit.keys.filterNot(_.alive).foreach(stateByUnit.remove)
     
@@ -43,5 +44,7 @@ class Executor {
       val nextUnit = unitQueue.dequeue()
       Idle.consider(nextUnit)
     }
+  
+    finishedExecuting = unitQueue.isEmpty
   }
 }

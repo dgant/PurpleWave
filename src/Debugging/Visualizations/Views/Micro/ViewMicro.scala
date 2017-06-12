@@ -5,7 +5,7 @@ import Debugging.Visualizations.Views.View
 object ViewMicro extends View {
   
   def render() {
-    VisualizeHitPoints.render()
+    VisualizeUnits.render()
     VisualizeUnitsForeign.render()
     VisualizeUnitsOurs.render()
     VisualizeMovementHeuristics.render()

@@ -11,14 +11,14 @@ abstract class Action {
   protected def allowed(state:ExecutionState)    : Boolean = true
   protected def perform(state:ExecutionState)
   
-  def consider(state:ExecutionState, giveCredit:Boolean = true) {
+  def consider(state: ExecutionState, giveCredit: Boolean = true) {
     if (stillReady(state) && allowed(state)) {
       if (giveCredit) state.lastAction = Some(this)
       perform(state)
     }
   }
   
-  def delegate(state:ExecutionState) {
+  def delegate(state: ExecutionState) {
     consider(state, giveCredit = false)
   }
 }

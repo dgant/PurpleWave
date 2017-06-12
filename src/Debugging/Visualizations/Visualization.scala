@@ -7,7 +7,7 @@ import Debugging.Visualizations.Views.Geography._
 import Debugging.Visualizations.Views.Micro._
 import Debugging.Visualizations.Views.Performance.ViewPerformance
 import Debugging.Visualizations.Views.Planning.{ViewPlanning, VisualizePlansMap}
-import Debugging.Visualizations.Views.{View, ViewNothing}
+import Debugging.Visualizations.Views.View
 import Lifecycle.With
 
 import scala.util.Random
@@ -22,10 +22,10 @@ class Visualization {
     ViewPlanning
   )
   
-  private var view: View = ViewNothing
+  private var view: View = ViewPlanning
   private var lastCycle = 0
   
-  var cycle     = true
+  var cycle     = false
   var screen    = true
   var grids     = false
   var map       = true
@@ -85,9 +85,6 @@ class Visualization {
   
   private def pickNextView() {
     var i = -1
-    if (view == ViewNothing) {
-      i = 0
-    }
     if (viewCycle.contains(view)) {
       i = (viewCycle.indexOf(view) + 1) % viewCycle.length
     }

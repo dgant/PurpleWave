@@ -29,16 +29,16 @@ class ExecutionState(val unit: FriendlyUnitInfo) {
   // Decisions //
   ///////////////
   
-  var toTravel    : Option[Pixel]     = None
-  var toAttack    : Option[UnitInfo]  = None
-  var toGather    : Option[UnitInfo]  = None
-  var toBuild     : Option[UnitClass] = None
-  var toBuildTile : Option[Tile]      = None
-  var toTrain     : Option[UnitClass] = None
-  var toTech      : Option[Tech]      = None
-  var toUpgrade   : Option[Upgrade]   = None
-  var canAttack   : Boolean           = true
-  var canPursue   : Boolean           = true
+  var toTravel      : Option[Pixel]     = None
+  var toAttack      : Option[UnitInfo]  = None
+  var toGather      : Option[UnitInfo]  = None
+  var toBuild       : Option[UnitClass] = None
+  var toBuildTile   : Option[Tile]      = None
+  var toTrain       : Option[UnitClass] = None
+  var toTech        : Option[Tech]      = None
+  var toUpgrade     : Option[Upgrade]   = None
+  var canPursue     : Boolean           = true
+  var canAttack     : Boolean           = true
   
   var movementProfile : MovementProfile   = MovementProfiles.default
   var targetProfile   : TargetingProfile  = TargetingProfiles.default

@@ -3,6 +3,7 @@ package ProxyBwapi.UnitInfo
 import Mathematics.Pixels.{Pixel, Tile}
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.UnitClass.UnitClass
+import bwapi.UnitCommand
 
 abstract class UnitProxy(var base:bwapi.Unit) {
     
@@ -67,6 +68,9 @@ abstract class UnitProxy(var base:bwapi.Unit) {
   def targetPixel:Option[Pixel]
   def orderTarget:Option[UnitInfo]
   def orderTargetPixel:Option[Pixel]
+  
+  def command:UnitCommand
+  def order:String
   
   def attacking:Boolean
   def constructing:Boolean

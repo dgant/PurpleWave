@@ -18,6 +18,6 @@ class Intention(val plan:Plan, val unit:FriendlyUnitInfo) {
   var toTrain     : Option[UnitClass] = None
   var toTech      : Option[Tech]      = None
   var toUpgrade   : Option[Upgrade]   = None
-  var canAttack   : Boolean           = true
   var canPursue   : Boolean           = true
+  var canAttack   : Boolean           = true
 }

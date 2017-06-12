@@ -29,7 +29,7 @@ class ResearchUpgrade(upgrade: Upgrade, level: Int) extends Plan {
     currency.isSpent = false
     upgraders.acquire(this)
     upgraders.units.foreach(upgrader => {
-      currency.isSpent = upgrader.upgrading
+      currency.isSpent = upgrader.upgrading && upgrader.upgradingType == upgrade
       With.executor.intend(new Intention(this, upgrader) { toUpgrade = Some(upgrade) })
     })
   }

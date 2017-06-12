@@ -238,8 +238,13 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   
   def carryingResources:Boolean = carryingMinerals || carryingGas
   
-  def isBeingViolent: Boolean = attacking || target.orElse(orderTarget).exists(isEnemyOf)
-  def isBeingViolentTo(victim:UnitInfo): Boolean =
+  def isBeingViolent: Boolean = {
+    attacking ||
+    target.orElse(orderTarget).exists(isEnemyOf) ||
+    List(Commands.Attack_Move, Commands.Attack_Unit).contains(command.getUnitCommandType.toString)
+  }
+  
+  def isBeingViolentTo(victim: UnitInfo): Boolean =
     isEnemyOf(victim) &&
       canAttackThisSecond(victim) &&
       //Are we not attacking anyone else?

@@ -7,13 +7,13 @@ import Mathematics.Pixels.Pixel
 import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.Color
 
-object VisualizeHitPoints {
+object VisualizeUnits {
   
   def render() {
-    With.units.all.foreach(renderHitPoints)
+    With.units.all.foreach(renderUnit)
   }
   
-  def renderHitPoints(unit:UnitInfo) {
+  def renderUnit(unit:UnitInfo) {
     if (unit.invincible) return
     if ( ! unit.possiblyStillThere) return
     
@@ -81,6 +81,10 @@ object VisualizeHitPoints {
       if (unit.attackAnimationHappening) {
         DrawMap.box(Pixel(xStartCooldownButton0, yStartCooldown), Pixel(xStartCooldownButton0 + widthCooldownButton, yEndCooldown), Colors.BrightOrange, solid = true)
       }
+    }
+    
+    if (unit.isBeingViolent) {
+      DrawMap.box(Pixel(unit.left, unit.top), Pixel(unit.right, unit.bottom), unit.player.colorBright)
     }
   }
 }

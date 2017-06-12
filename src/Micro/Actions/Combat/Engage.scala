@@ -19,8 +19,15 @@ object Engage extends Action {
     }
   }
   
-  override def perform(state:ExecutionState) {
-    state.toAttack = state.toAttack.orElse(EvaluateTargets.best(state, state.targets))
-    Attack.delegate(state)
+  override def perform(state: ExecutionState) {
+    // Attack-move to avoid indecisive fighting in melee brawls
+    // This condition could probably be smarter
+    if (state.unit.melee && state.targets.forall(_.melee)) {
+      
+    }
+    else {
+      state.toAttack = state.toAttack.orElse(EvaluateTargets.best(state, state.targets))
+      Attack.delegate(state)
+    }
   }
 }

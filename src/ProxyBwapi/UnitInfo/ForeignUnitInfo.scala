@@ -6,7 +6,7 @@ import Performance.Caching.Limiter
 import ProxyBwapi.Players.{PlayerInfo, Players}
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
-import bwapi.Position
+import bwapi.{Position, UnitCommand}
 
 class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
   
@@ -171,6 +171,8 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
   private def updateOrders() {
     _target               = base.getTarget
     _targetPosition       = base.getTargetPosition
+    _command              = base.getLastCommand
+    _order                = base.getOrder.toString
     _orderTarget          = base.getOrderTarget
     _orderTargetPosition  = base.getOrderTargetPosition
     _gatheringMinerals    = base.isGatheringMinerals
@@ -191,16 +193,20 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
   
   private var _target               : bwapi.Unit  = _
   private var _targetPosition       : Position    = Position.None
+  private var _command              : UnitCommand = _
+  private var _order                : String      = "Stop"
   private var _orderTarget          : bwapi.Unit  = _
   private var _orderTargetPosition  : Position    = Position.None
   private var _gatheringMinerals    : Boolean     = _
   private var _gatheringGas         : Boolean     = _
   
   private val badPositions = Vector(Position.Invalid, Position.None, Position.Unknown, null)
-  def target           : Option[UnitInfo]  = if (_target == null) None else With.units.get(_target)
-  def targetPixel      : Option[Pixel]     = if (badPositions.contains(_targetPosition)) None else Some(new Pixel(_targetPosition))
-  def orderTarget      : Option[UnitInfo]  = (if (_target == null) None else With.units.get(_orderTarget))
-  def orderTargetPixel : Option[Pixel]     = if (badPositions.contains(_orderTargetPosition)) None else Some(new Pixel(_orderTargetPosition))
+  def target            : Option[UnitInfo]  = if (_target == null) None else With.units.get(_target)
+  def targetPixel       : Option[Pixel]     = if (badPositions.contains(_targetPosition)) None else Some(new Pixel(_targetPosition))
+  def command           : UnitCommand       = _command
+  def order             : String            = _order
+  def orderTarget       : Option[UnitInfo]  = (if (_target == null) None else With.units.get(_orderTarget))
+  def orderTargetPixel  : Option[Pixel]     = if (badPositions.contains(_orderTargetPosition)) None else Some(new Pixel(_orderTargetPosition))
   
   def gatheringMinerals   : Boolean = base.isGatheringMinerals
   def gatheringGas        : Boolean = base.isGatheringGas

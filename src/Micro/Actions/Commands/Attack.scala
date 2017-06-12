@@ -11,7 +11,7 @@ object Attack extends Action {
     state.toAttack.isDefined
   }
   
-  override def perform(state:ExecutionState) {
+  override def perform(state: ExecutionState) {
     With.commander.attack(state.unit, state.toAttack.get)
   }
 }

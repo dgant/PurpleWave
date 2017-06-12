@@ -103,7 +103,7 @@ abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
   
   def target            : Option[UnitInfo]  = targetCache.get
   def targetPixel       : Option[Pixel]     = targetPixelCache.get
-  def order             : Order             = base.getOrder
+  def order             : String            = base.getOrder.toString
   def orderTarget       : Option[UnitInfo]  = orderTargetCache.get
   def orderTargetPixel  : Option[Pixel]     = orderTargetPixelCache.get
   

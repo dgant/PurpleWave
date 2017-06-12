@@ -15,9 +15,6 @@ object Collaborate extends Action {
       if (state.unit.wounded) {
         Flee.consider(state)
       }
-      if (state.unit.unitClass.isWorker) {
-        Flee.consider(state)
-      }
     }
     
     Charge.consider(state)
@@ -25,5 +22,4 @@ object Collaborate extends Action {
   
   private def retreatArmy  (state:ExecutionState)  : Boolean = state.battleEstimation.exists(_.weLose)
   private def isWounded    (state:ExecutionState)  : Boolean = state.unit.wounded
-  private def isWorker     (state:ExecutionState)  : Boolean = state.unit.unitClass.isWorker
 }

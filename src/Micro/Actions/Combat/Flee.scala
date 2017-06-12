@@ -4,14 +4,23 @@ import Information.Geography.Types.Zone
 import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Commands.{Reposition, Travel}
+import Micro.Behaviors.MovementProfiles
 import Micro.Task.ExecutionState
 
 object Flee extends Action {
   
   override def allowed(state: ExecutionState) = {
     state.unit.canMoveThisFrame &&
-    state.threats.exists(threat => zoneQualifies(threat.pixelCenter.zone)) &&
-    zoneQualifies(state.unit.pixelCenter.zone)
+    (
+      (
+        state.unit.unitClass.isWorker &&
+        state.threatsActive.nonEmpty
+      ) ||
+      (
+        state.threats.exists(threat => zoneQualifies(threat.pixelCenter.zone)) &&
+        zoneQualifies(state.unit.pixelCenter.zone)
+      )
+    )
   }
   
   private def zoneQualifies(zone: Zone): Boolean = {
@@ -20,6 +29,8 @@ object Flee extends Action {
   
   override def perform(state: ExecutionState) {
     
+    state.movementProfile = MovementProfiles.flee
+    
     state.canPursue = false
     state.toTravel  = Some(state.origin)
     val isBackLine = state.unit.battle.exists(battle =>
@@ -27,6 +38,7 @@ object Flee extends Action {
       battle.enemy.vanguard.pixelDistanceFast(battle.us.centroid))
   
     if (isBackLine) {
+      state.movementProfile = MovementProfiles.approach
       Reposition.delegate(state)
       if ( ! stillReady(state)) return
     }

@@ -2,8 +2,7 @@ package Micro.Actions.Basic
 
 import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Actions.Combat.Shoot
-import Micro.Actions.Commands.Reposition
+import Micro.Actions.Combat.{Flee, Shoot}
 import Micro.Task.ExecutionState
 
 object Gather extends Action {
@@ -16,8 +15,8 @@ object Gather extends Action {
   
     Shoot.consider(state)
     
-    if (state.unit.wounded && state.threatsActive.exists(_.isBeingViolentTo(state.unit))) {
-      Reposition.consider(state)
+    if (state.threatsActive.exists(_.isBeingViolentTo(state.unit))) {
+      Flee.consider(state)
     }
     
     if (stillReady(state)) {

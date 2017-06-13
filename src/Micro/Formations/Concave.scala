@@ -1,4 +1,4 @@
-package Mathematics.Formations
+package Micro.Formations
 
 import Mathematics.Pixels.Pixel
 import ProxyBwapi.UnitInfo.UnitInfo
@@ -11,30 +11,30 @@ object Concave {
     units       : Seq[UnitInfo],
     targetStart : Pixel,
     targetEnd   : Pixel,
-    direction   : Pixel)
-    : Seq[FormationParticipant] = {
+    origin      : Pixel)
+    : Seq[FormationSlot] = {
   
     val targetCenter = targetStart.midpoint(targetEnd)
     
     val arc = new Arc(
       Math.PI, // Configurable
       targetCenter,
-      targetCenter.radiansTo(direction)
+      targetCenter.radiansTo(origin)
     )
     
     val arcPlacement = new ArcPlacementState(arc, targetStart.pixelDistanceFast(targetEnd))
     
     val ranks = units
-      .map(new FormationParticipant(_))
-      .groupBy(_.range)
+      .map(new FormationSlot(_))
+      .groupBy(_.idealDistance)
       .values
       .toList
-      .sortBy(_.head.range)
+      .sortBy(_.head.idealDistance)
     
-    val output = new ArrayBuffer[FormationParticipant]
+    val output = new ArrayBuffer[FormationSlot]
     
     ranks.foreach(rank => {
-      arcPlacement.startRank(rank.head.range)
+      arcPlacement.startRank(rank.head.idealDistance)
       rank.foreach(participant => {
         participant.pixelAfter = arcPlacement.reserveSpace(participant.unitClass.radialHypotenuse)
       })

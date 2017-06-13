@@ -36,6 +36,7 @@ class ExecutionState(val unit: FriendlyUnitInfo) {
   var toBuildTile   : Option[Tile]      = None
   var toTrain       : Option[UnitClass] = None
   var toTech        : Option[Tech]      = None
+  var toForm        : Option[Pixel]     = None
   var toUpgrade     : Option[Upgrade]   = None
   var canPursue     : Boolean           = true
   var canAttack     : Boolean           = true

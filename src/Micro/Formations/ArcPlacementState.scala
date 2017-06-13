@@ -1,4 +1,4 @@
-package Mathematics.Formations
+package Micro.Formations
 
 import Mathematics.Pixels.Pixel
 

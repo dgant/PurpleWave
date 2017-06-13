@@ -1,6 +1,6 @@
 package Planning.Composition.UnitMatchers
-import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import ProxyBwapi.UnitInfo.UnitInfo
 
 object UnitMatchAnything extends UnitMatcher {
-  override def accept(unit: FriendlyUnitInfo): Boolean = true
+  override def accept(unit: UnitInfo): Boolean = true
 }

@@ -1,9 +1,9 @@
 package Planning.Composition.UnitMatchers
 
-import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import ProxyBwapi.UnitInfo.UnitInfo
 
 object UnitMatchWarriors extends UnitMatcher {
-  override def accept(unit: FriendlyUnitInfo):Boolean =
+  override def accept(unit: UnitInfo):Boolean =
     unit.aliveAndComplete &&
     unit.unitClass.helpsInCombat &&
     unit.unitClass.canMove &&

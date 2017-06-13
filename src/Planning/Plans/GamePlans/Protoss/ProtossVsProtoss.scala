@@ -61,9 +61,10 @@ class ProtossVsProtoss extends Parallel {
     new IfThenElse(
       new Or(
         new UnitsAtLeast(6, UnitMatchType(Protoss.Dragoon)),
-        new UnitsAtLeast(1, UnitMatchType(Protoss.Reaver))),
+        new UnitsAtLeast(1, UnitMatchType(Protoss.Reaver)),
         new EnemyUnitsAtLeast(1, UnitMatchType(Protoss.PhotonCannon)),
-        new EnemyUnitsAtLeast(1, UnitMatchType(Protoss.Forge)))
+        new EnemyUnitsAtLeast(1, UnitMatchType(Protoss.Forge))
+      ),
       new Parallel(
         new UnitsAtLeast(2, UnitMatchType(Protoss.Zealot)),
         new Build(ProtossBuilds.TakeNatural)

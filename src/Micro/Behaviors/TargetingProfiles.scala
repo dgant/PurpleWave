@@ -5,7 +5,8 @@ import Micro.Heuristics.Targeting.TargetingProfile
 object TargetingProfiles {
   
   def default = new TargetingProfile(
-    preferInRange     = 3.0,
+    preferInRange     = 2.5,
+    preferValue       = 0.5,
     preferCombat      = 1.0,
     preferDps         = 1.5,
     preferDamageType  = 1.0,

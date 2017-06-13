@@ -1,12 +1,12 @@
 package Planning.Composition.UnitMatchers
 
-import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import ProxyBwapi.UnitInfo.UnitInfo
 
 class UnitMatchSpecific(defaultUnits:Set[UnitInfo] = Set.empty) extends UnitMatcher {
   
   var specificUnits:Set[UnitInfo] = defaultUnits
   
-  override def accept(unit: FriendlyUnitInfo): Boolean = {
+  override def accept(unit: UnitInfo): Boolean = {
     specificUnits.contains(unit)
   }
 }

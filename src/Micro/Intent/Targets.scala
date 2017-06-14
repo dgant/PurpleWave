@@ -26,7 +26,7 @@ object Targets {
       ! ineligibleClasses.contains(target.unitClass)
   }
   
-  def inRange(intent:Intention, target:UnitInfo):Boolean = {
-    intent.unit.inRangeToAttackFast(target, With.configuration.microFrameLookahead)
+  def inRange(intent: Intention, target: UnitInfo):Boolean = {
+    intent.unit.inRangeToAttackFast(target, With.latency.framesRemaining)
   }
 }

@@ -224,7 +224,7 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   
   def framesToTravel(destination: Pixel)  : Int = framesToTravelPixels(pixelDistanceTravelling(destination))
   def framesToTravelPixels(pixels:Double) : Int = if (canMoveThisFrame) Math.max(0, Math.ceil(pixels/topSpeed).toInt) else Int.MaxValue
-  def framesBeforeAttacking(enemy:UnitInfo):Int = {
+  def framesBeforeAttacking(enemy: UnitInfo): Int = {
     if (canAttackThisSecond(enemy)) {
       Math.max(cooldownLeft, framesToTravelPixels(pixelDistanceFast(enemy) - pixelRangeAgainstFromEdge(enemy)))
     }
@@ -245,20 +245,21 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
     List(Commands.Attack_Move, Commands.Attack_Unit).contains(command.getUnitCommandType.toString)
   }
   
-  def isBeingViolentTo(victim: UnitInfo): Boolean =
+  def isBeingViolentTo(victim: UnitInfo): Boolean = {
+    //Are we capable of hurting the victim?
     isEnemyOf(victim) &&
-      canAttackThisSecond(victim) &&
-      //Are we not attacking anyone else?
-      ! target.orElse(orderTarget).exists(_ != victim) && (
-      //Are we attacking the victim?
-      target.orElse(orderTarget).contains(victim) ||
-      //Are we moving towards the victim?
-      targetPixel.orElse(orderTargetPixel).exists(destination =>
-        victim.pixelDistanceFast(
-          pixelCenter.project(
-            destination,
-            Math.min(topSpeed * With.configuration.microFrameLookahead, pixelDistanceFast(victim))))
-          < pixelRangeAgainstFromEdge(victim)))
+    canAttackThisSecond(victim) &&
+    //Are we not attacking anyone else?
+    ! target.orElse(orderTarget).exists(_ != victim) &&
+    //Are we close to being able to hit the victim?
+    victim.pixelDistanceFast(
+      pixelCenter.project(
+        targetPixel
+          .orElse(orderTargetPixel)
+          .getOrElse(pixelCenter.radiateRadians(angleFacingRadians, 10)),
+        Math.min(pixelDistanceFast(victim), topSpeed * With.configuration.violenceFrameThreshold))) <=
+      pixelRangeAgainstFromEdge(victim)
+  }
   
   ////////////////
   // Visibility //

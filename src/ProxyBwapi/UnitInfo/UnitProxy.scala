@@ -99,7 +99,7 @@ abstract class UnitProxy(var base:bwapi.Unit) {
   //////////////
   
   def accelerating:Boolean
-  def angle:Double
+  def angleFacingRadians:Double
   def braking:Boolean
   def ensnared:Boolean
   def flying:Boolean

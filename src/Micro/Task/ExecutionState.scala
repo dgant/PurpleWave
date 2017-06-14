@@ -60,7 +60,7 @@ class ExecutionState(val unit: FriendlyUnitInfo) {
   def targetsInRange  : Vector[UnitInfo]      = targetsInRangeCache.get
   def targetValues    : Map[UnitInfo, Double] = targetValuesCache.get
   private val threatsCache        = new CacheFrame(() => Threats.get(intent))
-  private val threatsActiveCache  = new CacheFrame(() => threats.filter(threat => Threats.active(intent, threat)))
+  private val threatsActiveCache  = new CacheFrame(() => threats.filter(_.isBeingViolentTo(unit)))
   private val targetsCache        = new CacheFrame(() => Targets.get(intent))
   private val targetsInRangeCache = new CacheFrame(() => targets.filter(target => Targets.inRange(intent, target)))
           val targetValuesCache   = new CacheFrame(() => targets.map(target => (target, EvaluateTargets.evaluate(this, target))).toMap)

@@ -17,7 +17,7 @@ class Configuration {
   
   var attackableRangeBuffer           = 8
   var fogPositionDuration             = 24 * 99999
-  var microFrameLookahead             = 8
+  var violenceFrameThreshold          = 24
   var enableYolo                      = true
   var enablePathRecalculation         = true
   var pathRecalculationDelayFrames    = 48

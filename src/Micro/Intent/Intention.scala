@@ -10,6 +10,7 @@ import ProxyBwapi.Upgrades.Upgrade
 class Intention(val plan:Plan, val unit:FriendlyUnitInfo) {
   
   // Modify only on construction
+  var toReturn    : Option[Pixel]     = None
   var toTravel    : Option[Pixel]     = None
   var toAttack    : Option[UnitInfo]  = None
   var toGather    : Option[UnitInfo]  = None

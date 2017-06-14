@@ -29,6 +29,7 @@ class ExecutionState(val unit: FriendlyUnitInfo) {
   // Decisions //
   ///////////////
   
+  var toReturn      : Option[Pixel]     = None
   var toTravel      : Option[Pixel]     = None
   var toAttack      : Option[UnitInfo]  = None
   var toGather      : Option[UnitInfo]  = None
@@ -50,7 +51,7 @@ class ExecutionState(val unit: FriendlyUnitInfo) {
   
   def battleEstimation:Option[BattleEstimation] = With.battles.byUnit.get(unit).map(_.estimation)
   
-  def origin: Pixel = originCache.get
+  def origin: Pixel = toReturn.getOrElse(originCache.get)
   private val originCache = new CacheFrame(() => if (With.geography.ourBases.nonEmpty) With.geography.ourBases.map(_.heart.pixelCenter).minBy(unit.pixelDistanceTravelling) else With.geography.home.pixelCenter)
   
   def threats         : Vector[UnitInfo]      = threatsCache.get

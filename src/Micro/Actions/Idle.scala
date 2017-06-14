@@ -12,6 +12,7 @@ object Idle extends Action {
   
   def perform(state:ExecutionState) {
     
+    state.toReturn        = state.intent.toReturn
     state.toTravel        = state.intent.toTravel
     state.toAttack        = state.intent.toAttack
     state.toGather        = state.intent.toGather

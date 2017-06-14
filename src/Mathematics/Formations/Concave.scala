@@ -3,8 +3,6 @@ package Mathematics.Formations
 import Mathematics.Points.Pixel
 import ProxyBwapi.UnitInfo.UnitInfo
 
-import scala.collection.mutable.ArrayBuffer
-
 object Concave {
   
   def generate(
@@ -16,7 +14,7 @@ object Concave {
   
     val targetCenter = targetStart.midpoint(targetEnd)
     
-    val arc = new Arc(
+    val arc = Arc(
       Math.PI, // Configurable
       targetCenter,
       targetCenter.radiansTo(origin)
@@ -31,16 +29,14 @@ object Concave {
       .toList
       .sortBy(_.head.idealDistance)
     
-    val output = new ArrayBuffer[FormationSlot]
-    
     ranks.foreach(rank => {
       arcPlacement.startRank(rank.head.idealDistance)
       rank.foreach(participant => {
         participant.pixelAfter = arcPlacement.reserveSpace(participant.unitClass.radialHypotenuse)
       })
     })
-    
-    output
+  
+    ranks.flatten
   }
 }
 

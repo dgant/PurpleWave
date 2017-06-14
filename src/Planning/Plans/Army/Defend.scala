@@ -36,8 +36,9 @@ class Defend extends ControlPixel {
         defender => {
           val spot = formation.get(defender).getOrElse(targetPixel)
           With.executor.intend(new Intention(this, defender) {
-            toTravel = Some(spot)
-            toForm  = Some(spot)
+            toReturn  = Some(spot)
+            toTravel  = Some(spot)
+            toForm    = Some(spot)
           })
         })
     }

@@ -1,4 +1,4 @@
-package Micro.Formations
+package Mathematics.Formations
 
 import Mathematics.Points.Pixel
 import ProxyBwapi.UnitInfo.UnitInfo

@@ -1,8 +1,8 @@
-package Micro.Formations
+package Mathematics.Formations
 
 import Mathematics.Points.Pixel
 import ProxyBwapi.UnitClass.UnitClass
-import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -13,7 +13,8 @@ object Formation {
     units       : Iterable[FriendlyUnitInfo],
     targetStart : Pixel,
     targetEnd   : Pixel,
-    origin      : Pixel) {
+    origin      : Pixel)
+      : Map[UnitInfo, Pixel] = {
     
     val formationSlots = new mutable.HashMap[UnitClass, ListBuffer[Pixel]]
     
@@ -32,11 +33,12 @@ object Formation {
     units
       .toArray
       .sortBy(_.pixelDistanceFast(center))
-      .foreach(unit => {
+      .map(unit => {
         val groupSlots = formationSlots(unit.unitClass)
         val bestSlot = groupSlots.minBy(unit.pixelDistanceFast)
-        unit.executionState.toForm = Some(bestSlot)
         groupSlots -= bestSlot
+        (unit, bestSlot)
       })
+      .toMap
   }
 }

@@ -3,7 +3,6 @@ package Planning.Plans.Army
 import Debugging.Visualizations.Rendering.DrawMap
 import Lifecycle.With
 import Mathematics.Points.{Pixel, SpecificPoints}
-import Micro.Intent.Intention
 import Planning.Composition.Property
 import Planning.Composition.ResourceLocks.LockUnits
 import Planning.{Plan, Yolo}
@@ -20,7 +19,7 @@ abstract class ControlPixel extends Plan {
   
   protected var targetPixel: Pixel = SpecificPoints.middle
   
-  protected def control(pixel: Pixel) {
+  protected def updateTarget(pixel: Pixel) {
     
     targetPixel = pixel
     val ourBases = With.geography.ourBases.map(_.townHallArea.midPixel)
@@ -36,11 +35,6 @@ abstract class ControlPixel extends Plan {
         
     if (infiltrators.nonEmpty) {
       targetPixel = infiltrators.map(_.pixelCenter).minBy(_.pixelDistanceSlow(With.geography.home.pixelCenter))
-    }
-    
-    controllers.get.acquire(this)
-    if (controllers.get.satisfied) {
-      controllers.get.units.foreach(fighter => With.executor.intend(new Intention(this, fighter) { toTravel = Some(targetPixel) }))
     }
   }
   

@@ -21,7 +21,7 @@ class ArcPlacementState(arc: Arc, minimumRadius: Double) {
   }
   
   private def recenter() {
-    angleRadians       = 0.0
+    angleRadians  = 0.0
     nextClockwise = true
   }
   

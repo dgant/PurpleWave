@@ -34,7 +34,7 @@ object Flee extends Action {
     state.canPursue = false
     state.toTravel  = Some(state.origin)
     val isBackLine = state.unit.battle.exists(battle =>
-      battle.enemy.vanguard.pixelDistanceFast(state.unit.pixelCenter) <=
+      battle.enemy.vanguard.pixelDistanceFast(state.unit.pixelCenter) >
       battle.enemy.vanguard.pixelDistanceFast(battle.us.centroid))
   
     if (isBackLine) {

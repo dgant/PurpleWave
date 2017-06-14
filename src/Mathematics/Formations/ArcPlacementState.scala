@@ -30,7 +30,7 @@ class ArcPlacementState(arc: Arc, minimumRadius: Double) {
       advanceRank()
     }
     val unitRadians = widthPixels / radiusPixels
-    val output = arc.centerPixel.radiate(
+    val output = arc.centerPixel.radiateRadians(
       arc.centerRadians + (angleRadians + unitRadians) * (if (nextClockwise) 1 else -1),
       widthPixels)
     

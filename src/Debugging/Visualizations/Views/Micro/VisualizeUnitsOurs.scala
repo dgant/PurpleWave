@@ -1,5 +1,6 @@
 package Debugging.Visualizations.Views.Micro
 
+import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
 import Lifecycle.With
 import Micro.Task.ExecutionState
@@ -40,7 +41,12 @@ object VisualizeUnitsOurs {
     if (state.target.isDefined) {
       DrawMap.line(state.unit.pixelCenter, state.intent.toAttack.get.pixelCenter, Colors.BrightRed)
     }
-    if (state.intent.toGather.isDefined) {
+    */
+    if (state.toForm.isDefined) {
+      DrawMap.circle(state.toForm.get, state.unit.unitClass.radialHypotenuse.toInt, Colors.MediumTeal)
+    }
+    /*
+    if (state.toGather.isDefined) {
       DrawMap.line(state.unit.pixelCenter, state.intent.toGather.get.pixelCenter, Colors.DarkGreen)
     }
     val targetUnit = state.unit.target.orElse(state.unit.orderTarget)

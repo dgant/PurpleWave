@@ -2,7 +2,7 @@ package Information.Grids
 
 import Information.Grids.ArrayTypes.AbstractGridVector
 import Lifecycle.With
-import Mathematics.Pixels.Tile
+import Mathematics.Points.Tile
 import ProxyBwapi.UnitInfo.UnitInfo
 
 class GridUnits extends AbstractGridVector[UnitInfo] {

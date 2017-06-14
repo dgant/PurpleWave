@@ -2,7 +2,7 @@ package Planning.Composition.ResourceLocks
 
 import Planning.Plan
 import Lifecycle.With
-import Mathematics.Pixels.TileRectangle
+import Mathematics.Points.TileRectangle
 
 class LockArea extends ResourceLock {
   

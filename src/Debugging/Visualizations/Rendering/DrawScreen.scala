@@ -2,7 +2,7 @@ package Debugging.Visualizations.Rendering
 
 import Debugging.Visualizations.{Colors, Visualization}
 import Lifecycle.With
-import Mathematics.Pixels.Pixel
+import Mathematics.Points.Pixel
 import bwapi.Color
 
 object DrawScreen {

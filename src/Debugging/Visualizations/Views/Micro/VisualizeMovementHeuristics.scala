@@ -4,7 +4,7 @@ import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
 import Lifecycle.With
 import Mathematics.Heuristics.HeuristicMathMultiplicative
-import Mathematics.Pixels.Pixel
+import Mathematics.Points.Pixel
 import Micro.Heuristics.Movement.MovementHeuristicResult
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 

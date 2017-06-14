@@ -5,7 +5,7 @@ import Debugging.Visualizations.Rendering.DrawMap
 import Information.Battles.Estimation.BattleEstimation
 import Information.Battles.Types.Battle
 import Lifecycle.With
-import Mathematics.Pixels.Pixel
+import Mathematics.Points.Pixel
 import Planning.Yolo
 import Utilities.EnrichPixel._
 

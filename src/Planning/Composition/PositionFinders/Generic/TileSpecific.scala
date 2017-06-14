@@ -1,6 +1,6 @@
 package Planning.Composition.PixelFinders.Generic
 
-import Mathematics.Pixels.Tile
+import Mathematics.Points.Tile
 import Planning.Composition.PixelFinders.TileFinder
 
 case class TileSpecific(val position:Tile) extends TileFinder {

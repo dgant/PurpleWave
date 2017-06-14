@@ -2,7 +2,7 @@ package Information.Grids.ArrayTypes
 
 import java.text.DecimalFormat
 
-import Mathematics.Pixels.Tile
+import Mathematics.Points.Tile
 
 class AbstractGridDouble extends AbstractGridArray[Double] {
   

@@ -1,6 +1,6 @@
 package Information.Geography.Types
 
-import Mathematics.Pixels.Pixel
+import Mathematics.Points.Pixel
 import bwta.Chokepoint
 
 class ZoneEdge(
@@ -9,7 +9,7 @@ class ZoneEdge(
   
   val centerPixel   = new Pixel(chokepoint.getCenter)
   val radiusPixels  = chokepoint.getWidth / 2
-  val sidePixels    = Vector(chokepoint.getSides.first, chokepoint.getSides.second)
+  val sidePixels    = Vector(new Pixel(chokepoint.getSides.first), new Pixel(chokepoint.getSides.second))
   
   def contains(pixel:Pixel):Boolean = centerPixel.pixelDistanceFast(pixel) <= radiusPixels
 }

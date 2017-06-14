@@ -1,32 +1,31 @@
 package Utilities
 
-import Mathematics.Pixels
-import Mathematics.Pixels.{Pixel, Tile, TileRectangle}
+import Mathematics.Points.{Pixel, SpecificPoints, Tile, TileRectangle}
 
 case object EnrichPixel {
   implicit class EnrichedPixelCollection(positions:Iterable[Pixel]) {
     def minBound:Pixel = {
-      if (positions.isEmpty) return Pixels.Points.middle
+      if (positions.isEmpty) return SpecificPoints.middle
       Pixel(
         positions.view.map(_.x).min,
         positions.view.map(_.y).min)}
     def maxBound:Pixel = {
-      if (positions.isEmpty) return Pixels.Points.middle
+      if (positions.isEmpty) return SpecificPoints.middle
       Pixel(
         positions.view.map(_.x).max,
         positions.view.map(_.y).max)}
     def bottomLeftBound:Pixel = {
-      if (positions.isEmpty) return Pixels.Points.middle
+      if (positions.isEmpty) return SpecificPoints.middle
       Pixel(
         positions.view.map(_.x).min,
         positions.view.map(_.y).max)}
     def topRightBound:Pixel = {
-      if (positions.isEmpty) return Pixels.Points.middle
+      if (positions.isEmpty) return SpecificPoints.middle
       Pixel(
         positions.view.map(_.x).max,
         positions.view.map(_.y).min)}
     def centroid:Pixel = {
-      if (positions.isEmpty) return Pixels.Points.middle
+      if (positions.isEmpty) return SpecificPoints.middle
       Pixel(
         positions.view.map(_.x).sum / positions.size,
         positions.view.map(_.y).sum / positions.size)
@@ -46,17 +45,17 @@ case object EnrichPixel {
   
   implicit class EnrichedTileCollection(positions:Iterable[Tile]) {
     def minBound:Tile = {
-      if (positions.isEmpty) return Pixels.Points.tileMiddle
+      if (positions.isEmpty) return SpecificPoints.tileMiddle
       new Tile(
         positions.view.map(_.x).min,
         positions.view.map(_.y).min)}
     def maxBound:Tile = {
-      if (positions.isEmpty) return Pixels.Points.tileMiddle
+      if (positions.isEmpty) return SpecificPoints.tileMiddle
       new Tile(
         positions.view.map(_.x).max,
         positions.view.map(_.y).max)}
     def centroid:Tile = {
-      if (positions.isEmpty) return Pixels.Points.tileMiddle
+      if (positions.isEmpty) return SpecificPoints.tileMiddle
       new Tile(
         positions.view.map(_.x).sum / positions.size,
         positions.view.map(_.y).sum / positions.size)

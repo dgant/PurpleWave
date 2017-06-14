@@ -1,6 +1,6 @@
 package Planning.Composition.PixelFinders.Buildings
 
-import Mathematics.Pixels.Tile
+import Mathematics.Points.Tile
 import Performance.Caching.CacheFrame
 import Planning.Composition.PixelFinders.TileFinder
 import ProxyBwapi.UnitClass.UnitClass

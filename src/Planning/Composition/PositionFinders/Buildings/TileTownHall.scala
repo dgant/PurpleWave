@@ -2,7 +2,7 @@ package Planning.Composition.PixelFinders.Buildings
 
 import Planning.Composition.PixelFinders.TileFinder
 import Lifecycle.With
-import Mathematics.Pixels.Tile
+import Mathematics.Points.Tile
 
 
 object TileTownHall extends TileFinder {

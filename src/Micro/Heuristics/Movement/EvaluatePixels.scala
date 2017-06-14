@@ -3,7 +3,7 @@ package Micro.Heuristics.Movement
 import Information.Geography.Types.Zone
 import Lifecycle.With
 import Mathematics.Heuristics.HeuristicMathMultiplicative
-import Mathematics.Pixels.Pixel
+import Mathematics.Points.Pixel
 import Micro.Task.ExecutionState
 import ProxyBwapi.UnitInfo.UnitInfo
 

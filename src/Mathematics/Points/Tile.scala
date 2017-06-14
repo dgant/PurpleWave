@@ -1,8 +1,7 @@
-package Mathematics.Pixels
+package Mathematics.Points
 
 import Information.Geography.Types.Zone
 import Lifecycle.With
-import Mathematics.Points.{AbstractPoint, WalkTile}
 import bwapi.TilePosition
 
 case class Tile(argX:Int, argY:Int) extends AbstractPoint(argX, argY) {

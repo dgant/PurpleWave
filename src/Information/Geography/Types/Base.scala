@@ -1,6 +1,6 @@
 package Information.Geography.Types
 
-import Mathematics.Pixels.{Tile, TileRectangle}
+import Mathematics.Points.{Tile, TileRectangle}
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.UnitInfo.UnitInfo
 

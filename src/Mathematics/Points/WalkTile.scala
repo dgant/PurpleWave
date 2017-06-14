@@ -1,6 +1,5 @@
 package Mathematics.Points
 
-import Mathematics.Pixels.Point
 import bwapi.WalkPosition
 
 case class WalkTile(argX:Int, argY:Int) extends AbstractPoint(argX, argY) {

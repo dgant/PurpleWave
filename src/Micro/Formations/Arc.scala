@@ -1,6 +1,6 @@
 package Micro.Formations
 
-import Mathematics.Pixels.Pixel
+import Mathematics.Points.Pixel
 
 case class Arc(
   val spanRadians   : Double,

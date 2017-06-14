@@ -1,7 +1,7 @@
 package Mathematics
 
 import Lifecycle.With
-import Mathematics.Pixels.Pixel
+import Mathematics.Points.Pixel
 import ProxyBwapi.UnitInfo.UnitInfo
 
 import scala.collection.mutable

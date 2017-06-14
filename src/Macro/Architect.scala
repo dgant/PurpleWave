@@ -1,7 +1,7 @@
 package Macro
 
 import Lifecycle.With
-import Mathematics.Pixels.{Tile, TileRectangle}
+import Mathematics.Points.{Tile, TileRectangle}
 import Mathematics.Shapes.Spiral
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClass._

@@ -2,7 +2,7 @@ package Debugging.Visualizations.Views.Fun
 
 import Debugging.Visualizations.Rendering.DrawMap
 import Lifecycle.With
-import Mathematics.Pixels.Pixel
+import Mathematics.Points.Pixel
 import ProxyBwapi.Players.Players
 
 import scala.collection.JavaConverters._

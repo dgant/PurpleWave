@@ -2,7 +2,7 @@ package Information.Grids.Construction
 
 import Information.Grids.ArrayTypes.AbstractGridBoolean
 import Lifecycle.With
-import Mathematics.Pixels.Point
+import Mathematics.Points.Point
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 

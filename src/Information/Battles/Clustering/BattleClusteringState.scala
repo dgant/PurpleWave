@@ -1,7 +1,7 @@
 package Information.Battles.Clustering
 
 import Lifecycle.With
-import Mathematics.Pixels.Tile
+import Mathematics.Points.Tile
 import Mathematics.Shapes.Circle
 import ProxyBwapi.UnitInfo.UnitInfo
 

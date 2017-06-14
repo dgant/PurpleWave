@@ -1,7 +1,7 @@
 package Information.Geography.Pathfinding
 
 import Lifecycle.With
-import Mathematics.Pixels.Pixel
+import Mathematics.Points.Pixel
 
 object PathFinder {
   

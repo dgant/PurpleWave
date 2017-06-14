@@ -1,6 +1,6 @@
 package Micro.Formations
 
-import Mathematics.Pixels.Pixel
+import Mathematics.Points.Pixel
 
 class ArcPlacementState(arc: Arc, minimumRadius: Double) {
   var radiusPixels    = -1.0

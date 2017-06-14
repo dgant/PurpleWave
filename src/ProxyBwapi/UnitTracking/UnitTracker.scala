@@ -1,7 +1,7 @@
 package ProxyBwapi.UnitTracking
 
 import Lifecycle.With
-import Mathematics.Pixels.{Pixel, Tile, TileRectangle}
+import Mathematics.Points.{Pixel, Tile, TileRectangle}
 import Mathematics.Shapes.Circle
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, UnitInfo}
 import bwapi.UnitType

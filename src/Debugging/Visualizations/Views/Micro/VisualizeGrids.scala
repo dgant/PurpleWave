@@ -3,7 +3,7 @@ package Debugging.Visualizations.Views.Micro
 import Debugging.Visualizations.Rendering.DrawMap
 import Information.Grids.AbstractGrid
 import Lifecycle.With
-import Mathematics.Pixels.TileRectangle
+import Mathematics.Points.TileRectangle
 
 object VisualizeGrids {
   def render() {

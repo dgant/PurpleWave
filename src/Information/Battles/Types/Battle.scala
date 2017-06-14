@@ -2,7 +2,7 @@ package Information.Battles.Types
 
 import Information.Battles.Estimation.BattleEstimation
 import Lifecycle.With
-import Mathematics.Pixels.Pixel
+import Mathematics.Points.Pixel
 
 class Battle(
   val us    : BattleGroup,

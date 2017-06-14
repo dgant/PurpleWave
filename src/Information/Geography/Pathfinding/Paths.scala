@@ -1,7 +1,7 @@
 package Information.Geography.Pathfinding
 
 import Lifecycle.With
-import Mathematics.Pixels.Tile
+import Mathematics.Points.Tile
 import bwta.BWTA
 
 import scala.collection.mutable

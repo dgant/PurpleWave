@@ -1,7 +1,7 @@
 package Planning.Plans.Information
 
 import Lifecycle.With
-import Mathematics.Pixels.Pixel
+import Mathematics.Points.Pixel
 import Micro.Intent.Intention
 import Planning.Composition.Property
 import Planning.Composition.ResourceLocks.LockUnits

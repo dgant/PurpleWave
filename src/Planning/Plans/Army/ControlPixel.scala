@@ -2,26 +2,27 @@ package Planning.Plans.Army
 
 import Debugging.Visualizations.Rendering.DrawMap
 import Lifecycle.With
+import Mathematics.Points.{Pixel, SpecificPoints}
 import Micro.Intent.Intention
-import Planning.Composition.PixelFinders.Tactics.TileEnemyBase
-import Planning.Composition.PixelFinders.TileFinder
 import Planning.Composition.Property
 import Planning.Composition.ResourceLocks.LockUnits
 import Planning.{Plan, Yolo}
 
-class ControlPixel extends Plan {
+abstract class ControlPixel extends Plan {
   
   description.set("Control a position")
   
-  val controllers             = new Property[LockUnits](new LockUnits)
-  var positionToControl = new Property[TileFinder](new TileEnemyBase)
+  val controllers = new Property[LockUnits](new LockUnits)
   
   private val infiltrationRadius = 32.0 * 25
   
-  override def onUpdate() {
+  protected override def onUpdate()
+  
+  protected var targetPixel: Pixel = SpecificPoints.middle
+  
+  protected def control(pixel: Pixel) {
     
-    var targetTile = positionToControl.get.find.get
-    
+    targetPixel = pixel
     val ourBases = With.geography.ourBases.map(_.townHallArea.midPixel)
     val infiltrators = With.units.enemy
       .filter(e =>
@@ -31,33 +32,28 @@ class ControlPixel extends Plan {
         ourBases.exists(base =>
           e.pixelDistanceTravelling(base.tileIncluding) < infiltrationRadius &&
           e.pixelDistanceTravelling(base.tileIncluding) <
-          e.pixelDistanceTravelling(base.tileIncluding, targetTile)))
+          e.pixelDistanceTravelling(base.tileIncluding, targetPixel.tileIncluding)))
         
     if (infiltrators.nonEmpty) {
-      targetTile = infiltrators.map(_.tileIncludingCenter).minBy(_.tileDistanceSlow(With.geography.home))
+      targetPixel = infiltrators.map(_.pixelCenter).minBy(_.pixelDistanceSlow(With.geography.home.pixelCenter))
     }
     
     controllers.get.acquire(this)
     if (controllers.get.satisfied) {
-      //TODO: Dispatch only units capable of fighting an infiltrator
-      
-      controllers.get.units.foreach(fighter => With.executor.intend(new Intention(this, fighter) { toTravel = Some(targetTile.pixelCenter) }))
+      controllers.get.units.foreach(fighter => With.executor.intend(new Intention(this, fighter) { toTravel = Some(targetPixel) }))
     }
   }
   
   override def visualize() {
-    
-    positionToControl.get.find.map(tile => {
-      DrawMap.circle(
-        tile.pixelCenter,
-        64,
-        With.self.colorDark)
-      
-      DrawMap.label(
-        description.get,
-        tile.pixelCenter,
-        drawBackground = true,
-        With.self.colorDark)
-    })
+    DrawMap.circle(
+      targetPixel,
+      64,
+      With.self.colorDark)
+        
+    DrawMap.label(
+      description.get,
+      targetPixel,
+      drawBackground = true,
+      With.self.colorDark)
   }
 }

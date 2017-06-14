@@ -1,7 +1,7 @@
 package Debugging.Visualizations
 
 import Lifecycle.With
-import Mathematics.Pixels.Pixel
+import Mathematics.Points.Pixel
 import Performance.Caching.CacheFrame
 
 class Viewport {

@@ -3,7 +3,7 @@ package Debugging.Visualizations.Views.Fun
 import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
 import Lifecycle.With
-import Mathematics.Pixels.Pixel
+import Mathematics.Points.Pixel
 import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.Color
 

@@ -2,7 +2,7 @@ package ProxyBwapi.UnitInfo
 import Performance.Caching.{Cache, CacheFrame}
 import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
 import Lifecycle.With
-import Mathematics.Pixels.{Pixel, Tile}
+import Mathematics.Points.{Pixel, Tile}
 import ProxyBwapi.Players.{PlayerInfo, Players}
 import bwapi._
 

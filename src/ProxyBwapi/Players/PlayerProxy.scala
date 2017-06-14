@@ -1,7 +1,7 @@
 package ProxyBwapi.Players
 
 import Lifecycle.With
-import Mathematics.Pixels.Tile
+import Mathematics.Points.Tile
 import Performance.Caching.CacheFrame
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}

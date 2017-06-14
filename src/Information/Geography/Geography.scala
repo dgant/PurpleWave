@@ -1,12 +1,13 @@
 package Information.Geography
 
 import Information.Geography.Calculations.{ZoneBuilder, ZoneUpdater}
-import Information.Geography.Types.{Base, Zone}
+import Information.Geography.Types.{Base, Zone, ZoneEdge}
 import Lifecycle.With
-import Mathematics.Pixels
-import Mathematics.Pixels.{Tile, TileRectangle}
+import Mathematics.Points
+import Mathematics.Points.{SpecificPoints, Tile, TileRectangle}
 import Performance.Caching.{Cache, Limiter}
 import ProxyBwapi.UnitInfo.UnitInfo
+import com.sun.glass.ui.Pixels
 
 import scala.collection.mutable
 
@@ -43,7 +44,26 @@ class Geography {
       .sortBy( ! _.isStartLocation)
       .headOption
       .map(_.townHallArea.startInclusive)
-      .getOrElse(Pixels.Points.tileMiddle))
+      .getOrElse(SpecificPoints.tileMiddle))
+  
+  
+  def ourExposedChokes: Iterable[ZoneEdge] =
+    With.geography.zones
+      .filter(zone =>
+        zone.owner == With.self ||
+          With.executor.states.exists(state =>
+            state.intent.toBuild.nonEmpty &&
+            state.intent.toTravel.exists(_.zone == zone)))
+      .flatten(_.edges)
+      .filter(edge => edge.zones.exists(_.owner != With.self))
+  
+  def mostExposedChokes: Vector[ZoneEdge] =
+    ourExposedChokes
+      .toVector
+      .sortBy(choke =>
+        With.paths.groundPixels(
+          choke.centerPixel.tileIncluding,
+          With.intelligence.mostBaselikeEnemyTile))
   
   def update() {
     zoneUpdateLimiter.act()

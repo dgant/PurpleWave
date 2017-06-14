@@ -1,7 +1,7 @@
 package ProxyBwapi.UnitInfo
 
 import Lifecycle.With
-import Mathematics.Pixels.{Pixel, Tile}
+import Mathematics.Points.{Pixel, Tile}
 import Performance.Caching.Limiter
 import ProxyBwapi.Players.{PlayerInfo, Players}
 import ProxyBwapi.Races.{Protoss, Terran}

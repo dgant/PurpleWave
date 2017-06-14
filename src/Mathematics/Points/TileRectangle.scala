@@ -1,28 +1,28 @@
-package Mathematics.Pixels
+package Mathematics.Points
 
 case class TileRectangle(
- val startInclusive : Tile,
- val endExclusive   : Tile) {
+  startInclusive : Tile,
+  endExclusive   : Tile) {
   
   if (endExclusive.x < startInclusive.x || endExclusive.y < startInclusive.y) {
     throw new Exception("Created an invalid (non-normalized) rectangle")
   }
   
   def add(x:Int, y:Int):TileRectangle =
-    new TileRectangle(
+    TileRectangle(
       startInclusive.add(x, y),
       endExclusive.add(x, y))
   
   def expand(x:Int, y:Int):TileRectangle =
-    new TileRectangle(
+    TileRectangle(
       startInclusive.add(-x, -y),
       endExclusive  .add( x,  y))
   
   def add(Tile:Tile):TileRectangle =
     add(Tile.x, Tile.y)
 
-  lazy val midPixel : Pixel     = startPixel.midpoint(endPixel)
-  lazy val midpoint : Tile = startInclusive.midpoint(endExclusive)
+  lazy val midPixel : Pixel = startPixel.midpoint(endPixel)
+  lazy val midpoint : Tile  = startInclusive.midpoint(endExclusive)
   
   def contains(x:Int, y:Int):Boolean =
     x >= startInclusive.x &&
@@ -39,8 +39,8 @@ case class TileRectangle(
   }
   
   private def containsRectangle(otherRectangle:TileRectangle):Boolean = {
-    contains(otherRectangle.startInclusive)                                             ||
-    contains(otherRectangle.endExclusive.subtract(1, 1))                                ||
+    contains(otherRectangle.startInclusive)                                       ||
+    contains(otherRectangle.endExclusive.subtract(1, 1))                          ||
     contains(otherRectangle.startInclusive.x, otherRectangle.endExclusive.y - 1)  ||
     contains(otherRectangle.endExclusive.x - 1, otherRectangle.startInclusive.y)
   }
@@ -59,7 +59,7 @@ case class TileRectangle(
     while (x < sizeX) {
       var y = 0
       while (y < sizeY) {
-        output(x + sizeX * y) = new Tile(startX + x, startY + y)
+        output(x + sizeX * y) = Tile(startX + x, startY + y)
         y += 1
       }
       x += 1

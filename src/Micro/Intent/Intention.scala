@@ -1,6 +1,6 @@
 package Micro.Intent
 
-import Mathematics.Pixels.{Pixel, Tile}
+import Mathematics.Points.{Pixel, Tile}
 import Planning.Plan
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClass.UnitClass

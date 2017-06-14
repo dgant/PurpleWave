@@ -11,7 +11,7 @@ import Planning.Composition.ResourceLocks.{LockArea, LockCurrencyForUnit, LockUn
 import ProxyBwapi.UnitClass.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Lifecycle.With
-import Mathematics.Pixels.Tile
+import Mathematics.Points.Tile
 import bwapi.Race
 
 class BuildBuilding(val buildingClass:UnitClass) extends Plan {

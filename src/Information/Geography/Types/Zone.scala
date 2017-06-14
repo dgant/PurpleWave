@@ -1,7 +1,7 @@
 package Information.Geography.Types
 
 import Lifecycle.With
-import Mathematics.Pixels.{Pixel, Tile, TileRectangle}
+import Mathematics.Points.{Pixel, Tile, TileRectangle}
 import ProxyBwapi.Players.PlayerInfo
 import bwta.Region
 

@@ -5,7 +5,7 @@ import Mathematics.Clustering
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.ForeignUnitInfo
 import Lifecycle.With
-import Mathematics.Pixels.{Tile, TileRectangle}
+import Mathematics.Points.{Tile, TileRectangle}
 import Utilities.EnrichPixel._
 
 import scala.collection.JavaConverters._

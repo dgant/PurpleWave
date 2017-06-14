@@ -1,6 +1,6 @@
 package Information.Grids.ArrayTypes
 
-import Mathematics.Pixels.Tile
+import Mathematics.Points.Tile
 
 import scala.collection.mutable
 

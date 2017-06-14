@@ -2,7 +2,7 @@ package Micro.Task
 
 import Information.Battles.Estimation.BattleEstimation
 import Lifecycle.With
-import Mathematics.Pixels.{Pixel, Tile}
+import Mathematics.Points.{Pixel, Tile}
 import Micro.Actions.Action
 import Micro.Behaviors.{MovementProfiles, TargetingProfiles}
 import Micro.Heuristics.Movement.{MovementHeuristicResult, MovementProfile}

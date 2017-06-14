@@ -4,7 +4,7 @@ import Mathematics.Shapes.Spiral
 import Information.Geography.Types.{Base, Zone, ZoneEdge}
 import ProxyBwapi.Races.Protoss
 import Lifecycle.With
-import Mathematics.Pixels.{Pixel, Tile, TileRectangle}
+import Mathematics.Points.{Pixel, Tile, TileRectangle}
 import bwta.{BWTA, Chokepoint, Region}
 
 import scala.collection.JavaConverters._

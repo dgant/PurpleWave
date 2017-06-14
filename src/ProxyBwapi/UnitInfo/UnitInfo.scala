@@ -2,7 +2,7 @@ package ProxyBwapi.UnitInfo
 
 import Information.Battles.Types.Battle
 import Lifecycle.With
-import Mathematics.Pixels.{Pixel, Tile, TileRectangle}
+import Mathematics.Points.{Pixel, Tile, TileRectangle}
 import Performance.Caching.CacheFrame
 import ProxyBwapi.Engine.Damage
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}

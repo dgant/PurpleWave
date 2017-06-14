@@ -2,7 +2,7 @@ package Debugging.Visualizations.Rendering
 
 import Debugging.Visualizations.Colors
 import Lifecycle.With
-import Mathematics.Pixels.{Pixel, TileRectangle}
+import Mathematics.Points.{Pixel, TileRectangle}
 import bwapi.Color
 
 object DrawMap {

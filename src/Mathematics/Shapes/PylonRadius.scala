@@ -1,6 +1,6 @@
 package Mathematics.Shapes
 
-import Mathematics.Pixels.Tile
+import Mathematics.Points.Tile
 
 object PylonRadius {
   

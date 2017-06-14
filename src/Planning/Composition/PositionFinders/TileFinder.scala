@@ -1,6 +1,6 @@
 package Planning.Composition.PixelFinders
 
-import Mathematics.Pixels.Tile
+import Mathematics.Points.Tile
 
 trait TileFinder {
   

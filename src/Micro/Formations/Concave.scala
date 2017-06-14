@@ -1,6 +1,6 @@
 package Micro.Formations
 
-import Mathematics.Pixels.Pixel
+import Mathematics.Points.Pixel
 import ProxyBwapi.UnitInfo.UnitInfo
 
 import scala.collection.mutable.ArrayBuffer
@@ -8,7 +8,7 @@ import scala.collection.mutable.ArrayBuffer
 object Concave {
   
   def generate(
-    units       : Seq[UnitInfo],
+    units       : Iterable[UnitInfo],
     targetStart : Pixel,
     targetEnd   : Pixel,
     origin      : Pixel)

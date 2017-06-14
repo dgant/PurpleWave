@@ -1,7 +1,7 @@
 package Information.Grids
 
 import Lifecycle.With
-import Mathematics.Pixels.Tile
+import Mathematics.Points.Tile
 
 abstract class AbstractGrid[T] {
   

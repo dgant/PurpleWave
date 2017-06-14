@@ -1,6 +1,6 @@
 package ProxyBwapi.UnitInfo
 
-import Mathematics.Pixels.{Pixel, Tile}
+import Mathematics.Points.{Pixel, Tile}
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.UnitClass.UnitClass
 import bwapi.UnitCommand

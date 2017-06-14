@@ -1,18 +1,18 @@
 package Debugging
 
 import Lifecycle.With
-import Mathematics.Pixels.{Pixel, Points}
+import Mathematics.Points.{Pixel, SpecificPoints}
 import ProxyBwapi.UnitInfo.UnitInfo
 
 class AutoCamera {
   
-  private var tweenFrom: Pixel = Points.middle
+  private var tweenFrom: Pixel = SpecificPoints.middle
   private var focus = With.self.startTile.pixelCenter
   
   private val refocusLimit = 96
   private var focusFrame = -240
   private val tweenFrames = 24
-  private var focusUnit:UnitInfo = null
+  private var focusUnit:UnitInfo = _
   
   def onFrame() {
     

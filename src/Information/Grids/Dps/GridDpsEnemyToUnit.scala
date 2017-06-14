@@ -1,7 +1,7 @@
 package Information.Grids.Dps
 
 import Lifecycle.With
-import Mathematics.Pixels.Tile
+import Mathematics.Points.Tile
 import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.UnitSizeType
 

@@ -2,7 +2,7 @@ package Information.Grids.Vision
 
 import Information.Grids.ArrayTypes.AbstractGridDouble
 import Lifecycle.With
-import Mathematics.Pixels.Tile
+import Mathematics.Points.Tile
 
 class GridAltitudeBonus extends AbstractGridDouble {
   

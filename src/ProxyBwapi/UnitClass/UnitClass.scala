@@ -1,6 +1,6 @@
 package ProxyBwapi.UnitClass
 
-import Mathematics.Pixels.{Tile, TileRectangle}
+import Mathematics.Points.{Tile, TileRectangle}
 import ProxyBwapi.Races.{Neutral, Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.{Tech, Techs}
 import bwapi.{Race, UnitType}

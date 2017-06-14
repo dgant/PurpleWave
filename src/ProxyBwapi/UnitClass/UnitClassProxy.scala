@@ -1,6 +1,6 @@
 package ProxyBwapi.UnitClass
 
-import Mathematics.Pixels.Tile
+import Mathematics.Points.Tile
 import ProxyBwapi.Techs.Techs
 import ProxyBwapi.Upgrades.Upgrades
 import bwapi.{DamageType, UnitSizeType, UnitType}

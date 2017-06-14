@@ -4,7 +4,7 @@ import Planning.Composition.PixelFinders.TileFinder
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClass.UnitClass
 import Lifecycle.With
-import Mathematics.Pixels.{Tile, TileRectangle}
+import Mathematics.Points.{Tile, TileRectangle}
 
 class TileSimpleBuilding(val buildingClass:UnitClass) extends TileFinder {
   

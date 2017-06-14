@@ -1,6 +1,6 @@
 package Macro.Allocation
 
-import Mathematics.Pixels.TileRectangle
+import Mathematics.Points.TileRectangle
 import Planning.Composition.ResourceLocks.LockArea
 
 import scala.collection.mutable

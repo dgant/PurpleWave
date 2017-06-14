@@ -1,7 +1,7 @@
 package Micro.Intent
 
 import Lifecycle.With
-import Mathematics.Pixels.{Pixel, Tile}
+import Mathematics.Points.{Pixel, Tile}
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClass.UnitClass

@@ -3,7 +3,7 @@ package Information
 import Information.Geography.Types.Base
 import Performance.Caching.CacheFrame
 import Lifecycle.With
-import Mathematics.Pixels.Tile
+import Mathematics.Points.Tile
 
 class Intelligence {
   

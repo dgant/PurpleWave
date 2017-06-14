@@ -1,7 +1,6 @@
 package Planning.Plans.Army
 
 import Lifecycle.With
-import Planning.Composition.PixelFinders.Tactics.TileEnemyBase
 import Planning.Composition.ResourceLocks.LockUnits
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Composition.{Property, UnitCountEverything}
@@ -17,13 +16,12 @@ class ConsiderAttacking
     unitCounter.set(UnitCountEverything)
   })
   
-  val control = new ControlPixel
-  control.controllers.inherit(attackers)
-  control.positionToControl.set(new TileEnemyBase)
+  val attack = new Attack
+  attack.controllers.inherit(attackers)
     
   val scout = new FindEnemyBase
   scout.scouts.inherit(attackers)
   
-  val attackOrScout = new IfThenElse(new FoundEnemyBase, control, scout)
+  val attackOrScout = new IfThenElse(new FoundEnemyBase, attack, scout)
   whenTrue.set(attackOrScout)
 }

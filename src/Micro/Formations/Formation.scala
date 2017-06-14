@@ -1,6 +1,6 @@
 package Micro.Formations
 
-import Mathematics.Pixels.Pixel
+import Mathematics.Points.Pixel
 import ProxyBwapi.UnitClass.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -10,7 +10,7 @@ import scala.collection.mutable.ListBuffer
 object Formation {
   
   def concave(
-    units       : Seq[FriendlyUnitInfo],
+    units       : Iterable[FriendlyUnitInfo],
     targetStart : Pixel,
     targetEnd   : Pixel,
     origin      : Pixel) {

@@ -1,7 +1,7 @@
 package Information.Grids.ArrayTypes
 
 import Information.Grids.AbstractGrid
-import Mathematics.Pixels.Tile
+import Mathematics.Points.Tile
 
 abstract class AbstractGridArray[T] extends AbstractGrid[T] {
   

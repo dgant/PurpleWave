@@ -2,7 +2,7 @@ package Micro.Heuristics.Movement
 
 import Lifecycle.With
 import Mathematics.Heuristics.HeuristicMathMultiplicative
-import Mathematics.Pixels.{Pixel, Tile}
+import Mathematics.Points.{Pixel, Tile}
 import Micro.Task.ExecutionState
 object MovementHeuristicTraffic extends MovementHeuristic {
   

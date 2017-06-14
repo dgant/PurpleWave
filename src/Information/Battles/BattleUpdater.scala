@@ -2,7 +2,7 @@ package Information.Battles
 
 import Information.Battles.Types.Battle
 import Lifecycle.With
-import Mathematics.Pixels.Points
+import Mathematics.Points.SpecificPoints
 
 object BattleUpdater {
   
@@ -24,6 +24,6 @@ object BattleUpdater {
         if (battle.happening)
           group.units.minBy(_.pixelDistanceFast(group.opponent.centroid)).pixelCenter
         else
-          group.units.headOption.map(_.pixelCenter).getOrElse(Points.middle))
+          group.units.headOption.map(_.pixelCenter).getOrElse(SpecificPoints.middle))
   }
 }

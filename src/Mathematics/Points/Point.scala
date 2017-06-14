@@ -1,6 +1,4 @@
-package Mathematics.Pixels
-
-import Mathematics.Points.AbstractPoint
+package Mathematics.Points
 
 case class Point(argX:Int, argY:Int) extends AbstractPoint(argX, argY) {
   def position:Pixel = Pixel(x, y)

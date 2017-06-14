@@ -48,7 +48,7 @@ class Configuration {
   /////////////////
   
   var peformanceFrameMilliseconds = 20
-  var performanceMinimumUnitSleep = 4
+  var performanceMinimumUnitSleep = 2
   var performanceMicroAngleStep   = 4
   var useFastGroundDistance       = true
   

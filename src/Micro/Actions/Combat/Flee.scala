@@ -65,6 +65,7 @@ object Flee extends Action {
         else                    threat.pixelDistanceTravelling(state.origin)))) {
     
       Travel.delegate(state)
+      if ( ! stillReady(state)) return
     }
   
     Reposition.delegate(state)

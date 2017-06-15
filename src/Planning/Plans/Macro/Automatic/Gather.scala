@@ -69,7 +69,7 @@ class Gather extends Plan {
     safeGas         = allGas.filter(safe)
     if (safeMinerals.isEmpty) safeMinerals  = allMinerals
     if (safeGas.isEmpty)      safeGas       = allGas
-    safeResources = (safeMinerals ++ safeGas)
+    safeResources = safeMinerals ++ safeGas
   }
   
   private def decideLongDistanceMining() {
@@ -96,7 +96,7 @@ class Gather extends Plan {
     haveEnoughGas       = With.self.gas >= Math.max(400, With.self.minerals)
     workersForGas       = Vector(safeGas.size * 3, allWorkers.size/3, if(haveEnoughGas) 0 else 200).min
     workersForMinerals  = allWorkers.size - workersForGas
-    workersPerGas       = if (safeGas.size == 0) 0 else workersForGas.toDouble / safeGas.size
+    workersPerGas       = if (safeGas.isEmpty) 0 else workersForGas.toDouble / safeGas.size
     workersOnGas        = safeGas.toVector.map(gas => workersByResource.get(gas).map(_.size).getOrElse(0)).sum
     
     needPerMineral = new mutable.HashMap[UnitInfo, Double] ++
@@ -121,7 +121,7 @@ class Gather extends Plan {
     workersToAddToMinerals  = unassignedWorkers.drop(numberToAddToGas)
   }
   
-  val unassignSupersaturatingWorkersLimiter = new Limiter(5, () => unassignSupersaturatingWorkers)
+  val unassignSupersaturatingWorkersLimiter = new Limiter(5, () => unassignSupersaturatingWorkers())
   def unassignSupersaturatingWorkers() {
     val supersaturatedMinerals = safeMinerals.filter(needPerMineral(_) < 0)
     val supersaturationWorkerGroups = supersaturatedMinerals.flatten(workersByResource.get)

@@ -8,6 +8,7 @@ class LockCurrency extends ResourceLock {
   var minerals    = 0
   var gas         = 0
   var supply      = 0
+  var framesLeft  = Int.MaxValue
   var isSpent     = false
   var isSatisfied = false
   var owner:Plan  = null

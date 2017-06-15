@@ -24,12 +24,11 @@ class ResearchTech(tech: Tech) extends Plan {
     if (isComplete) return
     
     currency.acquire(this)
+    currency.isSpent = techers.units.exists(techer => techer.researching && techer.techingType == tech)
     if (! currency.satisfied) return
   
-    currency.isSpent = false
     techers.acquire(this)
     techers.units.foreach(techer => {
-      currency.isSpent = techer.researching && techer.techingType == tech
       With.executor.intend(new Intention(this, techer) { toTech = Some(tech) })
     })
   }

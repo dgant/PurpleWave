@@ -274,7 +274,7 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   def isBeingViolent: Boolean = {
     attacking ||
     target.orElse(orderTarget).exists(isEnemyOf) ||
-    List(Commands.Attack_Move, Commands.Attack_Unit).contains(command.getUnitCommandType.toString)
+    List(Commands.Attack_Move, Commands.Attack_Unit).contains(command.map(_.getUnitCommandType.toString).getOrElse(""))
   }
   
   def isBeingViolentTo(victim: UnitInfo): Boolean = {

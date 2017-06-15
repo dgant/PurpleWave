@@ -138,10 +138,10 @@ abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
   private val isTrainingCache         = new CacheFrame(() => base.isTraining)
   private val isUpgradingCache        = new CacheFrame(() => base.isUpgrading)
   
-  def command       : UnitCommand  = getLastCommandCache.get
-  def commandFrame  : Int          = getLastCommandFrameCache.get
+  def command: Option[UnitCommand]  = getLastCommandCache.get
+  def commandFrame: Int          = getLastCommandFrameCache.get
   
-  private val getLastCommandCache      = new CacheFrame(() => base.getLastCommand)
+  private val getLastCommandCache      = new CacheFrame(() => Option(base.getLastCommand) )
   private val getLastCommandFrameCache = new CacheFrame(() => base.getLastCommandFrame)
   
   def trainingQueue: Iterable[UnitClass] = trainingQueueCache.get

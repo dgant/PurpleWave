@@ -5,17 +5,19 @@ import Lifecycle.With
 
 object VisualizeResources {
   def render() {
-    DrawScreen.column(
-      455,
+    DrawScreen.table(
+      325,
       31,
       With.bank.prioritizedRequests
         .take(20)
-        .map(r =>
-          (if (r.isSatisfied) "X " else "  ") ++
-            (if (r.minerals > 0)  r.minerals  .toString ++ "m " else "") ++
-            (if (r.gas      > 0)  r.gas       .toString ++ "g " else "") ++
-            (if (r.supply   > 0)  r.supply    .toString ++ "s " else "") ++
-            r.owner.toString)
-        .mkString("\n"))
+        .map(request =>
+          Iterable(
+            request.owner.toString,
+            if (request.isSatisfied) "X" else "",
+            if (request.expectedFrames > 0 && request.expectedFrames < 24 * 60 * 5) request.expectedFrames.toString else "",
+            if (request.minerals > 0)  request.minerals + "m" else "",
+            if (request.gas      > 0)  request.gas      + "g" else "",
+            if (request.supply   > 0)  request.supply   + "s" else ""
+          )))
   }
 }

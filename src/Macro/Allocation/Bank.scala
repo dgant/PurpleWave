@@ -16,7 +16,7 @@ class Bank {
     recountResources()
   }
   
-  def prioritizedRequests:Iterable[LockCurrency] = {
+  def prioritizedRequests: Iterable[LockCurrency] = {
     requests.toVector.sortBy(request => With.prioritizer.getPriority(request.owner))
   }
   
@@ -25,7 +25,7 @@ class Bank {
     recountResources()
   }
   
-  def release(request:LockCurrency) {
+  def release(request: LockCurrency) {
     request.isSatisfied = false
     requests.remove(request)
     recountResources()
@@ -38,7 +38,7 @@ class Bank {
     prioritizedRequests.foreach(queueBuyer)
   }
   
-  private def queueBuyer(request:LockCurrency) {
+  private def queueBuyer(request: LockCurrency) {
     request.isSatisfied = request.isSpent || isAvailableNow(request)
     
     if ( ! request.isSpent) {
@@ -46,11 +46,32 @@ class Bank {
       gasLeft      -= request.gas
       supplyLeft   -= request.supply
     }
+    
+    request.expectedFrames = expectedFrames(request)
   }
   
-  private def isAvailableNow(request:LockCurrency): Boolean = {
+  private def isAvailableNow(request: LockCurrency): Boolean = {
     (request.minerals == 0  ||  mineralsLeft  >= request.minerals) &&
     (request.gas      == 0  ||  gasLeft       >= request.gas)      &&
     (request.supply   == 0  ||  supplyLeft    >= request.supply)
+  }
+  
+  private def expectedFrames(request: LockCurrency): Int = {
+    if (request.isSatisfied) return 0
+    Vector(
+      0,
+      if (request.minerals == 0)
+        0
+      else if (With.economy.ourIncomePerFrameMinerals == 0)
+        Int.MaxValue
+      else
+        -mineralsLeft / With.economy.ourIncomePerFrameMinerals,
+      if (request.gas == 0)
+        0
+      else if (With.economy.ourIncomePerFrameGas == 0)
+        Int.MaxValue
+      else
+        -gasLeft / With.economy.ourIncomePerFrameGas
+    ).min.toInt
   }
 }

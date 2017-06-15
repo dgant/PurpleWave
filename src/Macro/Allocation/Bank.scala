@@ -72,6 +72,6 @@ class Bank {
         Int.MaxValue
       else
         -gasLeft / With.economy.ourIncomePerFrameGas
-    ).min.toInt
+    ).max.toInt
   }
 }

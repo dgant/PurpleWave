@@ -52,7 +52,7 @@ class Configuration {
   var performanceMicroAngleStep   = 4
   var useFastGroundDistance       = true
   var unitHistoryAge              = 24 * 3
-  var bunkerSafetyMargin          = Math.sqrt(16.0 * 16.0 * 2.0) + Math.sqrt(32.0 * 16.0 * 2.0) + 32.0 * (4.0 + 1.0)
+  var bunkerSafetyMargin          = Math.sqrt(16.0 * 16.0 * 2.0) + Math.sqrt(32.0 * 16.0 * 2.0) + 32.0 * (4.0 + 1.0) + /* This is the margin! */ 8.0
   
   var urgencyManners        = 1
   var urgencyEconomy        = 1

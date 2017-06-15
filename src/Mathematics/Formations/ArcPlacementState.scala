@@ -6,28 +6,27 @@ class ArcPlacementState(arc: Arc, minimumRadius: Double) {
   var radiusPixels    = -1.0
   var angleRadians    = 0.0
   var lastUnitRadians = 0.0
+  var spanPixels      = 0.0
+  var spanPixelsLeft  = 0.0
   var nextClockwise   = true
   
   def startRank(radiusDesired: Double) {
     if (radiusDesired > radiusPixels) {
-      radiusPixels  = radiusDesired
-      recenter()
+      radiusPixels    = radiusDesired
+      spanPixels      = arc.spanRadians * radiusPixels
+      spanPixelsLeft  = spanPixels
+      angleRadians    = 0.0
+      nextClockwise   = true
     }
   }
   
-  private def advanceRank() {
-    radiusPixels += 32.0
-    recenter()
-  }
-  
-  private def recenter() {
-    angleRadians  = 0.0
-    nextClockwise = true
+  private def advanceToNextRank() {
+    startRank(radiusPixels + 32.0)
   }
   
   def reserveSpace(widthPixels: Double): Pixel = {
-    if (spaceLeft < widthPixels) {
-      advanceRank()
+    if (spanPixelsLeft < widthPixels) {
+      advanceToNextRank()
     }
     val unitRadians = widthPixels / radiusPixels
     val output = arc.centerPixel.radiateRadians(
@@ -40,9 +39,5 @@ class ArcPlacementState(arc: Arc, minimumRadius: Double) {
     }
     lastUnitRadians = unitRadians
     output
-  }
-  
-  def spaceLeft: Double = {
-    radiusPixels * 2 * (arc.spanRadians - angleRadians)
   }
 }

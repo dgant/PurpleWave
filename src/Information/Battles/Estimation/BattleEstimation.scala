@@ -107,6 +107,8 @@ class BattleEstimation(
     avatar.subjectiveValue * damage / avatar.totalHealth
   }
   
-  def weWin   : Boolean = result.costToEnemy >  result.costToUs
-  def weLose  : Boolean = result.costToEnemy <= result.costToUs
+  def weGainValue : Boolean = result.costToEnemy  >   result.costToUs
+  def weLoseValue : Boolean = result.costToEnemy  <=  result.costToUs
+  def weSurvive   : Boolean = result.deathsUs     <   unitsOurs.size
+  def weDie       : Boolean = result.deathsUs     >=  unitsOurs.size
 }

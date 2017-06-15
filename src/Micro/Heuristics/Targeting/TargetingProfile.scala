@@ -6,6 +6,7 @@ class TargetingProfile(
   var preferCombat      : Double = 0.0,
   var preferDps         : Double = 0.0,
   var preferDamageType  : Double = 0.0,
+  var avoidPain         : Double = 1.0,
   var avoidHealth       : Double = 0.0,
   var avoidDistance     : Double = 0.0,
   var avoidDistraction  : Double = 0.0) {
@@ -17,6 +18,7 @@ class TargetingProfile(
       new TargetHeuristicWeight(TargetHeuristicCombat,          preferCombat),
       new TargetHeuristicWeight(TargetHeuristicDamagePerSecond, preferDps),
       new TargetHeuristicWeight(TargetHeuristicDamageType,      preferDamageType),
+      new TargetHeuristicWeight(TargetHeuristicPain,            -avoidPain),
       new TargetHeuristicWeight(TargetHeuristicHealth,          -avoidHealth),
       new TargetHeuristicWeight(TargetHeuristicDistance,        -avoidDistance),
       new TargetHeuristicWeight(TargetHeuristicDistraction,     -avoidDistraction)

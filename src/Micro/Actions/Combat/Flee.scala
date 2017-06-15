@@ -10,6 +10,7 @@ import Micro.Task.ExecutionState
 object Flee extends Action {
   
   override def allowed(state: ExecutionState) = {
+    state.intent.canFlee &&
     state.unit.canMoveThisFrame &&
     (
       (

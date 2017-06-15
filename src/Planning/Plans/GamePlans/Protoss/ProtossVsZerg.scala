@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Protoss
 
 import Macro.BuildRequests.{BuildRequest, RequestUnitAtLeast, RequestUpgrade}
 import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors}
-import Planning.Plans.Army.{ConsiderAttacking, ControlEnemyAirspace, Defend}
+import Planning.Plans.Army.{ConsiderAttacking, ControlEnemyAirspace, DefendChokes, DefendHearts}
 import Planning.Plans.Compound.{IfThenElse, _}
 import Planning.Plans.Information.{ScoutAt, ScoutExpansionsAt}
 import Planning.Plans.Macro.Automatic.Continuous.{RequireSufficientPylons, TrainContinuously, TrainGatewayUnitsContinuously, TrainProbesContinuously}
@@ -52,6 +52,12 @@ class ProtossVsZerg extends Parallel {
     RequestUnitAtLeast(8,   Protoss.Nexus)
   )
   
+  private val plusOneWeapons = Vector[BuildRequest] (
+    RequestUnitAtLeast(1,   Protoss.Assimilator),
+    RequestUnitAtLeast(1,   Protoss.Forge),
+    RequestUpgrade(         Protoss.GroundDamage, 1)
+  )
+  
   private class WhenSafeTakeNatural extends IfThenElse(
     new UnitsAtLeast(12, UnitMatchWarriors),
     new Build(ProtossBuilds.TakeNatural)
@@ -70,7 +76,7 @@ class ProtossVsZerg extends Parallel {
   
   private class BuildZealotsInitially extends IfThenElse(
     new UnitsExactly(0, UnitMatchType(Protoss.CyberneticsCore)),
-    new Build(ProtossBuilds.OpeningTwoGate99Zealots)
+    new Build(ProtossBuilds.OpeningTwoGate1012Zealots)
   )
   
   private class RespondToMutalisksWithMassCorsairs extends IfThenElse(
@@ -109,7 +115,10 @@ class ProtossVsZerg extends Parallel {
   private class AttackWhenWeHaveArmy extends IfThenElse(
     new UnitsAtLeast(10, UnitMatchWarriors),
     new ConsiderAttacking,
-    new Defend
+    new IfThenElse(
+      new UnitsAtLeast(5, UnitMatchWarriors),
+      new DefendChokes,
+      new DefendHearts)
   )
   
   private class EatOverlordsUntilMutalisksArrive extends IfThenElse(
@@ -125,7 +134,7 @@ class ProtossVsZerg extends Parallel {
   private val earlyZealotCount = 8
   
   children.set(Vector(
-    new Build(ProtossBuilds.OpeningTwoGate99),
+    new Build(ProtossBuilds.OpeningTwoGate1012),
     new WhenMinedOutExpand,
     new WhenSafeTakeNatural,
     new WhenSafeTakeThirdBase,
@@ -137,6 +146,7 @@ class ProtossVsZerg extends Parallel {
     new TrainContinuously(Protoss.DarkTemplar, 3),
     new TrainContinuously(Protoss.Reaver, 2),
     new TrainContinuously(Protoss.Corsair, 3),
+    new Build(plusOneWeapons),
     new RespondToHydrasWithReavers_OrGetCorsairTech,
     new BuildZealotsOrDragoons_BasedOnMutalisksAndZerglings,
     new Build(ProtossBuilds.TakeNatural),

@@ -3,7 +3,7 @@ package Mathematics.Formations
 import Mathematics.Points.Pixel
 
 class ArcPlacementState(arc: Arc, minimumRadius: Double) {
-  var radiusPixels    = -1.0
+  var radiusPixels    = arc.minRadiusPixels
   var angleRadians    = 0.0
   var lastUnitRadians = 0.0
   var spanPixels      = 0.0
@@ -30,7 +30,7 @@ class ArcPlacementState(arc: Arc, minimumRadius: Double) {
     }
     val unitRadians = widthPixels / radiusPixels
     val output = arc.centerPixel.radiateRadians(
-      arc.centerRadians + (angleRadians + unitRadians) * (if (nextClockwise) 1 else -1),
+      arc.centerAngleRadians + (angleRadians + unitRadians) * (if (nextClockwise) 1 else -1),
       widthPixels)
     
     nextClockwise = ! nextClockwise

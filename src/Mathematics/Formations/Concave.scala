@@ -17,7 +17,8 @@ object Concave {
     val arc = Arc(
       Math.PI, // Configurable
       targetCenter,
-      targetCenter.radiansTo(origin)
+      targetCenter.radiansTo(origin),
+      targetStart.pixelDistanceFast(targetEnd) / 2.0
     )
     
     val arcPlacement = new ArcPlacementState(arc, targetStart.pixelDistanceFast(targetEnd))

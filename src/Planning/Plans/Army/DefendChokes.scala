@@ -7,7 +7,7 @@ import Micro.Intent.Intention
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import ProxyBwapi.UnitInfo.UnitInfo
 
-class Defend extends ControlPixel {
+class DefendChokes extends ControlPixel {
   
   controllers.get.unitMatcher.set(UnitMatchWarriors)
   

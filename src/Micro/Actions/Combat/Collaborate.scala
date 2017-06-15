@@ -20,6 +20,6 @@ object Collaborate extends Action {
     Charge.consider(state)
   }
   
-  private def retreatArmy  (state:ExecutionState)  : Boolean = state.battleEstimation.exists(_.weLose)
+  private def retreatArmy  (state:ExecutionState)  : Boolean = state.battleEstimation.exists(_.weLoseValue)
   private def isWounded    (state:ExecutionState)  : Boolean = state.unit.wounded
 }

@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Protoss
 
 import Macro.BuildRequests.{BuildRequest, RequestUnitAtLeast}
 import Planning.Composition.UnitMatchers.UnitMatchType
-import Planning.Plans.Army.{ConsiderAttacking, Defend}
+import Planning.Plans.Army.{ConsiderAttacking, DefendChokes}
 import Planning.Plans.Compound.{IfThenElse, Parallel}
 import Planning.Plans.Information.ScoutAt
 import Planning.Plans.Macro.Automatic.Continuous.{RequireSufficientPylons, TrainGatewayUnitsContinuously, TrainProbesContinuously}
@@ -33,6 +33,6 @@ class ProtossVsRandom extends Parallel {
     new Build(safeBuild),
     new ScoutAt(7),
     new ConsiderAttacking,
-    new Defend
+    new DefendChokes
   ))
 }

@@ -3,6 +3,7 @@ package Mathematics.Formations
 import Mathematics.Points.Pixel
 
 case class Arc(
-  spanRadians   : Double,
-  centerPixel   : Pixel,
-  centerRadians : Double)
+  spanRadians         : Double,
+  centerPixel         : Pixel,
+  centerAngleRadians  : Double,
+  minRadiusPixels     : Double)

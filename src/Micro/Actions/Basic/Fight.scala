@@ -10,7 +10,7 @@ object Fight extends Action {
     state.unit.canMoveThisFrame || state.unit.canAttackThisFrame
   }
   
-  override def perform(state:ExecutionState) {
+  override def perform(state: ExecutionState) {
     Shoot.consider(state)
     Collaborate.consider(state)
     Kite.consider(state)

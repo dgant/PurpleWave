@@ -19,8 +19,9 @@ object BustBunker extends Action {
     state.unit.is(Protoss.Dragoon)                          &&
     With.self.hasUpgrade(Protoss.DragoonRange)              &&
     ! With.enemies.exists(_.hasUpgrade(Terran.MarineRange)) &&
-    state.targets.exists(_.is(Terran.Bunker))               &&
-    state.threats.forall( ! _.is(Terran.SiegeTankSieged))
+    state.threats.forall( ! _.is(Terran.SiegeTankSieged))   &&
+    state.targets.exists(target => target.aliveAndComplete && target.is(Terran.Bunker))
+    
   }
   
   override protected def perform(state: ExecutionState) {

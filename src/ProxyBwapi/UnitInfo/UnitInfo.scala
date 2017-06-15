@@ -228,10 +228,11 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
     canDoAnythingThisFrame &&
     (
       unitClass.canAttack
+      || (is(Terran.Bunker)
       || (is(Protoss.Carrier) && interceptors > 0)
       || (is(Protoss.Reaver)  && scarabs > 0)
       || (is(Zerg.Lurker)     && burrowed)
-    ))
+    )))
   
   def canAttackThisSecond(enemy:UnitInfo):Boolean =
     canAttackThisSecond &&

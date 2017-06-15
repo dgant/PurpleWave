@@ -17,7 +17,7 @@ class FriendlyUnitTracker {
   def get(someUnit:bwapi.Unit):Option[FriendlyUnitInfo] = get(someUnit.getID)
   def get(id:Int):Option[FriendlyUnitInfo] = friendlyUnitsById.get(id)
   
-  def onFrame() {
+  def update() {
   
     //Important to remember: bwapi.Units are not persisted frame-to-frame
     //So we do all our comparisons by ID, rather than by object

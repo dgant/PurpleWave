@@ -22,7 +22,7 @@ class ForeignUnitTracker {
   def get(id:Int):Option[ForeignUnitInfo] = foreignUnitsById.get(id)
   
   private val limitInvalidatePixels = new Limiter(1, invalidatePositions)
-  def onFrame() {
+  def update() {
     initialize()
     
     //Important to remember: bwapi.Units are not persisted frame-to-frame

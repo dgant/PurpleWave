@@ -9,7 +9,13 @@ import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitClass.UnitClass
 import bwapi._
 
+import scala.collection.mutable
+
 abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
+  
+  //////////////
+  // Identity //
+  //////////////
   
   def friendly  : Option[FriendlyUnitInfo]  = None
   def foreign   : Option[ForeignUnitInfo]   = None
@@ -17,6 +23,31 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   override def toString:String = unitClass.toString + " " + tileIncludingCenter.toString
   
   def is(unitClasses:UnitClass*):Boolean = unitClasses.contains(unitClass)
+  
+  //////////////////
+  // Statefulness //
+  //////////////////
+
+  private val history = new mutable.Queue[UnitState]
+  def update() {
+    while (history.headOption.exists(_.age > With.configuration.unitHistoryAge)) {
+      history.dequeue()
+    }
+    history.enqueue(new UnitState(this))
+  }
+  
+  def damageInLastSecond: Int = {
+    Math.max(
+      0,
+      history
+        .filter(_.age > 24)
+        .lastOption
+        .map(lastState =>
+          lastState.hitPoints             - hitPoints     +
+          lastState.shieldPoints          - shieldPoints  +
+          lastState.defensiveMatrixPoints - defensiveMatrixPoints)
+        .getOrElse(0))
+  }
   
   ////////////
   // Health //

@@ -15,7 +15,18 @@ object Shoot extends Action {
   }
   
   override def perform(state:ExecutionState) {
-    state.toAttack = EvaluateTargets.best(state, state.targetsInRange.filter(_.canAttackThisSecond(state.unit)))
+    
+    // If there are no threats, shoot anything.
+    // Otherwise, don't waste cooldowns on non-combat units.
+    
+    val combatTargets = state.targets.filter(_.unitClass.helpsInCombat)
+    
+    state.toAttack = EvaluateTargets.best(
+      state,
+      state
+        .targetsInRange
+        .filter(target => combatTargets.isEmpty || target.unitClass.helpsInCombat))
+    
     Attack.delegate(state)
   }
 }

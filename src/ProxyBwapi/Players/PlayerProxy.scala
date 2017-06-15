@@ -52,8 +52,6 @@ abstract class PlayerProxy(base:Player) {
     techsResearchedCaches(tech).get
   }
   
-  
-  
   private val gasCache                = new CacheFrame(() => base.gas)
   private val mineralsCache           = new CacheFrame(() => base.minerals)
   private val gatheredGasCache        = new CacheFrame(() => base.gatheredGas)

@@ -1,11 +1,14 @@
 package ProxyBwapi.Players
 
 import Debugging.Visualizations.Colors
+import ProxyBwapi.Upgrades.Upgrade
 import bwapi.Player
 
 case class PlayerInfo(basePlayer:Player) extends PlayerProxy(basePlayer) {
   
   def isFriendly = isUs || isAlly
+  
+  def hasUpgrade(upgrade: Upgrade): Boolean = getUpgradeLevel(upgrade) > 0
   
   lazy val colorMidnight: bwapi.Color   =
     if      (isUs)      Colors.MidnightViolet

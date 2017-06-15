@@ -57,8 +57,9 @@ class UnitTracker {
   }
   
   def update() {
-    friendlyUnitTracker.onFrame()
-    foreignUnitTracker.onFrame()
+    friendlyUnitTracker.update()
+    foreignUnitTracker.update()
+    With.units.all.foreach(_.update())
   }
   
   def onUnitDestroy(unit: bwapi.Unit) {

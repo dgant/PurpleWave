@@ -6,10 +6,14 @@ import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Composition.{Property, UnitCountEverything}
 import Planning.Plans.Compound.{If, IfThenElse}
 import Planning.Plans.Information.{FindEnemyBase, FoundEnemyBase}
+import Planning.Yolo
 
 class ConsiderAttacking
   extends IfThenElse(
-    new If(() => With.battles.global.estimation.weWin || With.battles.global.estimation.result.costToUs == 0)) {
+    new If(() =>
+      Yolo.active
+      || With.battles.global.estimation.weWin
+      || With.battles.global.estimation.result.costToUs == 0)) {
   
   val attackers = new Property[LockUnits](new LockUnits {
     unitMatcher.set(UnitMatchWarriors)

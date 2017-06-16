@@ -20,7 +20,7 @@ class Logger {
     val filename = "bwapi-data/write/" + filenameRaw.replaceAll("[^A-Za-z0-9 \\-\\.]", "") + ".log.txt";
     val file = new File(filename)
     val printWriter = new PrintWriter(file)
-    printWriter.write(logMessages.distinct.mkString("\n"))
+    printWriter.write(logMessages.distinct.mkString("\r\n"))
     printWriter.close()
   }
   

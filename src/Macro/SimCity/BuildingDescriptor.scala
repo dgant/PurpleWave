@@ -24,6 +24,13 @@ class BuildingDescriptor(
     margin    <= suggestion.margin
   }
   
+  def marginTiles: Int = if(margin) 1 else 0
+  
+  def buildStart  : Tile = Tile(0, 0)
+  def buildEnd    : Tile = Tile(width, height)
+  def marginStart : Tile = buildStart.subtract(marginTiles, marginTiles)
+  def marginEnd   : Tile = buildEnd.add(marginTiles, marginTiles)
+  
   def accepts(tile: Tile): Boolean = {
     
     if ( ! tile.valid) return false
@@ -42,20 +49,27 @@ class BuildingDescriptor(
       // TODO: Verify legality
     }
     
-    val marginTiles = if (margin) 1 else 0
-    var x = tile.x - marginTiles
-    var y = tile.y - marginTiles
+    var x             = tile.add(marginStart).x
+    var y             = tile.add(marginStart).y
+    val xMax          = tile.add(marginEnd).x
+    val yMax          = tile.add(marginEnd).y
+    val tileBuildEnd  = tile.add(buildEnd)
     
     // TODO: Reject areas occupied by units
     
     // While loops have lower overhead than other iterative mechanisms in Scala.
-    while (x < tile.x + width + marginTiles) {
-      while (y < tile.y + height + marginTiles) {
-        if (x < tile.x || y < tile.y || x > tile.x + width || y > tile.y + height) {
-          if ( ! With.grids.walkable.get(Tile(x, y))) return false
+    while (x < xMax) {
+      while (y < yMax) {
+        val nextTile = Tile(x, y)
+        if (
+          nextTile.x < tile.x         ||
+          nextTile.y < tile.y         ||
+          nextTile.x > tileBuildEnd.x ||
+          nextTile.y > tileBuildEnd.y) {
+          if ( ! With.grids.walkable.get(nextTile)) return false
         }
         else {
-          if ( ! With.grids.buildable.get(Tile(x, y))) return false
+          if ( ! With.grids.buildable.get(nextTile)) return false
         }
         y += 1
       }

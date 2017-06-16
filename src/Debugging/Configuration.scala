@@ -54,14 +54,15 @@ class Configuration {
   var unitHistoryAge              = 24 * 3
   var bunkerSafetyMargin          = Math.sqrt(16.0 * 16.0 * 2.0) + Math.sqrt(32.0 * 16.0 * 2.0) + 32.0 * (4.0 + 1.0) + /* This is the margin! */ 8.0
   
-  var urgencyManners        = 1
-  var urgencyEconomy        = 1
-  var urgencyGeography      = 1
-  var urgencyPlanning       = 2
-  var urgencyBattles        = 5
-  var urgencyGrids          = 10
-  var urgencyUnitTracking   = 10
-  var urgencyMicro          = 100
+  var urgencyManners            = 1
+  var urgencyEconomy            = 1
+  var urgencyGeography          = 1
+  var urgencyBuildingPlacement  = 1
+  var urgencyPlanning           = 2
+  var urgencyBattles            = 5
+  var urgencyGrids              = 10
+  var urgencyUnitTracking       = 10
+  var urgencyMicro              = 100
   
   ///////////////////
   // Visualization //

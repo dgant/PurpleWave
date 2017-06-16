@@ -4,7 +4,7 @@ import Lifecycle.With
 import Mathematics.Points.{Pixel, SpecificPoints}
 import ProxyBwapi.UnitInfo.UnitInfo
 
-class AutoCamera {
+class Camera {
   
   private var tweenFrom: Pixel = SpecificPoints.middle
   private var focus = With.self.startTile.pixelCenter

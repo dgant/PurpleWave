@@ -1,4 +1,4 @@
-package Macro
+package Macro.SimCity
 
 import Lifecycle.With
 import Mathematics.Points.{Tile, TileRectangle}
@@ -7,6 +7,16 @@ import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClass._
 
 class Architect {
+  
+  def fulfill(building: BuildingDescriptor, tile: Option[Tile]): Option[Tile] = {
+   
+    if (tile.isDefined && building.accepts(tile.get)) {
+      return tile
+    }
+    
+    // TODO
+    None
+  }
   
   def placeBuilding(
     buildingClass:  UnitClass,

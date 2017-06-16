@@ -6,6 +6,7 @@ import Lifecycle.With
 import scala.collection.mutable
 
 class Bank {
+  
   private var mineralsLeft  = 0
   private var gasLeft       = 0
   private var supplyLeft    = 0
@@ -20,7 +21,7 @@ class Bank {
     requests.toVector.sortBy(request => With.prioritizer.getPriority(request.owner))
   }
   
-  def request(request:LockCurrency) {
+  def request(request: LockCurrency) {
     requests.add(request)
     recountResources()
   }

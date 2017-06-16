@@ -45,10 +45,10 @@ class Groundskeeper {
     // 2. [ ] Pause and pick up placement next time? (potentially leading to stale placements)
     // 3. [ ] Overengineer an urgency-based queue for placements? (no)
     
-    val architect = new Architect
+    With.architect.reboot()
     suggestions.foreach(suggestion => {
       if (With.performance.continueRunning) {
-        val tile = architect.fulfill(suggestion, placements.get(suggestion))
+        val tile = With.architect.fulfill(suggestion, placements.get(suggestion))
         if (tile.isDefined) placements.put(suggestion, tile.get) else placements.remove(suggestion)
       }
     })

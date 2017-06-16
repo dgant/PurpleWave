@@ -9,7 +9,7 @@ import Information.Grids.Grids
 import Information._
 import Macro.Allocation._
 import Macro.Scheduling.Scheduler
-import Macro.SimCity.Groundskeeper
+import Macro.SimCity.{Architect, Groundskeeper}
 import Micro.Intent.Commander
 import Micro.Task.Executor
 import Performance.TaskQueue.{AbstractTaskQueue, TaskQueueGlobal}
@@ -24,18 +24,19 @@ import scala.collection.JavaConverters._
 
 object With {
   var game            : bwapi.Game          = _
+  var architect       : Architect           = _
   var bank            : Bank                = _
-  var groundskeeper   : Groundskeeper       = _
-  var camera          : Camera              = _
-  var configuration   : Configuration       = _
   var battles         : BattleClassifier    = _
-  var executor        : Executor            = _
+  var camera          : Camera              = _
   var commander       : Commander           = _
+  var configuration   : Configuration       = _
   var economy         : Economy             = _
-  var grids           : Grids               = _
-  var intelligence    : Intelligence        = _
-  var geography       : Geography           = _
+  var executor        : Executor            = _
   var gameplan        : WinTheGame          = _
+  var geography       : Geography           = _
+  var grids           : Grids               = _
+  var groundskeeper   : Groundskeeper       = _
+  var intelligence    : Intelligence        = _
   var latency         : Latency             = _
   var logger          : Logger              = _
   var paths           : Paths               = _
@@ -76,28 +77,29 @@ object With {
     configuration     = new Configuration
     logger            = new Logger
     initializeBWTA()
-    bank             = new Bank
-    battles          = new BattleClassifier
-    groundskeeper    = new Groundskeeper
-    camera           = new Camera
-    economy          = new Economy
-    executor         = new Executor
-    commander        = new Commander
-    gameplan         = new WinTheGame
-    geography        = new Geography
-    grids            = new Grids
-    intelligence     = new Intelligence
-    latency          = new Latency
-    paths            = new Paths
-    performance      = new PerformanceMonitor
-    prioritizer      = new Prioritizer
-    realEstate       = new RealEstate
-    recruiter        = new Recruiter
-    scheduler        = new Scheduler
-    tasks            = new TaskQueueGlobal
-    units            = new UnitTracker
-    viewport         = new Viewport
-    visualization    = new Visualization
+    architect         = new Architect
+    bank              = new Bank
+    battles           = new BattleClassifier
+    groundskeeper     = new Groundskeeper
+    camera            = new Camera
+    economy           = new Economy
+    executor          = new Executor
+    commander         = new Commander
+    gameplan          = new WinTheGame
+    geography         = new Geography
+    grids             = new Grids
+    intelligence      = new Intelligence
+    latency           = new Latency
+    paths             = new Paths
+    performance       = new PerformanceMonitor
+    prioritizer       = new Prioritizer
+    realEstate        = new RealEstate
+    recruiter         = new Recruiter
+    scheduler         = new Scheduler
+    tasks             = new TaskQueueGlobal
+    units             = new UnitTracker
+    viewport          = new Viewport
+    visualization     = new Visualization
     
     game.setLocalSpeed(configuration.gameSpeed)
   }

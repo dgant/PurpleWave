@@ -1,5 +1,6 @@
 package Macro.SimCity
 
+import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Points.{Tile, TileRectangle}
 import Mathematics.Shapes.Spiral
@@ -8,9 +9,14 @@ import scala.collection.mutable
 
 class Architect {
   
-  private val bases = With.geography.ourBases.toList.sortBy(base => - base.mineralsLeft * base.zone.area)
-  private val exclusions = new mutable.ArrayBuffer[TileRectangle]
-  exclusions ++= bases.map(_.harvestingArea)
+  private var bases: Array[Base] = Array.empty
+  val exclusions: mutable.ArrayBuffer[TileRectangle] = new mutable.ArrayBuffer[TileRectangle]
+  
+  def reboot() {
+    bases = With.geography.ourBases.toArray.sortBy(base => - base.mineralsLeft * base.zone.area)
+    exclusions.clear()
+    exclusions ++= bases.map(_.harvestingArea)
+  }
   
   def fulfill(buildingDescriptor: BuildingDescriptor, tile: Option[Tile]): Option[Tile] = {
     
@@ -49,11 +55,13 @@ class Architect {
     searchRadius        : Int                     = 30)
       : Option[Tile] = {
     
-    bases.flatten(base =>
-      Spiral
-        .points(searchRadius)
-        .view
-        .map(base.heart.add))
-        .find(tile => buildingDescriptor.accepts(tile))
+    val points = bases.map(base =>
+        Spiral
+          .points(searchRadius)
+          .view
+          .map(base.heart.add))
+      .flatten
+      
+    points.find(tile => buildingDescriptor.accepts(tile))
   }
 }

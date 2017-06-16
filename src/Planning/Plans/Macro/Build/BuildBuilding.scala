@@ -10,17 +10,19 @@ import Planning.Composition.ResourceLocks.{LockArea, LockCurrencyForUnit, LockUn
 import ProxyBwapi.UnitClass.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Lifecycle.With
+import Macro.SimCity.BuildingDescriptor
 import Mathematics.Points.Tile
 import bwapi.Race
 
-class BuildBuilding(val buildingClass:UnitClass) extends Plan {
+class BuildBuilding(val buildingClass: UnitClass) extends Plan {
   
+  val buildingDescriptor = new BuildingDescriptor(this, buildingClass)
   val areaLock = new LockArea
   val currencyLock = new LockCurrencyForUnit(buildingClass)
   val builderLock = new LockUnits {
     description.set("Get a builder")
     unitCounter.set(UnitCountOne)
-    unitMatcher.set(new UnitMatchType(buildingClass.whatBuilds._1))
+    unitMatcher.set(UnitMatchType(buildingClass.whatBuilds._1))
     unitPreference.set(new UnitPreferClose)
   }
   private var builder:Option[FriendlyUnitInfo] = None

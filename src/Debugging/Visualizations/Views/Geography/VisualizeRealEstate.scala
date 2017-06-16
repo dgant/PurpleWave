@@ -7,7 +7,10 @@ import Planning.Composition.ResourceLocks.LockArea
 
 object VisualizeRealEstate {
   
-  def render() = With.realEstate.requests.foreach(renderArea)
+  def render() = {
+    With.architect.exclusions.foreach(DrawMap.tileRectangle(_, Colors.MidnightRed))
+    With.realEstate.requests.foreach(renderArea)
+  }
   
   def renderArea(lock:LockArea) {
     if ( ! lock.satisfied) return

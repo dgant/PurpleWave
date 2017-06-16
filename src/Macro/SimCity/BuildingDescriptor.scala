@@ -3,6 +3,8 @@ package Macro.SimCity
 import Lifecycle.With
 import Mathematics.Points.Tile
 import Planning.Plan
+import ProxyBwapi.Races.Protoss
+import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
 
 class BuildingDescriptor(
   val requestor : Plan,
@@ -13,6 +15,28 @@ class BuildingDescriptor(
   val townHall  : Boolean       = false,
   val gas       : Boolean       = false,
   val margin    : Boolean       = false) {
+  
+  def this(
+    requestor : Plan,
+    building  : UnitClass,
+    width     : Option[Int]     = None,
+    height    : Option[Int]     = None,
+    powers    : Option[Boolean] = None,
+    powered   : Option[Boolean] = None,
+    townHall  : Option[Boolean] = None,
+    gas       : Option[Boolean] = None,
+    margin    : Option[Boolean] = None) {
+    this(
+      requestor,
+      width     = width     .getOrElse(building.tileWidth),
+      height    = height    .getOrElse(building.tileHeight),
+      powers    = powers    .getOrElse(building == Protoss.Pylon),
+      powered   = powered   .getOrElse(building.requiresPsi),
+      townHall  = townHall  .getOrElse(building.isTownHall),
+      gas       = gas       .getOrElse(building.isRefinery),
+      margin    = margin    .getOrElse(UnitClasses.all.exists(unit => ! unit.isFlyer && unit.whatBuilds._1 == building))
+    )
+  }
   
   def fulfilledBy(suggestion: BuildingDescriptor): Boolean = {
     width     == suggestion.width                   &&

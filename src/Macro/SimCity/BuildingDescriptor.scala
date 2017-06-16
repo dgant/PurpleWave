@@ -26,6 +26,8 @@ class BuildingDescriptor(
   
   def accepts(tile: Tile): Boolean = {
     
+    if ( ! tile.valid) return false
+    
     if (powered) {
       if (width == 4 && ! With.grids.psi4x3.get(tile))        return false
       if (width == 3 && ! With.grids.psi2x2and3x2.get(tile))  return false
@@ -43,6 +45,8 @@ class BuildingDescriptor(
     val marginTiles = if (margin) 1 else 0
     var x = tile.x - marginTiles
     var y = tile.y - marginTiles
+    
+    // TODO: Reject areas occupied by units
     
     // While loops have lower overhead than other iterative mechanisms in Scala.
     while (x < tile.x + width + marginTiles) {

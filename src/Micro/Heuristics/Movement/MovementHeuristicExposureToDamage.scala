@@ -11,6 +11,5 @@ object MovementHeuristicExposureToDamage extends MovementHeuristic {
     if (state.threats.forall(_.melee)) return MovementHeuristicThreatDistance.evaluate(state, candidate)
     
     With.grids.dpsEnemy.get(candidate.tileIncluding, state.unit)
-    
   }
 }

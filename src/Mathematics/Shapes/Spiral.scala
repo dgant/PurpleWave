@@ -32,7 +32,7 @@ object Spiral {
           segment_length += 1
         }
       }
-      new Point(x, y)
+      Point(x, y)
     })
   }
 }

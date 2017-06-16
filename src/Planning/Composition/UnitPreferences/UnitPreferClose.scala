@@ -1,17 +1,14 @@
 package Planning.Composition.UnitPreferences
 
-import Planning.Composition.PixelFinders.Generic.TileMiddle
-import Planning.Composition.PixelFinders.TileFinder
+import Mathematics.Points.{Pixel, SpecificPoints}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Planning.Composition.Property
 
-class UnitPreferClose extends UnitPreference {
+class UnitPreferClose(initialPixel: Pixel = SpecificPoints.middle) extends UnitPreference {
   
-  val positionFinder = new Property[TileFinder](TileMiddle)
+  val pixel = new Property[Pixel](initialPixel)
   
   override def preference(unit: FriendlyUnitInfo): Double = {
-    positionFinder.get.find
-      .map(tile => tile.pixelCenter.pixelDistanceFast(unit.pixelCenter))
-      .getOrElse(0)
+    pixel.get.pixelDistanceFast(unit.pixelCenter)
   }
 }

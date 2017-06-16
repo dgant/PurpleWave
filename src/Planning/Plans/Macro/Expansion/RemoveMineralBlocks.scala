@@ -2,7 +2,6 @@ package Planning.Plans.Macro.Expansion
 
 import Lifecycle.With
 import Micro.Intent.Intention
-import Planning.Composition.PixelFinders.Generic.TileSpecific
 import Planning.Composition.Property
 import Planning.Composition.ResourceLocks.LockUnits
 import Planning.Composition.UnitCounters.UnitCountOne
@@ -27,7 +26,7 @@ class RemoveMineralBlocks extends Plan {
     if (ourMineralBlocks.isEmpty) return
     
     val mineral = ourMineralBlocks.head
-    miners.get.unitPreference.set(new UnitPreferClose { positionFinder.set(new TileSpecific(mineral.tileIncludingCenter)) } )
+    miners.get.unitPreference.set(new UnitPreferClose(mineral.pixelCenter))
     miners.get.acquire(this)
     miners.get.units.foreach(unit => With.executor.intend(new Intention(this, unit) { toGather = Some(mineral) }))
   }

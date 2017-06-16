@@ -17,7 +17,6 @@ object BustBunker extends Action {
     state.canAttack                                         &&
     state.unit.canMoveThisFrame                             &&
     state.unit.is(Protoss.Dragoon)                          &&
-    With.self.hasUpgrade(Protoss.DragoonRange)              &&
     ! With.enemies.exists(_.hasUpgrade(Terran.MarineRange)) &&
     state.threats.forall( ! _.is(Terran.SiegeTankSieged))   &&
     state.targets.exists(target => target.aliveAndComplete && target.is(Terran.Bunker))
@@ -26,19 +25,23 @@ object BustBunker extends Action {
   
   override protected def perform(state: ExecutionState) {
     
-    // Goal: Take down the bunker. Don't take any damage.
+    // Goal: Take down the bunker. Don't take any damage from it.
     
-    // Make darn sure we're not taking bunker damage!
     if (
-      state.unit.damageInLastSecond > 0 &&
-      state.threats.exists(threat =>
-        threat.is(Terran.Bunker) &&
-        threat.pixelDistanceSlow(state.unit) < With.configuration.bunkerSafetyMargin)) {
-      state.movementProfile.preferThreatDistance = 5.0
-      state.movementProfile.avoidDamage = 5.0
-      Reposition.delegate(state)
+      // If we don't have Dragoon range yet, back off.
+      With.units.ours.exists(unit => unit.researching && unit.upgradingType == Protoss.DragoonRange) ||
+        
+      // If we're getting shot at by the bunker, back off.
+      (
+        state.unit.damageInLastSecond > 0 &&
+        state.threats.exists(threat =>
+          threat.is(Terran.Bunker) &&
+          threat.pixelDistanceSlow(state.unit) < With.configuration.bunkerSafetyMargin)
+      )) {
+        state.movementProfile.preferThreatDistance = 100.0
+        Reposition.delegate(state)
     }
-    else {
+    else if (With.self.hasUpgrade(Protoss.DragoonRange)) {
       state.toAttack = Some(state.targets.minBy(_.pixelDistanceSquared(state.unit)))
       Attack.delegate(state)
     }

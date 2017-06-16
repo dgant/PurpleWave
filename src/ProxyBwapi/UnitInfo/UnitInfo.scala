@@ -80,18 +80,21 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   def pixelRangeAir: Double = pixelRangeAirCache.get
   private val pixelRangeAirCache = new CacheFrame(() =>
     unitClass.airRange +
-      (if (is(Terran.Marine)    && player.getUpgradeLevel(Terran.MarineRange)     > 0)  32.0 else 0.0) +
-      (if (is(Terran.Goliath)   && player.getUpgradeLevel(Terran.GoliathAirRange) > 0)  96.0 else 0.0) +
-      (if (is(Protoss.Dragoon)  && player.getUpgradeLevel(Protoss.DragoonRange)   > 0)  64.0 else 0.0) +
-      (if (is(Zerg.Hydralisk)   && player.getUpgradeLevel(Zerg.HydraliskRange)    > 0)  32.0 else 0.0) )
+      (if (is(Terran.Bunker))                                                 32.0 else 0.0) +
+      (if (is(Terran.Bunker)    && player.hasUpgrade(Terran.MarineRange))     32.0 else 0.0) +
+      (if (is(Terran.Marine)    && player.hasUpgrade(Terran.MarineRange))     32.0 else 0.0) +
+      (if (is(Terran.Goliath)   && player.hasUpgrade(Terran.GoliathAirRange)) 96.0 else 0.0) +
+      (if (is(Protoss.Dragoon)  && player.hasUpgrade(Protoss.DragoonRange))   64.0 else 0.0) +
+      (if (is(Zerg.Hydralisk)   && player.hasUpgrade(Zerg.HydraliskRange))    32.0 else 0.0))
   
   def pixelRangeGround: Double = pixelRangeGroundCache.get
   private val pixelRangeGroundCache = new CacheFrame(() =>
     unitClass.groundRange +
-      (if (is(Terran.Marine)    && player.getUpgradeLevel(Terran.MarineRange)     > 0)  32.0 else 0.0) +
-      (if (is(Terran.Bunker)    && player.getUpgradeLevel(Terran.MarineRange)   > 0)    32.0 else 0.0) +
-      (if (is(Protoss.Dragoon)  && player.getUpgradeLevel(Protoss.DragoonRange)   > 0)  64.0 else 0.0) +
-      (if (is(Zerg.Hydralisk)   && player.getUpgradeLevel(Zerg.HydraliskRange)    > 0)  32.0 else 0.0))
+      (if (is(Terran.Bunker))                                               32.0 else 0.0) +
+      (if (is(Terran.Bunker)    && player.hasUpgrade(Terran.MarineRange))   32.0 else 0.0) +
+      (if (is(Terran.Marine)    && player.hasUpgrade(Terran.MarineRange))   32.0 else 0.0) +
+      (if (is(Protoss.Dragoon)  && player.hasUpgrade(Protoss.DragoonRange)) 64.0 else 0.0) +
+      (if (is(Zerg.Hydralisk)   && player.hasUpgrade(Zerg.HydraliskRange))  32.0 else 0.0))
   
   def pixelRangeMax:Double = Math.max(pixelRangeAir, pixelRangeGround)
   

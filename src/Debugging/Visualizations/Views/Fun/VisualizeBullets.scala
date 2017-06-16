@@ -11,8 +11,7 @@ object VisualizeBullets {
   
   def render() {
     With.game.getBullets.asScala
-      .filter(_.isVisible)
-      .filter(_.exists)
+      .filter(bullet => bullet.isVisible && bullet.exists && bullet.getPlayer != null)
       .foreach(bullet => {
         DrawMap.circle(
           new Pixel(bullet.getPosition).add(-2, -2),

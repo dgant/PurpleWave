@@ -9,7 +9,7 @@ import Information.Grids.Grids
 import Information._
 import Macro.Allocation._
 import Macro.Scheduling.Scheduler
-import Macro.SimCity.{Architect, Groundskeeper}
+import Macro.Architecture.Architect
 import Micro.Intent.Commander
 import Micro.Task.Executor
 import Performance.TaskQueue.{AbstractTaskQueue, TaskQueueGlobal}
@@ -43,7 +43,6 @@ object With {
   var performance     : PerformanceMonitor  = _
   var proxy           : ProxyBWMirror       = _
   var prioritizer     : Prioritizer         = _
-  var realEstate      : RealEstate          = _
   var recruiter       : Recruiter           = _
   var scheduler       : Scheduler           = _
   var tasks           : AbstractTaskQueue   = _
@@ -93,7 +92,6 @@ object With {
     paths             = new Paths
     performance       = new PerformanceMonitor
     prioritizer       = new Prioritizer
-    realEstate        = new RealEstate
     recruiter         = new Recruiter
     scheduler         = new Scheduler
     tasks             = new TaskQueueGlobal

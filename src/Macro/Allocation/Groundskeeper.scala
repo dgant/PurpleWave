@@ -1,6 +1,7 @@
-package Macro.SimCity
+package Macro.Allocation
 
 import Lifecycle.With
+import Macro.Architecture.BuildingDescriptor
 import Mathematics.Points.Tile
 
 import scala.collection.mutable

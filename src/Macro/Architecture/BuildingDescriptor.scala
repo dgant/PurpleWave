@@ -1,4 +1,4 @@
-package Macro.SimCity
+package Macro.Architecture
 
 import Lifecycle.With
 import Mathematics.Points.Tile
@@ -7,36 +7,23 @@ import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
 
 class BuildingDescriptor(
-  val requestor : Plan,
-  val width     : Int,
-  val height    : Int,
-  val powers    : Boolean       = false,
-  val powered   : Boolean       = false,
-  val townHall  : Boolean       = false,
-  val gas       : Boolean       = false,
-  val margin    : Boolean       = false) {
+    val requestor : Plan,
+        argBuilding  : Option[UnitClass] = None,
+        argWidth     : Option[Int]       = None,
+        argHeight    : Option[Int]       = None,
+        argPowers    : Option[Boolean]   = None,
+        argPowered   : Option[Boolean]   = None,
+        argTownHall  : Option[Boolean]   = None,
+        argGas       : Option[Boolean]   = None,
+        argMargin    : Option[Boolean]   = None) {
   
-  def this(
-    requestor : Plan,
-    building  : UnitClass,
-    width     : Option[Int]     = None,
-    height    : Option[Int]     = None,
-    powers    : Option[Boolean] = None,
-    powered   : Option[Boolean] = None,
-    townHall  : Option[Boolean] = None,
-    gas       : Option[Boolean] = None,
-    margin    : Option[Boolean] = None) {
-    this(
-      requestor,
-      width     = width     .getOrElse(building.tileWidth),
-      height    = height    .getOrElse(building.tileHeight),
-      powers    = powers    .getOrElse(building == Protoss.Pylon),
-      powered   = powered   .getOrElse(building.requiresPsi),
-      townHall  = townHall  .getOrElse(building.isTownHall),
-      gas       = gas       .getOrElse(building.isRefinery),
-      margin    = margin    .getOrElse(UnitClasses.all.exists(unit => ! unit.isFlyer && unit.whatBuilds._1 == building))
-    )
-  }
+  val width     : Int     = argWidth     .orElse(argBuilding.map(_.tileWidth)).getOrElse(1)
+  val height    : Int     = argHeight    .orElse(argBuilding.map(_.tileHeight)).getOrElse(1)
+  val powers    : Boolean = argPowers    .getOrElse(argBuilding.contains(Protoss.Pylon))
+  val powered   : Boolean = argPowered   .getOrElse(argBuilding.exists(_.requiresPsi))
+  val townHall  : Boolean = argTownHall  .getOrElse(argBuilding.exists(_.isTownHall))
+  val gas       : Boolean = argGas       .getOrElse(argBuilding.exists(_.isRefinery))
+  val margin    : Boolean = argMargin    .getOrElse(argBuilding.exists(building => UnitClasses.all.exists(unit => ! unit.isFlyer && unit.whatBuilds._1 == building)))
   
   def fulfilledBy(suggestion: BuildingDescriptor): Boolean = {
     width     == suggestion.width                   &&

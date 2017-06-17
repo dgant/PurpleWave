@@ -1,4 +1,4 @@
-package Macro.SimCity
+package Macro.Architecture
 
 import Information.Geography.Types.Base
 import Lifecycle.With
@@ -16,6 +16,7 @@ class Architect {
     bases = With.geography.ourBases.toArray.sortBy(base => - base.mineralsLeft * base.zone.area)
     exclusions.clear()
     exclusions ++= bases.map(_.harvestingArea)
+    exclusions ++= With.units.ours.filter(_.unitClass.isBuilding).map(_.tileArea)
   }
   
   def fulfill(buildingDescriptor: BuildingDescriptor, tile: Option[Tile]): Option[Tile] = {

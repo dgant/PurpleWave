@@ -28,6 +28,7 @@ class BuildingDescriptor(
   val margin    : Boolean = argMargin    .getOrElse(argBuilding.exists(building => UnitClasses.all.exists(unit => ! unit.isFlyer && unit.whatBuilds._1 == building)))
   
   def fulfilledBy(suggestion: BuildingDescriptor): Boolean = {
+    if (suggestion == this) return true
     width     == suggestion.width                   &&
     height    == suggestion.height                  &&
     powers    == suggestion.powers    || ! powers   &&

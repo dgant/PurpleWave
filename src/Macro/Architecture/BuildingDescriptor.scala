@@ -7,15 +7,17 @@ import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
 
 class BuildingDescriptor(
-    val requestor : Plan,
-        argBuilding  : Option[UnitClass] = None,
-        argWidth     : Option[Int]       = None,
-        argHeight    : Option[Int]       = None,
-        argPowers    : Option[Boolean]   = None,
-        argPowered   : Option[Boolean]   = None,
-        argTownHall  : Option[Boolean]   = None,
-        argGas       : Option[Boolean]   = None,
-        argMargin    : Option[Boolean]   = None) {
+  val suggestor   : Plan,
+  argBuilding     : Option[UnitClass] = None,
+  argWidth        : Option[Int]       = None,
+  argHeight       : Option[Int]       = None,
+  argPowers       : Option[Boolean]   = None,
+  argPowered      : Option[Boolean]   = None,
+  argTownHall     : Option[Boolean]   = None,
+  argGas          : Option[Boolean]   = None,
+  argMargin       : Option[Boolean]   = None) {
+  
+  val frameCreated: Int = With.frame
   
   val width     : Int     = argWidth     .orElse(argBuilding.map(_.tileWidth)).getOrElse(1)
   val height    : Int     = argHeight    .orElse(argBuilding.map(_.tileHeight)).getOrElse(1)

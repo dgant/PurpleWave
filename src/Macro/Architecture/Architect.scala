@@ -15,8 +15,7 @@ class Architect {
   def reboot() {
     bases = With.geography.ourBases.toArray.sortBy(base => - base.mineralsLeft * base.zone.area)
     exclusions.clear()
-    exclusions ++= bases.map(_.harvestingArea)
-    exclusions ++= With.units.ours.filter(_.unitClass.isBuilding).map(_.tileArea)
+    exclusions ++= With.geography.bases.filterNot(_.owner.isEnemy).map(_.harvestingArea)
   }
   
   def fulfill(buildingDescriptor: BuildingDescriptor, tile: Option[Tile]): Option[Tile] = {
@@ -32,15 +31,43 @@ class Architect {
   }
   
   private def canBuild(buildingDescriptor: BuildingDescriptor, tile: Tile): Boolean = {
-    buildingDescriptor.accepts(tile) && ! violatesExclusion(buildingDescriptor, tile)
-  }
-  
-  private def violatesExclusion(buildingDescriptor: BuildingDescriptor, tile: Tile): Boolean = {
+    
+    if ( ! buildingDescriptor.accepts(tile)) {
+      return false
+    }
+    
     val buildArea = TileRectangle(
       tile.add(buildingDescriptor.buildStart),
       tile.add(buildingDescriptor.buildEnd))
     
+    if (violatesExclusion(buildingDescriptor, buildArea)) {
+      return false
+    }
+    if (tripsOnUnits(buildingDescriptor, buildArea)) {
+      return false
+    }
+    true
+  }
+  
+  private def violatesExclusion(buildingDescriptor: BuildingDescriptor, buildArea: TileRectangle): Boolean = {
     exclusions.exists(_.intersects(buildArea))
+  }
+  
+  private def tripsOnUnits(buildingDescriptor: BuildingDescriptor, buildArea: TileRectangle): Boolean = {
+    var totalWorkers = 0
+    buildArea.tiles.foreach(tile =>
+      With.grids.units.get(tile).foreach(unit =>
+        if (unit.isOurs && unit.unitClass.isWorker) {
+          totalWorkers += 1
+          if (totalWorkers > 1) {
+            return true
+          }
+        }
+        else if ( ! unit.flying) {
+          return true
+        }
+      ))
+    false
   }
   
   private def exclude(buildingDescriptor: BuildingDescriptor, tile: Tile) {
@@ -56,13 +83,12 @@ class Architect {
     searchRadius        : Int                     = 30)
       : Option[Tile] = {
     
-    val points = bases.map(base =>
-        Spiral
-          .points(searchRadius)
-          .view
-          .map(base.heart.add))
-      .flatten
+    val points = bases.flatMap(base =>
+      Spiral
+        .points(searchRadius)
+        .view
+        .map(base.heart.add))
       
-    points.find(tile => buildingDescriptor.accepts(tile))
+    points.find(canBuild(buildingDescriptor, _))
   }
 }

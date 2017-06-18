@@ -3,17 +3,15 @@ package Information.Geography
 import Information.Geography.Calculations.{ZoneBuilder, ZoneUpdater}
 import Information.Geography.Types.{Base, Zone, ZoneEdge}
 import Lifecycle.With
-import Mathematics.Points
 import Mathematics.Points.{SpecificPoints, Tile, TileRectangle}
 import Performance.Caching.{Cache, Limiter}
 import ProxyBwapi.UnitInfo.UnitInfo
-import com.sun.glass.ui.Pixels
 
 import scala.collection.mutable
 
 class Geography {
   
-  val mapArea             : TileRectangle           = new TileRectangle(new Tile(0, 0), new Tile(With.mapWidth, With.mapHeight))
+  val mapArea             : TileRectangle           = TileRectangle(Tile(0, 0), Tile(With.mapWidth, With.mapHeight))
   val allTiles            : Iterable[Tile]          = mapArea.tiles
   lazy val zones          : Iterable[Zone]          = ZoneBuilder.build
   def bases               : Iterable[Base]          = zones.flatten(_.bases)

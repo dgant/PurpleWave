@@ -7,6 +7,6 @@ import Lifecycle.With
 object VisualizeRealEstate {
   
   def render() = {
-    With.architect.exclusions.foreach(DrawMap.tileRectangle(_, Colors.MidnightRed))
+    With.architect.exclusions.foreach(DrawMap.tileRectangle(_, Colors.DarkRed))
   }
 }

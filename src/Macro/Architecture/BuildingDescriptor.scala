@@ -47,12 +47,16 @@ class BuildingDescriptor(
   
   def accepts(tile: Tile): Boolean = {
     
-    if ( ! tile.valid) return false
-    
     if (powered) {
-      if (width == 4 && ! With.grids.psi4x3.get(tile))        return false
-      if (width == 3 && ! With.grids.psi2x2and3x2.get(tile))  return false
-      if (width == 2 && ! With.grids.psi2x2and3x2.get(tile))  return false
+      if (width == 4 && ! With.grids.psi4x3.get(tile)) {
+        return false
+      }
+      if (width == 3 && ! With.grids.psi2x2and3x2.get(tile)) {
+        return false
+      }
+      if (width == 2 && ! With.grids.psi2x2and3x2.get(tile)) {
+        return false
+      }
     }
     
     if (townHall) {
@@ -75,15 +79,22 @@ class BuildingDescriptor(
     while (x < xMax) {
       while (y < yMax) {
         val nextTile = Tile(x, y)
+        if ( ! nextTile.valid) {
+          return false
+        }
         if (
           nextTile.x < tile.x         ||
           nextTile.y < tile.y         ||
           nextTile.x > tileBuildEnd.x ||
           nextTile.y > tileBuildEnd.y) {
-          if ( ! With.grids.walkable.get(nextTile)) return false
+          if ( ! With.grids.walkable.get(nextTile)) {
+            return false
+          }
         }
         else {
-          if ( ! With.grids.buildable.get(nextTile)) return false
+          if ( ! With.grids.buildable.get(nextTile)) {
+            return false
+          }
         }
         y += 1
       }

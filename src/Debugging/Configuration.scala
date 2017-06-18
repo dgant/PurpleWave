@@ -33,6 +33,7 @@ class Configuration {
   ///////////
   
   var maxMineralsBeforeMinedOut = 300 * 8
+  var blockerMineralThreshold   = 50
   
   /////////////
   // Battles //

@@ -23,7 +23,7 @@ class Groundskeeper {
     Vector(placed.keys, unplaced)
       .foreach(descriptors => sortByPriority(descriptors)
         .foreach(suggestion =>
-          if (With.performance.continueRunning) {
+          if (true || With.performance.continueRunning) {
             val tile = With.architect.fulfill(suggestion, placed.get(suggestion))
             if (tile.isDefined) placed.put(suggestion, tile.get) else placed.remove(suggestion)
           }))

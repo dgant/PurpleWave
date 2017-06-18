@@ -48,7 +48,7 @@ object ZoneBuilder {
   
   def buildZone(region:Region):Zone = {
     val polygon = region.getPolygon
-    val tileArea = new TileRectangle(
+    val tileArea = TileRectangle(
       Pixel(
         polygon.getPoints.asScala.map(_.getX).min,
         polygon.getPoints.asScala.map(_.getY).min).tileIncluding,

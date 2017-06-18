@@ -9,5 +9,5 @@ object Square {
   def pointsDownAndRight(count:Int):Iterable[Point] =
     (0 until count).flatten(dy =>
       (0 until count).map(dx =>
-        new Point(dx, dy)))
+        Point(dx, dy)))
 }

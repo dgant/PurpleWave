@@ -7,7 +7,7 @@ object SpecificPoints {
     With.mapWidth * 32 / 2,
     With.mapHeight * 32 / 2)
   
-  def tileMiddle = new Tile(
+  def tileMiddle = Tile(
       With.mapWidth / 2,
       With.mapHeight / 2)
 }

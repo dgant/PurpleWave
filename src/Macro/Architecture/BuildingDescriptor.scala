@@ -60,7 +60,7 @@ class BuildingDescriptor(
     }
     
     if (townHall) {
-      // TODO: Verify legality
+      With.geography.bases.exists(base => base.townHallArea.startInclusive == buildStart)
     }
     
     if (gas) {

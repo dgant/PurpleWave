@@ -34,11 +34,11 @@ case object EnrichPixel {
   
   implicit class EnrichedRectangleCollection(rectangles:Iterable[TileRectangle]) {
     def boundary: TileRectangle =
-      new TileRectangle(
-        new Tile(
+      TileRectangle(
+        Tile(
           rectangles.map(_.startInclusive.x).min,
           rectangles.map(_.startInclusive.y).min),
-        new Tile(
+        Tile(
           rectangles.map(_.endExclusive.x).max,
           rectangles.map(_.endExclusive.y).max))
   }
@@ -46,17 +46,17 @@ case object EnrichPixel {
   implicit class EnrichedTileCollection(positions:Iterable[Tile]) {
     def minBound:Tile = {
       if (positions.isEmpty) return SpecificPoints.tileMiddle
-      new Tile(
+      Tile(
         positions.view.map(_.x).min,
         positions.view.map(_.y).min)}
     def maxBound:Tile = {
       if (positions.isEmpty) return SpecificPoints.tileMiddle
-      new Tile(
+      Tile(
         positions.view.map(_.x).max,
         positions.view.map(_.y).max)}
     def centroid:Tile = {
       if (positions.isEmpty) return SpecificPoints.tileMiddle
-      new Tile(
+      Tile(
         positions.view.map(_.x).sum / positions.size,
         positions.view.map(_.y).sum / positions.size)
     }

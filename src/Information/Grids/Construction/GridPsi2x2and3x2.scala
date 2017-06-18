@@ -13,7 +13,7 @@ class GridPsi2x2and3x2 extends AbstractGridPsi {
   override val psiPoints:Array[Point] =
     (-8 to 7).flatten(x =>
       (-4 to 4).map(y =>
-        new Point(x, y)))
+        Point(x, y)))
       .filter(point =>
         point.y match {
           case -4|3         =>  point.x >= -6 && point.x <= 5

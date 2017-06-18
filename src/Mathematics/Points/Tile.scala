@@ -4,12 +4,12 @@ import Information.Geography.Types.Zone
 import Lifecycle.With
 import bwapi.TilePosition
 
-case class Tile(argX:Int, argY:Int) extends AbstractPoint(argX, argY) {
+case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   
-  def this(i:Int) = this(i % With.mapWidth, i / With.mapWidth )
-  def this(tilePosition:TilePosition) = this(tilePosition.getX, tilePosition.getY)
+  def this(i: Int) = this(i % With.mapWidth, i / With.mapWidth )
+  def this(tilePosition: TilePosition) = this(tilePosition.getX, tilePosition.getY)
   
-  def bwapi:TilePosition = new TilePosition(x, y)
+  def bwapi: TilePosition = new TilePosition(x, y)
   
   // Performance optimization: This is not a strict equality check!
   // If you try to compare a Tile to a non-Tile you can get incorrect results.
@@ -28,7 +28,7 @@ case class Tile(argX:Int, argY:Int) extends AbstractPoint(argX, argY) {
     x + With.mapWidth * y
   }
   def add(dx: Int, dy: Int): Tile = {
-    new Tile(x + dx, y + dy)
+    Tile(x + dx, y + dy)
   }
   def add(point: Point): Tile = {
     add(point.x, point.y)
@@ -43,10 +43,10 @@ case class Tile(argX:Int, argY:Int) extends AbstractPoint(argX, argY) {
     subtract(tile.x, tile.y)
   }
   def multiply(scale: Int): Tile = {
-    new Tile(scale * x, scale * y)
+    Tile(scale * x, scale * y)
   }
   def divide(scale: Int): Tile = {
-    new Tile(x/scale, y/scale)
+    Tile(x/scale, y/scale)
   }
   def midpoint(pixel: Tile): Tile = {
     add(pixel).divide(2)

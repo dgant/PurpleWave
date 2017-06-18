@@ -151,7 +151,7 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
   }
   
   private var _pixelCenter : Pixel  = Pixel(0, 0)
-  private var _tileTopLeft : Tile   = new Tile(0, 0)
+  private var _tileTopLeft : Tile   = Tile(0, 0)
   private var _top         : Int    = _
   private var _left        : Int    = _
   private var _right       : Int    = _

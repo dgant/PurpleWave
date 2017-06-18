@@ -11,7 +11,7 @@ object VisualizeGrids {
   }
   
   private def renderGridArray[T](map:AbstractGrid[T], offsetX:Int=0, offsetY:Int=0) {
-    val viewportTiles = new TileRectangle(With.viewport.start.tileIncluding, With.viewport.end.tileIncluding)
+    val viewportTiles = TileRectangle(With.viewport.start.tileIncluding, With.viewport.end.tileIncluding)
     viewportTiles.tiles
       .filterNot(tile => map.get(tile) == map.defaultValue)
       .foreach(tile => DrawMap.text(

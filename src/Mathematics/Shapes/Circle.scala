@@ -15,7 +15,7 @@ object Circle {
             (x, y, x * x + y * y < radius * radius)
           ))
           .filter(_._3)
-          .map(point => new Point(point._1, point._2))
+          .map(point => Point(point._1, point._2))
           .toVector)
       this (radius)
     }

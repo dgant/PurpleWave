@@ -90,7 +90,7 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
   lazy val orderable:Boolean = ! isSpell && ! Set(Protoss.Interceptor, Protoss.Scarab, Terran.SpiderMine).contains(this)
   lazy val isMinerals:Boolean = isMineralField
   lazy val isGas:Boolean = Vector(Neutral.Geyser, Terran.Refinery, Protoss.Assimilator, Zerg.Extractor).contains(this)
-  lazy val tileArea:TileRectangle = new TileRectangle(new Tile(0, 0), tileSize)
+  lazy val tileArea:TileRectangle = TileRectangle(Tile(0, 0), tileSize)
   lazy val isTownHall:Boolean = Vector(Terran.CommandCenter, Protoss.Nexus, Zerg.Hatchery, Zerg.Lair, Zerg.Hive).contains(this)
   
   ///////////

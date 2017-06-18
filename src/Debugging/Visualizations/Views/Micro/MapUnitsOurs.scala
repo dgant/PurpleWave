@@ -5,7 +5,7 @@ import Debugging.Visualizations.Rendering.DrawMap
 import Lifecycle.With
 import Micro.Task.ExecutionState
 
-object VisualizeUnitsOurs {
+object MapUnitsOurs {
   
   def render() = {
     With.executor.states.foreach(renderUnitState)

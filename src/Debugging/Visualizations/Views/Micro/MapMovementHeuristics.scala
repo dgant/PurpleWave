@@ -8,7 +8,7 @@ import Mathematics.Points.Pixel
 import Micro.Heuristics.Movement.MovementHeuristicResult
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-object VisualizeMovementHeuristics {
+object MapMovementHeuristics {
   
   def render() {
     

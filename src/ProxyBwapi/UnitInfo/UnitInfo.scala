@@ -291,7 +291,7 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
       pixelCenter.project(
         targetPixel
           .orElse(orderTargetPixel)
-          .getOrElse(pixelCenter.radiateRadians(angleFacingRadians, 10)),
+          .getOrElse(pixelCenter.radiateRadians(angleRadians, 10)),
         Math.min(pixelDistanceFast(victim), topSpeed * With.configuration.violenceFrameThreshold))) <=
       pixelRangeAgainstFromEdge(victim)
   }

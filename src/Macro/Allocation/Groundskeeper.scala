@@ -8,9 +8,9 @@ import scala.collection.mutable
 
 class Groundskeeper {
 
-  private val updated   = new mutable.HashSet[BuildingDescriptor]
-  private val unplaced  = new mutable.HashSet[BuildingDescriptor]
-  private val placed    = new mutable.HashMap[BuildingDescriptor, Tile]
+  val updated   : mutable.Set[BuildingDescriptor]       = new mutable.HashSet[BuildingDescriptor]
+  val unplaced  : mutable.Set[BuildingDescriptor]       = new mutable.HashSet[BuildingDescriptor]
+  val placed    : mutable.Map[BuildingDescriptor, Tile] = new mutable.HashMap[BuildingDescriptor, Tile]
   
   def update() {
     unplaced.diff(updated).foreach(removeDescriptor)

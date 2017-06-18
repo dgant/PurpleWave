@@ -3,7 +3,7 @@ package Debugging.Visualizations.Views.Economy
 import Debugging.Visualizations.Rendering.DrawScreen
 import Lifecycle.With
 
-object VisualizeEconomy {
+object ScreenEconomy {
   def render() {
     val labels = Vector(
       "Active miners:",

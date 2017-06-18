@@ -8,7 +8,7 @@ import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
 
 class BuildingDescriptor(
   val suggestor   : Plan,
-  argBuilding     : Option[UnitClass] = None,
+  val argBuilding : Option[UnitClass] = None,
   argWidth        : Option[Int]       = None,
   argHeight       : Option[Int]       = None,
   argPowers       : Option[Boolean]   = None,
@@ -25,7 +25,7 @@ class BuildingDescriptor(
   val powered   : Boolean = argPowered   .getOrElse(argBuilding.exists(_.requiresPsi))
   val townHall  : Boolean = argTownHall  .getOrElse(argBuilding.exists(_.isTownHall))
   val gas       : Boolean = argGas       .getOrElse(argBuilding.exists(_.isRefinery))
-  val margin    : Boolean = argMargin    .getOrElse(argBuilding.exists(building => UnitClasses.all.exists(unit => ! unit.isFlyer && unit.whatBuilds._1 == building)))
+  val margin    : Boolean = argMargin    .getOrElse( ! townHall && argBuilding.exists(building => UnitClasses.all.exists(unit => ! unit.isFlyer && unit.whatBuilds._1 == building)))
   
   def fulfilledBy(suggestion: BuildingDescriptor): Boolean = {
     if (suggestion == this) return true
@@ -60,11 +60,15 @@ class BuildingDescriptor(
     }
     
     if (townHall) {
-      With.geography.bases.exists(base => base.townHallArea.startInclusive == buildStart)
+      if ( ! With.geography.bases.exists(base => base.townHallArea.startInclusive == buildStart)) {
+        return false
+      }
     }
     
     if (gas) {
-      // TODO: Verify legality
+      if( ! With.units.neutral.exists(unit => unit.unitClass.isGas && unit.tileTopLeft == tile)) {
+        return false
+      }
     }
     
     var x             = tile.add(marginStart).x
@@ -103,4 +107,16 @@ class BuildingDescriptor(
     
     true
   }
+  
+  override def toString: String =
+    suggestor.toString
+    ": " +
+    argBuilding.map(_.toString + " ").getOrElse("") +
+    width + "x" + height + " " +
+    (if (margin) width + 2 * marginTiles + "x" + height + 2 * marginTiles + " " else "") +
+    (if (powers) "(Powers) " else "") +
+    (if (powered) "(Powered) " else "") +
+    (if (townHall) "(Town hall) " else "") +
+    (if (gas) "(Gas) " else "")
+  
 }

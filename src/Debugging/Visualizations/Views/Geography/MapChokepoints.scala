@@ -3,7 +3,7 @@ package Debugging.Visualizations.Views.Geography
 import Debugging.Visualizations.Rendering.DrawMap
 import Lifecycle.With
 
-object VisualizeChokepoints {
+object MapChokepoints {
   
   def render() {
     

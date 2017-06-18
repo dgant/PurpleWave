@@ -2,7 +2,7 @@ package Debugging.Visualizations.Views.Fun
 
 import Lifecycle.With
 
-object VisualizeBlackScreenOverlay {
+object ScreenBlackScreenOverlay {
   
   def render(visionLabel:String) {
     With.game.setTextSize(bwapi.Text.Size.Enum.Large)

@@ -5,7 +5,7 @@ import Information.Grids.AbstractGrid
 import Lifecycle.With
 import Mathematics.Points.TileRectangle
 
-object VisualizeGrids {
+object MapGrids {
   def render() {
     renderGridArray(With.grids.dpsEnemyApproximate,  0, 0)
   }

@@ -7,7 +7,7 @@ import ProxyBwapi.Players.Players
 
 import scala.collection.JavaConverters._
 
-object VisualizeBullets {
+object MapBullets {
   
   def render() {
     With.game.getBullets.asScala

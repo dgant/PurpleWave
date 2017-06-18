@@ -295,7 +295,7 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
   private var _velocityY      : Double    = _
   
   def accelerating  : Boolean = _accelerating
-  def angleFacingRadians         : Double  = _angle
+  def angleRadians  : Double  = _angle
   def braking       : Boolean = _braking
   def ensnared      : Boolean = _ensnared
   def flying        : Boolean = _flying

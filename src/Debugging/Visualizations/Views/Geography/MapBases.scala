@@ -4,7 +4,7 @@ import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
 import Lifecycle.With
 
-object VisualizeBases {
+object MapBases {
   
   def render() {
     With.geography.zones.foreach(zone => {

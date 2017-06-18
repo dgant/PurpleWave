@@ -3,7 +3,7 @@ package Debugging.Visualizations.Views.Economy
 import Debugging.Visualizations.Rendering.DrawScreen
 import Lifecycle.With
 
-object VisualizeScheduler {
+object ScreenScheduler {
   
   def render() {
     With.game.drawTextScreen(5, 31, "Original queue")

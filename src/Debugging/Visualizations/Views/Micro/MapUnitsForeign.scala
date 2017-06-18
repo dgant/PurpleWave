@@ -4,7 +4,7 @@ import Debugging.Visualizations.Rendering.DrawMap
 import Lifecycle.With
 import ProxyBwapi.UnitInfo.ForeignUnitInfo
 
-object VisualizeUnitsForeign {
+object MapUnitsForeign {
   
   def render() {
     With.units.enemy.foreach(drawTrackedUnit)

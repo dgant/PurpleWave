@@ -6,7 +6,7 @@ import Debugging.Visualizations.Views.Fun.{ViewHappy, ViewTextOnly}
 import Debugging.Visualizations.Views.Geography._
 import Debugging.Visualizations.Views.Micro._
 import Debugging.Visualizations.Views.Performance.ViewPerformance
-import Debugging.Visualizations.Views.Planning.{ViewPlanning, VisualizePlansMap}
+import Debugging.Visualizations.Views.Planning.{ViewPlanning, MapPlans}
 import Debugging.Visualizations.Views.View
 import Lifecycle.With
 
@@ -17,12 +17,13 @@ class Visualization {
   val lineHeightSmall = 9
   
   private val viewCycle = Vector(
+    ViewGeography,
     ViewEconomy,
     ViewPerformance,
     ViewPlanning
   )
   
-  private var view: View = ViewPlanning
+  private var view: View = ViewGeography
   private var lastCycle = 0
   
   var cycle     = false
@@ -49,11 +50,14 @@ class Visualization {
     }
     else {
       if (map) {
-        ViewGeography.render()
+        MapGeography.render()
+        MapChokepoints.render()
+        MapBases.render()
+        MapArchitecture.render()
         if (grids) {
-          VisualizeGrids.render()
+          MapGrids.render()
         }
-        VisualizePlansMap.render()
+        MapPlans.render()
         ViewMicro.render()
       }
       if (screen) {

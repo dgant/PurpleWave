@@ -3,7 +3,7 @@ package Debugging.Visualizations.Views.Planning
 import Lifecycle.With
 import Planning.Plan
 
-object VisualizePlansMap {
+object MapPlans {
   
   def render() {
     visualizePlansRecursively(With.gameplan)

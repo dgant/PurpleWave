@@ -10,12 +10,14 @@ import scala.collection.mutable
 class Architect {
   
   private var bases: Array[Base] = Array.empty
-  val exclusions: mutable.ArrayBuffer[TileRectangle] = new mutable.ArrayBuffer[TileRectangle]
+  val exclusions: mutable.ArrayBuffer[Exclusion] = new mutable.ArrayBuffer[Exclusion]
   
   def reboot() {
     bases = With.geography.ourBases.toArray.sortBy(base => - base.mineralsLeft * base.zone.area)
     exclusions.clear()
-    exclusions ++= With.geography.bases.filterNot(_.owner.isEnemy).map(_.harvestingArea)
+    exclusions ++= With.geography.bases
+      .filterNot(_.owner.isEnemy)
+      .map(base => Exclusion("Harvesting area", base.harvestingArea))
   }
   
   def fulfill(buildingDescriptor: BuildingDescriptor, tile: Option[Tile]): Option[Tile] = {
@@ -50,7 +52,7 @@ class Architect {
   }
   
   private def violatesExclusion(buildingDescriptor: BuildingDescriptor, buildArea: TileRectangle): Boolean = {
-    exclusions.exists(_.intersects(buildArea))
+    exclusions.exists(_.area.intersects(buildArea))
   }
   
   private def tripsOnUnits(buildingDescriptor: BuildingDescriptor, buildArea: TileRectangle): Boolean = {
@@ -72,9 +74,11 @@ class Architect {
   
   private def exclude(buildingDescriptor: BuildingDescriptor, tile: Tile) {
     val margin = if (buildingDescriptor.margin) 1 else 0
-    exclusions += TileRectangle(
-      tile.add(buildingDescriptor.marginStart),
-      tile.add(buildingDescriptor.marginEnd))
+    exclusions += Exclusion(
+      buildingDescriptor.toString,
+      TileRectangle(
+        tile.add(buildingDescriptor.marginStart),
+        tile.add(buildingDescriptor.marginEnd)))
   }
   
   private def placeBuilding(

@@ -3,7 +3,7 @@ package Debugging.Visualizations.Views.Planning
 import Lifecycle.With
 import Planning.Plan
 
-object VisualizePlansScreen {
+object ScreenPlans {
   
   def render() {
     describePlanTree(With.gameplan, 0, 0)

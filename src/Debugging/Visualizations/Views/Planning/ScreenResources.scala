@@ -3,7 +3,7 @@ package Debugging.Visualizations.Views.Planning
 import Debugging.Visualizations.Rendering.DrawScreen
 import Lifecycle.With
 
-object VisualizeResources {
+object ScreenResources {
   def render() {
     DrawScreen.table(
       285,

@@ -7,7 +7,7 @@ import Mathematics.Points.Pixel
 import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.Color
 
-object VisualizeUnits {
+object MapUnits {
   
   def render() {
     With.units.all.foreach(renderUnit)

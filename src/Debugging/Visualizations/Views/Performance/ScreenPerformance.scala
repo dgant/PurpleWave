@@ -3,7 +3,7 @@ package Debugging.Visualizations.Views.Performance
 import Debugging.Visualizations.Rendering.DrawScreen
 import Lifecycle.With
 
-object VisualizePerformance {
+object ScreenPerformance {
   def render() {
     DrawScreen.header(50,  With.game.getLatencyFrames             + " latency frames")
     DrawScreen.header(125, With.latency.turnSize                  + " frames/turn")

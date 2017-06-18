@@ -5,6 +5,6 @@ import Debugging.Visualizations.Views.View
 object ViewPerformance extends View {
 
   def render() {
-    VisualizePerformance.render()
+    ScreenPerformance.render()
   }
 }

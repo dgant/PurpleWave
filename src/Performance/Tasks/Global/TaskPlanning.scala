@@ -13,5 +13,6 @@ class TaskPlanning extends AbstractTask {
     With.prioritizer.update()
     With.gameplan.update()
     With.scheduler.update()
+    With.groundskeeper.update()
   }
 }

@@ -4,6 +4,7 @@ import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Points.{Tile, TileRectangle}
 import Mathematics.Shapes.Spiral
+import ProxyBwapi.Races.Neutral
 
 import scala.collection.mutable
 
@@ -17,7 +18,11 @@ class Architect {
     exclusions.clear()
     exclusions ++= With.geography.bases
       .filterNot(_.owner.isEnemy)
-      .map(base => Exclusion("Harvesting area", base.harvestingArea))
+      .map(base => Exclusion(
+        "Harvesting area",
+        base.harvestingArea,
+        gasAllowed = true,
+        townHallAllowed = true))
   }
   
   def fulfill(buildingDescriptor: BuildingDescriptor, tile: Option[Tile]): Option[Tile] = {
@@ -43,20 +48,25 @@ class Architect {
     }
     
     val buildArea = TileRectangle(
-      tile.add(buildingDescriptor.buildStart),
-      tile.add(buildingDescriptor.buildEnd))
+      tile.add(buildingDescriptor.relativeBuildStart),
+      tile.add(buildingDescriptor.relativeBuildEnd))
     
-    if ( ! buildingDescriptor.gas && ! buildingDescriptor.townHall && violatesExclusion(buildingDescriptor, buildArea)) {
+    if (violatesExclusion(buildingDescriptor, buildArea)) {
       return false
     }
     if ( ! buildingDescriptor.gas && tripsOnUnits(buildingDescriptor, buildArea)) {
       return false
     }
+    
     true
   }
   
   private def violatesExclusion(buildingDescriptor: BuildingDescriptor, buildArea: TileRectangle): Boolean = {
-    exclusions.exists(_.area.intersects(buildArea))
+    exclusions
+      .exists(exclusion =>
+        ! (exclusion.gasAllowed       && buildingDescriptor.gas)       &&
+        ! (exclusion.townHallAllowed  && buildingDescriptor.townHall)  &&
+        exclusion.area.intersects(buildArea))
   }
   
   private def tripsOnUnits(buildingDescriptor: BuildingDescriptor, buildArea: TileRectangle): Boolean = {
@@ -68,6 +78,9 @@ class Architect {
           if (totalWorkers > 1) {
             return true
           }
+        }
+        else if ( ! buildingDescriptor.gas || ! unit.is(Neutral.Geyser)) {
+          return true
         }
         else if ( ! unit.flying) {
           return true
@@ -81,8 +94,10 @@ class Architect {
     exclusions += Exclusion(
       buildingDescriptor.toString,
       TileRectangle(
-        tile.add(buildingDescriptor.marginStart),
-        tile.add(buildingDescriptor.marginEnd)))
+        tile.add(buildingDescriptor.relativeMarginStart),
+        tile.add(buildingDescriptor.relativeMarginEnd)),
+      gasAllowed      = false,
+      townHallAllowed = false)
   }
   
   private def placeBuilding(
@@ -91,12 +106,21 @@ class Architect {
     searchRadius        : Int                     = 30)
       : Option[Tile] = {
     
-    val points = bases.flatMap(base =>
-      Spiral
-        .points(searchRadius)
-        .view
-        .map(base.heart.add))
+    val points: Iterable[Tile] =
+      if (buildingDescriptor.townHall) {
+        With.geography.bases.map(_.townHallArea.startInclusive)
+      }
+      else if (buildingDescriptor.gas) {
+        With.units.neutral.filter(_.unitClass.isGas).map(_.tileTopLeft)
+      }
+      else {
+        bases.flatMap(base =>
+          Spiral
+            .points(searchRadius)
+            .view
+            .map(base.heart.add))
+      }
       
-    points.find(canBuild(buildingDescriptor, _))
+      points.find(canBuild(buildingDescriptor, _))
   }
 }

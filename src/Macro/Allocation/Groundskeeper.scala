@@ -56,11 +56,13 @@ class Groundskeeper {
         return Some(tile)
       })
     
+    /*
     // Do we have a placement for a matching descriptor? Use that placement.
     sortByPriority(placed.keys)
       .find(descriptor.fulfilledBy)
       .foreach(matchingPlacement =>
         return placed.put(descriptor, placed(matchingPlacement)))
+    */
     
     // This request is a new suggestion. Add it.
     suggest(descriptor)

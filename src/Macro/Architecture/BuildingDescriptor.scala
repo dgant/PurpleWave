@@ -40,10 +40,10 @@ class BuildingDescriptor(
   
   def marginTiles: Int = if(margin) 1 else 0
   
-  def buildStart  : Tile = Tile(0, 0)
-  def buildEnd    : Tile = Tile(width, height)
-  def marginStart : Tile = buildStart.subtract(marginTiles, marginTiles)
-  def marginEnd   : Tile = buildEnd.add(marginTiles, marginTiles)
+  def relativeBuildStart  : Tile = Tile(0, 0)
+  def relativeBuildEnd    : Tile = Tile(width, height)
+  def relativeMarginStart : Tile = relativeBuildStart.subtract(marginTiles, marginTiles)
+  def relativeMarginEnd   : Tile = relativeBuildEnd.add(marginTiles, marginTiles)
   
   def accepts(tile: Tile): Boolean = {
     
@@ -60,7 +60,7 @@ class BuildingDescriptor(
     }
     
     if (townHall) {
-      if ( ! With.geography.bases.exists(base => base.townHallArea.startInclusive == buildStart)) {
+      if ( ! With.geography.bases.exists(base => base.townHallArea.startInclusive == tile)) {
         return false
       }
     }
@@ -71,26 +71,26 @@ class BuildingDescriptor(
       }
     }
     
-    var x             = tile.add(marginStart).x
-    var y             = tile.add(marginStart).y
-    val xMax          = tile.add(marginEnd).x
-    val yMax          = tile.add(marginEnd).y
-    val tileBuildEnd  = tile.add(buildEnd)
+    var x             = tile.add(relativeMarginStart).x
+    val xMax          = tile.add(relativeMarginEnd).x
+    val yMax          = tile.add(relativeMarginEnd).y
+    val tileBuildEnd  = tile.add(relativeBuildEnd)
     
     // TODO: Reject areas occupied by units
     
     // While loops have lower overhead than other iterative mechanisms in Scala.
     while (x < xMax) {
+      var y = tile.add(relativeMarginStart).y
       while (y < yMax) {
         val nextTile = Tile(x, y)
         if ( ! nextTile.valid) {
           return false
         }
         if (
-          nextTile.x < tile.x         ||
-          nextTile.y < tile.y         ||
-          nextTile.x > tileBuildEnd.x ||
-          nextTile.y > tileBuildEnd.y) {
+          nextTile.x < tile.x           ||
+          nextTile.y < tile.y           ||
+          nextTile.x >= tileBuildEnd.x  ||
+          nextTile.y >= tileBuildEnd.y) {
           if ( ! With.grids.walkable.get(nextTile)) {
             return false
           }

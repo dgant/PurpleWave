@@ -22,9 +22,13 @@ class Architect {
   
   def fulfill(buildingDescriptor: BuildingDescriptor, tile: Option[Tile]): Option[Tile] = {
     
-    if (tile.isDefined && canBuild(buildingDescriptor, tile.get)) {
-      exclude(buildingDescriptor, tile.get)
-      return tile
+    if (tile.isDefined) {
+      if (canBuild(buildingDescriptor, tile.get)) {
+        exclude(buildingDescriptor, tile.get)
+        return tile
+      } else {
+        val setBreakpointHere = false
+      }
     }
   
     val output = placeBuilding(buildingDescriptor)

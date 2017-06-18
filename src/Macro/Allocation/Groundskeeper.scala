@@ -13,6 +13,9 @@ class Groundskeeper {
   val placed    : mutable.Map[BuildingDescriptor, Tile] = new mutable.HashMap[BuildingDescriptor, Tile]
   
   def update() {
+    if (updated.isEmpty) {
+      return
+    }
     unplaced.diff(updated).foreach(removeDescriptor)
     placed.keySet.diff(updated).foreach(removeDescriptor)
     updated.clear()
@@ -25,7 +28,12 @@ class Groundskeeper {
         .foreach(suggestion =>
           if (true || With.performance.continueRunning) {
             val tile = With.architect.fulfill(suggestion, placed.get(suggestion))
-            if (tile.isDefined) placed.put(suggestion, tile.get) else placed.remove(suggestion)
+            if (tile.isDefined) {
+              placed.put(suggestion, tile.get)
+            }
+            else {
+              placed.remove(suggestion)
+            }
           }))
   }
   

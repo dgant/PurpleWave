@@ -29,12 +29,12 @@ class BuildingDescriptor(
   
   def fulfilledBy(suggestion: BuildingDescriptor): Boolean = {
     if (suggestion == this) return true
-    width     == suggestion.width                   &&
-    height    == suggestion.height                  &&
-    powers    == suggestion.powers    || ! powers   &&
-    powered   == suggestion.powered   || ! powered  &&
-    townHall  == suggestion.townHall                &&
-    gas       == suggestion.gas                     &&
+    width     == suggestion.width                     &&
+    height    == suggestion.height                    &&
+    (powers    == suggestion.powers    || ! powers)   &&
+    (powered   == suggestion.powered   || ! powered)  &&
+    townHall  == suggestion.townHall                  &&
+    gas       == suggestion.gas                       &&
     margin    <= suggestion.margin
   }
   
@@ -107,8 +107,8 @@ class BuildingDescriptor(
   }
   
   override def toString: String =
-    suggestor.toString
-    ": " +
+    "#" + With.prioritizer.getPriority(suggestor) + " " +
+    suggestor.toString.take(5) + "... " +
     argBuilding.map(_.toString + " ").getOrElse("") +
     width + "x" + height + " " +
     (if (margin) width + 2 * marginTiles + "x" + height + 2 * marginTiles + " " else "") +

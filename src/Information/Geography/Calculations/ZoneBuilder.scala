@@ -13,7 +13,7 @@ import scala.collection.mutable.ListBuffer
 
 object ZoneBuilder {
   
-  def build:Iterable[Zone] = {
+  def build: Iterable[Zone] = {
     val zones = BWTA.getRegions.asScala.map(buildZone)
     val edges = BWTA.getChokepoints.asScala.map(choke => buildEdge(choke, zones))
     val bases = BaseFinder.calculate.map(townHallPixel => buildBase(townHallPixel, zones))
@@ -22,23 +22,23 @@ object ZoneBuilder {
     edges.foreach(edge => edge.zones.foreach(zone => zone.edges += edge))
     ensureAllTilesAreAssignedToAZone(zones)
     
-    return zones
+    zones
   }
   
-  def ensureAllTilesAreAssignedToAZone(zones:Iterable[Zone]) = {
+  def ensureAllTilesAreAssignedToAZone(zones: Iterable[Zone]) {
     With.geography.allTiles
       .filterNot(tile => zones.exists(_.contains(tile)))
       .foreach(tile => assignTile(tile, zones))
   }
   
-  def assignTile(tile:Tile, zones:Iterable[Zone]) = {
+  def assignTile(tile: Tile, zones: Iterable[Zone]): Boolean = {
     val groundHeight = With.game.getGroundHeight(tile.bwapi)
     val candidates = zones.filter(_.altitude == groundHeight)
     val matchingZone = Spiral
       .points(5)
       .view
       .map(tile.add)
-      .flatMap(neighborTile => candidates.view.filter(candidate => candidate.tiles.contains(neighborTile)).headOption)
+      .flatMap(neighborTile => candidates.view.find(candidate => candidate.tiles.contains(neighborTile)))
       .headOption
     matchingZone
       .getOrElse(zones.minBy(_.centroid.pixelDistanceFast(tile.pixelCenter)))
@@ -46,7 +46,7 @@ object ZoneBuilder {
       .add(tile)
   }
   
-  def buildZone(region:Region):Zone = {
+  def buildZone(region: Region):Zone = {
     val polygon = region.getPolygon
     val tileArea = TileRectangle(
       Pixel(
@@ -72,7 +72,7 @@ object ZoneBuilder {
       new ListBuffer[ZoneEdge])
   }
   
-  def buildBase(townHallPixel:Tile, zones:Iterable[Zone]):Base = {
+  def buildBase(townHallPixel: Tile, zones: Iterable[Zone]): Base = {
     val townHallArea = Protoss.Nexus.tileArea.add(townHallPixel)
     new Base(
       zones
@@ -82,7 +82,7 @@ object ZoneBuilder {
       With.game.getStartLocations.asScala.map(new Tile(_)).exists(_.tileDistanceSlow(townHallPixel) < 6))
   }
   
-  def buildEdge(choke: Chokepoint, zones:Iterable[Zone]):ZoneEdge =
+  def buildEdge(choke: Chokepoint, zones: Iterable[Zone]): ZoneEdge =
     new ZoneEdge(
       choke,
       Vector(

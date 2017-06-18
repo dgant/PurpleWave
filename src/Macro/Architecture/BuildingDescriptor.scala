@@ -4,7 +4,7 @@ import Lifecycle.With
 import Mathematics.Points.Tile
 import Planning.Plan
 import ProxyBwapi.Races.Protoss
-import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
+import ProxyBwapi.UnitClass.UnitClass
 
 class BuildingDescriptor(
   val suggestor   : Plan,
@@ -25,7 +25,7 @@ class BuildingDescriptor(
   val powered   : Boolean = argPowered   .getOrElse(argBuilding.exists(_.requiresPsi))
   val townHall  : Boolean = argTownHall  .getOrElse(argBuilding.exists(_.isTownHall))
   val gas       : Boolean = argGas       .getOrElse(argBuilding.exists(_.isRefinery))
-  val margin    : Boolean = argMargin    .getOrElse( ! townHall && argBuilding.exists(building => UnitClasses.all.exists(unit => ! unit.isFlyer && unit.whatBuilds._1 == building)))
+  val margin    : Boolean = argMargin    .getOrElse(argBuilding.exists(With.architect.usuallyNeedsMargin))
   
   def fulfilledBy(suggestion: BuildingDescriptor): Boolean = {
     if (suggestion == this) return true

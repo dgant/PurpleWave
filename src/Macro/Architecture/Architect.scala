@@ -5,6 +5,7 @@ import Lifecycle.With
 import Mathematics.Points.{Tile, TileRectangle}
 import Mathematics.Shapes.Spiral
 import ProxyBwapi.Races.Neutral
+import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
 
 import scala.collection.mutable
 
@@ -12,6 +13,10 @@ class Architect {
   
   private var bases: Array[Base] = Array.empty
   val exclusions: mutable.ArrayBuffer[Exclusion] = new mutable.ArrayBuffer[Exclusion]
+  
+  def usuallyNeedsMargin(unitClass: UnitClass): Boolean = {
+    unitClass.isBuilding && UnitClasses.all.exists(unit => ! unit.isFlyer && unit.whatBuilds._1 == unitClass)
+  }
   
   def reboot() {
     bases = With.geography.ourBases.toArray.sortBy(base => - base.mineralsLeft * base.zone.area)
@@ -21,6 +26,13 @@ class Architect {
       .map(base => Exclusion(
         "Harvesting area",
         base.harvestingArea,
+        gasAllowed = true,
+        townHallAllowed = true))
+    exclusions ++= With.units.ours
+      .filter(unit => usuallyNeedsMargin(unit.unitClass))
+      .map(unit => Exclusion(
+        "Margin for " + unit,
+        unit.tileArea.expand(1, 1),
         gasAllowed = true,
         townHallAllowed = true))
   }
@@ -42,6 +54,9 @@ class Architect {
   }
   
   private def canBuild(buildingDescriptor: BuildingDescriptor, tile: Tile): Boolean = {
+    if ( ! With.performance.continueRunning) {
+      return false
+    }
     
     if ( ! buildingDescriptor.accepts(tile)) {
       return false
@@ -111,14 +126,18 @@ class Architect {
         With.geography.bases.map(_.townHallArea.startInclusive)
       }
       else if (buildingDescriptor.gas) {
-        With.units.neutral.filter(_.unitClass.isGas).map(_.tileTopLeft)
+        With.units.neutral
+          .filter(_.unitClass.isGas)
+          .map(_.tileTopLeft)
+          .toArray
+          .sortBy( _.zone.owner != With.self)
       }
       else {
         bases.flatMap(base =>
           Spiral
             .points(searchRadius)
             .view
-            .map(base.heart.add))
+            .map(base.townHallArea.midpoint.add))
       }
       
       points.find(canBuild(buildingDescriptor, _))

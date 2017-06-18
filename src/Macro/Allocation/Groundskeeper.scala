@@ -59,7 +59,7 @@ class Groundskeeper {
     None
   }
   
-  private def sortByPriority(descriptors: Iterable[BuildingDescriptor] ): Iterable[BuildingDescriptor] = {
+  def sortByPriority(descriptors: Iterable[BuildingDescriptor] ): Iterable[BuildingDescriptor] = {
     descriptors.toVector.sortBy(suggestion => With.prioritizer.getPriority(suggestion.suggestor))
   }
   

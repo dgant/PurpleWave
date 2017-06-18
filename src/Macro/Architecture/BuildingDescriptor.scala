@@ -95,10 +95,8 @@ class BuildingDescriptor(
             return false
           }
         }
-        else {
-          if ( ! With.grids.buildable.get(nextTile)) {
+        else if ( ! gas && ! With.grids.buildable.get(nextTile)) {
             return false
-          }
         }
         y += 1
       }

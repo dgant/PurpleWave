@@ -42,10 +42,10 @@ class Architect {
       tile.add(buildingDescriptor.buildStart),
       tile.add(buildingDescriptor.buildEnd))
     
-    if (violatesExclusion(buildingDescriptor, buildArea)) {
+    if ( ! buildingDescriptor.gas && ! buildingDescriptor.townHall && violatesExclusion(buildingDescriptor, buildArea)) {
       return false
     }
-    if (tripsOnUnits(buildingDescriptor, buildArea)) {
+    if ( ! buildingDescriptor.gas && tripsOnUnits(buildingDescriptor, buildArea)) {
       return false
     }
     true

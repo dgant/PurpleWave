@@ -78,7 +78,7 @@ class Recruiter {
     
     val requiredUnits = lock.offerUnits(Iterable(unassignedUnits) ++ assignedToLowerPriority)
 
-    if (requiredUnits == None) {
+    if (requiredUnits.isEmpty) {
       remove(lock)
     }
     else {

@@ -13,14 +13,14 @@ object ScreenGroundskeeper {
         With.groundskeeper.updated)
         .map(_.toString))
     
-    With.game.drawTextScreen(225, 25,"Unplaced:")
+    With.game.drawTextScreen(195, 25,"Unplaced:")
     DrawScreen.column(
       225, 50,
       With.groundskeeper.sortByPriority(
         With.groundskeeper.unplaced)
         .map(_.toString))
     
-    With.game.drawTextScreen(445, 25,"Placed:")
+    With.game.drawTextScreen(385, 25,"Placed:")
     DrawScreen.table(
       445, 50,
       With.groundskeeper.sortByPriority(

@@ -76,7 +76,9 @@ class Commander {
     }
     
     // Mineral walk!
-    if (unit.unitClass.isWorker && ! unit.carryingResources) {
+    if (With.configuration.enableMineralWalk
+      && unit.unitClass.isWorker
+      && ! unit.carryingResources) {
       val from = unit.pixelCenter
       val fromZone = from.zone
       val toZone = to.zone

@@ -20,6 +20,7 @@ class Configuration {
   var violenceFrameThreshold          = 24
   var enableYolo                      = true
   var enablePathRecalculation         = true
+  var enableMineralWalk               = false
   var pathRecalculationDelayFrames    = 48
   var woundedThresholdHealth          = 40
   var evaluateDangerousBases          = false

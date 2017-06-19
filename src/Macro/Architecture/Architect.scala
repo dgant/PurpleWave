@@ -130,7 +130,7 @@ class Architect {
     
     if (buildingDescriptor.townHall) {
       With.geography.bases
-        .view
+        .filterNot(_.owner.isEnemy)
         .map(_.townHallArea.startInclusive)
     }
     else if (buildingDescriptor.gas) {
@@ -142,7 +142,7 @@ class Architect {
       shuffle(
         With.geography.bases
           .toList
-          .sortBy( ! _.owner.isUs)
+          .filterNot(_.owner.isEnemy)
           .flatMap(_.zone.tiles))
     }
   }

@@ -74,9 +74,9 @@ class Recruiter {
       .filter(otherRequest =>
         With.prioritizer.getPriority(lock.owner) <
         With.prioritizer.getPriority(otherRequest.owner))
-      .map(getUnits)
+      .flatMap(getUnits)
     
-    lock.offerUnits(Set(unassignedUnits) ++ assignedToLowerPriority)
+    lock.offerUnits(unassignedUnits ++ assignedToLowerPriority)
   }
   
   private def tryToSatisfy(lock: LockUnits) {

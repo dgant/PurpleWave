@@ -69,6 +69,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
     if (orderedTile.exists(_ != buildingTile.get)) {
       builderLock.release()
     }
+    builderLock.unitPreference.set(new UnitPreferClose(buildingTile.get.pixelCenter))
     builderLock.acquire(this)
     
     if (builderLock.satisfied && building.isEmpty) {

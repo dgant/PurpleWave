@@ -46,12 +46,10 @@ class LockUnits extends ResourceLock {
     candidates
       .toVector
       .filter(unitMatcher.get.accept)
-        .sortBy(unitPreference.get.preference)
-        .foreach(unit => if (unitCounter.get.continue(desiredUnits)) desiredUnits.add(unit))
+      .sortBy(unitPreference.get.preference)
+      .foreach(unit => if (unitCounter.get.continue(desiredUnits)) desiredUnits.add(unit))
   
     isSatisfied = unitCounter.get.accept(desiredUnits)
     if (isSatisfied) Some(desiredUnits) else None
   }
-  
-  
 }

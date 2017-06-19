@@ -17,6 +17,6 @@ object PlacementHeuristicPowering extends PlacementHeuristic {
       .map(candidate.add)
       .count(tile =>
         With.grids.buildable.get(tile)
-          && ! With.grids.psi2x2and3x2.get(tile))
+        && ! With.grids.psi2x2and3x2.get(tile))
   }
 }

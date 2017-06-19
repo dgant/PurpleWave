@@ -3,7 +3,7 @@ package Performance.Tasks.Global
 import Lifecycle.With
 import Performance.Tasks.AbstractTask
 
-class TaskBuildingPlacement extends AbstractTask {
+class TaskArchitecture extends AbstractTask {
   
   urgency = With.configuration.urgencyBuildingPlacement
   

@@ -7,8 +7,8 @@ import Mathematics.Points.Tile
 object PlacementHeuristicEnemy extends PlacementHeuristic {
   
   override def evaluate(state: BuildingDescriptor, candidate: Tile): Double = {
-    
-    candidate.tileDistanceFast(With.intelligence.mostBaselikeEnemyTile)
+  
+    With.paths.groundPixels(candidate, With.intelligence.mostBaselikeEnemyTile)
     
   }
 }

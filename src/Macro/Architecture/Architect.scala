@@ -138,8 +138,7 @@ class Architect {
     }
     else if (buildingDescriptor.gas) {
       With.geography.bases
-        .toList
-        .sortBy( ! _.owner.isUs)
+        .filter(_.owner.isUs)
         .flatMap(_.gas.map(_.tileTopLeft))
     }
     else {

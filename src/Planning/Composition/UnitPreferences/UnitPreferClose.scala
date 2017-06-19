@@ -9,6 +9,6 @@ class UnitPreferClose(initialPixel: Pixel = SpecificPoints.middle) extends UnitP
   val pixel = new Property[Pixel](initialPixel)
   
   override def preference(unit: FriendlyUnitInfo): Double = {
-    pixel.get.pixelDistanceFast(unit.pixelCenter)
+    unit.framesToTravel(pixel.get)
   }
 }

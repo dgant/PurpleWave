@@ -74,7 +74,7 @@ class Configuration {
   
   var visualize                           = true
   var visualizationProbabilityHappyVision = 0.1
-  var visualizationProbabilityTextOnly    = 0.05
+  var visualizationProbabilityTextOnly    = 0.02
   
   var camera                      = false
   var cameraDynamicSpeed          = false

@@ -12,7 +12,7 @@ class TaskQueueGlobal extends AbstractTaskQueue {
     new TaskBattleClassify,
     new TaskBattleEstimator,
     new TaskEconomy,
-    new TaskBuildingPlacement,
+    new TaskArchitecture,
     new TaskPlanning,
     new TaskMicro,
     new TaskManners,

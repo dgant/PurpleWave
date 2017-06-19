@@ -26,7 +26,7 @@ class Visualization {
   private var view: View = ViewGeography
   private var lastCycle = 0
   
-  var cycle     = false
+  var cycle     = true
   var screen    = true
   var grids     = false
   var map       = true

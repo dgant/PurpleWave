@@ -12,8 +12,8 @@ object PlacementProfiles {
     preferSpace     = 1.0,
     preferPowering  = 8.0,
     avoidExit       = 0.0,
-    avoidDistance   = 1.0,
-    avoidEnemy      = 1.0
+    avoidDistance   = 0.25,
+    avoidEnemy      = 0.25
   )
   
   val factory = new PlacementProfile(
@@ -56,12 +56,12 @@ object PlacementProfiles {
     "Town Hall",
     preferZone      = 0.0,
     preferExit      = 0.0,
-    preferGas       = 2.0,
+    preferGas       = 3.0,
     preferSpace     = 0.0,
     preferPowering  = 0.0,
     avoidExit       = 0.0,
-    avoidDistance   = 2.0,
-    avoidEnemy      = 1.5
+    avoidDistance   = 4.0,
+    avoidEnemy      = 1.0
   )
   
   def default(buildingDescriptor: BuildingDescriptor): PlacementProfile = {

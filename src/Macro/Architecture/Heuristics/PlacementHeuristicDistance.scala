@@ -8,8 +8,10 @@ object PlacementHeuristicDistance extends PlacementHeuristic {
   
   override def evaluate(state: BuildingDescriptor, candidate: Tile): Double = {
   
-    candidate.tileDistanceFast(With.geography.home)
-    
+    if (With.geography.ourBases.isEmpty)
+      With.paths.groundPixels(candidate, With.geography.home)
+    else
+      With.geography.ourBases.map(base =>With.paths.groundPixels(candidate, base.townHallArea.midpoint)).sum
   }
   
 }

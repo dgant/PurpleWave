@@ -90,9 +90,10 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
     if (desiredTile.isEmpty) {
       return false
     }
-    val proposedBuilders = With.recruiter.inquire(builderLock)
-    val framesToBuild = currencyLock.expectedFrames
-    proposedBuilders.exists(_.exists(_.framesToTravel(desiredTile.get.pixelCenter) >= framesToBuild))
+    val proposedBuilders = builderLock.inquire(this)
+    proposedBuilders.exists(_.exists(
+      _.framesToTravel(desiredTile.get.pixelCenter) >=
+      currencyLock.expectedFrames))
   }
   
   def buildingTile: Option[Tile] = With.groundskeeper.reserve(buildingDescriptor)

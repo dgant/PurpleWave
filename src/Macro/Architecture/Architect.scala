@@ -54,10 +54,6 @@ class Architect {
   }
   
   def canBuild(buildingDescriptor: BuildingDescriptor, tile: Tile): Boolean = {
-    if ( ! With.performance.continueRunning) {
-      return false
-    }
-    
     if ( ! buildingDescriptor.accepts(tile)) {
       return false
     }

@@ -8,7 +8,6 @@ class PlacementProfile(
   var preferGas       : Double = 0.0,
   var preferSpace     : Double = 0.0,
   var preferPowering  : Double = 0.0,
-  var avoidExit       : Double = 0.0,
   var avoidDistance   : Double = 0.0,
   var avoidEnemy      : Double = 0.0) {
   
@@ -19,7 +18,6 @@ class PlacementProfile(
       new PlacementHeuristicWeight(PlacementHeuristicGas,           preferGas),
       new PlacementHeuristicWeight(PlacementHeuristicSpace,         preferSpace),
       new PlacementHeuristicWeight(PlacementHeuristicPowering,      preferPowering),
-      new PlacementHeuristicWeight(PlacementHeuristicExit,         -avoidExit),
       new PlacementHeuristicWeight(PlacementHeuristicDistance,     -avoidDistance),
       new PlacementHeuristicWeight(PlacementHeuristicEnemy,        -avoidEnemy)
     )

@@ -23,10 +23,10 @@ class Visualization {
     ViewPlanning
   )
   
-  private var view: View = ViewGeography
+  private var view: View = ViewPlanning
   private var lastCycle = 0
   
-  var cycle     = true
+  var cycle     = false
   var screen    = true
   var grids     = false
   var map       = true
@@ -35,6 +35,11 @@ class Visualization {
   
   def setView(newView: View) {
     view = newView
+  }
+  
+  def forceCycle() {
+    cycle = false
+    pickNextView()
   }
   
   def render() {

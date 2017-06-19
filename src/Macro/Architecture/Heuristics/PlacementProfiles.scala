@@ -9,11 +9,10 @@ object PlacementProfiles {
     preferZone      = 3.0,
     preferExit      = 0.75,
     preferGas       = 0.0,
-    preferSpace     = 2.0,
+    preferSpace     = 0.5,
     preferPowering  = 6.0,
-    avoidExit       = 0.0,
-    avoidDistance   = 0.25,
-    avoidEnemy      = 0.25
+    avoidDistance   = 0.5,
+    avoidEnemy      = 0.5
   )
   
   val factory = new PlacementProfile(
@@ -23,9 +22,8 @@ object PlacementProfiles {
     preferGas       = 0.0,
     preferSpace     = 1.0,
     preferPowering  = 0.0,
-    avoidExit       = 0.0,
     avoidDistance   = 0.0,
-    avoidEnemy      = 0.0
+    avoidEnemy      = 0.25
   )
   
   val tech = new PlacementProfile(
@@ -33,11 +31,10 @@ object PlacementProfiles {
     preferZone      = 1.0,
     preferExit      = 0.0,
     preferGas       = 0.0,
-    preferSpace     = 1.0,
+    preferSpace     = 0.0,
     preferPowering  = 0.0,
-    avoidExit       = 1.0,
     avoidDistance   = 0.0,
-    avoidEnemy      = 0.0
+    avoidEnemy      = 1.0
   )
   
   val gas  = new PlacementProfile(
@@ -47,7 +44,6 @@ object PlacementProfiles {
     preferGas       = 0.0,
     preferSpace     = 0.0,
     preferPowering  = 0.0,
-    avoidExit       = 0.0,
     avoidDistance   = 1.0,
     avoidEnemy      = 1.0
   )
@@ -59,7 +55,6 @@ object PlacementProfiles {
     preferGas       = 2.0,
     preferSpace     = 0.0,
     preferPowering  = 0.0,
-    avoidExit       = 0.0,
     avoidDistance   = 4.0,
     avoidEnemy      = 1.0
   )

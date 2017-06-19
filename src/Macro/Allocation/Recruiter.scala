@@ -73,10 +73,10 @@ class Recruiter {
     val assignedToLowerPriority = unitsByLock.keys
       .filter(otherRequest =>
         With.prioritizer.getPriority(lock.owner) <
-          With.prioritizer.getPriority(otherRequest.owner))
+        With.prioritizer.getPriority(otherRequest.owner))
       .map(getUnits)
     
-    lock.offerUnits(Iterable(unassignedUnits) ++ assignedToLowerPriority)
+    lock.offerUnits(Set(unassignedUnits) ++ assignedToLowerPriority)
   }
   
   private def tryToSatisfy(lock: LockUnits) {
@@ -106,17 +106,17 @@ class Recruiter {
     unitsByLock.remove(lock)
   }
   
-  private def assign(unit:FriendlyUnitInfo, lock:LockUnits) {
+  private def assign(unit: FriendlyUnitInfo, lock: LockUnits) {
     unitsByLock(lock).add(unit)
     unassignedUnits.remove(unit)
   }
   
-  private def unassign(unit:FriendlyUnitInfo) {
+  private def unassign(unit: FriendlyUnitInfo) {
     unassignedUnits.add(unit)
     unitsByLock.find(pair => pair._2.contains(unit)).foreach(pair => unitsByLock.remove(pair._1))
   }
   
-  def getUnits(lock: LockUnits):Set[FriendlyUnitInfo] = {
+  def getUnits(lock: LockUnits): Set[FriendlyUnitInfo] = {
     unitsByLock.get(lock).map(_.toSet).getOrElse(Set.empty)
   }
 }

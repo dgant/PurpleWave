@@ -6,7 +6,7 @@ import scala.collection.mutable
 
 class Prioritizer {
   
-  private val priorities = new mutable.HashMap[Plan, Integer] {
+  val priorities = new mutable.HashMap[Plan, Integer] {
     override def default(key: Plan): Integer = Integer.MAX_VALUE
   }
   

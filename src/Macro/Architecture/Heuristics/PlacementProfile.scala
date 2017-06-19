@@ -2,6 +2,7 @@ package Macro.Architecture.Heuristics
 
 
 class PlacementProfile(
+  val name            : String,
   var preferZone      : Double = 0.0,
   var preferExit      : Double = 0.0,
   var preferGas       : Double = 0.0,
@@ -23,4 +24,6 @@ class PlacementProfile(
       new PlacementHeuristicWeight(PlacementHeuristicEnemy,        -avoidEnemy)
     )
   }
+  
+  override def toString: String = name
 }

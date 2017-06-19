@@ -1,16 +1,16 @@
 package Macro.Allocation
 
 import Lifecycle.With
-import Macro.Architecture.BuildingDescriptor
+import Macro.Architecture.{BuildingDescriptor, Placement}
 import Mathematics.Points.Tile
 
 import scala.collection.mutable
 
 class Groundskeeper {
 
-  val updated   : mutable.Set[BuildingDescriptor]       = new mutable.HashSet[BuildingDescriptor]
-  val unplaced  : mutable.Set[BuildingDescriptor]       = new mutable.HashSet[BuildingDescriptor]
-  val placed    : mutable.Map[BuildingDescriptor, Tile] = new mutable.HashMap[BuildingDescriptor, Tile]
+  val updated   : mutable.Set[BuildingDescriptor]             = new mutable.HashSet[BuildingDescriptor]
+  val unplaced  : mutable.Set[BuildingDescriptor]             = new mutable.HashSet[BuildingDescriptor]
+  val placed    : mutable.Map[BuildingDescriptor, Placement]  = new mutable.HashMap[BuildingDescriptor, Placement]
   
   def update() {
     if (updated.isEmpty) {
@@ -25,15 +25,17 @@ class Groundskeeper {
     With.architect.reboot()
     Vector(placed.keys, unplaced)
       .foreach(descriptors => sortByPriority(descriptors)
-        .foreach(suggestion =>
+        .foreach(descriptor =>
           if (With.performance.continueRunning) {
-            val tile = With.architect.fulfill(suggestion, placed.get(suggestion))
-            if (tile.isDefined) {
-              placed.put(suggestion, tile.get)
-            }
-            else {
-              placed.remove(suggestion)
-            }
+            val tile = With.architect.fulfill(descriptor, placed.get(descriptor))
+            placed.remove(descriptor)
+            tile
+              .map(
+                Placement(
+                  descriptor,
+                  _,
+                  With.frame))
+              .foreach(placed.put(descriptor, _))
           }))
   }
   
@@ -51,9 +53,9 @@ class Groundskeeper {
     // Do we have a placement for this descriptor already? Use it.
     placed
       .get(descriptor)
-      .foreach(tile => {
+      .foreach(placement => {
         unplaced -= descriptor
-        return Some(tile)
+        return Some(placement.tile)
       })
     
     /*

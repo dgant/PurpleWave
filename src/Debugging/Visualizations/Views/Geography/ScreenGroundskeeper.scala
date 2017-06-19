@@ -25,6 +25,6 @@ object ScreenGroundskeeper {
       385, 50,
       With.groundskeeper.sortByPriority(
         With.groundskeeper.placed.keys)
-        .map(key => Vector(With.groundskeeper.placed(key).toString, key.toString)))
+        .map(key => Vector(With.groundskeeper.placed(key).tile.toString, key.toString)))
   }
 }

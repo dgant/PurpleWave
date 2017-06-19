@@ -74,6 +74,10 @@ class BuildingDescriptor(
       }
     }
     
+    if (tile.zone.island) {
+      return false
+    }
+    
     var x             = tile.add(relativeMarginStart).x
     val xMax          = tile.add(relativeMarginEnd).x
     val yMax          = tile.add(relativeMarginEnd).y
@@ -113,6 +117,7 @@ class BuildingDescriptor(
     "#" + With.prioritizer.getPriority(suggestor) + " " +
     suggestor.toString.take(5) + " " +
     argBuilding.map(_.toString + " ").getOrElse("") +
+    placement.toString + " " +
     width + "x" + height + " " +
     (if (margin) (width + 2 * marginTiles) + "x" + (height + 2 * marginTiles) + " " else "") +
     (if (powers)    "(Powers) "     else "") +

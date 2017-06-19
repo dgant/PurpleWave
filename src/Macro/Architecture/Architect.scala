@@ -37,14 +37,13 @@ class Architect {
         townHallAllowed = true))
   }
   
-  def fulfill(buildingDescriptor: BuildingDescriptor, tile: Option[Tile]): Option[Tile] = {
+  def fulfill(buildingDescriptor: BuildingDescriptor, placement: Option[Placement]): Option[Tile] = {
     
-    if (tile.isDefined) {
-      if (canBuild(buildingDescriptor, tile.get)) {
-        exclude(buildingDescriptor, tile.get)
-        return tile
-      } else {
-        val setBreakpointHere = false
+    if (placement.isDefined && With.frame - placement.get.createdFrame < With.configuration.maxPlacementAge) {
+      val tile = placement.get.tile
+      if (canBuild(buildingDescriptor, tile)) {
+        exclude(buildingDescriptor, tile)
+        return Some(tile)
       }
     }
   

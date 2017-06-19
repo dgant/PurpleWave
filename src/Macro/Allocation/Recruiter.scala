@@ -35,7 +35,7 @@ class Recruiter {
   val ineligibleClasses = Set(Protoss.Interceptor, Protoss.Scarab, Terran.SpiderMine)
   private def isEligible(unit:FriendlyUnitInfo):Boolean = unit.aliveAndComplete && ! ineligibleClasses.contains(unit.unitClass)
   
-  private def test {
+  private def test() {
     //Verify no units are shared between locks
     unitsByLock.foreach(pair1 =>
       unitsByLock.foreach(pair2 =>

@@ -3,6 +3,7 @@ package Information
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Micro.Actions.Basic.Gather
+import Performance.Caching.CacheFrame
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 class Economy {
@@ -31,11 +32,15 @@ class Economy {
   def genericIncomePerFrameMinerals (miners:Int, bases:Int): Double = Math.min(miners, bases * 16)  * incomePerFrameMinerals
   def genericIncomePerFrameGas      (miners:Int, bases:Int): Double = Math.min(miners, bases * 3)   * incomePerFrameGas
   
-  def ourActiveGatherers  : Traversable[FriendlyUnitInfo] = With.geography.ourBases.flatten(ourActiveGatherers)
-  def ourActiveMiners     : Traversable[FriendlyUnitInfo] = With.geography.ourBases.flatten(ourActiveMiners)
-  def ourActiveDrillers   : Traversable[FriendlyUnitInfo] = With.geography.ourBases.flatten(ourActiveDrillers)
+  def ourActiveGatherers  : Traversable[FriendlyUnitInfo] = ourActiveGatherersCache.get
+  def ourActiveMiners     : Traversable[FriendlyUnitInfo] = ourActiveMinersCache.get
+  def ourActiveDrillers   : Traversable[FriendlyUnitInfo] = ourActiveDrillersCache.get
   
-  def ourActiveGatherers(base:Base):Traversable[FriendlyUnitInfo] = {
+  private val ourActiveGatherersCache = new CacheFrame(() => With.geography.ourBases.flatten(ourActiveGatherers))
+  private val ourActiveMinersCache    = new CacheFrame(() => With.geography.ourBases.flatten(ourActiveMiners))
+  private val ourActiveDrillersCache  = new CacheFrame(() => With.geography.ourBases.flatten(ourActiveDrillers))
+  
+  def ourActiveGatherers(base: Base): Traversable[FriendlyUnitInfo] = {
     With.units
       .inRectangle(base.harvestingArea)
       .flatten(_.friendly)

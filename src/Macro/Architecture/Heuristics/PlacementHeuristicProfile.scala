@@ -1,0 +1,26 @@
+package Macro.Architecture.Heuristics
+
+
+class PlacementHeuristicProfile(
+  var preferZone      : Double = 0.0,
+  var preferExit      : Double = 0.0,
+  var preferBack      : Double = 0.0,
+  var preferGas       : Double = 0.0,
+  var preferSpace     : Double = 0.0,
+  var preferPowering  : Double = 0.0,
+  var avoidDistance   : Double = 0.0,
+  var avoidEnemy      : Double = 0.0) {
+  
+  def weightedHeuristics: Iterable[PlacementHeuristicWeight] = {
+    Vector(
+      new PlacementHeuristicWeight(PlacementHeuristicZone,          preferZone),
+      new PlacementHeuristicWeight(PlacementHeuristicExit,          preferExit),
+      new PlacementHeuristicWeight(PlacementHeuristicBack,          preferBack),
+      new PlacementHeuristicWeight(PlacementHeuristicGas,           preferGas),
+      new PlacementHeuristicWeight(PlacementHeuristicSpace,         preferSpace),
+      new PlacementHeuristicWeight(PlacementHeuristicPowering,      preferPowering),
+      new PlacementHeuristicWeight(PlacementHeuristicDistance,     -avoidDistance),
+      new PlacementHeuristicWeight(PlacementHeuristicEnemy,        -avoidEnemy)
+    )
+  }
+}

@@ -15,14 +15,14 @@ object ScreenGroundskeeper {
     
     With.game.drawTextScreen(195, 25,"Unplaced:")
     DrawScreen.column(
-      225, 50,
+      195, 50,
       With.groundskeeper.sortByPriority(
         With.groundskeeper.unplaced)
         .map(_.toString))
     
     With.game.drawTextScreen(385, 25,"Placed:")
     DrawScreen.table(
-      445, 50,
+      385, 50,
       With.groundskeeper.sortByPriority(
         With.groundskeeper.placed.keys)
         .map(key => Vector(With.groundskeeper.placed(key).toString, key.toString)))

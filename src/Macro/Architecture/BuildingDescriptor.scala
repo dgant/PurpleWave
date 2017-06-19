@@ -1,6 +1,7 @@
 package Macro.Architecture
 
 import Lifecycle.With
+import Macro.Architecture.Heuristics.{PlacementHeuristicProfile, PlacementHeuristicProfiles}
 import Mathematics.Points.Tile
 import Planning.Plan
 import ProxyBwapi.Races.Protoss
@@ -15,7 +16,8 @@ class BuildingDescriptor(
   argPowered      : Option[Boolean]   = None,
   argTownHall     : Option[Boolean]   = None,
   argGas          : Option[Boolean]   = None,
-  argMargin       : Option[Boolean]   = None) {
+  argMargin       : Option[Boolean]   = None,
+  val placement: PlacementHeuristicProfile = PlacementHeuristicProfiles.default) {
   
   val frameCreated: Int = With.frame
   
@@ -29,12 +31,12 @@ class BuildingDescriptor(
   
   def fulfilledBy(suggestion: BuildingDescriptor): Boolean = {
     if (suggestion == this) return true
-    width     == suggestion.width                     &&
-    height    == suggestion.height                    &&
-    (powers    == suggestion.powers    || ! powers)   &&
-    (powered   == suggestion.powered   || ! powered)  &&
-    townHall  == suggestion.townHall                  &&
-    gas       == suggestion.gas                       &&
+    width     == suggestion.width                   &&
+    height    == suggestion.height                  &&
+    (powers   == suggestion.powers    || ! powers)  &&
+    (powered  == suggestion.powered   || ! powered) &&
+    townHall  == suggestion.townHall                &&
+    gas       == suggestion.gas                     &&
     margin    <= suggestion.margin
   }
   

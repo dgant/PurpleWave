@@ -6,6 +6,6 @@ import ProxyBwapi.UnitInfo.UnitInfo
 
 abstract class TargetHeuristic extends Heuristic[ExecutionState, UnitInfo] {
   
-  def evaluate(state: ExecutionState, candidate: UnitInfo):Double
+  def evaluate(state: ExecutionState, candidate: UnitInfo): Double
   
 }

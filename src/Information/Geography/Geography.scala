@@ -15,7 +15,7 @@ class Geography {
   val allTiles            : Iterable[Tile]          = mapArea.tiles
   lazy val zones          : Iterable[Zone]          = ZoneBuilder.build
   def bases               : Iterable[Base]          = zones.flatten(_.bases)
-  def ourZones            : Iterable[Zone]          = zones.filter(_.owner == With.self)
+  def ourZones            : Iterable[Zone]          = zones.filter(_.owner.isUs)
   def ourBases            : Iterable[Base]          = ourZones.flatten(_.bases)
   def enemyZones          : Iterable[Zone]          = zones.filterNot(zone => Vector(With.self, With.neutral).contains(zone.owner))
   def enemyBases          : Iterable[Base]          = enemyZones.flatten(_.bases)
@@ -26,9 +26,7 @@ class Geography {
   private lazy val zonesByTileCache =
     new mutable.HashMap[Tile, Zone] {
       override def default(key: Tile): Zone = {
-        val zone = zones
-          .filter(_.tiles.contains(key))
-          .headOption
+        val zone = zones.find(_.tiles.contains(key))
           .getOrElse(zones.minBy(_.centroid.pixelDistanceFast(key.pixelCenter)))
         put(key, zone)
         zone
@@ -48,12 +46,12 @@ class Geography {
   def ourExposedChokes: Iterable[ZoneEdge] =
     With.geography.zones
       .filter(zone =>
-        zone.owner == With.self ||
+        zone.owner.isUs ||
           With.executor.states.exists(state =>
             state.intent.toBuild.nonEmpty &&
             state.intent.toTravel.exists(_.zone == zone)))
       .flatten(_.edges)
-      .filter(edge => edge.zones.exists(_.owner != With.self))
+      .filter(edge => edge.zones.exists( ! _.owner.isUs))
   
   def mostExposedChokes: Vector[ZoneEdge] =
     ourExposedChokes

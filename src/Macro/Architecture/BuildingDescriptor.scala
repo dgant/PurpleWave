@@ -1,7 +1,7 @@
 package Macro.Architecture
 
 import Lifecycle.With
-import Macro.Architecture.Heuristics.{PlacementHeuristicProfile, PlacementHeuristicProfiles}
+import Macro.Architecture.Heuristics.{PlacementProfile, PlacementProfiles}
 import Mathematics.Points.Tile
 import Planning.Plan
 import ProxyBwapi.Races.Protoss
@@ -9,25 +9,26 @@ import ProxyBwapi.UnitClass.UnitClass
 
 class BuildingDescriptor(
   val suggestor   : Plan,
-  val argBuilding : Option[UnitClass] = None,
-  argWidth        : Option[Int]       = None,
-  argHeight       : Option[Int]       = None,
-  argPowers       : Option[Boolean]   = None,
-  argPowered      : Option[Boolean]   = None,
-  argTownHall     : Option[Boolean]   = None,
-  argGas          : Option[Boolean]   = None,
-  argMargin       : Option[Boolean]   = None,
-  val placement: PlacementHeuristicProfile = PlacementHeuristicProfiles.default) {
+  val argBuilding : Option[UnitClass]         = None,
+  argWidth        : Option[Int]               = None,
+  argHeight       : Option[Int]               = None,
+  argPowers       : Option[Boolean]           = None,
+  argPowered      : Option[Boolean]           = None,
+  argTownHall     : Option[Boolean]           = None,
+  argGas          : Option[Boolean]           = None,
+  argMargin       : Option[Boolean]           = None,
+  argPlacement    : Option[PlacementProfile]  = None) {
   
   val frameCreated: Int = With.frame
   
-  val width     : Int     = argWidth     .orElse(argBuilding.map(_.tileWidth)).getOrElse(1)
-  val height    : Int     = argHeight    .orElse(argBuilding.map(_.tileHeight)).getOrElse(1)
-  val powers    : Boolean = argPowers    .getOrElse(argBuilding.contains(Protoss.Pylon))
-  val powered   : Boolean = argPowered   .getOrElse(argBuilding.exists(_.requiresPsi))
-  val townHall  : Boolean = argTownHall  .getOrElse(argBuilding.exists(_.isTownHall))
-  val gas       : Boolean = argGas       .getOrElse(argBuilding.exists(_.isRefinery))
-  val margin    : Boolean = argMargin    .getOrElse(argBuilding.exists(With.architect.usuallyNeedsMargin))
+  val width             : Int               = argWidth     .orElse(argBuilding.map(_.tileWidth)).getOrElse(1)
+  val height            : Int               = argHeight    .orElse(argBuilding.map(_.tileHeight)).getOrElse(1)
+  val powers            : Boolean           = argPowers    .getOrElse(argBuilding.contains(Protoss.Pylon))
+  val powered           : Boolean           = argPowered   .getOrElse(argBuilding.exists(_.requiresPsi))
+  val townHall          : Boolean           = argTownHall  .getOrElse(argBuilding.exists(_.isTownHall))
+  val gas               : Boolean           = argGas       .getOrElse(argBuilding.exists(_.isRefinery))
+  val margin            : Boolean           = argMargin    .getOrElse(argBuilding.exists(With.architect.usuallyNeedsMargin))
+  val placement  : PlacementProfile  = argPlacement .getOrElse(PlacementProfiles.default(this))
   
   def fulfilledBy(suggestion: BuildingDescriptor): Boolean = {
     if (suggestion == this) return true

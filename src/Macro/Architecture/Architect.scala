@@ -120,8 +120,12 @@ class Architect {
     exclusions          : Iterable[TileRectangle] = Vector.empty)
       : Option[Tile] = {
     
-    val allCandidates = candidates(buildingDescriptor).take(With.configuration.maxBuildingPlacementCandidates)
+    val allCandidates = candidates(buildingDescriptor)
+      .filter(canBuild(buildingDescriptor, _))
+      .take(With.configuration.maxBuildingPlacementCandidates)
+    
     val bestCandidate = EvaluatePlacements.best(buildingDescriptor, allCandidates)
+    
     bestCandidate
   }
   

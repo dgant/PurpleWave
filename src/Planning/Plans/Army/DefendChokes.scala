@@ -25,7 +25,7 @@ class DefendChokes extends ControlPixel {
           choke.zones
             .toList
             .sortBy(zone => With.paths.groundPixels(zone.centroid.tileIncluding, With.geography.home))
-            .sortBy(zone => zone.owner != With.self)
+            .sortBy(zone => ! zone.owner.isUs)
             .head
             .centroid))
       .getOrElse(Map[UnitInfo, Pixel]())

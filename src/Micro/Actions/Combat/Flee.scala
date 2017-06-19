@@ -1,7 +1,6 @@
 package Micro.Actions.Combat
 
 import Information.Geography.Types.Zone
-import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Commands.{Reposition, Travel}
 import Micro.Behaviors.MovementProfiles
@@ -25,7 +24,7 @@ object Flee extends Action {
   }
   
   private def zoneQualifies(zone: Zone): Boolean = {
-    zone.owner != With.self || zone.bases.isEmpty
+    ! zone.owner.isUs || zone.bases.isEmpty
   }
   
   override def perform(state: ExecutionState) {

@@ -54,6 +54,13 @@ case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   def tileDistanceSlow(tile: Tile): Double = {
     Math.sqrt(tileDistanceSquared(tile))
   }
+  def tileDistanceFast(tile: Tile): Double = {
+    // Octagonal distance
+    // https://en.wikibooks.org/wiki/Algorithms/Distance_approximations#Octagonal
+    val dx = Math.abs(x - tile.x)
+    val dy = Math.abs(y - tile.y)
+    0.941256 * Math.max(dx, dy) + Math.min(dx, dy) * 0.414213562
+  }
   def tileDistanceSquared(tile: Tile): Int = {
     val dx = x - tile.x
     val dy = y - tile.y

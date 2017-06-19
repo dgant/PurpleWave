@@ -112,11 +112,11 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   def pixelDistanceTravelling (from: Pixel, to: Pixel)  : Double  = pixelDistanceTravelling(from.tileIncluding, to.tileIncluding)
   def pixelDistanceTravelling (from: Tile,  to: Tile)   : Double  = if (flying) from.pixelCenter.pixelDistanceSlow(to.pixelCenter) else With.paths.groundPixels(from, to)
   
-  def canMoveThisFrame:Boolean = unitClass.canMove && topSpeed > 0 && canDoAnythingThisFrame && ! burrowed
+  def canMoveThisFrame: Boolean = unitClass.canMove && topSpeed > 0 && canDoAnythingThisFrame && ! burrowed
   
-  def topSpeed:Double = topSpeedCache.get
+  def topSpeed: Double = topSpeedCache.get
   private val topSpeedCache = new CacheFrame(() =>
-    stimBonus * (
+    (if (stimmed) 1.5 else 1.0) * (
     unitClass.topSpeed * (if (
       (is(Terran.Vulture)   && player.getUpgradeLevel(Terran.VultureSpeed)    > 0) ||
       (is(Protoss.Observer) && player.getUpgradeLevel(Protoss.ObserverSpeed)  > 0) ||
@@ -149,13 +149,13 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   def totalHealth: Int = hitPoints + shieldPoints + defensiveMatrixPoints
   def fractionalHealth:Double = totalHealth.toDouble / unitClass.maxTotalHealth
   
-  def stimBonus:Int = if (stimmed) 2 else 1
+  def stimAttackSpeedBonus: Int = if (stimmed) 2 else 1
   
   def attacksGround : Boolean = unitClass.attacksGround
   def attacksAir    : Boolean = unitClass.attacksAir
   
-  def airDps    : Double = stimBonus * unitClass.airDps
-  def groundDps : Double = stimBonus * unitClass.groundDps
+  def airDps    : Double = stimAttackSpeedBonus * unitClass.airDps
+  def groundDps : Double = stimAttackSpeedBonus * unitClass.groundDps
   
   def attacksAgainstAir: Int = unitClass.airDamageFactorRaw * unitClass.maxAirHitsRaw
   def attacksAgainstGround: Int = {
@@ -170,8 +170,8 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
   }
   
   def cooldownLeft          : Int         = Math.max(airCooldownLeft, groundCooldownLeft)
-  def cooldownMaxAir        : Int         = unitClass.airDamageCooldown     / stimBonus
-  def cooldownMaxGround     : Int         = unitClass.groundDamageCooldown  / stimBonus
+  def cooldownMaxAir        : Int         = unitClass.airDamageCooldown     / stimAttackSpeedBonus
+  def cooldownMaxGround     : Int         = unitClass.groundDamageCooldown  / stimAttackSpeedBonus
   def cooldownMaxAirGround  : Int         = Math.max(if (attacksAir) cooldownMaxAir else 0, if (attacksGround) cooldownMaxGround else 0)
   def cooldownMaxAgainst(enemy:UnitInfo): Int = if (enemy.flying) cooldownMaxAir else cooldownMaxGround
   

@@ -8,8 +8,6 @@ object PlacementHeuristicZone extends PlacementHeuristic {
   
   override def evaluate(state: BuildingDescriptor, candidate: Tile): Double = {
     
-    HeuristicMathMultiplicative.default
-    
+    HeuristicMathMultiplicative.fromBoolean(candidate.zone.owner.isUs)
   }
-  
 }

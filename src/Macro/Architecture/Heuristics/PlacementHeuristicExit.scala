@@ -8,8 +8,8 @@ object PlacementHeuristicExit extends PlacementHeuristic {
   
   override def evaluate(state: BuildingDescriptor, candidate: Tile): Double = {
     
-    HeuristicMathMultiplicative.default
-    
+    candidate.zone.exit
+      .map(_.centerPixel.pixelDistanceFast(candidate.pixelCenter))
+      .getOrElse(HeuristicMathMultiplicative.default)
   }
-  
 }

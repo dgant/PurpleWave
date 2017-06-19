@@ -7,14 +7,14 @@ object ScreenGroundskeeper {
   
   def render() {
     
-    With.game.drawTextScreen(185, 25,"Unplaced:")
+    With.game.drawTextScreen(5, 25,"Unplaced:")
     DrawScreen.column(
       5, 50,
       With.groundskeeper.sortByPriority(
         With.groundskeeper.unplaced)
         .map(_.toString))
     
-    With.game.drawTextScreen(385, 25,"Placed:")
+    With.game.drawTextScreen(325, 25,"Placed:")
     DrawScreen.table(
       325, 50,
       With.groundskeeper.sortByPriority(

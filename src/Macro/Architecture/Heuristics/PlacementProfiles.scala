@@ -7,10 +7,10 @@ object PlacementProfiles {
   val pylon = new PlacementProfile(
     "Pylon",
     preferZone      = 3.0,
-    preferExit      = 0.5,
+    preferExit      = 0.75,
     preferGas       = 0.0,
-    preferSpace     = 1.0,
-    preferPowering  = 8.0,
+    preferSpace     = 2.0,
+    preferPowering  = 6.0,
     avoidExit       = 0.0,
     avoidDistance   = 0.25,
     avoidEnemy      = 0.25
@@ -19,7 +19,7 @@ object PlacementProfiles {
   val factory = new PlacementProfile(
     "Factory",
     preferZone      = 1.0,
-    preferExit      = 1.0,
+    preferExit      = 2.0,
     preferGas       = 0.0,
     preferSpace     = 1.0,
     preferPowering  = 0.0,
@@ -56,7 +56,7 @@ object PlacementProfiles {
     "Town Hall",
     preferZone      = 0.0,
     preferExit      = 0.0,
-    preferGas       = 3.0,
+    preferGas       = 2.0,
     preferSpace     = 0.0,
     preferPowering  = 0.0,
     avoidExit       = 0.0,

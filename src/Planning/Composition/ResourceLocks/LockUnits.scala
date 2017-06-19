@@ -20,7 +20,7 @@ class LockUnits extends ResourceLock {
   
   var isSatisfied:Boolean = false
   override def satisfied: Boolean = isSatisfied
-  override def acquire(plan:Plan) = {
+  override def acquire(plan: Plan) {
     owner = plan
     With.recruiter.add(this)
   }

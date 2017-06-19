@@ -19,9 +19,10 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
   val buildingDescriptor  = new BuildingDescriptor(this, Some(buildingClass))
   val currencyLock        = new LockCurrencyForUnit(buildingClass)
   
-  private var builder     : Option[FriendlyUnitInfo]  = None
-  private var building    : Option[FriendlyUnitInfo]  = None
-  private var orderedTile : Option[Tile]              = None
+  private var desiredTile   : Option[Tile]              = None
+  private var orderedTile   : Option[Tile]              = None
+  private var builder       : Option[FriendlyUnitInfo]  = None
+  private var building      : Option[FriendlyUnitInfo]  = None
   
   val builderLock = new LockUnits {
     description.set("Get a builder")
@@ -49,31 +50,52 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
             unit.tileTopLeft == tile))
           .getOrElse(None))
   
-    val buildingTile = building
+    desiredTile = building
       .map(_.tileTopLeft)
       .orElse(With.groundskeeper.reserve(buildingDescriptor))
   
+    if (desiredTile.isEmpty) {
+      return
+    }
+    
     currencyLock.isSpent = building.isDefined
     currencyLock.acquire(this)
     
-    if (buildingTile.isDefined && currencyLock.satisfied) {
-        
-      if (building.isEmpty || buildingClass.race == Race.Terran) {
-        builderLock.acquire(this)
-      }
-      
-      if (building.isEmpty && builderLock.satisfied) {
-        orderedTile = buildingTile
-        With.executor.intend(
-          new Intention(this, builderLock.units.head) {
-            toBuild     = Some(buildingClass)
-            toBuildTile = orderedTile
-            toTravel    = Some(orderedTile.get.pixelCenter)
-            canAttack   = false
-          })
-      }
+    if ( ! needBuilder) {
+      return
+    }
+  
+    // When building placement changes we want a builder closer to the new placement
+    if (orderedTile.exists(_ != buildingTile.get)) {
+      builderLock.release()
+    }
+    builderLock.acquire(this)
+    
+    if (builderLock.satisfied && building.isEmpty) {
+      orderedTile = buildingTile
+      With.executor.intend(
+        new Intention(this, builderLock.units.head) {
+          toBuild     = if (currencyLock.isSatisfied) Some(buildingClass) else None
+          toBuildTile = if (currencyLock.isSatisfied) orderedTile         else None
+          toTravel    = Some(orderedTile.get.pixelCenter)
+          canAttack   = false
+        })
     }
   }
+  
+  def needBuilder: Boolean = {
+    if (building.isDefined && buildingClass.race != Race.Terran) {
+      return false
+    }
+    if (desiredTile.isEmpty) {
+      return false
+    }
+    val proposedBuilders = With.recruiter.inquire(builderLock)
+    val framesToBuild = currencyLock.expectedFrames
+    proposedBuilders.exists(_.exists(_.framesToTravel(desiredTile.get.pixelCenter) >= framesToBuild))
+  }
+  
+  def buildingTile: Option[Tile] = With.groundskeeper.reserve(buildingDescriptor)
   
   override def visualize() {
     if (isComplete) return

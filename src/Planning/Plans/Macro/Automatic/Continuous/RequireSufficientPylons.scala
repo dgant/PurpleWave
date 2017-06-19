@@ -44,8 +44,9 @@ class RequireSufficientPylons extends Plan {
     val depotCompletionFrames     = Protoss.Pylon.buildFrames + 24 * 5 //Add a few seconds to account for builder transit time (and Pylon finishing time)
     val incomePerFrame            = With.economy.ourIncomePerFrameMinerals + With.economy.ourIncomePerFrameGas
     val supplyUsedPerFrame        = incomePerFrame * unitSpendingRatio / costPerUnitSupply
+    val supplyBanked              = With.self.minerals / costPerUnitSupply
   
-    val supplySpentBeforeDepotCompletion  = supplyUsedPerFrame * depotCompletionFrames
+    val supplySpentBeforeDepotCompletion  = supplyBanked + supplyUsedPerFrame * depotCompletionFrames
     val supplyUsedWhenDepotWouldFinish    = currentSupplyUsed + supplySpentBeforeDepotCompletion
     val totalPylonsRequired               = Math.ceil((supplyUsedWhenDepotWouldFinish - currentSupplyOfNexus) / supplyPerDepot).toInt
     val pylonsRequired                    = Math.max(0, totalPylonsRequired)

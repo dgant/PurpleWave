@@ -64,8 +64,8 @@ class Recruiter {
     tryToSatisfy(lock)
   }
   
-  private def tryToSatisfy(lock: LockUnits) {
-    
+  def inquire(lock: LockUnits): Option[Iterable[FriendlyUnitInfo]] = {
+  
     // Offer batches of unit for the lock to choose.
     //   Batch 0: Units not assigned
     //   Batch 1+: Units assigned to weaker-priority locks
@@ -73,16 +73,20 @@ class Recruiter {
     val assignedToLowerPriority = unitsByLock.keys
       .filter(otherRequest =>
         With.prioritizer.getPriority(lock.owner) <
-        With.prioritizer.getPriority(otherRequest.owner))
+          With.prioritizer.getPriority(otherRequest.owner))
       .map(getUnits)
     
-    val requiredUnits = lock.offerUnits(Iterable(unassignedUnits) ++ assignedToLowerPriority)
+    lock.offerUnits(Iterable(unassignedUnits) ++ assignedToLowerPriority)
+  }
+  
+  private def tryToSatisfy(lock: LockUnits) {
+
+    val requiredUnits = inquire(lock)
 
     if (requiredUnits.isEmpty) {
       remove(lock)
     }
     else {
-  
       // 1. Unassign all the current unit
       // 2. Unassign all the required unit
       // 3. Assign all the required unit

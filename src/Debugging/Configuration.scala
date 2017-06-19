@@ -37,7 +37,7 @@ class Configuration {
   var maxBuildingPlacementCandidates  = 100
   var maxMineralsBeforeMinedOut       = 300 * 8
   var blockerMineralThreshold         = 50
-  var maxPlacementAge                 = 24 * 20
+  var maxPlacementAge                 = 24 * 60
   
   /////////////
   // Battles //

@@ -8,6 +8,7 @@ import ProxyBwapi.Races.Neutral
 import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
 
 import scala.collection.mutable
+import scala.util.Random
 
 class Architect {
   
@@ -142,11 +143,15 @@ class Architect {
         .flatMap(_.gas.map(_.tileTopLeft))
     }
     else {
-      With.geography.bases
-        .toList
-        .sortBy( ! _.owner.isUs)
-        .view
-        .flatMap(_.zone.tiles.view)
+      shuffle(
+        With.geography.bases
+          .toList
+          .sortBy( ! _.owner.isUs)
+          .flatMap(_.zone.tiles))
     }
+  }
+  
+  def shuffle(tiles: Iterable[Tile]): Iterable[Tile] = {
+    Random.shuffle(tiles)
   }
 }

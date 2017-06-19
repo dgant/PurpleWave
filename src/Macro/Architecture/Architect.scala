@@ -120,7 +120,7 @@ class Architect {
     exclusions          : Iterable[TileRectangle] = Vector.empty)
       : Option[Tile] = {
     
-    val allCandidates = candidates(buildingDescriptor)
+    val allCandidates = candidates(buildingDescriptor).take(With.configuration.maxBuildingPlacementCandidates)
     val bestCandidate = EvaluatePlacements.best(buildingDescriptor, allCandidates)
     bestCandidate
   }
@@ -133,13 +133,17 @@ class Architect {
         .map(_.townHallArea.startInclusive)
     }
     else if (buildingDescriptor.gas) {
-      With.units.neutral
-        .view
-        .filter(_.unitClass.isGas)
-        .map(_.tileTopLeft)
+      With.geography.bases
+        .toList
+        .sortBy( ! _.owner.isUs)
+        .flatMap(_.gas.map(_.tileTopLeft))
     }
     else {
-      bases.flatMap(_.zone.tiles.view).view
+      With.geography.bases
+        .toList
+        .sortBy( ! _.owner.isUs)
+        .view
+        .flatMap(_.zone.tiles.view)
     }
   }
 }

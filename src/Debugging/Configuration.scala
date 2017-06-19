@@ -28,13 +28,15 @@ class Configuration {
   var dpsGridDistancePenalty          = 0.5
   var dpsGridMovementPenalty          = 0.5
   var dpsGridCooldownPenalty          = 0.25
+  var bunkerSafetyMargin              = Math.sqrt(16.0 * 16.0 * 2.0) + Math.sqrt(32.0 * 16.0 * 2.0) + 32.0 * (4.0 + 1.0) + /* This is the margin! */ 8.0
   
   ///////////
   // Macro //
   ///////////
   
-  var maxMineralsBeforeMinedOut = 300 * 8
-  var blockerMineralThreshold   = 50
+  var maxBuildingPlacementCandidates  = 100
+  var maxMineralsBeforeMinedOut       = 300 * 8
+  var blockerMineralThreshold         = 50
   
   /////////////
   // Battles //
@@ -54,7 +56,6 @@ class Configuration {
   var performanceMicroAngleStep   = 4
   var useFastGroundDistance       = true
   var unitHistoryAge              = 24 * 3
-  var bunkerSafetyMargin          = Math.sqrt(16.0 * 16.0 * 2.0) + Math.sqrt(32.0 * 16.0 * 2.0) + 32.0 * (4.0 + 1.0) + /* This is the margin! */ 8.0
   
   var urgencyManners            = 1
   var urgencyEconomy            = 1

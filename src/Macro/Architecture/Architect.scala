@@ -2,8 +2,8 @@ package Macro.Architecture
 
 import Information.Geography.Types.Base
 import Lifecycle.With
+import Macro.Architecture.Heuristics.EvaluatePlacements
 import Mathematics.Points.{Tile, TileRectangle}
-import Mathematics.Shapes.Spiral
 import ProxyBwapi.Races.Neutral
 import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
 
@@ -117,29 +117,29 @@ class Architect {
   
   private def placeBuilding(
     buildingDescriptor  : BuildingDescriptor,
-    exclusions          : Iterable[TileRectangle] = Vector.empty,
-    searchRadius        : Int                     = 30)
+    exclusions          : Iterable[TileRectangle] = Vector.empty)
       : Option[Tile] = {
     
-    val points: Iterable[Tile] =
-      if (buildingDescriptor.townHall) {
-        With.geography.bases.map(_.townHallArea.startInclusive)
-      }
-      else if (buildingDescriptor.gas) {
-        With.units.neutral
-          .filter(_.unitClass.isGas)
-          .map(_.tileTopLeft)
-          .toArray
-          .sortBy( _.zone.owner != With.self)
-      }
-      else {
-        bases.flatMap(base =>
-          Spiral
-            .points(searchRadius)
-            .view
-            .map(base.townHallArea.midpoint.add))
-      }
-      
-      points.find(canBuild(buildingDescriptor, _))
+    val allCandidates = candidates(buildingDescriptor)
+    val bestCandidate = EvaluatePlacements.best(buildingDescriptor, allCandidates)
+    bestCandidate
+  }
+  
+  def candidates(buildingDescriptor: BuildingDescriptor): Iterable[Tile] = {
+    
+    if (buildingDescriptor.townHall) {
+      With.geography.bases
+        .view
+        .map(_.townHallArea.startInclusive)
+    }
+    else if (buildingDescriptor.gas) {
+      With.units.neutral
+        .view
+        .filter(_.unitClass.isGas)
+        .map(_.tileTopLeft)
+    }
+    else {
+      bases.flatMap(_.zone.tiles.view).view
+    }
   }
 }

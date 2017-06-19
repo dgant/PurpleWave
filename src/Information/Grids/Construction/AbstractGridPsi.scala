@@ -18,8 +18,12 @@ abstract class AbstractGridPsi extends AbstractGridBoolean {
     
     reset()
     pylons.foreach(pylon =>
-      psiPoints.foreach(point =>
-        set(pylon.tileTopLeft.add(point), true)))
+      psiPoints.foreach(point => {
+        val tile = pylon.tileTopLeft.add(point)
+        if (tile.valid) {
+          set(tile, true)
+        }
+      }))
   }
   
   val psiPoints:Array[Point]

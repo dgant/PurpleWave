@@ -25,6 +25,7 @@ class Groundskeeper {
     With.architect.reboot()
     Vector(placed.keys, unplaced)
       .foreach(descriptors => sortByPriority(descriptors)
+        .headOption //Let's just do 1-2 per run so we run frequently in smaller batches
         .foreach(descriptor =>
           if (With.performance.continueRunning) {
             val tile = With.architect.fulfill(descriptor, placed.get(descriptor))

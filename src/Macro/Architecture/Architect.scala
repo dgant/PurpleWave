@@ -53,7 +53,7 @@ class Architect {
     output
   }
   
-  private def canBuild(buildingDescriptor: BuildingDescriptor, tile: Tile): Boolean = {
+  def canBuild(buildingDescriptor: BuildingDescriptor, tile: Tile): Boolean = {
     if ( ! With.performance.continueRunning) {
       return false
     }

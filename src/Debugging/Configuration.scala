@@ -37,7 +37,7 @@ class Configuration {
   var maxBuildingPlacementCandidates  = 100
   var maxMineralsBeforeMinedOut       = 300 * 8
   var blockerMineralThreshold         = 50
-  var maxPlacementAge                 = 24 * 60
+  var maxPlacementAge                 = 24 * 20
   
   /////////////
   // Battles //
@@ -61,11 +61,11 @@ class Configuration {
   var urgencyManners            = 1
   var urgencyEconomy            = 1
   var urgencyGeography          = 1
-  var urgencyBuildingPlacement  = 1
+  var urgencyBuildingPlacement  = 2
   var urgencyPlanning           = 2
-  var urgencyBattles            = 5
-  var urgencyGrids              = 10
-  var urgencyUnitTracking       = 10
+  var urgencyBattles            = 3
+  var urgencyGrids              = 5
+  var urgencyUnitTracking       = 5
   var urgencyMicro              = 100
   
   ///////////////////

@@ -11,7 +11,7 @@ class HeuristicWeight[TContext, TCandidate] (
       else
         Math.pow(HeuristicMathMultiplicative.clamp(heuristic.evaluate(context, candidate)), weight)
     
-    return result
+    result
   }
   
   def weighAdditively(context:TContext, candidate:TCandidate):Double = {
@@ -21,7 +21,7 @@ class HeuristicWeight[TContext, TCandidate] (
       else
         HeuristicMathAdditive.clamp(heuristic.evaluate(context, candidate)) * weight
     
-    return result
+    result
   }
   
 }

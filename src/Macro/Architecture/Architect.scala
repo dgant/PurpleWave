@@ -123,6 +123,7 @@ class Architect {
     val allCandidates = candidates(buildingDescriptor)
       .filter(canBuild(buildingDescriptor, _))
       .take(With.configuration.maxBuildingPlacementCandidates)
+      .toVector
     
     val bestCandidate = EvaluatePlacements.best(buildingDescriptor, allCandidates)
     

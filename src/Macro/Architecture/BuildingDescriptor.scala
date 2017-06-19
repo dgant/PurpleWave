@@ -111,13 +111,13 @@ class BuildingDescriptor(
   
   override def toString: String =
     "#" + With.prioritizer.getPriority(suggestor) + " " +
-    suggestor.toString.take(5) + "... " +
+    suggestor.toString.take(5) + " " +
     argBuilding.map(_.toString + " ").getOrElse("") +
     width + "x" + height + " " +
-    (if (margin) width + 2 * marginTiles + "x" + height + 2 * marginTiles + " " else "") +
-    (if (powers) "(Powers) " else "") +
-    (if (powered) "(Powered) " else "") +
-    (if (townHall) "(Town hall) " else "") +
-    (if (gas) "(Gas) " else "")
+    (if (margin) (width + 2 * marginTiles) + "x" + (height + 2 * marginTiles) + " " else "") +
+    (if (powers)    "(Powers) "     else "") +
+    (if (powered)   "(Powered) "    else "") +
+    (if (townHall)  "(Town hall) "  else "") +
+    (if (gas)       "(Gas) "        else "")
   
 }

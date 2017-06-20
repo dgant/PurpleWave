@@ -1,4 +1,4 @@
-package Planning.Plans.Macro.Automatic.Continuous
+package Planning.Plans.Macro.Automatic
 
 import Lifecycle.With
 import ProxyBwapi.Races.Protoss

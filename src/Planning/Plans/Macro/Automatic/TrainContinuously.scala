@@ -1,4 +1,4 @@
-package Planning.Plans.Macro.Automatic.Continuous
+package Planning.Plans.Macro.Automatic
 
 import Lifecycle.With
 import Macro.BuildRequests.RequestUnitAtLeast
@@ -12,14 +12,15 @@ class TrainContinuously(unitClass: UnitClass, maximum:Int = Int.MaxValue) extend
   override def onUpdate() {
     if ( ! canBuild) return
     
-    With.scheduler.request(this, Vector(
+    With.scheduler.request(
+      this,
       RequestUnitAtLeast(
         List(
           maximum,
           maxDesirable,
           buildCapacity + With.units.ours.count(unit => unit.aliveAndComplete && unit.unitClass == unitClass))
         .min,
-        unitClass)))
+        unitClass))
   }
   
   protected def canBuild:Boolean = {

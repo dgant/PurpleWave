@@ -5,7 +5,7 @@ import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Plans.Army.{ConsiderAttacking, DefendChokes}
 import Planning.Plans.Compound.{IfThenElse, Parallel}
 import Planning.Plans.Information.ScoutAt
-import Planning.Plans.Macro.Automatic.Continuous.{RequireSufficientPylons, TrainGatewayUnitsContinuously, TrainProbesContinuously}
+import Planning.Plans.Macro.Automatic.{RequireSufficientPylons, TrainGatewayUnitsContinuously, TrainProbesContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Milestones.UnitsExactly
 import ProxyBwapi.Races.Protoss

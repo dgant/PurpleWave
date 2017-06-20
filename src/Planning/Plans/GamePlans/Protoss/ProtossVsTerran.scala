@@ -5,10 +5,8 @@ import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Plans.Army.{ConsiderAttacking, ControlEnemyAirspace}
 import Planning.Plans.Compound.{And, IfThenElse, Or, Parallel}
 import Planning.Plans.Information.{ScoutAt, ScoutExpansionsAt}
-import Planning.Plans.Macro.Automatic.Continuous.{RequireSufficientPylons, TrainContinuously, TrainProbesContinuously}
-import Planning.Plans.Macro.Automatic.Gas.BuildAssimilators
+import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Macro.Expansion.WhenMinedOutExpand
 import Planning.Plans.Macro.Milestones.{HaveUpgrade, UnitsAtLeast}
 import Planning.Plans.Macro.Reaction.{EnemyBio, EnemyBioAllIn}
 import ProxyBwapi.Races.Protoss
@@ -27,19 +25,14 @@ class ProtossVsTerran extends Parallel {
     RequestUnitAtLeast(2,   Protoss.Forge),
     RequestUnitAtLeast(1,   Protoss.Stargate),
     
-    RequestUnitAtLeast(5,   Protoss.Nexus),
     RequestUpgrade(         Protoss.GroundDamage,   1),
     RequestUpgrade(         Protoss.GroundArmor,    1),
     
-    RequestUnitAtLeast(6,   Protoss.Nexus),
     RequestUnitAtLeast(1,   Protoss.TemplarArchives),
     RequestUpgrade(         Protoss.GroundDamage,   2),
     RequestUpgrade(         Protoss.GroundArmor,    2),
     RequestUpgrade(         Protoss.GroundDamage,   3),
-    RequestUpgrade(         Protoss.GroundArmor,    3),
-    
-    RequestUnitAtLeast(7,   Protoss.Nexus),
-    RequestUnitAtLeast(8,   Protoss.Nexus)
+    RequestUpgrade(         Protoss.GroundArmor,    3)
   )
   
   private class RespondToBioAllInWithReavers extends IfThenElse(
@@ -54,18 +47,18 @@ class ProtossVsTerran extends Parallel {
   
   private class WhenSafeToTakeNatural extends IfThenElse(
     new Or(
-      new UnitsAtLeast(5, UnitMatchType(Protoss.Dragoon)),
+      new UnitsAtLeast(3, UnitMatchType(Protoss.Dragoon)),
       new UnitsAtLeast(1, UnitMatchType(Protoss.Reaver))
     ),
-    new Build(ProtossBuilds.TakeNatural)
+    new BuildMiningBases(2)
   )
   
   private class WhenSafeToTakeThirdBase extends IfThenElse(
     new Or(
-      new UnitsAtLeast(8, UnitMatchType(Protoss.Dragoon)),
+      new UnitsAtLeast(5, UnitMatchType(Protoss.Dragoon)),
       new UnitsAtLeast(1, UnitMatchType(Protoss.Reaver))
     ),
-    new Build(ProtossBuilds.TakeThirdBase)
+    new BuildMiningBases(3)
   )
   
   private class BuildDragoonsUntilWeHaveZealotSpeed extends IfThenElse(
@@ -82,19 +75,18 @@ class ProtossVsTerran extends Parallel {
   )
   
   children.set(Vector(
-    new WhenMinedOutExpand,
+    new BuildMiningBases(1),
     new Build(ProtossBuilds.OpeningTwoGate1015Dragoons),
     new RequireSufficientPylons,
     new TrainProbesContinuously,
+    new BuildAssimilators,
     new RespondToBioAllInWithReavers,
     new WhenSafeToTakeNatural,
     new RespondToBioWithReavers,
     new WhenSafeToTakeThirdBase,
-    new BuildAssimilators,
     new TrainContinuously(Protoss.Reaver, 2),
     new TrainContinuously(Protoss.Scout,  3),
     new BuildDragoonsUntilWeHaveZealotSpeed,
-    new Build(ProtossBuilds.TakeNatural),
     new UpgradeReavers,
     new Build(lateGameBuild),
     new ScoutExpansionsAt(60),

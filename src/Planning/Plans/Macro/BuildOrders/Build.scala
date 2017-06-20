@@ -5,13 +5,13 @@ import Planning.Composition.Property
 import Planning.Plan
 import Lifecycle.With
 
-class Build(initialBuildables:Seq[BuildRequest] = Vector.empty) extends Plan {
+class Build(initialBuildables: Seq[BuildRequest] = Vector.empty) extends Plan {
   
-  def this(someBuildables:BuildRequest) = this(Vector(someBuildables))
+  def this(someBuildable: BuildRequest) = this(Vector(someBuildable))
   
   description.set("Schedule a fixed build order")
   
   val buildables = new Property[Seq[BuildRequest]](initialBuildables)
   
-  override def onUpdate() = With.scheduler.request(this, buildables.get)
+  override def onUpdate() { With.scheduler.request(this, buildables.get) }
 }

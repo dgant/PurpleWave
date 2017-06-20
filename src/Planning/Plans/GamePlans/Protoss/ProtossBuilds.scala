@@ -150,16 +150,4 @@ object ProtossBuilds {
     RequestUnitAtLeast(1,   Protoss.CitadelOfAdun),
     RequestUnitAtLeast(1,   Protoss.TemplarArchives)
   )
-  
-  val TakeNatural = Vector[BuildRequest] (
-    RequestUnitAtLeast(2, Protoss.Nexus)
-  )
-  
-  val TakeThirdBase = Vector[BuildRequest] (
-    RequestUnitAtLeast(3, Protoss.Nexus)
-  )
-  
-  val TakeFourthBase = Vector[BuildRequest] (
-    RequestUnitAtLeast(4, Protoss.Nexus)
-  )
 }

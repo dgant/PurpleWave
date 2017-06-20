@@ -21,7 +21,11 @@ class Scheduler {
   var queueOriginal   : Iterable[Buildable]   = Vector.empty
   def queueOptimized  : Iterable[BuildEvent]  = simulationResults.suggestedEvents
   
-  def request(requester:Plan, requests: Iterable[BuildRequest]) {
+  def request(requester: Plan, aRequest: BuildRequest) {
+    request(requester, List(aRequest))
+  }
+  
+  def request(requester: Plan, requests: Iterable[BuildRequest]) {
     requestsByPlan.put(requester, requests)
     recentlyUpdated.add(requester)
   }

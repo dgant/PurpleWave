@@ -11,7 +11,7 @@ object PlacementProfiles {
     preferGas       = 0.0,
     preferSpace     = 0.5,
     preferPowering  = 6.0,
-    avoidDistance   = 0.5,
+    avoidDistance   = 1.0,
     avoidEnemy      = 0.5
   )
   

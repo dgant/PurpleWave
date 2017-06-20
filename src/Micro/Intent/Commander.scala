@@ -76,22 +76,27 @@ class Commander {
     }
     
     // Mineral walk!
-    if (With.configuration.enableMineralWalk
-      && unit.unitClass.isWorker
+    if (
+      unit.unitClass.isWorker
       && ! unit.carryingResources) {
-      val from = unit.pixelCenter
-      val fromZone = from.zone
-      val toZone = to.zone
-      val walkableMineral = toZone.bases
-        .flatten(_.minerals)
-        .find(mineral =>
-          mineral.visible && //Can't mineral walk to an invisible mineral
-          mineral.pixelsFromEdgeFast(unit) > 60.0 && ( //Don't get stuck by trying to mineral walk through a mineral
-            toZone != fromZone ||
-            Math.abs(from.degreesTo(to) - from.degreesTo(mineral.pixelCenter)) < 30))
-      if (walkableMineral.isDefined) {
-        gather(unit, walkableMineral.get)
-        return
+      val from      = unit.pixelCenter
+      val fromZone  = from.zone
+      val toZone    = to.zone
+      if (fromZone != toZone || With.configuration.enableMineralWalkInSameZone) {
+        val walkableMineral = toZone.bases
+          .flatten(_.minerals)
+          .find(mineral =>
+            mineral.visible && //Can't mineral walk to an invisible mineral
+            mineral.pixelsFromEdgeFast(unit) > 60.0 &&
+            (
+              //Don't get stuck by trying to mineral walk through a mineral
+              toZone != fromZone ||
+              Math.abs(from.degreesTo(to) - from.degreesTo(mineral.pixelCenter)) < 30
+            ))
+        if (walkableMineral.isDefined) {
+          gather(unit, walkableMineral.get)
+          return
+        }
       }
     }
     

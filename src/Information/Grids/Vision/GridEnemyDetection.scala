@@ -12,7 +12,7 @@ class GridEnemyDetection extends AbstractGridBoolean {
       .filter(_.likelyStillThere)
       .filter(_.unitClass.isDetector)
       .foreach(u => {
-      Circle.points(u.unitClass.sightRange / 32)
+      Circle.points(11) // All detectors have a detection range of 11 even if their sight range is different
         .map(u.tileIncludingCenter.add)
         .foreach(set(_, true))
     })

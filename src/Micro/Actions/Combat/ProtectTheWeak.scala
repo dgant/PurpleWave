@@ -2,7 +2,8 @@ package Micro.Actions.Combat
 
 import Micro.Actions.Action
 import Micro.Actions.Basic.Gather
-import Micro.Actions.Commands.Attack
+import Micro.Actions.Commands.{Attack, Reposition}
+import Micro.Behaviors.MovementProfiles
 import Micro.Execution.ExecutionState
 import Micro.Heuristics.Targeting.EvaluateTargets
 import ProxyBwapi.UnitInfo.UnitInfo
@@ -16,12 +17,21 @@ object ProtectTheWeak extends Action {
   }
   
   override protected def perform(state: ExecutionState) {
+    
     val currentBullies = bullies(state)
     
     if (currentBullies.nonEmpty) {
+  
       state.toAttack = EvaluateTargets.best(state, currentBullies)
-      Attack.delegate(state)
-      // TODO: Keep repositioning while hitting bullies!
+      state.movementProfile = MovementProfiles.safelyAttackTarget
+  
+      if (state.unit.canAttackThisFrame) {
+        Attack.delegate(state)
+      }
+      else {
+        // Avoid taking damage while we defend our workers
+        Reposition.delegate(state)
+      }
     }
   }
   

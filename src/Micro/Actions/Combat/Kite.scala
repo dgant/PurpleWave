@@ -20,9 +20,8 @@ object Kite extends Action {
     // * We match their top speed: Frames before hitting us
     // so if we're fighting both Zealots and Dragoons, we outspeed if we're out of Dragoon range for long enough to shoot
     
-    val canFire = state.unit.cooldownLeft > 0
-    
-    if (canFire) {
+    val canAttackThisFrame = state.unit.canAttackThisFrame
+    if (canAttackThisFrame) {
       
       val activelyThreatened = state.threatsActive.nonEmpty
       
@@ -68,7 +67,7 @@ object Kite extends Action {
     //  If we're not being pursued they're not pursuing us, fire
     
     if (state.unit.cooldownLeft > 0) {
-      Hover.delegate(state)
+      HoverOutsideRange.delegate(state)
       return
     }
     
@@ -92,7 +91,7 @@ object Kite extends Action {
           else
             state.unit.pixelRangeMax - 80.0))) {
       
-      Hover.delegate(state)
+      HoverOutsideRange.delegate(state)
     }
     
     Engage.delegate(state)

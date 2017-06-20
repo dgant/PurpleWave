@@ -56,7 +56,7 @@ class Commander {
     if (unready(unit)) return
     
     if (target.visible) {
-      if (unit.cooldownLeft == 0 || ! unit.target.exists(_ == target)) {
+      if (unit.canAttackThisFrame || ! unit.target.contains(target)) {
         unit.base.attack(target.base)
       }
       sleepAttack(unit)

@@ -1,27 +1,29 @@
 package Micro.Actions.Combat
 
 import Micro.Actions.Action
-import Micro.Actions.Commands.Attack
+import Micro.Actions.Commands.{Attack, Reposition}
 import Micro.Execution.ExecutionState
 
 object Engage extends Action {
   
   override def allowed(state: ExecutionState): Boolean = {
-    // TODO: Are these the right conditions?
-    state.canFight              &&
-    state.toAttack.isEmpty      &&
-    state.unit.canMoveThisFrame &&
-    state.targets.nonEmpty      &&
-    {
-      val zone = state.unit.pixelCenter.zone
-      ! zone.owner.isNeutral || state.toTravel.exists(_.zone == zone)
-    }
+    state.canFight &&
+    state.targets.nonEmpty
   }
   
   override def perform(state: ExecutionState) {
+    
+    // TODO: Avoid chasing distractions (make PURSUE the judge of that).
+    
+    state.toTravel = state.unit.battle.map(_.enemy.centroid).orElse(state.toTravel)
+    
     Brawl.consider(state)
     Target.delegate(state)
-    Attack.delegate(state)
-    // TODO: How do we kite?
+    if (state.unit.canAttackThisFrame) {
+      Attack.delegate(state)
+    }
+    else {
+      Reposition.delegate(state)
+    }
   }
 }

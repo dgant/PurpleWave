@@ -14,9 +14,10 @@ object Pursue extends Action {
     state.targets.nonEmpty
   }
   
-  override def perform(state:ExecutionState) {
+  override def perform(state: ExecutionState) {
     val pursuableTargets = state.targets.filter(_.topSpeed < state.unit.topSpeed * 0.9)
     state.toAttack = EvaluateTargets.best(state, pursuableTargets)
     Attack.delegate(state)
+    // TODO: Chase down where the target is going to go!
   }
 }

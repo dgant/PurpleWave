@@ -11,26 +11,31 @@ object Disengage extends Action {
   
   override protected def perform(state: ExecutionState) {
     
-    // TODO: These outrange/outspeed concepts are excessively rigid.
-    // For example, 20 dragoons vs 20 Vultures + 1 Siege Tank basically means WE OUTRANGE THEM even if one of their units outranges us.
+    val completelySafe = state.threats.isEmpty
+    if (completelySafe) {
+      Engage.delegate(state)
+      return
+    }
     
-    // Are we totally safe? Keep fighting.
-    //
-    if (state.threats.isEmpty) {
+    val trapped = state.threats.count(threat =>
+      threat.melee
+      && threat.topSpeed > state.unit.topSpeed
+      && threat.pixelDistanceFast(state.unit) < 48.0) > 2
+    if (trapped) {
+      Brawl.delegate(state)
       Engage.delegate(state)
     }
   
-    // Are we trapped? Fight like a caged animal.
-    //
-    val trapped = true // TODO
-    if (trapped) {
-      Engage.delegate(state)
-    }
+    // TODO: These outrange/outspeed concepts are excessively rigid.
+    // For example, 20 dragoons vs 20 Vultures + 1 Siege Tank basically means WE OUTRANGE THEM even if one of their units outranges us.
     
     // If we're faster than all the threats we can afford to be clever.
     //
-    val weOutspeed = true // TODO
-    val weOutrange = true // TODO
+    val ourMaxRange     = if (state.targets.isEmpty) 0.0 else state.unit.pixelRangeMax
+    val threatMaxSpeed  = state.threats.map(_.topSpeed).max
+    val threatMaxRange  = state.threats.map(_.pixelRangeAgainstFromCenter(state.unit)).max
+    val weOutspeed      = state.unit.topSpeed > threatMaxSpeed
+    val weOutrange      = ourMaxRange > threatMaxRange
     if (weOutspeed) {
       // Do we outrange AND outspeed all threats? MAYBE Kite.
       // But don't, for example, kite 10 Marines with a Dragoon.
@@ -41,16 +46,18 @@ object Disengage extends Action {
           Kite.delegate(state)
         }
       }
-      Hover.consider(state)
+      HoverOutsideRange.consider(state)
     }
   
-    // If we're outsped, we may be forced to fight
-    val outsped = true
-    if (outsped) {
-      
+    // If we're caught, we may be forced to fight
+    val caught = state.threats.exists(threat => threat.inRangeToAttackFast(state.unit) && threat.topSpeed > state.unit.topSpeed)
+    if (caught) {
       // Let's get some shots in, at least
       if (weOutrange) {
         Kite.delegate(state)
+      }
+      else {
+        Potshot.delegate(state)
       }
     }
   

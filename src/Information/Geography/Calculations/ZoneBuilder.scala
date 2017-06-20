@@ -41,7 +41,7 @@ object ZoneBuilder {
       .flatMap(neighborTile => candidates.view.find(candidate => candidate.tiles.contains(neighborTile)))
       .headOption
     matchingZone
-      .getOrElse(zones.minBy(_.centroid.pixelDistanceFast(tile.pixelCenter)))
+      .getOrElse(zones.minBy(_.centroid.tileDistanceSquared(tile)))
       .tiles
       .add(tile)
   }
@@ -72,14 +72,14 @@ object ZoneBuilder {
       new ListBuffer[ZoneEdge])
   }
   
-  def buildBase(townHallPixel: Tile, zones: Iterable[Zone]): Base = {
-    val townHallArea = Protoss.Nexus.tileArea.add(townHallPixel)
+  def buildBase(townHallTile: Tile, zones: Iterable[Zone]): Base = {
+    val townHallArea = Protoss.Nexus.tileArea.add(townHallTile)
     new Base(
       zones
-        .find(_.contains(townHallPixel.pixelCenter))
-        .getOrElse(zones.minBy(_.centroid.pixelDistanceFast(townHallPixel.pixelCenter))),
+        .find(_.contains(townHallTile.pixelCenter))
+        .getOrElse(zones.minBy(_.centroid.tileDistanceSquared(townHallTile))),
       townHallArea,
-      With.game.getStartLocations.asScala.map(new Tile(_)).exists(_.tileDistanceSlow(townHallPixel) < 6))
+      With.game.getStartLocations.asScala.map(new Tile(_)).exists(_.tileDistanceSlow(townHallTile) < 6))
   }
   
   def buildEdge(choke: Chokepoint, zones: Iterable[Zone]): ZoneEdge =

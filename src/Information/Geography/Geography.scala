@@ -22,18 +22,18 @@ class Geography {
   def ourTownHalls        : Iterable[UnitInfo]      = ourBases.flatMap(_.townHall)
   def ourHarvestingAreas  : Iterable[TileRectangle] = ourBases.map(_.harvestingArea)
   
-  def zoneByTile(tile:Tile):Zone = zonesByTileCache(tile)
+  def zoneByTile(tile: Tile):Zone = zonesByTileCache(tile)
   private lazy val zonesByTileCache =
     new mutable.HashMap[Tile, Zone] {
       override def default(key: Tile): Zone = {
         val zone = zones.find(_.tiles.contains(key))
-          .getOrElse(zones.minBy(_.centroid.pixelDistanceFast(key.pixelCenter)))
+          .getOrElse(zones.minBy(_.centroid.tileDistanceSquared(key)))
         put(key, zone)
         zone
       }
     }
   
-  def home:Tile = homeCache.get
+  def home: Tile = homeCache.get
   private val homeCache = new Cache(5, () =>
     ourBases
       .toVector

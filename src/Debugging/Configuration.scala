@@ -34,7 +34,7 @@ class Configuration {
   // Macro //
   ///////////
   
-  var maxBuildingPlacementCandidates  = 100
+  var maxBuildingPlacementCandidates  = 300
   var maxMineralsBeforeMinedOut       = 300 * 8
   var blockerMineralThreshold         = 50
   var maxPlacementAge                 = 24 * 20

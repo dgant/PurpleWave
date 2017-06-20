@@ -15,8 +15,8 @@ object PathFinder {
     }
     
     if ( ! With.paths.exists(
-      fromZone.centroid.tileIncluding,
-      toZone.centroid.tileIncluding,
+      fromZone.centroid,
+      toZone.centroid,
       requireBwta = true)) {
       return With.paths.impossiblyLargeDistance
     }

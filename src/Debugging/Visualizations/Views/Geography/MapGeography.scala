@@ -11,11 +11,6 @@ object MapGeography {
       DrawMap.polygonPixels(
         zone.points,
         zone.owner.colorDark)
-      
-      DrawMap.line(
-        zone.points.head,
-        zone.points.last,
-        zone.owner.colorDark)
     })
   }
 }

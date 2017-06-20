@@ -13,13 +13,13 @@ class Paths {
   private val distanceCache = new mutable.HashMap[(Tile, Tile), Double]
   private val distanceAge = new mutable.HashMap[(Tile, Tile), Double]
   
-  val impossiblyLargeDistance = 32.0 * 32.0 * 256.0 * 256.0 * 100.0
+  val impossiblyLargeDistance: Double = 32.0 * 32.0 * 256.0 * 256.0 * 100.0
   
   def exists(origin:Tile, destination: Tile, requireBwta:Boolean = false):Boolean = {
     groundPixels(origin, destination, requireBwta) < impossiblyLargeDistance
   }
   
-  def groundPixels(origin:Tile, destination:Tile, requireBwta:Boolean = false):Double = {
+  def groundPixels(origin: Tile, destination: Tile, requireBwta: Boolean = false):Double = {
     val request = (origin, destination)
     if ( ! distanceCache.contains(request)) {
       calculateDistance(request, requireBwta)
@@ -35,7 +35,7 @@ class Paths {
     result
   }
   
-  private def calculateDistance(request:(Tile, Tile), requireBwta:Boolean) {
+  private def calculateDistance(request: (Tile, Tile), requireBwta: Boolean) {
     val distance =
       if (With.configuration.useFastGroundDistance && With.frame > 0 && ! requireBwta)
         PathFinder.roughGroundDistance(request._1.pixelCenter, request._2.pixelCenter)

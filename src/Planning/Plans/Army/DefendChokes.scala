@@ -24,17 +24,18 @@ class DefendChokes extends ControlPixel {
           choke.sidePixels.last,
           choke.zones
             .toList
-            .sortBy(zone => With.paths.groundPixels(zone.centroid.tileIncluding, With.geography.home))
+            .sortBy(zone => With.paths.groundPixels(zone.centroid, With.geography.home))
             .sortBy(zone => ! zone.owner.isUs)
             .head
-            .centroid))
+            .centroid
+            .pixelCenter))
       .getOrElse(Map[UnitInfo, Pixel]())
   
     controllers.get.acquire(this)
     if (controllers.get.satisfied) {
       controllers.get.units.foreach(
         defender => {
-          val spot = formation.get(defender).getOrElse(targetPixel)
+          val spot = formation.getOrElse(defender, targetPixel)
           With.executor.intend(new Intention(this, defender) {
             toReturn  = Some(spot)
             toTravel  = Some(spot)

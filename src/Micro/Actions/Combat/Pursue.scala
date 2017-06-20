@@ -3,14 +3,13 @@ package Micro.Actions.Combat
 import Micro.Actions.Action
 import Micro.Actions.Commands.Attack
 import Micro.Heuristics.Targeting.EvaluateTargets
-import Micro.Task.ExecutionState
+import Micro.Execution.ExecutionState
 
 object Pursue extends Action {
   
-  override def allowed(state:ExecutionState): Boolean = {
-    state.canAttack &&
-    state.canPursue &&
-    state.toAttack.isEmpty &&
+  override def allowed(state: ExecutionState): Boolean = {
+    state.canFight              &&
+    state.toAttack.isEmpty      &&
     state.unit.canMoveThisFrame &&
     state.targets.nonEmpty
   }

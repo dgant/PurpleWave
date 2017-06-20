@@ -11,7 +11,7 @@ import Macro.Allocation._
 import Macro.Scheduling.Scheduler
 import Macro.Architecture.Architect
 import Micro.Intent.Commander
-import Micro.Task.Executor
+import Micro.Execution.Executor
 import Performance.TaskQueue.{AbstractTaskQueue, TaskQueueGlobal}
 import Planning.Plans.GamePlans.WinTheGame
 import ProxyBwapi.Players.{PlayerInfo, Players}

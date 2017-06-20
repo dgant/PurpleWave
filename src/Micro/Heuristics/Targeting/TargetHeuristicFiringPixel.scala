@@ -1,7 +1,7 @@
 package Micro.Heuristics.Targeting
 
 import Lifecycle.With
-import Micro.Task.ExecutionState
+import Micro.Execution.ExecutionState
 import ProxyBwapi.UnitInfo.UnitInfo
 
 object TargetHeuristicFiringPixel extends TargetHeuristic{

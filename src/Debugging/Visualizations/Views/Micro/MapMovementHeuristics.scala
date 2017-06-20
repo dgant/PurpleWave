@@ -12,7 +12,7 @@ object MapMovementHeuristics {
   
   def render() {
     
-    var focus:Iterable[FriendlyUnitInfo] = With.units.ours.filter(unit => unit.selected && eligible(unit))
+    var focus: Iterable[FriendlyUnitInfo] = With.units.ours.filter(unit => unit.selected && eligible(unit))
     
     if (focus.isEmpty) {
       focus = With.executor.states
@@ -24,17 +24,17 @@ object MapMovementHeuristics {
     focus.foreach(unit => renderUnit(unit.executionState.movementHeuristicResults))
   }
   
-  private def eligible(unit:FriendlyUnitInfo):Boolean =
+  private def eligible(unit: FriendlyUnitInfo): Boolean =
     unit.aliveAndComplete &&
       (With.frame - With.executor.getState(unit).movedHeuristicallyFrame) < 24 &&
       With.viewport.contains(unit.pixelCenter)
   
-  def scale(results:Iterable[MovementHeuristicResult]):Double =
+  def scale(results: Iterable[MovementHeuristicResult]): Double =
     normalize(results.map(_.evaluation).max / results.map(_.evaluation).min)
   
-  def normalize(value:Double):Double = if (value < 1.0) 1.0/value else value
+  def normalize(value: Double): Double = if (value < 1.0) 1.0/value else value
   
-  def renderUnit(results:Iterable[MovementHeuristicResult]) {
+  def renderUnit(results: Iterable[MovementHeuristicResult]) {
     if (results.isEmpty) return
     
     val heuristicGroups = results.groupBy(_.heuristic)
@@ -49,7 +49,7 @@ object MapMovementHeuristics {
     DrawMap.circle(unit.pixelCenter, With.configuration.battleMarginPixels.toInt, Colors.BrightRed)
   }
   
-  def renderUnitHeuristic(results:Iterable[MovementHeuristicResult], maxScale:Double) {
+  def renderUnitHeuristic(results: Iterable[MovementHeuristicResult], maxScale: Double) {
     val ourScale          = scale(results)
     val relativeScale     = ourScale / maxScale
     val evaluationExtreme = results.maxBy(result => Math.abs(HeuristicMathMultiplicative.default - result.evaluation)).evaluation
@@ -80,7 +80,7 @@ object MapMovementHeuristics {
       })
   }
   
-  def renderLegend(groups:Iterable[Iterable[MovementHeuristicResult]]) {
+  def renderLegend(groups: Iterable[Iterable[MovementHeuristicResult]]) {
     val descendingScale = groups
       .toVector
       .sortBy(scale)
@@ -89,7 +89,7 @@ object MapMovementHeuristics {
     descendingScale.zipWithIndex.foreach { case (group, index) => renderLegendKey(group, index) }
   }
   
-  def renderLegendKey(group:Iterable[MovementHeuristicResult], order:Int) {
+  def renderLegendKey(group: Iterable[MovementHeuristicResult], order: Int) {
     val left = 5
     val top = 5
     val rowHeight = 15

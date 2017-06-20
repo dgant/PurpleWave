@@ -1,7 +1,7 @@
 package Micro.Heuristics.Targeting
 
 import Mathematics.Heuristics.HeuristicMathMultiplicative
-import Micro.Task.ExecutionState
+import Micro.Execution.ExecutionState
 import ProxyBwapi.UnitInfo.UnitInfo
 
 object TargetHeuristicDistraction extends TargetHeuristic{

@@ -1,8 +1,9 @@
 package Micro.Actions
 
 import Micro.Actions.Basic._
+import Micro.Actions.Combat.Fight
 import Micro.Actions.Commands.{Attack, Travel}
-import Micro.Task.ExecutionState
+import Micro.Execution.ExecutionState
 
 object Idle extends Action {
   
@@ -22,8 +23,7 @@ object Idle extends Action {
     state.toTech          = state.intent.toTech
     state.toUpgrade       = state.intent.toUpgrade
     state.toForm          = state.intent.toForm
-    state.canPursue       = state.intent.canPursue
-    state.canAttack       = state.intent.canAttack
+    state.canFight       = state.intent.canAttack
     
     actions.foreach(_.consider(state))
   }

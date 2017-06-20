@@ -10,7 +10,8 @@ import ProxyBwapi.Upgrades.Upgrade
 import Utilities.CountMap
 
 // Commander is responsible for issuing unit commands
-// in a way that Brood War handles gracefully.
+// in a way that Brood War handles gracefully,
+// and to take advantage of Brood War mechanics to optimize commands.
 //
 // The goal is for the rest of the code base to be blissfully unaware
 // of Brood War's glitchy unit behavior.
@@ -43,15 +44,15 @@ class Commander {
     nextOrderFrame.contains(unit) && (unit.attackAnimationHappening || unit.attackStarting)
   }
   
-  def ready(unit: FriendlyUnitInfo):Boolean = {
+  def ready(unit: FriendlyUnitInfo): Boolean = {
     nextOrderFrame(unit) < With.frame
   }
   
-  private def unready(unit: FriendlyUnitInfo):Boolean = {
+  private def unready(unit: FriendlyUnitInfo): Boolean = {
     ! ready(unit)
   }
   
-  def attack(unit:FriendlyUnitInfo, target:UnitInfo) {
+  def attack(unit: FriendlyUnitInfo, target: UnitInfo) {
     if (unready(unit)) return
     
     if (target.visible) {
@@ -64,7 +65,14 @@ class Commander {
     }
   }
   
-  def move(unit:FriendlyUnitInfo, to:Pixel) {
+  def attackMove(unit: FriendlyUnitInfo, destination: Pixel) {
+    if (unready(unit)) return
+    
+    unit.base.attack(destination.bwapi)
+    sleepAttack(unit)
+  }
+  
+  def move(unit: FriendlyUnitInfo, to: Pixel) {
     if (unready(unit)) return
     
     //Send flying units past their destination to maximize acceleration
@@ -121,7 +129,7 @@ class Commander {
     }
   }
   
-  def gather(unit:FriendlyUnitInfo, resource:UnitInfo) {
+  def gather(unit: FriendlyUnitInfo, resource: UnitInfo) {
     if (unready(unit)) return
     
     if (unit.carryingMinerals || unit.carryingGas) {
@@ -151,13 +159,13 @@ class Commander {
     }
   }
   
-  def build(unit:FriendlyUnitInfo, unitClass:UnitClass) {
+  def build(unit: FriendlyUnitInfo, unitClass: UnitClass) {
     if (unready(unit)) return
     unit.base.build(unitClass.baseType)
     sleepBuild(unit)
   }
   
-  def build(unit:FriendlyUnitInfo, unitClass:UnitClass, tile:Tile) {
+  def build(unit: FriendlyUnitInfo, unitClass: UnitClass, tile: Tile) {
     if (unready(unit)) return
     if (unit.pixelDistanceSquared(tile.pixelCenter) > Math.pow(32.0 * 5.0, 2)) {
       move(unit, tile.pixelCenter)
@@ -167,35 +175,35 @@ class Commander {
     sleepBuild(unit)
   }
   
-  def tech(unit:FriendlyUnitInfo, tech: Tech) {
+  def tech(unit: FriendlyUnitInfo, tech: Tech) {
     if (unready(unit)) return
     unit.base.research(tech.baseType)
     sleep(unit)
   }
   
-  def upgrade(unit:FriendlyUnitInfo, upgrade: Upgrade) {
+  def upgrade(unit: FriendlyUnitInfo, upgrade: Upgrade) {
     if (unready(unit)) return
     unit.base.upgrade(upgrade.baseType)
     sleep(unit)
   }
   
-  def buildScarab(unit:FriendlyUnitInfo) {
+  def buildScarab(unit: FriendlyUnitInfo) {
     if (unready(unit)) return
     unit.base.build(Protoss.Scarab.baseType)
     sleep(unit)
   }
   
-  def buildInterceptor(unit:FriendlyUnitInfo) {
+  def buildInterceptor(unit: FriendlyUnitInfo) {
     if (unready(unit)) return
     unit.base.build(Protoss.Interceptor.baseType)
     sleep(unit)
   }
   
-  private def sleepAttack(unit:FriendlyUnitInfo) {
+  private def sleepAttack(unit: FriendlyUnitInfo) {
     sleep(unit, unit.unitClass.framesRequiredForAttackToComplete)
   }
   
-  private def sleepBuild(unit:FriendlyUnitInfo) {
+  private def sleepBuild(unit: FriendlyUnitInfo) {
     //Based on https://github.com/tscmoo/tsc-bwai/blame/master/src/unit_controls.h#L1497
     sleep(unit, 7)
   }
@@ -205,7 +213,7 @@ class Commander {
     sleep(unit, 8)
   }
   
-  private def sleep(unit:FriendlyUnitInfo, requiredDelay:Int = 2) {
+  private def sleep(unit: FriendlyUnitInfo, requiredDelay: Int = 2) {
     val sleepUntil = Array(
       With.frame + With.configuration.performanceMinimumUnitSleep,
       With.frame + requiredDelay,

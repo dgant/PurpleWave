@@ -2,18 +2,18 @@ package Micro.Actions.Basic
 
 import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Actions.Combat.{Flee, Shoot}
-import Micro.Task.ExecutionState
+import Micro.Actions.Combat.{Flee, Potshot}
+import Micro.Execution.ExecutionState
 
 object Gather extends Action {
   
-  override def allowed(state:ExecutionState) = {
+  override def allowed(state: ExecutionState): Boolean = {
     state.intent.toGather.isDefined
   }
   
-  override def perform(state:ExecutionState) {
+  override def perform(state: ExecutionState) {
   
-    Shoot.consider(state)
+    Potshot.consider(state)
     
     if (state.threatsActive.exists(_.isBeingViolentTo(state.unit))) {
       Flee.consider(state)

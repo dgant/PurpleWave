@@ -3,7 +3,7 @@ package Micro.Heuristics.Movement
 import Lifecycle.With
 import Mathematics.Heuristics.HeuristicMathMultiplicative
 import Mathematics.Points.{Pixel, Tile}
-import Micro.Task.ExecutionState
+import Micro.Execution.ExecutionState
 object MovementHeuristicTraffic extends MovementHeuristic {
   
   val scaling = 1.0 / 32.0 / 32.0

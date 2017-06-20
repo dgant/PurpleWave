@@ -2,7 +2,7 @@ package Micro.Heuristics.Movement
 
 import Lifecycle.With
 import Mathematics.Points.Pixel
-import Micro.Task.ExecutionState
+import Micro.Execution.ExecutionState
 
 object MovementHeuristicExposureToDamage extends MovementHeuristic {
   

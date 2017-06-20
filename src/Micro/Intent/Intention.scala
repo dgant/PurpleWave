@@ -20,8 +20,7 @@ class Intention(val plan: Plan, val unit: FriendlyUnitInfo) {
   var toTech      : Option[Tech]      = None
   var toForm      : Option[Pixel]     = None
   var toUpgrade   : Option[Upgrade]   = None
-  var canPursue   : Boolean           = true
   var canAttack   : Boolean           = true
   var canFlee     : Boolean           = true
-  var canCower     : Boolean           = true
+  var canCower    : Boolean           = true
 }

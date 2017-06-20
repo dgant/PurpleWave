@@ -2,7 +2,7 @@ package Micro.Heuristics.Movement
 
 import Mathematics.Heuristics.HeuristicMathMultiplicative
 import Mathematics.Points.Pixel
-import Micro.Task.ExecutionState
+import Micro.Execution.ExecutionState
 
 object MovementHeuristicThreatDistance extends MovementHeuristic {
   

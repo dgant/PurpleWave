@@ -1,5 +1,5 @@
 package Micro.Heuristics.Targeting
-import Micro.Task.ExecutionState
+import Micro.Execution.ExecutionState
 import ProxyBwapi.UnitInfo.UnitInfo
 
 object TargetHeuristicDamagePerSecond extends TargetHeuristic{

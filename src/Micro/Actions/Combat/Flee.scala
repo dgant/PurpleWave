@@ -1,37 +1,21 @@
 package Micro.Actions.Combat
 
-import Information.Geography.Types.Zone
 import Micro.Actions.Action
 import Micro.Actions.Commands.{Reposition, Travel}
 import Micro.Behaviors.MovementProfiles
-import Micro.Task.ExecutionState
+import Micro.Execution.ExecutionState
 
 object Flee extends Action {
   
-  override def allowed(state: ExecutionState) = {
+  override def allowed(state: ExecutionState): Boolean = {
     state.intent.canFlee &&
-    state.unit.canMoveThisFrame &&
-    (
-      (
-        state.unit.unitClass.isWorker &&
-        state.threatsActive.nonEmpty
-      ) ||
-      (
-        state.threats.exists(threat => zoneQualifies(threat.pixelCenter.zone)) &&
-        zoneQualifies(state.unit.pixelCenter.zone)
-      )
-    )
-  }
-  
-  private def zoneQualifies(zone: Zone): Boolean = {
-    ! zone.owner.isUs || zone.bases.isEmpty
+    state.unit.canMoveThisFrame
   }
   
   override def perform(state: ExecutionState) {
     
     state.movementProfile = MovementProfiles.flee
     
-    state.canPursue = false
     state.toTravel  = Some(state.origin)
     val isBackLine = state.unit.battle.exists(battle =>
       battle.enemy.vanguard.pixelDistanceFast(state.unit.pixelCenter) >

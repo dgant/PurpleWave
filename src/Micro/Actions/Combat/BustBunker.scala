@@ -3,8 +3,9 @@ package Micro.Actions.Combat
 import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Commands.{Attack, Reposition}
-import Micro.Task.ExecutionState
+import Micro.Execution.ExecutionState
 import ProxyBwapi.Races.{Protoss, Terran}
+import bwapi.Race
 
 object BustBunker extends Action {
   
@@ -14,13 +15,15 @@ object BustBunker extends Action {
   // Thus, we explicitly encode this behavior.
   
   override protected def allowed(state: ExecutionState): Boolean = {
-    state.canAttack                                         &&
+    With.enemies.exists(_.race == Race.Terran)              &&
+    state.canFight                                          &&
     state.unit.canMoveThisFrame                             &&
     state.unit.is(Protoss.Dragoon)                          &&
-    ! With.enemies.exists(_.hasUpgrade(Terran.MarineRange)) &&
     state.threats.forall( ! _.is(Terran.SiegeTankSieged))   &&
-    state.targets.exists(target => target.aliveAndComplete && target.is(Terran.Bunker))
-    
+    state.targets.exists(target =>
+      target.aliveAndComplete   &&
+      target.is(Terran.Bunker)  &&
+      ! target.player.hasUpgrade(Terran.MarineRange))
   }
   
   override protected def perform(state: ExecutionState) {

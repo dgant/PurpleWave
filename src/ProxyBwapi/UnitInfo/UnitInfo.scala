@@ -266,6 +266,8 @@ abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
     else Int.MaxValue
   }
   
+  def framesPerAttack: Int = 10 //TODO: Fill in with values from Dave Churchill's table
+  
   ////////////
   // Orders //
   ////////////

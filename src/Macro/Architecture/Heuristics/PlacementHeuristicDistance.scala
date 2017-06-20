@@ -11,7 +11,7 @@ object PlacementHeuristicDistance extends PlacementHeuristic {
     if (With.geography.ourBases.isEmpty)
       With.paths.groundPixels(candidate, With.geography.home)
     else
-      With.geography.ourBases.map(base =>With.paths.groundPixels(candidate, base.townHallArea.midpoint)).sum
+      With.geography.ourBases.map(base => With.paths.groundPixels(candidate, base.townHallArea.midpoint)).sum
   }
   
 }

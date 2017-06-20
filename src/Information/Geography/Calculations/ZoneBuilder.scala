@@ -88,5 +88,5 @@ object ZoneBuilder {
       Vector(
         choke.getRegions.first,
         choke.getRegions.second)
-      .map(region => zones.find(_.centroid == new Pixel(region.getCenter)).get))
+      .map(region => zones.minBy(_.centroid.pixelCenter.pixelDistanceSquared(new Pixel(region.getCenter)))))
 }

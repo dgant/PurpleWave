@@ -2,7 +2,7 @@ package Micro.Actions.Combat
 
 import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Actions.Commands.{Attack, Reposition}
+import Micro.Actions.Commands.Attack
 import Micro.Execution.ExecutionState
 import ProxyBwapi.Races.{Protoss, Terran}
 import bwapi.Race
@@ -41,8 +41,7 @@ object BustBunker extends Action {
           threat.is(Terran.Bunker) &&
           threat.pixelDistanceSlow(state.unit) < With.configuration.bunkerSafetyMargin)
       )) {
-        state.movementProfile.preferThreatDistance = 100.0
-        Reposition.delegate(state)
+      HoverOutsideRange.delegate(state)
     }
     else if (With.self.hasUpgrade(Protoss.DragoonRange)) {
       state.toAttack = Some(state.targets.minBy(_.pixelDistanceSquared(state.unit)))

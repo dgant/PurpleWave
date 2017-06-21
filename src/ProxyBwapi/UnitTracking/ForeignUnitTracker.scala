@@ -61,7 +61,7 @@ class ForeignUnitTracker {
     foreignUnits.filter(unit =>
       unit.possiblyStillThere
       &&  ! unit.visible
-      &&  ( ! unit.cloaked || ! unit.burrowed || unit.detected)
+      &&  ! unit.effectivelyCloaked
       &&  unit.tileArea.tiles.forall(tile => With.game.isVisible(tile.bwapi)))
       .foreach(updateMissing)
   }

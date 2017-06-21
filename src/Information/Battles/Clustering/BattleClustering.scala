@@ -3,6 +3,8 @@ package Information.Battles.Clustering
 import Lifecycle.With
 import ProxyBwapi.UnitInfo.UnitInfo
 
+import scala.collection.mutable.ArrayBuffer
+
 class BattleClustering {
   
   var lastUpdateFrame = 0
@@ -15,7 +17,7 @@ class BattleClustering {
   // Batch processing //
   //////////////////////
   
-  def clusters = clusterComplete.clusters
+  def clusters: ArrayBuffer[ArrayBuffer[UnitInfo]] = clusterComplete.clusters
   
   def enqueue(units: Traversable[UnitInfo]) {
     nextUnits = units

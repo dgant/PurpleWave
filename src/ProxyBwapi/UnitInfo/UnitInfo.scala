@@ -11,7 +11,7 @@ import bwapi._
 
 import scala.collection.mutable
 
-abstract class UnitInfo (base:bwapi.Unit) extends UnitProxy(base) {
+abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   
   //////////////
   // Identity //

@@ -8,6 +8,6 @@ class TaskBattles extends AbstractTask {
   urgency = With.configuration.urgencyBattles
   
   override protected def onRun() {
-    With.battles.classify()
+    With.battles.run()
   }
 }

@@ -18,9 +18,9 @@ class Battle(
   // Features //
   //////////////
   
-  def groups: Vector[Team] = Vector(us, enemy)
+  def teams: Vector[Team] = Vector(us, enemy)
   
-  def focus: Pixel = groups.map(_.vanguard).centroid
+  def focus: Pixel = teams.map(_.vanguard).centroid
   
-  def happening: Boolean = groups.forall(_.units.nonEmpty) && groups.exists(_.units.exists(_.canAttackThisSecond))
+  def happening: Boolean = teams.forall(_.units.nonEmpty) && teams.exists(_.units.exists(_.canAttackThisSecond))
 }

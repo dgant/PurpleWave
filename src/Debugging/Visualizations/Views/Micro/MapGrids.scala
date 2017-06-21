@@ -7,7 +7,7 @@ import Mathematics.Points.TileRectangle
 
 object MapGrids {
   def render() {
-    renderGridArray(With.grids.dpsEnemyApproximate,  0, 0)
+    renderGridArray(With.grids.enemyDetection, 0, 0)
   }
   
   private def renderGridArray[T](map:AbstractGrid[T], offsetX:Int=0, offsetY:Int=0) {

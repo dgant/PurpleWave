@@ -14,7 +14,7 @@ class Estimator(val considerGeometry: Boolean) {
   def this(argBattle: Battle, considerGeometry: Boolean) {
     this(considerGeometry)
     battle = Some(argBattle)
-    argBattle.groups.flatMap(_.units).foreach(addUnit)
+    argBattle.teams.flatMap(_.units).foreach(addUnit)
   }
   
   ///////////

@@ -46,6 +46,7 @@ object Disengage extends Action {
           Kite.delegate(state)
         }
       }
+      
       HoverOutsideRange.consider(state)
     }
   

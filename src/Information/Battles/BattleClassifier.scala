@@ -4,6 +4,7 @@ import Information.Battles.Clustering.BattleClustering
 import Information.Battles.Types.{Battle, Team}
 import Information.Geography.Types.Zone
 import Lifecycle.With
+import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, UnitInfo}
 
 class BattleClassifier {
@@ -17,17 +18,17 @@ class BattleClassifier {
   
   private val clustering = new BattleClustering
   
-  def classify() {
+  def run() {
     clustering.enqueue(With.units.all.filter(isCombatantLocal))
     clustering.run()
     replaceBattleGlobal()
-    replaceBattleByZone()
+    replaceBattlesByZone()
     replaceBattlesLocal()
-    all.foreach(BattleUpdater.updateBattle)
+    BattleUpdater.run()
   }
   
   private def isCombatantLocal(unit: UnitInfo): Boolean = {
-    ! unit.player.isNeutral && isCombatantGlobal(unit) && unit.likelyStillThere
+    isCombatantGlobal(unit) && unit.likelyStillThere
   }
   
   private def isCombatantZone(unit: UnitInfo): Boolean = {
@@ -35,80 +36,45 @@ class BattleClassifier {
   }
   
   private def isCombatantGlobal(unit: UnitInfo): Boolean = {
-    (unit.complete || unit.unitClass.isBuilding) && unit.unitClass.helpsInCombat
+    unit.alive                                    &&
+    (unit.complete || unit.unitClass.isBuilding)  &&
+    unit.unitClass.helpsInCombat                  &&
+    ! unit.player.isNeutral                       &&
+    ! unit.is(Terran.SpiderMine)                  &&
+    ! unit.is(Protoss.Scarab)                     &&
+    ! unit.is(Protoss.Interceptor)
   }
   
   private def replaceBattleGlobal() {
-    val oldGlobal = global
     global = new Battle(
-      new Team(upcastOurs  (With.units.ours  .filter(isCombatantGlobal))),
-      new Team(upcastEnemy (With.units.enemy .filter(isCombatantGlobal))))
-    if (oldGlobal != null) {
-      adoptMetrics(oldGlobal, global)
-    }
+      new Team(asVectorUs     (With.units.ours  .filter(isCombatantGlobal))),
+      new Team(asVectorEnemy  (With.units.enemy .filter(isCombatantGlobal))))
   }
   
-  private def replaceBattleByZone() {
-    val combatantsOursByZone  = With.units.ours.filter(isCombatantZone).groupBy(_.tileIncludingCenter.zone)
-    val combatantsEnemyByZone = With.units.enemy.filter(isCombatantZone).groupBy(_.tileIncludingCenter.zone)
-    val oldByZone = byZone
+  private def replaceBattlesByZone() {
+    val combatantsOursByZone  = With.units.ours   .filter(isCombatantZone).groupBy(_.tileIncludingCenter.zone)
+    val combatantsEnemyByZone = With.units.enemy  .filter(isCombatantZone).groupBy(_.tileIncludingCenter.zone)
     byZone = With.geography.zones
       .map(zone => (
         zone,
         new Battle(
-          new Team(upcastOurs  (combatantsOursByZone .getOrElse(zone, Vector.empty))),
-          new Team(upcastEnemy (combatantsEnemyByZone.getOrElse(zone, Vector.empty)))
+          new Team(asVectorUs     (combatantsOursByZone .getOrElse(zone, Vector.empty))),
+          new Team(asVectorEnemy  (combatantsEnemyByZone.getOrElse(zone, Vector.empty)))
         )))
       .toMap
-    
-    if (oldByZone.nonEmpty) {
-      With.geography.zones.foreach(zone => adoptMetrics(oldByZone(zone), byZone(zone)))
-    }
   }
   
   private def replaceBattlesLocal() {
-    if ( ! With.units.enemy.exists(isCombatantLocal)) {
-      local = Vector.empty
-      byUnit = Map.empty
-      return
-    }
-    val localNew = buildBattlesLocal
-    localNew.foreach(adoptExistingLocalBattleMetrics)
-    local = localNew
-    byUnit = local
-      .flatten(battle =>
-        Vector(
-          battle.us.units,
-          battle.enemy.units)
-        .flatten
-        .map(unit => (unit, battle)))
-      .toMap
-  }
-  
-  private def adoptExistingLocalBattleMetrics(battle: Battle) {
-    val existingBattles = (battle.us.units ++ battle.enemy.units).groupBy(byUnit.get).filter(_._1.nonEmpty)
-    if (existingBattles.nonEmpty) {
-      adoptMetrics(existingBattles.maxBy(_._2.size)._1.get, battle)
-    }
-  }
-  
-  private def buildBattlesLocal: Vector[Battle] = {
-    clustering.clusters
+    local = clustering.clusters
       .map(cluster =>
         new Battle(
           new Team(cluster.filter(_.isOurs).toVector),
           new Team(cluster.filter(_.isEnemy).toVector)))
-      .filter(battle => {
-        battle.us.units.nonEmpty &&
-        battle.enemy.units.nonEmpty
-      })
+      .filter(_.happening)
       .toVector
+    byUnit = local.flatten(battle => battle.teams.flatMap(_.units).map(unit => (unit, battle))).toMap
   }
   
-  private def adoptMetrics(oldBattle: Battle, newBattle: Battle) {
-    newBattle.estimationGeometric = oldBattle.estimationGeometric
-  }
-  
-  private def upcastOurs  (units: Traversable[FriendlyUnitInfo]) : Vector[UnitInfo] = units.map(_.asInstanceOf[UnitInfo]).toVector
-  private def upcastEnemy (units: Traversable[ForeignUnitInfo])  : Vector[UnitInfo] = units.map(_.asInstanceOf[UnitInfo]).toVector
+  private def asVectorUs    (units: Traversable[FriendlyUnitInfo]) : Vector[UnitInfo] = units.map(_.asInstanceOf[UnitInfo]).toVector
+  private def asVectorEnemy (units: Traversable[ForeignUnitInfo])  : Vector[UnitInfo] = units.map(_.asInstanceOf[UnitInfo]).toVector
 }

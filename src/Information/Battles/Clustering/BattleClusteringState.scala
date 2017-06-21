@@ -15,7 +15,7 @@ class BattleClusteringState(units: Traversable[UnitInfo]) {
   private val exploredTiles   = new mutable.HashSet[Tile]
   private val horizonTiles    = new mutable.HashSet[Tile]
   
-  def isComplete:Boolean = unassignedUnits.isEmpty
+  def isComplete: Boolean = unassignedUnits.isEmpty
   
   def step() {
     if (unassignedUnits.isEmpty) return
@@ -38,7 +38,6 @@ class BattleClusteringState(units: Traversable[UnitInfo]) {
       unassignedUnits   --= nextUnits
       nextCluster       ++= nextUnits
     
-      //Note that this includes non-combatants!
       Circle.points(With.configuration.battleMarginTiles)
         .foreach(point => {
           val tile = nextTile.add(point)

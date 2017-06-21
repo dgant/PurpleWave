@@ -1,12 +1,11 @@
 package Micro.Execution
 
-import Information.Battles.Estimation.Estimator
 import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile}
 import Micro.Actions.Action
 import Micro.Behaviors.{MovementProfiles, TargetingProfiles}
 import Micro.Heuristics.Movement.{MovementHeuristicResult, MovementProfile}
-import Micro.Heuristics.Targeting.{EvaluateTargets, TargetHeuristicResult, TargetingProfile}
+import Micro.Heuristics.Targeting.{EvaluateTargets, TargetingProfile}
 import Micro.Intent.Intention
 import Performance.Caching.CacheFrame
 import ProxyBwapi.Techs.Tech
@@ -39,7 +38,7 @@ class ExecutionState(val unit: FriendlyUnitInfo) {
   var toTech        : Option[Tech]      = None
   var toForm        : Option[Pixel]     = None
   var toUpgrade     : Option[Upgrade]   = None
-  var canFight     : Boolean            = true
+  var canFight      : Boolean           = true
   
   var movementProfile : MovementProfile   = MovementProfiles.default
   var targetProfile   : TargetingProfile  = TargetingProfiles.default
@@ -72,8 +71,4 @@ class ExecutionState(val unit: FriendlyUnitInfo) {
   var movingTo                  : Option[Pixel] = None
   var movedHeuristicallyFrame   : Int = 0
   var movementHeuristicResults  : Iterable[MovementHeuristicResult] = Vector.empty
-  
-  var target                      : Option[UnitInfo] = None
-  var targetedHeuristicallyFrame  : Int = 0
-  var targetHeuristicResults      : Iterable[TargetHeuristicResult]   = Vector.empty
 }

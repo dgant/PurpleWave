@@ -11,6 +11,7 @@ object MovementProfiles {
     preferTarget          = 0.00,
     preferTargetValue     = 0.50,
     avoidTraffic          = 0.30,
+    avoidExplosions       = 2.00,
     avoidDamage           = 0.50)
   
   def engage = new MovementProfile(
@@ -20,12 +21,14 @@ object MovementProfiles {
     preferTarget      = 1.00,
     preferTargetValue = 1.00,
     avoidTraffic      = default.avoidTraffic,
+    avoidExplosions   = default.avoidExplosions,
     avoidDamage       = default.avoidDamage)
   
   def safelyAttackTarget = new MovementProfile(
     preferTarget          = 2.00,
     preferMobility        = default.preferMobility,
     avoidTraffic          = default.avoidTraffic,
+    avoidExplosions       = 3.00,
     avoidDamage           = 1.00
   )
   
@@ -33,6 +36,7 @@ object MovementProfiles {
     preferOrigin      = 1.00,
     preferMobility    = default.preferMobility,
     avoidTraffic      = default.avoidTraffic,
+    avoidExplosions   = 5.00,
     avoidDamage       = 5.00
   )
   

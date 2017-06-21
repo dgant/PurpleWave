@@ -41,6 +41,7 @@ object Zerg {
   def DefilerMound          = UnitClasses.get(UnitType.Zerg_Defiler_Mound)
   def NydusCanal            = UnitClasses.get(UnitType.Zerg_Nydus_Canal)
   def InfestedCommandCenter = UnitClasses.get(UnitType.Zerg_Infested_Command_Center)
+  def DarkSwarmCloud        = UnitClasses.get(UnitType.Spell_Dark_Swarm)
   def ZerglingAttackSpeed   = Upgrades.get(UpgradeType.Adrenal_Glands)
   def UltraliskSpeed        = Upgrades.get(UpgradeType.Anabolic_Synthesis)
   def OverlordVisionRange   = Upgrades.get(UpgradeType.Antennae)

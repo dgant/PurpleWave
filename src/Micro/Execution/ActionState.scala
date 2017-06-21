@@ -13,6 +13,8 @@ import ProxyBwapi.UnitClass.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import ProxyBwapi.Upgrades.Upgrade
 
+import scala.collection.mutable.ListBuffer
+
 class ActionState(val unit: FriendlyUnitInfo) {
   
   /////////////
@@ -42,6 +44,8 @@ class ActionState(val unit: FriendlyUnitInfo) {
   
   var movementProfile : MovementProfile   = MovementProfiles.default
   var targetProfile   : TargetingProfile  = TargetingProfiles.default
+  
+  var explosions: ListBuffer[Explosion] = new ListBuffer[Explosion]
   
   /////////////////
   // Suggestions //

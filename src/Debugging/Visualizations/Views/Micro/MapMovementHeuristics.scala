@@ -41,7 +41,7 @@ object MapMovementHeuristics {
     val scales = heuristicGroups.map(group => scale(group._2))
     val maxScale = scales.max
     if (maxScale == HeuristicMathMultiplicative.default) return
-    val activeGroups = heuristicGroups.map(_._2).filterNot(group => group.forall(_.evaluation == group.head.evaluation))
+    val activeGroups = heuristicGroups.values.filterNot(group => group.forall(_.evaluation == group.head.evaluation))
     activeGroups.foreach(group => renderUnitHeuristic(group, maxScale))
     renderLegend(activeGroups)
     val unit = results.head.context.unit
@@ -54,11 +54,18 @@ object MapMovementHeuristics {
     val relativeScale     = ourScale / maxScale
     val evaluationExtreme = results.maxBy(result => Math.abs(HeuristicMathMultiplicative.default - result.evaluation)).evaluation
     
+    if (ourScale == maxScale) {
+      val context = results.head.context
+      DrawMap.line(context.unit.pixelCenter, context.movingTo.get, Colors.White)
+    }
+    
     results
       .filter(_.evaluation != HeuristicMathMultiplicative.default)
       .foreach(result => {
+        
         // We want to offset the centerpoint slightly for each heuristic
         // so very discrete heuristics (especially booleans) don't completely ovelap
+        
         val offsetX = (result.color.hashCode)     % 3 - 1
         val offsetY = (result.color.hashCode / 3) % 3 - 1
         

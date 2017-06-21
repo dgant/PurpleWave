@@ -106,7 +106,7 @@ class BattleClassifier {
   }
   
   private def adoptMetrics(oldBattle:Battle, newBattle:Battle) {
-    newBattle.estimation = oldBattle.estimation
+    newBattle.estimationGeometric = oldBattle.estimationGeometric
   }
   
   private def upcastOurs  (units:Traversable[FriendlyUnitInfo]) : Vector[UnitInfo] = units.map(_.asInstanceOf[UnitInfo]).toVector

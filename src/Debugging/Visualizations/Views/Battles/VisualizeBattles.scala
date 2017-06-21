@@ -26,13 +26,13 @@ object VisualizeBattles {
   
   def render() {
     With.game.drawTextScreen(army0.bwapi, "Overall:")
-    With.game.drawTextScreen(army1.bwapi, "+" + With.battles.global.estimation.result.costToEnemy.toInt)
-    With.game.drawTextScreen(army2.bwapi, "-" + With.battles.global.estimation.result.costToUs.toInt)
+    With.game.drawTextScreen(army1.bwapi, "+" + With.battles.global.estimationGeometric.result.costToEnemy.toInt)
+    With.game.drawTextScreen(army2.bwapi, "-" + With.battles.global.estimationGeometric.result.costToUs.toInt)
     With.battles.local.foreach(drawBattle)
     val localBattles = With.battles.local
     if (localBattles.nonEmpty) {
       val battle      = localBattles.minBy(battle => battle.focus.pixelDistanceSquared(With.viewport.center))
-      val estimation  = battle.estimation
+      val estimation  = battle.estimationGeometric
       drawEstimationReport(estimation)
     }
     if (Yolo.active && With.frame / 24 % 2 == 0) {
@@ -46,7 +46,7 @@ object VisualizeBattles {
     val neutralColor        = Colors.NeonOrange
     val topLeft             = (battle.us.units ++ battle.enemy.units).map(_.pixelCenter).minBound.subtract(16, 16)
     val bottomRight         = (battle.us.units ++ battle.enemy.units).map(_.pixelCenter).maxBound.add(16, 16)
-    val winnerStrengthColor = if (battle.estimation.result.costToEnemy >=  battle.estimation.result.costToUs) ourColor else enemyColor
+    val winnerStrengthColor = if (battle.estimationGeometric.result.costToEnemy >=  battle.estimationGeometric.result.costToUs) ourColor else enemyColor
     DrawMap.circle  (battle.focus,          8,                      neutralColor)
     DrawMap.circle  (battle.us.vanguard,    8,                      ourColor)
     DrawMap.circle  (battle.enemy.vanguard, 8,                      enemyColor)
@@ -54,7 +54,7 @@ object VisualizeBattles {
     DrawMap.line    (battle.focus,          battle.enemy.vanguard,  enemyColor)
     DrawMap.box     (topLeft,               bottomRight,            neutralColor)
     DrawMap.labelBox(
-      Vector(battle.estimation.result.netCost.toInt.toString),
+      Vector(battle.estimationGeometric.result.netCost.toInt.toString),
       battle.focus.add(24, 0),
       drawBackground = true,
       backgroundColor = winnerStrengthColor)

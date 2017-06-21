@@ -29,11 +29,20 @@ object MovementProfiles {
     avoidDamage           = 1.00
   )
   
+  def rout = new MovementProfile(
+    preferOrigin      = 1.00,
+    preferMobility    = default.preferMobility,
+    avoidTraffic      = default.avoidTraffic,
+    avoidDamage       = 5.00
+  )
+  
   def hoverOutsideRange = new MovementProfile(
     preferDestination = default.preferDestination,
     preferOrigin      = default.preferOrigin,
     preferMobility    = default.preferMobility,
     avoidTraffic      = default.avoidTraffic,
-    avoidDamage       = 5.00
+    avoidDamage       = rout.avoidDamage
   )
+  
+  
 }

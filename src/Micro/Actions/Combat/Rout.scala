@@ -1,7 +1,8 @@
 package Micro.Actions.Combat
 
 import Micro.Actions.Action
-import Micro.Actions.Commands.Travel
+import Micro.Actions.Commands.{Reposition, Travel}
+import Micro.Behaviors.MovementProfiles
 import Micro.Execution.ExecutionState
 
 object Rout extends Action {
@@ -13,10 +14,24 @@ object Rout extends Action {
   
   override protected def perform(state: ExecutionState): Unit = {
     
-    state.toTravel = Some(state.origin)
-    Travel.delegate(state)
+    if (state.unit.pixelDistanceFast(state.origin) < 128.0) {
+      Potshot.consider(state)
+    }
     
-    // TODO: Determine when this is a dumb way to retreat (ie. back through the enemy's army)
+    // Are we blocked from running away?
+    //
+    if (state.threatsActive.exists(threat =>
+      threat.pixelCenter.zone == state.origin.zone &&
+      state.origin.pixelDistanceFast(threat.pixelCenter) <
+      state.origin.pixelDistanceFast(state.unit.pixelCenter))) {
+      
+      state.movementProfile = MovementProfiles.rout
+      Reposition.delegate(state)
+    }
+    else {
+      state.toTravel = Some(state.origin)
+      Travel.delegate(state)
+    }
   }
   
 }

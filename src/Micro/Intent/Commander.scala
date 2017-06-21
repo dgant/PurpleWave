@@ -35,9 +35,11 @@ class Commander {
     // That formula causes Dragoons to miss some shots, especially on consecutive attacks without moving.
     // So I've added one more frame of delay. Consecutive attacks are still sometimes missing.
     //
+    // WARNING: This requires micro to run on *every frame*!
+    //
     nextOrderFrame.keys
       .filter(unit => unit.attackStarting && unit.is(Protoss.Dragoon))
-      .foreach(dragoon => nextOrderFrame(dragoon) = With.frame + 9/* + 1 - With.latency.framesRemaining*/)
+      .foreach(dragoon => nextOrderFrame(dragoon) = With.frame + 9 - With.latency.framesRemaining)
   }
   
   def eligibleForResleeping(unit: FriendlyUnitInfo):Boolean = {

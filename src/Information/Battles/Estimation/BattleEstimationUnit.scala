@@ -42,9 +42,10 @@ class BattleEstimationUnit {
     
     this()
   
+    val frames        = With.configuration.battleEstimationFrames
     val pixelsAway    = if (considerGeometry && battleGroup.isDefined) unit.pixelDistanceFast(battleGroup.get.opponent.vanguard)        else With.configuration.battleMarginPixels
     val framesAway    = if (considerGeometry) PurpleMath.nanToInfinity(Math.max(0.0, pixelsAway - unit.pixelRangeMax) / unit.topSpeed)  else 0
-    val effectiveness = if (considerGeometry) Math.min(1.0, With.configuration.battleEstimationFrames / framesAway)                     else 1.0
+    val effectiveness = if (considerGeometry) Math.max(0.0, (frames - framesAway) / frames) else 1.0
     
     vulnerabilityGroundConcussive   = if (   unit.flying) 0.0 else Damage.scaleBySize(DamageType.Concussive, unit.unitClass.size)
     vulnerabilityGroundExplosive    = if (   unit.flying) 0.0 else Damage.scaleBySize(DamageType.Explosive,  unit.unitClass.size)

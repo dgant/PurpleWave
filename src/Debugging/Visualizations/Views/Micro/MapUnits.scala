@@ -17,8 +17,8 @@ object MapUnits {
     if (unit.invincible) return
     if ( ! unit.possiblyStillThere) return
     
-    val width                 = Math.min(48, Math.max(unit.unitClass.width / 2, 18))
-    val marginTopHp           = 4
+    val width                 = Math.min(48, Math.max(18, (unit.unitClass.maxTotalHealth + unit.defensiveMatrixPoints) / 5))
+    val marginTopHp           = 3
     val denominator           = unit.unitClass.maxTotalHealth + (if (unit.defensiveMatrixPoints > 0) width * 250 else 0)
     val widthHpMax            = width * unit.unitClass.maxHitPoints             / denominator
     val widthShMax            = width * unit.unitClass.maxShields               / denominator
@@ -32,7 +32,7 @@ object MapUnits {
     val widthCooldownNow      = widthCooldown * Math.max(unit.cooldownLeft, unit.spellCooldownLeft) / Math.max(1, unit.cooldownMaxAirGround) //TODO: Max spell cooldown?
   
     val yStartHp              = unit.pixelCenter.y + unit.unitClass.height/2 - marginTopHp
-    val yEndHp                = yStartHp + 3
+    val yEndHp                = yStartHp + 5
     val yStartEnergy          = yEndHp + 3
     val yEndEnergy            = yStartEnergy + 3
     val yStartCooldown        = if (unit.energyMax > 0) yEndEnergy + 3 else yEndHp + 3
@@ -44,11 +44,11 @@ object MapUnits {
     val xStartCooldownButton0 = xStart + widthCooldown + 1
     val xStartCooldownButton1 = xStart + widthCooldown + 2 + widthCooldownButton
     
-    val colorHp = Colors.BrightGreen
-    val colorSh = Colors.BrightBlue
-    val colorDm = Colors.BrightViolet
+    val colorHp = Colors.NeonGreen
+    val colorSh = Colors.NeonBlue
+    val colorDm = Colors.NeonViolet
   
-    DrawMap.box(Pixel(xStart - 1, yStartHp - 1), Pixel(xStart + width + 2, yEndHp + 1), Color.Black, solid = true)
+    DrawMap.box(Pixel(xStart - 2, yStartHp - 2), Pixel(xStart + width + 3, yEndHp + 2), Color.Black, solid = true)
     DrawMap.box(Pixel(xStartDm, yStartHp), Pixel(xStartDm + widthDmMax, yEndHp), colorDm, solid = false)
     DrawMap.box(Pixel(xStartSh, yStartHp), Pixel(xStartSh + widthShMax, yEndHp), colorSh, solid = false)
     DrawMap.box(Pixel(xStart,   yStartHp), Pixel(xStart   + widthHpMax, yEndHp), colorHp, solid = false)
@@ -57,7 +57,7 @@ object MapUnits {
     DrawMap.box(Pixel(xStart,   yStartHp), Pixel(xStart   + widthHpNow, yEndHp), colorHp, solid = true)
     
     if (unit.wounded) {
-      DrawMap.box(Pixel(xStart - 1, yStartHp - 1), Pixel(xStart + width + 2, yEndHp + 1), Colors.NeonRed, solid = false)
+      DrawMap.box(Pixel(xStart - 3, yStartHp - 3), Pixel(xStart + width + 4, yEndHp + 3), Colors.NeonRed, solid = false)
       DrawMap.circle(unit.pixelCenter, unit.unitClass.radialHypotenuse.toInt + 1, Colors.NeonRed)
     }
     

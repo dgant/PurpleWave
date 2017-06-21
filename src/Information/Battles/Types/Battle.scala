@@ -8,14 +8,16 @@ class Battle(
   val us    : BattleGroup,
   val enemy : BattleGroup) {
   
-  val frameCreated = With.frame
+  val frameCreated: Int = With.frame
   
   us.battle       = this
   enemy.battle    = this
   us.opponent     = enemy
   enemy.opponent  = us
   
-  var estimation:BattleEstimation = new BattleEstimation(Some(this), true)
+  var estimationGeometric:  BattleEstimation = new BattleEstimation(Some(this), considerGeometry = true)
+  var estimationAbstract:   BattleEstimation = new BattleEstimation(Some(this), considerGeometry = false)
+  
   
   //////////////
   // Features //
@@ -23,7 +25,14 @@ class Battle(
   
   def groups: Iterable[BattleGroup] = Vector(us, enemy)
   
-  def happening: Boolean = us.units.nonEmpty && enemy.units.nonEmpty && (us.units.exists(_.canAttackThisSecond) || enemy.units.exists(_.canAttackThisSecond))
+  def happening: Boolean = {
+    us.units.nonEmpty     &&
+    enemy.units.nonEmpty  &&
+    (
+      us.units.exists(_.canAttackThisSecond) ||
+      enemy.units.exists(_.canAttackThisSecond)
+    )
+  }
   
   def focus: Pixel = us.vanguard.midpoint(enemy.vanguard)
 }

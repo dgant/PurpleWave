@@ -4,7 +4,7 @@ import Mathematics.Points.{Pixel, SpecificPoints, Tile, TileRectangle}
 
 case object EnrichPixel {
   
-  implicit class EnrichedPixelCollection(positions: Iterable[Pixel]) {
+  implicit class EnrichedPixelCollection(positions: Traversable[Pixel]) {
     
     def minBound: Pixel =
       if (positions.isEmpty)
@@ -47,7 +47,7 @@ case object EnrichPixel {
           positions.view.map(_.y).sum / positions.size)
   }
   
-  implicit class EnrichedRectangleCollection(rectangles: Iterable[TileRectangle]) {
+  implicit class EnrichedRectangleCollection(rectangles: Traversable[TileRectangle]) {
     def boundary: TileRectangle =
       TileRectangle(
         Tile(
@@ -58,7 +58,7 @@ case object EnrichPixel {
           rectangles.map(_.endExclusive.y).max))
   }
   
-  implicit class EnrichedTileCollection(positions: Iterable[Tile]) {
+  implicit class EnrichedTileCollection(positions: Traversable[Tile]) {
     
     def minBound: Tile =
       if (positions.isEmpty)

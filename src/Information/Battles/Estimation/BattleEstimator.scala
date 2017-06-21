@@ -1,35 +1,22 @@
 package Information.Battles.Estimation
 
+import Information.Battles.Types.Battle
 import Lifecycle.With
 
 object BattleEstimator {
   
   def run() {
-    recalculateLocal()
-    recalculateZones()
-    recalculateGlobal()
+    With.battles.local.foreach(recalculate)
+    With.battles.byZone.values.foreach(recalculate)
+    recalculate(With.battles.global)
   }
   
-  def recalculateLocal() {
-    With.battles.local.foreach(battle => {
-      battle.estimationGeometric = new BattleEstimation(Some(battle), considerGeometry = true)
-      battle.estimationGeometric.addUnits(battle)
-      battle.estimationGeometric.recalculate()
-    })
-  }
-  
-  def recalculateZones() {
-    With.battles.byZone.values.foreach(battle => {
-      battle.estimationGeometric = new BattleEstimation(Some(battle), considerGeometry = false)
-      battle.estimationGeometric.addUnits(battle)
-      battle.estimationGeometric.recalculate()
-    })
-  }
-  
-  def recalculateGlobal() {
-    val battle = With.battles.global
-    battle.estimationGeometric = new BattleEstimation(Some(battle), considerGeometry = false)
+  def recalculate(battle: Battle) {
+    battle.estimationGeometric = new BattleEstimation(Some(battle), considerGeometry = true)
     battle.estimationGeometric.addUnits(battle)
     battle.estimationGeometric.recalculate()
+    battle.estimationAbstract = new BattleEstimation(Some(battle), considerGeometry = false)
+    battle.estimationAbstract.addUnits(battle)
+    battle.estimationAbstract.recalculate()
   }
 }

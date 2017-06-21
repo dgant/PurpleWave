@@ -29,7 +29,7 @@ object MapBases {
               + estimation.result.costToUs.toInt
           ),
           base.townHallArea.midPixel,
-          true,
+          drawBackground = true,
           base.zone.owner.colorDark)
       })
     })

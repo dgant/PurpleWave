@@ -1,13 +1,13 @@
 package Information.Battles.Estimation
 
-import Information.Battles.Types.{Battle, BattleGroup}
+import Information.Battles.Types.{Battle, Team}
 import Lifecycle.With
 import Mathematics.PurpleMath
 import ProxyBwapi.Engine.Damage
 import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.DamageType
 
-class BattleAvatar {
+class Avatar {
   
   var vulnerabilityGroundConcussive   = 0.0
   var vulnerabilityGroundExplosive    = 0.0
@@ -35,9 +35,9 @@ class BattleAvatar {
   var totalUnits                      = 0.0
   
   def this(
-    unit              : UnitInfo,
-    battleGroup       : Option[BattleGroup] = None,
-    considerGeometry  : Boolean) {
+            unit              : UnitInfo,
+            battleGroup       : Option[Team] = None,
+            considerGeometry  : Boolean) {
     
     this()
   
@@ -72,7 +72,7 @@ class BattleAvatar {
     totalUnits                      = 1.0
   }
   
-  def add(that:BattleAvatar) {
+  def add(that:Avatar) {
     vulnerabilityGroundConcussive   += that.vulnerabilityGroundConcussive
     vulnerabilityGroundExplosive    += that.vulnerabilityGroundExplosive
     vulnerabilityGroundNormal       += that.vulnerabilityGroundNormal
@@ -99,7 +99,7 @@ class BattleAvatar {
     totalUnits                      += that.totalUnits
   }
   
-  def remove(that:BattleAvatar) {
+  def remove(that:Avatar) {
     vulnerabilityGroundConcussive   -= that.vulnerabilityGroundConcussive
     vulnerabilityGroundExplosive    -= that.vulnerabilityGroundExplosive
     vulnerabilityGroundNormal       -= that.vulnerabilityGroundNormal

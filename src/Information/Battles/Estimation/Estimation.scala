@@ -1,6 +1,6 @@
 package Information.Battles.Estimation
 
-class BattleEstimationResult {
+class Estimation {
 
   var damageToUs    = 0.0
   var damageToEnemy = 0.0
@@ -9,5 +9,5 @@ class BattleEstimationResult {
   var deathsUs      = 0.0
   var deathsEnemy   = 0.0
   
-  def netCost:Double = costToEnemy - costToUs
+  def netCost: Double = costToEnemy - costToUs
 }

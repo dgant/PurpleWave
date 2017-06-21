@@ -1,6 +1,6 @@
 package Micro.Execution
 
-import Information.Battles.Estimation.BattleEstimation
+import Information.Battles.Estimation.Estimator
 import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile}
 import Micro.Actions.Action

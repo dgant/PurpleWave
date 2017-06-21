@@ -9,8 +9,6 @@ import Planning.{Plan, Yolo}
 
 abstract class ControlPixel extends Plan {
   
-  description.set("Control a position")
-  
   val controllers = new Property[LockUnits](new LockUnits)
   
   private val infiltrationRadius = 32.0 * 25

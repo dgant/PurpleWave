@@ -10,7 +10,7 @@ import scala.collection.{breakOut, mutable}
 
 object ScheduleSimulationStateBuilder {
   def build:ScheduleSimulationState = {
-    val techsOwned    = Techs.all.filter(With.self.hasResearched).to[mutable.HashSet]
+    val techsOwned    = Techs.all.filter(With.self.hasTech).to[mutable.HashSet]
     val upgradesOwned = Upgrades.all.map(upgrade => (upgrade, With.self.getUpgradeLevel(upgrade))).toMap
   
     val output = new ScheduleSimulationState(

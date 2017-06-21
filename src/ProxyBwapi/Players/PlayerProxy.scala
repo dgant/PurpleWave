@@ -44,7 +44,7 @@ abstract class PlayerProxy(base:Player) {
     upgradeLevelCaches(upgrade).get
   }
   
-  def hasResearched(tech: Tech):Boolean = {
+  def hasTech(tech: Tech):Boolean = {
     //Further optimization: Stop expiring when researched
     if ( ! techsResearchedCaches.contains(tech)) {
       techsResearchedCaches.put(tech, new CacheFrame(() => base.hasResearched(tech.baseType)))

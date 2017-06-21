@@ -16,7 +16,8 @@ object PlacementHeuristicPowering extends PlacementHeuristic {
     PylonRadius.points
       .map(candidate.add)
       .count(tile =>
-        With.grids.buildable.get(tile)
+        tile.valid
+        && With.grids.buildable.get(tile)
         && ! With.grids.psi2x2and3x2.get(tile))
   }
 }

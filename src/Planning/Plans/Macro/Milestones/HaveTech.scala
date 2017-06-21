@@ -8,5 +8,5 @@ class HaveTech(tech:Tech) extends Plan {
   
   description.set("Require a tech")
   
-  override def isComplete: Boolean = With.self.hasResearched(tech)
+  override def isComplete: Boolean = With.self.hasTech(tech)
 }

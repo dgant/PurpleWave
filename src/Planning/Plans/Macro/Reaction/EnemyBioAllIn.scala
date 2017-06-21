@@ -14,7 +14,7 @@ class EnemyBioAllIn extends Plan {
       With.units.enemy.count(unit => unit.is(Terran.Barracks))  > 2   ||
       With.units.enemy.count(unit => unit.is(Terran.Medic))     > 1   ||
       With.units.enemy.count(unit => unit.is(Terran.Firebat))   > 1   ||
-      With.enemies.exists(_.hasResearched(Terran.Stim))               ||
+      With.enemies.exists(_.hasTech(Terran.Stim))               ||
       With.enemies.exists(_.getUpgradeLevel(Terran.MarineRange) > 0)
     ) &&
     With.units.enemy.count(unit => unit.is(Terran.Vulture))           == 0 &&

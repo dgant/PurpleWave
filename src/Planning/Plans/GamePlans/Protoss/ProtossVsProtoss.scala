@@ -29,7 +29,7 @@ class ProtossVsProtoss extends Parallel {
   )
   
   children.set(Vector(
-    new IfThenElse( //Emergency -- make sure we have some defense even if our economy is destroyed
+    new IfThenElse(
       new And(
         new UnitsAtLeast(1, UnitMatchType(Protoss.Probe)),
         new UnitsAtLeast(1, UnitMatchType(Protoss.Assimilator)),
@@ -40,7 +40,7 @@ class ProtossVsProtoss extends Parallel {
         new Build(RequestUnitAtLeast(1, Protoss.Probe)),
         new Build(RequestUnitAtLeast(2, Protoss.Dragoon))
       )
-    ),
+    ) { description.set("Produce emergency units") },
     new Build(ProtossBuilds.OpeningOneGateCore_DragoonFirst),
     new IfThenElse(
       new Or(

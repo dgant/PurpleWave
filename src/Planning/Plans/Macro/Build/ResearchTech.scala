@@ -18,7 +18,7 @@ class ResearchTech(tech: Tech) extends Plan {
   
   description.set("Tech " + tech)
   
-  override def isComplete: Boolean = With.self.hasResearched(tech)
+  override def isComplete: Boolean = With.self.hasTech(tech)
   
   override def onUpdate() {
     if (isComplete) return

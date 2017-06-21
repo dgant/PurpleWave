@@ -60,7 +60,7 @@ class Scheduler {
         return None
     }
     else if (request.buildable.techOption.nonEmpty) {
-      if (With.self.hasResearched(request.buildable.techOption.get))
+      if (With.self.hasTech(request.buildable.techOption.get))
         return Vector(request.buildable)
       else
         return None

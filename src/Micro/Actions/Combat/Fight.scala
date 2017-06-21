@@ -13,5 +13,6 @@ object Fight extends Action {
     BustBunker.consider(state)
     ProtectTheWeak.consider(state)
     Teamfight.consider(state)
+    Pursue.consider(state)
   }
 }

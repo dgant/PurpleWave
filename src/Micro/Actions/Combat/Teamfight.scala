@@ -19,7 +19,7 @@ object Teamfight extends Action {
     if (state.battleEstimation.exists(_.weGainValue) || Yolo.active) {
       Engage.consider(state)
     }
-    else {
+    else if (state.battleEstimation.exists(_.weLoseValue)) {
       Disengage.consider(state)
     }
   }

@@ -1,8 +1,8 @@
 package Information.Battles.Estimation
 
-import Information.Battles.Types.Battle
+import Information.Battles.Types.{Battle, BattleGroup}
 import Lifecycle.With
-import ProxyBwapi.Races.Protoss
+import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.UnitInfo
 
 import scala.collection.mutable
@@ -15,44 +15,57 @@ class BattleEstimation(
   // Setup //
   ///////////
   
-  private val unitsOurs   = new mutable.HashMap[UnitInfo, BattleEstimationUnit]
-  private val unitsEnemy  = new mutable.HashMap[UnitInfo, BattleEstimationUnit]
-  private val avatarUs    = new BattleEstimationUnit
-  private val avatarEnemy = new BattleEstimationUnit
+  private val unitsOurs   = new mutable.HashMap[UnitInfo, BattleAvatar]
+  private val unitsEnemy  = new mutable.HashMap[UnitInfo, BattleAvatar]
+  private val avatarUs    = new BattleAvatar
+  private val avatarEnemy = new BattleAvatar
   
   def addUnits(battle: Battle) {
-    battle.us.units.foreach(addUnit)
-    battle.enemy.units.foreach(addUnit)
+    battle.groups.flatMap(_.units).foreach(addUnit)
   }
   
   def addUnit(unit: UnitInfo) {
     if ( ! eligible(unit)) return
-    if (unit.isFriendly) {
-      unitsOurs.put(unit, new BattleEstimationUnit(unit, battle, battle.map(_.us), considerGeometry))
-      avatarUs.add(unitsOurs(unit))
-    }
-    else {
-      unitsEnemy.put(unit, new BattleEstimationUnit(unit, battle, battle.map(_.enemy), considerGeometry))
-      avatarEnemy.add(unitsEnemy(unit))
-    }
+    if (unit.isFriendly)  addUnit(unit, avatarUs,     unitsOurs,  battle.map(_.us))
+    else                  addUnit(unit, avatarEnemy,  unitsEnemy, battle.map(_.us))
   }
   
   def removeUnit(unit: UnitInfo) {
-    unitsOurs.get(unit).foreach(unitProxy => {
-      avatarUs.remove(unitsOurs(unit))
-      unitsOurs.remove(unit)
-    })
-    unitsEnemy.get(unit).foreach(unitProxy => {
-      avatarEnemy.remove(unitsEnemy(unit))
-      unitsEnemy.remove(unit)
-    })
+    removeUnit(unit, avatarUs,    unitsOurs)
+    removeUnit(unit, avatarEnemy, unitsEnemy)
   }
   
-  def eligible(unit: UnitInfo):Boolean = {
-    if (unit.unitClass.isWorker) return false
-    if (unit.unitClass.isBuilding && ! unit.unitClass.helpsInCombat) return false
-    if (unit.is(Protoss.Scarab))      return false
-    if (unit.is(Protoss.Interceptor)) return false
+  private def addUnit(
+    unit      : UnitInfo,
+    bigAvatar : BattleAvatar,
+    avatars   : mutable.HashMap[UnitInfo, BattleAvatar],
+    group     : Option[BattleGroup]) {
+    
+    val newAvatar = new BattleAvatar(unit, group, considerGeometry)
+    avatars.put(unit, newAvatar)
+    bigAvatar.add(newAvatar)
+  }
+  
+  private def removeUnit(
+    unit      : UnitInfo,
+    bigAvatar : BattleAvatar,
+    avatars   : mutable.HashMap[UnitInfo, BattleAvatar]) {
+    
+    avatars
+      .get(unit)
+      .foreach(avatar => {
+        bigAvatar.remove(avatar)
+        avatars.remove(unit)
+      })
+  }
+  
+  def eligible(unit: UnitInfo): Boolean = {
+    if (unit.unitClass.isWorker && ! unit.isBeingViolent)             return false
+    if (unit.unitClass.isBuilding && ! unit.unitClass.helpsInCombat)  return false
+    if (unit.is(Terran.SpiderMine))                                   return false
+    if (unit.is(Protoss.Scarab))                                      return false
+    if (unit.is(Protoss.Interceptor))                                 return false
+    
     unit.aliveAndComplete
   }
   
@@ -66,17 +79,17 @@ class BattleEstimation(
     
     result = new BattleEstimationResult
     
-    if (avatarUs.totalUnits == 0 || avatarEnemy.totalUnits == 0) return
+    if (avatarUs.totalUnits <= 0 || avatarEnemy.totalUnits <= 0) return
     
-    result.damageToUs     = dealDamage(avatarEnemy, avatarUs)
-    result.damageToEnemy  = dealDamage(avatarUs,    avatarEnemy)
-    result.deathsUs       = deaths(avatarUs,        result.damageToUs)
-    result.deathsEnemy    = deaths(avatarEnemy,     result.damageToEnemy)
-    result.costToUs       = totalCost(avatarUs,     result.damageToUs)
-    result.costToEnemy    = totalCost(avatarEnemy,  result.damageToEnemy)
+    result.damageToUs     = dealDamage  (avatarEnemy, avatarUs)
+    result.damageToEnemy  = dealDamage  (avatarUs,    avatarEnemy)
+    result.deathsUs       = deaths      (avatarUs,    result.damageToUs)
+    result.deathsEnemy    = deaths      (avatarEnemy, result.damageToEnemy)
+    result.costToUs       = totalCost   (avatarUs,    result.damageToUs)
+    result.costToEnemy    = totalCost   (avatarEnemy, result.damageToEnemy)
   }
   
-  private def dealDamage(from: BattleEstimationUnit, to: BattleEstimationUnit): Double = {
+  private def dealDamage(from: BattleAvatar, to: BattleAvatar): Double = {
     
     val airFocus        = to.totalFlyers / to.totalUnits
     val groundFocus     = 1.0 - airFocus
@@ -99,11 +112,11 @@ class BattleEstimation(
   // 2 units,  199 damage, 200 hp = 1 death
   // 2 units,  99 damage,  200 hp = 0 deaths
   //
-  private def deaths(avatar: BattleEstimationUnit, damage: Double):Double = {
+  private def deaths(avatar: BattleAvatar, damage: Double): Double = {
     Math.min(avatar.totalUnits, Math.floor(avatar.totalUnits * damage / avatar.totalHealth))
   }
   
-  private def totalCost(avatar: BattleEstimationUnit, damage: Double) = {
+  private def totalCost(avatar: BattleAvatar, damage: Double) = {
     avatar.subjectiveValue * damage / avatar.totalHealth
   }
   

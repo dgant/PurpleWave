@@ -7,7 +7,7 @@ import ProxyBwapi.Engine.Damage
 import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.DamageType
 
-class BattleEstimationUnit {
+class BattleAvatar {
   
   var vulnerabilityGroundConcussive   = 0.0
   var vulnerabilityGroundExplosive    = 0.0
@@ -36,7 +36,6 @@ class BattleEstimationUnit {
   
   def this(
     unit              : UnitInfo,
-    battle            : Option[Battle]      = None,
     battleGroup       : Option[BattleGroup] = None,
     considerGeometry  : Boolean) {
     
@@ -73,7 +72,7 @@ class BattleEstimationUnit {
     totalUnits                      = 1.0
   }
   
-  def add(that:BattleEstimationUnit) {
+  def add(that:BattleAvatar) {
     vulnerabilityGroundConcussive   += that.vulnerabilityGroundConcussive
     vulnerabilityGroundExplosive    += that.vulnerabilityGroundExplosive
     vulnerabilityGroundNormal       += that.vulnerabilityGroundNormal
@@ -100,7 +99,7 @@ class BattleEstimationUnit {
     totalUnits                      += that.totalUnits
   }
   
-  def remove(that:BattleEstimationUnit) {
+  def remove(that:BattleAvatar) {
     vulnerabilityGroundConcussive   -= that.vulnerabilityGroundConcussive
     vulnerabilityGroundExplosive    -= that.vulnerabilityGroundExplosive
     vulnerabilityGroundNormal       -= that.vulnerabilityGroundNormal

@@ -48,8 +48,6 @@ class ExecutionState(val unit: FriendlyUnitInfo) {
   // Suggestions //
   /////////////////
   
-  def battleEstimation:Option[BattleEstimation] = With.battles.byUnit.get(unit).map(_.estimationGeometric)
-  
   def origin: Pixel = toReturn.getOrElse(originCache.get)
   private val originCache = new CacheFrame(() => if (With.geography.ourBases.nonEmpty) With.geography.ourBases.map(_.heart.pixelCenter).minBy(unit.pixelDistanceTravelling) else With.geography.home.pixelCenter)
   

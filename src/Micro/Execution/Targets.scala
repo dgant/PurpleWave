@@ -8,7 +8,7 @@ object Targets {
   
   val ineligibleClasses = Vector(Zerg.Larva, Zerg.Egg)
   
-  def get(state: ExecutionState): Vector[UnitInfo] = {
+  def get(state: ActionState): Vector[UnitInfo] = {
     if ( ! state.unit.canAttackThisSecond) return Vector.empty
     if (state.unit.battle.isEmpty && state.unit.unitClass.isWorker) return Vector.empty //Performance shortcut
     With.units.inTileRadius(
@@ -18,7 +18,7 @@ object Targets {
       .toVector
   }
   
-  def valid(state: ExecutionState, target: UnitInfo): Boolean = {
+  def valid(state: ActionState, target: UnitInfo): Boolean = {
     target.likelyStillThere &&
       With.frame - target.lastSeen < 24 * 60 &&
       target.isEnemyOf(state.unit) &&
@@ -26,7 +26,7 @@ object Targets {
       ! ineligibleClasses.contains(target.unitClass)
   }
   
-  def inRange(state: ExecutionState, target: UnitInfo): Boolean = {
+  def inRange(state: ActionState, target: UnitInfo): Boolean = {
     state.unit.inRangeToAttackFast(target, With.latency.framesRemaining)
   }
 }

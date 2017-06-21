@@ -1,11 +1,11 @@
 package Micro.Heuristics.Targeting
 import Lifecycle.With
-import Micro.Execution.ExecutionState
+import Micro.Execution.ActionState
 import ProxyBwapi.UnitInfo.UnitInfo
 
 object TargetHeuristicPain extends TargetHeuristic {
   
-  override def evaluate(state: ExecutionState, candidate: UnitInfo): Double = {
+  override def evaluate(state: ActionState, candidate: UnitInfo): Double = {
   
     val distanceToReach = Math.max(
       0.0,

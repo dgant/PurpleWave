@@ -3,16 +3,16 @@ package Micro.Actions.Combat
 import Micro.Actions.Action
 import Micro.Actions.Commands.{Reposition, Travel}
 import Micro.Behaviors.MovementProfiles
-import Micro.Execution.ExecutionState
+import Micro.Execution.ActionState
 
 object Rout extends Action {
   
-  override protected def allowed(state: ExecutionState): Boolean = {
+  override protected def allowed(state: ActionState): Boolean = {
     state.unit.canMoveThisFrame &&
     state.unit.pixelCenter.zone != state.origin.zone
   }
   
-  override protected def perform(state: ExecutionState): Unit = {
+  override protected def perform(state: ActionState): Unit = {
     
     if (state.unit.pixelDistanceFast(state.origin) < 128.0) {
       Potshot.consider(state)

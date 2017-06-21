@@ -3,15 +3,15 @@ package Micro.Actions.Basic
 import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Potshot
-import Micro.Execution.ExecutionState
+import Micro.Execution.ActionState
 
 object Gather extends Action {
   
-  override def allowed(state: ExecutionState): Boolean = {
+  override def allowed(state: ActionState): Boolean = {
     state.intent.toGather.isDefined
   }
   
-  override def perform(state: ExecutionState) {
+  override def perform(state: ActionState) {
   
     Potshot.consider(state)
     

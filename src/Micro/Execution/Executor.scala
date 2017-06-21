@@ -9,18 +9,18 @@ import scala.collection.mutable
 
 class Executor {
   
-  private val stateByUnit = new mutable.HashMap[FriendlyUnitInfo, ExecutionState]
+  private val stateByUnit = new mutable.HashMap[FriendlyUnitInfo, ActionState]
   private var finishedExecuting = true
   
-  def states: Iterable[ExecutionState] = stateByUnit.values
+  def states: Iterable[ActionState] = stateByUnit.values
   
   def intend(intention:Intention) = {
     getState(intention.unit).intent = intention
   }
   
-  def getState(unit:FriendlyUnitInfo):ExecutionState = {
+  def getState(unit:FriendlyUnitInfo):ActionState = {
     if ( ! stateByUnit.contains(unit)) {
-      stateByUnit.put(unit, new ExecutionState(unit))
+      stateByUnit.put(unit, new ActionState(unit))
     }
     stateByUnit(unit)
   }
@@ -29,7 +29,7 @@ class Executor {
   // Batching //
   //////////////
   
-  val unitQueue = new mutable.Queue[ExecutionState]
+  val unitQueue = new mutable.Queue[ActionState]
   
   def run() {
     if ( ! With.latency.isLastFrameOfTurn && ! finishedExecuting) return

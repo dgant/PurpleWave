@@ -3,7 +3,7 @@ package Micro.Actions.Combat
 import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Commands.Attack
-import Micro.Execution.ExecutionState
+import Micro.Execution.ActionState
 import ProxyBwapi.Races.{Protoss, Terran}
 import bwapi.Race
 
@@ -14,7 +14,7 @@ object BustBunker extends Action {
   // The window for a Dragoon to shoot at a Bunker for free is smaller than the resolution of our damage grid.
   // Thus, we explicitly encode this behavior.
   
-  override protected def allowed(state: ExecutionState): Boolean = {
+  override protected def allowed(state: ActionState): Boolean = {
     With.enemies.exists(_.race == Race.Terran)              &&
     state.canFight                                          &&
     state.unit.canMoveThisFrame                             &&
@@ -26,7 +26,7 @@ object BustBunker extends Action {
       ! target.player.hasUpgrade(Terran.MarineRange))
   }
   
-  override protected def perform(state: ExecutionState) {
+  override protected def perform(state: ActionState) {
     
     // Goal: Take down the bunker. Don't take any damage from it.
     

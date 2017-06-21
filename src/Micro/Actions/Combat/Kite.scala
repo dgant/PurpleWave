@@ -1,18 +1,18 @@
 package Micro.Actions.Combat
 
 import Micro.Actions.Action
-import Micro.Execution.ExecutionState
+import Micro.Execution.ActionState
 
 object Kite extends Action {
   
-  override def allowed(state: ExecutionState): Boolean = (
+  override def allowed(state: ActionState): Boolean = (
     state.unit.canMoveThisFrame
     && state.targets.nonEmpty
     && state.threats.nonEmpty
     && state.unit.pixelRangeMax > 32 * 3.0
   )
   
-  override def perform(state: ExecutionState) {
+  override def perform(state: ActionState) {
     if (state.unit.canAttackThisFrame) {
       val fasterThanActiveThreats = state.threatsActive.nonEmpty || state.threatsActive.forall(state.unit.topSpeed > _.topSpeed)
       if (fasterThanActiveThreats) {

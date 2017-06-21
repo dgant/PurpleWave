@@ -5,7 +5,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Neighbors {
   
-  def get(state: ExecutionState): Vector[FriendlyUnitInfo] = {
+  def get(state: ActionState): Vector[FriendlyUnitInfo] = {
     With.units.inTileRadius(
       state.unit.tileIncludingCenter,
       With.configuration.battleMarginTiles)

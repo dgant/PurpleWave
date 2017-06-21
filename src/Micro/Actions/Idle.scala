@@ -3,15 +3,15 @@ package Micro.Actions
 import Micro.Actions.Basic._
 import Micro.Actions.Combat.Fight
 import Micro.Actions.Commands.{Attack, Travel}
-import Micro.Execution.ExecutionState
+import Micro.Execution.ActionState
 
 object Idle extends Action {
   
-  override def allowed(state:ExecutionState):Boolean = {
+  override def allowed(state:ActionState):Boolean = {
     ! state.unit.attackStarting
   }
   
-  def perform(state:ExecutionState) {
+  def perform(state:ActionState) {
     
     state.toReturn        = state.intent.toReturn
     state.toTravel        = state.intent.toTravel

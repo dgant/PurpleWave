@@ -2,14 +2,14 @@ package Micro.Heuristics.Movement
 
 import Mathematics.Heuristics.{Heuristic, HeuristicResult}
 import Mathematics.Points.Pixel
-import Micro.Execution.ExecutionState
+import Micro.Execution.ActionState
 
 class MovementHeuristicResult (
-    heuristic   : Heuristic[ExecutionState, Pixel],
-    state       : ExecutionState,
-    candidate   : Pixel,
-    evaluation  : Double,
-    val color   : bwapi.Color)
+                                heuristic   : Heuristic[ActionState, Pixel],
+                                state       : ActionState,
+                                candidate   : Pixel,
+                                evaluation  : Double,
+                                val color   : bwapi.Color)
 
   extends HeuristicResult (
     heuristic,

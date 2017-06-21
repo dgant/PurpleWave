@@ -1,12 +1,12 @@
 package Micro.Heuristics.Targeting
 
 import Lifecycle.With
-import Micro.Execution.ExecutionState
+import Micro.Execution.ActionState
 import ProxyBwapi.UnitInfo.UnitInfo
 
 object TargetHeuristicFiringPixel extends TargetHeuristic{
   
-  override def evaluate(state: ExecutionState, candidate: UnitInfo): Double = {
+  override def evaluate(state: ActionState, candidate: UnitInfo): Double = {
     
     val firingPixel =
       state.unit.pixelCenter

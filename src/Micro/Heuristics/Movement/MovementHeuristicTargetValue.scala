@@ -2,11 +2,11 @@ package Micro.Heuristics.Movement
 
 import Mathematics.Heuristics.HeuristicMathMultiplicative
 import Mathematics.Points.Pixel
-import Micro.Execution.ExecutionState
+import Micro.Execution.ActionState
 
 object MovementHeuristicTargetValue extends MovementHeuristic {
   
-  override def evaluate(state: ExecutionState, candidate: Pixel): Double = {
+  override def evaluate(state: ActionState, candidate: Pixel): Double = {
     
     if ( state.targets.isEmpty) return HeuristicMathMultiplicative.default
     

@@ -1,12 +1,12 @@
 package Micro.Heuristics.Movement
 
 import Mathematics.Points.Pixel
-import Micro.Execution.ExecutionState
+import Micro.Execution.ActionState
 import ProxyBwapi.UnitInfo.UnitInfo
 
 object MovementHeuristicExposureToDamage extends MovementHeuristic {
   
-  override def evaluate(state: ExecutionState, candidate: Pixel): Double = {
+  override def evaluate(state: ActionState, candidate: Pixel): Double = {
   
     if (state.threats.forall(_.melee)) return MovementHeuristicThreatDistance.evaluate(state, candidate)
     
@@ -15,7 +15,7 @@ object MovementHeuristicExposureToDamage extends MovementHeuristic {
     state.threats.take(20).map(threat => evaluateOne(state, threat, candidate)).sum
   }
   
-  def evaluateOne(state: ExecutionState, threat: UnitInfo, candidate: Pixel): Double = {
+  def evaluateOne(state: ActionState, threat: UnitInfo, candidate: Pixel): Double = {
     val dps               = threat.dpsAgainst(state.unit)
     val range             = threat.pixelRangeAgainstFromCenter(state.unit)
     val distance          = threat.pixelDistanceFast(state.unit)

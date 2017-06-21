@@ -1,11 +1,11 @@
 package Micro.Heuristics.Targeting
 
-import Micro.Execution.ExecutionState
+import Micro.Execution.ActionState
 import ProxyBwapi.UnitInfo.UnitInfo
 
 object TargetHeuristicDistance extends TargetHeuristic{
   
-  override def evaluate(state: ExecutionState, candidate: UnitInfo): Double = {
+  override def evaluate(state: ActionState, candidate: UnitInfo): Double = {
     
     Math.max(
       state.unit.pixelRangeAgainstFromEdge(candidate),

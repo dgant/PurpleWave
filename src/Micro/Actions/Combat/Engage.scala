@@ -2,16 +2,16 @@ package Micro.Actions.Combat
 
 import Micro.Actions.Action
 import Micro.Actions.Commands.{Attack, Reposition}
-import Micro.Execution.ExecutionState
+import Micro.Execution.ActionState
 
 object Engage extends Action {
   
-  override def allowed(state: ExecutionState): Boolean = {
+  override def allowed(state: ActionState): Boolean = {
     state.canFight &&
     state.targets.nonEmpty
   }
   
-  override def perform(state: ExecutionState) {
+  override def perform(state: ActionState) {
     
     // TODO: Avoid chasing distractions (make PURSUE the judge of that).
     

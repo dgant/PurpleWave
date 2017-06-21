@@ -1,15 +1,15 @@
 package Micro.Actions.Combat
 
 import Micro.Actions.Action
-import Micro.Execution.ExecutionState
+import Micro.Execution.ActionState
 
 object Disengage extends Action {
   
-  override protected def allowed(state: ExecutionState): Boolean = {
+  override protected def allowed(state: ActionState): Boolean = {
     state.unit.canMoveThisFrame
   }
   
-  override protected def perform(state: ExecutionState) {
+  override protected def perform(state: ActionState) {
     
     val completelySafe = state.threats.isEmpty
     if (completelySafe) {
@@ -53,6 +53,7 @@ object Disengage extends Action {
     // If we're caught, we may be forced to fight
     val caught = state.threats.exists(threat => threat.inRangeToAttackFast(state.unit) && threat.topSpeed > state.unit.topSpeed)
     if (caught) {
+      
       // Let's get some shots in, at least
       if (weOutrange) {
         Kite.delegate(state)

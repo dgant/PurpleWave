@@ -4,12 +4,12 @@ import Information.Geography.Types.Zone
 import Lifecycle.With
 import Mathematics.Heuristics.HeuristicMathMultiplicative
 import Mathematics.Points.Pixel
-import Micro.Execution.ExecutionState
+import Micro.Execution.ActionState
 import ProxyBwapi.UnitInfo.UnitInfo
 
 object EvaluatePixels {
 
-  def best(state:ExecutionState, profile:MovementProfile): Pixel = {
+  def best(state:ActionState, profile:MovementProfile): Pixel = {
     
     val candidates = getCandidates(state)
   
@@ -30,7 +30,7 @@ object EvaluatePixels {
     HeuristicMathMultiplicative.best(state, profile.weightedHeuristics, candidates)
   }
   
-  def getCandidates(state:ExecutionState):Vector[Pixel] = {
+  def getCandidates(state:ActionState):Vector[Pixel] = {
 
     val startingPixel = state.unit.pixelCenter
     val startingZone  = startingPixel.zone

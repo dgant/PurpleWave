@@ -1,17 +1,17 @@
 package Micro.Actions.Combat
 
 import Micro.Actions.Action
-import Micro.Execution.ExecutionState
+import Micro.Execution.ActionState
 import Planning.Yolo
 
 object Teamfight extends Action {
   
-  override def allowed(state: ExecutionState): Boolean = {
+  override def allowed(state: ActionState): Boolean = {
     state.canFight &&
     state.unit.battle.exists(_.happening)
   }
   
-  override def perform(state: ExecutionState) {
+  override def perform(state: ActionState) {
     
     // TODO: When should we continue fighting losing battles?
     // How should we avoid indecision?

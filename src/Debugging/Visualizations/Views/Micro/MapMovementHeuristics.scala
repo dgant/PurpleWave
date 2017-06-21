@@ -21,7 +21,7 @@ object MapMovementHeuristics {
         .headOption
     }
     
-    focus.foreach(unit => renderUnit(unit.executionState.movementHeuristicResults))
+    focus.foreach(unit => renderUnit(unit.actionState.movementHeuristicResults))
   }
   
   private def eligible(unit: FriendlyUnitInfo): Boolean =

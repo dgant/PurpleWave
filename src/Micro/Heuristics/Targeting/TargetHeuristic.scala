@@ -1,11 +1,11 @@
 package Micro.Heuristics.Targeting
 
 import Mathematics.Heuristics.Heuristic
-import Micro.Execution.ExecutionState
+import Micro.Execution.ActionState
 import ProxyBwapi.UnitInfo.UnitInfo
 
-abstract class TargetHeuristic extends Heuristic[ExecutionState, UnitInfo] {
+abstract class TargetHeuristic extends Heuristic[ActionState, UnitInfo] {
   
-  def evaluate(state: ExecutionState, candidate: UnitInfo): Double
+  def evaluate(state: ActionState, candidate: UnitInfo): Double
   
 }

@@ -13,7 +13,7 @@ import ProxyBwapi.UnitClass.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import ProxyBwapi.Upgrades.Upgrade
 
-class ExecutionState(val unit: FriendlyUnitInfo) {
+class ActionState(val unit: FriendlyUnitInfo) {
   
   /////////////
   // History //

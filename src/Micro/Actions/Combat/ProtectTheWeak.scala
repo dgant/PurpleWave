@@ -4,7 +4,7 @@ import Micro.Actions.Action
 import Micro.Actions.Basic.Gather
 import Micro.Actions.Commands.{Attack, Reposition}
 import Micro.Behaviors.MovementProfiles
-import Micro.Execution.ExecutionState
+import Micro.Execution.ActionState
 import Micro.Heuristics.Targeting.EvaluateTargets
 import ProxyBwapi.UnitInfo.UnitInfo
 
@@ -12,11 +12,11 @@ object ProtectTheWeak extends Action {
   
   // Protect our workers from harassment. Don't abandon them!
   
-  override protected def allowed(state: ExecutionState): Boolean = {
+  override protected def allowed(state: ActionState): Boolean = {
     true
   }
   
-  override protected def perform(state: ExecutionState) {
+  override protected def perform(state: ActionState) {
     
     val currentBullies = bullies(state)
     
@@ -35,9 +35,9 @@ object ProtectTheWeak extends Action {
     }
   }
   
-  private def bullies(state: ExecutionState): Iterable[UnitInfo] = {
+  private def bullies(state: ActionState): Iterable[UnitInfo] = {
     state.neighbors
-      .filter(neighbor => neighbor.executionState.lastAction.exists(innocentActions.contains))
+      .filter(neighbor => neighbor.actionState.lastAction.exists(innocentActions.contains))
       .flatMap(neighbor => state.targets.filter(_.isBeingViolentTo(neighbor)))
   }
   

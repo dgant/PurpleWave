@@ -3,12 +3,12 @@ package Micro.Heuristics.Movement
 import Lifecycle.With
 import Mathematics.Heuristics.HeuristicMathMultiplicative
 import Mathematics.Points.{Pixel, Tile}
-import Micro.Execution.ExecutionState
+import Micro.Execution.ActionState
 object MovementHeuristicTraffic extends MovementHeuristic {
   
   val scaling = 1.0 / 32.0 / 32.0
   
-  override def evaluate(state: ExecutionState, candidate: Pixel): Double = {
+  override def evaluate(state: ActionState, candidate: Pixel): Double = {
   
     if (state.unit.flying) return HeuristicMathMultiplicative.default
     
@@ -45,9 +45,9 @@ object MovementHeuristicTraffic extends MovementHeuristic {
   }
   
   def measureTraffic(
-    state       : ExecutionState,
-    multiplier  : Double,
-    candidate   : Tile)
+                      state       : ActionState,
+                      multiplier  : Double,
+                      candidate   : Tile)
       : Double = {
     
     multiplier *

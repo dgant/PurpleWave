@@ -5,7 +5,7 @@ import ProxyBwapi.UnitInfo.UnitInfo
 
 object Threats {
   
-  def get(state: ExecutionState): Vector[UnitInfo] = {
+  def get(state: ActionState): Vector[UnitInfo] = {
     if (state.unit.battle.isEmpty) return Vector.empty
     With.units.inTileRadius(
       state.unit.tileIncludingCenter,
@@ -14,7 +14,7 @@ object Threats {
     .toVector
   }
   
-  def valid(state: ExecutionState, threat: UnitInfo): Boolean = {
+  def valid(state: ActionState, threat: UnitInfo): Boolean = {
     threat.likelyStillThere &&
       With.frame - threat.lastSeen < 24 * 60 &&
       threat.isEnemyOf(state.unit) &&

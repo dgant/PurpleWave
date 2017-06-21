@@ -2,15 +2,15 @@ package Micro.Actions.Basic
 
 import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Execution.ExecutionState
+import Micro.Execution.ActionState
 
 object Produce extends Action {
   
-  override def allowed(state:ExecutionState) = {
+  override def allowed(state:ActionState) = {
     state.unit.trainingQueue.isEmpty
   }
   
-  override def perform(state:ExecutionState) {
+  override def perform(state:ActionState) {
     
     if (state.toTrain.isDefined) {
       With.commander.build(state.unit, state.toTrain.get)

@@ -3,7 +3,7 @@ package Debugging.Visualizations.Views.Micro
 import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
 import Lifecycle.With
-import Micro.Execution.ExecutionState
+import Micro.Execution.ActionState
 
 object MapUnitsOurs {
   
@@ -11,7 +11,7 @@ object MapUnitsOurs {
     With.executor.states.foreach(renderUnitState)
   }
   
-  def renderUnitState(state: ExecutionState) {
+  def renderUnitState(state: ActionState) {
     if ( ! With.viewport.contains(state.unit.pixelCenter)) return
     
     /*

@@ -29,6 +29,7 @@ object Idle extends Action {
   }
   
   private val actions = Vector(
+    Unstick,
     Duck,
     Gather,
     Build,

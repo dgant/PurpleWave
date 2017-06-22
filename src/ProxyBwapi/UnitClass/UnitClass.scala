@@ -9,7 +9,7 @@ import scala.collection.mutable.ListBuffer
 
 case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
   
-  lazy val asStringNeat = asString
+  lazy val asStringNeat: String = asString
     .replace("Terran_", "")
     .replace("Zerg_", "")
     .replace("Protoss_", "")
@@ -25,7 +25,7 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
   // Geometry //
   //////////////
   
-  def radialHypotenuse = Math.sqrt(width.toDouble * width.toDouble + height.toDouble * height.toDouble)/2.0
+  def radialHypotenuse: Double = Math.sqrt(width.toDouble * width.toDouble + height.toDouble * height.toDouble)/2.0
   
   ////////////
   // Combat //

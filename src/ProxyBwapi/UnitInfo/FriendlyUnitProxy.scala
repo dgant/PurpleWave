@@ -175,7 +175,7 @@ abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
   def sieged        : Boolean = base.isSieged
   def stasised      : Boolean = cachedStasised.get
   def stimmed       : Boolean = cachedIsStimmed.get
-  def stuck         : Boolean = base.isStuck
+  def failingToMove         : Boolean = base.isStuck
   def velocityX     : Double  = base.getVelocityX
   def velocityY     : Double  = base.getVelocityY
   

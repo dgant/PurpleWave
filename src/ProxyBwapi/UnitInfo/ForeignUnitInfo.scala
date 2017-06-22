@@ -305,7 +305,7 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
   def sieged        : Boolean = _sieged
   def stasised      : Boolean = _stasised
   def stimmed       : Boolean = _stimmed
-  def stuck         : Boolean = _stuck
+  def failingToMove         : Boolean = _stuck
   def velocityX     : Double  = _velocityX
   def velocityY     : Double  = _velocityY
   

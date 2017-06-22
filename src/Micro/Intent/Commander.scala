@@ -54,6 +54,11 @@ class Commander {
     ! ready(unit)
   }
   
+  def stop(unit: FriendlyUnitInfo) {
+    unit.base.stop()
+    sleep(unit)
+  }
+  
   def attack(unit: FriendlyUnitInfo, target: UnitInfo) {
     if (unready(unit)) return
     

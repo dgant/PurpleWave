@@ -61,11 +61,11 @@ class ProtossVsZerg extends Parallel {
     new Build(ProtossBuilds.OpeningTwoGate1012Zealots)
   )
   
-  private object RespondToMutalisksWithMassCorsairs extends IfThenElse(
+  private object RespondToMutalisksWithCorsairs extends IfThenElse(
     new EnemyMutalisks,
     new Parallel(
       new Build(ProtossBuilds.TechCorsairs),
-      new TrainContinuously(Protoss.Corsair, 12)
+      new TrainContinuously(Protoss.Corsair, 10)
     )
   )
   
@@ -76,14 +76,17 @@ class ProtossVsZerg extends Parallel {
   )
   
   private object BuildZealotsOrDragoons_BasedOnMutalisksAndZerglings extends IfThenElse (
-    new Or (
+    new Or(
       new EnemyMassMutalisks,
       new And(
         new EnemyMutalisks,
         new UnitsAtLeast(8, UnitMatchType(Protoss.Zealot))
       )
     ),
-    new TrainContinuously(Protoss.Dragoon),
+    new Parallel(
+      new Build(RequestUpgrade(Protoss.DragoonRange)),
+      new TrainContinuously(Protoss.Dragoon)
+    ),
     new IfThenElse(
       new Or(
         new EnemyMassZerglings,
@@ -124,7 +127,7 @@ class ProtossVsZerg extends Parallel {
     new RequireSufficientPylons,
     new TrainProbesContinuously,
     new BuildAssimilators,
-    RespondToMutalisksWithMassCorsairs,
+    RespondToMutalisksWithCorsairs,
     new TrainContinuously(Protoss.DarkTemplar, 3),
     new TrainContinuously(Protoss.Reaver, 2),
     new TrainContinuously(Protoss.Corsair, 3),

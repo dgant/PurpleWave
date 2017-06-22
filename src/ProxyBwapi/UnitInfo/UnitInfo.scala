@@ -49,6 +49,10 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
         .getOrElse(0))
   }
   
+  def failingToMove: Boolean = {
+    history.filter(_.age < 24).forall(state => state.tryingToMove && state.pixelCenter == pixelCenter)
+  }
+  
   ////////////
   // Health //
   ////////////

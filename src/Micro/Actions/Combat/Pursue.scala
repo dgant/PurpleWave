@@ -16,8 +16,13 @@ object Pursue extends Action {
   
   override def perform(state: ActionState) {
     val pursuableTargets = state.targets.filter(_.topSpeed < state.unit.topSpeed * 0.9)
+    
     state.toAttack = EvaluateTargets.best(state, pursuableTargets)
-    Attack.delegate(state)
-    // TODO: Chase down where the target is going to go!
+    if (state.unit.canAttackThisFrame) {
+      Attack.delegate(state)
+    }
+    else {
+      state.toAttack.foreach(target => state.toTravel = Some(target.targetPixel.getOrElse(target.project(state.unit.cooldownLeft))))
+    }
   }
 }

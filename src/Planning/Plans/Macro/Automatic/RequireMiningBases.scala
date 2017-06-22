@@ -1,13 +1,14 @@
 package Planning.Plans.Macro.Automatic
 
+import Debugging.English
 import Lifecycle.With
 import Macro.BuildRequests.RequestUnitAtLeast
 import Planning.Composition.Property
 import Planning.Plan
 
-class BuildMiningBases(basesInitial: Int = 1) extends Plan {
+class RequireMiningBases(basesInitial: Int = 1) extends Plan {
   
-  description.set("Builds a certain number of mining bases")
+  override def toString: String = "Require " + basesDesired.get + English.pluralize(" mining base", basesDesired.get)
   
   val basesDesired = new Property(basesInitial)
   

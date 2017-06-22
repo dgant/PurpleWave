@@ -48,7 +48,7 @@ object MapUnits {
     val colorSh = Colors.NeonBlue
     val colorDm = Colors.NeonViolet
   
-    DrawMap.box(Pixel(xStart - 2, yStartHp - 2), Pixel(xStart + width + 3, yEndHp + 2), Color.Black, solid = true)
+    DrawMap.box(Pixel(xStart - 1, yStartHp - 1), Pixel(xStart + width + 1, yEndHp + 1), Color.Black, solid = true)
     DrawMap.box(Pixel(xStartDm, yStartHp), Pixel(xStartDm + widthDmMax, yEndHp), colorDm, solid = false)
     DrawMap.box(Pixel(xStartSh, yStartHp), Pixel(xStartSh + widthShMax, yEndHp), colorSh, solid = false)
     DrawMap.box(Pixel(xStart,   yStartHp), Pixel(xStart   + widthHpMax, yEndHp), colorHp, solid = false)

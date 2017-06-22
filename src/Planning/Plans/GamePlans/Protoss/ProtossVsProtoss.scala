@@ -26,11 +26,11 @@ class ProtossVsProtoss extends Parallel {
     RequestUnitAtLeast(6,   Protoss.Gateway),
     RequestUnitAtLeast(1,   Protoss.CitadelOfAdun),
     RequestUnitAtLeast(8,   Protoss.Gateway),
-    RequestUpgradeLevel(         Protoss.ZealotSpeed),
+    RequestUpgradeLevel(    Protoss.ZealotSpeed),
     RequestUnitAtLeast(10,  Protoss.Gateway)
   )
   
-  private object MakeEmergencyUnits extends IfThenElse(
+  private class MakeEmergencyUnits extends IfThenElse(
     new And(
       new UnitsAtLeast(1, UnitMatchType(Protoss.Probe)),
       new UnitsAtLeast(1, UnitMatchType(Protoss.Assimilator)),
@@ -41,49 +41,49 @@ class ProtossVsProtoss extends Parallel {
       new Build(RequestUnitAtLeast(1, Protoss.Probe)),
       new Build(RequestUnitAtLeast(2, Protoss.Dragoon))
     )
-  )
+  ) { description.set("Make emergency units")}
   
-  private object ExpandAgainstCannons extends IfThenElse(
+  private class ExpandAgainstCannons extends IfThenElse(
     new Or(
       new EnemyUnitsAtLeast(1, UnitMatchType(Protoss.PhotonCannon)),
       new EnemyUnitsAtLeast(1, UnitMatchType(Protoss.Forge))
     ),
-    new BuildMiningBases(2)
-  )
+    new RequireMiningBases(2)
+  ) { description.set("Expand against cannons")}
   
-  private object TakeNatural extends IfThenElse(
+  private class TakeNatural extends IfThenElse(
     new Or(
       new UnitsAtLeast(6, UnitMatchType(Protoss.Dragoon)),
       new UnitsAtLeast(1, UnitMatchType(Protoss.Reaver))
     ),
     new Parallel(
       new UnitsAtLeast(2, UnitMatchType(Protoss.Zealot)),
-      new BuildMiningBases(2)
+      new RequireMiningBases(2)
     )
-  )
+  ) { description.set("Take our natural when safe")}
   
-  private object TakeThirdBase extends IfThenElse(
+  private class TakeThirdBase extends IfThenElse(
     new And(
       new UnitsAtLeast(8, UnitMatchType(Protoss.Dragoon)),
       new UnitsAtLeast(2, UnitMatchType(Protoss.Reaver))
     ),
-    new BuildMiningBases(3)
-  )
+    new RequireMiningBases(3)
+  ) { description.set("Take our third base when safe")}
   
-  private object TakeFourthBase extends IfThenElse(
+  private class TakeFourthBase extends IfThenElse(
     new And(
       new UnitsAtLeast(15, UnitMatchType(Protoss.Dragoon)),
       new UnitsAtLeast(3, UnitMatchType(Protoss.Reaver))
     ),
-    new BuildMiningBases(4)
-  )
+    new RequireMiningBases(4)
+  ) { description.set("Take our fourth base when safe")}
   
-  private object UpgradeScarabDamage extends IfThenElse(
+  private class UpgradeScarabDamage extends IfThenElse(
       new UnitsAtLeast(2, UnitMatchType(Protoss.Reaver)),
       new Build(RequestUpgradeLevel(Protoss.ScarabDamage))
-  )
+  )  { description.set("Upgrade Scarab damage")}
   
-  private object BuildDragoonsorZealotsWithLegSpeed extends IfThenElse(
+  private class BuildDragoonsorZealotsWithLegSpeed extends IfThenElse(
     new And(
       new HaveUpgrade(Protoss.ZealotSpeed),
       new UnitsAtLeast(12, UnitMatchType(Protoss.Dragoon))),
@@ -91,7 +91,7 @@ class ProtossVsProtoss extends Parallel {
     new TrainContinuously(Protoss.Dragoon)
   )
   
-  private object AttackWithDragoonRange extends IfThenElse(
+  private class AttackWithDragoonRange extends IfThenElse(
     new And(
       new UnitsAtLeast(8, UnitMatchType(Protoss.Dragoon)),
       new HaveUpgrade(Protoss.DragoonRange)),
@@ -99,25 +99,25 @@ class ProtossVsProtoss extends Parallel {
   )
   
   children.set(Vector(
-    MakeEmergencyUnits,
+    new MakeEmergencyUnits,
     new Build(ProtossBuilds.OpeningOneGateCore_DragoonFirst),
     new MatchMiningBases,
-    TakeNatural,
-    ExpandAgainstCannons,
-    TakeThirdBase,
-    TakeFourthBase,
+    new TakeNatural,
+    new ExpandAgainstCannons,
+    new TakeThirdBase,
+    new TakeFourthBase,
     new RequireSufficientPylons,
     new TrainProbesContinuously,
     new BuildAssimilators,
-    UpgradeScarabDamage,
+    new UpgradeScarabDamage,
     new TrainContinuously(Protoss.Reaver, 4),
-    BuildDragoonsorZealotsWithLegSpeed,
+    new BuildDragoonsorZealotsWithLegSpeed,
     new Build(_secondGateway),
     new Build(RequestUpgradeLevel(Protoss.DragoonRange)),
     new Build(ProtossBuilds.TechReavers),
     new Build(_lateGame),
     new ScoutExpansionsAt(70),
     new ScoutAt(9),
-    AttackWithDragoonRange
+    new AttackWithDragoonRange
   ))
 }

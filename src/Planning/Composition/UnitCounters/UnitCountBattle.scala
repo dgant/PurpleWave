@@ -1,8 +1,12 @@
 package Planning.Composition.UnitCounters
-import Information.Battles.Types.Battle
-import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
-class UnitCountBattle(battle: Battle) extends UnitCounter {
+class UnitCountBattle extends UnitCounter {
+  
+  var overkill = 1.5
+  var acceptWhenLosing = true
+  
+  private var enemies: Set[UnitInfo] = Set.empty
   
   override def continue(units: Iterable[FriendlyUnitInfo]): Boolean = {
     

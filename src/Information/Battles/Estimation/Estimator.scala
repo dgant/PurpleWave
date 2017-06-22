@@ -83,7 +83,7 @@ class Estimator(val considerGeometry: Boolean) {
   }
   
   def weGainValue : Boolean = result.costToEnemy  >   result.costToUs
-  def weLoseValue : Boolean = result.costToEnemy  <=  result.costToUs
+  def weLoseValue : Boolean = result.costToEnemy  <   result.costToUs
   def weSurvive   : Boolean = result.deathsUs     <   unitsOurs.size
   def weDie       : Boolean = result.deathsUs     >=  unitsOurs.size
   

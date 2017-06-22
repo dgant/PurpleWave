@@ -40,12 +40,12 @@ class ProtossVsZerg extends Parallel {
     RequestUpgradeLevel(         Protoss.GroundDamage, 1)
   )
   
-  private object WhenSafeTakeNatural extends IfThenElse(
+  private class WhenSafeTakeNatural extends IfThenElse(
     new UnitsAtLeast(12, UnitMatchWarriors),
-    new BuildMiningBases(2)
+    new RequireMiningBases(2)
   )
   
-  private object WhenSafeTakeThirdBase extends IfThenElse(
+  private class WhenSafeTakeThirdBase extends IfThenElse(
     new And(
       new UnitsAtLeast(16, UnitMatchWarriors),
       new UnitsAtLeast(1, UnitMatchType(Protoss.Corsair)),
@@ -53,15 +53,15 @@ class ProtossVsZerg extends Parallel {
         new UnitsAtLeast(1, UnitMatchType(Protoss.Reaver)),
         new UnitsAtLeast(1, UnitMatchType(Protoss.DarkTemplar)))
     ),
-    new BuildMiningBases(3)
+    new RequireMiningBases(3)
   )
   
-  private object BuildZealotsInitially extends IfThenElse(
+  private class BuildZealotsInitially extends IfThenElse(
     new UnitsExactly(0, UnitMatchType(Protoss.CyberneticsCore)),
     new Build(ProtossBuilds.OpeningTwoGate1012Zealots)
   )
   
-  private object RespondToMutalisksWithCorsairs extends IfThenElse(
+  private class RespondToMutalisksWithCorsairs extends IfThenElse(
     new EnemyMutalisks,
     new Parallel(
       new Build(ProtossBuilds.TechCorsairs),
@@ -69,13 +69,13 @@ class ProtossVsZerg extends Parallel {
     )
   )
   
-  private object RespondToHydrasWithReavers_OrGetCorsairTech extends IfThenElse(
+  private class RespondToHydrasWithReavers_OrGetCorsairTech extends IfThenElse(
     new EnemyHydralisks,
     new Build(ProtossBuilds.TechReavers),
     new Build(ProtossBuilds.TechCorsairs)
   )
   
-  private object BuildZealotsOrDragoons_BasedOnMutalisksAndZerglings extends IfThenElse (
+  private class BuildZealotsOrDragoons_BasedOnMutalisksAndZerglings extends IfThenElse (
     new Or(
       new EnemyMassMutalisks,
       new And(
@@ -97,7 +97,7 @@ class ProtossVsZerg extends Parallel {
     )
   )
   
-  private object AttackWhenWeHaveArmy extends IfThenElse(
+  private class AttackWhenWeHaveArmy extends IfThenElse(
     new UnitsAtLeast(10, UnitMatchWarriors),
     new ConsiderAttacking,
     new IfThenElse(
@@ -106,7 +106,7 @@ class ProtossVsZerg extends Parallel {
       new DefendHearts)
   )
   
-  private object EatOverlordsUntilMutalisksArrive extends IfThenElse(
+  private class EatOverlordsUntilMutalisksArrive extends IfThenElse(
     new EnemyMutalisks,
     new ScoutExpansionsAt(100),
     new Parallel(
@@ -119,24 +119,24 @@ class ProtossVsZerg extends Parallel {
   private val earlyZealotCount = 8
   
   children.set(Vector(
-    new BuildMiningBases(1),
+    new RequireMiningBases(1),
     new Build(ProtossBuilds.OpeningTwoGate1012),
-    WhenSafeTakeNatural,
-    WhenSafeTakeThirdBase,
-    BuildZealotsInitially,
+    new WhenSafeTakeNatural,
+    new WhenSafeTakeThirdBase,
+    new BuildZealotsInitially,
     new RequireSufficientPylons,
     new TrainProbesContinuously,
     new BuildAssimilators,
-    RespondToMutalisksWithCorsairs,
+    new RespondToMutalisksWithCorsairs,
     new TrainContinuously(Protoss.DarkTemplar, 3),
     new TrainContinuously(Protoss.Reaver, 2),
     new TrainContinuously(Protoss.Corsair, 3),
     new Build(plusOneWeapons),
-    RespondToHydrasWithReavers_OrGetCorsairTech,
-    BuildZealotsOrDragoons_BasedOnMutalisksAndZerglings,
+    new RespondToHydrasWithReavers_OrGetCorsairTech,
+    new BuildZealotsOrDragoons_BasedOnMutalisksAndZerglings,
     new Build(lateGameBuild),
     new ScoutAt(10),
-    EatOverlordsUntilMutalisksArrive,
-    AttackWhenWeHaveArmy
+    new EatOverlordsUntilMutalisksArrive,
+    new AttackWhenWeHaveArmy
   ))
 }

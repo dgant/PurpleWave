@@ -31,33 +31,33 @@ class ProtossVsTerran extends Parallel {
     RequestUnitAtLeast(1,   Protoss.TemplarArchives)
   )
   
-  private object RespondToBioAllInWithReavers extends IfThenElse(
+  private class RespondToBioAllInWithReavers extends IfThenElse(
     new EnemyBioAllIn,
     new Build(ProtossBuilds.TechReavers)
   )
   
-  private object RespondToBioWithReavers extends IfThenElse(
+  private class RespondToBioWithReavers extends IfThenElse(
     new EnemyBio,
     new Build(ProtossBuilds.TechReavers)
   )
   
-  private object TakeNatural extends IfThenElse(
+  private class TakeNatural extends IfThenElse(
     new Or(
       new UnitsAtLeast(3, UnitMatchType(Protoss.Dragoon)),
       new UnitsAtLeast(1, UnitMatchType(Protoss.Reaver))
     ),
-    new BuildMiningBases(2)
+    new RequireMiningBases(2)
   )
   
-  private object TakeThirdBase extends IfThenElse(
+  private class TakeThirdBase extends IfThenElse(
     new Or(
       new UnitsAtLeast(5, UnitMatchType(Protoss.Dragoon)),
       new UnitsAtLeast(1, UnitMatchType(Protoss.Reaver))
     ),
-    new BuildMiningBases(3)
+    new RequireMiningBases(3)
   )
   
-  private object BuildDragoonsUntilWeHaveZealotSpeed extends IfThenElse(
+  private class BuildDragoonsUntilWeHaveZealotSpeed extends IfThenElse(
     new And(
       new HaveUpgrade(Protoss.ZealotSpeed),
       new UnitsAtLeast(12, UnitMatchType(Protoss.Dragoon))),
@@ -65,26 +65,26 @@ class ProtossVsTerran extends Parallel {
     new TrainContinuously(Protoss.Dragoon)
   )
   
-  private object UpgradeReavers extends IfThenElse(
+  private class UpgradeReavers extends IfThenElse(
     new UnitsAtLeast(2, UnitMatchType(Protoss.Reaver)),
     new Build(RequestUpgradeLevel(Protoss.ScarabDamage))
   )
   
   children.set(Vector(
-    new BuildMiningBases(1),
+    new RequireMiningBases(1),
     new Build(ProtossBuilds.OpeningTwoGate1015Dragoons),
     new RequireSufficientPylons,
     new TrainProbesContinuously,
     new BuildAssimilators,
-    RespondToBioAllInWithReavers,
+    new RespondToBioAllInWithReavers,
     new MatchMiningBases(1),
-    TakeNatural,
-    RespondToBioWithReavers,
-    TakeThirdBase,
+    new TakeNatural,
+    new RespondToBioWithReavers,
+    new TakeThirdBase,
     new TrainContinuously(Protoss.Reaver, 2),
     new TrainContinuously(Protoss.Scout,  3),
-    BuildDragoonsUntilWeHaveZealotSpeed,
-    UpgradeReavers,
+    new BuildDragoonsUntilWeHaveZealotSpeed,
+    new UpgradeReavers,
     new Build(lateGameBuild),
     new ScoutExpansionsAt(60),
     new ScoutAt(10),

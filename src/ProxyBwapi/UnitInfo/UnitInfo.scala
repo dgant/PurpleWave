@@ -20,7 +20,12 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   def friendly  : Option[FriendlyUnitInfo]  = None
   def foreign   : Option[ForeignUnitInfo]   = None
   
-  override def toString:String = unitClass.toString + " " + tileIncludingCenter.toString
+  override def toString:String = {
+    unitClass.toString + " " +
+    hitPoints + "/" + unitClass.maxHitPoints + " " +
+    (if (shieldPoints > 0) "(" + shieldPoints + "/" + unitClass.maxShields + ")" else "") +
+    tileIncludingCenter.toString + " " + pixelCenter.toString
+  }
   
   def is(unitClasses:UnitClass*):Boolean = unitClasses.contains(unitClass)
   
@@ -50,7 +55,7 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   }
   
   def failingToMove: Boolean = {
-    history.filter(_.age < 24).forall(state => state.tryingToMove && state.pixelCenter == pixelCenter)
+    history.size >= 24 && history.filter(_.age < 24).forall(state => state.tryingToMove && state.pixelCenter == pixelCenter)
   }
   
   ////////////

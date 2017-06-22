@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Protoss
 
-import Macro.BuildRequests.{BuildRequest, RequestUnitAtLeast, RequestUpgrade}
+import Macro.BuildRequests.{BuildRequest, RequestUnitAtLeast, RequestUpgradeLevel}
 import ProxyBwapi.Races.Protoss
 
 object ProtossBuilds {
@@ -85,7 +85,7 @@ object ProtossBuilds {
     RequestUnitAtLeast(15,  Protoss.Probe),
     RequestUnitAtLeast(2,   Protoss.Gateway),
     RequestUnitAtLeast(2,   Protoss.Pylon),
-    RequestUpgrade(         Protoss.DragoonRange),
+    RequestUpgradeLevel(         Protoss.DragoonRange),
     RequestUnitAtLeast(2,   Protoss.Dragoon),
     RequestUnitAtLeast(3,   Protoss.Pylon),
     RequestUnitAtLeast(6,   Protoss.Dragoon)
@@ -108,7 +108,7 @@ object ProtossBuilds {
     RequestUnitAtLeast(19,  Protoss.Probe),
     RequestUnitAtLeast(2,   Protoss.Pylon),
     RequestUnitAtLeast(2,   Protoss.Dragoon),
-    RequestUpgrade(         Protoss.DragoonRange),
+    RequestUpgradeLevel(         Protoss.DragoonRange),
     RequestUnitAtLeast(21,  Protoss.Probe),
     RequestUnitAtLeast(3,   Protoss.Pylon),
     RequestUnitAtLeast(4,   Protoss.Dragoon),
@@ -122,7 +122,7 @@ object ProtossBuilds {
     RequestUnitAtLeast(1,   Protoss.Gateway),
     RequestUnitAtLeast(1,   Protoss.Assimilator),
     RequestUnitAtLeast(1,   Protoss.CyberneticsCore),
-    RequestUpgrade(         Protoss.DragoonRange)
+    RequestUpgradeLevel(         Protoss.DragoonRange)
   )
   
   val TechReavers = Vector[BuildRequest] (

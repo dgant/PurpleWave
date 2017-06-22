@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Protoss
 
-import Macro.BuildRequests.{BuildRequest, RequestUnitAtLeast, RequestUpgrade}
+import Macro.BuildRequests.{BuildRequest, RequestUnitAtLeast, RequestUpgradeLevel}
 import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors}
 import Planning.Plans.Army.{ConsiderAttacking, ControlEnemyAirspace, DefendChokes, DefendHearts}
 import Planning.Plans.Compound.{IfThenElse, _}
@@ -18,26 +18,26 @@ class ProtossVsZerg extends Parallel {
   private val lateGameBuild = Vector[BuildRequest] (
     RequestUnitAtLeast(4,   Protoss.Gateway),
     RequestUnitAtLeast(1,   Protoss.CitadelOfAdun),
-    RequestUpgrade(         Protoss.DragoonRange),
-    RequestUpgrade(         Protoss.ZealotSpeed),
+    RequestUpgradeLevel(    Protoss.DragoonRange),
+    RequestUpgradeLevel(    Protoss.ZealotSpeed),
     RequestUnitAtLeast(6,   Protoss.Gateway),
     RequestUnitAtLeast(1,   Protoss.TemplarArchives),
-    RequestUpgrade(         Protoss.GroundDamage, 2),
+    RequestUpgradeLevel(    Protoss.GroundDamage, 2),
     RequestUnitAtLeast(10,  Protoss.Gateway),
-    RequestUpgrade(         Protoss.GroundDamage, 3),
+    RequestUpgradeLevel(    Protoss.GroundDamage, 3),
     RequestUnitAtLeast(2,   Protoss.Forge),
     RequestUnitAtLeast(7,   Protoss.PhotonCannon),
-    RequestUpgrade(         Protoss.GroundDamage, 2),
-    RequestUpgrade(         Protoss.GroundArmor,  2),
+    RequestUpgradeLevel(    Protoss.GroundDamage, 2),
+    RequestUpgradeLevel(    Protoss.GroundArmor,  2),
     RequestUnitAtLeast(8,   Protoss.Gateway),
     RequestUnitAtLeast(10,  Protoss.Gateway),
-    RequestUpgrade(         Protoss.GroundDamage, 3),
-    RequestUpgrade(         Protoss.GroundArmor, 3)
+    RequestUpgradeLevel(    Protoss.GroundDamage, 3),
+    RequestUpgradeLevel(    Protoss.GroundArmor, 3)
   )
   
   private val plusOneWeapons = Vector[BuildRequest] (
     RequestUnitAtLeast(1,   Protoss.Forge),
-    RequestUpgrade(         Protoss.GroundDamage, 1)
+    RequestUpgradeLevel(         Protoss.GroundDamage, 1)
   )
   
   private object WhenSafeTakeNatural extends IfThenElse(
@@ -84,7 +84,7 @@ class ProtossVsZerg extends Parallel {
       )
     ),
     new Parallel(
-      new Build(RequestUpgrade(Protoss.DragoonRange)),
+      new Build(RequestUpgradeLevel(Protoss.DragoonRange)),
       new TrainContinuously(Protoss.Dragoon)
     ),
     new IfThenElse(

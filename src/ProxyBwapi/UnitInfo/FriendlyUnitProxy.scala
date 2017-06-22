@@ -165,7 +165,7 @@ abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
   //////////////
   
   def accelerating  : Boolean = base.isAccelerating
-  def angleRadians         : Double  = base.getAngle
+  def angleRadians  : Double  = base.getAngle
   def braking       : Boolean = base.isBraking
   def ensnared      : Boolean = base.isEnsnared
   def flying        : Boolean = cachedFlying.get
@@ -175,7 +175,7 @@ abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
   def sieged        : Boolean = base.isSieged
   def stasised      : Boolean = cachedStasised.get
   def stimmed       : Boolean = cachedIsStimmed.get
-  def failingToMove         : Boolean = base.isStuck
+  def stuck         : Boolean = base.isStuck
   def velocityX     : Double  = base.getVelocityX
   def velocityY     : Double  = base.getVelocityY
   

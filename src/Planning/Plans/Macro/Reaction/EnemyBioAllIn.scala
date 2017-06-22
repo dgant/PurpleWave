@@ -6,7 +6,7 @@ import ProxyBwapi.Races.Terran
 
 class EnemyBioAllIn extends Plan {
   
-  description.set("Is the enemy threatening Terran Bio??")
+  description.set("Is the enemy threatening a Terran Bio all-in?")
   
   override def isComplete: Boolean = {
     (

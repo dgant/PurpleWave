@@ -6,7 +6,7 @@ import ProxyBwapi.Races.Terran
 
 class EnemyBio extends Plan {
   
-  description.set("Is the enemy threatening Terran Bio??")
+  description.set("Is the enemy threatening Terran Bio?")
   
   override def isComplete: Boolean = {
     With.units.enemy.count(unit => unit.is(Terran.Marine))    > 4   ||

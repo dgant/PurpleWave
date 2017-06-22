@@ -26,7 +26,7 @@ class ProtossVsProtoss extends Parallel {
     RequestUnitAtLeast(6,   Protoss.Gateway),
     RequestUnitAtLeast(1,   Protoss.CitadelOfAdun),
     RequestUnitAtLeast(8,   Protoss.Gateway),
-    RequestUpgrade(         Protoss.ZealotSpeed),
+    RequestUpgradeLevel(         Protoss.ZealotSpeed),
     RequestUnitAtLeast(10,  Protoss.Gateway)
   )
   
@@ -80,7 +80,7 @@ class ProtossVsProtoss extends Parallel {
   
   private object UpgradeScarabDamage extends IfThenElse(
       new UnitsAtLeast(2, UnitMatchType(Protoss.Reaver)),
-      new Build(RequestUpgrade(Protoss.ScarabDamage))
+      new Build(RequestUpgradeLevel(Protoss.ScarabDamage))
   )
   
   private object BuildDragoonsorZealotsWithLegSpeed extends IfThenElse(
@@ -113,7 +113,7 @@ class ProtossVsProtoss extends Parallel {
     new TrainContinuously(Protoss.Reaver, 4),
     BuildDragoonsorZealotsWithLegSpeed,
     new Build(_secondGateway),
-    new Build(RequestUpgrade(Protoss.DragoonRange)),
+    new Build(RequestUpgradeLevel(Protoss.DragoonRange)),
     new Build(ProtossBuilds.TechReavers),
     new Build(_lateGame),
     new ScoutExpansionsAt(70),

@@ -13,7 +13,7 @@ import scala.collection.mutable
 
 class Scheduler {
   
-  private val requestsByPlan = new mutable.HashMap[Plan, Iterable[BuildRequest]]
+  private val requestsByPlan  = new mutable.HashMap[Plan, Iterable[BuildRequest]]
   private val recentlyUpdated = new mutable.HashSet[Plan]
   
   var simulationResults:ScheduleSimulationResult = new ScheduleSimulationResult(Vector.empty, Vector.empty, Vector.empty)
@@ -30,7 +30,7 @@ class Scheduler {
     recentlyUpdated.add(requester)
   }
   
-  def update() = {
+  def update() {
     requestsByPlan.keySet.diff(recentlyUpdated).foreach(requestsByPlan.remove)
     
     //TODO: This needs to go elsewhere when we go async!
@@ -54,16 +54,19 @@ class Scheduler {
       : Iterable[Buildable] = {
     
     if (request.buildable.upgradeOption.nonEmpty) {
-      if(With.self.getUpgradeLevel(request.buildable.upgradeOption.get) < request.buildable.upgradeLevel)
-        return Vector(request.buildable)
+      val upgrade = request.buildable.upgradeOption.get
+      if (With.self.getUpgradeLevel(upgrade) < request.buildable.upgradeLevel)
+        Vector(request.buildable)
+      else if (request.add > 0 && With.self.getUpgradeLevel(upgrade) < upgrade.levels.last)
+        Vector(request.buildable)
       else
-        return None
+        None
     }
     else if (request.buildable.techOption.nonEmpty) {
       if (With.self.hasTech(request.buildable.techOption.get))
-        return Vector(request.buildable)
+        Vector(request.buildable)
       else
-        return None
+        None
     }
     else {
       val unit = request.buildable.unitOption.get
@@ -74,10 +77,11 @@ class Scheduler {
       val differenceChange = differenceAfter - differenceBefore
       if (differenceChange > 0) {
         val buildables = (0 until differenceChange).map(i => request.buildable)
-        return buildables
+        buildables
       }
-      else
-        return Vector.empty
+      else {
+        Vector.empty
+      }
     }
   }
 }

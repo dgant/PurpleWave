@@ -18,21 +18,17 @@ class ProtossVsTerran extends Parallel {
   private val lateGameBuild = Vector[BuildRequest] (
     RequestUnitAtLeast(1,   Protoss.CitadelOfAdun),
     RequestUnitAtLeast(8,   Protoss.Gateway),
-    RequestUpgrade(         Protoss.ZealotSpeed,    1),
+    RequestUpgradeLevel(         Protoss.ZealotSpeed,    1),
     RequestUnitAtLeast(10,  Protoss.Gateway),
     
     RequestUnitAtLeast(4,   Protoss.Nexus),
     RequestUnitAtLeast(2,   Protoss.Forge),
     RequestUnitAtLeast(1,   Protoss.Stargate),
     
-    RequestUpgrade(         Protoss.GroundDamage,   1),
-    RequestUpgrade(         Protoss.GroundArmor,    1),
+    RequestUpgradeLevel(         Protoss.GroundDamage,   1),
+    RequestUpgradeLevel(         Protoss.GroundArmor,    1),
     
-    RequestUnitAtLeast(1,   Protoss.TemplarArchives),
-    RequestUpgrade(         Protoss.GroundDamage,   2),
-    RequestUpgrade(         Protoss.GroundArmor,    2),
-    RequestUpgrade(         Protoss.GroundDamage,   3),
-    RequestUpgrade(         Protoss.GroundArmor,    3)
+    RequestUnitAtLeast(1,   Protoss.TemplarArchives)
   )
   
   private object RespondToBioAllInWithReavers extends IfThenElse(
@@ -71,7 +67,7 @@ class ProtossVsTerran extends Parallel {
   
   private object UpgradeReavers extends IfThenElse(
     new UnitsAtLeast(2, UnitMatchType(Protoss.Reaver)),
-    new Build(RequestUpgrade(Protoss.ScarabDamage))
+    new Build(RequestUpgradeLevel(Protoss.ScarabDamage))
   )
   
   children.set(Vector(

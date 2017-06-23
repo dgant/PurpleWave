@@ -16,8 +16,8 @@ class Logger {
       .map(_.name)
       .mkString("-")
     
-    val filenameRaw = (opponents + "-" + Calendar.getInstance.getTime.toString)
-    val filename = "bwapi-data/write/" + filenameRaw.replaceAll("[^A-Za-z0-9 \\-\\.]", "") + ".log.txt";
+    val filenameRaw = opponents + "-" + Calendar.getInstance.getTime.toString
+    val filename = "bwapi-data/write/" + filenameRaw.replaceAll("[^A-Za-z0-9 \\-\\.]", "") + ".log.txt"
     val file = new File(filename)
     val printWriter = new PrintWriter(file)
     printWriter.write(logMessages.distinct.mkString("\r\n"))
@@ -30,19 +30,19 @@ class Logger {
     debug(formatException(exception))
   }
   
-  def debug(message:String) {
+  def debug(message: String) {
     log(message)
   }
   
-  def warn(message:String) {
+  def warn(message: String) {
     log(message)
   }
   
-  def error(message:String) {
+  def error(message: String) {
     log(message)
   }
   
-  private def log(message:String) {
+  private def log(message: String) {
     if (With.configuration.enableStdOut) {
       System.out.println(message)
     }
@@ -54,7 +54,7 @@ class Logger {
     logMessages.append(message)
   }
   
-  private def formatException(exception: Exception):String = {
+  private def formatException(exception: Exception): String = {
       exception.getClass.getSimpleName + "\n" +
       exception.getMessage + "\n"
       exception.getStackTrace.map(stackElement => {

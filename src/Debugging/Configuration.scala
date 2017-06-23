@@ -38,6 +38,7 @@ class Configuration {
   var maxMineralsBeforeMinedOut       = 300 * 8
   var blockerMineralThreshold         = 50
   var maxPlacementAge                 = 24 * 20
+  var maxScarabCount                  = 3
   
   /////////////
   // Battles //

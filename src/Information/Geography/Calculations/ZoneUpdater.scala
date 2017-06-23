@@ -18,7 +18,7 @@ object ZoneUpdater {
   private def updateBase(base:Base) {
     updateTownHall(base)
     updateOwner(base)
-    updateResources(base)
+    updateAssets(base)
   }
   
   private def updateTownHall(base: Base) {
@@ -45,14 +45,11 @@ object ZoneUpdater {
     }
   }
   
-  private def updateResources(base: Base) {
+  private def updateAssets(base: Base) {
     
-    base.minerals = With.units.neutral
-      .filter(unit => unit.unitClass.isMinerals && base.zone.contains(unit.pixelCenter) && unit.mineralsLeft > 0)
-      .toSet
-    base.gas = With.units.all
-      .filter(unit => unit.unitClass.isGas && base.zone.contains(unit.pixelCenter))
-  
+    base.minerals       = With.units.neutral.filter(unit => unit.unitClass.isMinerals && base.zone.contains(unit.pixelCenter) && unit.mineralsLeft > 0).toSet
+    base.gas            = With.units.all.filter(unit => unit.unitClass.isGas && base.zone.contains(unit.pixelCenter))
+    base.workers        = With.units.all.filter(unit => unit.unitClass.isWorker && base.zone.contains(unit.pixelCenter))
     base.mineralsLeft   = base.minerals.filter(_.alive).toVector.map(_.mineralsLeft).sum
     base.gasLeft        = base.gas.filter(_.alive).toVector.map(_.gasLeft).sum
     base.harvestingArea = (Vector(base.townHallArea) ++ (base.minerals.filter(_.mineralsLeft > With.configuration.blockerMineralThreshold) ++ base.gas).map(_.tileArea)).boundary

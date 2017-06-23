@@ -8,6 +8,9 @@ object EstimationCalculator {
     
     val output = new Estimation
     
+    output.avatarUs       = e.avatarUs
+    output.avatarEnemy    = e.avatarEnemy
+    
     if (e.avatarUs.totalUnits <= 0 || e.avatarEnemy.totalUnits <= 0) return output
     
     output.damageToUs     = dealDamage  (e.avatarEnemy, e.avatarUs)

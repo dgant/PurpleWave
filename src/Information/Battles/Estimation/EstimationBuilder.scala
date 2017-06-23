@@ -71,7 +71,6 @@ class EstimationBuilder(val considerGeometry: Boolean) {
     if (unit.is(Terran.SpiderMine))                                   return false
     if (unit.is(Protoss.Scarab))                                      return false
     if (unit.is(Protoss.Interceptor))                                 return false
-    
     unit.aliveAndComplete
   }
   
@@ -80,17 +79,12 @@ class EstimationBuilder(val considerGeometry: Boolean) {
   /////////////
 
   def result: Estimation = {
-    validResult = validResult.orElse(Some(EstimationCalculator.calculate(this)))
-    validResult.get
+    estimation = estimation.orElse(Some(EstimationCalculator.calculate(this)))
+    estimation.get
   }
   
-  private var validResult: Option[Estimation] = None
+  private var estimation: Option[Estimation] = None
   private def invalidateResult() {
-    validResult = None
+    estimation = None
   }
-  
-  def weGainValue : Boolean = result.costToEnemy  >   result.costToUs
-  def weLoseValue : Boolean = result.costToEnemy  <   result.costToUs
-  def weSurvive   : Boolean = result.deathsUs     <   unitsOurs.size
-  def weDie       : Boolean = result.deathsUs     >=  unitsOurs.size
 }

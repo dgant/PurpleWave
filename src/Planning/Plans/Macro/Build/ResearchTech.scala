@@ -13,7 +13,7 @@ class ResearchTech(tech: Tech) extends Plan {
   val currency = new LockCurrencyForTech(tech)
   val techers = new LockUnits {
     unitCounter.set(UnitCountOne)
-    unitMatcher.set(new UnitMatchType(tech.whatResearches))
+    unitMatcher.set(UnitMatchType(tech.whatResearches))
   }
   
   description.set("Tech " + tech)

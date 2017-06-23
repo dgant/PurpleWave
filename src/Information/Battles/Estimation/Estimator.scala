@@ -1,7 +1,6 @@
 package Information.Battles.Estimation
 
 import Information.Battles.Types.{Battle, Team}
-import Lifecycle.With
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.UnitInfo
 
@@ -21,10 +20,10 @@ class Estimator(val considerGeometry: Boolean) {
   // Setup //
   ///////////
   
-  private val unitsOurs   = new mutable.HashMap[UnitInfo, Avatar]
-  private val unitsEnemy  = new mutable.HashMap[UnitInfo, Avatar]
-  private val avatarUs    = new Avatar
-  private val avatarEnemy = new Avatar
+  val unitsOurs   = new mutable.HashMap[UnitInfo, Avatar]
+  val unitsEnemy  = new mutable.HashMap[UnitInfo, Avatar]
+  val avatarUs    = new Avatar
+  val avatarEnemy = new Avatar
   
   def addUnit(unit: UnitInfo) {
     if ( ! eligible(unit)) return
@@ -73,69 +72,22 @@ class Estimator(val considerGeometry: Boolean) {
     unit.aliveAndComplete
   }
   
-  /////////////////
-  // Calculation //
-  /////////////////
-  
+  /////////////
+  // Results //
+  /////////////
+
   def result: Estimation = {
-    validResult = validResult.orElse(Some(recalculate))
+    validResult = validResult.orElse(Some(EstimationCalculator.calculate(this)))
     validResult.get
   }
-  
-  def weGainValue : Boolean = result.costToEnemy  >   result.costToUs
-  def weLoseValue : Boolean = result.costToEnemy  <   result.costToUs
-  def weSurvive   : Boolean = result.deathsUs     <   unitsOurs.size
-  def weDie       : Boolean = result.deathsUs     >=  unitsOurs.size
   
   private var validResult: Option[Estimation] = None
   private def invalidateResult() {
     validResult = None
   }
   
-  private def recalculate: Estimation = {
-    
-    val output = new Estimation
-    
-    if (avatarUs.totalUnits <= 0 || avatarEnemy.totalUnits <= 0) return output
-    
-    output.damageToUs     = dealDamage  (avatarEnemy, avatarUs)
-    output.damageToEnemy  = dealDamage  (avatarUs,    avatarEnemy)
-    output.deathsUs       = deaths      (avatarUs,    output.damageToUs)
-    output.deathsEnemy    = deaths      (avatarEnemy, output.damageToEnemy)
-    output.costToUs       = totalCost   (avatarUs,    output.damageToUs)
-    output.costToEnemy    = totalCost   (avatarEnemy, output.damageToEnemy)
-  
-    output
-  }
-  
-  private def dealDamage(from: Avatar, to: Avatar): Double = {
-    
-    val airFocus        = to.totalFlyers / to.totalUnits
-    val groundFocus     = 1.0 - airFocus
-    val fromDenominator = from.totalUnits
-    val toDenominator   = to.totalUnits
-    
-    val damagePerFramePerUnit =
-      to.vulnerabilityGroundConcussive  / toDenominator * (from.dpfGroundConcussiveFocused + from.dpfGroundConcussiveUnfocused * groundFocus) +
-      to.vulnerabilityGroundExplosive   / toDenominator * (from.dpfGroundExplosiveFocused  + from.dpfGroundExplosiveUnfocused  * groundFocus) +
-      to.vulnerabilityGroundNormal      / toDenominator * (from.dpfGroundNormalFocused     + from.dpfGroundNormalUnfocused     * groundFocus) +
-      to.vulnerabilityAirConcussive     / toDenominator * (from.dpfAirConcussiveFocused    + from.dpfAirConcussiveUnfocused    * airFocus) +
-      to.vulnerabilityAirExplosive      / toDenominator * (from.dpfAirExplosiveFocused     + from.dpfAirExplosiveUnfocused     * airFocus) +
-      to.vulnerabilityAirNormal         / toDenominator * (from.dpfAirNormalFocused        + from.dpfAirNormalUnfocused        * airFocus)
-    
-    Math.min(to.totalHealth, damagePerFramePerUnit * With.configuration.battleEstimationFrames / to.totalUnits)
-  }
-  
-  // Examples:
-  // 1 unit,   99 damage,  100 hp = 0 deaths
-  // 2 units,  199 damage, 200 hp = 1 death
-  // 2 units,  99 damage,  200 hp = 0 deaths
-  //
-  private def deaths(avatar: Avatar, damage: Double): Double = {
-    Math.min(avatar.totalUnits, Math.floor(avatar.totalUnits * damage / avatar.totalHealth))
-  }
-  
-  private def totalCost(avatar: Avatar, damage: Double) = {
-    avatar.subjectiveValue * damage / avatar.totalHealth
-  }
+  def weGainValue : Boolean = result.costToEnemy  >   result.costToUs
+  def weLoseValue : Boolean = result.costToEnemy  <   result.costToUs
+  def weSurvive   : Boolean = result.deathsUs     <   unitsOurs.size
+  def weDie       : Boolean = result.deathsUs     >=  unitsOurs.size
 }

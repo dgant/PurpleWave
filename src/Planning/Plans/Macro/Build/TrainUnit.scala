@@ -16,7 +16,7 @@ class TrainUnit(val traineeClass:UnitClass) extends Plan {
   
   val currencyLock = new LockCurrencyForUnit(traineeClass)
   val trainerLock = new LockUnits {
-    unitMatcher.set(new UnitMatchType(traineeClass.whatBuilds._1))
+    unitMatcher.set(UnitMatchType(traineeClass.whatBuilds._1))
     unitCounter.set(UnitCountOne)
   }
   

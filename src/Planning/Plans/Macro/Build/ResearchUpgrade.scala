@@ -13,7 +13,7 @@ class ResearchUpgrade(upgrade: Upgrade, level: Int) extends Plan {
   val currency = new LockCurrencyForUpgrade(upgrade, level)
   val upgraders = new LockUnits {
     unitCounter.set(UnitCountOne)
-    unitMatcher.set(new UnitMatchType(upgrade.whatUpgrades))
+    unitMatcher.set(UnitMatchType(upgrade.whatUpgrades))
   }
   
   description.set("Upgrade " + upgrade + " " + level)

@@ -8,9 +8,9 @@ class Plan {
   var parent: Option[Plan] = None
   val description = new Property[String]("")
   
-  def isComplete:Boolean = false
-  def getChildren:Iterable[Plan] = Vector.empty
-  def visualize():Unit = {}
+  def isComplete: Boolean = false
+  def getChildren: Iterable[Plan] = Vector.empty
+  def visualize(): Unit = {}
   
   protected def onUpdate() {}
   final def update() {
@@ -29,7 +29,7 @@ class Plan {
     else
       if (description.get == "") realName else description.get
   
-  lazy val realName:String = {
+  lazy val realName: String = {
     val name = getClass.getSimpleName
     if (name.contains("$anon$")) "" else name
   }

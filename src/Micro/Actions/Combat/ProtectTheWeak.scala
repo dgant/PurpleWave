@@ -22,6 +22,7 @@ object ProtectTheWeak extends Action {
     
     if (currentBullies.nonEmpty) {
   
+      state.canCower = false
       state.toAttack = EvaluateTargets.best(state, currentBullies)
       state.movementProfile = MovementProfiles.safelyAttackTarget
   

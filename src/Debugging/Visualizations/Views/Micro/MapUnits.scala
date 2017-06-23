@@ -4,6 +4,7 @@ import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
 import Lifecycle.With
 import Mathematics.Points.Pixel
+import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.Color
 
@@ -85,6 +86,10 @@ object MapUnits {
     
     if (unit.isBeingViolent) {
       DrawMap.box(Pixel(unit.left, unit.top), Pixel(unit.right, unit.bottom), unit.player.colorBright)
+    }
+    
+    if (unit.is(Protoss.Scarab)) {
+      unit.target.foreach(scarabTarget => Range(1, 6).foreach(r => DrawMap.circle(scarabTarget.pixelCenter, 4 * r)))
     }
   }
 }

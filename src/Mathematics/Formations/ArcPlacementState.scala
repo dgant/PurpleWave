@@ -1,43 +1,66 @@
 package Mathematics.Formations
 
+import Lifecycle.With
 import Mathematics.Points.Pixel
+import Mathematics.PurpleMath
 
 class ArcPlacementState(arc: Arc, minimumRadius: Double) {
-  var radiusPixels    = arc.minRadiusPixels
-  var angleRadians    = 0.0
-  var lastUnitRadians = 0.0
-  var spanPixels      = 0.0
-  var spanPixelsLeft  = 0.0
-  var nextClockwise   = true
+  
+  // All measurements in pixels/radius
+  
+  var currentRadius = arc.minRadiusPixels
+  var angleDelta    = 0.0
+  var nextClockwise = false
+  var lastPlacement = arc.centerPixel
   
   def startRank(radiusDesired: Double) {
-    if (radiusDesired > radiusPixels) {
-      radiusPixels    = radiusDesired
-      spanPixels      = arc.spanRadians * radiusPixels
-      spanPixelsLeft  = spanPixels
-      angleRadians    = 0.0
-      nextClockwise   = true
+    if (radiusDesired > currentRadius) {
+      currentRadius   = radiusDesired
+      angleDelta      = 0.0
+      nextClockwise   = false
     }
   }
   
   private def advanceToNextRank() {
-    startRank(radiusPixels + 32.0)
+    startRank(currentRadius + 32.0)
   }
   
   def reserveSpace(widthPixels: Double): Pixel = {
-    if (spanPixelsLeft < widthPixels) {
+    var output: Option[Pixel] = None
+    var attempts = 0
+    while (attempts < 10 && output.isEmpty) {
+      attempts += 1
+      output = tryReserveSpace(widthPixels)
+    }
+    lastPlacement = output.getOrElse(lastPlacement)
+    lastPlacement
+  }
+  
+  private def tryReserveSpace(widthPixels: Double): Option[Pixel] = {
+    if (arcPixelsLeft < widthPixels) {
       advanceToNextRank()
     }
-    val unitRadians = widthPixels / radiusPixels
+    
     val output = arc.centerPixel.radiateRadians(
-      arc.centerAngleRadians + (angleRadians + unitRadians) * (if (nextClockwise) 1 else -1),
-      widthPixels)
+      arc.centerAngleRadians + angleDelta * (if (nextClockwise) 1 else -1),
+      currentRadius)
     
     nextClockwise = ! nextClockwise
     if (nextClockwise) {
-      angleRadians += Math.max(unitRadians, lastUnitRadians)
+      angleDelta += widthPixels / currentRadius
     }
-    lastUnitRadians = unitRadians
-    output
+    
+    if (With.grids.walkable.get(output.tileIncluding))
+      Some(output)
+    else
+      None
+  }
+  
+  def arcPixelsTotal: Double = {
+    currentRadius * arc.spanRadians / PurpleMath.twoPI
+  }
+  
+  def arcPixelsLeft: Double = {
+    arcPixelsTotal * (arc.spanRadians - 2.0 * angleDelta)
   }
 }

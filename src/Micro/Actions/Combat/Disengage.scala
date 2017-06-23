@@ -64,6 +64,6 @@ object Disengage extends Action {
     }
   
     // There's nothing clever to do. Just get out.
-    Rout.consider(state)
+    Retreat.consider(state)
   }
 }

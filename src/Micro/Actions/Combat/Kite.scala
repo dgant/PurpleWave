@@ -39,7 +39,7 @@ object Kite extends Action {
         HoverOutsideRange.delegate(state)
       }
       else {
-        Rout.delegate(state)
+        Retreat.delegate(state)
       }
     }
   }

@@ -2,6 +2,8 @@ package Mathematics
 
 object PurpleMath {
   
+  val twoPI: Double = 2 * Math.PI
+  
   def mean(values: Traversable[Double]): Double = {
     if (values.isEmpty)
       0.0

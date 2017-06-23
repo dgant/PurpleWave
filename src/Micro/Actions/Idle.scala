@@ -7,11 +7,11 @@ import Micro.Execution.ActionState
 
 object Idle extends Action {
   
-  override def allowed(state:ActionState):Boolean = {
+  override def allowed(state: ActionState): Boolean = {
     ! state.unit.attackStarting
   }
   
-  def perform(state:ActionState) {
+  override def perform(state: ActionState) {
     
     state.toReturn        = state.intent.toReturn
     state.toTravel        = state.intent.toTravel
@@ -24,8 +24,11 @@ object Idle extends Action {
     state.toUpgrade       = state.intent.toUpgrade
     state.toForm          = state.intent.toForm
     state.canFight        = state.intent.canAttack
+    state.canCower        = state.intent.canCower
     
     actions.foreach(_.consider(state))
+    
+    state.shovers.clear()
   }
   
   private val actions = Vector(

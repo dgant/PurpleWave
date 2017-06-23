@@ -13,11 +13,16 @@ object Concave {
     : Seq[FormationSlot] = {
   
     val targetCenter = targetStart.midpoint(targetEnd)
+    val targetRadians = targetStart.radiansTo(targetEnd)
+    val arcCenterRadians = List(
+      targetRadians + Math.PI / 2,
+      targetRadians - Math.PI / 2)
+        .maxBy(radians => targetCenter.radiateRadians(radians, 1.0).pixelDistanceFast(origin))
     
     val arc = Arc(
-      Math.PI, // Configurable
+      Math.PI, // Configurable.
       targetCenter,
-      targetCenter.radiansTo(origin),
+      arcCenterRadians,
       targetStart.pixelDistanceFast(targetEnd) / 2.0
     )
     
@@ -33,7 +38,7 @@ object Concave {
     ranks.foreach(rank => {
       arcPlacement.startRank(rank.head.idealDistance)
       rank.foreach(participant => {
-        participant.pixelAfter = arcPlacement.reserveSpace(2 * participant.unitClass.radialHypotenuse)
+        participant.pixelAfter = arcPlacement.reserveSpace(2.0 + 2.0 * participant.unitClass.radialHypotenuse)
       })
     })
   

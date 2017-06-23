@@ -5,7 +5,7 @@ import Micro.Actions.Commands.{Reposition, Travel}
 import Micro.Behaviors.MovementProfiles
 import Micro.Execution.ActionState
 
-object Rout extends Action {
+object Retreat extends Action {
   
   override protected def allowed(state: ActionState): Boolean = {
     state.unit.canMoveThisFrame &&
@@ -25,13 +25,24 @@ object Rout extends Action {
       state.origin.pixelDistanceFast(threat.pixelCenter) <
       state.origin.pixelDistanceFast(state.unit.pixelCenter))) {
       
-      state.movementProfile = MovementProfiles.rout
+      state.movementProfile = MovementProfiles.retreat
       Reposition.delegate(state)
+    }
+    // If we have nowhere to retreat to, just fight the best we can.
+    else if (
+      state.threats.nonEmpty &&
+        state.unit.pixelDistanceFast(state.origin) <
+        state.unit.unitClass.radialHypotenuse +
+        state.threats.map(_.pixelRangeAgainstFromCenter(state.unit)).max +
+        16.0) {
+  
+      state.toTravel = Some(state.origin)
+      Engage.delegate(state)
+      
     }
     else {
       state.toTravel = Some(state.origin)
       Travel.delegate(state)
     }
   }
-  
 }

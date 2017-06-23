@@ -17,6 +17,14 @@ import scala.collection.mutable.ListBuffer
 
 class ActionState(val unit: FriendlyUnitInfo) {
   
+  ///////////////
+  // Messaging //
+  ///////////////
+  
+  def shove(shover: FriendlyUnitInfo) {
+    shovers.append(shover)
+  }
+  
   /////////////
   // History //
   /////////////
@@ -30,17 +38,19 @@ class ActionState(val unit: FriendlyUnitInfo) {
   // Decisions //
   ///////////////
   
-  var toReturn      : Option[Pixel]     = None
-  var toTravel      : Option[Pixel]     = None
-  var toAttack      : Option[UnitInfo]  = None
-  var toGather      : Option[UnitInfo]  = None
-  var toBuild       : Option[UnitClass] = None
-  var toBuildTile   : Option[Tile]      = None
-  var toTrain       : Option[UnitClass] = None
-  var toTech        : Option[Tech]      = None
-  var toForm        : Option[Pixel]     = None
-  var toUpgrade     : Option[Upgrade]   = None
-  var canFight      : Boolean           = true
+  var toReturn      : Option[Pixel]                 = None
+  var toTravel      : Option[Pixel]                 = None
+  var toAttack      : Option[UnitInfo]              = None
+  var toGather      : Option[UnitInfo]              = None
+  var toBuild       : Option[UnitClass]             = None
+  var toBuildTile   : Option[Tile]                  = None
+  var toTrain       : Option[UnitClass]             = None
+  var toTech        : Option[Tech]                  = None
+  var toForm        : Option[Pixel]                 = None
+  var toUpgrade     : Option[Upgrade]               = None
+  var canFight      : Boolean                       = true
+  var canCower      : Boolean                       = false
+  var shovers       : ListBuffer[FriendlyUnitInfo]  = new ListBuffer[FriendlyUnitInfo]
   
   var movementProfile : MovementProfile   = MovementProfiles.default
   var targetProfile   : TargetingProfile  = TargetingProfiles.default

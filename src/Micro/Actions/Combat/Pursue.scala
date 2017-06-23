@@ -15,7 +15,15 @@ object Pursue extends Action {
   }
   
   override def perform(state: ActionState) {
-    val pursuableTargets = state.targets.filter(_.topSpeed < state.unit.topSpeed * 0.9)
+    val pursuableTargets = state.targets.filter(target =>
+      target.topSpeed < state.unit.topSpeed ||
+      (
+        ! target.flying &&
+        state.unit.pixelRangeAgainstFromCenter(target) > 32 * 3.0 &&
+        target.pixelCenter.zone.edges.forall(edge =>
+          edge.centerPixel.pixelDistanceFast(state.unit.pixelCenter) <
+          edge.centerPixel.pixelDistanceFast(target.pixelCenter))
+      ))
     
     state.toAttack = EvaluateTargets.best(state, pursuableTargets)
     if (state.unit.canAttackThisFrame) {

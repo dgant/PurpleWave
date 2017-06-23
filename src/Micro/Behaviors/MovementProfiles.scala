@@ -16,18 +16,18 @@ object MovementProfiles {
     avoidShovers          = 3.0)
   
   def safelyAttackTarget = new MovementProfile(default) {
-    preferTarget      += 2.0
-    avoidExplosions   += 1.0
-    avoidDamage       += 1.0
+    preferTarget          += 2.0
+    avoidExplosions       += 1.0
+    avoidDamage           += 1.0
   }
   
   def avoid = new MovementProfile(default) {
-    avoidExplosions += 2.0
-    avoidDamage     += 2.0
+    avoidExplosions       += 2.0
+    avoidDamage           += 2.0
   }
   
   def retreat = new MovementProfile(avoid) {
-    preferDestination = 0.00
-    preferOrigin      = 1.00
+    preferDestination     = 0.00
+    preferOrigin          = 1.00
   }
 }

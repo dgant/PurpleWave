@@ -24,8 +24,8 @@ class ResearchUpgrade(upgrade: Upgrade, level: Int) extends Plan {
     if (isComplete) return
     
     currency.acquire(this)
-    currency.isSpent = upgraders.units.exists(upgrader => upgrader.upgrading && upgrader.upgradingType == upgrade)
-    if (! currency.satisfied) return
+    currency.isSpent = With.units.ours.exists(upgrader => upgrader.upgrading && upgrader.upgradingType == upgrade)
+    if ( ! currency.satisfied) return
     
     upgraders.acquire(this)
     upgraders.units.foreach(upgrader => {

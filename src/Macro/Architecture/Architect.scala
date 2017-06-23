@@ -84,7 +84,11 @@ class Architect {
     var totalWorkers = 0
     buildArea.tiles.foreach(tile =>
       With.grids.units.get(tile).foreach(unit =>
-        if (unit.isOurs && unit.unitClass.isWorker) {
+        if (unit.targetPixel.exists(targetPixel => ! buildArea.contains(targetPixel.tileIncluding))) {
+          //This is fine. Right?
+          //We want to be a little lenient about units being in the way because otherwise we often refuse to take our natural
+        }
+        else if (unit.isOurs && unit.unitClass.isWorker) {
           totalWorkers += 1
           if (totalWorkers > 1) {
             return true

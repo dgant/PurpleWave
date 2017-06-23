@@ -35,12 +35,11 @@ class TrainUnit(val traineeClass:UnitClass) extends Plan {
     
     if (trainer.isDefined && trainee.isEmpty) {
       trainee = With.units.ours
-        .filter(unit =>
+        .find(unit =>
           ! unit.complete
             && unit.is(traineeClass)
             && unit.x == trainer.get.x
             && unit.y == trainer.get.y)
-        .headOption
     }
   
     currencyLock.isSpent = trainee.isDefined || trainer.exists(_.trainingQueue.headOption.contains(traineeClass))

@@ -24,9 +24,9 @@ object MapBases {
             else if (base.lastScoutedFrame <= 0) "Never scouted"
             else "Last scouted " + (With.frame - base.lastScoutedFrame) + " frames ago",
             "+" +
-              estimation.result.costToEnemy.toInt
+              estimation.costToEnemy.toInt
               + " vs -"
-              + estimation.result.costToUs.toInt
+              + estimation.costToUs.toInt
           ),
           base.townHallArea.midPixel,
           drawBackground = true,

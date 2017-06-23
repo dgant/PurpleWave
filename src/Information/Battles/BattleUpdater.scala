@@ -1,6 +1,6 @@
 package Information.Battles
 
-import Information.Battles.Estimation.EstimationBuilder
+import Information.Battles.Estimation.{AvatarBuilder, Estimator}
 import Information.Battles.Types.Battle
 import Lifecycle.With
 import Mathematics.Points.SpecificPoints
@@ -25,8 +25,15 @@ object BattleUpdater {
       group.vanguard =
         if (battle.happening) group.units.minBy(_.pixelDistanceFast(group.opponent.centroid)).pixelCenter
         else                  group.units.headOption.map(_.pixelCenter).getOrElse(SpecificPoints.middle))
+  
+    val avatarBuilderAbstract   = new AvatarBuilder
+    val avatarBuilderGeometric  = new AvatarBuilder
+    avatarBuilderGeometric.vanguardUs     = Some(battle.us.vanguard)
+    avatarBuilderGeometric.vanguardEnemy  = Some(battle.enemy.vanguard)
+    battle.teams.flatMap(_.units).foreach(avatarBuilderAbstract.addUnit)
+    battle.teams.flatMap(_.units).foreach(avatarBuilderGeometric.addUnit)
+    battle.estimationAbstract   = Estimator.calculate(avatarBuilderAbstract)
+    battle.estimationGeometric  = Estimator.calculate(avatarBuilderGeometric)
     
-    battle.estimationGeometric  = new EstimationBuilder(battle, considerGeometry = true)
-    battle.estimationAbstract   = new EstimationBuilder(battle, considerGeometry = false)
   }
 }

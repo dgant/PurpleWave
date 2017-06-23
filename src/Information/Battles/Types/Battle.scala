@@ -1,6 +1,6 @@
 package Information.Battles.Types
 
-import Information.Battles.Estimation.EstimationBuilder
+import Information.Battles.Estimation.Estimation
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Utilities.EnrichPixel.EnrichedPixelCollection
@@ -12,8 +12,8 @@ class Battle(
   us.battle     = this
   enemy.battle  = this
   
-  var estimationGeometric:  EstimationBuilder = new EstimationBuilder(this, considerGeometry = true)
-  var estimationAbstract:   EstimationBuilder = new EstimationBuilder(this, considerGeometry = false)
+  var estimationGeometric = new Estimation
+  var estimationAbstract  = new Estimation
   
   //////////////
   // Features //

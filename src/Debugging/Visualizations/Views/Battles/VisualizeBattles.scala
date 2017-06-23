@@ -2,7 +2,7 @@ package Debugging.Visualizations.Views.Battles
 
 import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
-import Information.Battles.Estimation.EstimationBuilder
+import Information.Battles.Estimation.Estimation
 import Information.Battles.Types.Battle
 import Lifecycle.With
 import Mathematics.Points.Pixel
@@ -26,8 +26,8 @@ object VisualizeBattles {
   
   def render() {
     With.game.drawTextScreen(army0.bwapi, "Overall:")
-    With.game.drawTextScreen(army1.bwapi, "+" + With.battles.global.estimationGeometric.result.costToEnemy.toInt)
-    With.game.drawTextScreen(army2.bwapi, "-" + With.battles.global.estimationGeometric.result.costToUs.toInt)
+    With.game.drawTextScreen(army1.bwapi, "+" + With.battles.global.estimationGeometric.costToEnemy.toInt)
+    With.game.drawTextScreen(army2.bwapi, "-" + With.battles.global.estimationGeometric.costToUs.toInt)
     With.battles.local.foreach(drawBattle)
     val localBattles = With.battles.local
     if (localBattles.nonEmpty) {
@@ -40,13 +40,13 @@ object VisualizeBattles {
     }
   }
   
-  private def drawBattle(battle:Battle) {
+  private def drawBattle(battle: Battle) {
     val ourColor            = With.self.colorDark
     val enemyColor          = With.enemies.head.colorDark
     val neutralColor        = Colors.NeonOrange
     val topLeft             = (battle.us.units ++ battle.enemy.units).map(_.pixelCenter).minBound.subtract(16, 16)
     val bottomRight         = (battle.us.units ++ battle.enemy.units).map(_.pixelCenter).maxBound.add(16, 16)
-    val winnerStrengthColor = if (battle.estimationGeometric.result.costToEnemy >=  battle.estimationGeometric.result.costToUs) ourColor else enemyColor
+    val winnerStrengthColor = if (battle.estimationGeometric.costToEnemy >=  battle.estimationGeometric.costToUs) ourColor else enemyColor
     DrawMap.circle  (battle.focus,          8,                      neutralColor)
     DrawMap.circle  (battle.us.vanguard,    8,                      ourColor)
     DrawMap.circle  (battle.enemy.vanguard, 8,                      enemyColor)
@@ -54,18 +54,18 @@ object VisualizeBattles {
     DrawMap.line    (battle.focus,          battle.enemy.vanguard,  enemyColor)
     DrawMap.box     (topLeft,               bottomRight,            neutralColor)
     DrawMap.labelBox(
-      Vector(battle.estimationGeometric.result.netCost.toInt.toString),
+      Vector(battle.estimationGeometric.netCost.toInt.toString),
       battle.focus.add(24, 0),
       drawBackground = true,
       backgroundColor = winnerStrengthColor)
   }
   
-  private def drawEstimationReport(estimation:EstimationBuilder) {
+  private def drawEstimationReport(estimation: Estimation) {
     With.game.setTextSize(bwapi.Text.Size.Enum.Large)
     With.game.drawTextScreen(tableHeader0.bwapi, With.self.name)
     With.game.drawTextScreen(tableHeader1.bwapi, With.enemies.head.name)
-    With.game.drawTextScreen(tableStart0.bwapi, "+" + estimation.result.costToEnemy.toInt)
-    With.game.drawTextScreen(tableStart1.bwapi, "-" + estimation.result.costToUs.toInt)
+    With.game.drawTextScreen(tableStart0.bwapi, "+" + estimation.costToEnemy.toInt)
+    With.game.drawTextScreen(tableStart1.bwapi, "-" + estimation.costToUs.toInt)
     With.game.setTextSize(bwapi.Text.Size.Enum.Small)
     
     

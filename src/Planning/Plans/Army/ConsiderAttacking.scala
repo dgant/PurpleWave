@@ -12,8 +12,8 @@ class ConsiderAttacking
   extends IfThenElse(
     new If(() =>
       Yolo.active
-      || With.battles.global.estimationGeometric.result.weGainValue
-      || With.battles.global.estimationGeometric.result.weSurvive)) {
+      || With.battles.global.estimationAbstract.weGainValue
+      || With.battles.global.estimationAbstract.weSurvive)) {
   
   val attackers = new Property[LockUnits](new LockUnits {
     unitMatcher.set(UnitMatchWarriors)

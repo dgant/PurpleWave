@@ -1,29 +1,20 @@
 package Information.Battles.Estimation
 
-import Information.Battles.Types.Battle
 import Mathematics.Points.Pixel
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.UnitInfo
 
 import scala.collection.mutable
 
-class EstimationBuilder(val considerGeometry: Boolean) {
+class AvatarBuilder {
   
-  private var vanguardUs    : Option[Pixel] = None
-  private var vanguardEnemy : Option[Pixel] = None
-  
+  var vanguardUs    : Option[Pixel] = None
+  var vanguardEnemy : Option[Pixel] = None
   val unitsOurs   = new mutable.HashMap[UnitInfo, Avatar]
   val unitsEnemy  = new mutable.HashMap[UnitInfo, Avatar]
   val avatarUs    = new Avatar
   val avatarEnemy = new Avatar
-  
-  def this(argBattle: Battle, considerGeometry: Boolean) {
-    this(considerGeometry)
-    vanguardUs    = if (considerGeometry) Some(argBattle.us.vanguard)     else None
-    vanguardEnemy = if (considerGeometry) Some(argBattle.enemy.vanguard)  else None
-    argBattle.teams.flatMap(_.units).foreach(addUnit)
-  }
-  
+
   ///////////
   // Setup //
   ///////////
@@ -79,7 +70,7 @@ class EstimationBuilder(val considerGeometry: Boolean) {
   /////////////
 
   def result: Estimation = {
-    estimation = estimation.orElse(Some(EstimationCalculator.calculate(this)))
+    estimation = estimation.orElse(Some(Estimator.calculate(this)))
     estimation.get
   }
   

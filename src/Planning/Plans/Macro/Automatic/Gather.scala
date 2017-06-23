@@ -133,7 +133,7 @@ class Gather extends Plan {
     workersToAddToGas.foreach(addWorkerToGas)
   }
   
-  private def addWorkerToMinerals(worker:FriendlyUnitInfo) {
+  private def addWorkerToMinerals(worker: FriendlyUnitInfo) {
     if (safeMinerals.isEmpty) return
     val mineral = safeMinerals
       .toVector
@@ -143,7 +143,7 @@ class Gather extends Plan {
     needPerMineral(mineral) -= 1
   }
 
-  private def addWorkerToGas(worker:FriendlyUnitInfo) {
+  private def addWorkerToGas(worker: FriendlyUnitInfo) {
     if (safeGas.isEmpty) return
     val gas = safeGas
       .toVector
@@ -157,7 +157,7 @@ class Gather extends Plan {
     allWorkers.foreach(order)
   }
   
-  private def assignWorker(worker:FriendlyUnitInfo, resource:UnitInfo) {
+  private def assignWorker(worker: FriendlyUnitInfo, resource: UnitInfo) {
     unassignWorker(worker)
     if ( ! workersByResource.contains(resource)) {
       workersByResource.put(resource, new mutable.HashSet)
@@ -166,26 +166,26 @@ class Gather extends Plan {
     resourceByWorker.put(worker, resource)
   }
   
-  private def unassignWorker(worker:FriendlyUnitInfo) {
+  private def unassignWorker(worker: FriendlyUnitInfo) {
     resourceByWorker.get(worker).foreach(resource => workersByResource.get(resource).foreach(_.remove(worker)))
     resourceByWorker.remove(worker)
   }
   
-  private def unassignResource(resource:UnitInfo) {
+  private def unassignResource(resource: UnitInfo) {
     if (workersByResource.contains(resource)) {
       workersByResource(resource).foreach(unassignWorker)
       workersByResource.remove(resource)
     }
   }
   
-  private def safe(resource:UnitInfo):Boolean = {
+  private def safe(resource: UnitInfo): Boolean = {
     ! With.configuration.evaluateDangerousBases ||
     With.battles.byZone
       .get(With.geography.zoneByTile(resource.tileIncludingCenter))
-      .forall(zoneBattle => zoneBattle.estimationGeometric.result.netCost >= 0)
+      .forall(zoneBattle => zoneBattle.estimationAbstract.netCost >= 0)
   }
   
-  private def order(worker:FriendlyUnitInfo) {
+  private def order(worker: FriendlyUnitInfo) {
     With.executor.intend(new Intention(this, worker) { toGather = resourceByWorker.get(worker) })
   }
 }

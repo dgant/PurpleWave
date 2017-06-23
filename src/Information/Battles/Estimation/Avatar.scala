@@ -35,13 +35,12 @@ class Avatar {
   var totalUnits                      = 0.0
   
   def this(
-    unit              : UnitInfo,
-    nearestEnemy      : Option[Pixel] = None,
-    considerGeometry  : Boolean) {
+    unit         : UnitInfo,
+    nearestEnemy : Option[Pixel] = None) {
     
     this()
     
-    val pixelsAway    = if (considerGeometry && nearestEnemy.isDefined) unit.pixelDistanceFast(nearestEnemy.get) else With.configuration.battleMarginPixels
+    val pixelsAway    = if (nearestEnemy.isDefined) unit.pixelDistanceFast(nearestEnemy.get) else With.configuration.battleMarginPixels
     val framesAway    = PurpleMath.nanToInfinity(Math.max(0.0, pixelsAway - unit.pixelRangeMax) / unit.topSpeed)
     val framesTotal   = With.configuration.battleEstimationFrames
     val effectiveness = Math.max(0.0, (framesTotal - framesAway) / framesTotal)

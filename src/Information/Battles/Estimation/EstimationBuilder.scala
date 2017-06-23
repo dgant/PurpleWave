@@ -1,6 +1,7 @@
 package Information.Battles.Estimation
 
-import Information.Battles.Types.{Battle, Team}
+import Information.Battles.Types.Battle
+import Mathematics.Points.Pixel
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.UnitInfo
 
@@ -8,11 +9,18 @@ import scala.collection.mutable
 
 class EstimationBuilder(val considerGeometry: Boolean) {
   
-  private var battle: Option[Battle] = None
+  private var vanguardUs    : Option[Pixel] = None
+  private var vanguardEnemy : Option[Pixel] = None
+  
+  val unitsOurs   = new mutable.HashMap[UnitInfo, Avatar]
+  val unitsEnemy  = new mutable.HashMap[UnitInfo, Avatar]
+  val avatarUs    = new Avatar
+  val avatarEnemy = new Avatar
   
   def this(argBattle: Battle, considerGeometry: Boolean) {
     this(considerGeometry)
-    battle = Some(argBattle)
+    vanguardUs    = if (considerGeometry) Some(argBattle.us.vanguard)     else None
+    vanguardEnemy = if (considerGeometry) Some(argBattle.enemy.vanguard)  else None
     argBattle.teams.flatMap(_.units).foreach(addUnit)
   }
   
@@ -20,15 +28,10 @@ class EstimationBuilder(val considerGeometry: Boolean) {
   // Setup //
   ///////////
   
-  val unitsOurs   = new mutable.HashMap[UnitInfo, Avatar]
-  val unitsEnemy  = new mutable.HashMap[UnitInfo, Avatar]
-  val avatarUs    = new Avatar
-  val avatarEnemy = new Avatar
-  
   def addUnit(unit: UnitInfo) {
     if ( ! eligible(unit)) return
-    if (unit.isFriendly)  addUnit(unit, avatarUs,     unitsOurs,  battle.map(_.us))
-    else                  addUnit(unit, avatarEnemy,  unitsEnemy, battle.map(_.enemy))
+    if (unit.isFriendly)  addUnit(unit, avatarUs,     unitsOurs,  vanguardEnemy)
+    else                  addUnit(unit, avatarEnemy,  unitsEnemy, vanguardUs)
   }
   
   def removeUnit(unit: UnitInfo) {
@@ -37,13 +40,13 @@ class EstimationBuilder(val considerGeometry: Boolean) {
   }
   
   private def addUnit(
-    unit      : UnitInfo,
-    bigAvatar : Avatar,
-    avatars   : mutable.HashMap[UnitInfo, Avatar],
-    group     : Option[Team]) {
+    unit          : UnitInfo,
+    bigAvatar     : Avatar,
+    avatars       : mutable.HashMap[UnitInfo, Avatar],
+    enemyVanguard : Option[Pixel]) {
     
     invalidateResult()
-    val newAvatar = new Avatar(unit, group.map(_.vanguard), considerGeometry)
+    val newAvatar = new Avatar(unit, enemyVanguard)
     avatars.put(unit, newAvatar)
     bigAvatar.add(newAvatar)
   }
@@ -63,7 +66,7 @@ class EstimationBuilder(val considerGeometry: Boolean) {
   }
   
   private def eligible(unit: UnitInfo): Boolean = {
-    if (unit.unitClass.isWorker && ! unit.isBeingViolent)             return false
+    if (unit.unitClass.isWorker   && ! unit.isBeingViolent)           return false
     if (unit.unitClass.isBuilding && ! unit.unitClass.helpsInCombat)  return false
     if (unit.is(Terran.SpiderMine))                                   return false
     if (unit.is(Protoss.Scarab))                                      return false

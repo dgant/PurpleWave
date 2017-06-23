@@ -2,7 +2,7 @@ package Planning.Composition.UnitCounters
 import Information.Battles.Estimation.Avatar
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-class UnitCountBattle(enemy: Avatar) extends UnitCounter {
+class UnitCountThreat(enemy: Avatar) extends UnitCounter {
   
   var overkill = 1.5
   var acceptWhenLosing = true

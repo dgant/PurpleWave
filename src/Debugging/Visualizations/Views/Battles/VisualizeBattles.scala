@@ -2,7 +2,7 @@ package Debugging.Visualizations.Views.Battles
 
 import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
-import Information.Battles.Estimation.Estimator
+import Information.Battles.Estimation.EstimationBuilder
 import Information.Battles.Types.Battle
 import Lifecycle.With
 import Mathematics.Points.Pixel
@@ -60,7 +60,7 @@ object VisualizeBattles {
       backgroundColor = winnerStrengthColor)
   }
   
-  private def drawEstimationReport(estimation:Estimator) {
+  private def drawEstimationReport(estimation:EstimationBuilder) {
     With.game.setTextSize(bwapi.Text.Size.Enum.Large)
     With.game.drawTextScreen(tableHeader0.bwapi, With.self.name)
     With.game.drawTextScreen(tableHeader1.bwapi, With.enemies.head.name)

@@ -6,7 +6,7 @@ import ProxyBwapi.UnitInfo.UnitInfo
 
 import scala.collection.mutable
 
-class Estimator(val considerGeometry: Boolean) {
+class EstimationBuilder(val considerGeometry: Boolean) {
   
   private var battle: Option[Battle] = None
   
@@ -43,7 +43,7 @@ class Estimator(val considerGeometry: Boolean) {
     group     : Option[Team]) {
     
     invalidateResult()
-    val newAvatar = new Avatar(unit, group, considerGeometry)
+    val newAvatar = new Avatar(unit, group.map(_.vanguard), considerGeometry)
     avatars.put(unit, newAvatar)
     bigAvatar.add(newAvatar)
   }

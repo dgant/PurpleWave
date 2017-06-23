@@ -4,7 +4,8 @@ import Information.Geography.Types.Zone
 import Lifecycle.With
 import Planning.Composition.Property
 import Planning.Composition.ResourceLocks.LockUnits
-import Planning.Composition.UnitCounters.UnitCountBattle
+import Planning.Composition.UnitCounters.UnitCountThreat
+import Planning.Composition.UnitMatchers.UnitMatchThreat
 import Planning.Composition.UnitPreferences.UnitPreferClose
 import Planning.Plan
 
@@ -20,7 +21,8 @@ class ControlZone(zone: Zone) extends Plan {
       
       val threat = battle.estimationAbstract.avatarEnemy
       
-      army.get.unitCounter.set(new UnitCountBattle(threat))
+      army.get.unitMatcher.set(new UnitMatchThreat(threat))
+      army.get.unitCounter.set(new UnitCountThreat(threat))
       army.get.unitPreference.set(new UnitPreferClose(zone.centroid.pixelCenter))
     }
     

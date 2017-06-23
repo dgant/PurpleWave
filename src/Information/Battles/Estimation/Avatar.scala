@@ -1,7 +1,7 @@
 package Information.Battles.Estimation
 
-import Information.Battles.Types.{Battle, Team}
 import Lifecycle.With
+import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
 import ProxyBwapi.Engine.Damage
 import ProxyBwapi.UnitInfo.UnitInfo
@@ -35,16 +35,16 @@ class Avatar {
   var totalUnits                      = 0.0
   
   def this(
-            unit              : UnitInfo,
-            battleGroup       : Option[Team] = None,
-            considerGeometry  : Boolean) {
+    unit              : UnitInfo,
+    nearestEnemy      : Option[Pixel] = None,
+    considerGeometry  : Boolean) {
     
     this()
-  
-    val frames        = With.configuration.battleEstimationFrames
-    val pixelsAway    = if (considerGeometry && battleGroup.isDefined) unit.pixelDistanceFast(battleGroup.get.opponent.vanguard)        else With.configuration.battleMarginPixels
-    val framesAway    = if (considerGeometry) PurpleMath.nanToInfinity(Math.max(0.0, pixelsAway - unit.pixelRangeMax) / unit.topSpeed)  else 0
-    val effectiveness = if (considerGeometry) Math.max(0.0, (frames - framesAway) / frames) else 1.0
+    
+    val pixelsAway    = if (considerGeometry && nearestEnemy.isDefined) unit.pixelDistanceFast(nearestEnemy.get) else With.configuration.battleMarginPixels
+    val framesAway    = PurpleMath.nanToInfinity(Math.max(0.0, pixelsAway - unit.pixelRangeMax) / unit.topSpeed)
+    val framesTotal   = With.configuration.battleEstimationFrames
+    val effectiveness = Math.max(0.0, (framesTotal - framesAway) / framesTotal)
     
     vulnerabilityGroundConcussive   = if (   unit.flying) 0.0 else Damage.scaleBySize(DamageType.Concussive, unit.unitClass.size)
     vulnerabilityGroundExplosive    = if (   unit.flying) 0.0 else Damage.scaleBySize(DamageType.Explosive,  unit.unitClass.size)
@@ -58,12 +58,12 @@ class Avatar {
     dpfAirConcussiveFocused         = effectiveness * (if (unit.unitClass.airDamageType    == DamageType.Concussive) unit.damageOnHitBeforeArmorAir    else 0.0) / unit.cooldownMaxAir.toDouble
     dpfAirExplosiveFocused          = effectiveness * (if (unit.unitClass.airDamageType    == DamageType.Explosive)  unit.damageOnHitBeforeArmorAir    else 0.0) / unit.cooldownMaxAir.toDouble
     dpfAirNormalFocused             = effectiveness * (if (unit.unitClass.airDamageType    == DamageType.Normal)     unit.damageOnHitBeforeArmorAir    else 0.0) / unit.cooldownMaxAir.toDouble
-    dpfGroundConcussiveUnfocused    = dpfGroundConcussiveFocused  * unfocusedPenalty(unit:UnitInfo)
-    dpfGroundExplosiveUnfocused     = dpfGroundExplosiveFocused   * unfocusedPenalty(unit:UnitInfo)
-    dpfGroundNormalUnfocused        = dpfGroundNormalFocused      * unfocusedPenalty(unit:UnitInfo)
-    dpfAirConcussiveUnfocused       = dpfAirConcussiveFocused     * unfocusedPenalty(unit:UnitInfo)
-    dpfAirExplosiveUnfocused        = dpfAirExplosiveFocused      * unfocusedPenalty(unit:UnitInfo)
-    dpfAirNormalUnfocused           = dpfAirNormalFocused         * unfocusedPenalty(unit:UnitInfo)
+    dpfGroundConcussiveUnfocused    = dpfGroundConcussiveFocused  * unfocusedPenalty(unit)
+    dpfGroundExplosiveUnfocused     = dpfGroundExplosiveFocused   * unfocusedPenalty(unit)
+    dpfGroundNormalUnfocused        = dpfGroundNormalFocused      * unfocusedPenalty(unit)
+    dpfAirConcussiveUnfocused       = dpfAirConcussiveFocused     * unfocusedPenalty(unit)
+    dpfAirExplosiveUnfocused        = dpfAirExplosiveFocused      * unfocusedPenalty(unit)
+    dpfAirNormalUnfocused           = dpfAirNormalFocused         * unfocusedPenalty(unit)
     attacksGround                   = if (unit.attacksGround) 1.0 else 0.0
     attacksAir                      = if (unit.attacksAir)    1.0 else 0.0
     subjectiveValue                 = unit.unitClass.subjectiveValue
@@ -72,7 +72,7 @@ class Avatar {
     totalUnits                      = 1.0
   }
   
-  def add(that:Avatar) {
+  def add(that: Avatar) {
     vulnerabilityGroundConcussive   += that.vulnerabilityGroundConcussive
     vulnerabilityGroundExplosive    += that.vulnerabilityGroundExplosive
     vulnerabilityGroundNormal       += that.vulnerabilityGroundNormal
@@ -99,7 +99,7 @@ class Avatar {
     totalUnits                      += that.totalUnits
   }
   
-  def remove(that:Avatar) {
+  def remove(that: Avatar) {
     vulnerabilityGroundConcussive   -= that.vulnerabilityGroundConcussive
     vulnerabilityGroundExplosive    -= that.vulnerabilityGroundExplosive
     vulnerabilityGroundNormal       -= that.vulnerabilityGroundNormal
@@ -126,5 +126,7 @@ class Avatar {
     totalUnits                      -= that.totalUnits
   }
   
-  private def unfocusedPenalty(unit:UnitInfo):Double = if (unit.attacksAir && unit.attacksGround) 0.0 else 1.0
+  private def unfocusedPenalty(unit: UnitInfo): Double = {
+    if (unit.attacksAir && unit.attacksGround) 0.0 else 1.0
+  }
 }

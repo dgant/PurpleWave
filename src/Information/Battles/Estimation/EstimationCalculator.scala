@@ -4,7 +4,7 @@ import Lifecycle.With
 
 object EstimationCalculator {
   
-  def calculate(e: Estimator): Estimation = {
+  def calculate(e: EstimationBuilder): Estimation = {
     
     val output = new Estimation
     

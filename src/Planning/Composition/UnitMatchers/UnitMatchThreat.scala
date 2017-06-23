@@ -2,7 +2,7 @@ package Planning.Composition.UnitMatchers
 import Information.Battles.Estimation.Avatar
 import ProxyBwapi.UnitInfo.UnitInfo
 
-class UnitMatchBattle(enemy: Avatar) extends UnitMatcher {
+class UnitMatchThreat(enemy: Avatar) extends UnitMatcher {
   
   override def accept(unit: UnitInfo): Boolean = {
     

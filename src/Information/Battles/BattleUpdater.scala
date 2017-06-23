@@ -1,6 +1,6 @@
 package Information.Battles
 
-import Information.Battles.Estimation.Estimator
+import Information.Battles.Estimation.EstimationBuilder
 import Information.Battles.Types.Battle
 import Lifecycle.With
 import Mathematics.Points.SpecificPoints
@@ -26,7 +26,7 @@ object BattleUpdater {
         if (battle.happening) group.units.minBy(_.pixelDistanceFast(group.opponent.centroid)).pixelCenter
         else                  group.units.headOption.map(_.pixelCenter).getOrElse(SpecificPoints.middle))
     
-    battle.estimationGeometric  = new Estimator(battle, considerGeometry = true)
-    battle.estimationAbstract   = new Estimator(battle, considerGeometry = false)
+    battle.estimationGeometric  = new EstimationBuilder(battle, considerGeometry = true)
+    battle.estimationAbstract   = new EstimationBuilder(battle, considerGeometry = false)
   }
 }

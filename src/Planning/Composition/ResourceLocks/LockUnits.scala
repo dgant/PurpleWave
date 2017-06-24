@@ -40,7 +40,8 @@ class LockUnits extends ResourceLock {
   def units: Set[FriendlyUnitInfo] = With.recruiter.getUnits(this)
   
   def offerUnits(candidates: Iterable[FriendlyUnitInfo]): Option[Iterable[FriendlyUnitInfo]] = {
-    
+  
+    unitMatcher.get.reset()
     val desiredUnits = With.recruiter.getUnits(this).to[mutable.Set]
     
     candidates

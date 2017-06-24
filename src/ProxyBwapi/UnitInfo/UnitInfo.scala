@@ -20,7 +20,7 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   def friendly  : Option[FriendlyUnitInfo]  = None
   def foreign   : Option[ForeignUnitInfo]   = None
   
-  override def toString:String = {
+  override def toString: String = {
     unitClass.toString + " " +
     hitPoints + "/" + unitClass.maxHitPoints + " " +
     (if (shieldPoints > 0) "(" + shieldPoints + "/" + unitClass.maxShields + ")" else "") +

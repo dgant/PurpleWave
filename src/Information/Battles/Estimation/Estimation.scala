@@ -13,8 +13,12 @@ class Estimation {
   
   def netCost: Double = costToEnemy - costToUs
   
-  def weGainValue : Boolean = costToEnemy  >   costToUs
-  def weLoseValue : Boolean = costToEnemy  <   costToUs
-  def weSurvive   : Boolean = deathsUs     <   avatarUs.totalUnits
-  def weDie       : Boolean = deathsUs     >=  avatarEnemy.totalUnits
+  def weGainValue     : Boolean = costToEnemy  >   costToUs
+  def weLoseValue     : Boolean = costToEnemy  <   costToUs
+  def weSurvive       : Boolean = deathsUs     <   avatarUs.totalUnits
+  def weDie           : Boolean = deathsUs     >=  avatarEnemy.totalUnits
+  def enemyGainValue  : Boolean = costToUs     >   costToEnemy
+  def enemyLoseValue  : Boolean = costToUs     <   costToEnemy
+  def enemySurvives   : Boolean = deathsEnemy  <   avatarEnemy.totalUnits
+  def enemyDies       : Boolean = deathsEnemy  >=  avatarUs.totalUnits
 }

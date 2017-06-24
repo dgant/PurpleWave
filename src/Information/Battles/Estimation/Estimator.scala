@@ -4,21 +4,21 @@ import Lifecycle.With
 
 object Estimator {
   
-  def calculate(avatars: AvatarBuilder): Estimation = {
+  def calculate(avatarBuilder: AvatarBuilder): Estimation = {
     
     val output = new Estimation
     
-    output.avatarUs       = avatars.avatarUs
-    output.avatarEnemy    = avatars.avatarEnemy
+    output.avatarUs       = avatarBuilder.avatarUs
+    output.avatarEnemy    = avatarBuilder.avatarEnemy
     
-    if (avatars.avatarUs.totalUnits <= 0 || avatars.avatarEnemy.totalUnits <= 0) return output
+    if (avatarBuilder.avatarUs.totalUnits <= 0 || avatarBuilder.avatarEnemy.totalUnits <= 0) return output
     
-    output.damageToUs     = dealDamage  (avatars.avatarEnemy, avatars.avatarUs)
-    output.damageToEnemy  = dealDamage  (avatars.avatarUs,    avatars.avatarEnemy)
-    output.deathsUs       = deaths      (avatars.avatarUs,    output.damageToUs)
-    output.deathsEnemy    = deaths      (avatars.avatarEnemy, output.damageToEnemy)
-    output.costToUs       = totalCost   (avatars.avatarUs,    output.damageToUs)
-    output.costToEnemy    = totalCost   (avatars.avatarEnemy, output.damageToEnemy)
+    output.damageToUs     = dealDamage  (avatarBuilder.avatarEnemy, avatarBuilder.avatarUs)
+    output.damageToEnemy  = dealDamage  (avatarBuilder.avatarUs,    avatarBuilder.avatarEnemy)
+    output.deathsUs       = deaths      (avatarBuilder.avatarUs,    output.damageToUs)
+    output.deathsEnemy    = deaths      (avatarBuilder.avatarEnemy, output.damageToEnemy)
+    output.costToUs       = totalCost   (avatarBuilder.avatarUs,    output.damageToUs)
+    output.costToEnemy    = totalCost   (avatarBuilder.avatarEnemy, output.damageToEnemy)
     
     output
   }

@@ -12,12 +12,8 @@ class AvatarBuilder {
   var vanguardEnemy : Option[Pixel] = None
   val unitsOurs   = new mutable.HashMap[UnitInfo, Avatar]
   val unitsEnemy  = new mutable.HashMap[UnitInfo, Avatar]
-  val avatarUs    = new Avatar
-  val avatarEnemy = new Avatar
-
-  ///////////
-  // Setup //
-  ///////////
+  var avatarUs    = new Avatar
+  var avatarEnemy = new Avatar
   
   def addUnit(unit: UnitInfo) {
     if ( ! eligible(unit)) return
@@ -36,7 +32,8 @@ class AvatarBuilder {
     avatars       : mutable.HashMap[UnitInfo, Avatar],
     enemyVanguard : Option[Pixel]) {
     
-    invalidateResult()
+    if (avatars.contains(unit)) return
+    
     val newAvatar = new Avatar(unit, enemyVanguard)
     avatars.put(unit, newAvatar)
     bigAvatar.add(newAvatar)
@@ -47,7 +44,6 @@ class AvatarBuilder {
     bigAvatar : Avatar,
     avatars   : mutable.HashMap[UnitInfo, Avatar]) {
   
-    invalidateResult()
     avatars
       .get(unit)
       .foreach(avatar => {
@@ -63,19 +59,5 @@ class AvatarBuilder {
     if (unit.is(Protoss.Scarab))                                      return false
     if (unit.is(Protoss.Interceptor))                                 return false
     unit.aliveAndComplete
-  }
-  
-  /////////////
-  // Results //
-  /////////////
-
-  def result: Estimation = {
-    estimation = estimation.orElse(Some(Estimator.calculate(this)))
-    estimation.get
-  }
-  
-  private var estimation: Option[Estimation] = None
-  private def invalidateResult() {
-    estimation = None
   }
 }

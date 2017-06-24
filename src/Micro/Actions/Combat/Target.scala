@@ -13,6 +13,6 @@ object Target extends Action {
   }
   
   override protected def perform(state: ActionState) {
-    state.toAttack = state.toAttack.orElse(EvaluateTargets.best(state, state.targets))
+    state.toAttack = EvaluateTargets.best(state, state.targets)
   }
 }

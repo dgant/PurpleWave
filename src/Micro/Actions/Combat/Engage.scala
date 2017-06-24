@@ -18,6 +18,7 @@ object Engage extends Action {
     state.toTravel = state.unit.battle.map(_.enemy.centroid).orElse(state.toTravel)
     
     Brawl.consider(state)
+    BustWallin.consider(state)
     Target.delegate(state)
     if (state.unit.canAttackThisFrame) {
       Attack.delegate(state)

@@ -7,26 +7,24 @@ import Micro.Execution.ActionState
 
 object MapUnitsOurs {
   
-  def render() = {
+  def render() {
     With.executor.states.foreach(renderUnitState)
   }
   
   def renderUnitState(state: ActionState) {
     if ( ! With.viewport.contains(state.unit.pixelCenter)) return
     
-    /*
     DrawMap.label(
       state.intent.plan.toString,
       state.unit.pixelCenter.add(0, -21),
       drawBackground = false)
-      */
     DrawMap.label(
       state.lastAction.map(_.name).getOrElse(""),
       state.unit.pixelCenter.add(0, -14),
       drawBackground = false)
     /*
     DrawMap.label(
-      state.unit.command.getUnitCommandType.toString,
+      state.unit.command.map(_.getUnitCommandType.toString).getOrElse(""),
       state.unit.pixelCenter.add(0, -7),
       drawBackground = false)
     DrawMap.label(

@@ -8,11 +8,13 @@ import Performance.Caching.{Cache, Limiter}
 import ProxyBwapi.UnitInfo.UnitInfo
 
 import scala.collection.mutable
+import scala.collection.JavaConverters._
 
 class Geography {
   
   val mapArea             : TileRectangle           = TileRectangle(Tile(0, 0), Tile(With.mapWidth, With.mapHeight))
   val allTiles            : Iterable[Tile]          = mapArea.tiles
+  lazy val startLocations : Iterable[Tile]          = With.game.getStartLocations.asScala.map(new Tile(_))
   lazy val zones          : Iterable[Zone]          = ZoneBuilder.build
   def bases               : Iterable[Base]          = zones.flatten(_.bases)
   def ourZones            : Iterable[Zone]          = zones.filter(_.owner.isUs)
@@ -22,7 +24,7 @@ class Geography {
   def ourTownHalls        : Iterable[UnitInfo]      = ourBases.flatMap(_.townHall)
   def ourHarvestingAreas  : Iterable[TileRectangle] = ourBases.map(_.harvestingArea)
   
-  def zoneByTile(tile: Tile):Zone = zonesByTileCache(tile)
+  def zoneByTile(tile: Tile): Zone = zonesByTileCache(tile)
   private lazy val zonesByTileCache =
     new mutable.HashMap[Tile, Zone] {
       override def default(key: Tile): Zone = {

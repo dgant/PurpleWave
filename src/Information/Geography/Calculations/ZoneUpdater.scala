@@ -2,7 +2,7 @@ package Information.Geography.Calculations
 
 import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
-import ProxyBwapi.Races.Protoss
+import ProxyBwapi.Races.{Protoss, Terran}
 import Utilities.EnrichPixel._
 
 object ZoneUpdater {
@@ -54,5 +54,13 @@ object ZoneUpdater {
     base.gasLeft        = base.gas.filter(_.alive).toVector.map(_.gasLeft).sum
     base.harvestingArea = (Vector(base.townHallArea) ++ (base.minerals.filter(_.mineralsLeft > With.configuration.blockerMineralThreshold) ++ base.gas).map(_.tileArea)).boundary
     base.heart          = base.harvestingArea.midpoint
+    
+    val exitBuildings = base.zone.exit.map(exit =>
+      With.units
+        .inTileRadius(exit.centerPixel.tileIncluding, 6)
+        .filter(u => u.unitClass.isBuilding && ! u.flying))
+      .getOrElse(List.empty)
+    
+    base.walledIn = exitBuildings.count(_.is(Terran.SupplyDepot)) >= 2 && exitBuildings.count(_.is(Terran.Barracks)) >= 1
   }
 }

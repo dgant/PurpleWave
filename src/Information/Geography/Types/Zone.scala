@@ -17,12 +17,24 @@ class Zone(
   val bases       : ListBuffer[Base],
   val edges       : ListBuffer[ZoneEdge]) {
   
-  val exit      : Option[ZoneEdge]  = if (edges.isEmpty) None else Some(edges.minBy(edge => With.paths.groundPixels(edge.centerPixel.tileIncluding, With.intelligence.mostBaselikeEnemyTile)))
   val centroid  : Tile              = if (tiles.isEmpty) new Pixel(bwtaRegion.getCenter).tileIncluding else tiles.minBy(_.tileDistanceSquared(new Pixel(bwtaRegion.getCenter).tileIncluding))
   var owner     : PlayerInfo        = With.neutral
   val area      : Double            = bwtaRegion.getPolygon.getArea
   val points    : Iterable[Pixel]   = bwtaRegion.getPolygon.getPoints.asScala.map(new Pixel(_)).toVector
-  val island    : Boolean           = ! With.game.getStartLocations.asScala.map(new Tile(_)).exists(startTile => With.paths.exists(centroid, startTile))
+  val island    : Boolean           = ! With.geography.startLocations.exists(startTile => With.paths.exists(centroid, startTile))
+  
+  val exit: Option[ZoneEdge]  =
+    if (edges.isEmpty)
+      None
+    else Some(edges.minBy(edge =>
+      With.geography.startLocations
+        .map(startLocation =>
+          With.paths.groundPixels(
+            edge.centerPixel.tileIncluding,
+            startLocation))
+        .max))
+      
+  var isWalledIn: Boolean = false
   
   def contains(tile: Tile)    : Boolean = boundary.contains(tile) && tiles.contains(tile)
   def contains(pixel: Pixel)  : Boolean = contains(pixel.tileIncluding)

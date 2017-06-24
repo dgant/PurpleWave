@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Protoss
 
 import Macro.BuildRequests._
 import Planning.Composition.UnitMatchers.UnitMatchType
-import Planning.Plans.Army.{ConsiderAttacking, ControlEnemyAirspace}
+import Planning.Plans.Army.{ControlEnemyAirspace, ControlMap}
 import Planning.Plans.Compound.{And, IfThenElse, Or, Parallel}
 import Planning.Plans.Information.{ScoutAt, ScoutExpansionsAt}
 import Planning.Plans.Macro.Automatic._
@@ -16,18 +16,16 @@ class ProtossVsTerran extends Parallel {
   description.set("Protoss vs Terran")
   
   private val lateGameBuild = Vector[BuildRequest] (
+    RequestUnitAtLeast(3,   Protoss.Nexus),
     RequestUnitAtLeast(1,   Protoss.CitadelOfAdun),
     RequestUnitAtLeast(8,   Protoss.Gateway),
-    RequestUpgradeLevel(         Protoss.ZealotSpeed,    1),
+    RequestUpgradeLevel(    Protoss.ZealotSpeed,    1),
     RequestUnitAtLeast(10,  Protoss.Gateway),
-    
     RequestUnitAtLeast(4,   Protoss.Nexus),
     RequestUnitAtLeast(2,   Protoss.Forge),
     RequestUnitAtLeast(1,   Protoss.Stargate),
-    
-    RequestUpgradeLevel(         Protoss.GroundDamage,   1),
-    RequestUpgradeLevel(         Protoss.GroundArmor,    1),
-    
+    RequestUpgradeLevel(    Protoss.GroundDamage,   1),
+    RequestUpgradeLevel(    Protoss.GroundArmor,    1),
     RequestUnitAtLeast(1,   Protoss.TemplarArchives)
   )
   
@@ -89,6 +87,7 @@ class ProtossVsTerran extends Parallel {
     new ScoutExpansionsAt(60),
     new ScoutAt(10),
     new ControlEnemyAirspace,
-    new ConsiderAttacking
+    new ControlMap
+    //new ConsiderAttacking
   ))
 }

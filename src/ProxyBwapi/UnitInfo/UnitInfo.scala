@@ -23,7 +23,7 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   override def toString: String = {
     unitClass.toString + " " +
     hitPoints + "/" + unitClass.maxHitPoints + " " +
-    (if (shieldPoints > 0) "(" + shieldPoints + "/" + unitClass.maxShields + ")" else "") +
+    (if (shieldPoints > 0) "(" + shieldPoints + "/" + unitClass.maxShields + ") " else "") +
     tileIncludingCenter.toString + " " + pixelCenter.toString
   }
   

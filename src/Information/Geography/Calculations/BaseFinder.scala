@@ -1,14 +1,13 @@
 package Information.Geography.Calculations
 
-import Mathematics.Shapes.Circle
+import Lifecycle.With
 import Mathematics.Clustering
+import Mathematics.Points.{Tile, TileRectangle}
+import Mathematics.Shapes.Circle
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.ForeignUnitInfo
-import Lifecycle.With
-import Mathematics.Points.{Tile, TileRectangle}
 import Utilities.EnrichPixel._
 
-import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 object BaseFinder {
@@ -74,7 +73,7 @@ object BaseFinder {
         
         //Take the hall which is closest to a geyser
         val preferredHall = conflictingHalls
-          .sortBy(With.game.getStartLocations.asScala.contains)
+          .sortBy(conflictingHallTile => With.geography.startLocations.exists(_ == conflictingHallTile))
           .sortBy(hall => With.units.neutral
             .filter(_.unitClass.isGas)
             .map(_.pixelDistanceFast(hall.pixelCenter))

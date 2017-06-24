@@ -4,13 +4,13 @@ import Information.Geography.Types.Zone
 import Lifecycle.With
 import bwapi.Position
 
-case class Pixel(x: Int, y: Int) {
+case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   
   def this(position: Position) = this(position.getX, position.getY)
   
-  def bwapi:Position = new Position(x, y)
+  def bwapi: Position = new Position(x, y)
   
-  def valid:Boolean = {
+  def valid: Boolean = {
     x >= 0 &&
     y >= 0 &&
     x < With.mapWidth * 32 &&
@@ -19,10 +19,10 @@ case class Pixel(x: Int, y: Int) {
   def add(dx: Int, dy: Int): Pixel = {
     Pixel(x + dx, y + dy)
   }
-  def add(point: Point):Pixel = {
+  def add(point: Point): Pixel = {
     add(point.x, point.y)
   }
-  def add(pixel: Pixel):Pixel = {
+  def add(pixel: Pixel): Pixel = {
     add(pixel.x, pixel.y)
   }
   def subtract(dx: Int, dy: Int): Pixel = {

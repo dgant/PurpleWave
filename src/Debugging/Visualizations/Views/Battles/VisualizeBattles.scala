@@ -26,8 +26,8 @@ object VisualizeBattles {
   
   def render() {
     With.game.drawTextScreen(army0.bwapi, "Overall:")
-    With.game.drawTextScreen(army1.bwapi, "+" + With.battles.global.estimationGeometric.costToEnemy.toInt)
-    With.game.drawTextScreen(army2.bwapi, "-" + With.battles.global.estimationGeometric.costToUs.toInt)
+    With.game.drawTextScreen(army1.bwapi, "+" + With.battles.global.estimationAbstract.costToEnemy.toInt)
+    With.game.drawTextScreen(army2.bwapi, "-" + With.battles.global.estimationAbstract.costToUs.toInt)
     With.battles.local.foreach(drawBattle)
     val localBattles = With.battles.local
     if (localBattles.nonEmpty) {

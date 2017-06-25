@@ -74,7 +74,7 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   // Economics //
   ///////////////
   
-  def subjectiveValue: Int = unitClass.subjectiveValue + scarabs * Protoss.Scarab.subjectiveValue + interceptors * Protoss.Interceptor.subjectiveValue
+  def subjectiveValue: Int = unitClass.subjectiveValue + scarabCount * Protoss.Scarab.subjectiveValue + interceptorCount * Protoss.Interceptor.subjectiveValue
   
   //////////////
   // Geometry //
@@ -241,8 +241,8 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
     (
       unitClass.canAttack
       || (is(Terran.Bunker)
-      || (is(Protoss.Carrier) && interceptors > 0)
-      || (is(Protoss.Reaver)  && scarabs > 0)
+      || (is(Protoss.Carrier) && interceptorCount > 0)
+      || (is(Protoss.Reaver)  && scarabCount > 0)
       || (is(Zerg.Lurker)     && burrowed)
     )))
   

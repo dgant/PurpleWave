@@ -10,7 +10,7 @@ object ReloadInterceptors extends Action {
   override def allowed(state:ActionState): Boolean =(
     state.unit.is(Protoss.Carrier)
     && With.self.minerals > Protoss.Interceptor.mineralPrice
-    && state.unit.interceptors < 8
+    && state.unit.interceptorCount < 8
     && state.unit.trainingQueue.isEmpty
     // TODO: Stop reloading if we're about to die
   )

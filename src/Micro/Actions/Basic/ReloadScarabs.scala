@@ -13,8 +13,8 @@ object ReloadScarabs extends Action {
   
     state.unit.is(Protoss.Reaver)
     && With.self.minerals > Protoss.Scarab.mineralPrice
-    && state.unit.scarabs < With.configuration.maxScarabCount
-    && state.unit.scarabs < (if(state.targetsInRange.isEmpty || state.unit.cooldownLeft > 0) With.configuration.maxScarabCount else 1)
+    && state.unit.scarabCount < With.configuration.maxScarabCount
+    && state.unit.scarabCount < (if(state.targetsInRange.isEmpty || state.unit.cooldownLeft > 0) With.configuration.maxScarabCount else 1)
     && state.unit.trainingQueue.isEmpty
     
     // TODO: Stop reloading if we're about to die

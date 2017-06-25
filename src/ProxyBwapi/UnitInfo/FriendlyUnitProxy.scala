@@ -4,6 +4,7 @@ import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
 import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile}
 import ProxyBwapi.Players.{PlayerInfo, Players}
+import ProxyBwapi.Races.Protoss
 import bwapi._
 
 import scala.collection.JavaConverters._
@@ -61,8 +62,9 @@ abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
   // Combat //
   ////////////
   
-  def interceptors : Int = interceptorCountCache.get
-  def scarabs      : Int = scarabCountCache.get
+  def interceptors      : Iterable[UnitInfo] = if (is(Protoss.Carrier)) base.getInterceptors.asScala.flatMap(With.units.get) else List.empty
+  def interceptorCount  : Int = interceptorCountCache.get
+  def scarabCount       : Int = scarabCountCache.get
   
   def attackStarting            : Boolean = isStartingAttackCache.get
   def attackAnimationHappening  : Boolean = isAttackFrameCache.get

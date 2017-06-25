@@ -62,6 +62,11 @@ class Commander {
   def attack(unit: FriendlyUnitInfo, target: UnitInfo) {
     if (unready(unit)) return
     
+    if (unit.is(Protoss.Carrier)) {
+      tryCarrierAttack(unit, target)
+      if (unready(unit)) return
+    }
+    
     if (target.visible) {
       if (unit.canAttackThisFrame || ! unit.target.contains(target)) {
         unit.base.attack(target.base)
@@ -69,6 +74,27 @@ class Commander {
       sleepAttack(unit)
     } else {
       move(unit, target.pixelCenter)
+    }
+  }
+  
+  def tryCarrierAttack(unit: FriendlyUnitInfo, target: UnitInfo) {
+    if (unready(unit)) return
+  
+    // Carriers are finicky. Manage them appropriately.
+    // * Don't attack units that aren't huge. Just attack-move to keep the interceptors going
+    // * Don't disturb interceptors that are already moving
+    if (target.unitClass.maxTotalHealth >= 400) {
+      unit.base.attack(target.base)
+      sleepAttack(unit)
+      return
+    }
+    val destination = target.pixelCenter
+    if (target.totalHealth < 400) {
+      if ( ! unit.interceptors.exists(_.attacking)) {
+        // TODO: This is probably incorrect
+        attackMove(unit, target.pixelCenter)
+        sleepAttack(unit)
+      }
     }
   }
   
@@ -91,9 +117,7 @@ class Commander {
     }
     
     // Mineral walk!
-    if (
-      unit.unitClass.isWorker
-      && ! unit.carryingResources) {
+    if (unit.unitClass.isWorker && ! unit.carryingResources) {
       val from      = unit.pixelCenter
       val fromZone  = from.zone
       val toZone    = to.zone

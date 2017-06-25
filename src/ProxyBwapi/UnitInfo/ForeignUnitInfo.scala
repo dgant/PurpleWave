@@ -8,6 +8,8 @@ import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
 import bwapi.{Position, UnitCommand}
 
+import scala.collection.JavaConverters._
+
 class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
   
   override def foreign: Option[ForeignUnitInfo] = Some(this)
@@ -64,7 +66,7 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
   def possiblyStillThere : Boolean    = _possiblyStillThere
   def unitClass          : UnitClass  = _unitClass
   
-  def lastSeenWithin(frames: Int) = With.frame - _lastSeen < frames
+  def lastSeenWithin(frames: Int): Boolean = With.frame - _lastSeen < frames
   
   ////////////
   // Health //
@@ -114,10 +116,11 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
   // Combat //
   ////////////
   
-  val interceptors  : Int = if (is(Protoss.Carrier))  8 else 0
-  val scarabs       : Int = if (is(Protoss.Reaver))   5 else 0
+  val interceptorCount  : Int = interceptors.size
+  val scarabCount       : Int = if (is(Protoss.Reaver)) 3 else 0 // Don't know whether BWAPI gives this for enemy units. Here's an approximation.
   
   private def updateCombat() {
+    _interceptors             = if (is(Protoss.Carrier)) base.getInterceptors.asScala.flatMap(With.units.get) else Iterable.empty
     _attackStarting           = base.isStartingAttack
     _attackAnimationHappening = base.isAttackFrame
     _airWeaponCooldownLeft    = base.getAirWeaponCooldown
@@ -125,17 +128,19 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
     _spellCooldownLeft        = base.getSpellCooldown
   }
   
-  var _attackStarting           : Boolean = _
-  var _attackAnimationHappening : Boolean = _
-  var _airWeaponCooldownLeft    : Int     = _
-  var _groundWeaponCooldownLeft : Int     = _
-  var _spellCooldownLeft        : Int     = _
+  var _interceptors             : Iterable[UnitInfo]  = Iterable.empty
+  var _attackStarting           : Boolean             = _
+  var _attackAnimationHappening : Boolean             = _
+  var _airWeaponCooldownLeft    : Int                 = _
+  var _groundWeaponCooldownLeft : Int                 = _
+  var _spellCooldownLeft        : Int                 = _
   
-  def attackStarting            : Boolean = _attackStarting
-  def attackAnimationHappening  : Boolean = _attackAnimationHappening
-  def airCooldownLeft           : Int     = _airWeaponCooldownLeft
-  def groundCooldownLeft        : Int     = _groundWeaponCooldownLeft
-  def spellCooldownLeft         : Int     = _spellCooldownLeft
+  def interceptors              : Iterable[UnitInfo]  = _interceptors
+  def attackStarting            : Boolean             = _attackStarting
+  def attackAnimationHappening  : Boolean             = _attackAnimationHappening
+  def airCooldownLeft           : Int                 = _airWeaponCooldownLeft
+  def groundCooldownLeft        : Int                 = _groundWeaponCooldownLeft
+  def spellCooldownLeft         : Int                 = _spellCooldownLeft
   
   //////////////
   // Geometry //

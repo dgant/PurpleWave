@@ -5,9 +5,9 @@ import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.UnitClass.UnitClass
 import bwapi.UnitCommand
 
-abstract class UnitProxy(var base:bwapi.Unit) {
+abstract class UnitProxy(var base: bwapi.Unit) {
     
-  var id = base.getID
+  var id: Int = base.getID
   
   ///////////////////
   // Tracking info //
@@ -37,8 +37,9 @@ abstract class UnitProxy(var base:bwapi.Unit) {
   // Combat //
   ////////////
   
-  def interceptors:Int
-  def scarabs:Int
+  def interceptors:Iterable[UnitInfo]
+  def interceptorCount:Int
+  def scarabCount:Int
   
   def attackStarting:Boolean
   def attackAnimationHappening:Boolean

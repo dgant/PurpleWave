@@ -51,7 +51,7 @@ object MapUnitsForeign {
       .filterNot(resourcesSaturated.contains)
       .foreach(resource => {
         DrawMap.circle(resource.pixelCenter, 12, Colors.MidnightTeal, solid = true)
-        DrawMap.label(":(", resource.pixelCenter.add(5, -5))
+        DrawMap.label(": (", resource.pixelCenter.add(-2, -5))
       })
     With.game.setTextSize(bwapi.Text.Size.Enum.Small)
   }

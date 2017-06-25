@@ -56,17 +56,16 @@ object MapUnits {
     DrawMap.box(Pixel(xStartDm, yStartHp), Pixel(xStartDm + widthDmNow, yEndHp), colorDm, solid = true)
     DrawMap.box(Pixel(xStartSh, yStartHp), Pixel(xStartSh + widthShNow, yEndHp), colorSh, solid = true)
     DrawMap.box(Pixel(xStart,   yStartHp), Pixel(xStart   + widthHpNow, yEndHp), colorHp, solid = true)
-    
-    if (unit.wounded) {
-      DrawMap.box(Pixel(xStart - 3, yStartHp - 3), Pixel(xStart + width + 4, yEndHp + 3), Colors.NeonRed, solid = false)
-      DrawMap.circle(unit.pixelCenter, unit.unitClass.radialHypotenuse.toInt + 1, Colors.NeonRed)
-    }
+    (25 until unit.totalHealth by 25).foreach(energy => {
+      val x = xStart + width * energy / unit.energyMax
+      DrawMap.line(Pixel(x, yStartHp), Pixel(x, yEndHp), Color.Black)
+    })
     
     if (unit.energyMax > 0) {
       DrawMap.box(Pixel(xStart - 1, yStartEnergy - 1), Pixel(xStart + width + 2, yEndEnergy + 1), Color.Black, solid = true)
       (25 until unit.energyMax by 25).foreach(energy => {
-        val x = width * energy / unit.energyMax
-        DrawMap.line(Pixel(x, yStartEnergy), Pixel(x, yEndEnergy))
+        val x = xStart + width * energy / unit.energyMax
+        DrawMap.line(Pixel(x, yStartEnergy), Pixel(x, yEndEnergy), Color.Black)
       })
       DrawMap.box(Pixel(xStart, yStartEnergy), Pixel(xStart + widthEnergyNow, yEndEnergy), Colors.BrightTeal, solid = true)
     }
@@ -83,9 +82,14 @@ object MapUnits {
         DrawMap.box(Pixel(xStartCooldownButton0, yStartCooldown), Pixel(xStartCooldownButton0 + widthCooldownButton, yEndCooldown), Colors.BrightOrange, solid = true)
       }
     }
+  
+    if (unit.wounded) {
+      DrawMap.box(Pixel(xStart - 3, yStartHp - 3), Pixel(xStart + width + 4, yEndHp + 3), Colors.NeonRed, solid = false)
+      DrawMap.label(":(", Pixel(unit.pixelCenter.x, unit.top), drawBackground = true, unit.player.colorBright)
+    }
     
     if (unit.isBeingViolent) {
-      DrawMap.box(Pixel(unit.left, unit.top), Pixel(unit.right, unit.bottom), unit.player.colorBright)
+      DrawMap.label("!", Pixel(unit.pixelCenter.x, unit.top - 8), drawBackground = true, unit.player.colorBright)
     }
     
     if (unit.is(Protoss.Scarab)) {

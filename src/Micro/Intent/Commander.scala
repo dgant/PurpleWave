@@ -231,7 +231,7 @@ class Commander {
   }
   
   private def sleepAttack(unit: FriendlyUnitInfo) {
-    sleep(unit, unit.unitClass.framesRequiredForAttackToComplete)
+    sleep(unit, unit.unitClass.framesRequiredForAttackToComplete + With.latency.turnSize - 1) //After attack completes, ready on first frame of following turn
   }
   
   private def sleepBuild(unit: FriendlyUnitInfo) {

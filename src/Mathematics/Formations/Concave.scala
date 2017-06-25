@@ -1,6 +1,6 @@
 package Mathematics.Formations
 
-import Mathematics.Points.Pixel
+import Mathematics.Points.{Pixel, SpecificPoints}
 import ProxyBwapi.UnitInfo.UnitInfo
 
 object Concave {
@@ -12,19 +12,20 @@ object Concave {
     origin      : Pixel)
     : Seq[FormationSlot] = {
   
-    val targetCenter = targetStart.midpoint(targetEnd)
+    val targetCenter  = targetStart.midpoint(targetEnd)
     val targetRadians = targetStart.radiansTo(targetEnd)
-    val arcCenterRadians = List(
-      targetRadians + Math.PI / 2.0,
-      targetRadians - Math.PI / 2.0)
-        .maxBy(radians => targetCenter.radiateRadians(radians, 48.0).groundPixels(origin))
+    val centerToArcRadians = List(
+      targetRadians - Math.PI / 2.0,
+      targetRadians + Math.PI / 2.0)
+        .sortBy(radians => - targetCenter.radiateRadians(radians, 128.0).pixelDistanceFast(SpecificPoints.middle))
+        .sortBy(radians => targetCenter.radiateRadians(radians, 128.0).zone != origin.zone)
+        .head
     
     val arc = Arc(
       Math.PI, // Configurable.
       targetCenter,
-      arcCenterRadians,
-      targetStart.pixelDistanceFast(targetEnd) / 2.0
-    )
+      centerToArcRadians,
+      targetStart.pixelDistanceFast(targetEnd) / 2.0)
     
     val arcPlacement = new ArcPlacementState(arc, targetStart.pixelDistanceFast(targetEnd))
     

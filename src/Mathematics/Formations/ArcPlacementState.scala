@@ -8,10 +8,11 @@ class ArcPlacementState(arc: Arc, minimumRadius: Double) {
   
   // All measurements in pixels/radius
   
-  var currentRadius = arc.minRadiusPixels
-  var angleDelta    = 0.0
-  var nextClockwise = false
-  var lastPlacement = arc.centerPixel
+  var currentRadius   : Double  = arc.minRadiusPixels
+  var angleDelta      : Double  = 0.0
+  var nextClockwise   : Boolean = false
+  var lastPlacement   : Pixel   = arc.centerPixel
+  var maxWidthPixels  : Double  = 0.0
   
   def startRank(radiusDesired: Double) {
     if (radiusDesired > currentRadius) {
@@ -22,7 +23,7 @@ class ArcPlacementState(arc: Arc, minimumRadius: Double) {
   }
   
   private def advanceToNextRank() {
-    startRank(currentRadius + 32.0)
+    startRank(currentRadius + 32.0 * 1.141)
   }
   
   def reserveSpace(widthPixels: Double): Pixel = {
@@ -42,7 +43,7 @@ class ArcPlacementState(arc: Arc, minimumRadius: Double) {
     }
     
     val output = arc.centerPixel.radiateRadians(
-      arc.centerAngleRadians + angleDelta * (if (nextClockwise) 1 else -1),
+      arc.centerToArcRadians + angleDelta * (if (nextClockwise) 1 else -1),
       currentRadius)
     
     nextClockwise = ! nextClockwise
@@ -51,7 +52,7 @@ class ArcPlacementState(arc: Arc, minimumRadius: Double) {
     }
     
     val tile = output.tileIncluding
-    if (With.grids.walkable.get(tile) && tile.zone == lastPlacement.zone)
+    if (With.grids.walkable.get(tile) && (lastPlacement == arc.centerPixel || tile.zone == lastPlacement.zone))
       Some(output)
     else
       None

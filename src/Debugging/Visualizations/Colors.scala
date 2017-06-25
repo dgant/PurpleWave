@@ -5,7 +5,7 @@ import bwapi.Color
 object Colors {
   
   //Via http://stackoverflow.com/questions/3018313/algorithm-to-convert-rgb-to-hsv-and-hsv-to-rgb-in-range-0-255-for-both
-  private def hsv(h:Int, s:Int, v:Int):Color = {
+  private def hsv(h: Int, s: Int, v: Int):Color = {
     if (s == 0) return new Color(v, v, v)
     val region = h/43
     val remainder = 6 * (h - 43 * region)
@@ -22,7 +22,7 @@ object Colors {
     }
   }
   
-  private def hv(h:Int, v:Int):Color = hsv(h, 255, v)
+  private def hv(h: Int, v: Int): Color = hsv(h, 255, v)
   
   private val red     = 0
   private val orange  = 32
@@ -33,7 +33,7 @@ object Colors {
   private val indigo  = 192
   private val violet  = 224
   
-  private val midnight  = 32
+  private val midnight  = 48
   private val deep      = 96
   private val dark      = 128
   private val medium    = 160

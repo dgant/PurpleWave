@@ -78,7 +78,14 @@ case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   def topLeftWalkPixel: WalkTile = {
     WalkTile(x*4, y*4)
   }
-  def zone:Zone = {
+  def zone: Zone = {
     With.geography.zoneByTile(this)
   }
+  def groundPixels(other: Tile): Double = {
+    With.paths.groundPixels(this, other)
+  }
+  def groundPixels(other: Pixel): Double = {
+    With.paths.groundPixels(this, other.tileIncluding)
+  }
+  
 }

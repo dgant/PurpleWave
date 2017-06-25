@@ -28,10 +28,7 @@ class Zone(
       None
     else Some(edges.minBy(edge =>
       With.geography.startLocations
-        .map(startLocation =>
-          With.paths.groundPixels(
-            edge.centerPixel.tileIncluding,
-            startLocation))
+        .map(_.groundPixels(edge.centerPixel))
         .max))
       
   var isWalledIn: Boolean = false

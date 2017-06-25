@@ -17,6 +17,8 @@ class ForeignUnitInfo(baseUnit: bwapi.Unit) extends UnitInfo (baseUnit) {
   def flagDead()      { _alive = false }
   def flagMissing()   { _possiblyStillThere = false }
   def flagInvisible() { _visible = false }
+  def flagBurrowed()  { _burrowed = true }
+  def flagCloaked()   { _cloaked = true }
   
   def update(unit: bwapi.Unit) {
     base = unit

@@ -16,7 +16,7 @@ object Pursue extends Action {
   
   override def perform(state: ActionState) {
     val pursuableTargets = state.targets.filter(target =>
-      target.topSpeed < state.unit.topSpeed ||
+      target.topSpeed < state.unit.topSpeed * 0.8 ||
       (
         ! target.flying &&
         state.unit.pixelRangeAgainstFromCenter(target) > 32 * 3.0 &&

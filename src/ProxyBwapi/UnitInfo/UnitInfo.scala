@@ -119,7 +119,7 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   def pixelDistanceTravelling (destination: Pixel)      : Double  = pixelDistanceTravelling(pixelCenter, destination)
   def pixelDistanceTravelling (destination: Tile)       : Double  = pixelDistanceTravelling(tileIncludingCenter, destination)
   def pixelDistanceTravelling (from: Pixel, to: Pixel)  : Double  = pixelDistanceTravelling(from.tileIncluding, to.tileIncluding)
-  def pixelDistanceTravelling (from: Tile,  to: Tile)   : Double  = if (flying) from.pixelCenter.pixelDistanceSlow(to.pixelCenter) else With.paths.groundPixels(from, to)
+  def pixelDistanceTravelling (from: Tile,  to: Tile)   : Double  = if (flying) from.pixelCenter.pixelDistanceSlow(to.pixelCenter) else from.groundPixels(to)
   
   def canMoveThisFrame: Boolean = unitClass.canMove && topSpeed > 0 && canDoAnythingThisFrame && ! burrowed
   

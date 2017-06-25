@@ -57,10 +57,7 @@ class Geography {
   def mostExposedChokes: Vector[ZoneEdge] =
     ourExposedChokes
       .toVector
-      .sortBy(choke =>
-        With.paths.groundPixels(
-          choke.centerPixel.tileIncluding,
-          With.intelligence.mostBaselikeEnemyTile))
+      .sortBy(_.centerPixel.groundPixels(With.intelligence.mostBaselikeEnemyTile))
   
   def update() {
     zoneUpdateLimiter.act()

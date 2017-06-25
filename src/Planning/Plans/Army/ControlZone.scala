@@ -5,27 +5,24 @@ import Lifecycle.With
 import Micro.Intent.Intention
 import Planning.Composition.Property
 import Planning.Composition.ResourceLocks.LockUnits
-import Planning.Composition.UnitCounters.UnitCountBattle
+import Planning.Composition.UnitCounters.UnitCountCombat
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Composition.UnitPreferences.UnitPreferClose
 import Planning.Plan
+import ProxyBwapi.UnitInfo.UnitInfo
 
 class ControlZone(zone: Zone) extends Plan {
   
   val army = new Property[LockUnits](new LockUnits)
   
   override def onUpdate() {
-    val battle = With.battles.byZone(zone)
     
-    val enemies = battle.enemy.units
+    val enemies = With.units.enemy.filter(threateningZone)
     val ourBase = zone.bases.find(_.owner.isUs)
     
     if (enemies.exists(threat => threat.canAttackThisSecond && ! threat.unitClass.isWorker)) {
-      
-      val threat = battle.estimationAbstract.avatarEnemy
-      
       army.get.unitMatcher.set(UnitMatchWarriors)
-      army.get.unitCounter.set(new UnitCountBattle(enemies, alwaysAccept = ourBase.isDefined))
+      army.get.unitCounter.set(new UnitCountCombat(enemies, alwaysAccept = ourBase.isDefined))
       army.get.unitPreference.set(new UnitPreferClose(zone.centroid.pixelCenter))
       army.get.acquire(this)
       
@@ -39,5 +36,12 @@ class ControlZone(zone: Zone) extends Plan {
     }
     
     // TODO: If there's no threat, answer likely ones
+  }
+  
+  def threateningZone(unit: UnitInfo): Boolean = {
+    unit.pixelCenter.zone == zone                   ||
+    unit.targetPixel.exists(_.zone == zone)         ||
+    unit.target.exists(_.pixelCenter.zone == zone)  ||
+    zone.edges.map(_.centerPixel).exists(unit.pixelDistanceFast(_) < With.configuration.battleMarginPixels)
   }
 }

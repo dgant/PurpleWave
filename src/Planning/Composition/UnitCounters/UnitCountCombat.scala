@@ -3,7 +3,7 @@ package Planning.Composition.UnitCounters
 import Information.Battles.Estimation.{AvatarBuilder, Estimation, Estimator}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
-class UnitCountBattle(
+class UnitCountCombat(
   enemies: Iterable[UnitInfo],
   alwaysAccept: Boolean) extends UnitCounter {
   

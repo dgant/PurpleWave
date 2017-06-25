@@ -40,13 +40,13 @@ object Clustering {
         groupsByLeader(thing).foreach(groupMember => unitLeaders.put(groupMember, thing))
       }})
     
-    return groupsByLeader
+    groupsByLeader
   }
   
   private def mapUnitsToNeighbors[T](
-    things:Iterable[T],
-    radius:Int,
-    extractPixel:(T) => Pixel)
+    things        : Iterable[T],
+    radius        : Int,
+    extractPixel  : (T) => Pixel)
       :Map[T, Iterable[T]] = {
     
     val radiusSquared = radius * radius

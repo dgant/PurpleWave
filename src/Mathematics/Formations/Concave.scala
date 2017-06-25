@@ -15,9 +15,9 @@ object Concave {
     val targetCenter = targetStart.midpoint(targetEnd)
     val targetRadians = targetStart.radiansTo(targetEnd)
     val arcCenterRadians = List(
-      targetRadians + Math.PI / 2,
-      targetRadians - Math.PI / 2)
-        .minBy(radians => targetCenter.radiateRadians(radians, 1.0).pixelDistanceFast(origin))
+      targetRadians + Math.PI / 2.0,
+      targetRadians - Math.PI / 2.0)
+        .maxBy(radians => targetCenter.radiateRadians(radians, 48.0).groundPixels(origin))
     
     val arc = Arc(
       Math.PI, // Configurable.

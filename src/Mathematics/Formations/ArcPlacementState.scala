@@ -50,7 +50,8 @@ class ArcPlacementState(arc: Arc, minimumRadius: Double) {
       angleDelta += widthPixels / currentRadius
     }
     
-    if (With.grids.walkable.get(output.tileIncluding))
+    val tile = output.tileIncluding
+    if (With.grids.walkable.get(tile) && tile.zone == lastPlacement.zone)
       Some(output)
     else
       None

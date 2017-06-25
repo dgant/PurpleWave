@@ -22,4 +22,5 @@ class Base(
   var lastScoutedFrame  = 0
   
   def owner: PlayerInfo = zone.owner
+  def resources: Set[UnitInfo] = minerals ++ gas
 }

@@ -10,9 +10,10 @@ object MapUnitsForeign {
   def render() {
     With.units.enemy.foreach(drawTrackedUnit)
     With.units.neutral.foreach(drawTrackedUnit)
+    renderSaturation()
   }
   
-  private def drawTrackedUnit(unit:ForeignUnitInfo) {
+  private def drawTrackedUnit(unit: ForeignUnitInfo) {
     if ( ! With.viewport.contains(unit.pixelCenter)) return
     
     if ( ! unit.visible) {
@@ -27,12 +28,31 @@ object MapUnitsForeign {
       DrawMap.circle(
         unit.pixelCenter,
         unit.unitClass.width / 2,
-        unit.player.colorDark)
+        color)
       DrawMap.label(
         unit.unitClass.toString,
         unit.pixelCenter,
         drawBackground = true,
-        unit.player.colorDark)
+        color)
     }
+  }
+  
+  def renderSaturation() {
+    val resourcesSaturated = With.units.ours
+      .filter(unit =>
+        unit.velocityX == 0 &&
+        unit.velocityY == 0 &&
+        unit.target.exists(_.unitClass.isResource))
+      .flatMap(_.target)
+  
+    With.game.setTextSize(bwapi.Text.Size.Enum.Large)
+    With.geography.ourBases
+      .flatMap(base => base.resources)
+      .filterNot(resourcesSaturated.contains)
+      .foreach(resource => {
+        DrawMap.circle(resource.pixelCenter, 18, Colors.MidnightTeal, solid = true)
+        DrawMap.label(":(", resource.pixelCenter)
+      })
+    With.game.setTextSize(bwapi.Text.Size.Enum.Small)
   }
 }

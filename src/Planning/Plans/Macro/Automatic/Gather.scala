@@ -78,7 +78,7 @@ class Gather extends Plan {
       if (allSafeMinerals.nonEmpty) {
         safeMinerals ++= allSafeMinerals
           .toVector
-          .sortBy(mineral => With.paths.groundPixels(mineral.tileIncludingCenter, With.geography.home))
+          .sortBy(_.pixelCenter.groundPixels(With.geography.home))
           .take(9)
       }
     }

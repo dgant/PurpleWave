@@ -39,7 +39,7 @@ class Commander {
     //
     nextOrderFrame.keys
       .filter(unit => unit.attackStarting && unit.is(Protoss.Dragoon))
-      .foreach(dragoon => nextOrderFrame(dragoon) = With.frame + 9 - With.latency.framesRemaining)
+      .foreach(dragoon => nextOrderFrame(dragoon) = With.frame + 8 + With.latency.turnSize - With.latency.framesRemaining)
   }
   
   def eligibleForResleeping(unit: FriendlyUnitInfo):Boolean = {

@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Protoss
 
-import Planning.Plans.Army.{DefendChokes, WorkersDefend}
+import Planning.Plans.Army.DefendChokes
 import Planning.Plans.Compound.Parallel
 import Planning.Plans.Information.SwitchEnemyRace
 import Planning.Plans.Macro.Automatic.Gather
@@ -17,7 +17,6 @@ class ProtossGamePlan
     },
     new FollowBuildOrder,
     new RemoveMineralBlockAt(50),
-    new WorkersDefend,
     new Gather,
     new DefendChokes
   )

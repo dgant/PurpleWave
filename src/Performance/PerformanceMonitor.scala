@@ -58,7 +58,7 @@ class PerformanceMonitor {
     millisecondsSpentThisFrame >= 50
   }
   
-  def danger:Boolean = {
+  def danger: Boolean = {
     framesOver55    > 100 ||
     framesOver1000  > 5   ||
     framesOver10000 > 1

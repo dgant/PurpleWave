@@ -3,7 +3,7 @@ package ProxyBwapi.UnitTracking
 import Lifecycle.With
 import Performance.Caching.Limiter
 import ProxyBwapi.Players.Players
-import ProxyBwapi.UnitInfo.ForeignUnitInfo
+import ProxyBwapi.UnitInfo.{ForeignUnitInfo, Orders}
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable.HashSet
@@ -94,6 +94,18 @@ class ForeignUnitTracker {
   }
   
   private def updateMissing(unit: ForeignUnitInfo) {
+    
+    if (unit.lastSeenWithin(24)) {
+      if (unit.order == Orders.Burrowing) {
+        unit.flagBurrowed()
+        if (unit.effectivelyCloaked) return
+      }
+      else if (unit.order == Orders.Cloak) {
+        unit.flagCloaked()
+        if (unit.effectivelyCloaked) return
+      }
+    }
+    
     //Well, if it can't move, it must be dead. Like a building that burned down or was otherwise destroyed.
     if (unit.unitClass.canMove) unit.flagMissing() else remove(unit)
   }

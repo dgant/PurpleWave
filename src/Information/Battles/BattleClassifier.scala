@@ -4,7 +4,6 @@ import Information.Battles.Clustering.BattleClustering
 import Information.Battles.Types.{Battle, Team}
 import Information.Geography.Types.Zone
 import Lifecycle.With
-import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, UnitInfo}
 
 class BattleClassifier {
@@ -36,13 +35,13 @@ class BattleClassifier {
   }
   
   private def isCombatantGlobal(unit: UnitInfo): Boolean = {
+    isCombatant(unit)
+  }
+  
+  private def isCombatant(unit: UnitInfo): Boolean = {
     unit.alive                                    &&
     (unit.complete || unit.unitClass.isBuilding)  &&
-    unit.unitClass.helpsInCombat                  &&
-    ! unit.player.isNeutral                       &&
-    ! unit.is(Terran.SpiderMine)                  &&
-    ! unit.is(Protoss.Scarab)                     &&
-    ! unit.is(Protoss.Interceptor)
+    unit.unitClass.helpsInCombat
   }
   
   private def replaceBattleGlobal() {

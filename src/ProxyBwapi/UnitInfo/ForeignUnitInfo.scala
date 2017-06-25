@@ -4,13 +4,13 @@ import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile}
 import Performance.Caching.Limiter
 import ProxyBwapi.Players.{PlayerInfo, Players}
-import ProxyBwapi.Races.{Protoss, Terran}
+import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
 import bwapi.{Position, UnitCommand}
 
 import scala.collection.JavaConverters._
 
-class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
+class ForeignUnitInfo(baseUnit: bwapi.Unit) extends UnitInfo (baseUnit) {
   
   override def foreign: Option[ForeignUnitInfo] = Some(this)
   
@@ -18,7 +18,7 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
   def flagMissing()   { _possiblyStillThere = false }
   def flagInvisible() { _visible = false }
   
-  def update(unit:bwapi.Unit) {
+  def update(unit: bwapi.Unit) {
     base = unit
     updateTimeSensitiveInformation()
     limitMostUpdates.act()
@@ -26,16 +26,14 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
   
   private val limitMostUpdates = new Limiter(1, () => {
     updateTracking()
-    if ( ! is(Terran.SpiderMine)) {
-      updateHealth()
-      updateCombat()
-      updateGeometry()
-      updateMovement()
-      updateOrders()
-      updateVisibility()
-      updateStatuses()
-      fixCloakedUnits()
-    }
+    updateVisibility()
+    updateHealth()
+    updateCombat()
+    updateGeometry()
+    updateMovement()
+    updateOrders()
+    updateStatuses()
+    fixCloakedUnits()
   })
   
   ///////////////////
@@ -87,7 +85,6 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
     _resourcesLeft          = base.getResources
     _energy                 = base.getEnergy
     _plagued                = base.isPlagued
-    
   }
   
   private var _alive                  : Boolean   = true
@@ -116,8 +113,8 @@ class ForeignUnitInfo(baseUnit:bwapi.Unit) extends UnitInfo (baseUnit) {
   // Combat //
   ////////////
   
-  val interceptorCount  : Int = interceptors.size
-  val scarabCount       : Int = if (is(Protoss.Reaver)) 3 else 0 // Don't know whether BWAPI gives this for enemy units. Here's an approximation.
+  def interceptorCount  : Int = interceptors.size
+  def scarabCount       : Int = if (is(Protoss.Reaver)) 3 else 0 // Don't know whether BWAPI gives this for enemy units. Here's an approximation.
   
   private def updateCombat() {
     _interceptors             = if (is(Protoss.Carrier)) base.getInterceptors.asScala.flatMap(With.units.get) else Iterable.empty

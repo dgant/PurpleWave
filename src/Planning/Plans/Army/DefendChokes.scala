@@ -1,25 +1,61 @@
 package Planning.Plans.Army
 
+import Information.Geography.Types.ZoneEdge
 import Lifecycle.With
 import Mathematics.Formations.Formation
-import Mathematics.Points.Pixel
 import Micro.Intent.Intention
+import Planning.Composition.ResourceLocks.LockUnits
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
-import ProxyBwapi.UnitInfo.UnitInfo
+import Planning.Composition.{Property, UnitCountEverything}
+import Planning.Plan
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-class DefendChokes extends ControlPixel {
+import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
+
+class DefendChokes extends Plan {
   
-  controllers.get.unitMatcher.set(UnitMatchWarriors)
+  val defenders = new Property[LockUnits](new LockUnits)
+  defenders.get.unitMatcher.set(UnitMatchWarriors)
+  defenders.get.unitCounter.set(UnitCountEverything)
   
   override def onUpdate() {
-    val chokeOption = With.geography.mostExposedChokes.headOption
-    val pixelToDefend = chokeOption.map(_.centerPixel).getOrElse(With.geography.home.pixelCenter)
-    updateTarget(pixelToDefend)
+  
+    // Step 1. Organize our chokes & defenders
     
-    val formation = chokeOption
-      .map(choke =>
+    val chokes = With.geography.mostExposedChokes
+    if (chokes.isEmpty) return
+    
+    defenders.get.acquire(this)
+    val unassignedUnits = new mutable.HashSet[FriendlyUnitInfo] ++ defenders.get.units
+    val unitsNearestChoke = chokes
+      .map(choke => (choke, unassignedUnits.toVector.sortBy(_.framesToTravel(choke.centerPixel))))
+      .toMap
+    
+    val assignments = new mutable.HashMap[ZoneEdge, ArrayBuffer[FriendlyUnitInfo]]
+    chokes.foreach(choke => assignments.put(choke, new ArrayBuffer[FriendlyUnitInfo]))
+    
+    // Step 2. Assign our defenders to chokes
+    
+    while (unassignedUnits.nonEmpty) {
+      chokes.foreach(choke => {
+        val queue = unitsNearestChoke(choke)
+        queue
+          .find(unassignedUnits.contains)
+          .foreach(assignee => {
+          unassignedUnits.remove(assignee)
+            assignments(choke).append(assignee)
+        })
+      })
+    }
+    
+    // Step 3. Arrange defensive formation & issue intentions
+    
+    chokes.foreach(choke => {
+      val chokeDefenders = assignments(choke)
+      val formation =
         Formation.concave(
-          controllers.get.units,
+          chokeDefenders,
           choke.sidePixels.head,
           choke.sidePixels.last,
           choke.zones
@@ -28,20 +64,17 @@ class DefendChokes extends ControlPixel {
             .sortBy(zone => ! zone.owner.isUs)
             .head
             .centroid
-            .pixelCenter))
-      .getOrElse(Map[UnitInfo, Pixel]())
-  
-    controllers.get.acquire(this)
-    if (controllers.get.satisfied) {
-      controllers.get.units.foreach(
+            .pixelCenter)
+      
+      chokeDefenders.foreach(
         defender => {
-          val spot = formation.getOrElse(defender, targetPixel)
+          val spot = formation(defender)
           With.executor.intend(new Intention(this, defender) {
             toReturn  = Some(spot)
             toTravel  = Some(spot)
             toForm    = Some(spot)
           })
         })
-    }
+    })
   }
 }

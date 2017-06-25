@@ -44,7 +44,6 @@ class Geography {
       .map(_.townHallArea.startInclusive)
       .getOrElse(SpecificPoints.tileMiddle))
   
-  
   def ourExposedChokes: Iterable[ZoneEdge] =
     With.geography.zones
       .filter(zone =>

@@ -18,8 +18,8 @@ class ForeignUnitTracker {
   var neutralUnits    : Set[ForeignUnitInfo] = new HashSet[ForeignUnitInfo]
   var enemyGhostUnits : Set[Int]             = new HashSet[Int]
   
-  def get(someUnit:bwapi.Unit):Option[ForeignUnitInfo] = get(someUnit.getID)
-  def get(id:Int):Option[ForeignUnitInfo] = foreignUnitsById.get(id)
+  def get(someUnit  : bwapi.Unit) : Option[ForeignUnitInfo] = get(someUnit.getID)
+  def get(id        : Int)        : Option[ForeignUnitInfo] = foreignUnitsById.get(id)
   
   private val limitInvalidatePixels = new Limiter(1, invalidatePositions)
   def update() {
@@ -49,7 +49,7 @@ class ForeignUnitTracker {
     enemyUnits   = foreignUnits.filter(_.player.isEnemy)
     neutralUnits = foreignUnits.filter(_.player.isNeutral)
   
-    unitsToFlagInvisible.foreach(_.flagInvisible)
+    unitsToFlagInvisible.foreach(_.flagInvisible())
     limitInvalidatePixels.act()
   }
   
@@ -83,35 +83,35 @@ class ForeignUnitTracker {
     }
   }
   
-  private def trackStaticUnits() = {
+  private def trackStaticUnits() {
     With.game.getStaticNeutralUnits.asScala.foreach(add)
   }
   
-  private def add(unit:bwapi.Unit) {
+  private def add(unit: bwapi.Unit) {
     val knownUnit = new ForeignUnitInfo(unit)
     knownUnit.update(unit)
     foreignUnitsById.put(knownUnit.id, knownUnit)
   }
   
-  private def updateMissing(unit:ForeignUnitInfo) {
+  private def updateMissing(unit: ForeignUnitInfo) {
     //Well, if it can't move, it must be dead. Like a building that burned down or was otherwise destroyed.
     if (unit.unitClass.canMove) unit.flagMissing() else remove(unit)
   }
   
-  private def remove(unit:ForeignUnitInfo) {
+  private def remove(unit: ForeignUnitInfo) {
     unit.flagDead()
     foreignUnitsById.remove(unit.id)
   }
   
-  private def remove(unit:bwapi.Unit) {
+  private def remove(unit: bwapi.Unit) {
     remove(unit.getID)
   }
   
-  private def remove(id:Int) {
+  private def remove(id: Int) {
     foreignUnitsById.remove(id)
   }
   
-  private def isValidForeignUnit(unit:bwapi.Unit):Boolean = {
+  private def isValidForeignUnit(unit: bwapi.Unit):Boolean = {
     //This case just doesn't make sense; if they're invisible and foreign how is BWAPI returning them
     //This check filters out the weird ghost units that BWAPI gives us at the start of a game
     if (!unit.isVisible) return false

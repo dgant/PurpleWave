@@ -29,6 +29,8 @@ class PerformanceMonitor {
   }
   
   private def updateFrameDelay() = {
+    
+    // This is the old performance management system; its purpose is s
     if (With.frame % framesToTrack == 0) {
       if (meanFrameMilliseconds > 20 || maxFrameMilliseconds > 60) {
         currentCacheLength += 4

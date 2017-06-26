@@ -14,10 +14,12 @@ object MapUnitsOurs {
   def renderUnitState(state: ActionState) {
     if ( ! With.viewport.contains(state.unit.pixelCenter)) return
     
-    DrawMap.label(
-      state.intent.plan.toString,
-      state.unit.pixelCenter.add(0, -21),
-      drawBackground = false)
+    if (state.intent.plan != With.gameplan) {
+      DrawMap.label(
+        state.intent.plan.toString,
+        state.unit.pixelCenter.add(0, -21),
+        drawBackground = false)
+    }
     DrawMap.label(
       state.lastAction.map(_.name).getOrElse(""),
       state.unit.pixelCenter.add(0, -14),

@@ -117,6 +117,8 @@ abstract class UnitProxy(var base: bwapi.Unit) {
   //////////////
   // Statuses //
   //////////////
+
+  def remainingBuildFrames:Int
   
   def beingConstructed:Boolean
   def beingGathered:Boolean

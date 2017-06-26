@@ -14,11 +14,11 @@ class Executor {
   
   def states: Iterable[ActionState] = stateByUnit.values
   
-  def intend(intention:Intention) = {
+  def intend(intention: Intention) = {
     getState(intention.unit).intent = intention
   }
   
-  def getState(unit:FriendlyUnitInfo):ActionState = {
+  def getState(unit: FriendlyUnitInfo): ActionState = {
     if ( ! stateByUnit.contains(unit)) {
       stateByUnit.put(unit, new ActionState(unit))
     }

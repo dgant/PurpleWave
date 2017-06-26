@@ -33,9 +33,9 @@ object MapUnits {
     val widthCooldownNow      = widthCooldown * Math.max(unit.cooldownLeft, unit.spellCooldownLeft) / Math.max(1, unit.cooldownMaxAirGround) //TODO: Max spell cooldown?
   
     val yStartHp              = unit.pixelCenter.y + unit.unitClass.height/2 - marginTopHp
-    val yEndHp                = yStartHp + 5
-    val yStartEnergy          = yEndHp + 3
-    val yEndEnergy            = yStartEnergy + 3
+    val yEndHp                = yStartHp + 4
+    val yStartEnergy          = yEndHp + 2
+    val yEndEnergy            = yStartEnergy + 4
     val yStartCooldown        = if (unit.energyMax > 0) yEndEnergy + 3 else yEndHp + 3
     val yEndCooldown          = yStartCooldown + 3
     val xStart                = unit.pixelCenter.x - width/2
@@ -56,8 +56,10 @@ object MapUnits {
     DrawMap.box(Pixel(xStartDm, yStartHp), Pixel(xStartDm + widthDmNow, yEndHp), colorDm, solid = true)
     DrawMap.box(Pixel(xStartSh, yStartHp), Pixel(xStartSh + widthShNow, yEndHp), colorSh, solid = true)
     DrawMap.box(Pixel(xStart,   yStartHp), Pixel(xStart   + widthHpNow, yEndHp), colorHp, solid = true)
-    (25 until unit.totalHealth by 25).foreach(energy => {
-      val x = xStart + width * energy / unit.energyMax
+    
+    val healthBarEvery = Math.max(3, width * 25 / (unit.unitClass.maxTotalHealth + unit.defensiveMatrixPoints))
+    (0 until width by healthBarEvery).foreach(healthX => {
+      val x = xStart + healthX - 1
       DrawMap.line(Pixel(x, yStartHp), Pixel(x, yEndHp), Color.Black)
     })
     
@@ -85,11 +87,12 @@ object MapUnits {
   
     if (unit.wounded) {
       DrawMap.box(Pixel(xStart - 3, yStartHp - 3), Pixel(xStart + width + 4, yEndHp + 3), Colors.NeonRed, solid = false)
-      DrawMap.label(":(", Pixel(unit.pixelCenter.x, unit.top), drawBackground = true, unit.player.colorBright)
+      DrawMap.label(":(", Pixel(unit.pixelCenter.x, unit.top + 4), drawBackground = true, unit.player.colorBright)
     }
     
     if (unit.isBeingViolent) {
-      DrawMap.label("!", Pixel(unit.pixelCenter.x, unit.top - 8), drawBackground = true, unit.player.colorBright)
+      DrawMap.circle(Pixel(unit.pixelCenter.x, unit.top - 8), 6, unit.player.colorMedium, solid = true)
+      DrawMap.text(Pixel(unit.pixelCenter.x - 4, unit.top - 12), "!!")
     }
     
     if (unit.is(Protoss.Scarab)) {

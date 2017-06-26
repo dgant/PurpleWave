@@ -55,7 +55,6 @@ class Visualization {
     }
     else {
       if (map) {
-        MapGeography.render()
         MapChokepoints.render()
         MapBases.render()
         MapArchitecture.render()

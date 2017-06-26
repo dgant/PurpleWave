@@ -9,6 +9,7 @@ object Pursue extends Action {
   
   override def allowed(state: ActionState): Boolean = {
     state.canFight              &&
+    state.canPursue             &&
     state.toAttack.isEmpty      &&
     state.unit.canMoveThisFrame &&
     state.targets.nonEmpty

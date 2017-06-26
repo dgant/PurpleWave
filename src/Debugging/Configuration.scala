@@ -44,10 +44,11 @@ class Configuration {
   // Battles //
   /////////////
   
-  var battleWorkerCostPerFrame  = 0.25
-  var battleMarginTiles         = 14
-  var battleMarginPixels        = battleMarginTiles * 32.0
-  var battleEstimationFrames    = 24 * 5
+  var abstractBattleDistancePixels  = 32.0 * 6.0
+  var battleWorkerCostPerFrame      = 0.25
+  var battleMarginTiles             = 14
+  var battleMarginPixels            = battleMarginTiles * 32.0
+  var battleEstimationFrames        = 24 * 5
   
   /////////////////
   // Performance //

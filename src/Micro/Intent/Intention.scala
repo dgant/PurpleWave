@@ -22,5 +22,6 @@ class Intention(val plan: Plan, val unit: FriendlyUnitInfo) {
   var toUpgrade   : Option[Upgrade]   = None
   var canAttack   : Boolean           = true
   var canFlee     : Boolean           = true
+  var canPursue   : Boolean           = true
   var canCower    : Boolean           = false
 }

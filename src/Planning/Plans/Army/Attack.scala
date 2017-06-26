@@ -1,29 +1,38 @@
 package Planning.Plans.Army
 
 import Lifecycle.With
-import Mathematics.Points.Pixel
 import Micro.Intent.Intention
+import Planning.Composition.ResourceLocks.LockUnits
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
+import Planning.Composition.UnitPreferences.UnitPreferClose
+import Planning.Composition.{Property, UnitCountEverything}
+import Planning.Plan
 
-class Attack extends ControlPixel {
+class Attack extends Plan {
   
-  controllers.get.unitMatcher.set(UnitMatchWarriors)
+  val attackers  = new Property[LockUnits](new LockUnits)
+  attackers.get.unitMatcher.set(UnitMatchWarriors)
+  attackers.get.unitCounter.set(UnitCountEverything)
   
   override def onUpdate() {
-  
-    controllers.get.acquire(this)
-    val target = getTarget
-    updateTarget(With.intelligence.mostBaselikeEnemyTile.pixelCenter)
     
-    if (controllers.get.satisfied) {
-      controllers.get.units.foreach(fighter => With.executor.intend(new Intention(this, fighter) { toTravel = Some(targetPixel) }))
-    }
-  }
-  
-  protected def getTarget: Pixel = {
+    val target =
+      if (With.geography.enemyBases.isEmpty)
+        With.intelligence.mostBaselikeEnemyTile
+          .pixelCenter
+      else
+        With.geography.enemyBases
+          .map(_.heart.pixelCenter)
+          .minBy(_.groundPixels(With.geography.home))
     
-    if (With.geography.enemyBases.isEmpty) return With.intelligence.mostBaselikeEnemyTile.pixelCenter
+    attackers.get.unitPreference.set(new UnitPreferClose(target))
+    attackers.get.acquire(this)
     
-    With.geography.enemyBases.head.heart.pixelCenter
+    attackers.get.units.foreach(fighter =>
+      With.executor.intend(
+        new Intention(this, fighter) {
+          toTravel = Some(target)
+          canPursue = false
+        }))
   }
 }

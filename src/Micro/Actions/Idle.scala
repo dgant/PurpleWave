@@ -24,6 +24,7 @@ object Idle extends Action {
     state.toUpgrade       = state.intent.toUpgrade
     state.toForm          = state.intent.toForm
     state.canFight        = state.intent.canAttack
+    state.canPursue       = state.intent.canPursue
     state.canCower        = state.intent.canCower
     
     actions.foreach(_.consider(state))

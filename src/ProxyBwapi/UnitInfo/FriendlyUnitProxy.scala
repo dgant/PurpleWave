@@ -189,6 +189,8 @@ abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
   // Statuses //
   //////////////
   
+  def remainingBuildFrames: Int = base.getRemainingBuildTime
+  
   def beingConstructed    : Boolean = base.isBeingConstructed
   def beingGathered       : Boolean = base.isBeingGathered
   def beingHealed         : Boolean = base.isBeingHealed

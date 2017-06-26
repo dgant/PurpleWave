@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Protoss
 
 import Macro.BuildRequests._
 import Planning.Composition.UnitMatchers.UnitMatchType
-import Planning.Plans.Army.{ControlEnemyAirspace, ControlMap}
+import Planning.Plans.Army.{ConsiderAttacking, ControlEnemyAirspace, ControlMap}
 import Planning.Plans.Compound.{And, IfThenElse, Or, Parallel}
 import Planning.Plans.Information.{ScoutAt, ScoutExpansionsAt}
 import Planning.Plans.Macro.Automatic._
@@ -87,7 +87,7 @@ class ProtossVsTerran extends Parallel {
     new ScoutExpansionsAt(60),
     new ScoutAt(10),
     new ControlEnemyAirspace,
-    new ControlMap
-    //new ConsiderAttacking
+    new ControlMap,
+    new ConsiderAttacking
   ))
 }

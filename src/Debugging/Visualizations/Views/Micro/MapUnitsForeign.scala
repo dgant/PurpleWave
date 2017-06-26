@@ -3,6 +3,7 @@ package Debugging.Visualizations.Views.Micro
 import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
 import Lifecycle.With
+import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.ForeignUnitInfo
 
 object MapUnitsForeign {
@@ -34,6 +35,13 @@ object MapUnitsForeign {
         unit.pixelCenter,
         drawBackground = true,
         color)
+    }
+    
+    if (unit.is(Terran.SiegeTankSieged)) {
+      DrawMap.circle(
+        unit.pixelCenter,
+        (unit.pixelRangeGround + unit.unitClass.radialHypotenuse).toInt,
+        unit.player.colorNeon)
     }
   }
   

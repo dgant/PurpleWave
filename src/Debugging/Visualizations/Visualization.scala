@@ -6,8 +6,8 @@ import Debugging.Visualizations.Views.Fun.{ViewHappy, ViewTextOnly}
 import Debugging.Visualizations.Views.Geography._
 import Debugging.Visualizations.Views.Micro._
 import Debugging.Visualizations.Views.Performance.ViewPerformance
-import Debugging.Visualizations.Views.Planning.{ViewPlanning, MapPlans}
-import Debugging.Visualizations.Views.View
+import Debugging.Visualizations.Views.Planning.{MapPlans, ViewPlanning}
+import Debugging.Visualizations.Views.{ScreenClock, View}
 import Lifecycle.With
 
 import scala.util.Random
@@ -54,6 +54,7 @@ class Visualization {
       ViewTextOnly.render()
     }
     else {
+      ScreenClock.render()
       if (map) {
         MapChokepoints.render()
         MapBases.render()

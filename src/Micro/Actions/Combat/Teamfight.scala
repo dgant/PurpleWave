@@ -7,8 +7,7 @@ import Planning.Yolo
 object Teamfight extends Action {
   
   override def allowed(state: ActionState): Boolean = {
-    state.canFight &&
-    state.unit.battle.exists(_.happening)
+    state.canFight
   }
   
   override def perform(state: ActionState) {

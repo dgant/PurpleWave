@@ -10,6 +10,8 @@ import Planning.Plan
 
 class Attack extends Plan {
   
+  description.set("Attack")
+  
   val attackers  = new Property[LockUnits](new LockUnits)
   attackers.get.unitMatcher.set(UnitMatchWarriors)
   attackers.get.unitCounter.set(UnitCountEverything)

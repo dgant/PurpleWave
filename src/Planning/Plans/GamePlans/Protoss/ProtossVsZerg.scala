@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Protoss
 
 import Macro.BuildRequests.{BuildRequest, RequestUnitAtLeast, RequestUpgradeLevel}
 import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors}
-import Planning.Plans.Army.{ConsiderAttacking, ControlEnemyAirspace, DefendChokes, DefendHearts}
+import Planning.Plans.Army.{Attack, ConsiderAttacking, ControlEnemyAirspace, DefendChokes}
 import Planning.Plans.Compound.{IfThenElse, _}
 import Planning.Plans.Information.{ScoutAt, ScoutExpansionsAt}
 import Planning.Plans.Macro.Automatic._
@@ -100,11 +100,7 @@ class ProtossVsZerg extends Parallel {
   private class AttackWhenWeHaveArmy extends IfThenElse(
     new UnitsAtLeast(10, UnitMatchWarriors),
     new ConsiderAttacking,
-    new IfThenElse(
-      new UnitsAtLeast(5, UnitMatchWarriors),
-      new DefendChokes,
-      new DefendHearts)
-  )
+    new DefendChokes)
   
   private class EatOverlordsUntilMutalisksArrive extends IfThenElse(
     new EnemyMutalisks,
@@ -112,7 +108,7 @@ class ProtossVsZerg extends Parallel {
     new Parallel(
       new ScoutExpansionsAt(40),
       new ControlEnemyAirspace,
-      new ConsiderAttacking { attackers.get.unitMatcher.set(UnitMatchType(Protoss.Corsair)) }
+      new Attack { attackers.get.unitMatcher.set(UnitMatchType(Protoss.Corsair)) }
     )
   )
   

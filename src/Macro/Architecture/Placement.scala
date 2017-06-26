@@ -6,5 +6,5 @@ import Mathematics.Points.Tile
 case class Placement(
                       buildingDescriptor  : BuildingDescriptor,
                       tile                : Option[Tile],
-                      results             : Iterable[PlacementHeuristicEvaluation],
+                      evaluations             : Iterable[PlacementHeuristicEvaluation],
                       createdFrame        : Int)

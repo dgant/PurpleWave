@@ -1,7 +1,7 @@
 package Debugging.Visualizations
 
 import Lifecycle.With
-import Mathematics.Points.Pixel
+import Mathematics.Points.{Pixel, Tile}
 import Performance.Caching.CacheFrame
 
 class Viewport {
@@ -18,11 +18,15 @@ class Viewport {
       .bwapi)
   }
   
-  def contains(pixel:Pixel):Boolean = {
+  def contains(pixel: Pixel): Boolean = {
     pixel.x >= start.x  &&
     pixel.y >= start.y  &&
     pixel.x <= end.x    &&
     pixel.y <= end.y
+  }
+  
+  def contains(tile: Tile): Boolean = {
+    contains(tile.pixelCenter)
   }
   
   private val startCache  = new CacheFrame[Pixel](() => startRecalculate)

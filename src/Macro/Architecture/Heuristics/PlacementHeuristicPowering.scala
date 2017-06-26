@@ -4,7 +4,6 @@ import Lifecycle.With
 import Macro.Architecture.BuildingDescriptor
 import Mathematics.Heuristics.HeuristicMathMultiplicative
 import Mathematics.Points.Tile
-import Mathematics.Shapes.PylonRadius
 
 object PlacementHeuristicPowering extends PlacementHeuristic {
   
@@ -12,8 +11,7 @@ object PlacementHeuristicPowering extends PlacementHeuristic {
     
     if ( ! state.powers) return HeuristicMathMultiplicative.default
     
-    // At time of writing, PylonRadius may have incorrect math, but is still a decent metric
-    PylonRadius.points
+    With.grids.psi2x2and3x2.psiPoints
       .map(candidate.add)
       .count(tile =>
         tile.valid

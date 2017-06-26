@@ -9,8 +9,11 @@ class GridPsi2x2and3x2 extends AbstractGridPsi {
   //
   // JohnJ/jaj22 confirmed the accuracy of Skynet's pylon range reference:
   // https://github.com/Laccolith/skynet/blob/399018f41b49fbb55a0ea32142117e97e9d2f9ae/Skynet/PylonPowerTracker.cpp#L54
+  //
+  // JohnJ's grid:
+  // http://pastebin.com/0PiTvGpK
   
-  override val psiPoints:Array[Point] =
+  override val psiPoints: Array[Point] =
     (-8 to 7).flatten(x =>
       (-4 to 4).map(y =>
         Point(x, y)))

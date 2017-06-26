@@ -8,7 +8,7 @@ object HeuristicMathAdditive extends HeuristicMath {
   
   
   
-  def order[TContext, TCandidate, THeuristic, THeuristicWeight <: HeuristicWeight[TContext, TCandidate]](
+  def resolve[TContext, TCandidate, THeuristic, THeuristicWeight <: HeuristicWeight[TContext, TCandidate]](
     context       : TContext,
     heuristics    : Iterable[THeuristicWeight],
     candidate     : TCandidate)

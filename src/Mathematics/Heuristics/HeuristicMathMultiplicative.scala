@@ -8,7 +8,7 @@ object HeuristicMathMultiplicative extends HeuristicMath {
   
   def fromBoolean(value:Boolean):Double = if (value) 2.0 else 1.0
   
-  def order[TContext, TCandidate, THeuristic, THeuristicWeight <: HeuristicWeight[TContext, TCandidate]](
+  def resolve[TContext, TCandidate, THeuristic, THeuristicWeight <: HeuristicWeight[TContext, TCandidate]](
     context       : TContext,
     heuristics    : Iterable[THeuristicWeight],
     candidate     : TCandidate)

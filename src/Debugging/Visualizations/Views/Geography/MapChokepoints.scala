@@ -17,6 +17,12 @@ object MapChokepoints {
           ),
           edge.centerPixel)
         
+        DrawMap.line(
+          edge.sidePixels.head,
+          edge.sidePixels.last,
+          zone.owner.colorDark
+        )
+        
         DrawMap.circle(
           edge.centerPixel,
           edge.radiusPixels.toInt,

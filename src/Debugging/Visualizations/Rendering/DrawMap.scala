@@ -8,24 +8,24 @@ import bwapi.Color
 object DrawMap {
   
   def text(
-    origin:Pixel,
-    text:String) {
+    origin  : Pixel,
+    text    : String) {
     if (irrelevant(origin)) return
     With.game.drawTextMap(origin.bwapi, text)
   }
   
   def line(
-    start:Pixel,
-    end:Pixel,
-    color:Color = Colors.DefaultGray) {
+    start : Pixel,
+    end   : Pixel,
+    color : Color = Colors.DefaultGray) {
     if (irrelevant(Vector(start, end))) return
     With.game.drawLineMap(start.bwapi, end.bwapi, color)
   }
   
   def arrow(
-    start:Pixel,
-    end:Pixel,
-    color:Color = Colors.DefaultGray) {
+    start : Pixel,
+    end   : Pixel,
+    color : Color = Colors.DefaultGray) {
     if (irrelevant(Vector(start, end))) return
     
     line(start, end, color)
@@ -36,19 +36,19 @@ object DrawMap {
   }
   
   def box(
-    start:Pixel,
-    end:Pixel,
-    color:Color = Colors.DefaultGray,
-    solid:Boolean = false) {
+    start : Pixel,
+    end   : Pixel,
+    color : Color = Colors.DefaultGray,
+    solid : Boolean = false) {
     if (irrelevant(Vector(start, end))) return
     With.game.drawBoxMap(start.bwapi, end.bwapi, color, solid)
   }
   
   def circle(
-    center:Pixel,
-    radius:Int,
-    color:Color = Colors.DefaultGray,
-    solid:Boolean = false) {
+    center  : Pixel,
+    radius  : Int,
+    color   : Color = Colors.DefaultGray,
+    solid   : Boolean = false) {
     if (irrelevant(
       Vector(
         center,
@@ -60,29 +60,29 @@ object DrawMap {
   }
   
   def triangle(
-    position1:Pixel,
-    position2:Pixel,
-    position3:Pixel,
-    color:Color = Colors.DefaultGray,
+    position1 : Pixel,
+    position2 : Pixel,
+    position3 : Pixel,
+    color     : Color = Colors.DefaultGray,
     solid: Boolean = false) {
     if (irrelevant(Vector(position1, position2, position3))) return
     With.game.drawTriangleMap(position1.bwapi, position2.bwapi, position3.bwapi, color, solid)
   }
   
   def label(
-    text:String,
-    position:Pixel,
-    drawBackground:Boolean = false,
-    backgroundColor:Color = Colors.DefaultGray) {
+    text            : String,
+    position        : Pixel,
+    drawBackground  : Boolean = false,
+    backgroundColor : Color = Colors.DefaultGray) {
     if (irrelevant(position)) return
     labelBox(Vector(text), position, drawBackground, backgroundColor)
   }
   
   def labelBox(
-      textLines:Iterable[String],
-      position:Pixel,
-      drawBackground:Boolean = false,
-      backgroundColor:Color = Colors.DefaultGray) {
+      textLines       : Iterable[String],
+      position        : Pixel,
+      drawBackground  : Boolean = false,
+      backgroundColor : Color = Colors.DefaultGray) {
     
     if (irrelevant(position)) return
     
@@ -110,20 +110,20 @@ object DrawMap {
       textLines.mkString("\n"))
   }
   
-  def tileRectangle(rectangle:TileRectangle, color:Color) {
+  def tileRectangle(rectangle: TileRectangle, color: Color) {
     if (irrelevant(Vector(rectangle.startPixel, rectangle.endPixel))) return
     With.game.drawBoxMap(rectangle.startPixel.bwapi, rectangle.endPixel.bwapi, color)
   }
   
-  def polygonPixels(points:Iterable[Pixel], color:Color = Colors.DefaultGray) {
+  def polygonPixels(points: Iterable[Pixel], color: Color = Colors.DefaultGray) {
     points.reduce((p1, p2) => { line(p1, p2, color); p2 })
     line(points.head, points.last, color)
   }
   
-  def irrelevant(points:Iterable[Pixel]):Boolean = {
+  def irrelevant(points: Iterable[Pixel]): Boolean = {
     points.forall(irrelevant)
   }
-  def irrelevant(pixel:Pixel):Boolean = {
+  def irrelevant(pixel: Pixel): Boolean = {
     val buffer = 32 * 4
     ! pixel.valid || ! With.viewport.contains(pixel)
   }

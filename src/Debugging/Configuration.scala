@@ -36,6 +36,8 @@ class Configuration {
   
   var maxBuildingPlacementCandidates  = 1000
   var maxMineralsBeforeMinedOut       = 300 * 8
+  var maxFramesToSendAdvanceBuilder   = 24 * 20
+  var maxFramesToTrustBuildRequest    = 24 * 60 * 10
   var blockerMineralThreshold         = 50
   var maxPlacementAge                 = 24 * 20
   var maxScarabCount                  = 3

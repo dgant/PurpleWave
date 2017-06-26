@@ -55,6 +55,10 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
       .orElse(With.groundskeeper.reserve(buildingDescriptor))
   
     if (desiredTile.isEmpty) {
+      if (With.frame < With.configuration.maxFramesToTrustBuildRequest) {
+        //Assume we'll find a build location eventually and reserve the currency anyway
+        currencyLock.acquire(this)
+      }
       return
     }
     
@@ -92,9 +96,10 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
       return false
     }
     val proposedBuilders = builderLock.inquire(this)
-    proposedBuilders.exists(_.exists(
-      _.framesToTravel(desiredTile.get.pixelCenter) >=
-      currencyLock.expectedFrames))
+    proposedBuilders.exists(
+      _.exists(someBuilder =>
+        Math.max(With.configuration.maxFramesToSendAdvanceBuilder, someBuilder.framesToTravel(desiredTile.get.pixelCenter)) >=
+        currencyLock.expectedFrames))
   }
   
   def buildingTile: Option[Tile] = With.groundskeeper.reserve(buildingDescriptor)

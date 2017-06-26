@@ -38,18 +38,20 @@ class Architect {
         townHallAllowed = true))
   }
   
-  def fulfill(buildingDescriptor: BuildingDescriptor, placement: Option[Placement]): Option[Tile] = {
+  def fulfill(buildingDescriptor: BuildingDescriptor, placement: Option[Placement]): Placement = {
     
-    if (placement.isDefined && With.frame - placement.get.createdFrame < With.configuration.maxPlacementAge) {
-      val tile = placement.get.tile
+    if (placement.isDefined
+      && placement.get.tile.isDefined
+      && With.frame - placement.get.createdFrame < With.configuration.maxPlacementAge) {
+      val tile = placement.get.tile.get
       if (canBuild(buildingDescriptor, tile)) {
         exclude(buildingDescriptor, tile)
-        return Some(tile)
+        return placement.get
       }
     }
   
     val output = placeBuilding(buildingDescriptor)
-    output.foreach(exclude(buildingDescriptor, _))
+    output.tile.foreach(exclude(buildingDescriptor, _))
     output
   }
   
@@ -77,7 +79,7 @@ class Architect {
       .exists(exclusion =>
         ! (exclusion.gasAllowed       && buildingDescriptor.gas)       &&
         ! (exclusion.townHallAllowed  && buildingDescriptor.townHall)  &&
-        exclusion.area.intersects(buildArea))
+        exclusion.areaExcluded.intersects(buildArea))
   }
   
   private def tripsOnUnits(buildingDescriptor: BuildingDescriptor, buildArea: TileRectangle): Boolean = {
@@ -118,7 +120,7 @@ class Architect {
   private def placeBuilding(
     buildingDescriptor  : BuildingDescriptor,
     exclusions          : Iterable[TileRectangle] = Vector.empty)
-      : Option[Tile] = {
+      : Placement = {
     
     val allCandidates = candidates(buildingDescriptor)
       .filter(canBuild(buildingDescriptor, _))
@@ -130,7 +132,7 @@ class Architect {
     bestCandidate
   }
   
-  def candidates(buildingDescriptor: BuildingDescriptor): Iterable[Tile] = {
+  private def candidates(buildingDescriptor: BuildingDescriptor): Iterable[Tile] = {
     
     if (buildingDescriptor.townHall) {
       With.geography.bases
@@ -151,7 +153,7 @@ class Architect {
     }
   }
   
-  def shuffle(tiles: Iterable[Tile]): Iterable[Tile] = {
+  private def shuffle(tiles: Iterable[Tile]): Iterable[Tile] = {
     Random.shuffle(tiles)
   }
 }

@@ -1,6 +1,6 @@
 package Mathematics.Heuristics
 
-class HeuristicResult[TContext, TCandidate] (
+class HeuristicEvaluation[TContext, TCandidate](
   val heuristic   : Heuristic[TContext, TCandidate],
   val context     : TContext,
   val candidate   : TCandidate,

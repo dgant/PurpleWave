@@ -26,6 +26,7 @@ class Visualization {
   private var view: View = ViewPlanning
   private var lastCycle = 0
   
+  var enabled   = false
   var cycle     = false
   var screen    = false
   var grids     = false
@@ -44,7 +45,7 @@ class Visualization {
   
   def render() {
     requireInitialization()
-    if (! With.configuration.visualize) return
+    if ( ! enabled) return
     With.game.setTextSize(bwapi.Text.Size.Enum.Small)
     
     if (happy) {
@@ -80,6 +81,7 @@ class Visualization {
   private def requireInitialization() {
     if (initialized) return
     initialized = true
+    enabled = With.configuration.visualize
     var random = Random.nextDouble()
     random -= With.configuration.visualizationProbabilityHappyVision
     if (random < 0) {

@@ -1,17 +1,17 @@
 package Micro.Heuristics.Targeting
 
-import Mathematics.Heuristics.{Heuristic, HeuristicResult}
+import Mathematics.Heuristics.{Heuristic, HeuristicEvaluation}
 import Micro.Intent.Intention
 import ProxyBwapi.UnitInfo.UnitInfo
 
-class TargetHeuristicResult(
+class TargetHeuristicEvaluation(
                              heuristic   : Heuristic[Intention, UnitInfo],
                              intent      : Intention,
                              candidate   : UnitInfo,
                              evaluation  : Double,
                              val color   : bwapi.Color)
   
-  extends HeuristicResult (
+  extends HeuristicEvaluation (
       heuristic,
       intent,
       candidate,

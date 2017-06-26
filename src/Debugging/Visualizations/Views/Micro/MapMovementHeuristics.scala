@@ -5,7 +5,7 @@ import Debugging.Visualizations.Rendering.DrawMap
 import Lifecycle.With
 import Mathematics.Heuristics.HeuristicMathMultiplicative
 import Mathematics.Points.Pixel
-import Micro.Heuristics.Movement.MovementHeuristicResult
+import Micro.Heuristics.Movement.MovementHeuristicEvaluation
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object MapMovementHeuristics {
@@ -29,12 +29,12 @@ object MapMovementHeuristics {
       (With.frame - With.executor.getState(unit).movedHeuristicallyFrame) < 24 &&
       With.viewport.contains(unit.pixelCenter)
   
-  def scale(results: Iterable[MovementHeuristicResult]): Double =
+  def scale(results: Iterable[MovementHeuristicEvaluation]): Double =
     normalize(results.map(_.evaluation).max / results.map(_.evaluation).min)
   
   def normalize(value: Double): Double = if (value < 1.0) 1.0/value else value
   
-  def renderUnit(results: Iterable[MovementHeuristicResult]) {
+  def renderUnit(results: Iterable[MovementHeuristicEvaluation]) {
     if (results.isEmpty) return
     
     val heuristicGroups = results.groupBy(_.heuristic)
@@ -49,7 +49,7 @@ object MapMovementHeuristics {
     DrawMap.circle(unit.pixelCenter, With.configuration.battleMarginPixels.toInt, Colors.BrightRed)
   }
   
-  def renderUnitHeuristic(results: Iterable[MovementHeuristicResult], maxScale: Double) {
+  def renderUnitHeuristic(results: Iterable[MovementHeuristicEvaluation], maxScale: Double) {
     val ourScale          = scale(results)
     val relativeScale     = ourScale / maxScale
     val evaluationExtreme = results.maxBy(result => Math.abs(HeuristicMathMultiplicative.default - result.evaluation)).evaluation
@@ -87,7 +87,7 @@ object MapMovementHeuristics {
       })
   }
   
-  def renderLegend(groups: Iterable[Iterable[MovementHeuristicResult]]) {
+  def renderLegend(groups: Iterable[Iterable[MovementHeuristicEvaluation]]) {
     val descendingScale = groups
       .toVector
       .sortBy(scale)
@@ -96,7 +96,7 @@ object MapMovementHeuristics {
     descendingScale.zipWithIndex.foreach { case (group, index) => renderLegendKey(group, index) }
   }
   
-  def renderLegendKey(group: Iterable[MovementHeuristicResult], order: Int) {
+  def renderLegendKey(group: Iterable[MovementHeuristicEvaluation], order: Int) {
     val left = 5
     val top = 5
     val rowHeight = 15

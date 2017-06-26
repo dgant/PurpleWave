@@ -9,7 +9,7 @@ import ProxyBwapi.UnitInfo.UnitInfo
 
 object EvaluatePixels {
 
-  def best(state:ActionState, profile:MovementProfile): Pixel = {
+  def best(state: ActionState, profile: MovementProfile): Pixel = {
     
     val candidates = getCandidates(state)
   
@@ -20,7 +20,7 @@ object EvaluatePixels {
     state.movementHeuristicResults =
       candidates.flatten(candidate =>
         profile.weightedHeuristics.map(weightedHeuristic =>
-          new MovementHeuristicResult(
+          new MovementHeuristicEvaluation(
             weightedHeuristic.heuristic,
             state,
             candidate,
@@ -30,7 +30,7 @@ object EvaluatePixels {
     HeuristicMathMultiplicative.best(state, profile.weightedHeuristics, candidates)
   }
   
-  def getCandidates(state:ActionState):Vector[Pixel] = {
+  def getCandidates(state: ActionState): Vector[Pixel] = {
 
     val startingPixel = state.unit.pixelCenter
     val startingZone  = startingPixel.zone
@@ -48,11 +48,11 @@ object EvaluatePixels {
   }
   
   def acceptable(
-    unit:UnitInfo,
-    candidate:Pixel,
-    startingPixel:Pixel,
-    startingZone:Zone)
-      :Boolean = {
+    unit          : UnitInfo,
+    candidate     : Pixel,
+    startingPixel :Pixel,
+    startingZone  : Zone)
+      : Boolean = {
     
     if ( ! candidate.valid) return false
     if (unit.flying) return true

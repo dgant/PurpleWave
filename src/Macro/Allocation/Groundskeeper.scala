@@ -28,15 +28,13 @@ class Groundskeeper {
         .take(With.configuration.buildingPlacements) //Let's just do a few per run so we run frequently in smaller batches
         .foreach(descriptor =>
           if (With.performance.continueRunning) {
-            val tile = With.architect.fulfill(descriptor, placed.get(descriptor))
-            placed.remove(descriptor)
-            tile
-              .map(
-                Placement(
-                  descriptor,
-                  _,
-                  With.frame))
-              .foreach(placed.put(descriptor, _))
+            val placement = With.architect.fulfill(descriptor, placed.get(descriptor))
+            if (placement.tile.isDefined) {
+              placed.put(descriptor, placement)
+            }
+            else {
+              placed.remove(descriptor)
+            }
           }))
   }
   
@@ -54,9 +52,10 @@ class Groundskeeper {
     // Do we have a placement for this descriptor already? Use it.
     placed
       .get(descriptor)
+      .filter(_.tile.isDefined) // We shouldn't be keeping placements with no tile anyhow, but just in case
       .foreach(placement => {
         unplaced -= descriptor
-        return Some(placement.tile)
+        return placement.tile
       })
     
     /*

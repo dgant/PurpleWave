@@ -12,7 +12,7 @@ abstract class HeuristicMath {
     context     : TContext,
     heuristics  : Iterable[THeuristicWeight],
     candidates  : Iterable[TCandidate])
-      :TCandidate = {
+      : TCandidate = {
     candidates.minBy(candidate => order(context, heuristics, candidate))
   }
   
@@ -20,7 +20,7 @@ abstract class HeuristicMath {
     context     : TContext,
     heuristics  : Iterable[THeuristicWeight],
     candidates  : Iterable[TCandidate])
-      :Vector[TCandidate] = {
+      : Vector[TCandidate] = {
     
     candidates.toVector.sortBy(candidate => order(context, heuristics, candidate))
   }

@@ -1,5 +1,7 @@
 package Macro.Architecture.Heuristics
 
+import Debugging.Visualizations.Colors
+
 
 class PlacementProfile(
   val name            : String,
@@ -13,13 +15,13 @@ class PlacementProfile(
   
   def weightedHeuristics: Iterable[PlacementHeuristicWeight] = {
     Vector(
-      new PlacementHeuristicWeight(PlacementHeuristicZone,          preferZone),
-      new PlacementHeuristicWeight(PlacementHeuristicExit,          preferExit),
-      new PlacementHeuristicWeight(PlacementHeuristicGas,           preferGas),
-      new PlacementHeuristicWeight(PlacementHeuristicSpace,         preferSpace),
-      new PlacementHeuristicWeight(PlacementHeuristicPowering,      preferPowering),
-      new PlacementHeuristicWeight(PlacementHeuristicDistance,     -avoidDistance),
-      new PlacementHeuristicWeight(PlacementHeuristicEnemy,        -avoidEnemy)
+      new PlacementHeuristicWeight(PlacementHeuristicZone,          preferZone,     Colors.NeonRed),
+      new PlacementHeuristicWeight(PlacementHeuristicExit,          preferExit,     Colors.NeonOrange),
+      new PlacementHeuristicWeight(PlacementHeuristicGas,           preferGas,      Colors.NeonYellow),
+      new PlacementHeuristicWeight(PlacementHeuristicSpace,         preferSpace,    Colors.NeonGreen),
+      new PlacementHeuristicWeight(PlacementHeuristicPowering,      preferPowering, Colors.NeonTeal),
+      new PlacementHeuristicWeight(PlacementHeuristicDistance,     -avoidDistance,  Colors.NeonBlue),
+      new PlacementHeuristicWeight(PlacementHeuristicEnemy,        -avoidEnemy,     Colors.NeonIndigo)
     )
   }
   

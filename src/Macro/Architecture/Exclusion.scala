@@ -4,6 +4,6 @@ import Mathematics.Points.TileRectangle
 
 case class Exclusion(
   description     : String,
-  area            : TileRectangle,
+  areaExcluded    : TileRectangle,
   gasAllowed      : Boolean,
   townHallAllowed : Boolean)

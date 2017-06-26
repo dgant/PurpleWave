@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Protoss
 
-import Macro.BuildRequests._
+import Macro.BuildRequests.{RequestUpgradeLevel, _}
 import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Plans.Army.{ConsiderAttacking, ControlEnemyAirspace, ControlMap}
 import Planning.Plans.Compound.{And, IfThenElse, Or, Parallel}
@@ -22,11 +22,12 @@ class ProtossVsTerran extends Parallel {
     RequestUpgradeLevel(    Protoss.ZealotSpeed,    1),
     RequestUnitAtLeast(10,  Protoss.Gateway),
     RequestUnitAtLeast(4,   Protoss.Nexus),
-    RequestUnitAtLeast(2,   Protoss.Forge),
+    RequestUnitAtLeast(1,   Protoss.Forge),
     RequestUnitAtLeast(1,   Protoss.Stargate),
     RequestUpgradeLevel(    Protoss.GroundDamage,   1),
-    RequestUpgradeLevel(    Protoss.GroundArmor,    1),
-    RequestUnitAtLeast(1,   Protoss.TemplarArchives)
+    RequestUnitAtLeast(1,   Protoss.TemplarArchives),
+    RequestUpgradeLevel(    Protoss.GroundDamage,   2),
+    RequestUpgradeLevel(    Protoss.GroundDamage,   3)
   )
   
   private class RespondToBioAllInWithReavers extends IfThenElse(

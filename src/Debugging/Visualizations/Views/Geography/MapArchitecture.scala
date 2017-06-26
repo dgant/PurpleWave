@@ -8,8 +8,8 @@ object MapArchitecture {
   
   def render() {
     With.architect.exclusions.foreach(exclusion => {
-      DrawMap.tileRectangle(exclusion.area, Colors.MediumRed)
-      DrawMap.label(exclusion.description, exclusion.area.midPixel)
+      DrawMap.tileRectangle(exclusion.areaExcluded, Colors.MediumRed)
+      DrawMap.label(exclusion.description, exclusion.areaExcluded.midPixel)
     })
   }
 }

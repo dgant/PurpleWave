@@ -7,7 +7,7 @@ object KeyboardCommands {
     text match {
       case "q"    => breakpoint()
       case "c"    => With.configuration.camera      = ! With.configuration.camera
-      case "v"    => With.configuration.visualize   = ! With.configuration.visualize
+      case "v"    => With.visualization.enabled     = ! With.visualization.enabled
       case "vc"   => With.visualization.cycle       = ! With.visualization.cycle
       case "vm"   => With.visualization.map         = ! With.visualization.map
       case "vs"   => With.visualization.screen      = ! With.visualization.screen

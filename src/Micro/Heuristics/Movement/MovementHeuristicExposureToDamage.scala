@@ -7,8 +7,6 @@ import ProxyBwapi.UnitInfo.UnitInfo
 object MovementHeuristicExposureToDamage extends MovementHeuristic {
   
   override def evaluate(state: ActionState, candidate: Pixel): Double = {
-  
-    if (state.threats.forall(_.melee)) return MovementHeuristicThreatDistance.evaluate(state, candidate)
     
     // DPS grid's resolution is too low. It leads to wobby, wasteful movement.
     // With.grids.dpsEnemy.get(candidate.tileIncluding, state.unit)

@@ -140,16 +140,16 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   
   def project(framesToLookAhead:Int):Pixel = pixelCenter.add((velocityX * framesToLookAhead).toInt, (velocityY * framesToLookAhead).toInt)
   
-  def inTileRadius  (tiles:Int)  : Traversable[UnitInfo] = With.units.inTileRadius(tileIncludingCenter, tiles)
-  def inPixelRadius (pixels:Int) : Traversable[UnitInfo] = With.units.inPixelRadius(pixelCenter, pixels)
+  def inTileRadius  (tiles: Int)  : Traversable[UnitInfo] = With.units.inTileRadius(tileIncludingCenter, tiles)
+  def inPixelRadius (pixels: Int) : Traversable[UnitInfo] = With.units.inPixelRadius(pixelCenter, pixels)
   
   ////////////
   // Combat //
   ////////////
   
-  def battle:Option[Battle] = With.battles.byUnit.get(this)
+  def battle: Option[Battle] = With.battles.byUnit.get(this)
   
-  def melee:Boolean = unitClass.maxAirGroundRange <= 32 * 2
+  def melee: Boolean = unitClass.maxAirGroundRange <= 32 * 2
   
   //TODO: Account for upgrades. Make sure to handle case where unit has no armor upgrades
   def armorHealth: Int = unitClass.armor // if (player.getUpgradeLevel(unitClass.armorUpgrade)
@@ -311,7 +311,7 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   // Visibility //
   ////////////////
   
-  def likelyStillThere:Boolean =
+  def likelyStillThere: Boolean =
     possiblyStillThere &&
     ( ! canMoveThisFrame || lastSeen + With.configuration.fogPositionDuration > With.frame || is(Terran.SiegeTankUnsieged))
   

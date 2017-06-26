@@ -22,14 +22,7 @@ class Zone(
   val area      : Double            = bwtaRegion.getPolygon.getArea
   val points    : Iterable[Pixel]   = bwtaRegion.getPolygon.getPoints.asScala.map(new Pixel(_)).toVector
   val island    : Boolean           = ! With.geography.startLocations.exists(startTile => With.paths.exists(centroid, startTile))
-  
-  val exit: Option[ZoneEdge]  =
-    if (edges.isEmpty)
-      None
-    else Some(edges.minBy(edge =>
-      With.geography.startLocations
-        .map(_.groundPixels(edge.centerPixel))
-        .max))
+  var exit      : Option[ZoneEdge]  = None
       
   var isWalledIn: Boolean = false
   

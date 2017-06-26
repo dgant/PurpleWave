@@ -15,5 +15,6 @@ object Fight extends Action {
     ProtectTheWeak.consider(state)
     Teamfight.consider(state)
     Pursue.consider(state)
+    Pillage.consider(state)
   }
 }

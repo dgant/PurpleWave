@@ -13,8 +13,6 @@ object Engage extends Action {
   
   override def perform(state: ActionState) {
     
-    // TODO: Avoid chasing distractions (make PURSUE the judge of that).
-    
     state.toTravel = state.unit.battle.map(_.enemy.centroid).orElse(state.toTravel)
     
     Brawl.consider(state)

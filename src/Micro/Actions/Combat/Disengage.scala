@@ -47,7 +47,7 @@ object Disengage extends Action {
         }
       }
       
-      HoverOutsideRange.consider(state)
+      HoverOutsideRange.delegate(state)
     }
   
     // If we're caught, we may be forced to fight

@@ -10,14 +10,13 @@ object Threats {
     With.units.inTileRadius(
       state.unit.tileIncludingCenter,
       With.configuration.battleMarginTiles)
-      .filter(threat => valid(state, threat))
+        .filter(threat => valid(state, threat))
     .toVector
   }
   
   def valid(state: ActionState, threat: UnitInfo): Boolean = {
     threat.likelyStillThere &&
-      With.frame - threat.lastSeen < 24 * 60 &&
-      threat.isEnemyOf(state.unit) &&
-      threat.canAttackThisSecond(state.unit)
+    threat.isEnemyOf(state.unit) &&
+    threat.canAttackThisSecond(state.unit)
   }
 }

@@ -91,8 +91,8 @@ object MapUnits {
     }
     
     if (unit.isBeingViolent) {
-      DrawMap.circle(Pixel(unit.pixelCenter.x, unit.top - 8), 6, unit.player.colorMedium, solid = true)
-      DrawMap.text(Pixel(unit.pixelCenter.x - 4, unit.top - 12), "!!")
+      DrawMap.circle(Pixel(unit.pixelCenter.x, unit.top - 7), 5, unit.player.colorMedium, solid = true)
+      DrawMap.text(Pixel(unit.pixelCenter.x - 2, unit.top - 12), "!!")
     }
     
     if (unit.is(Protoss.Scarab)) {

@@ -27,7 +27,7 @@ class Visualization {
   private var lastCycle = 0
   
   var cycle     = false
-  var screen    = true
+  var screen    = false
   var grids     = false
   var map       = true
   var happy     = false

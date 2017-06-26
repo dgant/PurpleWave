@@ -20,6 +20,15 @@ object ZoneBuilder {
   
     bases.foreach(base => base.zone.bases += base)
     edges.foreach(edge => edge.zones.foreach(zone => zone.edges += edge))
+    zones.foreach(zone =>
+      if (zone.edges.nonEmpty) {
+        zone.exit =
+          Some(zone.edges.minBy(edge =>
+            With.geography.startLocations
+              .map(_.groundPixels(edge.centerPixel))
+              .max))
+    })
+    
     ensureAllTilesAreAssignedToAZone(zones)
     
     zones
@@ -46,7 +55,7 @@ object ZoneBuilder {
       .add(tile)
   }
   
-  def buildZone(region: Region):Zone = {
+  def buildZone(region: Region): Zone = {
     val polygon = region.getPolygon
     val tileArea = TileRectangle(
       Pixel(

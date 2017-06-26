@@ -146,10 +146,14 @@ class Architect {
     }
     else {
       shuffle(
-        With.geography.bases
+        With.geography.ourBases
+          .flatMap(_.zone.tiles)
+          .toList) ++
+      shuffle(
+        With.geography.zones
+          .filter(zone => zone.owner.isNeutral && With.geography.ourBases.exists(ourBase => ourBase.heart.groundPixels(zone.centroid) < 32.0 * 50.0))
           .toList
-          .filterNot(_.owner.isEnemy)
-          .flatMap(_.zone.tiles))
+          .flatMap(_.tiles))
     }
   }
   

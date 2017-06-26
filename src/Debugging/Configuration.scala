@@ -34,7 +34,7 @@ class Configuration {
   // Macro //
   ///////////
   
-  var maxBuildingPlacementCandidates  = 1000
+  var maxBuildingPlacementCandidates  = 3000
   var maxMineralsBeforeMinedOut       = 300 * 8
   var maxFramesToSendAdvanceBuilder   = 24 * 20
   var maxFramesToTrustBuildRequest    = 24 * 60 * 10

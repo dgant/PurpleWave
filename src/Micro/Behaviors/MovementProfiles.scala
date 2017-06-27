@@ -8,7 +8,7 @@ object MovementProfiles {
     preferDestination     = 1.0,
     preferOrigin          = 0.3,
     preferMobility        = 0.4,
-    preferTarget          = 0.2,
+    preferTarget          = 0.1,
     preferTargetValue     = 0.1,
     avoidTraffic          = 0.3,
     avoidExplosions       = 8.0,
@@ -23,7 +23,7 @@ object MovementProfiles {
   }
   
   def safelyAttackTarget = new MovementProfile(default) {
-    preferTarget          += 2.0
+    preferTarget          += 0.5
     avoidExplosions       += 1.0
     avoidDamage           += 1.0
   }

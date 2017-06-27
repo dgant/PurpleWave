@@ -6,23 +6,23 @@ object PlacementProfiles {
   
   val pylon = new PlacementProfile(
     "Pylon",
-    preferZone          = 3.0,
+    preferZone          = 4.0,
     preferExit          = 1.0,
     preferGas           = 0.0,
     preferSpace         = 0.25,
-    preferPowering      = 3.0,
-    preferEnemyDistance = 0.25,
-    avoidDistance       = 1.0
+    preferPowering      = 1.0,
+    preferEnemyDistance = 0.0,
+    avoidDistance       = 0.5
   )
   
   val factory = new PlacementProfile(
     "Factory",
     preferZone          = 1.0,
-    preferExit          = 2.0,
+    preferExit          = 4.0,
     preferGas           = 0.0,
-    preferSpace         = 1.0,
+    preferSpace         = 0.5,
     preferPowering      = 0.0,
-    preferEnemyDistance = 0.25,
+    preferEnemyDistance = 0.0,
     avoidDistance       = 0.25
   )
   

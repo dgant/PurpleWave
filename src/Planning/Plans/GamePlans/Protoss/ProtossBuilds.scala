@@ -117,7 +117,7 @@ object ProtossBuilds {
     RequestUnitAtLeast(6,   Protoss.Dragoon)
   )
   
-  val Opening13Nexus_NoZealot = Vector[BuildRequest] (
+  val Opening13Nexus_NoZealot_TwoGateways = Vector[BuildRequest] (
     RequestUnitAtLeast(1,   Protoss.Nexus),
     RequestUnitAtLeast(8,   Protoss.Probe),
     RequestUnitAtLeast(1,   Protoss.Pylon),
@@ -140,6 +140,20 @@ object ProtossBuilds {
     RequestUnitAtLeast(4,   Protoss.Dragoon),
     RequestUnitAtLeast(23,  Protoss.Probe),
     RequestUnitAtLeast(3,   Protoss.Pylon)
+  )
+  
+  val Opening13Nexus_NoZealot_OneGateway_EarlyThird = Vector[BuildRequest] (
+    RequestUnitAtLeast(1,   Protoss.Nexus),
+    RequestUnitAtLeast(8,   Protoss.Probe),
+    RequestUnitAtLeast(1,   Protoss.Pylon),
+    RequestUnitAtLeast(13,  Protoss.Probe),
+    RequestUnitAtLeast(2,   Protoss.Nexus),
+    RequestUnitAtLeast(14,  Protoss.Probe),
+    RequestUnitAtLeast(1,   Protoss.Gateway),
+    RequestUnitAtLeast(15,  Protoss.Probe),
+    RequestUnitAtLeast(1,   Protoss.Assimilator),
+    RequestUnitAtLeast(17,  Protoss.Probe),
+    RequestUnitAtLeast(1,   Protoss.CyberneticsCore)
   )
   
   val TechDragoons = Vector[BuildRequest] (

@@ -9,7 +9,11 @@ object PlacementHeuristicExit extends PlacementHeuristic {
   override def evaluate(state: BuildingDescriptor, candidate: Tile): Double = {
     
     candidate.zone.exit
-      .map(exit => exit.centerPixel.midpoint(candidate.zone.centroid.pixelCenter).pixelDistanceFast(candidate.pixelCenter))
+      .map(exit => {
+        val distance = candidate.pixelCenter.pixelDistanceFast(exit.centerPixel)
+        
+        exit.centerPixel.midpoint(candidate.zone.centroid.pixelCenter).pixelDistanceFast(candidate.pixelCenter)
+      })
       .getOrElse(HeuristicMathMultiplicative.default)
   }
 }

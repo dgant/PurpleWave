@@ -63,7 +63,7 @@ class Commander {
     if (unready(unit)) return
     
     if (unit.is(Protoss.Carrier)) {
-      tryCarrierAttack(unit, target)
+      //tryCarrierAttack(unit, target)
       if (unready(unit)) return
     }
     

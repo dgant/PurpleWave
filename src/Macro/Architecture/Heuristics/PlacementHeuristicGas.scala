@@ -8,7 +8,8 @@ object PlacementHeuristicGas extends PlacementHeuristic {
   
   override def evaluate(state: BuildingDescriptor, candidate: Tile): Double = {
     
-    HeuristicMathMultiplicative.fromBoolean(candidate.zone.bases.exists(_.gas.nonEmpty))
+    HeuristicMathMultiplicative.fromBoolean(
+      candidate.zone.bases.exists(_.gas.nonEmpty))
     
   }
 }

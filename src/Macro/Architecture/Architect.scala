@@ -141,7 +141,7 @@ class Architect {
     }
     else if (buildingDescriptor.gas) {
       With.geography.bases
-        .filter(_.owner.isUs)
+        .filter(_.townHall.exists(_.player.isUs))
         .flatMap(_.gas.map(_.tileTopLeft))
     }
     else {

@@ -11,8 +11,8 @@ object MovementProfiles {
     preferTarget          = 0.2,
     preferTargetValue     = 0.1,
     avoidTraffic          = 0.3,
-    avoidExplosions       = 4.0,
-    avoidDamage           = 4.0,
+    avoidExplosions       = 8.0,
+    avoidDamage           = 5.0,
     avoidShovers          = 3.0)
   
   def smash = new MovementProfile(default) {

@@ -8,7 +8,9 @@ object PlacementHeuristicEnemy extends PlacementHeuristic {
   
   override def evaluate(state: BuildingDescriptor, candidate: Tile): Double = {
   
-    candidate.groundPixels(With.intelligence.mostBaselikeEnemyTile)
-    
+    if (With.geography.enemyBases.isEmpty)
+      candidate.groundPixels(With.intelligence.mostBaselikeEnemyTile)
+    else
+      With.geography.enemyBases.map(_.heart.groundPixels(candidate)).min
   }
 }

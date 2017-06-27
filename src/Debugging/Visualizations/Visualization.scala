@@ -27,10 +27,10 @@ class Visualization {
   private var lastCycle = 0
   
   var enabled   = false
-  var cycle     = false
-  var screen    = false
+  var cycle     = true
+  var screen    = true
   var grids     = false
-  var map       = false
+  var map       = true
   var happy     = false
   var textOnly  = false
   

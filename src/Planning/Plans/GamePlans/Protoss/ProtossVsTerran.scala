@@ -15,10 +15,13 @@ class ProtossVsTerran extends Parallel {
   description.set("Protoss vs Terran")
   
   private val lateGame = Vector[BuildRequest] (
-    RequestUnitAtLeast(4,   Protoss.Gateway),
+    RequestUnitAtLeast(1,   Protoss.RoboticsFacility),
     RequestUnitAtLeast(1,   Protoss.CitadelOfAdun),
-    RequestUnitAtLeast(1,   Protoss.Forge),
+    RequestUnitAtLeast(1,   Protoss.Observatory),
     RequestUpgradeLevel(    Protoss.ZealotSpeed,      1),
+    RequestUpgradeLevel(    Protoss.ObserverSpeed,    1),
+    RequestUnitAtLeast(4,   Protoss.Gateway),
+    RequestUnitAtLeast(1,   Protoss.Forge),
     RequestUpgradeLevel(    Protoss.GroundDamage,     1),
     RequestUnitAtLeast(14,   Protoss.Gateway)
   )
@@ -38,6 +41,7 @@ class ProtossVsTerran extends Parallel {
     new ProtossVsTerranIdeas.RespondToBioWithReavers,
     new ConsiderTakingFourthBase,
     new TrainContinuously(Protoss.Reaver, 2),
+    new TrainContinuously(Protoss.Observer, 3),
     new ProtossVsTerranIdeas.BuildDragoonsUntilWeHaveZealotSpeed,
     new RequireMiningBases(2),
     new Build(RequestUpgradeLevel(Protoss.DragoonRange, 1)),

@@ -1,7 +1,8 @@
 package Planning.Plans.GamePlans.Protoss
 
+import Lifecycle.With
 import Planning.Composition.UnitMatchers.UnitMatchType
-import Planning.Plans.Compound.{And, If}
+import Planning.Plans.Compound.{And, Check, If, Or}
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Milestones.{HaveUpgrade, UnitsAtLeast}
@@ -22,9 +23,11 @@ object ProtossVsTerranIdeas {
   
   class BuildDragoonsUntilWeHaveZealotSpeed extends If(
     new And(
-      new HaveUpgrade(Protoss.ZealotSpeed),
-      new UnitsAtLeast(12, UnitMatchType(Protoss.Dragoon))),
+      new HaveUpgrade(Protoss.ZealotSpeed, Protoss.Zealot.buildFrames),
+      new Or(
+        new UnitsAtLeast(12, UnitMatchType(Protoss.Dragoon)),
+        new Check(() => With.self.minerals > With.self.gas * 4)),
     new TrainContinuously(Protoss.Zealot),
     new TrainContinuously(Protoss.Dragoon)
-  )
+  ))
 }

@@ -82,7 +82,7 @@ class ProtossVsProtoss extends Parallel {
   
   private class BuildDragoonsorZealotsWithLegSpeed extends If(
     new And(
-      new HaveUpgrade(Protoss.ZealotSpeed),
+      new HaveUpgrade(Protoss.ZealotSpeed, Protoss.Zealot.buildFrames),
       new UnitsAtLeast(12, UnitMatchType(Protoss.Dragoon))),
     new TrainContinuously(Protoss.Zealot),
     new TrainContinuously(Protoss.Dragoon)
@@ -91,7 +91,7 @@ class ProtossVsProtoss extends Parallel {
   private class AttackWithDragoonRange extends If(
     new And(
       new UnitsAtLeast(8, UnitMatchType(Protoss.Dragoon)),
-      new HaveUpgrade(Protoss.DragoonRange)),
+      new HaveUpgrade(Protoss.DragoonRange, 24 * 30)),
     new ConsiderAttacking
   )
   

@@ -22,10 +22,7 @@ class ProtossVsTerran extends Parallel {
       RequestUnitAtLeast(1,   Protoss.CitadelOfAdun),
       RequestUnitAtLeast(1,   Protoss.Observatory),
       RequestUpgradeLevel(    Protoss.ZealotSpeed,      1),
-      RequestUpgradeLevel(    Protoss.ObserverSpeed,    1),
       RequestUnitAtLeast(4,   Protoss.Gateway),
-      RequestUnitAtLeast(1,   Protoss.Forge),
-      RequestUpgradeLevel(    Protoss.GroundDamage,     1),
       RequestUnitAtLeast(8,   Protoss.Gateway),
       RequestUnitAtLeast(10,  Protoss.Gateway),
       RequestUnitAtLeast(14,  Protoss.Gateway)
@@ -36,6 +33,12 @@ class ProtossVsTerran extends Parallel {
       RequestUnitAtLeast(1,   Protoss.TemplarArchives),
       RequestUnitAtLeast(1,   Protoss.Stargate),
       RequestUnitAtLeast(1,   Protoss.ArbiterTribunal)
+    ))
+  
+  private class OnThreeBases_WeaponsUpgrades extends OnMiningBases(3,
+    new Build(
+      RequestUnitAtLeast(1,   Protoss.Forge),
+      RequestUpgradeLevel(    Protoss.GroundDamage,     1)
     ))
   
   private class ConsiderTakingFourthBase extends If(
@@ -58,12 +61,12 @@ class ProtossVsTerran extends Parallel {
     new TrainContinuously(Protoss.Arbiter, 3),
     new ProtossVsTerranIdeas.BuildDragoonsUntilWeHaveZealotSpeed,
     new Build(RequestUpgradeLevel(Protoss.DragoonRange, 1)),
-    new Build(RequestUnitAtLeast(2,   Protoss.Gateway)),
+    new Build(RequestUnitAtLeast(2, Protoss.Gateway)),
     new RequireMiningBases(3),
-    new Build(RequestUnitAtLeast(3,   Protoss.Gateway)),
     new BuildAssimilators,
     new OnThreeBases_SpeedlotsAndObservers,
     new OnThreeGas_Arbiters,
+    new OnThreeBases_WeaponsUpgrades,
     new OnMiningBases(4, new Build(RequestUnitAtLeast(14, Protoss.Gateway))),
     new RequireMiningBases(4),
     new ScoutAt(14),

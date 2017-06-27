@@ -16,6 +16,7 @@ class RemoveMineralBlocks extends Plan {
   val miners = new Property[LockUnits](new LockUnits)
   miners.get.unitMatcher.set(UnitMatchWorker)
   miners.get.unitCounter.set(UnitCountOne)
+  miners.get.interruptable.set(false)
   
   override def onUpdate() {
     val ourEdges = With.geography.ourZones.flatten(_.edges)

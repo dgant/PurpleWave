@@ -12,6 +12,7 @@ import scala.collection.mutable
 
 class LockUnits extends ResourceLock {
   
+  var interruptable   = new Property[Boolean](true)
   val unitMatcher     = new Property[UnitMatcher](UnitMatchAnything)
   val unitPreference  = new Property[UnitPreference](UnitPreferAnything)
   val unitCounter     = new Property[UnitCounter](UnitCountEverything)

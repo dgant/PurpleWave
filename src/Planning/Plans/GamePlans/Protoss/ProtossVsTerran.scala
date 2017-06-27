@@ -23,7 +23,12 @@ class ProtossVsTerran extends Parallel {
     RequestUnitAtLeast(4,   Protoss.Gateway),
     RequestUnitAtLeast(1,   Protoss.Forge),
     RequestUpgradeLevel(    Protoss.GroundDamage,     1),
-    RequestUnitAtLeast(14,   Protoss.Gateway)
+    RequestUnitAtLeast(8,   Protoss.Gateway),
+    RequestUnitAtLeast(1,   Protoss.TemplarArchives),
+    RequestUnitAtLeast(1,   Protoss.Stargate),
+    RequestUnitAtLeast(10,  Protoss.Gateway),
+    RequestUnitAtLeast(1,   Protoss.ArbiterTribunal),
+    RequestUnitAtLeast(14,  Protoss.Gateway)
   )
   
   private class ConsiderTakingFourthBase extends IfThenElse(
@@ -42,6 +47,7 @@ class ProtossVsTerran extends Parallel {
     new ConsiderTakingFourthBase,
     new TrainContinuously(Protoss.Reaver, 2),
     new TrainContinuously(Protoss.Observer, 3),
+    new TrainContinuously(Protoss.Arbiter, 3),
     new ProtossVsTerranIdeas.BuildDragoonsUntilWeHaveZealotSpeed,
     new RequireMiningBases(2),
     new Build(RequestUpgradeLevel(Protoss.DragoonRange, 1)),

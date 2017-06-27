@@ -70,8 +70,8 @@ class ProtossVsTerran extends Parallel {
   
   private class TakeFourthBase extends IfThenElse(
     new Or(
-      new UnitsAtLeast(5, UnitMatchType(Protoss.Dragoon)),
-      new UnitsAtLeast(1, UnitMatchType(Protoss.Reaver)),
+      new UnitsAtLeast(20, UnitMatchType(Protoss.Dragoon)),
+      new UnitsAtLeast(2, UnitMatchType(Protoss.Reaver)),
       new UnitsAtLeast(6, UnitMatchType(Protoss.Carrier))
     ),
     new RequireMiningBases(4)
@@ -101,7 +101,8 @@ class ProtossVsTerran extends Parallel {
   
   children.set(Vector(
     new RequireMiningBases(1),
-    new Build(ProtossBuilds.OpeningTwoGate1015Dragoons),
+    //new Build(ProtossBuilds.OpeningTwoGate1015Dragoons),
+    new Build(ProtossBuilds.Opening13Nexus_NoZealot),
     new RequireSufficientPylons,
     new TrainProbesContinuously,
     new BuildAssimilators,
@@ -116,7 +117,7 @@ class ProtossVsTerran extends Parallel {
     new TrainContinuously(Protoss.Carrier),
     new BuildDragoonsUntilWeHaveZealotSpeed,
     new Build(lateGameCarriers),
-    new ScoutAt(10),
+    new ScoutAt(14),
     new ControlMap,
     new TimingAttacks
   ))

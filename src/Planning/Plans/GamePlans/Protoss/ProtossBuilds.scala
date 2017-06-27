@@ -108,13 +108,38 @@ object ProtossBuilds {
     RequestUnitAtLeast(19,  Protoss.Probe),
     RequestUnitAtLeast(2,   Protoss.Pylon),
     RequestUnitAtLeast(2,   Protoss.Dragoon),
-    RequestUpgradeLevel(         Protoss.DragoonRange),
+    RequestUpgradeLevel(    Protoss.DragoonRange),
     RequestUnitAtLeast(21,  Protoss.Probe),
     RequestUnitAtLeast(3,   Protoss.Pylon),
     RequestUnitAtLeast(4,   Protoss.Dragoon),
     RequestUnitAtLeast(23,  Protoss.Probe),
     RequestUnitAtLeast(3,   Protoss.Pylon),
     RequestUnitAtLeast(6,   Protoss.Dragoon)
+  )
+  
+  val Opening13Nexus_NoZealot = Vector[BuildRequest] (
+    RequestUnitAtLeast(1,   Protoss.Nexus),
+    RequestUnitAtLeast(8,   Protoss.Probe),
+    RequestUnitAtLeast(1,   Protoss.Pylon),
+    RequestUnitAtLeast(13,  Protoss.Probe),
+    RequestUnitAtLeast(2,   Protoss.Nexus),
+    RequestUnitAtLeast(14,  Protoss.Probe),
+    RequestUnitAtLeast(1,   Protoss.Gateway),
+    RequestUnitAtLeast(15,  Protoss.Probe),
+    RequestUnitAtLeast(1,   Protoss.Assimilator),
+    RequestUnitAtLeast(17,  Protoss.Probe),
+    RequestUnitAtLeast(1,   Protoss.CyberneticsCore),
+    RequestUnitAtLeast(2,   Protoss.Gateway),
+    //Normally would get Zealot here
+    RequestUnitAtLeast(19,  Protoss.Probe),
+    RequestUnitAtLeast(2,   Protoss.Pylon),
+    RequestUnitAtLeast(2,   Protoss.Dragoon),
+    RequestUpgradeLevel(    Protoss.DragoonRange),
+    RequestUnitAtLeast(21,  Protoss.Probe),
+    RequestUnitAtLeast(3,   Protoss.Pylon),
+    RequestUnitAtLeast(4,   Protoss.Dragoon),
+    RequestUnitAtLeast(23,  Protoss.Probe),
+    RequestUnitAtLeast(3,   Protoss.Pylon)
   )
   
   val TechDragoons = Vector[BuildRequest] (

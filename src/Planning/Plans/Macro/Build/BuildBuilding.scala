@@ -98,7 +98,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
     val proposedBuilders = builderLock.inquire(this)
     proposedBuilders.exists(
       _.exists(someBuilder =>
-        Math.max(With.configuration.maxFramesToSendAdvanceBuilder, someBuilder.framesToTravel(desiredTile.get.pixelCenter)) >=
+        Math.min(With.configuration.maxFramesToSendAdvanceBuilder, someBuilder.framesToTravel(desiredTile.get.pixelCenter)) >=
         currencyLock.expectedFrames))
   }
   

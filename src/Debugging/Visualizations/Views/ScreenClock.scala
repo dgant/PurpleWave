@@ -9,7 +9,7 @@ object ScreenClock {
     val minutes = totalSeconds / 60
     val seconds = totalSeconds % 60
     val clock = minutes + ":" + "%02d".format(seconds)
-    With.game.drawTextScreen(380, 5, clock)
-    With.game.drawTextScreen(410, 5, With.frame.toString)
+    With.game.drawTextScreen(375, 5, clock)
+    With.game.drawTextScreen(405, 5, With.frame.toString)
   }
 }

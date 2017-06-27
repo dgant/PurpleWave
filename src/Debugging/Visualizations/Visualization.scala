@@ -30,7 +30,7 @@ class Visualization {
   var cycle     = false
   var screen    = false
   var grids     = false
-  var map       = true
+  var map       = false
   var happy     = false
   var textOnly  = false
   

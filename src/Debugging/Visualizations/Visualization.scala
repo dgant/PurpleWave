@@ -59,7 +59,6 @@ class Visualization {
       if (map) {
         MapChokepoints.render()
         MapBases.render()
-        VisualizeArchitecture.render()
         if (grids) {
           MapGrids.render()
         }

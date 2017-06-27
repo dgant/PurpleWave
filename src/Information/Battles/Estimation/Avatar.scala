@@ -4,6 +4,7 @@ import Lifecycle.With
 import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
 import ProxyBwapi.Engine.Damage
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.DamageType
 
@@ -39,11 +40,20 @@ class Avatar {
     nearestEnemy : Option[Pixel] = None) {
     
     this()
+  
+    val splashFactor =
+      if(unit.is(Terran.SiegeTankSieged) || unit.is(Protoss.Reaver) || unit.is(Zerg.Lurker))
+        2.5
+      else if(unit.is(Terran.Valkyrie) || unit.is(Protoss.Corsair) || unit.is(Zerg.Mutalisk))
+        1.5
+      else
+        1.0
     
+    val range         = unit.pixelRangeMax + 64.0
     val pixelsAway    = if (nearestEnemy.isDefined) unit.pixelDistanceFast(nearestEnemy.get) else With.configuration.abstractBattleDistancePixels
-    val framesAway    = PurpleMath.nanToInfinity(Math.max(0.0, pixelsAway - unit.pixelRangeMax) / unit.topSpeed)
+    val framesAway    = if (pixelsAway <= range) 0.0 else PurpleMath.nanToInfinity(Math.max(0.0, pixelsAway - range) / unit.topSpeed)
     val framesTotal   = With.configuration.battleEstimationFrames
-    val effectiveness = Math.max(0.0, (framesTotal - framesAway) / framesTotal)
+    val effectiveness = splashFactor * Math.max(0.0, (framesTotal - framesAway) / framesTotal)
     
     vulnerabilityGroundConcussive   = if (   unit.flying) 0.0 else Damage.scaleBySize(DamageType.Concussive, unit.unitClass.size)
     vulnerabilityGroundExplosive    = if (   unit.flying) 0.0 else Damage.scaleBySize(DamageType.Explosive,  unit.unitClass.size)

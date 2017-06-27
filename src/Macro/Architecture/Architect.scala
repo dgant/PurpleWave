@@ -136,7 +136,7 @@ class Architect {
     
     if (buildingDescriptor.townHall) {
       With.geography.bases
-        .filterNot(_.owner.isEnemy)
+        .filterNot(base => base.owner.isEnemy || base.zone.island)
         .map(_.townHallArea.startInclusive)
     }
     else if (buildingDescriptor.gas) {
@@ -151,7 +151,10 @@ class Architect {
           .toList) ++
       shuffle(
         With.geography.zones
-          .filter(zone => zone.owner.isNeutral && With.geography.ourBases.exists(ourBase => ourBase.heart.groundPixels(zone.centroid) < 32.0 * 50.0))
+          .filter(zone =>
+            ! zone.island
+            && zone.owner.isNeutral
+            && With.geography.ourBases.exists(ourBase => ourBase.heart.groundPixels(zone.centroid) < 32.0 * 50.0))
           .toList
           .flatMap(_.tiles))
     }

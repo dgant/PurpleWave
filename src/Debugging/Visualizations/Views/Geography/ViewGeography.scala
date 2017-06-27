@@ -6,5 +6,6 @@ object ViewGeography extends View {
   
   def render() {
     ScreenGroundskeeper.render()
+    VisualizeArchitecture.render()
   }
 }

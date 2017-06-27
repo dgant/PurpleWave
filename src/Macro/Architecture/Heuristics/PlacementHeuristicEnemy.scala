@@ -11,6 +11,6 @@ object PlacementHeuristicEnemy extends PlacementHeuristic {
     if (With.geography.enemyBases.isEmpty)
       candidate.groundPixels(With.intelligence.mostBaselikeEnemyTile)
     else
-      With.geography.enemyBases.map(_.heart.groundPixels(candidate)).min
+      With.geography.enemyBases.map(_.townHallArea.midpoint.groundPixels(candidate)).min
   }
 }

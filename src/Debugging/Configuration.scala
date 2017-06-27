@@ -20,7 +20,7 @@ class Configuration {
   var violenceFrameThreshold          = 24
   var enableYolo                      = true
   var enablePathRecalculation         = true
-  var enableMineralWalkInSameZone     = true
+  var enableMineralWalkInSameZone     = false // Tends to lead to stuck builders
   var pathRecalculationDelayFrames    = 48
   var woundedThresholdHealth          = 40
   var evaluateDangerousBases          = false
@@ -66,7 +66,7 @@ class Configuration {
   var urgencyManners            = 1
   var urgencyEconomy            = 1
   var urgencyGeography          = 1
-  var urgencyBuildingPlacement  = 2
+  var urgencyBuildingPlacement  = 1
   var urgencyPlanning           = 2
   var urgencyBattles            = 3
   var urgencyGrids              = 5

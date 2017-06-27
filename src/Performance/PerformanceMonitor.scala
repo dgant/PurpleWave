@@ -50,11 +50,11 @@ class PerformanceMonitor {
     Math.max(0, System.currentTimeMillis - millisecondsBefore)
   }
   
-  def continueRunning:Boolean = {
+  def continueRunning: Boolean = {
     millisecondsLeftThisFrame > 1
   }
   
-  def overrunning:Boolean = {
+  def violation: Boolean = {
     millisecondsSpentThisFrame >= 50
   }
   

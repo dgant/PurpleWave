@@ -15,7 +15,7 @@ object KeyboardCommands {
       case "vt"   => With.visualization.textOnly    = ! With.visualization.textOnly
       case "vg"   => With.visualization.grids       = ! With.visualization.grids
 
-      case "\\"   => With.visualization.forceCycle()
+      case "\\"   => With.visualization.enabled = true; With.visualization.screen = true; With.visualization.map = true; With.visualization.forceCycle()
       case "1"    => With.game.setLocalSpeed(1000)  ; With.configuration.camera = false
       case "2"    => With.game.setLocalSpeed(60)    ; With.configuration.camera = false
       case "3"    => With.game.setLocalSpeed(30)    ; With.configuration.camera = false

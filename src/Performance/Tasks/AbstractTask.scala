@@ -23,7 +23,7 @@ abstract class AbstractTask {
   final def framesSinceRunning = Math.max(1, With.frame - lastRunFrame)
   final def totalRuns = totalRunCount
   final def totalSkips = totalSkipCount
-  final def totalOverruns = overruns
+  final def totalCutoffs = overruns
   
   final def run() {
     val millisecondsBefore = System.nanoTime() / 1000000
@@ -46,21 +46,21 @@ abstract class AbstractTask {
     while (runtimeMilliseconds.size > runtimesToTrack) {
       runtimeMilliseconds.dequeue()
     }
-    if (With.performance.overrunning) {
+    if (With.performance.violation) {
       overruns += 1
     }
   }
   
-  final def runMillisecondsMaxRecent:Long = {
+  final def runMillisecondsMaxRecent: Long = {
     if (runtimeMilliseconds.isEmpty) return 0
     runtimeMilliseconds.max
   }
   
-  final def runMillisecondsMaxAllTime:Long = {
+  final def runMillisecondsMaxAllTime: Long = {
     maxMillisecondsEver
   }
   
-  final def runMillisecondsMean:Long = {
+  final def runMillisecondsMean: Long = {
     if (runtimeMilliseconds.isEmpty) return 0
     runtimeMilliseconds.sum / runtimeMilliseconds.size
   }

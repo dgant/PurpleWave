@@ -11,8 +11,8 @@ object ScreenPerformance {
     DrawScreen.header(275, With.performance.maxFrameMilliseconds  + "ms max")
     DrawScreen.header(350, With.performance.cacheLength(1)        + " cache duration")
     With.game.drawTextScreen(5,   290, "+55ms:    " + With.performance.framesOver55 + "/200")
-    With.game.drawTextScreen(80,  290, "+1000ms:  " + With.performance.framesOver1000 + "/10")
-    With.game.drawTextScreen(155, 290, "+10000ms: " + With.performance.framesOver10000 + "/2")
+    With.game.drawTextScreen(100,  290, "+1000ms:  " + With.performance.framesOver1000 + "/10")
+    With.game.drawTextScreen(195, 290, "+10000ms: " + With.performance.framesOver10000 + "/2")
     if (With.performance.disqualified) {
       With.game.setTextSize(bwapi.Text.Size.Enum.Large)
       With.game.drawTextScreen(5, 260, "Limits exceeded")
@@ -24,7 +24,7 @@ object ScreenPerformance {
   
   def renderDetails() {
     val title = Vector("Cutoff: ", With.configuration.peformanceFrameMilliseconds + "ms")
-    val headers = Vector("System", "Last run", "Total runs", "Total skips", "Avg ms", "Max (Recent)", "Max (All time)", "Overruns")
+    val headers = Vector("System", "Last run", "Total runs", "Total skips", "Avg ms", "Max (Recent)", "Max (All time)", "Violations")
     val body = With.tasks.tasks
       .sortBy(_.getClass.getSimpleName + "  ")
       .map(task => Vector(
@@ -35,7 +35,7 @@ object ScreenPerformance {
         task.runMillisecondsMean.toString,
         task.runMillisecondsMaxRecent.toString,
         task.runMillisecondsMaxAllTime.toString,
-        task.totalOverruns.toString
+        task.totalCutoffs.toString
       ))
     DrawScreen.table(5, With.visualization.lineHeightSmall * 2, Vector(title) ++ Vector(headers) ++ body)
   }

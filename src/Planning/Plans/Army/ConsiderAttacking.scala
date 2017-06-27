@@ -8,6 +8,5 @@ class ConsiderAttacking
   extends IfThenElse(
     new If(() =>
       Yolo.active
-      || With.battles.global.estimationAbstract.weGainValue
-      || With.battles.global.estimationAbstract.weSurvive),
+      || With.battles.global.estimationAbstract.weGainValue),
     new Attack)

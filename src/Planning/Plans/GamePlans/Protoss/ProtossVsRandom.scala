@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Protoss
 import Macro.BuildRequests.{BuildRequest, RequestUnitAtLeast}
 import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Plans.Army.{ConsiderAttacking, DefendChokes}
-import Planning.Plans.Compound.{IfThenElse, Parallel}
+import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.Information.ScoutAt
 import Planning.Plans.Macro.Automatic.{RequireSufficientPylons, TrainGatewayUnitsContinuously, TrainProbesContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
@@ -22,15 +22,15 @@ class ProtossVsRandom extends Parallel {
   )
   
   children.set(Vector(
-    new Build(ProtossBuilds.OpeningTwoGate1012),
-    new IfThenElse(
+    new Build(ProtossBuilds.OpeningTwoGate1012: _*),
+    new If(
       new UnitsExactly(0, UnitMatchType(Protoss.CyberneticsCore)),
-      new Build(ProtossBuilds.OpeningTwoGate1012Zealots)
+      new Build(ProtossBuilds.OpeningTwoGate1012Zealots: _*)
     ),
     new RequireSufficientPylons,
     new TrainProbesContinuously,
     new TrainGatewayUnitsContinuously,
-    new Build(safeBuild),
+    new Build(safeBuild: _*),
     new ScoutAt(7),
     new ConsiderAttacking,
     new DefendChokes

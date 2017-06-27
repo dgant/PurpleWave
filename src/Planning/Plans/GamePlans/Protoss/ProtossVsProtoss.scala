@@ -3,21 +3,18 @@ package Planning.Plans.GamePlans.Protoss
 import Macro.BuildRequests.{RequestUnitAtLeast, _}
 import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Plans.Army.ConsiderAttacking
-import Planning.Plans.Compound.{And, IfThenElse, Or, Parallel}
+import Planning.Plans.Compound.{And, If, Or, Parallel}
 import Planning.Plans.Information.{ScoutAt, ScoutExpansionsAt}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
+import Planning.Plans.Macro.Expanding.{MatchMiningBases, RequireMiningBases}
+import Planning.Plans.Macro.Gas.BuildAssimilators
 import Planning.Plans.Macro.Milestones.{EnemyUnitsAtLeast, HaveUpgrade, UnitsAtLeast}
 import ProxyBwapi.Races.Protoss
 
 class ProtossVsProtoss extends Parallel {
   
   description.set("Protoss vs Protoss")
-  
-  private val _secondGateway = Vector[BuildRequest] (
-    RequestUnitAtLeast(2, Protoss.Gateway)
-  )
-  
   private val _lateGame = Vector[BuildRequest] (
     RequestUnitAtLeast(1,   Protoss.RoboticsFacility),
     RequestUnitAtLeast(1,   Protoss.RoboticsSupportBay),
@@ -30,7 +27,7 @@ class ProtossVsProtoss extends Parallel {
     RequestUnitAtLeast(10,  Protoss.Gateway)
   )
   
-  private class MakeEmergencyUnits extends IfThenElse(
+  private class MakeEmergencyUnits extends If(
     new And(
       new UnitsAtLeast(1, UnitMatchType(Protoss.Probe)),
       new UnitsAtLeast(1, UnitMatchType(Protoss.Assimilator)),
@@ -43,7 +40,7 @@ class ProtossVsProtoss extends Parallel {
     )
   ) { description.set("Make emergency units")}
   
-  private class ExpandAgainstCannons extends IfThenElse(
+  private class ExpandAgainstCannons extends If(
     new Or(
       new EnemyUnitsAtLeast(1, UnitMatchType(Protoss.PhotonCannon)),
       new EnemyUnitsAtLeast(1, UnitMatchType(Protoss.Forge))
@@ -51,7 +48,7 @@ class ProtossVsProtoss extends Parallel {
     new RequireMiningBases(2)
   ) { description.set("Expand against cannons")}
   
-  private class TakeNatural extends IfThenElse(
+  private class TakeNatural extends If(
     new Or(
       new UnitsAtLeast(6, UnitMatchType(Protoss.Dragoon)),
       new UnitsAtLeast(1, UnitMatchType(Protoss.Reaver))
@@ -62,7 +59,7 @@ class ProtossVsProtoss extends Parallel {
     )
   ) { description.set("Take our natural when safe")}
   
-  private class TakeThirdBase extends IfThenElse(
+  private class TakeThirdBase extends If(
     new And(
       new UnitsAtLeast(8, UnitMatchType(Protoss.Dragoon)),
       new UnitsAtLeast(2, UnitMatchType(Protoss.Reaver))
@@ -70,7 +67,7 @@ class ProtossVsProtoss extends Parallel {
     new RequireMiningBases(3)
   ) { description.set("Take our third base when safe")}
   
-  private class TakeFourthBase extends IfThenElse(
+  private class TakeFourthBase extends If(
     new And(
       new UnitsAtLeast(15, UnitMatchType(Protoss.Dragoon)),
       new UnitsAtLeast(3, UnitMatchType(Protoss.Reaver))
@@ -78,12 +75,12 @@ class ProtossVsProtoss extends Parallel {
     new RequireMiningBases(4)
   ) { description.set("Take our fourth base when safe")}
   
-  private class UpgradeScarabDamage extends IfThenElse(
+  private class UpgradeScarabDamage extends If(
       new UnitsAtLeast(2, UnitMatchType(Protoss.Reaver)),
       new Build(RequestUpgradeLevel(Protoss.ScarabDamage))
   )  { description.set("Upgrade Scarab damage")}
   
-  private class BuildDragoonsorZealotsWithLegSpeed extends IfThenElse(
+  private class BuildDragoonsorZealotsWithLegSpeed extends If(
     new And(
       new HaveUpgrade(Protoss.ZealotSpeed),
       new UnitsAtLeast(12, UnitMatchType(Protoss.Dragoon))),
@@ -91,7 +88,7 @@ class ProtossVsProtoss extends Parallel {
     new TrainContinuously(Protoss.Dragoon)
   )
   
-  private class AttackWithDragoonRange extends IfThenElse(
+  private class AttackWithDragoonRange extends If(
     new And(
       new UnitsAtLeast(8, UnitMatchType(Protoss.Dragoon)),
       new HaveUpgrade(Protoss.DragoonRange)),
@@ -100,7 +97,7 @@ class ProtossVsProtoss extends Parallel {
   
   children.set(Vector(
     new MakeEmergencyUnits,
-    new Build(ProtossBuilds.OpeningOneGateCore_DragoonFirst),
+    new Build(ProtossBuilds.OpeningOneGateCore_DragoonFirst: _*),
     new MatchMiningBases,
     new TakeNatural,
     new ExpandAgainstCannons,
@@ -113,9 +110,9 @@ class ProtossVsProtoss extends Parallel {
     new TrainContinuously(Protoss.Reaver, 4),
     new BuildDragoonsorZealotsWithLegSpeed,
     new Build(RequestUpgradeLevel(Protoss.DragoonRange)),
-    new Build(_secondGateway),
-    new Build(ProtossBuilds.TechReavers),
-    new Build(_lateGame),
+    new Build( RequestUnitAtLeast(2, Protoss.Gateway)),
+    new Build(ProtossBuilds.TechReavers: _*),
+    new Build(_lateGame: _*),
     new ScoutExpansionsAt(70),
     new ScoutAt(9),
     new AttackWithDragoonRange

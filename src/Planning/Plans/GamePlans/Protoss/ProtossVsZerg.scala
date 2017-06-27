@@ -3,10 +3,12 @@ package Planning.Plans.GamePlans.Protoss
 import Macro.BuildRequests.{BuildRequest, RequestUnitAtLeast, RequestUpgradeLevel}
 import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors}
 import Planning.Plans.Army.{Attack, ConsiderAttacking, ControlEnemyAirspace, DefendChokes}
-import Planning.Plans.Compound.{IfThenElse, _}
+import Planning.Plans.Compound.{If, _}
 import Planning.Plans.Information.{ScoutAt, ScoutExpansionsAt}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
+import Planning.Plans.Macro.Expanding.RequireMiningBases
+import Planning.Plans.Macro.Gas.BuildAssimilators
 import Planning.Plans.Macro.Milestones.{UnitsAtLeast, UnitsAtMost, UnitsExactly}
 import Planning.Plans.Macro.Reaction.{EnemyHydralisks, EnemyMassMutalisks, EnemyMassZerglings, EnemyMutalisks}
 import ProxyBwapi.Races.Protoss
@@ -40,12 +42,12 @@ class ProtossVsZerg extends Parallel {
     RequestUpgradeLevel(         Protoss.GroundDamage, 1)
   )
   
-  private class WhenSafeTakeNatural extends IfThenElse(
+  private class WhenSafeTakeNatural extends If(
     new UnitsAtLeast(12, UnitMatchWarriors),
     new RequireMiningBases(2)
   )
   
-  private class WhenSafeTakeThirdBase extends IfThenElse(
+  private class WhenSafeTakeThirdBase extends If(
     new And(
       new UnitsAtLeast(16, UnitMatchWarriors),
       new UnitsAtLeast(1, UnitMatchType(Protoss.Corsair)),
@@ -56,26 +58,26 @@ class ProtossVsZerg extends Parallel {
     new RequireMiningBases(3)
   )
   
-  private class BuildZealotsInitially extends IfThenElse(
+  private class BuildZealotsInitially extends If(
     new UnitsExactly(0, UnitMatchType(Protoss.CyberneticsCore)),
-    new Build(ProtossBuilds.OpeningTwoGate1012Zealots)
+    new Build(ProtossBuilds.OpeningTwoGate1012Zealots: _*)
   )
   
-  private class RespondToMutalisksWithCorsairs extends IfThenElse(
+  private class RespondToMutalisksWithCorsairs extends If(
     new EnemyMutalisks,
     new Parallel(
-      new Build(ProtossBuilds.TechCorsairs),
+      new Build(ProtossBuilds.TechCorsairs: _*),
       new TrainContinuously(Protoss.Corsair, 10)
     )
   )
   
-  private class RespondToHydrasWithReavers_OrGetCorsairTech extends IfThenElse(
+  private class RespondToHydrasWithReavers_OrGetCorsairTech extends If(
     new EnemyHydralisks,
-    new Build(ProtossBuilds.TechReavers),
-    new Build(ProtossBuilds.TechCorsairs)
+    new Build(ProtossBuilds.TechReavers: _*),
+    new Build(ProtossBuilds.TechCorsairs: _*)
   )
   
-  private class BuildZealotsOrDragoons_BasedOnMutalisksAndZerglings extends IfThenElse (
+  private class BuildZealotsOrDragoons_BasedOnMutalisksAndZerglings extends If (
     new Or(
       new EnemyMassMutalisks,
       new And(
@@ -87,7 +89,7 @@ class ProtossVsZerg extends Parallel {
       new Build(RequestUpgradeLevel(Protoss.DragoonRange)),
       new TrainContinuously(Protoss.Dragoon)
     ),
-    new IfThenElse(
+    new If(
       new Or(
         new EnemyMassZerglings,
         new UnitsAtMost(8, UnitMatchType(Protoss.Zealot))
@@ -97,12 +99,12 @@ class ProtossVsZerg extends Parallel {
     )
   )
   
-  private class AttackWhenWeHaveArmy extends IfThenElse(
+  private class AttackWhenWeHaveArmy extends If(
     new UnitsAtLeast(10, UnitMatchWarriors),
     new ConsiderAttacking,
     new DefendChokes)
   
-  private class EatOverlordsUntilMutalisksArrive extends IfThenElse(
+  private class EatOverlordsUntilMutalisksArrive extends If(
     new EnemyMutalisks,
     new ScoutExpansionsAt(100),
     new Parallel(
@@ -116,7 +118,7 @@ class ProtossVsZerg extends Parallel {
   
   children.set(Vector(
     new RequireMiningBases(1),
-    new Build(ProtossBuilds.OpeningTwoGate1012),
+    new Build(ProtossBuilds.OpeningTwoGate1012: _*),
     new WhenSafeTakeNatural,
     new WhenSafeTakeThirdBase,
     new BuildZealotsInitially,
@@ -127,10 +129,10 @@ class ProtossVsZerg extends Parallel {
     new TrainContinuously(Protoss.DarkTemplar, 3),
     new TrainContinuously(Protoss.Reaver, 2),
     new TrainContinuously(Protoss.Corsair, 3),
-    new Build(plusOneWeapons),
+    new Build(plusOneWeapons: _*),
     new RespondToHydrasWithReavers_OrGetCorsairTech,
     new BuildZealotsOrDragoons_BasedOnMutalisksAndZerglings,
-    new Build(lateGameBuild),
+    new Build(lateGameBuild: _*),
     new ScoutAt(10),
     new EatOverlordsUntilMutalisksArrive,
     new AttackWhenWeHaveArmy

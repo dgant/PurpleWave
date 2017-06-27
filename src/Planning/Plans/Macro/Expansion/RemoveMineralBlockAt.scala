@@ -1,10 +1,10 @@
 package Planning.Plans.Macro.Expansion
 
-import Planning.Plans.Compound.IfThenElse
+import Planning.Plans.Compound.If
 import Planning.Plans.Macro.Milestones.SupplyAtLeastDoubleThis
 
 class RemoveMineralBlockAt(minimumSupply:Int)
-  extends IfThenElse(
+  extends If(
     new SupplyAtLeastDoubleThis(minimumSupply),
     new RemoveMineralBlocks) {
   

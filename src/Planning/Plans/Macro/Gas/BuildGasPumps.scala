@@ -1,6 +1,7 @@
-package Planning.Plans.Macro.Automatic
+package Planning.Plans.Macro.Gas
 
 import Lifecycle.With
+import Planning.Plans.Macro.Automatic.TrainContinuously
 import ProxyBwapi.UnitClass.UnitClass
 
 abstract class BuildGasPumps(pumpType: UnitClass) extends TrainContinuously(pumpType) {

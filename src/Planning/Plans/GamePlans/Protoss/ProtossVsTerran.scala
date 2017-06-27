@@ -1,61 +1,71 @@
 package Planning.Plans.GamePlans.Protoss
 
-import Macro.BuildRequests.{RequestUnitAtLeast, RequestUpgradeLevel, _}
+import Macro.BuildRequests.{RequestUnitAtLeast, RequestUpgradeLevel}
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plans.Army.{ConsiderAttacking, ControlMap}
-import Planning.Plans.Compound.{IfThenElse, Parallel}
+import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.Information.{ScoutAt, ScoutExpansionsAt}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Macro.Milestones.UnitsAtLeast
+import Planning.Plans.Macro.Expanding.{MatchMiningBases, RequireMiningBases}
+import Planning.Plans.Macro.Gas.BuildAssimilators
+import Planning.Plans.Macro.Milestones.{OnGasBases, OnMiningBases, UnitsAtLeast}
 import ProxyBwapi.Races.Protoss
 
 class ProtossVsTerran extends Parallel {
   
   description.set("Protoss vs Terran")
   
-  private val lateGame = Vector[BuildRequest] (
-    RequestUnitAtLeast(1,   Protoss.RoboticsFacility),
-    RequestUnitAtLeast(1,   Protoss.CitadelOfAdun),
-    RequestUnitAtLeast(1,   Protoss.Observatory),
-    RequestUpgradeLevel(    Protoss.ZealotSpeed,      1),
-    RequestUpgradeLevel(    Protoss.ObserverSpeed,    1),
-    RequestUnitAtLeast(4,   Protoss.Gateway),
-    RequestUnitAtLeast(1,   Protoss.Forge),
-    RequestUpgradeLevel(    Protoss.GroundDamage,     1),
-    RequestUnitAtLeast(8,   Protoss.Gateway),
-    RequestUnitAtLeast(1,   Protoss.TemplarArchives),
-    RequestUnitAtLeast(1,   Protoss.Stargate),
-    RequestUnitAtLeast(10,  Protoss.Gateway),
-    RequestUnitAtLeast(1,   Protoss.ArbiterTribunal),
-    RequestUnitAtLeast(14,  Protoss.Gateway)
-  )
+  private class OnThreeBases_SpeedlotsAndObservers extends OnMiningBases(3,
+    new Build(
+      RequestUnitAtLeast(1,   Protoss.RoboticsFacility),
+      RequestUnitAtLeast(1,   Protoss.CitadelOfAdun),
+      RequestUnitAtLeast(1,   Protoss.Observatory),
+      RequestUpgradeLevel(    Protoss.ZealotSpeed,      1),
+      RequestUpgradeLevel(    Protoss.ObserverSpeed,    1),
+      RequestUnitAtLeast(4,   Protoss.Gateway),
+      RequestUnitAtLeast(1,   Protoss.Forge),
+      RequestUpgradeLevel(    Protoss.GroundDamage,     1),
+      RequestUnitAtLeast(8,   Protoss.Gateway),
+      RequestUnitAtLeast(10,  Protoss.Gateway),
+      RequestUnitAtLeast(14,  Protoss.Gateway)
+    ))
   
-  private class ConsiderTakingFourthBase extends IfThenElse(
+  private class OnThreeGas_Arbiters extends OnGasBases(3,
+    new Build(
+      RequestUnitAtLeast(1,   Protoss.TemplarArchives),
+      RequestUnitAtLeast(1,   Protoss.Stargate),
+      RequestUnitAtLeast(1,   Protoss.ArbiterTribunal)
+    ))
+  
+  private class ConsiderTakingFourthBase extends If(
     new UnitsAtLeast(20, UnitMatchWarriors),
     new RequireMiningBases(4)
   )
   
   children.set(Vector(
     new RequireMiningBases(1),
-    new Build(ProtossBuilds.Opening13Nexus_NoZealot_OneGateway_EarlyThird),
+    new Build(ProtossBuilds.Opening13Nexus_NoZealot_OneGateway_EarlyThird: _*),
     new RequireSufficientPylons,
     new TrainProbesContinuously,
     new ProtossVsTerranIdeas.RespondToBioAllInWithReavers,
     new MatchMiningBases(1),
+    new RequireMiningBases(2),
     new ProtossVsTerranIdeas.RespondToBioWithReavers,
     new ConsiderTakingFourthBase,
     new TrainContinuously(Protoss.Reaver, 2),
     new TrainContinuously(Protoss.Observer, 3),
     new TrainContinuously(Protoss.Arbiter, 3),
     new ProtossVsTerranIdeas.BuildDragoonsUntilWeHaveZealotSpeed,
-    new RequireMiningBases(2),
     new Build(RequestUpgradeLevel(Protoss.DragoonRange, 1)),
     new Build(RequestUnitAtLeast(2,   Protoss.Gateway)),
     new RequireMiningBases(3),
     new Build(RequestUnitAtLeast(3,   Protoss.Gateway)),
     new BuildAssimilators,
-    new Build(lateGame),
+    new OnThreeBases_SpeedlotsAndObservers,
+    new OnThreeGas_Arbiters,
+    new OnMiningBases(4, new Build(RequestUnitAtLeast(14, Protoss.Gateway))),
+    new RequireMiningBases(4),
     new ScoutAt(14),
     new ScoutExpansionsAt(100),
     new ControlMap,

@@ -1,9 +1,9 @@
 package Planning.Plans.Information
 
-import Planning.Plans.Compound.{IfThenElse, Not}
+import Planning.Plans.Compound.{If, Not}
 
 class RequireEnemyBase
-  extends IfThenElse (
+  extends If (
     new Not(new FoundEnemyBase),
     new FindEnemyBase
   )

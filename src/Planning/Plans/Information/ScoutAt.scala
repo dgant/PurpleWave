@@ -1,10 +1,10 @@
 package Planning.Plans.Information
 
-import Planning.Plans.Compound.{And, IfThenElse, Not}
+import Planning.Plans.Compound.{And, If, Not}
 import Planning.Plans.Macro.Milestones.SupplyAtLeastDoubleThis
 
 class ScoutAt(minimumSupply:Int)
-  extends IfThenElse(
+  extends If(
     new And(
       new SupplyAtLeastDoubleThis(minimumSupply),
       new Not(new FoundEnemyBase)

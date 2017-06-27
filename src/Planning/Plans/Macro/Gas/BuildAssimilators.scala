@@ -1,4 +1,4 @@
-package Planning.Plans.Macro.Automatic
+package Planning.Plans.Macro.Gas
 
 import ProxyBwapi.Races.Protoss
 

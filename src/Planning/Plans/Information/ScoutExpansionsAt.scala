@@ -1,10 +1,10 @@
 package Planning.Plans.Information
 
-import Planning.Plans.Compound.IfThenElse
+import Planning.Plans.Compound.If
 import Planning.Plans.Macro.Milestones.SupplyAtLeastDoubleThis
 
 class ScoutExpansionsAt(minimumSupply:Int)
-  extends IfThenElse(
+  extends If(
     new SupplyAtLeastDoubleThis(minimumSupply),
     new FindExpansions) {
   

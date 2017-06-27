@@ -1,12 +1,12 @@
 package Planning.Plans.Army
 
 import Lifecycle.With
-import Planning.Plans.Compound.{If, IfThenElse}
+import Planning.Plans.Compound.{Check, If}
 import Planning.Yolo
 
 class ConsiderAttacking
-  extends IfThenElse(
-    new If(() =>
+  extends If(
+    new Check(() =>
       Yolo.active
       || With.battles.global.estimationAbstract.weGainValue),
     new Attack)

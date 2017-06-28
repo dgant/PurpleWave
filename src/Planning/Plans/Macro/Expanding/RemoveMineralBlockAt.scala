@@ -1,4 +1,4 @@
-package Planning.Plans.Macro.Expansion
+package Planning.Plans.Macro.Expanding
 
 import Planning.Plans.Compound.If
 import Planning.Plans.Macro.Milestones.SupplyAtLeastDoubleThis

@@ -5,7 +5,7 @@ import Planning.Plans.Compound.Parallel
 import Planning.Plans.Information.SwitchEnemyRace
 import Planning.Plans.Macro.Automatic.Gather
 import Planning.Plans.Macro.BuildOrders.FollowBuildOrder
-import Planning.Plans.Macro.Expansion.RemoveMineralBlockAt
+import Planning.Plans.Macro.Expanding.RemoveMineralBlockAt
 
 class ProtossGamePlan
   extends Parallel (

@@ -7,8 +7,7 @@ import Planning.Plans.Compound.{And, If, Or, Parallel}
 import Planning.Plans.Information.{ScoutAt, ScoutExpansionsAt}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Macro.Expanding.{MatchMiningBases, RequireMiningBases}
-import Planning.Plans.Macro.Gas.BuildAssimilators
+import Planning.Plans.Macro.Expanding.{BuildAssimilators, MatchMiningBases, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.{EnemyUnitsAtLeast, HaveUpgrade, UnitsAtLeast}
 import ProxyBwapi.Races.Protoss
 

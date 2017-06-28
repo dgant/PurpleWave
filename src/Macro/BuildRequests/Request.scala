@@ -6,7 +6,7 @@ import ProxyBwapi.Upgrades.Upgrade
 
 object Request {
   
-  def tech(unit: UnitClass, quantity: Int = 1): BuildRequest = {
+  def unit(unit: UnitClass, quantity: Int = 1): BuildRequest = {
     RequestUnitAtLeast(quantity, unit)
   }
   

@@ -1,5 +1,6 @@
 package Macro.BuildRequests
 
+import Macro.Architecture.BuildingDescriptor
 import Macro.Buildables.Buildable
 
 abstract class BuildRequest(val buildable: Buildable) {

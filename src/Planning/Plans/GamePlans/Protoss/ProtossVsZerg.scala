@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Protoss
 
-import Macro.BuildRequests.{BuildRequest, RequestUnitAtLeast, RequestUpgradeLevel}
+import Macro.BuildRequests.{BuildRequest, Request}
 import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors}
 import Planning.Plans.Army.{Attack, ConsiderAttacking, ControlEnemyAirspace, DefendChokes}
 import Planning.Plans.Compound.{If, _}
@@ -18,28 +18,25 @@ class ProtossVsZerg extends Parallel {
   description.set("Protoss vs Zerg")
   
   private val lateGameBuild = Vector[BuildRequest] (
-    RequestUnitAtLeast(4,   Protoss.Gateway),
-    RequestUnitAtLeast(1,   Protoss.CitadelOfAdun),
-    RequestUpgradeLevel(    Protoss.DragoonRange),
-    RequestUpgradeLevel(    Protoss.ZealotSpeed),
-    RequestUnitAtLeast(6,   Protoss.Gateway),
-    RequestUnitAtLeast(1,   Protoss.TemplarArchives),
-    RequestUpgradeLevel(    Protoss.GroundDamage, 2),
-    RequestUnitAtLeast(10,  Protoss.Gateway),
-    RequestUpgradeLevel(    Protoss.GroundDamage, 3),
-    RequestUnitAtLeast(2,   Protoss.Forge),
-    RequestUnitAtLeast(7,   Protoss.PhotonCannon),
-    RequestUpgradeLevel(    Protoss.GroundDamage, 2),
-    RequestUpgradeLevel(    Protoss.GroundArmor,  2),
-    RequestUnitAtLeast(8,   Protoss.Gateway),
-    RequestUnitAtLeast(10,  Protoss.Gateway),
-    RequestUpgradeLevel(    Protoss.GroundDamage, 3),
-    RequestUpgradeLevel(    Protoss.GroundArmor, 3)
+    Request.tech(Protoss.Gateway,        4),
+    Request.tech(Protoss.CitadelOfAdun),
+    Request.upgr(Protoss.DragoonRange),
+    Request.upgr(Protoss.ZealotSpeed),
+    Request.tech(Protoss.Gateway,        6),
+    Request.tech(Protoss.TemplarArchives),
+    Request.upgr(Protoss.GroundDamage,   2),
+    Request.tech(Protoss.Gateway),
+    Request.upgr(Protoss.GroundDamage,   3),
+    Request.tech(Protoss.PhotonCannon,   7),
+    Request.upgr(Protoss.GroundArmor,    1),
+    Request.tech(Protoss.Gateway,        10),
+    Request.upgr(Protoss.GroundArmor,    2),
+    Request.upgr(Protoss.GroundArmor,    3)
   )
   
   private val plusOneWeapons = Vector[BuildRequest] (
-    RequestUnitAtLeast(1,   Protoss.Forge),
-    RequestUpgradeLevel(         Protoss.GroundDamage, 1)
+    Request.tech(Protoss.Forge),
+    Request.upgr(Protoss.GroundDamage)
   )
   
   private class WhenSafeTakeNatural extends If(
@@ -86,7 +83,7 @@ class ProtossVsZerg extends Parallel {
       )
     ),
     new Parallel(
-      new Build(RequestUpgradeLevel(Protoss.DragoonRange)),
+      new Build(Request.upgr(Protoss.DragoonRange)),
       new TrainContinuously(Protoss.Dragoon)
     ),
     new If(

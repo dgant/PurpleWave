@@ -10,9 +10,9 @@ object PlacementProfiles {
     preferGas           = 0.0,
     preferSpace         = 0.1,
     preferPowering      = 0.5,
-    preferEnemyDistance = 1.0,
-    avoidDistance       = 2.5,
-    avoidExitDistance   = 1.0
+    preferDistanceFromEnemy = 1.0,
+    avoidDistanceFromBase       = 2.5,
+    avoidDistanceFromExitRange   = 1.0
   )
   
   val factory = new PlacementProfile(
@@ -21,9 +21,9 @@ object PlacementProfiles {
     preferGas           = 0.0,
     preferSpace         = 0.5,
     preferPowering      = 0.0,
-    preferEnemyDistance = 0.0,
-    avoidDistance       = 0.25,
-    avoidExitDistance   = 4.0
+    preferDistanceFromEnemy = 0.0,
+    avoidDistanceFromBase       = 0.25,
+    avoidDistanceFromExitRange   = 4.0
   )
   
   val tech = new PlacementProfile(
@@ -32,9 +32,9 @@ object PlacementProfiles {
     preferGas           = 0.0,
     preferSpace         = 0.0,
     preferPowering      = 0.0,
-    preferEnemyDistance = 4.0,
-    avoidDistance       = 1.0,
-    avoidExitDistance   = 0.0
+    preferDistanceFromEnemy = 4.0,
+    avoidDistanceFromBase       = 1.0,
+    avoidDistanceFromExitRange   = 0.0
   )
   
   val gas = new PlacementProfile(
@@ -43,9 +43,9 @@ object PlacementProfiles {
     preferGas           = 0.0,
     preferSpace         = 0.0,
     preferPowering      = 0.0,
-    preferEnemyDistance = 1.0,
-    avoidDistance       = 1.0,
-    avoidExitDistance   = 0.0
+    preferDistanceFromEnemy = 1.0,
+    avoidDistanceFromBase       = 1.0,
+    avoidDistanceFromExitRange   = 0.0
   )
   
   val townHall = new PlacementProfile(
@@ -54,9 +54,9 @@ object PlacementProfiles {
     preferGas           = 1.0,
     preferSpace         = 0.0,
     preferPowering      = 0.0,
-    preferEnemyDistance = 1.5,
-    avoidDistance       = 2.5,
-    avoidExitDistance   = 0.0
+    preferDistanceFromEnemy = 1.5,
+    avoidDistanceFromBase       = 2.5,
+    avoidDistanceFromExitRange   = 0.0
   )
   
   def default(buildingDescriptor: BuildingDescriptor): PlacementProfile = {

@@ -1,5 +1,6 @@
 package Macro.Architecture
 
+import Information.Geography.Types.Zone
 import Lifecycle.With
 import Macro.Architecture.Heuristics.{PlacementProfile, PlacementProfiles}
 import Mathematics.Points.Tile
@@ -17,36 +18,39 @@ class BuildingDescriptor(
   argTownHall     : Option[Boolean]           = None,
   argGas          : Option[Boolean]           = None,
   argMargin       : Option[Boolean]           = None,
-  argPlacement    : Option[PlacementProfile]  = None) {
+  argPlacement    : Option[PlacementProfile]  = None,
+  argRangePixels  : Option[Double]            = None,
+  val zone        : Option[Zone]              = None) {
   
   val frameCreated: Int = With.frame
   
-  val width             : Int               = argWidth     .orElse(argBuilding.map(_.tileWidth)).getOrElse(1)
-  val height            : Int               = argHeight    .orElse(argBuilding.map(_.tileHeight)).getOrElse(1)
-  val powers            : Boolean           = argPowers    .getOrElse(argBuilding.contains(Protoss.Pylon))
-  val powered           : Boolean           = argPowered   .getOrElse(argBuilding.exists(_.requiresPsi))
-  val townHall          : Boolean           = argTownHall  .getOrElse(argBuilding.exists(_.isTownHall))
-  val gas               : Boolean           = argGas       .getOrElse(argBuilding.exists(_.isRefinery))
-  val margin            : Boolean           = argMargin    .getOrElse(argBuilding.exists(With.architect.usuallyNeedsMargin))
-  val placement  : PlacementProfile  = argPlacement .getOrElse(PlacementProfiles.default(this))
+  val width       : Int               = argWidth        .orElse(argBuilding.map(_.tileWidth)).getOrElse(1)
+  val height      : Int               = argHeight       .orElse(argBuilding.map(_.tileHeight)).getOrElse(1)
+  val powers      : Boolean           = argPowers       .getOrElse(argBuilding.contains(Protoss.Pylon))
+  val powered     : Boolean           = argPowered      .getOrElse(argBuilding.exists(_.requiresPsi))
+  val townHall    : Boolean           = argTownHall     .getOrElse(argBuilding.exists(_.isTownHall))
+  val gas         : Boolean           = argGas          .getOrElse(argBuilding.exists(_.isRefinery))
+  val margin      : Boolean           = argMargin       .getOrElse(argBuilding.exists(With.architect.usuallyNeedsMargin))
+  val placement   : PlacementProfile  = argPlacement    .getOrElse(PlacementProfiles.default(this))
+  val attackRange : Option[Double]    = argRangePixels  .orElse(argBuilding.map(building => building.maxAirGroundRange + building.radialHypotenuse))
   
   def fulfilledBy(suggestion: BuildingDescriptor): Boolean = {
     if (suggestion == this) return true
-    width     == suggestion.width                   &&
-    height    == suggestion.height                  &&
-    (powers   == suggestion.powers    || ! powers)  &&
-    (powered  == suggestion.powered   || ! powered) &&
-    townHall  == suggestion.townHall                &&
-    gas       == suggestion.gas                     &&
-    margin    <= suggestion.margin
+    width     == suggestion.width                       &&
+    height    == suggestion.height                      &&
+    (powers   == suggestion.powers    || ! powers)      &&
+    (powered  == suggestion.powered   || ! powered)     &&
+    townHall  == suggestion.townHall                    &&
+    gas       == suggestion.gas                         &&
+    margin    <= suggestion.margin                      &&
+    (zone     == suggestion.zone      || zone.isEmpty)
   }
   
-  def marginTiles: Int = if(margin) 1 else 0
-  
-  def relativeBuildStart  : Tile = Tile(0, 0)
-  def relativeBuildEnd    : Tile = Tile(width, height)
-  def relativeMarginStart : Tile = relativeBuildStart.subtract(marginTiles, marginTiles)
-  def relativeMarginEnd   : Tile = relativeBuildEnd.add(marginTiles, marginTiles)
+  def marginTiles         : Int   = if(margin) 1 else 0
+  def relativeBuildStart  : Tile  = Tile(0, 0)
+  def relativeBuildEnd    : Tile  = Tile(width, height)
+  def relativeMarginStart : Tile  = relativeBuildStart.subtract(marginTiles, marginTiles)
+  def relativeMarginEnd   : Tile  = relativeBuildEnd.add(marginTiles, marginTiles)
   
   def accepts(tile: Tile): Boolean = {
     
@@ -75,6 +79,10 @@ class BuildingDescriptor(
     }
     
     if (tile.zone.island) {
+      return false
+    }
+    
+    if (zone.exists(_ != tile.zone)) {
       return false
     }
     

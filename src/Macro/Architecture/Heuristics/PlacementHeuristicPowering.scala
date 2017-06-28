@@ -7,9 +7,9 @@ import Mathematics.Points.Tile
 
 object PlacementHeuristicPowering extends PlacementHeuristic {
   
-  override def evaluate(state: BuildingDescriptor, candidate: Tile): Double = {
+  override def evaluate(building: BuildingDescriptor, candidate: Tile): Double = {
     
-    if ( ! state.powers) return HeuristicMathMultiplicative.default
+    if ( ! building.powers) return HeuristicMathMultiplicative.default
     
     With.grids.psi2x2and3x2.psiPoints
       .map(candidate.add)

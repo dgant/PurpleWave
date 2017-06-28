@@ -4,9 +4,9 @@ import Lifecycle.With
 import Macro.Architecture.BuildingDescriptor
 import Mathematics.Points.Tile
 
-object PlacementHeuristicEnemy extends PlacementHeuristic {
+object PlacementHeuristicDistanceFromEnemy extends PlacementHeuristic {
   
-  override def evaluate(state: BuildingDescriptor, candidate: Tile): Double = {
+  override def evaluate(building: BuildingDescriptor, candidate: Tile): Double = {
   
     val enemyBases =
     if (With.geography.enemyBases.isEmpty)

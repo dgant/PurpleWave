@@ -7,15 +7,15 @@ import Utilities.EnrichPixel._
 
 object ZoneUpdater {
   
-  def update() = {
+  def update() {
     With.geography.zones.foreach(updateZone)
   }
   
-  private def updateZone(zone:Zone) {
+  private def updateZone(zone: Zone) {
     zone.bases.foreach(updateBase)
   }
   
-  private def updateBase(base:Base) {
+  private def updateBase(base: Base) {
     updateTownHall(base)
     updateOwner(base)
     updateAssets(base)

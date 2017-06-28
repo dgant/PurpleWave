@@ -4,25 +4,27 @@ import Debugging.Visualizations.Colors
 
 
 class PlacementProfile(
-  val name                : String,
-  var preferZone          : Double = 0.0,
-  var preferGas           : Double = 0.0,
-  var preferSpace         : Double = 0.0,
-  var preferPowering      : Double = 0.0,
-  var preferEnemyDistance : Double = 0.0,
-  var avoidDistance       : Double = 0.0,
-  var avoidExitDistance   : Double = 0.0
-  ) {
+  val name                        : String,
+  var preferZone                  : Double = 0.0,
+  var preferGas                   : Double = 0.0,
+  var preferSpace                 : Double = 0.0,
+  var preferPowering              : Double = 0.0,
+  var preferDistanceFromEnemy     : Double = 0.0,
+  var preferCoveringWorkers       : Double = 0.0,
+  var avoidDistanceFromBase       : Double = 0.0,
+  var avoidDistanceFromExitRange  : Double = 0.0,
+  var avoidSurfaceArea            : Double = 0.0) {
   
   def weightedHeuristics: Iterable[PlacementHeuristicWeight] = {
     Vector(
-      new PlacementHeuristicWeight(PlacementHeuristicZone,          preferZone,           Colors.NeonRed),
-      new PlacementHeuristicWeight(PlacementHeuristicGas,           preferGas,            Colors.NeonYellow),
-      new PlacementHeuristicWeight(PlacementHeuristicSpace,         preferSpace,          Colors.NeonGreen),
-      new PlacementHeuristicWeight(PlacementHeuristicPowering,      preferPowering,       Colors.NeonTeal),
-      new PlacementHeuristicWeight(PlacementHeuristicEnemy,         preferEnemyDistance,  Colors.NeonIndigo),
-      new PlacementHeuristicWeight(PlacementHeuristicDistance,     -avoidDistance,        Colors.NeonBlue),
-      new PlacementHeuristicWeight(PlacementHeuristicExit,         -avoidExitDistance,    Colors.NeonOrange)
+      new PlacementHeuristicWeight(PlacementHeuristicZone,                  preferZone,                   Colors.NeonRed),
+      new PlacementHeuristicWeight(PlacementHeuristicGas,                   preferGas,                    Colors.NeonOrange),
+      new PlacementHeuristicWeight(PlacementHeuristicSpace,                 preferSpace,                  Colors.NeonYellow),
+      new PlacementHeuristicWeight(PlacementHeuristicPowering,              preferPowering,               Colors.NeonGreen),
+      new PlacementHeuristicWeight(PlacementHeuristicDistanceFromEnemy,     preferDistanceFromEnemy,      Colors.NeonTeal),
+      new PlacementHeuristicWeight(PlacementHeuristicDistanceFromBase,      -avoidDistanceFromBase,       Colors.NeonBlue),
+      new PlacementHeuristicWeight(PlacementHeuristicDistanceFromExitRange, -avoidDistanceFromExitRange,  Colors.NeonIndigo),
+      new PlacementHeuristicWeight(PlacementHeuristicSurfaceArea,           -avoidSurfaceArea,            Colors.NeonViolet)
     )
   }
   

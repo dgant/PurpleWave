@@ -9,6 +9,7 @@ class Base(
   val townHallArea    : TileRectangle,
   val isStartLocation : Boolean)
 {
+  var isNaturalOf     : Option[Base]      = None
   var townHall        : Option[UnitInfo]  = None
   var harvestingArea  : TileRectangle     = townHallArea
   var heart           : Tile              = harvestingArea.midpoint

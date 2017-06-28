@@ -29,6 +29,17 @@ object ZoneBuilder {
               .max))
     })
     
+    // TODO: Run this only after we populate the gas!
+    bases
+      .filter(_.isStartLocation)
+      .foreach(startLocationBase =>
+        bases
+          .filter(_.gas.nonEmpty)
+          .minBy(
+            _.townHallArea.startInclusive.groundPixels(
+              startLocationBase.townHallArea.startInclusive))
+          .isNaturalOf = Some(startLocationBase))
+    
     ensureAllTilesAreAssignedToAZone(zones)
     
     zones

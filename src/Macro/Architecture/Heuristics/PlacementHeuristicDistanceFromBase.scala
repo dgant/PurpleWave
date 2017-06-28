@@ -4,9 +4,9 @@ import Lifecycle.With
 import Macro.Architecture.BuildingDescriptor
 import Mathematics.Points.Tile
 
-object PlacementHeuristicDistance extends PlacementHeuristic {
+object PlacementHeuristicDistanceFromBase extends PlacementHeuristic {
   
-  override def evaluate(state: BuildingDescriptor, candidate: Tile): Double = {
+  override def evaluate(building: BuildingDescriptor, candidate: Tile): Double = {
   
     if (With.geography.ourBases.isEmpty)
       With.geography.home.groundPixels(candidate)

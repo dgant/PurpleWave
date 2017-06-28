@@ -25,7 +25,7 @@ class ControlZone(zone: Zone) extends Plan {
   override def onUpdate() {
     
     val enemies = With.units.enemy.filter(threateningZone)
-    val ourBase = zone.bases.find(_.owner.isUs)
+    val ourBase = zone.bases.find(base => base.owner.isUs || base.planningToTake)
     
     val threats = enemies.filter(threat => threat.canAttackThisSecond && ! threat.unitClass.isWorker)
     if (threats.nonEmpty) {

@@ -62,5 +62,8 @@ object ZoneUpdater {
       .getOrElse(List.empty)
     
     base.walledIn = exitBuildings.count(_.is(Terran.SupplyDepot)) >= 2 && exitBuildings.count(_.is(Terran.Barracks)) >= 1
+    base.planningToTake = With.units.ours.exists(unit =>
+      unit.actionState.toBuildTile.exists(_.zone == base.zone) &&
+      unit.actionState.toBuild.exists(_.isTownHall))
   }
 }

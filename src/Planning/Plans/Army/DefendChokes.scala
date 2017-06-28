@@ -23,8 +23,7 @@ class DefendChokes extends Plan {
   
     // Step 1. Organize our chokes & defenders
     
-    // Logic is convoluted to move out for bases we intend to build, but to not defend bases with just a Pylon or something
-    val chokes = With.geography.mostExposedChokes.filter(_.zones.exists(_.bases.exists(base => base.townHall.isDefined || With.executor.states.exists(_.toBuildTile.contains(base.townHallArea.startInclusive)))))
+    val chokes = With.geography.mostExposedChokes
     
     if (chokes.isEmpty) return
     

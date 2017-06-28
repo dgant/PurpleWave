@@ -46,11 +46,7 @@ class Geography {
   
   def ourExposedChokes: Iterable[ZoneEdge] =
     With.geography.zones
-      .filter(zone =>
-        zone.owner.isUs ||
-          With.executor.states.exists(state =>
-            state.intent.toBuild.nonEmpty &&
-            state.intent.toTravel.exists(_.zone == zone)))
+      .filter(zone => zone.owner.isUs || zone.bases.exists(_.planningToTake))
       .flatten(_.edges)
       .filter(edge => edge.zones.exists( ! _.owner.isUs))
   

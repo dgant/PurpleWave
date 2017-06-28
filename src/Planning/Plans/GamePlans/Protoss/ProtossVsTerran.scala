@@ -1,15 +1,14 @@
 package Planning.Plans.GamePlans.Protoss
 
 import Macro.BuildRequests.{RequestUnitAtLeast, RequestUpgradeLevel}
-import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plans.Army.{ConsiderAttacking, ControlMap}
-import Planning.Plans.Compound.{If, Parallel}
+import Planning.Plans.Compound.Parallel
 import Planning.Plans.Information.{ScoutAt, ScoutExpansionsAt}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{MatchMiningBases, RequireMiningBases}
 import Planning.Plans.Macro.Gas.BuildAssimilators
-import Planning.Plans.Macro.Milestones.{OnGasBases, OnMiningBases, UnitsAtLeast}
+import Planning.Plans.Macro.Milestones.{OnGasBases, OnMiningBases}
 import ProxyBwapi.Races.Protoss
 
 class ProtossVsTerran extends Parallel {
@@ -40,12 +39,6 @@ class ProtossVsTerran extends Parallel {
       RequestUnitAtLeast(1,   Protoss.Forge),
       RequestUpgradeLevel(    Protoss.GroundDamage,     1)
     ))
-  
-  private class ConsiderTakingFourthBase extends If(
-    new UnitsAtLeast(20, UnitMatchWarriors),
-    new RequireMiningBases(4)
-  )
-  
   children.set(Vector(
     new RequireMiningBases(1),
     new Build(ProtossBuilds.Opening13Nexus_NoZealot_OneGateway_EarlyThird: _*),
@@ -55,7 +48,6 @@ class ProtossVsTerran extends Parallel {
     new MatchMiningBases(1),
     new RequireMiningBases(2),
     new ProtossVsTerranIdeas.RespondToBioWithReavers,
-    new ConsiderTakingFourthBase,
     new TrainContinuously(Protoss.Reaver, 2),
     new TrainContinuously(Protoss.Observer, 3),
     new TrainContinuously(Protoss.Arbiter, 3),

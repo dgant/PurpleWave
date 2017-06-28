@@ -16,6 +16,7 @@ class Base(
   var minerals        : Set[UnitInfo]     = Set.empty
   var workers         : Set[UnitInfo]     = Set.empty
   var walledIn        : Boolean           = false
+  var planningToTake  : Boolean           = false
   
   var mineralsLeft      = 0
   var gasLeft           = 0

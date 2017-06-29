@@ -15,7 +15,7 @@ object ZoneUpdater {
       .filter(_.isStartLocation)
       .foreach(startLocationBase =>
         With.geography.bases
-          .filter(_.gas.nonEmpty)
+          .filter(otherBase => otherBase != startLocationBase && otherBase.gas.nonEmpty)
           .minBy(
             _.townHallArea.startInclusive.groundPixels(
               startLocationBase.townHallArea.startInclusive))

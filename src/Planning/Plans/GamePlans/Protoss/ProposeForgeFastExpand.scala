@@ -8,10 +8,15 @@ import ProxyBwapi.Races.Protoss
 
 class ProposeForgeFastExpand extends Parallel {
   
-  children.set(
+  override def onUpdate(): Unit = {
+    children.set(proposals)
+    super.onUpdate()
+  }
+  
+  private lazy val proposals =
     Vector(
       new BuildingDescriptor(this, argBuilding = Some(Protoss.Pylon), zone = With.geography.ourNatural.map(_.zone)),
       new BuildingDescriptor(this, argBuilding = Some(Protoss.Forge), zone = With.geography.ourNatural.map(_.zone)),
       new BuildingDescriptor(this, argBuilding = Some(Protoss.PhotonCannon), zone = With.geography.ourNatural.map(_.zone)))
-    .map(new ProposePlacement(_)))
+    .map(new ProposePlacement(_))
 }

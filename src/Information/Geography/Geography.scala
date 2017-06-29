@@ -23,6 +23,7 @@ class Geography {
   def enemyBases          : Iterable[Base]          = enemyZones.flatten(_.bases)
   def ourTownHalls        : Iterable[UnitInfo]      = ourBases.flatMap(_.townHall)
   def ourHarvestingAreas  : Iterable[TileRectangle] = ourBases.map(_.harvestingArea)
+  lazy val ourNatural     : Option[Base]            = bases.find(_.isNaturalOf.exists(_.owner.isUs))
   
   def zoneByTile(tile: Tile): Zone = zonesByTileCache(tile)
   private lazy val zonesByTileCache =

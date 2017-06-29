@@ -86,14 +86,14 @@ class Groundskeeper {
   }
   
   private def addRequirement(requirement: BuildingDescriptor) {
-    val matchedProposal = proposals
+    val proposal = proposals
       .diff(requirementMatches.map(_.proposal))
       .find(requirement.fulfilledBy)
       .getOrElse(requirement)
-    if (matchedProposal == requirement) {
+    if (proposal == requirement) {
       addProposal(requirement)
     }
-    makeMatch(requirement, requirement)
+    requirementMatches.add(RequirementMatch(requirement = requirement, proposal = proposal))
   }
   
   private def getTileForRequirement(requirement: BuildingDescriptor): Option[Tile] = {
@@ -104,9 +104,5 @@ class Groundskeeper {
   
   private def getProposalForRequirement(requirement: BuildingDescriptor): BuildingDescriptor = {
     requirementMatches.find(_.requirement == requirement).get.proposal
-  }
-  
-  private def makeMatch(requirement: BuildingDescriptor, proposal: BuildingDescriptor) {
-    requirementMatches.add(RequirementMatch(requirement = requirement, proposal = proposal))
   }
 }

@@ -7,14 +7,14 @@ object ScreenGroundskeeper {
   
   def render() {
     
-    With.game.drawTextScreen(5, 25,"Unplaced:")
+    With.game.drawTextScreen(5, 25, "Unplaced:")
     DrawScreen.column(
       5, 50,
       With.groundskeeper.sortByPriority(
         With.groundskeeper.proposals.diff(With.groundskeeper.proposalPlacements.keySet))
         .map(_.toString))
   
-    With.game.drawTextScreen(165, 25,"Matched:")
+    With.game.drawTextScreen(165, 25, "Matched:")
     val matches =
       With.groundskeeper.requirementMatches
         .filter(r => r.proposal != r.requirement)
@@ -27,7 +27,7 @@ object ScreenGroundskeeper {
       325, 50,
       matches.map(" => " + _.requirement.toString))
     
-    With.game.drawTextScreen(485, 25,"Placed:")
+    With.game.drawTextScreen(485, 25, "Placed:")
     DrawScreen.table(
       485, 50,
       With.groundskeeper.sortByPriority(

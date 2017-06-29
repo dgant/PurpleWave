@@ -28,7 +28,7 @@ object VisualizeArchitecture {
     if (placement.tile.isEmpty || placement.scoresByTile.isEmpty) return
   
     renderPlacementHeuristics(descriptor, placement)
-    renderPlacementList(descriptor, placement)
+    //renderPlacementList(descriptor, placement)
   }
   
   private def renderPlacementList(descriptor: BuildingDescriptor, placement: Placement) = {

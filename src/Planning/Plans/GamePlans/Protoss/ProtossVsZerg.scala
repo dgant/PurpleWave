@@ -52,6 +52,7 @@ class ProtossVsZerg extends Parallel {
   
   children.set(Vector(
     new RequireMiningBases(1),
+    new ProposeForgeFastExpand,
     new FiveGateGoon_Start,
     new TrainProbesContinuously,
     new RequireMiningBases(2),

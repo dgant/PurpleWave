@@ -11,7 +11,7 @@ object ZoneUpdater {
     With.geography.zones.foreach(updateZone)
   }
   
-  private def updateZone(zone: Zone) {
+  def updateZone(zone: Zone) {
     zone.bases.foreach(updateBase)
   }
   

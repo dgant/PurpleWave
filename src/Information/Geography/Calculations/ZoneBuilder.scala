@@ -29,7 +29,11 @@ object ZoneBuilder {
               .max))
     })
     
-    // TODO: Run this only after we populate the gas!
+    ensureAllTilesAreAssignedToAZone(zones)
+    
+    // We want to assign isNatural, which requires gas to be populated.
+    // So let's run our regular ZoneUpdate now to populate the gas and then assign isNatural.
+    zones.foreach(ZoneUpdater.updateZone)
     bases
       .filter(_.isStartLocation)
       .foreach(startLocationBase =>
@@ -39,8 +43,6 @@ object ZoneBuilder {
             _.townHallArea.startInclusive.groundPixels(
               startLocationBase.townHallArea.startInclusive))
           .isNaturalOf = Some(startLocationBase))
-    
-    ensureAllTilesAreAssignedToAZone(zones)
     
     zones
   }

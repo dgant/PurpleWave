@@ -55,13 +55,13 @@ class BuildingDescriptor(
   def accepts(tile: Tile): Boolean = {
     
     if (powered) {
-      if (width == 4 && ! With.grids.psi4x3.get(tile)) {
+      if (width == 4 && ! With.grids.psi4x3.get(tile) && ! With.architect.powered4x3.contains(tile)) {
         return false
       }
-      if (width == 3 && ! With.grids.psi2x2and3x2.get(tile)) {
+      if (width == 3 && ! With.grids.psi2x2and3x2.get(tile) && ! With.architect.powered2x2and3x2.contains(tile)) {
         return false
       }
-      if (width == 2 && ! With.grids.psi2x2and3x2.get(tile)) {
+      if (width == 2 && ! With.grids.psi2x2and3x2.get(tile) && ! With.architect.powered2x2and3x2.contains(tile)) {
         return false
       }
     }

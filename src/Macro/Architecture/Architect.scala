@@ -4,7 +4,7 @@ import Information.Geography.Types.Base
 import Lifecycle.With
 import Macro.Architecture.Heuristics.EvaluatePlacements
 import Mathematics.Points.{Tile, TileRectangle}
-import ProxyBwapi.Races.Neutral
+import ProxyBwapi.Races.{Neutral, Protoss}
 import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
 
 import scala.collection.mutable
@@ -13,7 +13,9 @@ import scala.util.Random
 class Architect {
   
   private var bases: Array[Base] = Array.empty
-  val exclusions: mutable.ArrayBuffer[Exclusion] = new mutable.ArrayBuffer[Exclusion]
+  val exclusions        : mutable.ArrayBuffer[Exclusion]  = new mutable.ArrayBuffer[Exclusion]
+  val powered2x2and3x2  : mutable.Set[Tile]               = new mutable.HashSet[Tile]
+  val powered4x3        : mutable.Set[Tile]               = new mutable.HashSet[Tile]
   
   def usuallyNeedsMargin(unitClass: UnitClass): Boolean = {
     unitClass.isBuilding &&
@@ -24,6 +26,9 @@ class Architect {
   def reboot() {
     bases = With.geography.ourBases.toArray.sortBy(base => - base.mineralsLeft * base.zone.area)
     exclusions.clear()
+    powered2x2and3x2.clear()
+    powered4x3.clear()
+    With.units.ours.filter(_.is(Protoss.Pylon)).map(_.tileTopLeft).foreach(addPower)
     exclusions ++= With.geography.bases
       .filterNot(_.owner.isEnemy)
       .map(base => Exclusion(
@@ -47,13 +52,14 @@ class Architect {
       && With.frame - placement.get.createdFrame < With.configuration.maxPlacementAge) {
       val tile = placement.get.tile.get
       if (canBuild(buildingDescriptor, tile)) {
-        exclude(buildingDescriptor, tile)
+        addExclusion(buildingDescriptor, tile)
+        addPower(buildingDescriptor, tile)
         return placement.get
       }
     }
   
     val output = placeBuilding(buildingDescriptor)
-    output.tile.foreach(exclude(buildingDescriptor, _))
+    output.tile.foreach(addExclusion(buildingDescriptor, _))
     output
   }
   
@@ -108,7 +114,7 @@ class Architect {
     false
   }
   
-  private def exclude(buildingDescriptor: BuildingDescriptor, tile: Tile) {
+  private def addExclusion(buildingDescriptor: BuildingDescriptor, tile: Tile) {
     val margin = if (buildingDescriptor.margin) 1 else 0
     exclusions += Exclusion(
       buildingDescriptor.toString,
@@ -117,6 +123,17 @@ class Architect {
         tile.add(buildingDescriptor.relativeMarginEnd)),
       gasAllowed      = false,
       townHallAllowed = false)
+  }
+  
+  def addPower(buildingDescriptor: BuildingDescriptor, tile: Tile) {
+    if (buildingDescriptor.powers) {
+      addPower(tile)
+    }
+  }
+  
+  def addPower(tile: Tile) {
+    powered2x2and3x2  ++= With.grids.psi2x2and3x2.psiPoints.map(tile.add)
+    powered4x3        ++= With.grids.psi4x3.psiPoints.map(tile.add)
   }
   
   private def placeBuilding(

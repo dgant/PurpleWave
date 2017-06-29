@@ -15,8 +15,9 @@ object VisualizeArchitecture {
       DrawMap.label(exclusion.description, exclusion.areaExcluded.midPixel)
     })
     
-    With.groundskeeper
-      .sortByPriority(With.groundskeeper.proposalPlacements.keys)
+    With.groundskeeper.proposalPlacements.keys
+      .toVector
+      .sortBy(_.proposer.priority)
       .headOption
       .foreach(renderPlacement)
   }

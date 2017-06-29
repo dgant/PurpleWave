@@ -73,8 +73,7 @@ class Recruiter {
     val assignedToLowerPriority = unitsByLock.keys
       .filter(otherRequest =>
         otherRequest.interruptable.get &&
-        With.prioritizer.getPriority(lock.owner) <
-        With.prioritizer.getPriority(otherRequest.owner))
+        lock.owner.priority < otherRequest.owner.priority)
       .flatMap(getUnits)
     
     lock.offerUnits(unassignedUnits ++ assignedToLowerPriority)

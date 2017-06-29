@@ -40,7 +40,7 @@ class Scheduler {
   
   private val updateQueueLimiter = new Limiter(2, () => updateQueue())
   private def updateQueue() {
-    val requestQueue = requestsByPlan.keys.toVector.sortBy(With.prioritizer.getPriority).flatten(requestsByPlan)
+    val requestQueue = requestsByPlan.keys.toVector.sortBy(_.priority).flatten(requestsByPlan)
     val unitsWanted = new CountMap[UnitClass]
     val unitsActual:CountMap[UnitClass] = CountMapper.make(With.units.ours.filter(_.aliveAndComplete).groupBy(_.unitClass).mapValues(_.size))
     queueOriginal = requestQueue.flatten(buildable => getUnfulfilledBuildables(buildable, unitsWanted, unitsActual))

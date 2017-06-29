@@ -30,8 +30,7 @@ class Groundskeeper {
   def placeBuildings() {
     var newSearches = 0
     With.architect.reboot()
-    sortByPriority(proposals)
-      .sortBy(lastPlacementAttempt.getOrElse(_, 0))
+    proposalsInUpdateOrder
       .foreach(descriptor =>
         if (With.performance.continueRunning && newSearches < With.configuration.maxGroundskeeperSearches) {
           val previousPlacement = proposalPlacements.get(descriptor)
@@ -56,6 +55,23 @@ class Groundskeeper {
     requirementMatches
       .filter(m => m.requirement == descriptor || m.proposal == descriptor)
       .foreach(requirementMatches.remove)
+  }
+  
+  private def proposalsInUpdateOrder: Iterable[BuildingDescriptor] = {
+    // Verify existing proposals
+    // in priority order (top priority first)
+    // Then place upcoming proposals
+    // ordered by time since last attempt at placement
+    // then by priority
+    val placed = proposalPlacements.keySet
+    val unplaced = proposals.diff(placed)
+    val ordered =
+      placed.toList
+        .sortBy(_.proposer.priority) ++
+      unplaced.toList
+        .sortBy(_.proposer.priority)
+        .sortBy(lastPlacementAttempt.getOrElse(_, 0))
+    ordered
   }
   
   //////////////
@@ -85,14 +101,6 @@ class Groundskeeper {
     flagUpdated(requirement)
     addRequirement(requirement)
     getTileForRequirement(requirement)
-  }
-  
-  ///////////////////////
-  // Visualization API //
-  ///////////////////////
-  
-  def sortByPriority(descriptors: Iterable[BuildingDescriptor] ): Vector[BuildingDescriptor] = {
-    descriptors.toVector.sortBy(proposal => With.prioritizer.getPriority(proposal.proposer))
   }
   
   //////////////

@@ -33,4 +33,6 @@ class Plan {
     val name = getClass.getSimpleName
     if (name.contains("$anon$")) "" else name
   }
+  
+  def priority: Int = With.prioritizer.getPriority(this)
 }

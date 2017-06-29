@@ -122,7 +122,7 @@ class BuildingDescriptor(
   }
   
   override def toString: String =
-    "#" + With.prioritizer.getPriority(proposer) + " " +
+    "#" + proposer.priority + " " +
     proposer.toString.take(12) + " " +
     argBuilding.map(_.toString + " ").getOrElse("") +
     placement.toString + " " +

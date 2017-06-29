@@ -42,7 +42,7 @@ class Groundskeeper {
           if (placement.tile.isDefined) {
             proposalPlacements.put(descriptor, placement)
           }
-          else {
+          else if (previousPlacement.isDefined) {
             proposalPlacements.remove(descriptor)
           }
         })

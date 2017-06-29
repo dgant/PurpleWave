@@ -52,7 +52,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
   
     desiredTile = building
       .map(_.tileTopLeft)
-      .orElse(With.groundskeeper.reserve(buildingDescriptor))
+      .orElse(With.groundskeeper.require(buildingDescriptor))
   
     if (desiredTile.isEmpty) {
       if (With.frame < With.configuration.maxFramesToTrustBuildRequest) {
@@ -102,7 +102,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
         currencyLock.expectedFrames))
   }
   
-  def buildingTile: Option[Tile] = With.groundskeeper.reserve(buildingDescriptor)
+  def buildingTile: Option[Tile] = With.groundskeeper.require(buildingDescriptor)
   
   override def visualize() {
     if (isComplete) return

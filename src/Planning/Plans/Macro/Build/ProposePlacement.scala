@@ -12,6 +12,6 @@ class ProposePlacement(buildingDescriptors: BuildingDescriptor*) extends Plan {
   
   override def onUpdate() {
     buildingDescriptors.foreach(buildingDescriptor =>
-      With.groundskeeper.suggest(buildingDescriptor))
+      With.groundskeeper.propose(buildingDescriptor))
   }
 }

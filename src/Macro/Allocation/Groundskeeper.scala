@@ -7,76 +7,106 @@ import Mathematics.Points.Tile
 import scala.collection.mutable
 
 class Groundskeeper {
-
-  val updated   : mutable.Set[BuildingDescriptor]             = new mutable.HashSet[BuildingDescriptor]
-  val unplaced  : mutable.Set[BuildingDescriptor]             = new mutable.HashSet[BuildingDescriptor]
-  val placed    : mutable.Map[BuildingDescriptor, Placement]  = new mutable.HashMap[BuildingDescriptor, Placement]
+  
+  case class RequirementMatch(requirement: BuildingDescriptor, proposal: BuildingDescriptor)
+  
+  val updated             : mutable.Set[BuildingDescriptor]             = new mutable.HashSet[BuildingDescriptor]
+  val proposals           : mutable.Set[BuildingDescriptor]             = new mutable.HashSet[BuildingDescriptor]
+  val proposalPlacements  : mutable.Map[BuildingDescriptor, Placement]  = new mutable.HashMap[BuildingDescriptor, Placement]
+  val requirementMatches  : mutable.Set[RequirementMatch]               = new mutable.HashSet[RequirementMatch]
+  
+  ///////////
+  // Tasks //
+  ///////////
   
   def update() {
-    if (updated.isEmpty) {
-      return
-    }
-    unplaced.diff(updated).foreach(removeDescriptor)
-    placed.keySet.diff(updated).foreach(removeDescriptor)
+    proposals.diff(updated).foreach(removeDescriptor)
+    proposalPlacements.keySet.diff(updated).foreach(removeDescriptor)
+    requirementMatches.map(_.requirement).diff(updated).foreach(removeDescriptor)
     updated.clear()
   }
   
   def placeBuildings() {
     With.architect.reboot()
-    Vector(placed.keys, unplaced)
+    Vector(proposalPlacements.keys, proposals.diff(proposalPlacements.keySet))
       .foreach(descriptors => sortByPriority(descriptors)
         .take(With.configuration.buildingPlacements) //Let's just do a few per run so we run frequently in smaller batches
         .foreach(descriptor =>
-          if (With.performance.continueRunning) {
-            val placement = With.architect.fulfill(descriptor, placed.get(descriptor))
-            if (placement.tile.isDefined) {
-              placed.put(descriptor, placement)
-            }
-            else {
-              placed.remove(descriptor)
-            }
-          }))
-  }
-  
-  def suggest(descriptor: BuildingDescriptor) {
-    updated += descriptor
-    if ( ! placed.contains(descriptor)) {
-      unplaced += descriptor
-    }
-  }
-  
-  def reserve(descriptor: BuildingDescriptor): Option[Tile] = {
-    
-    updated += descriptor
-    
-    // Do we have a placement for this descriptor already? Use it.
-    placed
-      .get(descriptor)
-      .filter(_.tile.isDefined) // We shouldn't be keeping placements with no tile anyhow, but just in case
-      .foreach(placement => {
-        unplaced -= descriptor
-        return placement.tile
-      })
-    
-    /*
-    // Do we have a placement for a matching descriptor? Use that placement.
-    sortByPriority(placed.keys)
-      .find(descriptor.fulfilledBy)
-      .foreach(matchingPlacement =>
-        return placed.put(descriptor, placed(matchingPlacement)))
-    */
-    
-    // This request is a new suggestion. Add it.
-    suggest(descriptor)
-    None
-  }
-  
-  def sortByPriority(descriptors: Iterable[BuildingDescriptor] ): Iterable[BuildingDescriptor] = {
-    descriptors.toVector.sortBy(suggestion => With.prioritizer.getPriority(suggestion.suggestor))
+        if (With.performance.continueRunning) {
+          val placement = With.architect.fulfill(descriptor, proposalPlacements.get(descriptor))
+          if (placement.tile.isDefined) {
+            proposalPlacements.put(descriptor, placement)
+          }
+          else {
+            proposalPlacements.remove(descriptor)
+          }
+        }))
   }
   
   private def removeDescriptor(descriptor: BuildingDescriptor) {
-    unplaced  -=  descriptor
-    placed    -=  descriptor
+    proposals.remove(descriptor)
+    proposalPlacements.remove(descriptor)
+    requirementMatches
+      .filter(m => m.requirement == descriptor || m.proposal == descriptor)
+      .foreach(requirementMatches.remove)
+  }
+  
+  //////////////
+  // Plan API //
+  //////////////
+  
+  def propose(proposal: BuildingDescriptor) {
+    flagUpdated(proposal)
+    addProposal(proposal)
+  }
+  
+  def require(requirement: BuildingDescriptor): Option[Tile] = {
+    flagUpdated(requirement)
+    addRequirement(requirement)
+    getTileForRequirement(requirement)
+  }
+  
+  ///////////////////////
+  // Visualization API //
+  ///////////////////////
+  
+  def sortByPriority(descriptors: Iterable[BuildingDescriptor] ): Iterable[BuildingDescriptor] = {
+    descriptors.toVector.sortBy(proposal => With.prioritizer.getPriority(proposal.proposer))
+  }
+  
+  //////////////
+  // Internal //
+  //////////////
+  
+  private def flagUpdated(descriptor: BuildingDescriptor) {
+    updated.add(descriptor)
+  }
+  private def addProposal(proposal: BuildingDescriptor) {
+    proposals.add(proposal)
+  }
+  
+  private def addRequirement(requirement: BuildingDescriptor) {
+    val matchedProposal = proposals
+      .diff(requirementMatches.map(_.proposal))
+      .find(requirement.fulfilledBy)
+      .getOrElse(requirement)
+    if (matchedProposal == requirement) {
+      addProposal(requirement)
+    }
+    makeMatch(requirement, requirement)
+  }
+  
+  private def getTileForRequirement(requirement: BuildingDescriptor): Option[Tile] = {
+    proposalPlacements
+      .get(getProposalForRequirement(requirement))
+      .flatMap(_.tile)
+  }
+  
+  private def getProposalForRequirement(requirement: BuildingDescriptor): BuildingDescriptor = {
+    requirementMatches.find(_.requirement == requirement).get.proposal
+  }
+  
+  private def makeMatch(requirement: BuildingDescriptor, proposal: BuildingDescriptor) {
+    requirementMatches.add(RequirementMatch(requirement = requirement, proposal = proposal))
   }
 }

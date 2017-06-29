@@ -9,7 +9,7 @@ import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClass.UnitClass
 
 class BuildingDescriptor(
-  val suggestor   : Plan,
+  val proposer    : Plan,
   val argBuilding : Option[UnitClass]         = None,
   argWidth        : Option[Int]               = None,
   argHeight       : Option[Int]               = None,
@@ -122,8 +122,8 @@ class BuildingDescriptor(
   }
   
   override def toString: String =
-    "#" + With.prioritizer.getPriority(suggestor) + " " +
-    suggestor.toString.take(5) + " " +
+    "#" + With.prioritizer.getPriority(proposer) + " " +
+    proposer.toString.take(5) + " " +
     argBuilding.map(_.toString + " ").getOrElse("") +
     placement.toString + " " +
     width + "x" + height + " " +

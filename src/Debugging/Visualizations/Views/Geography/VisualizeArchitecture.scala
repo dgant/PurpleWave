@@ -16,14 +16,14 @@ object VisualizeArchitecture {
     })
     
     With.groundskeeper
-      .sortByPriority(With.groundskeeper.placed.keys)
+      .sortByPriority(With.groundskeeper.proposalPlacements.keys)
       .headOption
       .foreach(renderPlacement)
   }
   
   def renderPlacement(descriptor: BuildingDescriptor) {
     
-    val placement = With.groundskeeper.placed(descriptor)
+    val placement = With.groundskeeper.proposalPlacements(descriptor)
     
     if (placement.tile.isEmpty || placement.scoresByTile.isEmpty) return
     

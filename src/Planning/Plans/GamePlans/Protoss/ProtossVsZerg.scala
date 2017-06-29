@@ -16,6 +16,7 @@ class ProtossVsZerg extends Parallel {
   description.set("Protoss vs Zerg")
   
   class FiveGateGoon_Start extends Parallel(
+    // http://wiki.teamliquid.net/starcraft/5_Gate_Ranged_Goons_(vs._Zerg)
     new Build(
       Request.unit(Protoss.Nexus),
       Request.unit(Protoss.Probe,         8),

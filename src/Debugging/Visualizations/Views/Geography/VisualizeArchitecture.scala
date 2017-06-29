@@ -3,7 +3,7 @@ package Debugging.Visualizations.Views.Geography
 import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.{DrawMap, DrawScreen}
 import Lifecycle.With
-import Macro.Architecture.BuildingDescriptor
+import Macro.Architecture.{BuildingDescriptor, Placement}
 import Mathematics.Points.Pixel
 import bwapi.Color
 
@@ -26,7 +26,28 @@ object VisualizeArchitecture {
     val placement = With.groundskeeper.proposalPlacements(descriptor)
     
     if (placement.tile.isEmpty || placement.scoresByTile.isEmpty) return
-    
+  
+    renderPlacementHeuristics(descriptor, placement)
+    renderPlacementList(descriptor, placement)
+  }
+  
+  private def renderPlacementList(descriptor: BuildingDescriptor, placement: Placement) = {
+    With.game.setTextSize(bwapi.Text.Size.Enum.Default)
+    DrawScreen.column(
+      5,
+      5,
+      List(
+        List(descriptor.toString),
+        placement.scoresByTile.toList
+          .sortBy(_._2)
+          .take(5)
+          .zipWithIndex
+          .map(pair => "#" + pair._2 + " " + pair._1._1 + " (" + (-pair._1._2) + ")"))
+        .flatten)
+    With.game.setTextSize(bwapi.Text.Size.Enum.Small)
+  }
+  
+  private def renderPlacementHeuristics(descriptor: BuildingDescriptor, placement: Placement) = {
     val heuristicRanges = placement
       .evaluations
       .groupBy(_.heuristic)
@@ -52,7 +73,7 @@ object VisualizeArchitecture {
           range.min,
           range.max)
       })
-  
+    
     val scoreMin = placement.scoresByTile.values.min
     val scoreMax = placement.scoresByTile.values.max
     placement.scoresByTile
@@ -65,20 +86,6 @@ object VisualizeArchitecture {
           pair._2,
           scoreMin,
           scoreMax))
-  
-    With.game.setTextSize(bwapi.Text.Size.Enum.Default)
-    DrawScreen.column(
-      5,
-      5,
-      List(
-        List(descriptor.toString),
-        placement.scoresByTile.toList
-          .sortBy(_._2)
-          .take(5)
-          .zipWithIndex
-          .map(pair =>"#" + pair._2 + " " + pair._1._1 + " (" + ( - pair._1._2) + ")"))
-      .flatten)
-    With.game.setTextSize(bwapi.Text.Size.Enum.Small)
   }
   
   private def draw(
@@ -89,6 +96,7 @@ object VisualizeArchitecture {
     min       : Double,
     max       : Double
   ) {
+    // Temporarily disabled
     DrawMap.circle(
       pixel.add(
         16 * building.width,

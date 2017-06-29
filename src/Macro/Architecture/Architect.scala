@@ -16,7 +16,9 @@ class Architect {
   val exclusions: mutable.ArrayBuffer[Exclusion] = new mutable.ArrayBuffer[Exclusion]
   
   def usuallyNeedsMargin(unitClass: UnitClass): Boolean = {
-    unitClass.isBuilding && UnitClasses.all.exists(unit => ! unit.isFlyer && unit.whatBuilds._1 == unitClass)
+    unitClass.isBuilding &&
+    UnitClasses.all.exists(unit => ! unit.isFlyer && unit.whatBuilds._1 == unitClass) &&
+    ! unitClass.isTownHall //Nexus margins bork FFEs. Down the road Hatcheries may need margins.
   }
   
   def reboot() {
@@ -124,7 +126,7 @@ class Architect {
     
     val allCandidates = candidates(buildingDescriptor)
       .filter(canBuild(buildingDescriptor, _))
-      .take(With.configuration.maxBuildingPlacementCandidates)
+      .take(With.configuration.maxGroundskeeperSearches)
       .toVector
     
     val bestCandidate = EvaluatePlacements.best(buildingDescriptor, allCandidates)

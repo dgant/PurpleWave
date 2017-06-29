@@ -28,14 +28,18 @@ class Groundskeeper {
   }
   
   def placeBuildings() {
+    var newSearches = 0
     With.architect.reboot()
     sortByPriority(proposals)
       .sortBy(lastPlacementAttempt.getOrElse(_, 0))
-      .take(With.configuration.buildingPlacements)
       .foreach(descriptor =>
-        if (With.performance.continueRunning) {
+        if (With.performance.continueRunning && newSearches < With.configuration.maxGroundskeeperSearches) {
+          val previousPlacement = proposalPlacements.get(descriptor)
+          if (previousPlacement.isEmpty) {
+            newSearches += 1
+          }
           lastPlacementAttempt(descriptor) = With.frame
-          val placement = With.architect.fulfill(descriptor, proposalPlacements.get(descriptor))
+          val placement = With.architect.fulfill(descriptor, previousPlacement)
           if (placement.tile.isDefined) {
             proposalPlacements.put(descriptor, placement)
           }

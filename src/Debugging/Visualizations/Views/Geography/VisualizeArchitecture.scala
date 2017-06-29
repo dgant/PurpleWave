@@ -27,7 +27,7 @@ object VisualizeArchitecture {
     
     if (placement.tile.isEmpty || placement.scoresByTile.isEmpty) return
   
-    renderPlacementHeuristics(descriptor, placement)
+    //renderPlacementHeuristics(descriptor, placement)
     //renderPlacementList(descriptor, placement)
   }
   

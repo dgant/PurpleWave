@@ -9,6 +9,17 @@ object ZoneUpdater {
   
   def update() {
     With.geography.zones.foreach(updateZone)
+  
+    // TODO: We only want to do this once!
+    With.geography.bases
+      .filter(_.isStartLocation)
+      .foreach(startLocationBase =>
+        With.geography.bases
+          .filter(_.gas.nonEmpty)
+          .minBy(
+            _.townHallArea.startInclusive.groundPixels(
+              startLocationBase.townHallArea.startInclusive))
+          .isNaturalOf = Some(startLocationBase))
   }
   
   def updateZone(zone: Zone) {
@@ -65,5 +76,7 @@ object ZoneUpdater {
     base.planningToTake = With.units.ours.exists(unit =>
       unit.actionState.toBuildTile.exists(_.zone == base.zone) &&
       unit.actionState.toBuild.exists(_.isTownHall))
+    
+    
   }
 }

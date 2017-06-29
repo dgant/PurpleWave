@@ -31,8 +31,8 @@ class BuildingDescriptor(
   val townHall    : Boolean           = argTownHall     .getOrElse(argBuilding.exists(_.isTownHall))
   val gas         : Boolean           = argGas          .getOrElse(argBuilding.exists(_.isRefinery))
   val margin      : Boolean           = argMargin       .getOrElse(argBuilding.exists(With.architect.usuallyNeedsMargin))
-  val placement   : PlacementProfile  = argPlacement    .getOrElse(PlacementProfiles.default(this))
   val attackRange : Option[Double]    = argRangePixels  .orElse(argBuilding.map(building => building.maxAirGroundRange + building.radialHypotenuse))
+  val placement   : PlacementProfile  = argPlacement    .getOrElse(PlacementProfiles.default(this))
   
   def fulfilledBy(suggestion: BuildingDescriptor): Boolean = {
     if (suggestion == this) return true

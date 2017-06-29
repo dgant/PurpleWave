@@ -5,7 +5,7 @@ import Planning.Plan
 
 abstract class AbstractAll(initialChildren: Plan*) extends Plan {
   
-  val children = new Property[Vector[Plan]](initialChildren.toVector)
+  val children = new Property[Seq[Plan]](initialChildren.toVector)
   
   override def isComplete:Boolean = getChildren.forall(_.isComplete)
   

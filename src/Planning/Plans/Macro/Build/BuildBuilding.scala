@@ -70,14 +70,14 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
     }
   
     // When building placement changes we want a builder closer to the new placement
-    if (orderedTile.exists(_ != buildingTile.get)) {
+    if (orderedTile.isDefined && orderedTile != desiredTile) {
       builderLock.release()
     }
-    builderLock.unitPreference.set(new UnitPreferClose(buildingTile.get.pixelCenter))
+    builderLock.unitPreference.set(UnitPreferClose(desiredTile.get.pixelCenter))
     builderLock.acquire(this)
     
     if (builderLock.satisfied && building.isEmpty) {
-      orderedTile = buildingTile
+      orderedTile = desiredTile
       With.executor.intend(
         new Intention(this, builderLock.units.head) {
           toBuild     = if (currencyLock.isSatisfied) Some(buildingClass) else None
@@ -101,8 +101,6 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
         Math.min(With.configuration.maxFramesToSendAdvanceBuilder, someBuilder.framesToTravel(desiredTile.get.pixelCenter)) >=
         currencyLock.expectedFrames))
   }
-  
-  def buildingTile: Option[Tile] = With.groundskeeper.require(buildingDescriptor)
   
   override def visualize() {
     if (isComplete) return

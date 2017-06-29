@@ -4,14 +4,11 @@ import Lifecycle.With
 import Macro.Architecture.BuildingDescriptor
 import Planning.Plan
 
-class ProposePlacement(buildingDescriptors: BuildingDescriptor*) extends Plan {
+class ProposePlacement(buildingDescriptor: BuildingDescriptor) extends Plan {
   
-  description.set("Propose placing "
-    + buildingDescriptors.take(3).map(_.toString).mkString(", ")
-    + (if(buildingDescriptors.size > 3) "..." else ""))
+  description.set("Propose placing " + buildingDescriptor)
   
   override def onUpdate() {
-    buildingDescriptors.foreach(buildingDescriptor =>
-      With.groundskeeper.propose(buildingDescriptor))
+    With.groundskeeper.propose(buildingDescriptor)
   }
 }

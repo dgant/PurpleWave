@@ -1,12 +1,12 @@
 package Macro.Architecture.Heuristics
 
 import Lifecycle.With
-import Macro.Architecture.BuildingDescriptor
+import Macro.Architecture.Blueprint
 import Mathematics.Points.Tile
 
 object PlacementHeuristicSurfaceArea extends PlacementHeuristic {
   
-  override def evaluate(building: BuildingDescriptor, candidate: Tile): Double = {
+  override def evaluate(building: Blueprint, candidate: Tile): Double = {
     
     val zone = candidate.zone
     val dxEnd = building.width + 2
@@ -21,7 +21,7 @@ object PlacementHeuristicSurfaceArea extends PlacementHeuristic {
           if (
             With.grids.walkable.get(borderTile)
             && ! zone.bases.exists(_.townHallArea.contains(borderTile))
-            && ! With.architect.exclusions.exists(_.areaExcluded.contains(borderTile))) { //Note that this incorrectly counts margin tiles as non-surface-area
+            && ! With.architecture.exclusions.exists(_.areaExcluded.contains(borderTile))) { //Note that this incorrectly counts margin tiles as non-surface-area
             walkableTiles += 1
           }
         }

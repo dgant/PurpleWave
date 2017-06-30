@@ -8,7 +8,7 @@ import Planning.Plan
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClass.UnitClass
 
-class BuildingDescriptor(
+class Blueprint(
   val proposer    : Plan,
   val building    : Option[UnitClass]         = None,
   argWidth        : Option[Int]               = None,
@@ -30,11 +30,11 @@ class BuildingDescriptor(
   val powered     : Boolean           = argPowered      .getOrElse(building.exists(_.requiresPsi))
   val townHall    : Boolean           = argTownHall     .getOrElse(building.exists(_.isTownHall))
   val gas         : Boolean           = argGas          .getOrElse(building.exists(_.isRefinery))
-  val margin      : Boolean           = argMargin       .getOrElse(building.exists(With.architect.usuallyNeedsMargin))
+  val margin      : Boolean           = argMargin       .getOrElse(building.exists(With.architecture.usuallyNeedsMargin))
   val attackRange : Option[Double]    = argRangePixels  .orElse(building.map(building => building.maxAirGroundRange + building.radialHypotenuse))
   val placement   : PlacementProfile  = argPlacement    .getOrElse(PlacementProfiles.default(this))
   
-  def fulfilledBy(proposal: BuildingDescriptor): Boolean = {
+  def fulfilledBy(proposal: Blueprint): Boolean = {
     if (proposal == this) return true
     width         == proposal.width                             &&
     height        == proposal.height                            &&
@@ -56,13 +56,13 @@ class BuildingDescriptor(
   def accepts(tile: Tile): Boolean = {
     
     if (powered) {
-      if (width == 4 && ! With.grids.psi4x3.get(tile) && ! With.architect.powered4x3.contains(tile)) {
+      if (width == 4 && ! With.grids.psi3Height.get(tile) && ! With.architecture.powered3Height.contains(tile)) {
         return false
       }
-      if (width == 3 && ! With.grids.psi2x2and3x2.get(tile) && ! With.architect.powered2x2and3x2.contains(tile)) {
+      if (width == 3 && ! With.grids.psi2Height.get(tile) && ! With.architecture.powered2Height.contains(tile)) {
         return false
       }
-      if (width == 2 && ! With.grids.psi2x2and3x2.get(tile) && ! With.architect.powered2x2and3x2.contains(tile)) {
+      if (width == 2 && ! With.grids.psi2Height.get(tile) && ! With.architecture.powered2Height.contains(tile)) {
         return false
       }
     }
@@ -92,8 +92,6 @@ class BuildingDescriptor(
     val yMax          = tile.add(relativeMarginEnd).y
     val tileBuildEnd  = tile.add(relativeBuildEnd)
     
-    // TODO: Reject areas occupied by units
-    
     // While loops have lower overhead than other iterative mechanisms in Scala.
     while (x < xMax) {
       var y = tile.add(relativeMarginStart).y
@@ -107,7 +105,7 @@ class BuildingDescriptor(
           nextTile.y < tile.y           ||
           nextTile.x >= tileBuildEnd.x  ||
           nextTile.y >= tileBuildEnd.y) {
-          if ( ! With.grids.walkable.get(nextTile)) {
+          if ( ! With.architecture.walkable(tile)) {
             return false
           }
         }

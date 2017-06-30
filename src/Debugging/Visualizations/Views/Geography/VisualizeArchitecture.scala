@@ -3,14 +3,14 @@ package Debugging.Visualizations.Views.Geography
 import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.{DrawMap, DrawScreen}
 import Lifecycle.With
-import Macro.Architecture.{BuildingDescriptor, Placement}
+import Macro.Architecture.{Blueprint, Placement}
 import Mathematics.Points.Pixel
 import bwapi.Color
 
 object VisualizeArchitecture {
   
   def render() {
-    With.architect.exclusions.foreach(exclusion => {
+    With.architecture.exclusions.foreach(exclusion => {
       DrawMap.tileRectangle(exclusion.areaExcluded, Colors.MediumRed)
       DrawMap.label(exclusion.description, exclusion.areaExcluded.midPixel)
     })
@@ -22,7 +22,7 @@ object VisualizeArchitecture {
       .foreach(renderPlacement)
   }
   
-  def renderPlacement(descriptor: BuildingDescriptor) {
+  def renderPlacement(descriptor: Blueprint) {
     
     val placement = With.groundskeeper.proposalPlacements(descriptor)
     
@@ -32,7 +32,7 @@ object VisualizeArchitecture {
     //renderPlacementList(descriptor, placement)
   }
   
-  private def renderPlacementList(descriptor: BuildingDescriptor, placement: Placement) = {
+  private def renderPlacementList(descriptor: Blueprint, placement: Placement) = {
     With.game.setTextSize(bwapi.Text.Size.Enum.Default)
     DrawScreen.column(
       5,
@@ -48,7 +48,7 @@ object VisualizeArchitecture {
     With.game.setTextSize(bwapi.Text.Size.Enum.Small)
   }
   
-  private def renderPlacementHeuristics(descriptor: BuildingDescriptor, placement: Placement) = {
+  private def renderPlacementHeuristics(descriptor: Blueprint, placement: Placement) = {
     val heuristicRanges = placement
       .evaluations
       .groupBy(_.heuristic)
@@ -90,12 +90,12 @@ object VisualizeArchitecture {
   }
   
   private def draw(
-    building  : BuildingDescriptor,
-    color     : Color,
-    pixel     : Pixel,
-    value     : Double,
-    min       : Double,
-    max       : Double
+                    building  : Blueprint,
+                    color     : Color,
+                    pixel     : Pixel,
+                    value     : Double,
+                    min       : Double,
+                    max       : Double
   ) {
     // Temporarily disabled
     DrawMap.circle(

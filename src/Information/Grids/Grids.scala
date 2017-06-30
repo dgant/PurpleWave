@@ -1,6 +1,6 @@
 package Information.Grids
 
-import Information.Grids.Construction.{GridBuildable, GridBuildableTerrain, GridPsi2x2and3x2, GridPsi4x3}
+import Information.Grids.Construction.{GridBuildable, GridBuildableTerrain, GridPsi2Height, GridPsi3Height}
 import Information.Grids.Dps._
 import Information.Grids.Movement._
 import Information.Grids.Vision.{GridAltitudeBonus, GridEnemyDetection, GridEnemyVision}
@@ -20,8 +20,8 @@ class Grids {
   val dpsEnemyGroundNormal      = new GridDpsEnemyGroundNormal
   val dpsEnemyApproximate       = new GridDpsEnemyApproximate
   val enemyVision               = new GridEnemyVision
-  val psi2x2and3x2              = new GridPsi2x2and3x2
-  val psi4x3                    = new GridPsi4x3
+  val psi2Height                = new GridPsi2Height
+  val psi3Height                = new GridPsi3Height
   val mobility                  = new GridMobility
   val units                     = new GridUnits
   val walkable                  = new GridWalkable

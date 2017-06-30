@@ -5,6 +5,6 @@ import Performance.Tasks.AbstractTask
 
 class TaskGridPsi2x2and3x2 extends AbstractTask {
   
-  override protected def onRun(): Unit = With.grids.psi2x2and3x2.update()
+  override protected def onRun(): Unit = With.grids.psi2Height.update()
   
 }

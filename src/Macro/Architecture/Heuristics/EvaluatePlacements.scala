@@ -1,14 +1,14 @@
 package Macro.Architecture.Heuristics
 
 import Lifecycle.With
-import Macro.Architecture.{BuildingDescriptor, Placement}
+import Macro.Architecture.{Blueprint, Placement}
 import Mathematics.Heuristics.HeuristicMathMultiplicative
 import Mathematics.Points.Tile
 
 object EvaluatePlacements {
   
   def best(
-    buildingDescriptor  : BuildingDescriptor,
+    buildingDescriptor  : Blueprint,
     tiles               : Iterable[Tile])
       : Placement = {
     
@@ -49,8 +49,8 @@ object EvaluatePlacements {
   }
   
   def evaluate(
-    buildingDescriptor  : BuildingDescriptor,
-    candidate           : Tile)
+                buildingDescriptor  : Blueprint,
+                candidate           : Tile)
       : Iterable[PlacementHeuristicEvaluation] =
         buildingDescriptor.placement.weightedHeuristics
           .map(weightedHeuristic =>
@@ -65,9 +65,9 @@ object EvaluatePlacements {
               weightedHeuristic.color))
           
   def evaluateHeuristic(
-    buildingDescriptor  : BuildingDescriptor,
-    candidate           : Tile,
-    heuristicWeight     : PlacementHeuristicWeight)
+                         buildingDescriptor  : Blueprint,
+                         candidate           : Tile,
+                         heuristicWeight     : PlacementHeuristicWeight)
       : Double =
         heuristicWeight.weighMultiplicatively(
           buildingDescriptor,

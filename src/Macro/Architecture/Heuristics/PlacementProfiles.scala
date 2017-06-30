@@ -1,6 +1,6 @@
 package Macro.Architecture.Heuristics
 
-import Macro.Architecture.BuildingDescriptor
+import Macro.Architecture.Blueprint
 
 object PlacementProfiles {
   
@@ -64,7 +64,7 @@ object PlacementProfiles {
     avoidDistanceFromExitRange  = 2.0
   )
   
-  def default(buildingDescriptor: BuildingDescriptor): PlacementProfile = {
+  def default(buildingDescriptor: Blueprint): PlacementProfile = {
     if (buildingDescriptor.townHall)
       townHall
     else if (buildingDescriptor.gas)

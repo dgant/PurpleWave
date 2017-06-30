@@ -1,12 +1,12 @@
 package Macro.Architecture.Heuristics
 
 import Lifecycle.With
-import Macro.Architecture.BuildingDescriptor
+import Macro.Architecture.Blueprint
 import Mathematics.Points.Tile
 
 object PlacementHeuristicDistanceFromEnemy extends PlacementHeuristic {
   
-  override def evaluate(building: BuildingDescriptor, candidate: Tile): Double = {
+  override def evaluate(building: Blueprint, candidate: Tile): Double = {
   
     val enemyBases =
     if (With.geography.enemyBases.isEmpty)

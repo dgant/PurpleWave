@@ -1,12 +1,12 @@
 package Macro.Architecture.Heuristics
 
 import Information.Geography.Types.ZoneEdge
-import Macro.Architecture.BuildingDescriptor
+import Macro.Architecture.Blueprint
 import Mathematics.Points.Tile
 
 object PlacementHeuristicDistanceFromExitRange extends PlacementHeuristic {
   
-  override def evaluate(building: BuildingDescriptor, candidate: Tile): Double = {
+  override def evaluate(building: Blueprint, candidate: Tile): Double = {
     
     val targetDistance            = building.attackRange.getOrElse(32.0 * 6.0)
     val candidatePixel            = candidate.pixelCenter

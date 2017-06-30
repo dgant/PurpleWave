@@ -51,6 +51,9 @@ case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   def midpoint(pixel: Tile): Tile = {
     add(pixel).divide(2)
   }
+  def tileDistanceManhattan(tile: Tile): Int = {
+    Math.abs(x-tile.x) + Math.abs(y-tile.y)
+  }
   def tileDistanceSlow(tile: Tile): Double = {
     Math.sqrt(tileDistanceSquared(tile))
   }
@@ -77,6 +80,18 @@ case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   }
   def topLeftWalkPixel: WalkTile = {
     WalkTile(x*4, y*4)
+  }
+  def left: Tile = {
+    Tile(x-1, y)
+  }
+  def right: Tile = {
+    Tile(x+1, y)
+  }
+  def up: Tile = {
+    Tile(x, y-1) //Remember our flipped coordinate system
+  }
+  def down: Tile = {
+    Tile(x, y+1) //Remember our flipped coordinate system
   }
   def zone: Zone = {
     With.geography.zoneByTile(this)

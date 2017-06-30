@@ -1,21 +1,19 @@
 package Macro.Allocation
 
 import Lifecycle.With
-import Macro.Architecture.{BuildingDescriptor, Placement}
+import Macro.Architecture.{Architect, Blueprint, BlueprintMatch, Placement}
 import Mathematics.Points.Tile
 
 import scala.collection.mutable
 
 class Groundskeeper {
   
-  case class RequirementMatch(requirement: BuildingDescriptor, proposal: BuildingDescriptor)
-  
-  val updated               : mutable.Set[BuildingDescriptor]             = new mutable.HashSet[BuildingDescriptor]
-  val proposals             : mutable.Set[BuildingDescriptor]             = new mutable.HashSet[BuildingDescriptor]
-  val proposalPlacements    : mutable.Map[BuildingDescriptor, Placement]  = new mutable.HashMap[BuildingDescriptor, Placement]
-  val lastPlacementAttempt  : mutable.Map[BuildingDescriptor, Int]        = new mutable.HashMap[BuildingDescriptor, Int]
-  val requirementMatches    : mutable.Set[RequirementMatch]               = new mutable.HashSet[RequirementMatch]
-  val proposalsFulfilled    : mutable.Set[BuildingDescriptor]             = new mutable.HashSet[BuildingDescriptor]
+  val updated               : mutable.Set[Blueprint]             = new mutable.HashSet[Blueprint]
+  val proposals             : mutable.Set[Blueprint]             = new mutable.HashSet[Blueprint]
+  val proposalPlacements    : mutable.Map[Blueprint, Placement]  = new mutable.HashMap[Blueprint, Placement]
+  val lastPlacementAttempt  : mutable.Map[Blueprint, Int]        = new mutable.HashMap[Blueprint, Int]
+  val requirementMatches    : mutable.Set[BlueprintMatch]         = new mutable.HashSet[BlueprintMatch]
+  val proposalsFulfilled    : mutable.Set[Blueprint]             = new mutable.HashSet[Blueprint]
   
   ///////////
   // Tasks //
@@ -30,7 +28,7 @@ class Groundskeeper {
   
   def placeBuildings() {
     var newSearches = 0
-    With.architect.reboot()
+    With.architecture.reboot()
     proposalsInUpdateOrder
       .foreach(descriptor =>
         if (With.performance.continueRunning && newSearches < With.configuration.maxGroundskeeperSearches) {
@@ -39,7 +37,7 @@ class Groundskeeper {
             newSearches += 1
           }
           lastPlacementAttempt(descriptor) = With.frame
-          val placementAfter = With.architect.fulfill(descriptor, placementBefore)
+          val placementAfter = Architect.fulfill(descriptor, placementBefore)
           proposalPlacements.put(descriptor, placementAfter)
           
           // For debugging only!
@@ -57,7 +55,7 @@ class Groundskeeper {
         })
   }
   
-  private def removeDescriptor(descriptor: BuildingDescriptor) {
+  private def removeDescriptor(descriptor: Blueprint) {
     proposals.remove(descriptor)
     proposalPlacements.remove(descriptor)
     lastPlacementAttempt.remove(descriptor)
@@ -66,7 +64,7 @@ class Groundskeeper {
       .foreach(requirementMatches.remove)
   }
   
-  private def proposalsInUpdateOrder: Iterable[BuildingDescriptor] = {
+  private def proposalsInUpdateOrder: Iterable[Blueprint] = {
     // Verify existing placements
     // in priority order (top priority first)
     // Then place upcoming proposals
@@ -94,7 +92,7 @@ class Groundskeeper {
   Intended for use by Plans that don't actually care when the building gets placed.
   This is just to say "hey, it would be nice if a matching building got built here."
   */
-  def propose(proposal: BuildingDescriptor) {
+  def propose(proposal: Blueprint) {
     if (proposalsFulfilled.contains(proposal)) return
     flagUpdated(proposal)
     addProposal(proposal)
@@ -109,14 +107,14 @@ class Groundskeeper {
   but someone proposed a specific place for a Pylon,
   use the previously proposed place.
    */
-  def require(requirement: BuildingDescriptor): Option[Tile] = {
+  def require(requirement: Blueprint): Option[Tile] = {
     unfulfillProposalForRequirement(requirement)
     flagUpdated(requirement)
     addRequirement(requirement)
     getTileForRequirement(requirement)
   }
   
-  def flagFulfilled(requirement: BuildingDescriptor) {
+  def flagFulfilled(requirement: Blueprint) {
     val proposal = getRepresentativeDescriptorForRequirement(requirement)
     removeDescriptor(requirement)
     removeDescriptor(proposal)
@@ -128,45 +126,45 @@ class Groundskeeper {
   // Internal //
   //////////////
   
-  private def flagUpdated(descriptor: BuildingDescriptor) {
+  private def flagUpdated(descriptor: Blueprint) {
     updated.add(descriptor)
   }
   
-  private def addProposal(proposal: BuildingDescriptor) {
+  private def addProposal(proposal: Blueprint) {
     proposals.add(proposal)
   }
   
-  private def addRequirement(requirement: BuildingDescriptor) {
+  private def addRequirement(requirement: Blueprint) {
     val proposal = getRepresentativeDescriptorForRequirement(requirement)
     if (proposal == requirement) {
       addProposal(requirement)
     }
-    requirementMatches.add(RequirementMatch(requirement = requirement, proposal = proposal))
+    requirementMatches.add(BlueprintMatch(requirement = requirement, proposal = proposal))
   }
   
-  private def getTileForRequirement(requirement: BuildingDescriptor): Option[Tile] = {
+  private def getTileForRequirement(requirement: Blueprint): Option[Tile] = {
     val proposal = findProposalAlreadyMatchedWithRequirement(requirement)
     proposal.foreach(flagUpdated)
     proposal.flatMap(proposalPlacements.get).flatMap(_.tile)
   }
   
-  private def getRepresentativeDescriptorForRequirement(requirement: BuildingDescriptor): BuildingDescriptor = {
+  private def getRepresentativeDescriptorForRequirement(requirement: Blueprint): Blueprint = {
     findProposalAlreadyMatchedWithRequirement(requirement)
       .orElse(findProposalToMatchWithRequirement(requirement))
       .getOrElse(requirement)
   }
   
-  private def findProposalAlreadyMatchedWithRequirement(requirement: BuildingDescriptor): Option[BuildingDescriptor] = {
+  private def findProposalAlreadyMatchedWithRequirement(requirement: Blueprint): Option[Blueprint] = {
     requirementMatches.find(_.requirement == requirement).map(_.proposal)
   }
   
-  private def findProposalToMatchWithRequirement(requirement: BuildingDescriptor): Option[BuildingDescriptor] = {
+  private def findProposalToMatchWithRequirement(requirement: Blueprint): Option[Blueprint] = {
     proposals
       .diff(requirementMatches.map(_.proposal))
       .find(requirement.fulfilledBy)
   }
   
-  private def unfulfillProposalForRequirement(requirement: BuildingDescriptor) {
+  private def unfulfillProposalForRequirement(requirement: Blueprint) {
     proposalsFulfilled.remove(getRepresentativeDescriptorForRequirement(requirement))
   }
 }

@@ -9,7 +9,7 @@ import Information.Grids.Grids
 import Information._
 import Macro.Allocation._
 import Macro.Scheduling.Scheduler
-import Macro.Architecture.Architect
+import Macro.Architecture.Architecture
 import Micro.Intent.Commander
 import Micro.Execution.Executor
 import Performance.TaskQueue.{AbstractTaskQueue, TaskQueueGlobal}
@@ -24,7 +24,7 @@ import scala.collection.JavaConverters._
 
 object With {
   var game            : bwapi.Game          = _
-  var architect       : Architect           = _
+  var architecture    : Architecture        = _
   var bank            : Bank                = _
   var battles         : BattleClassifier    = _
   var camera          : Camera              = _
@@ -76,7 +76,7 @@ object With {
     configuration     = new Configuration
     logger            = new Logger
     initializeBWTA()
-    architect         = new Architect
+    architecture      = new Architecture
     bank              = new Bank
     battles           = new BattleClassifier
     groundskeeper     = new Groundskeeper

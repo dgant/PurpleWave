@@ -10,13 +10,13 @@ import Planning.Composition.ResourceLocks.{LockCurrencyForUnit, LockUnits}
 import ProxyBwapi.UnitClass.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Lifecycle.With
-import Macro.Architecture.BuildingDescriptor
+import Macro.Architecture.Blueprint
 import Mathematics.Points.Tile
 import bwapi.Race
 
 class BuildBuilding(val buildingClass: UnitClass) extends Plan {
   
-  val buildingDescriptor  = new BuildingDescriptor(this, Some(buildingClass))
+  val buildingDescriptor  = new Blueprint(this, Some(buildingClass))
   val currencyLock        = new LockCurrencyForUnit(buildingClass)
   
   private var desiredTile   : Option[Tile]              = None

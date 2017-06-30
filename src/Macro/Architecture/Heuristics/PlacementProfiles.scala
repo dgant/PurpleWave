@@ -28,7 +28,7 @@ object PlacementProfiles {
     "Tech",
     preferZone                  = 1.0,
     preferDistanceFromEnemy     = 4.0,
-    avoidSurfaceArea            = 0.25,
+    avoidSurfaceArea            = 0.5,
     avoidDistanceFromBase       = 1.0,
     avoidDistanceFromExitRange  = 0.0
   )

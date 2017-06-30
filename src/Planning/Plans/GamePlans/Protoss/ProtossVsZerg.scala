@@ -26,12 +26,9 @@ class ProtossVsZerg extends Parallel {
       Request.unit(Protoss.Probe,         12),
       Request.unit(Protoss.PhotonCannon,  2),
       Request.unit(Protoss.Probe,         15),
-      Request.unit(Protoss.Pylon,         2),
-      Request.unit(Protoss.Probe,         18),
-      Request.unit(Protoss.Nexus,         2),
-      Request.unit(Protoss.Probe,         19),
-      Request.unit(Protoss.Gateway),
-      Request.unit(Protoss.Assimilator)
+      Request.unit(Protoss.PhotonCannon,  3),
+      Request.unit(Protoss.Probe,         16),
+      Request.unit(Protoss.Pylon,         2)
     )
   )
   
@@ -54,11 +51,13 @@ class ProtossVsZerg extends Parallel {
     new RequireMiningBases(1),
     new ProposeForgeFastExpand,
     new FiveGateGoon_Start,
-    new TrainProbesContinuously,
     new RequireMiningBases(2),
-    new Build(Request.unit(Protoss.CyberneticsCore, 5)),
-    new Build(Request.unit(Protoss.PhotonCannon,  4)), // Very conservative
     new RequireSufficientPylons,
+    new TrainProbesContinuously,
+    new Build(Request.unit(Protoss.Gateway)),
+    new Build(Request.unit(Protoss.Assimilator)),
+    new Build(Request.unit(Protoss.CyberneticsCore, 1)),
+    new Build(Request.unit(Protoss.PhotonCannon,  4)),
     new BuildDragoonsAndAssimilators_AfterCyberneticsCore,
     new Build(Request.unit(Protoss.Gateway, 5)),
     //This part is freelancing. Replace with an actual late game.

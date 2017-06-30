@@ -39,7 +39,10 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
   
   override def onUpdate() {
     
-    if (isComplete) return
+    if (isComplete) {
+      With.groundskeeper.flagFulfilled(buildingDescriptor)
+      return
+    }
     
     building = building
       .filter(_.alive)
@@ -50,9 +53,14 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
             unit.tileTopLeft == tile))
           .getOrElse(None))
   
-    desiredTile = building
-      .map(_.tileTopLeft)
-      .orElse(With.groundskeeper.require(buildingDescriptor))
+    desiredTile =
+      if (building.isDefined) {
+        With.groundskeeper.flagFulfilled(buildingDescriptor)
+        building.map(_.tileTopLeft)
+      }
+      else {
+        With.groundskeeper.require(buildingDescriptor)
+      }
   
     if (desiredTile.isEmpty) {
       if (With.frame < With.configuration.maxFramesToTrustBuildRequest) {

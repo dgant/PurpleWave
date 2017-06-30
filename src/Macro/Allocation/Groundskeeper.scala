@@ -15,6 +15,7 @@ class Groundskeeper {
   val proposalPlacements    : mutable.Map[BuildingDescriptor, Placement]  = new mutable.HashMap[BuildingDescriptor, Placement]
   val lastPlacementAttempt  : mutable.Map[BuildingDescriptor, Int]        = new mutable.HashMap[BuildingDescriptor, Int]
   val requirementMatches    : mutable.Set[RequirementMatch]               = new mutable.HashSet[RequirementMatch]
+  val proposalsFulfilled    : mutable.Set[BuildingDescriptor]             = new mutable.HashSet[BuildingDescriptor]
   
   ///////////
   // Tasks //
@@ -94,6 +95,7 @@ class Groundskeeper {
   This is just to say "hey, it would be nice if a matching building got built here."
   */
   def propose(proposal: BuildingDescriptor) {
+    if (proposalsFulfilled.contains(proposal)) return
     flagUpdated(proposal)
     addProposal(proposal)
   }
@@ -108,9 +110,15 @@ class Groundskeeper {
   use the previously proposed place.
    */
   def require(requirement: BuildingDescriptor): Option[Tile] = {
+    unfulfillProposalForRequirement(requirement)
     flagUpdated(requirement)
     addRequirement(requirement)
     getTileForRequirement(requirement)
+  }
+  
+  def flagFulfilled(requirement: BuildingDescriptor) {
+    removeDescriptor(requirement)
+    proposalsFulfilled.add(requirement)
   }
   
   //////////////
@@ -153,5 +161,9 @@ class Groundskeeper {
     proposals
       .diff(requirementMatches.map(_.proposal))
       .find(requirement.fulfilledBy)
+  }
+  
+  private def unfulfillProposalForRequirement(requirement: BuildingDescriptor) {
+    proposalsFulfilled.remove(getRepresentativeDescriptorForRequirement(requirement))
   }
 }

@@ -10,7 +10,7 @@ import ProxyBwapi.UnitClass.UnitClass
 
 class BuildingDescriptor(
   val proposer    : Plan,
-  val argBuilding : Option[UnitClass]         = None,
+  val building    : Option[UnitClass]         = None,
   argWidth        : Option[Int]               = None,
   argHeight       : Option[Int]               = None,
   argPowers       : Option[Boolean]           = None,
@@ -24,26 +24,27 @@ class BuildingDescriptor(
   
   val frameCreated: Int = With.frame
   
-  val width       : Int               = argWidth        .orElse(argBuilding.map(_.tileWidth)).getOrElse(1)
-  val height      : Int               = argHeight       .orElse(argBuilding.map(_.tileHeight)).getOrElse(1)
-  val powers      : Boolean           = argPowers       .getOrElse(argBuilding.contains(Protoss.Pylon))
-  val powered     : Boolean           = argPowered      .getOrElse(argBuilding.exists(_.requiresPsi))
-  val townHall    : Boolean           = argTownHall     .getOrElse(argBuilding.exists(_.isTownHall))
-  val gas         : Boolean           = argGas          .getOrElse(argBuilding.exists(_.isRefinery))
-  val margin      : Boolean           = argMargin       .getOrElse(argBuilding.exists(With.architect.usuallyNeedsMargin))
-  val attackRange : Option[Double]    = argRangePixels  .orElse(argBuilding.map(building => building.maxAirGroundRange + building.radialHypotenuse))
+  val width       : Int               = argWidth        .orElse(building.map(_.tileWidth)).getOrElse(1)
+  val height      : Int               = argHeight       .orElse(building.map(_.tileHeight)).getOrElse(1)
+  val powers      : Boolean           = argPowers       .getOrElse(building.contains(Protoss.Pylon))
+  val powered     : Boolean           = argPowered      .getOrElse(building.exists(_.requiresPsi))
+  val townHall    : Boolean           = argTownHall     .getOrElse(building.exists(_.isTownHall))
+  val gas         : Boolean           = argGas          .getOrElse(building.exists(_.isRefinery))
+  val margin      : Boolean           = argMargin       .getOrElse(building.exists(With.architect.usuallyNeedsMargin))
+  val attackRange : Option[Double]    = argRangePixels  .orElse(building.map(building => building.maxAirGroundRange + building.radialHypotenuse))
   val placement   : PlacementProfile  = argPlacement    .getOrElse(PlacementProfiles.default(this))
   
-  def fulfilledBy(suggestion: BuildingDescriptor): Boolean = {
-    if (suggestion == this) return true
-    width     == suggestion.width                       &&
-    height    == suggestion.height                      &&
-    (powers   == suggestion.powers    || ! powers)      &&
-    (powered  == suggestion.powered   || ! powered)     &&
-    townHall  == suggestion.townHall                    &&
-    gas       == suggestion.gas                         &&
-    margin    <= suggestion.margin                      &&
-    (zone     == suggestion.zone      || zone.isEmpty)
+  def fulfilledBy(proposal: BuildingDescriptor): Boolean = {
+    if (proposal == this) return true
+    width         == proposal.width                             &&
+    height        == proposal.height                            &&
+    (powers       == proposal.powers          || ! powers)      &&
+    (powered      == proposal.powered         || ! powered)     &&
+    townHall      == proposal.townHall                          &&
+    gas           == proposal.gas                               &&
+    margin        <= proposal.margin                            &&
+    (zone         == proposal.zone            || zone.isEmpty)  &&
+    (building     == proposal.building        || building.isEmpty || proposal.building.isEmpty)
   }
   
   def marginTiles         : Int   = if(margin) 1 else 0
@@ -124,7 +125,7 @@ class BuildingDescriptor(
   override def toString: String =
     "#" + proposer.priority + " " +
     proposer.toString.take(12) + " " +
-    argBuilding.map(_.toString + " ").getOrElse("") +
+    building.map(_.toString + " ").getOrElse("") +
     placement.toString + " " +
     width + "x" + height + " " +
     (if (margin) (width + 2 * marginTiles) + "x" + (height + 2 * marginTiles) + " " else "") +

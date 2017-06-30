@@ -18,9 +18,7 @@ object PlacementProfiles {
     "Factory",
     preferZone                  = 1.0,
     preferSpace                 = 0.5,
-    preferPowering              = 0.0,
-    preferDistanceFromEnemy     = 0.0,
-    avoidDistanceFromBase       = 0.25,
+    avoidDistanceFromBase       = 0.5,
     avoidDistanceFromExitRange  = 4.0
   )
   
@@ -42,6 +40,7 @@ object PlacementProfiles {
   
   val townHall = new PlacementProfile(
     "Town Hall",
+    preferNatural               = 3.0,
     preferGas                   = 1.0,
     preferDistanceFromEnemy     = 1.5,
     avoidDistanceFromBase       = 2.5
@@ -49,9 +48,9 @@ object PlacementProfiles {
   
   val cannonPylon = new PlacementProfile(
     "Pylon for Cannons",
-    preferPowering              = 1.0,
+    preferPowering              = 0.75,
     preferDistanceFromEnemy     = 0.5,
-    preferCoveringWorkers       = 0.5,
+    preferCoveringWorkers       = 0.25,
     avoidDistanceFromBase       = 1.0,
     avoidSurfaceArea            = 0.5,
     avoidDistanceFromExitRange  = 2.0

@@ -8,5 +8,6 @@ class ConsiderAttacking
   extends If(
     new Check(() =>
       Yolo.active
-      || With.battles.global.estimationAbstract.weGainValue),
+      ||    With.battles.global.estimationAbstract.weGainValue
+      ||  ! With.battles.global.estimationAbstract.weLoseValue),
     new Attack)

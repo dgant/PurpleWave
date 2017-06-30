@@ -52,13 +52,15 @@ object PlacementProfiles {
     preferPowering              = 1.0,
     preferDistanceFromEnemy     = 0.5,
     preferCoveringWorkers       = 0.5,
-    avoidSurfaceArea            = 0.25,
+    avoidDistanceFromBase       = 1.0,
+    avoidSurfaceArea            = 0.5,
     avoidDistanceFromExitRange  = 2.0
   )
   
   val groundDefense = new PlacementProfile(
     "Ground defense",
     preferCoveringWorkers       = 1.0,
+    avoidDistanceFromBase       = 0.5,
     avoidSurfaceArea            = 0.5,
     avoidDistanceFromExitRange  = 2.0
   )

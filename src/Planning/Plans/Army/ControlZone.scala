@@ -27,7 +27,7 @@ class ControlZone(zone: Zone) extends Plan {
     val enemies = With.units.enemy.filter(threateningZone)
     val ourBase = zone.bases.find(base => base.owner.isUs || base.planningToTake)
     
-    val threats = enemies.filter(threat => threat.canAttackThisSecond && ! threat.unitClass.isWorker)
+    val threats = enemies.filter(threat => threat.canAttackThisSecond && ! threat.unitClass.isWorker && threat.likelyStillThere)
     if (threats.nonEmpty) {
       fighters.get.unitCounter.set(new UnitCountCombat(enemies, alwaysAccept = ourBase.isDefined))
       fighters.get.acquire(this)

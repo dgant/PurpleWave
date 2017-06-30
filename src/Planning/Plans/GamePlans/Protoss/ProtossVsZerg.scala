@@ -57,6 +57,7 @@ class ProtossVsZerg extends Parallel {
     new TrainProbesContinuously,
     new RequireMiningBases(2),
     new Build(Request.unit(Protoss.CyberneticsCore, 5)),
+    new Build(Request.unit(Protoss.PhotonCannon,  4)), // Very conservative
     new RequireSufficientPylons,
     new BuildDragoonsAndAssimilators_AfterCyberneticsCore,
     new Build(Request.unit(Protoss.Gateway, 5)),

@@ -3,6 +3,7 @@ package Micro.Execution
 import Lifecycle.With
 import Micro.Actions.Idle
 import Micro.Intent.Intention
+import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 import scala.collection.mutable
@@ -42,7 +43,11 @@ class Executor {
     
     while (unitQueue.nonEmpty && With.performance.continueRunning) {
       val nextUnit = unitQueue.dequeue()
-      Idle.consider(nextUnit)
+      
+      // Hack fix for CIG -- we were cancelling our Photon Cannon attacks.
+      if ( ! nextUnit.unit.is(Protoss.PhotonCannon)) {
+        Idle.consider(nextUnit)
+      }
     }
   
     finishedExecuting = unitQueue.isEmpty

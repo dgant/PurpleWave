@@ -13,7 +13,7 @@ import scala.collection.mutable
 class Architecture {
   
   val exclusions      : mutable.ArrayBuffer[Exclusion]                = new mutable.ArrayBuffer[Exclusion]
-  val excludedTiles   : mutable.Set[Tile]                             = new mutable.HashSet[Tile]
+  val unwalkable      : mutable.Set[Tile]                             = new mutable.HashSet[Tile]
   val powered2Height  : mutable.Set[Tile]                             = new mutable.HashSet[Tile]
   val powered3Height  : mutable.Set[Tile]                             = new mutable.HashSet[Tile]
   val edgeWalkability : mutable.HashMap[ZoneEdge, Boolean]            = new mutable.HashMap[ZoneEdge, Boolean]
@@ -26,16 +26,17 @@ class Architecture {
   
   def reboot() {
     exclusions      .clear()
-    excludedTiles   .clear()
+    unwalkable      .clear()
     powered2Height  .clear()
     powered3Height  .clear()
     edgeWalkability .clear()
+    recalculateUnwalkable()
     recalculateExclusions()
     recalculatePower()
   }
   
   def walkable(tile: Tile): Boolean = {
-    With.grids.walkable.get(tile) && ! excludedTiles.contains(tile)
+    With.grids.walkable.get(tile) && ! unwalkable.contains(tile)
   }
   
   def affectsPathing(blockedArea: TileRectangle): Boolean = {
@@ -45,46 +46,51 @@ class Architecture {
       .exists(affectsPathing(_, blockedArea))
   }
   
-  def affectsPathing(edge: ZoneEdge, blockedArea: TileRectangle): Boolean = {
+  private def affectsPathing(edge: ZoneEdge, blockedArea: TileRectangle): Boolean = {
     lazy val start            = canaryTile(edge.zones.head)
     lazy val end              = canaryTile(edge.zones.last)
-    lazy val maxTiles         = Math.max(20, 3 * start.groundPixels(end).toInt)
-    lazy val excludedBefore   = excludedTiles.toSet
-    lazy val excludedAfter    = excludedTiles.toSet ++ blockedArea.tiles
+    lazy val maxTiles         = Math.max(20, 2 * start.groundPixels(end).toInt / 32)
+    lazy val excludedBefore   = unwalkable.toSet
+    lazy val excludedAfter    = unwalkable.toSet ++ blockedArea.tiles
     lazy val walkableBefore   = PathFinder.manhattanGroundDistanceThroughObstacles(start, end, excludedBefore, maxTiles).isDefined
     lazy val walkableAfter    = PathFinder.manhattanGroundDistanceThroughObstacles(start, end, excludedAfter,  maxTiles).isDefined
     edgeWalkability.put(edge, edgeWalkability.getOrElse(edge, walkableBefore))
     walkableBefore && ! walkableAfter
   }
   
+  def assumePlacement(placement: Placement) {
+    if (placement.tile.isEmpty) return
+    addExclusion(placement)
+    addPower(placement)
+    addUnwalkable(placement)
+  }
+  
   /////////////
   // Margins //
   /////////////
+  
+  private def recalculateUnwalkable() {
+    unwalkable ++= With.units.all
+      .filter(unit => unit.unitClass.isBuilding && ! unit.flying)
+      .flatMap(_.tileArea.tiles)
+  }
 
   private def recalculateExclusions() {
-    With.units.ours
+    exclusions ++= With.units.ours
       .filter(unit => usuallyNeedsMargin(unit.unitClass))
       .map(unit => Exclusion(
         "Margin for " + unit,
         unit.tileArea.expand(1, 1),
         gasAllowed      = true,
         townHallAllowed = true))
-    .foreach(exclude)
-    
-    With.geography.bases
+  
+    exclusions ++= With.geography.bases
       .filterNot(_.owner.isEnemy)
       .map(base => Exclusion(
         "Harvesting area",
         base.harvestingArea,
         gasAllowed      = true,
         townHallAllowed = true))
-    .foreach(exclude)
-  }
-  
-  def assumePlacement(placement: Placement) {
-    if (placement.tile.isEmpty) return
-    addExclusion(placement)
-    addPower(placement)
   }
   
   private def addExclusion(placement: Placement) {
@@ -96,11 +102,6 @@ class Architecture {
         placement.tile.get.add(placement.buildingDescriptor.relativeMarginEnd)),
       gasAllowed      = false,
       townHallAllowed = false)
-  }
-  
-  private def exclude(exclusion: Exclusion) {
-    exclusions    +=  exclusion
-    excludedTiles ++= exclusion.areaExcluded.tiles
   }
   
   ///////////
@@ -126,8 +127,12 @@ class Architecture {
   // Walkability //
   /////////////////
   
-  private def canaryEdges: Set[ZoneEdge] = {
-    With.geography.ourBases.flatMap(_.zone.edges).toSet
+  private def addUnwalkable(placement: Placement) {
+    unwalkable ++=
+      TileRectangle(
+        placement.tile.get.add(placement.buildingDescriptor.relativeMarginStart),
+        placement.tile.get.add(placement.buildingDescriptor.relativeMarginEnd))
+        .tiles
   }
   
   private def canaryTile(zone: Zone): Tile = {

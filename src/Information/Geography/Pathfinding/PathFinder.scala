@@ -58,24 +58,27 @@ object PathFinder {
     horizon += start
     while (horizon.nonEmpty) {
       val thisTile = horizon.dequeue()
-      visited.add(thisTile)
-      if (thisTile == end) return Some(costToStart(end))
-      val distanceSquared = thisTile.tileDistanceSquared(end)
-      val neighbors = Array(thisTile.left, thisTile.right, thisTile.up, thisTile.down)
-      var i = 0
-      while(i < 4) {
-        val nextTile = neighbors(i)
-        i += 1
-        if (With.grids.walkable.get(nextTile)
-          && ! obstacles.contains(nextTile)
-          && ! visited.contains(nextTile)) {
-          val nextCostToStart = costToStart(thisTile) + 1
-          val nextCostToEnd   = nextCostToStart + nextTile.tileDistanceManhattan(end)
-          if (nextCostToEnd < maximumLength) {
-            horizon += nextTile
-            if (nextCostToStart < costToStart(nextTile)) {
-              costToStart(nextTile) = nextCostToStart
-              costToEnd(nextTile)   = nextCostToEnd
+      if (!visited.contains(thisTile)) {
+        visited.add(thisTile)
+        if (thisTile == end) return Some(costToStart(end))
+        val distanceSquared = thisTile.tileDistanceSquared(end)
+        val neighbors = Array(thisTile.left, thisTile.right, thisTile.up, thisTile.down)
+        var i = 0
+        while (i < 4) {
+          val nextTile = neighbors(i)
+          i += 1
+          if (nextTile.valid
+            && With.grids.walkable.get(nextTile)
+            && !obstacles.contains(nextTile)
+            && !visited.contains(nextTile)) {
+            val nextCostToStart = costToStart(thisTile) + 1
+            val nextCostToEnd = nextCostToStart + nextTile.tileDistanceManhattan(end)
+            if (nextCostToEnd < maximumLength) {
+              horizon += nextTile
+              if (nextCostToStart < costToStart(nextTile)) {
+                costToStart(nextTile) = nextCostToStart
+                costToEnd(nextTile) = nextCostToEnd
+              }
             }
           }
         }

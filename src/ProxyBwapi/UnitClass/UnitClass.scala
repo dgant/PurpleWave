@@ -39,7 +39,7 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
     // and https://github.com/Cmccrave/McRave/blob/d9816ebd82f0bf88401f70f400b6517217a1b6a2/UnitManager.cpp#L55
     //
     if      (this == Protoss.Dragoon)       9
-    else if (this == Protoss.PhotonCannon)  9
+    else if (this == Protoss.PhotonCannon)  18
     else if (this == Protoss.Reaver)        1 //?
     else if (this == Zerg.Devourer)         10
     else if (this == Protoss.Carrier)       48

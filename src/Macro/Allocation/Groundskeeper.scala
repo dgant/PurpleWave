@@ -33,17 +33,25 @@ class Groundskeeper {
     proposalsInUpdateOrder
       .foreach(descriptor =>
         if (With.performance.continueRunning && newSearches < With.configuration.maxGroundskeeperSearches) {
-          val previousPlacement = proposalPlacements.get(descriptor)
-          if (previousPlacement.isEmpty) {
+          val placementBefore = proposalPlacements.get(descriptor)
+          if (placementBefore.isEmpty) {
             newSearches += 1
           }
           lastPlacementAttempt(descriptor) = With.frame
-          val placement = With.architect.fulfill(descriptor, previousPlacement)
-          if (placement.tile.isDefined) {
-            proposalPlacements.put(descriptor, placement)
+          val placementAfter = With.architect.fulfill(descriptor, placementBefore)
+          proposalPlacements.put(descriptor, placementAfter)
+          
+          // For debugging only!
+          val tileBefore  = placementBefore.flatMap(_.tile)
+          val tileAfter   = placementAfter.tile
+          if (tileBefore != tileAfter) {
+            if (tileBefore.isDefined) {
+              val putBreakpointHere1 = 12345
+            }
+            val putBreakpointHere2 = 12345
           }
-          else if (previousPlacement.isDefined) {
-            proposalPlacements.remove(descriptor)
+          if (tileAfter.isEmpty) {
+            val putBreakpointHere3 = 12345
           }
         })
   }
@@ -58,7 +66,7 @@ class Groundskeeper {
   }
   
   private def proposalsInUpdateOrder: Iterable[BuildingDescriptor] = {
-    // Verify existing proposals
+    // Verify existing placements
     // in priority order (top priority first)
     // Then place upcoming proposals
     // ordered by time since last attempt at placement
@@ -66,9 +74,11 @@ class Groundskeeper {
     val placed = proposalPlacements.keySet
     val unplaced = proposals.diff(placed)
     val ordered =
-      placed.toList
+      placed
+        .toVector
         .sortBy(_.proposer.priority) ++
-      unplaced.toList
+      unplaced
+        .toVector
         .sortBy(_.proposer.priority)
         .sortBy(lastPlacementAttempt.getOrElse(_, 0))
     ordered
@@ -110,15 +120,13 @@ class Groundskeeper {
   private def flagUpdated(descriptor: BuildingDescriptor) {
     updated.add(descriptor)
   }
+  
   private def addProposal(proposal: BuildingDescriptor) {
     proposals.add(proposal)
   }
   
   private def addRequirement(requirement: BuildingDescriptor) {
-    val proposal = proposals
-      .diff(requirementMatches.map(_.proposal))
-      .find(requirement.fulfilledBy)
-      .getOrElse(requirement)
+    val proposal = getRepresentativeDescriptorForRequirement(requirement)
     if (proposal == requirement) {
       addProposal(requirement)
     }
@@ -126,12 +134,24 @@ class Groundskeeper {
   }
   
   private def getTileForRequirement(requirement: BuildingDescriptor): Option[Tile] = {
-    val proposal = getProposalForRequirement(requirement)
-    flagUpdated(proposal)
-    proposalPlacements.get(proposal).flatMap(_.tile)
+    val proposal = findProposalAlreadyMatchedWithRequirement(requirement)
+    proposal.foreach(flagUpdated)
+    proposal.flatMap(proposalPlacements.get).flatMap(_.tile)
   }
   
-  private def getProposalForRequirement(requirement: BuildingDescriptor): BuildingDescriptor = {
-    requirementMatches.find(_.requirement == requirement).get.proposal
+  private def getRepresentativeDescriptorForRequirement(requirement: BuildingDescriptor): BuildingDescriptor = {
+    findProposalAlreadyMatchedWithRequirement(requirement)
+      .orElse(findProposalToMatchWithRequirement(requirement))
+      .getOrElse(requirement)
+  }
+  
+  private def findProposalAlreadyMatchedWithRequirement(requirement: BuildingDescriptor): Option[BuildingDescriptor] = {
+    requirementMatches.find(_.requirement == requirement).map(_.proposal)
+  }
+  
+  private def findProposalToMatchWithRequirement(requirement: BuildingDescriptor): Option[BuildingDescriptor] = {
+    proposals
+      .diff(requirementMatches.map(_.proposal))
+      .find(requirement.fulfilledBy)
   }
 }

@@ -39,7 +39,7 @@ class Configuration {
   var maxFramesToSendAdvanceBuilder   = 24 * 20
   var maxFramesToTrustBuildRequest    = 24 * 60 * 10
   var blockerMineralThreshold         = 50
-  var maxPlacementAge                 = 24 * 20
+  var maxPlacementAge                 = 99999 * 24 * 20
   var maxScarabCount                  = 3
   
   /////////////
@@ -77,7 +77,7 @@ class Configuration {
   // Visualization //
   ///////////////////
   
-  var visualize                           = true
+  var visualize                           = false
   var visualizationProbabilityHappyVision = 0.1
   var visualizationProbabilityTextOnly    = 0.02
   

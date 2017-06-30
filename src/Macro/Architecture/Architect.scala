@@ -45,22 +45,26 @@ class Architect {
         townHallAllowed = true))
   }
   
-  def fulfill(buildingDescriptor: BuildingDescriptor, placement: Option[Placement]): Placement = {
+  def fulfill(buildingDescriptor: BuildingDescriptor, existingPlacement: Option[Placement]): Placement = {
     
-    if (placement.isDefined
-      && placement.get.tile.isDefined
-      && With.frame - placement.get.createdFrame < With.configuration.maxPlacementAge) {
-      val tile = placement.get.tile.get
+    if (existingPlacement.exists(_.tile.isDefined)
+      && With.frame - existingPlacement.get.createdFrame < With.configuration.maxPlacementAge) {
+      val tile = existingPlacement.get.tile.get
       if (canBuild(buildingDescriptor, tile)) {
-        addExclusion(buildingDescriptor, tile)
-        addPower(buildingDescriptor, tile)
-        return placement.get
+        assumePlacement(existingPlacement.get)
+        return existingPlacement.get
       }
     }
   
     val output = placeBuilding(buildingDescriptor)
-    output.tile.foreach(addExclusion(buildingDescriptor, _))
+    assumePlacement(output)
     output
+  }
+  
+  def assumePlacement(placement: Placement) {
+    if (placement.tile.isEmpty) return
+    addExclusion(placement)
+    addPower(placement)
   }
   
   def canBuild(buildingDescriptor: BuildingDescriptor, tile: Tile): Boolean = {
@@ -114,20 +118,20 @@ class Architect {
     false
   }
   
-  private def addExclusion(buildingDescriptor: BuildingDescriptor, tile: Tile) {
-    val margin = if (buildingDescriptor.margin) 1 else 0
+  private def addExclusion(placement: Placement) {
+    val margin = if (placement.buildingDescriptor.margin) 1 else 0
     exclusions += Exclusion(
-      buildingDescriptor.toString,
+      placement.buildingDescriptor.toString,
       TileRectangle(
-        tile.add(buildingDescriptor.relativeMarginStart),
-        tile.add(buildingDescriptor.relativeMarginEnd)),
+        placement.tile.get.add(placement.buildingDescriptor.relativeMarginStart),
+        placement.tile.get.add(placement.buildingDescriptor.relativeMarginEnd)),
       gasAllowed      = false,
       townHallAllowed = false)
   }
   
-  def addPower(buildingDescriptor: BuildingDescriptor, tile: Tile) {
-    if (buildingDescriptor.powers) {
-      addPower(tile)
+  def addPower(placement: Placement) {
+    if (placement.buildingDescriptor.powers) {
+      placement.tile.foreach(addPower)
     }
   }
   

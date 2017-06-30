@@ -10,7 +10,10 @@ object ScreenGroundskeeper {
     With.game.drawTextScreen(5, 25, "Unplaced:")
     DrawScreen.column(
       5, 50,
-      With.groundskeeper.proposals.diff(With.groundskeeper.proposalPlacements.keySet)
+      With.groundskeeper.proposals.diff(
+        With.groundskeeper.proposalPlacements
+          .filter(_._2.tile.isDefined)
+          .keySet)
         .toVector
         .sortBy(_.proposer.priority)
         .map(_.toString))
@@ -23,15 +26,17 @@ object ScreenGroundskeeper {
         .sortBy(_.proposal.proposer.priority)
     DrawScreen.column(
       165, 50,
-      matches.map(_.requirement.toString))
+      matches.map(_.requirement.toString.take(5)))
     DrawScreen.column(
-      325, 50,
-      matches.map(" => " + _.requirement.toString))
+      265, 50,
+      matches.map(" => " + _.requirement.toString.take(5)))
     
-    With.game.drawTextScreen(485, 25, "Placed:")
+    With.game.drawTextScreen(365, 25, "Placed:")
     DrawScreen.table(
-      485, 50,
-      With.groundskeeper.proposalPlacements.keys
+      365, 50,
+      With.groundskeeper.proposalPlacements
+        .filter(_._2.tile.isDefined)
+        .keys
         .toVector
         .sortBy(_.proposer.priority)
         .map(key => Vector(With.groundskeeper.proposalPlacements(key).tile.toString, key.toString)))

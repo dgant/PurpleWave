@@ -117,8 +117,11 @@ class Groundskeeper {
   }
   
   def flagFulfilled(requirement: BuildingDescriptor) {
+    val proposal = getRepresentativeDescriptorForRequirement(requirement)
     removeDescriptor(requirement)
+    removeDescriptor(proposal)
     proposalsFulfilled.add(requirement)
+    proposalsFulfilled.add(proposal)
   }
   
   //////////////

@@ -57,23 +57,15 @@ class Blueprint(
   
   def accepts(tile: Tile): Boolean = {
     
+    if ( ! tile.valid) {
+      return false
+    }
+    
     if (powered) {
       if (height == 3 && ! With.grids.psi3Height.get(tile) && ! With.architecture.powered3Height.contains(tile)) {
         return false
       }
       if (height == 2 && ! With.grids.psi2Height.get(tile) && ! With.architecture.powered2Height.contains(tile)) {
-        return false
-      }
-    }
-    
-    if (townHall) {
-      if (With.architecture.untownhallable.contains(tile)) {
-        return false
-      }
-    }
-    
-    if (gas) {
-      if( ! With.units.neutral.exists(unit => unit.unitClass.isGas && unit.tileTopLeft == tile)) {
         return false
       }
     }
@@ -85,38 +77,29 @@ class Blueprint(
     if (zone.exists(_ != tile.zone)) {
       return false
     }
-    
-    var x             = tile.add(relativeMarginStart).x
-    val xMax          = tile.add(relativeMarginEnd).x
-    val yMax          = tile.add(relativeMarginEnd).y
-    val tileBuildEnd  = tile.add(relativeBuildEnd)
-    
-    // While loops have lower overhead than other iterative mechanisms in Scala.
-    while (x < xMax) {
-      var y = tile.add(relativeMarginStart).y
-      while (y < yMax) {
-        val nextTile = Tile(x, y)
-        if ( ! nextTile.valid) {
-          return false
-        }
-        if (
-          nextTile.x < tile.x           ||
-          nextTile.y < tile.y           ||
-          nextTile.x >= tileBuildEnd.x  ||
-          nextTile.y >= tileBuildEnd.y) {
-          if ( ! With.architecture.walkable(tile)) {
-            return false
-          }
-        }
-        else if ( ! gas && ! With.architecture.buildable(nextTile)) {
-            return false
-        }
-        y += 1
-      }
-      x += 1
+  
+    if (townHall) {
+      return ! With.architecture.untownhallable.contains(tile)
+    }
+  
+    if (gas) {
+      return ! With.architecture.ungassable.contains(tile)
     }
     
-    true
+    val marginArea  = relativeMarginArea.add(tile)
+    val buildArea   = relativeBuildArea.add(tile)
+  
+    marginArea.tiles.forall(nextTile => {
+      nextTile.valid &&
+        (
+          if (buildArea.contains(nextTile)) {
+            With.architecture.buildable(nextTile)
+          }
+          else {
+            With.architecture.walkable(nextTile)
+          }
+        )
+    })
   }
   
   override def toString: String =

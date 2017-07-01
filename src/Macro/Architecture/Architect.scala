@@ -7,10 +7,10 @@ import Mathematics.Points.{Tile, TileRectangle}
 object Architect {
   
   def fulfill(blueprint: Blueprint, existingPlacement: Option[Placement]): Placement = {
-    
-    val placement = validate(blueprint, existingPlacement).getOrElse(place(blueprint))
-    With.architecture.assumePlacement(placement)
-    placement
+    val placementBefore = validate(blueprint, existingPlacement)
+    val placementAfter = if (placementBefore.exists(_.tile.isDefined)) placementBefore.get else place(blueprint)
+    With.architecture.assumePlacement(placementAfter)
+    placementAfter
   }
   
   def validate(blueprint: Blueprint, placement: Option[Placement]): Option[Placement] = {
@@ -32,15 +32,6 @@ object Architect {
       tile.add(blueprint.relativeBuildEnd))
     
     if ( ! blueprint.accepts(tile)) {
-      return false
-    }
-    if (blueprint.gas && With.architecture.ungassable.contains(tile)) {
-      return false
-    }
-    else if (blueprint.townHall && With.architecture.untownhallable.contains(tile)) {
-      return false
-    }
-    else if (buildArea.tiles.exists(With.architecture.unbuildable.contains)) {
       return false
     }
     

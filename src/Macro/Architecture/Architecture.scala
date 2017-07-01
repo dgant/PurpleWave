@@ -14,15 +14,27 @@ import scala.collection.mutable
 
 class Architecture {
   
-  val exclusions      : mutable.ArrayBuffer[Exclusion]      = new mutable.ArrayBuffer[Exclusion]
-  val unbuildable     : mutable.Set[Tile]                   = new mutable.HashSet[Tile]
-  val unwalkable      : mutable.Set[Tile]                   = new mutable.HashSet[Tile]
-  val ungassable      : mutable.Set[Tile]                   = new mutable.HashSet[Tile]
-  val untownhallable  : mutable.Set[Tile]                   = new mutable.HashSet[Tile]
-  val powered2Height  : mutable.Set[Tile]                   = new mutable.HashSet[Tile]
-  val powered3Height  : mutable.Set[Tile]                   = new mutable.HashSet[Tile]
-  val edgeWalkability : mutable.HashMap[ZoneEdge, TilePath] = new mutable.HashMap[ZoneEdge, TilePath]
+  val exclusions      : mutable.ArrayBuffer[Exclusion]            = new mutable.ArrayBuffer[Exclusion]
+  val unbuildable     : mutable.Set[Tile]                         = new mutable.HashSet[Tile]
+  val unwalkable      : mutable.Set[Tile]                         = new mutable.HashSet[Tile]
+  val ungassable      : mutable.Set[Tile]                         = new mutable.HashSet[Tile]
+  val untownhallable  : mutable.Set[Tile]                         = new mutable.HashSet[Tile]
+  val powered2Height  : mutable.Set[Tile]                         = new mutable.HashSet[Tile]
+  val powered3Height  : mutable.Set[Tile]                         = new mutable.HashSet[Tile]
+  val edgeWalkability : mutable.HashMap[ZoneEdge, TilePathCache]  = new mutable.HashMap[ZoneEdge, TilePathCache]
   
+  class TilePathCache {
+    var path: Option[TilePath] = None
+  
+    def update() {
+      if (path.isDefined &&
+        path.get.tiles.isDefined &&
+        ! path.get.tiles.get.exists(tile => With.architecture.walkable(tile))) {
+        path = None
+      }
+    }
+  }
+    
   def usuallyNeedsMargin(unitClass: UnitClass): Boolean = {
     unitClass.isBuilding &&
     UnitClasses.all.exists(unit => ! unit.isFlyer && unit.whatBuilds._1 == unitClass) &&
@@ -40,6 +52,7 @@ class Architecture {
     edgeWalkability .clear()
     recalculateExclusions()
     recalculatePower()
+    edgeWalkability.values.foreach(_.update())
   }
   
   def buildable(tile: Tile): Boolean = {
@@ -58,15 +71,18 @@ class Architecture {
   }
   
   private def blocksPathing(edge: ZoneEdge, blockedArea: TileRectangle): Boolean = {
-    lazy val start            = canaryTile(edge.zones.head)
-    lazy val end              = canaryTile(edge.zones.last)
-    lazy val maxTiles         = Math.max(20, 2 * start.groundPixels(end).toInt / 32)
-    lazy val excludedBefore   = unwalkable.toSet
-    lazy val excludedAfter    = unwalkable.toSet ++ blockedArea.tiles
-    lazy val pathBefore       = PathFinder.manhattanGroundDistanceThroughObstacles(start, end, excludedBefore, maxTiles)
-    lazy val pathAfter        = PathFinder.manhattanGroundDistanceThroughObstacles(start, end, excludedAfter,  maxTiles)
-    edgeWalkability.put(edge, edgeWalkability.getOrElse(edge, pathBefore))
-    pathBefore.tiles.isDefined && pathAfter.tiles.isEmpty
+    if ( ! edgeWalkability.contains(edge)) {
+      edgeWalkability.put(edge, new TilePathCache)
+    }
+    lazy val start              = canaryTile(edge.zones.head)
+    lazy val end                = canaryTile(edge.zones.last)
+    lazy val maxTiles           = Math.max(20, 2 * start.groundPixels(end).toInt / 32)
+    lazy val excludedBefore     = unwalkable.toSet
+    lazy val excludedAfter      = unwalkable.toSet ++ blockedArea.tiles
+    lazy val pathBefore         = PathFinder.manhattanGroundDistanceThroughObstacles(start, end, excludedBefore, maxTiles)
+    lazy val pathAfter          = PathFinder.manhattanGroundDistanceThroughObstacles(start, end, excludedAfter,  maxTiles)
+    edgeWalkability(edge).path  = edgeWalkability(edge).path.orElse(Some(pathBefore))
+    edgeWalkability(edge).path.get.tiles.isDefined && pathAfter.tiles.isEmpty
   }
   
   def assumePlacement(placement: Placement) {
@@ -92,7 +108,7 @@ class Architecture {
     }
     
     if (With.visualization.enabled) {
-      exclusions += new Exclusion(placement.buildingDescriptor.toString, margin)
+      exclusions += Exclusion(placement.buildingDescriptor.toString, margin)
     }
   }
   

@@ -28,7 +28,7 @@ object VisualizeArchitecture {
       Colors.MediumTeal,
       solid = false))
     
-    With.architecture.edgeWalkability.values.foreach(path => {
+    With.architecture.edgeWalkability.values.flatMap(_.path).foreach(path => {
       DrawMap.circle(path.start.pixelCenter,  16, Colors.BrightYellow, solid = false)
       DrawMap.circle(path.end.pixelCenter,    16, Colors.BrightYellow, solid = false)
       path.tiles.foreach(tileList => {

@@ -53,7 +53,6 @@ class Architecture {
     untownhallable  .clear()
     powered2Height  .clear()
     powered3Height  .clear()
-    existingPaths .clear()
     recalculateExclusions()
     recalculatePower()
     updatePaths()

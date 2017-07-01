@@ -43,7 +43,7 @@ class PerformanceMonitor {
   }
   
   def millisecondsLeftThisFrame: Long = {
-    Math.max(0, With.configuration.peformanceFrameMilliseconds - millisecondsSpentThisFrame)
+    Math.max(0, With.configuration.initialTaskLengthMilliseconds - millisecondsSpentThisFrame)
   }
   
   def millisecondsSpentThisFrame: Long = {

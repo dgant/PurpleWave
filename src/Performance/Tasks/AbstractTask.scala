@@ -20,15 +20,16 @@ abstract class AbstractTask {
   
   protected def onRun()
   
-  final def framesSinceRunning = Math.max(1, With.frame - lastRunFrame)
-  final def totalRuns = totalRunCount
-  final def totalSkips = totalSkipCount
-  final def totalCutoffs = overruns
+  final def framesSinceRunning  : Int = Math.max(1, With.frame - lastRunFrame)
+  final def totalRuns           : Int = totalRunCount
+  final def totalSkips          : Int = totalSkipCount
+  final def totalCutoffs        : Int = overruns
   
   final def run() {
-    val millisecondsBefore = System.nanoTime() / 1000000
+    val nanosToMillis = 1000000
+    val millisecondsBefore  = System.nanoTime() / nanosToMillis
     onRun()
-    val millisecondsAfter = System.nanoTime() / 1000000
+    val millisecondsAfter   = System.nanoTime() / nanosToMillis
     recordRunDuration(millisecondsAfter - millisecondsBefore)
     lastRunFrame = With.frame
     totalRunCount += 1

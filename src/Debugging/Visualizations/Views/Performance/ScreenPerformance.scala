@@ -23,7 +23,7 @@ object ScreenPerformance {
   }
   
   def renderDetails() {
-    val title = Vector("Cutoff: ", With.configuration.peformanceFrameMilliseconds + "ms")
+    val title = Vector("Cutoff: ", With.configuration.initialTaskLengthMilliseconds + "ms")
     val headers = Vector("System", "Last run", "Total runs", "Total skips", "Avg ms", "Max (Recent)", "Max (All time)", "Violations")
     val body = With.tasks.tasks
       .sortBy(_.getClass.getSimpleName + "  ")

@@ -56,12 +56,13 @@ class Configuration {
   // Performance //
   /////////////////
   
-  var peformanceFrameMilliseconds = 20
-  var performanceMinimumUnitSleep = 2
-  var performanceMicroAngleStep   = 4
-  var useFastGroundDistance       = true
-  var unitHistoryAge              = 24 * 3
-  var buildingPlacements          = 5
+  var peformanceFrameMilliseconds   = 20
+  var initialTaskLengthMilliseconds = 20
+  var performanceMinimumUnitSleep   = 2
+  var performanceMicroAngleStep     = 4
+  var useFastGroundDistance         = true
+  var unitHistoryAge                = 24 * 3
+  var buildingPlacements            = 5
   
   var urgencyManners            = 1
   var urgencyEconomy            = 1

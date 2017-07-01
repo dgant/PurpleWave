@@ -6,7 +6,7 @@ import Information.Geography.Types.{Zone, ZoneEdge}
 import Lifecycle.With
 import Mathematics.Points.{Tile, TileRectangle}
 import Mathematics.Shapes.Spiral
-import ProxyBwapi.Races.Protoss
+import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
 import ProxyBwapi.UnitInfo.UnitInfo
 
@@ -35,7 +35,9 @@ class Architecture {
     }
   
     def update() {
-      valid = valid && path.get.tiles.get.forall(With.architecture.walkable)
+      if (valid && ! path.exists(_.tiles.exists(_.forall(With.architecture.walkable)))) {
+        valid = false
+      }
     }
   }
     
@@ -120,8 +122,7 @@ class Architecture {
     }
     
     // Fine, we'll do some very expensive pathfinding :(
-    // TODO: We could pathfind less by only doing testing the #1 candidate (and rejecting it if it fails the pathfinding test)
-    
+    //
     // If our new path is successful, let's use that one instead
     if (pathAfter.pathExists) {
       existingPaths(edge).set(pathAfter)
@@ -197,7 +198,7 @@ class Architecture {
   }
   
   private def isGroundBuilding(unit: UnitInfo): Boolean = {
-    ! unit.flying && unit.unitClass.isBuilding
+    ( ! unit.flying && unit.unitClass.isBuilding) || unit.is(Zerg.Egg) || unit.is(Zerg.LurkerEgg) //Commonly used as map blocks
   }
   
   ///////////

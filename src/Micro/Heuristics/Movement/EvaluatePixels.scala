@@ -37,7 +37,14 @@ object EvaluatePixels {
     val otherPixels =
       (0 until 256 by With.configuration.performanceMicroAngleStep)
         .flatten(angle => {
-          val targetPixel = startingPixel.radiateDegrees(angle, 50.0)
+          // Jaj22 puts the cutoff for straight line movement at 79/80 pixels.
+          // Tscmoo puts it at 64 and below.
+          // Put it a little under that threshold to account for changed positions due to latency.
+          // Jaj22: "Behaviour changes drastically at 64x + 16 pixel boundaries."
+          // Tscmoo2: if you right click for a unit within 64 pixels, it'll just move directly
+          // Tscmoo2: for longer distances, it has to go through a waypoint kinda
+          // TODO: Just pick the pixels we want and then consider pathing in the Commander.
+          val targetPixel = startingPixel.radiateDegrees(angle, 70.0)
           if (acceptable(state.unit, targetPixel, startingPixel, startingZone))
             Some(targetPixel)
           else

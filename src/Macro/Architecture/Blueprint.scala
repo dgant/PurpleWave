@@ -3,7 +3,7 @@ package Macro.Architecture
 import Information.Geography.Types.Zone
 import Lifecycle.With
 import Macro.Architecture.Heuristics.{PlacementProfile, PlacementProfiles}
-import Mathematics.Points.Tile
+import Mathematics.Points.{Tile, TileRectangle}
 import Planning.Plan
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClass.UnitClass
@@ -49,26 +49,25 @@ class Blueprint(
   
   def marginTiles         : Int   = if(margin) 1 else 0
   def relativeBuildStart  : Tile  = Tile(0, 0)
-  def relativeBuildEnd    : Tile  = Tile(width, height)
+  def relativeBuildEnd    : Tile  = Tile(width, height)  
   def relativeMarginStart : Tile  = relativeBuildStart.subtract(marginTiles, marginTiles)
   def relativeMarginEnd   : Tile  = relativeBuildEnd.add(marginTiles, marginTiles)
+  def relativeBuildArea   : TileRectangle = TileRectangle(relativeBuildStart, relativeBuildEnd)
+  def relativeMarginArea  : TileRectangle = TileRectangle(relativeMarginStart, relativeMarginEnd)
   
   def accepts(tile: Tile): Boolean = {
     
     if (powered) {
-      if (width == 4 && ! With.grids.psi3Height.get(tile) && ! With.architecture.powered3Height.contains(tile)) {
+      if (height == 3 && ! With.grids.psi3Height.get(tile) && ! With.architecture.powered3Height.contains(tile)) {
         return false
       }
-      if (width == 3 && ! With.grids.psi2Height.get(tile) && ! With.architecture.powered2Height.contains(tile)) {
-        return false
-      }
-      if (width == 2 && ! With.grids.psi2Height.get(tile) && ! With.architecture.powered2Height.contains(tile)) {
+      if (height == 2 && ! With.grids.psi2Height.get(tile) && ! With.architecture.powered2Height.contains(tile)) {
         return false
       }
     }
     
     if (townHall) {
-      if ( ! With.geography.bases.exists(base => base.townHallArea.startInclusive == tile)) {
+      if (With.architecture.untownhallable.contains(tile)) {
         return false
       }
     }
@@ -109,7 +108,7 @@ class Blueprint(
             return false
           }
         }
-        else if ( ! gas && ! With.grids.buildable.get(nextTile)) {
+        else if ( ! gas && ! With.architecture.buildable(nextTile)) {
             return false
         }
         y += 1

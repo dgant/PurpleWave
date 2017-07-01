@@ -18,7 +18,7 @@ object Architect {
     val placementIsFresh = placement.exists(With.frame - _.createdFrame < With.configuration.maxPlacementAge)
   
     if (placementHasTile && placementIsFresh) {
-      if (canBuild(blueprint, placement.get.tile.get)) {
+      if (canBuild(blueprint, placement.get.tile.get, recheckPathing = false)) {
         With.architecture.assumePlacement(placement.get)
         return placement
       }
@@ -26,25 +26,34 @@ object Architect {
     None
   }
   
-  def canBuild(blueprint: Blueprint, tile: Tile): Boolean = {
+  def canBuild(blueprint: Blueprint, tile: Tile, recheckPathing: Boolean = false): Boolean = {
     lazy val buildArea = TileRectangle(
       tile.add(blueprint.relativeBuildStart),
       tile.add(blueprint.relativeBuildEnd))
     
-    blueprint.accepts(tile)                       &&
-    ! intersectsExclusion (blueprint, buildArea)  &&
-    ! intersectsUnits     (blueprint, buildArea)  &&
-    ! With.architecture.affectsPathing(buildArea)
+    if ( ! blueprint.accepts(tile)) {
+      return false
+    }
+    if (blueprint.gas && With.architecture.ungassable.contains(tile)) {
+      return false
+    }
+    else if (blueprint.townHall && With.architecture.untownhallable.contains(tile)) {
+      return false
+    }
+    else if (buildArea.tiles.exists(With.architecture.unbuildable.contains)) {
+      return false
+    }
+    
+    if (intersectsUnits(blueprint, buildArea)) {
+      return false
+    }
+    
+    if ( ! blueprint.margin && recheckPathing && With.architecture.affectsPathing(buildArea)) {
+      return false
+    }
+    
+    true
   }
-  
-  private def intersectsExclusion(blueprint: Blueprint, buildArea: TileRectangle): Boolean = {
-    With.architecture.exclusions
-      .exists(exclusion =>
-        ! (exclusion.gasAllowed       && blueprint.gas)       &&
-        ! (exclusion.townHallAllowed  && blueprint.townHall)  &&
-        exclusion.areaExcluded.intersects(buildArea))
-  }
-  
   private def intersectsUnits(blueprint: Blueprint, buildArea: TileRectangle): Boolean = {
     if (blueprint.gas) return false
     var totalWorkers = 0
@@ -71,7 +80,7 @@ object Architect {
     EvaluatePlacements.best(
       blueprint,
       Surveyor.candidates(blueprint)
-        .filter(canBuild(blueprint, _))
+        .filter(canBuild(blueprint, _, recheckPathing = true))
         .take(With.configuration.maxGroundskeeperSearches))
   }
 }

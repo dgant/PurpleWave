@@ -10,9 +10,33 @@ import bwapi.Color
 object VisualizeArchitecture {
   
   def render() {
+    
     With.architecture.exclusions.foreach(exclusion => {
       DrawMap.tileRectangle(exclusion.areaExcluded, Colors.MediumRed)
       DrawMap.label(exclusion.description, exclusion.areaExcluded.midPixel)
+    })
+    
+    With.architecture.unwalkable.foreach(tile => DrawMap.box(
+      tile.topLeftPixel.add(8, 8),
+      tile.topLeftPixel.add(24, 24),
+      Colors.MediumOrange,
+      solid = false))
+  
+    With.architecture.unbuildable.foreach(tile => DrawMap.box(
+      tile.topLeftPixel.add(4, 4),
+      tile.topLeftPixel.add(28, 28),
+      Colors.MediumTeal,
+      solid = false))
+    
+    With.architecture.edgeWalkability.values.foreach(path => {
+      DrawMap.circle(path.start.pixelCenter,  16, Colors.BrightYellow, solid = false)
+      DrawMap.circle(path.end.pixelCenter,    16, Colors.BrightYellow, solid = false)
+      path.tiles.foreach(tileList => {
+        var lastTile = path.start
+        tileList.drop(1).foreach(tile => {
+          DrawMap.arrow(lastTile.pixelCenter, tile.pixelCenter, Colors.BrightYellow)
+        })
+      })
     })
     
     With.groundskeeper.proposalPlacements.keys
@@ -23,9 +47,7 @@ object VisualizeArchitecture {
   }
   
   def renderPlacement(descriptor: Blueprint) {
-    
     val placement = With.groundskeeper.proposalPlacements(descriptor)
-    
     if (placement.tile.isEmpty || placement.scoresByTile.isEmpty) return
   
     //renderPlacementHeuristics(descriptor, placement)

@@ -16,8 +16,8 @@ class ProposeForgeFastExpand extends Parallel {
   
   private lazy val proposals =
     Vector(
-      new Blueprint(this, argPlacement = Some(PlacementProfiles.cannonPylon),    building = Some(Protoss.Pylon),         zone = With.geography.ourNatural.map(_.zone), argRangePixels = Some(4.0 * 32.0)),
-      new Blueprint(this, argPlacement = Some(PlacementProfiles.groundDefense),  building = Some(Protoss.Forge),         zone = With.geography.ourNatural.map(_.zone), argRangePixels = Some(4.0 * 32.0)),
+      new Blueprint(this, argPlacement = Some(PlacementProfiles.cannonPylon),    building = Some(Protoss.Pylon),         zone = With.geography.ourNatural.map(_.zone), argRangePixels = Some(5.0 * 32.0)),
+      new Blueprint(this, argPlacement = Some(PlacementProfiles.groundDefense),  building = Some(Protoss.Forge),         zone = With.geography.ourNatural.map(_.zone), argRangePixels = Some(5.0 * 32.0)),
       new Blueprint(this, argPlacement = Some(PlacementProfiles.groundDefense),  building = Some(Protoss.PhotonCannon),  zone = With.geography.ourNatural.map(_.zone), argRangePixels = Some(7.0 * 32.0)),
       new Blueprint(this, argPlacement = Some(PlacementProfiles.groundDefense),  building = Some(Protoss.PhotonCannon),  zone = With.geography.ourNatural.map(_.zone), argRangePixels = Some(7.0 * 32.0)),
       new Blueprint(this, argPlacement = Some(PlacementProfiles.groundDefense),  building = Some(Protoss.PhotonCannon),  zone = With.geography.ourNatural.map(_.zone), argRangePixels = Some(7.0 * 32.0)),

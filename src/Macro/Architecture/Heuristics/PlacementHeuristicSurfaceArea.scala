@@ -19,9 +19,8 @@ object PlacementHeuristicSurfaceArea extends PlacementHeuristic {
         if (dx == 0 || dy == 0 || dx == dxEnd - 1 || dy == dyEnd - 1) {
           val borderTile = candidate.add(dx, dy)
           if (
-            With.grids.walkable.get(borderTile)
-            && ! zone.bases.exists(_.townHallArea.contains(borderTile))
-            && ! With.architecture.exclusions.exists(_.areaExcluded.contains(borderTile))) { //Note that this incorrectly counts margin tiles as non-surface-area
+               ! zone.bases.exists(_.townHallArea.contains(borderTile))
+            && ! With.architecture.walkable(borderTile)) {
             walkableTiles += 1
           }
         }

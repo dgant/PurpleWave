@@ -48,10 +48,10 @@ object PlacementProfiles {
   
   val cannonPylon = new PlacementProfile(
     "Pylon for Cannons",
-    preferPowering              = 0.75,
+    preferPowering              = 0.5,
     preferDistanceFromEnemy     = 0.5,
     preferCoveringWorkers       = 0.25,
-    avoidDistanceFromBase       = 1.0,
+    avoidDistanceFromBase       = 1.5,
     avoidSurfaceArea            = 0.5,
     avoidDistanceFromExitRange  = 2.0
   )

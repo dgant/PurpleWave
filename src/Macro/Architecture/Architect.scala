@@ -39,9 +39,11 @@ object Architect {
       return false
     }
     
-    if ( ! blueprint.margin && recheckPathing && With.architecture.affectsPathing(buildArea)) {
+    /*
+    if ( ! blueprint.margin && recheckPathing && With.architecture.breaksPathing(buildArea)) {
       return false
     }
+    */
     
     true
   }

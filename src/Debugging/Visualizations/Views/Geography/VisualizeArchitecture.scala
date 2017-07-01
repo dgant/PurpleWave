@@ -28,13 +28,14 @@ object VisualizeArchitecture {
       Colors.MediumTeal,
       solid = false))
     
-    With.architecture.edgeWalkability.values.flatMap(_.path).foreach(path => {
+    With.architecture.existingPaths.values.flatMap(_.path).foreach(path => {
       DrawMap.circle(path.start.pixelCenter,  16, Colors.BrightYellow, solid = false)
       DrawMap.circle(path.end.pixelCenter,    16, Colors.BrightYellow, solid = false)
       path.tiles.foreach(tileList => {
-        var lastTile = path.start
+        var lastTile = path.end
         tileList.drop(1).foreach(tile => {
           DrawMap.arrow(lastTile.pixelCenter, tile.pixelCenter, Colors.BrightYellow)
+          lastTile = tile
         })
       })
     })
@@ -112,12 +113,12 @@ object VisualizeArchitecture {
   }
   
   private def draw(
-                    building  : Blueprint,
-                    color     : Color,
-                    pixel     : Pixel,
-                    value     : Double,
-                    min       : Double,
-                    max       : Double
+    building  : Blueprint,
+    color     : Color,
+    pixel     : Pixel,
+    value     : Double,
+    min       : Double,
+    max       : Double
   ) {
     // Temporarily disabled
     DrawMap.circle(

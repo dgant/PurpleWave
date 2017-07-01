@@ -21,17 +21,21 @@ class Architecture {
   val untownhallable  : mutable.Set[Tile]                         = new mutable.HashSet[Tile]
   val powered2Height  : mutable.Set[Tile]                         = new mutable.HashSet[Tile]
   val powered3Height  : mutable.Set[Tile]                         = new mutable.HashSet[Tile]
-  val edgeWalkability : mutable.HashMap[ZoneEdge, TilePathCache]  = new mutable.HashMap[ZoneEdge, TilePathCache]
+  val existingPaths   : mutable.HashMap[ZoneEdge, TilePathCache]  = new mutable.HashMap[ZoneEdge, TilePathCache]
   
   class TilePathCache {
-    var path: Option[TilePath] = None
+    var path  : Option[TilePath]  = None
+    var tiles : Set[Tile]         = Set.empty
+    var valid : Boolean           = false
+    
+    def set(newPath: TilePath) {
+      path  = Some(newPath)
+      tiles = newPath.tiles.map(_.toSet).getOrElse(Set.empty)
+      valid = true
+    }
   
     def update() {
-      if (path.isDefined &&
-        path.get.tiles.isDefined &&
-        ! path.get.tiles.get.exists(tile => With.architecture.walkable(tile))) {
-        path = None
-      }
+      valid = valid && ! path.get.tiles.get.exists(With.architecture.walkable)
     }
   }
     
@@ -49,10 +53,10 @@ class Architecture {
     untownhallable  .clear()
     powered2Height  .clear()
     powered3Height  .clear()
-    edgeWalkability .clear()
+    existingPaths .clear()
     recalculateExclusions()
     recalculatePower()
-    edgeWalkability.values.foreach(_.update())
+    existingPaths.values.foreach(_.update())
   }
   
   def buildable(tile: Tile): Boolean = {
@@ -63,7 +67,19 @@ class Architecture {
     With.grids.walkable.get(tile) && ! unwalkable.contains(tile)
   }
   
-  def affectsPathing(blockedArea: TileRectangle): Boolean = {
+  def breaksPathing(blockedArea: TileRectangle): Boolean = {
+    // This is a critical but potentially expensive check.
+    //
+    // Cost of not checking:            Walling ourself in and losing the game because of a dumb Pylon
+    // Cost of checking inefficiently:  Dropping frames and getting disqualified because of fear of dumb Pylons
+    //
+    // So let's check this every time, but really focus on making it an inexpensive check
+    
+    // If we have a margin, then it's not possible to break pathing.
+    if (blockedArea.tilesSurrounding.forall(tile => ! tile.valid || walkable(tile))) {
+      return false
+    }
+    
     blockedArea.tiles
       .flatMap(_.zone.edges)
       .toSet
@@ -71,18 +87,44 @@ class Architecture {
   }
   
   private def blocksPathing(edge: ZoneEdge, blockedArea: TileRectangle): Boolean = {
-    if ( ! edgeWalkability.contains(edge)) {
-      edgeWalkability.put(edge, new TilePathCache)
+    
+    if ( ! existingPaths.contains(edge)) {
+      existingPaths.put(edge, new TilePathCache)
     }
-    lazy val start              = canaryTile(edge.zones.head)
-    lazy val end                = canaryTile(edge.zones.last)
-    lazy val maxTiles           = Math.max(20, 2 * start.groundPixels(end).toInt / 32)
-    lazy val excludedBefore     = unwalkable.toSet
-    lazy val excludedAfter      = unwalkable.toSet ++ blockedArea.tiles
-    lazy val pathBefore         = PathFinder.manhattanGroundDistanceThroughObstacles(start, end, excludedBefore, maxTiles)
-    lazy val pathAfter          = PathFinder.manhattanGroundDistanceThroughObstacles(start, end, excludedAfter,  maxTiles)
-    edgeWalkability(edge).path  = edgeWalkability(edge).path.orElse(Some(pathBefore))
-    edgeWalkability(edge).path.get.tiles.isDefined && pathAfter.tiles.isEmpty
+    
+    lazy val start                  = canaryTile(edge.zones.head)
+    lazy val end                    = canaryTile(edge.zones.last)
+    lazy val maxTiles               = Math.max(20, 4 * start.groundPixels(end).toInt / 32)
+    lazy val blockedTiles           = blockedArea.tiles
+    lazy val excludedBefore         = unwalkable.toSet
+    lazy val excludedAfter          = unwalkable.toSet ++ blockedTiles
+    lazy val pathBefore             = PathFinder.manhattanGroundDistanceThroughObstacles(start, end, excludedBefore, maxTiles)
+    lazy val pathAfter              = PathFinder.manhattanGroundDistanceThroughObstacles(start, end, excludedAfter,  maxTiles)
+    
+    // Cache the before-path, if we haven't already
+    if ( ! existingPaths(edge).valid) {
+      existingPaths(edge).set(pathBefore)
+    }
+    
+    // If we're not even touching the original path, then everything is fine.
+    if ( ! blockedTiles.exists(existingPaths(edge).tiles.contains)) {
+      return false
+    }
+    
+    // If the path was already blocked, we're screwed anyway, so whatever.
+    if ( ! pathBefore.pathExists) {
+      return false
+    }
+    
+    // Fine, we'll do some very expensive pathfinding :(
+    // TODO: We could pathfind less by only doing testing the #1 candidate (and rejecting it if it fails the pathfinding test)
+    
+    // If our new path is successful, let's use that one instead
+    if (pathAfter.pathExists) {
+      existingPaths(edge).set(pathAfter)
+    }
+    
+    pathAfter.pathExists
   }
   
   def assumePlacement(placement: Placement) {

@@ -66,4 +66,8 @@ case class TileRectangle(
     }
     output
   }
+  
+  lazy val tilesSurrounding: Iterable[Tile] = {
+    expand(1, 1).tiles.filterNot(contains)
+  }
 }

@@ -43,13 +43,16 @@ object PathFinder {
     start     : Tile,
     end       : Tile,
     distance  : Int,
-    tiles     : Option[Iterable[Tile]])
+    visited   : Int,
+    tiles     : Option[Iterable[Tile]]) {
+    def pathExists: Boolean = tiles.nonEmpty
+  }
   
   def manhattanGroundDistanceThroughObstacles(
-    start          : Tile,
-    end            : Tile,
-    obstacles      : Set[Tile],
-    maximumLength  : Int)
+    start           : Tile,
+    end             : Tile,
+    obstacles       : Set[Tile],
+    maximumDistance : Int)
       : TilePath = {
     
     // I don't want to stop
@@ -59,41 +62,49 @@ object PathFinder {
     val visited         = new mutable.HashSet[Tile]
     val horizon         = new mutable.PriorityQueue[Tile]()(Ordering.by(_.tileDistanceManhattan(end)))
     val cameFrom        = new mutable.HashMap[Tile, Tile]
-    val costToStart     = new mutable.HashMap[Tile, Int] { override def default(key: Tile): Int = Int.MaxValue }
-    val costToEnd       = new mutable.HashMap[Tile, Int] { override def default(key: Tile): Int = Int.MaxValue }
-    costToEnd(start)    = 0
-    costToStart(start)  = start.tileDistanceManhattan(end)
+    val distanceFrom    = new mutable.HashMap[Tile, Int] { override def default(key: Tile): Int = Int.MaxValue }
+    val distanceTo      = new mutable.HashMap[Tile, Int] { override def default(key: Tile): Int = Int.MaxValue }
+    distanceTo(start)    = 0
+    distanceFrom(start)  = start.tileDistanceManhattan(end)
     horizon += start
+    
     while (horizon.nonEmpty) {
+      
       val thisTile = horizon.dequeue()
-      if (!visited.contains(thisTile)) {
+      
+      if ( ! visited.contains(thisTile)) {
+        
         visited.add(thisTile)
-        if (thisTile == end) return TilePath(start, end, costToStart(end), Some(assemblePath(cameFrom, end)))
-        val distanceSquared = thisTile.tileDistanceSquared(end)
+        if (thisTile == end) {
+          return TilePath(start, end, distanceFrom(end), visited.size, Some(assemblePath(cameFrom, end)))
+        }
+        
         val neighbors = Array(thisTile.left, thisTile.right, thisTile.up, thisTile.down)
         var i = 0
         while (i < 4) {
-          val nextTile = neighbors(i)
+          val neighbor = neighbors(i)
           i += 1
-          if (nextTile.valid
-            && With.grids.walkable.get(nextTile)
-            && !obstacles.contains(nextTile)
-            && !visited.contains(nextTile)) {
-            val nextCostToStart = costToStart(thisTile) + 1
-            val nextCostToEnd = nextCostToStart + nextTile.tileDistanceManhattan(end)
-            if (nextCostToEnd < maximumLength) {
-              horizon += nextTile
-              if (nextCostToStart < costToStart(nextTile)) {
-                cameFrom(nextTile)    = thisTile
-                costToStart(nextTile) = nextCostToStart
-                costToEnd(nextTile)   = nextCostToEnd
-              }
+          
+          if (neighbor.valid
+            && With.grids.walkable.get(neighbor)
+            && ! obstacles.contains(neighbor)
+            && ! visited.contains(neighbor)
+            && thisTile.tileDistanceManhattan(end) < maximumDistance) {
+  
+            horizon += neighbor
+            
+            val neighborDistanceFrom  = distanceFrom(thisTile) + 1
+            
+            if (neighborDistanceFrom < distanceFrom(neighbor)) {
+              cameFrom(neighbor)      = thisTile
+              distanceFrom(neighbor)  = neighborDistanceFrom
+              distanceTo(neighbor)    = neighborDistanceFrom + neighbor.tileDistanceManhattan(end)
             }
           }
         }
       }
     }
-    TilePath(start, end, Int.MaxValue, None)
+    TilePath(start, end, Int.MaxValue, visited.size, None)
   }
   
   private def assemblePath(cameFrom: mutable.Map[Tile, Tile], end: Tile): Iterable[Tile] = {

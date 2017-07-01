@@ -113,5 +113,4 @@ class Blueprint(
     (if (powered)   "(Powered) "    else "") +
     (if (townHall)  "(Town hall) "  else "") +
     (if (gas)       "(Gas) "        else "")
-  
 }

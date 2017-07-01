@@ -57,7 +57,7 @@ object EvaluatePlacements {
     //
     // So we'll keep popping the best placement off the top until we find one that's path-safe.
       
-    val placements = mutable.PriorityQueue[Tile]()(Ordering.by(HeuristicMathMultiplicative.resolve(buildingDescriptor, buildingDescriptor.placement.weightedHeuristics, _)))
+    val placements = mutable.PriorityQueue[Tile]()(Ordering.by( - HeuristicMathMultiplicative.resolve(buildingDescriptor, buildingDescriptor.placement.weightedHeuristics, _)))
     placements ++= tiles
     placements.find(tile => ! With.architecture.breaksPathing(buildingDescriptor.relativeBuildArea.add(tile)))
   }

@@ -35,7 +35,7 @@ class Architecture {
     }
   
     def update() {
-      valid = valid && ! path.get.tiles.get.exists(With.architecture.walkable)
+      valid = valid && path.get.tiles.get.forall(With.architecture.walkable)
     }
   }
     
@@ -56,6 +56,10 @@ class Architecture {
     existingPaths .clear()
     recalculateExclusions()
     recalculatePower()
+    updatePaths()
+  }
+  
+  private def updatePaths() {
     existingPaths.values.foreach(_.update())
   }
   
@@ -94,7 +98,7 @@ class Architecture {
     
     lazy val start                  = canaryTile(edge.zones.head)
     lazy val end                    = canaryTile(edge.zones.last)
-    lazy val maxTiles               = Math.max(20, 4 * start.groundPixels(end).toInt / 32)
+    lazy val maxTiles               = Math.max(20, 5 * start.groundPixels(end).toInt / 32)
     lazy val blockedTiles           = blockedArea.tiles
     lazy val excludedBefore         = unwalkable.toSet
     lazy val excludedAfter          = unwalkable.toSet ++ blockedTiles
@@ -148,6 +152,8 @@ class Architecture {
     if (placement.buildingDescriptor.powers) {
       addPower(tile)
     }
+  
+    updatePaths() //Invalidate any paths which no longer work
     
     if (With.visualization.enabled) {
       exclusions += Exclusion(placement.buildingDescriptor.toString, margin)

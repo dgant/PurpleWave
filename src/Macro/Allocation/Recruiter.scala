@@ -1,8 +1,7 @@
 package Macro.Allocation
 
-import Planning.Composition.ResourceLocks.LockUnits
-import ProxyBwapi.Races.{Protoss, Terran}
 import Lifecycle.With
+import Planning.Composition.ResourceLocks.LockUnits
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 import scala.collection.mutable
@@ -32,8 +31,7 @@ class Recruiter {
     //test
   }
   
-  val ineligibleClasses = Set(Protoss.Interceptor, Protoss.Scarab, Terran.SpiderMine)
-  private def isEligible(unit:FriendlyUnitInfo):Boolean = unit.aliveAndComplete && ! ineligibleClasses.contains(unit.unitClass)
+  private def isEligible(unit: FriendlyUnitInfo): Boolean = unit.aliveAndComplete && unit.unitClass.orderable
   
   private def test() {
     //Verify no units are shared between locks

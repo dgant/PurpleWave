@@ -13,7 +13,7 @@ object Disengage extends Action {
     
     val completelySafe = state.threats.isEmpty
     if (completelySafe) {
-      Engage.delegate(state)
+      Engage.consider(state)
       return
     }
     

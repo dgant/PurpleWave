@@ -16,12 +16,15 @@ class ProtossVsTerran extends Parallel {
   
   private class OnThreeBases_Carriers extends OnMiningBases(3,
     new Build(
+      RequestUnitAtLeast(1,   Protoss.CitadelOfAdun),
       RequestUnitAtLeast(1,   Protoss.Stargate),
       RequestUnitAtLeast(5,   Protoss.Gateway),
+      RequestUpgradeLevel(    Protoss.ZealotSpeed),
       RequestUnitAtLeast(1,   Protoss.FleetBeacon),
       RequestUnitAtLeast(3,   Protoss.Stargate),
       RequestUnitAtLeast(1,   Protoss.Stargate),
       RequestUpgradeLevel(    Protoss.AirDamage,      1),
+      RequestUpgradeLevel(    Protoss.CarrierCapacity),
       RequestUpgradeLevel(    Protoss.AirDamage,      2),
       RequestUpgradeLevel(    Protoss.AirDamage,      3)
     ))
@@ -29,9 +32,7 @@ class ProtossVsTerran extends Parallel {
   private class OnThreeBases_SpeedlotsAndObservers extends OnMiningBases(3,
     new Build(
       RequestUnitAtLeast(1,   Protoss.RoboticsFacility),
-      RequestUnitAtLeast(1,   Protoss.CitadelOfAdun),
       RequestUnitAtLeast(1,   Protoss.Observatory),
-      RequestUpgradeLevel(    Protoss.ZealotSpeed,      1),
       RequestUnitAtLeast(4,   Protoss.Gateway),
       RequestUnitAtLeast(8,   Protoss.Gateway),
       RequestUnitAtLeast(10,  Protoss.Gateway),
@@ -68,12 +69,9 @@ class ProtossVsTerran extends Parallel {
     new Build(RequestUpgradeLevel(Protoss.DragoonRange, 1)),
     new Build(RequestUnitAtLeast(2, Protoss.Gateway)),
     new RequireMiningBases(3),
-    new OnThreeBases_Carriers,
-    /*
     new OnThreeBases_SpeedlotsAndObservers,
     new OnThreeGas_Arbiters,
     new OnThreeBases_WeaponsUpgrades,
-    */
     new OnMiningBases(4, new Build(RequestUnitAtLeast(14, Protoss.Gateway))),
     new RequireMiningBases(4),
     new ScoutAt(14),

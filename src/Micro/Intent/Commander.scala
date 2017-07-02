@@ -83,6 +83,8 @@ class Commander {
     // Carriers are finicky. Manage them appropriately.
     // * Don't attack units that aren't huge. Just attack-move to keep the interceptors going
     // * Don't disturb interceptors that are already moving
+    //
+    // According to tscmoo, Carrier leash range is 10 (not the 12 on Liquipedia)
     if (target.unitClass.maxTotalHealth >= 400) {
       unit.base.attack(target.base)
       sleepAttack(unit)

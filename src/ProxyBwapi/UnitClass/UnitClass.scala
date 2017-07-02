@@ -54,7 +54,7 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
   
   lazy val effectiveGroundDamage:Int =
     if (this == Terran.Bunker)         Terran.Marine.effectiveGroundDamage * 4 else
-    if (this == Protoss.Carrier)       (Protoss.Interceptor.effectiveGroundDamage * 8) else
+    if (this == Protoss.Carrier)       Protoss.Interceptor.effectiveGroundDamage * 8 else
     if (this == Protoss.Interceptor)   0 else
     if (this == Protoss.Reaver)        Protoss.Scarab.effectiveGroundDamage
     else                               groundDamageRaw
@@ -97,6 +97,8 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
   ///////////
   // Macro //
   ///////////
+  
+  lazy val trainsGroundUnits: Boolean = UnitClasses.all.exists(unit => ! unit.isFlyer && unit.whatBuilds._1 == this)
   
   lazy val isProtoss : Boolean = race == Race.Protoss
   lazy val isTerran  : Boolean = race == Race.Terran

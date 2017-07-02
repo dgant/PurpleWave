@@ -15,7 +15,7 @@ class Executor {
   
   def states: Iterable[ActionState] = stateByUnit.values
   
-  def intend(intention: Intention) = {
+  def intend(intention: Intention) {
     getState(intention.unit).intent = intention
   }
   
@@ -42,11 +42,12 @@ class Executor {
     }
     
     while (unitQueue.nonEmpty && With.performance.continueRunning) {
-      val nextUnit = unitQueue.dequeue()
+      val nextState = unitQueue.dequeue()
       
-      // Hack fix for CIG -- we were cancelling our Photon Cannon attacks.
-      if ( ! nextUnit.unit.is(Protoss.PhotonCannon)) {
-        Idle.consider(nextUnit)
+      if (nextState.unit.unitClass.orderable &&
+        ! nextState.unit.is(Protoss.PhotonCannon)) // Hack fix for CIG -- we were cancelling our Photon Cannon attacks.
+        {
+        Idle.consider(nextState)
       }
     }
   

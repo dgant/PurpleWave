@@ -71,7 +71,7 @@ object PlacementProfiles {
       gas
     else if (buildingDescriptor.powers)
       pylon
-    else if (buildingDescriptor.margin)
+    else if (buildingDescriptor.building.exists(_.trainsGroundUnits))
       factory
     else if (buildingDescriptor.attackRange.isDefined)
       groundDefense

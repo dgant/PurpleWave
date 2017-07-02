@@ -7,7 +7,7 @@ import Lifecycle.With
 import Mathematics.Points.{Tile, TileRectangle}
 import Mathematics.Shapes.Spiral
 import ProxyBwapi.Races.{Protoss, Zerg}
-import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
+import ProxyBwapi.UnitClass.UnitClass
 import ProxyBwapi.UnitInfo.UnitInfo
 
 import scala.collection.mutable
@@ -44,7 +44,7 @@ class Architecture {
   def usuallyNeedsMargin(unitClass: UnitClass): Boolean = {
     if (With.configuration.enableTightBuildingPlacement) {
       unitClass.isBuilding &&
-      UnitClasses.all.exists(unit => ! unit.isFlyer && unit.whatBuilds._1 == unitClass) &&
+      unitClass.trainsGroundUnits &&
       ! unitClass.isTownHall //Nexus margins bork FFEs. Down the road Hatcheries may need margins.
     }
     else true

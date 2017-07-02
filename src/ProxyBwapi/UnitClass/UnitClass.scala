@@ -42,7 +42,7 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
     else if (this == Protoss.PhotonCannon)  18
     else if (this == Protoss.Reaver)        1 //?
     else if (this == Zerg.Devourer)         10
-    else if (this == Protoss.Carrier)       48
+    else if (this == Protoss.Carrier)       24 * 4
     else                                    0
   }
   

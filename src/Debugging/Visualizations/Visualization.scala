@@ -23,14 +23,14 @@ class Visualization {
     ViewPlanning
   )
   
-  private var view: View = ViewGeography
+  private var view: View = ViewPerformance
   private var lastCycle = 0
   
   var enabled   = false
   var cycle     = false
   var screen    = true
   var grids     = false
-  var map       = true
+  var map       = false
   var happy     = false
   var textOnly  = false
   

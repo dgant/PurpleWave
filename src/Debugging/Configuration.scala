@@ -57,6 +57,7 @@ class Configuration {
   // Performance //
   /////////////////
   
+  var garbageCollectionThresholdMs  = 5
   var peformanceFrameMilliseconds   = 20
   var initialTaskLengthMilliseconds = 20
   var performanceMinimumUnitSleep   = 2

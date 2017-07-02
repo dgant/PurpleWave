@@ -17,7 +17,8 @@ abstract class AbstractTask {
   final val runtimesToTrack = 10
   
   var urgency             : Int = 1
-  def maxConsecutiveSkips : Int = 24
+  def maxConsecutiveSkips : Int = 48
+  def overdue             : Boolean = framesSinceRunning > maxConsecutiveSkips
   
   protected def onRun()
   

@@ -19,6 +19,11 @@ abstract class AbstractTaskQueue {
       return
     }
   
+    tasks
+      .sortBy(task => - task.urgency * task.framesSinceRunning)
+      .sortBy( ! _.overdue)
+      
+  
     // Ordinarily we'd do foreach() but that swallows exceptions and I don't understand why
     //
     var i = 0
@@ -29,14 +34,17 @@ abstract class AbstractTaskQueue {
           if (task.totalRuns < 10) With.configuration.initialTaskLengthMilliseconds else 0,
           if (With.performance.danger) task.runMillisecondsMaxAllTime else 2 * task.runMillisecondsMaxRecent)
     
-      if (
-        task.framesSinceRunning > task.maxConsecutiveSkips
+      if (task.framesSinceRunning > task.maxConsecutiveSkips
           || With.performance.millisecondsLeftThisFrame > expectedMilliseconds) {
         task.run()
       } else {
         task.skip()
       }
       i += 1
+    }
+    
+    if (With.performance.millisecondsSpentThisFrame < With.configuration.garbageCollectionThresholdMs) {
+      System.gc()
     }
   }
 }

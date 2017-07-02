@@ -42,9 +42,12 @@ class Architecture {
   }
     
   def usuallyNeedsMargin(unitClass: UnitClass): Boolean = {
-    unitClass.isBuilding &&
-    UnitClasses.all.exists(unit => ! unit.isFlyer && unit.whatBuilds._1 == unitClass) &&
-    ! unitClass.isTownHall //Nexus margins bork FFEs. Down the road Hatcheries may need margins.
+    if (With.configuration.enableTightBuildingPlacement) {
+      unitClass.isBuilding &&
+      UnitClasses.all.exists(unit => ! unit.isFlyer && unit.whatBuilds._1 == unitClass) &&
+      ! unitClass.isTownHall //Nexus margins bork FFEs. Down the road Hatcheries may need margins.
+    }
+    else false
   }
   
   def reboot() {
@@ -79,6 +82,11 @@ class Architecture {
     // Cost of checking inefficiently:  Dropping frames and getting disqualified because of fear of dumb Pylons
     //
     // So let's check this every time, but really focus on making it an inexpensive check
+    
+    // CIG 2017 deadline is coming up and this is going to single-handedly disqualify us.
+    if ( ! With.configuration.verifyBuildingsDontBreakPaths) {
+      return false
+    }
     
     // If we have a margin, then it's not possible to break pathing.
     if (blockedArea.tilesSurrounding.forall(tile => ! tile.valid || walkable(tile))) {

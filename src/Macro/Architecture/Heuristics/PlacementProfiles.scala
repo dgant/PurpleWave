@@ -8,7 +8,7 @@ object PlacementProfiles {
     "Pylon",
     preferZone                  = 3.0,
     preferSpace                 = 0.1,
-    preferPowering              = 0.5,
+    preferPowering              = 1.0,
     preferDistanceFromEnemy     = 1.0,
     avoidDistanceFromBase       = 2.5,
     avoidDistanceFromExitRange  = 1.0

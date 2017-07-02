@@ -10,7 +10,8 @@ abstract class AbstractTask {
   private var totalRunCount       : Int   = 0
   private var totalSkipCount      : Int   = 0
   private var maxMillisecondsEver : Long  = 0
-  private var overruns            : Int   = 0
+  private var violatedThreshold   : Int   = 0
+  private var violatedRules       : Int   = 0
   
   final val runtimeMilliseconds = new mutable.Queue[Long]
   final val runtimesToTrack = 10
@@ -20,10 +21,11 @@ abstract class AbstractTask {
   
   protected def onRun()
   
-  final def framesSinceRunning  : Int = Math.max(1, With.frame - lastRunFrame)
-  final def totalRuns           : Int = totalRunCount
-  final def totalSkips          : Int = totalSkipCount
-  final def totalCutoffs        : Int = overruns
+  final def framesSinceRunning      : Int = Math.max(1, With.frame - lastRunFrame)
+  final def totalRuns               : Int = totalRunCount
+  final def totalSkips              : Int = totalSkipCount
+  final def totalViolatedThreshold  : Int = violatedThreshold
+  final def totalViolatedRules      : Int = violatedRules
   
   final def run() {
     val nanosToMillis = 1000000
@@ -47,8 +49,11 @@ abstract class AbstractTask {
     while (runtimeMilliseconds.size > runtimesToTrack) {
       runtimeMilliseconds.dequeue()
     }
-    if (With.performance.violation) {
-      overruns += 1
+    if (With.performance.violatedThreshold) {
+      violatedThreshold += 1
+    }
+    if (With.performance.violatedRules) {
+      violatedRules += 1
     }
   }
   

@@ -8,14 +8,15 @@ import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.ForeignUnitInfo
 import Utilities.EnrichPixel._
 
+import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 object BaseFinder {
   
-  def calculate:Iterable[Tile] = {
+  def calculate: Iterable[Tile] = {
   
     //Find base positions
-    val allHalls = clusteredResourcePatches.flatMap(bestTownHallTile).to[mutable.Set]
+    val allHalls = clusteredResourcePatches.flatMap(bestTownHallTile).to[mutable.Set] ++ With.game.getStartLocations.asScala.map(new Tile(_))
     removeConflictingBases(allHalls)
   }
   
@@ -34,14 +35,15 @@ object BaseFinder {
   private def bestTownHallTile(resources: Iterable[ForeignUnitInfo]): Option[Tile] = {
     val centroid = resources.map(_.pixelCenter).centroid
     val centroidTile = centroid.tileIncluding
+    val altitude = With.game.getGroundHeight(centroidTile.bwapi)
     val searchRadius = 10
     val candidates =
       Circle
         .points(searchRadius)
         .map(centroidTile.add)
-        .filter(isLegalTownHallTile)
+        .filter(tile => isLegalTownHallTile(tile) && altitude == With.game.getGroundHeight(tile.bwapi))
     if (candidates.isEmpty) return None
-    Some(candidates.minBy(_.topLeftPixel.add(64, 48).pixelDistanceSlow(centroid)))
+    Some(candidates.minBy(_.topLeftPixel.add(64, 48).pixelDistanceFast(centroid)))
   }
   
   private def isLegalTownHallTile(candidate: Tile): Boolean = {
@@ -78,6 +80,7 @@ object BaseFinder {
             .filter(_.unitClass.isGas)
             .map(_.pixelDistanceFast(hall.pixelCenter))
             .min)
+        
         basesToRemove -- conflictingHalls.filterNot(_ == preferredHall)
       })
     

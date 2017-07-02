@@ -46,6 +46,7 @@ class Visualization {
   def render() {
     requireInitialization()
     if ( ! enabled) return
+    if (With.tasks.tasks.exists(_.totalRuns == 0)) return
     With.game.setTextSize(bwapi.Text.Size.Enum.Small)
     
     if (happy) {

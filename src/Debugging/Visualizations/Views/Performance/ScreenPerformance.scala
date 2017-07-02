@@ -24,7 +24,7 @@ object ScreenPerformance {
   
   def renderDetails() {
     val title = Vector("Cutoff: ", With.configuration.initialTaskLengthMilliseconds + "ms")
-    val headers = Vector("System", "Last run", "Total runs", "Total skips", "Avg ms", "Max (Recent)", "Max (All time)", "Violations")
+    val headers = Vector("System", "Last run", "Total runs", "Total skips", "Avg ms", "Max (Recent)", "Max (All time)", "Threshold :(", "Rules :(")
     val body = With.tasks.tasks
       .sortBy(_.getClass.getSimpleName + "  ")
       .map(task => Vector(
@@ -35,7 +35,8 @@ object ScreenPerformance {
         task.runMillisecondsMean.toString,
         task.runMillisecondsMaxRecent.toString,
         task.runMillisecondsMaxAllTime.toString,
-        task.totalCutoffs.toString
+        task.totalViolatedThreshold.toString,
+        task.totalViolatedRules.toString
       ))
     DrawScreen.table(5, With.visualization.lineHeightSmall * 2, Vector(title) ++ Vector(headers) ++ body)
   }

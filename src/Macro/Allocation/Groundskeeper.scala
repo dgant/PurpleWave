@@ -70,7 +70,7 @@ class Groundskeeper {
     // Then place upcoming proposals
     // ordered by time since last attempt at placement
     // then by priority
-    val placed = proposalPlacements.keySet
+    val placed = proposalPlacements.filter(_._2.tile.isDefined).keySet
     val unplaced = proposals.diff(placed)
     val ordered =
       placed

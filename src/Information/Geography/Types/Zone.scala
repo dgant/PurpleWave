@@ -26,6 +26,8 @@ class Zone(
       
   var isWalledIn: Boolean = false
   
+  lazy val border: mutable.Set[Tile] = tiles.filter(tile => Array(tile.up, tile.down, tile.left, tile.right).exists( ! tiles.contains(_)))
+  
   def contains(tile: Tile)    : Boolean = boundary.contains(tile) && tiles.contains(tile)
   def contains(pixel: Pixel)  : Boolean = contains(pixel.tileIncluding)
 }

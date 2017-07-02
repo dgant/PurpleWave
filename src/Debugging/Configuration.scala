@@ -41,6 +41,7 @@ class Configuration {
   var blockerMineralThreshold         = 50
   var maxPlacementAge                 = 99999 * 24 * 20
   var maxScarabCount                  = 3
+  var enableTightBuildingPlacement     = false
   
   /////////////
   // Battles //
@@ -61,6 +62,7 @@ class Configuration {
   var performanceMinimumUnitSleep   = 2
   var performanceMicroAngleStep     = 4
   var useFastGroundDistance         = true
+  var verifyBuildingsDontBreakPaths = false
   var unitHistoryAge                = 24 * 3
   var buildingPlacements            = 5
   
@@ -78,7 +80,7 @@ class Configuration {
   // Visualization //
   ///////////////////
   
-  var visualize                           = false
+  var visualize                           = true
   var visualizationProbabilityHappyVision = 0.1
   var visualizationProbabilityTextOnly    = 0.02
   

@@ -11,6 +11,7 @@ object MapGeography {
       DrawMap.polygonPixels(
         zone.points,
         zone.owner.colorDark)
+      
     })
   }
 }

@@ -54,8 +54,12 @@ class PerformanceMonitor {
     millisecondsLeftThisFrame > 1
   }
   
-  def violation: Boolean = {
-    millisecondsSpentThisFrame >= 50
+  def violatedThreshold: Boolean = {
+    millisecondsLeftThisFrame <= 0
+  }
+  
+  def violatedRules: Boolean = {
+    millisecondsSpentThisFrame >= 55
   }
   
   def danger: Boolean = {

@@ -23,7 +23,7 @@ object ProtossVsTerranIdeas {
   
   class BuildDragoonsUntilWeHaveZealotSpeed extends If(
     new And(
-      new HaveUpgrade(Protoss.ZealotSpeed, Protoss.Zealot.buildFrames),
+      new HaveUpgrade(Protoss.ZealotSpeed, withinFrames = Protoss.Zealot.buildFrames),
       new Or(
         new UnitsAtLeast(12, UnitMatchType(Protoss.Dragoon)),
         new Check(() => With.self.minerals > With.self.gas * 4))),

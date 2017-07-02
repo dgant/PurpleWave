@@ -1,6 +1,6 @@
 package Planning.Plans.Army
 
-import Information.Geography.Types.ZoneEdge
+import Information.Geography.Types.Edge
 import Lifecycle.With
 import Mathematics.Formations.Formation
 import Micro.Intent.Intention
@@ -33,7 +33,7 @@ class DefendChokes extends Plan {
       .map(choke => (choke, unassignedUnits.toVector.sortBy(_.framesToTravel(choke.centerPixel))))
       .toMap
     
-    val assignments = new mutable.HashMap[ZoneEdge, ArrayBuffer[FriendlyUnitInfo]]
+    val assignments = new mutable.HashMap[Edge, ArrayBuffer[FriendlyUnitInfo]]
     chokes.foreach(choke => assignments.put(choke, new ArrayBuffer[FriendlyUnitInfo]))
     
     // Step 2. Assign our defenders to chokes

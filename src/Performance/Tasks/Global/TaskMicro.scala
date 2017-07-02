@@ -7,7 +7,7 @@ class TaskMicro extends AbstractTask {
   
   urgency = With.configuration.urgencyMicro
   
-  override def skippable: Boolean = false
+  override def maxConsecutiveSkips: Int = 1
   
   override protected def onRun() {
     With.commander.run()

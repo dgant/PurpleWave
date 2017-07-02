@@ -11,7 +11,7 @@ import scala.collection.mutable
 class Executor {
   
   private val stateByUnit = new mutable.HashMap[FriendlyUnitInfo, ActionState]
-  private var finishedExecuting = true
+  private var finishedExecutingLastTime = true
   
   def states: Iterable[ActionState] = stateByUnit.values
   
@@ -33,7 +33,8 @@ class Executor {
   val unitQueue = new mutable.Queue[ActionState]
   
   def run() {
-    if ( ! With.latency.isLastFrameOfTurn && ! finishedExecuting) return
+    
+    if ( ! With.latency.isLastFrameOfTurn && finishedExecutingLastTime) return
   
     stateByUnit.keys.filterNot(_.alive).foreach(stateByUnit.remove)
     
@@ -41,16 +42,17 @@ class Executor {
       unitQueue ++= stateByUnit.values.toVector.sortBy(_.lastFrame)
     }
     
-    while (unitQueue.nonEmpty && With.performance.continueRunning) {
+    var doContinue = true
+    while (doContinue && unitQueue.nonEmpty) {
+      doContinue = doContinue && With.performance.continueRunning
       val nextState = unitQueue.dequeue()
       
-      if (nextState.unit.unitClass.orderable &&
-        ! nextState.unit.is(Protoss.PhotonCannon)) // Hack fix for CIG -- we were cancelling our Photon Cannon attacks.
-        {
+      if (nextState.unit.unitClass.orderable
+        && ! nextState.unit.is(Protoss.PhotonCannon)) /* Hack fix for CIG -- we were cancelling our Photon Cannon attacks. */ {
         Idle.consider(nextState)
       }
     }
   
-    finishedExecuting = unitQueue.isEmpty
+    finishedExecutingLastTime = unitQueue.isEmpty
   }
 }

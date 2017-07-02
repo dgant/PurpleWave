@@ -1,7 +1,7 @@
 package Information.Geography
 
 import Information.Geography.Calculations.{ZoneBuilder, ZoneUpdater}
-import Information.Geography.Types.{Base, Zone, ZoneEdge}
+import Information.Geography.Types.{Base, Zone, Edge}
 import Lifecycle.With
 import Mathematics.Points.{SpecificPoints, Tile, TileRectangle}
 import Performance.Caching.{Cache, Limiter}
@@ -12,11 +12,12 @@ import scala.collection.JavaConverters._
 
 class Geography {
   
-  val mapArea             : TileRectangle           = TileRectangle(Tile(0, 0), Tile(With.mapWidth, With.mapHeight))
-  val allTiles            : Iterable[Tile]          = mapArea.tiles
+  lazy val mapArea        : TileRectangle           = TileRectangle(Tile(0, 0), Tile(With.mapWidth, With.mapHeight))
+  lazy val allTiles       : Iterable[Tile]          = mapArea.tiles
   lazy val startLocations : Iterable[Tile]          = With.game.getStartLocations.asScala.map(new Tile(_))
-  lazy val zones          : Iterable[Zone]          = ZoneBuilder.build
-  def bases               : Iterable[Base]          = zones.flatten(_.bases)
+  lazy val zones          : Iterable[Zone]          = ZoneBuilder.zones
+  lazy val edges          : Iterable[Edge]          = ZoneBuilder.edges
+  lazy val bases          : Iterable[Base]          = ZoneBuilder.bases
   def ourZones            : Iterable[Zone]          = zones.filter(_.owner.isUs)
   def ourBases            : Iterable[Base]          = ourZones.flatten(_.bases)
   def enemyZones          : Iterable[Zone]          = zones.filterNot(zone => Vector(With.self, With.neutral).contains(zone.owner))
@@ -25,14 +26,11 @@ class Geography {
   def ourHarvestingAreas  : Iterable[TileRectangle] = ourBases.map(_.harvestingArea)
   lazy val ourNatural     : Option[Base]            = bases.find(_.isNaturalOf.exists(_.owner.isUs))
   
-  def zoneByTile(tile: Tile): Zone = zonesByTileCache(tile)
-  private lazy val zonesByTileCache =
+  def zoneByTile(tile: Tile): Zone = zoneByTileCache(tile)
+  private lazy val zoneByTileCache =
     new mutable.HashMap[Tile, Zone] {
       override def default(key: Tile): Zone = {
-        val zone = zones.find(_.tiles.contains(key))
-          .getOrElse(zones.minBy(_.centroid.tileDistanceSquared(key)))
-        put(key, zone)
-        zone
+        put(key, zones.find(_.tiles.contains(key)).get).get
       }
     }
   
@@ -45,13 +43,13 @@ class Geography {
       .map(_.townHallArea.startInclusive)
       .getOrElse(SpecificPoints.tileMiddle))
   
-  def ourExposedChokes: Iterable[ZoneEdge] =
+  def ourExposedChokes: Iterable[Edge] =
     With.geography.zones
       .filter(zone => zone.owner.isUs || zone.bases.exists(_.planningToTake))
       .flatten(_.edges)
       .filter(edge => edge.zones.exists( ! _.owner.isUs))
   
-  def mostExposedChokes: Vector[ZoneEdge] =
+  def mostExposedChokes: Vector[Edge] =
     ourExposedChokes
       .toVector
       .sortBy(_.centerPixel.groundPixels(With.intelligence.mostBaselikeEnemyTile))

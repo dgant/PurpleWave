@@ -2,7 +2,7 @@ package Macro.Architecture
 
 import Information.Geography.Pathfinding.PathFinder
 import Information.Geography.Pathfinding.PathFinder.TilePath
-import Information.Geography.Types.{Zone, ZoneEdge}
+import Information.Geography.Types.{Zone, Edge}
 import Lifecycle.With
 import Mathematics.Points.{Tile, TileRectangle}
 import Mathematics.Shapes.Spiral
@@ -21,7 +21,7 @@ class Architecture {
   val untownhallable  : mutable.Set[Tile]                         = new mutable.HashSet[Tile]
   val powered2Height  : mutable.Set[Tile]                         = new mutable.HashSet[Tile]
   val powered3Height  : mutable.Set[Tile]                         = new mutable.HashSet[Tile]
-  val existingPaths   : mutable.HashMap[ZoneEdge, TilePathCache]  = new mutable.HashMap[ZoneEdge, TilePathCache]
+  val existingPaths   : mutable.HashMap[Edge, TilePathCache]  = new mutable.HashMap[Edge, TilePathCache]
   
   class TilePathCache {
     var path  : Option[TilePath]  = None
@@ -99,7 +99,7 @@ class Architecture {
       .exists(blocksPathing(_, blockedArea))
   }
   
-  private def blocksPathing(edge: ZoneEdge, blockedArea: TileRectangle): Boolean = {
+  private def blocksPathing(edge: Edge, blockedArea: TileRectangle): Boolean = {
     
     if ( ! existingPaths.contains(edge)) {
       existingPaths.put(edge, new TilePathCache)

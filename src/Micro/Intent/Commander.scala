@@ -125,7 +125,7 @@ class Commander {
       val toZone    = to.zone
       if (fromZone != toZone || With.configuration.enableMineralWalkInSameZone) {
         val walkableMineral = toZone.bases
-          .flatten(_.minerals)
+          .flatMap(_.minerals)
           .find(mineral =>
             mineral.visible && //Can't mineral walk to an invisible mineral
             mineral.pixelsFromEdgeFast(unit) > 60.0 &&

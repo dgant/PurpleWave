@@ -21,11 +21,12 @@ abstract class AbstractTask {
   
   protected def onRun()
   
-  final def framesSinceRunning      : Int = Math.max(1, With.frame - lastRunFrame)
-  final def totalRuns               : Int = totalRunCount
-  final def totalSkips              : Int = totalSkipCount
-  final def totalViolatedThreshold  : Int = violatedThreshold
-  final def totalViolatedRules      : Int = violatedRules
+  final def framesSinceRunning      : Int     = Math.max(1, With.frame - lastRunFrame)
+  final def totalRuns               : Int     = totalRunCount
+  final def totalSkips              : Int     = totalSkipCount
+  final def totalViolatedThreshold  : Int     = violatedThreshold
+  final def totalViolatedRules      : Int     = violatedRules
+  final def hasNeverRun             : Boolean = totalRuns == 0
   
   final def run() {
     val nanosToMillis = 1000000

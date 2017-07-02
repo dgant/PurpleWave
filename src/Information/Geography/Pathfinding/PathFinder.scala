@@ -8,13 +8,13 @@ import scala.collection.mutable.ListBuffer
 
 object PathFinder {
   
-  def roughGroundDistance(from: Pixel, to: Pixel): Double = {
+  def groundDistanceFast(from: Pixel, to: Pixel): Double = {
     
     val fromZone = from.zone
     val toZone = to.zone
     
     if (fromZone == toZone) {
-      return from.pixelDistanceSlow(to)
+      return from.pixelDistanceFast(to)
     }
     
     if ( ! With.paths.exists(
@@ -29,8 +29,8 @@ object PathFinder {
     
     fromEdgeTiles.map(fromEdgeTile =>
       toEdgeTiles.map(toEdgeTile =>
-        from.pixelDistanceSlow(fromEdgeTile.pixelCenter) +
-          to.pixelDistanceSlow(  toEdgeTile.pixelCenter) +
+        from.pixelDistanceFast(fromEdgeTile.pixelCenter) +
+          to.pixelDistanceFast(  toEdgeTile.pixelCenter) +
         With.paths.groundPixels(
           fromEdgeTile,
           toEdgeTile,

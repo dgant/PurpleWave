@@ -86,19 +86,19 @@ class Blueprint(
       return ! With.architecture.ungassable.contains(tile)
     }
     
-    val marginArea  = relativeMarginArea.add(tile)
-    val buildArea   = relativeBuildArea.add(tile)
+    val marginArea      = relativeMarginArea.add(tile)
+    lazy val buildArea  = relativeBuildArea.add(tile)
   
     marginArea.tiles.forall(nextTile => {
       nextTile.valid &&
-        (
-          if (buildArea.contains(nextTile)) {
-            With.architecture.buildable(nextTile)
-          }
-          else {
-            With.architecture.walkable(nextTile)
-          }
-        )
+      (
+        if (buildArea.contains(nextTile)) {
+          With.architecture.buildable(nextTile)
+        }
+        else {
+          With.architecture.walkable(nextTile)
+        }
+      )
     })
   }
   

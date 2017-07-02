@@ -12,9 +12,9 @@ abstract class AbstractTaskQueue {
     // There's some path-dependency in task initialization.
     // Run each task in order until we've run everything once.
     //
-    if (tasks.exists(_.totalRuns == 0)) {
-      while (With.performance.continueRunning) {
-        tasks.find(_.totalRuns == 0).get.run()
+    if (tasks.exists(_.hasNeverRun)) {
+      while (With.performance.continueRunning && tasks.exists(_.hasNeverRun)) {
+        tasks.find(_.hasNeverRun).get.run()
       }
       return
     }
@@ -27,7 +27,7 @@ abstract class AbstractTaskQueue {
       val expectedMilliseconds =
         Math.max(
           if (task.totalRuns < 10) With.configuration.initialTaskLengthMilliseconds else 0,
-          if (With.performance.danger) task.runMillisecondsMaxAllTime else task.runMillisecondsMaxRecent)
+          if (With.performance.danger) task.runMillisecondsMaxAllTime else 2 * task.runMillisecondsMaxRecent)
     
       if (
         task.framesSinceRunning > task.maxConsecutiveSkips

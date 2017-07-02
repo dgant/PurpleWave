@@ -83,7 +83,9 @@ class Architecture {
     //
     // So let's check this every time, but really focus on making it an inexpensive check
     
-    // CIG 2017 deadline is coming up and this is going to single-handedly disqualify us.
+    
+    // CIG 2017 deadline is coming up and this is going to single-handedly disqualify us from every game :(.
+    //
     if ( ! With.configuration.verifyBuildingsDontBreakPaths) {
       return false
     }

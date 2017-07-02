@@ -5,17 +5,17 @@ import Lifecycle.With
 
 object ScreenPerformance {
   def render() {
-    DrawScreen.header(50,  With.game.getLatencyFrames             + " latency frames")
-    DrawScreen.header(125, With.latency.turnSize                  + " frames/turn")
-    DrawScreen.header(200, With.performance.meanFrameMilliseconds + "ms avg")
-    DrawScreen.header(275, With.performance.maxFrameMilliseconds  + "ms max")
-    DrawScreen.header(350, With.performance.cacheLength(1)        + " cache duration")
-    With.game.drawTextScreen(5,   290, "+55ms:    " + With.performance.framesOver55 + "/200")
-    With.game.drawTextScreen(100,  290, "+1000ms:  " + With.performance.framesOver1000 + "/10")
-    With.game.drawTextScreen(195, 290, "+10000ms: " + With.performance.framesOver10000 + "/2")
+    DrawScreen.header(5,  With.game.getLatencyFrames             + " latency frames")
+    DrawScreen.header(80, With.latency.turnSize                  + " frames/turn")
+    DrawScreen.header(155, With.performance.meanFrameMilliseconds + "ms avg")
+    DrawScreen.header(230, With.performance.maxFrameMilliseconds  + "ms max")
+    DrawScreen.header(305, With.performance.cacheLength(1)        + " cache duration")
+    With.game.drawTextScreen(5,   2 * With.visualization.lineHeightSmall, "+55ms: " + With.performance.framesOver55 + "/200")
+    With.game.drawTextScreen(80,  2 * With.visualization.lineHeightSmall, "+1000ms: " + With.performance.framesOver1000 + "/10")
+    With.game.drawTextScreen(155, 2 * With.visualization.lineHeightSmall, "+10000ms: " + With.performance.framesOver10000 + "/2")
     if (With.performance.disqualified) {
       With.game.setTextSize(bwapi.Text.Size.Enum.Large)
-      With.game.drawTextScreen(5, 260, "Limits exceeded")
+      With.game.drawTextScreen(230, 4 * With.visualization.lineHeightSmall, "Disqualified!")
       With.game.setTextSize(bwapi.Text.Size.Enum.Small)
     }
     
@@ -38,6 +38,6 @@ object ScreenPerformance {
         task.totalViolatedThreshold.toString,
         task.totalViolatedRules.toString
       ))
-    DrawScreen.table(5, With.visualization.lineHeightSmall * 2, Vector(title) ++ Vector(headers) ++ body)
+    DrawScreen.table(5, With.visualization.lineHeightSmall * 8, Vector(title) ++ Vector(headers) ++ body)
   }
 }

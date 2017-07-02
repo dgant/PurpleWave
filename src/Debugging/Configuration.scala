@@ -81,7 +81,7 @@ class Configuration {
   // Visualization //
   ///////////////////
   
-  var visualize                           = false
+  var visualize                           = true
   var visualizationProbabilityHappyVision = 0.1
   var visualizationProbabilityTextOnly    = 0.02
   

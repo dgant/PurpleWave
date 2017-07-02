@@ -79,15 +79,15 @@ object DrawMap {
   }
   
   def labelBox(
-      textLines       : Iterable[String],
-      position        : Pixel,
-      drawBackground  : Boolean = false,
-      backgroundColor : Color = Colors.DefaultGray) {
+    textLines       : Iterable[String],
+    position        : Pixel,
+    drawBackground  : Boolean = false,
+    backgroundColor : Color = Colors.DefaultGray) {
     
     if (irrelevant(position)) return
     
     val horizontalMargin = 2
-    val estimatedTextWidth = (9 * textLines.map(_.size).max) / 2
+    val estimatedTextWidth = (9 * textLines.map(_.length).max) / 2
     val boxWidth = estimatedTextWidth + (if (estimatedTextWidth > 0) 2 * horizontalMargin else 0)
     val boxHeight = 11 * textLines.size
     val textX = position.x - boxWidth/2

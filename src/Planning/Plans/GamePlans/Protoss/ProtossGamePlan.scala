@@ -16,7 +16,7 @@ class ProtossGamePlan
       random  .set(new ProtossVsRandom)
     },
     new FollowBuildOrder,
-    new RemoveMineralBlockAt(40),
+    new RemoveMineralBlockAt(30),
     new Gather,
     new DefendChokes
   )

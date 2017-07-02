@@ -198,7 +198,7 @@ class Architecture {
     unwalkable      ++= forUnwalkable.flatMap(_.tileArea.expand(1, 1).tiles)
     untownhallable  ++= unbuildable
     unbuildable     ++= harvestingAreas.flatMap(_.tiles)
-    ungassable      ++= With.units.all.filter(unit => unit.unitClass.isGas && unit.alive).map(_.tileTopLeft)
+    ungassable      ++= With.units.all.filter(unit => ! unit.player.isNeutral && unit.alive && unit.unitClass.isGas).map(_.tileTopLeft)
       
     if (With.visualization.enabled) {
       exclusions ++= harvestingAreas.map(area => Exclusion("Harvesting area", area))

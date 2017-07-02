@@ -36,14 +36,14 @@ class Blueprint(
   
   def fulfilledBy(proposal: Blueprint): Boolean = {
     if (proposal == this) return true
-    width         == proposal.width                             &&
-    height        == proposal.height                            &&
-    (powers       == proposal.powers          || ! powers)      &&
-    (powered      == proposal.powered         || ! powered)     &&
-    townHall      == proposal.townHall                          &&
-    gas           == proposal.gas                               &&
-    margin        <= proposal.margin                            &&
-    (zone         == proposal.zone            || zone.isEmpty)  &&
+    width         == proposal.width                                                               &&
+    height        == proposal.height                                                              &&
+    (powers       == proposal.powers          || ! powers)                                        &&
+    (powered      == proposal.powered         || ! powered)                                       &&
+    townHall      == proposal.townHall                                                            &&
+    gas           == proposal.gas                                                                 &&
+    (margin       <= proposal.margin          || With.configuration.enableTightBuildingPlacement) &&
+    (zone         == proposal.zone            || zone.isEmpty)                                    &&
     (building     == proposal.building        || building.isEmpty || proposal.building.isEmpty)
   }
   

@@ -47,7 +47,7 @@ class Architecture {
       UnitClasses.all.exists(unit => ! unit.isFlyer && unit.whatBuilds._1 == unitClass) &&
       ! unitClass.isTownHall //Nexus margins bork FFEs. Down the road Hatcheries may need margins.
     }
-    else false
+    else true
   }
   
   def reboot() {

@@ -13,7 +13,7 @@ object ZoneBuilder {
   
   def zones: Iterable[Zone] = {
     val zones = BWTA.getRegions.asScala.map(buildZone)
-    ensureAllTilesAreAssignedToAZone(zones)
+    mapObviousTilesToZones(zones)
     zones
   }
   
@@ -21,14 +21,14 @@ object ZoneBuilder {
   def bases: Iterable[Base]     = BaseFinder.calculate.map(new Base(_))
   
   
-  def ensureAllTilesAreAssignedToAZone(zones: Iterable[Zone]) {
+  def mapObviousTilesToZones(zones: Iterable[Zone]) {
+    //This will map most -- but not all tiles
     With.geography.allTiles
       .filterNot(tile => zones.exists(_.contains(tile)))
-      .foreach(tile => assignTile(tile, zones))
+      .foreach(assignTile(_, zones))
   }
   
   def assignTile(tile: Tile, zones: Iterable[Zone]): Boolean = {
-    val groundHeight = With.game.getGroundHeight(tile.bwapi)
     val matchingZone = Spiral
       .points(5)
       .view

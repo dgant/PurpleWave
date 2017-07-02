@@ -30,7 +30,11 @@ class Geography {
   private lazy val zoneByTileCache =
     new mutable.HashMap[Tile, Zone] {
       override def default(key: Tile): Zone = {
-        put(key, zones.find(_.tiles.contains(key)).get).get
+        val zone = zones
+          .find(_.tiles.contains(key))
+          .getOrElse(zones.minBy(_.centroid.tileDistanceSquared(key)))
+        put(key, zone)
+        zone
       }
     }
   

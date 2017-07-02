@@ -1,5 +1,6 @@
 package Information.Geography.Types
 
+import Lifecycle.With
 import Mathematics.Points.Pixel
 import bwta.Chokepoint
 
@@ -14,7 +15,7 @@ class Edge(choke: Chokepoint) {
     Vector(
       choke.getRegions.first,
       choke.getRegions.second)
-    .map(region => zones.minBy(
+    .map(region => With.geography.zones.minBy(
       _.centroid.pixelCenter.pixelDistanceSquared(
         new Pixel(region.getCenter))))
   

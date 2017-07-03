@@ -13,12 +13,12 @@ case class TileRectangle(
       startInclusive.add(x, y),
       endExclusive.add(x, y))
   
-  def expand(x:Int, y:Int):TileRectangle =
+  def expand(x:Int, y:Int): TileRectangle =
     TileRectangle(
       startInclusive.add(-x, -y),
       endExclusive  .add( x,  y))
   
-  def add(Tile:Tile):TileRectangle =
+  def add(Tile: Tile):TileRectangle =
     add(Tile.x, Tile.y)
 
   lazy val midPixel : Pixel = startPixel.midpoint(endPixel)

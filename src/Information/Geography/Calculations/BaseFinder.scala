@@ -13,77 +13,106 @@ import scala.collection.mutable
 
 object BaseFinder {
   
-  def calculate: Iterable[Tile] = {
   
-    //Find base positions
-    val allHalls = clusteredResourcePatches.flatMap(bestTownHallTile).to[mutable.Set] ++ With.game.getStartLocations.asScala.map(new Tile(_))
-    removeConflictingBases(allHalls)
+  private val baseToResourceRadius = 32.0 * 12.0
+  
+  def calculate: Iterable[Tile] = {
+    
+    
+    // Ignore mineral blocks.
+    // Calculate exclusions (assume mineral blocks blocking mineral patches are designed to be mined out).
+    // Remove resources near start positions from consideration (to make sure we don't specify an in-base expansion.
+    // Cluster the remaining resources.
+    // For each cluster, identify a base
+    
+    // Start locations are free base placements.
+    val startTiles    = With.game.getStartLocations.asScala.map(new Tile(_)).toArray
+    val startPixels   = startTiles.map(Protoss.Nexus.tileArea.add(_).midPixel)
+  
+    // Get every resource on the map
+    val allResources  = With.units.neutral.filter(unit => unit.unitClass.isGas || unit.unitClass.isMinerals)
+    
+    // Get every resource that isn't a mineral block and isn't tied to a start location
+    val baseResources = allResources.filterNot(r => r.unitClass.isMinerals && r.initialResources <= With.configuration.blockerMineralThreshold)
+    val expoResources = baseResources.filterNot(r => startPixels.exists(_.pixelDistanceFast(r.pixelCenter) <= baseToResourceRadius))
+    
+    // Cluster the expansion resources
+    val clusters = clusterResourcePatches(expoResources)
+  
+    // Find base positions
+    val exclusions = measureExclusions(expoResources)
+    val expansions = clusters.flatMap(cluster => bestTownHallTile(cluster, exclusions))
+    
+    // Merge nearby base positions (like the middle of Heartbreak Ridge)
+    mergeBases(expansions)
   }
   
-  private def clusteredResourcePatches: Iterable[Iterable[ForeignUnitInfo]] = {
+  private def clusterResourcePatches(resources: Iterable[ForeignUnitInfo]): Iterable[Iterable[ForeignUnitInfo]] = {
     Clustering.group[ForeignUnitInfo](
-      resourcePatches,
+      resources,
       32 * 12,
       limitRegion = true,
       (unit) => unit.pixelCenter).values
   }
   
-  private def resourcePatches = {
-    With.units.neutral.filter(unit => unit.unitClass.isGas || unit.unitClass.isMinerals && unit.initialResources > With.configuration.blockerMineralThreshold)
+  private def measureExclusions(expansionResources: Iterable[ForeignUnitInfo]): Set[Tile] = {
+    expansionResources.flatMap(_.tileArea.expand(3, 3).tiles).toSet
   }
   
-  private def bestTownHallTile(resources: Iterable[ForeignUnitInfo]): Option[Tile] = {
-    val centroid = resources.map(_.pixelCenter).centroid
-    val centroidTile = centroid.tileIncluding
-    val altitude = With.game.getGroundHeight(centroidTile.bwapi)
-    val searchRadius = 10
+  private def bestTownHallTile(
+    resources   : Iterable[ForeignUnitInfo],
+    exclusions  : Set[Tile])
+      : Option[Tile] = {
+  
+    val centroid      = resources.map(_.pixelCenter).centroid.tileIncluding
+    val altitude      = With.game.getGroundHeight(centroid.bwapi)
+    val searchRadius  = 10
     val candidates =
       Circle
         .points(searchRadius)
-        .map(centroidTile.add)
-        .filter(tile => isLegalTownHallTile(tile) && altitude == With.game.getGroundHeight(tile.bwapi))
+        .map(centroid.add)
+        .filter(tile => isLegalTownHallTile(tile, exclusions, altitude))
+    
     if (candidates.isEmpty) return None
-    Some(candidates.minBy(_.topLeftPixel.add(64, 48).pixelDistanceFast(centroid)))
+    Some(candidates.minBy(cost(_, resources)))
   }
   
-  private def isLegalTownHallTile(candidate: Tile): Boolean = {
+  private def cost(tile: Tile, resources: Iterable[ForeignUnitInfo]): Double = {
+    val center = tile.topLeftPixel.add(Protoss.Nexus.width / 2, Protoss.Nexus.height / 2)
+    resources.map(resource => 5 * resource.gasLeft * resource.pixelDistanceFast(center)).sum
+  }
+  
+  private def isLegalTownHallTile(
+    candidate   : Tile,
+    exclusions  : Set[Tile],
+    altitude    : Int)
+      : Boolean = {
+    
     if ( ! candidate.valid) return false
     val buildingArea = Protoss.Nexus.tileArea.add(candidate)
-    val exclusions =
-      resourcePatches
-        .map(resourcePatch => TileRectangle(
-          resourcePatch.tileTopLeft.subtract(3, 3),
-          resourcePatch.tileTopLeft.add(3, 3).add(resourcePatch.unitClass.tileSize)))
-    
-    buildingArea.tiles.forall(tile => With.game.isBuildable(tile.bwapi)) &&
-      ! resourcePatches.view.map(resourcePatch => resourcePatch.tileArea.expand(3, 3)).exists(buildingArea.intersects)
+ 
+    buildingArea.tiles
+      .forall(tile =>
+        ! exclusions.contains(tile) &&
+        With.game.isBuildable(tile.bwapi) &&
+        With.game.getGroundHeight(tile.bwapi) == altitude)
   }
   
-  private def removeConflictingBases(halls: mutable.Set[Tile]): Iterable[Tile] = {
+  private def mergeBases(bases: Iterable[Tile]): Iterable[Tile] = {
+    
+    val candidates  = new mutable.HashSet[TileRectangle] ++ bases.map(Protoss.Nexus.tileArea.add)
+    val output      = new mutable.ArrayBuffer[Tile]
+    
+    while (candidates.nonEmpty) {
+      val candidate = candidates.head
+      candidates.remove(candidate)
+      output += candidate.startInclusive
   
-    val basesToRemove = new mutable.HashSet[Tile]
+      // Real lazy -- just remove all conflicting candidates (instead of, say, picking the best one or something)
+      val conflicts = candidates.filter(_.intersects(candidate))
+      candidates --= conflicts
+    }
     
-    //Remove conflicting/overlapping positions
-    //O(n^3) but we only do it once
-    halls.foreach(hall =>
-      if ( ! basesToRemove.contains(hall)) {
-        val conflictingHalls =
-          Vector(hall) ++
-          halls
-            .diff(basesToRemove)
-            .filter(otherHall => otherHall != hall && otherHall.tileDistanceSlow(hall) < 8)
-        
-        //Take the hall which is closest to a geyser
-        val preferredHall = conflictingHalls
-          .sortBy(conflictingHallTile => With.geography.startLocations.exists(_ == conflictingHallTile))
-          .sortBy(hall => With.units.neutral
-            .filter(_.unitClass.isGas)
-            .map(_.pixelDistanceFast(hall.pixelCenter))
-            .min)
-        
-        basesToRemove -- conflictingHalls.filterNot(_ == preferredHall)
-      })
-    
-    halls.diff(basesToRemove)
+    output
   }
 }

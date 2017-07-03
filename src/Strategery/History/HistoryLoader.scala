@@ -4,49 +4,79 @@ import java.io._
 
 import Lifecycle.With
 
+import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 object HistoryLoader {
   
-  private val loadFile = "bwapi-data/read/_history.csv"
-  private val saveFile = "bwapi-data/write/_history.csv"
-  private val seedFile = "bwapi-data/AI/trainingHistory.csv"
-  private val possibleFilenames = Array(loadFile, saveFile, seedFile)
+  private val filenameEnemyToken = "{opponent}"
+  private val filenameTemplate = "_history_" + filenameEnemyToken + ".csv"
+  private val loadFilesDirectory = "bwapi-data/read/"
+  private val saveFilesDirectory = "bwapi-data/write/"
+  private val seedFilesDirectory = "bwapi-data/AI/"
+  
+  // The order matters (see below) thus meriting the explicit naming
+  private val possibleFilenamesInDescendingOrderOfRecency = Array(loadFilesDirectory, saveFilesDirectory, seedFilesDirectory)
   
   def load(): Iterable[HistoricalGame] = {
-    val gamesSerialized = loadBestGames(possibleFilenames)
+    val gamesSerialized = loadAllGames(possibleFilenamesInDescendingOrderOfRecency)
     val games = HistorySerializer.readGames(gamesSerialized)
-    games
+    
+    // Loading history from multiple potentially-redundant sources means some games may appear in the history multiple times.
+    // Let's distinct-ify them by timestamp to prevent that.
+    //
+    // As an added check, we are implicitly trusting the more "recent" (read -> write -> seeded training) game associated with a timestamp
+    //
+    val gamesByTimestamp = new mutable.HashMap[Long, HistoricalGame]
+    games.foreach(game => gamesByTimestamp.put(game.timestamp, gamesByTimestamp.getOrElse(game.timestamp, game)))
+    gamesByTimestamp.values
   }
   
   def save(games: Iterable[HistoricalGame]) {
-    val gamesSerialized = HistorySerializer.writeGames(games)
-    saveGames(saveFile, gamesSerialized)
+    val enemyGamesSerialized = HistorySerializer.writeGames(games.filter(_.enemyName == With.history.currentEnemyName))
+    saveGames(saveName, enemyGamesSerialized)
   }
   
-  
-  private def loadBestGames(possibleFilenames: Iterable[String]): Iterable[String] = {
-    possibleFilenames
-      .view
-      .map(loadGames)
-      .find(_.isDefined)
-      .map(_.get)
-      .getOrElse(List[String]())
+  private def saveName: String = {
+    saveFilesDirectory +
+    filenameTemplate.replace(filenameEnemyToken, With.history.currentEnemyName)
   }
   
-  private def loadGames(filename: String): Option[Iterable[String]] = {
+  private def loadAllGames(directories: Iterable[String]): Iterable[String] = {
+    directories.flatMap(loadGamesFromDirectory)
+  }
+  
+  private def loadGamesFromDirectory(directory: String): Iterable[String] = {
+    var files: Array[File] = Array.empty
+    
+    // I don't think this can actually throw, but let's wear some tinfoil.
+    try {
+      files = new File(directory).listFiles
+      if (files == null) {
+        files = Array.empty
+      }
+      files.flatMap(loadGamesFromFile)
+    }
+    catch { case exception: Exception =>
+      With.logger.warn("Failed to read games directory " + directory)
+      With.logger.onException(exception)
+    }
+    Iterable.empty
+  }
+  
+  private def loadGamesFromFile(file: File): Iterable[String] = {
     
     var reader: BufferedReader = null
-    var output: Option[Iterable[String]] = None
+    var output: Iterable[String] = Iterable.empty
+    var filename = "[Unknown file]"
     
     try {
-      val file    = new File(filename)
       if (file.exists) {
-        var proceed = true
-        val lines   = new ArrayBuffer[String]
-        val stream  = new FileInputStream(file)
-            reader  = new BufferedReader(new InputStreamReader(stream))
-        
+            filename  = file.getName
+        var proceed   = true
+        val lines     = new ArrayBuffer[String]
+        val stream    = new FileInputStream(file)
+            reader    = new BufferedReader(new InputStreamReader(stream))
         while (proceed) {
           val nextLine = reader.readLine()
           proceed = nextLine != null
@@ -55,7 +85,7 @@ object HistoryLoader {
           }
         }
   
-        output = Some(lines)
+        output = lines
       }
     }
     catch { case exception: Exception =>

@@ -2,7 +2,7 @@ package Strategery.History
 
 object HistorySerializer {
   
-  // Let's roll our own half-baked CSV because the CIG deadline is in two weeks and json4s doesn't want to import and we are wise, experienced developers.
+  // Let's roll our own half-baked CSV because the CIG deadline is in two weeks and json4s is being stubborn and we are wise, experienced developers.
   
   val separator = ",,,"
   
@@ -15,17 +15,17 @@ object HistorySerializer {
   }
   
   private def readGameFromColumns(columns: Array[String]): HistoricalGame = {
-    val id            = columns(0).toInt
+    val id            = columns(0).toLong
     val mapName       = columns(1)
     val opponentName  = columns(2)
     val won           = columns(3).toBoolean
     val strategies    = columns.drop(4).toSet
     HistoricalGame(
-      id            = id,
-      mapName       = mapName,
+      timestamp         = id,
+      mapName    = mapName,
       enemyName  = opponentName,
-      won           = won,
-      strategies    = strategies)
+      won        = won,
+      strategies = strategies)
   }
   
   def writeGames(games: Iterable[HistoricalGame]): Iterable[String] = {
@@ -33,7 +33,7 @@ object HistorySerializer {
   }
   
   private def writeGame(game: HistoricalGame): String = {
-    val columns = List(game.id.toString, game.mapName.toString, game.enemyName.toString, game.won.toString) ++ game.strategies
+    val columns = List(game.timestamp.toString, game.mapName.toString, game.enemyName.toString, game.won.toString) ++ game.strategies
     columns.mkString(separator)
   }
   

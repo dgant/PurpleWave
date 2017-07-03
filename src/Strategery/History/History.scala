@@ -5,7 +5,7 @@ import Utilities.CountMap
 
 class History {
   
-  private lazy val games: Iterable[HistoricalGame] = HistoryLoader.load()
+  lazy val games: Iterable[HistoricalGame] = HistoryLoader.load()
   
   lazy val currentMapName   : String = With.game.mapFileName
   lazy val currentEnemyName : String = With.enemies.head.name
@@ -13,18 +13,17 @@ class History {
   def onStart() {
     Manners.chat("Good luck on " + currentMapName + ", " + currentEnemyName + "!")
     
-    val mapWins   = games.count(g => g.mapName == currentMapName &&   g.won)
-    val mapLosses = games.count(g => g.mapName == currentMapName && ! g.won)
-    val vsWins   = games.count(g => g.enemyName == currentEnemyName && g .won)
-    val vsLosses = games.count(g => g.enemyName == currentEnemyName && ! g.won)
-    Manners.chat("Record on " + currentMapName + ": " + mapWins + " - " + mapLosses)
-    Manners.chat("Record vs. " + currentEnemyName + ": " + vsWins + " - " + vsLosses)
+    val mapWins   = games.count(g => g.mapName    == currentMapName   &&    g.won)
+    val mapLosses = games.count(g => g.mapName    == currentMapName   &&  ! g.won)
+    val vsWins    = games.count(g => g.enemyName  == currentEnemyName &&    g.won)
+    val vsLosses  = games.count(g => g.enemyName  == currentEnemyName &&  ! g.won)
+    Manners.chat("Record on "   + currentMapName    + ": " + mapWins  + " - " + mapLosses)
+    Manners.chat("Record vs. "  + currentEnemyName  + ": " + vsWins   + " - " + vsLosses)
   }
   
   def onEnd(weWon: Boolean) {
-    val nextId = if (games.isEmpty) 0 else games.map(_.id).max + 1
     val thisGame = HistoricalGame(
-      id            = nextId,
+      timestamp    = System.currentTimeMillis,
       mapName       = currentMapName,
       enemyName     = currentEnemyName,
       won           = weWon,

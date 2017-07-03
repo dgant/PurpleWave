@@ -3,7 +3,7 @@ package Debugging
 import java.io.{File, PrintWriter}
 import java.util.Calendar
 
-import Lifecycle.With
+import Lifecycle.{Manners, With}
 
 import scala.collection.mutable.ListBuffer
 
@@ -47,9 +47,7 @@ class Logger {
       System.out.println(message)
     }
     
-    if (With.configuration.enableChat) {
-      With.game.sendText(message)
-    }
+    Manners.chat(message)
     
     logMessages.append(message)
   }

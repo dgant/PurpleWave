@@ -1,8 +1,8 @@
 package Strategery.History
 
 case class HistoricalGame(
-  id            : Int,
-  mapName       : String,
-  opponentName  : String,
-  won           : Boolean,
-  strategies    : Set[String])
+                           id            : Int,
+                           mapName       : String,
+                           enemyName  : String,
+                           won           : Boolean,
+                           strategies    : Set[String])

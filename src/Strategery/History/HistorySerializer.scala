@@ -6,8 +6,8 @@ object HistorySerializer {
   
   val separator = ",,,"
   
-  def readGames(serializedHistory: String): Vector[HistoricalGame] = {
-    serializedHistory.lines.map(readGame).toVector
+  def readGames(serializedHistory: Iterable[String]): Vector[HistoricalGame] = {
+    serializedHistory.map(readGame).toVector
   }
   
   private def readGame(serializedGame: String): HistoricalGame = {
@@ -23,7 +23,7 @@ object HistorySerializer {
     HistoricalGame(
       id            = id,
       mapName       = mapName,
-      opponentName  = opponentName,
+      enemyName  = opponentName,
       won           = won,
       strategies    = strategies)
   }
@@ -33,7 +33,7 @@ object HistorySerializer {
   }
   
   private def writeGame(game: HistoricalGame): String = {
-    val columns = List(game.id.toString, game.mapName.toString, game.opponentName.toString, game.won.toString) ++ game.strategies
+    val columns = List(game.id.toString, game.mapName.toString, game.enemyName.toString, game.won.toString) ++ game.strategies
     columns.mkString(separator)
   }
   

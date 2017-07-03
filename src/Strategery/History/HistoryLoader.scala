@@ -4,6 +4,8 @@ import java.io._
 
 import Lifecycle.With
 
+import scala.collection.mutable.ArrayBuffer
+
 object HistoryLoader {
   
   private val loadFile = "bwapi-data/read/_history.json"
@@ -23,35 +25,35 @@ object HistoryLoader {
   }
   
   
-  private def loadBestGames(possibleFilenames: Iterable[String]): String = {
+  private def loadBestGames(possibleFilenames: Iterable[String]): Iterable[String] = {
     possibleFilenames
       .view
       .map(loadGames)
       .find(_.isDefined)
       .map(_.get)
-      .getOrElse("")
+      .getOrElse(List[String]())
   }
   
-  private def loadGames(filename: String): Option[String] = {
+  private def loadGames(filename: String): Option[Iterable[String]] = {
     
     var reader: BufferedReader = null
-    var output: Option[String] = None
+    var output: Option[Iterable[String]] = None
     
     try {
       var proceed = true
-      val lines   = new StringBuilder
+      val lines   = new ArrayBuffer[String]
       val file    = new File(filename)
       val stream  = new FileInputStream(file)
           reader  = new BufferedReader(new InputStreamReader(stream))
       
       while (proceed) {
         val nextLine = reader.readLine()
-        proceed = nextLine == null
+        proceed = nextLine != null
         if (proceed) {
-          lines.append(nextLine)
+          lines += nextLine
         }
       }
-      output = Some(lines.toString)
+      output = Some(lines)
     }
     catch { case exception: Exception =>
       With.logger.warn("Failed to load game history from " + filename)

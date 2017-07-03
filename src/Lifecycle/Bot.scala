@@ -7,7 +7,8 @@ class Bot() extends DefaultBWListener {
 
   override def onStart() {
     try {
-     With.onStart()
+      With.onStart()
+      With.history.onStart()
     }
     catch { case exception: Exception =>
       val dontLoseTheExceptionWhileDebugging = exception

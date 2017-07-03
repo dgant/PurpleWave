@@ -8,9 +8,9 @@ import scala.collection.mutable.ArrayBuffer
 
 object HistoryLoader {
   
-  private val loadFile = "bwapi-data/read/_history.json"
-  private val saveFile = "bwapi-data/write/_history.json"
-  private val seedFile = "bwapi-data/AI/trainingHistory.json"
+  private val loadFile = "bwapi-data/read/_history.csv"
+  private val saveFile = "bwapi-data/write/_history.csv"
+  private val seedFile = "bwapi-data/AI/trainingHistory.csv"
   private val possibleFilenames = Array(loadFile, saveFile, seedFile)
   
   def load(): Iterable[HistoricalGame] = {
@@ -40,20 +40,23 @@ object HistoryLoader {
     var output: Option[Iterable[String]] = None
     
     try {
-      var proceed = true
-      val lines   = new ArrayBuffer[String]
       val file    = new File(filename)
-      val stream  = new FileInputStream(file)
-          reader  = new BufferedReader(new InputStreamReader(stream))
-      
-      while (proceed) {
-        val nextLine = reader.readLine()
-        proceed = nextLine != null
-        if (proceed) {
-          lines += nextLine
+      if (file.exists) {
+        var proceed = true
+        val lines   = new ArrayBuffer[String]
+        val stream  = new FileInputStream(file)
+            reader  = new BufferedReader(new InputStreamReader(stream))
+        
+        while (proceed) {
+          val nextLine = reader.readLine()
+          proceed = nextLine != null
+          if (proceed) {
+            lines += nextLine
+          }
         }
+  
+        output = Some(lines)
       }
-      output = Some(lines)
     }
     catch { case exception: Exception =>
       With.logger.warn("Failed to load game history from " + filename)
@@ -74,7 +77,7 @@ object HistoryLoader {
       val fileWriter      = new FileWriter(file)
           bufferedWriter  = new BufferedWriter(fileWriter)
       
-      contents.foreach(bufferedWriter.write)
+      contents.map(_ + "\n").foreach(bufferedWriter.write)
     }
     catch { case exception: Exception =>
       With.logger.warn("Failed to save game history to " + filename)

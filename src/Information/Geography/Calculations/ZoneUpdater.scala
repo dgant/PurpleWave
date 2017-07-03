@@ -16,10 +16,12 @@ object ZoneUpdater {
       .foreach(startLocationBase =>
         With.geography.bases
           .filter(otherBase => otherBase != startLocationBase && otherBase.gas.nonEmpty)
-          .minBy(
+          .toVector
+          .sortBy(
             _.townHallArea.startInclusive.groundPixels(
               startLocationBase.townHallArea.startInclusive))
-          .isNaturalOf = Some(startLocationBase))
+          .headOption
+          .foreach(_.isNaturalOf = Some(startLocationBase)))
   }
   
   def updateZone(zone: Zone) {

@@ -9,8 +9,9 @@ import scala.collection.mutable.ArrayBuffer
 
 object HistoryLoader {
   
+  private val filenameHistoryPrefix = "_history_"
   private val filenameEnemyToken = "{opponent}"
-  private val filenameTemplate = "_history_" + filenameEnemyToken + ".csv"
+  private val filenameTemplate = filenameHistoryPrefix + filenameEnemyToken + ".csv"
   private val loadFilesDirectory = "bwapi-data/read/"
   private val saveFilesDirectory = "bwapi-data/write/"
   private val seedFilesDirectory = "bwapi-data/AI/"
@@ -47,15 +48,16 @@ object HistoryLoader {
   }
   
   private def loadGamesFromDirectory(directory: String): Iterable[String] = {
-    var files: Array[File] = Array.empty
+    
     
     // I don't think this can actually throw, but let's wear some tinfoil.
     try {
-      files = new File(directory).listFiles
+      var files: Array[File] =  new File(directory).listFiles
       if (files == null) {
         files = Array.empty
       }
-      files.flatMap(loadGamesFromFile)
+      val historyFiles = files.filter(_.getName.contains(filenameHistoryPrefix))
+      historyFiles.flatMap(loadGamesFromFile)
     }
     catch { case exception: Exception =>
       With.logger.warn("Failed to read games directory " + directory)

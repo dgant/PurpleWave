@@ -20,6 +20,9 @@ abstract class AbstractTask {
   def maxConsecutiveSkips : Int = 48
   def overdue             : Boolean = framesSinceRunning > maxConsecutiveSkips
   
+  private var alreadyViolatedThreshold  = false
+  private var alreadyViolatedRules      = false
+  
   protected def onRun()
   
   final def framesSinceRunning      : Int     = Math.max(1, With.frame - lastRunFrame)
@@ -29,9 +32,12 @@ abstract class AbstractTask {
   final def totalViolatedRules      : Int     = violatedRules
   final def hasNeverRun             : Boolean = totalRuns == 0
   
+  private val nanosToMillis = 1000000
   final def run() {
-    val nanosToMillis = 1000000
+    
     val millisecondsBefore  = System.nanoTime() / nanosToMillis
+    alreadyViolatedThreshold  = With.performance.violatedThreshold
+    alreadyViolatedRules      = With.performance.violatedRules
     onRun()
     val millisecondsAfter   = System.nanoTime() / nanosToMillis
     recordRunDuration(millisecondsAfter - millisecondsBefore)
@@ -43,7 +49,7 @@ abstract class AbstractTask {
     totalSkipCount += 1
   }
   
-  final def recordRunDuration(millisecondsDuration:Long) {
+  final def recordRunDuration(millisecondsDuration: Long) {
     if (With.frame > 5) {
       maxMillisecondsEver = Math.max(maxMillisecondsEver, millisecondsDuration)
     }
@@ -51,10 +57,10 @@ abstract class AbstractTask {
     while (runtimeMilliseconds.size > runtimesToTrack) {
       runtimeMilliseconds.dequeue()
     }
-    if (With.performance.violatedThreshold) {
+    if ( ! alreadyViolatedThreshold && With.performance.violatedThreshold) {
       violatedThreshold += 1
     }
-    if (With.performance.violatedRules) {
+    if ( ! alreadyViolatedRules && With.performance.violatedRules) {
       violatedRules += 1
     }
   }

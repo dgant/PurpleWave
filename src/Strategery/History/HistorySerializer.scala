@@ -28,8 +28,8 @@ object HistorySerializer {
       strategies    = strategies)
   }
   
-  def writeGames(games: Iterable[HistoricalGame]): String = {
-    games.map(writeGame).mkString("\n")
+  def writeGames(games: Iterable[HistoricalGame]): Iterable[String] = {
+    games.map(writeGame)
   }
   
   private def writeGame(game: HistoricalGame): String = {

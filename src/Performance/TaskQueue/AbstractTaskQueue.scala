@@ -21,7 +21,7 @@ abstract class AbstractTaskQueue {
   
     tasks
       .sortBy(task => - task.urgency * task.framesSinceRunning)
-      .sortBy( ! _.overdue)
+      .sortBy( ! _.due)
       
   
     // Ordinarily we'd do foreach() but that swallows exceptions and I don't understand why

@@ -31,7 +31,7 @@ class Groundskeeper {
     With.architecture.reboot()
     proposalsInUpdateOrder
       .foreach(descriptor =>
-        if (With.performance.continueRunning && newSearches < With.configuration.maxGroundskeeperSearches) {
+        if (With.performance.continueRunning && newSearches < With.configuration.maxPlacementsToEvaluate) {
           val placementBefore = proposalPlacements.get(descriptor)
           if (placementBefore.isEmpty) {
             newSearches += 1

@@ -34,7 +34,7 @@ class Configuration {
   // Macro //
   ///////////
   
-  var maxGroundskeeperSearches        = 3000
+  var maxPlacementsToEvaluate         = 500
   var maxMineralsBeforeMinedOut       = 300 * 8
   var maxFramesToSendAdvanceBuilder   = 24 * 20
   var maxFramesToTrustBuildRequest    = 24 * 60 * 10

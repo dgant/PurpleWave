@@ -9,7 +9,7 @@ import scala.collection.mutable.ArrayBuffer
 
 object HistoryLoader {
   
-  private val filenameHistoryPrefix = "_history_"
+  private val filenameHistoryPrefix = "_v" + HistorySerializer.formatVersion + "_history_"
   private val filenameEnemyToken = "{opponent}"
   private val filenameTemplate = filenameHistoryPrefix + filenameEnemyToken + ".csv"
   private val loadFilesDirectory = "bwapi-data/read/"
@@ -48,8 +48,6 @@ object HistoryLoader {
   }
   
   private def loadGamesFromDirectory(directory: String): Iterable[String] = {
-    
-    
     // I don't think this can actually throw, but let's wear some tinfoil.
     try {
       var files: Array[File] =  new File(directory).listFiles

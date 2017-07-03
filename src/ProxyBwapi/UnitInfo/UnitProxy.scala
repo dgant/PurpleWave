@@ -7,7 +7,7 @@ import bwapi.UnitCommand
 
 abstract class UnitProxy(var base: bwapi.Unit) {
     
-  var id: Int = base.getID
+  val id: Int = base.getID
   
   ///////////////////
   // Tracking info //

@@ -2,32 +2,46 @@ package Strategery.History
 
 import Lifecycle.{Manners, With}
 import Utilities.CountMap
+import bwapi.Race
 
 class History {
   
   lazy val games: Iterable[HistoricalGame] = HistoryLoader.load()
   
-  lazy val currentMapName   : String = With.game.mapFileName
-  lazy val currentEnemyName : String = With.enemies.head.name
+  lazy val currentMapName   : String  = With.game.mapFileName
+  lazy val currentEnemyName : String  = With.enemies.head.name
+  lazy val currentEnemyRace : Race    = With.enemies.head.race
   
   def onStart() {
+    Manners.chat(" ")
+    Manners.chat(" ")
     Manners.chat("Good luck on " + currentMapName + ", " + currentEnemyName + "!")
+    Manners.chat(" ")
     
-    val mapWins   = games.count(g => g.mapName    == currentMapName   &&    g.won)
-    val mapLosses = games.count(g => g.mapName    == currentMapName   &&  ! g.won)
-    val vsWins    = games.count(g => g.enemyName  == currentEnemyName &&    g.won)
-    val vsLosses  = games.count(g => g.enemyName  == currentEnemyName &&  ! g.won)
-    Manners.chat("Record on "   + currentMapName    + ": " + mapWins  + " - " + mapLosses)
-    Manners.chat("Record vs. "  + currentEnemyName  + ": " + vsWins   + " - " + vsLosses)
+    val mapWins         = games.count(g => g.mapName    == currentMapName   &&    g.won)
+    val mapLosses       = games.count(g => g.mapName    == currentMapName   &&  ! g.won)
+    val enemyRaceWins   = games.count(g => g.enemyRace  == currentEnemyRace &&    g.won)
+    val enemyRaceLosses = games.count(g => g.enemyRace  == currentEnemyRace &&  ! g.won)
+    val ourRaceWins     = games.count(g => g.ourRace    == currentEnemyRace &&    g.won)
+    val ourRaceLosses   = games.count(g => g.ourRace    == currentEnemyRace &&  ! g.won)
+    val vsWins          = games.count(g => g.enemyName  == currentEnemyName &&    g.won)
+    val vsLosses        = games.count(g => g.enemyName  == currentEnemyName &&  ! g.won)
+    Manners.chat("On "  + currentMapName    + ": " + mapWins        + " - " + mapLosses)
+    Manners.chat("As "  + currentEnemyRace  + ": " + ourRaceWins    + " - " + ourRaceLosses)
+    Manners.chat("Vs. " + currentEnemyRace  + ": " + enemyRaceWins  + " - " + enemyRaceLosses)
+    Manners.chat("Vs. " + currentEnemyName  + ": " + vsWins         + " - " + vsLosses)
+    
   }
   
   def onEnd(weWon: Boolean) {
     val thisGame = HistoricalGame(
       timestamp    = System.currentTimeMillis,
-      mapName       = currentMapName,
-      enemyName     = currentEnemyName,
-      won           = weWon,
-      strategies    = With.strategy.selected.map(_.toString))
+      mapName     = currentMapName,
+      enemyName   = currentEnemyName,
+      ourRace     = With.self.race,
+      enemyRace   = currentEnemyRace,
+      won         = weWon,
+      strategies  = With.strategy.selected.map(_.toString))
     HistoryLoader.save(games.toVector :+ thisGame)
   }
   

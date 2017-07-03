@@ -72,6 +72,6 @@ object Architect {
       blueprint,
       Surveyor.candidates(blueprint)
         .filter(canBuild(blueprint, _, recheckPathing = true))
-        .take(With.configuration.maxGroundskeeperSearches))
+        .take(With.configuration.maxPlacementsToEvaluate))
   }
 }

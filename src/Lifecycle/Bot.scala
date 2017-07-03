@@ -59,6 +59,7 @@ class Bot() extends DefaultBWListener {
   
   override def onEnd(isWinner: Boolean) {
     try {
+      With.history.onEnd(isWinner)
       Manners.onEnd(isWinner)
       With.onEnd()
     }

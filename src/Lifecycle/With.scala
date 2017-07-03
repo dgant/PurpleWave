@@ -17,6 +17,8 @@ import Planning.Plans.GamePlans.WinTheGame
 import ProxyBwapi.Players.{PlayerInfo, Players}
 import ProxyBwapi.ProxyBWMirror
 import ProxyBwapi.UnitTracking.UnitTracker
+import Strategery.History.History
+import Strategery.Strategist
 import _root_.Performance.{Latency, PerformanceMonitor}
 import bwta.BWTA
 
@@ -36,6 +38,7 @@ object With {
   var geography       : Geography           = _
   var grids           : Grids               = _
   var groundskeeper   : Groundskeeper       = _
+  var history         : History             = _
   var intelligence    : Intelligence        = _
   var latency         : Latency             = _
   var logger          : Logger              = _
@@ -45,6 +48,7 @@ object With {
   var prioritizer     : Prioritizer         = _
   var recruiter       : Recruiter           = _
   var scheduler       : Scheduler           = _
+  var strategy        : Strategist          = _
   var tasks           : AbstractTaskQueue   = _
   var units           : UnitTracker         = _
   var viewport        : Viewport            = _
@@ -87,6 +91,7 @@ object With {
     gameplan          = new WinTheGame
     geography         = new Geography
     grids             = new Grids
+    history           = new History
     intelligence      = new Intelligence
     latency           = new Latency
     paths             = new Paths
@@ -94,6 +99,7 @@ object With {
     prioritizer       = new Prioritizer
     recruiter         = new Recruiter
     scheduler         = new Scheduler
+    strategy          = new Strategist
     tasks             = new TaskQueueGlobal
     units             = new UnitTracker
     viewport          = new Viewport

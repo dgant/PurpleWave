@@ -2,9 +2,10 @@ package Debugging.Visualizations.Views.Geography
 
 import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
+import Debugging.Visualizations.Views.View
 import Lifecycle.With
 
-object MapBases {
+object ShowBases extends View {
   
   def render() {
     With.geography.zones.foreach(zone => {

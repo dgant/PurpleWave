@@ -1,22 +1,19 @@
 package Debugging.Visualizations.Views.Geography
 
-import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.View
 import Lifecycle.With
 
-object ViewGeography extends View {
+object ShowZoneBorderTiles extends View {
   
-  def render() {
-    ScreenGroundskeeper.render()
-    VisualizeArchitecture.render()
+  override def renderMap() {
   
     With.geography.zones.foreach(zone =>
       zone.border.foreach(tile =>
         DrawMap.box(
           tile.topLeftPixel,
           tile.bottomRightPixel,
-          Colors.MediumGray,
+          zone.owner.colorMedium,
           solid = false)))
   }
 }

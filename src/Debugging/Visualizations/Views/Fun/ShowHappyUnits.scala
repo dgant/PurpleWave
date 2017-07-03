@@ -2,14 +2,15 @@ package Debugging.Visualizations.Views.Fun
 
 import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
+import Debugging.Visualizations.Views.View
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.Color
 
-object MapVectorUnits {
+object ShowHappyUnits extends View {
   
-  def render() {
+  override def renderMap() {
     
     With.units.all
       .filter(unit =>

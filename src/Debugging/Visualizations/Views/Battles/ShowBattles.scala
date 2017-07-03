@@ -2,6 +2,7 @@ package Debugging.Visualizations.Views.Battles
 
 import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
+import Debugging.Visualizations.Views.View
 import Information.Battles.Estimation.Estimation
 import Information.Battles.Types.Battle
 import Lifecycle.With
@@ -9,7 +10,7 @@ import Mathematics.Points.Pixel
 import Planning.Yolo
 import Utilities.EnrichPixel._
 
-object VisualizeBattles {
+object ShowBattles extends View {
   
   private val graphMargin             = Pixel(2, 2)
   private val graphWidth              = 90
@@ -24,23 +25,29 @@ object VisualizeBattles {
   private val yolo                    = Pixel(310, 230)
   private val tacticsRanks            = Pixel(235, 18)
   
-  def render() {
+  override def renderScreen() {
     With.game.drawTextScreen(army0.bwapi, "Overall:")
     With.game.drawTextScreen(army1.bwapi, "+" + With.battles.global.estimationAbstract.costToEnemy.toInt)
     With.game.drawTextScreen(army2.bwapi, "-" + With.battles.global.estimationAbstract.costToUs.toInt)
-    With.battles.local.foreach(drawBattle)
-    val localBattles = With.battles.local
-    if (localBattles.nonEmpty) {
-      val battle      = localBattles.minBy(battle => battle.focus.pixelDistanceSquared(With.viewport.center))
-      val estimation  = battle.estimationGeometric
-      drawEstimationReport(estimation)
-    }
+    localBattle.foreach(battle => drawEstimationReport(battle.estimationGeometric))
     if (Yolo.active && With.frame / 24 % 2 == 0) {
       With.game.drawTextScreen(yolo.bwapi, "YOLO")
     }
   }
   
-  private def drawBattle(battle: Battle) {
+  override def renderMap() {
+    localBattle.foreach(drawBattleMap)
+  }
+  
+  def localBattle: Option[Battle] = {
+    val localBattles = With.battles.local
+    if (localBattles.isEmpty)
+      None
+    else
+      Some(localBattles.minBy(battle => battle.focus.pixelDistanceSquared(With.viewport.center)))
+  }
+  
+  private def drawBattleMap(battle: Battle) {
     val ourColor            = With.self.colorDark
     val enemyColor          = With.enemies.head.colorDark
     val neutralColor        = Colors.NeonOrange

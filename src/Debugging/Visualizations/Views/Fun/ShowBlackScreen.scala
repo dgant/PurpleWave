@@ -1,12 +1,12 @@
 package Debugging.Visualizations.Views.Fun
 
+import Debugging.Visualizations.Views.View
 import Lifecycle.With
 import bwapi.Color
 
-object ScreenBlackScreen {
+object ShowBlackScreen extends View {
   
-  def render() {
+  override def renderScreen() {
     With.game.drawBoxScreen(0, 0, 1500, 1200, Color.Black, true)
-    //With.grids.friendlyVision.tiles
   }
 }

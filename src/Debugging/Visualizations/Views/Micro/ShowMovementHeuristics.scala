@@ -2,15 +2,16 @@ package Debugging.Visualizations.Views.Micro
 
 import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
+import Debugging.Visualizations.Views.View
 import Lifecycle.With
 import Mathematics.Heuristics.HeuristicMathMultiplicative
 import Mathematics.Points.Pixel
 import Micro.Heuristics.Movement.MovementHeuristicEvaluation
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-object MapMovementHeuristics {
+object ShowMovementHeuristics extends View {
   
-  def render() {
+  override def renderMap() {
     
     var focus: Iterable[FriendlyUnitInfo] = With.units.ours.filter(unit => unit.selected && eligible(unit))
     

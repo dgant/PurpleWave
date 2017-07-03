@@ -44,7 +44,7 @@ object BaseFinder {
     val expansions = clusters.flatMap(cluster => bestTownHallTile(cluster, exclusions))
     
     // Merge nearby base positions (like the middle of Heartbreak Ridge)
-    mergeBases(expansions)
+    mergeBases(startTiles ++ expansions)
   }
   
   private def clusterResourcePatches(resources: Iterable[ForeignUnitInfo]): Iterable[Iterable[ForeignUnitInfo]] = {
@@ -100,18 +100,20 @@ object BaseFinder {
   
   private def mergeBases(bases: Iterable[Tile]): Iterable[Tile] = {
     
-    val candidates  = new mutable.HashSet[TileRectangle] ++ bases.map(Protoss.Nexus.tileArea.add)
+    val baseAreas   = bases.map(Protoss.Nexus.tileArea.add)
+    val candidates  = new mutable.HashSet[TileRectangle] ++ baseAreas
     val output      = new mutable.ArrayBuffer[Tile]
-    
-    while (candidates.nonEmpty) {
-      val candidate = candidates.head
-      candidates.remove(candidate)
-      output += candidate.startInclusive
   
-      // Real lazy -- just remove all conflicting candidates (instead of, say, picking the best one or something)
-      val conflicts = candidates.filter(_.intersects(candidate))
-      candidates --= conflicts
-    }
+    baseAreas.foreach(base =>
+      if (candidates.contains(base)) {
+        val candidate = candidates.head
+        candidates.remove(candidate)
+        output += candidate.startInclusive
+    
+        // Real lazy -- just remove all conflicting candidates (instead of, say, picking the best one or something)
+        val conflicts = candidates.filter(_.intersects(candidate))
+        candidates --= conflicts
+    })
     
     output
   }

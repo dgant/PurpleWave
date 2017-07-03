@@ -1,11 +1,16 @@
 package Debugging.Visualizations.Views.Geography
 
 import Debugging.Visualizations.Rendering.DrawScreen
+import Debugging.Visualizations.Views.View
 import Lifecycle.With
 
-object ScreenGroundskeeper {
+object ShowGroundskeeperQueue extends View {
   
-  def render() {
+  override def renderMap() {
+    
+  }
+  
+  override def renderScreen() {
     
     With.game.drawTextScreen(5, 25, "Unplaced:")
     DrawScreen.column(

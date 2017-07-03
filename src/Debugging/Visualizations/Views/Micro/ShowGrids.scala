@@ -1,12 +1,14 @@
 package Debugging.Visualizations.Views.Micro
 
 import Debugging.Visualizations.Rendering.DrawMap
+import Debugging.Visualizations.Views.View
 import Information.Grids.AbstractGrid
 import Lifecycle.With
 import Mathematics.Points.TileRectangle
 
-object MapGrids {
-  def render() {
+object ShowGrids extends View {
+  
+  override def renderMap() {
     renderGridArray(With.grids.enemyDetection, 0, 0)
   }
   

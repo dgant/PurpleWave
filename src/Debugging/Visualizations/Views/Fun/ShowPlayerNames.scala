@@ -2,9 +2,9 @@ package Debugging.Visualizations.Views.Fun
 
 import Lifecycle.With
 
-object ScreenBlackScreenOverlay {
+object ShowPlayerNames {
   
-  def render(visionLabel:String) {
+  def render(visionLabel: String) {
     With.game.setTextSize(bwapi.Text.Size.Enum.Large)
     With.game.drawBoxScreen   (5,      5,      5 + 20, 5 + 20,        With.self.colorDark,          true)
     With.game.drawBoxScreen   (5,      5 + 25, 5 + 20, 5 + 20 + 25,   With.enemies.head.colorDark,  true)

@@ -1,10 +1,12 @@
 package Debugging.Visualizations.Views.Economy
 
 import Debugging.Visualizations.Rendering.DrawScreen
+import Debugging.Visualizations.Views.View
 import Lifecycle.With
 
-object ScreenEconomy {
-  def render() {
+object ShowEconomy extends View {
+  
+  override def renderScreen() {
     val labels = Vector(
       "Active miners:",
       "Active drillers:",

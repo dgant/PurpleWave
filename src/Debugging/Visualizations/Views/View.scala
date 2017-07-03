@@ -1,5 +1,10 @@
 package Debugging.Visualizations.Views
 
-abstract class View {
-  def render()
+trait View {
+  def unimplemented() {}
+  
+  def renderScreen(): Unit  = unimplemented
+  def renderMap(): Unit     = unimplemented
+  
+  
 }

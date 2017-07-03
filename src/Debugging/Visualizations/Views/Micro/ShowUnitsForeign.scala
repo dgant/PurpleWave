@@ -2,13 +2,14 @@ package Debugging.Visualizations.Views.Micro
 
 import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
+import Debugging.Visualizations.Views.View
 import Lifecycle.With
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.ForeignUnitInfo
 
-object MapUnitsForeign {
+object ShowUnitsForeign extends View {
   
-  def render() {
+  override def renderMap() {
     With.units.enemy.foreach(drawTrackedUnit)
     With.units.neutral.foreach(drawTrackedUnit)
     renderSaturation()

@@ -2,12 +2,13 @@ package Debugging.Visualizations.Views.Micro
 
 import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
+import Debugging.Visualizations.Views.View
 import Lifecycle.With
 import Micro.Execution.ActionState
 
-object MapUnitsOurs {
+object ShowUnitsOurs extends View {
   
-  def render() {
+  override def renderMap() {
     With.executor.states.foreach(renderUnitState)
   }
   

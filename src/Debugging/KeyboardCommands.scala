@@ -13,7 +13,6 @@ object KeyboardCommands {
       case "vs"   => With.visualization.screen      = ! With.visualization.screen
       case "vh"   => With.visualization.happy       = ! With.visualization.happy
       case "vt"   => With.visualization.textOnly    = ! With.visualization.textOnly
-      case "vg"   => With.visualization.grids       = ! With.visualization.grids
 
       case "\\"   => With.visualization.enabled = true; With.visualization.screen = true; With.visualization.map = true; With.visualization.forceCycle()
       case "1"    => With.game.setLocalSpeed(1000)  ; With.configuration.camera = false

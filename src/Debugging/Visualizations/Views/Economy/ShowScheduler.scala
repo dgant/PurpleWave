@@ -1,11 +1,12 @@
 package Debugging.Visualizations.Views.Economy
 
 import Debugging.Visualizations.Rendering.DrawScreen
+import Debugging.Visualizations.Views.View
 import Lifecycle.With
 
-object ScreenScheduler {
+object ShowScheduler extends View {
   
-  def render() {
+  override def renderScreen() {
     With.game.drawTextScreen(5, 31, "Original queue")
     DrawScreen.table(5, 57,
       With.scheduler.queueOriginal

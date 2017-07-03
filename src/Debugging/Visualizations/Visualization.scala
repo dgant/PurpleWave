@@ -1,13 +1,8 @@
 package Debugging.Visualizations
 
-import Debugging.Visualizations.Views.Battles.VisualizeBattles
-import Debugging.Visualizations.Views.Economy.ViewEconomy
-import Debugging.Visualizations.Views.Fun.{ViewHappy, ViewTextOnly}
-import Debugging.Visualizations.Views.Geography._
-import Debugging.Visualizations.Views.Micro._
-import Debugging.Visualizations.Views.Performance.ViewPerformance
-import Debugging.Visualizations.Views.Planning.{MapPlans, ViewPlanning}
-import Debugging.Visualizations.Views.{ScreenClock, View}
+import Debugging.Visualizations.Views.Fun.{ShowHappyVision, ShowTextOnly}
+import Debugging.Visualizations.Views.Performance.ShowPerformance
+import Debugging.Visualizations.Views.View
 import Lifecycle.With
 
 import scala.util.Random
@@ -17,20 +12,16 @@ class Visualization {
   val lineHeightSmall = 9
   
   private val viewCycle = Vector(
-    ViewGeography,
-    ViewEconomy,
-    ViewPerformance,
-    ViewPlanning
+    ShowPerformance
   )
   
-  private var view: View = ViewPerformance
+  private var view: View = ShowPerformance
   private var lastCycle = 0
   
-  var enabled   = false
+  var enabled   = true
   var cycle     = false
   var screen    = true
-  var grids     = false
-  var map       = false
+  var map       = true
   var happy     = false
   var textOnly  = false
   
@@ -50,30 +41,22 @@ class Visualization {
     With.game.setTextSize(bwapi.Text.Size.Enum.Small)
     
     if (happy) {
-      ViewHappy.render()
+      ShowHappyVision.render()
     }
     else if (textOnly) {
-      ViewTextOnly.render()
+      ShowTextOnly.render()
     }
     else {
-      ScreenClock.render()
       if (map) {
-        MapChokepoints.render()
-        MapBases.render()
-        if (grids) {
-          MapGrids.render()
-        }
-        MapPlans.render()
-        ViewMicro.render()
+        view.renderMap()
       }
       if (screen) {
-        view.render()
-        if (cycle && (With.frame - lastCycle) > 24 * 8) {
-          pickNextView()
-        }
+        view.renderScreen()
       }
-  
-      VisualizeBattles.render()
+      
+      if (cycle && (With.frame - lastCycle) > 24 * 8) {
+        pickNextView()
+      }
     }
   }
   

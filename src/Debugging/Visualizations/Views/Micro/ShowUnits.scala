@@ -2,15 +2,16 @@ package Debugging.Visualizations.Views.Micro
 
 import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
+import Debugging.Visualizations.Views.View
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.Color
 
-object MapUnits {
+object ShowUnits extends View {
   
-  def render() {
+  override def renderMap() {
     With.units.all.foreach(renderUnit)
   }
   

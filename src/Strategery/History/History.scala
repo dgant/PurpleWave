@@ -30,7 +30,6 @@ class History {
     Manners.chat("As "  + currentEnemyRace  + ": "  + ourRaceWins   + " - " + ourRaceLosses)
     Manners.chat("Vs. " + currentEnemyRace  + ": "  + enemyRaceWins + " - " + enemyRaceLosses)
     Manners.chat("Vs. " + currentEnemyName  + ": "  + vsWins        + " - " + vsLosses)
-    
   }
   
   def onEnd(weWon: Boolean) {

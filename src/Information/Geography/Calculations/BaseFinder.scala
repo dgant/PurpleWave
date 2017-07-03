@@ -100,19 +100,18 @@ object BaseFinder {
   
   private def mergeBases(bases: Iterable[Tile]): Iterable[Tile] = {
     
-    val baseAreas   = bases.map(Protoss.Nexus.tileArea.add)
-    val candidates  = new mutable.HashSet[TileRectangle] ++ baseAreas
-    val output      = new mutable.ArrayBuffer[Tile]
+    val baseAreas = bases.map(Protoss.Nexus.tileArea.add)
+    val basesLeft = new mutable.HashSet[TileRectangle] ++ baseAreas
+    val output    = new mutable.ArrayBuffer[Tile]
   
     baseAreas.foreach(base =>
-      if (candidates.contains(base)) {
-        val candidate = candidates.head
-        candidates.remove(candidate)
-        output += candidate.startInclusive
+      if (basesLeft.contains(base)) {
+        basesLeft.remove(base)
+        output += base.startInclusive
     
         // Real lazy -- just remove all conflicting candidates (instead of, say, picking the best one or something)
-        val conflicts = candidates.filter(_.intersects(candidate))
-        candidates --= conflicts
+        val conflicts = basesLeft.filter(_.intersects(base))
+        basesLeft --= conflicts
     })
     
     output

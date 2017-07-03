@@ -17,10 +17,10 @@ object HistoryLoader {
   private val seedFilesDirectory = "bwapi-data/AI/"
   
   // The order matters (see below) thus meriting the explicit naming
-  private val possibleFilenamesInDescendingOrderOfRecency = Array(loadFilesDirectory, saveFilesDirectory, seedFilesDirectory)
+  private val directoriesInDecendingOrderOfRecency = Array(loadFilesDirectory, saveFilesDirectory, seedFilesDirectory)
   
   def load(): Iterable[HistoricalGame] = {
-    val gamesSerialized = loadAllGames(possibleFilenamesInDescendingOrderOfRecency)
+    val gamesSerialized = loadAllGames(directoriesInDecendingOrderOfRecency)
     val games = HistorySerializer.readGames(gamesSerialized)
     
     // Loading history from multiple potentially-redundant sources means some games may appear in the history multiple times.
@@ -50,12 +50,12 @@ object HistoryLoader {
   private def loadGamesFromDirectory(directory: String): Iterable[String] = {
     // I don't think this can actually throw, but let's wear some tinfoil.
     try {
-      var files: Array[File] =  new File(directory).listFiles
+      var files: Array[File] = new File(directory).listFiles
       if (files == null) {
         files = Array.empty
       }
       val historyFiles = files.filter(_.getName.contains(filenameHistoryPrefix))
-      historyFiles.flatMap(loadGamesFromFile)
+      return historyFiles.flatMap(loadGamesFromFile)
     }
     catch { case exception: Exception =>
       With.logger.warn("Failed to read games directory " + directory)

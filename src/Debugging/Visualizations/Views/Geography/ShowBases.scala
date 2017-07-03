@@ -7,7 +7,7 @@ import Lifecycle.With
 
 object ShowBases extends View {
   
-  def render() {
+  override def renderMap() {
     With.geography.zones.foreach(zone => {
   
       val battle = With.battles.byZone(zone)

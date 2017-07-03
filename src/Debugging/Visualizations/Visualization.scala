@@ -2,6 +2,7 @@ package Debugging.Visualizations
 
 import Debugging.Visualizations.Views.Fun.{ShowHappyVision, ShowTextOnly}
 import Debugging.Visualizations.Views.Geography.ShowBases
+import Debugging.Visualizations.Views.Micro.{ShowUnits, ShowUnitsForeign, ShowUnitsOurs}
 import Debugging.Visualizations.Views.Performance.ShowPerformance
 import Lifecycle.With
 
@@ -13,7 +14,10 @@ class Visualization {
   
   private val views = Vector(
     ShowPerformance,
-    ShowBases
+    ShowBases,
+    ShowUnits,
+    ShowUnitsForeign,
+    ShowUnitsOurs
   )
   
   var enabled   = true

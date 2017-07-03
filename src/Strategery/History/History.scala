@@ -26,10 +26,10 @@ class History {
     val ourRaceLosses   = games.count(g => g.ourRace    == currentEnemyRace &&  ! g.won)
     val vsWins          = games.count(g => g.enemyName  == currentEnemyName &&    g.won)
     val vsLosses        = games.count(g => g.enemyName  == currentEnemyName &&  ! g.won)
-    Manners.chat("On "  + currentMapName    + ": " + mapWins        + " - " + mapLosses)
-    Manners.chat("As "  + currentEnemyRace  + ": " + ourRaceWins    + " - " + ourRaceLosses)
-    Manners.chat("Vs. " + currentEnemyRace  + ": " + enemyRaceWins  + " - " + enemyRaceLosses)
-    Manners.chat("Vs. " + currentEnemyName  + ": " + vsWins         + " - " + vsLosses)
+    Manners.chat("On this map: "                    + mapWins       + " - " + mapLosses)
+    Manners.chat("As "  + currentEnemyRace  + ": "  + ourRaceWins   + " - " + ourRaceLosses)
+    Manners.chat("Vs. " + currentEnemyRace  + ": "  + enemyRaceWins + " - " + enemyRaceLosses)
+    Manners.chat("Vs. " + currentEnemyName  + ": "  + vsWins        + " - " + vsLosses)
     
   }
   

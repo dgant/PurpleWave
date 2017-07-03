@@ -1,8 +1,8 @@
 package Debugging.Visualizations
 
 import Debugging.Visualizations.Views.Fun.{ShowHappyVision, ShowTextOnly}
+import Debugging.Visualizations.Views.Geography.ShowBases
 import Debugging.Visualizations.Views.Performance.ShowPerformance
-import Debugging.Visualizations.Views.View
 import Lifecycle.With
 
 import scala.util.Random
@@ -11,28 +11,16 @@ class Visualization {
   
   val lineHeightSmall = 9
   
-  private val viewCycle = Vector(
-    ShowPerformance
+  private val views = Vector(
+    ShowPerformance,
+    ShowBases
   )
   
-  private var view: View = ShowPerformance
-  private var lastCycle = 0
-  
   var enabled   = true
-  var cycle     = false
   var screen    = true
   var map       = true
   var happy     = false
   var textOnly  = false
-  
-  def setView(newView: View) {
-    view = newView
-  }
-  
-  def forceCycle() {
-    cycle = false
-    pickNextView()
-  }
   
   def render() {
     requireInitialization()
@@ -48,15 +36,12 @@ class Visualization {
     }
     else {
       if (map) {
-        view.renderMap()
+        views.foreach(_.renderMap())
       }
       if (screen) {
-        view.renderScreen()
+        views.foreach(_.renderScreen())
       }
       
-      if (cycle && (With.frame - lastCycle) > 24 * 8) {
-        pickNextView()
-      }
     }
   }
   
@@ -75,17 +60,6 @@ class Visualization {
       if (random < 0) {
         textOnly = true
       }
-    }
-  }
-  
-  private def pickNextView() {
-    var i = -1
-    if (viewCycle.contains(view)) {
-      i = (viewCycle.indexOf(view) + 1) % viewCycle.length
-    }
-    if (i >= 0) {
-      view = viewCycle(i)
-      lastCycle = With.frame
     }
   }
 }

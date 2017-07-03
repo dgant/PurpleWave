@@ -33,10 +33,7 @@ class ProtossVsTerran extends Parallel {
     new Build(
       RequestUnitAtLeast(1,   Protoss.RoboticsFacility),
       RequestUnitAtLeast(1,   Protoss.Observatory),
-      RequestUnitAtLeast(4,   Protoss.Gateway),
-      RequestUnitAtLeast(8,   Protoss.Gateway),
-      RequestUnitAtLeast(10,  Protoss.Gateway),
-      RequestUnitAtLeast(14,  Protoss.Gateway)
+      RequestUnitAtLeast(15,  Protoss.Gateway)
     ))
   
   private class OnThreeGas_Arbiters extends OnGasBases(3,

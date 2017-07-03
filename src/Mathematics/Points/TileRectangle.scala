@@ -21,8 +21,8 @@ case class TileRectangle(
   def add(Tile: Tile):TileRectangle =
     add(Tile.x, Tile.y)
 
-  lazy val midPixel : Pixel = startPixel.midpoint(endPixel)
-  lazy val midpoint : Tile  = startInclusive.midpoint(endExclusive)
+  def midPixel : Pixel = startPixel.midpoint(endPixel)
+  def midpoint : Tile  = startInclusive.midpoint(endExclusive)
   
   def contains(x:Int, y:Int):Boolean =
     x >= startInclusive.x &&
@@ -45,8 +45,12 @@ case class TileRectangle(
     contains(otherRectangle.endExclusive.x - 1, otherRectangle.startInclusive.y)
   }
   
-  lazy val startPixel : Pixel = startInclusive.topLeftPixel
-  lazy val endPixel   : Pixel = endExclusive.topLeftPixel.subtract(1, 1)
+  def startPixel      : Pixel = startInclusive.topLeftPixel
+  def endPixel        : Pixel = endExclusive.topLeftPixel.subtract(1, 1)
+  def topRightPixel   : Pixel = Pixel(endPixel.x, startPixel.y)
+  def bottomleftPixel : Pixel = Pixel(startPixel.x, endPixel.y)
+  
+  lazy val cornerPixels: Array[Pixel] = Array(startPixel, topRightPixel, endPixel, bottomleftPixel)
   
   lazy val tiles: Array[Tile] = {
     // Scala while-loops are way faster than for-loops because they don't create Range objects

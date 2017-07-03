@@ -33,8 +33,8 @@ object HistorySerializer {
     catch { case exception: Exception =>
       With.logger.warn("Failed to deserialize game: " + serializedGame)
       With.logger.onException(exception)
+      None
     }
-    None
   }
   
   private def readGameFromColumns(columns: Array[String]): HistoricalGame = {

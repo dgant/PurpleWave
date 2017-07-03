@@ -38,6 +38,7 @@ class Configuration {
   var maxMineralsBeforeMinedOut       = 300 * 8
   var maxFramesToSendAdvanceBuilder   = 24 * 20
   var maxFramesToTrustBuildRequest    = 24 * 60 * 10
+  var baseRadiusPixels                = 32.0 * 12.0
   var blockerMineralThreshold         = 50
   var maxPlacementAge                 = 99999 * 24 * 20
   var maxScarabCount                  = 3

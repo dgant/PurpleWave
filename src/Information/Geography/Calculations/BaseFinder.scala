@@ -13,17 +13,7 @@ import scala.collection.mutable
 
 object BaseFinder {
   
-  
-  private val baseToResourceRadius = 32.0 * 12.0
-  
   def calculate: Iterable[Tile] = {
-    
-    
-    // Ignore mineral blocks.
-    // Calculate exclusions (assume mineral blocks blocking mineral patches are designed to be mined out).
-    // Remove resources near start positions from consideration (to make sure we don't specify an in-base expansion.
-    // Cluster the remaining resources.
-    // For each cluster, identify a base
     
     // Start locations are free base placements.
     val startTiles    = With.game.getStartLocations.asScala.map(new Tile(_)).toArray
@@ -34,7 +24,7 @@ object BaseFinder {
     
     // Get every resource that isn't a mineral block and isn't tied to a start location
     val baseResources = allResources.filterNot(r => r.unitClass.isMinerals && r.initialResources <= With.configuration.blockerMineralThreshold)
-    val expoResources = baseResources.filterNot(r => startPixels.exists(_.pixelDistanceFast(r.pixelCenter) <= baseToResourceRadius))
+    val expoResources = baseResources.filterNot(r => startPixels.exists(_.pixelDistanceFast(r.pixelCenter) <= With.configuration.baseRadiusPixels))
     
     // Cluster the expansion resources
     val clusters = clusterResourcePatches(expoResources)
@@ -50,7 +40,7 @@ object BaseFinder {
   private def clusterResourcePatches(resources: Iterable[ForeignUnitInfo]): Iterable[Iterable[ForeignUnitInfo]] = {
     Clustering.group[ForeignUnitInfo](
       resources,
-      32 * 12,
+      With.configuration.baseRadiusPixels,
       limitRegion = true,
       (unit) => unit.pixelCenter).values
   }
@@ -78,8 +68,12 @@ object BaseFinder {
   }
   
   private def cost(tile: Tile, resources: Iterable[ForeignUnitInfo]): Double = {
-    val center = tile.topLeftPixel.add(Protoss.Nexus.width / 2, Protoss.Nexus.height / 2)
-    resources.map(resource => 5 * resource.gasLeft * resource.pixelDistanceFast(center)).sum
+    val corners = Protoss.Nexus.tileArea.add(tile).cornerPixels
+    corners.map(corner =>
+      resources.map(resource =>
+        (5 *  resource.gasLeft +
+              resource.mineralsLeft)
+          * resource.pixelDistanceSquared(corner)).sum).min
   }
   
   private def isLegalTownHallTile(

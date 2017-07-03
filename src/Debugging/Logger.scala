@@ -43,13 +43,14 @@ class Logger {
   }
   
   private def log(message: String) {
+    
+    logMessages.append(message)
+  
+    Manners.chat(message)
+    
     if (With.configuration.enableStdOut) {
       System.out.println(message)
     }
-    
-    Manners.chat(message)
-    
-    logMessages.append(message)
   }
   
   private def formatException(exception: Exception): String = {

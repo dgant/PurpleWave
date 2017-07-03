@@ -4,6 +4,7 @@ import Debugging.Visualizations.Views.Fun.{ShowHappyVision, ShowTextOnly}
 import Debugging.Visualizations.Views.Geography.ShowBases
 import Debugging.Visualizations.Views.Micro.{ShowUnits, ShowUnitsForeign, ShowUnitsOurs}
 import Debugging.Visualizations.Views.Performance.ShowPerformance
+import Debugging.Visualizations.Views.ShowClock
 import Lifecycle.With
 
 import scala.util.Random
@@ -17,7 +18,8 @@ class Visualization {
     ShowBases,
     ShowUnits,
     ShowUnitsForeign,
-    ShowUnitsOurs
+    ShowUnitsOurs,
+    ShowClock
   )
   
   var enabled   = true

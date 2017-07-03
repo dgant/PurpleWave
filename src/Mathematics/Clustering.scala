@@ -17,10 +17,10 @@ object Clustering {
   }
   
   def group[T](
-    things:Iterable[T],
-    radius:Int,
-    limitRegion:Boolean = false,
-    extractPixel:(T) => Pixel)
+    things        : Iterable[T],
+    radius        : Double,
+    limitRegion   : Boolean = false,
+    extractPixel  : (T) => Pixel)
       :mutable.HashMap[T, mutable.HashSet[T]] = {
     
     val neighborsByUnit = mapUnitsToNeighbors(things, radius, extractPixel)
@@ -45,7 +45,7 @@ object Clustering {
   
   private def mapUnitsToNeighbors[T](
     things        : Iterable[T],
-    radius        : Int,
+    radius        : Double,
     extractPixel  : (T) => Pixel)
       :Map[T, Iterable[T]] = {
     

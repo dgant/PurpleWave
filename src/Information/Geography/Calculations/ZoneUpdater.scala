@@ -3,6 +3,7 @@ package Information.Geography.Calculations
 import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
 import ProxyBwapi.Races.{Protoss, Terran}
+import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.EnrichPixel._
 
 object ZoneUpdater {
@@ -60,8 +61,8 @@ object ZoneUpdater {
   
   private def updateAssets(base: Base) {
     
-    base.minerals       = With.units.neutral.filter(unit => unit.unitClass.isMinerals && base.zone.contains(unit.pixelCenter) && unit.mineralsLeft > 0).toSet
-    base.gas            = With.units.all.filter(unit => unit.unitClass.isGas && base.zone.contains(unit.pixelCenter))
+    base.minerals       = With.units.neutral.filter(_.mineralsLeft > With.configuration.blockerMineralThreshold).filter(resourceIsInBase(_, base)).toSet
+    base.gas            = With.units.all.filter(_.unitClass.isGas).filter(resourceIsInBase(_, base)).toSet
     base.workers        = With.units.all.filter(unit => unit.unitClass.isWorker && base.zone.contains(unit.pixelCenter))
     base.mineralsLeft   = base.minerals.filter(_.alive).toVector.map(_.mineralsLeft).sum
     base.gasLeft        = base.gas.filter(_.alive).toVector.map(_.gasLeft).sum
@@ -78,7 +79,10 @@ object ZoneUpdater {
     base.planningToTake = With.units.ours.exists(unit =>
       unit.actionState.toBuildTile.exists(_.zone == base.zone) &&
       unit.actionState.toBuild.exists(_.isTownHall))
-    
-    
+  }
+  
+  private def resourceIsInBase(resource: UnitInfo, base: Base): Boolean = {
+    resource.pixelCenter.zone == base.townHallTile.zone &&
+    resource.pixelDistanceFast(base.townHallArea.midPixel) < With.configuration.baseRadiusPixels
   }
 }

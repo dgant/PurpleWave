@@ -4,7 +4,7 @@ import Information.Geography.Types.Base
 import Micro.Intent.Intention
 import Performance.Caching.Limiter
 import Planning.Composition.UnitCountEverything
-import Planning.Composition.UnitMatchers.UnitMatchWorker
+import Planning.Composition.UnitMatchers.UnitMatchWorkers
 import Planning.Plan
 import Planning.Composition.ResourceLocks.LockUnits
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -15,7 +15,7 @@ import scala.collection.mutable
 class Gather extends Plan {
 
   val workers = new LockUnits {
-    unitMatcher.set(UnitMatchWorker)
+    unitMatcher.set(UnitMatchWorkers)
     unitCounter.set(UnitCountEverything)
   }
   

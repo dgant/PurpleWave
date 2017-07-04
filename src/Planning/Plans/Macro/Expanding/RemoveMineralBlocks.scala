@@ -5,7 +5,7 @@ import Micro.Intent.Intention
 import Planning.Composition.Property
 import Planning.Composition.ResourceLocks.LockUnits
 import Planning.Composition.UnitCounters.UnitCountOne
-import Planning.Composition.UnitMatchers.UnitMatchWorker
+import Planning.Composition.UnitMatchers.UnitMatchWorkers
 import Planning.Composition.UnitPreferences.UnitPreferClose
 import Planning.Plan
 
@@ -14,7 +14,7 @@ class RemoveMineralBlocks extends Plan {
   description.set("Remove nearby mineral blocks")
   
   val miners = new Property[LockUnits](new LockUnits)
-  miners.get.unitMatcher.set(UnitMatchWorker)
+  miners.get.unitMatcher.set(UnitMatchWorkers)
   miners.get.unitCounter.set(UnitCountOne)
   miners.get.interruptable.set(false)
   

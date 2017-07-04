@@ -62,6 +62,8 @@ object With {
   var mapWidth  : Int = 0
   var mapHeight : Int = 0
   
+  def framesSince(previousFrame: Int): Int = Math.max(0, frame - previousFrame)
+  
   def onFrame() {
     frame = With.game.getFrameCount
   }

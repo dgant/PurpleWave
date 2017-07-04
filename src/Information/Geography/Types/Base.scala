@@ -20,11 +20,12 @@ class Base(val townHallTile: Tile)
   var       workers         : Set[UnitInfo]     = Set.empty
   var       walledIn        : Boolean           = false
   var       planningToTake  : Boolean           = false
+  var       owner           : PlayerInfo        = With.neutral
   
   var mineralsLeft      = 0
   var gasLeft           = 0
   var lastScoutedFrame  = 0
   
-  def owner: PlayerInfo = zone.owner
+  
   def resources: Set[UnitInfo] = minerals ++ gas
 }

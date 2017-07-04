@@ -41,7 +41,7 @@ class Camera {
   }
   
   def focusOn(unit:UnitInfo) {
-    if (With.frame - focusFrame < refocusLimit) return
+    if (With.framesSince(focusFrame) < refocusLimit) return
     focusUnit = unit
     focusFrame = With.frame
     tweenFrom = focus
@@ -56,7 +56,7 @@ class Camera {
   def tween() {
     if (focusUnit != null && focusUnit.alive) {
       focus = focusUnit.pixelCenter
-      val tweenFraction = Math.max(0.0, Math.min(1.0, (With.frame - focusFrame + 1).toDouble/tweenFrames))
+      val tweenFraction = Math.max(0.0, Math.min(1.0, (With.framesSince(focusFrame) + 1).toDouble/tweenFrames))
       val tweenPoint    = tweenFrom.project(focus, tweenFrom.pixelDistanceSlow(focus) * tweenFraction)
       With.viewport.centerOn(tweenPoint)
     }

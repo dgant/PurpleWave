@@ -50,13 +50,19 @@ object ZoneUpdater {
   
   private def updateOwner(base: Base) {
     
-    base.zone.owner = base.townHall.map(_.player).getOrElse(With.neutral)
+    base.owner = base.townHall.map(_.player).getOrElse(With.neutral)
     
-    if (base.zone.owner.isNeutral && base.lastScoutedFrame < With.frame - Protoss.Nexus.buildFrames) {
+    // Assume ownership of occupied base we haven't seen lately
+    if (base.owner.isNeutral && base.lastScoutedFrame < With.framesSince(Protoss.Nexus.buildFrames)) {
       With.units.enemy
         .find(unit => ! unit.flying && unit.unitClass.isBuilding && unit.pixelCenter.zone == base.zone)
-        .foreach(enemyUnit => base.zone.owner = enemyUnit.player)
+        .foreach(enemyBuilding => base.owner = enemyBuilding.player)
     }
+    
+    // Assume ownership of unscouted main from natural
+    base.isNaturalOf
+      .filter(main => base.owner.isEnemy && main.lastScoutedFrame <= 0)
+      .foreach(main => main.owner = base.owner)
   }
   
   private def updateAssets(base: Base) {

@@ -15,7 +15,7 @@ object Architect {
   
   def validate(blueprint: Blueprint, placement: Option[Placement]): Option[Placement] = {
     val placementHasTile = placement.exists(_.tile.isDefined)
-    val placementIsFresh = placement.exists(With.frame - _.createdFrame < With.configuration.maxPlacementAge)
+    val placementIsFresh = placement.exists(p => With.framesSince(p.createdFrame) < With.configuration.maxPlacementAge)
   
     if (placementHasTile && placementIsFresh) {
       if (canBuild(blueprint, placement.get.tile.get, recheckPathing = false)) {

@@ -21,9 +21,17 @@ class Zone(
   lazy val  points      : Iterable[Pixel]   = bwtaRegion.getPolygon.getPoints.asScala.map(new Pixel(_)).toVector
   lazy val  island      : Boolean           = ! With.geography.startLocations.exists(startTile => With.paths.exists(centroid, startTile))
   lazy val  exit        : Option[Edge]      = if (edges.isEmpty) None else Some(edges.minBy(edge => With.geography.startLocations.map(_.groundPixels(edge.centerPixel)).max))
-  var       owner       : PlayerInfo        = With.neutral
   var       isWalledIn  : Boolean           = false
   
   def contains(tile: Tile)    : Boolean = boundary.contains(tile) && tiles.contains(tile)
   def contains(pixel: Pixel)  : Boolean = contains(pixel.tileIncluding)
+  def owner: PlayerInfo = {
+    val owners = bases.map(_.owner).toSet
+    if (owners.size == 1)
+      owners.head
+    else if (owners.contains(With.self))
+      With.self //Contested and we have a piece? It's ours, dangit!
+    else
+      With.neutral
+  }
 }

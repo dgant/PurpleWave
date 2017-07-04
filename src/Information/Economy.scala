@@ -16,8 +16,8 @@ class Economy {
   var ourEstimatedTotalGas = 0.0
   
   var _lastFrame = 0
-  def update() = {
-    val frameDiff = With.frame - _lastFrame
+  def update() {
+    val frameDiff = With.framesSince(_lastFrame)
     ourEstimatedTotalMinerals += frameDiff * ourIncomePerFrameMinerals
     ourEstimatedTotalGas      += frameDiff * ourIncomePerFrameGas
     _lastFrame = With.frame

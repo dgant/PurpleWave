@@ -25,7 +25,7 @@ abstract class AbstractTask {
   
   protected def onRun()
   
-  final def framesSinceRunning      : Int     = Math.max(1, With.frame - lastRunFrame)
+  final def framesSinceRunning      : Int     = Math.max(1, With.framesSince(lastRunFrame))
   final def totalRuns               : Int     = totalRunCount
   final def totalSkips              : Int     = totalSkipCount
   final def totalViolatedThreshold  : Int     = violatedThreshold

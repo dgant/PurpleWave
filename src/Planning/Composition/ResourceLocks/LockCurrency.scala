@@ -15,6 +15,7 @@ class LockCurrency extends ResourceLock {
   var owner: Plan     = _
   
   override def satisfied: Boolean = isSatisfied || isSpent
+  
   override def acquire(plan:Plan) {
     owner = plan
     With.bank.request(this)
@@ -23,4 +24,6 @@ class LockCurrency extends ResourceLock {
   override def release() {
     With.bank.release(this)
   }
+  
+  def onSchedule: Boolean = expectedFrames <= framesAhead
 }

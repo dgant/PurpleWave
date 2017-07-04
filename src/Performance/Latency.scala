@@ -24,7 +24,7 @@ class Latency {
     val shouldWeRun =
       With.frame == 0 ||
       With.game.getRemainingLatencyFrames == minRemainingLatencyFrames ||
-      With.frame - lastRunFrame > minRemainingLatencyFrames ||
+      With.framesSince(lastRunFrame) > minRemainingLatencyFrames ||
       With.game.isPaused
     if (shouldWeRun) lastRunFrame = With.frame
     shouldWeRun

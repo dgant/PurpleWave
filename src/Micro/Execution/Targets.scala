@@ -20,7 +20,7 @@ object Targets {
   
   def valid(state: ActionState, target: UnitInfo): Boolean = {
     target.likelyStillThere &&
-      With.frame - target.lastSeen < 24 * 60 &&
+      With.framesSince(target.lastSeen) < 24 * 60 &&
       target.isEnemyOf(state.unit) &&
       state.unit.canAttackThisSecond(target) &&
       ! ineligibleClasses.contains(target.unitClass)

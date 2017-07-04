@@ -18,23 +18,29 @@ class FindEnemyBase extends Plan {
   val scouts = new Property[LockUnits](new LockUnits {
     unitCounter.set(new UnitCountExactly(1))
     unitMatcher.set(UnitMatchMobile)
-    unitPreference.set(new UnitPreferClose(SpecificPoints.middle))
+    unitPreference.set(UnitPreferClose(SpecificPoints.middle))
   })
+  
+  var lastScouts: Iterable[FriendlyUnitInfo] = Iterable.empty
+  var lastScoutFrame: Int = 0
   
   override def isComplete: Boolean = With.geography.enemyBases.nonEmpty
   
   override def onUpdate() {
+    // Did our scouts die?
+    //if (With.framesSince(lastScoutFrame) < 24 * 30 && lastScouts.forall(_.alive))
+    val scoutingDestination = getNextScoutingPixel
+    scouts.get.unitPreference.set(UnitPreferClose(scoutingDestination))
     scouts.get.acquire(this)
-    scouts.get.units.foreach(orderScout)
+    scouts.get.units.foreach(orderScout(_, scoutingDestination))
   }
   
-  private def orderScout(scout:FriendlyUnitInfo) =
-    With.executor.intend(new Intention(this, scout) { toTravel = getNextScoutingPixel; canAttack = ! scout.unitClass.isWorker })
+  private def orderScout(scout: FriendlyUnitInfo, destination: Pixel) =
+    With.executor.intend(new Intention(this, scout) { toTravel = Some(destination); canAttack = ! scout.unitClass.isWorker })
   
-  private def getNextScoutingPixel:Option[Pixel] =
+  private def getNextScoutingPixel: Pixel =
     With.intelligence.leastScoutedBases
-      .map(_.townHallArea.midpoint)
-      .filter(base => With.paths.exists(With.geography.home, base))
-      .headOption
-      .map(_.pixelCenter)
+      .filter( ! _.zone.island)
+      .map(_.townHallArea.midPixel)
+      .head
 }

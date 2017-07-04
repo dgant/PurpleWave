@@ -22,21 +22,33 @@ class FindEnemyBase extends Plan {
   })
   
   var lastScouts: Iterable[FriendlyUnitInfo] = Iterable.empty
-  var lastScoutFrame: Int = 0
+  var lastScoutSlaughter: Int = -24 * 60
   
   override def isComplete: Boolean = With.geography.enemyBases.nonEmpty
   
   override def onUpdate() {
-    // Did our scouts die?
-    //if (With.framesSince(lastScoutFrame) < 24 * 30 && lastScouts.forall(_.alive))
+    val scoutsDied = lastScouts.forall( ! _.alive)
+    if (scoutsDied) {
+      lastScouts = List.empty
+      lastScoutSlaughter = With.frame
+    }
+    if (With.framesSince(lastScoutSlaughter) < 24 * 60) {
+      return
+    }
+    
     val scoutingDestination = getNextScoutingPixel
     scouts.get.unitPreference.set(UnitPreferClose(scoutingDestination))
     scouts.get.acquire(this)
-    scouts.get.units.foreach(orderScout(_, scoutingDestination))
+    lastScouts = scouts.get.units
+    lastScouts.foreach(orderScout(_, scoutingDestination))
   }
   
-  private def orderScout(scout: FriendlyUnitInfo, destination: Pixel) =
-    With.executor.intend(new Intention(this, scout) { toTravel = Some(destination); canAttack = ! scout.unitClass.isWorker })
+  private def orderScout(scout: FriendlyUnitInfo, destination: Pixel) {
+    With.executor.intend(new Intention(this, scout) {
+      toTravel = Some(destination);
+      canAttack = ! scout.unitClass.isWorker
+    })
+  }
   
   private def getNextScoutingPixel: Pixel =
     With.intelligence.leastScoutedBases

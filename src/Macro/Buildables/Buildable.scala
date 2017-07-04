@@ -17,8 +17,8 @@ abstract class Buildable {
   def supplyRequired  : Int = 0
   def supplyProvided  : Int = 0
   
-  def requirements:Iterable[Buildable] = Vector.empty
-  def buildersOccupied:Iterable[BuildableUnit] = Vector.empty
-  def buildersBorrowed:Iterable[BuildableUnit] = Vector.empty
-  def buildersConsumed:Iterable[BuildableUnit] = Vector.empty
+  def requirements:     Iterable[Buildable] = Vector.empty
+  def buildersOccupied: Iterable[BuildableUnit] = Vector.empty
+  def buildersBorrowed: Iterable[BuildableUnit] = Vector.empty
+  def buildersConsumed: Iterable[BuildableUnit] = Vector.empty
 }

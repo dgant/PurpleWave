@@ -5,6 +5,7 @@ import Planning.Plan
 
 class LockCurrency extends ResourceLock {
   
+  var framesAhead     = 0
   var minerals        = 0
   var gas             = 0
   var supply          = 0

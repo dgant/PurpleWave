@@ -32,7 +32,7 @@ object BustBunker extends Action {
     
     if (
       // If we don't have Dragoon range yet, back off.
-      With.units.ours.exists(unit => unit.researching && unit.upgradingType == Protoss.DragoonRange) ||
+      With.units.ours.exists(unit => unit.upgrading && unit.upgradingType == Protoss.DragoonRange) ||
         
       // If we're getting shot at by the bunker, back off.
       (

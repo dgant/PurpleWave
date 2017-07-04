@@ -122,7 +122,7 @@ abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
   def interruptible   : Boolean = isInterruptibleCache.get
   def morphing        : Boolean = isMorphingCache.get
   def repairing       : Boolean = isRepairingCache.get
-  def researching     : Boolean = isResearchingCache.get
+  def teching     : Boolean = isResearchingCache.get
   def patrolling      : Boolean = isPatrollingCache.get
   def training        : Boolean = isTrainingCache.get
   def upgrading       : Boolean = isUpgradingCache.get
@@ -189,7 +189,9 @@ abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
   // Statuses //
   //////////////
   
-  def remainingBuildFrames: Int = base.getRemainingBuildTime
+  def remainingBuildFrames    : Int = base.getRemainingBuildTime
+  def remainingUpgradeFrames  : Int = base.getRemainingUpgradeTime
+  def remainingTechFrames     : Int = base.getRemainingResearchTime
   
   def beingConstructed    : Boolean = base.isBeingConstructed
   def beingGathered       : Boolean = base.isBeingGathered

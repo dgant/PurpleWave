@@ -236,7 +236,7 @@ class ForeignUnitInfo(baseUnit: bwapi.Unit) extends UnitInfo (baseUnit) {
   def interruptible   : Boolean = _interruptible
   def morphing        : Boolean = _morphing
   def repairing       : Boolean = _repairing
-  def researching     : Boolean = _researching
+  def teching     : Boolean = _researching
   def patrolling      : Boolean = _patrolling
   def training        : Boolean = _training
   def upgrading       : Boolean = _upgrading
@@ -319,6 +319,8 @@ class ForeignUnitInfo(baseUnit: bwapi.Unit) extends UnitInfo (baseUnit) {
   
   private def updateStatuses() {
     _remainingBuildFrames   = base.getRemainingBuildTime
+    _remainingUpgradeFrames = base.getRemainingUpgradeTime
+    _remainingTechFrames    = base.getRemainingResearchTime
     _beingConstructed       = base.isBeingConstructed
     _beingGathered          = base.isBeingGathered
     _beingHealed            = base.isBeingHealed
@@ -334,35 +336,39 @@ class ForeignUnitInfo(baseUnit: bwapi.Unit) extends UnitInfo (baseUnit) {
     _underStorm             = base.isUnderStorm
   }
   
-  private var _remainingBuildFrames : Int = _
-  private var _beingConstructed     : Boolean = _
-  private var _beingGathered        : Boolean = _
-  private var _beingHealed          : Boolean = _
-  private var _blind                : Boolean = _
-  private var _carryingMinerals     : Boolean = _
-  private var _carryingGas          : Boolean = _
-  private var _powered              : Boolean = _
-  private var _selected             : Boolean = _
-  private var _targetable           : Boolean = _
-  private var _underAttack          : Boolean = _
-  private var _underDarkSwarm       : Boolean = _
-  private var _underDisruptionWeb   : Boolean = _
-  private var _underStorm           : Boolean = _
+  private var _remainingBuildFrames   : Int = _
+  private var _remainingUpgradeFrames : Int = _
+  private var _remainingTechFrames    : Int = _
+  private var _beingConstructed       : Boolean = _
+  private var _beingGathered          : Boolean = _
+  private var _beingHealed            : Boolean = _
+  private var _blind                  : Boolean = _
+  private var _carryingMinerals       : Boolean = _
+  private var _carryingGas            : Boolean = _
+  private var _powered                : Boolean = _
+  private var _selected               : Boolean = _
+  private var _targetable             : Boolean = _
+  private var _underAttack            : Boolean = _
+  private var _underDarkSwarm         : Boolean = _
+  private var _underDisruptionWeb     : Boolean = _
+  private var _underStorm             : Boolean = _
   
-  def remainingBuildFrames  : Int     = _remainingBuildFrames
-  def beingConstructed      : Boolean = _beingConstructed
-  def beingGathered         : Boolean = _beingGathered
-  def beingHealed           : Boolean = _beingHealed
-  def blind                 : Boolean = _blind
-  def carryingGas           : Boolean = _carryingGas
-  def carryingMinerals      : Boolean = _carryingMinerals
-  def powered               : Boolean = _powered
-  def selected              : Boolean = _selected
-  def targetable            : Boolean = _targetable
-  def underAttack           : Boolean = _underAttack
-  def underDarkSwarm        : Boolean = _underDarkSwarm
-  def underDisruptionWeb    : Boolean = _underDisruptionWeb
-  def underStorm            : Boolean = _underStorm
+  def remainingBuildFrames    : Int     = _remainingBuildFrames
+  def remainingUpgradeFrames  : Int     = _remainingUpgradeFrames
+  def remainingTechFrames     : Int     = _remainingTechFrames
+  def beingConstructed        : Boolean = _beingConstructed
+  def beingGathered           : Boolean = _beingGathered
+  def beingHealed             : Boolean = _beingHealed
+  def blind                   : Boolean = _blind
+  def carryingGas             : Boolean = _carryingGas
+  def carryingMinerals        : Boolean = _carryingMinerals
+  def powered                 : Boolean = _powered
+  def selected                : Boolean = _selected
+  def targetable              : Boolean = _targetable
+  def underAttack             : Boolean = _underAttack
+  def underDarkSwarm          : Boolean = _underDarkSwarm
+  def underDisruptionWeb      : Boolean = _underDisruptionWeb
+  def underStorm              : Boolean = _underStorm
   
   // Cloaked units show up with 0 hit points/shields.
   // Presumably, if we've never seen them, then they're healthier than that.

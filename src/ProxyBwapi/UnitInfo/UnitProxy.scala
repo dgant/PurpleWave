@@ -81,7 +81,7 @@ abstract class UnitProxy(var base: bwapi.Unit) {
   def interruptible:Boolean
   def morphing:Boolean
   def repairing:Boolean
-  def researching:Boolean
+  def teching:Boolean
   def patrolling:Boolean
   def training:Boolean
   def upgrading:Boolean
@@ -119,6 +119,8 @@ abstract class UnitProxy(var base: bwapi.Unit) {
   //////////////
 
   def remainingBuildFrames:Int
+  def remainingUpgradeFrames:Int
+  def remainingTechFrames:Int
   
   def beingConstructed:Boolean
   def beingGathered:Boolean

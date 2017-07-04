@@ -11,7 +11,7 @@ case class Tech(val baseType:TechType) {
   lazy val getRace          = baseType.getRace
   lazy val getWeapon        = baseType.getWeapon
   lazy val mineralPrice     = baseType.mineralPrice
-  lazy val researchTime     = baseType.researchTime
+  lazy val researchFrames     = baseType.researchTime
   lazy val requiredUnit     = UnitClasses.get(baseType.requiredUnit)
   lazy val targetsPixel     = baseType.targetsPosition
   lazy val targetsUnits     = baseType.targetsUnit

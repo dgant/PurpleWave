@@ -7,13 +7,15 @@ import Planning.Plan
 import Planning.Composition.ResourceLocks.{LockCurrencyForTech, LockUnits}
 import ProxyBwapi.Techs.Tech
 import Lifecycle.With
+import Macro.Scheduling.Project
 
 class ResearchTech(tech: Tech) extends Plan {
-  
+
+  val techerMatcher = UnitMatchType(tech.whatResearches)
   val currency = new LockCurrencyForTech(tech)
   val techers = new LockUnits {
     unitCounter.set(UnitCountOne)
-    unitMatcher.set(UnitMatchType(tech.whatResearches))
+    unitMatcher.set(techerMatcher)
   }
   
   description.set("Tech " + tech)
@@ -23,8 +25,9 @@ class ResearchTech(tech: Tech) extends Plan {
   override def onUpdate() {
     if (isComplete) return
     
+    currency.framesAhead = Project.framesToUnits(techerMatcher)
     currency.acquire(this)
-    currency.isSpent = With.units.ours.exists(techer => techer.researching && techer.techingType == tech)
+    currency.isSpent = With.units.ours.exists(techer => techer.teching && techer.techingType == tech)
     if ( ! currency.satisfied) return
   
     techers.acquire(this)

@@ -1,6 +1,7 @@
 package Planning.Plans.Macro.Build
 
 import Lifecycle.With
+import Macro.Scheduling.Project
 import Micro.Intent.Intention
 import Planning.Composition.ResourceLocks._
 import Planning.Composition.UnitCounters.UnitCountOne
@@ -10,10 +11,11 @@ import ProxyBwapi.Upgrades.Upgrade
 
 class ResearchUpgrade(upgrade: Upgrade, level: Int) extends Plan {
   
+  val upgraderMatcher = UnitMatchType(upgrade.whatUpgrades)
   val currency = new LockCurrencyForUpgrade(upgrade, level)
   val upgraders = new LockUnits {
     unitCounter.set(UnitCountOne)
-    unitMatcher.set(UnitMatchType(upgrade.whatUpgrades))
+    unitMatcher.set(upgraderMatcher)
   }
   
   description.set("Upgrade " + upgrade + " " + level)
@@ -23,6 +25,7 @@ class ResearchUpgrade(upgrade: Upgrade, level: Int) extends Plan {
   override def onUpdate() {
     if (isComplete) return
     
+    currency.framesAhead = Project.framesToUnits(upgraderMatcher)
     currency.acquire(this)
     currency.isSpent = With.units.ours.exists(upgrader => upgrader.upgrading && upgrader.upgradingType == upgrade)
     if ( ! currency.satisfied) return

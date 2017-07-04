@@ -71,7 +71,7 @@ object BaseFinder {
     val corners = Protoss.Nexus.tileArea.add(tile).cornerPixels
     corners.map(corner =>
       resources.map(resource =>
-        (3 *  resource.gasLeft +
+        (2 *  resource.gasLeft +
               resource.mineralsLeft)
           * resource.pixelDistanceSquared(corner)).sum).min
   }

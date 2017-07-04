@@ -1,17 +1,9 @@
 package Macro.Architecture
 
 import Lifecycle.With
-import Macro.Architecture.Heuristics.EvaluatePlacements
 import Mathematics.Points.{Tile, TileRectangle}
 
 object Architect {
-  
-  def fulfill(blueprint: Blueprint, existingPlacement: Option[Placement]): Placement = {
-    val placementBefore = validate(blueprint, existingPlacement)
-    val placementAfter = if (placementBefore.exists(_.tile.isDefined)) placementBefore.get else place(blueprint)
-    With.architecture.assumePlacement(placementAfter)
-    placementAfter
-  }
   
   def validate(blueprint: Blueprint, placement: Option[Placement]): Option[Placement] = {
     val placementHasTile = placement.exists(_.tile.isDefined)
@@ -65,13 +57,5 @@ object Architect {
         }
       ))
     false
-  }
-  
-  private def place(blueprint: Blueprint): Placement = {
-    EvaluatePlacements.best(
-      blueprint,
-      Surveyor.candidates(blueprint)
-        .filter(canBuild(blueprint, _, recheckPathing = true))
-        .take(With.configuration.maxPlacementsToEvaluate))
   }
 }

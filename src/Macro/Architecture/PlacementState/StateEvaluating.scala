@@ -20,15 +20,19 @@ class StateEvaluating(blueprint: Blueprint) extends PlacementState {
       // Figure out which tiles to evaluate
       candidates = Some(Surveyor.candidates(blueprint).toArray)
     }
-    else if (nextCandidateIndex < candidates.get.length) {
-      // Evaluate them (in small batches)
-      val candidate = candidates.get(nextCandidateIndex)
-      evaluations(candidate) = EvaluatePlacements.evaluate(blueprint, candidate)
-      evaluationValues(candidate) = HeuristicMathMultiplicative.resolve(
-        blueprint,
-        evaluations(candidate),
-        candidate)
-      nextCandidateIndex += 1
+    else if (stillEvaluating) {
+      // Evaluate them (in batches)
+      var evaluationCount = 0
+      while (stillEvaluating && evaluationCount < 100) {
+        evaluationCount += 1
+        val candidate = candidates.get(nextCandidateIndex)
+        evaluations(candidate) = EvaluatePlacements.evaluate(blueprint, candidate)
+        evaluationValues(candidate) = HeuristicMathMultiplicative.resolve(
+          blueprint,
+          blueprint.placement.weightedHeuristics,
+          candidate)
+        nextCandidateIndex += 1
+      }
     }
     else {
       // We've evaluated all the tiles! Return our placement conclusions.
@@ -42,4 +46,6 @@ class StateEvaluating(blueprint: Blueprint) extends PlacementState {
         With.frame)
     }
   }
+  
+  private def stillEvaluating: Boolean = candidates.exists(nextCandidateIndex < _.length)
 }

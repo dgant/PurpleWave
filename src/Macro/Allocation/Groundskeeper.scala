@@ -1,7 +1,7 @@
 package Macro.Allocation
 
 import Lifecycle.With
-import Macro.Architecture.{Architect, Blueprint, BlueprintMatch, Placement}
+import Macro.Architecture.{Blueprint, BlueprintMatch, Placement}
 import Mathematics.Points.Tile
 
 import scala.collection.mutable
@@ -24,22 +24,6 @@ class Groundskeeper {
     proposalPlacements.keySet.diff(updated).foreach(removeBlueprint)
     requirementMatches.map(_.requirement).diff(updated).foreach(removeBlueprint)
     updated.clear()
-  }
-  
-  def placeBuildings() {
-    var newSearches = 0
-    With.architecture.reboot()
-    proposalQueue
-      .foreach(blueprint =>
-        if (With.performance.continueRunning && newSearches < With.configuration.maxPlacementsToEvaluate) {
-          val placementBefore = proposalPlacements.get(blueprint)
-          if (placementBefore.isEmpty) {
-            newSearches += 1
-          }
-          indicatePlacementAttempt(blueprint)
-          val placementAfter = Architect.fulfill(blueprint, placementBefore)
-          proposalPlacements.put(blueprint, placementAfter)
-        })
   }
   
   def indicatePlacementAttempt(blueprint: Blueprint) {

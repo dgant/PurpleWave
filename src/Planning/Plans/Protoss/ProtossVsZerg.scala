@@ -1,14 +1,15 @@
-package Planning.Plans.GamePlans.Protoss
+package Planning.Plans.Protoss
 
 import Macro.BuildRequests.Request
 import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors}
 import Planning.Plans.Army._
 import Planning.Plans.Compound.{If, _}
-import Planning.Plans.Information.ScoutAt
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildAssimilators, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.UnitsAtLeast
+import Planning.Plans.Protoss.Situational.ForgeFastExpand
+import Planning.Plans.Scouting.ScoutAt
 import ProxyBwapi.Races.Protoss
 
 class ProtossVsZerg extends Parallel {
@@ -49,7 +50,7 @@ class ProtossVsZerg extends Parallel {
   
   children.set(Vector(
     new RequireMiningBases(1),
-    new ProposeForgeFastExpand,
+    new ForgeFastExpand,
     new FiveGateGoon_Start,
     new RequireMiningBases(2),
     new RequireSufficientPylons,

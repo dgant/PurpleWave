@@ -1,4 +1,4 @@
-package Planning.Plans.Information
+package Planning.Plans.Scouting
 
 import Planning.Plans.Compound.If
 import Planning.Plans.Macro.Milestones.SupplyAtLeastDoubleThis

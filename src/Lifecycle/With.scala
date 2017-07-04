@@ -13,7 +13,7 @@ import Macro.Architecture.Architecture
 import Micro.Intent.Commander
 import Micro.Execution.Executor
 import Performance.TaskQueue.{AbstractTaskQueue, TaskQueueGlobal}
-import Planning.Plans.GamePlans.WinTheGame
+import Planning.Plans.WinTheGame
 import ProxyBwapi.Players.{PlayerInfo, Players}
 import ProxyBwapi.ProxyBWMirror
 import ProxyBwapi.UnitTracking.UnitTracker

@@ -1,4 +1,4 @@
-package Planning.Plans.GamePlans.Protoss
+package Planning.Plans.Protoss.Situational
 
 import Lifecycle.With
 import Macro.Architecture.Blueprint
@@ -7,7 +7,7 @@ import Planning.Plans.Compound.Parallel
 import Planning.Plans.Macro.Build.ProposePlacement
 import ProxyBwapi.Races.Protoss
 
-class ProposeForgeFastExpand extends Parallel {
+class ForgeFastExpand extends Parallel {
   
   override def onUpdate(): Unit = {
     children.set(proposals)

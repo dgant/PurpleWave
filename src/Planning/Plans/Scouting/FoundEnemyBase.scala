@@ -1,7 +1,7 @@
-package Planning.Plans.Information
+package Planning.Plans.Scouting
 
-import Planning.Plan
 import Lifecycle.With
+import Planning.Plan
 
 class FoundEnemyBase extends Plan {
   

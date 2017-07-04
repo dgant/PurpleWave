@@ -1,4 +1,4 @@
-package Planning.Plans.GamePlans.Protoss
+package Planning.Plans.Protoss
 
 import Lifecycle.With
 import Planning.Composition.UnitMatchers.UnitMatchType

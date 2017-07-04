@@ -1,14 +1,14 @@
-package Planning.Plans.GamePlans.Protoss
+package Planning.Plans.Protoss
 
 import Macro.BuildRequests.{RequestUnitAtLeast, _}
 import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Plans.Army.ConsiderAttacking
 import Planning.Plans.Compound.{And, If, Or, Parallel}
-import Planning.Plans.Information.{ScoutAt, ScoutExpansionsAt}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildAssimilators, MatchMiningBases, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.{EnemyUnitsAtLeast, HaveUpgrade, UnitsAtLeast}
+import Planning.Plans.Scouting.{ScoutAt, ScoutExpansionsAt}
 import ProxyBwapi.Races.Protoss
 
 class ProtossVsProtoss extends Parallel {

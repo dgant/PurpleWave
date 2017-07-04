@@ -1,4 +1,4 @@
-package Planning.Plans.GamePlans.Protoss
+package Planning.Plans.Protoss
 
 import Macro.BuildRequests.{BuildRequest, RequestUnitAtLeast, RequestUpgradeLevel}
 import ProxyBwapi.Races.Protoss

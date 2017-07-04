@@ -1,4 +1,4 @@
-package Planning.Plans.Information
+package Planning.Plans.Scouting
 
 import Lifecycle.With
 import Mathematics.Points.Pixel

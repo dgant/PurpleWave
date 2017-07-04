@@ -12,7 +12,7 @@ class Groundskeeper {
   val proposals             : mutable.Set[Blueprint]             = new mutable.HashSet[Blueprint]
   val proposalPlacements    : mutable.Map[Blueprint, Placement]  = new mutable.HashMap[Blueprint, Placement]
   val lastPlacementAttempt  : mutable.Map[Blueprint, Int]        = new mutable.HashMap[Blueprint, Int]
-  val requirementMatches    : mutable.Set[BlueprintMatch]         = new mutable.HashSet[BlueprintMatch]
+  val requirementMatches    : mutable.Set[BlueprintMatch]        = new mutable.HashSet[BlueprintMatch]
   val proposalsFulfilled    : mutable.Set[Blueprint]             = new mutable.HashSet[Blueprint]
   
   ///////////
@@ -20,51 +20,33 @@ class Groundskeeper {
   ///////////
   
   def update() {
-    proposals.diff(updated).foreach(removeDescriptor)
-    proposalPlacements.keySet.diff(updated).foreach(removeDescriptor)
-    requirementMatches.map(_.requirement).diff(updated).foreach(removeDescriptor)
+    proposals.diff(updated).foreach(removeBlueprint)
+    proposalPlacements.keySet.diff(updated).foreach(removeBlueprint)
+    requirementMatches.map(_.requirement).diff(updated).foreach(removeBlueprint)
     updated.clear()
   }
   
   def placeBuildings() {
     var newSearches = 0
     With.architecture.reboot()
-    proposalsInUpdateOrder
-      .foreach(descriptor =>
+    proposalQueue
+      .foreach(blueprint =>
         if (With.performance.continueRunning && newSearches < With.configuration.maxPlacementsToEvaluate) {
-          val placementBefore = proposalPlacements.get(descriptor)
+          val placementBefore = proposalPlacements.get(blueprint)
           if (placementBefore.isEmpty) {
             newSearches += 1
           }
-          lastPlacementAttempt(descriptor) = With.frame
-          val placementAfter = Architect.fulfill(descriptor, placementBefore)
-          proposalPlacements.put(descriptor, placementAfter)
-          
-          // For debugging only!
-          val tileBefore  = placementBefore.flatMap(_.tile)
-          val tileAfter   = placementAfter.tile
-          if (tileBefore != tileAfter) {
-            if (tileBefore.isDefined) {
-              val putBreakpointHere1 = 12345
-            }
-            val putBreakpointHere2 = 12345
-          }
-          if (tileAfter.isEmpty) {
-            val putBreakpointHere3 = 12345
-          }
+          indicatePlacementAttempt(blueprint)
+          val placementAfter = Architect.fulfill(blueprint, placementBefore)
+          proposalPlacements.put(blueprint, placementAfter)
         })
   }
   
-  private def removeDescriptor(descriptor: Blueprint) {
-    proposals.remove(descriptor)
-    proposalPlacements.remove(descriptor)
-    lastPlacementAttempt.remove(descriptor)
-    requirementMatches
-      .filter(m => m.requirement == descriptor || m.proposal == descriptor)
-      .foreach(requirementMatches.remove)
+  def indicatePlacementAttempt(blueprint: Blueprint) {
+    lastPlacementAttempt(blueprint) = With.frame
   }
   
-  private def proposalsInUpdateOrder: Iterable[Blueprint] = {
+  def proposalQueue: Iterable[Blueprint] = {
     // Verify existing placements
     // in priority order (top priority first)
     // Then place upcoming proposals
@@ -115,9 +97,9 @@ class Groundskeeper {
   }
   
   def flagFulfilled(requirement: Blueprint) {
-    val proposal = getRepresentativeDescriptorForRequirement(requirement)
-    removeDescriptor(requirement)
-    removeDescriptor(proposal)
+    val proposal = getRepresentativeBlueprintForRequirement(requirement)
+    removeBlueprint(requirement)
+    removeBlueprint(proposal)
     proposalsFulfilled.add(requirement)
     proposalsFulfilled.add(proposal)
   }
@@ -126,16 +108,25 @@ class Groundskeeper {
   // Internal //
   //////////////
   
-  private def flagUpdated(descriptor: Blueprint) {
-    updated.add(descriptor)
+  private def flagUpdated(blueprint: Blueprint) {
+    updated.add(blueprint)
   }
   
   private def addProposal(proposal: Blueprint) {
     proposals.add(proposal)
   }
   
+  private def removeBlueprint(blueprint: Blueprint) {
+    proposals.remove(blueprint)
+    proposalPlacements.remove(blueprint)
+    lastPlacementAttempt.remove(blueprint)
+    requirementMatches
+      .filter(m => m.requirement == blueprint || m.proposal == blueprint)
+      .foreach(requirementMatches.remove)
+  }
+  
   private def addRequirement(requirement: Blueprint) {
-    val proposal = getRepresentativeDescriptorForRequirement(requirement)
+    val proposal = getRepresentativeBlueprintForRequirement(requirement)
     if (proposal == requirement) {
       addProposal(requirement)
     }
@@ -148,7 +139,7 @@ class Groundskeeper {
     proposal.flatMap(proposalPlacements.get).flatMap(_.tile)
   }
   
-  private def getRepresentativeDescriptorForRequirement(requirement: Blueprint): Blueprint = {
+  private def getRepresentativeBlueprintForRequirement(requirement: Blueprint): Blueprint = {
     findProposalAlreadyMatchedWithRequirement(requirement)
       .orElse(findProposalToMatchWithRequirement(requirement))
       .getOrElse(requirement)
@@ -165,6 +156,6 @@ class Groundskeeper {
   }
   
   private def unfulfillProposalForRequirement(requirement: Blueprint) {
-    proposalsFulfilled.remove(getRepresentativeDescriptorForRequirement(requirement))
+    proposalsFulfilled.remove(getRepresentativeBlueprintForRequirement(requirement))
   }
 }

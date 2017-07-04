@@ -21,7 +21,7 @@ class Architecture {
   val untownhallable  : mutable.Set[Tile]                         = new mutable.HashSet[Tile]
   val powered2Height  : mutable.Set[Tile]                         = new mutable.HashSet[Tile]
   val powered3Height  : mutable.Set[Tile]                         = new mutable.HashSet[Tile]
-  val existingPaths   : mutable.HashMap[Edge, TilePathCache]  = new mutable.HashMap[Edge, TilePathCache]
+  val existingPaths   : mutable.HashMap[Edge, TilePathCache]      = new mutable.HashMap[Edge, TilePathCache]
   
   class TilePathCache {
     var path  : Option[TilePath]  = None

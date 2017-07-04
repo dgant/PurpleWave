@@ -45,6 +45,7 @@ object Architect {
     
     true
   }
+  
   private def intersectsUnits(blueprint: Blueprint, buildArea: TileRectangle): Boolean = {
     if (blueprint.gas) return false
     var totalWorkers = 0

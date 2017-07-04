@@ -8,6 +8,6 @@ class TaskArchitecture extends AbstractTask {
   urgency = With.configuration.urgencyBuildingPlacement
   
   override protected def onRun() {
-    With.groundskeeper.placeBuildings()
+    With.placement.run()
   }
 }

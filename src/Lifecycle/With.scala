@@ -9,7 +9,7 @@ import Information.Grids.Grids
 import Information._
 import Macro.Allocation._
 import Macro.Scheduling.Scheduler
-import Macro.Architecture.Architecture
+import Macro.Architecture.{Architecture, PlacementScheduler}
 import Micro.Intent.Commander
 import Micro.Execution.Executor
 import Performance.TaskQueue.{AbstractTaskQueue, TaskQueueGlobal}
@@ -44,6 +44,7 @@ object With {
   var logger          : Logger              = _
   var paths           : Paths               = _
   var performance     : PerformanceMonitor  = _
+  var placement       : PlacementScheduler  = _
   var proxy           : ProxyBWMirror       = _
   var prioritizer     : Prioritizer         = _
   var recruiter       : Recruiter           = _
@@ -98,6 +99,7 @@ object With {
     latency           = new Latency
     paths             = new Paths
     performance       = new PerformanceMonitor
+    placement         = new PlacementScheduler
     prioritizer       = new Prioritizer
     recruiter         = new Recruiter
     scheduler         = new Scheduler

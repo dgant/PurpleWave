@@ -60,7 +60,8 @@ class StateEvaluating(blueprint: Blueprint) extends PlacementState {
         evaluations.values.flatten,
         evaluationValuesMap,
         With.frame)
-      With.groundskeeper.updateplacement(blueprint, placement)
+      With.groundskeeper.updatePlacement(blueprint, placement)
+      transition(new StateComplete)
     }
   }
   

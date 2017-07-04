@@ -30,7 +30,7 @@ class Groundskeeper {
     lastPlacementAttempt(blueprint) = With.frame
   }
   
-  def updateplacement(blueprint: Blueprint, placement: Placement) {
+  def updatePlacement(blueprint: Blueprint, placement: Placement) {
     proposalPlacements.put(blueprint, placement)
   }
   

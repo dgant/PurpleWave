@@ -2,36 +2,52 @@ package Macro.Architecture.PlacementState
 
 import Lifecycle.With
 import Macro.Architecture.Heuristics.{EvaluatePlacements, PlacementHeuristicEvaluation}
-import Macro.Architecture.{Blueprint, Placement, Surveyor}
+import Macro.Architecture.{Architect, Blueprint, Placement, Surveyor}
 import Mathematics.Heuristics.HeuristicMathMultiplicative
 import Mathematics.Points.Tile
 
 import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 
 class StateEvaluating(blueprint: Blueprint) extends PlacementState {
   
-  private var candidates          : Option[Array[Tile]] = None
-  private var nextCandidateIndex  : Int                 = 0
+  private var candidatesUnfiltered  : Option[Array[Tile]]       = None
+  private var candidatesFiltered    : Option[ArrayBuffer[Tile]] = None
+  private var nextFilteringIndex    : Int                       = 0
+  private var nextEvaluationIndex   : Int                       = 0
   private val evaluations       = new mutable.HashMap[Tile, Iterable[PlacementHeuristicEvaluation]]
   private val evaluationValues  = new mutable.HashMap[Tile, Double]
   
   override def step() {
-    if (candidates.isEmpty) {
+    if (candidatesUnfiltered.isEmpty) {
       // Figure out which tiles to evaluate
-      candidates = Some(Surveyor.candidates(blueprint).toArray)
+      candidatesUnfiltered  = Some(Surveyor.candidates(blueprint).toArray)
+      candidatesFiltered    = Some(new ArrayBuffer[Tile])
+    }
+    else if (stillFiltering) {
+      // Filter them (in batches)
+      var evaluationCount = 0
+      while (stillFiltering && evaluationCount < With.configuration.placementBatchSize) {
+        evaluationCount += 1
+        val nextCandidate = candidatesUnfiltered.get(nextFilteringIndex)
+        if (Architect.canBuild(blueprint, nextCandidate)) {
+          candidatesFiltered.get += nextCandidate
+        }
+        nextFilteringIndex += 1
+      }
     }
     else if (stillEvaluating) {
       // Evaluate them (in batches)
       var evaluationCount = 0
-      while (stillEvaluating && evaluationCount < 100) {
+      while (stillEvaluating && evaluationCount < With.configuration.placementBatchSize) {
         evaluationCount += 1
-        val candidate = candidates.get(nextCandidateIndex)
+        val candidate = candidatesFiltered.get(nextEvaluationIndex)
         evaluations(candidate) = EvaluatePlacements.evaluate(blueprint, candidate)
         evaluationValues(candidate) = HeuristicMathMultiplicative.resolve(
           blueprint,
           blueprint.placement.weightedHeuristics,
           candidate)
-        nextCandidateIndex += 1
+        nextEvaluationIndex += 1
       }
     }
     else {
@@ -44,8 +60,10 @@ class StateEvaluating(blueprint: Blueprint) extends PlacementState {
         evaluations.values.flatten,
         evaluationValuesMap,
         With.frame)
+      With.groundskeeper.updateplacement(blueprint, placement)
     }
   }
   
-  private def stillEvaluating: Boolean = candidates.exists(nextCandidateIndex < _.length)
+  private def stillFiltering  : Boolean = candidatesUnfiltered.exists(nextFilteringIndex < _.length)
+  private def stillEvaluating : Boolean = candidatesFiltered.exists(nextEvaluationIndex < _.length)
 }

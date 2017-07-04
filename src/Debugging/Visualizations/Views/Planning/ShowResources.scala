@@ -1,10 +1,11 @@
 package Debugging.Visualizations.Views.Planning
 
 import Debugging.Visualizations.Rendering.DrawScreen
+import Debugging.Visualizations.Views.View
 import Lifecycle.With
 
-object ScreenResources {
-  def render() {
+object ShowResources extends View {
+  override def renderScreen() {
     DrawScreen.table(
       285,
       31,

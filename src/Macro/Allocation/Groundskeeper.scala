@@ -30,6 +30,10 @@ class Groundskeeper {
     lastPlacementAttempt(blueprint) = With.frame
   }
   
+  def updateplacement(blueprint: Blueprint, placement: Placement) {
+    proposalPlacements.put(blueprint, placement)
+  }
+  
   def proposalQueue: Iterable[Blueprint] = {
     // Verify existing placements
     // in priority order (top priority first)

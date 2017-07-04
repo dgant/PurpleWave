@@ -59,6 +59,7 @@ class Configuration {
   // Performance //
   /////////////////
   
+  var placementBatchSize            = 500
   var garbageCollectionThresholdMs  = 5
   var peformanceFrameMilliseconds   = 20
   var initialTaskLengthMilliseconds = 20

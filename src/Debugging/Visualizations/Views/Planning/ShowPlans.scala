@@ -1,11 +1,21 @@
 package Debugging.Visualizations.Views.Planning
 
+import Debugging.Visualizations.Views.View
 import Lifecycle.With
 import Planning.Plan
 
-object ScreenPlans {
+object ShowPlans extends View {
   
-  def render() {
+  override def renderMap() {
+    drawPlansRecursively(With.gameplan)
+  }
+  
+  private def drawPlansRecursively(plan: Plan) {
+    plan.visualize()
+    plan.getChildren.filter(isRelevant).foreach(drawPlansRecursively)
+  }
+  
+  override def renderScreen() {
     describePlanTree(With.gameplan, 0, 0)
       .zipWithIndex
       .foreach(pair => With.game.drawTextScreen(0, pair._2 * With.visualization.lineHeightSmall, pair._1))

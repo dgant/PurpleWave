@@ -19,7 +19,6 @@ object Architect {
   
     if (placementHasTile && placementIsFresh) {
       if (canBuild(blueprint, placement.get.tile.get, recheckPathing = false)) {
-        With.architecture.assumePlacement(placement.get)
         return placement
       }
     }

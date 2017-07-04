@@ -40,16 +40,20 @@ class Groundskeeper {
     // Then place upcoming proposals
     // ordered by time since last attempt at placement
     // then by priority
-    val placed = proposalPlacements.filter(_._2.tile.isDefined).keySet
+    val placed = proposalPlacements.filter(pair => pair._2.tile.isDefined).keySet
     val unplaced = proposals.diff(placed)
     val ordered =
       placed
+        .filter(_.proposer.isPrioritized)
         .toVector
         .sortBy(_.proposer.priority) ++
       unplaced
+        .filter(_.proposer.isPrioritized)
         .toVector
         .sortBy(_.proposer.priority)
         .sortBy(lastPlacementAttempt.getOrElse(_, 0))
+        .take(With.configuration.buildingPlacementMaximumQueue)
+    
     ordered
   }
   

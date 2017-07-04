@@ -34,5 +34,6 @@ class Plan {
     if (name.contains("$anon$")) "" else name
   }
   
+  def isPrioritized: Boolean = With.prioritizer.isPrioritized(this)
   def priority: Int = With.prioritizer.getPriority(this)
 }

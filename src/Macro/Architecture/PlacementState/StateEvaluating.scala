@@ -27,7 +27,7 @@ class StateEvaluating(blueprint: Blueprint) extends PlacementState {
     else if (stillFiltering) {
       // Filter them (in batches)
       var evaluationCount = 0
-      while (stillFiltering && evaluationCount < With.configuration.placementBatchSize) {
+      while (stillFiltering && evaluationCount < With.configuration.buildingPlacementBatchSize) {
         evaluationCount += 1
         val nextCandidate = candidatesUnfiltered.get(nextFilteringIndex)
         if (Architect.canBuild(blueprint, nextCandidate)) {
@@ -39,7 +39,7 @@ class StateEvaluating(blueprint: Blueprint) extends PlacementState {
     else if (stillEvaluating) {
       // Evaluate them (in batches)
       var evaluationCount = 0
-      while (stillEvaluating && evaluationCount < With.configuration.placementBatchSize) {
+      while (stillEvaluating && evaluationCount < With.configuration.buildingPlacementBatchSize) {
         evaluationCount += 1
         val candidate = candidatesFiltered.get(nextEvaluationIndex)
         evaluations(candidate) = EvaluatePlacements.evaluate(blueprint, candidate)

@@ -104,7 +104,7 @@ object BaseFinder {
         output += base.startInclusive
     
         // Real lazy -- just remove all conflicting candidates (instead of, say, picking the best one or something)
-        val conflicts = basesLeft.filter(_.intersects(base))
+        val conflicts = basesLeft.filter(_.midPixel.pixelDistanceFast(base.midPixel) < With.configuration.baseMergingRangePixels)
         basesLeft --= conflicts
     })
     

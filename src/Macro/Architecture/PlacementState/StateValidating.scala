@@ -5,7 +5,6 @@ import Macro.Architecture.{Architect, Blueprint}
 
 class StateValidating(blueprint: Blueprint) extends PlacementState {
   override def step() {
-    With.groundskeeper.indicatePlacementAttempt(blueprint)
     val placement = placements.get(blueprint)
     
     val validatedPlacement = Architect.validate(blueprint, placement)

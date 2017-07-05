@@ -11,9 +11,10 @@ class Groundskeeper {
   val updated               : mutable.Set[Blueprint]             = new mutable.HashSet[Blueprint]
   val proposals             : mutable.Set[Blueprint]             = new mutable.HashSet[Blueprint]
   val proposalPlacements    : mutable.Map[Blueprint, Placement]  = new mutable.HashMap[Blueprint, Placement]
-  val lastPlacementAttempt  : mutable.Map[Blueprint, Int]        = new mutable.HashMap[Blueprint, Int]
   val requirementMatches    : mutable.Set[BlueprintMatch]        = new mutable.HashSet[BlueprintMatch]
   val proposalsFulfilled    : mutable.Set[Blueprint]             = new mutable.HashSet[Blueprint]
+  
+  private var nextId: Int = 0
   
   ///////////
   // Tasks //
@@ -24,10 +25,6 @@ class Groundskeeper {
     proposalPlacements.keySet.diff(updated).foreach(removeBlueprint)
     requirementMatches.map(_.requirement).diff(updated).foreach(removeBlueprint)
     updated.clear()
-  }
-  
-  def indicatePlacementAttempt(blueprint: Blueprint) {
-    lastPlacementAttempt(blueprint) = With.frame
   }
   
   def updatePlacement(blueprint: Blueprint, placement: Placement) {
@@ -46,12 +43,13 @@ class Groundskeeper {
       placed
         .filter(_.proposer.isPrioritized)
         .toVector
+        .sortBy(_.id)
         .sortBy(_.proposer.priority) ++
       unplaced
         .filter(_.proposer.isPrioritized)
         .toVector
+        .sortBy(_.id)
         .sortBy(_.proposer.priority)
-        .sortBy(lastPlacementAttempt.getOrElse(_, 0))
         .take(With.configuration.buildingPlacementMaximumQueue)
     
     ordered
@@ -68,6 +66,7 @@ class Groundskeeper {
   */
   def propose(proposal: Blueprint) {
     if (proposalsFulfilled.contains(proposal)) return
+    tagWithId(proposal)
     flagUpdated(proposal)
     addProposal(proposal)
   }
@@ -83,9 +82,17 @@ class Groundskeeper {
    */
   def require(requirement: Blueprint): Option[Tile] = {
     unfulfillProposalForRequirement(requirement)
+    tagWithId(requirement)
     flagUpdated(requirement)
     addRequirement(requirement)
     getTileForRequirement(requirement)
+  }
+  
+  def tagWithId(blueprint: Blueprint) {
+    if (blueprint.id.isEmpty) {
+      blueprint.id = Some(nextId)
+      nextId += 1
+    }
   }
   
   def flagFulfilled(requirement: Blueprint) {
@@ -111,7 +118,6 @@ class Groundskeeper {
   private def removeBlueprint(blueprint: Blueprint) {
     proposals.remove(blueprint)
     proposalPlacements.remove(blueprint)
-    lastPlacementAttempt.remove(blueprint)
     requirementMatches
       .filter(m => m.requirement == blueprint || m.proposal == blueprint)
       .foreach(requirementMatches.remove)

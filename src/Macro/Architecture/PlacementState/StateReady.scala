@@ -6,7 +6,8 @@ class StateReady extends PlacementState {
       transition(new StateComplete)
     }
     else {
-      transition(new StateValidating(queue.dequeue()))
+      val nextBlueprint = queue.dequeue()
+      transition(new StateValidating(nextBlueprint))
     }
   }
 }

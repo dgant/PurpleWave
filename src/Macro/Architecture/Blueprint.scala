@@ -22,6 +22,7 @@ class Blueprint(
   argRangePixels  : Option[Double]            = None,
   val zone        : Option[Zone]              = None) {
   
+  var id: Option[Int] = None
   val frameCreated: Int = With.frame
   
   val width       : Int               = argWidth        .orElse(building.map(_.tileWidth)).getOrElse(1)

@@ -1,7 +1,7 @@
 package Debugging.Visualizations
 
 import Debugging.Visualizations.Views.Fun.{ShowHappyVision, ShowTextOnly}
-import Debugging.Visualizations.Views.Geography.ShowGroundskeeperQueue
+import Debugging.Visualizations.Views.Geography.{ShowArchitecture, ShowGroundskeeperQueue}
 import Lifecycle.With
 
 import scala.util.Random
@@ -20,7 +20,8 @@ class Visualization {
     ShowClock,
     ShowPerformance
     */
-    ShowGroundskeeperQueue
+    ShowGroundskeeperQueue,
+    ShowArchitecture
   )
   
   var enabled   = true

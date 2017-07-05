@@ -1,7 +1,8 @@
 package Debugging.Visualizations
 
 import Debugging.Visualizations.Views.Fun.{ShowHappyVision, ShowTextOnly}
-import Debugging.Visualizations.Views.Geography.{ShowArchitecture, ShowGroundskeeperQueue}
+import Debugging.Visualizations.Views.Performance.ShowPerformance
+import Debugging.Visualizations.Views.ShowClock
 import Lifecycle.With
 
 import scala.util.Random
@@ -11,17 +12,8 @@ class Visualization {
   val lineHeightSmall = 9
   
   private val views = Vector(
-    /*
-    ShowZones,
-    ShowBases,
-    ShowUnits,
-    ShowUnitsForeign,
-    ShowUnitsOurs,
-    ShowClock,
-    ShowPerformance
-    */
-    ShowGroundskeeperQueue,
-    ShowArchitecture
+    ShowPerformance,
+    ShowClock
   )
   
   var enabled   = true

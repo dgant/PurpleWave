@@ -28,7 +28,7 @@ object ShowPerformance extends View {
     val title = Vector("Cutoff: ", With.configuration.initialTaskLengthMilliseconds + "ms")
     val headers = Vector("System", "Last run", "Total runs", "Total skips", "Avg ms", "Max (Recent)", "Max (All time)", "Threshold :(", "Rules :(")
     val body = With.tasks.tasks
-      .sortBy(_.getClass.getSimpleName + "  ")
+      .sortBy(_.getClass.getSimpleName)
       .map(task => Vector(
         task.getClass.getSimpleName.replace("Task", ""),
         "X" * Math.min(10, Math.max(0, task.framesSinceRunning - 1)),

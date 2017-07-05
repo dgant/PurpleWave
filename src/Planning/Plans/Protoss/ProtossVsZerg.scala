@@ -49,8 +49,8 @@ class ProtossVsZerg extends Parallel {
   private val earlyZealotCount = 8
   
   children.set(Vector(
-    new RequireMiningBases(1),
     new ForgeFastExpand,
+    new RequireMiningBases(1),
     new FiveGateGoon_Start,
     new RequireMiningBases(2),
     new RequireSufficientPylons,

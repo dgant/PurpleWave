@@ -26,36 +26,10 @@ object Architect {
       return false
     }
     
-    if (intersectsUnits(blueprint, buildArea)) {
-      return false
-    }
-    
     if (With.configuration.verifyBuildingsDontBreakPaths && ! blueprint.margin && recheckPathing && With.architecture.breaksPathing(buildArea)) {
       return false
     }
     
     true
-  }
-  
-  private def intersectsUnits(blueprint: Blueprint, buildArea: TileRectangle): Boolean = {
-    if (blueprint.gas) return false
-    var totalWorkers = 0
-    buildArea.tiles.foreach(tile =>
-      With.grids.units.get(tile).foreach(unit =>
-        if (unit.targetPixel.exists(targetPixel => ! buildArea.contains(targetPixel.tileIncluding))) {
-          //This is fine. Right?
-          //We want to be a little lenient about units being in the way because otherwise we often refuse to take our natural
-        }
-        else if (unit.isOurs && unit.unitClass.isWorker) {
-          totalWorkers += 1
-          if (totalWorkers > 1) {
-            return true
-          }
-        }
-        else if ( ! unit.flying) {
-          return true
-        }
-      ))
-    false
   }
 }

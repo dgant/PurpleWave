@@ -4,11 +4,13 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Planning.Plan
 
-class ProposePlacement(buildingDescriptor: Blueprint) extends Plan {
+class ProposePlacement extends Plan {
   
-  description.set("Propose placing " + buildingDescriptor)
+  description.set("Propose blueprints")
+  
+  lazy val blueprints: Iterable[Blueprint] = Iterable.empty
   
   override def onUpdate() {
-    With.groundskeeper.propose(buildingDescriptor)
+    blueprints.foreach(With.groundskeeper.propose)
   }
 }

@@ -41,9 +41,9 @@ class Configuration {
   var baseRadiusPixels                = 32.0 * 12.0
   var baseMergingRangePixels          = 32.0 * 8.0
   var blockerMineralThreshold         = 50
-  var maxPlacementAge                 = 99999 * 24 * 20
+  var maxPlacementAge                 = 24 * 60 * 5
   var maxScarabCount                  = 3
-  var enableTightBuildingPlacement     = false
+  var enableTightBuildingPlacement    = true //Turning this off breaks FFE!
   
   /////////////
   // Battles //
@@ -74,7 +74,7 @@ class Configuration {
   var urgencyManners            = 1
   var urgencyEconomy            = 1
   var urgencyGeography          = 1
-  var urgencyArchitecture  = 1
+  var urgencyArchitecture       = 1
   var urgencyPlanning           = 2
   var urgencyBattles            = 3
   var urgencyGrids              = 5

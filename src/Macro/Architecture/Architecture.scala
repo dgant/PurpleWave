@@ -72,7 +72,9 @@ class Architecture {
   }
   
   def walkable(tile: Tile): Boolean = {
-    With.grids.walkable.get(tile) && ! unwalkable.contains(tile)
+    With.grids.walkable.get(tile) &&
+      ! unwalkable.contains(tile) &&
+      ! tile.zone.bases.exists(_.townHallArea.contains(tile))
   }
   
   def breaksPathing(blockedArea: TileRectangle): Boolean = {
@@ -83,9 +85,7 @@ class Architecture {
     //
     // So let's check this every time, but really focus on making it an inexpensive check
     
-    
-    // CIG 2017 deadline is coming up and this is going to single-handedly disqualify us from every game :(.
-    //
+
     if ( ! With.configuration.verifyBuildingsDontBreakPaths) {
       return false
     }

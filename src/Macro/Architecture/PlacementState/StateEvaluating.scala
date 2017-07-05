@@ -42,7 +42,9 @@ class StateEvaluating(blueprint: Blueprint) extends PlacementState {
       while (stillEvaluating && evaluationCount < With.configuration.buildingPlacementBatchSize) {
         evaluationCount += 1
         val candidate = candidatesFiltered.get(nextEvaluationIndex)
-        evaluations(candidate) = EvaluatePlacements.evaluate(blueprint, candidate)
+        if (With.visualization.enabled) {
+          evaluations(candidate) = EvaluatePlacements.evaluate(blueprint, candidate)
+        }
         evaluationValues(candidate) = HeuristicMathMultiplicative.resolve(
           blueprint,
           blueprint.placement.weightedHeuristics,

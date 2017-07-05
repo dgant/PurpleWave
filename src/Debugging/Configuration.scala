@@ -67,7 +67,7 @@ class Configuration {
   var performanceMinimumUnitSleep   = 2
   var performanceMicroAngleStep     = 4
   var useFastGroundDistance         = true
-  var verifyBuildingsDontBreakPaths = false
+  var verifyBuildingsDontBreakPaths = true
   var unitHistoryAge                = 24 * 3
   var buildingPlacements            = 5
   

@@ -1,7 +1,8 @@
 package Debugging.Visualizations
 
 import Debugging.Visualizations.Views.Fun.{ShowHappyVision, ShowTextOnly}
-import Debugging.Visualizations.Views.Performance.ShowPerformance
+import Debugging.Visualizations.Views.Geography.{ShowArchitecture, ShowArchitecturePaths, ShowBases, ShowGroundskeeperQueue}
+import Debugging.Visualizations.Views.Performance.ShowPerformanceSummary
 import Debugging.Visualizations.Views.ShowClock
 import Lifecycle.With
 
@@ -12,7 +13,11 @@ class Visualization {
   val lineHeightSmall = 9
   
   private val views = Vector(
-    ShowPerformance,
+    ShowBases,
+    ShowGroundskeeperQueue,
+    ShowArchitecture,
+    ShowArchitecturePaths,
+    ShowPerformanceSummary,
     ShowClock
   )
   

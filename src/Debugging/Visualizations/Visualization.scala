@@ -1,7 +1,8 @@
 package Debugging.Visualizations
 
 import Debugging.Visualizations.Views.Fun.{ShowHappyVision, ShowTextOnly}
-import Debugging.Visualizations.Views.Geography.{ShowBases, ShowGroundskeeperQueue}
+import Debugging.Visualizations.Views.Geography.ShowBases
+import Debugging.Visualizations.Views.Micro.{ShowUnits, ShowUnitsForeign, ShowUnitsFriendly}
 import Debugging.Visualizations.Views.Performance.ShowPerformanceSummary
 import Debugging.Visualizations.Views.ShowClock
 import Lifecycle.With
@@ -14,7 +15,9 @@ class Visualization {
   
   private val views = Vector(
     ShowBases,
-    ShowGroundskeeperQueue,
+    ShowUnits,
+    ShowUnitsForeign,
+    ShowUnitsFriendly,
     ShowPerformanceSummary,
     ShowClock
   )

@@ -2,6 +2,7 @@ package Micro.Actions.Combat
 
 import Lifecycle.With
 import Micro.Actions.Action
+import Micro.Actions.Basic.MineralWalk
 import Micro.Actions.Commands.Attack
 import Micro.Execution.ActionState
 
@@ -18,8 +19,6 @@ object Smorc extends Action {
     * Otherwise, kite the worker closest to the exit
      */
     
-    // Do not throw away your shot.
-    Potshot.delegate(state)
     if ( ! stillReady(state)) return
     
     var attack            = true
@@ -35,6 +34,11 @@ object Smorc extends Action {
       attack = false
     }
     
+    // Don't take losing fights
+    if (enemies.count(_.isBeingViolentTo(state.unit)) > 1) {
+      attack = false
+    }
+    
     // If we completely overpower the enemy, let's go kill 'em.
     if (allyFighters.size * allyFighters.map(_.totalHealth).sum > enemies.size * enemies.map(_.totalHealth).sum) {
       attack = true
@@ -43,31 +47,40 @@ object Smorc extends Action {
     val zone = state.toTravel.get.zone
     val exit = zone.exit.map(_.centerPixel).getOrElse(With.geography.home.pixelCenter)
     if (attack) {
+      
       // Ignore units outside their bases
       // TODO: If they're pushing us out of their base we should fight back
       val targets = With.units.enemy.filter(unit => unit.pixelCenter.zone == zone && unit.canAttackThisSecond)
       if (targets.isEmpty) {
         destroyBuildings(state)
       }
+      else if (state.unit.canAttackThisFrame) {
+        state.toAttack = Some(targets.minBy(target => target.pixelDistanceFast(state.unit) + 5.0 * target.pixelDistanceFast(exit)))
+        Attack.consider(state)
+      }
       else {
-        state.toAttack = Some(targets.minBy(_.pixelDistanceFast(exit)))
-        Attack.delegate(state)
+        mineralWalkAway(state)
       }
     }
     else {
       // Hang out if we can
       if (enemies.exists(_.isBeingViolentTo(state.unit)) || enemies.exists(_.pixelDistanceFast(exit) < state.unit.pixelDistanceFast(exit))) {
-        Retreat.delegate(state)
+        Retreat.consider(state)
       } else {
-        destroyBuildings(state)
-        
+        HoverOutsideRange.consider(state)
       }
     }
+  }
+  
+  private def mineralWalkAway(state: ActionState) {
+    state.toGather = With.geography.ourBases.flatMap(_.minerals).headOption
+    MineralWalk.consider(state)
+    HoverOutsideRange.consider(state)
   }
   
   private def destroyBuildings(state: ActionState) {
     val freebies = state.targets.filter( ! _.canAttackThisSecond(state.unit)).toList.sortBy(_.pixelDistanceFast(state.toTravel.get))
     state.toAttack = freebies.headOption
-    Attack.delegate(state)
+    Attack.consider(state)
   }
 }

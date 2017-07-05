@@ -1,7 +1,7 @@
 package Micro.Actions
 
 import Micro.Actions.Basic._
-import Micro.Actions.Combat.{Duck, Fight}
+import Micro.Actions.Combat.{Duck, Fight, Smorc}
 import Micro.Actions.Commands.{Attack, Travel}
 import Micro.Execution.ActionState
 
@@ -34,6 +34,7 @@ object Idle extends Action {
   
   private val actions = Vector(
     Unstick,
+    Smorc,
     Duck,
     Gather,
     Build,

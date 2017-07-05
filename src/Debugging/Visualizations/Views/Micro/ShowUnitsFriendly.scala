@@ -6,7 +6,7 @@ import Debugging.Visualizations.Views.View
 import Lifecycle.With
 import Micro.Execution.ActionState
 
-object ShowUnitsOurs extends View {
+object ShowUnitsFriendly extends View {
   
   override def renderMap() {
     With.executor.states.foreach(renderUnitState)

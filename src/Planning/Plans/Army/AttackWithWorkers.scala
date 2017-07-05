@@ -38,11 +38,13 @@ class AttackWithWorkers extends Plan {
   
     val unassignedScouts = new mutable.HashSet[FriendlyUnitInfo] ++ fighters.units
     val scoutAssignments = new mutable.HashMap[FriendlyUnitInfo, Base]
-    while( ! fighters.units.forall(scoutAssignments.contains)) {
+    while(unassignedScouts.nonEmpty) {
       unscoutedMains.foreach(base => {
-        val scout = unassignedScouts.minBy(_.pixelDistanceTravelling(base.heart))
-        unassignedScouts.remove(scout)
-        scoutAssignments(scout) = base
+        if (unassignedScouts.nonEmpty) {
+          val scout = unassignedScouts.minBy(_.pixelDistanceTravelling(base.heart))
+          unassignedScouts.remove(scout)
+          scoutAssignments(scout) = base
+        }
       })
     }
     

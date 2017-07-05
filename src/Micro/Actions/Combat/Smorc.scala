@@ -3,7 +3,7 @@ package Micro.Actions.Combat
 import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Basic.MineralWalk
-import Micro.Actions.Commands.Attack
+import Micro.Actions.Commands.{Attack, Travel}
 import Micro.Execution.ActionState
 import ProxyBwapi.UnitInfo.UnitInfo
 
@@ -37,6 +37,11 @@ object Smorc extends Action {
     val enemyStrength         = strength(enemies)
     val enemyFighterStrength  = strength(enemyFighters)
     
+    // Get in their base!
+    if (state.unit.pixelCenter.zone != zone) {
+      Travel.consider(state)
+      return
+    }
     // Never get surrounded
     if (
       zone.bases.exists(_.harvestingArea.contains(state.unit.tileIncludingCenter)

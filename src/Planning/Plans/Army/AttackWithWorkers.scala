@@ -30,16 +30,17 @@ class AttackWithWorkers extends Plan {
   def findBases() {
     
     // Distribute scouts among unscouted bases, preferring to send more to the closest bases
-    val unscoutedMains =
+    val unscoutedBases =
       With.geography.bases
-        .filter(base => base.isStartLocation && base.lastScoutedFrame <= 0)
         .toVector
         .sortBy( - _.heart.groundPixels(With.geography.home))
+        .sortBy(_.isStartLocation)
+        .sortBy(_.lastScoutedFrame)
   
     val unassignedScouts = new mutable.HashSet[FriendlyUnitInfo] ++ fighters.units
     val scoutAssignments = new mutable.HashMap[FriendlyUnitInfo, Base]
     while(unassignedScouts.nonEmpty) {
-      unscoutedMains.foreach(base => {
+      unscoutedBases.foreach(base => {
         if (unassignedScouts.nonEmpty) {
           val scout = unassignedScouts.minBy(_.pixelDistanceTravelling(base.heart))
           unassignedScouts.remove(scout)

@@ -33,11 +33,11 @@ object Idle extends Action {
   }
   
   private val actions = Vector(
-    Unstick,
     Smorc,
     Duck,
     Gather,
     Build,
+    Unstick, //Workers don't seem to ever get stuck
     Produce,
     ReloadInterceptors,
     ReloadScarabs,

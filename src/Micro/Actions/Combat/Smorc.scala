@@ -55,7 +55,9 @@ object Smorc extends Action {
         destroyBuildings(state)
       }
       else if (state.unit.canAttackThisFrame) {
-        state.toAttack = Some(targets.minBy(target => target.pixelDistanceFast(state.unit) + 5.0 * target.pixelDistanceFast(exit)))
+        state.toAttack = Some(targets.minBy(target =>
+          target.totalHealth *
+          (target.pixelDistanceFast(state.unit) + 5.0 * target.pixelDistanceFast(exit))))
         Attack.consider(state)
       }
       else {

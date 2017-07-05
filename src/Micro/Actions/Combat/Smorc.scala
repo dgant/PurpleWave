@@ -101,7 +101,7 @@ object Smorc extends Action {
           .sortBy(target => target.totalHealth * target.pixelDistanceFast(state.unit))
           .headOption
           .getOrElse(targets.minBy(_.pixelDistanceFast(exit))))
-  
+        
         Attack.consider(state)
         return
       }
@@ -118,7 +118,8 @@ object Smorc extends Action {
   private def mineralWalkAway(state: ActionState) {
     state.toGather = With.geography.ourBases.flatMap(_.minerals).headOption
     MineralWalk.consider(state)
-    Retreat.consider(state)
+    state.toTravel = Some(state.origin)
+    Travel.consider(state)
   }
   
   private def destroyBuildings(state: ActionState) {

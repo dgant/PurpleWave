@@ -17,12 +17,15 @@ class AttackWithWorkers extends Plan {
   fighters.unitMatcher.set(UnitMatchWorkers)
   fighters.unitCounter.set(UnitCountEverything)
   
+  var haveSeenABase = false
+  
   override def onUpdate() {
     fighters.acquire(this)
     if (With.geography.enemyBases.isEmpty) {
       findBases()
     }
     else {
+      haveSeenABase = true
       smorc()
     }
   }
@@ -32,10 +35,13 @@ class AttackWithWorkers extends Plan {
     // Distribute scouts among unscouted bases, preferring to send more to the closest bases
     val unscoutedBases =
       With.geography.bases
+        .filter( ! _.owner.isUs)
+        .filter(_.isStartLocation || haveSeenABase) //Only search non-start locations until we've killed the first
         .toVector
         .sortBy( - _.heart.groundPixels(With.geography.home))
         .sortBy( ! _.isStartLocation)
         .sortBy(_.lastScoutedFrame)
+        
   
     val unassignedScouts = new mutable.HashSet[FriendlyUnitInfo] ++ fighters.units
     val scoutAssignments = new mutable.HashMap[FriendlyUnitInfo, Base]

@@ -7,7 +7,7 @@ import Micro.Execution.ActionState
 object MineralWalk extends Action {
   
   override def allowed(state: ActionState): Boolean = {
-    state.intent.toGather.isDefined
+    state.toGather.isDefined
   }
   
   override def perform(state: ActionState) {

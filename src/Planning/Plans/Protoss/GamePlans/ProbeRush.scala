@@ -2,7 +2,8 @@ package Planning.Plans.Protoss.GamePlans
 
 import Lifecycle.With
 import Macro.BuildRequests.RequestUnitAnother
-import Planning.Composition.UnitCounters.UnitCountOne
+import Planning.Composition.UnitCounters.UnitCountExactly
+import Planning.Composition.UnitPreferences.UnitPreferClose
 import Planning.Plans.Army.AttackWithWorkers
 import Planning.Plans.Compound.{Check, If, Parallel}
 import Planning.Plans.Macro.Automatic.{Gather, TrainContinuously}
@@ -11,17 +12,27 @@ import ProxyBwapi.Races.Protoss
 
 class ProbeRush extends Parallel(
   new If(
-    // Gather with the 5th Probe, not the first four.
-    new Check(() => With.frame > 24 * 21),
-    new Gather {
-      description.set("Gather")
-      workers.unitCounter.set(UnitCountOne)
-    }),
-  new AttackWithWorkers,
-  new If(
     new Check(() => With.self.supplyUsed == With.self.supplyTotal),
     new Build(RequestUnitAnother(1, Protoss.Pylon))
   ),
   new TrainContinuously(Protoss.Probe),
-  new FollowBuildOrder
+  new FollowBuildOrder,
+  new ProbeRushGather,
+  new AttackWithWorkers
 )
+
+class ProbeRushGather extends Gather {
+  
+  var haveWeBuildFifthProbe = false
+  
+  override def onUpdate() {
+    if (With.units.ours.count(unit => unit.aliveAndComplete && unit.unitClass.isWorker) >= 5) {
+      haveWeBuildFifthProbe = true
+    }
+    
+    workers.unitCounter.set(new UnitCountExactly(if (haveWeBuildFifthProbe) 1 else 0))
+    workers.unitPreference.set(UnitPreferClose(With.geography.home.pixelCenter))
+    
+    super.onUpdate()
+  }
+}

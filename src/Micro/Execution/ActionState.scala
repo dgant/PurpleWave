@@ -67,14 +67,14 @@ class ActionState(val unit: FriendlyUnitInfo) {
   
   def neighbors       : Vector[FriendlyUnitInfo]  = neighborsCache.get
   def threats         : Vector[UnitInfo]          = threatsCache.get
-  def threatsActive   : Vector[UnitInfo]          = threatsActiveCache.get
+  def threatsViolent  : Vector[UnitInfo]          = threatsViolentCache.get
   def targets         : Vector[UnitInfo]          = targetsCache.get
   def targetsInRange  : Vector[UnitInfo]          = targetsInRangeCache.get
   def targetValues    : Map[UnitInfo, Double]     = targetValuesCache.get
   
   private val neighborsCache      = new CacheFrame(() => Neighbors.get(this))
   private val threatsCache        = new CacheFrame(() => Threats.get(this))
-  private val threatsActiveCache  = new CacheFrame(() => threats.filter(_.isBeingViolentTo(unit)))
+  private val threatsViolentCache = new CacheFrame(() => threats.filter(_.isBeingViolentTo(unit)))
   private val targetsCache        = new CacheFrame(() => Targets.get(this))
   private val targetsInRangeCache = new CacheFrame(() => targets.filter(target => Targets.inRange(this, target)))
           val targetValuesCache   = new CacheFrame(() => targets.map(target => (target, EvaluateTargets.evaluate(this, target))).toMap)

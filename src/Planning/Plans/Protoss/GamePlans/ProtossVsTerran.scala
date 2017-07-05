@@ -1,4 +1,4 @@
-package Planning.Plans.Protoss
+package Planning.Plans.Protoss.GamePlans
 
 import Macro.BuildRequests.{RequestUnitAtLeast, RequestUpgradeLevel}
 import Planning.Composition.UnitMatchers.UnitMatchType
@@ -9,6 +9,7 @@ import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildAssimilators, MatchMiningBases, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.{OnGasBases, OnMiningBases, UnitsAtLeast}
 import Planning.Plans.Macro.Reaction.EnemyBio
+import Planning.Plans.Protoss.{ProtossBuilds, ProtossVsTerranIdeas}
 import Planning.Plans.Scouting.{ScoutAt, ScoutExpansionsAt}
 import ProxyBwapi.Races.Protoss
 

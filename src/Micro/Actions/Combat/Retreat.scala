@@ -20,7 +20,7 @@ object Retreat extends Action {
     
     // Are we blocked from running away?
     //
-    if (state.threatsActive.exists(threat =>
+    if (state.threatsViolent.exists(threat =>
       threat.pixelCenter.zone == state.origin.zone &&
       state.origin.pixelDistanceFast(threat.pixelCenter) <
       state.origin.pixelDistanceFast(state.unit.pixelCenter))) {

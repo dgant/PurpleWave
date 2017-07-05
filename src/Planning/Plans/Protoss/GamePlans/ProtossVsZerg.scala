@@ -1,4 +1,4 @@
-package Planning.Plans.Protoss
+package Planning.Plans.Protoss.GamePlans
 
 import Macro.BuildRequests.Request
 import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors}

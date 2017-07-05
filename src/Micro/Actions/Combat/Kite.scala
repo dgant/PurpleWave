@@ -14,13 +14,13 @@ object Kite extends Action {
   
   override def perform(state: ActionState) {
     if (state.unit.canAttackThisFrame) {
-      val fasterThanActiveThreats = state.threatsActive.nonEmpty || state.threatsActive.forall(state.unit.topSpeed > _.topSpeed)
+      val fasterThanActiveThreats = state.threatsViolent.nonEmpty || state.threatsViolent.forall(state.unit.topSpeed > _.topSpeed)
       if (fasterThanActiveThreats) {
       
         // Before shooting, make sure we have ample space
         // Also, don't close distance unless we are faster
       
-        val sufficientSpace = state.threatsActive.forall(_.framesBeforeAttacking(state.unit) > state.unit.framesPerAttack)
+        val sufficientSpace = state.threatsViolent.forall(_.framesBeforeAttacking(state.unit) > state.unit.framesPerAttack)
         if (sufficientSpace) {
           Potshot.consider(state)
         } else {
@@ -34,7 +34,7 @@ object Kite extends Action {
     else {
       
       // Back off. If we outspeed, sit at the sweet spot of range. If we don't, just get as far as possible.
-      val weOutspeedActiveThreats = state.threatsActive.forall(state.unit.topSpeed > _.topSpeed)
+      val weOutspeedActiveThreats = state.threatsViolent.forall(state.unit.topSpeed > _.topSpeed)
       if (weOutspeedActiveThreats) {
         HoverOutsideRange.delegate(state)
       }

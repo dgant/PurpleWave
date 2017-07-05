@@ -1,4 +1,4 @@
-package Planning.Plans.Protoss
+package Planning.Plans.Protoss.GamePlans
 
 import Macro.BuildRequests.{BuildRequest, RequestUnitAtLeast}
 import Planning.Composition.UnitMatchers.UnitMatchType
@@ -7,6 +7,7 @@ import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.Macro.Automatic.{RequireSufficientPylons, TrainGatewayUnitsContinuously, TrainProbesContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Milestones.UnitsExactly
+import Planning.Plans.Protoss.ProtossBuilds
 import Planning.Plans.Scouting.ScoutAt
 import ProxyBwapi.Races.Protoss
 

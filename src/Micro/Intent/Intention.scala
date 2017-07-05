@@ -24,4 +24,5 @@ class Intention(val plan: Plan, val unit: FriendlyUnitInfo) {
   var canFlee     : Boolean           = true
   var canPursue   : Boolean           = true
   var canCower    : Boolean           = false
+  var smorc       : Boolean           = false
 }

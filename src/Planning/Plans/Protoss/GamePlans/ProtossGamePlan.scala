@@ -1,4 +1,4 @@
-package Planning.Plans.Protoss
+package Planning.Plans.Protoss.GamePlans
 
 import Planning.Plans.Army.DefendChokes
 import Planning.Plans.Compound.Parallel

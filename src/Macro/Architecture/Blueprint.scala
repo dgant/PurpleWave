@@ -72,11 +72,12 @@ class Blueprint(
       }
     }
     
-    if (tile.zone.island) {
+    val thisZone = tile.zone
+    if (thisZone.island) {
       return false
     }
     
-    if (zone.exists(_ != tile.zone)) {
+    if (zone.exists(_ != thisZone)) {
       return false
     }
   
@@ -98,7 +99,9 @@ class Blueprint(
           With.architecture.buildable(nextTile)
         }
         else {
-          With.architecture.walkable(nextTile)
+          // Let margin-y buildings overlap each other, but not touch the edge of the map
+          // With.architecture.walkable(nextTile)
+          With.grids.walkableTerrain.get(nextTile)
         }
       )
     })

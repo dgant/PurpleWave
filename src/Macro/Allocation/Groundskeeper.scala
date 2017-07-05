@@ -14,6 +14,8 @@ class Groundskeeper {
   val requirementMatches    : mutable.Set[BlueprintMatch]        = new mutable.HashSet[BlueprintMatch]
   val proposalsFulfilled    : mutable.Set[Blueprint]             = new mutable.HashSet[Blueprint]
   
+  private var lastEmergencyBuildingPlacement = -24 * 60 * 60
+  
   private var nextId: Int = 0
   
   ///////////
@@ -134,6 +136,25 @@ class Groundskeeper {
   private def getTileForRequirement(requirement: Blueprint): Option[Tile] = {
     val proposal = findProposalAlreadyMatchedWithRequirement(requirement)
     proposal.foreach(flagUpdated)
+    var output = getTileForProposal(proposal)
+    
+    // Some jankiness from building placement is tolerable later in the game.
+    // But if it wrecks our early game build we just plain lose.
+    // Example: Failing to place the Forge in an FFE vs. a 4-pool until it's too late
+    if (output.isEmpty
+      && With.configuration.emergencyBuildingPlacement
+      && With.frame < With.configuration.emergencyBuildingCutoffFrames
+      && With.framesSince(lastEmergencyBuildingPlacement) > With.configuration.emergencyBuildingCooldown) {
+      With.logger.warn("Emergency building placement required for " + requirement.toString)
+      lastEmergencyBuildingPlacement = With.frame
+      With.placement.run(runToCompletionEvenIfItCostsUsAFrame = true)
+      output = getTileForProposal(proposal)
+    }
+    
+    output
+  }
+  
+  private def getTileForProposal(proposal: Option[Blueprint]): Option[Tile] = {
     proposal.flatMap(proposalPlacements.get).flatMap(_.tile)
   }
   

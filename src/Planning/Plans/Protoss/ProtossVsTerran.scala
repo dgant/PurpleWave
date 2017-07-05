@@ -8,6 +8,7 @@ import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildAssimilators, MatchMiningBases, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.{OnGasBases, OnMiningBases, UnitsAtLeast}
+import Planning.Plans.Macro.Reaction.EnemyBio
 import Planning.Plans.Scouting.{ScoutAt, ScoutExpansionsAt}
 import ProxyBwapi.Races.Protoss
 
@@ -72,7 +73,10 @@ class ProtossVsTerran extends Parallel {
     new OnThreeGas_Arbiters,
     new OnThreeBases_WeaponsUpgrades,
     new TrainContinuously(Protoss.Carrier),
-    new TrainContinuously(Protoss.Reaver, 2),
+    new If(
+      new EnemyBio,
+      new TrainContinuously(Protoss.Reaver, 2)
+    ),
     new TrainContinuously(Protoss.Arbiter, 3),
     new TrainContinuously(Protoss.Observer, 3),
     new ProtossVsTerranIdeas.BuildDragoonsUntilWeHaveZealotSpeed,

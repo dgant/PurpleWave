@@ -59,17 +59,20 @@ class Configuration {
   // Performance //
   /////////////////
   
-  var buildingPlacementBatchSize    = 500
-  var buildingPlacementMaximumQueue = 8
-  var garbageCollectionThresholdMs  = 5
-  var peformanceFrameMilliseconds   = 20
-  var initialTaskLengthMilliseconds = 20
-  var performanceMinimumUnitSleep   = 2
-  var performanceMicroAngleStep     = 4
-  var useFastGroundDistance         = true
-  var verifyBuildingsDontBreakPaths = false
-  var unitHistoryAge                = 24 * 3
-  var buildingPlacements            = 5
+  var buildingPlacementBatchSize      = 500
+  var buildingPlacementMaximumQueue   = 8
+  var garbageCollectionThresholdMs    = 5
+  var peformanceFrameMilliseconds     = 20
+  var initialTaskLengthMilliseconds   = 20
+  var performanceMinimumUnitSleep     = 2
+  var performanceMicroAngleStep       = 4
+  var useFastGroundDistance           = true
+  var verifyBuildingsDontBreakPaths   = false
+  var emergencyBuildingPlacement      = true
+  var emergencyBuildingCutoffFrames   = 24 * 60 * 4
+  var emergencyBuildingCooldown       = 24 * 5
+  var unitHistoryAge                  = 24 * 3
+  var buildingPlacements              = 5
   
   var urgencyManners            = 1
   var urgencyEconomy            = 1

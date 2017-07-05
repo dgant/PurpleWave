@@ -53,14 +53,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
             unit.tileTopLeft == tile))
           .getOrElse(None))
   
-    desiredTile =
-      if (building.isDefined) {
-        With.groundskeeper.flagFulfilled(buildingDescriptor)
-        building.map(_.tileTopLeft)
-      }
-      else {
-        With.groundskeeper.require(buildingDescriptor)
-      }
+    desiredTile = getDesiredTile()
   
     if (desiredTile.isEmpty) {
       if (With.frame < With.configuration.maxFramesToTrustBuildRequest) {
@@ -93,6 +86,16 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
           toTravel    = Some(orderedTile.get.pixelCenter)
           canAttack   = false
         })
+    }
+  }
+  
+  private def getDesiredTile(): Option[Tile] = {
+    if (building.isDefined) {
+      With.groundskeeper.flagFulfilled(buildingDescriptor)
+      building.map(_.tileTopLeft)
+    }
+    else {
+      With.groundskeeper.require(buildingDescriptor)
     }
   }
   

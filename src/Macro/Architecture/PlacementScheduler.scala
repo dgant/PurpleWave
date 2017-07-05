@@ -11,12 +11,12 @@ class PlacementScheduler {
   var placements  : Map[Blueprint, Placement] = _
   var state       : PlacementState            = new StateComplete
   
-  def run() {
+  def run(runToCompletionEvenIfItCostsUsAFrame: Boolean = false) {
     if (state.isComplete) {
       reset()
       setState(new StateInitial)
     }
-    while (With.performance.continueRunning && ! state.isComplete) {
+    while ((runToCompletionEvenIfItCostsUsAFrame || With.performance.continueRunning) && ! state.isComplete) {
       state.step()
     }
   }

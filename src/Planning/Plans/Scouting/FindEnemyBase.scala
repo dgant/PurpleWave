@@ -27,7 +27,7 @@ class FindEnemyBase extends Plan {
   override def isComplete: Boolean = With.geography.enemyBases.nonEmpty
   
   override def onUpdate() {
-    val scoutsDied = lastScouts.forall( ! _.alive)
+    val scoutsDied = lastScouts.nonEmpty && lastScouts.forall( ! _.alive)
     if (scoutsDied) {
       lastScouts = List.empty
       lastScoutSlaughter = With.frame

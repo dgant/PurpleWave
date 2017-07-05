@@ -63,8 +63,8 @@ class ProtossVsZerg extends Parallel {
     new Build(Request.unit(Protoss.Gateway, 5)),
     //This part is freelancing. Replace with an actual late game.
     new Build(
-      Request.upgr(Protoss.GroundArmor),
       Request.unit(Protoss.Gateway, 8),
+      Request.upgr(Protoss.GroundArmor),
       Request.upgr(Protoss.GroundDamage)),
     new ScoutAt(9),
     new ControlMap,

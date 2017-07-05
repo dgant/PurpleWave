@@ -10,14 +10,14 @@ object Architect {
     val placementIsFresh = placement.exists(p => With.framesSince(p.createdFrame) < With.configuration.maxPlacementAge)
   
     if (placementHasTile && placementIsFresh) {
-      if (canBuild(blueprint, placement.get.tile.get, recheckPathing = false)) {
+      if (canBuild(blueprint, placement.get.tile.get)) {
         return placement
       }
     }
     None
   }
   
-  def canBuild(blueprint: Blueprint, tile: Tile, recheckPathing: Boolean = false): Boolean = {
+  def canBuild(blueprint: Blueprint, tile: Tile): Boolean = {
     lazy val buildArea = TileRectangle(
       tile.add(blueprint.relativeBuildStart),
       tile.add(blueprint.relativeBuildEnd))
@@ -26,7 +26,7 @@ object Architect {
       return false
     }
     
-    if (With.configuration.verifyBuildingsDontBreakPaths && ! blueprint.margin && recheckPathing && With.architecture.breaksPathing(buildArea)) {
+    if (With.configuration.verifyBuildingsDontBreakPaths && ! blueprint.margin && With.architecture.breaksPathing(buildArea)) {
       return false
     }
     

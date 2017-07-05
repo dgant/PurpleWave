@@ -34,7 +34,7 @@ class AttackWithWorkers extends Plan {
       With.geography.bases
         .toVector
         .sortBy( - _.heart.groundPixels(With.geography.home))
-        .sortBy(_.isStartLocation)
+        .sortBy( ! _.isStartLocation)
         .sortBy(_.lastScoutedFrame)
   
     val unassignedScouts = new mutable.HashSet[FriendlyUnitInfo] ++ fighters.units

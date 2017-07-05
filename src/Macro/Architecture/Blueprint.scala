@@ -43,7 +43,8 @@ class Blueprint(
     (powered      == proposal.powered         || ! powered)                                       &&
     townHall      == proposal.townHall                                                            &&
     gas           == proposal.gas                                                                 &&
-    (margin       <= proposal.margin          || With.configuration.enableTightBuildingPlacement) &&
+    // Disabled to allow FFE to work
+    //(margin       <= proposal.margin          || With.configuration.enableTightBuildingPlacement) &&
     (zone         == proposal.zone            || zone.isEmpty)                                    &&
     (building     == proposal.building        || building.isEmpty || proposal.building.isEmpty)
   }

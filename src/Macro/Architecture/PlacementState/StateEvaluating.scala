@@ -30,7 +30,7 @@ class StateEvaluating(blueprint: Blueprint) extends PlacementState {
       while (stillFiltering && evaluationCount < With.configuration.buildingPlacementBatchSize) {
         evaluationCount += 1
         val nextCandidate = candidatesUnfiltered.get(nextFilteringIndex)
-        if (Architect.canBuild(blueprint, nextCandidate)) {
+        if (Architect.canBuild(blueprint, nextCandidate, recheckPathing = true)) {
           candidatesFiltered.get += nextCandidate
         }
         nextFilteringIndex += 1

@@ -43,7 +43,7 @@ class Configuration {
   var blockerMineralThreshold         = 50
   var maxPlacementAge                 = 24 * 60 * 5
   var maxScarabCount                  = 3
-  var enableTightBuildingPlacement    = true //Turning this off breaks FFE!
+  var enableTightBuildingPlacement    = false
   
   /////////////
   // Battles //
@@ -67,7 +67,7 @@ class Configuration {
   var performanceMinimumUnitSleep   = 2
   var performanceMicroAngleStep     = 4
   var useFastGroundDistance         = true
-  var verifyBuildingsDontBreakPaths = true
+  var verifyBuildingsDontBreakPaths = false
   var unitHistoryAge                = 24 * 3
   var buildingPlacements            = 5
   

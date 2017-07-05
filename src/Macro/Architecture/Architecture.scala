@@ -78,13 +78,13 @@ class Architecture {
   }
   
   def breaksPathing(blockedArea: TileRectangle): Boolean = {
+    
     // This is a critical but potentially expensive check.
     //
     // Cost of not checking:            Walling ourself in and losing the game because of a dumb Pylon
     // Cost of checking inefficiently:  Dropping frames and getting disqualified because of fear of dumb Pylons
     //
     // So let's check this every time, but really focus on making it an inexpensive check
-    
 
     if ( ! With.configuration.verifyBuildingsDontBreakPaths) {
       return false

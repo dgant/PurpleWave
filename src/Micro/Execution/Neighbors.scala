@@ -10,6 +10,7 @@ object Neighbors {
       state.unit.tileIncludingCenter,
       With.configuration.battleMarginTiles)
       .flatMap(_.friendly)
+      .filterNot(_ == state.unit)
       .toVector
   }
 }

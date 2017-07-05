@@ -30,8 +30,8 @@ case class TileRectangle(
     x < endExclusive.x &&
     y < endExclusive.y
   
-  def contains(point:Tile):Boolean = {
-    contains(point.x, point.y)
+  def contains(tile:Tile):Boolean = {
+    contains(tile.x, tile.y)
   }
   
   def intersects(otherRectangle: TileRectangle):Boolean = {

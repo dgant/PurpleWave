@@ -5,6 +5,7 @@ import Micro.Actions.Action
 import Micro.Actions.Basic.MineralWalk
 import Micro.Actions.Commands.Attack
 import Micro.Execution.ActionState
+import ProxyBwapi.UnitInfo.UnitInfo
 
 object Smorc extends Action {
   override protected def allowed(state: ActionState): Boolean = {
@@ -13,76 +14,97 @@ object Smorc extends Action {
   
   override protected def perform(state: ActionState) {
     
-    /*
-    How to SMORC:
-    * If there's an SCV building something, send someone to SMORC it
-    * Otherwise, kite the worker closest to the exit
-     */
+    // Potential improvements:
+    // * Use convex hull to ensure we don't get trapped in the worker line
+    // * Fight when injured if everyone nearby is targeting someone else
+    // * Don't get pulled out of the base
     
     if ( ! stillReady(state)) return
     
-    var attack            = true
-    val dyingThreshold    = 11
-    val dying             = state.unit.totalHealth < dyingThreshold
-    val enemies           = state.threats
-    val enemyFighters     = state.threats.filter(_.isBeingViolent)
-    val allyFighters      = state.neighbors
-    val allyFightersDying = allyFighters.filter(_.totalHealth < dyingThreshold)
+    var attack                = true
+  
+    val zone                  = state.toTravel.get.zone
+    val exit                  = zone.exit.map(_.centerPixel).getOrElse(With.geography.home.pixelCenter)
+    val dyingThreshold        = 11
+    val dying                 = state.unit.totalHealth < dyingThreshold
+    val enemies               = state.threats
+    val enemyFighters         = state.threats.filter(_.isBeingViolent)
+    val enemiesAttackingUs    = enemies.filter(_.isBeingViolentTo(state.unit))
+    val allyFighters          = state.neighbors
+    val allyFightersDying     = allyFighters.filter(_.totalHealth < dyingThreshold)
+    val strength              = (units: Iterable[UnitInfo]) => units.size * units.map(_.totalHealth).sum
+    val ourStrength           = strength(allyFighters :+ state.unit)
+    val enemyStrength         = strength(enemies)
+    val enemyFighterStrength  = strength(enemyFighters)
     
-    // Try to avoid dying and let our shield recharge work for us.
+    // Never get surrounded
+    if (
+      zone.bases.exists(_.harvestingArea.contains(state.unit.tileIncludingCenter)
+      && enemies.exists(enemy =>
+         enemy.pixelCenter.zone == zone
+          && enemy.pixelDistanceFast(exit) < state.unit.pixelDistanceFast(exit)))) {
+      mineralWalkAway(state)
+      return
+    }
+    
+    // Try to avoid dying. Let our shield recharge work for us.
     if (dying) {
       attack = false
     }
     
     // Don't take losing fights
-    if (enemies.count(_.isBeingViolentTo(state.unit)) > 1) {
+    if (enemiesAttackingUs.size > 1) {
       attack = false
     }
-    
+  
     // If we completely overpower the enemy, let's go kill 'em.
-    if (allyFighters.size * allyFighters.map(_.totalHealth).sum > enemies.size * enemies.map(_.totalHealth).sum) {
+    if (ourStrength > enemyStrength) {
       attack = true
     }
+    
+    // If violent enemies completely overpower us, let's back off
+    if (ourStrength < enemyFighterStrength) {
+      attack = false
+    }
   
-    val zone = state.toTravel.get.zone
-    val exit = zone.exit.map(_.centerPixel).getOrElse(With.geography.home.pixelCenter)
     if (attack) {
-      
       // Ignore units outside their bases
       // TODO: If they're pushing us out of their base we should fight back
       val targets = With.units.enemy.filter(unit => unit.pixelCenter.zone == zone && unit.canAttackThisSecond)
       if (targets.isEmpty) {
         destroyBuildings(state)
+        return
       }
       else if (state.unit.canAttackThisFrame) {
-        state.toAttack = Some(targets.minBy(target =>
-          target.totalHealth *
-          (target.pixelDistanceFast(state.unit) + 5.0 * target.pixelDistanceFast(exit))))
+        val nearestTargetDistance = targets.map(_.pixelDistanceFast(exit)).min
+        val validTargets = targets.filter(target => target.pixelDistanceFast(exit) - 16.0 <= nearestTargetDistance)
+        state.toAttack = Some(validTargets
+          .toVector
+          .sortBy(target => target.totalHealth * target.pixelDistanceFast(state.unit))
+          .headOption
+          .getOrElse(targets.minBy(_.pixelDistanceFast(exit))))
+  
         Attack.consider(state)
-      }
-      else {
-        mineralWalkAway(state)
+        return
       }
     }
-    else {
-      // Hang out if we can
-      if (enemies.exists(_.isBeingViolentTo(state.unit)) || enemies.exists(_.pixelDistanceFast(exit) < state.unit.pixelDistanceFast(exit))) {
-        Retreat.consider(state)
-      } else {
-        HoverOutsideRange.consider(state)
-      }
+      
+    // We're not attacking, so let's hang out and wait for opportunities
+    if (enemiesAttackingUs.nonEmpty) {
+      mineralWalkAway(state)
+    } else {
+      HoverOutsideRange.consider(state)
     }
   }
   
   private def mineralWalkAway(state: ActionState) {
     state.toGather = With.geography.ourBases.flatMap(_.minerals).headOption
     MineralWalk.consider(state)
-    HoverOutsideRange.consider(state)
+    Retreat.consider(state)
   }
   
   private def destroyBuildings(state: ActionState) {
-    val freebies = state.targets.filter( ! _.canAttackThisSecond(state.unit)).toList.sortBy(_.pixelDistanceFast(state.toTravel.get))
-    state.toAttack = freebies.headOption
+    state.toAttack = With.units.enemy.toList.sortBy(_.pixelDistanceFast(state.unit)).headOption
     Attack.consider(state)
   }
 }

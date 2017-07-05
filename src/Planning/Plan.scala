@@ -6,7 +6,7 @@ import Planning.Composition.Property
 class Plan {
   
   var parent: Option[Plan] = None
-  val description = new Property[String]("")
+  
   
   def isComplete: Boolean = false
   def getChildren: Iterable[Plan] = Vector.empty
@@ -23,16 +23,18 @@ class Plan {
     child.update()
   }
   
+  lazy val realName: String = {
+    val name = getClass.getSimpleName
+    if (name.contains("$anon$")) "" else name
+  }
+  
+  val description = new Property[String](realName)
+  
   override def toString: String =
     if (realName == "")
       description.get
     else
       if (description.get == "") realName else description.get
-  
-  lazy val realName: String = {
-    val name = getClass.getSimpleName
-    if (name.contains("$anon$")) "" else name
-  }
   
   def isPrioritized: Boolean = With.prioritizer.isPrioritized(this)
   def priority: Int = With.prioritizer.getPriority(this)

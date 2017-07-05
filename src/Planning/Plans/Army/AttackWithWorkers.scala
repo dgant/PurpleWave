@@ -2,6 +2,7 @@ package Planning.Plans.Army
 
 import Information.Geography.Types.Base
 import Lifecycle.With
+import Mathematics.Points.Pixel
 import Micro.Intent.Intention
 import Planning.Composition.ResourceLocks.LockUnits
 import Planning.Composition.UnitCountEverything
@@ -21,7 +22,7 @@ class AttackWithWorkers extends Plan {
   
   override def onUpdate() {
     fighters.acquire(this)
-    if (With.geography.enemyBases.isEmpty) {
+    if (With.geography.enemyBases.isEmpty && ! With.units.enemy.exists(unit => unit.unitClass.isBuilding && ! unit.flying)) {
       findBases()
     }
     else {
@@ -55,17 +56,18 @@ class AttackWithWorkers extends Plan {
       })
     }
     
-    scoutAssignments.foreach(pair => smorc(pair._1, pair._2))
+    scoutAssignments.foreach(pair => smorc(pair._1, pair._2.heart.pixelCenter))
   }
   
   def smorc() {
-    val base = With.geography.enemyBases.maxBy(_.workers.size)
-    fighters.units.foreach(smorc(_, base))
+    val base = With.geography.enemyBases.toList.sortBy(_.workers.size).lastOption
+    val target = base.map(_.heart.pixelCenter).getOrElse(With.intelligence.mostBaselikeEnemyTile.pixelCenter)
+    fighters.units.foreach(smorc(_, target))
   }
   
-  def smorc(unit: FriendlyUnitInfo, base: Base) {
+  def smorc(unit: FriendlyUnitInfo, target: Pixel) {
     With.executor.intend(new Intention(this, unit) {
-      toTravel = Some(base.heart.pixelCenter)
+      toTravel = Some(target)
       smorc = true
     })
   }

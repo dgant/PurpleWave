@@ -6,6 +6,7 @@ import Micro.Actions.Basic.MineralWalk
 import Micro.Actions.Commands.{Attack, Travel}
 import Micro.Execution.ActionState
 import ProxyBwapi.UnitInfo.UnitInfo
+import Utilities.EnrichPixel._
 
 object Smorc extends Action {
   override protected def allowed(state: ActionState): Boolean = {
@@ -78,6 +79,13 @@ object Smorc extends Action {
     // If we completely overpower the enemy, let's go kill 'em.
     if (ourStrength > enemyStrength) {
       attack = true
+    }
+    else {
+      // But otherwise, if they're worker drilling, we should back off (they're just wasting mining time anyhow)
+      val centroid = enemies.map(_.pixelCenter).centroid
+      if (enemies.forall(_.pixelDistanceFast(centroid) < 32.0)) {
+       attack = false
+      }
     }
     
     // Lastly, if they've started training combat units, we are ALL IN

@@ -42,6 +42,7 @@ object Smorc extends Action {
       Travel.consider(state)
       return
     }
+    
     // Never get surrounded
     if (
       zone.bases.exists(_.harvestingArea.contains(state.unit.tileIncludingCenter)
@@ -61,15 +62,27 @@ object Smorc extends Action {
     if (enemiesAttackingUs.size > 1) {
       attack = false
     }
+    
+    // If violent enemies completely overpower us, let's back off
+    if (ourStrength < enemyFighterStrength) {
+      attack = false
+    }
+  
+    // Wait for re-enforcements
+    val workersTotal  = With.units.ours.count(u => u.unitClass.isWorker)
+    val workersHere   = With.units.ours.count(u => u.unitClass.isWorker && u.pixelCenter.zone == zone)
+    if (workersHere * 2 < workersTotal) {
+      attack = false
+    }
   
     // If we completely overpower the enemy, let's go kill 'em.
     if (ourStrength > enemyStrength) {
       attack = true
     }
     
-    // If violent enemies completely overpower us, let's back off
-    if (ourStrength < enemyFighterStrength) {
-      attack = false
+    // Lastly, if they've started training combat units, we are ALL IN
+    if (enemies.exists( ! _.unitClass.isWorker)) {
+      attack = true
     }
   
     if (attack) {

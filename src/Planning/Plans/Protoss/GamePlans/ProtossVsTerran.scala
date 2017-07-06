@@ -1,7 +1,7 @@
 package Planning.Plans.Protoss.GamePlans
 
 import Macro.BuildRequests.{RequestUnitAtLeast, RequestUpgradeLevel}
-import Planning.Composition.UnitMatchers.UnitMatchType
+import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors}
 import Planning.Plans.Army.{ConsiderAttacking, ControlMap}
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.Macro.Automatic._
@@ -71,8 +71,11 @@ class ProtossVsTerran extends Parallel {
     new TakeThirdBase,
     new OnMiningBases(3, new BuildAssimilators),
     new OnThreeBases_SpeedlotsAndObservers,
-    new OnThreeGas_Arbiters,
-    new OnThreeBases_WeaponsUpgrades,
+    new If( // We have a habit of getting this tech too soon and dying
+      new UnitsAtLeast(8, UnitMatchWarriors),
+      new Parallel(
+        new OnThreeGas_Arbiters,
+        new OnThreeBases_WeaponsUpgrades)),
     new TrainContinuously(Protoss.Carrier),
     new If(
       new EnemyBio,

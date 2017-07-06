@@ -1,7 +1,7 @@
 package Micro.Actions.Combat
 
 import Micro.Actions.Action
-import Micro.Actions.Commands.{Attack, Reposition}
+import Micro.Actions.Commands.Attack
 import Micro.Execution.ActionState
 
 object Engage extends Action {
@@ -18,11 +18,9 @@ object Engage extends Action {
     Brawl.consider(state)
     BustWallin.consider(state)
     Target.delegate(state)
-    if (state.unit.canAttackThisFrame) {
-      Attack.delegate(state)
+    if ( ! state.unit.canAttackThisFrame) {
+      Kite.delegate(state)
     }
-    else {
-      Reposition.delegate(state)
-    }
+    Attack.delegate(state)
   }
 }

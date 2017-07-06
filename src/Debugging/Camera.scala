@@ -2,6 +2,7 @@ package Debugging
 
 import Lifecycle.With
 import Mathematics.Points.{Pixel, SpecificPoints}
+import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.UnitInfo
 
 class Camera {
@@ -30,7 +31,9 @@ class Camera {
     } else if (With.units.ours.nonEmpty) {
   
       setCameraSpeed(With.configuration.cameraDynamicSpeedFastest)
-      focusOn(With.units.ours.toList
+      focusOn(With.units.ours
+        .filterNot(unit => unit.is(Protoss.Interceptor) || unit.is(Protoss.Scarab) || unit.is(Terran.SpiderMine))
+        .toList
         .sortBy(_.pixelDistanceSquared(With.intelligence.mostBaselikeEnemyTile.pixelCenter))
         .sortBy( ! _.canAttackThisSecond)
         .sortBy( ! _.canMoveThisFrame)
@@ -40,14 +43,14 @@ class Camera {
     tween()
   }
   
-  def focusOn(unit:UnitInfo) {
+  def focusOn(unit: UnitInfo) {
     if (With.framesSince(focusFrame) < refocusLimit) return
     focusUnit = unit
     focusFrame = With.frame
     tweenFrom = focus
   }
   
-  def setCameraSpeed(speed:Int) {
+  def setCameraSpeed(speed: Int) {
     if (With.configuration.cameraDynamicSpeed) {
       With.game.setLocalSpeed(speed)
     }

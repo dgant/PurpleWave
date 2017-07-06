@@ -130,13 +130,13 @@ object Smorc extends Action {
       mineralWalkAway(state)
     }
     else {
-      val builder = enemies.find(builder =>
-        builder.constructing
+      val freebies = enemies.find(freebie =>
+        (freebie.unitClass.isBuilding || freebie.constructing)
           && enemies.forall(defender =>
-          defender != builder
+          defender != freebie
             && state.unit.pixelDistanceFast(defender) >
-            state.unit.pixelDistanceFast(builder)))
-      state.toAttack = builder
+            state.unit.pixelDistanceFast(freebie)))
+      state.toAttack = freebies
       Attack.consider(state)
       HoverOutsideRange.consider(state)
     }

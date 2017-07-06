@@ -4,11 +4,12 @@ import Macro.BuildRequests.Request
 import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors}
 import Planning.Plans.Army._
 import Planning.Plans.Compound.{If, _}
+import Planning.Plans.Information.Scenarios.WeAreBeing4Pooled
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildAssimilators, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.UnitsAtLeast
-import Planning.Plans.Protoss.Situational.ForgeFastExpand
+import Planning.Plans.Protoss.Situational.{BlockWithWorkers, ForgeFastExpand}
 import Planning.Plans.Scouting.ScoutAt
 import ProxyBwapi.Races.Protoss
 
@@ -68,6 +69,9 @@ class ProtossVsZerg extends Parallel {
       Request.upgr(Protoss.GroundDamage)),
     new ScoutAt(9),
     new ControlMap,
-    new AttackWithFour
+    new AttackWithFour,
+    new If(
+      new WeAreBeing4Pooled,
+      new BlockWithWorkers)
   ))
 }

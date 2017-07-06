@@ -39,7 +39,7 @@ class Configuration {
   var maxFramesToSendAdvanceBuilder   = 24 * 20
   var maxFramesToTrustBuildRequest    = 24 * 60 * 10
   var baseRadiusPixels                = 32.0 * 12.0
-  var baseMergingRangePixels          = 32.0 * 8.0
+  var baseMergingRangePixels          = 32.0 * 12.0
   var blockerMineralThreshold         = 50
   var maxPlacementAge                 = 24 * 60 * 5
   var maxScarabCount                  = 3
@@ -88,7 +88,7 @@ class Configuration {
   // Visualization //
   ///////////////////
   
-  var visualize                           = true
+  var visualize                           = false
   var visualizationProbabilityHappyVision = 0.1
   var visualizationProbabilityTextOnly    = 0.00
   

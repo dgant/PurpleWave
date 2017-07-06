@@ -55,8 +55,8 @@ class IslandCarriers extends Parallel {
     new Build(ProtossBuilds.Opening13Nexus_NoZealot_OneGateCore: _*),
     new RequireSufficientPylons,
     new TrainProbesContinuously,
-    new ExpandOverIsland,
     new BuildAssimilators,
+    new ExpandOverIsland,
     new TechToCarriers,
     new If(
       new UnitsAtLeast(4, UnitMatchType(Protoss.Carrier)),

@@ -1,5 +1,5 @@
 package Planning.Plans
 
-import Planning.Plans.Protoss.GamePlans.ProbeRush
+import Planning.Plans.Protoss.GamePlans.ProtossGamePlan
 
-class WinTheGame extends ProbeRush //ProtossGamePlan
+class WinTheGame extends ProtossGamePlan

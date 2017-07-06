@@ -3,7 +3,7 @@ package Strategery
 import Lifecycle.With
 import Planning.Plan
 import Planning.Plans.WinTheGame
-import Strategery.Strategies.Strategy
+import Strategery.Strategies.{AllStrategies, Strategy}
 
 import scala.util.Random
 

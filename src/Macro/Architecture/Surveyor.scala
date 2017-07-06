@@ -51,9 +51,10 @@ object Surveyor {
         .flatMap(_.gas.map(_.tileTopLeft))
     }
     else {
-      Spiral
-        .points(60)
-        .map(With.self.startTile.add)
+      With.geography.ourBases.flatMap(base =>
+        Spiral
+          .points(18)
+          .map(base.heart.add))
     }
   }
 }

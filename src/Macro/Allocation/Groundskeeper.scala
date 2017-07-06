@@ -156,7 +156,7 @@ class Groundskeeper {
     if (With.configuration.emergencyBuildingPlacement
     && With.frame < With.configuration.emergencyBuildingCutoffFrames
     && With.framesSince(lastEmergencyBuildingPlacement) > With.configuration.emergencyBuildingCooldown) {
-      With.logger.warn("Emergency building placement required for " + requirement.toString)
+      With.logger.debug("Emergency building placement required for " + requirement.toString)
       lastEmergencyBuildingPlacement = With.frame
       With.placement.run(runToCompletionEvenIfItCostsUsAFrame = true)
     }

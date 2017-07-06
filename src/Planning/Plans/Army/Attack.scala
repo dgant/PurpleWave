@@ -37,7 +37,6 @@ class Attack extends Plan {
     
     if (attackers.get.units.isEmpty) return
   
-  
     detectors.get.unitPreference.set(UnitPreferClose(target))
     detectors.get.satisfied
     detectors.get.acquire(this)
@@ -52,7 +51,7 @@ class Attack extends Plan {
     detectors.get.units.foreach(detector =>
       With.executor.intend(
         new Intention(this, detector) {
-          toTravel = Some(attackers.get.units.minBy(_.pixelDistanceTravelling(target)).pixelCenter.project(target, 32 * 6.0))
+          toTravel = Some(attackers.get.units.minBy(_.framesToTravel(target)).project(32.0 * 3.0))
           canCower = true
         }
       )

@@ -94,6 +94,9 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
       With.groundskeeper.flagFulfilled(buildingDescriptor)
       building.map(_.tileTopLeft)
     }
+    else if (currencyLock.expectedFrames < With.configuration.maxFramesToSendAdvanceBuilder) {
+      With.groundskeeper.demand(buildingDescriptor)
+    }
     else {
       With.groundskeeper.require(buildingDescriptor)
     }

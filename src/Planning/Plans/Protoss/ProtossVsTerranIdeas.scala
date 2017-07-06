@@ -26,7 +26,7 @@ object ProtossVsTerranIdeas {
       new HaveUpgrade(Protoss.ZealotSpeed, withinFrames = Protoss.Zealot.buildFrames),
       new Or(
         new UnitsAtLeast(12, UnitMatchType(Protoss.Dragoon)),
-        new Check(() => With.self.gas < 50))),
+        new Check(() => With.self.gas < 100))),
     new TrainContinuously(Protoss.Zealot),
     new TrainContinuously(Protoss.Dragoon)
   )

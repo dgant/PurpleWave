@@ -13,7 +13,7 @@ object HistorySerializer {
   //                                                                                                  //
   //////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  val formatVersion: Int = 1
+  val formatVersion: Int = 2
   
   
   
@@ -38,22 +38,24 @@ object HistorySerializer {
   }
   
   private def readGameFromColumns(columns: Array[String]): HistoricalGame = {
-    val id            = columns(0).toLong
-    val mapName       = columns(1)
-    val opponentName  = columns(2)
-    val ourRace       = columns(3)
-    val enemyRace     = columns(4)
-    val won           = columns(5).toBoolean
-    val strategies    = columns.drop(6).toSet
+    val id              = columns(0).toLong
+    val startLocations  = columns(1).toInt
+    val mapName         = columns(2)
+    val opponentName    = columns(3)
+    val ourRace         = columns(4)
+    val enemyRace       = columns(5)
+    val won             = columns(6).toBoolean
+    val strategies      = columns.drop(7).toSet
     val allRaces = Array(Race.Terran, Race.Protoss, Race.Zerg, Race.Random, Race.None, Race.Unknown)
     HistoricalGame(
-      timestamp   = id,
-      mapName     = mapName,
-      enemyName   = opponentName,
-      ourRace     = allRaces.find(_.toString == ourRace).getOrElse(Race.Unknown),
-      enemyRace   = allRaces.find(_.toString == enemyRace).getOrElse(Race.Unknown),
-      won         = won,
-      strategies  = strategies)
+      timestamp       = id,
+      startLocations  = startLocations,
+      mapName         = mapName,
+      enemyName       = opponentName,
+      ourRace         = allRaces.find(_.toString == ourRace).getOrElse(Race.Unknown),
+      enemyRace       = allRaces.find(_.toString == enemyRace).getOrElse(Race.Unknown),
+      won             = won,
+      strategies      = strategies)
   }
   
   def writeGames(games: Iterable[HistoricalGame]): Iterable[String] = {
@@ -62,12 +64,13 @@ object HistorySerializer {
   
   private def writeGame(game: HistoricalGame): String = {
     val columns = List(
-      game.timestamp  .toString,
-      game.mapName    .toString,
-      game.enemyName  .toString,
-      game.ourRace    .toString,
-      game.enemyRace  .toString,
-      game.won        .toString) ++ game.strategies
+      game.timestamp      .toString,
+      game.startLocations .toString,
+      game.mapName        .toString,
+      game.enemyName      .toString,
+      game.ourRace        .toString,
+      game.enemyRace      .toString,
+      game.won            .toString) ++ game.strategies
     columns.mkString(separator)
   }
   

@@ -34,13 +34,14 @@ class History {
   
   def onEnd(weWon: Boolean) {
     val thisGame = HistoricalGame(
-      timestamp    = System.currentTimeMillis,
-      mapName     = currentMapName,
-      enemyName   = currentEnemyName,
-      ourRace     = With.self.race,
-      enemyRace   = currentEnemyRace,
-      won         = weWon,
-      strategies  = With.strategy.selected.map(_.toString))
+      timestamp       = System.currentTimeMillis,
+      startLocations  = With.geography.startLocations.size,
+      mapName         = currentMapName,
+      enemyName       = currentEnemyName,
+      ourRace         = With.self.race,
+      enemyRace       = currentEnemyRace,
+      won             = weWon,
+      strategies      = With.strategy.selected.map(_.toString))
     HistoryLoader.save(games.toVector :+ thisGame)
   }
   

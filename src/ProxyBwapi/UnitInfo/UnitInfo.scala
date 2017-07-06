@@ -138,7 +138,8 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
       (is(Zerg.Ultralisk)   && player.getUpgradeLevel(Zerg.UltraliskSpeed)    > 0))
       1.5 else 1.0)))
   
-  def project(framesToLookAhead:Int):Pixel = pixelCenter.add((velocityX * framesToLookAhead).toInt, (velocityY * framesToLookAhead).toInt)
+  def project(distance: Double)       : Pixel = pixelCenter.radiateRadians(angleRadians, distance)
+  def project(framesToLookAhead: Int) : Pixel = pixelCenter.add((velocityX * framesToLookAhead).toInt, (velocityY * framesToLookAhead).toInt)
   
   def inTileRadius  (tiles: Int)  : Traversable[UnitInfo] = With.units.inTileRadius(tileIncludingCenter, tiles)
   def inPixelRadius (pixels: Int) : Traversable[UnitInfo] = With.units.inPixelRadius(pixelCenter, pixels)

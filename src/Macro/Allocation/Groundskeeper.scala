@@ -62,9 +62,9 @@ class Groundskeeper {
   //////////////
   
   /*
-  Propose an idea for building placement.
-  Intended for use by Plans that don't actually care when the building gets placed.
-  This is just to say "hey, it would be nice if a matching building got built here."
+    Propose an idea for building placement.
+    Intended for use by Plans that don't actually care when the building gets placed.
+    This is just to say "hey, it would be nice if a matching building got built here."
   */
   def propose(proposal: Blueprint) {
     if (proposalsFulfilled.contains(proposal)) return
@@ -74,20 +74,32 @@ class Groundskeeper {
   }
   
   /*
-  Require placement of a building matching the specified criteria.
-  Intended for use by Plans that urgently need a building placement.
-  If a matching proposal (specified by the above propose()) is available, they'll use that.
-  
-  So if you want to build a Pylon and don't really care where,
-  but someone proposed a specific place for a Pylon,
-  use the previously proposed place.
-   */
+    Require placement of a building matching the specified criteria.
+    Intended for use by Plans that urgently need a building placement.
+    If a matching proposal (specified by the above propose()) is available, they'll use that.
+    
+    So if you want to build a Pylon and don't really care where,
+    but someone proposed a specific place for a Pylon,
+    use the previously proposed place.
+  */
   def require(requirement: Blueprint): Option[Tile] = {
     unfulfillProposalForRequirement(requirement)
     tagWithId(requirement)
     flagUpdated(requirement)
     addRequirement(requirement)
     getTileForRequirement(requirement)
+  }
+  
+  /*
+    Some jankiness from building placement is tolerable later in the game.
+    But if it wrecks our early game build we just plain lose.
+    Example: Failing to place the Forge in an FFE vs. a 4-pool until it's too late
+  */
+  def demand(requirement: Blueprint): Option[Tile] = {
+    require(requirement).orElse({
+      requestEmergencyPlacement(requirement)
+      require(requirement)
+    })
   }
   
   def tagWithId(blueprint: Blueprint) {
@@ -137,21 +149,17 @@ class Groundskeeper {
     val proposal = findProposalAlreadyMatchedWithRequirement(requirement)
     proposal.foreach(flagUpdated)
     var output = getTileForProposal(proposal)
-    
-    // Some jankiness from building placement is tolerable later in the game.
-    // But if it wrecks our early game build we just plain lose.
-    // Example: Failing to place the Forge in an FFE vs. a 4-pool until it's too late
-    if (output.isEmpty
-      && With.configuration.emergencyBuildingPlacement
-      && With.frame < With.configuration.emergencyBuildingCutoffFrames
-      && With.framesSince(lastEmergencyBuildingPlacement) > With.configuration.emergencyBuildingCooldown) {
+    output
+  }
+  
+  private def requestEmergencyPlacement(requirement: Blueprint) {
+    if (With.configuration.emergencyBuildingPlacement
+    && With.frame < With.configuration.emergencyBuildingCutoffFrames
+    && With.framesSince(lastEmergencyBuildingPlacement) > With.configuration.emergencyBuildingCooldown) {
       With.logger.warn("Emergency building placement required for " + requirement.toString)
       lastEmergencyBuildingPlacement = With.frame
       With.placement.run(runToCompletionEvenIfItCostsUsAFrame = true)
-      output = getTileForProposal(proposal)
     }
-    
-    output
   }
   
   private def getTileForProposal(proposal: Option[Blueprint]): Option[Tile] = {

@@ -69,6 +69,7 @@ class Recruiter {
     //   Batch 1+: Units assigned to weaker-priority locks
     //
     val assignedToLowerPriority = unitsByLock.keys
+      .toSeq
       .filter(otherRequest =>
         otherRequest.interruptable.get &&
         lock.owner.priority < otherRequest.owner.priority)

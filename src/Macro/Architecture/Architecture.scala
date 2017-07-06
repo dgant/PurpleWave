@@ -109,7 +109,7 @@ class Architecture {
     
     lazy val start                  = canaryTile(edge.zones.head)
     lazy val end                    = canaryTile(edge.zones.last)
-    lazy val maxTiles               = Math.max(20, 5 * start.groundPixels(end).toInt / 32)
+    lazy val maxTiles               = Math.max(20, 5 * start.groundPixelsByTile(end).toInt / 32)
     lazy val blockedTiles           = blockedArea.tiles
     lazy val excludedBefore         = unwalkable.toSet
     lazy val excludedAfter          = unwalkable.toSet ++ blockedTiles
@@ -195,12 +195,12 @@ class Architecture {
     val forUnwalkable   = With.units.ours.filter(unit => isGroundBuilding(unit) && usuallyNeedsMargin(unit.unitClass))
     val harvestingAreas = With.geography.bases.map(_.harvestingArea)
     
-    unbuildable     ++= forUnbuildable.flatMap(_.tileArea.tiles)
+    unbuildable     ++= forUnbuildable.toSeq.flatMap(_.tileArea.tiles)
     unwalkable      ++= unbuildable
-    unwalkable      ++= forUnwalkable.flatMap(_.tileArea.expand(1, 1).tiles)
+    unwalkable      ++= forUnwalkable.toSeq.flatMap(_.tileArea.expand(1, 1).tiles)
     untownhallable  ++= unbuildable
-    unbuildable     ++= harvestingAreas.flatMap(_.tiles)
-    ungassable      ++= With.units.all.filter(unit => ! unit.player.isNeutral && unit.alive && unit.unitClass.isGas).map(_.tileTopLeft)
+    unbuildable     ++= harvestingAreas.toSeq.flatMap(_.tiles)
+    ungassable      ++= With.units.all.toSeq.filter(unit => ! unit.player.isNeutral && unit.alive && unit.unitClass.isGas).map(_.tileTopLeft)
       
     if (With.visualization.enabled) {
       exclusions ++= harvestingAreas.map(area => Exclusion("Harvesting area", area))

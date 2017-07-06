@@ -42,8 +42,8 @@ object PlacementProfiles {
     "Town Hall",
     preferNatural               = 3.0,
     preferGas                   = 1.0,
-    preferDistanceFromEnemy     = 1.5,
-    avoidDistanceFromBase       = 2.5
+    preferDistanceFromEnemy     = 2.0,
+    avoidDistanceFromBase       = 2.0
   )
   
   val cannonPylon = new PlacementProfile(

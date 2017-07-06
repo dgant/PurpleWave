@@ -117,9 +117,8 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   def pixelDistanceSquared    (otherUnit:   UnitInfo)   : Double  = pixelDistanceSquared(otherUnit.pixelCenter)
   def pixelDistanceSquared    (otherPixel:  Pixel)      : Double  = pixelCenter.pixelDistanceSquared(otherPixel)
   def pixelDistanceTravelling (destination: Pixel)      : Double  = pixelDistanceTravelling(pixelCenter, destination)
-  def pixelDistanceTravelling (destination: Tile)       : Double  = pixelDistanceTravelling(tileIncludingCenter, destination)
-  def pixelDistanceTravelling (from: Pixel, to: Pixel)  : Double  = pixelDistanceTravelling(from.tileIncluding, to.tileIncluding)
-  def pixelDistanceTravelling (from: Tile,  to: Tile)   : Double  = if (flying) from.pixelCenter.pixelDistanceSlow(to.pixelCenter) else from.groundPixels(to)
+  def pixelDistanceTravelling (destination: Tile)       : Double  = pixelDistanceTravelling(pixelCenter, destination.pixelCenter)
+  def pixelDistanceTravelling (from: Pixel, to: Pixel)  : Double  = if (flying) from.pixelDistanceFast(to) else from.groundPixels(to)
   
   def canMoveThisFrame: Boolean = unitClass.canMove && topSpeed > 0 && canDoAnythingThisFrame && ! burrowed
   
@@ -267,8 +266,8 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   def inRangeToAttackSlow(enemy: UnitInfo, framesAhead: Int) : Boolean = enemy.project(framesAhead).pixelDistanceSlow(project(framesAhead)) <= pixelRangeAgainstFromEdge(enemy) + unitClass.radialHypotenuse + enemy.unitClass.radialHypotenuse + With.configuration.attackableRangeBuffer
   def inRangeToAttackFast(enemy: UnitInfo, framesAhead: Int) : Boolean = enemy.project(framesAhead).pixelDistanceFast(project(framesAhead)) <= pixelRangeAgainstFromEdge(enemy) + unitClass.radialHypotenuse + enemy.unitClass.radialHypotenuse + With.configuration.attackableRangeBuffer
   
-  def framesToTravel(destination: Pixel)  : Int = framesToTravelPixels(pixelDistanceTravelling(destination))
-  def framesToTravelPixels(pixels:Double) : Int = if (canMoveThisFrame) Math.max(0, Math.ceil(pixels/topSpeed).toInt) else Int.MaxValue
+  def framesToTravel(destination: Pixel)    : Int = framesToTravelPixels(pixelDistanceTravelling(destination))
+  def framesToTravelPixels(pixels: Double)  : Int = if (canMoveThisFrame) Math.max(0, Math.ceil(pixels/topSpeed).toInt) else Int.MaxValue
   def framesBeforeAttacking(enemy: UnitInfo): Int = {
     if (canAttackThisSecond(enemy)) {
       Math.max(cooldownLeft, framesToTravelPixels(pixelDistanceFast(enemy) - pixelRangeAgainstFromEdge(enemy)))

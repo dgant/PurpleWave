@@ -19,7 +19,7 @@ object ZoneUpdater {
           .filter(otherBase => otherBase != startLocationBase && otherBase.gas.nonEmpty)
           .toVector
           .sortBy(
-            _.townHallArea.startInclusive.groundPixels(
+            _.townHallArea.startInclusive.groundPixelsByTile(
               startLocationBase.townHallArea.startInclusive))
           .headOption
           .foreach(_.isNaturalOf = Some(startLocationBase)))

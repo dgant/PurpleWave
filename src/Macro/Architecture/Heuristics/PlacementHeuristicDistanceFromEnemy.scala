@@ -14,12 +14,8 @@ object PlacementHeuristicDistanceFromEnemy extends PlacementHeuristic {
     else
       With.geography.enemyBases
     
-    enemyBases
-      .map(_.townHallArea.midPixel)
-      .map(basePixel =>
-        Math.min(
-          3 * basePixel.pixelDistanceFast(candidate.pixelCenter),
-          basePixel.groundPixels(candidate)))
-      .min
+    var totalDistance = 0.0
+    enemyBases.foreach(base => totalDistance += base.townHallArea.midPixel.pixelDistanceFast(candidate.pixelCenter))
+    totalDistance
   }
 }

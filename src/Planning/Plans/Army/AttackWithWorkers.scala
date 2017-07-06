@@ -39,7 +39,7 @@ class AttackWithWorkers extends Plan {
         .filter( ! _.owner.isUs)
         .filter(_.isStartLocation || haveSeenABase) //Only search non-start locations until we've killed the first
         .toVector
-        .sortBy( - _.heart.groundPixels(With.geography.home))
+        .sortBy( - _.heart.groundPixelsByTile(With.geography.home))
         .sortBy( ! _.isStartLocation)
         .sortBy(_.lastScoutedFrame)
         

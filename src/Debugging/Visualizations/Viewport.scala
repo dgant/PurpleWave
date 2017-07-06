@@ -10,7 +10,7 @@ class Viewport {
   def end     : Pixel = endcache.get
   def center  : Pixel = start.midpoint(end)
   
-  def centerOn(pixel:Pixel) {
+  def centerOn(pixel: Pixel) {
     With.game.setScreenPosition(
       pixel.subtract(
         With.configuration.cameraViewportWidth  / 2,

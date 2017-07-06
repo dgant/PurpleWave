@@ -1,4 +1,4 @@
-package Macro.Architecture.PlacementState
+package Macro.Architecture.PlacementStates
 
 import Lifecycle.With
 import Macro.Architecture.{Blueprint, Placement}

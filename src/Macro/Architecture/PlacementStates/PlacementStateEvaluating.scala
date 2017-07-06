@@ -1,4 +1,4 @@
-package Macro.Architecture.PlacementState
+package Macro.Architecture.PlacementStates
 
 import Lifecycle.With
 import Macro.Architecture.Heuristics.{EvaluatePlacements, PlacementHeuristicEvaluation}
@@ -9,7 +9,7 @@ import Mathematics.Points.Tile
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
-class StateEvaluating(blueprint: Blueprint) extends PlacementState {
+class PlacementStateEvaluating(blueprint: Blueprint) extends PlacementState {
   
   private var candidatesUnfiltered  : Option[Array[Tile]]       = None
   private var candidatesFiltered    : Option[ArrayBuffer[Tile]] = None
@@ -43,6 +43,7 @@ class StateEvaluating(blueprint: Blueprint) extends PlacementState {
         evaluationCount += 1
         val candidate = candidatesFiltered.get(nextEvaluationIndex)
         if (With.visualization.enabled) {
+          // This does all the math twice! It's slow and only useful for visualizations so we avoid it when possible.
           evaluations(candidate) = EvaluatePlacements.evaluate(blueprint, candidate)
         }
         evaluationValues(candidate) = HeuristicMathMultiplicative.resolve(
@@ -63,7 +64,7 @@ class StateEvaluating(blueprint: Blueprint) extends PlacementState {
         evaluationValuesMap,
         With.frame)
       With.groundskeeper.updatePlacement(blueprint, placement)
-      transition(new StateReady)
+      transition(new PlacementStateReady)
     }
   }
   

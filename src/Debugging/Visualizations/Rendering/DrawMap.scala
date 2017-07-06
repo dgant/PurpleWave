@@ -32,7 +32,7 @@ object DrawMap {
     
     //Crummy arrowhead drawn from circles
     circle(end, 1, color, solid = true)
-    circle(start.project(end, start.pixelDistanceSlow(end) - 2), 2, color, solid = true)
+    circle(start.project(end, start.pixelDistanceFast(end) - 2), 2, color, solid = true)
   }
   
   def box(

@@ -61,7 +61,7 @@ class DefendChokes extends Plan {
           choke.sidePixels.last,
           choke.zones
             .toList
-            .sortBy(_.centroid.groundPixels(With.geography.home))
+            .sortBy(_.centroid.groundPixelsByTile(With.geography.home))
             .sortBy( ! _.owner.isUs)
             .head
             .centroid

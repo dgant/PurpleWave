@@ -31,7 +31,7 @@ object PathFinder {
       toEdgeTiles.map(toEdgeTile =>
         from.pixelDistanceFast(fromEdgeTile.pixelCenter) +
           to.pixelDistanceFast(  toEdgeTile.pixelCenter) +
-        With.paths.groundPixels(
+        With.paths.groundPixelsByTile(
           fromEdgeTile,
           toEdgeTile,
           requireBwta = true))

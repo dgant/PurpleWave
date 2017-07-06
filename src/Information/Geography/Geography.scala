@@ -1,10 +1,10 @@
 package Information.Geography
 
 import Information.Geography.Calculations.{ZoneBuilder, ZoneUpdater}
-import Information.Geography.Types.{Base, Zone, Edge}
+import Information.Geography.Types.{Base, Edge, Zone}
 import Lifecycle.With
 import Mathematics.Points.{SpecificPoints, Tile, TileRectangle}
-import Performance.Caching.{Cache, Limiter}
+import Performance.Caching.{Cache, CacheFrame, Limiter}
 import ProxyBwapi.UnitInfo.UnitInfo
 
 import scala.collection.mutable
@@ -18,13 +18,21 @@ class Geography {
   lazy val zones          : Iterable[Zone]          = ZoneBuilder.zones
   lazy val edges          : Iterable[Edge]          = ZoneBuilder.edges
   lazy val bases          : Iterable[Base]          = ZoneBuilder.bases
-  def ourZones            : Iterable[Zone]          = zones.filter(_.owner.isUs)
-  def ourBases            : Iterable[Base]          = ourZones.flatten(_.bases)
-  def enemyZones          : Iterable[Zone]          = zones.filterNot(zone => Vector(With.self, With.neutral).contains(zone.owner))
-  def enemyBases          : Iterable[Base]          = enemyZones.flatten(_.bases)
-  def ourTownHalls        : Iterable[UnitInfo]      = ourBases.flatMap(_.townHall)
-  def ourHarvestingAreas  : Iterable[TileRectangle] = ourBases.map(_.harvestingArea)
-  lazy val ourNatural     : Option[Base]            = bases.find(_.isNaturalOf.exists(_.owner.isUs))
+  def ourZones            : Iterable[Zone]          = ourZonesCache.get
+  def ourBases            : Iterable[Base]          = ourBasesCache.get
+  def enemyZones          : Iterable[Zone]          = enemyZonesCache.get
+  def enemyBases          : Iterable[Base]          = enemyBasesCache.get
+  def ourTownHalls        : Iterable[UnitInfo]      = ourTownHallsCache.get
+  def ourHarvestingAreas  : Iterable[TileRectangle] = ourHarvestingAreasCache.get
+  def ourNatural          : Option[Base]            = ourNaturalCache.get
+  
+  private val ourZonesCache           = new CacheFrame(() => zones.filter(_.owner.isUs))
+  private val ourBasesCache           = new CacheFrame(() => bases.filter(_.owner.isUs))
+  private val enemyZonesCache         = new CacheFrame(() => zones.filter(_.owner.isEnemy))
+  private val enemyBasesCache         = new CacheFrame(() => bases.filter(_.owner.isEnemy))
+  private val ourTownHallsCache       = new CacheFrame(() => ourBases.flatMap(_.townHall))
+  private val ourHarvestingAreasCache = new CacheFrame(() => ourBases.map(_.harvestingArea))
+  private val ourNaturalCache         = new CacheFrame(() => bases.find(_.isNaturalOf.exists(_.owner.isUs)))
   
   def zoneByTile(tile: Tile): Zone = zoneByTileCache(tile)
   private lazy val zoneByTileCache =

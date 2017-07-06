@@ -96,9 +96,9 @@ case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     With.geography.zoneByTile(tileIncluding)
   }
   def groundPixels(other: Tile): Double = {
-    With.paths.groundPixels(tileIncluding, other)
+    With.paths.groundPixels(this, other.pixelCenter)
   }
   def groundPixels(other: Pixel): Double = {
-    With.paths.groundPixels(tileIncluding, other.tileIncluding)
+    With.paths.groundPixels(this, other)
   }
 }

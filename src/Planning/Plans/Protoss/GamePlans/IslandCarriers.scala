@@ -9,6 +9,7 @@ import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientPylons, TrainCon
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildAssimilators, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.{OnMiningBases, UnitsAtLeast}
+import Planning.Plans.Protoss.ProtossBuilds
 import ProxyBwapi.Races.Protoss
 
 class IslandCarriers extends Parallel {
@@ -51,7 +52,7 @@ class IslandCarriers extends Parallel {
   )
   
   children.set(Vector(
-    new RequireMiningBases(1),
+    new Build(ProtossBuilds.Opening13Nexus_NoZealot_OneGateCore: _*),
     new RequireSufficientPylons,
     new TrainProbesContinuously,
     new ExpandOverIsland,

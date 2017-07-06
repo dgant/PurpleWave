@@ -52,7 +52,7 @@ object Surveyor {
     }
     else {
       Spiral
-        .points(50)
+        .points(60)
         .map(With.self.startTile.add)
     }
   }

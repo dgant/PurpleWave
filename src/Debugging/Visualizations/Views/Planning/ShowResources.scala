@@ -7,7 +7,7 @@ import Lifecycle.With
 object ShowResources extends View {
   override def renderScreen() {
     DrawScreen.table(
-      285,
+      315,
       31,
       With.bank.prioritizedRequests
         .take(20)

@@ -11,17 +11,17 @@ object Project {
   //
   def framesToUnits(unitMatcher: UnitMatcher, quantity: Int = 1): Int = {
     
-    val all = With.units.ours.filter(unitMatcher.accept)
-    val complete = all.filter(_.complete)
+    val allUnits = With.units.ours.filter(unitMatcher.accept)
+    val complete = allUnits.filter(_.complete)
     
     // Do we already have it?
     val shortfall = quantity - complete.size
-    if (shortfall == 0) {
+    if (shortfall <= 0) {
       return 0
     }
     
     // Are we building what we need already?
-    val incomplete = all.filterNot(_.complete).toVector.sortBy(_.framesBeforeBecomingComplete)
+    val incomplete = allUnits.filterNot(_.complete).toVector.sortBy(_.framesBeforeBecomingComplete)
     if (incomplete.size >= shortfall) {
       incomplete
         .take(shortfall)

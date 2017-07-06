@@ -73,7 +73,7 @@ class Blueprint(
     }
     
     val thisZone = tile.zone
-    if (thisZone.island) {
+    if (thisZone.island && ! With.strategy.isPlasma) {
       return false
     }
     

@@ -15,7 +15,11 @@ class IslandCarriers extends Parallel {
   
   private class ExpandOverIsland extends RequireMiningBases {
     description.set("Fill island with expansions")
-    basesDesired.set(With.geography.bases.count(base => With.paths.exists(base.heart, With.self.startTile)))
+    basesDesired.set(
+      if (With.strategy.isPlasma)
+        3
+      else
+        With.geography.bases.count(base => With.paths.exists(base.heart, With.self.startTile)))
   }
   
   private class TechToCarriers extends Build(
@@ -56,19 +60,15 @@ class IslandCarriers extends Parallel {
     new If(
       new UnitsAtLeast(4, UnitMatchType(Protoss.Carrier)),
       new Parallel(
-        new SpamUpgrades,
-        new TechToObservers,
-        new TechToArbiters,
+        new OnMiningBases(2, new Parallel(new SpamUpgrades, new TechToObservers)),
+        new OnMiningBases(3, new Parallel(new TechToArbiters)),
         new TrainContinuously(Protoss.Observer, 2),
         new TrainContinuously(Protoss.Arbiter, 2),
-        new TrainContinuously(Protoss.Carrier)
-      ),
+        new TrainContinuously(Protoss.Carrier)),
       new Parallel(
         new TrainContinuously(Protoss.Scout, 3),
         new TrainContinuously(Protoss.Carrier),
-        new TrainContinuously(Protoss.Observer, 1)
-      )
-    ),
+        new TrainContinuously(Protoss.Observer, 1))),
     new OnMiningBases(1, new Build(RequestUnitAtLeast(3, Protoss.Stargate))),
     new OnMiningBases(2, new Build(RequestUnitAtLeast(5, Protoss.Stargate))),
     new OnMiningBases(3, new Build(RequestUnitAtLeast(8, Protoss.Stargate))),

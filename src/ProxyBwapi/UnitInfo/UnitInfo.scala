@@ -247,7 +247,7 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
       || (is(Zerg.Lurker)     && burrowed)
     )))
   
-  def canAttackThisSecond(enemy:UnitInfo):Boolean =
+  def canAttackThisSecond(enemy: UnitInfo): Boolean =
     canAttackThisSecond &&
     enemy.canBeAttackedThisFrame &&
     ! enemy.effectivelyCloaked &&

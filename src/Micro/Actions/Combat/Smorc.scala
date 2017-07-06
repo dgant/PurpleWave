@@ -37,6 +37,14 @@ object Smorc extends Action {
     val ourStrength           = strength(allyFighters :+ state.unit)
     val enemyStrength         = strength(enemies)
     val enemyFighterStrength  = strength(enemyFighters)
+  
+    // We want to avoid big drilling stacks
+    val centroidSoft    = enemies.map(_.pixelCenter).centroid
+    val centroidHard    = if (enemies.size > 3) enemies.sortBy(_.pixelDistanceFast(centroidSoft)).take(enemies.size/2).map(_.pixelCenter).centroid else centroidSoft //Don't centroid an empty list
+    var drillingEnemies = enemies.filter(_.pixelDistanceFast(centroidHard) < 24.0)
+    if (drillingEnemies.size < 4) {
+      drillingEnemies = Vector.empty
+    }
     
     // Get in their base!
     if (state.unit.pixelCenter.zone != zone) {
@@ -80,13 +88,6 @@ object Smorc extends Action {
     if (ourStrength > enemyStrength) {
       attack = true
     }
-    else {
-      // But otherwise, if they're worker drilling, we should back off (they're just wasting mining time anyhow)
-      val centroid = enemies.map(_.pixelCenter).centroid
-      if (enemies.forall(_.pixelDistanceFast(centroid) < 32.0)) {
-       attack = false
-      }
-    }
     
     // Lastly, if they've started training combat units, we are ALL IN
     if (enemies.exists( ! _.unitClass.isWorker)) {
@@ -102,21 +103,24 @@ object Smorc extends Action {
         return
       }
       else if (state.unit.canAttackThisFrame) {
+        // Let's pick the outermost target while avoiding drilling stacks
         val nearestTargetDistance = targets.map(_.pixelDistanceFast(exit)).min
-        val validTargets = targets.filter(target => target.pixelDistanceFast(exit) - 16.0 <= nearestTargetDistance)
+        val validTargets = targets.filter(target =>
+          target.pixelDistanceFast(exit) - 16.0 <= nearestTargetDistance
+          && ! drillingEnemies.contains(target))
         state.toAttack = Some(validTargets
           .toVector
           .sortBy(target => target.totalHealth * target.pixelDistanceFast(state.unit))
           .headOption
           .getOrElse(targets.minBy(_.pixelDistanceFast(exit))))
-        
+  
         Attack.consider(state)
         return
       }
     }
       
     // We're not attacking, so let's hang out and wait for opportunities
-    if (enemiesAttackingUs.nonEmpty) {
+    if (enemiesAttackingUs.nonEmpty || enemies.exists(_.pixelDistanceFast(state.unit) < 64.0)) {
       mineralWalkAway(state)
     } else {
       HoverOutsideRange.consider(state)

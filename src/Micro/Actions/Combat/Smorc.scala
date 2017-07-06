@@ -25,7 +25,7 @@ object Smorc extends Action {
     var attack                = true
   
     val zone                  = state.toTravel.get.zone
-    val exit                  = zone.exit.map(_.centerPixel).getOrElse(With.geography.home.pixelCenter)
+    val exit                  = zone.edges.map(_.centerPixel).sortBy(_.groundPixels(With.geography.home)).headOption.getOrElse(With.geography.home.pixelCenter)
     val dyingThreshold        = 11
     val dying                 = state.unit.totalHealth < dyingThreshold
     val enemies               = state.threats
@@ -122,7 +122,16 @@ object Smorc extends Action {
     // We're not attacking, so let's hang out and wait for opportunities
     if (enemiesAttackingUs.nonEmpty || enemies.exists(_.pixelDistanceFast(state.unit) < 64.0)) {
       mineralWalkAway(state)
-    } else {
+    }
+    else {
+      val builder = enemies.find(builder =>
+        builder.constructing
+          && enemies.forall(defender =>
+          defender != builder
+            && state.unit.pixelDistanceFast(defender) >
+            state.unit.pixelDistanceFast(builder)))
+      state.toAttack = builder
+      Attack.consider(state)
       HoverOutsideRange.consider(state)
     }
   }

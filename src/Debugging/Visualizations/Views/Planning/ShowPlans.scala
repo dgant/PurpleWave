@@ -7,7 +7,7 @@ import Planning.Plan
 object ShowPlans extends View {
   
   override def renderMap() {
-    drawPlansRecursively(With.gameplan)
+    drawPlansRecursively(With.strategy.gameplan)
   }
   
   private def drawPlansRecursively(plan: Plan) {
@@ -16,7 +16,7 @@ object ShowPlans extends View {
   }
   
   override def renderScreen() {
-    describePlanTree(With.gameplan, 0, 0)
+    describePlanTree(With.strategy.gameplan, 0, 0)
       .zipWithIndex
       .foreach(pair => With.game.drawTextScreen(0, pair._2 * With.visualization.lineHeightSmall, pair._1))
   }

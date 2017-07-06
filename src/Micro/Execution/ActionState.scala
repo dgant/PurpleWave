@@ -29,7 +29,7 @@ class ActionState(val unit: FriendlyUnitInfo) {
   // History //
   /////////////
   
-  var intent: Intention = new Intention(With.gameplan, unit)
+  var intent: Intention = new Intention(With.strategy.gameplan, unit)
 
   var lastAction: Option[Action] = None
   var lastFrame: Int = 0

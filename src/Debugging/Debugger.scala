@@ -5,7 +5,7 @@ import Lifecycle.With
 
 object Debugger {
   
-  def plans:Iterable[Plan] = flatten(With.gameplan)
+  def plans:Iterable[Plan] = flatten(With.strategy.gameplan)
   
   def planDescriptions:Iterable[String] = plans.map(plan => plan.toString)
   

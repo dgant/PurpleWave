@@ -45,6 +45,8 @@ object Smorc extends Action {
     if (drillingEnemies.size < 4) {
       drillingEnemies = Vector.empty
     }
+    // Let's try disabling this.
+    drillingEnemies = Vector.empty
     
     // Get in their base!
     if (state.unit.pixelCenter.zone != zone) {
@@ -102,7 +104,11 @@ object Smorc extends Action {
         destroyBuildings(state)
         return
       }
-      else if (state.unit.canAttackThisFrame) {
+      else if (
+        state.unit.canAttackThisFrame ||
+          state.unit.cooldownLeft < targets.map(target =>
+            state.unit.framesToTravelPixels(
+              state.unit.pixelsFromEdgeFast(target))).min) {
         // Let's pick the outermost target while avoiding drilling stacks
         val nearestTargetDistance = targets.map(_.pixelDistanceFast(exit)).min
         val validTargets = targets.filter(target =>

@@ -34,7 +34,6 @@ object With {
   var configuration   : Configuration       = _
   var economy         : Economy             = _
   var executor        : Executor            = _
-  var gameplan        : WinTheGame          = _
   var geography       : Geography           = _
   var grids           : Grids               = _
   var groundskeeper   : Groundskeeper       = _
@@ -91,7 +90,6 @@ object With {
     economy           = new Economy
     executor          = new Executor
     commander         = new Commander
-    gameplan          = new WinTheGame
     geography         = new Geography
     grids             = new Grids
     history           = new History

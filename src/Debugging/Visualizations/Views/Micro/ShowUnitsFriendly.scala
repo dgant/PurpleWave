@@ -15,7 +15,7 @@ object ShowUnitsFriendly extends View {
   def renderUnitState(state: ActionState) {
     if ( ! With.viewport.contains(state.unit.pixelCenter)) return
     
-    if (state.intent.plan != With.gameplan) {
+    if (state.intent.plan != With.strategy.gameplan) {
       DrawMap.label(
         state.intent.plan.toString,
         state.unit.pixelCenter.add(0, -21),

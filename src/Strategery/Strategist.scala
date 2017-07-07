@@ -107,8 +107,8 @@ class Strategist {
     }
     val bestStrategy = chooseBestStrategy()
     output.append(bestStrategy)
-    if (bestStrategy.options.nonEmpty) {
-      output ++= chooseBest(bestStrategy.options)
+    if (bestStrategy.features.nonEmpty) {
+      output ++= bestStrategy.features.flatMap(features => chooseBest(features.options))
     }
     output
   }
@@ -128,11 +128,11 @@ class Strategist {
   // How many games before we have confidence in this strategy?
   // Definitely not statistically sound.
   private def getConfidenceSamples(strategy: Strategy): Double = {
-    if (strategy.options.isEmpty) {
-      5.0
+    if (strategy.features.isEmpty) {
+      3.0
     }
     else {
-      strategy.options.map(getConfidenceSamples).sum
+      strategy.features.map(_.options.map(getConfidenceSamples).sum).sum
     }
   }
   

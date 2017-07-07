@@ -1,6 +1,7 @@
 package Strategery.Strategies
 
 import Planning.Plan
+import Strategery.Strategies.Options.StrategyFeature
 import bwapi.Race
 
 abstract class Strategy {
@@ -9,7 +10,7 @@ abstract class Strategy {
   
   lazy val gameplan: Option[Plan] = None
   
-  def options: Iterable[Strategy] = Iterable.empty
+  def features: Iterable[StrategyFeature] = Iterable.empty
   
   def islandMaps        : Boolean         = false
   def groundMaps        : Boolean         = true

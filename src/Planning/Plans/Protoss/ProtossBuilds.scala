@@ -5,6 +5,10 @@ import ProxyBwapi.Races.Protoss
 
 object ProtossBuilds {
   
+  /////////////////////////
+  // Protoss Vs. Protoss //
+  /////////////////////////
+  
   val OpeningOneGateCore_DragoonFirst = Vector[BuildRequest] (
     RequestAtLeast(1,   Protoss.Nexus),
     RequestAtLeast(8,   Protoss.Probe),
@@ -184,6 +188,36 @@ object ProtossBuilds {
   )
   
   //////////////////////
+  // Protoss vs. Zerg //
+  //////////////////////
+  
+  val FFE_ForgeFirst = Vector[BuildRequest] (
+    RequestAtLeast(1,   Protoss.Nexus),
+    RequestAtLeast(8,   Protoss.Probe),
+    RequestAtLeast(1,   Protoss.Pylon),
+    RequestAtLeast(10,  Protoss.Probe),
+    RequestAtLeast(1,   Protoss.Forge),
+    RequestAtLeast(13,  Protoss.Probe),
+    RequestAtLeast(2,   Protoss.PhotonCannon),
+    RequestAtLeast(15,  Protoss.Probe),
+    RequestAtLeast(3,   Protoss.PhotonCannon),
+    RequestAtLeast(16,  Protoss.Probe),
+    RequestAtLeast(2,   Protoss.Pylon))
+  
+  val FFE_NexusFirst = Vector[BuildRequest] (
+    RequestAtLeast(1,   Protoss.Nexus),
+    RequestAtLeast(8,   Protoss.Probe),
+    RequestAtLeast(1,   Protoss.Pylon),
+    RequestAtLeast(12,  Protoss.Probe),
+    RequestAtLeast(2,   Protoss.Nexus),
+    RequestAtLeast(13,  Protoss.Probe),
+    RequestAtLeast(1,   Protoss.Forge),
+    RequestAtLeast(15,  Protoss.Probe),
+    RequestAtLeast(2,   Protoss.Pylon),
+    RequestAtLeast(3,   Protoss.PhotonCannon))
+  
+  
+  /////////////////////
   // General-Purpose //
   /////////////////////
   

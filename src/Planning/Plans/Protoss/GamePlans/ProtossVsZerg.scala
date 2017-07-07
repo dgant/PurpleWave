@@ -1,77 +1,235 @@
 package Planning.Plans.Protoss.GamePlans
 
-import Macro.BuildRequests.Request
-import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors}
+import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
+import Planning.Composition.UnitCounters.UnitCountBetween
+import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors, UnitMatchWorkers}
 import Planning.Plans.Army._
 import Planning.Plans.Compound.{If, _}
+import Planning.Plans.Information.Employ
 import Planning.Plans.Information.Scenarios.WeAreBeing4Pooled
 import Planning.Plans.Macro.Automatic._
-import Planning.Plans.Macro.BuildOrders.Build
+import Planning.Plans.Macro.BuildOrders.{Build, FirstFiveMinutes}
 import Planning.Plans.Macro.Expanding.{BuildAssimilators, RequireMiningBases}
-import Planning.Plans.Macro.Milestones.UnitsAtLeast
-import Planning.Plans.Protoss.Situational.{BlockWithWorkers, ForgeFastExpand}
-import Planning.Plans.Scouting.ScoutAt
-import ProxyBwapi.Races.Protoss
+import Planning.Plans.Macro.Milestones.{EnemyUnitsAtLeast, MiningBasesAtLeast, UnitsAtLeast}
+import Planning.Plans.Macro.Reaction.{EnemyBasesAtLeast, EnemyMutalisks}
+import Planning.Plans.Macro.Upgrades.UpgradeContinuously
+import Planning.Plans.Protoss.ProtossBuilds
+import Planning.Plans.Protoss.Situational.{DefendChokeWithWorkers, ForgeFastExpand}
+import Planning.Plans.Scouting.RequireScouting
+import ProxyBwapi.Races.{Protoss, Zerg}
+import Strategery.Strategies.Options.Protoss.VsZerg.Early.{Early2Gate, EarlyFFEHeavy, EarlyFFELight, EarlyZealotAllIn}
+import Strategery.Strategies.Options.Protoss.VsZerg.Midgame.{Midgame5GateDragoons, MidgameCorsairCarrier, MidgameCorsairReaver, MidgameCorsairSpeedlot}
 
 class ProtossVsZerg extends Parallel {
   
-  description.set("Protoss vs Zerg")
+  description.set("Protoss vs. Zerg")
   
-  class FiveGateGoon_Start extends Parallel(
-    // http://wiki.teamliquid.net/starcraft/5_Gate_Ranged_Goons_(vs._Zerg)
-    new Build(
-      Request.unit(Protoss.Nexus),
-      Request.unit(Protoss.Probe,         8),
-      Request.unit(Protoss.Pylon),
-      Request.unit(Protoss.Probe,         10),
-      Request.unit(Protoss.Forge),
-      Request.unit(Protoss.Probe,         12),
-      Request.unit(Protoss.PhotonCannon,  2),
-      Request.unit(Protoss.Probe,         15),
-      Request.unit(Protoss.PhotonCannon,  3),
-      Request.unit(Protoss.Probe,         16),
-      Request.unit(Protoss.Pylon,         2)
-    )
-  )
+  ////////////////
+  // Early game //
+  ////////////////
   
-  class BuildDragoonsAndAssimilators_AfterCyberneticsCore extends If(
-    new UnitsAtLeast(1, UnitMatchType(Protoss.CyberneticsCore), complete = true),
+  private class ImplementEarly2Gate extends FirstFiveMinutes(
+    new Build(ProtossBuilds.OpeningTwoGate99: _*))
+  
+  private class ImplementEarlyFFELight extends FirstFiveMinutes(
     new Parallel(
-      new Build(Request.upgr(Protoss.DragoonRange)),
-      new BuildAssimilators,
-      new TrainContinuously(Protoss.Dragoon)),
-    new TrainContinuously(Protoss.Zealot)
-  )
-  private class AttackWithFour extends If(
-    new UnitsAtLeast(4, UnitMatchWarriors),
-    new ConsiderAttacking,
-    new DefendChokes)
+      new ForgeFastExpand,
+      new If(
+        new EnemyBasesAtLeast(2),
+        new Build(ProtossBuilds.FFE_NexusFirst: _*),
+        new Build(ProtossBuilds.FFE_ForgeFirst: _*)),
+      new RequireMiningBases(2)))
   
-  private val earlyZealotCount = 8
+  private class ImplementEarlyFFEHeavy extends ImplementEarlyFFELight
+  
+  /////////////
+  // Midgame //
+  /////////////
+  
+  private class ImplementMidgame5GateDragoons extends Parallel(
+    new Build(
+      RequestAtLeast(1, Protoss.Gateway),
+      RequestAtLeast(1, Protoss.Assimilator),
+      RequestAtLeast(1, Protoss.CyberneticsCore),
+      RequestAtLeast(1, Protoss.Zealot),
+      RequestUpgrade(Protoss.DragoonRange),
+      RequestAtLeast(1, Protoss.Dragoon)),
+    new If(
+      new MiningBasesAtLeast(2),
+      new Parallel(
+        new Build(RequestAtLeast(2, Protoss.Assimilator)),
+        new Build(RequestAtLeast(5, Protoss.Gateway))),
+      new Build(RequestAtLeast(3, Protoss.Gateway))))
+  
+  private class ImplementMidgameCorsairCarrier extends Parallel(
+    new Build(
+      RequestAtLeast(2, Protoss.Assimilator),
+      RequestAtLeast(1, Protoss.Gateway),
+      RequestAtLeast(1, Protoss.CyberneticsCore),
+      RequestAtLeast(1, Protoss.Stargate),
+      RequestAtLeast(5, Protoss.PhotonCannon),
+      RequestAtLeast(1, Protoss.FleetBeacon),
+      RequestAtLeast(3, Protoss.Stargate),
+      RequestUpgrade(Protoss.AirDamage),
+      RequestAtLeast(4, Protoss.Stargate)))
+  
+  private class ImplementMidgameCorsairSpeedlot extends Parallel(
+    new Build(
+      RequestAtLeast(1, Protoss.Gateway),
+      RequestAtLeast(1, Protoss.Assimilator),
+      RequestAtLeast(1, Protoss.CyberneticsCore),
+      RequestUpgrade(Protoss.ZealotSpeed)),
+    new If(
+      new MiningBasesAtLeast(2),
+      new Build(
+        RequestAtLeast(2, Protoss.Assimilator),
+        RequestAtLeast(5, Protoss.Gateway),
+        RequestAtLeast(1, Protoss.Stargate),
+        RequestAtLeast(1, Protoss.CitadelOfAdun)),
+      new Build(RequestAtLeast(3, Protoss.Gateway))))
+  
+  private class ImplementMidgameCorsairReaver extends Parallel(
+    new Build(
+      RequestAtLeast(1, Protoss.Gateway),
+      RequestAtLeast(2, Protoss.Assimilator),
+      RequestAtLeast(1, Protoss.CyberneticsCore),
+      RequestAtLeast(1, Protoss.Stargate),
+      RequestAtLeast(4, Protoss.PhotonCannon),
+      RequestAtLeast(1, Protoss.RoboticsFacility),
+      RequestAtLeast(1, Protoss.RoboticsSupportBay)))
+  
+  ///////////
+  // Macro //
+  ///////////
+  
+  private class TakeSafeNatural extends If(
+    new UnitsAtLeast(12, UnitMatchWarriors),
+    new RequireMiningBases(2))
+  
+  private class TakeSafeThirdBase extends If(
+    new UnitsAtLeast(20, UnitMatchWarriors),
+    new RequireMiningBases(3))
+  
+  private class BuildDetectionForLurkers extends If(
+    new EnemyUnitsAtLeast(1, UnitMatchType(Zerg.Lurker)),
+    new Build(
+      RequestAtLeast(1, Protoss.CyberneticsCore),
+      RequestAtLeast(1, Protoss.RoboticsFacility),
+      RequestAtLeast(1, Protoss.Observatory)))
+
+  private class BuildAntiAirForMutalisks extends If(
+    new EnemyMutalisks,
+    new Build
+  )
+  
+  /////////////////
+  // Here we go! //
+  /////////////////
   
   children.set(Vector(
-    new ForgeFastExpand,
+    
+    // Early game
     new RequireMiningBases(1),
-    new FiveGateGoon_Start,
-    new RequireMiningBases(2),
+    new Employ(EarlyZealotAllIn,  new ImplementEarly2Gate),
+    new Employ(Early2Gate,        new ImplementEarly2Gate),
+    new Employ(EarlyFFELight,     new ImplementEarlyFFELight),
+    new Employ(EarlyFFEHeavy,     new ImplementEarlyFFEHeavy),
+    new TakeSafeNatural,
+    new TakeSafeThirdBase,
+    
+    
+    // Early game macro
     new RequireSufficientPylons,
     new TrainProbesContinuously,
-    new Build(Request.unit(Protoss.Gateway)),
-    new Build(Request.unit(Protoss.Assimilator)),
-    new Build(Request.unit(Protoss.CyberneticsCore, 1)),
-    new Build(Request.unit(Protoss.PhotonCannon,  4)),
-    new BuildDragoonsAndAssimilators_AfterCyberneticsCore,
-    new Build(Request.unit(Protoss.Gateway, 5)),
-    //This part is freelancing. Replace with an actual late game.
+  
+    // #YOLO
+    new Employ(EarlyZealotAllIn, new Parallel(
+      new TrainContinuously(Protoss.Zealot),
+      new TrainContinuously(Protoss.Gateway, 5))),
+  
+    // Mid game builds
+    new Employ(Midgame5GateDragoons, new ImplementMidgame5GateDragoons),
+    
+    // Mid-game macro
+    new Employ(EarlyFFEHeavy, new TrainContinuously(Protoss.PhotonCannon, 8)),
+    new BuildAssimilators,
+    new BuildDetectionForLurkers,
+    
+    new If(
+      new UnitsAtLeast(6, UnitMatchType(Protoss.Carrier), complete = false),
+      new UpgradeContinuously(Protoss.AirDamage)),
+  
+    new If(
+      new UnitsAtLeast(1, UnitMatchType(Protoss.Dragoon), complete = false),
+      new Build(RequestUpgrade(Protoss.DragoonRange))),
+    
+    new If(
+      new UnitsAtLeast(8, UnitMatchType(Protoss.Zealot), complete = false),
+      new Parallel(
+        new UpgradeContinuously(Protoss.GroundDamage),
+        new Build(RequestUpgrade(Protoss.ZealotSpeed)))),
+    
+    new If(
+      new EnemyMutalisks,
+      new TrainMatchingRatio(Protoss.Corsair, UnitMatchType(Zerg.Mutalisk), 1.5),
+      new TrainContinuously(Protoss.Corsair, 1)),
+    
+    new TrainContinuously(Protoss.Carrier),
+    new TrainMatchingRatio(Protoss.Observer, UnitMatchType(Zerg.Lurker), 0.2, 3),
+  
+    new If(
+      new EnemyMutalisks,
+      new TrainContinuously(Protoss.Dragoon),
+      new Parallel(
+        new TrainContinuously(Protoss.Reaver, 5),
+        new If(
+          new UnitsAtLeast(12, UnitMatchType(Protoss.Zealot)),
+          new TrainContinuously(Protoss.Dragoon),
+          new TrainContinuously(Protoss.Zealot)))),
+  
+    new Employ(MidgameCorsairReaver,    new ImplementMidgameCorsairReaver),
+    new Employ(MidgameCorsairSpeedlot,  new ImplementMidgameCorsairSpeedlot),
+    new Employ(MidgameCorsairCarrier,   new ImplementMidgameCorsairCarrier),
+    
+    // Late game macro
     new Build(
-      Request.unit(Protoss.Gateway, 8),
-      Request.upgr(Protoss.GroundArmor),
-      Request.upgr(Protoss.GroundDamage)),
-    new ScoutAt(9),
-    new ControlMap,
-    new AttackWithFour,
+      RequestAtLeast(3, Protoss.Gateway),
+      RequestAtLeast(1, Protoss.Stargate),
+      RequestAtLeast(8, Protoss.Gateway),
+      RequestAtLeast(1, Protoss.Forge),
+      RequestAtLeast(1, Protoss.CitadelOfAdun),
+      RequestAtLeast(1, Protoss.RoboticsFacility)),
+    
+    new Build(
+      RequestAtLeast(2, Protoss.Forge),
+      RequestAtLeast(1, Protoss.CitadelOfAdun),
+      RequestAtLeast(1, Protoss.TemplarArchives)),
+    
+    new UpgradeContinuously(Protoss.GroundArmor),
+    new UpgradeContinuously(Protoss.GroundDamage),
+    
+    
+    // Tactics
     new If(
       new WeAreBeing4Pooled,
-      new BlockWithWorkers)
+      new DefendChokeWithWorkers,
+      new If(
+        new UnitsAtLeast(1, UnitMatchType(Protoss.Pylon), complete = false),
+        new RequireScouting)), // Don't scout while being 4-pooled
+    
+    // 2-gate: Trigger attacking immediately! And bring Probes
+    new Employ(EarlyZealotAllIn,
+      new Trigger(
+        new UnitsAtLeast(2, UnitMatchType(Protoss.Zealot), complete = true),
+        new Parallel(
+          new ConsiderAttacking,
+          new ConsiderAttacking {
+            attack.attackers.get.unitCounter.set(new UnitCountBetween(1, 2))
+            attack.attackers.get.unitMatcher.set(UnitMatchWorkers)
+          }),
+        new DefendHearts)),
+    
+    new ControlMap,
+    new ConsiderAttacking
   ))
 }

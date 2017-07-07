@@ -1,5 +1,6 @@
 package Strategery.Strategies.Options.Protoss.VsTerran.PvTMacro
 
+import Strategery.Strategies.Options.Protoss.VsTerran.PvTMacro.Early.{Early1015GateGoon, Early14Nexus, Early1GateRange, EarlyDTExpand}
 import Strategery.Strategies.{Strategy, StrategyChoice}
 
 object PvTMacroEarly extends StrategyChoice {

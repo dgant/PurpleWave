@@ -8,6 +8,6 @@ class OnMiningBases(
   argWhenTrue   : Plan = new Plan,
   argWhenFalse  : Plan = new Plan)
   extends If(
-    new HaveMiningBases(requiredBases),
+    new MiningBasesAtLeast(requiredBases),
     argWhenTrue,
     argWhenFalse)

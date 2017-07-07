@@ -3,7 +3,7 @@ package Planning.Plans.Macro.Milestones
 import Lifecycle.With
 import Planning.Plan
 
-class HaveMiningBases(requiredBases: Int) extends Plan {
+class MiningBasesAtLeast(requiredBases: Int) extends Plan {
   
   description.set("Require " + requiredBases + " mining bases.")
   

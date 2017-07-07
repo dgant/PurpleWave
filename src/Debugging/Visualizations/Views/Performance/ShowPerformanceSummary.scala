@@ -17,7 +17,7 @@ object ShowPerformanceSummary extends View {
     With.game.drawTextScreen(155, 2 * With.visualization.lineHeightSmall, "+10000ms: "  + With.performance.framesOver10000  + "/2")
     if (With.performance.disqualified) {
       With.game.setTextSize(bwapi.Text.Size.Enum.Large)
-      With.game.drawTextScreen(230, 4 * With.visualization.lineHeightSmall, "Disqualified!")
+      With.game.drawTextScreen(230, 2 * With.visualization.lineHeightSmall, "Disqualified!")
       With.game.setTextSize(bwapi.Text.Size.Enum.Small)
     }
   }

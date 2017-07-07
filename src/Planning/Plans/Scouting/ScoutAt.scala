@@ -1,15 +1,11 @@
 package Planning.Plans.Scouting
 
-import Planning.Plans.Compound.{And, If, Not}
+import Planning.Plans.Compound.If
 import Planning.Plans.Macro.Milestones.SupplyAtLeastDoubleThis
 
-class ScoutAt(minimumSupply:Int)
-  extends If(
-    new And(
-      new SupplyAtLeastDoubleThis(minimumSupply),
-      new Not(new FoundEnemyBase)
-    ),
-    new FindEnemyBase) {
+class ScoutAt(minimumSupply: Int) extends If(
+    new SupplyAtLeastDoubleThis(minimumSupply),
+    new RequireScouting) {
   
   description.set("Find an enemy base at " + minimumSupply + " supply")
 }

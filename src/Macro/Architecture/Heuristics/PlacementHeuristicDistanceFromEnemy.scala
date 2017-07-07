@@ -6,7 +6,7 @@ import Mathematics.Points.Tile
 
 object PlacementHeuristicDistanceFromEnemy extends PlacementHeuristic {
   
-  override def evaluate(building: Blueprint, candidate: Tile): Double = {
+  override def evaluate(blueprint: Blueprint, candidate: Tile): Double = {
   
     val enemyBases =
     if (With.geography.enemyBases.isEmpty)
@@ -15,7 +15,18 @@ object PlacementHeuristicDistanceFromEnemy extends PlacementHeuristic {
       With.geography.enemyBases
     
     var totalDistance = 0.0
-    enemyBases.foreach(base => totalDistance += base.townHallArea.midPixel.pixelDistanceFast(candidate.pixelCenter))
+    enemyBases.foreach(base => {
+      val from = base.townHallArea.midPixel
+      val to = candidate.pixelCenter
+  
+      // Performance optimization.
+      // We want ground distance for expansions, but that's too luxurious for ordinary buildings
+      if (blueprint.townHall)
+        totalDistance += from.groundPixels(to)
+      else
+        totalDistance += from.pixelDistanceFast(to)
+      
+      })
     totalDistance
   }
 }

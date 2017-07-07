@@ -1,9 +1,9 @@
-package Strategery.Strategies.Options.PvT_Macro
+package Strategery.Strategies.Options.PvTMacro
 
 import Strategery.Strategies.Options.StrategyFeature
 import Strategery.Strategies.Strategy
 
-object PvT_MacroLate extends StrategyFeature {
+object PvTMacroLate extends StrategyFeature {
   
   override val options: Iterable[Strategy] = Vector(
     LateArbiters,

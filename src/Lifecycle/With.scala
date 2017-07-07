@@ -61,7 +61,7 @@ object With {
   var frame       : Int = 0
   var mapWidth    : Int = 0
   var mapHeight   : Int = 0
-  var mapFileName : String = With.game.mapFileName
+  var mapFileName : String = _
   
   def framesSince(previousFrame: Int): Int = Math.max(0, frame - previousFrame)
   
@@ -80,6 +80,7 @@ object With {
     enemies           = game.enemies.asScala.map(Players.get).toVector
     mapWidth          = game.mapWidth
     mapHeight         = game.mapHeight
+    mapFileName       = game.mapFileName
     configuration     = new Configuration
     logger            = new Logger
     initializeBWTA()

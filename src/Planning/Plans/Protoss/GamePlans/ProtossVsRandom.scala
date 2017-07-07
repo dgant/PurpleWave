@@ -1,6 +1,6 @@
 package Planning.Plans.Protoss.GamePlans
 
-import Macro.BuildRequests.{BuildRequest, RequestUnitAtLeast}
+import Macro.BuildRequests.{BuildRequest, RequestAtLeast}
 import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Plans.Army.{ConsiderAttacking, DefendChokes}
 import Planning.Plans.Compound.{If, Parallel}
@@ -16,10 +16,10 @@ class ProtossVsRandom extends Parallel {
   description.set("Protoss vs Random")
   
   private val safeBuild = Vector[BuildRequest] (
-    RequestUnitAtLeast(3,   Protoss.Gateway),
-    RequestUnitAtLeast(1,   Protoss.CyberneticsCore),
-    RequestUnitAtLeast(1,   Protoss.Assimilator),
-    RequestUnitAtLeast(4,   Protoss.Gateway)
+    RequestAtLeast(3,   Protoss.Gateway),
+    RequestAtLeast(1,   Protoss.CyberneticsCore),
+    RequestAtLeast(1,   Protoss.Assimilator),
+    RequestAtLeast(4,   Protoss.Gateway)
   )
   
   children.set(Vector(

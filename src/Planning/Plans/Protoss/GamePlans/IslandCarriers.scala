@@ -1,7 +1,7 @@
 package Planning.Plans.Protoss.GamePlans
 
 import Lifecycle.With
-import Macro.BuildRequests.{RequestUnitAtLeast, RequestUpgradeNext}
+import Macro.BuildRequests.{RequestAtLeast, RequestUpgradeNext}
 import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Plans.Army.{ConsiderAttacking, ControlMap, DefendChokes}
 import Planning.Plans.Compound.{If, Parallel}
@@ -24,29 +24,29 @@ class IslandCarriers extends Parallel {
   }
   
   private class TechToCarriers extends Build(
-    RequestUnitAtLeast(1, Protoss.Gateway),
-    RequestUnitAtLeast(1, Protoss.CyberneticsCore),
-    RequestUnitAtLeast(1, Protoss.Stargate),
-    RequestUnitAtLeast(1, Protoss.FleetBeacon),
+    RequestAtLeast(1, Protoss.Gateway),
+    RequestAtLeast(1, Protoss.CyberneticsCore),
+    RequestAtLeast(1, Protoss.Stargate),
+    RequestAtLeast(1, Protoss.FleetBeacon),
     RequestUpgradeNext(Protoss.CarrierCapacity)
   )
   
   private class TechToArbiters extends Build(
-    RequestUnitAtLeast(1, Protoss.Gateway),
-    RequestUnitAtLeast(1, Protoss.CyberneticsCore),
-    RequestUnitAtLeast(1, Protoss.CitadelOfAdun),
-    RequestUnitAtLeast(1, Protoss.Stargate),
-    RequestUnitAtLeast(1, Protoss.TemplarArchives),
-    RequestUnitAtLeast(1, Protoss.ArbiterTribunal)
+    RequestAtLeast(1, Protoss.Gateway),
+    RequestAtLeast(1, Protoss.CyberneticsCore),
+    RequestAtLeast(1, Protoss.CitadelOfAdun),
+    RequestAtLeast(1, Protoss.Stargate),
+    RequestAtLeast(1, Protoss.TemplarArchives),
+    RequestAtLeast(1, Protoss.ArbiterTribunal)
   )
   
   private class TechToObservers extends Build(
-    RequestUnitAtLeast(1, Protoss.RoboticsFacility),
-    RequestUnitAtLeast(1, Protoss.Observatory)
+    RequestAtLeast(1, Protoss.RoboticsFacility),
+    RequestAtLeast(1, Protoss.Observatory)
   )
   
   private class SpamUpgrades extends Build(
-    RequestUnitAtLeast(2, Protoss.CyberneticsCore),
+    RequestAtLeast(2, Protoss.CyberneticsCore),
     RequestUpgradeNext(Protoss.AirDamage),
     RequestUpgradeNext(Protoss.AirArmor)
   )
@@ -70,9 +70,9 @@ class IslandCarriers extends Parallel {
         new TrainContinuously(Protoss.Scout, 3),
         new TrainContinuously(Protoss.Carrier),
         new TrainContinuously(Protoss.Observer, 1))),
-    new OnMiningBases(1, new Build(RequestUnitAtLeast(3, Protoss.Stargate))),
-    new OnMiningBases(2, new Build(RequestUnitAtLeast(5, Protoss.Stargate))),
-    new OnMiningBases(3, new Build(RequestUnitAtLeast(8, Protoss.Stargate))),
+    new OnMiningBases(1, new Build(RequestAtLeast(3, Protoss.Stargate))),
+    new OnMiningBases(2, new Build(RequestAtLeast(5, Protoss.Stargate))),
+    new OnMiningBases(3, new Build(RequestAtLeast(8, Protoss.Stargate))),
     new ControlMap,
     new If(
       new UnitsAtLeast(6 * 8, UnitMatchType(Protoss.Interceptor)),

@@ -1,7 +1,7 @@
 package Planning.Plans.Macro.Upgrades
 
 import Lifecycle.With
-import Macro.BuildRequests.RequestUpgradeLevel
+import Macro.BuildRequests.RequestUpgrade
 import Planning.Plan
 import ProxyBwapi.Upgrades.Upgrade
 
@@ -15,7 +15,7 @@ class UpgradeMatch(ourUpgrade: Upgrade, enemyUpgrade: Upgrade, delta: Int = 0) e
   
   override def onUpdate() {
     if (isComplete) return
-    With.scheduler.request(this, RequestUpgradeLevel(ourUpgrade, With.self.getUpgradeLevel(ourUpgrade) + 1))
+    With.scheduler.request(this, RequestUpgrade(ourUpgrade, With.self.getUpgradeLevel(ourUpgrade) + 1))
   }
   
   private def levelRequired: Int = {

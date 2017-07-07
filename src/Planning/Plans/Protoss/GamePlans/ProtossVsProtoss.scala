@@ -1,6 +1,6 @@
 package Planning.Plans.Protoss.GamePlans
 
-import Macro.BuildRequests.{RequestUnitAtLeast, _}
+import Macro.BuildRequests.{RequestAtLeast, _}
 import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Plans.Army.{ConsiderAttacking, ControlMap}
 import Planning.Plans.Compound.{And, If, Or, Parallel}
@@ -16,15 +16,15 @@ class ProtossVsProtoss extends Parallel {
   
   description.set("Protoss vs Protoss")
   private val _lateGame = Vector[BuildRequest] (
-    RequestUnitAtLeast(1,   Protoss.RoboticsFacility),
-    RequestUnitAtLeast(1,   Protoss.RoboticsSupportBay),
-    RequestUnitAtLeast(3,   Protoss.Gateway),
-    RequestUnitAtLeast(2,   Protoss.Nexus),
-    RequestUnitAtLeast(6,   Protoss.Gateway),
-    RequestUnitAtLeast(1,   Protoss.CitadelOfAdun),
-    RequestUnitAtLeast(8,   Protoss.Gateway),
-    RequestUpgradeLevel(    Protoss.ZealotSpeed),
-    RequestUnitAtLeast(10,  Protoss.Gateway)
+    RequestAtLeast(1,   Protoss.RoboticsFacility),
+    RequestAtLeast(1,   Protoss.RoboticsSupportBay),
+    RequestAtLeast(3,   Protoss.Gateway),
+    RequestAtLeast(2,   Protoss.Nexus),
+    RequestAtLeast(6,   Protoss.Gateway),
+    RequestAtLeast(1,   Protoss.CitadelOfAdun),
+    RequestAtLeast(8,   Protoss.Gateway),
+    RequestUpgrade(    Protoss.ZealotSpeed),
+    RequestAtLeast(10,  Protoss.Gateway)
   )
   
   private class MakeEmergencyUnits extends If(
@@ -35,8 +35,8 @@ class ProtossVsProtoss extends Parallel {
       new UnitsAtLeast(1, UnitMatchType(Protoss.CyberneticsCore))
     ),
     new Parallel(
-      new Build(RequestUnitAtLeast(1, Protoss.Probe)),
-      new Build(RequestUnitAtLeast(2, Protoss.Dragoon))
+      new Build(RequestAtLeast(1, Protoss.Probe)),
+      new Build(RequestAtLeast(2, Protoss.Dragoon))
     )
   ) { description.set("Make emergency units")}
   
@@ -77,7 +77,7 @@ class ProtossVsProtoss extends Parallel {
   
   private class UpgradeScarabDamage extends If(
       new UnitsAtLeast(2, UnitMatchType(Protoss.Reaver)),
-      new Build(RequestUpgradeLevel(Protoss.ScarabDamage))
+      new Build(RequestUpgrade(Protoss.ScarabDamage))
   )  { description.set("Upgrade Scarab damage")}
   
   private class BuildDragoonsorZealotsWithLegSpeed extends If(
@@ -109,8 +109,8 @@ class ProtossVsProtoss extends Parallel {
     new UpgradeScarabDamage,
     new TrainContinuously(Protoss.Reaver, 4),
     new BuildDragoonsorZealotsWithLegSpeed,
-    new Build(RequestUpgradeLevel(Protoss.DragoonRange)),
-    new Build( RequestUnitAtLeast(2, Protoss.Gateway)),
+    new Build(RequestUpgrade(Protoss.DragoonRange)),
+    new Build( RequestAtLeast(2, Protoss.Gateway)),
     new Build(ProtossBuilds.TechReavers: _*),
     new Build(_lateGame: _*),
     new ScoutExpansionsAt(70),

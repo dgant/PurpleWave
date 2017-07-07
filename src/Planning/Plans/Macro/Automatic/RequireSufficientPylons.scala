@@ -1,7 +1,7 @@
 package Planning.Plans.Macro.Automatic
 
 import Lifecycle.With
-import Macro.BuildRequests.RequestUnitAtLeast
+import Macro.BuildRequests.RequestAtLeast
 import Planning.Plan
 import ProxyBwapi.Races.Protoss
 
@@ -10,7 +10,7 @@ class RequireSufficientPylons extends Plan {
   description.set("Require enough pylons to avoid supply block")
   
   override def onUpdate() {
-    With.scheduler.request(this, RequestUnitAtLeast(totalRequiredRecalculate, Protoss.Pylon))
+    With.scheduler.request(this, RequestAtLeast(totalRequiredRecalculate, Protoss.Pylon))
   }
   
   def totalRequiredRecalculate: Int = {

@@ -7,7 +7,7 @@ object PvTMacroEarly extends StrategyFeature {
   
   override val options: Iterable[Strategy] = Vector(
     Early14Nexus,
-    EarlyDarkTemplar,
+    EarlyDTExpand,
     Early1GateRange,
     Early1015GateGoon)
   

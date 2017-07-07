@@ -4,6 +4,9 @@ import Information.Geography.Types.Base
 import Performance.Caching.CacheFrame
 import Lifecycle.With
 import Mathematics.Points.Tile
+import ProxyBwapi.UnitClass.UnitClass
+
+import scala.collection.mutable
 
 class Intelligence {
   
@@ -25,4 +28,10 @@ class Intelligence {
       .sortBy(_.heart.groundPixelsByTile(With.geography.home))
       .sortBy( ! _.isStartLocation)
       .sortBy(_.lastScoutedFrame))
+  
+  def enemyHasShown(unitClass: UnitClass): Boolean = enemyHasShownUnit(unitClass)
+  private val enemyHasShownUnit = new mutable.HashSet[UnitClass]
+  def update() {
+    enemyHasShownUnit ++= With.units.enemy.map(_.unitClass)
+  }
 }

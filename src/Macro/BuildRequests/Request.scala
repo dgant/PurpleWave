@@ -7,11 +7,11 @@ import ProxyBwapi.Upgrades.Upgrade
 object Request {
   
   def unit(unit: UnitClass, quantity: Int = 1): BuildRequest = {
-    RequestUnitAtLeast(quantity, unit)
+    RequestAtLeast(quantity, unit)
   }
   
   def upgr(upgrade: Upgrade, level: Int = 1): BuildRequest = {
-    RequestUpgradeLevel(upgrade, level)
+    RequestUpgrade(upgrade, level)
   }
   
   def tech(tech: Tech): BuildRequest = {

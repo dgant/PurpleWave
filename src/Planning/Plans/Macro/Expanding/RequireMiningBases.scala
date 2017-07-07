@@ -2,7 +2,7 @@ package Planning.Plans.Macro.Expanding
 
 import Debugging.English
 import Lifecycle.With
-import Macro.BuildRequests.RequestUnitAtLeast
+import Macro.BuildRequests.RequestAtLeast
 import Planning.Composition.Property
 import Planning.Plan
 
@@ -18,7 +18,7 @@ class RequireMiningBases(basesInitial: Int = 1) extends Plan {
     val goal        = basesDesired.get + bases - miningBases
     
     if (goal > 0) {
-      With.scheduler.request(this, RequestUnitAtLeast(goal, With.self.townHallClass))
+      With.scheduler.request(this, RequestAtLeast(goal, With.self.townHallClass))
     }
   }
 }

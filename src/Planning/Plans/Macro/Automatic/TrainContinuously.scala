@@ -1,7 +1,7 @@
 package Planning.Plans.Macro.Automatic
 
 import Lifecycle.With
-import Macro.BuildRequests.RequestUnitAtLeast
+import Macro.BuildRequests.RequestAtLeast
 import Planning.Plan
 import ProxyBwapi.UnitClass.UnitClass
 
@@ -14,7 +14,7 @@ class TrainContinuously(unitClass: UnitClass, maximum: Int = Int.MaxValue) exten
     
     With.scheduler.request(
       this,
-      RequestUnitAtLeast(
+      RequestAtLeast(
         List(
           maximum,
           maxDesirable,

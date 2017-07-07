@@ -1,14 +1,17 @@
 package Debugging.Visualizations.Views
 
+import Lifecycle.With
+
 abstract class View {
   
-  def unimplemented() {}
+  private def unimplemented() {}
   
-  def renderScreen(): Unit  = unimplemented
-  def renderMap(): Unit     = unimplemented
+  def renderScreen(): Unit = unimplemented()
+  def renderMap(): Unit = unimplemented()
   
-  
-  // Statefulness in a singleton! We avoid this because we don't want to maintain state across multiple games run consecutively.
-  // But in this case it has nothing to do with the game and everything to do with testing across games.
-  var enabled = false
+  def inUse: Boolean = {
+    With.visualization.enabled &&
+      With.visualization.views.contains(this) &&
+      (With.visualization.map || With.visualization.screen)
+  }
 }

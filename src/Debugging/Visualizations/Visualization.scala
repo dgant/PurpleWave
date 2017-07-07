@@ -14,7 +14,7 @@ class Visualization {
   
   val lineHeightSmall = 9
   
-  private val views = Vector(
+  val views = Vector(
     ShowBases,
     ShowUnits,
     ShowUnitsForeign,
@@ -24,9 +24,9 @@ class Visualization {
     ShowStrategy
   )
   
-  var enabled   = true
+  var enabled   = false
   var screen    = true
-  var map       = true
+  var map       = false
   var happy     = false
   var textOnly  = false
   

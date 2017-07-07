@@ -1,6 +1,6 @@
 package Strategery.Strategies.Options.Protoss.Choices
 
-import Strategery.Strategies.Options.Protoss.PvTMacro.{PvTMacroEarly, PvTMacroLate}
+import Strategery.Strategies.Options.Protoss.VsTerran.PvTMacro.{PvTMacroEarly, PvTMacroLate}
 import Strategery.Strategies.{Strategy, StrategyChoice}
 import bwapi.Race
 

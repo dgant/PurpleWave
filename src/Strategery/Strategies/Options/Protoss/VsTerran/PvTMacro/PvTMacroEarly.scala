@@ -1,4 +1,4 @@
-package Strategery.Strategies.Options.Protoss.PvTMacro
+package Strategery.Strategies.Options.Protoss.VsTerran.PvTMacro
 
 import Strategery.Strategies.{Strategy, StrategyChoice}
 

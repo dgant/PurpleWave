@@ -1,8 +1,9 @@
 package Macro.Architecture
 
+import Debugging.Visualizations.Views.Geography.ShowArchitecture
 import Information.Geography.Pathfinding.PathFinder
 import Information.Geography.Pathfinding.PathFinder.TilePath
-import Information.Geography.Types.{Zone, Edge}
+import Information.Geography.Types.{Edge, Zone}
 import Lifecycle.With
 import Mathematics.Points.{Tile, TileRectangle}
 import Mathematics.Shapes.Spiral
@@ -165,7 +166,7 @@ class Architecture {
   
     updatePaths() //Invalidate any paths which no longer work
     
-    if (With.visualization.enabled) {
+    if (ShowArchitecture.inUse) {
       exclusions += Exclusion(placement.buildingDescriptor.toString, margin)
     }
   }
@@ -202,7 +203,7 @@ class Architecture {
     unbuildable     ++= harvestingAreas.toSeq.flatMap(_.tiles)
     ungassable      ++= With.units.all.toSeq.filter(unit => ! unit.player.isNeutral && unit.alive && unit.unitClass.isGas).map(_.tileTopLeft)
       
-    if (With.visualization.enabled) {
+    if (ShowArchitecture.inUse) {
       exclusions ++= harvestingAreas.map(area => Exclusion("Harvesting area", area))
       exclusions ++= forUnwalkable.map(unit => Exclusion("Margin for " + unit, unit.tileArea.expand(1, 1)))
     }

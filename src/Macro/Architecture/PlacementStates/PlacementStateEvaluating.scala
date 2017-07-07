@@ -1,5 +1,6 @@
 package Macro.Architecture.PlacementStates
 
+import Debugging.Visualizations.Views.Geography.ShowArchitectureHeuristics
 import Lifecycle.With
 import Macro.Architecture.Heuristics.{EvaluatePlacements, PlacementHeuristicEvaluation}
 import Macro.Architecture.{Architect, Blueprint, Placement, Surveyor}
@@ -42,7 +43,7 @@ class PlacementStateEvaluating(blueprint: Blueprint) extends PlacementState {
       while (stillEvaluating && evaluationCount < With.configuration.buildingPlacementBatchSize) {
         evaluationCount += 1
         val candidate = candidatesFiltered.get(nextEvaluationIndex)
-        if (With.visualization.enabled) {
+        if (ShowArchitectureHeuristics.inUse) {
           // This does all the math twice! It's slow and only useful for visualizations so we avoid it when possible.
           evaluations(candidate) = EvaluatePlacements.evaluate(blueprint, candidate)
         }

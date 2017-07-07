@@ -1,5 +1,6 @@
 package Micro.Heuristics.Movement
 
+import Debugging.Visualizations.Views.Micro.ShowMovementHeuristics
 import Information.Geography.Types.Zone
 import Lifecycle.With
 import Mathematics.Heuristics.HeuristicMathMultiplicative
@@ -17,15 +18,17 @@ object EvaluatePixels {
       return state.unit.pixelCenter
     }
     
-    state.movementHeuristicResults =
-      candidates.flatten(candidate =>
-        profile.weightedHeuristics.map(weightedHeuristic =>
-          new MovementHeuristicEvaluation(
-            weightedHeuristic.heuristic,
-            state,
-            candidate,
-            weightedHeuristic.weighMultiplicatively(state, candidate),
-            weightedHeuristic.color)))
+    if (ShowMovementHeuristics.inUse) {
+      state.movementHeuristicResults =
+        candidates.flatten(candidate =>
+          profile.weightedHeuristics.map(weightedHeuristic =>
+            new MovementHeuristicEvaluation(
+              weightedHeuristic.heuristic,
+              state,
+              candidate,
+              weightedHeuristic.weighMultiplicatively(state, candidate),
+              weightedHeuristic.color)))
+    }
     
     HeuristicMathMultiplicative.best(state, profile.weightedHeuristics, candidates)
   }

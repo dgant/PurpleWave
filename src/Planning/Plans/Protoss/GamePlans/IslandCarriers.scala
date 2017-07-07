@@ -10,6 +10,7 @@ import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildAssimilators, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.{OnMiningBases, UnitsAtLeast}
 import Planning.Plans.Protoss.ProtossBuilds
+import Planning.Plans.Scouting.FindExpansions
 import ProxyBwapi.Races.Protoss
 
 class IslandCarriers extends Parallel {
@@ -73,6 +74,7 @@ class IslandCarriers extends Parallel {
     new OnMiningBases(1, new Build(RequestAtLeast(3, Protoss.Stargate))),
     new OnMiningBases(2, new Build(RequestAtLeast(5, Protoss.Stargate))),
     new OnMiningBases(3, new Build(RequestAtLeast(8, Protoss.Stargate))),
+    new FindExpansions { scouts.get.unitMatcher.set(UnitMatchType(Protoss.Scout)) },
     new ControlMap,
     new If(
       new UnitsAtLeast(6 * 8, UnitMatchType(Protoss.Interceptor)),

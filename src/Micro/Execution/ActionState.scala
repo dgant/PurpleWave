@@ -85,5 +85,5 @@ class ActionState(val unit: FriendlyUnitInfo) {
   
   var movingTo                  : Option[Pixel] = None
   var movedHeuristicallyFrame   : Int = 0
-  var movementHeuristicResults  : Iterable[MovementHeuristicEvaluation] = Vector.empty
+  var movementHeuristicResults  : Iterable[MovementHeuristicEvaluation] = Iterable.empty
 }

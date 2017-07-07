@@ -11,7 +11,7 @@ object PlacementProfiles {
     preferPowering              = 1.0,
     preferDistanceFromEnemy     = 1.0,
     avoidDistanceFromBase       = 2.5,
-    avoidDistanceFromExitRange  = 1.0
+    avoidDistanceFromExitRange  = 0.25
   )
   
   val factory = new PlacementProfile(

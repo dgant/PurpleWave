@@ -191,13 +191,13 @@ class Architecture {
   }
 
   private def recalculateExclusions() {
-    val forUnbuildable  = With.units.all.filter(isGroundBuilding)
-    val forUnwalkable   = With.units.ours.filter(unit => isGroundBuilding(unit) && usuallyNeedsMargin(unit.unitClass))
+    val forUnbuildable  = With.units.all.toSeq.filter(isGroundBuilding)
+    val forUnwalkable   = With.units.ours.toSeq.filter(unit => isGroundBuilding(unit) && usuallyNeedsMargin(unit.unitClass))
     val harvestingAreas = With.geography.bases.map(_.harvestingArea)
     
-    unbuildable     ++= forUnbuildable.toSeq.flatMap(_.tileArea.tiles)
+    unbuildable     ++= forUnbuildable.flatMap(_.tileArea.tiles)
     unwalkable      ++= unbuildable
-    unwalkable      ++= forUnwalkable.toSeq.flatMap(_.tileArea.expand(1, 1).tiles)
+    unwalkable      ++= forUnwalkable.flatMap(_.tileArea.expand(1, 1).tiles)
     untownhallable  ++= unbuildable
     unbuildable     ++= harvestingAreas.toSeq.flatMap(_.tiles)
     ungassable      ++= With.units.all.toSeq.filter(unit => ! unit.player.isNeutral && unit.alive && unit.unitClass.isGas).map(_.tileTopLeft)

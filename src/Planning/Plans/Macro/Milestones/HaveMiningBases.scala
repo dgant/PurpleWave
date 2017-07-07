@@ -12,5 +12,4 @@ class HaveMiningBases(requiredBases: Int) extends Plan {
       .count(base =>
         base.minerals.size >= 6 &&
         base.mineralsLeft / base.minerals.size > 300) >= requiredBases
-  
 }

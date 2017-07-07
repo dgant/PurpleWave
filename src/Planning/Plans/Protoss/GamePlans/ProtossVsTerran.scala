@@ -130,10 +130,10 @@ class ProtossVsTerran extends Parallel {
     
     // Mid game
     new MatchMiningBases(1),
+    new TakeThirdBaseSafely,
     new OnMiningBases(2,
       new Parallel(
         new ProtossVsTerranIdeas.RespondToBioWithReavers,
-        new TakeThirdBaseSafely,
         new BuildAssimilators,
         new IfCloakedThreats_Observers,
         new FulfillMidgameTech)),
@@ -143,11 +143,13 @@ class ProtossVsTerran extends Parallel {
       new UnitsAtLeast(30, UnitMatchWarriors), // We have a habit of getting this tech too soon and dying
       new Parallel(
         new Employ(LateArbiters, new ImplementLateArbiters),
+        new Employ(LateCarriers, new ImplementLateCarriers),
         new OnThreeBases_WeaponsUpgrades)),
-    new Employ(LateCarriers, new ImplementLateCarriers),
     
     // Units
-    new TrainContinuously(Protoss.Carrier),
+    new If(
+      new UnitsAtLeast(20, UnitMatchWarriors),
+      new TrainContinuously(Protoss.Carrier)),
     new IfNoDetection_DarkTemplar,
     new If(
       new EnemyBio,

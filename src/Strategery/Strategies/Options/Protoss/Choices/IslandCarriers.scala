@@ -1,7 +1,8 @@
-package Strategery.Strategies
+package Strategery.Strategies.Options.Protoss.Choices
 
 import Planning.Plan
 import Planning.Plans.Protoss._
+import Strategery.Strategies.Strategy
 import bwapi.Race
 
 object IslandCarriers extends Strategy {

@@ -1,7 +1,8 @@
-package Strategery.Strategies
+package Strategery.Strategies.Options.AllRaces
 
 import Planning.Plan
 import Planning.Plans.Protoss.GamePlans.ProbeRush
+import Strategery.Strategies.Strategy
 
 object WorkerRush3StartLocations extends Strategy {
   

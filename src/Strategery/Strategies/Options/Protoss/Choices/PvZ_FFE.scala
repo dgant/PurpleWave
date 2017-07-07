@@ -1,5 +1,6 @@
-package Strategery.Strategies
+package Strategery.Strategies.Options.Protoss.Choices
 
+import Strategery.Strategies.Strategy
 import bwapi.Race
 
 object PvZ_FFE extends Strategy {

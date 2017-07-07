@@ -1,4 +1,4 @@
-package Strategery.Strategies.Options.PvTMacro
+package Strategery.Strategies.Options.Protoss.PvTMacro
 
 import Strategery.Strategies.Strategy
 import bwapi.Race

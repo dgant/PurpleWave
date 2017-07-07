@@ -3,8 +3,8 @@ package Strategery
 import Lifecycle.With
 import Planning.Plan
 import Planning.Plans.WinTheGame
-import Strategery.Choices.Overall
 import Strategery.History.HistoricalGame
+import Strategery.Strategies.Options.Protoss.ProtossChoices
 import Strategery.Strategies.Strategy
 
 import scala.collection.mutable.ArrayBuffer
@@ -30,7 +30,7 @@ class Strategist {
     val isGround = ! isIsland
     val startLocations = With.geography.startLocations.size
     
-    val strategies = Overall.strategies
+    val strategies = ProtossChoices.options
       .filter(strategy =>
         (strategy.islandMaps  || ! isIsland) &&
         (strategy.groundMaps  || ! isGround) &&

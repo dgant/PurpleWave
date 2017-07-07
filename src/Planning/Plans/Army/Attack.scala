@@ -3,7 +3,6 @@ package Planning.Plans.Army
 import Lifecycle.With
 import Micro.Intent.Intention
 import Planning.Composition.ResourceLocks.LockUnits
-import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Composition.UnitMatchers.{UnitMatchAnd, UnitMatchDetectors, UnitMatchMobile, UnitMatchWarriors}
 import Planning.Composition.UnitPreferences.UnitPreferClose
 import Planning.Composition.{Property, UnitCountEverything}
@@ -19,7 +18,7 @@ class Attack extends Plan {
   
   val detectors = new Property[LockUnits](new LockUnits)
   detectors.get.unitMatcher.set(UnitMatchAnd(UnitMatchDetectors, UnitMatchMobile))
-  detectors.get.unitCounter.set(UnitCountOne)
+  detectors.get.unitCounter.set(UnitCountEverything)
   
   override def onUpdate() {
     
@@ -48,13 +47,14 @@ class Attack extends Plan {
           canPursue = false
         }))
     
-    detectors.get.units.foreach(detector =>
+    var nextDetectorDepth = 32.0 * 4
+    detectors.get.units.foreach(detector => {
       With.executor.intend(
         new Intention(this, detector) {
-          toTravel = Some(attackers.get.units.minBy(_.framesToTravel(target)).project(32.0 * 3.0))
+          toTravel = Some(attackers.get.units.minBy(_.framesToTravel(target)).pixelCenter.project(target, nextDetectorDepth))
           canCower = true
-        }
-      )
-    )
+        })
+      nextDetectorDepth -= 96.0
+    })
   }
 }

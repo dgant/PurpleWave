@@ -9,7 +9,7 @@ abstract class Strategy {
   
   lazy val gameplan: Option[Plan] = None
   
-  def features: Iterable[StrategyChoice] = Iterable.empty
+  def choices: Iterable[Iterable[Strategy]] = Iterable.empty
   
   def islandMaps        : Boolean         = false
   def groundMaps        : Boolean         = true

@@ -13,8 +13,7 @@ import Planning.Plans.Macro.Reaction.EnemyBio
 import Planning.Plans.Protoss.{ProtossBuilds, ProtossVsTerranIdeas}
 import Planning.Plans.Scouting.{ScoutAt, ScoutExpansionsAt}
 import ProxyBwapi.Races.{Protoss, Terran}
-import Strategery.Strategies.Options.Protoss.VsTerran.PvTMacro.Early.{Early1015GateGoon, Early14Nexus, Early1GateRange, EarlyDTExpand}
-import Strategery.Strategies.Options.Protoss.VsTerran.PvTMacro.Late.{LateArbiters, LateCarriers}
+import Strategery.Strategies.Options.Protoss.PvT._
 
 class ProtossVsTerran extends Parallel {
   

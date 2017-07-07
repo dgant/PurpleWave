@@ -1,18 +1,16 @@
 package Strategery.Strategies.Options.Protoss
 
 import Strategery.Strategies.Options.AllRaces.{WorkerRush2StartLocations, WorkerRush3StartLocations}
-import Strategery.Strategies.Options.Protoss.Choices._
+import Strategery.Strategies.Options.Protoss.Global._
 import Strategery.Strategies._
 
-object ProtossChoices extends StrategyChoice {
+object ProtossChoices {
   
-  val options: Vector[Strategy] = Vector(
+  val options: Iterable[Strategy] = Vector(
     WorkerRush2StartLocations,
     WorkerRush3StartLocations,
     IslandCarriers,
-    PvT_Macro,
-    PvP_Macro,
-    PvZ_FFE,
-    PvZ_2Gate
-  )
+    AllPvT,
+    AllPvP,
+    AllPvZ)
 }

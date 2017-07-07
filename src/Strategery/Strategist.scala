@@ -32,11 +32,11 @@ class Strategist {
     
     val strategies = ProtossChoices.options
       .filter(strategy =>
-        (strategy.islandMaps  || ! isIsland) &&
-        (strategy.groundMaps  || ! isGround) &&
-        strategy.ourRaces.exists(_ == ourRace) &&
+        (strategy.islandMaps  || ! isIsland)            &&
+        (strategy.groundMaps  || ! isGround)            &&
+        strategy.ourRaces.exists(_ == ourRace)          &&
         strategy.enemyRaces.exists(enemyRaces.contains) &&
-        strategy.startLocationsMin <= startLocations &&
+        strategy.startLocationsMin <= startLocations    &&
         strategy.startLocationsMax >= startLocations)
     
     chooseBest(strategies).toSet
@@ -107,8 +107,8 @@ class Strategist {
     }
     val bestStrategy = chooseBestStrategy()
     output.append(bestStrategy)
-    if (bestStrategy.features.nonEmpty) {
-      output ++= bestStrategy.features.flatMap(features => chooseBest(features.options))
+    if (bestStrategy.choices.nonEmpty) {
+      output ++= bestStrategy.choices.flatMap(choice => chooseBest(choice))
     }
     output
   }
@@ -128,11 +128,11 @@ class Strategist {
   // How many games before we have confidence in this strategy?
   // Definitely not statistically sound.
   private def getConfidenceSamples(strategy: Strategy): Double = {
-    if (strategy.features.isEmpty) {
+    if (strategy.choices.isEmpty) {
       3.0
     }
     else {
-      strategy.features.map(_.options.map(getConfidenceSamples).sum).sum
+      strategy.choices.map(_.map(getConfidenceSamples).sum).sum
     }
   }
   

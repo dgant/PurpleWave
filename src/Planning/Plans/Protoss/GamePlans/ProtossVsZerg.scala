@@ -17,8 +17,7 @@ import Planning.Plans.Protoss.ProtossBuilds
 import Planning.Plans.Protoss.Situational.{DefendChokeWithWorkers, ForgeFastExpand}
 import Planning.Plans.Scouting.RequireScouting
 import ProxyBwapi.Races.{Protoss, Zerg}
-import Strategery.Strategies.Options.Protoss.VsZerg.Early.{Early2Gate, EarlyFFEHeavy, EarlyFFELight, EarlyZealotAllIn}
-import Strategery.Strategies.Options.Protoss.VsZerg.Midgame.{Midgame5GateDragoons, MidgameCorsairCarrier, MidgameCorsairReaver, MidgameCorsairSpeedlot}
+import Strategery.Strategies.Options.Protoss.PvZ._
 
 class ProtossVsZerg extends Parallel {
   
@@ -217,12 +216,14 @@ class ProtossVsZerg extends Parallel {
         new UnitsAtLeast(1, UnitMatchType(Protoss.Pylon), complete = false),
         new RequireScouting)), // Don't scout while being 4-pooled
     
-    // 2-gate: Trigger attacking immediately! And bring Probes
+    // Zealot all-in: Trigger attacking immediately! And bring Probes
     new Employ(EarlyZealotAllIn,
       new Trigger(
         new UnitsAtLeast(2, UnitMatchType(Protoss.Zealot), complete = true),
         new Parallel(
-          new ConsiderAttacking,
+          new ConsiderAttacking {
+            whenFalse.set(new DefendHearts)
+          },
           new ConsiderAttacking {
             attack.attackers.get.unitCounter.set(new UnitCountBetween(1, 2))
             attack.attackers.get.unitMatcher.set(UnitMatchWorkers)

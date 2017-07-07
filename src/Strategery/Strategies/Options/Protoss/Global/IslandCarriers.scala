@@ -1,4 +1,4 @@
-package Strategery.Strategies.Options.Protoss.Choices
+package Strategery.Strategies.Options.Protoss.Global
 
 import Planning.Plan
 import Planning.Plans.Protoss._

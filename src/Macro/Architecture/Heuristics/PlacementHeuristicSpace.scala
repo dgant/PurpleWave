@@ -5,7 +5,7 @@ import Mathematics.Points.Tile
 
 object PlacementHeuristicSpace extends PlacementHeuristic {
   
-  override def evaluate(building: Blueprint, candidate: Tile): Double = {
+  override def evaluate(blueprint: Blueprint, candidate: Tile): Double = {
     
     candidate.zone.area / 10000.0
     

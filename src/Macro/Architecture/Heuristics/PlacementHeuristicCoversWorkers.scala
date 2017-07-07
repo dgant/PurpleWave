@@ -6,15 +6,15 @@ import Mathematics.Points.Tile
 
 object PlacementHeuristicCoversWorkers extends PlacementHeuristic {
   
-  override def evaluate(building: Blueprint, candidate: Tile): Double = {
+  override def evaluate(blueprint: Blueprint, candidate: Tile): Double = {
     
-    if (building.attackRange.isEmpty) return HeuristicMathMultiplicative.default
+    if (blueprint.attackRange.isEmpty) return HeuristicMathMultiplicative.default
     
     candidate.zone.bases
       .map(
         _.harvestingArea.tiles.count(
           _.tileDistanceFast(candidate) * 32.0
-          <= building.attackRange.get))
+          <= blueprint.attackRange.get))
       .sum
   }
 }

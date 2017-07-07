@@ -8,12 +8,11 @@ import Information.Geography.Pathfinding.Paths
 import Information.Grids.Grids
 import Information._
 import Macro.Allocation._
-import Macro.Scheduling.Scheduler
 import Macro.Architecture.{Architecture, PlacementScheduler}
-import Micro.Intent.Commander
+import Macro.Scheduling.Scheduler
 import Micro.Execution.Executor
+import Micro.Intent.Commander
 import Performance.TaskQueue.{AbstractTaskQueue, TaskQueueGlobal}
-import Planning.Plans.WinTheGame
 import ProxyBwapi.Players.{PlayerInfo, Players}
 import ProxyBwapi.ProxyBWMirror
 import ProxyBwapi.UnitTracking.UnitTracker
@@ -57,10 +56,12 @@ object With {
   var self    : PlayerInfo         = _
   var neutral : PlayerInfo         = _
   var enemies : Vector[PlayerInfo] = _
+  def enemy   : PlayerInfo        = enemies.head
   
-  var frame     : Int = 0
-  var mapWidth  : Int = 0
-  var mapHeight : Int = 0
+  var frame       : Int = 0
+  var mapWidth    : Int = 0
+  var mapHeight   : Int = 0
+  var mapFileName : String = With.game.mapFileName
   
   def framesSince(previousFrame: Int): Int = Math.max(0, frame - previousFrame)
   

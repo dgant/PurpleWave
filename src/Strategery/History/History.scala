@@ -9,8 +9,8 @@ class History {
   lazy val games: Iterable[HistoricalGame] = HistoryLoader.load()
   
   lazy val currentMapName   : String  = With.game.mapFileName
-  lazy val currentEnemyName : String  = With.enemies.head.name
-  lazy val currentEnemyRace : Race    = With.enemies.head.race
+  lazy val currentEnemyName : String  = With.enemy.name
+  lazy val currentEnemyRace : Race    = With.enemy.race
   
   def onStart() {
     Manners.chat(" ")

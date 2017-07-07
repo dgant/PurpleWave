@@ -9,6 +9,8 @@ abstract class Strategy {
   
   lazy val gameplan: Option[Plan] = None
   
+  def options: Iterable[Strategy] = Iterable.empty
+  
   def islandMaps        : Boolean         = false
   def groundMaps        : Boolean         = true
   def ourRaces          : Iterable[Race]  = Vector(Race.Terran, Race.Protoss, Race.Zerg, Race.Random)

@@ -49,7 +49,7 @@ object ShowBattles extends View {
   
   private def drawBattleMap(battle: Battle) {
     val ourColor            = With.self.colorDark
-    val enemyColor          = With.enemies.head.colorDark
+    val enemyColor          = With.enemy.colorDark
     val neutralColor        = Colors.NeonOrange
     val topLeft             = (battle.us.units ++ battle.enemy.units).map(_.pixelCenter).minBound.subtract(16, 16)
     val bottomRight         = (battle.us.units ++ battle.enemy.units).map(_.pixelCenter).maxBound.add(16, 16)
@@ -70,12 +70,10 @@ object ShowBattles extends View {
   private def drawEstimationReport(estimation: Estimation) {
     With.game.setTextSize(bwapi.Text.Size.Enum.Large)
     With.game.drawTextScreen(tableHeader0.bwapi, With.self.name)
-    With.game.drawTextScreen(tableHeader1.bwapi, With.enemies.head.name)
+    With.game.drawTextScreen(tableHeader1.bwapi, With.enemy.name)
     With.game.drawTextScreen(tableStart0.bwapi, "+" + estimation.costToEnemy.toInt)
     With.game.drawTextScreen(tableStart1.bwapi, "-" + estimation.costToUs.toInt)
     With.game.setTextSize(bwapi.Text.Size.Enum.Small)
-    
-    
   }
 }
 

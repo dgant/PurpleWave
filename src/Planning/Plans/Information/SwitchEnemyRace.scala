@@ -17,7 +17,7 @@ class SwitchEnemyRace extends Plan {
   
   private val mysteriousRaces = Vector(Race.Random, Race.Unknown, Race.None)
   
-  private var permanentRace:Option[Race] = None
+  private var permanentRace: Option[Race] = None
   
   override def onUpdate() {
     

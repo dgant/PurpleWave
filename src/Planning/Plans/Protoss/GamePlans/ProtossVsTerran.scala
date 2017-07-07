@@ -71,8 +71,8 @@ class ProtossVsTerran extends Parallel {
     new TakeThirdBase,
     new OnMiningBases(3, new BuildAssimilators),
     new OnThreeBases_SpeedlotsAndObservers,
-    new If( // We have a habit of getting this tech too soon and dying
-      new UnitsAtLeast(8, UnitMatchWarriors),
+    new If(
+      new UnitsAtLeast(30, UnitMatchWarriors), // We have a habit of getting this tech too soon and dying
       new Parallel(
         new OnThreeGas_Arbiters,
         new OnThreeBases_WeaponsUpgrades)),

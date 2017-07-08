@@ -41,7 +41,7 @@ class Configuration {
   var baseRadiusPixels                = 32.0 * 12.0
   var baseMergingRangePixels          = 32.0 * 12.0
   var blockerMineralThreshold         = 50
-  var maxPlacementAge                 = 24 * 60 * 5
+  var maxPlacementAge                 = 24 * 30
   var maxScarabCount                  = 3
   var enableTightBuildingPlacement    = false
   

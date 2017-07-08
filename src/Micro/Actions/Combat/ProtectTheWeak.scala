@@ -38,7 +38,7 @@ object ProtectTheWeak extends Action {
   
   private def bullies(state: ActionState): Iterable[UnitInfo] = {
     state.neighbors
-      .filter(neighbor => neighbor.actionState.lastAction.exists(innocentActions.contains))
+      .filter(neighbor => ! neighbor.isBeingViolent && (neighbor.unitClass.isWorker || (neighbor.wounded && neighbor.unitClass.isBuilding)))
       .flatMap(neighbor => state.targets.filter(_.isBeingViolentTo(neighbor)))
   }
   

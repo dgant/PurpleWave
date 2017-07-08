@@ -37,7 +37,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
   
   def startedBuilding: Boolean = building.isDefined
   
-  var waitForBuilderToRecall: Boolean = false
+  var waitForBuilderToRecallUntil: Option[Int] = None
   
   override def onUpdate() {
     
@@ -79,9 +79,14 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
     builderLock.unitPreference.set(UnitPreferClose(desiredTile.get.pixelCenter))
     builderLock.acquire(this)
     
-    if (waitForBuilderToRecall) {
-      waitForBuilderToRecall = false
-      orderedTile = None
+    if (waitForBuilderToRecallUntil.isDefined) {
+      if (With.frame < waitForBuilderToRecallUntil.get) {
+        return
+      }
+      else {
+        orderedTile = None
+        waitForBuilderToRecallUntil = None
+      }
     }
     
     if (builderLock.satisfied && building.isEmpty) {
@@ -94,7 +99,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
         // Steps:
         // 1. Recall the builder
         // 2. Wait for the order to take effect
-        waitForBuilderToRecall = true
+        waitForBuilderToRecallUntil = Some(With.frame + 24)
         With.executor.intend(
           new Intention(this, builderLock.units.head) { toTravel = Some(orderedTile.get.pixelCenter); canAttack = false })
       } else {

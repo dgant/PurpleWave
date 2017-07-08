@@ -1,13 +1,13 @@
 package Planning.Plans.Protoss.GamePlans
 
 import Macro.BuildRequests.{RequestAtLeast, _}
-import Planning.Composition.UnitMatchers.UnitMatchType
-import Planning.Plans.Army.{ConsiderAttacking, ControlMap}
+import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors}
+import Planning.Plans.Army.ControlMap
 import Planning.Plans.Compound.{And, If, Or, Parallel}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildAssimilators, MatchMiningBases, RequireMiningBases}
-import Planning.Plans.Macro.Milestones.{EnemyUnitsAtLeast, HaveUpgrade, UnitsAtLeast}
+import Planning.Plans.Macro.Milestones.{EnemyUnitsAtLeast, HaveUpgrade, UnitsAtLeast, UnitsAtMost}
 import Planning.Plans.Protoss.ProtossBuilds
 import Planning.Plans.Scouting.{ScoutAt, ScoutExpansionsAt}
 import ProxyBwapi.Races.Protoss
@@ -15,107 +15,82 @@ import ProxyBwapi.Races.Protoss
 class ProtossVsProtoss extends Parallel {
   
   description.set("Protoss vs Protoss")
-  private val _lateGame = Vector[BuildRequest] (
-    RequestAtLeast(1,   Protoss.RoboticsFacility),
-    RequestAtLeast(1,   Protoss.RoboticsSupportBay),
-    RequestAtLeast(3,   Protoss.Gateway),
-    RequestAtLeast(2,   Protoss.Nexus),
-    RequestAtLeast(6,   Protoss.Gateway),
-    RequestAtLeast(1,   Protoss.CitadelOfAdun),
-    RequestAtLeast(8,   Protoss.Gateway),
-    RequestUpgrade(    Protoss.ZealotSpeed),
-    RequestAtLeast(10,  Protoss.Gateway)
-  )
   
-  private class MakeEmergencyUnits extends If(
-    new And(
-      new UnitsAtLeast(1, UnitMatchType(Protoss.Probe)),
-      new UnitsAtLeast(1, UnitMatchType(Protoss.Assimilator)),
-      new UnitsAtLeast(1, UnitMatchType(Protoss.Gateway)),
-      new UnitsAtLeast(1, UnitMatchType(Protoss.CyberneticsCore))
-    ),
-    new Parallel(
-      new Build(RequestAtLeast(1, Protoss.Probe)),
-      new Build(RequestAtLeast(2, Protoss.Dragoon))
-    )
-  ) { description.set("Make emergency units")}
+  ///////////////////////////
+  // Early game strategies //
+  ///////////////////////////
+  
+  ////////////////////////
+  // Midgame strategies //
+  ////////////////////////
+  
+  ///////////////
+  // Expanding //
+  ///////////////
   
   private class ExpandAgainstCannons extends If(
     new Or(
       new EnemyUnitsAtLeast(1, UnitMatchType(Protoss.PhotonCannon)),
-      new EnemyUnitsAtLeast(1, UnitMatchType(Protoss.Forge))
-    ),
+      new EnemyUnitsAtLeast(1, UnitMatchType(Protoss.Forge))),
     new RequireMiningBases(2)
   ) { description.set("Expand against cannons")}
   
   private class TakeNatural extends If(
     new Or(
-      new UnitsAtLeast(6, UnitMatchType(Protoss.Dragoon)),
-      new UnitsAtLeast(1, UnitMatchType(Protoss.Reaver))
-    ),
-    new Parallel(
-      new UnitsAtLeast(2, UnitMatchType(Protoss.Zealot)),
-      new RequireMiningBases(2)
-    )
+      new UnitsAtLeast(8, UnitMatchWarriors),
+      new UnitsAtLeast(2, UnitMatchType(Protoss.PhotonCannon)),
+      new UnitsAtLeast(1, UnitMatchType(Protoss.Reaver))),
+    new RequireMiningBases(2)
   ) { description.set("Take our natural when safe")}
   
   private class TakeThirdBase extends If(
-    new And(
-      new UnitsAtLeast(8, UnitMatchType(Protoss.Dragoon)),
-      new UnitsAtLeast(2, UnitMatchType(Protoss.Reaver))
-    ),
+    new UnitsAtLeast(15, UnitMatchWarriors),
     new RequireMiningBases(3)
   ) { description.set("Take our third base when safe")}
   
-  private class TakeFourthBase extends If(
-    new And(
-      new UnitsAtLeast(15, UnitMatchType(Protoss.Dragoon)),
-      new UnitsAtLeast(3, UnitMatchType(Protoss.Reaver))
-    ),
-    new RequireMiningBases(4)
-  ) { description.set("Take our fourth base when safe")}
+  ///////////////
+  // Late game //
+  ///////////////
   
   private class UpgradeScarabDamage extends If(
       new UnitsAtLeast(2, UnitMatchType(Protoss.Reaver)),
       new Build(RequestUpgrade(Protoss.ScarabDamage))
   )  { description.set("Upgrade Scarab damage")}
   
-  private class BuildDragoonsorZealotsWithLegSpeed extends If(
-    new And(
-      new HaveUpgrade(Protoss.ZealotSpeed, Protoss.Zealot.buildFrames),
-      new UnitsAtLeast(12, UnitMatchType(Protoss.Dragoon))),
+  private class BuildDragoonsOrZealots extends If(
+    new Or(
+      new UnitsAtMost(0, UnitMatchType(Protoss.CyberneticsCore),  complete = true),
+      new UnitsAtMost(0, UnitMatchType(Protoss.Assimilator),      complete = true),
+      new And(
+        new HaveUpgrade(Protoss.ZealotSpeed, Protoss.Zealot.buildFrames),
+        new UnitsAtLeast(12, UnitMatchType(Protoss.Dragoon)))),
     new TrainContinuously(Protoss.Zealot),
     new TrainContinuously(Protoss.Dragoon)
   )
   
-  private class AttackWithDragoonRange extends If(
-    new And(
-      new UnitsAtLeast(8, UnitMatchType(Protoss.Dragoon)),
-      new HaveUpgrade(Protoss.DragoonRange, 24 * 30)),
-    new ConsiderAttacking
-  )
+  /////////////////
+  // Here we go! //
+  /////////////////
   
   children.set(Vector(
-    new MakeEmergencyUnits,
-    new Build(ProtossBuilds.OpeningOneGateCore_DragoonFirst: _*),
+    new Build(ProtossBuilds.Opening_1GateCore: _*),
     new MatchMiningBases,
     new TakeNatural,
     new ExpandAgainstCannons,
     new TakeThirdBase,
-    new TakeFourthBase,
     new RequireSufficientPylons,
     new TrainProbesContinuously,
     new BuildAssimilators,
     new UpgradeScarabDamage,
+    new TrainContinuously(Protoss.Carrier, 4),
     new TrainContinuously(Protoss.Reaver, 4),
-    new BuildDragoonsorZealotsWithLegSpeed,
+    new BuildDragoonsOrZealots,
     new Build(RequestUpgrade(Protoss.DragoonRange)),
     new Build( RequestAtLeast(2, Protoss.Gateway)),
     new Build(ProtossBuilds.TechReavers: _*),
-    new Build(_lateGame: _*),
     new ScoutExpansionsAt(70),
     new ScoutAt(9),
-    new AttackWithDragoonRange,
+    //TODO: Attack
     new ControlMap
   ))
 }

@@ -130,10 +130,10 @@ class ProtossVsZerg extends Parallel {
     // Early game
     new RequireMiningBases(1),
     new ForgeFastExpand,
-    new Employ(EarlyZealotAllIn,  new ImplementEarly2Gate),
-    new Employ(Early2Gate,        new ImplementEarly2Gate),
-    new Employ(EarlyFFELight,     new ImplementEarlyFFELight),
-    new Employ(EarlyFFEHeavy,     new ImplementEarlyFFEHeavy),
+    new Employ(PvZEarlyZealotAllIn,  new ImplementEarly2Gate),
+    new Employ(PvZEarly2Gate,        new ImplementEarly2Gate),
+    new Employ(PvZEarlyFFELight,     new ImplementEarlyFFELight),
+    new Employ(PvZEarlyFFEHeavy,     new ImplementEarlyFFEHeavy),
     new TakeSafeNatural,
     new TakeSafeThirdBase,
     
@@ -143,16 +143,16 @@ class ProtossVsZerg extends Parallel {
     new TrainProbesContinuously,
   
     // #YOLO
-    new Employ(EarlyZealotAllIn, new Parallel(
+    new Employ(PvZEarlyZealotAllIn, new Parallel(
       new TrainContinuously(Protoss.Zealot),
       new TrainContinuously(Protoss.Gateway, 5))),
   
     // Mid game builds
-    new Employ(Midgame5GateDragoons, new ImplementMidgame5GateDragoons),
+    new Employ(PvZMidgame5GateDragoons, new ImplementMidgame5GateDragoons),
     
     // Mid-game macro
     new BuildAssimilators,
-    new Employ(EarlyFFEHeavy, new Build(RequestAtLeast(6, Protoss.PhotonCannon))),
+    new FirstFiveMinutes(new Employ(PvZEarlyFFEHeavy, new Build(RequestAtLeast(1, Protoss.Gateway), RequestAtLeast(6, Protoss.PhotonCannon)))),
     new BuildDetectionForLurkers,
     new BuildCannonsAtExpansions(5),
   
@@ -195,19 +195,20 @@ class ProtossVsZerg extends Parallel {
           new TrainContinuously(Protoss.Dragoon),
           new TrainContinuously(Protoss.Zealot)))),
   
-    new Employ(MidgameCorsairReaver,    new ImplementMidgameCorsairReaver),
-    new Employ(MidgameCorsairSpeedlot,  new ImplementMidgameCorsairSpeedlot),
-    new Employ(MidgameCorsairCarrier,   new ImplementMidgameCorsairCarrier),
+    new Employ(PvZMidgameCorsairReaver,    new ImplementMidgameCorsairReaver),
+    new Employ(PvZMidgameCorsairSpeedlot,  new ImplementMidgameCorsairSpeedlot),
+    new Employ(PvZMidgameCorsairCarrier,   new ImplementMidgameCorsairCarrier),
     
     // Late game macro
-    new RequireMiningBases(3),
     new Build(
       RequestAtLeast(3, Protoss.Gateway),
       RequestAtLeast(1, Protoss.Stargate),
-      RequestAtLeast(8, Protoss.Gateway),
+      RequestAtLeast(2, Protoss.Nexus),
+      RequestAtLeast(5, Protoss.Gateway),
       RequestAtLeast(1, Protoss.Forge),
       RequestAtLeast(1, Protoss.CitadelOfAdun),
-      RequestAtLeast(1, Protoss.RoboticsFacility)),
+      RequestAtLeast(3, Protoss.Nexus),
+      RequestAtLeast(8, Protoss.Gateway)),
     
     new Build(
       RequestAtLeast(2, Protoss.Forge),
@@ -230,7 +231,7 @@ class ProtossVsZerg extends Parallel {
     
     
     // Zealot all-in: Trigger attacking immediately! And bring Probes because they help kill Zerglings faster
-    new Employ(EarlyZealotAllIn,
+    new Employ(PvZEarlyZealotAllIn,
       new Trigger(
         new UnitsAtLeast(2, UnitMatchType(Protoss.Zealot), complete = true),
         new Parallel(

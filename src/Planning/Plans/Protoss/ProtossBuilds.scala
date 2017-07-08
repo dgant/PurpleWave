@@ -5,11 +5,11 @@ import ProxyBwapi.Races.Protoss
 
 object ProtossBuilds {
   
-  /////////////////////////
-  // Protoss Vs. Protoss //
-  /////////////////////////
+  /////////////////////
+  // General Purpose //
+  /////////////////////
   
-  val OpeningOneGateCore_DragoonFirst = Vector[BuildRequest] (
+  val Opening_1GateCore = Vector[BuildRequest] (
     RequestAtLeast(1,   Protoss.Nexus),
     RequestAtLeast(8,   Protoss.Probe),
     RequestAtLeast(1,   Protoss.Pylon),
@@ -24,7 +24,7 @@ object ProtossBuilds {
     RequestAtLeast(1,   Protoss.Dragoon)
   )
   
-  val OpeningOneGateCore_WithZealot_BeforeZealot = Vector[BuildRequest] (
+  val Opening_1GateZZCore = Vector[BuildRequest] (
     RequestAtLeast(1,   Protoss.Nexus),
     RequestAtLeast(8,   Protoss.Probe),
     RequestAtLeast(1,   Protoss.Pylon),
@@ -33,15 +33,6 @@ object ProtossBuilds {
     RequestAtLeast(12,  Protoss.Probe),
     RequestAtLeast(1,   Protoss.Assimilator),
     RequestAtLeast(13,  Protoss.Probe)
-  )
-  
-  val OpeningOneGateCore_WithZealot_AfterZealot = Vector[BuildRequest] (
-    //Expected: One zealot
-    RequestAtLeast(14,  Protoss.Probe),
-    RequestAtLeast(2,   Protoss.Pylon),
-    RequestAtLeast(15,  Protoss.Probe),
-    RequestAtLeast(1,   Protoss.CyberneticsCore),
-    RequestAtLeast(1,   Protoss.Dragoon)
   )
   
   val OpeningTwoGate99 = Vector[BuildRequest] (
@@ -70,25 +61,7 @@ object ProtossBuilds {
     RequestAtLeast(1,   Protoss.Gateway),
     RequestAtLeast(12,  Protoss.Probe),
     RequestAtLeast(2,   Protoss.Gateway),
-    RequestAtLeast(13,  Protoss.Probe)
-  )
-  
-  val OpeningTwoGate99Zealots = Vector[BuildRequest] (
-    RequestAtLeast(1,   Protoss.Zealot),
-    RequestAtLeast(2,   Protoss.Pylon),
-    RequestAtLeast(2,   Protoss.Zealot)
-  )
-  
-  val OpeningTwoGate1012Zealots = Vector[BuildRequest] (
-    RequestAtLeast(1,   Protoss.Zealot),
-    RequestAtLeast(14,  Protoss.Probe),
-    RequestAtLeast(2,   Protoss.Pylon),
-    RequestAtLeast(3,   Protoss.Zealot)
-  )
-  
-  ////////////////////////
-  // Protoss vs. Terran //
-  ////////////////////////
+    RequestAtLeast(13,  Protoss.Probe))
   
   val OpeningTwoGate1015Dragoons = Vector[BuildRequest] (
     RequestAtLeast(1,   Protoss.Nexus),

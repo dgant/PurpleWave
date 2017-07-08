@@ -24,7 +24,7 @@ class ProtossVsTerran extends Parallel {
   ///////////////////////////
   
   private class ImplementEarly14Nexus       extends FirstFiveMinutes(new Build(ProtossBuilds.Opening13Nexus_NoZealot_OneGateCore: _*))
-  private class ImplementEarly1GateRange    extends FirstFiveMinutes(new Build(ProtossBuilds.OpeningOneGateCore_DragoonFirst: _*))
+  private class ImplementEarly1GateRange    extends FirstFiveMinutes(new Build(ProtossBuilds.Opening_1GateCore: _*))
   private class ImplementEarly1015GateGoon  extends FirstFiveMinutes(new Build(ProtossBuilds.OpeningTwoGate1015Dragoons: _*))
   private class ImplementEarlyDTExpand      extends FirstFiveMinutes(new Build(ProtossBuilds.OpeningDTExpand: _*))
   
@@ -122,10 +122,10 @@ class ProtossVsTerran extends Parallel {
   children.set(Vector(
     // Early game
     new RequireMiningBases(1),
-    new Employ(Early14Nexus,      new ImplementEarly14Nexus),
-    new Employ(Early1GateRange,   new ImplementEarly1GateRange),
-    new Employ(Early1015GateGoon, new ImplementEarly1015GateGoon),
-    new Employ(EarlyDTExpand,     new ImplementEarlyDTExpand),
+    new Employ(PvTEarly14Nexus,      new ImplementEarly14Nexus),
+    new Employ(PvTEarly1GateRange,   new ImplementEarly1GateRange),
+    new Employ(PvTEarly1015GateGoon, new ImplementEarly1015GateGoon),
+    new Employ(PvTEarlyDTExpand,     new ImplementEarlyDTExpand),
     new RequireSufficientPylons,
     new TrainProbesContinuously,
     new ProtossVsTerranIdeas.RespondToBioAllInWithReavers,
@@ -146,8 +146,8 @@ class ProtossVsTerran extends Parallel {
     new If(
       new UnitsAtLeast(20, UnitMatchWarriors), // We have a habit of getting this tech too soon and dying
       new Parallel(
-        new Employ(LateArbiters, new ImplementLateArbiters),
-        new Employ(LateCarriers, new ImplementLateCarriers),
+        new Employ(PvTLateArbiters, new ImplementLateArbiters),
+        new Employ(PvTLateCarriers, new ImplementLateCarriers),
         new OnThreeBases_WeaponsUpgrades)),
     
     // Units
@@ -165,7 +165,7 @@ class ProtossVsTerran extends Parallel {
     // Luxuries
     new Build(RequestAtLeast(5, Protoss.Gateway)),
     new RequireMiningBases(3),
-    new Employ(LateCarriers, new ImplementLateCarriers),
+    new Employ(PvTLateCarriers, new ImplementLateCarriers),
     new Build(RequestAtLeast(10, Protoss.Gateway)),
     new RequireMiningBases(4),
     new Build(RequestAtLeast(15, Protoss.Gateway)),

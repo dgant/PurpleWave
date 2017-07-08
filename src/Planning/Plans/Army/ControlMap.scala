@@ -34,7 +34,7 @@ class ControlMap extends Plan {
         else if (base.planningToTake)
           50.0
         else if (base.owner.isEnemy)
-          10.0
+          20.0
         else
           1.0
       )

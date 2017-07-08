@@ -8,13 +8,13 @@ object PlacementHeuristicCoversWorkers extends PlacementHeuristic {
   
   override def evaluate(blueprint: Blueprint, candidate: Tile): Double = {
     
-    if (blueprint.attackRangePixels.isEmpty) return HeuristicMathMultiplicative.default
+    if (blueprint.distancePixels.isEmpty) return HeuristicMathMultiplicative.default
     
     candidate.zone.bases
       .map(
         _.harvestingArea.tiles.count(
           _.tileDistanceFast(candidate) * 32.0
-          <= blueprint.attackRangePixels.get))
+          <= blueprint.distancePixels.get))
       .sum
   }
 }

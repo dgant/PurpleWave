@@ -46,15 +46,19 @@ object PlacementProfiles {
     avoidDistanceFromBase       = 2.0
   )
   
-  val cannonPylon = new PlacementProfile(
-    "Pylon for Cannons",
+  val naturalCannonPylon = new PlacementProfile(
+    "Pylon for natural Cannons",
     preferPowering              = 0.5,
     preferDistanceFromEnemy     = 0.5,
-    preferCoveringWorkers       = 0.25,
+    preferCoveringWorkers       = 0.5,
     avoidDistanceFromBase       = 1.5,
-    avoidSurfaceArea            = 0.5,
-    avoidDistanceFromExitRange  = 2.0
-  )
+    avoidSurfaceArea            = 0.25,
+    avoidDistanceFromExitRange  = 2.0)
+  
+  val mineralCannon = new PlacementProfile(
+    "Pylon for mineral line Cannons",
+    preferPowering              = 0.1,
+    preferCoveringWorkers       = 1.0)
   
   val groundDefense = new PlacementProfile(
     "Ground defense",
@@ -73,7 +77,7 @@ object PlacementProfiles {
       pylon
     else if (buildingDescriptor.building.exists(_.trainsGroundUnits))
       factory
-    else if (buildingDescriptor.building.exists(_.canAttack) || buildingDescriptor.attackRangePixels.isDefined)
+    else if (buildingDescriptor.building.exists(_.canAttack) || buildingDescriptor.distancePixels.isDefined)
       groundDefense
     else
       tech

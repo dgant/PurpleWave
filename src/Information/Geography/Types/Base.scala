@@ -11,6 +11,7 @@ class Base(val townHallTile: Tile)
   lazy val  zone            : Zone              = With.geography.zoneByTile(townHallTile)
   lazy val  townHallArea    : TileRectangle     = Protoss.Nexus.tileArea.add(townHallTile)
   lazy val  isStartLocation : Boolean           = With.geography.startLocations.exists(_ == townHallTile)
+  lazy val  isOurMain       : Boolean           = isStartLocation && owner.isUs && ! With.geography.bases.exists(_.isOurMain)
   var       isNaturalOf     : Option[Base]      = None
   var       townHall        : Option[UnitInfo]  = None
   var       harvestingArea  : TileRectangle     = townHallArea

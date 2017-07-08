@@ -9,7 +9,7 @@ import Planning.Plans.Information.Employ
 import Planning.Plans.Information.Scenarios.WeAreBeing4Pooled
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, FirstFiveMinutes}
-import Planning.Plans.Macro.Expanding.{BuildAssimilators, RequireMiningBases}
+import Planning.Plans.Macro.Expanding.{BuildAssimilators, BuildCannonsAtExpansions, RequireMiningBases}
 import Planning.Plans.Macro.Milestones._
 import Planning.Plans.Macro.Reaction.{EnemyBasesAtLeast, EnemyMutalisks}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
@@ -105,7 +105,7 @@ class ProtossVsZerg extends Parallel {
   ///////////
   
   private class TakeSafeNatural extends If(
-    new UnitsAtLeast(12, UnitMatchWarriors),
+    new UnitsAtLeast(6, UnitMatchWarriors),
     new RequireMiningBases(2))
   
   private class TakeSafeThirdBase extends If(
@@ -156,6 +156,7 @@ class ProtossVsZerg extends Parallel {
     new BuildAssimilators,
     new Employ(EarlyFFEHeavy, new Build(RequestAtLeast(8, Protoss.PhotonCannon))),
     new BuildDetectionForLurkers,
+    new BuildCannonsAtExpansions(5),
   
     new If(
       new UnitsAtLeast(3, UnitMatchType(Protoss.Carrier), complete = false),

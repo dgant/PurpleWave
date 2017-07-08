@@ -7,7 +7,7 @@ import ProxyBwapi.Races.Zerg
 class WeAreBeing4Pooled extends Plan {
   
   override def isComplete: Boolean = {
-    With.frame < 24 * 60 * 4 &&
+    With.frame < 24 * 60 * 3 &&
     (
       // 5 pool spawning pool finishes about 1:35 == 95 seconds
       // Let's add a bit of buffer to our detection.

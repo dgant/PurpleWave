@@ -25,20 +25,20 @@ class Blueprint(
   var id: Option[Int] = None
   val frameCreated: Int = With.frame
   
-  val widthTiles       : Int               = argWidth        .orElse(building.map(_.tileWidth)).getOrElse(1)
-  val heightTiles      : Int               = argHeight       .orElse(building.map(_.tileHeight)).getOrElse(1)
-  val powers      : Boolean           = argPowers       .getOrElse(building.contains(Protoss.Pylon))
-  val powered     : Boolean           = argPowered      .getOrElse(building.exists(_.requiresPsi))
-  val townHall    : Boolean           = argTownHall     .getOrElse(building.exists(_.isTownHall))
-  val gas         : Boolean           = argGas          .getOrElse(building.exists(_.isRefinery))
-  val margin      : Boolean           = argMargin       .getOrElse(building.exists(With.architecture.usuallyNeedsMargin))
-  val attackRangePixels : Option[Double]    = argRangePixels  .orElse(building.map(building => building.maxAirGroundRange + building.radialHypotenuse))
-  val placement   : PlacementProfile  = argPlacement    .getOrElse(PlacementProfiles.default(this))
+  val widthTiles      : Int               = argWidth        .orElse(building.map(_.tileWidth)).getOrElse(1)
+  val heightTiles     : Int               = argHeight       .orElse(building.map(_.tileHeight)).getOrElse(1)
+  val powers          : Boolean           = argPowers       .getOrElse(building.contains(Protoss.Pylon))
+  val powered         : Boolean           = argPowered      .getOrElse(building.exists(_.requiresPsi))
+  val townHall        : Boolean           = argTownHall     .getOrElse(building.exists(_.isTownHall))
+  val gas             : Boolean           = argGas          .getOrElse(building.exists(_.isRefinery))
+  val margin          : Boolean           = argMargin       .getOrElse(building.exists(With.architecture.usuallyNeedsMargin))
+  val distancePixels  : Option[Double]    = argRangePixels  .orElse(building.map(building => building.maxAirGroundRange + building.radialHypotenuse))
+  val placement       : PlacementProfile  = argPlacement    .getOrElse(PlacementProfiles.default(this))
   
   def fulfilledBy(proposal: Blueprint): Boolean = {
     if (proposal == this) return true
-    widthTiles         == proposal.widthTiles                                                               &&
-    heightTiles        == proposal.heightTiles                                                              &&
+    widthTiles    == proposal.widthTiles                                                          &&
+    heightTiles   == proposal.heightTiles                                                         &&
     (powers       == proposal.powers          || ! powers)                                        &&
     (powered      == proposal.powered         || ! powered)                                       &&
     townHall      == proposal.townHall                                                            &&

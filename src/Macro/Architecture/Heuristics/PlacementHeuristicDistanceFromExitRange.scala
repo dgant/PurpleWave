@@ -8,7 +8,7 @@ object PlacementHeuristicDistanceFromExitRange extends PlacementHeuristic {
   
   override def evaluate(blueprint: Blueprint, candidate: Tile): Double = {
     
-    val targetDistance            = blueprint.attackRangePixels.getOrElse(32.0 * 6.0)
+    val targetDistance            = blueprint.distancePixels.getOrElse(32.0 * 6.0)
     val candidatePixel            = candidate.topLeftPixel.add(16 * blueprint.widthTiles, 16 * blueprint.heightTiles)
     val zone                      = candidate.zone
     val exits: Iterable[Edge]     = if (zone.exit.isDefined) zone.exit else zone.edges

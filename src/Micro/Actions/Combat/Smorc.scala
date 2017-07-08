@@ -103,7 +103,7 @@ object Smorc extends Action {
         unit.pixelCenter.zone == zone &&
         unit.canAttackThisSecond      &&
         (
-          unit.targetPixel.exists(_.zone != zone) ||
+          unit.targetPixel.forall(_.zone == zone) ||
           state.unit.inRangeToAttackFast(unit)
         ))
       if (targets.isEmpty) {

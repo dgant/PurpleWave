@@ -1,7 +1,7 @@
 package Planning.Plans.Macro.Automatic
 
 import Lifecycle.With
-import Macro.BuildRequests.{BuildRequest, RequestUnitAnother, RequestUnitAnotherOne}
+import Macro.BuildRequests.{BuildRequest, RequestAnother, RequestUnitAnotherOne}
 import Planning.Plan
 import ProxyBwapi.Races.Protoss
 
@@ -26,8 +26,8 @@ class TrainGatewayUnitsContinuously extends Plan {
         Math.min(capacity, With.self.gas / 50)
       else 0
     val zealots = Math.max(0, capacity - dragoons)
-    requests.append(RequestUnitAnother(dragoons,  Protoss.Dragoon))
-    requests.append(RequestUnitAnother(zealots,   Protoss.Zealot))
+    requests.append(RequestAnother(dragoons,  Protoss.Dragoon))
+    requests.append(RequestAnother(zealots,   Protoss.Zealot))
     
     With.scheduler.request(this, requests)
   }

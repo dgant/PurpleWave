@@ -1,7 +1,7 @@
 package Planning.Plans.Protoss.GamePlans
 
 import Lifecycle.With
-import Macro.BuildRequests.RequestUnitAnother
+import Macro.BuildRequests.RequestAnother
 import Planning.Composition.UnitCounters.UnitCountExactly
 import Planning.Composition.UnitMatchers.UnitMatchWorkers
 import Planning.Composition.UnitPreferences.UnitPreferClose
@@ -15,7 +15,7 @@ import ProxyBwapi.Races.Protoss
 class ProbeRush extends Parallel(
   new If(
     new Check(() => With.self.supplyUsed == With.self.supplyTotal),
-    new Build(RequestUnitAnother(1, Protoss.Pylon))
+    new Build(RequestAnother(1, Protoss.Pylon))
   ),
   new TrainContinuously(Protoss.Probe),
   new FollowBuildOrder,

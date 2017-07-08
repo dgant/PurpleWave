@@ -24,6 +24,7 @@ class Geography {
   def enemyBases          : Iterable[Base]          = enemyBasesCache.get
   def ourTownHalls        : Iterable[UnitInfo]      = ourTownHallsCache.get
   def ourHarvestingAreas  : Iterable[TileRectangle] = ourHarvestingAreasCache.get
+  def ourMain             : Option[Base]            = ourMainCache.get
   def ourNatural          : Option[Base]            = ourNaturalCache.get
   
   private val ourZonesCache           = new CacheFrame(() => zones.filter(_.owner.isUs))
@@ -32,6 +33,7 @@ class Geography {
   private val enemyBasesCache         = new CacheFrame(() => bases.filter(_.owner.isEnemy))
   private val ourTownHallsCache       = new CacheFrame(() => ourBases.flatMap(_.townHall))
   private val ourHarvestingAreasCache = new CacheFrame(() => ourBases.map(_.harvestingArea))
+  private val ourMainCache            = new CacheFrame(() => bases.find(_.isOurMain))
   private val ourNaturalCache         = new CacheFrame(() => bases.find(_.isNaturalOf.exists(_.owner.isUs)))
   
   def zoneByTile(tile: Tile): Zone = zoneByTileCache(tile)

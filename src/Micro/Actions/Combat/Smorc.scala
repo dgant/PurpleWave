@@ -99,7 +99,13 @@ object Smorc extends Action {
     if (attack) {
       // Ignore units outside their bases
       // TODO: If they're pushing us out of their base we should fight back
-      val targets = With.units.enemy.filter(unit => unit.pixelCenter.zone == zone && unit.canAttackThisSecond)
+      val targets = With.units.enemy.filter(unit =>
+        unit.pixelCenter.zone == zone &&
+        unit.canAttackThisSecond      &&
+        (
+          unit.targetPixel.exists(_.zone != zone) ||
+          state.unit.inRangeToAttackFast(unit)
+        ))
       if (targets.isEmpty) {
         destroyBuildings(state)
         return

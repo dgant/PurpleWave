@@ -28,7 +28,7 @@ class ProtossVsZerg extends Parallel {
   ////////////////
   
   private class ImplementEarly2Gate extends FirstFiveMinutes(
-    new Build(ProtossBuilds.OpeningTwoGate99: _*))
+    new Build(ProtossBuilds.OpeningTwoGate99_WithZealots: _*))
   
   private class ImplementEarlyFFELight extends FirstFiveMinutes(
     new Parallel(
@@ -216,7 +216,7 @@ class ProtossVsZerg extends Parallel {
         new UnitsAtLeast(1, UnitMatchType(Protoss.Pylon), complete = false),
         new RequireScouting)), // Don't scout while being 4-pooled
     
-    // Zealot all-in: Trigger attacking immediately! And bring Probes
+    // Zealot all-in: Trigger attacking immediately! And bring Probes because they help kill Zerglings faster
     new Employ(EarlyZealotAllIn,
       new Trigger(
         new UnitsAtLeast(2, UnitMatchType(Protoss.Zealot), complete = true),
@@ -231,6 +231,8 @@ class ProtossVsZerg extends Parallel {
         new DefendHearts)),
     
     new ControlMap,
-    new ConsiderAttacking
+    new If(
+      new UnitsAtLeast(4, UnitMatchWarriors, complete = true),
+      new ConsiderAttacking)
   ))
 }

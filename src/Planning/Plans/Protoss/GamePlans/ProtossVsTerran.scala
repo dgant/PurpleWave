@@ -144,7 +144,7 @@ class ProtossVsTerran extends Parallel {
     
     // Late game
     new If(
-      new UnitsAtLeast(30, UnitMatchWarriors), // We have a habit of getting this tech too soon and dying
+      new UnitsAtLeast(20, UnitMatchWarriors), // We have a habit of getting this tech too soon and dying
       new Parallel(
         new Employ(LateArbiters, new ImplementLateArbiters),
         new Employ(LateCarriers, new ImplementLateCarriers),
@@ -165,6 +165,7 @@ class ProtossVsTerran extends Parallel {
     // Luxuries
     new Build(RequestAtLeast(5, Protoss.Gateway)),
     new RequireMiningBases(3),
+    new Employ(LateCarriers, new ImplementLateCarriers),
     new Build(RequestAtLeast(10, Protoss.Gateway)),
     new RequireMiningBases(4),
     new Build(RequestAtLeast(15, Protoss.Gateway)),

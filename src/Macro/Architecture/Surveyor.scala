@@ -24,16 +24,20 @@ object Surveyor {
         .flatMap(_.gas.map(_.tileTopLeft))
     }
     else {
-        With.geography.ourBases
-          .flatMap(_.zone.tiles)
-          .toVector ++
-        With.geography.zones
-          .filter(zone =>
-            ! zone.island
-            && zone.owner.isNeutral
-            && zone.edges.exists(_.zones.exists(_.owner.isUs)))
-          .flatMap(_.tiles)
-          .toVector
+        if (blueprint.zone.isDefined)
+          blueprint.zone.get.tiles
+            .toVector
+        else
+          With.geography.ourBases
+            .flatMap(_.zone.tiles)
+            .toVector ++
+          With.geography.zones
+            .filter(zone =>
+              ! zone.island
+              && zone.owner.isNeutral
+              && zone.edges.exists(_.zones.exists(_.owner.isUs)))
+            .flatMap(_.tiles)
+            .toVector
     }
   }
   

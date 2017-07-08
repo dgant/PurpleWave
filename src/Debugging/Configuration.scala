@@ -23,7 +23,7 @@ class Configuration {
   var enableMineralWalkInSameZone     = false // Tends to lead to stuck builders
   var pathRecalculationDelayFrames    = 48
   var woundedThresholdHealth          = 40
-  var evaluateDangerousBases          = true
+  var evacuateDangerousBases          = true
   
   var dpsGridDistancePenalty          = 0.5
   var dpsGridMovementPenalty          = 0.5
@@ -60,7 +60,7 @@ class Configuration {
   /////////////////
   
   var buildingPlacementBatchSize      = 300
-  var buildingPlacementMaximumQueue   = 8
+  var buildingPlacementMaximumQueue   = 40
   var garbageCollectionThresholdMs    = 5
   var peformanceFrameMilliseconds     = 20
   var initialTaskLengthMilliseconds   = 20

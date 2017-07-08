@@ -6,10 +6,6 @@ import Lifecycle.With
 
 object ShowGroundskeeperQueue extends View {
   
-  override def renderMap() {
-    
-  }
-  
   override def renderScreen() {
     
     With.game.drawTextScreen(5, 25, "Unplaced:")

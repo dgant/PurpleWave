@@ -14,9 +14,12 @@ class BuildCannonsAtBases(initialCount: Int) extends Plan {
   val count: Property[Int] = new Property(initialCount)
   
   override def onUpdate() {
-    
-    With.scheduler.request(this, RequestAtLeast(1, Protoss.Forge))
-    eligibleBases.foreach(cannonBase)
+    if (With.units.ours.exists(_.is(Protoss.PhotonCannon))) {
+      eligibleBases.foreach(cannonBase)
+    }
+    else {
+      With.scheduler.request(this, RequestAtLeast(1, Protoss.Forge))
+    }
   }
   
   protected def eligibleBases: Iterable[Base] = {

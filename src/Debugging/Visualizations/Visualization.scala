@@ -4,7 +4,7 @@ import Debugging.Visualizations.Views.Fun.{ShowHappyVision, ShowTextOnly}
 import Debugging.Visualizations.Views.Geography.{ShowArchitecture, ShowBases, ShowZones}
 import Debugging.Visualizations.Views.Micro.{ShowUnits, ShowUnitsForeign, ShowUnitsFriendly}
 import Debugging.Visualizations.Views.Performance.ShowPerformanceSummary
-import Debugging.Visualizations.Views.Planning.{ShowPlans, ShowResources, ShowStrategy}
+import Debugging.Visualizations.Views.Planning.{ShowResources, ShowStrategy}
 import Debugging.Visualizations.Views.ShowClock
 import Lifecycle.With
 
@@ -24,8 +24,7 @@ class Visualization {
     ShowStrategy,
     ShowZones,
     ShowArchitecture,
-    ShowResources,
-    ShowPlans
+    ShowResources
   )
   
   var enabled   = false

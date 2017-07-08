@@ -25,20 +25,20 @@ class Blueprint(
   var id: Option[Int] = None
   val frameCreated: Int = With.frame
   
-  val width       : Int               = argWidth        .orElse(building.map(_.tileWidth)).getOrElse(1)
-  val height      : Int               = argHeight       .orElse(building.map(_.tileHeight)).getOrElse(1)
+  val widthTiles       : Int               = argWidth        .orElse(building.map(_.tileWidth)).getOrElse(1)
+  val heightTiles      : Int               = argHeight       .orElse(building.map(_.tileHeight)).getOrElse(1)
   val powers      : Boolean           = argPowers       .getOrElse(building.contains(Protoss.Pylon))
   val powered     : Boolean           = argPowered      .getOrElse(building.exists(_.requiresPsi))
   val townHall    : Boolean           = argTownHall     .getOrElse(building.exists(_.isTownHall))
   val gas         : Boolean           = argGas          .getOrElse(building.exists(_.isRefinery))
   val margin      : Boolean           = argMargin       .getOrElse(building.exists(With.architecture.usuallyNeedsMargin))
-  val attackRange : Option[Double]    = argRangePixels  .orElse(building.map(building => building.maxAirGroundRange + building.radialHypotenuse))
+  val attackRangePixels : Option[Double]    = argRangePixels  .orElse(building.map(building => building.maxAirGroundRange + building.radialHypotenuse))
   val placement   : PlacementProfile  = argPlacement    .getOrElse(PlacementProfiles.default(this))
   
   def fulfilledBy(proposal: Blueprint): Boolean = {
     if (proposal == this) return true
-    width         == proposal.width                                                               &&
-    height        == proposal.height                                                              &&
+    widthTiles         == proposal.widthTiles                                                               &&
+    heightTiles        == proposal.heightTiles                                                              &&
     (powers       == proposal.powers          || ! powers)                                        &&
     (powered      == proposal.powered         || ! powered)                                       &&
     townHall      == proposal.townHall                                                            &&
@@ -51,7 +51,7 @@ class Blueprint(
   
   def marginTiles         : Int   = if(margin) 1 else 0
   def relativeBuildStart  : Tile  = Tile(0, 0)
-  def relativeBuildEnd    : Tile  = Tile(width, height)  
+  def relativeBuildEnd    : Tile  = Tile(widthTiles, heightTiles)
   def relativeMarginStart : Tile  = relativeBuildStart.subtract(marginTiles, marginTiles)
   def relativeMarginEnd   : Tile  = relativeBuildEnd.add(marginTiles, marginTiles)
   def relativeBuildArea   : TileRectangle = TileRectangle(relativeBuildStart, relativeBuildEnd)
@@ -64,10 +64,10 @@ class Blueprint(
     }
     
     if (powered) {
-      if (height == 3 && ! With.grids.psi3Height.get(tile) && ! With.architecture.powered3Height.contains(tile)) {
+      if (heightTiles == 3 && ! With.grids.psi3Height.get(tile) && ! With.architecture.powered3Height.contains(tile)) {
         return false
       }
-      if (height == 2 && ! With.grids.psi2Height.get(tile) && ! With.architecture.powered2Height.contains(tile)) {
+      if (heightTiles == 2 && ! With.grids.psi2Height.get(tile) && ! With.architecture.powered2Height.contains(tile)) {
         return false
       }
     }
@@ -112,8 +112,8 @@ class Blueprint(
     proposer.toString.take(12) + " " +
     building.map(_.toString + " ").getOrElse("") +
     placement.toString + " " +
-    width + "x" + height + " " +
-    (if (margin) (width + 2 * marginTiles) + "x" + (height + 2 * marginTiles) + " " else "") +
+    widthTiles + "x" + heightTiles + " " +
+    (if (margin) (widthTiles + 2 * marginTiles) + "x" + (heightTiles + 2 * marginTiles) + " " else "") +
     (if (powers)    "(Powers) "     else "") +
     (if (powered)   "(Powered) "    else "") +
     (if (townHall)  "(Town hall) "  else "") +

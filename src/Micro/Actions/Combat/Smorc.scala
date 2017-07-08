@@ -41,7 +41,7 @@ object Smorc extends Action {
     // We want to avoid big drilling stacks
     val centroidSoft    = enemies.map(_.pixelCenter).centroid
     val centroidHard    = if (enemies.size > 3) enemies.sortBy(_.pixelDistanceFast(centroidSoft)).take(enemies.size/2).map(_.pixelCenter).centroid else centroidSoft //Don't centroid an empty list
-    var drillingEnemies = enemies.filter(_.pixelDistanceFast(centroidHard) < 24.0)
+    var drillingEnemies = enemies.filter(_.pixelDistanceFast(centroidHard) < 8.0)
     if (drillingEnemies.size < 4) {
       drillingEnemies = Vector.empty
     }

@@ -58,8 +58,8 @@ object PlacementProfiles {
   
   val groundDefense = new PlacementProfile(
     "Ground defense",
-    preferCoveringWorkers       = 1.0,
-    avoidDistanceFromBase       = 0.5,
+    preferCoveringWorkers       = 0.25,
+    avoidDistanceFromBase       = 0.25,
     avoidSurfaceArea            = 0.5,
     avoidDistanceFromExitRange  = 2.0
   )
@@ -73,7 +73,7 @@ object PlacementProfiles {
       pylon
     else if (buildingDescriptor.building.exists(_.trainsGroundUnits))
       factory
-    else if (buildingDescriptor.attackRange.isDefined)
+    else if (buildingDescriptor.building.exists(_.canAttack) || buildingDescriptor.attackRangePixels.isDefined)
       groundDefense
     else
       tech

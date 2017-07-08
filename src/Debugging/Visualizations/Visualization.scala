@@ -1,7 +1,7 @@
 package Debugging.Visualizations
 
 import Debugging.Visualizations.Views.Fun.{ShowHappyVision, ShowTextOnly}
-import Debugging.Visualizations.Views.Geography.ShowBases
+import Debugging.Visualizations.Views.Geography.{ShowArchitecture, ShowBases, ShowZones}
 import Debugging.Visualizations.Views.Micro.{ShowUnits, ShowUnitsForeign, ShowUnitsFriendly}
 import Debugging.Visualizations.Views.Performance.ShowPerformanceSummary
 import Debugging.Visualizations.Views.Planning.ShowStrategy
@@ -21,7 +21,9 @@ class Visualization {
     ShowUnitsFriendly,
     ShowPerformanceSummary,
     ShowClock,
-    ShowStrategy
+    ShowStrategy,
+    ShowZones,
+    ShowArchitecture
   )
   
   var enabled   = false

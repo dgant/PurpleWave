@@ -5,13 +5,13 @@ import Macro.BuildRequests.{RequestAtLeast, RequestUpgradeNext}
 import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Plans.Army.{ConsiderAttacking, ControlMap, DefendChokes}
 import Planning.Plans.Compound.{If, Parallel}
-import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientPylons, TrainContinuously, TrainProbesContinuously}
+import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildAssimilators, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.{OnMiningBases, UnitsAtLeast}
 import Planning.Plans.Protoss.ProtossBuilds
 import Planning.Plans.Scouting.FindExpansions
-import ProxyBwapi.Races.Protoss
+import ProxyBwapi.Races.{Protoss, Zerg}
 
 class IslandCarriers extends Parallel {
   
@@ -29,6 +29,7 @@ class IslandCarriers extends Parallel {
     RequestAtLeast(1, Protoss.CyberneticsCore),
     RequestAtLeast(1, Protoss.Stargate),
     RequestAtLeast(1, Protoss.FleetBeacon),
+    RequestUpgradeNext(Protoss.AirDamage),
     RequestUpgradeNext(Protoss.CarrierCapacity)
   )
   
@@ -59,6 +60,7 @@ class IslandCarriers extends Parallel {
     new BuildAssimilators,
     new ExpandOverIsland,
     new TechToCarriers,
+    new TrainMatchingRatio(Protoss.Corsair, UnitMatchType(Zerg.Mutalisk), 1.5),
     new If(
       new UnitsAtLeast(4, UnitMatchType(Protoss.Carrier)),
       new Parallel(

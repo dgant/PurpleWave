@@ -9,8 +9,8 @@ object PlacementHeuristicSurfaceArea extends PlacementHeuristic {
   override def evaluate(blueprint: Blueprint, candidate: Tile): Double = {
     
     val zone = candidate.zone
-    val dxEnd = blueprint.width + 2
-    val dyEnd = blueprint.height + 2
+    val dxEnd = blueprint.widthTiles + 2
+    val dyEnd = blueprint.heightTiles + 2
     var walkableTiles = 0
     var dx = 0
     while(dx < dxEnd) {

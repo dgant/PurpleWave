@@ -10,7 +10,7 @@ import Planning.Plans.Information.Scenarios.WeAreBeing4Pooled
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, FirstFiveMinutes}
 import Planning.Plans.Macro.Expanding.{BuildAssimilators, RequireMiningBases}
-import Planning.Plans.Macro.Milestones.{EnemyUnitsAtLeast, MiningBasesAtLeast, UnitsAtLeast}
+import Planning.Plans.Macro.Milestones.{EnemyUnitsAtLeast, MiningBasesAtLeast, UnitsAtLeast, UnitsAtMost}
 import Planning.Plans.Macro.Reaction.{EnemyBasesAtLeast, EnemyMutalisks}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Protoss.ProtossBuilds
@@ -70,6 +70,7 @@ class ProtossVsZerg extends Parallel {
       RequestAtLeast(1, Protoss.FleetBeacon),
       RequestAtLeast(3, Protoss.Stargate),
       RequestUpgrade(Protoss.AirDamage),
+      RequestUpgrade(Protoss.CarrierCapacity),
       RequestAtLeast(4, Protoss.Stargate)))
   
   private class ImplementMidgameCorsairSpeedlot extends Parallel(
@@ -77,7 +78,7 @@ class ProtossVsZerg extends Parallel {
       RequestAtLeast(1, Protoss.Gateway),
       RequestAtLeast(1, Protoss.Assimilator),
       RequestAtLeast(1, Protoss.CyberneticsCore),
-      RequestUpgrade(Protoss.ZealotSpeed)),
+      RequestUpgrade(Protoss.GroundDamage)),
     new If(
       new MiningBasesAtLeast(2),
       new Build(
@@ -150,9 +151,13 @@ class ProtossVsZerg extends Parallel {
     new Employ(Midgame5GateDragoons, new ImplementMidgame5GateDragoons),
     
     // Mid-game macro
-    new Employ(EarlyFFEHeavy, new TrainContinuously(Protoss.PhotonCannon, 8)),
     new BuildAssimilators,
+    new Employ(EarlyFFEHeavy, new Build(RequestAtLeast(8, Protoss.PhotonCannon))),
     new BuildDetectionForLurkers,
+  
+    new If(
+      new UnitsAtLeast(3, UnitMatchType(Protoss.Carrier), complete = false),
+      new Build(RequestUpgrade(Protoss.CarrierCapacity))),
     
     new If(
       new UnitsAtLeast(6, UnitMatchType(Protoss.Carrier), complete = false),
@@ -210,11 +215,14 @@ class ProtossVsZerg extends Parallel {
     
     // Tactics
     new If(
-      new WeAreBeing4Pooled,
+      new And(
+        new WeAreBeing4Pooled,
+        new UnitsAtMost(2, UnitMatchType(Protoss.PhotonCannon), complete = true)),
       new DefendChokeWithWorkers,
       new If(
         new UnitsAtLeast(1, UnitMatchType(Protoss.Pylon), complete = false),
         new RequireScouting)), // Don't scout while being 4-pooled
+    
     
     // Zealot all-in: Trigger attacking immediately! And bring Probes because they help kill Zerglings faster
     new Employ(EarlyZealotAllIn,

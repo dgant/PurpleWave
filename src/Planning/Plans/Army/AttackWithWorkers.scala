@@ -17,6 +17,7 @@ class AttackWithWorkers extends Plan {
   val fighters = new LockUnits
   fighters.unitMatcher.set(UnitMatchWorkers)
   fighters.unitCounter.set(UnitCountEverything)
+  fighters.interruptable.set(false)
   
   var haveSeenABase = false
   

@@ -24,6 +24,7 @@ class ProbeRush extends Parallel(
     new Gather {
       workers.unitCounter.set(UnitCountExactly(1))
       workers.unitPreference.set(UnitPreferClose(With.geography.home.pixelCenter))
+      workers.interruptable.set(false)
     }),
   new AttackWithWorkers
 )

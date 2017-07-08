@@ -7,14 +7,28 @@ object Listener extends BWEventListener{
   var bot:Option[Bot] = None
 
   def initialize(): Unit = {
-    mirror.getModule.setEventListener(this)
-    mirror.startGame
+    try {
+      mirror.getModule.setEventListener(this)
+      mirror.startGame
+    }
+    catch { case exception: Exception =>
+      val dontLoseTheExceptionWhileDebugging = exception
+      val dontLoseTheStackTraceWhileDebugging = exception.getStackTrace
+      val setABreakpointHere = 12345
+    }
   }
 
   override def onStart(): Unit = {
-    With.game = mirror.getGame
-    bot = Some(new Bot())
-    bot.get.onStart
+    try {
+      With.game = mirror.getGame
+      bot = Some(new Bot())
+      bot.get.onStart
+    }
+    catch { case exception: Exception =>
+      val dontLoseTheExceptionWhileDebugging = exception
+      val dontLoseTheStackTraceWhileDebugging = exception.getStackTrace
+      val setABreakpointHere = 12345
+    }
   }
 
   override def onEnd(b: Boolean):                         Unit = { bot.get.onEnd(b) }

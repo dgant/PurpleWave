@@ -3,12 +3,12 @@ package Planning.Plans.Protoss.GamePlans
 import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, RequestUpgradeNext}
 import Planning.Composition.UnitMatchers.UnitMatchType
-import Planning.Plans.Army.{ConsiderAttacking, ControlMap, DefendChokes}
+import Planning.Plans.Army.{ConsiderAttacking, ControlMap, DefendHearts}
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
-import Planning.Plans.Macro.Expanding.{BuildAssimilators, RequireMiningBases}
-import Planning.Plans.Macro.Milestones.{OnMiningBases, UnitsAtLeast}
+import Planning.Plans.Macro.Expanding.{BuildAssimilators, BuildCannonsAtBases, RequireMiningBases}
+import Planning.Plans.Macro.Milestones.{OnGasBases, OnMiningBases, UnitsAtLeast}
 import Planning.Plans.Protoss.ProtossBuilds
 import Planning.Plans.Scouting.FindExpansions
 import ProxyBwapi.Races.{Protoss, Zerg}
@@ -73,15 +73,16 @@ class IslandCarriers extends Parallel {
         new TrainContinuously(Protoss.Scout, 3),
         new TrainContinuously(Protoss.Carrier),
         new TrainContinuously(Protoss.Observer, 1))),
-    new OnMiningBases(1, new Build(RequestAtLeast(3, Protoss.Stargate))),
-    new OnMiningBases(2, new Build(RequestAtLeast(5, Protoss.Stargate))),
-    new OnMiningBases(3, new Build(RequestAtLeast(8, Protoss.Stargate))),
+    new OnGasBases(1, new Build(RequestAtLeast(3, Protoss.Stargate))),
+    new OnGasBases(2, new Build(RequestAtLeast(5, Protoss.Stargate))),
+    new OnGasBases(3, new Build(RequestAtLeast(8, Protoss.Stargate))),
+    new BuildCannonsAtBases(6),
     new FindExpansions { scouts.get.unitMatcher.set(UnitMatchType(Protoss.Scout)) },
     new ControlMap,
     new If(
       new UnitsAtLeast(6 * 8, UnitMatchType(Protoss.Interceptor)),
       new ConsiderAttacking,
-      new DefendChokes),
+      new DefendHearts),
     new FollowBuildOrder,
     new Gather
   ))

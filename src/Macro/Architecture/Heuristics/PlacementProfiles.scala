@@ -17,18 +17,15 @@ object PlacementProfiles {
   val factory = new PlacementProfile(
     "Factory",
     preferZone                  = 1.0,
-    preferSpace                 = 0.5,
-    avoidDistanceFromBase       = 0.5,
-    avoidDistanceFromExitRange  = 4.0
+    avoidDistanceFromBase       = 2.0,
+    avoidDistanceFromExitRange  = 2.0
   )
   
   val tech = new PlacementProfile(
     "Tech",
     preferZone                  = 1.0,
-    preferDistanceFromEnemy     = 4.0,
-    avoidSurfaceArea            = 0.5,
-    avoidDistanceFromBase       = 1.0,
-    avoidDistanceFromExitRange  = 0.0
+    preferDistanceFromEnemy     = 3.0,
+    avoidDistanceFromBase       = 3.0
   )
   
   val gas = new PlacementProfile(

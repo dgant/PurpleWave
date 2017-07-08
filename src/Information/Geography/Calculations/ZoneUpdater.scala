@@ -60,9 +60,10 @@ object ZoneUpdater {
     }
     
     // Assume ownership of unscouted main from natural
-    base.isNaturalOf
-      .filter(main => base.owner.isEnemy && main.lastScoutedFrame <= 0)
-      .foreach(main => main.owner = base.owner)
+    if (base.owner.isNeutral) {
+      val natural = With.geography.bases.find(_.isNaturalOf.contains(base))
+      natural.foreach(someNatural => base.owner = someNatural.owner)
+    }
   }
   
   private def updateAssets(base: Base) {

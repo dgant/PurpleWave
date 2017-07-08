@@ -23,7 +23,6 @@ class Visualization {
     ShowClock,
     ShowStrategy,
     ShowZones,
-    ShowArchitecture,
     ShowResources
   )
   

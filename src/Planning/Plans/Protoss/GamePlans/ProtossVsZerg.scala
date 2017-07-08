@@ -152,7 +152,7 @@ class ProtossVsZerg extends Parallel {
     
     // Mid-game macro
     new BuildAssimilators,
-    new Employ(EarlyFFEHeavy, new Build(RequestAtLeast(8, Protoss.PhotonCannon))),
+    new Employ(EarlyFFEHeavy, new Build(RequestAtLeast(6, Protoss.PhotonCannon))),
     new BuildDetectionForLurkers,
     new BuildCannonsAtExpansions(5),
   
@@ -169,10 +169,13 @@ class ProtossVsZerg extends Parallel {
       new Build(RequestUpgrade(Protoss.DragoonRange))),
     
     new If(
-      new UnitsAtLeast(8, UnitMatchType(Protoss.Zealot), complete = false),
+      new And(
+        new UnitsAtLeast(4, UnitMatchType(Protoss.Zealot), complete = false),
+        new UnitsAtLeast(1, UnitMatchType(Protoss.Forge), complete = true),
+        new UnitsAtLeast(1, UnitMatchType(Protoss.Assimilator), complete = true)),
       new Parallel(
         new UpgradeContinuously(Protoss.GroundDamage),
-        new Build(RequestUpgrade(Protoss.ZealotSpeed)))),
+        new UpgradeContinuously(Protoss.ZealotSpeed),
     
     new If(
       new EnemyMutalisks,
@@ -197,6 +200,7 @@ class ProtossVsZerg extends Parallel {
     new Employ(MidgameCorsairCarrier,   new ImplementMidgameCorsairCarrier),
     
     // Late game macro
+    new RequireMiningBases(3),
     new Build(
       RequestAtLeast(3, Protoss.Gateway),
       RequestAtLeast(1, Protoss.Stargate),

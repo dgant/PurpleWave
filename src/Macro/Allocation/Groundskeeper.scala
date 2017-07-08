@@ -34,25 +34,13 @@ class Groundskeeper {
   }
   
   def proposalQueue: Iterable[Blueprint] = {
-    // Verify existing placements
-    // in priority order (top priority first)
-    // Then place upcoming proposals
-    // ordered by time since last attempt at placement
-    // then by priority
-    val placed = proposalPlacements.filter(pair => pair._2.tile.isDefined).keySet
-    val unplaced = proposals.diff(placed)
-    val ordered =
-      placed
-        .filter(_.proposer.isPrioritized)
-        .toVector
-        .sortBy(_.id)
-        .sortBy(_.proposer.priority) ++
-      unplaced
-        .filter(_.proposer.isPrioritized)
-        .toVector
-        .sortBy(_.id)
-        .sortBy(_.proposer.priority)
-        .take(With.configuration.buildingPlacementMaximumQueue)
+    val ordered = requirementMatches
+      .filter(_.requirement.proposer.isPrioritized)
+      .toVector
+      .sortBy(_.proposal.id)
+      .sortBy(_.requirement.proposer.priority)
+      .map(_.proposal)
+      .take(With.configuration.buildingPlacementMaximumQueue)
     
     ordered
   }

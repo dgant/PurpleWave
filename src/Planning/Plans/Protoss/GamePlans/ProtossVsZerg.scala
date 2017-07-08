@@ -66,7 +66,6 @@ class ProtossVsZerg extends Parallel {
       RequestAtLeast(1, Protoss.Gateway),
       RequestAtLeast(1, Protoss.CyberneticsCore),
       RequestAtLeast(1, Protoss.Stargate),
-      RequestAtLeast(5, Protoss.PhotonCannon),
       RequestAtLeast(1, Protoss.FleetBeacon),
       RequestAtLeast(3, Protoss.Stargate),
       RequestUpgrade(Protoss.AirDamage),
@@ -94,11 +93,9 @@ class ProtossVsZerg extends Parallel {
       RequestAtLeast(2, Protoss.Assimilator),
       RequestAtLeast(1, Protoss.CyberneticsCore),
       RequestAtLeast(1, Protoss.Stargate),
-      RequestAtLeast(4, Protoss.PhotonCannon),
       RequestAtLeast(1, Protoss.RoboticsFacility),
       RequestAtLeast(1, Protoss.RoboticsSupportBay)),
-    new OnGasBases(3,
-      new ImplementMidgameCorsairCarrier))
+    new OnGasBases(3, new ImplementMidgameCorsairCarrier))
   
   ///////////
   // Macro //
@@ -132,6 +129,7 @@ class ProtossVsZerg extends Parallel {
     
     // Early game
     new RequireMiningBases(1),
+    new ForgeFastExpand,
     new Employ(EarlyZealotAllIn,  new ImplementEarly2Gate),
     new Employ(Early2Gate,        new ImplementEarly2Gate),
     new Employ(EarlyFFELight,     new ImplementEarlyFFELight),

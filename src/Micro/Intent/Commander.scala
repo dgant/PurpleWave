@@ -54,6 +54,11 @@ class Commander {
     ! ready(unit)
   }
   
+  def cancel(unit: FriendlyUnitInfo) {
+    unit.base.cancelConstruction()
+    sleep(unit)
+  }
+  
   def stop(unit: FriendlyUnitInfo) {
     unit.base.stop()
     sleep(unit)

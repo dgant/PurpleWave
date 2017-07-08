@@ -235,7 +235,7 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
       ! invincible &&
       ! stasised)
   
-  def canAttackThisSecond:Boolean = canAttackThisSecondCache.get
+  def canAttackThisSecond: Boolean = canAttackThisSecondCache.get
   private val canAttackThisSecondCache = new CacheFrame(() =>
     canDoAnythingThisFrame &&
     (
@@ -313,7 +313,7 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   
   def likelyStillThere: Boolean =
     possiblyStillThere &&
-    ( ! canMoveThisFrame || lastSeen + With.configuration.fogPositionDuration > With.frame || is(Terran.SiegeTankUnsieged))
+    ( ! canMoveThisFrame || With.framesSince(lastSeen) < With.configuration.fogPositionDuration || is(Terran.SiegeTankUnsieged))
   
   def effectivelyCloaked:Boolean =
     (burrowed || cloaked) && (

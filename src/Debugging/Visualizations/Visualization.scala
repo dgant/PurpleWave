@@ -1,7 +1,8 @@
 package Debugging.Visualizations
 
+import Debugging.Visualizations.Views.Economy.ShowScheduler
 import Debugging.Visualizations.Views.Fun.{ShowHappyVision, ShowTextOnly}
-import Debugging.Visualizations.Views.Geography.{ShowArchitecture, ShowBases, ShowZones}
+import Debugging.Visualizations.Views.Geography.{ShowBases, ShowZones}
 import Debugging.Visualizations.Views.Micro.{ShowUnits, ShowUnitsForeign, ShowUnitsFriendly}
 import Debugging.Visualizations.Views.Performance.ShowPerformanceSummary
 import Debugging.Visualizations.Views.Planning.{ShowResources, ShowStrategy}
@@ -23,7 +24,8 @@ class Visualization {
     ShowClock,
     ShowStrategy,
     ShowZones,
-    ShowResources
+    ShowResources,
+    ShowScheduler
   )
   
   var enabled   = false

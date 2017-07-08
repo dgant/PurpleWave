@@ -33,6 +33,7 @@ object Idle extends Action {
   }
   
   private val actions = Vector(
+    Cancel, //Probably not actually used yet because candidates won't be in the Executor queue
     Smorc,
     Duck,
     Gather,

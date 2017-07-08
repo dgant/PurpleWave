@@ -58,8 +58,9 @@ object Smorc extends Action {
     if (
       zone.bases.exists(_.harvestingArea.contains(state.unit.tileIncludingCenter)
       && enemies.exists(enemy =>
-         enemy.pixelCenter.zone == zone
-          && enemy.pixelDistanceFast(exit) < state.unit.pixelDistanceFast(exit)))) {
+        enemy.pixelCenter.zone == zone
+        && enemy.pixelDistanceFast(state.unit) < 64.0
+        && enemy.pixelDistanceFast(exit) < state.unit.pixelDistanceFast(exit)))) {
       mineralWalkAway(state)
       return
     }
@@ -99,10 +100,11 @@ object Smorc extends Action {
     if (attack) {
       // Ignore units outside their bases
       // TODO: If they're pushing us out of their base we should fight back
-      val targets = With.units.enemy.filter(unit =>
+      val targets = state.targets.filter(unit =>
         unit.pixelCenter.zone == zone &&
         unit.canAttackThisSecond      &&
         (
+          // Don't get distracted by workers leaving the base
           unit.targetPixel.forall(_.zone == zone) ||
           state.unit.inRangeToAttackFast(unit)
         ))
@@ -127,7 +129,7 @@ object Smorc extends Action {
             .headOption
             .getOrElse(targets.minBy(_.pixelDistanceFast(exit)))
   
-        if (state.unit.cooldownLeft < With.latency.framesRemaining) {
+        if (state.unit.canAttackThisFrame) {
           state.toAttack = Some(bestTarget)
           Attack.consider(state)
         }
@@ -147,6 +149,7 @@ object Smorc extends Action {
     else {
       val freebies = enemies.find(freebie =>
         (freebie.unitClass.isBuilding || freebie.constructing)
+          && freebie.armorHealth < 5
           && enemies.forall(defender =>
           defender != freebie
             && state.unit.pixelDistanceFast(defender) >
@@ -165,7 +168,7 @@ object Smorc extends Action {
   }
   
   private def destroyBuildings(state: ActionState) {
-    state.toAttack = With.units.enemy.toList.sortBy(_.pixelDistanceFast(state.unit)).headOption
+    state.toAttack = state.targets.sortBy(_.pixelDistanceFast(state.unit)).headOption
     Attack.consider(state)
   }
 }

@@ -16,7 +16,7 @@ class Configuration {
   ///////////
   
   var attackableRangeBuffer           = 8
-  var fogPositionDuration             = 24 * 99999
+  var fogPositionDuration             = 24 * 20
   var violenceFrameThreshold          = 24
   var enableYolo                      = true
   var enablePathRecalculation         = true
@@ -88,7 +88,7 @@ class Configuration {
   // Visualization //
   ///////////////////
   
-  var visualize                           = false
+  var visualize                           = true
   var visualizationProbabilityHappyVision = 0.1
   var visualizationProbabilityTextOnly    = 0.00
   

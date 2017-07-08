@@ -10,7 +10,7 @@ object Targets {
   
   def get(state: ActionState): Vector[UnitInfo] = {
     if ( ! state.unit.canAttackThisSecond) return Vector.empty
-    if (state.unit.battle.isEmpty && state.unit.unitClass.isWorker) return Vector.empty //Performance shortcut
+    if (state.unit.battle.isEmpty && (state.intent.toGather.isDefined || state.intent.toBuild.isDefined)) return Vector.empty //Performance shortcut
     With.units.inTileRadius(
       state.unit.tileIncludingCenter,
       With.configuration.battleMarginTiles)

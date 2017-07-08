@@ -55,6 +55,11 @@ object PlacementProfiles {
     avoidSurfaceArea            = 0.25,
     avoidDistanceFromExitRange  = 2.0)
   
+  val naturalCannon = new PlacementProfile(
+    "Natural cannons",
+    avoidSurfaceArea            = 0.25,
+    avoidDistanceFromExitRange  = 2.0)
+  
   val mineralCannon = new PlacementProfile(
     "Pylon for mineral line Cannons",
     preferPowering              = 0.1,

@@ -15,10 +15,10 @@ class Estimation {
   
   def weGainValue     : Boolean = costToEnemy  >   costToUs
   def weLoseValue     : Boolean = costToEnemy  <   costToUs
-  def weSurvive       : Boolean = deathsUs     <   avatarUs.totalUnits
-  def weDie           : Boolean = deathsUs     >=  avatarEnemy.totalUnits
+  def weSurvive       : Boolean = deathsUs     <   avatarUs.totalUnits    || deathsUs == 0
+  def weDie           : Boolean = deathsUs     >=  avatarEnemy.totalUnits && deathsUs > 0
   def enemyGainValue  : Boolean = costToUs     >   costToEnemy
   def enemyLoseValue  : Boolean = costToUs     <   costToEnemy
-  def enemySurvives   : Boolean = deathsEnemy  <   avatarEnemy.totalUnits
-  def enemyDies       : Boolean = deathsEnemy  >=  avatarUs.totalUnits
+  def enemySurvives   : Boolean = deathsEnemy  <   avatarEnemy.totalUnits || deathsEnemy == 0
+  def enemyDies       : Boolean = deathsEnemy  >=  avatarUs.totalUnits    && deathsEnemy > 0
 }

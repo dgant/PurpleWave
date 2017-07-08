@@ -10,12 +10,12 @@ import Planning.Plans.Information.Scenarios.WeAreBeing4Pooled
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, FirstFiveMinutes}
 import Planning.Plans.Macro.Expanding.{BuildAssimilators, RequireMiningBases}
-import Planning.Plans.Macro.Milestones.{EnemyUnitsAtLeast, MiningBasesAtLeast, UnitsAtLeast, UnitsAtMost}
+import Planning.Plans.Macro.Milestones._
 import Planning.Plans.Macro.Reaction.{EnemyBasesAtLeast, EnemyMutalisks}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Protoss.ProtossBuilds
 import Planning.Plans.Protoss.Situational.{DefendChokeWithWorkers, ForgeFastExpand}
-import Planning.Plans.Scouting.RequireScouting
+import Planning.Plans.Scouting.{FindExpansions, RequireScouting}
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Options.Protoss.PvZ._
 
@@ -96,7 +96,9 @@ class ProtossVsZerg extends Parallel {
       RequestAtLeast(1, Protoss.Stargate),
       RequestAtLeast(4, Protoss.PhotonCannon),
       RequestAtLeast(1, Protoss.RoboticsFacility),
-      RequestAtLeast(1, Protoss.RoboticsSupportBay)))
+      RequestAtLeast(1, Protoss.RoboticsSupportBay)),
+    new OnGasBases(3,
+      new ImplementMidgameCorsairCarrier))
   
   ///////////
   // Macro //
@@ -176,7 +178,7 @@ class ProtossVsZerg extends Parallel {
     new If(
       new EnemyMutalisks,
       new TrainMatchingRatio(Protoss.Corsair, UnitMatchType(Zerg.Mutalisk), 1.5),
-      new TrainContinuously(Protoss.Corsair, 1)),
+      new TrainContinuously(Protoss.Corsair, 2)),
     
     new TrainContinuously(Protoss.Carrier),
     new TrainMatchingRatio(Protoss.Observer, UnitMatchType(Zerg.Lurker), 0.2, 3),
@@ -237,6 +239,14 @@ class ProtossVsZerg extends Parallel {
             attack.attackers.get.unitMatcher.set(UnitMatchWorkers)
           }),
         new DefendHearts)),
+  
+    new If(
+      new And(
+        new EnemyUnitsAtMost(0, UnitMatchType(Zerg.Mutalisk)),
+        new EnemyUnitsAtMost(0, UnitMatchType(Zerg.Scourge))),
+      new Parallel(
+        new FindExpansions       { scouts.get.unitMatcher.set(UnitMatchType(Protoss.Corsair)) },
+        new ControlEnemyAirspace { flyers.get.unitMatcher.set(UnitMatchType(Protoss.Corsair)) })),
     
     new ControlMap,
     new If(

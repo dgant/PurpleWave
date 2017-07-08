@@ -175,7 +175,7 @@ class ProtossVsZerg extends Parallel {
         new UnitsAtLeast(1, UnitMatchType(Protoss.Assimilator), complete = true)),
       new Parallel(
         new UpgradeContinuously(Protoss.GroundDamage),
-        new UpgradeContinuously(Protoss.ZealotSpeed),
+        new UpgradeContinuously(Protoss.ZealotSpeed))),
     
     new If(
       new EnemyMutalisks,

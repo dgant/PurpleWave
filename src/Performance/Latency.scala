@@ -6,7 +6,8 @@ import Performance.Caching.CacheFrame
 class Latency {
   
   var lastRunFrame = 0
-  var minRemainingLatencyFrames:Int = With.game.getLatencyFrames
+  var latencyFrames: Int   = With.game.getLatencyFrames
+  var minRemainingLatencyFrames: Int = latencyFrames
   
   def onFrame() {
     minRemainingLatencyFrames = Math.min(minRemainingLatencyFrames, With.game.getRemainingLatencyFrames)

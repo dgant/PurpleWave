@@ -35,7 +35,9 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
   
   override def isComplete: Boolean = building.exists(_.aliveAndComplete)
   
-  def startedBuilding:Boolean = building.isDefined
+  def startedBuilding: Boolean = building.isDefined
+  
+  var waitForBuilderToRecall: Boolean = false
   
   override def onUpdate() {
     
@@ -53,7 +55,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
             unit.tileTopLeft == tile))
           .getOrElse(None))
   
-    desiredTile = getDesiredTile()
+    desiredTile = acquireDesiredTile()
   
     if (desiredTile.isEmpty) {
       if (With.frame < With.configuration.maxFramesToTrustBuildRequest) {
@@ -77,19 +79,38 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
     builderLock.unitPreference.set(UnitPreferClose(desiredTile.get.pixelCenter))
     builderLock.acquire(this)
     
+    if (waitForBuilderToRecall) {
+      waitForBuilderToRecall = false
+      orderedTile = None
+    }
+    
     if (builderLock.satisfied && building.isEmpty) {
-      orderedTile = desiredTile
-      With.executor.intend(
-        new Intention(this, builderLock.units.head) {
-          toBuild     = if (currencyLock.isSatisfied) Some(buildingClass) else None
-          toBuildTile = if (currencyLock.isSatisfied) orderedTile         else None
-          toTravel    = Some(orderedTile.get.pixelCenter)
-          canAttack   = false
-        })
+      if (orderedTile.exists( ! desiredTile.contains(_))) {
+        // The building placement has changed. This puts us at risk of building the same building twice.
+        // We've already sent the builder out. We need to recall them if they haven't already started.
+        // If we just issue another build order, latency may mean that they just started the building in the old location
+        // Then, we wait to see if they have in fact started.
+        //
+        // Steps:
+        // 1. Recall the builder
+        // 2. Wait for the order to take effect
+        waitForBuilderToRecall = true
+        With.executor.intend(
+          new Intention(this, builderLock.units.head) { toTravel = Some(orderedTile.get.pixelCenter); canAttack = false })
+      } else {
+        orderedTile = desiredTile
+        With.executor.intend(
+          new Intention(this, builderLock.units.head) {
+            toBuild     = if (currencyLock.isSatisfied) Some(buildingClass) else None
+            toBuildTile = if (currencyLock.isSatisfied) orderedTile         else None
+            toTravel    = Some(orderedTile.get.pixelCenter)
+            canAttack   = false
+          })
+      }
     }
   }
   
-  private def getDesiredTile(): Option[Tile] = {
+  private def acquireDesiredTile(): Option[Tile] = {
     if (building.isDefined) {
       With.groundskeeper.flagFulfilled(buildingDescriptor)
       building.map(_.tileTopLeft)

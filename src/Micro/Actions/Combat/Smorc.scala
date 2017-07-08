@@ -112,21 +112,30 @@ object Smorc extends Action {
       }
       else if (
         state.unit.canAttackThisFrame ||
-          state.unit.cooldownLeft < targets.map(target =>
-            state.unit.framesToTravelPixels(
-              state.unit.pixelsFromEdgeFast(target))).min) {
+        state.unit.cooldownLeft < targets.map(target =>
+          state.unit.framesToTravelPixels(
+            state.unit.pixelsFromEdgeFast(target))).min) {
         // Let's pick the outermost target while avoiding drilling stacks
         val nearestTargetDistance = targets.map(_.pixelDistanceFast(exit)).min
         val validTargets = targets.filter(target =>
           target.pixelDistanceFast(exit) - 16.0 <= nearestTargetDistance
           && ! drillingEnemies.contains(target))
-        state.toAttack = Some(validTargets
-          .toVector
-          .sortBy(target => target.totalHealth * target.pixelDistanceFast(state.unit))
-          .headOption
-          .getOrElse(targets.minBy(_.pixelDistanceFast(exit))))
+        val bestTarget =
+          validTargets
+            .toVector
+            .sortBy(target => target.totalHealth * target.pixelDistanceFast(state.unit))
+            .headOption
+            .getOrElse(targets.minBy(_.pixelDistanceFast(exit)))
   
-        Attack.consider(state)
+        if (state.unit.cooldownLeft < With.latency.framesRemaining) {
+          state.toAttack = Some(bestTarget)
+          Attack.consider(state)
+        }
+        else {
+          state.toTravel = Some(bestTarget.pixelCenter.project(state.unit.pixelCenter, 4))
+          Travel.consider(state)
+        }
+        
         return
       }
     }

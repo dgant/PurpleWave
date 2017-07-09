@@ -211,13 +211,14 @@ class ProtossVsProtoss extends Parallel {
     new OnMiningBases(2, new Build(RequestUpgrade(Protoss.ZealotSpeed))),
     
     new TrainContinuously(Protoss.Carrier),
-    new If(new EnemyHasShown(Protoss.DarkTemplar),
+    new If(
+      new EnemyHasShown(Protoss.DarkTemplar),
       new Parallel(
         new TrainContinuously(Protoss.Observer, 2),
-        new TrainContinuously(Protoss.Reaver, 4),
+        new TrainContinuously(Protoss.Reaver, 4)),
       new Parallel(
         new TrainContinuously(Protoss.Reaver, 4),
-        new TrainContinuously(Protoss.Observer, 1)))),
+        new TrainContinuously(Protoss.Observer, 1))),
     new BuildDragoonsOrZealots,
     
     // Midgame

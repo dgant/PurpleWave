@@ -120,7 +120,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
       With.groundskeeper.flagFulfilled(buildingDescriptor)
       building.map(_.tileTopLeft)
     }
-    else if (currencyLock.expectedFrames < With.configuration.maxFramesToSendAdvanceBuilder) {
+    else if (currencyLock.expectedFrames < With.blackboard.maxFramesToSendAdvanceBuilder) {
       With.groundskeeper.demand(buildingDescriptor)
     }
     else {
@@ -138,7 +138,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
     val proposedBuilders = builderLock.inquire(this)
     proposedBuilders.exists(
       _.exists(someBuilder =>
-        Math.min(With.configuration.maxFramesToSendAdvanceBuilder, someBuilder.framesToTravel(desiredTile.get.pixelCenter)) >=
+        Math.min(With.blackboard.maxFramesToSendAdvanceBuilder, someBuilder.framesToTravel(desiredTile.get.pixelCenter)) >=
         currencyLock.expectedFrames))
   }
   

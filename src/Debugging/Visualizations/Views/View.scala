@@ -11,7 +11,7 @@ abstract class View {
   
   def inUse: Boolean = {
     With.visualization.enabled &&
-      With.visualization.views.contains(this) &&
-      (With.visualization.map || With.visualization.screen)
+    With.visualization.views.contains(this) &&
+    (With.visualization.map || With.visualization.screen)
   }
 }

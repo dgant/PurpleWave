@@ -53,7 +53,7 @@ class ProtossVsProtoss extends Parallel {
       new Trigger(
         new UnitsAtLeast(1, UnitMatchType(Protoss.Pylon), complete = false),
         after = new Parallel(
-          new ForgeFastExpand,
+          new ForgeFastExpand(cannonsInFront = false),
           new Build(
             RequestAtLeast(2, Protoss.Pylon)),
           new Trigger(
@@ -67,7 +67,7 @@ class ProtossVsProtoss extends Parallel {
   
   private class ImplementEarlyFFE extends FirstFiveMinutes(
     new Parallel(
-      new ForgeFastExpand,
+      new ForgeFastExpand(cannonsInFront = false),
       new Build(ProtossBuilds.FFE_ForgeFirst: _*)))
   
   ////////////////////////
@@ -237,8 +237,8 @@ class ProtossVsProtoss extends Parallel {
       RequestAtLeast(3, Protoss.Gateway),
       RequestAtLeast(1, Protoss.RoboticsFacility),
       RequestAtLeast(1, Protoss.RoboticsSupportBay),
-      RequestAtLeast(1, Protoss.Observatory),
       RequestAtLeast(5, Protoss.Gateway),
+      RequestAtLeast(1, Protoss.Observatory),
       RequestAtLeast(1, Protoss.CitadelOfAdun),
       RequestAtLeast(2, Protoss.RoboticsFacility),
       RequestUpgrade(Protoss.ZealotSpeed),

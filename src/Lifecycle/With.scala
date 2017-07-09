@@ -13,6 +13,7 @@ import Macro.Scheduling.Scheduler
 import Micro.Execution.Executor
 import Micro.Intent.Commander
 import Performance.TaskQueue.{AbstractTaskQueue, TaskQueueGlobal}
+import Planning.Blackboard
 import ProxyBwapi.Players.{PlayerInfo, Players}
 import ProxyBwapi.ProxyBWMirror
 import ProxyBwapi.UnitTracking.UnitTracker
@@ -27,6 +28,7 @@ object With {
   var game            : bwapi.Game          = _
   var architecture    : Architecture        = _
   var bank            : Bank                = _
+  var blackboard      : Blackboard          = _
   var battles         : BattleClassifier    = _
   var camera          : Camera              = _
   var commander       : Commander           = _
@@ -86,6 +88,7 @@ object With {
     initializeBWTA()
     architecture      = new Architecture
     bank              = new Bank
+    blackboard        = new Blackboard
     battles           = new BattleClassifier
     groundskeeper     = new Groundskeeper
     camera            = new Camera

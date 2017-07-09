@@ -17,6 +17,7 @@ object PlacementProfiles {
   val factory = new PlacementProfile(
     "Factory",
     preferZone                  = 1.0,
+    preferSpace                 = 0.5,
     avoidDistanceFromBase       = 2.0,
     avoidDistanceFromExitRange  = 2.0
   )

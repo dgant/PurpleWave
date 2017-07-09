@@ -82,17 +82,19 @@ class ProtossVsProtoss extends Parallel {
   
   private class ImplementMidgameCarriers extends Parallel(
     new OnMiningBases(2,
-      new Build(
-        RequestAtLeast(1, Protoss.Assimilator),
-        RequestAtLeast(1, Protoss.CyberneticsCore),
-        RequestAtLeast(1, Protoss.Stargate)),
       new If(
-        new UnitsAtLeast(1, UnitMatchType(Protoss.Stargate), complete = true),
+        new UnitsAtLeast(20, UnitMatchWarriors),
         new Build(
-          RequestAtLeast(1, Protoss.FleetBeacon),
-          RequestAtLeast(2, Protoss.Stargate),
-          RequestUpgrade(Protoss.AirDamage),
-          RequestUpgrade(Protoss.CarrierCapacity)))))
+          RequestAtLeast(1, Protoss.Assimilator),
+          RequestAtLeast(1, Protoss.CyberneticsCore),
+          RequestAtLeast(1, Protoss.Stargate)),
+        new If(
+          new UnitsAtLeast(1, UnitMatchType(Protoss.Stargate), complete = true),
+          new Build(
+            RequestAtLeast(1, Protoss.FleetBeacon),
+            RequestAtLeast(2, Protoss.Stargate),
+            RequestUpgrade(Protoss.AirDamage),
+            RequestUpgrade(Protoss.CarrierCapacity))))))
   
   private class ImplementMidgameDarkTemplar extends Parallel(
     new Build(
@@ -231,18 +233,25 @@ class ProtossVsProtoss extends Parallel {
     // Default builds
     new Build(RequestAtLeast(1, Protoss.Gateway)),
     new BuildAssimilators,
-    new Build(
-      RequestAtLeast(1, Protoss.CyberneticsCore),
-      RequestUpgrade(Protoss.DragoonRange),
-      RequestAtLeast(3, Protoss.Gateway),
-      RequestAtLeast(1, Protoss.RoboticsFacility),
-      RequestAtLeast(1, Protoss.RoboticsSupportBay),
-      RequestAtLeast(5, Protoss.Gateway),
-      RequestAtLeast(1, Protoss.Observatory),
-      RequestAtLeast(1, Protoss.CitadelOfAdun),
-      RequestAtLeast(2, Protoss.RoboticsFacility),
-      RequestUpgrade(Protoss.ZealotSpeed),
-      RequestAtLeast(10, Protoss.Gateway)),
+    new If (
+      new Employing(PvPMidgameCarriers),
+      new Build(
+        RequestAtLeast(1, Protoss.CyberneticsCore),
+        RequestAtLeast(6, Protoss.PhotonCannon),
+        RequestUpgrade(Protoss.DragoonRange),
+        RequestAtLeast(5, Protoss.Gateway)),
+      new Build(
+        RequestAtLeast(1, Protoss.CyberneticsCore),
+        RequestUpgrade(Protoss.DragoonRange),
+        RequestAtLeast(3, Protoss.Gateway),
+        RequestAtLeast(1, Protoss.RoboticsFacility),
+        RequestAtLeast(1, Protoss.RoboticsSupportBay),
+        RequestAtLeast(5, Protoss.Gateway),
+        RequestAtLeast(1, Protoss.Observatory),
+        RequestAtLeast(1, Protoss.CitadelOfAdun),
+        RequestAtLeast(2, Protoss.RoboticsFacility),
+        RequestUpgrade(Protoss.ZealotSpeed),
+        RequestAtLeast(10, Protoss.Gateway))),
     
     new ScoutExpansionsAt(70),
     new ScoutAt(9),

@@ -34,7 +34,7 @@ class Proxy2GateAtNatural extends Parallel {
       RequestAtLeast(9, Protoss.Probe),
       RequestAtLeast(1, Protoss.Pylon)),
     
-    // Crappy haxx to
+    // Crappy haxx to make this work
     new If(
       new UnitsAtLeast(1, UnitMatchType(Protoss.Pylon), complete = false),
       new Build(RequestAtLeast(1, Protoss.Gateway))),

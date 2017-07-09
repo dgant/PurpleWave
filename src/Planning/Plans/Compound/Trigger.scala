@@ -4,16 +4,16 @@ import Planning.Composition.Property
 import Planning.Plan
 
 class Trigger(
-  initialPredicate : Plan = new Plan,
-  initialWhenTrue  : Plan = new Plan,
-  initialWhenFalse : Plan = new Plan)
+  trigger  : Plan = new Plan,
+  after    : Plan = new Plan,
+  before   : Plan = new Plan)
   extends Plan {
   
   description.set("When triggered")
   
-  val predicate = new Property[Plan](initialPredicate)
-  val whenTrue  = new Property[Plan](initialWhenTrue)
-  val whenFalse = new Property[Plan](initialWhenFalse)
+  val predicate = new Property[Plan](trigger)
+  val whenTrue  = new Property[Plan](after)
+  val whenFalse = new Property[Plan](before)
   
   var triggered: Boolean = false
   

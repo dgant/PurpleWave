@@ -28,7 +28,7 @@ class ProtossVsZerg extends Parallel {
   ////////////////
   
   private class ImplementEarly2Gate extends FirstFiveMinutes(
-    new Build(ProtossBuilds.OpeningTwoGate99_WithZealots: _*))
+    new Build(ProtossBuilds.Opening_TwoGate99_WithZealots: _*))
   
   private class ImplementEarlyFFELight extends FirstFiveMinutes(
     new Parallel(
@@ -136,7 +136,6 @@ class ProtossVsZerg extends Parallel {
     new Employ(PvZEarlyFFEHeavy,     new ImplementEarlyFFEHeavy),
     new TakeSafeNatural,
     new TakeSafeThirdBase,
-    
     
     // Early game macro
     new RequireSufficientPylons,

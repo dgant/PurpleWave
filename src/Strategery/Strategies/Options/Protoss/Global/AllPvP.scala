@@ -12,6 +12,7 @@ object AllPvP extends Strategy {
       PvPEarly1GateZZCore,
       PvPEarly2Gate99,
       PvPEarly2Gate1012,
+      PvPEarlyFE,
       PvPEarlyFFE))
   
   override def ourRaces    : Iterable[Race] = Vector(Race.Protoss)

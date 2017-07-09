@@ -1,16 +1,20 @@
 package Planning.Plans.Protoss.GamePlans
 
+import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, _}
 import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors}
 import Planning.Plans.Army.ControlMap
-import Planning.Plans.Compound.{And, If, Or, Parallel}
+import Planning.Plans.Compound._
+import Planning.Plans.Information.Employ
 import Planning.Plans.Macro.Automatic._
-import Planning.Plans.Macro.BuildOrders.Build
+import Planning.Plans.Macro.BuildOrders.{Build, FirstFiveMinutes}
 import Planning.Plans.Macro.Expanding.{BuildAssimilators, MatchMiningBases, RequireMiningBases}
-import Planning.Plans.Macro.Milestones.{EnemyUnitsAtLeast, HaveUpgrade, UnitsAtLeast, UnitsAtMost}
+import Planning.Plans.Macro.Milestones._
 import Planning.Plans.Protoss.ProtossBuilds
+import Planning.Plans.Protoss.Situational.{ForgeFastExpand, TwoGateAtNatural}
 import Planning.Plans.Scouting.{ScoutAt, ScoutExpansionsAt}
 import ProxyBwapi.Races.Protoss
+import Strategery.Strategies.Options.Protoss.PvP._
 
 class ProtossVsProtoss extends Parallel {
   
@@ -20,9 +24,103 @@ class ProtossVsProtoss extends Parallel {
   // Early game strategies //
   ///////////////////////////
   
+  private class ImplementEarly2Gate99 extends FirstFiveMinutes(
+    new Parallel(
+      new TwoGateAtNatural,
+      new Build(ProtossBuilds.Opening_TwoGate99_WithZealots: _*)))
+  
+  private class ImplementEarly2Gate1012 extends FirstFiveMinutes(
+    new Build(ProtossBuilds.Opening_TwoGate1012: _*))
+  
+  private class ImplementEarly1GateCore extends FirstFiveMinutes(
+    new Build(ProtossBuilds.Opening_1GateCore: _*))
+  
+  private class ImplementEarly1GateZZCore extends FirstFiveMinutes(
+    new Build(ProtossBuilds.Opening_1GateZZCore: _*))
+  
+  private class ImplementEarlyFE extends FirstFiveMinutes(
+    new Parallel(
+      new Build(
+        RequestAtLeast(1,   Protoss.Nexus),
+        RequestAtLeast(8,   Protoss.Probe),
+        RequestAtLeast(1,   Protoss.Pylon),
+        RequestAtLeast(12,  Protoss.Probe),
+        RequestAtLeast(2,   Protoss.Nexus),
+        RequestAtLeast(1,   Protoss.Gateway),
+        RequestAtLeast(14,  Protoss.Probe),
+        RequestAtLeast(2,   Protoss.Nexus),
+        RequestAtLeast(15,  Protoss.Probe)),
+      new Trigger(
+        new UnitsAtLeast(1, UnitMatchType(Protoss.Pylon), complete = false),
+        after = new Parallel(
+          new ForgeFastExpand,
+          new Build(
+            RequestAtLeast(2, Protoss.Pylon)),
+          new Trigger(
+            new UnitsAtLeast(1, UnitMatchType(Protoss.CyberneticsCore)),
+            before =  new TrainContinuously(Protoss.Zealot)),
+          new Build(
+            RequestAtLeast(1, Protoss.Assimilator),
+            RequestAtLeast(1, Protoss.CyberneticsCore),
+            RequestAtLeast(1, Protoss.Forge),
+            RequestAtLeast(3, Protoss.PhotonCannon))))))
+  
+  private class ImplementEarlyFFE extends FirstFiveMinutes(
+    new Parallel(
+      new ForgeFastExpand,
+      new Build(ProtossBuilds.FFE_ForgeFirst: _*)))
+  
   ////////////////////////
   // Midgame strategies //
   ////////////////////////
+  
+  private class ImplementMidgame4GateGoon extends
+    Build(
+      RequestAtLeast(1, Protoss.Assimilator),
+      RequestAtLeast(1, Protoss.CyberneticsCore),
+      RequestAtLeast(4, Protoss.Gateway))
+  
+  private class ImplementMidgameCarriers extends Parallel(
+    new OnMiningBases(2,
+      new Build(
+        RequestAtLeast(1, Protoss.Assimilator),
+        RequestAtLeast(1, Protoss.CyberneticsCore),
+        RequestAtLeast(1, Protoss.Stargate)),
+      new If(
+        new UnitsAtLeast(1, UnitMatchType(Protoss.Stargate), complete = true),
+        new Build(
+          RequestAtLeast(1, Protoss.FleetBeacon),
+          RequestAtLeast(2, Protoss.Stargate),
+          RequestUpgrade(Protoss.AirDamage),
+          RequestUpgrade(Protoss.CarrierCapacity)))))
+  
+  private class ImplementMidgameDarkTemplar extends Parallel(
+    new Build(
+      RequestAtLeast(1, Protoss.Assimilator),
+      RequestAtLeast(1, Protoss.CyberneticsCore),
+      RequestAtLeast(1, Protoss.CitadelOfAdun),
+      RequestAtLeast(1, Protoss.TemplarArchives)))
+  
+  private class ImplementMidgameFE extends If(
+    new UnitsAtLeast(3, UnitMatchWarriors, complete = false),
+    new RequireMiningBases(2))
+  
+  private class ImplementMidgameReaver extends Parallel(
+    new Build(
+      RequestAtLeast(1, Protoss.Assimilator),
+      RequestAtLeast(1, Protoss.CyberneticsCore),
+      RequestAtLeast(2, Protoss.Gateway),
+      RequestAtLeast(1, Protoss.RoboticsFacility),
+      RequestAtLeast(1, Protoss.RoboticsSupportBay)))
+  
+  private class ImplementMidgameObserverReaver extends Parallel(
+    new Build(
+      RequestAtLeast(1, Protoss.Assimilator),
+      RequestAtLeast(1, Protoss.CyberneticsCore),
+      RequestAtLeast(2, Protoss.Gateway),
+      RequestAtLeast(1, Protoss.RoboticsFacility),
+      RequestAtLeast(1, Protoss.Observatory),
+      RequestAtLeast(1, Protoss.RoboticsSupportBay)))
   
   ///////////////
   // Expanding //
@@ -52,15 +150,11 @@ class ProtossVsProtoss extends Parallel {
   // Late game //
   ///////////////
   
-  private class UpgradeScarabDamage extends If(
-      new UnitsAtLeast(2, UnitMatchType(Protoss.Reaver)),
-      new Build(RequestUpgrade(Protoss.ScarabDamage))
-  )  { description.set("Upgrade Scarab damage")}
-  
   private class BuildDragoonsOrZealots extends If(
     new Or(
       new UnitsAtMost(0, UnitMatchType(Protoss.CyberneticsCore),  complete = true),
       new UnitsAtMost(0, UnitMatchType(Protoss.Assimilator),      complete = true),
+      new Check(() => With.self.gas < 30),
       new And(
         new HaveUpgrade(Protoss.ZealotSpeed, Protoss.Zealot.buildFrames),
         new UnitsAtLeast(12, UnitMatchType(Protoss.Dragoon)))),
@@ -73,23 +167,77 @@ class ProtossVsProtoss extends Parallel {
   /////////////////
   
   children.set(Vector(
-    new Build(ProtossBuilds.Opening_1GateCore: _*),
+    
+    // Early game
+    new RequireMiningBases(1),
+    new Employ(PvPEarly1GateCore,       new ImplementEarly1GateCore),
+    new Employ(PvPEarly1GateZZCore,     new ImplementEarly1GateZZCore),
+    new Employ(PvPEarly2Gate99,         new ImplementEarly2Gate99),
+    new Employ(PvPEarly2Gate1012,       new ImplementEarly2Gate1012),
+    new Employ(PvPEarlyFE,              new ImplementEarlyFE),
+    new Employ(PvPEarlyFFE,             new ImplementEarlyFFE),
+    
+    // Expanding
     new MatchMiningBases,
     new TakeNatural,
     new ExpandAgainstCannons,
     new TakeThirdBase,
+  
+    // Early game macro
     new RequireSufficientPylons,
     new TrainProbesContinuously,
-    new BuildAssimilators,
-    new UpgradeScarabDamage,
-    new TrainContinuously(Protoss.Carrier, 4),
-    new TrainContinuously(Protoss.Reaver, 4),
+    
+    // Units/Upgrades
+    
+    new If(
+      new And(
+        new EnemyUnitsAtMost(0, UnitMatchType(Protoss.Observer)),
+        new EnemyUnitsAtMost(0, UnitMatchType(Protoss.Forge))),
+      new TrainContinuously(Protoss.DarkTemplar, 3),
+      new TrainContinuously(Protoss.DarkTemplar, 1)),
+    
+    new If(
+      new UnitsAtLeast(2, UnitMatchType(Protoss.Reaver)),
+      new Build(RequestUpgrade(Protoss.ScarabDamage))),
+    
+    new OnMiningBases(2, new Build(RequestUpgrade(Protoss.ZealotSpeed))),
+    
+    new TrainContinuously(Protoss.Carrier),
+    new If(new EnemyHasShown(Protoss.DarkTemplar),
+      new Parallel(
+        new TrainContinuously(Protoss.Observer, 2),
+        new TrainContinuously(Protoss.Reaver, 4),
+      new Parallel(
+        new TrainContinuously(Protoss.Reaver, 4),
+        new TrainContinuously(Protoss.Observer, 1)))),
     new BuildDragoonsOrZealots,
-    new Build(RequestUpgrade(Protoss.DragoonRange)),
-    new Build( RequestAtLeast(2, Protoss.Gateway)),
-    new Build(ProtossBuilds.TechReavers: _*),
+    
+    // Midgame
+    new Employ(PvPMidgame4GateGoon,       new ImplementMidgame4GateGoon),
+    new Employ(PvPMidgameDarkTemplar,     new ImplementMidgameDarkTemplar),
+    new Employ(PvPMidgameCarriers,        new ImplementMidgameCarriers),
+    new Employ(PvPMidgameObserverReaver,  new ImplementMidgameObserverReaver),
+    new Employ(PvPMidgameReaver,          new ImplementMidgameReaver),
+    
+    // Default builds
+    new Build(RequestAtLeast(1, Protoss.Gateway)),
+    new BuildAssimilators,
+    new Build(
+      RequestAtLeast(1, Protoss.CyberneticsCore),
+      RequestUpgrade(Protoss.DragoonRange),
+      RequestAtLeast(3, Protoss.Gateway),
+      RequestAtLeast(1, Protoss.RoboticsFacility),
+      RequestAtLeast(1, Protoss.RoboticsSupportBay),
+      RequestAtLeast(1, Protoss.Observatory),
+      RequestAtLeast(5, Protoss.Gateway),
+      RequestAtLeast(1, Protoss.CitadelOfAdun),
+      RequestAtLeast(2, Protoss.RoboticsFacility),
+      RequestUpgrade(Protoss.ZealotSpeed),
+      RequestAtLeast(10, Protoss.Gateway)),
+    
     new ScoutExpansionsAt(70),
     new ScoutAt(9),
+  
     //TODO: Attack
     new ControlMap
   ))

@@ -5,9 +5,9 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.Parallel
-import Planning.Plans.Macro.Automatic.{RequireSufficientPylons, TrainContinuously}
+import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientPylons, TrainContinuously}
 import Planning.Plans.Macro.Build.ProposePlacement
-import Planning.Plans.Macro.BuildOrders.Build
+import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
 import Planning.Plans.Protoss.ProtossBuilds
 import ProxyBwapi.Races.Protoss
 
@@ -29,5 +29,8 @@ class Proxy2GateAtNatural extends Parallel {
     new RequireSufficientPylons,
     new TrainContinuously(Protoss.Zealot),
     new TrainContinuously(Protoss.Probe),
-    new Attack))
+    new Attack,
+    new FollowBuildOrder,
+    new Gather
+  ))
 }

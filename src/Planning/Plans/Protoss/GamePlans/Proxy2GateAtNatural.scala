@@ -5,7 +5,6 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.BuildRequests.RequestAtLeast
 import Planning.Composition.UnitMatchers.UnitMatchType
-import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{And, If, Parallel, Trigger}
 import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientPylons, TrainContinuously}
@@ -21,8 +20,12 @@ class Proxy2GateAtNatural extends Parallel {
     With.geography.bases.find(_.isNaturalOf.exists( ! _.owner.isUs)).map(_.zone)
   }
   
+  override def onUpdate(): Unit = {
+    With.blackboard.maxFramesToSendAdvanceBuilder = Int.MaxValue
+    super.onUpdate()
+  }
+  
   children.set(Vector(
-    new Plan { override def onUpdate(): Unit = { With.blackboard.maxFramesToSendAdvanceBuilder = Int.MaxValue }},
     new ProposePlacement{
       override lazy val blueprints = Vector(
         new Blueprint(this, building = Some(Protoss.Pylon), zone = proxyZone),
@@ -49,11 +52,6 @@ class Proxy2GateAtNatural extends Parallel {
         new TrainContinuously(Protoss.Zealot),
         new TrainContinuously(Protoss.Probe),
         new TrainContinuously(Protoss.Gateway, 5))),
-    new If(
-      new And (
-        new UnitsAtLeast(7, UnitMatchType(Protoss.Probe), complete = false),
-        new UnitsAtMost(1, UnitMatchType(Protoss.Pylon), complete = false)),
-      new FindEnemyBase),
     
     new Attack,
     new FollowBuildOrder,

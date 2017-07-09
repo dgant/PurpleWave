@@ -1,10 +1,9 @@
 package Debugging.Visualizations
 
-import Debugging.Visualizations.Views.Economy.ShowScheduler
 import Debugging.Visualizations.Views.Fun.{ShowHappyVision, ShowTextOnly}
-import Debugging.Visualizations.Views.Geography.{ShowBases, ShowZones}
+import Debugging.Visualizations.Views.Geography.ShowBases
 import Debugging.Visualizations.Views.Micro.{ShowUnits, ShowUnitsForeign, ShowUnitsFriendly}
-import Debugging.Visualizations.Views.Performance.ShowPerformanceSummary
+import Debugging.Visualizations.Views.Performance.{ShowPerformanceDetails, ShowPerformanceSummary}
 import Debugging.Visualizations.Views.Planning.{ShowResources, ShowStrategy}
 import Debugging.Visualizations.Views.ShowClock
 import Lifecycle.With
@@ -23,16 +22,17 @@ class Visualization {
     ShowPerformanceSummary,
     ShowClock,
     ShowStrategy,
-    ShowZones,
+    //ShowZones,
     ShowResources,
-    ShowScheduler
+    ShowPerformanceDetails
+    //ShowScheduler
     //ShowArchitecture,
     //ShowGroundskeeperQueue
   )
   
   var enabled   = false
   var screen    = true
-  var map       = true
+  var map       = false
   var happy     = false
   var textOnly  = false
   

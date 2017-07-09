@@ -80,7 +80,7 @@ class IslandCarriers extends Parallel {
     new FindExpansions { scouts.get.unitMatcher.set(UnitMatchType(Protoss.Scout)) },
     new ControlMap,
     new If(
-      new UnitsAtLeast(6 * 8, UnitMatchType(Protoss.Interceptor)),
+      new UnitsAtLeast(9 * 8, UnitMatchType(Protoss.Interceptor)),
       new ConsiderAttacking,
       new DefendHearts),
     new FollowBuildOrder,

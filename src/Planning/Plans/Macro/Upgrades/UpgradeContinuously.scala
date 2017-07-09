@@ -9,7 +9,7 @@ class UpgradeContinuously(upgrade: Upgrade, maxLevel: Int = 3) extends Plan {
   
   description.set("Upgrade " + upgrade + " up to level " + maxLevel)
   
-  override def isComplete: Boolean = With.self.getUpgradeLevel(upgrade) >= maxLevel
+  override def isComplete: Boolean = With.self.getUpgradeLevel(upgrade) >= Math.min(maxLevel, upgrade.levels.size)
   
   override def onUpdate() {
     if (isComplete) return

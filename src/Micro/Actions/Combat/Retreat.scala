@@ -38,7 +38,6 @@ object Retreat extends Action {
   
       state.toTravel = Some(state.origin)
       Engage.delegate(state)
-      
     }
     else {
       state.toTravel = Some(state.origin)

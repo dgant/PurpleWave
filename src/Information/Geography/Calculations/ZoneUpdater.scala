@@ -23,6 +23,14 @@ object ZoneUpdater {
               startLocationBase.townHallArea.startInclusive))
           .headOption
           .foreach(_.isNaturalOf = Some(startLocationBase)))
+  
+    val plannedBases = With.groundskeeper.proposalPlacements
+      .flatMap(placement => placement._2.tile)
+      .flatMap(tile => if (tile.zone.bases.isEmpty) None else Some(tile.zone.bases.minBy(_.heart.tileDistanceFast(tile))))
+      .filter(_.owner.isNeutral)
+        .toSet
+    
+    With.geography.bases.foreach(base => base.planningToTake = plannedBases.contains(base))
   }
   
   def updateZone(zone: Zone) {
@@ -83,9 +91,6 @@ object ZoneUpdater {
       .getOrElse(List.empty)
     
     base.walledIn = exitBuildings.count(_.is(Terran.SupplyDepot)) >= 2 && exitBuildings.count(_.is(Terran.Barracks)) >= 1
-    base.planningToTake = With.units.ours.exists(unit =>
-      unit.actionState.toBuildTile.exists(_.zone == base.zone) &&
-      unit.actionState.toBuild.exists(_.isTownHall))
   }
   
   private def resourceIsInBase(resource: UnitInfo, base: Base): Boolean = {

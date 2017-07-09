@@ -11,7 +11,7 @@ import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Protoss.ProtossBuilds
 import ProxyBwapi.Races.Protoss
 
-class Proxy2Gate extends Parallel {
+class Proxy2GateAtNatural extends Parallel {
   
   private def proxyZone: Option[Zone] = {
     With.geography.bases.find(base => base.isNaturalOf.isDefined && ! base.owner.isUs).map(_.zone)

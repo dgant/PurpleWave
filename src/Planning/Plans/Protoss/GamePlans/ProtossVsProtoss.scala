@@ -139,8 +139,8 @@ class ProtossVsProtoss extends Parallel {
     new Or(
       new UnitsAtLeast(8, UnitMatchWarriors),
       new UnitsAtLeast(2, UnitMatchType(Protoss.PhotonCannon)),
-      new UnitsAtLeast(1, UnitMatchType(Protoss.Reaver))),
-      new UnitsAtLeast(2, UnitMatchType(Protoss.DarkTemplar)),
+      new UnitsAtLeast(1, UnitMatchType(Protoss.Reaver)),
+      new UnitsAtLeast(2, UnitMatchType(Protoss.DarkTemplar))),
     new RequireMiningBases(2)
   ) { description.set("Take our natural when safe")}
   

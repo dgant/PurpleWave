@@ -235,23 +235,40 @@ class ProtossVsProtoss extends Parallel {
     new BuildAssimilators,
     new If (
       new Employing(PvPMidgameCarriers),
-      new Build(
-        RequestAtLeast(1, Protoss.CyberneticsCore),
-        RequestAtLeast(6, Protoss.PhotonCannon),
-        RequestUpgrade(Protoss.DragoonRange),
-        RequestAtLeast(5, Protoss.Gateway)),
-      new Build(
-        RequestAtLeast(1, Protoss.CyberneticsCore),
-        RequestUpgrade(Protoss.DragoonRange),
-        RequestAtLeast(3, Protoss.Gateway),
-        RequestAtLeast(1, Protoss.RoboticsFacility),
-        RequestAtLeast(1, Protoss.RoboticsSupportBay),
-        RequestAtLeast(5, Protoss.Gateway),
-        RequestAtLeast(1, Protoss.Observatory),
-        RequestAtLeast(1, Protoss.CitadelOfAdun),
-        RequestAtLeast(2, Protoss.RoboticsFacility),
-        RequestUpgrade(Protoss.ZealotSpeed),
-        RequestAtLeast(10, Protoss.Gateway))),
+      new Parallel(
+        new Build(
+          RequestAtLeast(1, Protoss.Gateway),
+          RequestAtLeast(1, Protoss.CyberneticsCore),
+          RequestUpgrade(Protoss.DragoonRange),
+          RequestAtLeast(3, Protoss.Gateway)),
+        new OnMiningBases(2,
+          new Parallel(
+            new If(
+              new And(
+                new MiningBasesAtLeast(2),
+                new UnitsAtLeast(1, UnitMatchType(Protoss.Forge), complete = true)),
+              new Build(
+                RequestAtLeast(1, Protoss.Forge),
+                RequestAtLeast(6, Protoss.PhotonCannon))),
+            new Build(
+              RequestAtLeast(1, Protoss.CyberneticsCore),
+              RequestAtLeast(1, Protoss.Stargate))))),
+      new Parallel(
+        new Build(
+          RequestAtLeast(1, Protoss.CyberneticsCore),
+          RequestUpgrade(Protoss.DragoonRange),
+          RequestAtLeast(3, Protoss.Gateway),
+          RequestAtLeast(1, Protoss.RoboticsFacility),
+          RequestAtLeast(1, Protoss.RoboticsSupportBay)),
+        new OnMiningBases(2,
+          new Build(
+            RequestAtLeast(5, Protoss.Gateway),
+            RequestAtLeast(1, Protoss.Observatory),
+            RequestAtLeast(1, Protoss.CitadelOfAdun))),
+        new OnMiningBases(3,
+          new Build(
+            RequestAtLeast(2, Protoss.RoboticsFacility),
+            RequestAtLeast(10, Protoss.Gateway))))),
     
     new ScoutExpansionsAt(70),
     new ScoutAt(9),

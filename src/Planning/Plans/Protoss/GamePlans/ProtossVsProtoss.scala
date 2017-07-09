@@ -3,9 +3,9 @@ package Planning.Plans.Protoss.GamePlans
 import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, _}
 import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors}
-import Planning.Plans.Army.ControlMap
+import Planning.Plans.Army.{ConsiderAttacking, ControlMap}
 import Planning.Plans.Compound._
-import Planning.Plans.Information.Employ
+import Planning.Plans.Information.{Employ, Employing}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, FirstFiveMinutes}
 import Planning.Plans.Macro.Expanding.{BuildAssimilators, MatchMiningBases, RequireMiningBases}
@@ -188,6 +188,14 @@ class ProtossVsProtoss extends Parallel {
     new TrainProbesContinuously,
     
     // Units/Upgrades
+  
+    new If(
+      new And(
+        new UnitsAtLeast(2, UnitMatchType(Protoss.Dragoon), complete = false),
+        new Or(
+          new Not(new Employing(PvPMidgameDarkTemplar)),
+          new UnitsAtLeast(2, UnitMatchType(Protoss.DarkTemplar), complete = false))),
+      new Build(RequestUpgrade(Protoss.DragoonRange))),
     
     new If(
       new And(
@@ -238,7 +246,7 @@ class ProtossVsProtoss extends Parallel {
     new ScoutExpansionsAt(70),
     new ScoutAt(9),
   
-    //TODO: Attack
+    new ConsiderAttacking,
     new ControlMap
   ))
 }

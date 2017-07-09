@@ -15,7 +15,10 @@ abstract class CacheBase[T](recalculator: () => T) {
     lastValue.get
   }
   
-  def invalidate() { lastValue = None }
+  def invalidate() {
+    lastValue = None
+    nextUpdateFrame = With.frame
+  }
   
   protected def nextCacheDelay: Int
 }

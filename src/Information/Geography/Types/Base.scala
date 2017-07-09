@@ -27,6 +27,5 @@ class Base(val townHallTile: Tile)
   var gasLeft           = 0
   var lastScoutedFrame  = 0
   
-  
   def resources: Set[UnitInfo] = minerals ++ gas
 }

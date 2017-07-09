@@ -39,9 +39,9 @@ object ZoneUpdater {
     base.townHall = None
     val townHalls = With.units.buildings
       .filter(unit =>
-        unit.unitClass.isTownHall &&
-        unit.tileIncludingCenter.zone == base.zone &&
-        base.zone.contains(unit.pixelCenter))
+        unit.unitClass.isTownHall
+        && unit.tileIncludingCenter.zone == base.zone
+        && base.zone.bases.minBy(_.heart.tileDistanceFast(unit.tileIncludingCenter)) == base)
     
     if (townHalls.nonEmpty) {
       base.townHall = Some(townHalls.minBy(_.pixelDistanceSquared(base.townHallArea.midPixel)))

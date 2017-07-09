@@ -1,10 +1,11 @@
 package Debugging.Visualizations
 
+import Debugging.Visualizations.Views.Economy.ShowScheduler
 import Debugging.Visualizations.Views.Fun.{ShowHappyVision, ShowTextOnly}
-import Debugging.Visualizations.Views.Geography.{ShowArchitecture, ShowBases, ShowGroundskeeperQueue, ShowZones}
+import Debugging.Visualizations.Views.Geography.{ShowBases, ShowZones}
 import Debugging.Visualizations.Views.Micro.{ShowUnits, ShowUnitsForeign, ShowUnitsFriendly}
 import Debugging.Visualizations.Views.Performance.ShowPerformanceSummary
-import Debugging.Visualizations.Views.Planning.ShowStrategy
+import Debugging.Visualizations.Views.Planning.{ShowResources, ShowStrategy}
 import Debugging.Visualizations.Views.ShowClock
 import Lifecycle.With
 
@@ -23,10 +24,10 @@ class Visualization {
     ShowClock,
     ShowStrategy,
     ShowZones,
-    //ShowResources,
-    //ShowScheduler
-    ShowArchitecture,
-    ShowGroundskeeperQueue
+    ShowResources,
+    ShowScheduler
+    //ShowArchitecture,
+    //ShowGroundskeeperQueue
   )
   
   var enabled   = false

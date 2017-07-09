@@ -29,6 +29,7 @@ class Gather extends Plan {
   private var allMinerals             : Set[UnitInfo]                     = Set.empty
   private var allGas                  : Set[UnitInfo]                     = Set.empty
   private var allResources            : Set[UnitInfo]                     = Set.empty
+  private var safeBases               : Set[Base]                         = Set.empty
   private var safeMinerals            : Set[UnitInfo]                     = Set.empty
   private var safeGas                 : Set[UnitInfo]                     = Set.empty
   private var safeResources           : Set[UnitInfo]                     = Set.empty
@@ -65,11 +66,23 @@ class Gather extends Plan {
     ourActiveBases  = With.geography.ourBases.filter(_.townHall.exists(_.aliveAndComplete))
     allMinerals     = ourActiveBases.flatten(base => base.minerals).filter(_.alive).toSet
     allGas          = ourActiveBases.flatten(base => base.gas).filter(gas => gas.isOurs && gas.aliveAndComplete).toSet
+    safeBases       = getSafeBases
     safeMinerals    = allMinerals.filter(safe)
     safeGas         = allGas.filter(safe)
     if (safeMinerals.isEmpty) safeMinerals  = allMinerals
     if (safeGas.isEmpty)      safeGas       = allGas
     safeResources = safeMinerals ++ safeGas
+  }
+  
+  private def getSafeBases: Set[Base] = {
+    With.geography.bases.filter(base => {
+      val battle = With.battles.byZone(base.zone)
+      val distanceToHeart = battle.enemy.centroid.pixelDistanceFast(base.heart.pixelCenter)
+      ( ! With.configuration.evacuateDangerousBases
+        || With.geography.ourBases.size < 2
+        || battle.estimationAbstract.weSurvive
+        || base.zone.exit.exists(_.centerPixel.pixelDistanceFast(battle.enemy.centroid) < distanceToHeart))
+    }).toSet
   }
   
   private def decideLongDistanceMining() {
@@ -179,11 +192,10 @@ class Gather extends Plan {
   }
   
   private def safe(resource: UnitInfo): Boolean = {
-    ! With.configuration.evacuateDangerousBases ||
-    With.geography.ourBases.size < 2 ||
-    With.battles.byZone
-      .get(With.geography.zoneByTile(resource.tileIncludingCenter))
-      .forall(zoneBattle => zoneBattle.estimationAbstract.weSurvive)
+    if (resource.unitClass.isMinerals)
+      getSafeBases.exists(_.minerals.contains(resource))
+    else
+      getSafeBases.exists(_.gas.contains(resource))
   }
   
   private def order(worker: FriendlyUnitInfo) {

@@ -11,8 +11,8 @@ import Planning.Plans.Macro.BuildOrders.{Build, FirstFiveMinutes}
 import Planning.Plans.Macro.Expanding.{BuildAssimilators, MatchMiningBases, RequireMiningBases}
 import Planning.Plans.Macro.Milestones._
 import Planning.Plans.Protoss.ProtossBuilds
-import Planning.Plans.Protoss.Situational.{ForgeFastExpand, TwoGateAtNatural}
-import Planning.Plans.Scouting.{ScoutAt, ScoutExpansionsAt}
+import Planning.Plans.Protoss.Situational.{ForgeFastExpand, Nexus2GateThenCannons, TwoGateAtNatural}
+import Planning.Plans.Scouting.{FindEnemyBase, ScoutExpansionsAt}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Options.Protoss.PvP._
 
@@ -40,6 +40,7 @@ class ProtossVsProtoss extends Parallel {
   
   private class ImplementEarlyFE extends FirstFiveMinutes(
     new Parallel(
+      new Nexus2GateThenCannons,
       new Build(
         RequestAtLeast(1,   Protoss.Nexus),
         RequestAtLeast(8,   Protoss.Probe),
@@ -48,23 +49,16 @@ class ProtossVsProtoss extends Parallel {
         RequestAtLeast(2,   Protoss.Nexus),
         RequestAtLeast(1,   Protoss.Gateway),
         RequestAtLeast(14,  Protoss.Probe),
-        RequestAtLeast(2,   Protoss.Nexus),
+        RequestAtLeast(2,   Protoss.Gateway),
         RequestAtLeast(15,  Protoss.Probe)),
-      new Trigger(
-        new UnitsAtLeast(1, UnitMatchType(Protoss.Pylon), complete = false),
-        after = new Parallel(
-          new ForgeFastExpand(cannonsInFront = false),
-          new Build(
-            RequestAtLeast(2, Protoss.Pylon)),
-          new Trigger(
-            new UnitsAtLeast(1, UnitMatchType(Protoss.CyberneticsCore)),
-            before =  new TrainContinuously(Protoss.Zealot)),
-          new Build(
-            RequestAtLeast(1, Protoss.Assimilator),
-            RequestAtLeast(1, Protoss.CyberneticsCore),
-            RequestAtLeast(1, Protoss.Forge),
-            RequestAtLeast(3, Protoss.PhotonCannon))))))
-  
+      new TrainContinuously(Protoss.Zealot),
+      new Build(
+        RequestAtLeast(2, Protoss.Pylon),
+        RequestAtLeast(1, Protoss.Assimilator),
+        RequestAtLeast(1, Protoss.CyberneticsCore),
+        RequestAtLeast(1, Protoss.Forge),
+        RequestAtLeast(3, Protoss.PhotonCannon))))
+    
   private class ImplementEarlyFFE extends FirstFiveMinutes(
     new Parallel(
       new ForgeFastExpand(cannonsInFront = false),
@@ -155,6 +149,9 @@ class ProtossVsProtoss extends Parallel {
   
   private class BuildDragoonsOrZealots extends If(
     new Or(
+      new And(
+        new Employing(PvPMidgameCarriers),
+        new UnitsAtLeast(1, UnitMatchType(Protoss.FleetBeacon), complete = false)),
       new UnitsAtMost(0, UnitMatchType(Protoss.CyberneticsCore),  complete = true),
       new UnitsAtMost(0, UnitMatchType(Protoss.Assimilator),      complete = true),
       new Check(() => With.self.gas < 30),
@@ -241,6 +238,7 @@ class ProtossVsProtoss extends Parallel {
           RequestAtLeast(1, Protoss.CyberneticsCore),
           RequestUpgrade(Protoss.DragoonRange),
           RequestAtLeast(3, Protoss.Gateway)),
+        new RequireMiningBases(2),
         new OnMiningBases(2,
           new Parallel(
             new If(
@@ -271,14 +269,21 @@ class ProtossVsProtoss extends Parallel {
             RequestAtLeast(10, Protoss.Gateway))))),
     
     new ScoutExpansionsAt(70),
-    new ScoutAt(9),
+    new If(
+      new UnitsAtLeast(1, UnitMatchType(Protoss.Pylon), complete = false),
+      new FindEnemyBase),
   
     new If(
       new Employing(PvPMidgameDarkTemplar),
       new Trigger(
         new UnitsAtLeast(1, UnitMatchType(Protoss.DarkTemplar), complete = true),
         new ConsiderAttacking),
-      new ConsiderAttacking),
+      new If (
+        new Employing(PvPMidgameCarriers),
+        new If(
+          new UnitsAtLeast(6 * 8, UnitMatchType(Protoss.Interceptor), complete = true),
+          new ConsiderAttacking),
+        new ConsiderAttacking)),
     
     new ControlMap
   ))

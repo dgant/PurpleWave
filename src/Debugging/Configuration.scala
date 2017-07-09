@@ -69,7 +69,7 @@ class Configuration {
   var useFastGroundDistance           = true
   var verifyBuildingsDontBreakPaths   = false
   var emergencyBuildingPlacement      = true
-  var emergencyBuildingCutoffFrames   = 24 * 60 * 4
+  var emergencyBuildingCutoffFrames   = 24 * 60 * 5
   var emergencyBuildingCooldown       = 24 * 5
   var unitHistoryAge                  = 24 * 3
   var buildingPlacements              = 5

@@ -13,8 +13,8 @@ import scala.collection.mutable
 
 class Scheduler {
   
-  private val requestsByPlan  = new mutable.HashMap[Plan, Iterable[BuildRequest]]
-  private val recentlyUpdated = new mutable.HashSet[Plan]
+  val requestsByPlan  = new mutable.HashMap[Plan, Iterable[BuildRequest]]
+  val recentlyUpdated = new mutable.HashSet[Plan]
   
   var simulationResults:ScheduleSimulationResult = new ScheduleSimulationResult(Vector.empty, Vector.empty, Vector.empty)
   

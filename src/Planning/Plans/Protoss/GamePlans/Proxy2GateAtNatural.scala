@@ -18,7 +18,7 @@ import ProxyBwapi.Races.Protoss
 class Proxy2GateAtNatural extends Parallel {
   
   private def proxyZone: Option[Zone] = {
-    With.geography.bases.find(base => base.isNaturalOf.isDefined && ! base.owner.isUs).map(_.zone)
+    With.geography.bases.find(_.isNaturalOf.exists( ! _.owner.isUs)).map(_.zone)
   }
   
   children.set(Vector(
@@ -48,7 +48,7 @@ class Proxy2GateAtNatural extends Parallel {
         new RequireSufficientPylons,
         new TrainContinuously(Protoss.Zealot),
         new TrainContinuously(Protoss.Probe),
-        new TrainContinuously(Protoss.Gateway))),
+        new TrainContinuously(Protoss.Gateway, 5))),
     new If(
       new And (
         new UnitsAtLeast(7, UnitMatchType(Protoss.Probe), complete = false),

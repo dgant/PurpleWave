@@ -274,7 +274,10 @@ class ProtossVsProtoss extends Parallel {
       new FindEnemyBase),
   
     new If(
-      new Employing(PvPMidgameDarkTemplar),
+      new And(
+        new Employing(PvPMidgameDarkTemplar),
+        new Not(new Employing(PvPEarly2Gate99)),
+        new Not(new Employing(PvPEarly2Gate1012))),
       new Trigger(
         new UnitsAtLeast(1, UnitMatchType(Protoss.DarkTemplar), complete = true),
         new ConsiderAttacking),

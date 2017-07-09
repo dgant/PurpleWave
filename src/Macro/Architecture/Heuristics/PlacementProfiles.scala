@@ -26,7 +26,7 @@ object PlacementProfiles {
     "Tech",
     preferZone                  = 1.0,
     preferDistanceFromEnemy     = 3.0,
-    avoidDistanceFromBase       = 3.0
+    avoidDistanceFromBase       = 1.0
   )
   
   val gas = new PlacementProfile(

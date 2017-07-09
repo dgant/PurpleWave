@@ -140,6 +140,7 @@ class ProtossVsProtoss extends Parallel {
       new UnitsAtLeast(8, UnitMatchWarriors),
       new UnitsAtLeast(2, UnitMatchType(Protoss.PhotonCannon)),
       new UnitsAtLeast(1, UnitMatchType(Protoss.Reaver))),
+      new UnitsAtLeast(2, UnitMatchType(Protoss.DarkTemplar)),
     new RequireMiningBases(2)
   ) { description.set("Take our natural when safe")}
   
@@ -203,8 +204,7 @@ class ProtossVsProtoss extends Parallel {
       new And(
         new EnemyUnitsAtMost(0, UnitMatchType(Protoss.Observer)),
         new EnemyUnitsAtMost(0, UnitMatchType(Protoss.Forge))),
-      new TrainContinuously(Protoss.DarkTemplar, 3),
-      new TrainContinuously(Protoss.DarkTemplar, 1)),
+      new TrainContinuously(Protoss.DarkTemplar, 3)),
     
     new If(
       new UnitsAtLeast(2, UnitMatchType(Protoss.Reaver)),
@@ -256,7 +256,13 @@ class ProtossVsProtoss extends Parallel {
     new ScoutExpansionsAt(70),
     new ScoutAt(9),
   
-    new ConsiderAttacking,
+    new If(
+      new Employing(PvPMidgameDarkTemplar),
+      new Trigger(
+        new UnitsAtLeast(1, UnitMatchType(Protoss.DarkTemplar), complete = true),
+        new ConsiderAttacking),
+      new ConsiderAttacking),
+    
     new ControlMap
   ))
 }

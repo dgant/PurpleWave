@@ -67,7 +67,6 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
     
     currencyLock.isSpent = building.isDefined
     currencyLock.acquire(this)
-    
     if ( ! needBuilder) {
       return
     }
@@ -101,7 +100,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
         // 2. Wait for the order to take effect
         waitForBuilderToRecallUntil = Some(With.frame + 24)
         With.executor.intend(
-          new Intention(this, builderLock.units.head) { toTravel = Some(orderedTile.get.pixelCenter); canAttack = false })
+          new Intention(this, builderLock.units.head) { toTravel = Some(desiredTile.get.pixelCenter); canAttack = false })
       } else {
         orderedTile = desiredTile
         With.executor.intend(

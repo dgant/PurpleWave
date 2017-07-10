@@ -1,27 +1,27 @@
 package Macro.Scheduling
 
 import Lifecycle.With
-import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatcher}
 import ProxyBwapi.Techs.Tech
+import ProxyBwapi.UnitClass.UnitClass
 import ProxyBwapi.Upgrades.Upgrade
 
 object Project {
   
   // Frames before we could possibly have this unit, not counting costs
   //
-  def framesToUnits(unitMatcher: UnitMatcher, quantity: Int = 1): Int = {
+  def framesToUnits(unitClass: UnitClass, quantity: Int = 1, unitsInCycle: Array[UnitClass] = Array.empty): Int = {
     
-    val allUnits = With.units.ours.filter(unitMatcher.accept)
-    val complete = allUnits.filter(_.complete)
+    val unitsOfClass          = With.units.ours.filter(_.is(unitClass))
+    val unitsOfClassComplete  = unitsOfClass.filter(_.complete)
     
     // Do we already have it?
-    val shortfall = quantity - complete.size
+    val shortfall = quantity - unitsOfClassComplete.size
     if (shortfall <= 0) {
       return 0
     }
     
     // Are we building what we need already?
-    val incomplete = allUnits.filterNot(_.complete).toVector.sortBy(_.framesBeforeBecomingComplete)
+    val incomplete = unitsOfClass.filterNot(_.complete).toVector.sortBy(_.framesBeforeBecomingComplete)
     if (incomplete.size >= shortfall) {
       incomplete
         .take(shortfall)
@@ -29,9 +29,16 @@ object Project {
         .framesBeforeBecomingComplete
     }
     
-    // Guess we can never get this, ever.
-    // (Okay, we can probably do better than this)
-    Int.MaxValue
+    ((unitClass.buildUnitsEnabling ++
+      unitClass.buildUnitsBorrowed ++
+      unitClass.buildUnitsSpent)
+        .toSet
+        .map(requiredClass =>
+          if (unitsInCycle.contains(requiredClass))
+            Int.MaxValue
+          else
+            framesToUnits(requiredClass, 1, unitsInCycle :+ requiredClass)) ++ Set(Int.MaxValue)
+    ).max
   }
   
   // Frames before we could possibly have this Tech, not counting costs
@@ -44,7 +51,7 @@ object Project {
     }
     
     // Do we need to build the thing that techs this?
-    val framesToTecher = framesToUnits(UnitMatchType(tech.whatResearches))
+    val framesToTecher = framesToUnits(tech.whatResearches)
     if (framesToTecher > 0) {
       return framesToTecher + tech.researchFrames
     }
@@ -71,7 +78,7 @@ object Project {
     }
     
     // Do we need to build the thing that upgrades this?
-    val framesToUpgrader = framesToUnits(UnitMatchType(upgrade.whatUpgrades))
+    val framesToUpgrader = framesToUnits(upgrade.whatUpgrades)
     if (framesToUpgrader > 0) {
       return framesToUpgrader + upgrade.upgradeTime(level) //Doesn't count catching up to this level from lower levels!
     }

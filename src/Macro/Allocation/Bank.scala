@@ -88,6 +88,7 @@ class Bank {
   private def expectedFrames(request: LockCurrency): Int = {
     if (request.isSatisfied) return 0
     Vector(
+      request.framesAhead,
       framesToEarnMinerals(-mineralsLeft),
       framesToEarnGas(-gasLeft)
     ).max

@@ -32,7 +32,6 @@ class ProtossVsZerg extends Parallel {
   
   private class ImplementEarlyFFELight extends FirstFiveMinutes(
     new Parallel(
-      new ForgeFastExpand(cannonsInFront = true),
       new If(
         new EnemyBasesAtLeast(2),
         new Build(ProtossBuilds.FFE_NexusFirst: _*),
@@ -130,7 +129,7 @@ class ProtossVsZerg extends Parallel {
     
     // Early game
     new RequireMiningBases(1),
-    new ForgeFastExpand(cannonsInFront = true),
+    new ForgeFastExpand(cannonsInFront = true), // Do we always want this placement?
     new Employ(PvZEarlyZealotAllIn,  new ImplementEarly2Gate),
     new Employ(PvZEarly2Gate,        new ImplementEarly2Gate),
     new Employ(PvZEarlyFFELight,     new ImplementEarlyFFELight),

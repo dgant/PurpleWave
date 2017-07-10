@@ -33,12 +33,17 @@ class Groundskeeper {
     proposalPlacements.put(blueprint, placement)
   }
   
+  // CIG 2017 HACK: This needs to match the sort below (priority -> id)
+  // Ideally we'd represent this in one Ordering that could be used by both queues,
+  // but one is BlueprintMatch and the other is Blueprint
+  //
+  private val blueprintMatchOrdering = Ordering.by { b : BlueprintMatch  => (b.proposal.proposer.priority, b.proposal.id) }
+  
   def proposalQueue: Iterable[Blueprint] = {
     val ordered = requirementMatches
       .filter(_.requirement.proposer.isPrioritized)
       .toVector
-      .sortBy(_.proposal.id)
-      .sortBy(_.requirement.proposer.priority)
+      .sorted(blueprintMatchOrdering)
       .map(_.proposal)
       .take(With.configuration.buildingPlacementMaximumQueue)
     
@@ -167,6 +172,12 @@ class Groundskeeper {
   private def findProposalToMatchWithRequirement(requirement: Blueprint): Option[Blueprint] = {
     proposals
       .diff(requirementMatches.map(_.proposal))
+      .toVector
+      // CIG 2017 HACK: This needs to match the sort above (priority -> id)
+      // Ideally we'd represent this in one Ordering that could be used by both queues,
+      // but one is BlueprintMatch and the other is Blueprint.
+      //
+      .sortBy(p => (p.proposer.priority, p.id))
       .find(requirement.fulfilledBy)
   }
   

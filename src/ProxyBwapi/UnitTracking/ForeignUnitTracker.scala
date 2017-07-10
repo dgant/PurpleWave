@@ -123,13 +123,26 @@ class ForeignUnitTracker {
     foreignUnitsById.remove(id)
   }
   
-  private def isValidForeignUnit(unit: bwapi.Unit):Boolean = {
-    //This case just doesn't make sense; if they're invisible and foreign how is BWAPI returning them
-    //This check filters out the weird ghost units that BWAPI gives us at the start of a game
-    if (!unit.isVisible) return false
+  private def isValidForeignUnit(unit: bwapi.Unit): Boolean = {
+    val exists        = unit.exists
+    lazy val id       = unit.getID
+    lazy val unitType = unit.getType
+    lazy val playerBw = unit.getPlayer
+    lazy val player   = Players.get(playerBw)
     
-    if (With.units.invalidUnitTypes.contains(unit.getType)) return false
-    if ( ! unit.exists) return false
-    Players.get(unit.getPlayer).isEnemy || Players.get(unit.getPlayer).isNeutral
+    if ( ! exists) {
+      return false
+    }
+    if (enemyGhostUnits.contains(id)) {
+      return false
+    }
+    if (With.units.invalidUnitTypes.contains(unitType)) {
+      return false
+    }
+    if (player.isFriendly) {
+      return false
+    }
+    
+    true
   }
 }

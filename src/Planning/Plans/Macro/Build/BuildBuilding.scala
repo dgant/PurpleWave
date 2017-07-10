@@ -1,17 +1,18 @@
 package Planning.Plans.Macro.Build
 
 import Debugging.Visualizations.Rendering.DrawMap
+import Lifecycle.With
+import Macro.Architecture.Blueprint
+import Macro.Scheduling.Project
+import Mathematics.Points.Tile
 import Micro.Intent.Intention
+import Planning.Composition.ResourceLocks.{LockCurrencyForUnit, LockUnits}
 import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Composition.UnitPreferences.UnitPreferClose
 import Planning.Plan
-import Planning.Composition.ResourceLocks.{LockCurrencyForUnit, LockUnits}
 import ProxyBwapi.UnitClass.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Lifecycle.With
-import Macro.Architecture.Blueprint
-import Mathematics.Points.Tile
 import bwapi.Race
 
 class BuildBuilding(val buildingClass: UnitClass) extends Plan {
@@ -23,10 +24,11 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
   private var orderedTile   : Option[Tile]              = None
   private var building      : Option[FriendlyUnitInfo]  = None
   
+  val builderMatcher = UnitMatchType(buildingClass.whatBuilds._1)
   val builderLock = new LockUnits {
     description.set("Get a builder")
     unitCounter.set(UnitCountOne)
-    unitMatcher.set(UnitMatchType(buildingClass.whatBuilds._1))
+    unitMatcher.set(builderMatcher)
     unitPreference.set(new UnitPreferClose)
   }
     
@@ -63,7 +65,8 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
       }
       return
     }
-    
+  
+    currencyLock.framesAhead = (buildingClass.buildUnitsEnabling.map(enablingClass => Project.framesToUnits(UnitMatchType(enablingClass), 1)) :+ 0).max
     currencyLock.isSpent = building.isDefined
     currencyLock.acquire(this)
     if ( ! needBuilder) {

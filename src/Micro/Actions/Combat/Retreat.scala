@@ -30,11 +30,12 @@ object Retreat extends Action {
     }
     // If we have nowhere to retreat to, just fight the best we can.
     else if (
-      state.threats.nonEmpty &&
-        state.unit.pixelDistanceFast(state.origin) <
+      state.unit.damageInLastSecond > 0 &&
+      state.threats.exists(_.inRangeToAttackFast(state.unit)) &&
+      state.unit.pixelDistanceFast(state.origin) <
         state.unit.unitClass.radialHypotenuse +
         state.threats.map(_.pixelRangeAgainstFromCenter(state.unit)).max +
-        16.0) {
+      16.0) {
   
       state.toTravel = Some(state.origin)
       Engage.delegate(state)

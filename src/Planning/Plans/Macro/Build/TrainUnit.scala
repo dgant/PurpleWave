@@ -9,19 +9,21 @@ import Planning.Composition.ResourceLocks.{LockCurrencyForUnit, LockUnits}
 import ProxyBwapi.UnitClass.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Lifecycle.With
+import Macro.Scheduling.Project
 
-class TrainUnit(val traineeClass:UnitClass) extends Plan {
+class TrainUnit(val traineeClass: UnitClass) extends Plan {
   
   description.set("Train a " + traineeClass)
   
-  val currencyLock = new LockCurrencyForUnit(traineeClass)
-  val trainerLock = new LockUnits {
-    unitMatcher.set(UnitMatchType(traineeClass.whatBuilds._1))
+  val currencyLock    = new LockCurrencyForUnit(traineeClass)
+  val trainerMatcher  = UnitMatchType(traineeClass.whatBuilds._1)
+  val trainerLock     = new LockUnits {
+    unitMatcher.set(trainerMatcher)
     unitCounter.set(UnitCountOne)
   }
   
-  private var trainer:Option[FriendlyUnitInfo] = None
-  private var trainee:Option[FriendlyUnitInfo] = None
+  private var trainer: Option[FriendlyUnitInfo] = None
+  private var trainee: Option[FriendlyUnitInfo] = None
   
   override def isComplete: Boolean = trainee.exists(_.aliveAndComplete)
   
@@ -42,6 +44,9 @@ class TrainUnit(val traineeClass:UnitClass) extends Plan {
             && unit.y == trainer.get.y)
     }
   
+    currencyLock.framesAhead = (
+      traineeClass.buildUnitsEnabling.map(enablingClass => Project.framesToUnits(UnitMatchType(enablingClass), 1))
+      :+ Project.framesToUnits(trainerMatcher, 1)).max
     currencyLock.isSpent = trainee.isDefined || trainer.exists(_.trainingQueue.headOption.contains(traineeClass))
     currencyLock.acquire(this)
     if (currencyLock.satisfied) {

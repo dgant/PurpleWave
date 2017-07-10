@@ -1,7 +1,7 @@
 package Debugging.Visualizations
 
 import Debugging.Visualizations.Views.Fun.{ShowHappyVision, ShowTextOnly}
-import Debugging.Visualizations.Views.Geography.ShowBases
+import Debugging.Visualizations.Views.Geography.{ShowBases, ShowZoneBorderTiles, ShowZones}
 import Debugging.Visualizations.Views.Micro.{ShowUnits, ShowUnitsForeign, ShowUnitsFriendly}
 import Debugging.Visualizations.Views.Performance.{ShowPerformanceDetails, ShowPerformanceSummary}
 import Debugging.Visualizations.Views.Planning.{ShowResources, ShowStrategy}
@@ -24,7 +24,9 @@ class Visualization {
     ShowStrategy,
     //ShowZones,
     ShowResources,
-    ShowPerformanceDetails
+    ShowPerformanceDetails,
+    ShowZoneBorderTiles,
+    ShowZones
     //ShowScheduler
     //ShowArchitecture,
     //ShowGroundskeeperQueue

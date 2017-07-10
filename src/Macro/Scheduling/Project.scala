@@ -7,7 +7,7 @@ import ProxyBwapi.Upgrades.Upgrade
 
 object Project {
   
-  // Frames before we could possibly have this unit, not counting
+  // Frames before we could possibly have this unit, not counting costs
   //
   def framesToUnits(unitMatcher: UnitMatcher, quantity: Int = 1): Int = {
     

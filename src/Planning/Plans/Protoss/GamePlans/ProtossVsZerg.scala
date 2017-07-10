@@ -37,7 +37,8 @@ class ProtossVsZerg extends Parallel {
         new EnemyBasesAtLeast(2),
         new Build(ProtossBuilds.FFE_NexusFirst: _*),
         new Build(ProtossBuilds.FFE_ForgeFirst: _*)),
-      new RequireMiningBases(2)))
+      new RequireMiningBases(2),
+      new Build(RequestAtLeast(3, Protoss.PhotonCannon))))
   
   private class ImplementEarlyFFEHeavy extends ImplementEarlyFFELight
   

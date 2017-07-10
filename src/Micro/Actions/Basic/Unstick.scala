@@ -8,7 +8,7 @@ object Unstick extends Action {
   
   override protected def allowed(state: ActionState): Boolean = {
     state.unit.canMoveThisFrame &&
-    state.unit.failingToMove
+    state.unit.seeminglyStuck
   }
   
   override protected def perform(state: ActionState): Unit = {

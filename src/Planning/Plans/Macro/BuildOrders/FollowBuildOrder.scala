@@ -11,7 +11,7 @@ import scala.collection.mutable.ListBuffer
 
 class FollowBuildOrder extends Plan {
   
-  description.set("Build a build order")
+  description.set("Follow the build order")
   
   private val maxToFollow = 25
   

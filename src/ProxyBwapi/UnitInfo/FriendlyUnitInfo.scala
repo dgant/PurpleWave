@@ -5,7 +5,7 @@ import Micro.Execution.ActionState
 import ProxyBwapi.Techs.{Tech, Techs}
 import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
 
-class FriendlyUnitInfo(base:bwapi.Unit) extends FriendlyUnitProxy(base) {
+class FriendlyUnitInfo(base: bwapi.Unit) extends FriendlyUnitProxy(base) {
   
   override def friendly: Option[FriendlyUnitInfo] = Some(this)
   

@@ -14,7 +14,7 @@ class Groundskeeper {
   val requirementMatches    : mutable.Set[BlueprintMatch]        = new mutable.HashSet[BlueprintMatch]
   val proposalsFulfilled    : mutable.Set[Blueprint]             = new mutable.HashSet[Blueprint]
   
-  private var lastEmergencyBuildingPlacement = -24 * 60 * 60
+  private var lastUrgentBuildingPlacement = -24 * 60 * 60
   
   private var nextId: Int = 0
   
@@ -85,7 +85,7 @@ class Groundskeeper {
   */
   def demand(requirement: Blueprint): Option[Tile] = {
     require(requirement).orElse({
-      requestEmergencyPlacement(requirement)
+      requestUrgentPlacement(requirement)
       require(requirement)
     })
   }
@@ -140,12 +140,12 @@ class Groundskeeper {
     output
   }
   
-  private def requestEmergencyPlacement(requirement: Blueprint) {
-    if (With.configuration.emergencyBuildingPlacement
-    && With.frame < With.configuration.emergencyBuildingCutoffFrames
-    && With.framesSince(lastEmergencyBuildingPlacement) > With.configuration.emergencyBuildingCooldown) {
-      With.logger.debug("Emergency building placement required for " + requirement.toString)
-      lastEmergencyBuildingPlacement = With.frame
+  private def requestUrgentPlacement(requirement: Blueprint) {
+    if (With.configuration.urgentBuildingPlacement
+    && With.frame < With.configuration.urgentBuildingPlacementCutoffFrames
+    && ! With.performance.danger
+    && With.framesSince(lastUrgentBuildingPlacement) > With.configuration.urgentBuildingPlacementCooldown) {
+      lastUrgentBuildingPlacement = With.frame
       With.placement.run(runToCompletionEvenIfItCostsUsAFrame = true)
     }
   }

@@ -6,15 +6,14 @@ import Macro.Architecture.Blueprint
 import Macro.BuildRequests.RequestAtLeast
 import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Plans.Army.Attack
-import Planning.Plans.Compound.{And, If, Parallel, Trigger}
+import Planning.Plans.Compound.{If, Parallel, Trigger}
 import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientPylons, TrainContinuously}
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
-import Planning.Plans.Macro.Milestones.{UnitsAtLeast, UnitsAtMost}
-import Planning.Plans.Scouting.FindEnemyBase
+import Planning.Plans.Macro.Milestones.UnitsAtLeast
 import ProxyBwapi.Races.Protoss
 
-class Proxy2GateAtNatural extends Parallel {
+class Proxy2GateAtEnemyNatural extends Parallel {
   
   private def proxyZone: Option[Zone] = {
     With.geography.bases.find(_.isNaturalOf.exists( ! _.owner.isUs)).map(_.zone)

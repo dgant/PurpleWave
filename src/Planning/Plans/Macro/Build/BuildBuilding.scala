@@ -21,7 +21,6 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
   
   private var desiredTile   : Option[Tile]              = None
   private var orderedTile   : Option[Tile]              = None
-  private var builder       : Option[FriendlyUnitInfo]  = None
   private var building      : Option[FriendlyUnitInfo]  = None
   
   val builderLock = new LockUnits {
@@ -137,7 +136,9 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
     val proposedBuilders = builderLock.inquire(this)
     proposedBuilders.exists(
       _.exists(someBuilder =>
-        Math.min(With.blackboard.maxFramesToSendAdvanceBuilder, someBuilder.framesToTravel(desiredTile.get.pixelCenter)) >=
+        Math.min(
+          With.blackboard.maxFramesToSendAdvanceBuilder,
+          someBuilder.framesToTravel(desiredTile.get.pixelCenter) / With.configuration.assumedBuilderTravelSpeed) >=
         currencyLock.expectedFrames))
   }
   

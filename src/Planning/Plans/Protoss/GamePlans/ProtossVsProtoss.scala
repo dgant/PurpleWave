@@ -12,7 +12,7 @@ import Planning.Plans.Macro.Expanding.{BuildAssimilators, MatchMiningBases, Requ
 import Planning.Plans.Macro.Milestones._
 import Planning.Plans.Protoss.ProtossBuilds
 import Planning.Plans.Protoss.Situational.{ForgeFastExpand, Nexus2GateThenCannons, TwoGateAtNatural}
-import Planning.Plans.Scouting.{FindEnemyBase, ScoutExpansionsAt}
+import Planning.Plans.Scouting.{RequireEnemyBase, ScoutExpansionsAt}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Options.Protoss.PvP._
 
@@ -271,7 +271,7 @@ class ProtossVsProtoss extends Parallel {
     new ScoutExpansionsAt(70),
     new If(
       new UnitsAtLeast(1, UnitMatchType(Protoss.Pylon), complete = false),
-      new FindEnemyBase),
+      new RequireEnemyBase),
   
     new If(
       new And(

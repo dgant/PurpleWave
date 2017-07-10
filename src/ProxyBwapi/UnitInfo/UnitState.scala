@@ -6,7 +6,6 @@ import bwapi.UnitCommandType
 
 class UnitState(unit: UnitInfo) {
   val frame                 : Int     = With.frame
-  
   val pixelCenter           : Pixel   = unit.pixelCenter
   val hitPoints             : Int     = unit.hitPoints
   val shieldPoints          : Int     = unit.shieldPoints

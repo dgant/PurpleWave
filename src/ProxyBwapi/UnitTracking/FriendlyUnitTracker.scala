@@ -4,18 +4,17 @@ import Lifecycle.With
 import ProxyBwapi.Players.Players
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-import scala.collection.JavaConverters._
 import scala.collection.immutable.HashSet
 import scala.collection.mutable
 
 class FriendlyUnitTracker {
   
   private val friendlyUnitsById = new mutable.HashMap[Int, FriendlyUnitInfo].empty
-  private var friendlyUnits:Set[FriendlyUnitInfo] = new HashSet[FriendlyUnitInfo]
-  var ourUnits:Set[FriendlyUnitInfo] = new HashSet[FriendlyUnitInfo]
+  private var friendlyUnits: Set[FriendlyUnitInfo] = new HashSet[FriendlyUnitInfo]
+  var ourUnits: Set[FriendlyUnitInfo] = new HashSet[FriendlyUnitInfo]
   
-  def get(someUnit:bwapi.Unit):Option[FriendlyUnitInfo] = get(someUnit.getID)
-  def get(id:Int):Option[FriendlyUnitInfo] = friendlyUnitsById.get(id)
+  def get(someUnit: bwapi.Unit):Option[FriendlyUnitInfo] = get(someUnit.getID)
+  def get(id: Int): Option[FriendlyUnitInfo] = friendlyUnitsById.get(id)
   
   def update() {
   

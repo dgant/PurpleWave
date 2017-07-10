@@ -15,6 +15,7 @@ class Configuration {
   // Micro //
   ///////////
   
+  var assumedBuilderTravelSpeed       = 0.8
   var attackableRangeBuffer           = 8
   var fogPositionDuration             = 24 * 20
   var violenceFrameThreshold          = 24
@@ -59,20 +60,20 @@ class Configuration {
   // Performance //
   /////////////////
   
-  var buildingPlacementBatchSize      = 300
-  var buildingPlacementMaximumQueue   = 40
-  var garbageCollectionThresholdMs    = 5
-  var peformanceFrameMilliseconds     = 20
-  var initialTaskLengthMilliseconds   = 20
-  var performanceMinimumUnitSleep     = 2
-  var performanceMicroAngleStep       = 4
-  var useFastGroundDistance           = true
-  var verifyBuildingsDontBreakPaths   = false
-  var emergencyBuildingPlacement      = true
-  var emergencyBuildingCutoffFrames   = 24 * 60 * 5
-  var emergencyBuildingCooldown       = 24 * 5
-  var unitHistoryAge                  = 24 * 3
-  var buildingPlacements              = 5
+  var buildingPlacementBatchSize          = 300
+  var buildingPlacementMaximumQueue       = 40
+  var garbageCollectionThresholdMs        = 5
+  var peformanceFrameMilliseconds         = 20
+  var initialTaskLengthMilliseconds       = 20
+  var performanceMinimumUnitSleep         = 2
+  var performanceMicroAngleStep           = 4
+  var useFastGroundDistance               = true
+  var verifyBuildingsDontBreakPaths       = false
+  var urgentBuildingPlacement             = true
+  var urgentBuildingPlacementCutoffFrames = 24 * 60 * 15
+  var urgentBuildingPlacementCooldown     = 24 * 5
+  var unitHistoryAge                      = 24 * 3
+  var buildingPlacements                  = 5
   
   var urgencyManners            = 1
   var urgencyEconomy            = 1

@@ -54,7 +54,7 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
         .getOrElse(0))
   }
   
-  def failingToMove: Boolean = {
+  def seeminglyStuck: Boolean = {
     history.size >= 24 && history.filter(_.age < 24).forall(state => state.tryingToMove && state.pixelCenter == pixelCenter)
   }
   

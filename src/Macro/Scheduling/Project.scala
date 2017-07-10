@@ -32,7 +32,7 @@ object Project {
     ((unitClass.buildUnitsEnabling ++
       unitClass.buildUnitsBorrowed ++
       unitClass.buildUnitsSpent)
-        .toSet
+        .toSet[UnitClass]
         .map(requiredClass =>
           if (unitsInCycle.contains(requiredClass))
             Int.MaxValue

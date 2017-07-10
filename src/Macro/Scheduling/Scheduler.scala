@@ -16,7 +16,7 @@ class Scheduler {
   val requestsByPlan  = new mutable.HashMap[Plan, Iterable[BuildRequest]]
   val recentlyUpdated = new mutable.HashSet[Plan]
   
-  var simulationResults:ScheduleSimulationResult = new ScheduleSimulationResult(Vector.empty, Vector.empty, Vector.empty)
+  var simulationResults: ScheduleSimulationResult = new ScheduleSimulationResult(Vector.empty, Vector.empty, Vector.empty)
   
   var queueOriginal   : Iterable[Buildable]   = Vector.empty
   def queueOptimized  : Iterable[BuildEvent]  = simulationResults.suggestedEvents

@@ -8,7 +8,7 @@ import bwapi.Color
 object DrawScreen {
   
   def header(x: Int, text: String) {
-    column(x, 5, text)
+    column(x, With.visualization.lineHeightSmall, text)
   }
   
   def column(x: Int, y: Int, text: Iterable[String]) {

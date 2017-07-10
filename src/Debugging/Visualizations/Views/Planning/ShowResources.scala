@@ -8,7 +8,7 @@ object ShowResources extends View {
   override def renderScreen() {
     DrawScreen.table(
       315,
-      31,
+      5 * With.visualization.lineHeightSmall,
       With.bank.prioritizedRequests
         .take(20)
         .map(request =>

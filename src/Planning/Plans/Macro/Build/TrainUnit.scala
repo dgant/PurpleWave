@@ -16,9 +16,9 @@ class TrainUnit(val traineeClass: UnitClass) extends Plan {
   description.set("Train a " + traineeClass)
   
   val currencyLock    = new LockCurrencyForUnit(traineeClass)
-  val trainerMatcher  = UnitMatchType(traineeClass.whatBuilds._1)
+  val trainerClass    = traineeClass.whatBuilds._1
   val trainerLock     = new LockUnits {
-    unitMatcher.set(trainerMatcher)
+    unitMatcher.set(UnitMatchType(trainerClass))
     unitCounter.set(UnitCountOne)
   }
   
@@ -45,8 +45,8 @@ class TrainUnit(val traineeClass: UnitClass) extends Plan {
     }
   
     currencyLock.framesAhead = (
-      traineeClass.buildUnitsEnabling.map(enablingClass => Project.framesToUnits(UnitMatchType(enablingClass), 1))
-      :+ Project.framesToUnits(trainerMatcher, 1)).max
+      traineeClass.buildUnitsEnabling.map(enablingClass => Project.framesToUnits(enablingClass, 1))
+      :+ Project.framesToUnits(trainerClass, 1)).max
     currencyLock.isSpent = trainee.isDefined || trainer.exists(_.trainingQueue.headOption.contains(traineeClass))
     currencyLock.acquire(this)
     if (currencyLock.satisfied) {

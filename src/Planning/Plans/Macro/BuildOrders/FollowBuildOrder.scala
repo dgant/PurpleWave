@@ -37,7 +37,7 @@ class FollowBuildOrder extends Plan {
   
     //Add plans to match number of builds we need
     //queue = With.scheduler.queueOptimized.filter(_.frameStart <= With.frame).map(_.buildable)
-    queue = With.scheduler.queueOriginal.take(maxToFollow)
+    queue = With.scheduler.queue.take(maxToFollow)
     val buildsNeeded = queue.groupBy(x => x).map(group => (group._1, group._2.size))
     buildsNeeded.keys.foreach(build => {
       if ( ! plans.contains(build)) {

@@ -5,7 +5,7 @@ import Debugging.Visualizations.Views.Economy.{ShowEconomy, ShowScheduler}
 import Debugging.Visualizations.Views.Fun._
 import Debugging.Visualizations.Views.Geography._
 import Debugging.Visualizations.Views.Micro._
-import Debugging.Visualizations.Views.Performance.ShowPerformanceSummary
+import Debugging.Visualizations.Views.Performance.{ShowPerformanceDetails, ShowPerformanceSummary}
 import Debugging.Visualizations.Views.Planning.{ShowPlans, ShowResources, ShowStrategy}
 import Debugging.Visualizations.Views.{ShowClock, View}
 import Lifecycle.With
@@ -20,6 +20,7 @@ class Visualization {
   //////////////
   
   var views = mutable.ArrayBuffer(
+    //Evergreen
     ShowBases,
     ShowUnits,
     ShowUnitsForeign,
@@ -27,15 +28,13 @@ class Visualization {
     ShowPerformanceSummary,
     ShowClock,
     ShowStrategy,
-    ShowResources,
-    ShowPlans,
-    ShowZones,
-    ShowZoneBorderTiles,
-    ShowArchitecture
+  
+    ShowScheduler,
+    ShowResources
   )
   
   var enabled   = false
-  var screen    = false
+  var screen    = true
   var map       = true
   var happy     = false
   var textOnly  = false
@@ -66,7 +65,12 @@ class Visualization {
     ShowMovementHeuristics,
     ShowUnits,
     ShowUnitsForeign,
-    ShowUnitsFriendly
+    ShowUnitsFriendly,
+    ShowPerformanceDetails,
+    ShowPerformanceSummary,
+    ShowPlans,
+    ShowResources,
+    ShowStrategy
   )
   
   def toggle(view: View) {

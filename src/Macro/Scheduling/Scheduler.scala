@@ -3,8 +3,7 @@ package Macro.Scheduling
 import Lifecycle.With
 import Macro.BuildRequests.BuildRequest
 import Macro.Buildables.Buildable
-import Macro.Scheduling.Optimization.ScheduleSimulationResult
-import Performance.Caching.Limiter
+import Performance.Caching.CacheFrame
 import Planning.Plan
 import ProxyBwapi.UnitClass.UnitClass
 import Utilities.{CountMap, CountMapper}
@@ -13,44 +12,33 @@ import scala.collection.mutable
 
 class Scheduler {
   
-  val requestsByPlan  = new mutable.HashMap[Plan, Iterable[BuildRequest]]
-  val recentlyUpdated = new mutable.HashSet[Plan]
+  val requestsByPlan = new mutable.HashMap[Plan, Iterable[BuildRequest]]
   
-  var simulationResults: ScheduleSimulationResult = new ScheduleSimulationResult(Vector.empty, Vector.empty, Vector.empty)
-  
-  var queueOriginal   : Iterable[Buildable]   = Vector.empty
-  def queueOptimized  : Iterable[BuildEvent]  = simulationResults.suggestedEvents
-  
-  def request(requester: Plan, aRequest: BuildRequest) {
-    request(requester, List(aRequest))
+  def request(requester: Plan, theRequest: BuildRequest) {
+    request(requester, List(theRequest))
   }
   
   def request(requester: Plan, requests: Iterable[BuildRequest]) {
     requestsByPlan.put(requester, requests)
-    recentlyUpdated.add(requester)
   }
   
-  def update() {
-    requestsByPlan.keySet.diff(recentlyUpdated).foreach(requestsByPlan.remove)
-    
-    //TODO: This needs to go elsewhere when we go async!
-    recentlyUpdated.clear()
-    updateQueueLimiter.act()
+  def reset() {
+    requestsByPlan.clear()
   }
   
-  private val updateQueueLimiter = new Limiter(2, () => updateQueue())
-  private def updateQueue() {
+  def queue: Iterable[Buildable] = queueCache.get
+  val queueCache = new CacheFrame(() => queueRecalculate)
+  private def queueRecalculate: Iterable[Buildable] = {
     val requestQueue = requestsByPlan.keys.toVector.sortBy(_.priority).flatten(requestsByPlan)
     val unitsWanted = new CountMap[UnitClass]
-    val unitsActual:CountMap[UnitClass] = CountMapper.make(With.units.ours.filter(_.aliveAndComplete).groupBy(_.unitClass).mapValues(_.size))
-    queueOriginal = requestQueue.flatten(buildable => getUnfulfilledBuildables(buildable, unitsWanted, unitsActual))
-    //simulationResults = ScheduleSimulator.simulate(queueOriginal)
+    val unitsActual: CountMap[UnitClass] = CountMapper.make(With.units.ours.filter(_.aliveAndComplete).groupBy(_.unitClass).mapValues(_.size))
+    requestQueue.flatten(buildable => getUnfulfilledBuildables(buildable, unitsWanted, unitsActual))
   }
   
   private def getUnfulfilledBuildables(
-    request:BuildRequest,
-    unitsWanted:CountMap[UnitClass],
-    unitsActual:CountMap[UnitClass])
+    request     : BuildRequest,
+    unitsWanted : CountMap[UnitClass],
+    unitsActual : CountMap[UnitClass])
       : Iterable[Buildable] = {
     
     if (request.buildable.upgradeOption.nonEmpty) {

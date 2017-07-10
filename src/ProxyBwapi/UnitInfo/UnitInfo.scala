@@ -54,8 +54,15 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
         .getOrElse(0))
   }
   
+  private val stuckMoveFrames     = 12
+  private val stuckAttackFrames = cooldownMaxAirGround + 8
+  private val stuckFramesMax    = Math.max(stuckMoveFrames, stuckAttackFrames)
   def seeminglyStuck: Boolean = {
-    history.size >= 24 && history.filter(_.age < 24).forall(state => state.tryingToMove && state.pixelCenter == pixelCenter)
+    val recentHistory = history.takeRight(stuckFramesMax)
+    history.size >= stuckFramesMax && (
+      history.takeRight(stuckMoveFrames   ).forall(state => state.couldMoveThisFrame    && state.tryingToMove   && state.pixelCenter == pixelCenter) ||
+      history.takeRight(stuckAttackFrames ).forall(state => state.couldAttackThisFrame  && state.tryingToAttack && state.pixelCenter == pixelCenter && state.cooldown == 0)
+    )
   }
   
   ////////////

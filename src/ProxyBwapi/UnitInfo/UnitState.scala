@@ -10,6 +10,18 @@ class UnitState(unit: UnitInfo) {
   val hitPoints             : Int     = unit.hitPoints
   val shieldPoints          : Int     = unit.shieldPoints
   val defensiveMatrixPoints : Int     = unit.defensiveMatrixPoints
+  val couldMoveThisFrame    : Boolean = unit.canMoveThisFrame
+  val couldAttackThisFrame  : Boolean = unit.canAttackThisFrame
+  val cooldown              : Int     = unit.cooldownLeft
+  val tryingToAttack: Boolean = {
+    if (unit.command.isEmpty) {
+      false
+    }
+    else {
+      val command = unit.command.get
+      command.getUnitCommandType == UnitCommandType.Attack_Unit
+    }
+  }
   var tryingToMove: Boolean = {
     if (unit.command.isEmpty) {
       false

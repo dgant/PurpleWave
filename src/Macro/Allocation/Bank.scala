@@ -7,10 +7,10 @@ import scala.collection.mutable
 
 class Bank {
   
-  private var mineralsLeft  = 0
-  private var gasLeft       = 0
-  private var supplyLeft    = 0
-  private val requests      = new mutable.HashSet[LockCurrency]()
+  private var mineralsLeft    = 0
+  private var gasLeft         = 0
+  private var supplyLeft      = 0
+  private val requests        = new mutable.HashSet[LockCurrency]()
   
   def update() {
     requests.clear()

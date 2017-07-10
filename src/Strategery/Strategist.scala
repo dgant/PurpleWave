@@ -24,22 +24,23 @@ class Strategist {
     .getOrElse(new WinTheGame)
   
   def selectStrategies: Set[Strategy] = {
+    val strategies = ProtossChoices.options.filter(isAppropriate)
+    chooseBest(strategies).toSet
+  }
+  
+  private def isAppropriate(strategy: Strategy): Boolean = {
     val ourRace = With.self.race
     val enemyRaces = With.enemies.map(_.race).toSet
     val isIsland = isIslandMap
     val isGround = ! isIsland
     val startLocations = With.geography.startLocations.size
     
-    val strategies = ProtossChoices.options
-      .filter(strategy =>
-        (strategy.islandMaps  || ! isIsland)            &&
-        (strategy.groundMaps  || ! isGround)            &&
-        strategy.ourRaces.exists(_ == ourRace)          &&
-        strategy.enemyRaces.exists(enemyRaces.contains) &&
-        strategy.startLocationsMin <= startLocations    &&
-        strategy.startLocationsMax >= startLocations)
-    
-    chooseBest(strategies).toSet
+    (strategy.islandMaps  || ! isIsland)            &&
+    (strategy.groundMaps  || ! isGround)            &&
+    strategy.ourRaces.exists(_ == ourRace)          &&
+    strategy.enemyRaces.exists(enemyRaces.contains) &&
+    strategy.startLocationsMin <= startLocations    &&
+    strategy.startLocationsMax >= startLocations
   }
   
   private def heyIsThisAnIslandMap = {
@@ -56,6 +57,10 @@ class Strategist {
   private val importanceOnMap       = 1.0
   
   private def chooseBest(strategies: Iterable[Strategy]): Iterable[Strategy] = {
+    
+    if (strategies.isEmpty) {
+      return Iterable.empty
+    }
     
     val output = new ArrayBuffer[Strategy]
     
@@ -108,7 +113,7 @@ class Strategist {
     val bestStrategy = chooseBestStrategy()
     output.append(bestStrategy)
     if (bestStrategy.choices.nonEmpty) {
-      output ++= bestStrategy.choices.flatMap(choice => chooseBest(choice))
+      output ++= bestStrategy.choices.flatMap(choice => chooseBest(choice.filter(isAppropriate)))
     }
     output
   }

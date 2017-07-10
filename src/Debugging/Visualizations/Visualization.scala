@@ -1,20 +1,25 @@
 package Debugging.Visualizations
 
-import Debugging.Visualizations.Views.Fun.{ShowHappyVision, ShowTextOnly}
-import Debugging.Visualizations.Views.Geography.ShowBases
-import Debugging.Visualizations.Views.Micro.{ShowUnits, ShowUnitsForeign, ShowUnitsFriendly}
+import Debugging.Visualizations.Views.Battles.ShowBattles
+import Debugging.Visualizations.Views.Economy.{ShowEconomy, ShowScheduler}
+import Debugging.Visualizations.Views.Fun._
+import Debugging.Visualizations.Views.Geography._
+import Debugging.Visualizations.Views.Micro._
 import Debugging.Visualizations.Views.Performance.ShowPerformanceSummary
 import Debugging.Visualizations.Views.Planning.{ShowPlans, ShowResources, ShowStrategy}
-import Debugging.Visualizations.Views.ShowClock
+import Debugging.Visualizations.Views.{ShowClock, View}
 import Lifecycle.With
 
+import scala.collection.mutable
 import scala.util.Random
 
 class Visualization {
   
-  val lineHeightSmall = 9
+  //////////////
+  // Settings //
+  //////////////
   
-  val views = Vector(
+  var views = mutable.ArrayBuffer(
     ShowBases,
     ShowUnits,
     ShowUnitsForeign,
@@ -23,14 +28,64 @@ class Visualization {
     ShowClock,
     ShowStrategy,
     ShowResources,
-    ShowPlans
+    ShowPlans,
+    ShowZones,
+    ShowZoneBorderTiles,
+    ShowArchitecture
   )
   
   var enabled   = false
-  var screen    = true
-  var map       = false
+  var screen    = false
+  var map       = true
   var happy     = false
   var textOnly  = false
+  
+  //////////////
+  
+  val lineHeightSmall = 9
+  
+  lazy val knownViews: Vector[View] = Vector[View](
+    ShowBattles,
+    ShowEconomy,
+    ShowScheduler,
+    ShowBlackScreen,
+    ShowBulletsAsHearts,
+    ShowHappyUnits,
+    ShowHappyVision,
+    //ShowPlayerNames, TODO: Not actually a View yet
+    ShowTextOnly,
+    ShowTextOnlyUnits,
+    ShowArchitecture,
+    ShowArchitectureHeuristics,
+    ShowArchitecturePaths,
+    ShowBases,
+    ShowGroundskeeper,
+    ShowZoneBorderTiles,
+    ShowZones,
+    ShowGrids,
+    ShowMovementHeuristics,
+    ShowUnits,
+    ShowUnitsForeign,
+    ShowUnitsFriendly
+  )
+  
+  def toggle(view: View) {
+    if (views.contains(view)) {
+      views -= view
+    }
+    else {
+      views += view
+    }
+  }
+  
+  def tryToggle(viewName: String): Boolean = {
+    val matches = knownViews.filter(_.name.toLowerCase.contains(viewName.toLowerCase))
+    val matched = matches.size == 1
+    if (matched) {
+      toggle(matches.head)
+    }
+    matched
+  }
   
   def render() {
     requireInitialization()

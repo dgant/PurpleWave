@@ -18,7 +18,7 @@ object ShowPlans extends View {
   override def renderScreen() {
     describePlanTree(With.strategy.gameplan, 0, 0)
       .zipWithIndex
-      .foreach(pair => With.game.drawTextScreen(0, pair._2 * With.visualization.lineHeightSmall, pair._1))
+      .foreach(pair => With.game.drawTextScreen(0, (5 + pair._2) * With.visualization.lineHeightSmall, pair._1))
   }
   
   private def describePlanTree(plan: Plan, childOrder: Integer, depth: Integer): Seq[String] = {

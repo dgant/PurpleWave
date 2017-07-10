@@ -9,7 +9,7 @@ object ShowHappyVision extends View {
     ShowBlackScreen.renderScreen()
     ShowZones.renderMap()
     ShowHappyUnits.renderMap()
-    ShowBulletsAsHearts.render()
-    ShowPlayerNames.render("Retro Arcade Happy Vision")
+    ShowBulletsAsHearts.renderMap()
+    ShowPlayerNames.renderScreen("Retro Arcade Happy Vision")
   }
 }

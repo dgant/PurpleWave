@@ -4,10 +4,10 @@ import Lifecycle.With
 
 abstract class View {
   
-  private def unimplemented() {}
+  lazy val name: String = getClass.toString.replace("$", "").replace("Show", "")
   
-  def renderScreen(): Unit = unimplemented()
-  def renderMap(): Unit = unimplemented()
+  def renderScreen(): Unit = {}
+  def renderMap(): Unit = {}
   
   def inUse: Boolean = {
     With.visualization.enabled &&

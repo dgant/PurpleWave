@@ -1,10 +1,11 @@
 package Planning.Plans.Protoss.GamePlans
 
+import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
 import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors}
 import Planning.Plans.Army.{ConsiderAttacking, ControlMap}
-import Planning.Plans.Compound.{And, If, Or, Parallel}
-import Planning.Plans.Information.Employ
+import Planning.Plans.Compound._
+import Planning.Plans.Information.{Employ, Employing}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, FirstFiveMinutes}
 import Planning.Plans.Macro.Expanding.{BuildAssimilators, MatchMiningBases, RequireMiningBases}
@@ -27,6 +28,7 @@ class ProtossVsTerran extends Parallel {
   private class ImplementEarly1GateRange    extends FirstFiveMinutes(new Build(ProtossBuilds.Opening_1GateCore: _*))
   private class ImplementEarly1015GateGoon  extends FirstFiveMinutes(new Build(ProtossBuilds.OpeningTwoGate1015Dragoons: _*))
   private class ImplementEarlyDTExpand      extends FirstFiveMinutes(new Build(ProtossBuilds.OpeningDTExpand: _*))
+  private class ImplementEarly4GateAllIn    extends FirstFiveMinutes(new Build(ProtossBuilds.Opening_1GateZZCore: _*))
   
   private class FulfillEarlyTech extends Build(
     RequestAtLeast(1,   Protoss.Pylon),
@@ -115,6 +117,21 @@ class ProtossVsTerran extends Parallel {
       RequestAtLeast(1, Protoss.RoboticsFacility),
       RequestAtLeast(1, Protoss.Observatory)))
   
+  class TrainZealotsOrDragoons extends If(
+    new Or(
+      new And(
+        new Employing(PvTEarly4GateAllIn),
+        new Or(
+          new UnitsAtMost(0, UnitMatchType(Protoss.CyberneticsCore), complete = true),
+          new Check(() => With.self.gas < 50 && With.self.minerals > 200))),
+      new And(
+        new HaveUpgrade(Protoss.ZealotSpeed, withinFrames = Protoss.Zealot.buildFrames),
+        new Or(
+          new UnitsAtLeast(12, UnitMatchType(Protoss.Dragoon)),
+          new Check(() => With.self.gas < 100)))),
+    new TrainContinuously(Protoss.Zealot),
+    new TrainContinuously(Protoss.Dragoon))
+  
   /////////////////
   // Here we go! //
   /////////////////
@@ -126,8 +143,17 @@ class ProtossVsTerran extends Parallel {
     new Employ(PvTEarly1GateRange,   new ImplementEarly1GateRange),
     new Employ(PvTEarly1015GateGoon, new ImplementEarly1015GateGoon),
     new Employ(PvTEarlyDTExpand,     new ImplementEarlyDTExpand),
+    new Employ(PvTEarly4GateAllIn,   new ImplementEarly4GateAllIn),
     new RequireSufficientPylons,
     new TrainProbesContinuously,
+    new Employ(PvTEarly4GateAllIn, new Parallel(
+      new TrainZealotsOrDragoons,
+      new Build(
+        RequestAtLeast(1, Protoss.Gateway),
+        RequestAtLeast(1, Protoss.CyberneticsCore),
+        RequestAtLeast(4, Protoss.Gateway))
+    )),
+  
     new ProtossVsTerranIdeas.RespondToBioAllInWithReavers,
     new RequireMiningBases(2),
     new FulfillEarlyTech,
@@ -160,7 +186,7 @@ class ProtossVsTerran extends Parallel {
       new TrainContinuously(Protoss.Reaver, 2)),
     new TrainContinuously(Protoss.Arbiter, 3),
     new TrainContinuously(Protoss.Observer, 3),
-    new ProtossVsTerranIdeas.BuildDragoonsUntilWeHaveZealotSpeed,
+    new TrainZealotsOrDragoons,
     
     // Luxuries
     new Build(RequestAtLeast(5, Protoss.Gateway)),

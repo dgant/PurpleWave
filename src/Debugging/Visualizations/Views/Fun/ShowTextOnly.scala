@@ -9,6 +9,6 @@ object ShowTextOnly extends View {
     ShowBlackScreen.renderScreen()
     ShowTextOnlyUnits.renderMap()
     ShowZones.renderMap()
-    ShowPlayerNames.render("Work-Friendly Retro Console Vision")
+    ShowPlayerNames.renderScreen("Work-Friendly Retro Console Vision")
   }
 }

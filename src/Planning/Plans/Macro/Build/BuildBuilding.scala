@@ -136,13 +136,16 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
     if (desiredTile.isEmpty) {
       return false
     }
-    val proposedBuilders = builderLock.inquire(this)
-    proposedBuilders.exists(
-      _.exists(someBuilder =>
-        Math.min(
-          With.blackboard.maxFramesToSendAdvanceBuilder,
-          someBuilder.framesToTravel(desiredTile.get.pixelCenter) / With.configuration.assumedBuilderTravelSpeed) >=
-        currencyLock.expectedFrames))
+    if (currencyLock.expectedFrames > With.blackboard.maxFramesToSendAdvanceBuilder) {
+      return false
+    }
+    val proposedBuilder = builderLock.inquire(this).flatMap(_.headOption)
+    if (proposedBuilder.isEmpty) {
+      return false
+    }
+    val travelFrames    = proposedBuilder.get.framesToTravel(desiredTile.get.pixelCenter) / With.configuration.assumedBuilderTravelSpeed
+    val expectedFrames  = currencyLock.expectedFrames
+    travelFrames >= expectedFrames
   }
   
   override def visualize() {

@@ -4,7 +4,7 @@ import Debugging.Visualizations.Rendering.DrawScreen
 import Debugging.Visualizations.Views.View
 import Lifecycle.With
 
-object ShowGroundskeeperQueue extends View {
+object ShowGroundskeeper extends View {
   
   override def renderScreen() {
     

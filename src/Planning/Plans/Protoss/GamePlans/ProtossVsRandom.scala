@@ -1,15 +1,17 @@
 package Planning.Plans.Protoss.GamePlans
 
 import Macro.BuildRequests.RequestAtLeast
+import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Plans.Army.{ConsiderAttacking, ControlMap}
-import Planning.Plans.Compound.Parallel
+import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.Information.Employ
 import Planning.Plans.Macro.Automatic.{RequireSufficientPylons, TrainContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
+import Planning.Plans.Macro.Milestones.UnitsAtLeast
 import Planning.Plans.Protoss.ProtossBuilds
 import Planning.Plans.Protoss.Situational.TwoGatewaysAtNatural
-import Planning.Plans.Scouting.ScoutAt
+import Planning.Plans.Scouting.RequireEnemyBase
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Options.Protoss.PvR.{PvREarly2Gate99, PvREarly2Gate99AtNatural}
 
@@ -34,7 +36,9 @@ class ProtossVsRandom extends Parallel {
       RequestAtLeast(1, Protoss.Assimilator),
       RequestAtLeast(1, Protoss.CyberneticsCore),
       RequestAtLeast(3, Protoss.Gateway)),
-    new ScoutAt(7),
+    new If(
+      new UnitsAtLeast(1, UnitMatchType(Protoss.Pylon), complete = false),
+      new RequireEnemyBase),
     new ConsiderAttacking,
     new ControlMap
   ))

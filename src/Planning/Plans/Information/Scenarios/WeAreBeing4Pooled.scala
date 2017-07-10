@@ -15,7 +15,7 @@ class WeAreBeing4Pooled extends Plan {
       With.units.enemy.exists(_.is(Zerg.Zergling)) ||
       With.units.enemy.exists(u =>
         u.is(Zerg.SpawningPool) &&
-        (u.complete || With.frame + u.remainingBuildFrames < 24 * 120))
+        (u.complete || u.lastSeen + u.remainingBuildFrames < 24 * 120))
     )
   }
 }

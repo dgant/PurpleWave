@@ -1,6 +1,6 @@
 package Debugging
 
-import Lifecycle.With
+import Lifecycle.{Manners, With}
 
 object KeyboardCommands {
   def onSendText(text: String) {
@@ -17,7 +17,8 @@ object KeyboardCommands {
       case "2"    => With.game.setLocalSpeed(60)    ; With.configuration.camera = false
       case "3"    => With.game.setLocalSpeed(30)    ; With.configuration.camera = false
       case "4"    => With.game.setLocalSpeed(0)     ; With.configuration.camera = false
-      case "map"  => With.logger.debug("The current map is " + With.game.mapName + ": " + With.game.mapFileName)
+      case "map"  => Manners.chat("The current map is " + With.game.mapName + ": " + With.game.mapFileName)
+      case _      => With.visualization.tryToggle(text)
     }
   }
   

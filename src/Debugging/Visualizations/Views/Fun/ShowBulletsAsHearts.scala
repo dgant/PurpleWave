@@ -1,15 +1,16 @@
 package Debugging.Visualizations.Views.Fun
 
 import Debugging.Visualizations.Rendering.DrawMap
+import Debugging.Visualizations.Views.View
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import ProxyBwapi.Players.Players
 
 import scala.collection.JavaConverters._
 
-object ShowBulletsAsHearts {
+object ShowBulletsAsHearts extends View {
   
-  def render() {
+  override def renderMap() {
     With.game.getBullets.asScala
       .filter(bullet => bullet.isVisible && bullet.exists && bullet.getPlayer != null)
       .foreach(bullet => {

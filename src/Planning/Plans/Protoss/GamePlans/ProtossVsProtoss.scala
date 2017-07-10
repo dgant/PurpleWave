@@ -11,7 +11,7 @@ import Planning.Plans.Macro.BuildOrders.{Build, FirstFiveMinutes}
 import Planning.Plans.Macro.Expanding.{BuildAssimilators, MatchMiningBases, RequireMiningBases}
 import Planning.Plans.Macro.Milestones._
 import Planning.Plans.Protoss.ProtossBuilds
-import Planning.Plans.Protoss.Situational.{ForgeFastExpand, Nexus2GateThenCannons, TwoGateAtNatural}
+import Planning.Plans.Protoss.Situational.{ForgeFastExpand, Nexus2GateThenCannons, TwoGatewaysAtNatural}
 import Planning.Plans.Scouting.{RequireEnemyBase, ScoutExpansionsAt}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Options.Protoss.PvP._
@@ -26,11 +26,11 @@ class ProtossVsProtoss extends Parallel {
   
   private class ImplementEarly2Gate99 extends FirstFiveMinutes(
     new Parallel(
-      new TwoGateAtNatural,
-      new Build(ProtossBuilds.Opening_TwoGate99_WithZealots: _*)))
+      new TwoGatewaysAtNatural,
+      new Build(ProtossBuilds.OpeningTwoGate99_WithZealots: _*)))
   
   private class ImplementEarly2Gate1012 extends FirstFiveMinutes(
-    new Build(ProtossBuilds.Opening_TwoGate1012: _*))
+    new Build(ProtossBuilds.OpeningTwoGate1012: _*))
   
   private class ImplementEarly1GateCore extends FirstFiveMinutes(
     new Build(ProtossBuilds.Opening_1GateCore: _*))

@@ -28,7 +28,7 @@ class ProtossVsZerg extends Parallel {
   ////////////////
   
   private class ImplementEarly2Gate extends FirstFiveMinutes(
-    new Build(ProtossBuilds.Opening_TwoGate99_WithZealots: _*))
+    new Build(ProtossBuilds.OpeningTwoGate99_WithZealots: _*))
   
   private class ImplementEarlyFFELight extends FirstFiveMinutes(
     new Parallel(

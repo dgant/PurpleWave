@@ -6,5 +6,5 @@ import bwapi.Race
 object PvTEarly1GateRange extends Strategy {
   
   override def ourRaces    : Iterable[Race] = Vector(Race.Random, Race.Protoss)
-  override def enemyRaces  : Iterable[Race] = Vector(Race.Terran)
+  override def enemyRaces  : Iterable[Race] = Vector(Race.Unknown, Race.Terran)
 }

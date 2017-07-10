@@ -11,6 +11,7 @@ object ProtossChoices {
     WorkerRush3StartLocations,
     Proxy2Gate2StartLocations,
     IslandCarriers,
+    AllPvR,
     AllPvT,
     AllPvP,
     AllPvZ)

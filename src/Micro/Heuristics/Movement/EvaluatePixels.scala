@@ -1,10 +1,10 @@
 package Micro.Heuristics.Movement
 
 import Debugging.Visualizations.Views.Micro.ShowMovementHeuristics
-import Information.Geography.Types.Zone
 import Lifecycle.With
 import Mathematics.Heuristics.HeuristicMathMultiplicative
 import Mathematics.Points.Pixel
+import Mathematics.Shapes.Circle
 import Micro.Execution.ActionState
 import ProxyBwapi.UnitInfo.UnitInfo
 
@@ -12,7 +12,7 @@ object EvaluatePixels {
 
   def best(state: ActionState, profile: MovementProfile): Pixel = {
     
-    val candidates = getCandidates(state)
+    val candidates = getSprayCandidates(state)
   
     if (candidates.isEmpty) {
       return state.unit.pixelCenter
@@ -33,10 +33,20 @@ object EvaluatePixels {
     HeuristicMathMultiplicative.best(state, profile.weightedHeuristics, candidates)
   }
   
-  def getCandidates(state: ActionState): Vector[Pixel] = {
-
+  def getSprayCandidates(state: ActionState): Vector[Pixel] = {
     val startingPixel = state.unit.pixelCenter
     val startingZone  = startingPixel.zone
+    val scalingFactor = 8
+    val pixels =
+      Circle.points(8)
+        .map(point => state.unit.pixelCenter.add(scalingFactor * point.x, scalingFactor * point.y))
+        .filter(pixel => acceptable(state.unit, pixel, startingPixel))
+    pixels
+  }
+  
+  def getRadialCandidates(state: ActionState): Vector[Pixel] = {
+
+    val startingPixel = state.unit.pixelCenter
     val otherPixels =
       (0 until 256 by With.configuration.performanceMicroAngleStep)
         .flatten(angle => {
@@ -48,7 +58,7 @@ object EvaluatePixels {
           // Tscmoo2: for longer distances, it has to go through a waypoint kinda
           // TODO: Just pick the pixels we want and then consider pathing in the Commander.
           val targetPixel = startingPixel.radiateDegrees(angle, 70.0)
-          if (acceptable(state.unit, targetPixel, startingPixel, startingZone))
+          if (acceptable(state.unit, targetPixel, startingPixel))
             Some(targetPixel)
           else
             None
@@ -60,22 +70,13 @@ object EvaluatePixels {
   def acceptable(
     unit          : UnitInfo,
     candidate     : Pixel,
-    startingPixel :Pixel,
-    startingZone  : Zone)
+    startingPixel : Pixel)
       : Boolean = {
     
-    if ( ! candidate.valid) return false
-    if (unit.flying) return true
-    if ( ! With.grids.walkable.get(candidate.tileIncluding)) return false
-    
-    val candidateZone = candidate.zone
-    if (startingZone == candidateZone) return true
-    
-    startingZone.edges.exists(
-      edge => edge.zones.exists(_ == candidateZone)
-      &&
-        candidate.pixelDistanceFast(startingPixel) * 2 >
-        candidate.pixelDistanceFast(edge.centerPixel) + startingPixel.pixelDistanceFast(edge.centerPixel))
+    if ( ! candidate.valid)                                   return false
+    if (unit.flying)                                          return true
+    if ( ! With.grids.walkable.get(candidate.tileIncluding))  return false
+    true
   }
   
 }

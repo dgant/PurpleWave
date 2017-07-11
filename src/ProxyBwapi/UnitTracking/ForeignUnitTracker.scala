@@ -74,7 +74,8 @@ class ForeignUnitTracker {
   }
   
   private def flagGhostUnits() {
-    //At the start of the game BWAPI sometimes gives us enemy units that don't make any sense.
+    //At the start of the game BWAPI sometimes gives us enemy units that don't make any sense.\
+    // TODO: Track ghost minerals too
     val ghostUnits = With.game.getAllUnits.asScala.filter(unit => Players.get(unit.getPlayer).isEnemy)
     enemyGhostUnits = ghostUnits.map(_.getID).toSet
     if (ghostUnits.nonEmpty) {

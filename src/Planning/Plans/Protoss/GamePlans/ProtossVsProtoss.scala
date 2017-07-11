@@ -92,8 +92,10 @@ class ProtossVsProtoss extends Parallel {
   
   private class ImplementMidgameDarkTemplar extends Parallel(
     new Build(
+      RequestAtLeast(1, Protoss.Gateway),
       RequestAtLeast(1, Protoss.Assimilator),
       RequestAtLeast(1, Protoss.CyberneticsCore),
+      RequestAtLeast(2, Protoss.Gateway),
       RequestAtLeast(1, Protoss.CitadelOfAdun),
       RequestAtLeast(1, Protoss.TemplarArchives)))
   

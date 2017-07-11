@@ -83,7 +83,9 @@ object Smorc extends Action {
     // Wait for re-enforcements
     val workersTotal  = With.units.ours.count(u => u.unitClass.isWorker)
     val workersHere   = With.units.ours.count(u => u.unitClass.isWorker && u.pixelCenter.zone == zone)
-    if (workersHere * 2 < workersTotal) {
+    if (workersHere * 2 < workersTotal // Tomorrow, there'll be more of us.
+      && workersHere * 2 < enemies.size // Especially vs. 4-Pools
+      ) {
       attack = false
     }
   

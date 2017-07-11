@@ -23,11 +23,13 @@ object Project {
     // Are we building what we need already?
     val incomplete = unitsOfClass.filterNot(_.complete).toVector.sortBy(_.framesBeforeBecomingComplete)
     if (incomplete.size >= shortfall) {
-      incomplete
+      return incomplete
         .take(shortfall)
         .last
         .framesBeforeBecomingComplete
     }
+    
+    // TODO: Could we build one now?
     
     val frameLimits =
       (unitClass.buildUnitsEnabling ++

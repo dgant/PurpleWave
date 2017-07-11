@@ -5,6 +5,7 @@ import Micro.Actions.Action
 import Micro.Actions.Basic.MineralWalk
 import Micro.Actions.Commands.{Attack, Travel}
 import Micro.Execution.ActionState
+import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.EnrichPixel._
 
@@ -90,7 +91,8 @@ object Smorc extends Action {
     }
   
     // If we completely overpower the enemy, let's go kill 'em.
-    if (ourStrength > enemyStrength) {
+    var weOverpower = ourStrength > enemyStrength
+    if (weOverpower) {
       attack = true
     }
     
@@ -114,11 +116,11 @@ object Smorc extends Action {
         destroyBuildings(state)
         return
       }
+      // Don't waste time mineral walking -- we need to get off as many shots as possible
       else if (
         state.unit.canAttackThisFrame ||
-        state.unit.cooldownLeft < targets.map(target =>
-          state.unit.framesToTravelPixels(
-            state.unit.pixelsFromEdgeFast(target))).min) {
+        state.unit.cooldownLeft - With.latency.framesRemaining <=
+          targets.map(target =>state.unit.framesToTravelPixels(state.unit.pixelsFromEdgeFast(target))).min) {
         // Let's pick the outermost target while avoiding drilling stacks
         val nearestTargetDistance = targets.map(_.pixelDistanceFast(exit)).min
         val validTargets = targets.filter(target =>
@@ -126,11 +128,14 @@ object Smorc extends Action {
           && ! drillingEnemies.contains(target))
         val bestTarget =
           validTargets
-            .toVector
             .sortBy(target => target.totalHealth * target.pixelDistanceFast(state.unit))
             .headOption
             .getOrElse(targets.minBy(_.pixelDistanceFast(exit)))
   
+        state.toAttack = Some(bestTarget)
+        Attack.consider(state)
+        /*
+        Mineral-walky version
         if (state.unit.canAttackThisFrame) {
           state.toAttack = Some(bestTarget)
           Attack.consider(state)
@@ -139,6 +144,7 @@ object Smorc extends Action {
           state.toTravel = Some(bestTarget.pixelCenter.project(state.unit.pixelCenter, 4))
           Travel.consider(state)
         }
+        */
         
         return
       }
@@ -146,7 +152,10 @@ object Smorc extends Action {
       
     // We're not attacking, so let's hang out and wait for opportunities
     if (enemiesAttackingUs.nonEmpty || enemies.exists(_.pixelDistanceFast(state.unit) < 64.0)) {
-      mineralWalkAway(state)
+      // Extra aggression vs. 4-pool
+      if ( ! weOverpower) {
+        mineralWalkAway(state)
+      }
     }
     else {
       val freebies = enemies.find(freebie =>
@@ -170,7 +179,11 @@ object Smorc extends Action {
   }
   
   private def destroyBuildings(state: ActionState) {
-    state.toAttack = state.targets.sortBy(_.pixelDistanceFast(state.unit)).headOption
+    // Vs. 4-pool they will often be left with just an egg or two.
+    // We need to surround it and do as much damage to it as possible
+    val egg = With.units.enemy.filter(_.is(Zerg.Egg)).toVector.sortBy(_.totalHealth).headOption
+    lazy val nonEgg = state.targets.sortBy(_.pixelDistanceFast(state.unit)).headOption
+    state.toAttack = egg.orElse(nonEgg)
     Attack.consider(state)
   }
 }

@@ -12,32 +12,34 @@ object ShowStrategyEvaluations extends View {
       .toVector
       .sortBy( - _.interestTotal)
     
-    drawColumn(5, "Strategy", evaluations.map(_.strategy.toString))
-    var nextX = 50
+    drawColumn(5, "Strategy",     evaluations.map(_.strategy.toString))
+    var nextX = 100
     nextX = moveX(nextX)
-    drawColumn(nextX, "Samples",    evaluations.map(_.samplesNeeded.toString))
+    drawColumn(nextX, "Samps",    evaluations.map(_.samplesNeeded.toString))
     nextX = moveX(nextX)
-    drawColumn(nextX, "Games",      evaluations.map(_.games.size.toString))
+    drawColumn(nextX, "Games",    evaluations.map(_.games.size.toString))
     nextX = moveX(nextX)
-    drawColumn(nextX, "Vs. Foe",    evaluations.map(_.gamesVsEnemy.size.toString))
+    drawColumn(nextX, "vFoe",     evaluations.map(_.gamesVsEnemy.size.toString))
     nextX = moveX(nextX)
-    drawColumn(nextX, "Vs. Race",   evaluations.map(_.gamesVsRace.size.toString))
+    drawColumn(nextX, "vRace",    evaluations.map(_.gamesVsRace.size.toString))
     nextX = moveX(nextX)
-    drawColumn(nextX, "On map",     evaluations.map(_.gamesOnMap.size.toString))
+    drawColumn(nextX, "Map",      evaluations.map(_.gamesOnMap.size.toString))
     nextX = moveX(nextX)
-    drawColumn(nextX, "Winrate",    evaluations.map(_.winrateTotal.toString))
+    drawColumn(nextX, "Win",      evaluations.map(_.winrateTotal.toString))
     nextX = moveX(nextX)
-    drawColumn(nextX, "Vs. Foe",    evaluations.map(_.winrateVsEnemy.toString))
+    drawColumn(nextX, "vFoe",     evaluations.map(_.winrateVsEnemy.toString))
     nextX = moveX(nextX)
-    drawColumn(nextX, "Vs. Race",   evaluations.map(_.winrateVsRace.toString))
+    drawColumn(nextX, "vRace",    evaluations.map(_.winrateVsRace.toString))
     nextX = moveX(nextX)
-    drawColumn(nextX, "On map",     evaluations.map(_.winrateOnMap.toString))
+    drawColumn(nextX, "Map",      evaluations.map(_.winrateOnMap.toString))
     nextX = moveX(nextX)
-    drawColumn(nextX, "Expected",   evaluations.map(_.interestTotal.toString))
+    drawColumn(nextX, "Expected", evaluations.map(_.interestTotal.toString))
   }
   
+  
+  
   private def moveX(previousX: Int = 0): Int = {
-    previousX + 30
+    previousX + 45
   }
   
   private def drawColumn(x: Int, name: String, rows: Iterable[String]) {

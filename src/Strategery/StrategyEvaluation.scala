@@ -10,20 +10,20 @@ case class StrategyEvaluation(strategy: Strategy) {
   private val importanceVsRace      = 3.0
   private val importanceOnMap       = 1.0
   
-  var games             : Iterable[HistoricalGame]  = With.history.games.filter(_.strategies.contains(strategy.toString))
-  var gamesVsEnemy      : Iterable[HistoricalGame]  = games.filter(_.enemyName == With.enemy.name)
-  var gamesVsRace       : Iterable[HistoricalGame]  = games.filter(_.enemyRace == With.enemy.race)
-  var gamesOnMap        : Iterable[HistoricalGame]  = games.filter(_.mapName   == With.mapFileName)
-  var samplesNeeded     : Double                    = getConfidenceSamples(strategy)
-  var winrateTotal      : Double                    = winrate(games)
-  var winrateVsEnemy    : Double                    = winrate(gamesVsEnemy)
-  var winrateVsRace     : Double                    = winrate(gamesVsRace)
-  var winrateOnMap      : Double                    = winrate(gamesOnMap)
-  var interestRaw       : Double                    = optimisticWinrate(games,        samplesNeeded)
-  var interestVsEnemy   : Double                    = optimisticWinrate(gamesVsEnemy, samplesNeeded)
-  var interestVsRace    : Double                    = optimisticWinrate(gamesVsRace,  samplesNeeded)
-  var interestOnMap     : Double                    = optimisticWinrate(gamesOnMap,   samplesNeeded)
-  var interestTotal: Double = weigh(Vector(
+  val games             : Iterable[HistoricalGame]  = With.history.games.filter(_.strategies.contains(strategy.toString))
+  val gamesVsEnemy      : Iterable[HistoricalGame]  = games.filter(_.enemyName == With.enemy.name)
+  val gamesVsRace       : Iterable[HistoricalGame]  = games.filter(_.enemyRace == With.enemy.race)
+  val gamesOnMap        : Iterable[HistoricalGame]  = games.filter(_.mapName   == With.mapFileName)
+  val samplesNeeded     : Double                    = getConfidenceSamples(strategy)
+  val winrateTotal      : Double                    = winrate(games)
+  val winrateVsEnemy    : Double                    = winrate(gamesVsEnemy)
+  val winrateVsRace     : Double                    = winrate(gamesVsRace)
+  val winrateOnMap      : Double                    = winrate(gamesOnMap)
+  val interestRaw       : Double                    = optimisticWinrate(games,        samplesNeeded)
+  val interestVsEnemy   : Double                    = optimisticWinrate(gamesVsEnemy, samplesNeeded)
+  val interestVsRace    : Double                    = optimisticWinrate(gamesVsRace,  samplesNeeded)
+  val interestOnMap     : Double                    = optimisticWinrate(gamesOnMap,   samplesNeeded)
+  val interestTotal: Double = weigh(Vector(
     new WinrateFactor(winrateVsEnemy, gamesVsEnemy.size,  samplesNeeded, importanceVsEnemy),
     new WinrateFactor(winrateVsRace,  gamesVsRace.size,   samplesNeeded, importanceVsRace),
     new WinrateFactor(winrateOnMap,   gamesOnMap.size,    samplesNeeded, importanceOnMap)))
@@ -56,13 +56,13 @@ case class StrategyEvaluation(strategy: Strategy) {
       0.0
     }
     else {
-      games.count(_.won) / games.size
+      games.count(_.won).toDouble / games.size
     }
   }
   
   private def optimisticWinrate(games: Iterable[HistoricalGame], confidenceSamples: Double): Double = {
-    val wins = games.count(_.won)
-    val numerator = wins + With.configuration.rideItOutWinrate * Math.max(0, confidenceSamples - games.size)
+    val wins        = games.count(_.won).toDouble
+    val numerator   = wins + With.configuration.rideItOutWinrate * Math.max(0, confidenceSamples - games.size)
     val denominator = Math.max(games.size, confidenceSamples)
     numerator / denominator
   }

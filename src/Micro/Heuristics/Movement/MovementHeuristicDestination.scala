@@ -9,13 +9,9 @@ object MovementHeuristicDestination extends MovementHeuristic {
     
     if (state.toTravel.isEmpty) return HeuristicMathMultiplicative.default
     
-    val candidateDistance = state.unit.tileIncludingCenter.pixelCenter.pixelDistanceFast(candidate)
-  
-    if (candidateDistance <= 0) return HeuristicMathMultiplicative.default
-  
     val before = state.unit.pixelDistanceTravelling(state.unit.pixelCenter, state.toTravel.get)
     val after  = state.unit.pixelDistanceTravelling(candidate,              state.toTravel.get)
   
-    (before - after) / candidateDistance
+    before - after
   }
 }

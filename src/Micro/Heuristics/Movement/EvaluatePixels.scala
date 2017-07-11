@@ -38,7 +38,7 @@ object EvaluatePixels {
     val startingZone  = startingPixel.zone
     val scalingFactor = 8
     val pixels =
-      Circle.points(8)
+      Circle.points(12)
         .map(point => state.unit.pixelCenter.add(scalingFactor * point.x, scalingFactor * point.y))
         .filter(pixel => acceptable(state.unit, pixel, startingPixel))
     pixels

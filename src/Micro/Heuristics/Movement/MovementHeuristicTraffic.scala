@@ -45,9 +45,9 @@ object MovementHeuristicTraffic extends MovementHeuristic {
   }
   
   def measureTraffic(
-                      state       : ActionState,
-                      multiplier  : Double,
-                      candidate   : Tile)
+    state       : ActionState,
+    multiplier  : Double,
+    candidate   : Tile)
       : Double = {
     
     multiplier *

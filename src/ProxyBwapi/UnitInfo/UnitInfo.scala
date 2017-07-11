@@ -46,6 +46,10 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
     history.enqueue(new UnitState(this))
   }
   
+  def lastAttackFrame: Int = {
+    history.filter(_.attackStarting).lastOption.map(_.frame).getOrElse(With.frame)
+  }
+  
   def damageInLastSecond: Int = {
     Math.max(
       0,

@@ -38,12 +38,9 @@ class Commander {
     // WARNING: This requires micro to run on *every frame*!
     //
     nextOrderFrame.keys
-      .filter(unit => unit.attackStarting && unit.is(Protoss.Dragoon))
-      .foreach(dragoon => nextOrderFrame(dragoon) = With.frame + 11)
-  }
-  
-  def eligibleForResleeping(unit: FriendlyUnitInfo):Boolean = {
-    nextOrderFrame.contains(unit) && (unit.attackAnimationHappening || unit.attackStarting)
+      .filter(unit => unit.is(Protoss.Dragoon))
+      .filter(unit => unit.is(Protoss.Dragoon))
+      .foreach(dragoon => nextOrderFrame(dragoon) = Math.max(nextOrderFrame(dragoon), dragoon.lastAttackFrame + 9 - With.latency.latencyFrames))
   }
   
   def ready(unit: FriendlyUnitInfo): Boolean = {

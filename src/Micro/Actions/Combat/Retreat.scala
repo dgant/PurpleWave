@@ -25,7 +25,7 @@ object Retreat extends Action {
       state.origin.pixelDistanceFast(threat.pixelCenter) <
       state.origin.pixelDistanceFast(state.unit.pixelCenter))) {
       
-      state.movementProfile = MovementProfiles.retreat
+      state.movementProfile = MovementProfiles.avoid
       Reposition.delegate(state)
     }
     // If we have nowhere to retreat to, just fight the best we can.

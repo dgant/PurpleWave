@@ -43,7 +43,7 @@ class LockUnits extends ResourceLock {
   def offerUnits(candidates: Iterable[FriendlyUnitInfo]): Option[Iterable[FriendlyUnitInfo]] = {
   
     val desiredUnits    = With.recruiter.getUnits(this).to[mutable.Set]
-    val candidateQueue  = new mutable.PriorityQueue[FriendlyUnitInfo]()(Ordering.by(unitPreference.get.preference))
+    val candidateQueue  = new mutable.PriorityQueue[FriendlyUnitInfo]()(Ordering.by( - unitPreference.get.preference(_))) //Negative because priority queue is highest-first
     candidateQueue ++= candidates.filter(unitMatcher.get.accept)
     
     unitMatcher.get.reset()

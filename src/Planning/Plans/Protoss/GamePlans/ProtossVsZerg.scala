@@ -233,7 +233,7 @@ class ProtossVsZerg extends Parallel {
         new WeAreBeing4Pooled,
         new UnitsAtMost(2, UnitMatchType(Protoss.PhotonCannon), complete = true)),
       new If(
-        new Check(() => With.frame > 24 * (2 * 60)),
+        new Check(() => With.frame > 24 * (2 * 60 + 10)), // When a 4-pool arrives on a tiny rush distance
         new DefendChokeWithWorkers),
       new If(
         new UnitsAtLeast(1, UnitMatchType(Protoss.Pylon), complete = false),

@@ -234,9 +234,12 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   def canDoAnythingThisFrame:Boolean = canDoAnythingThisFrameCache.get
   private val canDoAnythingThisFrameCache = new CacheFrame(() =>
     aliveAndComplete  &&
-    ! stasised        &&
-    ! maelstrommed    &&
-    ! lockedDown)
+      true)
+  
+    // These three checks along comprise 6% of our CPU usage. Yes, really.
+    // ! stasised        &&
+    // ! maelstrommed    &&
+    // ! lockedDown)
   
   def canBeAttackedThisFrame:Boolean = canBeAttackedThisFrameCache.get
   private val canBeAttackedThisFrameCache = new CacheFrame(() =>

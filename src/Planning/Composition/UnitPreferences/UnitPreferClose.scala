@@ -5,5 +5,6 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 case class UnitPreferClose(pixel: Pixel = SpecificPoints.middle) extends UnitPreference {
   
-  override def preference(unit: FriendlyUnitInfo): Double = unit.framesToTravel(pixel)
+  // For performance we use air distance
+  override def preference(unit: FriendlyUnitInfo): Double = unit.framesToTravelPixels(unit.pixelDistanceFast(pixel))
 }

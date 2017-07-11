@@ -32,12 +32,12 @@ case class MovementProfile(
     Vector(
       new MovementHeuristicWeight(MovementHeuristicDestination,             preferDestination,    Colors.NeonViolet),
       new MovementHeuristicWeight(MovementHeuristicOrigin,                  preferOrigin,         Colors.NeonGreen),
-      new MovementHeuristicWeight(MovementHeuristicThreatDistance,          preferThreatDistance, Colors.NeonRed),
+      new MovementHeuristicWeight(MovementHeuristicThreatDistance,          preferThreatDistance, Colors.NeonIndigo),
       new MovementHeuristicWeight(MovementHeuristicTargetInRange,           preferTarget,         Colors.NeonOrange),
       new MovementHeuristicWeight(MovementHeuristicTargetValue,             preferTargetValue,    Colors.NeonOrange),
       new MovementHeuristicWeight(MovementHeuristicMobility,                preferMobility,       Colors.BrightGray),
       new MovementHeuristicWeight(MovementHeuristicExplosions,              -avoidExplosions,     Colors.NeonYellow),
-      new MovementHeuristicWeight(MovementHeuristicExposureToDamage,        -avoidDamage,         Colors.NeonIndigo),
+      new MovementHeuristicWeight(MovementHeuristicExposureToDamage,        -avoidDamage,         Colors.NeonRed),
       new MovementHeuristicWeight(MovementHeuristicTraffic,                 -avoidTraffic,        Colors.NeonTeal),
       new MovementHeuristicWeight(MovementHeuristicShovers,                 -avoidShovers,        Colors.NeonBlue)
     )

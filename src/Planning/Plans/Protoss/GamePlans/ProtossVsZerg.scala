@@ -1,11 +1,12 @@
 package Planning.Plans.Protoss.GamePlans
 
+import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
 import Planning.Composition.UnitCounters.UnitCountBetween
 import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors, UnitMatchWorkers}
 import Planning.Plans.Army._
 import Planning.Plans.Compound.{If, _}
-import Planning.Plans.Information.Employ
+import Planning.Plans.Information.{Employ, Employing}
 import Planning.Plans.Information.Scenarios.WeAreBeing4Pooled
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, FirstFiveMinutes}
@@ -134,6 +135,14 @@ class ProtossVsZerg extends Parallel {
     new Employ(PvZEarly2Gate,        new ImplementEarly2Gate),
     new Employ(PvZEarlyFFELight,     new ImplementEarlyFFELight),
     new Employ(PvZEarlyFFEHeavy,     new ImplementEarlyFFEHeavy),
+    
+    // Build cannons vs. Zergling rushes
+    new If(
+      new Or(
+        new Employing(PvZEarlyFFELight),
+        new Employing(PvZEarlyFFEHeavy)),
+      new TrainMatchingRatio(Protoss.PhotonCannon, UnitMatchType(Zerg.Zergling), 0.5, 6)),
+    
     new TakeSafeNatural,
     new TakeSafeThirdBase,
     
@@ -223,7 +232,9 @@ class ProtossVsZerg extends Parallel {
       new And(
         new WeAreBeing4Pooled,
         new UnitsAtMost(2, UnitMatchType(Protoss.PhotonCannon), complete = true)),
-      new DefendChokeWithWorkers,
+      new If(
+        new Check(() => With.frame > 24 * (2 * 60)),
+        new DefendChokeWithWorkers),
       new If(
         new UnitsAtLeast(1, UnitMatchType(Protoss.Pylon), complete = false),
         new RequireScouting)), // Don't scout while being 4-pooled

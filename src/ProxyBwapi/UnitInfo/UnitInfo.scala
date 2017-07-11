@@ -27,7 +27,7 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
     tileIncludingCenter.toString + " " + pixelCenter.toString
   }
   
-  def is(unitClasses:UnitClass*):Boolean = unitClasses.contains(unitClass)
+  def is(unitClasses: UnitClass*):Boolean = unitClasses.contains(unitClass)
   
   //////////////////
   // Statefulness //
@@ -35,6 +35,11 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
 
   private val history = new mutable.Queue[UnitState]
   def update() {
+    if (history.headOption.exists(_.frame == With.frame)) {
+      // Game is paused; we don't know how to clear the queue
+      return
+    }
+      
     while (history.headOption.exists(_.age > With.configuration.unitHistoryAge)) {
       history.dequeue()
     }

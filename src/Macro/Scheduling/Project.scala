@@ -29,16 +29,22 @@ object Project {
         .framesBeforeBecomingComplete
     }
     
-    ((unitClass.buildUnitsEnabling ++
-      unitClass.buildUnitsBorrowed ++
-      unitClass.buildUnitsSpent)
-        .toSet[UnitClass]
-        .map(requiredClass =>
-          if (unitsInCycle.contains(requiredClass))
-            Int.MaxValue
-          else
-            framesToUnits(requiredClass, 1, unitsInCycle :+ requiredClass)) ++ Set(Int.MaxValue)
-    ).max
+    val frameLimits =
+      (unitClass.buildUnitsEnabling ++
+        unitClass.buildUnitsBorrowed ++
+        unitClass.buildUnitsSpent)
+          .toSet[UnitClass]
+          .map(requiredClass =>
+            if (unitsInCycle.contains(requiredClass))
+              Int.MaxValue
+            else
+              framesToUnits(requiredClass, 1, unitsInCycle :+ requiredClass))
+        
+    if (frameLimits.isEmpty) {
+      Int.MaxValue
+    } else {
+      frameLimits.max
+    }
   }
   
   // Frames before we could possibly have this Tech, not counting costs

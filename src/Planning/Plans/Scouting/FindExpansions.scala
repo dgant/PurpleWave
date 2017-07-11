@@ -16,7 +16,7 @@ class FindExpansions extends Plan {
   description.set("Find enemy expansions")
   
   val scouts = new Property[LockUnits](new LockUnits {
-    unitCounter.set(new UnitCountExactly(1))
+    unitCounter.set(UnitCountExactly(1))
     unitMatcher.set(UnitMatchMobile)
     unitPreference.set(UnitPreferFast)
   })
@@ -28,12 +28,12 @@ class FindExpansions extends Plan {
     scouts.get.units.foreach(orderScout)
   }
   
-  private def orderScout(scout:FriendlyUnitInfo) =
+  private def orderScout(scout: FriendlyUnitInfo) =
     With.executor.intend(new Intention(this, scout) { toTravel = getNextScoutingPixel })
   
-  private def getNextScoutingPixel:Option[Pixel] =
+  private def getNextScoutingPixel: Option[Pixel] =
     With.intelligence.leastScoutedBases
-      .filter(base => base.zone.owner.isNeutral && ! base.zone.island)
+      .filter(base => base.zone.owner.isNeutral && ( ! base.zone.island || With.strategy.isPlasma))
       .map(_.townHallArea.midPixel)
       .headOption
 }

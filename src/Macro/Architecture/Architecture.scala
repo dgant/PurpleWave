@@ -148,26 +148,26 @@ class Architecture {
     val tile = placement.tile.get
   
     val area = TileRectangle(
-      tile.add(placement.buildingDescriptor.relativeBuildStart),
-      tile.add(placement.buildingDescriptor.relativeBuildEnd))
+      tile.add(placement.blueprint.relativeBuildStart),
+      tile.add(placement.blueprint.relativeBuildEnd))
     
     val margin = TileRectangle(
-      tile.add(placement.buildingDescriptor.relativeMarginStart),
-      tile.add(placement.buildingDescriptor.relativeMarginEnd))
+      tile.add(placement.blueprint.relativeMarginStart),
+      tile.add(placement.blueprint.relativeMarginEnd))
     
     unbuildable     ++= margin.tiles
     unwalkable      ++= area.tiles
     untownhallable  ++= area.tiles
     ungassable      ++= area.tiles
   
-    if (placement.buildingDescriptor.powers) {
+    if (placement.blueprint.powers) {
       addPower(tile)
     }
   
     updatePaths() //Invalidate any paths which no longer work
     
     if (ShowArchitecture.inUse) {
-      exclusions += Exclusion(placement.buildingDescriptor.toString, margin)
+      exclusions += Exclusion(placement.blueprint.toString, margin)
     }
   }
   

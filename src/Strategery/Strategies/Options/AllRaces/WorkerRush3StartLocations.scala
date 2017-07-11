@@ -6,7 +6,7 @@ import Strategery.Strategies.Strategy
 
 object WorkerRush3StartLocations extends Strategy {
   
-  override lazy val gameplan: Option[Plan] = Some(new ProbeRush)
+  override lazy val buildGameplan: Option[Plan] = Some(new ProbeRush)
   
   override def startLocationsMin = 3
 }

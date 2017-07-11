@@ -7,7 +7,7 @@ import bwapi.Race
 
 object Proxy2Gate2StartLocations extends Strategy {
   
-  override lazy val gameplan: Option[Plan] = Some(new Proxy2GateAtEnemyNatural)
+  override def buildGameplan(): Option[Plan] = { Some(new Proxy2GateAtEnemyNatural) }
   
   override def ourRaces: Iterable[Race] = Vector(Race.Protoss)
   

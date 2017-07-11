@@ -7,7 +7,7 @@ abstract class Strategy {
   
   override def toString: String = getClass.getSimpleName.replace("$", "")
   
-  lazy val gameplan: Option[Plan] = None
+  def buildGameplan(): Option[Plan] = { None }
   
   def choices: Iterable[Iterable[Strategy]] = Iterable.empty
   

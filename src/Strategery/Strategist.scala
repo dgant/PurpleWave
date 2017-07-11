@@ -19,8 +19,8 @@ class Strategist {
   lazy val isIslandMap: Boolean = heyIsThisAnIslandMap
   
   lazy val gameplan: Plan = selected
-    .find(_.gameplan.isDefined)
-    .map(_.gameplan.get)
+    .find(_.buildGameplan.isDefined)
+    .map(_.buildGameplan.get)
     .getOrElse(new WinTheGame)
   
   def selectStrategies: Set[Strategy] = {

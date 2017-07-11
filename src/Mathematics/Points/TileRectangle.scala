@@ -8,7 +8,7 @@ case class TileRectangle(
     throw new Exception("Created an invalid (non-normalized) rectangle")
   }
   
-  def add(x:Int, y:Int):TileRectangle =
+  def add(x:Int, y:Int): TileRectangle =
     TileRectangle(
       startInclusive.add(x, y),
       endExclusive.add(x, y))
@@ -18,23 +18,23 @@ case class TileRectangle(
       startInclusive.add(-x, -y),
       endExclusive  .add( x,  y))
   
-  def add(Tile: Tile):TileRectangle =
+  def add(Tile: Tile): TileRectangle =
     add(Tile.x, Tile.y)
 
   def midPixel : Pixel = startPixel.midpoint(endPixel)
   def midpoint : Tile  = startInclusive.midpoint(endExclusive)
   
-  def contains(x:Int, y:Int):Boolean =
+  def contains(x: Int, y: Int): Boolean =
     x >= startInclusive.x &&
     y >= startInclusive.y &&
     x < endExclusive.x &&
     y < endExclusive.y
   
-  def contains(tile:Tile):Boolean = {
+  def contains(tile: Tile): Boolean = {
     contains(tile.x, tile.y)
   }
   
-  def intersects(otherRectangle: TileRectangle):Boolean = {
+  def intersects(otherRectangle: TileRectangle): Boolean = {
     containsRectangle(otherRectangle) || otherRectangle.containsRectangle(this)
   }
   

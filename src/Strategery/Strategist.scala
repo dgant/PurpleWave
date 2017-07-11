@@ -3,10 +3,10 @@ package Strategery
 import Lifecycle.With
 import Planning.Plan
 import Planning.Plans.WinTheGame
-import Strategery.History.HistoricalGame
 import Strategery.Strategies.Options.Protoss.ProtossChoices
 import Strategery.Strategies.Strategy
 
+import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 class Strategist {
@@ -49,113 +49,41 @@ class Strategist {
         With.geography.startLocations.forall(start2 =>
           !With.paths.exists(start1, start2)))
   }
+
+  val evaluations = new mutable.HashMap[Strategy, StrategyEvaluation]
   
-  private val rideItOutWinrate      = 0.95
-  private val goalWinrate           = 0.8 // For comparison, the #1 bot in CIG 2016 had a 65% overall winrate
-  private val importanceVsEnemy     = 5.0
-  private val importanceVsRace      = 3.0
-  private val importanceOnMap       = 1.0
+  def evaluate(strategy: Strategy): StrategyEvaluation = {
+    if ( ! evaluations.contains(strategy)) {
+      evaluations.put(strategy, StrategyEvaluation(strategy))
+    }
+    evaluations(strategy)
+  }
   
   private def chooseBest(strategies: Iterable[Strategy]): Iterable[Strategy] = {
-    
     if (strategies.isEmpty) {
       return Iterable.empty
     }
     
-    val output = new ArrayBuffer[Strategy]
+    val output        = new ArrayBuffer[Strategy]
+    val evaluated     = strategies.map(evaluate)
+    val bestVsEnemy   = evaluated.maxBy(_.winrateVsEnemy)
+    val untested      = evaluated.filter(_.games.isEmpty)
     
-    // Goal: Choose the strategy which gives us the best chance of hitting our target winrate vs. this opponent.
-    // There are surely better approaches for doing this, but this is a quick and dirty solution with the CIG deadline impending.
-    //
-    // 1. If we have an undefeated strategy vs. this opponent, keep using it
-    // 2. Otherwise, if we have untested strategies, try the one most likely to win based on prior games
-    // 3. Otherwise, do some number-crunching
-    
-    val games              = strategies.map(strategy => (strategy, With.history.games.filter(_.strategies.contains(strategy.toString)))).toMap
-    val gamesVsEnemy       = strategies.map(strategy => (strategy, games(strategy).filter(_.enemyName == With.enemy.name))).toMap
-    val gamesVsRace        = strategies.map(strategy => (strategy, games(strategy).filter(_.enemyRace == With.enemy.race))).toMap
-    val gamesOnMap         = strategies.map(strategy => (strategy, games(strategy).filter(_.mapName   == With.mapFileName))).toMap
-    val confidenceSamples  = strategies.map(strategy => (strategy, getConfidenceSamples(strategy))).toMap
-    val winratesTotal      = historyToBiasedWinrate(games)
-    val winratesVsEnemy    = historyToBiasedWinrate(gamesVsEnemy)
-    val winratesVsRace     = historyToBiasedWinrate(gamesVsRace)
-    val winratesOnMap      = historyToBiasedWinrate(gamesOnMap)
-    
-    def expectedWinrate(strategy: Strategy): Double = {
-      val factorEnemy   = new Factor(winratesVsEnemy(strategy), gamesVsEnemy(strategy).size,  confidenceSamples(strategy), importanceVsEnemy)
-      val factorRace    = new Factor(winratesVsRace(strategy),  gamesVsRace(strategy).size,   confidenceSamples(strategy), importanceVsRace)
-      val factorMap     = new Factor(winratesOnMap(strategy),   gamesOnMap(strategy).size,    confidenceSamples(strategy), importanceOnMap)
-      val factors       = Vector(factorEnemy, factorRace, factorMap)
-      val weighted      = weigh(factors)
-      weighted
-    }
-    
-    val biasedWinrates = strategies.map(strategy => (strategy, expectedWinrate(strategy))).toMap
-    
-    def chooseBestStrategy = () => {
-      
-      val bestVsEnemy = strategies.maxBy(winratesVsEnemy)
-      lazy val untestedStrategies = strategies.filter(gamesVsEnemy(_).isEmpty)
-  
-      // 1. If we have a near-undefeated strategy vs. this opponent, ride it out
-      if (winratesVsEnemy(bestVsEnemy) > rideItOutWinrate) {
+    val bestEvaluation =
+      if (bestVsEnemy.winrateVsEnemy >= With.configuration.rideItOutWinrate) {
         bestVsEnemy
       }
-      // 2. If there's any strategy we haven't tried yet vs. this opponent, try the best
-      else if (untestedStrategies.nonEmpty) {
-        untestedStrategies.maxBy(biasedWinrates(_))
+      else if (untested.nonEmpty) {
+        untested.head
       }
-      // 3. Otherwise, take the best strategy period
       else {
-        strategies.maxBy(biasedWinrates)
+        evaluated.maxBy(_.interestTotal)
       }
-    }
-    val bestStrategy = chooseBestStrategy()
+    
+    val bestStrategy = bestEvaluation.strategy
     output.append(bestStrategy)
-    if (bestStrategy.choices.nonEmpty) {
-      output ++= bestStrategy.choices.flatMap(choice => chooseBest(choice.filter(isAppropriate)))
-    }
+    output ++= bestStrategy.choices.flatMap(choice => chooseBest(choice.filter(isAppropriate)))
     output
-  }
-  
-  private class Factor(
-    val winrate         : Double,
-    val games           : Double,
-    val confidenceGames : Double,
-    val importance      : Double)
-  
-  private def weigh(factors: Iterable[Factor]): Double = {
-    val effectiveGamesByFactor = factors.map(factor => (factor, factor.importance * Math.max(factor.games, factor.confidenceGames))).toMap
-    val output  = factors.map(factor => factor.winrate * effectiveGamesByFactor(factor)).sum / effectiveGamesByFactor.values.sum
-    output
-  }
-  
-  // How many games before we have confidence in this strategy?
-  // Definitely not statistically sound.
-  private def getConfidenceSamples(strategy: Strategy): Double = {
-    if (strategy.choices.isEmpty) {
-      3.0
-    }
-    else {
-      strategy.choices.map(_.map(getConfidenceSamples).sum).sum
-    }
-  }
-  
-  private def historyToBiasedWinrate(games: Map[Strategy, Iterable[HistoricalGame]]): Map[Strategy, Double] = {
-    games.keys
-      .map(strategy =>
-        (strategy,
-        {
-          // For games below confidenceSamples, assume the strategy's winrate is the target winrate
-          val confidenceGames   = getConfidenceSamples(strategy)
-          val gamesTotal        = games(strategy).size
-          val gamesDenominator  = Math.max(gamesTotal, confidenceGames)
-          val winsReal          = games(strategy).count(_.won).toDouble
-          val winsNumerator     = winsReal + goalWinrate * Math.max(0, getConfidenceSamples(strategy) - gamesTotal)
-          val output            = winsNumerator / gamesDenominator
-          output
-        }))
-      .toMap
   }
 }
 

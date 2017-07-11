@@ -11,6 +11,12 @@ class Configuration {
   var enableStdOut       = false // StdOut crashes bots on SSCAIT because it blocks forever
   var enableChat         = true
   
+  //////////////
+  // Strategy //
+  //////////////
+  
+  var rideItOutWinrate = 0.9
+  
   ///////////
   // Micro //
   ///////////

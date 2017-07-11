@@ -42,16 +42,20 @@ class LockUnits extends ResourceLock {
   
   def offerUnits(candidates: Iterable[FriendlyUnitInfo]): Option[Iterable[FriendlyUnitInfo]] = {
   
-    unitMatcher.get.reset()
-    val desiredUnits = With.recruiter.getUnits(this).to[mutable.Set]
+    val desiredUnits    = With.recruiter.getUnits(this).to[mutable.Set]
+    val candidateQueue  = new mutable.PriorityQueue[FriendlyUnitInfo]()(Ordering.by(unitPreference.get.preference))
+    candidateQueue ++= candidates.filter(unitMatcher.get.accept)
     
-    candidates
-      .toVector
-      .filter(unitMatcher.get.accept)
-      .sortBy(unitPreference.get.preference)
-      .foreach(unit => if (unitCounter.get.continue(desiredUnits)) desiredUnits.add(unit))
-  
+    unitMatcher.get.reset()
+    
+    while (unitCounter.get.continue(desiredUnits) && candidateQueue.nonEmpty) {
+      desiredUnits += candidateQueue.dequeue()
+    }
+    
     isSatisfied = unitCounter.get.accept(desiredUnits)
-    if (isSatisfied) Some(desiredUnits) else None
+    if (isSatisfied)
+      Some(desiredUnits)
+    else
+      None
   }
 }

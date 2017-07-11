@@ -99,7 +99,7 @@ object ShowMovementHeuristics extends View {
   
   def renderLegendKey(group: Iterable[MovementHeuristicEvaluation], order: Int) {
     val left = 5
-    val top = 5
+    val top = 5 * With.visualization.lineHeightSmall
     val rowHeight = 15
     val rowMargin = 2
     val boxStart = Pixel(left, top + (rowHeight + rowMargin) * order)

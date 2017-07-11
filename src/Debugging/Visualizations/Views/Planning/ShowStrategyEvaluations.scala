@@ -16,7 +16,7 @@ object ShowStrategyEvaluations extends View {
     drawColumn(5, "Strategy",     evaluations.map(_.strategy.toString))
     var nextX = 100
     nextX = moveX(nextX)
-    drawColumn(nextX, "Order",    evaluations.map(_.playbookOrder.toString))
+    drawColumn(nextX, "Order",    evaluations.map(e => if (e.playbookOrder > 100) "" else e.playbookOrder.toString))
     nextX = moveX(nextX)
     drawColumn(nextX, "Samps",    evaluations.map(_.samplesNeeded.toString))
     nextX = moveX(nextX)

@@ -6,7 +6,7 @@ import Debugging.Visualizations.Views.Fun._
 import Debugging.Visualizations.Views.Geography._
 import Debugging.Visualizations.Views.Micro._
 import Debugging.Visualizations.Views.Performance.{ShowPerformanceDetails, ShowPerformanceSummary}
-import Debugging.Visualizations.Views.Planning.{ShowPlans, ShowResources, ShowStrategy}
+import Debugging.Visualizations.Views.Planning.{ShowPlans, ShowResources, ShowStrategy, ShowStrategyEvaluations}
 import Debugging.Visualizations.Views.{ShowClock, View}
 import Lifecycle.With
 
@@ -70,7 +70,8 @@ class Visualization {
     ShowPerformanceSummary,
     ShowPlans,
     ShowResources,
-    ShowStrategy
+    ShowStrategy,
+    ShowStrategyEvaluations
   )
   
   def toggle(view: View) {

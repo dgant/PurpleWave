@@ -6,10 +6,11 @@ import Strategery.Strategies.Strategy
 
 case class StrategyEvaluation(strategy: Strategy) {
   private val goalWinrate           = 0.8 // For comparison, the #1 bot in CIG 2016 had a 65% overall winrate
-  private val importanceVsEnemy     = 5.0
-  private val importanceVsRace      = 3.0
+  private val importanceVsEnemy     = 4.0
+  private val importanceVsRace      = 2.0
   private val importanceOnMap       = 1.0
   
+  val playbookOrder     : Int                       = if (Playbook.strategyOrder.contains(strategy)) Playbook.strategyOrder.indexOf(strategy) else Int.MaxValue
   val games             : Iterable[HistoricalGame]  = With.history.games.filter(_.strategies.contains(strategy.toString))
   val gamesVsEnemy      : Iterable[HistoricalGame]  = games.filter(_.enemyName == With.enemy.name)
   val gamesVsRace       : Iterable[HistoricalGame]  = games.filter(_.enemyRace == With.enemy.race)
@@ -24,19 +25,19 @@ case class StrategyEvaluation(strategy: Strategy) {
   val interestVsRace    : Double                    = optimisticWinrate(gamesVsRace,  samplesNeeded)
   val interestOnMap     : Double                    = optimisticWinrate(gamesOnMap,   samplesNeeded)
   val interestTotal: Double = weigh(Vector(
-    new WinrateFactor(winrateVsEnemy, gamesVsEnemy.size,  samplesNeeded, importanceVsEnemy),
-    new WinrateFactor(winrateVsRace,  gamesVsRace.size,   samplesNeeded, importanceVsRace),
-    new WinrateFactor(winrateOnMap,   gamesOnMap.size,    samplesNeeded, importanceOnMap)))
+    new WinrateFactor(interestVsEnemy,  gamesVsEnemy.size,  samplesNeeded, importanceVsEnemy),
+    new WinrateFactor(interestVsRace,   gamesVsRace.size,   samplesNeeded, importanceVsRace),
+    new WinrateFactor(interestOnMap,    gamesOnMap.size,    samplesNeeded, importanceOnMap)))
   
   private class WinrateFactor(
-    val winrate         : Double,
+    val interest        : Double,
     val games           : Double,
     val confidenceGames : Double,
     val importance      : Double)
   
   private def weigh(factors: Iterable[WinrateFactor]): Double = {
     val effectiveGamesByFactor = factors.map(factor => (factor, factor.importance * Math.max(factor.games, factor.confidenceGames))).toMap
-    val output  = factors.map(factor => factor.winrate * effectiveGamesByFactor(factor)).sum / effectiveGamesByFactor.values.sum
+    val output = factors.map(factor => factor.interest * effectiveGamesByFactor(factor)).sum / effectiveGamesByFactor.values.sum
     output
   }
   
@@ -44,7 +45,7 @@ case class StrategyEvaluation(strategy: Strategy) {
   // Definitely not statistically sound.
   private def getConfidenceSamples(strategy: Strategy): Double = {
     if (strategy.choices.isEmpty) {
-      3.0
+      6.0
     }
     else {
       strategy.choices.map(_.map(getConfidenceSamples).sum).sum

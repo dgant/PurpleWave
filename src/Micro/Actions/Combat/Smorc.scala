@@ -182,7 +182,7 @@ object Smorc extends Action {
     // Vs. 4-pool they will often be left with just an egg or two.
     // We need to surround it and do as much damage to it as possible
     val egg = With.units.enemy.filter(_.is(Zerg.Egg)).toVector.sortBy(_.totalHealth).headOption
-    lazy val nonEgg = state.targets.sortBy(_.pixelDistanceFast(state.unit)).headOption
+    lazy val nonEgg = state.targets.sortBy(_.totalHealth).headOption
     state.toAttack = egg.orElse(nonEgg)
     Attack.consider(state)
   }

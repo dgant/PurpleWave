@@ -10,10 +10,13 @@ object ShowStrategyEvaluations extends View {
     
     val evaluations = With.strategy.evaluations.values
       .toVector
+      .sortBy(_.playbookOrder)
       .sortBy( - _.interestTotal)
     
     drawColumn(5, "Strategy",     evaluations.map(_.strategy.toString))
     var nextX = 100
+    nextX = moveX(nextX)
+    drawColumn(nextX, "Order",    evaluations.map(_.playbookOrder.toString))
     nextX = moveX(nextX)
     drawColumn(nextX, "Samps",    evaluations.map(_.samplesNeeded.toString))
     nextX = moveX(nextX)
@@ -33,7 +36,7 @@ object ShowStrategyEvaluations extends View {
     nextX = moveX(nextX)
     drawColumn(nextX, "Map",      evaluations.map(e => formatWinrate(e.winrateOnMap)))
     nextX = moveX(nextX)
-    drawColumn(nextX, "Expected", evaluations.map(e => formatWinrate(e.interestTotal)))
+    drawColumn(nextX, "Hope",     evaluations.map(e => formatWinrate(e.interestTotal)))
   }
   
   private def formatWinrate(value: Double): String = {

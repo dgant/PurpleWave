@@ -19,12 +19,13 @@ class Strategist {
   lazy val isIslandMap: Boolean = heyIsThisAnIslandMap
   
   lazy val gameplan: Plan = selected
-    .find(_.buildGameplan.isDefined)
-    .map(_.buildGameplan.get)
+    .find(_.buildGameplan().isDefined)
+    .map(_.buildGameplan().get)
     .getOrElse(new WinTheGame)
   
   def selectStrategies: Set[Strategy] = {
     val strategies = ProtossChoices.options.filter(isAppropriate)
+    strategies.foreach(evaluate)
     chooseBest(strategies).toSet
   }
   
@@ -55,6 +56,7 @@ class Strategist {
   def evaluate(strategy: Strategy): StrategyEvaluation = {
     if ( ! evaluations.contains(strategy)) {
       evaluations.put(strategy, StrategyEvaluation(strategy))
+      strategy.choices.flatten.filter(isAppropriate).foreach(evaluate)
     }
     evaluations(strategy)
   }
@@ -66,15 +68,18 @@ class Strategist {
     
     val output        = new ArrayBuffer[Strategy]
     val evaluated     = strategies.map(evaluate)
-    val bestVsEnemy   = evaluated.maxBy(_.winrateVsEnemy)
+    val bestVsEnemy   = evaluated.map(_.winrateVsEnemy).max
     val untested      = evaluated.filter(_.games.isEmpty)
     
     val bestEvaluation =
-      if (bestVsEnemy.winrateVsEnemy >= With.configuration.rideItOutWinrate) {
-        bestVsEnemy
+      if (bestVsEnemy >= With.configuration.rideItOutWinrate) {
+        evaluated
+          .filter(_.winrateVsEnemy >= bestVsEnemy)
+          .toVector
+          .minBy(_.playbookOrder)
       }
       else if (untested.nonEmpty) {
-        untested.head
+        untested.minBy(_.playbookOrder)
       }
       else {
         evaluated.maxBy(_.interestTotal)

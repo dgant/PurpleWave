@@ -20,14 +20,15 @@ class Visualization {
   //////////////
   
   var views = mutable.ArrayBuffer(
-    //Evergreen
+    // Evergreen views
+    ShowPerformanceSummary,
+    ShowClock,
+    ShowStrategy,
     ShowBases,
     ShowUnits,
     ShowUnitsForeign,
-    ShowUnitsFriendly,
-    ShowPerformanceSummary,
-    ShowClock,
-    ShowStrategy
+    ShowUnitsFriendly
+    ////////////
   )
   
   var enabled   = false
@@ -58,6 +59,7 @@ class Visualization {
     ShowGroundskeeper,
     ShowZoneBorderTiles,
     ShowZones,
+    ShowZonePathDemo,
     ShowGrids,
     ShowMovementHeuristics,
     ShowUnits,

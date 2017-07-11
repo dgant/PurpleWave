@@ -8,6 +8,8 @@ import scala.collection.immutable.Seq
 
 class Edge(choke: Chokepoint) {
   
+  def otherSideof(zone: Zone): Zone = zones.filter(_ != zone).head
+  
   lazy val centerPixel  : Pixel = new Pixel(choke.getCenter)
   lazy val radiusPixels : Double = choke.getWidth / 2
   lazy val sidePixels   : Seq[Pixel] = Vector(new Pixel(choke.getSides.first), new Pixel(choke.getSides.second))

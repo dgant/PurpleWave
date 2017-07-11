@@ -6,7 +6,7 @@ import Mathematics.Points.{Pixel, Tile}
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
-object PathFinder {
+object GroundPathFinder {
   
   def groundDistanceFast(from: Pixel, to: Pixel): Double = {
     
@@ -17,7 +17,7 @@ object PathFinder {
       return from.pixelDistanceFast(to)
     }
     
-    if ( ! With.paths.exists(
+    if ( ! With.paths.groundPathExists(
       fromZone.centroid,
       toZone.centroid,
       requireBwta = true)) {
@@ -37,15 +37,6 @@ object PathFinder {
           requireBwta = true))
         .min)
       .min
-  }
-  
-  case class TilePath(
-    start     : Tile,
-    end       : Tile,
-    distance  : Int,
-    visited   : Int,
-    tiles     : Option[Iterable[Tile]]) {
-    def pathExists: Boolean = tiles.nonEmpty
   }
   
   def manhattanGroundDistanceThroughObstacles(

@@ -48,7 +48,7 @@ class Strategist {
     isPlasma ||
       With.geography.startLocations.forall(start1 =>
         With.geography.startLocations.forall(start2 =>
-          !With.paths.exists(start1, start2)))
+          !With.paths.groundPathExists(start1, start2)))
   }
 
   val evaluations = new mutable.HashMap[Strategy, StrategyEvaluation]

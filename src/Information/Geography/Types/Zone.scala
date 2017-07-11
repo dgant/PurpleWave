@@ -19,7 +19,7 @@ class Zone(
   lazy val  centroid    : Tile              = if (tiles.isEmpty) new Pixel(bwtaRegion.getCenter).tileIncluding else tiles.minBy(_.tileDistanceSquared(new Pixel(bwtaRegion.getCenter).tileIncluding))
   lazy val  area        : Double            = bwtaRegion.getPolygon.getArea
   lazy val  points      : Iterable[Pixel]   = bwtaRegion.getPolygon.getPoints.asScala.map(new Pixel(_)).toVector
-  lazy val  island      : Boolean           = ! With.geography.startLocations.exists(startTile => With.paths.exists(centroid, startTile))
+  lazy val  island      : Boolean           = ! With.geography.startLocations.exists(startTile => With.paths.groundPathExists(centroid, startTile))
   lazy val  exit        : Option[Edge]      = if (edges.isEmpty) None else Some(edges.minBy(edge => With.geography.startLocations.map(_.groundPixels(edge.centerPixel)).max))
   var       isWalledIn  : Boolean           = false
   

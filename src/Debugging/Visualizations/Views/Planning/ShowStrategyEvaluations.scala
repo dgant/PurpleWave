@@ -37,7 +37,7 @@ object ShowStrategyEvaluations extends View {
   }
   
   private def formatWinrate(value: Double): String = {
-    (value * 100.0).toInt + """%"""
+    (value * 100.0).toInt + """%%"""
   }
   
   private def moveX(previousX: Int = 0): Int = {

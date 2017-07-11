@@ -25,21 +25,23 @@ object ShowStrategyEvaluations extends View {
     nextX = moveX(nextX)
     drawColumn(nextX, "Map",      evaluations.map(_.gamesOnMap.size.toString))
     nextX = moveX(nextX)
-    drawColumn(nextX, "Win",      evaluations.map(_.winrateTotal.toString))
+    drawColumn(nextX, "Win",      evaluations.map(e => formatWinrate(e.winrateTotal)))
     nextX = moveX(nextX)
-    drawColumn(nextX, "vFoe",     evaluations.map(_.winrateVsEnemy.toString))
+    drawColumn(nextX, "vFoe",     evaluations.map(e => formatWinrate(e.winrateVsEnemy)))
     nextX = moveX(nextX)
-    drawColumn(nextX, "vRace",    evaluations.map(_.winrateVsRace.toString))
+    drawColumn(nextX, "vRace",    evaluations.map(e => formatWinrate(e.winrateVsRace)))
     nextX = moveX(nextX)
-    drawColumn(nextX, "Map",      evaluations.map(_.winrateOnMap.toString))
+    drawColumn(nextX, "Map",      evaluations.map(e => formatWinrate(e.winrateOnMap)))
     nextX = moveX(nextX)
-    drawColumn(nextX, "Expected", evaluations.map(_.interestTotal.toString))
+    drawColumn(nextX, "Expected", evaluations.map(e => formatWinrate(e.interestTotal)))
   }
   
-  
+  private def formatWinrate(value: Double): String = {
+    (value * 100.0).toInt + """%"""
+  }
   
   private def moveX(previousX: Int = 0): Int = {
-    previousX + 45
+    previousX + 35
   }
   
   private def drawColumn(x: Int, name: String, rows: Iterable[String]) {

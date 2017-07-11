@@ -27,10 +27,7 @@ class Visualization {
     ShowUnitsFriendly,
     ShowPerformanceSummary,
     ShowClock,
-    ShowStrategy,
-  
-    ShowScheduler,
-    ShowResources
+    ShowStrategy
   )
   
   var enabled   = false

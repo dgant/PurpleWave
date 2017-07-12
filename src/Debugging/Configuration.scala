@@ -66,6 +66,7 @@ class Configuration {
   // Performance //
   /////////////////
   
+  var buildingPlacementMaxTilesToEvaluate = 5000
   var buildingPlacementBatchSize          = 300
   var buildingPlacementMaximumQueue       = 40
   var garbageCollectionThresholdMs        = 5
@@ -79,7 +80,6 @@ class Configuration {
   var urgentBuildingPlacementCutoffFrames = 24 * 60 * 15
   var urgentBuildingPlacementCooldown     = 24 * 5
   var unitHistoryAge                      = 24 * 3
-  var buildingPlacements                  = 5
   
   var urgencyManners            = 1
   var urgencyEconomy            = 1

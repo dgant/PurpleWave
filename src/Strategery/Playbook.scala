@@ -16,6 +16,7 @@ object Playbook {
   // Use these whenever possible.
   //
   val forced = Vector(
+    Proxy2Gate2StartLocations,
     Proxy2Gate3StartLocations
   )
   

@@ -3,7 +3,8 @@ package Macro.Architecture.PlacementStates
 import Debugging.Visualizations.Views.Geography.ShowArchitectureHeuristics
 import Lifecycle.With
 import Macro.Architecture.Heuristics.{EvaluatePlacements, PlacementHeuristicEvaluation}
-import Macro.Architecture.{Architect, Blueprint, Placement, Surveyor}
+import Macro.Architecture.Tiles.Surveyor
+import Macro.Architecture.{Architect, Blueprint, Placement}
 import Mathematics.Heuristics.HeuristicMathMultiplicative
 import Mathematics.Points.Tile
 
@@ -12,7 +13,7 @@ import scala.collection.mutable.ArrayBuffer
 
 class PlacementStateEvaluating(blueprint: Blueprint) extends PlacementState {
   
-  private var candidatesUnfiltered  : Option[Array[Tile]]       = None
+  private var candidatesUnfiltered  : Option[ArrayBuffer[Tile]] = None
   private var candidatesFiltered    : Option[ArrayBuffer[Tile]] = None
   private var nextFilteringIndex    : Int                       = 0
   private var nextEvaluationIndex   : Int                       = 0
@@ -22,8 +23,14 @@ class PlacementStateEvaluating(blueprint: Blueprint) extends PlacementState {
   override def step() {
     if (candidatesUnfiltered.isEmpty) {
       // Figure out which tiles to evaluate
-      candidatesUnfiltered  = Some(Surveyor.candidates(blueprint).toArray)
+      val sources = Surveyor.candidates(blueprint)
+      candidatesUnfiltered  = Some(new ArrayBuffer[Tile])
       candidatesFiltered    = Some(new ArrayBuffer[Tile])
+      sources.foreach(source => {
+        if (candidatesUnfiltered.size < With.configuration.buildingPlacementMaxTilesToEvaluate) {
+          candidatesUnfiltered.get ++= source.tiles(blueprint)
+        }
+      })
     }
     else if (stillFiltering) {
       // Filter them (in batches)

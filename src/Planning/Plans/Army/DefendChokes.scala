@@ -30,7 +30,6 @@ class DefendChokes extends Plan {
           With.geography.enemyBases.map(_.heart.pixelCenter.pixelDistanceFast(choke.centerPixel)).min
         else
           With.intelligence.mostBaselikeEnemyTile.pixelCenter.pixelDistanceFast(choke.centerPixel))
-      .take(2)
     
     if (chokes.isEmpty) return
     

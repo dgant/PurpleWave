@@ -15,7 +15,7 @@ object BorderFinder {
     val output = new mutable.HashSet[Zone]
     
     // Start with our bases
-    val playerZones = With.geography.bases.filter(base => base.owner == player || (player.isUs && base.planningToTake)).map(_.zone)
+    val playerZones = With.geography.bases.filter(base => base.owner == player).map(_.zone)
     output ++= playerZones
     
     // Include all zones along the shortest paths between the bases

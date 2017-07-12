@@ -60,7 +60,6 @@ abstract class AbstractProxy2Gate extends Parallel {
       override lazy val blueprints = Vector(
         new Blueprint(this, building = Some(Protoss.Pylon),   zone = proxyZone, argPlacement = Some(PlacementProfiles.proxyPylon)),
         new Blueprint(this, building = Some(Protoss.Gateway), zone = proxyZone, argPlacement = Some(PlacementProfiles.proxy)),
-        new Blueprint(this, building = Some(Protoss.Gateway), zone = proxyZone, argPlacement = Some(PlacementProfiles.proxy)),
         new Blueprint(this, building = Some(Protoss.Gateway), zone = proxyZone, argPlacement = Some(PlacementProfiles.proxy)))
     },
     new Build(

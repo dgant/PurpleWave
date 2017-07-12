@@ -42,7 +42,7 @@ class Configuration {
   ///////////
   
   var maxMineralsBeforeMinedOut       = 300 * 8
-  var maxFramesToSendAdvanceBuilder   = 24 * 20
+  var maxFramesToSendAdvanceBuilder   = 24 * 40
   var maxFramesToTrustBuildRequest    = 24 * 60 * 10
   var baseRadiusPixels                = 32.0 * 15.0
   var baseMergingRangePixels          = 32.0 * 12.0

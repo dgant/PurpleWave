@@ -8,12 +8,14 @@ object Surveyor {
   
   def candidates(blueprint: Blueprint): Iterable[Tile] = {
     
-    // Ugh. Plasma completely confounds BWTA which wrecks everything related to zone logic.
-    if (With.strategy.isPlasma) {
-      return plasmaCandidates(blueprint: Blueprint)
+    if (blueprint.tiles.isDefined) {
+      blueprint.tiles.get
     }
-    
-    if (blueprint.townHall) {
+    else if (With.strategy.isPlasma) {
+      // Ugh. Plasma completely confounds BWTA which wrecks everything related to zone logic.
+      plasmaCandidates(blueprint: Blueprint)
+    }
+    else if (blueprint.townHall) {
       With.geography.bases
         .filterNot(base => base.owner.isEnemy || base.zone.island)
         .map(_.townHallArea.startInclusive)

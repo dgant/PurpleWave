@@ -24,9 +24,16 @@ class Strategist {
     .getOrElse(new WinTheGame)
   
   def selectStrategies: Set[Strategy] = {
-    val strategies = ProtossChoices.options.filter(isAppropriate)
+    val strategies = filterForcedStrategies(ProtossChoices.options.filter(isAppropriate))
     strategies.foreach(evaluate)
     chooseBest(strategies).toSet
+  }
+  
+  private def filterForcedStrategies(strategies: Iterable[Strategy]): Iterable[Strategy] = {
+    if (strategies.exists(Playbook.forced.contains))
+      strategies.filter(Playbook.forced.contains)
+    else
+      strategies
   }
   
   private def isAppropriate(strategy: Strategy): Boolean = {
@@ -37,7 +44,6 @@ class Strategist {
     val startLocations = With.geography.startLocations.size
     
     ! Playbook.disabled.contains(strategy)                          &&
-    (Playbook.forced.contains(strategy) || Playbook.forced.isEmpty) &&
     (strategy.islandMaps  || ! isIsland)                            &&
     (strategy.groundMaps  || ! isGround)                            &&
     strategy.ourRaces.exists(_ == ourRace)                          &&
@@ -58,7 +64,7 @@ class Strategist {
   def evaluate(strategy: Strategy): StrategyEvaluation = {
     if ( ! evaluations.contains(strategy)) {
       evaluations.put(strategy, StrategyEvaluation(strategy))
-      strategy.choices.flatten.filter(isAppropriate).foreach(evaluate)
+      strategy.choices.flatMap(choices => filterForcedStrategies(choices.filter(isAppropriate))).foreach(evaluate)
     }
     evaluations(strategy)
   }
@@ -89,7 +95,7 @@ class Strategist {
     
     val bestStrategy = bestEvaluation.strategy
     output.append(bestStrategy)
-    output ++= bestStrategy.choices.flatMap(choice => chooseBest(choice.filter(isAppropriate)))
+    output ++= bestStrategy.choices.flatMap(choice => chooseBest(filterForcedStrategies(choice.filter(isAppropriate))))
     output
   }
 }

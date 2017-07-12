@@ -15,5 +15,5 @@ class UnitsAtMost(
   
   override def isComplete: Boolean = With.units.ours.count(unit =>
     ( ! complete || unit.complete) &&
-      matcher.accept(unit)) <= quantity
+    matcher.accept(unit)) <= quantity
 }

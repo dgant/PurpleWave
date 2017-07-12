@@ -13,6 +13,7 @@ class PlacementProfile(
   var preferDistanceFromEnemy     : Double = 0.0,
   var preferCoveringWorkers       : Double = 0.0,
   var avoidDistanceFromBase       : Double = 0.0,
+  var avoidDistanceFromEnemy      : Double = 0.0,
   var avoidDistanceFromIdealRange : Double = 0.0,
   var avoidSurfaceArea            : Double = 0.0) {
   
@@ -25,6 +26,7 @@ class PlacementProfile(
       new PlacementHeuristicWeight(PlacementHeuristicPowering,                preferPowering,               Colors.NeonGreen),
       new PlacementHeuristicWeight(PlacementHeuristicDistanceFromEnemy,       preferDistanceFromEnemy,      Colors.NeonTeal),
       new PlacementHeuristicWeight(PlacementHeuristicDistanceFromBase,        -avoidDistanceFromBase,       Colors.NeonBlue),
+      new PlacementHeuristicWeight(PlacementHeuristicDistanceFromBase,        -avoidDistanceFromEnemy,      Colors.NeonBlue),
       new PlacementHeuristicWeight(PlacementHeuristicDistanceFromIdealRange,  -avoidDistanceFromIdealRange, Colors.NeonIndigo),
       new PlacementHeuristicWeight(PlacementHeuristicSurfaceArea,             -avoidSurfaceArea,            Colors.NeonViolet)
     )

@@ -5,7 +5,7 @@ import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Plans.Army.{ConsiderAttacking, ControlMap}
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.Information.Employ
-import Planning.Plans.Macro.Automatic.{RequireSufficientPylons, TrainContinuously}
+import Planning.Plans.Macro.Automatic.{RequireSufficientPylons, TrainContinuously, TrainProbesContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Milestones.UnitsAtLeast
@@ -30,7 +30,7 @@ class ProtossVsRandom extends Parallel {
     new Employ(PvREarly2Gate99, new Build(ProtossBuilds.OpeningTwoGate1012: _*)),
     new RequireSufficientPylons,
     new TrainContinuously(Protoss.Zealot),
-    new TrainContinuously(Protoss.Probe),
+    new TrainProbesContinuously,
     new RequireMiningBases(2),
     new Build(
       RequestAtLeast(1, Protoss.Assimilator),

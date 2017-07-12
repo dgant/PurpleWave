@@ -3,15 +3,19 @@ package Planning.Plans.Protoss.GamePlans
 import Information.Geography.Types.Zone
 import Lifecycle.With
 import Macro.Architecture.Blueprint
+import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.RequestAtLeast
 import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Plans.Army.Attack
-import Planning.Plans.Compound.{If, Parallel, Trigger}
-import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientPylons, TrainContinuously}
+import Planning.Plans.Compound.{And, If, Parallel, Trigger}
+import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientPylons, TrainContinuously, TrainProbesContinuously}
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
-import Planning.Plans.Macro.Milestones.UnitsAtLeast
-import ProxyBwapi.Races.Protoss
+import Planning.Plans.Macro.Expanding.{BuildAssimilators, RequireMiningBases}
+import Planning.Plans.Macro.Milestones.{EnemyUnitsAtMost, UnitsAtLeast}
+import Planning.Plans.Macro.Upgrades.UpgradeContinuously
+import Planning.Plans.Scouting.RequireEnemyBase
+import ProxyBwapi.Races.{Protoss, Terran}
 
 abstract class AbstractProxy2Gate extends Parallel {
   
@@ -25,17 +29,17 @@ abstract class AbstractProxy2Gate extends Parallel {
   children.set(Vector(
     new ProposePlacement{
       override lazy val blueprints = Vector(
-        new Blueprint(this, building = Some(Protoss.Pylon),   zone = proxyZone),
-        new Blueprint(this, building = Some(Protoss.Gateway), zone = proxyZone),
-        new Blueprint(this, building = Some(Protoss.Gateway), zone = proxyZone),
-        new Blueprint(this, building = Some(Protoss.Gateway), zone = proxyZone))
+        new Blueprint(this, building = Some(Protoss.Pylon),   zone = proxyZone, argPlacement = Some(PlacementProfiles.proxyPylon)),
+        new Blueprint(this, building = Some(Protoss.Gateway), zone = proxyZone, argPlacement = Some(PlacementProfiles.proxy)),
+        new Blueprint(this, building = Some(Protoss.Gateway), zone = proxyZone, argPlacement = Some(PlacementProfiles.proxy)),
+        new Blueprint(this, building = Some(Protoss.Gateway), zone = proxyZone, argPlacement = Some(PlacementProfiles.proxy)))
     },
     new Build(
       RequestAtLeast(1, Protoss.Nexus),
       RequestAtLeast(9, Protoss.Probe),
       RequestAtLeast(1, Protoss.Pylon)),
     
-    // Crappy haxx to make this all work
+    // Crappy haxx to make this all work, and to not pull three Probes to build three buildings
     new If(
       new UnitsAtLeast(1, UnitMatchType(Protoss.Pylon), complete = false),
       new Build(RequestAtLeast(1, Protoss.Gateway))),
@@ -46,10 +50,29 @@ abstract class AbstractProxy2Gate extends Parallel {
       new UnitsAtLeast(2, UnitMatchType(Protoss.Gateway), complete = false),
       initialAfter = new Parallel(
         new RequireSufficientPylons,
-        new TrainContinuously(Protoss.Zealot),
-        new TrainContinuously(Protoss.Probe),
-        new TrainContinuously(Protoss.Gateway, 5))),
-    
+        new If(
+          new And(
+            new EnemyUnitsAtMost(0, UnitMatchType(Terran.Factory), complete = true),
+            new EnemyUnitsAtMost(0, UnitMatchType(Terran.Vulture))),
+          new Parallel(
+            new TrainContinuously(Protoss.Zealot),
+            new TrainProbesContinuously,
+            new TrainContinuously(Protoss.Gateway, 5)),
+          new Parallel(
+            new TrainContinuously(Protoss.Probe),
+            new Build(RequestAtLeast(1, Protoss.CyberneticsCore)),
+            new BuildAssimilators,
+            new If(
+              new And(
+                new UnitsAtLeast(1, UnitMatchType(Protoss.CyberneticsCore), complete = true),
+                new UnitsAtLeast(1, UnitMatchType(Protoss.Assimilator), complete = true)),
+              new Parallel(
+                new UpgradeContinuously(Protoss.DragoonRange),
+                new TrainContinuously(Protoss.Dragoon)),
+              new TrainContinuously(Protoss.Zealot)),
+            new RequireMiningBases(2),
+            new Build(RequestAtLeast(7, Protoss.Gateway)))),
+        new RequireEnemyBase)),
     new Attack,
     new FollowBuildOrder,
     new Gather

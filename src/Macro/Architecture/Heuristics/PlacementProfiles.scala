@@ -67,6 +67,17 @@ object PlacementProfiles {
     avoidSurfaceArea            = 1.0,
     avoidDistanceFromIdealRange = 2.0)
   
+  var proxy = new PlacementProfile(
+    "Proxy",
+    avoidDistanceFromBase       = 1.0,
+    avoidDistanceFromEnemy      = 1.0)
+  
+  var proxyPylon = new PlacementProfile(
+    "Proxy Pylon",
+    preferPowering              = 1.0,
+    avoidDistanceFromBase       = 1.0,
+    avoidDistanceFromEnemy      = 1.0)
+  
   def default(blueprint: Blueprint): PlacementProfile = {
     if (blueprint.townHall)
       townHall

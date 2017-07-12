@@ -21,6 +21,7 @@ class Blueprint(
   argWall         : Option[Boolean]           = None,
   argPlacement    : Option[PlacementProfile]  = None,
   argRangePixels  : Option[Double]            = None,
+  val tiles       : Option[Iterable[Tile]]    = None,
   val zone        : Option[Zone]              = None) {
   
   var id: Option[Int] = None

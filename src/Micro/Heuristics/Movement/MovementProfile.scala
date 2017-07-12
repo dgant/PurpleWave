@@ -3,16 +3,17 @@ package Micro.Heuristics.Movement
 import Debugging.Visualizations.Colors
 
 case class MovementProfile(
-  var preferDestination     : Double = 0,
-  var preferOrigin          : Double = 0,
-  var preferThreatDistance  : Double = 0,
-  var preferTarget          : Double = 0,
-  var preferTargetValue     : Double = 0,
-  var preferMobility        : Double = 0,
-  var avoidExplosions       : Double = 0,
-  var avoidDamage           : Double = 0,
-  var avoidTraffic          : Double = 0,
-  var avoidShovers          : Double = 0) {
+  var preferDestination     : Double = 0.0,
+  var preferOrigin          : Double = 0.0,
+  var preferThreatDistance  : Double = 0.0,
+  var preferTarget          : Double = 0.0,
+  var preferTargetValue     : Double = 0.0,
+  var preferMobility        : Double = 0.0,
+  var avoidExplosions       : Double = 0.0,
+  var avoidDetection        : Double = 0.0,
+  var avoidDamage           : Double = 0.0,
+  var avoidTraffic          : Double = 0.0,
+  var avoidShovers          : Double = 0.0) {
   
   def this(source: MovementProfile) {
     this(
@@ -23,6 +24,7 @@ case class MovementProfile(
       source.preferTargetValue,
       source.preferMobility,
       source.avoidExplosions,
+      source.avoidDetection,
       source.avoidDamage,
       source.avoidTraffic,
       source.avoidShovers)
@@ -37,6 +39,7 @@ case class MovementProfile(
       new MovementHeuristicWeight(MovementHeuristicTargetValue,             preferTargetValue,    Colors.NeonOrange),
       new MovementHeuristicWeight(MovementHeuristicMobility,                preferMobility,       Colors.BrightGray),
       new MovementHeuristicWeight(MovementHeuristicExplosions,              -avoidExplosions,     Colors.NeonYellow),
+      new MovementHeuristicWeight(MovementHeuristicDetection,               -avoidDetection,      Colors.NeonGreen),
       new MovementHeuristicWeight(MovementHeuristicExposureToDamage,        -avoidDamage,         Colors.NeonRed),
       new MovementHeuristicWeight(MovementHeuristicTraffic,                 -avoidTraffic,        Colors.NeonTeal),
       new MovementHeuristicWeight(MovementHeuristicShovers,                 -avoidShovers,        Colors.NeonBlue)

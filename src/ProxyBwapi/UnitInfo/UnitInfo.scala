@@ -50,7 +50,9 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
     history.filter(_.attackStarting).lastOption.map(_.frame).getOrElse(0)
   }
   
-  def damageInLastSecond: Int = {
+  def damageInLastSecond: Int = damageInLastSectiondCache.get
+  
+  private val damageInLastSectiondCache = new CacheFrame(() =>
     Math.max(
       0,
       history
@@ -60,8 +62,7 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
           lastState.hitPoints             - hitPoints     +
           lastState.shieldPoints          - shieldPoints  +
           lastState.defensiveMatrixPoints - defensiveMatrixPoints)
-        .getOrElse(0))
-  }
+        .getOrElse(0)))
   
   private lazy val stuckMoveFrames     = 12
   private lazy val stuckAttackFrames = cooldownMaxAirGround + 8

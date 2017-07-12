@@ -1,5 +1,7 @@
 package Micro.Heuristics.Movement
 
+import Lifecycle.With
+import Mathematics.Heuristics.HeuristicMathMultiplicative
 import Mathematics.Points.Pixel
 import Micro.Execution.ActionState
 import ProxyBwapi.UnitInfo.UnitInfo
@@ -7,6 +9,12 @@ import ProxyBwapi.UnitInfo.UnitInfo
 object MovementHeuristicExposureToDamage extends MovementHeuristic {
   
   override def evaluate(state: ActionState, candidate: Pixel): Double = {
+    
+    if (state.unit.effectivelyCloaked
+      && ! With.grids.enemyDetection.get(candidate.tileIncluding)
+      && state.unit.damageInLastSecond == 0) {
+      return HeuristicMathMultiplicative.default
+    }
     
     // DPS grid's resolution is too low. It leads to wobby, wasteful movement.
     // With.grids.dpsEnemy.get(candidate.tileIncluding, state.unit)

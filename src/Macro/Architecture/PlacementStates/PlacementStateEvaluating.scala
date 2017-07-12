@@ -31,11 +31,16 @@ class PlacementStateEvaluating(blueprint: Blueprint) extends PlacementState {
           candidatesUnfiltered.get ++= source.tiles(blueprint)
         }
       })
+      val candidates = candidatesUnfiltered.get.take(With.configuration.buildingPlacementMaxTilesToEvaluate)
+      candidatesUnfiltered = Some(new ArrayBuffer[Tile])
+      candidatesUnfiltered.get ++= candidates
     }
     else if (stillFiltering) {
       // Filter them (in batches)
       var evaluationCount = 0
-      while (stillFiltering && evaluationCount < With.configuration.buildingPlacementBatchSize) {
+      while (stillFiltering && (
+        evaluationCount < With.configuration.buildingPlacementBatchSize
+          || With.frame < With.configuration.buildingPlacementBatchingStartFrame)) {
         evaluationCount += 1
         val nextCandidate = candidatesUnfiltered.get(nextFilteringIndex)
         if (Architect.canBuild(blueprint, nextCandidate, recheckPathing = true)) {
@@ -47,7 +52,9 @@ class PlacementStateEvaluating(blueprint: Blueprint) extends PlacementState {
     else if (stillEvaluating) {
       // Evaluate them (in batches)
       var evaluationCount = 0
-      while (stillEvaluating && evaluationCount < With.configuration.buildingPlacementBatchSize) {
+      while (stillEvaluating && (
+        evaluationCount < With.configuration.buildingPlacementBatchSize
+        || With.frame < With.configuration.buildingPlacementBatchingStartFrame)) {
         evaluationCount += 1
         val candidate = candidatesFiltered.get(nextEvaluationIndex)
         if (ShowArchitectureHeuristics.inUse) {

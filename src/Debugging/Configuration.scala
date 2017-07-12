@@ -41,14 +41,13 @@ class Configuration {
   // Macro //
   ///////////
   
-  var maxPlacementsToEvaluate         = 1000
   var maxMineralsBeforeMinedOut       = 300 * 8
   var maxFramesToSendAdvanceBuilder   = 24 * 20
   var maxFramesToTrustBuildRequest    = 24 * 60 * 10
   var baseRadiusPixels                = 32.0 * 15.0
   var baseMergingRangePixels          = 32.0 * 12.0
   var blockerMineralThreshold         = 50
-  var maxPlacementAge                 = 24 * 30
+  var maxPlacementAge                 = 24 * 60
   var maxScarabCount                  = 3
   var enableTightBuildingPlacement    = false
   
@@ -66,8 +65,9 @@ class Configuration {
   // Performance //
   /////////////////
   
-  var buildingPlacementMaxTilesToEvaluate = 5000
+  var buildingPlacementMaxTilesToEvaluate = 900
   var buildingPlacementBatchSize          = 300
+  var buildingPlacementBatchingStartFrame = 24 * 60 * 4
   var buildingPlacementMaximumQueue       = 40
   var garbageCollectionThresholdMs        = 5
   var peformanceFrameMilliseconds         = 20
@@ -78,7 +78,7 @@ class Configuration {
   var verifyBuildingsDontBreakPaths       = false
   var urgentBuildingPlacement             = true
   var urgentBuildingPlacementCutoffFrames = 24 * 60 * 15
-  var urgentBuildingPlacementCooldown     = 24 * 5
+  var urgentBuildingPlacementCooldown     = 24 * 1
   var unitHistoryAge                      = 24 * 3
   
   var urgencyManners            = 1

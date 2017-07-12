@@ -10,7 +10,7 @@ object PlacementHeuristicDistanceFromEnemy extends PlacementHeuristic {
   
     val enemyBases =
     if (With.geography.enemyBases.isEmpty)
-      With.intelligence.leastScoutedBases.filter(_.isStartLocation).take(1)
+      With.intelligence.leastScoutedBases.filter(_.isStartLocation)
     else
       With.geography.enemyBases
     

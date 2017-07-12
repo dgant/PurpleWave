@@ -26,7 +26,7 @@ class PlacementProfile(
       new PlacementHeuristicWeight(PlacementHeuristicPowering,                preferPowering,               Colors.NeonGreen),
       new PlacementHeuristicWeight(PlacementHeuristicDistanceFromEnemy,       preferDistanceFromEnemy,      Colors.NeonTeal),
       new PlacementHeuristicWeight(PlacementHeuristicDistanceFromBase,        -avoidDistanceFromBase,       Colors.NeonBlue),
-      new PlacementHeuristicWeight(PlacementHeuristicDistanceFromBase,        -avoidDistanceFromEnemy,      Colors.NeonBlue),
+      new PlacementHeuristicWeight(PlacementHeuristicDistanceFromEnemy,       -avoidDistanceFromEnemy,      Colors.NeonBlue),
       new PlacementHeuristicWeight(PlacementHeuristicDistanceFromIdealRange,  -avoidDistanceFromIdealRange, Colors.NeonIndigo),
       new PlacementHeuristicWeight(PlacementHeuristicSurfaceArea,             -avoidSurfaceArea,            Colors.NeonViolet)
     )

@@ -81,11 +81,15 @@ class Blueprint(
     }
   
     if (townHall) {
-      return ! With.architecture.untownhallable.contains(tile)
+      val legal   = thisZone.bases.exists(_.townHallTile == tile)
+      val blocked = With.architecture.untownhallable.contains(tile)
+      return legal && ! blocked
     }
   
     if (gas) {
-      return ! With.architecture.ungassable.contains(tile)
+      val legal   = thisZone.bases.exists(_.gas.exists(_.tileTopLeft == tile))
+      val blocked = With.architecture.ungassable.contains(tile)
+      return legal && ! blocked
     }
     
     val marginArea      = relativeMarginArea.add(tile)

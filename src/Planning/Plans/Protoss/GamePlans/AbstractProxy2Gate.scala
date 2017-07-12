@@ -34,9 +34,11 @@ abstract class AbstractProxy2Gate extends Parallel {
   
   private class OhNoTheyreTerran extends Parallel(
     new Trigger(
-      new And(
-        new EnemyUnitsAtLeast(1, UnitMatchType(Terran.Vulture)),
-        new Check(() => With.geography.enemyZones.exists(_.walledIn))),
+      new Or(
+        new And(
+          new EnemyUnitsAtLeast(1, UnitMatchType(Terran.Vulture)),
+          new Check(() => With.geography.enemyZones.exists(_.walledIn))),
+        new Check(() => With.units.enemy.exists(u => u.flying && u.unitClass.isBuilding))),
       initialAfter = new Parallel(
         new TrainProbesContinuously,
         new Build(RequestAtLeast(1, Protoss.CyberneticsCore)),

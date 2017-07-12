@@ -8,6 +8,13 @@ object PlacementHeuristicZone extends PlacementHeuristic {
   
   override def evaluate(blueprint: Blueprint, candidate: Tile): Double = {
     
-    HeuristicMathMultiplicative.fromBoolean(candidate.zone.owner.isUs)
+    val candidateZone = candidate.zone
+    val zoneMatches =
+      if (blueprint.zone.isDefined)
+        blueprint.zone.contains(candidateZone)
+      else
+        candidateZone.owner.isFriendly
+    
+    HeuristicMathMultiplicative.fromBoolean(zoneMatches)
   }
 }

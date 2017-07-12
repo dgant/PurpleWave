@@ -8,9 +8,9 @@ object ShowGroundskeeper extends View {
   
   override def renderScreen() {
     
-    With.game.drawTextScreen(5, 25, "Unplaced:")
+    With.game.drawTextScreen(5, 5 * With.visualization.lineHeightSmall, "Unplaced:")
     DrawScreen.column(
-      5, 50,
+      5, 7 * With.visualization.lineHeightSmall,
       With.groundskeeper.proposals.diff(
         With.groundskeeper.proposalPlacements
           .filter(_._2.tile.isDefined)
@@ -19,22 +19,22 @@ object ShowGroundskeeper extends View {
         .sortBy(_.proposer.priority)
         .map(_.toString))
   
-    With.game.drawTextScreen(165, 25, "Matched:")
+    With.game.drawTextScreen(165, 5 * With.visualization.lineHeightSmall, "Matched:")
     val matches =
       With.groundskeeper.requirementMatches
         .filter(r => r.proposal != r.requirement)
         .toList
         .sortBy(_.proposal.proposer.priority)
     DrawScreen.column(
-      165, 50,
+      165, 7 * With.visualization.lineHeightSmall,
       matches.map(_.requirement.toString.take(5)))
     DrawScreen.column(
-      265, 50,
+      265, 7 * With.visualization.lineHeightSmall,
       matches.map(" => " + _.requirement.toString.take(5)))
     
-    With.game.drawTextScreen(365, 25, "Placed:")
+    With.game.drawTextScreen(365, 5 * With.visualization.lineHeightSmall, "Placed:")
     DrawScreen.table(
-      365, 50,
+      365, 7 * With.visualization.lineHeightSmall,
       With.groundskeeper.proposalPlacements
         .filter(_._2.tile.isDefined)
         .keys

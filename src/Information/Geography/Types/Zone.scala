@@ -23,7 +23,7 @@ class Zone(
   lazy val  exit            : Option[Edge]      = if (edges.isEmpty) None else Some(edges.minBy(edge => With.geography.startLocations.map(_.groundPixels(edge.centerPixel)).max))
   lazy val  tilesBuildable  : Array[Tile]       = { With.grids.buildableTerrain.initialize(); tiles.filter(With.grids.buildableTerrain.get).toArray }
   
-  var isWalledIn  : Boolean           = false
+  var walledIn: Boolean = false
   
   def contains(tile: Tile)    : Boolean = boundary.contains(tile) && tiles.contains(tile)
   def contains(pixel: Pixel)  : Boolean = contains(pixel.tileIncluding)

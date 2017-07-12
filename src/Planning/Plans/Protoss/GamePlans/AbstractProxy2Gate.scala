@@ -36,7 +36,7 @@ abstract class AbstractProxy2Gate extends Parallel {
     new Trigger(
       new And(
         new EnemyUnitsAtLeast(1, UnitMatchType(Terran.Vulture)),
-        new Check(() => With.geography.enemyBases.exists(_.walledIn))),
+        new Check(() => With.geography.enemyZones.exists(_.walledIn))),
       initialAfter = new Parallel(
         new TrainProbesContinuously,
         new Build(RequestAtLeast(1, Protoss.CyberneticsCore)),

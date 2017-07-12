@@ -19,7 +19,6 @@ class Base(val townHallTile: Tile)
   var       gas             : Set[UnitInfo]     = Set.empty
   var       minerals        : Set[UnitInfo]     = Set.empty
   var       workers         : Set[UnitInfo]     = Set.empty
-  var       walledIn        : Boolean           = false
   var       planningToTake  : Boolean           = false
   var       owner           : PlayerInfo        = With.neutral
   

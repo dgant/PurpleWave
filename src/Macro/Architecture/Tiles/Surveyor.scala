@@ -11,7 +11,7 @@ object Surveyor {
     TileSourceTownHall,
     TileSourceGas,
     TileSourceOurBases,
-    TileSourceOurZones,
+    TileSourceOurNonBaseZones,
     TileSourceOurPylons,
     TileSourceAnywhere)
   

@@ -79,10 +79,6 @@ class Blueprint(
     if (thisZone.island && ! With.strategy.isPlasma) {
       return false
     }
-    
-    if (zone.exists(_ != thisZone)) {
-      return false
-    }
   
     if (townHall) {
       return ! With.architecture.untownhallable.contains(tile)

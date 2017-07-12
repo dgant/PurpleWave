@@ -16,7 +16,15 @@ object BorderFinder {
     
     // Start with our bases
     val playerZones = With.geography.bases.filter(base => base.owner == player).map(_.zone)
+    val occupiedZones = With.units.all
+      .filter(unit =>
+        unit.unitClass.isBuilding
+        && unit.player == player
+        && ! unit.flying)
+      .map(_.pixelCenter.zone)
+      .filter(_.bases.nonEmpty)
     output ++= playerZones
+    output ++= occupiedZones // Specifically, we want to include bases that are getting static defense before being taken
     
     // Include all zones along the shortest paths between the bases
     val travelZones =

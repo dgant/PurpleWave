@@ -16,6 +16,7 @@ object ShowZones extends View {
   
     With.geography.zones.foreach(zone => {
       zone.edges.foreach(edge => {
+        val owner = edge.zones.find( ! _.owner.isNeutral).map(_.owner).getOrElse(With.neutral)
         DrawMap.labelBox(
           Vector(
             edge.zones.map(_.centroid.toString).mkString(" -> ")
@@ -25,13 +26,13 @@ object ShowZones extends View {
         DrawMap.line(
           edge.sidePixels.head,
           edge.sidePixels.last,
-          zone.owner.colorDark
+          owner.colorDark
         )
       
         DrawMap.circle(
           edge.centerPixel,
           edge.radiusPixels.toInt,
-          zone.owner.colorDark)
+          owner.colorDark)
       })
     })
   }

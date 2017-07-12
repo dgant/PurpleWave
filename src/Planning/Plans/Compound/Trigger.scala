@@ -22,7 +22,6 @@ class Trigger(
   override def onUpdate() {
     delegate(trigger.get)
     triggered = triggered || trigger.get.isComplete
-      
     if (triggered)
       delegate(after.get)
     else

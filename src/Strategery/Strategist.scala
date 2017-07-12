@@ -36,11 +36,13 @@ class Strategist {
     val isGround = ! isIsland
     val startLocations = With.geography.startLocations.size
     
-    (strategy.islandMaps  || ! isIsland)            &&
-    (strategy.groundMaps  || ! isGround)            &&
-    strategy.ourRaces.exists(_ == ourRace)          &&
-    strategy.enemyRaces.exists(enemyRaces.contains) &&
-    strategy.startLocationsMin <= startLocations    &&
+    ! Playbook.disabled.contains(strategy)                          &&
+    (Playbook.forced.contains(strategy) || Playbook.forced.isEmpty) &&
+    (strategy.islandMaps  || ! isIsland)                            &&
+    (strategy.groundMaps  || ! isGround)                            &&
+    strategy.ourRaces.exists(_ == ourRace)                          &&
+    strategy.enemyRaces.exists(enemyRaces.contains)                 &&
+    strategy.startLocationsMin <= startLocations                    &&
     strategy.startLocationsMax >= startLocations
   }
   

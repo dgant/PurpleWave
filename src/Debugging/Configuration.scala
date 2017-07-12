@@ -21,7 +21,7 @@ class Configuration {
   // Micro //
   ///////////
   
-  var assumedBuilderTravelSpeed       = 0.75
+  var assumedBuilderTravelSpeed       = 0.65
   var attackableRangeBuffer           = 8
   var fogPositionDuration             = 24 * 20
   var violenceFrameThreshold          = 24

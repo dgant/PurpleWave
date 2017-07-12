@@ -1,6 +1,6 @@
 package Strategery.Strategies.Options.Protoss
 
-import Strategery.Strategies.Options.AllRaces.{Proxy2Gate2StartLocations, WorkerRush2StartLocations, WorkerRush3StartLocations}
+import Strategery.Strategies.Options.AllRaces.{Proxy2Gate2StartLocations, Proxy2Gate3StartLocations, WorkerRush2StartLocations, WorkerRush3StartLocations}
 import Strategery.Strategies.Options.Protoss.Global._
 import Strategery.Strategies._
 
@@ -10,6 +10,7 @@ object ProtossChoices {
     WorkerRush2StartLocations,
     WorkerRush3StartLocations,
     Proxy2Gate2StartLocations,
+    Proxy2Gate3StartLocations,
     IslandCarriers,
     AllPvR,
     AllPvT,

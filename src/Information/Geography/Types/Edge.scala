@@ -8,7 +8,11 @@ import scala.collection.immutable.Seq
 
 class Edge(choke: Chokepoint) {
   
-  def otherSideof(zone: Zone): Zone = zones.filter(_ != zone).head
+  def otherSideof(zone: Zone): Zone =
+    if (zones.head == zone)
+      zones.last
+    else
+      zones.head // On Pathfinder there's an edge with the same zone on both sides. Grrr.
   
   lazy val centerPixel  : Pixel = new Pixel(choke.getCenter)
   lazy val radiusPixels : Double = choke.getWidth / 2

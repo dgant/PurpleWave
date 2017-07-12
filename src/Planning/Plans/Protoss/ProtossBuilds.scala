@@ -193,6 +193,16 @@ object ProtossBuilds {
   // Protoss vs. Zerg //
   //////////////////////
   
+  val FFE_Vs4Pool = Vector[BuildRequest] (
+    RequestAtLeast(1,   Protoss.Nexus),
+    RequestAtLeast(8,   Protoss.Probe),
+    RequestAtLeast(1,   Protoss.Pylon),
+    RequestAtLeast(9,   Protoss.Probe),
+    RequestAtLeast(1,   Protoss.Forge),
+    RequestAtLeast(3,   Protoss.PhotonCannon),
+    RequestAtLeast(16,  Protoss.Probe),
+    RequestAtLeast(2,   Protoss.Pylon))
+  
   val FFE_ForgeFirst = Vector[BuildRequest] (
     RequestAtLeast(1,   Protoss.Nexus),
     RequestAtLeast(8,   Protoss.Probe),

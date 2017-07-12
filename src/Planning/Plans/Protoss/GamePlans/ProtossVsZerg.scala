@@ -34,9 +34,12 @@ class ProtossVsZerg extends Parallel {
   private class ImplementEarlyFFELight extends FirstFiveMinutes(
     new Parallel(
       new If(
-        new EnemyBasesAtLeast(2),
-        new Build(ProtossBuilds.FFE_NexusFirst: _*),
-        new Build(ProtossBuilds.FFE_ForgeFirst: _*)),
+        new WeAreBeing4Pooled,
+        new Build(ProtossBuilds.FFE_Vs4Pool: _*),
+        new If(
+          new EnemyBasesAtLeast(2),
+          new Build(ProtossBuilds.FFE_NexusFirst: _*),
+          new Build(ProtossBuilds.FFE_ForgeFirst: _*))),
       new RequireMiningBases(2),
       new Build(RequestAtLeast(3, Protoss.PhotonCannon))))
   
@@ -199,7 +202,9 @@ class ProtossVsZerg extends Parallel {
       new Parallel(
         new TrainContinuously(Protoss.Reaver, 5),
         new If(
-          new UnitsAtLeast(12, UnitMatchType(Protoss.Zealot)),
+          new Or(
+            new Employing(PvZMidgame5GateDragoons),
+            new UnitsAtLeast(12, UnitMatchType(Protoss.Zealot))),
           new TrainContinuously(Protoss.Dragoon),
           new TrainContinuously(Protoss.Zealot)))),
   
@@ -231,9 +236,9 @@ class ProtossVsZerg extends Parallel {
     new If(
       new And(
         new WeAreBeing4Pooled,
-        new UnitsAtMost(2, UnitMatchType(Protoss.PhotonCannon), complete = true)),
+        new UnitsAtMost(1, UnitMatchType(Protoss.PhotonCannon), complete = true)),
       new If(
-        new Check(() => With.frame > 24 * (2 * 60 + 10)), // When a 4-pool arrives on a tiny rush distance
+        new Check(() => With.frame > 24 * (2 * 60)), // When a 4-pool arrives on a tiny rush distance
         new DefendChokeWithWorkers),
       new If(
         new UnitsAtLeast(1, UnitMatchType(Protoss.Pylon), complete = false),

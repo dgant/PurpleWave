@@ -134,14 +134,20 @@ class ForeignUnitTracker {
     if ( ! exists) {
       return false
     }
-    if (enemyGhostUnits.contains(id)) {
-      return false
-    }
     if (With.units.invalidUnitTypes.contains(unitType)) {
       return false
     }
     if (player.isFriendly) {
       return false
+    }
+    if (enemyGhostUnits.contains(id)) {
+      if (With.frame > 5 && unit.isVisible) {
+        // Looks like it's a legit unit! It just happened to share an ID with a ghost unit
+        enemyGhostUnits = enemyGhostUnits - id
+      }
+      else {
+        return false
+      }
     }
     
     true

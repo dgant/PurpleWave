@@ -48,7 +48,7 @@ case class StrategyEvaluation(strategy: Strategy) {
       6.0
     }
     else {
-      strategy.choices.map(_.map(getConfidenceSamples).sum).sum
+      Math.min(15.0, strategy.choices.map(_.map(getConfidenceSamples).sum).sum)
     }
   }
   

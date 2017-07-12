@@ -8,7 +8,7 @@ import Planning.Plans.Army.DefendChokes
 class DefendChokeWithWorkers extends DefendChokes {
   override def onUpdate(): Unit = {
     defenders.get.unitMatcher.set(UnitMatchOr(UnitMatchWorkers, UnitMatchWarriors))
-    defenders.get.unitCounter.set(UnitCountExactly(With.units.ours.count(_.unitClass.isWorker) / 2))
+    defenders.get.unitCounter.set(UnitCountExactly(With.units.ours.count(_.unitClass.isWorker) - 4))
     super.onUpdate()
   }
 }

@@ -25,13 +25,7 @@ class Zone(
   
   def contains(tile: Tile)    : Boolean = boundary.contains(tile) && tiles.contains(tile)
   def contains(pixel: Pixel)  : Boolean = contains(pixel.tileIncluding)
-  def owner: PlayerInfo = {
-    val owners = bases.map(_.owner).toSet
-    if (owners.size == 1)
-      owners.head
-    else if (owners.contains(With.self))
-      With.self //Contested and we have a piece? It's ours, dangit!
-    else
-      With.neutral
-  }
+  
+  var owner     : PlayerInfo  = With.neutral
+  var contested : Boolean     = false
 }

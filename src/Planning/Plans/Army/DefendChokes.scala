@@ -23,7 +23,14 @@ class DefendChokes extends Plan {
   
     // Step 1. Organize our chokes & defenders
     
-    val chokes = With.geography.mostExposedChokes
+    val chokes = With.geography.ourBorder
+      .toVector
+      .sortBy(choke =>
+        if (With.geography.enemyBases.nonEmpty)
+          With.geography.enemyBases.map(_.heart.pixelCenter.pixelDistanceFast(choke.centerPixel)).min
+        else
+          With.intelligence.mostBaselikeEnemyTile.pixelCenter.pixelDistanceFast(choke.centerPixel))
+      .take(2)
     
     if (chokes.isEmpty) return
     

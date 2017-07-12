@@ -35,7 +35,7 @@ object Surveyor {
         With.geography.zones
           .filter(zone =>
             ! zone.island
-            && zone.owner.isNeutral
+            && ! zone.owner.isEnemy
             && zone.edges.exists(_.zones.exists(_.owner.isUs)))
           .flatMap(_.tiles)
           .toVector

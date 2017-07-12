@@ -8,8 +8,9 @@ object MovementHeuristicOrigin extends MovementHeuristic {
   
   override def evaluate(state: ActionState, candidate: Pixel): Double = {
     
-    val zone = state.unit.tileIncludingCenter.zone
-    if (zone.bases.nonEmpty && zone.owner.isUs) return HeuristicMathMultiplicative.default
+    val zone = state.unit.pixelCenter.zone
+    
+    if (zone.bases.exists(_.owner.isUs)) return HeuristicMathMultiplicative.default
   
     val candidateDistance = state.unit.tileIncludingCenter.pixelCenter.pixelDistanceFast(candidate)
     

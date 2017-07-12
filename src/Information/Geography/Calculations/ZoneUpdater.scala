@@ -2,6 +2,7 @@ package Information.Geography.Calculations
 
 import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
+import ProxyBwapi.Players.Players
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.EnrichPixel._
@@ -28,9 +29,25 @@ object ZoneUpdater {
       .flatMap(placement => placement._2.tile)
       .flatMap(tile => if (tile.zone.bases.isEmpty) None else Some(tile.zone.bases.minBy(_.heart.tileDistanceFast(tile))))
       .filter(_.owner.isNeutral)
-        .toSet
+      .toSet
     
     With.geography.bases.foreach(base => base.planningToTake = plannedBases.contains(base))
+  
+    With.geography.zones.foreach(zone =>  { zone.owner = With.neutral; zone.contested = false })
+    val playerBorders = Players.all
+      .filterNot(_.isNeutral)
+      .map(player => (player, BorderFinder.claimedZones(player)))
+      .toMap
+    
+    playerBorders.foreach(pair => pair._2.foreach(zone => {
+      if ( ! zone.owner.isNeutral || zone.contested) {
+        zone.owner = With.neutral
+        zone.contested = true
+      }
+      else {
+        zone.owner = pair._1
+      }
+    }))
   }
   
   def updateZone(zone: Zone) {

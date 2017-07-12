@@ -33,7 +33,7 @@ class FindExpansions extends Plan {
   
   private def getNextScoutingPixel: Option[Pixel] =
     With.intelligence.leastScoutedBases
-      .filter(base => base.zone.owner.isNeutral && ( ! base.zone.island || With.strategy.isPlasma))
+      .filter(base => base.owner.isNeutral && ( ! base.zone.island || With.strategy.isPlasma))
       .map(_.townHallArea.midPixel)
       .headOption
 }

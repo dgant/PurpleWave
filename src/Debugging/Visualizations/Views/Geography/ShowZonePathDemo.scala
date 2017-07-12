@@ -10,7 +10,7 @@ object ShowZonePathDemo extends View {
     With.geography.startLocations.foreach(start1 =>
       With.geography.startLocations.foreach(start2 =>
         if (start1 != start2) {
-          val path = With.paths.path(start1.zone, start2.zone)
+          val path = With.paths.zonePath(start1.zone, start2.zone)
           if (path.isDefined) {
             path.get.steps.foreach(pathNode =>
               DrawMap.line(

@@ -26,6 +26,7 @@ class Geography {
   def ourHarvestingAreas  : Iterable[TileRectangle] = ourHarvestingAreasCache.get
   lazy val ourMain        : Option[Base]            = With.geography.ourBases.find(_.isStartLocation)
   def ourNatural          : Option[Base]            = ourNaturalCache.get
+  def ourBorder           : Iterable[Edge]          = ourBorderCache.get
   
   private val ourZonesCache           = new CacheFrame(() => zones.filter(_.owner.isUs))
   private val ourBasesCache           = new CacheFrame(() => bases.filter(_.owner.isUs))
@@ -34,6 +35,7 @@ class Geography {
   private val ourTownHallsCache       = new CacheFrame(() => ourBases.flatMap(_.townHall))
   private val ourHarvestingAreasCache = new CacheFrame(() => ourBases.map(_.harvestingArea))
   private val ourNaturalCache         = new CacheFrame(() => bases.find(_.isNaturalOf.exists(_.owner.isUs)))
+  private val ourBorderCache          = new CacheFrame(() => ourZones.flatMap(_.edges).filter(_.zones.exists( ! _.owner.isFriendly)))
   
   def zoneByTile(tile: Tile): Zone = zoneByTileCache(tile)
   private lazy val zoneByTileCache =
@@ -55,17 +57,6 @@ class Geography {
       .headOption
       .map(_.townHallArea.startInclusive)
       .getOrElse(SpecificPoints.tileMiddle))
-  
-  def ourExposedChokes: Iterable[Edge] =
-    With.geography.zones
-      .filter(zone => zone.owner.isUs || zone.bases.exists(_.planningToTake))
-      .flatten(_.edges)
-      .filter(edge => edge.zones.exists( ! _.owner.isUs))
-  
-  def mostExposedChokes: Vector[Edge] =
-    ourExposedChokes
-      .toVector
-      .sortBy(_.centerPixel.groundPixels(With.intelligence.mostBaselikeEnemyTile))
   
   def update() {
     zoneUpdateLimiter.act()

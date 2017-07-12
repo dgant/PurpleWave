@@ -9,11 +9,8 @@ class WeAreBeingProxiedInBase extends Plan {
     With.units.enemy.exists(unit =>
       unit.unitClass.isBuilding && {
         val zone = unit.pixelCenter.zone
-        zone.owner.isUs &&
-        (
-          zone.bases.exists(_.isStartLocation) ||
-          zone.bases.exists(_.isNaturalOf.exists(main => main.owner.isUs))
-        )
+        zone.bases.exists(_.isStartLocation) ||
+        zone.bases.exists(_.isNaturalOf.exists(main => main.owner.isUs))
       })
   }
 }

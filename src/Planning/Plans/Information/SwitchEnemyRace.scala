@@ -5,11 +5,17 @@ import Planning.Composition.Property
 import Planning.Plan
 import bwapi.Race
 
-class SwitchEnemyRace extends Plan {
-  val terran  = new Property[Plan](new Plan)
-  val protoss = new Property[Plan](new Plan)
-  val zerg    = new Property[Plan](new Plan)
-  val random  = new Property[Plan](new Plan)
+class SwitchEnemyRace(
+  whenTerran  : Plan = new Plan,
+  whenProtoss : Plan = new Plan,
+  whenZerg    : Plan = new Plan,
+  whenRandom  : Plan = new Plan)
+    extends Plan {
+  
+  val terran  = new Property[Plan](whenTerran)
+  val protoss = new Property[Plan](whenProtoss)
+  val zerg    = new Property[Plan](whenZerg)
+  val random  = new Property[Plan](whenRandom)
   
   description.set("Choose race-specific plan")
   

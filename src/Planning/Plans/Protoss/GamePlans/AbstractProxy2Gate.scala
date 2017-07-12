@@ -7,7 +7,8 @@ import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.RequestAtLeast
 import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Plans.Army.Attack
-import Planning.Plans.Compound.{And, If, Parallel, Trigger}
+import Planning.Plans.Compound._
+import Planning.Plans.Information.SwitchEnemyRace
 import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientPylons, TrainContinuously, TrainProbesContinuously}
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
@@ -25,6 +26,33 @@ abstract class AbstractProxy2Gate extends Parallel {
     With.blackboard.maxFramesToSendAdvanceBuilder = Int.MaxValue
     super.onUpdate()
   }
+  
+  private class BasicPlan extends Parallel(
+    new TrainContinuously(Protoss.Zealot),
+    new TrainProbesContinuously,
+    new TrainContinuously(Protoss.Gateway, 5))
+  
+  private class OhNoTheyreTerran extends Parallel(
+    new If(
+      new And(
+        new EnemyUnitsAtMost(0, UnitMatchType(Terran.Factory), complete = true),
+        new EnemyUnitsAtMost(0, UnitMatchType(Terran.Vulture)),
+        new Check(() => With.geography.enemyBases.exists(_.walledIn))),
+      new Parallel(
+        new TrainProbesContinuously,
+        new Build(RequestAtLeast(1, Protoss.CyberneticsCore)),
+        new BuildAssimilators,
+        new If(
+          new And(
+            new UnitsAtLeast(1, UnitMatchType(Protoss.CyberneticsCore), complete = true),
+            new UnitsAtLeast(1, UnitMatchType(Protoss.Assimilator), complete = true)),
+          new Parallel(
+            new UpgradeContinuously(Protoss.DragoonRange),
+            new TrainContinuously(Protoss.Dragoon)),
+          new TrainContinuously(Protoss.Zealot)),
+        new RequireMiningBases(2),
+        new Build(RequestAtLeast(7, Protoss.Gateway))),
+      new BasicPlan))
   
   children.set(Vector(
     new ProposePlacement{
@@ -50,29 +78,13 @@ abstract class AbstractProxy2Gate extends Parallel {
       new UnitsAtLeast(2, UnitMatchType(Protoss.Gateway), complete = false),
       initialAfter = new Parallel(
         new RequireSufficientPylons,
-        new If(
-          new And(
-            new EnemyUnitsAtMost(0, UnitMatchType(Terran.Factory), complete = true),
-            new EnemyUnitsAtMost(0, UnitMatchType(Terran.Vulture))),
-          new Parallel(
-            new TrainContinuously(Protoss.Zealot),
-            new TrainProbesContinuously,
-            new TrainContinuously(Protoss.Gateway, 5)),
-          new Parallel(
-            new TrainContinuously(Protoss.Probe),
-            new Build(RequestAtLeast(1, Protoss.CyberneticsCore)),
-            new BuildAssimilators,
-            new If(
-              new And(
-                new UnitsAtLeast(1, UnitMatchType(Protoss.CyberneticsCore), complete = true),
-                new UnitsAtLeast(1, UnitMatchType(Protoss.Assimilator), complete = true)),
-              new Parallel(
-                new UpgradeContinuously(Protoss.DragoonRange),
-                new TrainContinuously(Protoss.Dragoon)),
-              new TrainContinuously(Protoss.Zealot)),
-            new RequireMiningBases(2),
-            new Build(RequestAtLeast(7, Protoss.Gateway)))),
+        new SwitchEnemyRace(
+          whenTerran  = new OhNoTheyreTerran,
+          whenProtoss = new BasicPlan,
+          whenZerg    = new BasicPlan,
+          whenRandom  = new BasicPlan),
         new RequireEnemyBase)),
+    
     new Attack,
     new FollowBuildOrder,
     new Gather

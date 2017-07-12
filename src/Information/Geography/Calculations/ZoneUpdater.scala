@@ -1,5 +1,6 @@
 package Information.Geography.Calculations
 
+import Information.Geography.Pathfinding.GroundPathFinder
 import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
 import ProxyBwapi.Players.Players
@@ -107,7 +108,18 @@ object ZoneUpdater {
         .filter(u => u.unitClass.isBuilding && ! u.flying))
       .getOrElse(List.empty)
     
-    base.walledIn = exitBuildings.count(_.is(Terran.SupplyDepot)) >= 2 && exitBuildings.count(_.is(Terran.Barracks)) >= 1
+    lazy val canaryTileInside   = base.zone.tiles.find(With.grids.walkable.get)
+    lazy val canaryTileOutside  = base.zone.exit.map(_.otherSideof(base.zone)).flatMap(_.tiles.find(With.grids.walkable.get))
+    base.walledIn =
+      exitBuildings.count(_.is(Terran.SupplyDepot))  >= 1 &&
+      exitBuildings.count(_.is(Terran.Barracks))     >= 1 &&
+      canaryTileInside.exists(tileInside =>
+        canaryTileOutside.exists(tileOutside =>
+           ! GroundPathFinder.manhattanGroundDistanceThroughObstacles(
+             tileInside,
+             tileOutside,
+             obstacles = Set.empty,
+             maximumDistance = 100).pathExists))
   }
   
   private def resourceIsInBase(resource: UnitInfo, base: Base): Boolean = {

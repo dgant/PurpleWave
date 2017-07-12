@@ -28,4 +28,5 @@ class Base(val townHallTile: Tile)
   var lastScoutedFrame  = 0
   
   def resources: Set[UnitInfo] = minerals ++ gas
+  def natural: Option[Base] = With.geography.bases.find(_.isNaturalOf.contains(this))
 }

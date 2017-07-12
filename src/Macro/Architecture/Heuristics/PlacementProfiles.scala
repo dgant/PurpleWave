@@ -11,7 +11,7 @@ object PlacementProfiles {
     preferPowering              = 1.0,
     preferDistanceFromEnemy     = 1.0,
     avoidDistanceFromBase       = 0.25,
-    avoidDistanceFromExitRange  = 0.25
+    avoidDistanceFromIdealRange  = 0.25
   )
   
   val factory = new PlacementProfile(
@@ -19,7 +19,7 @@ object PlacementProfiles {
     preferZone                  = 1.0,
     preferSpace                 = 0.5,
     avoidDistanceFromBase       = 2.0,
-    avoidDistanceFromExitRange  = 2.0
+    avoidDistanceFromIdealRange  = 2.0
   )
   
   val tech = new PlacementProfile(
@@ -51,37 +51,37 @@ object PlacementProfiles {
     preferCoveringWorkers       = 0.5,
     avoidDistanceFromBase       = 1.5,
     avoidSurfaceArea            = 0.25,
-    avoidDistanceFromExitRange  = 2.0)
+    avoidDistanceFromIdealRange = 2.0)
   
   val naturalCannon = new PlacementProfile(
     "Natural cannons",
     avoidSurfaceArea            = 0.25,
-    avoidDistanceFromExitRange  = 2.0)
+    avoidDistanceFromIdealRange = 2.0)
   
   val mineralCannon = new PlacementProfile(
     "Pylon for mineral line Cannons",
     preferPowering              = 0.1,
     preferCoveringWorkers       = 1.0)
   
-  val groundDefense = new PlacementProfile(
+  val wall = new PlacementProfile(
     "Ground defense",
     preferCoveringWorkers       = 0.25,
     avoidDistanceFromBase       = 0.25,
-    avoidSurfaceArea            = 0.5,
-    avoidDistanceFromExitRange  = 2.0
+    avoidSurfaceArea            = 1.0,
+    avoidDistanceFromIdealRange = 2.0
   )
   
-  def default(buildingDescriptor: Blueprint): PlacementProfile = {
-    if (buildingDescriptor.townHall)
+  def default(blueprint: Blueprint): PlacementProfile = {
+    if (blueprint.townHall)
       townHall
-    else if (buildingDescriptor.gas)
+    else if (blueprint.gas)
       gas
-    else if (buildingDescriptor.powers)
+    else if (blueprint.powers)
       pylon
-    else if (buildingDescriptor.building.exists(_.trainsGroundUnits))
+    else if (blueprint.building.exists(_.trainsGroundUnits))
       factory
-    else if (buildingDescriptor.building.exists(_.canAttack) || buildingDescriptor.distancePixels.isDefined)
-      groundDefense
+    else if (blueprint.building.exists(_.canAttack) || blueprint.wall)
+      wall
     else
       tech
   }

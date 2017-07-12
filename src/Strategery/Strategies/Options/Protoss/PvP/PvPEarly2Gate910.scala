@@ -3,7 +3,7 @@ package Strategery.Strategies.Options.Protoss.PvP
 import Strategery.Strategies.Strategy
 import bwapi.Race
 
-object PvPEarly2Gate99 extends Strategy {
+object PvPEarly2Gate910 extends Strategy {
   
   override def choices: Iterable[Iterable[Strategy]] = Vector(
     Vector(

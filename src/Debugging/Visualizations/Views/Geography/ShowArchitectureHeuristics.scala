@@ -41,7 +41,7 @@ object ShowArchitectureHeuristics extends View {
     With.game.setTextSize(bwapi.Text.Size.Enum.Default)
     DrawScreen.column(
       5,
-      5,
+      5 * With.visualization.lineHeightSmall,
       List(
         List(blueprint.toString),
         placement.scoresByTile.toList

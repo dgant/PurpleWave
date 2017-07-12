@@ -13,8 +13,8 @@ object PlacementHeuristicDistanceFromBase extends PlacementHeuristic {
     else {
       var totalDistance = 0.0
       With.geography.ourBases.foreach(base => {
-        val from = base.townHallArea.midPixel
-        val to = candidate.pixelCenter
+        val from  = base.heart.pixelCenter
+        val to    = candidate.pixelCenter
         
         // Performance optimization.
         // We want ground distance for expansions, but that's too luxurious for ordinary buildings

@@ -9,7 +9,7 @@ object ShowClock extends View {
     val minutes = totalSeconds / 60
     val seconds = totalSeconds % 60
     val clock = minutes + ":" + "%02d".format(seconds)
-    With.game.drawTextScreen(375, 5, clock)
-    With.game.drawTextScreen(405, 5, With.frame.toString)
+    With.game.drawTextScreen(375, With.visualization.lineHeightSmall, clock)
+    With.game.drawTextScreen(405, With.visualization.lineHeightSmall, With.frame.toString)
   }
 }

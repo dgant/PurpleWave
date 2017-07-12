@@ -10,7 +10,7 @@ object AllPvP extends Strategy {
     Vector(
       PvPEarly1GateCore,
       PvPEarly1GateZZCore,
-      PvPEarly2Gate99,
+      PvPEarly2Gate910,
       PvPEarly2Gate1012,
       PvPEarlyFE,
       PvPEarlyFFE))

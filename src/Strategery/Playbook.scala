@@ -35,7 +35,7 @@ object Playbook {
     PvTLateMassGateway,
     PvTLateCarriers,
     PvTLateArbiters,
-    PvPEarly2Gate99,
+    PvPEarly2Gate910,
     PvPEarlyFE,
     PvPEarly1GateZZCore,
     PvPEarly2Gate1012,

@@ -24,13 +24,15 @@ class ProtossVsProtoss extends Parallel {
   // Early game strategies //
   ///////////////////////////
   
-  private class ImplementEarly2Gate99 extends FirstFiveMinutes(
+  private class ImplementEarly2Gate910 extends FirstFiveMinutes(
     new Parallel(
       new TwoGatewaysAtNatural,
-      new Build(ProtossBuilds.OpeningTwoGate99_WithZealots: _*)))
+      new Build(ProtossBuilds.OpeningTwoGate910_WithZealots: _*)))
   
   private class ImplementEarly2Gate1012 extends FirstFiveMinutes(
-    new Build(ProtossBuilds.OpeningTwoGate1012: _*))
+    new Parallel(
+      new TwoGatewaysAtNatural,
+      new Build(ProtossBuilds.OpeningTwoGate1012: _*)))
   
   private class ImplementEarly1GateCore extends FirstFiveMinutes(
     new Build(ProtossBuilds.Opening_1GateCore: _*))
@@ -174,7 +176,7 @@ class ProtossVsProtoss extends Parallel {
     new RequireMiningBases(1),
     new Employ(PvPEarly1GateCore,       new ImplementEarly1GateCore),
     new Employ(PvPEarly1GateZZCore,     new ImplementEarly1GateZZCore),
-    new Employ(PvPEarly2Gate99,         new ImplementEarly2Gate99),
+    new Employ(PvPEarly2Gate910,        new ImplementEarly2Gate910),
     new Employ(PvPEarly2Gate1012,       new ImplementEarly2Gate1012),
     new Employ(PvPEarlyFE,              new ImplementEarlyFE),
     new Employ(PvPEarlyFFE,             new ImplementEarlyFFE),
@@ -278,7 +280,7 @@ class ProtossVsProtoss extends Parallel {
     new If(
       new And(
         new Employing(PvPMidgameDarkTemplar),
-        new Not(new Employing(PvPEarly2Gate99)),
+        new Not(new Employing(PvPEarly2Gate910)),
         new Not(new Employing(PvPEarly2Gate1012))),
       new Trigger(
         new UnitsAtLeast(1, UnitMatchType(Protoss.DarkTemplar), complete = true),

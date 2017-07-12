@@ -18,6 +18,7 @@ class Blueprint(
   argTownHall     : Option[Boolean]           = None,
   argGas          : Option[Boolean]           = None,
   argMargin       : Option[Boolean]           = None,
+  argWall         : Option[Boolean]           = None,
   argPlacement    : Option[PlacementProfile]  = None,
   argRangePixels  : Option[Double]            = None,
   val zone        : Option[Zone]              = None) {
@@ -32,7 +33,8 @@ class Blueprint(
   val townHall        : Boolean           = argTownHall     .getOrElse(building.exists(_.isTownHall))
   val gas             : Boolean           = argGas          .getOrElse(building.exists(_.isRefinery))
   val margin          : Boolean           = argMargin       .getOrElse(building.exists(With.architecture.usuallyNeedsMargin))
-  val distancePixels  : Option[Double]    = argRangePixels  .orElse(building.map(building => building.maxAirGroundRange + building.radialHypotenuse))
+  val wall            : Boolean           = argWall         .getOrElse(building.exists(_.canAttack))
+  val distancePixels  : Double            = argRangePixels  .orElse(building.map(building => building.maxAirGroundRange.toDouble)).getOrElse(32.0 * 9.0)
   val placement       : PlacementProfile  = argPlacement    .getOrElse(PlacementProfiles.default(this))
   
   def fulfilledBy(proposal: Blueprint): Boolean = {

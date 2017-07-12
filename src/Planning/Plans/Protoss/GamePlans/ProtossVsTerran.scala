@@ -178,7 +178,7 @@ class ProtossVsTerran extends Parallel {
     
     // Units
     new If(
-      new UnitsAtLeast(20, UnitMatchWarriors),
+      new UnitsAtLeast(12, UnitMatchWarriors),
       new TrainContinuously(Protoss.Carrier)),
     new IfNoDetection_DarkTemplar,
     new If(

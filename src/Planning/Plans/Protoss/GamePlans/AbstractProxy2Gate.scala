@@ -13,7 +13,7 @@ import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientPylons, TrainCon
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildAssimilators, RequireMiningBases}
-import Planning.Plans.Macro.Milestones.{EnemyUnitsAtMost, UnitsAtLeast}
+import Planning.Plans.Macro.Milestones.{EnemyUnitsAtLeast, UnitsAtLeast}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Scouting.RequireEnemyBase
 import ProxyBwapi.Races.{Protoss, Terran}
@@ -33,12 +33,11 @@ abstract class AbstractProxy2Gate extends Parallel {
     new TrainContinuously(Protoss.Gateway, 5))
   
   private class OhNoTheyreTerran extends Parallel(
-    new If(
+    new Trigger(
       new And(
-        new EnemyUnitsAtMost(0, UnitMatchType(Terran.Factory), complete = true),
-        new EnemyUnitsAtMost(0, UnitMatchType(Terran.Vulture)),
+        new EnemyUnitsAtLeast(1, UnitMatchType(Terran.Vulture)),
         new Check(() => With.geography.enemyBases.exists(_.walledIn))),
-      new Parallel(
+      initialAfter = new Parallel(
         new TrainProbesContinuously,
         new Build(RequestAtLeast(1, Protoss.CyberneticsCore)),
         new BuildAssimilators,
@@ -52,7 +51,7 @@ abstract class AbstractProxy2Gate extends Parallel {
           new TrainContinuously(Protoss.Zealot)),
         new RequireMiningBases(2),
         new Build(RequestAtLeast(7, Protoss.Gateway))),
-      new BasicPlan))
+      initialBefore = new BasicPlan))
   
   children.set(Vector(
     new ProposePlacement{

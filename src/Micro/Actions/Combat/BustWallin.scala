@@ -2,7 +2,7 @@ package Micro.Actions.Combat
 
 import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Actions.Commands.Reposition
+import Micro.Actions.Commands.{Attack, Reposition}
 import Micro.Behaviors.MovementProfiles
 import Micro.Execution.ActionState
 import ProxyBwapi.Races.Terran
@@ -36,7 +36,14 @@ object BustWallin extends Action {
     // Don't rely on BW's pathing to bring us into the wall-in.
     // Wall-ins tend to cause Dragoons to do the "walk around the perimeter of the map" dance
     state.movementProfile = MovementProfiles.smash
-    Target.delegate(state)
+    
+    if (state.unit.melee && state.targets.nonEmpty) {
+      // Bash down the doors!
+      state.toAttack = Some(state.targets.minBy(_.pixelDistanceFast(state.unit)))
+      Attack.delegate(state)
+      return
+    }
+    
     Reposition.delegate(state)
   }
 }

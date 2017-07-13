@@ -17,7 +17,10 @@ object Engage extends Action {
     
     Brawl.consider(state)
     BustWallin.consider(state)
+    
+    //TODO: Don't chase distractions
     Target.delegate(state)
+    
     if ( ! state.unit.canAttackThisFrame) {
       Kite.delegate(state)
     }

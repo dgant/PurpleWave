@@ -12,7 +12,7 @@ import Planning.Plans.Information.SwitchEnemyRace
 import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientPylons, TrainContinuously, TrainProbesContinuously}
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
-import Planning.Plans.Macro.Expanding.{BuildAssimilators, RequireMiningBases}
+import Planning.Plans.Macro.Expanding.BuildAssimilators
 import Planning.Plans.Macro.Milestones.{EnemyUnitsAtLeast, UnitsAtLeast}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Scouting.RequireEnemyBase
@@ -46,13 +46,17 @@ abstract class AbstractProxy2Gate extends Parallel {
         new If(
           new And(
             new UnitsAtLeast(1, UnitMatchType(Protoss.CyberneticsCore), complete = true),
-            new UnitsAtLeast(1, UnitMatchType(Protoss.Assimilator), complete = true)),
+            new UnitsAtLeast(1, UnitMatchType(Protoss.Assimilator),     complete = true)),
           new Parallel(
             new UpgradeContinuously(Protoss.DragoonRange),
-            new TrainContinuously(Protoss.Dragoon)),
-          new TrainContinuously(Protoss.Zealot)),
-        new RequireMiningBases(2),
-        new Build(RequestAtLeast(7, Protoss.Gateway))),
+            new If(
+              new Check(() => With.self.gas > 40),
+              new TrainContinuously(Protoss.Dragoon),
+              new TrainContinuously(Protoss.Zealot)),
+            new Build(RequestAtLeast(5, Protoss.Gateway))),
+          new Parallel(
+            new TrainContinuously(Protoss.Zealot),
+            new Build(RequestAtLeast(5, Protoss.Gateway))))),
       initialBefore = new BasicPlan))
   
   children.set(Vector(

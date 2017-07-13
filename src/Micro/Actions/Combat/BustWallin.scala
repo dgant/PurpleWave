@@ -39,7 +39,7 @@ object BustWallin extends Action {
     
     if (state.unit.melee && state.targets.nonEmpty) {
       // Bash down the doors!
-      state.toAttack = Some(state.targets.minBy(_.pixelDistanceFast(state.unit)))
+      state.toAttack = Some(state.targets.minBy(target => state.unit.pixelDistanceTravelling(target.pixelCenter)))
       Attack.delegate(state)
       return
     }

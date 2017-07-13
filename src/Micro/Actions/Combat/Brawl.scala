@@ -10,10 +10,10 @@ object Brawl extends Action {
   // When engaging Zerglings, just attack-move to avoid glitching
   
   override protected def allowed(state: ActionState): Boolean = {
-    state.canFight &&
-    state.unit.canAttackThisSecond &&
-    state.unit.melee &&
-    state.targets.nonEmpty &&
+    state.canFight                  &&
+    state.unit.canAttackThisSecond  &&
+    state.unit.melee                &&
+    state.targets.nonEmpty          &&
     state.targets.minBy(_.pixelDistanceFast(state.unit)).is(Zerg.Zergling)
   }
   

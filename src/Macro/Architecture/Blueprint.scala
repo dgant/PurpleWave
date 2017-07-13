@@ -9,21 +9,21 @@ import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClass.UnitClass
 
 class Blueprint(
-                 val proposer          : Plan,
-                 val building          : Option[UnitClass]         = None,
-                 argWidth              : Option[Int]               = None,
-                 argHeight             : Option[Int]               = None,
-                 argPowers             : Option[Boolean]           = None,
-                 argPowered            : Option[Boolean]           = None,
-                 argTownHall           : Option[Boolean]           = None,
-                 argGas                : Option[Boolean]           = None,
-                 argMargin             : Option[Boolean]           = None,
-                 argWall               : Option[Boolean]           = None,
-                 argPlacement          : Option[PlacementProfile]  = None,
-                 argRangePixels        : Option[Double]            = None,
-                 val tiles             : Option[Iterable[Tile]]    = None,
-                 val zone              : Option[Zone]              = None,
-                 respectHarvesting  : Boolean                   = true) {
+  val proposer         : Plan,
+  val building         : Option[UnitClass]         = None,
+  argWidth             : Option[Int]               = None,
+  argHeight            : Option[Int]               = None,
+  argPowers            : Option[Boolean]           = None,
+  argPowered           : Option[Boolean]           = None,
+  argTownHall          : Option[Boolean]           = None,
+  argGas               : Option[Boolean]           = None,
+  argMargin            : Option[Boolean]           = None,
+  argWall              : Option[Boolean]           = None,
+  argPlacement         : Option[PlacementProfile]  = None,
+  argRangePixels       : Option[Double]            = None,
+  val tiles            : Option[Iterable[Tile]]    = None,
+  val zone             : Option[Zone]              = None,
+  respectHarvesting    : Boolean                   = true) {
   
   var id: Option[Int] = None
   val frameCreated: Int = With.frame

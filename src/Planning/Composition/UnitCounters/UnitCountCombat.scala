@@ -17,7 +17,7 @@ class UnitCountCombat(
   override def continue(units: Iterable[FriendlyUnitInfo]): Boolean = {
     units.foreach(builder.addUnit)
     lastEstimation = Estimator.calculate(builder)
-    isSufficient
+    ! isSufficient
   }
   
   override def accept(units: Iterable[FriendlyUnitInfo]): Boolean = {

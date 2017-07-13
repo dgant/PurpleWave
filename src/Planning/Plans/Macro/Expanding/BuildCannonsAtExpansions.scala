@@ -7,7 +7,7 @@ class BuildCannonsAtExpansions(initialCount: Int) extends BuildCannonsAtBases(in
   
   override def eligibleBases: Iterable[Base] = {
     (With.geography.ourBases ++ With.geography.bases.filter(_.planningToTake))
-      .filterNot(With.geography.ourMain.contains)
+      .filterNot(_ == With.geography.ourMain)
       .filterNot(With.geography.ourNatural.contains)
       .toSet
   }

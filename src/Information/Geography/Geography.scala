@@ -14,19 +14,21 @@ class Geography {
   
   lazy val mapArea        : TileRectangle           = TileRectangle(Tile(0, 0), Tile(With.mapWidth, With.mapHeight))
   lazy val allTiles       : Iterable[Tile]          = mapArea.tiles
+  lazy val startBases     : Iterable[Base]          = bases.filter(_.isStartLocation)
   lazy val startLocations : Iterable[Tile]          = With.game.getStartLocations.asScala.map(new Tile(_))
   lazy val zones          : Iterable[Zone]          = ZoneBuilder.zones
   lazy val edges          : Iterable[Edge]          = ZoneBuilder.edges
   lazy val bases          : Iterable[Base]          = ZoneBuilder.bases
+  lazy val ourMain        : Base                    = With.geography.ourBases.find(_.isStartLocation).get
+  def ourNatural          : Option[Base]            = ourNaturalCache.get
   def ourZones            : Iterable[Zone]          = ourZonesCache.get
   def ourBases            : Iterable[Base]          = ourBasesCache.get
-  def enemyZones          : Iterable[Zone]          = enemyZonesCache.get
-  def enemyBases          : Iterable[Base]          = enemyBasesCache.get
   def ourTownHalls        : Iterable[UnitInfo]      = ourTownHallsCache.get
   def ourHarvestingAreas  : Iterable[TileRectangle] = ourHarvestingAreasCache.get
-  lazy val ourMain        : Option[Base]            = With.geography.ourBases.find(_.isStartLocation)
-  def ourNatural          : Option[Base]            = ourNaturalCache.get
   def ourBorder           : Iterable[Edge]          = ourBorderCache.get
+  def enemyZones          : Iterable[Zone]          = enemyZonesCache.get
+  def enemyBases          : Iterable[Base]          = enemyBasesCache.get
+  
   
   private val ourZonesCache           = new CacheFrame(() => zones.filter(_.owner.isUs))
   private val ourBasesCache           = new CacheFrame(() => bases.filter(_.owner.isUs))

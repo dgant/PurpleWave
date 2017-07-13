@@ -115,7 +115,7 @@ class Architecture {
     
     lazy val start                  = canaryTile(edge.zones.head)
     lazy val end                    = canaryTile(edge.zones.last)
-    lazy val maxTiles               = Math.max(20, 5 * start.groundPixelsByTile(end).toInt / 32)
+    lazy val maxTiles               = Math.max(20, 3 * start.tileDistanceManhattan(end) / 32)
     lazy val blockedTiles           = blockedArea.tiles
     lazy val excludedBefore         = unwalkable.toSet
     lazy val excludedAfter          = unwalkable.toSet ++ blockedTiles

@@ -25,7 +25,7 @@ class Intelligence {
   private val leastScoutedBasesCache = new CacheFrame(() =>
     With.geography.bases
       .toVector
-      .sortBy(_.heart.groundPixelsByTile(With.geography.home))
+      .sortBy(_.heart.tileDistanceFast(With.geography.home))
       .sortBy( ! _.isStartLocation)
       .sortBy(_.lastScoutedFrame))
   

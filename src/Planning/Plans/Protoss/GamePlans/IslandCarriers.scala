@@ -21,7 +21,7 @@ class IslandCarriers extends Parallel {
       if (With.strategy.isPlasma)
         3
       else
-        With.geography.bases.count(base => With.paths.groundPathExists(base.heart, With.self.startTile)))
+        With.geography.bases.count(_.zone.canWalkTo(With.geography.ourMain.zone)))
   }
   
   private class TechToCarriers extends Build(

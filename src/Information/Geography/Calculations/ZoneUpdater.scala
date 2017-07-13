@@ -20,9 +20,7 @@ object ZoneUpdater {
         With.geography.bases
           .filter(otherBase => otherBase != startLocationBase && otherBase.gas.nonEmpty)
           .toVector
-          .sortBy(
-            _.townHallArea.startInclusive.groundPixelsByTile(
-              startLocationBase.townHallArea.startInclusive))
+          .sortBy(_.zone.distancePixels(startLocationBase.zone))
           .headOption
           .foreach(_.isNaturalOf = Some(startLocationBase)))
   

@@ -19,15 +19,24 @@ class Zone(
   lazy val  centroid        : Tile              = if (tiles.isEmpty) new Pixel(bwtaRegion.getCenter).tileIncluding else tiles.minBy(_.tileDistanceSquared(new Pixel(bwtaRegion.getCenter).tileIncluding))
   lazy val  area            : Double            = bwtaRegion.getPolygon.getArea
   lazy val  points          : Iterable[Pixel]   = bwtaRegion.getPolygon.getPoints.asScala.map(new Pixel(_)).toVector
-  lazy val  island          : Boolean           = ! With.geography.startLocations.exists(startTile => With.paths.groundPathExists(centroid, startTile))
-  lazy val  exit            : Option[Edge]      = if (edges.isEmpty) None else Some(edges.minBy(edge => With.geography.startLocations.map(_.groundPixels(edge.centerPixel)).max))
+  lazy val  island          : Boolean           = With.geography.startBases.map(_.zone).filter(_ != this).exists(otherZone => With.paths.zonePath(this, otherZone).isDefined)
   lazy val  tilesBuildable  : Array[Tile]       = { With.grids.buildableTerrain.initialize(); tiles.filter(With.grids.buildableTerrain.get).toArray }
   
-  var walledIn: Boolean = false
+  lazy val exit: Option[Edge] = {
+    if (edges.isEmpty)
+      None
+    else
+      // Uses ground distance, but seems to work okay
+      Some(edges.minBy(edge => With.geography.startLocations.map(_.groundPixels(edge.centerPixel)).max))
+  }
+  
+  var owner     : PlayerInfo  = With.neutral
+  var contested : Boolean     = false
+  var walledIn  : Boolean     = false
   
   def contains(tile: Tile)    : Boolean = boundary.contains(tile) && tiles.contains(tile)
   def contains(pixel: Pixel)  : Boolean = contains(pixel.tileIncluding)
   
-  var owner     : PlayerInfo  = With.neutral
-  var contested : Boolean     = false
+  def canWalkTo(to: Zone): Boolean = With.paths.zonePath(this, to).isDefined
+  def distancePixels(to: Zone): Double = With.paths.zoneDistance(this, to)
 }

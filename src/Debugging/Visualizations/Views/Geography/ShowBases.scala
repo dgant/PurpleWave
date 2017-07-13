@@ -18,7 +18,12 @@ object ShowBases extends View {
         DrawMap.labelBox(
           Vector(
             base.zone.owner.name,
-            if (base.isStartLocation) "Start location" else if (base.isNaturalOf.isDefined) "Natural" else "",
+            Vector(
+              if (base.isStartLocation)       Some("Start location")  else None,
+              if (base.isNaturalOf.isDefined) Some("Natural")         else None,
+              if (base.zone.island)           Some("Island")          else None,
+              if (base.planningToTake)        Some ("Planned")        else None)
+              .mkString(", "),
             "Minerals left: " + base.mineralsLeft,
             "Gas left:     " + base.gasLeft,
             if (base.lastScoutedFrame <= With.frame+ 24 ) ""

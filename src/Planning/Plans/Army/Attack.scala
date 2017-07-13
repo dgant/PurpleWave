@@ -28,8 +28,12 @@ class Attack extends Plan {
           .pixelCenter
       else
         With.geography.enemyBases
-          .map(_.heart.pixelCenter)
-          .minBy(_.groundPixels(With.geography.home))
+          .minBy(base =>
+            if (With.geography.ourBases.nonEmpty)
+              With.geography.ourBases.map(_.zone.distancePixels(base.zone)).min
+            else
+              - base.mineralsLeft)
+            .heart.pixelCenter
     
     attackers.get.unitPreference.set(UnitPreferClose(target))
     attackers.get.acquire(this)

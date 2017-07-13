@@ -18,10 +18,10 @@ class ForgeFastExpand(var cannonsInFront: Boolean) extends ProposePlacement {
     new Blueprint(this, argWall = Some(true),                           argPlacement = Some(PlacementProfiles.naturalCannon),      building = Some(Protoss.PhotonCannon),  zone = With.geography.ourNatural.map(_.zone), argRangePixels = Some(3.0 * 32.0)),
     new Blueprint(this, argWall = Some(true),                           argPlacement = Some(PlacementProfiles.naturalCannon),      building = Some(Protoss.PhotonCannon),  zone = With.geography.ourNatural.map(_.zone), argRangePixels = Some(3.0 * 32.0)),
     new Blueprint(this, argWall = Some(true),                           argPlacement = Some(PlacementProfiles.naturalCannon),      building = Some(Protoss.PhotonCannon),  zone = With.geography.ourNatural.map(_.zone), argRangePixels = Some(3.0 * 32.0)),
-    new Blueprint(this, building = Some(Protoss.Pylon),               zone = With.geography.ourMain.map(_.zone)),
-    new Blueprint(this, building = Some(Protoss.Pylon),               zone = With.geography.ourMain.map(_.zone)),
-    new Blueprint(this, building = Some(Protoss.Gateway),             zone = With.geography.ourMain.map(_.zone)),
-    new Blueprint(this, building = Some(Protoss.CyberneticsCore),     zone = With.geography.ourMain.map(_.zone))
+    new Blueprint(this, building = Some(Protoss.Pylon),                 zone = Some(With.geography.ourMain.zone)),
+    new Blueprint(this, building = Some(Protoss.Pylon),                 zone = Some(With.geography.ourMain.zone)),
+    new Blueprint(this, building = Some(Protoss.Gateway),               zone = Some(With.geography.ourMain.zone)),
+    new Blueprint(this, building = Some(Protoss.CyberneticsCore),       zone = Some(With.geography.ourMain.zone))
   )
 }
 

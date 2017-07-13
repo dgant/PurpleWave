@@ -54,9 +54,9 @@ class Strategist {
   
   private def heyIsThisAnIslandMap = {
     isPlasma ||
-      With.geography.startLocations.forall(start1 =>
-        With.geography.startLocations.forall(start2 =>
-          !With.paths.groundPathExists(start1, start2)))
+      With.geography.startBases.forall(base1 =>
+        With.geography.startBases.forall(base2 =>
+          base1 == base2 || With.paths.zonePath(base1.zone, base2.zone).isEmpty))
   }
 
   val evaluations = new mutable.HashMap[Strategy, StrategyEvaluation]

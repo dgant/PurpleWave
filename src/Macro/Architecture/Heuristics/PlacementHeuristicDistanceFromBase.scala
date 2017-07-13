@@ -16,12 +16,10 @@ object PlacementHeuristicDistanceFromBase extends PlacementHeuristic {
         val from  = base.heart.pixelCenter
         val to    = candidate.pixelCenter
         
-        // Performance optimization.
-        // We want ground distance for expansions, but that's too luxurious for ordinary buildings
+        // Performance optimization. Town hall placements matter more so use the zone distance as well.
         if (blueprint.townHall)
-          totalDistance += from.groundPixels(to)
-        else
-          totalDistance += from.pixelDistanceFast(to)
+          totalDistance += from.zone.distancePixels(to.zone)
+        totalDistance += from.pixelDistanceFast(to)
       })
       totalDistance
     }

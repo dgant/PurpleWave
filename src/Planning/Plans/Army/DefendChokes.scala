@@ -68,7 +68,7 @@ class DefendChokes(val maxChokes: Int = 3) extends Plan {
           choke.sidePixels.last,
           choke.zones
             .toList
-            .sortBy(_.centroid.groundPixelsByTile(With.geography.home))
+            .sortBy(_.centroid.tileDistanceFast(With.geography.home))
             .sortBy( ! _.owner.isUs)
             .head
             .centroid

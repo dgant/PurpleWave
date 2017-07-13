@@ -40,17 +40,16 @@ class AttackWithWorkers extends Plan {
         .filter( ! _.owner.isUs)
         .filter(_.isStartLocation || haveSeenABase) //Only search non-start locations until we've killed the first
         .toVector
-        .sortBy( - _.heart.groundPixelsByTile(With.geography.home))
+        .sortBy( - _.heart.tileDistanceFast(With.geography.home))
         .sortBy( ! _.isStartLocation)
         .sortBy(_.lastScoutedFrame)
-        
   
     val unassignedScouts = new mutable.HashSet[FriendlyUnitInfo] ++ fighters.units
     val scoutAssignments = new mutable.HashMap[FriendlyUnitInfo, Base]
     while(unassignedScouts.nonEmpty) {
       unscoutedBases.foreach(base => {
         if (unassignedScouts.nonEmpty) {
-          val scout = unassignedScouts.minBy(_.pixelDistanceTravelling(base.heart))
+          val scout = unassignedScouts.minBy(_.pixelDistanceFast(base.heart.pixelCenter))
           unassignedScouts.remove(scout)
           scoutAssignments(scout) = base
         }

@@ -10,6 +10,7 @@ import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, FirstFiveMinutes}
 import Planning.Plans.Macro.Expanding.{BuildAssimilators, MatchMiningBases, RequireMiningBases}
 import Planning.Plans.Macro.Milestones._
+import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Protoss.ProtossBuilds
 import Planning.Plans.Protoss.Situational.{ForgeFastExpand, Nexus2GateThenCannons, TwoGatewaysAtNatural}
 import Planning.Plans.Scouting.{RequireEnemyBase, ScoutExpansionsAt}
@@ -159,6 +160,7 @@ class ProtossVsProtoss extends Parallel {
       new UnitsAtMost(0, UnitMatchType(Protoss.CyberneticsCore),  complete = true),
       new UnitsAtMost(0, UnitMatchType(Protoss.Assimilator),      complete = true),
       new Check(() => With.self.gas < 30),
+      new Check(() => With.self.gas < 100 && With.self.minerals > With.self.gas * 5),
       new And(
         new HaveUpgrade(Protoss.ZealotSpeed, Protoss.Zealot.buildFrames),
         new UnitsAtLeast(12, UnitMatchType(Protoss.Dragoon)))),
@@ -268,9 +270,16 @@ class ProtossVsProtoss extends Parallel {
             RequestAtLeast(1, Protoss.Observatory),
             RequestAtLeast(1, Protoss.CitadelOfAdun))),
         new OnMiningBases(3,
-          new Build(
-            RequestAtLeast(2, Protoss.RoboticsFacility),
-            RequestAtLeast(10, Protoss.Gateway))))),
+          new Parallel(
+            new UpgradeContinuously(Protoss.GroundDamage),
+            new Build(
+              RequestAtLeast(2, Protoss.RoboticsFacility),
+              RequestAtLeast(7, Protoss.Gateway),
+              RequestAtLeast(1, Protoss.Forge),
+              RequestAtLeast(1, Protoss.TemplarArchives),
+              RequestAtLeast(2, Protoss.Forge)),
+            new UpgradeContinuously(Protoss.GroundArmor),
+            new Build(RequestAtLeast(10, Protoss.Gateway)))))),
     
     new ScoutExpansionsAt(70),
     new If(

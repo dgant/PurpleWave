@@ -181,9 +181,7 @@ class ProtossVsTerran extends Parallel {
         new OnThreeBases_WeaponsUpgrades)),
     
     // Units
-    new If(
-      new UnitsAtLeast(12, UnitMatchWarriors),
-      new TrainContinuously(Protoss.Carrier)),
+    new TrainContinuously(Protoss.Carrier),
     new IfNoDetection_DarkTemplar,
     new If(
       new EnemyBio,

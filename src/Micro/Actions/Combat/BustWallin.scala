@@ -48,8 +48,11 @@ object BustWallin extends Action {
         Iterable.empty
     
     state.toAttack = EvaluateTargets.best(state, targets)
-    Attack.delegate(state)
-    if (stillReady(state) && ! state.unit.melee && state.toAttack.isDefined) {
+    
+    if (state.unit.canAttackThisFrame || state.unit.melee) {
+      Attack.delegate(state)
+    }
+    else if (state.toAttack.isDefined) {
       // Get up in there!
       val targetUnit = state.toAttack.get
       val targetTile = targetUnit.tileIncludingCenter

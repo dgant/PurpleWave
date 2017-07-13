@@ -7,6 +7,8 @@ import ProxyBwapi.Upgrades.Upgrade
 
 object Project {
   
+  val forever = 24 * 60 * 120
+  
   // Frames before we could possibly have this unit, not counting costs
   //
   def framesToUnits(unitClass: UnitClass, quantity: Int = 1, unitsInCycle: Array[UnitClass] = Array.empty): Int = {
@@ -29,8 +31,7 @@ object Project {
         .framesBeforeBecomingComplete
     }
     
-    // TODO: Could we build one now?
-    
+    // Do we need to build other units to build this?
     val frameLimits =
       (unitClass.buildUnitsEnabling ++
         unitClass.buildUnitsBorrowed ++
@@ -38,18 +39,14 @@ object Project {
           .toSet[UnitClass]
           .map(requiredClass =>
             if (unitsInCycle.contains(requiredClass))
-              Int.MaxValue
+              forever
             else
               framesToUnits(requiredClass, 1, unitsInCycle :+ requiredClass))
-        
-    if (frameLimits.isEmpty) {
-      Int.MaxValue
-    } else {
-      frameLimits.max
-    }
+    
+    unitClass.buildFrames + (frameLimits + 0).max
   }
   
-  // Frames before we could possibly have this Tech, not counting costs
+  // Frames before we could possibly have this Tech, not considering income
   //
   def framesToTech(tech: Tech): Int = {
     
@@ -57,22 +54,20 @@ object Project {
     if (With.self.hasTech(tech)) {
       return 0
     }
-    
-    // Do we need to build the thing that techs this?
-    val framesToTecher = framesToUnits(tech.whatResearches)
-    if (framesToTecher > 0) {
-      return framesToTecher + tech.researchFrames
-    }
-    
+  
     // How much longer before the tech finishes?
     val techer = With.units.ours.find(unit => unit.teching && unit.techingType == tech)
     if (techer.isDefined) {
       return techer.get.remainingTechFrames
     }
-  
-    tech.researchFrames
+    
+    // Do we need to build the thing that techs this?
+    val framesToTecher = framesToUnits(tech.whatResearches)
+    tech.researchFrames + framesToTecher
   }
   
+  // Frames before we could possibly have this Upgrade, not considering income
+  //
   def framesToUpgrade(upgrade: Upgrade, level: Int = 1): Int = {
     
     // Do we have it already?
@@ -84,19 +79,15 @@ object Project {
     if (With.self.getUpgradeLevel(upgrade) < level - 1) {
       framesToUpgrade(upgrade, level - 1) + upgrade.upgradeTime(level)
     }
-    
-    // Do we need to build the thing that upgrades this?
-    val framesToUpgrader = framesToUnits(upgrade.whatUpgrades)
-    if (framesToUpgrader > 0) {
-      return framesToUpgrader + upgrade.upgradeTime(level) //Doesn't count catching up to this level from lower levels!
-    }
   
     // How much longer before the upgrade finishes?
     val upgrader = With.units.ours.find(unit => unit.upgrading && unit.upgradingType == upgrade)
     if (upgrader.isDefined) {
       return upgrader.get.remainingUpgradeFrames
     }
-  
-    upgrade.upgradeTime(level)
+    
+    // Do we need to build the thing that upgrades this?
+    val framesToUpgrader = framesToUnits(upgrade.whatUpgrades)
+    framesToUpgrader + upgrade.upgradeTime(level)
   }
 }

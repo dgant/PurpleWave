@@ -16,7 +16,7 @@ import Planning.Plans.Macro.Expanding.BuildAssimilators
 import Planning.Plans.Macro.Milestones.{EnemyUnitsAtLeast, UnitsAtLeast}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Scouting.RequireEnemyBase
-import ProxyBwapi.Races.{Protoss, Terran}
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 
 abstract class AbstractProxy2Gate extends Parallel {
   
@@ -28,14 +28,26 @@ abstract class AbstractProxy2Gate extends Parallel {
   }
   
   private class BasicPlan extends Parallel(
+    new If(
+      new Or(
+        new EnemyUnitsAtLeast(1, UnitMatchType(Terran.Factory)),
+        new EnemyUnitsAtLeast(1, UnitMatchType(Terran.Vulture)),
+        new EnemyUnitsAtLeast(1, UnitMatchType(Terran.Wraith)),
+        new EnemyUnitsAtLeast(1, UnitMatchType(Zerg.Spire)),
+        new EnemyUnitsAtLeast(1, UnitMatchType(Zerg.Mutalisk)),
+        new EnemyUnitsAtLeast(1, UnitMatchType(Zerg.LurkerEgg)),
+        new EnemyUnitsAtLeast(1, UnitMatchType(Zerg.Lurker)),
+        new EnemyUnitsAtLeast(1, UnitMatchType(Protoss.Scout)),
+        new EnemyUnitsAtLeast(1, UnitMatchType(Protoss.Carrier)),
+        new EnemyUnitsAtLeast(1, UnitMatchType(Protoss.CitadelOfAdun)),
+        new EnemyUnitsAtLeast(1, UnitMatchType(Protoss.TemplarArchives)),
+        new EnemyUnitsAtLeast(1, UnitMatchType(Protoss.DarkTemplar))),
+      new AllIn),
     new TrainContinuously(Protoss.Zealot),
     new TrainProbesContinuously,
-    new TrainContinuously(Protoss.Gateway, 5))
-  
-  private class OhNoTheyreTerranYolo extends Parallel(
-    new If (new EnemyUnitsAtLeast(1, UnitMatchType(Terran.Vulture)),
-    new AllIn),
-    new BasicPlan)
+    new Trigger(
+      new UnitsAtLeast(2, UnitMatchType(Protoss.Zealot), complete = false),
+      initialAfter = new TrainContinuously(Protoss.Gateway, 5)))
   
   private class OhNoTheyreTerranGetGoons extends Parallel(
     new Trigger(
@@ -88,7 +100,7 @@ abstract class AbstractProxy2Gate extends Parallel {
       initialAfter = new Parallel(
         new RequireSufficientPylons,
         new SwitchEnemyRace(
-          whenTerran  = new OhNoTheyreTerranYolo, // new OhNoTheyreTerranGetGoons,
+          whenTerran  = new BasicPlan, // new OhNoTheyreTerranGetGoons,
           whenProtoss = new BasicPlan,
           whenZerg    = new BasicPlan,
           whenRandom  = new BasicPlan),

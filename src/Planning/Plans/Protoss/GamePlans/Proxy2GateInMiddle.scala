@@ -13,10 +13,10 @@ class Proxy2GateInMiddle extends AbstractProxy2Gate {
       eligibleZones.minBy(zone =>
         5 * With.geography.bases
           .filter(base => base.isStartLocation && ! base.owner.isFriendly)
-          .map(_.heart.tileDistanceFast(zone.centroid))
+          .map(_.heart.groundPixels(zone.centroid))
           .sum +
         3 * With.geography.ourBases
-          .map(_.heart.tileDistanceFast(zone.centroid))
+          .map(_.heart.groundPixels(zone.centroid))
           .sum))
   }
 }

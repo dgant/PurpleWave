@@ -6,7 +6,7 @@ import Lifecycle.With
 class BuildCannonsAtExpansions(initialCount: Int) extends BuildCannonsAtBases(initialCount) {
   
   override def eligibleBases: Iterable[Base] = {
-    (With.geography.ourBases ++ With.geography.bases.filter(_.planningToTake))
+    With.geography.ourBases
       .filterNot(_ == With.geography.ourMain)
       .filterNot(With.geography.ourNatural.contains)
       .toSet

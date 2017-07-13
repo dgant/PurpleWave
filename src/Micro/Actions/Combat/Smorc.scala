@@ -42,15 +42,9 @@ object Smorc extends Action {
     // We want to avoid big drilling stacks
     val centroidSoft    = enemies.map(_.pixelCenter).centroid
     val centroidHard    = if (enemies.size > 3) enemies.sortBy(_.pixelDistanceFast(centroidSoft)).take(enemies.size/2).map(_.pixelCenter).centroid else centroidSoft //Don't centroid an empty list
-    var drillingEnemies = enemies.filter(_.pixelDistanceFast(centroidHard) < 8.0)
-    if (drillingEnemies.size < 4) {
-      drillingEnemies = Vector.empty
-    }
-    // Let's try disabling this.
-    drillingEnemies = Vector.empty
     
     // Get in their base!
-    if (state.unit.pixelCenter.zone != zone) {
+    if ( ! state.unit.pixelCenter.zone.bases.exists(_.owner.isEnemy) && enemiesAttackingUs.size <= 1) {
       Travel.consider(state)
       return
     }
@@ -102,6 +96,16 @@ object Smorc extends Action {
     }
   
     if (attack) {
+      // No static defense allowed!
+      val staticDefense = state.targets.filter(u => u.unitClass.isBuilding && u.unitClass.canAttack)
+      if (staticDefense.nonEmpty) {
+        state.toAttack = staticDefense
+          .sortBy(_.remainingBuildFrames)
+          .sortBy(_.totalHealth)
+          .headOption
+        Attack.delegate(state)
+      }
+      
       // Ignore units outside their bases
       // TODO: If they're pushing us out of their base we should fight back
       val targets = state.targets.filter(unit =>
@@ -123,9 +127,7 @@ object Smorc extends Action {
           targets.map(target =>state.unit.framesToTravelPixels(state.unit.pixelsFromEdgeFast(target))).min) {
         // Let's pick the outermost target while avoiding drilling stacks
         val nearestTargetDistance = targets.map(_.pixelDistanceFast(exit)).min
-        val validTargets = targets.filter(target =>
-          target.pixelDistanceFast(exit) - 16.0 <= nearestTargetDistance
-          && ! drillingEnemies.contains(target))
+        val validTargets = targets.filter(_.pixelDistanceFast(exit) - 16.0 <= nearestTargetDistance)
         val bestTarget =
           validTargets
             .sortBy(target => target.totalHealth * target.pixelDistanceFast(state.unit))
@@ -134,17 +136,6 @@ object Smorc extends Action {
   
         state.toAttack = Some(bestTarget)
         Attack.consider(state)
-        /*
-        Mineral-walky version
-        if (state.unit.canAttackThisFrame) {
-          state.toAttack = Some(bestTarget)
-          Attack.consider(state)
-        }
-        else {
-          state.toTravel = Some(bestTarget.pixelCenter.project(state.unit.pixelCenter, 4))
-          Travel.consider(state)
-        }
-        */
         
         return
       }

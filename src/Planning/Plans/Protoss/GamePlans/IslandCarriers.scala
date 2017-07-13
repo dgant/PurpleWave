@@ -11,7 +11,7 @@ import Planning.Plans.Macro.Expanding.{BuildAssimilators, BuildCannonsAtBases, R
 import Planning.Plans.Macro.Milestones.{OnGasBases, OnMiningBases, UnitsAtLeast}
 import Planning.Plans.Protoss.ProtossBuilds
 import Planning.Plans.Scouting.FindExpansions
-import ProxyBwapi.Races.{Protoss, Zerg}
+import ProxyBwapi.Races.Protoss
 
 class IslandCarriers extends Parallel {
   
@@ -30,7 +30,8 @@ class IslandCarriers extends Parallel {
     RequestAtLeast(1, Protoss.Stargate),
     RequestAtLeast(1, Protoss.FleetBeacon),
     RequestUpgradeNext(Protoss.AirDamage),
-    RequestUpgradeNext(Protoss.CarrierCapacity)
+    RequestUpgradeNext(Protoss.CarrierCapacity),
+    RequestAtLeast(1, Protoss.Forge)
   )
   
   private class TechToArbiters extends Build(
@@ -60,7 +61,6 @@ class IslandCarriers extends Parallel {
     new BuildAssimilators,
     new ExpandOverIsland,
     new TechToCarriers,
-    new TrainMatchingRatio(Protoss.Corsair, UnitMatchType(Zerg.Mutalisk), 1.5),
     new If(
       new UnitsAtLeast(4, UnitMatchType(Protoss.Carrier)),
       new Parallel(
@@ -76,7 +76,7 @@ class IslandCarriers extends Parallel {
     new OnGasBases(1, new Build(RequestAtLeast(3, Protoss.Stargate))),
     new OnGasBases(2, new Build(RequestAtLeast(5, Protoss.Stargate))),
     new OnGasBases(3, new Build(RequestAtLeast(8, Protoss.Stargate))),
-    new BuildCannonsAtBases(6),
+    new BuildCannonsAtBases(8),
     new FindExpansions { scouts.get.unitMatcher.set(UnitMatchType(Protoss.Scout)) },
     new ControlMap,
     new If(

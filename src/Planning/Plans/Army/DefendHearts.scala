@@ -19,7 +19,7 @@ class DefendHearts extends Plan {
       return
     }
     
-    val base = With.geography.bases.minBy(_.heart.tileDistanceFast(With.intelligence.mostBaselikeEnemyTile))
+    val base = With.geography.ourBases.minBy(_.heart.tileDistanceFast(With.intelligence.mostBaselikeEnemyTile))
     
     defenders.get.acquire(this)
     defenders.get.units.foreach(

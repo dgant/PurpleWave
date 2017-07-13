@@ -156,7 +156,14 @@ class ProtossVsZerg extends Parallel {
     // #YOLO
     new Employ(PvZEarlyZealotAllIn, new Parallel(
       new TrainContinuously(Protoss.Zealot),
-      new TrainContinuously(Protoss.Gateway, 5))),
+      new TrainContinuously(Protoss.Gateway, 5),
+      new Trigger(
+        new Or(
+          new EnemyUnitsAtLeast(1, UnitMatchType(Zerg.Mutalisk)),
+          new EnemyUnitsAtLeast(1, UnitMatchType(Zerg.Lurker)),
+          new EnemyUnitsAtLeast(1, UnitMatchType(Zerg.Spire))),
+        initialAfter = new AllIn)
+    )),
   
     // Mid game builds
     new Employ(PvZMidgame5GateDragoons, new ImplementMidgame5GateDragoons),
@@ -253,10 +260,12 @@ class ProtossVsZerg extends Parallel {
           new ConsiderAttacking {
             whenFalse.set(new DefendHearts)
           },
-          new ConsiderAttacking {
-            attack.attackers.get.unitCounter.set(new UnitCountBetween(1, 2))
-            attack.attackers.get.unitMatcher.set(UnitMatchWorkers)
-          }),
+          new If (
+            new Check(() => With.frame < 24 * 60 * 4),
+            new ConsiderAttacking {
+              attack.attackers.get.unitCounter.set(new UnitCountBetween(1, 2))
+              attack.attackers.get.unitMatcher.set(UnitMatchWorkers)
+            })),
         new DefendHearts)),
   
     new If(

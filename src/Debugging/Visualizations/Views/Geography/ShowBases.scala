@@ -22,7 +22,8 @@ object ShowBases extends View {
               if (base.isStartLocation)       Some("Start location")  else None,
               if (base.isNaturalOf.isDefined) Some("Natural")         else None,
               if (base.zone.island)           Some("Island")          else None,
-              if (base.planningToTake)        Some ("Planned")        else None)
+              if (base.planningToTake)        Some("Planned")         else None)
+              .flatten
               .mkString(", "),
             "Minerals left: " + base.mineralsLeft,
             "Gas left:     " + base.gasLeft,

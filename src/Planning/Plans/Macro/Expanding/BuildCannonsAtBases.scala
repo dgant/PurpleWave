@@ -16,7 +16,7 @@ class BuildCannonsAtBases(initialCount: Int) extends Plan {
   override def onUpdate() {
     val bases = eligibleBases
     if (eligibleBases.nonEmpty) {
-      if (With.units.ours.exists(_.is(Protoss.PhotonCannon))) {
+      if (With.units.ours.exists(_.is(Protoss.Forge))) {
         eligibleBases.foreach(cannonBase)
       }
       else {

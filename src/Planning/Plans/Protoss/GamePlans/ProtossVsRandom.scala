@@ -13,7 +13,7 @@ import Planning.Plans.Protoss.ProtossBuilds
 import Planning.Plans.Protoss.Situational.TwoGatewaysAtNatural
 import Planning.Plans.Scouting.RequireEnemyBase
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Options.Protoss.PvR.{PvREarly2Gate99, PvREarly2Gate99AtNatural}
+import Strategery.Strategies.Options.Protoss.PvR.{PvREarly2Gate1012, PvREarly2Gate910, PvREarly2Gate910AtNatural}
 
 class ProtossVsRandom extends Parallel {
   
@@ -21,13 +21,13 @@ class ProtossVsRandom extends Parallel {
   
   children.set(Vector(
     new RequireMiningBases(1),
-    new Employ(PvREarly2Gate99AtNatural,
+    new Employ(PvREarly2Gate910AtNatural,
       new Parallel(
         new TwoGatewaysAtNatural,
-        new Build(ProtossBuilds.OpeningTwoGate99_WithZealots: _*)
+        new Build(ProtossBuilds.OpeningTwoGate910_WithZealots: _*)
       )),
-    new Employ(PvREarly2Gate99, new Build(ProtossBuilds.OpeningTwoGate99_WithZealots: _*)),
-    new Employ(PvREarly2Gate99, new Build(ProtossBuilds.OpeningTwoGate1012: _*)),
+    new Employ(PvREarly2Gate910, new Build(ProtossBuilds.OpeningTwoGate910_WithZealots: _*)),
+    new Employ(PvREarly2Gate1012, new Build(ProtossBuilds.OpeningTwoGate1012: _*)),
     new RequireSufficientPylons,
     new TrainContinuously(Protoss.Zealot),
     new TrainProbesContinuously,

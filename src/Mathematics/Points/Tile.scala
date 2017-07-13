@@ -99,4 +99,8 @@ case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   def groundPixels(other: Pixel): Double = {
     With.paths.groundPixels(pixelCenter, other)
   }
+  def groundPixels(other: Tile): Double = {
+    With.paths.groundPixels(pixelCenter, other.pixelCenter)
+  }
+  
 }

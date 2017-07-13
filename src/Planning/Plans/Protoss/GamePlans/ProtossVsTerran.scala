@@ -155,6 +155,7 @@ class ProtossVsTerran extends Parallel {
       new Build(
         RequestAtLeast(1, Protoss.Gateway),
         RequestAtLeast(1, Protoss.CyberneticsCore),
+        RequestUpgrade(Protoss.DragoonRange),
         RequestAtLeast(4, Protoss.Gateway))
     )),
   
@@ -163,7 +164,9 @@ class ProtossVsTerran extends Parallel {
     new FulfillEarlyTech,
     
     // Mid game
-    new MatchMiningBases(1),
+    new If(
+      new Not(new Employing(PvTEarly4GateAllIn)),
+      new MatchMiningBases(1)),
     new TakeThirdBaseSafely,
     new OnMiningBases(2,
       new Parallel(
@@ -203,15 +206,15 @@ class ProtossVsTerran extends Parallel {
     new ScoutAt(14),
     new ScoutExpansionsAt(100),
     new ControlMap,
-  
-    // Contain 'em
+    
+    new Attack { attackers.get.unitMatcher.set(UnitMatchType(Protoss.DarkTemplar)) },
     new If(
       new And(
         new UnitsAtLeast(12, UnitMatchWarriors, complete = true),
         new Or(
           new UnitsAtLeast(1, UnitMatchType(Protoss.Observer), complete = true),
           new Not(new EnemyHasShown(Terran.SpiderMine)))),
-      new Attack,
+      new Attack, // Contain 'em
       new ConsiderAttacking)
   ))
 }

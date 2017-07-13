@@ -13,9 +13,6 @@ object Engage extends Action {
   }
   
   override def perform(state: ActionState) {
-    
-    state.toTravel = state.unit.battle.map(_.enemy.centroid).orElse(state.toTravel)
-    
     Brawl.consider(state)
     BustWallin.consider(state)
     chooseTarget(state)

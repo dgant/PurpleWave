@@ -14,7 +14,10 @@ object Brawl extends Action {
     state.unit.canAttackThisSecond  &&
     state.unit.melee                &&
     state.targets.nonEmpty          &&
-    state.targets.minBy(_.pixelDistanceFast(state.unit)).is(Zerg.Zergling)
+    {
+      val nearestEnemy = state.targets.minBy(_.pixelDistanceFast(state.unit))
+      nearestEnemy.is(Zerg.Zergling) && nearestEnemy.pixelDistanceFast(state.unit) < 64.0 && nearestEnemy.isBeingViolent
+    }
   }
   
   override protected def perform(state: ActionState) {

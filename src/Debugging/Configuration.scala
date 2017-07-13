@@ -95,7 +95,7 @@ class Configuration {
   // Visualization //
   ///////////////////
   
-  var visualize                           = true
+  var visualize                           = false
   var visualizationProbabilityHappyVision = 0.1
   var visualizationProbabilityTextOnly    = 0.00
   
@@ -107,4 +107,11 @@ class Configuration {
   var cameraViewportHeight        = 362
   var conservativeViewportWidth   = 640 + cameraViewportWidth
   var conservativeViewportHeight  = 480 + cameraViewportHeight
+  
+  // CIG SETTINGS
+  visualize = false
+  enableSurrendering = false
+  enableChat = false
+
+  
 }

@@ -119,6 +119,9 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
   private def buildUnitsEnablingCalculate: Vector[UnitClass] = {
     
     val output = new ListBuffer[UnitClass]
+  
+    //Probes (Protoss buildings)
+    addBuildUnitIf(output, isProtoss && isBuilding, Protoss.Probe)
     
     //Pylon (Protoss buildings except Nexus/Pylon/Assimilator)
     addBuildUnitIf(output, requiresPsi, Protoss.Pylon)

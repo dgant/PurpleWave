@@ -13,7 +13,7 @@ object ProtectTheWeak extends Action {
   // Protect our workers from harassment. Don't abandon them!
   
   override protected def allowed(state: ActionState): Boolean = {
-    true
+    state.threatsViolent.isEmpty
   }
   
   override protected def perform(state: ActionState) {

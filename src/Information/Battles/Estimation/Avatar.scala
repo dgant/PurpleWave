@@ -51,7 +51,7 @@ class Avatar {
     
     val range         = unit.pixelRangeMax + 64.0
     val pixelsAway    = if (nearestEnemy.isDefined) unit.pixelDistanceFast(nearestEnemy.get) else With.configuration.abstractBattleDistancePixels
-    val framesAway    = if (pixelsAway <= range) 0.0 else PurpleMath.nanToInfinity(Math.max(0.0, pixelsAway - range) / unit.topSpeed)
+    val framesAway    = if (pixelsAway <= range) 0.0 else PurpleMath.nanToInfinity(Math.max(0.0, pixelsAway - range) / (unit.topSpeed * 0.5)) //Reward range a bit more
     val framesTotal   = With.configuration.battleEstimationFrames
     val effectiveness = splashFactor * Math.max(0.0, (framesTotal - framesAway) / framesTotal)
     

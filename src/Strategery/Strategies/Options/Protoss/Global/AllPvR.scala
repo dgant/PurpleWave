@@ -1,6 +1,6 @@
 package Strategery.Strategies.Options.Protoss.Global
 
-import Strategery.Strategies.Options.Protoss.PvR.{PvREarly2Gate1012, PvREarly2Gate99, PvREarly2Gate99AtNatural}
+import Strategery.Strategies.Options.Protoss.PvR.{PvREarly2Gate1012, PvREarly2Gate910, PvREarly2Gate910AtNatural}
 import Strategery.Strategies.Strategy
 import bwapi.Race
 
@@ -11,8 +11,8 @@ object AllPvR extends Strategy {
     AllPvP.choices ++
     AllPvZ.choices ++
     Vector(Vector(
-      PvREarly2Gate99,
-      PvREarly2Gate99AtNatural,
+      PvREarly2Gate910,
+      PvREarly2Gate910AtNatural,
       PvREarly2Gate1012
     ))
   

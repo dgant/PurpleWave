@@ -20,7 +20,7 @@ class WeAreBeing4Pooled extends Plan {
     // Let's add a bit of buffer to our detection.
     conditionsMet = (conditionsMet
       || With.units.enemy.exists(_.is(Zerg.Zergling))
-      || (With.units.enemy.exists(u => u.is(Zerg.Drone) && u.pixelCenter.zone.owner.isUs) && With.frame < 24 * 60 * 2)
+      || (With.units.enemy.exists(u => u.is(Zerg.Drone) && u.pixelCenter.zone.owner.isUs) && With.frame < 24 * 75 && With.units.enemy.count(_.is(Zerg.Hatchery)) < 2)
       || With.units.enemy.exists(u => u.is(Zerg.SpawningPool) && (u.complete || u.lastSeen + u.remainingBuildFrames < 24 * 120)))
   }
 }

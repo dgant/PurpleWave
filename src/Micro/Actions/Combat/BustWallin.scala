@@ -1,10 +1,12 @@
 package Micro.Actions.Combat
 
 import Lifecycle.With
+import Mathematics.Shapes.Circle
 import Micro.Actions.Action
-import Micro.Actions.Commands.{Attack, Reposition}
+import Micro.Actions.Commands.{Attack, Travel}
 import Micro.Behaviors.MovementProfiles
 import Micro.Execution.ActionState
+import Micro.Heuristics.Targeting.EvaluateTargets
 import ProxyBwapi.Races.Terran
 import bwapi.Race
 
@@ -36,14 +38,30 @@ object BustWallin extends Action {
     // Don't rely on BW's pathing to bring us into the wall-in.
     // Wall-ins tend to cause Dragoons to do the "walk around the perimeter of the map" dance
     state.movementProfile = MovementProfiles.smash
+  
+    val targets =
+      if (state.targetsInRange.nonEmpty)
+        state.targetsInRange
+      else if (state.targets.nonEmpty)
+        Iterable(state.targets.minBy(target => state.unit.pixelDistanceTravelling(target.pixelCenter)))
+      else
+        Iterable.empty
     
-    if (state.unit.melee && state.targets.nonEmpty) {
-      // Bash down the doors!
-      state.toAttack = Some(state.targets.minBy(target => state.unit.pixelDistanceTravelling(target.pixelCenter)))
-      Attack.delegate(state)
-      return
+    state.toAttack = EvaluateTargets.best(state, targets)
+    Attack.delegate(state)
+    if (stillReady(state) && ! state.unit.melee && state.toAttack.isDefined) {
+      // Get up in there!
+      val targetUnit = state.toAttack.get
+      val targetTile = targetUnit.tileIncludingCenter
+      val targetAreaTiles = Circle.points(4).map(targetTile.add)
+      val targetSpots = targetAreaTiles
+        .filter(With.grids.walkable.get)
+        .map(_.pixelCenter)
+        .filter(pixel => state.unit.pixelDistanceFast(pixel) < state.unit.pixelDistanceFast(targetUnit))
+      if (targetSpots.nonEmpty) {
+        state.toTravel = Some(targetSpots.minBy(targetUnit.pixelDistanceFast))
+        Travel.delegate(state)
+      }
     }
-    
-    Reposition.delegate(state)
   }
 }

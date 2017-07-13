@@ -13,7 +13,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
-class DefendChokes extends Plan {
+class DefendChokes(val maxChokes: Int = 3) extends Plan {
   
   val defenders = new Property[LockUnits](new LockUnits)
   defenders.get.unitMatcher.set(UnitMatchWarriors)
@@ -30,6 +30,7 @@ class DefendChokes extends Plan {
           With.geography.enemyBases.map(_.heart.pixelCenter.pixelDistanceFast(choke.centerPixel)).min
         else
           With.intelligence.mostBaselikeEnemyTile.pixelCenter.pixelDistanceFast(choke.centerPixel))
+        .take(maxChokes)
     
     if (chokes.isEmpty) return
     
@@ -79,7 +80,6 @@ class DefendChokes extends Plan {
           With.executor.intend(new Intention(this, defender) {
             toReturn  = Some(spot)
             toTravel  = Some(spot)
-            toForm    = Some(spot)
           })
         })
     })

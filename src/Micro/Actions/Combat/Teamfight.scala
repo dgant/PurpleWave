@@ -21,8 +21,6 @@ object Teamfight extends Action {
     else if (state.unit.battle.exists(_.estimationGeometric.weLoseValue)) {
       Disengage.consider(state)
     }
-    else {
-      Engage.consider(state)
-    }
+    Engage.consider(state)
   }
 }

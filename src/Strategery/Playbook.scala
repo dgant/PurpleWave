@@ -1,6 +1,7 @@
 package Strategery
 
 import Strategery.Strategies.Options.AllRaces.{Proxy2Gate2StartLocations, Proxy2Gate3StartLocations, WorkerRush2StartLocations, WorkerRush3StartLocations}
+import Strategery.Strategies.Options.Protoss.Global.AllPvT
 import Strategery.Strategies.Options.Protoss.PvP._
 import Strategery.Strategies.Options.Protoss.PvR.{PvREarly2Gate1012, PvREarly2Gate99, PvREarly2Gate99AtNatural}
 import Strategery.Strategies.Options.Protoss.PvT._
@@ -16,8 +17,8 @@ object Playbook {
   // Use these whenever possible.
   //
   val forced = Vector(
-    Proxy2Gate2StartLocations,
-    Proxy2Gate3StartLocations
+    AllPvT,
+    PvTEarly1015GateGoon
   )
   
   // Specify the order in which you want to try strategies vs. new opponents

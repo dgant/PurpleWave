@@ -3,7 +3,7 @@ package Planning.Plans.Protoss.GamePlans
 import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
 import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors}
-import Planning.Plans.Army.{ConsiderAttacking, ControlMap}
+import Planning.Plans.Army.{Attack, ConsiderAttacking, ControlMap}
 import Planning.Plans.Compound._
 import Planning.Plans.Information.{Employ, Employing}
 import Planning.Plans.Macro.Automatic._
@@ -11,6 +11,7 @@ import Planning.Plans.Macro.BuildOrders.{Build, FirstFiveMinutes}
 import Planning.Plans.Macro.Expanding.{BuildAssimilators, MatchMiningBases, RequireMiningBases}
 import Planning.Plans.Macro.Milestones._
 import Planning.Plans.Macro.Reaction.EnemyBio
+import Planning.Plans.Protoss.Situational.TwoGatewaysAtNatural
 import Planning.Plans.Protoss.{ProtossBuilds, ProtossVsTerranIdeas}
 import Planning.Plans.Scouting.{ScoutAt, ScoutExpansionsAt}
 import ProxyBwapi.Races.{Protoss, Terran}
@@ -26,7 +27,10 @@ class ProtossVsTerran extends Parallel {
   
   private class ImplementEarly14Nexus       extends FirstFiveMinutes(new Build(ProtossBuilds.Opening13Nexus_NoZealot_OneGateCore: _*))
   private class ImplementEarly1GateRange    extends FirstFiveMinutes(new Build(ProtossBuilds.Opening_1GateCore: _*))
-  private class ImplementEarly1015GateGoon  extends FirstFiveMinutes(new Build(ProtossBuilds.OpeningTwoGate1015Dragoons: _*))
+  private class ImplementEarly1015GateGoon  extends FirstFiveMinutes(
+    new Parallel(
+      new TwoGatewaysAtNatural,
+      new Build(ProtossBuilds.OpeningTwoGate1015Dragoons: _*)))
   private class ImplementEarlyDTExpand      extends FirstFiveMinutes(new Build(ProtossBuilds.OpeningDTExpand: _*))
   private class ImplementEarly4GateAllIn    extends FirstFiveMinutes(new Build(ProtossBuilds.Opening_1GateZZCore: _*))
   
@@ -170,7 +174,7 @@ class ProtossVsTerran extends Parallel {
     
     // Late game
     new If(
-      new UnitsAtLeast(20, UnitMatchWarriors), // We have a habit of getting this tech too soon and dying
+      new UnitsAtLeast(12, UnitMatchWarriors), // We have a habit of getting this tech too soon and dying
       new Parallel(
         new Employ(PvTLateArbiters, new ImplementLateArbiters),
         new Employ(PvTLateCarriers, new ImplementLateCarriers),
@@ -201,6 +205,15 @@ class ProtossVsTerran extends Parallel {
     new ScoutAt(14),
     new ScoutExpansionsAt(100),
     new ControlMap,
-    new ConsiderAttacking
+  
+    // Contain 'em
+    new If(
+      new And(
+        new UnitsAtLeast(12, UnitMatchWarriors, complete = true),
+        new Or(
+          new UnitsAtLeast(1, UnitMatchType(Protoss.Observer), complete = true),
+          new Not(new EnemyHasShown(Terran.SpiderMine)))),
+      new Attack,
+      new ConsiderAttacking)
   ))
 }

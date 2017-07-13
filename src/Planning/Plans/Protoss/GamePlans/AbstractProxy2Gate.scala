@@ -6,7 +6,7 @@ import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.RequestAtLeast
 import Planning.Composition.UnitMatchers.UnitMatchType
-import Planning.Plans.Army.Attack
+import Planning.Plans.Army.{AllIn, Attack}
 import Planning.Plans.Compound._
 import Planning.Plans.Information.SwitchEnemyRace
 import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientPylons, TrainContinuously, TrainProbesContinuously}
@@ -32,7 +32,12 @@ abstract class AbstractProxy2Gate extends Parallel {
     new TrainProbesContinuously,
     new TrainContinuously(Protoss.Gateway, 5))
   
-  private class OhNoTheyreTerran extends Parallel(
+  private class OhNoTheyreTerranYolo extends Parallel(
+    new If (new EnemyUnitsAtLeast(1, UnitMatchType(Terran.Vulture)),
+    new AllIn),
+    new BasicPlan)
+  
+  private class OhNoTheyreTerranGetGoons extends Parallel(
     new Trigger(
       new Or(
         new And(
@@ -62,9 +67,9 @@ abstract class AbstractProxy2Gate extends Parallel {
   children.set(Vector(
     new ProposePlacement{
       override lazy val blueprints = Vector(
-        new Blueprint(this, building = Some(Protoss.Pylon),   zone = proxyZone, argPlacement = Some(PlacementProfiles.proxyPylon)),
-        new Blueprint(this, building = Some(Protoss.Gateway), zone = proxyZone, argPlacement = Some(PlacementProfiles.proxy)),
-        new Blueprint(this, building = Some(Protoss.Gateway), zone = proxyZone, argPlacement = Some(PlacementProfiles.proxy)))
+        new Blueprint(this, building = Some(Protoss.Pylon),   zone = proxyZone, respectHarvesting = false, argPlacement = Some(PlacementProfiles.proxyPylon)),
+        new Blueprint(this, building = Some(Protoss.Gateway), zone = proxyZone, respectHarvesting = false, argPlacement = Some(PlacementProfiles.proxy)),
+        new Blueprint(this, building = Some(Protoss.Gateway), zone = proxyZone, respectHarvesting = false, argPlacement = Some(PlacementProfiles.proxy)))
     },
     new Build(
       RequestAtLeast(1, Protoss.Nexus),
@@ -83,7 +88,7 @@ abstract class AbstractProxy2Gate extends Parallel {
       initialAfter = new Parallel(
         new RequireSufficientPylons,
         new SwitchEnemyRace(
-          whenTerran  = new OhNoTheyreTerran,
+          whenTerran  = new OhNoTheyreTerranYolo, // new OhNoTheyreTerranGetGoons,
           whenProtoss = new BasicPlan,
           whenZerg    = new BasicPlan,
           whenRandom  = new BasicPlan),

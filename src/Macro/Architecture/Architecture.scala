@@ -14,6 +14,8 @@ import scala.collection.mutable
 
 class Architecture {
   
+  lazy val harvestingTiles: Set[Tile] = With.geography.bases.flatMap(_.harvestingArea.tiles).toSet
+  
   val exclusions      : mutable.ArrayBuffer[Exclusion]            = new mutable.ArrayBuffer[Exclusion]
   val unbuildable     : mutable.Set[Tile]                         = new mutable.HashSet[Tile]
   val unwalkable      : mutable.Set[Tile]                         = new mutable.HashSet[Tile]
@@ -69,6 +71,10 @@ class Architecture {
   
   def buildable(tile: Tile): Boolean = {
     With.grids.buildable.get(tile) && ! unbuildable.contains(tile)
+  }
+  
+  def isHarvestingArea(tile: Tile): Boolean = {
+    harvestingTiles.contains(tile)
   }
   
   def walkable(tile: Tile): Boolean = {
@@ -193,17 +199,14 @@ class Architecture {
   private def recalculateExclusions() {
     val forUnbuildable  = With.units.all.toSeq.filter(isGroundBuilding)
     val forUnwalkable   = With.units.ours.toSeq.filter(unit => isGroundBuilding(unit) && usuallyNeedsMargin(unit.unitClass))
-    val harvestingAreas = With.geography.bases.map(_.harvestingArea)
     
     unbuildable     ++= forUnbuildable.flatMap(_.tileArea.tiles)
     unwalkable      ++= unbuildable
     unwalkable      ++= forUnwalkable.flatMap(_.tileArea.expand(1, 1).tiles)
     untownhallable  ++= unbuildable
-    unbuildable     ++= harvestingAreas.toSeq.flatMap(_.tiles)
     ungassable      ++= With.units.all.toSeq.filter(unit => ! unit.player.isNeutral && unit.alive && unit.unitClass.isGas).map(_.tileTopLeft)
       
     if (ShowArchitecture.inUse) {
-      exclusions ++= harvestingAreas.map(area => Exclusion("Harvesting area", area))
       exclusions ++= forUnwalkable.map(unit => Exclusion("Margin for " + unit, unit.tileArea.expand(1, 1)))
     }
   }

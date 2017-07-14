@@ -76,7 +76,8 @@ class ProtossVsZerg extends Parallel {
       RequestAtLeast(3, Protoss.Stargate),
       RequestUpgrade(Protoss.AirDamage),
       RequestUpgrade(Protoss.CarrierCapacity),
-      RequestAtLeast(4, Protoss.Stargate)))
+      RequestAtLeast(1, Protoss.CitadelOfAdun),
+      RequestUpgrade(Protoss.ZealotSpeed)))
   
   private class ImplementMidgameCorsairSpeedlot extends Parallel(
     new If(
@@ -89,8 +90,9 @@ class ProtossVsZerg extends Parallel {
           RequestAtLeast(1, Protoss.CyberneticsCore),
           RequestAtLeast(1, Protoss.Stargate),
           RequestAtLeast(1, Protoss.CitadelOfAdun),
-          RequestUpgrade(Protoss.ZealotSpeed),
           RequestUpgrade(Protoss.GroundDamage),
+          RequestUpgrade(Protoss.ZealotSpeed),
+          RequestAtLeast(1, Protoss.TemplarArchives),
           RequestAtLeast(5, Protoss.Gateway))),
       new Build(RequestAtLeast(3, Protoss.Gateway))))
   
@@ -238,7 +240,9 @@ class ProtossVsZerg extends Parallel {
       new EnemyMutalisks,
       new TrainContinuously(Protoss.Dragoon),
       new Parallel(
-        new TrainContinuously(Protoss.DarkTemplar, 3),
+        new If(
+          new Not(new Employing(PvZMidgameCorsairSpeedlot)),
+          new TrainContinuously(Protoss.DarkTemplar, 3)),
         new TrainContinuously(Protoss.Reaver, 5),
         new If(
           new Check(() =>
@@ -305,6 +309,9 @@ class ProtossVsZerg extends Parallel {
   
     new If(
       new And(
+        new Or(
+          new UnitsAtMost(0, UnitMatchType(Protoss.DarkTemplar), complete = true),
+          new Not(new Employing(PvZMidgameCorsairDarkTemplar))),
         new EnemyUnitsAtMost(0, UnitMatchType(Zerg.Spire), complete = true),
         new EnemyUnitsAtMost(0, UnitMatchType(Zerg.Mutalisk)),
         new EnemyUnitsAtMost(0, UnitMatchType(Zerg.Scourge))),

@@ -59,7 +59,7 @@ object HistorySerializer {
   }
   
   def writeGames(games: Iterable[HistoricalGame]): Iterable[String] = {
-    games.map(writeGame)
+    games.toVector.sortBy(-_.timestamp).map(writeGame)
   }
   
   private def writeGame(game: HistoricalGame): String = {

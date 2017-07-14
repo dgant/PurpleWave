@@ -47,7 +47,7 @@ class RequireSufficientPylons extends Plan {
     val supplyBanked              = With.self.minerals / costPerUnitSupply
   
     val supplySpentBeforeDepotCompletion  = supplyBanked + supplyUsedPerFrame * depotCompletionFrames
-    val supplyUsedWhenDepotWouldFinish    = currentSupplyUsed + supplySpentBeforeDepotCompletion
+    val supplyUsedWhenDepotWouldFinish    = Math.min(400, currentSupplyUsed + supplySpentBeforeDepotCompletion)
     val totalPylonsRequired               = Math.ceil((supplyUsedWhenDepotWouldFinish - currentSupplyOfNexus) / supplyPerDepot).toInt
     val pylonsRequired                    = Math.max(0, totalPylonsRequired)
   

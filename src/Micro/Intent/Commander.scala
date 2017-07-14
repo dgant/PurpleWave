@@ -40,7 +40,7 @@ class Commander {
     nextOrderFrame.keys
       .filter(unit => unit.is(Protoss.Dragoon))
       .filter(unit => unit.is(Protoss.Dragoon))
-      .foreach(dragoon => nextOrderFrame(dragoon) = Math.max(nextOrderFrame(dragoon), dragoon.lastAttackFrame + 9 - With.latency.latencyFrames))
+      .foreach(dragoon => nextOrderFrame(dragoon) = Math.max(nextOrderFrame(dragoon), dragoon.lastAttackFrame + 10 - With.latency.latencyFrames))
   }
   
   def ready(unit: FriendlyUnitInfo): Boolean = {

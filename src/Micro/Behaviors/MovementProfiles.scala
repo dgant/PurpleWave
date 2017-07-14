@@ -8,7 +8,7 @@ object MovementProfiles {
     preferMobility        = 0.7,
     preferTarget          = 0.1,
     preferTargetValue     = 0.1,
-    avoidTraffic          = 0.3,
+    avoidTraffic          = 0.5,
     avoidExplosions       = 8.0,
     avoidDetection        = 8.0,
     avoidDamage           = 3.0,

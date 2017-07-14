@@ -24,7 +24,7 @@ class ControlZone(zone: Zone) extends Plan {
   
   override def onUpdate() {
     
-    val enemies = With.units.enemy.filter(threateningZone)
+    val enemies = With.units.enemy.filter(enemy => enemy.likelyStillThere && threateningZone(enemy))
     val ourBase = zone.bases.find(base => base.owner.isUs || base.planningToTake)
     
     val threats = enemies.filter(threat => threat.canAttackThisSecond && ! threat.unitClass.isWorker && threat.likelyStillThere)
@@ -33,7 +33,7 @@ class ControlZone(zone: Zone) extends Plan {
       fighters.get.acquire(this)
       
       if (fighters.get.satisfied) {
-        val target = enemies
+        val target = threats
           .map(_.pixelCenter)
           .minBy(_.pixelDistanceFast(ourBase.map(_.heart).getOrElse(zone.centroid).pixelCenter))
   
@@ -50,7 +50,6 @@ class ControlZone(zone: Zone) extends Plan {
           }))
         }
       }
-      
     }
     
     // TODO: If there's no threat, answer likely ones

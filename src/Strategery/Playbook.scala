@@ -5,17 +5,18 @@ import Strategery.Strategies.Options.Protoss.PvP._
 import Strategery.Strategies.Options.Protoss.PvR.{PvREarly2Gate1012, PvREarly2Gate910, PvREarly2Gate910AtNatural}
 import Strategery.Strategies.Options.Protoss.PvT._
 import Strategery.Strategies.Options.Protoss.PvZ._
+import Strategery.Strategies.Strategy
 
 object Playbook {
   
   // Don't use these.
   //
-  val disabled = Vector(
+  val disabled = Vector[Strategy](
   )
   
   // Use these whenever possible.
   //
-  val forced = Vector(
+  val forced = Vector[Strategy](
     //AllPvT,
     //PvTEarly1015GateGoon
   )

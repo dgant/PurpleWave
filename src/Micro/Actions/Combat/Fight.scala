@@ -11,6 +11,7 @@ object Fight extends Action {
   
   override def perform(state: ActionState) {
     Cower.consider(state)
+    Sneak.consider(state)
     BustBunker.consider(state)
     ProtectTheWeak.consider(state)
     Teamfight.consider(state)

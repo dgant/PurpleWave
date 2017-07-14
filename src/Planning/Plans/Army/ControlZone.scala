@@ -9,7 +9,7 @@ import Planning.Composition.UnitCounters.{UnitCountCombat, UnitCountOne}
 import Planning.Composition.UnitMatchers.{UnitMatchAnd, UnitMatchDetectors, UnitMatchMobile, UnitMatchWarriors}
 import Planning.Composition.UnitPreferences.UnitPreferClose
 import Planning.Plan
-import ProxyBwapi.UnitInfo.UnitInfo
+import ProxyBwapi.UnitInfo.{ForeignUnitInfo, UnitInfo}
 
 class ControlZone(zone: Zone) extends Plan {
   
@@ -22,12 +22,15 @@ class ControlZone(zone: Zone) extends Plan {
   detectors.get.unitMatcher.set(UnitMatchAnd(UnitMatchDetectors, UnitMatchMobile))
   detectors.get.unitCounter.set(UnitCountOne)
   
+  var enemies: Set[ForeignUnitInfo] = Set.empty
+  var threats: Set[ForeignUnitInfo] = Set.empty
+  
   override def onUpdate() {
-    
-    val enemies = With.units.enemy.filter(enemy => enemy.likelyStillThere && threateningZone(enemy))
+  
     val ourBase = zone.bases.find(base => base.owner.isUs || base.planningToTake)
     
-    val threats = enemies.filter(threat => threat.canAttackThisSecond && ! threat.unitClass.isWorker && threat.likelyStillThere)
+    enemies = With.units.enemy.filter(enemy => enemy.likelyStillThere && threateningZone(enemy))
+    threats = enemies.filter(threat => threat.canAttackThisSecond && ! threat.unitClass.isWorker && threat.likelyStillThere)
     if (threats.nonEmpty) {
       fighters.get.unitCounter.set(new UnitCountCombat(enemies, alwaysAccept = ourBase.isDefined))
       fighters.get.acquire(this)

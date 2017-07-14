@@ -164,6 +164,12 @@ class Commander {
     }
   }
   
+  def useTechOnUnit(unit: FriendlyUnitInfo, tech: Tech, target: UnitInfo) {
+    if (unready(unit)) return
+    unit.base.useTech(tech.baseType, target.base)
+    sleep(unit)
+  }
+  
   def gather(unit: FriendlyUnitInfo, resource: UnitInfo) {
     if (unready(unit)) return
     

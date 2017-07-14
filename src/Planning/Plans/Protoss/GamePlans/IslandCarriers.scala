@@ -76,11 +76,11 @@ class IslandCarriers extends Parallel {
     new OnGasBases(1, new Build(RequestAtLeast(3, Protoss.Stargate))),
     new OnGasBases(2, new Build(RequestAtLeast(5, Protoss.Stargate))),
     new OnGasBases(3, new Build(RequestAtLeast(8, Protoss.Stargate))),
-    new BuildCannonsAtBases(8),
+    new BuildCannonsAtBases(16),
     new FindExpansions { scouts.get.unitMatcher.set(UnitMatchType(Protoss.Scout)) },
     new ControlMap,
     new If(
-      new UnitsAtLeast(9 * 8, UnitMatchType(Protoss.Interceptor)),
+      new UnitsAtLeast(8 * 8, UnitMatchType(Protoss.Interceptor)),
       new ConsiderAttacking,
       new DefendHearts),
     new FollowBuildOrder,

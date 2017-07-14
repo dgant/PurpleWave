@@ -9,27 +9,41 @@ object Retreat extends Action {
   
   override protected def allowed(state: ActionState): Boolean = {
     state.unit.canMoveThisFrame &&
-    state.unit.pixelCenter.zone != state.origin.zone
+    state.unit.pixelCenter.zone != state.origin.zone &&
+    state.threats.nonEmpty
   }
   
   override protected def perform(state: ActionState): Unit = {
+  
+    state.toTravel = Some(state.origin)
     
+    // A
     if (state.unit.pixelDistanceFast(state.origin) < 128.0) {
       Potshot.consider(state)
     }
     
-    // Are we blocked from running away?
+    // Take shots while retreating if we're going to get shot anyway.
+    // Good for Reavers.
+    //
+    if (state.unit.topSpeed < state.threats.map(_.topSpeed).min) {
+      Potshot.consider(state)
+    }
+    
+    // Are we trying to retreat from our own base?
     //
     if (state.threatsViolent.exists(threat =>
-      threat.pixelCenter.zone == state.origin.zone &&
+      threat.pixelCenter.zone == state.origin.zone
+      &&
       state.origin.pixelDistanceFast(threat.pixelCenter) <
       state.origin.pixelDistanceFast(state.unit.pixelCenter))) {
       
       state.movementProfile = MovementProfiles.avoid
+      Potshot.delegate(state)
       Reposition.delegate(state)
     }
+    
     // If we have nowhere to retreat to, just fight the best we can.
-    else if (
+    if (
       state.unit.damageInLastSecond > 0 &&
       state.threats.exists(_.inRangeToAttackFast(state.unit)) &&
       state.unit.pixelDistanceFast(state.origin) <
@@ -37,12 +51,9 @@ object Retreat extends Action {
         state.threats.map(_.pixelRangeAgainstFromCenter(state.unit)).max +
       16.0) {
   
-      state.toTravel = Some(state.origin)
-      Engage.delegate(state)
+      Potshot.delegate(state)
     }
-    else {
-      state.toTravel = Some(state.origin)
-      Travel.delegate(state)
-    }
+    
+    Travel.delegate(state)
   }
 }

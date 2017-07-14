@@ -3,6 +3,7 @@ package Micro.Actions
 import Micro.Actions.Basic._
 import Micro.Actions.Combat.{Duck, Fight, Smorc}
 import Micro.Actions.Commands.{Attack, Travel}
+import Micro.Actions.Protoss.Meld
 import Micro.Execution.ActionState
 
 object Idle extends Action {
@@ -26,6 +27,7 @@ object Idle extends Action {
     state.canFight        = state.intent.canAttack
     state.canPursue       = state.intent.canPursue
     state.canCower        = state.intent.canCower
+    state.canMeld         = state.intent.canMeld
     
     actions.foreach(_.consider(state))
     
@@ -34,6 +36,7 @@ object Idle extends Action {
   
   private val actions = Vector(
     Cancel, //Probably not actually used yet because candidates won't be in the Executor queue
+    Meld,
     Smorc,
     Duck,
     Gather,

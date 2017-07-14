@@ -6,7 +6,7 @@ object PlacementProfiles {
   
   val pylon = new PlacementProfile(
     "Pylon",
-    preferZone                  = 3.0,
+    preferZone                  = 10.0,
     preferSpace                 = 0.1,
     preferPowering              = 1.0,
     preferDistanceFromEnemy     = 1.0,
@@ -43,6 +43,7 @@ object PlacementProfiles {
   
   val naturalCannonPylon = new PlacementProfile(
     "Pylon for natural Cannons",
+    preferZone                  = 100.0,
     preferPowering              = 0.5,
     preferDistanceFromEnemy     = 0.5,
     preferCoveringWorkers       = 0.5,
@@ -52,11 +53,13 @@ object PlacementProfiles {
   
   val naturalCannon = new PlacementProfile(
     "Natural cannons",
+    preferZone                  = 100.0,
     avoidSurfaceArea            = 0.25,
     avoidDistanceFromIdealRange = 5.0)
   
   val mineralCannon = new PlacementProfile(
     "Pylon for mineral line Cannons",
+    preferZone                  = 100.0,
     preferPowering              = 0.1,
     preferCoveringWorkers       = 1.0)
   

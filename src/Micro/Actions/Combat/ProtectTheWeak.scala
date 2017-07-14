@@ -1,7 +1,6 @@
 package Micro.Actions.Combat
 
 import Micro.Actions.Action
-import Micro.Actions.Basic.Gather
 import Micro.Actions.Commands.{Attack, Reposition}
 import Micro.Behaviors.MovementProfiles
 import Micro.Execution.ActionState
@@ -30,7 +29,7 @@ object ProtectTheWeak extends Action {
         Attack.delegate(state)
       }
       else {
-        // Avoid taking damage while we defend our workers
+        // Avoid taking damage while we defen
         Reposition.delegate(state)
       }
     }
@@ -38,9 +37,11 @@ object ProtectTheWeak extends Action {
   
   private def bullies(state: ActionState): Iterable[UnitInfo] = {
     state.neighbors
-      .filter(neighbor => ! neighbor.isBeingViolent && (neighbor.unitClass.isWorker || (neighbor.wounded && neighbor.unitClass.isBuilding)))
+      .filter(neighbor =>
+        neighbor.unitClass.isWorker ||
+        (
+          neighbor.unitClass.isBuilding &&
+          (neighbor.wounded || neighbor.unitClass.canAttack)))
       .flatMap(neighbor => state.targets.filter(_.isBeingViolentTo(neighbor)))
   }
-  
-  private val innocentActions = Array(Gather)
 }

@@ -8,7 +8,7 @@ import scala.collection.mutable
 
 class ControlMap extends Plan {
   
-  private val zones = new mutable.HashMap[Zone, Plan]
+  private val zones = new mutable.HashMap[Zone, ControlZone]
   
   protected override def onUpdate() {
     initialize()
@@ -31,9 +31,9 @@ class ControlMap extends Plan {
       (
         if (base.owner.isFriendly)
           100.0
-        else if (base.planningToTake)
-          50.0
         else if (base.owner.isEnemy)
+          50.0
+        else if (base.planningToTake)
           20.0
         else
           1.0

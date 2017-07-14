@@ -5,7 +5,7 @@ import Micro.Heuristics.Movement.MovementProfile
 object MovementProfiles {
   
   def default = MovementProfile(
-    preferMobility        = 0.7,
+    preferMobility        = 1.0,
     preferTarget          = 0.1,
     preferTargetValue     = 0.1,
     avoidTraffic          = 0.5,

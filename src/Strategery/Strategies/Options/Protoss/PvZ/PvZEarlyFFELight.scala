@@ -9,6 +9,7 @@ object PvZEarlyFFELight extends Strategy {
     Vector(
       PvZMidgame5GateDragoons,
       PvZMidgameCorsairCarrier,
+      PvZMidgameCorsairDarkTemplar,
       PvZMidgameCorsairReaver,
       PvZMidgameCorsairSpeedlot))
   

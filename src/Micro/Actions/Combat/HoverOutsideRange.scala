@@ -13,7 +13,7 @@ object HoverOutsideRange extends Action {
   
   override def perform(state: ActionState) {
     
-    state.movementProfile = MovementProfiles.avoid
+    state.movementProfile = MovementProfiles.safelyAttackTarget
     Reposition.delegate(state)
   }
 }

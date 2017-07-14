@@ -160,7 +160,10 @@ class ProtossVsTerran extends Parallel {
     )),
   
     new ProtossVsTerranIdeas.RespondToBioAllInWithReavers,
-    new RequireMiningBases(2),
+    // Mid game
+    new If(
+      new Not(new Employing(PvTEarly4GateAllIn)),
+      new RequireMiningBases(2)),
     new FulfillEarlyTech,
     
     // Mid game

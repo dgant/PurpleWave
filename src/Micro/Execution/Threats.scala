@@ -5,18 +5,22 @@ import ProxyBwapi.UnitInfo.UnitInfo
 
 object Threats {
   
-  def get(state: ActionState): Vector[UnitInfo] = {
+  def enemies(state: ActionState): Vector[UnitInfo] = {
     if (state.unit.battle.isEmpty) return Vector.empty
     With.units.inTileRadius(
       state.unit.tileIncludingCenter,
       With.configuration.battleMarginTiles)
-        .filter(threat => valid(state, threat))
-    .toVector
+        .filter(threat =>
+          threat.likelyStillThere &&
+          threat.isEnemyOf(state.unit))
+        .toVector
   }
   
-  def valid(state: ActionState, threat: UnitInfo): Boolean = {
-    threat.likelyStillThere &&
-    threat.isEnemyOf(state.unit) &&
-    threat.canAttackThisSecond(state.unit)
+  def threats(state: ActionState): Vector[UnitInfo] = {
+    state.enemies.filter(_.canAttackThisSecond(state.unit))
+  }
+  
+  def violent(state: ActionState): Vector[UnitInfo] = {
+    state.threats.filter(_.isBeingViolentTo(state.unit))
   }
 }

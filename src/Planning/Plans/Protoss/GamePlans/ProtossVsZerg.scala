@@ -41,7 +41,10 @@ class ProtossVsZerg extends Parallel {
           new Build(ProtossBuilds.FFE_NexusFirst: _*),
           new Build(ProtossBuilds.FFE_ForgeFirst: _*))),
       new RequireMiningBases(2),
-      new Build(RequestAtLeast(3, Protoss.PhotonCannon))))
+      new Build(
+        RequestAtLeast(2, Protoss.PhotonCannon),
+        RequestAtLeast(1, Protoss.Gateway),
+        RequestAtLeast(3, Protoss.PhotonCannon))))
   
   private class ImplementEarlyFFEHeavy extends ImplementEarlyFFELight
   
@@ -55,12 +58,11 @@ class ProtossVsZerg extends Parallel {
       RequestAtLeast(1, Protoss.Assimilator),
       RequestAtLeast(1, Protoss.CyberneticsCore),
       RequestAtLeast(1, Protoss.Zealot),
-      RequestUpgrade(Protoss.DragoonRange),
-      RequestAtLeast(1, Protoss.Dragoon)),
+      RequestUpgrade(Protoss.DragoonRange)),
     new If(
       new MiningBasesAtLeast(2),
       new Parallel(
-        new Build(RequestAtLeast(2, Protoss.Assimilator)),
+        new BuildAssimilators,
         new Build(RequestAtLeast(5, Protoss.Gateway))),
       new Build(RequestAtLeast(3, Protoss.Gateway))))
   
@@ -77,29 +79,51 @@ class ProtossVsZerg extends Parallel {
       RequestAtLeast(4, Protoss.Stargate)))
   
   private class ImplementMidgameCorsairSpeedlot extends Parallel(
-    new Build(
-      RequestAtLeast(1, Protoss.Gateway),
-      RequestAtLeast(1, Protoss.Assimilator),
-      RequestAtLeast(1, Protoss.CyberneticsCore),
-      RequestUpgrade(Protoss.GroundDamage)),
     new If(
       new MiningBasesAtLeast(2),
-      new Build(
-        RequestAtLeast(2, Protoss.Assimilator),
-        RequestAtLeast(5, Protoss.Gateway),
-        RequestAtLeast(1, Protoss.Stargate),
-        RequestAtLeast(1, Protoss.CitadelOfAdun)),
+      new Parallel(
+        new BuildAssimilators,
+        new Build(
+          RequestAtLeast(1, Protoss.Gateway),
+          RequestAtLeast(1, Protoss.Assimilator),
+          RequestAtLeast(1, Protoss.CyberneticsCore),
+          RequestAtLeast(1, Protoss.Stargate),
+          RequestAtLeast(1, Protoss.CitadelOfAdun),
+          RequestUpgrade(Protoss.ZealotSpeed),
+          RequestUpgrade(Protoss.GroundDamage),
+          RequestAtLeast(5, Protoss.Gateway))),
       new Build(RequestAtLeast(3, Protoss.Gateway))))
   
   private class ImplementMidgameCorsairReaver extends Parallel(
-    new Build(
-      RequestAtLeast(1, Protoss.Gateway),
-      RequestAtLeast(2, Protoss.Assimilator),
-      RequestAtLeast(1, Protoss.CyberneticsCore),
-      RequestAtLeast(1, Protoss.Stargate),
-      RequestAtLeast(1, Protoss.RoboticsFacility),
-      RequestAtLeast(1, Protoss.RoboticsSupportBay)),
-    new OnGasBases(3, new ImplementMidgameCorsairCarrier))
+    new If(
+      new MiningBasesAtLeast(2),
+      new Parallel(
+        new BuildAssimilators,
+        new Build(
+          RequestAtLeast(1, Protoss.Gateway),
+          RequestAtLeast(1, Protoss.Assimilator),
+          RequestAtLeast(1, Protoss.CyberneticsCore),
+          RequestAtLeast(1, Protoss.Stargate),
+          RequestAtLeast(1, Protoss.RoboticsFacility),
+          RequestUpgrade(Protoss.GroundDamage),
+          RequestAtLeast(1, Protoss.RoboticsSupportBay),
+          RequestAtLeast(5, Protoss.Gateway))),
+      new Build(RequestAtLeast(3, Protoss.Gateway))))
+  
+  private class ImplementMidgameCorsairDarkTemplar extends Parallel(
+    new If(
+      new MiningBasesAtLeast(2),
+      new Parallel(
+        new BuildAssimilators,
+        new Build(
+          RequestAtLeast(1, Protoss.Gateway),
+          RequestAtLeast(1, Protoss.Assimilator),
+          RequestAtLeast(1, Protoss.CyberneticsCore),
+          RequestAtLeast(1, Protoss.Stargate),
+          RequestAtLeast(1, Protoss.CitadelOfAdun),
+          RequestAtLeast(1, Protoss.TemplarArchives),
+          RequestAtLeast(5, Protoss.Gateway))),
+      new Build(RequestAtLeast(3, Protoss.Gateway))))
   
   ///////////
   // Macro //
@@ -130,6 +154,8 @@ class ProtossVsZerg extends Parallel {
   /////////////////
   
   children.set(Vector(
+  
+    new MeldArchons,
     
     // Early game
     new RequireMiningBases(1),
@@ -188,7 +214,7 @@ class ProtossVsZerg extends Parallel {
     
     new If(
       new And(
-        new UnitsAtLeast(4, UnitMatchType(Protoss.Zealot), complete = false),
+        new UnitsAtLeast(4, UnitMatchWarriors, complete = false),
         new UnitsAtLeast(1, UnitMatchType(Protoss.Forge), complete = true),
         new UnitsAtLeast(1, UnitMatchType(Protoss.Assimilator), complete = true)),
       new Parallel(
@@ -198,7 +224,12 @@ class ProtossVsZerg extends Parallel {
     new If(
       new EnemyMutalisks,
       new TrainMatchingRatio(Protoss.Corsair, UnitMatchType(Zerg.Mutalisk), 1.5),
-      new TrainContinuously(Protoss.Corsair, 2)),
+      new If(
+        new And(
+          new Employing(PvZMidgameCorsairDarkTemplar),
+          new UnitsAtLeast(2, UnitMatchType(Protoss.DarkTemplar), complete = true)),
+        new TrainContinuously(Protoss.Corsair, 5),
+        new TrainContinuously(Protoss.Corsair, 2))),
     
     new TrainContinuously(Protoss.Carrier),
     new TrainMatchingRatio(Protoss.Observer, UnitMatchType(Zerg.Lurker), 0.2, 3),
@@ -207,17 +238,28 @@ class ProtossVsZerg extends Parallel {
       new EnemyMutalisks,
       new TrainContinuously(Protoss.Dragoon),
       new Parallel(
+        new TrainContinuously(Protoss.DarkTemplar, 3),
         new TrainContinuously(Protoss.Reaver, 5),
         new If(
-          new Or(
-            new Employing(PvZMidgame5GateDragoons),
-            new UnitsAtLeast(12, UnitMatchType(Protoss.Zealot))),
+          new Check(() =>
+            With.units.ours.exists(u => u.is(Protoss.TemplarArchives) && u.aliveAndComplete) &&
+              With.self.gas > With.self.minerals),
+          new TrainContinuously(Protoss.HighTemplar, 4)),
+        new If(
+          new And(
+            new Check(() => With.self.minerals > With.self.gas * 5),
+            new Or(
+              new Employing(PvZMidgame5GateDragoons),
+              new Employing(PvZMidgame5GateDragoons),
+              new UnitsAtLeast(12, UnitMatchType(Protoss.Zealot)))),
           new TrainContinuously(Protoss.Dragoon),
           new TrainContinuously(Protoss.Zealot)))),
-  
-    new Employ(PvZMidgameCorsairReaver,    new ImplementMidgameCorsairReaver),
-    new Employ(PvZMidgameCorsairSpeedlot,  new ImplementMidgameCorsairSpeedlot),
-    new Employ(PvZMidgameCorsairCarrier,   new ImplementMidgameCorsairCarrier),
+    
+    new Employ(PvZMidgameCorsairCarrier,        new ImplementMidgameCorsairCarrier),
+    new Employ(PvZMidgameCorsairDarkTemplar,    new ImplementMidgameCorsairDarkTemplar),
+    new Employ(PvZMidgameCorsairReaver,         new ImplementMidgameCorsairReaver),
+    new Employ(PvZMidgameCorsairSpeedlot,       new ImplementMidgameCorsairSpeedlot),
+    
     
     // Late game macro
     new Build(
@@ -227,17 +269,11 @@ class ProtossVsZerg extends Parallel {
       RequestAtLeast(5, Protoss.Gateway),
       RequestAtLeast(1, Protoss.Forge),
       RequestAtLeast(1, Protoss.CitadelOfAdun),
-      RequestAtLeast(3, Protoss.Nexus),
-      RequestAtLeast(8, Protoss.Gateway)),
-    
-    new Build(
-      RequestAtLeast(2, Protoss.Forge),
-      RequestAtLeast(1, Protoss.CitadelOfAdun),
+      RequestAtLeast(8, Protoss.Gateway),
       RequestAtLeast(1, Protoss.TemplarArchives)),
     
     new UpgradeContinuously(Protoss.GroundArmor),
     new UpgradeContinuously(Protoss.GroundDamage),
-    
     
     // Tactics
     new If(
@@ -250,7 +286,6 @@ class ProtossVsZerg extends Parallel {
       new If(
         new UnitsAtLeast(1, UnitMatchType(Protoss.Pylon), complete = false),
         new RequireScouting)), // Don't scout while being 4-pooled
-    
     
     // Zealot all-in: Trigger attacking immediately! And bring Probes because they help kill Zerglings faster
     new Employ(PvZEarlyZealotAllIn,
@@ -270,6 +305,7 @@ class ProtossVsZerg extends Parallel {
   
     new If(
       new And(
+        new EnemyUnitsAtMost(0, UnitMatchType(Zerg.Spire), complete = true),
         new EnemyUnitsAtMost(0, UnitMatchType(Zerg.Mutalisk)),
         new EnemyUnitsAtMost(0, UnitMatchType(Zerg.Scourge))),
       new Parallel(

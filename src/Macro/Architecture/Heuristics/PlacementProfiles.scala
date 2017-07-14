@@ -65,10 +65,10 @@ object PlacementProfiles {
   
   val wall = new PlacementProfile(
     "Ground defense",
-    preferCoveringWorkers       = 0.25,
-    avoidDistanceFromBase       = 0.25,
+    preferCoveringWorkers       = 2.0,
+    avoidDistanceFromBase       = 0.5,
     avoidSurfaceArea            = 1.0,
-    avoidDistanceFromIdealRange = 2.0)
+    avoidDistanceFromIdealRange = 1.0)
   
   var proxy = new PlacementProfile(
     "Proxy",

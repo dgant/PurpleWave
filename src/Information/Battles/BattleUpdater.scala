@@ -11,7 +11,7 @@ object BattleUpdater {
     With.battles.all.foreach(updateBattle)
   }
   
-  private def updateBattle(battle:Battle) {
+  private def updateBattle(battle: Battle) {
     
     if (battle.happening) {
       battle.teams.foreach(group => {
@@ -34,6 +34,5 @@ object BattleUpdater {
     battle.teams.flatMap(_.units).foreach(avatarBuilderGeometric.addUnit)
     battle.estimationAbstract   = Estimator.calculate(avatarBuilderAbstract)
     battle.estimationGeometric  = Estimator.calculate(avatarBuilderGeometric)
-    
   }
 }

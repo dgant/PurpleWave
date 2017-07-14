@@ -168,11 +168,12 @@ class ProtossVsZerg extends Parallel {
     new Employ(PvZEarlyFFEHeavy,     new ImplementEarlyFFEHeavy),
     
     // Build cannons vs. Zergling rushes
-    new If(
-      new Or(
-        new Employing(PvZEarlyFFELight),
-        new Employing(PvZEarlyFFEHeavy)),
-      new TrainMatchingRatio(Protoss.PhotonCannon, UnitMatchType(Zerg.Zergling), 0.5, 6)),
+    new FirstFiveMinutes(
+      new If(
+        new Or(
+          new Employing(PvZEarlyFFELight),
+          new Employing(PvZEarlyFFEHeavy)),
+        new TrainMatchingRatio(Protoss.PhotonCannon, UnitMatchType(Zerg.Zergling), 0.5, 6))),
     
     new TakeSafeNatural,
     new TakeSafeThirdBase,
@@ -318,6 +319,8 @@ class ProtossVsZerg extends Parallel {
       new Parallel(
         new FindExpansions       { scouts.get.unitMatcher.set(UnitMatchType(Protoss.Corsair)) },
         new ControlEnemyAirspace { flyers.get.unitMatcher.set(UnitMatchType(Protoss.Corsair)) })),
+  
+    new FindExpansions { scouts.get.unitMatcher.set(UnitMatchType(Protoss.DarkTemplar)) },
     
     new ControlMap,
     new If(

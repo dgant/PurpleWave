@@ -40,8 +40,8 @@ object BattleUpdater {
       builder.vanguardEnemy = Some(battle.enemy.vanguard)
     }
     def fitsAttackCriteria(unit: UnitInfo, mustBeMobile: Boolean): Boolean = ! mustBeMobile || ! unit.unitClass.isBuilding
-    battle.us.units.filter(fitsAttackCriteria(_, weAttack))     .foreach(builder.addUnit)
-    battle.us.units.filter(fitsAttackCriteria(_, enemyAttacks)) .foreach(builder.addUnit)
+    battle.us     .units.filter(fitsAttackCriteria(_, weAttack))     .foreach(builder.addUnit)
+    battle.enemy  .units.filter(fitsAttackCriteria(_, enemyAttacks)) .foreach(builder.addUnit)
     Estimator.calculate(builder)
   }
 }

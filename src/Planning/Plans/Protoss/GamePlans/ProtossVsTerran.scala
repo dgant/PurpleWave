@@ -47,7 +47,7 @@ class ProtossVsTerran extends Parallel {
   
   private class TakeThirdBaseSafely extends If(
     new Or(
-      new UnitsAtLeast(6, UnitMatchType(Protoss.Dragoon)),
+      new UnitsAtLeast(5, UnitMatchType(Protoss.Dragoon)),
       new UnitsAtLeast(1, UnitMatchType(Protoss.Reaver))
     ),
     new RequireMiningBases(3))
@@ -57,6 +57,9 @@ class ProtossVsTerran extends Parallel {
     RequestAtLeast(1,   Protoss.Gateway),
     RequestAtLeast(1,   Protoss.CyberneticsCore),
     RequestUpgrade(Protoss.DragoonRange),
+    RequestAtLeast(2,   Protoss.Gateway),
+    RequestAtLeast(1,   Protoss.RoboticsFacility),
+    RequestAtLeast(1,   Protoss.Observatory),
     RequestAtLeast(1,   Protoss.CitadelOfAdun),
     RequestUpgrade(Protoss.ZealotSpeed))
   
@@ -164,6 +167,7 @@ class ProtossVsTerran extends Parallel {
     )),
   
     new ProtossVsTerranIdeas.RespondToBioAllInWithReavers,
+    
     // Mid game
     new If(
       new Not(new Employing(PvTEarly4GateAllIn)),

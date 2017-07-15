@@ -1,5 +1,6 @@
 package Information.Geography.Types
 
+import Information.Geography.Pathfinding.ZonePath
 import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile, TileRectangle}
 import ProxyBwapi.Players.PlayerInfo
@@ -37,6 +38,7 @@ class Zone(
   def contains(tile: Tile)    : Boolean = boundary.contains(tile) && tiles.contains(tile)
   def contains(pixel: Pixel)  : Boolean = contains(pixel.tileIncluding)
   
-  def canWalkTo(to: Zone): Boolean = With.paths.zonePath(this, to).isDefined
-  def distancePixels(to: Zone): Double = With.paths.zoneDistance(this, to)
+  def pathTo          (to: Zone): Option[ZonePath]  = With.paths.zonePath(this, to)
+  def canWalkTo       (to: Zone): Boolean           = pathTo(to).isDefined
+  def distancePixels  (to: Zone): Double            = With.paths.zoneDistance(this, to)
 }

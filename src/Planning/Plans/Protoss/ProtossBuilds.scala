@@ -211,7 +211,6 @@ object ProtossBuilds {
     RequestAtLeast(1,   Protoss.Forge),
     RequestAtLeast(13,  Protoss.Probe),
     RequestAtLeast(2,   Protoss.PhotonCannon),
-    RequestAtLeast(15,  Protoss.Probe),
     RequestAtLeast(16,  Protoss.Probe),
     RequestAtLeast(2,   Protoss.Pylon))
   
@@ -223,7 +222,7 @@ object ProtossBuilds {
     RequestAtLeast(2,   Protoss.Nexus),
     RequestAtLeast(13,  Protoss.Probe),
     RequestAtLeast(1,   Protoss.Forge),
-    RequestAtLeast(15,  Protoss.Probe),
+    RequestAtLeast(16,  Protoss.Probe),
     RequestAtLeast(2,   Protoss.Pylon))
   
   

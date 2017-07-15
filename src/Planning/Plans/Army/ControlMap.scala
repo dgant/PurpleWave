@@ -13,6 +13,7 @@ class ControlMap extends Plan {
   protected override def onUpdate() {
     initialize()
     zones.keys.toList
+      .filter(zoneValue(_) > 0.0)
       .sortBy(-zoneValue(_))
       .foreach(zones(_).update())
   }

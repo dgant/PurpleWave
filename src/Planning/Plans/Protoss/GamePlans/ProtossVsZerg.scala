@@ -246,19 +246,26 @@ class ProtossVsZerg extends Parallel {
           new TrainContinuously(Protoss.DarkTemplar, 3)),
         new TrainContinuously(Protoss.Reaver, 5),
         new If(
-          new Check(() =>
-            With.units.ours.exists(u => u.is(Protoss.TemplarArchives) && u.aliveAndComplete) &&
-              With.self.gas > With.self.minerals),
-          new TrainContinuously(Protoss.HighTemplar, 4)),
-        new If(
           new And(
-            new Check(() => With.self.minerals > With.self.gas * 5),
-            new Or(
-              new Employing(PvZMidgame5GateDragoons),
-              new Employing(PvZMidgame5GateDragoons),
-              new UnitsAtLeast(12, UnitMatchType(Protoss.Zealot)))),
-          new TrainContinuously(Protoss.Dragoon),
-          new TrainContinuously(Protoss.Zealot)))),
+            new UnitsAtLeast(1, UnitMatchType(Protoss.TemplarArchives), complete = true),
+            new UnitsAtMost(3, UnitMatchType(Protoss.Archon), complete = false),
+            new Check(() => With.self.gas > With.self.minerals)),
+          new TrainContinuously(Protoss.HighTemplar, 4)),
+          new If(
+            new And(
+              new UnitsAtLeast(1, UnitMatchType(Protoss.CyberneticsCore), complete = true),
+              new Or(
+                new And(
+                  new Employing(PvZMidgame5GateDragoons),
+                  new UnitsAtMost(15, UnitMatchType(Protoss.Dragoon))),
+                new And(
+                  new Employing(PvZMidgameCorsairDarkTemplar),
+                  new UnitsAtMost(15, UnitMatchType(Protoss.Dragoon))),
+                new UnitsAtLeast(12, UnitMatchType(Protoss.Zealot))
+              )
+            ),
+            new TrainContinuously(Protoss.Dragoon),
+            new TrainContinuously(Protoss.Zealot)))),
     
     new Employ(PvZMidgameCorsairCarrier,        new ImplementMidgameCorsairCarrier),
     new Employ(PvZMidgameCorsairDarkTemplar,    new ImplementMidgameCorsairDarkTemplar),

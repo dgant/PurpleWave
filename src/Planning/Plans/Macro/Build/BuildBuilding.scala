@@ -145,7 +145,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
     }
     val travelFrames    = proposedBuilder.get.framesToTravel(desiredTile.get.pixelCenter) / With.configuration.assumedBuilderTravelSpeed
     val expectedFrames  = currencyLock.expectedFrames
-    travelFrames >= expectedFrames
+    travelFrames + 24 >= expectedFrames
   }
   
   override def visualize() {

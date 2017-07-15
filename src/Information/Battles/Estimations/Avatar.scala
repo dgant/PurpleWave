@@ -36,8 +36,8 @@ class Avatar {
   var totalUnits                      = 0.0
   
   def this(
-    unit         : UnitInfo,
-    nearestEnemy : Option[Pixel] = None) {
+    unit          : UnitInfo,
+    nearestEnemy  : Option[Pixel] = None) {
     
     this()
   

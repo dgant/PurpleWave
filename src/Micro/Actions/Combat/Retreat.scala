@@ -16,6 +16,7 @@ object Retreat extends Action {
   override protected def perform(state: ActionState): Unit = {
   
     state.toTravel = Some(state.origin)
+    CarrierRetreat.delegate(state)
     
     if (state.unit.pixelDistanceFast(state.origin) < 128.0 || ! state.unit.melee) {
       Potshot.consider(state)

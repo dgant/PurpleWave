@@ -3,7 +3,7 @@ package Planning.Plans.Protoss.GamePlans
 import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
 import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors}
-import Planning.Plans.Army.{Attack, ClearBurrowedBlockers, ConsiderAttacking, ControlMap}
+import Planning.Plans.Army._
 import Planning.Plans.Compound._
 import Planning.Plans.Information.{Employ, Employing}
 import Planning.Plans.Macro.Automatic._
@@ -148,6 +148,13 @@ class ProtossVsTerran extends Parallel {
   /////////////////
   
   children.set(Vector(
+    new If(
+      new And(
+        new Employing(PvTEarly4GateAllIn),
+        new Check(() => With.geography.enemyBases.size > 1)),
+      new AllIn
+    ),
+    
     // Early game
     new RequireMiningBases(1),
     new Employ(PvTEarly14Nexus,      new ImplementEarly14Nexus),

@@ -4,11 +4,12 @@ import Information.Battles.Estimations.{AvatarBuilder, Estimation, Estimator}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 class UnitCountCombat(
-  enemies: Iterable[UnitInfo],
-  alwaysAccept: Boolean) extends UnitCounter {
+  val enemies: Iterable[UnitInfo],
+  val alwaysAccept: Boolean) extends UnitCounter {
   
   val builder = new AvatarBuilder
   var lastEstimation: Estimation = _
+  enemies.foreach(builder.addUnit)
   
   /////////////////
   // UnitCounter //

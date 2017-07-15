@@ -52,6 +52,6 @@ class Economy {
   }
   
   def ourActiveDrillers(base:Base):Traversable[FriendlyUnitInfo] = {
-    ourActiveGatherers(base).filter(_.gatheringGas).take(base.gas.filter(_.isOurs).size * 3)
+    ourActiveGatherers(base).filter(_.gatheringGas).take(base.gas.count(_.isOurs) * 3)
   }
 }

@@ -6,8 +6,8 @@ import Planning.Composition.UnitCounters.UnitCountBetween
 import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors, UnitMatchWorkers}
 import Planning.Plans.Army._
 import Planning.Plans.Compound.{If, _}
-import Planning.Plans.Information.{Employ, Employing}
 import Planning.Plans.Information.Scenarios.WeAreBeing4Pooled
+import Planning.Plans.Information.{Employ, Employing}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, FirstFiveMinutes}
 import Planning.Plans.Macro.Expanding.{BuildAssimilators, BuildCannonsAtExpansions, RequireMiningBases}
@@ -15,7 +15,7 @@ import Planning.Plans.Macro.Milestones._
 import Planning.Plans.Macro.Reaction.{EnemyBasesAtLeast, EnemyMutalisks}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Protoss.ProtossBuilds
-import Planning.Plans.Protoss.Situational.{DefendChokeWithWorkers, ForgeFastExpand}
+import Planning.Plans.Protoss.Situational.ForgeFastExpand
 import Planning.Plans.Scouting.{FindExpansions, RequireScouting}
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Options.Protoss.PvZ._
@@ -298,7 +298,7 @@ class ProtossVsZerg extends Parallel {
         new UnitsAtMost(1, UnitMatchType(Protoss.PhotonCannon), complete = true)),
       new If(
         new Check(() => With.frame > 24 * (2 * 60)), // When a 4-pool arrives on a tiny rush distance
-        new DefendChokeWithWorkers),
+        new DefendCannonsWithProbes),
       new If(
         new UnitsAtLeast(1, UnitMatchType(Protoss.Pylon), complete = false),
         new RequireScouting)), // Don't scout while being 4-pooled

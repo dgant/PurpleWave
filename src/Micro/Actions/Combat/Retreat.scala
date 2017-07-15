@@ -17,8 +17,7 @@ object Retreat extends Action {
   
     state.toTravel = Some(state.origin)
     
-    // A
-    if (state.unit.pixelDistanceFast(state.origin) < 128.0) {
+    if (state.unit.pixelDistanceFast(state.origin) < 128.0 || ! state.unit.melee) {
       Potshot.consider(state)
     }
     

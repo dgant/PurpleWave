@@ -331,6 +331,7 @@ class ProtossVsZerg extends Parallel {
         new FindExpansions       { scouts.get.unitMatcher.set(UnitMatchType(Protoss.Corsair)) },
         new ControlEnemyAirspace { flyers.get.unitMatcher.set(UnitMatchType(Protoss.Corsair)) })),
   
+    new ClearBurrowedBlockers,
     new FindExpansions { scouts.get.unitMatcher.set(UnitMatchType(Protoss.DarkTemplar)) },
     
     new ControlMap(attack = false),

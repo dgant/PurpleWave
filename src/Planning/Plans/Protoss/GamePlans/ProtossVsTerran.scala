@@ -3,7 +3,7 @@ package Planning.Plans.Protoss.GamePlans
 import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
 import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors}
-import Planning.Plans.Army.{Attack, ConsiderAttacking, ControlMap}
+import Planning.Plans.Army.{Attack, ClearBurrowedBlockers, ConsiderAttacking, ControlMap}
 import Planning.Plans.Compound._
 import Planning.Plans.Information.{Employ, Employing}
 import Planning.Plans.Macro.Automatic._
@@ -201,7 +201,13 @@ class ProtossVsTerran extends Parallel {
       new EnemyBio,
       new TrainContinuously(Protoss.Reaver, 2)),
     new TrainContinuously(Protoss.Arbiter, 3),
-    new TrainContinuously(Protoss.Observer, 3),
+    new If(
+      new Or(
+        new EnemyHasShown(Terran.SpiderMine),
+        new EnemyHasTech(Terran.WraithCloak)),
+      new TrainContinuously(Protoss.Observer, 3),
+      new TrainContinuously(Protoss.Observer, 1)
+    ),
     new TrainZealotsOrDragoons,
     
     // Luxuries
@@ -216,6 +222,7 @@ class ProtossVsTerran extends Parallel {
     // Tactics
     new ScoutAt(14),
     new ScoutExpansionsAt(100),
+    new ClearBurrowedBlockers,
     new ControlMap(attack = true),
     
     new Attack { attackers.get.unitMatcher.set(UnitMatchType(Protoss.DarkTemplar)) },

@@ -121,7 +121,9 @@ class Commander {
     }
     
     // Mineral walk!
-    if (unit.unitClass.isWorker && ! unit.carryingResources) {
+    if (unit.unitClass.isWorker && ! unit.carryingResources
+      && ! With.mapFileName.toLowerCase.contains("barrier") //Hack -- Great Barrier Reef is ruinous for automatic mineral walking
+    ) {
       val from      = unit.pixelCenter
       val fromZone  = from.zone
       val toZone    = to.zone

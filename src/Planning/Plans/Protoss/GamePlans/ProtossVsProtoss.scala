@@ -286,6 +286,8 @@ class ProtossVsProtoss extends Parallel {
       new UnitsAtLeast(1, UnitMatchType(Protoss.Pylon), complete = false),
       new RequireEnemyBase),
   
+    new ControlMap(attack = false),
+    
     new Attack { attackers.get.unitMatcher.set(UnitMatchType(Protoss.DarkTemplar)) },
     new If(
       new And(
@@ -300,8 +302,6 @@ class ProtossVsProtoss extends Parallel {
         new If(
           new UnitsAtLeast(6 * 8, UnitMatchType(Protoss.Interceptor), complete = true),
           new ConsiderAttacking),
-        new ConsiderAttacking)),
-    
-    new ControlMap
+        new ConsiderAttacking))
   ))
 }

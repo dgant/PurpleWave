@@ -41,7 +41,8 @@ object ProtectTheWeak extends Action {
         neighbor.unitClass.isWorker ||
         (
           neighbor.unitClass.isBuilding &&
-          (neighbor.wounded || neighbor.unitClass.canAttack)))
+          (neighbor.wounded || neighbor.unitClass.canAttack))
+        )
       .flatMap(neighbor => state.targets.filter(_.isBeingViolentTo(neighbor)))
   }
 }

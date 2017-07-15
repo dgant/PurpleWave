@@ -68,9 +68,10 @@ class ProtossVsZerg extends Parallel {
   
   private class ImplementMidgameCorsairCarrier extends Parallel(
     new Build(
-      RequestAtLeast(2, Protoss.Assimilator),
+      RequestAtLeast(1, Protoss.Assimilator),
       RequestAtLeast(1, Protoss.Gateway),
       RequestAtLeast(1, Protoss.CyberneticsCore),
+      RequestAtLeast(2, Protoss.Assimilator),
       RequestAtLeast(1, Protoss.Stargate),
       RequestAtLeast(1, Protoss.FleetBeacon),
       RequestAtLeast(3, Protoss.Stargate),
@@ -88,6 +89,7 @@ class ProtossVsZerg extends Parallel {
           RequestAtLeast(1, Protoss.Gateway),
           RequestAtLeast(1, Protoss.Assimilator),
           RequestAtLeast(1, Protoss.CyberneticsCore),
+          RequestAtLeast(2, Protoss.Assimilator),
           RequestAtLeast(1, Protoss.Stargate),
           RequestAtLeast(1, Protoss.CitadelOfAdun),
           RequestUpgrade(Protoss.GroundDamage),
@@ -175,6 +177,7 @@ class ProtossVsZerg extends Parallel {
           new Employing(PvZEarlyFFEHeavy)),
         new TrainMatchingRatio(Protoss.PhotonCannon, UnitMatchType(Zerg.Zergling), 0.5, 6))),
     
+    
     new TakeSafeNatural,
     new TakeSafeThirdBase,
     
@@ -198,7 +201,6 @@ class ProtossVsZerg extends Parallel {
     new Employ(PvZMidgame5GateDragoons, new ImplementMidgame5GateDragoons),
     
     // Mid-game macro
-    new BuildAssimilators,
     new FirstFiveMinutes(new Employ(PvZEarlyFFEHeavy, new Build(RequestAtLeast(1, Protoss.Gateway), RequestAtLeast(6, Protoss.PhotonCannon)))),
     new BuildDetectionForLurkers,
     new BuildCannonsAtExpansions(5),
@@ -273,7 +275,7 @@ class ProtossVsZerg extends Parallel {
     new Employ(PvZMidgameCorsairDarkTemplar,    new ImplementMidgameCorsairDarkTemplar),
     new Employ(PvZMidgameCorsairReaver,         new ImplementMidgameCorsairReaver),
     new Employ(PvZMidgameCorsairSpeedlot,       new ImplementMidgameCorsairSpeedlot),
-    
+    new BuildAssimilators,
     
     // Late game macro
     new Build(
@@ -331,7 +333,7 @@ class ProtossVsZerg extends Parallel {
   
     new FindExpansions { scouts.get.unitMatcher.set(UnitMatchType(Protoss.DarkTemplar)) },
     
-    new ControlMap,
+    new ControlMap(attack = false),
     new If(
       new UnitsAtLeast(4, UnitMatchWarriors, complete = true),
       new ConsiderAttacking)

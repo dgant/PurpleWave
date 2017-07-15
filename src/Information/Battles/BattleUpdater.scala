@@ -5,6 +5,7 @@ import Information.Battles.Types.Battle
 import Lifecycle.With
 import Mathematics.Points.SpecificPoints
 import ProxyBwapi.UnitInfo.UnitInfo
+import Utilities.EnrichPixel._
 
 object BattleUpdater {
   
@@ -15,7 +16,7 @@ object BattleUpdater {
   private def updateBattle(battle: Battle) {
     if (battle.happening) {
       battle.teams.foreach(group => {
-        val airCentroid = group.units.map(_.pixelCenter).reduce(_.add(_)).divide(group.units.size)
+        val airCentroid = group.units.map(_.pixelCenter).centroid
         val hasGround   = group.units.exists( ! _.flying)
         group.centroid  = group.units.filterNot(_.flying && hasGround).minBy(_.pixelDistanceSquared(airCentroid)).pixelCenter
       })
@@ -23,8 +24,11 @@ object BattleUpdater {
     
     battle.teams.foreach(group =>
       group.vanguard =
-        if (battle.happening) group.units.minBy(_.pixelDistanceFast(group.opponent.centroid)).pixelCenter
-        else                  group.units.headOption.map(_.pixelCenter).getOrElse(SpecificPoints.middle))
+        if (battle.happening)           group.units.minBy(_.pixelDistanceFast(group.opponent.centroid)).pixelCenter
+        else if (group.units.nonEmpty)  group.units.minBy(_.pixelDistanceFast(SpecificPoints.middle)).pixelCenter
+        else SpecificPoints.middle)
+    
+    battle
   }
   
   def estimate(

@@ -1,7 +1,11 @@
 package Information.Battles.Estimations
 
+import Lifecycle.With
+
 class Estimation {
 
+  val frameCalculated = With.frame
+  
   var avatarUs      = new Avatar
   var avatarEnemy   = new Avatar
   var damageToUs    = 0.0

@@ -216,7 +216,7 @@ class ProtossVsTerran extends Parallel {
     // Tactics
     new ScoutAt(14),
     new ScoutExpansionsAt(100),
-    new ControlMap,
+    new ControlMap(attack = true),
     
     new Attack { attackers.get.unitMatcher.set(UnitMatchType(Protoss.DarkTemplar)) },
     new If(

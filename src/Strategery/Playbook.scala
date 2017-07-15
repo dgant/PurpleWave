@@ -16,24 +16,22 @@ object Playbook {
     
     //Too crummy to use
     PvZMidgameCorsairCarrier,
-    PvZEarlyFFEHeavy
+    PvZEarlyFFEHeavy,
     
-    /* Secret tech
+    /* Secret tech*/
     WorkerRush3StartLocations,
     WorkerRush2StartLocations,
     PvTEarlyDTExpand,
     PvPMidgameDarkTemplar,
     Proxy2Gate2StartLocations,
     Proxy2Gate3StartLocations
-    */
   )
   
   // Use these whenever possible.
   //
   val forced = Vector[Strategy](
     AllPvZ,
-    PvZEarlyFFELight,
-    PvZMidgameCorsairDarkTemplar
+    PvZEarlyFFELight
   )
   
   // Specify the order in which you want to try strategies vs. new opponents

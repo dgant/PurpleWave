@@ -17,5 +17,5 @@ class Team(val units: Vector[UnitInfo]) {
   // Features //
   //////////////
   
-  def opponent: Team = if (battle.us == this) battle.us else battle.enemy
+  def opponent: Team = if (battle.us == this) battle.enemy else battle.us
 }

@@ -37,7 +37,8 @@ class Avatar {
   
   def this(
     unit          : UnitInfo,
-    nearestEnemy  : Option[Pixel] = None) {
+    nearestEnemy  : Option[Pixel] = None,
+    attacking     : Boolean       = false) {
     
     this()
   
@@ -49,7 +50,7 @@ class Avatar {
       else
         1.0
     
-    val range         = unit.pixelRangeMax + 128.0
+    val range         = unit.pixelRangeMax + (if (attacking && ! unit.canMoveThisFrame) 0.0 else 128.0)
     val pixelsAway    = if (nearestEnemy.isDefined) unit.pixelDistanceFast(nearestEnemy.get) else With.configuration.abstractBattleDistancePixels
     val framesAway    = if (pixelsAway <= range) 0.0 else PurpleMath.nanToInfinity(Math.max(0.0, pixelsAway - range) / (unit.topSpeed * 0.5)) //Reward range a bit more
     val framesTotal   = With.configuration.battleEstimationFrames

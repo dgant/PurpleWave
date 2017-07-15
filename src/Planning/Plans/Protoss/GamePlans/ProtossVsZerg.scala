@@ -257,10 +257,12 @@ class ProtossVsZerg extends Parallel {
               new Or(
                 new And(
                   new Employing(PvZMidgame5GateDragoons),
-                  new UnitsAtMost(15, UnitMatchType(Protoss.Dragoon))),
+                  new UnitsAtMost(15, UnitMatchType(Protoss.Dragoon)),
+                  new Check(() => With.self.minerals < With.self.gas * 5)),
                 new And(
-                  new Employing(PvZMidgameCorsairDarkTemplar),
-                  new UnitsAtMost(15, UnitMatchType(Protoss.Dragoon))),
+                  new Employing(PvZMidgame5GateDragoons),
+                  new UnitsAtMost(15, UnitMatchType(Protoss.Dragoon)),
+                  new Check(() => With.self.minerals < With.self.gas * 5)),
                 new UnitsAtLeast(12, UnitMatchType(Protoss.Zealot))
               )
             ),
@@ -318,7 +320,7 @@ class ProtossVsZerg extends Parallel {
     new If(
       new And(
         new Or(
-          new UnitsAtMost(0, UnitMatchType(Protoss.DarkTemplar), complete = true),
+          new UnitsAtMost(0, UnitMatchType(Protoss.DarkTemplar), complete = false),
           new Not(new Employing(PvZMidgameCorsairDarkTemplar))),
         new EnemyUnitsAtMost(0, UnitMatchType(Zerg.Spire), complete = true),
         new EnemyUnitsAtMost(0, UnitMatchType(Zerg.Mutalisk)),

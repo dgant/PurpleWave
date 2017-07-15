@@ -10,6 +10,8 @@ class AvatarBuilder {
   
   var vanguardUs    : Option[Pixel] = None
   var vanguardEnemy : Option[Pixel] = None
+  var weAttack      : Boolean       = false
+  var enemyAttacks  : Boolean       = false
   val unitsOurs   = new mutable.HashMap[UnitInfo, Avatar]
   val unitsEnemy  = new mutable.HashMap[UnitInfo, Avatar]
   var avatarUs    = new Avatar
@@ -17,8 +19,8 @@ class AvatarBuilder {
   
   def addUnit(unit: UnitInfo) {
     if ( ! eligible(unit)) return
-    if (unit.isFriendly)  addUnit(unit, avatarUs,     unitsOurs,  vanguardEnemy)
-    else                  addUnit(unit, avatarEnemy,  unitsEnemy, vanguardUs)
+    if (unit.isFriendly)  addUnit(unit, avatarUs,     unitsOurs,  vanguardEnemy,  weAttack)
+    else                  addUnit(unit, avatarEnemy,  unitsEnemy, vanguardUs,     enemyAttacks)
   }
   
   def removeUnit(unit: UnitInfo) {
@@ -30,11 +32,12 @@ class AvatarBuilder {
     unit          : UnitInfo,
     bigAvatar     : Avatar,
     avatars       : mutable.HashMap[UnitInfo, Avatar],
-    enemyVanguard : Option[Pixel]) {
+    enemyVanguard : Option[Pixel],
+    attacking     : Boolean) {
     
     if (avatars.contains(unit)) return
     
-    val newAvatar = new Avatar(unit, enemyVanguard)
+    val newAvatar = new Avatar(unit, enemyVanguard, attacking)
     avatars.put(unit, newAvatar)
     bigAvatar.add(newAvatar)
   }

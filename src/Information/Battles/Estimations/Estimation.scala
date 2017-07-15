@@ -1,4 +1,4 @@
-package Information.Battles.Estimation
+package Information.Battles.Estimations
 
 class Estimation {
 

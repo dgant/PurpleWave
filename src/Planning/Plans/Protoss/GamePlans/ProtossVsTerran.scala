@@ -11,6 +11,7 @@ import Planning.Plans.Macro.BuildOrders.{Build, FirstFiveMinutes}
 import Planning.Plans.Macro.Expanding.{BuildAssimilators, MatchMiningBases, RequireMiningBases}
 import Planning.Plans.Macro.Milestones._
 import Planning.Plans.Macro.Reaction.EnemyBio
+import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Protoss.Situational.TwoGatewaysAtNatural
 import Planning.Plans.Protoss.{ProtossBuilds, ProtossVsTerranIdeas}
 import Planning.Plans.Scouting.{ScoutAt, ScoutExpansionsAt}
@@ -64,15 +65,18 @@ class ProtossVsTerran extends Parallel {
   //////////////////////////
   
   private class ImplementLateCarriers extends OnMiningBases(3,
-    new Build(
-      RequestAtLeast(1, Protoss.Stargate),
-      RequestAtLeast(5, Protoss.Gateway),
-      RequestAtLeast(1, Protoss.FleetBeacon),
-      RequestAtLeast(3, Protoss.Stargate),
-      RequestUpgrade(Protoss.AirDamage, 1),
-      RequestUpgrade(Protoss.CarrierCapacity),
-      RequestUpgrade(Protoss.AirDamage, 2),
-      RequestUpgrade(Protoss.AirDamage, 3)))
+    new Parallel(
+      new Build(
+        RequestAtLeast(1, Protoss.Stargate),
+        RequestAtLeast(5, Protoss.Gateway),
+        RequestAtLeast(1, Protoss.FleetBeacon),
+        RequestAtLeast(3, Protoss.Stargate),
+        RequestUpgrade(Protoss.AirDamage, 1),
+        RequestUpgrade(Protoss.CarrierCapacity)),
+      new If(
+        new EnemyBio,
+        new UpgradeContinuously(Protoss.AirArmor),
+        new UpgradeContinuously(Protoss.AirDamage))))
   
   private class ImplementLateArbiters extends OnGasBases(3,
     new Build(

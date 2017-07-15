@@ -1,6 +1,7 @@
 package Information.Battles.Types
 
-import Information.Battles.Estimation.Estimation
+import Information.Battles.BattleUpdater
+import Information.Battles.Estimations.Estimation
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Utilities.EnrichPixel.EnrichedPixelCollection
@@ -12,8 +13,16 @@ class Battle(
   us.battle     = this
   enemy.battle  = this
   
-  var estimationGeometric = new Estimation
-  var estimationAbstract  = new Estimation
+  /////////////////
+  // Estimations //
+  /////////////////
+  
+  lazy val estimationAbstract         : Estimation  = BattleUpdater.estimate(this, geometric = false, weAttack = true,  enemyAttacks = true)
+  lazy val estimationAbstractOffense  : Estimation  = BattleUpdater.estimate(this, geometric = false, weAttack = true,  enemyAttacks = false)
+  lazy val estimationAbstractDefense  : Estimation  = BattleUpdater.estimate(this, geometric = false, weAttack = false, enemyAttacks = true)
+  lazy val estimationGeometric        : Estimation  = BattleUpdater.estimate(this, geometric = false, weAttack = true,  enemyAttacks = true)
+  lazy val estimationGeometricOffense : Estimation  = BattleUpdater.estimate(this, geometric = true,  weAttack = true,  enemyAttacks = false)
+  lazy val estimationGeometricDefense : Estimation  = BattleUpdater.estimate(this, geometric = true,  weAttack = false, enemyAttacks = true)
   
   //////////////
   // Features //

@@ -15,10 +15,10 @@ object Teamfight extends Action {
     // TODO: When should we continue fighting losing battles?
     // How should we avoid indecision?
     
-    if (state.unit.battle.exists(_.estimationGeometric.weGainValue) || Yolo.active) {
+    if (state.unit.battle.exists(_.estimationGeometricOffense.weGainValue) || Yolo.active) {
       Engage.consider(state)
     }
-    else if (state.unit.battle.exists(_.estimationGeometric.weLoseValue)) {
+    else if (state.unit.battle.exists(_.estimationGeometricOffense.weLoseValue)) {
       Disengage.consider(state)
     }
     Engage.consider(state)

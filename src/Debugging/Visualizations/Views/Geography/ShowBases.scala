@@ -11,7 +11,7 @@ object ShowBases extends View {
     With.geography.zones.foreach(zone => {
   
       val battle = With.battles.byZone(zone)
-      val estimation = battle.estimationGeometric
+      val estimation = battle.estimationAbstract
       zone.bases.foreach(base => {
         DrawMap.tileRectangle(base.harvestingArea,  Colors.DarkGreen)
         DrawMap.tileRectangle(base.townHallArea,    base.zone.owner.colorDark)

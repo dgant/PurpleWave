@@ -1,6 +1,6 @@
 package Planning.Composition.UnitCounters
 
-import Information.Battles.Estimation.{AvatarBuilder, Estimation, Estimator}
+import Information.Battles.Estimations.{AvatarBuilder, Estimation, Estimator}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 class UnitCountCombat(

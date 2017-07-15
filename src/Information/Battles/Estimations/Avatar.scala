@@ -1,4 +1,4 @@
-package Information.Battles.Estimation
+package Information.Battles.Estimations
 
 import Lifecycle.With
 import Mathematics.Points.Pixel

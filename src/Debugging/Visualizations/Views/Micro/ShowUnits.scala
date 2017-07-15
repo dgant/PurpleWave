@@ -15,9 +15,10 @@ object ShowUnits extends View {
     With.units.all.foreach(renderUnit)
   }
   
-  def renderUnit(unit:UnitInfo) {
+  def renderUnit(unit: UnitInfo) {
     if (unit.invincible) return
     if ( ! unit.possiblyStillThere) return
+    if ( ! With.viewport.contains(unit.pixelCenter)) return
     
     val width                 = Math.min(48, Math.max(18, (unit.unitClass.maxTotalHealth + unit.defensiveMatrixPoints) / 5))
     val marginTopHp           = 3

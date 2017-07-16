@@ -33,7 +33,6 @@ object Smorc extends Action {
     val enemyFighters         = state.threats.filter(_.isBeingViolent)
     val enemiesAttackingUs    = enemies.filter(_.isBeingViolentTo(state.unit))
     val allyFighters          = state.neighbors
-    val allyFightersDying     = allyFighters.filter(_.totalHealth < dyingThreshold)
     val strength              = (units: Iterable[UnitInfo]) => units.size * units.map(_.totalHealth).sum
     val ourStrength           = strength(allyFighters :+ state.unit)
     val enemyStrength         = strength(enemies)
@@ -44,7 +43,9 @@ object Smorc extends Action {
     val centroidHard    = if (enemies.size > 3) enemies.sortBy(_.pixelDistanceFast(centroidSoft)).take(enemies.size/2).map(_.pixelCenter).centroid else centroidSoft //Don't centroid an empty list
     
     // Get in their base!
-    if ( ! state.unit.pixelCenter.zone.bases.exists(_.owner.isEnemy) && enemiesAttackingUs.size <= 1) {
+    if ( ! state.unit.pixelCenter.zone.bases.exists(_.owner.isEnemy)
+      && ! enemies.exists(_.pixelDistanceFast(state.unit) < 48.0)
+      && enemiesAttackingUs.size < 1) {
       Travel.consider(state)
       return
     }
@@ -107,14 +108,24 @@ object Smorc extends Action {
       }
       
       // Ignore units outside their bases
-      // TODO: If they're pushing us out of their base we should fight back
       val targets = state.targets.filter(unit =>
-        unit.pixelCenter.zone == zone &&
-        unit.canAttackThisSecond      &&
+        (
+          unit.pixelCenter.zone == zone         ||
+          // ...unless they're fighting us! Or building a building.
+          state.unit.constructing               ||
+          state.unit.inRangeToAttackFast(unit)  ||
+          (
+            unit.isBeingViolent &&
+            unit.pixelDistanceTravelling(zone.centroid) <= state.unit.pixelDistanceTravelling(zone.centroid)
+          )
+        ) &&
+        unit.canAttackThisSecond &&
         (
           // Don't get distracted by workers leaving the base
           unit.targetPixel.forall(_.zone == zone) ||
-          state.unit.inRangeToAttackFast(unit)
+          state.unit.inRangeToAttackFast(unit)    ||
+          unit.isBeingViolent                     ||
+          state.unit.constructing
         ))
       if (targets.isEmpty) {
         destroyBuildings(state)

@@ -22,8 +22,11 @@ class Defend2GateAgainst4Pool extends Plan {
     val zealots           = With.units.ours .filter(u => u.aliveAndComplete && u.is(Protoss.Zealot) && inOurBase(u))
     lazy val zerglings    = With.units.enemy.filter(u => u.aliveAndComplete && u.is(Zerg.Zergling)  && inOurBase(u))
     lazy val workers      = With.units.ours.filter(u => u.aliveAndComplete && u.unitClass.isWorker)
-    lazy val threatening  = zerglings.filter(_.inPixelRadius(32 * 3).exists(n => n.isOurs && n.totalHealth < 200))
+    lazy val threatening  = zerglings.filter(_.inPixelRadius(32 * 4).exists(n => n.isOurs && n.totalHealth < 200))
     
+    if (zealots.isEmpty) {
+      return
+    }
     if (zealots.size > 3) {
       return
     }
@@ -36,8 +39,8 @@ class Defend2GateAgainst4Pool extends Plan {
     
     val workersNeeded   = 1 + 2 * zerglings.size - 3 * zealots.size
     val workerCap       = workers.size - 4
-    val workersToFight  = Math.min(workerCap, workersNeeded)
-    val target          = threatening.minBy(_.pixelDistanceFast(With.geography.ourMain.heart.pixelCenter)).pixelCenter
+    val workersToFight  = Math.max(0, Math.min(workerCap, workersNeeded))
+    val target          = zealots.minBy(zealot => zerglings.map(_.pixelDistanceFast(zealot)).min).pixelCenter
     
     defenders.get.unitCounter.set(UnitCountExactly(workersToFight))
     defenders.get.acquire(this)

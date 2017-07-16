@@ -145,7 +145,7 @@ class ProtossVsZerg extends Parallel {
     new RequireMiningBases(2))
   
   private class TakeSafeThirdBase extends If(
-    new UnitsAtLeast(20, UnitMatchWarriors),
+    new UnitsAtLeast(14, UnitMatchWarriors),
     new RequireMiningBases(3))
   
   private class BuildDetectionForLurkers extends If(
@@ -177,11 +177,16 @@ class ProtossVsZerg extends Parallel {
     
     // Build cannons vs. Zergling rushes
     new FirstFiveMinutes(
-      new If(
-        new Or(
-          new Employing(PvZEarlyFFELight),
-          new Employing(PvZEarlyFFEHeavy)),
-        new TrainMatchingRatio(Protoss.PhotonCannon, UnitMatchType(Zerg.Zergling), 0.5, 6))),
+      new Parallel(
+        new If(
+          new Or(
+            new Employing(PvZEarlyFFELight),
+            new Employing(PvZEarlyFFEHeavy)),
+          new TrainMatchingRatio(Protoss.PhotonCannon, UnitMatchType(Zerg.Zergling), 0.5, 6)),
+        new If(
+          new UnitsAtLeast(1, UnitMatchType(Protoss.CyberneticsCore), complete = false),
+          new Build(RequestAtLeast(4, Protoss.PhotonCannon))
+        ))),
   
     // 4/5-pool defense
     new If(
@@ -312,7 +317,13 @@ class ProtossVsZerg extends Parallel {
       new Trigger(
         new UnitsAtLeast(2, UnitMatchType(Protoss.Zealot), complete = true),
         new Parallel(
-          new ConsiderAttacking { whenFalse.set(new DefendHearts) },
+          new ConsiderAttacking {
+            whenFalse.set(
+              new If(
+                new UnitsAtLeast(6, UnitMatchType(Protoss.Zealot), complete = true),
+                new DefendChokes(1),
+                new DefendHearts
+              )) },
           new If (
             new And(
               new UnitsAtLeast(2, UnitMatchType(Protoss.Zealot), complete = true),

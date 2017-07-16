@@ -11,7 +11,7 @@ object TargetingProfiles {
     preferDps         = 2.0,
     preferDamageType  = 1.0,
     avoidPain         = 3.0,
-    avoidHealth       = 1.0,
+    avoidHealth       = 1.5,
     avoidDistance     = 1.0,
     avoidDistraction  = 1.0)
 }

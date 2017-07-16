@@ -18,13 +18,16 @@ class DefendFFEAgainst4Pool extends Plan {
   
     lazy val zerglings    = With.units.enemy.find(_.is(Zerg.Zergling))
     lazy val threatSource = zerglings.map(_.pixelCenter).getOrElse(With.intelligence.mostBaselikeEnemyTile.pixelCenter)
-    lazy val cannons      = With.units.ours.filter(_.is(Protoss.PhotonCannon)).map(_.pixelCenter.project(threatSource, 48.0))
+    lazy val cannons      = With.units.ours.filter(_.is(Protoss.PhotonCannon))
     
     if (cannons.isEmpty) return
     
-    val toDefend = cannons.minBy(_.pixelDistanceFast(threatSource))
-    val workerCount = With.units.ours.count(_.unitClass.isWorker)
-
+    val toDefend        = cannons.minBy(_.pixelDistanceFast(threatSource)).pixelCenter.project(threatSource, 48.0)
+    val workerCount     = With.units.ours.count(_.unitClass.isWorker)
+    val workersCap      = workerCount - 3
+    val workersDesired  = 12 - 3 * cannons.count(_.complete)
+    val workersFinal    = Math.max(0, Math.min(workersCap, workersDesired))
+    
     defenders.get.unitCounter.set(UnitCountExactly(workerCount - 4))
     defenders.get.acquire(this)
     defenders.get.units.foreach(defender => With.executor.intend(new Intention(this, defender) {

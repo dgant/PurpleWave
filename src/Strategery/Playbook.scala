@@ -31,8 +31,8 @@ object Playbook {
   // Use these whenever possible.
   //
   val forced = Vector[Strategy](
-    AllPvZ,
-    PvZEarlyZealotAllIn
+    Proxy2Gate2StartLocations,
+    Proxy2Gate3StartLocations
   )
   
   // Specify the order in which you want to try strategies vs. new opponents

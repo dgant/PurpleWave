@@ -92,9 +92,8 @@ object PlacementProfiles {
   
   val hugTheNexus = new PlacementProfile(
     "Hugging Nexus",
-    preferPowering        = 0.25,
-    avoidDistanceFromBase = 1.0,
-    preferCoveringWorkers = 0.25)
+    preferPowering        = 0.5,
+    avoidDistanceFromBase = 1.0)
   
   def default(blueprint: Blueprint): PlacementProfile = {
     if (blueprint.townHall)

@@ -16,7 +16,6 @@ class TaskQueueGrids extends AbstractTaskQueue {
     new TaskGridUnits                       { urgency = 100 },
     new TaskGridAltitudeBonus               { urgency = 1   },
     new TaskGridEnemyDetection              { urgency = 100 },
-    new TaskGridEnemyVision                 { urgency = 100 },
     new TaskGridMobility                    { urgency = 1   },
     new TaskGridDpsEnemyGroundConcussive    { urgency = 1000 },
     new TaskGridDpsEnemyGroundExplosive     { urgency = 1000 },

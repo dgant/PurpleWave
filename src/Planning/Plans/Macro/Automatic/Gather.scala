@@ -199,6 +199,9 @@ class Gather extends Plan {
   }
   
   private def order(worker: FriendlyUnitInfo) {
-    With.executor.intend(new Intention(this, worker) { toGather = resourceByWorker.get(worker) })
+    With.executor.intend(new Intention(this, worker) {
+      toGather = resourceByWorker.get(worker)
+      canCower = true
+    })
   }
 }

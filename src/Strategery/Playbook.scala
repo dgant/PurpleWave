@@ -14,16 +14,7 @@ object Playbook {
   val disabled = Vector[Strategy](
     
     //Too crummy to use
-    PvZMidgameCorsairCarrier,
-    
-    WorkerRush3StartLocations,
-    WorkerRush2StartLocations,
-    Proxy2Gate2StartLocations,
-    Proxy2Gate3StartLocations
-    /* Secret tech
-    PvTEarlyDTExpand,
-    PvPMidgameDarkTemplar,
-    */
+    PvZMidgameCorsairCarrier
   )
   
   // Use these whenever possible.

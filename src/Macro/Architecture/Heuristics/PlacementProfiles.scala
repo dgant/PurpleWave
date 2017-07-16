@@ -8,10 +8,10 @@ object PlacementProfiles {
     "Pylon",
     preferZone                  = 10.0,
     preferSpace                 = 0.1,
-    preferPowering              = 1.0,
+    preferPowering              = 0.25,
     preferDistanceFromEnemy     = 1.0,
     avoidDistanceFromBase       = 0.25,
-    avoidDistanceFromIdealRange  = 0.25
+    avoidDistanceFromIdealRange = 0.1
   )
   
   val factory = new PlacementProfile(
@@ -19,7 +19,7 @@ object PlacementProfiles {
     preferZone                  = 1.0,
     preferSpace                 = 0.5,
     avoidDistanceFromBase       = 2.0,
-    avoidDistanceFromIdealRange  = 2.0
+    avoidDistanceFromIdealRange = 2.0
   )
   
   val tech = new PlacementProfile(
@@ -94,7 +94,7 @@ object PlacementProfiles {
     "Hugging Nexus",
     preferPowering        = 0.25,
     avoidDistanceFromBase = 1.0,
-    preferCoveringWorkers = 1.0)
+    preferCoveringWorkers = 0.25)
   
   def default(blueprint: Blueprint): PlacementProfile = {
     if (blueprint.townHall)

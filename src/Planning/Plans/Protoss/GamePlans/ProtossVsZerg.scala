@@ -314,7 +314,9 @@ class ProtossVsZerg extends Parallel {
         new Parallel(
           new ConsiderAttacking { whenFalse.set(new DefendHearts) },
           new If (
-            new Check(() => With.frame < 24 * 60 * 4),
+            new And(
+              new UnitsAtLeast(2, UnitMatchType(Protoss.Zealot), complete = true),
+              new Check(() => With.frame < 24 * 60 * 4)),
             new ConsiderAttacking {
               attack.attackers.get.unitCounter.set(new UnitCountBetween(1, 2))
               attack.attackers.get.unitMatcher.set(UnitMatchWorkers)
@@ -323,16 +325,17 @@ class ProtossVsZerg extends Parallel {
   
     // Don't scout while being 4-pooled
     new If(
-      new And(
-        new Or(
-          new Employing(PvZEarlyFFELight),
-          new Employing(PvZEarlyFFEHeavy)),
-        new StartPositionsAtLeast(4)),
-      new ScoutAt(6),
+      new Or(
+        new Employing(PvZEarlyFFELight),
+        new Employing(PvZEarlyFFEHeavy)),
       new If(
-        new UnitsAtLeast(1, UnitMatchType(Protoss.Pylon), complete = false),
-        new RequireScouting)),
-  
+        new StartPositionsAtLeast(4),
+        new ScoutAt(6),
+        new If(
+          new UnitsAtLeast(1, UnitMatchType(Protoss.Pylon), complete = false),
+          new RequireScouting)),
+      new ScoutAt(14)),
+    
     new If(
       new And(
         new Or(

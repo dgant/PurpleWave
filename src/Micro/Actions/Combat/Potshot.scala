@@ -16,7 +16,8 @@ object Potshot extends Action {
   }
   
   override def perform(state: ActionState) {
-    state.toAttack = EvaluateTargets.best(state, state.targetsInRange)
+    val validTargets = state.targetsInRange.filter(_.unitClass.helpsInCombat)
+    state.toAttack = EvaluateTargets.best(state, validTargets)
     Attack.delegate(state)
   }
 }

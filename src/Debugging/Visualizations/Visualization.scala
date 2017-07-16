@@ -53,7 +53,7 @@ class Visualization {
     //ShowPlayerNames, TODO: Not actually a View yet
     ShowTextOnly,
     ShowTextOnlyUnits,
-    ShowArchitecture,
+    ShowArchitecturePlacements,
     ShowArchitectureHeuristics,
     ShowArchitecturePaths,
     ShowBases,

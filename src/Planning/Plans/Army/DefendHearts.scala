@@ -15,7 +15,7 @@ class DefendHearts extends Plan {
   
   override def onUpdate() {
     
-    if (With.geography.bases.isEmpty) {
+    if (With.geography.ourBases.isEmpty) {
       return
     }
     

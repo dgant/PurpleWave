@@ -78,8 +78,7 @@ class DefendChokes(val maxChokes: Int = 3) extends Plan {
         defender => {
           val spot = formation(defender)
           With.executor.intend(new Intention(this, defender) {
-            toReturn  = Some(spot)
-            toTravel  = Some(spot)
+            toTravel = Some(spot)
           })
         })
     })

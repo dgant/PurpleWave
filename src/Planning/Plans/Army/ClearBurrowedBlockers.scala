@@ -5,14 +5,14 @@ import Micro.Intent.Intention
 import Planning.Composition.Property
 import Planning.Composition.ResourceLocks.LockUnits
 import Planning.Composition.UnitCounters.UnitCountOne
-import Planning.Composition.UnitMatchers.UnitMatchDetectors
+import Planning.Composition.UnitMatchers.UnitMatchMobileDetectors
 import Planning.Composition.UnitPreferences.UnitPreferClose
 import Planning.Plan
 
 class ClearBurrowedBlockers extends Plan {
   
   val detector = new Property(new LockUnits)
-  detector.get.unitMatcher.set(UnitMatchDetectors)
+  detector.get.unitMatcher.set(UnitMatchMobileDetectors)
   detector.get.unitCounter.set(UnitCountOne)
   
   override def onUpdate(): Unit = {

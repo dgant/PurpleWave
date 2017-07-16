@@ -1,6 +1,5 @@
 package Micro.Actions.Combat
 
-import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Execution.ActionState
 import ProxyBwapi.Races.Zerg
@@ -21,10 +20,6 @@ object Brawl extends Action {
   }
   
   override protected def perform(state: ActionState) {
-    val target = state.unit.battle
-      .map(_.enemy.vanguard)
-      .getOrElse(state.targets.minBy(_.pixelDistanceFast(state.unit)).pixelCenter)
-        
-    With.commander.attackMove(state.unit, target)
+    Potshot.delegate(state)
   }
 }

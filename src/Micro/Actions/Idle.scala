@@ -25,6 +25,7 @@ object Idle extends Action {
     state.toUpgrade       = state.intent.toUpgrade
     state.toForm          = state.intent.toForm
     state.canFight        = state.intent.canAttack
+    state.canFlee         = state.intent.canFlee
     state.canPursue       = state.intent.canPursue
     state.canCower        = state.intent.canCower
     state.canMeld         = state.intent.canMeld

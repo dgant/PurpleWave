@@ -7,7 +7,7 @@ import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors, Unit
 import Planning.Plans.Army._
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.Information.Scenarios.WeAreBeing4Pooled
-import Planning.Plans.Information.{Employ, Employing}
+import Planning.Plans.Information.{Employ, Employing, StartPositionsAtLeast}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, FirstFiveMinutes}
 import Planning.Plans.Macro.Expanding.{BuildAssimilators, BuildCannonsAtExpansions, RequireMiningBases}
@@ -15,8 +15,8 @@ import Planning.Plans.Macro.Milestones._
 import Planning.Plans.Macro.Reaction.{EnemyBasesAtLeast, EnemyMutalisks}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Protoss.ProtossBuilds
-import Planning.Plans.Protoss.Situational.ForgeFastExpand
-import Planning.Plans.Scouting.{FindExpansions, RequireScouting}
+import Planning.Plans.Protoss.Situational.{Defend2GateAgainst4Pool, DefendFFEAgainst4Pool, ForgeFastExpand, TwoGatewaysAtNexus}
+import Planning.Plans.Scouting.{FindExpansions, RequireScouting, ScoutAt}
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Options.Protoss.PvZ._
 
@@ -29,12 +29,19 @@ class ProtossVsZerg extends Parallel {
   ////////////////
   
   private class ImplementEarly2Gate extends FirstFiveMinutes(
-    new Build(ProtossBuilds.OpeningTwoGate99_WithZealots: _*))
+    new Parallel(
+      new TwoGatewaysAtNexus,
+      new Trigger(
+        new UnitsAtLeast(2, UnitMatchType(Protoss.Zealot), complete = true),
+        initialBefore = new Build(ProtossBuilds.OpeningTwoGate99_WithZealots: _*))))
   
   private class ImplementEarlyFFELight extends FirstFiveMinutes(
     new Parallel(
+      new ForgeFastExpand(cannonsInFront = false),
       new If(
-        new WeAreBeing4Pooled,
+        new Or(
+          new Employing(PvZEarlyFFEHeavy),
+          new WeAreBeing4Pooled),
         new Build(ProtossBuilds.FFE_Vs4Pool: _*),
         new If(
           new EnemyBasesAtLeast(2),
@@ -163,7 +170,6 @@ class ProtossVsZerg extends Parallel {
     
     // Early game
     new RequireMiningBases(1),
-    new ForgeFastExpand(cannonsInFront = true), // Do we always want this placement?
     new Employ(PvZEarlyZealotAllIn,  new ImplementEarly2Gate),
     new Employ(PvZEarly2Gate,        new ImplementEarly2Gate),
     new Employ(PvZEarlyFFELight,     new ImplementEarlyFFELight),
@@ -176,14 +182,24 @@ class ProtossVsZerg extends Parallel {
           new Employing(PvZEarlyFFELight),
           new Employing(PvZEarlyFFEHeavy)),
         new TrainMatchingRatio(Protoss.PhotonCannon, UnitMatchType(Zerg.Zergling), 0.5, 6))),
-    
-    
-    new TakeSafeNatural,
-    new TakeSafeThirdBase,
+  
+    // 4/5-pool defense
+    new If(
+      new And(
+        new WeAreBeing4Pooled,
+        new Check(() => With.frame > 24 * 120),
+        new UnitsAtMost(2, UnitMatchType(Protoss.PhotonCannon), complete = true)),
+      new DefendFFEAgainst4Pool),
+    new FirstFiveMinutes(new Defend2GateAgainst4Pool),
     
     // Early game macro
     new RequireSufficientPylons,
     new TrainProbesContinuously,
+    new If(
+      new Not(new Employing(PvZEarlyZealotAllIn)),
+      new Parallel(
+        new TakeSafeNatural,
+        new TakeSafeThirdBase)),
   
     // #YOLO
     new Employ(PvZEarlyZealotAllIn, new Parallel(
@@ -201,7 +217,7 @@ class ProtossVsZerg extends Parallel {
     new Employ(PvZMidgame5GateDragoons, new ImplementMidgame5GateDragoons),
     
     // Mid-game macro
-    new FirstFiveMinutes(new Employ(PvZEarlyFFEHeavy, new Build(RequestAtLeast(1, Protoss.Gateway), RequestAtLeast(6, Protoss.PhotonCannon)))),
+    new FirstFiveMinutes(new Employ(PvZEarlyFFEHeavy, new Build(RequestAtLeast(1, Protoss.Gateway), RequestAtLeast(4, Protoss.PhotonCannon)))),
     new BuildDetectionForLurkers,
     new BuildCannonsAtExpansions(5),
   
@@ -291,26 +307,12 @@ class ProtossVsZerg extends Parallel {
     new UpgradeContinuously(Protoss.GroundArmor),
     new UpgradeContinuously(Protoss.GroundDamage),
     
-    // Tactics
-    new If(
-      new And(
-        new WeAreBeing4Pooled,
-        new UnitsAtMost(1, UnitMatchType(Protoss.PhotonCannon), complete = true)),
-      new If(
-        new Check(() => With.frame > 24 * (2 * 60)), // When a 4-pool arrives on a tiny rush distance
-        new DefendCannonsWithProbes),
-      new If(
-        new UnitsAtLeast(1, UnitMatchType(Protoss.Pylon), complete = false),
-        new RequireScouting)), // Don't scout while being 4-pooled
-    
     // Zealot all-in: Trigger attacking immediately! And bring Probes because they help kill Zerglings faster
     new Employ(PvZEarlyZealotAllIn,
       new Trigger(
         new UnitsAtLeast(2, UnitMatchType(Protoss.Zealot), complete = true),
         new Parallel(
-          new ConsiderAttacking {
-            whenFalse.set(new DefendHearts)
-          },
+          new ConsiderAttacking { whenFalse.set(new DefendHearts) },
           new If (
             new Check(() => With.frame < 24 * 60 * 4),
             new ConsiderAttacking {
@@ -318,6 +320,18 @@ class ProtossVsZerg extends Parallel {
               attack.attackers.get.unitMatcher.set(UnitMatchWorkers)
             })),
         new DefendHearts)),
+  
+    // Don't scout while being 4-pooled
+    new If(
+      new And(
+        new Or(
+          new Employing(PvZEarlyFFELight),
+          new Employing(PvZEarlyFFEHeavy)),
+        new StartPositionsAtLeast(4)),
+      new ScoutAt(6),
+      new If(
+        new UnitsAtLeast(1, UnitMatchType(Protoss.Pylon), complete = false),
+        new RequireScouting)),
   
     new If(
       new And(

@@ -32,7 +32,7 @@ object Playbook {
   //
   val forced = Vector[Strategy](
     AllPvZ,
-    PvZEarlyFFELight
+    PvZEarlyZealotAllIn
   )
   
   // Specify the order in which you want to try strategies vs. new opponents

@@ -44,6 +44,7 @@ object PlacementProfiles {
   val naturalCannonPylon = new PlacementProfile(
     "Pylon for natural Cannons",
     preferZone                  = 100.0,
+    preferNatural               = 30.0,
     preferPowering              = 0.5,
     preferDistanceFromEnemy     = 0.5,
     preferCoveringWorkers       = 0.5,
@@ -54,6 +55,10 @@ object PlacementProfiles {
   val naturalCannon = new PlacementProfile(
     "Natural cannons",
     preferZone                  = 100.0,
+    preferNatural               = 30.0,
+    preferDistanceFromEnemy     = 0.5,
+    preferCoveringWorkers       = 0.5,
+    avoidDistanceFromBase       = 1.5,
     avoidSurfaceArea            = 0.25,
     avoidDistanceFromIdealRange = 5.0)
   
@@ -65,7 +70,9 @@ object PlacementProfiles {
   
   val wall = new PlacementProfile(
     "Ground defense",
+    preferNatural               = 30.0,
     preferCoveringWorkers       = 2.0,
+    avoidDistanceFromEnemy      = 0.75,
     avoidDistanceFromBase       = 0.5,
     avoidSurfaceArea            = 1.0,
     avoidDistanceFromIdealRange = 1.0)
@@ -82,6 +89,12 @@ object PlacementProfiles {
     preferPowering              = 5.0,
     avoidDistanceFromBase       = 1.0,
     avoidDistanceFromEnemy      = 3.0)
+  
+  val hugTheNexus = new PlacementProfile(
+    "Hugging Nexus",
+    preferPowering        = 0.25,
+    avoidDistanceFromBase = 1.0,
+    preferCoveringWorkers = 1.0)
   
   def default(blueprint: Blueprint): PlacementProfile = {
     if (blueprint.townHall)

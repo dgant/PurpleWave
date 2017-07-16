@@ -11,7 +11,7 @@ class WeAreBeing4Pooled extends Plan {
   override def isComplete: Boolean = conditionsMet
   
   override def onUpdate(): Unit = {
-    if (With.frame > 24 * 60 * 3) {
+    if (With.frame > 24 * 60 * 4) {
       conditionsMet = false
       return
     }

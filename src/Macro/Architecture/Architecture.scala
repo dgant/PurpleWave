@@ -1,6 +1,6 @@
 package Macro.Architecture
 
-import Debugging.Visualizations.Views.Geography.ShowArchitecture
+import Debugging.Visualizations.Views.Geography.ShowArchitecturePlacements
 import Information.Geography.Pathfinding.{GroundPathFinder, TilePath}
 import Information.Geography.Types.{Edge, Zone}
 import Lifecycle.With
@@ -171,7 +171,7 @@ class Architecture {
   
     updatePaths() //Invalidate any paths which no longer work
     
-    if (ShowArchitecture.inUse) {
+    if (ShowArchitecturePlacements.inUse) {
       exclusions += Exclusion(placement.blueprint.toString, margin)
     }
   }
@@ -206,7 +206,7 @@ class Architecture {
     untownhallable  ++= unbuildable
     ungassable      ++= With.units.all.toSeq.filter(unit => ! unit.player.isNeutral && unit.alive && unit.unitClass.isGas).map(_.tileTopLeft)
       
-    if (ShowArchitecture.inUse) {
+    if (ShowArchitecturePlacements.inUse) {
       exclusions ++= forUnwalkable.map(unit => Exclusion("Margin for " + unit, unit.tileArea.expand(1, 1)))
     }
   }

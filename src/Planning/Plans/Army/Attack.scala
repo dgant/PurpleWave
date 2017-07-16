@@ -3,7 +3,7 @@ package Planning.Plans.Army
 import Lifecycle.With
 import Micro.Intent.Intention
 import Planning.Composition.ResourceLocks.LockUnits
-import Planning.Composition.UnitMatchers.{UnitMatchAnd, UnitMatchDetectors, UnitMatchMobile, UnitMatchWarriors}
+import Planning.Composition.UnitMatchers.{UnitMatchAnd, UnitMatchMobileDetectors, UnitMatchMobile, UnitMatchWarriors}
 import Planning.Composition.UnitPreferences.UnitPreferClose
 import Planning.Composition.{Property, UnitCountEverything}
 import Planning.Plan
@@ -17,7 +17,7 @@ class Attack extends Plan {
   attackers.get.unitCounter.set(UnitCountEverything)
   
   val detectors = new Property[LockUnits](new LockUnits)
-  detectors.get.unitMatcher.set(UnitMatchAnd(UnitMatchDetectors, UnitMatchMobile))
+  detectors.get.unitMatcher.set(UnitMatchAnd(UnitMatchMobileDetectors, UnitMatchMobile))
   detectors.get.unitCounter.set(UnitCountEverything)
   
   override def onUpdate() {

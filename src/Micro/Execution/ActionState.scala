@@ -49,6 +49,7 @@ class ActionState(val unit: FriendlyUnitInfo) {
   var toForm        : Option[Pixel]                 = None
   var toUpgrade     : Option[Upgrade]               = None
   var canFight      : Boolean                       = true
+  var canFlee       : Boolean                       = true
   var canPursue     : Boolean                       = true
   var canCower      : Boolean                       = false
   var canMeld       : Boolean                       = false

@@ -16,7 +16,8 @@ object Build extends Action {
     
     val buildArea = state.toBuild.get.tileArea.add(state.toBuildTile.get)
     val blockers  = state.targets.filter(_.tileArea.intersects(buildArea))
-    if (blockers.nonEmpty) {
+    blockers.flatMap(_.friendly).foreach(_.actionState.shove(state.unit))
+    if (blockers.exists(_.isEnemy)) {
       Fight.consider(state)
     }
     else {

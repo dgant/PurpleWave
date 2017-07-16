@@ -7,6 +7,7 @@ import Planning.Yolo
 object Disengage extends Action {
   
   override protected def allowed(state: ActionState): Boolean = {
+    state.canFlee &&
     state.unit.canMoveThisFrame &&
     ! Yolo.active
   }
@@ -24,8 +25,7 @@ object Disengage extends Action {
       && threat.topSpeed > state.unit.topSpeed
       && threat.pixelDistanceFast(state.unit) < 48.0) > 2
     if (trapped) {
-      Brawl.delegate(state)
-      Engage.delegate(state)
+      Potshot.delegate(state)
     }
   
     // TODO: These outrange/outspeed concepts are excessively rigid.

@@ -6,7 +6,7 @@ import Micro.Intent.Intention
 import Planning.Composition.Property
 import Planning.Composition.ResourceLocks.LockUnits
 import Planning.Composition.UnitCounters.{UnitCountCombat, UnitCountOne}
-import Planning.Composition.UnitMatchers.{UnitMatchAnd, UnitMatchDetectors, UnitMatchMobile, UnitMatchWarriors}
+import Planning.Composition.UnitMatchers.{UnitMatchAnd, UnitMatchMobileDetectors, UnitMatchMobile, UnitMatchWarriors}
 import Planning.Composition.UnitPreferences.UnitPreferClose
 import Planning.Plan
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, UnitInfo}
@@ -19,7 +19,7 @@ class ControlZone(zone: Zone) extends Plan {
   
   val detectors = new Property[LockUnits](new LockUnits)
   detectors.get.unitPreference.set(fighters.get.unitPreference.get)
-  detectors.get.unitMatcher.set(UnitMatchAnd(UnitMatchDetectors, UnitMatchMobile))
+  detectors.get.unitMatcher.set(UnitMatchAnd(UnitMatchMobileDetectors, UnitMatchMobile))
   detectors.get.unitCounter.set(UnitCountOne)
   
   var enemies: Set[ForeignUnitInfo] = Set.empty

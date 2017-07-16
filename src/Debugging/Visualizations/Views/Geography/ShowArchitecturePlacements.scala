@@ -5,7 +5,7 @@ import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.View
 import Lifecycle.With
 
-object ShowArchitecture extends View {
+object ShowArchitecturePlacements extends View {
   
   override def renderMap() {
   

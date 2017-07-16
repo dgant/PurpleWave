@@ -6,11 +6,11 @@ import Micro.Execution.ActionState
 
 object Produce extends Action {
   
-  override def allowed(state:ActionState) = {
+  override def allowed(state: ActionState): Boolean = {
     state.unit.trainingQueue.isEmpty
   }
   
-  override def perform(state:ActionState) {
+  override def perform(state: ActionState) {
     
     if (state.toTrain.isDefined) {
       With.commander.build(state.unit, state.toTrain.get)

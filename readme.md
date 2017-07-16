@@ -29,7 +29,7 @@ PurpleWave is built directly on BWAPI, but is designed to be easily adapted for 
 What you'll need:
 * Windows
 * 32-bit (x86) Java Runtime Environment 8: http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html
-* 32-bit (x86) Java Development Kit 8: http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html
+* 32-bit (x86) Java Development Kit 8:http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
 * IntelliJ IDEA Community Edition: https://www.jetbrains.com/idea/download/#section=windows
 * (Optional) Git: Git-2.13.2-64-bit.exe
 * (Very optional, for packaging PurpleWave as an executable) Launch4j: http://launch4j.sourceforge.net/

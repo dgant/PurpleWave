@@ -207,7 +207,8 @@ class ProtossVsProtoss extends Parallel {
       new And(
         new EnemyUnitsAtMost(0, UnitMatchType(Protoss.Observer)),
         new EnemyUnitsAtMost(0, UnitMatchType(Protoss.Forge))),
-      new TrainContinuously(Protoss.DarkTemplar, 3)),
+      new TrainContinuously(Protoss.DarkTemplar, 3),
+      new TrainContinuously(Protoss.DarkTemplar, 1)),
     
     new If(
       new UnitsAtLeast(2, UnitMatchType(Protoss.Reaver)),

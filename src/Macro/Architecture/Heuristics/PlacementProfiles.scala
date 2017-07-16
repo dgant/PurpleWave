@@ -70,10 +70,10 @@ object PlacementProfiles {
   
   val wall = new PlacementProfile(
     "Ground defense",
-    preferNatural               = 30.0,
+    preferNatural               = 10.0,
     preferCoveringWorkers       = 2.0,
-    avoidDistanceFromEnemy      = 0.75,
-    avoidDistanceFromBase       = 0.5,
+    avoidDistanceFromEnemy      = 1.0,
+    avoidDistanceFromBase       = 5.0,
     avoidSurfaceArea            = 1.0,
     avoidDistanceFromIdealRange = 1.0)
   

@@ -59,7 +59,7 @@ class AttackWithWorkers extends Plan {
       val unassignedScouts  = new mutable.HashSet[FriendlyUnitInfo] ++ fighters.units
       while(unassignedScouts.nonEmpty && unscoutedBases.size > 1) {
         val nextBase = unscoutedBases.minBy(_.zone.distancePixels(With.geography.ourMain.zone))
-        val scout = unassignedScouts.minBy(_.pixelDistanceFast(nextBase.heart.pixelCenter))
+        val scout = unassignedScouts.minBy(_.framesToTravel(nextBase.heart.pixelCenter))
         unassignedScouts  -= scout
         unscoutedBases    -= nextBase
         smorc(scout, nextBase)

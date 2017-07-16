@@ -222,7 +222,7 @@ class ProtossVsZerg extends Parallel {
     new Employ(PvZMidgame5GateDragoons, new ImplementMidgame5GateDragoons),
     
     // Mid-game macro
-    new FirstFiveMinutes(new Employ(PvZEarlyFFEHeavy, new Build(RequestAtLeast(1, Protoss.Gateway), RequestAtLeast(4, Protoss.PhotonCannon)))),
+    new FirstFiveMinutes(new Employ(PvZEarlyFFEHeavy, new Build(RequestAtLeast(1, Protoss.Gateway), RequestAtLeast(5, Protoss.PhotonCannon)))),
     new BuildDetectionForLurkers,
     new BuildCannonsAtExpansions(5),
   

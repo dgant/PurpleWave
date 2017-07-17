@@ -6,7 +6,7 @@ object TargetHeuristicDamagePerSecond extends TargetHeuristic{
   
   override def evaluate(state: ActionState, candidate: UnitInfo): Double = {
     
-    candidate.dpsAgainst(state.unit) + Math.max(candidate.groundDps, candidate.airDps)
+    candidate.dpfAgainst(state.unit) + Math.max(candidate.groundDpf, candidate.airDpf)
     
   }
 }

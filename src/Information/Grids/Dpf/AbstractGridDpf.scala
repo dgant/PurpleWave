@@ -1,4 +1,4 @@
-package Information.Grids.Dps
+package Information.Grids.Dpf
 
 import Information.Grids.ArrayTypes.AbstractGridDouble
 import Lifecycle.With
@@ -6,7 +6,7 @@ import Mathematics.Shapes.Circle
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.UnitInfo
 
-abstract class AbstractGridDps extends AbstractGridDouble {
+abstract class AbstractGridDpf extends AbstractGridDouble {
   
   //Range is calculated from unit edge to unit edge.
   //Let's make sure we account for the hypotenuse of even a big target like a Dragoon
@@ -20,20 +20,20 @@ abstract class AbstractGridDps extends AbstractGridDouble {
     reset()
     
     val framesToLookAhead = 24
-    val cooldownPenalty = With.configuration.dpsGridCooldownPenalty
-    val distancePenalty = With.configuration.dpsGridDistancePenalty
-    val movementPenalty = With.configuration.dpsGridMovementPenalty
+    val cooldownPenalty = With.configuration.dpfGridCooldownPenalty
+    val distancePenalty = With.configuration.dpfGridDistancePenalty
+    val movementPenalty = With.configuration.dpfGridMovementPenalty
     
     getUnits.foreach(unit => {
-      var dps = if (air) unit.airDps else unit.groundDps
-      if (dps > 0.0) {
+      var dpf = if (air) unit.airDpf else unit.groundDpf
+      if (dpf > 0.0) {
         var pixelImpactMax  = if (air) unit.pixelReachAir(framesToLookAhead) else unit.pixelReachGround(framesToLookAhead)
         var pixelRangeMax   = if (air) unit.pixelRangeAir else unit.pixelRangeGround
         var pixelRangeMin   = unit.unitClass.groundMinRangeRaw
         
         //Assume invisible siege tanks are sieged
         if ( ! unit.isOurs && ! unit.visible && unit.is(Terran.SiegeTankUnsieged)) {
-          dps               = Math.max(dps,             Terran.SiegeTankSieged.groundDps)
+          dpf               = Math.max(dpf,             Terran.SiegeTankSieged.groundDpf)
           pixelImpactMax    = Math.max(pixelImpactMax,  Terran.SiegeTankSieged.groundRange)
           pixelRangeMax     = Math.max(pixelRangeMax,   Terran.SiegeTankSieged.groundRange)
         }
@@ -50,7 +50,7 @@ abstract class AbstractGridDps extends AbstractGridDouble {
           val cooldown: Double = if (air) unit.unitClass.airDamageCooldown else unit.unitClass.groundDamageCooldown
           if (cooldown > 0) {
             val cooldownLeft: Double = if (air) unit.airCooldownLeft else unit.groundCooldownLeft
-            dps *= 1.0 - cooldownPenalty * Math.max(0.0, cooldownLeft/cooldown)
+            dpf *= 1.0 - cooldownPenalty * Math.max(0.0, cooldownLeft/cooldown)
           }
         }
   
@@ -63,11 +63,11 @@ abstract class AbstractGridDps extends AbstractGridDouble {
           .foreach(point => {
             val nearbyTile = tileCenter.add(point)
             if (nearbyTile.valid) {
-              val adjustedDps = dps -
+              val adjustedDpf = dpf -
                 distancePenalty * point.lengthSquared * distancePenaltyRatio -
                 movementPenalty * point.lengthSquared * movementPenaltyRatio
-              if (adjustedDps > 0) {
-                add(nearbyTile, adjustedDps)
+              if (adjustedDpf > 0) {
+                add(nearbyTile, adjustedDpf)
               }
             }
           })

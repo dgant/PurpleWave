@@ -1,9 +1,9 @@
-package Information.Grids.Dps
+package Information.Grids.Dpf
 
 import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.DamageType
 
-class GridDpsEnemyAirNormal extends AbstractGridDpsEnemy {
+class GridDpfEnemyAirNormal extends AbstractGridDpfEnemy {
   
   val unacceptableDamageTypes = Vector(DamageType.Concussive, DamageType.Explosive)
   override protected val air: Boolean = true

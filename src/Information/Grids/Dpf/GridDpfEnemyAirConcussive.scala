@@ -1,9 +1,9 @@
-package Information.Grids.Dps
+package Information.Grids.Dpf
 
 import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.DamageType
 
-class GridDpsEnemyAirConcussive extends AbstractGridDpsEnemy {
+class GridDpfEnemyAirConcussive extends AbstractGridDpfEnemy {
   
   override protected val air: Boolean = true
   override protected def getUnits: Iterable[UnitInfo] =

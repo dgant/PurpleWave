@@ -10,7 +10,7 @@ class Configuration {
   var enableSurrendering  = true
   var enableStdOut        = false // StdOut crashes bots on SSCAIT because it blocks forever
   var enableChat          = true
-  var identifyGhostUnits  = false
+  var identifyGhostUnits  = true
   
   //////////////
   // Strategy //
@@ -33,9 +33,9 @@ class Configuration {
   var woundedThresholdHealth          = 40
   var evacuateDangerousBases          = true
   
-  var dpsGridDistancePenalty          = 0.5
-  var dpsGridMovementPenalty          = 0.5
-  var dpsGridCooldownPenalty          = 0.25
+  var dpfGridDistancePenalty          = 0.5
+  var dpfGridMovementPenalty          = 0.5
+  var dpfGridCooldownPenalty          = 0.25
   var bunkerSafetyMargin              = Math.sqrt(16.0 * 16.0 * 2.0) + Math.sqrt(32.0 * 16.0 * 2.0) + 32.0 * (4.0 + 1.0) + /* This is the margin! */ 8.0
   
   ///////////
@@ -96,8 +96,8 @@ class Configuration {
   // Visualization //
   ///////////////////
   
-  var visualize                           = false
-  var visualizationProbabilityHappyVision = 0.1
+  var visualize                           = true
+  var visualizationProbabilityHappyVision = 1.0
   var visualizationProbabilityTextOnly    = 0.00
   
   var camera                      = false

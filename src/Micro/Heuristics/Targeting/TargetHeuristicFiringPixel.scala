@@ -15,8 +15,8 @@ object TargetHeuristicFiringPixel extends TargetHeuristic{
           Math.max(0, state.unit.pixelsFromEdgeFast(candidate) - state.unit.pixelRangeAgainstFromEdge(candidate)))
         .tileIncluding
     
-    val dpsExposure = With.grids.dpsEnemy.get(firingPixel, state.unit)
+    val dpfExposure = With.grids.dpfEnemy.get(firingPixel, state.unit)
     
-    dpsExposure
+    dpfExposure
   }
 }

@@ -73,8 +73,8 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
     cooldownZeroBecomesInfinity(groundDamageCooldownRaw)
   
   //The extra 2+ is to account for the 1-3 frame random variation in cooldown
-  lazy val airDps    : Double = airDamageFactorRaw    * maxAirHitsRaw     * effectiveAirDamage    * 24 / (2 + airDamageCooldown).toDouble
-  lazy val groundDps : Double = groundDamageFactorRaw * maxGroundHitsRaw  * effectiveGroundDamage * 24 / (2 + groundDamageCooldown).toDouble
+  lazy val airDpf    : Double = airDamageFactorRaw    * maxAirHitsRaw     * effectiveAirDamage    / (2 + airDamageCooldown).toDouble
+  lazy val groundDpf : Double = groundDamageFactorRaw * maxGroundHitsRaw  * effectiveGroundDamage / (2 + groundDamageCooldown).toDouble
   
   lazy val attacksGround : Boolean = effectiveGroundDamage > 0
   lazy val attacksAir    : Boolean = effectiveAirDamage    > 0

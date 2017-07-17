@@ -14,7 +14,7 @@ object TargetHeuristicPain extends TargetHeuristic {
     
     val firingPixel = state.unit.pixelCenter.project(candidate.pixelCenter, distanceToReach)
     
-    With.grids.dpsEnemy.get(firingPixel.tileIncluding, state.unit)
+    With.grids.dpfEnemy.get(firingPixel.tileIncluding, state.unit)
   }
   
 }

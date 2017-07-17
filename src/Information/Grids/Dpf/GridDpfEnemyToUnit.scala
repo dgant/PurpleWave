@@ -1,11 +1,11 @@
-package Information.Grids.Dps
+package Information.Grids.Dpf
 
 import Lifecycle.With
 import Mathematics.Points.Tile
 import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.UnitSizeType
 
-class GridDpsEnemyToUnit {
+class GridDpfEnemyToUnit {
   
   def get(tile:Tile, unit: UnitInfo): Double = {
     
@@ -33,12 +33,12 @@ class GridDpsEnemyToUnit {
     }
     
     if (unit.flying)
-                    With.grids.dpsEnemyAirNormal.get(tile) +
-      explosive   * With.grids.dpsEnemyAirExplosive.get(tile) +
-      concussive  * With.grids.dpsEnemyAirConcussive.get(tile)
+                    With.grids.dpfEnemyAirNormal.get(tile) +
+      explosive   * With.grids.dpfEnemyAirExplosive.get(tile) +
+      concussive  * With.grids.dpfEnemyAirConcussive.get(tile)
     else
-                    With.grids.dpsEnemyGroundNormal.get(tile) +
-      explosive   * With.grids.dpsEnemyGroundExplosive.get(tile) +
-      concussive  * With.grids.dpsEnemyGroundConcussive.get(tile)
+                    With.grids.dpfEnemyGroundNormal.get(tile) +
+      explosive   * With.grids.dpfEnemyGroundExplosive.get(tile) +
+      concussive  * With.grids.dpfEnemyGroundConcussive.get(tile)
   }
 }

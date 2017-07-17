@@ -1,10 +1,6 @@
 package Strategery
 
 import Strategery.Strategies.Options.AllRaces.{Proxy2Gate2StartLocations, Proxy2Gate3StartLocations, WorkerRush2StartLocations, WorkerRush3StartLocations}
-import Strategery.Strategies.Options.Protoss.PvP._
-import Strategery.Strategies.Options.Protoss.PvR.{PvREarly2Gate1012, PvREarly2Gate910, PvREarly2Gate910AtNatural}
-import Strategery.Strategies.Options.Protoss.PvT._
-import Strategery.Strategies.Options.Protoss.PvZ._
 import Strategery.Strategies.Strategy
 
 object Playbook {
@@ -12,9 +8,10 @@ object Playbook {
   // Don't use these.
   //
   val disabled = Vector[Strategy](
-    
-    //Too crummy to use
-    PvZMidgameCorsairCarrier
+    WorkerRush2StartLocations,
+    WorkerRush3StartLocations,
+    Proxy2Gate2StartLocations,
+    Proxy2Gate3StartLocations
   )
   
   // Use these whenever possible.
@@ -37,6 +34,7 @@ object Playbook {
   // If we don't win with 9-9 Gateways, we probably won't win with 10-12 Gateways either so try something else.
   //
   val strategyOrder = Vector(
+    /*
     WorkerRush2StartLocations,
     WorkerRush3StartLocations,
     Proxy2Gate2StartLocations,
@@ -72,5 +70,6 @@ object Playbook {
     PvZMidgameCorsairReaver,
     PvZMidgameCorsairSpeedlot,
     PvZMidgameCorsairCarrier
+    */
   )
 }

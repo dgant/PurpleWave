@@ -180,8 +180,8 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   def attacksGround : Boolean = unitClass.attacksGround
   def attacksAir    : Boolean = unitClass.attacksAir
   
-  def airDps    : Double = stimAttackSpeedBonus * unitClass.airDps
-  def groundDps : Double = stimAttackSpeedBonus * unitClass.groundDps
+  def airDpf    : Double = stimAttackSpeedBonus * unitClass.airDpf
+  def groundDpf : Double = stimAttackSpeedBonus * unitClass.groundDpf
   
   def attacksAgainstAir: Int = unitClass.airDamageFactorRaw * unitClass.maxAirHitsRaw
   def attacksAgainstGround: Int = {
@@ -208,10 +208,10 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   def attacksAgainst    (enemy:UnitInfo)  : Int         = if (enemy.flying) attacksAgainstAir             else attacksAgainstGround
   
   def damageScaleAgainst(enemy:UnitInfo): Double =
-    if (enemy.flying && airDps > 0)
+    if (enemy.flying && airDpf > 0)
       if (enemy.shieldPoints > 5) 1.0
       else Damage.scaleBySize(unitClass.airDamageTypeRaw, enemy.unitClass.size)
-    else if (groundDps > 0)
+    else if (groundDpf > 0)
       if (enemy.shieldPoints > 5) 1.0
       else Damage.scaleBySize(unitClass.groundDamageTypeRaw, enemy.unitClass.size)
     else
@@ -230,10 +230,10 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
     Math.max(1, damageToHealth.toInt + damageToShields)
   }
   
-  def dpsAgainst(enemy:UnitInfo): Double = {
+  def dpfAgainst(enemy:UnitInfo): Double = {
     val cooldownVs = cooldownMaxAgainst(enemy)
     if (cooldownVs == 0) return 0.0
-    damageAgainst(enemy) * 24.0 / cooldownVs
+    damageAgainst(enemy).toDouble / cooldownVs
   }
   
   def canDoAnythingThisFrame:Boolean = canDoAnythingThisFrameCache.get

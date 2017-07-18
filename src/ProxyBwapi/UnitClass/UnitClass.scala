@@ -31,21 +31,6 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
   // Combat //
   ////////////
   
-  lazy val framesRequiredForAttackToComplete: Int = {
-    // The question:
-    // If we order this unit to attack, for how many frames after the attack animation happens can the attack be cancelled?
-    //
-    // See also https://docs.google.com/spreadsheets/d/1bsvPvFil-kpvEUfSG74U3E5PLSTC02JxSkiR8QdLMuw/edit#gid=0
-    // and https://github.com/Cmccrave/McRave/blob/d9816ebd82f0bf88401f70f400b6517217a1b6a2/UnitManager.cpp#L55
-    //
-    if      (this == Protoss.Dragoon)       9
-    else if (this == Protoss.PhotonCannon)  18
-    else if (this == Protoss.Reaver)        1 //?
-    else if (this == Zerg.Devourer)         10
-    else if (this == Protoss.Carrier)       24 * 4
-    else                                    0
-  }
-  
   lazy val effectiveAirDamage:Int =
     if      (this == Protoss.Carrier)      Protoss.Interceptor.effectiveAirDamage * 8
     else if (this == Protoss.Interceptor)  Protoss.Interceptor.airDamageRaw
@@ -290,11 +275,60 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
     if (predicate) classes.append(thenAddThatClass)
   }
   
-  private def addBuildUnitIf(classes:ListBuffer[UnitClass], ifThisClass:UnitClass, thenAddThatClass:UnitClass) {
+  private def addBuildUnitIf(classes: ListBuffer[UnitClass], ifThisClass: UnitClass, thenAddThatClass: UnitClass) {
     addBuildUnitIf(classes, this == ifThisClass, thenAddThatClass)
   }
   
   lazy val mineralValue     : Int = mineralPrice + buildUnitsSpent.map(_.mineralValue).sum
   lazy val gasValue         : Int = mineralPrice + buildUnitsSpent.map(_.gasValue).sum
   lazy val subjectiveValue  : Int = (2 * mineralValue + 3 * gasValue) * (if(isWorker) 2 else 1) * (if(isZerg) 3 else 2)
+  
+  //////////////////////
+  // Micro frame data //
+  //////////////////////
+  
+  // Largely from https://docs.google.com/spreadsheets/d/1bsvPvFil-kpvEUfSG74U3E5PLSTC02JxSkiR8QdLMuw/edit#gid=0
+  //
+  // According to professor jaj22:
+  // Well, the stop frames are the main guide (to how many frames of movement are lost by attacking)
+  // But that won't strictly tell you how many frames you lose.
+  //
+  
+  lazy val stopFrames: Int = {
+    if (this == Terran.SCV                ) 2
+    if (this == Terran.Marine             ) 8   else
+    if (this == Terran.Firebat            ) 8   else
+    if (this == Terran.Ghost              ) 3   else
+    if (this == Terran.Vulture            ) 2   else
+    if (this == Terran.Goliath            ) 1   else
+    if (this == Terran.SiegeTankUnsieged  ) 1   else
+    if (this == Terran.SiegeTankSieged    ) 1   else
+    if (this == Terran.Wraith             ) 2   else
+    if (this == Terran.Battlecruiser      ) 2   else
+    if (this == Terran.Valkyrie           ) 40  else
+    if (this == Protoss.Probe             ) 2   else
+    if (this == Protoss.Zealot            ) 7   else
+    if (this == Protoss.Dragoon           ) 2   else
+    if (this == Protoss.DarkTemplar       ) 9   else
+    if (this == Protoss.Archon            ) 15  else
+    if (this == Protoss.Reaver            ) 1   else
+    if (this == Protoss.Scout             ) 2   else
+    if (this == Protoss.Corsair           ) 8   else
+    if (this == Protoss.Arbiter           ) 4   else
+    if (this == Zerg.Drone                ) 2   else
+    if (this == Zerg.Zergling             ) 4   else
+    if (this == Zerg.Hydralisk            ) 3   else
+    if (this == Zerg.Lurker               ) 2   else
+    if (this == Zerg.Ultralisk            ) 14  else
+    if (this == Zerg.Mutalisk             ) 2   else
+    if (this == Zerg.Devourer             ) 9   else
+    2 // Arbitrary.
+  }
+  
+  lazy val minStop: Int = {
+    if (this == Protoss.Dragoon           ) 5   else
+    if (this == Zerg.Devourer             ) 7   else
+    if (this == Protoss.Carrier           ) 48  else
+    0
+  }
 }

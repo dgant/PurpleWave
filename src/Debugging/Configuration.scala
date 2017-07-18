@@ -23,7 +23,7 @@ class Configuration {
   ///////////
   
   var assumedBuilderTravelSpeed       = 0.65
-  var attackableRangeBuffer           = 6
+  var attackableRangeBuffer           = 4
   var fogPositionDuration             = 24 * 20
   var violenceFrameThreshold          = 24
   var enableYolo                      = true

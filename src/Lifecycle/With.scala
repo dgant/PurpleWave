@@ -12,6 +12,7 @@ import Macro.Architecture.{Architecture, PlacementScheduler}
 import Macro.Scheduling.Scheduler
 import Micro.Execution.Executor
 import Micro.Intent.Commander
+import Micro.Matchups.MatchupGraph
 import Performance.TaskQueue.{AbstractTaskQueue, TaskQueueGlobal}
 import Planning.Blackboard
 import ProxyBwapi.Players.{PlayerInfo, Players}
@@ -42,6 +43,7 @@ object With {
   var intelligence    : Intelligence        = _
   var latency         : Latency             = _
   var logger          : Logger              = _
+  var matchups        : MatchupGraph        = _
   var paths           : Paths               = _
   var performance     : PerformanceMonitor  = _
   var placement       : PlacementScheduler  = _
@@ -100,6 +102,7 @@ object With {
     history           = new History
     intelligence      = new Intelligence
     latency           = new Latency
+    matchups          = new MatchupGraph
     paths             = new Paths
     performance       = new PerformanceMonitor
     placement         = new PlacementScheduler

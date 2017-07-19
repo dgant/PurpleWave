@@ -1,8 +1,10 @@
 package Micro.Matchups
 
+import Lifecycle.With
 import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
 import Micro.Decisions.MicroValue
+import Micro.Execution.Threats
 import ProxyBwapi.UnitInfo.UnitInfo
 
 case class MatchupAnalysis(us: UnitInfo, at: Pixel) {
@@ -13,7 +15,7 @@ case class MatchupAnalysis(us: UnitInfo, at: Pixel) {
   
   def ifAt(elsewhere: Pixel): MatchupAnalysis = MatchupAnalysis(us, elsewhere)
   
-  lazy val threats        : Vector[UnitInfo]  = if (us.battle.isEmpty) Vector.empty else us.battle.get.enemy.units.filter(_.canAttackThisSecond(us))
+  lazy val threats        : Vector[UnitInfo]  = Threats.enemies(us).actionState.th Threats. With.units.inTileRadius(us.tileIncludingCenter, With.configuration.battleMarginTiles).filter(_.is. .battle.get.enemy.units.filter(_.canAttackThisSecond(us))
   lazy val targets        : Vector[UnitInfo]  = if (us.battle.isEmpty) Vector.empty else us.battle.get.enemy.units.filter(us.canAttackThisSecond)
   lazy val threatsInRange : Vector[UnitInfo]  = threats.filter(threat => threat.pixelRangeAgainstFromCenter(us) <= threat.pixelDistanceFast(at))
   lazy val targetsInRange : Vector[UnitInfo]  = targets.filter(target => us.pixelRangeAgainstFromCenter(target) <= target.pixelDistanceFast(at))

@@ -39,6 +39,8 @@ case class DecideToAttack(argAgent: FriendlyUnitInfo, target: UnitInfo) extends 
   }
   
   override def renderMap() {
-    renderWith(targetPixel, destination, Colors.MediumRed)
+    if (best) {
+      renderWith(targetPixel, destination, Colors.MediumRed)
+    }
   }
 }

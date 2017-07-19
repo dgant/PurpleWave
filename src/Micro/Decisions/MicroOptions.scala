@@ -41,10 +41,20 @@ object MicroOptions {
   def moves(agent: FriendlyUnitInfo): Vector[MicroDecision] = {
     val outputs = Vector(
       flee(agent),
+      travels(agent),
       cardinalMoves(agent)
     )
     val output = outputs.flatten
     output
+  }
+  
+  def travels(agent: FriendlyUnitInfo): Vector[MicroDecision] = {
+    val zone = agent.pixelCenter.zone
+    val outputs = zone.edges
+      .map(_.otherSideof(zone).centroid.pixelCenter)
+      .map(pixel => DecideToMove(agent, pixel, moveFrames(agent)))
+      .toVector
+    outputs
   }
   
   def flee(agent: FriendlyUnitInfo): Vector[MicroDecision] = {

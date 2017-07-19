@@ -1,6 +1,5 @@
 package Micro.Decisions
 
-import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
 import Mathematics.Points.Pixel
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -26,6 +25,6 @@ abstract class MicroDecision(actingAgent: FriendlyUnitInfo) {
       DrawMap.circle(labelAt, 16, color, solid = true)
     }
     DrawMap.line(currentPixel, lineTo, color)
-    DrawMap.label("%1.2f".format(valuePerFrame), labelAt, drawBackground = true, backgroundColor = Colors.MediumRed)
+    DrawMap.label("%1.2f".format(evaluation), labelAt, drawBackground = true, backgroundColor = color)
   }
 }

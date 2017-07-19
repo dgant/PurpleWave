@@ -3,13 +3,14 @@ package Micro.Decisions
 import Lifecycle.With
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
-case class DecideToAttack(agent: FriendlyUnitInfo, target: UnitInfo) extends MicroDecision {
+case class DecideToAttack(argAgent: FriendlyUnitInfo, target: UnitInfo) extends MicroDecision(argAgent) {
   
-  override def value: Double = {
-    val distanceNow       = agent.pixelsFromEdgeFast(target)
-    val rangeAgainst      = agent.pixelRangeAgainstFromEdge(target)
-    val distanceToCover   = Math.max(0.0,  distanceNow - rangeAgainst)
-    val destination       = agent.pixelCenter.project(target.pixelCenter, distanceToCover)
+  lazy private val distanceNow      = agent.pixelsFromEdgeFast(target)
+  lazy private val rangeAgainst     = agent.pixelRangeAgainstFromEdge(target)
+  lazy private val distanceToCover  = Math.max(0.0,  distanceNow - rangeAgainst)
+  lazy private val destination      = agent.pixelCenter.project(target.pixelCenter, distanceToCover)
+  
+  override def valueFixed: Double = {
     val valueGained       = MicroValue.valuePerAttack(agent, target)
     val framesToExecute   = frames
     val valueLostHere     = framesToExecute / 2.0 * agent.matchups.vpfReceivingDiffused
@@ -18,8 +19,16 @@ case class DecideToAttack(agent: FriendlyUnitInfo, target: UnitInfo) extends Mic
     net
   }
   
+  override def valuePerFrame: Double = {
+    0.0
+  }
+  
   override def frames: Double = {
     agent.framesBeforeAttacking(target) + agent.unitClass.stopFrames
+  }
+  
+  override def legal: Boolean = {
+    agent.canAttackThisSecond(target)
   }
   
   override def execute(): Unit = {

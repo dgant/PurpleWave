@@ -91,6 +91,10 @@ class Commander {
     ! ready(unit)
   }
   
+  def doNothing(unit: FriendlyUnitInfo) {
+    sleep(unit)
+  }
+  
   def cancel(unit: FriendlyUnitInfo) {
     unit.base.cancelConstruction()
     sleep(unit)

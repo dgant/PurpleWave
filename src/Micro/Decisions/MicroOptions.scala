@@ -5,47 +5,66 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object MicroOptions {
   
-  def get(actor: FriendlyUnitInfo): Vector[MicroDecision] = {
+  def choose(agent: FriendlyUnitInfo): MicroDecision = {
+    val output = get(agent).maxBy(evaluate)
+    output
+  }
+  
+  def evaluate(decision: MicroDecision): Double = {
+    val frames = Math.min(48.0, decision.agent.matchups.framesToLiveCurrently)
+    decision.valueFixed + decision.valuePerFrame * frames
+  }
+  
+  def get(agent: FriendlyUnitInfo): Vector[MicroDecision] = {
     val outputs = Vector(
-      attacks(actor),
-      moves(actor)
+      Vector(DecideToDoNothing(agent)),
+      attacks(agent),
+      moves(agent)
     )
     val output = outputs.flatten
     output
   }
   
-  def attacks(actor: FriendlyUnitInfo): Vector[MicroDecision] = {
-    val output = actor.matchups.targets.map(target => DecideToAttack(actor, target))
+  def attacks(agent: FriendlyUnitInfo): Vector[MicroDecision] = {
+    val output = agent.matchups.targets.map(target => DecideToAttack(agent, target))
     output
   }
   
-  def attack(actor: FriendlyUnitInfo, target: UnitInfo): Vector[MicroDecision] = {
-    Vector(DecideToAttack(actor, target))
+  def attack(agent: FriendlyUnitInfo, target: UnitInfo): Vector[MicroDecision] = {
+    Vector(DecideToAttack(agent, target))
   }
   
-  def moves(actor: FriendlyUnitInfo): Vector[MicroDecision] = {
+  def moves(agent: FriendlyUnitInfo): Vector[MicroDecision] = {
     val outputs = Vector(
-      flee(actor)
-      // TODO: Add and evaluate traveling?
+      flee(agent),
+      cardinalMoves(agent)
     )
     val output = outputs.flatten
     output
   }
   
-  def flee(actor: FriendlyUnitInfo): Vector[MicroDecision] = {
-    val outputs = actor.matchups.threats.map(threat => flee(actor, threat))
+  def flee(agent: FriendlyUnitInfo): Vector[MicroDecision] = {
+    val outputs = agent.matchups.threats.map(threat => flee(agent, threat))
     val output  = outputs.flatten
     output
   }
   
-  def flee(actor: FriendlyUnitInfo, threat: UnitInfo): Vector[MicroDecision] = {
+  def cardinalMoves(agent: FriendlyUnitInfo): Vector[MicroDecision] = {
+    val outputs = (0.0 until 360.0 by 45.0)
+      .map(degrees => agent.pixelCenter.radiateDegrees(100.0, degrees))
+      .map(destination => DecideToMove(agent, destination, moveFrames(agent), isCardinalMove = true))
+      .toVector
+    outputs
+  }
+  
+  def flee(agent: FriendlyUnitInfo, threat: UnitInfo): Vector[MicroDecision] = {
     val output = Vector(
-      DecideToMove(actor, threat.pixelCenter.project(actor.pixelCenter, threat.pixelRangeAgainstFromCenter(actor) + 32.0), moveFrames(actor))
+      DecideToMove(agent, threat.pixelCenter.project(agent.pixelCenter, threat.pixelRangeAgainstFromCenter(agent) + 32.0), moveFrames(agent))
     )
     output
   }
   
-  def moveFrames(actor: FriendlyUnitInfo): Int = {
-    Math.max(With.latency.turnSize, Math.min(actor.cooldownLeft, 6))
+  def moveFrames(agent: FriendlyUnitInfo): Int = {
+    Math.max(With.latency.turnSize, Math.min(agent.cooldownLeft, 6))
   }
 }

@@ -38,6 +38,4 @@ case class MatchupAnalysis(us: UnitInfo, at: Pixel) {
       0.0
     else
       dpfDealingDiffused(target)
-  
-  
 }

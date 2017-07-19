@@ -7,7 +7,7 @@ import Lifecycle.With
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, UnitInfo}
 
 class BattleClassifier {
-  
+    
   var global  : Battle                = _
   var byZone  : Map[Zone, Battle]     = Map.empty
   var byUnit  : Map[UnitInfo, Battle] = Map.empty
@@ -15,7 +15,7 @@ class BattleClassifier {
   
   def all: Traversable[Battle] = local ++ byZone.values :+ global
   
-  private val clustering = new BattleClustering
+  val clustering = new BattleClustering
   
   def run() {
     clustering.enqueue(With.units.all.filter(isCombatantLocal))

@@ -1,55 +1,53 @@
 package Information.Battles.Clustering
 
 import Lifecycle.With
-import Mathematics.Points.Tile
-import Mathematics.Shapes.Circle
 import ProxyBwapi.UnitInfo.UnitInfo
 
+import scala.annotation.tailrec
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 class BattleClusteringState(units: Traversable[UnitInfo]) {
   
-          val clusters        = new ArrayBuffer[ArrayBuffer[UnitInfo]]
-  private val unassignedUnits = mutable.HashSet.empty ++ units
-  private val exploredTiles   = new mutable.HashSet[Tile]
-  private val horizonTiles    = new mutable.HashSet[Tile]
+  val unitsByLink = new mutable.HashMap[UnitInfo, UnitInfo]
+  val horizon: mutable.Stack[UnitInfo] = mutable.Stack[UnitInfo]()
   
-  def isComplete: Boolean = unassignedUnits.isEmpty
+  horizon.pushAll(units.toSeq.filter(_.isEnemy))
+  
+  def isComplete: Boolean = horizon.isEmpty
   
   def step() {
-    if (unassignedUnits.isEmpty) return
-  
-    val nextUnit = unassignedUnits.head
-  
-    val nextCluster = new ArrayBuffer[UnitInfo]
-    unassignedUnits   -= nextUnit
-    nextCluster       += nextUnit
-  
-    horizonTiles.add(nextUnit.tileIncludingCenter)
-  
-    while (horizonTiles.nonEmpty) {
+    if (isComplete) return
     
-      val nextTile = horizonTiles.head
-      horizonTiles  -=  nextTile
-      exploredTiles +=  nextTile
-    
-      val nextUnits = unitsInTile(nextTile)
-      unassignedUnits   --= nextUnits
-      nextCluster       ++= nextUnits
-    
-      Circle.points(With.configuration.battleMarginTiles)
-        .foreach(point => {
-          val tile = nextTile.add(point)
-          if (tile.valid
-            && ! exploredTiles.contains(tile)
-            && unitsInTile(tile).exists(unassignedUnits.contains))
-            horizonTiles += tile
-        })
+    val next = horizon.pop()
+    if ( ! unitsByLink.contains(next)) {
+      unitsByLink.put(next, next)
     }
-  
-    clusters.append(nextCluster)
+    val foes = foesNear(next).filterNot(unitsByLink.contains)
+    foes.foreach(foe => unitsByLink.put(foe, next))
+    horizon.pushAll(foes)
   }
   
-  private def unitsInTile(tile:Tile) = With.grids.units.get(tile).filter(unassignedUnits.contains)
+  def clusters: Vector[Vector[UnitInfo]] = {
+    val roots = unitsByLink.toSeq.filter(p => p._1 == p._2).map(_._1)
+    val clusters = roots.map(root => (root, new ArrayBuffer[UnitInfo] :+ root)).toMap
+    // This could be faster if we didn't have to find more
+    unitsByLink.keys.foreach(unit => {
+      val root = getRoot(unit)
+      clusters(root) :+ root
+    })
+    val output = clusters.toVector.map(_._2.toVector)
+    output
+  }
+  
+  @tailrec
+  private def getRoot(unit: UnitInfo): UnitInfo = {
+    if (unit == unitsByLink(unit)) unit else getRoot(unit)
+  }
+  
+  private def foesNear(unit: UnitInfo): Iterable[UnitInfo] = {
+    val tileRadius = Math.min(With.configuration.battleMarginPixels, unit.pixelRangeMax + unit.topSpeed * With.configuration.battleEstimationFrames) / 32.0
+    val enemies = With.units.inTileRadius(unit.tileIncludingCenter, tileRadius.toInt).toIterable.filter(_.isEnemyOf(unit))
+    enemies
+  }
 }

@@ -26,6 +26,7 @@ object ShowBattles extends View {
     With.game.drawTextScreen(army0.bwapi, "Overall:")
     With.game.drawTextScreen(army1.bwapi, "+" + With.battles.global.estimationAbstract.costToEnemy.toInt)
     With.game.drawTextScreen(army2.bwapi, "-" + With.battles.global.estimationAbstract.costToUs.toInt)
+    With.game.drawTextScreen(army0.add(0, 13).bwapi, "Frames since last update: " + With.framesSince(With.battles.clustering.lastClusterCompletion))
     localBattle.foreach(battle => drawEstimationReport(battle.estimationGeometric))
     if (Yolo.active && With.frame / 24 % 2 == 0) {
       With.game.drawTextScreen(yolo.bwapi, "YOLO")

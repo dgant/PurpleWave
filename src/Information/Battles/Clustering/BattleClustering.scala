@@ -7,7 +7,7 @@ import scala.collection.mutable.ArrayBuffer
 
 class BattleClustering {
   
-  var lastUpdateFrame = 0
+  var lastClusterCompletion = 0
   
   private var nextUnits:          Traversable[UnitInfo] = Vector.empty
   private var clusterInProgress:  BattleClusteringState = new BattleClusteringState(Vector.empty)
@@ -17,7 +17,7 @@ class BattleClustering {
   // Batch processing //
   //////////////////////
   
-  def clusters: ArrayBuffer[ArrayBuffer[UnitInfo]] = clusterComplete.clusters
+  def clusters: ArrayBuffer[ArrayBuffer[UnitInfo]] = ArrayBuffer.empty//clusterComplete.clusters
   
   def enqueue(units: Traversable[UnitInfo]) {
     nextUnits = units
@@ -29,6 +29,7 @@ class BattleClustering {
     }
   
     if (clusterInProgress.isComplete) {
+      lastClusterCompletion = With.frame
       clusterComplete = clusterInProgress
       clusterInProgress = new BattleClusteringState(nextUnits)
     }

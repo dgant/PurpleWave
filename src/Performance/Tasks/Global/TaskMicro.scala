@@ -10,6 +10,7 @@ class TaskMicro extends AbstractTask {
   override def maxConsecutiveSkips: Int = 1
   
   override protected def onRun() {
+    With.matchups.run()
     With.commander.run()
     With.executor.run()
   }

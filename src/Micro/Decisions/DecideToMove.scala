@@ -1,10 +1,11 @@
 package Micro.Decisions
 
+import Debugging.Visualizations.Colors
+import Debugging.Visualizations.Rendering.DrawMap
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Micro.Matchups.MatchupAnalysis
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import sun.management.resources
 
 case class DecideToMove(
   argAgent        : FriendlyUnitInfo,
@@ -36,13 +37,18 @@ case class DecideToMove(
     destination.valid && agent.canTraverse(destination.tileIncluding)
   }
   
-  override def execute(): Unit = {
+  override def execute() {
     With.commander.move(
       agent,
       if (isCardinalMove)
         destination
       else
         agent.pixelCenter.project(destination, 75.0)) // Less than 80 to get straight-line movement
+  }
+  
+  override def renderMap() {
+    DrawMap.line(currentPixel, destination, Colors.MediumViolet)
+    DrawMap.label("%1.2f".format(valuePerFrame), destination, backgroundColor = Colors.MediumViolet)
   }
   
 }

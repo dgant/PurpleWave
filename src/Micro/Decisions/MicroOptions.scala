@@ -6,7 +6,9 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 object MicroOptions {
   
   def choose(agent: FriendlyUnitInfo): MicroDecision = {
-    val output = get(agent).maxBy(evaluate)
+    agent.actionState.microDecisionsUpdateFrame = With.frame
+    agent.actionState.microDecisions = get(agent)
+    val output = agent.actionState.microDecisions.maxBy(_.evaluation)
     output
   }
   
@@ -51,7 +53,7 @@ object MicroOptions {
   
   def cardinalMoves(agent: FriendlyUnitInfo): Vector[MicroDecision] = {
     val outputs = (0.0 until 360.0 by 45.0)
-      .map(degrees => agent.pixelCenter.radiateDegrees(100.0, degrees))
+      .map(degrees => agent.pixelCenter.radiateDegrees(degrees, 100.0))
       .map(destination => DecideToMove(agent, destination, moveFrames(agent), isCardinalMove = true))
       .toVector
     outputs

@@ -13,8 +13,6 @@ case class MatchupAnalysis(us: UnitInfo, at: Pixel) {
   
   def ifAt(elsewhere: Pixel): MatchupAnalysis = MatchupAnalysis(us, elsewhere)
   
-  // TODO: Revisit "canAttackThisSecond"
-  
   lazy val threats        : Vector[UnitInfo]  = if (us.battle.isEmpty) Vector.empty else us.battle.get.enemy.units.filter(_.canAttackThisSecond(us))
   lazy val targets        : Vector[UnitInfo]  = if (us.battle.isEmpty) Vector.empty else us.battle.get.enemy.units.filter(us.canAttackThisSecond)
   lazy val threatsInRange : Vector[UnitInfo]  = threats.filter(threat => threat.pixelRangeAgainstFromCenter(us) <= threat.pixelDistanceFast(at))
@@ -30,7 +28,7 @@ case class MatchupAnalysis(us: UnitInfo, at: Pixel) {
   lazy val netValuePerFrameDiffused   : Double = vpfDealingDiffused   - vpfReceivingDiffused
   lazy val netValuePerFrameCurrently  : Double = vpfDealingCurrently  - vpfReceivingCurrently
   
-  def dpfDealingDiffused(target: UnitInfo): Double = us.dpfAgainst(target) / Math.max(1, targets.size)
+  def dpfDealingDiffused(target: UnitInfo): Double = us.dpfAgainst(target) / Math.max(1.0, targets.size)
   def dpfDealingCurrently(target: UnitInfo): Double =
     if(us.target.contains(target))
       us.dpfAgainst(target)

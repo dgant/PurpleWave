@@ -1,5 +1,7 @@
 package Micro.Decisions
 
+import Debugging.Visualizations.Colors
+import Debugging.Visualizations.Rendering.DrawMap
 import Lifecycle.With
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
@@ -33,5 +35,10 @@ case class DecideToAttack(argAgent: FriendlyUnitInfo, target: UnitInfo) extends 
   
   override def execute(): Unit = {
     With.commander.attack(agent, target)
+  }
+  
+  override def renderMap() {
+    DrawMap.line(currentPixel, destination, Colors.MediumRed)
+    DrawMap.label("%1.2f".format(valuePerFrame), destination, backgroundColor = Colors.MediumRed)
   }
 }

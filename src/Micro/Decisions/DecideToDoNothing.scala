@@ -1,8 +1,9 @@
 package Micro.Decisions
 
+import Debugging.Visualizations.Colors
+import Debugging.Visualizations.Rendering.DrawMap
 import Lifecycle.With
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import sun.management.resources.agent
 
 case class DecideToDoNothing(argAgent: FriendlyUnitInfo) extends MicroDecision(argAgent) {
   
@@ -24,6 +25,10 @@ case class DecideToDoNothing(argAgent: FriendlyUnitInfo) extends MicroDecision(a
   
   override def execute() {
     With.commander.doNothing(agent)
+  }
+  
+  override def renderMap() {
+    DrawMap.label("%1.2f".format(valuePerFrame), currentPixel, backgroundColor = Colors.MediumGreen)
   }
   
 }

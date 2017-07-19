@@ -14,7 +14,7 @@ class MatchupGraph {
     analyses(unit.id)
   }
   
-  def update() {
+  def run() {
     var i = 0
     while (i < maxUnitId) {
       analyses(i) = null

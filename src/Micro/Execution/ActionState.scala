@@ -4,6 +4,7 @@ import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile}
 import Micro.Actions.Action
 import Micro.Behaviors.{MovementProfiles, TargetingProfiles}
+import Micro.Decisions.MicroDecision
 import Micro.Heuristics.Movement.{MovementHeuristicEvaluation, MovementProfile}
 import Micro.Heuristics.Targeting.{EvaluateTargets, TargetingProfile}
 import Micro.Intent.Intention
@@ -87,7 +88,10 @@ class ActionState(val unit: FriendlyUnitInfo) {
   // Diagnostics //
   /////////////////
   
-  var movingTo                  : Option[Pixel] = None
-  var movedHeuristicallyFrame   : Int = 0
-  var movementHeuristicResults  : Iterable[MovementHeuristicEvaluation] = Iterable.empty
+  var movingTo                    : Option[Pixel] = None
+  var movedHeuristicallyFrame     : Int = 0
+  var movementHeuristicResults    : Iterable[MovementHeuristicEvaluation] = Iterable.empty
+  
+  var microDecisions              : Vector[MicroDecision] = Vector.empty
+  var microDecisionsUpdateFrame   : Int = 0
 }

@@ -25,13 +25,14 @@ class Visualization {
     ShowClock,
     ShowStrategy,
     ShowBases,
-    ShowBattles
+    ShowBattles,
+    ShowMicroDecisions
     ////////////
   )
   
   var enabled   = true
   var screen    = true
-  var map       = false
+  var map       = true
   var happy     = false
   var textOnly  = false
   
@@ -59,6 +60,7 @@ class Visualization {
     ShowZones,
     ShowZonePathDemo,
     ShowGrids,
+    ShowMicroDecisions,
     ShowMovementHeuristics,
     ShowUnits,
     ShowUnitsForeign,

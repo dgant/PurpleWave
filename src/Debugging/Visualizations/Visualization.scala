@@ -26,7 +26,10 @@ class Visualization {
     ShowStrategy,
     ShowBases,
     ShowBattles,
-    ShowMicroDecisions
+    ShowMicroDecisions,
+    ShowUnitsAll,
+    ShowUnitsForeign,
+    ShowUnitsFriendly
     ////////////
   )
   
@@ -62,7 +65,7 @@ class Visualization {
     ShowGrids,
     ShowMicroDecisions,
     ShowMovementHeuristics,
-    ShowUnits,
+    ShowUnitsAll,
     ShowUnitsForeign,
     ShowUnitsFriendly,
     ShowPerformanceDetails,

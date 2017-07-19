@@ -9,7 +9,7 @@ import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.Color
 
-object ShowUnits extends View {
+object ShowUnitsAll extends View {
   
   override def renderMap() {
     With.units.all.foreach(renderUnit)

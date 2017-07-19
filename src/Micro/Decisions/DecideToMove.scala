@@ -1,7 +1,6 @@
 package Micro.Decisions
 
 import Debugging.Visualizations.Colors
-import Debugging.Visualizations.Rendering.DrawMap
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Micro.Matchups.MatchupAnalysis
@@ -47,8 +46,7 @@ case class DecideToMove(
   }
   
   override def renderMap() {
-    DrawMap.line(currentPixel, destination, Colors.MediumViolet)
-    DrawMap.label("%1.2f".format(valuePerFrame), destination, backgroundColor = Colors.MediumViolet)
+    renderWith(destination, destination, Colors.MediumBlue)
   }
   
 }

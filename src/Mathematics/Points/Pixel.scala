@@ -53,7 +53,7 @@ case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
       (pixels * Math.cos(angleRadians)).toInt,
       (pixels * Math.sin(angleRadians)).toInt)
   }
-  def radiateDegrees(angleDegrees: Double, pixels: Double): Pixel = {
+  def radiate256Degrees(angleDegrees: Double, pixels: Double): Pixel = {
     // According to JohnJ, Brood War understands 256 angles
     // The BWAPI interface reduces this to a double (radians) with the cartesian origin (pointing right)
     // We'll use 256 (to match the engine behavior) and the BWAPI origin

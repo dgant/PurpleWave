@@ -57,7 +57,7 @@ object EvaluatePixels {
           // Tscmoo2: if you right click for a unit within 64 pixels, it'll just move directly
           // Tscmoo2: for longer distances, it has to go through a waypoint kinda
           // TODO: Just pick the pixels we want and then consider pathing in the Commander.
-          val targetPixel = startingPixel.radiateDegrees(angle, 70.0)
+          val targetPixel = startingPixel.radiate256Degrees(angle, 70.0)
           if (acceptable(state.unit, targetPixel, startingPixel))
             Some(targetPixel)
           else

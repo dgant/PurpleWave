@@ -1,16 +1,17 @@
 package Micro.Decisions
 
 import Debugging.Visualizations.Colors
-import Debugging.Visualizations.Rendering.DrawMap
 import Lifecycle.With
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 case class DecideToAttack(argAgent: FriendlyUnitInfo, target: UnitInfo) extends MicroDecision(argAgent) {
   
+  val targetPixel = target.pixelCenter
+  val destination = agent.pixelCenter.project(targetPixel, distanceToCover)
+  
   lazy private val distanceNow      = agent.pixelsFromEdgeFast(target)
   lazy private val rangeAgainst     = agent.pixelRangeAgainstFromEdge(target)
   lazy private val distanceToCover  = Math.max(0.0,  distanceNow - rangeAgainst)
-  lazy private val destination      = agent.pixelCenter.project(target.pixelCenter, distanceToCover)
   
   override def valueFixed: Double = {
     val valueGained       = MicroValue.valuePerAttack(agent, target)
@@ -38,7 +39,6 @@ case class DecideToAttack(argAgent: FriendlyUnitInfo, target: UnitInfo) extends 
   }
   
   override def renderMap() {
-    DrawMap.line(currentPixel, destination, Colors.MediumRed)
-    DrawMap.label("%1.2f".format(valuePerFrame), destination, backgroundColor = Colors.MediumRed)
+    renderWith(targetPixel, destination, Colors.MediumRed)
   }
 }

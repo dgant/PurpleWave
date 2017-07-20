@@ -8,8 +8,8 @@ class BattleClustering {
   var lastClusterCompletion = 0
   
   private var nextUnits:          Traversable[UnitInfo] = Vector.empty
-  private var clusterInProgress:  BattleClusteringState = new BattleClusteringState(Vector.empty)
-  private var clusterComplete:    BattleClusteringState = new BattleClusteringState(Vector.empty)
+  private var clusterInProgress:  BattleClusteringState = new BattleClusteringState(Set.empty)
+  private var clusterComplete:    BattleClusteringState = new BattleClusteringState(Set.empty)
   
   //////////////////////
   // Batch processing //
@@ -29,7 +29,7 @@ class BattleClustering {
     if (clusterInProgress.isComplete) {
       lastClusterCompletion = With.frame
       clusterComplete = clusterInProgress
-      clusterInProgress = new BattleClusteringState(nextUnits)
+      clusterInProgress = new BattleClusteringState(nextUnits.toSet)
     }
   }
 }

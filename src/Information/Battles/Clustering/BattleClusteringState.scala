@@ -7,12 +7,12 @@ import scala.annotation.tailrec
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
-class BattleClusteringState(units: Traversable[UnitInfo]) {
+class BattleClusteringState(combatUnits: Set[UnitInfo]) {
   
   val unitLinks = new mutable.HashMap[UnitInfo, UnitInfo]
   val horizon: mutable.Stack[UnitInfo] = mutable.Stack[UnitInfo]()
   
-  horizon.pushAll(units.toSeq.filter(_.isEnemy))
+  horizon.pushAll(combatUnits.toSeq.filter(_.isEnemy))
   
   def isComplete: Boolean = horizon.isEmpty
   
@@ -29,7 +29,7 @@ class BattleClusteringState(units: Traversable[UnitInfo]) {
       unitLinks.put(next, oldFoe.getOrElse(next))
     }
     
-    horizon.pushAll(newFoes)
+    horizon.pushAll(newFoes.filter(combatUnits.contains))
   }
   
   private lazy val finalClusters: Vector[Vector[UnitInfo]] = {
@@ -58,7 +58,7 @@ class BattleClusteringState(units: Traversable[UnitInfo]) {
   }
   
   private def foesNear(unit: UnitInfo): Iterable[UnitInfo] = {
-    val tileRadius = Math.min(With.configuration.battleMarginPixels, unit.pixelRangeMax + unit.topSpeed * With.configuration.battleEstimationFrames) / 32.0
+    val tileRadius = Math.min(With.configuration.battleMarginPixels, unit.pixelRangeMax + unit.topSpeed * With.configuration.battleEstimationFrames + 96.0) / 32.0
     val enemies = With.units.inTileRadius(unit.tileIncludingCenter, tileRadius.toInt).toIterable.filter(_.isEnemyOf(unit))
     enemies
   }

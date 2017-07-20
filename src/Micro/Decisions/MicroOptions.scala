@@ -11,10 +11,12 @@ object MicroOptions {
     agent.actionState.microDecisions            = decisions
     agent.actionState.microDecisionsUpdateFrame = With.frame
     best.best = true
+    lazy val debuggingInfo = decisions.map(x => (x, "1.2f".format(x.valueFixed), "1.2f".format(x.valuePerFrame), "1.2f".format(x.evaluation))).sortBy(_._2)
     best
   }
   
   def evaluate(decision: MicroDecision): Double = {
+    
     val frames = Math.max(With.latency.turnSize, Array(6.0, decision.frames, decision.agent.matchups.framesToLiveCurrently).min)
     decision.valueFixed + decision.valuePerFrame * frames
   }

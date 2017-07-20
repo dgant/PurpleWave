@@ -10,8 +10,15 @@ abstract class MicroDecision(actingAgent: FriendlyUnitInfo) {
   var best: Boolean = false
   
   def agent: FriendlyUnitInfo = actingAgent
-  def valueFixed: Double
-  def valuePerFrame: Double
+  
+  def valueFixed: Double = {
+    0.0
+  }
+  
+  def valuePerFrame: Double = {
+    agent.matchups.netValuePerFrameDiffused
+  }
+  
   def frames: Double
   def legal: Boolean
   def execute()
@@ -22,7 +29,7 @@ abstract class MicroDecision(actingAgent: FriendlyUnitInfo) {
   
   protected def renderWith(lineTo: Pixel, labelAt: Pixel, color: Color) {
     if (best) {
-      DrawMap.circle(labelAt, 16, color, solid = true)
+      DrawMap.circle(labelAt, 8, color, solid = true)
     }
     DrawMap.line(currentPixel, lineTo, color)
     DrawMap.label("%1.2f".format(evaluation), labelAt, drawBackground = true, backgroundColor = color)

@@ -15,17 +15,8 @@ case class DecideToMove(
   
   lazy val hypotheticalMatchups: MatchupAnalysis = agent.matchups.ifAt(destination)
   
-  override def valueFixed: Double = {
-    val framesToExecute   = frames
-    val nextStep          = agent.pixelCenter.project(destination, framesToExecute * agent.topSpeed)
-    val valueLostHere     = framesToExecute / 2.0 * agent.matchups.vpfReceivingDiffused
-    val valueLostThere    = framesToExecute / 2.0 * hypotheticalMatchups.vpfReceivingDiffused
-    val net               = - valueLostHere - valueLostThere
-    net
-  }
-  
   override def valuePerFrame: Double = {
-    hypotheticalMatchups.netValuePerFrameDiffused - agent.matchups.netValuePerFrameDiffused
+    (agent.matchups.netValuePerFrameDiffused + hypotheticalMatchups.netValuePerFrameDiffused) / 2.0
   }
   
   override def frames: Double = {

@@ -2,12 +2,13 @@ package Micro.Decisions
 
 import Debugging.Visualizations.Colors
 import Lifecycle.With
+import Mathematics.Points.Pixel
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 case class DecideToAttack(argAgent: FriendlyUnitInfo, target: UnitInfo) extends MicroDecision(argAgent) {
   
-  val targetPixel = target.pixelCenter
-  val destination = agent.pixelCenter.project(targetPixel, distanceToCover)
+  val targetPixel: Pixel = target.pixelCenter
+  val destination: Pixel = agent.pixelCenter.project(targetPixel, distanceToCover)
   
   lazy private val distanceNow      = agent.pixelsFromEdgeFast(target)
   lazy private val rangeAgainst     = agent.pixelRangeAgainstFromEdge(target)
@@ -22,12 +23,8 @@ case class DecideToAttack(argAgent: FriendlyUnitInfo, target: UnitInfo) extends 
     net
   }
   
-  override def valuePerFrame: Double = {
-    0.0
-  }
-  
   override def frames: Double = {
-    agent.framesBeforeAttacking(target) + agent.unitClass.stopFrames
+    agent.framesBeforeAttacking(target) + 1 + agent.unitClass.stopFrames
   }
   
   override def legal: Boolean = {

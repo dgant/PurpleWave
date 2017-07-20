@@ -15,7 +15,7 @@ object MicroOptions {
   }
   
   def evaluate(decision: MicroDecision): Double = {
-    val frames = Math.min(48.0, decision.agent.matchups.framesToLiveCurrently)
+    val frames = Math.max(With.latency.turnSize, Array(6.0, decision.frames, decision.agent.matchups.framesToLiveCurrently).min)
     decision.valueFixed + decision.valuePerFrame * frames
   }
   

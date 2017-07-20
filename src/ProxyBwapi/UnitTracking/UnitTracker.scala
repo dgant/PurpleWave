@@ -36,20 +36,21 @@ class UnitTracker {
   }
   
   def inTileRadius(tile: Tile, tiles: Int): Traversable[UnitInfo] = {
-    inTiles(Circle.points(tiles).map(tile.add))
+    inTiles(Circle.points(tiles).map(tile.add).filter(_.valid))
   }
   
   def inPixelRadius(pixel: Pixel, pixels: Int): Traversable[UnitInfo] = {
     val tile = pixel.tileIncluding
-    inTiles(Circle.points(pixels / 32 + 1).map(tile.add))
-      .filter(_.pixelCenter.pixelDistanceSquared(pixel) <= pixels * pixels)
+    val pixelsSquared = pixels * pixels
+    inTiles(Circle.points(pixels / 32 + 1).map(tile.add).filter(_.valid))
+      .filter(_.pixelCenter.pixelDistanceSquared(pixel) <= pixelsSquared)
   }
   
   def inRectangle(rectangle: TileRectangle): Traversable[UnitInfo] = {
     inTiles(rectangle.tiles).toSet
   }
   
-  private def inTiles(tiles:Traversable[Tile]):Traversable[UnitInfo] = {
+  private def inTiles(tiles: Traversable[Tile]): Traversable[UnitInfo] = {
     tiles.flatten(tile => With.grids.units.get(tile))
   }
   

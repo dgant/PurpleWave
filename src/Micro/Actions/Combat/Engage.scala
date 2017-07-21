@@ -1,5 +1,6 @@
 package Micro.Actions.Combat
 
+import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Commands.Attack
 import Micro.Heuristics.Targeting.EvaluateTargets
@@ -31,7 +32,7 @@ object Engage extends Action {
       || target.constructing
       || target.gathering
       || target.repairing
-      || (target.melee && target.attacking)
+      || With.framesSince(target.lastAttackStartFrame) < 48
       || target.topSpeed < unit.topSpeed * 0.75)
     unit.action.toAttack = EvaluateTargets.best(unit.action, targets)
   }

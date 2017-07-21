@@ -52,6 +52,14 @@ class Commander {
     sleep(unit)
   }
   
+  def hold(unit: FriendlyUnitInfo) {
+    if (unready(unit)) return
+    if ( ! unit.holdingPosition) {
+      unit.base.holdPosition()
+    }
+    sleep(unit)
+  }
+  
   def attack(unit: FriendlyUnitInfo, target: UnitInfo) {
     if (unready(unit)) return
     

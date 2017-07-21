@@ -6,7 +6,7 @@ import Micro.Intent.Intention
 import Planning.Composition.Property
 import Planning.Composition.ResourceLocks.LockUnits
 import Planning.Composition.UnitCounters.{UnitCountCombat, UnitCountOne}
-import Planning.Composition.UnitMatchers.{UnitMatchAnd, UnitMatchMobileDetectors, UnitMatchMobile, UnitMatchWarriors}
+import Planning.Composition.UnitMatchers._
 import Planning.Composition.UnitPreferences.UnitPreferClose
 import Planning.Plan
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, UnitInfo}
@@ -44,6 +44,7 @@ class ControlZone(zone: Zone) extends Plan {
     enemies = With.units.enemy.filter(enemy => enemy.likelyStillThere && threateningZone(enemy, zonesToConsider))
     threats = enemies.filter(threat => threat.canAttackThisSecond && ! threat.unitClass.isWorker && threat.likelyStillThere)
     if (threats.nonEmpty) {
+      fighters.get.unitMatcher.set(UnitMatchCombat(enemies))
       fighters.get.unitCounter.set(new UnitCountCombat(enemies, alwaysAccept = ourBase.isDefined))
       fighters.get.acquire(this)
       

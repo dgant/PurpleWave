@@ -1,5 +1,6 @@
 package Micro.Actions.Combat
 
+import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Commands.Travel
 import Micro.Behaviors.MovementProfiles
@@ -21,22 +22,23 @@ object Retreat extends Action {
     //
     CarrierRetreat.delegate(unit)
     
-    val slowerThanThreats = unit.matchups.threats.forall(_.topSpeed > unit.topSpeed)
+    val canTakeFreeShots  = unit.matchups.threatsInRange.isEmpty
+    lazy val slowerThanThreats = unit.matchups.threats.forall(_.topSpeed > unit.topSpeed)
     lazy val trapped = unit.damageInLastSecond > 0 && unit.matchups.threatsViolent.exists(threat =>
       threat.topSpeed * 0.8 > unit.topSpeed
       && threat.inRangeToAttackFast(unit))
 
-    if (slowerThanThreats || trapped) {
+    if (canTakeFreeShots || slowerThanThreats || trapped) {
       Potshot.delegate(unit)
     }
     
     // If we're a melee unit trying to defend a choke against other melee units, hold the line!
     //
     lazy val threatsAllMelee = unit.matchups.threats.forall(_.melee)
+    lazy val inFormation = unit.action.toForm.exists(unit.pixelDistanceFast(_) < 4.0)
     
-    if (unit.melee && threatsAllMelee && unit.pixelDistanceFast(unit.action.origin) < 16.0) {
-      Potshot.delegate(unit)
-      Travel.delegate(unit)
+    if (unit.melee && threatsAllMelee && inFormation) {
+      With.commander.hold(unit)
     }
     
     if (unit.pixelDistanceFast(unit.action.origin) < 16.0) {

@@ -27,6 +27,6 @@ object Targets {
   }
   
   def inRange(state: ActionState, target: UnitInfo): Boolean = {
-    state.unit.inRangeToAttackFast(target, With.latency.framesRemaining)
+    target.visible && state.unit.inRangeToAttackFast(target, With.latency.framesRemaining)
   }
 }

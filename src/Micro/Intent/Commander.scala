@@ -53,7 +53,7 @@ class Commander {
     if (unready(unit)) return
     
     if (target.visible) {
-      if (unit.readyForAttackOrder || ! unit.target.contains(target)) {
+      if (unit.readyForAttackOrder || ! unit.target.contains(target) || With.framesSince(unit.lastAttackStartFrame) > unit.cooldownMaxAirGround * 1.5) {
         unit.base.attack(target.base)
       }
       sleepAttack(unit)
@@ -203,7 +203,7 @@ class Commander {
   }
   
   private def sleepAttack(unit: FriendlyUnitInfo) {
-    sleep(unit) //After attack completes, ready on first frame of following turn
+    sleep(unit, With.latency.latencyFrames + 1) // Make sure we don't cancel an attack before the order has executed
   }
   
   private def sleepBuild(unit: FriendlyUnitInfo) {

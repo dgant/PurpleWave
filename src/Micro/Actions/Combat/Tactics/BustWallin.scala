@@ -1,11 +1,11 @@
-package Micro.Actions.Combat
+package Micro.Actions.Combat.Tactics
 
 import Lifecycle.With
 import Mathematics.Shapes.Circle
 import Micro.Actions.Action
+import Micro.Actions.Combat.Attacking.Potshot
 import Micro.Actions.Commands.{Attack, Travel}
 import Micro.Behaviors.MovementProfiles
-import Micro.Execution.ActionState
 import Micro.Heuristics.Targeting.EvaluateTargets
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo

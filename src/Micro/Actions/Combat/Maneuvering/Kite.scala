@@ -1,6 +1,7 @@
-package Micro.Actions.Combat
+package Micro.Actions.Combat.Maneuvering
 
 import Micro.Actions.Action
+import Micro.Actions.Combat.Attacking.Potshot
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Kite extends Action {

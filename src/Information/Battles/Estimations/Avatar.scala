@@ -54,7 +54,8 @@ class Avatar {
     val pixelsAway    = if (nearestEnemy.isDefined) unit.pixelDistanceFast(nearestEnemy.get) else With.configuration.abstractBattleDistancePixels
     val framesAway    = if (pixelsAway <= range) 0.0 else PurpleMath.nanToInfinity(Math.max(0.0, pixelsAway - range) / (unit.topSpeed * 0.5)) //Reward range a bit more
     val framesTotal   = With.configuration.battleEstimationFrames
-    val effectiveness = splashFactor * Math.max(0.0, (framesTotal - framesAway) / framesTotal)
+    val efficacy      = splashFactor * Math.max(0.0, (framesTotal - framesAway) / framesTotal)
+    val fortitude     = With.grids.altitudeBonus.get(unit.tileIncludingCenter) * (if (unit.effectivelyCloaked) 5.0 else 1.0)
     
     vulnerabilityGroundConcussive   = if (   unit.flying) 0.0 else Damage.scaleBySize(DamageType.Concussive, unit.unitClass.size)
     vulnerabilityGroundExplosive    = if (   unit.flying) 0.0 else Damage.scaleBySize(DamageType.Explosive,  unit.unitClass.size)
@@ -62,12 +63,12 @@ class Avatar {
     vulnerabilityAirConcussive      = if ( ! unit.flying) 0.0 else Damage.scaleBySize(DamageType.Concussive, unit.unitClass.size)
     vulnerabilityAirExplosive       = if ( ! unit.flying) 0.0 else Damage.scaleBySize(DamageType.Explosive,  unit.unitClass.size)
     vulnerabilityAirNormal          = if ( ! unit.flying) 0.0 else Damage.scaleBySize(DamageType.Normal,     unit.unitClass.size)
-    dpfGroundConcussiveFocused      = effectiveness * (if (unit.unitClass.groundDamageType == DamageType.Concussive) unit.damageOnHitBeforeArmorGround else 0.0) / unit.cooldownMaxGround.toDouble
-    dpfGroundExplosiveFocused       = effectiveness * (if (unit.unitClass.groundDamageType == DamageType.Explosive)  unit.damageOnHitBeforeArmorGround else 0.0) / unit.cooldownMaxGround.toDouble
-    dpfGroundNormalFocused          = effectiveness * (if (unit.unitClass.groundDamageType == DamageType.Normal)     unit.damageOnHitBeforeArmorGround else 0.0) / unit.cooldownMaxGround.toDouble
-    dpfAirConcussiveFocused         = effectiveness * (if (unit.unitClass.airDamageType    == DamageType.Concussive) unit.damageOnHitBeforeArmorAir    else 0.0) / unit.cooldownMaxAir.toDouble
-    dpfAirExplosiveFocused          = effectiveness * (if (unit.unitClass.airDamageType    == DamageType.Explosive)  unit.damageOnHitBeforeArmorAir    else 0.0) / unit.cooldownMaxAir.toDouble
-    dpfAirNormalFocused             = effectiveness * (if (unit.unitClass.airDamageType    == DamageType.Normal)     unit.damageOnHitBeforeArmorAir    else 0.0) / unit.cooldownMaxAir.toDouble
+    dpfGroundConcussiveFocused      = efficacy * (if (unit.unitClass.groundDamageType == DamageType.Concussive) unit.damageOnHitBeforeArmorGround else 0.0) / unit.cooldownMaxGround.toDouble
+    dpfGroundExplosiveFocused       = efficacy * (if (unit.unitClass.groundDamageType == DamageType.Explosive)  unit.damageOnHitBeforeArmorGround else 0.0) / unit.cooldownMaxGround.toDouble
+    dpfGroundNormalFocused          = efficacy * (if (unit.unitClass.groundDamageType == DamageType.Normal)     unit.damageOnHitBeforeArmorGround else 0.0) / unit.cooldownMaxGround.toDouble
+    dpfAirConcussiveFocused         = efficacy * (if (unit.unitClass.airDamageType    == DamageType.Concussive) unit.damageOnHitBeforeArmorAir    else 0.0) / unit.cooldownMaxAir.toDouble
+    dpfAirExplosiveFocused          = efficacy * (if (unit.unitClass.airDamageType    == DamageType.Explosive)  unit.damageOnHitBeforeArmorAir    else 0.0) / unit.cooldownMaxAir.toDouble
+    dpfAirNormalFocused             = efficacy * (if (unit.unitClass.airDamageType    == DamageType.Normal)     unit.damageOnHitBeforeArmorAir    else 0.0) / unit.cooldownMaxAir.toDouble
     dpfGroundConcussiveUnfocused    = dpfGroundConcussiveFocused  * unfocusedPenalty(unit)
     dpfGroundExplosiveUnfocused     = dpfGroundExplosiveFocused   * unfocusedPenalty(unit)
     dpfGroundNormalUnfocused        = dpfGroundNormalFocused      * unfocusedPenalty(unit)
@@ -77,7 +78,7 @@ class Avatar {
     attacksGround                   = if (unit.attacksGround) 1.0 else 0.0
     attacksAir                      = if (unit.attacksAir)    1.0 else 0.0
     subjectiveValue                 = unit.unitClass.subjectiveValue
-    totalHealth                     = unit.totalHealth
+    totalHealth                     = fortitude * unit.totalHealth
     totalFlyers                     = if (unit.flying) 1.0 else 0.0
     totalUnits                      = 1.0
   }

@@ -1,6 +1,8 @@
-package Micro.Actions.Combat
+package Micro.Actions.Combat.Decisionmaking
 
 import Micro.Actions.Action
+import Micro.Actions.Combat.Attacking.Potshot
+import Micro.Actions.Combat.Maneuvering.{Kite, Retreat}
 import Planning.Yolo
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 

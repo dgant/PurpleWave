@@ -1,4 +1,4 @@
-package Micro.Actions.Combat
+package Micro.Actions.Combat.Maneuvering
 
 import Micro.Actions.Action
 import Micro.Actions.Commands.Reposition

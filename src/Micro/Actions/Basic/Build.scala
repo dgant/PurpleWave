@@ -2,7 +2,7 @@ package Micro.Actions.Basic
 
 import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Actions.Combat.Fight
+import Micro.Actions.Combat.Decisionmaking.Fight
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Build extends Action {

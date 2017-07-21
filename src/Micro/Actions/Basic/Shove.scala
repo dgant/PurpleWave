@@ -1,4 +1,4 @@
-package Micro.Actions.Combat
+package Micro.Actions.Basic
 
 import Micro.Actions.Action
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo

@@ -1,4 +1,4 @@
-package Micro.Actions.Combat
+package Micro.Actions.Combat.Specialized
 
 import Micro.Actions.Action
 import Micro.Actions.Commands.Travel

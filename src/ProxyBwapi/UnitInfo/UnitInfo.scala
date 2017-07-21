@@ -128,7 +128,7 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
       (if (is(Protoss.Dragoon)  && player.hasUpgrade(Protoss.DragoonRange)) 64.0 else 0.0) +
       (if (is(Zerg.Hydralisk)   && player.hasUpgrade(Zerg.HydraliskRange))  32.0 else 0.0))
   
-  def pixelRangeMax:Double = Math.max(pixelRangeAir, pixelRangeGround)
+  def pixelRangeMax: Double = Math.max(pixelRangeAir, pixelRangeGround)
   
   def canTraverse             (tile:        Tile)       : Boolean = flying || With.grids.walkable.get(tile)
   def pixelsFromEdgeSlow      (otherUnit:   UnitInfo)   : Double  = pixelDistanceSlow(otherUnit) - unitClass.radialHypotenuse - otherUnit.unitClass.radialHypotenuse

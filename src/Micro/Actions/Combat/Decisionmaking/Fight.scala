@@ -1,6 +1,9 @@
-package Micro.Actions.Combat
+package Micro.Actions.Combat.Decisionmaking
 
 import Micro.Actions.Action
+import Micro.Actions.Combat.Attacking.{Pillage, Pursue}
+import Micro.Actions.Combat.Maneuvering.{Cower, Sneak}
+import Micro.Actions.Combat.Tactics.{BustBunker, ProtectTheWeak}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Fight extends Action {

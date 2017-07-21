@@ -1,8 +1,9 @@
-package Micro.Actions.Combat
+package Micro.Actions.Combat.Tactics
 
 import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Basic.MineralWalk
+import Micro.Actions.Combat.Maneuvering.HoverOutsideRange
 import Micro.Actions.Commands.{Attack, Travel}
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}

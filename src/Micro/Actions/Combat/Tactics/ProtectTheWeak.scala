@@ -1,6 +1,7 @@
-package Micro.Actions.Combat
+package Micro.Actions.Combat.Tactics
 
 import Micro.Actions.Action
+import Micro.Actions.Combat.Maneuvering.Kite
 import Micro.Actions.Commands.Attack
 import Micro.Behaviors.MovementProfiles
 import Micro.Heuristics.Targeting.EvaluateTargets

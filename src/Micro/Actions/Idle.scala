@@ -1,7 +1,9 @@
 package Micro.Actions
 
 import Micro.Actions.Basic._
-import Micro.Actions.Combat.{Duck, Fight, Tickle}
+import Micro.Actions.Combat.Decisionmaking.Fight
+import Micro.Actions.Combat.Tactics.Tickle
+import Micro.Actions.Combat.Maneuvering.Duck
 import Micro.Actions.Commands.{Attack, Travel}
 import Micro.Actions.Protoss.Meld
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo

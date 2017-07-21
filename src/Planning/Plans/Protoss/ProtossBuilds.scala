@@ -186,6 +186,7 @@ object ProtossBuilds {
     RequestAtLeast(2,   Protoss.Pylon),
     RequestAtLeast(20,  Protoss.Probe),
     RequestAtLeast(1,   Protoss.TemplarArchives),
+    RequestAtLeast(3,   Protoss.Pylon),
     RequestAtLeast(1,   Protoss.DarkTemplar),
     RequestAtLeast(2,   Protoss.Nexus)
   )

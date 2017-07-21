@@ -1,4 +1,4 @@
-package Micro.Actions.Combat
+package Micro.Actions.Combat.Decisionmaking
 
 import Micro.Actions.Action
 import Planning.Yolo

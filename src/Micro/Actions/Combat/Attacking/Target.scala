@@ -1,4 +1,4 @@
-package Micro.Actions.Combat
+package Micro.Actions.Combat.Attacking
 
 import Micro.Actions.Action
 import Micro.Heuristics.Targeting.EvaluateTargets

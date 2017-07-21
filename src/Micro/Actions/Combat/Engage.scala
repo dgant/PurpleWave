@@ -16,7 +16,7 @@ object Engage extends Action {
     Brawl.consider(state)
     BustWallin.consider(state)
     chooseTarget(state)
-    if ( ! state.unit.canAttackThisFrame) {
+    if ( ! state.unit.readyForAttackOrder) {
       Kite.delegate(state)
     }
     Attack.delegate(state)
@@ -28,9 +28,10 @@ object Engage extends Action {
     }
     val targets = state.targets.filter(target =>
       state.unit.inRangeToAttackFast(target)
-      || target.isBeingViolent
+      || target.constructing
       || target.gathering
       || target.repairing
+      || (target.melee && target.attacking)
       || target.topSpeed < state.unit.topSpeed * 0.75)
     state.toAttack = EvaluateTargets.best(state, targets)
   }

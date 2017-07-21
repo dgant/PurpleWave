@@ -11,7 +11,7 @@ object Potshot extends Action {
   
   override def allowed(state: ActionState): Boolean = {
     state.canFight &&
-    state.unit.canAttackThisFrame &&
+    state.unit.readyForAttackOrder &&
     state.targetsInRange.nonEmpty
   }
   

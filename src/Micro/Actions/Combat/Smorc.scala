@@ -133,7 +133,7 @@ object Smorc extends Action {
       }
       // Don't waste time mineral walking -- we need to get off as many shots as possible
       else if (
-        state.unit.canAttackThisFrame ||
+        state.unit.readyForAttackOrder ||
         state.unit.cooldownLeft - With.latency.framesRemaining <=
           targets.map(target =>state.unit.framesToTravelPixels(state.unit.pixelsFromEdgeFast(target))).min) {
         // Let's pick the outermost target while avoiding drilling stacks

@@ -49,7 +49,7 @@ object BustWallin extends Action {
     
     state.toAttack = EvaluateTargets.best(state, targets)
     
-    if (state.unit.canAttackThisFrame || state.unit.melee) {
+    if (state.unit.readyForAttackOrder || state.unit.melee) {
       Attack.delegate(state)
     }
     else if (state.toAttack.isDefined) {

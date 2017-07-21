@@ -16,7 +16,9 @@ class Configuration {
   // Strategy //
   //////////////
   
-  var rideItOutWinrate = 0.9
+  var useIteratedRoundRobinStrategySelection  = false
+  var rideItOutWinrate                        = 0.9
+  
   
   ///////////
   // Micro //

@@ -27,7 +27,7 @@ object Pursue extends Action {
       ))
     
     state.toAttack = EvaluateTargets.best(state, pursuableTargets)
-    if (state.unit.canAttackThisFrame) {
+    if (state.unit.readyForAttackOrder) {
       Attack.delegate(state)
     }
     else {

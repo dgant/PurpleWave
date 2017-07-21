@@ -13,34 +13,34 @@ object Kite extends Action {
   )
   
   override def perform(state: ActionState) {
-    if (state.unit.canAttackThisFrame) {
-      val fasterThanActiveThreats = state.threatsViolent.nonEmpty || state.threatsViolent.forall(state.unit.topSpeed > _.topSpeed)
-      if (fasterThanActiveThreats) {
+  
+    lazy val fasterThanThreats  = state.threats.forall(threat => state.unit.topSpeed > threat.topSpeed)
+    lazy val slowerThanThreats  = state.threats.forall(threat => state.unit.topSpeed < threat.topSpeed)
+    
+    if (state.unit.readyForAttackOrder) {
+      if (fasterThanThreats) {
       
         // Before shooting, make sure we have ample space
         // Also, don't close distance unless we are faster
       
-        val sufficientSpace = state.threatsViolent.forall(_.framesBeforeAttacking(state.unit) > state.unit.framesPerAttack)
+        val sufficientSpace = state.threatsViolent.forall(_.framesBeforeAttacking(state.unit) > state.unit.unitClass.stopFrames + state.unit.unitClass.minStop)
         if (sufficientSpace) {
           Potshot.consider(state)
         } else {
           HoverOutsideRange.delegate(state)
         }
-      } else {
-        // If we're not in danger (or can't escape anyway) fire.
+      } else if (slowerThanThreats) {
+        // We can't outrun them so might as well shoot
+        // (This is bad vs. other units of same type)
         Potshot.consider(state)
       }
     }
+    
+    if (fasterThanThreats) {
+      HoverOutsideRange.delegate(state)
+    }
     else {
-      
-      // Back off. If we outspeed, sit at the sweet spot of range. If we don't, just get as far as possible.
-      val weOutspeedActiveThreats = state.threatsViolent.forall(state.unit.topSpeed > _.topSpeed)
-      if (weOutspeedActiveThreats) {
-        HoverOutsideRange.delegate(state)
-      }
-      else {
-        Retreat.delegate(state)
-      }
+      Retreat.delegate(state)
     }
   }
 }

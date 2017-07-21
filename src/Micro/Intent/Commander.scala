@@ -22,65 +22,9 @@ class Commander {
   
   def run() {
     nextOrderFrame.keys.filterNot(_.alive).foreach(nextOrderFrame.remove)
-  
-    /*
-    
-    Update: June 2017
-    
-    PurpleWaveJadien: Alright. Let's solve this once and for all so I can die 200 years old and not have once thought about dragoon attack cancelling ever again
-    PurpleWaveJadien: Frame 0: Dragoon isAttackStarting becomes true.
-    PurpleWaveJadien: Frame X: Issue earliest possible move order without Dragoon shot failing or getting stuck
-    PurpleWaveJadien: Goal is to solve for X
-    jaj22: 7-latency probably
-    PurpleWaveJadien: i... i don't believe you
-    PurpleWaveJadien: or i'm just confused
-    jaj22: I do need to test this again with order switch times  :P
-    PurpleWaveJadien: why 7?
-    PurpleWaveJadien: i thought we'd be talking 1 + 9 + max(2,3,4) = 14?
-    jaj22: X is order issue time, not the time that it moves
-    jaj22: and isStartingAttack goes true one frame after the attack order hits
-    jaj22: hence you skip that 1 for a start
-    PurpleWaveJadien: @jaj22 alright, so the timeline is:
-    PurpleWaveJadien: -1: Attack order arrives from the network
-    PurpleWaveJadien: 0: Attack order starts executing
-    PurpleWaveJadien: isStartingAttack == true
-    jaj22: and isAttackFrame = true, yes
-    jaj22: 8: isAttackFrame is still true
-    jaj22: 9: isAttackFrame goes false. Switching to move order at this point is safe.
-    PurpleWaveJadien: @jaj22 ahah. So if latencyFrames is, say, 6, I can issue the order at frame... 4? and be okay?
-    jaj22: latencyFramesRemaining  :P
-    jaj22: but yeah, in theory
-    jaj22: I'll check whether it's the move order or the moving that matters.
-    jaj22: 9-gap, sticks  :D
-    jaj22: 9 minus latency after isStartingAttack looks correct anyway
-    jaj22: optimal number of frames to wait before firing your move order.
-    jaj22: if the goon is changing direction then you can do 7 minus latency  :P
-    PurpleWaveJadien: @jaj22 i... dear god what?
-    jaj22: they only stick if you continue moving in the same direction after the shot.
-    PurpleWaveJadien: i'm gonna pretend i never heard that
-    jaj22: you can unstick them by giving a move order in the opposite direction too
-    jaj22: you may have to wait for the move order to kick in  :P
-    jaj22: hmm, unstick angle looks like <45 degrees
-     */
-    
-    // https://docs.google.com/spreadsheets/d/1bsvPvFil-kpvEUfSG74U3E5PLSTC02JxSkiR8QdLMuw/edit#gid=0
-    //
-    // "Dragoon, Devourer only units that can have damage prevented by stop() too early"
-    //
-    // According to JohnJ: "After the frame where isStartingAttack is true, it should be left alone for the next 8 frames"
-    // "I assume that frame count is in ignorance of latency, so if i issue an order before the 8 frames are up that would be executed on the first frame thereafter, i'm in the clear?"
-    // JohnJ: yeah in theory. actually in practice. I did test that.
-    //
-    // JohnJ's research says (now + 9 - frames before execution) is the exact timing
-    // That formula causes Dragoons to miss some shots, especially on consecutive attacks without moving.
-    // So I've added one more frame of delay. Consecutive attacks are still sometimes missing.
-    //
-    // WARNING: This requires micro to run on *every frame*!
-    //
     nextOrderFrame.keys
       .filter(unit => unit.is(Protoss.Dragoon))
-      .filter(unit => unit.is(Protoss.Dragoon))
-      .foreach(dragoon => nextOrderFrame(dragoon) = Math.max(nextOrderFrame(dragoon), dragoon.lastAttackFrame + 10 - With.latency.latencyFrames))
+      .foreach(dragoon => nextOrderFrame(dragoon) = Math.max(nextOrderFrame(dragoon), DragoonDelay.nextSafeFrameToOrder(dragoon)))
   }
   
   def ready(unit: FriendlyUnitInfo): Boolean = {
@@ -108,41 +52,13 @@ class Commander {
   def attack(unit: FriendlyUnitInfo, target: UnitInfo) {
     if (unready(unit)) return
     
-    if (unit.is(Protoss.Carrier)) {
-      //tryCarrierAttack(unit, target)
-      //if (unready(unit)) return
-    }
-    
     if (target.visible) {
-      if (unit.canAttackThisFrame || ! unit.target.contains(target)) {
+      if (unit.readyForAttackOrder || ! unit.target.contains(target)) {
         unit.base.attack(target.base)
       }
       sleepAttack(unit)
     } else {
       move(unit, target.pixelCenter)
-    }
-  }
-  
-  def tryCarrierAttack(unit: FriendlyUnitInfo, target: UnitInfo) {
-    if (unready(unit)) return
-  
-    // Carriers are finicky. Manage them appropriately.
-    // * Don't attack units that aren't huge. Just attack-move to keep the interceptors going
-    // * Don't disturb interceptors that are already moving
-    //
-    // According to tscmoo, Carrier leash range is 10 (not the 12 on Liquipedia)
-    if (target.unitClass.maxTotalHealth >= 400) {
-      unit.base.attack(target.base)
-      sleepAttack(unit)
-      return
-    }
-    val destination = target.pixelCenter
-    if (target.totalHealth < 400) {
-      if ( ! unit.interceptors.exists(_.attacking)) {
-        // TODO: This is probably incorrect
-        attackMove(unit, target.pixelCenter)
-        sleepAttack(unit)
-      }
     }
   }
   
@@ -156,7 +72,7 @@ class Commander {
   def move(unit: FriendlyUnitInfo, to: Pixel) {
     if (unready(unit)) return
     
-    //Send flying units past their destination to maximize acceleration
+    // Send flying units past their destination to maximize acceleration
     val flyingOvershoot = 144.0
     var destination = to
     if (unit.flying && unit.pixelDistanceSquared(to) < Math.pow(flyingOvershoot, 2)) {
@@ -287,7 +203,7 @@ class Commander {
   }
   
   private def sleepAttack(unit: FriendlyUnitInfo) {
-    sleep(unit, unit.unitClass.minStop + With.latency.turnSize - 1) //After attack completes, ready on first frame of following turn
+    sleep(unit) //After attack completes, ready on first frame of following turn
   }
   
   private def sleepBuild(unit: FriendlyUnitInfo) {

@@ -7,6 +7,8 @@ class TaskBattles extends AbstractTask {
   
   urgency = With.configuration.urgencyBattles
   
+  override def maxConsecutiveSkips: Int = 8
+  
   override protected def onRun() {
     With.battles.run()
   }

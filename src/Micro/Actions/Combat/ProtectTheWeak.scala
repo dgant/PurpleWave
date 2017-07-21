@@ -25,7 +25,7 @@ object ProtectTheWeak extends Action {
       state.toAttack = EvaluateTargets.best(state, currentBullies)
       state.movementProfile = MovementProfiles.safelyAttackTarget
   
-      if (state.unit.canAttackThisFrame) {
+      if (state.unit.readyForAttackOrder) {
         Attack.delegate(state)
       }
       else {

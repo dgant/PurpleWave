@@ -48,7 +48,7 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
     history.enqueue(new UnitState(this))
   }
   
-  def lastAttackFrame: Int = {
+  def lastAttackStartFrame: Int = {
     history.filter(_.attackStarting).lastOption.map(_.frame).getOrElse(0)
   }
   
@@ -169,7 +169,8 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   def battle: Option[Battle] = With.battles.byUnit.get(this)
   def matchups: MatchupAnalysis = With.matchups.get(this)
   
-  def melee: Boolean = unitClass.maxAirGroundRange <= 32 * 2
+  def ranged  : Boolean = unitClass.canAttack && unitClass.maxAirGroundRange > 32 * 2
+  def melee   : Boolean = unitClass.canAttack && ! melee
   
   //TODO: Account for upgrades. Make sure to handle case where unit has no armor upgrades
   def armorHealth: Int = unitClass.armor // if (player.getUpgradeLevel(unitClass.armorUpgrade)
@@ -273,7 +274,11 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
     ! enemy.effectivelyCloaked && // Eh.
     (if (enemy.flying) unitClass.attacksAir else unitClass.attacksGround)
   
-  def canAttackThisFrame:Boolean = canAttackThisSecond && cooldownLeft <= With.latency.framesRemaining
+  // Frame X:     Unit's cooldown is 0.   Unit starts attacking.
+  // Frame X-1:   Unit's cooldown is 1.   Unit receives attack order.
+  // Frame X-1-L: Unit's cooldown is L+1. Send attack order.
+  
+  def readyForAttackOrder: Boolean = canAttackThisSecond && cooldownLeft <= 1 + With.latency.framesRemaining
   
   def pixelsCovered     (framesAhead: Int): Double = if (canMoveThisFrame) topSpeed * framesAhead else 0.0
   def pixelReachAir     (framesAhead: Int): Double = pixelsCovered(framesAhead) + pixelRangeAir
@@ -294,8 +299,6 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
     }
     else Int.MaxValue
   }
-  
-  def framesPerAttack: Int = 10 //TODO: Fill in with values from Dave Churchill's table
   
   ////////////
   // Orders //

@@ -1,13 +1,12 @@
 package Micro.Actions.Combat
 
 import Micro.Actions.Action
-import Micro.Decisions.MicroOptions
 import Micro.Execution.ActionState
 
 object Fight extends Action {
   
   override def allowed(state: ActionState): Boolean = {
-    state.unit.canMoveThisFrame || state.unit.canAttackThisFrame
+    state.unit.canMoveThisFrame || state.unit.readyForAttackOrder
   }
   
   override def perform(state: ActionState) {

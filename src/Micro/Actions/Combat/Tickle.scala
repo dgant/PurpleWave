@@ -8,9 +8,10 @@ import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.EnrichPixel._
 
-object Smorc extends Action {
+object Tickle extends Action {
+  
   override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.action.intent.smorc
+    unit.action.intent.canTickle
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {

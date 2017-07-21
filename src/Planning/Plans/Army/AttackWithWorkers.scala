@@ -106,7 +106,7 @@ class AttackWithWorkers extends Plan {
   def smorc(unit: FriendlyUnitInfo, target: Pixel) {
     With.executor.intend(new Intention(this, unit) {
       toTravel = Some(target)
-      smorc = true
+      canTickle = true
     })
   }
 }

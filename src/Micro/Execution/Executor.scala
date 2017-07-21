@@ -46,6 +46,7 @@ class Executor {
     while (doContinue && unitQueue.nonEmpty) {
       doContinue = doContinue && With.performance.continueRunning
       val nextState = unitQueue.dequeue()
+      nextState.lastFrame = With.frame
       
       if (nextState.unit.unitClass.orderable
         && ! nextState.unit.is(Protoss.PhotonCannon)) /* Hack fix for CIG -- we were cancelling our Photon Cannon attacks. */ {

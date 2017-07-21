@@ -9,7 +9,7 @@ import Micro.Execution.ActionState
 object Idle extends Action {
   
   override def allowed(state: ActionState): Boolean = {
-    ! state.unit.attackStarting
+    true
   }
   
   override def perform(state: ActionState) {

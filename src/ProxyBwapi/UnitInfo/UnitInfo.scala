@@ -49,7 +49,11 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   }
   
   def lastAttackStartFrame: Int = {
-    history.filter(_.attackStarting).lastOption.map(_.frame).getOrElse(0)
+    val attackStartingStates = history.filter(_.attackStarting)
+    if (attackStartingStates.isEmpty)
+      0
+    else
+      attackStartingStates.map(_.frame).max
   }
   
   def damageInLastSecond: Int = damageInLastSectiondCache.get
@@ -292,10 +296,12 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   def inRangeToAttackFast(enemy: UnitInfo, framesAhead  : Int)    : Boolean = enemy.project(framesAhead).pixelDistanceFast(project(framesAhead)) <= pixelRangeAgainstFromEdge(enemy) + unitClass.radialHypotenuse + enemy.unitClass.radialHypotenuse + With.configuration.attackableRangeBuffer
   
   def framesToTravel(destination: Pixel)    : Int = framesToTravelPixels(pixelDistanceTravelling(destination))
-  def framesToTravelPixels(pixels: Double)  : Int = if (canMoveThisFrame) Math.max(0, Math.ceil(pixels/topSpeed).toInt) else Int.MaxValue
-  def framesBeforeAttacking(enemy: UnitInfo): Int = {
+  def framesToTravelPixels(pixels: Double)  : Int = if (pixels <= 0.0) 0 else if (canMoveThisFrame) Math.max(0, Math.ceil(pixels/topSpeed).toInt) else Int.MaxValue
+  
+  def framesBeforeAttacking(enemy: UnitInfo): Int = framesBeforeAttacking(enemy, enemy.pixelCenter)
+  def framesBeforeAttacking(enemy: UnitInfo, at: Pixel): Int = {
     if (canAttackThisSecond(enemy)) {
-      Math.max(cooldownLeft, framesToTravelPixels(pixelDistanceFast(enemy) - pixelRangeAgainstFromEdge(enemy)))
+      Math.max(cooldownLeft, framesToTravelPixels(pixelDistanceFast(at) - pixelRangeAgainstFromEdge(enemy)))
     }
     else Int.MaxValue
   }

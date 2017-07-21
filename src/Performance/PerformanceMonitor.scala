@@ -15,6 +15,8 @@ class PerformanceMonitor {
   var framesOver1000  = 0
   var framesOver10000 = 0
   
+  var enablePerformanceStops = true // For disabling performance stops while debugging
+  
   def startFrame() {
     millisecondsBefore = System.currentTimeMillis()
   }
@@ -51,7 +53,7 @@ class PerformanceMonitor {
   }
   
   def continueRunning: Boolean = {
-    millisecondsLeftThisFrame > 1
+    millisecondsLeftThisFrame > 1 || ! enablePerformanceStops
   }
   
   def violatedThreshold: Boolean = {

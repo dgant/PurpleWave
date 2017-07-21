@@ -28,7 +28,7 @@ class Commander {
   }
   
   def ready(unit: FriendlyUnitInfo): Boolean = {
-    nextOrderFrame(unit) < With.frame
+    nextOrderFrame(unit) <= With.frame
   }
   
   private def unready(unit: FriendlyUnitInfo): Boolean = {

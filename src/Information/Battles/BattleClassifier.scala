@@ -67,10 +67,9 @@ class BattleClassifier {
     local = clustering.clusters
       .map(cluster =>
         new Battle(
-          new Team(cluster.filter(_.isOurs).toVector),
-          new Team(cluster.filter(_.isEnemy).toVector)))
+          new Team(cluster.filter(_.isOurs)),
+          new Team(cluster.filter(_.isEnemy))))
       .filter(_.happening)
-      .toVector
     byUnit = local.flatten(battle => battle.teams.flatMap(_.units).map(unit => (unit, battle))).toMap
   }
   

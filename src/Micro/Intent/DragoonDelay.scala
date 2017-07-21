@@ -6,7 +6,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 object DragoonDelay {
   
   def nextSafeFrameToOrder(dragoon: FriendlyUnitInfo): Int = {
-    dragoon.lastAttackStartFrame + 9 - With.latency.latencyFrames
+    dragoon.lastAttackStartFrame + 1 + 9 - With.latency.framesRemaining
   }
   
   

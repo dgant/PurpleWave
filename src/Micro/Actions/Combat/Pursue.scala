@@ -12,11 +12,11 @@ object Pursue extends Action {
     state.canPursue             &&
     state.toAttack.isEmpty      &&
     state.unit.canMoveThisFrame &&
-    state.targets.nonEmpty
+    state.unit.matchups.targets.nonEmpty
   }
   
   override def perform(state: ActionState) {
-    val pursuableTargets = state.targets.filter(target =>
+    val pursuableTargets = state.unit.matchups.targets.filter(target =>
       target.topSpeed < state.unit.topSpeed * 0.8 ||
       (
         ! target.flying &&

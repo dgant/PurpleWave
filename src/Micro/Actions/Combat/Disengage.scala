@@ -14,7 +14,7 @@ object Disengage extends Action {
   
   override protected def perform(state: ActionState) {
     
-    val trapped = state.threats.count(threat =>
+    val trapped = state.unit.matchups.threats.count(threat =>
       threat.melee
       && threat.topSpeed > state.unit.topSpeed
       && threat.pixelDistanceFast(state.unit) < 48.0) > 2
@@ -24,7 +24,7 @@ object Disengage extends Action {
     
     // If we're faster than all the threats we can afford to be clever.
     //
-    val shouldKite = state.threats.forall(threat =>
+    val shouldKite = state.unit.matchups.threats.forall(threat =>
       threat.topSpeed <= state.unit.topSpeed &&
       threat.framesToGetInRange(state.unit, state.unit.pixelCenter.project(threat.pixelCenter, 64.0)) > 0.0)
     

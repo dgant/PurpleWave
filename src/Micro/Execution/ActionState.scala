@@ -68,21 +68,8 @@ class ActionState(val unit: FriendlyUnitInfo) {
   def origin: Pixel = toReturn.getOrElse(originCache.get)
   private val originCache = new CacheFrame(() => if (With.geography.ourBases.nonEmpty) With.geography.ourBases.map(_.heart.pixelCenter).minBy(unit.pixelDistanceTravelling) else With.geography.home.pixelCenter)
   
-  def neighbors       : Vector[FriendlyUnitInfo]  = neighborsCache.get
-  def enemies         : Vector[UnitInfo]          = enemiesCache.get
-  def threats         : Vector[UnitInfo]          = threatsCache.get
-  def threatsViolent  : Vector[UnitInfo]          = threatsViolentCache.get
-  def targets         : Vector[UnitInfo]          = targetsCache.get
-  def targetsInRange  : Vector[UnitInfo]          = targetsInRangeCache.get
-  def targetValues    : Map[UnitInfo, Double]     = targetValuesCache.get
-  
-  private val neighborsCache      = new CacheFrame(() => Neighbors.get(this))
-  private val enemiesCache        = new CacheFrame(() => Threats.enemies(this))
-  private val threatsCache        = new CacheFrame(() => Threats.threats(this))
-  private val threatsViolentCache = new CacheFrame(() => Threats.violent(this))
-  private val targetsCache        = new CacheFrame(() => Targets.get(this))
-  private val targetsInRangeCache = new CacheFrame(() => targets.filter(target => Targets.inRange(this, target)))
-          val targetValuesCache   = new CacheFrame(() => targets.map(target => (target, EvaluateTargets.evaluate(this, target))).toMap)
+  def targetValues: Map[UnitInfo, Double] = targetValuesCache.get
+  val targetValuesCache   = new CacheFrame(() => unit.matchups.targets.map(target => (target, EvaluateTargets.evaluate(this, target))).toMap)
   
   /////////////////
   // Diagnostics //

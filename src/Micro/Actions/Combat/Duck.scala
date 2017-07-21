@@ -29,7 +29,7 @@ object Duck extends Action {
     val output = new ListBuffer[Explosion]
     
     if ( ! state.unit.flying) {
-      output ++= state.threats
+      output ++= state.unit.matchups.threats
         .filter(threat =>
           threat.target.isDefined               &&
           ! threat.target.contains(state.unit)  &&

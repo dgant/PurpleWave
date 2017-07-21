@@ -29,10 +29,10 @@ object Smorc extends Action {
     val exit                  = zone.edges.map(_.centerPixel).sortBy(_.groundPixels(With.geography.home)).headOption.getOrElse(With.geography.home.pixelCenter)
     val dyingThreshold        = 11
     val dying                 = state.unit.totalHealth < dyingThreshold
-    val enemies               = state.threats
-    val enemyFighters         = state.threats.filter(_.isBeingViolent)
+    val enemies               = state.unit.matchups.threats
+    val enemyFighters         = state.unit.matchups.threats.filter(_.isBeingViolent)
     val enemiesAttackingUs    = enemies.filter(_.isBeingViolentTo(state.unit))
-    val allyFighters          = state.neighbors
+    val allyFighters          = state.unit.matchups.allies
     val strength              = (units: Iterable[UnitInfo]) => units.size * units.map(_.totalHealth).sum
     val ourStrength           = strength(allyFighters :+ state.unit)
     val enemyStrength         = strength(enemies)
@@ -98,7 +98,7 @@ object Smorc extends Action {
   
     if (attack) {
       // No static defense allowed!
-      val staticDefense = state.targets.filter(u => u.unitClass.isBuilding && u.unitClass.canAttack)
+      val staticDefense = state.unit.matchups.targets.filter(u => u.unitClass.isBuilding && u.unitClass.canAttack)
       if (staticDefense.nonEmpty) {
         state.toAttack = staticDefense
           .sortBy(_.remainingBuildFrames)
@@ -108,7 +108,7 @@ object Smorc extends Action {
       }
       
       // Ignore units outside their bases
-      val targets = state.targets.filter(unit =>
+      val targets = state.unit.matchups.targets.filter(unit =>
         (
           unit.pixelCenter.zone == zone         ||
           // ...unless they're fighting us! Or building a building.

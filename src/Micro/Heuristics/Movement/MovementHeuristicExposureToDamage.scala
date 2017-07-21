@@ -16,7 +16,7 @@ object MovementHeuristicExposureToDamage extends MovementHeuristic {
       return HeuristicMathMultiplicative.default
     }
     
-    state.threats.take(20).map(threat => evaluateOne(state, threat, candidate)).sum
+    state.unit.matchups.threats.take(20).map(threat => evaluateOne(state, threat, candidate)).sum
   }
   
   def evaluateOne(state: ActionState, threat: UnitInfo, candidate: Pixel): Double = {

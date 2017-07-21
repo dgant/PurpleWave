@@ -19,8 +19,8 @@ object BustBunker extends Action {
     state.canFight                                          &&
     state.unit.canMoveThisFrame                             &&
     state.unit.is(Protoss.Dragoon)                          &&
-    state.threats.forall( ! _.is(Terran.SiegeTankSieged))   &&
-    state.targets.exists(target =>
+    state.unit.matchups.threats.forall( ! _.is(Terran.SiegeTankSieged))   &&
+    state.unit.matchups.targets.exists(target =>
       target.aliveAndComplete   &&
       target.is(Terran.Bunker)  &&
       ! target.player.hasUpgrade(Terran.MarineRange))
@@ -37,14 +37,14 @@ object BustBunker extends Action {
       // If we're getting shot at by the bunker, back off.
       (
         state.unit.damageInLastSecond > 0 &&
-        state.threats.exists(threat =>
+        state.unit.matchups.threats.exists(threat =>
           threat.is(Terran.Bunker) &&
           threat.pixelDistanceSlow(state.unit) < With.configuration.bunkerSafetyMargin)
       )) {
       HoverOutsideRange.delegate(state)
     }
     else if (With.self.hasUpgrade(Protoss.DragoonRange)) {
-      state.toAttack = Some(state.targets.minBy(_.pixelDistanceSquared(state.unit)))
+      state.toAttack = Some(state.unit.matchups.targets.minBy(_.pixelDistanceSquared(state.unit)))
       Attack.delegate(state)
     }
   }

@@ -8,10 +8,10 @@ object Shove extends Action {
   override protected def allowed(state: ActionState): Boolean = {
     ! state.unit.flying &&
     state.unit.canMoveThisFrame &&
-    state.threats.nonEmpty
+    state.unit.matchups.threats.nonEmpty
   }
   
   override protected def perform(state: ActionState): Unit = {
-    state.neighbors.foreach(_.actionState.shove(state.unit))
+    state.unit.matchups.allies.foreach(_.actionState.shove(state.unit))
   }
 }

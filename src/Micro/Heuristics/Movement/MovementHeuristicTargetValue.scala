@@ -8,7 +8,7 @@ object MovementHeuristicTargetValue extends MovementHeuristic {
   
   override def evaluate(state: ActionState, candidate: Pixel): Double = {
     
-    if ( state.targets.isEmpty) return HeuristicMathMultiplicative.default
+    if (state.unit.matchups.targets.isEmpty) return HeuristicMathMultiplicative.default
     
     val targetValues = state.targetValues
       .filter(pair =>

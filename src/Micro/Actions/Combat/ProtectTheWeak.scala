@@ -12,7 +12,7 @@ object ProtectTheWeak extends Action {
   // Protect our workers from harassment. Don't abandon them!
   
   override protected def allowed(state: ActionState): Boolean = {
-    state.threatsViolent.isEmpty
+    state.unit.matchups.threatsViolent.isEmpty
   }
   
   override protected def perform(state: ActionState) {
@@ -36,13 +36,13 @@ object ProtectTheWeak extends Action {
   }
   
   private def bullies(state: ActionState): Iterable[UnitInfo] = {
-    state.neighbors
+    state.unit.matchups.allies
       .filter(neighbor =>
         neighbor.unitClass.isWorker ||
         (
           neighbor.unitClass.isBuilding &&
           (neighbor.wounded || neighbor.unitClass.canAttack))
         )
-      .flatMap(neighbor => state.targets.filter(_.isBeingViolentTo(neighbor)))
+      .flatMap(neighbor => state.unit.matchups.targets.filter(_.isBeingViolentTo(neighbor)))
   }
 }

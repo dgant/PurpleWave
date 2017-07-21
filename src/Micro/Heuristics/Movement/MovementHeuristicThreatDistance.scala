@@ -8,9 +8,9 @@ object MovementHeuristicThreatDistance extends MovementHeuristic {
   
   override def evaluate(state: ActionState, candidate: Pixel): Double = {
   
-    if (state.threats.isEmpty) return HeuristicMathMultiplicative.default
+    if (state.unit.matchups.threats.isEmpty) return HeuristicMathMultiplicative.default
     
-    state.threats
+    state.unit.matchups.threats
       .map(threat => threat.pixelDistanceFast(candidate) - threat.pixelRangeAgainstFromEdge(state.unit))
       .min
   }

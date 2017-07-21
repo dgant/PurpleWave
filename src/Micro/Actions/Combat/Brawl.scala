@@ -12,9 +12,9 @@ object Brawl extends Action {
     state.canFight                  &&
     state.unit.canAttackThisSecond  &&
     state.unit.melee                &&
-    state.targets.nonEmpty          &&
+    state.unit.matchups.targets.nonEmpty          &&
     {
-      val nearestEnemy = state.targets.minBy(_.pixelDistanceFast(state.unit))
+      val nearestEnemy = state.unit.matchups.targets.minBy(_.pixelDistanceFast(state.unit))
       nearestEnemy.is(Zerg.Zergling) && nearestEnemy.pixelDistanceFast(state.unit) < 64.0 && nearestEnemy.isBeingViolent
     }
   }

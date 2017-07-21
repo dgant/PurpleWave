@@ -27,7 +27,7 @@ object BustWallin extends Action {
     state.canFight                                          &&
     state.unit.canMoveThisFrame                             &&
     walledInZones.flatMap(_.edges).exists(_.centerPixel.pixelDistanceFast(state.unit.pixelCenter) < 32.0 * 8.0) &&
-    state.threats.forall(threat =>
+    state.unit.matchups.threats.forall(threat =>
       state.unit.inRangeToAttackFast(threat)
       || ! threat.is(Terran.SiegeTankSieged))
   }
@@ -40,10 +40,10 @@ object BustWallin extends Action {
     state.movementProfile = MovementProfiles.smash
   
     val targets =
-      if (state.targetsInRange.nonEmpty)
-        state.targetsInRange
-      else if (state.targets.nonEmpty)
-        Iterable(state.targets.minBy(target => state.unit.pixelDistanceTravelling(target.pixelCenter)))
+      if (state.unit.matchups.targetsInRange.nonEmpty)
+        state.unit.matchups.targetsInRange
+      else if (state.unit.matchups.targets.nonEmpty)
+        Iterable(state.unit.matchups.targets.minBy(target => state.unit.pixelDistanceTravelling(target.pixelCenter)))
       else
         Iterable.empty
     

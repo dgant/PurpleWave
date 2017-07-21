@@ -9,7 +9,7 @@ object Engage extends Action {
   
   override def allowed(state: ActionState): Boolean = {
     state.canFight &&
-    state.targets.nonEmpty
+    state.unit.matchups.targets.nonEmpty
   }
   
   override def perform(state: ActionState) {
@@ -26,7 +26,7 @@ object Engage extends Action {
     if (state.toAttack.isDefined) {
       return
     }
-    val targets = state.targets.filter(target =>
+    val targets = state.unit.matchups.targets.filter(target =>
       state.unit.inRangeToAttackFast(target)
       || target.constructing
       || target.gathering

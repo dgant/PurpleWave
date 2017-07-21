@@ -2,9 +2,6 @@ package Strategery
 
 import Strategery.Strategies.Options.AllRaces.{Proxy2Gate2StartLocations, Proxy2Gate3StartLocations, WorkerRush2StartLocations, WorkerRush3StartLocations}
 import Strategery.Strategies.Options.Protoss.Global.{AllPvP, AllPvT, AllPvZ}
-import Strategery.Strategies.Options.Protoss.PvP.{PvPEarly1GateCore, PvPMidgame4GateGoon}
-import Strategery.Strategies.Options.Protoss.PvT.PvTEarly1015GateGoon
-import Strategery.Strategies.Options.Protoss.PvZ.{PvZEarlyFFELight, PvZMidgame5GateDragoons}
 import Strategery.Strategies.Strategy
 
 object Playbook {
@@ -14,13 +11,13 @@ object Playbook {
   val disabled = Vector[Strategy](
     WorkerRush2StartLocations,
     WorkerRush3StartLocations,
-    Proxy2Gate2StartLocations,
     Proxy2Gate3StartLocations
   )
   
   // Use these whenever possible.
   //
   val forced = Vector[Strategy](
+    /*
     AllPvP,
     PvPEarly1GateCore,
     PvPMidgame4GateGoon,
@@ -29,6 +26,7 @@ object Playbook {
     AllPvZ,
     PvZEarlyFFELight,
     PvZMidgame5GateDragoons
+    */
   )
   
   // Specify the order in which you want to try strategies vs. new opponents
@@ -46,6 +44,12 @@ object Playbook {
   // If we don't win with 9-9 Gateways, we probably won't win with 10-12 Gateways either so try something else.
   //
   val strategyOrder = Vector(
+    AllPvP,
+    AllPvZ,
+    AllPvT
+  )
+  
+  val strategyOrderRoundRobin = Vector(
     /*
     WorkerRush2StartLocations,
     WorkerRush3StartLocations,

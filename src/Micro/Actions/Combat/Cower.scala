@@ -13,8 +13,8 @@ object Cower extends Action {
       state.unit.is(Protoss.Arbiter)
     )                                     &&
       state.intent.unit.canMoveThisFrame  &&
-      state.threats.nonEmpty              &&
-      state.threats.exists(threat =>
+      state.unit.matchups.threats.nonEmpty              &&
+      state.unit.matchups.threats.exists(threat =>
         threat.topSpeed > state.unit.topSpeed ||
         threat.framesBeforeAttacking(state.unit) < 24.0)
   }

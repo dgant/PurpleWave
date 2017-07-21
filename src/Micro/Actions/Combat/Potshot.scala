@@ -12,11 +12,11 @@ object Potshot extends Action {
   override def allowed(state: ActionState): Boolean = {
     state.canFight &&
     state.unit.readyForAttackOrder &&
-    state.targetsInRange.nonEmpty
+    state.unit.matchups.targetsInRange.nonEmpty
   }
   
   override def perform(state: ActionState) {
-    val validTargets = state.targetsInRange.filter(_.unitClass.helpsInCombat)
+    val validTargets = state.unit.matchups.targetsInRange.filter(_.unitClass.helpsInCombat)
     state.toAttack = EvaluateTargets.best(state, validTargets)
     Attack.delegate(state)
   }

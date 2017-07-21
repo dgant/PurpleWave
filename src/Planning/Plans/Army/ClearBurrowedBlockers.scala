@@ -26,7 +26,7 @@ class ClearBurrowedBlockers extends Plan {
     detector.get.unitPreference.set(UnitPreferClose(target.get))
     detector.get.acquire(this)
     
-    detector.get.units.foreach(unit => With.executor.intend(new Intention(this, unit) {
+    detector.get.units.foreach(_.intend(new Intention(this) {
       toTravel = target
       canCower = true
     }))

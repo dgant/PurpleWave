@@ -29,7 +29,7 @@ class RemoveMineralBlocks extends Plan {
     val mineral = ourMineralBlocks.head
     miners.get.unitPreference.set(new UnitPreferClose(mineral.pixelCenter))
     miners.get.acquire(this)
-    miners.get.units.foreach(unit => With.executor.intend(new Intention(this, unit) {
+    miners.get.units.foreach(_.intend(new Intention(this) {
       toGather = Some(mineral)
       canCower = true
     }))

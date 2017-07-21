@@ -18,7 +18,7 @@ class BattleClassifier {
   val clustering = new BattleClustering
   
   def run() {
-    clustering.enqueue(With.units.all.filter(isCombatantLocal))
+    clustering.enqueue(With.units.all.filter(isEligibleLocal))
     clustering.run()
     replaceBattleGlobal()
     replaceBattlesByZone()
@@ -26,19 +26,19 @@ class BattleClassifier {
     BattleUpdater.run()
   }
   
-  private def isCombatantLocal(unit: UnitInfo): Boolean = {
-    isCombatantGlobal(unit) && unit.likelyStillThere
+  private def isEligibleLocal(unit: UnitInfo): Boolean = {
+    isEligibleGlobal(unit) && unit.likelyStillThere
   }
   
-  private def isCombatantZone(unit: UnitInfo): Boolean = {
-    isCombatantGlobal(unit) && unit.possiblyStillThere
+  private def isEligibleZone(unit: UnitInfo): Boolean = {
+    isEligibleGlobal(unit) && unit.possiblyStillThere
   }
   
-  private def isCombatantGlobal(unit: UnitInfo): Boolean = {
-    isCombatant(unit)
+  private def isEligibleGlobal(unit: UnitInfo): Boolean = {
+    isEligible(unit)
   }
   
-  private def isCombatant(unit: UnitInfo): Boolean = {
+  private def isEligible(unit: UnitInfo): Boolean = {
     unit.alive                                    &&
     (unit.complete || unit.unitClass.isBuilding)  &&
     unit.unitClass.helpsInCombat
@@ -46,13 +46,13 @@ class BattleClassifier {
   
   private def replaceBattleGlobal() {
     global = new Battle(
-      new Team(asVectorUs     (With.units.ours  .filter(isCombatantGlobal))),
-      new Team(asVectorEnemy  (With.units.enemy .filter(isCombatantGlobal))))
+      new Team(asVectorUs     (With.units.ours  .filter(isEligibleGlobal))),
+      new Team(asVectorEnemy  (With.units.enemy .filter(isEligibleGlobal))))
   }
   
   private def replaceBattlesByZone() {
-    val combatantsOursByZone  = With.units.ours   .filter(isCombatantZone).groupBy(_.tileIncludingCenter.zone)
-    val combatantsEnemyByZone = With.units.enemy  .filter(isCombatantZone).groupBy(_.tileIncludingCenter.zone)
+    val combatantsOursByZone  = With.units.ours   .filter(isEligibleZone).groupBy(_.tileIncludingCenter.zone)
+    val combatantsEnemyByZone = With.units.enemy  .filter(isEligibleZone).groupBy(_.tileIncludingCenter.zone)
     byZone = With.geography.zones
       .map(zone => (
         zone,

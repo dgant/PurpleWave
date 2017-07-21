@@ -54,8 +54,8 @@ class TrainUnit(val traineeClass: UnitClass) extends Plan {
     if (currencyLock.satisfied) {
       trainerLock.acquire(this)
       trainer = trainerLock.units.headOption
-      if (trainee.isEmpty && trainer.isDefined) {
-        With.executor.intend(new Intention(this, trainer.get) { toTrain = Some(traineeClass) })
+      if (trainee.isEmpty) {
+        trainer.foreach(_.intend(new Intention(this) { toTrain = Some(traineeClass) }))
       }
     }
   }

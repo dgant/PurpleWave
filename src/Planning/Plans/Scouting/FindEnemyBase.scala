@@ -44,7 +44,7 @@ class FindEnemyBase extends Plan {
   }
   
   private def orderScout(scout: FriendlyUnitInfo, destination: Pixel) {
-    With.executor.intend(new Intention(this, scout) {
+    scout.intend(new Intention(this) {
       toTravel = Some(destination);
       canAttack = ! scout.unitClass.isWorker
     })

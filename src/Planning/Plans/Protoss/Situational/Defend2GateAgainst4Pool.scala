@@ -44,7 +44,7 @@ class Defend2GateAgainst4Pool extends Plan {
     
     defenders.get.unitCounter.set(UnitCountExactly(workersToFight))
     defenders.get.acquire(this)
-    defenders.get.units.foreach(defender => With.executor.intend(new Intention(this, defender) {
+    defenders.get.units.foreach(_.intend(new Intention(this) {
       toTravel = Some(target)
     }))
   }

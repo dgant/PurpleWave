@@ -91,6 +91,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
     }
     
     if (builderLock.satisfied && building.isEmpty) {
+      val builder = builderLock.units.head
       if (orderedTile.exists( ! desiredTile.contains(_))) {
         // The building placement has changed. This puts us at risk of building the same building twice.
         // We've already sent the builder out. We need to recall them if they haven't already started.
@@ -101,12 +102,11 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
         // 1. Recall the builder
         // 2. Wait for the order to take effect
         waitForBuilderToRecallUntil = Some(With.frame + 24)
-        With.executor.intend(
-          new Intention(this, builderLock.units.head) { toTravel = Some(desiredTile.get.pixelCenter); canAttack = false })
+        builder.intend(new Intention(this) { toTravel = Some(desiredTile.get.pixelCenter); canAttack = false })
       } else {
         orderedTile = desiredTile
-        With.executor.intend(
-          new Intention(this, builderLock.units.head) {
+        builder.intend(
+          new Intention(this) {
             toBuild     = if (currencyLock.isSatisfied) Some(buildingClass) else None
             toBuildTile = if (currencyLock.isSatisfied) orderedTile         else None
             toTravel    = Some(orderedTile.get.pixelCenter)

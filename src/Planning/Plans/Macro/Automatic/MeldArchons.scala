@@ -14,11 +14,9 @@ class MeldArchons extends Plan {
   
   override def onUpdate() {
     templar.acquire(this)
-    templar.units.foreach(unit => With.executor.intend(
-      new Intention(this, unit) {
-        toTravel = Some(With.geography.home.pixelCenter)
-        canMeld = true
-      }
-    ))
+    templar.units.foreach(_.intend(new Intention(this) {
+      toTravel = Some(With.geography.home.pixelCenter)
+      canMeld = true
+    }))
   }
 }

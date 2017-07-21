@@ -35,7 +35,7 @@ class AttackWithWorkers extends Plan {
       findBases()
     }
     else {
-      smorc()
+      tickle()
     }
   }
   
@@ -51,7 +51,7 @@ class AttackWithWorkers extends Plan {
       findBases()
     }
     else if (possibleStarts.size == 1) {
-      fighters.units.foreach(smorc(_, possibleStarts.head))
+      fighters.units.foreach(tickle(_, possibleStarts.head))
     }
     else {
       // Scout all but the furthest base and keep the rest of the workers in the middle
@@ -62,11 +62,11 @@ class AttackWithWorkers extends Plan {
         val scout = unassignedScouts.minBy(_.framesToTravel(nextBase.heart.pixelCenter))
         unassignedScouts  -= scout
         unscoutedBases    -= nextBase
-        smorc(scout, nextBase)
+        tickle(scout, nextBase)
       }
       
       val middleZone = With.geography.zones.minBy(_.centroid.tileDistanceFast(SpecificPoints.tileMiddle))
-      unassignedScouts.foreach(smorc(_, middleZone.centroid.pixelCenter))
+      unassignedScouts.foreach(tickle(_, middleZone.centroid.pixelCenter))
     }
   }
   
@@ -87,24 +87,24 @@ class AttackWithWorkers extends Plan {
         if (unassignedScouts.nonEmpty) {
           val scout = unassignedScouts.minBy(_.pixelDistanceFast(base.heart.pixelCenter))
           unassignedScouts.remove(scout)
-          smorc(scout, base)
+          tickle(scout, base)
         }
       })
     }
   }
   
-  def smorc(unit: FriendlyUnitInfo, base: Base) {
-    smorc(unit, base.heart.pixelCenter)
+  def tickle(unit: FriendlyUnitInfo, base: Base) {
+    tickle(unit, base.heart.pixelCenter)
   }
   
-  def smorc() {
+  def tickle() {
     val base = With.geography.enemyBases.toList.sortBy(_.workers.size).lastOption
     val target = base.map(_.heart.pixelCenter).getOrElse(With.intelligence.mostBaselikeEnemyTile.pixelCenter)
-    fighters.units.foreach(smorc(_, target))
+    fighters.units.foreach(tickle(_, target))
   }
   
-  def smorc(unit: FriendlyUnitInfo, target: Pixel) {
-    With.executor.intend(new Intention(this, unit) {
+  def tickle(unit: FriendlyUnitInfo, target: Pixel) {
+    unit.intend(new Intention(this) {
       toTravel = Some(target)
       canTickle = true
     })

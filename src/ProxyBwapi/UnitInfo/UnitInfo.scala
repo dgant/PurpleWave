@@ -346,7 +346,7 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
     possiblyStillThere &&
     ( ! canMoveThisFrame || With.framesSince(lastSeen) < With.configuration.fogPositionDuration || is(Terran.SiegeTankUnsieged))
   
-  def effectivelyCloaked:Boolean =
+  def effectivelyCloaked: Boolean =
     (burrowed || cloaked) && (
       if (isFriendly) ! With.grids.enemyDetection.get(tileIncludingCenter)
       else            ! detected
@@ -360,5 +360,5 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   def isNeutral  : Boolean = player.isNeutral
   def isFriendly : Boolean = player.isAlly || isOurs
   def isEnemy    : Boolean = player.isEnemy
-  def isEnemyOf(otherUnit:UnitInfo): Boolean = (isFriendly && otherUnit.isEnemy) || (isEnemy && otherUnit.isFriendly)
+  def isEnemyOf(otherUnit: UnitInfo): Boolean = (isFriendly && otherUnit.isEnemy) || (isEnemy && otherUnit.isFriendly)
 }

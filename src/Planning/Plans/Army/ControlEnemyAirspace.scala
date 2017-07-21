@@ -33,7 +33,7 @@ class ControlEnemyAirspace extends Plan {
         val basePixel = base.heart.pixelCenter
         val scout = unassignedScouts.minBy(_.pixelDistanceFast(basePixel))
         unassignedScouts -= scout
-        With.executor.intend(new Intention(this, scout) {
+        scout.intend(new Intention(this) {
           toTravel = Some(basePixel)
           canCower = true
         })

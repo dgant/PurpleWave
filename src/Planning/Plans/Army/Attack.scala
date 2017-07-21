@@ -45,16 +45,16 @@ class Attack extends Plan {
     detectors.get.acquire(this)
     
     attackers.get.units.foreach(attacker =>
-      With.executor.intend(
-        new Intention(this, attacker) {
+      attacker.intend(
+        new Intention(this) {
           toTravel = Some(target)
           canPursue = false
         }))
     
     var nextDetectorDepth = 32.0 * 4
     detectors.get.units.foreach(detector => {
-      With.executor.intend(
-        new Intention(this, detector) {
+      detector.intend(
+        new Intention(this) {
           toTravel = Some(attackers.get.units.minBy(_.framesToTravel(target)).pixelCenter.project(target, nextDetectorDepth))
           canCower = true
         })

@@ -52,14 +52,14 @@ class ControlZone(zone: Zone) extends Plan {
           .map(_.pixelCenter)
           .minBy(_.pixelDistanceFast(ourBase.map(_.heart).getOrElse(zone.centroid).pixelCenter))
   
-        fighters.get.units.foreach(fighter => With.executor.intend(new Intention(this, fighter) {
+        fighters.get.units.foreach(_.intend(new Intention(this) {
           toTravel = Some(target)
         }))
   
         val cloakedThreats = threats.filter(threat => threat.cloaked || threat.burrowed)
         if (cloakedThreats.nonEmpty) {
           detectors.get.acquire(this)
-          detectors.get.units.foreach(detector => With.executor.intend(new Intention(this, detector) {
+          detectors.get.units.foreach(_.intend(new Intention(this) {
             toTravel = Some(cloakedThreats.minBy(_.pixelDistanceFast(zone.centroid.pixelCenter)).pixelCenter)
             canCower = true
           }))

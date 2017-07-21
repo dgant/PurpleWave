@@ -170,7 +170,7 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   def matchups: MatchupAnalysis = With.matchups.get(this)
   
   def ranged  : Boolean = unitClass.canAttack && unitClass.maxAirGroundRange > 32 * 2
-  def melee   : Boolean = unitClass.canAttack && ! melee
+  def melee   : Boolean = unitClass.canAttack && ! ranged
   
   //TODO: Account for upgrades. Make sure to handle case where unit has no armor upgrades
   def armorHealth: Int = unitClass.armor // if (player.getUpgradeLevel(unitClass.armorUpgrade)

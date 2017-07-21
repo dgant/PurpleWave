@@ -298,10 +298,12 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   def framesToTravel(destination: Pixel)    : Int = framesToTravelPixels(pixelDistanceTravelling(destination))
   def framesToTravelPixels(pixels: Double)  : Int = if (pixels <= 0.0) 0 else if (canMoveThisFrame) Math.max(0, Math.ceil(pixels/topSpeed).toInt) else Int.MaxValue
   
+  def framesToGetInRange(enemy: UnitInfo): Int = framesToGetInRange(enemy, enemy.pixelCenter)
+  def framesToGetInRange(enemy: UnitInfo, at: Pixel): Int = if (canAttackThisSecond(enemy)) framesToTravelPixels(pixelDistanceFast(at) - pixelRangeAgainstFromCenter(enemy)) else Int.MaxValue
   def framesBeforeAttacking(enemy: UnitInfo): Int = framesBeforeAttacking(enemy, enemy.pixelCenter)
   def framesBeforeAttacking(enemy: UnitInfo, at: Pixel): Int = {
     if (canAttackThisSecond(enemy)) {
-      Math.max(cooldownLeft, framesToTravelPixels(pixelDistanceFast(at) - pixelRangeAgainstFromEdge(enemy)))
+      Math.max(cooldownLeft, framesToGetInRange(enemy))
     }
     else Int.MaxValue
   }

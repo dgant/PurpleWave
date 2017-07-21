@@ -26,7 +26,7 @@ object Disengage extends Action {
     //
     val shouldKite = state.threats.forall(threat =>
       threat.topSpeed <= state.unit.topSpeed &&
-      threat.framesBeforeAttacking(state.unit, state.unit.pixelCenter.project(threat.pixelCenter, 32.0)) > 12.0)
+      threat.framesToGetInRange(state.unit, state.unit.pixelCenter.project(threat.pixelCenter, 64.0)) > 0.0)
     
     if (shouldKite) {
       Kite.delegate(state)

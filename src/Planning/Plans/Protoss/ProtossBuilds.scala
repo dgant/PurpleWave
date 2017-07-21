@@ -98,7 +98,8 @@ object ProtossBuilds {
     RequestUpgrade(    Protoss.DragoonRange),
     RequestAtLeast(2,   Protoss.Dragoon),
     RequestAtLeast(3,   Protoss.Pylon),
-    RequestAtLeast(6,   Protoss.Dragoon)
+    RequestAtLeast(4,   Protoss.Dragoon),
+    RequestAtLeast(4,   Protoss.Pylon)
   )
   
   val Opening12Nexus = Vector[BuildRequest] (
@@ -232,14 +233,6 @@ object ProtossBuilds {
   // General-Purpose //
   /////////////////////
   
-  val TechDragoons = Vector[BuildRequest] (
-    RequestAtLeast(1,   Protoss.Pylon),
-    RequestAtLeast(1,   Protoss.Gateway),
-    RequestAtLeast(1,   Protoss.Assimilator),
-    RequestAtLeast(1,   Protoss.CyberneticsCore),
-    RequestUpgrade(    Protoss.DragoonRange)
-  )
-  
   val TechReavers = Vector[BuildRequest] (
     RequestAtLeast(1,   Protoss.Pylon),
     RequestAtLeast(1,   Protoss.Gateway),
@@ -247,22 +240,5 @@ object ProtossBuilds {
     RequestAtLeast(1,   Protoss.CyberneticsCore),
     RequestAtLeast(1,   Protoss.RoboticsFacility),
     RequestAtLeast(1,   Protoss.RoboticsSupportBay)
-  )
-  
-  val TechCorsairs = Vector[BuildRequest] (
-    RequestAtLeast(1,   Protoss.Pylon),
-    RequestAtLeast(1,   Protoss.Gateway),
-    RequestAtLeast(1,   Protoss.Assimilator),
-    RequestAtLeast(1,   Protoss.CyberneticsCore),
-    RequestAtLeast(1,   Protoss.Stargate)
-  )
-  
-  val TechDarkTemplar = Vector[BuildRequest] (
-    RequestAtLeast(1,   Protoss.Pylon),
-    RequestAtLeast(1,   Protoss.Gateway),
-    RequestAtLeast(1,   Protoss.Assimilator),
-    RequestAtLeast(1,   Protoss.CyberneticsCore),
-    RequestAtLeast(1,   Protoss.CitadelOfAdun),
-    RequestAtLeast(1,   Protoss.TemplarArchives)
   )
 }

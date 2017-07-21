@@ -27,7 +27,7 @@ object Retreat extends Action {
       && threat.inRangeToAttackFast(state.unit))
 
     if (slowerThanThreats || trapped) {
-      Potshot.consider(state)
+      Potshot.delegate(state)
     }
     
     // If we're a melee unit trying to defend a choke against other melee units, hold the line!
@@ -35,14 +35,14 @@ object Retreat extends Action {
     lazy val threatsAllMelee = state.threats.forall(_.melee)
     
     if (state.unit.melee && threatsAllMelee && state.unit.pixelDistanceFast(state.origin) < 16.0) {
-      Potshot.consider(state)
-      Travel.consider(state)
+      Potshot.delegate(state)
+      Travel.delegate(state)
     }
     
     if (state.unit.pixelDistanceFast(state.origin) < 16.0) {
       state.movementProfile = MovementProfiles.avoid
       Potshot.delegate(state)
-      Engage.delegate(state)
+      Engage.consider(state)
     }
     
     Travel.delegate(state)

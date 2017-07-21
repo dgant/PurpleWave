@@ -39,9 +39,7 @@ class BattleClassifier {
   }
   
   private def isEligible(unit: UnitInfo): Boolean = {
-    unit.alive                                    &&
-    (unit.complete || unit.unitClass.isBuilding)  &&
-    unit.unitClass.helpsInCombat
+    unit.alive && (unit.complete || unit.unitClass.isBuilding)
   }
   
   private def replaceBattleGlobal() {

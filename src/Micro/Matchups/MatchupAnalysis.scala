@@ -19,8 +19,8 @@ case class MatchupAnalysis(us: UnitInfo, at: Pixel) {
   lazy val threats        : Vector[UnitInfo]  = enemies.filter(_.canAttackThisSecond(us))
   lazy val targets        : Vector[UnitInfo]  = enemies.filter(us.canAttackThisSecond)
   lazy val threatsViolent : Vector[UnitInfo]  = threats.filter(_.isBeingViolentTo(us))
-  lazy val threatsInRange : Vector[UnitInfo]  = threats.filter(threat => threat.pixelRangeAgainstFromCenter(us) <= threat.pixelDistanceFast(at))
-  lazy val targetsInRange : Vector[UnitInfo]  = targets.filter(target => us.pixelRangeAgainstFromCenter(target) <= target.pixelDistanceFast(at))
+  lazy val threatsInRange : Vector[UnitInfo]  = threats.filter(threat => threat.pixelRangeAgainstFromCenter(us) >= threat.pixelDistanceFast(at))
+  lazy val targetsInRange : Vector[UnitInfo]  = targets.filter(target => us.pixelRangeAgainstFromCenter(target) >= target.pixelDistanceFast(at))
   lazy val vpfDealingDiffused         : Double = targetsInRange.map(target => dpfDealingDiffused(target)  * MicroValue.valuePerDamage(target)).sum
   lazy val vpfDealingCurrently        : Double = targetsInRange.map(target => dpfDealingCurrently(target) * MicroValue.valuePerDamage(target)).sum
   lazy val dpfReceivingDiffused       : Double = threatsInRange.map(_.matchups.dpfDealingDiffused(us)).sum

@@ -44,6 +44,7 @@ object Idle extends Action {
     Build,
     Unstick,
     Produce,
+    Rally,
     ReloadInterceptors,
     ReloadScarabs,
     Fight,

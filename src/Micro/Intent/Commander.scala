@@ -40,12 +40,6 @@ class Commander {
     sleep(unit)
   }
   
-  def cancel(unit: FriendlyUnitInfo) {
-    if (unready(unit)) return
-    unit.base.cancelConstruction()
-    sleep(unit)
-  }
-  
   def stop(unit: FriendlyUnitInfo) {
     if (unready(unit)) return
     unit.base.stop()
@@ -198,6 +192,27 @@ class Commander {
   def upgrade(unit: FriendlyUnitInfo, upgrade: Upgrade) {
     if (unready(unit)) return
     unit.base.upgrade(upgrade.baseType)
+    sleep(unit)
+  }
+  
+  
+  def cancel(unit: FriendlyUnitInfo) {
+    if (unready(unit)) return
+    unit.base.cancelConstruction()
+    sleep(unit)
+  }
+  
+  def rally(unit: FriendlyUnitInfo, pixel: Pixel) {
+    if (unready(unit)) return
+    unit.base.setRallyPoint(pixel.bwapi)
+    unit.hasSetRallyPoint = true
+    sleep(unit)
+  }
+  
+  def rally(unit: FriendlyUnitInfo, targetUnit: UnitInfo) {
+    if (unready(unit)) return
+    unit.base.setRallyPoint(unit.base)
+    unit.hasSetRallyPoint = true
     sleep(unit)
   }
   

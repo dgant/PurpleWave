@@ -3,17 +3,17 @@ package Micro.Actions.Combat
 import Micro.Actions.Action
 import Micro.Actions.Commands.Reposition
 import Micro.Behaviors.MovementProfiles
-import Micro.Execution.ActionState
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object HoverOutsideRange extends Action {
   
-  override def allowed(state: ActionState): Boolean = {
-    state.unit.canMoveThisFrame
+  override def allowed(unit: FriendlyUnitInfo): Boolean = {
+    unit.canMoveThisFrame
   }
   
-  override def perform(state: ActionState) {
+  override def perform(unit: FriendlyUnitInfo) {
     
-    state.movementProfile = MovementProfiles.safelyAttackTarget
-    Reposition.delegate(state)
+    unit.action.movementProfile = MovementProfiles.safelyAttackTarget
+    Reposition.delegate(unit)
   }
 }

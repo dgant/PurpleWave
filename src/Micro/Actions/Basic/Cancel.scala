@@ -2,17 +2,17 @@ package Micro.Actions.Basic
 
 import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Execution.ActionState
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Cancel extends Action {
   
-  override def allowed(state: ActionState): Boolean = {
-    ! state.unit.complete &&
-    state.unit.unitClass.isBuilding &&
-    state.unit.totalHealth < state.unit.damageInLastSecond * 2
+  override def allowed(unit: FriendlyUnitInfo): Boolean = {
+    ! unit.complete &&
+    unit.unitClass.isBuilding &&
+    unit.totalHealth < unit.damageInLastSecond * 2
   }
   
-  override def perform(state: ActionState) {
-    With.commander.cancel(state.unit)
+  override def perform(unit: FriendlyUnitInfo) {
+    With.commander.cancel(unit)
   }
 }

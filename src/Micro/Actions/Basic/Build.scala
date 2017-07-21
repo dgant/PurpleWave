@@ -3,25 +3,25 @@ package Micro.Actions.Basic
 import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Fight
-import Micro.Execution.ActionState
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Build extends Action {
   
-  override def allowed(state: ActionState): Boolean = {
-    state.intent.toBuild.isDefined &&
-    state.intent.toBuildTile.isDefined
+  override def allowed(unit: FriendlyUnitInfo): Boolean = {
+    unit.action.toBuild.isDefined &&
+    unit.action.toBuildTile.isDefined
   }
   
-  override def perform(state: ActionState) {
+  override def perform(unit: FriendlyUnitInfo) {
     
-    val buildArea = state.toBuild.get.tileArea.add(state.toBuildTile.get)
-    val blockers  = state.unit.matchups.targets.filter(_.tileArea.intersects(buildArea))
-    blockers.flatMap(_.friendly).foreach(_.actionState.shove(state.unit))
+    val buildArea = unit.action.toBuild.get.tileArea.add(unit.action.toBuildTile.get)
+    val blockers  = unit.matchups.others.filter(_.tileArea.intersects(buildArea))
+    blockers.flatMap(_.friendly).foreach(_.action.shove(unit))
     if (blockers.exists(_.isEnemy)) {
-      Fight.consider(state)
+      Fight.consider(unit)
     }
     else {
-      With.commander.build(state.unit, state.intent.toBuild.get, state.intent.toBuildTile.get)
+      With.commander.build(unit, unit.action.toBuild.get, unit.action.intent.toBuildTile.get)
     }
   }
 }

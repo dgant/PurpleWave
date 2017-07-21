@@ -9,7 +9,8 @@ class FriendlyUnitInfo(base: bwapi.Unit) extends FriendlyUnitProxy(base) {
   
   override def friendly: Option[FriendlyUnitInfo] = Some(this)
   
-  def actionState: ActionState = With.executor.getState(this)
+  def action: ActionState = With.executor.getState(this)
+  def readyForMicro: Boolean = With.commander.ready(this)
   
   ////////////
   // Health //

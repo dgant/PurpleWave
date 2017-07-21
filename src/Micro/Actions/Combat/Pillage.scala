@@ -2,19 +2,19 @@ package Micro.Actions.Combat
 
 import Micro.Actions.Action
 import Micro.Actions.Commands.Attack
-import Micro.Execution.ActionState
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Pillage extends Action {
   
-  override protected def allowed(state: ActionState): Boolean = {
-    state.unit.canAttackThisSecond  &&
-    state.unit.matchups.threats.isEmpty           &&
-    state.unit.matchups.targets.nonEmpty          &&
-    (state.toTravel.isEmpty || state.unit.pixelDistanceFast(state.toTravel.get) < 32.0 * 8.0)
+  override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
+    unit.canAttackThisSecond  &&
+    unit.matchups.threats.isEmpty           &&
+    unit.matchups.targets.nonEmpty          &&
+    (unit.action.toTravel.isEmpty || unit.pixelDistanceFast(unit.action.toTravel.get) < 32.0 * 8.0)
   }
   
-  override protected def perform(state: ActionState) {
-    Target.delegate(state)
-    Attack.delegate(state)
+  override protected def perform(unit: FriendlyUnitInfo) {
+    Target.delegate(unit)
+    Attack.delegate(unit)
   }
 }

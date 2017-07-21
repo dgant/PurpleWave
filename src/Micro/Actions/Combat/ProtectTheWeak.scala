@@ -1,48 +1,46 @@
 package Micro.Actions.Combat
 
 import Micro.Actions.Action
-import Micro.Actions.Commands.{Attack, Reposition}
+import Micro.Actions.Commands.Attack
 import Micro.Behaviors.MovementProfiles
-import Micro.Execution.ActionState
 import Micro.Heuristics.Targeting.EvaluateTargets
-import ProxyBwapi.UnitInfo.UnitInfo
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object ProtectTheWeak extends Action {
   
   // Protect our workers from harassment. Don't abandon them!
   
-  override protected def allowed(state: ActionState): Boolean = {
-    state.unit.matchups.threatsViolent.isEmpty
+  override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
+    unit.matchups.threatsViolent.isEmpty
   }
   
-  override protected def perform(state: ActionState) {
+  override protected def perform(unit: FriendlyUnitInfo) {
     
-    val currentBullies = bullies(state)
+    val currentBullies = bullies(unit)
     
     if (currentBullies.nonEmpty) {
   
-      state.canCower = false
-      state.toAttack = EvaluateTargets.best(state, currentBullies)
-      state.movementProfile = MovementProfiles.safelyAttackTarget
+      unit.action.canCower = false
+      unit.action.toAttack = EvaluateTargets.best(unit.action, currentBullies)
+      unit.action.movementProfile = MovementProfiles.safelyAttackTarget
   
-      if (state.unit.readyForAttackOrder) {
-        Attack.delegate(state)
+      if (unit.readyForAttackOrder) {
+        Attack.delegate(unit)
       }
       else {
-        // Avoid taking damage while we defen
-        Reposition.delegate(state)
+        Kite.delegate(unit)
       }
     }
   }
   
-  private def bullies(state: ActionState): Iterable[UnitInfo] = {
-    state.unit.matchups.allies
+  private def bullies(unit: FriendlyUnitInfo): Iterable[UnitInfo] = {
+    unit.matchups.allies
       .filter(neighbor =>
         neighbor.unitClass.isWorker ||
         (
           neighbor.unitClass.isBuilding &&
           (neighbor.wounded || neighbor.unitClass.canAttack))
         )
-      .flatMap(neighbor => state.unit.matchups.targets.filter(_.isBeingViolentTo(neighbor)))
+      .flatMap(neighbor => unit.matchups.targets.filter(_.isBeingViolentTo(neighbor)))
   }
 }

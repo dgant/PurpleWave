@@ -2,20 +2,20 @@ package Micro.Actions.Basic
 
 import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Execution.ActionState
 import ProxyBwapi.Races.Protoss
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object ReloadInterceptors extends Action {
   
-  override def allowed(state:ActionState): Boolean =(
-    state.unit.is(Protoss.Carrier)
+  override def allowed(unit: FriendlyUnitInfo): Boolean =(
+    unit.is(Protoss.Carrier)
     && With.self.minerals > Protoss.Interceptor.mineralPrice
-    && state.unit.interceptorCount < 8
-    && state.unit.trainingQueue.isEmpty
-    // TODO: Stop reloading if we're about to die
+    && unit.interceptorCount < 8
+    && unit.trainingQueue.isEmpty
+    && unit.matchups.framesToLiveCurrently > Protoss.Interceptor.buildFrames + 48.0
   )
   
-  override def perform(state:ActionState) {
-    With.commander.buildInterceptor(state.unit)
+  override def perform(unit: FriendlyUnitInfo) {
+    With.commander.buildInterceptor(unit)
   }
 }

@@ -22,7 +22,7 @@ object ShowMovementHeuristics extends View {
         .headOption
     }
     
-    focus.foreach(unit => renderUnit(unit.actionState.movementHeuristicResults))
+    focus.foreach(unit => renderUnit(unit.action.movementHeuristicResults))
   }
   
   private def eligible(unit: FriendlyUnitInfo): Boolean =

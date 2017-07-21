@@ -3,26 +3,24 @@ package Micro.Actions.Basic
 import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.{Fight, Potshot}
-import Micro.Execution.ActionState
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Gather extends Action {
   
-  override def allowed(state: ActionState): Boolean = {
-    state.toGather.isDefined
+  override def allowed(unit: FriendlyUnitInfo): Boolean = {
+    unit.action.toGather.isDefined
   }
   
-  override def perform(state: ActionState) {
+  override def perform(unit: FriendlyUnitInfo) {
   
-    Potshot.consider(state)
+    Potshot.consider(unit)
     
-    if ( ! state.toGather.exists(_.pixelCenter.zone == state.unit.pixelCenter.zone)) {
-      if (state.unit.matchups.threats.exists(_.framesBeforeAttacking(state.unit) < 10)) {
-        Fight.consider(state)
+    if ( ! unit.action.toGather.exists(_.pixelCenter.zone == unit.pixelCenter.zone)) {
+      if (unit.matchups.threats.exists(_.framesBeforeAttacking(unit) < 10)) {
+        Fight.consider(unit)
       }
     }
     
-    if (stillReady(state)) {
-      With.commander.gather(state.unit, state.toGather.get)
-    }
+    With.commander.gather(unit, unit.action.toGather.get)
   }
 }

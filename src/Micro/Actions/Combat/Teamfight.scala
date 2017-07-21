@@ -1,29 +1,25 @@
 package Micro.Actions.Combat
 
 import Micro.Actions.Action
-import Micro.Execution.ActionState
 import Planning.Yolo
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Teamfight extends Action {
   
-  override def allowed(state: ActionState): Boolean = {
-    state.canFight
+  override def allowed(unit: FriendlyUnitInfo): Boolean = {
+    unit.action.canFight
   }
   
-  override def perform(state: ActionState) {
-    
-    // TODO: When should we continue fighting losing battles?
-    // How should we avoid indecision?
-    
-    if (state.unit.matchups.threats.isEmpty) {
-      Engage.consider(state)
+  override def perform(unit: FriendlyUnitInfo) {
+    if (unit.matchups.threats.isEmpty) {
+      Engage.consider(unit)
     }
-    else if (state.unit.battle.exists(_.estimationGeometricOffense.weGainValue) || Yolo.active) {
-      Engage.consider(state)
+    else if (unit.battle.exists(_.estimationGeometricOffense.weGainValue) || Yolo.active) {
+      Engage.consider(unit)
     }
-    else if (state.unit.battle.exists(_.estimationGeometricOffense.weLoseValue)) {
-      Disengage.consider(state)
+    else if (unit.battle.exists(_.estimationGeometricOffense.weLoseValue)) {
+      Disengage.consider(unit)
     }
-    Engage.consider(state)
+    Engage.consider(unit)
   }
 }

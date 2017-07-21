@@ -2,16 +2,16 @@ package Micro.Actions.Commands
 
 import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Execution.ActionState
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Attack extends Action {
   
-  override def allowed(state:ActionState): Boolean = {
-    state.canFight &&
-    state.toAttack.isDefined
+  override def allowed(unit: FriendlyUnitInfo): Boolean = {
+    unit.action.canFight &&
+    unit.action.toAttack.isDefined
   }
   
-  override def perform(state: ActionState) {
-    With.commander.attack(state.unit, state.toAttack.get)
+  override def perform(unit: FriendlyUnitInfo) {
+    With.commander.attack(unit, unit.action.toAttack.get)
   }
 }

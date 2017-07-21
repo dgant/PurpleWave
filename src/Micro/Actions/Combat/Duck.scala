@@ -2,37 +2,38 @@ package Micro.Actions.Combat
 
 import Micro.Actions.Action
 import Micro.Actions.Commands.Reposition
-import Micro.Execution.{ActionState, Explosion}
+import Micro.Execution.Explosion
 import ProxyBwapi.Races.{Protoss, Terran}
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 import scala.collection.mutable.ListBuffer
 
 object Duck extends Action {
   
-  override protected def allowed(state: ActionState): Boolean = {
+  override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
     
-    state.unit.canMoveThisFrame
+    unit.canMoveThisFrame
   }
   
-  override protected def perform(state: ActionState) {
-    state.explosions ++= getDodgables(state)
+  override protected def perform(unit: FriendlyUnitInfo) {
+    unit.action.explosions ++= getDodgables(unit)
     
-    if (state.explosions.exists(explosion =>
+    if (unit.action.explosions.exists(explosion =>
       explosion.radius >=
-      explosion.center.pixelDistanceFast(state.unit.pixelCenter) + 32.0)) {
+      explosion.center.pixelDistanceFast(unit.pixelCenter) + 32.0)) {
       
-      Reposition.delegate(state)
+      Reposition.delegate(unit)
     }
   }
   
-  private def getDodgables(state: ActionState): Iterable[Explosion] = {
+  private def getDodgables(unit: FriendlyUnitInfo): Iterable[Explosion] = {
     val output = new ListBuffer[Explosion]
     
-    if ( ! state.unit.flying) {
-      output ++= state.unit.matchups.threats
+    if ( ! unit.flying) {
+      output ++= unit.matchups.threats
         .filter(threat =>
           threat.target.isDefined               &&
-          ! threat.target.contains(state.unit)  &&
+          ! threat.target.contains(unit)  &&
           (
             threat.is(Protoss.Scarab)     ||
             threat.is(Terran.SpiderMine)
@@ -40,7 +41,7 @@ object Duck extends Action {
         .map(threat => Explosion(
           threat.target.get.pixelCenter,
           32.0 * 2.0,
-          threat.damageAgainst(state.unit)))
+          threat.damageAgainst(unit)))
     }
     
     output

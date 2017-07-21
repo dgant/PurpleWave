@@ -18,8 +18,8 @@ class ClearBurrowedBlockers extends Plan {
   override def onUpdate(): Unit = {
     
     val target = With.units.ours
-      .find(u => u.actionState.toBuild.exists(_.isTownHall))
-      .flatMap(_.actionState.toBuildTile.map(_.pixelCenter))
+      .find(u => u.action.toBuild.exists(_.isTownHall))
+      .flatMap(_.action.toBuildTile.map(_.pixelCenter))
     
     if (target.isEmpty) return
     

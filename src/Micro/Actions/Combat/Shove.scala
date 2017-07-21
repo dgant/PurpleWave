@@ -1,17 +1,17 @@
 package Micro.Actions.Combat
 
 import Micro.Actions.Action
-import Micro.Execution.ActionState
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Shove extends Action {
   
-  override protected def allowed(state: ActionState): Boolean = {
-    ! state.unit.flying &&
-    state.unit.canMoveThisFrame &&
-    state.unit.matchups.threats.nonEmpty
+  override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
+    ! unit.flying &&
+    unit.canMoveThisFrame &&
+    unit.matchups.threats.nonEmpty
   }
   
-  override protected def perform(state: ActionState): Unit = {
-    state.unit.matchups.allies.foreach(_.actionState.shove(state.unit))
+  override protected def perform(unit: FriendlyUnitInfo): Unit = {
+    unit.matchups.allies.foreach(_.action.shove(unit))
   }
 }

@@ -2,18 +2,18 @@ package Micro.Actions.Commands
 
 import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Execution.ActionState
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Travel extends Action {
   
-  override def allowed(state: ActionState): Boolean = {
-    state.unit.canMoveThisFrame &&
-    state.toTravel.isDefined
+  override def allowed(unit: FriendlyUnitInfo): Boolean = {
+    unit.canMoveThisFrame &&
+    unit.action.toTravel.isDefined
   }
   
-  override def perform(state: ActionState) {
-    val pixelToMove = state.toTravel.get
-    state.movingTo = Some(pixelToMove)
-    With.commander.move(state.unit, pixelToMove)
+  override def perform(unit: FriendlyUnitInfo) {
+    val pixelToMove = unit.action.toTravel.get
+    unit.action.movingTo = Some(pixelToMove)
+    With.commander.move(unit, pixelToMove)
   }
 }

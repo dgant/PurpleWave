@@ -2,17 +2,15 @@ package Micro.Actions.Basic
 
 import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Execution.ActionState
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object MineralWalk extends Action {
   
-  override def allowed(state: ActionState): Boolean = {
-    state.toGather.isDefined
+  override def allowed(unit: FriendlyUnitInfo): Boolean = {
+    unit.action.toGather.isDefined
   }
   
-  override def perform(state: ActionState) {
-    if (stillReady(state)) {
-      With.commander.gather(state.unit, state.toGather.get)
-    }
+  override def perform(unit: FriendlyUnitInfo) {
+    With.commander.gather(unit, unit.action.toGather.get)
   }
 }

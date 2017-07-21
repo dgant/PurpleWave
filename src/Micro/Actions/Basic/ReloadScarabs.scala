@@ -2,25 +2,23 @@ package Micro.Actions.Basic
 
 import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Execution.ActionState
 import ProxyBwapi.Races.Protoss
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object ReloadScarabs extends Action {
   
-  override def allowed(state: ActionState): Boolean = (
+  override def allowed(unit: FriendlyUnitInfo): Boolean = (
     
     //Repetition of scarab count check is a performance optimization to avoid calculating targets needlessly
   
-    state.unit.is(Protoss.Reaver)
+    unit.is(Protoss.Reaver)
     && With.self.minerals > Protoss.Scarab.mineralPrice
-    && state.unit.scarabCount < With.configuration.maxScarabCount
-    && state.unit.scarabCount < (if(state.unit.matchups.targetsInRange.isEmpty || state.unit.cooldownLeft > 0) With.configuration.maxScarabCount else 1)
-    && state.unit.trainingQueue.isEmpty
-    
-    // TODO: Stop reloading if we're about to die
+    && unit.scarabCount < With.configuration.maxScarabCount
+    && unit.scarabCount < (if(unit.matchups.targetsInRange.isEmpty || unit.cooldownLeft > 0) With.configuration.maxScarabCount else 1)
+    && unit.trainingQueue.isEmpty
   )
   
-  override def perform(state: ActionState) {
-    With.commander.buildScarab(state.unit)
+  override def perform(unit: FriendlyUnitInfo) {
+    With.commander.buildScarab(unit)
   }
 }

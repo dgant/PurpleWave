@@ -3,21 +3,21 @@ package Micro.Actions.Combat
 import Micro.Actions.Action
 import Micro.Actions.Commands.Attack
 import Micro.Heuristics.Targeting.EvaluateTargets
-import Micro.Execution.ActionState
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Potshot extends Action {
   
   // If we're off cooldown, take a shot at something already in range.
   
-  override def allowed(state: ActionState): Boolean = {
-    state.canFight &&
-    state.unit.readyForAttackOrder &&
-    state.unit.matchups.targetsInRange.nonEmpty
+  override def allowed(unit: FriendlyUnitInfo): Boolean = {
+    unit.action.canFight &&
+    unit.readyForAttackOrder &&
+    unit.matchups.targetsInRange.nonEmpty
   }
   
-  override def perform(state: ActionState) {
-    val validTargets = state.unit.matchups.targetsInRange.filter(_.unitClass.helpsInCombat)
-    state.toAttack = EvaluateTargets.best(state, validTargets)
-    Attack.delegate(state)
+  override def perform(unit: FriendlyUnitInfo) {
+    val validTargets = unit.matchups.targetsInRange.filter(_.unitClass.helpsInCombat)
+    unit.action.toAttack = EvaluateTargets.best(unit.action, validTargets)
+    Attack.delegate(unit)
   }
 }

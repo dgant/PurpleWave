@@ -2,17 +2,17 @@ package Micro.Actions.Combat
 
 import Micro.Actions.Action
 import Micro.Heuristics.Targeting.EvaluateTargets
-import Micro.Execution.ActionState
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Target extends Action {
   
-  override protected def allowed(state: ActionState): Boolean = {
-    state.canFight &&
-    state.unit.canAttackThisSecond &&
-    state.unit.matchups.targets.nonEmpty
+  override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
+    unit.action.canFight &&
+    unit.canAttackThisSecond &&
+    unit.matchups.targets.nonEmpty
   }
   
-  override protected def perform(state: ActionState) {
-    state.toAttack = EvaluateTargets.best(state, state.unit.matchups.targets)
+  override protected def perform(unit: FriendlyUnitInfo) {
+    unit.action.toAttack = EvaluateTargets.best(unit.action, unit.matchups.targets)
   }
 }

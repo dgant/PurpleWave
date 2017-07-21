@@ -8,6 +8,7 @@ import Micro.Behaviors.MovementProfiles
 import Micro.Execution.ActionState
 import Micro.Heuristics.Targeting.EvaluateTargets
 import ProxyBwapi.Races.Terran
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import bwapi.Race
 
 object BustWallin extends Action {
@@ -19,51 +20,51 @@ object BustWallin extends Action {
   //
   // So let's equip our units to fight vs. wall-ins.
   
-  override protected def allowed(state: ActionState): Boolean = {
+  override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
     val walledInZones = With.geography.zones.filter(_.walledIn)
   
-    walledInZones.nonEmpty                                  &&
-    With.enemies.exists(_.race == Race.Terran)              &&
-    state.canFight                                          &&
-    state.unit.canMoveThisFrame                             &&
-    walledInZones.flatMap(_.edges).exists(_.centerPixel.pixelDistanceFast(state.unit.pixelCenter) < 32.0 * 8.0) &&
-    state.unit.matchups.threats.forall(threat =>
-      state.unit.inRangeToAttackFast(threat)
+    walledInZones.nonEmpty                            &&
+    With.enemies.exists(_.race == Race.Terran)        &&
+    unit.action.canFight                              &&
+    unit.canMoveThisFrame                             &&
+    walledInZones.flatMap(_.edges).exists(_.centerPixel.pixelDistanceFast(unit.pixelCenter) < 32.0 * 8.0) &&
+    unit.matchups.threats.forall(threat =>
+      unit.inRangeToAttackFast(threat)
       || ! threat.is(Terran.SiegeTankSieged))
   }
   
-  override protected def perform(state: ActionState) {
-    Potshot.delegate(state)
+  override protected def perform(unit: FriendlyUnitInfo) {
+    Potshot.delegate(unit)
     
     // Don't rely on BW's pathing to bring us into the wall-in.
     // Wall-ins tend to cause Dragoons to do the "walk around the perimeter of the map" dance
-    state.movementProfile = MovementProfiles.smash
+    unit.action.movementProfile = MovementProfiles.smash
   
     val targets =
-      if (state.unit.matchups.targetsInRange.nonEmpty)
-        state.unit.matchups.targetsInRange
-      else if (state.unit.matchups.targets.nonEmpty)
-        Iterable(state.unit.matchups.targets.minBy(target => state.unit.pixelDistanceTravelling(target.pixelCenter)))
+      if (unit.matchups.targetsInRange.nonEmpty)
+        unit.matchups.targetsInRange
+      else if (unit.matchups.targets.nonEmpty)
+        Iterable(unit.matchups.targets.minBy(target => unit.pixelDistanceTravelling(target.pixelCenter)))
       else
         Iterable.empty
     
-    state.toAttack = EvaluateTargets.best(state, targets)
+    unit.action.toAttack = EvaluateTargets.best(unit.action, targets)
     
-    if (state.unit.readyForAttackOrder || state.unit.melee) {
-      Attack.delegate(state)
+    if (unit.readyForAttackOrder || unit.melee) {
+      Attack.delegate(unit)
     }
-    else if (state.toAttack.isDefined) {
+    else if (unit.action.toAttack.isDefined) {
       // Get up in there!
-      val targetUnit = state.toAttack.get
+      val targetUnit = unit.action.toAttack.get
       val targetTile = targetUnit.tileIncludingCenter
       val targetAreaTiles = Circle.points(4).map(targetTile.add)
       val targetSpots = targetAreaTiles
         .filter(With.grids.walkable.get)
         .map(_.pixelCenter)
-        .filter(pixel => state.unit.pixelDistanceFast(pixel) < state.unit.pixelDistanceFast(targetUnit))
+        .filter(pixel => unit.pixelDistanceFast(pixel) < unit.pixelDistanceFast(targetUnit))
       if (targetSpots.nonEmpty) {
-        state.toTravel = Some(targetSpots.minBy(targetUnit.pixelDistanceFast))
-        Travel.delegate(state)
+        unit.action.toTravel = Some(targetSpots.minBy(targetUnit.pixelDistanceFast))
+        Travel.delegate(unit)
       }
     }
   }

@@ -1,46 +1,46 @@
 package Micro.Actions.Combat
 
 import Micro.Actions.Action
-import Micro.Execution.ActionState
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Kite extends Action {
   
-  override def allowed(state: ActionState): Boolean = (
-    state.unit.canMoveThisFrame
-    && state.unit.matchups.targets.nonEmpty
-    && state.unit.matchups.threats.nonEmpty
-    && state.unit.pixelRangeMax > 32 * 3.0
+  override def allowed(unit: FriendlyUnitInfo): Boolean = (
+    unit.canMoveThisFrame
+    && unit.matchups.targets.nonEmpty
+    && unit.matchups.threats.nonEmpty
+    && unit.pixelRangeMax > 32 * 3.0
   )
   
-  override def perform(state: ActionState) {
+  override def perform(unit: FriendlyUnitInfo) {
   
-    lazy val fasterThanThreats  = state.unit.matchups.threats.forall(threat => state.unit.topSpeed > threat.topSpeed)
-    lazy val slowerThanThreats  = state.unit.matchups.threats.forall(threat => state.unit.topSpeed < threat.topSpeed)
+    lazy val fasterThanThreats  = unit.matchups.threats.forall(threat => unit.topSpeed > threat.topSpeed)
+    lazy val slowerThanThreats  = unit.matchups.threats.forall(threat => unit.topSpeed < threat.topSpeed)
     
-    if (state.unit.readyForAttackOrder) {
+    if (unit.readyForAttackOrder) {
       if (fasterThanThreats) {
       
         // Before shooting, make sure we have ample space
         // Also, don't close distance unless we are faster
       
-        val sufficientSpace = state.unit.matchups.threatsViolent.forall(_.framesBeforeAttacking(state.unit) > state.unit.unitClass.stopFrames + state.unit.unitClass.minStop)
+        val sufficientSpace = unit.matchups.threatsViolent.forall(_.framesBeforeAttacking(unit) > unit.unitClass.stopFrames + unit.unitClass.minStop)
         if (sufficientSpace) {
-          Potshot.consider(state)
+          Potshot.consider(unit)
         } else {
-          HoverOutsideRange.delegate(state)
+          HoverOutsideRange.delegate(unit)
         }
       } else if (slowerThanThreats) {
         // We can't outrun them so might as well shoot
         // (This is bad vs. other units of same type)
-        Potshot.consider(state)
+        Potshot.consider(unit)
       }
     }
     
     if (fasterThanThreats) {
-      HoverOutsideRange.delegate(state)
+      HoverOutsideRange.delegate(unit)
     }
     else {
-      Retreat.delegate(state)
+      Retreat.delegate(unit)
     }
   }
 }

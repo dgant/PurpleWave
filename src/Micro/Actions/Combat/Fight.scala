@@ -1,21 +1,21 @@
 package Micro.Actions.Combat
 
 import Micro.Actions.Action
-import Micro.Execution.ActionState
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Fight extends Action {
   
-  override def allowed(state: ActionState): Boolean = {
-    state.unit.canMoveThisFrame || state.unit.readyForAttackOrder
+  override def allowed(unit: FriendlyUnitInfo): Boolean = {
+    unit.canMoveThisFrame || unit.readyForAttackOrder
   }
   
-  override def perform(state: ActionState) {
-    Cower.consider(state)
-    Sneak.consider(state)
-    BustBunker.consider(state)
-    ProtectTheWeak.consider(state)
-    Teamfight.consider(state)
-    Pursue.consider(state)
-    Pillage.consider(state)
+  override def perform(unit: FriendlyUnitInfo) {
+    Cower.consider(unit)
+    Sneak.consider(unit)
+    BustBunker.consider(unit)
+    ProtectTheWeak.consider(unit)
+    Teamfight.consider(unit)
+    Pursue.consider(unit)
+    Pillage.consider(unit)
   }
 }

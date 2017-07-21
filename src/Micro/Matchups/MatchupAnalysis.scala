@@ -15,6 +15,7 @@ case class MatchupAnalysis(us: UnitInfo, at: Pixel) {
   
   lazy val allies         : Vector[FriendlyUnitInfo]  = if (us.battle.isEmpty) Vector.empty else us.battle.get.us.units.filterNot(_ == us).flatMap(_.friendly)
   lazy val enemies        : Vector[ForeignUnitInfo]   = if (us.battle.isEmpty) Vector.empty else us.battle.get.enemy.units.flatMap(_.foreign)
+  lazy val others         : Vector[UnitInfo]          = allies ++ enemies
   lazy val threats        : Vector[UnitInfo]  = enemies.filter(_.canAttackThisSecond(us))
   lazy val targets        : Vector[UnitInfo]  = enemies.filter(us.canAttackThisSecond)
   lazy val threatsViolent : Vector[UnitInfo]  = threats.filter(_.isBeingViolentTo(us))

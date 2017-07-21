@@ -1,27 +1,22 @@
 package Micro.Actions
 
-import Lifecycle.With
-import Micro.Execution.ActionState
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 abstract class Action {
   
   val name: String = getClass.getSimpleName.replaceAllLiterally("$", "")
   
-  protected def allowed(state: ActionState): Boolean
-  protected def perform(state: ActionState)
+  protected def allowed(unit: FriendlyUnitInfo): Boolean
+  protected def perform(unit: FriendlyUnitInfo)
   
-  final def consider(state: ActionState, giveCredit: Boolean = true) {
-    if (stillReady(state) && allowed(state)) {
-      if (giveCredit) state.lastAction = Some(this)
-      perform(state)
+  final def consider(unit: FriendlyUnitInfo, giveCredit: Boolean = true) {
+    if (unit.readyForMicro && allowed(unit)) {
+      if (giveCredit) unit.action.lastAction = Some(this)
+      perform(unit)
     }
   }
   
-  final def delegate(state: ActionState) {
-    consider(state, giveCredit = false)
-  }
-  
-  protected final def stillReady(state: ActionState): Boolean = {
-    With.commander.ready(state.unit)
+  final def delegate(unit: FriendlyUnitInfo) {
+    consider(unit, giveCredit = false)
   }
 }

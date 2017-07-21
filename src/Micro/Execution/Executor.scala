@@ -50,7 +50,7 @@ class Executor {
       
       if (nextState.unit.unitClass.orderable
         && ! nextState.unit.is(Protoss.PhotonCannon)) /* Hack fix for CIG -- we were cancelling our Photon Cannon attacks. */ {
-        Idle.consider(nextState)
+        Idle.consider(nextState.unit)
       }
     }
   

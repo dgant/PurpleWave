@@ -20,7 +20,7 @@ object MovementHeuristicShovers extends MovementHeuristic {
     shover    : FriendlyUnitInfo): Double = {
     
     val margin = 2.0 * state.unit.unitClass.radialHypotenuse + shover.unitClass.radialHypotenuse
-    val shoveFrom = shover.actionState.movingTo.map(shover.pixelCenter.project(_, margin)).getOrElse(shover.pixelCenter)
+    val shoveFrom = shover.action.movingTo.map(shover.pixelCenter.project(_, margin)).getOrElse(shover.pixelCenter)
     
     Math.min(margin, shoveFrom.pixelDistanceFast(candidate))
   }

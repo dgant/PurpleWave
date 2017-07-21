@@ -2,37 +2,37 @@ package Micro.Actions.Combat
 
 import Micro.Actions.Action
 import Micro.Actions.Commands.Attack
-import Micro.Execution.ActionState
 import Micro.Heuristics.Targeting.EvaluateTargets
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Engage extends Action {
   
-  override def allowed(state: ActionState): Boolean = {
-    state.canFight &&
-    state.unit.matchups.targets.nonEmpty
+  override def allowed(unit: FriendlyUnitInfo): Boolean = {
+    unit.action.canFight &&
+    unit.matchups.targets.nonEmpty
   }
   
-  override def perform(state: ActionState) {
-    Brawl.consider(state)
-    BustWallin.consider(state)
-    chooseTarget(state)
-    if ( ! state.unit.readyForAttackOrder) {
-      Kite.delegate(state)
+  override def perform(unit: FriendlyUnitInfo) {
+    Punch.consider(unit)
+    BustWallin.consider(unit)
+    chooseTarget(unit)
+    if ( ! unit.readyForAttackOrder) {
+      Kite.delegate(unit)
     }
-    Attack.delegate(state)
+    Attack.delegate(unit)
   }
   
-  def chooseTarget(state: ActionState) {
-    if (state.toAttack.isDefined) {
+  def chooseTarget(unit: FriendlyUnitInfo) {
+    if (unit.action.toAttack.isDefined) {
       return
     }
-    val targets = state.unit.matchups.targets.filter(target =>
-      state.unit.inRangeToAttackFast(target)
+    val targets = unit.matchups.targets.filter(target =>
+      unit.inRangeToAttackFast(target)
       || target.constructing
       || target.gathering
       || target.repairing
       || (target.melee && target.attacking)
-      || target.topSpeed < state.unit.topSpeed * 0.75)
-    state.toAttack = EvaluateTargets.best(state, targets)
+      || target.topSpeed < unit.topSpeed * 0.75)
+    unit.action.toAttack = EvaluateTargets.best(unit.action, targets)
   }
 }

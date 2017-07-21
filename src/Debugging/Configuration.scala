@@ -60,7 +60,7 @@ class Configuration {
   
   var abstractBattleDistancePixels  = 32.0 * 6.0
   var battleWorkerCostPerFrame      = 0.25
-  var battleMarginTiles             = 15
+  var battleMarginTiles             = 17
   var battleMarginPixels            = battleMarginTiles * 32.0
   var battleEstimationFrames        = 24 * 5
   

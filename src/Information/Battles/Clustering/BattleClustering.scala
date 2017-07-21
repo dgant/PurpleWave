@@ -22,7 +22,7 @@ class BattleClustering {
   }
   
   def run() {
-    while ( ! clusterInProgress.isComplete /*&& With.performance.continueRunning*/) {
+    while ( ! clusterInProgress.isComplete && With.performance.continueRunning) {
       clusterInProgress.step()
     }
   

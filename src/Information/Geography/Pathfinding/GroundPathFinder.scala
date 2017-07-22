@@ -70,7 +70,7 @@ object GroundPathFinder {
           return TilePath(start, end, distanceFrom(end), visited.size, Some(assemblePath(cameFrom, end)))
         }
         
-        val neighbors = Array(thisTile.left, thisTile.right, thisTile.up, thisTile.down)
+        val neighbors = thisTile.adjacent4
         var i = 0
         while (i < 4) {
           val neighbor = neighbors(i)

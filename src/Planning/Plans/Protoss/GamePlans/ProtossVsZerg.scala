@@ -1,7 +1,7 @@
 package Planning.Plans.Protoss.GamePlans
 
 import Lifecycle.With
-import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
+import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
 import Planning.Composition.UnitCounters.UnitCountBetween
 import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors, UnitMatchWorkers}
 import Planning.Plans.Army._
@@ -166,7 +166,10 @@ class ProtossVsZerg extends Parallel {
   
   children.set(Vector(
   
-    new MeldArchons,
+    new If(
+      new HaveTech(Protoss.PsionicStorm),
+      new MeldArchons(40),
+      new MeldArchons),
     
     // Early game
     new RequireMiningBases(1),
@@ -237,6 +240,10 @@ class ProtossVsZerg extends Parallel {
     new If(
       new UnitsAtLeast(1, UnitMatchType(Protoss.Dragoon), complete = false),
       new Build(RequestUpgrade(Protoss.DragoonRange))),
+  
+    new If(
+      new UnitsAtLeast(2, UnitMatchType(Protoss.HighTemplar), complete = false),
+      new Build(RequestTech(Protoss.PsionicStorm))),
     
     new If(
       new And(
@@ -272,7 +279,7 @@ class ProtossVsZerg extends Parallel {
           new And(
             new UnitsAtLeast(1, UnitMatchType(Protoss.TemplarArchives), complete = true),
             new UnitsAtMost(3, UnitMatchType(Protoss.Archon), complete = false),
-            new Check(() => With.self.gas > With.self.minerals)),
+            new Check(() => With.self.gas * 2 > With.self.minerals)),
           new TrainContinuously(Protoss.HighTemplar, 4)),
           new If(
             new And(
@@ -307,7 +314,9 @@ class ProtossVsZerg extends Parallel {
       RequestAtLeast(1, Protoss.Forge),
       RequestAtLeast(1, Protoss.CitadelOfAdun),
       RequestAtLeast(8, Protoss.Gateway),
-      RequestAtLeast(1, Protoss.TemplarArchives)),
+      RequestAtLeast(1, Protoss.TemplarArchives),
+      RequestTech(Protoss.PsionicStorm),
+      RequestUpgrade(Protoss.HighTemplarEnergy)),
     
     new UpgradeContinuously(Protoss.GroundArmor),
     new UpgradeContinuously(Protoss.GroundDamage),

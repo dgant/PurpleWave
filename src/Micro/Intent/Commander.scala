@@ -57,7 +57,10 @@ class Commander {
   def attack(unit: FriendlyUnitInfo, target: UnitInfo) {
     if (unready(unit)) return
     
-    if (target.visible) {
+    if (unit.interceptors > 0) {
+      unit.base.attack(target.pixelCenter.bwapi)
+    }
+    else if (target.visible) {
       if (unit.readyForAttackOrder || ! unit.target.contains(target) || With.framesSince(unit.lastAttackStartFrame) > unit.cooldownMaxAirGround * 1.5) {
         unit.base.attack(target.base)
       }
@@ -135,6 +138,12 @@ class Commander {
     if (unready(unit)) return
     unit.base.useTech(tech.baseType, target.base)
     sleep(unit)
+  }
+  
+  def useTechOnPixel(unit: FriendlyUnitInfo, tech: Tech, target: Pixel) {
+    if (unready(unit)) return
+    unit.base.useTech(tech.baseType, target.bwapi)
+    sleepAttack(unit)
   }
   
   def gather(unit: FriendlyUnitInfo, resource: UnitInfo) {

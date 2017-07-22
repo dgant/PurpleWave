@@ -12,21 +12,21 @@ import Utilities.EnrichPixel._
 
 object ShowBattles extends View {
   
-  private val tableHeader0            = Pixel(220, 320)
-  private val tableHeader1            = tableHeader0.add(125, 0)
-  private val tableStart0             = tableHeader0.add(0, 25)
-  private val tableStart1             = tableHeader1.add(0, 25)
-  private val army0                   = Pixel(438, 18)
-  private val army1                   = Pixel(521, 18)
-  private val army2                   = Pixel(589, 18)
-  private val yolo                    = Pixel(310, 230)
-  private val tacticsRanks            = Pixel(235, 18)
+  private val tableHeader0  = Pixel(220, 320)
+  private val tableHeader1  = tableHeader0.add(125, 0)
+  private val tableStart0   = tableHeader0.add(0, 25)
+  private val tableStart1   = tableHeader1.add(0, 25)
+  private val army0         = Pixel(438, 18)
+  private val army1         = Pixel(521, 18)
+  private val army2         = Pixel(589, 18)
+  private val yolo          = Pixel(310, 230)
+  private val tacticsRanks  = Pixel(235, 18)
   
   override def renderScreen() {
     With.game.drawTextScreen(army0.bwapi, "Overall:")
     With.game.drawTextScreen(army1.bwapi, "+" + With.battles.global.estimationAbstract.costToEnemy.toInt)
     With.game.drawTextScreen(army2.bwapi, "-" + With.battles.global.estimationAbstract.costToUs.toInt)
-    With.game.drawTextScreen(army0.add(0, 13).bwapi, "Frames since last update: " + With.framesSince(With.battles.clustering.lastClusterCompletion))
+    With.game.drawTextScreen(army0.add(0, 13).bwapi, "Frames since estimation: " + With.framesSince(With.battles.clustering.lastClusterCompletion))
     localBattle.foreach(battle => drawEstimationReport(battle.estimationGeometric))
     if (Yolo.active && With.frame / 24 % 2 == 0) {
       With.game.drawTextScreen(yolo.bwapi, "YOLO")

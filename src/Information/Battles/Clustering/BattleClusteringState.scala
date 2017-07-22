@@ -7,12 +7,12 @@ import scala.annotation.tailrec
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
-class BattleClusteringState(combatUnits: Set[UnitInfo]) {
+class BattleClusteringState(seedUnits: Set[UnitInfo]) {
   
   val unitLinks = new mutable.HashMap[UnitInfo, UnitInfo]
   val horizon: mutable.Stack[UnitInfo] = mutable.Stack[UnitInfo]()
   
-  horizon.pushAll(combatUnits.toSeq.filter(_.isEnemy))
+  horizon.pushAll(seedUnits.toSeq.filter(_.isEnemy))
   
   def isComplete: Boolean = horizon.isEmpty
   
@@ -29,7 +29,7 @@ class BattleClusteringState(combatUnits: Set[UnitInfo]) {
       unitLinks.put(next, oldFoe.getOrElse(next))
     }
     
-    horizon.pushAll(newFoes.filter(combatUnits.contains))
+    horizon.pushAll(newFoes.filter(seedUnits.contains))
   }
   
   private lazy val finalClusters: Vector[Vector[UnitInfo]] = {

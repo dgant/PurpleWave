@@ -2,16 +2,13 @@ package Micro.Actions.Combat.Maneuvering
 
 import Micro.Actions.Action
 import Micro.Actions.Combat.Decisionmaking.Disengage
-import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Cower extends Action {
   
   override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
     (
-      unit.action.canCower      ||
-      unit.is(Protoss.Observer) || //Dirty hacks -- need to do better than this
-      unit.is(Protoss.Arbiter)
+      unit.action.canCower || ! unit.canAttackThisSecond
     ) &&
       unit.canMoveThisFrame           &&
       unit.matchups.threats.nonEmpty  &&

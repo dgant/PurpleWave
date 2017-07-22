@@ -1,9 +1,9 @@
 package Micro.Actions.Combat.Specialized
 
 import Micro.Actions.Action
-import Micro.Actions.Commands.Travel
+import Micro.Actions.Commands.{AttackMove, Travel}
 import ProxyBwapi.Races.Protoss
-import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders}
 
 object CarrierRetreat extends Action {
   
@@ -14,6 +14,13 @@ object CarrierRetreat extends Action {
   // Carriers can't afford to be fancy in their retreating.
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     unit.action.toTravel = Some(unit.action.origin)
-    Travel.delegate(unit)
+    
+    if (unit.interceptorCount > 0 && unit.interceptors.forall(_.order != Orders.InterceptorAttack)) {
+      AttackMove.delegate(unit)
+    }
+    else {
+      Travel.delegate(unit)
+    }
+    
   }
 }

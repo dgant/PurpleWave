@@ -34,7 +34,7 @@ class UnitCountCombat(
   private def isSufficient: Boolean = {
     builder.avatarEnemy.totalUnits == 0 ||
     (lastEstimation.enemyDies && ! lastEstimation.weSurvive)
-    lastEstimation.netCost > 0.0
+    lastEstimation.netValue > 0.0
   }
   
   private def isAcceptable: Boolean = {

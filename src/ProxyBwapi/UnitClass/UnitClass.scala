@@ -281,7 +281,7 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
   
   lazy val mineralValue     : Int = mineralPrice + buildUnitsSpent.map(_.mineralValue).sum
   lazy val gasValue         : Int = mineralPrice + buildUnitsSpent.map(_.gasValue).sum
-  lazy val subjectiveValue  : Int = (1 * mineralValue + 2 * gasValue) * (if(isWorker) 2 else 1) * (if(isZerg) 5 else if (isTerran && isMechanical) 5 else 3)
+  lazy val subjectiveValue  : Int = (1 * mineralValue + 2 * gasValue) * (if(isWorker) 2 else 1) * (if(isZerg) 7 else if (isTerran && isMechanical) 5 else 3)
   
   //////////////////////
   // Micro frame data //

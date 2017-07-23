@@ -16,6 +16,7 @@ class MeldArchons(maxEnergy: Int = 200) extends Plan {
       UnitMatchEnergyAtMost(maxEnergy)))
   
   override def onUpdate() {
+    templar.release()
     templar.acquire(this)
     templar.units.foreach(_.intend(new Intention(this) {
       toTravel = Some(With.geography.home.pixelCenter)

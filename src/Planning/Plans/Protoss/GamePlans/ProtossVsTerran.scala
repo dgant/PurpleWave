@@ -191,7 +191,9 @@ class ProtossVsTerran extends Parallel {
         new ProtossVsTerranIdeas.RespondToBioWithReavers,
         new BuildAssimilators,
         new IfCloakedThreats_Observers,
-        new FulfillMidgameTech)),
+        new If(
+          new UnitsAtLeast(5, UnitMatchWarriors, complete = true),
+          new FulfillMidgameTech))),
     
     // Late game
     new If(

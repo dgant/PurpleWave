@@ -34,8 +34,6 @@ class ControlMap(val attack: Boolean = false) extends Plan {
           100.0
         else if (base.owner.isEnemy)
           (if (attack) 50.0 else 0.0)
-        else if (base.planningToTake)
-          20.0
         else
           1.0
       )

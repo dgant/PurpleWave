@@ -27,7 +27,7 @@ class ControlZone(zone: Zone) extends Plan {
   
   override def onUpdate() {
   
-    val ourBase = zone.bases.find(base => base.owner.isUs || base.planningToTake)
+    val ourBase = zone.bases.find(base => base.owner.isUs)
     
     val zonesToConsider =
       if(ourBase.isDefined)

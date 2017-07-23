@@ -4,7 +4,7 @@ import Lifecycle.With
 
 class Estimation {
 
-  val frameCalculated = With.frame
+  val frameCalculated: Int = With.frame
   
   var avatarUs      = new Avatar
   var avatarEnemy   = new Avatar
@@ -15,7 +15,7 @@ class Estimation {
   var deathsUs      = 0.0
   var deathsEnemy   = 0.0
   
-  def netCost: Double = costToEnemy - costToUs
+  def netValue: Double = costToEnemy - costToUs
   
   def weGainValue     : Boolean = costToEnemy  >   costToUs
   def weLoseValue     : Boolean = costToEnemy  <   costToUs

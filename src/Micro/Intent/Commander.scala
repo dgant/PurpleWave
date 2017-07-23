@@ -5,7 +5,7 @@ import Mathematics.Points.{Pixel, Tile}
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClass.UnitClass
-import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders, UnitInfo}
 import ProxyBwapi.Upgrades.Upgrade
 import Utilities.CountMap
 
@@ -57,7 +57,8 @@ class Commander {
   def attack(unit: FriendlyUnitInfo, target: UnitInfo) {
     if (unready(unit)) return
     
-    if (unit.interceptors > 0) {
+    if (unit.interceptors.exists(_.order == Orders.InterceptorAttack)) {
+      // Carriers lose most of their DPS with direct attack orders
       unit.base.attack(target.pixelCenter.bwapi)
     }
     else if (target.visible) {

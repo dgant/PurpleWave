@@ -59,7 +59,7 @@ object ShowBattles extends View {
     DrawMap.line    (battle.focus,          battle.enemy.vanguard,  enemyColor)
     DrawMap.box     (topLeft,               bottomRight,            neutralColor)
     DrawMap.labelBox(
-      Vector(battle.estimationGeometric.netCost.toInt.toString),
+      Vector(battle.estimationGeometric.netValue.toInt.toString),
       battle.focus.add(24, 0),
       drawBackground = true,
       backgroundColor = winnerStrengthColor)

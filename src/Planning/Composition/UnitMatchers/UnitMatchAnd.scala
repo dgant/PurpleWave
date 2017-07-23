@@ -1,9 +1,8 @@
 package Planning.Composition.UnitMatchers
 import ProxyBwapi.UnitInfo.UnitInfo
 
-case class UnitMatchAnd(matches: UnitMatcher*) extends UnitMatcher {
+case class UnitMatchAnd(matchers: UnitMatcher*) extends UnitMatcher {
   
-  override def accept(unit: UnitInfo): Boolean =
-    matches.forall(_.accept(unit))
+  override def accept(unit: UnitInfo): Boolean = matchers.forall(_.accept(unit))
   
 }

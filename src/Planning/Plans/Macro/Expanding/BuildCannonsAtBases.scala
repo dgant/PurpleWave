@@ -26,7 +26,7 @@ class BuildCannonsAtBases(initialCount: Int) extends Plan {
   }
   
   protected def eligibleBases: Iterable[Base] = {
-    With.geography.ourBases ++ With.geography.bases.filter(_.planningToTake)
+    With.geography.ourBases
   }
   
   private def cannonBase(base: Base) {

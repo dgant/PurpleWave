@@ -100,11 +100,11 @@ class ForeignUnitTracker {
   private def updateMissing(unit: ForeignUnitInfo) {
     
     if (unit.lastSeenWithin(24)) {
-      if (unit.order == Orders.Burrowing) {
+      if (unit.order == Orders.Burrowing || unit.burrowed) {
         unit.flagBurrowed()
         if (unit.effectivelyCloaked) return
       }
-      else if (unit.order == Orders.Cloak) {
+      else if (unit.order == Orders.Cloak || unit.cloaked) {
         unit.flagCloaked()
         if (unit.effectivelyCloaked) return
       }

@@ -29,8 +29,6 @@ object ZoneUpdater {
       .flatMap(tile => if (tile.zone.bases.isEmpty) None else Some(tile.zone.bases.minBy(_.heart.tileDistanceFast(tile))))
       .filter(_.owner.isNeutral)
       .toSet
-    
-    With.geography.bases.foreach(base => base.planningToTake = plannedBases.contains(base))
   
     With.geography.zones.foreach(zone =>  { zone.owner = With.neutral; zone.contested = false })
     val playerBorders = Players.all

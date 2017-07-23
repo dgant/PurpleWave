@@ -17,7 +17,7 @@ object Teamfight extends Action {
     else if (unit.battle.exists(_.estimationGeometricOffense.weGainValue) || Yolo.active) {
       Engage.consider(unit)
     }
-    else if (unit.battle.exists(_.estimationGeometricOffense.weLoseValue)) {
+    else if (unit.battle.exists(_.shouldRetreat)) {
       Disengage.consider(unit)
     }
     Engage.consider(unit)

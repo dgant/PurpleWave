@@ -15,15 +15,15 @@ object PsionicStorm extends Action {
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {
+    
     val dying         = unit.matchups.framesToLiveCurrently < 24.0
     val targets       = unit.matchups.allUnits.filter(e => ! e.unitClass.isBuilding && unit.pixelDistanceFast(e) < 9.0 * 32.0)
+    val targetsByTile = targets.groupBy(_.project(12).tileIncluding)
     val targetValues  = targets.map(target => (target, valueTarget(target))).toMap
-    val targetTiles   = targets.map(target => (target, target.project(12).tileIncluding)).toMap
-    val targetsByTile = targetTiles.values.toSet.map(tile => (tile, targetTiles.filter(_._2 == tile).keys)).toMap
-    val tileValues    = targetsByTile.keys.map(tile => (tile, tile.adjacent8.flatMap(targetsByTile).toSet.toSeq.map(targetValues).sum)).toMap
+    val valueByTile   = targetsByTile.keys.map(tile => (tile, tile.adjacent8.flatMap(targetsByTile.get).flatten.map(targetValues).sum)).toMap
     
-    if (tileValues.nonEmpty) {
-      val bestTile = tileValues.maxBy(_._2)
+    if (valueByTile.nonEmpty) {
+      val bestTile = valueByTile.maxBy(_._2)
       if (bestTile._2 > unit.subjectiveValue / 2.0) {
         With.commander.useTechOnPixel(unit, Protoss.PsionicStorm, bestTile._1.pixelCenter)
       }

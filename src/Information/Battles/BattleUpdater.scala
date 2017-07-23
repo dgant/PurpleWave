@@ -35,10 +35,14 @@ object BattleUpdater {
     battle        : Battle,
     geometric     : Boolean,
     weAttack      : Boolean,
-    enemyAttacks  : Boolean)
+    enemyAttacks  : Boolean,
+    weRetreat     : Boolean)
       : Estimation = {
     
-    val builder = new AvatarBuilder
+    val builder           = new AvatarBuilder
+    builder.weAttack      = weAttack
+    builder.enemyAttacks  = enemyAttacks
+    builder.weRetreat     = weRetreat
     if (geometric) {
       builder.vanguardUs    = Some(battle.us.vanguard)
       builder.vanguardEnemy = Some(battle.enemy.vanguard)

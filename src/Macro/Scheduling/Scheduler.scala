@@ -52,9 +52,9 @@ class Scheduler {
     }
     else if (request.buildable.techOption.nonEmpty) {
       if (With.self.hasTech(request.buildable.techOption.get))
-        Vector(request.buildable)
-      else
         None
+      else
+        Vector(request.buildable)
     }
     else {
       val unit = request.buildable.unitOption.get

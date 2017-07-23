@@ -38,7 +38,9 @@ class Avatar {
   def this(
     unit          : UnitInfo,
     nearestEnemy  : Option[Pixel] = None,
-    attacking     : Boolean       = false) {
+    attacking     : Boolean       = false,
+    retreating    : Boolean       = false,
+    chasing       : Boolean       = false) {
     
     this()
   
@@ -50,11 +52,11 @@ class Avatar {
       else
         1.0
     
-    val range         = unit.pixelRangeMax + 32.0 * (if (attacking && ! unit.canMoveThisFrame) 1.0 else 6.0)
+    val range         = unit.pixelRangeMax + 32.0 * (if (attacking || ! unit.canMoveThisFrame) 1.0 else 3.0)
     val pixelsAway    = if (nearestEnemy.isDefined) unit.pixelDistanceFast(nearestEnemy.get) else With.configuration.abstractBattleDistancePixels
-    val framesAway    = if (pixelsAway <= range) 0.0 else PurpleMath.nanToInfinity(Math.max(0.0, pixelsAway - range) / (unit.topSpeed * 0.5)) //Reward range a bit more
+    val framesAway    = if (pixelsAway <= range) 0.0 else if (chasing) Double.PositiveInfinity else PurpleMath.nanToInfinity(Math.max(0.0, pixelsAway - range) / unit.topSpeed)
     val framesTotal   = With.configuration.battleEstimationFrames
-    val efficacy      = splashFactor * Math.max(0.0, (framesTotal - framesAway) / framesTotal)
+    val efficacy      = if (retreating) 0.0 else splashFactor * Math.max(0.0, (framesTotal - framesAway) / framesTotal)
     val fortitude     = With.grids.altitudeBonus.get(unit.tileIncludingCenter) * (if (unit.effectivelyCloaked) 5.0 else 1.0)
     
     vulnerabilityGroundConcussive   = if (   unit.flying) 0.0 else Damage.scaleBySize(DamageType.Concussive, unit.unitClass.size)

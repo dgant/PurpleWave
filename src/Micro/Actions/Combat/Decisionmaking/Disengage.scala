@@ -34,7 +34,7 @@ object Disengage extends Action {
       Kite.delegate(unit)
     }
     else {
-      Retreat.consider(unit)
+      Retreat.delegate(unit)
     }
   }
 }

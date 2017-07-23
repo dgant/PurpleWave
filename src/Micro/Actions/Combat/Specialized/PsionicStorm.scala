@@ -17,7 +17,7 @@ object PsionicStorm extends Action {
   override protected def perform(unit: FriendlyUnitInfo) {
     
     val dying         = unit.matchups.framesToLiveCurrently < 24.0
-    val targets       = unit.matchups.allUnits.filter(e => ! e.unitClass.isBuilding && unit.pixelDistanceFast(e) < 9.0 * 32.0)
+    val targets       = unit.matchups.allUnits.filter(e => ! e.unitClass.isBuilding && unit.pixelDistanceFast(e) < 9.0 * 32.0 && ! unit.underStorm)
     val targetsByTile = targets.groupBy(_.project(12).tileIncluding)
     val targetValues  = targets.map(target => (target, valueTarget(target))).toMap
     val valueByTile   = targetsByTile.keys.map(tile => (tile, tile.adjacent8.flatMap(targetsByTile.get).flatten.map(targetValues).sum)).toMap

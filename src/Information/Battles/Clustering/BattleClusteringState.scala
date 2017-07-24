@@ -58,7 +58,7 @@ class BattleClusteringState(seedUnits: Set[UnitInfo]) {
   }
   
   private def foesNear(unit: UnitInfo): Iterable[UnitInfo] = {
-    val tileRadius = Math.min(With.configuration.battleMarginPixels, unit.pixelRangeMax + unit.topSpeed * With.configuration.battleEstimationFrames + 96.0) / 32.0
+    val tileRadius = Math.min(With.configuration.battleMarginPixels, unit.pixelRangeMax + unit.topSpeed * 24 * 5.0 + 96.0) / 32.0
     val enemies = With.units.inTileRadius(unit.tileIncludingCenter, tileRadius.toInt).toIterable.filter(_.isEnemyOf(unit))
     enemies
   }

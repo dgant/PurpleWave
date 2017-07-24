@@ -178,15 +178,14 @@ object ProtossBuilds {
     RequestAtLeast(14,  Protoss.Probe),
     RequestAtLeast(1,   Protoss.CyberneticsCore),
     RequestAtLeast(1,   Protoss.Zealot),
-    RequestAtLeast(1,   Protoss.Pylon),
+    RequestAtLeast(2,   Protoss.Pylon),
     RequestAtLeast(16,  Protoss.Probe),
     RequestAtLeast(1,   Protoss.CitadelOfAdun),
     RequestAtLeast(1,   Protoss.Dragoon),
     RequestAtLeast(19,  Protoss.Probe),
-    RequestAtLeast(2,   Protoss.Pylon),
+    RequestAtLeast(3,   Protoss.Pylon),
     RequestAtLeast(20,  Protoss.Probe),
     RequestAtLeast(1,   Protoss.TemplarArchives),
-    RequestAtLeast(3,   Protoss.Pylon),
     RequestAtLeast(1,   Protoss.DarkTemplar),
     RequestAtLeast(2,   Protoss.Nexus)
   )

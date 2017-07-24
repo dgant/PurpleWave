@@ -6,8 +6,8 @@ import Strategery.Strategies.Strategy
 
 case class StrategyEvaluation(strategy: Strategy) {
   private val goalWinrate           = 0.8 // For comparison, the #1 bot in CIG 2016 had a 65% overall winrate
-  private val importanceVsEnemy     = 4.0
-  private val importanceVsRace      = 2.0
+  private val importanceVsEnemy     = 10.0
+  private val importanceVsRace      = 1.0
   private val importanceOnMap       = 1.0
   
   val playbookOrder     : Int                       = if (Playbook.strategyOrder.contains(strategy)) Playbook.strategyOrder.indexOf(strategy) else Int.MaxValue

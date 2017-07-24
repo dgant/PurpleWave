@@ -39,6 +39,11 @@ class Battle(
   // Judgement //
   ///////////////
   
+  lazy val attackDesire: Double = {
+    0.0
+    //if (estimationGeometricOffense.enemyDies)
+  }
+  
   lazy val shouldAttack: Boolean = {
     estimationGeometricOffense.enemyDies ||
     estimationGeometricOffense.netValue > estimationGeometricRetreat.netValue

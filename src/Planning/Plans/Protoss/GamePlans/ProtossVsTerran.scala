@@ -192,8 +192,9 @@ class ProtossVsTerran extends Parallel {
         new BuildAssimilators,
         new IfCloakedThreats_Observers,
         new If(
-          new UnitsAtLeast(5, UnitMatchWarriors, complete = true),
-          new FulfillMidgameTech))),
+          new UnitsAtLeast(8, UnitMatchWarriors, complete = true),
+          new FulfillMidgameTech),
+          new Build(RequestAtLeast(6, Protoss.Gateway)))),
     
     // Late game
     new If(

@@ -18,7 +18,7 @@ object Rally extends Action {
       val minerals = unit.pixelCenter.zone.bases.flatMap(_.minerals)
       if (minerals.nonEmpty) {
         val mineral = minerals.minBy(_.pixelDistanceFast(unit))
-        With.commander.rally(unit, mineral)
+        With.commander.rally(unit, mineral.pixelCenter) // Rallying onto the mineral itself doesn't esem to work
       }
     }
     else {

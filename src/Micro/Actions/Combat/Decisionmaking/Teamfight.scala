@@ -11,13 +11,16 @@ object Teamfight extends Action {
   }
   
   override def perform(unit: FriendlyUnitInfo) {
-    if (unit.matchups.threats.isEmpty) {
+    if (unit.matchups.netValuePerFrameDiffused > 0.0) {
       Engage.consider(unit)
     }
-    else if (unit.battle.exists(_.estimationGeometricOffense.weGainValue) || Yolo.active) {
+    else if (unit.matchups.threats.isEmpty) {
       Engage.consider(unit)
     }
-    else if (unit.battle.exists(_.shouldRetreat)) {
+    else if (unit.battle.exists(_.shouldAttack) || Yolo.active) {
+      Engage.consider(unit)
+    }
+    else if (unit.battle.exists(_.shouldRetreat) && unit.matchups.netValuePerFrameDiffused < 0.0) {
       Disengage.consider(unit)
     }
     Engage.consider(unit)

@@ -25,12 +25,12 @@ object ShowUnitsFriendly extends View {
       state.lastAction.map(_.name).getOrElse(""),
       state.unit.pixelCenter.add(0, -14),
       drawBackground = false)
-    /*
     DrawMap.label(
       state.unit.command.map(_.getUnitCommandType.toString).getOrElse(""),
       state.unit.pixelCenter.add(0, -7),
       drawBackground = false)
-    DrawMap.label(
+    /*
+        DrawMap.label(
       state.unit.order.toString,
       state.unit.pixelCenter.add(0, 0),
       drawBackground = false)

@@ -56,6 +56,7 @@ class Attack extends Plan {
       detector.intend(
         new Intention(this) {
           toTravel = Some(attackers.get.units.minBy(_.framesToTravel(target)).pixelCenter.project(target, nextDetectorDepth))
+          canPursue
           canCower = true
         })
       nextDetectorDepth -= 96.0

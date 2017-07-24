@@ -26,7 +26,7 @@ object PsionicStorm extends Action {
     
     if (valueByTile.nonEmpty) {
       val bestTile = valueByTile.maxBy(_._2)
-      if (bestTile._2 > unit.subjectiveValue / 2.0) {
+      if (bestTile._2 > unit.subjectiveValue) {
         With.commander.useTechOnPixel(unit, Protoss.PsionicStorm, bestTile._1.pixelCenter)
       }
     }

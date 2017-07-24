@@ -43,6 +43,7 @@ class ControlZone(zone: Zone) extends Plan {
   
         fighters.get.units.foreach(_.intend(new Intention(this) {
           toTravel = Some(target)
+          canPursue = true
         }))
   
         val cloakedThreats = threats.filter(threat => threat.cloaked || threat.burrowed)

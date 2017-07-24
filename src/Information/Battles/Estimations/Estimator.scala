@@ -17,8 +17,15 @@ object Estimator {
     
     if (avatarBuilder.avatarUs.totalUnits <= 0 || avatarBuilder.avatarEnemy.totalUnits <= 0) return output
     
+    val maxFrames =
+      if(avatarBuilder.weRetreat || avatarBuilder.enemyRetreats)
+        // Yeah, we need to do better than this.
+        24 * 3
+      else
+        With.configuration.battleEstimationFrames
+        
     val frameStep = 24
-    while (output.frames < With.configuration.battleEstimationFrames && output.weSurvive && output.enemySurvives) {
+    while (output.frames < maxFrames && output.weSurvive && output.enemySurvives) {
       output.frames         += frameStep
       output.damageToUs     += dealDamage (avatarBuilder.avatarEnemy, avatarBuilder.avatarUs,     frameStep, output.deathsEnemy, output.damageToUs)
       output.damageToEnemy  += dealDamage (avatarBuilder.avatarUs,    avatarBuilder.avatarEnemy,  frameStep, output.deathsUs,    output.damageToEnemy)

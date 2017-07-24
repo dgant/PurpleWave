@@ -11,16 +11,19 @@ object Teamfight extends Action {
   }
   
   override def perform(unit: FriendlyUnitInfo) {
-    if (unit.matchups.netValuePerFrameDiffused > 0.0) {
+    if (Yolo.active) {
+      Engage.consider(unit)
+    }
+    else if (unit.matchups.netValuePerFrameDiffused > 0.0) {
+      Engage.consider(unit)
+    }
+    else if (unit.matchups.netValuePerFrameCurrently > 0.0) {
       Engage.consider(unit)
     }
     else if (unit.matchups.threats.isEmpty) {
       Engage.consider(unit)
     }
-    else if (unit.battle.exists(_.shouldAttack) || Yolo.active) {
-      Engage.consider(unit)
-    }
-    else if (unit.battle.exists(_.shouldRetreat) && unit.matchups.netValuePerFrameDiffused < 0.0) {
+    if (unit.battle.exists(_.shouldRetreat) && unit.matchups.netValuePerFrameCurrently < 0.0) {
       Disengage.consider(unit)
     }
     Engage.consider(unit)

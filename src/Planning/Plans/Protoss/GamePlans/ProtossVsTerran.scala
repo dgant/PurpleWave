@@ -139,7 +139,7 @@ class ProtossVsTerran extends Parallel {
         new HaveUpgrade(Protoss.ZealotSpeed, withinFrames = Protoss.Zealot.buildFrames),
         new Or(
           new UnitsAtLeast(12, UnitMatchType(Protoss.Dragoon)),
-          new Check(() => With.self.gas < 100)))),
+          new Check(() => With.self.gas * 5 < With.self.minerals)))),
     new TrainContinuously(Protoss.Zealot),
     new TrainContinuously(Protoss.Dragoon))
   
@@ -194,7 +194,7 @@ class ProtossVsTerran extends Parallel {
         new If(
           new UnitsAtLeast(8, UnitMatchWarriors, complete = true),
           new FulfillMidgameTech),
-          new Build(RequestAtLeast(6, Protoss.Gateway)))),
+          new Build(RequestAtLeast(4, Protoss.Gateway)))),
     
     // Late game
     new If(

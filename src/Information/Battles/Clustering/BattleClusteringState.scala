@@ -58,8 +58,20 @@ class BattleClusteringState(seedUnits: Set[UnitInfo]) {
   }
   
   private def foesNear(unit: UnitInfo): Iterable[UnitInfo] = {
-    val tileRadius = Math.min(With.configuration.battleMarginPixels, unit.pixelRangeMax + unit.topSpeed * 24 * 5.0 + 96.0) / 32.0
+    val tileRadius = radiusTiles(unit)
     val enemies = With.units.inTileRadius(unit.tileIncludingCenter, tileRadius.toInt).toIterable.filter(_.isEnemyOf(unit))
     enemies
+  }
+  
+  private def radiusTiles(unit: UnitInfo): Int ={
+    val tilesDetecting  = if (unit.unitClass.isDetector) 11 else 0
+    val tilesCasting    = if (unit.unitClass.isSpellcaster) 32 * 8 else 0
+    val tilesAttacking  = unit.pixelRangeMax.toInt / 32
+    val tilesMoving     = (unit.topSpeed * 24 * 4 / 32).toInt
+    val tilesMargin     = 3
+    val tilesCustom     = tilesMargin + tilesMoving + Vector(tilesCasting, tilesAttacking, tilesDetecting).max
+    val tilesLimit      = With.configuration.battleMarginTiles
+    val output          = Math.min(tilesLimit, tilesCustom)
+    output
   }
 }

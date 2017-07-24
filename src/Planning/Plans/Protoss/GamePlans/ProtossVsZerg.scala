@@ -267,7 +267,9 @@ class ProtossVsZerg extends Parallel {
     new TrainMatchingRatio(Protoss.Observer, UnitMatchType(Zerg.Lurker), 0.2, 3),
   
     new If(
-      new EnemyMutalisks,
+      new And(
+        new EnemyMutalisks,
+        new UnitsAtMost(5, UnitMatchType(Protoss.Corsair))),
       new TrainContinuously(Protoss.Dragoon),
       new Parallel(
         new If(

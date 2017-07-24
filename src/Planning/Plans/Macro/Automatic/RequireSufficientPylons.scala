@@ -35,13 +35,13 @@ class RequireSufficientPylons extends Plan {
     // What a mess. Fortunately, there's a better way to break it down:
     //   #1 Supply that is/will be provided by units that exist
     //   #2 Supply that will be provided by plans for which we haven't started building
-    
+  
+    val depotCompletionFrames     = Protoss.Pylon.buildFrames + 24 * 4 //Add a few seconds to account for builder transit time (and Pylon finishing time)
     val supplyPerDepot            = With.self.race.getSupplyProvider.supplyProvided
-    val currentSupplyOfNexus      = With.units.ours.filter(unit => unit.complete && ! unit.is(Protoss.Pylon)).toSeq.map(_.unitClass.supplyProvided).sum
+    val currentSupplyOfNexus      = With.units.ours.filter(unit => unit.remainingBuildFrames < depotCompletionFrames && ! unit.is(Protoss.Pylon)).toSeq.map(_.unitClass.supplyProvided).sum
     val currentSupplyUsed         = With.self.supplyUsed
-    val unitSpendingRatio         = if (With.geography.ourBases.size < 3) 0.5 else 0.75 //This is the metric that needs the most improvement
+    val unitSpendingRatio         = if (With.geography.ourBases.size < 3) 0.4 else 0.75 //This is the metric that needs the most improvement
     val costPerUnitSupply         = 50.0 / 2 //Assume 50 minerals = 1 supply (then divide by two because 1 supply = 2 BWAPI supply)
-    val depotCompletionFrames     = Protoss.Pylon.buildFrames + 24 * 5 //Add a few seconds to account for builder transit time (and Pylon finishing time)
     val incomePerFrame            = With.economy.ourIncomePerFrameMinerals + With.economy.ourIncomePerFrameGas
     val supplyUsedPerFrame        = incomePerFrame * unitSpendingRatio / costPerUnitSupply
     val supplyBanked              = With.self.minerals / costPerUnitSupply

@@ -52,14 +52,15 @@ class Avatar {
       else
         1.0
     
+    val geometric     = nearestEnemy.isDefined
     val contributes   = unit.unitClass.helpsInCombat
     val range         = unit.pixelRangeMax + 32.0 * (if (attacking || ! unit.canMoveThisFrame) 1.0 else 3.0)
-    val pixelsAway    = if (nearestEnemy.isDefined) unit.pixelDistanceFast(nearestEnemy.get) else With.configuration.abstractBattleDistancePixels
+    val pixelsAway    = if (geometric) unit.pixelDistanceFast(nearestEnemy.get) else With.configuration.abstractBattleDistancePixels
     val framesAway    = if (pixelsAway <= range) 0.0 else if (chasing) Double.PositiveInfinity else PurpleMath.nanToInfinity(Math.max(0.0, pixelsAway - range) / unit.topSpeed)
     val framesTotal   = With.configuration.battleEstimationFrames
     var efficacy      = if (retreating) 0.0 else splashFactor * Math.max(0.0, (framesTotal - framesAway) / framesTotal)
-    val altitudeBonus = if (unit.flying) 1.0 else With.grids.altitudeBonus.get(unit.tileIncludingCenter)
-    var fortitude     = altitudeBonus * (if (unit.effectivelyCloaked) 5.0 else 1.0)
+    val altitudeBonus = if (unit.flying || ! geometric) 1.0 else With.grids.altitudeBonus.get(unit.tileIncludingCenter)
+    var fortitude     = altitudeBonus * (if (geometric && unit.effectivelyCloaked) 5.0 else 1.0)
 
     // Very rough approximation -- of course Dark Swarm matters when it's the *target* under the swarm
     if (unit.underDisruptionWeb || (unit.underDarkSwarm && unit.unitClass.affectedByDarkSwarm)) {

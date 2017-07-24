@@ -7,8 +7,8 @@ import Lifecycle.With
 
 object ShowBattleDetails extends View {
   val x1 = 5
-  val x2 = 400
-  val y1 = 7 * With.visualization.lineHeightSmall
+  val x2 = 320
+  lazy val y1 = 7 * With.visualization.lineHeightSmall
   val y2 = 200
   
   override def renderScreen() {
@@ -40,7 +40,7 @@ object ShowBattleDetails extends View {
      Vector[String](title, With.self.name, With.enemy.name),
      Vector[String]("", if (estimation.weSurvive) "Survives" else "", if (estimation.enemySurvives) "Survives" else ""),
      Vector[String]("Seconds", "" + estimation.frames / 24, ""),
-     Vector[String]("Value", "+" + estimation.costToUs.toInt, "-" + estimation.costToEnemy.toInt, "(" + estimation.netValue.toInt + ")"),
+     Vector[String]("Value", "" + estimation.costToUs.toInt, "" + estimation.costToEnemy.toInt, "= " + estimation.netValue.toInt),
      Vector[String]("Survivors",
        survivorPercentage(estimation.deathsUs,    estimation.avatarUs.totalUnits),
        survivorPercentage(estimation.deathsEnemy, estimation.avatarEnemy.totalUnits)))

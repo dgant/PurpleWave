@@ -10,8 +10,10 @@ object Estimator {
     
     val output = new Estimation
     
-    output.avatarUs       = avatarBuilder.avatarUs
-    output.avatarEnemy    = avatarBuilder.avatarEnemy
+    output.avatarUs         = avatarBuilder.avatarUs
+    output.avatarEnemy      = avatarBuilder.avatarEnemy
+    output.totalUnitsUs     = output.avatarUs.totalUnits
+    output.totalUnitsEnemy  = output.avatarEnemy.totalUnits
     
     if (avatarBuilder.avatarUs.totalUnits <= 0 || avatarBuilder.avatarEnemy.totalUnits <= 0) return output
     
@@ -52,19 +54,21 @@ object Estimator {
   
     val output = new Estimation
     
-    val us      = battle.us.units.map(_.matchups)
-    val enemy   = battle.enemy.units.map(_.matchups)
+    val us            = battle.us.units.map(_.matchups)
+    val enemy         = battle.enemy.units.map(_.matchups)
+    val lifetimeUs    = PurpleMath.nanToZero(us     .map(u => Math.min(u.framesToLiveDiffused, With.configuration.battleEstimationFrames)).sum / us.size)
+    val lifetimeEnemy = PurpleMath.nanToZero(enemy  .map(u => Math.min(u.framesToLiveDiffused, With.configuration.battleEstimationFrames)).sum / enemy.size)
+    val max           = Math.max(lifetimeUs, lifetimeEnemy)
     
-    val lifetimeUs    = PurpleMath.nanToZero(us.map(_.framesToLiveCurrently).sum / battle.us.units.size)
-    val lifetimeEnemy = PurpleMath.nanToZero(enemy.map(_.framesToLiveCurrently).sum / battle.us.units.size)
-    
-    output.frames       = Math.min(lifetimeUs, lifetimeEnemy).toInt
-    output.costToUs     = output.frames * us.map(_.vpfReceivingDiffused).sum
-    output.costToEnemy  = output.frames * enemy.map(_.vpfReceivingDiffused).sum
-    output.damageToUs   = output.frames * us.map(_.dpfReceivingDiffused).sum
-    output.damageToUs   = output.frames * enemy.map(_.dpfReceivingDiffused).sum
-    output.deathsUs     = us.count(_.framesToLiveDiffused <= output.frames)
-    output.deathsEnemy  = enemy.count(_.framesToLiveDiffused <= output.frames)
+    output.frames           = Math.min(lifetimeUs, lifetimeEnemy).toInt
+    output.costToUs         = output.frames * us.map(_.vpfReceivingDiffused).sum
+    output.costToEnemy      = output.frames * enemy.map(_.vpfReceivingDiffused).sum
+    output.damageToUs       = output.frames * us.map(_.dpfReceivingDiffused).sum
+    output.damageToUs       = output.frames * enemy.map(_.dpfReceivingDiffused).sum
+    output.deathsUs         = us.count(_.framesToLiveDiffused < output.frames)
+    output.deathsEnemy      = enemy.count(_.framesToLiveDiffused < output.frames)
+    output.totalUnitsUs     = us.size
+    output.totalUnitsEnemy  = enemy.size
     output
   }
   

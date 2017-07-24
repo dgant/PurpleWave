@@ -154,11 +154,6 @@ class ProtossVsZerg extends Parallel {
       RequestAtLeast(1, Protoss.CyberneticsCore),
       RequestAtLeast(1, Protoss.RoboticsFacility),
       RequestAtLeast(1, Protoss.Observatory)))
-
-  private class BuildAntiAirForMutalisks extends If(
-    new EnemyMutalisks,
-    new Build
-  )
   
   /////////////////
   // Here we go! //

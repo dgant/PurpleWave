@@ -34,7 +34,7 @@ class Visualization {
   
   var enabled   = true
   var screen    = true
-  var map       = false
+  var map       = true
   var happy     = false
   var textOnly  = false
   

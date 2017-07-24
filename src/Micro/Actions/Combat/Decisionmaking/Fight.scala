@@ -21,7 +21,7 @@ object Fight extends Action {
     Recover.consider(unit)
     BustBunker.consider(unit)
     ProtectTheWeak.consider(unit)
-    Teamfight.consider(unit)
+    FightOrFlight.consider(unit)
     Pursue.consider(unit)
     Pillage.consider(unit)
   }

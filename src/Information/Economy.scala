@@ -30,7 +30,7 @@ class Economy {
   def ourIncomePerFrameGas      : Double = ourIncomePerFrameGasCache.get
   
   private val ourIncomePerFrameMineralsCache  = new CacheFrame(() => ourActiveMiners.size   * incomePerFrameMinerals)
-  private val ourIncomePerFrameGasCache       = new CacheFrame(() => ourActiveMiners.size   * incomePerFrameGas)
+  private val ourIncomePerFrameGasCache       = new CacheFrame(() => ourActiveDrillers.size * incomePerFrameGas)
   
   def genericIncomePerFrameMinerals (miners:Int, bases:Int): Double = Math.min(miners, bases * 16)  * incomePerFrameMinerals
   def genericIncomePerFrameGas      (miners:Int, bases:Int): Double = Math.min(miners, bases * 3)   * incomePerFrameGas

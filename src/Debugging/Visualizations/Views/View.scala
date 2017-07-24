@@ -4,7 +4,7 @@ import Lifecycle.With
 
 abstract class View {
   
-  lazy val name: String = getClass.toString.replace("$", "").replace("Show", "")
+  lazy val name: String = getClass.getSimpleName.replace("$", "").replace("Show", "")
   
   def renderScreen(): Unit = {}
   def renderMap(): Unit = {}

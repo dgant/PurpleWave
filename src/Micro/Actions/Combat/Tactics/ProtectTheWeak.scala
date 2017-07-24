@@ -1,10 +1,7 @@
 package Micro.Actions.Combat.Tactics
 
 import Micro.Actions.Action
-import Micro.Actions.Combat.Maneuvering.Kite
-import Micro.Actions.Commands.Attack
-import Micro.Behaviors.MovementProfiles
-import Micro.Heuristics.Targeting.EvaluateTargets
+import Micro.Actions.Combat.Decisionmaking.Engage
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object ProtectTheWeak extends Action {
@@ -20,17 +17,7 @@ object ProtectTheWeak extends Action {
     val currentBullies = bullies(unit)
     
     if (currentBullies.nonEmpty) {
-  
-      unit.action.canCower = false
-      unit.action.toAttack = EvaluateTargets.best(unit.action, currentBullies)
-      unit.action.movementProfile = MovementProfiles.safelyAttackTarget
-  
-      if (unit.readyForAttackOrder) {
-        Attack.delegate(unit)
-      }
-      else {
-        Kite.delegate(unit)
-      }
+      Engage.consider(unit)
     }
   }
   

@@ -79,9 +79,23 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
   lazy val tileArea:TileRectangle = TileRectangle(Tile(0, 0), tileSize)
   lazy val isTownHall:Boolean = Vector(Terran.CommandCenter, Protoss.Nexus, Zerg.Hatchery, Zerg.Lair, Zerg.Hive).contains(this)
   
+  lazy val affectedByDarkSwarm: Boolean = ! Vector(
+    Terran.SiegeTankSieged,
+    Terran.Firebat,
+    Protoss.Zealot,
+    Protoss.DarkTemplar,
+    Protoss.Reaver,
+    Protoss.Archon,
+    Zerg.Zergling,
+    Zerg.Lurker,
+    Zerg.Ultralisk
+  ).contains(this)
+  
   ///////////
   // Macro //
   ///////////
+  
+  lazy val unitsTrained: Array[UnitClass] = UnitClasses.all.filter(_.whatBuilds._1 == this).toArray
   
   lazy val trainsGroundUnits: Boolean = UnitClasses.all.exists(unit => ! unit.isFlyer && unit.whatBuilds._1 == this)
   
@@ -281,7 +295,7 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
   
   lazy val mineralValue     : Int = mineralPrice + buildUnitsSpent.map(_.mineralValue).sum
   lazy val gasValue         : Int = mineralPrice + buildUnitsSpent.map(_.gasValue).sum
-  lazy val subjectiveValue  : Int = (1 * mineralValue + 2 * gasValue) * (if(isWorker) 2 else 1) * (if(isZerg) 7 else if (isTerran && isMechanical) 5 else 3)
+  lazy val subjectiveValue  : Int = (1 * mineralValue + 2 * gasValue) * (if(isWorker) 2 else 1) * (if(isZerg) 4 else if (isTerran && isMechanical) 5 else 3)
   
   //////////////////////
   // Micro frame data //

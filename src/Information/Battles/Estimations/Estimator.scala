@@ -13,22 +13,28 @@ object Estimator {
     
     if (avatarBuilder.avatarUs.totalUnits <= 0 || avatarBuilder.avatarEnemy.totalUnits <= 0) return output
     
-    output.damageToUs     = dealDamage  (avatarBuilder.avatarEnemy, avatarBuilder.avatarUs)
-    output.damageToEnemy  = dealDamage  (avatarBuilder.avatarUs,    avatarBuilder.avatarEnemy)
-    output.deathsUs       = deaths      (avatarBuilder.avatarUs,    output.damageToUs)
-    output.deathsEnemy    = deaths      (avatarBuilder.avatarEnemy, output.damageToEnemy)
-    output.costToUs       = totalCost   (avatarBuilder.avatarUs,    output.damageToUs)
-    output.costToEnemy    = totalCost   (avatarBuilder.avatarEnemy, output.damageToEnemy)
+    while (output.frames < With.configuration.battleEstimationFrames && output.weSurvive && output.enemySurvives) {
+      output.frames         += 24
+      output.damageToUs     = dealDamage  (avatarBuilder.avatarEnemy, avatarBuilder.avatarUs,     output.deathsEnemy)
+      output.damageToEnemy  = dealDamage  (avatarBuilder.avatarUs,    avatarBuilder.avatarEnemy,  output.deathsUs)
+      output.deathsUs       = deaths      (avatarBuilder.avatarUs,    output.damageToUs)
+      output.deathsEnemy    = deaths      (avatarBuilder.avatarEnemy, output.damageToEnemy)
+    }
+    
+    output.costToUs     = totalCost   (avatarBuilder.avatarUs,    output.damageToUs)
+    output.costToEnemy  = totalCost   (avatarBuilder.avatarEnemy, output.damageToEnemy)
     
     output
   }
   
-  private def dealDamage(from: Avatar, to: Avatar): Double = {
-    
+  private def dealDamage(from: Avatar, to: Avatar, fromDeaths: Double): Double = {
+    val damageOutput    = (from.totalUnits - fromDeaths) / from.totalUnits
     val airFocus        = to.totalFlyers / to.totalUnits
     val groundFocus     = 1.0 - airFocus
     val fromDenominator = from.totalUnits
     val toDenominator   = to.totalUnits
+    
+    val seconds = With.configuration.battleEstimationFrames / 24.0
     
     val damagePerFramePerUnit =
       to.vulnerabilityGroundConcussive  / toDenominator * (from.dpfGroundConcussiveFocused + from.dpfGroundConcussiveUnfocused * groundFocus) +

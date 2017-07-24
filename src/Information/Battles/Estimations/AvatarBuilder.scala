@@ -1,7 +1,7 @@
 package Information.Battles.Estimations
 
 import Mathematics.Points.Pixel
-import ProxyBwapi.Races.{Protoss, Terran}
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
 
 import scala.collection.mutable
@@ -60,11 +60,15 @@ class AvatarBuilder {
   }
   
   private def eligible(unit: UnitInfo): Boolean = {
+    if ( ! unit.unitClass.helpsInCombat)                              return false
     if (unit.unitClass.isWorker   && ! unit.isBeingViolent)           return false
     if (unit.unitClass.isBuilding && ! unit.unitClass.helpsInCombat)  return false
     if (unit.is(Terran.SpiderMine))                                   return false
     if (unit.is(Protoss.Scarab))                                      return false
     if (unit.is(Protoss.Interceptor))                                 return false
+    if (unit.is(Zerg.Larva))                                          return false
+    if (unit.is(Zerg.Egg))                                            return false
+    if (unit.is(Zerg.LurkerEgg))                                      return false
     unit.aliveAndComplete
   }
 }

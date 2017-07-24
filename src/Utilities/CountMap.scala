@@ -11,7 +11,7 @@ class CountMap[T] extends mutable.HashMap[T, Int] {
   def subtract    (key:T, value:Int) = add(key, -value)
   def subtractOne (key:T)            = subtract(key, 1)
   
-  override def clone:CountMap[T] = {
+  override def clone: CountMap[T] = {
     val output = new CountMap[T]
     keys.foreach(key => output.put(key, this(key)))
     output

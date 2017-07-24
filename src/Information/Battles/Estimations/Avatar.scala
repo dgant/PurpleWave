@@ -52,12 +52,19 @@ class Avatar {
       else
         1.0
     
+    val contributes   = unit.unitClass.helpsInCombat
     val range         = unit.pixelRangeMax + 32.0 * (if (attacking || ! unit.canMoveThisFrame) 1.0 else 3.0)
     val pixelsAway    = if (nearestEnemy.isDefined) unit.pixelDistanceFast(nearestEnemy.get) else With.configuration.abstractBattleDistancePixels
     val framesAway    = if (pixelsAway <= range) 0.0 else if (chasing) Double.PositiveInfinity else PurpleMath.nanToInfinity(Math.max(0.0, pixelsAway - range) / unit.topSpeed)
     val framesTotal   = With.configuration.battleEstimationFrames
-    val efficacy      = if (retreating) 0.0 else splashFactor * Math.max(0.0, (framesTotal - framesAway) / framesTotal)
-    val fortitude     = With.grids.altitudeBonus.get(unit.tileIncludingCenter) * (if (unit.effectivelyCloaked) 5.0 else 1.0)
+    var efficacy      = if (retreating) 0.0 else splashFactor * Math.max(0.0, (framesTotal - framesAway) / framesTotal)
+    val altitudeBonus = if (unit.flying) 1.0 else With.grids.altitudeBonus.get(unit.tileIncludingCenter)
+    var fortitude     = altitudeBonus * (if (unit.effectivelyCloaked) 5.0 else 1.0)
+
+    // Very rough approximation -- of course Dark Swarm matters when it's the *target* under the swarm
+    if (unit.underDisruptionWeb || (unit.underDarkSwarm && unit.unitClass.affectedByDarkSwarm)) {
+      efficacy = 0.0
+    }
     
     vulnerabilityGroundConcussive   = if (   unit.flying) 0.0 else Damage.scaleBySize(DamageType.Concussive, unit.unitClass.size)
     vulnerabilityGroundExplosive    = if (   unit.flying) 0.0 else Damage.scaleBySize(DamageType.Explosive,  unit.unitClass.size)

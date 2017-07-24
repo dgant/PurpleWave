@@ -6,6 +6,7 @@ class Estimation {
 
   val frameCalculated: Int = With.frame
   
+  var frames        = 0
   var avatarUs      = new Avatar
   var avatarEnemy   = new Avatar
   var damageToUs    = 0.0

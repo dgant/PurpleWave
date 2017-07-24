@@ -40,10 +40,10 @@ object ShowBattleDetails extends View {
      Vector[String](title, With.self.name, With.enemy.name),
      Vector[String]("", if (estimation.weSurvive) "Survives" else "", if (estimation.enemySurvives) "Survives" else ""),
      Vector[String]("Seconds", "" + estimation.frames / 24, ""),
-     Vector[String]("Value", "" + estimation.costToUs.toInt, "" + estimation.costToEnemy.toInt, "= " + estimation.netValue.toInt),
+     Vector[String]("Value", "" + estimation.costToEnemy.toInt, "" + estimation.costToUs.toInt, "= " + estimation.netValue.toInt),
      Vector[String]("Survivors",
-       survivorPercentage(estimation.deathsUs,    estimation.avatarUs.totalUnits),
-       survivorPercentage(estimation.deathsEnemy, estimation.avatarEnemy.totalUnits)))
+       survivorPercentage(estimation.deathsUs,    estimation.totalUnitsUs),
+       survivorPercentage(estimation.deathsEnemy, estimation.totalUnitsEnemy)))
     
     DrawScreen.table(x, y, table)
   }

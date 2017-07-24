@@ -54,8 +54,8 @@ object Estimator {
   
     val output = new Estimation
     
-    val us            = battle.us.units.map(_.matchups)
-    val enemy         = battle.enemy.units.map(_.matchups)
+    val us            = battle.us.units.filter(_.unitClass.helpsInCombat).map(_.matchups)
+    val enemy         = battle.enemy.units.filter(_.unitClass.helpsInCombat).map(_.matchups)
     val lifetimeUs    = PurpleMath.nanToZero(us     .map(u => Math.min(u.framesToLiveDiffused, With.configuration.battleEstimationFrames)).sum / us.size)
     val lifetimeEnemy = PurpleMath.nanToZero(enemy  .map(u => Math.min(u.framesToLiveDiffused, With.configuration.battleEstimationFrames)).sum / enemy.size)
     val max           = Math.max(lifetimeUs, lifetimeEnemy)
@@ -64,7 +64,7 @@ object Estimator {
     output.costToUs         = output.frames * us.map(_.vpfReceivingDiffused).sum
     output.costToEnemy      = output.frames * enemy.map(_.vpfReceivingDiffused).sum
     output.damageToUs       = output.frames * us.map(_.dpfReceivingDiffused).sum
-    output.damageToUs       = output.frames * enemy.map(_.dpfReceivingDiffused).sum
+    output.damageToEnemy    = output.frames * enemy.map(_.dpfReceivingDiffused).sum
     output.deathsUs         = us.count(_.framesToLiveDiffused < output.frames)
     output.deathsEnemy      = enemy.count(_.framesToLiveDiffused < output.frames)
     output.totalUnitsUs     = us.size

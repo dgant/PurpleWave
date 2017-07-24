@@ -29,19 +29,7 @@ class ControlZone(zone: Zone) extends Plan {
   
     val ourBase = zone.bases.find(base => base.owner.isUs)
     
-    val zonesToConsider =
-      if(ourBase.isDefined)
-        Vector(zone)
-      else {
-        // This sequence broke my brain so let's lay out the steps and let static type analysis save us
-        val aaa = With.geography.home.zone.pathTo(zone)
-        val bbb = aaa.map(_.steps)
-        val ccc = bbb.map(_.map(_.from))
-        val ddd = ccc.getOrElse(Vector.empty)
-        ddd
-      }
-    
-    enemies = With.units.enemy.filter(enemy => enemy.likelyStillThere && threateningZone(enemy, zonesToConsider))
+    enemies = With.units.enemy.filter(enemy => enemy.likelyStillThere && threateningZone(enemy, zone))
     threats = enemies.filter(threat => threat.canAttackThisSecond && ! threat.unitClass.isWorker && threat.likelyStillThere)
     if (threats.nonEmpty) {
       fighters.get.unitMatcher.set(UnitMatchCombat(enemies))
@@ -71,13 +59,10 @@ class ControlZone(zone: Zone) extends Plan {
     // TODO: If there's no threat, answer likely ones
   }
   
-  def threateningZone(unit: UnitInfo, zones: Vector[Zone]): Boolean = {
-    zones.contains(unit.pixelCenter.zone)   ||
-    unit.targetPixel.exists(zones.contains) ||
-    unit.target.exists(zones.contains)      ||
-    zones
-      .flatMap(_.edges)
-      .map(_.centerPixel)
-      .exists(unit.pixelDistanceFast(_) < With.configuration.battleMarginPixels)
+  def threateningZone(unit: UnitInfo, zone: Zone): Boolean = {
+    val unitZone = unit.pixelCenter.zone
+    zone == unitZone ||
+    (unit.flying && unit.framesToTravel(zone.centroid.pixelCenter) < 24 * 8) ||
+    zone.edges.exists(edge => edge.otherSideof(zone).owner != With.self && edge.otherSideof(zone) == unitZone)
   }
 }

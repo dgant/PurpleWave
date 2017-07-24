@@ -12,7 +12,7 @@ import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, FirstFiveMinutes}
 import Planning.Plans.Macro.Expanding.{BuildAssimilators, BuildCannonsAtExpansions, RequireMiningBases}
 import Planning.Plans.Macro.Milestones._
-import Planning.Plans.Macro.Reaction.{EnemyBasesAtLeast, EnemyMutalisks}
+import Planning.Plans.Macro.Reaction.{EnemyBasesAtLeast, EnemyMassMutalisks, EnemyMutalisks}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Protoss.ProtossBuilds
 import Planning.Plans.Protoss.Situational.{Defend2GateAgainst4Pool, DefendFFEAgainst4Pool, ForgeFastExpand, TwoGatewaysAtNexus}
@@ -258,6 +258,10 @@ class ProtossVsZerg extends Parallel {
           new UnitsAtLeast(2, UnitMatchType(Protoss.DarkTemplar), complete = true)),
         new TrainContinuously(Protoss.Corsair, 5),
         new TrainContinuously(Protoss.Corsair, 2))),
+  
+    new If(
+      new EnemyMassMutalisks,
+      new Build(RequestAtLeast(2, Protoss.Stargate))),
     
     new TrainContinuously(Protoss.Carrier),
     new TrainMatchingRatio(Protoss.Observer, UnitMatchType(Zerg.Lurker), 0.2, 3),

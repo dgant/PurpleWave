@@ -4,7 +4,7 @@ import Strategery.Strategies.Options.AllRaces.{Proxy2Gate3StartLocations, Worker
 import Strategery.Strategies.Options.Protoss.Global.{AllPvP, AllPvT, AllPvZ}
 import Strategery.Strategies.Options.Protoss.PvP._
 import Strategery.Strategies.Options.Protoss.PvT._
-import Strategery.Strategies.Options.Protoss.PvZ.{PvZEarlyFFELight, PvZMidgameCorsairSpeedlot}
+import Strategery.Strategies.Options.Protoss.PvZ._
 import Strategery.Strategies.Strategy
 
 object Playbook {
@@ -22,7 +22,7 @@ object Playbook {
   val forced = Vector[Strategy](
     AllPvZ,
     PvZEarlyFFELight,
-    PvZMidgameCorsairSpeedlot
+    PvZMidgameCorsairDarkTemplar
     /*
     AllPvP,
     PvPEarly1GateCore,
@@ -72,8 +72,15 @@ object Playbook {
     PvPMidgameFE,
     PvPMidgameReaver,
     PvPMidgameCarriers,
-    PvPMidgame4GateGoon
-    
+    PvPMidgame4GateGoon,
+    PvZEarlyFFELight,
+    PvZEarlyFFEHeavy,
+    PvZEarly2Gate,
+    PvZMidgameCorsairDarkTemplar,
+    PvZMidgameCorsairSpeedlot,
+    PvZMidgame5GateDragoons,
+    PvZMidgameCorsairReaver,
+    PvZMidgameCorsairCarrier
   )
   
   val strategyOrderRoundRobin = Vector(

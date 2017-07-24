@@ -1,6 +1,8 @@
 package Information.Battles.Estimations
 
+import Information.Battles.Types.Battle
 import Lifecycle.With
+import Mathematics.PurpleMath
 
 object Estimator {
   
@@ -13,10 +15,11 @@ object Estimator {
     
     if (avatarBuilder.avatarUs.totalUnits <= 0 || avatarBuilder.avatarEnemy.totalUnits <= 0) return output
     
+    val frameStep = 24
     while (output.frames < With.configuration.battleEstimationFrames && output.weSurvive && output.enemySurvives) {
-      output.frames         += 24
-      output.damageToUs     = dealDamage  (avatarBuilder.avatarEnemy, avatarBuilder.avatarUs,     output.deathsEnemy)
-      output.damageToEnemy  = dealDamage  (avatarBuilder.avatarUs,    avatarBuilder.avatarEnemy,  output.deathsUs)
+      output.frames         += frameStep
+      output.damageToUs     = dealDamage  (avatarBuilder.avatarEnemy, avatarBuilder.avatarUs,     frameStep, output.deathsEnemy, output.damageToUs)
+      output.damageToEnemy  = dealDamage  (avatarBuilder.avatarUs,    avatarBuilder.avatarEnemy,  frameStep, output.deathsUs,    output.damageToEnemy)
       output.deathsUs       = deaths      (avatarBuilder.avatarUs,    output.damageToUs)
       output.deathsEnemy    = deaths      (avatarBuilder.avatarEnemy, output.damageToEnemy)
     }
@@ -27,24 +30,42 @@ object Estimator {
     output
   }
   
-  private def dealDamage(from: Avatar, to: Avatar, fromDeaths: Double): Double = {
+  private def dealDamage(from: Avatar, to: Avatar, frames: Double, fromDeaths: Double, damageExisting: Double): Double = {
     val damageOutput    = (from.totalUnits - fromDeaths) / from.totalUnits
     val airFocus        = to.totalFlyers / to.totalUnits
     val groundFocus     = 1.0 - airFocus
-    val fromDenominator = from.totalUnits
-    val toDenominator   = to.totalUnits
     
     val seconds = With.configuration.battleEstimationFrames / 24.0
     
-    val damagePerFramePerUnit =
-      to.vulnerabilityGroundConcussive  / toDenominator * (from.dpfGroundConcussiveFocused + from.dpfGroundConcussiveUnfocused * groundFocus) +
-      to.vulnerabilityGroundExplosive   / toDenominator * (from.dpfGroundExplosiveFocused  + from.dpfGroundExplosiveUnfocused  * groundFocus) +
-      to.vulnerabilityGroundNormal      / toDenominator * (from.dpfGroundNormalFocused     + from.dpfGroundNormalUnfocused     * groundFocus) +
-      to.vulnerabilityAirConcussive     / toDenominator * (from.dpfAirConcussiveFocused    + from.dpfAirConcussiveUnfocused    * airFocus) +
-      to.vulnerabilityAirExplosive      / toDenominator * (from.dpfAirExplosiveFocused     + from.dpfAirExplosiveUnfocused     * airFocus) +
-      to.vulnerabilityAirNormal         / toDenominator * (from.dpfAirNormalFocused        + from.dpfAirNormalUnfocused        * airFocus)
+    val damagePerFrame =
+      to.vulnerabilityGroundConcussive  * (from.dpfGroundConcussiveFocused + from.dpfGroundConcussiveUnfocused * groundFocus) +
+      to.vulnerabilityGroundExplosive   * (from.dpfGroundExplosiveFocused  + from.dpfGroundExplosiveUnfocused  * groundFocus) +
+      to.vulnerabilityGroundNormal      * (from.dpfGroundNormalFocused     + from.dpfGroundNormalUnfocused     * groundFocus) +
+      to.vulnerabilityAirConcussive     * (from.dpfAirConcussiveFocused    + from.dpfAirConcussiveUnfocused    * airFocus) +
+      to.vulnerabilityAirExplosive      * (from.dpfAirExplosiveFocused     + from.dpfAirExplosiveUnfocused     * airFocus) +
+      to.vulnerabilityAirNormal         * (from.dpfAirNormalFocused        + from.dpfAirNormalUnfocused        * airFocus)
     
-    Math.min(to.totalHealth, damagePerFramePerUnit * With.configuration.battleEstimationFrames / to.totalUnits)
+    Math.min(to.totalHealth - damageExisting, damagePerFrame * frames)
+  }
+  
+  def fromMatchups(battle: Battle): Estimation = {
+  
+    val output = new Estimation
+    
+    val us      = battle.us.units.map(_.matchups)
+    val enemy   = battle.enemy.units.map(_.matchups)
+    
+    val lifetimeUs    = PurpleMath.nanToZero(us.map(_.framesToLiveCurrently).sum / battle.us.units.size)
+    val lifetimeEnemy = PurpleMath.nanToZero(enemy.map(_.framesToLiveCurrently).sum / battle.us.units.size)
+    
+    output.frames       = Math.min(lifetimeUs, lifetimeEnemy).toInt
+    output.costToUs     = output.frames * us.map(_.vpfReceivingDiffused).sum
+    output.costToEnemy  = output.frames * enemy.map(_.vpfReceivingDiffused).sum
+    output.damageToUs   = output.frames * us.map(_.dpfReceivingDiffused).sum
+    output.damageToUs   = output.frames * enemy.map(_.dpfReceivingDiffused).sum
+    output.deathsUs     = us.count(_.framesToLiveDiffused <= output.frames)
+    output.deathsEnemy  = enemy.count(_.framesToLiveDiffused <= output.frames)
+    output
   }
   
   // Examples:

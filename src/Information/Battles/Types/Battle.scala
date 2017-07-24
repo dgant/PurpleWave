@@ -16,13 +16,14 @@ class Battle(
   // Estimations //
   /////////////////
   
-  lazy val estimationAbstract         : Estimation  = BattleUpdater.estimate(this, geometric = false, weAttack = true,  enemyAttacks = true,  weRetreat = false)
-  lazy val estimationAbstractOffense  : Estimation  = BattleUpdater.estimate(this, geometric = false, weAttack = true,  enemyAttacks = false, weRetreat = false)
-  lazy val estimationAbstractDefense  : Estimation  = BattleUpdater.estimate(this, geometric = false, weAttack = false, enemyAttacks = true,  weRetreat = false)
-  lazy val estimationGeometric        : Estimation  = BattleUpdater.estimate(this, geometric = false, weAttack = true,  enemyAttacks = true,  weRetreat = false)
-  lazy val estimationGeometricOffense : Estimation  = BattleUpdater.estimate(this, geometric = true,  weAttack = true,  enemyAttacks = false, weRetreat = false)
-  lazy val estimationGeometricDefense : Estimation  = BattleUpdater.estimate(this, geometric = true,  weAttack = false, enemyAttacks = true,  weRetreat = false)
-  lazy val estimationGeometricRetreat : Estimation  = BattleUpdater.estimate(this, geometric = true,  weAttack = false, enemyAttacks = false, weRetreat = true)
+  lazy val estimationAbstract         : Estimation  = BattleUpdater.estimateAvatar(this, geometric = false, weAttack = true,  enemyAttacks = true,  weRetreat = false)
+  lazy val estimationAbstractOffense  : Estimation  = BattleUpdater.estimateAvatar(this, geometric = false, weAttack = true,  enemyAttacks = false, weRetreat = false)
+  lazy val estimationAbstractDefense  : Estimation  = BattleUpdater.estimateAvatar(this, geometric = false, weAttack = false, enemyAttacks = true,  weRetreat = false)
+  lazy val estimationGeometric        : Estimation  = BattleUpdater.estimateAvatar(this, geometric = false, weAttack = true,  enemyAttacks = true,  weRetreat = false)
+  lazy val estimationGeometricOffense : Estimation  = BattleUpdater.estimateAvatar(this, geometric = true,  weAttack = true,  enemyAttacks = false, weRetreat = false)
+  lazy val estimationGeometricDefense : Estimation  = BattleUpdater.estimateAvatar(this, geometric = true,  weAttack = false, enemyAttacks = true,  weRetreat = false)
+  lazy val estimationGeometricRetreat : Estimation  = BattleUpdater.estimateAvatar(this, geometric = true,  weAttack = false, enemyAttacks = true,  weRetreat = true)
+  lazy val estimationMatchups         : Estimation  = BattleUpdater.estimateMatchups(this)
   
   //////////////
   // Features //

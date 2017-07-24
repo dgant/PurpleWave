@@ -31,7 +31,7 @@ object BattleUpdater {
     battle
   }
   
-  def estimate(
+  def estimateAvatar(
     battle        : Battle,
     geometric     : Boolean,
     weAttack      : Boolean,
@@ -51,5 +51,9 @@ object BattleUpdater {
     battle.us     .units.filter(fitsAttackCriteria(_, weAttack))     .foreach(builder.addUnit)
     battle.enemy  .units.filter(fitsAttackCriteria(_, enemyAttacks)) .foreach(builder.addUnit)
     Estimator.calculate(builder)
+  }
+  
+  def estimateMatchups(battle: Battle): Estimation = {
+    Estimator.fromMatchups(battle)
   }
 }

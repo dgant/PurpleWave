@@ -20,8 +20,8 @@ object Estimator {
     val frameStep = 24
     while (output.frames < With.configuration.battleEstimationFrames && output.weSurvive && output.enemySurvives) {
       output.frames         += frameStep
-      output.damageToUs     = dealDamage  (avatarBuilder.avatarEnemy, avatarBuilder.avatarUs,     frameStep, output.deathsEnemy, output.damageToUs)
-      output.damageToEnemy  = dealDamage  (avatarBuilder.avatarUs,    avatarBuilder.avatarEnemy,  frameStep, output.deathsUs,    output.damageToEnemy)
+      output.damageToUs     += dealDamage (avatarBuilder.avatarEnemy, avatarBuilder.avatarUs,     frameStep, output.deathsEnemy, output.damageToUs)
+      output.damageToEnemy  += dealDamage (avatarBuilder.avatarUs,    avatarBuilder.avatarEnemy,  frameStep, output.deathsUs,    output.damageToEnemy)
       output.deathsUs       = deaths      (avatarBuilder.avatarUs,    output.damageToUs)
       output.deathsEnemy    = deaths      (avatarBuilder.avatarEnemy, output.damageToEnemy)
     }
@@ -39,7 +39,7 @@ object Estimator {
     
     val seconds = With.configuration.battleEstimationFrames / 24.0
     
-    val damagePerFrame =
+    val damagePerFramePerUnit =
       to.vulnerabilityGroundConcussive  * (from.dpfGroundConcussiveFocused + from.dpfGroundConcussiveUnfocused * groundFocus) +
       to.vulnerabilityGroundExplosive   * (from.dpfGroundExplosiveFocused  + from.dpfGroundExplosiveUnfocused  * groundFocus) +
       to.vulnerabilityGroundNormal      * (from.dpfGroundNormalFocused     + from.dpfGroundNormalUnfocused     * groundFocus) +
@@ -47,7 +47,7 @@ object Estimator {
       to.vulnerabilityAirExplosive      * (from.dpfAirExplosiveFocused     + from.dpfAirExplosiveUnfocused     * airFocus) +
       to.vulnerabilityAirNormal         * (from.dpfAirNormalFocused        + from.dpfAirNormalUnfocused        * airFocus)
     
-    Math.min(to.totalHealth - damageExisting, damagePerFrame * frames)
+    Math.min(to.totalHealth - damageExisting, damagePerFramePerUnit * frames / to.totalUnits)
   }
   
   def fromMatchups(battle: Battle): Estimation = {

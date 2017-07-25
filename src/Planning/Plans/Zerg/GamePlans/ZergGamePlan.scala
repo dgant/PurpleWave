@@ -22,7 +22,7 @@ class ZergGamePlan extends Parallel {
       RequestAtLeast(10,  Zerg.Zergling)),
     new FindEnemyBase { scouts.get.unitMatcher.set(UnitMatchType(Zerg.Overlord)) },
     new If(
-      new UnitsAtLeast(1, UnitMatchType(Zerg.SpawningPool), complete = false),
+      new UnitsAtLeast(1, UnitMatchType(Zerg.SpawningPool), complete = true),
       new Attack {
         attackers.get.unitCounter.set(UnitCountOne)
         attackers.get.unitMatcher.set(UnitMatchWorkers)

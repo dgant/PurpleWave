@@ -102,7 +102,7 @@ class Blueprint(
       nextTile.valid &&
       (
         if (buildArea.contains(nextTile)) {
-          (! requireCreep || With.grids.creep.get(tile)) &&
+          (! requireCreep || With.grids.creep.get(nextTile)) &&
           With.architecture.buildable(nextTile) && (
             ( ! respectHarvesting && ! thisZone.owner.isUs) ||
             ! With.architecture.isHarvestingArea(nextTile)

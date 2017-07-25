@@ -46,6 +46,7 @@ class TrainUnit(val traineeClass: UnitClass) extends Plan {
       trainee = With.units.ours.find(unit => matches(unit, trainer.get))
     }
   
+    // Duplicated across MorphUnit
     currencyLock.framesAhead = (
       traineeClass.buildUnitsEnabling.map(enablingClass => Project.framesToUnits(enablingClass, 1))
       :+ Project.framesToUnits(trainerClass, 1)).max

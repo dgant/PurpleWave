@@ -62,7 +62,10 @@ class Scheduler {
       unitsWanted.put(unit, Math.max(unitsWanted(unit), unitsActual(unit) + request.add))
       unitsWanted.put(unit, Math.max(unitsWanted(unit), request.require))
       val differenceAfter = unitsWanted(unit) - unitsActual(unit)
-      val differenceChange = differenceAfter - differenceBefore
+      var differenceChange = differenceAfter - differenceBefore
+      if (unit.isTwoUnitsInOneEgg) {
+        differenceChange = (1 + differenceChange) / 2
+      }
       if (differenceChange > 0) {
         val buildables = (0 until differenceChange).map(i => request.buildable)
         buildables

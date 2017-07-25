@@ -46,11 +46,11 @@ class Battle(
   
   lazy val shouldAttack: Boolean = {
     estimationGeometricOffense.enemyDies ||
-    estimationGeometricOffense.netValue > estimationGeometricRetreat.netValue
+    estimationGeometricOffense.netValue > 0 //estimationGeometricRetreat.netValue
   }
   
   lazy val shouldRetreat: Boolean = {
     estimationGeometricOffense.weDie &&
-    estimationGeometricOffense.netValue < estimationGeometricRetreat.netValue
+    estimationGeometricOffense.netValue < 0 //estimationGeometricRetreat.netValue
   }
 }

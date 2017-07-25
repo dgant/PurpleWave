@@ -4,6 +4,7 @@ import Lifecycle.With
 import Planning.Plan
 import Planning.Plans.WinTheGame
 import Strategery.Strategies.Options.Protoss.ProtossChoices
+import Strategery.Strategies.Options.ZergChoices
 import Strategery.Strategies.Strategy
 
 import scala.collection.mutable
@@ -24,7 +25,8 @@ class Strategist {
     .getOrElse(new WinTheGame)
   
   def selectStrategies: Set[Strategy] = {
-    val strategies = filterForcedStrategies(ProtossChoices.options.filter(isAppropriate))
+    val strategies = filterForcedStrategies(
+      (ProtossChoices.options ++ ZergChoices.options).filter(isAppropriate))
     strategies.foreach(evaluate)
     chooseBest(strategies).toSet
   }
@@ -37,11 +39,11 @@ class Strategist {
   }
   
   private def isAppropriate(strategy: Strategy): Boolean = {
-    val ourRace = With.self.race
-    val enemyRaces = With.enemies.map(_.race).toSet
-    val isIsland = isIslandMap
-    val isGround = ! isIsland
-    val startLocations = With.geography.startLocations.size
+    val ourRace         = With.self.race
+    val enemyRaces      = With.enemies.map(_.race).toSet
+    val isIsland        = isIslandMap
+    val isGround        = ! isIsland
+    val startLocations  = With.geography.startLocations.size
     
     ! Playbook.disabled.contains(strategy)                          &&
     (strategy.islandMaps  || ! isIsland)                            &&

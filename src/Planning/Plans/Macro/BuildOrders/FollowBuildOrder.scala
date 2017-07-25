@@ -1,10 +1,10 @@
 package Planning.Plans.Macro.BuildOrders
 
+import Lifecycle.With
 import Macro.Buildables.Buildable
 import Performance.Caching.CacheFrame
 import Planning.Plan
-import Planning.Plans.Macro.Build.{BuildBuilding, ResearchTech, ResearchUpgrade, TrainUnit}
-import Lifecycle.With
+import Planning.Plans.Macro.Build._
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -44,10 +44,8 @@ class FollowBuildOrder extends Plan {
         .groupBy(buildable => buildable)
         .map(buildable => (
           buildable._1,
-          if (buildable._1.unitOption.exists(_.isTwoUnitsInOneEgg))
-            (buildable._2.size + 1) / 2
-          else
-            buildable._2.size))
+          buildable._2.size))
+    
     buildsNeeded.keys.foreach(build => {
       if ( ! plans.contains(build)) {
         plans.put(build, new ListBuffer[Plan])
@@ -67,6 +65,8 @@ class FollowBuildOrder extends Plan {
       val unitClass = buildable.unitOption.get
       if (unitClass.isBuilding) {
         return new BuildBuilding(unitClass)
+      } else if (unitClass.buildUnitsSpent.exists(_.isZerg)) {
+        return new MorphUnit(unitClass)
       } else {
         return new TrainUnit(unitClass)
       }

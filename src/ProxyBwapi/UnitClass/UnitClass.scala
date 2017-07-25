@@ -19,7 +19,7 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
     .replace("Special_", "")
     .replaceAll("_", " ")
   
-  override def toString:String = asStringNeat
+  override def toString: String = asStringNeat
   
   //////////////
   // Geometry //

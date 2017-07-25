@@ -30,8 +30,9 @@ class TrainContinuously(unitClass: UnitClass, maximum: Int = Int.MaxValue) exten
   }
   
   protected def buildCapacity: Int = {
+    val builderCount = With.units.ours.count(_.is(unitClass.whatBuilds._1))
     Vector(
-      With.units.ours.count(_.is(unitClass.whatBuilds._1)),
+      builderCount * (if (unitClass.isTwoUnitsInOneEgg) 2 else 1),
       if (unitClass.supplyRequired == 0) 400 else (400 - With.self.supplyUsed) / unitClass.supplyRequired
     ).min
   }

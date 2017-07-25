@@ -68,7 +68,7 @@ class BattleClusteringState(seedUnits: Set[UnitInfo]) {
     val tilesCasting    = if (unit.unitClass.isSpellcaster) 32 * 8 else 0
     val tilesAttacking  = unit.pixelRangeMax.toInt / 32
     val tilesMoving     = (unit.topSpeed * 24 * 4 / 32).toInt
-    val tilesMargin     = 3
+    val tilesMargin     = 5
     val tilesCustom     = tilesMargin + tilesMoving + Vector(tilesCasting, tilesAttacking, tilesDetecting).max
     val tilesLimit      = With.configuration.battleMarginTiles
     val output          = Math.min(tilesLimit, tilesCustom)

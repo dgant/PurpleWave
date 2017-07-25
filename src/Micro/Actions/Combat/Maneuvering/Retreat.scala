@@ -38,9 +38,9 @@ object Retreat extends Action {
     // If we're a melee unit trying to defend a choke against other melee units, hold the line!
     //
     lazy val threatsAllMelee = unit.matchups.threats.forall(_.melee)
-    lazy val inFormation = unit.action.toForm.exists(unit.pixelDistanceFast(_) < 4.0)
+    lazy val holdingFormation = unit.action.toForm.exists(unit.pixelDistanceFast(_) < 4.0)
     
-    if (unit.melee && threatsAllMelee && inFormation) {
+    if (unit.melee && threatsAllMelee && holdingFormation) {
       With.commander.hold(unit)
     }
     

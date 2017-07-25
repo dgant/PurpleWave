@@ -14,27 +14,18 @@ object FightOrFlight extends Action {
     if (Yolo.active) {
       Engage.consider(unit)
     }
-    else if (unit.matchups.threats.isEmpty) {
-      Engage.consider(unit)
-    }
     else if (unit.matchups.netValuePerFrameDiffused > 0.0) {
       Engage.consider(unit)
     }
     else if (unit.matchups.netValuePerFrameCurrently > 0.0) {
       Engage.consider(unit)
     }
+    else if (unit.battle.exists(_.shouldAttack) && unit.matchups.netValuePerFrameCurrently >= 0) {
+      Engage.consider(unit)
+    }
     
-    if (unit.matchups.threatsViolent.nonEmpty && unit.matchups.targets.isEmpty) {
+    if (unit.battle.exists(_.shouldRetreat) && unit.matchups.threats.nonEmpty) {
       Disengage.consider(unit)
     }
-
-    if (unit.battle.exists(_.shouldRetreat) &&
-      (
-        unit.matchups.netValuePerFrameCurrently < 0.0 ||
-        unit.matchups.netValuePerFrameDiffused < 0.0
-      )) {
-      Disengage.consider(unit)
-    }
-    Engage.consider(unit)
   }
 }

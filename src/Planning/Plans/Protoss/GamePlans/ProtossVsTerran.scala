@@ -186,6 +186,7 @@ class ProtossVsTerran extends Parallel {
       new Not(new Employing(PvTEarly4GateAllIn)),
       new MatchMiningBases(1)),
     new TakeThirdBaseSafely,
+    
     new OnMiningBases(2,
       new Parallel(
         new ProtossVsTerranIdeas.RespondToBioWithReavers,
@@ -193,8 +194,7 @@ class ProtossVsTerran extends Parallel {
         new IfCloakedThreats_Observers,
         new If(
           new UnitsAtLeast(8, UnitMatchWarriors, complete = true),
-          new FulfillMidgameTech),
-          new Build(RequestAtLeast(4, Protoss.Gateway)))),
+          new FulfillMidgameTech))),
     
     // Late game
     new If(

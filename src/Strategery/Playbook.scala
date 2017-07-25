@@ -23,7 +23,7 @@ object Playbook {
     AllPvZ,
     PvZEarlyFFELight,
     PvZMidgameCorsairDarkTemplar,
-    PvTEarly1015GateGoon
+    PvTEarly14Nexus
     /*
     AllPvP,
     PvPEarly1GateCore,

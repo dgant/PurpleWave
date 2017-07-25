@@ -5,7 +5,9 @@ import Mathematics.PurpleMath
 import Micro.Decisions.MicroValue
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, UnitInfo}
 
-case class MatchupAnalysis(us: UnitInfo, at: Pixel) {
+case class MatchupAnalysis(
+  us      : UnitInfo,
+  at      : Pixel) {
  
   def this(us: UnitInfo) {
     this(us, us.pixelCenter)
@@ -17,11 +19,12 @@ case class MatchupAnalysis(us: UnitInfo, at: Pixel) {
   lazy val enemies        : Vector[ForeignUnitInfo]   = if (us.battle.isEmpty) Vector.empty else us.battle.get.enemy.units.flatMap(_.foreign)
   lazy val others         : Vector[UnitInfo]          = allies ++ enemies
   lazy val allUnits       : Vector[UnitInfo]          = others :+ us
-  lazy val threats        : Vector[UnitInfo]  = enemies.filter(_.canAttackThisSecond(us))
-  lazy val targets        : Vector[UnitInfo]  = enemies.filter(us.canAttackThisSecond)
-  lazy val threatsViolent : Vector[UnitInfo]  = threats.filter(_.isBeingViolentTo(us))
-  lazy val threatsInRange : Vector[UnitInfo]  = threats.filter(threat => threat.pixelRangeAgainstFromCenter(us) >= threat.pixelDistanceFast(at))
-  lazy val targetsInRange : Vector[UnitInfo]  = targets.filter(target => us.pixelRangeAgainstFromCenter(target) >= target.pixelDistanceFast(at))
+  lazy val threats        : Vector[UnitInfo]          = enemies.filter(_.canAttackThisSecond(us))
+  lazy val targets        : Vector[UnitInfo]          = enemies.filter(us.canAttackThisSecond)
+  lazy val threatsViolent : Vector[UnitInfo]          = threats.filter(_.isBeingViolentTo(us))
+  lazy val threatsInRange : Vector[UnitInfo]          = threats.filter(threat => threat.pixelRangeAgainstFromCenter(us) >= threat.pixelDistanceFast(at))
+  lazy val targetsInRange : Vector[UnitInfo]          = targets.filter(target => us.pixelRangeAgainstFromCenter(target) >= target.pixelDistanceFast(at))
+  
   lazy val vpfDealingDiffused         : Double = targetsInRange.map(target => dpfDealingDiffused(target)  * MicroValue.valuePerDamage(target)).sum
   lazy val vpfDealingCurrently        : Double = targetsInRange.map(target => dpfDealingCurrently(target) * MicroValue.valuePerDamage(target)).sum
   lazy val dpfReceivingDiffused       : Double = threatsInRange.map(_.matchups.dpfDealingDiffused(us)).sum

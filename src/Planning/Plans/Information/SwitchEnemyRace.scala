@@ -17,7 +17,7 @@ class SwitchEnemyRace(
   val zerg    = new Property[Plan](whenZerg)
   val random  = new Property[Plan](whenRandom)
   
-  description.set("Choose race-specific plan")
+  description.set("Given enemy race")
   
   override def getChildren: Iterable[Plan] = Vector(terran.get, protoss.get, zerg.get, random.get)
   

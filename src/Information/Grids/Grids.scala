@@ -1,6 +1,6 @@
 package Information.Grids
 
-import Information.Grids.Construction.{GridBuildable, GridBuildableTerrain, GridPsi2Height, GridPsi3Height}
+import Information.Grids.Construction._
 import Information.Grids.Dpf._
 import Information.Grids.Movement._
 import Information.Grids.Vision.{GridAltitudeBonus, GridEnemyDetection}
@@ -11,6 +11,7 @@ class Grids {
   val buildable                 = new GridBuildable
   val buildableTerrain          = new GridBuildableTerrain
   val chokepoints               = new GridChokepoint
+  val creep                     = new GridCreep
   val enemyDetection            = new GridEnemyDetection
   val dpfEnemyAirConcussive     = new GridDpfEnemyAirConcussive
   val dpfEnemyAirExplosive      = new GridDpfEnemyAirExplosive

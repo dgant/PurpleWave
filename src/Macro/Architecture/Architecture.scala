@@ -21,6 +21,7 @@ class Architecture {
   val unwalkable      : mutable.Set[Tile]                         = new mutable.HashSet[Tile]
   val ungassable      : mutable.Set[Tile]                         = new mutable.HashSet[Tile]
   val untownhallable  : mutable.Set[Tile]                         = new mutable.HashSet[Tile]
+  val creep           : mutable.Set[Tile]                         = new mutable.HashSet[Tile]
   val powered2Height  : mutable.Set[Tile]                         = new mutable.HashSet[Tile]
   val powered3Height  : mutable.Set[Tile]                         = new mutable.HashSet[Tile]
   val existingPaths   : mutable.HashMap[Edge, TilePathCache]      = new mutable.HashMap[Edge, TilePathCache]

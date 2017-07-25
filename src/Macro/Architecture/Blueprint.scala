@@ -9,21 +9,22 @@ import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClass.UnitClass
 
 class Blueprint(
-  val proposer         : Plan,
-  val building         : Option[UnitClass]         = None,
-  argWidth             : Option[Int]               = None,
-  argHeight            : Option[Int]               = None,
-  argPowers            : Option[Boolean]           = None,
-  argPowered           : Option[Boolean]           = None,
-  argTownHall          : Option[Boolean]           = None,
-  argGas               : Option[Boolean]           = None,
-  argMargin            : Option[Boolean]           = None,
-  argWall              : Option[Boolean]           = None,
-  argPlacement         : Option[PlacementProfile]  = None,
-  argRangePixels       : Option[Double]            = None,
-  val tiles            : Option[Iterable[Tile]]    = None,
-  val zone             : Option[Zone]              = None,
-  respectHarvesting    : Boolean                   = true) {
+  val proposer        : Plan,
+  val building        : Option[UnitClass]         = None,
+  argWidth            : Option[Int]               = None,
+  argHeight           : Option[Int]               = None,
+  argPowers           : Option[Boolean]           = None,
+  argPowered          : Option[Boolean]           = None,
+  argRequireCreep     : Option[Boolean]           = None,
+  argTownHall         : Option[Boolean]           = None,
+  argGas              : Option[Boolean]           = None,
+  argMargin           : Option[Boolean]           = None,
+  argWall             : Option[Boolean]           = None,
+  argPlacement        : Option[PlacementProfile]  = None,
+  argRangePixels      : Option[Double]            = None,
+  val tiles           : Option[Iterable[Tile]]    = None,
+  val zone            : Option[Zone]              = None,
+  respectHarvesting   : Boolean                   = true) {
   
   var id: Option[Int] = None
   val frameCreated: Int = With.frame
@@ -32,6 +33,7 @@ class Blueprint(
   val heightTiles     : Int               = argHeight       .orElse(building.map(_.tileHeight)).getOrElse(1)
   val powers          : Boolean           = argPowers       .getOrElse(building.contains(Protoss.Pylon))
   val powered         : Boolean           = argPowered      .getOrElse(building.exists(_.requiresPsi))
+  val requireCreep    : Boolean           = argRequireCreep .getOrElse(building.exists(_.requiresCreep))
   val townHall        : Boolean           = argTownHall     .getOrElse(building.exists(_.isTownHall))
   val gas             : Boolean           = argGas          .getOrElse(building.exists(_.isRefinery))
   val margin          : Boolean           = argMargin       .getOrElse(building.exists(With.architecture.usuallyNeedsMargin))
@@ -74,6 +76,10 @@ class Blueprint(
       if (heightTiles == 2 && ! With.grids.psi2Height.get(tile) && ! With.architecture.powered2Height.contains(tile)) {
         return false
       }
+    }
+    
+    if (requireCreep && ! With.grids.creep.get(tile)) {
+      return false
     }
     
     val thisZone = tile.zone

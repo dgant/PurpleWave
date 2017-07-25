@@ -27,5 +27,7 @@ object FightOrFlight extends Action {
     if (unit.battle.exists(_.shouldRetreat) && unit.matchups.threats.nonEmpty) {
       Disengage.consider(unit)
     }
+    
+    Engage.consider(unit)
   }
 }

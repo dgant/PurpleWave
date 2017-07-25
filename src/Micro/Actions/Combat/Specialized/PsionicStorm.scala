@@ -20,7 +20,7 @@ object PsionicStorm extends Action {
     
     val dying         = unit.matchups.framesToLiveCurrently < 24.0
     val targets       = unit.matchups.allUnits.filter(e => ! e.unitClass.isBuilding && unit.pixelDistanceFast(e) < 12.0 * 32.0 && ! unit.underStorm)
-    val targetsByTile = targets.groupBy(_.project(12).tileIncluding)
+    val targetsByTile = targets.groupBy(_.project(6).tileIncluding)
     val targetValues  = targets.map(target => (target, valueTarget(target))).toMap
     val valueByTile   = targetsByTile.keys.map(tile => (tile, tile.adjacent8.flatMap(targetsByTile.get).flatten.map(targetValues).sum)).toMap
     
@@ -39,7 +39,7 @@ object PsionicStorm extends Action {
         if(target.isFriendly)
           -5.0
         else if (target.isEnemy)
-          1.0 * Math.min(1.0, PurpleMath.nanToZero(24 / target.matchups.framesToLiveDiffused))
+          1.0 * Math.max(1.0, PurpleMath.nanToZero(target.matchups.framesToLiveDiffused / 48))
         else
           0.0
       )

@@ -27,6 +27,12 @@ class ZergGamePlan extends Parallel {
     RequestAtLeast(2,   Zerg.Hatchery),
     RequestAtLeast(1,   Zerg.SpawningPool),
     RequestAtLeast(2,   Zerg.Overlord)))
+  
+  class ImplementPvZ9Hatch9PoolAllIn extends Employ(PvZ9Hatch9PoolAllIn, new Build(
+    RequestAtLeast(9,   Zerg.Drone),
+    RequestAtLeast(2,   Zerg.Hatchery),
+    RequestAtLeast(1,   Zerg.SpawningPool),
+    RequestAtLeast(2,   Zerg.Overlord)))
  
   children.set(Vector(
     new ImplementPvZ4PoolAllIn,

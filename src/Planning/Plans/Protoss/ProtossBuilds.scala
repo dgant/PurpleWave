@@ -225,7 +225,9 @@ object ProtossBuilds {
     RequestAtLeast(1,   Protoss.Pylon),
     RequestAtLeast(12,  Protoss.Probe),
     RequestAtLeast(2,   Protoss.Nexus),
-    RequestAtLeast(1,   Protoss.Gateway),
+    //This should only be done vs 12-hatch, not 9-hatch
+    //Our building placement also seems to demand a new Pylon for this
+    //RequestAtLeast(1,   Protoss.Gateway),
     RequestAtLeast(1,   Protoss.Forge),
     RequestAtLeast(15,  Protoss.Probe),
     RequestAtLeast(2,   Protoss.Pylon))

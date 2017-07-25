@@ -78,10 +78,6 @@ class Blueprint(
       }
     }
     
-    if (requireCreep && ! With.grids.creep.get(tile)) {
-      return false
-    }
-    
     val thisZone = tile.zone
     if (thisZone.island && ! With.strategy.isPlasma) {
       return false
@@ -106,6 +102,7 @@ class Blueprint(
       nextTile.valid &&
       (
         if (buildArea.contains(nextTile)) {
+          (! requireCreep || With.grids.creep.get(tile)) &&
           With.architecture.buildable(nextTile) && (
             ( ! respectHarvesting && ! thisZone.owner.isUs) ||
             ! With.architecture.isHarvestingArea(nextTile)

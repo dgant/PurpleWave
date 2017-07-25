@@ -11,11 +11,12 @@ class GridCreep extends AbstractGridBoolean {
   // So we need to actually query for this
   
   override def update(): Unit = {
+    val length = values.length
     var i = 0
-    var length = values.length
     while (i < length) {
-      var tile = new Tile(i)
+      val tile = new Tile(i)
       values(i) = With.game.hasCreep(tile.x, tile.y)
+      i += 1
     }
   }
     

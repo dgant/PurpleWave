@@ -4,8 +4,9 @@ import Information.Battles.Estimations.{AvatarBuilder, Estimation, Estimator}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 class UnitCountCombat(
-  val enemies: Iterable[UnitInfo],
-  val alwaysAccept: Boolean) extends UnitCounter {
+  val enemies       : Iterable[UnitInfo],
+  val alwaysAccept  : Boolean,
+  val overkill      : Double = 1.5) extends UnitCounter {
   
   val builder = new AvatarBuilder
   var lastEstimation: Estimation = _
@@ -32,9 +33,8 @@ class UnitCountCombat(
   //////////
   
   private def isSufficient: Boolean = {
-    builder.avatarEnemy.totalUnits == 0 ||
-    (lastEstimation.enemyDies && ! lastEstimation.weSurvive)
-    lastEstimation.netValue > 0.0
+    (builder.avatarEnemy.totalUnits == 0 || (lastEstimation.enemyDies && ! lastEstimation.weSurvive)) &&
+    lastEstimation.costToEnemy * overkill >= lastEstimation.costToUs
   }
   
   private def isAcceptable: Boolean = {

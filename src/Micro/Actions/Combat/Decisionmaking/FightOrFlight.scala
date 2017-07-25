@@ -20,11 +20,11 @@ object FightOrFlight extends Action {
     else if (unit.matchups.netValuePerFrameCurrently > 0.0) {
       Engage.consider(unit)
     }
-    else if (unit.battle.exists(_.shouldAttack) && unit.matchups.netValuePerFrameCurrently >= 0) {
+    else if (unit.battle.exists(_.shouldAttackLocally) && unit.matchups.netValuePerFrameCurrently >= 0) {
       Engage.consider(unit)
     }
     
-    if (unit.battle.exists(_.shouldRetreat) && unit.matchups.threats.nonEmpty) {
+    if (unit.battle.exists(_.shouldRetreatLocally) && unit.matchups.threats.nonEmpty) {
       Disengage.consider(unit)
     }
     

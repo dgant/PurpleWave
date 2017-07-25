@@ -10,7 +10,7 @@ object Unstick extends Action {
   override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.canMoveThisFrame &&
     unit.seeminglyStuck   &&
-    ! unit.is(Protoss.Carrier)
+    ! unit.is(Protoss.Carrier) //Telling a Carrier to stop withdraws its interceptors. Really harmful. Never seen one get stuck anyhow.
   }
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {

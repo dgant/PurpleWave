@@ -316,6 +316,7 @@ class ProtossVsZerg extends Parallel {
       RequestAtLeast(1, Protoss.CitadelOfAdun),
       RequestAtLeast(8, Protoss.Gateway),
       RequestAtLeast(1, Protoss.TemplarArchives),
+      RequestUpgrade(Protoss.HighTemplarEnergy),
       RequestTech(Protoss.PsionicStorm),
       RequestUpgrade(Protoss.HighTemplarEnergy),
       RequestAtLeast(10, Protoss.Gateway)),

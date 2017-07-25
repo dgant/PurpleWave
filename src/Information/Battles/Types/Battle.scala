@@ -40,16 +40,27 @@ class Battle(
   ///////////////
   
   lazy val attackDesire: Double = {
-    0.0
-    //if (estimationGeometricOffense.enemyDies)
+    estimationGeometricOffense.costToEnemy / Math.max(1.0, estimationGeometricOffense.costToUs)
   }
   
-  lazy val shouldAttack: Boolean = {
+  lazy val shouldAttackGlobally: Boolean = {
+    estimationAbstractOffense.enemyDies || estimationAbstractOffense.netValue > 0
+  }
+  
+  lazy val safeDefensivelyGlobally: Boolean = {
+    estimationAbstractDefense.weSurvive && estimationAbstractDefense.netValue >= 0
+  }
+  
+  lazy val shouldRetreatLocally: Boolean = {
+    estimationGeometricOffense.weDie && estimationGeometricOffense.netValue < 0
+  }
+  
+  lazy val shouldAttackLocally: Boolean = {
     estimationGeometricOffense.enemyDies ||
     estimationGeometricOffense.netValue > 0 //estimationGeometricRetreat.netValue
   }
   
-  lazy val shouldRetreat: Boolean = {
+  lazy val shouldRetreatLocally: Boolean = {
     estimationGeometricOffense.weDie &&
     estimationGeometricOffense.netValue < 0 //estimationGeometricRetreat.netValue
   }

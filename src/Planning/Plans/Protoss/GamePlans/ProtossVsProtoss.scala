@@ -123,6 +123,14 @@ class ProtossVsProtoss extends Parallel {
       RequestAtLeast(1, Protoss.Observatory),
       RequestAtLeast(1, Protoss.RoboticsSupportBay)))
   
+  private class BuildReaversOrTemplar extends Parallel(
+    new If(
+      new UnitsAtLeast(1, UnitMatchType(Protoss.TemplarArchives), complete = true),
+      new Parallel(
+        new TrainContinuously(Protoss.HighTemplar,  6),
+        new TrainContinuously(Protoss.Reaver,       1)),
+      new TrainContinuously(Protoss.Reaver, 4)))
+  
   ///////////////
   // Expanding //
   ///////////////
@@ -173,6 +181,8 @@ class ProtossVsProtoss extends Parallel {
   /////////////////
   
   children.set(Vector(
+  
+    new MeldArchons(40),
     
     // Early game
     new RequireMiningBases(1),
@@ -194,6 +204,10 @@ class ProtossVsProtoss extends Parallel {
     new TrainProbesContinuously,
     
     // Units/Upgrades
+    
+    new If(
+      new UnitsAtLeast(2, UnitMatchType(Protoss.HighTemplar), complete = false),
+      new Build(RequestTech(Protoss.PsionicStorm))),
   
     new If(
       new And(
@@ -221,10 +235,10 @@ class ProtossVsProtoss extends Parallel {
       new EnemyHasShown(Protoss.DarkTemplar),
       new Parallel(
         new TrainContinuously(Protoss.Observer, 2),
-        new TrainContinuously(Protoss.Reaver, 4)),
+        new BuildReaversOrTemplar,
       new Parallel(
-        new TrainContinuously(Protoss.Reaver, 4),
-        new TrainContinuously(Protoss.Observer, 1))),
+        new BuildReaversOrTemplar,
+        new TrainContinuously(Protoss.Observer, 1)))),
     new BuildDragoonsOrZealots,
     
     // Midgame
@@ -274,13 +288,13 @@ class ProtossVsProtoss extends Parallel {
           new Parallel(
             new UpgradeContinuously(Protoss.GroundDamage),
             new Build(
-              RequestAtLeast(2, Protoss.RoboticsFacility),
               RequestAtLeast(7, Protoss.Gateway),
               RequestAtLeast(1, Protoss.Forge),
               RequestAtLeast(1, Protoss.TemplarArchives),
-              RequestAtLeast(2, Protoss.Forge)),
+              RequestAtLeast(2, Protoss.Forge),
+              RequestUpgrade(Protoss.HighTemplarEnergy)),
             new UpgradeContinuously(Protoss.GroundArmor),
-            new Build(RequestAtLeast(10, Protoss.Gateway)))))),
+            new Build(RequestAtLeast(12, Protoss.Gateway)))))),
     
     new ScoutExpansionsAt(70),
     new If(

@@ -6,7 +6,7 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 class UnitCountCombat(
   val enemies       : Iterable[UnitInfo],
   val alwaysAccept  : Boolean,
-  val overkill      : Double = 1.5) extends UnitCounter {
+  val overkill      : Double = 2.0) extends UnitCounter {
   
   val builder = new AvatarBuilder
   var lastEstimation: Estimation = _

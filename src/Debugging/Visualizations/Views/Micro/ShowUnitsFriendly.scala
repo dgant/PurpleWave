@@ -4,6 +4,7 @@ import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.View
 import Lifecycle.With
+import Mathematics.Points.Pixel
 import Micro.Execution.ActionState
 
 object ShowUnitsFriendly extends View {
@@ -29,6 +30,15 @@ object ShowUnitsFriendly extends View {
       state.unit.command.map(_.getUnitCommandType.toString).getOrElse(""),
       state.unit.pixelCenter.add(0, -7),
       drawBackground = false)
+    
+    if (state.desireTotal != 0.0) {
+      val left = state.unit.left
+      val y = state.unit.pixelCenter.y
+      val width = state.unit.unitClass.width/3
+      drawDesire(state.desireTeam,        left,                 y, width)
+      drawDesire(state.desireIndividual,  left + width     / 3, y, width)
+      drawDesire(state.desireTotal,       left + width * 2 / 3, y, width)
+    }
     /*
         DrawMap.label(
       state.unit.order.toString,
@@ -62,5 +72,14 @@ object ShowUnitsFriendly extends View {
     }
     
     */
+  }
+  
+  def drawDesire(desire: Double, x: Int, y: Int, width: Int) {
+    val color = if (desire > 0.0) Colors.DarkGreen else Colors.MediumRed
+    DrawMap.box(
+      Pixel(x, y),
+      Pixel(x+width, y+With.visualization.lineHeightSmall),
+      solid = true,
+      color = color)
   }
 }

@@ -15,6 +15,10 @@ object Idle extends Action {
   }
   
   override def perform(unit: FriendlyUnitInfo) {
+  
+    ////////////
+    // Intent //
+    ////////////
     
     unit.action.toReturn        = unit.action.intent.toReturn
     unit.action.toTravel        = unit.action.intent.toTravel
@@ -31,6 +35,18 @@ object Idle extends Action {
     unit.action.canPursue       = unit.action.intent.canPursue
     unit.action.canCower        = unit.action.intent.canCower
     unit.action.canMeld         = unit.action.intent.canMeld
+  
+    /////////////////
+    // Diagnostics //
+    /////////////////
+  
+    unit.action.desireTeam        = 0.0
+    unit.action.desireIndividual  = 0.0
+    unit.action.desireTotal       = 0.0
+  
+    /////////
+    // ACT //
+    /////////
     
     actions.foreach(_.consider(unit))
     

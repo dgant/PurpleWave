@@ -24,7 +24,7 @@ object BeACarrier extends Action {
     lazy val interceptorsAreShooting  = interceptorsFighting * 2 >= interceptorsTotal
     lazy val exitingLeash             = unit.matchups.targets.forall(_.pixelDistanceFast(unit) > 32.0 * 9.0)
     
-    if (interceptorsTotal > 3 && (exitingLeash || ! interceptorsAreShooting)) {
+    if (interceptorsTotal > 2 && (exitingLeash || ! interceptorsAreShooting)) {
       TargetRelevant.delegate(unit)
       Attack.consider(unit)
     }

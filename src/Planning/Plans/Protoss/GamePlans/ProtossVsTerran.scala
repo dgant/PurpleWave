@@ -70,8 +70,8 @@ class ProtossVsTerran extends Parallel {
   private class ImplementLateCarriers extends OnMiningBases(3,
     new Parallel(
       new Build(
+        RequestAtLeast(8, Protoss.Gateway),
         RequestAtLeast(1, Protoss.Stargate),
-        RequestAtLeast(5, Protoss.Gateway),
         RequestAtLeast(1, Protoss.FleetBeacon),
         RequestAtLeast(3, Protoss.Stargate),
         RequestUpgrade(Protoss.AirDamage, 1),

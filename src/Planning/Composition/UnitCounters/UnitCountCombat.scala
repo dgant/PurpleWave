@@ -33,11 +33,10 @@ class UnitCountCombat(
   //////////
   
   private def isSufficient: Boolean = {
-    (builder.avatarEnemy.totalUnits == 0 || (lastEstimation.enemyDies && ! lastEstimation.weSurvive)) &&
-    lastEstimation.costToEnemy * overkill >= lastEstimation.costToUs
+    (lastEstimation.enemyDies && ! lastEstimation.weSurvive) || lastEstimation.costToEnemy * overkill >= lastEstimation.costToUs
   }
   
   private def isAcceptable: Boolean = {
-    alwaysAccept || isSufficient || lastEstimation.weGainValue || lastEstimation.enemyDies
+    alwaysAccept || isSufficient || lastEstimation.weGainValue || lastEstimation.weSurvive
   }
 }

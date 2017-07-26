@@ -12,7 +12,7 @@ import Planning.Plans.Macro.Expanding.{BuildAssimilators, MatchMiningBases, Requ
 import Planning.Plans.Macro.Milestones._
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Protoss.ProtossBuilds
-import Planning.Plans.Protoss.Situational.{ForgeFastExpand, Nexus2GateThenCannons, TwoGatewaysAtNatural}
+import Planning.Plans.Protoss.Situational.{ForgeFastExpand, TwoGatewaysAtNatural}
 import Planning.Plans.Scouting.{RequireEnemyBase, ScoutExpansionsAt}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Options.Protoss.PvP._
@@ -43,7 +43,7 @@ class ProtossVsProtoss extends Parallel {
   
   private class ImplementEarlyFE extends FirstFiveMinutes(
     new Parallel(
-      new Nexus2GateThenCannons,
+      //new Nexus2GateThenCannons,
       new Build(
         RequestAtLeast(1,   Protoss.Nexus),
         RequestAtLeast(8,   Protoss.Probe),
@@ -58,9 +58,10 @@ class ProtossVsProtoss extends Parallel {
       new Build(
         RequestAtLeast(2, Protoss.Pylon),
         RequestAtLeast(1, Protoss.Assimilator),
-        RequestAtLeast(1, Protoss.CyberneticsCore),
-        RequestAtLeast(1, Protoss.Forge),
-        RequestAtLeast(3, Protoss.PhotonCannon))))
+        RequestAtLeast(1, Protoss.CyberneticsCore)
+        //RequestAtLeast(1, Protoss.Forge),
+        //RequestAtLeast(3, Protoss.PhotonCannon)
+      )))
     
   private class ImplementEarlyFFE extends FirstFiveMinutes(
     new Parallel(
@@ -242,6 +243,13 @@ class ProtossVsProtoss extends Parallel {
     new BuildDragoonsOrZealots,
     
     // Midgame
+    
+    // Don't directly go expand-> tech
+    new OnMiningBases(2,
+      new If(
+        new UnitsAtLeast(1, UnitMatchType(Protoss.CyberneticsCore)),
+        new Build(RequestAtLeast(4, Protoss.Gateway)))),
+      
     new Employ(PvPMidgame4GateGoon,       new ImplementMidgame4GateGoon),
     new Employ(PvPMidgameDarkTemplar,     new ImplementMidgameDarkTemplar),
     new Employ(PvPMidgameCarriers,        new ImplementMidgameCarriers),

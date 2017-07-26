@@ -277,9 +277,9 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
     )))
   
   def canAttackThisSecond(enemy: UnitInfo): Boolean =
-    canAttackThisSecond &&
-    enemy.canBeAttackedThisFrame &&
-    ! enemy.effectivelyCloaked && // Eh.
+    canAttackThisSecond           &&
+    enemy.canBeAttackedThisFrame  &&
+    ! enemy.effectivelyCloaked    && // Eh.
     (if (enemy.flying) unitClass.attacksAir else unitClass.attacksGround)
   
   // Frame X:     Unit's cooldown is 0.   Unit starts attacking.

@@ -33,7 +33,7 @@ class ControlZone(zone: Zone) extends Plan {
     threats = enemies.filter(threat => threat.canAttackThisSecond && ! threat.unitClass.isWorker && threat.likelyStillThere)
     if (threats.nonEmpty) {
       fighters.get.unitMatcher.set(UnitMatchCombat(enemies))
-      fighters.get.unitCounter.set(new UnitCountCombat(enemies, alwaysAccept = ourBase.isDefined))
+      fighters.get.unitCounter.set(new UnitCountCombat(enemies, alwaysAccept = ourBase.isDefined, overkill = if (ourBase.isDefined) 1.2 else 2.0))
       fighters.get.acquire(this)
       
       if (fighters.get.satisfied) {

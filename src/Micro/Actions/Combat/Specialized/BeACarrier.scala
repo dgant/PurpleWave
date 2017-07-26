@@ -19,12 +19,12 @@ object BeACarrier extends Action {
   
   override protected def perform(unit: FriendlyUnitInfo) {
     
-    lazy val interceptorsTotal        = unit.interceptorCount
+    lazy val interceptorsTotal        = unit.interceptors.count(_.aliveAndComplete)
     lazy val interceptorsFighting     = unit.interceptors.count(_.order == Orders.InterceptorAttack)
     lazy val interceptorsAreShooting  = interceptorsFighting * 2 >= interceptorsTotal
     lazy val exitingLeash             = unit.matchups.targets.forall(_.pixelDistanceFast(unit) > 32.0 * 9.0)
     
-    if (exitingLeash || ! interceptorsAreShooting) {
+    if (interceptorsTotal > 3 && (exitingLeash || ! interceptorsAreShooting)) {
       TargetRelevant.delegate(unit)
       Attack.consider(unit)
     }

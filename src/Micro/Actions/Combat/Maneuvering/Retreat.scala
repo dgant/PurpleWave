@@ -4,7 +4,6 @@ import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Attacking.Potshot
 import Micro.Actions.Combat.Decisionmaking.Engage
-import Micro.Actions.Combat.Specialized.CarrierRetreat
 import Micro.Actions.Commands.Travel
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -19,21 +18,18 @@ object Retreat extends Action {
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
   
     unit.action.toTravel = Some(unit.action.origin)
-
-    CarrierRetreat.delegate(unit)
   
+    lazy val zone               = unit.pixelCenter.zone
+    lazy val originZone         = unit.action.origin.zone
+    lazy val exitToOrigin       = zone.pathTo(originZone).flatMap(_.steps.headOption.map(_.edge.centerPixel))
     lazy val threatsAllMelee    = unit.matchups.threats.forall(_.melee)
-    lazy val alreadyHome        = unit.pixelCenter.zone == unit.action.origin.zone
+    lazy val alreadyHome        = zone == originZone
     lazy val holdingFormation   = unit.action.toForm.exists(unit.pixelDistanceFast(_) < 4.0)
-    lazy val canTakeFreeShots   = unit.matchups.threatsInRange.isEmpty
+    lazy val canTakeFreeShots   = unit.matchups.inFrames(unit.unitClass.stopFrames).threatsInRange.isEmpty
     lazy val slowerThanThreats  = unit.matchups.threats.forall(_.topSpeedChasing > unit.topSpeed)
-    lazy val trapped            = unit.damageInLastSecond > 0 &&
-      unit.matchups.threatsViolent.count(threat =>
-        threat.melee
-          && threat.topSpeedChasing > unit.topSpeed
-          && threat.pixelDistanceFast(unit) < 48.0) > 2
+    lazy val trapped            = unit.damageInLastSecond > 0 && (exitToOrigin.isEmpty || unit.matchups.framesToLiveCurrently < unit.framesToTravelTo(exitToOrigin.get))
     
-    if (canTakeFreeShots || slowerThanThreats || trapped) {
+    if (canTakeFreeShots || slowerThanThreats || alreadyHome || trapped) {
       Potshot.delegate(unit)
     }
     
@@ -44,8 +40,10 @@ object Retreat extends Action {
     if (alreadyHome) {
       Engage.consider(unit)
     }
+    else if (trapped) {
+      HoverOutsideRange.delegate(unit)
+    }
     else {
-      // TODO: Dodge! Kite!
       Travel.delegate(unit)
     }
   }

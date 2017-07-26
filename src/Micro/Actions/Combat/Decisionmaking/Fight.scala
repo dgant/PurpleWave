@@ -16,8 +16,8 @@ object Fight extends Action {
     Cower.consider(unit)
     Sneak.consider(unit)
     BeACarrier.consider(unit)
-    Cast.consider(unit)
     Recover.consider(unit)
+    Cast.consider(unit)
     BustBunker.consider(unit)
     FightOrFlight.consider(unit)
   }

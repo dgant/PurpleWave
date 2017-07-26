@@ -1,17 +1,83 @@
 package Micro.Intent
 
 import Lifecycle.With
+import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-object DragoonDelay {
-  
-  def nextSafeFrameToOrder(dragoon: FriendlyUnitInfo): Int = {
-    dragoon.lastAttackStartFrame + 1 + 9 - With.latency.framesRemaining
-  }
-  
+object AttackDelay {
   
   /*
-  Update: June 2017
+  Units get stuck when they execute a move order shortly after their attack animation finishes.
+  The goal here is to withhold orders until the unit can safely receive them.
+  
+  In practice it's probably impossible to fully prevent stuck units without having frame-perfect movement and range calculations.
+  Units will start attacks at times you don't expect.
+  It'll fool you into issuing an order when you think it's safe but which after latency causes the unit to stick.
+  So having good stuck-unit detection and unsticking is also important.
+  */
+  
+  def framesToWaitAfterIssuingAttackOrder(unit: FriendlyUnitInfo): Int = {
+    1 + Math.max(With.latency.latencyFrames, unit.unitClass.stopFrames)
+  }
+  
+  def nextSafeOrderFrame(unit: FriendlyUnitInfo): Int = {
+    if (unit.is(Protoss.Dragoon))
+      nextSafeOrderFrameDragoon(unit)
+    else
+      nextSafeOrderFrameInGeneral(unit)
+  }
+  
+  private def nextSafeOrderFrameInGeneral(unit: FriendlyUnitInfo): Int = {
+    unit.lastAttackStartFrame + unit.unitClass.stopFrames - With.latency.latencyFrames
+  }
+  
+  private def nextSafeOrderFrameDragoon(dragoon: FriendlyUnitInfo): Int = {
+    dragoon.lastAttackStartFrame + 1 + 9 - With.latency.latencyFrames
+  }
+  
+  /*
+  Here's the math justifying the above calculations.
+  This math assumes turn size 1. Turn sizes in most cases are 1 (Local PC) or 2 (LAN).
+  For some turn size T > 1 you could be a bit more precise and save N - 1 frames.
+  
+  ---
+
+  Scenario 1:
+  Latency frames: 5
+  Stop frames: 	  10
+  
+  Frame 0: Issue attack order
+  Frame 5: Receive attack order
+  Frame 6: Execute attack order <-- Attack animation starts
+  Frame 11: Issue move order    <-- Attack start frame (6) + stop frames (10) - latency frames (5)
+  Frame 15: Last stopped frame.
+  Frame 16: Receive move order. If we started moving now we would get stuck.
+  Frame 17: Start moving
+  
+  ---
+  
+  Scenario 2:
+  Latency frames: 5
+  Stop frames:	  2
+  
+  Frame 0: Issue attack order
+  Frame 3; Issue move order
+  Frame 5: Receive attack order
+  Frame 6: Execute attack order
+  Frame 7: Last stopped frame
+  Frame 8: Receive move order. If we started moving now we would get stuck.
+  Frame 9: Start moving
+  
+  ---
+  
+  Conclusion:
+  If you issue an attack order on frame N,
+  The next safe time to issue a move order to the unit is 1 + Max(Latency frames, stop frames)
+  And once you see a unit starting to attack, withhold orders until (Attack start frame + stop frames - latency frames)
+   */
+  
+  /*
+  Notes from June 2017
   
   PurpleWaveJadien: Alright. Let's solve this once and for all so I can die 200 years old and not have once thought about dragoon attack cancelling ever again
   PurpleWaveJadien: Frame 0: Dragoon isAttackStarting becomes true.
@@ -47,7 +113,7 @@ object DragoonDelay {
   jaj22: you can unstick them by giving a move order in the opposite direction too
   jaj22: you may have to wait for the move order to kick in  :P
   jaj22: hmm, unstick angle looks like <45 degrees
-   */
+  */
   
   // https://docs.google.com/spreadsheets/d/1bsvPvFil-kpvEUfSG74U3E5PLSTC02JxSkiR8QdLMuw/edit#gid=0
   //

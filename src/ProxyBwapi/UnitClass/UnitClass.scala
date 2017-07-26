@@ -339,6 +339,8 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
     2 // Arbitrary.
   }
   
+  // These numbers are taken from Dave Churchill's table,
+  // but the Dragoon number at least doesn't seem to correlate to the required delay to prevent attack cancelling.
   lazy val minStop: Int = {
     if (this == Protoss.Dragoon           ) 5   else
     if (this == Zerg.Devourer             ) 7   else

@@ -1,8 +1,8 @@
 package Micro.Actions.Combat.Decisionmaking
 
 import Micro.Actions.Action
-import Micro.Actions.Combat.Specialized.PsionicStorm
-import ProxyBwapi.Races.Protoss
+import Micro.Actions.Combat.Maneuvering.HoverOutsideRange
+import Micro.Actions.Combat.Spells.PsionicStorm
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Cast extends Action {
@@ -12,8 +12,7 @@ object Cast extends Action {
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {
-    if (unit.is(Protoss.HighTemplar)) {
-      PsionicStorm.consider(unit)
-    }
+    PsionicStorm.consider(unit)
+    HoverOutsideRange.consider(unit)
   }
 }

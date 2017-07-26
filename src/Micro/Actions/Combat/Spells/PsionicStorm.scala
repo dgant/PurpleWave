@@ -1,4 +1,4 @@
-package Micro.Actions.Combat.Specialized
+package Micro.Actions.Combat.Spells
 
 import Lifecycle.With
 import Mathematics.PurpleMath
@@ -10,9 +10,9 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 object PsionicStorm extends Action {
   
   override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.is(Protoss.HighTemplar) &&
-    unit.energy >= Protoss.PsionicStorm.energyCost &&
-    With.self.hasTech(Protoss.PsionicStorm) &&
+    unit.is(Protoss.HighTemplar)                    &&
+    unit.energy >= Protoss.PsionicStorm.energyCost  &&
+    With.self.hasTech(Protoss.PsionicStorm)         &&
     unit.matchups.enemies.nonEmpty
   }
   

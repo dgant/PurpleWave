@@ -22,9 +22,7 @@ class Commander {
   
   def run() {
     nextOrderFrame.keys.filterNot(_.alive).foreach(nextOrderFrame.remove)
-    nextOrderFrame.keys
-      .filter(unit => unit.is(Protoss.Dragoon))
-      .foreach(dragoon => nextOrderFrame(dragoon) = Math.max(nextOrderFrame(dragoon), DragoonDelay.nextSafeFrameToOrder(dragoon)))
+    nextOrderFrame.keys.foreach(unit => nextOrderFrame(unit) = Math.max(nextOrderFrame(unit), AttackDelay.nextSafeOrderFrame(unit)))
   }
   
   def ready(unit: FriendlyUnitInfo): Boolean = {
@@ -239,7 +237,7 @@ class Commander {
   }
   
   private def sleepAttack(unit: FriendlyUnitInfo) {
-    sleep(unit, With.latency.latencyFrames + 1) // Make sure we don't cancel an attack before the order has executed
+    sleep(unit, AttackDelay.framesToWaitAfterIssuingAttackOrder(unit))
   }
   
   private def sleepBuild(unit: FriendlyUnitInfo) {

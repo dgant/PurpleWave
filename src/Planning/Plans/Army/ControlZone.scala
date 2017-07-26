@@ -37,13 +37,20 @@ class ControlZone(zone: Zone) extends Plan {
       fighters.get.acquire(this)
       
       if (fighters.get.satisfied) {
-        val target = threats
+        
+        val focus = threats
           .map(_.pixelCenter)
           .minBy(_.pixelDistanceFast(ourBase.map(_.heart).getOrElse(zone.centroid).pixelCenter))
   
-        fighters.get.units.foreach(_.intend(new Intention(this) {
-          toTravel = Some(target)
+        fighters.get.units.foreach(fighter => fighter.intend(new Intention(this) {
           canPursue = true
+          toTravel = {
+            val attackables = threats.filter(fighter.canAttackThisSecond)
+            if (attackables.isEmpty)
+              Some(focus)
+            else
+              Some(attackables.minBy(_.pixelDistanceFast(fighter)).pixelCenter)
+          }
         }))
   
         val cloakedThreats = threats.filter(threat => threat.cloaked || threat.burrowed)

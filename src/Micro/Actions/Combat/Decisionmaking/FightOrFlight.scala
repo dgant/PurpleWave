@@ -16,12 +16,16 @@ object FightOrFlight extends Action {
       Engage.consider(unit)
     }
   
-    val doomed    = unit.matchups.doomed
-    val matchups  = unit.matchups.inFrames(24)
+    val prioritizeTeam  = 2.0
+    val prioritizeSelf  = 1.0
+    val doomed          = unit.matchups.doomed
+    val matchups        = unit.matchups.inFrames(24)
     
     unit.action.desireTeam        = unit.battle.map(_.desire).getOrElse(1.0)
     unit.action.desireIndividual  = PurpleMath.nanToInfinity(matchups.vpfDealingDiffused / matchups.vpfReceivingDiffused) // NaN: If we're taking no damage, great!
-    unit.action.desireTotal       = PurpleMath.nanToInfinity(unit.action.desireTeam * unit.action.desireIndividual)       // NaN: If the team has no preference and we're happy, great!
+    unit.action.desireTotal       = PurpleMath.nanToInfinity(
+      Math.pow(unit.action.desireTeam,        prioritizeTeam) *
+      Math.pow(unit.action.desireIndividual,  prioritizeSelf)) // NaN: If the team has no preference and we're happy, great!
   
     if (doomed) {
       Engage.consider(unit)

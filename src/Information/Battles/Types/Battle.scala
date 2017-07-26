@@ -2,7 +2,9 @@ package Information.Battles.Types
 
 import Information.Battles.BattleUpdater
 import Information.Battles.Estimations.Estimation
+import Lifecycle.With
 import Mathematics.Points.Pixel
+import Mathematics.PurpleMath
 import Utilities.EnrichPixel.EnrichedPixelCollection
 
 class Battle(
@@ -40,8 +42,15 @@ class Battle(
   ///////////////
   
   lazy val desire: Double = {
-    val fighters = us.units.filter(_.canAttackThisSecond)
-    estimationGeometricOffense.costToEnemy / Math.max(1.0, estimationGeometricOffense.costToUs)
+    val nearestBaseOurs   = if (With.geography.ourBases.isEmpty)    With.geography.home.pixelCenter                     else With.geography.ourBases  .map(_.heart.pixelCenter).minBy(_.groundPixels(focus))
+    val nearestBaseEnemy  = if (With.geography.enemyBases.isEmpty)  With.intelligence.mostBaselikeEnemyTile.pixelCenter else With.geography.enemyBases.map(_.heart.pixelCenter).minBy(_.groundPixels(focus))
+    val urgencyOurs       = focus.pixelDistanceFast(nearestBaseEnemy)
+    val urgencyEnemy      = focus.pixelDistanceFast(nearestBaseOurs)
+    val fighters          = us.units.filter(_.canAttackThisSecond)
+    val directDesire      = estimationGeometricOffense.costToEnemy / Math.max(1.0, estimationGeometricOffense.costToUs)
+    val geographicDesire  = PurpleMath.nanToInfinity(urgencyOurs / urgencyEnemy)
+    val output            = directDesire * geographicDesire
+    output
   }
   
   lazy val globalSafeToAttack: Boolean = {

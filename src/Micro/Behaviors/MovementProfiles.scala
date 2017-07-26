@@ -10,7 +10,7 @@ object MovementProfiles {
     avoidVpfReceiving     = 1.0,
     avoidTraffic          = 1.0,
     avoidDamage           = 1.0,
-    avoidShovers          = 1.0)
+    avoidShovers          = 0.0)
   
   def avoid = new MovementProfile(default) {
     preferVpfDealing      = 0.0
@@ -21,4 +21,6 @@ object MovementProfiles {
     avoidTraffic          = 0.0
     avoidDamage           = 0.0
   }
+  
+  def pardon = MovementProfile(avoidShovers = 1.0)
 }

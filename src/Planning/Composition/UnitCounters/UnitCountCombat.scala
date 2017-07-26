@@ -33,10 +33,18 @@ class UnitCountCombat(
   //////////
   
   private def isSufficient: Boolean = {
-    (lastEstimation.enemyDies && ! lastEstimation.weSurvive) || lastEstimation.costToEnemy * overkill >= lastEstimation.costToUs
+    weKillThemAndSurvive || weOverkill
   }
   
   private def isAcceptable: Boolean = {
-    alwaysAccept || isSufficient || lastEstimation.weGainValue || lastEstimation.weSurvive
+    alwaysAccept || isSufficient
+  }
+  
+  private def weKillThemAndSurvive: Boolean = {
+    lastEstimation.enemyDies && lastEstimation.weSurvive
+  }
+  
+  private def weOverkill: Boolean = {
+    lastEstimation.costToEnemy * overkill > lastEstimation.costToUs
   }
 }

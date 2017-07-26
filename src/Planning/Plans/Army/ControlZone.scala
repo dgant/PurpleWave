@@ -63,7 +63,7 @@ class ControlZone(zone: Zone) extends Plan {
   def threateningZone(unit: UnitInfo, zone: Zone): Boolean = {
     val unitZone = unit.pixelCenter.zone
     zone == unitZone ||
-    (unit.flying && unit.framesToTravel(zone.centroid.pixelCenter) < 24 * 8) ||
+    (unit.flying && unit.framesToTravelTo(zone.centroid.pixelCenter) < 24 * 8) ||
     zone.edges.exists(edge => edge.otherSideof(zone).owner != With.self && edge.otherSideof(zone) == unitZone)
   }
 }

@@ -1,5 +1,6 @@
 package Micro.Actions.Combat.Decisionmaking
 
+import Mathematics.PurpleMath
 import Micro.Actions.Action
 import Planning.Yolo
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -14,20 +15,19 @@ object FightOrFlight extends Action {
     if (Yolo.active) {
       Engage.consider(unit)
     }
-    else if (unit.matchups.netValuePerFrameDiffused > 0.0) {
-      Engage.consider(unit)
-    }
-    else if (unit.matchups.netValuePerFrameCurrently > 0.0) {
-      Engage.consider(unit)
-    }
-    else if (unit.battle.exists(_.shouldAttackLocally) && unit.matchups.netValuePerFrameCurrently >= 0) {
-      Engage.consider(unit)
-    }
+  
+    lazy val doomed         = unit.matchups.doomed
+    lazy val matchups       = unit.matchups.inFrames(24)
+    lazy val groupDesire    = unit.battle.map(_.localAttackDesire).getOrElse(1.0)
+    lazy val personalDesire = PurpleMath.nanToInfinity(matchups.vpfDealingDiffused / matchups.vpfReceivingDiffused)
+    lazy val totalDesire    = groupDesire * personalDesire
     
-    if (unit.battle.exists(_.shouldRetreatLocally) && unit.matchups.threats.nonEmpty) {
+    if (doomed) {
+      Engage.consider(unit)
+    }
+    if (totalDesire < 1.0) {
       Disengage.consider(unit)
     }
-    
     Engage.consider(unit)
   }
 }

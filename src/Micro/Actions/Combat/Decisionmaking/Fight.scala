@@ -1,10 +1,9 @@
 package Micro.Actions.Combat.Decisionmaking
 
 import Micro.Actions.Action
-import Micro.Actions.Combat.Attacking.{Pillage, Pursue}
 import Micro.Actions.Combat.Maneuvering.{Cower, Sneak}
-import Micro.Actions.Combat.Specialized.{CarrierLeash, Recover}
-import Micro.Actions.Combat.Tactics.{BustBunker, ProtectTheWeak}
+import Micro.Actions.Combat.Specialized.{BeACarrier, Recover}
+import Micro.Actions.Combat.Tactics.{BustBunker}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Fight extends Action {
@@ -16,13 +15,10 @@ object Fight extends Action {
   override def perform(unit: FriendlyUnitInfo) {
     Cower.consider(unit)
     Sneak.consider(unit)
-    CarrierLeash.consider(unit)
+    BeACarrier.consider(unit)
     Cast.consider(unit)
     Recover.consider(unit)
     BustBunker.consider(unit)
-    ProtectTheWeak.consider(unit)
     FightOrFlight.consider(unit)
-    Pursue.consider(unit)
-    Pillage.consider(unit)
   }
 }

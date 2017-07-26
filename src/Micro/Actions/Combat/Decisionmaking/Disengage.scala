@@ -1,34 +1,28 @@
 package Micro.Actions.Combat.Decisionmaking
 
 import Micro.Actions.Action
-import Micro.Actions.Combat.Attacking.Potshot
 import Micro.Actions.Combat.Maneuvering.{Kite, Retreat}
 import Planning.Yolo
-import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object Disengage extends Action {
   
   override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.action.canFlee &&
+    unit.action.canFlee   &&
     unit.canMoveThisFrame &&
     ! Yolo.active
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {
     
-    val trapped = unit.matchups.threats.count(threat =>
-      threat.melee
-      && threat.topSpeed > unit.topSpeed
-      && threat.pixelDistanceFast(unit) < 48.0) > 2
-    if (trapped) {
-      Potshot.delegate(unit)
+    def kiteable(enemy: UnitInfo): Boolean = {
+      enemy.pixelRangeAgainstFromCenter(unit) < unit.pixelRangeMax &&
+      enemy.topSpeedChasing < unit.topSpeed
     }
     
-    // If we're faster than all the threats we can afford to be clever.
-    //
-    val shouldKite = unit.matchups.threats.forall(threat =>
-      threat.topSpeed <= unit.topSpeed &&
-      threat.framesToGetInRange(unit, unit.pixelCenter.project(threat.pixelCenter, 64.0)) > 0.0)
+    val shouldKite =
+      unit.matchups.threatsViolent.exists(kiteable) ||
+      unit.matchups.inFrames(24).threatsInRange.exists(kiteable)
     
     if (shouldKite) {
       Kite.delegate(unit)

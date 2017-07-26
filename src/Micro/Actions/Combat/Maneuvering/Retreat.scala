@@ -6,7 +6,6 @@ import Micro.Actions.Combat.Attacking.Potshot
 import Micro.Actions.Combat.Decisionmaking.Engage
 import Micro.Actions.Combat.Specialized.CarrierRetreat
 import Micro.Actions.Commands.Travel
-import Micro.Behaviors.MovementProfiles
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Retreat extends Action {
@@ -20,36 +19,34 @@ object Retreat extends Action {
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
   
     unit.action.toTravel = Some(unit.action.origin)
-    
-    // Carriers have their own wonky retreat logic
-    //
-    CarrierRetreat.delegate(unit)
-    
-    val canTakeFreeShots  = unit.matchups.threatsInRange.isEmpty
-    lazy val slowerThanThreats = unit.matchups.threats.forall(_.topSpeed > unit.topSpeed)
-    lazy val trapped = unit.damageInLastSecond > 0 && unit.matchups.threatsViolent.exists(threat =>
-      threat.topSpeed * 0.8 > unit.topSpeed
-      && threat.inRangeToAttackFast(unit))
 
+    CarrierRetreat.delegate(unit)
+  
+    lazy val threatsAllMelee    = unit.matchups.threats.forall(_.melee)
+    lazy val alreadyHome        = unit.pixelCenter.zone == unit.action.origin.zone
+    lazy val holdingFormation   = unit.action.toForm.exists(unit.pixelDistanceFast(_) < 4.0)
+    lazy val canTakeFreeShots   = unit.matchups.threatsInRange.isEmpty
+    lazy val slowerThanThreats  = unit.matchups.threats.forall(_.topSpeedChasing > unit.topSpeed)
+    lazy val trapped            = unit.damageInLastSecond > 0 &&
+      unit.matchups.threatsViolent.count(threat =>
+        threat.melee
+          && threat.topSpeedChasing > unit.topSpeed
+          && threat.pixelDistanceFast(unit) < 48.0) > 2
+    
     if (canTakeFreeShots || slowerThanThreats || trapped) {
       Potshot.delegate(unit)
     }
-    
-    // If we're a melee unit trying to defend a choke against other melee units, hold the line!
-    //
-    lazy val threatsAllMelee = unit.matchups.threats.forall(_.melee)
-    lazy val holdingFormation = unit.action.toForm.exists(unit.pixelDistanceFast(_) < 4.0)
     
     if (unit.melee && threatsAllMelee && holdingFormation) {
       With.commander.hold(unit)
     }
     
-    if (unit.pixelDistanceFast(unit.action.origin) < 16.0) {
-      unit.action.movementProfile = MovementProfiles.avoid
-      Potshot.delegate(unit)
+    if (alreadyHome) {
       Engage.consider(unit)
     }
-    
-    Travel.delegate(unit)
+    else {
+      // TODO: Dodge! Kite!
+      Travel.delegate(unit)
+    }
   }
 }

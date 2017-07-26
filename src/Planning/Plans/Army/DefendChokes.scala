@@ -37,7 +37,7 @@ class DefendChokes(val maxChokes: Int = 3) extends Plan {
     defenders.get.acquire(this)
     val unassignedUnits = new mutable.HashSet[FriendlyUnitInfo] ++ defenders.get.units
     val unitsNearestChoke = chokes
-      .map(choke => (choke, unassignedUnits.toVector.sortBy(_.framesToTravel(choke.centerPixel))))
+      .map(choke => (choke, unassignedUnits.toVector.sortBy(_.framesToTravelTo(choke.centerPixel))))
       .toMap
     
     val assignments = new mutable.HashMap[Edge, ArrayBuffer[FriendlyUnitInfo]]

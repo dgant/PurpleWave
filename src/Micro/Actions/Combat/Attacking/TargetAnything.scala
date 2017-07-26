@@ -1,9 +1,10 @@
 package Micro.Actions.Combat.Attacking
 
 import Micro.Actions.Action
+import Micro.Heuristics.Targeting.EvaluateTargets
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-object Target extends Action {
+object TargetAnything extends Action {
   
   override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.action.canFight          &&
@@ -13,15 +14,7 @@ object Target extends Action {
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {
-    lazy val canPillage = unit.matchups.threats.isEmpty
-    lazy val canPursue  = unit.action.canPursue
-    lazy val arrived    = unit.action.toTravel.forall(_.zone == unit.pixelCenter.zone)
-    
-    if (canPillage || canPursue || arrived) {
-      TargetAnything.consider(unit)
-    }
-    else {
-      TargetRelevant.consider(unit)
-    }
+    val targets = unit.matchups.targets
+    unit.action.toAttack = EvaluateTargets.best(unit.action, targets)
   }
 }

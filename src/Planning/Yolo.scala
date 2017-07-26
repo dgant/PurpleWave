@@ -10,5 +10,4 @@ object Yolo {
       || ! With.units.ours.exists(_.unitClass.isWorker)
       || With.geography.ourBases.forall(_.mineralsLeft == 0)
       || With.blackboard.allIn)
-      
 }

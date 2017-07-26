@@ -20,7 +20,7 @@ case class DecideToMove(
   }
   
   override def frames: Double = {
-    Math.min(maxFrames, agent.framesToTravel(destination))
+    Math.min(maxFrames, agent.framesToTravelTo(destination))
   }
   
   override def legal: Boolean = {

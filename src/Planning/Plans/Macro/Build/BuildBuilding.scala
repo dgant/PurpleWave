@@ -143,7 +143,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
     if (proposedBuilder.isEmpty) {
       return false
     }
-    val travelFrames    = proposedBuilder.get.framesToTravel(desiredTile.get.pixelCenter) / With.configuration.assumedBuilderTravelSpeed
+    val travelFrames    = proposedBuilder.get.framesToTravelTo(desiredTile.get.pixelCenter) / With.configuration.assumedBuilderTravelSpeed
     val expectedFrames  = currencyLock.expectedFrames
     travelFrames + 24 >= expectedFrames
   }

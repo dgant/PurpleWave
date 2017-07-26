@@ -9,7 +9,7 @@ object Sneak extends Action {
   override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.cloaked && ( ! unit.effectivelyCloaked || {
       
-      val matchups = unit.matchups.inFrames(24)
+      val matchups = unit.matchups.ifAt(24)
       matchups.threats.nonEmpty &&
       matchups.enemies.exists(e =>
         e.unitClass.isDetector

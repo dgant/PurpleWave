@@ -28,7 +28,7 @@ object Disengage extends Action {
     
     val shouldKite =
       unit.matchups.threatsViolent.exists(kiteable) ||
-      unit.matchups.inFrames(24).threatsInRange.exists(kiteable)
+      unit.matchups.ifAt(24).threatsInRange.exists(kiteable)
     
     if (shouldKite) {
       Kite.delegate(unit)

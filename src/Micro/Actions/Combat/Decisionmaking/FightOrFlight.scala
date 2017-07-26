@@ -19,7 +19,7 @@ object FightOrFlight extends Action {
     val prioritizeTeam  = 2.0
     val prioritizeSelf  = 1.0
     val doomed          = unit.matchups.doomed
-    val matchups        = unit.matchups.inFrames(24)
+    val matchups        = unit.matchups.ifAt(24)
     
     unit.action.desireTeam        = unit.battle.map(_.desire).getOrElse(1.0)
     unit.action.desireIndividual  = PurpleMath.nanToInfinity(matchups.vpfDealingDiffused / matchups.vpfReceivingDiffused) // NaN: If we're taking no damage, great!

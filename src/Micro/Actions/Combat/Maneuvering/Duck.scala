@@ -1,7 +1,7 @@
 package Micro.Actions.Combat.Maneuvering
 
 import Micro.Actions.Action
-import Micro.Actions.Commands.Reposition
+import Micro.Actions.Commands.MoveHeuristically
 import Micro.Execution.Explosion
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -22,7 +22,7 @@ object Duck extends Action {
       explosion.radius >=
       explosion.center.pixelDistanceFast(unit.pixelCenter) + 32.0)) {
       
-      Reposition.delegate(unit)
+      MoveHeuristically.delegate(unit)
     }
   }
   

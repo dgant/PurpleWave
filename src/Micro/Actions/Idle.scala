@@ -2,10 +2,11 @@ package Micro.Actions
 
 import Micro.Actions.Basic._
 import Micro.Actions.Combat.Decisionmaking.Fight
-import Micro.Actions.Combat.Tactics.Tickle
 import Micro.Actions.Combat.Maneuvering.Duck
+import Micro.Actions.Combat.Tactics.Tickle
 import Micro.Actions.Commands.{Attack, Travel}
 import Micro.Actions.Protoss.Meld
+import Micro.Behaviors.MovementProfiles
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Idle extends Action {
@@ -16,9 +17,9 @@ object Idle extends Action {
   
   override def perform(unit: FriendlyUnitInfo) {
   
-    ////////////
-    // Intent //
-    ////////////
+    ///////////
+    // Setup //
+    ///////////
     
     unit.action.toReturn        = unit.action.intent.toReturn
     unit.action.toTravel        = unit.action.intent.toTravel
@@ -36,6 +37,8 @@ object Idle extends Action {
     unit.action.canCower        = unit.action.intent.canCower
     unit.action.canMeld         = unit.action.intent.canMeld
   
+    unit.action.movementProfile = MovementProfiles.default
+    
     /////////////////
     // Diagnostics //
     /////////////////

@@ -5,17 +5,30 @@ import Mathematics.PurpleMath
 import Micro.Decisions.MicroValue
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, UnitInfo}
 
+import scala.collection.mutable
+
 case class MatchupAnalysis(
-  us    : UnitInfo,
-  at    : Pixel,
-  frame : Int = 0) {
+  us: UnitInfo,
+  conditions: MatchupConditions) {
  
   def this(us: UnitInfo) {
-    this(us, us.pixelCenter, 0)
+    this(us, MatchupConditions(us.pixelCenter, 0))
   }
   
-  def ifAt      (elsewhere    : Pixel)  : MatchupAnalysis = MatchupAnalysis(us, elsewhere,  frame)
-  def inFrames  (framesAhead  : Int)    : MatchupAnalysis = MatchupAnalysis(us, at,         frame + framesAhead)
+  lazy val at     : Pixel = conditions.at
+  lazy val frame  : Int   = conditions.framesAhead
+  
+  lazy val hypotheticalMatchups = new mutable.HashMap[MatchupConditions, MatchupAnalysis]
+  
+  def ifAt(elsewhere: Pixel): MatchupAnalysis = ifAt(elsewhere, frame)
+  def ifAt(framesAhead: Int): MatchupAnalysis = ifAt(at, framesAhead)
+  private def ifAt(elsewhere: Pixel, framesAhead: Int): MatchupAnalysis = {
+    val hypotheticalConditions = MatchupConditions(elsewhere, framesAhead)
+    if ( ! hypotheticalMatchups.contains(hypotheticalConditions)) {
+      hypotheticalMatchups.put(hypotheticalConditions, MatchupAnalysis(us, hypotheticalConditions))
+    }
+    hypotheticalMatchups(hypotheticalConditions)
+  }
   
   lazy val allies         : Vector[FriendlyUnitInfo]  = if (us.battle.isEmpty) Vector.empty else us.battle.get.us.units.filterNot(_ == us).flatMap(_.friendly)
   lazy val enemies        : Vector[ForeignUnitInfo]   = if (us.battle.isEmpty) Vector.empty else us.battle.get.enemy.units.flatMap(_.foreign)

@@ -2,7 +2,7 @@ package Micro.Actions.Combat.Specialized
 
 import Micro.Actions.Action
 import Micro.Actions.Combat.Attacking.TargetRelevant
-import Micro.Actions.Combat.Maneuvering.HoverOutsideRange
+import Micro.Actions.Combat.Maneuvering.KiteMove
 import Micro.Actions.Commands.Attack
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders}
@@ -29,7 +29,7 @@ object BeACarrier extends Action {
       Attack.consider(unit)
     }
     else {
-      HoverOutsideRange.consider(unit)
+      KiteMove.consider(unit)
     }
   }
 }

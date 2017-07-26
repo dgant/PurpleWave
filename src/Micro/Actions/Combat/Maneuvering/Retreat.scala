@@ -3,7 +3,6 @@ package Micro.Actions.Combat.Maneuvering
 import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Attacking.Potshot
-import Micro.Actions.Combat.Decisionmaking.Engage
 import Micro.Actions.Commands.Travel
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -25,7 +24,7 @@ object Retreat extends Action {
     lazy val threatsAllMelee    = unit.matchups.threats.forall(_.melee)
     lazy val alreadyHome        = zone == originZone
     lazy val holdingFormation   = unit.action.toForm.exists(unit.pixelDistanceFast(_) < 4.0)
-    lazy val canTakeFreeShots   = unit.matchups.inFrames(unit.unitClass.stopFrames).threatsInRange.isEmpty
+    lazy val canTakeFreeShots   = unit.matchups.threatsInRange.isEmpty
     lazy val slowerThanThreats  = unit.matchups.threats.forall(_.topSpeedChasing > unit.topSpeed)
     lazy val trapped            = unit.damageInLastSecond > 0 && (exitToOrigin.isEmpty || unit.matchups.framesToLiveCurrently < unit.framesToTravelTo(exitToOrigin.get))
     
@@ -36,12 +35,8 @@ object Retreat extends Action {
     if (unit.melee && threatsAllMelee && holdingFormation) {
       With.commander.hold(unit)
     }
-    
-    if (alreadyHome) {
-      Engage.consider(unit)
-    }
-    else if (unit.flying || trapped) {
-      HoverOutsideRange.delegate(unit)
+    else if (alreadyHome || unit.flying || trapped) {
+      Avoid.delegate(unit)
     }
     else {
       Travel.delegate(unit)

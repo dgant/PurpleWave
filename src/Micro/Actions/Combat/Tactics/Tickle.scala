@@ -3,7 +3,7 @@ package Micro.Actions.Combat.Tactics
 import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Basic.MineralWalk
-import Micro.Actions.Combat.Maneuvering.HoverOutsideRange
+import Micro.Actions.Combat.Maneuvering.KiteMove
 import Micro.Actions.Commands.{Attack, Travel}
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -170,7 +170,7 @@ object Tickle extends Action {
             unit.pixelDistanceFast(freebie)))
       unit.action.toAttack = freebies
       Attack.consider(unit)
-      HoverOutsideRange.consider(unit)
+      KiteMove.consider(unit)
     }
   }
   

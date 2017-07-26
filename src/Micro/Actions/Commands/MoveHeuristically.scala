@@ -5,9 +5,9 @@ import Micro.Actions.Action
 import Micro.Heuristics.Movement.EvaluatePixels
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-object Reposition extends Action {
+object MoveHeuristically extends Action {
   
-  override def allowed(unit: FriendlyUnitInfo) = {
+  override def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.canMoveThisFrame
   }
   

@@ -21,7 +21,7 @@ object BeACarrier extends Action {
     
     lazy val interceptorsTotal        = unit.interceptors.count(_.aliveAndComplete)
     lazy val interceptorsFighting     = unit.interceptors.count(_.order == Orders.InterceptorAttack)
-    lazy val interceptorsAreShooting  = interceptorsFighting * 2 >= interceptorsTotal
+    lazy val interceptorsAreShooting  = interceptorsFighting >= interceptorsTotal
     lazy val exitingLeash             = unit.matchups.targets.forall(_.pixelDistanceFast(unit) > 32.0 * 8.5)
     
     if (interceptorsTotal > 2 && (exitingLeash || ! interceptorsAreShooting)) {

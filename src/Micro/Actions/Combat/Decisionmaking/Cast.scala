@@ -13,6 +13,8 @@ object Cast extends Action {
   
   override protected def perform(unit: FriendlyUnitInfo) {
     PsionicStorm.consider(unit)
-    HoverOutsideRange.consider(unit)
+    if (unit.matchups.inFrames(48).threatsInRange.nonEmpty) {
+      HoverOutsideRange.consider(unit)
+    }
   }
 }

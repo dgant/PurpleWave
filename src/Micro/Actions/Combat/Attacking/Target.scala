@@ -18,10 +18,10 @@ object Target extends Action {
     lazy val arrived    = unit.action.toTravel.forall(_.zone == unit.pixelCenter.zone)
     
     if (canPillage || canPursue || arrived) {
-      TargetAnything.consider(unit)
+      TargetAnything.delegate(unit)
     }
     else {
-      TargetRelevant.consider(unit)
+      TargetRelevant.delegate(unit)
     }
   }
 }

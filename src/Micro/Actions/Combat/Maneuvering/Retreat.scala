@@ -40,7 +40,7 @@ object Retreat extends Action {
     if (alreadyHome) {
       Engage.consider(unit)
     }
-    else if (trapped) {
+    else if (unit.flying || trapped) {
       HoverOutsideRange.delegate(unit)
     }
     else {

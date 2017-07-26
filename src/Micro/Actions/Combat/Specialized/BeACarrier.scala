@@ -1,9 +1,9 @@
 package Micro.Actions.Combat.Specialized
 
 import Micro.Actions.Action
-import Micro.Actions.Combat.Attacking.TargetRelevant
 import Micro.Actions.Combat.Maneuvering.KiteMove
-import Micro.Actions.Commands.Attack
+import Micro.Actions.Commands.AttackMove
+import Micro.Heuristics.Movement.EvaluatePixels
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders}
 
@@ -14,7 +14,7 @@ object BeACarrier extends Action {
   override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.aliveAndComplete           &&
     unit.is(Protoss.Carrier)        &&
-    unit.matchups.targets.nonEmpty
+    unit.matchups.enemies.nonEmpty
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {
@@ -22,11 +22,12 @@ object BeACarrier extends Action {
     lazy val interceptorsTotal        = unit.interceptors.count(_.aliveAndComplete)
     lazy val interceptorsFighting     = unit.interceptors.count(_.order == Orders.InterceptorAttack)
     lazy val interceptorsAreShooting  = interceptorsFighting * 2 >= interceptorsTotal
-    lazy val exitingLeash             = unit.matchups.targets.forall(_.pixelDistanceFast(unit) > 32.0 * 9.0)
+    lazy val exitingLeash             = unit.matchups.targets.forall(_.pixelDistanceFast(unit) > 32.0 * 8.5)
     
     if (interceptorsTotal > 2 && (exitingLeash || ! interceptorsAreShooting)) {
-      TargetRelevant.delegate(unit)
-      Attack.consider(unit)
+      val attackTarget = EvaluatePixels.best(unit.action, unit.action.movementProfile)
+      unit.action.toTravel = Some(attackTarget)
+      AttackMove.consider(unit)
     }
     else {
       KiteMove.consider(unit)

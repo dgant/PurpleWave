@@ -9,7 +9,7 @@ import Planning.Plans.Information.{Employ, Employing}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, FirstFiveMinutes}
 import Planning.Plans.Macro.Expanding.{BuildAssimilators, MatchMiningBases, RequireMiningBases}
-import Planning.Plans.Macro.Milestones._
+import Planning.Plans.Macro.Milestones.{UnitsAtLeast, _}
 import Planning.Plans.Macro.Reaction.EnemyBio
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Protoss.Situational.TwoGatewaysAtNatural
@@ -179,6 +179,14 @@ class ProtossVsTerran extends Parallel {
     new If(
       new Not(new Employing(PvTEarly4GateAllIn)),
       new RequireMiningBases(2)),
+  
+    // Make sure we get an early Dragoon for Vulture defense
+    new If(
+      new UnitsAtLeast(1, UnitMatchType(Protoss.CyberneticsCore)),
+      new Trigger(
+        new UnitsAtLeast(1, UnitMatchType(Protoss.Dragoon)),
+        initialBefore = new Build(RequestAtLeast(1, Protoss.Dragoon)))),
+    
     new FulfillEarlyTech,
     
     // Mid game

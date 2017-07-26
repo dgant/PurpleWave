@@ -3,7 +3,6 @@ package Information.Battles.Types
 import Information.Battles.BattleUpdater
 import Information.Battles.Estimations.Estimation
 import Mathematics.Points.Pixel
-import Mathematics.PurpleMath
 import Utilities.EnrichPixel.EnrichedPixelCollection
 
 class Battle(
@@ -40,9 +39,9 @@ class Battle(
   // Judgement //
   ///////////////
   
-  lazy val averageLocalNetCost: Double = {
+  lazy val desire: Double = {
     val fighters = us.units.filter(_.canAttackThisSecond)
-    PurpleMath.nanToZero((estimationGeometricOffense.costToEnemy - estimationGeometricOffense.costToUs) / fighters.size)
+    estimationGeometricOffense.costToEnemy / Math.max(1.0, estimationGeometricOffense.costToUs)
   }
   
   lazy val globalSafeToAttack: Boolean = {

@@ -19,10 +19,11 @@ object ShowBases extends View {
           Vector(
             base.zone.owner.name,
             Vector(
-              if (base.isStartLocation)       Some("Start location")  else "",
-              if (base.isNaturalOf.isDefined) Some("Natural")         else "",
-              if (base.zone.island)           Some("Island")          else ""
+              if (base.isStartLocation)       Some("Start location")  else None,
+              if (base.isNaturalOf.isDefined) Some("Natural")         else None,
+              if (base.zone.island)           Some("Island")          else None
             )
+            .flatten
             .mkString(", "),
             "Minerals left: " + base.mineralsLeft,
             "Gas left:     " + base.gasLeft,

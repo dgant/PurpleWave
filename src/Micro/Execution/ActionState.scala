@@ -76,9 +76,9 @@ class ActionState(val unit: FriendlyUnitInfo) {
   // Mood //
   //////////
   
-  var desireTeam        : Double = 0.0
-  var desireIndividual  : Double = 0.0
-  var desireTotal       : Double = 0.0
+  var desireTeam        : Double = _
+  var desireIndividual  : Double = _
+  var desireTotal       : Double = _
   
   /////////////////
   // Diagnostics //

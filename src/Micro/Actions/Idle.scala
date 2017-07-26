@@ -40,9 +40,9 @@ object Idle extends Action {
     // Diagnostics //
     /////////////////
   
-    unit.action.desireTeam        = 0.0
-    unit.action.desireIndividual  = 0.0
-    unit.action.desireTotal       = 0.0
+    unit.action.desireTeam        = 1.0
+    unit.action.desireIndividual  = 1.0
+    unit.action.desireTotal       = 1.0
   
     /////////
     // ACT //

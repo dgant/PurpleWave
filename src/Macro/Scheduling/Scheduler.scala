@@ -14,6 +14,10 @@ class Scheduler {
   
   val requestsByPlan = new mutable.HashMap[Plan, Iterable[BuildRequest]]
   
+  def requestsForDebugging: Vector[(Plan, Iterable[BuildRequest])] = {
+    With.scheduler.requestsByPlan.toVector.sortBy(_._1.priority)
+  }
+  
   def request(requester: Plan, theRequest: BuildRequest) {
     request(requester, List(theRequest))
   }

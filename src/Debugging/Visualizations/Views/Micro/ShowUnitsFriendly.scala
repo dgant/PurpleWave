@@ -31,13 +31,13 @@ object ShowUnitsFriendly extends View {
       state.unit.pixelCenter.add(0, -7),
       drawBackground = false)
     
-    if (state.desireTotal != 0.0) {
-      val left = state.unit.left
+    if (state.desireTotal != 1.0) {
+      val x = state.unit.pixelCenter.x
       val y = state.unit.pixelCenter.y
-      val width = state.unit.unitClass.width/3
-      drawDesire(state.desireTeam,        left,                 y, width)
-      drawDesire(state.desireIndividual,  left + width     / 3, y, width)
-      drawDesire(state.desireTotal,       left + width * 2 / 3, y, width)
+      val width = 18
+      drawDesire(state.desireTeam,        x - width * 2 / 3,  y, width)
+      drawDesire(state.desireIndividual,  x,                  y, width)
+      drawDesire(state.desireTotal,       x + width * 2 / 3,  y, width)
     }
     /*
         DrawMap.label(
@@ -81,5 +81,6 @@ object ShowUnitsFriendly extends View {
       Pixel(x+width, y+With.visualization.lineHeightSmall),
       solid = true,
       color = color)
+    DrawMap.text(Pixel(x, y), "%1.1f".format(desire))
   }
 }

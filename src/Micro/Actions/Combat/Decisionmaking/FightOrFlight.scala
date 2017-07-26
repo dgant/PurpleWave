@@ -19,14 +19,14 @@ object FightOrFlight extends Action {
     val doomed = unit.matchups.doomed
     val matchups       = unit.matchups.inFrames(24)
     
-    unit.action.desireTeam        = unit.battle.map(_.averageLocalNetCost).getOrElse(1.0)
+    unit.action.desireTeam        = unit.battle.map(_.desire).getOrElse(1.0)
     unit.action.desireIndividual  = PurpleMath.nanToInfinity(matchups.vpfDealingDiffused / matchups.vpfReceivingDiffused)
-    unit.action.desireTotal       = 2 * unit.action.desireTeam + unit.action.desireIndividual
+    unit.action.desireTotal       = unit.action.desireTeam * unit.action.desireIndividual
   
     if (doomed) {
       Engage.consider(unit)
     }
-    if (unit.action.desireTotal > 0.0) {
+    if (unit.action.desireTotal < 1.0) {
       Disengage.consider(unit)
     }
     Engage.consider(unit)

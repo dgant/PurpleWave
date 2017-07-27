@@ -9,7 +9,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 object Retreat extends Action {
   
   override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.canMoveThisFrame &&
+    unit.canMove &&
     unit.pixelCenter.zone != unit.action.origin.zone &&
     unit.matchups.threats.nonEmpty
   }

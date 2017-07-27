@@ -7,7 +7,7 @@ object TargetHeuristicDamageType extends TargetHeuristic {
   
   override def evaluate(state: ActionState, candidate: UnitInfo): Double = {
     
-    if ( ! state.unit.canAttackThisSecond(candidate)) HeuristicMathMultiplicative.default
+    if ( ! state.unit.canAttack(candidate)) HeuristicMathMultiplicative.default
     
     4.0 * state.unit.damageScaleAgainst(candidate)
   }

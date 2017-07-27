@@ -7,10 +7,10 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 object Sally extends Action {
   
   override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.canMoveThisFrame &&
+    unit.canMove &&
     unit.matchups.allies.exists(staticDefense =>
       staticDefense.unitClass.isBuilding  &&
-      staticDefense.unitClass.canAttack   &&
+      staticDefense.unitClass.rawCanAttack   &&
       staticDefense.matchups.dpfReceivingDiffused > 0)
   }
   

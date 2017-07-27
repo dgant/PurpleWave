@@ -15,7 +15,7 @@ object BustBunker extends Action {
   override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
     With.enemies.exists(_.race == Race.Terran)                    &&
     unit.action.canFight                                          &&
-    unit.canMoveThisFrame                                         &&
+    unit.canMove                                         &&
     unit.is(Protoss.Dragoon)                                      &&
     With.self.hasUpgrade(Protoss.DragoonRange)                    &&
     unit.matchups.threats.forall( ! _.is(Terran.SiegeTankSieged)) &&

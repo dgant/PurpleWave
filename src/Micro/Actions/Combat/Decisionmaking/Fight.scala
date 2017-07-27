@@ -9,7 +9,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 object Fight extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.canMoveThisFrame || unit.readyForAttackOrder
+    unit.canMove || unit.readyForAttackOrder
   }
   
   override def perform(unit: FriendlyUnitInfo) {

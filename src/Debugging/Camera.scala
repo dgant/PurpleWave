@@ -35,8 +35,8 @@ class Camera {
         .filterNot(unit => unit.is(Protoss.Interceptor) || unit.is(Protoss.Scarab) || unit.is(Terran.SpiderMine))
         .toList
         .sortBy(_.pixelDistanceSquared(With.intelligence.mostBaselikeEnemyTile.pixelCenter))
-        .sortBy( ! _.canAttackThisSecond)
-        .sortBy( ! _.canMoveThisFrame)
+        .sortBy( ! _.canAttack)
+        .sortBy( ! _.canMove)
         .head)
     }
     

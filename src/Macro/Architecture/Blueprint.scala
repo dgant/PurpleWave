@@ -37,7 +37,7 @@ class Blueprint(
   val townHall        : Boolean           = argTownHall     .getOrElse(building.exists(_.isTownHall))
   val gas             : Boolean           = argGas          .getOrElse(building.exists(_.isRefinery))
   val margin          : Boolean           = argMargin       .getOrElse(building.exists(With.architecture.usuallyNeedsMargin))
-  val wall            : Boolean           = argWall         .getOrElse(building.exists(_.canAttack))
+  val wall            : Boolean           = argWall         .getOrElse(building.exists(_.rawCanAttack))
   val distancePixels  : Double            = argRangePixels  .orElse(building.map(building => building.maxAirGroundRange.toDouble)).getOrElse(32.0 * 9.0)
   val placement       : PlacementProfile  = argPlacement    .getOrElse(PlacementProfiles.default(this))
   

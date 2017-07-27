@@ -10,7 +10,7 @@ object Rally extends Action {
     ! unit.hasSetRallyPoint           &&
     unit.unitClass.isBuilding         &&
     unit.unitClass.trainsGroundUnits  &&
-    unit.canDoAnythingThisFrame
+    unit.canDoAnything
   }
   
   override def perform(unit: FriendlyUnitInfo) {

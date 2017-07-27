@@ -99,7 +99,7 @@ object Tickle extends Action {
   
     if (attack) {
       // No static defense allowed!
-      val staticDefense = unit.matchups.targets.filter(u => u.unitClass.isBuilding && u.unitClass.canAttack)
+      val staticDefense = unit.matchups.targets.filter(u => u.unitClass.isBuilding && u.unitClass.rawCanAttack)
       if (staticDefense.nonEmpty) {
         unit.action.toAttack = staticDefense
           .sortBy(_.remainingBuildFrames)
@@ -120,7 +120,7 @@ object Tickle extends Action {
             target.pixelDistanceTravelling(zone.centroid) <= unit.pixelDistanceTravelling(zone.centroid)
           )
         ) &&
-        target.canAttackThisSecond &&
+        target.canAttack &&
         (
           // Don't get distracted by workers leaving the base
           target.targetPixel.forall(_.zone == zone) ||

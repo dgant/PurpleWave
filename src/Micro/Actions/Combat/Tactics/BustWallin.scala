@@ -26,7 +26,7 @@ object BustWallin extends Action {
     walledInZones.nonEmpty                            &&
     With.enemies.exists(_.race == Race.Terran)        &&
     unit.action.canFight                              &&
-    unit.canMoveThisFrame                             &&
+    unit.canMove                             &&
     walledInZones.flatMap(_.edges).exists(_.centerPixel.pixelDistanceFast(unit.pixelCenter) < 32.0 * 8.0) &&
     unit.matchups.threats.forall(threat =>
       unit.inRangeToAttackFast(threat)

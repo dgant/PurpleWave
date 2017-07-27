@@ -9,7 +9,7 @@ object TargetAnything extends Action {
   override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.action.canFight          &&
     unit.action.toAttack.isEmpty  &&
-    unit.canAttackThisSecond      &&
+    unit.canAttack      &&
     unit.matchups.targets.nonEmpty
   }
   

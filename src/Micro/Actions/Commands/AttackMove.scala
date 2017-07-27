@@ -7,7 +7,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 object AttackMove extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.canMoveThisFrame &&
+    unit.canMove &&
     unit.action.toTravel.isDefined
   }
   

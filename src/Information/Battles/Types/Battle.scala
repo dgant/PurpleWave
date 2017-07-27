@@ -39,7 +39,7 @@ class Battle(
   
   def focus: Pixel = teams.map(_.vanguard).centroid
   
-  def happening: Boolean = teams.forall(_.units.nonEmpty) && teams.exists(_.units.exists(_.canAttackThisSecond))
+  def happening: Boolean = teams.forall(_.units.nonEmpty) && teams.exists(_.units.exists(_.canAttack))
   
   ///////////////
   // Judgement //
@@ -50,7 +50,7 @@ class Battle(
     val nearestBaseEnemy  = if (With.geography.enemyBases.isEmpty)  With.intelligence.mostBaselikeEnemyTile.pixelCenter else With.geography.enemyBases.map(_.heart.pixelCenter).minBy(_.groundPixels(focus))
     val urgencyOurs       = focus.pixelDistanceFast(nearestBaseEnemy)
     val urgencyEnemy      = focus.pixelDistanceFast(nearestBaseOurs)
-    val fighters          = us.units.filter(_.canAttackThisSecond)
+    val fighters          = us.units.filter(_.canAttack)
     val geographicDesire  = if (enemy.units.exists(_.unitClass.isSiegeTank)) Math.max(0.8, PurpleMath.nanToInfinity(urgencyOurs / urgencyEnemy)) else 1.0
     val estimation        = estimationSimulation
     val output            = (estimation.costToEnemy * geographicDesire - estimation.costToUs) / estimation.frames / Math.max(1, fighters.size)

@@ -144,7 +144,8 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   def pixelDistanceTravelling (destination: Tile)       : Double  = pixelDistanceTravelling(pixelCenter, destination.pixelCenter)
   def pixelDistanceTravelling (from: Pixel, to: Pixel)  : Double  = if (flying) from.pixelDistanceFast(to) else from.groundPixels(to)
   
-  def canMoveThisFrame: Boolean = unitClass.canMove && topSpeed > 0 && canDoAnythingThisFrame && ! burrowed
+  def canMove: Boolean = canMoveCache.get
+  private val canMoveCache = new CacheFrame(() => unitClass.canMove && topSpeed > 0 && canDoAnything && ! burrowed)
   
   def topSpeedChasing: Double = topSpeedChasingCache.get
   private val topSpeedChasingCache = new CacheFrame(() => topSpeedCache.get * PurpleMath.nanToOne((cooldownMaxAirGround - unitClass.stopFrames) / cooldownMaxAirGround.toDouble))
@@ -177,8 +178,8 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   def battle: Option[Battle] = With.battles.byUnit.get(this)
   def matchups: MatchupAnalysis = With.matchups.get(this)
   
-  def ranged  : Boolean = unitClass.canAttack && unitClass.maxAirGroundRange > 32 * 2
-  def melee   : Boolean = unitClass.canAttack && ! ranged
+  def ranged  : Boolean = unitClass.rawCanAttack && unitClass.maxAirGroundRange > 32 * 2
+  def melee   : Boolean = unitClass.rawCanAttack && ! ranged
   
   //TODO: Account for upgrades. Make sure to handle case where unit has no armor upgrades
   def armorHealth: Int = unitClass.armor // if (player.getUpgradeLevel(unitClass.armorUpgrade)
@@ -248,47 +249,46 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
     damageAgainst(enemy).toDouble / cooldownVs
   }
   
-  def canDoAnythingThisFrame:Boolean = canDoAnythingThisFrameCache.get
-  private val canDoAnythingThisFrameCache = new CacheFrame(() =>
+  def canDoAnything:Boolean = canDoAnythingCache.get
+  private val canDoAnythingCache = new CacheFrame(() =>
     aliveAndComplete  &&
     // These three checks along comprise 6% of our CPU usage. Yes, really.
     ! stasised        &&
     ! maelstrommed    &&
     ! lockedDown)
   
-  def canBeAttackedThisFrame:Boolean = canBeAttackedThisFrameCache.get
-  private val canBeAttackedThisFrameCache = new CacheFrame(() =>
+  def canBeAttacked: Boolean = canBeAttackedCache.get
+  private val canBeAttackedCache = new CacheFrame(() =>
       alive &&
       (complete || unitClass.isBuilding) &&
       totalHealth > 0 &&
-      visible &&
       ! invincible &&
       ! stasised)
   
-  def canAttackThisSecond: Boolean = canAttackThisSecondCache.get
-  private val canAttackThisSecondCache = new CacheFrame(() =>
-    canDoAnythingThisFrame &&
+  def canAttack: Boolean = canAttackCache.get
+  private val canAttackCache = new CacheFrame(() =>
+    canDoAnything &&
     (
-      unitClass.canAttack
+      unitClass.rawCanAttack
       || (is(Terran.Bunker)
       || (is(Protoss.Carrier) && interceptorCount > 0)
       || (is(Protoss.Reaver)  && scarabCount > 0)
       || (is(Zerg.Lurker)     && burrowed)
     )))
   
-  def canAttackThisSecond(enemy: UnitInfo): Boolean =
-    canAttackThisSecond           &&
-    enemy.canBeAttackedThisFrame  &&
-    ! enemy.effectivelyCloaked    && // Eh.
+  def canAttack(enemy: UnitInfo): Boolean =
+    canAttack                   &&
+    enemy.canBeAttacked         &&
+    ! enemy.effectivelyCloaked  && // Eh.
     (if (enemy.flying) unitClass.attacksAir else unitClass.attacksGround)
   
   // Frame X:     Unit's cooldown is 0.   Unit starts attacking.
   // Frame X-1:   Unit's cooldown is 1.   Unit receives attack order.
   // Frame X-1-L: Unit's cooldown is L+1. Send attack order.
   
-  def readyForAttackOrder: Boolean = canAttackThisSecond && cooldownLeft <= 1 + With.latency.framesRemaining
+  def readyForAttackOrder: Boolean = canAttack && cooldownLeft <= 1 + With.latency.framesRemaining
   
-  def pixelsTravelledMax(framesAhead: Int): Double = if (canMoveThisFrame) topSpeed * framesAhead else 0.0
+  def pixelsTravelledMax(framesAhead: Int): Double = if (canMove) topSpeed * framesAhead else 0.0
   def pixelReachAir     (framesAhead: Int): Double = pixelsTravelledMax(framesAhead) + pixelRangeAir
   def pixelReachGround  (framesAhead: Int): Double = pixelsTravelledMax(framesAhead) + pixelRangeGround
   def pixelReachMax     (framesAhead: Int): Double = Math.max(pixelReachAir(framesAhead), pixelReachGround(framesAhead))
@@ -300,13 +300,13 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   def inRangeToAttackFast(enemy: UnitInfo, framesAhead  : Int)    : Boolean = enemy.project(framesAhead).pixelDistanceFast(project(framesAhead)) <= pixelRangeAgainstFromEdge(enemy) + unitClass.radialHypotenuse + enemy.unitClass.radialHypotenuse + With.configuration.attackableRangeBuffer
   
   def framesToTravelTo(destination: Pixel)  : Int = framesToTravelPixels(pixelDistanceTravelling(destination))
-  def framesToTravelPixels(pixels: Double)  : Int = if (pixels <= 0.0) 0 else if (canMoveThisFrame) Math.max(0, Math.ceil(pixels/topSpeed).toInt) else Int.MaxValue
+  def framesToTravelPixels(pixels: Double)  : Int = if (pixels <= 0.0) 0 else if (canMove) Math.max(0, Math.ceil(pixels/topSpeed).toInt) else Int.MaxValue
   
   def framesToGetInRange(enemy: UnitInfo): Int = framesToGetInRange(enemy, enemy.pixelCenter)
-  def framesToGetInRange(enemy: UnitInfo, at: Pixel): Int = if (canAttackThisSecond(enemy)) framesToTravelPixels(pixelDistanceFast(at) - pixelRangeAgainstFromCenter(enemy)) else Int.MaxValue
+  def framesToGetInRange(enemy: UnitInfo, at: Pixel): Int = if (canAttack(enemy)) framesToTravelPixels(pixelDistanceFast(at) - pixelRangeAgainstFromCenter(enemy)) else Int.MaxValue
   def framesBeforeAttacking(enemy: UnitInfo): Int = framesBeforeAttacking(enemy, enemy.pixelCenter)
   def framesBeforeAttacking(enemy: UnitInfo, at: Pixel): Int = {
-    if (canAttackThisSecond(enemy)) {
+    if (canAttack(enemy)) {
       Math.max(cooldownLeft, framesToGetInRange(enemy))
     }
     else Int.MaxValue
@@ -329,7 +329,7 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   def isBeingViolentTo(victim: UnitInfo): Boolean = {
     //Are we capable of hurting the victim?
     isEnemyOf(victim) &&
-    canAttackThisSecond(victim) &&
+    canAttack(victim) &&
     //Are we not attacking anyone else?
     ! target.orElse(orderTarget).exists(_ != victim) &&
     //Are we close to being able to hit the victim?
@@ -348,7 +348,7 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   
   def likelyStillThere: Boolean =
     possiblyStillThere &&
-    ( ! canMoveThisFrame || With.framesSince(lastSeen) < With.configuration.fogPositionDuration || is(Terran.SiegeTankUnsieged))
+    ( ! canMove || With.framesSince(lastSeen) < With.configuration.fogPositionDuration || is(Terran.SiegeTankUnsieged))
   
   def effectivelyCloaked: Boolean =
     (burrowed || cloaked) && (

@@ -28,7 +28,7 @@ case class DecideToAttack(argAgent: FriendlyUnitInfo, target: UnitInfo) extends 
   }
   
   override def legal: Boolean = {
-    agent.canAttackThisSecond(target)
+    agent.canAttack(target) && target.visible
   }
   
   override def execute(): Unit = {

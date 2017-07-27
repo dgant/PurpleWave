@@ -7,7 +7,7 @@ object Shove extends Action {
   
   override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
     ! unit.flying &&
-    unit.canMoveThisFrame &&
+    unit.canMove &&
     unit.matchups.threats.nonEmpty
   }
   

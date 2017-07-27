@@ -7,7 +7,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 object KiteMove extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.canMoveThisFrame
+    unit.canMove
   }
   
   override def perform(unit: FriendlyUnitInfo) {

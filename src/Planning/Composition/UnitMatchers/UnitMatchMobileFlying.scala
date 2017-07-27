@@ -5,5 +5,5 @@ import ProxyBwapi.UnitInfo.UnitInfo
 object UnitMatchMobileFlying extends UnitMatcher {
   
   override def accept(unit: UnitInfo): Boolean =
-    unit.canMoveThisFrame && unit.flying
+    unit.canMove && unit.flying
 }

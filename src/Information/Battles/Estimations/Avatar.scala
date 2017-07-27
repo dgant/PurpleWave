@@ -54,7 +54,7 @@ class Avatar {
     
     val geometric     = nearestEnemy.isDefined
     val contributes   = unit.unitClass.helpsInCombat
-    val range         = unit.pixelRangeMax + 32.0 * (if (attacking || ! unit.canMoveThisFrame) 1.0 else 3.0)
+    val range         = unit.pixelRangeMax + 32.0 * (if (attacking || ! unit.canMove) 1.0 else 3.0)
     val pixelsAway    = if (geometric) unit.pixelDistanceFast(nearestEnemy.get) else With.configuration.abstractBattleDistancePixels
     val framesAway    = if (pixelsAway <= range) 0.0 else if (chasing) Double.PositiveInfinity else PurpleMath.nanToInfinity(Math.max(0.0, pixelsAway - range) / unit.topSpeed * 0.5)
     val framesTotal   = With.configuration.battleEstimationFrames

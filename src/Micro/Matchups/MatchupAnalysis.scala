@@ -34,8 +34,8 @@ case class MatchupAnalysis(
   lazy val enemies        : Vector[UnitInfo]  = if (me.battle.isEmpty) Vector.empty else me.battle.get.teamOf(me).opponent.units
   lazy val others         : Vector[UnitInfo]  = allies ++ enemies
   lazy val allUnits       : Vector[UnitInfo]  = others :+ me
-  lazy val threats        : Vector[UnitInfo]  = enemies.filter(_.canAttackThisSecond(me))
-  lazy val targets        : Vector[UnitInfo]  = enemies.filter(me.canAttackThisSecond)
+  lazy val threats        : Vector[UnitInfo]  = enemies.filter(_.canAttack(me))
+  lazy val targets        : Vector[UnitInfo]  = enemies.filter(me.canAttack)
   lazy val threatsViolent : Vector[UnitInfo]  = threats.filter(_.isBeingViolentTo(me))
   lazy val threatsInRange : Vector[UnitInfo]  = threats.filter(threat => threat.pixelRangeAgainstFromCenter(me) >= threat.pixelDistanceFast(at) - me.pixelsTravelledMax(frame) - threat.pixelsTravelledMax(frame))
   lazy val targetsInRange : Vector[UnitInfo]  = targets.filter(target => me.pixelRangeAgainstFromCenter(target) >= target.pixelDistanceFast(at) - me.pixelsTravelledMax(frame) - target.pixelsTravelledMax(frame))

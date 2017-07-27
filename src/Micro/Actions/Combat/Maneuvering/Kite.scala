@@ -7,7 +7,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 object Kite extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
-    unit.canMoveThisFrame
+    unit.canMove
     && unit.matchups.targets.nonEmpty
     && unit.matchups.threats.nonEmpty
     && unit.pixelRangeMax > 32 * 3.0

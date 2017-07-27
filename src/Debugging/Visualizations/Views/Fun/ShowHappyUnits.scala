@@ -89,7 +89,7 @@ object ShowHappyUnits extends View {
     var mouthTop        = top     + unit.unitClass.height * 6 / 10
     var mouthBottom     = top     + unit.unitClass.height * 7 / 10
     
-    if (unit.unitClass.canAttack && ! unit.unitClass.isWorker) {
+    if (unit.unitClass.rawCanAttack && ! unit.unitClass.isWorker) {
       val foreheadLow   = eyeLevel - unit.unitClass.height / 8
       val foreheadHigh  = eyeLevel - unit.unitClass.height / 4
       DrawMap.line(

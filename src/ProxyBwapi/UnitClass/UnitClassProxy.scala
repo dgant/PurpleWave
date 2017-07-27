@@ -13,8 +13,8 @@ class UnitClassProxy(val baseType:UnitType) {
   lazy val armor                    = baseType.armor
   lazy val armorUpgrade             = Upgrades.get(baseType.armorUpgrade)
   lazy val buildScore               = baseType.buildScore
-  lazy val buildFrames                = baseType.buildTime
-  lazy val canAttack                = baseType.canAttack
+  lazy val buildFrames              = baseType.buildTime
+  lazy val rawCanAttack             = baseType.canAttack
   lazy val canBuildAddon            = baseType.canBuildAddon
   lazy val canMove                  = baseType.canMove
   lazy val canProduce               = baseType.canProduce

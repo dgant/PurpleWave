@@ -18,7 +18,7 @@ case class Simulacrum(simulation: Simulation, unit: UnitInfo) {
       ++ unit.matchups.targets.flatMap(simulation.simulacra.get))
   
   val participating     : Boolean                     = unit.unitClass.helpsInCombat && ( ! unit.unitClass.isWorker || unit.isBeingViolent)
-  val canMove           : Boolean                     = unit.canMoveThisFrame
+  val canMove           : Boolean                     = unit.canMove
   var hitPoints         : Int                         = unit.totalHealth
   var cooldown          : Int                         = unit.cooldownLeft
   var pixel             : Pixel                       = unit.pixelCenter
@@ -85,7 +85,7 @@ case class Simulacrum(simulation: Simulation, unit: UnitInfo) {
     if (pixelsFromRange <= 0) {
       atTarget = true
     }
-    else if (unit.canMoveThisFrame) {
+    else if (unit.canMove) {
       val travelFrames  = Math.min(SIMULATION_STEP_FRAMES, unit.framesToTravelPixels(pixelsFromRange))
       val travelPixel   = pixel.project(victim.pixel, unit.topSpeed * travelFrames)
       moves             += ((pixel, travelPixel))

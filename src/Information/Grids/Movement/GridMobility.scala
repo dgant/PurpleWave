@@ -8,7 +8,7 @@ class GridMobility extends AbstractGridInt {
   
   override def update() = {
     val tilesToUpdate = With.units.ours
-      .filter(_.canMoveThisFrame)
+      .filter(_.canMove)
       .map(_.tileIncludingCenter)
       .flatten(tile => Circle.points(4).map(tile.add))
       .filter(With.grids.walkableTerrain.get)

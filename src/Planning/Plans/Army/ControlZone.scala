@@ -30,7 +30,7 @@ class ControlZone(zone: Zone) extends Plan {
     val ourBase = zone.bases.find(base => base.owner.isUs)
     
     enemies = With.units.enemy.filter(enemy => enemy.likelyStillThere && threateningZone(enemy, zone))
-    threats = enemies.filter(threat => threat.canAttackThisSecond && ! threat.unitClass.isWorker && threat.likelyStillThere)
+    threats = enemies.filter(threat => threat.canAttack && ! threat.unitClass.isWorker && threat.likelyStillThere)
     if (threats.nonEmpty) {
       fighters.get.unitMatcher.set(UnitMatchCombat(enemies))
       fighters.get.unitCounter.set(new UnitCountCombat(enemies, alwaysAccept = ourBase.isDefined, overkill = if (ourBase.isDefined) 1.2 else 2.0))
@@ -45,7 +45,7 @@ class ControlZone(zone: Zone) extends Plan {
         fighters.get.units.foreach(fighter => fighter.intend(new Intention(this) {
           canPursue = true
           toTravel = {
-            val attackables = threats.filter(fighter.canAttackThisSecond)
+            val attackables = threats.filter(fighter.canAttack)
             if (attackables.isEmpty)
               Some(focus)
             else

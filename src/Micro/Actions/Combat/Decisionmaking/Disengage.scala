@@ -10,7 +10,7 @@ object Disengage extends Action {
   
   override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.action.canFlee   &&
-    unit.canMoveThisFrame &&
+    unit.canMove &&
     ! Yolo.active
   }
   

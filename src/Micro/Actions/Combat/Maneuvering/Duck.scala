@@ -12,7 +12,7 @@ object Duck extends Action {
   
   override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
     
-    unit.canMoveThisFrame
+    unit.canMove
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {

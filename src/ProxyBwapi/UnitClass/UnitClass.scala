@@ -64,7 +64,7 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
   lazy val attacksGround : Boolean = effectiveGroundDamage > 0
   lazy val attacksAir    : Boolean = effectiveAirDamage    > 0
   
-  lazy val helpsInCombat:Boolean = canAttack || isSpellcaster || Set(Terran.Bunker).contains(this)
+  lazy val helpsInCombat:Boolean = rawCanAttack || isSpellcaster || Set(Terran.Bunker).contains(this)
   
   lazy val groundRange        : Int = if (this == Terran.Bunker) Terran.Marine.groundRange  + 32 else if (this == Protoss.Carrier) 32 * 8 else if (this == Protoss.Reaver) 32 * 8 else groundRangeRaw
   lazy val airRange           : Int = if (this == Terran.Bunker) Terran.Marine.airRange     + 32 else if (this == Protoss.Carrier) 32 * 8 else airRangeRaw

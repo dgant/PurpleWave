@@ -24,7 +24,7 @@ object Playbook {
     PvZ9Hatch9PoolAllIn,
     AllPvZ,
     PvZEarlyFFELight,
-    PvZMidgameCorsairDarkTemplar,
+    PvZMidgameCorsairSpeedlot,
     PvTEarly14Nexus
     /*
     AllPvP,

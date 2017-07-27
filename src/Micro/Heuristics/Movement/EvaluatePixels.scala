@@ -73,9 +73,10 @@ object EvaluatePixels {
     startingPixel : Pixel)
       : Boolean = {
     
-    if ( ! candidate.valid)                                   return false
-    if (unit.flying)                                          return true
-    if ( ! With.grids.walkable.get(candidate.tileIncluding))  return false
+    if ( ! candidate.valid)                                           return false
+    if (candidate.distanceFromEdge < unit.unitClass.radialHypotenuse) return false
+    if (unit.flying)                                                  return true
+    if ( ! With.grids.walkable.get(candidate.tileIncluding))          return false
     true
   }
   

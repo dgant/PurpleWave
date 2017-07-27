@@ -1,6 +1,9 @@
 package Information.Battles.Estimations
 
 import Lifecycle.With
+import ProxyBwapi.UnitInfo.UnitInfo
+
+import scala.collection.mutable
 
 class Estimation {
 
@@ -17,6 +20,8 @@ class Estimation {
   var totalUnitsEnemy   = 0.0
   var deathsUs          = 0.0
   var deathsEnemy       = 0.0
+  
+  var reportCards = new mutable.HashMap[UnitInfo, ReportCard]
   
   def netValue: Double = costToEnemy - costToUs
   

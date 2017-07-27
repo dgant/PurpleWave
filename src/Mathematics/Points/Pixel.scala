@@ -16,6 +16,9 @@ case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     x < With.mapWidth * 32 &&
     y < With.mapHeight * 32
   }
+  def distanceFromEdge: Int = {
+    Seq(x, y, With.mapWidth - x, With.mapHeight - y).min
+  }
   def add(dx: Int, dy: Int): Pixel = {
     Pixel(x + dx, y + dy)
   }

@@ -4,7 +4,7 @@ import Information.Battles.Types.Battle
 import Lifecycle.With
 import Mathematics.PurpleMath
 
-object Estimator {
+object EstimateAvatar {
   
   def calculate(avatarBuilder: AvatarBuilder): Estimation = {
     

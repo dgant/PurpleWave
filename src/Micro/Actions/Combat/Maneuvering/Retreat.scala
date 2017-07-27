@@ -41,7 +41,7 @@ object Retreat extends Action {
     if (unit.melee && threatsAllMelee && holdingFormation) {
       With.commander.hold(unit)
     }
-    else if (alreadyHome || unit.flying || trapped || ! blocked) {
+    else if (alreadyHome || unit.flying || trapped /*|| ! blocked*/) {
       Avoid.delegate(unit)
     }
     else {

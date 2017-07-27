@@ -100,5 +100,15 @@ object ShowUnitsAll extends View {
     if (unit.is(Protoss.Scarab)) {
       unit.target.foreach(scarabTarget => Range(1, 6).foreach(r => DrawMap.circle(scarabTarget.pixelCenter, 4 * r)))
     }
+    
+    unit.targetPixel.foreach(target => {
+      val distance = Math.min(48.0, unit.pixelDistanceFast(target))
+      DrawMap.line(unit.pixelCenter, unit.pixelCenter.project(target, distance), Colors.BrightTeal)
+    })
+    
+    unit.target.foreach(target => {
+      val distance = Math.min(32.0 * 7.0, unit.pixelDistanceFast(target))
+      DrawMap.line(unit.pixelCenter, unit.pixelCenter.project(target.pixelCenter, distance), Colors.BrightOrange)
+    })
   }
 }

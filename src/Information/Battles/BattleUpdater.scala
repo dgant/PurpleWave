@@ -1,6 +1,6 @@
 package Information.Battles
 
-import Information.Battles.Estimations.{AvatarBuilder, Estimation, Estimator}
+import Information.Battles.Estimations.{AvatarBuilder, Estimation, EstimateAvatar}
 import Information.Battles.Types.Battle
 import Lifecycle.With
 import Mathematics.Points.SpecificPoints
@@ -28,7 +28,6 @@ object BattleUpdater {
         else if (group.units.nonEmpty)  group.units.minBy(_.pixelDistanceFast(SpecificPoints.middle)).pixelCenter
         else SpecificPoints.middle)
     
-    battle
   }
   
   def estimateAvatar(
@@ -50,10 +49,10 @@ object BattleUpdater {
     def fitsAttackCriteria(unit: UnitInfo, mustBeMobile: Boolean): Boolean = ! mustBeMobile || ! unit.unitClass.isBuilding
     battle.us     .units.filter(fitsAttackCriteria(_, weAttack))     .foreach(builder.addUnit)
     battle.enemy  .units.filter(fitsAttackCriteria(_, enemyAttacks)) .foreach(builder.addUnit)
-    Estimator.calculate(builder)
+    EstimateAvatar.calculate(builder)
   }
   
   def estimateMatchups(battle: Battle): Estimation = {
-    Estimator.fromMatchups(battle)
+    EstimateAvatar.fromMatchups(battle)
   }
 }

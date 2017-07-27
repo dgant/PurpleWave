@@ -1,6 +1,6 @@
 package Planning.Composition.UnitCounters
 
-import Information.Battles.Estimations.{AvatarBuilder, Estimation, Estimator}
+import Information.Battles.Estimations.{AvatarBuilder, Estimation, EstimateAvatar}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 class UnitCountCombat(
@@ -18,13 +18,13 @@ class UnitCountCombat(
   
   override def continue(units: Iterable[FriendlyUnitInfo]): Boolean = {
     units.foreach(builder.addUnit)
-    lastEstimation = Estimator.calculate(builder)
+    lastEstimation = EstimateAvatar.calculate(builder)
     ! isSufficient
   }
   
   override def accept(units: Iterable[FriendlyUnitInfo]): Boolean = {
     units.foreach(builder.addUnit)
-    lastEstimation = Estimator.calculate(builder)
+    lastEstimation = EstimateAvatar.calculate(builder)
     isAcceptable
   }
   

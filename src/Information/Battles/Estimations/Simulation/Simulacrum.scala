@@ -107,6 +107,7 @@ case class Simulacrum(simulation: Simulation, unit: UnitInfo) {
   }
   
   def reportCard: ReportCard = ReportCard(
+    estimation      = simulation.estimation,
     valueDealt      = valueDealt,
     valueReceived   = valueReceived,
     damageDealt     = damageDealt,

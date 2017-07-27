@@ -20,8 +20,8 @@ object FightOrFlight extends Action {
     val futureMatchups    = unit.matchups.ifAt(framesAhead)
     val costOfRetreating  = unit.matchups.framesToRetreatDiffused * unit.matchups.vpfReceivingDiffused //TODO: Kill this. Leaving this here while debugging
     
-    unit.action.desireTeam        = unit.battle.map(_.desire).getOrElse(1.0)
-    unit.action.desireIndividual  = futureMatchups.netValuePerFrameDiffused
+    unit.action.desireTeam        = unit.battle.map(_.desire).getOrElse(0.0)
+    unit.action.desireIndividual  = unit.battle.flatMap(_.estimationSimulation.reportCards.get(unit).map(_.netValuePerFrame)).getOrElse(0.0)
     unit.action.desireTotal       = unit.action.desireTeam + unit.action.desireIndividual // Vanity metric, for now
   
     if (doomed) {

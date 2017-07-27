@@ -2,18 +2,22 @@ package Micro.Actions.Scouting
 
 import Lifecycle.With
 import Micro.Actions.Action
-import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import bwapi.Race
 
 object DisruptBuilder extends Action {
   
   override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
-    With.enemies.exists(_.race == Race.Terran) &&
-    unit.matchups.enemies.exists(_.constructing)
+    With.enemies.exists(_.race == Race.Terran)  &&
+    disruptableBuilders(unit).nonEmpty
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {
     
+  }
+  
+  def disruptableBuilders(unit: FriendlyUnitInfo): Iterable[UnitInfo] = {
+    unit.matchups.enemies.filter(_.constructing)
   }
   
   

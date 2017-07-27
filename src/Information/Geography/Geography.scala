@@ -12,7 +12,7 @@ import scala.collection.JavaConverters._
 
 class Geography {
   
-  lazy val mapArea        : TileRectangle           = TileRectangle(Tile(0, 0), Tile(With.mapWidth, With.mapHeight))
+  lazy val mapArea        : TileRectangle           = TileRectangle(Tile(0, 0), Tile(With.mapTileWidth, With.mapTileHeight))
   lazy val allTiles       : Iterable[Tile]          = mapArea.tiles
   lazy val startBases     : Iterable[Base]          = bases.filter(_.isStartLocation)
   lazy val startLocations : Iterable[Tile]          = With.game.getStartLocations.asScala.map(new Tile(_))

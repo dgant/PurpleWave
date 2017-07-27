@@ -62,10 +62,13 @@ object With {
   var enemies : Vector[PlayerInfo] = _
   def enemy   : PlayerInfo        = enemies.head
   
-  var frame       : Int = 0
-  var mapWidth    : Int = 0
-  var mapHeight   : Int = 0
-  var mapFileName : String = _
+  var frame           : Int     = 0
+  var mapTileWidth    : Int     = 0
+  var mapTileHeight   : Int     = 0
+  var mapFileName     : String  = _
+  def mapPixelWidth   : Int     = mapTileWidth * 32
+  def mapPixelHeight  : Int     = mapTileHeight * 32
+  
   
   def framesSince(previousFrame: Int): Int = Math.max(0, frame - previousFrame)
   
@@ -82,8 +85,8 @@ object With {
     self              = Players.get(game.self)
     neutral           = Players.get(game.neutral)
     enemies           = game.enemies.asScala.map(Players.get).toVector
-    mapWidth          = game.mapWidth
-    mapHeight         = game.mapHeight
+    mapTileWidth          = game.mapWidth
+    mapTileHeight         = game.mapHeight
     mapFileName       = game.mapFileName
     configuration     = new Configuration
     logger            = new Logger

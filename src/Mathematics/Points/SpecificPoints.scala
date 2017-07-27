@@ -5,10 +5,10 @@ import Lifecycle.With
 object SpecificPoints {
   
   def middle = Pixel(
-    With.mapWidth * 32 / 2,
-    With.mapHeight * 32 / 2)
+    With.mapPixelWidth / 2,
+    With.mapPixelHeight / 2)
   
   def tileMiddle = Tile(
-      With.mapWidth / 2,
-      With.mapHeight / 2)
+      With.mapTileWidth / 2,
+      With.mapTileHeight / 2)
 }

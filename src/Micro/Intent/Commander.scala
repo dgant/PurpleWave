@@ -127,10 +127,10 @@ class Commander {
       destination = destination.add((With.frame / With.configuration.pathRecalculationDelayFrames) % 3 - 1, 0)
     }
     
-    if (unit.pixelDistanceFast(destination) > 7) {
+    if (unit.pixelDistanceFast(destination) > 0) {
       unit.base.move(destination.bwapi)
-      sleep(unit)
     }
+    sleep(unit)
   }
   
   def useTechOnUnit(unit: FriendlyUnitInfo, tech: Tech, target: UnitInfo) {

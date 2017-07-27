@@ -6,7 +6,7 @@ import bwapi.TilePosition
 
 case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   
-  def this(i: Int) = this(i % With.mapWidth, i / With.mapWidth )
+  def this(i: Int) = this(i % With.mapTileWidth, i / With.mapTileWidth )
   def this(tilePosition: TilePosition) = this(tilePosition.getX, tilePosition.getY)
   
   def bwapi: TilePosition = new TilePosition(x, y)
@@ -21,11 +21,11 @@ case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   def valid: Boolean = {
     x >= 0 &&
     y >= 0 &&
-    x < With.mapWidth &&
-    y < With.mapHeight
+    x < With.mapTileWidth &&
+    y < With.mapTileHeight
   }
   def i: Int = {
-    x + With.mapWidth * y
+    x + With.mapTileWidth * y
   }
   def add(dx: Int, dy: Int): Tile = {
     Tile(x + dx, y + dy)

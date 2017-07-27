@@ -103,6 +103,8 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
   lazy val isTerran  : Boolean = race == Race.Terran
   lazy val isZerg    : Boolean = race == Race.Zerg
   
+  lazy val isSiegeTank: Boolean = this == Terran.SiegeTankSieged || this == Terran.SiegeTankUnsieged
+  
   lazy val buildTechEnabling     : Option[Tech]       = buildTechEnablingCalculate
   lazy val buildUnitsEnabling    : Vector[UnitClass]  = buildUnitsEnablingCalculate
   lazy val buildUnitsBorrowed    : Vector[UnitClass]  = buildUnitsBorrowedCalculate

@@ -48,7 +48,7 @@ class Battle(
     val urgencyEnemy      = focus.pixelDistanceFast(nearestBaseOurs)
     val fighters          = us.units.filter(_.canAttackThisSecond)
     val directDesire      = estimationGeometricOffense.costToEnemy / Math.max(1.0, estimationGeometricOffense.costToUs)
-    val geographicDesire  = Math.max(0.8, PurpleMath.nanToInfinity(urgencyOurs / urgencyEnemy))
+    val geographicDesire  = if (enemy.units.exists(_.unitClass.isSiegeTank)) Math.max(0.8, PurpleMath.nanToInfinity(urgencyOurs / urgencyEnemy)) else 1.0
     val output            = directDesire * geographicDesire
     output
   }

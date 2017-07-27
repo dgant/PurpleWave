@@ -3,7 +3,7 @@ package Micro.Actions.Combat.Decisionmaking
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.{Cower, Sneak}
 import Micro.Actions.Combat.Specialized.{BeACarrier, Recover}
-import Micro.Actions.Combat.Tactics.{BustBunker}
+import Micro.Actions.Combat.Tactics.{BustBunker, Sally}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Fight extends Action {
@@ -19,6 +19,7 @@ object Fight extends Action {
     Recover.consider(unit)
     Cast.consider(unit)
     BustBunker.consider(unit)
+    Sally.consider(unit)
     FightOrFlight.consider(unit)
   }
 }

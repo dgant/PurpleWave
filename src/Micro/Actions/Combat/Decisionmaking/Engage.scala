@@ -19,7 +19,7 @@ object Engage extends Action {
     BustWallin.consider(unit)
     Target.delegate(unit)
     if ( ! unit.readyForAttackOrder) {
-      Kite.delegate(unit)
+      Kite.consider(unit)
     }
     Attack.delegate(unit)
   }

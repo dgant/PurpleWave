@@ -31,7 +31,7 @@ object Disengage extends Action {
       unit.matchups.ifAt(24).threatsInRange.exists(kiteable)
     
     if (shouldKite) {
-      Kite.delegate(unit)
+      Kite.consider(unit)
     }
     else {
       Retreat.delegate(unit)

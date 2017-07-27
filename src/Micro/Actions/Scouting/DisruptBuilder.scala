@@ -10,7 +10,7 @@ import bwapi.Race
 object DisruptBuilder extends Action {
   
   override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
-    With.enemies.exists(_.race == Race.Terran)  &&
+    With.enemies.exists(_.race == Race.Terran) &&
     disruptableBuilders(unit).nonEmpty
   }
   
@@ -27,6 +27,4 @@ object DisruptBuilder extends Action {
   def disruptableBuilders(unit: FriendlyUnitInfo): Iterable[UnitInfo] = {
     unit.matchups.enemies.filter(_.constructing)
   }
-  
-  
 }

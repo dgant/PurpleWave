@@ -1,4 +1,4 @@
-package Micro.Actions.Combat.Specialized
+package Micro.Actions.Protoss
 
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.KiteMove

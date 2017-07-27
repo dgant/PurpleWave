@@ -9,11 +9,14 @@ import scala.collection.mutable
 
 case class Simulacrum(simulation: Simulation, unit: UnitInfo) {
   
-  lazy val targetQueue: mutable.PriorityQueue[Simulacrum] = (
-    new mutable.PriorityQueue[Simulacrum]()
-      (Ordering.by( - _.pixel.pixelDistanceFast(pixel)))
-      ++ unit.matchups.targets.map(simulation.simulacra))
+  // Constant
+  private val SIMULATION_STEP_FRAMES = 12
   
+  lazy val targetQueue: mutable.PriorityQueue[Simulacrum] = (
+    new mutable.PriorityQueue[Simulacrum]()(Ordering.by(x => (x.unit.unitClass.helpsInCombat, - x.pixel.pixelDistanceFast(pixel))))
+      ++ unit.matchups.targets.flatMap(simulation.simulacra.get))
+  
+  val canMove           : Boolean             = unit.canMoveThisFrame
   var hitPoints         : Int                 = unit.totalHealth
   var cooldown          : Int                 = unit.cooldownLeft
   var pixel             : Pixel               = unit.pixelCenter
@@ -53,14 +56,36 @@ case class Simulacrum(simulation: Simulation, unit: UnitInfo) {
   
   def acquireTarget() {
     while (target.forall(_.dead) && targetQueue.nonEmpty) {
-      target = Some(targetQueue.dequeue())
       atTarget = false
+      if (canMove || targetQueue.headOption.exists(pixelsOutOfRange(_) <= 0.0)) {
+        target = Some(targetQueue.dequeue())
+        
+        if ( ! canMove) {
+          atTarget = true
+        }
+      } else {
+        // Static defense
+        cooldown = SIMULATION_STEP_FRAMES // Warning: This resets the timer on combat!
+        return
+      }
     }
   }
   
+  def pixelsOutOfRange(simulacrum: Simulacrum): Double = {
+    pixel.pixelDistanceFast(simulacrum.pixel) - unit.pixelRangeAgainstFromCenter(simulacrum.unit)
+  }
+  
   def chaseTarget() {
-    cooldown = unit.framesToTravelPixels(pixel.pixelDistanceFast(target.get.pixel))
-    pixel = target.get.pixel //Consider that this puts us closer to our opponent for this whole time!
+    val victim = target.get
+    val pixelsFromRange = pixelsOutOfRange(victim)
+    if (pixelsFromRange <= 0) {
+      atTarget = true
+    }
+    else if (unit.canMoveThisFrame) {
+      val travelFrames = Math.min(SIMULATION_STEP_FRAMES, unit.framesToTravelPixels(pixelsFromRange))
+      cooldown  = travelFrames
+      pixel     = pixel.project(victim.pixel, unit.topSpeed * travelFrames)
+    }
   }
   
   def strikeTarget() {

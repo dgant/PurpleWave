@@ -6,6 +6,7 @@ import Micro.Decisions.MicroValue
 import ProxyBwapi.UnitInfo.UnitInfo
 
 import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 
 case class Simulacrum(simulation: Simulation, unit: UnitInfo) {
   
@@ -16,19 +17,21 @@ case class Simulacrum(simulation: Simulation, unit: UnitInfo) {
     new mutable.PriorityQueue[Simulacrum]()(Ordering.by(x => (x.unit.unitClass.helpsInCombat, - x.pixel.pixelDistanceFast(pixel))))
       ++ unit.matchups.targets.flatMap(simulation.simulacra.get))
   
-  val canMove           : Boolean             = unit.canMoveThisFrame
-  var hitPoints         : Int                 = unit.totalHealth
-  var cooldown          : Int                 = unit.cooldownLeft
-  var pixel             : Pixel               = unit.pixelCenter
-  var dead              : Boolean             = false
-  var target            : Option[Simulacrum]  = None
-  var atTarget          : Boolean             = false
-  var killed            : Int                 = 0
-  var damageDealt       : Double              = 0.0
-  var damageReceived    : Double              = 0.0
-  var valueDealt        : Double              = 0.0
-  var valueReceived     : Double              = 0.0
-  var valuePerDamage    : Double              = MicroValue.valuePerDamage(unit)
+  val participating     : Boolean                     = unit.unitClass.helpsInCombat && ( ! unit.unitClass.isWorker || unit.isBeingViolent)
+  val canMove           : Boolean                     = unit.canMoveThisFrame
+  var hitPoints         : Int                         = unit.totalHealth
+  var cooldown          : Int                         = unit.cooldownLeft
+  var pixel             : Pixel                       = unit.pixelCenter
+  var dead              : Boolean                     = false
+  var target            : Option[Simulacrum]          = None
+  var atTarget          : Boolean                     = false
+  var killed            : Int                         = 0
+  var damageDealt       : Double                      = 0.0
+  var damageReceived    : Double                      = 0.0
+  var valueDealt        : Double                      = 0.0
+  var valueReceived     : Double                      = 0.0
+  var valuePerDamage    : Double                      = MicroValue.valuePerDamage(unit)
+  var moves             : ArrayBuffer[(Pixel, Pixel)] = new ArrayBuffer[(Pixel, Pixel)]
   
   def checkDeath() {
     dead = dead || hitPoints <= 0
@@ -36,6 +39,7 @@ case class Simulacrum(simulation: Simulation, unit: UnitInfo) {
   
   def step() {
     if (dead) {}
+    else if ( ! participating) {}
     else if (cooldown > 0) {
       simulation.updated = true
       cooldown -= 1
@@ -82,9 +86,11 @@ case class Simulacrum(simulation: Simulation, unit: UnitInfo) {
       atTarget = true
     }
     else if (unit.canMoveThisFrame) {
-      val travelFrames = Math.min(SIMULATION_STEP_FRAMES, unit.framesToTravelPixels(pixelsFromRange))
-      cooldown  = travelFrames
-      pixel     = pixel.project(victim.pixel, unit.topSpeed * travelFrames)
+      val travelFrames  = Math.min(SIMULATION_STEP_FRAMES, unit.framesToTravelPixels(pixelsFromRange))
+      val travelPixel   = pixel.project(victim.pixel, unit.topSpeed * travelFrames)
+      moves             += ((pixel, travelPixel))
+      cooldown          = travelFrames
+      pixel             = travelPixel
     }
   }
   

@@ -2,7 +2,6 @@ package Micro.Actions.Combat.Decisionmaking
 
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.{Cower, Sneak}
-import Recover
 import Micro.Actions.Combat.Tactics.{BustBunker, Sally}
 import Micro.Actions.Protoss.BeACarrier
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo

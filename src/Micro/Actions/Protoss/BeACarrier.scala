@@ -3,7 +3,6 @@ package Micro.Actions.Protoss
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.KiteMove
 import Micro.Actions.Commands.AttackMove
-import Micro.Heuristics.Movement.EvaluatePixels
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders}
 
@@ -25,8 +24,9 @@ object BeACarrier extends Action {
     lazy val exitingLeash             = unit.matchups.targets.forall(_.pixelDistanceFast(unit) > 32.0 * 8.5)
     
     if (interceptorsTotal > 2 && (exitingLeash || ! interceptorsAreShooting)) {
-      val attackTarget = EvaluatePixels.best(unit.action, unit.action.movementProfile)
-      unit.action.toTravel = Some(attackTarget)
+      val attackTarget = unit.matchups.enemies.minBy(_.pixelDistanceFast(unit))
+      val attackPoint = unit.pixelCenter.project(attackTarget.pixelCenter, 32)
+      unit.action.toTravel = Some(attackPoint)
       AttackMove.consider(unit)
     }
     else {

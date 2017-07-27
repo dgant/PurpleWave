@@ -8,11 +8,10 @@ class Simulation(battle: Battle) {
   
   private def simulacra(team: Team) = team.units.map(Simulacrum(this, _))
   
-  val estimation: Estimation = new Estimation
-  
-  val unitsOurs   : Vector[Simulacrum] = simulacra(battle.us)
-  val unitsEnemy  : Vector[Simulacrum] = simulacra(battle.enemy)
-  val everyone    : Vector[Simulacrum] = unitsOurs ++ unitsEnemy
+  val estimation  : Estimation          = new Estimation
+  val unitsOurs   : Vector[Simulacrum]  = simulacra(battle.us)
+  val unitsEnemy  : Vector[Simulacrum]  = simulacra(battle.enemy)
+  val everyone    : Vector[Simulacrum]  = unitsOurs ++ unitsEnemy
   
   val simulacra: Map[UnitInfo, Simulacrum] = (unitsOurs ++ unitsEnemy).map(simulacrum => (simulacrum.unit, simulacrum)).toMap
   
@@ -34,6 +33,7 @@ class Simulation(battle: Battle) {
   }
   
   def cleanup() {
+    estimation.simulation       = Some(this)
     estimation.costToUs         = unitsOurs.map(_.valueReceived).sum
     estimation.costToEnemy      = unitsEnemy.map(_.valueReceived).sum
     estimation.damageToUs       = unitsOurs.map(_.damageReceived).sum
@@ -44,5 +44,4 @@ class Simulation(battle: Battle) {
     estimation.totalUnitsEnemy  = unitsEnemy.size
     estimation.reportCards ++= everyone.map(simulacrum => (simulacrum.unit, simulacrum.reportCard))
   }
-  
 }

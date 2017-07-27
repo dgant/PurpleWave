@@ -1,6 +1,7 @@
 package Information.Battles
 
-import Information.Battles.Estimations.{AvatarBuilder, Estimation, EstimateAvatar}
+import Information.Battles.Estimations.Simulation.Simulation
+import Information.Battles.Estimations.{AvatarBuilder, EstimateAvatar, Estimation}
 import Information.Battles.Types.Battle
 import Lifecycle.With
 import Mathematics.Points.SpecificPoints
@@ -54,5 +55,11 @@ object BattleUpdater {
   
   def estimateMatchups(battle: Battle): Estimation = {
     EstimateAvatar.fromMatchups(battle)
+  }
+  
+  def estimateSimulation(battle: Battle): Estimation = {
+    val simulation = new Simulation(battle)
+    simulation.run()
+    simulation.estimation
   }
 }

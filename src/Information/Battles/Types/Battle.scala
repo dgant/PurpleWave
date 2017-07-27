@@ -26,6 +26,7 @@ class Battle(
   lazy val estimationGeometricDefense : Estimation  = BattleUpdater.estimateAvatar(this, geometric = true,  weAttack = false, enemyAttacks = true,  weRetreat = false)
   lazy val estimationGeometricRetreat : Estimation  = BattleUpdater.estimateAvatar(this, geometric = true,  weAttack = false, enemyAttacks = true,  weRetreat = true)
   lazy val estimationMatchups         : Estimation  = BattleUpdater.estimateMatchups(this)
+  lazy val estimationSimulation       : Estimation  = BattleUpdater.estimateSimulation(this)
   
   //////////////
   // Features //
@@ -48,7 +49,7 @@ class Battle(
     val urgencyEnemy      = focus.pixelDistanceFast(nearestBaseOurs)
     val fighters          = us.units.filter(_.canAttackThisSecond)
     val geographicDesire  = if (enemy.units.exists(_.unitClass.isSiegeTank)) Math.max(0.8, PurpleMath.nanToInfinity(urgencyOurs / urgencyEnemy)) else 1.0
-    val estimation        = estimationGeometricOffense
+    val estimation        = estimationSimulation
     val output            = (estimation.costToEnemy * geographicDesire - estimation.costToUs) / estimation.frames / Math.max(1, fighters.size)
     output
   }

@@ -27,11 +27,11 @@ class BattleClassifier {
   }
   
   private def isEligibleLocal(unit: UnitInfo): Boolean = {
-    isEligibleGlobal(unit) && unit.likelyStillThere
+    isEligible(unit) && unit.likelyStillThere
   }
   
   private def isEligibleZone(unit: UnitInfo): Boolean = {
-    isEligibleGlobal(unit) && unit.possiblyStillThere
+    isEligible(unit) && unit.possiblyStillThere
   }
   
   private def isEligibleGlobal(unit: UnitInfo): Boolean = {
@@ -65,8 +65,8 @@ class BattleClassifier {
     local = clustering.clusters
       .map(cluster =>
         new Battle(
-          new Team(cluster.filter(_.isOurs)),
-          new Team(cluster.filter(_.isEnemy))))
+          new Team(cluster.filter(_.isOurs).toVector),
+          new Team(cluster.filter(_.isEnemy).toVector)))
       .filter(_.happening)
     byUnit = local.flatten(battle => battle.teams.flatMap(_.units).map(unit => (unit, battle))).toMap
   }

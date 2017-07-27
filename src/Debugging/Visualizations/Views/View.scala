@@ -14,4 +14,12 @@ abstract class View {
     With.visualization.views.contains(this) &&
     (With.visualization.map || With.visualization.screen)
   }
+  
+  def mapInUse: Boolean = {
+    inUse && With.visualization.map
+  }
+  
+  def screenInUse: Boolean = {
+    inUse && With.visualization.screen
+  }
 }

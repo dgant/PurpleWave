@@ -32,7 +32,7 @@ class BattleClusteringState(seedUnits: Set[UnitInfo]) {
     horizon.pushAll(newFoes.filter(seedUnits.contains))
   }
   
-  private lazy val finalClusters: Vector[Vector[UnitInfo]] = {
+  private lazy val finalClusters: Vector[Set[UnitInfo]] = {
     val roots = unitLinks.toSeq.filter(p => p._1 == p._2).map(_._1)
     val clusters = roots.map(root => (root, new ArrayBuffer[UnitInfo] :+ root)).toMap
     // This could be faster if we didn't have to find more
@@ -40,11 +40,11 @@ class BattleClusteringState(seedUnits: Set[UnitInfo]) {
       val unitRoot = getRoot(unit)
       clusters(unitRoot) += unit
     })
-    val output = clusters.toVector.map(_._2.toVector)
+    val output = clusters.toVector.map(_._2.toSet)
     output
   }
   
-  def clusters: Vector[Vector[UnitInfo]] = {
+  def clusters: Vector[Set[UnitInfo]] = {
     if (isComplete)
       finalClusters
     else
@@ -59,7 +59,12 @@ class BattleClusteringState(seedUnits: Set[UnitInfo]) {
   
   private def foesNear(unit: UnitInfo): Iterable[UnitInfo] = {
     val tileRadius = radiusTiles(unit)
-    val enemies = With.units.inTileRadius(unit.tileIncludingCenter, tileRadius.toInt).toIterable.filter(_.isEnemyOf(unit))
+    val enemies = With.units
+      .inTileRadius(unit.tileIncludingCenter, tileRadius.toInt)
+      .toIterable
+      .filter(foundUnit =>
+        foundUnit.isEnemyOf(unit) &&
+        seedUnits.contains(foundUnit))
     enemies
   }
   

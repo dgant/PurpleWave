@@ -15,7 +15,7 @@ class BattleClustering {
   // Batch processing //
   //////////////////////
   
-  def clusters: Vector[Vector[UnitInfo]] = clusterComplete.clusters
+  def clusters: Vector[Set[UnitInfo]] = clusterComplete.clusters
   
   def enqueue(units: Traversable[UnitInfo]) {
     nextUnits = units

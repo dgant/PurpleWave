@@ -1,5 +1,6 @@
 package Information.Battles.Estimations.Simulation
 
+import Debugging.Visualizations.Views.Battles.ShowBattleDetails
 import Information.Battles.Estimations.ReportCard
 import Mathematics.Points.Pixel
 import Micro.Decisions.MicroValue
@@ -88,9 +89,12 @@ case class Simulacrum(simulation: Simulation, unit: UnitInfo) {
     else if (unit.canMove) {
       val travelFrames  = Math.min(SIMULATION_STEP_FRAMES, unit.framesToTravelPixels(pixelsFromRange))
       val travelPixel   = pixel.project(victim.pixel, unit.topSpeed * travelFrames)
-      moves             += ((pixel, travelPixel))
       cooldown          = travelFrames
       pixel             = travelPixel
+  
+      if (ShowBattleDetails.inUse) {
+        moves += ((pixel, travelPixel))
+      }
     }
   }
   

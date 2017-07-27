@@ -1,7 +1,8 @@
 package Micro.Heuristics.Targeting
 
+import Mathematics.Heuristics.Heuristic
 import Micro.Execution.ActionState
-import ProxyBwapi.UnitInfo.UnitInfo
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object EvaluateTargets {
   
@@ -17,5 +18,12 @@ object EvaluateTargets {
     state.targetProfile.weightedHeuristics
       .map(_.weighMultiplicatively(state, target))
       .product
+  }
+  
+  def audit(unit: FriendlyUnitInfo): Seq[(UnitInfo, Double, Iterable[(Heuristic[ActionState, UnitInfo], Double)])] = {
+    val output = unit.matchups.targets.map(target =>
+      (target, EvaluateTargets.evaluate(unit.action, target), unit.action.targetProfile.weightedHeuristics.map(h =>
+        (h.heuristic, h.weighMultiplicatively(unit.action, target))))).sortBy(_._2)
+    return output
   }
 }

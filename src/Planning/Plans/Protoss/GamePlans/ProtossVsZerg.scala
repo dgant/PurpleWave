@@ -1,12 +1,13 @@
 package Planning.Plans.Protoss.GamePlans
 
+import Information.StrategyDetection.Fingerprint4Pool
 import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
 import Planning.Composition.UnitCounters.UnitCountBetween
 import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors, UnitMatchWorkers}
 import Planning.Plans.Army._
 import Planning.Plans.Compound.{If, _}
-import Planning.Plans.Information.Scenarios.WeAreBeing4Pooled
+import Planning.Plans.Information.Scenarios.{EnemyStrategy}
 import Planning.Plans.Information.{Employ, Employing, StartPositionsAtLeast}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, FirstFiveMinutes}
@@ -41,7 +42,7 @@ class ProtossVsZerg extends Parallel {
       new If(
         new Or(
           new Employing(PvZEarlyFFEHeavy),
-          new WeAreBeing4Pooled),
+          new EnemyStrategy(Fingerprint4Pool)),
         new Build(ProtossBuilds.FFE_Vs4Pool: _*),
         new If(
           new EnemyBasesAtLeast(2),
@@ -189,7 +190,7 @@ class ProtossVsZerg extends Parallel {
     // 4/5-pool defense
     new If(
       new And(
-        new WeAreBeing4Pooled,
+        new EnemyStrategy(Fingerprint4Pool),
         new Check(() => With.frame > 24 * 120),
         new UnitsAtMost(2, UnitMatchType(Protoss.PhotonCannon), complete = true)),
       new DefendFFEAgainst4Pool),

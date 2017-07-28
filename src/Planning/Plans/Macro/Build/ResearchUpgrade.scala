@@ -31,6 +31,6 @@ class ResearchUpgrade(upgrade: Upgrade, level: Int) extends Plan {
     if ( ! currency.satisfied) return
     
     upgraders.acquire(this)
-    upgraders.units.foreach(_.intend(new Intention(this) { toUpgrade = Some(upgrade) }))
+    upgraders.units.foreach(_.agent.intend(this, new Intention { toUpgrade = Some(upgrade) }))
   }
 }

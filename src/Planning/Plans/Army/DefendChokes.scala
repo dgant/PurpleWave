@@ -77,9 +77,7 @@ class DefendChokes(val maxChokes: Int = 3) extends Plan {
       chokeDefenders.foreach(
         defender => {
           val spot = formation(defender)
-          defender.intend(new Intention(this) {
-            toTravel = Some(spot)
-          })
+          defender.agent.intend(this, new Intention { toTravel = Some(spot) })
         })
     })
   }

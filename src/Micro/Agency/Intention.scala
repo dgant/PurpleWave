@@ -1,15 +1,12 @@
 package Micro.Agency
 
 import Mathematics.Points.{Pixel, Tile}
-import Planning.Plan
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClass.UnitClass
-import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import ProxyBwapi.UnitInfo.UnitInfo
 import ProxyBwapi.Upgrades.Upgrade
 
-class Intention(val plan: Plan) {
-  
-  // Modify only on construction
+class Intention {
   var toReturn    : Option[Pixel]     = None
   var toTravel    : Option[Pixel]     = None
   var toAttack    : Option[UnitInfo]  = None

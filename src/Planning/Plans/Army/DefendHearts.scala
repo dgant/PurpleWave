@@ -23,7 +23,7 @@ class DefendHearts extends Plan {
     
     defenders.get.acquire(this)
     defenders.get.units.foreach(
-      _.intend(new Intention(this) {
+      _.agent.intend(this, new Intention {
         toReturn  = Some(base.heart.pixelCenter)
         toTravel  = Some(base.heart.pixelCenter)
       }))

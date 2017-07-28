@@ -104,7 +104,7 @@ class AttackWithWorkers extends Plan {
   }
   
   def tickle(unit: FriendlyUnitInfo, target: Pixel) {
-    unit.intend(new Intention(this) {
+    unit.agent.intend(this, new Intention {
       toTravel = Some(target)
       canTickle = true
     })

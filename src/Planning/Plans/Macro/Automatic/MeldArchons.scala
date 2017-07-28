@@ -18,7 +18,7 @@ class MeldArchons(maxEnergy: Int = 200) extends Plan {
   override def onUpdate() {
     templar.release()
     templar.acquire(this)
-    templar.units.foreach(_.intend(new Intention(this) {
+    templar.units.foreach(_.agent.intend(this, new Intention {
       toTravel = Some(With.geography.home.pixelCenter)
       canMeld = true
     }))

@@ -42,7 +42,7 @@ class Scout extends Plan {
     scouts.get.unitPreference.set(UnitPreferClose(scoutingDestination))
     scouts.get.acquire(this)
     lastScouts = scouts.get.units
-    lastScouts.foreach(_.intend(new Intention(this) {
+    lastScouts.foreach(_.agent.intend(this, new Intention {
       toTravel = Some(scoutingDestination)
       canScout = true
     }))

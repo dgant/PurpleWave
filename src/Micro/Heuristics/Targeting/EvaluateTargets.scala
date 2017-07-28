@@ -14,7 +14,7 @@ object EvaluateTargets {
   }
   
   def evaluate(unit: FriendlyUnitInfo, target: UnitInfo): Double = {
-    unit.agent.targetProfile.weightedHeuristics
+    unit.agent.targetingProfile.weightedHeuristics
       .map(_.weighMultiplicatively(unit, target))
       .product
   }
@@ -24,7 +24,7 @@ object EvaluateTargets {
       (
         target,
         EvaluateTargets.evaluate(unit, target),
-        unit.agent.targetProfile.weightedHeuristics.map(h =>
+        unit.agent.targetingProfile.weightedHeuristics.map(h =>
         (
           h.heuristic,
           h.weighMultiplicatively(unit, target),

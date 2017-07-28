@@ -7,6 +7,7 @@ import Micro.Decisions.MicroDecision
 import Micro.Heuristics.Movement.{MovementHeuristicEvaluation, MovementProfile}
 import Micro.Heuristics.Targeting.TargetingProfile
 import Performance.Caching.CacheFrame
+import Planning.Plan
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClass.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -24,14 +25,17 @@ class Agent(val unit: FriendlyUnitInfo) {
     shovers.append(shover)
   }
   
+  def intend(client: Plan, intent: Intention) {
+    lastIntent = intent
+    lastClient = Some(client)
+  }
+  
   /////////////
   // History //
   /////////////
   
-  var intention: Intention = new Intention(With.strategy.gameplan)
-
-  var lastAction: Option[Action] = None
-  var lastFrame: Int = 0
+  var lastIntent: Intention = new Intention
+  var shovers: ListBuffer[FriendlyUnitInfo] = new ListBuffer[FriendlyUnitInfo]
   
   ///////////////
   // Decisions //
@@ -53,10 +57,9 @@ class Agent(val unit: FriendlyUnitInfo) {
   var canCower      : Boolean                       = false
   var canMeld       : Boolean                       = false
   var canScout      : Boolean                       = false
-  var shovers       : ListBuffer[FriendlyUnitInfo]  = new ListBuffer[FriendlyUnitInfo]
   
-  var movementProfile : MovementProfile   = MovementProfiles.default
-  var targetProfile   : TargetingProfile  = TargetingProfiles.default
+  var movementProfile   : MovementProfile   = MovementProfiles.default
+  var targetingProfile  : TargetingProfile  = TargetingProfiles.default
   
   var explosions: ListBuffer[Explosion] = new ListBuffer[Explosion]
   
@@ -70,6 +73,10 @@ class Agent(val unit: FriendlyUnitInfo) {
   /////////////////
   // Diagnostics //
   /////////////////
+  
+  var lastFrame   : Int             = 0
+  var lastClient  : Option[Plan]    = None
+  var lastAction  : Option[Action]  = None
   
   var desireTeam        : Double = _
   var desireIndividual  : Double = _
@@ -87,44 +94,41 @@ class Agent(val unit: FriendlyUnitInfo) {
   ///////////////
   
   def execute() {
-  
-    ///////////
-    // Setup //
-    ///////////
-  
-    unit.agent.toReturn        = unit.agent.intention.toReturn
-    unit.agent.toTravel        = unit.agent.intention.toTravel
-    unit.agent.toAttack        = unit.agent.intention.toAttack
-    unit.agent.toGather        = unit.agent.intention.toGather
-    unit.agent.toBuild         = unit.agent.intention.toBuild
-    unit.agent.toBuildTile     = unit.agent.intention.toBuildTile
-    unit.agent.toTrain         = unit.agent.intention.toTrain
-    unit.agent.toTech          = unit.agent.intention.toTech
-    unit.agent.toUpgrade       = unit.agent.intention.toUpgrade
-    unit.agent.toForm          = unit.agent.intention.toForm
-    unit.agent.canFight        = unit.agent.intention.canAttack
-    unit.agent.canFlee         = unit.agent.intention.canFlee
-    unit.agent.canPursue       = unit.agent.intention.canPursue
-    unit.agent.canCower        = unit.agent.intention.canCower
-    unit.agent.canMeld         = unit.agent.intention.canMeld
-    unit.agent.canScout        = unit.agent.intention.canScout
-  
-    unit.agent.movementProfile = MovementProfiles.default
-  
-    /////////////////
-    // Diagnostics //
-    /////////////////
-  
-    unit.agent.desireTeam        = 1.0
-    unit.agent.desireIndividual  = 1.0
-    unit.agent.desireTotal       = 1.0
-  
-    /////////
-    // Go! //
-    /////////
-    
+    resetState()
+    followIntent()
     Idle.consider(unit)
+    cleanUp()
+  }
   
+  private def resetState() {
+    unit.agent.desireTeam         = 1.0
+    unit.agent.desireIndividual   = 1.0
+    unit.agent.desireTotal        = 1.0
+    unit.agent.movementProfile    = MovementProfiles.default
+    unit.agent.targetingProfile   = TargetingProfiles.default
+  }
+  
+  private def followIntent() {
+    unit.agent.toReturn = unit.agent.lastIntent.toReturn
+    unit.agent.toTravel = unit.agent.lastIntent.toTravel
+    unit.agent.toAttack = unit.agent.lastIntent.toAttack
+    unit.agent.toGather = unit.agent.lastIntent.toGather
+    unit.agent.toBuild = unit.agent.lastIntent.toBuild
+    unit.agent.toBuildTile = unit.agent.lastIntent.toBuildTile
+    unit.agent.toTrain = unit.agent.lastIntent.toTrain
+    unit.agent.toTech = unit.agent.lastIntent.toTech
+    unit.agent.toUpgrade = unit.agent.lastIntent.toUpgrade
+    unit.agent.toForm = unit.agent.lastIntent.toForm
+    unit.agent.canFight = unit.agent.lastIntent.canAttack
+    unit.agent.canFlee = unit.agent.lastIntent.canFlee
+    unit.agent.canPursue = unit.agent.lastIntent.canPursue
+    unit.agent.canCower = unit.agent.lastIntent.canCower
+    unit.agent.canMeld = unit.agent.lastIntent.canMeld
+    unit.agent.canScout = unit.agent.lastIntent.canScout
+  }
+  
+  private def cleanUp() {
     unit.agent.shovers.clear()
+    explosions.clear()
   }
 }

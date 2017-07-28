@@ -209,7 +209,7 @@ class Gather extends Plan {
   }
   
   private def order(worker: FriendlyUnitInfo) {
-    worker.intend(new Intention(this) {
+    worker.agent.intend(this, new Intention {
       toGather = resourceByWorker.get(worker)
       canCower = true
     })

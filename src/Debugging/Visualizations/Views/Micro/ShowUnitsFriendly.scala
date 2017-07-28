@@ -12,23 +12,22 @@ object ShowUnitsFriendly extends View {
     With.agents.states.foreach(renderUnitState)
   }
   
-  def renderUnitState(state: Agent) {
-    if ( ! With.viewport.contains(state.unit.pixelCenter)) return
-    if ( ! state.unit.unitClass.orderable) return
+  def renderUnitState(agent: Agent) {
+    if ( ! With.viewport.contains(agent.unit.pixelCenter)) return
+    if ( ! agent.unit.unitClass.orderable) return
     
-    if (state.intention.plan != With.strategy.gameplan) {
+    agent.lastClient.foreach(plan =>
       DrawMap.label(
-        state.intention.plan.toString,
-        state.unit.pixelCenter.add(0, -21),
-        drawBackground = false)
-    }
+        plan.toString,
+        agent.unit.pixelCenter.add(0, -21),
+        drawBackground = false))
     DrawMap.label(
-      state.lastAction.map(_.name).getOrElse(""),
-      state.unit.pixelCenter.add(0, -14),
+      agent.lastAction.map(_.name).getOrElse(""),
+      agent.unit.pixelCenter.add(0, -14),
       drawBackground = false)
     DrawMap.label(
-      state.unit.command.map(_.getUnitCommandType.toString).getOrElse(""),
-      state.unit.pixelCenter.add(0, -7),
+      agent.unit.command.map(_.getUnitCommandType.toString).getOrElse(""),
+      agent.unit.pixelCenter.add(0, -7),
       drawBackground = false)
     
     /*
@@ -45,8 +44,8 @@ object ShowUnitsFriendly extends View {
       DrawMap.line(state.unit.pixelCenter, state.intent.toAttack.get.pixelCenter, Colors.BrightRed)
     }
     */
-    if (state.toForm.isDefined) {
-      DrawMap.circle(state.toForm.get, state.unit.unitClass.radialHypotenuse.toInt, Colors.MediumTeal)
+    if (agent.toForm.isDefined) {
+      DrawMap.circle(agent.toForm.get, agent.unit.unitClass.radialHypotenuse.toInt, Colors.MediumTeal)
     }
     /*
     if (state.toGather.isDefined) {

@@ -56,7 +56,7 @@ class TrainUnit(val traineeClass: UnitClass) extends Plan {
       trainerLock.acquire(this)
       trainer = trainerLock.units.headOption
       if (trainee.isEmpty) {
-        trainer.foreach(_.intend(new Intention(this) { toTrain = Some(traineeClass) }))
+        trainer.foreach(_.agent.intend(this, new Intention { toTrain = Some(traineeClass) }))
       }
     }
   }

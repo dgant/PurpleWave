@@ -31,6 +31,6 @@ class ResearchTech(tech: Tech) extends Plan {
     if ( ! currency.satisfied) return
   
     techers.acquire(this)
-    techers.units.foreach(_.intend(new Intention(this) { toTech = Some(tech) }))
+    techers.units.foreach(_.agent.intend(this, new Intention { toTech = Some(tech) }))
   }
 }

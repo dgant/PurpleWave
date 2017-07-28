@@ -34,7 +34,7 @@ class Scout extends Plan {
       lastScouts = List.empty
       lastScoutDeath = With.frame
     }
-    if (With.framesSince(lastScoutDeath) < 24 * 60) {
+    if (With.framesSince(lastScoutDeath) < 24 * 30) {
       return
     }
     

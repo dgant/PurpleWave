@@ -1,5 +1,16 @@
 package Micro.Actions.Scouting
 
-object Poke {
+import Micro.Actions.Action
+import Micro.Actions.Combat.Decisionmaking.Engage
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+
+object Poke extends Action {
+  override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
+    unit.matchups.threatsViolent.isEmpty &&
+    ! unit.wounded
+  }
   
+  override protected def perform(unit: FriendlyUnitInfo) {
+    Engage.delegate(unit)
+  }
 }

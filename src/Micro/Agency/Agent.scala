@@ -2,7 +2,7 @@ package Micro.Agency
 
 import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile}
-import Micro.Actions.Action
+import Micro.Actions.{Action, Idle}
 import Micro.Decisions.MicroDecision
 import Micro.Heuristics.Movement.{MovementHeuristicEvaluation, MovementProfile}
 import Micro.Heuristics.Targeting.TargetingProfile
@@ -28,8 +28,7 @@ class Agent(val unit: FriendlyUnitInfo) {
   // History //
   /////////////
   
-  var intent: Intention = new Intention(With.strategy.gameplan)
-  intent.unit = unit
+  var intention: Intention = new Intention(With.strategy.gameplan)
 
   var lastAction: Option[Action] = None
   var lastFrame: Int = 0
@@ -68,17 +67,13 @@ class Agent(val unit: FriendlyUnitInfo) {
   def origin: Pixel = toReturn.getOrElse(originCache.get)
   private val originCache = new CacheFrame(() => if (With.geography.ourBases.nonEmpty) With.geography.ourBases.map(_.heart.pixelCenter).minBy(unit.pixelDistanceTravelling) else With.geography.home.pixelCenter)
   
-  //////////
-  // Mood //
-  //////////
+  /////////////////
+  // Diagnostics //
+  /////////////////
   
   var desireTeam        : Double = _
   var desireIndividual  : Double = _
   var desireTotal       : Double = _
-  
-  /////////////////
-  // Diagnostics //
-  /////////////////
   
   var movingTo                    : Option[Pixel] = None
   var movedHeuristicallyFrame     : Int = 0
@@ -86,4 +81,50 @@ class Agent(val unit: FriendlyUnitInfo) {
   
   var microDecisions              : Vector[MicroDecision] = Vector.empty
   var microDecisionsUpdateFrame   : Int = 0
+  
+  ///////////////
+  // Execution //
+  ///////////////
+  
+  def execute() {
+  
+    ///////////
+    // Setup //
+    ///////////
+  
+    unit.agent.toReturn        = unit.agent.intention.toReturn
+    unit.agent.toTravel        = unit.agent.intention.toTravel
+    unit.agent.toAttack        = unit.agent.intention.toAttack
+    unit.agent.toGather        = unit.agent.intention.toGather
+    unit.agent.toBuild         = unit.agent.intention.toBuild
+    unit.agent.toBuildTile     = unit.agent.intention.toBuildTile
+    unit.agent.toTrain         = unit.agent.intention.toTrain
+    unit.agent.toTech          = unit.agent.intention.toTech
+    unit.agent.toUpgrade       = unit.agent.intention.toUpgrade
+    unit.agent.toForm          = unit.agent.intention.toForm
+    unit.agent.canFight        = unit.agent.intention.canAttack
+    unit.agent.canFlee         = unit.agent.intention.canFlee
+    unit.agent.canPursue       = unit.agent.intention.canPursue
+    unit.agent.canCower        = unit.agent.intention.canCower
+    unit.agent.canMeld         = unit.agent.intention.canMeld
+    unit.agent.canScout        = unit.agent.intention.canScout
+  
+    unit.agent.movementProfile = MovementProfiles.default
+  
+    /////////////////
+    // Diagnostics //
+    /////////////////
+  
+    unit.agent.desireTeam        = 1.0
+    unit.agent.desireIndividual  = 1.0
+    unit.agent.desireTotal       = 1.0
+  
+    /////////
+    // Go! //
+    /////////
+    
+    Idle.consider(unit)
+  
+    unit.agent.shovers.clear()
+  }
 }

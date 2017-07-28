@@ -21,7 +21,7 @@ object Build extends Action {
       Fight.consider(unit)
     }
     else {
-      With.commander.build(unit, unit.agent.toBuild.get, unit.agent.intent.toBuildTile.get)
+      With.commander.build(unit, unit.agent.toBuild.get, unit.agent.intention.toBuildTile.get)
     }
   }
 }

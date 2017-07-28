@@ -11,10 +11,7 @@ class FriendlyUnitInfo(base: bwapi.Unit) extends FriendlyUnitProxy(base) {
   
   def agent: Agent = With.agents.getState(this)
   def readyForMicro: Boolean = With.commander.ready(this)
-  def intend(intention: Intention) {
-    intention.unit = this
-    With.agents.intend(intention)
-  }
+  def intend(intention: Intention) { agent.intention = intention }
   
   ////////////
   // Health //

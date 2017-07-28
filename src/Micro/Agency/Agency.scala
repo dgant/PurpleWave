@@ -1,7 +1,6 @@
 package Micro.Agency
 
 import Lifecycle.With
-import Micro.Actions.Idle
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -14,10 +13,6 @@ class Agency {
   
   def states: Iterable[Agent] = agents.values
   
-  def intend(intention: Intention) {
-    getState(intention.unit).intent = intention
-  }
-  
   def getState(unit: FriendlyUnitInfo): Agent = {
     if ( ! agents.contains(unit)) {
       agents.put(unit, new Agent(unit))
@@ -29,7 +24,7 @@ class Agency {
   // Batching //
   //////////////
   
-  val unitQueue = new mutable.Queue[Agent]
+  val agentQueue = new mutable.Queue[Agent]
   
   def run() {
     
@@ -37,22 +32,22 @@ class Agency {
   
     agents.keys.filterNot(_.alive).foreach(agents.remove)
     
-    if (unitQueue.isEmpty) {
-      unitQueue ++= agents.values.toVector.sortBy(_.lastFrame)
+    if (agentQueue.isEmpty) {
+      agentQueue ++= agents.values.toVector.sortBy(_.lastFrame)
     }
     
     var doContinue = true
-    while (doContinue && unitQueue.nonEmpty) {
+    while (doContinue && agentQueue.nonEmpty) {
       doContinue = doContinue && With.performance.continueRunning
-      val nextState = unitQueue.dequeue()
-      nextState.lastFrame = With.frame
+      val agent = agentQueue.dequeue()
+      agent.lastFrame = With.frame
       
-      if (nextState.unit.unitClass.orderable
-        && ! nextState.unit.is(Protoss.PhotonCannon)) /* Hack fix for CIG -- we were cancelling our Photon Cannon attacks. */ {
-        Idle.consider(nextState.unit)
+      if (agent.unit.unitClass.orderable
+        && ! agent.unit.is(Protoss.PhotonCannon)) /* Hack fix for CIG -- we were cancelling our Photon Cannon attacks. */ {
+        agent.execute()
       }
     }
   
-    finishedExecutingLastTime = unitQueue.isEmpty
+    finishedExecutingLastTime = agentQueue.isEmpty
   }
 }

@@ -16,9 +16,9 @@ object ShowUnitsFriendly extends View {
     if ( ! With.viewport.contains(state.unit.pixelCenter)) return
     if ( ! state.unit.unitClass.orderable) return
     
-    if (state.intent.plan != With.strategy.gameplan) {
+    if (state.intention.plan != With.strategy.gameplan) {
       DrawMap.label(
-        state.intent.plan.toString,
+        state.intention.plan.toString,
         state.unit.pixelCenter.add(0, -21),
         drawBackground = false)
     }

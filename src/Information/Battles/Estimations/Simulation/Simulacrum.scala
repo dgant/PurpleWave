@@ -47,7 +47,7 @@ case class Simulacrum(simulation: Simulation, unit: UnitInfo) {
     }
     else {
       acquireTarget()
-      if (target.exists( ! _.dead)) {
+      if (target.exists(valid)) {
         simulation.updated = true
         if (atTarget) {
           strikeTarget()
@@ -59,8 +59,14 @@ case class Simulacrum(simulation: Simulation, unit: UnitInfo) {
     }
   }
   
+  def valid(target: Simulacrum): Boolean = {
+    ! target.dead &&
+    // Siege tanks
+    (unit.pixelRangeMin <= 0 || pixel.pixelDistanceFast(target.pixel) >= unit.pixelRangeMin)
+  }
+  
   def acquireTarget() {
-    while (target.forall(_.dead) && targetQueue.nonEmpty) {
+    while ( ! target.exists(valid) && targetQueue.nonEmpty) {
       atTarget = false
       if (canMove || targetQueue.headOption.exists(pixelsOutOfRange(_) <= 0.0)) {
         target = Some(targetQueue.dequeue())

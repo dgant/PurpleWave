@@ -1,9 +1,25 @@
 package Information.Grids.Vision
 
-import ProxyBwapi.UnitInfo.UnitInfo
+import Information.Grids.ArrayTypes.AbstractGridInt
 import Lifecycle.With
+import Mathematics.Points.Tile
+import Mathematics.Shapes.Circle
 
-class GridFriendlyVision extends AbstractGridVision {
+class GridFriendlyVision extends AbstractGridInt {
   
-  override def units: Iterable[UnitInfo] = With.units.ours
+  def visible(tile: Tile): Boolean = get(tile) >= lastUpdateFrame
+  
+  var lastUpdateFrame = 0
+  
+  def everSeen(tile: Tile): Boolean = get(tile) > 0
+  def framesSince(tile: Tile): Int = lastUpdateFrame - get(tile)
+  
+  override def update() {
+    lastUpdateFrame = With.frame
+    With.units.ours
+      .flatMap(u => Circle.points(12).map(u.tileIncludingCenter.add))
+      .foreach(tile =>
+        if (With.game.isVisible(tile.bwapi))
+          set(tile, With.frame))
+  }
 }

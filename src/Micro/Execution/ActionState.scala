@@ -55,6 +55,7 @@ class ActionState(val unit: FriendlyUnitInfo) {
   var canPursue     : Boolean                       = true
   var canCower      : Boolean                       = false
   var canMeld       : Boolean                       = false
+  var canScout      : Boolean                       = false
   var shovers       : ListBuffer[FriendlyUnitInfo]  = new ListBuffer[FriendlyUnitInfo]
   
   var movementProfile : MovementProfile   = MovementProfiles.default

@@ -23,6 +23,8 @@ case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     if (With.mapPixelHeight - y < min) min = With.mapPixelHeight - y
     min
   }
+  def +(other: Pixel): Pixel = add(other)
+  def -(other: Pixel): Pixel = subtract(other)
   def add(dx: Int, dy: Int): Pixel = {
     Pixel(x + dx, y + dy)
   }

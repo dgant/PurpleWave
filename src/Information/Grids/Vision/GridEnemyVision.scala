@@ -1,9 +1,19 @@
 package Information.Grids.Vision
 
-import ProxyBwapi.UnitInfo.UnitInfo
+import Information.Grids.ArrayTypes.AbstractGridBoolean
 import Lifecycle.With
+import Mathematics.Shapes.Circle
 
-class GridEnemyVision extends AbstractGridVision {
+class GridEnemyVision extends AbstractGridBoolean {
   
-  override def units: Iterable[UnitInfo] = With.units.enemy
+  override def update() {
+    reset()
+    With.units.enemy
+      .filter(_.possiblyStillThere)
+      .foreach(u => {
+        Circle.points(u.unitClass.sightRange / 32)
+          .map(u.tileIncludingCenter.add)
+          .foreach(set(_, true))
+      })
+  }
 }

@@ -38,6 +38,16 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) {
     Zerg.Scourge)
     .contains(this)
   
+  lazy val floats: Boolean = Array(
+    Terran.SCV,
+    Terran.Vulture,
+    Terran.SpiderMine,
+    Protoss.Probe,
+    Protoss.Archon,
+    Protoss.DarkArchon,
+    Zerg.Drone
+    ).contains(this)
+  
   lazy val maxTotalHealth: Int = maxHitPoints + maxShields
   
   lazy val effectiveAirDamage: Int =
@@ -79,12 +89,13 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) {
   lazy val isSiegeTank  : Boolean     = this == Terran.SiegeTankSieged || this == Terran.SiegeTankUnsieged
   lazy val tileArea     : TileRectangle = TileRectangle(Tile(0, 0), tileSize)
   
-  lazy val affectedByDarkSwarm: Boolean = Vector(
+  lazy val unaffectedByDarkSwarm: Boolean = Vector(
     Terran.SiegeTankSieged,
     Terran.Firebat,
     Protoss.Zealot,
     Protoss.DarkTemplar,
     Protoss.Reaver,
+    Protoss.Scarab,
     Protoss.Archon,
     Zerg.Zergling,
     Zerg.Lurker,

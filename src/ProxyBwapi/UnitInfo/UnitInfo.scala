@@ -227,6 +227,15 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   def pixelRangeAgainstFromEdge   (enemy: UnitInfo): Double = if (enemy.flying) pixelRangeAir else pixelRangeGround
   def pixelRangeAgainstFromCenter (enemy: UnitInfo): Double = pixelRangeAgainstFromEdge(enemy) + unitClass.radialHypotenuse + enemy.unitClass.radialHypotenuse
   
+  def missChanceAgainst(enemy: UnitInfo): Double = {
+    if (guaranteedToHit(enemy)) 0.53 else 0.0
+  }
+  def guaranteedToHit(enemy: UnitInfo): Boolean =
+    flying                          ||
+    enemy.flying                    ||
+    unitClass.unaffectedByDarkSwarm ||
+    With.grids.altitudeBonus.get(tileIncludingCenter) >= With.grids.altitudeBonus.get(enemy.tileIncludingCenter)
+  
   def damageTypeAgainst (enemy: UnitInfo)  : DamageType  = if (enemy.flying) unitClass.airDamageTypeRaw else unitClass.groundDamageTypeRaw
   def attacksAgainst    (enemy: UnitInfo)  : Int         = if (enemy.flying) attacksAgainstAir          else attacksAgainstGround
   
@@ -247,6 +256,7 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   def damageOnNextHitAgainst(enemy: UnitInfo): Int = {
     damageOnNextHitAgainst(enemy, enemy.shieldPoints)
   }
+  
   def damageOnNextHitAgainst(enemy: UnitInfo, enemyShields: Int): Int = {
     val hits                    = attacksAgainst(enemy)
     val damageScale             = damageScaleAgainstHitPoints(enemy)
@@ -255,7 +265,8 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
     val damageToShields         = Math.min(hits * (damagePerHit - enemy.armorShield), enemyShields)
     val damageAssignedToHealth  = hits * damagePerHit - damageAssignedToShields
     val damageToHealth          = damageAssignedToHealth * damageScaleAgainstHitPoints(enemy) - enemy.armorHealth * hits
-    Math.max(1, damageAssignedToHealth + damageAssignedToShields)
+    val damageDealtTotal        = damageAssignedToHealth + damageAssignedToShields
+    Math.max(1, missChanceAgainst(enemy) * damageDealtTotal).toInt
   }
   
   def dpfOnNextHitAgainst(enemy: UnitInfo): Double = {
@@ -301,7 +312,8 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
     canAttack                   &&
     enemy.canBeAttacked         &&
     ! enemy.effectivelyCloaked  && // Eh.
-    (if (enemy.flying) unitClass.attacksAir else unitClass.attacksGround)
+    (if (enemy.flying) unitClass.attacksAir else unitClass.attacksGround) &&
+    ( ! enemy.unitClass.floats || ! unitClass.suicides || ! is(Terran.SpiderMine))
   
   // Frame X:     Unit's cooldown is 0.   Unit starts attacking.
   // Frame X-1:   Unit's cooldown is 1.   Unit receives attack order.

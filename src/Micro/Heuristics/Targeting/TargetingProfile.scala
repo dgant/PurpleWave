@@ -17,7 +17,7 @@ class TargetingProfile(
       new TargetHeuristicWeight(TargetHeuristicValue,           preferValue),
       new TargetHeuristicWeight(TargetHeuristicCombat,          preferCombat),
       new TargetHeuristicWeight(TargetHeuristicDamagePerSecond, preferDpf),
-      new TargetHeuristicWeight(TargetHeuristicDamageAgainst,   preferDamageAgainst),
+      new TargetHeuristicWeight(TargetHeuristicDpfAgainst,   preferDamageAgainst),
       new TargetHeuristicWeight(TargetHeuristicPain,            -avoidPain),
       new TargetHeuristicWeight(TargetHeuristicHealth,          -avoidHealth),
       new TargetHeuristicWeight(TargetHeuristicDistance,        -avoidDistance),

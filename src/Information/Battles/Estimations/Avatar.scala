@@ -63,7 +63,7 @@ class Avatar {
     var fortitude     = altitudeBonus * (if (geometric && unit.effectivelyCloaked) 5.0 else 1.0)
 
     // Very rough approximation -- of course Dark Swarm matters when it's the *target* under the swarm
-    if (unit.underDisruptionWeb || (unit.underDarkSwarm && unit.unitClass.affectedByDarkSwarm)) {
+    if (unit.underDisruptionWeb || (unit.underDarkSwarm && unit.unitClass.unaffectedByDarkSwarm)) {
       efficacy = 0.0
     }
     

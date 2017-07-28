@@ -9,7 +9,7 @@ import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Plans.Army.{AllIn, Attack}
 import Planning.Plans.Compound._
 import Planning.Plans.Information.SwitchEnemyRace
-import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientPylons, TrainContinuously, TrainProbesContinuously}
+import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
 import Planning.Plans.Macro.Expanding.BuildAssimilators
@@ -44,7 +44,7 @@ abstract class AbstractProxy2Gate extends Parallel {
         new EnemyUnitsAtLeast(1, UnitMatchType(Protoss.DarkTemplar))),
       new AllIn),
     new TrainContinuously(Protoss.Zealot),
-    new TrainProbesContinuously,
+    new TrainWorkersContinuously,
     new Trigger(
       new Check(() => With.frame > 24 * 60 * 3),
       initialAfter = new TrainContinuously(Protoss.Gateway, 5)))
@@ -57,7 +57,7 @@ abstract class AbstractProxy2Gate extends Parallel {
           new Check(() => With.geography.enemyZones.exists(_.walledIn))),
         new Check(() => With.units.enemy.exists(u => u.flying && u.unitClass.isBuilding))),
       initialAfter = new Parallel(
-        new TrainProbesContinuously,
+        new TrainWorkersContinuously,
         new Build(RequestAtLeast(1, Protoss.CyberneticsCore)),
         new BuildAssimilators,
         new If(
@@ -98,7 +98,7 @@ abstract class AbstractProxy2Gate extends Parallel {
     new Trigger(
       new UnitsAtLeast(2, UnitMatchType(Protoss.Gateway), complete = false),
       initialAfter = new Parallel(
-        new RequireSufficientPylons,
+        new RequireSufficientSupply,
         new SwitchEnemyRace(
           whenTerran  = new BasicPlan, // new OhNoTheyreTerranGetGoons,
           whenProtoss = new BasicPlan,

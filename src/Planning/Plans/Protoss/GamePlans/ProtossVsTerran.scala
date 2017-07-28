@@ -162,8 +162,8 @@ class ProtossVsTerran extends Parallel {
     new Employ(PvTEarly1015GateGoon, new ImplementEarly1015GateGoon),
     new Employ(PvTEarlyDTExpand,     new ImplementEarlyDTExpand),
     new Employ(PvTEarly4GateAllIn,   new ImplementEarly4GateAllIn),
-    new RequireSufficientPylons,
-    new TrainProbesContinuously,
+    new RequireSufficientSupply,
+    new TrainWorkersContinuously,
     new Employ(PvTEarly4GateAllIn, new Parallel(
       new TrainZealotsOrDragoons,
       new Build(

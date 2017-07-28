@@ -8,7 +8,7 @@ object Target extends Action {
   override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.action.canFight          &&
     unit.action.toAttack.isEmpty  &&
-    unit.canAttack      &&
+    unit.canAttack                &&
     unit.matchups.targets.nonEmpty
   }
   

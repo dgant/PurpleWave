@@ -16,7 +16,7 @@ class FindEnemyBase extends Plan {
   description.set("Discover an enemy base")
   
   val scouts = new Property[LockUnits](new LockUnits {
-    unitCounter.set(new UnitCountExactly(1))
+    unitCounter.set(UnitCountExactly(1))
     unitMatcher.set(UnitMatchMobile)
     unitPreference.set(UnitPreferClose(SpecificPoints.middle))
   })

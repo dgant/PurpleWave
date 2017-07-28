@@ -5,6 +5,7 @@ import Strategery.Strategies.Options.Protoss.Global.{AllPvP, AllPvT, AllPvZ}
 import Strategery.Strategies.Options.Protoss.PvP._
 import Strategery.Strategies.Options.Protoss.PvT._
 import Strategery.Strategies.Options.Protoss.PvZ._
+import Strategery.Strategies.Options.Zerg.Global.Zerg2HatchMutaAllIn
 import Strategery.Strategies.Strategy
 
 object Playbook {
@@ -20,6 +21,7 @@ object Playbook {
   // Use these whenever possible.
   //
   val forced = Vector[Strategy](
+    Zerg2HatchMutaAllIn
     /*
     AllPvP,
     PvPEarly1GateCore,

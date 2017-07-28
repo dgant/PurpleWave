@@ -196,8 +196,8 @@ class ProtossVsZerg extends Parallel {
     new FirstFiveMinutes(new Defend2GateAgainst4Pool),
     
     // Early game macro
-    new RequireSufficientPylons,
-    new TrainProbesContinuously,
+    new RequireSufficientSupply,
+    new TrainWorkersContinuously,
     new If(
       new Not(new Employing(PvZEarlyZealotAllIn)),
       new Parallel(

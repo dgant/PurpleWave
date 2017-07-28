@@ -4,7 +4,7 @@ import Lifecycle.With
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import ProxyBwapi.UnitClass.UnitClass
 
-abstract class BuildGasPumps(pumpType: UnitClass) extends TrainContinuously(pumpType) {
+class BuildGasPumps(pumpType: UnitClass) extends TrainContinuously(pumpType) {
   
   description.set("Build gas pumps on all our geysers")
   

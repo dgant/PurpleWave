@@ -3,7 +3,7 @@ package Planning.Plans.Macro.Automatic
 import Lifecycle.With
 import ProxyBwapi.Races.Protoss
 
-class TrainProbesContinuously extends TrainContinuously(Protoss.Probe) {
+class TrainWorkersContinuously extends TrainContinuously(Protoss.Probe) {
   
   override def maxDesirable: Int = Math.min(
     75,

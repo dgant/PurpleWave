@@ -3,14 +3,16 @@ package Planning.Plans.Macro.Automatic
 import Lifecycle.With
 import Macro.BuildRequests.RequestAtLeast
 import Planning.Plan
-import ProxyBwapi.Races.Protoss
+import ProxyBwapi.UnitClass.UnitClasses
 
-class RequireSufficientPylons extends Plan {
+class RequireSufficientSupply extends Plan {
   
-  description.set("Require enough pylons to avoid supply block")
+  description.set("Require enough supply to avoid supply block")
+  
+  val supplyProvider =  UnitClasses.get(With.self.race.getSupplyProvider)
   
   override def onUpdate() {
-    With.scheduler.request(this, RequestAtLeast(totalRequiredRecalculate, Protoss.Pylon))
+    With.scheduler.request(this, RequestAtLeast(totalRequiredRecalculate, supplyProvider))
   }
   
   def totalRequiredRecalculate: Int = {
@@ -36,9 +38,9 @@ class RequireSufficientPylons extends Plan {
     //   #1 Supply that is/will be provided by units that exist
     //   #2 Supply that will be provided by plans for which we haven't started building
   
-    val depotCompletionFrames     = Protoss.Pylon.buildFrames + 24 * 4 //Add a few seconds to account for builder transit time (and Pylon finishing time)
-    val supplyPerDepot            = With.self.race.getSupplyProvider.supplyProvided
-    val currentSupplyOfNexus      = With.units.ours.filter(unit => unit.remainingBuildFrames < depotCompletionFrames && ! unit.is(Protoss.Pylon)).toSeq.map(_.unitClass.supplyProvided).sum
+    val depotCompletionFrames     = supplyProvider.buildFrames + (if (supplyProvider.isBuilding) 24 * 4 else 0) //Add a few seconds to account for builder transit time (and finishing time)
+    val supplyPerProvider         = supplyProvider.supplyProvided
+    val currentSupplyOfTownHalls  = With.units.ours.filter(unit => unit.remainingBuildFrames < depotCompletionFrames && ! unit.is(supplyProvider)).toSeq.map(_.unitClass.supplyProvided).sum
     val currentSupplyUsed         = With.self.supplyUsed
     val unitSpendingRatio         = if (With.geography.ourBases.size < 3) 0.4 else 0.75 //This is the metric that needs the most improvement
     val costPerUnitSupply         = 50.0 / 2 //Assume 50 minerals = 1 supply (then divide by two because 1 supply = 2 BWAPI supply)
@@ -48,9 +50,9 @@ class RequireSufficientPylons extends Plan {
   
     val supplySpentBeforeDepotCompletion  = supplyBanked + supplyUsedPerFrame * depotCompletionFrames
     val supplyUsedWhenDepotWouldFinish    = Math.min(400, currentSupplyUsed + supplySpentBeforeDepotCompletion)
-    val totalPylonsRequired               = Math.ceil((supplyUsedWhenDepotWouldFinish - currentSupplyOfNexus) / supplyPerDepot).toInt
-    val pylonsRequired                    = Math.max(0, totalPylonsRequired)
+    val totalProvidersRequired            = Math.ceil((supplyUsedWhenDepotWouldFinish - currentSupplyOfTownHalls) / supplyPerProvider).toInt
+    val providersRequired                 = Math.max(0, totalProvidersRequired)
   
-    pylonsRequired
+    providersRequired
   }
 }

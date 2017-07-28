@@ -201,8 +201,8 @@ class ProtossVsProtoss extends Parallel {
     new TakeThirdBase,
   
     // Early game macro
-    new RequireSufficientPylons,
-    new TrainProbesContinuously,
+    new RequireSufficientSupply,
+    new TrainWorkersContinuously,
     
     // Units/Upgrades
     

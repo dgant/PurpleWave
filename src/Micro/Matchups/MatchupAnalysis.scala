@@ -55,7 +55,9 @@ case class MatchupAnalysis(
   
   def dpfDealingDiffused  (target: UnitInfo): Double = me.dpfOnNextHitAgainst(target) / Math.max(1.0, targets.size)
   def dpfDealingCurrently (target: UnitInfo): Double =
-    if(me.target.contains(target))
+    if ( ! me.canAttack)
+      0.0
+    else if(me.target.contains(target))
       me.dpfOnNextHitAgainst(target)
     else if (me.target.isDefined)
       0.0

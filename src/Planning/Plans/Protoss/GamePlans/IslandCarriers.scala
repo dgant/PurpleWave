@@ -56,8 +56,8 @@ class IslandCarriers extends Parallel {
   
   children.set(Vector(
     new Build(ProtossBuilds.Opening13Nexus_NoZealot_OneGateCore: _*),
-    new RequireSufficientPylons,
-    new TrainProbesContinuously,
+    new RequireSufficientSupply,
+    new TrainWorkersContinuously,
     new BuildAssimilators,
     new ExpandOverIsland,
     new TechToCarriers,

@@ -19,10 +19,19 @@ object EvaluateTargets {
       .product
   }
   
-  def audit(unit: FriendlyUnitInfo): Seq[(UnitInfo, Double, Iterable[(Heuristic[FriendlyUnitInfo, UnitInfo], Double)])] = {
+  def audit(unit: FriendlyUnitInfo): Seq[(UnitInfo, Double, Iterable[(Heuristic[FriendlyUnitInfo, UnitInfo], Double, Double)])] = {
     val output = unit.matchups.targets.map(target =>
-      (target, EvaluateTargets.evaluate(unit, target), unit.action.targetProfile.weightedHeuristics.map(h =>
-        (h.heuristic, h.weighMultiplicatively(unit, target))))).sortBy(_._2)
+      (
+        target,
+        EvaluateTargets.evaluate(unit, target),
+        unit.action.targetProfile.weightedHeuristics.map(h =>
+        (
+          h.heuristic,
+          h.weighMultiplicatively(unit, target),
+          h.heuristic.evaluate(unit, target)
+        ))
+      )
+    ).sortBy(_._2)
     output
   }
 }

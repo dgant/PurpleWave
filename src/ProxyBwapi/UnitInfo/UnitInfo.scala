@@ -148,7 +148,7 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   private val canMoveCache = new CacheFrame(() => unitClass.canMove && topSpeed > 0 && canDoAnything && ! burrowed)
   
   def topSpeedChasing: Double = topSpeedChasingCache.get
-  private val topSpeedChasingCache = new CacheFrame(() => topSpeed * PurpleMath.nanToOne((cooldownMaxAirGround - unitClass.stopFrames) / cooldownMaxAirGround.toDouble))
+  private val topSpeedChasingCache = new CacheFrame(() => topSpeed * PurpleMath.nanToOne(Math.max(0, cooldownMaxAirGround - unitClass.stopFrames) / cooldownMaxAirGround.toDouble))
   
   def topSpeed: Double = topSpeedCache.get
   private val topSpeedCache = new CacheFrame(() =>
@@ -287,6 +287,7 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   def canDoAnything: Boolean = canDoAnythingCache.get
   private val canDoAnythingCache = new CacheFrame(() =>
     aliveAndComplete  &&
+    ( ! unitClass.requiresPsi || powered) &&
     ! stasised        && // These three checks along comprise 6% of our CPU usage. Yes, really.
     ! maelstrommed    &&
     ! lockedDown)

@@ -11,6 +11,6 @@ class MiningBasesAtLeast(requiredBases: Int) extends Plan {
     With.geography.ourBases
       .filter(_.townHall.isDefined)
       .count(base =>
-        base.minerals.size >= 6 &&
+        base.minerals.size >= 5 &&
         base.mineralsLeft / base.minerals.size > 300) >= requiredBases
 }

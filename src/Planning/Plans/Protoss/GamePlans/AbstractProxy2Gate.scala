@@ -46,7 +46,7 @@ abstract class AbstractProxy2Gate extends Parallel {
     new TrainContinuously(Protoss.Zealot),
     new TrainProbesContinuously,
     new Trigger(
-      new UnitsAtLeast(2, UnitMatchType(Protoss.Zealot), complete = false),
+      new Check(() => With.frame > 24 * 60 * 3),
       initialAfter = new TrainContinuously(Protoss.Gateway, 5)))
   
   private class OhNoTheyreTerranGetGoons extends Parallel(

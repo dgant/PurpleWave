@@ -13,16 +13,18 @@ object ZoneUpdater {
   def update() {
     With.geography.zones.foreach(updateZone)
   
-    // TODO: We only want to do this once!
-    With.geography.bases
-      .filter(_.isStartLocation)
-      .foreach(startLocationBase =>
-        With.geography.bases
-          .filter(otherBase => otherBase != startLocationBase && otherBase.gas.nonEmpty)
-          .toVector
-          .sortBy(_.zone.distancePixels(startLocationBase.zone))
-          .headOption
-          .foreach(_.isNaturalOf = Some(startLocationBase)))
+    // TODO: We only want to do this once! The current check is a hack
+    if (With.geography.ourNatural.isEmpty) {
+      With.geography.bases
+        .filter(_.isStartLocation)
+        .foreach(startLocationBase =>
+          With.geography.bases
+            .filter(otherBase => otherBase != startLocationBase && otherBase.gas.nonEmpty)
+            .toVector
+            .sortBy(_.zone.distancePixels(startLocationBase.zone))
+            .headOption
+            .foreach(_.isNaturalOf = Some(startLocationBase)))
+    }
   
     val plannedBases = With.groundskeeper.proposalPlacements
       .flatMap(placement => placement._2.tile)

@@ -53,10 +53,8 @@ class Visualization {
     ShowArchitectureHeuristics,
     ShowArchitecturePaths,
     ShowBases,
+    ShowDesire,
     ShowGroundskeeper,
-    ShowZoneBorderTiles,
-    ShowZones,
-    ShowZonePathDemo,
     ShowGrids,
     ShowMicroDecisions,
     ShowMovementHeuristics,
@@ -68,7 +66,10 @@ class Visualization {
     ShowPlans,
     ShowResources,
     ShowStrategy,
-    ShowStrategyEvaluations
+    ShowStrategyEvaluations,
+    ShowZoneBorderTiles,
+    ShowZones,
+    ShowZonePathDemo
   )
   
   def toggle(view: View) {

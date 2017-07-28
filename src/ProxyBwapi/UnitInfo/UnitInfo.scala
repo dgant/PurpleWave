@@ -148,7 +148,7 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   private val canMoveCache = new CacheFrame(() => unitClass.canMove && topSpeed > 0 && canDoAnything && ! burrowed)
   
   def topSpeedChasing: Double = topSpeedChasingCache.get
-  private val topSpeedChasingCache = new CacheFrame(() => topSpeedCache.get * PurpleMath.nanToOne((cooldownMaxAirGround - unitClass.stopFrames) / cooldownMaxAirGround.toDouble))
+  private val topSpeedChasingCache = new CacheFrame(() => topSpeed * PurpleMath.nanToOne((cooldownMaxAirGround - unitClass.stopFrames) / cooldownMaxAirGround.toDouble))
   
   def topSpeed: Double = topSpeedCache.get
   private val topSpeedCache = new CacheFrame(() =>
@@ -181,79 +181,100 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   def ranged  : Boolean = unitClass.rawCanAttack && unitClass.maxAirGroundRange > 32 * 2
   def melee   : Boolean = unitClass.rawCanAttack && ! ranged
   
-  //TODO: Account for upgrades. Make sure to handle case where unit has no armor upgrades
-  def armorHealth: Int = unitClass.armor // if (player.getUpgradeLevel(unitClass.armorUpgrade)
-  def armorShield: Int = 0 //if(unitClass.maxShields > 0) player.getUpgradeLevel(Protoss.Shields) else 0
+  def armorHealth: Int = armorHealthCache.get
+  def armorShield: Int = armorShieldsCache.get
+  
+  lazy val armorHealthCache   = new CacheFrame(() => unitClass.armor + (if (unitClass.armorUpgrade.levels.size < 3) 0 else player.getUpgradeLevel(unitClass.armorUpgrade)))
+  lazy val armorShieldsCache  = new CacheFrame(() => player.getUpgradeLevel(Protoss.Shields))
   
   def totalHealth: Int = hitPoints + shieldPoints + defensiveMatrixPoints
-  def fractionalHealth:Double = totalHealth.toDouble / unitClass.maxTotalHealth
   
   def stimAttackSpeedBonus: Int = if (stimmed) 2 else 1
   
   def attacksGround : Boolean = unitClass.attacksGround
   def attacksAir    : Boolean = unitClass.attacksAir
   
-  def airDpf    : Double = stimAttackSpeedBonus * unitClass.airDpf
-  def groundDpf : Double = stimAttackSpeedBonus * unitClass.groundDpf
+  def airDpf    : Double = damageOnHitAir     * attacksAgainstAir     / cooldownMaxAir
+  def groundDpf : Double = damageOnHitGround  * attacksAgainstGround  / cooldownMaxGround
   
-  def attacksAgainstAir: Int = unitClass.airDamageFactorRaw * unitClass.maxAirHitsRaw
-  def attacksAgainstGround: Int = {
-    var output = unitClass.groundDamageFactorRaw * unitClass.maxGroundHitsRaw
-    //if() is just to avoid slow is() calls
-    if (output == 0) {
-      if (is(Protoss.Reaver)) output = 1
-      //TODO: Carrier = N attacks, but not Nx damage
-      //TODO: Bunker = 4 attacks, but not 4x damage
-    }
+  def attacksAgainstAir: Int = attacksAgainstAirCache.get
+  private val attacksAgainstAirCache = new CacheFrame(() => {
+    var output = unitClass.airDamageFactorRaw * unitClass.maxAirHitsRaw
+    if (output == 0  && is(Terran.Bunker))    output = 4
+    if (output == 0  && is(Protoss.Carrier))  output = interceptorCount
     output
-  }
+  })
   
-  def cooldownLeft          : Int         = Math.max(airCooldownLeft, groundCooldownLeft)
-  def cooldownMaxAir        : Int         = unitClass.airDamageCooldown     / stimAttackSpeedBonus
-  def cooldownMaxGround     : Int         = unitClass.groundDamageCooldown  / stimAttackSpeedBonus
-  def cooldownMaxAirGround  : Int         = Math.max(if (attacksAir) cooldownMaxAir else 0, if (attacksGround) cooldownMaxGround else 0)
-  def cooldownMaxAgainst(enemy:UnitInfo): Int = if (enemy.flying) cooldownMaxAir else cooldownMaxGround
+  def attacksAgainstGround: Int = attacksAgainstGroundCache.get
+  private val attacksAgainstGroundCache = new CacheFrame(() => {
+    var output = unitClass.groundDamageFactorRaw * unitClass.maxGroundHitsRaw
+    if (output == 0  && is(Terran.Bunker))    output = 4
+    if (output == 0  && is(Protoss.Carrier))  output = interceptorCount
+    if (output == 0  && is(Protoss.Reaver))   output = 1
+    output
+  })
+  
+  def cooldownLeft      : Int = Math.max(airCooldownLeft, groundCooldownLeft)
+  def cooldownMaxAir    : Int = (2 + unitClass.airDamageCooldown)     / stimAttackSpeedBonus // +2 is the RNG
+  def cooldownMaxGround : Int = (2 + unitClass.groundDamageCooldown)  / stimAttackSpeedBonus // +2 is the RNG
+  
+  def cooldownMaxAirGround: Int = Math.max(
+    if (attacksAir)     cooldownMaxAir    else 0,
+    if (attacksGround)  cooldownMaxGround else 0)
+  
+  def cooldownMaxAgainst(enemy: UnitInfo): Int = if (enemy.flying) cooldownMaxAir else cooldownMaxGround
   
   def pixelRangeAgainstFromEdge   (enemy: UnitInfo): Double = if (enemy.flying) pixelRangeAir else pixelRangeGround
   def pixelRangeAgainstFromCenter (enemy: UnitInfo): Double = pixelRangeAgainstFromEdge(enemy) + unitClass.radialHypotenuse + enemy.unitClass.radialHypotenuse
   
-  def damageTypeAgainst (enemy:UnitInfo)  : DamageType  = if (enemy.flying) unitClass.airDamageTypeRaw    else unitClass.groundDamageTypeRaw
-  def attacksAgainst    (enemy:UnitInfo)  : Int         = if (enemy.flying) attacksAgainstAir             else attacksAgainstGround
+  def damageTypeAgainst (enemy: UnitInfo)  : DamageType  = if (enemy.flying) unitClass.airDamageTypeRaw else unitClass.groundDamageTypeRaw
+  def attacksAgainst    (enemy: UnitInfo)  : Int         = if (enemy.flying) attacksAgainstAir          else attacksAgainstGround
   
-  def damageScaleAgainst(enemy:UnitInfo): Double =
+  def damageScaleAgainstHitPoints(enemy: UnitInfo): Double =
     if (enemy.flying && airDpf > 0)
-      if (enemy.shieldPoints > 5) 1.0
-      else Damage.scaleBySize(unitClass.airDamageTypeRaw, enemy.unitClass.size)
+      Damage.scaleBySize(unitClass.airDamageTypeRaw, enemy.unitClass.size)
     else if (groundDpf > 0)
-      if (enemy.shieldPoints > 5) 1.0
-      else Damage.scaleBySize(unitClass.groundDamageTypeRaw, enemy.unitClass.size)
+      Damage.scaleBySize(unitClass.groundDamageTypeRaw, enemy.unitClass.size)
     else
       0.0
   
-  def damageOnHitBeforeArmorGround : Int = unitClass.effectiveGroundDamage //Plus upgrades! Note that the base method accounts for multiple hits (ie interceptors, bunker) and needs revision for this to be accurately used vs armor
-  def damageOnHitBeforeArmorAir    : Int = unitClass.effectiveAirDamage    //Plus upgrades! Note that the base method accounts for multiple hits (ie interceptors, bunker) and needs revision for this to be accurately used vs armor
-  def damageOnHitBeforeArmor(enemy:UnitInfo):Int = if(enemy.flying) damageOnHitBeforeArmorAir else damageOnHitBeforeArmorGround
+  def damageOnHitGround : Int = damageOnHitGroundCache.get
+  def damageOnHitAir    : Int = damageOnHitAirCache.get
+  private val damageOnHitGroundCache  = new CacheFrame(() => unitClass.effectiveGroundDamage  + unitClass.groundDamageBonusRaw  * With.self.getUpgradeLevel(unitClass.groundDamageUpgradeType))
+  private val damageOnHitAirCache     = new CacheFrame(() => unitClass.effectiveAirDamage     + unitClass.airDamageBonusRaw     * With.self.getUpgradeLevel(unitClass.airDamageUpgradeType))
   
-  def damageAgainst(enemy:UnitInfo, enemyShields:Int = 0) : Int = {
-    val hits = attacksAgainst(enemy)
-    val damageOnHit = damageOnHitBeforeArmor(enemy:UnitInfo)
-    val damageScale = damageScaleAgainst(enemy)
-    val damageToShields = if (enemy.shieldPoints > 0) Math.max(0, Math.min(enemy.shieldPoints, hits * (damageOnHit - enemy.armorShield))) else 0
-    val damageToHealth  = Math.max(0, damageScale * (hits * (damageOnHit - enemy.armorHealth) - damageToShields))
-    Math.max(1, damageToHealth.toInt + damageToShields)
+  def damageOnHitBeforeShieldsArmorAndDamageType(enemy: UnitInfo): Int = if(enemy.flying) damageOnHitAir else damageOnHitGround
+  def damageOnNextHitAgainst(enemy: UnitInfo): Int = {
+    damageOnNextHitAgainst(enemy, enemy.shieldPoints)
+  }
+  def damageOnNextHitAgainst(enemy: UnitInfo, enemyShields: Int): Int = {
+    val hits                    = attacksAgainst(enemy)
+    val damageScale             = damageScaleAgainstHitPoints(enemy)
+    val damagePerHit            = damageOnHitBeforeShieldsArmorAndDamageType(enemy: UnitInfo)
+    val damageAssignedToShields = Math.min(damagePerHit * hits, enemyShields + enemy.armorShield * hits)
+    val damageToShields         = Math.min(hits * (damagePerHit - enemy.armorShield), enemyShields)
+    val damageAssignedToHealth  = hits * damagePerHit - damageAssignedToShields
+    val damageToHealth          = damageAssignedToHealth * damageScaleAgainstHitPoints(enemy) - enemy.armorHealth * hits
+    Math.max(1, damageAssignedToHealth + damageAssignedToShields)
   }
   
-  def dpfAgainst(enemy:UnitInfo): Double = {
-    val cooldownVs = cooldownMaxAgainst(enemy)
-    if (cooldownVs == 0) return 0.0
-    damageAgainst(enemy).toDouble / cooldownVs
+  def dpfOnNextHitAgainst(enemy: UnitInfo): Double = {
+    if (unitClass.suicides) {
+      damageOnNextHitAgainst(enemy)
+    }
+    else {
+      val cooldownVs = cooldownMaxAgainst(enemy)
+      if (cooldownVs == 0)
+        0.0
+      else
+        damageOnNextHitAgainst(enemy).toDouble / cooldownVs
+    }
   }
   
-  def canDoAnything:Boolean = canDoAnythingCache.get
+  def canDoAnything: Boolean = canDoAnythingCache.get
   private val canDoAnythingCache = new CacheFrame(() =>
     aliveAndComplete  &&
-    // These three checks along comprise 6% of our CPU usage. Yes, really.
-    ! stasised        &&
+    ! stasised        && // These three checks along comprise 6% of our CPU usage. Yes, really.
     ! maelstrommed    &&
     ! lockedDown)
   

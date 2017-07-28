@@ -73,12 +73,12 @@ class Avatar {
     vulnerabilityAirConcussive      = if ( ! unit.flying) 0.0 else Damage.scaleBySize(DamageType.Concussive, unit.unitClass.size)
     vulnerabilityAirExplosive       = if ( ! unit.flying) 0.0 else Damage.scaleBySize(DamageType.Explosive,  unit.unitClass.size)
     vulnerabilityAirNormal          = if ( ! unit.flying) 0.0 else Damage.scaleBySize(DamageType.Normal,     unit.unitClass.size)
-    dpfGroundConcussiveFocused      = efficacy * (if (unit.unitClass.groundDamageType == DamageType.Concussive) unit.damageOnHitBeforeArmorGround else 0.0) / unit.cooldownMaxGround.toDouble
-    dpfGroundExplosiveFocused       = efficacy * (if (unit.unitClass.groundDamageType == DamageType.Explosive)  unit.damageOnHitBeforeArmorGround else 0.0) / unit.cooldownMaxGround.toDouble
-    dpfGroundNormalFocused          = efficacy * (if (unit.unitClass.groundDamageType == DamageType.Normal)     unit.damageOnHitBeforeArmorGround else 0.0) / unit.cooldownMaxGround.toDouble
-    dpfAirConcussiveFocused         = efficacy * (if (unit.unitClass.airDamageType    == DamageType.Concussive) unit.damageOnHitBeforeArmorAir    else 0.0) / unit.cooldownMaxAir.toDouble
-    dpfAirExplosiveFocused          = efficacy * (if (unit.unitClass.airDamageType    == DamageType.Explosive)  unit.damageOnHitBeforeArmorAir    else 0.0) / unit.cooldownMaxAir.toDouble
-    dpfAirNormalFocused             = efficacy * (if (unit.unitClass.airDamageType    == DamageType.Normal)     unit.damageOnHitBeforeArmorAir    else 0.0) / unit.cooldownMaxAir.toDouble
+    dpfGroundConcussiveFocused      = efficacy * (if (unit.unitClass.groundDamageType == DamageType.Concussive) unit.damageOnHitGround else 0.0) / unit.cooldownMaxGround.toDouble
+    dpfGroundExplosiveFocused       = efficacy * (if (unit.unitClass.groundDamageType == DamageType.Explosive)  unit.damageOnHitGround else 0.0) / unit.cooldownMaxGround.toDouble
+    dpfGroundNormalFocused          = efficacy * (if (unit.unitClass.groundDamageType == DamageType.Normal)     unit.damageOnHitGround else 0.0) / unit.cooldownMaxGround.toDouble
+    dpfAirConcussiveFocused         = efficacy * (if (unit.unitClass.airDamageType    == DamageType.Concussive) unit.damageOnHitAir    else 0.0) / unit.cooldownMaxAir.toDouble
+    dpfAirExplosiveFocused          = efficacy * (if (unit.unitClass.airDamageType    == DamageType.Explosive)  unit.damageOnHitAir    else 0.0) / unit.cooldownMaxAir.toDouble
+    dpfAirNormalFocused             = efficacy * (if (unit.unitClass.airDamageType    == DamageType.Normal)     unit.damageOnHitAir    else 0.0) / unit.cooldownMaxAir.toDouble
     dpfGroundConcussiveUnfocused    = dpfGroundConcussiveFocused  * unfocusedPenalty(unit)
     dpfGroundExplosiveUnfocused     = dpfGroundExplosiveFocused   * unfocusedPenalty(unit)
     dpfGroundNormalUnfocused        = dpfGroundNormalFocused      * unfocusedPenalty(unit)

@@ -14,6 +14,7 @@ object Sneak extends Action {
       matchups.enemies.exists(e =>
         e.unitClass.isDetector
         && e.aliveAndComplete
+        && (e.unitClass.canMove || e.pixelDistanceFast(unit) < 11.0 * 32.0)
         && e.pixelDistanceFast(unit) < 13.0 * 32.0)
     })
   }

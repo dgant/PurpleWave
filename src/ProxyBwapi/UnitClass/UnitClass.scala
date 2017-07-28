@@ -7,7 +7,7 @@ import bwapi.{Race, UnitType}
 
 import scala.collection.mutable.ListBuffer
 
-case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
+case class UnitClass(base: UnitType) extends UnitClassProxy(base) {
   
   lazy val asStringNeat: String = asString
     .replace("Terran_", "")
@@ -31,55 +31,55 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
   // Combat //
   ////////////
   
-  lazy val effectiveAirDamage:Int =
-    if      (this == Protoss.Carrier)      Protoss.Interceptor.effectiveAirDamage * 8
-    else if (this == Protoss.Interceptor)  Protoss.Interceptor.airDamageRaw
-    else if (this == Terran.Bunker)        Terran.Marine.effectiveAirDamage * 4
-    else                                   airDamageRaw
+  lazy val suicides: Boolean = Array(
+    Terran.SpiderMine,
+    Protoss.Scarab,
+    Zerg.InfestedTerran,
+    Zerg.Scourge)
+    .contains(this)
   
-  lazy val effectiveGroundDamage:Int =
-    if (this == Terran.Bunker)         Terran.Marine.effectiveGroundDamage * 4 else
-    if (this == Protoss.Carrier)       Protoss.Interceptor.groundDamageRaw * 8 else
-    if (this == Protoss.Interceptor)   0 else
-    if (this == Protoss.Reaver)        Protoss.Scarab.effectiveGroundDamage
-    else                               groundDamageRaw
+  lazy val maxTotalHealth: Int = maxHitPoints + maxShields
   
-  private def cooldownZeroBecomesInfinity(cooldown:Int):Int = if (cooldown == 0) Int.MaxValue else cooldown
+  lazy val effectiveAirDamage: Int =
+    if      (this == Terran.Bunker)   Terran.Marine.airDamageRaw
+    else                              airDamageRaw
   
-  lazy val airDamageCooldown:Int =
-    if (this == Terran.Bunker)   Terran.Marine.airDamageCooldown else
-    if (this == Protoss.Carrier) Protoss.Interceptor.airDamageCooldown else
-    cooldownZeroBecomesInfinity(airDamageCooldownRaw)
+  lazy val effectiveGroundDamage: Int =
+    if      (this == Terran.Bunker)   Terran.Marine.groundDamageRaw
+    else if (this == Protoss.Reaver)  Protoss.Scarab.groundDamageRaw
+    else                              groundDamageRaw
+  
+  private def cooldownZeroBecomesInfinity(cooldown: Int): Int = if (cooldown == 0) Int.MaxValue else cooldown
+  
+  lazy val airDamageCooldown: Int =
+    if      (this == Terran.Bunker)   Terran.Marine.airDamageCooldown
+    else if (this == Protoss.Carrier) Protoss.Interceptor.airDamageCooldown
+    else                              cooldownZeroBecomesInfinity(airDamageCooldownRaw)
     
-  lazy val groundDamageCooldown:Int =
-    if (this == Terran.Bunker)    Terran.Marine.groundDamageCooldown else
-    if (this == Protoss.Carrier)  Protoss.Interceptor.groundDamageCooldown else
-    if (this == Protoss.Reaver)   60 else
-    cooldownZeroBecomesInfinity(groundDamageCooldownRaw)
-  
-  //The extra 2+ is to account for the 1-3 frame random variation in cooldown
-  lazy val airDpf    : Double = airDamageFactorRaw    * maxAirHitsRaw     * effectiveAirDamage    / (2 + airDamageCooldown).toDouble
-  lazy val groundDpf : Double = groundDamageFactorRaw * maxGroundHitsRaw  * effectiveGroundDamage / (2 + groundDamageCooldown).toDouble
+  lazy val groundDamageCooldown: Int =
+    if      (this == Terran.Bunker)   Terran.Marine.groundDamageCooldown
+    else if (this == Protoss.Carrier) Protoss.Interceptor.groundDamageCooldown
+    else if (this == Protoss.Reaver)  60
+    else                              cooldownZeroBecomesInfinity(groundDamageCooldownRaw)
   
   lazy val attacksGround : Boolean = effectiveGroundDamage > 0
   lazy val attacksAir    : Boolean = effectiveAirDamage    > 0
   
-  lazy val helpsInCombat:Boolean = rawCanAttack || isSpellcaster || Set(Terran.Bunker).contains(this)
+  lazy val helpsInCombat: Boolean = rawCanAttack || isSpellcaster || Set(Terran.Bunker).contains(this)
   
   lazy val groundRange        : Int = if (this == Terran.Bunker) Terran.Marine.groundRange  + 32 else if (this == Protoss.Carrier) 32 * 8 else if (this == Protoss.Reaver) 32 * 8 else groundRangeRaw
   lazy val airRange           : Int = if (this == Terran.Bunker) Terran.Marine.airRange     + 32 else if (this == Protoss.Carrier) 32 * 8 else airRangeRaw
   lazy val maxAirGroundRange  : Int = Math.max(groundRange, airRange)
   
-  lazy val isResource:Boolean = isMinerals || isGas
-  lazy val maxTotalHealth:Int = maxHitPoints + maxShields
-  lazy val totalCost: Int = mineralPrice + gasPrice
-  lazy val orderable:Boolean = ! isSpell && ! Set(Protoss.Interceptor, Protoss.Scarab, Terran.SpiderMine).contains(this)
-  lazy val isMinerals:Boolean = isMineralField
-  lazy val isGas:Boolean = Vector(Neutral.Geyser, Terran.Refinery, Protoss.Assimilator, Zerg.Extractor).contains(this)
-  lazy val tileArea:TileRectangle = TileRectangle(Tile(0, 0), tileSize)
-  lazy val isTownHall:Boolean = Vector(Terran.CommandCenter, Protoss.Nexus, Zerg.Hatchery, Zerg.Lair, Zerg.Hive).contains(this)
+  lazy val orderable    : Boolean     = ! isSpell && ! Set(Protoss.Interceptor, Protoss.Scarab, Terran.SpiderMine).contains(this)
+  lazy val isResource   : Boolean     = isMinerals || isGas
+  lazy val isMinerals   : Boolean     = isMineralField
+  lazy val isGas        : Boolean     = Vector(Neutral.Geyser, Terran.Refinery, Protoss.Assimilator, Zerg.Extractor).contains(this)
+  lazy val isTownHall   : Boolean     = Vector(Terran.CommandCenter, Protoss.Nexus, Zerg.Hatchery, Zerg.Lair, Zerg.Hive).contains(this)
+  lazy val isSiegeTank  : Boolean     = this == Terran.SiegeTankSieged || this == Terran.SiegeTankUnsieged
+  lazy val tileArea     : TileRectangle = TileRectangle(Tile(0, 0), tileSize)
   
-  lazy val affectedByDarkSwarm: Boolean = ! Vector(
+  lazy val affectedByDarkSwarm: Boolean = Vector(
     Terran.SiegeTankSieged,
     Terran.Firebat,
     Protoss.Zealot,
@@ -102,8 +102,6 @@ case class UnitClass(base:UnitType) extends UnitClassProxy(base) {
   lazy val isProtoss : Boolean = race == Race.Protoss
   lazy val isTerran  : Boolean = race == Race.Terran
   lazy val isZerg    : Boolean = race == Race.Zerg
-  
-  lazy val isSiegeTank: Boolean = this == Terran.SiegeTankSieged || this == Terran.SiegeTankUnsieged
   
   lazy val buildTechEnabling     : Option[Tech]       = buildTechEnablingCalculate
   lazy val buildUnitsEnabling    : Vector[UnitClass]  = buildUnitsEnablingCalculate

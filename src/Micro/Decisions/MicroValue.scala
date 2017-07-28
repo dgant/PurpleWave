@@ -10,10 +10,10 @@ object MicroValue {
   }
   
   def valuePerAttack(from: UnitInfo, to: UnitInfo): Double = {
-    from.damageAgainst(to) * valuePerDamage(to)
+    from.damageOnNextHitAgainst(to) * valuePerDamage(to)
   }
   
   def valuePerFrame(from: UnitInfo, to: UnitInfo): Double = {
-    PurpleMath.nanToOne(from.damageAgainst(to) * valuePerDamage(to) / from.cooldownMaxAgainst(to))
+    PurpleMath.nanToOne(from.damageOnNextHitAgainst(to) * valuePerDamage(to) / from.cooldownMaxAgainst(to))
   }
 }

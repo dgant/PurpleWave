@@ -9,8 +9,8 @@ object Sally extends Action {
   override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.canMove &&
     unit.matchups.allies.exists(staticDefense =>
-      staticDefense.unitClass.isBuilding  &&
-      staticDefense.unitClass.rawCanAttack   &&
+      staticDefense.unitClass.isBuilding      &&
+      staticDefense.unitClass.rawCanAttack    &&
       staticDefense.matchups.dpfReceivingDiffused > 0)
   }
   

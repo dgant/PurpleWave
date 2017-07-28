@@ -41,7 +41,7 @@ object Duck extends Action {
         .map(threat => Explosion(
           threat.target.get.pixelCenter,
           32.0 * 2.0,
-          threat.damageAgainst(unit)))
+          threat.damageOnNextHitAgainst(unit)))
     }
     
     output

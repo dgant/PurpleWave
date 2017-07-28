@@ -53,10 +53,10 @@ case class MatchupAnalysis(
   lazy val framesToRetreatDiffused    : Double  = if (threatsInRange.isEmpty) 0.0 else threatsInRange.map(threat => me.framesToTravelPixels(threat.pixelRangeAgainstFromCenter(me) - threat.pixelDistanceFast(at))).max
   lazy val doomed                     : Boolean = framesToLiveDiffused <= framesToRetreatDiffused
   
-  def dpfDealingDiffused  (target: UnitInfo): Double = me.dpfAgainst(target) / Math.max(1.0, targets.size)
+  def dpfDealingDiffused  (target: UnitInfo): Double = me.dpfOnNextHitAgainst(target) / Math.max(1.0, targets.size)
   def dpfDealingCurrently (target: UnitInfo): Double =
     if(me.target.contains(target))
-      me.dpfAgainst(target)
+      me.dpfOnNextHitAgainst(target)
     else if (me.target.isDefined)
       0.0
     else

@@ -100,7 +100,7 @@ case class Simulacrum(simulation: Simulation, unit: UnitInfo) {
   
   def strikeTarget() {
     val victim            = target.get
-    val damage            = Math.min(target.get.hitPoints, unit.damageAgainst(victim.unit))
+    val damage            = Math.min(target.get.hitPoints, unit.damageOnNextHitAgainst(victim.unit))
     val value             = damage * victim.valuePerDamage
     cooldown              = unit.cooldownMaxAgainst(victim.unit)
     damageDealt           += damage

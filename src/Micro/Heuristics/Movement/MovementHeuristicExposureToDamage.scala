@@ -22,7 +22,7 @@ object MovementHeuristicExposureToDamage extends MovementHeuristic {
   }
   
   def evaluateOne(us: FriendlyUnitInfo, threat: UnitInfo, candidate: Pixel): Double = {
-    val dpf               = threat.dpfAgainst(us)
+    val dpf               = threat.dpfOnNextHitAgainst(us)
     val range             = threat.pixelRangeAgainstFromCenter(us)
     val distance          = threat.pixelDistanceFast(us)
     val travelDelay       = threat.framesToTravelPixels(threat.pixelDistanceFast(candidate)) // Air distance! Ground distance might be interesting too for shooting over cliffs

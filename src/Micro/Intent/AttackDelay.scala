@@ -16,8 +16,10 @@ object AttackDelay {
   So having good stuck-unit detection and unsticking is also important.
   */
   
+  private val inexplicableExperimentalSafetyMargin = 1
+  
   def framesToWaitAfterIssuingAttackOrder(unit: FriendlyUnitInfo): Int = {
-    1 + Math.max(With.latency.latencyFrames, unit.unitClass.stopFrames)
+    1 + Math.max(With.latency.latencyFrames, unit.unitClass.stopFrames)                 + inexplicableExperimentalSafetyMargin
   }
   
   def nextSafeOrderFrame(unit: FriendlyUnitInfo): Int = {
@@ -28,11 +30,11 @@ object AttackDelay {
   }
   
   private def nextSafeOrderFrameInGeneral(unit: FriendlyUnitInfo): Int = {
-    unit.lastAttackStartFrame + unit.unitClass.stopFrames - With.latency.latencyFrames
+    unit.lastAttackStartFrame + unit.unitClass.stopFrames - With.latency.latencyFrames  + inexplicableExperimentalSafetyMargin
   }
   
   private def nextSafeOrderFrameDragoon(dragoon: FriendlyUnitInfo): Int = {
-    dragoon.lastAttackStartFrame + 1 + 9 - With.latency.latencyFrames
+    dragoon.lastAttackStartFrame + 1 + 9 - With.latency.latencyFrames                   + inexplicableExperimentalSafetyMargin
   }
   
   /*

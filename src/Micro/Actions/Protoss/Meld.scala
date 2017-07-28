@@ -8,11 +8,11 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 object Meld extends Action {
   
   override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.action.canMeld
+    unit.agent.canMeld
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {
-    val besties = unit.matchups.allies.filter(u => u.friendly.get.action.canMeld)
+    val besties = unit.matchups.allies.filter(u => u.friendly.get.agent.canMeld)
     if (besties.nonEmpty) {
       val bestBestie = besties.minBy(_.pixelDistanceFast(unit))
       With.commander.useTechOnUnit(unit, Protoss.ArchonMeld, bestBestie)

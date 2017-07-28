@@ -12,15 +12,15 @@ object Produce extends Action {
   
   override def perform(unit: FriendlyUnitInfo) {
     
-    if (unit.action.toTrain.isDefined) {
-      With.commander.build(unit, unit.action.toTrain.get)
-      unit.action.intent.toTrain = None //Avoid building repeatedly
+    if (unit.agent.toTrain.isDefined) {
+      With.commander.build(unit, unit.agent.toTrain.get)
+      unit.agent.intent.toTrain = None //Avoid building repeatedly
     }
-    else if (unit.action.toTech.isDefined) {
-      With.commander.tech(unit, unit.action.toTech.get)
+    else if (unit.agent.toTech.isDefined) {
+      With.commander.tech(unit, unit.agent.toTech.get)
     }
-    else if (unit.action.toUpgrade.isDefined) {
-      With.commander.upgrade(unit, unit.action.toUpgrade.get)
+    else if (unit.agent.toUpgrade.isDefined) {
+      With.commander.upgrade(unit, unit.agent.toUpgrade.get)
     }
   }
 }

@@ -2,7 +2,7 @@ package Planning.Plans.Army
 
 import Information.Geography.Types.Zone
 import Lifecycle.With
-import Micro.Intent.Intention
+import Micro.Agency.Intention
 import Planning.Composition.Property
 import Planning.Composition.ResourceLocks.LockUnits
 import Planning.Composition.UnitCounters.{UnitCountCombat, UnitCountOne}

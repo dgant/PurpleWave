@@ -1,7 +1,7 @@
 package Planning.Plans.Army
 
 import Lifecycle.With
-import Micro.Intent.Intention
+import Micro.Agency.Intention
 import Planning.Composition.Property
 import Planning.Composition.ResourceLocks.LockUnits
 import Planning.Composition.UnitCounters.UnitCountOne
@@ -18,8 +18,8 @@ class ClearBurrowedBlockers extends Plan {
   override def onUpdate(): Unit = {
     
     val target = With.units.ours
-      .find(u => u.action.toBuild.exists(_.isTownHall))
-      .flatMap(_.action.toBuildTile.map(_.pixelCenter))
+      .find(u => u.agent.toBuild.exists(_.isTownHall))
+      .flatMap(_.agent.toBuildTile.map(_.pixelCenter))
     
     if (target.isEmpty) return
     

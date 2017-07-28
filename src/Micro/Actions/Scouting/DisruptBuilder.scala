@@ -19,7 +19,7 @@ object DisruptBuilder extends Action {
     
     if (unit.matchups.threatsViolent.isEmpty) {
       val target = EvaluateTargets.best(unit, builders)
-      unit.action.toAttack = target
+      unit.agent.toAttack = target
       Attack.delegate(unit)
     }
   }

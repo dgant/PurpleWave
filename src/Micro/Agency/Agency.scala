@@ -1,45 +1,44 @@
-package Micro.Execution
+package Micro.Agency
 
 import Lifecycle.With
 import Micro.Actions.Idle
-import Micro.Intent.Intention
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 import scala.collection.mutable
 
-class Executor {
+class Agency {
   
-  private val stateByUnit = new mutable.HashMap[FriendlyUnitInfo, ActionState]
+  private val agents = new mutable.HashMap[FriendlyUnitInfo, Agent]
   private var finishedExecutingLastTime = true
   
-  def states: Iterable[ActionState] = stateByUnit.values
+  def states: Iterable[Agent] = agents.values
   
   def intend(intention: Intention) {
     getState(intention.unit).intent = intention
   }
   
-  def getState(unit: FriendlyUnitInfo): ActionState = {
-    if ( ! stateByUnit.contains(unit)) {
-      stateByUnit.put(unit, new ActionState(unit))
+  def getState(unit: FriendlyUnitInfo): Agent = {
+    if ( ! agents.contains(unit)) {
+      agents.put(unit, new Agent(unit))
     }
-    stateByUnit(unit)
+    agents(unit)
   }
   
   //////////////
   // Batching //
   //////////////
   
-  val unitQueue = new mutable.Queue[ActionState]
+  val unitQueue = new mutable.Queue[Agent]
   
   def run() {
     
     if ( ! With.latency.isLastFrameOfTurn && finishedExecutingLastTime) return
   
-    stateByUnit.keys.filterNot(_.alive).foreach(stateByUnit.remove)
+    agents.keys.filterNot(_.alive).foreach(agents.remove)
     
     if (unitQueue.isEmpty) {
-      unitQueue ++= stateByUnit.values.toVector.sortBy(_.lastFrame)
+      unitQueue ++= agents.values.toVector.sortBy(_.lastFrame)
     }
     
     var doContinue = true

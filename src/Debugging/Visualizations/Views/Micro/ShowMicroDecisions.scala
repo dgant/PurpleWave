@@ -11,13 +11,13 @@ object ShowMicroDecisions extends View {
     if (units.isEmpty) units = With.units.ours.filter(_.battle.exists(_.happening))
     units = units
       .filter(unit => With.viewport.contains(unit.pixelCenter))
-      .filter(_.action.microDecisions.nonEmpty)
-      .filter(unit => With.framesSince(unit.action.microDecisionsUpdateFrame) < 24)
+      .filter(_.agent.microDecisions.nonEmpty)
+      .filter(unit => With.framesSince(unit.agent.microDecisionsUpdateFrame) < 24)
     units = units.take(1)
     units.foreach(renderMapUnit)
   }
   
   def renderMapUnit(unit: FriendlyUnitInfo) {
-    unit.action.microDecisions.foreach(_.renderMap())
+    unit.agent.microDecisions.foreach(_.renderMap())
   }
 }

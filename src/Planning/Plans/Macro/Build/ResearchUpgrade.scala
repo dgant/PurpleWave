@@ -2,7 +2,7 @@ package Planning.Plans.Macro.Build
 
 import Lifecycle.With
 import Macro.Scheduling.Project
-import Micro.Intent.Intention
+import Micro.Agency.Intention
 import Planning.Composition.ResourceLocks._
 import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Composition.UnitMatchers.UnitMatchType

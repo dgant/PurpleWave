@@ -1,7 +1,7 @@
 package Planning.Plans.Macro.Build
 
 import Macro.Scheduling.Project
-import Micro.Intent.Intention
+import Micro.Agency.Intention
 import Planning.Composition.ResourceLocks.{LockCurrencyForUnit, LockUnits}
 import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Composition.UnitMatchers.UnitMatchType

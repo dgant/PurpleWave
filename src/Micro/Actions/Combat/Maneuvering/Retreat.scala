@@ -10,21 +10,21 @@ object Retreat extends Action {
   
   override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.canMove &&
-    unit.pixelCenter.zone != unit.action.origin.zone &&
+    unit.pixelCenter.zone != unit.agent.origin.zone &&
     unit.matchups.threats.nonEmpty
   }
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
   
     lazy val zone               = unit.pixelCenter.zone
-    lazy val originZone         = unit.action.origin.zone
-    lazy val destinationZone    = unit.action.toTravel.map(_.zone)
+    lazy val originZone         = unit.agent.origin.zone
+    lazy val destinationZone    = unit.agent.toTravel.map(_.zone)
     lazy val exitToOrigin       = zone.pathTo(originZone).flatMap(_.steps.headOption.map(_.edge.centerPixel))
     lazy val exitToDestination  = destinationZone.flatMap(dZone => zone.pathTo(dZone).flatMap(_.steps.headOption.map(_.edge.centerPixel)))
     lazy val threatsAllMelee    = unit.matchups.threats.forall(_.melee)
     lazy val alreadyHome        = zone == originZone
     lazy val alreadyArrived     = destinationZone.contains(zone)
-    lazy val holdingFormation   = unit.action.toForm.exists(unit.pixelDistanceFast(_) < 4.0)
+    lazy val holdingFormation   = unit.agent.toForm.exists(unit.pixelDistanceFast(_) < 4.0)
     lazy val canTakeFreeShots   = unit.matchups.threatsInRange.isEmpty
     lazy val slowerThanThreats  = unit.matchups.threats.forall(_.topSpeedChasing > unit.topSpeed)
     lazy val trapped            = unit.damageInLastSecond > 0 && (exitToOrigin.isEmpty      || unit.matchups.framesToLiveCurrently < unit.framesToTravelTo(exitToOrigin.get))
@@ -45,7 +45,7 @@ object Retreat extends Action {
       Avoid.delegate(unit)
     }
     else {
-      unit.action.toTravel = Some(unit.action.origin)
+      unit.agent.toTravel = Some(unit.agent.origin)
       Travel.delegate(unit)
     }
     

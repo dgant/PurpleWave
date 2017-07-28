@@ -1,7 +1,7 @@
 package Micro.Heuristics.Targeting
 
 import Mathematics.Heuristics.{Heuristic, HeuristicEvaluation}
-import Micro.Intent.Intention
+import Micro.Agency.Intention
 import ProxyBwapi.UnitInfo.UnitInfo
 
 class TargetHeuristicEvaluation(

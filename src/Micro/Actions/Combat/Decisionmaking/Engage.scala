@@ -10,7 +10,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 object Engage extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.action.canFight &&
+    unit.agent.canFight &&
     unit.matchups.targets.nonEmpty
   }
   

@@ -1,4 +1,4 @@
-package Micro.Behaviors
+package Micro.Agency
 
 import Micro.Heuristics.Movement.MovementProfile
 

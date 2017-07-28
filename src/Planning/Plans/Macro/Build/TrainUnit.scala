@@ -1,7 +1,6 @@
 package Planning.Plans.Macro.Build
 
 import Debugging.Visualizations.Rendering.DrawMap
-import Micro.Intent.Intention
 import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Plan
@@ -10,6 +9,7 @@ import ProxyBwapi.UnitClass.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Lifecycle.With
 import Macro.Scheduling.Project
+import Micro.Agency.Intention
 
 class TrainUnit(val traineeClass: UnitClass) extends Plan {
   

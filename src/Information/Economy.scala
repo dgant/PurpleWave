@@ -47,7 +47,7 @@ class Economy {
     With.units
       .inRectangle(base.harvestingArea)
       .flatten(_.friendly)
-      .filter(unit => unit.unitClass.isWorker && unit.action.lastAction.contains(Gather))
+      .filter(unit => unit.unitClass.isWorker && unit.agent.lastAction.contains(Gather))
   }
   
   def ourActiveMiners(base:Base):Traversable[FriendlyUnitInfo] = {

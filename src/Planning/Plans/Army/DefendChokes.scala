@@ -3,7 +3,7 @@ package Planning.Plans.Army
 import Information.Geography.Types.Edge
 import Lifecycle.With
 import Mathematics.Formations.Formation
-import Micro.Intent.Intention
+import Micro.Agency.Intention
 import Planning.Composition.ResourceLocks.LockUnits
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Composition.{Property, UnitCountEverything}

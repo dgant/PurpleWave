@@ -12,9 +12,9 @@ object MoveHeuristically extends Action {
   }
   
   override def perform(unit: FriendlyUnitInfo) {
-    val pixelToMove = EvaluatePixels.best(unit.action, unit.action.movementProfile)
-    unit.action.movingTo = Some(pixelToMove)
-    unit.action.movedHeuristicallyFrame = With.frame
+    val pixelToMove = EvaluatePixels.best(unit.agent, unit.agent.movementProfile)
+    unit.agent.movingTo = Some(pixelToMove)
+    unit.agent.movedHeuristicallyFrame = With.frame
     With.commander.move(unit, pixelToMove)
   }
 }

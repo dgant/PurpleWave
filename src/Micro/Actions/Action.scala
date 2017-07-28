@@ -11,7 +11,7 @@ abstract class Action {
   
   final def consider(unit: FriendlyUnitInfo, giveCredit: Boolean = true) {
     if (unit.readyForMicro && allowed(unit)) {
-      if (giveCredit) unit.action.lastAction = Some(this)
+      if (giveCredit) unit.agent.lastAction = Some(this)
       perform(unit)
     }
   }

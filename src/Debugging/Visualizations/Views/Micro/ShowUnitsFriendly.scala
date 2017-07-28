@@ -4,15 +4,15 @@ import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.View
 import Lifecycle.With
-import Micro.Execution.ActionState
+import Micro.Agency.Agent
 
 object ShowUnitsFriendly extends View {
   
   override def renderMap() {
-    With.executor.states.foreach(renderUnitState)
+    With.agents.states.foreach(renderUnitState)
   }
   
-  def renderUnitState(state: ActionState) {
+  def renderUnitState(state: Agent) {
     if ( ! With.viewport.contains(state.unit.pixelCenter)) return
     if ( ! state.unit.unitClass.orderable) return
     

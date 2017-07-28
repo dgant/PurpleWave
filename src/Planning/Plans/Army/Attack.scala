@@ -1,9 +1,9 @@
 package Planning.Plans.Army
 
 import Lifecycle.With
-import Micro.Intent.Intention
+import Micro.Agency.Intention
 import Planning.Composition.ResourceLocks.LockUnits
-import Planning.Composition.UnitMatchers.{UnitMatchAnd, UnitMatchMobileDetectors, UnitMatchMobile, UnitMatchWarriors}
+import Planning.Composition.UnitMatchers.{UnitMatchAnd, UnitMatchMobile, UnitMatchMobileDetectors, UnitMatchWarriors}
 import Planning.Composition.UnitPreferences.UnitPreferClose
 import Planning.Composition.{Property, UnitCountEverything}
 import Planning.Plan

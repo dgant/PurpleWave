@@ -2,7 +2,7 @@ package Planning.Plans.Macro.Automatic
 
 import Information.Geography.Types.Base
 import Lifecycle.With
-import Micro.Intent.Intention
+import Micro.Agency.Intention
 import Performance.Caching.Limiter
 import Planning.Composition.ResourceLocks.LockUnits
 import Planning.Composition.UnitCountEverything

@@ -5,12 +5,12 @@ import Lifecycle.With
 import Mathematics.Heuristics.HeuristicMathMultiplicative
 import Mathematics.Points.Pixel
 import Mathematics.Shapes.Circle
-import Micro.Execution.ActionState
+import Micro.Agency.Agent
 import ProxyBwapi.UnitInfo.UnitInfo
 
 object EvaluatePixels {
 
-  def best(state: ActionState, profile: MovementProfile): Pixel = {
+  def best(state: Agent, profile: MovementProfile): Pixel = {
     
     val candidates = getSprayCandidates(state)
   
@@ -33,7 +33,7 @@ object EvaluatePixels {
     HeuristicMathMultiplicative.best(state, profile.weightedHeuristics, candidates)
   }
   
-  def getSprayCandidates(state: ActionState): Vector[Pixel] = {
+  def getSprayCandidates(state: Agent): Vector[Pixel] = {
     val startingPixel = state.unit.pixelCenter
     val startingZone  = startingPixel.zone
     val scalingFactor = 8
@@ -44,7 +44,7 @@ object EvaluatePixels {
     pixels
   }
   
-  def getRadialCandidates(state: ActionState): Vector[Pixel] = {
+  def getRadialCandidates(state: Agent): Vector[Pixel] = {
 
     val startingPixel = state.unit.pixelCenter
     val otherPixels =

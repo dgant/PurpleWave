@@ -7,7 +7,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 object Punch extends Action {
   
   override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.action.canFight                  &&
+    unit.agent.canFight                  &&
     unit.canAttack              &&
     unit.melee                            &&
     unit.matchups.targetsInRange.nonEmpty &&

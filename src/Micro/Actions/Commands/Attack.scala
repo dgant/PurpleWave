@@ -7,11 +7,11 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 object Attack extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.action.canFight &&
-    unit.action.toAttack.isDefined
+    unit.agent.canFight &&
+    unit.agent.toAttack.isDefined
   }
   
   override def perform(unit: FriendlyUnitInfo) {
-    With.commander.attack(unit, unit.action.toAttack.get)
+    With.commander.attack(unit, unit.agent.toAttack.get)
   }
 }

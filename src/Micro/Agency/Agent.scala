@@ -1,13 +1,11 @@
-package Micro.Execution
+package Micro.Agency
 
 import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile}
 import Micro.Actions.Action
-import Micro.Behaviors.{MovementProfiles, TargetingProfiles}
 import Micro.Decisions.MicroDecision
 import Micro.Heuristics.Movement.{MovementHeuristicEvaluation, MovementProfile}
 import Micro.Heuristics.Targeting.TargetingProfile
-import Micro.Intent.Intention
 import Performance.Caching.CacheFrame
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClass.UnitClass
@@ -16,7 +14,7 @@ import ProxyBwapi.Upgrades.Upgrade
 
 import scala.collection.mutable.ListBuffer
 
-class ActionState(val unit: FriendlyUnitInfo) {
+class Agent(val unit: FriendlyUnitInfo) {
   
   ///////////////
   // Messaging //

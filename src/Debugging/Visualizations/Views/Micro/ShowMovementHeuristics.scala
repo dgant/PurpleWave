@@ -16,18 +16,18 @@ object ShowMovementHeuristics extends View {
     var focus: Iterable[FriendlyUnitInfo] = With.units.ours.filter(unit => unit.selected && eligible(unit))
     
     if (focus.isEmpty) {
-      focus = With.executor.states
+      focus = With.agents.states
         .filter(state => state.movementHeuristicResults.nonEmpty && eligible(state.unit))
         .map(_.unit)
         .headOption
     }
     
-    focus.foreach(unit => renderUnit(unit.action.movementHeuristicResults))
+    focus.foreach(unit => renderUnit(unit.agent.movementHeuristicResults))
   }
   
   private def eligible(unit: FriendlyUnitInfo): Boolean =
     unit.aliveAndComplete &&
-      With.framesSince(With.executor.getState(unit).movedHeuristicallyFrame) < 24 &&
+      With.framesSince(With.agents.getState(unit).movedHeuristicallyFrame) < 24 &&
       With.viewport.contains(unit.pixelCenter)
   
   def scale(results: Iterable[MovementHeuristicEvaluation]): Double =

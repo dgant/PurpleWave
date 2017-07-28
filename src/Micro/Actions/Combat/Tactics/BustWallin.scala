@@ -5,7 +5,7 @@ import Mathematics.Shapes.Circle
 import Micro.Actions.Action
 import Micro.Actions.Combat.Attacking.Potshot
 import Micro.Actions.Commands.{Attack, Travel}
-import Micro.Behaviors.MovementProfiles
+import Micro.Agency.MovementProfiles
 import Micro.Heuristics.Targeting.EvaluateTargets
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -25,7 +25,7 @@ object BustWallin extends Action {
   
     walledInZones.nonEmpty                            &&
     With.enemies.exists(_.race == Race.Terran)        &&
-    unit.action.canFight                              &&
+    unit.agent.canFight                              &&
     unit.canMove                             &&
     walledInZones.flatMap(_.edges).exists(_.centerPixel.pixelDistanceFast(unit.pixelCenter) < 32.0 * 8.0) &&
     unit.matchups.threats.forall(threat =>
@@ -38,7 +38,7 @@ object BustWallin extends Action {
     
     // Don't rely on BW's pathing to bring us into the wall-in.
     // Wall-ins tend to cause Dragoons to do the "walk around the perimeter of the map" dance
-    unit.action.movementProfile = MovementProfiles.smash
+    unit.agent.movementProfile = MovementProfiles.smash
   
     val targets =
       if (unit.matchups.targetsInRange.nonEmpty)
@@ -48,14 +48,14 @@ object BustWallin extends Action {
       else
         Iterable.empty
     
-    unit.action.toAttack = EvaluateTargets.best(unit, targets)
+    unit.agent.toAttack = EvaluateTargets.best(unit, targets)
     
     if (unit.readyForAttackOrder || unit.melee) {
       Attack.delegate(unit)
     }
-    else if (unit.action.toAttack.isDefined) {
+    else if (unit.agent.toAttack.isDefined) {
       // Get up in there!
-      val targetUnit = unit.action.toAttack.get
+      val targetUnit = unit.agent.toAttack.get
       val targetTile = targetUnit.tileIncludingCenter
       val targetAreaTiles = Circle.points(4).map(targetTile.add)
       val targetSpots = targetAreaTiles
@@ -63,7 +63,7 @@ object BustWallin extends Action {
         .map(_.pixelCenter)
         .filter(pixel => unit.pixelDistanceFast(pixel) < unit.pixelDistanceFast(targetUnit))
       if (targetSpots.nonEmpty) {
-        unit.action.toTravel = Some(targetSpots.minBy(targetUnit.pixelDistanceFast))
+        unit.agent.toTravel = Some(targetSpots.minBy(targetUnit.pixelDistanceFast))
         Travel.delegate(unit)
       }
     }

@@ -8,8 +8,8 @@ object MicroOptions {
   def choose(agent: FriendlyUnitInfo): MicroDecision = {
     val decisions = get(agent)
     val best      = decisions.maxBy(_.evaluation)
-    agent.action.microDecisions            = decisions
-    agent.action.microDecisionsUpdateFrame = With.frame
+    agent.agent.microDecisions            = decisions
+    agent.agent.microDecisionsUpdateFrame = With.frame
     best.best = true
     lazy val debuggingInfo = decisions.map(x => (x, "1.2f".format(x.valueFixed), "1.2f".format(x.valuePerFrame), "1.2f".format(x.evaluation))).sortBy(_._2)
     best
@@ -85,6 +85,6 @@ object MicroOptions {
   }
   
   def describe(agent: FriendlyUnitInfo): String = {
-    agent.action.microDecisions.map(x => (x, "%1.2".format(x.evaluation))).sortBy(_._2).map(_.toString).mkString("\n")
+    agent.agent.microDecisions.map(x => (x, "%1.2".format(x.evaluation))).sortBy(_._2).map(_.toString).mkString("\n")
   }
 }

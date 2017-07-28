@@ -3,12 +3,12 @@ package Micro.Heuristics.Movement
 import Lifecycle.With
 import Mathematics.Heuristics.HeuristicMathMultiplicative
 import Mathematics.Points.Pixel
-import Micro.Execution.ActionState
+import Micro.Agency.Agent
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object MovementHeuristicExposureToDamage extends MovementHeuristic {
   
-  override def evaluate(state: ActionState, candidate: Pixel): Double = {
+  override def evaluate(state: Agent, candidate: Pixel): Double = {
     
     val us = state.unit
     

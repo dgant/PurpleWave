@@ -12,7 +12,7 @@ import Utilities.EnrichPixel._
 object Tickle extends Action {
   
   override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.action.intent.canTickle
+    unit.agent.intent.canTickle
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {
@@ -26,7 +26,7 @@ object Tickle extends Action {
     
     var attack                = true
   
-    val zone                  = unit.action.toTravel.get.zone
+    val zone                  = unit.agent.toTravel.get.zone
     val exit                  = zone.edges.map(_.centerPixel).sortBy(_.groundPixels(With.geography.home)).headOption.getOrElse(With.geography.home.pixelCenter)
     val dyingThreshold        = 11
     val dying                 = unit.totalHealth < dyingThreshold
@@ -101,7 +101,7 @@ object Tickle extends Action {
       // No static defense allowed!
       val staticDefense = unit.matchups.targets.filter(u => u.unitClass.isBuilding && u.unitClass.rawCanAttack)
       if (staticDefense.nonEmpty) {
-        unit.action.toAttack = staticDefense
+        unit.agent.toAttack = staticDefense
           .sortBy(_.remainingBuildFrames)
           .sortBy(_.totalHealth)
           .headOption
@@ -146,7 +146,7 @@ object Tickle extends Action {
             .headOption
             .getOrElse(targets.minBy(_.pixelDistanceFast(exit)))
   
-        unit.action.toAttack = Some(bestTarget)
+        unit.agent.toAttack = Some(bestTarget)
         Attack.consider(unit)
         
         return
@@ -168,16 +168,16 @@ object Tickle extends Action {
           defender != freebie
             && unit.pixelDistanceFast(defender) >
             unit.pixelDistanceFast(freebie)))
-      unit.action.toAttack = freebies
+      unit.agent.toAttack = freebies
       Attack.consider(unit)
       KiteMove.consider(unit)
     }
   }
   
   private def mineralWalkAway(unit: FriendlyUnitInfo) {
-    unit.action.toGather = With.geography.ourBases.flatMap(_.minerals).headOption
+    unit.agent.toGather = With.geography.ourBases.flatMap(_.minerals).headOption
     MineralWalk.consider(unit)
-    unit.action.toTravel = Some(unit.action.origin)
+    unit.agent.toTravel = Some(unit.agent.origin)
     Travel.consider(unit)
   }
   
@@ -186,7 +186,7 @@ object Tickle extends Action {
     // We need to surround it and do as much damage to it as possible
     val egg = With.units.enemy.filter(_.is(Zerg.Egg)).toVector.sortBy(_.totalHealth).headOption
     lazy val nonEgg = With.units.enemy.filter(_.unitClass.isBuilding).toVector.sortBy(_.totalHealth).headOption
-    unit.action.toAttack = egg.orElse(nonEgg)
+    unit.agent.toAttack = egg.orElse(nonEgg)
     Attack.consider(unit)
   }
 }

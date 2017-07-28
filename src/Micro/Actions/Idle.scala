@@ -7,7 +7,7 @@ import Micro.Actions.Combat.Tactics.Tickle
 import Micro.Actions.Commands.{Attack, Travel}
 import Micro.Actions.Protoss.Meld
 import Micro.Actions.Scouting.Scout
-import Micro.Behaviors.MovementProfiles
+import Micro.Agency.MovementProfiles
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Idle extends Action {
@@ -22,32 +22,32 @@ object Idle extends Action {
     // Setup //
     ///////////
     
-    unit.action.toReturn        = unit.action.intent.toReturn
-    unit.action.toTravel        = unit.action.intent.toTravel
-    unit.action.toAttack        = unit.action.intent.toAttack
-    unit.action.toGather        = unit.action.intent.toGather
-    unit.action.toBuild         = unit.action.intent.toBuild
-    unit.action.toBuildTile     = unit.action.intent.toBuildTile
-    unit.action.toTrain         = unit.action.intent.toTrain
-    unit.action.toTech          = unit.action.intent.toTech
-    unit.action.toUpgrade       = unit.action.intent.toUpgrade
-    unit.action.toForm          = unit.action.intent.toForm
-    unit.action.canFight        = unit.action.intent.canAttack
-    unit.action.canFlee         = unit.action.intent.canFlee
-    unit.action.canPursue       = unit.action.intent.canPursue
-    unit.action.canCower        = unit.action.intent.canCower
-    unit.action.canMeld         = unit.action.intent.canMeld
-    unit.action.canScout        = unit.action.intent.canScout
+    unit.agent.toReturn        = unit.agent.intent.toReturn
+    unit.agent.toTravel        = unit.agent.intent.toTravel
+    unit.agent.toAttack        = unit.agent.intent.toAttack
+    unit.agent.toGather        = unit.agent.intent.toGather
+    unit.agent.toBuild         = unit.agent.intent.toBuild
+    unit.agent.toBuildTile     = unit.agent.intent.toBuildTile
+    unit.agent.toTrain         = unit.agent.intent.toTrain
+    unit.agent.toTech          = unit.agent.intent.toTech
+    unit.agent.toUpgrade       = unit.agent.intent.toUpgrade
+    unit.agent.toForm          = unit.agent.intent.toForm
+    unit.agent.canFight        = unit.agent.intent.canAttack
+    unit.agent.canFlee         = unit.agent.intent.canFlee
+    unit.agent.canPursue       = unit.agent.intent.canPursue
+    unit.agent.canCower        = unit.agent.intent.canCower
+    unit.agent.canMeld         = unit.agent.intent.canMeld
+    unit.agent.canScout        = unit.agent.intent.canScout
   
-    unit.action.movementProfile = MovementProfiles.default
+    unit.agent.movementProfile = MovementProfiles.default
     
     /////////////////
     // Diagnostics //
     /////////////////
   
-    unit.action.desireTeam        = 1.0
-    unit.action.desireIndividual  = 1.0
-    unit.action.desireTotal       = 1.0
+    unit.agent.desireTeam        = 1.0
+    unit.agent.desireIndividual  = 1.0
+    unit.agent.desireTotal       = 1.0
   
     /////////
     // ACT //
@@ -55,7 +55,7 @@ object Idle extends Action {
     
     actions.foreach(_.consider(unit))
     
-    unit.action.shovers.clear()
+    unit.agent.shovers.clear()
   }
   
   private val actions = Vector(

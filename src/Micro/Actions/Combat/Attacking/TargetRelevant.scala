@@ -8,8 +8,8 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 object TargetRelevant extends Action {
   
   override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.action.canFight          &&
-    unit.action.toAttack.isEmpty  &&
+    unit.agent.canFight          &&
+    unit.agent.toAttack.isEmpty  &&
     unit.canAttack      &&
     unit.matchups.targets.nonEmpty
   }
@@ -22,6 +22,6 @@ object TargetRelevant extends Action {
         || target.repairing
         || With.framesSince(target.lastAttackStartFrame) < 48
         || target.topSpeed < unit.topSpeed * 0.75)
-    unit.action.toAttack = EvaluateTargets.best(unit, targets)
+    unit.agent.toAttack = EvaluateTargets.best(unit, targets)
   }
 }

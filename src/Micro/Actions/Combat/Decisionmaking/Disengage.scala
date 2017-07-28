@@ -9,7 +9,7 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 object Disengage extends Action {
   
   override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.action.canFlee   &&
+    unit.agent.canFlee   &&
     unit.canMove          &&
     ! Yolo.active
   }

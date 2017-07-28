@@ -1,7 +1,7 @@
 package Planning.Plans.Army
 
 import Lifecycle.With
-import Micro.Intent.Intention
+import Micro.Agency.Intention
 import Planning.Composition.{Property, UnitCountEverything}
 import Planning.Composition.ResourceLocks.LockUnits
 import Planning.Composition.UnitMatchers.UnitMatchWarriors

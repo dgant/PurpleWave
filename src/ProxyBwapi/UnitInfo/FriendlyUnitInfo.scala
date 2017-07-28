@@ -1,8 +1,7 @@
 package ProxyBwapi.UnitInfo
 
 import Lifecycle.With
-import Micro.Execution.ActionState
-import Micro.Intent.Intention
+import Micro.Agency.{Agent, Intention}
 import ProxyBwapi.Techs.{Tech, Techs}
 import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
 
@@ -10,11 +9,11 @@ class FriendlyUnitInfo(base: bwapi.Unit) extends FriendlyUnitProxy(base) {
   
   override def friendly: Option[FriendlyUnitInfo] = Some(this)
   
-  def action: ActionState = With.executor.getState(this)
+  def agent: Agent = With.agents.getState(this)
   def readyForMicro: Boolean = With.commander.ready(this)
   def intend(intention: Intention) {
     intention.unit = this
-    With.executor.intend(intention)
+    With.agents.intend(intention)
   }
   
   ////////////

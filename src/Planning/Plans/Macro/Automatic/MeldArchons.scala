@@ -1,7 +1,7 @@
 package Planning.Plans.Macro.Automatic
 
 import Lifecycle.With
-import Micro.Intent.Intention
+import Micro.Agency.Intention
 import Planning.Composition.ResourceLocks.LockUnits
 import Planning.Composition.UnitMatchers.{UnitMatchAnd, UnitMatchEnergyAtMost, UnitMatchType}
 import Planning.Plan

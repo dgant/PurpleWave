@@ -10,14 +10,14 @@ object Potshot extends Action {
   // If we're off cooldown, take a shot at something already in range.
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.action.canFight &&
+    unit.agent.canFight &&
     unit.readyForAttackOrder &&
     unit.matchups.targetsInRange.nonEmpty
   }
   
   override def perform(unit: FriendlyUnitInfo) {
     val validTargets = unit.matchups.targetsInRange.filter(_.unitClass.helpsInCombat)
-    unit.action.toAttack = EvaluateTargets.best(unit, validTargets)
+    unit.agent.toAttack = EvaluateTargets.best(unit, validTargets)
     Attack.delegate(unit)
   }
 }

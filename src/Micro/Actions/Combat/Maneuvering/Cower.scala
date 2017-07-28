@@ -8,7 +8,7 @@ object Cower extends Action {
   
   override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
     (
-      unit.action.canCower || ( ! unit.canAttack && ! unit.unitClass.isSpellcaster)
+      unit.agent.canCower || ( ! unit.canAttack && ! unit.unitClass.isSpellcaster)
     ) &&
       unit.canMove           &&
       unit.matchups.threats.nonEmpty  &&

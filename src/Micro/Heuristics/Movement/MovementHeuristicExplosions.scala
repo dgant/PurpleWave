@@ -1,19 +1,19 @@
 package Micro.Heuristics.Movement
 
 import Mathematics.Points.Pixel
-import Micro.Execution.{ActionState, Explosion}
+import Micro.Agency.{Agent, Explosion}
 
 object MovementHeuristicExplosions extends MovementHeuristic {
   
-  override def evaluate(state: ActionState, candidate: Pixel): Double = {
+  override def evaluate(state: Agent, candidate: Pixel): Double = {
   
     state.explosions.map(evaluateExplosion(state, candidate, _)).sum
   }
   
   private def evaluateExplosion(
-    state     : ActionState,
-    candidate : Pixel,
-    explosion : Explosion): Double = {
+                                 state     : Agent,
+                                 candidate : Pixel,
+                                 explosion : Explosion): Double = {
   
     explosion.damage *
       Math.max(

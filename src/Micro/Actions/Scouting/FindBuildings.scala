@@ -35,7 +35,7 @@ object FindBuildings extends Action {
     
     //TODO: Use actual potential flow so we can avoid obstacles and threats
     val target = unit.pixelCenter.project(unit.pixelCenter.add(force.pixel), 32.0)
-    unit.action.toTravel = Some(target)
+    unit.agent.toTravel = Some(target)
     Travel.delegate(unit)
   }
   

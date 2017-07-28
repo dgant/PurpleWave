@@ -8,20 +8,20 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 object Build extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.action.toBuild.isDefined &&
-    unit.action.toBuildTile.isDefined
+    unit.agent.toBuild.isDefined &&
+    unit.agent.toBuildTile.isDefined
   }
   
   override def perform(unit: FriendlyUnitInfo) {
     
-    val buildArea = unit.action.toBuild.get.tileArea.add(unit.action.toBuildTile.get)
+    val buildArea = unit.agent.toBuild.get.tileArea.add(unit.agent.toBuildTile.get)
     val blockers  = unit.matchups.others.filter(_.tileArea.intersects(buildArea))
-    blockers.flatMap(_.friendly).foreach(_.action.shove(unit))
+    blockers.flatMap(_.friendly).foreach(_.agent.shove(unit))
     if (blockers.exists(_.isEnemy)) {
       Fight.consider(unit)
     }
     else {
-      With.commander.build(unit, unit.action.toBuild.get, unit.action.intent.toBuildTile.get)
+      With.commander.build(unit, unit.agent.toBuild.get, unit.agent.intent.toBuildTile.get)
     }
   }
 }

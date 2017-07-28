@@ -6,8 +6,8 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 object Scout extends Action {
   
   override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.action.toTravel.isDefined  &&
-    unit.action.canScout            &&
+    unit.agent.toTravel.isDefined  &&
+    unit.agent.canScout            &&
     unit.canAttack
   }
   

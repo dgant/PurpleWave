@@ -2,7 +2,7 @@ package Micro.Actions.Combat.Maneuvering
 
 import Micro.Actions.Action
 import Micro.Actions.Commands.MoveHeuristically
-import Micro.Behaviors.MovementProfiles
+import Micro.Agency.MovementProfiles
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Avoid extends Action {
@@ -12,7 +12,7 @@ object Avoid extends Action {
   }
   
   override def perform(unit: FriendlyUnitInfo) {
-    unit.action.movementProfile = MovementProfiles.avoid
+    unit.agent.movementProfile = MovementProfiles.avoid
     MoveHeuristically.delegate(unit)
   }
 }

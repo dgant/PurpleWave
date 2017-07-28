@@ -10,8 +10,7 @@ import Information._
 import Macro.Allocation._
 import Macro.Architecture.{Architecture, PlacementScheduler}
 import Macro.Scheduling.Scheduler
-import Micro.Execution.Executor
-import Micro.Intent.Commander
+import Micro.Agency.{Agency, Commander}
 import Micro.Matchups.MatchupGraph
 import Performance.TaskQueue.{AbstractTaskQueue, TaskQueueGlobal}
 import Planning.Blackboard
@@ -35,7 +34,7 @@ object With {
   var commander       : Commander           = _
   var configuration   : Configuration       = _
   var economy         : Economy             = _
-  var executor        : Executor            = _
+  var agents        : Agency            = _
   var geography       : Geography           = _
   var grids           : Grids               = _
   var groundskeeper   : Groundskeeper       = _
@@ -98,7 +97,7 @@ object With {
     groundskeeper     = new Groundskeeper
     camera            = new Camera
     economy           = new Economy
-    executor          = new Executor
+    agents          = new Agency
     commander         = new Commander
     geography         = new Geography
     grids             = new Grids

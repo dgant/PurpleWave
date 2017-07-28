@@ -3,7 +3,7 @@ package Planning.Plans.Army
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Points.{Pixel, SpecificPoints}
-import Micro.Intent.Intention
+import Micro.Agency.Intention
 import Planning.Composition.ResourceLocks.LockUnits
 import Planning.Composition.UnitCountEverything
 import Planning.Composition.UnitMatchers.UnitMatchWorkers

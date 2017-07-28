@@ -12,6 +12,6 @@ object Shove extends Action {
   }
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
-    unit.matchups.allies.foreach(_.friendly.get.action.shove(unit))
+    unit.matchups.allies.foreach(_.friendly.get.agent.shove(unit))
   }
 }

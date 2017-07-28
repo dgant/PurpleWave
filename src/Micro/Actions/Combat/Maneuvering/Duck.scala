@@ -2,7 +2,7 @@ package Micro.Actions.Combat.Maneuvering
 
 import Micro.Actions.Action
 import Micro.Actions.Commands.MoveHeuristically
-import Micro.Execution.Explosion
+import Micro.Agency.Explosion
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -16,9 +16,9 @@ object Duck extends Action {
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {
-    unit.action.explosions ++= getDodgables(unit)
+    unit.agent.explosions ++= getDodgables(unit)
     
-    if (unit.action.explosions.exists(explosion =>
+    if (unit.agent.explosions.exists(explosion =>
       explosion.radius >=
       explosion.center.pixelDistanceFast(unit.pixelCenter) + 32.0)) {
       

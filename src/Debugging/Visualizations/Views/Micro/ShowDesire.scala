@@ -5,16 +5,16 @@ import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.View
 import Lifecycle.With
 import Mathematics.Points.Pixel
-import Micro.Execution.ActionState
+import Micro.Agency.Agent
 import bwapi.Color
 
 object ShowDesire extends View {
   
   override def renderMap() {
-    With.executor.states.foreach(renderUnitState)
+    With.agents.states.foreach(renderUnitState)
   }
   
-  def renderUnitState(state: ActionState) {
+  def renderUnitState(state: Agent) {
     if ( ! With.viewport.contains(state.unit.pixelCenter)) return
     if ( ! state.unit.unitClass.orderable) return
     

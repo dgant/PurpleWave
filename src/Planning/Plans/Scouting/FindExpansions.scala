@@ -2,7 +2,7 @@ package Planning.Plans.Scouting
 
 import Lifecycle.With
 import Mathematics.Points.Pixel
-import Micro.Intent.Intention
+import Micro.Agency.Intention
 import Planning.Composition.Property
 import Planning.Composition.ResourceLocks.LockUnits
 import Planning.Composition.UnitCounters.UnitCountExactly

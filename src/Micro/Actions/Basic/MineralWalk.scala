@@ -7,10 +7,10 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 object MineralWalk extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.action.toGather.isDefined
+    unit.agent.toGather.isDefined
   }
   
   override def perform(unit: FriendlyUnitInfo) {
-    With.commander.gather(unit, unit.action.toGather.get)
+    With.commander.gather(unit, unit.agent.toGather.get)
   }
 }

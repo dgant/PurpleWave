@@ -2,6 +2,6 @@ package Micro.Heuristics.Movement
 
 import Mathematics.Heuristics.Heuristic
 import Mathematics.Points.Pixel
-import Micro.Execution.ActionState
+import Micro.Agency.Agent
 
-abstract class MovementHeuristic extends Heuristic[ActionState, Pixel]
+abstract class MovementHeuristic extends Heuristic[Agent, Pixel]

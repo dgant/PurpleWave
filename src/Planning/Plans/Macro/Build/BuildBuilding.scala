@@ -5,7 +5,7 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Scheduling.Project
 import Mathematics.Points.Tile
-import Micro.Intent.Intention
+import Micro.Agency.Intention
 import Planning.Composition.ResourceLocks.{LockCurrencyForUnit, LockUnits}
 import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Composition.UnitMatchers.UnitMatchType

@@ -7,7 +7,7 @@ object MovementHeuristicVpfReceiving extends MovementHeuristic {
   
   override def evaluate(state: ActionState, candidate: Pixel): Double = {
   
-    state.unit.matchups.ifAt(candidate).vpfReceivingDiffused
+    240 * state.unit.matchups.ifAt(candidate).vpfReceivingDiffused
     
   }
 }

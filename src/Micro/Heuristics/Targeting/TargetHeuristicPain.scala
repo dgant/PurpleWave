@@ -8,8 +8,8 @@ object TargetHeuristicPain extends TargetHeuristic {
     val firingPixel = candidate.pixelCenter.project(
       unit.pixelCenter,
       unit.pixelRangeAgainstFromCenter(candidate))
-    
-    unit.matchups.ifAt(firingPixel).vpfReceivingDiffused
+  
+    240 * unit.matchups.ifAt(firingPixel).vpfReceivingDiffused
   }
   
 }

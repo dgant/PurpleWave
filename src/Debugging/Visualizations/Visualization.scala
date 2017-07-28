@@ -24,7 +24,8 @@ class Visualization {
     ShowPerformanceSummary,
     ShowClock,
     ShowStrategy,
-    ShowBattles
+    ShowBattles,
+    ShowUnitsFriendly
   )
   
   var enabled   = true

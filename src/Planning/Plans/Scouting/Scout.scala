@@ -19,6 +19,7 @@ class Scout extends Plan {
     unitCounter.set(UnitCountExactly(1))
     unitMatcher.set(UnitMatchWorkers)
     unitPreference.set(UnitPreferClose(SpecificPoints.middle))
+    interruptable.set(false)
   })
   
   var lastScouts: Iterable[FriendlyUnitInfo] = Iterable.empty

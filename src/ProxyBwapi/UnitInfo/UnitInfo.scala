@@ -19,6 +19,8 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   // Identity //
   //////////////
   
+  val frameDiscovered: Int = With.frame
+  
   def friendly  : Option[FriendlyUnitInfo]  = None
   def foreign   : Option[ForeignUnitInfo]   = None
   
@@ -35,9 +37,15 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   //////////////////
   // Statefulness //
   //////////////////
+  
+  var completionFrame: Int = frameDiscovered + remainingBuildFrames
 
   private val history = new mutable.Queue[UnitState]
   def update() {
+    if ( ! complete) {
+      completionFrame = frameDiscovered + remainingBuildFrames
+    }
+    
     if (history.headOption.exists(_.frame == With.frame)) {
       // Game is paused; we don't know how to clear the queue
       return

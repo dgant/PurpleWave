@@ -87,7 +87,7 @@ class Avatar {
     dpfAirNormalUnfocused           = dpfAirNormalFocused         * unfocusedPenalty(unit)
     attacksGround                   = if (unit.attacksGround) 1.0 else 0.0
     attacksAir                      = if (unit.attacksAir)    1.0 else 0.0
-    subjectiveValue                 = unit.unitClass.subjectiveValue
+    subjectiveValue                 = unit.subjectiveValue
     totalHealth                     = fortitude * unit.totalHealth
     totalFlyers                     = if (unit.flying) 1.0 else 0.0
     totalUnits                      = 1.0

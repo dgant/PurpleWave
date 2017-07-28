@@ -48,7 +48,7 @@ object BustWallin extends Action {
       else
         Iterable.empty
     
-    unit.action.toAttack = EvaluateTargets.best(unit.action, targets)
+    unit.action.toAttack = EvaluateTargets.best(unit, targets)
     
     if (unit.readyForAttackOrder || unit.melee) {
       Attack.delegate(unit)

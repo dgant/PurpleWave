@@ -22,6 +22,6 @@ object TargetRelevant extends Action {
         || target.repairing
         || With.framesSince(target.lastAttackStartFrame) < 48
         || target.topSpeed < unit.topSpeed * 0.75)
-    unit.action.toAttack = EvaluateTargets.best(unit.action, targets)
+    unit.action.toAttack = EvaluateTargets.best(unit, targets)
   }
 }

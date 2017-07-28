@@ -6,7 +6,7 @@ import ProxyBwapi.UnitInfo.UnitInfo
 object MicroValue {
   
   def valuePerDamage(unit: UnitInfo): Double = {
-    PurpleMath.nanToZero(unit.unitClass.subjectiveValue / unit.totalHealth.toDouble)
+    PurpleMath.nanToZero(unit.subjectiveValue / unit.totalHealth.toDouble)
   }
   
   def valuePerAttack(from: UnitInfo, to: UnitInfo): Double = {

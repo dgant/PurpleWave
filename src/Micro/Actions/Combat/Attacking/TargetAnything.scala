@@ -15,6 +15,6 @@ object TargetAnything extends Action {
   
   override protected def perform(unit: FriendlyUnitInfo) {
     val targets = unit.matchups.targets
-    unit.action.toAttack = EvaluateTargets.best(unit.action, targets)
+    unit.action.toAttack = EvaluateTargets.best(unit, targets)
   }
 }

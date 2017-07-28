@@ -70,7 +70,7 @@ class ActionState(val unit: FriendlyUnitInfo) {
   private val originCache = new CacheFrame(() => if (With.geography.ourBases.nonEmpty) With.geography.ourBases.map(_.heart.pixelCenter).minBy(unit.pixelDistanceTravelling) else With.geography.home.pixelCenter)
   
   def targetValues: Map[UnitInfo, Double] = targetValuesCache.get
-  val targetValuesCache   = new CacheFrame(() => unit.matchups.targets.map(target => (target, EvaluateTargets.evaluate(this, target))).toMap)
+  val targetValuesCache = new CacheFrame(() => unit.matchups.targets.map(target => (target, EvaluateTargets.evaluate(unit, target))).toMap)
   
   //////////
   // Mood //

@@ -259,12 +259,13 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   
   def damageOnNextHitAgainst(enemy: UnitInfo, enemyShields: Int): Int = {
     val hits                    = attacksAgainst(enemy)
-    val damageScale             = damageScaleAgainstHitPoints(enemy)
     val damagePerHit            = damageOnHitBeforeShieldsArmorAndDamageType(enemy: UnitInfo)
-    val damageAssignedToShields = Math.min(damagePerHit * hits, enemyShields + enemy.armorShield * hits)
-    val damageToShields         = Math.min(hits * (damagePerHit - enemy.armorShield), enemyShields)
-    val damageAssignedToHealth  = hits * damagePerHit - damageAssignedToShields
-    val damageToHealth          = damageAssignedToHealth * damageScaleAgainstHitPoints(enemy) - enemy.armorHealth * hits
+    val damageScale             = damageScaleAgainstHitPoints(enemy)
+    val damageAssignedTotal     = hits * damagePerHit
+    val damageAssignedToShields = Math.min(damageAssignedTotal, enemyShields + enemy.armorShield * hits)
+    val damageToShields         = damageAssignedToShields - enemy.armorShield * hits
+    val damageAssignedToHealth  = damageAssignedTotal - damageAssignedToShields
+    val damageToHealth          = (damageAssignedToHealth - enemy.armorHealth * hits) * damageScaleAgainstHitPoints(enemy)
     val damageDealtTotal        = damageAssignedToHealth + damageAssignedToShields
     Math.max(1, missChanceAgainst(enemy) * damageDealtTotal).toInt
   }

@@ -184,7 +184,7 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   def armorHealth: Int = armorHealthCache.get
   def armorShield: Int = armorShieldsCache.get
   
-  lazy val armorHealthCache   = new CacheFrame(() => unitClass.armor + (if (unitClass.armorUpgrade.levels.size < 3) 0 else player.getUpgradeLevel(unitClass.armorUpgrade)))
+  lazy val armorHealthCache   = new CacheFrame(() => unitClass.armor + unitClass.armorUpgrade.map(player.getUpgradeLevel).getOrElse(0))
   lazy val armorShieldsCache  = new CacheFrame(() => player.getUpgradeLevel(Protoss.Shields))
   
   def totalHealth: Int = hitPoints + shieldPoints + defensiveMatrixPoints
@@ -247,10 +247,11 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
     else
       0.0
   
-  def damageOnHitGround : Int = damageOnHitGroundCache.get
-  def damageOnHitAir    : Int = damageOnHitAirCache.get
-  private val damageOnHitGroundCache  = new CacheFrame(() => unitClass.effectiveGroundDamage  + unitClass.groundDamageBonusRaw  * With.self.getUpgradeLevel(unitClass.groundDamageUpgradeType))
-  private val damageOnHitAirCache     = new CacheFrame(() => unitClass.effectiveAirDamage     + unitClass.airDamageBonusRaw     * With.self.getUpgradeLevel(unitClass.airDamageUpgradeType))
+  def damageUpgradeLevel  : Int = unitClass.damageUpgradeType.map(player.getUpgradeLevel).getOrElse(0)
+  def damageOnHitGround   : Int = damageOnHitGroundCache.get
+  def damageOnHitAir      : Int = damageOnHitAirCache.get
+  private val damageOnHitGroundCache  = new CacheFrame(() => unitClass.effectiveGroundDamage  + unitClass.groundDamageBonusRaw  * damageUpgradeLevel)
+  private val damageOnHitAirCache     = new CacheFrame(() => unitClass.effectiveAirDamage     + unitClass.airDamageBonusRaw     * damageUpgradeLevel)
   
   def damageOnHitBeforeShieldsArmorAndDamageType(enemy: UnitInfo): Int = if(enemy.flying) damageOnHitAir else damageOnHitGround
   def damageOnNextHitAgainst(enemy: UnitInfo): Int = {

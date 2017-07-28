@@ -1,8 +1,9 @@
 package ProxyBwapi.UnitClass
 
 import Mathematics.Points.Tile
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Techs
-import ProxyBwapi.Upgrades.Upgrades
+import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
 import bwapi.{DamageType, UnitSizeType, UnitType}
 
 import scala.collection.JavaConverters._
@@ -11,7 +12,6 @@ class UnitClassProxy(val baseType:UnitType) {
   lazy val abilities                = baseType.abilities.asScala.map(Techs.get)
   lazy val acceleration             = baseType.acceleration
   lazy val armor                    = baseType.armor
-  lazy val armorUpgrade             = Upgrades.get(baseType.armorUpgrade)
   lazy val buildScore               = baseType.buildScore
   lazy val buildFrames              = baseType.buildTime
   lazy val rawCanAttack             = baseType.canAttack
@@ -92,7 +92,6 @@ class UnitClassProxy(val baseType:UnitType) {
   lazy val airDamageCooldownRaw     = baseType.airWeapon.damageCooldown
   lazy val airDamageFactorRaw       = baseType.airWeapon.damageFactor
   lazy val airDamageTypeRaw         = baseType.airWeapon.damageType
-  lazy val airDamageUpgradeType     = Upgrades.get(baseType.airWeapon.upgradeType)
   lazy val airExplosionTypeRaw      = baseType.airWeapon.explosionType
   lazy val airRangeRaw              = baseType.airWeapon.maxRange
   lazy val groundDamageRaw          = baseType.groundWeapon.damageAmount
@@ -100,7 +99,6 @@ class UnitClassProxy(val baseType:UnitType) {
   lazy val groundDamageCooldownRaw  = baseType.groundWeapon.damageCooldown
   lazy val groundDamageFactorRaw    = baseType.groundWeapon.damageFactor
   lazy val groundDamageTypeRaw      = baseType.groundWeapon.damageType
-  lazy val groundDamageUpgradeType  = Upgrades.get(baseType.groundWeapon.upgradeType)
   lazy val groundExplosionTypeRaw   = baseType.groundWeapon.explosionType
   lazy val groundMinRangeRaw        = baseType.groundWeapon.minRange
   lazy val groundRangeRaw           = baseType.groundWeapon.maxRange
@@ -108,7 +106,7 @@ class UnitClassProxy(val baseType:UnitType) {
   
   // .size is broken in BWMirror. This is a manual replacement.
   // Data via http://classic.battle.net/scc/GS/damage.shtml
-  lazy val size:UnitSizeType = {
+  lazy val size: UnitSizeType = {
     if (Vector(
       UnitType.Terran_SCV,
       UnitType.Terran_Marine,
@@ -184,5 +182,126 @@ class UnitClassProxy(val baseType:UnitType) {
       DamageType.Explosive
     else
       DamageType.Normal
+  }
+  
+  
+  lazy val armorUpgrade: Option[Upgrade] = {
+    if (Vector(
+      Terran.Marine,
+      Terran.Firebat,
+      Terran.Medic,
+      Terran.Ghost
+    ).contains(this))
+      Some(Terran.BioArmor)
+    else if (Vector(
+      Terran.Vulture,
+      Terran.Goliath,
+      Terran.SiegeTankSieged,
+      Terran.SiegeTankUnsieged
+    ).contains(this))
+      Some(Terran.MechArmor)
+    else if (Vector(
+      Terran.Wraith,
+      Terran.Valkyrie,
+      Terran.Battlecruiser,
+      Terran.ScienceVessel
+    ).contains(this))
+      Some(Terran.AirArmor)
+    else if (Vector(
+      Protoss.Zealot,
+      Protoss.Dragoon,
+      Protoss.DarkTemplar,
+      Protoss.Archon,
+      Protoss.HighTemplar,
+      Protoss.DarkArchon,
+      Protoss.Reaver
+    ).contains(this))
+      Some(Protoss.GroundArmor)
+    else if(Vector(
+      Protoss.Scout,
+      Protoss.Corsair,
+      Protoss.Carrier,
+      Protoss.Interceptor,
+      Protoss.Arbiter
+    ).contains(this))
+      Some(Protoss.AirArmor)
+    else if(Vector(
+      Zerg.Zergling,
+      Zerg.Ultralisk,
+      Zerg.Hydralisk,
+      Zerg.Lurker,
+      Zerg.Defiler
+    ).contains(this))
+      Some(Zerg.GroundArmor)
+    else if(Vector(
+      Zerg.Overlord,
+      Zerg.Mutalisk,
+      Zerg.Guardian,
+      Zerg.Devourer,
+      Zerg.Queen
+    ).contains(this))
+      Some(Zerg.AirArmor)
+    else
+      None
+  }
+  
+  lazy val damageUpgradeType: Option[Upgrade] = {
+    if (Vector(
+      Terran.Marine,
+      Terran.Firebat,
+      Terran.Ghost
+    ).contains(this))
+      Some(Terran.BioDamage)
+    else if (Vector(
+      Terran.Vulture,
+      Terran.Goliath,
+      Terran.SiegeTankSieged,
+      Terran.SiegeTankUnsieged
+    ).contains(this))
+      Some(Terran.MechDamage)
+    else if (Vector(
+      Terran.Wraith,
+      Terran.Valkyrie,
+      Terran.Battlecruiser
+    ).contains(this))
+      Some(Terran.AirDamage)
+    else if (Vector(
+      Protoss.Zealot,
+      Protoss.Dragoon,
+      Protoss.DarkTemplar,
+      Protoss.Archon
+    ).contains(this))
+      Some(Protoss.GroundDamage)
+    else if(Vector(
+      Protoss.Scout,
+      Protoss.Corsair,
+      Protoss.Carrier,
+      Protoss.Interceptor,
+      Protoss.Arbiter
+    ).contains(this))
+      Some(Protoss.AirArmor)
+    else if(Vector(
+      Protoss.Reaver,
+      Protoss.Scarab
+    ).contains(this))
+      Some(Protoss.ScarabDamage)
+    else if(Vector(
+      Zerg.Zergling,
+      Zerg.Ultralisk
+    ).contains(this))
+      Some(Zerg.GroundMeleeDamage)
+    else if(Vector(
+      Zerg.Hydralisk,
+      Zerg.Lurker
+    ).contains(this))
+      Some(Zerg.GroundRangeDamage)
+    else if(Vector(
+      Zerg.Mutalisk,
+      Zerg.Guardian,
+      Zerg.Devourer
+    ).contains(this))
+      Some(Zerg.AirDamage)
+    else
+      None
   }
 }

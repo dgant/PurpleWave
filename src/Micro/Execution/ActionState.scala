@@ -6,7 +6,7 @@ import Micro.Actions.Action
 import Micro.Behaviors.{MovementProfiles, TargetingProfiles}
 import Micro.Decisions.MicroDecision
 import Micro.Heuristics.Movement.{MovementHeuristicEvaluation, MovementProfile}
-import Micro.Heuristics.Targeting.{EvaluateTargets, TargetingProfile}
+import Micro.Heuristics.Targeting.TargetingProfile
 import Micro.Intent.Intention
 import Performance.Caching.CacheFrame
 import ProxyBwapi.Techs.Tech
@@ -68,9 +68,6 @@ class ActionState(val unit: FriendlyUnitInfo) {
   
   def origin: Pixel = toReturn.getOrElse(originCache.get)
   private val originCache = new CacheFrame(() => if (With.geography.ourBases.nonEmpty) With.geography.ourBases.map(_.heart.pixelCenter).minBy(unit.pixelDistanceTravelling) else With.geography.home.pixelCenter)
-  
-  def targetValues: Map[UnitInfo, Double] = targetValuesCache.get
-  val targetValuesCache = new CacheFrame(() => unit.matchups.targets.map(target => (target, EvaluateTargets.evaluate(unit, target))).toMap)
   
   //////////
   // Mood //

@@ -2,7 +2,7 @@ package ProxyBwapi.UnitInfo
 
 import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile}
-import Performance.Caching.Limiter
+import Performance.Caching.{CacheFrame, Limiter}
 import ProxyBwapi.Players.{PlayerInfo, Players}
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
@@ -115,8 +115,9 @@ class ForeignUnitInfo(baseUnit: bwapi.Unit) extends UnitInfo (baseUnit) {
   // Combat //
   ////////////
   
-  def interceptorCount  : Int = interceptors.size
   def scarabCount       : Int = if (is(Protoss.Reaver)) 3 else 0 // Don't know whether BWAPI gives this for enemy units. Here's an approximation.
+  def interceptorCount  : Int = interceptorCountCache.get
+  private val interceptorCountCache = new CacheFrame(() => interceptors.size)
   
   private def updateCombat() {
     _interceptors             = if (is(Protoss.Carrier)) base.getInterceptors.asScala.flatMap(With.units.get) else Iterable.empty

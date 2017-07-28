@@ -51,17 +51,24 @@ object MovementHeuristicTraffic extends MovementHeuristic {
       : Double = {
     
     multiplier *
-    scaling *
-    With.grids.units.get(candidate)
-    .filter(neighbor =>
-      neighbor.likelyStillThere
-      && neighbor != state.unit
-      && ! neighbor.flying
-      && ! neighbor.unitClass.isBuilding)
-    .map(neighbor =>
-      Math.min(32.0, neighbor.unitClass.width) *
-      Math.min(32.0, neighbor.unitClass.height))
-    .sum
+    scaling * {
+      var space = 0
+      var i     = 0
+      val units = With.grids.units.get(candidate)
+      val size  = units.size
+      while (i < size) {
+        val neighbor = units(i)
+        if (neighbor.visible
+          && neighbor != state.unit
+          && ! neighbor.flying
+          && ! neighbor.unitClass.isBuilding) {
+          space +=
+            Math.min(32, neighbor.unitClass.width) *
+            Math.min(32, neighbor.unitClass.height)
+        }
+        i += 1
+      }
+      space
+    }
   }
-  
 }

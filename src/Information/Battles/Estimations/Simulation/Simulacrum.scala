@@ -108,6 +108,7 @@ case class Simulacrum(simulation: Simulation, unit: UnitInfo) {
     victim.hitPoints      -= damage
     victim.damageReceived += damage
     victim.valueReceived  += value
+    dead                  = dead || unit.unitClass.suicides
   }
   
   def reportCard: ReportCard = ReportCard(

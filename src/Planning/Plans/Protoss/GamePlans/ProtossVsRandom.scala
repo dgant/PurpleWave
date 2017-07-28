@@ -11,7 +11,7 @@ import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Milestones.UnitsAtLeast
 import Planning.Plans.Protoss.ProtossBuilds
 import Planning.Plans.Protoss.Situational.TwoGatewaysAtNatural
-import Planning.Plans.Scouting.RequireEnemyBase
+import Planning.Plans.Scouting.Scout
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Options.Protoss.PvR.{PvREarly2Gate1012, PvREarly2Gate910, PvREarly2Gate910AtNatural}
 
@@ -38,7 +38,7 @@ class ProtossVsRandom extends Parallel {
       RequestAtLeast(3, Protoss.Gateway)),
     new If(
       new UnitsAtLeast(1, UnitMatchType(Protoss.Pylon), complete = false),
-      new RequireEnemyBase),
+      new Scout),
     new ConsiderAttacking,
     new ControlMap
   ))

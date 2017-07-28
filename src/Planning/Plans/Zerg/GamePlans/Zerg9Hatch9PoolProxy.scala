@@ -4,14 +4,14 @@ import Information.Geography.Types.Zone
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.BuildRequests.RequestAtLeast
-import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWorkers}
+import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.Macro.Automatic.{Gather, TrainContinuously}
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
 import Planning.Plans.Macro.Milestones.UnitsAtLeast
-import Planning.Plans.Scouting.{FindEnemyBase, FoundEnemyBase}
+import Planning.Plans.Scouting.Scout
 import Planning.ProxyPlanner
 import ProxyBwapi.Races.Zerg
 
@@ -46,11 +46,8 @@ class Zerg9Hatch9PoolProxy extends Parallel {
       RequestAtLeast(50,  Zerg.Zergling)),
     new TrainContinuously(Zerg.Hatchery),
     new If(
-      new And(
-        new Not(new FoundEnemyBase),
-        new UnitsAtLeast(2, UnitMatchType(Zerg.SpawningPool), complete = false)
-      ),
-      new FindEnemyBase { scouts.get.unitMatcher.set(UnitMatchWorkers) }),
+      new UnitsAtLeast(2, UnitMatchType(Zerg.SpawningPool), complete = false),
+      new Scout),
     new Attack,
     new FollowBuildOrder,
     new Gather

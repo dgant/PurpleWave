@@ -9,40 +9,20 @@ import Information.Battles.Types.{Battle, Team}
 import Lifecycle.With
 
 object ShowBattleDetails extends View {
-  val x1 = 5
-  val x2 = 215
-  val x3 = 425
-  lazy val y1: Int = 5 * With.visualization.lineHeightSmall
-  val y2 = 150
   
   override def renderScreen() {
     ShowBattles.localBattle.foreach(battle => {
       renderBattleScreen(
-        "Simulated:",
         battle,
         battle.estimationSimulation,
-        x1,
-        y1)
-      
-      renderBattleScreen(
-        "Avatar:",
-        battle,
-        battle.estimationGeometricOffense,
-        x2,
-        y1)
-      
-      renderBattleScreen(
-        "Matchups:",
-        battle,
-        battle.estimationMatchups,
-        x3,
-        y1)
+        5,
+        5 * With.visualization.lineHeightSmall)
     })
   }
   
-  def renderBattleScreen(title: String, battle: Battle, estimation: Estimation, x: Int, y: Int) {
+  def renderBattleScreen(battle: Battle, estimation: Estimation, x: Int, y: Int) {
     val table = Vector(
-      Vector[String](title, With.self.name, With.enemy.name),
+      Vector[String]("", With.self.name, With.enemy.name),
       Vector[String]("", if (estimation.weSurvive) "Survives" else "", if (estimation.enemySurvives) "Survives" else ""),
       Vector[String]("Seconds", "" + estimation.frames / 24, ""),
       Vector[String]("Value", "" + estimation.costToEnemy.toInt, "" + estimation.costToUs.toInt),
@@ -53,8 +33,10 @@ object ShowBattleDetails extends View {
       Vector[String]("Desire", "%1.2f".format(battle.desire)))
     DrawScreen.table(x, y, table)
     
-    With.game.drawTextScreen(x1, y2, describeTeam(battle.us))
-    With.game.drawTextScreen(x1, y2 + With.visualization.lineHeightSmall, describeTeam(battle.enemy))
+    val y2 = y + (table.length + 2) * With.visualization.lineHeightSmall
+    val y3 = y2 + With.visualization.lineHeightSmall
+    With.game.drawTextScreen(x, y2, describeTeam(battle.us))
+    With.game.drawTextScreen(x, y3, describeTeam(battle.enemy))
   }
   
   def describeTeam(team: Team): String = {

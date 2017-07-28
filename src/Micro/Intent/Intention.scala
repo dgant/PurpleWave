@@ -27,4 +27,5 @@ class Intention(val plan: Plan) {
   var canCower    : Boolean           = false
   var canMeld     : Boolean           = false
   var canTickle   : Boolean           = false
+  var canScout    : Boolean           = false
 }

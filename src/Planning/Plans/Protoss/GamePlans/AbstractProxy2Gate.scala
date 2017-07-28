@@ -15,7 +15,7 @@ import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
 import Planning.Plans.Macro.Expanding.BuildAssimilators
 import Planning.Plans.Macro.Milestones.{EnemyUnitsAtLeast, UnitsAtLeast}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
-import Planning.Plans.Scouting.RequireEnemyBase
+import Planning.Plans.Scouting.Scout
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 
 abstract class AbstractProxy2Gate extends Parallel {
@@ -104,7 +104,7 @@ abstract class AbstractProxy2Gate extends Parallel {
           whenProtoss = new BasicPlan,
           whenZerg    = new BasicPlan,
           whenRandom  = new BasicPlan),
-        new RequireEnemyBase)),
+        new Scout)),
     
     new Attack,
     new FollowBuildOrder,

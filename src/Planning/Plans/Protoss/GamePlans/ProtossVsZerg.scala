@@ -16,7 +16,7 @@ import Planning.Plans.Macro.Reaction.{EnemyBasesAtLeast, EnemyMassMutalisks, Ene
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Protoss.ProtossBuilds
 import Planning.Plans.Protoss.Situational.{Defend2GateAgainst4Pool, DefendFFEAgainst4Pool, ForgeFastExpand, TwoGatewaysAtNexus}
-import Planning.Plans.Scouting.{FindExpansions, RequireScouting, ScoutAt}
+import Planning.Plans.Scouting.{FindExpansions, Scout, ScoutAt}
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Options.Protoss.PvZ._
 
@@ -356,7 +356,7 @@ class ProtossVsZerg extends Parallel {
         new ScoutAt(6),
         new If(
           new UnitsAtLeast(1, UnitMatchType(Protoss.Pylon), complete = false),
-          new RequireScouting)),
+          new Scout)),
       new ScoutAt(14)),
     
     new If(

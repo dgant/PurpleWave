@@ -6,6 +6,7 @@ import Micro.Actions.Combat.Maneuvering.Duck
 import Micro.Actions.Combat.Tactics.Tickle
 import Micro.Actions.Commands.{Attack, Travel}
 import Micro.Actions.Protoss.Meld
+import Micro.Actions.Scouting.Scout
 import Micro.Behaviors.MovementProfiles
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -36,6 +37,7 @@ object Idle extends Action {
     unit.action.canPursue       = unit.action.intent.canPursue
     unit.action.canCower        = unit.action.intent.canCower
     unit.action.canMeld         = unit.action.intent.canMeld
+    unit.action.canScout        = unit.action.intent.canScout
   
     unit.action.movementProfile = MovementProfiles.default
     
@@ -69,6 +71,7 @@ object Idle extends Action {
     ReloadInterceptors,
     ReloadScarabs,
     Pardon,
+    Scout,
     Fight,
     Attack,
     Travel

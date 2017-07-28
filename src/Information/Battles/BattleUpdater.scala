@@ -53,10 +53,6 @@ object BattleUpdater {
     EstimateAvatar.calculate(builder)
   }
   
-  def estimateMatchups(battle: Battle): Estimation = {
-    EstimateAvatar.fromMatchups(battle)
-  }
-  
   def estimateSimulation(battle: Battle): Estimation = {
     val simulation = new Simulation(battle)
     simulation.run()

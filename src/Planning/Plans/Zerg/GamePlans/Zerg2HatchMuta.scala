@@ -24,6 +24,7 @@ class Zerg2HatchMuta extends Parallel {
       RequestAtLeast(2,   Zerg.Extractor),
       RequestAtLeast(6,   Zerg.Zergling),
       RequestAtLeast(1,   Zerg.Lair),
+      RequestAtLeast(21,  Zerg.Drone),
       RequestUpgrade(Zerg.ZerglingSpeed),
       RequestAtLeast(1,   Zerg.Spire)),
     new RequireSufficientSupply,

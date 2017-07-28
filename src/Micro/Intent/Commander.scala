@@ -80,7 +80,7 @@ class Commander {
     if (unready(unit)) return
     
     // Send flying units past their destination to maximize acceleration
-    val flyingOvershoot = 144.0
+    val flyingOvershoot = 188.0
     var destination = to
     if (unit.flying && unit.pixelDistanceSquared(to) < Math.pow(flyingOvershoot, 2)) {
       val overshoot = unit.pixelCenter.project(to, flyingOvershoot)

@@ -1,14 +1,15 @@
 package Planning.Plans.Macro.Automatic
 
 import Information.Geography.Types.Base
+import Lifecycle.With
 import Micro.Intent.Intention
 import Performance.Caching.Limiter
+import Planning.Composition.ResourceLocks.LockUnits
 import Planning.Composition.UnitCountEverything
 import Planning.Composition.UnitMatchers.UnitMatchWorkers
 import Planning.Plan
-import Planning.Composition.ResourceLocks.LockUnits
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Lifecycle.With
+import bwapi.Race
 
 import scala.collection.mutable
 
@@ -63,7 +64,7 @@ class Gather extends Plan {
   }
   
   private def updateResourceInformation() = {
-    ourActiveBases  = With.geography.ourBases.filter(_.townHall.exists(_.aliveAndComplete))
+    ourActiveBases  = With.geography.ourBases.filter(_.townHall.exists(th => th.aliveAndComplete && (th.complete || th.morphing)))
     allMinerals     = ourActiveBases.flatten(base => base.minerals).filter(_.alive).toSet
     allGas          = ourActiveBases.flatten(base => base.gas).filter(gas => gas.isOurs && gas.aliveAndComplete).toSet
     safeBases       = getSafeBases
@@ -103,6 +104,15 @@ class Gather extends Plan {
   
   private def removeUnavailableResources() = {
     workersByResource.keySet.diff(safeResources).foreach(unassignResource)
+  }
+  
+  private def gasWorkers: Int = {
+    if (With.self.race == Race.Zerg) {
+      Vector(safeGas.size * 3, Math.ceil(allWorkers.size*3.0/8.0).toInt, if(haveEnoughGas) 0 else 200).min
+    }
+    else {
+      Vector(safeGas.size * 3, allWorkers.size/3, if(haveEnoughGas) 0 else 200).min
+    }
   }
   
   private def decideIdealWorkerDistribution() {

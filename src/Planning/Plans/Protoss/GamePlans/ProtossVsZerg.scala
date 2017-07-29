@@ -87,8 +87,7 @@ class ProtossVsZerg extends Parallel {
       RequestUpgrade(Protoss.ZealotSpeed),
       RequestAtLeast(2, Protoss.Stargate),
       RequestUpgrade(Protoss.AirDamage),
-      RequestUpgrade(Protoss.CarrierCapacity)
-      ))
+      RequestUpgrade(Protoss.CarrierCapacity)))
   
   private class ImplementMidgameCorsairSpeedlot extends Parallel(
     new If(

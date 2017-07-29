@@ -1,6 +1,7 @@
 package Micro.Actions.Scouting
 
 import Micro.Actions.Action
+import Micro.Actions.Combat.Attacking.Potshot
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Scout extends Action {
@@ -12,9 +13,10 @@ object Scout extends Action {
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {
+    Potshot.consider(unit)
+    PreserveScout.consider(unit)
     DisruptBuilder.consider(unit)
     BlockConstruction.consider(unit)
-    PreserveScout.consider(unit)
     FindBuildings.consider(unit)
     Poke.consider(unit)
   }

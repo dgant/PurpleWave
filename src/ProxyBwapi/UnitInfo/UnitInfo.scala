@@ -363,28 +363,24 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   
   def gathering: Boolean = gatheringMinerals || gatheringGas
   
-  def carryingResources:Boolean = carryingMinerals || carryingGas
+  def carryingResources: Boolean = carryingMinerals || carryingGas
   
   def isBeingViolent: Boolean = {
-    attacking ||
-    target.orElse(orderTarget).exists(isEnemyOf) ||
+    attacking                                     ||
+    cooldownLeft > 0                              ||
+    target.orElse(orderTarget).exists(isEnemyOf)  ||
     List(Commands.Attack_Move, Commands.Attack_Unit).contains(command.map(_.getUnitCommandType.toString).getOrElse(""))
   }
   
   def isBeingViolentTo(victim: UnitInfo): Boolean = {
+    isBeingViolent &&
     //Are we capable of hurting the victim?
     isEnemyOf(victim) &&
     canAttack(victim) &&
     //Are we not attacking anyone else?
     ! target.orElse(orderTarget).exists(_ != victim) &&
     //Are we close to being able to hit the victim?
-    victim.pixelDistanceFast(
-      pixelCenter.project(
-        targetPixel
-          .orElse(orderTargetPixel)
-          .getOrElse(pixelCenter.radiateRadians(angleRadians, 10)),
-        Math.min(pixelDistanceFast(victim), topSpeed * With.configuration.violenceFrameThreshold))) <=
-      pixelRangeAgainstFromEdge(victim)
+    framesToGetInRange(victim) < With.configuration.violenceFrameThreshold
   }
   
   ////////////////

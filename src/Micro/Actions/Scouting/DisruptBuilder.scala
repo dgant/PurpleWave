@@ -16,12 +16,9 @@ object DisruptBuilder extends Action {
   
   override protected def perform(unit: FriendlyUnitInfo) {
     val builders = disruptableBuilders(unit)
-    
-    if (unit.matchups.threatsViolent.isEmpty) {
-      val target = EvaluateTargets.best(unit, builders)
-      unit.agent.toAttack = target
-      Attack.delegate(unit)
-    }
+    val target = EvaluateTargets.best(unit, builders)
+    unit.agent.toAttack = target
+    Attack.delegate(unit)
   }
   
   def disruptableBuilders(unit: FriendlyUnitInfo): Iterable[UnitInfo] = {

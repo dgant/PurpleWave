@@ -44,7 +44,9 @@ object BlockConstruction extends Action {
       builder.unitClass.isWorker &&
       (
         builder.command.exists(_.getUnitCommandType == UnitCommandType.Build) ||
-        builder.targetPixel.exists(targetPixel => targetPixel.zone.bases.exists(_.townHallArea.contains(targetPixel.tileIncluding)))
+        builder.targetPixel.exists(targetPixel => targetPixel.zone.bases.exists(base =>
+          base.townHall.isEmpty &&
+          base.townHallArea.contains(targetPixel.tileIncluding)))
       ))
   }
 }

@@ -24,7 +24,7 @@ class DefendFFEAgainst4Pool extends Plan {
     
     val toDefend        = cannons.minBy(_.pixelDistanceFast(threatSource)).pixelCenter.project(threatSource, 64.0)
     val workerCount     = With.units.ours.count(_.unitClass.isWorker)
-    val workersCap      = workerCount - 3
+    val workersCap      = workerCount - 4
     val workersDesired  = 12 - 3 * cannons.count(_.complete)
     val workersFinal    = Math.max(0, Math.min(workersCap, workersDesired))
     

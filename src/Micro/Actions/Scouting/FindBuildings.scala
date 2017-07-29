@@ -18,7 +18,7 @@ object FindBuildings extends Action {
       .flatMap(base => {
         val tiles = base.zone.tiles.filter(tile =>
           With.grids.walkable.get(tile) &&
-          With.grids.friendlyVision.framesSince(tile) > 30)
+          With.grids.friendlyVision.framesSince(tile) > 24 * 30)
         if (base.owner.race == Race.Zerg) {
           tiles.filter(tile => With.grids.creep.get(tile) || tile.tileDistanceFast(base.townHallArea.midpoint) < 9.0)
         }

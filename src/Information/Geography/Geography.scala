@@ -29,7 +29,6 @@ class Geography {
   def enemyZones          : Iterable[Zone]          = enemyZonesCache.get
   def enemyBases          : Iterable[Base]          = enemyBasesCache.get
   
-  
   private val ourZonesCache           = new CacheFrame(() => zones.filter(_.owner.isUs))
   private val ourBasesCache           = new CacheFrame(() => bases.filter(_.owner.isUs))
   private val enemyZonesCache         = new CacheFrame(() => zones.filter(_.owner.isEnemy))

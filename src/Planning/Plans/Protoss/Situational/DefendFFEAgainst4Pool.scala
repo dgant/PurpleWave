@@ -22,17 +22,14 @@ class DefendFFEAgainst4Pool extends Plan {
     
     if (cannons.isEmpty) return
     
-    val toDefend        = cannons.minBy(_.pixelDistanceFast(threatSource)).pixelCenter.project(threatSource, 48.0)
+    val toDefend        = cannons.minBy(_.pixelDistanceFast(threatSource)).pixelCenter.project(threatSource, 64.0)
     val workerCount     = With.units.ours.count(_.unitClass.isWorker)
     val workersCap      = workerCount - 3
     val workersDesired  = 12 - 3 * cannons.count(_.complete)
     val workersFinal    = Math.max(0, Math.min(workersCap, workersDesired))
     
-    defenders.get.unitCounter.set(UnitCountExactly(workerCount - 4))
+    defenders.get.unitCounter.set(UnitCountExactly(workersFinal))
     defenders.get.acquire(this)
-    defenders.get.units.foreach(_.agent.intend(this, new Intention {
-      toTravel = Some(toDefend)
-      canFlee = false
-    }))
+    defenders.get.units.foreach(_.agent.intend(this, new Intention { toTravel = Some(toDefend) }))
   }
 }

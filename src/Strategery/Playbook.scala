@@ -5,7 +5,6 @@ import Strategery.Strategies.Options.Protoss.Global.{AllPvP, AllPvT, AllPvZ}
 import Strategery.Strategies.Options.Protoss.PvP._
 import Strategery.Strategies.Options.Protoss.PvT._
 import Strategery.Strategies.Options.Protoss.PvZ._
-import Strategery.Strategies.Options.Zerg.Global.Zerg3HatchHydra
 import Strategery.Strategies.Strategy
 
 object Playbook {
@@ -21,7 +20,9 @@ object Playbook {
   // Use these whenever possible.
   //
   val forced = Vector[Strategy](
-    Zerg3HatchHydra
+    AllPvZ,
+    PvZEarlyFFELight
+    
     /*
     AllPvP,
     PvPEarly1GateCore,

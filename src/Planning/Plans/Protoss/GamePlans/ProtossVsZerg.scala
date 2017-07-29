@@ -192,7 +192,7 @@ class ProtossVsZerg extends Parallel {
       new And(
         new EnemyStrategy(Fingerprint4Pool),
         new Check(() => With.frame > 24 * 120),
-        new UnitsAtMost(2, UnitMatchType(Protoss.PhotonCannon), complete = true)),
+        new UnitsAtMost(1, UnitMatchType(Protoss.PhotonCannon), complete = true)),
       new DefendFFEAgainst4Pool),
     new FirstFiveMinutes(new Defend2GateAgainst4Pool),
     
@@ -347,17 +347,16 @@ class ProtossVsZerg extends Parallel {
             })),
         new DefendHearts)),
   
-    // Don't scout while being 4-pooled
     new If(
       new Or(
         new Employing(PvZEarlyFFELight),
         new Employing(PvZEarlyFFEHeavy)),
       new If(
-        new StartPositionsAtLeast(4),
-        new ScoutAt(6),
+        new UnitsAtLeast(1, UnitMatchType(Protoss.Pylon), complete = false),
         new If(
-          new UnitsAtLeast(1, UnitMatchType(Protoss.Pylon), complete = false),
-          new Scout)),
+          new StartPositionsAtLeast(4),
+          new Scout(2),
+          new Scout(1))),
       new ScoutAt(14)),
     
     new If(

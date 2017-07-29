@@ -12,9 +12,10 @@ object Scout extends Action {
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {
-    FindBuildings.consider(unit)
     DisruptBuilder.consider(unit)
     BlockConstruction.consider(unit)
+    PreserveScout.consider(unit)
+    FindBuildings.consider(unit)
     Poke.consider(unit)
   }
 }

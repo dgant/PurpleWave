@@ -30,6 +30,8 @@ class DefendFFEAgainst4Pool extends Plan {
     
     defenders.get.unitCounter.set(UnitCountExactly(workersFinal))
     defenders.get.acquire(this)
-    defenders.get.units.foreach(_.agent.intend(this, new Intention { toTravel = Some(toDefend) }))
+    defenders.get.units.foreach(_.agent.intend(this, new Intention {
+      toTravel = Some(toDefend)
+    }))
   }
 }

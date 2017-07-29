@@ -213,7 +213,7 @@ object ProtossBuilds {
     RequestAtLeast(1,   Protoss.Pylon),
     RequestAtLeast(10,  Protoss.Probe),
     RequestAtLeast(1,   Protoss.Forge),
-    RequestAtLeast(12,  Protoss.Probe),
+    RequestAtLeast(11,  Protoss.Probe), // Normally 12; 11 is protection against 4/5 pools
     RequestAtLeast(2,   Protoss.PhotonCannon),
     RequestAtLeast(16,  Protoss.Probe),
     RequestAtLeast(2,   Protoss.Nexus),
@@ -225,7 +225,7 @@ object ProtossBuilds {
     RequestAtLeast(1,   Protoss.Pylon),
     RequestAtLeast(12,  Protoss.Probe),
     RequestAtLeast(2,   Protoss.Nexus),
-    //This should only be done vs 12-hatch, not 9-hatch
+    //This Gateway should only be placed vs 12-hatch, not 9-hatch
     //Our building placement also seems to demand a new Pylon for this
     //RequestAtLeast(1,   Protoss.Gateway),
     RequestAtLeast(1,   Protoss.Forge),

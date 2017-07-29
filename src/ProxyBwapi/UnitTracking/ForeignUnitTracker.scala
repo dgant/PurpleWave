@@ -60,6 +60,7 @@ class ForeignUnitTracker {
   private def invalidatePositions() {
     foreignUnits.filter(unit =>
       unit.possiblyStillThere
+      && With.framesSince(unit.lastSeen) > 24
       &&  ! unit.visible
       &&  ! unit.effectivelyCloaked
       &&  unit.tileArea.tiles.forall(tile => With.game.isVisible(tile.bwapi)))

@@ -81,12 +81,14 @@ class ProtossVsZerg extends Parallel {
       RequestAtLeast(1, Protoss.CyberneticsCore),
       RequestAtLeast(2, Protoss.Assimilator),
       RequestAtLeast(1, Protoss.Stargate),
-      RequestAtLeast(1, Protoss.FleetBeacon),
-      RequestAtLeast(3, Protoss.Stargate),
-      RequestUpgrade(Protoss.AirDamage),
-      RequestUpgrade(Protoss.CarrierCapacity),
+      RequestAtLeast(4, Protoss.Gateway),
       RequestAtLeast(1, Protoss.CitadelOfAdun),
-      RequestUpgrade(Protoss.ZealotSpeed)))
+      RequestAtLeast(1, Protoss.FleetBeacon),
+      RequestUpgrade(Protoss.ZealotSpeed),
+      RequestAtLeast(2, Protoss.Stargate),
+      RequestUpgrade(Protoss.AirDamage),
+      RequestUpgrade(Protoss.CarrierCapacity)
+      ))
   
   private class ImplementMidgameCorsairSpeedlot extends Parallel(
     new If(
@@ -191,7 +193,7 @@ class ProtossVsZerg extends Parallel {
     new If(
       new And(
         new EnemyStrategy(Fingerprint4Pool),
-        new Check(() => With.frame > 24 * 120),
+        new Check(() => With.frame > 24 * 125),
         new UnitsAtMost(1, UnitMatchType(Protoss.PhotonCannon), complete = true)),
       new DefendFFEAgainst4Pool),
     new FirstFiveMinutes(new Defend2GateAgainst4Pool),

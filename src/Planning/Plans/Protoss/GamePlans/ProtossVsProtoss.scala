@@ -157,6 +157,12 @@ class ProtossVsProtoss extends Parallel {
   ) { description.set("Take our third base when safe")}
   
   ///////////////
+  // Reactions //
+  ///////////////
+  
+  private class ReactToDarkTemplar extends If
+  
+  ///////////////
   // Late game //
   ///////////////
   

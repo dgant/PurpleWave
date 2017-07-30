@@ -34,6 +34,8 @@ case class Simulacrum(simulation: Simulation, unit: UnitInfo) {
   var valuePerDamage    : Double                      = MicroValue.valuePerDamage(unit)
   var moves             : ArrayBuffer[(Pixel, Pixel)] = new ArrayBuffer[(Pixel, Pixel)]
   
+  def splashFactor : Double = Math.min(targetQueue.size / 4.0, MicroValue.maxSplashFactor(unit))
+  
   def checkDeath() {
     dead = dead || hitPoints <= 0
   }
@@ -108,7 +110,7 @@ case class Simulacrum(simulation: Simulation, unit: UnitInfo) {
     val victim            = target.get
     val damage            = Math.min(target.get.hitPoints, unit.damageOnNextHitAgainst(victim.unit))
     val value             = damage * victim.valuePerDamage
-    cooldown              = unit.cooldownMaxAgainst(victim.unit)
+    cooldown              = Math.max(1, (unit.cooldownMaxAgainst(victim.unit) / splashFactor).toInt)
     damageDealt           += damage
     valueDealt            += value
     victim.hitPoints      -= damage

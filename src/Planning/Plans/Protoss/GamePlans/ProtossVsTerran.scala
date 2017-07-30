@@ -10,7 +10,7 @@ import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, FirstFiveMinutes}
 import Planning.Plans.Macro.Expanding.{BuildAssimilators, MatchMiningBases, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.{UnitsAtLeast, _}
-import Planning.Plans.Macro.Reaction.EnemyBio
+import Planning.Plans.Information.Reactive.EnemyBio
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Protoss.Situational.TwoGatewaysAtNatural
 import Planning.Plans.Protoss.{ProtossBuilds, ProtossVsTerranIdeas}

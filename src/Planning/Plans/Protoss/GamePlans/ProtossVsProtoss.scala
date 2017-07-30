@@ -5,6 +5,7 @@ import Macro.BuildRequests.{RequestAtLeast, _}
 import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors}
 import Planning.Plans.Army.{Attack, ConsiderAttacking, ControlMap}
 import Planning.Plans.Compound._
+import Planning.Plans.Information.Reactive.{EnemyDarkTemplarExists, EnemyDarkTemplarPossible}
 import Planning.Plans.Information.{Employ, Employing}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, FirstFiveMinutes}
@@ -160,7 +161,23 @@ class ProtossVsProtoss extends Parallel {
   // Reactions //
   ///////////////
   
-  private class ReactToDarkTemplar extends If
+  private class ReactToDarkTemplarPossible extends If(
+    new EnemyDarkTemplarPossible,
+    new Parallel(
+      new Build(
+        RequestAtLeast(1, Protoss.RoboticsFacility),
+        RequestAtLeast(1, Protoss.Observatory)),
+      new TrainContinuously(Protoss.Observer, 2)))
+  
+  private class ReactToDarkTemplarExisting extends If(
+    new EnemyDarkTemplarExists,
+    new Parallel(
+      new Build(
+        RequestAtLeast(1, Protoss.RoboticsFacility),
+        RequestAtLeast(1, Protoss.Observatory),
+        RequestAtLeast(1, Protoss.Forge),
+        RequestAtLeast(1, Protoss.PhotonCannon)),
+      new TrainContinuously(Protoss.Observer, 3)))
   
   ///////////////
   // Late game //
@@ -210,6 +227,9 @@ class ProtossVsProtoss extends Parallel {
     new TrainWorkersContinuously,
     
     // Units/Upgrades
+    
+    new ReactToDarkTemplarExisting,
+    new ReactToDarkTemplarPossible,
     
     new If(
       new UnitsAtLeast(2, UnitMatchType(Protoss.HighTemplar), complete = false),

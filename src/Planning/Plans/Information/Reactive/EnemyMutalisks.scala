@@ -1,4 +1,4 @@
-package Planning.Plans.Macro.Reaction
+package Planning.Plans.Information.Reactive
 
 import Lifecycle.With
 import Planning.Plan

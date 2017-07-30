@@ -7,7 +7,7 @@ import Planning.Plans.Information.Employing
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Milestones.{HaveUpgrade, UnitsAtLeast, UnitsAtMost}
-import Planning.Plans.Macro.Reaction.{EnemyBio, EnemyBioAllIn}
+import Planning.Plans.Information.Reactive.{EnemyBio, EnemyBioAllIn}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Options.Protoss.PvT.PvTEarly4GateAllIn
 

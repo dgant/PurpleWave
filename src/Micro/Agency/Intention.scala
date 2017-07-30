@@ -19,7 +19,6 @@ class Intention {
   var toUpgrade   : Option[Upgrade]   = None
   var canAttack   : Boolean           = true
   var canFlee     : Boolean           = true
-  var canPursue   : Boolean           = false
   var canCower    : Boolean           = false
   var canMeld     : Boolean           = false
   var canTickle   : Boolean           = false

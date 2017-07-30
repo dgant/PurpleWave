@@ -11,7 +11,7 @@ import bwapi.Color
 object ShowDesire extends View {
   
   override def renderMap() {
-    With.agents.states.foreach(renderUnitState)
+    With.agents.all.foreach(renderUnitState)
   }
   
   def renderUnitState(state: Agent) {

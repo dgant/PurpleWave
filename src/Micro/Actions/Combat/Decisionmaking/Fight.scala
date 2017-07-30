@@ -20,6 +20,11 @@ object Fight extends Action {
     Cast.consider(unit)
     BustBunker.consider(unit)
     Sally.consider(unit)
-    FightOrFlight.consider(unit)
+    if (unit.agent.shouldEngage) {
+      Engage.consider(unit)
+    }
+    else {
+      Disengage.consider(unit)
+    }
   }
 }

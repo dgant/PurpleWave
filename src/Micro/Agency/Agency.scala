@@ -11,7 +11,7 @@ class Agency {
   private val agents = new mutable.HashMap[FriendlyUnitInfo, Agent]
   private var finishedExecutingLastTime = true
   
-  def states: Iterable[Agent] = agents.values
+  def all: Iterable[Agent] = agents.values
   
   def getState(unit: FriendlyUnitInfo): Agent = {
     if ( ! agents.contains(unit)) {

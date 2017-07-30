@@ -12,9 +12,10 @@ object TargetHeuristicDetectors extends TargetHeuristic{
     
     val detects = (
       candidate.unitClass.isDetector
-      ||  (candidate.constructing && candidate.target.exists(_.unitClass.isDetector))
+      ||  (candidate.constructing && candidate.target.exists(buildee => Array(Terran.EngineeringBay, Terran.MissileTurret).contains(buildee.unitClass)))
       ||  candidate.is(Terran.Comsat)
       ||  candidate.is(Terran.EngineeringBay)
+      ||  candidate.is(Terran.ControlTower)
       ||  candidate.is(Protoss.Forge)
       ||  candidate.is(Protoss.Observatory)
       ||  candidate.is(Protoss.RoboticsFacility))

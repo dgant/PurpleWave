@@ -47,7 +47,7 @@ class Attack extends Plan {
     val attackIntent = new Intention { toTravel = Some(target) }
     attackers.get.units.foreach(_.agent.intend(this, attackIntent))
     
-    var nextDetectorDepth = 32.0 * 4
+    var nextDetectorDepth = 32.0 * 8
     detectors.get.units.foreach(detector => {
       detector.agent.intend(
         this,

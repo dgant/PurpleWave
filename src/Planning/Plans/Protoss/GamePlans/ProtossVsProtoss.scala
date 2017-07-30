@@ -124,13 +124,12 @@ class ProtossVsProtoss extends Parallel {
       RequestAtLeast(1, Protoss.Observatory),
       RequestAtLeast(1, Protoss.RoboticsSupportBay)))
   
-  private class BuildReaversOrTemplar extends Parallel(
-    new If(
+  private class BuildReaversOrTemplar extends If(
       new UnitsAtLeast(1, UnitMatchType(Protoss.TemplarArchives), complete = true),
       new Parallel(
         new TrainContinuously(Protoss.HighTemplar,  6),
         new TrainContinuously(Protoss.Reaver,       1)),
-      new TrainContinuously(Protoss.Reaver, 4)))
+      new TrainContinuously(Protoss.Reaver, 4))
   
   ///////////////
   // Expanding //

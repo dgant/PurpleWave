@@ -8,9 +8,9 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 object TargetRelevant extends Action {
   
   override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.agent.canFight          &&
-    unit.agent.toAttack.isEmpty  &&
-    unit.canAttack      &&
+    unit.agent.canFight           &&
+    unit.agent.toAttack.isEmpty   &&
+    unit.canAttack                &&
     unit.matchups.targets.nonEmpty
   }
   

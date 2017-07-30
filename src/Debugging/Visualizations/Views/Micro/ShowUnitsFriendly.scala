@@ -9,7 +9,7 @@ import Micro.Agency.Agent
 object ShowUnitsFriendly extends View {
   
   override def renderMap() {
-    With.agents.states.foreach(renderUnitState)
+    With.agents.all.foreach(renderUnitState)
   }
   
   def renderUnitState(agent: Agent) {
@@ -32,33 +32,31 @@ object ShowUnitsFriendly extends View {
     
     /*
         DrawMap.label(
-      state.unit.order.toString,
-      state.unit.pixelCenter.add(0, 0),
+      agent.unit.order.toString,
+      agent.unit.pixelCenter.add(0, 0),
       drawBackground = false)
     */
-    /*
-    if (state.movingTo.isDefined) {
-      DrawMap.line(state.unit.pixelCenter, state.movingTo.get, Colors.MediumGray)
+    if (agent.movingTo.isDefined) {
+      DrawMap.line(agent.unit.pixelCenter, agent.movingTo.get, Colors.MediumGray)
     }
-    if (state.target.isDefined) {
-      DrawMap.line(state.unit.pixelCenter, state.intent.toAttack.get.pixelCenter, Colors.BrightRed)
+    if (agent.toAttack.isDefined) {
+      DrawMap.line(agent.unit.pixelCenter, agent.toAttack.get.pixelCenter, Colors.BrightRed)
     }
-    */
     if (agent.toForm.isDefined) {
       DrawMap.circle(agent.toForm.get, agent.unit.unitClass.radialHypotenuse.toInt, Colors.MediumTeal)
     }
     /*
-    if (state.toGather.isDefined) {
-      DrawMap.line(state.unit.pixelCenter, state.intent.toGather.get.pixelCenter, Colors.DarkGreen)
+    if (agent.toGather.isDefined) {
+      DrawMap.line(agent.unit.pixelCenter, agent.intent.toGather.get.pixelCenter, Colors.DarkGreen)
     }
-    val targetUnit = state.unit.target.orElse(state.unit.orderTarget)
+    val targetUnit = agent.unit.target.orElse(agent.unit.orderTarget)
     if (targetUnit.nonEmpty) {
-      DrawMap.line(state.unit.pixelCenter, targetUnit.get.pixelCenter, state.unit.player.colorNeon)
+      DrawMap.line(agent.unit.pixelCenter, targetUnit.get.pixelCenter, agent.unit.player.colorNeon)
     }
     else {
-      val targetPosition = state.unit.targetPixel.orElse(state.unit.orderTargetPixel)
-      if (targetPosition.nonEmpty && state.unit.target.isEmpty) {
-        DrawMap.line(state.unit.pixelCenter, targetPosition.get, state.unit.player.colorDark)
+      val targetPosition = agent.unit.targetPixel.orElse(agent.unit.orderTargetPixel)
+      if (targetPosition.nonEmpty && agent.unit.target.isEmpty) {
+        DrawMap.line(agent.unit.pixelCenter, targetPosition.get, agent.unit.player.colorDark)
       }
     }
     

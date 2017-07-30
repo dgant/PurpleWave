@@ -1,7 +1,7 @@
 package Micro.Actions
 
 import Micro.Actions.Basic._
-import Micro.Actions.Combat.Decisionmaking.Fight
+import Micro.Actions.Combat.Decisionmaking.{Fight, FightOrFlight}
 import Micro.Actions.Combat.Maneuvering.Duck
 import Micro.Actions.Combat.Tactics.Tickle
 import Micro.Actions.Commands.{Attack, Travel}
@@ -22,6 +22,7 @@ object Idle extends Action {
   private val actions = Vector(
     Cancel, //Probably not actually used yet because candidates won't be in the Executor queue
     Meld,
+    FightOrFlight,
     Tickle,
     Duck,
     Gather,

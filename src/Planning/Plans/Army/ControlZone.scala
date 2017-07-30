@@ -43,7 +43,6 @@ class ControlZone(zone: Zone) extends Plan {
           .minBy(_.pixelDistanceFast(ourBase.map(_.heart).getOrElse(zone.centroid).pixelCenter))
   
         fighters.get.units.foreach(fighter => fighter.agent.intend(this, new Intention {
-          canPursue = true
           toTravel = {
             val attackables = threats.filter(fighter.canAttack)
             if (attackables.isEmpty)

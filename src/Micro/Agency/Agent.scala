@@ -53,7 +53,6 @@ class Agent(val unit: FriendlyUnitInfo) {
   var toUpgrade     : Option[Upgrade]               = None
   var canFight      : Boolean                       = true
   var canFlee       : Boolean                       = true
-  var canPursue     : Boolean                       = true
   var canCower      : Boolean                       = false
   var canMeld       : Boolean                       = false
   var canScout      : Boolean                       = false
@@ -62,6 +61,8 @@ class Agent(val unit: FriendlyUnitInfo) {
   var targetingProfile  : TargetingProfile  = TargetingProfiles.default
   
   var explosions: ListBuffer[Explosion] = new ListBuffer[Explosion]
+  
+  var shouldEngage: Boolean = false
   
   /////////////////
   // Suggestions //
@@ -109,22 +110,21 @@ class Agent(val unit: FriendlyUnitInfo) {
   }
   
   private def followIntent() {
-    unit.agent.toReturn = unit.agent.lastIntent.toReturn
-    unit.agent.toTravel = unit.agent.lastIntent.toTravel
-    unit.agent.toAttack = unit.agent.lastIntent.toAttack
-    unit.agent.toGather = unit.agent.lastIntent.toGather
-    unit.agent.toBuild = unit.agent.lastIntent.toBuild
-    unit.agent.toBuildTile = unit.agent.lastIntent.toBuildTile
-    unit.agent.toTrain = unit.agent.lastIntent.toTrain
-    unit.agent.toTech = unit.agent.lastIntent.toTech
-    unit.agent.toUpgrade = unit.agent.lastIntent.toUpgrade
-    unit.agent.toForm = unit.agent.lastIntent.toForm
-    unit.agent.canFight = unit.agent.lastIntent.canAttack
-    unit.agent.canFlee = unit.agent.lastIntent.canFlee
-    unit.agent.canPursue = unit.agent.lastIntent.canPursue
-    unit.agent.canCower = unit.agent.lastIntent.canCower
-    unit.agent.canMeld = unit.agent.lastIntent.canMeld
-    unit.agent.canScout = unit.agent.lastIntent.canScout
+    unit.agent.toReturn     = unit.agent.lastIntent.toReturn
+    unit.agent.toTravel     = unit.agent.lastIntent.toTravel
+    unit.agent.toAttack     = unit.agent.lastIntent.toAttack
+    unit.agent.toGather     = unit.agent.lastIntent.toGather
+    unit.agent.toBuild      = unit.agent.lastIntent.toBuild
+    unit.agent.toBuildTile  = unit.agent.lastIntent.toBuildTile
+    unit.agent.toTrain      = unit.agent.lastIntent.toTrain
+    unit.agent.toTech       = unit.agent.lastIntent.toTech
+    unit.agent.toUpgrade    = unit.agent.lastIntent.toUpgrade
+    unit.agent.toForm       = unit.agent.lastIntent.toForm
+    unit.agent.canFight     = unit.agent.lastIntent.canAttack
+    unit.agent.canFlee      = unit.agent.lastIntent.canFlee
+    unit.agent.canCower     = unit.agent.lastIntent.canCower
+    unit.agent.canMeld      = unit.agent.lastIntent.canMeld
+    unit.agent.canScout     = unit.agent.lastIntent.canScout
   }
   
   private def cleanUp() {

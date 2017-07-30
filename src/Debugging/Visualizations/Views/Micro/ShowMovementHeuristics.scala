@@ -16,7 +16,7 @@ object ShowMovementHeuristics extends View {
     var focus: Iterable[FriendlyUnitInfo] = With.units.ours.filter(unit => unit.selected && eligible(unit))
     
     if (focus.isEmpty) {
-      focus = With.agents.states
+      focus = With.agents.all
         .filter(state => state.movementHeuristicResults.nonEmpty && eligible(state.unit))
         .map(_.unit)
         .headOption

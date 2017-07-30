@@ -16,7 +16,7 @@ case class DecideToMove(
   lazy val hypotheticalMatchups: MatchupAnalysis = agent.matchups.ifAt(destination)
   
   override def valuePerFrame: Double = {
-    (agent.matchups.netValuePerFrameDiffused + hypotheticalMatchups.netValuePerFrameDiffused) / 2.0
+    (agent.matchups.vpfNetDiffused + hypotheticalMatchups.vpfNetDiffused) / 2.0
   }
   
   override def frames: Double = {

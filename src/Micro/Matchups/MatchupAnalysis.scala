@@ -46,8 +46,8 @@ case class MatchupAnalysis(
   lazy val dpfReceivingCurrently      : Double  = threatsInRange.map(_.matchups.dpfDealingCurrently(me)).sum
   lazy val vpfReceivingDiffused       : Double  = dpfReceivingDiffused   * MicroValue.valuePerDamage(me)
   lazy val vpfReceivingCurrently      : Double  = dpfReceivingCurrently  * MicroValue.valuePerDamage(me)
-  lazy val netValuePerFrameDiffused   : Double  = vpfDealingDiffused   - vpfReceivingDiffused
-  lazy val netValuePerFrameCurrently  : Double  = vpfDealingCurrently  - vpfReceivingCurrently
+  lazy val vpfNetDiffused             : Double  = vpfDealingDiffused   - vpfReceivingDiffused
+  lazy val vpfNetCurrently            : Double  = vpfDealingCurrently  - vpfReceivingCurrently
   lazy val framesToLiveDiffused       : Double  = PurpleMath.nanToInfinity(me.totalHealth / dpfReceivingDiffused)
   lazy val framesToLiveCurrently      : Double  = PurpleMath.nanToInfinity(me.totalHealth / dpfReceivingCurrently)
   lazy val framesToRetreatDiffused    : Double  = if (threatsInRange.isEmpty) 0.0 else threatsInRange.map(threat => me.framesToTravelPixels(threat.pixelRangeAgainstFromCenter(me) - threat.pixelDistanceFast(at))).max

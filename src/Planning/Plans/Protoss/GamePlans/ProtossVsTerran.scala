@@ -1,7 +1,7 @@
 package Planning.Plans.Protoss.GamePlans
 
 import Lifecycle.With
-import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
+import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
 import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors}
 import Planning.Plans.Army._
 import Planning.Plans.Compound._
@@ -190,6 +190,14 @@ class ProtossVsTerran extends Parallel {
     new FulfillEarlyTech,
     
     // Mid game
+     new If(
+      new UnitsAtLeast(1, UnitMatchType(Protoss.HighTemplar), complete = false),
+      new Build(RequestTech(Protoss.PsionicStorm))),
+  
+    new If(
+      new UnitsAtLeast(1, UnitMatchType(Protoss.Arbiter), complete = false),
+      new Build(RequestTech(Protoss.Stasis))),
+    
     new If(
       new Not(new Employing(PvTEarly4GateAllIn)),
       new MatchMiningBases(1)),

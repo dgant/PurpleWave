@@ -16,7 +16,7 @@ abstract class MicroDecision(actingAgent: FriendlyUnitInfo) {
   }
   
   def valuePerFrame: Double = {
-    agent.matchups.netValuePerFrameDiffused
+    agent.matchups.vpfNetDiffused
   }
   
   def frames: Double

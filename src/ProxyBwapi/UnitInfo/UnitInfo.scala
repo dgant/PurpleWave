@@ -40,7 +40,7 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   
   private def frameToFinishCompletion: Int = frameDiscovered + unitClass.framesToFinishCompletion + remainingBuildFrames
   
-  var completionFrame: Int = frameToFinishCompletion
+  var completionFrame: Int = Int.MaxValue // Can't use unitClass during construction
 
   private val history = new mutable.Queue[UnitState]
   def update() {

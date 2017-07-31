@@ -9,7 +9,7 @@ import bwapi._
 
 import scala.collection.JavaConverters._
 
-abstract class FriendlyUnitProxy(base:bwapi.Unit) extends UnitInfo(base) {
+abstract class FriendlyUnitProxy(base: bwapi.Unit) extends UnitInfo(base) {
   
   override def equals(obj: Any): Boolean = obj.isInstanceOf[FriendlyUnitProxy] && obj.asInstanceOf[FriendlyUnitProxy].id == id
   override def hashCode(): Int = id.hashCode

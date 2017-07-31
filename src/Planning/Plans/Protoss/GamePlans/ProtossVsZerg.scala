@@ -189,12 +189,14 @@ class ProtossVsZerg extends Parallel {
         ))),
   
     // 4/5-pool defense
-    new If(
-      new And(
-        new EnemyStrategy(Fingerprint4Pool),
-        new Check(() => With.frame > 24 * 125),
-        new UnitsAtMost(1, UnitMatchType(Protoss.PhotonCannon), complete = true)),
-      new DefendFFEAgainst4Pool),
+    new FirstFiveMinutes(
+      new If(
+        new And(
+          new EnemyStrategy(Fingerprint4Pool),
+          new Check(() => With.frame > 24 * 125),
+          new UnitsAtMost(1, UnitMatchType(Protoss.PhotonCannon), complete = true)),
+        new DefendFFEAgainst4Pool)),
+    
     new FirstFiveMinutes(new Defend2GateAgainst4Pool),
     
     // Early game macro

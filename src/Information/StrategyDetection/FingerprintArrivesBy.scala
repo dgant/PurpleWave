@@ -11,6 +11,6 @@ case class FingerprintArrivesBy(
   override def matches: Boolean = {
     With.units.enemy.count(u =>
       u.is(unitClass)
-      && u.framesToTravelTo(With.geography.home.pixelCenter) < gameTime.frames) >= quantity
+      && With.frame + u.framesToTravelTo(With.geography.home.pixelCenter) < gameTime.frames) >= quantity
   }
 }

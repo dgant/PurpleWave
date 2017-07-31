@@ -40,21 +40,35 @@ class Scout(scoutCount: Int = 1) extends Plan {
     if (With.framesSince(lastScoutDeath) < 24 * 30) {
       return
     }
+  
+    val enemyStartBases = With.geography.startBases.filter(_.owner.isEnemy)
+    var scoutsDesired: Int = 1
+    var scoutingDestinations: mutable.Queue[Pixel]  = mutable.Queue.empty
     
-    val unscoutedStartLocations = With.geography.startBases.filterNot(_.lastScoutedFrame > 0)
-    val scoutsDesired           = Math.max(1, Math.min(scoutCount, unscoutedStartLocations.size))
-    val scoutingDestinations    = new mutable.Queue[Pixel] ++ With.intelligence.leastScoutedBases.filter( ! _.zone.island).map(_.townHallArea.midPixel)
+    if (enemyStartBases.isEmpty) {
+      val unscoutedStartLocations = With.geography.startBases.filterNot(_.lastScoutedFrame > 0)
+      scoutsDesired = Math.max(1, Math.min(scoutCount, unscoutedStartLocations.size))
+      scoutingDestinations ++= With.intelligence.leastScoutedBases.filter( ! _.zone.island).map(_.townHallArea.midPixel)
+    }
+    else {
+      scoutingDestinations ++= enemyStartBases.map(_.townHallArea.midPixel)
+    }
+    
+    
+    if (acquiredScouts.size > scoutsDesired) {
+      scouts.get.release()
+    }
     
     scouts.get.unitCounter.set(UnitCountExactly(scoutsDesired))
     scouts.get.unitPreference.set(UnitPreferClose(scoutingDestinations.head))
     scouts.get.acquire(this)
     acquiredScouts = scouts.get.units
     
-    acquiredScouts.foreach(
-      _.agent.intend(this, new Intention {
-      toTravel = Some(scoutingDestinations.dequeue())
-      canScout = true
-    }))
+    acquiredScouts.foreach(scout =>
+      if (scoutingDestinations.nonEmpty) {
+        scout.agent.intend(this, new Intention {
+        toTravel = Some(scoutingDestinations.dequeue())
+        canScout = true
+      })})
   }
-    
 }

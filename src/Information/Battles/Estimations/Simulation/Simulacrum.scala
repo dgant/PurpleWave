@@ -34,7 +34,7 @@ case class Simulacrum(simulation: Simulation, unit: UnitInfo) {
   var valuePerDamage    : Double                      = MicroValue.valuePerDamage(unit)
   var moves             : ArrayBuffer[(Pixel, Pixel)] = new ArrayBuffer[(Pixel, Pixel)]
   
-  def splashFactor : Double = Math.min(targetQueue.size / 4.0, MicroValue.maxSplashFactor(unit))
+  def splashFactor : Double = Math.max(1.0, Math.min(targetQueue.size / 4.0, MicroValue.maxSplashFactor(unit)))
   
   def checkDeath() {
     dead = dead || hitPoints <= 0

@@ -9,38 +9,38 @@ import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClass.UnitClass
 
 class Blueprint(
-                 val proposer                 : Plan,
-                 val building                 : Option[UnitClass]         = None,
-                 var widthTiles               : Option[Int]               = None,
-                 var heightTiles              : Option[Int]               = None,
-                 var powers                   : Option[Boolean]           = None,
-                 var requirePower             : Option[Boolean]           = None,
-                 var requireCreep             : Option[Boolean]           = None,
-                 var requireTownHallTile      : Option[Boolean]           = None,
-                 var requireGasTile           : Option[Boolean]           = None,
-                 var preferMargin             : Option[Boolean]           = None,
-                 var preferWallPlacement      : Option[Boolean]           = None,
-                 var placementProfile         : Option[PlacementProfile]  = None,
-                 var preferredDistanceFromExit   : Option[Double]            = None,
-                 val requireCandidates        : Option[Iterable[Tile]]    = None,
-                 val preferZone               : Option[Zone]              = None,
-                 val requireZone              : Option[Zone]              = None,
-                 var respectHarvesting        : Boolean                   = true) {
+val proposer                   : Plan,
+val building                   : Option[UnitClass]         = None,
+var widthTiles                 : Option[Int]               = None,
+var heightTiles                : Option[Int]               = None,
+var powers                     : Option[Boolean]           = None,
+var requirePower               : Option[Boolean]           = None,
+var requireCreep               : Option[Boolean]           = None,
+var requireTownHallTile        : Option[Boolean]           = None,
+var requireGasTile             : Option[Boolean]           = None,
+var preferMargin               : Option[Boolean]           = None,
+var preferWallPlacement        : Option[Boolean]           = None,
+var placementProfile           : Option[PlacementProfile]  = None,
+var preferredDistanceFromExit  : Option[Double]            = None,
+val requireCandidates          : Option[Iterable[Tile]]    = None,
+var preferZone                 : Option[Zone]              = None,
+val requireZone                : Option[Zone]              = None,
+var respectHarvesting          : Boolean                   = true) {
   
   var id: Option[Int] = None
   val frameCreated: Int = With.frame
   
-  widthTiles              = widthTiles              .orElse(building.map(_.tileWidth)).orElse(Some(1))
-  heightTiles             = heightTiles             .orElse(building.map(_.tileHeight)).orElse(Some(1))
-  powers                  = powers                  .orElse(Some(building.contains(Protoss.Pylon)))
-  requirePower            = requirePower            .orElse(Some(building.exists(_.requiresPsi)))
-  requireCreep            = requireCreep            .orElse(Some(building.exists(_.requiresCreep)))
-  requireTownHallTile     = requireTownHallTile     .orElse(Some(building.exists(_.isTownHall)))
-  requireGasTile          = requireGasTile          .orElse(Some(building.exists(_.isRefinery)))
-  preferMargin            = preferMargin            .orElse(Some(building.exists(With.architecture.usuallyNeedsMargin)))
-  preferWallPlacement     = preferWallPlacement     .orElse(Some(building.exists(_.rawCanAttack)))
-  preferredDistanceFromExit  = preferredDistanceFromExit  .orElse(building.map(_.maxAirGroundRange.toDouble)).orElse(Some(32.0 * 9.0))
-  placementProfile        = placementProfile        .orElse(Some(PlacementProfiles.default(this)))
+  widthTiles                  = widthTiles                  .orElse(building.map(_.tileWidth)).orElse(Some(1))
+  heightTiles                 = heightTiles                 .orElse(building.map(_.tileHeight)).orElse(Some(1))
+  powers                      = powers                      .orElse(Some(building.contains(Protoss.Pylon)))
+  requirePower                = requirePower                .orElse(Some(building.exists(_.requiresPsi)))
+  requireCreep                = requireCreep                .orElse(Some(building.exists(_.requiresCreep)))
+  requireTownHallTile         = requireTownHallTile         .orElse(Some(building.exists(_.isTownHall)))
+  requireGasTile              = requireGasTile              .orElse(Some(building.exists(_.isRefinery)))
+  preferMargin                = preferMargin                .orElse(Some(building.exists(With.architecture.usuallyNeedsMargin)))
+  preferredDistanceFromExit   = preferredDistanceFromExit   .orElse(building.map(_.maxAirGroundRange.toDouble)).orElse(Some(32.0 * 9.0))
+  preferZone                  = preferZone                  .orElse(requireZone)
+  placementProfile            = placementProfile            .orElse(Some(PlacementProfiles.default(this)))
   
   def fulfilledBy(proposal: Blueprint): Boolean = {
     if (proposal == this) return true

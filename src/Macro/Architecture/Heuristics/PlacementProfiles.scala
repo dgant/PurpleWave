@@ -83,7 +83,7 @@ object PlacementProfiles {
     preferDistanceFromEnemy     = 0.5,
     preferCoveringWorkers       = 0.5,
     avoidDistanceFromBase       = 1.5,
-    avoidSurfaceArea            = 0.25,
+    avoidSurfaceArea            = 0.5,
     avoidDistanceFromIdealRange = 5.0)
   
   val cannon = new PlacementProfile("Defense", basic) {

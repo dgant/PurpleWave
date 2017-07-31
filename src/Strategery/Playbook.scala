@@ -79,8 +79,7 @@ object Playbook {
     PvZMidgameCorsairDarkTemplar,
     PvZMidgameCorsairSpeedlot,
     PvZMidgame5GateDragoons,
-    PvZMidgameCorsairReaver,
-    PvZMidgameCorsairCarrier
+    PvZMidgameCorsairReaver
   )
   
   val strategyOrderRoundRobin = Vector(

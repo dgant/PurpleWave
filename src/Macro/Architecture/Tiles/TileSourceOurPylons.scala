@@ -8,7 +8,7 @@ import ProxyBwapi.Races.Protoss
 object TileSourceOurPylons extends TileSource {
   
   override def appropriateFor(blueprint: Blueprint): Boolean = {
-    blueprint.powered
+    blueprint.requirePower.get
   }
   
   override def tiles(blueprint: Blueprint): Iterable[Tile] = {

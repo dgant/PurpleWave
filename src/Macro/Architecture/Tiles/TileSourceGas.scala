@@ -4,8 +4,9 @@ import Macro.Architecture.Blueprint
 import Mathematics.Points.Tile
 
 object TileSourceGas extends TileSource {
+  
   override def appropriateFor(blueprint: Blueprint): Boolean = {
-    blueprint.gas
+    blueprint.requireGasTile.get
   }
   
   override def tiles(blueprint: Blueprint): Iterable[Tile] = {

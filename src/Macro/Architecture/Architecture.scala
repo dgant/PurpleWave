@@ -166,7 +166,7 @@ class Architecture {
     untownhallable  ++= area.tiles
     ungassable      ++= area.tiles
   
-    if (placement.blueprint.powers) {
+    if (placement.blueprint.powers.get) {
       addPower(tile)
     }
   

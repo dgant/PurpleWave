@@ -32,7 +32,7 @@ class Zerg9Hatch9PoolProxy extends Parallel {
   }
   
   children.set(Vector(
-    new ProposePlacement { override lazy val blueprints = Vector(new Blueprint(this, building = Some(Zerg.Hatchery), zone = proxyZone)) },
+    new ProposePlacement { override lazy val blueprints = Vector(new Blueprint(this, building = Some(Zerg.Hatchery), preferZone = proxyZone)) },
     new Build(
       RequestAtLeast(9,   Zerg.Drone),
       RequestAtLeast(2,   Zerg.Hatchery),

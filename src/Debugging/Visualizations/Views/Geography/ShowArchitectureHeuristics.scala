@@ -103,8 +103,8 @@ object ShowArchitectureHeuristics extends View {
     max       : Double) {
     DrawMap.circle(
       pixel.add(
-        16 * building.widthTiles,
-        16 * building.heightTiles),
+        16 * building.widthTiles.get,
+        16 * building.heightTiles.get),
       (16 * (value - min) / max).toInt,
       color)
   }

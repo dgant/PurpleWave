@@ -9,55 +9,54 @@ import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClass.UnitClass
 
 class Blueprint(
-  val proposer        : Plan,
-  val building        : Option[UnitClass]         = None,
-  argWidth            : Option[Int]               = None,
-  argHeight           : Option[Int]               = None,
-  argPowers           : Option[Boolean]           = None,
-  argPowered          : Option[Boolean]           = None,
-  argRequireCreep     : Option[Boolean]           = None,
-  argTownHall         : Option[Boolean]           = None,
-  argGas              : Option[Boolean]           = None,
-  argMargin           : Option[Boolean]           = None,
-  argWall             : Option[Boolean]           = None,
-  argPlacement        : Option[PlacementProfile]  = None,
-  argRangePixels      : Option[Double]            = None,
-  val tiles           : Option[Iterable[Tile]]    = None,
-  val zone            : Option[Zone]              = None,
-  respectHarvesting   : Boolean                   = true) {
+                 val proposer                 : Plan,
+                 val building                 : Option[UnitClass]         = None,
+                 var widthTiles               : Option[Int]               = None,
+                 var heightTiles              : Option[Int]               = None,
+                 var powers                   : Option[Boolean]           = None,
+                 var requirePower             : Option[Boolean]           = None,
+                 var requireCreep             : Option[Boolean]           = None,
+                 var requireTownHallTile      : Option[Boolean]           = None,
+                 var requireGasTile           : Option[Boolean]           = None,
+                 var preferMargin             : Option[Boolean]           = None,
+                 var preferWallPlacement      : Option[Boolean]           = None,
+                 var placementProfile         : Option[PlacementProfile]  = None,
+                 var preferredDistanceFromExit   : Option[Double]            = None,
+                 val requireCandidates        : Option[Iterable[Tile]]    = None,
+                 val preferZone               : Option[Zone]              = None,
+                 val requireZone              : Option[Zone]              = None,
+                 var respectHarvesting        : Boolean                   = true) {
   
   var id: Option[Int] = None
   val frameCreated: Int = With.frame
   
-  val widthTiles      : Int               = argWidth        .orElse(building.map(_.tileWidth)).getOrElse(1)
-  val heightTiles     : Int               = argHeight       .orElse(building.map(_.tileHeight)).getOrElse(1)
-  val powers          : Boolean           = argPowers       .getOrElse(building.contains(Protoss.Pylon))
-  val powered         : Boolean           = argPowered      .getOrElse(building.exists(_.requiresPsi))
-  val requireCreep    : Boolean           = argRequireCreep .getOrElse(building.exists(_.requiresCreep))
-  val townHall        : Boolean           = argTownHall     .getOrElse(building.exists(_.isTownHall))
-  val gas             : Boolean           = argGas          .getOrElse(building.exists(_.isRefinery))
-  val margin          : Boolean           = argMargin       .getOrElse(building.exists(With.architecture.usuallyNeedsMargin))
-  val wall            : Boolean           = argWall         .getOrElse(building.exists(_.rawCanAttack))
-  val distancePixels  : Double            = argRangePixels  .orElse(building.map(building => building.maxAirGroundRange.toDouble)).getOrElse(32.0 * 9.0)
-  val placement       : PlacementProfile  = argPlacement    .getOrElse(PlacementProfiles.default(this))
+  widthTiles              = widthTiles              .orElse(building.map(_.tileWidth)).orElse(Some(1))
+  heightTiles             = heightTiles             .orElse(building.map(_.tileHeight)).orElse(Some(1))
+  powers                  = powers                  .orElse(Some(building.contains(Protoss.Pylon)))
+  requirePower            = requirePower            .orElse(Some(building.exists(_.requiresPsi)))
+  requireCreep            = requireCreep            .orElse(Some(building.exists(_.requiresCreep)))
+  requireTownHallTile     = requireTownHallTile     .orElse(Some(building.exists(_.isTownHall)))
+  requireGasTile          = requireGasTile          .orElse(Some(building.exists(_.isRefinery)))
+  preferMargin            = preferMargin            .orElse(Some(building.exists(With.architecture.usuallyNeedsMargin)))
+  preferWallPlacement     = preferWallPlacement     .orElse(Some(building.exists(_.rawCanAttack)))
+  preferredDistanceFromExit  = preferredDistanceFromExit  .orElse(building.map(_.maxAirGroundRange.toDouble)).orElse(Some(32.0 * 9.0))
+  placementProfile        = placementProfile        .orElse(Some(PlacementProfiles.default(this)))
   
   def fulfilledBy(proposal: Blueprint): Boolean = {
     if (proposal == this) return true
-    widthTiles    == proposal.widthTiles                                                          &&
-    heightTiles   == proposal.heightTiles                                                         &&
-    (powers       == proposal.powers          || ! powers)                                        &&
-    (powered      == proposal.powered         || ! powered)                                       &&
-    townHall      == proposal.townHall                                                            &&
-    gas           == proposal.gas                                                                 &&
-    // Disabled to allow FFE to work
-    //(margin       <= proposal.margin          || With.configuration.enableTightBuildingPlacement) &&
-    (zone         == proposal.zone            || zone.isEmpty)                                    &&
-    (building     == proposal.building        || building.isEmpty || proposal.building.isEmpty)
+    widthTiles.get  <= proposal.widthTiles.get                        &&
+    heightTiles.get <= proposal.heightTiles.get                       &&
+    proposal.powers == powers                                         &&
+    ( ! requirePower.get        || proposal.requirePower.get)         &&
+    ( ! requireTownHallTile.get || proposal.requireTownHallTile.get)  &&
+    requireGasTile.get == proposal.requireGasTile.get                 &&
+    (requireZone.isEmpty || requireZone == proposal.requireZone)      &&
+    (proposal.building.isEmpty || building == proposal.building)
   }
   
-  def marginTiles         : Int   = if(margin) 1 else 0
+  def marginTiles         : Int   = if(preferMargin.get) 1 else 0
   def relativeBuildStart  : Tile  = Tile(0, 0)
-  def relativeBuildEnd    : Tile  = Tile(widthTiles, heightTiles)
+  def relativeBuildEnd    : Tile  = Tile(widthTiles.get, heightTiles.get)
   def relativeMarginStart : Tile  = relativeBuildStart.subtract(marginTiles, marginTiles)
   def relativeMarginEnd   : Tile  = relativeBuildEnd.add(marginTiles, marginTiles)
   def relativeBuildArea   : TileRectangle = TileRectangle(relativeBuildStart, relativeBuildEnd)
@@ -69,11 +68,11 @@ class Blueprint(
       return false
     }
     
-    if (powered) {
-      if (heightTiles == 3 && ! With.grids.psi3Height.get(tile) && ! With.architecture.powered3Height.contains(tile)) {
+    if (requirePower.get) {
+      if (heightTiles.get == 3 && ! With.grids.psi3Height.get(tile) && ! With.architecture.powered3Height.contains(tile)) {
         return false
       }
-      if (heightTiles == 2 && ! With.grids.psi2Height.get(tile) && ! With.architecture.powered2Height.contains(tile)) {
+      if (heightTiles.get == 2 && ! With.grids.psi2Height.get(tile) && ! With.architecture.powered2Height.contains(tile)) {
         return false
       }
     }
@@ -83,13 +82,13 @@ class Blueprint(
       return false
     }
   
-    if (townHall) {
+    if (requireTownHallTile.get) {
       val legal   = thisZone.bases.exists(_.townHallTile == tile)
       val blocked = With.architecture.untownhallable.contains(tile)
       return legal && ! blocked
     }
   
-    if (gas) {
+    if (requireGasTile.get) {
       val legal   = thisZone.bases.exists(_.gas.exists(_.tileTopLeft == tile))
       val blocked = With.architecture.ungassable.contains(tile)
       return legal && ! blocked
@@ -98,34 +97,25 @@ class Blueprint(
     val marginArea      = relativeMarginArea.add(tile)
     lazy val buildArea  = relativeBuildArea.add(tile)
   
-    marginArea.tiles.forall(nextTile => {
+    buildArea.tiles.forall(nextTile => {
       nextTile.valid &&
-      (
-        if (buildArea.contains(nextTile)) {
-          (! requireCreep || With.grids.creep.get(nextTile)) &&
-          With.architecture.buildable(nextTile) && (
-            ( ! respectHarvesting && ! thisZone.owner.isUs) ||
-            ! With.architecture.isHarvestingArea(nextTile)
-          )
-        }
-        else {
-          // Let margin-y buildings overlap each other, but not touch the edge of the map
-          // With.architecture.walkable(nextTile)
-          With.grids.walkableTerrain.get(nextTile)
-        }
+      ( ! requireCreep.get || With.grids.creep.get(nextTile)) &&
+      With.architecture.buildable(nextTile) && (
+        ( ! respectHarvesting && ! thisZone.owner.isUs) ||
+        ! With.architecture.isHarvestingArea(nextTile)
       )
     })
   }
   
   override def toString: String =
-    "#" + proposer.priority + " " +
+    "#" + proposer.priority +    " " +
     proposer.toString.take(12) + " " +
     building.map(_.toString + " ").getOrElse("") +
-    placement.toString + " " +
+    placementProfile.toString + " " +
     widthTiles + "x" + heightTiles + " " +
-    (if (margin) (widthTiles + 2 * marginTiles) + "x" + (heightTiles + 2 * marginTiles) + " " else "") +
-    (if (powers)    "(Powers) "     else "") +
-    (if (powered)   "(Powered) "    else "") +
-    (if (townHall)  "(Town hall) "  else "") +
-    (if (gas)       "(Gas) "        else "")
+    (if (preferMargin.get) (widthTiles.get + 2 * marginTiles) + "x" + (heightTiles.get + 2 * marginTiles) + " " else "") +
+    (if (powers.get)              "(Powers) "     else "") +
+    (if (requirePower.get)        "(Powered) "    else "") +
+    (if (requireTownHallTile.get) "(Town hall) "  else "") +
+    (if (requireGasTile.get)      "(Gas) "        else "")
 }

@@ -11,14 +11,14 @@ object TileSourcePlasma extends TileSource {
   }
   
   override def tiles(blueprint: Blueprint): Iterable[Tile] = {
-    if (blueprint.townHall) {
+    if (blueprint.requireTownHallTile.get) {
       With.geography.bases
         .toVector
         .sortBy(_.heart.tileDistanceFast(With.self.startTile))
         .take(3)
         .map(_.townHallArea.startInclusive)
     }
-    else if (blueprint.gas) {
+    else if (blueprint.requireGasTile.get) {
       With.geography.bases
         .filter(_.townHall.exists(_.player.isUs))
         .flatMap(_.gas.map(_.tileTopLeft))

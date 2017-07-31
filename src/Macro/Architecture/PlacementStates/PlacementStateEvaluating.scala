@@ -63,7 +63,7 @@ class PlacementStateEvaluating(blueprint: Blueprint) extends PlacementState {
         }
         evaluationValues(candidate) = HeuristicMathMultiplicative.resolve(
           blueprint,
-          blueprint.placement.weightedHeuristics,
+          blueprint.placementProfile.get.weightedHeuristics,
           candidate)
         nextEvaluationIndex += 1
       }

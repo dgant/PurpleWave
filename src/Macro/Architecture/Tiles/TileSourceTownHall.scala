@@ -6,7 +6,7 @@ import Mathematics.Points.Tile
 object TileSourceTownHall extends TileSource {
   
   override def appropriateFor(blueprint: Blueprint): Boolean = {
-    blueprint.townHall
+    blueprint.requireTownHallTile.get
   }
   
   override def tiles(blueprint: Blueprint): Iterable[Tile] = {

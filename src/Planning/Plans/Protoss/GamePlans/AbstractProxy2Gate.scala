@@ -79,9 +79,9 @@ abstract class AbstractProxy2Gate extends Parallel {
   children.set(Vector(
     new ProposePlacement{
       override lazy val blueprints = Vector(
-        new Blueprint(this, building = Some(Protoss.Pylon),   zone = proxyZone, respectHarvesting = false, argPlacement = Some(PlacementProfiles.proxyPylon)),
-        new Blueprint(this, building = Some(Protoss.Gateway), zone = proxyZone, respectHarvesting = false, argPlacement = Some(PlacementProfiles.proxy)),
-        new Blueprint(this, building = Some(Protoss.Gateway), zone = proxyZone, respectHarvesting = false, argPlacement = Some(PlacementProfiles.proxy)))
+        new Blueprint(this, building = Some(Protoss.Pylon),   preferZone = proxyZone, respectHarvesting = false, placementProfile = Some(PlacementProfiles.proxyPylon)),
+        new Blueprint(this, building = Some(Protoss.Gateway), preferZone = proxyZone, respectHarvesting = false, placementProfile = Some(PlacementProfiles.proxy)),
+        new Blueprint(this, building = Some(Protoss.Gateway), preferZone = proxyZone, respectHarvesting = false, placementProfile = Some(PlacementProfiles.proxy)))
     },
     new Build(
       RequestAtLeast(1, Protoss.Nexus),

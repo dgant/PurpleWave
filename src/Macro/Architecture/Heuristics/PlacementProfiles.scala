@@ -96,15 +96,15 @@ object PlacementProfiles {
     avoidDistanceFromBase = 1.0)
   
   def default(blueprint: Blueprint): PlacementProfile = {
-    if (blueprint.townHall)
+    if (blueprint.requireTownHallTile.get)
       townHall
-    else if (blueprint.gas)
+    else if (blueprint.requireGasTile.get)
       gas
-    else if (blueprint.powers)
+    else if (blueprint.powers.get)
       pylon
     else if (blueprint.building.exists(_.trainsGroundUnits))
       factory
-    else if (blueprint.building.exists(_.rawCanAttack) || blueprint.wall)
+    else if (blueprint.building.exists(_.rawCanAttack) || blueprint.preferWallPlacement.get)
       wall
     else
       tech

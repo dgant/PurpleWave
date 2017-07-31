@@ -5,10 +5,10 @@ import Mathematics.Points.Tile
 object TileSourceBlueprintZone extends TileSource {
   
   override def appropriateFor(blueprint: Blueprint): Boolean = {
-    blueprint.zone.isDefined
+    blueprint.requireZone.isDefined
   }
   
   override def tiles(blueprint: Blueprint): Iterable[Tile] = {
-    blueprint.zone.get.tilesBuildable
+    blueprint.requireZone.get.tilesBuildable
   }
 }

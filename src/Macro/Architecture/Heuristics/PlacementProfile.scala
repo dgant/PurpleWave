@@ -17,6 +17,23 @@ class PlacementProfile(
   var avoidDistanceFromIdealRange : Double = 0.0,
   var avoidSurfaceArea            : Double = 0.0) {
   
+  def this(name: String, other: PlacementProfile) {
+    this (
+      name,
+      preferZone                  = other.preferZone,
+      preferNatural               = other.preferNatural,
+      preferGas                   = other.preferGas,
+      preferSpace                 = other.preferSpace,
+      preferPowering              = other.preferPowering,
+      preferDistanceFromEnemy     = other.preferDistanceFromEnemy,
+      preferCoveringWorkers       = other.preferCoveringWorkers,
+      avoidDistanceFromBase       = other.avoidDistanceFromBase,
+      avoidDistanceFromEnemy      = other.avoidDistanceFromEnemy,
+      avoidDistanceFromIdealRange = other.avoidDistanceFromIdealRange,
+      avoidSurfaceArea            = other.avoidSurfaceArea
+    )
+  }
+  
   def weightedHeuristics: Iterable[PlacementHeuristicWeight] = {
     Vector(
       new PlacementHeuristicWeight(PlacementHeuristicZone,                    preferZone,                   Colors.MediumRed),

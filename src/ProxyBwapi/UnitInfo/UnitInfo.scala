@@ -38,12 +38,14 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   // Statefulness //
   //////////////////
   
-  var completionFrame: Int = frameDiscovered + remainingBuildFrames
+  private def frameToFinishCompletion: Int = frameDiscovered + unitClass.framesToFinishCompletion + remainingBuildFrames
+  
+  var completionFrame: Int = frameToFinishCompletion
 
   private val history = new mutable.Queue[UnitState]
   def update() {
     if ( ! complete) {
-      completionFrame = frameDiscovered + remainingBuildFrames
+      completionFrame = frameToFinishCompletion
     }
     
     if (history.headOption.exists(_.frame == With.frame)) {

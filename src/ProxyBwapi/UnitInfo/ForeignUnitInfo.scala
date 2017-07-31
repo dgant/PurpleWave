@@ -319,7 +319,6 @@ class ForeignUnitInfo(baseUnit: bwapi.Unit) extends UnitInfo (baseUnit) {
   //////////////
   
   private def updateStatuses() {
-    _remainingBuildFrames   = base.getRemainingBuildTime
     _remainingUpgradeFrames = base.getRemainingUpgradeTime
     _remainingTechFrames    = base.getRemainingResearchTime
     _beingConstructed       = base.isBeingConstructed
@@ -337,7 +336,6 @@ class ForeignUnitInfo(baseUnit: bwapi.Unit) extends UnitInfo (baseUnit) {
     _underStorm             = base.isUnderStorm
   }
   
-  private var _remainingBuildFrames   : Int = _
   private var _remainingUpgradeFrames : Int = _
   private var _remainingTechFrames    : Int = _
   private var _beingConstructed       : Boolean = _
@@ -354,7 +352,12 @@ class ForeignUnitInfo(baseUnit: bwapi.Unit) extends UnitInfo (baseUnit) {
   private var _underDisruptionWeb     : Boolean = _
   private var _underStorm             : Boolean = _
   
-  def remainingBuildFrames    : Int     = _remainingBuildFrames
+  def remainingBuildFrames: Int = {
+    val startingHp  = 1 + unitClass.maxHitPoints / 10
+    val progress    = (hitPoints - startingHp) / (unitClass.maxTotalHealth - startingHp).toDouble
+    val output      = (progress * unitClass.buildFrames).toInt
+    output
+  }
   def remainingUpgradeFrames  : Int     = _remainingUpgradeFrames
   def remainingTechFrames     : Int     = _remainingTechFrames
   def beingConstructed        : Boolean = _beingConstructed

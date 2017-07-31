@@ -106,6 +106,11 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) {
   // Macro //
   ///////////
   
+  lazy val framesToFinishCompletion =
+    if      (isProtoss) 75
+    else if (isZerg)    12
+    else                0
+  
   lazy val unitsTrained: Array[UnitClass] = UnitClasses.all.filter(_.whatBuilds._1 == this).toArray
   
   lazy val trainsGroundUnits: Boolean = UnitClasses.all.exists(unit => ! unit.isFlyer && unit.whatBuilds._1 == this)

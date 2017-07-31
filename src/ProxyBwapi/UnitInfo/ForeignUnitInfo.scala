@@ -353,10 +353,11 @@ class ForeignUnitInfo(baseUnit: bwapi.Unit) extends UnitInfo (baseUnit) {
   private var _underStorm             : Boolean = _
   
   def remainingBuildFrames: Int = {
-    val startingHp  = 1 + unitClass.maxHitPoints / 10
-    val progress    = (hitPoints - startingHp) / (unitClass.maxTotalHealth - startingHp).toDouble
-    val output      = (progress * unitClass.buildFrames).toInt
-    output
+    val startingHp    = 1 + unitClass.maxHitPoints / 10
+    val progress      = (hitPoints - startingHp) / (unitClass.maxTotalHealth - startingHp).toDouble
+    val progressLeft  = 1.0 - progress
+    val output        = progress * unitClass.buildFrames
+    output.toInt
   }
   def remainingUpgradeFrames  : Int     = _remainingUpgradeFrames
   def remainingTechFrames     : Int     = _remainingTechFrames

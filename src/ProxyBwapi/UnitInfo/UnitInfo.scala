@@ -19,8 +19,6 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   // Identity //
   //////////////
   
-  val frameDiscovered: Int = With.frame
-  
   def friendly  : Option[FriendlyUnitInfo]  = None
   def foreign   : Option[ForeignUnitInfo]   = None
   
@@ -32,27 +30,34 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
     tileIncludingCenter.toString + " " + pixelCenter.toString
   }
   
-  def is(unitClasses: UnitClass*):Boolean = unitClasses.contains(unitClass)
+  def is(unitClasses: UnitClass*): Boolean = unitClasses.contains(unitClass)
   
   //////////////////
   // Statefulness //
   //////////////////
   
-  private def frameToFinishCompletion: Int = frameDiscovered + unitClass.framesToFinishCompletion + remainingBuildFrames
   
-  var completionFrame: Int = Int.MaxValue // Can't use unitClass during construction
+  val frameDiscovered   : Int = With.frame
+  var frameChangedClass : Int = With.frame
+  var completionFrame   : Int = Int.MaxValue // Can't use unitClass during construction
 
   private val history = new mutable.Queue[UnitState]
   def update() {
-    if ( ! complete) {
-      completionFrame = frameToFinishCompletion
+    if (history.lastOption.exists(_.unitClass != unitClass)) {
+      frameChangedClass = With.frame
     }
-    
+    if ( ! complete) {
+      completionFrame = With.frame + remainingBuildFrames
+    }
+    addHistory()
+  }
+  
+  def addHistory() {
     if (history.headOption.exists(_.frame == With.frame)) {
       // Game is paused; we don't know how to clear the queue
       return
     }
-      
+  
     while (history.headOption.exists(_.age > With.configuration.unitHistoryAge)) {
       history.dequeue()
     }

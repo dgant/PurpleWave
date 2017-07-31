@@ -14,12 +14,12 @@ object Fight extends Action {
   
   override def perform(unit: FriendlyUnitInfo) {
     Cower.consider(unit)
-    Sneak.consider(unit)
     BeACarrier.consider(unit)
     Recover.consider(unit)
     Cast.consider(unit)
     BustBunker.consider(unit)
     Sally.consider(unit)
+    Sneak.consider(unit)
     if (unit.agent.shouldEngage) {
       Engage.consider(unit)
     }

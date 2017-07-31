@@ -10,8 +10,8 @@ object PlacementHeuristicZone extends PlacementHeuristic {
     
     val candidateZone = candidate.zone
     val zoneMatches =
-      if (blueprint.requireZone.isDefined)
-        blueprint.requireZone.contains(candidateZone)
+      if (blueprint.preferZone.isDefined)
+        blueprint.preferZone.contains(candidateZone)
       else
         candidateZone.owner.isFriendly
     

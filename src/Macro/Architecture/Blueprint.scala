@@ -77,6 +77,11 @@ var respectHarvesting          : Boolean                   = true) {
     }
     
     val thisZone = tile.zone
+    
+    if (requireZone.isDefined) {
+      return requireZone.contains(thisZone)
+    }
+    
     if (thisZone.island && ! With.strategy.isPlasma) {
       return false
     }
@@ -99,7 +104,9 @@ var respectHarvesting          : Boolean                   = true) {
     buildArea.tiles.forall(nextTile => {
       nextTile.valid &&
       ( ! requireCreep.get || With.grids.creep.get(nextTile)) &&
-      With.architecture.buildable(nextTile) && (
+      ! thisZone.border.contains(nextTile)                    &&
+      With.architecture.buildable(nextTile)                   &&
+      (
         ( ! respectHarvesting && ! thisZone.owner.isUs) ||
         ! With.architecture.isHarvestingArea(nextTile)
       )

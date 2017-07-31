@@ -9,6 +9,5 @@ class BuildCannonsAtExpansions(initialCount: Int) extends BuildCannonsAtBases(in
     With.geography.ourBases
       .filterNot(_ == With.geography.ourMain)
       .filterNot(With.geography.ourNatural.contains)
-      .toSet
   }
 }

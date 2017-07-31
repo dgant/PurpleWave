@@ -70,8 +70,8 @@ class ProtossVsZerg extends Parallel {
     new If(
       new MiningBasesAtLeast(2),
       new Parallel(
-        new BuildAssimilators,
-        new Build(RequestAtLeast(5, Protoss.Gateway))),
+        new Build(RequestAtLeast(5, Protoss.Gateway)),
+        new BuildAssimilators),
       new Build(RequestAtLeast(3, Protoss.Gateway))))
   
   private class ImplementMidgameCorsairSpeedlot extends Parallel(

@@ -109,7 +109,6 @@ var respectHarvesting          : Boolean                   = true) {
   
   override def toString: String =
     "#" + proposer.priority +    " " +
-    proposer.toString.take(12) + " " +
     building.map(_.toString + " ").getOrElse("") +
     placementProfile.toString + " " +
     widthTiles + "x" + heightTiles + " " +

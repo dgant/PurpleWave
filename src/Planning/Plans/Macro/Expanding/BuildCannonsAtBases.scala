@@ -3,7 +3,6 @@ package Planning.Plans.Macro.Expanding
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Macro.Architecture.Blueprint
-import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{RequestAnother, RequestAtLeast}
 import Planning.Composition.Property
 import Planning.Plan
@@ -32,10 +31,10 @@ class BuildCannonsAtBases(initialCount: Int) extends Plan {
   private def cannonBase(base: Base) {
     val zone = base.zone
     val cannonsInExpansion = With.units.ours.filter(unit => unit.is(Protoss.PhotonCannon) && unit.pixelCenter.zone == zone)
-    val pylonBlueprint = new Blueprint(this, placementProfile = Some(PlacementProfiles.mineralCannon), building = Some(Protoss.Pylon), preferZone = Some(base.zone))
+    val pylonBlueprint = new Blueprint(this, building = Some(Protoss.Pylon), requireZone = Some(base.zone))
     With.groundskeeper.propose(pylonBlueprint)
     for (i <- 0 to count.get) {
-      val cannonBlueprint = new Blueprint(this, placementProfile = Some(PlacementProfiles.mineralCannon), building = Some(Protoss.PhotonCannon), preferZone = Some(base.zone))
+      val cannonBlueprint = new Blueprint(this, building = Some(Protoss.PhotonCannon), requireZone = Some(base.zone))
       With.groundskeeper.propose(cannonBlueprint)
     }
     With.scheduler.request(this, RequestAnother(count.get - cannonsInExpansion.size, Protoss.PhotonCannon))

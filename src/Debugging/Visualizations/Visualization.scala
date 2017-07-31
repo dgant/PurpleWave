@@ -25,7 +25,11 @@ class Visualization {
     ShowClock,
     ShowStrategy,
     ShowBattles,
-    ShowUnitsFriendly
+    ShowUnitsFriendly,
+  
+    ShowGroundskeeper,
+    ShowArchitecturePlacements,
+    ShowArchitectureHeuristics
   )
   
   var enabled   = true

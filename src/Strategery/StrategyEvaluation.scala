@@ -9,25 +9,30 @@ case class StrategyEvaluation(strategy: Strategy) {
   private val importanceVsEnemy     = 10.0
   private val importanceVsRace      = 1.0
   private val importanceOnMap       = 1.0
+  private val importanceWithStarts  = 1.0
   
-  val playbookOrder     : Int                       = if (Playbook.strategyOrder.contains(strategy)) Playbook.strategyOrder.indexOf(strategy) else Int.MaxValue
-  val games             : Iterable[HistoricalGame]  = With.history.games.filter(_.strategies.contains(strategy.toString))
-  val gamesVsEnemy      : Iterable[HistoricalGame]  = games.filter(_.enemyName == With.enemy.name)
-  val gamesVsRace       : Iterable[HistoricalGame]  = games.filter(_.enemyRace == With.enemy.race)
-  val gamesOnMap        : Iterable[HistoricalGame]  = games.filter(_.mapName   == With.mapFileName)
-  val samplesNeeded     : Double                    = getConfidenceSamples(strategy)
-  val winrateTotal      : Double                    = winrate(games)
-  val winrateVsEnemy    : Double                    = winrate(gamesVsEnemy)
-  val winrateVsRace     : Double                    = winrate(gamesVsRace)
-  val winrateOnMap      : Double                    = winrate(gamesOnMap)
-  val interestRaw       : Double                    = optimisticWinrate(games,        samplesNeeded)
-  val interestVsEnemy   : Double                    = optimisticWinrate(gamesVsEnemy, samplesNeeded)
-  val interestVsRace    : Double                    = optimisticWinrate(gamesVsRace,  samplesNeeded)
-  val interestOnMap     : Double                    = optimisticWinrate(gamesOnMap,   samplesNeeded)
+  val playbookOrder       : Int                       = if (Playbook.strategyOrder.contains(strategy)) Playbook.strategyOrder.indexOf(strategy) else Int.MaxValue
+  val games               : Iterable[HistoricalGame]  = With.history.games.filter(_.strategies.contains(strategy.toString))
+  val gamesVsEnemy        : Iterable[HistoricalGame]  = games.filter(_.enemyName      == With.enemy.name)
+  val gamesVsRace         : Iterable[HistoricalGame]  = games.filter(_.enemyRace      == With.enemy.race)
+  val gamesOnMap          : Iterable[HistoricalGame]  = games.filter(_.mapName        == With.mapFileName)
+  val gamesWithStarts     : Iterable[HistoricalGame]  = games.filter(_.startLocations == With.game.getStartLocations.size)
+  val samplesNeeded       : Double                    = getConfidenceSamples(strategy)
+  val winrateTotal        : Double                    = winrate(games)
+  val winrateVsEnemy      : Double                    = winrate(gamesVsEnemy)
+  val winrateVsRace       : Double                    = winrate(gamesVsRace)
+  val winrateOnMap        : Double                    = winrate(gamesOnMap)
+  val winrateWithStarts   : Double                    = winrate(gamesWithStarts)
+  val interestRaw         : Double                    = optimisticWinrate(games,            samplesNeeded)
+  val interestVsEnemy     : Double                    = optimisticWinrate(gamesVsEnemy,     samplesNeeded)
+  val interestVsRace      : Double                    = optimisticWinrate(gamesVsRace,      samplesNeeded)
+  val interestOnMap       : Double                    = optimisticWinrate(gamesOnMap,       samplesNeeded)
+  val interestWithStarts  : Double                    = optimisticWinrate(gamesWithStarts,  samplesNeeded)
   val interestTotal: Double = weigh(Vector(
-    new WinrateFactor(interestVsEnemy,  gamesVsEnemy.size,  samplesNeeded, importanceVsEnemy),
-    new WinrateFactor(interestVsRace,   gamesVsRace.size,   samplesNeeded, importanceVsRace),
-    new WinrateFactor(interestOnMap,    gamesOnMap.size,    samplesNeeded, importanceOnMap)))
+    new WinrateFactor(interestVsEnemy,    gamesVsEnemy.size,    samplesNeeded, importanceVsEnemy),
+    new WinrateFactor(interestVsRace,     gamesVsRace.size,     samplesNeeded, importanceVsRace),
+    new WinrateFactor(interestOnMap,      gamesOnMap.size,      samplesNeeded, importanceOnMap),
+    new WinrateFactor(interestWithStarts, gamesWithStarts.size, samplesNeeded, importanceWithStarts)))
   
   private class WinrateFactor(
     val interest        : Double,

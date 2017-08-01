@@ -9,6 +9,7 @@ class History {
   lazy val games: Iterable[HistoricalGame] = HistoryLoader.load()
   
   lazy val currentMapName   : String  = With.game.mapFileName
+  lazy val currentStarts    : Int     = With.game.getStartLocations.size
   lazy val currentEnemyName : String  = With.enemy.name
   lazy val currentEnemyRace : Race    = With.enemy.race
   
@@ -18,18 +19,22 @@ class History {
     Manners.chat("Good luck on " + currentMapName + ", " + currentEnemyName + "!")
     Manners.chat(" ")
     
-    val mapWins         = games.count(g => g.mapName    == currentMapName   &&    g.won)
-    val mapLosses       = games.count(g => g.mapName    == currentMapName   &&  ! g.won)
-    val enemyRaceWins   = games.count(g => g.enemyRace  == currentEnemyRace &&    g.won)
-    val enemyRaceLosses = games.count(g => g.enemyRace  == currentEnemyRace &&  ! g.won)
-    val ourRaceWins     = games.count(g => g.ourRace    == With.self.race   &&    g.won)
-    val ourRaceLosses   = games.count(g => g.ourRace    == With.self.race   &&  ! g.won)
-    val vsWins          = games.count(g => g.enemyName  == currentEnemyName &&    g.won)
-    val vsLosses        = games.count(g => g.enemyName  == currentEnemyName &&  ! g.won)
-    Manners.chat("On this map: "                    + mapWins       + " - " + mapLosses)
-    Manners.chat("As "  + With.self.race    + ": "  + ourRaceWins   + " - " + ourRaceLosses)
-    Manners.chat("Vs. " + currentEnemyRace  + ": "  + enemyRaceWins + " - " + enemyRaceLosses)
-    Manners.chat("Vs. " + currentEnemyName  + ": "  + vsWins        + " - " + vsLosses)
+    val mapWins         = games.count(g => g.mapName        == currentMapName   &&    g.won)
+    val mapLosses       = games.count(g => g.mapName        == currentMapName   &&  ! g.won)
+    val startWins       = games.count(g => g.startLocations == currentStarts    &&    g.won)
+    val startLosses     = games.count(g => g.startLocations == currentStarts    &&  ! g.won)
+    val enemyRaceWins   = games.count(g => g.enemyRace      == currentEnemyRace &&    g.won)
+    val enemyRaceLosses = games.count(g => g.enemyRace      == currentEnemyRace &&  ! g.won)
+    val ourRaceWins     = games.count(g => g.ourRace        == With.self.race   &&    g.won)
+    val ourRaceLosses   = games.count(g => g.ourRace        == With.self.race   &&  ! g.won)
+    val vsWins          = games.count(g => g.enemyName      == currentEnemyName &&    g.won)
+    val vsLosses        = games.count(g => g.enemyName      == currentEnemyName &&  ! g.won)
+    
+    Manners.chat("On this map: "                                              + mapWins       + " - " + mapLosses)
+    Manners.chat("With "          + currentStarts     + " start locations: "  + startWins     + " - " + startLosses)
+    Manners.chat("As "            + With.self.race    + ": "                  + ourRaceWins   + " - " + ourRaceLosses)
+    Manners.chat("Vs. "           + currentEnemyRace  + ": "                  + enemyRaceWins + " - " + enemyRaceLosses)
+    Manners.chat("Vs. "           + currentEnemyName  + ": "                  + vsWins        + " - " + vsLosses)
   }
   
   def onEnd(weWon: Boolean) {

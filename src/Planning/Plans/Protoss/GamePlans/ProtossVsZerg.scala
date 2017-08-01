@@ -134,7 +134,7 @@ class ProtossVsZerg extends Parallel {
     new RequireMiningBases(2))
   
   private class TakeSafeThirdBase extends If(
-    new UnitsAtLeast(14, UnitMatchWarriors),
+    new UnitsAtLeast(18, UnitMatchWarriors),
     new RequireMiningBases(3))
   
   private class BuildDetectionForLurkers extends If(

@@ -20,8 +20,7 @@ object Playbook {
   // Use these whenever possible.
   //
   val forced = Vector[Strategy](
-    AllPvZ,
-    PvZEarlyFFEEconomic
+    AllPvZ
     
     /*
     AllPvP,
@@ -73,8 +72,10 @@ object Playbook {
     PvPMidgameReaver,
     PvPMidgameCarriers,
     PvPMidgame4GateGoon,
-    PvZEarlyFFEEconomic,
     PvZEarlyFFEConservative,
+    PvZEarlyFFEEconomic,
+    PvZEarlyFFEGatewayFirst,
+    PvZEarlyFFENexusFirst,
     PvZEarly2Gate,
     PvZMidgameCorsairDarkTemplar,
     PvZMidgameCorsairSpeedlot,

@@ -33,7 +33,7 @@ object FightOrFlight extends Action {
     
     // Hysteresis
     val hysteresis = 0.3
-    val desireRequiredToEngage = if (unit.agent.shouldEngage) - hysteresis else hysteresis
+    val desireRequiredToEngage = if (unit.agent.shouldEngage) 0.0 else hysteresis
     
     unit.agent.shouldEngage =
       unit.agent.canFight && (

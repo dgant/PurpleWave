@@ -1,7 +1,6 @@
 package Micro.Actions.Combat.Spells
 
 import Lifecycle.With
-import Mathematics.PurpleMath
 import Micro.Actions.Action
 import Micro.Decisions.MicroValue
 import Micro.Heuristics.Spells.TargetAOE
@@ -36,14 +35,14 @@ object PsionicStorm extends Action {
     if (target.invincible) return 0.0
     
     MicroValue.valuePerDamage(target) *
-      Math.max(112, target.totalHealth) *
-      (
-        if(target.isFriendly)
-          -5.0
-        else if (target.isEnemy)
-          1.0 * Math.max(1.0, PurpleMath.nanToZero(target.matchups.framesToLiveDiffused / 48))
-        else
-          0.0
-      )
+    Math.min(112.0, target.totalHealth) *
+    (
+      if(target.isFriendly)
+        -5.0
+      else if (target.isEnemy)
+        1.0
+      else
+        0.0
+    )
   }
 }

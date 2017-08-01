@@ -95,15 +95,12 @@ object PlacementProfiles {
   
   val proxyBuilding = new PlacementProfile(
     "Proxy",
-    preferZone                  = 5.0,
-    avoidDistanceFromBase       = 1.0,
-    avoidDistanceFromEnemy      = 4.0,
     avoidSurfaceArea            = 1.0)
   
   val proxyPylon = new PlacementProfile(
     "Proxy Pylon",
     preferZone                  = 5.0,
-    preferPowering              = 5.0,
+    preferPowering              = 1.0,
     avoidDistanceFromBase       = 1.0,
     avoidDistanceFromEnemy      = 3.0,
     avoidSurfaceArea            = 1.0)

@@ -15,11 +15,13 @@ object PlacementHeuristicDistanceFromIdealRange extends PlacementHeuristic {
     
     // TODO: Once we add some better math tools use distance from line instead
     
-    exits
+    val totalDistance = exits
       .map(exit =>
         Math.abs(targetDistance - candidatePixel.pixelDistanceFast(exit.centerPixel)) +
         Math.abs(targetDistance - candidatePixel.pixelDistanceFast(exit.sidePixels.head)) +
         Math.abs(targetDistance - candidatePixel.pixelDistanceFast(exit.sidePixels.last)))
       .sum
+  
+    Math.max(128.0, totalDistance)
   }
 }

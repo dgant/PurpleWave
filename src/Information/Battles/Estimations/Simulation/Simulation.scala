@@ -14,7 +14,7 @@ class Simulation(battle: Battle) {
   val unitsEnemy  : Vector[Simulacrum]  = simulacra(battle.enemy)
   val everyone    : Vector[Simulacrum]  = unitsOurs ++ unitsEnemy
   
-  val simulacra: Map[UnitInfo, Simulacrum] = (unitsOurs ++ unitsEnemy).map(simulacrum => (simulacrum.unit, simulacrum)).toMap
+  val simulacra: Map[UnitInfo, Simulacrum] = (unitsOurs.filter(_.canMove) ++ unitsEnemy).map(simulacrum => (simulacrum.unit, simulacrum)).toMap
   
   var updated = true
   

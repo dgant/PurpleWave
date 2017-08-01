@@ -6,7 +6,7 @@ import Strategery.Strategies._
 
 object ProtossChoices {
   
-  val options: Iterable[Strategy] = Vector(
+  val overall: Iterable[Strategy] = Vector(
     WorkerRush2StartLocations,
     WorkerRush3StartLocations,
     Proxy2Gate2StartLocations,

@@ -8,4 +8,6 @@ class Blackboard {
 
   var battleDesire = 1.0
   var allIn: Boolean = false
+  
+  var zergWasTryingToExpand = false
 }

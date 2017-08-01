@@ -4,7 +4,9 @@ import Information.Geography.Types.Base
 import Performance.Caching.CacheFrame
 import Lifecycle.With
 import Mathematics.Points.Tile
+import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitClass.UnitClass
+import bwapi.UnitCommandType
 
 import scala.collection.mutable
 
@@ -31,7 +33,14 @@ class Intelligence {
   
   def enemyHasShown(unitClass: UnitClass): Boolean = enemyHasShownUnit(unitClass)
   private val enemyHasShownUnit = new mutable.HashSet[UnitClass]
+  
   def update() {
     enemyHasShownUnit ++= With.units.enemy.map(_.unitClass)
+    if (With.units.enemy.exists(unit =>
+      unit.is(Zerg.Drone) &&
+      unit.command.exists(_.getUnitCommandType == UnitCommandType.Build) &&
+      unit.targetPixel.exists(_.zone.bases.exists(_.owner.isNeutral)))) {
+      With.blackboard.zergWasTryingToExpand = true
+    }
   }
 }

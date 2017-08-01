@@ -1,5 +1,6 @@
-package Information.StrategyDetection
+package Information.StrategyDetection.Zerg
 
+import Information.StrategyDetection._
 import ProxyBwapi.Races.Zerg
 
 object Fingerprint4Pool extends FingerprintOr(

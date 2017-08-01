@@ -223,15 +223,29 @@ object ProtossBuilds {
     RequestAtLeast(1,   Protoss.Nexus),
     RequestAtLeast(8,   Protoss.Probe),
     RequestAtLeast(1,   Protoss.Pylon),
-    RequestAtLeast(12,  Protoss.Probe),
+    RequestAtLeast(13,  Protoss.Probe),
     RequestAtLeast(2,   Protoss.Nexus),
-    //This Gateway should only be placed vs 12-hatch, not 9-hatch
-    //Our building placement also seems to demand a new Pylon for this
-    //RequestAtLeast(1,   Protoss.Gateway),
     RequestAtLeast(1,   Protoss.Forge),
+    RequestAtLeast(1,   Protoss.Gateway),
     RequestAtLeast(15,  Protoss.Probe),
-    RequestAtLeast(2,   Protoss.Pylon))
+    RequestAtLeast(2,   Protoss.PhotonCannon),
+    RequestAtLeast(2,   Protoss.Pylon),
+    RequestAtLeast(1,   Protoss.Zealot))
   
+  val FFE_GatewayFirst = Vector[BuildRequest] (
+    RequestAtLeast(1,   Protoss.Nexus),
+    RequestAtLeast(8,   Protoss.Probe),
+    RequestAtLeast(1,   Protoss.Pylon),
+    RequestAtLeast(10,  Protoss.Probe),
+    RequestAtLeast(1,   Protoss.Gateway),
+    RequestAtLeast(12,  Protoss.Probe),
+    RequestAtLeast(2,   Protoss.Pylon),
+    RequestAtLeast(13,  Protoss.Probe),
+    RequestAtLeast(1,   Protoss.Zealot),
+    RequestAtLeast(15,  Protoss.Probe),
+    RequestAtLeast(2,   Protoss.Zealot),
+    RequestAtLeast(17,  Protoss.Probe),
+    RequestAtLeast(2,   Protoss.Nexus))
   
   /////////////////////
   // General-Purpose //

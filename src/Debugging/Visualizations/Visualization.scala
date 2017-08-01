@@ -6,7 +6,7 @@ import Debugging.Visualizations.Views.Fun._
 import Debugging.Visualizations.Views.Geography._
 import Debugging.Visualizations.Views.Micro._
 import Debugging.Visualizations.Views.Performance.{ShowPerformanceDetails, ShowPerformanceSummary}
-import Debugging.Visualizations.Views.Planning.{ShowPlans, ShowResources, ShowStrategy, ShowStrategyEvaluations}
+import Debugging.Visualizations.Views.Planning._
 import Debugging.Visualizations.Views.{ShowClock, View}
 import Lifecycle.With
 
@@ -25,7 +25,9 @@ class Visualization {
     ShowClock,
     ShowStrategy,
     ShowBattles,
-    ShowUnitsFriendly
+    ShowUnitsFriendly,
+  
+    ShowIntelligence
   )
   
   var enabled   = true

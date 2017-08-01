@@ -26,7 +26,7 @@ class Strategist {
   
   def selectStrategies: Set[Strategy] = {
     val strategies = filterForcedStrategies(
-      (ProtossChoices.options ++ ZergChoices.options).filter(isAppropriate))
+      (ProtossChoices.overall ++ ZergChoices.options).filter(isAppropriate))
     strategies.foreach(evaluate)
     chooseBest(strategies).toSet
   }

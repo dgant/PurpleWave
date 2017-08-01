@@ -77,12 +77,13 @@ var respectHarvesting          : Boolean                   = true) {
     }
     
     val thisZone = tile.zone
-    
-    if (requireZone.isDefined) {
-      return requireZone.contains(thisZone)
+  
+  
+    if (thisZone.island && ! With.strategy.isPlasma) {
+      return false
     }
     
-    if (thisZone.island && ! With.strategy.isPlasma) {
+    if (requireZone.isDefined && ! requireZone.contains(thisZone)) {
       return false
     }
   
@@ -101,16 +102,24 @@ var respectHarvesting          : Boolean                   = true) {
     val marginArea      = relativeMarginArea.add(tile)
     lazy val buildArea  = relativeBuildArea.add(tile)
   
-    buildArea.tiles.forall(nextTile => {
-      nextTile.valid &&
-      ( ! requireCreep.get || With.grids.creep.get(nextTile)) &&
-      ! thisZone.border.contains(nextTile)                    &&
-      With.architecture.buildable(nextTile)                   &&
-      (
-        ( ! respectHarvesting && ! thisZone.owner.isUs) ||
-        ! With.architecture.isHarvestingArea(nextTile)
-      )
-    })
+    def violatesMargin(nextTile: Tile): Boolean = {
+      ! nextTile.valid || thisZone.border.contains(nextTile)
+    }
+  
+    def violatesBuildArea(nextTile: Tile): Boolean = {
+      violatesMargin(nextTile)                                  ||
+      ! With.architecture.buildable(nextTile)                   ||
+      (requireCreep.get   && ! With.grids.creep.get(nextTile))  ||
+      (respectHarvesting  && With.architecture.isHarvestingArea(nextTile))
+    }
+    
+    val violator = marginArea.tiles.find(nextTile =>
+      if (buildArea.contains(nextTile))
+        violatesBuildArea(nextTile)
+      else
+        violatesMargin(nextTile))
+    
+    violator.isEmpty
   }
   
   override def toString: String =

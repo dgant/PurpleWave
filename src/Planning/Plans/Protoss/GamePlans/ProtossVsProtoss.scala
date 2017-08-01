@@ -66,7 +66,7 @@ class ProtossVsProtoss extends Parallel {
     
   private class ImplementEarlyFFE extends FirstFiveMinutes(
     new Parallel(
-      new ForgeFastExpand(cannonsInFront = false),
+      new ForgeFastExpand,
       new Build(ProtossBuilds.FFE_ForgeFirst: _*)))
   
   ////////////////////////

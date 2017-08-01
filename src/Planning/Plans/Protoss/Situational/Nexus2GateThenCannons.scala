@@ -8,6 +8,6 @@ class Nexus2GateThenCannons extends ProposePlacement {
   override lazy val blueprints: Vector[Blueprint] =
     Vector(
       new Blueprint(this, building = Some(Protoss.Pylon))) ++
-        new ForgeFastExpand(cannonsInFront = true).blueprints
+        new ForgeFastExpand().blueprints
 }
 

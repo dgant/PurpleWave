@@ -13,8 +13,7 @@ object Playbook {
   //
   val disabled = Vector[Strategy](
     WorkerRush2StartLocations,
-    WorkerRush3StartLocations,
-    Proxy2Gate3StartLocations
+    WorkerRush3StartLocations
   )
   
   // Use these whenever possible.

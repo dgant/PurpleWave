@@ -6,7 +6,8 @@ object Surveyor {
   
   val tileSources = Array(
     TileSourceBlueprint,
-    TileSourceBlueprintZone,
+    TileSourceBlueprintZoneRequired,
+    TileSourceBlueprintZonePreferred,
     TileSourcePlasma,
     TileSourceTownHall,
     TileSourceGas,

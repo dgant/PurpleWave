@@ -6,14 +6,17 @@ import ProxyBwapi.UnitClass.UnitClass
 
 class TrainMatchingRatio(
   unitClass     : UnitClass,
-  enemyMatcher  : UnitMatcher,
-  ratio         : Double,
-  maximum       : Int = Int.MaxValue)
+  maximum       : Int,
+  ratios        : Seq[MatchingRatio])
   extends TrainContinuously(unitClass) {
   
-  description.set("Train " + unitClass + " at " + ratio + ":1 vs. matching enemy")
+  description.set("Train " + unitClass + " based on enemies")
   
   override def maxDesirable: Int = {
-    Math.min(maximum, Math.ceil(With.units.enemy.count(enemyMatcher.accept) * ratio).toInt)
+    Math.min(maximum, Math.ceil(ratios.map(_.quantity).sum).toInt)
   }
+}
+
+case class MatchingRatio (enemyMatcher: UnitMatcher,  ratio: Double) {
+  def quantity: Double = With.units.enemy.count(enemyMatcher.accept) * ratio
 }

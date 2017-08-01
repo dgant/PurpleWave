@@ -1,6 +1,6 @@
 package Strategery
 
-import Strategery.Strategies.Options.AllRaces.{Proxy2Gate3StartLocations, WorkerRush2StartLocations, WorkerRush3StartLocations}
+import Strategery.Strategies.Options.AllRaces.{Proxy2Gate2StartLocations, Proxy2Gate3StartLocations, WorkerRush2StartLocations, WorkerRush3StartLocations}
 import Strategery.Strategies.Options.Protoss.Global.{AllPvP, AllPvT, AllPvZ}
 import Strategery.Strategies.Options.Protoss.PvP._
 import Strategery.Strategies.Options.Protoss.PvT._
@@ -20,7 +20,9 @@ object Playbook {
   // Use these whenever possible.
   //
   val forced = Vector[Strategy](
-    AllPvZ
+    Proxy2Gate2StartLocations,
+    Proxy2Gate3StartLocations
+    //AllPvZ
     
     /*
     AllPvP,

@@ -9,7 +9,7 @@ import Planning.Plans.Compound.{If, _}
 import Planning.Plans.Information.Reactive.{EnemyBasesAtLeast, EnemyMassMutalisks, EnemyMutalisks}
 import Planning.Plans.Information.Scenarios.EnemyStrategy
 import Planning.Plans.Information.{Employ, Employing, StartPositionsAtLeast}
-import Planning.Plans.Macro.Automatic._
+import Planning.Plans.Macro.Automatic.{MatchingRatio, _}
 import Planning.Plans.Macro.BuildOrders.{Build, FirstFiveMinutes}
 import Planning.Plans.Macro.Expanding.{BuildAssimilators, BuildCannonsAtExpansions, RequireMiningBases}
 import Planning.Plans.Macro.Milestones._
@@ -175,8 +175,12 @@ class ProtossVsZerg extends Parallel {
       new If(
         new UnitsAtLeast(1, UnitMatchType(Protoss.CyberneticsCore), complete = false),
         new Parallel(
-          new TrainMatchingRatio(Protoss.PhotonCannon, UnitMatchType(Zerg.Zergling), 0.5, 6),
-          new TrainMatchingRatio(Protoss.PhotonCannon, UnitMatchType(Zerg.Hydralisk), 0.75, 6),
+          new TrainMatchingRatio(
+            Protoss.PhotonCannon,
+            6,
+            Seq(
+              MatchingRatio(UnitMatchType(Zerg.Zergling), 0.5),
+              MatchingRatio(UnitMatchType(Zerg.Hydralisk), 0.5))),
           new If(
             new Not(new EnemyBasesAtLeast(2)),
             new TrainContinuously(Protoss.PhotonCannon, 6))))),
@@ -221,7 +225,7 @@ class ProtossVsZerg extends Parallel {
     
     new If(
       new EnemyMutalisks,
-      new TrainMatchingRatio(Protoss.Corsair, UnitMatchType(Zerg.Mutalisk), 1.5),
+      new TrainMatchingRatio(Protoss.Corsair, Int.MaxValue, Seq(MatchingRatio(UnitMatchType(Zerg.Mutalisk), 1.5))),
       new If(
         new And(
           new Employing(PvZMidgameCorsairDarkTemplar),
@@ -233,7 +237,7 @@ class ProtossVsZerg extends Parallel {
       new EnemyMassMutalisks,
       new Build(RequestAtLeast(2, Protoss.Stargate))),
     
-    new TrainMatchingRatio(Protoss.Observer, UnitMatchType(Zerg.Lurker), 0.2, 3),
+    new TrainMatchingRatio(Protoss.Observer, 3, Seq(MatchingRatio(UnitMatchType(Zerg.Lurker), 0.2))),
   
     new If(
       new And(
@@ -269,6 +273,14 @@ class ProtossVsZerg extends Parallel {
             new TrainContinuously(Protoss.Dragoon),
             new TrainContinuously(Protoss.Zealot)))),
   
+    new If(
+      new UnitsAtLeast(1, UnitMatchType(Protoss.CyberneticsCore)),
+      new TrainMatchingRatio(
+        Protoss.Gateway,
+        5,
+        Seq(
+          MatchingRatio(UnitMatchType(Zerg.Hydralisk), 0.3),
+          MatchingRatio(UnitMatchType(Zerg.Zergling), 0.25)))),
     new Employ(PvZMidgame5GateDragoons,         new ImplementMidgame5GateDragoons),
     new Employ(PvZMidgameCorsairDarkTemplar,    new ImplementMidgameCorsairDarkTemplar),
     new Employ(PvZMidgameCorsairReaver,         new ImplementMidgameCorsairReaver),

@@ -14,7 +14,7 @@ object ShowBattleDetails extends View {
     ShowBattles.localBattle.foreach(battle => {
       renderBattleScreen(
         battle,
-        battle.estimationSimulation,
+        battle.estimationSimulationAttack,
         5,
         5 * With.visualization.lineHeightSmall)
     })
@@ -52,7 +52,7 @@ object ShowBattleDetails extends View {
   }
   
   def renderBattleMap(battle: Battle) {
-    val simulation = battle.estimationSimulation.simulation.get
+    val simulation = battle.estimationSimulationAttack.simulation.get
     simulation.simulacra.values.foreach(renderSimulacrumMap)
   }
   

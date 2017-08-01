@@ -28,7 +28,7 @@ object FightOrFlight extends Action {
     }
     
     unit.agent.desireTeam        = unit.battle.map(_.desire).getOrElse(0.0)
-    unit.agent.desireIndividual  = unit.battle.flatMap(_.estimationSimulation.reportCards.get(unit).map(_.netValuePerFrame)).getOrElse(0.0)
+    unit.agent.desireIndividual  = unit.battle.flatMap(_.estimationSimulationAttack.reportCards.get(unit).map(_.netValuePerFrame)).getOrElse(0.0)
     unit.agent.desireTotal       = unit.agent.desireTeam + unit.agent.desireIndividual // Vanity metric, for now
     
     // Hysteresis

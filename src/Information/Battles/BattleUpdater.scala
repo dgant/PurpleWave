@@ -53,8 +53,8 @@ object BattleUpdater {
     EstimateAvatar.calculate(builder)
   }
   
-  def estimateSimulation(battle: Battle): Estimation = {
-    val simulation = new Simulation(battle)
+  def estimateSimulation(battle: Battle, weAttack: Boolean): Estimation = {
+    val simulation = new Simulation(battle, weAttack)
     simulation.run()
     simulation.estimation
   }

@@ -5,7 +5,7 @@ import Information.Battles.Types.{Battle, Team}
 import Lifecycle.With
 import ProxyBwapi.UnitInfo.UnitInfo
 
-class Simulation(battle: Battle) {
+class Simulation(battle: Battle, weAttack: Boolean) {
   
   private def simulacra(team: Team) = team.units.map(Simulacrum(this, _))
   

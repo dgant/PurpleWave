@@ -1,7 +1,7 @@
-package Strategery.Strategies.Options.AllRaces
+package Strategery.Strategies.Options.Protoss.Global
 
 import Planning.Plan
-import Planning.Plans.Protoss.GamePlans.{AbstractProxy2Gate, Proxy2GateAtEnemyNatural}
+import Planning.Plans.Protoss.GamePlans.Proxy2GateAtEnemyNatural
 import Strategery.Strategies.Strategy
 import bwapi.Race
 

@@ -1,4 +1,4 @@
-package Strategery.Strategies.Options.AllRaces
+package Strategery.Strategies.Options.Protoss.Global
 
 import Planning.Plan
 import Planning.Plans.Protoss.GamePlans.Proxy2GateInMiddle

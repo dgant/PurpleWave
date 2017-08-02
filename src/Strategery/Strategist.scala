@@ -4,7 +4,8 @@ import Lifecycle.With
 import Planning.Plan
 import Planning.Plans.WinTheGame
 import Strategery.Strategies.Options.Protoss.ProtossChoices
-import Strategery.Strategies.Options.ZergChoices
+import Strategery.Strategies.Options.Terran.TerranChoices
+import Strategery.Strategies.Options.Zerg.ZergChoices
 import Strategery.Strategies.Strategy
 
 import scala.collection.mutable
@@ -26,7 +27,11 @@ class Strategist {
   
   def selectStrategies: Set[Strategy] = {
     val strategies = filterForcedStrategies(
-      (ProtossChoices.overall ++ ZergChoices.options).filter(isAppropriate))
+      (
+        TerranChoices.overall ++
+        ProtossChoices.overall ++
+        ZergChoices.overall
+      ).filter(isAppropriate))
     strategies.foreach(evaluate)
     chooseBest(strategies).toSet
   }

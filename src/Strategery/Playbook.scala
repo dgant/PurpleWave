@@ -1,7 +1,7 @@
 package Strategery
 
-import Strategery.Strategies.Options.AllRaces.{Proxy2Gate3StartLocations, WorkerRush2StartLocations, WorkerRush3StartLocations}
-import Strategery.Strategies.Options.Protoss.Global.{AllPvP, AllPvT, AllPvZ}
+import Strategery.Strategies.Options.AllRaces.{WorkerRush2StartLocations, WorkerRush3StartLocations}
+import Strategery.Strategies.Options.Protoss.Global.{AllPvP, AllPvT, AllPvZ, Proxy2Gate3StartLocations}
 import Strategery.Strategies.Options.Protoss.PvP._
 import Strategery.Strategies.Options.Protoss.PvT._
 import Strategery.Strategies.Options.Protoss.PvZ._

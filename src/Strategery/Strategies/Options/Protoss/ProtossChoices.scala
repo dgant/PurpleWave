@@ -1,6 +1,6 @@
 package Strategery.Strategies.Options.Protoss
 
-import Strategery.Strategies.Options.AllRaces.{Proxy2Gate2StartLocations, Proxy2Gate3StartLocations, WorkerRush2StartLocations, WorkerRush3StartLocations}
+import Strategery.Strategies.Options.AllRaces.{WorkerRush2StartLocations, WorkerRush3StartLocations}
 import Strategery.Strategies.Options.Protoss.Global._
 import Strategery.Strategies._
 

@@ -50,6 +50,7 @@ class TerranVsTerran extends Parallel {
       RequestAtLeast(1, Terran.Barracks),
       RequestAtLeast(1, Terran.Factory),
       RequestAtLeast(1, Terran.MachineShop),
+      RequestAtLeast(1, Terran.Starport),
       RequestTech(Terran.SiegeMode)),
     new OnMiningBases(2, new Build(
       RequestAtLeast(3, Terran.Factory),

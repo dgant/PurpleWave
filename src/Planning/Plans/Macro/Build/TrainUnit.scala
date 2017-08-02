@@ -2,7 +2,7 @@ package Planning.Plans.Macro.Build
 
 import Debugging.Visualizations.Rendering.DrawMap
 import Planning.Composition.UnitCounters.UnitCountOne
-import Planning.Composition.UnitMatchers.UnitMatchType
+import Planning.Composition.UnitMatchers.{UnitMatchAnd, UnitMatchHasAddon, UnitMatchType}
 import Planning.Plan
 import Planning.Composition.ResourceLocks.{LockCurrencyForUnit, LockUnits}
 import ProxyBwapi.UnitClass.UnitClass
@@ -17,8 +17,16 @@ class TrainUnit(val traineeClass: UnitClass) extends Plan {
   
   val currencyLock    = new LockCurrencyForUnit(traineeClass)
   val trainerClass    = traineeClass.whatBuilds._1
+  val addonsRequired  = traineeClass.buildUnitsEnabling.find(b => b.isAddon && b.whatBuilds._1 == trainerClass)
+  val matchTrainer    = UnitMatchType(trainerClass)
+  val trainerMatcher  =
+    if(addonsRequired.isDefined)
+      UnitMatchAnd(matchTrainer, UnitMatchHasAddon(addonsRequired.head))
+    else
+      matchTrainer
+  
   val trainerLock     = new LockUnits {
-    unitMatcher.set(UnitMatchType(trainerClass))
+    unitMatcher.set(trainerMatcher)
     unitCounter.set(UnitCountOne)
   }
   

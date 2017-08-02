@@ -26,7 +26,6 @@ class BuildAddon(val addonClass: UnitClass) extends Plan {
     description.set("Get a builder")
     unitCounter.set(UnitCountOne)
     unitMatcher.set(builderMatcher)
-    interruptable.set(false)
   }
     
   description.set("Add on a " + addonClass)

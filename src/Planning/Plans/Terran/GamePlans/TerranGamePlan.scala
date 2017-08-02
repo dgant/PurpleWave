@@ -7,8 +7,8 @@ class TerranGamePlan
   extends Parallel (
     new SwitchEnemyRace {
       terran  .set(new TerranVsTerran)
-      protoss .set(new TerranVsZerg)
+      protoss .set(new ProxyBBS)
       zerg    .set(new TerranVsZerg)
-      random  .set(new TerranVsZerg)
+      random  .set(new ProxyBBS)
     }
   )

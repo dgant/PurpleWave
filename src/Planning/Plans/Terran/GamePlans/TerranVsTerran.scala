@@ -59,8 +59,8 @@ class TerranVsTerran extends Parallel {
     new OnMiningBases(2, new Build(
       RequestAtLeast(3, Terran.Factory),
       RequestUpgrade(Terran.VultureSpeed),
-      RequestAtLeast(1, Terran.Academy),
-      RequestAtLeast(5, Terran.Factory))),
+      RequestAtLeast(5, Terran.Factory),
+      RequestAtLeast(1, Terran.Academy))),
     new OnMiningBases(3, new Build(
       RequestAtLeast(8, Terran.Factory))),
     new OnGasBases(1, new Build(
@@ -76,8 +76,8 @@ class TerranVsTerran extends Parallel {
       RequestAtLeast(1, Terran.ScienceFacility),
       RequestAtLeast(2, Terran.Starport))),
     new UpgradeContinuously(Terran.MechDamage),
-    new TrainContinuously(Terran.Vulture),
     new TrainContinuously(Terran.Marine),
+    new TrainContinuously(Terran.Vulture),
     new RequireMiningBases(3),
     new ScoutAt(14),
     new ControlMap,

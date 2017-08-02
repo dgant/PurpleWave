@@ -133,6 +133,12 @@ class Commander {
     sleep(unit)
   }
   
+  def rightClick(unit: FriendlyUnitInfo, target: UnitInfo) {
+    if (unready(unit)) return
+    unit.base.rightClick(target.base)
+    sleepAttack(unit)
+  }
+  
   def useTech(unit: FriendlyUnitInfo, tech: Tech) {
     if (unready(unit)) return
     unit.base.useTech(tech.baseType)

@@ -5,7 +5,7 @@ import Planning.Plans.Compound.Parallel
 import Planning.Plans.Information.SwitchEnemyRace
 import Planning.Plans.Macro.Automatic.Gather
 import Planning.Plans.Macro.BuildOrders.FollowBuildOrder
-import Planning.Plans.Macro.Expanding.RemoveMineralBlockAt
+import Planning.Plans.Macro.Expanding.RemoveMineralBlocksAt
 
 class ProtossGamePlan
   extends Parallel (
@@ -16,7 +16,7 @@ class ProtossGamePlan
       random  .set(new ProtossVsRandom)
     },
     new FollowBuildOrder,
-    new RemoveMineralBlockAt(30),
+    new RemoveMineralBlocksAt(30),
     new Gather,
     new DefendChokes
   )

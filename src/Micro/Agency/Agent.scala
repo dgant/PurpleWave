@@ -50,6 +50,7 @@ class Agent(val unit: FriendlyUnitInfo) {
   var toBuildTile   : Option[Tile]                  = None
   var toTrain       : Option[UnitClass]             = None
   var toTech        : Option[Tech]                  = None
+  var toFinish      : Option[UnitInfo]              = None
   var toForm        : Option[Pixel]                 = None
   var toUpgrade     : Option[Upgrade]               = None
   var canFight      : Boolean                       = true
@@ -120,6 +121,7 @@ class Agent(val unit: FriendlyUnitInfo) {
     unit.agent.toBuildTile  = unit.agent.lastIntent.toBuildTile
     unit.agent.toTrain      = unit.agent.lastIntent.toTrain
     unit.agent.toTech       = unit.agent.lastIntent.toTech
+    unit.agent.toFinish     = unit.agent.lastIntent.toFinish
     unit.agent.toUpgrade    = unit.agent.lastIntent.toUpgrade
     unit.agent.toForm       = unit.agent.lastIntent.toForm
     unit.agent.canFight     = unit.agent.lastIntent.canAttack

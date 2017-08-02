@@ -16,6 +16,7 @@ class Intention {
   var toBuildTile : Option[Tile]      = None
   var toTrain     : Option[UnitClass] = None
   var toTech      : Option[Tech]      = None
+  var toFinish    : Option[UnitInfo]  = None
   var toForm      : Option[Pixel]     = None
   var toUpgrade   : Option[Upgrade]   = None
   var canAttack   : Boolean           = true

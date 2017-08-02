@@ -29,6 +29,7 @@ object Idle extends Action {
     Gather,
     Addon,
     Build,
+    Finish,
     Unstick,
     Produce,
     Rally,

@@ -307,6 +307,9 @@ class ProtossVsZerg extends Parallel {
       RequestTech(Protoss.PsionicStorm),
       RequestUpgrade(Protoss.DragoonRange),
       RequestAtLeast(8, Protoss.Gateway),
+      RequestAtLeast(1, Protoss.RoboticsFacility),
+      RequestAtLeast(1, Protoss.Observatory),
+      RequestAtLeast(1, Protoss.Observer),
       RequestAtLeast(12, Protoss.Gateway)),
   
     new UpgradeContinuously(Protoss.GroundDamage),

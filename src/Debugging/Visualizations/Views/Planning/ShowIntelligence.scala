@@ -10,6 +10,7 @@ object ShowIntelligence extends View {
     Fingerprint4Pool,
     Fingerprint9Pool,
     FingerprintOverpool,
+    Fingerprint10Hatch9Pool,
     Fingerprint12Hatch,
     Fingerprint12Pool
   )

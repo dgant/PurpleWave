@@ -13,7 +13,7 @@ class ForgeFastExpand extends ProposePlacement {
     new Blueprint(this, building = Some(Protoss.PhotonCannon),    requireZone = With.geography.ourNatural.map(_.zone),  placementProfile = Some(PlacementProfiles.cannon)),
     new Blueprint(this, building = Some(Protoss.PhotonCannon),    requireZone = With.geography.ourNatural.map(_.zone),  placementProfile = Some(PlacementProfiles.cannon)),
     new Blueprint(this, building = Some(Protoss.PhotonCannon),    requireZone = With.geography.ourNatural.map(_.zone),  placementProfile = Some(PlacementProfiles.cannon)),
-    new Blueprint(this, building = Some(Protoss.Gateway),         preferZone  = With.geography.ourNatural.map(_.zone)),
+    new Blueprint(this, building = Some(Protoss.Gateway),         preferZone  = Some(With.geography.ourMain.zone)),
     new Blueprint(this, building = Some(Protoss.PhotonCannon),    requireZone = With.geography.ourNatural.map(_.zone),  placementProfile = Some(PlacementProfiles.cannon)),
     new Blueprint(this, building = Some(Protoss.PhotonCannon),    requireZone = With.geography.ourNatural.map(_.zone),  placementProfile = Some(PlacementProfiles.cannon)),
     new Blueprint(this, building = Some(Protoss.PhotonCannon),    requireZone = With.geography.ourNatural.map(_.zone),  placementProfile = Some(PlacementProfiles.cannon)),

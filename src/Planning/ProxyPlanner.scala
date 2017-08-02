@@ -9,8 +9,21 @@ object ProxyPlanner {
     if (With.geography.startLocations.size > 2) proxyMiddle else proxyOutsideEnemyNatural
   }
   
+  def proxyAutomaticHatchery: Option[Zone] = {
+    if (With.geography.startLocations.size == 2) {
+      proxyEnemyNatural
+    }
+    else {
+      proxyMiddleBase
+    }
+  }
+  
+  def proxyEnemyNatural: Option[Zone] = {
+    With.geography.bases.find(_.isNaturalOf.exists( ! _.owner.isUs)).map(_.zone)
+  }
+  
   def proxyOutsideEnemyNatural: Option[Zone] = {
-    With.geography.bases.find(_.isNaturalOf.exists( ! _.owner.isUs)).map(_.zone).map(z => z.exit.map(_.otherSideof(z)).getOrElse(z))
+    proxyEnemyNatural.map(z => z.exit.map(_.otherSideof(z)).getOrElse(z))
   }
   
   def proxyMiddle: Option[Zone] = {

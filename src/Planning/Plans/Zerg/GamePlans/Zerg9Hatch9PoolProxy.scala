@@ -22,14 +22,7 @@ class Zerg9Hatch9PoolProxy extends Parallel {
     super.onUpdate()
   }
   
-  lazy val proxyZone: Option[Zone] = {
-    if (With.geography.startLocations.size == 2) {
-      ProxyPlanner.proxyOutsideEnemyNatural
-    }
-    else {
-      ProxyPlanner.proxyMiddleBase
-    }
-  }
+  lazy val proxyZone: Option[Zone] = ProxyPlanner.proxyAutomaticHatchery
   
   children.set(Vector(
     new ProposePlacement { override lazy val blueprints = Vector(new Blueprint(this, building = Some(Zerg.Hatchery), preferZone = proxyZone)) },

@@ -1,10 +1,11 @@
 package Planning.Plans.Terran.GamePlans
 
+import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
 import Planning.Composition.UnitMatchers.{UnitMatchSiegeTank, UnitMatchType, UnitMatchWarriors}
 import Planning.Plans.Army._
 import Planning.Plans.Compound._
-import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
+import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, FirstEightMinutes, FollowBuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildRefineries, RemoveMineralBlocksAt, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.{OnGasBases, OnMiningBases, UnitsAtLeast}
@@ -43,12 +44,13 @@ class TerranVsTerran extends Parallel {
     new TrainWorkersContinuously,
     new BuildRefineries,
     new TrainContinuously(Terran.Comsat),
-    new TrainContinuously(Terran.SiegeTankUnsieged),
+    new TrainContinuously(Terran.Battlecruiser),
+    new TrainContinuously(Terran.SiegeTankUnsieged, 30),
     new If(
       new UnitsAtLeast(1, UnitMatchType(Terran.Armory)),
       new Build(RequestAtLeast(1, Terran.ControlTower))
     ),
-    new TrainContinuously(Terran.Valkyrie, 1),
+    new TrainMatchingRatio(Terran.Valkyrie, 3, Seq(MatchingRatio(UnitMatchType(Terran.Wraith), 0.5))),
     new TrainContinuously(Terran.Wraith),
     new Build(
       RequestAtLeast(1, Terran.Barracks),
@@ -56,29 +58,40 @@ class TerranVsTerran extends Parallel {
       RequestAtLeast(1, Terran.MachineShop),
       RequestAtLeast(1, Terran.Starport),
       RequestTech(Terran.SiegeMode)),
+    new TrainContinuously(Terran.Marine),
+    new If(
+      new And(
+        new UnitsAtLeast(1, UnitMatchType(Terran.Armory), complete = true),
+        new Check(() => With.self.gas > 200)),
+      new TrainContinuously(Terran.Goliath),
+      new TrainContinuously(Terran.Vulture)),
     new OnMiningBases(2, new Build(
       RequestAtLeast(3, Terran.Factory),
       RequestUpgrade(Terran.VultureSpeed),
-      RequestAtLeast(6, Terran.Factory),
+      RequestAtLeast(5, Terran.Factory),
       RequestTech(Terran.SpiderMinePlant),
       RequestAtLeast(1, Terran.Academy))),
     new OnMiningBases(3, new Build(
       RequestAtLeast(8, Terran.Factory))),
+    new OnMiningBases(4, new Build(
+      RequestAtLeast(12, Terran.Factory))),
     new OnGasBases(1, new Build(
       RequestAtLeast(1, Terran.MachineShop))),
     new OnGasBases(2, new Build(
-      RequestAtLeast(2, Terran.MachineShop),
+      RequestAtLeast(3, Terran.MachineShop),
       RequestAtLeast(1, Terran.Armory))),
     new OnGasBases(3, new Build(
-      RequestAtLeast(4, Terran.MachineShop))),
-    new OnGasBases(1, new Build(
-      RequestAtLeast(1, Terran.Starport))),
+      RequestAtLeast(5, Terran.MachineShop))),
     new OnGasBases(3, new Build(
       RequestAtLeast(1, Terran.ScienceFacility),
       RequestAtLeast(2, Terran.Starport))),
+    new OnGasBases(4, new Build(
+      RequestAtLeast(1, Terran.PhysicsLab),
+      RequestAtLeast(4, Terran.Starport),
+      RequestAtLeast(4, Terran.ControlTower),
+      RequestUpgrade(Terran.BattlecruiserEnergy),
+      RequestTech(Terran.Yamato))),
     new UpgradeContinuously(Terran.MechDamage),
-    new TrainContinuously(Terran.Marine),
-    new TrainContinuously(Terran.Vulture),
     new RequireMiningBases(3),
     new ScoutAt(14),
     new ControlMap,

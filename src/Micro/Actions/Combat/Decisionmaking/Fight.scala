@@ -2,6 +2,7 @@ package Micro.Actions.Combat.Decisionmaking
 
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.{Cower, Sneak}
+import Micro.Actions.Combat.Spells.SpiderMine
 import Micro.Actions.Combat.Tactics.{BustBunker, Sally}
 import Micro.Actions.Protoss.BeACarrier
 import Micro.Actions.Terran.{Siege, Unsiege}
@@ -19,6 +20,7 @@ object Fight extends Action {
     Unsiege.consider(unit)
     BeACarrier.consider(unit)
     Recover.consider(unit)
+    SpiderMine.consider(unit)
     Cast.consider(unit)
     BustBunker.consider(unit)
     Sally.consider(unit)

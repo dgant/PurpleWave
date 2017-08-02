@@ -15,9 +15,9 @@ object Playbook {
   // Strategies to demand or disable //
   /////////////////////////////////////
   
-  lazy val forced = cheese
+  lazy val forced = none
   
-  lazy val disabled = none
+  lazy val disabled = cheese
   
   //////////////////////////
   // Groups of strategies //

@@ -11,7 +11,7 @@ object TargetAOE {
     minimumValue        : Double,
     evaluate            : (UnitInfo) => Double): Option[Pixel] = {
     
-    val targets       = caster.matchups.allUnits.filter(_.pixelDistanceFast(caster) < searchRadiusPixels)
+    val targets       = caster.matchups.allUnits.filter(_.pixelDistanceFast(caster) <= searchRadiusPixels)
     val targetsByTile = targets.groupBy(_.project(6).tileIncluding)
     val targetValues  = targets.map(target => (target, evaluate(target))).toMap
     

@@ -13,7 +13,7 @@ object SpiderMine extends Action {
     unit.spiderMines > 0                                &&
     ! unit.pixelCenter.zone.owner.isUs                  &&
     unit.matchups.targets.exists( ! _.unitClass.floats) &&
-    ! unit.matchups.allies.exists(ally => ally.unitClass.floats && ally.pixelDistanceFast(unit) < 96.0)
+    ! unit.matchups.allies.exists(ally => ! ally.unitClass.floats && ally.pixelDistanceFast(unit) < 96.0)
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {

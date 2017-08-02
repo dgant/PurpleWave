@@ -16,11 +16,12 @@ import Planning.Plans.Macro.Expanding.BuildAssimilators
 import Planning.Plans.Macro.Milestones.{EnemyUnitsAtLeast, UnitsAtLeast}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Scouting.Scout
+import Planning.ProxyPlanner
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 
-abstract class AbstractProxy2Gate extends Parallel {
+class Proxy2Gate extends Parallel {
   
-  protected def proxyZone: Option[Zone]
+  lazy val proxyZone: Option[Zone] = ProxyPlanner.proxyAutomatic
   
   override def onUpdate(): Unit = {
     With.blackboard.maxFramesToSendAdvanceBuilder = Int.MaxValue

@@ -44,6 +44,7 @@ class Agent(val unit: FriendlyUnitInfo) {
   var toReturn      : Option[Pixel]                 = None
   var toTravel      : Option[Pixel]                 = None
   var toAttack      : Option[UnitInfo]              = None
+  var toScan        : Option[Pixel]                 = None
   var toGather      : Option[UnitInfo]              = None
   var toAddon       : Option[UnitClass]             = None
   var toBuild       : Option[UnitClass]             = None
@@ -115,6 +116,7 @@ class Agent(val unit: FriendlyUnitInfo) {
     unit.agent.toReturn     = unit.agent.lastIntent.toReturn
     unit.agent.toTravel     = unit.agent.lastIntent.toTravel
     unit.agent.toAttack     = unit.agent.lastIntent.toAttack
+    unit.agent.toScan       = unit.agent.lastIntent.toScan
     unit.agent.toGather     = unit.agent.lastIntent.toGather
     unit.agent.toAddon      = unit.agent.lastIntent.toAddon
     unit.agent.toBuild      = unit.agent.lastIntent.toBuild

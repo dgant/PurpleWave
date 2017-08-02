@@ -28,6 +28,7 @@ object Idle extends Action {
     Tickle,
     Gather,
     Addon,
+    Scan,
     Build,
     Finish,
     Unstick,

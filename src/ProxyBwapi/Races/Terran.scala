@@ -55,6 +55,7 @@ object Terran {
   def MechDamage            = Upgrades.get(UpgradeType.Terran_Vehicle_Weapons)
   def ScienceVesselEnergy   = Upgrades.get(UpgradeType.Titan_Reactor)
   def MarineRange           = Upgrades.get(UpgradeType.U_238_Shells)
+  def ScannerSweep          = Techs.get(TechType.Scanner_Sweep)
   def WraithCloak           = Techs.get(TechType.Cloaking_Field)
   def DefensiveMatrix       = Techs.get(TechType.Defensive_Matrix)
   def EMP                   = Techs.get(TechType.EMP_Shockwave)

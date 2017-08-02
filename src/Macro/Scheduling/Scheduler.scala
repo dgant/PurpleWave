@@ -5,6 +5,7 @@ import Macro.BuildRequests.BuildRequest
 import Macro.Buildables.Buildable
 import Performance.Caching.CacheFrame
 import Planning.Plan
+import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitClass.UnitClass
 import Utilities.{CountMap, CountMapper}
 
@@ -35,7 +36,11 @@ class Scheduler {
   private def queueRecalculate: Iterable[Buildable] = {
     val requestQueue = requestsByPlan.keys.toVector.sortBy(_.priority).flatten(requestsByPlan)
     val unitsWanted = new CountMap[UnitClass]
-    val unitsActual: CountMap[UnitClass] = CountMapper.make(With.units.ours.filter(_.aliveAndComplete).groupBy(_.unitClass).mapValues(_.size))
+    val unitsActual: CountMap[UnitClass] = CountMapper
+      .make(With.units.ours
+        .filter(_.aliveAndComplete)
+        .groupBy(u => if (u.is(Terran.SiegeTankSieged)) Terran.SiegeTankUnsieged else u.unitClass)
+        .mapValues(_.size))
     requestQueue.flatten(buildable => getUnfulfilledBuildables(buildable, unitsWanted, unitsActual))
   }
   

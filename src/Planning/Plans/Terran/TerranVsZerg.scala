@@ -2,7 +2,7 @@ package Planning.Plans.Terran
 
 import Macro.BuildRequests.{RequestAtLeast, RequestTech}
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
-import Planning.Plans.Army.{ConsiderAttacking, ControlMap, DefendChokes, DefendHearts}
+import Planning.Plans.Army._
 import Planning.Plans.Compound._
 import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.BuildOrders.{Build, FirstEightMinutes, FollowBuildOrder}
@@ -12,7 +12,7 @@ import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Scouting.ScoutAt
 import ProxyBwapi.Races.Terran
 
-class DestinyCloudFist extends Parallel {
+class TerranVsZerg extends Parallel {
   
   children.set(Vector(
     new RequireMiningBases(1),
@@ -28,6 +28,7 @@ class DestinyCloudFist extends Parallel {
     new RequireSufficientSupply,
     new TrainWorkersContinuously,
     new TrainContinuously(Terran.ScienceVessel, 2),
+    new TrainContinuously(Terran.SiegeTankUnsieged, 4),
     new TrainContinuously(Terran.Marine),
     new RequireMiningBases(2),
     new BuildRefineries,
@@ -36,14 +37,15 @@ class DestinyCloudFist extends Parallel {
     new Build(RequestAtLeast(1, Terran.EngineeringBay)),
     new Build(RequestAtLeast(1, Terran.Academy)),
     new Build(RequestTech(Terran.SiegeMode)),
-    new TrainContinuously(Terran.SiegeTankUnsieged),
     new Build(RequestAtLeast(2, Terran.MissileTurret)),
     new Build(RequestAtLeast(1, Terran.Starport)),
+    new TrainContinuously(Terran.Comsat),
     new Build(RequestAtLeast(1, Terran.ScienceFacility)),
     new Build(RequestAtLeast(1, Terran.ControlTower)),
+    new Build(RequestAtLeast(4, Terran.Barracks)),
+    new RequireMiningBases(3),
     new TrainContinuously(Terran.Wraith),
     new Build(RequestAtLeast(2, Terran.EngineeringBay)),
-    new Build(RequestAtLeast(3, Terran.Starport)),
     new UpgradeContinuously(Terran.MarineRange),
     new UpgradeContinuously(Terran.BioDamage),
     new UpgradeContinuously(Terran.BioArmor),
@@ -58,6 +60,7 @@ class DestinyCloudFist extends Parallel {
       new DefendChokes,
       new DefendHearts),
     new FollowBuildOrder,
+    new Scan,
     new RemoveMineralBlocksAt(40),
     new Gather
   ))

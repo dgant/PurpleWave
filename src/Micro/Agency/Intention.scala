@@ -10,6 +10,7 @@ class Intention {
   var toReturn    : Option[Pixel]     = None
   var toTravel    : Option[Pixel]     = None
   var toAttack    : Option[UnitInfo]  = None
+  var toScan      : Option[Pixel]     = None
   var toGather    : Option[UnitInfo]  = None
   var toAddon     : Option[UnitClass] = None
   var toBuild     : Option[UnitClass] = None

@@ -209,4 +209,6 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit) extends UnitInfo(base) {
   
   private val carryingMineralsCache = new CacheFrame(() => base.isCarryingMinerals)
   private val carryingGasCache      = new CacheFrame(() => base.isCarryingGas)
+  
+  def addon: Option[UnitInfo] = With.units.get(base.getAddon)
 }

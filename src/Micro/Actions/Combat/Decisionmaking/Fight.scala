@@ -4,6 +4,7 @@ import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.{Cower, Sneak}
 import Micro.Actions.Combat.Tactics.{BustBunker, Sally}
 import Micro.Actions.Protoss.BeACarrier
+import Micro.Actions.Terran.{Siege, Unsiege}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Fight extends Action {
@@ -14,6 +15,8 @@ object Fight extends Action {
   
   override def perform(unit: FriendlyUnitInfo) {
     Cower.consider(unit)
+    Siege.consider(unit)
+    Unsiege.consider(unit)
     BeACarrier.consider(unit)
     Recover.consider(unit)
     Cast.consider(unit)

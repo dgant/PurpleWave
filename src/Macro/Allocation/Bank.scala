@@ -86,7 +86,7 @@ class Bank {
   }
   
   private def expectedFrames(request: LockCurrency): Int = {
-    if (request.isSatisfied) return 0
+    if (request.satisfied) return 0
     Vector(
       request.framesAhead,
       framesToEarnMinerals(-mineralsLeft),

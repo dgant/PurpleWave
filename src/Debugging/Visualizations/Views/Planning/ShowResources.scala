@@ -15,7 +15,7 @@ object ShowResources extends View {
           Iterable(
             if (request.isSpent)
               "Spent"
-            else if (request.isSatisfied)
+            else if (request.satisfied)
               "Available"
             else if (request.onSchedule)
               "On schedule"

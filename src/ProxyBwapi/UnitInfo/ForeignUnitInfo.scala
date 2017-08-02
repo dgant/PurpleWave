@@ -334,6 +334,7 @@ class ForeignUnitInfo(baseUnit: bwapi.Unit) extends UnitInfo (baseUnit) {
     _underDarkSwarm         = base.isUnderDarkSwarm
     _underDisruptionWeb     = base.isUnderDisruptionWeb
     _underStorm             = base.isUnderStorm
+    _addon                  = With.units.get(base.getAddon)
   }
   
   private var _remainingUpgradeFrames : Int = _
@@ -351,6 +352,7 @@ class ForeignUnitInfo(baseUnit: bwapi.Unit) extends UnitInfo (baseUnit) {
   private var _underDarkSwarm         : Boolean = _
   private var _underDisruptionWeb     : Boolean = _
   private var _underStorm             : Boolean = _
+  private var _addon                  : Option[UnitInfo] = None
   
   def remainingBuildFrames: Int = {
     val startingHp    = 1 + unitClass.maxHitPoints / 10
@@ -374,6 +376,8 @@ class ForeignUnitInfo(baseUnit: bwapi.Unit) extends UnitInfo (baseUnit) {
   def underDarkSwarm          : Boolean = _underDarkSwarm
   def underDisruptionWeb      : Boolean = _underDisruptionWeb
   def underStorm              : Boolean = _underStorm
+  
+  def addon: Option[UnitInfo] = _addon
   
   // Cloaked units show up with 0 hit points/shields.
   // Presumably, if we've never seen them, then they're healthier than that.

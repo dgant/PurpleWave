@@ -63,7 +63,10 @@ class FollowBuildOrder extends Plan {
   private def buildPlan(buildable: Buildable): Plan = {
     if (buildable.unitOption.nonEmpty) {
       val unitClass = buildable.unitOption.get
-      if (unitClass.isBuilding && ! unitClass.whatBuilds._1.isBuilding) {
+      if (unitClass.isAddon) {
+        return new BuildAddon(unitClass)
+      }
+      else if (unitClass.isBuilding && ! unitClass.whatBuilds._1.isBuilding) {
         return new BuildBuilding(unitClass)
       } else if (unitClass.buildUnitsSpent.exists(_.isZerg)) {
         return new MorphUnit(unitClass)

@@ -124,6 +124,7 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   
   def tileIncludingCenter:  Tile          = pixelCenter.tileIncluding
   def tileArea:             TileRectangle = unitClass.tileArea.add(tileTopLeft)
+  def addonArea:            TileRectangle = TileRectangle(Tile(0, 0), Tile(2, 2)).add(tileTopLeft).add(4,3)
   
   def pixelRangeMin: Double = unitClass.groundMinRangeRaw
   def pixelRangeAir: Double = pixelRangeAirCache.get

@@ -202,6 +202,7 @@ class Architecture {
     val forUnwalkable   = With.units.ours.toSeq.filter(unit => isGroundBuilding(unit) && usuallyNeedsMargin(unit.unitClass))
     
     unbuildable     ++= forUnbuildable.flatMap(_.tileArea.tiles)
+    unbuildable     ++= forUnbuildable.filter(_.unitClass.canBuildAddon).flatMap(_.addonArea.tiles)
     unwalkable      ++= unbuildable
     unwalkable      ++= forUnwalkable.flatMap(_.tileArea.expand(1, 1).tiles)
     untownhallable  ++= unbuildable

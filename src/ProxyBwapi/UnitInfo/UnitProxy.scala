@@ -135,4 +135,6 @@ abstract class UnitProxy(var base: bwapi.Unit) {
   def underDarkSwarm:Boolean
   def underDisruptionWeb:Boolean
   def underStorm:Boolean
+  
+  def addon:Option[UnitInfo]
 }

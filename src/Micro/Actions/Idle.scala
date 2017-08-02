@@ -27,6 +27,7 @@ object Idle extends Action {
     EmergencyRepair,
     Tickle,
     Gather,
+    Addon,
     Build,
     Unstick,
     Produce,

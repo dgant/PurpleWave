@@ -133,6 +133,12 @@ class Commander {
     sleep(unit)
   }
   
+  def useTech(unit: FriendlyUnitInfo, tech: Tech) {
+    if (unready(unit)) return
+    unit.base.useTech(tech.baseType)
+    sleep(unit)
+  }
+  
   def useTechOnUnit(unit: FriendlyUnitInfo, tech: Tech, target: UnitInfo) {
     if (unready(unit)) return
     unit.base.useTech(tech.baseType, target.base)
@@ -209,7 +215,6 @@ class Commander {
     sleep(unit)
   }
   
-  
   def cancel(unit: FriendlyUnitInfo) {
     if (unready(unit)) return
     unit.base.cancelConstruction()
@@ -227,6 +232,12 @@ class Commander {
     if (unready(unit)) return
     unit.base.setRallyPoint(unit.base)
     unit.hasSetRallyPoint = true
+    sleep(unit)
+  }
+  
+  def addon(unit: FriendlyUnitInfo, unitClass: UnitClass) {
+    if (unready(unit)) return
+    unit.base.buildAddon(unitClass.baseType)
     sleep(unit)
   }
   

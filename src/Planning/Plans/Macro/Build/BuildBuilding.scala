@@ -29,6 +29,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
     unitCounter.set(UnitCountOne)
     unitMatcher.set(builderMatcher)
     unitPreference.set(new UnitPreferClose)
+    interruptable.set(false)
   }
     
   description.set("Build a " + buildingClass)
@@ -105,8 +106,8 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
       } else {
         orderedTile = desiredTile
         builder.agent.intend(this, new Intention {
-            toBuild     = if (currencyLock.isSatisfied) Some(buildingClass) else None
-            toBuildTile = if (currencyLock.isSatisfied) orderedTile         else None
+            toBuild     = if (currencyLock.satisfied) Some(buildingClass) else None
+            toBuildTile = if (currencyLock.satisfied) orderedTile         else None
             toTravel    = Some(orderedTile.get.pixelCenter)
             canAttack   = false
           })
@@ -119,7 +120,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
       With.groundskeeper.flagFulfilled(buildingDescriptor, building.get)
       building.map(_.tileTopLeft)
     }
-    else if (currencyLock.isSatisfied && currencyLock.expectedFrames < With.blackboard.maxFramesToSendAdvanceBuilder) {
+    else if (currencyLock.satisfied && currencyLock.expectedFrames < With.blackboard.maxFramesToSendAdvanceBuilder) {
       With.groundskeeper.demand(buildingDescriptor)
     }
     else {

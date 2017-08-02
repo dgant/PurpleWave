@@ -29,7 +29,7 @@ var respectHarvesting          : Boolean                   = true) {
   var id: Option[Int] = None
   val frameCreated: Int = With.frame
   
-  widthTiles                  = widthTiles                  .orElse(building.map(_.tileWidth)).orElse(Some(1))
+  widthTiles                  = widthTiles                  .orElse(building.map(b => b.tileWidth + (if (b.canBuildAddon) 2 else 0))).orElse(Some(1))
   heightTiles                 = heightTiles                 .orElse(building.map(_.tileHeight)).orElse(Some(1))
   powers                      = powers                      .orElse(Some(building.contains(Protoss.Pylon)))
   requirePower                = requirePower                .orElse(Some(building.exists(_.requiresPsi)))

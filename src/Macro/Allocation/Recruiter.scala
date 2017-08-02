@@ -86,13 +86,13 @@ class Recruiter {
       remove(lock)
     }
     else {
-      // 1. Unassign all the current unit
-      // 2. Unassign all the required unit
+      // 1. Unassign all the current units
+      // 2. Unassign all the required units
       // 3. Assign all the required unit
-      val unitsBefore = getUnits(lock)
-      val unitsAfter = requiredUnits.get.toSet
+      val unitsBefore   = getUnits(lock)
+      val unitsAfter    = requiredUnits.get.toSet
       val unitsObsolete = unitsBefore.diff(unitsAfter)
-      val unitsNew = unitsAfter.diff(unitsBefore)
+      val unitsNew      = unitsAfter.diff(unitsBefore)
       
       unitsObsolete.foreach(unassign)
       unitsNew.foreach(unassign)

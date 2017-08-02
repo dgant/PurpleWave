@@ -13,7 +13,6 @@ import Planning.Composition.UnitPreferences.UnitPreferClose
 import Planning.Plan
 import ProxyBwapi.UnitClass.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import bwapi.Race
 
 class BuildBuilding(val buildingClass: UnitClass) extends Plan {
   
@@ -129,7 +128,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
   }
   
   def needBuilder: Boolean = {
-    if (building.isDefined && buildingClass.race != Race.Terran) {
+    if (building.isDefined && ! buildingClass.isTerran) {
       return false
     }
     if (desiredTile.isEmpty) {

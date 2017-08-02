@@ -7,6 +7,7 @@ import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.RequestAtLeast
 import Planning.Composition.UnitCounters.UnitCountBetween
 import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWorkers}
+import Planning.Composition.UnitPreferences.UnitPreferClose
 import Planning.Plans.Army.{Aggression, AllIn, Attack}
 import Planning.Plans.Compound._
 import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, TrainContinuously}
@@ -27,7 +28,7 @@ abstract class AbstractProxyBBS extends Parallel {
   }
   
   children.set(Vector(
-    new Aggression(4.0),
+    new Aggression(3.5),
     new ProposePlacement{
       override lazy val blueprints = Vector(
         new Blueprint(this, building = Some(Terran.Barracks), preferZone = proxyZone, respectHarvesting = false, placementProfile = Some(PlacementProfiles.proxyBuilding)),
@@ -40,7 +41,8 @@ abstract class AbstractProxyBBS extends Parallel {
         RequestAtLeast(8, Terran.SCV),
         RequestAtLeast(2, Terran.Barracks),
         RequestAtLeast(9, Terran.SCV),
-        RequestAtLeast(1, Terran.SupplyDepot))),
+        RequestAtLeast(1, Terran.SupplyDepot),
+        RequestAtLeast(1, Terran.Marine))),
     new RequireSufficientSupply,
     new TrainContinuously(Terran.Marine),
     new TrainContinuously(Terran.SCV),
@@ -50,7 +52,7 @@ abstract class AbstractProxyBBS extends Parallel {
     new AllIn(new UnitsAtLeast(10, UnitMatchType(Terran.Marine), complete = true)),
     new Attack,
     new FollowBuildOrder,
-    new Gather { workers.unitCounter.set(new UnitCountBetween(0, 8)) },
+    new Gather { workers.unitCounter.set(new UnitCountBetween(0, 8)); workers.unitPreference.set(UnitPreferClose(With.geography.home.pixelCenter)) },
     new Attack { attackers.get.unitMatcher.set(UnitMatchWorkers) }
   ))
 }

@@ -18,7 +18,7 @@ case class Simulacrum(simulation: Simulation, unit: UnitInfo) {
     new mutable.PriorityQueue[Simulacrum]()(Ordering.by(x => (x.unit.unitClass.helpsInCombat, - x.pixel.pixelDistanceFast(pixel))))
       ++ unit.matchups.targets.flatMap(simulation.simulacra.get))
   
-  val participating     : Boolean                     = unit.unitClass.helpsInCombat && ( ! unit.unitClass.isWorker || unit.isBeingViolent)
+  val participating     : Boolean                     = unit.unitClass.helpsInCombat && ( ! unit.unitClass.isWorker || unit.isBeingViolent || unit.friendly.exists(_.agent.canFight))
   val canMove           : Boolean                     = unit.canMove
   var hitPoints         : Int                         = unit.totalHealth
   var cooldown          : Int                         = unit.cooldownLeft

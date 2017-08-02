@@ -26,7 +26,9 @@ class Visualization {
     ShowStrategy,
     ShowBattles,
     ShowUnitsFriendly,
-    ShowIntelligence
+    ShowIntelligence,
+    ShowArchitectureHeuristics,
+    ShowArchitecturePlacements
   )
   
   var enabled   = true

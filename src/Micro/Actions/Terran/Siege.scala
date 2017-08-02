@@ -21,21 +21,15 @@ object Siege extends Action {
     }
     
     var siege = false
-    if (unit.agent.toTravel.exists(_.pixelDistanceFast(unit.pixelCenter) < 32.0)) {
-      siege = true
-    }
-    if (unit.matchups.targets.exists(t => t.topSpeed > 0 && t.pixelDistanceFast(unit) <= 32.0 * 16.0)) {
-      siege = true
-    }
-    if (unit.matchups.targets.exists(_.pixelDistanceFast(unit) <= 32.0 * 13.0)) {
-      siege = true
-    }
-    if (unit.agent.toTravel.isDefined) {
-      val otherSiegeTanks = unit.matchups.allies.filter(_.unitClass.isSiegeTank)
-      val closerSiegeTanks = otherSiegeTanks.filter(_.pixelDistanceFast(unit.agent.toTravel.get) < unit.pixelDistanceFast(unit.agent.toTravel.get))
-      if (otherSiegeTanks.nonEmpty && closerSiegeTanks.isEmpty)
-        siege = true
-    }
+    lazy val atDestination        = unit.agent.toTravel.exists(_.pixelDistanceFast(unit.pixelCenter) < 32.0)
+    lazy val targetsExist         = unit.matchups.targets.exists(t => t.topSpeed > 0 && t.pixelDistanceFast(unit) <= 32.0 * 13.0)
+    lazy val otherSiegeTanks      = unit.matchups.allies.filter(_.unitClass.isSiegeTank)
+    lazy val closerSiegeTanks     = otherSiegeTanks.filter(_.pixelDistanceTravelling(unit.agent.toTravel.get) < unit.pixelDistanceTravelling(unit.agent.toTravel.get))
+    lazy val isClosestTankInPush  = unit.agent.toTravel.isDefined && otherSiegeTanks.nonEmpty && closerSiegeTanks.isEmpty
+    
+    siege ||= atDestination
+    siege ||= targetsExist
+    siege ||= isClosestTankInPush
     
     if (siege) {
       With.commander.useTech(unit, Terran.SiegeMode)

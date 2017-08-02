@@ -62,12 +62,14 @@ class TerranVsTerran extends Parallel {
       RequestAtLeast(1, Terran.MachineShop))),
     new OnGasBases(2, new Build(
       RequestAtLeast(2, Terran.MachineShop),
-      RequestAtLeast(1, Terran.Armory))),
+      RequestAtLeast(1, Terran.Armory),
+      RequestAtLeast(1, Terran.ControlTower))),
     new OnGasBases(3, new Build(
       RequestAtLeast(4, Terran.MachineShop))),
     new OnGasBases(1, new Build(
       RequestAtLeast(1, Terran.Starport))),
     new OnGasBases(3, new Build(
+      RequestAtLeast(1, Terran.ScienceFacility),
       RequestAtLeast(2, Terran.Starport))),
     new UpgradeContinuously(Terran.MechDamage),
     new TrainContinuously(Terran.Vulture),
@@ -75,7 +77,10 @@ class TerranVsTerran extends Parallel {
     new RequireMiningBases(3),
     new ScoutAt(14),
     new ControlMap,
-    new ConsiderAttacking,
+    new Trigger(
+      new UnitsAtLeast(3, UnitMatchSiegeTank, complete = true),
+      new ConsiderAttacking
+    ),
     new DefendChokes,
     new FollowBuildOrder,
     new Scan,

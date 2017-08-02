@@ -1,14 +1,25 @@
 package Strategery
 
 import Strategery.Strategies.Options.AllRaces.{WorkerRush2StartLocations, WorkerRush3StartLocations}
-import Strategery.Strategies.Options.Protoss.Global.{AllPvP, AllPvT, AllPvZ, Proxy2Gate3StartLocations}
+import Strategery.Strategies.Options.Protoss.Global._
 import Strategery.Strategies.Options.Protoss.PvP._
 import Strategery.Strategies.Options.Protoss.PvT._
 import Strategery.Strategies.Options.Protoss.PvZ._
-import Strategery.Strategies.Options.Terran.Global.Macro
+import Strategery.Strategies.Options.Terran.Global.{Macro, Proxy5Rax, ProxyBBS2StartLocations, ProxyBBS3StartLocations}
 import Strategery.Strategies.Strategy
 
 object Playbook {
+  
+  val cheese = Vector[Strategy](
+    WorkerRush2StartLocations,
+    WorkerRush3StartLocations,
+    Proxy2Gate2StartLocations,
+    Proxy2Gate3StartLocations,
+    ProxyBBS2StartLocations,
+    ProxyBBS3StartLocations,
+    Proxy5Rax
+  )
+  
   
   // Don't use these.
   //

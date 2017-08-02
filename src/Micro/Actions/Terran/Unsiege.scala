@@ -13,23 +13,23 @@ object Unsiege extends Action {
   
   override protected def perform(unit: FriendlyUnitInfo) {
     
-    if (unit.matchups.targets.exists(t => t.pixelDistanceFast(unit) < 32.0 * 18.0 && t.pixelDistanceFast(unit) > 32.0 * 3.0)) {
+    if (unit.matchups.targets.exists(unit.inRangeToAttackFast)) {
       return
     }
     
     var unsiege = false
     
     if (unit.agent.toTravel.isDefined) {
-      val otherSiegeTanks = unit.matchups.allies.filter(_.unitClass.isSiegeTank)
-      val closerSiegeTanks = otherSiegeTanks.filter(_.pixelDistanceFast(unit.agent.toTravel.get) < unit.pixelDistanceFast(unit.agent.toTravel.get))
-      if (otherSiegeTanks.nonEmpty && closerSiegeTanks.nonEmpty) {
-        unsiege = true
-      }
+  
+      lazy val tile = unit.tileIncludingCenter
+      lazy val home = With.geography.home.pixelCenter
+      lazy val otherSiegeTanks = unit.matchups.allies.filter(_.unitClass.isSiegeTank)
+      lazy val closerSiegeTanks = otherSiegeTanks.filter(_.pixelDistanceFast(unit.agent.toTravel.get) < unit.pixelDistanceFast(unit.agent.toTravel.get))
       
-      val home = With.geography.home.pixelCenter
-      if (unit.agent.toTravel.exists(_.pixelDistanceFast(home) < unit.pixelDistanceFast(With.geography.home.pixelCenter) - 48)) {
-        unsiege = true
-      }
+      unsiege ||= With.grids.chokepoints.get(tile) && tile.zone.owner.isUs
+      unsiege ||= otherSiegeTanks.isEmpty
+      unsiege ||= otherSiegeTanks.nonEmpty && closerSiegeTanks.nonEmpty
+      unsiege ||= unit.agent.toTravel.exists(_.pixelDistanceFast(home) < unit.pixelDistanceFast(With.geography.home.pixelCenter) - 48.0)
     }
     
     if (unsiege) {

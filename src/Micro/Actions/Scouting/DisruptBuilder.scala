@@ -22,6 +22,6 @@ object DisruptBuilder extends Action {
   }
   
   def disruptableBuilders(unit: FriendlyUnitInfo): Iterable[UnitInfo] = {
-    unit.matchups.enemies.filter(_.constructing)
+    unit.matchups.enemies.filter(e => e.unitClass.isWorker && e.constructing)
   }
 }

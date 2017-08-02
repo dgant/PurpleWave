@@ -8,7 +8,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 object Siege extends Action {
   
   override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.is(Terran.SiegeTankUnsieged)
+    unit.is(Terran.SiegeTankUnsieged) && unit.player.hasTech(Terran.SiegeMode)
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {

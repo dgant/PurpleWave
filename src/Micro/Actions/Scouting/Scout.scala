@@ -14,7 +14,9 @@ object Scout extends Action {
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {
-    Potshot.consider(unit)
+    if ( ! unit.wounded) {
+      Potshot.consider(unit)
+    }
     PreserveScout.consider(unit)
     DisruptBuilder.consider(unit)
     BlockConstruction.consider(unit)

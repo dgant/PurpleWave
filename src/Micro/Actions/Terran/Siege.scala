@@ -24,6 +24,9 @@ object Siege extends Action {
     if (unit.agent.toTravel.exists(_.pixelDistanceFast(unit.pixelCenter) < 32.0)) {
       siege = true
     }
+    if (unit.matchups.targets.exists(t => t.topSpeed > 0 && t.pixelDistanceFast(unit) <= 32.0 * 16.0)) {
+      siege = true
+    }
     if (unit.matchups.targets.exists(_.pixelDistanceFast(unit) <= 32.0 * 13.0)) {
       siege = true
     }

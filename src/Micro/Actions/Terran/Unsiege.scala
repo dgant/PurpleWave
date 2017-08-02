@@ -13,7 +13,7 @@ object Unsiege extends Action {
   
   override protected def perform(unit: FriendlyUnitInfo) {
     
-    if (unit.matchups.targets.exists(t => t.pixelDistanceFast(unit) < 32.0 * 13.0 && t.pixelDistanceFast(unit) > 32.0 * 3.0)) {
+    if (unit.matchups.targets.exists(t => t.pixelDistanceFast(unit) < 32.0 * 18.0 && t.pixelDistanceFast(unit) > 32.0 * 3.0)) {
       return
     }
     

@@ -1,7 +1,7 @@
 package Debugging.Visualizations.Views.Planning
 
 import Debugging.Visualizations.Views.View
-import Information.StrategyDetection.Zerg._
+import Information.StrategyDetection.ZergStrategies._
 import Lifecycle.With
 
 object ShowIntelligence extends View {

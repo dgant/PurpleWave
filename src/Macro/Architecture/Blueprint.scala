@@ -103,11 +103,11 @@ var respectHarvesting          : Boolean                   = true) {
     lazy val buildArea  = relativeBuildArea.add(tile)
   
     def violatesMargin(nextTile: Tile): Boolean = {
-      ! nextTile.valid || thisZone.perimeter.contains(nextTile)
+      false
     }
   
     def violatesBuildArea(nextTile: Tile): Boolean = {
-      violatesMargin(nextTile)                                  ||
+      thisZone.perimeter.contains(nextTile)                     ||
       ! With.architecture.buildable(nextTile)                   ||
       (requireCreep.get   && ! With.grids.creep.get(nextTile))  ||
       (respectHarvesting  && With.architecture.isHarvestingArea(nextTile))

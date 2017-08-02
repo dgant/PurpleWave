@@ -1,6 +1,6 @@
 package Planning.Plans.Protoss.GamePlans
 
-import Information.StrategyDetection.Zerg.{Fingerprint12Hatch, Fingerprint4Pool, Fingerprint9Pool, FingerprintOverpool}
+import Information.StrategyDetection.ZergStrategies._
 import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
 import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors}
@@ -57,7 +57,8 @@ class ProtossVsZerg extends Parallel {
       new If(
         new Or(
           new EnemyStrategy(Fingerprint9Pool),
-          new EnemyStrategy(FingerprintOverpool)),
+          new EnemyStrategy(FingerprintOverpool),
+          new EnemyStrategy(Fingerprint10Hatch9Pool)),
         new Build(ProtossBuilds.FFE_ForgeFirst: _*),
       new If(
         new Employing(PvZEarlyFFEConservative),

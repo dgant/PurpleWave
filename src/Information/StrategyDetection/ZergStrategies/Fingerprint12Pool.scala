@@ -1,4 +1,4 @@
-package Information.StrategyDetection.Zerg
+package Information.StrategyDetection.ZergStrategies
 
 import Information.StrategyDetection._
 import ProxyBwapi.Races.Zerg

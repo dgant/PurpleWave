@@ -43,7 +43,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
   override def onUpdate() {
     
     if (isComplete) {
-      With.groundskeeper.flagFulfilled(buildingDescriptor)
+      With.groundskeeper.flagFulfilled(buildingDescriptor, building.get)
       return
     }
     
@@ -117,7 +117,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
   
   private def acquireDesiredTile(): Option[Tile] = {
     if (building.isDefined) {
-      With.groundskeeper.flagFulfilled(buildingDescriptor)
+      With.groundskeeper.flagFulfilled(buildingDescriptor, building.get)
       building.map(_.tileTopLeft)
     }
     else if (currencyLock.isSatisfied && currencyLock.expectedFrames < With.blackboard.maxFramesToSendAdvanceBuilder) {

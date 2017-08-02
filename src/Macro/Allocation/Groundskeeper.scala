@@ -3,6 +3,7 @@ package Macro.Allocation
 import Lifecycle.With
 import Macro.Architecture.{Blueprint, BlueprintMatch, Placement}
 import Mathematics.Points.Tile
+import ProxyBwapi.UnitInfo.UnitInfo
 
 import scala.collection.mutable
 
@@ -12,7 +13,7 @@ class Groundskeeper {
   val proposals             : mutable.Set[Blueprint]             = new mutable.HashSet[Blueprint]
   val proposalPlacements    : mutable.Map[Blueprint, Placement]  = new mutable.HashMap[Blueprint, Placement]
   val requirementMatches    : mutable.Set[BlueprintMatch]        = new mutable.HashSet[BlueprintMatch]
-  val proposalsFulfilled    : mutable.Set[Blueprint]             = new mutable.HashSet[Blueprint]
+  val proposalsFulfilled    : mutable.Map[Blueprint, UnitInfo]   = new mutable.HashMap[Blueprint, UnitInfo]
   
   private var lastUrgentBuildingPlacement = -24 * 60 * 60
   
@@ -23,6 +24,7 @@ class Groundskeeper {
   ///////////
   
   def update() {
+    proposalsFulfilled.filterNot(_._2.alive).foreach(pair => flagUnfulfilled(pair._1))
     proposals.diff(updated).foreach(removeBlueprint)
     proposalPlacements.keySet.diff(updated).foreach(removeBlueprint)
     requirementMatches.map(_.requirement).diff(updated).foreach(removeBlueprint)
@@ -102,12 +104,20 @@ class Groundskeeper {
     }
   }
   
-  def flagFulfilled(requirement: Blueprint) {
+  def flagFulfilled(requirement: Blueprint, fulfillingUnit: UnitInfo) {
     val proposal = getRepresentativeBlueprintForRequirement(requirement)
     removeBlueprint(requirement)
     removeBlueprint(proposal)
-    proposalsFulfilled.add(requirement)
-    proposalsFulfilled.add(proposal)
+    proposalsFulfilled.put(requirement, fulfillingUnit)
+    proposalsFulfilled.put(proposal, fulfillingUnit)
+  }
+  
+  def flagUnfulfilled(requirement: Blueprint) {
+    val proposal = getRepresentativeBlueprintForRequirement(requirement)
+    addProposal(proposal)
+    addRequirement(requirement)
+    proposalsFulfilled.remove(proposal)
+    proposalsFulfilled.remove(requirement)
   }
   
   //////////////

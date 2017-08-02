@@ -7,7 +7,7 @@ import Planning.Plans.Army._
 import Planning.Plans.Compound._
 import Planning.Plans.Information.{Employ, Employing}
 import Planning.Plans.Macro.Automatic._
-import Planning.Plans.Macro.BuildOrders.{Build, FirstFiveMinutes}
+import Planning.Plans.Macro.BuildOrders.{Build, FirstEightMinutes}
 import Planning.Plans.Macro.Expanding.{BuildAssimilators, MatchMiningBases, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.{UnitsAtLeast, _}
 import Planning.Plans.Information.Reactive.EnemyBio
@@ -26,14 +26,14 @@ class ProtossVsTerran extends Parallel {
   // Early-game strategies //
   ///////////////////////////
   
-  private class ImplementEarly14Nexus       extends FirstFiveMinutes(new Build(ProtossBuilds.Opening13Nexus_NoZealot_OneGateCore: _*))
-  private class ImplementEarly1GateRange    extends FirstFiveMinutes(new Build(ProtossBuilds.Opening_1GateCore: _*))
-  private class ImplementEarly1015GateGoon  extends FirstFiveMinutes(
+  private class ImplementEarly14Nexus       extends FirstEightMinutes(new Build(ProtossBuilds.Opening13Nexus_NoZealot_OneGateCore: _*))
+  private class ImplementEarly1GateRange    extends FirstEightMinutes(new Build(ProtossBuilds.Opening_1GateCore: _*))
+  private class ImplementEarly1015GateGoon  extends FirstEightMinutes(
     new Parallel(
       new TwoGatewaysAtNatural,
       new Build(ProtossBuilds.OpeningTwoGate1015Dragoons: _*)))
-  private class ImplementEarlyDTExpand      extends FirstFiveMinutes(new Build(ProtossBuilds.OpeningDTExpand: _*))
-  private class ImplementEarly4GateAllIn    extends FirstFiveMinutes(new Build(ProtossBuilds.Opening_1GateZZCore: _*))
+  private class ImplementEarlyDTExpand      extends FirstEightMinutes(new Build(ProtossBuilds.OpeningDTExpand: _*))
+  private class ImplementEarly4GateAllIn    extends FirstEightMinutes(new Build(ProtossBuilds.Opening_1GateZZCore: _*))
   
   private class FulfillEarlyTech extends Build(
     RequestAtLeast(1,   Protoss.Pylon),

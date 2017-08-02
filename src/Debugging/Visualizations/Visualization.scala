@@ -26,8 +26,6 @@ class Visualization {
     ShowStrategy,
     ShowBattles,
     ShowUnitsFriendly,
-    ShowArchitectureHeuristics,
-    ShowArchitecturePlacements,
     ShowIntelligence
   )
   

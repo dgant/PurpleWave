@@ -8,12 +8,20 @@ object ShowZoneBorderTiles extends View {
   
   override def renderMap() {
   
-    With.geography.zones.foreach(zone =>
+    With.geography.zones.foreach(zone => {
       zone.border.foreach(tile =>
         DrawMap.box(
           tile.topLeftPixel,
           tile.bottomRightPixel,
           zone.owner.colorMedium,
-          solid = false)))
+          solid = false))
+  
+      zone.perimeter.foreach(tile =>
+        DrawMap.circle(
+          tile.pixelCenter,
+          14,
+          zone.owner.colorMedium,
+          solid = false))
+    })
   }
 }

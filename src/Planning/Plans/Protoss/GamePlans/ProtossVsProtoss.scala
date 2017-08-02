@@ -8,12 +8,12 @@ import Planning.Plans.Compound._
 import Planning.Plans.Information.Reactive.{EnemyDarkTemplarExists, EnemyDarkTemplarPossible}
 import Planning.Plans.Information.{Employ, Employing}
 import Planning.Plans.Macro.Automatic._
-import Planning.Plans.Macro.BuildOrders.{Build, FirstFiveMinutes}
+import Planning.Plans.Macro.BuildOrders.{Build, FirstEightMinutes}
 import Planning.Plans.Macro.Expanding.{BuildAssimilators, MatchMiningBases, RequireMiningBases}
 import Planning.Plans.Macro.Milestones._
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Protoss.ProtossBuilds
-import Planning.Plans.Protoss.Situational.{ForgeFastExpand, TwoGatewaysAtNatural}
+import Planning.Plans.Protoss.Situational.{ForgeFastExpand, Nexus2GateThenCannons, TwoGatewaysAtNatural}
 import Planning.Plans.Scouting.{Scout, ScoutExpansionsAt}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Options.Protoss.PvP._
@@ -26,25 +26,25 @@ class ProtossVsProtoss extends Parallel {
   // Early game strategies //
   ///////////////////////////
   
-  private class ImplementEarly2Gate910 extends FirstFiveMinutes(
+  private class ImplementEarly2Gate910 extends FirstEightMinutes(
     new Parallel(
       new TwoGatewaysAtNatural,
       new Build(ProtossBuilds.OpeningTwoGate910_WithZealots: _*)))
   
-  private class ImplementEarly2Gate1012 extends FirstFiveMinutes(
+  private class ImplementEarly2Gate1012 extends FirstEightMinutes(
     new Parallel(
       new TwoGatewaysAtNatural,
       new Build(ProtossBuilds.OpeningTwoGate1012: _*)))
   
-  private class ImplementEarly1GateCore extends FirstFiveMinutes(
+  private class ImplementEarly1GateCore extends FirstEightMinutes(
     new Build(ProtossBuilds.Opening_1GateCore: _*))
   
-  private class ImplementEarly1GateZZCore extends FirstFiveMinutes(
+  private class ImplementEarly1GateZZCore extends FirstEightMinutes(
     new Build(ProtossBuilds.Opening_1GateZZCore: _*))
   
-  private class ImplementEarlyFE extends FirstFiveMinutes(
+  private class ImplementEarlyFE extends FirstEightMinutes(
     new Parallel(
-      //new Nexus2GateThenCannons,
+      new Nexus2GateThenCannons,
       new Build(
         RequestAtLeast(1,   Protoss.Nexus),
         RequestAtLeast(8,   Protoss.Probe),
@@ -59,12 +59,12 @@ class ProtossVsProtoss extends Parallel {
       new Build(
         RequestAtLeast(2, Protoss.Pylon),
         RequestAtLeast(1, Protoss.Assimilator),
-        RequestAtLeast(1, Protoss.CyberneticsCore)
-        //RequestAtLeast(1, Protoss.Forge),
-        //RequestAtLeast(3, Protoss.PhotonCannon)
+        RequestAtLeast(1, Protoss.CyberneticsCore),
+        RequestAtLeast(1, Protoss.Forge),
+        RequestAtLeast(3, Protoss.PhotonCannon)
       )))
     
-  private class ImplementEarlyFFE extends FirstFiveMinutes(
+  private class ImplementEarlyFFE extends FirstEightMinutes(
     new Parallel(
       new ForgeFastExpand,
       new Build(ProtossBuilds.FFE_ForgeFirst: _*)))

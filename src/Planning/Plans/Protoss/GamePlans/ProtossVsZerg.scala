@@ -10,7 +10,7 @@ import Planning.Plans.Information.Reactive.{EnemyBasesAtLeast, EnemyMassMutalisk
 import Planning.Plans.Information.Scenarios.EnemyStrategy
 import Planning.Plans.Information.{Employ, Employing, StartPositionsAtLeast}
 import Planning.Plans.Macro.Automatic.{MatchingRatio, _}
-import Planning.Plans.Macro.BuildOrders.{Build, FirstFiveMinutes}
+import Planning.Plans.Macro.BuildOrders.{Build, FirstEightMinutes}
 import Planning.Plans.Macro.Expanding.{BuildAssimilators, BuildCannonsAtExpansions, RequireMiningBases}
 import Planning.Plans.Macro.Milestones._
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
@@ -28,7 +28,7 @@ class ProtossVsZerg extends Parallel {
   // Early game //
   ////////////////
   
-  private class ImplementEarly2Gate extends FirstFiveMinutes(
+  private class ImplementEarly2Gate extends FirstEightMinutes(
     new Parallel(
       new TwoGatewaysAtNexus,
       new Trigger(
@@ -42,7 +42,7 @@ class ProtossVsZerg extends Parallel {
     RequestAtLeast(1, Protoss.CyberneticsCore),
     RequestAtLeast(3, Protoss.PhotonCannon))
   
-  private class FFE extends FirstFiveMinutes(
+  private class FFE extends FirstEightMinutes(
     new Parallel(
       new ForgeFastExpand,
       new If(
@@ -171,7 +171,7 @@ class ProtossVsZerg extends Parallel {
     // Early defense //
     ///////////////////
     
-    new FirstFiveMinutes(
+    new FirstEightMinutes(
       new If(
         new UnitsAtLeast(1, UnitMatchType(Protoss.CyberneticsCore), complete = false),
         new Parallel(
@@ -185,7 +185,7 @@ class ProtossVsZerg extends Parallel {
             new Not(new EnemyBasesAtLeast(2)),
             new TrainContinuously(Protoss.PhotonCannon, 6))))),
   
-    new FirstFiveMinutes(
+    new FirstEightMinutes(
       new If(
         new And(
           new EnemyStrategy(Fingerprint4Pool),
@@ -193,7 +193,7 @@ class ProtossVsZerg extends Parallel {
           new UnitsAtMost(1, UnitMatchType(Protoss.PhotonCannon), complete = true)),
         new DefendFFEAgainst4Pool)),
     
-    new FirstFiveMinutes(new Defend2GateAgainst4Pool),
+    new FirstEightMinutes(new Defend2GateAgainst4Pool),
   
     /////////////////
     // Early macro //

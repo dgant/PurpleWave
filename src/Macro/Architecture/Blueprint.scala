@@ -37,7 +37,7 @@ var respectHarvesting          : Boolean                   = true) {
   requireTownHallTile         = requireTownHallTile         .orElse(Some(building.exists(_.isTownHall)))
   requireGasTile              = requireGasTile              .orElse(Some(building.exists(_.isRefinery)))
   preferMargin                = preferMargin                .orElse(Some(building.exists(With.architecture.usuallyNeedsMargin)))
-  preferredDistanceFromExit   = preferredDistanceFromExit   .orElse(building.map(_.maxAirGroundRange.toDouble)).orElse(Some(32.0 * 9.0))
+  preferredDistanceFromExit   = preferredDistanceFromExit   .orElse(if (building.exists(_.attacks)) building.map(_.maxAirGroundRange.toDouble) else Some(32.0 * 9.0))
   preferZone                  = preferZone                  .orElse(requireZone)
   placementProfile            = placementProfile            .orElse(Some(PlacementProfiles.default(this)))
   
@@ -103,7 +103,7 @@ var respectHarvesting          : Boolean                   = true) {
     lazy val buildArea  = relativeBuildArea.add(tile)
   
     def violatesMargin(nextTile: Tile): Boolean = {
-      ! nextTile.valid || thisZone.border.contains(nextTile)
+      ! nextTile.valid || thisZone.perimeter.contains(nextTile)
     }
   
     def violatesBuildArea(nextTile: Tile): Boolean = {

@@ -65,33 +65,24 @@ object PlacementProfiles {
   // Specialty placements //
   //////////////////////////
   
-  val naturalCannonPylon = new PlacementProfile(
-    "Pylon for natural Cannons",
-    preferZone                  = 100.0,
-    preferNatural               = 30.0,
-    preferPowering              = 0.5,
-    preferDistanceFromEnemy     = 0.5,
-    preferCoveringWorkers       = 0.5,
-    avoidDistanceFromBase       = 1.5,
+  val cannonPylon = new PlacementProfile(
+    "Pylon for Cannons",
+    preferZone                  = 10.0,
+    preferNatural               = 10.0,
+    preferPowering              = 1.0,
+    preferCoveringWorkers       = 0.25,
+    avoidDistanceFromBase       = 0.25,
     avoidSurfaceArea            = 0.25,
-    avoidDistanceFromIdealRange = 5.0)
+    avoidDistanceFromIdealRange = 2.0)
   
-  val naturalCannon = new PlacementProfile(
-    "Natural cannons",
-    preferZone                  = 100.0,
-    preferNatural               = 30.0,
-    preferDistanceFromEnemy     = 0.5,
+  val cannon = new PlacementProfile(
+    "Cannons",
+    preferZone                  = 10.0,
+    preferNatural               = 10.0,
     preferCoveringWorkers       = 0.5,
-    avoidDistanceFromBase       = 1.5,
+    avoidDistanceFromBase       = 0.5,
     avoidSurfaceArea            = 0.5,
-    avoidDistanceFromIdealRange = 5.0)
-  
-  val cannon = new PlacementProfile("Defense", basic) {
-    preferNatural               = 5.0
-    preferCoveringWorkers       = 5.0
-    avoidDistanceFromBase       = 5.0
-    avoidDistanceFromEnemy      = 5.0
-  }
+    avoidDistanceFromIdealRange = 2.0)
   
   val proxyBuilding = new PlacementProfile(
     "Proxy",

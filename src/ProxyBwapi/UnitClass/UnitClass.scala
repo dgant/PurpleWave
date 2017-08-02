@@ -72,8 +72,10 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) {
     else if (this == Protoss.Reaver)  60
     else                              cooldownZeroBecomesInfinity(groundDamageCooldownRaw)
   
-  lazy val attacksGround : Boolean = effectiveGroundDamage > 0
-  lazy val attacksAir    : Boolean = effectiveAirDamage    > 0
+  
+  lazy val attacks        : Boolean = attacksGround || attacksAir
+  lazy val attacksGround  : Boolean = effectiveGroundDamage > 0
+  lazy val attacksAir     : Boolean = effectiveAirDamage    > 0
   
   lazy val helpsInCombat: Boolean = rawCanAttack || isSpellcaster || Set(Terran.Bunker).contains(this)
   

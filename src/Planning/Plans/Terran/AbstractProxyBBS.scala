@@ -27,7 +27,7 @@ abstract class AbstractProxyBBS extends Parallel {
   }
   
   children.set(Vector(
-    new Aggression(2.5),
+    new Aggression(4.0),
     new ProposePlacement{
       override lazy val blueprints = Vector(
         new Blueprint(this, building = Some(Terran.Barracks), preferZone = proxyZone, respectHarvesting = false, placementProfile = Some(PlacementProfiles.proxyBuilding)),
@@ -44,7 +44,6 @@ abstract class AbstractProxyBBS extends Parallel {
     new RequireSufficientSupply,
     new TrainContinuously(Terran.Marine),
     new TrainContinuously(Terran.SCV),
-    new TrainContinuously(Terran.Barracks),
     new If(
       new UnitsAtLeast(1, UnitMatchType(Terran.Barracks), complete = true),
       new Scout),

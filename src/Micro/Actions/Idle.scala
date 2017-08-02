@@ -23,8 +23,9 @@ object Idle extends Action {
     Cancel, //Probably not actually used yet because candidates won't be in the Executor queue
     Meld,
     FightOrFlight,
-    Tickle,
     Duck,
+    EmergencyRepair,
+    Tickle,
     Gather,
     Build,
     Unstick,

@@ -5,7 +5,7 @@ import Strategery.Strategies.Options.Protoss.Global.{AllPvP, AllPvT, AllPvZ, Pro
 import Strategery.Strategies.Options.Protoss.PvP._
 import Strategery.Strategies.Options.Protoss.PvT._
 import Strategery.Strategies.Options.Protoss.PvZ._
-import Strategery.Strategies.Options.Terran.Global.DestinyCloudFistAllIn
+import Strategery.Strategies.Options.Terran.Global.Macro
 import Strategery.Strategies.Strategy
 
 object Playbook {
@@ -21,7 +21,7 @@ object Playbook {
   // Use these whenever possible.
   //
   val forced = Vector[Strategy](
-    DestinyCloudFistAllIn
+    Macro
   )
   
   // Specify the order in which you want to try strategies vs. new opponents

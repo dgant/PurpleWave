@@ -100,8 +100,9 @@ object PlacementProfiles {
     avoidDistanceFromEnemy      = 3.0,
     avoidSurfaceArea            = 1.0)
   
-  val hugTheNexus = new PlacementProfile(
-    "Hugging Nexus",
-    preferPowering        = 0.5,
-    avoidDistanceFromBase = 1.0)
+  val hugTownHall = new PlacementProfile(
+    "Hugging Town Hall",
+    preferPowering              = 0.5,
+    avoidDistanceFromBase       = 1.0,
+    avoidDistanceFromEnemy      = 0.1)
 }

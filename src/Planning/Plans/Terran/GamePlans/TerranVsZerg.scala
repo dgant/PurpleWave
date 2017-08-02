@@ -1,10 +1,13 @@
-package Planning.Plans.Terran
+package Planning.Plans.Terran.GamePlans
 
+import Macro.Architecture.Blueprint
+import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{RequestAtLeast, RequestTech}
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plans.Army._
 import Planning.Plans.Compound._
 import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
+import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, FirstEightMinutes, FollowBuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildRefineries, RemoveMineralBlocksAt, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.UnitsAtLeast
@@ -16,6 +19,13 @@ class TerranVsZerg extends Parallel {
   
   children.set(Vector(
     new RequireMiningBases(1),
+    new ProposePlacement {
+      override lazy val blueprints: Iterable[Blueprint] = Vector(
+        new Blueprint(this, preferMargin = Some(false), building = Some(Terran.SupplyDepot),  placementProfile = Some(PlacementProfiles.hugTownHall)),
+        new Blueprint(this, preferMargin = Some(false), building = Some(Terran.Barracks),     placementProfile = Some(PlacementProfiles.hugTownHall)),
+        new Blueprint(this, preferMargin = Some(false), building = Some(Terran.Barracks),     placementProfile = Some(PlacementProfiles.hugTownHall))
+      )
+    },
     new FirstEightMinutes(
       new Build(
         RequestAtLeast(1, Terran.CommandCenter),

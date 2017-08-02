@@ -1,4 +1,4 @@
-package Planning.Plans.Terran
+package Planning.Plans.Terran.GamePlans
 
 import Macro.BuildRequests.RequestAtLeast
 import Planning.Plans.Army.Attack

@@ -160,7 +160,7 @@ class Commander {
   def repair(unit: FriendlyUnitInfo, target: UnitInfo) {
     if (unready(unit)) return
     unit.base.repair(target.base)
-    sleepAttack(unit)
+    sleep(unit, 24)
   }
   
   def gather(unit: FriendlyUnitInfo, resource: UnitInfo) {

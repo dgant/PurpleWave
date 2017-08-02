@@ -3,6 +3,7 @@ package Planning.Plans.Macro.Automatic
 import Lifecycle.With
 import Macro.BuildRequests.RequestAtLeast
 import Planning.Plan
+import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitClass.UnitClass
 
 class TrainContinuously(unitClass: UnitClass, maximum: Int = Int.MaxValue) extends Plan {
@@ -30,9 +31,15 @@ class TrainContinuously(unitClass: UnitClass, maximum: Int = Int.MaxValue) exten
   }
   
   protected def buildCapacity: Int = {
-    val builderCount = With.units.ours.count(_.is(unitClass.whatBuilds._1))
+    val builders = With.units.ours.filter(b =>
+      b.is(unitClass.whatBuilds._1)
+      && (! unitClass.buildUnitsEnabling.contains(Terran.MachineShop)   || b.addon.isDefined)
+      && (! unitClass.buildUnitsEnabling.contains(Terran.ControlTower)  || b.addon.isDefined))
+    
+    val builderCount = builders.size
     Vector(
       builderCount * (if (unitClass.isTwoUnitsInOneEgg) 2 else 1),
+      if (unitClass.isAddon) builders.count(_.addon.isEmpty) else Int.MaxValue,
       if (unitClass.supplyRequired == 0) 400 else (400 - With.self.supplyUsed) / unitClass.supplyRequired
     ).min
   }

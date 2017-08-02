@@ -1,7 +1,7 @@
 package Strategery.Strategies.Options.Terran.Global
 
 import Planning.Plan
-import Planning.Plans.Terran.Proxy5Rax
+import Planning.Plans.Terran.GamePlans.Proxy5Rax
 import Strategery.Strategies.Strategy
 import bwapi.Race
 

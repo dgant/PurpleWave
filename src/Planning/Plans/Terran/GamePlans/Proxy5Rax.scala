@@ -1,4 +1,4 @@
-package Planning.Plans.Terran
+package Planning.Plans.Terran.GamePlans
 
 import Information.Geography.Types.Zone
 import Lifecycle.With

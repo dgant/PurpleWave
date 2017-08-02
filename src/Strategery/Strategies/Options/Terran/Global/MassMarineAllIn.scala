@@ -1,7 +1,7 @@
 package Strategery.Strategies.Options.Terran.Global
 
 import Planning.Plan
-import Planning.Plans.Terran.{BBSInMiddle, MassMarine}
+import Planning.Plans.Terran.GamePlans.MassMarine
 import Strategery.Strategies.Strategy
 import bwapi.Race
 

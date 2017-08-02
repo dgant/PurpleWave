@@ -1,14 +1,14 @@
 package Strategery.Strategies.Options.Terran.Global
 
 import Planning.Plan
-import Planning.Plans.Terran.TerranVsZerg
+import Planning.Plans.Terran.GamePlans.TerranGamePlan
 import Strategery.Strategies.Strategy
 import bwapi.Race
 
-object DestinyCloudFistAllIn
+object Macro
   extends Strategy {
   
-  override def buildGameplan(): Option[Plan] = { Some(new TerranVsZerg) }
+  override def buildGameplan(): Option[Plan] = { Some(new TerranGamePlan) }
   
   override def ourRaces: Iterable[Race] = Vector(Race.Terran)
 }

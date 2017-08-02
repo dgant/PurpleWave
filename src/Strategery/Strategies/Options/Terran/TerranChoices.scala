@@ -10,5 +10,5 @@ object TerranChoices {
     ProxyBBS2StartLocations,
     ProxyBBS3StartLocations,
     MassMarineAllIn,
-    DestinyCloudFistAllIn)
+    Macro)
 }

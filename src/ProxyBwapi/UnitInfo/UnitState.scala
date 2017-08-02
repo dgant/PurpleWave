@@ -8,6 +8,7 @@ import bwapi.UnitCommandType
 class UnitState(unit: UnitInfo) {
   val frame                 : Int       = With.frame
   val pixelCenter           : Pixel     = unit.pixelCenter
+  val velocitySquared       : Double    = unit.velocityX * unit.velocityX + unit.velocityY * unit.velocityY
   val attackStarting        : Boolean   = unit.attackStarting
   val hitPoints             : Int       = unit.hitPoints
   val shieldPoints          : Int       = unit.shieldPoints

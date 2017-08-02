@@ -1,7 +1,7 @@
 package Planning.Plans.Terran.GamePlans
 
 import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
-import Planning.Composition.UnitMatchers.{UnitMatchSiegeTank, UnitMatchWarriors}
+import Planning.Composition.UnitMatchers.{UnitMatchSiegeTank, UnitMatchType, UnitMatchWarriors}
 import Planning.Plans.Army._
 import Planning.Plans.Compound._
 import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
@@ -44,6 +44,10 @@ class TerranVsTerran extends Parallel {
     new BuildRefineries,
     new TrainContinuously(Terran.Comsat),
     new TrainContinuously(Terran.SiegeTankUnsieged),
+    new If(
+      new UnitsAtLeast(1, UnitMatchType(Terran.Armory)),
+      new Build(RequestAtLeast(1, Terran.ControlTower))
+    ),
     new TrainContinuously(Terran.Valkyrie, 1),
     new TrainContinuously(Terran.Wraith),
     new Build(
@@ -63,8 +67,7 @@ class TerranVsTerran extends Parallel {
       RequestAtLeast(1, Terran.MachineShop))),
     new OnGasBases(2, new Build(
       RequestAtLeast(2, Terran.MachineShop),
-      RequestAtLeast(1, Terran.Armory),
-      RequestAtLeast(1, Terran.ControlTower))),
+      RequestAtLeast(1, Terran.Armory))),
     new OnGasBases(3, new Build(
       RequestAtLeast(4, Terran.MachineShop))),
     new OnGasBases(1, new Build(

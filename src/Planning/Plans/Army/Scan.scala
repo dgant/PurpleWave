@@ -35,7 +35,29 @@ class Scan extends Plan {
       return
     }
     
-    val blockedBuilders = With.units.ours.filter(_.agent.toBuild.exists(_.isTownHall))
+    val contentiousTanks = With.units.enemy.filter(u =>
+      ! u.visible &&
+      u.likelyStillThere &&
+      u.unitClass.isSiegeTank &&
+      u.matchups.enemies.exists(e =>
+        e.is(Terran.SiegeTankSieged)  &&
+        e.cooldownLeft == 0           &&
+        e.inRangeToAttackFast(u)      &&
+        ! e.matchups.targetsInRange.exists(_.visible)))
+  
+    if (contentiousTanks.nonEmpty) {
+      scan(contentiousTanks.minBy(_.totalHealth).pixelCenter)
+      return
+    }
+    
+    val blockedBuilders = With.units.ours.filter(b =>
+      b.agent.toBuild.exists(_.isTownHall)
+      && With.framesSince(b.lastMovementFrame) > 24 )
+    
+    if (blockedBuilders.nonEmpty) {
+      scan(blockedBuilders.head.pixelCenter)
+      return
+    }
   }
   
   def scan(targetPixel: Pixel) {

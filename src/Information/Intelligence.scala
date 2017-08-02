@@ -12,12 +12,11 @@ import scala.collection.mutable
 
 class Intelligence {
   
-  def mostBaselikeEnemyTile:Tile = mostBaselikeEnemyTileCache.get
+  def mostBaselikeEnemyTile: Tile = mostBaselikeEnemyTileCache.get
   val mostBaselikeEnemyTileCache = new CacheFrame(() =>
     With.units.enemy
       .toVector
-      .filter(unit => unit.possiblyStillThere && ! unit.flying)
-      .sortBy(unit => ! unit.unitClass.isBuilding)
+      .filter(unit => unit.possiblyStillThere && ! unit.flying && unit.unitClass.isBuilding)
       .sortBy(unit => ! unit.unitClass.isTownHall)
       .map(_.tileIncludingCenter)
       .headOption

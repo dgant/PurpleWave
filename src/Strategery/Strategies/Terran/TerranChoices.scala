@@ -7,7 +7,6 @@ object TerranChoices {
   
   val overall: Iterable[Strategy] = Vector(
     Proxy5RaxAllIn,
-    Proxy8FactllIn,
     ProxyBBS2StartLocations,
     ProxyBBS3StartLocations,
     MassMarineAllIn,

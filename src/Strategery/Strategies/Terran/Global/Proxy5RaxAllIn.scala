@@ -12,6 +12,5 @@ object Proxy5RaxAllIn
   
   override def ourRaces: Iterable[Race] = Vector(Race.Terran)
   
-  override def startLocationsMin = 2
   override def startLocationsMax = 2
 }

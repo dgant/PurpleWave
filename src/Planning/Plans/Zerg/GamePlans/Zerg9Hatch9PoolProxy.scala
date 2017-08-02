@@ -22,7 +22,7 @@ class Zerg9Hatch9PoolProxy extends Parallel {
     super.onUpdate()
   }
   
-  protected def proxyZone: Option[Zone] = {
+  lazy val proxyZone: Option[Zone] = {
     if (With.geography.startLocations.size == 2) {
       ProxyPlanner.proxyOutsideEnemyNatural
     }
@@ -46,7 +46,7 @@ class Zerg9Hatch9PoolProxy extends Parallel {
       RequestAtLeast(50,  Zerg.Zergling)),
     new TrainContinuously(Zerg.Hatchery),
     new If(
-      new UnitsAtLeast(2, UnitMatchType(Zerg.SpawningPool), complete = false),
+      new UnitsAtLeast(1, UnitMatchType(Zerg.SpawningPool), complete = false),
       new Scout),
     new Attack,
     new FollowBuildOrder,

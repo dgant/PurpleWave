@@ -3,7 +3,6 @@ package Planning.Plans.Macro.Automatic
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Micro.Agency.Intention
-import Performance.Caching.Limiter
 import Planning.Composition.ResourceLocks.LockUnits
 import Planning.Composition.UnitCountEverything
 import Planning.Composition.UnitMatchers.UnitMatchWorkers
@@ -107,17 +106,22 @@ class Gather extends Plan {
   }
   
   private def gasWorkers: Int = {
-    if (With.self.race == Race.Zerg) {
-      Vector(safeGas.size * 3, Math.ceil(allWorkers.size*3.0/8.0).toInt, if(haveEnoughGas) 0 else 200).min
-    }
-    else {
-      Vector(safeGas.size * 3, allWorkers.size/3, if(haveEnoughGas) 0 else 200).min
-    }
+    if (With.self.race == Race.Protoss)
+      Vector(
+        safeGas.size * 3,
+        allWorkers.size / 3,
+        if (haveEnoughGas) 0 else 200)
+        .min
+    else
+      Vector(
+        safeGas.size * 3,
+        allWorkers.size / 2,
+        if(haveEnoughGas) 0 else 300).min
   }
   
   private def decideIdealWorkerDistribution() {
     haveEnoughGas       = With.self.gas >= Math.max(200, With.self.minerals)
-    workersForGas       = Vector(safeGas.size * 3, allWorkers.size/3, if(haveEnoughGas) 0 else 200).min
+    workersForGas       = gasWorkers
     workersForMinerals  = allWorkers.size - workersForGas
     workersPerGas       = if (safeGas.isEmpty) 0 else workersForGas.toDouble / safeGas.size
     workersOnGas        = safeGas.toVector.map(gas => workersByResource.get(gas).map(_.size).getOrElse(0)).sum
@@ -136,7 +140,13 @@ class Gather extends Plan {
           .map(_.size)
           .getOrElse(0))).toMap
   
-    unassignSupersaturatingWorkersLimiter.act()
+    if (
+      With.framesSince(lastFrameUnassigning) > 24 * 5 || (
+        With.framesSince(lastFrameUnassigning) > 24 &&
+        With.units.ours.exists(u =>  u.unitClass.isGas && With.framesSince(u.frameDiscovered) < 48)))
+      {
+        unassignSupersaturatingWorkers()
+      }
     
     unassignedWorkers       = allWorkers.diff(resourceByWorker.keySet)
     numberToAddToGas        = Math.max(0, workersForGas - workersOnGas)
@@ -144,8 +154,9 @@ class Gather extends Plan {
     workersToAddToMinerals  = unassignedWorkers.drop(numberToAddToGas)
   }
   
-  val unassignSupersaturatingWorkersLimiter = new Limiter(5, () => unassignSupersaturatingWorkers())
+  var lastFrameUnassigning = 0
   def unassignSupersaturatingWorkers() {
+    lastFrameUnassigning = With.frame
     val supersaturatedMinerals = safeMinerals.filter(needPerMineral(_) < 0)
     val supersaturationWorkerGroups = supersaturatedMinerals.flatten(workersByResource.get)
     supersaturationWorkerGroups.foreach(_.drop(2).foreach(unassignWorker))

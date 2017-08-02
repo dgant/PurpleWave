@@ -33,8 +33,8 @@ object ProxyPlanner {
           .filter(base => base.isStartLocation && ! base.owner.isFriendly)
           .map(_.heart.groundPixels(zone.centroid))
           .sum +
-          3 * With.geography.ourBases
-            .map(_.heart.groundPixels(zone.centroid))
-            .sum))
+        3 * With.geography.ourBases
+          .map(_.heart.groundPixels(zone.centroid))
+          .sum))
   }
 }

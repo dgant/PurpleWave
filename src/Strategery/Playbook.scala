@@ -15,7 +15,7 @@ object Playbook {
   // Strategies to demand or disable //
   /////////////////////////////////////
   
-  lazy val forced = Vector(Proxy8FactllIn)
+  lazy val forced = cheese
   
   lazy val disabled = none
   

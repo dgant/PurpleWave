@@ -3,9 +3,9 @@ package Strategery
 import Lifecycle.With
 import Planning.Plan
 import Planning.Plans.WinTheGame
-import Strategery.Strategies.Options.Protoss.ProtossChoices
-import Strategery.Strategies.Options.Terran.TerranChoices
-import Strategery.Strategies.Options.Zerg.ZergChoices
+import Strategery.Strategies.Protoss.ProtossChoices
+import Strategery.Strategies.Terran.TerranChoices
+import Strategery.Strategies.Zerg.ZergChoices
 import Strategery.Strategies.Strategy
 
 import scala.collection.mutable

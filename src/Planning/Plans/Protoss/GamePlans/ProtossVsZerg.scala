@@ -18,7 +18,7 @@ import Planning.Plans.Protoss.ProtossBuilds
 import Planning.Plans.Protoss.Situational.{Defend2GateAgainst4Pool, DefendFFEAgainst4Pool, ForgeFastExpand, TwoGatewaysAtNexus}
 import Planning.Plans.Scouting.{FindExpansions, Scout, ScoutAt}
 import ProxyBwapi.Races.{Protoss, Zerg}
-import Strategery.Strategies.Options.Protoss.PvZ._
+import Strategery.Strategies.Protoss.PvZ._
 
 class ProtossVsZerg extends Parallel {
   

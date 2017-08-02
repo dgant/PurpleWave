@@ -13,7 +13,7 @@ import Planning.Plans.Protoss.ProtossBuilds
 import Planning.Plans.Protoss.Situational.TwoGatewaysAtNatural
 import Planning.Plans.Scouting.Scout
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Options.Protoss.PvR.{PvREarly2Gate1012, PvREarly2Gate910, PvREarly2Gate910AtNatural}
+import Strategery.Strategies.Protoss.PvR.{PvREarly2Gate1012, PvREarly2Gate910, PvREarly2Gate910AtNatural}
 
 class ProtossVsRandom extends Parallel {
   

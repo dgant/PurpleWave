@@ -5,7 +5,9 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.RequestAtLeast
-import Planning.Composition.UnitMatchers.UnitMatchType
+import Planning.Composition.UnitCounters.UnitCountBetween
+import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWorkers}
+import Planning.Composition.UnitPreferences.UnitPreferClose
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.Macro.Automatic.{Gather, TrainContinuously}
@@ -19,7 +21,7 @@ import ProxyBwapi.Races.Terran
 
 class Proxy5Rax extends Parallel {
   
-  lazy val proxyZone: Option[Zone] = ProxyPlanner.proxyEnemyNatural
+  lazy val proxyZone: Option[Zone] = ProxyPlanner.proxyOutsideEnemyNatural
   
   override def onUpdate(): Unit = {
     With.blackboard.maxFramesToSendAdvanceBuilder = Int.MaxValue
@@ -43,9 +45,17 @@ class Proxy5Rax extends Parallel {
     new TrainContinuously(Terran.SCV),
     new If(
       new UnitsAtLeast(1, UnitMatchType(Terran.Barracks), complete = true),
-      new Scout),
+      initialWhenTrue = new Parallel(
+        new Scout,
+        new Attack,
+        new Gather { workers.unitCounter.set(new UnitCountBetween(0, 4)); workers.unitPreference.set(UnitPreferClose(With.geography.home.pixelCenter)) },
+        new Attack { attackers.get.unitMatcher.set(UnitMatchWorkers) }
+      ),
+      initialWhenFalse = new Parallel(
+        new Gather
+      )),
     new Attack,
-    new FollowBuildOrder,
-    new Gather
+    new FollowBuildOrder
+    
   ))
 }

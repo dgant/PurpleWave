@@ -9,7 +9,7 @@ import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Milestones.{HaveUpgrade, UnitsAtLeast, UnitsAtMost}
 import Planning.Plans.Information.Reactive.{EnemyBio, EnemyBioAllIn}
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Options.Protoss.PvT.PvTEarly4GateAllIn
+import Strategery.Strategies.Protoss.PvT.PvTEarly4GateAllIn
 
 object ProtossVsTerranIdeas {
   

@@ -1,14 +1,29 @@
 package Strategery
 
-import Strategery.Strategies.Options.AllRaces.{WorkerRush2StartLocations, WorkerRush3StartLocations}
-import Strategery.Strategies.Options.Protoss.Global._
-import Strategery.Strategies.Options.Protoss.PvP._
-import Strategery.Strategies.Options.Protoss.PvT._
-import Strategery.Strategies.Options.Protoss.PvZ._
-import Strategery.Strategies.Options.Terran.Global.{Macro, Proxy5Rax, ProxyBBS2StartLocations, ProxyBBS3StartLocations}
+import Strategery.Strategies.AllRaces.{WorkerRush2StartLocations, WorkerRush3StartLocations}
+import Strategery.Strategies.Protoss.Global._
+import Strategery.Strategies.Protoss.PvP._
+import Strategery.Strategies.Protoss.PvT._
+import Strategery.Strategies.Protoss.PvZ._
 import Strategery.Strategies.Strategy
+import Strategery.Strategies.Terran.Global._
+import Strategery.Strategies.Zerg.Global.{Zerg4PoolAllIn, Zerg9Hatch9PoolProxyAllIn}
 
 object Playbook {
+  
+  /////////////////////////////////////
+  // Strategies to demand or disable //
+  /////////////////////////////////////
+  
+  lazy val forced = Vector(Proxy8FactllIn)
+  
+  lazy val disabled = none
+  
+  //////////////////////////
+  // Groups of strategies //
+  //////////////////////////
+  
+  val none = Vector[Strategy]()
   
   val cheese = Vector[Strategy](
     WorkerRush2StartLocations,
@@ -17,23 +32,26 @@ object Playbook {
     Proxy2Gate3StartLocations,
     ProxyBBS2StartLocations,
     ProxyBBS3StartLocations,
-    Proxy5Rax
+    Proxy5RaxAllIn,
+    MassMarineAllIn,
+    Zerg4PoolAllIn,
+    Zerg9Hatch9PoolProxyAllIn
   )
   
+  val tickles = Vector[Strategy](
+    WorkerRush2StartLocations,
+    WorkerRush3StartLocations
+  )
   
-  // Don't use these.
-  //
-  val disabled = Vector[Strategy](
+  val bad = Vector[Strategy](
     WorkerRush2StartLocations,
     WorkerRush3StartLocations,
     Proxy2Gate3StartLocations
   )
   
-  // Use these whenever possible.
-  //
-  val forced = Vector[Strategy](
-    Macro
-  )
+  //////////////////////
+  // Experiment order //
+  //////////////////////
   
   // Specify the order in which you want to try strategies vs. new opponents
   //

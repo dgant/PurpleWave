@@ -16,7 +16,7 @@ import Planning.Plans.Protoss.Situational.TwoGatewaysAtNatural
 import Planning.Plans.Protoss.{ProtossBuilds, ProtossVsTerranIdeas}
 import Planning.Plans.Scouting.{ScoutAt, ScoutExpansionsAt}
 import ProxyBwapi.Races.{Protoss, Terran}
-import Strategery.Strategies.Options.Protoss.PvT._
+import Strategery.Strategies.Protoss.PvT._
 
 class ProtossVsTerran extends Parallel {
   

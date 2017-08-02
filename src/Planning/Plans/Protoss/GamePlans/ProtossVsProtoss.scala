@@ -16,7 +16,7 @@ import Planning.Plans.Protoss.ProtossBuilds
 import Planning.Plans.Protoss.Situational.{ForgeFastExpand, Nexus2GateThenCannons, TwoGatewaysAtNatural}
 import Planning.Plans.Scouting.{Scout, ScoutExpansionsAt}
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Options.Protoss.PvP._
+import Strategery.Strategies.Protoss.PvP._
 
 class ProtossVsProtoss extends Parallel {
   

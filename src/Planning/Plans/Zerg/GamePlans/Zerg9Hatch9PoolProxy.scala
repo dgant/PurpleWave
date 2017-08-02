@@ -24,7 +24,7 @@ class Zerg9Hatch9PoolProxy extends Parallel {
   
   protected def proxyZone: Option[Zone] = {
     if (With.geography.startLocations.size == 2) {
-      ProxyPlanner.proxyEnemyNatural
+      ProxyPlanner.proxyOutsideEnemyNatural
     }
     else {
       ProxyPlanner.proxyMiddleBase

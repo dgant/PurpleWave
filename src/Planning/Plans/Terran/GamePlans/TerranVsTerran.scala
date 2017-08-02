@@ -59,7 +59,8 @@ class TerranVsTerran extends Parallel {
     new OnMiningBases(2, new Build(
       RequestAtLeast(3, Terran.Factory),
       RequestUpgrade(Terran.VultureSpeed),
-      RequestAtLeast(5, Terran.Factory),
+      RequestAtLeast(6, Terran.Factory),
+      RequestTech(Terran.SpiderMinePlant),
       RequestAtLeast(1, Terran.Academy))),
     new OnMiningBases(3, new Build(
       RequestAtLeast(8, Terran.Factory))),

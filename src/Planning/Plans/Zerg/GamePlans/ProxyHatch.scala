@@ -13,7 +13,7 @@ import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, TrainCon
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
-import Planning.Plans.Macro.Milestones.{UnitsAtLeast, UnitsAtMost}
+import Planning.Plans.Macro.Milestones.UnitsAtLeast
 import Planning.Plans.Scouting.ScoutAt
 import Planning.{Plan, ProxyPlanner}
 import ProxyBwapi.Races.Zerg
@@ -93,29 +93,36 @@ class ProxyHatch extends Parallel {
             RequestAtLeast(12, Zerg.Drone))))),
   
     new RequireSufficientSupply,
-    new If(
-      new UnitsAtLeast(1, UnitMatchType(Zerg.HydraliskDen), complete = false),
-      new TrainContinuously(Zerg.Hydralisk),
-      new TrainContinuously(Zerg.Zergling)),
   
-    new Employ(ProxyHatchZerglings, new TrainContinuously(Zerg.Hatchery)),
-    new Employ(ProxyHatchHydras, new Build(RequestAtLeast(1, Zerg.HydraliskDen))),
+    new Employ(ProxyHatchZerglings,
+      new Parallel(
+        new TrainContinuously(Zerg.Zergling),
+        new TrainContinuously(Zerg.Hatchery))),
   
-    new Employ(ProxyHatchSunkens, new If(
-      new And(
-        new UnitsAtLeast(2, UnitMatchType(Zerg.Hatchery),     complete = true),
-        new UnitsAtMost(6, UnitMatchType(Zerg.SunkenColony),  complete = false)),
+    new Employ(ProxyHatchHydras,
       new Parallel(
-        new TrainContinuously(Zerg.SunkenColony),
-        new TrainContinuously(Zerg.CreepColony, 2)),
-      new Parallel(
-        new TrainWorkersContinuously,
-        new Build(RequestAtLeast(1, Zerg.Lair)),
-        new RequireMiningBases(3),
-        new BuildGasPumps,
-        new Build(RequestAtLeast(1, Zerg.Spire)),
-        new TrainContinuously(Zerg.Mutalisk)
-      ))),
+        new Build(RequestAtLeast(1, Zerg.HydraliskDen)),
+        new If(
+          new UnitsAtLeast(1, UnitMatchType(Zerg.HydraliskDen), complete = false),
+          new TrainContinuously(Zerg.Hydralisk),
+          new TrainContinuously(Zerg.Zergling)))),
+  
+    new Employ(ProxyHatchSunkens,
+      new Trigger(
+        new UnitsAtLeast(2, UnitMatchType(Zerg.Hatchery), complete = true),
+        initialAfter = new Trigger(
+          new UnitsAtLeast(6, UnitMatchType(Zerg.SunkenColony), complete = false),
+          initialBefore = new Parallel(
+            new TrainContinuously(Zerg.SunkenColony),
+            new TrainContinuously(Zerg.CreepColony, 2)),
+          initialAfter = new Parallel(
+            new TrainWorkersContinuously,
+            new Build(RequestAtLeast(1, Zerg.Lair)),
+            new RequireMiningBases(3),
+            new BuildGasPumps,
+            new Build(RequestAtLeast(1, Zerg.Spire)),
+            new TrainContinuously(Zerg.Mutalisk)
+          )))),
       
     new If(
       new Check(() => ProxyPlanner.proxyEnemyNatural.isEmpty),

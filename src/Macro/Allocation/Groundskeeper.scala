@@ -108,6 +108,10 @@ class Groundskeeper {
     val proposal = getRepresentativeBlueprintForRequirement(requirement)
     removeBlueprint(requirement)
     removeBlueprint(proposal)
+    
+    // Part hack, part insurance policy. A unit can't fulfill multiple proposals. That's just silly.
+    proposalsFulfilled.find(_._2 == fulfillingUnit).map(_._1).foreach(proposalsFulfilled.remove)
+    
     proposalsFulfilled.put(requirement, fulfillingUnit)
     proposalsFulfilled.put(proposal, fulfillingUnit)
   }

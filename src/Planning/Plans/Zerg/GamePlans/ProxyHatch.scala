@@ -26,17 +26,7 @@ class ProxyHatch extends Parallel {
     super.onUpdate()
   }
   
-  val buildUpToHatchery = Vector(
-    RequestAtLeast(8,   Zerg.Drone),
-    RequestAtLeast(2,   Zerg.Overlord),
-    RequestAtLeast(13,  Zerg.Drone))
-  
-  val buildUpToHydras = Vector(
-    RequestAtLeast(1,   Zerg.Extractor),
-    RequestAtLeast(3,   Zerg.Overlord),
-    RequestAtLeast(1,   Zerg.HydraliskDen),
-    RequestAtLeast(15,  Zerg.Drone),
-    RequestAtLeast(4,   Zerg.Overlord))
+  private class WeHaveEnoughSunkens extends UnitsAtLeast(6, UnitMatchType(Zerg.SunkenColony), complete = false)
   
   private def blueprintCreepColonyNatural: Blueprint = new Blueprint(this,
     building          = Some(Zerg.CreepColony),
@@ -111,18 +101,18 @@ class ProxyHatch extends Parallel {
       new Trigger(
         new UnitsAtLeast(2, UnitMatchType(Zerg.Hatchery), complete = true),
         initialAfter = new Trigger(
-          new UnitsAtLeast(6, UnitMatchType(Zerg.SunkenColony), complete = false),
+          new WeHaveEnoughSunkens,
           initialBefore = new Parallel(
             new TrainContinuously(Zerg.SunkenColony),
             new TrainContinuously(Zerg.CreepColony, 2)),
           initialAfter = new Parallel(
             new TrainWorkersContinuously,
+            new BuildGasPumps,
             new Build(RequestAtLeast(1, Zerg.Lair)),
             new RequireMiningBases(3),
-            new BuildGasPumps,
             new Build(RequestAtLeast(1, Zerg.Spire)),
             new TrainContinuously(Zerg.Mutalisk)
-          )))),
+          )))), 
       
     new If(
       new Check(() => ProxyPlanner.proxyEnemyNatural.isEmpty),
@@ -136,7 +126,8 @@ class ProxyHatch extends Parallel {
       new If(
         new And(
           new UnitsAtLeast(2, UnitMatchType(Zerg.Hatchery),     complete = false),
-          new UnitsAtLeast(1, UnitMatchType(Zerg.SpawningPool), complete = false)),
+          new UnitsAtLeast(1, UnitMatchType(Zerg.SpawningPool), complete = false),
+          new Not(new WeHaveEnoughSunkens)),
         new Attack {
           attackers.get.unitMatcher.set(UnitMatchWorkers)
           attackers.get.unitCounter.set(UnitCountExactly(2))

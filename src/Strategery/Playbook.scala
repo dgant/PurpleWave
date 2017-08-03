@@ -54,7 +54,7 @@ object StrategyGroups {
 
 class TestingPlaybook extends EmptyPlaybook {
   
-  val strategyToTest = ProxyHatchHydras
+  val strategyToTest = ProxyHatchSunkens
   
   override lazy val forced: Seq[Strategy] = Seq(strategyToTest)
 }

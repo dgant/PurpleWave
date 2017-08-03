@@ -4,14 +4,16 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.RequestAtLeast
-import Planning.Composition.UnitMatchers.UnitMatchType
+import Planning.Composition.UnitCounters.UnitCountExactly
+import Planning.Composition.UnitMatchers.{UnitMatchMobileFlying, UnitMatchType, UnitMatchWorkers}
 import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Compound.{If, _}
-import Planning.Plans.Information.{Employ, Employing}
-import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, TrainContinuously}
+import Planning.Plans.Information.Employ
+import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
-import Planning.Plans.Macro.Milestones.UnitsAtMost
+import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
+import Planning.Plans.Macro.Milestones.{UnitsAtLeast, UnitsAtMost}
 import Planning.Plans.Scouting.ScoutAt
 import Planning.{Plan, ProxyPlanner}
 import ProxyBwapi.Races.Zerg
@@ -36,14 +38,13 @@ class ProxyHatch extends Parallel {
     RequestAtLeast(15,  Zerg.Drone),
     RequestAtLeast(4,   Zerg.Overlord))
   
-  private def blueprintCreepColony: Blueprint = new Blueprint(this,
+  private def blueprintCreepColonyNatural: Blueprint = new Blueprint(this,
     building          = Some(Zerg.CreepColony),
     requireZone       = ProxyPlanner.proxyEnemyNatural,
     placementProfile  = Some(PlacementProfiles.proxyCannon))
-  
   children.set(Vector(
     new Plan { override def onUpdate(): Unit = {
-      With.blackboard.gasBankSoftLimit = 75
+      With.blackboard.gasBankSoftLimit = if (With.units.ours.exists(_.is(Zerg.Lair))) 400 else 75
       With.blackboard.gasBankHardLimit = With.blackboard.gasBankSoftLimit
     }},
     new ProposePlacement { override lazy val blueprints = Vector(new Blueprint(this,
@@ -59,22 +60,33 @@ class ProxyHatch extends Parallel {
       new Parallel(
         new ProposePlacement { override lazy val blueprints = Vector(
           new Blueprint(this, preferZone = ProxyPlanner.proxyEnemyNatural, building = Some(Zerg.Hatchery), placementProfile = Some(PlacementProfiles.proxyBuilding)),
-          blueprintCreepColony,
-          blueprintCreepColony,
-          blueprintCreepColony,
-          blueprintCreepColony,
-          blueprintCreepColony,
-          blueprintCreepColony,
-          blueprintCreepColony,
-          blueprintCreepColony)},
-        new If(
-          new Employing(ProxyHatchHydras),
+          blueprintCreepColonyNatural,
+          blueprintCreepColonyNatural,
+          blueprintCreepColonyNatural,
+          blueprintCreepColonyNatural,
+          blueprintCreepColonyNatural,
+          blueprintCreepColonyNatural,
+          blueprintCreepColonyNatural,
+          blueprintCreepColonyNatural,
+          blueprintCreepColonyNatural,
+          blueprintCreepColonyNatural,
+          blueprintCreepColonyNatural,
+          blueprintCreepColonyNatural,
+          blueprintCreepColonyNatural,
+          blueprintCreepColonyNatural,
+          blueprintCreepColonyNatural)},
+        new Employ(ProxyHatchHydras,
           new Build(
             RequestAtLeast(2, Zerg.Hatchery),
             RequestAtLeast(1, Zerg.SpawningPool),
             RequestAtLeast(11, Zerg.Drone),
-            RequestAtLeast(1, Zerg.Extractor), //We get it a bit earlier than required to overcome a bug in which we refused to gather gas after the second hatch has spawned
-            RequestAtLeast(12, Zerg.Drone)),
+            RequestAtLeast(1, Zerg.Extractor), //We get it a bit earlier than required to overcome a bug in which we refuse to gather gas after the second hatch has spawned
+            RequestAtLeast(12, Zerg.Drone))),
+        new Employ(ProxyHatchZerglings,
+          new Build(
+            RequestAtLeast(2, Zerg.Hatchery),
+            RequestAtLeast(1, Zerg.SpawningPool))),
+        new Employ(ProxyHatchSunkens,
           new Build(
             RequestAtLeast(2, Zerg.Hatchery),
             RequestAtLeast(1, Zerg.SpawningPool),
@@ -82,26 +94,48 @@ class ProxyHatch extends Parallel {
   
     new RequireSufficientSupply,
     new If(
-      new UnitsAtMost(0, UnitMatchType(Zerg.HydraliskDen), complete = false),
-      new TrainContinuously(Zerg.Zergling),
-      new TrainContinuously(Zerg.Hydralisk)),
+      new UnitsAtLeast(1, UnitMatchType(Zerg.HydraliskDen), complete = false),
+      new TrainContinuously(Zerg.Hydralisk),
+      new TrainContinuously(Zerg.Zergling)),
   
-    new Employ(ProxyHatchHydras,
-      new Build(RequestAtLeast(1, Zerg.HydraliskDen))),
+    new Employ(ProxyHatchZerglings, new TrainContinuously(Zerg.Hatchery)),
+    new Employ(ProxyHatchHydras, new Build(RequestAtLeast(1, Zerg.HydraliskDen))),
   
-    new Employ(ProxyHatchSunkens,
+    new Employ(ProxyHatchSunkens, new If(
+      new And(
+        new UnitsAtLeast(2, UnitMatchType(Zerg.Hatchery),     complete = true),
+        new UnitsAtMost(6, UnitMatchType(Zerg.SunkenColony),  complete = false)),
       new Parallel(
         new TrainContinuously(Zerg.SunkenColony),
-        new TrainContinuously(Zerg.CreepColony, 2))),
-    
-    new Employ(ProxyHatchZerglings, new TrainContinuously(Zerg.Hatchery)),
+        new TrainContinuously(Zerg.CreepColony, 2)),
+      new Parallel(
+        new TrainWorkersContinuously,
+        new Build(RequestAtLeast(1, Zerg.Lair)),
+        new RequireMiningBases(3),
+        new BuildGasPumps,
+        new Build(RequestAtLeast(1, Zerg.Spire)),
+        new TrainContinuously(Zerg.Mutalisk)
+      ))),
       
     new If(
       new Check(() => ProxyPlanner.proxyEnemyNatural.isEmpty),
       new ScoutAt(8, 2)),
-    new Aggression(2.5),
+    
+    new Aggression(2.0),
     new Attack,
     new FollowBuildOrder,
+  
+    new Employ(ProxyHatchSunkens,
+      new If(
+        new And(
+          new UnitsAtLeast(2, UnitMatchType(Zerg.Hatchery),     complete = false),
+          new UnitsAtLeast(1, UnitMatchType(Zerg.SpawningPool), complete = false)),
+        new Attack {
+          attackers.get.unitMatcher.set(UnitMatchWorkers)
+          attackers.get.unitCounter.set(UnitCountExactly(2))
+        },
+        new Attack { attackers.get.unitMatcher.set(UnitMatchMobileFlying) })),
+    
     new Gather
   ))
 }

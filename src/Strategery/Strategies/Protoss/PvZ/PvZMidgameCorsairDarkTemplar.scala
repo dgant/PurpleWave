@@ -5,6 +5,6 @@ import bwapi.Race
 
 object PvZMidgameCorsairDarkTemplar extends Strategy {
   
-  override def ourRaces    : Iterable[Race] = Vector(Race.Random, Race.Protoss)
+  override def ourRaces    : Iterable[Race] = Vector(Race.Protoss)
   override def enemyRaces  : Iterable[Race] = Vector(Race.Unknown, Race.Zerg)
 }

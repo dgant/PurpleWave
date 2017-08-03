@@ -7,7 +7,6 @@ class Plan {
   
   var parent: Option[Plan] = None
   
-  
   def isComplete: Boolean = false
   def getChildren: Iterable[Plan] = Vector.empty
   def visualize(): Unit = {}

@@ -15,17 +15,17 @@ class PlacementStateEvaluating(blueprint: Blueprint) extends PlacementState {
   
   private var candidatesUnfiltered  : Option[ArrayBuffer[Tile]] = None
   private var candidatesFiltered    : Option[ArrayBuffer[Tile]] = None
-  private var nextFilteringIndex    : Int                       = 0
-  private var nextEvaluationIndex   : Int                       = 0
-  private val evaluationDebugging       = new mutable.HashMap[Tile, Iterable[PlacementHeuristicEvaluation]]
-  private val evaluationValues  = new mutable.HashMap[Tile, Double]
+  private var nextFilteringIndex  = 0
+  private var nextEvaluationIndex = 0
+  private val evaluationDebugging = new mutable.HashMap[Tile, Iterable[PlacementHeuristicEvaluation]]
+  private val evaluationValues    = new mutable.HashMap[Tile, Double]
   
   override def step() {
     if (stillSurveying) {
       val sources = Surveyor.candidates(blueprint)
-      candidatesUnfiltered  = Some(new ArrayBuffer[Tile])
-      candidatesFiltered    = Some(new ArrayBuffer[Tile])
-      candidatesUnfiltered  ++= sources.flatMap(_.tiles(blueprint))
+      candidatesUnfiltered      = Some(new ArrayBuffer[Tile])
+      candidatesFiltered        = Some(new ArrayBuffer[Tile])
+      candidatesUnfiltered.get  ++= sources.flatMap(_.tiles(blueprint))
     }
     else if (stillFiltering) {
       

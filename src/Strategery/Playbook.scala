@@ -7,35 +7,32 @@ import Strategery.Strategies.Protoss.PvT._
 import Strategery.Strategies.Protoss.PvZ._
 import Strategery.Strategies.Strategy
 import Strategery.Strategies.Terran.Global._
-import Strategery.Strategies.Zerg.Global.{Zerg4PoolAllIn, Zerg9Hatch9PoolProxyAllInZerglings}
+import Strategery.Strategies.Zerg.Global.{ProxyHatchHydras, ProxyHatchSunkens, ProxyHatchZerglings, Zerg4PoolAllIn}
 
-object Playbook {
+class EmptyPlaybook {
+  lazy val forced   : Seq[Strategy] = Seq.empty
+  lazy val disabled : Seq[Strategy] = Seq.empty
   
-  /////////////////////////////////////
-  // Strategies to demand or disable //
-  /////////////////////////////////////
-  
-  lazy val forced = List(Proxy5RaxAllIn)
-  
-  lazy val disabled = none
-  
-  //////////////////////////
-  // Groups of strategies //
-  //////////////////////////
-  
+  val none = Seq.empty
+}
+
+object StrategyGroups {
   val none = Vector[Strategy]()
   
   val cheese = Vector[Strategy](
     WorkerRush2StartLocations,
     WorkerRush3StartLocations,
-    Proxy2Gate2StartLocations,
-    Proxy2Gate3StartLocations,
     ProxyBBS2StartLocations,
     ProxyBBS3StartLocations,
     Proxy5RaxAllIn,
     MassMarineAllIn,
+    Proxy2Gate2StartLocations,
+    Proxy2Gate3StartLocations,
+    ProxyDarkTemplar,
     Zerg4PoolAllIn,
-    Zerg9Hatch9PoolProxyAllInZerglings
+    ProxyHatchZerglings,
+    ProxyHatchSunkens,
+    ProxyHatchHydras
   )
   
   val tickles = Vector[Strategy](
@@ -46,8 +43,33 @@ object Playbook {
   val bad = Vector[Strategy](
     WorkerRush2StartLocations,
     WorkerRush3StartLocations,
-    Proxy2Gate3StartLocations
+    ProxyBBS2StartLocations,
+    ProxyBBS3StartLocations,
+    Proxy5RaxAllIn,
+    MassMarineAllIn,
+    Proxy2Gate3StartLocations,
+    ProxyDarkTemplar
   )
+}
+
+class TestingPlaybook extends EmptyPlaybook {
+  
+  val strategyToTest = ProxyHatchHydras
+  
+  override lazy val forced: Seq[Strategy] = Seq(strategyToTest)
+}
+
+
+class PurpleWavePlaybook extends EmptyPlaybook {
+  override lazy val forced    : Seq[Nothing] = none
+  override lazy val disabled  : Seq[Strategy] = StrategyGroups.bad
+}
+
+class PurpleCheesePlaybook extends EmptyPlaybook {
+  override lazy val forced: Seq[Strategy] = StrategyGroups.cheese
+}
+
+object Playbook extends TestingPlaybook {
   
   //////////////////////
   // Experiment order //

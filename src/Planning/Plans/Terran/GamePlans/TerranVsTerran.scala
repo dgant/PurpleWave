@@ -118,7 +118,7 @@ class TerranVsTerran extends Parallel {
     
     new ScoutAt(14),
     new ScoutExpansionsAt(80),
-    new ControlMap,
+    new ControlMap(attack = true),
     new Trigger(
       new UnitsAtLeast(1, UnitMatchType(Terran.Wraith), complete = true),
       new Attack

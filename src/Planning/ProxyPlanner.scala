@@ -6,24 +6,23 @@ import Lifecycle.With
 object ProxyPlanner {
   
   def proxyAutomaticAggressive: Option[Zone] = {
-    if (With.geography.startLocations.size > 2) proxyMiddle else proxyEnemyNatural
+    proxyEnemyNatural.orElse(proxyMiddle)
   }
   
   def proxyAutomaticSneaky: Option[Zone] = {
-    if (With.geography.startLocations.size > 2) proxyMiddle else proxyOutsideEnemyNatural
+    proxyOutsideEnemyNatural.orElse(proxyMiddle)
   }
   
   def proxyAutomaticHatchery: Option[Zone] = {
-    if (With.geography.startLocations.size == 2) {
-      proxyEnemyNatural
-    }
-    else {
-      proxyMiddleBase
-    }
+    proxyEnemyNatural.orElse(proxyMiddleBase)
+  }
+  
+  def proxyEnemyMain: Option[Zone] = {
+    With.intelligence.enemyMain.map(_.zone)
   }
   
   def proxyEnemyNatural: Option[Zone] = {
-    With.geography.bases.find(_.isNaturalOf.exists( ! _.owner.isUs)).map(_.zone)
+    With.intelligence.enemyNatural.map(_.zone)
   }
   
   def proxyOutsideEnemyNatural: Option[Zone] = {

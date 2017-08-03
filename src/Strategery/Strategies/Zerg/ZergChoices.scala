@@ -7,8 +7,8 @@ object ZergChoices {
   
   val overall: Iterable[Strategy] = Vector(
     Zerg4PoolAllIn,
-    Zerg9Hatch9PoolProxyAllInZerglings,
-    Zerg9Hatch9PoolProxyAllInHydras,
+    ProxyHatchZerglings,
+    ProxyHatchHydras,
     Zerg2HatchMutaAllIn,
     Zerg3HatchHydra)
 }

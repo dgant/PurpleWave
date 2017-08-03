@@ -17,17 +17,35 @@ object Yamato extends Action {
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {
+  
+    def valueTarget(target: UnitInfo): Double = {
+      val baseValue =
+        if ( ! target.isEnemy)
+          0.0
+        else if (target.unitClass.gasPrice >= 100)
+          1.0
+        else if (target.canAttack(unit) && target.pixelRangeAgainstFromCenter(unit) > unit.pixelRangeAgainstFromCenter(target))
+          1.0
+        else
+          0.0
+      
+      val yamatoDamage    = 260.0
+      val castTime        = 72.0
+      lazy val presumedHp = target.totalHealth - target.matchups.dpfReceivingDiffused * castTime
+      lazy val utility    = MicroValue.valuePerDamage(target) * Math.min(yamatoDamage, presumedHp)
+      
+      val output = baseValue * utility
+      output
+    }
     
     val target = TargetSingle.chooseTarget(
       unit,
       32.0 * 14.0,
-      unit.subjectiveValue / 3.0,
+      0.0,
       valueTarget)
     
     target.foreach(With.commander.useTechOnUnit(unit, Terran.Yamato, _))
   }
   
-  private def valueTarget(target: UnitInfo): Double = {
-    MicroValue.valuePerDamage(target) * Math.min(260.0, target.totalHealth) * (if (target.isEnemy) 1.0 else -1.0)
-  }
+  
 }

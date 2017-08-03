@@ -111,16 +111,17 @@ class Gather extends Plan {
         safeGas.size * 3,
         allWorkers.size / 3,
         if (haveEnoughGas) 0 else 200)
-        .min
+      .min
     else
       Vector(
         safeGas.size * 3,
         allWorkers.size / 2,
-        if(haveEnoughGas) 0 else 300).min
+        if(haveEnoughGas) 0 else 300)
+      .min
   }
   
   private def decideIdealWorkerDistribution() {
-    haveEnoughGas       = With.self.gas >= Math.max(200, With.self.minerals)
+    haveEnoughGas       = With.self.gas >= Math.max(With.blackboard.gasBankSoftLimit, Math.min(With.blackboard.gasBankHardLimit, With.self.minerals))
     workersForGas       = gasWorkers
     workersForMinerals  = allWorkers.size - workersForGas
     workersPerGas       = if (safeGas.isEmpty) 0 else workersForGas.toDouble / safeGas.size
@@ -142,8 +143,8 @@ class Gather extends Plan {
   
     if (
       With.framesSince(lastFrameUnassigning) > 24 * 5 || (
-        With.framesSince(lastFrameUnassigning) > 24 &&
-        With.units.ours.exists(u =>  u.unitClass.isGas && With.framesSince(u.frameDiscovered) < 48)))
+      With.framesSince(lastFrameUnassigning) > 24 &&
+      With.units.ours.exists(u =>  u.unitClass.isGas && With.framesSince(u.frameDiscovered) < 48)))
       {
         unassignSupersaturatingWorkers()
       }

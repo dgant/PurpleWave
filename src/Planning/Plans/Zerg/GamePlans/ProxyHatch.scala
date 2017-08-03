@@ -12,7 +12,7 @@ import Planning.Plans.Information.Employ
 import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
-import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
+import Planning.Plans.Macro.Expanding.BuildGasPumps
 import Planning.Plans.Macro.Milestones.UnitsAtLeast
 import Planning.Plans.Scouting.ScoutAt
 import Planning.{Plan, ProxyPlanner}
@@ -34,7 +34,7 @@ class ProxyHatch extends Parallel {
     placementProfile  = Some(PlacementProfiles.proxyCannon))
   children.set(Vector(
     new Plan { override def onUpdate(): Unit = {
-      With.blackboard.gasBankSoftLimit = if (With.units.ours.exists(_.is(Zerg.Lair))) 400 else 75
+      With.blackboard.gasBankSoftLimit = if (With.units.ours.exists(_.is(Zerg.Lair))) 400 else 100
       With.blackboard.gasBankHardLimit = With.blackboard.gasBankSoftLimit
     }},
     new ProposePlacement { override lazy val blueprints = Vector(new Blueprint(this,
@@ -69,8 +69,7 @@ class ProxyHatch extends Parallel {
           new Build(
             RequestAtLeast(2, Zerg.Hatchery),
             RequestAtLeast(1, Zerg.SpawningPool),
-            RequestAtLeast(11, Zerg.Drone),
-            RequestAtLeast(1, Zerg.Extractor), //We get it a bit earlier than required to overcome a bug in which we refuse to gather gas after the second hatch has spawned
+            RequestAtLeast(1, Zerg.Extractor),
             RequestAtLeast(12, Zerg.Drone))),
         new Employ(ProxyHatchZerglings,
           new Build(
@@ -80,7 +79,8 @@ class ProxyHatch extends Parallel {
           new Build(
             RequestAtLeast(2, Zerg.Hatchery),
             RequestAtLeast(12, Zerg.Drone),
-            RequestAtLeast(1, Zerg.SpawningPool))))),
+            RequestAtLeast(1, Zerg.SpawningPool),
+            RequestAtLeast(14, Zerg.Drone))))),
   
     new RequireSufficientSupply,
   
@@ -99,22 +99,22 @@ class ProxyHatch extends Parallel {
   
     new Employ(ProxyHatchSunkens,
       new Parallel(
-        new TrainContinuously(Zerg.Zergling),
         new Trigger(
           new UnitsAtLeast(2, UnitMatchType(Zerg.Hatchery), complete = true),
           initialAfter = new Trigger(
             new WeHaveEnoughSunkens,
             initialBefore = new Parallel(
               new TrainContinuously(Zerg.SunkenColony),
+              new TrainContinuously(Zerg.Zergling),
               new TrainContinuously(Zerg.CreepColony, 2)),
             initialAfter = new Parallel(
+              new TrainContinuously(Zerg.Mutalisk),
               new TrainWorkersContinuously,
               new BuildGasPumps,
               new Build(RequestAtLeast(1, Zerg.Lair)),
-              new RequireMiningBases(3),
               new Build(RequestAtLeast(1, Zerg.Spire)),
-              new TrainContinuously(Zerg.Mutalisk)
-          ))))),
+              new TrainContinuously(Zerg.Hatchery, 8)
+            ))))),
       
     new If(
       new Check(() => ProxyPlanner.proxyEnemyNatural.isEmpty),

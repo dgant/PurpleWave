@@ -10,6 +10,7 @@ import Strategery.Strategies.Terran.Global._
 import Strategery.Strategies.Zerg.Global.{ProxyHatchHydras, ProxyHatchSunkens, ProxyHatchZerglings, Zerg4PoolAllIn}
 
 class EmptyPlaybook {
+  
   lazy val forced   : Seq[Strategy] = Seq.empty
   lazy val disabled : Seq[Strategy] = Seq.empty
   
@@ -17,7 +18,6 @@ class EmptyPlaybook {
 }
 
 object StrategyGroups {
-  val none = Vector[Strategy]()
   
   val cheese = Vector[Strategy](
     WorkerRush2StartLocations,
@@ -54,7 +54,7 @@ object StrategyGroups {
 
 class TestingPlaybook extends EmptyPlaybook {
   
-  val strategyToTest = ProxyHatchSunkens
+  val strategyToTest = ProxyHatchHydras
   
   override lazy val forced: Seq[Strategy] = Seq(strategyToTest)
 }

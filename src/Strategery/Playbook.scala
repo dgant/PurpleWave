@@ -15,9 +15,9 @@ object Playbook {
   // Strategies to demand or disable //
   /////////////////////////////////////
   
-  lazy val forced = none
+  lazy val forced = List(Proxy5RaxAllIn)
   
-  lazy val disabled = cheese
+  lazy val disabled = none
   
   //////////////////////////
   // Groups of strategies //

@@ -16,7 +16,7 @@ object ShowUnitsFriendly extends View {
     if ( ! With.viewport.contains(agent.unit.pixelCenter)) return
     if ( ! agent.unit.unitClass.orderable) return
     
-    val showClient  : Boolean = false
+    val showClient  : Boolean = true
     val showAction  : Boolean = true
     val showCommand : Boolean = false
     val showOrder   : Boolean = false

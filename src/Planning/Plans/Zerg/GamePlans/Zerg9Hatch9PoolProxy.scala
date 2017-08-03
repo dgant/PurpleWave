@@ -5,7 +5,7 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.BuildRequests.RequestAtLeast
 import Planning.Composition.UnitMatchers.UnitMatchType
-import Planning.Plans.Army.Attack
+import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.Macro.Automatic.{Gather, TrainContinuously}
 import Planning.Plans.Macro.Build.ProposePlacement
@@ -26,6 +26,7 @@ class Zerg9Hatch9PoolProxy extends Parallel {
   
   children.set(Vector(
     new ProposePlacement { override lazy val blueprints = Vector(new Blueprint(this, building = Some(Zerg.Hatchery), preferZone = proxyZone)) },
+    new Aggression(2.0),
     new Build(
       RequestAtLeast(9,   Zerg.Drone),
       RequestAtLeast(2,   Zerg.Hatchery),

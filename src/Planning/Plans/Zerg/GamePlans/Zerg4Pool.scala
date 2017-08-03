@@ -4,7 +4,7 @@ import Lifecycle.With
 import Macro.BuildRequests.RequestAtLeast
 import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWorkers}
-import Planning.Plans.Army.Attack
+import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply}
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
@@ -15,7 +15,7 @@ import ProxyBwapi.Races.Zerg
 class Zerg4Pool extends Parallel {
   
   children.set(Vector(
-    
+    new Aggression(2.0),
     new If(
       new FoundEnemyBase,
       new Build(RequestAtLeast(3, Zerg.Drone)),

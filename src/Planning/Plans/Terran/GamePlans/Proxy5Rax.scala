@@ -8,7 +8,7 @@ import Macro.BuildRequests.RequestAtLeast
 import Planning.Composition.UnitCounters.UnitCountBetween
 import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWorkers}
 import Planning.Composition.UnitPreferences.UnitPreferClose
-import Planning.Plans.Army.Attack
+import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Compound._
 import Planning.Plans.Macro.Automatic.{Gather, TrainContinuously}
 import Planning.Plans.Macro.Build.ProposePlacement
@@ -32,6 +32,7 @@ class Proxy5Rax extends Parallel {
     new ProposePlacement{
       override lazy val blueprints = Vector(new Blueprint(this, building = Some(Terran.Barracks), preferZone = proxyZone, respectHarvesting = false, placementProfile = Some(PlacementProfiles.proxyBuilding)))
     },
+    new Aggression(1.5),
     new RequireMiningBases(1),
     new FirstEightMinutes(
       new Build(
@@ -43,6 +44,7 @@ class Proxy5Rax extends Parallel {
         RequestAtLeast(1, Terran.Marine))),
     new TrainContinuously(Terran.Marine),
     new TrainContinuously(Terran.SCV),
+    new FollowBuildOrder,
     new If(
       new UnitsAtLeast(1, UnitMatchType(Terran.Barracks), complete = true),
       initialWhenTrue = new Parallel(
@@ -53,9 +55,7 @@ class Proxy5Rax extends Parallel {
       ),
       initialWhenFalse = new Parallel(
         new Gather
-      )),
-    new Attack,
-    new FollowBuildOrder
-    
+      )
+    )
   ))
 }

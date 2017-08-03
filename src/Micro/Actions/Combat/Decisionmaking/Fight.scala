@@ -3,7 +3,7 @@ package Micro.Actions.Combat.Decisionmaking
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.{Cower, Sneak}
 import Micro.Actions.Combat.Spells.SpiderMine
-import Micro.Actions.Combat.Tactics.{BustBunker, Sally}
+import Micro.Actions.Combat.Tactics.{BustBunker, Sally, Spot}
 import Micro.Actions.Protoss.BeACarrier
 import Micro.Actions.Terran.{Siege, Unsiege}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -24,6 +24,7 @@ object Fight extends Action {
     Cast.consider(unit)
     BustBunker.consider(unit)
     Sally.consider(unit)
+    Spot.consider(unit)
     Sneak.consider(unit)
     if (unit.agent.shouldEngage) {
       Engage.consider(unit)

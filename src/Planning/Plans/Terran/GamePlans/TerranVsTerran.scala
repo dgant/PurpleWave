@@ -47,20 +47,26 @@ class TerranVsTerran extends Parallel {
       )),
     
     new If(new UnitsAtLeast(1, UnitMatchSiegeTank, complete = true), new RequireMiningBases(2)),
-    new If(new UnitsAtLeast(10, UnitMatchWarriors), new RequireMiningBases(3)),
-    new If(new UnitsAtLeast(20, UnitMatchWarriors), new RequireMiningBases(4)),
+    new If(new UnitsAtLeast(20, UnitMatchWarriors), new RequireMiningBases(3)),
+    new If(new UnitsAtLeast(30, UnitMatchWarriors), new RequireMiningBases(4)),
     
     new RequireSufficientSupply,
     new TrainWorkersContinuously,
     new BuildRefineries,
     
-    new If(new UnitsAtLeast(2,  UnitMatchType(Terran.SiegeTankUnsieged)),  new Build(RequestTech(Terran.SiegeMode))),
-    new If(new UnitsAtLeast(1,  UnitMatchType(Terran.Armory)),             new Build(RequestAtLeast(1, Terran.ControlTower))),
-    new If(new UnitsAtLeast(2,  UnitMatchType(Terran.Goliath)),            new Build(RequestUpgrade(Terran.GoliathAirRange))),
-    new If(new UnitsAtLeast(3,  UnitMatchType(Terran.Battlecruiser)),      new Build(RequestTech(Terran.Yamato))),
-    new If(new UnitsAtLeast(3,  UnitMatchType(Terran.Vulture)),            new Build(RequestTech(Terran.SpiderMinePlant))),
-    new If(new UnitsAtLeast(5,  UnitMatchType(Terran.Vulture)),            new Build(RequestUpgrade(Terran.VultureSpeed))),
-    new If(new UnitsAtLeast(10, UnitMatchType(Terran.Vulture)),            new Build(RequestUpgrade(Terran.MarineRange))),
+    new If(new UnitsAtLeast(2,  UnitMatchType(Terran.SiegeTankUnsieged)), new Build(RequestTech(Terran.SiegeMode))),
+    new If(new UnitsAtLeast(2,  UnitMatchType(Terran.Goliath)),           new Build(RequestUpgrade(Terran.GoliathAirRange))),
+    new If(new UnitsAtLeast(3,  UnitMatchType(Terran.Battlecruiser)),     new Build(RequestTech(Terran.Yamato))),
+    new If(new UnitsAtLeast(3,  UnitMatchType(Terran.Vulture)),           new Build(RequestTech(Terran.SpiderMinePlant))),
+    new If(new UnitsAtLeast(5,  UnitMatchType(Terran.Vulture)),           new Build(RequestUpgrade(Terran.VultureSpeed))),
+    new If(new UnitsAtLeast(10, UnitMatchType(Terran.Vulture)),           new Build(RequestUpgrade(Terran.MarineRange))),
+    new If(new UnitsAtLeast(4,  UnitMatchType(Terran.Wraith)),            new Build(RequestUpgrade(Terran.GoliathAirRange))),
+    new If(new UnitsAtLeast(1,  UnitMatchType(Terran.PhysicsLab)),        new TrainContinuously(Terran.ControlTower)),
+    new If(new UnitsAtLeast(3,  UnitMatchType(Terran.Battlecruiser)),     new UpgradeContinuously(Terran.AirDamage)),
+    new If(new UnitsAtLeast(3,  UnitMatchType(Terran.Battlecruiser)),     new UpgradeContinuously(Terran.AirArmor)),
+    new If(new UnitsAtLeast(20, UnitMatchWarriors),                       new UpgradeContinuously(Terran.MechDamage)),
+    new If(new UnitsAtLeast(30, UnitMatchWarriors),                       new Build(RequestAtLeast(2, Terran.Armory))),
+    new If(new UnitsAtLeast(30, UnitMatchWarriors),                       new UpgradeContinuously(Terran.MechArmor)),
   
     new TrainContinuously(Terran.Comsat),
     new TrainMatchingRatio(Terran.Goliath, 1, Int.MaxValue, Seq(
@@ -70,12 +76,14 @@ class TerranVsTerran extends Parallel {
     
     new TrainContinuously(Terran.Battlecruiser),
     new TrainMatchingRatio(Terran.SiegeTankUnsieged, 3, Int.MaxValue, Seq(
+      MatchingRatio(UnitMatchSiegeTank,                   1.25),
       MatchingRatio(UnitMatchType(Terran.Goliath),        0.75),
       MatchingRatio(UnitMatchType(Terran.Wraith),         0.75),
       MatchingRatio(UnitMatchType(Terran.Vulture),        0.5))),
   
     new TrainMatchingRatio(Terran.Wraith, 3, Int.MaxValue, Seq(
-      MatchingRatio(UnitMatchType(Terran.Wraith),         1.5))),
+      MatchingRatio(UnitMatchType(Terran.Wraith),         1.5),
+      MatchingRatio(UnitMatchType(Terran.Vulture),        0.25))),
     
     new TrainContinuously(Terran.Marine),
     new TrainContinuously(Terran.Vulture),
@@ -83,8 +91,12 @@ class TerranVsTerran extends Parallel {
     new OnMiningBases(2, new Build(RequestAtLeast(3, Terran.Factory), RequestAtLeast(2, Terran.Starport), RequestAtLeast(1, Terran.Armory), RequestAtLeast(5, Terran.Factory))),
     new OnMiningBases(3, new Build(RequestAtLeast(5, Terran.Factory), RequestAtLeast(1, Terran.Academy), RequestAtLeast(8, Terran.Factory))),
     new OnGasBases(2, new Build(RequestAtLeast(2, Terran.MachineShop))),
-    new OnGasBases(3, new Build(RequestAtLeast(4, Terran.MachineShop),  RequestAtLeast(1, Terran.ScienceFacility))),
-    new OnGasBases(4, new Build(RequestAtLeast(1, Terran.PhysicsLab),   RequestUpgrade(Terran.BattlecruiserEnergy), RequestAtLeast(4, Terran.Starport), RequestAtLeast(4, Terran.ControlTower))),
+    new OnGasBases(3, new Build(
+      RequestAtLeast(3, Terran.MachineShop),
+      RequestAtLeast(1, Terran.ScienceFacility),
+      RequestAtLeast(2, Terran.Starport),
+      RequestAtLeast(1, Terran.PhysicsLab),
+      RequestUpgrade(Terran.BattlecruiserEnergy))),
   
     new RequireMiningBases(2),
     new Build(
@@ -102,12 +114,13 @@ class TerranVsTerran extends Parallel {
     new RequireMiningBases(4),
     new Build(RequestAtLeast(12, Terran.Factory)),
     new RequireMiningBases(5),
+    new Build(RequestAtLeast(16, Terran.Factory)),
     
     new ScoutAt(14),
     new ScoutExpansionsAt(80),
     new ControlMap,
     new Trigger(
-      new UnitsAtLeast(3, UnitMatchSiegeTank, complete = true),
+      new UnitsAtLeast(1, UnitMatchType(Terran.Wraith), complete = true),
       new Attack
     ),
     new DefendChokes,

@@ -18,7 +18,6 @@ var requirePower               : Option[Boolean]           = None,
 var requireCreep               : Option[Boolean]           = None,
 var requireTownHallTile        : Option[Boolean]           = None,
 var requireGasTile             : Option[Boolean]           = None,
-var preferMargin               : Option[Boolean]           = None,
 var placementProfile           : Option[PlacementProfile]  = None,
 var preferredDistanceFromExit  : Option[Double]            = None,
 val requireCandidates          : Option[Iterable[Tile]]    = None,
@@ -36,7 +35,6 @@ var respectHarvesting          : Boolean                   = true) {
   requireCreep                = requireCreep                .orElse(Some(building.exists(_.requiresCreep)))
   requireTownHallTile         = requireTownHallTile         .orElse(Some(building.exists(_.isTownHall)))
   requireGasTile              = requireGasTile              .orElse(Some(building.exists(_.isRefinery)))
-  preferMargin                = preferMargin                .orElse(Some(building.exists(With.architecture.usuallyNeedsMargin)))
   preferredDistanceFromExit   = preferredDistanceFromExit   .orElse(if (building.exists(_.attacks)) building.map(_.maxAirGroundRange.toDouble) else Some(32.0 * 9.0))
   preferZone                  = preferZone                  .orElse(requireZone)
   placementProfile            = placementProfile            .orElse(Some(PlacementProfiles.default(this)))
@@ -53,13 +51,9 @@ var respectHarvesting          : Boolean                   = true) {
     (proposal.building.isEmpty || building == proposal.building)
   }
   
-  def marginTiles         : Int   = if(preferMargin.get) 1 else 0
   def relativeBuildStart  : Tile  = Tile(0, 0)
   def relativeBuildEnd    : Tile  = Tile(widthTiles.get, heightTiles.get)
-  def relativeMarginStart : Tile  = relativeBuildStart.subtract(marginTiles, marginTiles)
-  def relativeMarginEnd   : Tile  = relativeBuildEnd.add(marginTiles, marginTiles)
   def relativeBuildArea   : TileRectangle = TileRectangle(relativeBuildStart, relativeBuildEnd)
-  def relativeMarginArea  : TileRectangle = TileRectangle(relativeMarginStart, relativeMarginEnd)
   
   def accepts(tile: Tile): Boolean = {
     
@@ -99,12 +93,7 @@ var respectHarvesting          : Boolean                   = true) {
       return legal && ! blocked
     }
     
-    val marginArea      = relativeMarginArea.add(tile)
-    lazy val buildArea  = relativeBuildArea.add(tile)
-  
-    def violatesMargin(nextTile: Tile): Boolean = {
-      false
-    }
+    val buildArea = relativeBuildArea.add(tile)
   
     def violatesBuildArea(nextTile: Tile): Boolean = {
       thisZone.perimeter.contains(nextTile)                     ||
@@ -113,11 +102,7 @@ var respectHarvesting          : Boolean                   = true) {
       (respectHarvesting  && With.architecture.isHarvestingArea(nextTile))
     }
     
-    val violator = marginArea.tiles.find(nextTile =>
-      if (buildArea.contains(nextTile))
-        violatesBuildArea(nextTile)
-      else
-        violatesMargin(nextTile))
+    val violator = buildArea.tiles.find(nextTile => violatesBuildArea(nextTile))
     
     violator.isEmpty
   }
@@ -127,7 +112,6 @@ var respectHarvesting          : Boolean                   = true) {
     building.map(_.toString + " ").getOrElse("") +
     placementProfile.toString + " " +
     widthTiles + "x" + heightTiles + " " +
-    (if (preferMargin.get) (widthTiles.get + 2 * marginTiles) + "x" + (heightTiles.get + 2 * marginTiles) + " " else "") +
     (if (powers.get)              "(Powers) "     else "") +
     (if (requirePower.get)        "(Powered) "    else "") +
     (if (requireTownHallTile.get) "(Town hall) "  else "") +

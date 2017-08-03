@@ -157,11 +157,7 @@ class Architecture {
       tile.add(placement.blueprint.relativeBuildStart),
       tile.add(placement.blueprint.relativeBuildEnd))
     
-    val margin = TileRectangle(
-      tile.add(placement.blueprint.relativeMarginStart),
-      tile.add(placement.blueprint.relativeMarginEnd))
-    
-    unbuildable     ++= margin.tiles
+    unbuildable     ++= area.tiles
     unwalkable      ++= area.tiles
     untownhallable  ++= area.tiles
     ungassable      ++= area.tiles
@@ -173,7 +169,7 @@ class Architecture {
     updatePaths() //Invalidate any paths which no longer work
     
     if (ShowArchitecturePlacements.inUse) {
-      exclusions += Exclusion(placement.blueprint.toString, margin)
+      exclusions += Exclusion(placement.blueprint.toString, area)
     }
   }
   

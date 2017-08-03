@@ -257,14 +257,8 @@ class ProtossVsProtoss extends Parallel {
     new OnMiningBases(2, new Build(RequestUpgrade(Protoss.ZealotSpeed))),
     
     new TrainContinuously(Protoss.Carrier),
-    new If(
-      new EnemyHasShown(Protoss.DarkTemplar),
-      new Parallel(
-        new TrainContinuously(Protoss.Observer, 2),
-        new BuildReaversOrTemplar,
-      new Parallel(
-        new BuildReaversOrTemplar,
-        new TrainContinuously(Protoss.Observer, 1)))),
+    new TrainMatchingRatio(Protoss.Observer, 2, Seq(MatchingRatio(UnitMatchType(Protoss.DarkTemplar), 2.0))),
+    new TrainContinuously(Protoss.Reaver, 4),
     new BuildDragoonsOrZealots,
     
     // Midgame
@@ -316,12 +310,12 @@ class ProtossVsProtoss extends Parallel {
           new Build(
             RequestAtLeast(5, Protoss.Gateway),
             RequestAtLeast(1, Protoss.Observatory),
-            RequestAtLeast(1, Protoss.CitadelOfAdun))),
+            RequestAtLeast(1, Protoss.CitadelOfAdun),
+            RequestAtLeast(8, Protoss.Gateway))),
         new OnMiningBases(3,
           new Parallel(
             new UpgradeContinuously(Protoss.GroundDamage),
             new Build(
-              RequestAtLeast(7, Protoss.Gateway),
               RequestAtLeast(1, Protoss.Forge),
               RequestAtLeast(1, Protoss.TemplarArchives),
               RequestAtLeast(2, Protoss.Forge),

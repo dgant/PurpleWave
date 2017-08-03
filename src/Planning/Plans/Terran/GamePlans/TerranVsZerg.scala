@@ -21,9 +21,9 @@ class TerranVsZerg extends Parallel {
     new RequireMiningBases(1),
     new ProposePlacement {
       override lazy val blueprints: Iterable[Blueprint] = Vector(
-        new Blueprint(this, preferMargin = Some(false), building = Some(Terran.SupplyDepot),  placementProfile = Some(PlacementProfiles.hugTownHall)),
-        new Blueprint(this, preferMargin = Some(false), building = Some(Terran.Barracks),     placementProfile = Some(PlacementProfiles.hugTownHall)),
-        new Blueprint(this, preferMargin = Some(false), building = Some(Terran.Barracks),     placementProfile = Some(PlacementProfiles.hugTownHall))
+        new Blueprint(this, building = Some(Terran.SupplyDepot),  placementProfile = Some(PlacementProfiles.hugTownHall)),
+        new Blueprint(this, building = Some(Terran.Barracks),     placementProfile = Some(PlacementProfiles.hugTownHall)),
+        new Blueprint(this, building = Some(Terran.Barracks),     placementProfile = Some(PlacementProfiles.hugTownHall))
       )
     },
     new FirstEightMinutes(

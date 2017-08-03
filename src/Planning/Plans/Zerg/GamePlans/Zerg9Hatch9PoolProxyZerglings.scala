@@ -5,7 +5,7 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.BuildRequests.RequestAtLeast
 import Planning.Composition.UnitMatchers.UnitMatchType
-import Planning.Plans.Army.{Aggression, Attack}
+import Planning.Plans.Army.{Aggression, AllIn, Attack}
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.Macro.Automatic.{Gather, TrainContinuously}
 import Planning.Plans.Macro.Build.ProposePlacement
@@ -15,7 +15,7 @@ import Planning.Plans.Scouting.Scout
 import Planning.ProxyPlanner
 import ProxyBwapi.Races.Zerg
 
-class Zerg9Hatch9PoolProxy extends Parallel {
+class Zerg9Hatch9PoolProxyZerglings extends Parallel {
   
   override def onUpdate() {
     With.blackboard.maxFramesToSendAdvanceBuilder = Int.MaxValue
@@ -38,6 +38,7 @@ class Zerg9Hatch9PoolProxy extends Parallel {
       RequestAtLeast(34,  Zerg.Zergling),
       RequestAtLeast(4,   Zerg.Overlord),
       RequestAtLeast(50,  Zerg.Zergling)),
+    new AllIn(new UnitsAtLeast(30, UnitMatchType(Zerg.Zergling))),
     new TrainContinuously(Zerg.Hatchery),
     new If(
       new UnitsAtLeast(1, UnitMatchType(Zerg.SpawningPool), complete = false),

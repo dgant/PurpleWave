@@ -4,9 +4,9 @@ import Lifecycle.With
 import Macro.BuildRequests.RequestAtLeast
 import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWorkers}
-import Planning.Plans.Army.{Aggression, Attack}
+import Planning.Plans.Army.{Aggression, AllIn, Attack}
 import Planning.Plans.Compound.{If, _}
-import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply}
+import Planning.Plans.Macro.Automatic.{AddSupplyWhenSupplyBlocked, Gather}
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
 import Planning.Plans.Macro.Milestones.UnitsAtLeast
 import Planning.Plans.Scouting.FoundEnemyBase
@@ -31,11 +31,10 @@ class Zerg4Pool extends Parallel {
         attackers.get.unitMatcher.set(UnitMatchWorkers)
       }),
     new Build(RequestAtLeast(12,  Zerg.Zergling)),
+    new AllIn(new UnitsAtLeast(12, UnitMatchType(Zerg.Zergling))),
     new If(
-      new Check(() => With.self.supplyUsed == With.self.supplyTotal && With.units.ours.count(_.is(Zerg.Larva)) >= 2
-      ),
-      new RequireSufficientSupply
-    ),
+      new Check(() => With.units.ours.count(_.is(Zerg.Larva)) >= 2),
+      new AddSupplyWhenSupplyBlocked),
     new Attack,
     new FollowBuildOrder,
     new Gather

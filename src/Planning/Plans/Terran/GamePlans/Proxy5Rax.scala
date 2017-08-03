@@ -21,7 +21,7 @@ import ProxyBwapi.Races.Terran
 
 class Proxy5Rax extends Parallel {
   
-  lazy val proxyZone: Option[Zone] = ProxyPlanner.proxyAutomatic
+  lazy val proxyZone: Option[Zone] = ProxyPlanner.proxyAutomaticAggressive
   
   override def onUpdate(): Unit = {
     With.blackboard.maxFramesToSendAdvanceBuilder = Int.MaxValue

@@ -1,5 +1,6 @@
-package Information.StrategyDetection
+package Information.StrategyDetection.Generic
 
+import Information.StrategyDetection.Fingerprint
 import Lifecycle.With
 import ProxyBwapi.UnitClass.UnitClass
 

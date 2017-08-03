@@ -21,7 +21,7 @@ import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 
 class Proxy2Gate extends Parallel {
   
-  lazy val proxyZone: Option[Zone] = ProxyPlanner.proxyAutomatic
+  lazy val proxyZone: Option[Zone] = ProxyPlanner.proxyAutomaticSneaky
   
   override def onUpdate(): Unit = {
     With.blackboard.maxFramesToSendAdvanceBuilder = Int.MaxValue

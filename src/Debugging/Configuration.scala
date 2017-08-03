@@ -68,6 +68,7 @@ class Configuration {
   // Performance //
   /////////////////
   
+  var buildingPlacementMaxTilesToCheck    = 8000
   var buildingPlacementMaxTilesToEvaluate = 1000
   var buildingPlacementBatchSize          = 300
   var buildingPlacementBatchingStartFrame = 24 * 60 * 4

@@ -65,7 +65,7 @@ class TerranVsTerran extends Parallel {
     new If(new UnitsAtLeast(3,  UnitMatchType(Terran.Battlecruiser)),     new UpgradeContinuously(Terran.AirDamage)),
     new If(new UnitsAtLeast(3,  UnitMatchType(Terran.Battlecruiser)),     new UpgradeContinuously(Terran.AirArmor)),
     new If(new UnitsAtLeast(20, UnitMatchWarriors),                       new UpgradeContinuously(Terran.MechDamage)),
-    new If(new UnitsAtLeast(30, UnitMatchWarriors),                       new Build(RequestAtLeast(2, Terran.Armory))),
+    new If(new UnitsAtLeast(30, UnitMatchWarriors),                       new Build(RequestAtLeast(1, Terran.ScienceFacility), RequestAtLeast(2, Terran.Armory))),
     new If(new UnitsAtLeast(30, UnitMatchWarriors),                       new UpgradeContinuously(Terran.MechArmor)),
   
     new TrainContinuously(Terran.Comsat),

@@ -21,7 +21,7 @@ import ProxyBwapi.Races.Terran
 
 class ProxyBBS extends Parallel {
   
-  def proxyZone: Option[Zone] = ProxyPlanner.proxyAutomatic
+  def proxyZone: Option[Zone] = ProxyPlanner.proxyAutomaticSneaky
   
   
   

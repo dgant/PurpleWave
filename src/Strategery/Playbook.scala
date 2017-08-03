@@ -7,7 +7,7 @@ import Strategery.Strategies.Protoss.PvT._
 import Strategery.Strategies.Protoss.PvZ._
 import Strategery.Strategies.Strategy
 import Strategery.Strategies.Terran.Global._
-import Strategery.Strategies.Zerg.Global.{Zerg4PoolAllIn, Zerg9Hatch9PoolProxyAllIn}
+import Strategery.Strategies.Zerg.Global.{Zerg4PoolAllIn, Zerg9Hatch9PoolProxyAllInZerglings}
 
 object Playbook {
   
@@ -35,7 +35,7 @@ object Playbook {
     Proxy5RaxAllIn,
     MassMarineAllIn,
     Zerg4PoolAllIn,
-    Zerg9Hatch9PoolProxyAllIn
+    Zerg9Hatch9PoolProxyAllInZerglings
   )
   
   val tickles = Vector[Strategy](

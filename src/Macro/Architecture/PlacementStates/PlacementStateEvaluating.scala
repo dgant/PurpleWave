@@ -17,54 +17,49 @@ class PlacementStateEvaluating(blueprint: Blueprint) extends PlacementState {
   private var candidatesFiltered    : Option[ArrayBuffer[Tile]] = None
   private var nextFilteringIndex    : Int                       = 0
   private var nextEvaluationIndex   : Int                       = 0
-  private val evaluations       = new mutable.HashMap[Tile, Iterable[PlacementHeuristicEvaluation]]
+  private val evaluationDebugging       = new mutable.HashMap[Tile, Iterable[PlacementHeuristicEvaluation]]
   private val evaluationValues  = new mutable.HashMap[Tile, Double]
   
   override def step() {
-    if (candidatesUnfiltered.isEmpty) {
-      // Figure out which tiles to evaluate
+    if (stillSurveying) {
       val sources = Surveyor.candidates(blueprint)
       candidatesUnfiltered  = Some(new ArrayBuffer[Tile])
       candidatesFiltered    = Some(new ArrayBuffer[Tile])
-      sources.foreach(source => {
-        if (candidatesUnfiltered.size < With.configuration.buildingPlacementMaxTilesToEvaluate) {
-          candidatesUnfiltered.get ++= source.tiles(blueprint)
-        }
-      })
-      val candidates = candidatesUnfiltered.get.take(With.configuration.buildingPlacementMaxTilesToEvaluate)
-      candidatesUnfiltered = Some(new ArrayBuffer[Tile])
-      candidatesUnfiltered.get ++= candidates
+      candidatesUnfiltered  ++= sources.flatMap(_.tiles(blueprint))
     }
     else if (stillFiltering) {
+      
       // Filter them (in batches)
-      var evaluationCount = 0
-      while (stillFiltering && (
-        evaluationCount < With.configuration.buildingPlacementBatchSize
-          || With.frame < With.configuration.buildingPlacementBatchingStartFrame)) {
-        evaluationCount += 1
-        val nextCandidate = candidatesUnfiltered.get(nextFilteringIndex)
-        if (Architect.canBuild(blueprint, nextCandidate, recheckPathing = true)) {
-          candidatesFiltered.get += nextCandidate
+      var filterCount = 0
+      val filterCountMax = batchSize
+      while (stillFiltering && filterCount < filterCountMax) {
+        
+        val candidate = candidatesUnfiltered.get(nextFilteringIndex)
+        if (Architect.canBuild(blueprint, candidate, recheckPathing = true)) {
+          candidatesFiltered.get += candidate
         }
-        nextFilteringIndex += 1
+        
+        filterCount         += 1
+        nextFilteringIndex  += 1
       }
     }
     else if (stillEvaluating) {
       // Evaluate them (in batches)
       var evaluationCount = 0
-      while (stillEvaluating && (
-        evaluationCount < With.configuration.buildingPlacementBatchSize
-        || With.frame < With.configuration.buildingPlacementBatchingStartFrame)) {
-        evaluationCount += 1
+      val evaluationCountMax = batchSize
+      while (stillEvaluating && evaluationCount < evaluationCountMax) {
+        
         val candidate = candidatesFiltered.get(nextEvaluationIndex)
         if (ShowArchitectureHeuristics.inUse) {
-          // This does all the math twice! It's slow and only useful for visualizations so we avoid it when possible.
-          evaluations(candidate) = EvaluatePlacements.evaluate(blueprint, candidate)
+          evaluationDebugging(candidate) = EvaluatePlacements.evaluate(blueprint, candidate)
         }
+        
         evaluationValues(candidate) = HeuristicMathMultiplicative.resolve(
           blueprint,
           blueprint.placementProfile.get.weightedHeuristics,
           candidate)
+        
+        evaluationCount     += 1
         nextEvaluationIndex += 1
       }
     }
@@ -75,7 +70,7 @@ class PlacementStateEvaluating(blueprint: Blueprint) extends PlacementState {
       val placement = Placement(
         blueprint,
         best,
-        evaluations.values.flatten,
+        evaluationDebugging.values.flatten,
         evaluationValuesMap,
         With.frame)
       With.groundskeeper.updatePlacement(blueprint, placement)
@@ -83,6 +78,13 @@ class PlacementStateEvaluating(blueprint: Blueprint) extends PlacementState {
     }
   }
   
-  private def stillFiltering  : Boolean = candidatesUnfiltered.exists(nextFilteringIndex < _.length)
+  private def batchSize: Int =
+    if (With.frame < With.configuration.buildingPlacementBatchingStartFrame)
+      Int.MaxValue
+    else
+      With.configuration.buildingPlacementBatchSize
+  
+  private def stillSurveying  : Boolean = candidatesUnfiltered.isEmpty
+  private def stillFiltering  : Boolean = candidatesUnfiltered.exists(nextFilteringIndex < _.length) && candidatesFiltered.size < With.configuration.buildingPlacementMaxTilesToEvaluate
   private def stillEvaluating : Boolean = candidatesFiltered.exists(nextEvaluationIndex < _.length)
 }

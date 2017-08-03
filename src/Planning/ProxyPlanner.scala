@@ -5,7 +5,11 @@ import Lifecycle.With
 
 object ProxyPlanner {
   
-  def proxyAutomatic: Option[Zone] = {
+  def proxyAutomaticAggressive: Option[Zone] = {
+    if (With.geography.startLocations.size > 2) proxyMiddle else proxyEnemyNatural
+  }
+  
+  def proxyAutomaticSneaky: Option[Zone] = {
     if (With.geography.startLocations.size > 2) proxyMiddle else proxyOutsideEnemyNatural
   }
   

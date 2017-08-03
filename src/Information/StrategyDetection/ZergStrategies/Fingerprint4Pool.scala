@@ -1,5 +1,6 @@
 package Information.StrategyDetection.ZergStrategies
 
+import Information.StrategyDetection.Generic.{FingerprintArrivesBy, FingerprintCompleteBy, FingerprintOr, GameTime}
 import Information.StrategyDetection._
 import ProxyBwapi.Races.Zerg
 

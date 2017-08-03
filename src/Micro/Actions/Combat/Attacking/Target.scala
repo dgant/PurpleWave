@@ -14,7 +14,7 @@ object Target extends Action {
   
   override protected def perform(unit: FriendlyUnitInfo) {
     TargetRelevant.delegate(unit)
-    if ( ! unit.pixelCenter.zone.owner.isNeutral && unit.matchups.threatsInRange.isEmpty) {
+    if (unit.pixelCenter.zone.bases.exists( ! _.owner.isNeutral) && unit.matchups.threatsInRange.isEmpty) {
       TargetAnything.delegate(unit)
     }
   }

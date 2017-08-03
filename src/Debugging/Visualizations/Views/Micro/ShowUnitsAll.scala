@@ -23,6 +23,9 @@ object ShowUnitsAll extends View {
     val width                 = Math.min(48, Math.max(18, (unit.unitClass.maxTotalHealth + unit.defensiveMatrixPoints) / 5))
     val marginTopHp           = 3
     val denominator           = unit.unitClass.maxTotalHealth + (if (unit.defensiveMatrixPoints > 0) width * 250 else 0)
+    
+    if (denominator == 0) return
+    
     val widthHpMax            = width * unit.unitClass.maxHitPoints             / denominator
     val widthShMax            = width * unit.unitClass.maxShields               / denominator
     val widthDmMax            = if (unit.defensiveMatrixPoints > 0) width * 250 / denominator else 0

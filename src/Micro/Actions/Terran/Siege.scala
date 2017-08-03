@@ -7,6 +7,8 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Siege extends Action {
   
+  val spread: Double = 32.0 * 5.0
+  
   override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.is(Terran.SiegeTankUnsieged) && unit.player.hasTech(Terran.SiegeMode)
   }
@@ -20,9 +22,11 @@ object Siege extends Action {
       return
     }
     
+    val siegedRangeFromCenter = 32.0 * 12.0 + unit.unitClass.radialHypotenuse
+    
     var siege = false
-    lazy val atDestination        = unit.agent.toTravel.exists(_.pixelDistanceFast(unit.pixelCenter) < 32.0)
-    lazy val targetsExist         = unit.matchups.targets.exists(t => t.topSpeed > 0 && t.pixelDistanceFast(unit) <= 32.0 * 13.0)
+    lazy val atDestination        = unit.agent.toForm.exists(_.pixelDistanceFast(unit.pixelCenter) < 32.0)
+    lazy val targetsExist         = unit.matchups.targets.exists(t => t.topSpeed > 0 && t.pixelDistanceFast(unit) <= siegedRangeFromCenter)
     lazy val otherSiegeTanks      = unit.matchups.allies.filter(_.unitClass.isSiegeTank)
     lazy val closerSiegeTanks     = otherSiegeTanks.filter(_.pixelDistanceTravelling(unit.agent.toTravel.get) < unit.pixelDistanceTravelling(unit.agent.toTravel.get))
     lazy val isClosestTankInPush  = unit.agent.toTravel.isDefined && otherSiegeTanks.nonEmpty && closerSiegeTanks.isEmpty

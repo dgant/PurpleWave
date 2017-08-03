@@ -30,7 +30,7 @@ class Agency {
     
     if ( ! With.latency.isLastFrameOfTurn && finishedExecutingLastTime) return
   
-    agents.keys.filterNot(_.alive).foreach(agents.remove)
+    agents.keys.filterNot(unit => unit.alive && (unit.complete || unit.unitClass.isBuilding)).foreach(agents.remove)
     
     if (agentQueue.isEmpty) {
       agentQueue ++= agents.values.toVector.sortBy(_.lastFrame)

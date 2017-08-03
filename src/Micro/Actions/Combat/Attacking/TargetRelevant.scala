@@ -15,13 +15,15 @@ object TargetRelevant extends Action {
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {
+    
     val targets = unit.matchups.targets.filter(target =>
       unit.inRangeToAttackFast(target)
         || target.constructing
         || target.gathering
         || target.repairing
         || With.framesSince(target.lastAttackStartFrame) < 48
-        || target.topSpeed < unit.topSpeed * 0.75)
+        || target.topSpeed < unit.topSpeedChasing)
+    
     unit.agent.toAttack = EvaluateTargets.best(unit, targets)
   }
 }

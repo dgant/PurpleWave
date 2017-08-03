@@ -25,12 +25,14 @@ class Visualization {
     ShowClock,
     ShowStrategy,
     ShowBattles,
-    ShowUnitsFriendly
+    ShowUnitsAll,
+    ShowUnitsFriendly,
+    ShowUnitsForeign
   )
   
   var enabled   = true
   var screen    = true
-  var map       = false
+  var map       = true
   var happy     = false
   var textOnly  = false
   

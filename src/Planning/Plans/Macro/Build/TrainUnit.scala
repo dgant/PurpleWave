@@ -1,15 +1,16 @@
 package Planning.Plans.Macro.Build
 
 import Debugging.Visualizations.Rendering.DrawMap
-import Planning.Composition.UnitCounters.UnitCountOne
-import Planning.Composition.UnitMatchers.{UnitMatchAnd, UnitMatchHasAddon, UnitMatchType}
-import Planning.Plan
-import Planning.Composition.ResourceLocks.{LockCurrencyForUnit, LockUnits}
-import ProxyBwapi.UnitClass.UnitClass
-import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Lifecycle.With
 import Macro.Scheduling.Project
 import Micro.Agency.Intention
+import Planning.Composition.ResourceLocks.{LockCurrencyForUnit, LockUnits}
+import Planning.Composition.UnitCounters.UnitCountOne
+import Planning.Composition.UnitMatchers.{UnitMatchAnd, UnitMatchHasAddon, UnitMatchType}
+import Planning.Composition.UnitPreferences.UnitPreferNoAddon
+import Planning.Plan
+import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 class TrainUnit(val traineeClass: UnitClass) extends Plan {
   
@@ -20,15 +21,20 @@ class TrainUnit(val traineeClass: UnitClass) extends Plan {
   val addonsRequired  = traineeClass.buildUnitsEnabling.find(b => b.isAddon && b.whatBuilds._1 == trainerClass)
   val matchTrainer    = UnitMatchType(trainerClass)
   val trainerMatcher  =
-    if(addonsRequired.isDefined)
+    if (addonsRequired.isDefined)
       UnitMatchAnd(matchTrainer, UnitMatchHasAddon(addonsRequired.head))
     else
       matchTrainer
-  
-  val trainerLock     = new LockUnits {
+    
+  val trainerLock = new LockUnits {
     unitMatcher.set(trainerMatcher)
     unitCounter.set(UnitCountOne)
   }
+  
+  if (addonsRequired.isEmpty) {
+    trainerLock.unitPreference.set(UnitPreferNoAddon)
+  }
+  
   
   private var trainer: Option[FriendlyUnitInfo] = None
   private var trainee: Option[FriendlyUnitInfo] = None

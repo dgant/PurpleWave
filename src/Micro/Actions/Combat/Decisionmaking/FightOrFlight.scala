@@ -7,7 +7,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 object FightOrFlight extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    true
+    unit.canMove
   }
   
   override def perform(unit: FriendlyUnitInfo) {
@@ -32,8 +32,9 @@ object FightOrFlight extends Action {
     unit.agent.desireTotal       = unit.agent.desireTeam + unit.agent.desireIndividual // Vanity metric, for now
     
     // Hysteresis
+    val caution = 0.3
     val hysteresis = 0.0
-    val desireRequiredToEngage = if (unit.agent.shouldEngage) 0.0 else hysteresis
+    val desireRequiredToEngage = caution + (if (unit.agent.shouldEngage) 0.0 else hysteresis)
     
     unit.agent.shouldEngage =
       unit.agent.canFight && (

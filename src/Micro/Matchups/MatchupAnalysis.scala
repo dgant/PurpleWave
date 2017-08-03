@@ -7,9 +7,7 @@ import ProxyBwapi.UnitInfo.UnitInfo
 
 import scala.collection.mutable
 
-case class MatchupAnalysis(
-                            me: UnitInfo,
-                            conditions: MatchupConditions) {
+case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
  
   def this(us: UnitInfo) {
     this(us, MatchupConditions(us.pixelCenter, 0))

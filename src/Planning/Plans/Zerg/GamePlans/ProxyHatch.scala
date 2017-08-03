@@ -79,8 +79,8 @@ class ProxyHatch extends Parallel {
         new Employ(ProxyHatchSunkens,
           new Build(
             RequestAtLeast(2, Zerg.Hatchery),
-            RequestAtLeast(1, Zerg.SpawningPool),
-            RequestAtLeast(12, Zerg.Drone))))),
+            RequestAtLeast(12, Zerg.Drone),
+            RequestAtLeast(1, Zerg.SpawningPool))))),
   
     new RequireSufficientSupply,
   
@@ -98,21 +98,23 @@ class ProxyHatch extends Parallel {
           new TrainContinuously(Zerg.Zergling)))),
   
     new Employ(ProxyHatchSunkens,
-      new Trigger(
-        new UnitsAtLeast(2, UnitMatchType(Zerg.Hatchery), complete = true),
-        initialAfter = new Trigger(
-          new WeHaveEnoughSunkens,
-          initialBefore = new Parallel(
-            new TrainContinuously(Zerg.SunkenColony),
-            new TrainContinuously(Zerg.CreepColony, 2)),
-          initialAfter = new Parallel(
-            new TrainWorkersContinuously,
-            new BuildGasPumps,
-            new Build(RequestAtLeast(1, Zerg.Lair)),
-            new RequireMiningBases(3),
-            new Build(RequestAtLeast(1, Zerg.Spire)),
-            new TrainContinuously(Zerg.Mutalisk)
-          )))), 
+      new Parallel(
+        new TrainContinuously(Zerg.Zergling),
+        new Trigger(
+          new UnitsAtLeast(2, UnitMatchType(Zerg.Hatchery), complete = true),
+          initialAfter = new Trigger(
+            new WeHaveEnoughSunkens,
+            initialBefore = new Parallel(
+              new TrainContinuously(Zerg.SunkenColony),
+              new TrainContinuously(Zerg.CreepColony, 2)),
+            initialAfter = new Parallel(
+              new TrainWorkersContinuously,
+              new BuildGasPumps,
+              new Build(RequestAtLeast(1, Zerg.Lair)),
+              new RequireMiningBases(3),
+              new Build(RequestAtLeast(1, Zerg.Spire)),
+              new TrainContinuously(Zerg.Mutalisk)
+          ))))),
       
     new If(
       new Check(() => ProxyPlanner.proxyEnemyNatural.isEmpty),

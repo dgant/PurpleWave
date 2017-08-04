@@ -25,13 +25,14 @@ class ProxyHatch extends Parallel {
     With.blackboard.maxFramesToSendAdvanceBuilder = Int.MaxValue
     super.onUpdate()
   }
-  
+  private class WeKnowWhereToProxy extends Check(() => ProxyPlanner.proxyEnemyNatural.isDefined)
   private class WeHaveEnoughSunkens extends UnitsAtLeast(6, UnitMatchType(Zerg.SunkenColony), complete = false)
   
   private def blueprintCreepColonyNatural: Blueprint = new Blueprint(this,
     building          = Some(Zerg.CreepColony),
     requireZone       = ProxyPlanner.proxyEnemyNatural,
     placementProfile  = Some(PlacementProfiles.proxyCannon))
+  
   children.set(Vector(
     new Plan { override def onUpdate(): Unit = {
       With.blackboard.gasBankSoftLimit = if (With.units.ours.exists(_.is(Zerg.Lair))) 400 else 100
@@ -40,13 +41,15 @@ class ProxyHatch extends Parallel {
     new ProposePlacement { override lazy val blueprints = Vector(new Blueprint(this,
       building = Some(Zerg.Extractor),
       requireZone = Some(With.geography.ourMain.zone))) },
+    
     new Build(
-      RequestAtLeast(8,   Zerg.Drone),
-      RequestAtLeast(2,   Zerg.Overlord),
+      RequestAtLeast(1,   Zerg.Hatchery),
+      RequestAtLeast(1,   Zerg.Drone),
+      RequestAtLeast(1,   Zerg.Overlord),
       RequestAtLeast(9,   Zerg.Drone)),
   
     new If(
-      new Check(() => ProxyPlanner.proxyEnemyNatural.isDefined),
+      new WeKnowWhereToProxy,
       new Parallel(
         new ProposePlacement { override lazy val blueprints = Vector(
           new Blueprint(this, preferZone = ProxyPlanner.proxyEnemyNatural, building = Some(Zerg.Hatchery), placementProfile = Some(PlacementProfiles.proxyBuilding)),
@@ -67,27 +70,32 @@ class ProxyHatch extends Parallel {
           blueprintCreepColonyNatural)},
         new Employ(ProxyHatchHydras,
           new Build(
-            RequestAtLeast(2, Zerg.Hatchery),
-            RequestAtLeast(1, Zerg.SpawningPool),
-            RequestAtLeast(1, Zerg.Extractor),
-            RequestAtLeast(12, Zerg.Drone))),
+            RequestAtLeast(2,   Zerg.Hatchery),
+            RequestAtLeast(1,   Zerg.SpawningPool),
+            RequestAtLeast(2,   Zerg.Overlord),
+            RequestAtLeast(1,   Zerg.Extractor),
+            RequestAtLeast(12,  Zerg.Drone))),
         new Employ(ProxyHatchZerglings,
           new Build(
-            RequestAtLeast(2, Zerg.Hatchery),
-            RequestAtLeast(1, Zerg.SpawningPool))),
+            RequestAtLeast(2,   Zerg.Hatchery),
+            RequestAtLeast(1,   Zerg.SpawningPool),
+            RequestAtLeast(2,   Zerg.Overlord))),
         new Employ(ProxyHatchSunkens,
           new Build(
-            RequestAtLeast(2, Zerg.Hatchery),
-            RequestAtLeast(12, Zerg.Drone),
-            RequestAtLeast(1, Zerg.SpawningPool),
-            RequestAtLeast(14, Zerg.Drone))))),
+            RequestAtLeast(2,   Zerg.Overlord),
+            RequestAtLeast(2,   Zerg.Hatchery),
+            RequestAtLeast(12,  Zerg.Drone),
+            RequestAtLeast(1,   Zerg.SpawningPool),
+            RequestAtLeast(14,  Zerg.Drone))))),
   
     new RequireSufficientSupply,
   
     new Employ(ProxyHatchZerglings,
       new Parallel(
         new TrainContinuously(Zerg.Zergling),
-        new TrainContinuously(Zerg.Hatchery))),
+        new If(
+          new WeKnowWhereToProxy,
+          new TrainContinuously(Zerg.Hatchery)))),
   
     new Employ(ProxyHatchHydras,
       new Parallel(
@@ -116,9 +124,7 @@ class ProxyHatch extends Parallel {
               new TrainContinuously(Zerg.Hatchery, 8)
             ))))),
       
-    new If(
-      new Check(() => ProxyPlanner.proxyEnemyNatural.isEmpty),
-      new ScoutAt(8, 2)),
+    new If(new Not(new WeKnowWhereToProxy), new ScoutAt(8, 2)),
     
     new Aggression(2.0),
     new Attack,

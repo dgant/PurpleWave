@@ -216,9 +216,6 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   
   def stimAttackSpeedBonus: Int = if (stimmed) 2 else 1
   
-  def attacksGround : Boolean = unitClass.attacksGround
-  def attacksAir    : Boolean = unitClass.attacksAir
-  
   def airDpf    : Double = damageOnHitAir     * attacksAgainstAir     / cooldownMaxAir
   def groundDpf : Double = damageOnHitGround  * attacksAgainstGround  / cooldownMaxGround
   
@@ -244,8 +241,8 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   def cooldownMaxGround : Int = (2 + unitClass.groundDamageCooldown)  / stimAttackSpeedBonus // +2 is the RNG
   
   def cooldownMaxAirGround: Int = Math.max(
-    if (attacksAir)     cooldownMaxAir    else 0,
-    if (attacksGround)  cooldownMaxGround else 0)
+    if (unitClass.attacksAir)     cooldownMaxAir    else 0,
+    if (unitClass.attacksGround)  cooldownMaxGround else 0)
   
   def cooldownMaxAgainst(enemy: UnitInfo): Int = if (enemy.flying) cooldownMaxAir else cooldownMaxGround
   

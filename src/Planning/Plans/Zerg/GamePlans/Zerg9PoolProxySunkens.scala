@@ -6,7 +6,7 @@ import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.RequestAtLeast
 import Planning.Composition.UnitCounters.UnitCountExactly
 import Planning.Composition.UnitMatchers.{UnitMatchMobileFlying, UnitMatchType, UnitMatchWorkers}
-import Planning.Plans.Army.{Aggression, Attack}
+import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.Macro.Automatic.{Gather, TrainContinuously}
 import Planning.Plans.Macro.Build.ProposePlacement
@@ -67,7 +67,6 @@ class Zerg9PoolProxySunkens extends Parallel {
         new TrainContinuously(Zerg.CreepColony, 2)),
       new TrainContinuously(Zerg.Zergling)),
     
-    new Aggression(1.5),
     new Attack,
     new FollowBuildOrder,
     new If(

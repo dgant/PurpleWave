@@ -5,7 +5,6 @@ import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
 import Micro.Decisions.MicroValue
 import ProxyBwapi.Engine.Damage
-import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.DamageType
 
@@ -80,8 +79,8 @@ class Avatar {
     dpfAirConcussiveUnfocused       = dpfAirConcussiveFocused     * unfocusedPenalty(unit)
     dpfAirExplosiveUnfocused        = dpfAirExplosiveFocused      * unfocusedPenalty(unit)
     dpfAirNormalUnfocused           = dpfAirNormalFocused         * unfocusedPenalty(unit)
-    attacksGround                   = if (unit.attacksGround) 1.0 else 0.0
-    attacksAir                      = if (unit.attacksAir)    1.0 else 0.0
+    attacksGround                   = if (unit.unitClass.attacksGround) 1.0 else 0.0
+    attacksAir                      = if (unit.unitClass.attacksAir)    1.0 else 0.0
     subjectiveValue                 = unit.subjectiveValue
     totalHealth                     = fortitude * unit.totalHealth
     totalFlyers                     = if (unit.flying) 1.0 else 0.0
@@ -143,6 +142,6 @@ class Avatar {
   }
   
   private def unfocusedPenalty(unit: UnitInfo): Double = {
-    if (unit.attacksAir && unit.attacksGround) 0.0 else 1.0
+    if (unit.unitClass.attacksAir && unit.unitClass.attacksGround) 0.0 else 1.0
   }
 }

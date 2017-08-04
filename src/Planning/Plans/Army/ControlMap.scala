@@ -31,11 +31,11 @@ class ControlMap(val attack: Boolean = false) extends Plan {
     (5.0 + base.workers.size) *
       (
         if (base.owner.isFriendly)
-          100.0
-        else if (base.owner.isEnemy)
-          (if (attack) 50.0 else 0.0)
-        else
+          2.0
+        else if (attack && base.owner.isEnemy)
           1.0
+        else
+          0.0
       )
   }
 }

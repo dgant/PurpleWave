@@ -12,6 +12,7 @@ import Macro.Architecture.{Architecture, PlacementScheduler}
 import Macro.Scheduling.Scheduler
 import Micro.Agency.{Agency, Commander}
 import Micro.Matchups.MatchupGraph
+import Micro.Squads.Squads
 import Performance.TaskQueue.{AbstractTaskQueue, TaskQueueGlobal}
 import Planning.Blackboard
 import ProxyBwapi.Players.{PlayerInfo, Players}
@@ -34,7 +35,7 @@ object With {
   var commander       : Commander           = _
   var configuration   : Configuration       = _
   var economy         : Economy             = _
-  var agents        : Agency            = _
+  var agents          : Agency              = _
   var geography       : Geography           = _
   var grids           : Grids               = _
   var groundskeeper   : Groundskeeper       = _
@@ -51,6 +52,7 @@ object With {
   var recruiter       : Recruiter           = _
   var scheduler       : Scheduler           = _
   var strategy        : Strategist          = _
+  var squads          : Squads              = _
   var tasks           : AbstractTaskQueue   = _
   var units           : UnitTracker         = _
   var viewport        : Viewport            = _
@@ -84,8 +86,8 @@ object With {
     self              = Players.get(game.self)
     neutral           = Players.get(game.neutral)
     enemies           = game.enemies.asScala.map(Players.get).toVector
-    mapTileWidth          = game.mapWidth
-    mapTileHeight         = game.mapHeight
+    mapTileWidth      = game.mapWidth
+    mapTileHeight     = game.mapHeight
     mapFileName       = game.mapFileName
     configuration     = new Configuration
     logger            = new Logger
@@ -97,7 +99,7 @@ object With {
     groundskeeper     = new Groundskeeper
     camera            = new Camera
     economy           = new Economy
-    agents          = new Agency
+    agents            = new Agency
     commander         = new Commander
     geography         = new Geography
     grids             = new Grids
@@ -112,6 +114,7 @@ object With {
     recruiter         = new Recruiter
     scheduler         = new Scheduler
     strategy          = new Strategist
+    squads            = new Squads
     tasks             = new TaskQueueGlobal
     units             = new UnitTracker
     viewport          = new Viewport

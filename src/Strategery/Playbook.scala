@@ -54,7 +54,7 @@ object StrategyGroups {
 
 class TestingPlaybook extends EmptyPlaybook {
   
-  val strategyToTest = ProxySunkens
+  val strategyToTest = ProxyDarkTemplar
   
   override lazy val forced: Seq[Strategy] = Seq(strategyToTest)
 }
@@ -69,7 +69,7 @@ class PurpleCheesePlaybook extends EmptyPlaybook {
   override lazy val forced: Seq[Strategy] = StrategyGroups.cheese
 }
 
-object Playbook extends TestingPlaybook {
+object Playbook extends PurpleCheesePlaybook {
   
   //////////////////////
   // Experiment order //
@@ -95,11 +95,11 @@ object Playbook extends TestingPlaybook {
     ProxyBBS2StartLocations,
     ProxyBBS3StartLocations,
     ProxyDarkTemplar,
+    ProxySunkens,
     ProxyHatchSunkens,
     ProxyHatchHydras,
     ProxyHatchZerglings,
-    ProxyHatchSunkens,
-    ProxySunkens,
+    
       
     AllPvP,
     AllPvZ,

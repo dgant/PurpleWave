@@ -10,6 +10,7 @@ object ZergChoices {
     ProxyHatchZerglings,
     ProxyHatchHydras,
     ProxyHatchSunkens,
+    ProxySunkens,
     Zerg2HatchMutaAllIn,
     Zerg3HatchHydra)
 }

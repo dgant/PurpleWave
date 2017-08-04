@@ -7,7 +7,7 @@ import Strategery.Strategies.Protoss.PvT._
 import Strategery.Strategies.Protoss.PvZ._
 import Strategery.Strategies.Strategy
 import Strategery.Strategies.Terran.Global._
-import Strategery.Strategies.Zerg.Global.{ProxyHatchHydras, ProxyHatchSunkens, ProxyHatchZerglings, Zerg4PoolAllIn}
+import Strategery.Strategies.Zerg.Global._
 
 class EmptyPlaybook {
   
@@ -54,7 +54,7 @@ object StrategyGroups {
 
 class TestingPlaybook extends EmptyPlaybook {
   
-  val strategyToTest = ProxyHatchZerglings
+  val strategyToTest = ProxySunkens
   
   override lazy val forced: Seq[Strategy] = Seq(strategyToTest)
 }
@@ -90,6 +90,17 @@ object Playbook extends TestingPlaybook {
   // If we don't win with 9-9 Gateways, we probably won't win with 10-12 Gateways either so try something else.
   //
   val strategyOrder = Vector(
+    // Cool stuff
+    Proxy5RaxAllIn,
+    ProxyBBS2StartLocations,
+    ProxyBBS3StartLocations,
+    ProxyDarkTemplar,
+    ProxyHatchSunkens,
+    ProxyHatchHydras,
+    ProxyHatchZerglings,
+    ProxyHatchSunkens,
+    ProxySunkens,
+      
     AllPvP,
     AllPvZ,
     AllPvT,

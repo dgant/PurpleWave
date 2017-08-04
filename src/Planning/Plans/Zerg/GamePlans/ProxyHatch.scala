@@ -9,7 +9,7 @@ import Planning.Composition.UnitMatchers.{UnitMatchMobileFlying, UnitMatchType, 
 import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.Information.Employ
-import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
+import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
 import Planning.Plans.Macro.Expanding.BuildGasPumps
@@ -88,18 +88,20 @@ class ProxyHatch extends Parallel {
             RequestAtLeast(1,   Zerg.SpawningPool),
             RequestAtLeast(14,  Zerg.Drone))))),
   
-    new RequireSufficientSupply,
-  
     new Employ(ProxyHatchZerglings,
       new Parallel(
+        new AddSupplyWhenSupplyBlocked,
         new TrainContinuously(Zerg.Zergling),
         new If(
-          new WeKnowWhereToProxy,
+          new And(
+            new WeKnowWhereToProxy,
+            new Check(() => ! With.units.ours.exists(_.is(Zerg.Larva)))),
           new TrainContinuously(Zerg.Hatchery)))),
   
     new Employ(ProxyHatchHydras,
       new Parallel(
         new Build(RequestAtLeast(1, Zerg.HydraliskDen)),
+        new RequireSufficientSupply,
         new If(
           new UnitsAtLeast(1, UnitMatchType(Zerg.HydraliskDen), complete = false),
           new TrainContinuously(Zerg.Hydralisk),

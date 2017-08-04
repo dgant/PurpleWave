@@ -68,6 +68,7 @@ class TerranVsZerg extends Parallel {
     new FollowBuildOrder,
     new Scan,
     new RemoveMineralBlocksAt(40),
-    new Gather
+    new Gather,
+    new Recruit
   ))
 }

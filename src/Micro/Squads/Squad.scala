@@ -1,17 +1,20 @@
 package Micro.Squads
 
 import Lifecycle.With
+import Mathematics.Points.Pixel
 import Micro.Squads.Companies._
 import Micro.Squads.Goals.{Chill, SquadGoal}
 import Planning.Plan
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import Utilities.EnrichPixel.EnrichedPixelCollection
+import scala.collection.mutable.ArrayBuffer
 
 class Squad(val client: Plan) {
   
   var goal: SquadGoal = Chill
   
-  var enemies   : Seq[UnitInfo] = Seq.empty
-  var recruits  : Seq[FriendlyUnitInfo] = Seq.empty
+  var enemies   : ArrayBuffer[UnitInfo]         = ArrayBuffer.empty
+  var recruits  : ArrayBuffer[FriendlyUnitInfo] = ArrayBuffer.empty
   
   val antiAir       = new AntiAir       (this)
   val antiGround    = new AntiGround    (this)
@@ -38,6 +41,18 @@ class Squad(val client: Plan) {
   
   def commission() {
     With.squads.commission(this)
+  }
+  
+  def addUnit(unit: FriendlyUnitInfo) {
+    recruits += unit
+    With.squads.addUnit(this, unit)
+  }
+  
+  def centroid: Pixel = {
+    if (recruits.isEmpty)
+      With.geography.home.pixelCenter
+    else
+      recruits.map(_.pixelCenter).centroid
   }
   
   def update() {

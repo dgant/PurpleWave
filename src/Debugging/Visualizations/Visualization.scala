@@ -27,7 +27,8 @@ class Visualization {
     ShowBattles,
     ShowUnitsAll,
     ShowUnitsFriendly,
-    ShowUnitsForeign
+    ShowUnitsForeign,
+    ShowSquads
   )
   
   var enabled   = true
@@ -68,6 +69,7 @@ class Visualization {
     ShowPerformanceSummary,
     ShowPlans,
     ShowResources,
+    ShowSquads,
     ShowStrategy,
     ShowStrategyEvaluations,
     ShowZoneBorderTiles,

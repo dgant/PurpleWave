@@ -1,6 +1,6 @@
 package Planning.Plans.Protoss.GamePlans
 
-import Planning.Plans.Army.DefendZones
+import Planning.Plans.Army.{DefendZones, Recruit}
 import Planning.Plans.Compound.Parallel
 import Planning.Plans.Information.SwitchEnemyRace
 import Planning.Plans.Macro.Automatic.Gather
@@ -18,5 +18,6 @@ class ProtossGamePlan
     new FollowBuildOrder,
     new RemoveMineralBlocksAt(30),
     new Gather,
-    new DefendZones
+    new DefendZones,
+    new Recruit
   )

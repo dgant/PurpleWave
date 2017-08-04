@@ -123,10 +123,10 @@ class TerranVsTerran extends Parallel {
       new UnitsAtLeast(1, UnitMatchType(Terran.Wraith), complete = true),
       new Attack
     ),
-    new
-        FollowBuildOrder,
+    new FollowBuildOrder,
     new Scan,
     new RemoveMineralBlocksAt(40),
-    new Gather
+    new Gather,
+    new Recruit
   ))
 }

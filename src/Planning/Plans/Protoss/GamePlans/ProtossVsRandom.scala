@@ -2,7 +2,7 @@ package Planning.Plans.Protoss.GamePlans
 
 import Macro.BuildRequests.RequestAtLeast
 import Planning.Composition.UnitMatchers.UnitMatchType
-import Planning.Plans.Army.{ConsiderAttacking, DefendZones}
+import Planning.Plans.Army.ConsiderAttacking
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.Information.Employ
 import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
@@ -39,7 +39,6 @@ class ProtossVsRandom extends Parallel {
     new If(
       new UnitsAtLeast(1, UnitMatchType(Protoss.Pylon), complete = false),
       new Scout),
-    new ConsiderAttacking,
-    new DefendZones
+    new ConsiderAttacking
   ))
 }

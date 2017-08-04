@@ -8,7 +8,7 @@ import ProxyBwapi.UnitInfo.{ForeignUnitInfo, UnitInfo}
 
 class ControlZone(zone: Zone) extends Plan {
   
-  val recruit: Recruit = new Recruit
+  val recruit: Conscript = new Conscript
   val goal: ProtectZone = new ProtectZone(zone)
   
   override def getChildren: Iterable[Plan] = Array(recruit)

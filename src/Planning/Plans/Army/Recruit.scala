@@ -1,4 +1,4 @@
-package Planning.Plans.Army.Recruitment
+package Planning.Plans.Army
 
 import Micro.Squads.Squad
 import Planning.Composition.Property

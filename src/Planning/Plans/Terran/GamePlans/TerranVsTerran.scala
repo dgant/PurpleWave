@@ -118,13 +118,13 @@ class TerranVsTerran extends Parallel {
     
     new ScoutAt(14),
     new ScoutExpansionsAt(80),
-    new ControlMap(attack = true),
+    new DefendZones,
     new Trigger(
       new UnitsAtLeast(1, UnitMatchType(Terran.Wraith), complete = true),
       new Attack
     ),
-    new DefendChokes,
-    new FollowBuildOrder,
+    new
+        FollowBuildOrder,
     new Scan,
     new RemoveMineralBlocksAt(40),
     new Gather

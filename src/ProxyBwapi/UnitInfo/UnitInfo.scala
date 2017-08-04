@@ -137,7 +137,7 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   def pixelRangeMin: Double = unitClass.groundMinRangeRaw
   def pixelRangeAir: Double = pixelRangeAirCache.get
   private val pixelRangeAirCache = new CacheFrame(() =>
-    unitClass.airRange +
+    unitClass.airRangePixels +
       (if (is(Terran.Bunker))                                                 32.0 else 0.0) +
       (if (is(Terran.Bunker)    && player.hasUpgrade(Terran.MarineRange))     32.0 else 0.0) +
       (if (is(Terran.Marine)    && player.hasUpgrade(Terran.MarineRange))     32.0 else 0.0) +
@@ -147,7 +147,7 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   
   def pixelRangeGround: Double = pixelRangeGroundCache.get
   private val pixelRangeGroundCache = new CacheFrame(() =>
-    unitClass.groundRange +
+    unitClass.groundRangePixels +
       (if (is(Terran.Bunker))                                               32.0 else 0.0) +
       (if (is(Terran.Bunker)    && player.hasUpgrade(Terran.MarineRange))   32.0 else 0.0) +
       (if (is(Terran.Marine)    && player.hasUpgrade(Terran.MarineRange))   32.0 else 0.0) +
@@ -203,7 +203,7 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   def battle: Option[Battle] = With.battles.byUnit.get(this)
   def matchups: MatchupAnalysis = With.matchups.get(this)
   
-  def ranged  : Boolean = unitClass.rawCanAttack && unitClass.maxAirGroundRange > 32 * 2
+  def ranged  : Boolean = unitClass.rawCanAttack && unitClass.maxAirGroundRangePixels > 32 * 2
   def melee   : Boolean = unitClass.rawCanAttack && ! ranged
   
   def armorHealth: Int = armorHealthCache.get
@@ -248,6 +248,7 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   
   def pixelRangeAgainstFromEdge   (enemy: UnitInfo): Double = if (enemy.flying) pixelRangeAir else pixelRangeGround
   def pixelRangeAgainstFromCenter (enemy: UnitInfo): Double = pixelRangeAgainstFromEdge(enemy) + unitClass.radialHypotenuse + enemy.unitClass.radialHypotenuse
+  def effectiveRangePixels: Double = Math.max(pixelRangeMax, unitClass.effectiveRangePixels)
   
   def missChanceAgainst(enemy: UnitInfo): Double = {
     if (guaranteedToHit(enemy)) 0.53 else 0.0

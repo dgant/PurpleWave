@@ -3,7 +3,7 @@ package Planning.Plans.Protoss.GamePlans
 import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, _}
 import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors}
-import Planning.Plans.Army.{Attack, ConsiderAttacking, ControlMap}
+import Planning.Plans.Army.{Attack, ConsiderAttacking, DefendZones}
 import Planning.Plans.Compound._
 import Planning.Plans.Information.Reactive.{EnemyDarkTemplarExists, EnemyDarkTemplarPossible}
 import Planning.Plans.Information.{Employ, Employing}
@@ -328,8 +328,7 @@ class ProtossVsProtoss extends Parallel {
       new UnitsAtLeast(1, UnitMatchType(Protoss.Pylon), complete = false),
       new Scout),
   
-    new ControlMap(attack = false),
-    
+    new DefendZones,
     new Attack { attackers.get.unitMatcher.set(UnitMatchType(Protoss.DarkTemplar)) },
     new If(
       new And(

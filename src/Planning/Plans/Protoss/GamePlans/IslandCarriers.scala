@@ -3,7 +3,7 @@ package Planning.Plans.Protoss.GamePlans
 import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, RequestUpgradeNext}
 import Planning.Composition.UnitMatchers.UnitMatchType
-import Planning.Plans.Army.{ConsiderAttacking, ControlMap, DefendHearts}
+import Planning.Plans.Army.{ConsiderAttacking, DefendZones}
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
@@ -78,11 +78,10 @@ class IslandCarriers extends Parallel {
     new OnGasBases(3, new Build(RequestAtLeast(8, Protoss.Stargate))),
     new BuildCannonsAtBases(16),
     new FindExpansions { scouts.get.unitMatcher.set(UnitMatchType(Protoss.Scout)) },
-    new ControlMap,
+    new DefendZones,
     new If(
       new UnitsAtLeast(8 * 8, UnitMatchType(Protoss.Interceptor)),
-      new ConsiderAttacking,
-      new DefendHearts),
+      new ConsiderAttacking),
     new FollowBuildOrder,
     new Gather
   ))

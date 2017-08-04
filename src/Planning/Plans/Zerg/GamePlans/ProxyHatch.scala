@@ -67,6 +67,9 @@ class ProxyHatch extends Parallel {
           blueprintCreepColonyNatural,
           blueprintCreepColonyNatural,
           blueprintCreepColonyNatural,
+          blueprintCreepColonyNatural,
+          blueprintCreepColonyNatural,
+          blueprintCreepColonyNatural,
           blueprintCreepColonyNatural)},
         new Employ(ProxyHatchHydras,
           new Build(
@@ -109,20 +112,22 @@ class ProxyHatch extends Parallel {
   
     new Employ(ProxyHatchSunkens,
       new Parallel(
+        new TrainContinuously(Zerg.SunkenColony),
         new Trigger(
           new UnitsAtLeast(2, UnitMatchType(Zerg.Hatchery), complete = true),
           initialAfter = new Trigger(
             new WeHaveEnoughSunkens,
             initialBefore = new Parallel(
-              new TrainContinuously(Zerg.SunkenColony),
               new TrainContinuously(Zerg.Zergling),
               new TrainContinuously(Zerg.CreepColony, 2)),
             initialAfter = new Parallel(
+              new RequireSufficientSupply,
               new TrainContinuously(Zerg.Mutalisk),
               new TrainWorkersContinuously,
               new BuildGasPumps,
               new Build(RequestAtLeast(1, Zerg.Lair)),
               new Build(RequestAtLeast(1, Zerg.Spire)),
+              new TrainContinuously(Zerg.CreepColony, 1),
               new TrainContinuously(Zerg.Hatchery, 8)
             ))))),
       

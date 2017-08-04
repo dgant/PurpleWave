@@ -1,3 +1,9 @@
 package Micro.Squads.Goals
 
-trait SquadGoal
+import Micro.Squads.Squad
+
+trait SquadGoal {
+  
+  def update(squad: Squad)
+  
+}

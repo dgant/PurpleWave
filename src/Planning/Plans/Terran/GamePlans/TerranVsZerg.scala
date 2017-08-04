@@ -61,14 +61,10 @@ class TerranVsZerg extends Parallel {
     new UpgradeContinuously(Terran.BioArmor),
     new TrainContinuously(Terran.Barracks),
     new ScoutAt(14),
-    new ControlMap,
+    new DefendZones,
     new If(
       new UnitsAtLeast(12, UnitMatchWarriors),
       new ConsiderAttacking),
-    new If(
-      new UnitsAtLeast(6, UnitMatchWarriors),
-      new DefendChokes,
-      new DefendHearts),
     new FollowBuildOrder,
     new Scan,
     new RemoveMineralBlocksAt(40),

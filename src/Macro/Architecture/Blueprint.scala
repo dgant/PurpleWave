@@ -35,7 +35,7 @@ var respectHarvesting          : Boolean                   = true) {
   requireCreep                = requireCreep                .orElse(Some(building.exists(_.requiresCreep)))
   requireTownHallTile         = requireTownHallTile         .orElse(Some(building.exists(_.isTownHall)))
   requireGasTile              = requireGasTile              .orElse(Some(building.exists(_.isRefinery)))
-  preferredDistanceFromExit   = preferredDistanceFromExit   .orElse(if (building.exists(_.attacks)) building.map(_.maxAirGroundRange.toDouble) else Some(32.0 * 9.0))
+  preferredDistanceFromExit   = preferredDistanceFromExit   .orElse(if (building.exists(_.attacks)) building.map(_.effectiveRangePixels.toDouble) else Some(32.0 * 9.0))
   preferZone                  = preferZone                  .orElse(requireZone)
   placementProfile            = placementProfile            .orElse(Some(PlacementProfiles.default(this)))
   

@@ -23,6 +23,6 @@ class Squads {
   }
   
   def update() {
-    
+    squads.foreach(_.update())
   }
 }

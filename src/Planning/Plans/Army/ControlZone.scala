@@ -4,7 +4,6 @@ import Information.Geography.Types.Zone
 import Lifecycle.With
 import Micro.Squads.Goals.ProtectZone
 import Planning.Plan
-import Planning.Plans.Army.Recruitment.Recruit
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, UnitInfo}
 
 class ControlZone(zone: Zone) extends Plan {

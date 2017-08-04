@@ -6,7 +6,7 @@ import Planning.Plan
 
 import scala.collection.mutable
 
-class ControlMap(val attack: Boolean = false) extends Plan {
+class DefendZones extends Plan {
   
   private val zones = new mutable.HashMap[Zone, ControlZone]
   
@@ -28,14 +28,6 @@ class ControlMap(val attack: Boolean = false) extends Plan {
   }
   
   private def baseValue(base: Base): Double = {
-    (5.0 + base.workers.size) *
-      (
-        if (base.owner.isFriendly)
-          2.0
-        else if (attack && base.owner.isEnemy)
-          1.0
-        else
-          0.0
-      )
+    (5.0 + base.workers.size) * (if (base.owner.isFriendly) 1.0 else 0.0)
   }
 }

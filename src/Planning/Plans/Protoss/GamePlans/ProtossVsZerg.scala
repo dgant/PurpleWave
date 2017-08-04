@@ -340,7 +340,7 @@ class ProtossVsZerg extends Parallel {
     new ClearBurrowedBlockers,
     new FindExpansions { scouts.get.unitMatcher.set(UnitMatchType(Protoss.DarkTemplar)) },
     
-    new ControlMap(attack = false),
+    new DefendZones,
     new If(
       new UnitsAtLeast(4, UnitMatchWarriors, complete = true),
       new ConsiderAttacking)

@@ -4,25 +4,25 @@ import Lifecycle.With
 import Micro.Squads.Companies._
 import Micro.Squads.Goals.{Chill, SquadGoal}
 import Planning.Plan
-import ProxyBwapi.UnitInfo.UnitInfo
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 class Squad(val client: Plan) {
   
   var goal: SquadGoal = Chill
   
   var enemies   : Seq[UnitInfo] = Seq.empty
-  var recruits  : Seq[UnitInfo] = Seq.empty
+  var recruits  : Seq[FriendlyUnitInfo] = Seq.empty
   
-  val antiAir       = new AntiAir(this)
-  val antiGround    = new AntiGround(this)
-  val detectors     = new Detectors(this)
-  val healers       = new Healers(this)
-  val repairers     = new Repairers(this)
-  val siege         = new Siege(this)
-  val splashAir     = new SplashAir(this)
-  val splashGround  = new SplashGround(this)
-  val spotters      = new Spotters(this)
-  val transports    = new Transport(this)
+  val antiAir       = new AntiAir       (this)
+  val antiGround    = new AntiGround    (this)
+  val detectors     = new Detectors     (this)
+  val healers       = new Healers       (this)
+  val repairers     = new Repairers     (this)
+  val siege         = new Siege         (this)
+  val splashAir     = new SplashAir     (this)
+  val splashGround  = new SplashGround  (this)
+  val spotters      = new Spotters      (this)
+  val transports    = new Transport     (this)
   
   var wantAntiAir       : Boolean = _
   var wantAntiGround    : Boolean = _
@@ -40,4 +40,7 @@ class Squad(val client: Plan) {
     With.squads.commission(this)
   }
   
+  def update() {
+    goal.update(this)
+  }
 }

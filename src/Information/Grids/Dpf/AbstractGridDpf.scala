@@ -34,8 +34,8 @@ abstract class AbstractGridDpf extends AbstractGridDouble {
         //Assume invisible siege tanks are sieged
         if ( ! unit.isOurs && ! unit.visible && unit.is(Terran.SiegeTankUnsieged)) {
           dpf               = dpf * 2 //Hack adjustment
-          pixelImpactMax    = Math.max(pixelImpactMax,  Terran.SiegeTankSieged.groundRange)
-          pixelRangeMax     = Math.max(pixelRangeMax,   Terran.SiegeTankSieged.groundRange)
+          pixelImpactMax    = Math.max(pixelImpactMax,  Terran.SiegeTankSieged.groundRangePixels)
+          pixelRangeMax     = Math.max(pixelRangeMax,   Terran.SiegeTankSieged.groundRangePixels)
         }
         
         //Account for edge-to-edge distance

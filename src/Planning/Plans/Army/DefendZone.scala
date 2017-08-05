@@ -12,7 +12,7 @@ class DefendZone(zone: Zone) extends Plan {
   
   override def getChildren: Iterable[Plan] = Array(recruit)
   
-  var enemies: Iterable[ForeignUnitInfo] = Iterable.empty
+  var enemies: Seq[ForeignUnitInfo] = Seq.empty
   
   override def onUpdate() {
   

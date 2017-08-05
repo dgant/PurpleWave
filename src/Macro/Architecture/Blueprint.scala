@@ -96,7 +96,7 @@ var respectHarvesting          : Boolean                   = true) {
     val buildArea = relativeBuildArea.add(tile)
   
     def violatesBuildArea(nextTile: Tile): Boolean = {
-      thisZone.perimeter.contains(nextTile)                     ||
+      nextTile.zone.perimeter.contains(nextTile)                ||
       ! With.architecture.buildable(nextTile)                   ||
       (requireCreep.get   && ! With.grids.creep.get(nextTile))  ||
       (respectHarvesting  && With.architecture.isHarvestingArea(nextTile))

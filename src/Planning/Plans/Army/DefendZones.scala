@@ -37,7 +37,7 @@ class DefendZones extends Plan {
       .map(_._1)
       .foreach(zone => {
         val plan = zones(zone)
-        plan.enemies = zoneByEnemyFiltered.filter(_._2 == zone).keys
+        plan.enemies = zoneByEnemyFiltered.filter(_._2 == zone).keys.toSeq
         delegate(plan)
       })
   }

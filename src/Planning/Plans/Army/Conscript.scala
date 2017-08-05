@@ -14,7 +14,7 @@ class Conscript extends Plan {
   
   var mustFight : Boolean = false
   var overkill  : Double = 2.0
-  var enemies   : Iterable[UnitInfo] = Iterable.empty
+  var enemies   : Seq[UnitInfo] = Seq.empty
   
   val fighters = new Property[LockUnits](new LockUnits)
   fighters.get.unitMatcher.set(UnitMatchWarriors)

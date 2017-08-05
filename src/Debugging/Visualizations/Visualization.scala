@@ -28,7 +28,8 @@ class Visualization {
     ShowUnitsAll,
     ShowUnitsFriendly,
     ShowUnitsForeign,
-    ShowSquads
+    ShowSquads,
+    ShowZones
   )
   
   var enabled   = true

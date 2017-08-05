@@ -2,8 +2,9 @@ package Planning.Plans.Army
 
 import Lifecycle.With
 import Micro.Agency.Intention
+import Micro.Squads.Squad
 import Planning.Composition.ResourceLocks.LockUnits
-import Planning.Composition.UnitMatchers.{UnitMatchAnd, UnitMatchMobile, UnitMatchMobileDetectors, UnitMatchWarriors}
+import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Composition.UnitPreferences.UnitPreferClose
 import Planning.Composition.{Property, UnitCountEverything}
 import Planning.Plan
@@ -12,13 +13,11 @@ class Attack extends Plan {
   
   description.set("Attack")
   
+  val squad = new Squad(this)
+  
   val attackers = new Property[LockUnits](new LockUnits)
   attackers.get.unitMatcher.set(UnitMatchWarriors)
   attackers.get.unitCounter.set(UnitCountEverything)
-  
-  val detectors = new Property[LockUnits](new LockUnits)
-  detectors.get.unitMatcher.set(UnitMatchAnd(UnitMatchMobileDetectors, UnitMatchMobile))
-  detectors.get.unitCounter.set(UnitCountEverything)
   
   override def onUpdate() {
     
@@ -39,23 +38,10 @@ class Attack extends Plan {
     attackers.get.acquire(this)
     
     if (attackers.get.units.isEmpty) return
-  
-    detectors.get.unitPreference.set(UnitPreferClose(target))
-    detectors.get.satisfied
-    detectors.get.acquire(this)
     
     val attackIntent = new Intention { toTravel = Some(target) }
     attackers.get.units.foreach(_.agent.intend(this, attackIntent))
-    
-    var nextDetectorDepth = 32.0 * 8
-    detectors.get.units.foreach(detector => {
-      detector.agent.intend(
-        this,
-        new Intention {
-          toTravel = Some(attackers.get.units.minBy(_.framesToTravelTo(target)).pixelCenter.project(target, nextDetectorDepth))
-          canCower = true
-        })
-      nextDetectorDepth -= 96.0
-    })
+  
+    squad.conscript(attackers.get.units)
   }
 }

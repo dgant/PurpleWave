@@ -13,7 +13,7 @@ class Squad(val client: Plan) {
   
   var goal: SquadGoal = Chill
   
-  var enemies   : ArrayBuffer[UnitInfo]         = ArrayBuffer.empty
+  var enemies   : Iterable[UnitInfo]            = Iterable.empty
   var recruits  : ArrayBuffer[FriendlyUnitInfo] = ArrayBuffer.empty
   
   val antiAir       = new AntiAir       (this)
@@ -39,11 +39,17 @@ class Squad(val client: Plan) {
   var wantTransport     : Boolean = _
   var wantSiege         : Boolean = _
   
-  def commission() {
+  def update() {
+    goal.update(this)
+  }
+  
+  def conscript(units: Iterable[FriendlyUnitInfo]) {
+    recruits.clear()
+    recruits ++= units
     With.squads.commission(this)
   }
   
-  def addUnit(unit: FriendlyUnitInfo) {
+  def recruit(unit: FriendlyUnitInfo) {
     recruits += unit
     With.squads.addUnit(this, unit)
   }
@@ -53,9 +59,5 @@ class Squad(val client: Plan) {
       With.geography.home.pixelCenter
     else
       recruits.map(_.pixelCenter).centroid
-  }
-  
-  def update() {
-    goal.update(this)
   }
 }

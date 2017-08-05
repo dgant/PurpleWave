@@ -11,6 +11,9 @@ import Utilities.EnrichPixel.EnrichedPixelCollection
 
 class ProtectZone(zone: Zone) extends SquadGoal {
   
+  private var lastAction = "ProtectZone"
+  override def toString: String = lastAction
+  
   def update(squad: Squad) {
   
     lazy val base   = zone.bases.find(_.owner.isUs)
@@ -23,15 +26,19 @@ class ProtectZone(zone: Zone) extends SquadGoal {
     lazy val canDefendChoke  = choke.isDefined
     
     if (canHuntEnemies) {
+      lastAction = "Hunt intruders"
       huntEnemies(squad)
     }
     else if (canDefendWall) {
+      lastAction = "Defend static defense"
       defendWall(squad, walls)
     }
     else if (canDefendChoke) {
+      lastAction = "Defend at choke"
       defendChoke(squad, choke.get)
     }
     else if (canDefendHeart) {
+      lastAction = "Defend heart"
       defendHeart(squad, base.map(_.heart.pixelCenter).getOrElse(zone.centroid.pixelCenter))
     }
   }

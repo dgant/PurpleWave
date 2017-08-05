@@ -5,6 +5,7 @@ import Debugging.Visualizations.Rendering.{DrawMap, DrawScreen}
 import Debugging.Visualizations.Views.View
 import Lifecycle.With
 import Micro.Squads.Squad
+import ProxyBwapi.UnitInfo.UnitInfo
 
 object ShowSquads extends View {
   
@@ -19,7 +20,7 @@ object ShowSquads extends View {
     Colors.White)
   
   override def renderMap() {
-    With.squads.all.foreach(renderSquadMap)
+    With.squads.all.filter(_.recruits.nonEmpty)foreach(renderSquadMap)
   }
   
   def renderSquadMap(squad: Squad) {
@@ -30,6 +31,8 @@ object ShowSquads extends View {
         unit.pixelCenter.add(0, unit.unitClass.height),
         drawBackground = true,
         color))
+    
+    DrawMap.circle(squad.centroid, squad.recruits.map(_.pixelDistanceSlow(squad.centroid)).max.toInt, color)
   }
   
   override def renderScreen() {
@@ -40,14 +43,13 @@ object ShowSquads extends View {
           squad.client.toString,
           squad.goal.toString,
           squad.centroid.toString,
-          enumerateSquadUnits(squad)))
+          enumerateUnits(squad.recruits) + " --> " + enumerateUnits(squad.enemies)))
   
     DrawScreen.table(5, 7 * With.visualization.lineHeightSmall, table)
   }
-  
-  def enumerateSquadUnits(squad: Squad): String = {
+  def enumerateUnits(units: Iterable[UnitInfo]): String = {
     
-    val counts = squad.recruits
+    val counts = units
       .map(_.unitClass)
       .groupBy(x => x)
     

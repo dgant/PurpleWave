@@ -21,7 +21,7 @@ class Recruit extends Plan {
     
     freelancers.acquire(this)
     freelancers.units.foreach(freelancer => {
-      squads.minBy(squad => freelancer.pixelDistanceFast(squad._2))._1.addUnit(freelancer)
+      squads.minBy(squad => freelancer.pixelDistanceFast(squad._2))._1.recruit(freelancer)
     })
   }
 }

@@ -6,5 +6,5 @@ trait SquadGoal {
   
   def update(squad: Squad)
   
-  override lazy val toString: String = getClass.getSimpleName.replaceAllLiterally("$", "")
+  override def toString: String = getClass.getSimpleName.replaceAllLiterally("$", "")
 }

@@ -3,24 +3,47 @@ package Planning.Plans.Army
 import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
 import Planning.Plan
-
-import scala.collection.mutable
+import ProxyBwapi.UnitInfo.ForeignUnitInfo
 
 class DefendZones extends Plan {
   
-  private val zones = new mutable.HashMap[Zone, ControlZone]
+  private lazy val zones = With.geography.zones.map(zone => (zone, new DefendZone(zone))).toMap
+  
+  override def getChildren: Iterable[Plan] = zones.values
   
   protected override def onUpdate() {
-    initialize()
-    zones.keys.toList
-      .filter(zoneValue(_) > 0.0)
-      .sortBy(-zoneValue(_))
-      .foreach(zones(_).update())
+    
+    val zoneScores = zones
+      .keys
+      .map(zone => (zone, zoneValue(zone)))
+      .filter(_._2 > 0.0)
+      .toMap
+    
+    if (zoneScores.isEmpty) {
+      // Safety valve for a weird situation in which we have no bases.
+      return
+    }
+    
+    val zoneByEnemyUnfiltered = With.units.enemy
+      .filter(_.likelyStillThere)
+      .map(enemy => (enemy, zoneScores.keys.minBy(zone => enemy.pixelDistanceTravelling(zone.centroid))))
+      .toMap
+    
+    val zoneByEnemyFiltered = zoneByEnemyUnfiltered.filter(pair => isThreatening(pair._1, pair._2))
+    
+    zoneScores
+      .toVector
+      .sortBy(-_._2)
+      .map(_._1)
+      .foreach(zone => {
+        val plan = zones(zone)
+        plan.enemies = zoneByEnemyFiltered.filter(_._2 == zone).keys
+        delegate(plan)
+      })
   }
   
-  private def initialize() {
-    if (zones.nonEmpty) return
-    With.geography.zones.foreach(zone => zones.put(zone, new ControlZone(zone)))
+  private def isThreatening(enemy: ForeignUnitInfo, zone: Zone): Boolean = {
+    (zone.edges.map(_.centerPixel) :+ zone.centroid.pixelCenter).exists(enemy.framesToTravelTo(_) < 24.0 * 10.0)
   }
   
   private def zoneValue(zone: Zone): Double = {

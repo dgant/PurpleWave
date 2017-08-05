@@ -19,6 +19,5 @@ class ProtossGamePlan
     new FollowBuildOrder,
     new RemoveMineralBlocksAt(30),
     new Gather,
-    new DefendZones,
     new RecruitFreelancers
   )

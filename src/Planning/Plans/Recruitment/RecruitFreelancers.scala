@@ -19,7 +19,11 @@ class RecruitFreelancers extends Plan {
   
   override def onUpdate() {
   
-    val squads = With.squads.squadsByPriority.filter(_.recruits.nonEmpty)
+    val squads =
+      if (With.squads.all.exists(_.recruits.nonEmpty))
+        With.squads.squadsByPriority.filter(_.recruits.nonEmpty)
+      else
+        With.squads.squadsByPriority
     
     if (squads.isEmpty) return
     

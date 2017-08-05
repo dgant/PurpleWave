@@ -52,6 +52,7 @@ class Visualization {
     ShowBulletsAsHearts,
     ShowHappyUnits,
     ShowHappyVision,
+    ShowIntelligence,
     //ShowPlayerNames, TODO: Not actually a View yet
     ShowTextOnly,
     ShowTextOnlyUnits,

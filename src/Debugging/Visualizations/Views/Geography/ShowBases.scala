@@ -17,7 +17,7 @@ object ShowBases extends View {
         DrawMap.tileRectangle(base.townHallArea,    base.zone.owner.colorDark)
         DrawMap.labelBox(
           Vector(
-            base.zone.owner.name,
+            base.zone.name + ": " + base.zone.owner.name,
             Vector(
               if (base.isStartLocation)       Some("Start location")  else None,
               if (base.isNaturalOf.isDefined) Some("Natural")         else None,

@@ -8,11 +8,13 @@ import bwta.{BWTA, Polygon, Region}
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
+import scala.util.Random
 
 object ZoneBuilder {
   
   def zones: Iterable[Zone] = {
-    val zones = BWTA.getRegions.asScala.map(buildZone)
+    val names = new mutable.Queue[String] ++ Random.shuffle(PlaceNames.countries)
+    val zones = BWTA.getRegions.asScala.map(buildZone(_, names.dequeue))
     mapObviousTilesToZones(zones)
     zones
   }
@@ -41,7 +43,7 @@ object ZoneBuilder {
       .add(tile)
   }
   
-  def buildZone(thisRegion: Region): Zone = {
+  def buildZone(thisRegion: Region, name: String): Zone = {
     
     // The goal:        We want to check if two regions are the same.
     // The problem:     BWMirror gives its proxy objects no unique identifiers, hashcodes, or equality comparisons for objects.
@@ -71,7 +73,7 @@ object ZoneBuilder {
       })
       .toSet
     
-    new Zone(thisRegion, boundingBox, tiles)
+    new Zone(name, thisRegion, boundingBox, tiles)
   }
   
   private class RegionIdentifier(region: Region) {
@@ -84,4 +86,5 @@ object ZoneBuilder {
       perimeter == other.perimeter
     }
   }
+  
 }

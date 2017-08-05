@@ -10,6 +10,7 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 class Zone(
+  val name        : String,
   val bwtaRegion  : Region,
   val boundary    : TileRectangle,
   val tiles       : mutable.Set[Tile]) {

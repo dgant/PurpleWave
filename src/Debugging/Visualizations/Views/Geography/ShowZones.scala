@@ -12,6 +12,7 @@ object ShowZones extends View {
       DrawMap.polygonPixels(
         zone.points,
         zone.owner.colorDark)
+      DrawMap.label(zone.name, zone.centroid.pixelCenter, drawBackground = true, backgroundColor = zone.owner.colorDark)
     })
   
     With.geography.zones.foreach(zone => {

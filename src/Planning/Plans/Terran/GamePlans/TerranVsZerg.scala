@@ -12,6 +12,7 @@ import Planning.Plans.Macro.BuildOrders.{Build, FirstEightMinutes, FollowBuildOr
 import Planning.Plans.Macro.Expanding.{BuildRefineries, RemoveMineralBlocksAt, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.UnitsAtLeast
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
+import Planning.Plans.Recruitment.RecruitFreelancers
 import Planning.Plans.Scouting.ScoutAt
 import ProxyBwapi.Races.Terran
 
@@ -69,6 +70,6 @@ class TerranVsZerg extends Parallel {
     new Scan,
     new RemoveMineralBlocksAt(40),
     new Gather,
-    new Recruit
+    new RecruitFreelancers
   ))
 }

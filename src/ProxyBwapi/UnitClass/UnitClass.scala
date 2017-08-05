@@ -90,6 +90,7 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) {
     else if (this == Protoss.Arbiter)       32.0 * 9.0
     else maxAirGroundRangePixels
   
+  lazy val tileArea         : TileRectangle = TileRectangle(Tile(0, 0), tileSize)
   lazy val orderable        : Boolean = ! isSpell && ! Set(Protoss.Interceptor, Protoss.Scarab, Terran.SpiderMine).contains(this)
   lazy val isResource       : Boolean = isMinerals || isGas
   lazy val isMinerals       : Boolean = isMineralField
@@ -97,7 +98,6 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) {
   lazy val isTownHall       : Boolean = Vector(Terran.CommandCenter, Protoss.Nexus, Zerg.Hatchery, Zerg.Lair, Zerg.Hive).contains(this)
   lazy val isSiegeTank      : Boolean = this == Terran.SiegeTankSieged || this == Terran.SiegeTankUnsieged
   lazy val isStaticDefense  : Boolean = isBuilding && attacks || this == Terran.Bunker || this == Protoss.ShieldBattery
-  lazy val tileArea     : TileRectangle = TileRectangle(Tile(0, 0), tileSize)
   
   lazy val unaffectedByDarkSwarm: Boolean = Vector(
     Terran.SiegeTankSieged,

@@ -1,11 +1,12 @@
 package Planning.Plans.Protoss.GamePlans
 
-import Planning.Plans.Army.{DefendZones, Recruit}
+import Planning.Plans.Army.DefendZones
 import Planning.Plans.Compound.Parallel
 import Planning.Plans.Information.SwitchEnemyRace
 import Planning.Plans.Macro.Automatic.Gather
 import Planning.Plans.Macro.BuildOrders.FollowBuildOrder
 import Planning.Plans.Macro.Expanding.RemoveMineralBlocksAt
+import Planning.Plans.Recruitment.RecruitFreelancers
 
 class ProtossGamePlan
   extends Parallel (
@@ -19,5 +20,5 @@ class ProtossGamePlan
     new RemoveMineralBlocksAt(30),
     new Gather,
     new DefendZones,
-    new Recruit
+    new RecruitFreelancers
   )

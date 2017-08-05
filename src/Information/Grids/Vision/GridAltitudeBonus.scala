@@ -10,10 +10,10 @@ class GridAltitudeBonus extends AbstractGridDouble {
     indices.foreach(i => set(i, getBonus(With.game.getGroundHeight(new Tile(i).bwapi))))
   }
   
-  private def getBonus(altitude:Int):Double = {
+  private def getBonus(altitude: Int):Double = {
     //http://wiki.teamliquid.net/starcraft/Terrain_Features#High_Ground
     val multiplier = 1.9
-    return altitude match {
+    altitude match {
       case 0 => 1.0
       case 1 => 1.0 * multiplier
       case 2 => 1.0 * multiplier

@@ -3,13 +3,14 @@ package Planning.Plans.Protoss.GamePlans
 import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, RequestUpgradeNext}
 import Planning.Composition.UnitMatchers.UnitMatchType
-import Planning.Plans.Army.{ConsiderAttacking, DefendZones, Recruit}
+import Planning.Plans.Army.{ConsiderAttacking, DefendZones}
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildAssimilators, BuildCannonsAtBases, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.{OnGasBases, OnMiningBases, UnitsAtLeast}
 import Planning.Plans.Protoss.ProtossBuilds
+import Planning.Plans.Recruitment.RecruitFreelancers
 import Planning.Plans.Scouting.FindExpansions
 import ProxyBwapi.Races.Protoss
 
@@ -79,7 +80,7 @@ class IslandCarriers extends Parallel {
     new BuildCannonsAtBases(16),
     new FindExpansions { scouts.get.unitMatcher.set(UnitMatchType(Protoss.Scout)) },
     new DefendZones,
-    new Recruit,
+    new RecruitFreelancers,
     new If(
       new UnitsAtLeast(8 * 8, UnitMatchType(Protoss.Interceptor)),
       new ConsiderAttacking),

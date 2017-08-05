@@ -1,6 +1,6 @@
 package Information.Battles.Estimations
 
-import Information.Battles.Estimations.Simulation.Simulation
+import Information.Battles.Estimations.Simulation.BattleSimulation
 import Lifecycle.With
 import ProxyBwapi.UnitInfo.UnitInfo
 
@@ -22,7 +22,7 @@ class Estimation {
   var deathsUs          = 0.0
   var deathsEnemy       = 0.0
   
-  var simulation: Option[Simulation] = None
+  var simulation: Option[BattleSimulation] = None
   
   var reportCards = new mutable.HashMap[UnitInfo, ReportCard]
   

@@ -32,7 +32,7 @@ object FightOrFlight extends Action {
     unit.agent.desireTotal       = unit.agent.desireTeam + unit.agent.desireIndividual // Vanity metric, for now
     
     // Hysteresis
-    val caution = 0.3
+    val caution = 0.15
     val hysteresis = 0.0
     val desireRequiredToEngage = caution + (if (unit.agent.shouldEngage) 0.0 else hysteresis)
     

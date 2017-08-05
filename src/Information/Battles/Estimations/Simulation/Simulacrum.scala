@@ -9,7 +9,7 @@ import ProxyBwapi.UnitInfo.UnitInfo
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
-case class Simulacrum(simulation: Simulation, unit: UnitInfo) {
+case class Simulacrum(simulation: BattleSimulation, unit: UnitInfo) {
   
   // Constant
   private val SIMULATION_STEP_FRAMES = 12
@@ -18,7 +18,7 @@ case class Simulacrum(simulation: Simulation, unit: UnitInfo) {
     new mutable.PriorityQueue[Simulacrum]()(Ordering.by(x => (x.unit.unitClass.helpsInCombat, - x.pixel.pixelDistanceFast(pixel))))
       ++ unit.matchups.targets.flatMap(simulation.simulacra.get))
   
-  val participating     : Boolean                     = unit.unitClass.helpsInCombat && ( ! unit.unitClass.isWorker || unit.isBeingViolent || unit.friendly.exists(_.agent.canFight))
+  val participating     : Boolean                     = (simulation.weAttack || unit.isEnemy) && unit.unitClass.helpsInCombat && ( ! unit.unitClass.isWorker || unit.isBeingViolent || unit.friendly.exists(_.agent.canFight))
   val canMove           : Boolean                     = unit.canMove
   var hitPoints         : Int                         = unit.totalHealth
   var cooldown          : Int                         = unit.cooldownLeft
@@ -42,7 +42,9 @@ case class Simulacrum(simulation: Simulation, unit: UnitInfo) {
   
   def step() {
     if (dead) {}
-    else if ( ! participating) {}
+    else if ( ! participating) {
+      // Run away!
+    }
     else if (cooldown > 0) {
       simulation.updated = true
       cooldown -= 1

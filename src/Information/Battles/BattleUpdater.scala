@@ -1,6 +1,6 @@
 package Information.Battles
 
-import Information.Battles.Estimations.Simulation.Simulation
+import Information.Battles.Estimations.Simulation.BattleSimulation
 import Information.Battles.Estimations.{AvatarBuilder, EstimateAvatar, Estimation}
 import Information.Battles.Types.Battle
 import Lifecycle.With
@@ -54,7 +54,7 @@ object BattleUpdater {
   }
   
   def estimateSimulation(battle: Battle, weAttack: Boolean): Estimation = {
-    val simulation = new Simulation(battle, weAttack)
+    val simulation = new BattleSimulation(battle, weAttack)
     simulation.run()
     simulation.estimation
   }

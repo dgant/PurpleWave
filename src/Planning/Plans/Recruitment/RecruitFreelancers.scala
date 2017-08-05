@@ -19,7 +19,7 @@ class RecruitFreelancers extends Plan {
   
   override def onUpdate() {
   
-    val squads = With.squads.squadsByPriority
+    val squads = With.squads.squadsByPriority.filter(_.recruits.nonEmpty)
     
     if (squads.isEmpty) return
     
@@ -49,9 +49,8 @@ class RecruitFreelancers extends Plan {
       if (squad.needsBuilders)  recruitBest(squad, _.builds)
     })
     
-    // Join the nearest squad
+    // Join the nearest squad.
     while (candidates.nonEmpty) {
-      //TODO: Be smarter about this.
       val candidate = candidates.head
       assign(candidate, squads.minBy(distance(candidate, _)))
     }

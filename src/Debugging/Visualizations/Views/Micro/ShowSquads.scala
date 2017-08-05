@@ -9,16 +9,6 @@ import ProxyBwapi.UnitInfo.UnitInfo
 
 object ShowSquads extends View {
   
-  lazy val squadColors = Vector(
-    Colors.NeonRed,
-    Colors.NeonOrange,
-    Colors.NeonYellow,
-    Colors.NeonGreen,
-    Colors.NeonBlue,
-    Colors.NeonIndigo,
-    Colors.NeonViolet,
-    Colors.White)
-  
   override def renderMap() {
     With.squads.all.filter(_.recruits.nonEmpty)foreach(renderSquadMap)
   }
@@ -31,8 +21,8 @@ object ShowSquads extends View {
         unit.pixelCenter.add(0, unit.unitClass.height),
         drawBackground = true,
         color))
-    
-    DrawMap.circle(squad.centroid, squad.recruits.map(_.pixelDistanceSlow(squad.centroid)).max.toInt, color)
+  
+    With.game.drawCircleMap(squad.centroid.bwapi, squad.recruits.map(_.pixelDistanceSlow(squad.centroid)).max.toInt, color)
   }
   
   override def renderScreen() {
@@ -47,6 +37,7 @@ object ShowSquads extends View {
   
     DrawScreen.table(5, 7 * With.visualization.lineHeightSmall, table)
   }
+  
   def enumerateUnits(units: Iterable[UnitInfo]): String = {
     
     val counts = units
@@ -61,4 +52,43 @@ object ShowSquads extends View {
     
     output
   }
+  
+  
+  lazy val squadColors = Vector(
+    Colors.MidnightRed,
+    Colors.MidnightOrange,
+    Colors.MidnightYellow,
+    Colors.MidnightGreen,
+    Colors.MidnightBlue,
+    Colors.MidnightIndigo,
+    Colors.MidnightViolet,
+    Colors.DarkRed,
+    Colors.DarkOrange,
+    Colors.DarkYellow,
+    Colors.DarkGreen,
+    Colors.DarkBlue,
+    Colors.DarkIndigo,
+    Colors.DarkViolet,
+    Colors.MediumRed,
+    Colors.MediumOrange,
+    Colors.MediumYellow,
+    Colors.MediumGreen,
+    Colors.MediumBlue,
+    Colors.MediumIndigo,
+    Colors.MediumViolet,
+    Colors.BrightRed,
+    Colors.BrightOrange,
+    Colors.BrightYellow,
+    Colors.BrightGreen,
+    Colors.BrightBlue,
+    Colors.BrightIndigo,
+    Colors.BrightViolet,
+    Colors.NeonRed,
+    Colors.NeonOrange,
+    Colors.NeonYellow,
+    Colors.NeonGreen,
+    Colors.NeonBlue,
+    Colors.NeonIndigo,
+    Colors.NeonViolet
+  )
 }

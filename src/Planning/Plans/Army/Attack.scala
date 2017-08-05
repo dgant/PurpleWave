@@ -2,6 +2,7 @@ package Planning.Plans.Army
 
 import Lifecycle.With
 import Micro.Agency.Intention
+import Micro.Squads.Goals.AttackPixel
 import Micro.Squads.Squad
 import Planning.Composition.ResourceLocks.LockUnits
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
@@ -42,6 +43,7 @@ class Attack extends Plan {
     val attackIntent = new Intention { toTravel = Some(target) }
     attackers.get.units.foreach(_.agent.intend(this, attackIntent))
   
+    squad.goal = new AttackPixel(target)
     squad.conscript(attackers.get.units)
   }
 }

@@ -1,14 +1,14 @@
 package Micro.Squads.Goals
 
-import Information.Geography.Types.Zone
+import Mathematics.Points.Pixel
 import Micro.Agency.Intention
 import Micro.Squads.Squad
 
-class ClearZone(zone: Zone) extends SquadGoal {
+class AttackPixel(pixel: Pixel) extends SquadGoal {
   
   def update(squad: Squad) {
     squad.recruits.foreach(_.agent.intend(squad.client, new Intention {
-      toTravel = Some(zone.centroid.pixelCenter)
+      toTravel = Some(pixel)
     }))
   }
   

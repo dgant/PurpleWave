@@ -8,7 +8,6 @@ import Information.Battles.Types.Battle
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Planning.Yolo
-import Utilities.EnrichPixel._
 
 object ShowBattles extends View {
   
@@ -48,16 +47,14 @@ object ShowBattles extends View {
   private def drawBattleMap(battle: Battle, estimation: Estimation) {
     val ourColor            = With.self.colorDark
     val enemyColor          = With.enemy.colorDark
-    val neutralColor        = Colors.NeonOrange
-    val topLeft             = (battle.us.units ++ battle.enemy.units).map(_.pixelCenter).minBound.subtract(16, 16)
-    val bottomRight         = (battle.us.units ++ battle.enemy.units).map(_.pixelCenter).maxBound.add(16, 16)
+    val neutralColor        = Colors.White
     val winnerStrengthColor = if (estimation.costToEnemy >= estimation.costToUs) ourColor else enemyColor
     DrawMap.circle  (battle.focus,          8,                      neutralColor)
     DrawMap.circle  (battle.us.vanguard,    8,                      ourColor)
     DrawMap.circle  (battle.enemy.vanguard, 8,                      enemyColor)
     DrawMap.line    (battle.focus,          battle.us.vanguard,     ourColor)
     DrawMap.line    (battle.focus,          battle.enemy.vanguard,  enemyColor)
-    DrawMap.box     (topLeft,               bottomRight,            neutralColor)
+    With.game.drawCircleMap(battle.focus.bwapi, (battle.us.units ++ battle.enemy.units).map(_.pixelDistanceFast(battle.focus)).max.toInt, neutralColor)
     DrawMap.labelBox(
       Vector(estimation.netValue.toInt.toString),
       battle.focus.add(24, 0),

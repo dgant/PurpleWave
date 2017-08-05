@@ -56,7 +56,7 @@ trait GroundPaths {
   def groundPixelsByTile(origin: Tile, destination: Tile, requireBwta: Boolean = false): Double = {
     // Shortcut for a common case
     if (With.configuration.useFastGroundDistance && origin.zone == destination.zone) {
-      return origin.tileDistanceFast(destination)
+      return origin.pixelCenter.pixelDistanceFast(destination.pixelCenter)
     }
     
     val request = (origin, destination)

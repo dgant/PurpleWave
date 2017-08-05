@@ -39,8 +39,8 @@ object ShowUnitsForeign extends View {
     }
     
     if (unit.is(Terran.SiegeTankSieged)) {
-      DrawMap.circle(
-        unit.pixelCenter,
+      With.game.drawCircleMap(
+        unit.pixelCenter.bwapi,
         (unit.pixelRangeGround + unit.unitClass.radialHypotenuse).toInt,
         unit.player.colorNeon)
     }

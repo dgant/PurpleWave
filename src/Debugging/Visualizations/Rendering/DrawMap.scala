@@ -73,16 +73,20 @@ object DrawMap {
     text            : String,
     position        : Pixel,
     drawBackground  : Boolean = false,
-    backgroundColor : Color = Colors.DefaultGray) {
+    backgroundColor : Color = Colors.DefaultGray,
+    drawBorder      : Boolean = false,
+    borderColor     : Color = Colors.DefaultGray) {
     if (irrelevant(position)) return
-    labelBox(Vector(text), position, drawBackground, backgroundColor)
+    labelBox(Vector(text), position, drawBackground, backgroundColor, drawBorder, borderColor)
   }
   
   def labelBox(
     textLines       : Iterable[String],
     position        : Pixel,
     drawBackground  : Boolean = false,
-    backgroundColor : Color = Colors.DefaultGray) {
+    backgroundColor : Color = Colors.DefaultGray,
+    drawBorder      : Boolean = false,
+    borderColor     : Color = Colors.DefaultGray) {
     
     if (irrelevant(position)) return
     
@@ -103,6 +107,16 @@ object DrawMap {
         boxY + boxHeight,
         backgroundColor,
         true) //isSolid
+    }
+    if (drawBorder) {
+      With.game.drawBoxMap(
+        boxX - 1,
+        boxY - 1,
+        boxX + boxWidth + 1,
+        boxY + boxHeight + 1,
+        borderColor,
+        false
+      )
     }
     With.game.drawTextMap(
       textX,

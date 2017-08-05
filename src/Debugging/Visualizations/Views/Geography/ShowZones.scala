@@ -18,22 +18,19 @@ object ShowZones extends View {
     With.geography.zones.foreach(zone => {
       zone.edges.foreach(edge => {
         val owner = edge.zones.find( ! _.owner.isNeutral).map(_.owner).getOrElse(With.neutral)
-        DrawMap.labelBox(
-          Vector(
-            edge.zones.map(_.centroid.toString).mkString(" -> ")
-          ),
-          edge.centerPixel)
       
         DrawMap.line(
           edge.sidePixels.head,
           edge.sidePixels.last,
           owner.colorDark
         )
-      
-        DrawMap.circle(
-          edge.centerPixel,
-          edge.radiusPixels.toInt,
-          owner.colorDark)
+        
+        edge.zones.foreach(edgeZone => {
+          val labelPixel = edge.centerPixel.project(edgeZone.centroid.pixelCenter, 32)
+          val color = edgeZone.owner.colorDark
+          DrawMap.line(edge.centerPixel, labelPixel, color)
+          DrawMap.label(edgeZone.name, labelPixel, drawBackground = true, backgroundColor = color)
+        })
       })
     })
   }

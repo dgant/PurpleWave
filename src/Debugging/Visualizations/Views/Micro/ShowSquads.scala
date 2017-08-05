@@ -16,11 +16,13 @@ object ShowSquads extends View {
   def renderSquadMap(squad: Squad) {
     val color = squadColors(squad.hashCode % squadColors.length)
     (squad.recruits ++ squad.enemies).foreach(unit =>
-      DrawMap.labelBox(
-        Vector(squad.client.toString, squad.goal.toString),
+      DrawMap.label(
+        squad.goal.toString,
         unit.pixelCenter.add(0, unit.unitClass.height),
         drawBackground = true,
-        color))
+        color,
+        drawBorder = unit.isEnemy,
+        unit.player.colorMedium))
   
     With.game.drawCircleMap(squad.centroid.bwapi, squad.recruits.map(_.pixelDistanceSlow(squad.centroid)).max.toInt, color)
   }
@@ -28,12 +30,19 @@ object ShowSquads extends View {
   override def renderScreen() {
     
     val table =
+      Vector(Vector("Client", "Goal", "", "", "Recruits", "", "", "", "", "Enemies")) ++
       With.squads.squadsByPriority.map(squad =>
         Vector(
           squad.client.toString,
           squad.goal.toString,
-          squad.centroid.toString,
-          enumerateUnits(squad.recruits) + " --> " + enumerateUnits(squad.enemies)))
+          "",
+          "",
+          enumerateUnits(squad.recruits),
+          "",
+          "",
+          "",
+          "",
+          enumerateUnits(squad.enemies)))
   
     DrawScreen.table(5, 7 * With.visualization.lineHeightSmall, table)
   }
@@ -82,13 +91,6 @@ object ShowSquads extends View {
     Colors.BrightGreen,
     Colors.BrightBlue,
     Colors.BrightIndigo,
-    Colors.BrightViolet,
-    Colors.NeonRed,
-    Colors.NeonOrange,
-    Colors.NeonYellow,
-    Colors.NeonGreen,
-    Colors.NeonBlue,
-    Colors.NeonIndigo,
-    Colors.NeonViolet
+    Colors.BrightViolet
   )
 }

@@ -133,7 +133,7 @@ class ProxyHatch extends Parallel {
       
     new If(new Not(new WeKnowWhereToProxy), new ScoutAt(8, 2)),
     
-    new Aggression(2.5),
+    new Aggression(1.5),
     new Attack,
     new FollowBuildOrder,
   

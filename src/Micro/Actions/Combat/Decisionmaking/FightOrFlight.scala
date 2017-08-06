@@ -38,7 +38,7 @@ object FightOrFlight extends Action {
     
     unit.agent.shouldEngage =
       unit.agent.canFight && (
-        unit.matchups.doomed                                  ||
+        unit.matchups.doomedDiffused                                  ||
         unit.agent.desireIndividual >= desireRequiredToEngage ||
         unit.agent.desireTeam       >= desireRequiredToEngage)
   }

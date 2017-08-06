@@ -40,7 +40,7 @@ class RecruitFreelancers extends Plan {
     }
     
     def recruitBest(squad: Squad, accept: (Resume) => Boolean) {
-      ByOption.min(candidates.toSeq.filter(accept))(distance(_, squad)).foreach(assign(_, squad))
+      ByOption.minBy(candidates.toSeq.filter(accept))(distance(_, squad)).foreach(assign(_, squad))
     }
     
     // For utility jobs: Give each squad a chance to recruit (ie. make sure nobody hogs all the detectors)

@@ -6,7 +6,7 @@ import Micro.Agency.Intention
 import Planning.Composition.Property
 import Planning.Composition.ResourceLocks.LockUnits
 import Planning.Composition.UnitCounters.UnitCountExactly
-import Planning.Composition.UnitMatchers.UnitMatchWorkers
+import Planning.Composition.UnitMatchers.{UnitMatchAnd, UnitMatchNotHoldingResources, UnitMatchWorkers}
 import Planning.Composition.UnitPreferences.UnitPreferClose
 import Planning.Plan
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -19,7 +19,7 @@ class Scout(scoutCount: Int = 1) extends Plan {
   
   val scouts = new Property[LockUnits](new LockUnits {
     unitCounter.set(UnitCountExactly(scoutCount))
-    unitMatcher.set(UnitMatchWorkers)
+    unitMatcher.set(UnitMatchAnd(UnitMatchWorkers, UnitMatchNotHoldingResources))
     unitPreference.set(UnitPreferClose(SpecificPoints.middle))
     interruptable.set(false)
   })

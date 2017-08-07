@@ -2,7 +2,7 @@ package Micro.Actions.Combat.Decisionmaking
 
 import Micro.Actions.Action
 import Micro.Actions.Combat.Attacking.Potshot
-import Micro.Actions.Combat.Maneuvering.{Avoid, Kite, Retreat}
+import Micro.Actions.Combat.Maneuvering.{Avoid, KiteSafely, Retreat}
 import Planning.Yolo
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -25,16 +25,17 @@ object Disengage extends Action {
     
     if (freeToFlee) {
       if (outrange) {
+        
         if (freeToChase) {
           // Let's chase 'em from a distance
-          Kite.consider(unit)
+          KiteSafely.consider(unit)
         }
+          
         else {
           // Example: Two Marines kiting a Zealot
           // The one being targeted shoots while the other flees.
-          val assumedFramesToTurnAndShootAndTurnBackAndAccelerate = 12 // Heh. https://github.com/bwapi/bwapi/blob/59b14af21b3c881ce06af8b1ea1d63fa3c8b2df0/bwapi/include/BWAPI/UnitType.h#L555
-          if (unit.matchups.framesOfSafetyCurrently > unit.unitClass.minStop + assumedFramesToTurnAndShootAndTurnBackAndAccelerate) {
-            Kite.consider(unit)
+          if (unit.matchups.framesOfSafetyCurrently > unit.framesToTurnAndShootAndTurnBackAndAccelerate) {
+            KiteSafely.consider(unit)
           }
           else {
             Avoid.consider(unit)
@@ -42,10 +43,12 @@ object Disengage extends Action {
         }
       }
       else {
+        
         // Get out of hurtsville ASAP
         if (unit.matchups.vpfReceivingDiffused > 0) {
           Avoid.consider(unit)
         }
+          
         // No shenanigans. Get out.
         else {
           Retreat.consider(unit)

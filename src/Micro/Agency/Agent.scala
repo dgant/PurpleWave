@@ -72,7 +72,11 @@ class Agent(val unit: FriendlyUnitInfo) {
   /////////////////
   
   def origin: Pixel = toReturn.getOrElse(originCache.get)
-  private val originCache = new CacheFrame(() => if (With.geography.ourBases.nonEmpty) With.geography.ourBases.map(_.heart.pixelCenter).minBy(unit.pixelDistanceTravelling) else With.geography.home.pixelCenter)
+  private val originCache = new CacheFrame(() =>
+    if (With.geography.ourBases.nonEmpty)
+      With.geography.ourBases.map(_.heart.pixelCenter).minBy(unit.pixelDistanceTravelling)
+    else
+      With.geography.home.pixelCenter)
   
   /////////////////
   // Diagnostics //
@@ -93,8 +97,8 @@ class Agent(val unit: FriendlyUnitInfo) {
   var microDecisions              : Vector[MicroDecision] = Vector.empty
   var microDecisionsUpdateFrame   : Int = 0
   
-  var lastAvoidFrame  : Int = 0
   var pathsAll        : Traversable[PixelRay] = Seq.empty
+  var pathsTruncated  : Traversable[PixelRay] = Seq.empty
   var pathsAcceptable : Traversable[PixelRay] = Seq.empty
   var pathAccepted    : Traversable[PixelRay] = Seq.empty
   
@@ -115,6 +119,10 @@ class Agent(val unit: FriendlyUnitInfo) {
     unit.agent.desireTotal        = 1.0
     unit.agent.movementProfile    = MovementProfiles.default
     unit.agent.targetingProfile   = TargetingProfiles.default
+    unit.agent.pathsAll           = Seq.empty
+    unit.agent.pathsTruncated     = Seq.empty
+    unit.agent.pathsAcceptable    = Seq.empty
+    unit.agent.pathAccepted       = Seq.empty
   }
   
   private def followIntent() {

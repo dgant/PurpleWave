@@ -190,6 +190,11 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
       (is(Zerg.Ultralisk)   && player.getUpgradeLevel(Zerg.UltraliskSpeed)    > 0))
       1.5 else 1.0)))
   
+  
+  // TODO. We need better math :( BWAPI doesn't define what its accel/turn rate numbers mean.
+  // https://github.com/bwapi/bwapi/blob/59b14af21b3c881ce06af8b1ea1d63fa3c8b2df0/bwapi/include/BWAPI/UnitType.h#L555
+  def framesToTurnAndShootAndTurnBackAndAccelerate: Int = unitClass.minStop + unitClass.stopFrames + 24
+  
   def project(distance: Double)       : Pixel = pixelCenter.radiateRadians(angleRadians, distance)
   def project(framesToLookAhead: Int) : Pixel = pixelCenter.add((velocityX * framesToLookAhead).toInt, (velocityY * framesToLookAhead).toInt)
   

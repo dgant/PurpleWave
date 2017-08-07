@@ -2,7 +2,7 @@ package Micro.Actions.Scouting
 
 import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Actions.Combat.Maneuvering.Kite
+import Micro.Actions.Combat.Maneuvering.AttackAndReposition
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Poke extends Action {
@@ -15,6 +15,6 @@ object Poke extends Action {
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {
-    Kite.delegate(unit)
+    AttackAndReposition.delegate(unit)
   }
 }

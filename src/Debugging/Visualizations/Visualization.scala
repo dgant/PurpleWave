@@ -20,8 +20,6 @@ class Visualization {
   //////////////
   
   var views = mutable.ArrayBuffer(
-    ShowZones,
-    ShowBases,
     // Evergreen views
     ShowPerformanceSummary,
     ShowClock,
@@ -29,8 +27,7 @@ class Visualization {
     ShowBattles,
     ShowUnitsAll,
     ShowUnitsFriendly,
-    ShowUnitsForeign,
-    ShowSquads
+    ShowUnitsForeign
   )
   
   var enabled   = true

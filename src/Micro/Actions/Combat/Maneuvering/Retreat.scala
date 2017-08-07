@@ -10,7 +10,6 @@ object Retreat extends Action {
   
   override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.canMove &&
-    unit.pixelCenter.zone != unit.agent.origin.zone &&
     unit.matchups.threats.nonEmpty
   }
   
@@ -40,9 +39,6 @@ object Retreat extends Action {
     
     if (unit.melee && threatsAllMelee && holdingFormation) {
       With.commander.hold(unit)
-    }
-    else if (alreadyHome || unit.flying || trapped /*|| ! blocked*/) {
-      Avoid.delegate(unit)
     }
     else {
       unit.agent.toTravel = Some(unit.agent.origin)

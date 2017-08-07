@@ -29,15 +29,16 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
     hypotheticalMatchups(hypotheticalConditions)
   }
   
-  lazy val allies         : Vector[UnitInfo]  = if (me.battle.isEmpty) Vector.empty else me.battle.get.teamOf(me).units.filterNot(_ == me)
-  lazy val enemies        : Vector[UnitInfo]  = if (me.battle.isEmpty) Vector.empty else me.battle.get.teamOf(me).opponent.units
-  lazy val others         : Vector[UnitInfo]  = allies ++ enemies
-  lazy val allUnits       : Vector[UnitInfo]  = others :+ me
-  lazy val threats        : Vector[UnitInfo]  = enemies.filter(_.canAttack(me))
-  lazy val targets        : Vector[UnitInfo]  = enemies.filter(me.canAttack)
-  lazy val threatsViolent : Vector[UnitInfo]  = threats.filter(_.isBeingViolentTo(me))
-  lazy val threatsInRange : Vector[UnitInfo]  = threats.filter(threat => threat.pixelRangeAgainstFromCenter(me) >= threat.pixelDistanceFast(at) - me.pixelsTravelledMax(frame) - threat.pixelsTravelledMax(frame))
-  lazy val targetsInRange : Vector[UnitInfo]  = targets.filter(target => me.pixelRangeAgainstFromCenter(target) >= target.pixelDistanceFast(at) - me.pixelsTravelledMax(frame) - target.pixelsTravelledMax(frame))
+  lazy val allies                 : Vector[UnitInfo]  = if (me.battle.isEmpty) Vector.empty else me.battle.get.teamOf(me).units.filterNot(_ == me)
+  lazy val enemies                : Vector[UnitInfo]  = if (me.battle.isEmpty) Vector.empty else me.battle.get.teamOf(me).opponent.units
+  lazy val others                 : Vector[UnitInfo]  = allies ++ enemies
+  lazy val allUnits               : Vector[UnitInfo]  = others :+ me
+  lazy val threats                : Vector[UnitInfo]  = enemies.filter(_.canAttack(me))
+  lazy val targets                : Vector[UnitInfo]  = enemies.filter(me.canAttack)
+  lazy val threatsViolent         : Vector[UnitInfo]  = threats.filter(_.isBeingViolentTo(me))
+  lazy val threatsInRange         : Vector[UnitInfo]  = threats.filter(threat => threat.pixelRangeAgainstFromCenter(me) >= threat.pixelDistanceFast(at) - me.pixelsTravelledMax(frame) - threat.pixelsTravelledMax(frame))
+  lazy val threatsViolentInRange  : Vector[UnitInfo]  = threatsInRange.filter(_.isBeingViolentTo(me))
+  lazy val targetsInRange         : Vector[UnitInfo]  = targets.filter(target => target.visible && me.pixelRangeAgainstFromCenter(target) >= target.pixelDistanceFast(at) - me.pixelsTravelledMax(frame) - target.pixelsTravelledMax(frame))
    
   lazy val vpfDealingDiffused                     : Double                = targetsInRange.map(target => dpfDealingDiffused(target)  * MicroValue.valuePerDamage(target)).sum
   lazy val vpfDealingCurrently                    : Double                = targetsInRange.map(target => dpfDealingCurrently(target) * MicroValue.valuePerDamage(target)).sum
@@ -54,10 +55,10 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
   lazy val framesOfEntanglementPerThreatCurrently : Map[UnitInfo, Double] = threatsViolent.map(threat => (threat, framesOfEntanglementWith(threat))).toMap
   lazy val framesOfEntanglementDiffused           : Double                = ByOption.min(framesOfEntanglementPerThreatDiffused.values).getOrElse(Double.NegativeInfinity)
   lazy val framesOfEntanglementCurrently          : Double                = ByOption.min(framesOfEntanglementPerThreatCurrently.values).getOrElse(Double.NegativeInfinity)
+  lazy val framesOfSafetyDiffused                 : Double                = - ByOption.max(framesOfEntanglementPerThreatDiffused.values).getOrElse(Double.NegativeInfinity)
+  lazy val framesOfSafetyCurrently                : Double                = - ByOption.max(framesOfEntanglementPerThreatCurrently.values).getOrElse(Double.NegativeInfinity)
   lazy val mostEntangledThreatDiffused            : Option[UnitInfo]      = ByOption.minBy(framesOfEntanglementPerThreatDiffused)(_._2).map(_._1)
   lazy val mostEntangledThreatCurrently           : Option[UnitInfo]      = ByOption.minBy(framesOfEntanglementPerThreatCurrently)(_._2).map(_._1)
-  def framesOfSafetyDiffused    : Double = Math.max(0.0, -framesOfEntanglementDiffused)
-  def framesOfSafetyCurrently   : Double = Math.max(0.0, -framesOfEntanglementCurrently)
   def framesToRetreatDiffused   : Double = Math.max(0.0, framesOfEntanglementDiffused)
   def framesToRetreatCurrently  : Double = Math.max(0.0, framesOfEntanglementCurrently)
   

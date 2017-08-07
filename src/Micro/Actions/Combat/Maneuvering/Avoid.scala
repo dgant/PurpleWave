@@ -2,6 +2,7 @@ package Micro.Actions.Combat.Maneuvering
 
 import Lifecycle.With
 import Mathematics.Points.PixelRay
+import Mathematics.PurpleMath
 import Micro.Actions.Action
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
@@ -13,7 +14,7 @@ object Avoid extends Action {
     unit.matchups.threats.nonEmpty
   }
   
-  private val orthogonalAngles = (0.0 to 2.0 by 0.25).map(_ * Math.PI)
+  private val orthogonalAngles = (0.0 to 2.0 by 0.25).map(_ * Math.PI).toVector
   
   override def perform(unit: FriendlyUnitInfo) {
     
@@ -41,19 +42,26 @@ object Avoid extends Action {
       Retreat.consider(unit)
     }
     
-    val angleAway         = threat.pixelCenter.radiansTo(unit.pixelCenter)
+    val angleAway         = PurpleMath.normalizeAngle(threat.pixelCenter.radiansTo(unit.pixelCenter))
     val angles            = angleAway +: orthogonalAngles.filter(angle => Math.abs(angle - angleAway) < Math.PI * .75)
     val targetDistance    = Math.min(idealDistance, Math.max(threat.pixelRangeAgainstFromCenter(unit), 32.0 * 3.0))
-    val paths             = angles.map(angle => PixelRay(unit.pixelCenter, unit.pixelCenter.radiateRadians(angle, targetDistance)))
-    val pathsTruncated    = paths.map(ray => PixelRay(ray.from, ray.from.project(ray.to, 32.0 * ray.tilesIntersected.takeWhile(tile => if(unit.flying) tile.valid else With.grids.walkable.get(tile)).length)))
-    val pathsAcceptable   = paths.filter(_.lengthFast >= targetDistance)
-    val pathAccepted      = ByOption.maxBy(pathsAcceptable)(_.to.pixelDistanceFast(threat.pixelCenter))
+    val paths             = angles.map(angle => PixelRay(unit.pixelCenter, unit.pixelCenter.radiateRadians(angle, targetDistance * 1.5)))
+    val pathsTruncated    = paths.map(ray => PixelRay(ray.from, ray.from.project(ray.to, ray
+      .tilesIntersected
+      .takeWhile(tile => tile.valid && (unit.flying || With.grids.walkable.get(tile)))
+      .lastOption
+      .map(_.pixelCenter.pixelDistanceFast(ray.from))
+      .getOrElse(0.0))))
+    val pathsAcceptable   = pathsTruncated.filter(_.lengthFast >= targetDistance)
+    val pathAccepted      = ByOption.minBy(pathsAcceptable)(path => unit.matchups.ifAt(path.to).framesOfEntanglementDiffused)
     
-    unit.agent.pathsAll         = pathsTruncated
+    unit.agent.pathsAll         = paths
+    unit.agent.pathsTruncated   = pathsTruncated
     unit.agent.pathsAcceptable  = pathsAcceptable
     unit.agent.pathAccepted     = pathAccepted
     
     if (pathAccepted.isDefined) {
+      val acceptedPathAngle = pathAccepted.get.from.radians
       With.commander.move(unit, pathAccepted.get.to)
     }
     else {

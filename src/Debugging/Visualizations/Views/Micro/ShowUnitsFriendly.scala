@@ -55,11 +55,16 @@ object ShowUnitsFriendly extends View {
     if (agent.toForm.isDefined) {
       DrawMap.circle(agent.toForm.get, agent.unit.unitClass.radialHypotenuse.toInt, Colors.MediumTeal)
     }
-    if (With.framesSince(agent.lastAvoidFrame) < 48) {
-      agent.pathsAll.foreach(ray => DrawMap.line(ray.from, ray.to, Colors.MediumGreen))
-      agent.pathsAcceptable.foreach(ray => DrawMap.line(ray.from, ray.to, Colors.BrightGreen))
-      agent.pathsAcceptable.foreach(ray => { DrawMap.line(ray.from, ray.to, Colors.NeonGreen); DrawMap.circle(ray.to, 4, Colors.NeonGreen, solid = true) })
-    }
+    
+    agent.pathsAll.foreach(ray => ray.tilesIntersected.foreach(tile => DrawMap.box(
+      tile.topLeftPixel.add(1, 1),
+      tile.bottomRightPixel.subtract(1, 1),
+      if (With.grids.walkable.get(tile)) Colors.BrightBlue else Colors.BrightRed)))
+    
+    agent.pathsAll          .foreach(ray =>   DrawMap.line(ray.from, ray.to, Colors.MediumGray))
+    agent.pathsTruncated    .foreach(ray =>   DrawMap.line(ray.from, ray.to, Colors.MediumGreen))
+    agent.pathsAcceptable   .foreach(ray =>   DrawMap.line(ray.from, ray.to, Colors.BrightGreen))
+    agent.pathAccepted      .foreach(ray => { DrawMap.line(ray.from, ray.to, Colors.NeonGreen); DrawMap.circle(ray.to, 4, Colors.NeonGreen, solid = true) })
     /*
     if (agent.toGather.isDefined) {
       DrawMap.line(agent.unit.pixelCenter, agent.intent.toGather.get.pixelCenter, Colors.DarkGreen)

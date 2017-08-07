@@ -14,7 +14,7 @@ object Avoid extends Action {
     unit.matchups.threats.nonEmpty
   }
   
-  private val orthogonalAngles = (0.0 to 2.0 by 0.25).map(_ * Math.PI).toVector
+  private val cardinal8Angles = (0.0 to 2.0 by 0.25).map(_ * Math.PI).toVector
   
   override def perform(unit: FriendlyUnitInfo) {
     
@@ -30,21 +30,22 @@ object Avoid extends Action {
     */
   
     
-    val threat        = unit.matchups.mostEntangledThreatDiffused.get
+    
+    val threats       = unit.matchups.mostEntangledThreatsDiffused.take(8)
     val zoneUs        = unit.pixelCenter.zone
     val exits         = zoneUs.edges
-    val idealDistance = idealDistancePixels(unit, threat)
+    val idealDistance = threats.map(idealDistancePixels(unit, _)).max
   
-    val trapped     = ! unit.flying && (zoneUs.owner.isUs || exits.forall(exit => unit.pixelDistanceFast(exit.centerPixel) > threat.pixelDistanceFast(exit.centerPixel)))
+    val trapped     = ! unit.flying && (zoneUs.owner.isUs || exits.forall(exit => unit.pixelDistanceFast(exit.centerPixel) > threats.map(_.pixelDistanceFast(exit.centerPixel)).min))
     val mustEscape  = ! trapped && idealDistance.isInfinity
     
     if (mustEscape) {
       Retreat.consider(unit)
     }
     
-    val angleAway         = PurpleMath.normalizeAngle(threat.pixelCenter.radiansTo(unit.pixelCenter))
-    val angles            = angleAway +: orthogonalAngles.filter(angle => Math.abs(angle - angleAway) < Math.PI * .75)
-    val targetDistance    = Math.min(idealDistance, Math.max(threat.pixelRangeAgainstFromCenter(unit), 32.0 * 3.0))
+    val anglesAway        = threats.map(threat => PurpleMath.normalizeAngle(threat.pixelCenter.radiansTo(unit.pixelCenter)))
+    val angles            = anglesAway ++ cardinal8Angles
+    val targetDistance    = Math.min(idealDistance, Math.max(threats.map(_.pixelRangeAgainstFromCenter(unit)).max, 32.0 * 3.0))
     val paths             = angles.map(angle => PixelRay(unit.pixelCenter, unit.pixelCenter.radiateRadians(angle, targetDistance * 1.5)))
     val pathsTruncated    = paths.map(ray => PixelRay(ray.from, ray.from.project(ray.to, ray
       .tilesIntersected
@@ -53,7 +54,7 @@ object Avoid extends Action {
       .map(_.pixelCenter.pixelDistanceFast(ray.from))
       .getOrElse(0.0))))
     val pathsAcceptable   = pathsTruncated.filter(_.lengthFast >= targetDistance)
-    val pathAccepted      = ByOption.minBy(pathsAcceptable)(path => unit.matchups.ifAt(path.to).framesOfEntanglementDiffused)
+    val pathAccepted      = ByOption.minBy(pathsAcceptable)(path => unit.matchups.ifAt(path.from.project(path.to, 8.0)).framesOfEntanglementDiffused)
     
     unit.agent.pathsAll         = paths
     unit.agent.pathsTruncated   = pathsTruncated
@@ -61,8 +62,12 @@ object Avoid extends Action {
     unit.agent.pathAccepted     = pathAccepted
     
     if (pathAccepted.isDefined) {
-      val acceptedPathAngle = pathAccepted.get.from.radians
-      With.commander.move(unit, pathAccepted.get.to)
+      // If we want to move at non-orthogonal angles we need to restrict moves to orders of < 64 pixels.
+      
+      val acceptedPathAngle = pathAccepted.get.from.radiansTo(pathAccepted.get.to)
+      val offsetFrom8       = cardinal8Angles.map(angle => Math.abs(angle - acceptedPathAngle)).min
+      val moveTarget        = if (offsetFrom8 < Math.PI / 32.0) pathAccepted.get.to else unit.pixelCenter.project(pathAccepted.get.to, 60.0)
+      With.commander.move(unit, moveTarget)
     }
     else {
       Retreat.delegate(unit)

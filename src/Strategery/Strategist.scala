@@ -4,9 +4,9 @@ import Lifecycle.With
 import Planning.Plan
 import Planning.Plans.WinTheGame
 import Strategery.Strategies.Protoss.ProtossChoices
+import Strategery.Strategies.Strategy
 import Strategery.Strategies.Terran.TerranChoices
 import Strategery.Strategies.Zerg.ZergChoices
-import Strategery.Strategies.Strategy
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -49,8 +49,10 @@ class Strategist {
     val isIsland        = isIslandMap
     val isGround        = ! isIsland
     val startLocations  = With.geography.startLocations.size
+    val isFfa           = With.enemies.size > 1
     
     ! Playbook.disabled.contains(strategy)                          &&
+    (strategy.ffa         || ! isFfa)                               && // TODO: Disable non-ffa strategies for FFA
     (strategy.islandMaps  || ! isIsland)                            &&
     (strategy.groundMaps  || ! isGround)                            &&
     strategy.ourRaces.exists(_ == ourRace)                          &&

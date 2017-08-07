@@ -1,10 +1,27 @@
 package Debugging.Visualizations.Views.Geography
 
-import Debugging.Visualizations.Rendering.DrawScreen
+import Debugging.Visualizations.Colors
+import Debugging.Visualizations.Rendering.{DrawMap, DrawScreen}
 import Debugging.Visualizations.Views.View
 import Lifecycle.With
+import Mathematics.Points.TileRectangle
 
 object ShowGroundskeeper extends View {
+  
+  override def renderMap() {
+    With.groundskeeper.proposalPlacements
+      .filter(_._2.tile.nonEmpty)
+      .foreach(placement => {
+        DrawMap.tileRectangle(
+          TileRectangle(
+            placement._2.tile.get,
+            placement._2.tile.get.add(placement._1.widthTiles.get, placement._1.heightTiles.get)
+          ),
+          color = Colors.DarkTeal
+        )
+        DrawMap.label(placement._1.toString, placement._2.tile.get.add(placement._1.widthTiles.get, 0).pixelCenter)
+    })
+  }
   
   override def renderScreen() {
     

@@ -21,7 +21,8 @@ object ShowBases extends View {
             Vector(
               if (base.isStartLocation)       Some("Start location")  else None,
               if (base.isNaturalOf.isDefined) Some("Natural")         else None,
-              if (base.zone.island)           Some("Island")          else None
+              if (base.zone.island)           Some("Island")          else None,
+              if (base.zone.contested)        Some("Contested")       else None
             )
             .flatten
             .mkString(", "),

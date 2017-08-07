@@ -52,7 +52,7 @@ class Strategist {
     val isFfa           = With.enemies.size > 1
     
     ! Playbook.disabled.contains(strategy)                          &&
-    (strategy.ffa         || ! isFfa)                               && // TODO: Disable non-ffa strategies for FFA
+    (strategy.ffa == isFfa)                                         && // TODO: Disable non-ffa strategies for FFA
     (strategy.islandMaps  || ! isIsland)                            &&
     (strategy.groundMaps  || ! isGround)                            &&
     strategy.ourRaces.exists(_ == ourRace)                          &&

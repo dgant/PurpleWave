@@ -26,19 +26,12 @@ object Kite extends Action {
         val sufficientSpace = unit.matchups.threatsViolent.forall(_.framesBeforeAttacking(unit) > unit.unitClass.stopFrames + unit.unitClass.minStop)
         if (sufficientSpace) {
           Potshot.consider(unit)
-        } else {
-          Avoid.delegate(unit)
         }
       } else {
         Potshot.consider(unit)
       }
     }
     
-    if (dominating) {
-      KiteMove.delegate(unit)
-    }
-    else {
-      Retreat.delegate(unit)
-    }
+    Avoid.delegate(unit)
   }
 }

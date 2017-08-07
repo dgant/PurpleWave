@@ -4,6 +4,13 @@ import Mathematics.PurpleMath
 
 case class PixelRay(from: Pixel, to: Pixel) {
   
+  def this(from: Pixel, lengthPixels: Double, angleRadians: Double) {
+    this(from, from.radiateRadians(angleRadians, lengthPixels))
+  }
+  
+  def lengthFast: Double = from.pixelDistanceFast(to)
+  def lengthSlow: Double = from.pixelDistanceSlow(to)
+  
   def tilesIntersected: Array[Tile] = {
     
     if (to.x == from.x) return (from.y / 32 to to.y / 32).map(tileY => Tile(to.x/32, tileY)).toArray

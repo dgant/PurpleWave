@@ -1,7 +1,7 @@
 package Micro.Actions.Protoss
 
 import Micro.Actions.Action
-import Micro.Actions.Combat.Maneuvering.KiteMove
+import Micro.Actions.Combat.Maneuvering.Avoid
 import Micro.Actions.Commands.AttackMove
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders}
@@ -30,7 +30,7 @@ object BeACarrier extends Action {
       AttackMove.consider(unit)
     }
     else {
-      KiteMove.consider(unit)
+      Avoid.consider(unit)
     }
   }
 }

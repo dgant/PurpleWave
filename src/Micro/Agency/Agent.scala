@@ -1,7 +1,7 @@
 package Micro.Agency
 
 import Lifecycle.With
-import Mathematics.Points.{Pixel, Tile}
+import Mathematics.Points.{Pixel, PixelRay, Tile}
 import Micro.Actions.{Action, Idle}
 import Micro.Decisions.MicroDecision
 import Micro.Heuristics.Movement.{MovementHeuristicEvaluation, MovementProfile}
@@ -92,6 +92,11 @@ class Agent(val unit: FriendlyUnitInfo) {
   
   var microDecisions              : Vector[MicroDecision] = Vector.empty
   var microDecisionsUpdateFrame   : Int = 0
+  
+  var lastAvoidFrame  : Int = 0
+  var pathsAll        : Traversable[PixelRay] = Seq.empty
+  var pathsAcceptable : Traversable[PixelRay] = Seq.empty
+  var pathAccepted    : Traversable[PixelRay] = Seq.empty
   
   ///////////////
   // Execution //

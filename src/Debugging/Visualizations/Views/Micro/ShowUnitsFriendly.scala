@@ -55,6 +55,11 @@ object ShowUnitsFriendly extends View {
     if (agent.toForm.isDefined) {
       DrawMap.circle(agent.toForm.get, agent.unit.unitClass.radialHypotenuse.toInt, Colors.MediumTeal)
     }
+    if (With.framesSince(agent.lastAvoidFrame) < 48) {
+      agent.pathsAll.foreach(ray => DrawMap.line(ray.from, ray.to, Colors.MediumGreen))
+      agent.pathsAcceptable.foreach(ray => DrawMap.line(ray.from, ray.to, Colors.BrightGreen))
+      agent.pathsAcceptable.foreach(ray => { DrawMap.line(ray.from, ray.to, Colors.NeonGreen); DrawMap.circle(ray.to, 4, Colors.NeonGreen, solid = true) })
+    }
     /*
     if (agent.toGather.isDefined) {
       DrawMap.line(agent.unit.pixelCenter, agent.intent.toGather.get.pixelCenter, Colors.DarkGreen)

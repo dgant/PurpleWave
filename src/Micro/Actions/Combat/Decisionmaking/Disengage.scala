@@ -41,6 +41,17 @@ object Disengage extends Action {
           }
         }
       }
+      else {
+        // Get out of hurtsville ASAP
+        if (unit.matchups.vpfReceivingDiffused > 0) {
+          Avoid.consider(unit)
+        }
+        // No shenanigans. Get out.
+        else {
+          Retreat.consider(unit)
+        }
+        
+      }
     }
     else {
       // We can at least trade with them while running away.

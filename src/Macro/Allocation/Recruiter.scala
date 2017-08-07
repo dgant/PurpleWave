@@ -8,9 +8,9 @@ import scala.collection.mutable
 
 class Recruiter {
   
-  private val unitsByLock     : mutable.HashMap[LockUnits, mutable.Set[FriendlyUnitInfo]] = mutable.HashMap.empty
-  private val unassignedUnits : mutable.Set[FriendlyUnitInfo]                             = mutable.Set.empty
-  private val activeLocks     : mutable.Set[LockUnits]                                    = mutable.Set.empty
+  val unitsByLock     : mutable.HashMap[LockUnits, mutable.Set[FriendlyUnitInfo]] = mutable.HashMap.empty
+  val unassignedUnits : mutable.Set[FriendlyUnitInfo]                             = mutable.Set.empty
+  val activeLocks     : mutable.Set[LockUnits]                                    = mutable.Set.empty
 
   def update() {
     

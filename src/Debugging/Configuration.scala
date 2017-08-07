@@ -72,7 +72,7 @@ class Configuration {
   var buildingPlacementMaxTilesToEvaluate = 1000
   var buildingPlacementBatchSize          = 300
   var buildingPlacementBatchingStartFrame = 24 * 60 * 4
-  var buildingPlacementMaximumQueue       = 40
+  var buildingPlacementMaximumQueue       = 100
   var garbageCollectionThresholdMs        = 5
   var peformanceFrameMilliseconds         = 20
   var initialTaskLengthMilliseconds       = 20

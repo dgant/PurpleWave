@@ -13,7 +13,7 @@ class FollowBuildOrder extends Plan {
   
   description.set("Follow the build order")
   
-  private val maxToFollow = 50
+  private val maxToFollow = 200
   
   private val plans = new mutable.HashMap[Buildable, ListBuffer[Plan]]
   private var queue: Iterable[Buildable] = Vector.empty

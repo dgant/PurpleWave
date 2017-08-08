@@ -32,7 +32,7 @@ object Duck extends Action {
     if ( ! unit.flying) {
       output ++= unit.matchups.threats
         .filter(threat =>
-          threat.target.isDefined               &&
+          threat.target.isDefined         &&
           ! threat.target.contains(unit)  &&
           (
             threat.is(Protoss.Scarab)     ||

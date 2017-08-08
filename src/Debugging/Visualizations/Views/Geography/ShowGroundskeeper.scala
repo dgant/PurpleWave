@@ -19,7 +19,7 @@ object ShowGroundskeeper extends View {
           ),
           color = Colors.DarkTeal
         )
-        DrawMap.label(placement._1.toString, placement._2.tile.get.add(placement._1.widthTiles.get, 0).pixelCenter)
+        DrawMap.label(placement._1.toString, placement._2.tile.get.add(placement._1.widthTiles.get / 2, 0).pixelCenter)
     })
   }
   

@@ -50,7 +50,7 @@ class Configuration {
   var baseRadiusPixels                = 32.0 * 15.0
   var baseMergingRangePixels          = 32.0 * 12.0
   var blockerMineralThreshold         = 50
-  var maxPlacementAge                 = 24 * 60
+  var maxPlacementAge                 = 24 * 5
   var maxScarabCount                  = 3
   var enableTightBuildingPlacement    = false
   
@@ -72,7 +72,7 @@ class Configuration {
   var buildingPlacementMaxTilesToEvaluate = 1000
   var buildingPlacementBatchSize          = 300
   var buildingPlacementBatchingStartFrame = 24 * 60 * 4
-  var buildingPlacementMaximumQueue       = 100
+  var buildingPlacementMaximumQueue       = 12
   var garbageCollectionThresholdMs        = 5
   var peformanceFrameMilliseconds         = 20
   var initialTaskLengthMilliseconds       = 20
@@ -99,7 +99,7 @@ class Configuration {
   // Visualization //
   ///////////////////
   
-  var visualize                           = true
+  var visualize                           = false
   var visualizationProbabilityHappyVision = 0.1
   var visualizationProbabilityTextOnly    = 0.00
   

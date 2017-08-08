@@ -17,8 +17,8 @@ object DefensiveMatrix extends Action {
   override protected def perform(unit: FriendlyUnitInfo) {
   
     def valueTarget(target: UnitInfo): Double = {
-      if (target.isFriendly)
-        target.matchups.vpfReceivingCurrently
+      if (target.isFriendly && ! target.unitClass.isBuilding && target.defensiveMatrixPoints <= 0)
+        24 * target.matchups.dpfReceivingCurrently + target.damageInLastSecond
       else
         -1.0
     }
@@ -26,10 +26,10 @@ object DefensiveMatrix extends Action {
     val target = TargetSingle.chooseTarget(
       unit,
       32.0 * 10.0,
-      0.0,
+      40.0,
       valueTarget)
     
-    target.foreach(With.commander.useTechOnUnit(unit, Terran.Yamato, _))
+    target.foreach(With.commander.useTechOnUnit(unit, Terran.DefensiveMatrix, _))
   }
   
   

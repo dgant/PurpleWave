@@ -10,6 +10,6 @@ object TerranChoices {
     ProxyBBS2StartLocations,
     ProxyBBS3StartLocations,
     MassMarineAllIn,
-    Macro,
+    TerranMacro,
     MassMarineFFA)
 }

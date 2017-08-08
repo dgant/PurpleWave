@@ -259,6 +259,18 @@ class Commander {
     sleep(unit)
   }
   
+  def cloak(unit: FriendlyUnitInfo, tech: Tech) {
+    if (unready(unit)) return
+    unit.base.cloak()
+    sleep(unit)
+  }
+  
+  def decloak(unit: FriendlyUnitInfo, tech: Tech) {
+    if (unready(unit)) return
+    unit.base.decloak()
+    sleep(unit)
+  }
+  
   private def sleepAttack(unit: FriendlyUnitInfo) {
     sleep(unit, AttackDelay.framesToWaitAfterIssuingAttackOrder(unit))
   }

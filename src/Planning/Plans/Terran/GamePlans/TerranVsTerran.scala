@@ -31,15 +31,19 @@ class TerranVsTerran extends Parallel {
         RequestAtLeast(16, Terran.SCV),
         RequestAtLeast(1, Terran.Factory),
         RequestAtLeast(20, Terran.SCV))),
-  
+    
     new RequireMiningBases(1),
+    new FirstEightMinutes(
+      new Build(
+        RequestAtLeast(1, Terran.Factory),
+        RequestAtLeast(1, Terran.MachineShop),
+        RequestAtLeast(1, Terran.Starport))),
+  
     new Build(
       RequestAtLeast(1, Terran.SCV),
       RequestAtLeast(1, Terran.Barracks),
-      RequestAtLeast(1, Terran.Factory),
-      RequestAtLeast(1, Terran.MachineShop),
-      RequestAtLeast(1, Terran.Starport)),
-  
+      RequestAtLeast(1, Terran.Factory)),
+    
     new If(
       new Check(() => With.self.minerals > 800),
       new Parallel(
@@ -56,6 +60,7 @@ class TerranVsTerran extends Parallel {
     new BuildRefineries,
     
     new If(new UnitsAtLeast(2,  UnitMatchType(Terran.SiegeTankUnsieged)), new Build(RequestTech(Terran.SiegeMode))),
+    new If(new UnitsAtLeast(3,  UnitMatchType(Terran.Wraith)),            new Build(RequestAtLeast(1, Terran.ControlTower), RequestTech(Terran.WraithCloak))),
     new If(new UnitsAtLeast(2,  UnitMatchType(Terran.Goliath)),           new Build(RequestUpgrade(Terran.GoliathAirRange))),
     new If(new UnitsAtLeast(3,  UnitMatchType(Terran.Battlecruiser)),     new Build(RequestTech(Terran.Yamato))),
     new If(new UnitsAtLeast(3,  UnitMatchType(Terran.Vulture)),           new Build(RequestTech(Terran.SpiderMinePlant))),
@@ -89,7 +94,7 @@ class TerranVsTerran extends Parallel {
     new TrainContinuously(Terran.Marine),
     new TrainContinuously(Terran.Vulture),
   
-    new OnMiningBases(2, new Build(RequestAtLeast(3, Terran.Factory), RequestAtLeast(2, Terran.Starport), RequestAtLeast(1, Terran.Armory), RequestAtLeast(5, Terran.Factory))),
+    new OnMiningBases(2, new Build(RequestAtLeast(1, Terran.Starport), RequestAtLeast(3, Terran.Factory), RequestAtLeast(2, Terran.Starport), RequestAtLeast(1, Terran.Armory), RequestAtLeast(1, Terran.Academy), RequestAtLeast(5, Terran.Factory))),
     new OnMiningBases(3, new Build(RequestAtLeast(5, Terran.Factory), RequestAtLeast(1, Terran.Academy), RequestAtLeast(8, Terran.Factory))),
     new OnGasBases(2, new Build(RequestAtLeast(2, Terran.MachineShop))),
     new OnGasBases(3, new Build(
@@ -98,7 +103,6 @@ class TerranVsTerran extends Parallel {
       RequestAtLeast(2, Terran.Starport),
       RequestAtLeast(1, Terran.PhysicsLab),
       RequestUpgrade(Terran.BattlecruiserEnergy))),
-  
     new RequireMiningBases(2),
     new Build(
       RequestAtLeast(3, Terran.Factory),

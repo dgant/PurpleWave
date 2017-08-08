@@ -243,7 +243,8 @@ class ProtossVsZerg extends Parallel {
       new Parallel(
         new If(
           new Not(new Employing(PvZMidgameCorsairSpeedlot)),
-          new TrainContinuously(Protoss.DarkTemplar, 3)),
+          new TrainContinuously(Protoss.DarkTemplar, 3),
+          new TrainContinuously(Protoss.DarkTemplar, 1)),
         new TrainContinuously(Protoss.Reaver, 5),
         new If(
           new And(

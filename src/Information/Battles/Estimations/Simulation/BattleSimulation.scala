@@ -5,7 +5,7 @@ import Information.Battles.Types.{Battle, Team}
 import Lifecycle.With
 import ProxyBwapi.UnitInfo.UnitInfo
 
-class BattleSimulation(battle: Battle, val weAttack: Boolean) {
+class BattleSimulation(val battle: Battle, val weAttack: Boolean) {
   
   private def simulacra(team: Team) = team.units.map(Simulacrum(this, _))
   

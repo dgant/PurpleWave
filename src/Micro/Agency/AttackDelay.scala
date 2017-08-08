@@ -7,6 +7,13 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 object AttackDelay {
   
   /*
+  UPDATE 8/7/0217
+  Resident wizard jaj22 discovers a new way to make Dragoons stick:
+  
+  jaj22: goon chasing zealot on attack order. Give attack order against different zealot in range. Goon fires and sticks.
+   */
+  
+  /*
   Units get stuck when they execute a move order shortly after their attack animation finishes.
   The goal here is to withhold orders until the unit can safely receive them.
   

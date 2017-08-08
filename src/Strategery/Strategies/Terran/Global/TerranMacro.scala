@@ -5,7 +5,7 @@ import Planning.Plans.Terran.GamePlans.TerranGamePlan
 import Strategery.Strategies.Strategy
 import bwapi.Race
 
-object Macro
+object TerranMacro
   extends Strategy {
   
   override def buildGameplan(): Option[Plan] = { Some(new TerranGamePlan) }

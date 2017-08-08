@@ -24,6 +24,7 @@ class TerranVsZerg extends Parallel {
       override lazy val blueprints: Iterable[Blueprint] = Vector(
         new Blueprint(this, building = Some(Terran.SupplyDepot),  placementProfile = Some(PlacementProfiles.hugTownHall)),
         new Blueprint(this, building = Some(Terran.Barracks),     placementProfile = Some(PlacementProfiles.hugTownHall)),
+        new Blueprint(this, building = Some(Terran.Bunker),       placementProfile = Some(PlacementProfiles.hugTownHall)),
         new Blueprint(this, building = Some(Terran.Barracks),     placementProfile = Some(PlacementProfiles.hugTownHall))
       )
     },
@@ -35,6 +36,8 @@ class TerranVsZerg extends Parallel {
         RequestAtLeast(11, Terran.SCV),
         RequestAtLeast(1, Terran.Barracks),
         RequestAtLeast(13, Terran.SCV),
+        RequestAtLeast(1, Terran.Bunker),
+        RequestAtLeast(15, Terran.SCV),
         RequestAtLeast(2, Terran.Barracks))),
     new RequireSufficientSupply,
     new TrainWorkersContinuously,

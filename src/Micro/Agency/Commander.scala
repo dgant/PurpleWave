@@ -241,6 +241,12 @@ class Commander {
     sleep(unit)
   }
   
+  
+  def unload(unit: FriendlyUnitInfo, passenger: UnitInfo) {
+    //No sleeping required
+    unit.base.unload(passenger.base)
+  }
+  
   def addon(unit: FriendlyUnitInfo, unitClass: UnitClass) {
     if (unready(unit)) return
     unit.base.buildAddon(unitClass.baseType)

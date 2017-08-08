@@ -27,9 +27,7 @@ class Visualization {
     ShowBattles,
     ShowUnitsAll,
     ShowUnitsFriendly,
-    ShowUnitsForeign,
-    ShowGroundskeeper,
-    ShowArchitecturePlacements
+    ShowUnitsForeign
   )
   
   var enabled   = true

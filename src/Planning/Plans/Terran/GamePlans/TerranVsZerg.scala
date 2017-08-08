@@ -37,6 +37,7 @@ class TerranVsZerg extends Parallel {
         RequestAtLeast(1, Terran.Marine),
         RequestAtLeast(12, Terran.SCV),
         RequestAtLeast(1, Terran.Marine))),
+    new If(new UnitsAtLeast(4, UnitMatchWarriors), new RequireMiningBases(2)),
     new RequireSufficientSupply,
     new TrainWorkersContinuously,
     new TrainContinuously(Terran.ScienceVessel),

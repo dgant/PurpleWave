@@ -2,7 +2,7 @@ package Micro.Agency
 
 import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile}
-import ProxyBwapi.Races.Protoss
+import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClass.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders, UnitInfo}
@@ -71,7 +71,6 @@ class Commander {
   
   def attackMove(unit: FriendlyUnitInfo, destination: Pixel) {
     if (unready(unit)) return
-    
     unit.base.attack(destination.bwapi)
     sleepAttack(unit)
   }
@@ -128,7 +127,12 @@ class Commander {
     }
     
     if (unit.pixelDistanceFast(destination) > 0) {
-      unit.base.move(destination.bwapi)
+      if (unit.is(Terran.Medic)) {
+        unit.base.attack(destination.bwapi)
+      }
+      else {
+        unit.base.move(destination.bwapi)
+      }
     }
     sleep(unit)
   }

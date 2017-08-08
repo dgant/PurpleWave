@@ -17,6 +17,7 @@ object Cast extends Action {
     WraithUncloak.consider(unit)
     Yamato.consider(unit)
     DefensiveMatrix.consider(unit)
+    Irradiate.consider(unit)
     PsionicStorm.consider(unit)
     Stasis.consider(unit)
     if (unit.matchups.ifAt(framesAhead = 48).threatsInRange.nonEmpty && ( ! unit.canAttack || unit.is(Protoss.Arbiter))) {

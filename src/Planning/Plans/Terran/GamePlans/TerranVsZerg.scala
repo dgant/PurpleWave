@@ -2,15 +2,15 @@ package Planning.Plans.Terran.GamePlans
 
 import Lifecycle.With
 import Macro.Architecture.Blueprint
-import Macro.Architecture.Heuristics.PlacementProfiles
-import Macro.BuildRequests.{RequestAtLeast, RequestTech}
-import Planning.Composition.UnitMatchers.UnitMatchWarriors
+import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
+import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors}
 import Planning.Plans.Army._
 import Planning.Plans.Compound._
+import Planning.Plans.Information.Reactive.EnemyMutalisks
 import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, FirstEightMinutes, FollowBuildOrder}
-import Planning.Plans.Macro.Expanding.{BuildRefineries, RemoveMineralBlocksAt, RequireMiningBases}
+import Planning.Plans.Macro.Expanding._
 import Planning.Plans.Macro.Milestones.UnitsAtLeast
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Recruitment.RecruitFreelancers
@@ -23,11 +23,9 @@ class TerranVsZerg extends Parallel {
     new RequireMiningBases(1),
     new ProposePlacement {
       override lazy val blueprints: Iterable[Blueprint] = Vector(
-        new Blueprint(this, building = Some(Terran.Bunker),       placementProfile = Some(PlacementProfiles.hugTownHall)),
-        new Blueprint(this, building = Some(Terran.SupplyDepot),  placementProfile = Some(PlacementProfiles.hugTownHall)),
-        new Blueprint(this, building = Some(Terran.Barracks),     placementProfile = Some(PlacementProfiles.hugTownHall)),
-        new Blueprint(this, building = Some(Terran.Barracks),     placementProfile = Some(PlacementProfiles.hugTownHall)),
-        new Blueprint(this, building = Some(Terran.Bunker),       placementProfile = Some(PlacementProfiles.hugTownHall), preferZone = With.geography.ourNatural.map(_.zone))
+        new Blueprint(this, building = Some(Terran.Bunker),       preferZone = With.geography.ourNatural.map(_.zone)),
+        new Blueprint(this, building = Some(Terran.Barracks),     preferZone = With.geography.ourNatural.map(_.zone)),
+        new Blueprint(this, building = Some(Terran.Barracks),     preferZone = With.geography.ourNatural.map(_.zone))
       )
     },
     new FirstEightMinutes(
@@ -40,38 +38,51 @@ class TerranVsZerg extends Parallel {
         RequestAtLeast(1, Terran.Bunker),
         RequestAtLeast(1, Terran.Marine),
         RequestAtLeast(12, Terran.SCV),
-        RequestAtLeast(2, Terran.Marine),
-        RequestAtLeast(2, Terran.Barracks))),
+        RequestAtLeast(1, Terran.Marine))),
     new RequireSufficientSupply,
     new TrainWorkersContinuously,
-    new TrainContinuously(Terran.ScienceVessel, 2),
-    new TrainContinuously(Terran.SiegeTankUnsieged, 4),
-    new TrainContinuously(Terran.Marine),
+    new TrainContinuously(Terran.ScienceVessel),
+    new If(
+      new And(
+        new UnitsAtLeast(1, UnitMatchType(Terran.Academy), complete = true),
+        new UnitsAtLeast(3, UnitMatchType(Terran.Marine), complete = true),
+        new Check(() => With.units.ours.count(_.is(Terran.Marine)) > 6 * With.units.ours.count(_.is(Terran.Medic)))
+      ),
+      new TrainContinuously(Terran.Medic, 12),
+      new TrainContinuously(Terran.Marine)
+    ),
     new RequireMiningBases(2),
-    new Build(RequestAtLeast(2, Terran.Bunker)),
     new BuildRefineries,
-    new Build(RequestAtLeast(1, Terran.Factory)),
-    new Build(RequestAtLeast(1, Terran.MachineShop)),
-    new Build(RequestAtLeast(1, Terran.EngineeringBay)),
-    new Build(RequestAtLeast(1, Terran.Academy)),
-    new Build(RequestTech(Terran.SiegeMode)),
-    new Build(RequestAtLeast(2, Terran.MissileTurret)),
-    new Build(RequestAtLeast(1, Terran.Starport)),
-    new TrainContinuously(Terran.Comsat),
-    new Build(RequestAtLeast(1, Terran.ScienceFacility)),
-    new Build(RequestAtLeast(1, Terran.ControlTower)),
-    new Build(RequestAtLeast(4, Terran.Barracks)),
-    new RequireMiningBases(3),
-    new TrainContinuously(Terran.Wraith),
-    new Build(RequestAtLeast(2, Terran.EngineeringBay)),
-    new UpgradeContinuously(Terran.MarineRange),
-    new UpgradeContinuously(Terran.BioDamage),
+    new Build(
+      RequestAtLeast(1, Terran.Academy),
+      RequestAtLeast(2, Terran.Barracks),
+      RequestTech(Terran.Stim),
+      RequestAtLeast(1, Terran.EngineeringBay),
+      RequestAtLeast(2, Terran.Comsat),
+      RequestAtLeast(5, Terran.Barracks),
+      RequestUpgrade(Terran.MarineRange)),
+    new If(
+      new EnemyMutalisks,
+      new BuildMissileTurretsAtBases(2)),
+    new Build(
+      RequestAtLeast(1, Terran.Factory),
+      RequestAtLeast(1, Terran.Starport),
+      RequestAtLeast(1, Terran.ScienceFacility),
+      RequestAtLeast(2, Terran.EngineeringBay)),
     new UpgradeContinuously(Terran.BioArmor),
-    new TrainContinuously(Terran.Barracks),
+    new UpgradeContinuously(Terran.BioDamage),
+    new TrainContinuously(Terran.Comsat),
+    new Build(
+      RequestUpgrade(Terran.ScienceVesselEnergy),
+      RequestAtLeast(2, Terran.Starport),
+      RequestAtLeast(2, Terran.ControlTower),
+      RequestTech(Terran.Irradiate)),
+    new RequireMiningBases(3),
+    new Build(RequestAtLeast(16, Terran.Barracks)),
     new ScoutAt(14),
     new DefendZones,
     new If(
-      new UnitsAtLeast(12, UnitMatchWarriors),
+      new UnitsAtLeast(25, UnitMatchWarriors),
       new ConsiderAttacking),
     new FollowBuildOrder,
     new Scan,

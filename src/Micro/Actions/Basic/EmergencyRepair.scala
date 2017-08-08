@@ -24,11 +24,11 @@ object EmergencyRepair extends Action {
   }
   
   def eligblePatients(unit: FriendlyUnitInfo): Iterable[UnitInfo] = {
-    val dangerLifetime = 24 * 5
+    val dangerLifetime = 24 * 10
     unit.matchups.allies.filter(patient =>
       patient.unitClass.isMechanical && (
-        unit.wounded
-        || unit.matchups.framesToLiveDiffused < 24 * 5
-        || unit.matchups.framesToLiveCurrently < 24 * 5))
+        patient.wounded
+        || patient.matchups.framesToLiveDiffused < dangerLifetime
+        || patient.matchups.framesToLiveCurrently < dangerLifetime))
   }
 }

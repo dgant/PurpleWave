@@ -16,16 +16,11 @@ object FightOrFlight extends Action {
     unit.agent.desireIndividual  = 0.0
     unit.agent.desireTotal       = 0.0
     
-    // Performance shortcuts
-    if ( ! unit.agent.canFight) {
-      unit.agent.shouldEngage = false
-      return
-    }
-    
-    if ( ! unit.canMove || Yolo.active) {
-      unit.agent.shouldEngage = true
-      return
-    }
+    if ( ! unit.agent.canFight)             { unit.agent.shouldEngage = false;  return }
+    if (unit.underStorm)                    { unit.agent.shouldEngage = false;  return }
+    if (unit.underDisruptionWeb)            { unit.agent.shouldEngage = false;  return }
+    if (unit.ranged && unit.underDarkSwarm) { unit.agent.shouldEngage = false;  return }
+    if ( ! unit.canMove || Yolo.active)     { unit.agent.shouldEngage = true;   return }
     
     unit.agent.desireTeam        = unit.battle.map(_.desire).getOrElse(0.0)
     unit.agent.desireIndividual  = unit.battle.flatMap(_.estimationSimulationAttack.reportCards.get(unit).map(_.netValuePerFrame)).getOrElse(0.0)

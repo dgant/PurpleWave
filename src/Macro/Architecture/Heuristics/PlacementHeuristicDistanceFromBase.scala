@@ -13,7 +13,7 @@ object PlacementHeuristicDistanceFromBase extends PlacementHeuristic {
     else {
       var totalDistance = 0.0
       With.geography.ourBases.foreach(base => {
-        val from  = base.heart.pixelCenter
+        val from  = base.townHallArea.midPixel
         val to    = candidate.pixelCenter
         
         // Performance optimization. Town hall placements matter more so use the zone distance as well.

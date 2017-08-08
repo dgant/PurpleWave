@@ -1,5 +1,6 @@
 package Planning.Plans.Terran.GamePlans
 
+import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{RequestAtLeast, RequestTech}
@@ -22,22 +23,24 @@ class TerranVsZerg extends Parallel {
     new RequireMiningBases(1),
     new ProposePlacement {
       override lazy val blueprints: Iterable[Blueprint] = Vector(
+        new Blueprint(this, building = Some(Terran.Bunker),       placementProfile = Some(PlacementProfiles.hugTownHall)),
         new Blueprint(this, building = Some(Terran.SupplyDepot),  placementProfile = Some(PlacementProfiles.hugTownHall)),
         new Blueprint(this, building = Some(Terran.Barracks),     placementProfile = Some(PlacementProfiles.hugTownHall)),
-        new Blueprint(this, building = Some(Terran.Bunker),       placementProfile = Some(PlacementProfiles.hugTownHall)),
-        new Blueprint(this, building = Some(Terran.Barracks),     placementProfile = Some(PlacementProfiles.hugTownHall))
+        new Blueprint(this, building = Some(Terran.Barracks),     placementProfile = Some(PlacementProfiles.hugTownHall)),
+        new Blueprint(this, building = Some(Terran.Bunker),       placementProfile = Some(PlacementProfiles.hugTownHall), preferZone = With.geography.ourNatural.map(_.zone))
       )
     },
     new FirstEightMinutes(
       new Build(
         RequestAtLeast(1, Terran.CommandCenter),
         RequestAtLeast(9, Terran.SCV),
-        RequestAtLeast(1, Terran.SupplyDepot),
-        RequestAtLeast(11, Terran.SCV),
         RequestAtLeast(1, Terran.Barracks),
-        RequestAtLeast(13, Terran.SCV),
+        RequestAtLeast(1, Terran.SupplyDepot),
+        RequestAtLeast(10, Terran.SCV),
         RequestAtLeast(1, Terran.Bunker),
-        RequestAtLeast(15, Terran.SCV),
+        RequestAtLeast(1, Terran.Marine),
+        RequestAtLeast(12, Terran.SCV),
+        RequestAtLeast(2, Terran.Marine),
         RequestAtLeast(2, Terran.Barracks))),
     new RequireSufficientSupply,
     new TrainWorkersContinuously,
@@ -45,6 +48,7 @@ class TerranVsZerg extends Parallel {
     new TrainContinuously(Terran.SiegeTankUnsieged, 4),
     new TrainContinuously(Terran.Marine),
     new RequireMiningBases(2),
+    new Build(RequestAtLeast(2, Terran.Bunker)),
     new BuildRefineries,
     new Build(RequestAtLeast(1, Terran.Factory)),
     new Build(RequestAtLeast(1, Terran.MachineShop)),

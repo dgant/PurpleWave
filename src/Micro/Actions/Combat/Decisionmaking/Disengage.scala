@@ -1,8 +1,10 @@
 package Micro.Actions.Combat.Decisionmaking
 
+import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Attacking.Potshot
 import Micro.Actions.Combat.Maneuvering.{Avoid, KiteSafely, Retreat}
+import Micro.Actions.Combat.Tactics.Bunk
 import Planning.Yolo
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -19,9 +21,17 @@ object Disengage extends Action {
     
     val mostEntangledThreat = unit.matchups.mostEntangledThreatDiffused.get
     
-    lazy val freeToFlee  = unit.topSpeed        > mostEntangledThreat.topSpeedChasing
-    lazy val freeToChase = unit.topSpeedChasing > mostEntangledThreat.topSpeed
-    lazy val outrange    = unit.canAttack(mostEntangledThreat) && unit.pixelRangeAgainstFromEdge(mostEntangledThreat) > mostEntangledThreat.pixelRangeAgainstFromEdge(unit)
+    lazy val bunkers      = Bunk.openBunkersFor(unit)
+    lazy val freeToFlee   = unit.topSpeed        > mostEntangledThreat.topSpeedChasing
+    lazy val freeToChase  = unit.topSpeedChasing > mostEntangledThreat.topSpeed
+    lazy val outrange     = unit.canAttack(mostEntangledThreat) && unit.pixelRangeAgainstFromEdge(mostEntangledThreat) > mostEntangledThreat.pixelRangeAgainstFromEdge(unit)
+  
+    // Bunker? Yes, please.
+    if (bunkers.nonEmpty) {
+      val bunker = bunkers.minBy(_.pixelDistanceFast(unit))
+      With.commander.rightClick(unit, bunker)
+      return
+    }
     
     if (freeToFlee) {
       if (outrange) {
@@ -44,7 +54,7 @@ object Disengage extends Action {
       }
       else {
         
-        // Get out of hurtsville ASAP
+        // Get out of hurtsville ASAP.
         if (unit.matchups.vpfReceivingDiffused > 0) {
           Avoid.consider(unit)
         }

@@ -13,7 +13,7 @@ object PlacementProfiles {
       pylon
     else if (blueprint.building.exists(_.trainsGroundUnits))
       factory
-    else if (blueprint.building.exists(_.rawCanAttack))
+    else if (blueprint.building.exists(_.attacks))
       cannon
     else
       tech

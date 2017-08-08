@@ -56,7 +56,7 @@ class TestingPlaybook extends EmptyPlaybook {
   
   val strategyToTest = PvPEarly1GateCore
   
-  override lazy val forced: Seq[Strategy] = Seq(AllPvZ, PvZEarlyFFEConservative)
+  override lazy val forced: Seq[Strategy] = Seq(AllPvZ, PvZEarlyFFEConservative, TerranMacro)
 }
 
 

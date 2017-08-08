@@ -8,7 +8,8 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 object EmergencyRepair extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.is(Terran.SCV)
+    unit.is(Terran.SCV) && eligblePatients(unit).nonEmpty
+    
   }
   
   override def perform(unit: FriendlyUnitInfo) {
@@ -23,8 +24,11 @@ object EmergencyRepair extends Action {
   }
   
   def eligblePatients(unit: FriendlyUnitInfo): Iterable[UnitInfo] = {
+    val dangerLifetime = 24 * 5
     unit.matchups.allies.filter(patient =>
-      patient.unitClass.isMechanical
-      && unit.wounded)
+      patient.unitClass.isMechanical && (
+        unit.wounded
+        || unit.matchups.framesToLiveDiffused < 24 * 5
+        || unit.matchups.framesToLiveCurrently < 24 * 5))
   }
 }

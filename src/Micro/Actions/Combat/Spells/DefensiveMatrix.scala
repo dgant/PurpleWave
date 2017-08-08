@@ -11,6 +11,7 @@ object DefensiveMatrix extends Action {
   override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.is(Terran.ScienceVessel)                     &&
     unit.energy >= Terran.DefensiveMatrix.energyCost  &&
+    ! With.self.hasTech(Terran.Irradiate)             &&
     unit.matchups.allies.exists(_.matchups.vpfReceivingCurrently > 0)
   }
   

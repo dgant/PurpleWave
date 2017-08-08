@@ -2,11 +2,14 @@ package ProxyBwapi.Players
 
 import Debugging.Visualizations.Colors
 import ProxyBwapi.Upgrades.Upgrade
-import bwapi.Player
+import bwapi.{Player, Race}
 
 case class PlayerInfo(basePlayer:Player) extends PlayerProxy(basePlayer) {
   
-  def isFriendly = isUs || isAlly
+  lazy val isTerran   : Boolean = race == Race.Terran
+  lazy val isProtoss  : Boolean = race == Race.Protoss
+  lazy val isZerg     : Boolean = race == Race.Zerg
+  lazy val isFriendly : Boolean = isUs || isAlly
   
   def hasUpgrade(upgrade: Upgrade): Boolean = getUpgradeLevel(upgrade) > 0
   

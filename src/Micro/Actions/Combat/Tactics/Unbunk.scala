@@ -8,7 +8,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 object Unbunk extends Action {
   
   override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.transport.exists(_.is(Terran.Bunker)) &&
+    unit.transport.exists(_.is(Terran.Bunker))          &&
     unit.transport.get.matchups.targetsInRange.isEmpty
   }
   

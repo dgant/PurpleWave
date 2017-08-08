@@ -6,7 +6,7 @@ import Macro.Architecture.Blueprint
 import Macro.BuildRequests.{RequestAnother, RequestAtLeast}
 import Planning.Composition.Property
 import Planning.Plan
-import ProxyBwapi.Races.{Protoss, Terran}
+import ProxyBwapi.Races.Terran
 
 class BuildMissileTurretsAtBases(initialCount: Int) extends Plan {
   
@@ -32,7 +32,7 @@ class BuildMissileTurretsAtBases(initialCount: Int) extends Plan {
     val zone = base.zone
     val turretsInBase = With.units.ours.filter(unit => unit.is(Terran.MissileTurret) && unit.pixelCenter.zone == zone)
     for (i <- 0 to count.get) {
-      val blueprint = new Blueprint(this, building = Some(Protoss.PhotonCannon), requireZone = Some(base.zone))
+      val blueprint = new Blueprint(this, building = Some(Terran.MissileTurret), requireZone = Some(base.zone))
       With.groundskeeper.propose(blueprint)
     }
     With.scheduler.request(this, RequestAnother(count.get - turretsInBase.size, Terran.MissileTurret))

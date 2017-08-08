@@ -9,17 +9,17 @@ import Utilities.ByOption
 object Heal extends Action {
   
   override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.is(Terran.Medic) && validTargets(unit).nonEmpty
+    unit.is(Terran.Medic) && validTargets(unit).nonEmpty && unit.energy > 0
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {
     val targets = validTargets(unit)
     val target  = ByOption.minBy(targets)(_.pixelDistanceFast(unit))
     
-    target.foreach(someTarget => With.commander.rightClick(unit, someTarget))
+    target.foreach(someTarget => With.commander.attackMove(unit, someTarget.pixelCenter))
   }
   
   private def validTargets(unit: FriendlyUnitInfo): Vector[UnitInfo] = {
-    unit.matchups.allies.filter(u => u.unitClass.isOrganic && u.hitPoints < u.unitClass.maxHitPoints && ! u.beingHealed)
+    unit.matchups.allies.filter(u => u.unitClass.isOrganic && ! u.beingHealed)
   }
 }

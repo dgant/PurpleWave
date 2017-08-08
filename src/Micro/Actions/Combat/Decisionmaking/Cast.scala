@@ -13,11 +13,12 @@ object Cast extends Action {
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {
+    Heal.consider(unit)
     WraithCloak.consider(unit)
     WraithUncloak.consider(unit)
     Yamato.consider(unit)
-    DefensiveMatrix.consider(unit)
     Irradiate.consider(unit)
+    DefensiveMatrix.consider(unit)
     PsionicStorm.consider(unit)
     Stasis.consider(unit)
     if (unit.matchups.ifAt(framesAhead = 48).threatsInRange.nonEmpty && ( ! unit.canAttack || unit.is(Protoss.Arbiter))) {

@@ -196,9 +196,11 @@ class Architecture {
   private def recalculateExclusions() {
     val forUnbuildable  = With.units.all.toSeq.filter(isGroundBuilding)
     val forUnwalkable   = With.units.ours.toSeq.filter(unit => isGroundBuilding(unit) && usuallyNeedsMargin(unit.unitClass))
+    val expansionAddons = if (With.self.isTerran) With.geography.bases.map(base => { val start = base.townHallTile.add(4, 1); TileRectangle(start, start.add(2, 2)) }) else Seq.empty
     
     unbuildable     ++= forUnbuildable.flatMap(_.tileArea.tiles)
     unbuildable     ++= forUnbuildable.filter(_.unitClass.canBuildAddon).flatMap(_.addonArea.tiles)
+    unbuildable     ++= expansionAddons.flatMap(_.tiles)
     unwalkable      ++= unbuildable
     unwalkable      ++= forUnwalkable.flatMap(_.tileArea.expand(1, 1).tiles)
     untownhallable  ++= unbuildable
@@ -229,6 +231,7 @@ class Architecture {
   /////////////////
   // Walkability //
   /////////////////
+  
   private def canaryTile(zone: Zone): Tile = {
     Spiral.points(20)
       .map(zone.centroid.add)

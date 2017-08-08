@@ -10,7 +10,7 @@ class EnemyLurkers extends Plan {
   
   override def isComplete: Boolean = {
     With.units.enemy.exists(_.is(Zerg.Lurker)) ||
-      With.units.enemy.exists(_.is(Zerg.LurkerEgg)) ||
+    With.units.enemy.exists(_.is(Zerg.LurkerEgg)) ||
     (
       (
         With.units.enemy.exists(_.is(Zerg.Hydralisk)) ||

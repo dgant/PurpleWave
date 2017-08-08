@@ -2,7 +2,7 @@ package Micro.Actions.Combat.Decisionmaking
 
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.{Cower, Sneak}
-import Micro.Actions.Combat.Spells.SpiderMine
+import Micro.Actions.Combat.Spells.{SpiderMine, Stim}
 import Micro.Actions.Combat.Tactics.{Bunk, BustBunker, Sally, Spot}
 import Micro.Actions.Protoss.BeACarrier
 import Micro.Actions.Terran.{Siege, Unsiege}
@@ -15,6 +15,7 @@ object Fight extends Action {
   }
   
   override def perform(unit: FriendlyUnitInfo) {
+    Stim.consider(unit)
     Bunk.consider(unit)
     Cower.consider(unit)
     Siege.consider(unit)

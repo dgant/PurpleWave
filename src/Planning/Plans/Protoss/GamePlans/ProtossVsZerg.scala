@@ -15,7 +15,7 @@ import Planning.Plans.Macro.Expanding.{BuildAssimilators, BuildCannonsAtExpansio
 import Planning.Plans.Macro.Milestones._
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Protoss.ProtossBuilds
-import Planning.Plans.Protoss.Situational.{Defend2GateAgainst4Pool, DefendFFEAgainst4Pool, ForgeFastExpand, TwoGatewaysAtNexus}
+import Planning.Plans.Protoss.Situational._
 import Planning.Plans.Scouting.{FindExpansions, Scout, ScoutAt}
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Protoss.PvZ._
@@ -28,19 +28,18 @@ class ProtossVsZerg extends Parallel {
   // Early game //
   ////////////////
   
+  private class WeAreFFEing extends Or(
+    new Employing(PvZEarlyFFEEconomic),
+    new Employing(PvZEarlyFFEConservative),
+    new Employing(PvZEarlyFFEGatewayFirst),
+    new Employing(PvZEarlyFFENexusFirst))
+  
   private class ImplementEarly2Gate extends FirstEightMinutes(
     new Parallel(
       new TwoGatewaysAtNexus,
       new Trigger(
         new UnitsAtLeast(2, UnitMatchType(Protoss.Zealot), complete = true),
         initialBefore = new Build(ProtossBuilds.OpeningTwoGate99_WithZealots: _*))))
-  
-  private class FFEFollowUp extends Build(
-    RequestAtLeast(1, Protoss.Forge),
-    RequestAtLeast(2, Protoss.PhotonCannon),
-    RequestAtLeast(1, Protoss.Gateway),
-    RequestAtLeast(1, Protoss.CyberneticsCore),
-    RequestAtLeast(3, Protoss.PhotonCannon))
   
   private class FFE extends FirstEightMinutes(
     new Parallel(
@@ -49,32 +48,41 @@ class ProtossVsZerg extends Parallel {
         new EnemyStrategy(Fingerprint4Pool),
         new Build(ProtossBuilds.FFE_Vs4Pool: _*),
       new If(
-        new Employing(PvZEarlyFFEGatewayFirst),
-        new Build(ProtossBuilds.FFE_GatewayFirst: _*),
-      new If(
-        new EnemyStrategy(Fingerprint12Hatch),
-        new Build(ProtossBuilds.FFE_NexusFirst: _*),
-      new If(
         new Or(
           new EnemyStrategy(Fingerprint9Pool),
           new EnemyStrategy(FingerprintOverpool),
           new EnemyStrategy(Fingerprint10Hatch9Pool)),
         new Build(ProtossBuilds.FFE_ForgeFirst: _*),
       new If(
+        new EnemyStrategy(Fingerprint12Hatch),
+        new If(
+          new Employing(PvZEarlyFFEGatewayFirst),
+          new Build(ProtossBuilds.FFE_GatewayFirst: _*),
+          new Build(ProtossBuilds.FFE_NexusFirst: _*)),
+      new If(
         new Employing(PvZEarlyFFEConservative),
         new Build(ProtossBuilds.FFE_Vs4Pool: _*),
+      new If(
+        new Employing(PvZEarlyFFEGatewayFirst),
+        new Build(ProtossBuilds.FFE_GatewayFirst: _*),
       new If(
         new Employing(PvZEarlyFFENexusFirst),
         new Build(ProtossBuilds.FFE_NexusFirst: _*),
         new Build(ProtossBuilds.FFE_ForgeFirst: _*))))))),
       new RequireMiningBases(2),
+      new If(
+        new EnemyStrategy(Fingerprint10Hatch9Pool),
+        new Build(RequestAtLeast(4, Protoss.PhotonCannon))),
       new FFEFollowUp
     ))
   
-  private class ImplementEarlyFFEEconomic extends FFE
-  private class ImplementEarlyFFEConservative extends FFE
-  private class ImplementEarlyFFEGatewayFirst extends FFE
-  private class ImplementEarlyFFENexusFirst extends FFE
+  private class FFEFollowUp extends Build(
+    RequestAtLeast(1, Protoss.Forge),
+    RequestAtLeast(2, Protoss.PhotonCannon),
+    RequestAtLeast(2, Protoss.Nexus),
+    RequestAtLeast(1, Protoss.Gateway),
+    RequestAtLeast(1, Protoss.CyberneticsCore),
+    RequestAtLeast(3, Protoss.PhotonCannon))
   
   /////////////
   // Midgame //
@@ -162,11 +170,8 @@ class ProtossVsZerg extends Parallel {
     /////////////////////////////
     
     new RequireMiningBases(1),
-    new Employ(PvZEarly2Gate,           new ImplementEarly2Gate),
-    new Employ(PvZEarlyFFEEconomic,     new ImplementEarlyFFEEconomic),
-    new Employ(PvZEarlyFFEConservative, new ImplementEarlyFFEConservative),
-    new Employ(PvZEarlyFFENexusFirst,   new ImplementEarlyFFENexusFirst),
-    new Employ(PvZEarlyFFEGatewayFirst, new ImplementEarlyFFEGatewayFirst),
+    new Employ(PvZEarly2Gate, new ImplementEarly2Gate),
+    new If(new WeAreFFEing, new FFE),
   
     ///////////////////
     // Early defense //
@@ -187,10 +192,22 @@ class ProtossVsZerg extends Parallel {
     new FirstEightMinutes(
       new If(
         new And(
+          new WeAreFFEing,
           new EnemyStrategy(Fingerprint4Pool),
           new Check(() => With.frame > 24 * 125),
           new UnitsAtMost(1, UnitMatchType(Protoss.PhotonCannon), complete = true)),
-        new DefendFFEAgainst4Pool)),
+        new DefendFFEWithProbesAgainst4Pool)),
+  
+    new FirstEightMinutes(
+      new If(
+        new And(
+          new WeAreFFEing,
+          new Or(
+            new EnemyStrategy(Fingerprint9Pool),
+            new EnemyStrategy(FingerprintOverpool)),
+          new Check(() => With.frame > 24 * 125),
+          new UnitsAtMost(2, UnitMatchType(Protoss.PhotonCannon), complete = true)),
+        new DefendFFEWithProbesAgainst9Pool)),
     
     new FirstEightMinutes(new Defend2GateAgainst4Pool),
   
@@ -313,13 +330,11 @@ class ProtossVsZerg extends Parallel {
     /////////////
     
     new If(
-      new Or(
-        new Employing(PvZEarlyFFEEconomic),
-        new Employing(PvZEarlyFFEConservative),
-        new Employing(PvZEarlyFFEGatewayFirst),
-        new Employing(PvZEarlyFFENexusFirst)),
+      new WeAreFFEing,
       new If(
-        new Check(() => With.units.ours.exists(u => u.is(Protoss.Pylon) && With.framesSince(u.frameDiscovered) > 24)),
+        new And(
+          new Not(new Employing(PvZEarlyFFEConservative)),
+          new Check(() => With.units.ours.exists(u => u.is(Protoss.Pylon) && With.framesSince(u.frameDiscovered) > 24))),
         new If(
           new StartPositionsAtLeast(4),
           new Scout(2),

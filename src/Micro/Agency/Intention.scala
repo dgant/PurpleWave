@@ -26,4 +26,5 @@ class Intention {
   var canMeld     : Boolean           = false
   var canTickle   : Boolean           = false
   var canScout    : Boolean           = false
+  var canPillage  : Boolean           = false
 }

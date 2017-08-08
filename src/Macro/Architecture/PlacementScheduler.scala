@@ -16,7 +16,7 @@ class PlacementScheduler {
       reset()
       setState(new PlacementStateInitial)
     }
-    while ((runToCompletionEvenIfItCostsUsAFrame || With.performance.continueRunning) && ! state.isComplete) {
+    while ( ! state.isComplete && (runToCompletionEvenIfItCostsUsAFrame || With.performance.continueRunning)) {
       state.step()
     }
   }
@@ -26,7 +26,7 @@ class PlacementScheduler {
   }
   
   private def reset() {
-    queue = new mutable.Queue[Blueprint] ++ With.groundskeeper.proposalQueue
-    placements = With.groundskeeper.proposalPlacements.toMap
+    queue       = new mutable.Queue[Blueprint] ++ With.groundskeeper.proposalQueue
+    placements  = With.groundskeeper.proposalPlacements.toMap
   }
 }

@@ -34,8 +34,9 @@ class ControlEnemyAirspace extends Plan {
         val scout = unassignedScouts.minBy(_.pixelDistanceFast(basePixel))
         unassignedScouts -= scout
         scout.agent.intend(this, new Intention {
-          toTravel = Some(basePixel)
-          canCower = true
+          toTravel    = Some(basePixel)
+          canPillage  = true
+          canCower    = true
         })
       })
   }

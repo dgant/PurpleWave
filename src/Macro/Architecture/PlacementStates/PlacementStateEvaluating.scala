@@ -73,6 +73,7 @@ class PlacementStateEvaluating(blueprint: Blueprint) extends PlacementState {
         evaluationDebugging.values.flatten,
         evaluationValuesMap,
         With.frame)
+      With.architecture.assumePlacement(placement)
       With.groundskeeper.updatePlacement(blueprint, placement)
       transition(new PlacementStateReady)
     }

@@ -201,9 +201,9 @@ object ProtossBuilds {
     RequestAtLeast(9,   Protoss.Probe),
     RequestAtLeast(1,   Protoss.Forge),
     RequestAtLeast(2,   Protoss.PhotonCannon),
-    RequestAtLeast(14,  Protoss.Probe),
+    RequestAtLeast(12,  Protoss.Probe),
     RequestAtLeast(3,   Protoss.PhotonCannon),
-    RequestAtLeast(16,  Protoss.Probe),
+    RequestAtLeast(15,  Protoss.Probe),
     RequestAtLeast(2,   Protoss.Nexus),
     RequestAtLeast(2,   Protoss.Pylon))
   
@@ -217,6 +217,7 @@ object ProtossBuilds {
     RequestAtLeast(2,   Protoss.PhotonCannon),
     RequestAtLeast(16,  Protoss.Probe),
     RequestAtLeast(2,   Protoss.Nexus),
+    RequestAtLeast(3,   Protoss.PhotonCannon),
     RequestAtLeast(2,   Protoss.Pylon))
   
   val FFE_NexusFirst = Vector[BuildRequest] (

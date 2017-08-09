@@ -29,14 +29,18 @@ class BuildCannonsAtBases(initialCount: Int) extends Plan {
   }
   
   private def cannonBase(base: Base) {
-    val zone = base.zone
-    val cannonsInExpansion = With.units.ours.filter(unit => unit.is(Protoss.PhotonCannon) && unit.pixelCenter.zone == zone)
-    val pylonBlueprint = new Blueprint(this, building = Some(Protoss.Pylon), requireZone = Some(base.zone))
+    val zone                = base.zone
+    val cannonsInExpansion  = With.units.ours.count(unit => unit.is(Protoss.PhotonCannon) && unit.pixelCenter.zone == zone)
+    val cannonsToAdd        = count.get - cannonsInExpansion
+    val pylonBlueprint      = new Blueprint(this, building = Some(Protoss.Pylon), requireZone = Some(base.zone))
+    
+    if (cannonsToAdd <= 0) return
+    
     With.groundskeeper.propose(pylonBlueprint)
-    for (i <- 0 to count.get) {
+    for (i <- 0 to cannonsToAdd) {
       val cannonBlueprint = new Blueprint(this, building = Some(Protoss.PhotonCannon), requireZone = Some(base.zone))
       With.groundskeeper.propose(cannonBlueprint)
     }
-    With.scheduler.request(this, RequestAnother(count.get - cannonsInExpansion.size, Protoss.PhotonCannon))
+    With.scheduler.request(this, RequestAnother(cannonsToAdd, Protoss.PhotonCannon))
   }
 }

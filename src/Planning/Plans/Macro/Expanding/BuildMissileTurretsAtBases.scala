@@ -3,6 +3,7 @@ package Planning.Plans.Macro.Expanding
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Macro.Architecture.Blueprint
+import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{RequestAnother, RequestAtLeast}
 import Planning.Composition.Property
 import Planning.Plan
@@ -29,12 +30,16 @@ class BuildMissileTurretsAtBases(initialCount: Int) extends Plan {
   }
   
   private def turretBase(base: Base) {
-    val zone = base.zone
-    val turretsInBase = With.units.ours.filter(unit => unit.is(Terran.MissileTurret) && unit.pixelCenter.zone == zone)
-    for (i <- 0 to count.get) {
-      val blueprint = new Blueprint(this, building = Some(Terran.MissileTurret), requireZone = Some(base.zone))
+    val zone          = base.zone
+    val turretsInBase = With.units.ours.count(unit => unit.is(Terran.MissileTurret) && unit.pixelCenter.zone == zone)
+    val turretsToAdd  = count.get - turretsInBase
+    
+    if (turretsToAdd <= 0) return
+    
+    for (i <- 0 to turretsToAdd) {
+      val blueprint = new Blueprint(this, building = Some(Terran.MissileTurret), requireZone = Some(base.zone), placementProfile = Some(PlacementProfiles.hugTownHall))
       With.groundskeeper.propose(blueprint)
     }
-    With.scheduler.request(this, RequestAnother(count.get - turretsInBase.size, Terran.MissileTurret))
+    With.scheduler.request(this, RequestAnother(turretsToAdd, Terran.MissileTurret))
   }
 }

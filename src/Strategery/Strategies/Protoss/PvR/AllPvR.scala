@@ -1,6 +1,8 @@
-package Strategery.Strategies.Protoss.Global
+package Strategery.Strategies.Protoss.PvR
 
-import Strategery.Strategies.Protoss.PvR.{PvREarly2Gate1012, PvREarly2Gate910, PvREarly2Gate910AtNatural}
+import Strategery.Strategies.Protoss.PvP.AllPvP
+import Strategery.Strategies.Protoss.PvT.AllPvT
+import Strategery.Strategies.Protoss.PvZ.AllPvZ
 import Strategery.Strategies.Strategy
 import bwapi.Race
 

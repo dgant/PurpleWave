@@ -5,8 +5,7 @@ import Planning.Plans.Terran.GamePlans.MassMarine
 import Strategery.Strategies.Strategy
 import bwapi.Race
 
-object MassMarineAllIn
-  extends Strategy {
+object TvEMassMarineAllIn extends Strategy {
   
   override def buildGameplan(): Option[Plan] = { Some(new MassMarine) }
   

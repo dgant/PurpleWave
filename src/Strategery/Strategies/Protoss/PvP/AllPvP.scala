@@ -1,6 +1,5 @@
-package Strategery.Strategies.Protoss.Global
+package Strategery.Strategies.Protoss.PvP
 
-import Strategery.Strategies.Protoss.PvP._
 import Strategery.Strategies.Strategy
 import bwapi.Race
 

@@ -5,11 +5,11 @@ import Planning.Plans.Terran.GamePlans.ProxyBBS
 import Strategery.Strategies.Strategy
 import bwapi.Race
 
-object ProxyBBS2StartLocations  extends Strategy {
+object TvEProxyBBS3StartLocations extends Strategy {
   
   override def buildGameplan(): Option[Plan] = { Some(new ProxyBBS) }
   
   override def ourRaces: Iterable[Race] = Vector(Race.Terran)
-
-  override def startLocationsMax = 2
+  
+  override def startLocationsMin = 3
 }

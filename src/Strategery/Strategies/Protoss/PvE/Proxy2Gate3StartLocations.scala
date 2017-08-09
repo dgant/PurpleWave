@@ -1,4 +1,4 @@
-package Strategery.Strategies.Protoss.Global
+package Strategery.Strategies.Protoss.PvE
 
 import Planning.Plan
 import Planning.Plans.Protoss.GamePlans.Proxy2Gate

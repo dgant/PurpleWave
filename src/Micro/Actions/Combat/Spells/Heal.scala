@@ -20,6 +20,6 @@ object Heal extends Action {
   }
   
   private def validTargets(unit: FriendlyUnitInfo): Vector[UnitInfo] = {
-    unit.matchups.allies.filter(u => u.unitClass.isOrganic && ! u.beingHealed)
+    unit.matchups.allies.filter(u => u.unitClass.isOrganic && ! u.beingHealed && ! u.is(Terran.Medic))
   }
 }

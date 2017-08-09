@@ -8,7 +8,7 @@ import Planning.Plans.Macro.BuildOrders.FollowBuildOrder
 import Planning.Plans.Macro.Expanding.RemoveMineralBlocksAt
 import Planning.Plans.Recruitment.RecruitFreelancers
 
-class ProtossGamePlan
+class ProtossStandardGamePlan
   extends Parallel (
     new SwitchEnemyRace {
       terran  .set(new ProtossVsTerran)

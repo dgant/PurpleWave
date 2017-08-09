@@ -1,15 +1,19 @@
 package Strategery.Strategies.Terran
 
 import Strategery.Strategies.Terran.Global._
+import Strategery.Strategies.Terran.Other.TerranFFAMassMarine
+import Strategery.Strategies.Terran.TvT.TvTStandard
+import Strategery.Strategies.Terran.TvZ.TvZStandard
 import Strategery.Strategies._
 
 object TerranChoices {
   
   val overall: Iterable[Strategy] = Vector(
-    Proxy5RaxAllIn,
-    ProxyBBS2StartLocations,
-    ProxyBBS3StartLocations,
-    MassMarineAllIn,
-    TerranMacro,
-    MassMarineFFA)
+    TvEProxy5RaxAllIn,
+    TvEProxyBBS2StartLocations,
+    TvEProxyBBS3StartLocations,
+    TvEMassMarineAllIn,
+    TvTStandard,
+    TvZStandard,
+    TerranFFAMassMarine)
 }

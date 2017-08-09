@@ -5,7 +5,7 @@ import Planning.Plans.Terran.GamePlans.Proxy8Fact
 import Strategery.Strategies.Strategy
 import bwapi.Race
 
-object Proxy8FactAllIn extends Strategy {
+object TvEProxy8FactAllIn extends Strategy {
   
   // Currently unusable due to delayed gas mining.
   
@@ -13,5 +13,5 @@ object Proxy8FactAllIn extends Strategy {
   
   override def ourRaces: Iterable[Race] = Vector(Race.Terran)
   
-  //override def startLocationsMax = 2
+  override def startLocationsMax = 2
 }

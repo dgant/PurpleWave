@@ -1,11 +1,11 @@
-package Strategery.Strategies.Protoss.Global
+package Strategery.Strategies.Protoss.Other
 
 import Planning.Plan
 import Planning.Plans.Protoss._
 import Strategery.Strategies.Strategy
 import bwapi.Race
 
-object IslandCarriers extends Strategy {
+object ProtossIslandCarriers extends Strategy {
   
   override def buildGameplan(): Option[Plan] = {  Some(new GamePlans.IslandCarriers) }
   

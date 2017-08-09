@@ -13,7 +13,7 @@ object Stim extends Action {
     (unit.is(Terran.Marine) || unit.is(Terran.Firebat)) &&
     With.self.hasTech(Terran.Stim)                      &&
     ! unit.stimmed                                      && // TODO: stimFrames < With.latency.framesRemaining
-    (unit.matchups.targetsInRange.nonEmpty || unit.matchups.threatsInRange.nonEmpty || unit.agent.shouldEngage)
+    (unit.matchups.targetsInRange.nonEmpty || unit.matchups.threatsInRange.nonEmpty)
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {

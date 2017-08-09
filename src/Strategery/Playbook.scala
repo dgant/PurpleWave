@@ -1,12 +1,14 @@
 package Strategery
 
 import Strategery.Strategies.AllRaces.{WorkerRush2StartLocations, WorkerRush3StartLocations}
-import Strategery.Strategies.Protoss.Global._
+import Strategery.Strategies.Protoss.PvE._
 import Strategery.Strategies.Protoss.PvP._
 import Strategery.Strategies.Protoss.PvT._
 import Strategery.Strategies.Protoss.PvZ._
 import Strategery.Strategies.Strategy
 import Strategery.Strategies.Terran.Global._
+import Strategery.Strategies.Terran.TvT.TvTStandard
+import Strategery.Strategies.Terran.TvZ.TvZStandard
 import Strategery.Strategies.Zerg.Global._
 
 class EmptyPlaybook {
@@ -22,10 +24,10 @@ object StrategyGroups {
   val cheese = Vector[Strategy](
     WorkerRush2StartLocations,
     WorkerRush3StartLocations,
-    ProxyBBS2StartLocations,
-    ProxyBBS3StartLocations,
-    Proxy5RaxAllIn,
-    MassMarineAllIn,
+    TvEProxyBBS2StartLocations,
+    TvEProxyBBS3StartLocations,
+    TvEProxy5RaxAllIn,
+    TvEMassMarineAllIn,
     Proxy2Gate2StartLocations,
     Proxy2Gate3StartLocations,
     ProxyDarkTemplar,
@@ -43,10 +45,10 @@ object StrategyGroups {
   val bad = Vector[Strategy](
     WorkerRush2StartLocations,
     WorkerRush3StartLocations,
-    ProxyBBS2StartLocations,
-    ProxyBBS3StartLocations,
-    Proxy5RaxAllIn,
-    MassMarineAllIn,
+    TvEProxyBBS2StartLocations,
+    TvEProxyBBS3StartLocations,
+    TvEProxy5RaxAllIn,
+    TvEMassMarineAllIn,
     Proxy2Gate3StartLocations,
     ProxyDarkTemplar
   )
@@ -56,7 +58,7 @@ class TestingPlaybook extends EmptyPlaybook {
   
   val strategyToTest = PvPEarly1GateCore
   
-  override lazy val forced: Seq[Strategy] = Seq(AllPvZ, PvZEarlyFFEConservative, TerranMacro)
+  override lazy val forced: Seq[Strategy] = Seq(AllPvP, AllPvT, AllPvZ, TvTStandard, TvZStandard)
 }
 
 
@@ -91,9 +93,9 @@ object Playbook extends TestingPlaybook {
   //
   val strategyOrder = Vector(
     // Cool stuff
-    Proxy5RaxAllIn,
-    ProxyBBS2StartLocations,
-    ProxyBBS3StartLocations,
+    TvEProxy5RaxAllIn,
+    TvEProxyBBS2StartLocations,
+    TvEProxyBBS3StartLocations,
     ProxyDarkTemplar,
     ProxySunkens,
     ProxyHatchSunkens,

@@ -39,5 +39,5 @@ class WorkerRush extends Trigger {
   
   trigger.set(new TimeToEndTheRush)
   before.set(new ExecuteRush)
-  after.set(new ProtossGamePlan)
+  after.set(new ProtossStandardGamePlan)
 }

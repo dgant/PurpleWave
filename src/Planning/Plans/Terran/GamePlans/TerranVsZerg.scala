@@ -23,11 +23,11 @@ class TerranVsZerg extends Parallel {
     new RequireMiningBases(1),
     new ProposePlacement {
       override lazy val blueprints: Iterable[Blueprint] = Vector(
-        new Blueprint(this, building = Some(Terran.Bunker), preferZone = With.geography.ourNatural.map(_.zone)),
-        new Blueprint(this, building = Some(Terran.Bunker), preferZone = With.geography.ourNatural.map(_.zone)),
-        new Blueprint(this, building = Some(Terran.Bunker), preferZone = With.geography.ourNatural.map(_.zone)),
-        new Blueprint(this, building = Some(Terran.Bunker), preferZone = With.geography.ourNatural.map(_.zone)),
-        new Blueprint(this, building = Some(Terran.MissileTurret), preferZone = With.geography.ourNatural.map(_.zone))
+        new Blueprint(this, building = Some(Terran.Bunker),         preferZone = With.geography.ourNatural.map(_.zone)),
+        new Blueprint(this, building = Some(Terran.Bunker),         preferZone = With.geography.ourNatural.map(_.zone)),
+        new Blueprint(this, building = Some(Terran.Bunker),         preferZone = With.geography.ourNatural.map(_.zone)),
+        new Blueprint(this, building = Some(Terran.Bunker),         preferZone = With.geography.ourNatural.map(_.zone)),
+        new Blueprint(this, building = Some(Terran.MissileTurret),  preferZone = With.geography.ourNatural.map(_.zone))
       )
     },
     new FirstEightMinutes(

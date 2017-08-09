@@ -45,8 +45,8 @@ class ForeignUnitInfo(baseUnit: bwapi.Unit) extends UnitInfo (baseUnit) {
   private def updateTimeSensitiveInformation() {
     _lastSeen           = With.frame
     _possiblyStillThere = true
-    _hitPoints          = base.getHitPoints
-    _shieldPoints       = base.getShields
+    _hitPoints          = if (effectivelyCloaked) if (_hitPoints == 0) _unitClass.maxHitPoints  else _hitPoints     else base.getHitPoints
+    _shieldPoints       = if (effectivelyCloaked) if (_hitPoints == 0) _unitClass.maxShields    else _shieldPoints  else base.getShields
     _pixelCenter        = new Pixel(base.getPosition)
     _tileTopLeft        = new Tile(base.getTilePosition)
   }
@@ -80,8 +80,6 @@ class ForeignUnitInfo(baseUnit: bwapi.Unit) extends UnitInfo (baseUnit) {
     
     _complete               = base.isCompleted
     _defensiveMatrixPoints  = base.getDefenseMatrixPoints
-    _shieldPoints           = if (effectivelyCloaked) if (_hitPoints == 0) _unitClass.maxShields    else _shieldPoints  else base.getShields
-    _hitPoints              = if (effectivelyCloaked) if (_hitPoints == 0) _unitClass.maxHitPoints  else _hitPoints     else base.getHitPoints
     _initialResources       = base.getInitialResources
     _invincible             = base.isInvincible
     _resourcesLeft          = base.getResources

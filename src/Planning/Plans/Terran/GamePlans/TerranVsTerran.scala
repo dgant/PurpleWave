@@ -132,6 +132,7 @@ class TerranVsTerran extends Parallel {
     new Scan,
     new RemoveMineralBlocksAt(40),
     new Gather,
-    new RecruitFreelancers
+    new RecruitFreelancers,
+    new DefendEntrance
   ))
 }

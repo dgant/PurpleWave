@@ -16,6 +16,7 @@ object Fight extends Action {
   
   override def perform(unit: FriendlyUnitInfo) {
     Stim.consider(unit)
+    Cast.consider(unit)
     Bunk.consider(unit)
     Cower.consider(unit)
     Siege.consider(unit)
@@ -23,7 +24,6 @@ object Fight extends Action {
     BeACarrier.consider(unit)
     Recover.consider(unit)
     SpiderMine.consider(unit)
-    Cast.consider(unit)
     BustBunker.consider(unit)
     Sally.consider(unit)
     Spot.consider(unit)

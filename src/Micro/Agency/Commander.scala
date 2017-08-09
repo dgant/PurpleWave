@@ -145,7 +145,10 @@ class Commander {
   
   def useTech(unit: FriendlyUnitInfo, tech: Tech) {
     if (unready(unit)) return
-    if (tech == Terran.Stim && With.framesSince(unit.agent.lastStim) < 24) return
+    if (tech == Terran.Stim) {
+      if (With.framesSince(unit.agent.lastStim) < 24) return
+      unit.agent.lastStim = With.frame
+    }
     unit.base.useTech(tech.baseType)
     sleep(unit)
   }

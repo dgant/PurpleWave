@@ -6,7 +6,7 @@ import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
 import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors}
 import Planning.Plans.Army._
 import Planning.Plans.Compound._
-import Planning.Plans.Information.Reactive.{EnemyLurkers, EnemyMutalisks}
+import Planning.Plans.Information.Reactive.EnemyMutalisks
 import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, FirstEightMinutes, FollowBuildOrder}
@@ -23,7 +23,11 @@ class TerranVsZerg extends Parallel {
     new RequireMiningBases(1),
     new ProposePlacement {
       override lazy val blueprints: Iterable[Blueprint] = Vector(
-        new Blueprint(this, building = Some(Terran.Bunker), preferZone = With.geography.ourNatural.map(_.zone))
+        new Blueprint(this, building = Some(Terran.Bunker), preferZone = With.geography.ourNatural.map(_.zone)),
+        new Blueprint(this, building = Some(Terran.Bunker), preferZone = With.geography.ourNatural.map(_.zone)),
+        new Blueprint(this, building = Some(Terran.Bunker), preferZone = With.geography.ourNatural.map(_.zone)),
+        new Blueprint(this, building = Some(Terran.Bunker), preferZone = With.geography.ourNatural.map(_.zone)),
+        new Blueprint(this, building = Some(Terran.MissileTurret), preferZone = With.geography.ourNatural.map(_.zone))
       )
     },
     new FirstEightMinutes(
@@ -39,6 +43,7 @@ class TerranVsZerg extends Parallel {
         RequestAtLeast(1, Terran.Marine))),
     new If(new UnitsAtLeast(4, UnitMatchWarriors), new RequireMiningBases(2)),
     new RequireSufficientSupply,
+    new TrainContinuously(Terran.Comsat),
     new TrainWorkersContinuously,
     new TrainContinuously(Terran.ScienceVessel),
     new If(
@@ -55,12 +60,13 @@ class TerranVsZerg extends Parallel {
       RequestAtLeast(1, Terran.Refinery),
       RequestAtLeast(1, Terran.Academy),
       RequestAtLeast(2, Terran.Barracks),
+      RequestAtLeast(2, Terran.Bunker),
       RequestTech(Terran.Stim),
       RequestAtLeast(1, Terran.EngineeringBay),
       RequestAtLeast(2, Terran.Comsat),
-      RequestAtLeast(5, Terran.Barracks)),
+      RequestAtLeast(5, Terran.Barracks),
+      RequestAtLeast(1, Terran.MissileTurret)),
     new BuildRefineries,
-    new If(new EnemyLurkers, new BuildMissileTurretsAtBases(1)),
     new If(new EnemyMutalisks, new BuildMissileTurretsAtBases(2)),
     new Build(
       RequestUpgrade(Terran.MarineRange),
@@ -87,6 +93,7 @@ class TerranVsZerg extends Parallel {
     new Scan,
     new RemoveMineralBlocksAt(40),
     new Gather,
-    new RecruitFreelancers
+    new RecruitFreelancers,
+    new DefendEntrance
   ))
 }

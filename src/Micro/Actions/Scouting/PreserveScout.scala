@@ -1,7 +1,7 @@
 package Micro.Actions.Scouting
 
 import Micro.Actions.Action
-import Micro.Actions.Combat.Maneuvering.Retreat
+import Micro.Actions.Combat.Decisionmaking.Disengage
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object PreserveScout extends Action {
@@ -11,6 +11,6 @@ object PreserveScout extends Action {
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {
-    Retreat.delegate(unit)
+    Disengage.delegate(unit)
   }
 }

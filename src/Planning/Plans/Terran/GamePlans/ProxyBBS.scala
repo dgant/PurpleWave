@@ -23,8 +23,6 @@ class ProxyBBS extends Parallel {
   
   def proxyZone: Option[Zone] = ProxyPlanner.proxyAutomaticSneaky
   
-  
-  
   override def onUpdate(): Unit = {
     With.blackboard.maxFramesToSendAdvanceBuilder = Int.MaxValue
     super.onUpdate()

@@ -16,10 +16,11 @@ object ShowUnitsFriendly extends View {
     if ( ! With.viewport.contains(agent.unit.pixelCenter)) return
     if ( ! agent.unit.unitClass.orderable) return
     
-    val showClient  : Boolean = true
-    val showAction  : Boolean = true
-    val showCommand : Boolean = false
-    val showOrder   : Boolean = false
+    var showClient  : Boolean = true
+    var showAction  : Boolean = true
+    var showCommand : Boolean = false
+    var showOrder   : Boolean = false
+    var showKiting  : Boolean = false
     
     if (showClient) {
       agent.lastClient.foreach(plan =>
@@ -61,10 +62,12 @@ object ShowUnitsFriendly extends View {
       tile.bottomRightPixel.subtract(1, 1),
       if (With.grids.walkable.get(tile)) Colors.BrightBlue else Colors.BrightRed)))
     
-    agent.pathsAll          .foreach(ray =>   DrawMap.line(ray.from, ray.to, Colors.MediumGray))
-    agent.pathsTruncated    .foreach(ray =>   DrawMap.line(ray.from, ray.to, Colors.MediumGreen))
-    agent.pathsAcceptable   .foreach(ray =>   DrawMap.line(ray.from, ray.to, Colors.BrightGreen))
-    agent.pathAccepted      .foreach(ray => { DrawMap.line(ray.from, ray.to, Colors.NeonGreen); DrawMap.circle(ray.to, 4, Colors.NeonGreen, solid = true) })
+    if (showKiting) {
+      agent.pathsAll.foreach(ray => DrawMap.line(ray.from, ray.to, Colors.MediumGray))
+      agent.pathsTruncated.foreach(ray => DrawMap.line(ray.from, ray.to, Colors.MediumGreen))
+      agent.pathsAcceptable.foreach(ray => DrawMap.line(ray.from, ray.to, Colors.BrightGreen))
+      agent.pathAccepted.foreach(ray => { DrawMap.line(ray.from, ray.to, Colors.NeonGreen); DrawMap.circle(ray.to, 4, Colors.NeonGreen, solid = true) })
+    }
     /*
     if (agent.toGather.isDefined) {
       DrawMap.line(agent.unit.pixelCenter, agent.intent.toGather.get.pixelCenter, Colors.DarkGreen)

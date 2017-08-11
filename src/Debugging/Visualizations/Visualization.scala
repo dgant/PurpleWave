@@ -24,11 +24,15 @@ class Visualization {
     ShowPerformanceSummary,
     ShowClock,
     ShowStrategy,
+    ShowPerformanceDetails,
+    ShowResources
+    /*
     ShowBattles,
     ShowUnitsAll,
     ShowUnitsFriendly,
     ShowUnitsForeign,
     ShowPerformanceDetails
+      */
   )
   
   var enabled   = true

@@ -20,8 +20,8 @@ class ProxyDarkTemplarRush extends Parallel {
   children.set(Vector(
     new ProposePlacement {
       override lazy val blueprints: Iterable[Blueprint] = Vector(
-        new Blueprint(this, building = Some(Protoss.Pylon),   placementProfile = Some(PlacementProfiles.hugTownHall)),
-        new Blueprint(this, building = Some(Protoss.Gateway), placementProfile = Some(PlacementProfiles.hugTownHall)),
+        new Blueprint(this, building = Some(Protoss.Pylon)),
+        new Blueprint(this, building = Some(Protoss.Gateway)),
         new Blueprint(this, building = Some(Protoss.Pylon),   placementProfile = Some(PlacementProfiles.proxyPylon),    preferZone = ProxyPlanner.proxyAutomaticSneaky),
         new Blueprint(this, building = Some(Protoss.Gateway), placementProfile = Some(PlacementProfiles.proxyBuilding), preferZone = ProxyPlanner.proxyAutomaticSneaky),
         new Blueprint(this, building = Some(Protoss.Gateway), placementProfile = Some(PlacementProfiles.proxyBuilding), preferZone = ProxyPlanner.proxyAutomaticSneaky))

@@ -16,11 +16,12 @@ object FightOrFlight extends Action {
     unit.agent.desireIndividual  = 0.0
     unit.agent.desireTotal       = 0.0
     
-    if ( ! unit.agent.canFight)             { unit.agent.shouldEngage = false;  return }
-    if (unit.underStorm)                    { unit.agent.shouldEngage = false;  return }
-    if (unit.underDisruptionWeb)            { unit.agent.shouldEngage = false;  return }
-    if (unit.ranged && unit.underDarkSwarm) { unit.agent.shouldEngage = false;  return }
-    if ( ! unit.canMove || Yolo.active)     { unit.agent.shouldEngage = true;   return }
+    if ( ! unit.agent.canFight)             { unit.agent.shouldEngage = false;                                  return }
+    if (unit.effectivelyCloaked)            { unit.agent.shouldEngage = true;                                   return }
+    if (unit.underStorm)                    { unit.agent.shouldEngage = false;                                  return }
+    if (unit.underDisruptionWeb)            { unit.agent.shouldEngage = false;                                  return }
+    if (unit.underDarkSwarm)                { unit.agent.shouldEngage = unit.unitClass.unaffectedByDarkSwarm;   return }
+    if ( ! unit.canMove || Yolo.active)     { unit.agent.shouldEngage = true;                                   return }
     
     unit.agent.desireTeam        = unit.battle.map(_.desire).getOrElse(0.0)
     unit.agent.desireIndividual  = unit.battle.flatMap(_.estimationSimulationAttack.reportCards.get(unit).map(_.netValuePerFrame)).getOrElse(0.0)
@@ -33,7 +34,7 @@ object FightOrFlight extends Action {
     
     unit.agent.shouldEngage =
       unit.agent.canFight && (
-        unit.matchups.doomedDiffused                                  ||
+        unit.matchups.doomedDiffused                          ||
         unit.agent.desireIndividual >= desireRequiredToEngage ||
         unit.agent.desireTeam       >= desireRequiredToEngage)
   }

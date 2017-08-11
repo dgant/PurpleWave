@@ -27,6 +27,7 @@ import scala.collection.JavaConverters._
 
 object With {
   var game            : bwapi.Game          = _
+  var agents          : Agency              = _
   var architecture    : Architecture        = _
   var bank            : Bank                = _
   var blackboard      : Blackboard          = _
@@ -34,8 +35,8 @@ object With {
   var camera          : Camera              = _
   var commander       : Commander           = _
   var configuration   : Configuration       = _
+  var damageCredit    : DamageCredit        = _
   var economy         : Economy             = _
-  var agents          : Agency              = _
   var geography       : Geography           = _
   var grids           : Grids               = _
   var groundskeeper   : Groundskeeper       = _
@@ -92,15 +93,16 @@ object With {
     configuration     = new Configuration
     logger            = new Logger
     initializeBWTA()
+    agents            = new Agency
     architecture      = new Architecture
     bank              = new Bank
     blackboard        = new Blackboard
     battles           = new BattleClassifier
-    groundskeeper     = new Groundskeeper
     camera            = new Camera
-    economy           = new Economy
-    agents            = new Agency
     commander         = new Commander
+    damageCredit      = new DamageCredit
+    economy           = new Economy
+    groundskeeper     = new Groundskeeper
     geography         = new Geography
     grids             = new Grids
     history           = new History

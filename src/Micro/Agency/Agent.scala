@@ -67,6 +67,7 @@ class Agent(val unit: FriendlyUnitInfo) {
   var explosions: ListBuffer[Explosion] = new ListBuffer[Explosion]
   
   var lastStim: Int = 0
+  var lastCloak: Int = 0
   var shouldEngage: Boolean = false
   
   /////////////////

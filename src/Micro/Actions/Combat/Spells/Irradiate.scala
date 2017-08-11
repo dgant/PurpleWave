@@ -20,15 +20,15 @@ object Irradiate extends Action {
     def valueTarget(target: UnitInfo): Double = {
       val baseValue =
         if ( ! target.isEnemy)
-          0.0
+          -1.0
         else if ( ! target.unitClass.isOrganic)
-          0.0
+          -1.0
         else if (target.matchups.framesToLiveDiffused < 24 * 20)
-          0.0
+          -1.0
         else if (target.unitClass.gasPrice >= 0)
           1.0
         else
-          0.0
+          -1.0
       baseValue
     }
     

@@ -26,7 +26,7 @@ class ProxyHatch extends Parallel {
     super.onUpdate()
   }
   private class WeKnowWhereToProxy extends Check(() => ProxyPlanner.proxyEnemyNatural.isDefined)
-  private class WeHaveEnoughSunkens extends UnitsAtLeast(6, UnitMatchType(Zerg.SunkenColony), complete = false)
+  private class WeHaveEnoughSunkens extends UnitsAtLeast(3, UnitMatchType(Zerg.SunkenColony), complete = false)
   
   private def blueprintCreepColonyNatural: Blueprint = new Blueprint(this,
     building          = Some(Zerg.CreepColony),
@@ -123,8 +123,8 @@ class ProxyHatch extends Parallel {
             initialAfter = new Parallel(
               new RequireSufficientSupply,
               new TrainContinuously(Zerg.Mutalisk),
-              new TrainWorkersContinuously,
               new BuildGasPumps,
+              new TrainWorkersContinuously,
               new Build(RequestAtLeast(1, Zerg.Lair)),
               new Build(RequestAtLeast(1, Zerg.Spire)),
               new TrainContinuously(Zerg.CreepColony, 1),

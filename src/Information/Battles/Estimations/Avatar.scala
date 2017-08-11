@@ -61,6 +61,10 @@ class Avatar {
       efficacy = 0.0
     }
     
+    if (unit.canStim && ! unit.stimmed) {
+      efficacy *= 1.75
+    }
+    
     vulnerabilityGroundConcussive   = if (   unit.flying) 0.0 else Damage.scaleBySize(DamageType.Concussive, unit.unitClass.size)
     vulnerabilityGroundExplosive    = if (   unit.flying) 0.0 else Damage.scaleBySize(DamageType.Explosive,  unit.unitClass.size)
     vulnerabilityGroundNormal       = if (   unit.flying) 0.0 else Damage.scaleBySize(DamageType.Normal,     unit.unitClass.size)

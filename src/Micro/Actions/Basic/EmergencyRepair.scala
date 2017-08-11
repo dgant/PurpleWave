@@ -23,11 +23,17 @@ object EmergencyRepair extends Action {
     With.commander.repair(unit, patient)
   }
   
-  def eligblePatients(unit: FriendlyUnitInfo): Iterable[UnitInfo] = {
-    val dangerLifetime = 24 * 10
-    unit.matchups.allies.filter(patient => patient.unitClass.isMechanical &&
-      (unit.repairing && patient.hitPoints < patient.unitClass.maxHitPoints) ||
-      patient.wounded                                                         ||
-      patient.damageInLastSecond > patient.totalHealth / 10)
+  def eligblePatients(repairer: FriendlyUnitInfo): Iterable[UnitInfo] = {
+    repairer.matchups.allies.filter(patient =>
+      patient.unitClass.isMechanical &&
+      (patient.pixelDistanceFast(repairer) < 32 || ! patient.canMove) &&
+      (
+        (repairer.repairing && patient.hitPoints < patient.unitClass.maxHitPoints)  ||
+        patient.wounded                                                             ||
+        patient.damageInLastSecond > patient.totalHealth / 10
+      ) &&
+      ! patient.moving &&
+      ! patient.plagued
+    )
   }
 }

@@ -2,6 +2,7 @@ package Micro.Actions.Combat.Maneuvering
 
 import Micro.Actions.Action
 import Micro.Actions.Combat.Attacking.Potshot
+import Micro.Actions.Combat.Decisionmaking.Disengage
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Sneak extends Action {
@@ -21,6 +22,6 @@ object Sneak extends Action {
   
   override protected def perform(unit: FriendlyUnitInfo) {
     Potshot.delegate(unit)
-    Retreat.delegate(unit)
+    Disengage.delegate(unit)
   }
 }

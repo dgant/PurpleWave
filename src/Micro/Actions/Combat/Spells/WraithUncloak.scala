@@ -10,7 +10,8 @@ object WraithUncloak extends Action {
   override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.is(Terran.Wraith)        &&
     unit.cloaked                  &&
-    unit.matchups.threats.isEmpty
+    unit.matchups.threats.isEmpty &&
+    With.framesSince(unit.agent.lastCloak) > 24 * 4
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {

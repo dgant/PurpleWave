@@ -23,9 +23,18 @@ class TerranVsZergMech extends Parallel {
     new TrainContinuously(Terran.Comsat),
     new TrainWorkersContinuously,
     new BuildRefineries,
-  
+    
+    new TrainContinuously(Terran.Marine),
+    
     new Build(RequestAtLeast(1, Terran.Bunker)),
-    new If(new EnemyMutalisks, new BuildMissileTurretsAtBases(3)),
+    new OnMiningBases(2,
+      new Build(
+        RequestAtLeast(1, Terran.Barracks),
+        RequestAtLeast(1, Terran.Refinery),
+        RequestAtLeast(1, Terran.Factory),
+        RequestAtLeast(1, Terran.MachineShop))),
+    
+    new If(new EnemyMutalisks, new Parallel(new BuildMissileTurretsAtBases(3), new TrainContinuously(Terran.Armory, 1), new TrainContinuously(Terran.Starport, 1), new TrainContinuously(Terran.ControlTower, 1))),
     new If(new EnemyLurkers, new Build(RequestAtLeast(1, Terran.EngineeringBay), RequestAtLeast(1, Terran.MissileTurret), RequestAtLeast(1, Terran.Academy))),
       
     new If(new UnitsAtLeast(2,  UnitMatchType(Terran.SiegeTankUnsieged)), new Build(RequestTech(Terran.SiegeMode))),
@@ -39,13 +48,13 @@ class TerranVsZergMech extends Parallel {
     new If(new UnitsAtLeast(20, UnitMatchWarriors),                       new UpgradeContinuously(Terran.MechDamage)),
     new If(new UnitsAtLeast(30, UnitMatchWarriors),                       new Build(RequestAtLeast(1, Terran.ScienceFacility), RequestAtLeast(2, Terran.Armory))),
     new If(new UnitsAtLeast(30, UnitMatchWarriors),                       new UpgradeContinuously(Terran.MechArmor)),
-    new If(new UnitsAtLeast(40, UnitMatchWarriors),                       new RequireMiningBases(3)),
-    new If(new UnitsAtLeast(50, UnitMatchWarriors),                       new RequireMiningBases(4)),
-  
+    new If(new UnitsAtLeast(20, UnitMatchWarriors),                       new RequireMiningBases(3)),
+    new If(new UnitsAtLeast(30, UnitMatchWarriors),                       new RequireMiningBases(4)),
   
     new TrainMatchingRatio(Terran.Valkyrie, 0, 4, Seq(
       MatchingRatio(UnitMatchType(Zerg.Mutalisk),  0.25),
       MatchingRatio(UnitMatchType(Zerg.Guardian),  0.25))),
+    
     new If(
       new Employing(TvZMidgameWraiths),
       new If(
@@ -62,8 +71,7 @@ class TerranVsZergMech extends Parallel {
       MatchingRatio(UnitMatchType(Zerg.Ultralisk),        2.0),
       MatchingRatio(UnitMatchType(Zerg.Hydralisk),        0.4),
       MatchingRatio(UnitMatchType(Zerg.Lurker),           0.6))),
-  
-    new TrainContinuously(Terran.Marine),
+    
     new TrainContinuously(Terran.Vulture),
   
     new If(
@@ -74,8 +82,10 @@ class TerranVsZergMech extends Parallel {
         RequestAtLeast(1, Terran.EngineeringBay),
         RequestAtLeast(1, Terran.Academy),
         RequestAtLeast(3, Terran.Barracks),
+        RequestAtLeast(1, Terran.MachineShop),
         RequestAtLeast(2, Terran.Factory),
-        RequestAtLeast(1, Terran.Armory))),
+        RequestAtLeast(1, Terran.Armory),
+        RequestAtLeast(6, Terran.Barracks))),
       new OnMiningBases(2, new Build(
         RequestAtLeast(1, Terran.Factory),
         RequestAtLeast(1, Terran.MachineShop),

@@ -42,7 +42,7 @@ class RequireSufficientSupply extends Plan {
     val supplyPerProvider         = supplyProvider.supplyProvided
     val currentSupplyOfTownHalls  = With.units.ours.filter(unit => unit.remainingBuildFrames < depotCompletionFrames && ! unit.is(supplyProvider)).toSeq.map(_.unitClass.supplyProvided).sum
     val currentSupplyUsed         = With.self.supplyUsed
-    val unitSpendingRatio         = if (With.geography.ourBases.size < 3) 0.4 else 0.75 //This is the metric that needs the most improvement
+    val unitSpendingRatio         = if (With.geography.ourBases.size < 3) 0.5 else 0.75 //This is the metric that needs the most improvement
     val costPerUnitSupply         = 50.0 / 2.0 //Assume 50 minerals buys 1 supply (then divide by two because 1 supply = 2 BWAPI supply)
     val incomePerFrame            = With.economy.ourIncomePerFrameMinerals + With.economy.ourIncomePerFrameGas
     val supplyUsedPerFrame        = incomePerFrame * unitSpendingRatio / costPerUnitSupply

@@ -122,8 +122,10 @@ class Commander {
     // The neutral buildings on Roadrunner frequently cause this.
     //
     // So we'll try to get the best of both worlds, and recalculate paths *occasionally*
+    //
+    // Also, give different units different paths to avoid "conga line" behavior
     if (With.configuration.enablePathRecalculation) {
-      destination = destination.add((With.frame / With.configuration.pathRecalculationDelayFrames) % 3 - 1, 0)
+      destination = destination.add((unit.id + With.frame / With.configuration.pathRecalculationDelayFrames) % 5 - 2, 0)
     }
     
     if (unit.pixelDistanceFast(destination) > 0) {
@@ -275,6 +277,7 @@ class Commander {
   
   def cloak(unit: FriendlyUnitInfo, tech: Tech) {
     if (unready(unit)) return
+    unit.agent.lastCloak = With.frame
     unit.base.cloak()
     sleep(unit)
   }

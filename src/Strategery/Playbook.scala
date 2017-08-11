@@ -8,7 +8,7 @@ import Strategery.Strategies.Protoss.PvZ._
 import Strategery.Strategies.Strategy
 import Strategery.Strategies.Terran.Global._
 import Strategery.Strategies.Terran.TvT.TvTStandard
-import Strategery.Strategies.Terran.TvZ.TvZStandard
+import Strategery.Strategies.Terran.TvZ._
 import Strategery.Strategies.Zerg.Global._
 
 class EmptyPlaybook {
@@ -37,13 +37,7 @@ object StrategyGroups {
     ProxyHatchHydras
   )
   
-  val tickles = Vector[Strategy](
-    WorkerRush2StartLocations,
-    WorkerRush3StartLocations
-  )
-  
   val bad = Vector[Strategy](
-    WorkerRush2StartLocations,
     WorkerRush3StartLocations,
     TvEProxyBBS2StartLocations,
     TvEProxyBBS3StartLocations,
@@ -61,7 +55,6 @@ class TestingPlaybook extends EmptyPlaybook {
   override lazy val forced: Seq[Strategy] = Seq(AllPvP, AllPvT, AllPvZ, TvTStandard, TvZStandard)
 }
 
-
 class PurpleWavePlaybook extends EmptyPlaybook {
   override lazy val forced    : Seq[Nothing] = none
   override lazy val disabled  : Seq[Strategy] = StrategyGroups.bad
@@ -71,7 +64,7 @@ class PurpleCheesePlaybook extends EmptyPlaybook {
   override lazy val forced: Seq[Strategy] = StrategyGroups.cheese
 }
 
-object Playbook extends TestingPlaybook {
+object Playbook extends PurpleCheesePlaybook {
   
   //////////////////////
   // Experiment order //
@@ -96,6 +89,12 @@ object Playbook extends TestingPlaybook {
     TvEProxy5RaxAllIn,
     TvEProxyBBS2StartLocations,
     TvEProxyBBS3StartLocations,
+    TvZStandard,
+    TvZEarly1RaxFEEconomic,
+    TvZEarly1RaxFEConservative,
+    TvZEarlyCCFirst,
+    TvZEarly2Rax,
+    TvZEarly1RaxGas,
     ProxyDarkTemplar,
     ProxySunkens,
     ProxyHatchSunkens,

@@ -9,7 +9,7 @@ import Planning.Plans.Information.Reactive.EnemyMutalisks
 import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
 import Planning.Plans.Macro.Expanding._
-import Planning.Plans.Macro.Milestones.UnitsAtLeast
+import Planning.Plans.Macro.Milestones.{OnMiningBases, UnitsAtLeast}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Recruitment.RecruitFreelancers
 import Planning.Plans.Scouting.ScoutAt
@@ -60,7 +60,9 @@ class TerranVsZergBio extends Parallel {
       RequestUpgrade(Terran.ScienceVesselEnergy)),
     new RequireMiningBases(3),
     new TrainContinuously(Terran.Vulture),
-    new Build(RequestAtLeast(16, Terran.Barracks)),
+    new OnMiningBases(2, new Build(RequestAtLeast(10,  Terran.Barracks))),
+    new OnMiningBases(3, new Build(RequestAtLeast(15, Terran.Barracks))),
+    new OnMiningBases(4, new Build(RequestAtLeast(20, Terran.Barracks))),
     new ScoutAt(16),
     new DefendZones,
     new ConsiderAttacking,

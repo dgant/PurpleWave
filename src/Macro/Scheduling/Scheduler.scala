@@ -31,6 +31,10 @@ class Scheduler {
     requestsByPlan.clear()
   }
   
+  def audit: Vector[(Plan, Iterable[BuildRequest])] = {
+    With.scheduler.requestsByPlan.toVector.sortBy(_._1.priority)
+  }
+  
   def queue: Iterable[Buildable] = queueCache.get
   val queueCache = new CacheFrame(() => queueRecalculate)
   private def queueRecalculate: Iterable[Buildable] = {

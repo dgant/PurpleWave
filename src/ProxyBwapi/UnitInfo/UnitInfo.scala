@@ -1,6 +1,7 @@
 package ProxyBwapi.UnitInfo
 
 import Information.Battles.Types.Battle
+import Information.Kill
 import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile, TileRectangle}
 import Mathematics.PurpleMath
@@ -36,16 +37,29 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   // Statefulness //
   //////////////////
   
+  def creditKill(kill: Kill) {
+    kills += kill
+  }
   
   val frameDiscovered   : Int = With.frame
   var frameChangedClass : Int = With.frame
   var completionFrame   : Int = Int.MaxValue // Can't use unitClass during construction
+  
+  var lastAttacker  : Option[UnitInfo] = None
+  val kills         : mutable.ArrayBuffer[Kill] = new mutable.ArrayBuffer[Kill]
 
   private val history = new mutable.Queue[UnitState]
   def update() {
-    if (history.lastOption.exists(_.unitClass != unitClass)) {
-      frameChangedClass = With.frame
-    }
+    history.lastOption.foreach(lastState => {
+      if (lastState.unitClass != unitClass) {
+        frameChangedClass = With.frame
+      }
+      if (lastState.cooldown < cooldownLeft && lastState.attackTarget.nonEmpty) {
+        val target = lastState.attackTarget.get
+        target.lastAttacker = Some(this)
+        With.damageCredit.onDamage(this, target)
+      }
+    })
     if ( ! complete) {
       completionFrame = With.frame + remainingBuildFrames
     }
@@ -53,14 +67,13 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   }
   
   def addHistory() {
-    if (history.headOption.exists(_.frame == With.frame)) {
-      // Game is paused; we don't know how to clear the queue
-      return
-    }
+    // Don't stuff the queue while the game is paused
+    if (history.lastOption.exists(_.frame == With.frame)) return
   
     while (history.headOption.exists(_.age > With.configuration.unitHistoryAge)) {
       history.dequeue()
     }
+    
     history.enqueue(new UnitState(this))
   }
   
@@ -375,6 +388,10 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
     }
     else Int.MaxValue
   }
+  
+  def canStim: Boolean = (is(Terran.Marine) || is(Terran.Firebat)) && player.hasTech(Terran.Stim) && hitPoints > 10
+  
+  def moving: Boolean = velocityX != 0 || velocityY != 0
   
   ////////////
   // Orders //

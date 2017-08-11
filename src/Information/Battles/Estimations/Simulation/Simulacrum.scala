@@ -122,6 +122,10 @@ case class Simulacrum(simulation: BattleSimulation, unit: UnitInfo) {
     victim.damageReceived += damage
     victim.valueReceived  += value
     dead                  = dead || unit.unitClass.suicides
+    
+    if (unit.canStim && ! unit.stimmed) {
+      cooldown = cooldown / 2
+    }
   }
   
   def reportCard: ReportCard = ReportCard(

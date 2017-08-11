@@ -24,16 +24,24 @@ class Attack extends Plan {
     
     val target =
       if (With.geography.enemyBases.isEmpty)
-        With.intelligence.mostBaselikeEnemyTile
-          .pixelCenter
-      else
-        With.geography.enemyBases
-          .minBy(base =>
-            if (With.geography.ourBases.nonEmpty)
-              With.geography.ourBases.map(_.zone.distancePixels(base.zone)).min
-            else
-              - base.mineralsLeft)
-            .heart.pixelCenter
+        With.intelligence.mostBaselikeEnemyTile.pixelCenter
+      else {
+        val base =
+          With.geography.enemyBases
+            .minBy(base =>
+              if (With.geography.ourBases.nonEmpty)
+                With.geography.ourBases.map(_.zone.distancePixels(base.zone)).min
+              else
+                -base.mineralsLeft)
+        
+        // Actually hunt down the remaining buildings
+        if (With.units.enemy.nonEmpty) {
+          With.units.enemy.minBy(_.pixelDistanceFast(base.heart.pixelCenter)).pixelCenter
+        }
+        else {
+          base.heart.pixelCenter
+        }
+      }
     
     attackers.get.unitPreference.set(UnitPreferClose(target))
     attackers.get.acquire(this)

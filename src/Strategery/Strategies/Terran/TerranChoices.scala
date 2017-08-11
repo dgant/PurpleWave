@@ -14,6 +14,7 @@ object TerranChoices {
     TvEProxyBBS3StartLocations,
     TvEMassMarineAllIn,
     TvTStandard,
+    //TvPStandard, // Still doing BBS for now
     TvZStandard,
     TerranFFAMassMarine)
 }

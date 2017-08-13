@@ -65,7 +65,7 @@ class PerformanceMonitor {
   }
   
   def danger: Boolean = {
-    framesOver55    > 100 ||
+    framesOver55    > 160 ||
     framesOver1000  > 5   ||
     framesOver10000 > 1
   }
@@ -76,7 +76,7 @@ class PerformanceMonitor {
   def cacheLength(size:Int):Int = currentCacheLength
   
   def disqualified: Boolean =
-    framesOver55    >= 200  ||
+    framesOver55    >= 320  ||
     framesOver1000  >= 10   ||
     framesOver10000 >= 2
 }

@@ -24,8 +24,7 @@ class Visualization {
     ShowPerformanceSummary,
     ShowClock,
     ShowStrategy,
-    //ShowPerformanceDetails,
-    ShowArchitecturePlacements
+    ShowPerformanceDetails
     /*
     ShowBattles,
     ShowUnitsAll,

@@ -14,6 +14,7 @@ class Groundskeeper {
   val proposalPlacements    : mutable.Map[Blueprint, Placement]  = new mutable.HashMap[Blueprint, Placement]
   val requirementMatches    : mutable.Set[BlueprintMatch]        = new mutable.HashSet[BlueprintMatch]
   val proposalsFulfilled    : mutable.Map[Blueprint, UnitInfo]   = new mutable.HashMap[Blueprint, UnitInfo]
+  val placementArchive      : mutable.Map[Blueprint, Placement]  = new mutable.HashMap[Blueprint, Placement]
   
   private var lastUrgentBuildingPlacement = -24 * 60 * 60
   
@@ -33,6 +34,7 @@ class Groundskeeper {
   
   def updatePlacement(blueprint: Blueprint, placement: Placement) {
     proposalPlacements.put(blueprint, placement)
+    placementArchive.put(blueprint, placement)
   }
   
   // CIG 2017 HACK: This needs to match the sort below (priority -> id)

@@ -10,4 +10,6 @@ case class Placement(
   scoresByTile      : Map[Tile, Double],
   totalNanoseconds  : Long,
   frameStarted      : Int,
-  frameFinished     : Int)
+  frameFinished     : Int,
+  candidates        : Int,
+  evaluated         : Int)

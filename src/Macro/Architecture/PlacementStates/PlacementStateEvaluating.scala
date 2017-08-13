@@ -81,7 +81,9 @@ class PlacementStateEvaluating(blueprint: Blueprint) extends PlacementState {
         evaluationValuesMap,
         totalNanoseconds  = evaluationNanoseconds,
         frameStarted      = evaluationStartFrame,
-        frameFinished     = With.frame)
+        frameFinished     = With.frame,
+        candidates        = candidatesUnfiltered.get.size,
+        evaluated         = candidatesFiltered.get.size)
       With.architecture.assumePlacement(placement)
       With.groundskeeper.updatePlacement(blueprint, placement)
       transition(new PlacementStateReady)
@@ -100,6 +102,6 @@ class PlacementStateEvaluating(blueprint: Blueprint) extends PlacementState {
       With.configuration.buildingPlacementBatchSize
   
   private def stillSurveying  : Boolean = candidatesUnfiltered.isEmpty
-  private def stillFiltering  : Boolean = candidatesUnfiltered.exists(nextFilteringIndex < _.length) && candidatesFiltered.size < With.configuration.buildingPlacementMaxTilesToEvaluate
+  private def stillFiltering  : Boolean = candidatesUnfiltered.exists(nextFilteringIndex < _.length) && candidatesFiltered.get.size < With.configuration.buildingPlacementMaxTilesToEvaluate
   private def stillEvaluating : Boolean = candidatesFiltered.exists(nextEvaluationIndex < _.length)
 }

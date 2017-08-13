@@ -15,17 +15,21 @@ class PlacementStateEvaluating(blueprint: Blueprint) extends PlacementState {
   
   private var candidatesUnfiltered  : Option[ArrayBuffer[Tile]] = None
   private var candidatesFiltered    : Option[ArrayBuffer[Tile]] = None
-  private var nextFilteringIndex  = 0
-  private var nextEvaluationIndex = 0
-  private val evaluationDebugging = new mutable.HashMap[Tile, Iterable[PlacementHeuristicEvaluation]]
-  private val evaluationValues    = new mutable.HashMap[Tile, Double]
+  private var nextFilteringIndex    = 0
+  private var nextEvaluationIndex   = 0
+  private val evaluationDebugging   = new mutable.HashMap[Tile, Iterable[PlacementHeuristicEvaluation]]
+  private val evaluationValues      = new mutable.HashMap[Tile, Double]
+  private val evaluationStartFrame  = With.frame
+  private var evaluationNanoseconds = 0L
   
   override def step() {
+    val nanosecondsOnStart = System.nanoTime()
     if (stillSurveying) {
       val sources = Surveyor.candidates(blueprint)
       candidatesUnfiltered      = Some(new ArrayBuffer[Tile])
       candidatesFiltered        = Some(new ArrayBuffer[Tile])
       candidatesUnfiltered.get  ++= sources.flatMap(_.tiles(blueprint))
+      updateStepNanoseconds(nanosecondsOnStart)
     }
     else if (stillFiltering) {
       
@@ -42,6 +46,7 @@ class PlacementStateEvaluating(blueprint: Blueprint) extends PlacementState {
         filterCount         += 1
         nextFilteringIndex  += 1
       }
+      updateStepNanoseconds(nanosecondsOnStart)
     }
     else if (stillEvaluating) {
       // Evaluate them (in batches)
@@ -62,21 +67,30 @@ class PlacementStateEvaluating(blueprint: Blueprint) extends PlacementState {
         evaluationCount     += 1
         nextEvaluationIndex += 1
       }
+      updateStepNanoseconds(nanosecondsOnStart)
     }
     else {
       // We've evaluated all the tiles! Return our placement conclusions.
       val evaluationValuesMap = evaluationValues.toMap
-      val best = EvaluatePlacements.findBest(blueprint, evaluationValuesMap)
+      val best                = EvaluatePlacements.findBest(blueprint, evaluationValuesMap)
+      updateStepNanoseconds(nanosecondsOnStart)
       val placement = Placement(
         blueprint,
         best,
         evaluationDebugging.values.flatten,
         evaluationValuesMap,
-        With.frame)
+        totalNanoseconds  = evaluationNanoseconds,
+        frameStarted      = evaluationStartFrame,
+        frameFinished     = With.frame)
       With.architecture.assumePlacement(placement)
       With.groundskeeper.updatePlacement(blueprint, placement)
       transition(new PlacementStateReady)
     }
+  }
+  
+  private def updateStepNanoseconds(nanosecondsOnStart: Long) {
+    val nanosecondsOnEnd = System.nanoTime()
+    evaluationNanoseconds += nanosecondsOnEnd - nanosecondsOnStart
   }
   
   private def batchSize: Int =

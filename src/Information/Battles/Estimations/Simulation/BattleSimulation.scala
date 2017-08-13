@@ -3,6 +3,7 @@ package Information.Battles.Estimations.Simulation
 import Information.Battles.Estimations.Estimation
 import Information.Battles.Types.{Battle, Team}
 import Lifecycle.With
+import Mathematics.Points.Pixel
 import ProxyBwapi.UnitInfo.UnitInfo
 
 class BattleSimulation(val battle: Battle, val weAttack: Boolean) {
@@ -10,6 +11,7 @@ class BattleSimulation(val battle: Battle, val weAttack: Boolean) {
   private def simulacra(team: Team) = team.units.map(Simulacrum(this, _))
   
   val estimation  : Estimation          = new Estimation
+  val focus       : Pixel               = battle.focus
   val unitsOurs   : Vector[Simulacrum]  = simulacra(battle.us)
   val unitsEnemy  : Vector[Simulacrum]  = simulacra(battle.enemy)
   val everyone    : Vector[Simulacrum]  = unitsOurs ++ unitsEnemy

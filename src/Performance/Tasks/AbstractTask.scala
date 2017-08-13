@@ -6,12 +6,13 @@ import scala.collection.mutable
 
 abstract class AbstractTask {
   
-  private var lastRunFrame        : Int   = -1
-  private var totalRunCount       : Int   = 0
-  private var totalSkipCount      : Int   = 0
-  private var maxMillisecondsEver : Long  = 0
-  private var violatedThreshold   : Int   = 0
-  private var violatedRules       : Int   = 0
+  private var lastRunFrame          : Int   = -1
+  private var totalRunCount         : Int   = 0
+  private var totalSkipCount        : Int   = 0
+  private var totalMillisecondsEver : Long = 0
+  private var maxMillisecondsEver   : Long  = 0
+  private var violatedThreshold     : Int   = 0
+  private var violatedRules         : Int   = 0
   
   final val runtimeMilliseconds = new mutable.Queue[Long]
   final val runtimesToTrack = 10
@@ -50,6 +51,7 @@ abstract class AbstractTask {
   }
   
   final def recordRunDuration(millisecondsDuration: Long) {
+    totalMillisecondsEver += millisecondsDuration
     if (With.frame > 5) {
       maxMillisecondsEver = Math.max(maxMillisecondsEver, millisecondsDuration)
     }
@@ -63,6 +65,10 @@ abstract class AbstractTask {
     if ( ! alreadyViolatedRules && With.performance.violatedRules) {
       violatedRules += 1
     }
+  }
+  
+  final def runMillisecondsTotal: Long = {
+    totalMillisecondsEver
   }
   
   final def runMillisecondsMaxRecent: Long = {

@@ -402,6 +402,7 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   def carryingResources: Boolean = carryingMinerals || carryingGas
   
   def isBeingViolent: Boolean = {
+    unitClass.isStaticDefense                     ||
     attacking                                     ||
     cooldownLeft > 0                              ||
     target.orElse(orderTarget).exists(isEnemyOf)  ||

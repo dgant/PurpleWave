@@ -28,8 +28,8 @@ class BattleClustering {
   
     if (clusterInProgress.isComplete) {
       lastClusterCompletion = With.frame
-      clusterComplete = clusterInProgress
-      clusterInProgress = new BattleClusteringState(nextUnits.toSet)
+      clusterComplete       = clusterInProgress
+      clusterInProgress     = new BattleClusteringState(nextUnits.toSet)
     }
   }
 }

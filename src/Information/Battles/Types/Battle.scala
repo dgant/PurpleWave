@@ -21,7 +21,6 @@ class Battle(
   
   lazy val estimationAbstract           : Estimation  = BattleUpdater.estimateAvatar(this, geometric = false, weAttack = true,  enemyAttacks = true,  weRetreat = false)
   lazy val estimationAbstractOffense    : Estimation  = BattleUpdater.estimateAvatar(this, geometric = false, weAttack = true,  enemyAttacks = false, weRetreat = false)
-  lazy val estimationAbstractDefense    : Estimation  = BattleUpdater.estimateAvatar(this, geometric = false, weAttack = false, enemyAttacks = true,  weRetreat = false)
   lazy val estimationSimulationAttack   : Estimation  = BattleUpdater.estimateSimulation(this, weAttack = true)
   lazy val estimationSimulationRetreat  : Estimation  = BattleUpdater.estimateSimulation(this, weAttack = false)
   

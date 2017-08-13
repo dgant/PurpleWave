@@ -34,7 +34,8 @@ case class Simulacrum(simulation: BattleSimulation, unit: UnitInfo) {
   var valuePerDamage    : Double                      = MicroValue.valuePerDamage(unit)
   var moves             : ArrayBuffer[(Pixel, Pixel)] = new ArrayBuffer[(Pixel, Pixel)]
   
-  def splashFactor : Double = Math.max(1.0, Math.min(targetQueue.size / 4.0, MicroValue.maxSplashFactor(unit)))
+  val maxSplashFactor = MicroValue.maxSplashFactor(unit)
+  def splashFactor : Double = Math.max(1.0, Math.min(targetQueue.size / 4.0, maxSplashFactor))
   
   def checkDeath() {
     dead = dead || hitPoints <= 0
@@ -43,7 +44,7 @@ case class Simulacrum(simulation: BattleSimulation, unit: UnitInfo) {
   def step() {
     if (dead) {}
     else if ( ! participating) {
-      val focus           = simulation.battle.focus
+      val focus           = simulation.focus
       val distanceBefore  = pixel.pixelDistanceFast(focus)
       val distanceAfter   = distanceBefore + unit.topSpeed
       

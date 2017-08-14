@@ -12,7 +12,6 @@ object ShowZones extends View {
       DrawMap.polygonPixels(
         zone.points,
         zone.owner.colorDark)
-      DrawMap.label(zone.name, zone.centroid.pixelCenter, drawBackground = true, backgroundColor = zone.owner.colorDark)
     })
   
     With.geography.zones.foreach(zone => {
@@ -24,13 +23,6 @@ object ShowZones extends View {
           edge.sidePixels.last,
           owner.colorDark
         )
-        
-        edge.zones.foreach(edgeZone => {
-          val labelPixel = edge.centerPixel.project(edgeZone.centroid.pixelCenter, 32)
-          val color = edgeZone.owner.colorDark
-          DrawMap.line(edge.centerPixel, labelPixel, color)
-          DrawMap.label(edgeZone.name, labelPixel, drawBackground = true, backgroundColor = color)
-        })
       })
     })
   }

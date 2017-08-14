@@ -6,8 +6,6 @@ object HeuristicMathAdditive extends HeuristicMath {
   val heuristicMinimum  = -heuristicMaximum
   val default           = 0.0
   
-  
-  
   def resolve[TContext, TCandidate, THeuristic, THeuristicWeight <: HeuristicWeight[TContext, TCandidate]](
     context       : TContext,
     heuristics    : Iterable[THeuristicWeight],

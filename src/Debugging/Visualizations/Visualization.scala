@@ -54,7 +54,6 @@ class Visualization {
     ShowHappyUnits,
     ShowHappyVision,
     ShowIntelligence,
-    //ShowPlayerNames, TODO: Not actually a View yet
     ShowTextOnly,
     ShowTextOnlyUnits,
     ShowArchitecturePlacements,
@@ -77,6 +76,7 @@ class Visualization {
     ShowStrategyEvaluations,
     ShowZoneBorderTiles,
     ShowZones,
+    ShowZoneLabels,
     ShowZonePathDemo
   )
   

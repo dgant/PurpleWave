@@ -5,7 +5,6 @@ import Mathematics.Shapes.Circle
 import Micro.Actions.Action
 import Micro.Actions.Combat.Attacking.Potshot
 import Micro.Actions.Commands.{Attack, Travel}
-import Micro.Agency.MovementProfiles
 import Micro.Heuristics.Targeting.EvaluateTargets
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -35,10 +34,6 @@ object BustWallin extends Action {
   
   override protected def perform(unit: FriendlyUnitInfo) {
     Potshot.delegate(unit)
-    
-    // Don't rely on BW's pathing to bring us into the wall-in.
-    // Wall-ins tend to cause Dragoons to do the "walk around the perimeter of the map" dance
-    unit.agent.movementProfile = MovementProfiles.smash
   
     val targets =
       if (unit.matchups.targetsInRange.nonEmpty)

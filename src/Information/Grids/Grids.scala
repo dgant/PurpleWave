@@ -15,7 +15,6 @@ class Grids {
   val enemyDetection   = new GridEnemyDetection
   val psi2Height       = new GridPsi2Height
   val psi3Height       = new GridPsi3Height
-  val mobility         = new GridMobility
   val units            = new GridUnits
   val walkable         = new GridWalkable
   val walkableTerrain  = new GridWalkableTerrain

@@ -4,7 +4,6 @@ import Lifecycle.With
 import Mathematics.Points.{Pixel, PixelRay, Tile}
 import Micro.Actions.{Action, Idle}
 import Micro.Decisions.MicroDecision
-import Micro.Heuristics.Movement.{MovementHeuristicEvaluation, MovementProfile}
 import Micro.Heuristics.Targeting.TargetingProfile
 import Performance.Caching.CacheFrame
 import Planning.Plan
@@ -61,8 +60,7 @@ class Agent(val unit: FriendlyUnitInfo) {
   var canScout      : Boolean                       = false
   var canPillage    : Boolean                       = false
   
-  var movementProfile   : MovementProfile   = MovementProfiles.default
-  var targetingProfile  : TargetingProfile  = TargetingProfiles.default
+  var targetingProfile: TargetingProfile = TargetingProfiles.default
   
   var explosions: ListBuffer[Explosion] = new ListBuffer[Explosion]
   
@@ -93,9 +91,7 @@ class Agent(val unit: FriendlyUnitInfo) {
   var desireIndividual  : Double = _
   var desireTotal       : Double = _
   
-  var movingTo                    : Option[Pixel] = None
-  var movedHeuristicallyFrame     : Int = 0
-  var movementHeuristicResults    : Iterable[MovementHeuristicEvaluation] = Iterable.empty
+  var movingTo: Option[Pixel] = None
   
   var microDecisions              : Vector[MicroDecision] = Vector.empty
   var microDecisionsUpdateFrame   : Int = 0
@@ -120,7 +116,6 @@ class Agent(val unit: FriendlyUnitInfo) {
     unit.agent.desireTeam         = 1.0
     unit.agent.desireIndividual   = 1.0
     unit.agent.desireTotal        = 1.0
-    unit.agent.movementProfile    = MovementProfiles.default
     unit.agent.targetingProfile   = TargetingProfiles.default
     unit.agent.pathsAll           = Seq.empty
     unit.agent.pathsTruncated     = Seq.empty

@@ -1,8 +1,6 @@
 package Micro.Actions.Basic
 
 import Micro.Actions.Action
-import Micro.Actions.Commands.MoveHeuristically
-import Micro.Agency.MovementProfiles
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Pardon extends Action {
@@ -12,7 +10,6 @@ object Pardon extends Action {
   }
   
   override def perform(unit: FriendlyUnitInfo) {
-    unit.agent.movementProfile = MovementProfiles.pardon
-    MoveHeuristically.delegate(unit)
+    // TODO: Get out of the way!
   }
 }

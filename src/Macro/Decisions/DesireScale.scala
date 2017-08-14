@@ -1,4 +1,4 @@
-package Macro.Decisions.Composition
+package Macro.Decisions
 
 class DesireScale(
   val min: Double = 0.0,

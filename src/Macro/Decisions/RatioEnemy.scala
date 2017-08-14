@@ -1,4 +1,4 @@
-package Macro.Decisions.Composition
+package Macro.Decisions
 
 import ProxyBwapi.UnitClass.UnitClass
 

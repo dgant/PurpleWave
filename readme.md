@@ -2,11 +2,7 @@
 ### An extensible AI player for *StarCraft: Brood War*
 
 ## About
-Since 2008, many *StarCraft* and AI enthusiasts have been writing bots to play *StarCraft* using BWAPI (Brood War API).
-
-PurpleWave is such a bot. It can play all races and a large variety of strategies. It's ranked as high as #8 on the [SSCAIT Ladder](https://sscaitournament.com/index.php?action=scores). 
-
-Most popular Brood War bots are written in C++. PurpleWave is written in Scala. It provides a lower ceiling on performance than C++, but has helped me to iterate on new features very quickly.
+PurpleWave is such a *StarCraft* AI written in Scala. It can play all races and a large variety of strategies. It's been ranked as high as #8 on the [SSCAIT Ladder](https://sscaitournament.com/index.php?action=scores). 
 
 ## How to build PurpleWave
 What you'll need:

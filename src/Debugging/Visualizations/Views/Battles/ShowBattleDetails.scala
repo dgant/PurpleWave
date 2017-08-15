@@ -53,20 +53,21 @@ object ShowBattleDetails extends View {
     
     val x2 = 200
     val valueUsInitial    = battle.us.units.map(_.subjectiveValue).sum
-    val valueEnemyInitial = battle.us.units.map(_.subjectiveValue).sum
+    val valueEnemyInitial = battle.enemy.units.map(_.subjectiveValue).sum
     val valueUsLost       = estimation.costToUs.toInt
     val valueEnemyLost    = estimation.costToEnemy.toInt
     val valueUsKept       = Math.max(0, valueUsInitial - valueUsLost)
     val valueEnemyKept    = Math.max(0, valueEnemyInitial - valueEnemyLost)
-    val baseline          = 200 / Array(1, valueUsInitial, valueEnemyInitial).max
-    val dxUsInitial       = valueUsInitial    / baseline
-    val dxEnemyInitial    = valueEnemyInitial / baseline
-    val dxUsLost          = valueUsLost       / baseline
-    val dxEnemyLost       = valueEnemyLost    / baseline
-    val dxUsKept          = valueUsKept       / baseline
-    val dxEnemyKept       = valueEnemyKept    / baseline
+    val baseWidth         = 200
+    val denominator       = Array(1, valueUsInitial, valueEnemyInitial).max
+    val dxUsInitial       = baseWidth * valueUsInitial    / denominator
+    val dxEnemyInitial    = baseWidth * valueEnemyInitial / denominator
+    val dxUsLost          = baseWidth * valueUsLost       / denominator
+    val dxEnemyLost       = baseWidth * valueEnemyLost    / denominator
+    val dxUsKept          = baseWidth * valueUsKept       / denominator
+    val dxEnemyKept       = baseWidth * valueEnemyKept    / denominator
     var nextY             = y
-    val boxHeight         = With.visualization.lineHeightSmall
+    val boxHeight         = With.visualization.lineHeightSmall + 4
     val margin            = 2
     
     val colorUs     = With.self.colorMedium
@@ -80,8 +81,8 @@ object ShowBattleDetails extends View {
   }
   
   def drawBar(x: Int, y: Int, dx: Int, dy: Int, color: Color, label: String) {
-    With.game.drawBoxScreen(x, y, x+dx, y+dy, color)
-    With.game.drawTextScreen(x + 1, y + 1, label)
+    With.game.drawBoxScreen(x, y, x+dx, y+dy, color, true)
+    With.game.drawTextScreen(x + 2, y + 1, label)
   }
   
   def describeTeam(units: Iterable[UnitInfo]): String = {

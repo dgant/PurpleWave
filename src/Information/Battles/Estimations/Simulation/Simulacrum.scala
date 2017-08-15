@@ -44,10 +44,16 @@ case class Simulacrum(simulation: BattleSimulation, unit: UnitInfo) {
   def step() {
     if (dead) {}
     else if ( ! participating) {
+      val frames          = 8
       val focus           = simulation.focus
       val distanceBefore  = pixel.pixelDistanceFast(focus)
-      val distanceAfter   = distanceBefore + unit.topSpeed
-      
+      val distanceAfter   = distanceBefore + unit.topSpeed * frames
+      val fleePixel       = focus.project(pixel, distanceAfter)
+      if (ShowBattleDetails.inUse) {
+        moves += ((pixel, fleePixel))
+      }
+      pixel     = fleePixel
+      cooldown  = frames
     }
     else if (cooldown > 0) {
       simulation.updated = true

@@ -48,8 +48,10 @@ class Battle(
     val fighters          = us.units.filter(_.canAttack)
     val aggressiveDesire  = With.blackboard.aggressionRatio
     val geographicDesire  = if (enemy.units.exists(_.unitClass.isSiegeTank)) Math.max(0.8, PurpleMath.nanToInfinity(urgencyOurs / urgencyEnemy)) else 1.0
-    val estimation        = estimationSimulationAttack
-    val output            = With.blackboard.battleDesire * (estimation.costToEnemy * geographicDesire * aggressiveDesire - estimation.costToUs) / estimation.frames / Math.max(1, fighters.size)
+    val bonusDesire       = With.blackboard.battleDesire * geographicDesire * aggressiveDesire
+    val estimationAttack  = estimationSimulationAttack
+    val estimationRetreat = estimationSimulationRetreat
+    val output            = bonusDesire * estimationAttack.costToEnemy + estimationRetreat.costToUs - estimationAttack.costToUs - estimationRetreat.costToEnemy
     output
   }
   

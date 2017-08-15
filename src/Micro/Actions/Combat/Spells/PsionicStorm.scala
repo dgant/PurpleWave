@@ -2,7 +2,6 @@ package Micro.Actions.Combat.Spells
 
 import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Decisions.MicroValue
 import Micro.Heuristics.Spells.TargetAOE
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -34,7 +33,7 @@ object PsionicStorm extends Action {
     if (target.underStorm) return 0.0
     if (target.invincible) return 0.0
     
-    MicroValue.valuePerDamage(target) *
+    target.matchups.valuePerDamage *
     Math.min(112.0, target.totalHealth) *
     (
       if(target.isFriendly)

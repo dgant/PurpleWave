@@ -2,7 +2,6 @@ package Micro.Actions.Combat.Spells
 
 import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Decisions.MicroValue
 import Micro.Heuristics.Spells.TargetAOE
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -33,8 +32,8 @@ object Stasis extends Action {
     if (target.unitClass.isBuilding) return 0.0
     if (target.underStorm) return 0.0
     if (target.invincible) return 0.0
-    
-    MicroValue.valuePerDamage(target) *
+  
+    target.matchups.valuePerDamage *
       target.matchups.vpfNetDiffused * Math.max(target.matchups.framesToLiveDiffused, 48) *
       (
         if(target.isFriendly)

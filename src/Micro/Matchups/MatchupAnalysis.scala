@@ -39,13 +39,14 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
   lazy val threatsInRange         : Vector[UnitInfo]  = threats.filter(threat => threat.pixelRangeAgainstFromCenter(me) >= threat.pixelDistanceFast(at) - me.pixelsTravelledMax(frame) - threat.pixelsTravelledMax(frame))
   lazy val threatsViolentInRange  : Vector[UnitInfo]  = threatsInRange.filter(_.isBeingViolentTo(me))
   lazy val targetsInRange         : Vector[UnitInfo]  = targets.filter(target => target.visible && me.pixelRangeAgainstFromCenter(target) >= target.pixelDistanceFast(at) - me.pixelsTravelledMax(frame) - target.pixelsTravelledMax(frame))
-   
-  lazy val vpfDealingDiffused                     : Double                = targetsInRange.map(target => dpfDealingDiffused(target)  * MicroValue.valuePerDamage(target)).sum
-  lazy val vpfDealingCurrently                    : Double                = targetsInRange.map(target => dpfDealingCurrently(target) * MicroValue.valuePerDamage(target)).sum
+  
+  lazy val valuePerDamage                         : Double                = MicroValue.valuePerDamage(me)
+  lazy val vpfDealingDiffused                     : Double                = targetsInRange.map(target => dpfDealingDiffused(target)  * target.matchups.valuePerDamage).sum
+  lazy val vpfDealingCurrently                    : Double                = targetsInRange.map(target => dpfDealingCurrently(target) * target.matchups.valuePerDamage).sum
   lazy val dpfReceivingDiffused                   : Double                = threatsInRange.map(_.matchups.dpfDealingDiffused(me)).sum
   lazy val dpfReceivingCurrently                  : Double                = threatsInRange.map(_.matchups.dpfDealingCurrently(me)).sum
-  lazy val vpfReceivingDiffused                   : Double                = dpfReceivingDiffused   * MicroValue.valuePerDamage(me)
-  lazy val vpfReceivingCurrently                  : Double                = dpfReceivingCurrently  * MicroValue.valuePerDamage(me)
+  lazy val vpfReceivingDiffused                   : Double                = valuePerDamage * dpfReceivingDiffused
+  lazy val vpfReceivingCurrently                  : Double                = valuePerDamage * dpfReceivingCurrently
   lazy val vpfNetDiffused                         : Double                = vpfDealingDiffused   - vpfReceivingDiffused
   lazy val vpfNetCurrently                        : Double                = vpfDealingCurrently  - vpfReceivingCurrently
   lazy val framesToLiveDiffused                   : Double                = PurpleMath.nanToInfinity(me.totalHealth / dpfReceivingDiffused)

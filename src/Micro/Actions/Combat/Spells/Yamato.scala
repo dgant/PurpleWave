@@ -2,7 +2,6 @@ package Micro.Actions.Combat.Spells
 
 import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Decisions.MicroValue
 import Micro.Heuristics.Spells.TargetSingle
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -32,7 +31,7 @@ object Yamato extends Action {
       val yamatoDamage    = 260.0
       val castTime        = 72.0
       lazy val presumedHp = target.totalHealth - target.matchups.dpfReceivingDiffused * castTime
-      lazy val utility    = MicroValue.valuePerDamage(target) * Math.min(yamatoDamage, presumedHp)
+      lazy val utility    = target.matchups.valuePerDamage * Math.min(yamatoDamage, presumedHp)
       
       val output = baseValue * utility
       output

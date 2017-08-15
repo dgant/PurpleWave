@@ -24,19 +24,15 @@ class Visualization {
     ShowPerformanceSummary,
     ShowClock,
     ShowStrategy,
-    ShowPerformanceDetails
-    /*
     ShowBattles,
     ShowUnitsAll,
     ShowUnitsFriendly,
-    ShowUnitsForeign,
-    ShowPerformanceDetails
-      */
+    ShowUnitsForeign
   )
   
   var enabled   = true
   var screen    = true
-  var map       = false
+  var map       = true
   var happy     = false
   var textOnly  = false
   

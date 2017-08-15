@@ -29,8 +29,6 @@ object DrawMap {
     if (irrelevant(Vector(start, end))) return
     
     line(start, end, color)
-    
-    //Crummy arrowhead drawn from circles
     circle(end, 1, color, solid = true)
     circle(start.project(end, start.pixelDistanceFast(end) - 2), 2, color, solid = true)
   }

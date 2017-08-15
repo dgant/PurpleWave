@@ -36,19 +36,19 @@ object ShowBattleDetails extends View {
     DrawScreen.table(x, y, table)
     
     val y2 = y + (table.length + 4) * With.visualization.lineHeightSmall
-    DrawScreen.column(5, y2,
+    DrawScreen.table(5, y2,
       Vector(
-      "Participants",
-      describeTeam(battle.us.units),
-      describeTeam(battle.enemy.units),
-      "",
-      "Survivors",
-      describeTeam(estimation.reportCards.filter(_._1.isFriendly) .filterNot(_._2.dead).keys),
-      describeTeam(estimation.reportCards.filter(_._1.isEnemy)    .filterNot(_._2.dead).keys),
-      "",
-      "Deaths",
-      describeTeam(estimation.reportCards.filter(_._1.isFriendly) .filter(_._2.dead).keys),
-      describeTeam(estimation.reportCards.filter(_._1.isEnemy)    .filter(_._2.dead).keys)
+        Vector("", "Participants"),
+        Vector(With.self.name,  describeTeam(battle.us.units)),
+        Vector(With.enemy.name, describeTeam(battle.enemy.units)),
+        Vector(),
+        Vector("", "Survivors"),
+        Vector(With.self.name,  describeTeam(estimation.reportCards.filter(_._1.isFriendly) .filterNot(_._2.dead).keys)),
+        Vector(With.enemy.name, describeTeam(estimation.reportCards.filter(_._1.isEnemy)    .filterNot(_._2.dead).keys)),
+        Vector(),
+        Vector("", "Deaths"),
+        Vector(With.self.name,  describeTeam(estimation.reportCards.filter(_._1.isFriendly) .filter(_._2.dead).keys)),
+        Vector(With.enemy.name, describeTeam(estimation.reportCards.filter(_._1.isEnemy)    .filter(_._2.dead).keys))
     ))
     
     val x2 = 200

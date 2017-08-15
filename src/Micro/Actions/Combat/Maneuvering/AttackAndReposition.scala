@@ -14,10 +14,10 @@ object AttackAndReposition extends Action {
   override def perform(unit: FriendlyUnitInfo) {
   
     Target.delegate(unit)
-    Attack.delegate(unit)
-    if (unit.readyForMicro && (unit.matchups.targets.isEmpty || unit.matchups.targetsInRange.nonEmpty)) {
+    if (unit.cooldownLeft > 0 && (unit.matchups.targets.isEmpty || unit.matchups.targetsInRange.nonEmpty)) {
       Avoid.delegate(unit)
     }
+    Attack.delegate(unit)
     if (unit.matchups.threats.isEmpty) {
       unit.agent.toTravel = unit.agent.toAttack.map(_.pixelCenter)
       Travel.delegate(unit)

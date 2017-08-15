@@ -33,7 +33,7 @@ object ShowBattleDetails extends View {
       Vector[String]("Desire", "%1.2f".format(battle.desire)))
     DrawScreen.table(x, y, table)
     
-    val y2 = y + (table.length + 2) * With.visualization.lineHeightSmall
+    val y2 = y + (table.length + 4) * With.visualization.lineHeightSmall
     val y3 = y2 + With.visualization.lineHeightSmall
     With.game.drawTextScreen(x, y2, describeTeam(battle.us))
     With.game.drawTextScreen(x, y3, describeTeam(battle.enemy))

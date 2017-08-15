@@ -18,7 +18,7 @@ case class Simulacrum(simulation: BattleSimulation, unit: UnitInfo) {
     new mutable.PriorityQueue[Simulacrum]()(Ordering.by(x => (x.unit.unitClass.helpsInCombat, - x.pixel.pixelDistanceFast(pixel))))
       ++ unit.matchups.targets.flatMap(simulation.simulacra.get))
   
-  val fighting          : Boolean                     = (simulation.weAttack || unit.isEnemy) && unit.unitClass.helpsInCombat && ( ! unit.unitClass.isWorker || unit.isBeingViolent || unit.friendly.exists(_.agent.canFight))
+  val fighting          : Boolean                     = (simulation.weAttack || unit.isEnemy) && unit.unitClass.helpsInCombat && ( ! unit.unitClass.isWorker || unit.isBeingViolent || ! unit.gathering)
   val canMove           : Boolean                     = unit.canMove
   val topSpeed          : Double                      = unit.topSpeed
   var hitPoints         : Int                         = unit.totalHealth
@@ -50,6 +50,8 @@ case class Simulacrum(simulation: BattleSimulation, unit: UnitInfo) {
     tryToChaseTarget()
     tryToStrikeTarget()
     tryToRunAway()
+    if (cooldownShooting > 0)           simulation.updated = true
+    if (cooldownMoving > 0 && fighting) simulation.updated = true
   }
   
   def tryToAcquireTarget() {
@@ -82,6 +84,7 @@ case class Simulacrum(simulation: BattleSimulation, unit: UnitInfo) {
     if ( ! canMove)           return
     if ( ! fighting)          return
     if (cooldownMoving > 0)   return
+    if ( ! targetExists)      return
     if (pixelsFromRange <= 0) return
 
     val travelFrames    = Math.min(SIMULATION_STEP_FRAMES, unit.framesToTravelPixels(pixelsFromRange))

@@ -20,12 +20,15 @@ class BattleSimulation(val battle: Battle, val weAttack: Boolean) {
   
   var updated = true
   
-  def complete: Boolean = unitsOurs.forall(_.dead) || unitsEnemy.forall(_.dead) || ! updated || estimation.frames > With.configuration.battleEstimationFrames
+  def complete: Boolean =
+    estimation.frames > With.configuration.battleEstimationFrames   ||
+    ! updated                                                       ||
+    unitsOurs.forall(_.dead)                                        ||
+    unitsEnemy.forall(_.dead)                                       ||
+    everyone.forall(e => e.dead || ! e.fighting)
   
   def run() {
-    while ( ! complete) {
-      step()
-    }
+    while ( ! complete) step()
     cleanup()
   }
   
@@ -33,19 +36,19 @@ class BattleSimulation(val battle: Battle, val weAttack: Boolean) {
     updated = false
     estimation.frames += 1
     everyone.foreach(_.step())
-    everyone.foreach(_.checkDeath())
+    everyone.foreach(_.updateDeath())
   }
   
   def cleanup() {
-    estimation.costToUs         = unitsOurs.map(_.valueReceived).sum
-    estimation.costToEnemy      = unitsEnemy.map(_.valueReceived).sum
-    estimation.damageToUs       = unitsOurs.map(_.damageReceived).sum
-    estimation.damageToEnemy    = unitsEnemy.map(_.damageReceived).sum
-    estimation.deathsUs         = unitsOurs.count(_.dead)
-    estimation.deathsEnemy      = unitsEnemy.count(_.dead)
-    estimation.totalUnitsUs     = unitsOurs.size
-    estimation.totalUnitsEnemy  = unitsEnemy.size
-    estimation.reportCards      ++= everyone.map(simulacrum => (simulacrum.unit, simulacrum.reportCard))
+    estimation.costToUs         = unitsOurs   .map(_.valueReceived).sum
+    estimation.costToEnemy      = unitsEnemy  .map(_.valueReceived).sum
+    estimation.damageToUs       = unitsOurs   .map(_.damageReceived).sum
+    estimation.damageToEnemy    = unitsEnemy  .map(_.damageReceived).sum
+    estimation.deathsUs         = unitsOurs   .count(_.dead)
+    estimation.deathsEnemy      = unitsEnemy  .count(_.dead)
+    estimation.totalUnitsUs     = unitsOurs   .size
+    estimation.totalUnitsEnemy  = unitsEnemy  .size
+    estimation.reportCards      ++= everyone  .map(simulacrum => (simulacrum.unit, simulacrum.reportCard))
     estimation.simulation       = Some(this)
   }
 }

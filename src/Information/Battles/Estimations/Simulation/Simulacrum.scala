@@ -12,20 +12,22 @@ import scala.collection.mutable.ArrayBuffer
 case class Simulacrum(simulation: BattleSimulation, unit: UnitInfo) {
   
   // Constant
-  private val SIMULATION_STEP_FRAMES = 12
+  private val SIMULATION_STEP_FRAMES = 8
   
   lazy val targetQueue: mutable.PriorityQueue[Simulacrum] = (
     new mutable.PriorityQueue[Simulacrum]()(Ordering.by(x => (x.unit.unitClass.helpsInCombat, - x.pixel.pixelDistanceFast(pixel))))
       ++ unit.matchups.targets.flatMap(simulation.simulacra.get))
   
-  val participating     : Boolean                     = (simulation.weAttack || unit.isEnemy) && unit.unitClass.helpsInCombat && ( ! unit.unitClass.isWorker || unit.isBeingViolent || unit.friendly.exists(_.agent.canFight))
+  val fighting          : Boolean                     = (simulation.weAttack || unit.isEnemy) && unit.unitClass.helpsInCombat && ( ! unit.unitClass.isWorker || unit.isBeingViolent || unit.friendly.exists(_.agent.canFight))
   val canMove           : Boolean                     = unit.canMove
+  val topSpeed          : Double                      = unit.topSpeed
   var hitPoints         : Int                         = unit.totalHealth
-  var cooldown          : Int                         = unit.cooldownLeft
+  var cooldownShooting  : Int                         = 1 + unit.cooldownLeft
+  var cooldownMoving    : Int                         = 0
   var pixel             : Pixel                       = unit.pixelCenter
   var dead              : Boolean                     = false
   var target            : Option[Simulacrum]          = None
-  var atTarget          : Boolean                     = false
+  val maxSplashFactor   : Double                      = MicroValue.maxSplashFactor(unit)
   var killed            : Int                         = 0
   var damageDealt       : Double                      = 0.0
   var damageReceived    : Double                      = 0.0
@@ -34,105 +36,114 @@ case class Simulacrum(simulation: BattleSimulation, unit: UnitInfo) {
   var valuePerDamage    : Double                      = MicroValue.valuePerDamage(unit)
   var moves             : ArrayBuffer[(Pixel, Pixel)] = new ArrayBuffer[(Pixel, Pixel)]
   
-  val maxSplashFactor = MicroValue.maxSplashFactor(unit)
-  def splashFactor : Double = Math.max(1.0, Math.min(targetQueue.size / 4.0, maxSplashFactor))
+  def splashFactor : Double = if (maxSplashFactor == 1.0) 1.0 else Math.max(1.0, Math.min(targetQueue.count( ! _.dead) / 4.0, maxSplashFactor))
   
-  def checkDeath() {
+  def updateDeath() {
     dead = dead || hitPoints <= 0
   }
   
   def step() {
-    if (dead) {}
-    else if ( ! participating) {
-      val frames          = 8
-      val focus           = simulation.focus
-      val distanceBefore  = pixel.pixelDistanceFast(focus)
-      val distanceAfter   = distanceBefore + unit.topSpeed * frames
-      val fleePixel       = focus.project(pixel, distanceAfter)
-      if (ShowBattleDetails.inUse) {
-        moves += ((pixel, fleePixel))
-      }
-      pixel     = fleePixel
-      cooldown  = frames
-    }
-    else if (cooldown > 0) {
-      simulation.updated = true
-      cooldown -= 1
-    }
-    else {
-      acquireTarget()
-      if (target.exists(valid)) {
-        simulation.updated = true
-        if (atTarget) {
-          strikeTarget()
-        }
-        else {
-          chaseTarget()
-        }
-      }
-    }
+    if (dead) return
+    cooldownMoving    -= 1
+    cooldownShooting  -= 1
+    tryToAcquireTarget()
+    tryToChaseTarget()
+    tryToStrikeTarget()
+    tryToRunAway()
   }
   
-  def valid(target: Simulacrum): Boolean = {
-    ! target.dead &&
-    // Siege tanks
-    (unit.pixelRangeMin <= 0 || pixel.pixelDistanceFast(target.pixel) >= unit.pixelRangeMin)
-  }
-  
-  def acquireTarget() {
-    while ( ! target.exists(valid) && targetQueue.nonEmpty) {
-      atTarget = false
-      if (canMove || targetQueue.headOption.exists(pixelsOutOfRange(_) <= 0.0)) {
+  def tryToAcquireTarget() {
+    if ( ! fighting)                                return
+    if (cooldownMoving > 0 || cooldownShooting > 0) return
+    if (targetExistsInRange)                        return
+    
+    if (targetExists) {
+      //Target is out of range, but maybe we can get them later. Put them back in the queue.
+      targetQueue += target.get
+    }
+    
+    target = None
+    while (target.isEmpty && targetQueue.nonEmpty) {
+      
+      // Clear crud from the queue
+      while (targetQueue.nonEmpty && ! valid(targetQueue.head)) {
+        targetQueue.dequeue()
+      }
+      
+      if (targetQueue.nonEmpty) {
         target = Some(targetQueue.dequeue())
-        
-        if ( ! canMove) {
-          atTarget = true
-        }
-      } else {
-        // Static defense
-        cooldown = SIMULATION_STEP_FRAMES // Warning: This resets the timer on combat!
-        return
       }
     }
   }
   
-  def pixelsOutOfRange(simulacrum: Simulacrum): Double = {
-    pixel.pixelDistanceFast(simulacrum.pixel) - unit.pixelRangeAgainstFromCenter(simulacrum.unit)
-  }
+  def tryToChaseTarget() {
+    lazy val victim          = target.get
+    lazy val pixelsFromRange = pixelsOutOfRange(victim)
+    if ( ! canMove)           return
+    if ( ! fighting)          return
+    if (cooldownMoving > 0)   return
+    if (pixelsFromRange <= 0) return
+
+    val travelFrames    = Math.min(SIMULATION_STEP_FRAMES, unit.framesToTravelPixels(pixelsFromRange))
+    val travelPixel     = pixel.project(victim.pixel, unit.topSpeed * travelFrames)
+    cooldownMoving      = travelFrames
+    pixel               = travelPixel
+    simulation.updated  = true
   
-  def chaseTarget() {
-    val victim = target.get
-    val pixelsFromRange = pixelsOutOfRange(victim)
-    if (pixelsFromRange <= 0) {
-      atTarget = true
-    }
-    else if (unit.canMove) {
-      val travelFrames  = Math.min(SIMULATION_STEP_FRAMES, unit.framesToTravelPixels(pixelsFromRange))
-      val travelPixel   = pixel.project(victim.pixel, unit.topSpeed * travelFrames)
-      cooldown          = travelFrames
-      pixel             = travelPixel
-  
-      if (ShowBattleDetails.inUse) {
-        moves += ((pixel, travelPixel))
-      }
+    if (ShowBattleDetails.inUse) {
+      moves += ((pixel, travelPixel))
     }
   }
   
-  def strikeTarget() {
+  def tryToStrikeTarget() {
+    if ( ! fighting)            return
+    if (cooldownShooting > 0)   return
+    if ( ! targetExistsInRange) return
     val victim            = target.get
     val damage            = Math.min(target.get.hitPoints, unit.damageOnNextHitAgainst(victim.unit))
     val value             = damage * victim.valuePerDamage
-    cooldown              = Math.max(1, (unit.cooldownMaxAgainst(victim.unit) / splashFactor).toInt)
+    cooldownShooting      = Math.max(1, (unit.cooldownMaxAgainst(victim.unit) / splashFactor).toInt)
+    cooldownMoving        = Math.max(cooldownMoving, unit.unitClass.stopFrames)
     damageDealt           += damage
     valueDealt            += value
     victim.hitPoints      -= damage
     victim.damageReceived += damage
     victim.valueReceived  += value
     dead                  = dead || unit.unitClass.suicides
-    
+    simulation.updated    = true
+  
     if (unit.canStim && ! unit.stimmed) {
-      cooldown = cooldown / 2
+      cooldownShooting = cooldownShooting / 2
     }
+  }
+  
+  def tryToRunAway() {
+    if (fighting)           return
+    if ( ! canMove)         return
+    if (cooldownMoving > 0) return
+    val focus           = simulation.focus
+    val distanceBefore  = pixel.pixelDistanceFast(focus)
+    val distanceAfter   = distanceBefore + unit.topSpeed * SIMULATION_STEP_FRAMES
+    val fleePixel       = focus.project(pixel, distanceAfter)
+    if (ShowBattleDetails.inUse) {
+      moves += ((pixel, fleePixel))
+    }
+    pixel           = fleePixel
+    cooldownMoving  = SIMULATION_STEP_FRAMES
+  }
+  
+  def valid(target: Simulacrum): Boolean = {
+    ! target.dead && (unit.pixelRangeMin <= 0 || pixel.pixelDistanceFast(target.pixel) >= unit.pixelRangeMin)
+  }
+  
+  def pixelsOutOfRange(simulacrum: Simulacrum): Double = {
+    pixel.pixelDistanceFast(simulacrum.pixel) - unit.pixelRangeAgainstFromCenter(simulacrum.unit)
+  }
+  
+  def targetExists: Boolean = target.exists(valid)
+  
+  def targetExistsInRange: Boolean = {
+    target.exists(valid) && pixelsOutOfRange(target.get) <= 0
   }
   
   def reportCard: ReportCard = ReportCard(

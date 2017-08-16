@@ -255,6 +255,7 @@ class ProtossVsTerran extends Parallel {
     new If(
       new And(
         new UnitsAtLeast(12, UnitMatchWarriors, complete = true),
+        new Not(new EnemyBio),
         new Or(
           new UnitsAtLeast(1, UnitMatchType(Protoss.Observer), complete = true),
           new Not(new EnemyHasShown(Terran.SpiderMine)))),

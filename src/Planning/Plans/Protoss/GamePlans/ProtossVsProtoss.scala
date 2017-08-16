@@ -235,7 +235,7 @@ class ProtossVsProtoss extends Parallel {
       new UnitsAtLeast(2, UnitMatchType(Protoss.Reaver)),
       new Build(RequestUpgrade(Protoss.ScarabDamage))),
     
-    new OnMiningBases(2, new Build(RequestUpgrade(Protoss.ZealotSpeed))),
+    new OnMiningBases(2, new UpgradeContinuously(Protoss.ZealotSpeed)),
     
     new TrainMatchingRatio(Protoss.Observer, 1, 2, Seq(MatchingRatio(UnitMatchType(Protoss.DarkTemplar), 2.0))),
     new TrainContinuously(Protoss.Reaver, 4),

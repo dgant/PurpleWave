@@ -14,7 +14,11 @@ object Target extends Action {
   
   override protected def perform(unit: FriendlyUnitInfo) {
     TargetRelevant.delegate(unit)
-    if (unit.agent.canPillage || unit.pixelCenter.zone.bases.exists( ! _.owner.isNeutral) && unit.matchups.threatsInRange.isEmpty) {
+    var canPillage = false
+    canPillage ||= unit.agent.canPillage
+    canPillage ||= unit.pixelCenter.zone.owner.isEnemy
+    canPillage &&= unit.matchups.threatsInRange.isEmpty
+    if (canPillage) {
       TargetAnything.delegate(unit)
     }
   }

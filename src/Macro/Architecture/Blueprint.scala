@@ -9,21 +9,21 @@ import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClass.UnitClass
 
 class Blueprint(
-val proposer                   : Plan,
-val building                   : Option[UnitClass]         = None,
-var widthTiles                 : Option[Int]               = None,
-var heightTiles                : Option[Int]               = None,
-var powers                     : Option[Boolean]           = None,
-var requirePower               : Option[Boolean]           = None,
-var requireCreep               : Option[Boolean]           = None,
-var requireTownHallTile        : Option[Boolean]           = None,
-var requireGasTile             : Option[Boolean]           = None,
-var placementProfile           : Option[PlacementProfile]  = None,
-var preferredDistanceFromExit  : Option[Double]            = None,
-val requireCandidates          : Option[Iterable[Tile]]    = None,
-var preferZone                 : Option[Zone]              = None,
-val requireZone                : Option[Zone]              = None,
-var respectHarvesting          : Boolean                   = true) {
+  val proposer                   : Plan,
+  val building                   : Option[UnitClass]         = None,
+  var widthTiles                 : Option[Int]               = None,
+  var heightTiles                : Option[Int]               = None,
+  var powers                     : Option[Boolean]           = None,
+  var requirePower               : Option[Boolean]           = None,
+  var requireCreep               : Option[Boolean]           = None,
+  var requireTownHallTile        : Option[Boolean]           = None,
+  var requireGasTile             : Option[Boolean]           = None,
+  var placementProfile           : Option[PlacementProfile]  = None,
+  var preferredDistanceFromExit  : Option[Double]            = None,
+  val requireCandidates          : Option[Iterable[Tile]]    = None,
+  var preferZone                 : Option[Zone]              = None,
+  val requireZone                : Option[Zone]              = None,
+  var respectHarvesting          : Boolean                   = true) {
   
   var id: Option[Int] = None
   val frameCreated: Int = With.frame
@@ -108,12 +108,14 @@ var respectHarvesting          : Boolean                   = true) {
   }
   
   override def toString: String =
-    "#" + proposer.priority +    " " +
-    building.map(_.toString + " ").getOrElse("") +
-    placementProfile.toString + " " +
-    widthTiles + "x" + heightTiles + " " +
-    (if (powers.get)              "(Powers) "     else "") +
-    (if (requirePower.get)        "(Powered) "    else "") +
-    (if (requireTownHallTile.get) "(Town hall) "  else "") +
-    (if (requireGasTile.get)      "(Gas) "        else "")
+    (
+      "#" + proposer.priority +    " " +
+      building.map(_.toString + " ").getOrElse("") +
+      placementProfile.toString + " " +
+      widthTiles + "x" + heightTiles + " " +
+      (if (powers.get)              "(Powers) "     else "") +
+      (if (requirePower.get)        "(Powered) "    else "") +
+      (if (requireTownHallTile.get) "(Town hall) "  else "") +
+      (if (requireGasTile.get)      "(Gas) "        else "")
+    ).replaceAllLiterally("Some", "")
 }

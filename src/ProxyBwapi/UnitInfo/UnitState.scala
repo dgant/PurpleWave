@@ -17,6 +17,7 @@ class UnitState(unit: UnitInfo) {
   val couldAttackThisFrame  : Boolean           = unit.readyForAttackOrder
   val cooldown              : Int               = unit.cooldownLeft
   val unitClass             : UnitClass         = unit.unitClass
+  val isBeingViolent        : Boolean           = unit.isBeingViolent
   val tryingToAttack: Boolean = {
     if (unit.command.isEmpty) {
       false

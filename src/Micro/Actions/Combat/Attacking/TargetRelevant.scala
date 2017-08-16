@@ -1,6 +1,5 @@
 package Micro.Actions.Combat.Attacking
 
-import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Heuristics.Targeting.EvaluateTargets
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -21,7 +20,7 @@ object TargetRelevant extends Action {
         || target.constructing
         || target.gathering
         || target.repairing
-        || With.framesSince(target.lastAttackStartFrame) < 48
+        || target.hasBeenViolentInLastTwoSeconds
         || target.topSpeed < unit.topSpeedChasing)
     
     unit.agent.toAttack = EvaluateTargets.best(unit, targets)

@@ -16,7 +16,7 @@ object Surveyor {
     TileSourceOurPylons,
     TileSourceAnywhere)
   
-  def candidates(blueprint: Blueprint): Iterable[TileSource] = {
+  def candidates(blueprint: Blueprint): Array[TileSource] = {
     tileSources.filter(_.appropriateFor(blueprint))
   }
 }

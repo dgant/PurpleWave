@@ -17,6 +17,8 @@ class DefendProxy extends Plan {
   val defenders = new Property[LockUnits](new LockUnits)
   defenders.get.unitMatcher.set(UnitMatchWorkers)
   
+  var lastProxyCount = 0
+  
   override def onUpdate() {
   
     val proxies = getProxies.sortBy(_.totalHealth).sortBy(_.remainingBuildFrames)
@@ -38,10 +40,13 @@ class DefendProxy extends Plan {
           3
       )).toMap
     val totalWorkersRequired = workersRequired.values.sum
-    val maxWorkers = With.units.ours.count(_.unitClass.isWorker) - 4
+    val maxWorkers = With.units.ours.count(_.unitClass.isWorker) - 5
     val finalWorkers = Math.min(totalWorkersRequired, maxWorkers)
     defenders.get.unitCounter.set(new UnitCountBetween(0, finalWorkers))
     defenders.get.unitPreference.set(UnitPreferClose(proxies.head.pixelCenter))
+    if (lastProxyCount > proxies.size) {
+      defenders.get.release()
+    }
     defenders.get.acquire(this)
   
     squad.enemies = proxies

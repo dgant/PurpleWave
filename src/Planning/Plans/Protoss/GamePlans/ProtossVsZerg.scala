@@ -154,6 +154,8 @@ class ProtossVsZerg extends Parallel {
       RequestAtLeast(1, Protoss.Observatory),
       RequestAtLeast(1, Protoss.Observer)))
   
+  private class CanBuildDragoons extends Check(() => With.self.minerals < With.self.gas * 5)
+  
   /////////////////
   // Here we go! //
   /////////////////
@@ -172,7 +174,7 @@ class ProtossVsZerg extends Parallel {
     new RequireMiningBases(1),
     new Employ(PvZEarly2Gate, new ImplementEarly2Gate),
     new If(new WeAreFFEing, new FFE),
-  
+    
     ///////////////////
     // Early defense //
     ///////////////////
@@ -256,32 +258,28 @@ class ProtossVsZerg extends Parallel {
       new And(
         new EnemyMutalisks,
         new UnitsAtMost(5, UnitMatchType(Protoss.Corsair))),
-      new TrainContinuously(Protoss.Dragoon),
+      new If(
+        new CanBuildDragoons,
+        new TrainContinuously(Protoss.Dragoon),
+        new TrainContinuously(Protoss.Zealot)),
       new Parallel(
         new If(
-          new Not(new Employing(PvZMidgameCorsairSpeedlot)),
+          new Employing(PvZMidgameCorsairDarkTemplar),
           new TrainContinuously(Protoss.DarkTemplar, 3),
           new TrainContinuously(Protoss.DarkTemplar, 1)),
         new TrainContinuously(Protoss.Reaver, 5),
         new If(
-          new And(
-            new UnitsAtLeast(1, UnitMatchType(Protoss.TemplarArchives), complete = true),
-            new UnitsAtMost(3, UnitMatchType(Protoss.Archon), complete = false),
-            new Check(() => With.self.gas * 2 > With.self.minerals)),
+          new Check(() => With.self.gas > Math.min(200, With.self.minerals)),
           new TrainContinuously(Protoss.HighTemplar, 8)),
           new If(
             new And(
+              new CanBuildDragoons,
               new UnitsAtLeast(1, UnitMatchType(Protoss.CyberneticsCore), complete = true),
               new Or(
                 new And(
                   new Employing(PvZMidgame5GateDragoons),
                   new UnitsAtMost(15, UnitMatchType(Protoss.Dragoon)),
-                  new Check(() => With.self.minerals < With.self.gas * 5)),
-                new And(
-                  new Employing(PvZMidgame5GateDragoons),
-                  new UnitsAtMost(15, UnitMatchType(Protoss.Dragoon)),
-                  new Check(() => With.self.minerals < With.self.gas * 5)),
-                new UnitsAtLeast(30, UnitMatchType(Protoss.Zealot))
+                new UnitsAtLeast(20, UnitMatchType(Protoss.Zealot)))
               )
             ),
             new TrainContinuously(Protoss.Dragoon),

@@ -35,7 +35,6 @@ class TrainUnit(val traineeClass: UnitClass) extends Plan {
     trainerLock.unitPreference.set(UnitPreferNoAddon)
   }
   
-  
   private var trainer: Option[FriendlyUnitInfo] = None
   private var trainee: Option[FriendlyUnitInfo] = None
   

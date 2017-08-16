@@ -33,15 +33,16 @@ object PsionicStorm extends Action {
     if (target.underStorm) return 0.0
     if (target.invincible) return 0.0
     
-    target.matchups.valuePerDamage *
+    target.subjectiveValue *
     Math.min(112.0, target.totalHealth) *
     (
       if(target.isFriendly)
-        -5.0
+        -3.0
       else if (target.isEnemy)
         1.0
       else
         0.0
-    )
+    ) /
+    target.unitClass.maxTotalHealth
   }
 }

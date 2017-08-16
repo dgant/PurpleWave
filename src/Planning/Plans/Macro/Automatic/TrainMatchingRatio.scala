@@ -19,5 +19,5 @@ class TrainMatchingRatio(
 }
 
 case class MatchingRatio (enemyMatcher: UnitMatcher,  ratio: Double) {
-  def quantity: Double = With.units.enemy.count(enemyMatcher.accept) * ratio
+  def quantity: Double = With.units.enemy.toSeq.filter(_.alive).count(enemyMatcher.accept) * ratio
 }

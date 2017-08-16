@@ -6,9 +6,7 @@ import bwapi.Race
 object PvPEarlyFFE  extends Strategy {
   
   override def choices: Iterable[Iterable[Strategy]] = Vector(
-    Vector(
-      PvPMidgameCarriers,
-      PvPMidgameReaver))
+    Vector(PvPMidgameReaver))
   
   override def ourRaces    : Iterable[Race] = Vector(Race.Protoss)
   override def enemyRaces  : Iterable[Race] = Vector(Race.Protoss)

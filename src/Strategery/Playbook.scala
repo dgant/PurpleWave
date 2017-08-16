@@ -123,7 +123,6 @@ object Playbook extends PurpleWavePlaybook {
     PvPMidgameObserverReaver,
     PvPMidgameFE,
     PvPMidgameReaver,
-    PvPMidgameCarriers,
     PvPMidgame4GateGoon,
     PvZEarlyFFEConservative,
     PvZEarlyFFEEconomic,

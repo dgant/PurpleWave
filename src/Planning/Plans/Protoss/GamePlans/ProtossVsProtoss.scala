@@ -79,22 +79,6 @@ class ProtossVsProtoss extends Parallel {
       RequestAtLeast(1, Protoss.CyberneticsCore),
       RequestAtLeast(4, Protoss.Gateway))
   
-  private class ImplementMidgameCarriers extends Parallel(
-    new OnMiningBases(2,
-      new If(
-        new UnitsAtLeast(20, UnitMatchWarriors),
-        new Build(
-          RequestAtLeast(1, Protoss.Assimilator),
-          RequestAtLeast(1, Protoss.CyberneticsCore),
-          RequestAtLeast(1, Protoss.Stargate)),
-        new If(
-          new UnitsAtLeast(1, UnitMatchType(Protoss.Stargate), complete = true),
-          new Build(
-            RequestAtLeast(1, Protoss.FleetBeacon),
-            RequestAtLeast(2, Protoss.Stargate),
-            RequestUpgrade(Protoss.AirDamage),
-            RequestUpgrade(Protoss.CarrierCapacity))))))
-  
   private class ImplementMidgameDarkTemplar extends Parallel(
     new Build(
       RequestAtLeast(1, Protoss.Gateway),
@@ -185,9 +169,6 @@ class ProtossVsProtoss extends Parallel {
   
   private class BuildDragoonsOrZealots extends If(
     new Or(
-      new And(
-        new Employing(PvPMidgameCarriers),
-        new UnitsAtLeast(1, UnitMatchType(Protoss.FleetBeacon), complete = false)),
       new UnitsAtMost(0, UnitMatchType(Protoss.CyberneticsCore),  complete = true),
       new UnitsAtMost(0, UnitMatchType(Protoss.Assimilator),      complete = true),
       new Check(() => With.self.gas < 30),
@@ -256,7 +237,6 @@ class ProtossVsProtoss extends Parallel {
     
     new OnMiningBases(2, new Build(RequestUpgrade(Protoss.ZealotSpeed))),
     
-    new TrainContinuously(Protoss.Carrier),
     new TrainMatchingRatio(Protoss.Observer, 1, 2, Seq(MatchingRatio(UnitMatchType(Protoss.DarkTemplar), 2.0))),
     new TrainContinuously(Protoss.Reaver, 4),
     new BuildDragoonsOrZealots,
@@ -271,59 +251,39 @@ class ProtossVsProtoss extends Parallel {
       
     new Employ(PvPMidgame4GateGoon,       new ImplementMidgame4GateGoon),
     new Employ(PvPMidgameDarkTemplar,     new ImplementMidgameDarkTemplar),
-    new Employ(PvPMidgameCarriers,        new ImplementMidgameCarriers),
     new Employ(PvPMidgameObserverReaver,  new ImplementMidgameObserverReaver),
     new Employ(PvPMidgameReaver,          new ImplementMidgameReaver),
     
     // Default builds
-    new Build(RequestAtLeast(1, Protoss.Gateway)),
+    new Build(
+      RequestAtLeast(1, Protoss.Gateway),
+      RequestAtLeast(1, Protoss.CyberneticsCore)),
     new BuildAssimilators,
-    new If (
-      new Employing(PvPMidgameCarriers),
-      new Parallel(
+    new Parallel(
+      new Build(
+        RequestAtLeast(2, Protoss.Gateway),
+        RequestUpgrade(Protoss.DragoonRange),
+        RequestAtLeast(3, Protoss.Gateway),
+        RequestAtLeast(1, Protoss.RoboticsFacility),
+        RequestAtLeast(1, Protoss.RoboticsSupportBay)),
+      new OnMiningBases(2,
         new Build(
-          RequestAtLeast(1, Protoss.Gateway),
-          RequestAtLeast(1, Protoss.CyberneticsCore),
-          RequestUpgrade(Protoss.DragoonRange),
-          RequestAtLeast(3, Protoss.Gateway)),
-        new RequireMiningBases(2),
-        new OnMiningBases(2,
-          new Parallel(
-            new If(
-              new And(
-                new MiningBasesAtLeast(2),
-                new UnitsAtLeast(1, UnitMatchType(Protoss.Forge), complete = true)),
-              new Build(
-                RequestAtLeast(1, Protoss.Forge),
-                RequestAtLeast(6, Protoss.PhotonCannon))),
-            new Build(
-              RequestAtLeast(1, Protoss.CyberneticsCore),
-              RequestAtLeast(1, Protoss.Stargate))))),
-      new Parallel(
-        new Build(
-          RequestAtLeast(1, Protoss.CyberneticsCore),
-          RequestUpgrade(Protoss.DragoonRange),
-          RequestAtLeast(3, Protoss.Gateway),
-          RequestAtLeast(1, Protoss.RoboticsFacility),
-          RequestAtLeast(1, Protoss.RoboticsSupportBay)),
-        new OnMiningBases(2,
+          RequestAtLeast(5, Protoss.Gateway),
+          RequestAtLeast(1, Protoss.Observatory),
+          RequestAtLeast(1, Protoss.CitadelOfAdun),
+          RequestAtLeast(8, Protoss.Gateway))),
+      new OnMiningBases(3,
+        new Parallel(
+          new UpgradeContinuously(Protoss.GroundDamage),
           new Build(
-            RequestAtLeast(5, Protoss.Gateway),
-            RequestAtLeast(1, Protoss.Observatory),
-            RequestAtLeast(1, Protoss.CitadelOfAdun),
-            RequestAtLeast(8, Protoss.Gateway))),
-        new OnMiningBases(3,
-          new Parallel(
-            new UpgradeContinuously(Protoss.GroundDamage),
-            new Build(
-              RequestAtLeast(1, Protoss.Forge),
-              RequestAtLeast(1, Protoss.TemplarArchives),
-              RequestAtLeast(2, Protoss.Forge),
-              RequestUpgrade(Protoss.HighTemplarEnergy)),
-            new UpgradeContinuously(Protoss.GroundArmor),
-            new Build(RequestAtLeast(12, Protoss.Gateway)))))),
+            RequestAtLeast(1, Protoss.Forge),
+            RequestAtLeast(1, Protoss.TemplarArchives),
+            RequestAtLeast(2, Protoss.Forge),
+            RequestUpgrade(Protoss.HighTemplarEnergy)),
+          new UpgradeContinuously(Protoss.GroundArmor),
+          new Build(RequestAtLeast(12, Protoss.Gateway))))),
     
-    new ScoutExpansionsAt(70),
+    new ScoutExpansionsAt(100),
     new If(
       new UnitsAtLeast(1, UnitMatchType(Protoss.Pylon), complete = false),
       new Scout),
@@ -338,11 +298,6 @@ class ProtossVsProtoss extends Parallel {
       new Trigger(
         new UnitsAtLeast(1, UnitMatchType(Protoss.DarkTemplar), complete = true),
         new ConsiderAttacking),
-      new If (
-        new Employing(PvPMidgameCarriers),
-        new If(
-          new UnitsAtLeast(6 * 8, UnitMatchType(Protoss.Interceptor), complete = true),
-          new ConsiderAttacking),
-        new ConsiderAttacking))
+      new ConsiderAttacking)
   ))
 }

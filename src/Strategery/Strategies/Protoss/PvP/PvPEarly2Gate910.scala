@@ -8,7 +8,6 @@ object PvPEarly2Gate910 extends Strategy {
   override def choices: Iterable[Iterable[Strategy]] = Vector(
     Vector(
       PvPMidgame4GateGoon,
-      PvPMidgameDarkTemplar,
       PvPMidgameFE,
       PvPMidgameObserverReaver,
       PvPMidgameReaver))

@@ -1,22 +1,22 @@
 package Planning.Plans.Macro.Expanding
 
-import Information.Geography.Types.Base
+import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
 import Macro.Architecture.Blueprint
+import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{RequestAnother, RequestAtLeast}
-import Planning.Composition.Property
 import Planning.Plan
 import ProxyBwapi.Races.Protoss
 
-class BuildCannonsAtBases(initialCount: Int) extends Plan {
-  
-  val count: Property[Int] = new Property(initialCount)
+class BuildCannonsAtBases(count: Int) extends Plan {
   
   override def onUpdate() {
     val bases = eligibleBases
-    if (eligibleBases.nonEmpty) {
+    val zones = bases.map(_.zone).toSet
+    
+    if (zones.nonEmpty) {
       if (With.units.ours.exists(_.is(Protoss.Forge))) {
-        eligibleBases.foreach(cannonBase)
+        zones.foreach(cannonZone)
       }
       else {
         With.scheduler.request(this, RequestAtLeast(1, Protoss.Forge))
@@ -24,23 +24,37 @@ class BuildCannonsAtBases(initialCount: Int) extends Plan {
     }
   }
   
+  private val pylonBlueprintByZone = With.geography.zones
+    .map(zone =>(
+      zone,
+      new Blueprint(this,
+        building          = Some(Protoss.Pylon),
+        requireZone       = Some(zone),
+        placementProfile  = Some(PlacementProfiles.hugWorkersWithPylon))))
+    .toMap
+  
+  private val cannonBlueprintsByZone = With.geography.zones
+    .map(zone => (
+      zone,
+      (1 to count).map(i =>
+        new Blueprint(this,
+          building          = Some(Protoss.PhotonCannon),
+          requireZone       = Some(zone),
+          placementProfile  = Some(PlacementProfiles.hugWorkersWithCannon)))))
+    .toMap
+  
   protected def eligibleBases: Iterable[Base] = {
     With.geography.ourBases
   }
   
-  private def cannonBase(base: Base) {
-    val zone                = base.zone
-    val cannonsInExpansion  = With.units.ours.count(unit => unit.is(Protoss.PhotonCannon) && unit.pixelCenter.zone == zone)
-    val cannonsToAdd        = count.get - cannonsInExpansion
-    val pylonBlueprint      = new Blueprint(this, building = Some(Protoss.Pylon), requireZone = Some(base.zone))
+  private def cannonZone(zone: Zone) {
+    val cannonsInZone  = With.units.ours.count(unit => unit.is(Protoss.PhotonCannon) && unit.pixelCenter.zone == zone)
+    val cannonsToAdd   = count - cannonsInZone
     
     if (cannonsToAdd <= 0) return
     
-    With.groundskeeper.propose(pylonBlueprint)
-    for (i <- 0 to cannonsToAdd) {
-      val cannonBlueprint = new Blueprint(this, building = Some(Protoss.PhotonCannon), requireZone = Some(base.zone))
-      With.groundskeeper.propose(cannonBlueprint)
-    }
+    With.groundskeeper.propose(pylonBlueprintByZone(zone))
+    cannonBlueprintsByZone(zone).foreach(With.groundskeeper.propose)
     With.scheduler.request(this, RequestAnother(cannonsToAdd, Protoss.PhotonCannon))
   }
 }

@@ -9,7 +9,7 @@ import Planning.Plans.Information.Reactive.EnemyBio
 import Planning.Plans.Information.{Employ, Employing}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, FirstEightMinutes}
-import Planning.Plans.Macro.Expanding.{BuildAssimilators, MatchMiningBases, RequireMiningBases}
+import Planning.Plans.Macro.Expanding.{BuildAssimilators, BuildCannonsAtBases, MatchMiningBases, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.{UnitsAtLeast, _}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Protoss.{ProtossBuilds, ProtossVsTerranIdeas}
@@ -57,6 +57,7 @@ class ProtossVsTerran extends Parallel {
     RequestAtLeast(1,   Protoss.RoboticsFacility),
     RequestAtLeast(1,   Protoss.Observatory),
     RequestAtLeast(1,   Protoss.CitadelOfAdun),
+    RequestAtLeast(1,   Protoss.Forge),
     RequestUpgrade(Protoss.ZealotSpeed))
   
   //////////////////////////
@@ -206,7 +207,8 @@ class ProtossVsTerran extends Parallel {
         new IfCloakedThreats_Observers,
         new If(
           new UnitsAtLeast(8, UnitMatchWarriors, complete = true),
-          new FulfillMidgameTech))),
+          new FulfillMidgameTech),
+        new BuildCannonsAtBases(1))),
     
     // Late game
     new If(

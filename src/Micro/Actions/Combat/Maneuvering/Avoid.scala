@@ -14,7 +14,7 @@ object Avoid extends Action {
     unit.matchups.threats.nonEmpty
   }
   
-  private val cardinal8Angles = (0.0 to 2.0 by 0.25).map(_ * Math.PI).toVector
+  private val cardinal8Angles = (0.0 until 2.0 by 0.25).map(_ * Math.PI).toVector
   
   override def perform(unit: FriendlyUnitInfo) {
     
@@ -31,13 +31,13 @@ object Avoid extends Action {
   
     
     
-    val threats       = unit.matchups.mostEntangledThreatsDiffused.take(8)
-    val zoneUs        = unit.pixelCenter.zone
-    val exits         = zoneUs.edges
-    val idealDistance = threats.map(idealDistancePixels(unit, _)).max
+    val threats             = unit.matchups.mostEntangledThreatsDiffused.take(8)
+    val zoneUs              = unit.pixelCenter.zone
+    val exits               = zoneUs.edges
+    val idealExtraDistance  = threats.map(idealExtraDistancePixels(unit, _)).max
   
     val trapped     = ! unit.flying && (zoneUs.owner.isUs || exits.forall(exit => unit.pixelDistanceFast(exit.centerPixel) > threats.map(_.pixelDistanceFast(exit.centerPixel)).min))
-    val mustEscape  = ! trapped && idealDistance.isInfinity
+    val mustEscape  = ! trapped && idealExtraDistance.isInfinity
     
     if (mustEscape) {
       Retreat.consider(unit)
@@ -45,15 +45,14 @@ object Avoid extends Action {
     
     val anglesAway        = threats.map(threat => PurpleMath.normalizeAngle(threat.pixelCenter.radiansTo(unit.pixelCenter)))
     val angles            = anglesAway ++ cardinal8Angles
-    val targetDistance    = Math.min(idealDistance, Math.max(threats.map(_.pixelRangeAgainstFromCenter(unit)).max, 32.0 * 3.0))
-    val paths             = angles.map(angle => PixelRay(unit.pixelCenter, unit.pixelCenter.radiateRadians(angle, targetDistance * 1.5)))
+    val paths             = angles.map(angle => PixelRay(unit.pixelCenter, unit.pixelCenter.radiateRadians(angle, idealExtraDistance * 1.5)))
     val pathsTruncated    = paths.map(ray => PixelRay(ray.from, ray.from.project(ray.to, ray
       .tilesIntersected
       .takeWhile(tile => tile.valid && (unit.flying || With.grids.walkable.get(tile)))
       .lastOption
       .map(_.pixelCenter.pixelDistanceFast(ray.from))
       .getOrElse(0.0))))
-    val pathsAcceptable   = pathsTruncated.filter(_.lengthFast >= targetDistance)
+    val pathsAcceptable   = pathsTruncated.filter(_.lengthFast >= idealExtraDistance)
     val pathAccepted      = ByOption.minBy(pathsAcceptable)(path => unit.matchups.ifAt(path.from.project(path.to, 8.0)).framesOfEntanglementDiffused)
     
     unit.agent.pathsAll         = paths
@@ -74,7 +73,7 @@ object Avoid extends Action {
     }
   }
   
-  def idealDistancePixels(unit: FriendlyUnitInfo, threat: UnitInfo): Double = {
+  def idealExtraDistancePixels(unit: FriendlyUnitInfo, threat: UnitInfo): Double = {
     val rangePixelsEdgeThem = threat.pixelRangeAgainstFromEdge(unit)
     val rangePixelsEdgeUs   = if (unit.canAttack(threat)) unit.pixelRangeAgainstFromEdge(threat) else 0.0
     
@@ -83,6 +82,6 @@ object Avoid extends Action {
     
     if (threat.topSpeedChasing > unit.topSpeed) return Double.PositiveInfinity
     
-    rangePixelsEdgeThem + 48.0
+    rangePixelsEdgeThem + 48.0 - unit.pixelDistanceFast(threat)
   }
 }

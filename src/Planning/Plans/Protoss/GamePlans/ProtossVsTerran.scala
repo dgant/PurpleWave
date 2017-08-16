@@ -5,14 +5,13 @@ import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
 import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors}
 import Planning.Plans.Army._
 import Planning.Plans.Compound._
+import Planning.Plans.Information.Reactive.EnemyBio
 import Planning.Plans.Information.{Employ, Employing}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, FirstEightMinutes}
 import Planning.Plans.Macro.Expanding.{BuildAssimilators, MatchMiningBases, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.{UnitsAtLeast, _}
-import Planning.Plans.Information.Reactive.EnemyBio
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
-import Planning.Plans.Protoss.Situational.TwoGatewaysAtNatural
 import Planning.Plans.Protoss.{ProtossBuilds, ProtossVsTerranIdeas}
 import Planning.Plans.Scouting.{ScoutAt, ScoutExpansionsAt}
 import ProxyBwapi.Races.{Protoss, Terran}
@@ -28,10 +27,7 @@ class ProtossVsTerran extends Parallel {
   
   private class ImplementEarly14Nexus       extends FirstEightMinutes(new Build(ProtossBuilds.Opening13Nexus_NoZealot_OneGateCore: _*))
   private class ImplementEarly1GateRange    extends FirstEightMinutes(new Build(ProtossBuilds.Opening_1GateCore: _*))
-  private class ImplementEarly1015GateGoon  extends FirstEightMinutes(
-    new Parallel(
-      new TwoGatewaysAtNatural,
-      new Build(ProtossBuilds.OpeningTwoGate1015Dragoons: _*)))
+  private class ImplementEarly1015GateGoon  extends FirstEightMinutes(new Build(ProtossBuilds.OpeningTwoGate1015Dragoons: _*))
   private class ImplementEarlyDTExpand      extends FirstEightMinutes(new Build(ProtossBuilds.OpeningDTExpand: _*))
   private class ImplementEarly4GateAllIn    extends FirstEightMinutes(new Build(ProtossBuilds.Opening_1GateZZCore: _*))
   

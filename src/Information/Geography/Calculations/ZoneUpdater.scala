@@ -110,9 +110,8 @@ object ZoneUpdater {
   }
   
   private def updateAssets(base: Base) {
-    
-    base.minerals       = With.units.neutral.filter(_.mineralsLeft > With.configuration.blockerMineralThreshold).filter(resourceIsInBase(_, base)).toSet
-    base.gas            = With.units.all.filter(_.unitClass.isGas).filter(resourceIsInBase(_, base)).toSet
+    base.minerals       = With.units.neutral.filter(u => u.mineralsLeft > 0 && ! u.isMineralBlocker && resourceIsInBase(u, base)).toSet
+    base.gas            = With.units.all.filter(_.unitClass.isGas).filter(resourceIsInBase(_, base))
     base.workers        = With.units.all.filter(unit => unit.unitClass.isWorker && base.zone.contains(unit.pixelCenter))
     base.mineralsLeft   = base.minerals.filter(_.alive).toVector.map(_.mineralsLeft).sum
     base.gasLeft        = base.gas.filter(_.alive).toVector.map(_.gasLeft).sum

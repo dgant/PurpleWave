@@ -8,9 +8,9 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 object WraithUncloak extends Action {
   
   override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.is(Terran.Wraith)        &&
-    unit.cloaked                  &&
-    unit.matchups.threats.isEmpty &&
+    unit.is(Terran.Wraith)                                  &&
+    unit.cloaked                                            &&
+    ! unit.matchups.enemies.exists(_.unitClass.attacksAir)  &&
     With.framesSince(unit.agent.lastCloak) > 24 * 4
   }
   

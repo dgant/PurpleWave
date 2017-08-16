@@ -7,11 +7,10 @@ import Planning.Plans.Compound._
 import Planning.Plans.Information.Employing
 import Planning.Plans.Information.Reactive.{EnemyLurkers, EnemyMutalisks}
 import Planning.Plans.Macro.Automatic._
-import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
+import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding._
 import Planning.Plans.Macro.Milestones.{OnGasBases, OnMiningBases, UnitsAtLeast}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
-import Planning.Plans.Recruitment.RecruitFreelancers
 import Planning.Plans.Scouting.ScoutAt
 import ProxyBwapi.Races.{Terran, Zerg}
 import Strategery.Strategies.Terran.TvZ.TvZMidgameWraiths
@@ -122,12 +121,6 @@ class TerranVsZergMech extends Parallel {
     new Build(RequestAtLeast(16, Terran.Barracks)),
     new ScoutAt(16),
     new DefendZones,
-    new ConsiderAttacking,
-    new FollowBuildOrder,
-    new Scan,
-    new RemoveMineralBlocksAt(40),
-    new Gather,
-    new RecruitFreelancers,
-    new DefendEntrance
+    new ConsiderAttacking
   ))
 }

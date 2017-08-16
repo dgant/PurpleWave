@@ -6,6 +6,7 @@ import Planning.Plans.Information.SwitchEnemyRace
 import Planning.Plans.Macro.Automatic.Gather
 import Planning.Plans.Macro.BuildOrders.FollowBuildOrder
 import Planning.Plans.Macro.Expanding.RemoveMineralBlocksAt
+import Planning.Plans.Protoss.Situational.DefendProxy
 import Planning.Plans.Recruitment.RecruitFreelancers
 
 class ProtossStandardGamePlan
@@ -17,6 +18,7 @@ class ProtossStandardGamePlan
       random  .set(new ProtossVsRandom)
     },
     new FollowBuildOrder,
+    new DefendProxy,
     new RemoveMineralBlocksAt(30),
     new Gather,
     new RecruitFreelancers,

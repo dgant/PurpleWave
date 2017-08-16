@@ -70,14 +70,16 @@ object ShowBattleDetails extends View {
     val boxHeight         = With.visualization.lineHeightSmall + 4
     val margin            = 2
     
+    val nameUs      = With.self.name
+    val nameEnemy   = With.enemy.name
     val colorUs     = With.self.colorMedium
     val colorEnemy  = With.enemy.colorMedium
-    drawBar(x2, nextY, dxUsInitial,     boxHeight, colorUs,     "Start (Us)")     ; nextY += boxHeight
-    drawBar(x2, nextY, dxEnemyInitial,  boxHeight, colorEnemy,  "Start (Enemy)")  ; nextY += boxHeight + margin
-    drawBar(x2, nextY, dxUsKept,        boxHeight, colorUs,     "Kept (Us)")      ; nextY += boxHeight
-    drawBar(x2, nextY, dxEnemyKept,     boxHeight, colorEnemy,  "Kept (Enemy)")   ; nextY += boxHeight + margin
-    drawBar(x2, nextY, dxUsLost,        boxHeight, colorUs,     "Lost (Us)")      ; nextY += boxHeight
-    drawBar(x2, nextY, dxEnemyLost,     boxHeight, colorEnemy,  "Lost (Enemy)")
+    drawBar(x2, nextY, dxUsInitial,     boxHeight, colorUs,     "Start (" + nameUs    + ")")  ; nextY += boxHeight
+    drawBar(x2, nextY, dxEnemyInitial,  boxHeight, colorEnemy,  "Start (" + nameEnemy + ")")  ; nextY += boxHeight + margin
+    drawBar(x2, nextY, dxUsKept,        boxHeight, colorUs,     "Kept ("  + nameUs    + ")")  ; nextY += boxHeight
+    drawBar(x2, nextY, dxEnemyKept,     boxHeight, colorEnemy,  "Kept ("  + nameEnemy + ")")  ; nextY += boxHeight + margin
+    drawBar(x2, nextY, dxUsLost,        boxHeight, colorUs,     "Lost ("  + nameUs    + ")")  ; nextY += boxHeight
+    drawBar(x2, nextY, dxEnemyLost,     boxHeight, colorEnemy,  "Lost ("  + nameEnemy + ")")
   }
   
   def drawBar(x: Int, y: Int, dx: Int, dy: Int, color: Color, label: String) {

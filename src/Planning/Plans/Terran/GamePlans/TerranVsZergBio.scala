@@ -6,12 +6,11 @@ import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Plans.Army._
 import Planning.Plans.Compound._
 import Planning.Plans.Information.Reactive.EnemyMutalisks
-import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
-import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
+import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
+import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding._
 import Planning.Plans.Macro.Milestones.{OnMiningBases, UnitsAtLeast}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
-import Planning.Plans.Recruitment.RecruitFreelancers
 import Planning.Plans.Scouting.ScoutAt
 import ProxyBwapi.Races.Terran
 
@@ -65,12 +64,6 @@ class TerranVsZergBio extends Parallel {
     new OnMiningBases(4, new Build(RequestAtLeast(20, Terran.Barracks))),
     new ScoutAt(16),
     new DefendZones,
-    new ConsiderAttacking,
-    new FollowBuildOrder,
-    new Scan,
-    new RemoveMineralBlocksAt(40),
-    new Gather,
-    new RecruitFreelancers,
-    new DefendEntrance
+    new ConsiderAttacking
   ))
 }

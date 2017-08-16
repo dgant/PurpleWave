@@ -13,6 +13,7 @@ import Planning.Plans.Macro.BuildOrders.{Build, FirstEightMinutes, FollowBuildOr
 import Planning.Plans.Macro.Expanding.{BuildRefineries, RemoveMineralBlocksAt, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.{OnGasBases, OnMiningBases, UnitsAtLeast}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
+import Planning.Plans.Protoss.Situational.DefendProxy
 import Planning.Plans.Recruitment.RecruitFreelancers
 import Planning.Plans.Scouting.{ScoutAt, ScoutExpansionsAt}
 import ProxyBwapi.Races.Terran
@@ -144,6 +145,7 @@ class TerranVsTerran extends Parallel {
     ),
     new FollowBuildOrder,
     new Scan,
+    new DefendProxy,
     new RemoveMineralBlocksAt(40),
     new Gather,
     new RecruitFreelancers,

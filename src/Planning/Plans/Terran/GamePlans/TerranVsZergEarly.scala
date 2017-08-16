@@ -4,12 +4,16 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.BuildRequests.RequestAtLeast
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
+import Planning.Plans.Army.{DefendEntrance, Scan}
 import Planning.Plans.Compound._
 import Planning.Plans.Information.Employ
+import Planning.Plans.Macro.Automatic.Gather
 import Planning.Plans.Macro.Build.ProposePlacement
-import Planning.Plans.Macro.BuildOrders.{Build, FirstEightMinutes}
+import Planning.Plans.Macro.BuildOrders.{Build, FirstEightMinutes, FollowBuildOrder}
 import Planning.Plans.Macro.Expanding._
 import Planning.Plans.Macro.Milestones.UnitsAtLeast
+import Planning.Plans.Protoss.Situational.DefendProxy
+import Planning.Plans.Recruitment.RecruitFreelancers
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvZ._
 
@@ -98,6 +102,13 @@ class TerranVsZergEarly extends Parallel {
     new If(new UnitsAtLeast(4, UnitMatchWarriors), new RequireMiningBases(2)),
     new Employ(TvZMidgameBio,     new TerranVsZergBio),
     new Employ(TvZMidgameMech,    new TerranVsZergMech),
-    new Employ(TvZMidgameWraiths, new TerranVsZergMech)
+    new Employ(TvZMidgameWraiths, new TerranVsZergMech),
+    new FollowBuildOrder,
+    new Scan,
+    new DefendProxy,
+    new RemoveMineralBlocksAt(40),
+    new Gather,
+    new RecruitFreelancers,
+    new DefendEntrance
   ))
 }

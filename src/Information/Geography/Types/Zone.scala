@@ -4,6 +4,7 @@ import Information.Geography.Pathfinding.ZonePath
 import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile, TileRectangle}
 import ProxyBwapi.Players.PlayerInfo
+import Utilities.ByOption
 import bwta.Region
 
 import scala.collection.JavaConverters._
@@ -24,6 +25,7 @@ class Zone(
   lazy val  points          : Iterable[Pixel]   = bwtaRegion.getPolygon.getPoints.asScala.map(new Pixel(_)).toVector
   lazy val  island          : Boolean           = ! With.geography.startBases.map(_.zone).exists(otherZone => this != otherZone && With.paths.zonePath(this, otherZone).isDefined)
   lazy val  tilesBuildable  : Array[Tile]       = { With.grids.buildableTerrain.initialize(); tiles.filter(With.grids.buildableTerrain.get).toArray }
+  lazy val  maxMobility     : Int               = ByOption.max(tiles.map(With.grids.mobilityTerrain.get)).getOrElse(0)
   
   lazy val exit: Option[Edge] = {
     if (edges.isEmpty)

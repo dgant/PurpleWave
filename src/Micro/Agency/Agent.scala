@@ -1,6 +1,7 @@
 package Micro.Agency
 
 import Lifecycle.With
+import Mathematics.Physics.Force
 import Mathematics.Points.{Pixel, PixelRay, Tile}
 import Micro.Actions.{Action, Idle}
 import Micro.Decisions.MicroDecision
@@ -11,7 +12,9 @@ import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClass.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import ProxyBwapi.Upgrades.Upgrade
+import bwapi.Color
 
+import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 class Agent(val unit: FriendlyUnitInfo) {
@@ -67,6 +70,8 @@ class Agent(val unit: FriendlyUnitInfo) {
   var lastStim: Int = 0
   var lastCloak: Int = 0
   var shouldEngage: Boolean = false
+  val forces: mutable.Map[Color, Force] = new mutable.HashMap[Color, Force]
+  
   
   /////////////////
   // Suggestions //
@@ -113,6 +118,7 @@ class Agent(val unit: FriendlyUnitInfo) {
   }
   
   private def resetState() {
+    forces.clear()
     unit.agent.desireTeam         = 1.0
     unit.agent.desireIndividual   = 1.0
     unit.agent.desireTotal        = 1.0

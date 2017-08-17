@@ -39,7 +39,7 @@ object FindBuildings extends Action {
     val force = pulls.map(_.apply(unit.pixelCenter)).reduce(_ + _)
     
     //TODO: Use actual potential flow so we can avoid obstacles and threats
-    val target = unit.pixelCenter.add(force.normalize(64.0))
+    val target = unit.pixelCenter.add(force.normalize(64.0).toPoint)
     val tileToScout = tilesToScout.minBy(_.pixelCenter.pixelDistanceFast(target))
     unit.agent.toTravel = Some(tileToScout.pixelCenter)
     Travel.delegate(unit)

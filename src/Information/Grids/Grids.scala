@@ -6,17 +6,18 @@ import Information.Grids.Vision.{GridAltitudeBonus, GridEnemyDetection, GridFrie
 
 class Grids {
   
-  val altitudeBonus    = new GridAltitudeBonus
-  val buildable        = new GridBuildable
-  val buildableTerrain = new GridBuildableTerrain
-  val chokepoints      = new GridChokepoint
-  val creep            = new GridCreep
-  val friendlyVision   = new GridFriendlyVision
-  val enemyDetection   = new GridEnemyDetection
-  val psi2Height       = new GridPsi2Height
-  val psi3Height       = new GridPsi3Height
-  val units            = new GridUnits
-  val walkable         = new GridWalkable
-  val walkableTerrain  = new GridWalkableTerrain
-  val walkableUnits    = new GridWalkableUnits
+  val altitudeBonus     = new GridAltitudeBonus
+  val buildable         = new GridBuildable
+  val buildableTerrain  = new GridBuildableTerrain
+  val chokepoints       = new GridChokepoint
+  val creep             = new GridCreep
+  val friendlyVision    = new GridFriendlyVision
+  val enemyDetection    = new GridEnemyDetection
+  val mobilityTerrain   = new GridMobilityTerrain
+  val psi2Height        = new GridPsi2Height
+  val psi3Height        = new GridPsi3Height
+  val units             = new GridUnits
+  val walkable          = new GridWalkable
+  val walkableTerrain   = new GridWalkableTerrain
+  val walkableUnits     = new GridWalkableUnits
 }

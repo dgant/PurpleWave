@@ -11,7 +11,7 @@ object ShowPlayerNames extends {
     With.game.drawTextScreen  (5 + 25, 5,                             With.self.name + " vs. ")
     With.game.drawTextScreen  (5 + 25, 5 + 25,                        With.enemy.name)
     With.game.setTextSize(bwapi.Text.Size.Enum.Default)
-    With.game.drawTextScreen  (5,      5 + 50,                        "PurpleWave is displaying this game in " + visionLabel + "!")
+    With.game.drawTextScreen  (5,      5 + 50,                        With.self.name + " is displaying this game in " + visionLabel + "!")
     With.game.setTextSize(bwapi.Text.Size.Enum.Small)
   }
 }

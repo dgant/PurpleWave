@@ -21,6 +21,7 @@ object ShowUnitsFriendly extends View {
     var showCommand : Boolean = false
     var showOrder   : Boolean = false
     var showKiting  : Boolean = false
+    var showForces  : Boolean = true
     
     if (showClient) {
       agent.lastClient.foreach(plan =>
@@ -67,6 +68,15 @@ object ShowUnitsFriendly extends View {
       agent.pathsTruncated.foreach(ray => DrawMap.line(ray.from, ray.to, Colors.MediumGreen))
       agent.pathsAcceptable.foreach(ray => DrawMap.line(ray.from, ray.to, Colors.BrightGreen))
       agent.pathAccepted.foreach(ray => { DrawMap.line(ray.from, ray.to, Colors.NeonGreen); DrawMap.circle(ray.to, 4, Colors.NeonGreen, solid = true) })
+    }
+    if (showForces) {
+      agent.forces.foreach(pair =>
+        DrawMap.line(
+          agent.unit.pixelCenter,
+          agent.unit.pixelCenter.add(
+            pair._2.x.toInt,
+            pair._2.y.toInt),
+          pair._1))
     }
     /*
     if (agent.toGather.isDefined) {

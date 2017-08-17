@@ -8,12 +8,14 @@ abstract class AbstractGrid[T] {
   val width = With.mapTileWidth
   val height = With.mapTileHeight
   
-  protected val length:Int          = width * height
-  def update()                      = {}
-  def valid(i:Int):Boolean          = i > 0 && i < length
-  def i(tileX:Int, tileY:Int)       = tileX + tileY * width
-  def get(i:Int):T
-  def get(tile: Tile):T             = get(tile.i)
-  def defaultValue:T
-  def repr(value:T):String          = value.toString
+  protected val length: Int = width * height
+  
+  def update() {}
+  
+  def valid(i: Int): Boolean          = i > 0 && i < length
+  def i(tileX: Int, tileY: Int): Int  = tileX + tileY * width
+  def get(i: Int): T
+  def get(tile: Tile): T              = get(tile.i)
+  def defaultValue: T
+  def repr(value: T): String          = value.toString
 }

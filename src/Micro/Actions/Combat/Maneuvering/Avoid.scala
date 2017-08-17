@@ -1,9 +1,12 @@
 package Micro.Actions.Combat.Maneuvering
 
+import Debugging.Visualizations.Colors
 import Lifecycle.With
-import Mathematics.Points.PixelRay
+import Mathematics.Physics.{BuildForce, Force}
+import Mathematics.Points.{PixelRay, SpecificPoints}
 import Mathematics.PurpleMath
 import Micro.Actions.Action
+import Micro.Actions.Commands.MoveWithField
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
 
@@ -17,6 +20,71 @@ object Avoid extends Action {
   private val cardinal8Angles = (0.0 until 2.0 by 0.25).map(_ * Math.PI).toVector
   
   override def perform(unit: FriendlyUnitInfo) {
+    val forceThreat     = threatForce(unit)
+    val forceMobility   = mobilityForce(unit)
+    val forceSpreading  = spreadingForce(unit)
+    unit.agent.forces.put(Colors.NeonRed,     forceThreat)
+    unit.agent.forces.put(Colors.NeonGreen,   forceMobility)
+    unit.agent.forces.put(Colors.NeonViolet,  forceSpreading)
+    MoveWithField.delegate(unit)
+  }
+  
+  private def threatForce(unit: FriendlyUnitInfo): Force = {
+    val forces      = unit.matchups.threats.map(singleThreatForce(unit, _))
+    val forceSum    = forces.reduce(_ + _)
+    val output      = forceSum.normalize
+    output
+  }
+  
+  private def singleThreatForce(unit: FriendlyUnitInfo, threat: UnitInfo): Force = {
+    val magnitudeDamage   = threat.dpfOnNextHitAgainst(unit)
+    val magnitudeDistance = Math.max(1.0, threat.framesToGetInRange(unit)) //This may fail vs. static defense -- we may want a bit more force
+    val magnitudeFinal    = magnitudeDamage / magnitudeDistance
+    val output            = BuildForce.fromPixels(threat.pixelCenter, unit.pixelCenter, magnitudeFinal)
+    output
+  }
+  
+  private def mobilityForce(unit: FriendlyUnitInfo): Force = {
+    if (unit.flying)
+      mobilityForceAir(unit)
+    else
+      mobilityForceGround(unit)
+  }
+  
+  private def mobilityForceAir(unit: FriendlyUnitInfo): Force = {
+    val threatRanges  = unit.matchups.threats.map(_.pixelRangeAgainstFromCenter(unit))
+    val marginDesired = 64.0 + ByOption.max(threatRanges).getOrElse(0.0)
+    val magnitude     = Math.max(0.0, marginDesired - unit.pixelCenter.distanceFromEdge)
+    val output        = BuildForce.fromPixels(unit.pixelCenter, SpecificPoints.middle, magnitude)
+    output
+  }
+  
+  private def mobilityForceGround(unit: FriendlyUnitInfo): Force = {
+    val tile                = unit.tileIncludingCenter
+    val mobility            = With.grids.mobilityTerrain.get(tile)
+    val mobilityMax         = tile.zone.maxMobility
+    val mostMobileNeighbor  = tile.adjacent8.maxBy(With.grids.mobilityTerrain.get) //This could be more granular or weighted over the neighbors
+    val magnitude           = 32.0 * Math.max(0.0, mobilityMax - 2.0 * mobility)
+    val output              = BuildForce.fromPixels(tile.pixelCenter, mostMobileNeighbor.pixelCenter, magnitude)
+    output
+  }
+  
+  private def spreadingForce(unit: FriendlyUnitInfo): Force = {
+    if (unit.flying) return new Force
+    
+    val blockers        = unit.matchups.allies.filterNot(_.flying)
+    val nearestBlocker  = ByOption.minBy(blockers)(_.pixelsFromEdgeFast(unit))
+    
+    if (nearestBlocker.isEmpty) return new Force
+    
+    val maximumDistance = Math.max(32.0, unit.pixelRangeMax)
+    val blockerDistance = nearestBlocker.get.pixelsFromEdgeFast(unit)
+    val magnitude       = Math.max(0.0, maximumDistance - blockerDistance)
+    val output          = BuildForce.fromPixels(nearestBlocker.get.pixelCenter, unit.pixelCenter, magnitude)
+    output
+  }
+  
+  def performOld(unit: FriendlyUnitInfo) {
     
     /*
     There are multiple different ways to avoid someone:

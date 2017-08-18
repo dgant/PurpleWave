@@ -1,9 +1,10 @@
 package Micro.Actions.Combat.Maneuvering
 
 import Debugging.Visualizations.Colors
+import Information.Grids.AbstractGrid
 import Lifecycle.With
 import Mathematics.Physics.{BuildForce, Force}
-import Mathematics.Points.{PixelRay, SpecificPoints}
+import Mathematics.Points.PixelRay
 import Mathematics.PurpleMath
 import Micro.Actions.Action
 import Micro.Actions.Commands.MoveWithField
@@ -46,25 +47,16 @@ object Avoid extends Action {
   
   private def mobilityForce(unit: FriendlyUnitInfo): Force = {
     if (unit.flying)
-      mobilityForceAir(unit)
+      mobilityForce(unit, 12, With.grids.mobilityBorder)
     else
-      mobilityForceGround(unit)
+      mobilityForce(unit, unit.pixelCenter.zone.maxMobility, With.grids.mobility)
   }
   
-  private def mobilityForceAir(unit: FriendlyUnitInfo): Force = {
-    val threatRanges  = unit.matchups.threats.map(_.pixelRangeAgainstFromCenter(unit))
-    val marginDesired = 64.0 + ByOption.max(threatRanges).getOrElse(0.0)
-    val magnitude     = Math.max(0.0, marginDesired - unit.pixelCenter.pixelDistanceFromEdge)
-    val output        = BuildForce.fromPixels(unit.pixelCenter, SpecificPoints.middle, magnitude)
-    output
-  }
-  
-  private def mobilityForceGround(unit: FriendlyUnitInfo): Force = {
+  private def mobilityForce(unit: FriendlyUnitInfo, maxMobility: Int, mobilitySource: AbstractGrid[Int]): Force = {
     val tile                = unit.tileIncludingCenter
-    val mobility            = With.grids.mobility.get(tile)
-    val mobilityMax         = tile.zone.maxMobility
-    val mostMobileNeighbor  = tile.adjacent8.maxBy(With.grids.mobility.get) //This could be more granular or weighted over the neighbors
-    val magnitude           = 32.0 * Math.max(0.0, mobilityMax - 2.0 * mobility)
+    val mobility            = mobilitySource.get(tile)
+    val mostMobileNeighbor  = tile.adjacent8.filter(_.valid).maxBy(mobilitySource.get) //This could be more granular or weighted over the neighbors
+    val magnitude           = Math.max(0.0, 1.0 - 2 * mobility / maxMobility.toDouble)
     val output              = BuildForce.fromPixels(tile.pixelCenter, mostMobileNeighbor.pixelCenter, magnitude)
     output
   }

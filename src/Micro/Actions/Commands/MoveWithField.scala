@@ -14,7 +14,7 @@ object MoveWithField extends Action {
   override def perform(unit: FriendlyUnitInfo) {
     val forceTotal  = unit.agent.forces.values.reduce(_ + _)
     val forceNormal = forceTotal.normalize(85.0)
-    val forcePoint  = forceTotal.toPoint
+    val forcePoint  = forceNormal.toPoint
     val pixelToMove = unit.pixelCenter.add(forcePoint)
     unit.agent.movingTo = Some(pixelToMove)
     With.commander.move(unit, pixelToMove)

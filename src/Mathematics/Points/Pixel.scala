@@ -16,7 +16,7 @@ case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     x < With.mapPixelWidth &&
     y < With.mapPixelHeight
   }
-  def distanceFromEdge: Int = {
+  def pixelDistanceFromEdge: Int = {
     var min = x
     if (y < min) min = y
     if (With.mapPixelWidth  - x < min) min = With.mapPixelWidth - x

@@ -9,6 +9,14 @@ class GridMobilityTerrain extends AbstractGridArray[Int] {
     
     With.grids.walkableTerrain.initialize()
     
+    // Paint the map with mobility numbers.
+    // Note that this *does not* handle map edges correctly!
+    //
+    // It wraps around and can overestimate the mobility along the edge of the map
+    // when the opposite side is walkable.
+    //
+    // Thus, this should be used in concert with GridMobilityBorder to limit the values
+    
     var mobility    = 0
     val horizon     = new Array[Boolean](length)
     val nextHorizon = new Array[Boolean](length)

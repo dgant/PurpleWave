@@ -86,15 +86,16 @@ case class Simulacrum(simulation: BattleSimulation, unit: UnitInfo) {
     if (cooldownMoving > 0)   return
     if ( ! targetExists)      return
     if (pixelsFromRange <= 0) return
-
+    
     val travelFrames    = Math.min(SIMULATION_STEP_FRAMES, unit.framesToTravelPixels(pixelsFromRange))
     val travelPixel     = pixel.project(victim.pixel, unit.topSpeed * travelFrames)
+    val originalPixel   = pixel
     cooldownMoving      = travelFrames
     pixel               = travelPixel
     simulation.updated  = true
   
     if (ShowBattleDetails.inUse) {
-      moves += ((pixel, travelPixel))
+      moves += ((originalPixel, travelPixel))
     }
   }
   
@@ -106,7 +107,7 @@ case class Simulacrum(simulation: BattleSimulation, unit: UnitInfo) {
     val damage            = Math.min(target.get.hitPoints, unit.damageOnNextHitAgainst(victim.unit))
     val value             = damage * victim.valuePerDamage
     cooldownShooting      = Math.max(1, (unit.cooldownMaxAgainst(victim.unit) / splashFactor).toInt)
-    cooldownMoving        = Math.max(cooldownMoving, unit.unitClass.stopFrames)
+    cooldownMoving        = Math.max(cooldownMoving, cooldownMoving + unit.unitClass.stopFrames)
     damageDealt           += damage
     valueDealt            += value
     victim.hitPoints      -= damage

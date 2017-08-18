@@ -54,16 +54,16 @@ object Avoid extends Action {
   private def mobilityForceAir(unit: FriendlyUnitInfo): Force = {
     val threatRanges  = unit.matchups.threats.map(_.pixelRangeAgainstFromCenter(unit))
     val marginDesired = 64.0 + ByOption.max(threatRanges).getOrElse(0.0)
-    val magnitude     = Math.max(0.0, marginDesired - unit.pixelCenter.distanceFromEdge)
+    val magnitude     = Math.max(0.0, marginDesired - unit.pixelCenter.pixelDistanceFromEdge)
     val output        = BuildForce.fromPixels(unit.pixelCenter, SpecificPoints.middle, magnitude)
     output
   }
   
   private def mobilityForceGround(unit: FriendlyUnitInfo): Force = {
     val tile                = unit.tileIncludingCenter
-    val mobility            = With.grids.mobilityTerrain.get(tile)
+    val mobility            = With.grids.mobility.get(tile)
     val mobilityMax         = tile.zone.maxMobility
-    val mostMobileNeighbor  = tile.adjacent8.maxBy(With.grids.mobilityTerrain.get) //This could be more granular or weighted over the neighbors
+    val mostMobileNeighbor  = tile.adjacent8.maxBy(With.grids.mobility.get) //This could be more granular or weighted over the neighbors
     val magnitude           = 32.0 * Math.max(0.0, mobilityMax - 2.0 * mobility)
     val output              = BuildForce.fromPixels(tile.pixelCenter, mostMobileNeighbor.pixelCenter, magnitude)
     output
@@ -79,7 +79,7 @@ object Avoid extends Action {
     
     val maximumDistance = Math.max(32.0, unit.pixelRangeMax)
     val blockerDistance = nearestBlocker.get.pixelsFromEdgeFast(unit)
-    val magnitude       = Math.max(0.0, maximumDistance - blockerDistance)
+    val magnitude       = Math.max(0.0, 1.0 - blockerDistance / maximumDistance)
     val output          = BuildForce.fromPixels(nearestBlocker.get.pixelCenter, unit.pixelCenter, magnitude)
     output
   }

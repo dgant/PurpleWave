@@ -24,6 +24,13 @@ case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     x < With.mapTileWidth &&
     y < With.mapTileHeight
   }
+  def tileDistanceFromEdge: Int = {
+    var min = x
+    if (y < min) min = y
+    if (With.mapTileWidth  - x < min) min = With.mapTileWidth - x
+    if (With.mapTileHeight - y < min) min = With.mapTileHeight - y
+    min
+  }
   def i: Int = {
     x + With.mapTileWidth * y
   }

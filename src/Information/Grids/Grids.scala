@@ -13,7 +13,10 @@ class Grids {
   val creep             = new GridCreep
   val friendlyVision    = new GridFriendlyVision
   val enemyDetection    = new GridEnemyDetection
+  val mobility          = new GridMobility
   val mobilityTerrain   = new GridMobilityTerrain
+  val mobilityBuildings = new GridMobilityBuildings
+  val mobilityBorder    = new GridMobilityBorder
   val psi2Height        = new GridPsi2Height
   val psi3Height        = new GridPsi3Height
   val units             = new GridUnits

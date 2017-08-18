@@ -9,15 +9,18 @@ import Mathematics.Points.TileRectangle
 object ShowGrids extends View {
   
   override def renderMap() {
-    renderGridArray(With.grids.mobilityTerrain, 0, 0)
+    renderGridArray(With.grids.mobility, 0, 0)
+    renderGridArray(With.grids.mobilityBorder, 1, 0)
+    renderGridArray(With.grids.mobilityBuildings, 0, 1)
+    renderGridArray(With.grids.mobilityTerrain, 1, 1)
   }
   
-  private def renderGridArray[T](map:AbstractGrid[T], offsetX:Int=0, offsetY:Int=0) {
+  private def renderGridArray[T](map:AbstractGrid[T], offsetX:Int = 0, offsetY:Int = 0) {
     val viewportTiles = TileRectangle(With.viewport.start.tileIncluding, With.viewport.end.tileIncluding)
     viewportTiles.tiles
       .filterNot(tile => map.get(tile) == map.defaultValue)
       .foreach(tile => DrawMap.text(
-        tile.topLeftPixel.add(offsetX*16, offsetY*13),
+        tile.topLeftPixel.add(offsetX*12, offsetY*13),
         map.repr(map.get(tile))))
   }
   

@@ -16,12 +16,15 @@ object ShowUnitsFriendly extends View {
     if ( ! With.viewport.contains(agent.unit.pixelCenter)) return
     if ( ! agent.unit.unitClass.orderable) return
     
-    var showClient  : Boolean = true
-    var showAction  : Boolean = true
-    var showCommand : Boolean = false
-    var showOrder   : Boolean = false
-    var showKiting  : Boolean = false
-    var showForces  : Boolean = true
+    var showClient    : Boolean = true
+    var showAction    : Boolean = true
+    var showCommand   : Boolean = false
+    var showOrder     : Boolean = false
+    var showTargets   : Boolean = false
+    var showFormation : Boolean = true
+    var showKiting    : Boolean = false
+    var showForces    : Boolean = true
+    var showDesire    : Boolean = true
     
     if (showClient) {
       agent.lastClient.foreach(plan =>
@@ -48,51 +51,58 @@ object ShowUnitsFriendly extends View {
         agent.unit.pixelCenter.add(0, 0),
         drawBackground = false)
     }
-    if (agent.movingTo.isDefined) {
-      DrawMap.line(agent.unit.pixelCenter, agent.movingTo.get, Colors.MediumGray)
-    }
-    if (agent.toAttack.isDefined) {
-      DrawMap.line(agent.unit.pixelCenter, agent.toAttack.get.pixelCenter, Colors.BrightRed)
-    }
-    if (agent.toForm.isDefined) {
-      DrawMap.circle(agent.toForm.get, agent.unit.unitClass.radialHypotenuse.toInt, Colors.MediumTeal)
-    }
     
-    agent.pathsAll.foreach(ray => ray.tilesIntersected.foreach(tile => DrawMap.box(
-      tile.topLeftPixel.add(1, 1),
-      tile.bottomRightPixel.subtract(1, 1),
-      if (With.grids.walkable.get(tile)) Colors.BrightBlue else Colors.BrightRed)))
+    if (showTargets) {
+      val targetUnit = agent.unit.target.orElse(agent.unit.orderTarget)
+      if (targetUnit.nonEmpty) {
+        DrawMap.line(agent.unit.pixelCenter, targetUnit.get.pixelCenter, agent.unit.player.colorNeon)
+      }
+      val targetPosition = agent.unit.targetPixel.orElse(agent.unit.orderTargetPixel)
+      if (targetPosition.nonEmpty && agent.unit.target.isEmpty) {
+        DrawMap.line(agent.unit.pixelCenter, targetPosition.get, agent.unit.player.colorDark)
+      }
+      if (agent.movingTo.isDefined) {
+        DrawMap.line(agent.unit.pixelCenter, agent.movingTo.get, Colors.MediumGray)
+      }
+      if (agent.toAttack.isDefined) {
+        DrawMap.line(agent.unit.pixelCenter, agent.toAttack.get.pixelCenter, Colors.BrightRed)
+      }
+      if (agent.toGather.isDefined) {
+        DrawMap.line(agent.unit.pixelCenter, agent.toGather.get.pixelCenter, Colors.DarkGreen)
+      }
+    }
+    if (showFormation) {
+      if (agent.toForm.isDefined) {
+        DrawMap.circle(agent.toForm.get, agent.unit.unitClass.radialHypotenuse.toInt, Colors.MediumTeal)
+      }
+    }
     
     if (showKiting) {
+      agent.pathsAll.foreach(ray => ray.tilesIntersected.foreach(tile => DrawMap.box(
+        tile.topLeftPixel.add(1, 1),
+        tile.bottomRightPixel.subtract(1, 1),
+        if (With.grids.walkable.get(tile)) Colors.BrightBlue else Colors.BrightRed)))
       agent.pathsAll.foreach(ray => DrawMap.line(ray.from, ray.to, Colors.MediumGray))
       agent.pathsTruncated.foreach(ray => DrawMap.line(ray.from, ray.to, Colors.MediumGreen))
       agent.pathsAcceptable.foreach(ray => DrawMap.line(ray.from, ray.to, Colors.BrightGreen))
       agent.pathAccepted.foreach(ray => { DrawMap.line(ray.from, ray.to, Colors.NeonGreen); DrawMap.circle(ray.to, 4, Colors.NeonGreen, solid = true) })
     }
+    
     if (showForces) {
-      agent.forces.foreach(pair =>
+      agent.forces.foreach(pair => {
+        val force = pair._2.normalize(96.0)
         DrawMap.line(
           agent.unit.pixelCenter,
           agent.unit.pixelCenter.add(
-            pair._2.x.toInt,
-            pair._2.y.toInt),
-          pair._1))
-    }
-    /*
-    if (agent.toGather.isDefined) {
-      DrawMap.line(agent.unit.pixelCenter, agent.intent.toGather.get.pixelCenter, Colors.DarkGreen)
-    }
-    val targetUnit = agent.unit.target.orElse(agent.unit.orderTarget)
-    if (targetUnit.nonEmpty) {
-      DrawMap.line(agent.unit.pixelCenter, targetUnit.get.pixelCenter, agent.unit.player.colorNeon)
-    }
-    else {
-      val targetPosition = agent.unit.targetPixel.orElse(agent.unit.orderTargetPixel)
-      if (targetPosition.nonEmpty && agent.unit.target.isEmpty) {
-        DrawMap.line(agent.unit.pixelCenter, targetPosition.get, agent.unit.player.colorDark)
-      }
+            force.x.toInt,
+            force.y.toInt),
+          pair._1)
+      })
     }
     
-    */
+    if (showDesire) {
+      val color = if (agent.shouldEngage) Colors.NeonGreen else Colors.NeonRed
+      DrawMap.circle(agent.unit.pixelCenter, 8, color)
+    }
   }
 }

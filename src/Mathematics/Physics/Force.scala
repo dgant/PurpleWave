@@ -19,8 +19,8 @@ case class Force(x: Double, y: Double) {
       Force(scale.toInt, 0)
     else
       Force(
-        (scale*x/length).toInt,
-        (scale*y/length).toInt)
+        scale * x / length,
+        scale * y / length)
   }
   
   def toPoint: Point = Point(x.toInt, y.toInt)

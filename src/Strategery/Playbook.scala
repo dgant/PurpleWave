@@ -3,6 +3,7 @@ package Strategery
 import Strategery.Strategies.AllRaces.{WorkerRush2StartLocations, WorkerRush3StartLocations}
 import Strategery.Strategies.Protoss.PvE._
 import Strategery.Strategies.Protoss.PvP._
+import Strategery.Strategies.Protoss.PvR.AllPvR
 import Strategery.Strategies.Protoss.PvT._
 import Strategery.Strategies.Protoss.PvZ._
 import Strategery.Strategies.Strategy
@@ -16,7 +17,7 @@ class EmptyPlaybook {
   lazy val forced   : Seq[Strategy] = Seq.empty
   lazy val disabled : Seq[Strategy] = Seq.empty
   
-  val none = Seq.empty
+  val none: Seq[Strategy] = Seq.empty
 }
 
 object StrategyGroups {
@@ -37,6 +38,18 @@ object StrategyGroups {
     ProxyHatchHydras
   )
   
+  val macroBuilds = Vector[Strategy](
+    AllPvT,
+    AllPvP,
+    AllPvZ,
+    AllPvR,
+    TvTStandard,
+    TvZStandard,
+    PvTEarly1GateRange,
+    PvPEarly1GateCore,
+    PvZEarlyFFEEconomic
+  )
+  
   val bad = Vector[Strategy](
     WorkerRush3StartLocations,
     TvEProxyBBS2StartLocations,
@@ -55,16 +68,22 @@ class TestingPlaybook extends EmptyPlaybook {
   override lazy val forced: Seq[Strategy] = Seq(AllPvP, AllPvT, AllPvZ, TvTStandard, TvZStandard)
 }
 
+class MacroPlaybook extends EmptyPlaybook {
+  
+  override lazy val forced    : Seq[Strategy] = StrategyGroups.macroBuilds
+  override lazy val disabled  : Seq[Strategy] = StrategyGroups.cheese
+}
+
 class PurpleWavePlaybook extends EmptyPlaybook {
-  override lazy val forced    : Seq[Nothing] = none
+  override lazy val forced    : Seq[Strategy] = none
   override lazy val disabled  : Seq[Strategy] = StrategyGroups.bad
 }
 
-class PurpleCheesePlaybook extends EmptyPlaybook {
+class PurpleCheesePlaybook extends MacroPlaybook {
   override lazy val forced: Seq[Strategy] = StrategyGroups.cheese
 }
 
-object Playbook extends PurpleWavePlaybook {
+object Playbook extends MacroPlaybook {
   
   //////////////////////
   // Experiment order //

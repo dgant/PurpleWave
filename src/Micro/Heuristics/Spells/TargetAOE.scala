@@ -2,6 +2,7 @@ package Micro.Heuristics.Spells
 
 import Mathematics.Points.Pixel
 import ProxyBwapi.UnitInfo.UnitInfo
+import Utilities.EnrichPixel.EnrichedPixelCollection
 
 object TargetAOE {
   
@@ -12,7 +13,7 @@ object TargetAOE {
     evaluate            : (UnitInfo) => Double): Option[Pixel] = {
     
     val targets       = caster.matchups.allUnits.filter(_.pixelDistanceFast(caster) <= searchRadiusPixels)
-    val targetsByTile = targets.groupBy(_.project(6).tileIncluding)
+    val targetsByTile = targets.groupBy(_.tileIncludingCenter)
     val targetValues  = targets.map(target => (target, evaluate(target))).toMap
     
     val valueByTile = targetsByTile.keys
@@ -28,7 +29,13 @@ object TargetAOE {
     if (valueByTile.nonEmpty) {
       val bestTile = valueByTile.maxBy(_._2)
       if (bestTile._2 > minimumValue) {
-        return Some(bestTile._1.pixelCenter)
+        val tile = bestTile._1
+        val finalTargets = tile.adjacent9.flatMap(targetsByTile).toSet
+        val finalPixels   = finalTargets.map(_.pixelCenter)
+        if (finalPixels.nonEmpty) { // Safety valve check
+          val centroid = finalPixels.centroid
+          return Some(centroid)
+        }
       }
     }
     

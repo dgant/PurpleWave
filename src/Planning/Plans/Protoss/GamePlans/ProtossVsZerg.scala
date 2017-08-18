@@ -154,14 +154,16 @@ class ProtossVsZerg extends Parallel {
       RequestAtLeast(1, Protoss.Observatory),
       RequestAtLeast(1, Protoss.Observer)))
   
-  private class CanBuildDragoons extends Check(() => With.self.minerals < With.self.gas * 5)
+  private class CanBuildDragoons extends Check(() => With.self.minerals < 1000 || With.self.gas > 200)
   
   /////////////////
   // Here we go! //
   /////////////////
   
   children.set(Vector(
-  
+    
+    new Aggression(0.85),
+    
     new If(
       new HaveTech(Protoss.PsionicStorm),
       new MeldArchons(40),
@@ -271,19 +273,17 @@ class ProtossVsZerg extends Parallel {
         new If(
           new Check(() => With.self.gas > Math.min(200, With.self.minerals)),
           new TrainContinuously(Protoss.HighTemplar, 8)),
-          new If(
-            new And(
-              new CanBuildDragoons,
-              new UnitsAtLeast(1, UnitMatchType(Protoss.CyberneticsCore), complete = true),
-              new Or(
-                new And(
-                  new Employing(PvZMidgame5GateDragoons),
-                  new UnitsAtMost(15, UnitMatchType(Protoss.Dragoon)),
-                new UnitsAtLeast(20, UnitMatchType(Protoss.Zealot)))
-              )
-            ),
-            new TrainContinuously(Protoss.Dragoon),
-            new TrainContinuously(Protoss.Zealot)))),
+        new If(
+          new And(
+            new CanBuildDragoons,
+            new UnitsAtLeast(1, UnitMatchType(Protoss.CyberneticsCore), complete = true),
+            new Or(
+              new And(
+                new Employing(PvZMidgame5GateDragoons),
+                new UnitsAtMost(15, UnitMatchType(Protoss.Dragoon)),
+              new UnitsAtLeast(20, UnitMatchType(Protoss.Zealot))))),
+          new TrainContinuously(Protoss.Dragoon),
+          new TrainContinuously(Protoss.Zealot)))),
   
     new If(
       new UnitsAtLeast(1, UnitMatchType(Protoss.CyberneticsCore)),

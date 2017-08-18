@@ -80,6 +80,19 @@ object ShowBattleDetails extends View {
     drawBar(x2, nextY, dxEnemyKept,     boxHeight, colorEnemy,  "Kept ("  + nameEnemy + ")")  ; nextY += boxHeight + margin
     drawBar(x2, nextY, dxUsLost,        boxHeight, colorUs,     "Lost ("  + nameUs    + ")")  ; nextY += boxHeight
     drawBar(x2, nextY, dxEnemyLost,     boxHeight, colorEnemy,  "Lost ("  + nameEnemy + ")")
+    
+    val scoreTable = Vector(
+      Vector("Attack secs",     "" + battle.estimationSimulationAttack.frames / 24),
+      Vector("Attack gain",     "" + battle.estimationSimulationAttack.costToEnemy.toInt),
+      Vector("Attack loss",     "" + battle.estimationSimulationAttack.costToUs.toInt),
+      Vector(),
+      Vector("Retreat secs",    "" + battle.estimationSimulationRetreat.frames / 24),
+      Vector("Retreat gain",    "" + battle.estimationSimulationRetreat.costToEnemy.toInt),
+      Vector("Retreat loss",    "" + battle.estimationSimulationRetreat.costToUs.toInt),
+      Vector(),
+      Vector("Desire",          "" + "%1.1f".format(battle.desire))
+    )
+    DrawScreen.table(450, y, scoreTable)
   }
   
   def drawBar(x: Int, y: Int, dx: Int, dy: Int, color: Color, label: String) {

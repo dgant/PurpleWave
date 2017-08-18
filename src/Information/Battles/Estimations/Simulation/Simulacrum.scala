@@ -14,11 +14,6 @@ case class Simulacrum(simulation: BattleSimulation, unit: UnitInfo) {
   // Constant
   private val SIMULATION_STEP_FRAMES = 8
   
-  lazy val targetQueue: mutable.PriorityQueue[Simulacrum] = (
-    new mutable.PriorityQueue[Simulacrum]()(Ordering.by(x => (x.unit.unitClass.helpsInCombat, - x.pixel.pixelDistanceFast(pixel))))
-      ++ unit.matchups.targets.flatMap(simulation.simulacra.get))
-  
-  val fighting          : Boolean                     = (simulation.weAttack || unit.isEnemy) && unit.unitClass.helpsInCombat && ( ! unit.unitClass.isWorker || unit.isBeingViolent || ! unit.gathering)
   val canMove           : Boolean                     = unit.canMove
   val topSpeed          : Double                      = unit.topSpeed
   var hitPoints         : Int                         = unit.totalHealth
@@ -35,6 +30,34 @@ case class Simulacrum(simulation: BattleSimulation, unit: UnitInfo) {
   var valueReceived     : Double                      = 0.0
   var valuePerDamage    : Double                      = MicroValue.valuePerDamage(unit)
   var moves             : ArrayBuffer[(Pixel, Pixel)] = new ArrayBuffer[(Pixel, Pixel)]
+  
+  lazy val targetQueue: mutable.PriorityQueue[Simulacrum] = (
+    new mutable.PriorityQueue[Simulacrum]()(Ordering.by(x => (x.unit.unitClass.helpsInCombat, - x.pixel.pixelDistanceFast(pixel))))
+      ++ unit.matchups.targets
+        .filter(target =>
+          unit.inRangeToAttackFast(target)
+          || ! unit.isOurs
+          || ! simulation.weAttack)
+        .flatMap(simulation.simulacra.get)
+    )
+  
+  val fighting: Boolean = {
+    if ( ! unit.unitClass.helpsInCombat) {
+      false
+    }
+    else if (unit.unitClass.isWorker) {
+      unit.isBeingViolent || ( ! unit.gathering && ! unit.constructing)
+    }
+    else if (unit.isEnemy) {
+      true
+    }
+    else if (simulation.weAttack) {
+      unit.canMove || unit.matchups.targetsInRange.nonEmpty
+    }
+    else {
+      true
+    }
+  }
   
   def splashFactor : Double = if (maxSplashFactor == 1.0) 1.0 else Math.max(1.0, Math.min(targetQueue.count( ! _.dead) / 4.0, maxSplashFactor))
   

@@ -103,8 +103,14 @@ case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   def adjacent4: Array[Tile] = {
     Array(up, down, left, right)
   }
+  def adjacent5: Array[Tile] = {
+    Array(this, up, down, left, right)
+  }
   def adjacent8: Array[Tile] = {
     Array(up, down, left, right, up.left, up.right, down.left, down.right)
+  }
+  def adjacent9: Array[Tile] = {
+    Array(this, up, down, left, right, up.left, up.right, down.left, down.right)
   }
   def zone: Zone = {
     With.geography.zoneByTile(this)

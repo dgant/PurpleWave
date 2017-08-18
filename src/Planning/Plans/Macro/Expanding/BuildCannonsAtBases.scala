@@ -48,12 +48,15 @@ class BuildCannonsAtBases(count: Int) extends Plan {
   }
   
   private def cannonZone(zone: Zone) {
-    val cannonsInZone  = With.units.ours.count(unit => unit.is(Protoss.PhotonCannon) && unit.pixelCenter.zone == zone)
-    val cannonsToAdd   = count - cannonsInZone
+    val pylonsInZone  = With.units.ours.count(unit => unit.is(Protoss.Pylon)        && unit.pixelCenter.zone == zone)
+    val cannonsInZone = With.units.ours.count(unit => unit.is(Protoss.PhotonCannon) && unit.pixelCenter.zone == zone)
+    val cannonsToAdd  = count - cannonsInZone
+    val pylonsToAdd   = 1 + cannonsToAdd / 5 - pylonsInZone
     
     if (cannonsToAdd <= 0) return
     
     With.groundskeeper.propose(pylonBlueprintByZone(zone))
+    With.scheduler.request(this, RequestAnother(pylonsToAdd, Protoss.Pylon))
     cannonBlueprintsByZone(zone).foreach(With.groundskeeper.propose)
     With.scheduler.request(this, RequestAnother(cannonsToAdd, Protoss.PhotonCannon))
   }

@@ -21,10 +21,11 @@ class BattleSimulation(val battle: Battle, val weAttack: Boolean) {
   var updated = true
   
   def complete: Boolean =
-    estimation.frames > With.configuration.battleEstimationFrames   ||
-    ! updated                                                       ||
-    unitsOurs.forall(_.dead)                                        ||
-    unitsEnemy.forall(_.dead)                                       ||
+    (   weAttack && estimation.frames > With.configuration.battleEstimationFrames) ||
+    ( ! weAttack && estimation.frames > 24 * 5)   ||
+    ! updated                                     ||
+    unitsOurs.forall(_.dead)                      ||
+    unitsEnemy.forall(_.dead)                     ||
     everyone.forall(e => e.dead || ! e.fighting)
   
   def run() {

@@ -22,9 +22,9 @@ object ShowBattles extends View {
   private val tacticsRanks  = Pixel(235, 18)
   
   override def renderScreen() {
-    With.game.drawTextScreen(army0.bwapi, "Overall:")
-    With.game.drawTextScreen(army1.bwapi, "+" + With.battles.global.estimationAbstract.costToEnemy.toInt)
-    With.game.drawTextScreen(army2.bwapi, "-" + With.battles.global.estimationAbstract.costToUs.toInt)
+    With.game.drawTextScreen(army0.bwapi, "Offense:")
+    With.game.drawTextScreen(army1.bwapi, "+" + With.battles.global.estimationAbstractOffense.costToEnemy.toInt)
+    With.game.drawTextScreen(army2.bwapi, "-" + With.battles.global.estimationAbstractOffense.costToUs.toInt)
     With.game.drawTextScreen(army0.add(0, 13).bwapi, "Frames since estimation: " + With.framesSince(With.battles.clustering.lastClusterCompletion))
     localBattle.foreach(battle => drawEstimationReport(battle.estimationSimulationAttack))
     if (Yolo.active && With.frame / 24 % 2 == 0) {

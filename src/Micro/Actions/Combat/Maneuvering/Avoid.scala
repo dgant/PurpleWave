@@ -56,7 +56,7 @@ object Avoid extends Action {
     val tile                = unit.tileIncludingCenter
     val mobility            = mobilitySource.get(tile)
     val mostMobileNeighbor  = tile.adjacent8.filter(_.valid).maxBy(mobilitySource.get) //This could be more granular or weighted over the neighbors
-    val magnitude           = Math.max(0.0, 1.0 - 2 * mobility / maxMobility.toDouble)
+    val magnitude           = 2.0 * Math.max(0.0, 1.0 - 2 * mobility / maxMobility.toDouble)
     val output              = BuildForce.fromPixels(tile.pixelCenter, mostMobileNeighbor.pixelCenter, magnitude)
     output
   }

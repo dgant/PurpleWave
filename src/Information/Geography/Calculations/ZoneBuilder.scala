@@ -13,6 +13,7 @@ import scala.util.Random
 object ZoneBuilder {
   
   def zones: Iterable[Zone] = {
+    With.grids.walkableTerrain.initialize()
     val names = new mutable.Queue[String] ++ Random.shuffle(PlaceNames.countries)
     val zones = BWTA.getRegions.asScala.map(buildZone(_, names.dequeue))
     mapObviousTilesToZones(zones)

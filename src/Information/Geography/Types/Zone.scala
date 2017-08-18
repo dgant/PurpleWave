@@ -19,7 +19,7 @@ class Zone(
   lazy val  edges           : Array[Edge]       = With.geography.edges.filter(_.zones.contains(this)).toArray
   lazy val  bases           : Array[Base]       = With.geography.bases.filter(_.townHallTile.zone == this).toArray
   lazy val  border          : Set[Tile]         = tiles.filter(tile => tile.adjacent8.exists( ! tiles.contains(_))).toSet
-  lazy val  perimeter       : Set[Tile]         = tiles.filter(tile => tile.x == 0 || tile.y == 0 || tile.x == With.mapTileWidth - 1 || tile.y == With.mapTileHeight - 1 || ! tile.adjacent8.forall(With.grids.walkableTerrain.get)).toSet
+  lazy val  perimeter       : Set[Tile]         = tiles.filter(tile => tile.tileDistanceFromEdge <= 1 || ! tile.adjacent8.forall(With.grids.walkableTerrain.get)).toSet
   lazy val  centroid        : Tile              = if (tiles.isEmpty) new Pixel(bwtaRegion.getCenter).tileIncluding else tiles.minBy(_.tileDistanceSquared(new Pixel(bwtaRegion.getCenter).tileIncluding))
   lazy val  area            : Double            = bwtaRegion.getPolygon.getArea
   lazy val  points          : Iterable[Pixel]   = bwtaRegion.getPolygon.getPoints.asScala.map(new Pixel(_)).toVector

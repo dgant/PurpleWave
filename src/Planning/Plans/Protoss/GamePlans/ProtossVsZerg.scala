@@ -6,7 +6,7 @@ import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
 import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors}
 import Planning.Plans.Army._
 import Planning.Plans.Compound.{If, _}
-import Planning.Plans.Information.Reactive.{EnemyBasesAtLeast, EnemyMassMutalisks, EnemyMutalisks}
+import Planning.Plans.Information.Reactive.{EnemyMassMutalisks, EnemyMutalisks}
 import Planning.Plans.Information.Scenarios.EnemyStrategy
 import Planning.Plans.Information.{Employ, Employing, StartPositionsAtLeast}
 import Planning.Plans.Macro.Automatic.{MatchingRatio, _}
@@ -188,10 +188,7 @@ class ProtossVsZerg extends Parallel {
           new TrainMatchingRatio(Protoss.PhotonCannon, 2, 6,
             Seq(
               MatchingRatio(UnitMatchType(Zerg.Zergling), 0.3),
-              MatchingRatio(UnitMatchType(Zerg.Hydralisk), 0.5))),
-          new If(
-            new Not(new EnemyBasesAtLeast(2)),
-            new TrainContinuously(Protoss.PhotonCannon, 6))))),
+              MatchingRatio(UnitMatchType(Zerg.Hydralisk), 0.5)))))),
   
     new FirstEightMinutes(
       new If(

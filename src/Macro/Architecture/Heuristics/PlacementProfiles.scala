@@ -70,9 +70,9 @@ object PlacementProfiles {
     "Pylon for Cannons",
     preferZone                  = 1000.0,
     preferNatural               = 10.0,
-    preferPowering              = 0.5,
+    preferPowering              = 1.0,
     preferCoveringWorkers       = 0.5,
-    avoidDistanceFromBase       = 1.0,
+    avoidDistanceFromBase       = 0.5,
     avoidSurfaceArea            = 0.05,
     avoidDistanceFromIdealRange = 0.5)
   

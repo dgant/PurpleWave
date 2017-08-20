@@ -14,7 +14,7 @@ object Scout extends Action {
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {
-    if ( ! unit.wounded) {
+    if (unit.totalHealth >= unit.unitClass.maxTotalHealth) {
       Potshot.consider(unit)
     }
     PreserveScout.consider(unit)

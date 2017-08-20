@@ -18,6 +18,7 @@ object Potshot extends Action {
   override def perform(unit: FriendlyUnitInfo) {
     val validTargets = unit.matchups.targetsInRange.filter(_.unitClass.helpsInCombat)
     unit.agent.toAttack = EvaluateTargets.best(unit, validTargets)
+    
     Attack.delegate(unit)
   }
 }

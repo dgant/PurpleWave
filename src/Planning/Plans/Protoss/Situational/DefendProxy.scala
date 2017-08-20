@@ -74,9 +74,12 @@ class DefendProxy extends Plan {
     Terran.Bunker,
     Terran.Barracks,
     Terran.Factory,
+    Terran.Refinery,
+    Protoss.Assimilator,
     Protoss.Pylon,
     Protoss.PhotonCannon,
     Zerg.CreepColony,
+    Zerg.Extractor,
     Zerg.SunkenColony,
     Zerg.Hatchery
   )

@@ -17,8 +17,11 @@ class Defend2GateAgainst4Pool extends Plan {
   
   override def onUpdate() {
     
+    if (With.units.ours.exists(u => u.aliveAndComplete && u.is(Protoss.PhotonCannon))) return
+    
     def inOurBase(unit: UnitInfo): Boolean = unit.pixelCenter.zone.bases.exists(_.owner.isUs)
     
+    val cannons           = With.units.ours .filter(u => u.aliveAndComplete && u.is(Protoss.PhotonCannon))
     val zealots           = With.units.ours .filter(u => u.aliveAndComplete && u.is(Protoss.Zealot) && inOurBase(u))
     lazy val zerglings    = With.units.enemy.filter(u => u.aliveAndComplete && u.is(Zerg.Zergling)  && inOurBase(u))
     lazy val workers      = With.units.ours.filter(u => u.aliveAndComplete && u.unitClass.isWorker)
@@ -28,6 +31,9 @@ class Defend2GateAgainst4Pool extends Plan {
       return
     }
     if (zealots.size > 3) {
+      return
+    }
+    if (cannons.nonEmpty) {
       return
     }
     if (zerglings.isEmpty) {

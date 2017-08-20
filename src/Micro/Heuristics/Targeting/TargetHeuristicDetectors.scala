@@ -4,7 +4,7 @@ import Mathematics.Heuristics.HeuristicMathMultiplicative
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
-object TargetHeuristicDetectors extends TargetHeuristic{
+object TargetHeuristicDetectors extends TargetHeuristic {
   
   override def evaluate(unit: FriendlyUnitInfo, candidate: UnitInfo): Double = {
     

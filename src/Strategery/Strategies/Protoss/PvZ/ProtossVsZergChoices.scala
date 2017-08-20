@@ -11,7 +11,7 @@ object ProtossVsZergChoices {
   val openers: Vector[Strategy] = Vector(
     PvZEarlyFFEEconomic,
     PvZEarlyFFEConservative,
-    //PvZEarlyFFEGatewayFirst,
+    PvZEarlyFFEGatewayFirst,
     PvZEarlyFFENexusFirst,
     PvZEarly2Gate)
   

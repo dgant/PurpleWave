@@ -10,10 +10,10 @@ class ForgeFastExpand extends ProposePlacement {
   override lazy val blueprints: Iterable[Blueprint] = Vector(
     new Blueprint(this, building = Some(Protoss.Pylon),           requireZone = With.geography.ourNatural.map(_.zone),  placementProfile = Some(PlacementProfiles.cannonPylon)),
     new Blueprint(this, building = Some(Protoss.Forge),           preferZone  = With.geography.ourNatural.map(_.zone),  placementProfile = Some(PlacementProfiles.cannonPylon)),
+    new Blueprint(this, building = Some(Protoss.Gateway),         preferZone  = With.geography.ourNatural.map(_.zone),  placementProfile = Some(PlacementProfiles.hugTownHall)),
     new Blueprint(this, building = Some(Protoss.PhotonCannon),    requireZone = With.geography.ourNatural.map(_.zone),  placementProfile = Some(PlacementProfiles.cannon)),
     new Blueprint(this, building = Some(Protoss.PhotonCannon),    requireZone = With.geography.ourNatural.map(_.zone),  placementProfile = Some(PlacementProfiles.cannon)),
     new Blueprint(this, building = Some(Protoss.PhotonCannon),    requireZone = With.geography.ourNatural.map(_.zone),  placementProfile = Some(PlacementProfiles.cannon)),
-    new Blueprint(this, building = Some(Protoss.Gateway),         preferZone  = Some(With.geography.ourMain.zone)),
     new Blueprint(this, building = Some(Protoss.PhotonCannon),    requireZone = With.geography.ourNatural.map(_.zone),  placementProfile = Some(PlacementProfiles.cannon)),
     new Blueprint(this, building = Some(Protoss.PhotonCannon),    requireZone = With.geography.ourNatural.map(_.zone),  placementProfile = Some(PlacementProfiles.cannon)),
     new Blueprint(this, building = Some(Protoss.PhotonCannon),    requireZone = With.geography.ourNatural.map(_.zone),  placementProfile = Some(PlacementProfiles.cannon)),

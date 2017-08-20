@@ -8,6 +8,7 @@ import Mathematics.Points.PixelRay
 import Mathematics.PurpleMath
 import Micro.Actions.Action
 import Micro.Actions.Commands.MoveWithField
+import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
 
@@ -31,7 +32,7 @@ object Avoid extends Action {
   }
   
   private def threatForce(unit: FriendlyUnitInfo): Force = {
-    val forces      = unit.matchups.threats.map(singleThreatForce(unit, _))
+    val forces      = unit.matchups.threats.filterNot(_.is(Protoss.Interceptor)).map(singleThreatForce(unit, _))
     val forceSum    = forces.reduce(_ + _)
     val output      = forceSum.normalize
     output

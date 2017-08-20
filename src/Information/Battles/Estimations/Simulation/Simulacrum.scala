@@ -36,8 +36,8 @@ case class Simulacrum(simulation: BattleSimulation, unit: UnitInfo) {
       ++ unit.matchups.targets
         .filter(target =>
           unit.inRangeToAttackFast(target)
-          || ! unit.isOurs
-          || ! simulation.weAttack)
+          || simulation.weAttack
+          || ! unit.isOurs)
         .flatMap(simulation.simulacra.get)
     )
   
@@ -55,7 +55,7 @@ case class Simulacrum(simulation: BattleSimulation, unit: UnitInfo) {
       unit.canMove || unit.matchups.targetsInRange.nonEmpty
     }
     else {
-      true
+      ! unit.canMove
     }
   }
   

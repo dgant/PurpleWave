@@ -42,7 +42,7 @@ You should find PurpleWave.exe in a directory with several DLLs which it needs t
 * As an EXE: Just double-click it! Make sure if you move the EXE that you move the aforementioned DLLs along with it
 
 ## Questions and feedback
-Say hi! Post an issue here on Github or email ds gant at gmail dotcom (without the x's)
+Say hi! Post an issue here on Github or email dsgant at gmail
 
 ## License
 PurpleWave is published under the MIT License.

@@ -34,7 +34,7 @@ class Zerg2HatchMuta extends Parallel {
     new Trigger(
       new UnitsAtLeast(1, UnitMatchType(Zerg.Mutalisk)),
       initialAfter = new Parallel(
-        new BuildGasPumps(Zerg.Extractor),
+        new BuildGasPumps,
         new TrainWorkersContinuously,
         new TrainContinuously(Zerg.Zergling),
         new TrainContinuously(Zerg.Hatchery))),

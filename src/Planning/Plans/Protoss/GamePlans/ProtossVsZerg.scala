@@ -6,7 +6,7 @@ import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
 import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors}
 import Planning.Plans.Army._
 import Planning.Plans.Compound.{If, _}
-import Planning.Plans.Information.Reactive.{EnemyMassMutalisks, EnemyMutalisks}
+import Planning.Plans.Information.Reactive.{EnemyMutalisks}
 import Planning.Plans.Information.Scenarios.EnemyStrategy
 import Planning.Plans.Information.{Employ, Employing, StartPositionsAtLeast}
 import Planning.Plans.Macro.Automatic.{MatchingRatio, _}
@@ -233,12 +233,16 @@ class ProtossVsZerg extends Parallel {
     
     new If(
       new And(
-        new UnitsAtLeast(4, UnitMatchWarriors, complete = false),
+        new UnitsAtLeast(2, UnitMatchWarriors, complete = false),
         new UnitsAtLeast(1, UnitMatchType(Protoss.Forge), complete = true),
         new UnitsAtLeast(1, UnitMatchType(Protoss.Assimilator), complete = true)),
       new Parallel(
         new UpgradeContinuously(Protoss.GroundDamage),
         new UpgradeContinuously(Protoss.ZealotSpeed))),
+  
+    new If(
+      new UnitsAtLeast(3, UnitMatchType(Protoss.Corsair), complete = false),
+      new Build(RequestUpgrade(Protoss.AirDamage, 1))),
   
     new If(
       new And(
@@ -248,8 +252,12 @@ class ProtossVsZerg extends Parallel {
       new TrainMatchingRatio(Protoss.Corsair, 1, Int.MaxValue, Seq(MatchingRatio(UnitMatchType(Zerg.Mutalisk), 1.5)))),
   
     new If(
-      new EnemyMassMutalisks,
+      new EnemyUnitsAtLeast(4, UnitMatchType(Zerg.Mutalisk)),
       new Build(RequestAtLeast(2, Protoss.Stargate))),
+    new OnGasBases(2,
+      new If(
+        new EnemyUnitsAtLeast(13, UnitMatchType(Zerg.Mutalisk)),
+        new Build(RequestAtLeast(3, Protoss.Stargate)))),
     
     new TrainMatchingRatio(Protoss.Observer, 0, 3, Seq(MatchingRatio(UnitMatchType(Zerg.Lurker), 0.5))),
   
@@ -304,14 +312,13 @@ class ProtossVsZerg extends Parallel {
       RequestAtLeast(5, Protoss.Gateway),
       RequestAtLeast(1, Protoss.Forge),
       RequestUpgrade(Protoss.GroundDamage),
-      RequestAtLeast(1, Protoss.Stargate),
       RequestAtLeast(1, Protoss.CitadelOfAdun),
       RequestUpgrade(Protoss.ZealotSpeed),
       RequestAtLeast(1, Protoss.TemplarArchives),
       RequestUpgrade(Protoss.HighTemplarEnergy),
       RequestTech(Protoss.PsionicStorm),
       RequestUpgrade(Protoss.DragoonRange),
-      RequestAtLeast(8, Protoss.Gateway),
+      RequestAtLeast(1, Protoss.Stargate),
       RequestAtLeast(1, Protoss.RoboticsFacility),
       RequestAtLeast(1, Protoss.Observatory),
       RequestAtLeast(1, Protoss.Observer),

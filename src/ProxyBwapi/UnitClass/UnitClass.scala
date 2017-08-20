@@ -39,14 +39,30 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) {
     .contains(this)
   
   lazy val floats: Boolean = Array(
-    Terran.SCV,
-    Terran.Vulture,
-    Terran.SpiderMine,
-    Protoss.Probe,
-    Protoss.Archon,
-    Protoss.DarkArchon,
-    Zerg.Drone
-    ).contains(this)
+      Terran.SCV,
+      Terran.Vulture,
+      Terran.SpiderMine,
+      Protoss.Probe,
+      Protoss.Archon,
+      Protoss.DarkArchon,
+      Zerg.Drone)
+    .contains(this)
+  
+  lazy val splashesFriendly: Boolean = Array(
+      Terran.SiegeTankSieged,
+      Terran.SpiderMine,
+      Zerg.InfestedTerran)
+    .contains(this)
+  
+  lazy val dealsRadialSplashDamage: Boolean = Array(
+      Terran.SiegeTankSieged,
+      Terran.Valkyrie,
+      Terran.SpiderMine,
+      Protoss.Archon,
+      Protoss.Reaver,
+      Protoss.Scarab,
+      Zerg.InfestedTerran)
+    .contains(this)
   
   lazy val maxTotalHealth: Int = maxHitPoints + maxShields
   

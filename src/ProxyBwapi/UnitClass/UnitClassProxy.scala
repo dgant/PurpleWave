@@ -94,12 +94,16 @@ class UnitClassProxy(val baseType:UnitType) {
   lazy val airDamageTypeRaw         = baseType.airWeapon.damageType
   lazy val airExplosionTypeRaw      = baseType.airWeapon.explosionType
   lazy val airRangeRaw              = baseType.airWeapon.maxRange
+  lazy val airSplashRadius50        = baseType.airWeapon.innerSplashRadius
+  lazy val airSplashRadius25        = baseType.airWeapon.outerSplashRadius
   lazy val groundDamageRaw          = baseType.groundWeapon.damageAmount
   lazy val groundDamageBonusRaw     = baseType.groundWeapon.damageBonus
   lazy val groundDamageCooldownRaw  = baseType.groundWeapon.damageCooldown
   lazy val groundDamageFactorRaw    = baseType.groundWeapon.damageFactor
   lazy val groundDamageTypeRaw      = baseType.groundWeapon.damageType
   lazy val groundExplosionTypeRaw   = baseType.groundWeapon.explosionType
+  lazy val groundSplashRadius50     = baseType.groundWeapon.innerSplashRadius
+  lazy val groundSplashRadius25     = baseType.groundWeapon.outerSplashRadius
   lazy val groundMinRangeRaw        = baseType.groundWeapon.minRange
   lazy val groundRangeRaw           = baseType.groundWeapon.maxRange
   lazy val asString                 = baseType.toString

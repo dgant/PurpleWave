@@ -1,7 +1,7 @@
 package Micro.Decisions
 
 import Mathematics.PurpleMath
-import ProxyBwapi.Races.{Protoss, Terran, Zerg}
+import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.UnitInfo
 
 object MicroValue {
@@ -19,9 +19,9 @@ object MicroValue {
   }
   
   def maxSplashFactor(unit: UnitInfo): Double = {
-    if(unit.is(Terran.SiegeTankSieged) || unit.is(Protoss.Reaver) || unit.is(Zerg.Lurker))
+    if(unit.unitClass.dealsRadialSplashDamage || unit.is(Zerg.Lurker))
       2.5
-    else if(unit.is(Terran.Valkyrie) || unit.is(Protoss.Corsair) || unit.is(Zerg.Mutalisk))
+    else if(unit.is(Zerg.Mutalisk))
       1.5
     else
       1.0

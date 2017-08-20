@@ -1,7 +1,6 @@
 package Micro.Agency
 
 import Lifecycle.With
-import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 import scala.collection.mutable
@@ -42,8 +41,7 @@ class Agency {
       val agent = agentQueue.dequeue()
       agent.lastFrame = With.frame
       
-      if (agent.unit.unitClass.orderable
-        && ! agent.unit.is(Protoss.PhotonCannon)) /* Hack fix for CIG -- we were cancelling our Photon Cannon attacks. */ {
+      if (agent.unit.unitClass.orderable)
         agent.execute()
       }
     }

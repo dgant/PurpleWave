@@ -5,6 +5,7 @@ import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.View
 import Lifecycle.With
 import Micro.Agency.Agent
+import Utilities.ByOption
 
 object ShowUnitsFriendly extends View {
   
@@ -89,15 +90,19 @@ object ShowUnitsFriendly extends View {
     }
     
     if (showForces) {
-      agent.forces.foreach(pair => {
-        val force = pair._2.normalize(96.0)
-        DrawMap.line(
-          agent.unit.pixelCenter,
-          agent.unit.pixelCenter.add(
-            force.x.toInt,
-            force.y.toInt),
-          pair._1)
-      })
+      val maxForce = ByOption.min(agent.forces.values.map(_.lengthSlow)).getOrElse(0.0)
+      if (maxForce > 0.0) {
+        agent.forces.foreach(pair => {
+          val force           = pair._2
+          val forceNormalized = force.normalize(96.0 * force.lengthSlow / maxForce)
+          DrawMap.line(
+            agent.unit.pixelCenter,
+            agent.unit.pixelCenter.add(
+              force.x.toInt,
+              force.y.toInt),
+            pair._1)
+        })
+      }
     }
     
     if (showDesire) {

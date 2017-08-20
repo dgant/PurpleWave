@@ -118,9 +118,16 @@ object ShowBattleDetails extends View {
   }
   
   def renderSimulacrumMap(sim: Simulacrum) {
-    sim.moves.foreach(move => DrawMap.arrow(move._1, move._2, sim.unit.player.colorMedium))
+    val attacking = sim.simulation.weAttack
+    val color = if (attacking) sim.unit.player.colorNeon else sim.unit.player.colorMidnight
+    
+    sim.moves.foreach(move => DrawMap.arrow(move._1, move._2, color))
     if (sim.dead) {
-      DrawMap.circle(sim.pixel, 5, Colors.NeonOrange)
+      DrawMap.circle(
+        sim.pixel,
+        5,
+        if (attacking) Colors.NeonOrange else Colors.MidnightOrange,
+        solid = true)
     }
   }
 }

@@ -54,6 +54,9 @@ class Commander {
   
   def attack(unit: FriendlyUnitInfo, target: UnitInfo) {
     if (unready(unit)) return
+  
+    // TODO: Fix attack cancelling for Photon Cannons
+    if (unit.is(Protoss.PhotonCannon)) return
     
     if (unit.interceptors.exists(_.order == Orders.InterceptorAttack)) {
       // Carriers lose most of their DPS with direct attack orders

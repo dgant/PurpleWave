@@ -1,27 +1,28 @@
 package Micro.Actions.Combat.Maneuvering
 
+import Debugging.Visualizations.Colors
 import Micro.Actions.Action
 import Micro.Actions.Combat.Attacking.Potshot
-import Micro.Actions.Combat.Decisionmaking.Disengage
+import Micro.Actions.Commands.Gravitate
+import Micro.Decisions.PotentialFieldMath
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Sneak extends Action {
   
   override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.cloaked && ( ! unit.effectivelyCloaked || {
-      
-      val matchups = unit.matchups.ifAt(24)
-      matchups.threats.nonEmpty &&
-      matchups.enemies.exists(e =>
-        e.unitClass.isDetector
-        && e.aliveAndComplete
-        && (e.unitClass.canMove || e.pixelDistanceFast(unit) < 11.0 * 32.0)
-        && e.pixelDistanceFast(unit) < 13.0 * 32.0)
-    })
+    unit.cloaked && ( ! unit.effectivelyCloaked ||
+      unit.matchups.threats.nonEmpty &&
+      unit.matchups.enemyDetectors.exists(e =>
+        e.pixelDistanceFast(unit) < 32.0 * ( if(e.unitClass.canMove) 12.0 else 15.0))
+    )
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {
     Potshot.delegate(unit)
-    Disengage.delegate(unit)
+    if (unit.readyForMicro) {
+      val force = PotentialFieldMath.detectionForce(unit)
+      unit.agent.forces.put(Colors.NeonTeal, force)
+      Gravitate.delegate(unit)
+    }
   }
 }

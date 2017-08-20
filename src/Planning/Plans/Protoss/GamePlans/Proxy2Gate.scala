@@ -12,7 +12,7 @@ import Planning.Plans.Information.SwitchEnemyRace
 import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
-import Planning.Plans.Macro.Expanding.{BuildAssimilators, BuildGasPumps}
+import Planning.Plans.Macro.Expanding.{BuildGasPumps}
 import Planning.Plans.Macro.Milestones.{EnemyUnitsAtLeast, UnitsAtLeast}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Scouting.Scout

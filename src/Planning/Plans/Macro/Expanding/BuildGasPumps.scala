@@ -1,17 +1,33 @@
 package Planning.Plans.Macro.Expanding
 
 import Lifecycle.With
-import Planning.Plans.Macro.Automatic.TrainContinuously
+import Macro.Architecture.Blueprint
+import Macro.BuildRequests.RequestAtLeast
+import Planning.Plan
 import ProxyBwapi.UnitClass.UnitClass
 
-class BuildGasPumps(pumpType: UnitClass = With.self.gasClass) extends TrainContinuously(pumpType) {
+class BuildGasPumps(quantity: Int = Int.MaxValue, pumpType: UnitClass = With.self.gasClass) extends Plan {
   
-  description.set("Build gas pumps on all our geysers")
+  private lazy val blueprints = With.geography.bases.map(
+    base =>
+    (
+      base,
+      base.gas.map(gas =>
+        new Blueprint(
+          this,
+          building = Some(pumpType),
+          requireZone = Some(base.zone),
+          requireCandidates = Some(Seq(gas.tileTopLeft))
+      )))
+    )
+    .toMap
   
-  override def maxDesirable: Int = With.geography.ourBases
-    .filter(_.townHall.exists(townHall =>
-      townHall.complete ||
-      townHall.remainingBuildFrames < pumpType.buildFrames))
-    .flatten(_.gas)
-    .count(_.gasLeft > 100)
+  override def onUpdate(): Unit = {
+    val eligibleBases       = With.geography.ourBases.filter(base => base.townHall.exists(_.remainingBuildFrames <= pumpType.buildFrames))
+    val eligibleGas         = eligibleBases.flatMap(_.gas)
+    val eligibleBlueprints  = eligibleBases.flatMap(blueprints)
+    eligibleBlueprints.foreach(With.groundskeeper.propose)
+    With.scheduler.request(this, RequestAtLeast(eligibleBlueprints.size, pumpType))
+  }
+  
 }

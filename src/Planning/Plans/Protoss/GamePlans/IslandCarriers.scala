@@ -7,7 +7,7 @@ import Planning.Plans.Army.{ConsiderAttacking, DefendZones}
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
-import Planning.Plans.Macro.Expanding.{BuildAssimilators, BuildCannonsAtBases, BuildGasPumps, RequireMiningBases}
+import Planning.Plans.Macro.Expanding.{BuildCannonsAtBases, BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.{OnGasBases, OnMiningBases, UnitsAtLeast}
 import Planning.Plans.Protoss.ProtossBuilds
 import Planning.Plans.Recruitment.RecruitFreelancers

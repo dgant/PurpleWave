@@ -10,7 +10,7 @@ import Planning.Plans.Compound._
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, FirstEightMinutes, FollowBuildOrder}
-import Planning.Plans.Macro.Expanding.{BuildGasPumps, BuildRefineries, RemoveMineralBlocksAt, RequireMiningBases}
+import Planning.Plans.Macro.Expanding.{BuildGasPumps, RemoveMineralBlocksAt, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.{OnGasBases, OnMiningBases, UnitsAtLeast}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Protoss.Situational.DefendProxy

@@ -9,7 +9,7 @@ import Planning.Plans.Information.Reactive.{EnemyDarkTemplarExists, EnemyDarkTem
 import Planning.Plans.Information.{Employ, Employing}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, FirstEightMinutes}
-import Planning.Plans.Macro.Expanding.{BuildAssimilators, BuildGasPumps, MatchMiningBases, RequireMiningBases}
+import Planning.Plans.Macro.Expanding.{BuildGasPumps, MatchMiningBases, RequireMiningBases}
 import Planning.Plans.Macro.Milestones._
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Protoss.ProtossBuilds

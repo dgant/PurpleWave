@@ -21,7 +21,7 @@ class TerranVsZergMech extends Parallel {
     new RequireSufficientSupply,
     new TrainContinuously(Terran.Comsat),
     new TrainWorkersContinuously,
-    new BuildRefineries,
+    new BuildGasPumps,
     
     new TrainContinuously(Terran.Marine),
     

@@ -9,7 +9,7 @@ import Planning.Plans.Compound._
 import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
-import Planning.Plans.Macro.Expanding.{BuildAssimilators, RequireMiningBases}
+import Planning.Plans.Macro.Expanding.{BuildAssimilators, BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.{EnemyUnitsAtLeast, UnitsAtLeast}
 import Planning.Plans.Scouting.{FoundEnemyBase, ScoutAt}
 import Planning.ProxyPlanner
@@ -65,7 +65,7 @@ class ProxyDarkTemplarRush extends Parallel {
     new TrainWorkersContinuously,
     new Build(RequestAtLeast(4, Protoss.Gateway)),
     new RequireMiningBases(2),
-    new BuildAssimilators,
+    new BuildGasPumps,
     new Build(RequestAtLeast(8, Protoss.Gateway)),
     
     new If(new Not(new FoundEnemyBase), new ScoutAt(11)),

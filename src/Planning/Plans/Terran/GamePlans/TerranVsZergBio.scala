@@ -41,7 +41,7 @@ class TerranVsZergBio extends Parallel {
       RequestAtLeast(2, Terran.Comsat),
       RequestAtLeast(5, Terran.Barracks),
       RequestAtLeast(1, Terran.MissileTurret)),
-    new BuildRefineries,
+    new BuildGasPumps,
     new If(new EnemyMutalisks, new BuildMissileTurretsAtBases(2)),
     new Build(
       RequestUpgrade(Terran.MarineRange),

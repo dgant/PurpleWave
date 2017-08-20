@@ -11,7 +11,7 @@ import Planning.Plans.Information.Scenarios.EnemyStrategy
 import Planning.Plans.Information.{Employ, Employing, StartPositionsAtLeast}
 import Planning.Plans.Macro.Automatic.{MatchingRatio, _}
 import Planning.Plans.Macro.BuildOrders.{Build, FirstEightMinutes}
-import Planning.Plans.Macro.Expanding.{BuildAssimilators, BuildCannonsAtExpansions, RequireMiningBases}
+import Planning.Plans.Macro.Expanding.{BuildAssimilators, BuildCannonsAtExpansions, BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Milestones._
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Protoss.ProtossBuilds
@@ -291,7 +291,7 @@ class ProtossVsZerg extends Parallel {
     new Employ(PvZMidgameCorsairDarkTemplar,    new ImplementMidgameCorsairDarkTemplar),
     new Employ(PvZMidgameCorsairReaver,         new ImplementMidgameCorsairReaver),
     new Employ(PvZMidgameCorsairSpeedlot,       new ImplementMidgameCorsairSpeedlot),
-    new BuildAssimilators,
+    new BuildGasPumps,
   
     /////////////////////
     // Late game macro //

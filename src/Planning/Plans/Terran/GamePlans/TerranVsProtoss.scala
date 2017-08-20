@@ -7,7 +7,7 @@ import Planning.Plans.Army._
 import Planning.Plans.Compound._
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, FirstEightMinutes, FollowBuildOrder}
-import Planning.Plans.Macro.Expanding.{BuildRefineries, RemoveMineralBlocksAt, RequireMiningBases}
+import Planning.Plans.Macro.Expanding.{BuildGasPumps, BuildRefineries, RemoveMineralBlocksAt, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.{OnGasBases, OnMiningBases, UnitsAtLeast}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Protoss.Situational.DefendProxy
@@ -58,7 +58,7 @@ class TerranVsProtoss extends Parallel {
     
     new RequireSufficientSupply,
     new TrainWorkersContinuously,
-    new BuildRefineries,
+    new BuildGasPumps,
     
     new If(new UnitsAtLeast(2,  UnitMatchType(Terran.SiegeTankUnsieged)), new Build(RequestTech(Terran.SiegeMode))),
     new If(new UnitsAtLeast(3,  UnitMatchType(Terran.Wraith)),            new Build(RequestAtLeast(1, Terran.ControlTower), RequestTech(Terran.WraithCloak))),

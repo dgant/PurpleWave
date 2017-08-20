@@ -9,7 +9,7 @@ import Planning.Plans.Information.Reactive.{EnemyDarkTemplarExists, EnemyDarkTem
 import Planning.Plans.Information.{Employ, Employing}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, FirstEightMinutes}
-import Planning.Plans.Macro.Expanding.{BuildAssimilators, MatchMiningBases, RequireMiningBases}
+import Planning.Plans.Macro.Expanding.{BuildAssimilators, BuildGasPumps, MatchMiningBases, RequireMiningBases}
 import Planning.Plans.Macro.Milestones._
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Protoss.ProtossBuilds
@@ -258,7 +258,7 @@ class ProtossVsProtoss extends Parallel {
     new Build(
       RequestAtLeast(1, Protoss.Gateway),
       RequestAtLeast(1, Protoss.CyberneticsCore)),
-    new BuildAssimilators,
+    new BuildGasPumps,
     new Parallel(
       new Build(
         RequestAtLeast(2, Protoss.Gateway),

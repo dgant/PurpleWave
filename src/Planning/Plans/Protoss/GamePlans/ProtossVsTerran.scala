@@ -9,7 +9,7 @@ import Planning.Plans.Information.Reactive.EnemyBio
 import Planning.Plans.Information.{Employ, Employing}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, FirstEightMinutes}
-import Planning.Plans.Macro.Expanding.{BuildAssimilators, BuildCannonsAtBases, MatchMiningBases, RequireMiningBases}
+import Planning.Plans.Macro.Expanding._
 import Planning.Plans.Macro.Milestones.{UnitsAtLeast, _}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Protoss.{ProtossBuilds, ProtossVsTerranIdeas}
@@ -203,7 +203,7 @@ class ProtossVsTerran extends Parallel {
     new OnMiningBases(2,
       new Parallel(
         new ProtossVsTerranIdeas.RespondToBioWithReavers,
-        new BuildAssimilators,
+        new BuildGasPumps,
         new IfCloakedThreats_Observers,
         new If(
           new UnitsAtLeast(8, UnitMatchWarriors, complete = true),

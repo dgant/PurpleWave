@@ -37,7 +37,8 @@ object ShowBattles extends View {
   }
   
   def localBattle: Option[Battle] = {
-    val localBattles = With.battles.local
+    val selectedUnits = With.units.ours.filter(_.selected)
+    val localBattles = if (selectedUnits.nonEmpty) selectedUnits.flatMap(_.battle) else With.battles.local
     if (localBattles.isEmpty)
       None
     else

@@ -1,6 +1,9 @@
 package Information.Battles.Estimations
 
+import Information.Battles.Estimations.Simulation.Simulacrum
+
 case class ReportCard(
+  simulacrum      : Simulacrum,
   estimation      : Estimation,
   valueDealt      : Double,
   valueReceived   : Double,

@@ -9,6 +9,6 @@ class TerranStandardGamePlan
       terran  .set(new TerranVsTerran)
       protoss .set(new ProxyBBS)
       zerg    .set(new TerranVsZergEarly)
-      random  .set(new ProxyBBS)
+      random  .set(new TerranVsZergEarly)
     }
   )

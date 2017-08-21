@@ -7,6 +7,7 @@ import Micro.Actions.Combat.Tactics.{Tickle, Unbunk}
 import Micro.Actions.Commands.{Attack, Travel}
 import Micro.Actions.Protoss.Meld
 import Micro.Actions.Scouting.Scout
+import Micro.Actions.Transportation.Transport
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Idle extends Action {
@@ -38,6 +39,7 @@ object Idle extends Action {
     ReloadInterceptors,
     ReloadScarabs,
     Pardon,
+    Transport,
     Scout,
     Fight,
     Attack,

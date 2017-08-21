@@ -6,11 +6,13 @@ abstract class Action {
   
   val name: String = getClass.getSimpleName.replaceAllLiterally("$", "")
   
+  protected def requiresReadiness: Boolean = true
+  
   protected def allowed(unit: FriendlyUnitInfo): Boolean
   protected def perform(unit: FriendlyUnitInfo)
   
   final def consider(unit: FriendlyUnitInfo, giveCredit: Boolean = true) {
-    if (unit.readyForMicro && allowed(unit)) {
+    if (( ! requiresReadiness || unit.readyForMicro) && allowed(unit)) {
       if (giveCredit) unit.agent.lastAction = Some(this)
       perform(unit)
     }

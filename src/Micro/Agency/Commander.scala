@@ -33,6 +33,10 @@ class Commander {
     ! ready(unit)
   }
   
+  def hijack(unit: FriendlyUnitInfo) {
+    nextOrderFrame.remove(unit)
+  }
+  
   def doNothing(unit: FriendlyUnitInfo) {
     if (unready(unit)) return
     sleep(unit)

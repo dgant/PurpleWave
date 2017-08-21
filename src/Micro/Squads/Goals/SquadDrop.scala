@@ -9,8 +9,8 @@ class SquadDrop(pixel: Pixel) extends SquadGoal {
   override def toString: String = "Drop on " + pixel.zone.name
   
   def update(squad: Squad) {
-    val transports  = squad.recruits.filter   (_.unitClass.isTransport)
-    val fighters    = squad.recruits.filterNot(_.unitClass.isTransport)
+    val transports  = squad.recruits.filter   (_.isTransport)
+    val passengers  = squad.recruits.filterNot(_.isTransport).filter( ! _.flying )
         
     squad.recruits.foreach(_.agent.intend(squad.client, new Intention {
       toTravel = Some(pixel)

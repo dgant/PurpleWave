@@ -28,6 +28,7 @@ class Configuration {
   var attackableRangeBuffer           = 4
   var fogPositionDuration             = 24 * 20
   var violenceFrameThreshold          = 24
+  var pickupRadiusPixels              = 48 //No idea what actual value is
   var enableYolo                      = true
   var enablePathRecalculation         = true
   var enableMineralWalkInSameZone     = false // Tends to lead to stuck builders

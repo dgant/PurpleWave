@@ -218,6 +218,8 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   def inTileRadius  (tiles: Int)  : Traversable[UnitInfo] = With.units.inTileRadius(tileIncludingCenter, tiles)
   def inPixelRadius (pixels: Int) : Traversable[UnitInfo] = With.units.inPixelRadius(pixelCenter, pixels)
   
+  def isTransport: Boolean = unitClass.isTransport && ( ! is(Zerg.Overlord) || player.hasUpgrade(Zerg.OverlordDrops))
+  
   ////////////
   // Combat //
   ////////////

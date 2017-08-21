@@ -128,7 +128,6 @@ object Playbook extends MacroPlaybook {
     PvTEarly1015GateGoon,
     PvTEarly14Nexus,
     PvTEarly1GateRange,
-    PvTEarly4GateAllIn,
     PvTLateCarriers,
     PvTLateMassGateway,
     PvTLateArbiters,

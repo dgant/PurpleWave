@@ -5,7 +5,7 @@ import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Plans.Army._
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
-import Planning.Plans.Macro.BuildOrders.{Build, FirstEightMinutes, FollowBuildOrder}
+import Planning.Plans.Macro.BuildOrders.{Build, FirstEightMinutes, FollowBuildOrder, RequireBareMinimum}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.{OnGasBases, OnMiningBases, UnitsAtLeast}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
@@ -35,7 +35,7 @@ class FFAMassMarine extends Parallel {
   )
   
   children.set(Vector(
-    new RequireMiningBases(1),
+    new RequireBareMinimum,
     new FirstEightMinutes(
       new Build(
         RequestAtLeast(1, Terran.CommandCenter),

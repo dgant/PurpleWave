@@ -6,11 +6,11 @@ import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
 import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors}
 import Planning.Plans.Army._
 import Planning.Plans.Compound.{If, _}
-import Planning.Plans.Information.Reactive.{EnemyMutalisks}
+import Planning.Plans.Information.Reactive.EnemyMutalisks
 import Planning.Plans.Information.Scenarios.EnemyStrategy
 import Planning.Plans.Information.{Employ, Employing, StartPositionsAtLeast}
 import Planning.Plans.Macro.Automatic.{MatchingRatio, _}
-import Planning.Plans.Macro.BuildOrders.{Build, FirstEightMinutes}
+import Planning.Plans.Macro.BuildOrders.{Build, FirstEightMinutes, RequireBareMinimum}
 import Planning.Plans.Macro.Expanding.{BuildCannonsAtExpansions, BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Milestones._
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
@@ -172,8 +172,8 @@ class ProtossVsZerg extends Parallel {
     /////////////////////////////
     // Early game build orders //
     /////////////////////////////
-    
-    new RequireMiningBases(1),
+  
+    new RequireBareMinimum,
     new Employ(PvZEarly2Gate, new ImplementEarly2Gate),
     new If(new WeAreFFEing, new FFE),
     

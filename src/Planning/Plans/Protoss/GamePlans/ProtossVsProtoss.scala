@@ -42,6 +42,10 @@ class ProtossVsProtoss extends Parallel {
   private class ImplementEarly1GateZZCore extends FirstEightMinutes(
     new Build(ProtossBuilds.Opening_1GateZZCore: _*))
   
+  private class DoingOneGateCore extends Or(
+    new Employing(PvPEarly1GateCore),
+    new Employing(PvPEarly1GateZZCore))
+  
   private class ImplementEarlyFE extends FirstEightMinutes(
     new Parallel(
       new Nexus2GateThenCannons,
@@ -285,8 +289,13 @@ class ProtossVsProtoss extends Parallel {
     
     new ScoutExpansionsAt(100),
     new If(
-      new UnitsAtLeast(1, UnitMatchType(Protoss.Pylon), complete = false),
-      new Scout),
+      new DoingOneGateCore,
+      new If(
+        new UnitsAtLeast(1, UnitMatchType(Protoss.Pylon), complete = false),
+        new Scout),
+      new If(
+        new UnitsAtLeast(1, UnitMatchType(Protoss.CyberneticsCore), complete = false),
+        new Scout)),
   
     new DefendZones,
     new Attack { attackers.get.unitMatcher.set(UnitMatchType(Protoss.DarkTemplar)) },

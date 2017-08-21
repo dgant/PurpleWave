@@ -146,10 +146,25 @@ class ProtossVsTerran extends Parallel {
     new Employ(PvTEarly1GateRange,   new ImplementEarly1GateRange),
     new Employ(PvTEarly1015GateGoon, new ImplementEarly1015GateGoon),
     new Employ(PvTEarlyDTExpand,     new ImplementEarlyDTExpand),
+    
     new RequireSufficientSupply,
     new TrainWorkersContinuously,
     
     // One-base tech
+    new Employ(PvTEarly1GateReaver, new Parallel(
+      new DropAttack,
+      new TrainContinuously(Protoss.Reaver, 1),
+      new TrainZealotsOrDragoons,
+      new Build(
+        RequestAtLeast(1, Protoss.Gateway),
+        RequestAtLeast(1, Protoss.CyberneticsCore),
+        RequestAtLeast(1, Protoss.RoboticsFacility),
+        RequestUpgrade(Protoss.DragoonRange),
+        RequestAtLeast(1, Protoss.RoboticsSupportBay),
+        RequestAtLeast(1, Protoss.Shuttle),
+        RequestAtLeast(2, Protoss.Gateway))
+    )),
+    
     new Employ(PvTEarly2GateObs, new Parallel(
       new TrainZealotsOrDragoons,
       new TrainContinuously(Protoss.Observer, 1),

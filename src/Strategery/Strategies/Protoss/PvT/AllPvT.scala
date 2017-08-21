@@ -10,6 +10,7 @@ object AllPvT extends Strategy {
       PvTEarly14Nexus,
       PvTEarlyDTExpand,
       PvTEarly1GateRange,
+      PvTEarly1GateReaver,
       PvTEarly2GateObs,
       PvTEarly1015GateGoon),
     Vector(

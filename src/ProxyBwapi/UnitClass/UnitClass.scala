@@ -114,6 +114,7 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) {
   lazy val isTownHall       : Boolean = Vector(Terran.CommandCenter, Protoss.Nexus, Zerg.Hatchery, Zerg.Lair, Zerg.Hive).contains(this)
   lazy val isSiegeTank      : Boolean = this == Terran.SiegeTankSieged || this == Terran.SiegeTankUnsieged
   lazy val isStaticDefense  : Boolean = isBuilding && attacks || this == Terran.Bunker || this == Protoss.ShieldBattery
+  lazy val isTransport      : Boolean = spaceProvided > 0 && isFlyer && this != Protoss.Carrier
   
   lazy val unaffectedByDarkSwarm: Boolean = Vector(
     Terran.SiegeTankSieged,

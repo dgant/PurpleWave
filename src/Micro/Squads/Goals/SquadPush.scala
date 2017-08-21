@@ -4,7 +4,7 @@ import Mathematics.Points.Pixel
 import Micro.Agency.Intention
 import Micro.Squads.Squad
 
-class Push(pixel: Pixel) extends SquadGoal {
+class SquadPush(pixel: Pixel) extends SquadGoal {
   
   override def toString: String = "Attack " + pixel.zone.name
   

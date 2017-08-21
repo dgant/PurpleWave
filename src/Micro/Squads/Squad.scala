@@ -3,7 +3,7 @@ package Micro.Squads
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Micro.Squads.Companies._
-import Micro.Squads.Goals.{Chill, SquadGoal}
+import Micro.Squads.Goals.{SquadChill, SquadGoal}
 import Planning.Plan
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitClass.UnitClass
@@ -14,7 +14,7 @@ import scala.collection.mutable.ArrayBuffer
 
 class Squad(val client: Plan) {
   
-  var goal: SquadGoal = Chill
+  var goal: SquadGoal = SquadChill
   
   var enemies   : Iterable[UnitInfo]            = Iterable.empty
   var recruits  : ArrayBuffer[FriendlyUnitInfo] = ArrayBuffer.empty

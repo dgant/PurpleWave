@@ -13,7 +13,7 @@ import scala.collection.mutable
 class Intelligence {
   
   def mostBaselikeEnemyTile: Tile = mostBaselikeEnemyTileCache.get
-  val mostBaselikeEnemyTileCache = new CacheFrame(() =>
+  private val mostBaselikeEnemyTileCache = new CacheFrame(() =>
     With.units.enemy
       .toVector
       .filter(unit => unit.possiblyStillThere && ! unit.flying && unit.unitClass.isBuilding)

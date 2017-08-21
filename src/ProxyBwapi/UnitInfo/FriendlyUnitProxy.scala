@@ -213,4 +213,7 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit) extends UnitInfo(base) {
   def spiderMines: Int = base.getSpiderMineCount
   
   def addon: Option[UnitInfo] = With.units.get(base.getAddon)
+  
+  def spaceRemaining: Int = spaceRemainingCache.get
+  private val spaceRemainingCache = new CacheFrame(() => base.getSpaceRemaining)
 }

@@ -9,7 +9,7 @@ import Micro.Squads.Squad
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.EnrichPixel.EnrichedPixelCollection
 
-class ProtectZone(zone: Zone) extends SquadGoal {
+class SquadProtectZone(zone: Zone) extends SquadGoal {
   
   private var lastAction = "ProtectZone"
   override def toString: String = lastAction + zone.name

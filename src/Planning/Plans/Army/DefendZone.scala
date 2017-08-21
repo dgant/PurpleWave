@@ -1,14 +1,14 @@
 package Planning.Plans.Army
 
 import Information.Geography.Types.Zone
-import Micro.Squads.Goals.ProtectZone
+import Micro.Squads.Goals.SquadProtectZone
 import Planning.Plan
 import ProxyBwapi.UnitInfo.ForeignUnitInfo
 
 class DefendZone(zone: Zone) extends Plan {
   
   val recruit: Conscript = new Conscript
-  val goal: ProtectZone = new ProtectZone(zone)
+  val goal: SquadProtectZone = new SquadProtectZone(zone)
   
   override def getChildren: Iterable[Plan] = Array(recruit)
   

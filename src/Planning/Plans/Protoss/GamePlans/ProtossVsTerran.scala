@@ -165,32 +165,33 @@ class ProtossVsTerran extends Parallel {
     ///////////////////
     
     new IfCloakedThreats_Observers,
-    new Employ(PvTEarly1GateReaver, new Parallel(
-      new DropAttack,
-      new TrainContinuously(Protoss.Reaver, 1),
-      new Build(
-        RequestAtLeast(1, Protoss.Gateway),
-        RequestAtLeast(1, Protoss.CyberneticsCore),
-        RequestAtLeast(1, Protoss.RoboticsFacility)),
-      new TrainZealotsOrDragoons,
-      new Build(
-        RequestAtLeast(1, Protoss.RoboticsSupportBay),
-        RequestAtLeast(1, Protoss.Shuttle),
-        RequestAtLeast(1, Protoss.Reaver),
-        RequestUpgrade(Protoss.DragoonRange))
-    )),
-    
-    new Employ(PvTEarly2GateObs, new Parallel(
-      new TrainZealotsOrDragoons,
-      new TrainContinuously(Protoss.Observer, 1),
-      new Build(
-        RequestAtLeast(1, Protoss.Gateway),
-        RequestAtLeast(1, Protoss.CyberneticsCore),
-        RequestUpgrade(Protoss.DragoonRange),
-        RequestAtLeast(1, Protoss.RoboticsFacility),
-        RequestAtLeast(2, Protoss.Gateway),
-        RequestAtLeast(1, Protoss.Observatory))
-    )),
+    new FirstEightMinutes(
+      new Employ(PvTEarly1GateReaver, new Parallel(
+        new TrainContinuously(Protoss.Reaver, 1),
+        new Build(
+          RequestAtLeast(1, Protoss.Gateway),
+          RequestAtLeast(1, Protoss.CyberneticsCore),
+          RequestAtLeast(1, Protoss.RoboticsFacility)),
+        new TrainZealotsOrDragoons,
+        new Build(
+          RequestAtLeast(1, Protoss.Shuttle),
+          RequestAtLeast(1, Protoss.RoboticsSupportBay),
+          RequestAtLeast(1, Protoss.Reaver),
+          RequestUpgrade(Protoss.DragoonRange))
+      ))),
+  
+    new FirstEightMinutes(
+      new Employ(PvTEarly2GateObs, new Parallel(
+        new TrainZealotsOrDragoons,
+        new TrainContinuously(Protoss.Observer, 1),
+        new Build(
+          RequestAtLeast(1, Protoss.Gateway),
+          RequestAtLeast(1, Protoss.CyberneticsCore),
+          RequestUpgrade(Protoss.DragoonRange),
+          RequestAtLeast(1, Protoss.RoboticsFacility),
+          RequestAtLeast(2, Protoss.Gateway),
+          RequestAtLeast(1, Protoss.Observatory))
+      ))),
   
     new ProtossVsTerranIdeas.RespondToBioAllInWithReavers,
     
@@ -208,7 +209,8 @@ class ProtossVsTerran extends Parallel {
         new Build(RequestAtLeast(1, Protoss.Dragoon)))),
     
     new FulfillEarlyTech,
-    
+    new BuildGasPumps,
+  
     // Mid game
      new If(
       new UnitsAtLeast(1, UnitMatchType(Protoss.HighTemplar), complete = false),
@@ -218,13 +220,11 @@ class ProtossVsTerran extends Parallel {
       new UnitsAtLeast(1, UnitMatchType(Protoss.Arbiter), complete = false),
       new Build(RequestTech(Protoss.Stasis))),
     
-    new MatchMiningBases(1),
     new TakeThirdBaseSafely,
     
     new OnMiningBases(2,
       new Parallel(
         new ProtossVsTerranIdeas.RespondToBioWithReavers,
-        new BuildGasPumps,
         new If(
           new UnitsAtLeast(8, UnitMatchWarriors, complete = true),
           new FulfillMidgameTech),
@@ -267,9 +267,9 @@ class ProtossVsTerran extends Parallel {
     new ScoutAt(14),
     new ScoutExpansionsAt(100),
     new ClearBurrowedBlockers,
-    new DefendZones,
-    
+    new DropAttack,
     new Attack { attackers.get.unitMatcher.set(UnitMatchType(Protoss.DarkTemplar)) },
+    new DefendZones,
     new If(
       new And(
         new UnitsAtLeast(12, UnitMatchWarriors, complete = true),

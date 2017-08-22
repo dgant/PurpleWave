@@ -27,7 +27,9 @@ class DropAttack extends Plan {
     val target = attackTarget
     
     transportLock.get.unitPreference.set(UnitPreferClose(target))
-    val potentialTranports = transportLock.get.inquire(this)
+    transportLock.get.acquire(this)
+    
+    val potentialTranports = Some(transportLock.get.units) //transportLock.get.inquire(this
     
     if (potentialTranports.isEmpty || potentialTranports.get.isEmpty) {
       return
@@ -41,7 +43,7 @@ class DropAttack extends Plan {
       return
     }
     
-    transportLock.get.acquire(this)
+    //transportLock.get.acquire(this)
     fighterLock.get.acquire(this)
     
     squad.conscript(transportLock.get.units)

@@ -57,7 +57,9 @@ class BuildCannonsAtBases(count: Int) extends Plan {
     
     With.groundskeeper.propose(pylonBlueprintByZone(zone))
     With.scheduler.request(this, RequestAnother(pylonsToAdd, Protoss.Pylon))
-    cannonBlueprintsByZone(zone).foreach(With.groundskeeper.propose)
-    With.scheduler.request(this, RequestAnother(cannonsToAdd, Protoss.PhotonCannon))
+    if (pylonsToAdd <= 0) {
+      cannonBlueprintsByZone(zone).foreach(With.groundskeeper.propose)
+      With.scheduler.request(this, RequestAnother(cannonsToAdd, Protoss.PhotonCannon))
+    }
   }
 }

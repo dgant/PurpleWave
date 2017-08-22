@@ -90,7 +90,7 @@ object ShowUnitsFriendly extends View {
     }
     
     if (showForces) {
-      val maxForce = ByOption.min(agent.forces.values.map(_.lengthSlow)).getOrElse(0.0)
+      val maxForce = ByOption.max(agent.forces.values.map(_.lengthSlow)).getOrElse(0.0)
       if (maxForce > 0.0) {
         agent.forces.foreach(pair => {
           val force           = pair._2

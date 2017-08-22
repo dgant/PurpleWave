@@ -8,17 +8,24 @@ object TargetHeuristicDetectors extends TargetHeuristic {
   
   override def evaluate(unit: FriendlyUnitInfo, candidate: UnitInfo): Double = {
     
-    if ( ! unit.cloaked) return HeuristicMathMultiplicative.default
+    val cloakedFighter = unit.matchups.alliesIncludingSelf.find(ally => ally.cloaked && ally.matchups.targets.nonEmpty)
     
-    val detects = (
-      candidate.unitClass.isDetector
-      ||  (candidate.constructing && candidate.target.exists(buildee => Array(Terran.EngineeringBay, Terran.MissileTurret, Terran.Academy).contains(buildee.unitClass)))
-      ||  candidate.is(Terran.Comsat)
-      ||  candidate.is(Terran.EngineeringBay)
-      ||  candidate.is(Terran.ControlTower)
-      ||  candidate.is(Protoss.Forge)
-      ||  candidate.is(Protoss.Observatory)
-      ||  candidate.is(Protoss.RoboticsFacility))
+    if (cloakedFighter.isEmpty) return HeuristicMathMultiplicative.default
+    
+    var detects = candidate.unitClass.isDetector
+    
+    detects ||= candidate.constructing && candidate.target.exists(_.is(
+      Terran.EngineeringBay,
+      Terran.MissileTurret,
+      Terran.Academy))
+    
+    detects ||= candidate.is(
+      Terran.Comsat,
+      Terran.EngineeringBay,
+      Terran.ControlTower,
+      Protoss.Forge,
+      Protoss.Observatory,
+      Protoss.RoboticsFacility)
     
     HeuristicMathMultiplicative.fromBoolean(detects)
   }

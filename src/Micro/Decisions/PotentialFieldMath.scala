@@ -82,6 +82,18 @@ object PotentialFieldMath {
     output
   }
   
+  def exitForce(unit: FriendlyUnitInfo): Force = {
+    val destination = unit.agent.origin.zone
+    
+    val path = With.paths.zonePath(
+      unit.pixelCenter.zone,
+      destination)
+    
+    if (path.isEmpty || path.get.steps.isEmpty) return new Force
+    
+    BuildForce.fromPixels(unit.pixelCenter, path.get.steps.head.edge.centerPixel, 1.0)
+  }
+  
   def sumForces(forces: Traversable[Force], origin: Pixel): Pixel = {
     val forceTotal  = forces.reduce(_ + _)
     val forceNormal = forceTotal.normalize(85.0)

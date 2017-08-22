@@ -7,7 +7,7 @@ import Micro.Squads.Squad
 import Planning.Composition.Property
 import Planning.Composition.ResourceLocks.LockUnits
 import Planning.Composition.UnitCounters.{UnitCountOne, UnitCountTransportable}
-import Planning.Composition.UnitMatchers.{UnitMatchDroppable, UnitMatchTransport}
+import Planning.Composition.UnitMatchers.{UnitMatchDroppable, UnitMatchTransport, UnitMatcher}
 import Planning.Composition.UnitPreferences.UnitPreferClose
 import Planning.Plan
 
@@ -17,8 +17,10 @@ class DropAttack extends Plan {
   transportLock.get.unitMatcher.set(UnitMatchTransport)
   transportLock.get.unitCounter.set(UnitCountOne)
   
-  val fighterLock = new Property(new LockUnits)
-  fighterLock.get.unitMatcher.set(UnitMatchDroppable)
+  val paratrooperMatcher = new Property[UnitMatcher](UnitMatchDroppable)
+  
+  val paratrooperLock = new Property(new LockUnits)
+  paratrooperLock.get.unitMatcher.inherit(paratrooperMatcher)
   
   val squad = new Squad(this)
   
@@ -28,26 +30,23 @@ class DropAttack extends Plan {
     
     transportLock.get.unitPreference.set(UnitPreferClose(target))
     transportLock.get.acquire(this)
+    val transports = transportLock.get.units
     
-    val potentialTranports = Some(transportLock.get.units) //transportLock.get.inquire(this
+    if (transports.isEmpty) return
     
-    if (potentialTranports.isEmpty || potentialTranports.get.isEmpty) {
-      return
-    }
-    
-    fighterLock.get.unitPreference.set(UnitPreferClose(target))
-    fighterLock.get.unitCounter.set(new UnitCountTransportable(potentialTranports.get))
-    val potentialFighters = fighterLock.get.inquire(this)
+    paratrooperLock.get.unitPreference.set(UnitPreferClose(target))
+    paratrooperLock.get.unitCounter.set(new UnitCountTransportable(transports))
+    val paratroopers = paratrooperLock.get.inquire(this)
     
     if (potentialFighters.isEmpty || potentialFighters.get.isEmpty) {
       return
     }
     
     //transportLock.get.acquire(this)
-    fighterLock.get.acquire(this)
+    paratrooperLock.get.acquire(this)
     
     squad.conscript(transportLock.get.units)
-    fighterLock.get.units.foreach(squad.recruit)
+    paratrooperLock.get.units.foreach(squad.recruit)
     squad.goal = new SquadDrop(target)
     
   }

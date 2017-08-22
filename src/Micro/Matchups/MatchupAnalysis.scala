@@ -29,10 +29,11 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
     hypotheticalMatchups(hypotheticalConditions)
   }
   
-  lazy val allies                 : Vector[UnitInfo]  = if (me.battle.isEmpty) Vector.empty else me.battle.get.teamOf(me).units.filterNot(_.id == me.id)
   lazy val enemies                : Vector[UnitInfo]  = if (me.battle.isEmpty) Vector.empty else me.battle.get.teamOf(me).opponent.units
-  lazy val others                 : Vector[UnitInfo]  = allies ++ enemies
-  lazy val allUnits               : Vector[UnitInfo]  = others :+ me
+  lazy val alliesIncludingSelf    : Vector[UnitInfo]  = if (me.battle.isEmpty) Vector.empty else me.battle.get.teamOf(me).units
+  lazy val allies                 : Vector[UnitInfo]  = alliesIncludingSelf.filterNot(_.id == me.id)
+  lazy val others                 : Vector[UnitInfo]  = enemies ++ allies
+  lazy val allUnits               : Vector[UnitInfo]  = enemies ++ alliesIncludingSelf
   lazy val enemyDetectors         : Vector[UnitInfo]  = enemies.filter(e => e.aliveAndComplete && e.unitClass.isDetector)
   lazy val threats                : Vector[UnitInfo]  = enemies.filter(_.canAttack(me))
   lazy val targets                : Vector[UnitInfo]  = enemies.filter(me.canAttack)

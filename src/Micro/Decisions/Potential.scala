@@ -94,6 +94,14 @@ object Potential {
   }
   
   def exitForce(unit: FriendlyUnitInfo): Force = {
+    if (unit.flying) exitForceAir(unit) else exitForceGround(unit)
+  }
+  
+  def exitForceAir(unit: FriendlyUnitInfo): Force = {
+    BuildForce.fromPixels(unit.pixelCenter, unit.agent.origin)
+  }
+  
+  def exitForceGround(unit: FriendlyUnitInfo): Force = {
     val destination = unit.agent.origin.zone
     
     val path = With.paths.zonePath(
@@ -102,7 +110,7 @@ object Potential {
     
     if (path.isEmpty || path.get.steps.isEmpty) return new Force
     
-    BuildForce.fromPixels(unit.pixelCenter, path.get.steps.head.edge.centerPixel, 1.0)
+    BuildForce.fromPixels(unit.pixelCenter, path.get.steps.head.edge.centerPixel)
   }
   
   def sumForces(forces: Traversable[Force], origin: Pixel): Pixel = {

@@ -17,7 +17,7 @@ object Avoid extends Action {
     val forceThreat     = Potential.threatsRepulsion(unit)
     val forceMobility   = Potential.mobilityForce(unit)
     val forceSpreading  = Potential.spreadingForce(unit)
-    val forceExiting    = Potential.exitForce(unit)
+    val forceExiting    = Potential.exitForceGround(unit)
     unit.agent.forces.put(Colors.NeonRed,     forceThreat)
     unit.agent.forces.put(Colors.NeonGreen,   forceMobility)
     unit.agent.forces.put(Colors.NeonViolet,  forceSpreading)

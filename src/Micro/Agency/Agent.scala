@@ -160,6 +160,9 @@ class Agent(val unit: FriendlyUnitInfo) {
     if (unit.agent.toReturn.isDefined) {
       unit.agent.toReturn.get
     }
+    else if (unit.agent.toForm.isDefined) {
+      unit.agent.toForm.get
+    }
     else if (anchors.nonEmpty) {
       anchors.minBy(_.pixelDistanceFast(unit)).pixelCenter
     }

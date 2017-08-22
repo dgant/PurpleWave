@@ -63,7 +63,7 @@ object StrategyGroups {
 
 class TestingPlaybook extends EmptyPlaybook {
   
-  val strategyToTest = PvTEarly1GateReaver
+  val strategyToTest = PvTEarly2GateObs
   
   override lazy val forced: Seq[Strategy] = Seq(AllPvP, AllPvT, AllPvZ, TvTStandard, TvZStandard, strategyToTest)
 }

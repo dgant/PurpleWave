@@ -12,7 +12,10 @@ import Utilities.ByOption
 object Potential {
   
   def sum(forces: Traversable[Force]): Force = {
-    forces.reduce(_ + _)
+    if (forces.isEmpty)
+      new Force
+    else
+      forces.reduce(_ + _)
   }
   
   def threatsRepulsion(unit: FriendlyUnitInfo): Force = {
@@ -64,7 +67,7 @@ object Potential {
     val tile                = pixel.tileIncluding
     val mobility            = mobilitySource.get(tile)
     val forces              = tile.adjacent8.filter(_.valid).map(neighbor => singleMobilityForce(tile, neighbor, mobilitySource))
-    val totalForce          = forces.reduce(_ + _)
+    val totalForce          = sum(forces)
     val magnitude           = 2.0 * Math.max(0.0, 1.0 - 2 * mobility / maxMobility.toDouble)
     val output              = totalForce.normalize(magnitude)
     output
@@ -113,8 +116,8 @@ object Potential {
     BuildForce.fromPixels(unit.pixelCenter, path.get.steps.head.edge.centerPixel)
   }
   
-  def sumForces(forces: Traversable[Force], origin: Pixel): Pixel = {
-    val forceTotal  = forces.reduce(_ + _)
+  def applyForcesForMoveOrder(forces: Traversable[Force], origin: Pixel): Pixel = {
+    val forceTotal  = sum(forces)
     val forceNormal = forceTotal.normalize(85.0)
     val forcePoint  = forceNormal.toPoint
     val output      = origin.add(forcePoint)

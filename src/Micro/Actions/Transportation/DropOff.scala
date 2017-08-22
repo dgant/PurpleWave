@@ -11,7 +11,7 @@ object DropOff extends Action {
     unit.loadedUnits.nonEmpty                         &&
     With.grids.walkable.get(unit.tileIncludingCenter) &&
     unit.agent.toTravel.exists(destination =>
-      unit.pixelDistanceFast(destination) < 32.0 * 5.0 &&
+      unit.pixelDistanceFast(destination) < 32.0 * 12.0 &&
       unit.pixelCenter.zone == destination.zone)
   }
   

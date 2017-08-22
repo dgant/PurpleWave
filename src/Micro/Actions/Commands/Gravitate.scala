@@ -15,7 +15,7 @@ object Gravitate extends Action {
   override def perform(unit: FriendlyUnitInfo) {
     val forces          = unit.agent.forces.values
     val origin          = unit.pixelCenter
-    val destination     = Potential.sumForces(forces, origin)
+    val destination     = Potential.applyForcesForMoveOrder(forces, origin)
     unit.agent.movingTo = Some(destination)
     With.commander.move(unit, destination)
   }

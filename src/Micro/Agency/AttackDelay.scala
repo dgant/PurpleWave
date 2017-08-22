@@ -26,6 +26,10 @@ object AttackDelay {
   private val inexplicableExperimentalSafetyMargin = 1
   
   def framesToWaitAfterIssuingAttackOrder(unit: FriendlyUnitInfo): Int = {
+    if (unit.is(Protoss.Carrier)) {
+      // Need a better answer than this
+      return 24
+    }
     1 + Math.max(With.latency.latencyFrames, unit.unitClass.stopFrames)                 + inexplicableExperimentalSafetyMargin
   }
   

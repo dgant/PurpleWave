@@ -18,6 +18,7 @@ object Build extends Action {
     val blockers  = unit.matchups.others.filter(_.tileArea.intersects(buildArea))
     blockers.flatMap(_.friendly).foreach(_.agent.shove(unit))
     if (blockers.exists(_.isEnemy)) {
+      unit.agent.canFight = true
       Fight.consider(unit)
     }
     else {

@@ -9,7 +9,7 @@ object ProtossBuilds {
   // General Purpose //
   /////////////////////
   
-  val Opening_1GateCore = Vector[BuildRequest] (
+  val Opening_10Gate11Gas13Core = Vector[BuildRequest] (
     RequestAtLeast(1,   Protoss.Nexus),
     RequestAtLeast(8,   Protoss.Probe),
     RequestAtLeast(1,   Protoss.Pylon),
@@ -81,7 +81,7 @@ object ProtossBuilds {
     RequestAtLeast(2,   Protoss.Pylon),
     RequestAtLeast(3,   Protoss.Zealot))
   
-  val OpeningTwoGate1015Dragoons = Vector[BuildRequest] (
+  val Opening_10Gate15GateDragoons = Vector[BuildRequest] (
     RequestAtLeast(1,   Protoss.Nexus),
     RequestAtLeast(8,   Protoss.Probe),
     RequestAtLeast(1,   Protoss.Pylon),

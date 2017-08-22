@@ -19,8 +19,9 @@ object Spot extends Action {
     val marginPixels      = unit.sightRangePixels / 2
     
     if (snipers.nonEmpty && hiders.nonEmpty) {
-      val nearestHider = hiders.minBy(_.pixelDistanceFast(unit))
-      unit.agent.toTravel = Some(nearestHider.pixelCenter.project(unit.agent.origin, unit.sightRangePixels - 32))
+      val nearestHider  = hiders.minBy(_.pixelDistanceFast(unit))
+      val nearestSniper = snipers.minBy(_.pixelDistanceFast(nearestHider))
+      unit.agent.toTravel = Some(nearestHider.pixelCenter.project(nearestSniper.pixelCenter, unit.sightRangePixels - 32))
       Move.delegate(unit)
     }
   }

@@ -226,6 +226,7 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   
   def sightRangePixels: Int = sightRangePixelsCache.get
   private val sightRangePixelsCache = new CacheFrame(() =>
+    if (blind) 32 else
     unitClass.sightRangePixels +
       (if (
         (is(Terran.Ghost)     && player.hasUpgrade(Terran.GhostVisionRange))      ||

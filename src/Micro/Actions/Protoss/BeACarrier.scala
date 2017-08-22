@@ -22,8 +22,9 @@ object BeACarrier extends Action {
     lazy val interceptorsFighting     = unit.interceptors.count(_.order == Orders.InterceptorAttack)
     lazy val interceptorsAreShooting  = interceptorsFighting >= interceptorsTotal
     lazy val exitingLeash             = unit.matchups.targets.forall(_.pixelDistanceFast(unit) > 32.0 * 8.5)
+    lazy val interceptorsNeedKick     = exitingLeash || ! interceptorsAreShooting
     
-    if (interceptorsTotal > 2 && (exitingLeash || ! interceptorsAreShooting)) {
+    if (interceptorsNeedKick && (unit.matchups.threats.isEmpty || interceptorsTotal > 2)) {
       val attackTarget = unit.matchups.enemies.minBy(_.pixelDistanceFast(unit))
       val attackPoint = unit.pixelCenter.project(attackTarget.pixelCenter, 32)
       unit.agent.toTravel = Some(attackPoint)

@@ -37,7 +37,7 @@ class ProtossVsProtoss extends Parallel {
       new Build(ProtossBuilds.OpeningTwoGate1012: _*)))
   
   private class ImplementEarly1GateCore extends FirstEightMinutes(
-    new Build(ProtossBuilds.Opening_1GateCore: _*))
+    new Build(ProtossBuilds.Opening_10Gate11Gas13Core: _*))
   
   private class ImplementEarly1GateZZCore extends FirstEightMinutes(
     new Build(ProtossBuilds.Opening_1GateZZCore: _*))

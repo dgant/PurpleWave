@@ -69,7 +69,7 @@ class UnitClassProxy(val baseType:UnitType) {
   lazy val requiresPsi              = baseType.requiresPsi
   lazy val researchesWhat           = baseType.researchesWhat.asScala.map(Techs.get)
   lazy val seekRange                = baseType.seekRange
-  lazy val sightRange               = baseType.sightRange
+  lazy val sightRangePixels         = baseType.sightRange
   lazy val spaceProvided            = baseType.spaceProvided
   lazy val spaceRequired            = baseType.spaceRequired
   lazy val supplyProvided           = baseType.supplyProvided

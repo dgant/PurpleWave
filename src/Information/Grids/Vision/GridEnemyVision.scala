@@ -11,7 +11,7 @@ class GridEnemyVision extends AbstractGridBoolean {
     With.units.enemy
       .filter(_.possiblyStillThere)
       .foreach(u => {
-        Circle.points(u.unitClass.sightRange / 32)
+        Circle.points(u.sightRangePixels / 32)
           .map(u.tileIncludingCenter.add)
           .foreach(set(_, true))
       })

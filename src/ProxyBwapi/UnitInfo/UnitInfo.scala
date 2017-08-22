@@ -226,14 +226,13 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   
   def sightRangePixels: Int = sightRangePixelsCache.get
   private val sightRangePixelsCache = new CacheFrame(() =>
-    32 * (
-      unitClass.sightRange +
-        (if (
-          (is(Terran.Ghost)     && player.hasUpgrade(Terran.GhostVisionRange))      ||
-          (is(Protoss.Observer) && player.hasUpgrade(Protoss.ObserverVisionRange))  ||
-          (is(Protoss.Scout)    && player.hasUpgrade(Protoss.ScoutVisionRange))     ||
-          (is(Zerg.Overlord)    && player.hasUpgrade(Zerg.OverlordVisionRange)))
-        2 else 0)))
+    unitClass.sightRangePixels +
+      (if (
+        (is(Terran.Ghost)     && player.hasUpgrade(Terran.GhostVisionRange))      ||
+        (is(Protoss.Observer) && player.hasUpgrade(Protoss.ObserverVisionRange))  ||
+        (is(Protoss.Scout)    && player.hasUpgrade(Protoss.ScoutVisionRange))     ||
+        (is(Zerg.Overlord)    && player.hasUpgrade(Zerg.OverlordVisionRange)))
+      64 else 0))
   
   ////////////
   // Combat //

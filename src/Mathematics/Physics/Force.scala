@@ -17,7 +17,7 @@ case class Force(x: Double, y: Double) {
     // Octagonal distance
     // https://en.wikibooks.org/wiki/Algorithms/Distance_approximations#Octagonal
     val ax = Math.abs(x)
-    val ay = Math.abs(x)
+    val ay = Math.abs(y)
     0.941256 * Math.max(ax, ay) + Math.min(ax, ay) * 0.414213562
   }
   

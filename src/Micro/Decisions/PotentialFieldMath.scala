@@ -52,7 +52,7 @@ object PotentialFieldMath {
   def mobilityForce(pixel: Pixel, maxMobility: Int, mobilitySource: AbstractGrid[Int]): Force = {
     val tile                = pixel.tileIncluding
     val mobility            = mobilitySource.get(tile)
-    val forces              = tile.adjacent8.map(neighbor => singleMobilityForce(tile, neighbor, mobilitySource))
+    val forces              = tile.adjacent8.filter(_.valid).map(neighbor => singleMobilityForce(tile, neighbor, mobilitySource))
     val totalForce          = forces.reduce(_ + _)
     val magnitude           = 2.0 * Math.max(0.0, 1.0 - 2 * mobility / maxMobility.toDouble)
     val output              = totalForce.normalize(magnitude)

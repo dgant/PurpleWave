@@ -3,7 +3,7 @@ package Micro.Actions.Combat.Maneuvering
 import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Attacking.Potshot
-import Micro.Actions.Commands.Travel
+import Micro.Actions.Commands.Move
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Retreat extends Action {
@@ -42,7 +42,7 @@ object Retreat extends Action {
     }
     else {
       unit.agent.toTravel = Some(unit.agent.origin)
-      Travel.delegate(unit)
+      Move.delegate(unit)
     }
     
   }

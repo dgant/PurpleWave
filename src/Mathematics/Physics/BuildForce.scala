@@ -3,6 +3,7 @@ package Mathematics.Physics
 import Mathematics.Points.Pixel
 
 object BuildForce {
+  
   def fromPixels(from: Pixel, to: Pixel, magnitude: Double): Force =
     fromRadians(from.radiansTo(to), magnitude)
   

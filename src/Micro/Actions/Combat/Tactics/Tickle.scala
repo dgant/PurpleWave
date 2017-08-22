@@ -4,7 +4,7 @@ import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Basic.MineralWalk
 import Micro.Actions.Combat.Maneuvering.Avoid
-import Micro.Actions.Commands.{Attack, Travel}
+import Micro.Actions.Commands.{Attack, Move}
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.EnrichPixel._
@@ -47,7 +47,7 @@ object Tickle extends Action {
     if ( ! unit.pixelCenter.zone.bases.exists(_.owner.isEnemy)
       && ! enemies.exists(_.pixelDistanceFast(unit) < 48.0)
       && enemiesAttackingUs.size < 1) {
-      Travel.consider(unit)
+      Move.consider(unit)
       return
     }
     
@@ -178,7 +178,7 @@ object Tickle extends Action {
     unit.agent.toGather = With.geography.ourBases.flatMap(_.minerals).headOption
     MineralWalk.consider(unit)
     unit.agent.toTravel = Some(unit.agent.origin)
-    Travel.consider(unit)
+    Move.consider(unit)
   }
   
   private def destroyBuildings(unit: FriendlyUnitInfo) {

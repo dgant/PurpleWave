@@ -79,11 +79,7 @@ class Agent(val unit: FriendlyUnitInfo) {
   /////////////////
   
   def origin: Pixel = toReturn.getOrElse(originCache.get)
-  private val originCache = new CacheFrame(() =>
-    if (With.geography.ourBases.nonEmpty)
-      With.geography.ourBases.map(_.heart.pixelCenter).minBy(unit.pixelDistanceTravelling)
-    else
-      With.geography.home.pixelCenter)
+  private val originCache = new CacheFrame(() => calculateOrigin)
   
   /////////////////
   // Diagnostics //
@@ -157,5 +153,35 @@ class Agent(val unit: FriendlyUnitInfo) {
   private def cleanUp() {
     unit.agent.shovers.clear()
     explosions.clear()
+  }
+  
+  private def calculateOrigin: Pixel = {
+    lazy val anchors = unit.matchups.allies.filter(isAnchor)
+    if (unit.agent.toReturn.isDefined) {
+      unit.agent.toReturn.get
+    }
+    else if (anchors.nonEmpty) {
+      anchors.minBy(_.pixelDistanceFast(unit)).pixelCenter
+    }
+    else if (With.geography.ourBases.nonEmpty) {
+      With.geography.ourBases.map(_.heart.pixelCenter).minBy(unit.pixelDistanceTravelling)
+    }
+    else {
+      With.geography.home.pixelCenter
+    }
+  }
+  
+  private def isAnchor(ally: UnitInfo): Boolean = {
+    if ( ! ally.unitClass.helpsInCombat) return false
+    
+    if (ally.topSpeed < unit.topSpeed && ally.subjectiveValue > unit.subjectiveValue) {
+      return true
+    }
+    
+    if ( ! ally.unitClass.canMove && ally.canAttack) {
+      return true
+    }
+    
+    false
   }
 }

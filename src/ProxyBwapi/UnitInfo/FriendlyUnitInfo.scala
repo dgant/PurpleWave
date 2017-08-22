@@ -14,6 +14,7 @@ class FriendlyUnitInfo(base: bwapi.Unit) extends FriendlyUnitProxy(base) {
   override def friendly: Option[FriendlyUnitInfo] = Some(this)
   
   def squad: Option[Squad] = With.squads.squadByUnit.get(this)
+  def squadmates: Seq[FriendlyUnitInfo] = squad.map(_.recruits).getOrElse(Seq.empty)
   def agent: Agent = With.agents.getState(this)
   def readyForMicro: Boolean = With.commander.ready(this)
   

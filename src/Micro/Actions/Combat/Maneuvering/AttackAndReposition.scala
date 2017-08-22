@@ -2,7 +2,7 @@ package Micro.Actions.Combat.Maneuvering
 
 import Micro.Actions.Action
 import Micro.Actions.Combat.Attacking.Target
-import Micro.Actions.Commands.{Attack, Travel}
+import Micro.Actions.Commands.{Attack, Move}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object AttackAndReposition extends Action {
@@ -20,7 +20,7 @@ object AttackAndReposition extends Action {
     Attack.delegate(unit)
     if (unit.matchups.threats.isEmpty) {
       unit.agent.toTravel = unit.agent.toAttack.map(_.pixelCenter)
-      Travel.delegate(unit)
+      Move.delegate(unit)
     }
   }
 }

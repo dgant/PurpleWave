@@ -2,7 +2,7 @@ package Micro.Actions.Scouting
 
 import Micro.Actions.Action
 import Micro.Actions.Combat.Decisionmaking.Engage
-import Micro.Actions.Commands.Travel
+import Micro.Actions.Commands.Move
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import bwapi.UnitCommandType
 
@@ -35,7 +35,7 @@ object BlockConstruction extends Action {
     }
     else if (block) {
       unit.agent.toTravel = destination
-      Travel.delegate(unit)
+      Move.delegate(unit)
     }
   }
   

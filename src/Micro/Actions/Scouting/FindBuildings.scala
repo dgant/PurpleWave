@@ -3,7 +3,7 @@ package Micro.Actions.Scouting
 import Lifecycle.With
 import Mathematics.Physics.Gravity
 import Micro.Actions.Action
-import Micro.Actions.Commands.Travel
+import Micro.Actions.Commands.Move
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import bwapi.{Race, UnitCommandType}
 
@@ -42,7 +42,7 @@ object FindBuildings extends Action {
     val target = unit.pixelCenter.add(force.normalize(64.0).toPoint)
     val tileToScout = tilesToScout.minBy(_.pixelCenter.pixelDistanceFast(target))
     unit.agent.toTravel = Some(tileToScout.pixelCenter)
-    Travel.delegate(unit)
+    Move.delegate(unit)
   }
   
   def blockableBuilders(unit: FriendlyUnitInfo): Iterable[UnitInfo] = {

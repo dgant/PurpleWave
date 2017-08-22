@@ -4,7 +4,7 @@ import Debugging.Visualizations.Colors
 import Micro.Actions.Action
 import Micro.Actions.Combat.Attacking.Potshot
 import Micro.Actions.Commands.Gravitate
-import Micro.Decisions.PotentialFieldMath
+import Micro.Decisions.Potential
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Sneak extends Action {
@@ -20,7 +20,7 @@ object Sneak extends Action {
   override protected def perform(unit: FriendlyUnitInfo) {
     Potshot.delegate(unit)
     if (unit.readyForMicro) {
-      val force = PotentialFieldMath.detectionForce(unit)
+      val force = Potential.detectionRepulsion(unit)
       unit.agent.forces.put(Colors.NeonTeal, force)
       Gravitate.delegate(unit)
     }

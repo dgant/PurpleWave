@@ -4,7 +4,7 @@ import Lifecycle.With
 import Micro.Actions.Action
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-object Travel extends Action {
+object Move extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.canMove &&

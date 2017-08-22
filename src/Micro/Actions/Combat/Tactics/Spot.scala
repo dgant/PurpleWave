@@ -1,8 +1,9 @@
 package Micro.Actions.Combat.Tactics
 
 import Micro.Actions.Action
-import ProxyBwapi.Races.Terran
+import Micro.Actions.Commands.Move
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Utilities.ByOption
 
 object Spot extends Action {
   
@@ -11,15 +12,16 @@ object Spot extends Action {
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {
-    val blindTanks = unit.matchups.allies.filter(tank =>
-      tank.is(Terran.SiegeTankSieged)                   &&
-      ! tank.matchups.targetsInRange.exists(_.visible)  &&
-      tank.matchups.targetsInRange.exists( ! _.visible))
+    val shooters          = unit.squadmates.filter(_.canAttack)
+    val maxRange          = ByOption.max(shooters.map(_.pixelRangeMax)).getOrElse(0.0)
+    val snipers           = shooters.filter(_.pixelRangeMax >= maxRange)
+    val hiders            = snipers.flatMap(sniper => sniper.matchups.targets).toSet.filter(enemy => ! enemy.visible)
+    val marginPixels      = unit.sightRangePixels / 2
     
-    if (blindTanks.nonEmpty) {
-      val tank = blindTanks.maxBy(_.matchups.vpfDealingDiffused)
-      val target = tank.pixelCenter.project(tank.matchups.targetsInRange.minBy(_.pixelDistanceFast(tank)).pixelCenter, 32.0 * 4.0)
-      unit.agent.toTravel = Some(target)
+    if (snipers.nonEmpty && hiders.nonEmpty) {
+      val nearestHider = hiders.minBy(_.pixelDistanceFast(unit))
+      unit.agent.toTravel = Some(nearestHider.pixelCenter.project(unit.agent.origin, unit.sightRangePixels - 32))
+      Move.delegate(unit)
     }
   }
 }

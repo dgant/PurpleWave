@@ -4,7 +4,7 @@ import Lifecycle.With
 import Mathematics.Shapes.Circle
 import Micro.Actions.Action
 import Micro.Actions.Combat.Attacking.Potshot
-import Micro.Actions.Commands.{Attack, Travel}
+import Micro.Actions.Commands.{Attack, Move}
 import Micro.Heuristics.Targeting.EvaluateTargets
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -59,7 +59,7 @@ object BustWallin extends Action {
         .filter(pixel => unit.pixelDistanceFast(pixel) < unit.pixelDistanceFast(targetUnit))
       if (targetSpots.nonEmpty) {
         unit.agent.toTravel = Some(targetSpots.minBy(targetUnit.pixelDistanceFast))
-        Travel.delegate(unit)
+        Move.delegate(unit)
       }
     }
   }

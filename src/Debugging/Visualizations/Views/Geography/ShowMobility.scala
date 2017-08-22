@@ -5,7 +5,7 @@ import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.View
 import Lifecycle.With
 import Mathematics.Points.Tile
-import Micro.Decisions.PotentialFieldMath
+import Micro.Decisions.Potential
 
 object ShowMobility extends View {
   
@@ -18,7 +18,7 @@ object ShowMobility extends View {
   
   def renderMapMobility(tile: Tile) {
     val pixelStart  = tile.pixelCenter
-    val force       = PotentialFieldMath.mobilityForce(pixelStart, tile.zone.maxMobility, With.grids.mobility)
+    val force       = Potential.mobilityForce(pixelStart, tile.zone.maxMobility, With.grids.mobility)
     if (force.lengthFast > 0.0) {
       val forceNormal = force.normalize(12.0)
       val pixelEnd    = pixelStart.add(forceNormal.x.toInt, forceNormal.y.toInt)

@@ -201,15 +201,14 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   private val topSpeedCache = new CacheFrame(() =>
     (if (stimmed) 1.5 else 1.0) * (
     unitClass.topSpeed * (if (
-      (is(Terran.Vulture)   && player.getUpgradeLevel(Terran.VultureSpeed)    > 0) ||
-      (is(Protoss.Observer) && player.getUpgradeLevel(Protoss.ObserverSpeed)  > 0) ||
-      (is(Protoss.Scout)    && player.getUpgradeLevel(Protoss.ScoutSpeed)     > 0) ||
-      (is(Protoss.Shuttle)  && player.getUpgradeLevel(Protoss.ShuttleSpeed)   > 0) ||
-      (is(Protoss.Zealot)   && player.getUpgradeLevel(Protoss.ZealotSpeed)    > 0) ||
-      (is(Zerg.Overlord)    && player.getUpgradeLevel(Zerg.OverlordSpeed)     > 0) ||
-      (is(Zerg.Zergling)    && player.getUpgradeLevel(Zerg.ZerglingSpeed)     > 0) ||
-      (is(Zerg.Hydralisk)   && player.getUpgradeLevel(Zerg.HydraliskSpeed)    > 0) ||
-      (is(Zerg.Ultralisk)   && player.getUpgradeLevel(Zerg.UltraliskSpeed)    > 0))
+      (is(Terran.Vulture)   && player.hasUpgrade(Terran.VultureSpeed))    ||
+      (is(Protoss.Observer) && player.hasUpgrade(Protoss.ObserverSpeed))  ||
+      (is(Protoss.Scout)    && player.hasUpgrade(Protoss.ScoutSpeed))     ||
+      (is(Protoss.Shuttle)  && player.hasUpgrade(Protoss.ShuttleSpeed))   ||
+      (is(Protoss.Zealot)   && player.hasUpgrade(Protoss.ZealotSpeed))    ||
+      (is(Zerg.Overlord)    && player.hasUpgrade(Zerg.ZerglingSpeed))     ||
+      (is(Zerg.Hydralisk)   && player.hasUpgrade(Zerg.HydraliskSpeed))    ||
+      (is(Zerg.Ultralisk)   && player.hasUpgrade(Zerg.UltraliskSpeed)))
       1.5 else 1.0)))
   
   
@@ -224,6 +223,17 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   def inPixelRadius (pixels: Int) : Traversable[UnitInfo] = With.units.inPixelRadius(pixelCenter, pixels)
   
   def isTransport: Boolean = unitClass.isTransport && ( ! is(Zerg.Overlord) || player.hasUpgrade(Zerg.OverlordDrops))
+  
+  def sightRangePixels: Int = sightRangePixelsCache.get
+  private val sightRangePixelsCache = new CacheFrame(() =>
+    32 * (
+      unitClass.sightRange +
+        (if (
+          (is(Terran.Ghost)     && player.hasUpgrade(Terran.GhostVisionRange))      ||
+          (is(Protoss.Observer) && player.hasUpgrade(Protoss.ObserverVisionRange))  ||
+          (is(Protoss.Scout)    && player.hasUpgrade(Protoss.ScoutVisionRange))     ||
+          (is(Zerg.Overlord)    && player.hasUpgrade(Zerg.OverlordVisionRange)))
+        2 else 0)))
   
   ////////////
   // Combat //

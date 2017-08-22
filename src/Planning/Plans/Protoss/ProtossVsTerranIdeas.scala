@@ -1,15 +1,8 @@
 package Planning.Plans.Protoss
 
-import Lifecycle.With
-import Planning.Composition.UnitMatchers.UnitMatchType
-import Planning.Plans.Compound.{And, Check, If, Or}
-import Planning.Plans.Information.Employing
-import Planning.Plans.Macro.Automatic.TrainContinuously
-import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Macro.Milestones.{HaveUpgrade, UnitsAtLeast, UnitsAtMost}
+import Planning.Plans.Compound.If
 import Planning.Plans.Information.Reactive.{EnemyBio, EnemyBioAllIn}
-import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvT.PvTEarly4GateAllIn
+import Planning.Plans.Macro.BuildOrders.Build
 
 object ProtossVsTerranIdeas {
   
@@ -22,6 +15,4 @@ object ProtossVsTerranIdeas {
     new EnemyBio,
     new Build(ProtossBuilds.TechReavers: _*)
   )
-  
-
 }

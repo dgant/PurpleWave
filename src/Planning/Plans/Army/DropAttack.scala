@@ -36,17 +36,13 @@ class DropAttack extends Plan {
     
     paratrooperLock.get.unitPreference.set(UnitPreferClose(target))
     paratrooperLock.get.unitCounter.set(new UnitCountTransportable(transports))
-    val paratroopers = paratrooperLock.get.inquire(this)
-    
-    if (potentialFighters.isEmpty || potentialFighters.get.isEmpty) {
-      return
-    }
-    
-    //transportLock.get.acquire(this)
     paratrooperLock.get.acquire(this)
+    val paratroopers = paratrooperLock.get.units
     
-    squad.conscript(transportLock.get.units)
-    paratrooperLock.get.units.foreach(squad.recruit)
+    if (paratroopers.isEmpty) return
+    
+    squad.conscript(transports)
+    paratroopers.foreach(squad.recruit)
     squad.goal = new SquadDrop(target)
     
   }

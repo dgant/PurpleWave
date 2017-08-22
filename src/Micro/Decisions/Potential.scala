@@ -9,36 +9,47 @@ import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
 
-object PotentialFieldMath {
+object Potential {
   
-  def threatForce(unit: FriendlyUnitInfo): Force = {
+  def sum(forces: Traversable[Force]): Force = {
+    forces.reduce(_ + _)
+  }
+  
+  def threatsRepulsion(unit: FriendlyUnitInfo): Force = {
     val threats     = unit.matchups.threats.filterNot(_.is(Protoss.Interceptor))
-    val forces      = threats.map(singleThreatForce(unit, _))
-    val forceSum    = forces.reduce(_ + _)
-    val output      = forceSum.normalize
+    val forces      = threats.map(threatRepulsion(unit, _))
+    val output      = sum(forces).normalize
     output
   }
   
-  def singleThreatForce(unit: FriendlyUnitInfo, threat: UnitInfo): Force = {
+  def threatRepulsion(unit: FriendlyUnitInfo, threat: UnitInfo): Force = {
     val magnitudeDamage   = threat.dpfOnNextHitAgainst(unit)
     val magnitudeDistance = Math.max(1.0, threat.framesToGetInRange(unit)) //This may fail vs. static defense -- we may want a bit more force
     val magnitudeFinal    = magnitudeDamage / magnitudeDistance
-    val output            = BuildForce.fromPixels(threat.pixelCenter, unit.pixelCenter, magnitudeFinal)
+    val output            = unitAttraction(unit, threat, -magnitudeFinal)
     output
   }
   
-  def detectionForce(unit: FriendlyUnitInfo): Force = {
-    val threats     = unit.matchups.enemies.filter(e => e.aliveAndComplete && e.unitClass.isDetector)
-    val forces      = threats.map(singleDetectorForce(unit, _))
-    val forceSum    = forces.reduce(_ + _)
-    val output      = forceSum.normalize
+  def detectionRepulsion(unit: FriendlyUnitInfo): Force = {
+    val detectors   = unit.matchups.enemies.filter(e => e.aliveAndComplete && e.unitClass.isDetector)
+    val forces      = detectors.map(detectorRepulsion(unit, _))
+    val output      = sum(forces).normalize
     output
   }
   
-  def singleDetectorForce(unit: FriendlyUnitInfo, threat: UnitInfo): Force = {
-    val magnitudeDistance = Math.max(1.0, threat.framesToGetInRange(unit)) //This may fail vs. static defense -- we may want a bit more force
-    val magnitudeFinal    = 1.0 / magnitudeDistance
-    val output            = BuildForce.fromPixels(threat.pixelCenter, unit.pixelCenter, magnitudeFinal)
+  def detectorRepulsion(unit: FriendlyUnitInfo, detector: UnitInfo): Force = {
+    val output = unitAttraction(unit, detector, -1.0 / detector.pixelDistanceFast(unit))
+    output
+  }
+  
+  def unitAttraction(unit: FriendlyUnitInfo, other: UnitInfo, magnifier: (UnitInfo, UnitInfo) => Double): Force = {
+    unitAttraction(unit, other, magnifier(unit, other))
+  }
+  
+  def unitAttraction(unit: FriendlyUnitInfo, other: UnitInfo, magnitude: Double): Force = {
+    val pixelFrom = unit.pixelCenter
+    val pixelTo   = other.pixelCenter
+    val output    = BuildForce.fromPixels(pixelFrom, pixelTo, magnitude)
     output
   }
   
@@ -78,7 +89,7 @@ object PotentialFieldMath {
     val maximumDistance = Math.max(32.0, unit.pixelRangeMax)
     val blockerDistance = nearestBlocker.get.pixelsFromEdgeFast(unit)
     val magnitude       = Math.max(0.0, 1.0 - blockerDistance / maximumDistance)
-    val output          = BuildForce.fromPixels(nearestBlocker.get.pixelCenter, unit.pixelCenter, magnitude)
+    val output          = unitAttraction(unit, nearestBlocker.get, - magnitude)
     output
   }
   

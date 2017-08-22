@@ -2,10 +2,9 @@ package Micro.Actions
 
 import Micro.Actions.Basic._
 import Micro.Actions.Combat.Decisionmaking.{Fight, FightOrFlight}
-import Micro.Actions.Combat.Detection.Detect
 import Micro.Actions.Combat.Maneuvering.Duck
-import Micro.Actions.Combat.Tactics.{Tickle, Unbunk}
-import Micro.Actions.Commands.{Attack, Travel}
+import Micro.Actions.Combat.Tactics.{Detect, Tickle, Unbunk}
+import Micro.Actions.Commands.{Attack, Move}
 import Micro.Actions.Protoss.Meld
 import Micro.Actions.Scouting.Scout
 import Micro.Actions.Transportation.Transport
@@ -45,6 +44,6 @@ object Idle extends Action {
     Scout,
     Fight,
     Attack,
-    Travel
+    Move
   )
 }

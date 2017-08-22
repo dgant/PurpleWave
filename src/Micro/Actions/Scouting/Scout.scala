@@ -2,7 +2,7 @@ package Micro.Actions.Scouting
 
 import Micro.Actions.Action
 import Micro.Actions.Combat.Attacking.Potshot
-import Micro.Actions.Commands.Travel
+import Micro.Actions.Commands.Move
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Scout extends Action {
@@ -22,6 +22,6 @@ object Scout extends Action {
     BlockConstruction.consider(unit)
     FindBuildings.consider(unit)
     Poke.consider(unit)
-    Travel.consider(unit)
+    Move.consider(unit)
   }
 }

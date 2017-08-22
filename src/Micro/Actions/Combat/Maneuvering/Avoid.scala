@@ -3,7 +3,7 @@ package Micro.Actions.Combat.Maneuvering
 import Debugging.Visualizations.Colors
 import Micro.Actions.Action
 import Micro.Actions.Commands.Gravitate
-import Micro.Decisions.PotentialFieldMath
+import Micro.Decisions.Potential
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Avoid extends Action {
@@ -14,10 +14,10 @@ object Avoid extends Action {
   }
   
   override def perform(unit: FriendlyUnitInfo) {
-    val forceThreat     = PotentialFieldMath.threatForce(unit)
-    val forceMobility   = PotentialFieldMath.mobilityForce(unit)
-    val forceSpreading  = PotentialFieldMath.spreadingForce(unit)
-    val forceExiting    = PotentialFieldMath.exitForce(unit)
+    val forceThreat     = Potential.threatsRepulsion(unit)
+    val forceMobility   = Potential.mobilityForce(unit)
+    val forceSpreading  = Potential.spreadingForce(unit)
+    val forceExiting    = Potential.exitForce(unit)
     unit.agent.forces.put(Colors.NeonRed,     forceThreat)
     unit.agent.forces.put(Colors.NeonGreen,   forceMobility)
     unit.agent.forces.put(Colors.NeonViolet,  forceSpreading)

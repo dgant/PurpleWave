@@ -124,6 +124,10 @@ class ProtossVsTerran extends Parallel {
       new EnemyHasShown(Terran.SpiderMine),
       new EnemyHasTech(Terran.WraithCloak)),
     new Build(
+      RequestAtLeast(1, Protoss.Pylon),
+      RequestAtLeast(1, Protoss.Gateway),
+      RequestAtLeast(1, Protoss.Assimilator),
+      RequestAtLeast(1, Protoss.CyberneticsCore),
       RequestAtLeast(1, Protoss.RoboticsFacility),
       RequestAtLeast(1, Protoss.Observatory)))
   
@@ -141,8 +145,11 @@ class ProtossVsTerran extends Parallel {
   /////////////////
   
   children.set(Vector(
+  
+    ////////////////
+    // Early game //
+    ////////////////
     
-    // Early game
     new RequireBareMinimum,
     new Employ(PvTEarly14Nexus,       new ImplementEarly14Nexus),
     new Employ(PvTEarly1GateRange,    new ImplementEarly1GateRange),
@@ -153,19 +160,25 @@ class ProtossVsTerran extends Parallel {
     new RequireSufficientSupply,
     new TrainWorkersContinuously,
     
-    // One-base tech
+    ///////////////////
+    // One-base tech //
+    ///////////////////
+    
+    new IfCloakedThreats_Observers,
     new Employ(PvTEarly1GateReaver, new Parallel(
       new DropAttack,
       new TrainContinuously(Protoss.Reaver, 1),
-      new TrainZealotsOrDragoons,
       new Build(
         RequestAtLeast(1, Protoss.Gateway),
         RequestAtLeast(1, Protoss.CyberneticsCore),
-        RequestAtLeast(1, Protoss.RoboticsFacility),
-        RequestUpgrade(Protoss.DragoonRange),
+        RequestAtLeast(1, Protoss.RoboticsFacility)),
+      new TrainZealotsOrDragoons,
+      new Build(
         RequestAtLeast(1, Protoss.RoboticsSupportBay),
         RequestAtLeast(1, Protoss.Shuttle),
-        RequestAtLeast(2, Protoss.Gateway))
+        RequestAtLeast(1, Protoss.Reaver),
+        RequestAtLeast(2, Protoss.Gateway),
+        RequestUpgrade(Protoss.DragoonRange))
     )),
     
     new Employ(PvTEarly2GateObs, new Parallel(
@@ -182,7 +195,10 @@ class ProtossVsTerran extends Parallel {
   
     new ProtossVsTerranIdeas.RespondToBioAllInWithReavers,
     
-    // Mid game
+    //////////////////////
+    // Two base midgame //
+    //////////////////////
+    
     new RequireMiningBases(2),
   
     // Make sure we get an early Dragoon for Vulture defense
@@ -210,7 +226,6 @@ class ProtossVsTerran extends Parallel {
       new Parallel(
         new ProtossVsTerranIdeas.RespondToBioWithReavers,
         new BuildGasPumps,
-        new IfCloakedThreats_Observers,
         new If(
           new UnitsAtLeast(8, UnitMatchWarriors, complete = true),
           new FulfillMidgameTech),

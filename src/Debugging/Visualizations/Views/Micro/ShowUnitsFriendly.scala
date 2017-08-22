@@ -98,8 +98,8 @@ object ShowUnitsFriendly extends View {
           DrawMap.line(
             agent.unit.pixelCenter,
             agent.unit.pixelCenter.add(
-              force.x.toInt,
-              force.y.toInt),
+              forceNormalized.x.toInt,
+              forceNormalized.y.toInt),
             pair._1)
         })
       }

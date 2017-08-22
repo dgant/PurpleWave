@@ -20,8 +20,7 @@ object ProtossBuilds {
     RequestAtLeast(13,  Protoss.Probe),
     RequestAtLeast(1,   Protoss.CyberneticsCore),
     RequestAtLeast(15,  Protoss.Probe),
-    RequestAtLeast(2,   Protoss.Pylon),
-    RequestAtLeast(1,   Protoss.Dragoon)
+    RequestAtLeast(2,   Protoss.Pylon)
   )
   
   val Opening_1GateZZCore = Vector[BuildRequest] (

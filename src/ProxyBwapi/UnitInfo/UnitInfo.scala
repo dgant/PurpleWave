@@ -138,11 +138,12 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   
   lazy val isMineralBlocker: Boolean = unitClass.isMinerals && mineralsLeft < 50
   
-  def subjectiveValue: Int =
+  def subjectiveValue: Int = (
     unitClass.subjectiveValue
     + scarabCount * Protoss.Scarab.subjectiveValue
     + interceptorCount * Protoss.Interceptor.subjectiveValue
     + friendly.map(_.loadedUnits.map(_.subjectiveValue).sum).sum
+  )
   
   //////////////
   // Geometry //

@@ -60,6 +60,7 @@ class Visualization {
     ShowGroundskeeper,
     ShowGrids,
     ShowMicroDecisions,
+    ShowMobility,
     ShowUnitsAll,
     ShowUnitsForeign,
     ShowUnitsFriendly,

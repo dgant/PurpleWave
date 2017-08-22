@@ -44,13 +44,13 @@ object PotentialFieldMath {
   
   def mobilityForce(unit: FriendlyUnitInfo): Force = {
     if (unit.flying)
-      mobilityForce(unit, 12, With.grids.mobilityBorder)
+      mobilityForce(unit.pixelCenter, 12, With.grids.mobilityBorder)
     else
-      mobilityForce(unit, unit.pixelCenter.zone.maxMobility, With.grids.mobility)
+      mobilityForce(unit.pixelCenter, unit.pixelCenter.zone.maxMobility, With.grids.mobility)
   }
   
-  def mobilityForce(unit: FriendlyUnitInfo, maxMobility: Int, mobilitySource: AbstractGrid[Int]): Force = {
-    val tile                = unit.tileIncludingCenter
+  def mobilityForce(pixel: Pixel, maxMobility: Int, mobilitySource: AbstractGrid[Int]): Force = {
+    val tile                = pixel.tileIncluding
     val mobility            = mobilitySource.get(tile)
     val forces              = tile.adjacent8.map(neighbor => singleMobilityForce(tile, neighbor, mobilitySource))
     val totalForce          = forces.reduce(_ + _)

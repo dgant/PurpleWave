@@ -22,6 +22,7 @@ object ShowMobility extends View {
     if (force.lengthFast > 0.0) {
       val forceNormal = force.normalize(12.0)
       val pixelEnd    = pixelStart.add(forceNormal.x.toInt, forceNormal.y.toInt)
+      DrawMap.circle(pixelStart, 3, Colors.MediumGreen)
       DrawMap.line(pixelStart, pixelEnd, Colors.MediumGreen)
     }
   }

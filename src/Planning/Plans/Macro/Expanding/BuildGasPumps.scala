@@ -23,11 +23,13 @@ class BuildGasPumps(quantity: Int = Int.MaxValue, pumpType: UnitClass = With.sel
   
   override def onUpdate(): Unit = {
     val eligibleBases       = With.geography.ourBases.filter(base => base.townHall.exists(_.remainingBuildFrames <= pumpType.buildFrames)).toSeq.sortBy(-_.gasLeft).sortBy(_.townHall.exists(_.complete))
-    val eligibleGas         = eligibleBases.flatMap(_.gas).filter(_.player.isNeutral)
-    val eligibleBlueprints  = eligibleGas.map(_.tileTopLeft).map(blueprints)
+    val eligibleGas         = eligibleBases.flatMap(_.gas)
+    val eligibleGasToTake   = eligibleGas.filter(_.player.isNeutral)
+    val eligibleBlueprints  = eligibleGasToTake.map(_.tileTopLeft).map(blueprints)
     val finalBlueprints     = eligibleBlueprints.take(quantity)
+    val gasToRequest        = Math.min(quantity, eligibleGas.size)
     finalBlueprints.foreach(With.groundskeeper.propose)
-    With.scheduler.request(this, RequestAtLeast(eligibleBlueprints.size, pumpType))
+    With.scheduler.request(this, RequestAtLeast(gasToRequest, pumpType))
   }
   
 }

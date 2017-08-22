@@ -62,7 +62,7 @@ object PotentialFieldMath {
   def singleMobilityForce(here: Tile, there: Tile, mobilitySource: AbstractGrid[Int]): Force = {
     val mobilityHere  = mobilitySource.get(here)
     val mobilityThere = mobilitySource.get(there)
-    val magnitude     = PurpleMath.signum(mobilityThere - mobilityHere)
+    val magnitude     = PurpleMath.signum(mobilityHere - mobilityThere)
     val output        = BuildForce.fromPixels(there.pixelCenter, here.pixelCenter, magnitude.toInt)
     output
   }

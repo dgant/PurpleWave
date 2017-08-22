@@ -138,7 +138,11 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   
   lazy val isMineralBlocker: Boolean = unitClass.isMinerals && mineralsLeft < 50
   
-  def subjectiveValue: Int = unitClass.subjectiveValue + scarabCount * Protoss.Scarab.subjectiveValue + interceptorCount * Protoss.Interceptor.subjectiveValue
+  def subjectiveValue: Int =
+    unitClass.subjectiveValue
+    + scarabCount * Protoss.Scarab.subjectiveValue
+    + interceptorCount * Protoss.Interceptor.subjectiveValue
+    + friendly.map(_.loadedUnits.map(_.subjectiveValue).sum).sum
   
   //////////////
   // Geometry //
@@ -359,9 +363,10 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
     )))
   
   def canAttack(enemy: UnitInfo): Boolean =
-    canAttack                   &&
-    enemy.canBeAttacked         &&
-    ! enemy.effectivelyCloaked  && // Eh.
+    canAttack                             &&
+    enemy.canBeAttacked                   &&
+    ! enemy.effectivelyCloaked            && // Eh.
+    ! enemy.friendly.exists(_.transport.isDefined) &&
     (if (enemy.flying) unitClass.attacksAir else unitClass.attacksGround) &&
     ( ! enemy.unitClass.floats || ! unitClass.suicides || ! is(Terran.SpiderMine))
   

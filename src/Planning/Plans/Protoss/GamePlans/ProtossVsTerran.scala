@@ -27,6 +27,7 @@ class ProtossVsTerran extends Parallel {
   
   private class ImplementEarly14Nexus       extends FirstEightMinutes(new Build(ProtossBuilds.Opening13Nexus_NoZealot_OneGateCore: _*))
   private class ImplementEarly1GateRange    extends FirstEightMinutes(new Build(ProtossBuilds.Opening_1GateCore: _*))
+  private class ImplementEarly1GateReaver   extends FirstEightMinutes(new Build(ProtossBuilds.Opening_1GateCore: _*))
   private class ImplementEarly2GateObs      extends FirstEightMinutes(new Build(ProtossBuilds.Opening_1GateCore: _*))
   private class ImplementEarly1015GateGoon  extends FirstEightMinutes(new Build(ProtossBuilds.OpeningTwoGate1015Dragoons: _*))
   private class ImplementEarlyDTExpand      extends FirstEightMinutes(new Build(ProtossBuilds.OpeningDTExpand: _*))
@@ -34,6 +35,7 @@ class ProtossVsTerran extends Parallel {
   private class FulfillEarlyTech extends Build(
     RequestAtLeast(1,   Protoss.Pylon),
     RequestAtLeast(1,   Protoss.Gateway),
+    RequestAtLeast(1,   Protoss.Assimilator),
     RequestAtLeast(1,   Protoss.CyberneticsCore),
     RequestUpgrade(Protoss.DragoonRange))
   
@@ -142,10 +144,11 @@ class ProtossVsTerran extends Parallel {
     
     // Early game
     new RequireBareMinimum,
-    new Employ(PvTEarly14Nexus,      new ImplementEarly14Nexus),
-    new Employ(PvTEarly1GateRange,   new ImplementEarly1GateRange),
-    new Employ(PvTEarly1015GateGoon, new ImplementEarly1015GateGoon),
-    new Employ(PvTEarlyDTExpand,     new ImplementEarlyDTExpand),
+    new Employ(PvTEarly14Nexus,       new ImplementEarly14Nexus),
+    new Employ(PvTEarly1GateRange,    new ImplementEarly1GateRange),
+    new Employ(PvTEarly1GateReaver,   new ImplementEarly1GateReaver),
+    new Employ(PvTEarly1015GateGoon,  new ImplementEarly1015GateGoon),
+    new Employ(PvTEarlyDTExpand,      new ImplementEarlyDTExpand),
     
     new RequireSufficientSupply,
     new TrainWorkersContinuously,

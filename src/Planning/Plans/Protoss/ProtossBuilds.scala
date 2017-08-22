@@ -15,7 +15,7 @@ object ProtossBuilds {
     RequestAtLeast(1,   Protoss.Pylon),
     RequestAtLeast(10,  Protoss.Probe),
     RequestAtLeast(1,   Protoss.Gateway),
-    RequestAtLeast(12,  Protoss.Probe),
+    RequestAtLeast(11,  Protoss.Probe),
     RequestAtLeast(1,   Protoss.Assimilator),
     RequestAtLeast(13,  Protoss.Probe),
     RequestAtLeast(1,   Protoss.CyberneticsCore),

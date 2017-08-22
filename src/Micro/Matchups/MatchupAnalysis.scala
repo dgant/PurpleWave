@@ -66,7 +66,7 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
   def framesToRetreatDiffused   : Double = Math.max(0.0, framesOfEntanglementDiffused)
   def framesToRetreatCurrently  : Double = Math.max(0.0, framesOfEntanglementCurrently)
   
-  def dpfDealingDiffused  (target: UnitInfo): Double = me.dpfOnNextHitAgainst(target) / Math.max(1.0, targets.size)
+  def dpfDealingDiffused  (target: UnitInfo): Double = me.dpfOnNextHitAgainst(target) / Math.max(1.0, targetsInRange.size)
   def dpfDealingCurrently (target: UnitInfo): Double =
     if ( ! me.canAttack)
       0.0

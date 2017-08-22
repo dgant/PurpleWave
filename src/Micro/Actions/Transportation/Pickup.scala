@@ -21,7 +21,7 @@ object Pickup extends Action {
     var spaceRemaining = unit.spaceRemaining
     passengersPotential.foreach(passenger => {
       val spaceRequired = passenger.unitClass.spaceRequired
-      if (spaceRequired >= spaceRemaining) {
+      if (spaceRequired <= spaceRemaining) {
         spaceRemaining -= spaceRequired
         passengersAccepted += passenger
         passenger.agent.toBoard = Some(unit)

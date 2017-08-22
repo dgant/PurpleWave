@@ -23,6 +23,14 @@ object PurpleMath {
     if (value.isNaN || value.isInfinity) Double.PositiveInfinity else value
   }
   
+  def clampRatio(value: Double, ratio: Double): Double = clamp(value, ratio, 1.0 / ratio)
+  
+  def clamp(value: Double, value1: Double, value2: Double): Double = {
+    val min = Math.min(value1, value2)
+    val max = Math.max(value1, value2)
+    Math.min(max, Math.max(value, min))
+  }
+  
   def clampToOne(value: Double): Double = Math.max(0.0, Math.min(1.0, value))
   
   def signum(int: Int): Int = if (int == 0) 0 else if (int < 0) -1 else 1

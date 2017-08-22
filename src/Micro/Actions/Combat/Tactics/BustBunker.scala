@@ -2,7 +2,7 @@ package Micro.Actions.Combat.Tactics
 
 import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Actions.Combat.Maneuvering.Retreat
+import Micro.Actions.Combat.Maneuvering.Avoid
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import bwapi.Race
@@ -40,7 +40,7 @@ object BustBunker extends Action {
         threat.is(Terran.Bunker) &&
         threat.pixelDistanceSlow(unit) < With.configuration.bunkerSafetyMargin)
       ) {
-      Retreat.delegate(unit)
+      Avoid.delegate(unit)
     }
   }
 }

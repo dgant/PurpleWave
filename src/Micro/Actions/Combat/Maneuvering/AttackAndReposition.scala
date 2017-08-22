@@ -12,7 +12,6 @@ object AttackAndReposition extends Action {
   }
   
   override def perform(unit: FriendlyUnitInfo) {
-  
     Target.delegate(unit)
     if (unit.cooldownLeft > 0 && (unit.matchups.targets.isEmpty || unit.matchups.targetsInRange.nonEmpty)) {
       Avoid.delegate(unit)

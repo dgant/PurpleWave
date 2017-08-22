@@ -46,13 +46,34 @@ class Battle(
     val urgencyOurs       = focus.pixelDistanceFast(nearestBaseEnemy)
     val urgencyEnemy      = focus.pixelDistanceFast(nearestBaseOurs)
     val fighters          = us.units.filter(_.canAttack)
-    val aggressiveDesire  = With.blackboard.aggressionRatio
-    val geographicDesire  = if (enemy.units.exists(_.unitClass.isSiegeTank)) Math.max(0.8, PurpleMath.nanToInfinity(urgencyOurs / urgencyEnemy)) else 1.0
-    val bonusDesire       = With.blackboard.battleDesire * geographicDesire * aggressiveDesire
+    val aggressionDesire  = With.blackboard.aggressionRatio
+    val flexibilityFactor = 1.3
+    val flexibilityOurs   = meanFlexibility(us.units)
+    val flexibilityEnemy  = meanFlexibility(enemy.units)
+    val flexibilityRatio  = flexibilityOurs / flexibilityEnemy
+    val flexibilityDesire = PurpleMath.clampRatio(flexibilityOurs / flexibilityEnemy, flexibilityFactor)
+    val urgencyFactor     = 1.5
+    val urgencyDesire     = PurpleMath.clampRatio(urgencyOurs / urgencyEnemy, urgencyFactor)
+    val terrainFactor     = 1.3
+    val terrainDesire     = if (us.centroid.zone != enemy.centroid.zone) 1.0 / terrainFactor else 1.0
+    val bonusDesire       = aggressionDesire * flexibilityDesire * urgencyDesire * terrainDesire
     val estimationAttack  = estimationSimulationAttack
     val estimationRetreat = estimationSimulationRetreat
     val output            = bonusDesire * estimationAttack.costToEnemy + estimationRetreat.costToUs - estimationAttack.costToUs - estimationRetreat.costToEnemy
     output
+  }
+  
+  private def meanFlexibility(units: Seq[UnitInfo]): Double = {
+    val fighters = units.filter(_.damageOnHitMax > 0)
+    val totalFlexibility = fighters.map(fighter => flexibility(fighter) * fighter.subjectiveValue).sum
+    val denominator = Math.max(fighters.map(_.subjectiveValue).sum, 1.0)
+    totalFlexibility / denominator
+  }
+  
+  private def flexibility(unit: UnitInfo): Double = {
+    val rangeFlexibility = unit.pixelRangeMax
+    val speedFlexibility = unit.topSpeed * 24.0 * (if (unit.flying) 2.0 else 1.0)
+    Math.max(rangeFlexibility, speedFlexibility)
   }
   
   lazy val globalSafeToAttack: Boolean = {

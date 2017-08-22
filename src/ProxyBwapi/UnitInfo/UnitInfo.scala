@@ -312,6 +312,7 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   def damageUpgradeLevel  : Int = unitClass.damageUpgradeType.map(player.getUpgradeLevel).getOrElse(0)
   def damageOnHitGround   : Int = damageOnHitGroundCache.get
   def damageOnHitAir      : Int = damageOnHitAirCache.get
+  def damageOnHitMax      : Int = Math.max(damageOnHitAir, damageOnHitGround)
   private val damageOnHitGroundCache  = new CacheFrame(() => unitClass.effectiveGroundDamage  + unitClass.groundDamageBonusRaw  * damageUpgradeLevel)
   private val damageOnHitAirCache     = new CacheFrame(() => unitClass.effectiveAirDamage     + unitClass.airDamageBonusRaw     * damageUpgradeLevel)
   

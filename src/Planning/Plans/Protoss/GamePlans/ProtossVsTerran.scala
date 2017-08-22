@@ -177,7 +177,6 @@ class ProtossVsTerran extends Parallel {
         RequestAtLeast(1, Protoss.RoboticsSupportBay),
         RequestAtLeast(1, Protoss.Shuttle),
         RequestAtLeast(1, Protoss.Reaver),
-        RequestAtLeast(2, Protoss.Gateway),
         RequestUpgrade(Protoss.DragoonRange))
     )),
     

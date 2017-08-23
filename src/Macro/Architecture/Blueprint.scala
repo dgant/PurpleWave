@@ -41,14 +41,14 @@ class Blueprint(
   
   def fulfilledBy(proposal: Blueprint): Boolean = {
     if (proposal == this) return true
-    widthTiles.get  <= proposal.widthTiles.get                        &&
-    heightTiles.get <= proposal.heightTiles.get                       &&
-    proposal.powers == powers                                         &&
-    ( ! requirePower.get        || proposal.requirePower.get)         &&
-    ( ! requireTownHallTile.get || proposal.requireTownHallTile.get)  &&
-    requireGasTile.get == proposal.requireGasTile.get                 &&
-    (requireZone.isEmpty || requireZone == proposal.requireZone)      &&
-    (proposal.building.isEmpty || building == proposal.building)
+    widthTiles.get  <= proposal.widthTiles.get                            &&
+    heightTiles.get <= proposal.heightTiles.get                           &&
+    proposal.powers == powers                                             &&
+    requireGasTile.get == proposal.requireGasTile.get                     &&
+    ( ! requirePower.get        || proposal.requirePower.get)             &&
+    ( ! requireTownHallTile.get || proposal.requireTownHallTile.get)      &&
+    (requireZone.isEmpty        || requireZone  == proposal.requireZone)  &&
+    (proposal.building.isEmpty  || building     == proposal.building)
   }
   
   def relativeBuildStart  : Tile  = Tile(0, 0)

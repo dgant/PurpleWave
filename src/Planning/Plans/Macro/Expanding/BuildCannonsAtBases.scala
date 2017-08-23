@@ -8,7 +8,7 @@ import Macro.BuildRequests.{RequestAnother, RequestAtLeast}
 import Planning.Plan
 import ProxyBwapi.Races.Protoss
 
-class BuildCannonsAtBases(count: Int) extends Plan {
+class BuildCannonsAtBases(cannonsRequired: Int) extends Plan {
   
   override def onUpdate() {
     val bases = eligibleBases
@@ -37,7 +37,7 @@ class BuildCannonsAtBases(count: Int) extends Plan {
   private val cannonBlueprintsByZone = With.geography.zones
     .map(zone => (
       zone,
-      (1 to count).map(i =>
+      (1 to cannonsRequired).map(i =>
         new Blueprint(this,
           building          = Some(Protoss.PhotonCannon),
           requireZone       = Some(zone),
@@ -46,20 +46,21 @@ class BuildCannonsAtBases(count: Int) extends Plan {
     .toMap
   
   protected def eligibleBases: Iterable[Base] = {
-    With.geography.ourBases
+    With.geography.ourBases.toSeq.sortBy(_.heart.i) //Arbitrary but stable ordering
   }
   
   private def cannonZone(zone: Zone) {
-    val pylonsInZone  = With.units.ours.count(unit => unit.is(Protoss.Pylon)        && unit.pixelCenter.zone == zone)
-    val cannonsInZone = With.units.ours.count(unit => unit.is(Protoss.PhotonCannon) && unit.pixelCenter.zone == zone)
-    val cannonsToAdd  = count - cannonsInZone
-    val pylonsToAdd   = 1 + cannonsToAdd / 5 - pylonsInZone
+    lazy val pylonsInZone    = With.units.ours.filter(unit => unit.is(Protoss.Pylon)        && unit.pixelCenter.zone == zone)
+    lazy val cannonsInZone   = With.units.ours.filter(unit => unit.is(Protoss.PhotonCannon) && unit.pixelCenter.zone == zone)
+    lazy val cannonsToAdd    = cannonsRequired - cannonsInZone.size
     
     if (cannonsToAdd <= 0) return
     
-    With.groundskeeper.propose(pylonBlueprintByZone(zone))
-    With.scheduler.request(this, RequestAnother(pylonsToAdd, Protoss.Pylon))
-    if (pylonsToAdd <= 0) {
+    if (pylonsInZone.isEmpty) {
+      With.groundskeeper.propose(pylonBlueprintByZone(zone))
+      With.scheduler.request(this, RequestAnother(1, Protoss.Pylon))
+    }
+    else if (pylonsInZone.exists(_.aliveAndComplete)) {
       cannonBlueprintsByZone(zone).foreach(With.groundskeeper.propose)
       With.scheduler.request(this, RequestAnother(cannonsToAdd, Protoss.PhotonCannon))
     }

@@ -6,14 +6,14 @@ import Performance.Caching.CacheFrame
 class Latency {
   
   var lastRunFrame = 0
-  var latencyFrames: Int   = With.game.getLatencyFrames
+  var latencyFrames: Int = With.game.getLatencyFrames
   var minRemainingLatencyFrames: Int = latencyFrames
   
   def onFrame() {
     minRemainingLatencyFrames = Math.min(minRemainingLatencyFrames, With.game.getRemainingLatencyFrames)
   }
   
-  def framesRemaining:Int = remainingFramesCache.get
+  def framesRemaining: Int = remainingFramesCache.get
   private val remainingFramesCache = new CacheFrame(() => With.game.getRemainingLatencyFrames)
   
   def turnSize:Int = {

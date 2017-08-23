@@ -30,6 +30,7 @@ class BuildCannonsAtBases(count: Int) extends Plan {
       new Blueprint(this,
         building          = Some(Protoss.Pylon),
         requireZone       = Some(zone),
+        requireCandidates = Some(zone.tiles),
         placementProfile  = Some(PlacementProfiles.hugWorkersWithPylon))))
     .toMap
   
@@ -40,6 +41,7 @@ class BuildCannonsAtBases(count: Int) extends Plan {
         new Blueprint(this,
           building          = Some(Protoss.PhotonCannon),
           requireZone       = Some(zone),
+          requireCandidates = Some(zone.tiles),
           placementProfile  = Some(PlacementProfiles.hugWorkersWithCannon)))))
     .toMap
   

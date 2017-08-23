@@ -152,7 +152,7 @@ class ProtossVsTerran extends Parallel {
     new Employ(PvTEarlyDTExpand,      new FirstEightMinutes(new Build(ProtossBuilds.OpeningDTExpand: _*))),
     
     new RequireSufficientSupply,
-    new TrainWorkersContinuously,
+    new TrainWorkersContinuously(oversaturate = true),
     
     ///////////////////
     // One-base tech //

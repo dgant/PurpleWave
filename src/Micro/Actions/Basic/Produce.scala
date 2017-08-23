@@ -7,7 +7,12 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 object Produce extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.trainingQueue.isEmpty
+    unit.trainingQueue.isEmpty &&
+    (
+      unit.agent.toTrain.isDefined  ||
+      unit.agent.toTech.isDefined   ||
+      unit.agent.toUpgrade.isDefined
+    )
   }
   
   override def perform(unit: FriendlyUnitInfo) {

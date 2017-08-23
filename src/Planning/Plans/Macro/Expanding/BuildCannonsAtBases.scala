@@ -61,8 +61,10 @@ class BuildCannonsAtBases(cannonsRequired: Int) extends Plan {
       With.scheduler.request(this, RequestAnother(1, Protoss.Pylon))
     }
     else if (pylonsInZone.exists(_.aliveAndComplete)) {
-      cannonBlueprintsByZone(zone).foreach(With.groundskeeper.propose)
-      With.scheduler.request(this, RequestAnother(cannonsToAdd, Protoss.PhotonCannon))
+      // Defensive programming measure. If we try re-proposing fulfilled blueprints we may just build cannons forever.
+      val newBlueprints = cannonBlueprintsByZone(zone).filterNot(With.groundskeeper.proposalsFulfilled.contains).take(cannonsToAdd)
+      newBlueprints.foreach(With.groundskeeper.propose)
+      With.scheduler.request(this, RequestAnother(newBlueprints.size, Protoss.PhotonCannon))
     }
   }
 }

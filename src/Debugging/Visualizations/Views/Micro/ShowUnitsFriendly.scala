@@ -17,15 +17,16 @@ object ShowUnitsFriendly extends View {
     if ( ! With.viewport.contains(agent.unit.pixelCenter)) return
     if ( ! agent.unit.unitClass.orderable) return
     
-    var showClient    : Boolean = true
-    var showAction    : Boolean = true
-    var showCommand   : Boolean = false
-    var showOrder     : Boolean = false
-    var showTargets   : Boolean = false
-    var showFormation : Boolean = true
-    var showKiting    : Boolean = false
-    var showForces    : Boolean = true
-    var showDesire    : Boolean = true
+    var showClient      : Boolean = true
+    var showAction      : Boolean = true
+    var showCommand     : Boolean = false
+    var showOrder       : Boolean = false
+    var showTargets     : Boolean = false
+    var showFormation   : Boolean = true
+    var showKiting      : Boolean = false
+    var showForces      : Boolean = true
+    var showDesire      : Boolean = true
+    var showExplosions  : Boolean = true
     
     if (showClient) {
       agent.lastClient.foreach(plan =>
@@ -108,6 +109,12 @@ object ShowUnitsFriendly extends View {
     if (showDesire) {
       val color = if (agent.shouldEngage) Colors.NeonGreen else Colors.NeonRed
       DrawMap.circle(agent.unit.pixelCenter, 8, color)
+    }
+    
+    if (showExplosions) {
+      agent.explosions.foreach(explosion => {
+        DrawMap.circle(explosion.pixelCenter, explosion.safetyRadius.toInt, Colors.NeonYellow)
+      })
     }
   }
 }

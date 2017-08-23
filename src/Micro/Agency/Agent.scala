@@ -119,6 +119,7 @@ class Agent(val unit: FriendlyUnitInfo) {
     unit.agent.desireTeam         = 1.0
     unit.agent.desireIndividual   = 1.0
     unit.agent.desireTotal        = 1.0
+    unit.agent.explosions         = new ListBuffer[Explosion]
     unit.agent.targetingProfile   = TargetingProfiles.default
     unit.agent.pathsAll           = Seq.empty
     unit.agent.pathsTruncated     = Seq.empty

@@ -5,6 +5,7 @@ import Lifecycle.With
 import Mathematics.Physics.{BuildForce, Force}
 import Mathematics.Points.{Pixel, Tile}
 import Mathematics.PurpleMath
+import Micro.Agency.Explosion
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
@@ -30,6 +31,21 @@ object Potential {
     val magnitudeDistance = Math.max(1.0, threat.framesToGetInRange(unit)) //This may fail vs. static defense -- we may want a bit more force
     val magnitudeFinal    = magnitudeDamage / magnitudeDistance
     val output            = unitAttraction(unit, threat, -magnitudeFinal)
+    output
+  }
+  
+  def explosionsRepulsion(unit: FriendlyUnitInfo): Force = {
+    val explosions  = unit.agent.explosions
+    val forces      = explosions.map(explosionRepulsion(unit, _))
+    val output      = sum(forces).normalize
+    output
+  }
+  
+  def explosionRepulsion(unit: FriendlyUnitInfo, explosion: Explosion): Force = {
+    val magnitudeDamage   = explosion.damage
+    val magnitudeDistance = explosion.safetyRadius / Math.max(1.0, unit.pixelDistanceFast(explosion.pixelCenter))
+    val magnitudeFinal    = magnitudeDamage / magnitudeDistance
+    val output            = BuildForce.fromPixels(unit.pixelCenter, explosion.pixelCenter, -magnitudeFinal)
     output
   }
   

@@ -8,6 +8,6 @@ class TaskGeography extends AbstractTask {
   urgency = With.configuration.urgencyGeography
   
   override protected def onRun() {
-   With.geography.update()
+    With.geography.update()
   }
 }

@@ -116,53 +116,52 @@ class Agent(val unit: FriendlyUnitInfo) {
   
   private def resetState() {
     forces.clear()
-    unit.agent.desireTeam         = 1.0
-    unit.agent.desireIndividual   = 1.0
-    unit.agent.desireTotal        = 1.0
-    unit.agent.explosions         = new ListBuffer[Explosion]
-    unit.agent.targetingProfile   = TargetingProfiles.default
-    unit.agent.pathsAll           = Seq.empty
-    unit.agent.pathsTruncated     = Seq.empty
-    unit.agent.pathsAcceptable    = Seq.empty
-    unit.agent.pathAccepted       = Seq.empty
+    explosions.clear
+    desireTeam         = 1.0
+    desireIndividual   = 1.0
+    desireTotal        = 1.0    
+    targetingProfile   = TargetingProfiles.default
+    pathsAll           = Seq.empty
+    pathsTruncated     = Seq.empty
+    pathsAcceptable    = Seq.empty
+    pathAccepted       = Seq.empty
   }
   
   private def followIntent() {
-    val intent = unit.agent.lastIntent
-    unit.agent.toReturn     = intent.toReturn
-    unit.agent.toTravel     = intent.toTravel
-    unit.agent.toAttack     = intent.toAttack
-    unit.agent.toScan       = intent.toScan
-    unit.agent.toGather     = intent.toGather
-    unit.agent.toAddon      = intent.toAddon
-    unit.agent.toBuild      = intent.toBuild
-    unit.agent.toBuildTile  = intent.toBuildTile
-    unit.agent.toTrain      = intent.toTrain
-    unit.agent.toTech       = intent.toTech
-    unit.agent.toFinish     = intent.toFinish
-    unit.agent.toUpgrade    = intent.toUpgrade
-    unit.agent.toForm       = intent.toForm
-    unit.agent.toBoard      = None
-    unit.agent.canFight     = intent.canAttack
-    unit.agent.canFlee      = intent.canFlee
-    unit.agent.canCower     = intent.canCower
-    unit.agent.canMeld      = intent.canMeld
-    unit.agent.canScout     = intent.canScout
-    unit.agent.canPillage   = intent.canPillage
+    val intent    = lastIntent
+    toReturn     = intent.toReturn
+    toTravel     = intent.toTravel
+    toAttack     = intent.toAttack
+    toScan       = intent.toScan
+    toGather     = intent.toGather
+    toAddon      = intent.toAddon
+    toBuild      = intent.toBuild
+    toBuildTile  = intent.toBuildTile
+    toTrain      = intent.toTrain
+    toTech       = intent.toTech
+    toFinish     = intent.toFinish
+    toUpgrade    = intent.toUpgrade
+    toForm       = intent.toForm
+    toBoard      = None
+    canFight     = intent.canAttack
+    canFlee      = intent.canFlee
+    canCower     = intent.canCower
+    canMeld      = intent.canMeld
+    canScout     = intent.canScout
+    canPillage   = intent.canPillage
   }
   
   private def cleanUp() {
-    unit.agent.shovers.clear()
-    explosions.clear()
+    shovers.clear()
   }
   
   private def calculateOrigin: Pixel = {
     lazy val anchors = unit.matchups.allies.filter(isAnchor)
-    if (unit.agent.toReturn.isDefined) {
-      unit.agent.toReturn.get
+    if (toReturn.isDefined) {
+      toReturn.get
     }
-    else if (unit.agent.toForm.isDefined) {
-      unit.agent.toForm.get
+    else if (toForm.isDefined) {
+      toForm.get
     }
     else if (anchors.nonEmpty) {
       anchors.minBy(_.pixelDistanceFast(unit)).pixelCenter

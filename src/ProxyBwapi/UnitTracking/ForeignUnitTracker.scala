@@ -101,7 +101,7 @@ class ForeignUnitTracker {
   private def updateMissing(unit: ForeignUnitInfo) {
     
     if (unit.lastSeenWithin(24)) {
-      if (unit.order == Orders.Burrowing || unit.burrowed) {
+      if (Array(Orders.Burrowing, Orders.VultureMine).contains(unit.order) || unit.burrowed) {
         unit.flagBurrowed()
         if (unit.effectivelyCloaked) return
       }

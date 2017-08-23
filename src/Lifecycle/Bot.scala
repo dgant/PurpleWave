@@ -58,6 +58,15 @@ class Bot() extends DefaultBWListener {
       With.logger.onException(exception)}
   }
   
+  override def onUnitHide(unit: bwapi.Unit) {
+    try {
+    }
+    catch { case exception: Exception =>
+      val dontLoseTheExceptionWhileDebugging = exception
+      val dontLoseTheStackTraceWhileDebugging = exception.getStackTrace
+      With.logger.onException(exception)}
+  }
+  
   override def onEnd(isWinner: Boolean) {
     try {
       With.history.onEnd(isWinner)

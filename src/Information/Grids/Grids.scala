@@ -2,7 +2,7 @@ package Information.Grids
 
 import Information.Grids.Construction._
 import Information.Grids.Movement._
-import Information.Grids.Vision.{GridAltitudeBonus, GridEnemyDetection, GridFriendlyVision}
+import Information.Grids.Vision.{GridAltitudeBonus, GridEnemyDetection, GridFriendlyDetection, GridFriendlyVision}
 
 class Grids {
   
@@ -13,6 +13,7 @@ class Grids {
   val creep             = new GridCreep
   val friendlyVision    = new GridFriendlyVision
   val enemyDetection    = new GridEnemyDetection
+  val friendlyDetection = new GridFriendlyDetection
   val mobility          = new GridMobility
   val mobilityTerrain   = new GridMobilityTerrain
   val mobilityBuildings = new GridMobilityBuildings

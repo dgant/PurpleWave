@@ -21,7 +21,7 @@ object Duck extends Action {
     unit.agent.explosions ++= getExplosions(unit)
     
     if (unit.agent.explosions.nonEmpty) {
-      val forceExplosion  = Potential.threatsRepulsion(unit)
+      val forceExplosion  = Potential.explosionsRepulsion(unit)
       val forceMobility   = Potential.mobilityForce(unit)
       val forceSpreading  = Potential.spreadingForce(unit)
       unit.agent.forces.put(Colors.NeonYellow,  forceExplosion)
@@ -36,7 +36,7 @@ object Duck extends Action {
     
     output ++= unit.matchups.threats.flatMap(threat => explosion(unit, threat))
     
-    output.filter(explosion => explosion.safetyRadius < unit.pixelDistanceFast(explosion.pixelCenter))
+    output.filter(explosion => explosion.safetyRadius > unit.pixelDistanceFast(explosion.pixelCenter))
   }
   
   private def explosion(unit: FriendlyUnitInfo, threat: UnitInfo): Option[Explosion] = {
@@ -58,8 +58,8 @@ object Duck extends Action {
       else {
         
         // Don't run if we're the target -- instead let other people run away from us.
-        val target = threat.target.orElse(ByOption.minBy(threat.matchups.targets)(_.pixelDistanceFast(threat)))
-        if ( ! target.contains(unit)) {
+        lazy val target = threat.target.orElse(ByOption.minBy(threat.matchups.targets)(_.pixelDistanceFast(threat)))
+        if (threat.moving && ! target.contains(unit)) {
           val safetyMarginPixels = 0.0
           Some(Explosion(
             threat.projectFrames(12),

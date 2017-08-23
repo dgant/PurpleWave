@@ -5,8 +5,8 @@ import Mathematics.Points.Tile
 
 abstract class AbstractGrid[T] {
   
-  val width = With.mapTileWidth
-  val height = With.mapTileHeight
+  val width: Int = With.mapTileWidth
+  val height: Int = With.mapTileHeight
   
   protected val length: Int = width * height
   

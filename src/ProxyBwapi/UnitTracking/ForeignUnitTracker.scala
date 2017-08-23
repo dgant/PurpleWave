@@ -21,7 +21,7 @@ class ForeignUnitTracker {
   def get(someUnit  : bwapi.Unit) : Option[ForeignUnitInfo] = get(someUnit.getID)
   def get(id        : Int)        : Option[ForeignUnitInfo] = foreignUnitsById.get(id)
   
-  private val limitInvalidatePixels = new Limiter(1, invalidatePositions)
+  private val limitInvalidatePositions = new Limiter(1, invalidatePositions)
   def update() {
     initialize()
     
@@ -50,7 +50,7 @@ class ForeignUnitTracker {
     neutralUnits = foreignUnits.filter(_.player.isNeutral)
   
     unitsToFlagInvisible.foreach(_.flagInvisible())
-    limitInvalidatePixels.act()
+    limitInvalidatePositions.act()
   }
   
   def onUnitDestroy(unit:bwapi.Unit) {
@@ -58,13 +58,7 @@ class ForeignUnitTracker {
   }
   
   private def invalidatePositions() {
-    foreignUnits.filter(unit =>
-      unit.possiblyStillThere
-      && With.framesSince(unit.lastSeen) > 24
-      &&  ! unit.visible
-      &&  ! unit.effectivelyCloaked
-      &&  unit.tileArea.tiles.forall(tile => With.game.isVisible(tile.bwapi)))
-      .foreach(updateMissing)
+    foreignUnits.foreach(updateMissing)
   }
   
   private def initialize() {
@@ -99,15 +93,26 @@ class ForeignUnitTracker {
   }
   
   private def updateMissing(unit: ForeignUnitInfo) {
+  
+    if (unit.visible) return
+    if ( ! unit.possiblyStillThere) return
+    if (unit.lastSeen > With.grids.friendlyVision.lastUpdateFrame) return
     
-    if (unit.lastSeenWithin(24)) {
-      if (Array(Orders.Burrowing, Orders.VultureMine).contains(unit.order) || unit.burrowed) {
-        unit.flagBurrowed()
-        if (unit.effectivelyCloaked) return
-      }
-      else if (unit.order == Orders.Cloak || unit.cloaked) {
-        unit.flagCloaked()
-        if (unit.effectivelyCloaked) return
+    lazy val shouldBeVisible  = With.grids.friendlyVision.visible(unit.tileIncludingCenter)
+    lazy val shouldBeDetected = With.grids.friendlyDetection.get(unit.tileIncludingCenter)
+    lazy val wasBurrowing     = unit.burrowed || Array(Orders.Burrowing, Orders.VultureMine).contains(unit.order)
+    lazy val wasCloaking      = unit.cloaked  || unit.order == Orders.Cloak
+
+    if (shouldBeVisible) {
+      if ( ! shouldBeDetected) {
+        if (wasBurrowing) {
+          unit.flagBurrowed()
+          return
+        }
+        else if (wasCloaking) {
+          unit.flagCloaked()
+          return
+        }
       }
     }
     

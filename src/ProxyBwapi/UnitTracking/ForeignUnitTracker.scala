@@ -97,6 +97,8 @@ class ForeignUnitTracker {
     if (unit.visible) return
     if ( ! unit.possiblyStillThere) return
     if (unit.lastSeen > With.grids.friendlyVision.lastUpdateFrame) return
+    if (unit.lastSeen > With.grids.friendlyDetection.lastUpdateFrame) return
+    if (With.framesSince(unit.lastSeen) < 48) return
     
     lazy val shouldBeVisible  = With.grids.friendlyVision.visible(unit.tileIncludingCenter)
     lazy val shouldBeDetected = With.grids.friendlyDetection.get(unit.tileIncludingCenter)
@@ -114,10 +116,10 @@ class ForeignUnitTracker {
           return
         }
       }
+  
+      //Well, if it can't move, it must be dead. Like a building that burned down or was otherwise destroyed.
+      if (unit.unitClass.canMove) unit.flagMissing() else remove(unit)
     }
-    
-    //Well, if it can't move, it must be dead. Like a building that burned down or was otherwise destroyed.
-    if (unit.unitClass.canMove) unit.flagMissing() else remove(unit)
   }
   
   private def remove(unit: ForeignUnitInfo) {

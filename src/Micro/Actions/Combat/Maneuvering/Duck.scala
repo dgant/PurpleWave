@@ -22,8 +22,8 @@ object Duck extends Action {
     
     if (unit.agent.explosions.nonEmpty) {
       val forceExplosion  = Potential.explosionsRepulsion(unit)
-      val forceMobility   = Potential.mobilityForce(unit)
-      val forceSpreading  = Potential.spreadingForce(unit)
+      val forceMobility   = Potential.barrierRepulsion(unit)
+      val forceSpreading  = Potential.collisionRepulsion(unit)
       unit.agent.forces.put(Colors.NeonYellow,  forceExplosion)
       unit.agent.forces.put(Colors.NeonGreen,   forceMobility)
       unit.agent.forces.put(Colors.NeonViolet,  forceSpreading)
@@ -62,7 +62,7 @@ object Duck extends Action {
         if (threat.moving && ! target.contains(unit)) {
           val safetyMarginPixels = 0.0
           Some(Explosion(
-            threat.projectFrames(12),
+            threat.projectFrames(4),
             32.0 * 2.0 + 10.0 + unit.unitClass.radialHypotenuse + safetyMarginPixels,
             threat.damageOnNextHitAgainst(unit) // 3 is the range; 1 is the safety margin to avoid triggering it
           ))
@@ -77,7 +77,7 @@ object Duck extends Action {
       // Don't run if we're the target -- instead let other people run away from us.
       val target = threat.target.orElse(ByOption.minBy(threat.matchups.targets)(_.pixelDistanceFast(threat)))
       if ( ! target.contains(unit)) {
-        val targetPixel = target.map(_.pixelCenter).getOrElse(threat.projectFrames(12))
+        val targetPixel = target.map(_.pixelCenter).getOrElse(threat.projectFrames(4))
         val safetyMarginPixels = 32.0
         Some(Explosion(
           targetPixel,

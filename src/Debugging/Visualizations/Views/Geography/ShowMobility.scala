@@ -18,7 +18,7 @@ object ShowMobility extends View {
   
   def renderMapMobility(tile: Tile) {
     val pixelStart  = tile.pixelCenter
-    val force       = Potential.mobilityForce(pixelStart, tile.zone.maxMobility, With.grids.mobility)
+    val force       = Potential.barrierRepulsion(pixelStart, tile.zone.maxMobility, With.grids.mobility)
     if (force.lengthFast > 0.0) {
       val forceNormal = force.normalize(12.0)
       val pixelEnd    = pixelStart.add(forceNormal.x.toInt, forceNormal.y.toInt)

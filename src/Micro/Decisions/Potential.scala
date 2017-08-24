@@ -72,14 +72,14 @@ object Potential {
     output
   }
   
-  def mobilityForce(unit: FriendlyUnitInfo): Force = {
+  def barrierRepulsion(unit: FriendlyUnitInfo): Force = {
     if (unit.flying)
-      mobilityForce(unit.pixelCenter, 12, With.grids.mobilityBorder)
+      barrierRepulsion(unit.pixelCenter, 12, With.grids.mobilityBorder)
     else
-      mobilityForce(unit.pixelCenter, unit.pixelCenter.zone.maxMobility, With.grids.mobility)
+      barrierRepulsion(unit.pixelCenter, unit.pixelCenter.zone.maxMobility, With.grids.mobility)
   }
   
-  def mobilityForce(pixel: Pixel, maxMobility: Int, mobilitySource: AbstractGrid[Int]): Force = {
+  def barrierRepulsion(pixel: Pixel, maxMobility: Int, mobilitySource: AbstractGrid[Int]): Force = {
     val tile                = pixel.tileIncluding
     val mobility            = mobilitySource.get(tile)
     val forces              = tile.adjacent8.filter(_.valid).map(neighbor => singleMobilityForce(tile, neighbor, mobilitySource))
@@ -97,7 +97,7 @@ object Potential {
     output
   }
   
-  def spreadingForce(unit: FriendlyUnitInfo): Force = {
+  def collisionRepulsion(unit: FriendlyUnitInfo): Force = {
     if (unit.flying) return new Force
     
     val blockers        = unit.matchups.allies.filterNot(_.flying)
@@ -112,15 +112,15 @@ object Potential {
     output
   }
   
-  def exitForce(unit: FriendlyUnitInfo): Force = {
-    if (unit.flying) exitForceAir(unit) else exitForceGround(unit)
+  def exitAttraction(unit: FriendlyUnitInfo): Force = {
+    if (unit.flying) exitAttractionAir(unit) else exitAttractionGround(unit)
   }
   
-  def exitForceAir(unit: FriendlyUnitInfo): Force = {
+  def exitAttractionAir(unit: FriendlyUnitInfo): Force = {
     BuildForce.fromPixels(unit.pixelCenter, unit.agent.origin)
   }
   
-  def exitForceGround(unit: FriendlyUnitInfo): Force = {
+  def exitAttractionGround(unit: FriendlyUnitInfo): Force = {
     val destination = unit.agent.origin.zone
     
     val path = With.paths.zonePath(

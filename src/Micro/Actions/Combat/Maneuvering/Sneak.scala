@@ -20,8 +20,14 @@ object Sneak extends Action {
   override protected def perform(unit: FriendlyUnitInfo) {
     Potshot.delegate(unit)
     if (unit.readyForMicro) {
-      val force = Potential.detectionRepulsion(unit)
-      unit.agent.forces.put(Colors.NeonTeal, force)
+      val forceThreat     = Potential.threatsRepulsion(unit)
+      val forceSneaking   = Potential.detectionRepulsion(unit)
+      val forceColliding  = Potential.collisionRepulsion(unit)
+      val forceMobility   = Potential.barrierRepulsion(unit)
+      unit.agent.forces.put(Colors.NeonRed,     forceThreat)
+      unit.agent.forces.put(Colors.NeonTeal,    forceSneaking)
+      unit.agent.forces.put(Colors.NeonGreen,   forceMobility)
+      unit.agent.forces.put(Colors.NeonViolet,  forceColliding)
       Gravitate.delegate(unit)
     }
   }

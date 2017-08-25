@@ -47,19 +47,22 @@ class Battle(
     val urgencyEnemy      = focus.pixelDistanceFast(nearestBaseOurs)
     val fighters          = us.units.filter(_.canAttack)
     val aggressionDesire  = With.blackboard.aggressionRatio
-    val flexibilityFactor = 1.3
     val flexibilityOurs   = meanFlexibility(us.units)
     val flexibilityEnemy  = meanFlexibility(enemy.units)
     val flexibilityRatio  = flexibilityOurs / flexibilityEnemy
-    val flexibilityDesire = PurpleMath.clampRatio(flexibilityOurs / flexibilityEnemy, flexibilityFactor)
-    val urgencyFactor     = 1.5
-    val urgencyDesire     = PurpleMath.clampRatio(urgencyOurs / urgencyEnemy, urgencyFactor)
-    val terrainFactor     = 1.3
-    val terrainDesire     = if (us.centroid.zone != enemy.centroid.zone) 1.0 / terrainFactor else 1.0
-    val bonusDesire       = aggressionDesire * flexibilityDesire * urgencyDesire * terrainDesire
+    val urgencyRatio      = urgencyOurs / urgencyEnemy
+    val chokiness         = if (us.centroid.zone == enemy.centroid.zone) 1.0 else 0.0
+    val economyRatio      = With.geography.ourBases.size.toDouble / With.geography.enemyBases.size
+    val flexibilityDesire = PurpleMath.clamp(flexibilityRatio,  0.8, 1.2)
+    val urgencyDesire     = PurpleMath.clamp(urgencyRatio,      0.8, 1.5)
+    val chokinessDesire   = PurpleMath.clamp(chokiness,         0.7, 1.0)
+    val economyDesire     = PurpleMath.clamp(economyRatio,      0.9, 1.3)
+    val bonusDesire       = aggressionDesire * flexibilityDesire * urgencyDesire * chokinessDesire * economyDesire
     val estimationAttack  = estimationSimulationAttack
     val estimationRetreat = estimationSimulationRetreat
-    val output            = bonusDesire * estimationAttack.costToEnemy + estimationRetreat.costToUs - estimationAttack.costToUs - estimationRetreat.costToEnemy
+    val attackGains       = estimationAttack.costToEnemy  + estimationRetreat.costToUs
+    val attackLosses      = estimationAttack.costToUs     + estimationRetreat.costToEnemy
+    val output            = bonusDesire * attackGains - attackLosses
     output
   }
   

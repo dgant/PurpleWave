@@ -93,8 +93,8 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
       movingFrames.map(_.frame).max
   }
   
-  def hasBeenViolentInLastTwoSeconds: Boolean = hasBeenViolentInLastSecondCache.get
-  private val hasBeenViolentInLastSecondCache = new CacheFrame(() => history.exists(h => With.framesSince(h.frame) < 48 && h.isBeingViolent))
+  def hasBeenViolentInLastTwoSeconds: Boolean = hasBeenViolentInLastTwoSecondsCache.get
+  private val hasBeenViolentInLastTwoSecondsCache = new CacheFrame(() => history.exists(h => With.framesSince(h.frame) < 48 && h.cooldown > 0))
   
   def damageInLastSecond: Int = damageInLastSecondCache.get
   private val damageInLastSecondCache = new CacheFrame(() =>

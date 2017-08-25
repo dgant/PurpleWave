@@ -55,7 +55,9 @@ class BuildCannonsAtBases(cannonsRequired: Int) extends Plan {
     lazy val cannonsInZone   = With.units.ours.filter(unit => unit.is(Protoss.PhotonCannon) && unit.pixelCenter.zone == zone)
     lazy val cannonsToAdd    = cannonsRequired - cannonsInZone.size
     
-    if (cannonsToAdd <= 0) return 0
+    if (cannonsToAdd <= 0) {
+      return 0
+    }
     
     if (pylonsInZone.isEmpty) {
       With.groundskeeper.propose(pylonBlueprintByZone(zone))

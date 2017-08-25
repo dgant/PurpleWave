@@ -70,12 +70,12 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) {
   
   lazy val effectiveAirDamage: Int =
     if      (this == Terran.Bunker)   Terran.Marine.airDamageRaw
-    else if (this == Protoss.Carrier) Protoss.Carrier.airDamageRaw
+    else if (this == Protoss.Carrier) Protoss.Interceptor.airDamageRaw
     else                              airDamageRaw
   
   lazy val effectiveGroundDamage: Int =
     if      (this == Terran.Bunker)   Terran.Marine.groundDamageRaw
-    else if (this == Protoss.Carrier) Protoss.Carrier.groundDamageRaw
+    else if (this == Protoss.Carrier) Protoss.Interceptor.groundDamageRaw
     else if (this == Protoss.Reaver)  Protoss.Scarab.groundDamageRaw
     else                              groundDamageRaw
   

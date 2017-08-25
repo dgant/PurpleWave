@@ -24,7 +24,7 @@ object BeACarrier extends Action {
     lazy val exitingLeash             = unit.matchups.targets.forall(_.pixelDistanceFast(unit) > 32.0 * 8.5)
     lazy val interceptorsNeedKick     = exitingLeash || ! interceptorsAreShooting
     
-    if (interceptorsNeedKick && (unit.matchups.threats.isEmpty || interceptorsTotal > 2)) {
+    if (unit.matchups.targets.nonEmpty && interceptorsNeedKick && (unit.matchups.threats.isEmpty || interceptorsTotal > 2)) {
       val attackTarget = unit.matchups.targets.minBy(_.pixelDistanceFast(unit))
       val attackPoint = unit.pixelCenter.project(attackTarget.pixelCenter, 8.0 * 32.0)
       unit.agent.toTravel = Some(attackPoint)

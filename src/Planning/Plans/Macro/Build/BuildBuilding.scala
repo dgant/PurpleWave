@@ -52,7 +52,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
         orderedTile
           .map(tile => With.units.ours.find(unit =>
             unit.is(buildingClass) &&
-              unit.tileTopLeft == tile))
+            unit.tileTopLeft == tile))
           .getOrElse(None))
       .filter(b =>
         b.isOurs  &&

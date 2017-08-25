@@ -108,14 +108,20 @@ class Groundskeeper {
   
   def flagFulfilled(requirement: Blueprint, fulfillingUnit: UnitInfo) {
     val proposal = getRepresentativeBlueprintForRequirement(requirement)
-    removeBlueprint(requirement)
-    removeBlueprint(proposal)
+    closeAsFulfilled(requirement, fulfillingUnit)
     
-    // Part hack, part insurance policy. A unit can't fulfill multiple proposals. That's just silly.
-    proposalsFulfilled.find(_._2 == fulfillingUnit).map(_._1).foreach(proposalsFulfilled.remove)
-    
-    proposalsFulfilled.put(requirement, fulfillingUnit)
-    proposalsFulfilled.put(proposal, fulfillingUnit)
+    //Sanity check
+    if (proposal.accepts(fulfillingUnit.tileTopLeft)) {
+      closeAsFulfilled(proposal, fulfillingUnit)
+    }
+    else {
+      requirementMatches --= requirementMatches.find(x => x.proposal == proposal && x.requirement == requirement)
+    }
+  }
+  
+  private def closeAsFulfilled(blueprint: Blueprint, fulfillingUnit: UnitInfo) {
+    removeBlueprint(blueprint)
+    proposalsFulfilled.put(blueprint, fulfillingUnit)
   }
   
   def flagUnfulfilled(requirement: Blueprint) {

@@ -12,7 +12,7 @@ import Planning.Plans.Macro.BuildOrders.{Build, FirstEightMinutes, RequireBareMi
 import Planning.Plans.Macro.Expanding._
 import Planning.Plans.Macro.Milestones.{UnitsAtLeast, _}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
-import Planning.Plans.Protoss.{ProtossBuilds, ProtossVsTerranIdeas}
+import Planning.Plans.Protoss.{ProtossBuilds}
 import Planning.Plans.Scouting.{ScoutAt, ScoutExpansionsAt}
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss.PvT._
@@ -133,7 +133,7 @@ class ProtossVsTerran extends Parallel {
     new And(
       new HaveUpgrade(Protoss.ZealotSpeed, withinFrames = Protoss.Zealot.buildFrames),
       new Or(
-        new UnitsAtLeast(12, UnitMatchType(Protoss.Dragoon)),
+        new UnitsAtLeast(18, UnitMatchType(Protoss.Dragoon)),
         new Check(() => With.self.gas * 5 < With.self.minerals))),
     new TrainContinuously(Protoss.Zealot),
     new TrainContinuously(Protoss.Dragoon))

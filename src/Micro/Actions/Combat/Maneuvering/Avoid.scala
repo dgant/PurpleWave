@@ -14,7 +14,7 @@ object Avoid extends Action {
   }
   
   override def perform(unit: FriendlyUnitInfo) {
-    val forceThreat     = Potential.threatsRepulsion(unit).normalize(3.0)
+    val forceThreat     = Potential.threatsRepulsion(unit).normalize(2.0)
     val forceMobility   = Potential.barrierRepulsion(unit)
     val forceSpreading  = Potential.collisionRepulsion(unit)
     val forceExiting    = Potential.exitAttraction(unit)

@@ -72,7 +72,7 @@ class Scheduler {
     else {
       val unit = request.buildable.unitOption.get
       val differenceBefore = Math.max(0, unitsWanted(unit) - unitsActual(unit))
-      unitsWanted.put(unit, Math.max(unitsWanted(unit), unitsActual(unit) + request.add))
+      unitsWanted.put(unit, request.add + Math.max(unitsWanted(unit), unitsActual(unit)))
       unitsWanted.put(unit, Math.max(unitsWanted(unit), request.require))
       val differenceAfter = unitsWanted(unit) - unitsActual(unit)
       var differenceChange = differenceAfter - differenceBefore

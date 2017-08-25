@@ -1,6 +1,7 @@
 package Micro.Actions.Transportation
 
 import Micro.Actions.Action
+import Micro.Actions.Commands.Move
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 import scala.collection.mutable.ArrayBuffer
@@ -35,6 +36,7 @@ object Pickup extends Action {
       val passengerCentroid = passengersAccepted.map(_.pixelCenter).centroid
       val passengerCentral  = passengersAccepted.minBy(_.pixelDistanceFast(passengerCentroid))
       unit.agent.toTravel = Some(passengerCentral.pixelCenter)
+      Move.delegate(unit)
     }
   }
   

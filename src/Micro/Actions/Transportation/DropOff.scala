@@ -2,6 +2,7 @@ package Micro.Actions.Transportation
 
 import Lifecycle.With
 import Micro.Actions.Action
+import Micro.Actions.Commands.Move
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object DropOff extends Action {
@@ -9,13 +10,17 @@ object DropOff extends Action {
   override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.isTransport                                  &&
     unit.loadedUnits.nonEmpty                         &&
-    With.grids.walkable.get(unit.tileIncludingCenter) &&
-    unit.agent.toTravel.exists(destination =>
-      unit.pixelDistanceFast(destination) < 32.0 * 12.0 &&
-      unit.pixelCenter.zone == destination.zone)
+    With.grids.walkable.get(unit.tileIncludingCenter)
   }
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
-    With.commander.unload(unit, unit.loadedUnits.head)
+    val fastestPassenger = unit.loadedUnits.maxBy(_.topSpeed)
+    val inZone    = unit.agent.toTravel.forall(_.zone == unit.pixelCenter.zone)
+    val onRunway  = unit.agent.toTravel.forall(unit.pixelDistanceFast(_) < 32.0 * 10.0)
+    val inHurry   = unit.matchups.framesOfEntanglementDiffused < 24 + 24 * unit.loadedUnits.size + unit.agent.toTravel.map(unit.framesToTravelTo).sum
+    
+    if (inZone && (onRunway || inHurry)) {
+      With.commander.unload(unit, unit.loadedUnits.head)
+    }
   }
 }

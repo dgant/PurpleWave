@@ -44,7 +44,7 @@ class ProtossVsTerran extends Parallel {
   
   private class ConsiderTakingThirdBase extends If(
     new Or(
-      new UnitsAtLeast(5, UnitMatchType(Protoss.Dragoon)),
+      new UnitsAtLeast(8, UnitMatchType(Protoss.Dragoon)),
       new UnitsAtLeast(1, UnitMatchType(Protoss.Reaver))),
     new RequireMiningBases(3))
   
@@ -264,6 +264,14 @@ class ProtossVsTerran extends Parallel {
       new TrainContinuously(Protoss.Observer, 3),
       new TrainContinuously(Protoss.Observer, 1)
     ),
+    new If(
+      new UnitsAtLeast(12, UnitMatchType(Protoss.Zealot)),
+      new Parallel(
+        new Build(RequestAtLeast(1, Protoss.RoboticsSupportBay)),
+        new Build(RequestAtLeast(1, Protoss.Shuttle)),
+        new Build(RequestUpgrade(Protoss.ShuttleSpeed)),
+        new Build(RequestAtLeast(2, Protoss.Shuttle)))
+    ),
     new TrainZealotsOrDragoons,
     
     // Luxuries
@@ -273,9 +281,6 @@ class ProtossVsTerran extends Parallel {
     new RequireMiningBases(2),
     new Build(RequestAtLeast(6, Protoss.Gateway)),
     new RequireMiningBases(3),
-    new Build(RequestAtLeast(1, Protoss.RoboticsSupportBay)),
-    new Build(RequestAtLeast(1, Protoss.Shuttle)),
-    new Build(RequestUpgrade(Protoss.ShuttleSpeed)),
     new Build(RequestAtLeast(10, Protoss.Gateway)),
     new RequireMiningBases(4),
     new Build(RequestAtLeast(15, Protoss.Gateway)),

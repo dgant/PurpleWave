@@ -53,11 +53,16 @@ class Battle(
     val urgencyRatio      = urgencyOurs / urgencyEnemy
     val chokiness         = if (us.centroid.zone == enemy.centroid.zone) 1.0 else 0.0
     val economyRatio      = With.geography.ourBases.size.toDouble / With.geography.enemyBases.size
+    val hysteresisVoters  = us.units.filter(unit => unit.canMove && unit.friendly.exists(_.agent.canFight))
+    val hysteresisEngaged = hysteresisVoters.filter(_.friendly.exists(_.agent.shouldEngage))
+    val hysteresisRatio   = if (hysteresisVoters.isEmpty) 0.0 else hysteresisEngaged.size.toDouble / hysteresisVoters.size
+    val hysteresis        = 2.0 * hysteresisRatio
     val flexibilityDesire = PurpleMath.clamp(flexibilityRatio,  0.9, 1.2)
     val urgencyDesire     = PurpleMath.clamp(urgencyRatio,      0.9, 1.5)
     val chokinessDesire   = PurpleMath.clamp(chokiness,         0.8, 1.0)
     val economyDesire     = PurpleMath.clamp(economyRatio,      0.9, 1.5)
-    val bonusDesire       = aggressionDesire * flexibilityDesire * urgencyDesire * chokinessDesire * economyDesire
+    val hysteresisDesire  = PurpleMath.clamp(hysteresis,        0.9, 2.0)
+    val bonusDesire       = aggressionDesire * flexibilityDesire * urgencyDesire * chokinessDesire * economyDesire * hysteresisDesire
     val estimationAttack  = estimationSimulationAttack
     val estimationRetreat = estimationSimulationRetreat
     val attackGains       = estimationAttack.costToEnemy  + estimationRetreat.costToUs

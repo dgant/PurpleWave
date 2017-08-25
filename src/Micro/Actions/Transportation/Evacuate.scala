@@ -10,7 +10,7 @@ object Evacuate extends Action {
     unit.isTransport                                  &&
     unit.loadedUnits.nonEmpty                         &&
     With.grids.walkable.get(unit.tileIncludingCenter) &&
-    unit.matchups.framesToLiveDiffused < unit.loadedUnits.size * 24
+    unit.matchups.framesToLiveCurrently < unit.loadedUnits.size * 24
   }
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {

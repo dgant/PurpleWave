@@ -70,10 +70,12 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) {
   
   lazy val effectiveAirDamage: Int =
     if      (this == Terran.Bunker)   Terran.Marine.airDamageRaw
+    else if (this == Protoss.Carrier) Protoss.Carrier.airDamageRaw
     else                              airDamageRaw
   
   lazy val effectiveGroundDamage: Int =
     if      (this == Terran.Bunker)   Terran.Marine.groundDamageRaw
+    else if (this == Protoss.Carrier) Protoss.Carrier.groundDamageRaw
     else if (this == Protoss.Reaver)  Protoss.Scarab.groundDamageRaw
     else                              groundDamageRaw
   
@@ -96,8 +98,15 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) {
   
   lazy val helpsInCombat: Boolean = rawCanAttack || isSpellcaster || Set(Terran.Bunker).contains(this)
   
-  lazy val groundRangePixels        : Double = if (this == Terran.Bunker) Terran.Marine.groundRangePixels  + 32 else if (this == Protoss.Carrier) 32 * 8 else if (this == Protoss.Reaver) 32 * 8 else groundRangeRaw
-  lazy val airRangePixels           : Double = if (this == Terran.Bunker) Terran.Marine.airRangePixels     + 32 else if (this == Protoss.Carrier) 32 * 8 else airRangeRaw
+  lazy val groundRangePixels: Double =
+    if      (this == Terran.Bunker)   Terran.Marine.groundRangePixels  + 32.0
+    else if (this == Protoss.Carrier) 32.0 * 8.0
+    else if (this == Protoss.Reaver)  32.0 * 8.0
+    else                              groundRangeRaw
+  lazy val airRangePixels: Double =
+    if      (this == Terran.Bunker)   Terran.Marine.groundRangePixels  + 32.0
+    else if (this == Protoss.Carrier) 32.0 * 8.0
+    else                              groundRangeRaw
   lazy val maxAirGroundRangePixels  : Double = Math.max(groundRangePixels, airRangePixels)
   lazy val effectiveRangePixels     : Double =
     if (isDetector)                         32.0 * 11.0

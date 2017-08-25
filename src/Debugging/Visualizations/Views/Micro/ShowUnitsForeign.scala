@@ -18,31 +18,36 @@ object ShowUnitsForeign extends View {
   private def drawTrackedUnit(unit: ForeignUnitInfo) {
     if ( ! With.viewport.contains(unit.pixelCenter)) return
     
-    if ( ! unit.visible) {
-      val color =
-        if (unit.likelyStillThere)
-          unit.player.colorDark
-        else if(unit.possiblyStillThere)
-          unit.player.colorMidnight
-        else
-          Colors.MidnightGray
-        
-      DrawMap.circle(
-        unit.pixelCenter,
-        unit.unitClass.width / 2,
-        color)
-      DrawMap.label(
-        unit.unitClass.toString,
-        unit.pixelCenter,
-        drawBackground = true,
-        color)
-    }
+    val showSiegeRadius = true
+    val showResources   = true
+    val showFogged      = true
+  
+    val color =
+      if (unit.likelyStillThere)        unit.player.colorNeon
+      else if (unit.possiblyStillThere) unit.player.colorMedium
+      else                              unit.player.colorMidnight
     
-    if (unit.is(Terran.SiegeTankSieged)) {
-      With.game.drawCircleMap(
-        unit.pixelCenter.bwapi,
-        (unit.pixelRangeGround + unit.unitClass.radialHypotenuse).toInt,
-        unit.player.colorNeon)
+    if (showFogged) {
+      if ( ! unit.visible) {
+        DrawMap.circle(unit.pixelCenter, unit.unitClass.width / 2, color)
+        DrawMap.label(unit.unitClass.toString, unit.pixelCenter, drawBackground = true, color)
+      }
+    }
+    if (showSiegeRadius) {
+      if (unit.is(Terran.SiegeTankSieged)) {
+        With.game.drawCircleMap(
+          unit.pixelCenter.bwapi,
+          (unit.pixelRangeGround + unit.unitClass.radialHypotenuse).toInt,
+          unit.player.colorNeon)
+      }
+    }
+    if (showResources) {
+      if (unit.initialResources > 0) {
+        DrawMap.label(unit.resourcesLeft + "/" + unit.initialResources, unit.pixelCenter.add(0, With.visualization.lineHeightSmall), drawBackground = true, color)
+      }
+      if (unit.isMineralBlocker) {
+        DrawMap.label("(Blocker)", unit.pixelCenter.add(0, 2 * With.visualization.lineHeightSmall), drawBackground = true, color)
+      }
     }
   }
   

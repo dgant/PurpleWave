@@ -136,7 +136,7 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   // Economics //
   ///////////////
   
-  lazy val isMineralBlocker: Boolean = unitClass.isMinerals && mineralsLeft < 50
+  lazy val isMineralBlocker: Boolean = unitClass.isMinerals && mineralsLeft < With.configuration.blockerMineralThreshold
   
   def subjectiveValue: Int = (
     unitClass.subjectiveValue

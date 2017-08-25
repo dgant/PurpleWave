@@ -26,7 +26,7 @@ object BeACarrier extends Action {
     
     if (interceptorsNeedKick && (unit.matchups.threats.isEmpty || interceptorsTotal > 2)) {
       val attackTarget = unit.matchups.enemies.minBy(_.pixelDistanceFast(unit))
-      val attackPoint = unit.pixelCenter.project(attackTarget.pixelCenter, 32)
+      val attackPoint = unit.pixelCenter.project(attackTarget.pixelCenter, 8.0 * 32.0)
       unit.agent.toTravel = Some(attackPoint)
       AttackMove.consider(unit)
     }

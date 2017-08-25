@@ -2,7 +2,9 @@
 ### An extensible AI player for *StarCraft: Brood War*
 
 ## About
-PurpleWave is such a *StarCraft* AI written in Scala. It can play all races and a large variety of strategies. It's been ranked as high as #8 on the [SSCAIT Ladder](https://sscaitournament.com/index.php?action=scores). 
+PurpleWave is such a *StarCraft* AI written in Scala. It can play all races and a large variety of strategies.
+
+PurpleWave won 3rd Place in the [2017 IEEE CIG Starcraft Tournament](https://cilab.sejong.ac.kr/sc_competition/?p=1090). It's been ranked as high as #7 on the [SSCAIT Ladder](https://sscaitournament.com/index.php?action=scores). 
 
 ## How to build PurpleWave
 What you'll need:

@@ -23,7 +23,7 @@ object PlacementProfiles {
     "Basic",
     preferZone                  = 1.0,
     preferNatural               = 0.0,
-    preferResources                   = 0.0,
+    preferResources             = 0.0,
     preferSpace                 = 0.2,
     preferPowering              = 0.3,
     preferDistanceFromEnemy     = 0.6,
@@ -57,7 +57,7 @@ object PlacementProfiles {
   val townHall = new PlacementProfile("Town Hall",
     preferZone                  = 1000.0,
     preferNatural               = 6.0,
-    preferResources             = 1.0,
+    preferResources             = 0.5,
     preferDistanceFromEnemy     = 1.5,
     avoidDistanceFromBase       = 2.0
   )

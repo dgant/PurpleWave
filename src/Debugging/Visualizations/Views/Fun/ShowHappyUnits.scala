@@ -15,11 +15,10 @@ object ShowHappyUnits extends View {
     With.units.all
       .filter(unit =>
         unit.alive &&
-        unit.visible &&
         (unit.complete || unit.unitClass.isBuilding))
       .toVector
-      .sortBy(_.flying)
       .sortBy(_.y)
+      .sortBy(_.flying)
       .foreach(renderUnit)
     
     With.game.drawTextScreen(408, 4, "Candy: ")
@@ -29,8 +28,8 @@ object ShowHappyUnits extends View {
   
   def renderUnit(unit:UnitInfo) {
     
-    val color = unit.player.colorNeon
-    val isActiveBuilding = unit.friendly.nonEmpty && unit.friendly.get.trainingQueue.size > 0
+    val color = unit.color
+    val isActiveBuilding = unit.friendly.nonEmpty && unit.friendly.get.trainingQueue.nonEmpty
     val animationFrame = unit.left + unit.top + With.frame
     
     val verticalBonus =

@@ -465,4 +465,14 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   def isFriendly : Boolean = player.isAlly || isOurs
   def isEnemy    : Boolean = player.isEnemy
   def isEnemyOf(otherUnit: UnitInfo): Boolean = (isFriendly && otherUnit.isEnemy) || (isEnemy && otherUnit.isFriendly)
+  
+  ///////////////////
+  // Visualization //
+  ///////////////////
+  
+  def color: Color =
+    if      (visible)             player.colorBright
+    else if (likelyStillThere)    player.colorMedium
+    else if (possiblyStillThere)  player.colorDark
+    else                          player.colorMidnight
 }

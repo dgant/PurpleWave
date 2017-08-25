@@ -16,7 +16,8 @@ class BuildCannonsAtBases(cannonsRequired: Int) extends Plan {
     
     if (zones.nonEmpty) {
       if (With.units.ours.exists(_.is(Protoss.Forge))) {
-        zones.foreach(cannonZone)
+        val cannonsRequired = zones.map(cannonZone).sum
+        With.scheduler.request(this, RequestAnother(cannonsRequired, Protoss.PhotonCannon))
       }
       else {
         With.scheduler.request(this, RequestAtLeast(1, Protoss.Forge))
@@ -49,12 +50,12 @@ class BuildCannonsAtBases(cannonsRequired: Int) extends Plan {
     With.geography.ourBases.toSeq.sortBy(_.heart.i) //Arbitrary but stable ordering
   }
   
-  private def cannonZone(zone: Zone) {
+  private def cannonZone(zone: Zone): Int = {
     lazy val pylonsInZone    = With.units.ours.filter(unit => unit.is(Protoss.Pylon)        && unit.pixelCenter.zone == zone)
     lazy val cannonsInZone   = With.units.ours.filter(unit => unit.is(Protoss.PhotonCannon) && unit.pixelCenter.zone == zone)
     lazy val cannonsToAdd    = cannonsRequired - cannonsInZone.size
     
-    if (cannonsToAdd <= 0) return
+    if (cannonsToAdd <= 0) return 0
     
     if (pylonsInZone.isEmpty) {
       With.groundskeeper.propose(pylonBlueprintByZone(zone))
@@ -64,7 +65,9 @@ class BuildCannonsAtBases(cannonsRequired: Int) extends Plan {
       // Defensive programming measure. If we try re-proposing fulfilled blueprints we may just build cannons forever.
       val newBlueprints = cannonBlueprintsByZone(zone).filterNot(With.groundskeeper.proposalsFulfilled.contains).take(cannonsToAdd)
       newBlueprints.foreach(With.groundskeeper.propose)
-      With.scheduler.request(this, RequestAnother(newBlueprints.size, Protoss.PhotonCannon))
+      return newBlueprints.size
     }
+  
+    0
   }
 }

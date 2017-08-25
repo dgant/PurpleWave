@@ -12,7 +12,7 @@ import Planning.Plans.Macro.BuildOrders.{Build, FirstEightMinutes, RequireBareMi
 import Planning.Plans.Macro.Expanding._
 import Planning.Plans.Macro.Milestones.{UnitsAtLeast, _}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
-import Planning.Plans.Protoss.{ProtossBuilds}
+import Planning.Plans.Protoss.ProtossBuilds
 import Planning.Plans.Scouting.{ScoutAt, ScoutExpansionsAt}
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss.PvT._
@@ -70,13 +70,22 @@ class ProtossVsTerran extends Parallel {
         RequestAtLeast(8, Protoss.Gateway),
         RequestAtLeast(1, Protoss.Stargate),
         RequestAtLeast(1, Protoss.FleetBeacon),
-        RequestAtLeast(3, Protoss.Stargate),
+        RequestAtLeast(2, Protoss.Stargate),
         RequestUpgrade(Protoss.AirDamage, 1),
         RequestUpgrade(Protoss.CarrierCapacity)),
       new If(
         new EnemyBio,
-        new UpgradeContinuously(Protoss.AirArmor),
-        new UpgradeContinuously(Protoss.AirDamage))))
+        new Parallel(
+          new UpgradeContinuously(Protoss.AirArmor),
+          new Build(RequestAtLeast(2, Protoss.CyberneticsCore)),
+          new UpgradeContinuously(Protoss.AirDamage)
+        ),
+        new Parallel(
+          new UpgradeContinuously(Protoss.AirDamage),
+          new Build(RequestAtLeast(2, Protoss.CyberneticsCore)),
+          new UpgradeContinuously(Protoss.AirArmor)
+        )),
+      new Build(RequestAtLeast(4, Protoss.Stargate))))
   
   private class ImplementLateArbiters extends OnGasBases(3,
     new Build(
@@ -258,9 +267,15 @@ class ProtossVsTerran extends Parallel {
     new TrainZealotsOrDragoons,
     
     // Luxuries
-    new Build(RequestAtLeast(5, Protoss.Gateway)),
+    new Build(RequestAtLeast(2, Protoss.Gateway)),
+    new Build(RequestAtLeast(1, Protoss.RoboticsFacility)),
+    new Build(RequestAtLeast(3, Protoss.Gateway)),
+    new RequireMiningBases(2),
+    new Build(RequestAtLeast(6, Protoss.Gateway)),
     new RequireMiningBases(3),
-    new Employ(PvTLateCarriers, new ImplementLateCarriers),
+    new Build(RequestAtLeast(1, Protoss.RoboticsSupportBay)),
+    new Build(RequestAtLeast(1, Protoss.Shuttle)),
+    new Build(RequestUpgrade(Protoss.ShuttleSpeed)),
     new Build(RequestAtLeast(10, Protoss.Gateway)),
     new RequireMiningBases(4),
     new Build(RequestAtLeast(15, Protoss.Gateway)),

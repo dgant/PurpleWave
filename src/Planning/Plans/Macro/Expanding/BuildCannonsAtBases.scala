@@ -12,7 +12,7 @@ class BuildCannonsAtBases(cannonsRequired: Int) extends Plan {
   
   override def onUpdate() {
     val bases = eligibleBases
-    val zones = bases.map(_.zone).toSet
+    val zones = bases.map(_.zone).toSet.toArray
     
     if (zones.nonEmpty) {
       if (With.units.ours.exists(_.is(Protoss.Forge))) {

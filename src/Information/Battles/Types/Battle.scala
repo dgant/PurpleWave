@@ -53,10 +53,10 @@ class Battle(
     val urgencyRatio      = urgencyOurs / urgencyEnemy
     val chokiness         = if (us.centroid.zone == enemy.centroid.zone) 1.0 else 0.0
     val economyRatio      = With.geography.ourBases.size.toDouble / With.geography.enemyBases.size
-    val flexibilityDesire = PurpleMath.clamp(flexibilityRatio,  0.8, 1.2)
-    val urgencyDesire     = PurpleMath.clamp(urgencyRatio,      0.8, 1.5)
-    val chokinessDesire   = PurpleMath.clamp(chokiness,         0.7, 1.0)
-    val economyDesire     = PurpleMath.clamp(economyRatio,      0.9, 1.3)
+    val flexibilityDesire = PurpleMath.clamp(flexibilityRatio,  0.9, 1.2)
+    val urgencyDesire     = PurpleMath.clamp(urgencyRatio,      0.9, 1.5)
+    val chokinessDesire   = PurpleMath.clamp(chokiness,         0.8, 1.0)
+    val economyDesire     = PurpleMath.clamp(economyRatio,      0.9, 1.5)
     val bonusDesire       = aggressionDesire * flexibilityDesire * urgencyDesire * chokinessDesire * economyDesire
     val estimationAttack  = estimationSimulationAttack
     val estimationRetreat = estimationSimulationRetreat

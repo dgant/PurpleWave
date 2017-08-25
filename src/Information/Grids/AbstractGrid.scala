@@ -12,7 +12,7 @@ abstract class AbstractGrid[T] {
   
   def update() {}
   
-  def valid(i: Int): Boolean          = i > 0 && i < length
+  def valid(i: Int): Boolean          = i >= 0 && i < length
   def i(tileX: Int, tileY: Int): Int  = tileX + tileY * width
   def get(i: Int): T
   def get(tile: Tile): T              = get(tile.i)

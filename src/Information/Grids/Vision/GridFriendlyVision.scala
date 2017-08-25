@@ -10,11 +10,16 @@ class GridFriendlyVision extends AbstractGridInt {
   def visible(tile: Tile): Boolean = get(tile) >= lastUpdateFrame
   
   var lastUpdateFrame = 0
+  val never: Int = -24 * 60 * 60
+  
+  override val defaultValue: Int = never
+  reset()
   
   def everSeen(tile: Tile): Boolean = get(tile) > 0
   def framesSince(tile: Tile): Int = lastUpdateFrame - get(tile)
   
   override def update() {
+    
     lastUpdateFrame = With.frame
     With.units.ours
       .flatMap(u => Circle.points(12).map(u.tileIncludingCenter.add))
@@ -22,4 +27,6 @@ class GridFriendlyVision extends AbstractGridInt {
         if (With.game.isVisible(tile.bwapi))
           set(tile, With.frame))
   }
+  
+  
 }

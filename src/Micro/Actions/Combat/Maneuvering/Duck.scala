@@ -41,7 +41,9 @@ object Duck extends Action {
   
   private def explosion(unit: FriendlyUnitInfo, threat: UnitInfo): Option[Explosion] = {
     
-    if (threat.is(Terran.SpiderMine) && ! unit.flying && ! unit.unitClass.floats) {
+    if (threat.is(Terran.SpiderMine)
+      && ! unit.flying
+      && ! unit.unitClass.floats) {
       if (threat.burrowed) {
         
         // Avoid activating the Spider Mine.

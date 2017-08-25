@@ -4,9 +4,9 @@ import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
 import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors}
 import Planning.Plans.Army._
-import Planning.Plans.Compound._
-import Planning.Plans.Information.Employ
-import Planning.Plans.Information.Reactive.EnemyBio
+import Planning.Plans.Compound.{If, _}
+import Planning.Plans.Information.{Employ, Employing}
+import Planning.Plans.Information.Reactive.{EnemyBio, EnemyBioAllIn}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, FirstEightMinutes, RequireBareMinimum}
 import Planning.Plans.Macro.Expanding._
@@ -36,11 +36,16 @@ class ProtossVsTerran extends Parallel {
   // Mid-game strategies //
   /////////////////////////
   
-  private class TakeThirdBaseSafely extends If(
+  private class ConsiderTakingSecondBase extends If(
+    new Or(
+      new UnitsAtLeast(1, UnitMatchWarriors, complete = false),
+      new Employing(PvTEarly14Nexus)),
+    new RequireMiningBases(2))
+  
+  private class ConsiderTakingThirdBase extends If(
     new Or(
       new UnitsAtLeast(5, UnitMatchType(Protoss.Dragoon)),
-      new UnitsAtLeast(1, UnitMatchType(Protoss.Reaver))
-    ),
+      new UnitsAtLeast(1, UnitMatchType(Protoss.Reaver))),
     new RequireMiningBases(3))
   
   private class FulfillMidgameTech extends Build(
@@ -187,13 +192,13 @@ class ProtossVsTerran extends Parallel {
           RequestAtLeast(1, Protoss.Observatory))
       ))),
   
-    new ProtossVsTerranIdeas.RespondToBioAllInWithReavers,
+    new If(
+      new EnemyBioAllIn,
+      new Build(ProtossBuilds.TechReavers: _*)),
     
     //////////////////////
     // Two base midgame //
     //////////////////////
-    
-    new RequireMiningBases(2),
   
     // Make sure we get an early Dragoon for Vulture defense
     new Trigger(
@@ -213,12 +218,15 @@ class ProtossVsTerran extends Parallel {
     new If(
       new UnitsAtLeast(1, UnitMatchType(Protoss.Arbiter), complete = false),
       new Build(RequestTech(Protoss.Stasis))),
-    
-    new TakeThirdBaseSafely,
+  
+    new ConsiderTakingSecondBase,
+    new ConsiderTakingThirdBase,
     
     new OnMiningBases(2,
       new Parallel(
-        new ProtossVsTerranIdeas.RespondToBioWithReavers,
+        new If(
+          new EnemyBio,
+          new Build(ProtossBuilds.TechReavers: _*)),
         new If(
           new UnitsAtLeast(8, UnitMatchWarriors, complete = true),
           new FulfillMidgameTech))),

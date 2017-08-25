@@ -41,7 +41,7 @@ object BaseUpdater {
     // Assume ownership of unscouted main from natural
     if (base.owner.isNeutral && ! base.scouted) {
       val natural = With.geography.bases.find(_.isNaturalOf.contains(base))
-      natural.foreach(someNatural => base.owner = someNatural.owner)
+      natural.filterNot(_.owner.isFriendly).foreach(someNatural => base.owner = someNatural.owner)
     }
   }
   

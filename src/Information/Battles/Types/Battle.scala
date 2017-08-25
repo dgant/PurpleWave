@@ -4,6 +4,7 @@ import Information.Battles.BattleUpdater
 import Information.Battles.Estimations.Estimation
 import Mathematics.Points.Pixel
 import ProxyBwapi.UnitInfo.UnitInfo
+import Utilities.EnrichPixel.EnrichedPixelCollection
 
 class Battle(
   val us    : Team,

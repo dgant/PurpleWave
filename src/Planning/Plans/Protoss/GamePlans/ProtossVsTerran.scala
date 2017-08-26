@@ -176,6 +176,11 @@ class ProtossVsTerran extends Parallel {
     
     new IfCloakedThreats_Observers,
     new FirstEightMinutes(
+      new Employ(PvTEarly1GateRange, new Parallel(
+        new Build(
+          RequestAtLeast(1, Protoss.Dragoon),
+          RequestAtLeast(2, Protoss.Nexus))))),
+    new FirstEightMinutes(
       new Employ(PvTEarly1GateReaver, new Parallel(
         new TrainContinuously(Protoss.Reaver, 1),
         new Build(

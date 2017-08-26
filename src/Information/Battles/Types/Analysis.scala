@@ -21,11 +21,11 @@ class Analysis(battle: Battle) {
   val hysteresisEngaged = hysteresisVoters.filter(_.friendly.exists(_.agent.shouldEngage))
   val hysteresisRatio   = if (hysteresisVoters.isEmpty) 0.0 else hysteresisEngaged.size.toDouble / hysteresisVoters.size
   val hysteresis        = 2.0 * hysteresisRatio
-  val flexibilityDesire = PurpleMath.clamp(flexibilityRatio,  0.9, 1.2)
-  val urgencyDesire     = PurpleMath.clamp(urgencyRatio,      0.9, 1.5)
-  val chokinessDesire   = PurpleMath.clamp(chokiness,         0.8, 1.0)
-  val economyDesire     = PurpleMath.clamp(economyRatio,      0.9, 1.5)
-  val hysteresisDesire  = PurpleMath.clamp(hysteresis,        0.9, 2.0)
+  val flexibilityDesire = PurpleMath.clamp(flexibilityRatio,  0.9, 1.3)
+  val urgencyDesire     = PurpleMath.clamp(urgencyRatio,      0.8, 1.5)
+  val chokinessDesire   = PurpleMath.clamp(chokiness,         0.8, 1.1)
+  val economyDesire     = PurpleMath.clamp(economyRatio,      0.9, 1.3)
+  val hysteresisDesire  = PurpleMath.clamp(hysteresis,        0.9, 1.2)
   val bonusDesire       = aggressionDesire * flexibilityDesire * urgencyDesire * chokinessDesire * economyDesire * hysteresisDesire
   val estimationAttack  = battle.estimationSimulationAttack
   val estimationRetreat = battle.estimationSimulationRetreat

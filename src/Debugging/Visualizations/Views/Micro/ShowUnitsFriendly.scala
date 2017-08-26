@@ -16,6 +16,7 @@ object ShowUnitsFriendly extends View {
   def renderUnitState(agent: Agent) {
     if ( ! With.viewport.contains(agent.unit.pixelCenter)) return
     if ( ! agent.unit.unitClass.orderable) return
+    if (agent.unit.transport.isDefined) return
     
     var showClient      : Boolean = true
     var showAction      : Boolean = true

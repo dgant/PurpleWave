@@ -30,4 +30,6 @@ class Base(val townHallTile: Tile)
   def scouted: Boolean = lastScoutedFrame > 0
   def resources: Set[UnitInfo] = minerals ++ gas
   def natural: Option[Base] = With.geography.bases.find(_.isNaturalOf.contains(this))
+  
+  override def toString: String = name + ", " + zone.name + " " + heart
 }

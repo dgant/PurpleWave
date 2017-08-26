@@ -22,7 +22,7 @@ class Intelligence {
       .headOption
       .getOrElse(leastScoutedBases.head.townHallArea.midpoint))
   
-  def leastScoutedBases:Iterable[Base] = leastScoutedBasesCache.get
+  def leastScoutedBases: Iterable[Base] = leastScoutedBasesCache.get
   private val leastScoutedBasesCache = new CacheFrame(() =>
     With.geography.bases
       .toVector

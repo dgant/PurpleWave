@@ -9,9 +9,8 @@ import Utilities.EnrichPixel._
 object BaseUpdater {
   
   def updateBase(base: Base) {
-    base.townHall = ByOption.minBy(base.units.filter(_.unitClass.isTownHall))(_.tileTopLeft.tileDistanceManhattan(base.townHallTile))
-    updateOwner(base)
     updateAssets(base)
+    updateOwner(base)
   }
   
   private def updateOwner(base: Base) {
@@ -33,6 +32,7 @@ object BaseUpdater {
   
   private def updateAssets(base: Base) {
     base.units          = base.zone.units.filter(_.base.contains(base))
+    base.townHall       = ByOption.minBy(base.units.filter(_.unitClass.isTownHall))(_.tileTopLeft.tileDistanceManhattan(base.townHallTile))
     base.minerals       = base.units.filter(u => u.mineralsLeft > 0 && ! u.isMineralBlocker)
     base.gas            = base.units.filter(_.unitClass.isGas)
     base.workers        = base.units.filter(_.unitClass.isWorker)

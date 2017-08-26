@@ -47,4 +47,12 @@ class Zone(
   def pathTo          (to: Zone): Option[ZonePath]  = With.paths.zonePath(this, to)
   def canWalkTo       (to: Zone): Boolean           = pathTo(to).isDefined
   def distancePixels  (to: Zone): Double            = With.paths.zoneDistance(this, to)
+  
+  override def toString: String = (
+    name
+    + " "
+    + (if (bases.nonEmpty) "(" + bases.mkString(", ") + ")" else "")
+      + " "
+    + centroid
+  )
 }

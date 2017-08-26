@@ -10,7 +10,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 object Smuggle extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.canMove
+    unit.canMove && unit.loadedUnits.nonEmpty
   }
   
   override def perform(unit: FriendlyUnitInfo) {

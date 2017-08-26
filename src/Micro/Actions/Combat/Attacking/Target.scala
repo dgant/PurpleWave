@@ -1,6 +1,7 @@
 package Micro.Actions.Combat.Attacking
 
 import Micro.Actions.Action
+import Planning.Yolo
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Target extends Action {
@@ -17,6 +18,7 @@ object Target extends Action {
     var canPillage = false
     canPillage ||= unit.agent.canPillage
     canPillage ||= unit.pixelCenter.zone.owner.isEnemy
+    canPillage ||= Yolo.active
     canPillage &&= unit.matchups.threatsInRange.isEmpty
     if (canPillage) {
       TargetAnything.delegate(unit)

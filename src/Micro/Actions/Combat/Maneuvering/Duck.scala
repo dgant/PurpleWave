@@ -2,7 +2,7 @@ package Micro.Actions.Combat.Maneuvering
 
 import Debugging.Visualizations.ForceColors
 import Micro.Actions.Action
-import Micro.Actions.Commands.Gravitate
+import Micro.Actions.Commands.{Attack, Gravitate}
 import Micro.Agency.Explosion
 import Micro.Decisions.Potential
 import ProxyBwapi.Races.{Protoss, Terran}
@@ -61,16 +61,20 @@ object Duck extends Action {
         
         // Don't run if we're the target -- instead let other people run away from us.
         lazy val target = threat.target.orElse(ByOption.minBy(threat.matchups.targets)(_.pixelDistanceFast(threat)))
-        if (threat.moving && ! target.contains(unit)) {
+        if (target.contains(unit)) {
+          if (unit.canAttack(threat) && unit.readyForAttackOrder) {
+            unit.agent.toAttack = Some(threat)
+            Attack.consider(unit)
+          }
+          None
+        }
+        else {
           val safetyMarginPixels = 0.0
           Some(Explosion(
             threat.projectFrames(4),
             32.0 * 2.0 + 10.0 + unit.unitClass.radialHypotenuse + safetyMarginPixels,
             threat.damageOnNextHitAgainst(unit) // 3 is the range; 1 is the safety margin to avoid triggering it
           ))
-        }
-        else {
-          None
         }
       }
     }

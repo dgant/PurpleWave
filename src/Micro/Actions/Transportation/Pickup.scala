@@ -42,7 +42,8 @@ object Pickup extends Action {
   
   protected def potentialPassengers(unit: FriendlyUnitInfo): Iterable[FriendlyUnitInfo] = {
     unit.squad.map(_.recruits.filter(passenger =>
-      unit.canTransport(passenger) &&
+      ! passenger.pixelCenter.zone.owner.isEnemy  &&
+      unit.canTransport(passenger)                &&
       passenger.matchups.threatsInRange.isEmpty)).getOrElse(Iterable.empty)
   }
 }

@@ -7,8 +7,6 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Potshot extends Action {
   
-  // If we're off cooldown, take a shot at something already in range.
-  
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.agent.canFight       &&
     unit.readyForAttackOrder  &&

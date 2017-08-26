@@ -17,7 +17,8 @@ object ShowBases extends View {
         DrawMap.tileRectangle(base.townHallArea,    base.zone.owner.colorDark)
         DrawMap.labelBox(
           Vector(
-            base.zone.name + ": " + base.zone.owner.name,
+            base.name + ", " + zone.name,
+            base.zone.owner.name,
             Vector(
               if (base.isStartLocation)       Some("Start location")  else None,
               if (base.isNaturalOf.isDefined) Some("Natural")         else None,
@@ -26,9 +27,8 @@ object ShowBases extends View {
             )
             .flatten
             .mkString(", "),
-            "Minerals left: " + base.mineralsLeft,
-            "Gas left:     " + base.gasLeft,
-            if (base.lastScoutedFrame <= With.frame+ 24 ) ""
+            "Resources: " + base.mineralsLeft + "m + " + base.gasLeft + "g",
+            if (With.framesSince(base.lastScoutedFrame) < 24 * 10) ""
             else if (base.lastScoutedFrame <= 0) "Never scouted"
             else "Last scouted " + With.framesSince(base.lastScoutedFrame) + " frames ago",
             "+" +

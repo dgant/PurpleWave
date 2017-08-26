@@ -21,8 +21,12 @@ object ZoneBuilder {
   }
   
   def edges: Iterable[Edge] = BWTA.getChokepoints.asScala.map(new Edge(_))
-  def bases: Iterable[Base] = BaseFinder.calculate.map(new Base(_))
-  
+  def bases: Iterable[Base] = {
+    val bases = BaseFinder.calculate.map(new Base(_))
+    val names = new mutable.Queue[String] ++ Random.shuffle(PlaceNames.cities)
+    bases.foreach(_.name = names.dequeue)
+    bases
+  }
   
   def mapObviousTilesToZones(zones: Iterable[Zone]) {
     //This will map most -- but not all tiles

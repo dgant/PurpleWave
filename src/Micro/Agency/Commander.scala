@@ -44,14 +44,14 @@ class Commander {
   
   def stop(unit: FriendlyUnitInfo) {
     if (unready(unit)) return
-    unit.base.stop()
+    unit.bwapi.stop()
     sleep(unit)
   }
   
   def hold(unit: FriendlyUnitInfo) {
     if (unready(unit)) return
     if ( ! unit.holdingPosition) {
-      unit.base.holdPosition()
+      unit.bwapi.holdPosition()
     }
     sleep(unit)
   }
@@ -64,11 +64,11 @@ class Commander {
     
     if (unit.interceptors.exists(_.order == Orders.InterceptorAttack)) {
       // Carriers lose most of their DPS with direct attack orders
-      unit.base.attack(target.pixelCenter.bwapi)
+      unit.bwapi.attack(target.pixelCenter.bwapi)
     }
     else if (target.visible) {
       if (unit.readyForAttackOrder || ! unit.target.contains(target) || With.framesSince(unit.lastAttackStartFrame) > unit.cooldownMaxAirGround * 1.5) {
-        unit.base.attack(target.base)
+        unit.bwapi.attack(target.bwapi)
       }
       sleepAttack(unit)
     } else {
@@ -78,7 +78,7 @@ class Commander {
   
   def attackMove(unit: FriendlyUnitInfo, destination: Pixel) {
     if (unready(unit)) return
-    unit.base.attack(destination.bwapi)
+    unit.bwapi.attack(destination.bwapi)
     sleepAttack(unit)
   }
   
@@ -137,10 +137,10 @@ class Commander {
     
     if (unit.pixelDistanceFast(destination) > 0) {
       if (unit.is(Terran.Medic)) {
-        unit.base.attack(destination.bwapi)
+        unit.bwapi.attack(destination.bwapi)
       }
       else {
-        unit.base.move(destination.bwapi)
+        unit.bwapi.move(destination.bwapi)
       }
     }
     sleep(unit)
@@ -148,7 +148,7 @@ class Commander {
   
   def rightClick(unit: FriendlyUnitInfo, target: UnitInfo) {
     if (unready(unit)) return
-    unit.base.rightClick(target.base)
+    unit.bwapi.rightClick(target.bwapi)
     sleepAttack(unit)
   }
   
@@ -158,25 +158,25 @@ class Commander {
       if (With.framesSince(unit.agent.lastStim) < 24) return
       unit.agent.lastStim = With.frame
     }
-    unit.base.useTech(tech.baseType)
+    unit.bwapi.useTech(tech.baseType)
     sleep(unit)
   }
   
   def useTechOnUnit(unit: FriendlyUnitInfo, tech: Tech, target: UnitInfo) {
     if (unready(unit)) return
-    unit.base.useTech(tech.baseType, target.base)
+    unit.bwapi.useTech(tech.baseType, target.bwapi)
     sleep(unit)
   }
   
   def useTechOnPixel(unit: FriendlyUnitInfo, tech: Tech, target: Pixel) {
     if (unready(unit)) return
-    unit.base.useTech(tech.baseType, target.bwapi)
+    unit.bwapi.useTech(tech.baseType, target.bwapi)
     sleepAttack(unit)
   }
   
   def repair(unit: FriendlyUnitInfo, target: UnitInfo) {
     if (unready(unit)) return
-    unit.base.repair(target.base)
+    unit.bwapi.repair(target.bwapi)
     sleep(unit, 24)
   }
   
@@ -185,7 +185,7 @@ class Commander {
     
     if (unit.carryingMinerals || unit.carryingGas) {
       if ( ! unit.gatheringGas && ! unit.gatheringMinerals) {
-        unit.base.returnCargo
+        unit.bwapi.returnCargo
         sleepReturnCargo(unit)
       }
       else {
@@ -198,7 +198,7 @@ class Commander {
     //
     else if ( ! unit.target.contains(resource)) {
       if (resource.visible) {
-        unit.base.gather(resource.base)
+        unit.bwapi.gather(resource.bwapi)
         sleep(unit)
       }
       else {
@@ -212,7 +212,7 @@ class Commander {
   
   def build(unit: FriendlyUnitInfo, unitClass: UnitClass) {
     if (unready(unit)) return
-    unit.base.build(unitClass.baseType)
+    unit.bwapi.build(unitClass.baseType)
     sleepBuild(unit)
   }
   
@@ -222,38 +222,38 @@ class Commander {
       move(unit, tile.pixelCenter)
       return
     }
-    unit.base.build(unitClass.baseType, tile.bwapi)
+    unit.bwapi.build(unitClass.baseType, tile.bwapi)
     sleepBuild(unit)
   }
   
   def tech(unit: FriendlyUnitInfo, tech: Tech) {
     if (unready(unit)) return
-    unit.base.research(tech.baseType)
+    unit.bwapi.research(tech.baseType)
     sleep(unit)
   }
   
   def upgrade(unit: FriendlyUnitInfo, upgrade: Upgrade) {
     if (unready(unit)) return
-    unit.base.upgrade(upgrade.baseType)
+    unit.bwapi.upgrade(upgrade.baseType)
     sleep(unit)
   }
   
   def cancel(unit: FriendlyUnitInfo) {
     if (unready(unit)) return
-    unit.base.cancelConstruction()
+    unit.bwapi.cancelConstruction()
     sleep(unit)
   }
   
   def rally(unit: FriendlyUnitInfo, pixel: Pixel) {
     if (unready(unit)) return
-    unit.base.setRallyPoint(pixel.bwapi)
+    unit.bwapi.setRallyPoint(pixel.bwapi)
     unit.hasSetRallyPoint = true
     sleep(unit)
   }
   
   def rally(unit: FriendlyUnitInfo, targetUnit: UnitInfo) {
     if (unready(unit)) return
-    unit.base.setRallyPoint(unit.base)
+    unit.bwapi.setRallyPoint(unit.bwapi)
     unit.hasSetRallyPoint = true
     sleep(unit)
   }
@@ -261,37 +261,37 @@ class Commander {
   
   def unload(unit: FriendlyUnitInfo, passenger: UnitInfo) {
     //No sleeping required
-    unit.base.unload(passenger.base)
+    unit.bwapi.unload(passenger.bwapi)
   }
   
   def addon(unit: FriendlyUnitInfo, unitClass: UnitClass) {
     if (unready(unit)) return
-    unit.base.buildAddon(unitClass.baseType)
+    unit.bwapi.buildAddon(unitClass.baseType)
     sleep(unit)
   }
   
   def buildScarab(unit: FriendlyUnitInfo) {
     if (unready(unit)) return
-    unit.base.build(Protoss.Scarab.baseType)
+    unit.bwapi.build(Protoss.Scarab.baseType)
     sleep(unit)
   }
   
   def buildInterceptor(unit: FriendlyUnitInfo) {
     if (unready(unit)) return
-    unit.base.build(Protoss.Interceptor.baseType)
+    unit.bwapi.build(Protoss.Interceptor.baseType)
     sleep(unit)
   }
   
   def cloak(unit: FriendlyUnitInfo, tech: Tech) {
     if (unready(unit)) return
     unit.agent.lastCloak = With.frame
-    unit.base.cloak()
+    unit.bwapi.cloak()
     sleep(unit)
   }
   
   def decloak(unit: FriendlyUnitInfo, tech: Tech) {
     if (unready(unit)) return
-    unit.base.decloak()
+    unit.bwapi.decloak()
     sleep(unit)
   }
   

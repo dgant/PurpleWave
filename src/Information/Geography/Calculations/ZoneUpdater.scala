@@ -1,12 +1,10 @@
 package Information.Geography.Calculations
 
 import Information.Geography.Pathfinding.GroundPathFinder
-import Information.Geography.Types.{Base, Zone}
+import Information.Geography.Types.Zone
 import Lifecycle.With
 import ProxyBwapi.Players.Players
-import ProxyBwapi.Races.{Protoss, Terran}
-import ProxyBwapi.UnitInfo.UnitInfo
-import Utilities.EnrichPixel._
+import ProxyBwapi.Races.Terran
 
 object ZoneUpdater {
   
@@ -50,6 +48,9 @@ object ZoneUpdater {
   }
   
   def updateZone(zone: Zone) {
+  
+    zone.units = With.units.all.filter(_.zone == zone)
+    
     zone.bases.foreach(BaseUpdater.updateBase)
   
     val exitBuildings = zone.exit.map(exit =>

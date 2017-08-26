@@ -1,7 +1,7 @@
 package ProxyBwapi.UnitInfo
 
 import Information.Battles.Types.Battle
-import Information.Geography.Types.Zone
+import Information.Geography.Types.{Base, Zone}
 import Information.Kill
 import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile, TileRectangle}
@@ -11,11 +11,12 @@ import Performance.Caching.CacheFrame
 import ProxyBwapi.Engine.Damage
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitClass.UnitClass
+import Utilities.ByOption
 import bwapi._
 
 import scala.collection.mutable
 
-abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
+abstract class UnitInfo (bwapi: bwapi.Unit) extends UnitProxy(bwapi) {
   
   //////////////
   // Identity //
@@ -159,6 +160,9 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   
   def zone: Zone = cacheZone.get
   private val cacheZone = new CacheFrame(() => pixelCenter.zone)
+  
+  def base: Option[Base] = cacheBase.get
+  private val cacheBase = new CacheFrame(() => ByOption.minBy(zone.bases)(_.heart.tileDistanceFast(tileIncludingCenter)))
   
   def pixelRangeMin: Double = unitClass.groundMinRangeRaw
   def pixelRangeAir: Double = pixelRangeAirCache.get

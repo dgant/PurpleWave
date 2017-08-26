@@ -21,7 +21,7 @@ class ForeignUnitInfo(baseUnit: bwapi.Unit) extends UnitInfo (baseUnit) {
   def flagCloaked()   { _cloaked = true }
   
   def update(unit: bwapi.Unit) {
-    base = unit
+    bwapi = unit
     updateTimeSensitiveInformation()
     limitMostUpdates.act()
   }
@@ -45,15 +45,15 @@ class ForeignUnitInfo(baseUnit: bwapi.Unit) extends UnitInfo (baseUnit) {
   private def updateTimeSensitiveInformation() {
     _lastSeen           = With.frame
     _possiblyStillThere = true
-    _hitPoints          = if (effectivelyCloaked) if (_hitPoints == 0) _unitClass.maxHitPoints  else _hitPoints     else base.getHitPoints
-    _shieldPoints       = if (effectivelyCloaked) if (_hitPoints == 0) _unitClass.maxShields    else _shieldPoints  else base.getShields
-    _pixelCenter        = new Pixel(base.getPosition)
-    _tileTopLeft        = new Tile(base.getTilePosition)
+    _hitPoints          = if (effectivelyCloaked) if (_hitPoints == 0) _unitClass.maxHitPoints  else _hitPoints     else bwapi.getHitPoints
+    _shieldPoints       = if (effectivelyCloaked) if (_hitPoints == 0) _unitClass.maxShields    else _shieldPoints  else bwapi.getShields
+    _pixelCenter        = new Pixel(bwapi.getPosition)
+    _tileTopLeft        = new Tile(bwapi.getTilePosition)
   }
   
   private def updateTracking() {
-    _player     = Players.get(base.getPlayer)
-    _unitClass  = UnitClasses.get(base.getType)
+    _player     = Players.get(bwapi.getPlayer)
+    _unitClass  = UnitClasses.get(bwapi.getType)
   }
   
   private var _lastSeen           : Int         = _
@@ -76,15 +76,15 @@ class ForeignUnitInfo(baseUnit: bwapi.Unit) extends UnitInfo (baseUnit) {
     
     //_alive is handled via flagDead()
   
-    _unitClass              = UnitClasses.get(base.getType)
+    _unitClass              = UnitClasses.get(bwapi.getType)
     
-    _complete               = base.isCompleted
-    _defensiveMatrixPoints  = base.getDefenseMatrixPoints
-    _initialResources       = base.getInitialResources
-    _invincible             = base.isInvincible
-    _resourcesLeft          = base.getResources
-    _energy                 = base.getEnergy
-    _plagued                = base.isPlagued
+    _complete               = bwapi.isCompleted
+    _defensiveMatrixPoints  = bwapi.getDefenseMatrixPoints
+    _initialResources       = bwapi.getInitialResources
+    _invincible             = bwapi.isInvincible
+    _resourcesLeft          = bwapi.getResources
+    _energy                 = bwapi.getEnergy
+    _plagued                = bwapi.isPlagued
   }
   
   private var _alive                  : Boolean   = true
@@ -118,12 +118,12 @@ class ForeignUnitInfo(baseUnit: bwapi.Unit) extends UnitInfo (baseUnit) {
   private val interceptorCountCache = new CacheFrame(() => interceptors.size)
   
   private def updateCombat() {
-    _interceptors             = if (is(Protoss.Carrier)) base.getInterceptors.asScala.flatMap(With.units.get) else Iterable.empty
-    _attackStarting           = base.isStartingAttack
-    _attackAnimationHappening = base.isAttackFrame
-    _airWeaponCooldownLeft    = base.getAirWeaponCooldown
-    _groundWeaponCooldownLeft = base.getGroundWeaponCooldown
-    _spellCooldownLeft        = base.getSpellCooldown
+    _interceptors             = if (is(Protoss.Carrier)) bwapi.getInterceptors.asScala.flatMap(With.units.get) else Iterable.empty
+    _attackStarting           = bwapi.isStartingAttack
+    _attackAnimationHappening = bwapi.isAttackFrame
+    _airWeaponCooldownLeft    = bwapi.getAirWeaponCooldown
+    _groundWeaponCooldownLeft = bwapi.getGroundWeaponCooldown
+    _spellCooldownLeft        = bwapi.getSpellCooldown
   }
   
   var _interceptors             : Iterable[UnitInfo]  = Iterable.empty
@@ -145,12 +145,12 @@ class ForeignUnitInfo(baseUnit: bwapi.Unit) extends UnitInfo (baseUnit) {
   //////////////
   
   private def updateGeometry() {
-    _pixelCenter  = new Pixel(base.getPosition)
-    _tileTopLeft  = new Tile(base.getTilePosition)
-    _top          = base.getTop
-    _left         = base.getLeft
-    _right        = base.getRight
-    _bottom       = base.getBottom
+    _pixelCenter  = new Pixel(bwapi.getPosition)
+    _tileTopLeft  = new Tile(bwapi.getTilePosition)
+    _top          = bwapi.getTop
+    _left         = bwapi.getLeft
+    _right        = bwapi.getRight
+    _bottom       = bwapi.getBottom
   }
   
   private var _pixelCenter : Pixel  = Pixel(0, 0)
@@ -172,26 +172,26 @@ class ForeignUnitInfo(baseUnit: bwapi.Unit) extends UnitInfo (baseUnit) {
   ////////////
   
   private def updateOrders() {
-    _target               = base.getTarget
-    _targetPosition       = base.getTargetPosition
-    _command              = base.getLastCommand
-    _order                = base.getOrder.toString
-    _orderTarget          = base.getOrderTarget
-    _orderTargetPosition  = base.getOrderTargetPosition
-    _gatheringMinerals    = base.isGatheringMinerals
-    _gatheringGas         = base.isGatheringGas
-    _attacking            = base.isAttacking
-    _constructing         = base.isConstructing
-    _following            = base.isFollowing
-    _holdingPosition      = base.isHoldingPosition
-    _idle                 = base.isIdle
-    _interruptible        = base.isInterruptible
-    _morphing             = base.isMorphing
-    _repairing            = base.isRepairing
-    _researching          = base.isResearching
-    _patrolling           = base.isPatrolling
-    _training             = base.isTraining
-    _upgrading            = base.isUpgrading
+    _target               = bwapi.getTarget
+    _targetPosition       = bwapi.getTargetPosition
+    _command              = bwapi.getLastCommand
+    _order                = bwapi.getOrder.toString
+    _orderTarget          = bwapi.getOrderTarget
+    _orderTargetPosition  = bwapi.getOrderTargetPosition
+    _gatheringMinerals    = bwapi.isGatheringMinerals
+    _gatheringGas         = bwapi.isGatheringGas
+    _attacking            = bwapi.isAttacking
+    _constructing         = bwapi.isConstructing
+    _following            = bwapi.isFollowing
+    _holdingPosition      = bwapi.isHoldingPosition
+    _idle                 = bwapi.isIdle
+    _interruptible        = bwapi.isInterruptible
+    _morphing             = bwapi.isMorphing
+    _repairing            = bwapi.isRepairing
+    _researching          = bwapi.isResearching
+    _patrolling           = bwapi.isPatrolling
+    _training             = bwapi.isTraining
+    _upgrading            = bwapi.isUpgrading
   }
   
   private var _target               : bwapi.Unit  = _
@@ -211,8 +211,8 @@ class ForeignUnitInfo(baseUnit: bwapi.Unit) extends UnitInfo (baseUnit) {
   def orderTarget       : Option[UnitInfo]    = if (_target == null) None else With.units.get(_orderTarget)
   def orderTargetPixel  : Option[Pixel]       = if (badPositions.contains(_orderTargetPosition)) None else Some(new Pixel(_orderTargetPosition))
   
-  def gatheringMinerals   : Boolean = base.isGatheringMinerals
-  def gatheringGas        : Boolean = base.isGatheringGas
+  def gatheringMinerals   : Boolean = bwapi.isGatheringMinerals
+  def gatheringGas        : Boolean = bwapi.isGatheringGas
   
   private var _attacking        : Boolean = _
   private var _constructing     : Boolean = _
@@ -245,10 +245,10 @@ class ForeignUnitInfo(baseUnit: bwapi.Unit) extends UnitInfo (baseUnit) {
   ////////////////
   
   private def updateVisibility() {
-    _burrowed = base.isBurrowed
-    _cloaked  = base.isCloaked
-    _detected = base.isDetected
-    _visible  = base.isVisible
+    _burrowed = bwapi.isBurrowed
+    _cloaked  = bwapi.isCloaked
+    _detected = bwapi.isDetected
+    _visible  = bwapi.isVisible
   }
   
   private var _burrowed  : Boolean  = _
@@ -266,20 +266,20 @@ class ForeignUnitInfo(baseUnit: bwapi.Unit) extends UnitInfo (baseUnit) {
   //////////////
   
   private def updateMovement() {
-    _accelerating = base.isAccelerating
-    _angle        = base.getAngle
-    _braking      = base.isBraking
-    _ensnared     = base.isEnsnared
-    _flying       = base.isFlying
-    _lifted       = base.isLifted
-    _lockedDown   = base.isLockedDown
-    _maelstrommed = base.isMaelstrommed
-    _sieged       = base.isSieged
-    _stasised     = base.isStasised
-    _stimmed      = base.isStimmed
-    _stuck        = base.isStuck
-    _velocityX    = base.getVelocityX
-    _velocityY    = base.getVelocityY
+    _accelerating = bwapi.isAccelerating
+    _angle        = bwapi.getAngle
+    _braking      = bwapi.isBraking
+    _ensnared     = bwapi.isEnsnared
+    _flying       = bwapi.isFlying
+    _lifted       = bwapi.isLifted
+    _lockedDown   = bwapi.isLockedDown
+    _maelstrommed = bwapi.isMaelstrommed
+    _sieged       = bwapi.isSieged
+    _stasised     = bwapi.isStasised
+    _stimmed      = bwapi.isStimmed
+    _stuck        = bwapi.isStuck
+    _velocityX    = bwapi.getVelocityX
+    _velocityY    = bwapi.getVelocityY
   }
   
   private var _accelerating   : Boolean   = _
@@ -317,22 +317,22 @@ class ForeignUnitInfo(baseUnit: bwapi.Unit) extends UnitInfo (baseUnit) {
   //////////////
   
   private def updateStatuses() {
-    _remainingUpgradeFrames = base.getRemainingUpgradeTime
-    _remainingTechFrames    = base.getRemainingResearchTime
-    _beingConstructed       = base.isBeingConstructed
-    _beingGathered          = base.isBeingGathered
-    _beingHealed            = base.isBeingHealed
-    _blind                  = base.isBlind
-    _carryingMinerals       = base.isCarryingMinerals
-    _carryingGas            = base.isCarryingGas
-    _powered                = base.isPowered
-    _selected               = base.isSelected
-    _targetable             = base.isTargetable
-    _underAttack            = base.isUnderAttack
-    _underDarkSwarm         = base.isUnderDarkSwarm
-    _underDisruptionWeb     = base.isUnderDisruptionWeb
-    _underStorm             = base.isUnderStorm
-    _addon                  = With.units.get(base.getAddon)
+    _remainingUpgradeFrames = bwapi.getRemainingUpgradeTime
+    _remainingTechFrames    = bwapi.getRemainingResearchTime
+    _beingConstructed       = bwapi.isBeingConstructed
+    _beingGathered          = bwapi.isBeingGathered
+    _beingHealed            = bwapi.isBeingHealed
+    _blind                  = bwapi.isBlind
+    _carryingMinerals       = bwapi.isCarryingMinerals
+    _carryingGas            = bwapi.isCarryingGas
+    _powered                = bwapi.isPowered
+    _selected               = bwapi.isSelected
+    _targetable             = bwapi.isTargetable
+    _underAttack            = bwapi.isUnderAttack
+    _underDarkSwarm         = bwapi.isUnderDarkSwarm
+    _underDisruptionWeb     = bwapi.isUnderDisruptionWeb
+    _underStorm             = bwapi.isUnderStorm
+    _addon                  = With.units.get(bwapi.getAddon)
   }
   
   private var _remainingUpgradeFrames : Int = _

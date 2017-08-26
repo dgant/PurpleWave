@@ -3,7 +3,6 @@ package Information.Geography.Calculations
 import Information.Geography.Types.Base
 import Lifecycle.With
 import ProxyBwapi.Races.Protoss
-import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.EnrichPixel._
 
 object BaseUpdater {
@@ -19,7 +18,7 @@ object BaseUpdater {
     val townHalls = With.units.buildings
       .filter(unit =>
         unit.unitClass.isTownHall
-        && unit.tileIncludingCenter.zone == base.zone
+        && unit.zone == base.zone
         && base.zone.bases.minBy(_.heart.tileDistanceFast(unit.tileIncludingCenter)) == base)
     
     if (townHalls.nonEmpty) {
@@ -33,8 +32,8 @@ object BaseUpdater {
     
     // Assume ownership of occupied base we haven't seen lately
     if (base.owner.isNeutral && base.lastScoutedFrame < With.framesSince(Protoss.Nexus.buildFrames)) {
-      With.units.enemy
-        .find(unit => ! unit.flying && unit.unitClass.isBuilding && unit.zone == base.zone)
+      base.zone.units
+        .find(unit => unit.isEnemy && ! unit.flying && unit.unitClass.isBuilding && unit.zone == base.zone)
         .foreach(enemyBuilding => base.owner = enemyBuilding.player)
     }
     
@@ -46,18 +45,12 @@ object BaseUpdater {
   }
   
   private def updateAssets(base: Base) {
-    base.minerals       = With.units.neutral.filter(u => u.mineralsLeft > 0 && ! u.isMineralBlocker && resourceIsInBase(u, base)).toSet
-    base.gas            = With.units.all.filter(_.unitClass.isGas).filter(resourceIsInBase(_, base))
+    base.minerals       = base.zone.units.filter(u => u.mineralsLeft > 0 && ! u.isMineralBlocker && u.base.contains(base)).toSet
+    base.gas            = base.zone.units.filter(u => u.unitClass.isGas && u.base.contains(base))
     base.workers        = With.units.all.filter(unit => unit.unitClass.isWorker && base.zone.contains(unit.pixelCenter))
     base.mineralsLeft   = base.minerals.filter(_.alive).toVector.map(_.mineralsLeft).sum
     base.gasLeft        = base.gas.filter(_.alive).toVector.map(_.gasLeft).sum
     base.harvestingArea = (Vector(base.townHallArea) ++ (base.minerals.filter(_.mineralsLeft > With.configuration.blockerMineralThreshold) ++ base.gas).map(_.tileArea)).boundary
     base.heart          = base.harvestingArea.midpoint
   }
-  
-  private def resourceIsInBase(resource: UnitInfo, base: Base): Boolean = {
-    resource.zone == base.townHallTile.zone &&
-    resource.pixelDistanceFast(base.townHallArea.midPixel) < With.configuration.baseRadiusPixels
-  }
-  
 }

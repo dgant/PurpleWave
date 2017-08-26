@@ -4,6 +4,7 @@ import Information.Geography.Pathfinding.ZonePath
 import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile, TileRectangle}
 import ProxyBwapi.Players.PlayerInfo
+import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.ByOption
 import bwta.Region
 
@@ -35,9 +36,10 @@ class Zone(
       Some(edges.minBy(edge => With.geography.startLocations.map(_.groundPixels(edge.centerPixel)).max))
   }
   
-  var owner     : PlayerInfo  = With.neutral
-  var contested : Boolean     = false
-  var walledIn  : Boolean     = false
+  var units     : Set[UnitInfo] = Set.empty
+  var owner     : PlayerInfo    = With.neutral
+  var contested : Boolean       = false
+  var walledIn  : Boolean       = false
   
   def contains(tile: Tile)    : Boolean = boundary.contains(tile) && tiles.contains(tile)
   def contains(pixel: Pixel)  : Boolean = contains(pixel.tileIncluding)

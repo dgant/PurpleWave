@@ -28,7 +28,8 @@ class Visualization {
     ShowUnitsAll,
     ShowUnitsFriendly,
     ShowUnitsForeign,
-    ShowZoneLabels
+    ShowZoneLabels,
+    ShowIntelligence
   )
   
   var enabled   = true

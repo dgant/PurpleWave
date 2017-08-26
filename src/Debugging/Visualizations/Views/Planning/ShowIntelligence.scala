@@ -7,12 +7,12 @@ import Lifecycle.With
 object ShowIntelligence extends View {
   
   val fingerprints = Vector(
-    Fingerprint4Pool,
-    Fingerprint9Pool,
-    FingerprintOverpool,
-    Fingerprint10Hatch9Pool,
-    Fingerprint12Hatch,
-    Fingerprint12Pool
+    new Fingerprint4Pool,
+    new Fingerprint9Pool,
+    new FingerprintOverpool,
+    new Fingerprint10Hatch9Pool,
+    new Fingerprint12Hatch,
+    new Fingerprint12Pool
   )
   
   override def renderScreen() {

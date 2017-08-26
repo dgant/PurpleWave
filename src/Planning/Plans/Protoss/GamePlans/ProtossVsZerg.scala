@@ -45,16 +45,16 @@ class ProtossVsZerg extends Parallel {
     new Parallel(
       new ForgeFastExpand,
       new If(
-        new EnemyStrategy(Fingerprint4Pool),
+        new EnemyStrategy(new Fingerprint4Pool),
         new Build(ProtossBuilds.FFE_Vs4Pool: _*),
       new If(
         new Or(
-          new EnemyStrategy(Fingerprint9Pool),
-          new EnemyStrategy(FingerprintOverpool),
-          new EnemyStrategy(Fingerprint10Hatch9Pool)),
+          new EnemyStrategy(new Fingerprint9Pool),
+          new EnemyStrategy(new FingerprintOverpool),
+          new EnemyStrategy(new Fingerprint10Hatch9Pool)),
         new Build(ProtossBuilds.FFE_ForgeFirst: _*),
       new If(
-        new EnemyStrategy(Fingerprint12Hatch),
+        new EnemyStrategy(new Fingerprint12Hatch),
         new If(
           new Employing(PvZEarlyFFEGatewayFirst),
           new Build(ProtossBuilds.FFE_GatewayFirst: _*),
@@ -71,7 +71,7 @@ class ProtossVsZerg extends Parallel {
         new Build(ProtossBuilds.FFE_ForgeFirst: _*))))))),
       new RequireMiningBases(2),
       new If(
-        new EnemyStrategy(Fingerprint10Hatch9Pool),
+        new EnemyStrategy(new Fingerprint10Hatch9Pool),
         new Build(RequestAtLeast(4, Protoss.PhotonCannon))),
       new FFEFollowUp
     ))
@@ -194,7 +194,7 @@ class ProtossVsZerg extends Parallel {
       new If(
         new And(
           new WeAreFFEing,
-          new EnemyStrategy(Fingerprint4Pool),
+          new EnemyStrategy(new Fingerprint4Pool),
           new Check(() => With.frame > 24 * 125),
           new UnitsAtMost(1, UnitMatchType(Protoss.PhotonCannon), complete = true)),
         new DefendFFEWithProbesAgainst4Pool)),
@@ -204,8 +204,8 @@ class ProtossVsZerg extends Parallel {
         new And(
           new WeAreFFEing,
           new Or(
-            new EnemyStrategy(Fingerprint9Pool),
-            new EnemyStrategy(FingerprintOverpool)),
+            new EnemyStrategy(new Fingerprint9Pool),
+            new EnemyStrategy(new FingerprintOverpool)),
           new Check(() => With.frame > 24 * 125),
           new UnitsAtMost(2, UnitMatchType(Protoss.PhotonCannon), complete = true)),
         new DefendFFEWithProbesAgainst9Pool)),

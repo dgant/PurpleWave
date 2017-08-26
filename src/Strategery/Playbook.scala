@@ -83,7 +83,7 @@ class PurpleCheesePlaybook extends EmptyPlaybook  {
   override lazy val forced: Seq[Strategy] = StrategyGroups.cheese
 }
 
-object Playbook extends TestingPlaybook {
+object Playbook extends MacroPlaybook {
   
   //////////////////////
   // Experiment order //

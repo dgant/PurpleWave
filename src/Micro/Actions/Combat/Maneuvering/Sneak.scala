@@ -1,6 +1,6 @@
 package Micro.Actions.Combat.Maneuvering
 
-import Debugging.Visualizations.Colors
+import Debugging.Visualizations.ForceColors
 import Micro.Actions.Action
 import Micro.Actions.Combat.Attacking.Potshot
 import Micro.Actions.Commands.Gravitate
@@ -22,12 +22,12 @@ object Sneak extends Action {
     if (unit.readyForMicro) {
       val forceThreat     = Potential.threatsRepulsion(unit)
       val forceSneaking   = Potential.detectionRepulsion(unit)
-      val forceColliding  = Potential.collisionRepulsion(unit)
+      val forceSpreading  = Potential.collisionRepulsion(unit)
       val forceMobility   = Potential.barrierRepulsion(unit)
-      unit.agent.forces.put(Colors.NeonRed,     forceThreat)
-      unit.agent.forces.put(Colors.NeonTeal,    forceSneaking)
-      unit.agent.forces.put(Colors.NeonGreen,   forceMobility)
-      unit.agent.forces.put(Colors.NeonViolet,  forceColliding)
+      unit.agent.forces.put(ForceColors.threat,     forceThreat)
+      unit.agent.forces.put(ForceColors.bypassing,  forceSneaking)
+      unit.agent.forces.put(ForceColors.mobility,   forceMobility)
+      unit.agent.forces.put(ForceColors.spreading,  forceSpreading)
       Gravitate.delegate(unit)
     }
   }

@@ -1,32 +1,18 @@
 package Information.Grids.Vision
 
-import Information.Grids.ArrayTypes.AbstractGridInt
+import Information.Grids.ArrayTypes.AbstractGridTimestamp
 import Lifecycle.With
 import Mathematics.Points.Tile
-import Mathematics.Shapes.Circle
 
-class GridFriendlyVision extends AbstractGridInt {
+class GridFriendlyVision extends AbstractGridTimestamp {
   
-  def visible(tile: Tile): Boolean = get(tile) >= lastUpdateFrame
-  
-  var lastUpdateFrame = 0
-  val never: Int = -24 * 60 * 60
-  
-  override val defaultValue: Int = never
-  reset()
-  
-  def everSeen(tile: Tile): Boolean = get(tile) > 0
-  def framesSince(tile: Tile): Int = lastUpdateFrame - get(tile)
-  
-  override def update() {
-    
-    lastUpdateFrame = With.frame
-    With.units.ours
-      .flatMap(u => Circle.points(12).map(u.tileIncludingCenter.add))
-      .foreach(tile =>
-        if (With.game.isVisible(tile.bwapi))
-          set(tile, With.frame))
+  override protected def updateTimestamps() {
+    var index = 0
+    while(index < length) {
+      val tile = new Tile(index)
+      if (With.game.isVisible(tile.x, tile.y))
+      set(index, frameUpdated)
+      index += 1
+    }
   }
-  
-  
 }

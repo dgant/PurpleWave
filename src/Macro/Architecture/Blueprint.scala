@@ -62,10 +62,10 @@ class Blueprint(
     }
     
     if (requirePower.get) {
-      if (heightTiles.get == 3 && ! With.grids.psi3Height.get(tile) && ! With.architecture.powered3Height.contains(tile)) {
+      if (heightTiles.get == 3 && ! With.grids.psi3Height.isSet(tile) && ! With.architecture.powered3Height.contains(tile)) {
         return false
       }
-      if (heightTiles.get == 2 && ! With.grids.psi2Height.get(tile) && ! With.architecture.powered2Height.contains(tile)) {
+      if (heightTiles.get == 2 && ! With.grids.psi2Height.isSet(tile) && ! With.architecture.powered2Height.contains(tile)) {
         return false
       }
     }

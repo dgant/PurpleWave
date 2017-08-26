@@ -96,12 +96,12 @@ class ForeignUnitTracker {
   
     if (unit.visible)                                                 return
     if ( ! unit.possiblyStillThere)                                   return
-    if (unit.lastSeen > With.grids.friendlyVision.lastUpdateFrame)    return
-    if (unit.lastSeen > With.grids.friendlyDetection.lastUpdateFrame) return
-    if (With.framesSince(unit.lastSeen) < 24 * 3)                     return
+    if (unit.lastSeen > With.grids.friendlyVision.frameUpdated)    return
+    if (unit.lastSeen > With.grids.friendlyDetection.frameUpdated) return
+    if (With.framesSince(unit.lastSeen) < 24 * 2)                     return
     
-    lazy val shouldBeVisible  = With.grids.friendlyVision.visible(unit.tileIncludingCenter)
-    lazy val shouldBeDetected = With.grids.friendlyDetection.get(unit.tileIncludingCenter)
+    lazy val shouldBeVisible  = With.grids.friendlyVision.isSet(unit.tileIncludingCenter)
+    lazy val shouldBeDetected = With.grids.friendlyDetection.isSet(unit.tileIncludingCenter)
     lazy val wasBurrowing     = unit.burrowed || Array(Orders.Burrowing, Orders.VultureMine).contains(unit.order)
     lazy val wasCloaking      = unit.cloaked  || unit.order == Orders.Cloak
 

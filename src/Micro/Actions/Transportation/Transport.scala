@@ -1,8 +1,9 @@
 package Micro.Actions.Transportation
 
 import Micro.Actions.Action
-import Micro.Actions.Combat.Maneuvering.Avoid
+import Micro.Actions.Combat.Maneuvering.Smuggle
 import Micro.Actions.Commands.Move
+import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Transport extends Action {
@@ -15,7 +16,8 @@ object Transport extends Action {
     Evacuate.consider(unit)
     DropOff.consider(unit)
     Pickup.consider(unit)
-    Avoid.consider(unit)
+    val fast = unit.player.hasUpgrade(Protoss.ShuttleSpeed)
+    Smuggle.consider(unit)
     Move.delegate(unit)
   }
 }

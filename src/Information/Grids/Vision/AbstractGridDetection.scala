@@ -1,29 +1,18 @@
 package Information.Grids.Vision
 
-import Information.Grids.ArrayTypes.AbstractGridBoolean
-import Lifecycle.With
+import Information.Grids.ArrayTypes.AbstractGridTimestamp
 import Mathematics.Shapes.Circle
 import ProxyBwapi.UnitInfo.UnitInfo
 
-abstract class AbstractGridDetection extends AbstractGridBoolean {
+abstract class AbstractGridDetection extends AbstractGridTimestamp {
   
-  var lastUpdateFrame = 0
-  
-  override def update() {
-    lastUpdateFrame = With.frame
-    reset()
-    units
-      .filter(_.likelyStillThere)
-      .filter(unit =>
-        unit.likelyStillThere &&
-        unit.aliveAndComplete &&
-        unit.unitClass.isDetector)
-      .foreach(u => {
-      Circle.points(11) // All detectors have a detection range of 11 even if their sight range is different. In practice this is closer to 10
-        .map(u.tileIncludingCenter.add)
-        .foreach(set(_, true))
-    })
+  override protected def updateTimestamps() {
+    detectors
+      .foreach(detector =>
+        Circle.points(11) // All detectors have an 11-tile detection range regardless of sight range
+          .map(detector.tileIncludingCenter.add)
+          .foreach(set(_, frameUpdated)))
   }
   
-  protected def units: Seq[UnitInfo]
+  protected def detectors: Traversable[UnitInfo]
 }

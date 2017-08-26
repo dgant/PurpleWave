@@ -5,7 +5,8 @@ import Lifecycle.With
 
 class GridWalkableUnits extends AbstractGridBoolean {
   
-  override def defaultValue:Boolean = true
+  override def defaultValue: Boolean = true
+  reset()
   
   override def update() {
     reset()

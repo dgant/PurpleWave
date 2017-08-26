@@ -12,7 +12,7 @@ object WraithCloak extends Action {
     ! unit.cloaked                                      &&
     unit.energy >= Terran.WraithCloak.energyCost + 10   &&
     unit.damageInLastSecond > 0                         &&
-    ! With.grids.enemyDetection.get(unit.tileIncludingCenter)
+    ! With.grids.enemyDetection.isSet(unit.tileIncludingCenter)
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {

@@ -11,6 +11,7 @@ class TaskQueueGrids extends AbstractTaskQueue {
     new TaskGridChokepoints                 { urgency = 1   },
     new TaskGridCreep                       { urgency = 1   },
     new TaskGridEnemyDetection              { urgency = 100 },
+    new TaskGridEnemyVision                 { urgency = 100 },
     new TaskGridFriendlyDetection           { urgency = 100 },
     new TaskGridFriendlyVision              { urgency = 100 },
     new TaskGridMobilityBorder              { urgency = 1   },

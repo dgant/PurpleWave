@@ -198,18 +198,21 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   private val topSpeedChasingCache = new CacheFrame(() => topSpeed * PurpleMath.nanToOne(Math.max(0, cooldownMaxAirGround - unitClass.stopFrames) / cooldownMaxAirGround.toDouble))
   
   def topSpeed: Double = topSpeedCache.get
+  //TODO: Ensnare
   private val topSpeedCache = new CacheFrame(() =>
-    (if (stimmed) 1.5 else 1.0) * (
-    unitClass.topSpeed * (if (
-      (is(Terran.Vulture)   && player.hasUpgrade(Terran.VultureSpeed))    ||
-      (is(Protoss.Observer) && player.hasUpgrade(Protoss.ObserverSpeed))  ||
-      (is(Protoss.Scout)    && player.hasUpgrade(Protoss.ScoutSpeed))     ||
-      (is(Protoss.Shuttle)  && player.hasUpgrade(Protoss.ShuttleSpeed))   ||
-      (is(Protoss.Zealot)   && player.hasUpgrade(Protoss.ZealotSpeed))    ||
-      (is(Zerg.Overlord)    && player.hasUpgrade(Zerg.ZerglingSpeed))     ||
-      (is(Zerg.Hydralisk)   && player.hasUpgrade(Zerg.HydraliskSpeed))    ||
-      (is(Zerg.Ultralisk)   && player.hasUpgrade(Zerg.UltraliskSpeed)))
-      1.5 else 1.0)))
+    if ( ! canDoAnything || burrowed) 0 else
+      (if (stimmed) 1.5 else 1.0) * (
+      unitClass.topSpeed * (if (
+        (is(Terran.Vulture)   && player.hasUpgrade(Terran.VultureSpeed))    ||
+        (is(Protoss.Observer) && player.hasUpgrade(Protoss.ObserverSpeed))  ||
+        (is(Protoss.Scout)    && player.hasUpgrade(Protoss.ScoutSpeed))     ||
+        (is(Protoss.Shuttle)  && player.hasUpgrade(Protoss.ShuttleSpeed))   ||
+        (is(Protoss.Zealot)   && player.hasUpgrade(Protoss.ZealotSpeed))    ||
+        (is(Zerg.Overlord)    && player.hasUpgrade(Zerg.ZerglingSpeed))     ||
+        (is(Zerg.Hydralisk)   && player.hasUpgrade(Zerg.HydraliskSpeed))    ||
+        (is(Zerg.Ultralisk)   && player.hasUpgrade(Zerg.UltraliskSpeed)))
+        1.5 else 1.0)))
+  
   
   
   // TODO. We need better math :( BWAPI doesn't define what its accel/turn rate numbers mean.
@@ -274,6 +277,7 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
     output
   })
   
+  //TODO: Ensnare
   def cooldownLeft      : Int = Math.max(airCooldownLeft, groundCooldownLeft)
   def cooldownMaxAir    : Int = (2 + unitClass.airDamageCooldown)     / stimAttackSpeedBonus // +2 is the RNG
   def cooldownMaxGround : Int = (2 + unitClass.groundDamageCooldown)  / stimAttackSpeedBonus // +2 is the RNG
@@ -446,13 +450,19 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   // Visibility //
   ////////////////
   
+  def visibleToOpponents: Boolean =
+    if (isFriendly)
+      With.grids.enemyVision.isSet(tileIncludingCenter)
+    else
+      visible
+  
   def likelyStillThere: Boolean =
     possiblyStillThere &&
     ( ! canMove || With.framesSince(lastSeen) < With.configuration.fogPositionDuration || is(Terran.SiegeTankUnsieged))
   
   def effectivelyCloaked: Boolean =
     (burrowed || cloaked) && (
-      if (isFriendly) ! With.grids.enemyDetection.get(tileIncludingCenter) && damageInLastSecond == 0
+      if (isFriendly) ! With.grids.enemyDetection.isSet(tileIncludingCenter) && damageInLastSecond == 0
       else            ! detected
     )
   

@@ -2,7 +2,7 @@ package Planning.Plans.Protoss.GamePlans
 
 import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
-import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors}
+import Planning.Composition.UnitMatchers.{UnitMatchDroppable, UnitMatchType, UnitMatchWarriors}
 import Planning.Plans.Army._
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.Information.{Employ, Employing}
@@ -44,7 +44,7 @@ class ProtossVsTerran extends Parallel {
   
   private class ConsiderTakingThirdBase extends If(
     new Or(
-      new UnitsAtLeast(8, UnitMatchType(Protoss.Dragoon)),
+      new UnitsAtLeast(4, UnitMatchWarriors, complete = false),
       new UnitsAtLeast(1, UnitMatchType(Protoss.Reaver))),
     new RequireMiningBases(3))
   
@@ -56,9 +56,11 @@ class ProtossVsTerran extends Parallel {
     RequestAtLeast(2,   Protoss.Gateway),
     RequestAtLeast(1,   Protoss.RoboticsFacility),
     RequestAtLeast(1,   Protoss.Observatory),
+    RequestAtLeast(4,   Protoss.Gateway),
+    RequestAtLeast(1,   Protoss.RoboticsSupportBay),
     RequestAtLeast(1,   Protoss.CitadelOfAdun),
-    RequestAtLeast(1,   Protoss.Forge),
-    RequestUpgrade(Protoss.ZealotSpeed))
+    RequestUpgrade(Protoss.ZealotSpeed),
+    RequestAtLeast(1,   Protoss.Forge))
   
   //////////////////////////
   // Late-game strategies //
@@ -239,8 +241,8 @@ class ProtossVsTerran extends Parallel {
         new If(
           new UnitsAtLeast(8, UnitMatchWarriors, complete = true),
           new FulfillMidgameTech))),
-  
-    new OnMiningBases(3, new BuildCannonsAtBases(1)),
+    
+    new OnMiningBases(3, new BuildCannonsAtExpansions(1)),
     
     // Late game
     new If(
@@ -253,9 +255,7 @@ class ProtossVsTerran extends Parallel {
     // Units
     new TrainContinuously(Protoss.Carrier),
     new IfNoDetection_DarkTemplar,
-    new If(
-      new EnemyBio,
-      new TrainContinuously(Protoss.Reaver, 2)),
+    new TrainContinuously(Protoss.Reaver, 2),
     new TrainContinuously(Protoss.Arbiter, 3),
     new If(
       new Or(
@@ -265,10 +265,12 @@ class ProtossVsTerran extends Parallel {
       new TrainContinuously(Protoss.Observer, 1)
     ),
     new If(
-      new UnitsAtLeast(12, UnitMatchType(Protoss.Zealot)),
+      new Or(
+        new UnitsAtLeast(2, UnitMatchDroppable),
+        new UnitsAtLeast(2, UnitMatchType(Protoss.Reaver))),
       new Parallel(
-        new Build(RequestAtLeast(1, Protoss.RoboticsSupportBay)),
         new Build(RequestAtLeast(1, Protoss.Shuttle)),
+        new Build(RequestAtLeast(1, Protoss.RoboticsSupportBay)),
         new Build(RequestUpgrade(Protoss.ShuttleSpeed)),
         new Build(RequestAtLeast(2, Protoss.Shuttle)))
     ),
@@ -278,6 +280,7 @@ class ProtossVsTerran extends Parallel {
     new Build(RequestAtLeast(2, Protoss.Gateway)),
     new Build(RequestAtLeast(1, Protoss.RoboticsFacility)),
     new Build(RequestAtLeast(3, Protoss.Gateway)),
+    new Build(RequestAtLeast(1, Protoss.Observatory)),
     new RequireMiningBases(2),
     new Build(RequestAtLeast(6, Protoss.Gateway)),
     new RequireMiningBases(3),

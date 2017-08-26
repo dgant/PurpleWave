@@ -32,7 +32,9 @@ object ShowBattleDetails extends View {
       Vector[String]("Survivors",
         survivorPercentage(estimation.deathsUs,    estimation.totalUnitsUs),
         survivorPercentage(estimation.deathsEnemy, estimation.totalUnitsEnemy)),
-      Vector[String]("Desire", "%1.2f".format(battle.desire)))
+      Vector[String]("Gains",   "%1.2f".format(battle.analysis.attackGains)),
+      Vector[String]("Losses",  "%1.2f".format(battle.analysis.attackLosses)),
+      Vector[String]("Desire",  "%1.2f".format(battle.desire)))
     DrawScreen.table(x, y, table)
     
     val y2 = y + (table.length + 4) * With.visualization.lineHeightSmall

@@ -80,15 +80,14 @@ object Potential {
   }
   
   def barrierRepulsion(pixel: Pixel, maxMobility: Int, mobilitySource: AbstractGrid[Int]): Force = {
-    val tile                = pixel.tileIncluding
-    val mobility            = mobilitySource.get(tile)
-    val forces              = tile.adjacent8.filter(_.valid).map(neighbor => singleMobilityForce(tile, neighbor, mobilitySource))
-    val totalForce          = sum(forces)
-    val magnitude           = 2.0 * Math.max(0.0, 1.0 - 2 * mobility / maxMobility.toDouble)
-    val output              = totalForce.normalize(magnitude)
+    val tile          = pixel.tileIncluding
+    val mobility      = mobilitySource.get(tile)
+    val forces        = tile.adjacent8.filter(_.valid).map(neighbor => singleMobilityForce(tile, neighbor, mobilitySource))
+    val totalForce    = sum(forces)
+    val magnitude     = 2.0 * Math.max(0.0, 1.0 - 2 * mobility / maxMobility.toDouble)
+    val output        = totalForce.normalize(magnitude)
     output
   }
-  
   def singleMobilityForce(here: Tile, there: Tile, mobilitySource: AbstractGrid[Int]): Force = {
     val mobilityHere  = mobilitySource.get(here)
     val mobilityThere = mobilitySource.get(there)
@@ -131,6 +130,12 @@ object Potential {
     
     BuildForce.fromPixels(unit.pixelCenter, path.get.steps.head.edge.centerPixel)
   }
+  
+  def smuggleRepulsion(unit: FriendlyUnitInfo): Force = {
+    if (unit.tileIncludingCenter.tileDistanceFromEdge < 5) return new Force
+    -barrierRepulsion(unit)
+  }
+  
   
   def applyForcesForMoveOrder(forces: Traversable[Force], origin: Pixel): Pixel = {
     val forceTotal  = sum(forces)

@@ -1,6 +1,6 @@
 package Micro.Actions.Combat.Maneuvering
 
-import Debugging.Visualizations.Colors
+import Debugging.Visualizations.ForceColors
 import Micro.Actions.Action
 import Micro.Actions.Commands.Gravitate
 import Micro.Agency.Explosion
@@ -21,12 +21,12 @@ object Duck extends Action {
     unit.agent.explosions ++= getExplosions(unit)
     
     if (unit.agent.explosions.nonEmpty) {
-      val forceExplosion  = Potential.explosionsRepulsion(unit).normalize(2.0)
-      val forceMobility   = Potential.barrierRepulsion(unit)
+      val forceExplosion  = Potential.explosionsRepulsion(unit).normalize(3.0)
+      val forceMobility   = Potential.barrierRepulsion(unit).normalize(2.0)
       val forceSpreading  = Potential.collisionRepulsion(unit)
-      unit.agent.forces.put(Colors.NeonYellow,  forceExplosion)
-      unit.agent.forces.put(Colors.NeonGreen,   forceMobility)
-      unit.agent.forces.put(Colors.NeonViolet,  forceSpreading)
+      unit.agent.forces.put(ForceColors.threat,     forceExplosion)
+      unit.agent.forces.put(ForceColors.mobility,   forceMobility)
+      unit.agent.forces.put(ForceColors.spreading,  forceSpreading)
       Gravitate.delegate(unit)
     }
   }

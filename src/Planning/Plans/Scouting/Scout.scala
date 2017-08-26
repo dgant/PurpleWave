@@ -27,7 +27,13 @@ class Scout(scoutCount: Int = 1) extends Plan {
   var acquiredScouts: Iterable[FriendlyUnitInfo] = Iterable.empty
   var lastScoutDeath: Int = -24 * 60
   
-  override def isComplete: Boolean = With.geography.enemyBases.nonEmpty && lastScoutDeath > 0
+  override def isComplete: Boolean = {
+    val bases = With.geography.enemyBases
+    if (bases.isEmpty) return false
+    if (lastScoutDeath > 0) return true
+    if (bases.exists(_.zone.walledIn)) return true
+    false
+  }
   
   override def onUpdate() {
     if (isComplete) return

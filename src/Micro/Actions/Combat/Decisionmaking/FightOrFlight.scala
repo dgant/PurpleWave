@@ -37,7 +37,7 @@ object FightOrFlight extends Action {
     val individualCaution           = 0.2
     val individualHysteresis        = 0.2
     val individualThreshold         = individualCaution + (if (unit.agent.shouldEngage) -individualHysteresis else individualHysteresis)
-    val motivatedByDoom             = unit.matchups.doomedDiffused || unit.battle.exists(_.estimationSimulationRetreat.reportCards.get(unit).exists(_.dead))
+    val motivatedByDoom             = unit.matchups.doomedDiffused && unit.battle.exists(_.estimationSimulationRetreat.reportCards.get(unit).exists(_.dead))
     val motivatedIndividually       = unit.agent.desireIndividual > individualThreshold
     val motivatedCollectively       = unit.agent.desireTeam       > 0.0
     unit.agent.shouldEngage         = motivatedByDoom || motivatedIndividually || motivatedCollectively

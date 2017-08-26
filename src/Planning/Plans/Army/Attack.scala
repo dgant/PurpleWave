@@ -9,6 +9,7 @@ import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Composition.UnitPreferences.UnitPreferClose
 import Planning.Composition.{Property, UnitCountEverything}
 import Planning.Plan
+import Utilities.ByOption
 
 class Attack extends Plan {
   
@@ -23,25 +24,13 @@ class Attack extends Plan {
   override def onUpdate() {
     
     val target =
-      if (With.geography.enemyBases.isEmpty)
-        With.intelligence.mostBaselikeEnemyTile.pixelCenter
-      else {
-        val base =
-          With.geography.enemyBases
-            .minBy(base =>
-              if (With.geography.ourBases.nonEmpty)
-                With.geography.ourBases.map(_.zone.distancePixels(base.zone)).min
-              else
-                -base.mineralsLeft)
-        
-        // Actually hunt down the remaining buildings
-        if (With.units.enemy.nonEmpty) {
-          With.units.enemy.minBy(_.pixelDistanceFast(base.heart.pixelCenter)).pixelCenter
-        }
-        else {
-          base.heart.pixelCenter
-        }
-      }
+      ByOption
+        .maxBy(With.geography.enemyBases)(base => base.mineralsLeft + base.gasLeft)
+        .map(base => ByOption.minBy(base.units.filter(u => u.isEnemy && u.unitClass.isBuilding))(_.pixelDistanceFast(base.heart.pixelCenter))
+          .map(_.tileIncludingCenter)
+          .getOrElse(base.heart))
+        .getOrElse(With.intelligence.mostBaselikeEnemyTile)
+        .pixelCenter
     
     attackers.get.unitPreference.set(UnitPreferClose(target))
     attackers.get.acquire(this)

@@ -164,6 +164,7 @@ class ProtossVsTerran extends Parallel {
     new Employ(PvTEarly1GateReaver,   new FirstEightMinutes(new Build(ProtossBuilds.Opening_10Gate11Gas13Core: _*))),
     new Employ(PvTEarly2GateObs,      new FirstEightMinutes(new Build(ProtossBuilds.Opening_10Gate11Gas13Core: _*))),
     new Employ(PvTEarly1015GateGoon,  new FirstEightMinutes(new Build(ProtossBuilds.Opening_10Gate15GateDragoons: _*))),
+    new Employ(PvTEarly1015GateDT,    new FirstEightMinutes(new Build(ProtossBuilds.Opening_10Gate15GateDragoons: _*))),
     new Employ(PvTEarlyDTExpand,      new FirstEightMinutes(new Build(ProtossBuilds.OpeningDTExpand: _*))),
     
     new RequireSufficientSupply,
@@ -175,38 +176,41 @@ class ProtossVsTerran extends Parallel {
     
     new IfCloakedThreats_Observers,
     new FirstEightMinutes(
-      new Employ(PvTEarly1GateRange, new Parallel(
-        new Build(
-          RequestAtLeast(1, Protoss.Dragoon),
-          RequestAtLeast(2, Protoss.Nexus))))),
-    new FirstEightMinutes(
-      new Employ(PvTEarly1GateReaver, new Parallel(
-        new TrainContinuously(Protoss.Reaver, 1),
-        new Build(
-          RequestAtLeast(1, Protoss.Gateway),
-          RequestAtLeast(1, Protoss.CyberneticsCore),
-          RequestAtLeast(1, Protoss.RoboticsFacility)),
-        new TrainZealotsOrDragoons,
-        new Build(
-          RequestAtLeast(1, Protoss.Shuttle),
-          RequestAtLeast(1, Protoss.RoboticsSupportBay),
-          RequestAtLeast(1, Protoss.Reaver),
-          RequestUpgrade(Protoss.DragoonRange))
-      ))),
-  
-    new FirstEightMinutes(
-      new Employ(PvTEarly2GateObs, new Parallel(
-        new TrainZealotsOrDragoons,
-        new TrainContinuously(Protoss.Observer, 1),
-        new Build(
-          RequestAtLeast(1, Protoss.Gateway),
-          RequestAtLeast(1, Protoss.CyberneticsCore),
-          RequestUpgrade(Protoss.DragoonRange),
-          RequestAtLeast(1, Protoss.RoboticsFacility),
-          RequestAtLeast(2, Protoss.Gateway),
-          RequestAtLeast(1, Protoss.Observatory))
-      ))),
-  
+      new Parallel(
+        new Employ(PvTEarly1GateRange, new Parallel(
+          new Build(
+            RequestAtLeast(1, Protoss.Dragoon),
+            RequestAtLeast(2, Protoss.Nexus)))),
+        new Employ(PvTEarly1GateReaver, new Parallel(
+          new TrainContinuously(Protoss.Reaver, 1),
+          new Build(
+            RequestAtLeast(1, Protoss.Gateway),
+            RequestAtLeast(1, Protoss.CyberneticsCore),
+            RequestAtLeast(1, Protoss.RoboticsFacility)),
+          new TrainZealotsOrDragoons,
+          new Build(
+            RequestAtLeast(1, Protoss.Shuttle),
+            RequestAtLeast(1, Protoss.RoboticsSupportBay),
+            RequestAtLeast(1, Protoss.Reaver),
+            RequestUpgrade(Protoss.DragoonRange))
+        )),
+        new Employ(PvTEarly1015GateDT, new Parallel(
+          new TrainContinuously(Protoss.DarkTemplar, 4),
+          new TrainZealotsOrDragoons,
+          new Build(
+            RequestAtLeast(1, Protoss.CitadelOfAdun),
+            RequestAtLeast(1, Protoss.TemplarArchives)))),
+        new Employ(PvTEarly2GateObs, new Parallel(
+          new TrainZealotsOrDragoons,
+          new TrainContinuously(Protoss.Observer, 1),
+          new Build(
+            RequestAtLeast(1, Protoss.Gateway),
+            RequestAtLeast(1, Protoss.CyberneticsCore),
+            RequestUpgrade(Protoss.DragoonRange),
+            RequestAtLeast(1, Protoss.RoboticsFacility),
+            RequestAtLeast(2, Protoss.Gateway),
+            RequestAtLeast(1, Protoss.Observatory))
+        )))),
     new If(
       new EnemyBioAllIn,
       new Build(ProtossBuilds.TechReavers: _*)),

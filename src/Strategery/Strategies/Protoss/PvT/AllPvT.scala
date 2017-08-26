@@ -11,8 +11,9 @@ object AllPvT extends Strategy {
       PvTEarlyDTExpand,
       PvTEarly1GateRange,
       PvTEarly1GateReaver,
-      PvTEarly2GateObs,
-      PvTEarly1015GateGoon),
+      PvTEarly1015GateDT,
+      PvTEarly1015GateGoon,
+      PvTEarly2GateObs),
     Vector(
       PvTLateArbiters,
       PvTLateCarriers,

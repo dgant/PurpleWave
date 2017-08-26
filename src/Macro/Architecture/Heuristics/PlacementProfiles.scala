@@ -56,10 +56,10 @@ object PlacementProfiles {
   
   val townHall = new PlacementProfile("Town Hall",
     preferZone                  = 1000.0,
-    preferNatural               = 6.0,
+    preferNatural               = 2.0,
     preferResources             = 0.5,
-    preferDistanceFromEnemy     = 1.5,
-    avoidDistanceFromBase       = 2.0
+    preferDistanceFromEnemy     = 0.8,
+    avoidDistanceFromBase       = 1.0
   )
   
   //////////////////////////

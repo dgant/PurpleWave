@@ -3,27 +3,15 @@ package Information.Geography.Calculations
 import Information.Geography.Types.Base
 import Lifecycle.With
 import ProxyBwapi.Races.Protoss
+import Utilities.ByOption
 import Utilities.EnrichPixel._
 
 object BaseUpdater {
   
   def updateBase(base: Base) {
-    updateTownHall(base)
+    base.townHall = ByOption.minBy(base.units.filter(_.unitClass.isTownHall))(_.tileTopLeft.tileDistanceManhattan(base.townHallTile))
     updateOwner(base)
     updateAssets(base)
-  }
-  
-  private def updateTownHall(base: Base) {
-    base.townHall = None
-    val townHalls = With.units.buildings
-      .filter(unit =>
-        unit.unitClass.isTownHall
-        && unit.zone == base.zone
-        && base.zone.bases.minBy(_.heart.tileDistanceFast(unit.tileIncludingCenter)) == base)
-    
-    if (townHalls.nonEmpty) {
-      base.townHall = Some(townHalls.minBy(_.pixelDistanceSquared(base.townHallArea.midPixel)))
-    }
   }
   
   private def updateOwner(base: Base) {
@@ -45,11 +33,12 @@ object BaseUpdater {
   }
   
   private def updateAssets(base: Base) {
-    base.minerals       = base.zone.units.filter(u => u.mineralsLeft > 0 && ! u.isMineralBlocker && u.base.contains(base)).toSet
-    base.gas            = base.zone.units.filter(u => u.unitClass.isGas && u.base.contains(base))
-    base.workers        = With.units.all.filter(unit => unit.unitClass.isWorker && base.zone.contains(unit.pixelCenter))
-    base.mineralsLeft   = base.minerals.filter(_.alive).toVector.map(_.mineralsLeft).sum
-    base.gasLeft        = base.gas.filter(_.alive).toVector.map(_.gasLeft).sum
+    base.units          = base.zone.units.filter(_.base.contains(base))
+    base.minerals       = base.units.filter(u => u.mineralsLeft > 0 && ! u.isMineralBlocker)
+    base.gas            = base.units.filter(u => u.unitClass.isGas)
+    base.workers        = base.units.filter(u => u.unitClass.isWorker)
+    base.mineralsLeft   = base.minerals.toSeq.map(_.mineralsLeft).sum
+    base.gasLeft        = base.gas.toSeq.map(_.gasLeft).sum
     base.harvestingArea = (Vector(base.townHallArea) ++ (base.minerals.filter(_.mineralsLeft > With.configuration.blockerMineralThreshold) ++ base.gas).map(_.tileArea)).boundary
     base.heart          = base.harvestingArea.midpoint
   }

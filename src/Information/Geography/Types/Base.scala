@@ -16,6 +16,7 @@ class Base(val townHallTile: Tile)
   var       townHall        : Option[UnitInfo]  = None
   var       harvestingArea  : TileRectangle     = townHallArea
   var       heart           : Tile              = harvestingArea.midpoint
+  var       units           : Set[UnitInfo]     = Set.empty
   var       gas             : Set[UnitInfo]     = Set.empty
   var       minerals        : Set[UnitInfo]     = Set.empty
   var       workers         : Set[UnitInfo]     = Set.empty

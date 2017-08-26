@@ -69,7 +69,7 @@ class ProtossVsTerran extends Parallel {
   private class ImplementLateCarriers extends OnMiningBases(3,
     new Parallel(
       new Build(
-        RequestAtLeast(8, Protoss.Gateway),
+        RequestAtLeast(6, Protoss.Gateway),
         RequestAtLeast(1, Protoss.Stargate),
         RequestAtLeast(1, Protoss.FleetBeacon),
         RequestAtLeast(2, Protoss.Stargate),
@@ -86,8 +86,7 @@ class ProtossVsTerran extends Parallel {
           new UpgradeContinuously(Protoss.AirDamage),
           new Build(RequestAtLeast(2, Protoss.CyberneticsCore)),
           new UpgradeContinuously(Protoss.AirArmor)
-        )),
-      new Build(RequestAtLeast(4, Protoss.Stargate))))
+        ))))
   
   private class ImplementLateArbiters extends OnGasBases(3,
     new Build(

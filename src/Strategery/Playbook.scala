@@ -44,10 +44,7 @@ object StrategyGroups {
     AllPvZ,
     AllPvR,
     TvTStandard,
-    TvZStandard,
-    PvTEarly1GateRange,
-    PvPEarly1GateCore,
-    PvZEarlyFFEEconomic
+    TvZStandard
   )
   
   val bad = Vector[Strategy](

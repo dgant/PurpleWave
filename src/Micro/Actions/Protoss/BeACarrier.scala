@@ -17,10 +17,10 @@ object BeACarrier extends Action {
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {
-    
+    lazy val interceptorActiveOrders  = Array(Orders.InterceptorAttack, Orders.InterceptorReturn)
     lazy val interceptorsTotal        = unit.interceptors.count(_.aliveAndComplete)
-    lazy val interceptorsFighting     = unit.interceptors.count(_.order == Orders.InterceptorAttack)
-    lazy val interceptorsAreShooting  = interceptorsFighting >= interceptorsTotal
+    lazy val interceptorsFighting     = unit.interceptors.count(i => interceptorActiveOrders.contains(i.order))
+    lazy val interceptorsAreShooting  = interceptorsFighting >= interceptorsTotal / 2
     lazy val exitingLeash             = unit.matchups.targets.forall(_.pixelDistanceFast(unit) > 32.0 * 8.5)
     lazy val interceptorsNeedKick     = exitingLeash || ! interceptorsAreShooting
     

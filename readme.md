@@ -6,6 +6,14 @@ PurpleWave is such a *StarCraft* AI written in Scala. It can play all races and 
 
 PurpleWave won 3rd Place in the [2017 IEEE CIG Starcraft Tournament](https://cilab.sejong.ac.kr/sc_competition/?p=1090). It's been ranked as high as #7 on the [SSCAIT Ladder](https://sscaitournament.com/index.php?action=scores). 
 
+## Credits
+Thanks to:
+* Antiga / Iruian (Nathan Roth) for strategy advice and consulting
+* @jaj22/JohnJ for lots of advice navigating Brood War mechanics
+* @IMP42 @AdakiteSystems and @tscmoo for helping me get BWAPI up and running when I was getting started
+* @kovarex @heinermann @bgweber @certicky @davechurchill and the Cognition & Intelligence Lab at Sejong University for making Brood War competitions possible in the first place
+* @vjurenka for BWMirror and Luke Perkins for BWTA
+
 ## How to build PurpleWave
 What you'll need:
 * Windows

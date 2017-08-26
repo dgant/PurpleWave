@@ -34,7 +34,7 @@ object BaseUpdater {
     // Assume ownership of occupied base we haven't seen lately
     if (base.owner.isNeutral && base.lastScoutedFrame < With.framesSince(Protoss.Nexus.buildFrames)) {
       With.units.enemy
-        .find(unit => ! unit.flying && unit.unitClass.isBuilding && unit.pixelCenter.zone == base.zone)
+        .find(unit => ! unit.flying && unit.unitClass.isBuilding && unit.zone == base.zone)
         .foreach(enemyBuilding => base.owner = enemyBuilding.player)
     }
     
@@ -56,7 +56,7 @@ object BaseUpdater {
   }
   
   private def resourceIsInBase(resource: UnitInfo, base: Base): Boolean = {
-    resource.pixelCenter.zone == base.townHallTile.zone &&
+    resource.zone == base.townHallTile.zone &&
     resource.pixelDistanceFast(base.townHallArea.midPixel) < With.configuration.baseRadiusPixels
   }
   

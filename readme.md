@@ -11,7 +11,7 @@ Thanks to:
 * Antiga / Iruian (Nathan Roth) for strategy advice and consulting
 * @jaj22/JohnJ for lots of advice navigating Brood War mechanics
 * @IMP42 @AdakiteSystems and @tscmoo for helping me get BWAPI up and running when I was getting started
-* @kovarex @heinermann @bgweber @certicky @davechurchill and the Cognition & Intelligence Lab at Sejong University for making Brood War competitions possible in the first place
+* @kovarex @heinermann @bgweber @certicky @krasi0 @davechurchill and the Cognition & Intelligence Lab at Sejong University for making Brood War competitions possible in the first place
 * @vjurenka for BWMirror and Luke Perkins for BWTA
 
 ## How to build PurpleWave

@@ -44,7 +44,7 @@ object Tickle extends Action {
     val centroidHard    = if (enemies.size > 3) enemies.sortBy(_.pixelDistanceFast(centroidSoft)).take(enemies.size/2).map(_.pixelCenter).centroid else centroidSoft //Don't centroid an empty list
     
     // Get in their base!
-    if ( ! unit.pixelCenter.zone.bases.exists(_.owner.isEnemy)
+    if ( ! unit.zone.bases.exists(_.owner.isEnemy)
       && ! enemies.exists(_.pixelDistanceFast(unit) < 48.0)
       && enemiesAttackingUs.size < 1) {
       Move.consider(unit)
@@ -55,7 +55,7 @@ object Tickle extends Action {
     if (
       zone.bases.exists(_.harvestingArea.contains(unit.tileIncludingCenter)
       && enemies.exists(enemy =>
-        enemy.pixelCenter.zone == zone
+        enemy.zone == zone
         && enemy.pixelDistanceFast(unit) < 64.0
         && enemy.pixelDistanceFast(exit) < unit.pixelDistanceFast(exit)))) {
       mineralWalkAway(unit)
@@ -79,7 +79,7 @@ object Tickle extends Action {
   
     // Wait for re-enforcements
     val workersTotal  = With.units.ours.count(u => u.unitClass.isWorker)
-    val workersHere   = With.units.ours.count(u => u.unitClass.isWorker && u.pixelCenter.zone == zone)
+    val workersHere   = With.units.ours.count(u => u.unitClass.isWorker && u.zone == zone)
     if (workersHere * 2 < workersTotal  // Tomorrow, there'll be more of us.
       && enemies.size > 4               // Verus 4-Pool need to start dealing damage immediately
       ) {
@@ -111,7 +111,7 @@ object Tickle extends Action {
       // Ignore units outside their bases
       val targets = unit.matchups.targets.filter(target =>
         (
-          target.pixelCenter.zone == zone   ||
+          target.zone == zone   ||
           // ...unless they're fighting us! Or building a building.
           target.constructing               ||
           unit.inRangeToAttackFast(target)  ||

@@ -51,7 +51,7 @@ object MicroOptions {
   }
   
   def travels(agent: FriendlyUnitInfo): Vector[MicroDecision] = {
-    val zone = agent.pixelCenter.zone
+    val zone = agent.zone
     val outputs = zone.edges
       .map(_.otherSideof(zone).centroid.pixelCenter)
       .map(pixel => DecideToMove(agent, pixel, moveFrames(agent)))

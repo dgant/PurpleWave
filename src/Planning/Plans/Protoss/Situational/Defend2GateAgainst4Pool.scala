@@ -19,7 +19,7 @@ class Defend2GateAgainst4Pool extends Plan {
     
     if (With.units.ours.exists(u => u.aliveAndComplete && u.is(Protoss.PhotonCannon))) return
     
-    def inOurBase(unit: UnitInfo): Boolean = unit.pixelCenter.zone.bases.exists(_.owner.isUs)
+    def inOurBase(unit: UnitInfo): Boolean = unit.zone.bases.exists(_.owner.isUs)
     
     val cannons           = With.units.ours .filter(u => u.aliveAndComplete && u.is(Protoss.PhotonCannon))
     val zealots           = With.units.ours .filter(u => u.aliveAndComplete && u.is(Protoss.Zealot) && inOurBase(u))

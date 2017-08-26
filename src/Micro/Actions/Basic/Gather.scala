@@ -16,7 +16,7 @@ object Gather extends Action {
   
     Potshot.consider(unit)
     
-    if ( ! unit.agent.toGather.exists(_.pixelCenter.zone == unit.pixelCenter.zone)) {
+    if ( ! unit.agent.toGather.exists(_.zone == unit.zone)) {
       if (unit.matchups.threats.exists(_.framesBeforeAttacking(unit) < 10)) {
         Fight.consider(unit)
       }

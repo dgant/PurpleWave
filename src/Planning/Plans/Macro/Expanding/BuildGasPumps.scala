@@ -15,7 +15,7 @@ class BuildGasPumps(quantity: Int = Int.MaxValue, pumpType: UnitClass = With.sel
       new Blueprint(
         this,
         building = Some(pumpType),
-        requireZone = Some(gas.pixelCenter.zone),
+        requireZone = Some(gas.zone),
         requireCandidates = Some(Seq(gas.tileTopLeft))
       )
     ))

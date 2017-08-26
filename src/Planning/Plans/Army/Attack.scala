@@ -52,7 +52,7 @@ class Attack extends Plan {
     attackers.get.units.foreach(_.agent.intend(this, attackIntent))
   
     squad.goal = new SquadPush(target)
-    squad.enemies = With.units.enemy.filter(u => u.unitClass.helpsInCombat && ( ! u.unitClass.isBuilding || u.pixelCenter.zone == target.zone))
+    squad.enemies = With.units.enemy.filter(u => u.unitClass.helpsInCombat && ( ! u.unitClass.isBuilding || u.zone == target.zone))
     squad.conscript(attackers.get.units)
   }
 }

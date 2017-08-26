@@ -8,9 +8,8 @@ class WeAreBeingProxiedInBase extends Plan {
   override def isComplete: Boolean = {
     With.units.enemy.exists(unit =>
       unit.unitClass.isBuilding && {
-        val zone = unit.pixelCenter.zone
-        zone.bases.exists(_.isStartLocation) ||
-        zone.bases.exists(_.isNaturalOf.exists(main => main.owner.isUs))
+        unit.zone.bases.exists(_.isStartLocation) ||
+        unit.zone.bases.exists(_.isNaturalOf.exists(main => main.owner.isUs))
       })
   }
 }

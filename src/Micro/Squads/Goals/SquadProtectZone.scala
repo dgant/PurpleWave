@@ -18,7 +18,7 @@ class SquadProtectZone(zone: Zone) extends SquadGoal {
   
     lazy val base   = zone.bases.find(_.owner.isUs)
     lazy val choke  = zone.exit
-    lazy val walls  = With.units.ours.toSeq.filter(u => u.unitClass.isStaticDefense && u.pixelCenter.zone == zone)
+    lazy val walls  = With.units.ours.toSeq.filter(u => u.unitClass.isStaticDefense && u.zone == zone)
     
     lazy val canHuntEnemies  = squad.enemies.exists(e => e.matchups.threatsInRange.isEmpty || e.matchups.vpfNetDiffused > 0.0)
     lazy val canDefendWall   = walls.nonEmpty

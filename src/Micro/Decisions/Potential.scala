@@ -76,7 +76,7 @@ object Potential {
     if (unit.flying)
       barrierRepulsion(unit.pixelCenter, 12, With.grids.mobilityBorder)
     else
-      barrierRepulsion(unit.pixelCenter, unit.pixelCenter.zone.maxMobility, With.grids.mobility)
+      barrierRepulsion(unit.pixelCenter, unit.zone.maxMobility, With.grids.mobility)
   }
   
   def barrierRepulsion(pixel: Pixel, maxMobility: Int, mobilitySource: AbstractGrid[Int]): Force = {
@@ -123,7 +123,7 @@ object Potential {
     val destination = unit.agent.origin.zone
     
     val path = With.paths.zonePath(
-      unit.pixelCenter.zone,
+      unit.zone,
       destination)
     
     if (path.isEmpty || path.get.steps.isEmpty) return new Force

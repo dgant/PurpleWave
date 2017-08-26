@@ -1,6 +1,7 @@
 package ProxyBwapi.UnitInfo
 
 import Information.Battles.Types.Battle
+import Information.Geography.Types.Zone
 import Information.Kill
 import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile, TileRectangle}
@@ -155,6 +156,9 @@ abstract class UnitInfo (base: bwapi.Unit) extends UnitProxy(base) {
   def tileIncludingCenter:  Tile          = pixelCenter.tileIncluding
   def tileArea:             TileRectangle = unitClass.tileArea.add(tileTopLeft)
   def addonArea:            TileRectangle = TileRectangle(Tile(0, 0), Tile(2, 2)).add(tileTopLeft).add(4,1)
+  
+  def zone: Zone = cacheZone.get
+  private val cacheZone = new CacheFrame(() => pixelCenter.zone)
   
   def pixelRangeMin: Double = unitClass.groundMinRangeRaw
   def pixelRangeAir: Double = pixelRangeAirCache.get

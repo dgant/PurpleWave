@@ -17,7 +17,7 @@ object Target extends Action {
     TargetRelevant.delegate(unit)
     var canPillage = false
     canPillage ||= unit.agent.canPillage
-    canPillage ||= unit.pixelCenter.zone.owner.isEnemy
+    canPillage ||= unit.zone.owner.isEnemy
     canPillage ||= Yolo.active
     canPillage &&= unit.matchups.threatsInRange.isEmpty
     if (canPillage) {

@@ -5,9 +5,9 @@ import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.UnitClass.UnitClass
 import bwapi.UnitCommand
 
-abstract class UnitProxy(var bwapi:  bwapi.Unit) {
+abstract class UnitProxy(var baseUnit: bwapi.Unit) {
     
-  val id:  Int = bwapi.getID
+  val id: Int = baseUnit.getID
   
   ///////////////////
   // Tracking info //

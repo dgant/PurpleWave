@@ -35,7 +35,7 @@ class FriendlyUnitTracker {
     
     //Remove no-longer-valid units
     //We have to do this after updating because it needs the latest bwapi.Units
-    friendlyUnitsById.values.map(_.bwapi).filterNot(isValidFriendlyUnit).foreach(remove)
+    friendlyUnitsById.values.map(_.baseUnit).filterNot(isValidFriendlyUnit).foreach(remove)
     
     //Could speed things up by diffing instead of recreating these
     friendlyUnits = friendlyUnitsById.values.toSet
@@ -52,7 +52,7 @@ class FriendlyUnitTracker {
   }
   
   private def update(unit:bwapi.Unit) {
-    friendlyUnitsById(unit.getID).bwapi = unit
+    friendlyUnitsById(unit.getID).baseUnit = unit
   }
   
   private def remove(id:Int) {

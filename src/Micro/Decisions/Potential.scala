@@ -136,6 +136,10 @@ object Potential {
     -barrierRepulsion(unit)
   }
   
+  def cloakAttraction(unit: FriendlyUnitInfo): Force = {
+    if (unit.tileIncludingCenter.tileDistanceFromEdge < 5) return new Force
+    -barrierRepulsion(unit)
+  }
   
   def applyForcesForMoveOrder(forces: Traversable[Force], origin: Pixel): Pixel = {
     val forceTotal  = sum(forces)

@@ -2,13 +2,12 @@ package Micro.Actions.Combat.Maneuvering
 
 import Micro.Actions.Action
 import Micro.Actions.Combat.Decisionmaking.Disengage
-import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Cower extends Action {
   
   override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
-    val isHelpless = ! unit.canAttack || unit.is(Protoss.Arbiter)
+    val isHelpless = ! unit.canAttack
     (unit.agent.canCower || isHelpless) &&
       unit.canMove                      &&
       unit.matchups.threats.nonEmpty    &&

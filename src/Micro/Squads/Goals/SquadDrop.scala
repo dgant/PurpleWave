@@ -15,6 +15,7 @@ class SquadDrop(pixel: Pixel) extends SquadGoal {
     squad.recruits.foreach(_.agent.intend(squad.client, new Intention {
       toTravel = Some(pixel)
     }))
+    
   }
   
   override def acceptsHelp: Boolean = false

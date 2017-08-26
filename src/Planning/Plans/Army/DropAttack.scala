@@ -16,11 +16,13 @@ class DropAttack extends Plan {
   val transportLock = new Property(new LockUnits)
   transportLock.get.unitMatcher.set(UnitMatchTransport)
   transportLock.get.unitCounter.set(UnitCountOne)
+  transportLock.get.interruptable.set(false)
   
   val paratrooperMatcher = new Property[UnitMatcher](UnitMatchDroppable)
   
   val paratrooperLock = new Property(new LockUnits)
   paratrooperLock.get.unitMatcher.inherit(paratrooperMatcher)
+  paratrooperLock.get.interruptable.set(false)
   
   val squad = new Squad(this)
   

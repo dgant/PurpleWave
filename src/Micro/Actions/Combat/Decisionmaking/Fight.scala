@@ -4,7 +4,7 @@ import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.{Cower, Sneak}
 import Micro.Actions.Combat.Spells.{SpiderMine, Stim}
 import Micro.Actions.Combat.Tactics.{Bunk, BustBunker, Sally, Spot}
-import Micro.Actions.Protoss.BeACarrier
+import Micro.Actions.Protoss.{BeACarrier, BeAnArbiter}
 import Micro.Actions.Terran.{Siege, Unsiege}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -22,6 +22,7 @@ object Fight extends Action {
     Siege.consider(unit)
     Unsiege.consider(unit)
     BeACarrier.consider(unit)
+    BeAnArbiter.consider(unit)
     Recover.consider(unit)
     SpiderMine.consider(unit)
     BustBunker.consider(unit)

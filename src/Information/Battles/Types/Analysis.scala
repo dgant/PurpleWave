@@ -22,8 +22,8 @@ class Analysis(battle: Battle) {
   val hysteresisRatio   = if (hysteresisVoters.isEmpty) 0.0 else hysteresisEngaged.size.toDouble / hysteresisVoters.size
   val hysteresis        = 2.0 * hysteresisRatio
   val flexibilityDesire = PurpleMath.clamp(flexibilityRatio,  0.9, 1.3)
-  val urgencyDesire     = PurpleMath.clamp(urgencyRatio,      0.8, 1.5)
-  val chokinessDesire   = PurpleMath.clamp(chokiness,         0.8, 1.1)
+  val urgencyDesire     = PurpleMath.clamp(urgencyRatio,      0.8, 1.8)
+  val chokinessDesire   = PurpleMath.clamp(chokiness,         0.6, 1.1)
   val economyDesire     = PurpleMath.clamp(economyRatio,      0.9, 1.3)
   val hysteresisDesire  = PurpleMath.clamp(hysteresis,        0.9, 1.2)
   val bonusDesire       = aggressionDesire * flexibilityDesire * urgencyDesire * chokinessDesire * economyDesire * hysteresisDesire

@@ -298,7 +298,7 @@ class ProtossVsTerran extends Parallel {
     new CompleteUpgrades,
     
     // Tactics
-    new ScoutAt(14),
+    new ScoutAt(16),
     new ScoutExpansionsAt(100),
     new ClearBurrowedBlockers,
     new DropAttack,

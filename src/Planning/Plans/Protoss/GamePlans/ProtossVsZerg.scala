@@ -350,9 +350,10 @@ class ProtossVsZerg extends Parallel {
       new Build(
         RequestAtLeast(1, Protoss.TemplarArchives),
         RequestUpgrade(Protoss.GroundDamage, 2),
-        RequestUpgrade(Protoss.HighTemplarEnergy),
+        RequestAtLeast(8, Protoss.Gateway),
         RequestTech(Protoss.PsionicStorm),
-        RequestUpgrade(Protoss.GroundDamage, 3))),
+        RequestUpgrade(Protoss.GroundDamage, 3),
+        RequestUpgrade(Protoss.HighTemplarEnergy))),
       
     new Build(
       RequestUpgrade(Protoss.DragoonRange),

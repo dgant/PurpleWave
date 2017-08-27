@@ -46,7 +46,7 @@ object FightOrFlight extends Action {
     
     val battle        = unit.battle.get
     val attackReport  = battle.estimationSimulationAttack.reportCards.get(unit)
-    val retreatReport = battle.estimationSimulationAttack.reportCards.get(unit)
+    val retreatReport = battle.estimationSimulationRetreat.reportCards.get(unit)
     
     if (attackReport.isEmpty)   return default
     if (retreatReport.isEmpty)  return default

@@ -47,11 +47,13 @@ abstract class UnitInfo (baseUnit: bwapi.Unit) extends UnitProxy(baseUnit) {
   var frameChangedClass : Int = With.frame
   var completionFrame   : Int = Int.MaxValue // Can't use unitClass during construction
   
+  var lastTarget    : Option[UnitInfo] = None
   var lastAttacker  : Option[UnitInfo] = None
   val kills         : mutable.ArrayBuffer[Kill] = new mutable.ArrayBuffer[Kill]
 
   private val history = new mutable.Queue[UnitState]
   def update() {
+    lastTarget = target.orElse(lastTarget)
     history.lastOption.foreach(lastState => {
       if (lastState.unitClass != unitClass) {
         frameChangedClass = With.frame

@@ -3,6 +3,7 @@ package Information.StrategyDetection.Generic
 import Information.StrategyDetection.Fingerprint
 import Lifecycle.With
 import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitInfo.UnitInfo
 
 class FingerprintArrivesBy(
   unitClass : UnitClass,
@@ -13,11 +14,27 @@ class FingerprintArrivesBy(
   var triggered = false
   
   override def matches: Boolean = {
-    val wasTriggeredBefore = triggered
-    triggered = triggered || With.units.enemy.count(u =>
-      u.is(unitClass)
-      && With.frame + u.framesToTravelTo(With.geography.home.pixelCenter) < gameTime.frames) >= quantity
-    
+    if (triggered) return true
+    val units         = With.units.enemy.filter(_.is(unitClass))
+    val arrivalFrame  = gameTime.frames
+    val arrivalTimes  = units.map(u => (u, arrivaltime(u))).toMap
+    val arriveOnTime  = arrivalTimes.count(_._2 < arrivalFrame)
     triggered
+  }
+  
+  protected def arrivaltime(unit: UnitInfo): Int = {
+    val home        = With.geography.home.pixelCenter
+    val classSpeed  = unit.unitClass.topSpeed
+    val travelTime  = Math.min(24 * 60 * 60,
+      if (unit.canMove)
+        unit.framesToTravelTo(home)
+      else if (classSpeed > 0)
+        (unit.pixelDistanceTravelling(home) / classSpeed).toInt
+      else
+        Int.MaxValue)
+    
+    val completionTime  = Math.max(With.frame, unit.completionFrame)
+    val arrivalTime     = completionTime + travelTime
+    arrivalTime
   }
 }

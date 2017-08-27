@@ -23,7 +23,7 @@ class TerranVsTerran extends Parallel {
   children.set(Vector(
     new ProposePlacement {
       override lazy val blueprints: Iterable[Blueprint] = Vector(
-        new Blueprint(this, building = Some(Terran.Bunker), preferZone = With.geography.ourNatural.map(_.zone))
+        new Blueprint(this, building = Some(Terran.Bunker), preferZone = Some(With.geography.ourNatural.zone))
       )
     },
     new FirstEightMinutes(

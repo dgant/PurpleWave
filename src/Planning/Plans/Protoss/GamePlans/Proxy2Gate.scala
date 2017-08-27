@@ -80,9 +80,9 @@ class Proxy2Gate extends Parallel {
   children.set(Vector(
     new ProposePlacement{
       override lazy val blueprints = Vector(
-        new Blueprint(this, building = Some(Protoss.Pylon),   preferZone = proxyZone, respectHarvesting = false, placementProfile = Some(PlacementProfiles.proxyPylon)),
-        new Blueprint(this, building = Some(Protoss.Gateway), preferZone = proxyZone, respectHarvesting = false, placementProfile = Some(PlacementProfiles.proxyBuilding)),
-        new Blueprint(this, building = Some(Protoss.Gateway), preferZone = proxyZone, respectHarvesting = false, placementProfile = Some(PlacementProfiles.proxyBuilding)))
+        new Blueprint(this, building = Some(Protoss.Pylon),   preferZone = proxyZone, respectHarvesting = false, placement = Some(PlacementProfiles.proxyPylon)),
+        new Blueprint(this, building = Some(Protoss.Gateway), preferZone = proxyZone, respectHarvesting = false, placement = Some(PlacementProfiles.proxyBuilding)),
+        new Blueprint(this, building = Some(Protoss.Gateway), preferZone = proxyZone, respectHarvesting = false, placement = Some(PlacementProfiles.proxyBuilding)))
     },
     new Build(
       RequestAtLeast(1, Protoss.Nexus),

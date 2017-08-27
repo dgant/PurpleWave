@@ -9,21 +9,21 @@ import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClass.UnitClass
 
 class Blueprint(
-  val proposer                   : Plan,
-  val building                   : Option[UnitClass]         = None,
-  var widthTiles                 : Option[Int]               = None,
-  var heightTiles                : Option[Int]               = None,
-  var powers                     : Option[Boolean]           = None,
-  var requirePower               : Option[Boolean]           = None,
-  var requireCreep               : Option[Boolean]           = None,
-  var requireTownHallTile        : Option[Boolean]           = None,
-  var requireGasTile             : Option[Boolean]           = None,
-  var placementProfile           : Option[PlacementProfile]  = None,
-  var preferredDistanceFromExit  : Option[Double]            = None,
-  val requireCandidates          : Option[Iterable[Tile]]    = None,
-  var preferZone                 : Option[Zone]              = None,
-  val requireZone                : Option[Zone]              = None,
-  var respectHarvesting          : Boolean                   = true) {
+                 val proposer                   : Plan,
+                 val building                   : Option[UnitClass]         = None,
+                 var widthTiles                 : Option[Int]               = None,
+                 var heightTiles                : Option[Int]               = None,
+                 var powers                     : Option[Boolean]           = None,
+                 var requirePower               : Option[Boolean]           = None,
+                 var requireCreep               : Option[Boolean]           = None,
+                 var requireTownHallTile        : Option[Boolean]           = None,
+                 var requireGasTile             : Option[Boolean]           = None,
+                 var placement           : Option[PlacementProfile]  = None,
+                 var marginPixels  : Option[Double]            = None,
+                 val requireCandidates          : Option[Iterable[Tile]]    = None,
+                 var preferZone                 : Option[Zone]              = None,
+                 val requireZone                : Option[Zone]              = None,
+                 var respectHarvesting          : Boolean                   = true) {
   
   var id: Option[Int] = None
   val frameCreated: Int = With.frame
@@ -35,9 +35,9 @@ class Blueprint(
   requireCreep                = requireCreep                .orElse(Some(building.exists(_.requiresCreep)))
   requireTownHallTile         = requireTownHallTile         .orElse(Some(building.exists(_.isTownHall)))
   requireGasTile              = requireGasTile              .orElse(Some(building.exists(_.isRefinery)))
-  preferredDistanceFromExit   = preferredDistanceFromExit   .orElse(if (building.exists(_.attacks)) building.map(_.effectiveRangePixels.toDouble) else Some(32.0 * 9.0))
+  marginPixels   = marginPixels   .orElse(if (building.exists(_.attacks)) building.map(_.effectiveRangePixels.toDouble) else Some(32.0 * 9.0))
   preferZone                  = preferZone                  .orElse(requireZone)
-  placementProfile            = placementProfile            .orElse(Some(PlacementProfiles.default(this)))
+  placement            = placement            .orElse(Some(PlacementProfiles.default(this)))
   
   def fulfilledBy(proposal: Blueprint): Boolean = {
     if (proposal == this) return true
@@ -111,7 +111,7 @@ class Blueprint(
     (
       "#" + proposer.priority +    " " +
       building.map(_.toString + " ").getOrElse("") +
-      placementProfile.toString + " " +
+      placement.toString + " " +
       widthTiles + "x" + heightTiles + " " +
       (if (powers.get)              "(Powers) "     else "") +
       (if (requirePower.get)        "(Powered) "    else "") +

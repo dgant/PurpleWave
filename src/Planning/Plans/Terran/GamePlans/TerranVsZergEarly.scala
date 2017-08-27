@@ -87,11 +87,11 @@ class TerranVsZergEarly extends Parallel {
     new RequireBareMinimum,
     new ProposePlacement {
       override lazy val blueprints: Iterable[Blueprint] = Vector(
-        new Blueprint(this, building = Some(Terran.Bunker),         preferZone = With.geography.ourNatural.map(_.zone)),
-        new Blueprint(this, building = Some(Terran.MissileTurret),  preferZone = With.geography.ourNatural.map(_.zone), preferredDistanceFromExit = Some(32.0 * 6.0)),
-        new Blueprint(this, building = Some(Terran.Bunker),         preferZone = With.geography.ourNatural.map(_.zone)),
-        new Blueprint(this, building = Some(Terran.Bunker),         preferZone = With.geography.ourNatural.map(_.zone)),
-        new Blueprint(this, building = Some(Terran.Bunker),         preferZone = With.geography.ourNatural.map(_.zone))
+        new Blueprint(this, building = Some(Terran.Bunker),         preferZone = Some(With.geography.ourNatural.zone)),
+        new Blueprint(this, building = Some(Terran.MissileTurret),  preferZone = Some(With.geography.ourNatural.zone), marginPixels = Some(32.0 * 6.0)),
+        new Blueprint(this, building = Some(Terran.Bunker),         preferZone = Some(With.geography.ourNatural.zone)),
+        new Blueprint(this, building = Some(Terran.Bunker),         preferZone = Some(With.geography.ourNatural.zone)),
+        new Blueprint(this, building = Some(Terran.Bunker),         preferZone = Some(With.geography.ourNatural.zone))
       )
     },
     new Employ(TvZEarly1RaxFEConservative,  new Build1RaxFEConservative),

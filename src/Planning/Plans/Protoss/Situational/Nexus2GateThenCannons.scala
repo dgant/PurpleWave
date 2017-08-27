@@ -10,8 +10,8 @@ class Nexus2GateThenCannons extends ProposePlacement {
   override lazy val blueprints: Vector[Blueprint] =
     Vector(
       new Blueprint(this, building = Some(Protoss.Pylon)),
-      new Blueprint(this, building = Some(Protoss.Pylon),           requireZone = With.geography.ourNatural.map(_.zone),  placementProfile = Some(PlacementProfiles.cannonPylon)),
-      new Blueprint(this, building = Some(Protoss.PhotonCannon),    requireZone = With.geography.ourNatural.map(_.zone),  placementProfile = Some(PlacementProfiles.cannon)),
-      new Blueprint(this, building = Some(Protoss.PhotonCannon),    requireZone = With.geography.ourNatural.map(_.zone),  placementProfile = Some(PlacementProfiles.cannon)))
+      new Blueprint(this, building = Some(Protoss.Pylon),           requireZone = Some(With.geography.ourNatural.zone),  placement = Some(PlacementProfiles.wallPylon)),
+      new Blueprint(this, building = Some(Protoss.PhotonCannon),    requireZone = Some(With.geography.ourNatural.zone),  placement = Some(PlacementProfiles.wallCannon)),
+      new Blueprint(this, building = Some(Protoss.PhotonCannon),    requireZone = Some(With.geography.ourNatural.zone),  placement = Some(PlacementProfiles.wallCannon)))
 }
 

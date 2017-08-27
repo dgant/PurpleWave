@@ -39,7 +39,7 @@ class ProtossVsZerg extends Parallel {
       new TwoGatewaysAtNexus,
       new Trigger(
         new UnitsAtLeast(2, UnitMatchType(Protoss.Zealot), complete = true),
-        initialBefore = new Build(ProtossBuilds.OpeningTwoGate99_WithZealots: _*))))
+        initialBefore = new Build(ProtossBuilds.OpeningTwoGate1012: _*))))
   
   private class FFE extends FirstEightMinutes(
     new Parallel(
@@ -83,6 +83,14 @@ class ProtossVsZerg extends Parallel {
     RequestAtLeast(1, Protoss.Gateway),
     RequestAtLeast(1, Protoss.CyberneticsCore),
     RequestAtLeast(3, Protoss.PhotonCannon))
+  
+  private class TwoGateFollowUp extends Build(
+    RequestAtLeast(1, Protoss.Assimilator),
+    RequestAtLeast(1, Protoss.CyberneticsCore),
+    RequestAtLeast(2, Protoss.Nexus),
+    RequestAtLeast(3, Protoss.Gateway),
+    RequestAtLeast(1, Protoss.Forge),
+    RequestAtLeast(4, Protoss.Gateway))
   
   /////////////
   // Midgame //
@@ -292,11 +300,7 @@ class ProtossVsZerg extends Parallel {
           new TrainContinuously(Protoss.Dragoon),
           new TrainContinuously(Protoss.Zealot)))),
   
-    new If(
-      new UnitsAtLeast(1, UnitMatchType(Protoss.CyberneticsCore)),
-      new TrainMatchingRatio(Protoss.Gateway, 1, 5, Seq(
-          MatchingRatio(UnitMatchType(Zerg.Hydralisk), 0.3),
-          MatchingRatio(UnitMatchType(Zerg.Zergling), 0.25)))),
+    new Employ(PvZEarly2Gate,                   new TwoGateFollowUp),
     new Employ(PvZMidgame5GateDragoons,         new ImplementMidgame5GateDragoons),
     new Employ(PvZMidgameCorsairDarkTemplar,    new ImplementMidgameCorsairDarkTemplar),
     new Employ(PvZMidgameCorsairReaver,         new ImplementMidgameCorsairReaver),

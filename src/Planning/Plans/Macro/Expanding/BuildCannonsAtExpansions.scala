@@ -8,6 +8,6 @@ class BuildCannonsAtExpansions(initialCount: Int) extends BuildCannonsAtBases(in
   override def eligibleBases: Iterable[Base] = {
     With.geography.ourBases
       .filterNot(_ == With.geography.ourMain)
-      .filterNot(With.geography.ourNatural.contains)
+      .filterNot(_ == With.geography.ourNatural)
   }
 }

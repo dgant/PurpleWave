@@ -32,7 +32,7 @@ class BuildCannonsAtBases(cannonsRequired: Int) extends Plan {
         building          = Some(Protoss.Pylon),
         requireZone       = Some(zone),
         requireCandidates = Some(zone.tiles),
-        placementProfile  = Some(PlacementProfiles.hugWorkersWithPylon))))
+        placement  = Some(PlacementProfiles.hugWorkersWithPylon))))
     .toMap
   
   private val cannonBlueprintsByZone = With.geography.zones
@@ -43,7 +43,7 @@ class BuildCannonsAtBases(cannonsRequired: Int) extends Plan {
           building          = Some(Protoss.PhotonCannon),
           requireZone       = Some(zone),
           requireCandidates = Some(zone.tiles),
-          placementProfile  = Some(PlacementProfiles.hugWorkersWithCannon)))))
+          placement  = Some(PlacementProfiles.hugWorkersWithCannon)))))
     .toMap
   
   protected def eligibleBases: Iterable[Base] = {

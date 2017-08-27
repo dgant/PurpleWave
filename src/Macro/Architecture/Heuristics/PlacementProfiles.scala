@@ -14,7 +14,7 @@ object PlacementProfiles {
     else if (blueprint.building.exists(_.trainsGroundUnits))
       factory
     else if (blueprint.building.exists(_.attacks))
-      cannon
+      wallCannon
     else
       tech
   }
@@ -66,8 +66,8 @@ object PlacementProfiles {
   // Specialty placements //
   //////////////////////////
   
-  val cannonPylon = new PlacementProfile(
-    "Pylon for Cannons",
+  val wallPylon = new PlacementProfile(
+    "Pylon for a wall",
     preferZone                  = 1000.0,
     preferNatural               = 10.0,
     preferPowering              = 1.0,
@@ -76,13 +76,13 @@ object PlacementProfiles {
     avoidSurfaceArea            = 0.05,
     avoidDistanceFromIdealRange = 0.5)
   
-  val cannon = new PlacementProfile(
-    "Cannons",
+  val wallCannon = new PlacementProfile(
+    "Cannons for a wall",
     preferZone                  = 1000.0,
     preferNatural               = 10.0,
     preferCoveringWorkers       = 0.5,
     avoidDistanceFromBase       = 1.0,
-    avoidSurfaceArea            = 0.25,
+    avoidSurfaceArea            = 0.1,
     avoidDistanceFromEnemy      = 0.5,
     avoidDistanceFromIdealRange = 3.0)
   

@@ -11,8 +11,8 @@ object ZoneUpdater {
   def update() {
     With.geography.zones.foreach(updateZone)
   
-    // TODO: We only want to do this once! The current check is a hack
-    if (With.geography.ourNatural.isEmpty) {
+    if ( ! With.geography.naturalsSearched) {
+      With.geography.naturalsSearched = true
       With.geography.bases
         .filter(_.isStartLocation)
         .foreach(startLocationBase =>

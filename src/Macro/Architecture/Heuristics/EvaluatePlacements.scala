@@ -31,7 +31,7 @@ object EvaluatePlacements {
     blueprint : Blueprint,
     candidate : Tile)
       : Iterable[PlacementHeuristicEvaluation] =
-        blueprint.placementProfile.get.weightedHeuristics
+        blueprint.placement.get.weightedHeuristics
           .map(weightedHeuristic =>
             new PlacementHeuristicEvaluation(
               weightedHeuristic.heuristic,

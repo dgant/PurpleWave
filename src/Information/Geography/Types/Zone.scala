@@ -51,7 +51,7 @@ class Zone(
   override def toString: String = (
     name
     + " "
-    + (if (bases.nonEmpty) "(" + bases.mkString(", ") + ")" else "")
+    + (if (bases.nonEmpty) "(" + bases.map(_.name).mkString(", ") + ")" else "")
       + " "
     + centroid
   )

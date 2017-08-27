@@ -41,7 +41,7 @@ object ProxyPlanner {
   
   def proxyPreferredZone(eligibleZones: Iterable[Zone]): Option[Zone] = {
     if (eligibleZones.isEmpty) {
-      return With.geography.ourNatural.map(_.zone)
+      return Some(With.geography.ourNatural.zone)
     }
     Some(
       eligibleZones.minBy(zone =>

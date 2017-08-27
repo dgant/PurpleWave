@@ -20,7 +20,7 @@ class Geography {
   lazy val edges          : Iterable[Edge]          = ZoneBuilder.edges
   lazy val bases          : Iterable[Base]          = ZoneBuilder.bases
   lazy val ourMain        : Base                    = With.geography.ourBases.find(_.isStartLocation).get
-  def ourNatural          : Option[Base]            = ourNaturalCache.get
+  def ourNatural          : Base                    = ourNaturalCache.get
   def ourZones            : Iterable[Zone]          = ourZonesCache.get
   def ourBases            : Iterable[Base]          = ourBasesCache.get
   def ourTownHalls        : Iterable[UnitInfo]      = ourTownHallsCache.get
@@ -35,7 +35,7 @@ class Geography {
   private val enemyBasesCache         = new CacheFrame(() => bases.filter(_.owner.isEnemy))
   private val ourTownHallsCache       = new CacheFrame(() => ourBases.flatMap(_.townHall))
   private val ourHarvestingAreasCache = new CacheFrame(() => ourBases.map(_.harvestingArea))
-  private val ourNaturalCache         = new CacheFrame(() => bases.find(_.isNaturalOf.exists(_.owner.isUs)))
+  private val ourNaturalCache         = new CacheFrame(() => bases.find(_.isNaturalOf.exists(_.owner.isUs)).getOrElse(bases.minBy(_.townHallTile.groundPixels(ourMain.townHallTile))))
   private val ourBorderCache          = new CacheFrame(() => ourZones.flatMap(_.edges).filter(_.zones.exists( ! _.owner.isFriendly)))
   
   def zoneByTile(tile: Tile): Zone = zoneByTileCache(tile)
@@ -65,4 +65,6 @@ class Geography {
   }
   
   private val zoneUpdateLimiter = new Limiter(2, () => ZoneUpdater.update())
+  
+  var naturalsSearched: Boolean = false
 }

@@ -31,7 +31,7 @@ class ProxyHatch extends Parallel {
   private def blueprintCreepColonyNatural: Blueprint = new Blueprint(this,
     building          = Some(Zerg.CreepColony),
     requireZone       = ProxyPlanner.proxyEnemyNatural,
-    placementProfile  = Some(PlacementProfiles.proxyCannon))
+    placement  = Some(PlacementProfiles.proxyCannon))
   
   children.set(Vector(
     new Plan { override def onUpdate(): Unit = {
@@ -52,7 +52,7 @@ class ProxyHatch extends Parallel {
       new WeKnowWhereToProxy,
       new Parallel(
         new ProposePlacement { override lazy val blueprints = Vector(
-          new Blueprint(this, preferZone = ProxyPlanner.proxyEnemyNatural, building = Some(Zerg.Hatchery), placementProfile = Some(PlacementProfiles.proxyBuilding)),
+          new Blueprint(this, preferZone = ProxyPlanner.proxyEnemyNatural, building = Some(Zerg.Hatchery), placement = Some(PlacementProfiles.proxyBuilding)),
           blueprintCreepColonyNatural,
           blueprintCreepColonyNatural,
           blueprintCreepColonyNatural,

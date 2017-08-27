@@ -25,9 +25,9 @@ class ProxyDarkTemplarRush extends Parallel {
       override lazy val blueprints: Iterable[Blueprint] = Vector(
         new Blueprint(this, building = Some(Protoss.Pylon)),
         new Blueprint(this, building = Some(Protoss.Gateway)),
-        new Blueprint(this, building = Some(Protoss.Pylon),   placementProfile = Some(PlacementProfiles.proxyPylon),    preferZone = ProxyPlanner.proxyAutomaticSneaky),
-        new Blueprint(this, building = Some(Protoss.Gateway), placementProfile = Some(PlacementProfiles.proxyBuilding), preferZone = ProxyPlanner.proxyAutomaticSneaky),
-        new Blueprint(this, building = Some(Protoss.Gateway), placementProfile = Some(PlacementProfiles.proxyBuilding), preferZone = ProxyPlanner.proxyAutomaticSneaky))
+        new Blueprint(this, building = Some(Protoss.Pylon),   placement = Some(PlacementProfiles.proxyPylon),    preferZone = ProxyPlanner.proxyAutomaticSneaky),
+        new Blueprint(this, building = Some(Protoss.Gateway), placement = Some(PlacementProfiles.proxyBuilding), preferZone = ProxyPlanner.proxyAutomaticSneaky),
+        new Blueprint(this, building = Some(Protoss.Gateway), placement = Some(PlacementProfiles.proxyBuilding), preferZone = ProxyPlanner.proxyAutomaticSneaky))
     },
     
     // Might be the fastest possible DT rush.

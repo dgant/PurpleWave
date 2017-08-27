@@ -30,7 +30,7 @@ class Proxy5Rax extends Parallel {
   
   children.set(Vector(
     new ProposePlacement{
-      override lazy val blueprints = Vector(new Blueprint(this, building = Some(Terran.Barracks), preferZone = proxyZone, respectHarvesting = false, placementProfile = Some(PlacementProfiles.proxyBuilding)))
+      override lazy val blueprints = Vector(new Blueprint(this, building = Some(Terran.Barracks), preferZone = proxyZone, respectHarvesting = false, placement = Some(PlacementProfiles.proxyBuilding)))
     },
     new Aggression(1.5),
     new RequireBareMinimum,

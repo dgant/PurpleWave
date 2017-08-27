@@ -26,7 +26,7 @@ class Zerg9PoolProxySunkens extends Parallel {
   private def blueprintCreepColony: Blueprint = new Blueprint(this,
     building          = Some(Zerg.CreepColony),
     requireZone       = ProxyPlanner.proxyEnemyMain,
-    placementProfile  = Some(PlacementProfiles.proxyCannon))
+    placement  = Some(PlacementProfiles.proxyCannon))
   
   children.set(Vector(
     new If(

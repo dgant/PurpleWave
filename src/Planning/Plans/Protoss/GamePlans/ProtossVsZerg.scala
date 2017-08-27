@@ -126,10 +126,12 @@ class ProtossVsZerg extends Parallel {
       RequestAtLeast(2, Protoss.Assimilator),
       RequestAtLeast(1, Protoss.Stargate),
       RequestAtLeast(1, Protoss.RoboticsFacility),
-      RequestUpgrade(Protoss.GroundDamage),
       RequestAtLeast(1, Protoss.RoboticsSupportBay),
+      RequestUpgrade(Protoss.GroundDamage),
       RequestAtLeast(2, Protoss.Nexus),
-      RequestAtLeast(5, Protoss.Gateway))
+      RequestAtLeast(6, Protoss.Gateway),
+      RequestAtLeast(2, Protoss.Stargate),
+      RequestAtLeast(1, Protoss.RoboticsFacility))
   
   private class ImplementMidgameCorsairDarkTemplar extends Build(
       RequestAtLeast(1, Protoss.Gateway),
@@ -151,7 +153,7 @@ class ProtossVsZerg extends Parallel {
     new RequireMiningBases(2))
   
   private class TakeSafeThirdBase extends If(
-    new UnitsAtLeast(18, UnitMatchWarriors),
+    new UnitsAtLeast(16, UnitMatchWarriors),
     new RequireMiningBases(3))
   
   private class BuildDetectionForLurkers extends If(
@@ -257,11 +259,20 @@ class ProtossVsZerg extends Parallel {
       new Build(RequestUpgrade(Protoss.AirDamage, 1))),
   
     new If(
+      new UnitsAtLeast(6, UnitMatchType(Protoss.Corsair), complete = false),
+      new Build(RequestUpgrade(Protoss.AirArmor, 1))),
+  
+    new If(
       new And(
         new Employing(PvZMidgameCorsairDarkTemplar),
         new UnitsAtLeast(2, UnitMatchType(Protoss.DarkTemplar), complete = true)),
       new TrainMatchingRatio(Protoss.Corsair, 5, Int.MaxValue, Seq(MatchingRatio(UnitMatchType(Zerg.Mutalisk), 1.5))),
-      new TrainMatchingRatio(Protoss.Corsair, 1, Int.MaxValue, Seq(MatchingRatio(UnitMatchType(Zerg.Mutalisk), 1.5)))),
+      new If(
+        new And(
+          new Employing(PvZMidgameCorsairReaver),
+          new UnitsAtLeast(3, UnitMatchType(Protoss.Corsair), complete = true)),
+        new TrainMatchingRatio(Protoss.Corsair, 5, Int.MaxValue, Seq(MatchingRatio(UnitMatchType(Zerg.Mutalisk), 1.5))),
+        new TrainMatchingRatio(Protoss.Corsair, 1, Int.MaxValue, Seq(MatchingRatio(UnitMatchType(Zerg.Mutalisk), 1.5))))),
   
     new If(
       new EnemyUnitsAtLeast(4, UnitMatchType(Zerg.Mutalisk)),
@@ -275,14 +286,16 @@ class ProtossVsZerg extends Parallel {
   
     // Gateway production
     new If(
+      
+      // Emergency Dragoons
       new And(
         new EnemyMutalisks,
         new UnitsAtMost(5, UnitMatchType(Protoss.Corsair))),
-      // Emergency Dragoons
       new If(
         new CanBuildDragoons,
         new TrainContinuously(Protoss.Dragoon),
         new TrainContinuously(Protoss.Zealot)),
+      
       // Normal behavior
       new Parallel(
         new If(
@@ -294,9 +307,11 @@ class ProtossVsZerg extends Parallel {
             new UnitsAtLeast(3, Protoss.Reaver, complete = false),
             new UnitsAtMost(0, Protoss.Shuttle, complete = false)),
           new TrainContinuously(Protoss.Shuttle, 1),
-          new TrainContinuously(Protoss.Reaver, 5)),
+          new TrainContinuously(Protoss.Reaver, 6)),
         new If(
-          new Check(() => With.self.gas > Math.min(200, With.self.minerals)),
+          new And(
+            new Not(new Employing(PvZMidgameCorsairReaver)),
+            new Check(() => With.self.gas > Math.min(200, With.self.minerals))),
           new TrainContinuously(Protoss.HighTemplar, 8)),
         new If(
           new And(

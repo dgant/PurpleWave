@@ -436,11 +436,10 @@ abstract class UnitInfo (baseUnit: bwapi.Unit) extends UnitProxy(baseUnit) {
   def carryingResources: Boolean = carryingMinerals || carryingGas
   
   def isBeingViolent: Boolean = {
-    unitClass.isStaticDefense                     ||
-    attacking                                     ||
-    cooldownLeft > 0                              ||
-    target.orElse(orderTarget).exists(isEnemyOf)  ||
-    List(Commands.Attack_Move, Commands.Attack_Unit).contains(command.map(_.getUnitCommandType.toString).getOrElse(""))
+    unitClass.isStaticDefense ||
+    attacking                 ||
+    cooldownLeft > 0          ||
+    target.exists(isEnemyOf)
   }
   
   def isBeingViolentTo(victim: UnitInfo): Boolean = {
@@ -449,7 +448,7 @@ abstract class UnitInfo (baseUnit: bwapi.Unit) extends UnitProxy(baseUnit) {
     isEnemyOf(victim) &&
     canAttack(victim) &&
     //Are we not attacking anyone else?
-    ! target.orElse(orderTarget).exists(_ != victim) &&
+    ! target.exists(_ != victim) &&
     //Are we close to being able to hit the victim?
     framesToGetInRange(victim) < With.configuration.violenceFrameThreshold
   }

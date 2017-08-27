@@ -27,7 +27,7 @@ class Configuration {
   var assumedBuilderTravelSpeed       = 0.65
   var attackableRangeBuffer           = 4
   var fogPositionDuration             = 24 * 20
-  var violenceFrameThreshold          = 24
+  var violenceFrameThreshold          = 48
   var pickupRadiusPixels              = 48 //No idea what actual value is
   var enableYolo                      = true
   var enablePathRecalculation         = true

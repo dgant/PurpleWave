@@ -18,6 +18,7 @@ object TargetRelevant extends Action {
     val targets = unit.matchups.targets.filter(target =>
       target.unitClass.helpsInCombat && (
         unit.inRangeToAttackFast(target)
+          || (target.unitClass.isDetector && unit.matchups.alliesIncludingSelf.exists(_.cloaked))
           || target.constructing
           || target.gathering
           || target.repairing

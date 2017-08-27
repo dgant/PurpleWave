@@ -1,6 +1,5 @@
 package Debugging.Visualizations.Views.Micro
 
-import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.View
 import Lifecycle.With
@@ -65,7 +64,7 @@ object ShowUnitsForeign extends View {
       .flatMap(base => base.resources)
       .filterNot(resourcesSaturated.contains)
       .foreach(resource => {
-        DrawMap.circle(resource.pixelCenter, 6, Colors.MidnightTeal, solid = true)
+        DrawMap.circle(resource.pixelCenter, 6, resource.player.colorDark, solid = true)
         DrawMap.label(":(", resource.pixelCenter.add(3, -1))
       })
   }

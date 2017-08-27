@@ -50,7 +50,7 @@ class Configuration {
   var maxFramesToTrustBuildRequest    = 24 * 60 * 10
   var baseRadiusPixels                = 32.0 * 15.0
   var baseMergingRangePixels          = 32.0 * 12.0
-  var blockerMineralThreshold         = 50
+  var blockerMineralThreshold         = 250 // Setting this goofily high as an AIIDe hack to account for the 249-mineral patches on Fortress
   var maxPlacementAge                 = 24 * 5
   var maxScarabCount                  = 3
   var enableTightBuildingPlacement    = false

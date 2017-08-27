@@ -89,7 +89,7 @@ class ProtossVsZerg extends Parallel {
     RequestAtLeast(1, Protoss.CyberneticsCore),
     RequestAtLeast(2, Protoss.Nexus),
     RequestAtLeast(3, Protoss.Gateway),
-    RequestAtLeast(1, Protoss.Forge),
+    RequestAtLeast(1, Protoss.Stargate),
     RequestAtLeast(4, Protoss.Gateway))
   
   /////////////
@@ -170,7 +170,7 @@ class ProtossVsZerg extends Parallel {
   
   children.set(Vector(
     
-    new Aggression(0.85),
+    new Aggression(0.7),
     
     new If(
       new HaveTech(Protoss.PsionicStorm),

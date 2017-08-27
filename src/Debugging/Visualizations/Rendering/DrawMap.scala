@@ -30,7 +30,8 @@ object DrawMap {
     
     line(start, end, color)
     circle(end, 1, color, solid = true)
-    circle(start.project(end, start.pixelDistanceFast(end) - 2), 2, color, solid = true)
+    circle(end.project(start, 3), 2, color, solid = true)
+    circle(end.project(start, 7), 3, color, solid = true)
   }
   
   def box(

@@ -2,6 +2,7 @@ package Information.Battles.Types
 
 import Information.Battles.BattleUpdater
 import Information.Battles.Estimations.Estimation
+import Lifecycle.With
 import Mathematics.Points.Pixel
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.EnrichPixel.EnrichedPixelCollection
@@ -39,6 +40,6 @@ class Battle(
   lazy val desire: Double = analysis.desire
   
   lazy val globalSafeToAttack: Boolean = {
-    estimationAbstractOffense.weSurvive || estimationAbstractOffense.enemyDies || estimationAbstractOffense.netValue > 0
+    With.blackboard.aggressionRatio * estimationAbstractOffense.costToEnemy - estimationAbstractOffense.costToUs > 0
   }
 }

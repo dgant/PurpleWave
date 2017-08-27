@@ -24,6 +24,14 @@ class BattleClassifier {
     replaceBattlesByZone()
     replaceBattlesLocal()
     BattleUpdater.run()
+    // If we have the time to do so, run lazy estimations here.
+    // Otherwise, it'll run on demand from the Micro task
+    if (With.performance.continueRunning) {
+      global.globalSafeToAttack
+      local.foreach(_.estimationSimulationAttack)
+      local.foreach(_.estimationSimulationRetreat)
+      local.foreach(_.desire)
+    }
   }
   
   private def isEligibleLocal(unit: UnitInfo): Boolean = {

@@ -9,6 +9,11 @@ import ProxyBwapi.UnitInfo.ForeignUnitInfo
 
 object ShowUnitsForeign extends View {
   
+  var showSiegeRadius = true
+  var showFogged      = true
+  var showTargets     = true
+  var showSaturation  = true
+  
   override def renderMap() {
     With.units.enemy.foreach(drawTrackedUnit)
     With.units.neutral.foreach(drawTrackedUnit)
@@ -18,8 +23,7 @@ object ShowUnitsForeign extends View {
   private def drawTrackedUnit(unit: ForeignUnitInfo) {
     if ( ! With.viewport.contains(unit.pixelCenter)) return
     
-    val showSiegeRadius = true
-    val showFogged      = true
+
     
     val color = unit.color
       
@@ -37,24 +41,32 @@ object ShowUnitsForeign extends View {
           color)
       }
     }
+    if (showTargets) {
+      if (unit.targetPixel.isDefined) {
+        DrawMap.line(unit.pixelCenter, unit.targetPixel.get, unit.player.colorMedium)
+      }
+      if (unit.target.isDefined) {
+        DrawMap.line(unit.pixelCenter, unit.target.get.pixelCenter, unit.player.colorNeon)
+      }
+    }
   }
   
   def renderSaturation() {
+    if ( ! showSaturation) return
+    
     val resourcesSaturated = With.units.ours
       .filter(unit =>
         unit.velocityX == 0 &&
         unit.velocityY == 0 &&
         unit.target.exists(_.unitClass.isResource))
       .flatMap(_.target)
-  
-    With.game.setTextSize(bwapi.Text.Size.Enum.Large)
+    
     With.geography.ourBases
       .flatMap(base => base.resources)
       .filterNot(resourcesSaturated.contains)
       .foreach(resource => {
-        DrawMap.circle(resource.pixelCenter, 12, Colors.MidnightTeal, solid = true)
-        DrawMap.label(":(", resource.pixelCenter.add(2, -5))
+        DrawMap.circle(resource.pixelCenter, 6, Colors.MidnightTeal, solid = true)
+        DrawMap.label(":(", resource.pixelCenter.add(1, -4))
       })
-    With.game.setTextSize(bwapi.Text.Size.Enum.Small)
   }
 }

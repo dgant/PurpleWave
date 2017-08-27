@@ -20,6 +20,7 @@ class Base(val townHallTile: Tile)
   var       gas             : Set[UnitInfo]     = Set.empty
   var       minerals        : Set[UnitInfo]     = Set.empty
   var       workers         : Set[UnitInfo]     = Set.empty
+  var       defenders       : Set[UnitInfo]     = Set.empty
   var       owner           : PlayerInfo        = With.neutral
   var       name            : String            = "Nowhere"
   

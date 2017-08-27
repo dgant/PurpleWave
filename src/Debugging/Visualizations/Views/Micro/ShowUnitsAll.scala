@@ -11,16 +11,15 @@ import bwapi.Color
 
 object ShowUnitsAll extends View {
   
-  override def renderMap() {
-    With.units.all.foreach(renderUnit)
-  }
+  var showHitPoints       = true
+  var showResources       = true
+  var showViolence        = true
+  var showBattleIgnorance = true
+  
+  override def renderMap() { With.units.all.foreach(renderUnit) }
   
   def renderUnit(unit: UnitInfo) {
     if ( ! With.viewport.contains(unit.pixelCenter)) return
-  
-    val showHitPoints = true
-    val showResources = true
-    val showViolence  = true
     
     val color = unit.color
     
@@ -44,6 +43,12 @@ object ShowUnitsAll extends View {
       }
       if (unit.isMineralBlocker) {
         DrawMap.label("(Blocker)", unit.pixelCenter.add(0, 2 * With.visualization.lineHeightSmall), drawBackground = true, color)
+      }
+    }
+    
+    if (showBattleIgnorance) {
+      if (unit.battle.isEmpty) {
+        DrawMap.circle(unit.pixelCenter, 3, Colors.MediumGray)
       }
     }
   }

@@ -9,25 +9,23 @@ import Utilities.ByOption
 
 object ShowUnitsFriendly extends View {
   
-  override def renderMap() {
-    With.agents.all.foreach(renderUnitState)
-  }
+  var showClient      : Boolean = true
+  var showAction      : Boolean = true
+  var showCommand     : Boolean = false
+  var showOrder       : Boolean = false
+  var showTargets     : Boolean = false
+  var showFormation   : Boolean = true
+  var showKiting      : Boolean = false
+  var showForces      : Boolean = true
+  var showDesire      : Boolean = true
+  var showExplosions  : Boolean = true
+  
+  override def renderMap() { With.agents.all.foreach(renderUnitState) }
   
   def renderUnitState(agent: Agent) {
     if ( ! With.viewport.contains(agent.unit.pixelCenter)) return
     if ( ! agent.unit.unitClass.orderable) return
     if (agent.unit.transport.isDefined) return
-    
-    var showClient      : Boolean = true
-    var showAction      : Boolean = true
-    var showCommand     : Boolean = false
-    var showOrder       : Boolean = false
-    var showTargets     : Boolean = false
-    var showFormation   : Boolean = true
-    var showKiting      : Boolean = false
-    var showForces      : Boolean = true
-    var showDesire      : Boolean = true
-    var showExplosions  : Boolean = true
     
     if (showClient) {
       agent.lastClient.foreach(plan =>

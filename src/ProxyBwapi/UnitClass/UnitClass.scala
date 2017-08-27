@@ -1,13 +1,15 @@
 package ProxyBwapi.UnitClass
 
 import Mathematics.Points.{Tile, TileRectangle}
+import Planning.Composition.UnitMatchers.UnitMatcher
 import ProxyBwapi.Races.{Neutral, Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.{Tech, Techs}
+import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.{Race, UnitType}
 
 import scala.collection.mutable.ListBuffer
 
-case class UnitClass(base: UnitType) extends UnitClassProxy(base) {
+case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatcher {
   
   lazy val asStringNeat: String = asString
     .replace("Terran_", "")
@@ -401,4 +403,11 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) {
     if (this == Protoss.Carrier           ) 48  else
     0
   }
+  
+  /////////////////
+  // Convenience //
+  /////////////////
+  
+  // UnitMatcher
+  def accept(unit: UnitInfo): Boolean = unit.unitClass == this
 }

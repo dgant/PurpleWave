@@ -8,7 +8,7 @@ import bwapi.{DamageType, UnitSizeType, UnitType}
 
 import scala.collection.JavaConverters._
 
-class UnitClassProxy(val baseType:UnitType) {
+class UnitClassProxy(val baseType: UnitType) {
   lazy val abilities                = baseType.abilities.asScala.map(Techs.get)
   lazy val acceleration             = baseType.acceleration
   lazy val armor                    = baseType.armor

@@ -54,7 +54,10 @@ class DropAttack extends Plan {
       With.intelligence.mostBaselikeEnemyTile.pixelCenter
     }
     else {
-      With.geography.enemyBases.maxBy(_.townHallTile.groundPixels(With.geography.home)).heart.pixelCenter
+      With.geography.enemyBases.maxBy(base =>
+        base.townHallTile.groundPixels(With.geography.home)
+        * base.workers.size
+        / (1 + base.defenders.size)).heart.pixelCenter
     }
   }
 }

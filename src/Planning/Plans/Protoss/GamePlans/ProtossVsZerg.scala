@@ -238,6 +238,10 @@ class ProtossVsZerg extends Parallel {
     new If(
       new UnitsAtLeast(2, UnitMatchType(Protoss.HighTemplar), complete = false),
       new Build(RequestTech(Protoss.PsionicStorm))),
+  
+    new If(
+      new UnitsAtLeast(3, UnitMatchType(Protoss.Reaver), complete = false),
+      new Build(RequestUpgrade(Protoss.ShuttleSpeed))),
     
     new If(
       new And(
@@ -285,7 +289,12 @@ class ProtossVsZerg extends Parallel {
           new Employing(PvZMidgameCorsairDarkTemplar),
           new TrainContinuously(Protoss.DarkTemplar, 3),
           new TrainContinuously(Protoss.DarkTemplar, 1)),
-        new TrainContinuously(Protoss.Reaver, 5),
+        new If(
+          new And(
+            new UnitsAtLeast(3, Protoss.Reaver, complete = false),
+            new UnitsAtMost(0, Protoss.Shuttle, complete = false)),
+          new TrainContinuously(Protoss.Shuttle, 1),
+          new TrainContinuously(Protoss.Reaver, 5)),
         new If(
           new Check(() => With.self.gas > Math.min(200, With.self.minerals)),
           new TrainContinuously(Protoss.HighTemplar, 8)),
@@ -296,7 +305,7 @@ class ProtossVsZerg extends Parallel {
               new And(
                 new Employing(PvZMidgame5GateDragoons),
                 new UnitsAtMost(15, UnitMatchType(Protoss.Dragoon))),
-              new UnitsAtLeast(20, UnitMatchType(Protoss.Zealot)))),
+              new UnitsAtLeast(10, UnitMatchType(Protoss.Zealot)))),
           new TrainContinuously(Protoss.Dragoon),
           new TrainContinuously(Protoss.Zealot)))),
   
@@ -367,8 +376,10 @@ class ProtossVsZerg extends Parallel {
   
     new ClearBurrowedBlockers,
     new FindExpansions { scouts.get.unitMatcher.set(UnitMatchType(Protoss.DarkTemplar)) },
-    
     new DefendZones,
+    new If(
+      new HaveUpgrade(Protoss.ShuttleSpeed),
+      new DropAttack),
     new If(
       new UnitsAtLeast(4, UnitMatchWarriors, complete = true),
       new ConsiderAttacking)

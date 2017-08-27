@@ -22,14 +22,15 @@ class BattleClustering {
   }
   
   def run() {
-    while ( ! clusterInProgress.isComplete && With.performance.continueRunning) {
-      clusterInProgress.step()
-    }
-  
     if (clusterInProgress.isComplete) {
       lastClusterCompletion = With.frame
       clusterComplete       = clusterInProgress
       clusterInProgress     = new BattleClusteringState(nextUnits.toSet)
+    }
+    else {
+      while ( ! clusterInProgress.isComplete && With.performance.continueRunning) {
+        clusterInProgress.step()
+      }
     }
   }
 }

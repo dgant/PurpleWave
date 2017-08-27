@@ -126,6 +126,7 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   lazy val isSiegeTank      : Boolean = this == Terran.SiegeTankSieged || this == Terran.SiegeTankUnsieged
   lazy val isStaticDefense  : Boolean = isBuilding && attacks || this == Terran.Bunker || this == Protoss.ShieldBattery
   lazy val isTransport      : Boolean = spaceProvided > 0 && isFlyer && this != Protoss.Carrier
+  lazy val shootsScarabs    : Boolean = this == Protoss.Reaver // Performance shortcut
   
   lazy val unaffectedByDarkSwarm: Boolean = Vector(
     Terran.SiegeTankSieged,

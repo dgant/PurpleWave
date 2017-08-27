@@ -379,6 +379,7 @@ abstract class UnitInfo (baseUnit: bwapi.Unit) extends UnitProxy(baseUnit) {
   def canAttack: Boolean = canAttackCache.get
   private val canAttackCache = new CacheFrame(() =>
     canDoAnything &&
+    ( ! unitClass.shootsScarabs || scarabCount > 0) &&
     (
       unitClass.rawCanAttack
       || (is(Terran.Bunker)

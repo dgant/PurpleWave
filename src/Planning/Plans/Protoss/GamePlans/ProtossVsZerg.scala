@@ -343,18 +343,23 @@ class ProtossVsZerg extends Parallel {
       RequestAtLeast(1, Protoss.Forge),
       RequestUpgrade(Protoss.GroundDamage),
       RequestAtLeast(1, Protoss.CitadelOfAdun),
-      RequestUpgrade(Protoss.ZealotSpeed),
-      RequestAtLeast(1, Protoss.TemplarArchives),
-      RequestUpgrade(Protoss.GroundDamage, 2),
-      RequestUpgrade(Protoss.HighTemplarEnergy),
-      RequestTech(Protoss.PsionicStorm),
-      RequestUpgrade(Protoss.GroundDamage, 3),
+      RequestUpgrade(Protoss.ZealotSpeed)),
+      
+    new If(
+      new Not(new Employing(PvZMidgameCorsairReaver)),
+      new Build(
+        RequestAtLeast(1, Protoss.TemplarArchives),
+        RequestUpgrade(Protoss.GroundDamage, 2),
+        RequestUpgrade(Protoss.HighTemplarEnergy),
+        RequestTech(Protoss.PsionicStorm),
+        RequestUpgrade(Protoss.GroundDamage, 3))),
+      
+    new Build(
       RequestUpgrade(Protoss.DragoonRange),
       RequestAtLeast(1, Protoss.Stargate),
       RequestAtLeast(1, Protoss.RoboticsFacility),
+      RequestAtLeast(6, Protoss.Gateway),
       RequestAtLeast(1, Protoss.Observatory),
-      RequestAtLeast(1, Protoss.Observer),
-      RequestAtLeast(8, Protoss.Gateway),
       RequestAtLeast(3, Protoss.Nexus),
       RequestAtLeast(12, Protoss.Gateway),
       RequestAtLeast(4, Protoss.Nexus)),

@@ -48,7 +48,7 @@ object ShowUnitsAll extends View {
     
     if (showBattleIgnorance) {
       if (unit.battle.isEmpty) {
-        DrawMap.circle(unit.pixelCenter, 3, Colors.MediumGray)
+        DrawMap.circle(unit.pixelCenter, 5, Color.Black, solid = true)
       }
     }
   }

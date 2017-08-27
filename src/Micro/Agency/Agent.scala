@@ -91,7 +91,6 @@ class Agent(val unit: FriendlyUnitInfo) {
   
   var desireTeam        : Double = _
   var desireIndividual  : Double = _
-  var desireTotal       : Double = _
   
   var movingTo: Option[Pixel] = None
   
@@ -119,7 +118,6 @@ class Agent(val unit: FriendlyUnitInfo) {
     explosions.clear
     desireTeam         = 1.0
     desireIndividual   = 1.0
-    desireTotal        = 1.0    
     targetingProfile   = TargetingProfiles.default
     pathsAll           = Seq.empty
     pathsTruncated     = Seq.empty

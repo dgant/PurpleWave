@@ -66,7 +66,7 @@ object ShowUnitsForeign extends View {
       .filterNot(resourcesSaturated.contains)
       .foreach(resource => {
         DrawMap.circle(resource.pixelCenter, 6, Colors.MidnightTeal, solid = true)
-        DrawMap.label(":(", resource.pixelCenter.add(1, -4))
+        DrawMap.label(":(", resource.pixelCenter.add(3, -1))
       })
   }
 }

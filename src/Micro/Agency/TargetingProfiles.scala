@@ -8,6 +8,6 @@ object TargetingProfiles {
     preferVpfEnemy    = 2.0,
     preferVpfOurs     = 2.0,
     preferDetectors   = 8.0,
-    avoidPain         = 2.0,
+    avoidPain         = 2.5,
     avoidDelay        = 0.05)
 }

@@ -1,5 +1,6 @@
 package Micro.Actions.Combat.Decisionmaking
 
+import Lifecycle.With
 import Micro.Actions.Action
 import Planning.Yolo
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -30,8 +31,7 @@ object FightOrFlight extends Action {
     }
     
     unit.agent.desireTeam        = unit.battle.map(_.desire).getOrElse(0.0)
-    unit.agent.desireIndividual  = unit.battle.flatMap(_.estimationSimulationAttack.reportCards.get(unit).map(_.netValuePerFrame)).getOrElse(0.0)
-    unit.agent.desireTotal       = unit.agent.desireTeam + unit.agent.desireIndividual // Vanity metric, for now
+    unit.agent.desireIndividual  = individualDesire(unit)
     
     // Hysteresis
     val individualCaution           = 0.2
@@ -41,5 +41,26 @@ object FightOrFlight extends Action {
     val motivatedIndividually       = unit.agent.desireIndividual > individualThreshold
     val motivatedCollectively       = unit.agent.desireTeam       > 0.0
     unit.agent.shouldEngage         = motivatedByDoom || motivatedIndividually || motivatedCollectively
+  }
+  
+  private def individualDesire(unit: FriendlyUnitInfo): Double = {
+    
+    val default = Double.NegativeInfinity
+    if (unit.battle.isEmpty) return default
+    
+    val battle        = unit.battle.get
+    val attackReport  = battle.estimationSimulationAttack.reportCards.get(unit)
+    val retreatReport = battle.estimationSimulationAttack.reportCards.get(unit)
+    
+    if (attackReport.isEmpty)   return default
+    if (retreatReport.isEmpty)  return default
+  
+    val bonusDesire   = With.blackboard.aggressionRatio
+    val attackGain    = attackReport.get.valueDealt
+    val attackLoss    = attackReport.get.valueReceived
+    val retreatGain   = attackReport.get.valueDealt
+    val retreatLoss   = attackReport.get.valueReceived
+    val output        = bonusDesire * attackGain + retreatLoss - attackLoss - retreatGain
+    output
   }
 }

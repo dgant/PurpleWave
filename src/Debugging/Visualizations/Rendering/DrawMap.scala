@@ -29,9 +29,14 @@ object DrawMap {
     if (irrelevant(Vector(start, end))) return
     
     line(start, end, color)
-    circle(end.project(start, 2), 1, color, solid = true)
-    circle(end.project(start, 4), 2, color, solid = true)
-    circle(end.project(start, 7), 3, color, solid = true)
+    val angleBack = end.radiansTo(start)
+    val angleDiff = Math.PI / 16
+    triangle(
+      end,
+      end.radiateRadians(angleBack + angleDiff, 10),
+      end.radiateRadians(angleBack - angleDiff, 10),
+      color,
+      solid = true)
   }
   
   def box(

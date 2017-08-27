@@ -30,8 +30,9 @@ class FindExpansions extends Plan {
   
   private def orderScout(scout: FriendlyUnitInfo) =
     scout.agent.intend(this, new Intention {
-      toTravel = getNextScoutingPixel
-      canCower = true
+      toTravel    = getNextScoutingPixel
+      canCower    = true
+      canPillage  = true
     })
   
   private def getNextScoutingPixel: Option[Pixel] =

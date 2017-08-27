@@ -26,11 +26,11 @@ class Attack extends Plan {
     val target =
       ByOption
         .maxBy(With.geography.enemyBases)(base => base.mineralsLeft + base.gasLeft)
-        .map(base => ByOption.minBy(base.units.filter(u => u.isEnemy && u.unitClass.isBuilding))(_.pixelDistanceFast(base.heart.pixelCenter))
-          .map(_.tileIncludingCenter)
-          .getOrElse(base.heart))
-        .getOrElse(With.intelligence.mostBaselikeEnemyTile)
-        .pixelCenter
+        .map(base => ByOption.minBy(base.units.filter(u => u.isEnemy && u.unitClass.isBuilding))(_.pixelDistanceFast(base.townHallArea.midPixel))
+          .map(_.pixelCenter)
+          .getOrElse(base.townHallArea.midPixel))
+        .getOrElse(With.intelligence.mostBaselikeEnemyTile.pixelCenter)
+        
     
     attackers.get.unitPreference.set(UnitPreferClose(target))
     attackers.get.acquire(this)

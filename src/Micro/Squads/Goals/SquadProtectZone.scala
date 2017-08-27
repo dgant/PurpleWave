@@ -3,22 +3,26 @@ package Micro.Squads.Goals
 import Information.Geography.Types.{Edge, Zone}
 import Lifecycle.With
 import Mathematics.Formations.Formation
-import Mathematics.Points.Pixel
+import Mathematics.Points.{Pixel, SpecificPoints}
 import Micro.Agency.Intention
 import Micro.Squads.Squad
-import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import ProxyBwapi.UnitInfo.UnitInfo
+import Utilities.ByOption
 import Utilities.EnrichPixel.EnrichedPixelCollection
 
 class SquadProtectZone(zone: Zone) extends SquadGoal {
   
   private var lastAction = "ProtectZone"
-  override def toString: String = lastAction + zone.name
+  override def toString: String = lastAction + zone
   
   def update(squad: Squad) {
   
-    lazy val base   = zone.bases.find(_.owner.isUs)
+    lazy val base   = ByOption.minBy(zone.bases)(_.heart.tileDistanceManhattan(With.intelligence.mostBaselikeEnemyTile))
     lazy val choke  = zone.exit
-    lazy val walls  = With.units.ours.toSeq.filter(u => u.unitClass.isStaticDefense && u.zone == zone)
+    lazy val walls  = zone.units.toSeq.filter(u =>
+      u.isOurs
+      && u.unitClass.isStaticDefense
+      && (squad.enemies.isEmpty || squad.enemies.exists(u.canAttack)))
     
     lazy val canHuntEnemies  = squad.enemies.exists(e => e.matchups.threatsInRange.isEmpty || e.matchups.vpfNetDiffused > 0.0)
     lazy val canDefendWall   = walls.nonEmpty
@@ -52,12 +56,18 @@ class SquadProtectZone(zone: Zone) extends SquadGoal {
     }))
   }
   
-  def defendWall(squad: Squad, walls: Seq[FriendlyUnitInfo]) {
-    val enemyCentroid = squad.enemies.map(_.pixelCenter).centroid
-    val wall = walls.minBy(_.pixelDistanceFast(enemyCentroid))
+  def defendWall(squad: Squad, walls: Seq[UnitInfo]) {
+    val centroidSources = Seq(squad.enemies.toSeq.map(_.pixelCenter), zone.exit.map(_.centerPixel).toSeq, Seq(SpecificPoints.middle))
+    val enemyCentroid   = centroidSources.find(_.nonEmpty).head.centroid
+    val wall            = walls.minBy(_.pixelDistanceFast(enemyCentroid))
+    val siegers         = squad.enemies.filter(e => walls.exists(e.canAttack))
+    val maxSiegerRange  = ByOption.max(siegers.map(_.pixelRangeGround)).getOrElse(0.0)
+    val maxWallRange    = walls.map(wall => ByOption.max(siegers.filter(wall.canAttack).map(sieger => wall.pixelRangeAgainstFromCenter(sieger))).getOrElse(0.0)).max
     
     squad.recruits.foreach(recruit => {
-      val formationPoint = wall.pixelCenter.project(enemyCentroid, 32.0 * 7.0 - recruit.effectiveRangePixels)
+      val range           = recruit.effectiveRangePixels
+      val margin          = wall.unitClass.radialHypotenuse + Math.max(32.0, maxWallRange - maxSiegerRange)
+      val formationPoint  = wall.pixelCenter.project(enemyCentroid, margin)
       recruit.agent.intend(squad.client, new Intention {
         toTravel = Some(formationPoint)
         toReturn = Some(formationPoint)

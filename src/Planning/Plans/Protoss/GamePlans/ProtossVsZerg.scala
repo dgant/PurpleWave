@@ -261,14 +261,17 @@ class ProtossVsZerg extends Parallel {
     
     new TrainMatchingRatio(Protoss.Observer, 0, 3, Seq(MatchingRatio(UnitMatchType(Zerg.Lurker), 0.5))),
   
+    // Gateway production
     new If(
       new And(
         new EnemyMutalisks,
         new UnitsAtMost(5, UnitMatchType(Protoss.Corsair))),
+      // Emergency Dragoons
       new If(
         new CanBuildDragoons,
         new TrainContinuously(Protoss.Dragoon),
         new TrainContinuously(Protoss.Zealot)),
+      // Normal behavior
       new Parallel(
         new If(
           new Employing(PvZMidgameCorsairDarkTemplar),
@@ -280,13 +283,12 @@ class ProtossVsZerg extends Parallel {
           new TrainContinuously(Protoss.HighTemplar, 8)),
         new If(
           new And(
-            new CanBuildDragoons,
             new UnitsAtLeast(1, UnitMatchType(Protoss.CyberneticsCore), complete = true),
             new Or(
               new And(
                 new Employing(PvZMidgame5GateDragoons),
-                new UnitsAtMost(15, UnitMatchType(Protoss.Dragoon)),
-              new UnitsAtLeast(20, UnitMatchType(Protoss.Zealot))))),
+                new UnitsAtMost(15, UnitMatchType(Protoss.Dragoon))),
+              new UnitsAtLeast(20, UnitMatchType(Protoss.Zealot)))),
           new TrainContinuously(Protoss.Dragoon),
           new TrainContinuously(Protoss.Zealot)))),
   

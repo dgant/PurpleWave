@@ -2,7 +2,7 @@ package Information.StrategyDetection.Generic
 
 import ProxyBwapi.UnitClass.UnitClass
 
-case class FingerprintIncompleteBy(
+class FingerprintIncompleteBy(
   unitClass : UnitClass,
   gameTime  : GameTime,
   quantity  : Int = 1)

@@ -43,7 +43,9 @@ class Squad(val client: Plan) {
   var needsSiege        : Boolean = _
   
   def update() {
-    goal.update(this)
+    if (recruits.nonEmpty) {
+      goal.update(this)
+    }
   }
   
   def conscript(units: Iterable[FriendlyUnitInfo]) {

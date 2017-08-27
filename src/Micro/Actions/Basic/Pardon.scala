@@ -1,15 +1,22 @@
 package Micro.Actions.Basic
 
+import Debugging.Visualizations.ForceColors
 import Micro.Actions.Action
+import Micro.Actions.Commands.Gravitate
+import Micro.Decisions.Potential
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Pardon extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.agent.shovers.nonEmpty
+    unit.canMove && unit.agent.shovers.nonEmpty
   }
   
   override def perform(unit: FriendlyUnitInfo) {
-    // TODO: Get out of the way!
+    val forceSpreading  = Potential.collisionRepulsion(unit)
+    val forceMobility   = Potential.barrierRepulsion(unit)
+    unit.agent.forces.put(ForceColors.spreading,  forceSpreading)
+    unit.agent.forces.put(ForceColors.mobility,   forceMobility)
+    Gravitate.delegate(unit)
   }
 }

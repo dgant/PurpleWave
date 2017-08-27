@@ -30,11 +30,11 @@ object DrawMap {
     
     line(start, end, color)
     val angleBack = end.radiansTo(start)
-    val angleDiff = Math.PI / 16
+    val angleDiff = Math.PI / 8
     triangle(
       end,
-      end.radiateRadians(angleBack + angleDiff, 10),
-      end.radiateRadians(angleBack - angleDiff, 10),
+      end.radiateRadians(angleBack + angleDiff, 12),
+      end.radiateRadians(angleBack - angleDiff, 12),
       color,
       solid = true)
   }

@@ -14,11 +14,11 @@ object Smuggle extends Action {
   }
   
   override def perform(unit: FriendlyUnitInfo) {
-    if (unit.matchups.ifAt(48).threatsInRange.nonEmpty) {
+    if (unit.matchups.ifAt(12).threatsInRange.nonEmpty) {
       Avoid.delegate(unit)
     }
     else if (unit.visibleToOpponents && unit.matchups.threats.nonEmpty) {
-      val forceThreat     = Potential.threatsRepulsion(unit)
+      val forceThreat     = Potential.threatsRepulsion(unit).normalize(1.5)
       val forceSmuggling  = Potential.smuggleRepulsion(unit)
       val forceHeading    = BuildForce.fromPixels(unit.pixelCenter, unit.agent.toTravel.getOrElse(unit.pixelCenter))
       unit.agent.forces.put(ForceColors.threat,     forceThreat)

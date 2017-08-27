@@ -29,8 +29,8 @@ object DrawMap {
     if (irrelevant(Vector(start, end))) return
     
     line(start, end, color)
-    circle(end, 1, color, solid = true)
-    circle(end.project(start, 3), 2, color, solid = true)
+    circle(end.project(start, 2), 1, color, solid = true)
+    circle(end.project(start, 4), 2, color, solid = true)
     circle(end.project(start, 7), 3, color, solid = true)
   }
   

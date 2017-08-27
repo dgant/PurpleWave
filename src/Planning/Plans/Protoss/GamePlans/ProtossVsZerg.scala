@@ -2,7 +2,7 @@ package Planning.Plans.Protoss.GamePlans
 
 import Information.StrategyDetection.ZergStrategies._
 import Lifecycle.With
-import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
+import Macro.BuildRequests.{RequestAnother, RequestAtLeast, RequestTech, RequestUpgrade}
 import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors}
 import Planning.Plans.Army._
 import Planning.Plans.Compound.{If, _}
@@ -310,9 +310,9 @@ class ProtossVsZerg extends Parallel {
           new TrainContinuously(Protoss.Reaver, 6)),
         new If(
           new And(
-            new Not(new Employing(PvZMidgameCorsairReaver)),
-            new Check(() => With.self.gas > Math.min(200, With.self.minerals))),
-          new TrainContinuously(Protoss.HighTemplar, 8)),
+            new UnitsAtLeast(1, Protoss.TemplarArchives, complete = true),
+            new Not(new Employing(PvZMidgameCorsairReaver))),
+          new Build(RequestAnother(2, Protoss.HighTemplar))),
         new If(
           new And(
             new UnitsAtLeast(1, UnitMatchType(Protoss.CyberneticsCore), complete = true),

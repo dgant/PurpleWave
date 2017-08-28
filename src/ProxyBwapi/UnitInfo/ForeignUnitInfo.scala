@@ -24,6 +24,7 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit) extends UnitInfo (originalBa
     baseUnit = unit
     updateTimeSensitiveInformation()
     limitMostUpdates.act()
+    update()
   }
   
   private val limitMostUpdates = new Limiter(1, () => {

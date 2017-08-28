@@ -250,7 +250,10 @@ class ProtossVsTerran extends Parallel {
           new UnitsAtLeast(8, UnitMatchWarriors, complete = true),
           new FulfillMidgameTech))),
     
-    new OnMiningBases(3, new BuildCannonsAtExpansions(1)),
+    new OnMiningBases(3, new If(
+      new EnemyUnitsAtLeast(1, Terran.Dropship),
+      new BuildCannonsAtBases(1),
+      new BuildCannonsAtExpansions(1))),
     
     // Late game
     new If(

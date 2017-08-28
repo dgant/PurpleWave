@@ -4,7 +4,6 @@ import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile, TileRectangle}
 import Mathematics.Shapes.Circle
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, UnitInfo}
-import bwapi.UnitType
 
 import scala.collection.JavaConverters._
 
@@ -19,9 +18,7 @@ class UnitTracker {
   
   def get(unit: bwapi.Unit): Option[UnitInfo] = if (unit == null) None else getId(unit.getID)
   
-  def all: Set[UnitInfo] = ours ++ enemy ++ neutral
-  
-  def buildings: Set[UnitInfo] = all.filter(_.unitClass.isBuilding)
+  def all: Seq[UnitInfo] = ours.toVector ++ enemy ++ neutral
   
   def ours: Set[FriendlyUnitInfo] = friendlyUnitTracker.ourUnits
   
@@ -55,7 +52,6 @@ class UnitTracker {
   def update() {
     friendlyUnitTracker.update()
     foreignUnitTracker.update()
-    With.units.all.foreach(_.update())
   }
   
   def onUnitDestroy(unit: bwapi.Unit) {

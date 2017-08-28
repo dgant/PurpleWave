@@ -1,7 +1,6 @@
 package ProxyBwapi.UnitTracking
 
 import Lifecycle.With
-import Performance.Caching.Limiter
 import ProxyBwapi.Players.Players
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, Orders}
 
@@ -11,7 +10,7 @@ import scala.collection.mutable
 
 class ForeignUnitTracker {
   
-  private val foreignUnitsById = new mutable.HashMap[Int, ForeignUnitInfo].empty
+  private val unitsByIdKnown = new mutable.HashMap[Int, ForeignUnitInfo].empty
   
   var foreignUnits    : Set[ForeignUnitInfo] = new HashSet[ForeignUnitInfo]
   var enemyUnits      : Set[ForeignUnitInfo] = new HashSet[ForeignUnitInfo]
@@ -19,42 +18,30 @@ class ForeignUnitTracker {
   var enemyGhostUnits : Set[Int]             = new HashSet[Int]
   
   def get(someUnit  : bwapi.Unit) : Option[ForeignUnitInfo] = get(someUnit.getID)
-  def get(id        : Int)        : Option[ForeignUnitInfo] = foreignUnitsById.get(id)
+  def get(id        : Int)        : Option[ForeignUnitInfo] = unitsByIdKnown.get(id)
   
-  private val limitInvalidatePositions = new Limiter(1, invalidatePositions)
   def update() {
     initialize()
-    
-    //Important to remember: bwapi.Units are not persisted frame-to-frame
-    //So we do all our comparisons by ID, rather than by object
   
-    val foreignUnitsKnown     = foreignUnitsById
-    val foreignUnitsVisible   = Players.all.filterNot(_.isFriendly).flatMap(_.rawUnits).filter(isValidForeignUnit).map(unit => (unit.getID, unit)).toMap
-    val foreignIdsKnown       = foreignUnitsKnown.keySet
-    val foreignIdsVisible     = foreignUnitsVisible.keySet
-    val unitsToAdd            = foreignIdsVisible.diff      (foreignIdsKnown)   .map(foreignUnitsVisible)
-    val unitsToUpdate         = foreignIdsVisible.intersect (foreignIdsKnown)   .map(foreignUnitsVisible)
-    val unitsToFlagInvisible  = foreignIdsKnown.diff        (foreignIdsVisible) .map(foreignUnitsById)
+    val unitsByIdVisible      = Players.all.filterNot(_.isFriendly).flatMap(_.rawUnits).filter(isValidForeignUnit).map(unit => (unit.getID, unit)).toMap
+    val unitsToAdd            = unitsByIdVisible.toSeq.filterNot(pair => unitsByIdKnown   .contains(pair._1))
+    val unitsToUpdate         = unitsByIdVisible.toSeq.filter   (pair => unitsByIdKnown   .contains(pair._1))
+    val unitsToFlagInvisible  = unitsByIdKnown  .toSeq.filterNot(pair => unitsByIdVisible .contains(pair._1))
     
-    unitsToAdd.foreach(add)
-    unitsToUpdate.foreach(unit => foreignUnitsById(unit.getID).update(unit))
-  
-    //Remove no-longer-valid units
-    //Whoops, foreignUnitsNew already lacks these units. Maybe this step isn't necessary
-    //val foreignUnitsInvalid = foreignUnitsNew.values.filterNot(_isValidForeignUnit)
-    //foreignUnitsInvalid.foreach(_remove)
+    unitsToAdd.foreach(pair => add(pair._2))
+    unitsToUpdate.foreach(pair => unitsByIdKnown(pair._1).update(pair._2))
   
     //Could speed things up by diffing instead of recreating these
-    foreignUnits = foreignUnitsById.values.toSet
+    foreignUnits = unitsByIdKnown.values.toSet
     enemyUnits   = foreignUnits.filter(_.player.isEnemy)
     neutralUnits = foreignUnits.filter(_.player.isNeutral)
   
-    unitsToFlagInvisible.foreach(_.flagInvisible())
-    limitInvalidatePositions.act()
+    unitsToFlagInvisible.foreach(_._2.flagInvisible())
+    invalidatePositions()
   }
   
   def onUnitDestroy(unit:bwapi.Unit) {
-    foreignUnitsById.get(unit.getID).foreach(remove)
+    unitsByIdKnown.get(unit.getID).foreach(remove)
   }
   
   private def invalidatePositions() {
@@ -89,7 +76,7 @@ class ForeignUnitTracker {
   private def add(unit: bwapi.Unit) {
     val knownUnit = new ForeignUnitInfo(unit)
     knownUnit.update(unit)
-    foreignUnitsById.put(knownUnit.id, knownUnit)
+    unitsByIdKnown.put(knownUnit.id, knownUnit)
   }
   
   private def updateMissing(unit: ForeignUnitInfo) {
@@ -124,7 +111,7 @@ class ForeignUnitTracker {
   
   private def remove(unit: ForeignUnitInfo) {
     unit.flagDead()
-    foreignUnitsById.remove(unit.id)
+    unitsByIdKnown.remove(unit.id)
   }
   
   private def remove(unit: bwapi.Unit) {
@@ -132,7 +119,7 @@ class ForeignUnitTracker {
   }
   
   private def remove(id: Int) {
-    foreignUnitsById.remove(id)
+    unitsByIdKnown.remove(id)
   }
   
   private def isValidForeignUnit(unit: bwapi.Unit): Boolean = {

@@ -10,7 +10,7 @@ class GridWalkableUnits extends AbstractGridBoolean {
   
   override def update() {
     reset()
-    With.units.buildings
+    With.units.all.filter(_.unitClass.isBuilding)
       .filter( ! _.flying)
       .foreach(building => building.tileArea.tiles
         .foreach(tile => set(tile, false)))

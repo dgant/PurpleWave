@@ -30,9 +30,14 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit) extends UnitInfo(base) {
   // Tracking info //
   ///////////////////
   
-  def player:PlayerInfo = cachePlayer.get
-  def lastSeen:Int = With.frame
-  def possiblyStillThere:Boolean = alive
+  def player              : PlayerInfo  = cachePlayer.get
+  def lastSeen            : Int         = With.frame
+  def possiblyStillThere  : Boolean     = alive
+  
+  def update(newBase: bwapi.Unit) {
+    baseUnit = newBase
+    update()
+  }
   
   ////////////
   // Health //

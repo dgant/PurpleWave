@@ -1,7 +1,6 @@
 package ProxyBwapi.UnitTracking
 
 import Lifecycle.With
-import ProxyBwapi.Players.Players
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 import scala.collection.immutable.HashSet
@@ -23,23 +22,15 @@ class FriendlyUnitTracker {
     //
     // Note that this only gets our own units and totally ignores allied units!
     
-    val friendlyUnitsNew        = With.self.rawUnits.map(unit => (unit.getID, unit)).toMap
-    val friendlyUnitsOld        = friendlyUnitsById
-    val friendlyIdsNew          = friendlyUnitsNew.keySet
-    val friendlyIdsOld          = friendlyUnitsOld.keySet
-    val unitsToAdd              = friendlyIdsNew.diff(friendlyIdsOld).map(friendlyUnitsNew)
-    val unitsToUpdate           = friendlyIdsNew.intersect(friendlyIdsOld).map(friendlyUnitsNew)
-    val unitsToRemoveDueToDeath = friendlyIdsOld.diff(friendlyIdsNew)
+    val friendlyUnitsByIdNew = With.self.rawUnits.map(unit => (unit.getID, unit)).toMap
+    
+    val unitsToAdd = friendlyUnitsByIdNew.filterNot(pair => friendlyUnitsById.contains(pair._1))
+    unitsToAdd.foreach(pair => add(pair._2))
   
-    unitsToAdd.foreach(add)
-    unitsToUpdate.foreach(update)
-    unitsToRemoveDueToDeath.foreach(remove)
+    val unitsToBury = friendlyUnitsById.filterNot(pair => friendlyUnitsByIdNew.contains(pair._1))
+    unitsToBury.foreach(pair => remove(pair._2))
     
-    //Remove no-longer-valid units
-    //We have to do this after updating because it needs the latest bwapi.Units
-    friendlyUnitsById.values.map(_.baseUnit).filterNot(isValidFriendlyUnit).foreach(remove)
-    
-    //Could speed things up by diffing instead of recreating these
+    friendlyUnitsById.foreach(pair => pair._2.update(friendlyUnitsByIdNew(pair._1)))
     friendlyUnits = friendlyUnitsById.values.toSet
     ourUnits = friendlyUnits.filter(_.player == With.self)
   }
@@ -48,13 +39,9 @@ class FriendlyUnitTracker {
     remove(unit.getID)
   }
   
-  private def add(unit:bwapi.Unit) {
+  private def add(unit: bwapi.Unit) {
     val unitInfo = new FriendlyUnitInfo(unit)
     friendlyUnitsById.put(unitInfo.id, unitInfo)
-  }
-  
-  private def update(unit:bwapi.Unit) {
-    friendlyUnitsById(unit.getID).baseUnit = unit
   }
   
   private def remove(id: Int) {

@@ -49,7 +49,7 @@ object ZoneUpdater {
   
   def updateZone(zone: Zone) {
   
-    zone.units = With.units.all.filter(_.zone == zone)
+    zone.units = With.units.all.filter(_.zone == zone).toSet
     
     zone.bases.foreach(BaseUpdater.updateBase)
   

@@ -26,7 +26,7 @@ object Architect {
       return false
     }
     
-    if (With.configuration.verifyBuildingsDontBreakPaths && recheckPathing && With.architecture.breaksPathing(buildArea)) {
+    if (With.configuration.buildingPlacementTestsPathing && recheckPathing && With.architecture.breaksPathing(buildArea)) {
       return false
     }
     

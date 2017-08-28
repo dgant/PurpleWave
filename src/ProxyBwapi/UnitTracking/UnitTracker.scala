@@ -13,8 +13,6 @@ class UnitTracker {
   private val friendlyUnitTracker = new FriendlyUnitTracker
   private val foreignUnitTracker = new ForeignUnitTracker
   
-  val invalidUnitTypes = Array(UnitType.None, UnitType.Unknown)
-  
   def alive(id: Int): Boolean = getId(id).exists(_.alive)
   
   def getId(id: Int): Option[UnitInfo] = friendlyUnitTracker.get(id).orElse(foreignUnitTracker.get(id))

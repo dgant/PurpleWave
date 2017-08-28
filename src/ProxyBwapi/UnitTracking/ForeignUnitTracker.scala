@@ -29,7 +29,7 @@ class ForeignUnitTracker {
     //So we do all our comparisons by ID, rather than by object
   
     val foreignUnitsKnown     = foreignUnitsById
-    val foreignUnitsVisible   = With.game.getAllUnits.asScala.filter(isValidForeignUnit).map(unit => (unit.getID, unit)).toMap
+    val foreignUnitsVisible   = Players.all.filterNot(_.isFriendly).flatMap(_.rawUnits).filter(isValidForeignUnit).map(unit => (unit.getID, unit)).toMap
     val foreignIdsKnown       = foreignUnitsKnown.keySet
     val foreignIdsVisible     = foreignUnitsVisible.keySet
     val unitsToAdd            = foreignIdsVisible.diff      (foreignIdsKnown)   .map(foreignUnitsVisible)
@@ -94,11 +94,11 @@ class ForeignUnitTracker {
   
   private def updateMissing(unit: ForeignUnitInfo) {
   
-    if (unit.visible)                                                 return
-    if ( ! unit.possiblyStillThere)                                   return
+    if (unit.visible)                                              return
+    if ( ! unit.possiblyStillThere)                                return
     if (unit.lastSeen > With.grids.friendlyVision.frameUpdated)    return
     if (unit.lastSeen > With.grids.friendlyDetection.frameUpdated) return
-    if (With.framesSince(unit.lastSeen) < 24 * 2)                     return
+    if (With.framesSince(unit.lastSeen) < 24 * 2)                  return
     
     lazy val shouldBeVisible  = With.grids.friendlyVision.isSet(unit.tileIncludingCenter)
     lazy val shouldBeDetected = With.grids.friendlyDetection.isSet(unit.tileIncludingCenter)
@@ -136,28 +136,20 @@ class ForeignUnitTracker {
   }
   
   private def isValidForeignUnit(unit: bwapi.Unit): Boolean = {
-    val exists        = unit.exists
-    lazy val id       = unit.getID
-    lazy val unitType = unit.getType
-    lazy val playerBw = unit.getPlayer
-    lazy val player   = Players.get(playerBw)
+    if ( ! unit.exists) {
+      return false
+    }
     
-    if ( ! exists) {
-      return false
-    }
-    if (With.units.invalidUnitTypes.contains(unitType)) {
-      return false
-    }
-    if (player.isFriendly) {
-      return false
-    }
-    if (enemyGhostUnits.contains(id)) {
-      if (With.frame > 5 && unit.isVisible) {
-        // Looks like it's a legit unit! It just happened to share an ID with a ghost unit
-        enemyGhostUnits = enemyGhostUnits - id
-      }
-      else {
-        return false
+    if (With.configuration.identifyGhostUnits) {
+      val id = unit.getID
+      if (enemyGhostUnits.contains(id)) {
+        if (With.frame > 5 && unit.isVisible) {
+          // Looks like it's a legit unit! It just happened to share an ID with a ghost unit
+          enemyGhostUnits = enemyGhostUnits - id
+        }
+        else {
+          return false
+        }
       }
     }
     

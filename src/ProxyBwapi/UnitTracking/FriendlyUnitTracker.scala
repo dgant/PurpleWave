@@ -20,14 +20,16 @@ class FriendlyUnitTracker {
   
     //Important to remember: bwapi.Units are not persisted frame-to-frame
     //So we do all our comparisons by ID, rather than by object
+    //
+    // Note that this only gets our own units and totally ignores allied units!
     
-    val friendlyUnitsNew                = With.self.rawUnits.filter(isValidFriendlyUnit).map(unit => (unit.getID, unit)).toMap
-    val friendlyUnitsOld                = friendlyUnitsById
-    val friendlyIdsNew                  = friendlyUnitsNew.keySet
-    val friendlyIdsOld                  = friendlyUnitsOld.keySet
-    val unitsToAdd                      = friendlyIdsNew.diff(friendlyIdsOld).map(friendlyUnitsNew)
-    val unitsToUpdate                   = friendlyIdsNew.intersect(friendlyIdsOld).map(friendlyUnitsNew)
-    val unitsToRemoveDueToDeath         = friendlyIdsOld.diff(friendlyIdsNew)
+    val friendlyUnitsNew        = With.self.rawUnits.map(unit => (unit.getID, unit)).toMap
+    val friendlyUnitsOld        = friendlyUnitsById
+    val friendlyIdsNew          = friendlyUnitsNew.keySet
+    val friendlyIdsOld          = friendlyUnitsOld.keySet
+    val unitsToAdd              = friendlyIdsNew.diff(friendlyIdsOld).map(friendlyUnitsNew)
+    val unitsToUpdate           = friendlyIdsNew.intersect(friendlyIdsOld).map(friendlyUnitsNew)
+    val unitsToRemoveDueToDeath = friendlyIdsOld.diff(friendlyIdsNew)
   
     unitsToAdd.foreach(add)
     unitsToUpdate.foreach(update)
@@ -42,7 +44,7 @@ class FriendlyUnitTracker {
     ourUnits = friendlyUnits.filter(_.player == With.self)
   }
   
-  def onUnitDestroy(unit:bwapi.Unit) {
+  def onUnitDestroy(unit: bwapi.Unit) {
     remove(unit.getID)
   }
   
@@ -55,21 +57,15 @@ class FriendlyUnitTracker {
     friendlyUnitsById(unit.getID).baseUnit = unit
   }
   
-  private def remove(id:Int) {
+  private def remove(id: Int) {
     friendlyUnitsById.remove(id)
   }
   
-  private def remove(unit:bwapi.Unit) {
+  private def remove(unit: bwapi.Unit) {
     remove(unit.getID)
   }
   
-  private def remove(unit:FriendlyUnitInfo) {
+  private def remove(unit: FriendlyUnitInfo) {
     remove(unit.id)
-  }
-  
-  private def isValidFriendlyUnit(unit:bwapi.Unit):Boolean ={
-    if (With.units.invalidUnitTypes.contains(unit.getType)) return false
-    if ( ! unit.exists) return false
-    Players.get(unit.getPlayer).isFriendly
   }
 }

@@ -93,7 +93,7 @@ class Architecture {
     //
     // So let's check this every time, but really focus on making it an inexpensive check
 
-    if ( ! With.configuration.verifyBuildingsDontBreakPaths) {
+    if ( ! With.configuration.buildingPlacementTestsPathing) {
       return false
     }
     

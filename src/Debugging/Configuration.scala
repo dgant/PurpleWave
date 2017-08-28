@@ -69,21 +69,22 @@ class Configuration {
   // Performance //
   /////////////////
   
+  
+  var peformanceFrameMilliseconds         = 20
+  var garbageCollectionThresholdMs        = 5
+  var initialTaskLengthMilliseconds       = 20
+  var performanceMinimumUnitSleep         = 2
+  var useFastGroundDistance               = true
+  
+  var urgentBuildingPlacement             = true
+  var urgentBuildingPlacementCutoffFrames = 24 * 60 * 15
+  var urgentBuildingPlacementCooldown     = 24 * 1
   var buildingPlacementMaxTilesToCheck    = 8000
   var buildingPlacementMaxTilesToEvaluate = 300
   var buildingPlacementBatchSize          = 300
   var buildingPlacementBatchingStartFrame = 24 * 60 * 4
   var buildingPlacementMaximumQueue       = 12
-  var garbageCollectionThresholdMs        = 5
-  var peformanceFrameMilliseconds         = 20
-  var initialTaskLengthMilliseconds       = 20
-  var performanceMinimumUnitSleep         = 2
-  var performanceMicroAngleStep           = 4
-  var useFastGroundDistance               = true
-  var verifyBuildingsDontBreakPaths       = false
-  var urgentBuildingPlacement             = true
-  var urgentBuildingPlacementCutoffFrames = 24 * 60 * 15
-  var urgentBuildingPlacementCooldown     = 24 * 1
+  var buildingPlacementTestsPathing       = false
   var unitHistoryAge                      = 24 * 3
   
   var urgencyManners            = 1

@@ -88,7 +88,6 @@ class ProtossVsZerg extends Parallel {
     RequestAtLeast(1, Protoss.Assimilator),
     RequestAtLeast(1, Protoss.CyberneticsCore),
     RequestAtLeast(2, Protoss.Nexus),
-    RequestAtLeast(3, Protoss.Gateway),
     RequestAtLeast(1, Protoss.Stargate),
     RequestAtLeast(4, Protoss.Gateway))
   
@@ -172,7 +171,7 @@ class ProtossVsZerg extends Parallel {
   
   children.set(Vector(
     
-    new Aggression(0.7),
+    new Aggression(0.75),
     
     new If(
       new HaveTech(Protoss.PsionicStorm),
@@ -320,7 +319,7 @@ class ProtossVsZerg extends Parallel {
               new And(
                 new Employing(PvZMidgame5GateDragoons),
                 new UnitsAtMost(15, UnitMatchType(Protoss.Dragoon))),
-              new UnitsAtLeast(10, UnitMatchType(Protoss.Zealot)))),
+              new UnitsAtLeast(6, UnitMatchType(Protoss.Zealot)))),
           new TrainContinuously(Protoss.Dragoon),
           new TrainContinuously(Protoss.Zealot)))),
   

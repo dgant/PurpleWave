@@ -14,7 +14,7 @@ object Smuggle extends Action {
   }
   
   override def perform(unit: FriendlyUnitInfo) {
-    if (unit.matchups.ifAt(12).threatsInRange.nonEmpty) {
+    if (unit.matchups.threats.exists(_.framesBeforeAttacking(unit) < 24)) {
       Avoid.delegate(unit)
     }
     else if (unit.visibleToOpponents && unit.matchups.threats.nonEmpty) {

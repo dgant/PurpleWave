@@ -1,6 +1,6 @@
 package Planning.Plans.Protoss
 
-import Macro.BuildRequests.{BuildRequest, RequestAtLeast, RequestUpgrade}
+import Macro.BuildRequests.{BuildRequest, RequestAnother, RequestAtLeast, RequestUpgrade}
 import ProxyBwapi.Races.Protoss
 
 object ProtossBuilds {
@@ -250,17 +250,19 @@ object ProtossBuilds {
   
   val FFE_GatewayFirst = Vector[BuildRequest] (
     RequestAtLeast(1,   Protoss.Nexus),
-    RequestAtLeast(8,   Protoss.Probe),
+    RequestAnother(4,   Protoss.Probe),
     RequestAtLeast(1,   Protoss.Pylon),
-    RequestAtLeast(10,  Protoss.Probe),
+    RequestAnother(1,   Protoss.Probe),
     RequestAtLeast(1,   Protoss.Gateway),
-    RequestAtLeast(12,  Protoss.Probe),
+    RequestAnother(2,   Protoss.Probe),
     RequestAtLeast(2,   Protoss.Pylon),
-    RequestAtLeast(13,  Protoss.Probe),
-    RequestAtLeast(1,   Protoss.Zealot),
-    RequestAtLeast(15,  Protoss.Probe),
-    RequestAtLeast(2,   Protoss.Zealot),
-    RequestAtLeast(17,  Protoss.Probe),
+    RequestAnother(1,   Protoss.Probe),
+    RequestAnother(1,   Protoss.Zealot),
+    RequestAnother(2,   Protoss.Probe),
+    RequestAnother(1,   Protoss.Zealot),
+    RequestAnother(1,   Protoss.Probe),
+    RequestAnother(1,   Protoss.Forge),
+    RequestAnother(1,   Protoss.Zealot),
     RequestAtLeast(2,   Protoss.Nexus))
   
   /////////////////////

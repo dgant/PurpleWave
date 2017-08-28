@@ -1,10 +1,11 @@
 package Debugging.Visualizations.Views.Micro
 
-import Debugging.Visualizations.Colors
+import Debugging.Visualizations.{Colors, ForceColors}
 import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.View
 import Lifecycle.With
 import Micro.Agency.Agent
+import Micro.Decisions.Potential
 import Utilities.ByOption
 
 object ShowUnitsFriendly extends View {
@@ -90,11 +91,12 @@ object ShowUnitsFriendly extends View {
     }
     
     if (showForces) {
+      val length = 96.0
       val maxForce = ByOption.max(agent.forces.values.map(_.lengthSlow)).getOrElse(0.0)
       if (maxForce > 0.0) {
         agent.forces.foreach(pair => {
           val force           = pair._2
-          val forceNormalized = force.normalize(96.0 * force.lengthSlow / maxForce)
+          val forceNormalized = force.normalize(length * force.lengthSlow / maxForce)
           DrawMap.line(
             agent.unit.pixelCenter,
             agent.unit.pixelCenter.add(
@@ -102,7 +104,16 @@ object ShowUnitsFriendly extends View {
               forceNormalized.y.toInt),
             pair._1)
         })
+        val sum = Potential.sum(agent.forces.values).normalize(length)
+        DrawMap.line(
+          agent.unit.pixelCenter,
+          agent.unit.pixelCenter.add(
+            sum.x.toInt,
+            sum.y.toInt),
+            ForceColors.sum)
       }
+      
+      
     }
     
     if (showDesire) {

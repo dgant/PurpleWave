@@ -40,7 +40,7 @@ class ForeignUnitTracker {
     invalidatePositions()
   }
   
-  def onUnitDestroy(unit:bwapi.Unit) {
+  def onUnitDestroy(unit: bwapi.Unit) {
     unitsByIdKnown.get(unit.getID).foreach(remove)
   }
   
@@ -96,10 +96,12 @@ class ForeignUnitTracker {
       if ( ! shouldBeDetected) {
         if (wasBurrowing) {
           unit.flagBurrowed()
+          unit.flagUndetected()
           return
         }
         else if (wasCloaking) {
           unit.flagCloaked()
+          unit.flagUndetected()
           return
         }
       }

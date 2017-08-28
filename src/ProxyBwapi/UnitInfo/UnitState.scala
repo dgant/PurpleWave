@@ -3,7 +3,6 @@ package ProxyBwapi.UnitInfo
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import ProxyBwapi.UnitClass.UnitClass
-import bwapi.UnitCommandType
 
 class UnitState(unit: UnitInfo) {
   val frame                 : Int               = With.frame
@@ -17,25 +16,9 @@ class UnitState(unit: UnitInfo) {
   val couldAttackThisFrame  : Boolean           = unit.readyForAttackOrder
   val cooldown              : Int               = unit.cooldownLeft
   val unitClass             : UnitClass         = unit.unitClass
-  val tryingToAttack: Boolean = {
-    if (unit.command.isEmpty) {
-      false
-    }
-    else {
-      val command = unit.command.get
-      command.getUnitCommandType == UnitCommandType.Attack_Unit
-    }
-  }
-  var tryingToMove: Boolean = {
-    if (unit.command.isEmpty) {
-      false
-    }
-    else {
-      val command = unit.command.get
-      command.getUnitCommandType == UnitCommandType.Move && unit.pixelDistanceFast(new Pixel(command.getTargetPosition)) > 128.0
-    }
-  }
-  val attackTarget: Option[UnitInfo] = if (tryingToAttack) unit.target.filter(_.isEnemy) else None
+  val attackTarget          : Option[UnitInfo]  = unit.target.filter(_.isEnemyOf(unit))
+  var tryingToMove          : Boolean           = unit.targetPixel.exists(_.pixelDistanceFast(unit.pixelCenter) > 32.0)
   
+  def tryingToAttack: Boolean = attackTarget.isDefined
   def age: Int = With.frame - frame
 }

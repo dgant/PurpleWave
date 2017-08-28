@@ -31,12 +31,13 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit) extends UnitInfo(base) {
   ///////////////////
   
   def player              : PlayerInfo  = cachePlayer.get
+  def unitClass           : UnitClass   = cacheClass.get
   def lastSeen            : Int         = With.frame
   def possiblyStillThere  : Boolean     = alive
   
   def update(newBase: bwapi.Unit) {
     baseUnit = newBase
-    update()
+    updateHistory()
   }
   
   ////////////
@@ -52,8 +53,7 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit) extends UnitInfo(base) {
   def resourcesLeft         : Int       = getResourcesCache.get
   def shieldPoints          : Int       = getShieldsCache.get
   def energy                : Int       = getEnergyCache.get
-  def unitClass             : UnitClass = cacheClass.get
-  def plagued               : Boolean   = base.isPlagued
+  def plagued               : Boolean   = isPlaguedCache.get
   
   private val getDefenseMatrixPointsCache   = new CacheFrame(() => base.getDefenseMatrixPoints)
   private val getHitPointsCache             = new CacheFrame(() => base.getHitPoints)
@@ -62,6 +62,7 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit) extends UnitInfo(base) {
   private val getResourcesCache             = new CacheFrame(() => base.getResources)
   private val getShieldsCache               = new CacheFrame(() => base.getShields)
   private val getEnergyCache                = new CacheFrame(() => base.getEnergy)
+  private val isPlaguedCache                = new CacheFrame(() => base.isPlagued)
   
   ////////////
   // Combat //

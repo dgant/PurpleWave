@@ -14,17 +14,19 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit) extends UnitInfo (originalBa
   
   override def foreign: Option[ForeignUnitInfo] = Some(this)
   
-  def flagDead()      { _alive = false }
-  def flagMissing()   { _possiblyStillThere = false }
-  def flagInvisible() { _visible = false }
-  def flagBurrowed()  { _burrowed = true }
-  def flagCloaked()   { _cloaked = true }
+  def flagDead()        { _alive              = false }
+  def flagMissing()     { _possiblyStillThere = false }
+  def flagInvisible()   { _visible            = false }
+  def flagBurrowed()    { _burrowed           = true  }
+  def flagCloaked()     { _cloaked            = true  }
+  def flagUndetected()  { _detected           = false }
   
   def update(unit: bwapi.Unit) {
     baseUnit = unit
     updateTimeSensitiveInformation()
     limitMostUpdates.act()
-    update()
+    fixCloakedUnits()
+    updateHistory()
   }
   
   private val limitMostUpdates = new Limiter(1, () => {
@@ -36,7 +38,6 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit) extends UnitInfo (originalBa
     updateMovement()
     updateOrders()
     updateStatuses()
-    fixCloakedUnits()
   })
   
   ///////////////////
@@ -236,7 +237,7 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit) extends UnitInfo (originalBa
   def interruptible   : Boolean = _interruptible
   def morphing        : Boolean = _morphing
   def repairing       : Boolean = _repairing
-  def teching     : Boolean = _researching
+  def teching         : Boolean = _researching
   def patrolling      : Boolean = _patrolling
   def training        : Boolean = _training
   def upgrading       : Boolean = _upgrading

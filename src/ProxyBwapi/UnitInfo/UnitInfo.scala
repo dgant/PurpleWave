@@ -52,7 +52,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit) extends UnitProxy(baseUnit) {
   val kills         : mutable.ArrayBuffer[Kill] = new mutable.ArrayBuffer[Kill]
 
   private val history = new mutable.Queue[UnitState]
-  def update() {
+  def updateHistory() {
     lastTarget = target.orElse(lastTarget)
     history.lastOption.foreach(lastState => {
       if (lastState.unitClass != unitClass) {

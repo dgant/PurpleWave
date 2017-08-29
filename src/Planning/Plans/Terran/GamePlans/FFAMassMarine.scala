@@ -1,7 +1,6 @@
 package Planning.Plans.Terran.GamePlans
 
 import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
-import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Plans.Army._
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
@@ -53,16 +52,16 @@ class FFAMassMarine extends Parallel {
     new TrainWorkersContinuously,
     new TrainContinuously(Terran.ScienceVessel),
     new If(
-      new UnitsAtLeast(30, UnitMatchType(Terran.Marine)),
+      new UnitsAtLeast(30, Terran.Marine),
       new UpgradeStuffEarly),
     new If(
-      new UnitsAtLeast(40, UnitMatchType(Terran.Marine)),
+      new UnitsAtLeast(40, Terran.Marine),
       new RequireMiningBases(3)),
     new If(
-      new UnitsAtLeast(50, UnitMatchType(Terran.Marine)),
+      new UnitsAtLeast(50, Terran.Marine),
       new UpgradeStuffLate),
     new If(
-      new UnitsAtLeast(60, UnitMatchType(Terran.Marine)),
+      new UnitsAtLeast(60, Terran.Marine),
       new RequireMiningBases(4)),
     new TrainContinuously(Terran.Marine),
     new OnMiningBases(1, new Build(RequestAtLeast(6, Terran.Barracks))),

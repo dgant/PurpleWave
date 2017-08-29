@@ -2,7 +2,6 @@ package Planning.Plans.Terran.GamePlans
 
 import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
-import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Plans.Army._
 import Planning.Plans.Compound._
 import Planning.Plans.Information.Reactive.EnemyMutalisks
@@ -23,8 +22,8 @@ class TerranVsZergBio extends Parallel {
     new TrainContinuously(Terran.ScienceVessel),
     new If(
       new And(
-        new UnitsAtLeast(1, UnitMatchType(Terran.Academy), complete = true),
-        new UnitsAtLeast(3, UnitMatchType(Terran.Marine), complete = true),
+        new UnitsAtLeast(1, Terran.Academy, complete = true),
+        new UnitsAtLeast(3, Terran.Marine, complete = true),
         new Check(() => With.units.ours.count(_.is(Terran.Marine)) > 6 * With.units.ours.count(_.is(Terran.Medic)))
       ),
       new TrainContinuously(Terran.Medic, 12),

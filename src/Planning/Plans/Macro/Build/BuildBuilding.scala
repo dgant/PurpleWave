@@ -8,7 +8,6 @@ import Mathematics.Points.Tile
 import Micro.Agency.Intention
 import Planning.Composition.ResourceLocks.{LockCurrencyForUnit, LockUnits}
 import Planning.Composition.UnitCounters.UnitCountOne
-import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Composition.UnitPreferences.UnitPreferClose
 import Planning.Plan
 import ProxyBwapi.UnitClass.UnitClass
@@ -23,7 +22,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
   private var orderedTile   : Option[Tile]              = None
   private var building      : Option[FriendlyUnitInfo]  = None
   
-  val builderMatcher = UnitMatchType(buildingClass.whatBuilds._1)
+  val builderMatcher = buildingClass.whatBuilds._1
   val builderLock = new LockUnits {
     description.set("Get a builder")
     unitCounter.set(UnitCountOne)

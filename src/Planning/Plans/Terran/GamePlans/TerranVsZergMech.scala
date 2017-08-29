@@ -1,7 +1,7 @@
 package Planning.Plans.Terran.GamePlans
 
 import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
-import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors}
+import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plans.Army._
 import Planning.Plans.Compound._
 import Planning.Plans.Information.Employing
@@ -36,40 +36,40 @@ class TerranVsZergMech extends Parallel {
     new If(new EnemyMutalisks, new Parallel(new BuildMissileTurretsAtBases(3), new TrainContinuously(Terran.Armory, 1), new TrainContinuously(Terran.Starport, 1), new TrainContinuously(Terran.ControlTower, 1))),
     new If(new EnemyLurkers, new Build(RequestAtLeast(1, Terran.EngineeringBay), RequestAtLeast(1, Terran.MissileTurret), RequestAtLeast(1, Terran.Academy))),
       
-    new If(new UnitsAtLeast(2,  UnitMatchType(Terran.SiegeTankUnsieged)), new Build(RequestTech(Terran.SiegeMode))),
-    new If(new UnitsAtLeast(3,  UnitMatchType(Terran.Wraith)),            new Build(RequestAtLeast(1, Terran.ControlTower), RequestTech(Terran.WraithCloak))),
-    new If(new UnitsAtLeast(2,  UnitMatchType(Terran.ScienceVessel)),     new Build(RequestTech(Terran.Irradiate))),
-    new If(new UnitsAtLeast(2,  UnitMatchType(Terran.Goliath)),           new Build(RequestUpgrade(Terran.GoliathAirRange))),
-    new If(new UnitsAtLeast(3,  UnitMatchType(Terran.Vulture)),           new Build(RequestTech(Terran.SpiderMinePlant))),
-    new If(new UnitsAtLeast(5,  UnitMatchType(Terran.Vulture)),           new Build(RequestUpgrade(Terran.VultureSpeed))),
-    new If(new UnitsAtLeast(10, UnitMatchType(Terran.Marine)),            new Build(RequestUpgrade(Terran.MarineRange))),
-    new If(new UnitsAtLeast(4,  UnitMatchType(Terran.Goliath)),           new Build(RequestUpgrade(Terran.GoliathAirRange))),
-    new If(new UnitsAtLeast(20, UnitMatchWarriors),                       new UpgradeContinuously(Terran.MechDamage)),
-    new If(new UnitsAtLeast(30, UnitMatchWarriors),                       new Build(RequestAtLeast(1, Terran.ScienceFacility), RequestAtLeast(2, Terran.Armory))),
-    new If(new UnitsAtLeast(30, UnitMatchWarriors),                       new UpgradeContinuously(Terran.MechArmor)),
-    new If(new UnitsAtLeast(20, UnitMatchWarriors),                       new RequireMiningBases(3)),
-    new If(new UnitsAtLeast(30, UnitMatchWarriors),                       new RequireMiningBases(4)),
+    new If(new UnitsAtLeast(2,  Terran.SiegeTankUnsieged),  new Build(RequestTech(Terran.SiegeMode))),
+    new If(new UnitsAtLeast(3,  Terran.Wraith),             new Build(RequestAtLeast(1, Terran.ControlTower), RequestTech(Terran.WraithCloak))),
+    new If(new UnitsAtLeast(2,  Terran.ScienceVessel),      new Build(RequestTech(Terran.Irradiate))),
+    new If(new UnitsAtLeast(2,  Terran.Goliath),            new Build(RequestUpgrade(Terran.GoliathAirRange))),
+    new If(new UnitsAtLeast(3,  Terran.Vulture),            new Build(RequestTech(Terran.SpiderMinePlant))),
+    new If(new UnitsAtLeast(5,  Terran.Vulture),            new Build(RequestUpgrade(Terran.VultureSpeed))),
+    new If(new UnitsAtLeast(10, Terran.Marine),             new Build(RequestUpgrade(Terran.MarineRange))),
+    new If(new UnitsAtLeast(4,  Terran.Goliath),            new Build(RequestUpgrade(Terran.GoliathAirRange))),
+    new If(new UnitsAtLeast(20, UnitMatchWarriors),         new UpgradeContinuously(Terran.MechDamage)),
+    new If(new UnitsAtLeast(30, UnitMatchWarriors),         new Build(RequestAtLeast(1, Terran.ScienceFacility), RequestAtLeast(2, Terran.Armory))),
+    new If(new UnitsAtLeast(30, UnitMatchWarriors),         new UpgradeContinuously(Terran.MechArmor)),
+    new If(new UnitsAtLeast(20, UnitMatchWarriors),         new RequireMiningBases(3)),
+    new If(new UnitsAtLeast(30, UnitMatchWarriors),         new RequireMiningBases(4)),
   
     new TrainMatchingRatio(Terran.Valkyrie, 0, 4, Seq(
-      MatchingRatio(UnitMatchType(Zerg.Mutalisk),  0.25),
-      MatchingRatio(UnitMatchType(Zerg.Guardian),  0.25))),
+      MatchingRatio(Zerg.Mutalisk,  0.25),
+      MatchingRatio(Zerg.Guardian,  0.25))),
     
     new If(
       new Employing(TvZMidgameWraiths),
       new If(
-        new UnitsAtLeast(2, UnitMatchType(Terran.ScienceVessel)),
+        new UnitsAtLeast(2, Terran.ScienceVessel),
         new TrainContinuously(Terran.ScienceVessel, 2),
         new TrainContinuously(Terran.Wraith)),
       new TrainContinuously(Terran.ScienceVessel, 4)),
   
     new TrainMatchingRatio(Terran.Goliath, 1, Int.MaxValue, Seq(
-      MatchingRatio(UnitMatchType(Zerg.Mutalisk),  1.0),
-      MatchingRatio(UnitMatchType(Zerg.Guardian),  2.0))),
+      MatchingRatio(Zerg.Mutalisk,  1.0),
+      MatchingRatio(Zerg.Guardian,  2.0))),
   
     new TrainMatchingRatio(Terran.SiegeTankUnsieged, 3, Int.MaxValue, Seq(
-      MatchingRatio(UnitMatchType(Zerg.Ultralisk),        2.0),
-      MatchingRatio(UnitMatchType(Zerg.Hydralisk),        0.4),
-      MatchingRatio(UnitMatchType(Zerg.Lurker),           0.6))),
+      MatchingRatio(Zerg.Ultralisk,        2.0),
+      MatchingRatio(Zerg.Hydralisk,        0.4),
+      MatchingRatio(Zerg.Lurker,           0.6))),
     
     new TrainContinuously(Terran.Vulture),
   

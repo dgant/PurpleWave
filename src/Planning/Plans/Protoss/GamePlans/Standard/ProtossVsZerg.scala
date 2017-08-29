@@ -3,7 +3,7 @@ package Planning.Plans.Protoss.GamePlans.Standard
 import Information.StrategyDetection.ZergStrategies._
 import Lifecycle.With
 import Macro.BuildRequests.{RequestAnother, RequestAtLeast, RequestTech, RequestUpgrade}
-import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors}
+import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plans.Army._
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.Information.Reactive.EnemyMutalisks
@@ -38,7 +38,7 @@ class ProtossVsZerg extends Parallel {
     new Parallel(
       new TwoGatewaysAtNexus,
       new Trigger(
-        new UnitsAtLeast(2, UnitMatchType(Protoss.Zealot), complete = true),
+        new UnitsAtLeast(2, Protoss.Zealot, complete = true),
         initialBefore = new Build(ProtossBuilds.OpeningTwoGate1012: _*))))
   
   private class FFE extends FirstEightMinutes(
@@ -156,7 +156,7 @@ class ProtossVsZerg extends Parallel {
     new RequireMiningBases(3))
   
   private class BuildDetectionForLurkers extends If(
-    new EnemyUnitsAtLeast(1, UnitMatchType(Zerg.Lurker)),
+    new EnemyUnitsAtLeast(1, Zerg.Lurker),
     new Build(
       RequestAtLeast(1, Protoss.CyberneticsCore),
       RequestAtLeast(1, Protoss.RoboticsFacility),
@@ -192,12 +192,12 @@ class ProtossVsZerg extends Parallel {
     
     new FirstEightMinutes(
       new If(
-        new UnitsAtLeast(1, UnitMatchType(Protoss.CyberneticsCore), complete = false),
+        new UnitsAtLeast(1, Protoss.CyberneticsCore, complete = false),
         new Parallel(
           new TrainMatchingRatio(Protoss.PhotonCannon, 2, 6,
             Seq(
-              MatchingRatio(UnitMatchType(Zerg.Zergling), 0.3),
-              MatchingRatio(UnitMatchType(Zerg.Hydralisk), 0.5)))))),
+              MatchingRatio(Zerg.Zergling, 0.3),
+              MatchingRatio(Zerg.Hydralisk, 0.5)))))),
   
     new FirstEightMinutes(
       new If(
@@ -205,8 +205,8 @@ class ProtossVsZerg extends Parallel {
           new WeAreFFEing,
           new EnemyStrategy(new Fingerprint4Pool),
           new Check(() => With.frame > 24 * 125),
-          new UnitsAtLeast(1, UnitMatchType(Protoss.PhotonCannon), complete = false),
-          new UnitsAtMost(1, UnitMatchType(Protoss.PhotonCannon), complete = true)),
+          new UnitsAtLeast(1, Protoss.PhotonCannon, complete = false),
+          new UnitsAtMost(1, Protoss.PhotonCannon, complete = true)),
         new DefendFFEWithProbesAgainst4Pool)),
   
     new FirstEightMinutes(
@@ -217,7 +217,7 @@ class ProtossVsZerg extends Parallel {
             new EnemyStrategy(new Fingerprint9Pool),
             new EnemyStrategy(new FingerprintOverpool)),
           new Check(() => With.frame > 24 * 125),
-          new UnitsAtMost(2, UnitMatchType(Protoss.PhotonCannon), complete = true)),
+          new UnitsAtMost(2, Protoss.PhotonCannon, complete = true)),
         new DefendFFEWithProbesAgainst9Pool)),
     
     new FirstEightMinutes(new Defend2GateAgainst4Pool),
@@ -234,55 +234,55 @@ class ProtossVsZerg extends Parallel {
     new BuildCannonsAtExpansions(5),
   
     new If(
-      new UnitsAtLeast(1, UnitMatchType(Protoss.Dragoon), complete = false),
+      new UnitsAtLeast(1, Protoss.Dragoon, complete = false),
       new Build(RequestUpgrade(Protoss.DragoonRange))),
   
     new If(
-      new UnitsAtLeast(2, UnitMatchType(Protoss.HighTemplar), complete = false),
+      new UnitsAtLeast(2, Protoss.HighTemplar, complete = false),
       new Build(RequestTech(Protoss.PsionicStorm))),
   
     new If(
-      new UnitsAtLeast(3, UnitMatchType(Protoss.Reaver), complete = false),
+      new UnitsAtLeast(3, Protoss.Reaver, complete = false),
       new Build(RequestUpgrade(Protoss.ShuttleSpeed))),
     
     new If(
       new And(
         new UnitsAtLeast(2, UnitMatchWarriors, complete = false),
-        new UnitsAtLeast(1, UnitMatchType(Protoss.Forge), complete = true),
-        new UnitsAtLeast(1, UnitMatchType(Protoss.Assimilator), complete = true)),
+        new UnitsAtLeast(1, Protoss.Forge, complete = true),
+        new UnitsAtLeast(1, Protoss.Assimilator, complete = true)),
       new Parallel(
         new UpgradeContinuously(Protoss.GroundDamage),
         new UpgradeContinuously(Protoss.ZealotSpeed))),
   
     new If(
-      new UnitsAtLeast(3, UnitMatchType(Protoss.Corsair), complete = false),
+      new UnitsAtLeast(3, Protoss.Corsair, complete = false),
       new Build(RequestUpgrade(Protoss.AirDamage, 1))),
   
     new If(
-      new UnitsAtLeast(6, UnitMatchType(Protoss.Corsair), complete = false),
+      new UnitsAtLeast(6, Protoss.Corsair, complete = false),
       new Build(RequestUpgrade(Protoss.AirArmor, 1))),
   
     new If(
       new And(
         new Employing(PvZMidgameCorsairDarkTemplar),
-        new UnitsAtLeast(2, UnitMatchType(Protoss.DarkTemplar), complete = true)),
-      new TrainMatchingRatio(Protoss.Corsair, 5, Int.MaxValue, Seq(MatchingRatio(UnitMatchType(Zerg.Mutalisk), 1.5))),
+        new UnitsAtLeast(2, Protoss.DarkTemplar, complete = true)),
+      new TrainMatchingRatio(Protoss.Corsair, 5, Int.MaxValue, Seq(MatchingRatio(Zerg.Mutalisk, 1.5))),
       new If(
         new And(
           new Employing(PvZMidgameCorsairReaver),
-          new UnitsAtLeast(3, UnitMatchType(Protoss.Corsair), complete = true)),
-        new TrainMatchingRatio(Protoss.Corsair, 5, Int.MaxValue, Seq(MatchingRatio(UnitMatchType(Zerg.Mutalisk), 1.5))),
-        new TrainMatchingRatio(Protoss.Corsair, 1, Int.MaxValue, Seq(MatchingRatio(UnitMatchType(Zerg.Mutalisk), 1.5))))),
+          new UnitsAtLeast(3, Protoss.Corsair, complete = true)),
+        new TrainMatchingRatio(Protoss.Corsair, 5, Int.MaxValue, Seq(MatchingRatio(Zerg.Mutalisk, 1.5))),
+        new TrainMatchingRatio(Protoss.Corsair, 1, Int.MaxValue, Seq(MatchingRatio(Zerg.Mutalisk, 1.5))))),
   
     new If(
-      new EnemyUnitsAtLeast(4, UnitMatchType(Zerg.Mutalisk)),
+      new EnemyUnitsAtLeast(4, Zerg.Mutalisk),
       new Build(RequestAtLeast(2, Protoss.Stargate))),
     new OnGasBases(2,
       new If(
-        new EnemyUnitsAtLeast(13, UnitMatchType(Zerg.Mutalisk)),
+        new EnemyUnitsAtLeast(13, Zerg.Mutalisk),
         new Build(RequestAtLeast(3, Protoss.Stargate)))),
     
-    new TrainMatchingRatio(Protoss.Observer, 0, 3, Seq(MatchingRatio(UnitMatchType(Zerg.Lurker), 0.5))),
+    new TrainMatchingRatio(Protoss.Observer, 0, 3, Seq(MatchingRatio(Zerg.Lurker, 0.5))),
   
     // Gateway production
     new If(
@@ -290,7 +290,7 @@ class ProtossVsZerg extends Parallel {
       // Emergency Dragoons
       new And(
         new EnemyMutalisks,
-        new UnitsAtMost(5, UnitMatchType(Protoss.Corsair))),
+        new UnitsAtMost(5, Protoss.Corsair)),
       new If(
         new CanBuildDragoons,
         new TrainContinuously(Protoss.Dragoon),
@@ -315,12 +315,12 @@ class ProtossVsZerg extends Parallel {
           new Build(RequestAnother(2, Protoss.HighTemplar))),
         new If(
           new And(
-            new UnitsAtLeast(1, UnitMatchType(Protoss.CyberneticsCore), complete = true),
+            new UnitsAtLeast(1, Protoss.CyberneticsCore, complete = true),
             new Or(
               new And(
                 new Employing(PvZMidgame5GateDragoons),
-                new UnitsAtMost(15, UnitMatchType(Protoss.Dragoon))),
-              new UnitsAtLeast(6, UnitMatchType(Protoss.Zealot)))),
+                new UnitsAtMost(15, Protoss.Dragoon)),
+              new UnitsAtLeast(6, Protoss.Zealot))),
           new TrainContinuously(Protoss.Dragoon),
           new TrainContinuously(Protoss.Zealot)))),
   
@@ -386,17 +386,17 @@ class ProtossVsZerg extends Parallel {
     new If(
       new And(
         new Or(
-          new UnitsAtMost(0, UnitMatchType(Protoss.DarkTemplar), complete = false),
+          new UnitsAtMost(0, Protoss.DarkTemplar, complete = false),
           new Not(new Employing(PvZMidgameCorsairDarkTemplar))),
-        new EnemyUnitsAtMost(0, UnitMatchType(Zerg.Spire), complete = true),
-        new EnemyUnitsAtMost(0, UnitMatchType(Zerg.Mutalisk)),
-        new EnemyUnitsAtMost(0, UnitMatchType(Zerg.Scourge))),
+        new EnemyUnitsAtMost(0, Zerg.Spire, complete = true),
+        new EnemyUnitsAtMost(0, Zerg.Mutalisk),
+        new EnemyUnitsAtMost(0, Zerg.Scourge)),
       new Parallel(
-        new FindExpansions       { scouts.get.unitMatcher.set(UnitMatchType(Protoss.Corsair)) },
-        new ControlEnemyAirspace { flyers.get.unitMatcher.set(UnitMatchType(Protoss.Corsair)) })),
+        new FindExpansions       { scouts.get.unitMatcher.set(Protoss.Corsair) },
+        new ControlEnemyAirspace { flyers.get.unitMatcher.set(Protoss.Corsair) })),
   
     new ClearBurrowedBlockers,
-    new FindExpansions { scouts.get.unitMatcher.set(UnitMatchType(Protoss.DarkTemplar)) },
+    new FindExpansions { scouts.get.unitMatcher.set(Protoss.DarkTemplar) },
     new DefendZones,
     new If(
       new HaveUpgrade(Protoss.ShuttleSpeed),

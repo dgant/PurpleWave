@@ -5,7 +5,6 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.RequestAtLeast
-import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Plans.Army.{AllIn, Attack}
 import Planning.Plans.Compound._
 import Planning.Plans.Information.SwitchEnemyRace
@@ -31,18 +30,18 @@ class Proxy2Gate extends Parallel {
   private class BasicPlan extends Parallel(
     new If(
       new Or(
-        new EnemyUnitsAtLeast(1, UnitMatchType(Terran.Factory)),
-        new EnemyUnitsAtLeast(1, UnitMatchType(Terran.Vulture)),
-        new EnemyUnitsAtLeast(1, UnitMatchType(Terran.Wraith)),
-        new EnemyUnitsAtLeast(1, UnitMatchType(Zerg.Spire)),
-        new EnemyUnitsAtLeast(1, UnitMatchType(Zerg.Mutalisk)),
-        new EnemyUnitsAtLeast(1, UnitMatchType(Zerg.LurkerEgg)),
-        new EnemyUnitsAtLeast(1, UnitMatchType(Zerg.Lurker)),
-        new EnemyUnitsAtLeast(1, UnitMatchType(Protoss.Scout)),
-        new EnemyUnitsAtLeast(1, UnitMatchType(Protoss.Carrier)),
-        new EnemyUnitsAtLeast(1, UnitMatchType(Protoss.CitadelOfAdun)),
-        new EnemyUnitsAtLeast(1, UnitMatchType(Protoss.TemplarArchives)),
-        new EnemyUnitsAtLeast(1, UnitMatchType(Protoss.DarkTemplar))),
+        new EnemyUnitsAtLeast(1, Terran.Factory),
+        new EnemyUnitsAtLeast(1, Terran.Vulture),
+        new EnemyUnitsAtLeast(1, Terran.Wraith),
+        new EnemyUnitsAtLeast(1, Zerg.Spire),
+        new EnemyUnitsAtLeast(1, Zerg.Mutalisk),
+        new EnemyUnitsAtLeast(1, Zerg.LurkerEgg),
+        new EnemyUnitsAtLeast(1, Zerg.Lurker),
+        new EnemyUnitsAtLeast(1, Protoss.Scout),
+        new EnemyUnitsAtLeast(1, Protoss.Carrier),
+        new EnemyUnitsAtLeast(1, Protoss.CitadelOfAdun),
+        new EnemyUnitsAtLeast(1, Protoss.TemplarArchives),
+        new EnemyUnitsAtLeast(1, Protoss.DarkTemplar)),
       new AllIn),
     new TrainContinuously(Protoss.Zealot),
     new TrainWorkersContinuously,
@@ -54,7 +53,7 @@ class Proxy2Gate extends Parallel {
     new Trigger(
       new Or(
         new And(
-          new EnemyUnitsAtLeast(1, UnitMatchType(Terran.Vulture)),
+          new EnemyUnitsAtLeast(1, Terran.Vulture),
           new Check(() => With.geography.enemyZones.exists(_.walledIn))),
         new Check(() => With.units.enemy.exists(u => u.flying && u.unitClass.isBuilding))),
       initialAfter = new Parallel(
@@ -63,8 +62,8 @@ class Proxy2Gate extends Parallel {
         new BuildGasPumps,
         new If(
           new And(
-            new UnitsAtLeast(1, UnitMatchType(Protoss.CyberneticsCore), complete = true),
-            new UnitsAtLeast(1, UnitMatchType(Protoss.Assimilator),     complete = true)),
+            new UnitsAtLeast(1, Protoss.CyberneticsCore, complete = true),
+            new UnitsAtLeast(1, Protoss.Assimilator,     complete = true)),
           new Parallel(
             new UpgradeContinuously(Protoss.DragoonRange),
             new If(
@@ -91,13 +90,13 @@ class Proxy2Gate extends Parallel {
     
     // Crappy haxx to make this all work, and to not pull three Probes to build three buildings
     new If(
-      new UnitsAtLeast(1, UnitMatchType(Protoss.Pylon), complete = false),
+      new UnitsAtLeast(1, Protoss.Pylon, complete = false),
       new Build(RequestAtLeast(1, Protoss.Gateway))),
     new If(
-      new UnitsAtLeast(1, UnitMatchType(Protoss.Gateway), complete = false),
+      new UnitsAtLeast(1, Protoss.Gateway, complete = false),
       new Build(RequestAtLeast(2, Protoss.Gateway))),
     new Trigger(
-      new UnitsAtLeast(2, UnitMatchType(Protoss.Gateway), complete = false),
+      new UnitsAtLeast(2, Protoss.Gateway, complete = false),
       initialAfter = new Parallel(
         new RequireSufficientSupply,
         new SwitchEnemyRace(

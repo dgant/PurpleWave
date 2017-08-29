@@ -5,7 +5,7 @@ import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.RequestAtLeast
 import Planning.Composition.UnitCounters.UnitCountExactly
-import Planning.Composition.UnitMatchers.{UnitMatchMobileFlying, UnitMatchType, UnitMatchWorkers}
+import Planning.Composition.UnitMatchers.{UnitMatchMobileFlying, UnitMatchWorkers}
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.Macro.Automatic.{Gather, TrainContinuously}
@@ -70,7 +70,7 @@ class Zerg9PoolProxySunkens extends Parallel {
     new Attack,
     new FollowBuildOrder,
     new If(
-      new UnitsAtLeast(1, UnitMatchType(Zerg.SpawningPool), complete = false),
+      new UnitsAtLeast(1, Zerg.SpawningPool, complete = false),
       new If(
         new Check(() => ProxyPlanner.proxyEnemyMain.isDefined),
         new Attack {

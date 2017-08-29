@@ -5,7 +5,7 @@ import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.RequestAtLeast
 import Planning.Composition.UnitCounters.UnitCountExactly
-import Planning.Composition.UnitMatchers.{UnitMatchMobileFlying, UnitMatchType, UnitMatchWorkers}
+import Planning.Composition.UnitMatchers.{UnitMatchMobileFlying, UnitMatchWorkers}
 import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.Information.Employ
@@ -26,7 +26,7 @@ class ProxyHatch extends Parallel {
     super.onUpdate()
   }
   private class WeKnowWhereToProxy extends Check(() => ProxyPlanner.proxyEnemyNatural.isDefined)
-  private class WeHaveEnoughSunkens extends UnitsAtLeast(3, UnitMatchType(Zerg.SunkenColony), complete = false)
+  private class WeHaveEnoughSunkens extends UnitsAtLeast(3, Zerg.SunkenColony, complete = false)
   
   private def blueprintCreepColonyNatural: Blueprint = new Blueprint(this,
     building          = Some(Zerg.CreepColony),
@@ -106,7 +106,7 @@ class ProxyHatch extends Parallel {
         new Build(RequestAtLeast(1, Zerg.HydraliskDen)),
         new RequireSufficientSupply,
         new If(
-          new UnitsAtLeast(1, UnitMatchType(Zerg.HydraliskDen), complete = false),
+          new UnitsAtLeast(1, Zerg.HydraliskDen, complete = false),
           new TrainContinuously(Zerg.Hydralisk),
           new TrainContinuously(Zerg.Zergling)))),
   
@@ -114,7 +114,7 @@ class ProxyHatch extends Parallel {
       new Parallel(
         new TrainContinuously(Zerg.SunkenColony),
         new Trigger(
-          new UnitsAtLeast(2, UnitMatchType(Zerg.Hatchery), complete = true),
+          new UnitsAtLeast(2, Zerg.Hatchery, complete = true),
           initialAfter = new Trigger(
             new WeHaveEnoughSunkens,
             initialBefore = new Parallel(
@@ -140,8 +140,8 @@ class ProxyHatch extends Parallel {
     new Employ(ProxyHatchSunkens,
       new If(
         new And(
-          new UnitsAtLeast(2, UnitMatchType(Zerg.Hatchery),     complete = false),
-          new UnitsAtLeast(1, UnitMatchType(Zerg.SpawningPool), complete = false),
+          new UnitsAtLeast(2, Zerg.Hatchery,      complete = false),
+          new UnitsAtLeast(1, Zerg.SpawningPool,  complete = false),
           new Not(new WeHaveEnoughSunkens)),
         new Attack {
           attackers.get.unitMatcher.set(UnitMatchWorkers)

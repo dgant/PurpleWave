@@ -1,7 +1,6 @@
 package Planning.Plans.Protoss.GamePlans.Standard
 
 import Macro.BuildRequests.RequestAtLeast
-import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Plans.Army.ConsiderAttacking
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.Information.Employ
@@ -37,7 +36,7 @@ class ProtossVsRandom extends Parallel {
       RequestAtLeast(1, Protoss.CyberneticsCore),
       RequestAtLeast(3, Protoss.Gateway)),
     new If(
-      new UnitsAtLeast(1, UnitMatchType(Protoss.Pylon), complete = false),
+      new UnitsAtLeast(1, Protoss.Pylon, complete = false),
       new Scout),
     new ConsiderAttacking
   ))

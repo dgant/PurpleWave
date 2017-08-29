@@ -3,17 +3,14 @@ package Planning.Plans.Macro.Automatic
 import Lifecycle.With
 import Micro.Agency.Intention
 import Planning.Composition.ResourceLocks.LockUnits
-import Planning.Composition.UnitMatchers.{UnitMatchAnd, UnitMatchEnergyAtMost, UnitMatchType}
+import Planning.Composition.UnitMatchers.{UnitMatchAnd, UnitMatchEnergyAtMost}
 import Planning.Plan
 import ProxyBwapi.Races.Protoss
 
 class MeldArchons(maxEnergy: Int = 200) extends Plan {
   
   val templar = new LockUnits
-  templar.unitMatcher.set(
-    UnitMatchAnd(
-      UnitMatchType(Protoss.HighTemplar),
-      UnitMatchEnergyAtMost(maxEnergy)))
+  templar.unitMatcher.set(UnitMatchAnd(Protoss.HighTemplar, UnitMatchEnergyAtMost(maxEnergy)))
   
   override def onUpdate() {
     templar.release()

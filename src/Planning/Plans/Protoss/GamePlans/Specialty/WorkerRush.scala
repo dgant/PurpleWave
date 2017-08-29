@@ -3,7 +3,7 @@ package Planning.Plans.Protoss.GamePlans.Specialty
 import Lifecycle.With
 import Macro.BuildRequests.RequestAnother
 import Planning.Composition.UnitCounters.UnitCountExactly
-import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWorkers}
+import Planning.Composition.UnitMatchers.UnitMatchWorkers
 import Planning.Composition.UnitPreferences.UnitPreferClose
 import Planning.Plans.Army.AttackWithWorkers
 import Planning.Plans.Compound.{And, _}
@@ -34,8 +34,8 @@ class WorkerRush extends Trigger {
   private class TimeToEndTheRush extends And(
     new EnemyUnitsAtMost(1, UnitMatchWorkers),
     new Or(
-      new EnemyUnitsAtLeast(1, UnitMatchType(Protoss.PhotonCannon), complete = true),
-      new EnemyUnitsAtLeast(1, UnitMatchType(Zerg.SunkenColony), complete = true)))
+      new EnemyUnitsAtLeast(1, Protoss.PhotonCannon, complete = true),
+      new EnemyUnitsAtLeast(1, Zerg.SunkenColony, complete = true)))
   
   
   trigger.set(new TimeToEndTheRush)

@@ -69,43 +69,43 @@ class TerranVsTerran extends Parallel {
     new TrainWorkersContinuously,
     new BuildGasPumps,
     
-    new If(new UnitsAtLeast(2,  UnitMatchType(Terran.SiegeTankUnsieged)), new Build(RequestTech(Terran.SiegeMode))),
-    new If(new UnitsAtLeast(3,  UnitMatchType(Terran.Wraith)),            new Build(RequestAtLeast(1, Terran.ControlTower), RequestTech(Terran.WraithCloak))),
-    new If(new UnitsAtLeast(2,  UnitMatchType(Terran.Goliath)),           new Build(RequestUpgrade(Terran.GoliathAirRange))),
-    new If(new UnitsAtLeast(3,  UnitMatchType(Terran.Battlecruiser)),     new Build(RequestTech(Terran.Yamato))),
-    new If(new UnitsAtLeast(3,  UnitMatchType(Terran.Vulture)),           new Build(RequestTech(Terran.SpiderMinePlant))),
-    new If(new UnitsAtLeast(5,  UnitMatchType(Terran.Vulture)),           new Build(RequestUpgrade(Terran.VultureSpeed))),
-    new If(new UnitsAtLeast(10, UnitMatchType(Terran.Marine)),            new Build(RequestUpgrade(Terran.MarineRange))),
-    new If(new UnitsAtLeast(4,  UnitMatchType(Terran.Goliath)),           new Build(RequestUpgrade(Terran.GoliathAirRange))),
-    new If(new UnitsAtLeast(1,  UnitMatchType(Terran.PhysicsLab)),        new TrainContinuously(Terran.ControlTower)),
-    new If(new UnitsAtLeast(3,  UnitMatchType(Terran.Battlecruiser)),     new UpgradeContinuously(Terran.AirDamage)),
-    new If(new UnitsAtLeast(3,  UnitMatchType(Terran.Battlecruiser)),     new UpgradeContinuously(Terran.AirArmor)),
-    new If(new UnitsAtLeast(20, UnitMatchWarriors),                       new UpgradeContinuously(Terran.MechDamage)),
-    new If(new UnitsAtLeast(30, UnitMatchWarriors),                       new Build(RequestAtLeast(1, Terran.ScienceFacility), RequestAtLeast(2, Terran.Armory))),
-    new If(new UnitsAtLeast(30, UnitMatchWarriors),                       new UpgradeContinuously(Terran.MechArmor)),
+    new If(new UnitsAtLeast(2,  Terran.SiegeTankUnsieged),  new Build(RequestTech(Terran.SiegeMode))),
+    new If(new UnitsAtLeast(3,  Terran.Wraith),             new Build(RequestAtLeast(1, Terran.ControlTower), RequestTech(Terran.WraithCloak))),
+    new If(new UnitsAtLeast(2,  Terran.Goliath),            new Build(RequestUpgrade(Terran.GoliathAirRange))),
+    new If(new UnitsAtLeast(3,  Terran.Battlecruiser),      new Build(RequestTech(Terran.Yamato))),
+    new If(new UnitsAtLeast(3,  Terran.Vulture),            new Build(RequestTech(Terran.SpiderMinePlant))),
+    new If(new UnitsAtLeast(5,  Terran.Vulture),            new Build(RequestUpgrade(Terran.VultureSpeed))),
+    new If(new UnitsAtLeast(10, Terran.Marine),             new Build(RequestUpgrade(Terran.MarineRange))),
+    new If(new UnitsAtLeast(4,  Terran.Goliath),            new Build(RequestUpgrade(Terran.GoliathAirRange))),
+    new If(new UnitsAtLeast(1,  Terran.PhysicsLab),         new TrainContinuously(Terran.ControlTower)),
+    new If(new UnitsAtLeast(3,  Terran.Battlecruiser),      new UpgradeContinuously(Terran.AirDamage)),
+    new If(new UnitsAtLeast(3,  Terran.Battlecruiser),      new UpgradeContinuously(Terran.AirArmor)),
+    new If(new UnitsAtLeast(20, UnitMatchWarriors),         new UpgradeContinuously(Terran.MechDamage)),
+    new If(new UnitsAtLeast(30, UnitMatchWarriors),         new Build(RequestAtLeast(1, Terran.ScienceFacility), RequestAtLeast(2, Terran.Armory))),
+    new If(new UnitsAtLeast(30, UnitMatchWarriors),         new UpgradeContinuously(Terran.MechArmor)),
   
     new TrainContinuously(Terran.Comsat),
     new TrainMatchingRatio(Terran.Goliath, 1, Int.MaxValue, Seq(
-        MatchingRatio(UnitMatchType(Terran.Battlecruiser),  3.0),
-        MatchingRatio(UnitMatchType(Terran.Wraith),         0.75),
-        MatchingRatio(UnitMatchType(Terran.Vulture),        0.5))),
+        MatchingRatio(Terran.Battlecruiser, 3.0),
+        MatchingRatio(Terran.Wraith,        0.75),
+        MatchingRatio(Terran.Vulture,       0.5))),
     
     new TrainContinuously(Terran.Battlecruiser),
     new TrainMatchingRatio(Terran.SiegeTankUnsieged, 3, Int.MaxValue, Seq(
-      MatchingRatio(UnitMatchSiegeTank,                   1.25),
-      MatchingRatio(UnitMatchType(Terran.Goliath),        0.75),
-      MatchingRatio(UnitMatchType(Terran.Wraith),         0.75),
-      MatchingRatio(UnitMatchType(Terran.Vulture),        0.5))),
+      MatchingRatio(UnitMatchSiegeTank, 1.25),
+      MatchingRatio(Terran.Goliath,     0.75),
+      MatchingRatio(Terran.Wraith,      0.75),
+      MatchingRatio(Terran.Vulture,     0.5))),
   
     new TrainMatchingRatio(Terran.Wraith, 3, Int.MaxValue, Seq(
-      MatchingRatio(UnitMatchType(Terran.Wraith),         1.5),
-      MatchingRatio(UnitMatchType(Terran.Vulture),        0.25))),
+      MatchingRatio(Terran.Wraith,      1.5),
+      MatchingRatio(Terran.Vulture,     0.25))),
     
     new TrainContinuously(Terran.Marine),
     new TrainContinuously(Terran.Vulture),
   
-    new OnMiningBases(2, new Build(RequestAtLeast(1, Terran.Starport), RequestAtLeast(3, Terran.Factory), RequestAtLeast(2, Terran.Starport), RequestAtLeast(1, Terran.Armory), RequestAtLeast(1, Terran.Academy), RequestAtLeast(5, Terran.Factory))),
-    new OnMiningBases(3, new Build(RequestAtLeast(5, Terran.Factory), RequestAtLeast(1, Terran.Academy), RequestAtLeast(8, Terran.Factory))),
+    new OnMiningBases(2, new Build(RequestAtLeast(1, Terran.Starport),  RequestAtLeast(3, Terran.Factory), RequestAtLeast(2, Terran.Starport), RequestAtLeast(1, Terran.Armory), RequestAtLeast(1, Terran.Academy), RequestAtLeast(5, Terran.Factory))),
+    new OnMiningBases(3, new Build(RequestAtLeast(5, Terran.Factory),   RequestAtLeast(1, Terran.Academy), RequestAtLeast(8, Terran.Factory))),
     new OnGasBases(2, new Build(RequestAtLeast(3, Terran.MachineShop))),
     new OnGasBases(3, new Build(
       RequestAtLeast(5, Terran.MachineShop),
@@ -135,7 +135,7 @@ class TerranVsTerran extends Parallel {
     new ScoutExpansionsAt(80),
     new DefendZones,
     new Trigger(
-      new UnitsAtLeast(1, UnitMatchType(Terran.Wraith), complete = true),
+      new UnitsAtLeast(1, Terran.Wraith, complete = true),
       new Parallel(
         new Attack,
         new Attack {

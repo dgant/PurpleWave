@@ -6,14 +6,13 @@ import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.RequestAtLeast
 import Planning.Composition.UnitCounters.UnitCountBetween
-import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWorkers}
+import Planning.Composition.UnitMatchers.UnitMatchWorkers
 import Planning.Composition.UnitPreferences.UnitPreferClose
 import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Compound._
 import Planning.Plans.Macro.Automatic.{Gather, TrainContinuously}
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, FirstEightMinutes, FollowBuildOrder, RequireBareMinimum}
-import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Milestones.UnitsAtLeast
 import Planning.Plans.Scouting.Scout
 import Planning.ProxyPlanner
@@ -46,7 +45,7 @@ class Proxy5Rax extends Parallel {
     new TrainContinuously(Terran.SCV),
     new FollowBuildOrder,
     new If(
-      new UnitsAtLeast(1, UnitMatchType(Terran.Barracks), complete = true),
+      new UnitsAtLeast(1, Terran.Barracks, complete = true),
       initialWhenTrue = new Parallel(
         new Scout,
         new Attack,

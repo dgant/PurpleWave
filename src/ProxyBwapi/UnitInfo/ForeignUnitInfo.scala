@@ -8,8 +8,6 @@ import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
 import bwapi.{Position, UnitCommand}
 
-import scala.collection.JavaConverters._
-
 class ForeignUnitInfo(originalBaseUnit: bwapi.Unit) extends UnitInfo (originalBaseUnit) {
   
   override def foreign: Option[ForeignUnitInfo] = Some(this)
@@ -115,12 +113,11 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit) extends UnitInfo (originalBa
   // Combat //
   ////////////
   
-  def scarabCount       : Int = if (is(Protoss.Reaver)) 3 else 0 // Don't know whether BWAPI gives this for enemy units. Here's an approximation.
+  def scarabCount       : Int = if (is(Protoss.Reaver)) 3 else 0 // BWAPI probably doens't give this for enemy units. Here's an approximation.
   def interceptorCount  : Int = interceptorCountCache.get
-  private val interceptorCountCache = new CacheFrame(() => interceptors.size)
+  private val interceptorCountCache = new CacheFrame(() => baseUnit.getInterceptorCount)
   
   private def updateCombat() {
-    _interceptors             = if (is(Protoss.Carrier)) baseUnit.getInterceptors.asScala.flatMap(With.units.get) else Iterable.empty
     _attackStarting           = baseUnit.isStartingAttack
     _attackAnimationHappening = baseUnit.isAttackFrame
     _airWeaponCooldownLeft    = baseUnit.getAirWeaponCooldown
@@ -135,7 +132,7 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit) extends UnitInfo (originalBa
   var _groundWeaponCooldownLeft : Int                 = _
   var _spellCooldownLeft        : Int                 = _
   
-  def interceptors              : Iterable[UnitInfo]  = _interceptors
+  def interceptors              : Iterable[UnitInfo]  = Iterable.empty // BWAPI doesn't publish this for enemy interceptors
   def attackStarting            : Boolean             = _attackStarting
   def attackAnimationHappening  : Boolean             = _attackAnimationHappening
   def airCooldownLeft           : Int                 = _airWeaponCooldownLeft

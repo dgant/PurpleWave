@@ -3,7 +3,7 @@ package Planning.Plans.Protoss.GamePlans.Specialty
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
-import Planning.Composition.UnitMatchers.{UnitMatchMobileDetectors, UnitMatchType}
+import Planning.Composition.UnitMatchers.UnitMatchMobileDetectors
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
@@ -34,7 +34,7 @@ class ProxyDarkTemplarRush extends Parallel {
     // An example: https://youtu.be/ca40eQ1s7iw
     
     new If(
-      new UnitsAtLeast(1, UnitMatchType(Protoss.TemplarArchives), complete = false),
+      new UnitsAtLeast(1, Protoss.TemplarArchives, complete = false),
       new If(
         new EnemyUnitsAtLeast(1, UnitMatchMobileDetectors),
         new Parallel(

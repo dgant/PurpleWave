@@ -4,7 +4,6 @@ import Macro.Scheduling.Project
 import Micro.Agency.Intention
 import Planning.Composition.ResourceLocks.{LockCurrencyForUnit, LockUnits}
 import Planning.Composition.UnitCounters.UnitCountOne
-import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Plan
 import ProxyBwapi.UnitClass.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -16,7 +15,7 @@ class MorphUnit(val classToMorph: UnitClass) extends Plan {
   val currencyLock    = new LockCurrencyForUnit(classToMorph)
   val morpherClass    = classToMorph.whatBuilds._1
   val morpherLock     = new LockUnits {
-    unitMatcher.set(UnitMatchType(morpherClass))
+    unitMatcher.set(morpherClass)
     unitCounter.set(UnitCountOne)
   }
   

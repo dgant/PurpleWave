@@ -5,13 +5,11 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.RequestAtLeast
-import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder, RequireBareMinimum}
-import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Milestones.UnitsAtLeast
 import Planning.Plans.Scouting.Scout
 import Planning.ProxyPlanner
@@ -41,7 +39,7 @@ class Proxy8Fact extends Parallel {
       RequestAtLeast(1, Terran.Barracks),
       RequestAtLeast(1, Terran.Refinery)),
     new Trigger(
-      new UnitsAtLeast(1, UnitMatchType(Terran.Barracks), complete = true),
+      new UnitsAtLeast(1, Terran.Barracks, complete = true),
       initialAfter =
         new Parallel(
           new Build(
@@ -57,7 +55,7 @@ class Proxy8Fact extends Parallel {
           new TrainWorkersContinuously,
           new TrainContinuously(Terran.Starport, 2))),
     new Trigger(
-      new UnitsAtLeast(1, UnitMatchType(Terran.Factory), complete = true),
+      new UnitsAtLeast(1, Terran.Factory, complete = true),
       initialAfter = new Scout),
     new Attack,
     new FollowBuildOrder,

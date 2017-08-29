@@ -2,7 +2,6 @@ package Planning.Plans.Zerg.GamePlans
 
 import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
-import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
@@ -32,7 +31,7 @@ class Zerg2HatchMuta extends Parallel {
       new Check(() => With.self.gas >= 100),
       new TrainContinuously(Zerg.Mutalisk)),
     new Trigger(
-      new UnitsAtLeast(1, UnitMatchType(Zerg.Mutalisk)),
+      new UnitsAtLeast(1, Zerg.Mutalisk),
       initialAfter = new Parallel(
         new BuildGasPumps,
         new TrainWorkersContinuously,

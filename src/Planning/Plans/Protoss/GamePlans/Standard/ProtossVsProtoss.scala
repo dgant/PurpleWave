@@ -2,7 +2,7 @@ package Planning.Plans.Protoss.GamePlans.Standard
 
 import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, _}
-import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors}
+import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plans.Army.{Attack, ConsiderAttacking, DefendZones}
 import Planning.Plans.Compound._
 import Planning.Plans.Information.Reactive.{EnemyCarriers, EnemyDarkTemplarExists, EnemyDarkTemplarPossible}
@@ -243,7 +243,7 @@ class ProtossVsProtoss extends Parallel {
       new UnitsAtLeast(1, Protoss.CitadelOfAdun),
       new UpgradeContinuously(Protoss.ZealotSpeed))),
     
-    new TrainMatchingRatio(Protoss.Observer, 1, 2, Seq(MatchingRatio(UnitMatchType(Protoss.DarkTemplar), 2.0))),
+    new TrainMatchingRatio(Protoss.Observer, 1, 2, Seq(MatchingRatio(Protoss.DarkTemplar, 2.0))),
     
     new If (
       new Not(new EnemyCarriers),

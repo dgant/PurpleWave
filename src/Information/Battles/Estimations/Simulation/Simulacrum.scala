@@ -4,6 +4,7 @@ import Debugging.Visualizations.Views.Battles.ShowBattleDetails
 import Information.Battles.Estimations.ReportCard
 import Mathematics.Points.Pixel
 import Micro.Decisions.MicroValue
+import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
 
 import scala.collection.mutable

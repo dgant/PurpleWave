@@ -5,7 +5,6 @@ import Mathematics.Points.Pixel
 import Micro.Agency.Intention
 import Planning.Composition.Property
 import Planning.Composition.ResourceLocks.LockUnits
-import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Plan
 import ProxyBwapi.Races.Terran
 
@@ -13,9 +12,7 @@ class Scan extends Plan {
   
   description.set("Use Scanner Sweep")
   
-  val scanners = new Property[LockUnits](new LockUnits {
-    unitMatcher.set(UnitMatchType(Terran.Comsat))
-  })
+  val scanners = new Property[LockUnits](new LockUnits { unitMatcher.set(Terran.Comsat) })
   
   var lastScan = 0
   

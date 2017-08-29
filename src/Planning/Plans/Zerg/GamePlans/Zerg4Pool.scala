@@ -3,7 +3,7 @@ package Planning.Plans.Zerg.GamePlans
 import Lifecycle.With
 import Macro.BuildRequests.RequestAtLeast
 import Planning.Composition.UnitCounters.UnitCountOne
-import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWorkers}
+import Planning.Composition.UnitMatchers.UnitMatchWorkers
 import Planning.Plans.Army.{Aggression, AllIn, Attack}
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.Macro.Automatic.{AddSupplyWhenSupplyBlocked, Gather}
@@ -24,14 +24,14 @@ class Zerg4Pool extends Parallel {
   
     new If(
       new And(
-        new UnitsAtLeast(5, UnitMatchType(Zerg.Drone)),
-        new UnitsAtLeast(1, UnitMatchType(Zerg.SpawningPool))),
+        new UnitsAtLeast(5, Zerg.Drone),
+        new UnitsAtLeast(1, Zerg.SpawningPool)),
       new Attack {
         attackers.get.unitCounter.set(UnitCountOne)
         attackers.get.unitMatcher.set(UnitMatchWorkers)
       }),
     new Build(RequestAtLeast(12,  Zerg.Zergling)),
-    new AllIn(new UnitsAtLeast(12, UnitMatchType(Zerg.Zergling))),
+    new AllIn(new UnitsAtLeast(12, Zerg.Zergling)),
     new If(
       new Check(() => With.units.ours.count(_.is(Zerg.Larva)) >= 2),
       new AddSupplyWhenSupplyBlocked),

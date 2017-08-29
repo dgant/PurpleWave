@@ -1,13 +1,12 @@
 package Planning.Plans.Macro.Build
 
-import Planning.Composition.UnitCounters.UnitCountOne
-import Planning.Composition.UnitMatchers.UnitMatchType
-import Planning.Plan
-import Planning.Composition.ResourceLocks.{LockCurrencyForTech, LockUnits}
-import ProxyBwapi.Techs.Tech
 import Lifecycle.With
 import Macro.Scheduling.Project
 import Micro.Agency.Intention
+import Planning.Composition.ResourceLocks.{LockCurrencyForTech, LockUnits}
+import Planning.Composition.UnitCounters.UnitCountOne
+import Planning.Plan
+import ProxyBwapi.Techs.Tech
 
 class ResearchTech(tech: Tech) extends Plan {
 
@@ -15,7 +14,7 @@ class ResearchTech(tech: Tech) extends Plan {
   val currency = new LockCurrencyForTech(tech)
   val techers = new LockUnits {
     unitCounter.set(UnitCountOne)
-    unitMatcher.set(UnitMatchType(techerClass))
+    unitMatcher.set(techerClass)
   }
   
   description.set("Tech " + tech)

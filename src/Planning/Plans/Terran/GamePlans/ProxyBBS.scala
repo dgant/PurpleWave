@@ -6,7 +6,7 @@ import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.RequestAtLeast
 import Planning.Composition.UnitCounters.UnitCountBetween
-import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWorkers}
+import Planning.Composition.UnitMatchers.UnitMatchWorkers
 import Planning.Composition.UnitPreferences.UnitPreferClose
 import Planning.Plans.Army.{Aggression, AllIn, Attack}
 import Planning.Plans.Compound.{If, Parallel}
@@ -48,9 +48,9 @@ class ProxyBBS extends Parallel {
     new TrainContinuously(Terran.Marine),
     new TrainContinuously(Terran.SCV),
     new If(
-      new UnitsAtLeast(1, UnitMatchType(Terran.Barracks), complete = true),
+      new UnitsAtLeast(1, Terran.Barracks, complete = true),
       new Scout),
-    new AllIn(new UnitsAtLeast(10, UnitMatchType(Terran.Marine), complete = true)),
+    new AllIn(new UnitsAtLeast(10, Terran.Marine, complete = true)),
     new Attack,
     new FollowBuildOrder,
     new Gather { workers.unitCounter.set(new UnitCountBetween(0, 8)); workers.unitPreference.set(UnitPreferClose(With.geography.home.pixelCenter)) },

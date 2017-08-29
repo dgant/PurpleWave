@@ -2,7 +2,6 @@ package Planning.Plans.Protoss.GamePlans.Specialty
 
 import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, RequestUpgradeNext}
-import Planning.Composition.UnitMatchers.UnitMatchType
 import Planning.Plans.Army.{ConsiderAttacking, DefendZones}
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.Macro.Automatic._
@@ -63,7 +62,7 @@ class ThreeBaseCarriersWithNoDefense extends Parallel {
     new ExpandOverIsland,
     new TechToCarriers,
     new If(
-      new UnitsAtLeast(4, UnitMatchType(Protoss.Carrier)),
+      new UnitsAtLeast(4, Protoss.Carrier),
       new Parallel(
         new OnMiningBases(2, new Parallel(new SpamUpgrades, new TechToObservers)),
         new OnMiningBases(3, new Parallel(new TechToArbiters)),
@@ -78,11 +77,11 @@ class ThreeBaseCarriersWithNoDefense extends Parallel {
     new OnGasBases(2, new Build(RequestAtLeast(5, Protoss.Stargate))),
     new OnGasBases(3, new Build(RequestAtLeast(8, Protoss.Stargate))),
     new BuildCannonsAtBases(16),
-    new FindExpansions { scouts.get.unitMatcher.set(UnitMatchType(Protoss.Scout)) },
+    new FindExpansions { scouts.get.unitMatcher.set(Protoss.Scout) },
     new DefendZones,
     new RecruitFreelancers,
     new If(
-      new UnitsAtLeast(8 * 8, UnitMatchType(Protoss.Interceptor)),
+      new UnitsAtLeast(8 * 8, Protoss.Interceptor),
       new ConsiderAttacking),
     new FollowBuildOrder,
     new Gather

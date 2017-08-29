@@ -2,7 +2,7 @@ package Planning.Plans.Protoss.GamePlans.Standard
 
 import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
-import Planning.Composition.UnitMatchers.{UnitMatchDroppable, UnitMatchType, UnitMatchWarriors}
+import Planning.Composition.UnitMatchers.{UnitMatchDroppable, UnitMatchWarriors}
 import Planning.Plans.Army._
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.Information.Reactive.{EnemyBio, EnemyBioAllIn}
@@ -45,7 +45,7 @@ class ProtossVsTerran extends Parallel {
   private class ConsiderTakingThirdBase extends If(
     new Or(
       new UnitsAtLeast(4, UnitMatchWarriors, complete = false),
-      new UnitsAtLeast(1, UnitMatchType(Protoss.Reaver))),
+      new UnitsAtLeast(1, Protoss.Reaver)),
     new RequireMiningBases(3))
   
   private class FulfillMidgameTech extends Build(
@@ -122,8 +122,8 @@ class ProtossVsTerran extends Parallel {
   
   private class IfNoDetection_DarkTemplar extends If(
     new And(
-      new EnemyUnitsNone(UnitMatchType(Terran.ScienceVessel)),
-      new EnemyUnitsNone(UnitMatchType(Terran.MissileTurret))),
+      new EnemyUnitsNone(Terran.ScienceVessel),
+      new EnemyUnitsNone(Terran.MissileTurret)),
     new TrainContinuously(Protoss.DarkTemplar, 3),
     new TrainContinuously(Protoss.DarkTemplar, 1))
   
@@ -143,7 +143,7 @@ class ProtossVsTerran extends Parallel {
     new And(
       new HaveUpgrade(Protoss.ZealotSpeed, withinFrames = Protoss.Zealot.buildFrames),
       new Or(
-        new UnitsAtLeast(18, UnitMatchType(Protoss.Dragoon)),
+        new UnitsAtLeast(18, Protoss.Dragoon),
         new Check(() => With.self.gas * 5 < With.self.minerals))),
     new TrainContinuously(Protoss.Zealot),
     new TrainContinuously(Protoss.Dragoon))
@@ -221,9 +221,9 @@ class ProtossVsTerran extends Parallel {
   
     // Make sure we get an early Dragoon for Vulture defense
     new Trigger(
-      new UnitsAtLeast(1, UnitMatchType(Protoss.Dragoon)),
+      new UnitsAtLeast(1, Protoss.Dragoon),
       initialBefore = new If(
-        new UnitsAtLeast(1, UnitMatchType(Protoss.CyberneticsCore)),
+        new UnitsAtLeast(1, Protoss.CyberneticsCore),
         new Build(RequestAtLeast(1, Protoss.Dragoon)))),
     
     new FulfillEarlyTech,
@@ -231,11 +231,11 @@ class ProtossVsTerran extends Parallel {
   
     // Mid game
      new If(
-      new UnitsAtLeast(1, UnitMatchType(Protoss.HighTemplar), complete = false),
+      new UnitsAtLeast(1, Protoss.HighTemplar, complete = false),
       new Build(RequestTech(Protoss.PsionicStorm))),
   
     new If(
-      new UnitsAtLeast(1, UnitMatchType(Protoss.Arbiter), complete = false),
+      new UnitsAtLeast(1, Protoss.Arbiter, complete = false),
       new Build(RequestTech(Protoss.Stasis))),
   
     new ConsiderTakingSecondBase,
@@ -278,7 +278,7 @@ class ProtossVsTerran extends Parallel {
     new If(
       new Or(
         new UnitsAtLeast(2, UnitMatchDroppable),
-        new UnitsAtLeast(2, UnitMatchType(Protoss.Reaver))),
+        new UnitsAtLeast(2, Protoss.Reaver)),
       new Parallel(
         new Build(RequestAtLeast(1, Protoss.Shuttle)),
         new Build(RequestAtLeast(1, Protoss.RoboticsSupportBay)),
@@ -305,14 +305,14 @@ class ProtossVsTerran extends Parallel {
     new ScoutExpansionsAt(100),
     new ClearBurrowedBlockers,
     new DropAttack,
-    new Attack { attackers.get.unitMatcher.set(UnitMatchType(Protoss.DarkTemplar)) },
+    new Attack { attackers.get.unitMatcher.set(Protoss.DarkTemplar) },
     new DefendZones,
     new If(
       new And(
         new UnitsAtLeast(12, UnitMatchWarriors, complete = true),
         new Not(new EnemyBio),
         new Or(
-          new UnitsAtLeast(1, UnitMatchType(Protoss.Observer), complete = true),
+          new UnitsAtLeast(1, Protoss.Observer, complete = true),
           new Not(new EnemyHasShown(Terran.SpiderMine)))),
       new Attack, // Contain 'em
       new ConsiderAttacking)

@@ -6,7 +6,7 @@ import Macro.Scheduling.Project
 import Micro.Agency.Intention
 import Planning.Composition.ResourceLocks.{LockCurrencyForUnit, LockUnits}
 import Planning.Composition.UnitCounters.UnitCountOne
-import Planning.Composition.UnitMatchers.{UnitMatchAnd, UnitMatchHasAddon, UnitMatchType}
+import Planning.Composition.UnitMatchers.{UnitMatchAnd, UnitMatchHasAddon}
 import Planning.Composition.UnitPreferences.UnitPreferNoAddon
 import Planning.Plan
 import ProxyBwapi.UnitClass.UnitClass
@@ -19,7 +19,7 @@ class TrainUnit(val traineeClass: UnitClass) extends Plan {
   val currencyLock    = new LockCurrencyForUnit(traineeClass)
   val trainerClass    = traineeClass.whatBuilds._1
   val addonsRequired  = traineeClass.buildUnitsEnabling.find(b => b.isAddon && b.whatBuilds._1 == trainerClass)
-  val matchTrainer    = UnitMatchType(trainerClass)
+  val matchTrainer    = trainerClass
   val trainerMatcher  =
     if (addonsRequired.isDefined)
       UnitMatchAnd(matchTrainer, UnitMatchHasAddon(addonsRequired.head))

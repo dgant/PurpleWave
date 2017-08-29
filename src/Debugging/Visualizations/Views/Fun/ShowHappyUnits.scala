@@ -115,8 +115,8 @@ object ShowHappyUnits extends View {
     }
     
     if (unit.complete) {
-      DrawMap.box(Pixel(eyeLeft-1,  eyeLevel-1), Pixel(eyeLeft+1,  eyeLevel+1), color, true)
-      DrawMap.box(Pixel(eyeRight-1, eyeLevel-1), Pixel(eyeRight+1, eyeLevel+1), color, true)
+      DrawMap.box(Pixel(eyeLeft-1,  eyeLevel-1), Pixel(eyeLeft+1,  eyeLevel+1), color, solid = true)
+      DrawMap.box(Pixel(eyeRight-1, eyeLevel-1), Pixel(eyeRight+1, eyeLevel+1), color, solid = true)
     }
     else {
       DrawMap.line(Pixel(eyeLeft-1,  eyeLevel+1),  Pixel(eyeLeft+1,  eyeLevel+1), color)
@@ -151,7 +151,7 @@ object ShowHappyUnits extends View {
     }
   }
   
-  def drawSolidTriangle(p1:Pixel, p2:Pixel, p3:Pixel, foreground:Color, background:Color = Color.Black) {
+  def drawSolidTriangle(p1: Pixel, p2: Pixel, p3: Pixel, foreground: Color, background: Color = Color.Black) {
     DrawMap.triangle(p1, p2, p3, background, true)
     DrawMap.triangle(p1, p2, p3, foreground, false)
   }

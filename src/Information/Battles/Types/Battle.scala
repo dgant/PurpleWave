@@ -40,7 +40,6 @@ class Battle(
   lazy val desire: Double = analysis.desire
   
   lazy val globalSafeToAttack: Boolean = {
-    (estimationAbstractOffense.weSurvive && estimationAbstractOffense.enemyDies) ||
-    With.blackboard.aggressionRatio * estimationAbstractOffense.costToEnemy - estimationAbstractOffense.costToUs > 0
+    With.blackboard.aggressionRatio * estimationAbstractOffense.costToEnemy - estimationAbstractOffense.costToUs >= 0
   }
 }

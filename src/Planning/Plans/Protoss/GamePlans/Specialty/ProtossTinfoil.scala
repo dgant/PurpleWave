@@ -1,9 +1,10 @@
 package Planning.Plans.Protoss.GamePlans.Specialty
 
+import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plans.Army.{Aggression, ConsiderAttacking, DefendEntrance, DropAttack}
-import Planning.Plans.Compound.{And, If, Parallel}
+import Planning.Plans.Compound.{And, Check, If, Parallel}
 import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder, RequireBareMinimum}
 import Planning.Plans.Macro.Expanding.{BuildCannonsAtBases, BuildGasPumps, RemoveMineralBlocksAt, RequireMiningBases}
@@ -31,10 +32,9 @@ class ProtossTinfoil extends Parallel {
     new TrainWorkersContinuously,
     new TrainContinuously(Protoss.Observer, 2),
     new TrainContinuously(Protoss.Carrier, 2),
-    new UpgradeContinuously(Protoss.DragoonRange),
-    new UpgradeContinuously(Protoss.CarrierCapacity),
     new If(
       new And(
+        new Check(() => With.self.gas >= 50),
         new UnitsAtLeast(1, Protoss.CyberneticsCore),
         new UnitsAtLeast(1, Protoss.Assimilator)),
       new TrainContinuously(Protoss.Dragoon, 30),
@@ -42,7 +42,9 @@ class ProtossTinfoil extends Parallel {
     new Build(
       RequestAtLeast(1, Protoss.Gateway),
       RequestAtLeast(1, Protoss.Assimilator),
+      RequestAtLeast(2, Protoss.Gateway),
       RequestAtLeast(1, Protoss.CyberneticsCore),
+      RequestUpgrade(Protoss.DragoonRange),
       RequestAtLeast(3, Protoss.Gateway),
       RequestAtLeast(1, Protoss.RoboticsFacility),
       RequestAtLeast(1, Protoss.Observatory),
@@ -57,11 +59,15 @@ class ProtossTinfoil extends Parallel {
     new Build(
       RequestAtLeast(1, Protoss.Stargate),
       RequestAtLeast(1, Protoss.FleetBeacon),
-      RequestAtLeast(3, Protoss.Stargate)),
+      RequestAtLeast(3, Protoss.Stargate),
+      RequestUpgrade(Protoss.CarrierCapacity)),
     new UpgradeContinuously(Protoss.AirDamage),
     new Build(RequestAtLeast(2, Protoss.CyberneticsCore)),
     new UpgradeContinuously(Protoss.AirArmor),
     new Build(RequestAtLeast(5, Protoss.Stargate)),
+    new RequireMiningBases(4),
+    new BuildCannonsAtBases(6),
+    new RequireMiningBases(6),
     new DropAttack { paratrooperMatcher.set(UnitMatchWarriors) },
     new ConsiderAttacking,
     new FollowBuildOrder,

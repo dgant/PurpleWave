@@ -3,9 +3,9 @@ package Planning.Plans.Protoss.GamePlans.Standard
 import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, _}
 import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors}
-import Planning.Plans.Army.{Attack, ConsiderAttacking, DefendZones}
+import Planning.Plans.Army.{Aggression, Attack, ConsiderAttacking, DefendZones}
 import Planning.Plans.Compound._
-import Planning.Plans.Information.Reactive.{EnemyDarkTemplarExists, EnemyDarkTemplarPossible}
+import Planning.Plans.Information.Reactive.{EnemyCarriers, EnemyDarkTemplarExists, EnemyDarkTemplarPossible}
 import Planning.Plans.Information.{Employ, Employing}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, FirstEightMinutes}
@@ -13,7 +13,7 @@ import Planning.Plans.Macro.Expanding.{BuildGasPumps, MatchMiningBases, RequireM
 import Planning.Plans.Macro.Milestones._
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Protoss.ProtossBuilds
-import Planning.Plans.Protoss.Situational.{ForgeFastExpand, Nexus2GateThenCannons, TwoGatewaysAtNatural}
+import Planning.Plans.Protoss.Situational.{ForgeFastExpand, Nexus2GateThenCannons}
 import Planning.Plans.Scouting.{Scout, ScoutExpansionsAt}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP._
@@ -26,15 +26,8 @@ class ProtossVsProtoss extends Parallel {
   // Early game strategies //
   ///////////////////////////
   
-  private class ImplementEarly2Gate910 extends FirstEightMinutes(
-    new Parallel(
-      new TwoGatewaysAtNatural,
-      new Build(ProtossBuilds.OpeningTwoGate910_WithZealots: _*)))
-  
-  private class ImplementEarly2Gate1012 extends FirstEightMinutes(
-    new Parallel(
-      new TwoGatewaysAtNatural,
-      new Build(ProtossBuilds.OpeningTwoGate1012: _*)))
+  private class ImplementEarly2Gate910 extends Build(ProtossBuilds.OpeningTwoGate910_WithZealots: _*)
+  private class ImplementEarly2Gate1012 extends Build(ProtossBuilds.OpeningTwoGate1012: _*)
   
   private class ImplementEarly1GateCore extends FirstEightMinutes(
     new Build(ProtossBuilds.Opening_10Gate11Gas13Core: _*))
@@ -131,6 +124,11 @@ class ProtossVsProtoss extends Parallel {
     new RequireMiningBases(2)
   ) { description.set("Expand against cannons")}
   
+  private class ExpandAgainAgainstMoreCannons extends If(
+    new EnemyUnitsAtLeast(5, UnitMatchType(Protoss.PhotonCannon)),
+    new RequireMiningBases(3)
+  ) { description.set("Expand again against more cannons")}
+  
   private class TakeNatural extends If(
     new Or(
       new UnitsAtLeast(8, UnitMatchWarriors),
@@ -179,7 +177,8 @@ class ProtossVsProtoss extends Parallel {
       new Check(() => With.self.gas < 100 && With.self.minerals > With.self.gas * 5),
       new And(
         new HaveUpgrade(Protoss.ZealotSpeed, Protoss.Zealot.buildFrames),
-        new UnitsAtLeast(12, UnitMatchType(Protoss.Dragoon)))),
+        new UnitsAtLeast(12, UnitMatchType(Protoss.Dragoon)),
+        new Not(new EnemyCarriers))),
     new TrainContinuously(Protoss.Zealot),
     new TrainContinuously(Protoss.Dragoon)
   )
@@ -205,6 +204,7 @@ class ProtossVsProtoss extends Parallel {
     new MatchMiningBases,
     new TakeNatural,
     new ExpandAgainstCannons,
+    new ExpandAgainAgainstMoreCannons,
     new TakeThirdBase,
   
     // Early game macro
@@ -242,7 +242,11 @@ class ProtossVsProtoss extends Parallel {
     new OnMiningBases(2, new UpgradeContinuously(Protoss.ZealotSpeed)),
     
     new TrainMatchingRatio(Protoss.Observer, 1, 2, Seq(MatchingRatio(UnitMatchType(Protoss.DarkTemplar), 2.0))),
-    new TrainContinuously(Protoss.Reaver, 4),
+    
+    new If (
+      new Not(new EnemyCarriers),
+      new TrainContinuously(Protoss.Reaver, 4)),
+    
     new BuildDragoonsOrZealots,
     
     // Midgame
@@ -263,31 +267,49 @@ class ProtossVsProtoss extends Parallel {
       RequestAtLeast(1, Protoss.Gateway),
       RequestAtLeast(1, Protoss.CyberneticsCore)),
     new BuildGasPumps,
-    new Parallel(
-      new Build(
-        RequestAtLeast(2, Protoss.Gateway),
-        RequestUpgrade(Protoss.DragoonRange),
-        RequestAtLeast(3, Protoss.Gateway),
-        RequestAtLeast(1, Protoss.RoboticsFacility),
-        RequestAtLeast(1, Protoss.RoboticsSupportBay)),
-      new OnMiningBases(2,
-        new Build(
-          RequestAtLeast(5, Protoss.Gateway),
+    new Build(
+      RequestAtLeast(2, Protoss.Gateway),
+      RequestUpgrade(Protoss.DragoonRange)),
+    new If(
+      new EnemyCarriers,
+      new Parallel(
+        new Build(RequestAtLeast(4, Protoss.Gateway)),
+        new OnMiningBases(2, new Build(RequestAtLeast(8, Protoss.Gateway))),
+        new OnMiningBases(3, new Build(RequestAtLeast(12, Protoss.Gateway))),
+        new OnMiningBases(4, new Build(
+          RequestAtLeast(15, Protoss.Gateway),
+          RequestAtLeast(1, Protoss.RoboticsFacility),
           RequestAtLeast(1, Protoss.Observatory),
-          RequestAtLeast(1, Protoss.CitadelOfAdun),
-          RequestAtLeast(8, Protoss.Gateway))),
-      new OnMiningBases(3,
-        new Parallel(
-          new UpgradeContinuously(Protoss.GroundDamage),
+          RequestAtLeast(3, Protoss.Observer)))),
+      new Parallel(
+        new Build(
+          RequestAtLeast(3, Protoss.Gateway),
+          RequestAtLeast(1, Protoss.RoboticsFacility),
+          RequestAtLeast(1, Protoss.RoboticsSupportBay)),
+        new OnMiningBases(2,
           new Build(
-            RequestAtLeast(1, Protoss.Forge),
-            RequestAtLeast(1, Protoss.TemplarArchives),
-            RequestAtLeast(2, Protoss.Forge),
-            RequestUpgrade(Protoss.HighTemplarEnergy)),
-          new UpgradeContinuously(Protoss.GroundArmor),
-          new Build(RequestAtLeast(12, Protoss.Gateway))))),
+            RequestAtLeast(5, Protoss.Gateway),
+            RequestAtLeast(1, Protoss.Observatory),
+            RequestAtLeast(1, Protoss.CitadelOfAdun),
+            RequestAtLeast(8, Protoss.Gateway))),
+        new OnMiningBases(3,
+          new Parallel(
+            new UpgradeContinuously(Protoss.GroundDamage),
+            new Build(
+              RequestAtLeast(1, Protoss.Forge),
+              RequestAtLeast(1, Protoss.TemplarArchives),
+              RequestAtLeast(2, Protoss.Forge),
+              RequestUpgrade(Protoss.HighTemplarEnergy)),
+            new UpgradeContinuously(Protoss.GroundArmor),
+            new Build(RequestAtLeast(12, Protoss.Gateway)))))),
     
-    new ScoutExpansionsAt(100),
+    new Build(
+      RequestAtLeast(2, Protoss.Forge),
+      RequestAtLeast(1, Protoss.TemplarArchives)),
+    new UpgradeContinuously(Protoss.GroundDamage),
+    new UpgradeContinuously(Protoss.GroundArmor),
+    
+    new ScoutExpansionsAt(90),
     new If(
       new DoingOneGateCore,
       new If(

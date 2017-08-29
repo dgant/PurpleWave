@@ -14,7 +14,7 @@ import Planning.Plans.Recruitment.RecruitFreelancers
 import Planning.Plans.Scouting.FindExpansions
 import ProxyBwapi.Races.Protoss
 
-class IslandCarriers extends Parallel {
+class ThreeBaseCarriersWithNoDefense extends Parallel {
   
   private class ExpandOverIsland extends RequireMiningBases {
     description.set("Fill island with expansions")
@@ -22,7 +22,7 @@ class IslandCarriers extends Parallel {
       if (With.strategy.isPlasma)
         3
       else
-        With.geography.bases.count(_.zone.canWalkTo(With.geography.ourMain.zone)))
+        Math.min(3, With.geography.bases.count(_.zone.canWalkTo(With.geography.ourMain.zone))))
   }
   
   private class TechToCarriers extends Build(

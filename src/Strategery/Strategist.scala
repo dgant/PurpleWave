@@ -51,14 +51,20 @@ class Strategist {
     val startLocations  = With.geography.startLocations.size
     val isFfa           = With.enemies.size > 1
     
-    ! Playbook.disabled.contains(strategy)                          &&
-    (strategy.ffa == isFfa)                                         && // TODO: Disable non-ffa strategies for FFA
-    (strategy.islandMaps  || ! isIsland)                            &&
-    (strategy.groundMaps  || ! isGround)                            &&
-    strategy.ourRaces.exists(_ == ourRace)                          &&
-    strategy.enemyRaces.exists(enemyRaces.contains)                 &&
-    strategy.startLocationsMin <= startLocations                    &&
-    strategy.startLocationsMax >= startLocations
+    ! Playbook.disabled.contains(strategy)            &&
+    (strategy.ffa == isFfa)                           && // TODO: Disable non-ffa strategies for FFA
+    (strategy.islandMaps  || ! isIsland)              &&
+    (strategy.groundMaps  || ! isGround)              &&
+    strategy.ourRaces.exists(_ == ourRace)            &&
+    strategy.enemyRaces.exists(enemyRaces.contains)   &&
+    strategy.startLocationsMin <= startLocations      &&
+    strategy.startLocationsMax >= startLocations      &&
+    (
+      strategy.restrictedOpponents.isEmpty ||
+      strategy.restrictedOpponents.get
+        .map(_.toLowerCase)
+        .exists(key => With.enemies.map(_.name.toLowerCase).exists(_.contains(key)))
+    )
   }
   
   private def heyIsThisAnIslandMap = {

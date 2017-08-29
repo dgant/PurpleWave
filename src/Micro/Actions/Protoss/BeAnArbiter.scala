@@ -16,7 +16,7 @@ object BeAnArbiter extends Action {
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {
-    val umbrellable = (u: UnitInfo) => u.unitClass.isBuilding
+    val umbrellable = (u: UnitInfo) => ! u.unitClass.isBuilding
     var friends: Seq[UnitInfo] = unit.squadmates.filter(umbrellable)
     if (friends.isEmpty) {
       friends = unit.matchups.allies.filter(umbrellable)

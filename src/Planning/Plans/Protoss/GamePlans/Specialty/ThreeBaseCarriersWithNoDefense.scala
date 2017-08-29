@@ -1,13 +1,14 @@
 package Planning.Plans.Protoss.GamePlans.Specialty
 
 import Lifecycle.With
-import Macro.BuildRequests.{RequestAtLeast, RequestUpgradeNext}
+import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgradeNext}
 import Planning.Plans.Army.{ConsiderAttacking, DefendZones}
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildCannonsAtBases, BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.{OnGasBases, OnMiningBases, UnitsAtLeast}
+import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Protoss.ProtossBuilds
 import Planning.Plans.Recruitment.RecruitFreelancers
 import Planning.Plans.Scouting.FindExpansions
@@ -15,13 +16,13 @@ import ProxyBwapi.Races.Protoss
 
 class ThreeBaseCarriersWithNoDefense extends Parallel {
   
-  private class ExpandOverIsland extends RequireMiningBases {
+  private class ExpandOverIsland(maxBases: Int) extends RequireMiningBases {
     description.set("Fill island with expansions")
     basesDesired.set(
       if (With.strategy.isPlasma)
         3
       else
-        Math.min(3, With.geography.bases.count(_.zone.canWalkTo(With.geography.ourMain.zone))))
+        Math.min(maxBases, With.geography.bases.count(_.zone.canWalkTo(With.geography.ourMain.zone))))
   }
   
   private class TechToCarriers extends Build(
@@ -48,21 +49,23 @@ class ThreeBaseCarriersWithNoDefense extends Parallel {
     RequestAtLeast(1, Protoss.Observatory)
   )
   
-  private class SpamUpgrades extends Build(
-    RequestAtLeast(2, Protoss.CyberneticsCore),
-    RequestUpgradeNext(Protoss.AirDamage),
-    RequestUpgradeNext(Protoss.AirArmor)
-  )
+  private class SpamUpgrades extends Parallel(
+    new Build(RequestAtLeast(2, Protoss.CyberneticsCore)),
+    new UpgradeContinuously(Protoss.AirDamage),
+    new UpgradeContinuously(Protoss.AirArmor))
   
   children.set(Vector(
     new Build(ProtossBuilds.Opening13Nexus_NoZealot_OneGateCore: _*),
     new RequireSufficientSupply,
     new TrainWorkersContinuously,
     new BuildGasPumps,
-    new ExpandOverIsland,
+    new ExpandOverIsland(3),
     new TechToCarriers,
     new If(
-      new UnitsAtLeast(4, Protoss.Carrier),
+      new UnitsAtLeast(1, Protoss.Arbiter),
+      new Build(RequestTech(Protoss.Stasis))),
+    new If(
+      new UnitsAtLeast(6, Protoss.Carrier),
       new Parallel(
         new OnMiningBases(2, new Parallel(new SpamUpgrades, new TechToObservers)),
         new OnMiningBases(3, new Parallel(new TechToArbiters)),
@@ -76,14 +79,16 @@ class ThreeBaseCarriersWithNoDefense extends Parallel {
     new OnGasBases(1, new Build(RequestAtLeast(3, Protoss.Stargate))),
     new OnGasBases(2, new Build(RequestAtLeast(5, Protoss.Stargate))),
     new OnGasBases(3, new Build(RequestAtLeast(8, Protoss.Stargate))),
-    new BuildCannonsAtBases(16),
+    new OnGasBases(4, new Build(RequestAtLeast(12, Protoss.Stargate))),
+    new BuildCannonsAtBases(8),
+    new ExpandOverIsland(12),
     new FindExpansions { scouts.get.unitMatcher.set(Protoss.Scout) },
     new DefendZones,
-    new RecruitFreelancers,
     new If(
       new UnitsAtLeast(8 * 8, Protoss.Interceptor),
       new ConsiderAttacking),
     new FollowBuildOrder,
-    new Gather
+    new Gather,
+    new RecruitFreelancers
   ))
 }

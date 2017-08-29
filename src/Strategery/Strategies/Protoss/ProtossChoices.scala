@@ -1,7 +1,7 @@
 package Strategery.Strategies.Protoss
 
 import Strategery.Strategies.AllRaces.{WorkerRush2StartLocations, WorkerRush3StartLocations}
-import Strategery.Strategies.Protoss.Other.ProtossIslandCarriers
+import Strategery.Strategies.Protoss.Other.CarriersFromAnIsland
 import Strategery.Strategies.Protoss.PvE._
 import Strategery.Strategies.Protoss.PvP.AllPvP
 import Strategery.Strategies.Protoss.PvR.AllPvR
@@ -17,7 +17,8 @@ object ProtossChoices {
     Proxy2Gate2StartLocations,
     Proxy2Gate3StartLocations,
     ProxyDarkTemplar,
-    ProtossIslandCarriers,
+    CarriersFromAnIsland,
+    CarriersWithNoDefense,
     AllPvR,
     AllPvT,
     AllPvP,

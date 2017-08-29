@@ -1,4 +1,4 @@
-package Planning.Plans.Protoss.GamePlans
+package Planning.Plans.Protoss.GamePlans.Standard
 
 import Information.StrategyDetection.ZergStrategies._
 import Lifecycle.With
@@ -205,6 +205,7 @@ class ProtossVsZerg extends Parallel {
           new WeAreFFEing,
           new EnemyStrategy(new Fingerprint4Pool),
           new Check(() => With.frame > 24 * 125),
+          new UnitsAtLeast(1, UnitMatchType(Protoss.PhotonCannon), complete = false),
           new UnitsAtMost(1, UnitMatchType(Protoss.PhotonCannon), complete = true)),
         new DefendFFEWithProbesAgainst4Pool)),
   

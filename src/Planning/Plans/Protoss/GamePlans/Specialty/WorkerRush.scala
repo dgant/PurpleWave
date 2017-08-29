@@ -1,4 +1,4 @@
-package Planning.Plans.Protoss.GamePlans
+package Planning.Plans.Protoss.GamePlans.Specialty
 
 import Lifecycle.With
 import Macro.BuildRequests.RequestAnother
@@ -10,6 +10,7 @@ import Planning.Plans.Compound.{And, _}
 import Planning.Plans.Macro.Automatic.{Gather, TrainContinuously}
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
 import Planning.Plans.Macro.Milestones.{EnemyUnitsAtLeast, EnemyUnitsAtMost, UnitsAtLeast}
+import Planning.Plans.Protoss.GamePlans.Standard.ProtossStandardGamePlan
 import ProxyBwapi.Races.{Protoss, Zerg}
 
 class WorkerRush extends Trigger {

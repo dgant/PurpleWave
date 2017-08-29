@@ -1,4 +1,4 @@
-package Planning.Plans.Protoss.GamePlans
+package Planning.Plans.Protoss.GamePlans.Standard
 
 import Macro.BuildRequests.RequestAtLeast
 import Planning.Composition.UnitMatchers.UnitMatchType

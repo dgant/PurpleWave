@@ -1,7 +1,7 @@
 package Planning.Plans
 
 import Planning.Plans.Information.SwitchOurRace
-import Planning.Plans.Protoss.GamePlans.ProtossStandardGamePlan
+import Planning.Plans.Protoss.GamePlans.Standard.ProtossStandardGamePlan
 import Planning.Plans.Terran.GamePlans.TerranStandardGamePlan
 import Planning.Plans.Zerg.GamePlans.ZergGamePlan
 

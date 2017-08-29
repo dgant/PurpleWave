@@ -1,4 +1,4 @@
-package Planning.Plans.Protoss.GamePlans
+package Planning.Plans.Protoss.GamePlans.Standard
 
 import Planning.Plans.Army.DefendEntrance
 import Planning.Plans.Compound.Parallel

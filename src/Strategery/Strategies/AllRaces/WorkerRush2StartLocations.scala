@@ -1,7 +1,7 @@
 package Strategery.Strategies.AllRaces
 
 import Planning.Plan
-import Planning.Plans.Protoss.GamePlans.WorkerRush
+import Planning.Plans.Protoss.GamePlans.Specialty.WorkerRush
 import Strategery.Strategies.Strategy
 
 object WorkerRush2StartLocations extends Strategy {

@@ -1,12 +1,12 @@
-package Planning.Plans.Protoss.GamePlans
+package Planning.Plans.Protoss.GamePlans.Standard
 
 import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
 import Planning.Composition.UnitMatchers.{UnitMatchDroppable, UnitMatchType, UnitMatchWarriors}
 import Planning.Plans.Army._
 import Planning.Plans.Compound.{If, _}
-import Planning.Plans.Information.{Employ, Employing}
 import Planning.Plans.Information.Reactive.{EnemyBio, EnemyBioAllIn}
+import Planning.Plans.Information.{Employ, Employing}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, FirstEightMinutes, RequireBareMinimum}
 import Planning.Plans.Macro.Expanding._

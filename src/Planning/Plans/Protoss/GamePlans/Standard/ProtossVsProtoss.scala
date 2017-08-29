@@ -1,4 +1,4 @@
-package Planning.Plans.Protoss.GamePlans
+package Planning.Plans.Protoss.GamePlans.Standard
 
 import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, _}

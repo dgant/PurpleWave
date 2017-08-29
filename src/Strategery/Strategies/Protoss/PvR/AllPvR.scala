@@ -13,6 +13,7 @@ object AllPvR extends Strategy {
     AllPvP.choices ++
     AllPvZ.choices ++
     Vector(Vector(
+      PvRTinfoil,
       PvREarly2Gate910,
       PvREarly2Gate910AtNatural,
       PvREarly2Gate1012

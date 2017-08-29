@@ -10,4 +10,4 @@ case class HistoricalGame(
   ourRace         : Race,
   enemyRace       : Race,
   won             : Boolean,
-  strategies    : Set[String])
+  strategies      : Set[String])

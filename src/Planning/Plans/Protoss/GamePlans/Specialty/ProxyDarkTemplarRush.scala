@@ -1,4 +1,4 @@
-package Planning.Plans.Protoss.GamePlans
+package Planning.Plans.Protoss.GamePlans.Specialty
 
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles

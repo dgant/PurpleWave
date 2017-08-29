@@ -3,7 +3,7 @@ package Planning.Plans.Protoss.GamePlans.Standard
 import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, _}
 import Planning.Composition.UnitMatchers.{UnitMatchType, UnitMatchWarriors}
-import Planning.Plans.Army.{Aggression, Attack, ConsiderAttacking, DefendZones}
+import Planning.Plans.Army.{Attack, ConsiderAttacking, DefendZones}
 import Planning.Plans.Compound._
 import Planning.Plans.Information.Reactive.{EnemyCarriers, EnemyDarkTemplarExists, EnemyDarkTemplarPossible}
 import Planning.Plans.Information.{Employ, Employing}
@@ -107,7 +107,7 @@ class ProtossVsProtoss extends Parallel {
       RequestAtLeast(1, Protoss.RoboticsSupportBay)))
   
   private class BuildReaversOrTemplar extends If(
-      new UnitsAtLeast(1, UnitMatchType(Protoss.TemplarArchives), complete = true),
+      new UnitsAtLeast(1, Protoss.TemplarArchives, complete = true),
       new Parallel(
         new TrainContinuously(Protoss.HighTemplar,  6),
         new TrainContinuously(Protoss.Reaver,       1)),
@@ -119,22 +119,22 @@ class ProtossVsProtoss extends Parallel {
   
   private class ExpandAgainstCannons extends If(
     new Or(
-      new EnemyUnitsAtLeast(1, UnitMatchType(Protoss.PhotonCannon)),
-      new EnemyUnitsAtLeast(1, UnitMatchType(Protoss.Forge))),
+      new EnemyUnitsAtLeast(1, Protoss.PhotonCannon),
+      new EnemyUnitsAtLeast(1, Protoss.Forge)),
     new RequireMiningBases(2)
   ) { description.set("Expand against cannons")}
   
   private class ExpandAgainAgainstMoreCannons extends If(
-    new EnemyUnitsAtLeast(5, UnitMatchType(Protoss.PhotonCannon)),
+    new EnemyUnitsAtLeast(5, Protoss.PhotonCannon),
     new RequireMiningBases(3)
   ) { description.set("Expand again against more cannons")}
   
   private class TakeNatural extends If(
     new Or(
       new UnitsAtLeast(8, UnitMatchWarriors),
-      new UnitsAtLeast(2, UnitMatchType(Protoss.PhotonCannon)),
-      new UnitsAtLeast(1, UnitMatchType(Protoss.Reaver)),
-      new UnitsAtLeast(2, UnitMatchType(Protoss.DarkTemplar))),
+      new UnitsAtLeast(2, Protoss.PhotonCannon),
+      new UnitsAtLeast(1, Protoss.Reaver),
+      new UnitsAtLeast(2, Protoss.DarkTemplar)),
     new RequireMiningBases(2)
   ) { description.set("Take our natural when safe")}
   
@@ -171,13 +171,13 @@ class ProtossVsProtoss extends Parallel {
   
   private class BuildDragoonsOrZealots extends If(
     new Or(
-      new UnitsAtMost(0, UnitMatchType(Protoss.CyberneticsCore),  complete = true),
-      new UnitsAtMost(0, UnitMatchType(Protoss.Assimilator),      complete = true),
+      new UnitsAtMost(0, Protoss.CyberneticsCore,  complete = true),
+      new UnitsAtMost(0, Protoss.Assimilator,      complete = true),
       new Check(() => With.self.gas < 30),
       new Check(() => With.self.gas < 100 && With.self.minerals > With.self.gas * 5),
       new And(
         new HaveUpgrade(Protoss.ZealotSpeed, Protoss.Zealot.buildFrames),
-        new UnitsAtLeast(12, UnitMatchType(Protoss.Dragoon)),
+        new UnitsAtLeast(12, Protoss.Dragoon),
         new Not(new EnemyCarriers))),
     new TrainContinuously(Protoss.Zealot),
     new TrainContinuously(Protoss.Dragoon)
@@ -217,29 +217,31 @@ class ProtossVsProtoss extends Parallel {
     new ReactToDarkTemplarPossible,
     
     new If(
-      new UnitsAtLeast(2, UnitMatchType(Protoss.HighTemplar), complete = false),
+      new UnitsAtLeast(2, Protoss.HighTemplar, complete = false),
       new Build(RequestTech(Protoss.PsionicStorm))),
   
     new If(
       new And(
-        new UnitsAtLeast(2, UnitMatchType(Protoss.Dragoon), complete = false),
+        new UnitsAtLeast(2, Protoss.Dragoon, complete = false),
         new Or(
           new Not(new Employing(PvPMidgameDarkTemplar)),
-          new UnitsAtLeast(2, UnitMatchType(Protoss.DarkTemplar), complete = false))),
+          new UnitsAtLeast(2, Protoss.DarkTemplar, complete = false))),
       new Build(RequestUpgrade(Protoss.DragoonRange))),
     
     new If(
       new And(
-        new EnemyUnitsAtMost(0, UnitMatchType(Protoss.Observer)),
-        new EnemyUnitsAtMost(0, UnitMatchType(Protoss.Forge))),
+        new EnemyUnitsAtMost(0, Protoss.Observer),
+        new EnemyUnitsAtMost(0, Protoss.Forge)),
       new TrainContinuously(Protoss.DarkTemplar, 3),
       new TrainContinuously(Protoss.DarkTemplar, 1)),
     
     new If(
-      new UnitsAtLeast(2, UnitMatchType(Protoss.Reaver)),
+      new UnitsAtLeast(2, Protoss.Reaver),
       new Build(RequestUpgrade(Protoss.ScarabDamage))),
     
-    new OnMiningBases(2, new UpgradeContinuously(Protoss.ZealotSpeed)),
+    new OnMiningBases(2, new If(
+      new UnitsAtLeast(1, Protoss.CitadelOfAdun),
+      new UpgradeContinuously(Protoss.ZealotSpeed))),
     
     new TrainMatchingRatio(Protoss.Observer, 1, 2, Seq(MatchingRatio(UnitMatchType(Protoss.DarkTemplar), 2.0))),
     
@@ -254,7 +256,7 @@ class ProtossVsProtoss extends Parallel {
     // Don't directly go expand-> tech
     new OnMiningBases(2,
       new If(
-        new UnitsAtLeast(1, UnitMatchType(Protoss.CyberneticsCore)),
+        new UnitsAtLeast(1, Protoss.CyberneticsCore),
         new Build(RequestAtLeast(4, Protoss.Gateway)))),
       
     new Employ(PvPMidgame4GateGoon,       new ImplementMidgame4GateGoon),
@@ -313,21 +315,21 @@ class ProtossVsProtoss extends Parallel {
     new If(
       new DoingOneGateCore,
       new If(
-        new UnitsAtLeast(1, UnitMatchType(Protoss.Pylon), complete = false),
+        new UnitsAtLeast(1, Protoss.Pylon, complete = false),
         new Scout),
       new If(
-        new UnitsAtLeast(1, UnitMatchType(Protoss.CyberneticsCore), complete = false),
+        new UnitsAtLeast(1, Protoss.CyberneticsCore, complete = false),
         new Scout)),
   
     new DefendZones,
-    new Attack { attackers.get.unitMatcher.set(UnitMatchType(Protoss.DarkTemplar)) },
+    new Attack { attackers.get.unitMatcher.set(Protoss.DarkTemplar) },
     new If(
       new And(
         new Employing(PvPMidgameDarkTemplar),
         new Not(new Employing(PvPEarly2Gate910)),
         new Not(new Employing(PvPEarly2Gate1012))),
       new Trigger(
-        new UnitsAtLeast(1, UnitMatchType(Protoss.DarkTemplar), complete = true),
+        new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
         new ConsiderAttacking),
       new ConsiderAttacking)
   ))

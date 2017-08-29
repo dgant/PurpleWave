@@ -359,7 +359,10 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
       + buildUnitsBorrowed.map(_.subjectiveValue).sum / 8
     )
     * (if(isWorker) 2 else 1)
-    * ((24 * 60 + buildFrames) / buildFrames))
+    * ((24 * 60 + buildFrames) / buildFrames)
+    * (if (this == Protoss.Carrier)     2 else 1)
+    / (if (this == Protoss.Interceptor) 4 else 1)
+    )
   
   //////////////////////
   // Micro frame data //

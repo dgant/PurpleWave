@@ -1,0 +1,1 @@
+"C:\Program Files (x86)\Java\jre1.8.0_121\bin\java.exe" -cp $SCALA_HOME/lib/scala-library.jar -Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.port=20000 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false -jar ./out/artifacts/PurpleWave.jar Startup.Main

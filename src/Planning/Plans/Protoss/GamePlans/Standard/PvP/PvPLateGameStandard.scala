@@ -50,19 +50,19 @@ class PvPLateGameStandard extends Parallel {
       new Build(RequestAnother(1, Protoss.HighTemplar))),
     
     new PvPIdeas.BuildDragoonsOrZealots,
-  
+    new BuildGasPumps,
     new OnMiningBases(1,
       new Build(
         RequestAtLeast(1, Protoss.Gateway),
         RequestAtLeast(1, Protoss.Assimilator),
         RequestAtLeast(1, Protoss.CyberneticsCore),
         RequestAtLeast(2, Protoss.Gateway),
-        RequestUpgrade(Protoss.DragoonRange),
         RequestAtLeast(1, Protoss.RoboticsFacility),
+        RequestUpgrade(Protoss.DragoonRange),
         RequestAtLeast(1, Protoss.Observatory),
-        RequestAtLeast(3, Protoss.Gateway))),
+        RequestAtLeast(3, Protoss.Gateway),
+        RequestAtLeast(1, Protoss.RoboticsSupportBay))),
     new RequireMiningBases(2),
-    new OnMiningBases(2, new BuildGasPumps),
     new OnMiningBases(2,
       new Build(
         RequestAtLeast(5, Protoss.Gateway),

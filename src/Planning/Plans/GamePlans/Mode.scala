@@ -9,4 +9,10 @@ abstract class Mode extends Parallel {
   
   val completionCriteria: Plan
   val activationCriteria: Plan
+  
+  override def onUpdate() {
+    if ( ! isComplete) {
+      super.update()
+    }
+  }
 }

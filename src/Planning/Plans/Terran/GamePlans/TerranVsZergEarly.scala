@@ -12,7 +12,7 @@ import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, FirstEightMinutes, FollowBuildOrder, RequireBareMinimum}
 import Planning.Plans.Macro.Expanding._
 import Planning.Plans.Macro.Milestones.UnitsAtLeast
-import Planning.Plans.Protoss.Situational.DefendProxy
+import Planning.Plans.Protoss.Situational.DefendAgainstProxy
 import Planning.Plans.Recruitment.RecruitFreelancers
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvZ._
@@ -105,7 +105,7 @@ class TerranVsZergEarly extends Parallel {
     new Employ(TvZMidgameWraiths, new TerranVsZergMech),
     new FollowBuildOrder,
     new Scan,
-    new DefendProxy,
+    new DefendAgainstProxy,
     new RemoveMineralBlocksAt(40),
     new Gather,
     new RecruitFreelancers,

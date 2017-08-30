@@ -10,7 +10,7 @@ import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder, RequireBareMin
 import Planning.Plans.Macro.Expanding.{BuildCannonsAtBases, BuildGasPumps, RemoveMineralBlocksAt, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.UnitsAtLeast
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
-import Planning.Plans.Protoss.Situational.DefendProxy
+import Planning.Plans.Protoss.Situational.DefendAgainstProxy
 import Planning.Plans.Recruitment.RecruitFreelancers
 import ProxyBwapi.Races.Protoss
 
@@ -71,7 +71,7 @@ class ProtossTinfoil extends Parallel {
     new DropAttack { paratrooperMatcher.set(UnitMatchWarriors) },
     new ConsiderAttacking,
     new FollowBuildOrder,
-    new DefendProxy,
+    new DefendAgainstProxy,
     new RemoveMineralBlocksAt(80),
     new Gather,
     new RecruitFreelancers,

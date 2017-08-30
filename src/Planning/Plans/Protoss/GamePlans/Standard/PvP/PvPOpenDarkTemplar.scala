@@ -4,13 +4,13 @@ import Macro.Architecture.Blueprint
 import Macro.BuildRequests.RequestAtLeast
 import Planning.Plan
 import Planning.Plans.Army.Attack
-import Planning.Plans.Compound.{And, Parallel, Trigger}
+import Planning.Plans.Compound.{And, If, Parallel, Trigger}
 import Planning.Plans.GamePlans.Mode
 import Planning.Plans.Information.Always
 import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder, RequireBareMinimum}
-import Planning.Plans.Macro.Milestones.UnitsAtLeast
+import Planning.Plans.Macro.Milestones.{EnemyUnitsAtMost, UnitsAtLeast, UnitsAtMost}
 import Planning.Plans.Protoss.Situational.Blueprinter
 import Planning.Plans.Scouting.Scout
 import ProxyBwapi.Races.Protoss
@@ -62,15 +62,21 @@ class PvPOpenDarkTemplar extends Mode {
       RequestAtLeast(2,   Protoss.DarkTemplar),
       RequestAtLeast(24,  Protoss.Probe)),
     new RequireSufficientSupply,
-    new TrainContinuously(Protoss.DarkTemplar),
+    new If(
+      new And(
+        new EnemyUnitsAtMost(0, Protoss.Observer),
+        new EnemyUnitsAtMost(0, Protoss.Observatory),
+        new UnitsAtMost(2, Protoss.DarkTemplar)),
+      new TrainContinuously(Protoss.DarkTemplar, 3),
+      new TrainContinuously(Protoss.Dragoon)),
     new TrainWorkersContinuously(oversaturate = true),
-    
-    new Trigger(
+  
+    new Build(RequestAtLeast(1, Protoss.Forge)),
+    new If(
       new UnitsAtLeast(4, Protoss.Pylon),
-      initialAfter = new Parallel(
+      new Parallel(
         new ProposeCannonsAtExpanion,
         new Build(
-          RequestAtLeast(1, Protoss.Forge),
           RequestAtLeast(5, Protoss.Pylon),
           RequestAtLeast(3, Protoss.PhotonCannon),
           RequestAtLeast(2, Protoss.Nexus)))),
@@ -80,7 +86,7 @@ class PvPOpenDarkTemplar extends Mode {
       new Scout),
     
     new Trigger(
-      new UnitsAtLeast(1, Protoss.DarkTemplar),
+      new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
       initialAfter = new Attack)
   ))
 }

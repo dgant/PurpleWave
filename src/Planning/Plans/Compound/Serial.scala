@@ -2,7 +2,7 @@ package Planning.Plans.Compound
 
 import Planning.Plan
 
-class Serial(initialChildren:Plan*) extends AbstractAll(initialChildren: _*) {
+class Serial(initialChildren: Plan*) extends AbstractAll(initialChildren: _*) {
   
   description.set("Do in series")
   

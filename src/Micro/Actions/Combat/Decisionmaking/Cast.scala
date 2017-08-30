@@ -22,7 +22,8 @@ object Cast extends Action {
     PsionicStorm.consider(unit)
     Stasis.consider(unit)
     MindControl.consider(unit)
-    if (unit.matchups.ifAt(framesAhead = 48).threatsInRange.nonEmpty && ( ! unit.canAttack || unit.is(Protoss.Arbiter))) {
+    Feedback.consider(unit)
+    if (unit.matchups.ifAt(framesAhead = 24).threatsInRange.nonEmpty && ( ! unit.canAttack || unit.is(Protoss.Arbiter))) {
       Avoid.consider(unit)
     }
   }

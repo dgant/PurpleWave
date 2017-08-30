@@ -11,7 +11,7 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 object BeAnArbiter extends Action {
   
   override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.aliveAndComplete           &&
+    unit.aliveAndComplete   &&
     unit.is(Protoss.Arbiter)
   }
   

@@ -48,6 +48,7 @@ object StrategyGroups {
   )
   
   val bad = Vector[Strategy](
+    CarriersWithNoDefense,
     WorkerRush3StartLocations,
     TvEProxyBBS2StartLocations,
     TvEProxyBBS3StartLocations,

@@ -211,7 +211,7 @@ class ProtossVsProtoss extends Parallel {
   
     // Early game macro
     new RequireSufficientSupply,
-    new TrainWorkersContinuously,
+    new TrainWorkersContinuously(oversaturate = true),
     
     // Units/Upgrades
     

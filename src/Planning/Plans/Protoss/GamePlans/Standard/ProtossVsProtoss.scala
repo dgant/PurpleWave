@@ -3,7 +3,7 @@ package Planning.Plans.Protoss.GamePlans.Standard
 import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, _}
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
-import Planning.Plans.Army.{Attack, ConsiderAttacking, DefendZones}
+import Planning.Plans.Army.{Attack, ConsiderAttacking, DefendZones, DropAttack}
 import Planning.Plans.Compound._
 import Planning.Plans.Information.Reactive.{EnemyCarriers, EnemyDarkTemplarExists, EnemyDarkTemplarPossible}
 import Planning.Plans.Information.{Employ, Employing}
@@ -324,6 +324,7 @@ class ProtossVsProtoss extends Parallel {
         new Scout)),
   
     new DefendZones,
+    new DropAttack,
     new Attack { attackers.get.unitMatcher.set(Protoss.DarkTemplar) },
     new If(
       new And(
@@ -331,7 +332,7 @@ class ProtossVsProtoss extends Parallel {
         new Not(new Employing(PvPEarly2Gate910)),
         new Not(new Employing(PvPEarly2Gate1012))),
       new Trigger(
-        new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
+        new UnitsAtLeast(1, Protoss.TemplarArchives, complete = true),
         new ConsiderAttacking),
       new ConsiderAttacking)
   ))

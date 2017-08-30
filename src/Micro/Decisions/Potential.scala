@@ -82,15 +82,15 @@ object Potential {
   def barrierRepulsion(pixel: Pixel, maxMobility: Int, mobilitySource: AbstractGrid[Int]): Force = {
     val tile          = pixel.tileIncluding
     val mobility      = mobilitySource.get(tile)
-    val forces        = tile.adjacent8.filter(_.valid).map(neighbor => singleMobilityForce(tile, neighbor, mobilitySource))
+    val forces        = tile.adjacent8.map(neighbor => singleMobilityForce(tile, neighbor, mobilitySource))
     val totalForce    = sum(forces)
     val magnitude     = 2.0 * Math.max(0.0, 1.0 - 2 * mobility / maxMobility.toDouble)
     val output        = totalForce.normalize(magnitude)
     output
   }
   def singleMobilityForce(here: Tile, there: Tile, mobilitySource: AbstractGrid[Int]): Force = {
-    val mobilityHere  = mobilitySource.get(here)
-    val mobilityThere = mobilitySource.get(there)
+    val mobilityHere  = if (here.valid)   mobilitySource.get(here)  else 0
+    val mobilityThere = if (there.valid)  mobilitySource.get(there) else 0
     val magnitude     = PurpleMath.signum(mobilityHere - mobilityThere)
     val output        = BuildForce.fromPixels(there.pixelCenter, here.pixelCenter, magnitude.toInt)
     output

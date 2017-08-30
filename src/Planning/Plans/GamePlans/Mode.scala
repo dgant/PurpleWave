@@ -12,7 +12,7 @@ abstract class Mode extends Parallel {
   
   override def onUpdate() {
     if ( ! isComplete) {
-      super.update()
+      super.onUpdate()
     }
   }
 }

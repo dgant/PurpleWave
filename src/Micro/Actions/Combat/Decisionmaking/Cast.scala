@@ -23,7 +23,7 @@ object Cast extends Action {
     Stasis.consider(unit)
     MindControl.consider(unit)
     Feedback.consider(unit)
-    if (unit.matchups.ifAt(framesAhead = 24).threatsInRange.nonEmpty && ( ! unit.canAttack || unit.is(Protoss.Arbiter))) {
+    if (unit.matchups.framesOfSafetyDiffused < 24 && ( ! unit.canAttack || unit.is(Protoss.Arbiter))) {
       Avoid.consider(unit)
     }
   }

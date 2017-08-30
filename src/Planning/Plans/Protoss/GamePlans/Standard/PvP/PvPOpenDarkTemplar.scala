@@ -21,7 +21,7 @@ class PvPOpenDarkTemplar extends Mode {
   
   override val completionCriteria: Plan = new And(
     new UnitsAtLeast(1, Protoss.DarkTemplar),
-    new UnitsAtLeast(1, Protoss.Nexus))
+    new UnitsAtLeast(2, Protoss.Nexus))
   
   private class ProposeCannonsAtExpanion extends ProposePlacement {
     override lazy val blueprints: Iterable[Blueprint] = Blueprinter.pylonsAndCannonsAtNatural(this, 1, 3)

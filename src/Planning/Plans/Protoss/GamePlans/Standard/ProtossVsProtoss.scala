@@ -201,6 +201,8 @@ class ProtossVsProtoss extends Parallel {
     new Employ(PvPEarlyFFE,             new ImplementEarlyFFE),
     
     // Expanding
+    new ReactToDarkTemplarExisting,
+    new ReactToDarkTemplarPossible,
     new MatchMiningBases,
     new TakeNatural,
     new ExpandAgainstCannons,
@@ -213,8 +215,6 @@ class ProtossVsProtoss extends Parallel {
     
     // Units/Upgrades
     
-    new ReactToDarkTemplarExisting,
-    new ReactToDarkTemplarPossible,
     
     new If(
       new UnitsAtLeast(2, Protoss.HighTemplar, complete = false),

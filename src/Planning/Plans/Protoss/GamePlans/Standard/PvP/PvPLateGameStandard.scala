@@ -16,11 +16,12 @@ class PvPLateGameStandard extends Parallel {
   
   children.set(Vector(
     new MeldArchons(40),
-    new RequireSufficientSupply,
-    new TrainWorkersContinuously(oversaturate = true),
-    
     new ReactToDarkTemplarPossible,
     new ReactToDarkTemplarExisting,
+    new RequireMiningBases(2),
+    new RequireSufficientSupply,
+    new TrainWorkersContinuously(oversaturate = true),
+    new BuildGasPumps,
   
     new If(new UnitsAtLeast(2, Protoss.Dragoon),      new Build(RequestUpgrade(Protoss.DragoonRange))),
     new If(new UnitsAtLeast(1, Protoss.HighTemplar),  new Build(RequestTech(Protoss.PsionicStorm))),
@@ -39,9 +40,12 @@ class PvPLateGameStandard extends Parallel {
     new If(
       new And(
         new UnitsAtMost(0, Protoss.Shuttle),
-        new UpgradeComplete(Protoss.ShuttleSpeed, Protoss.Shuttle.buildFrames)),
+        new UpgradeComplete(Protoss.ShuttleSpeed, 1, Protoss.Shuttle.buildFrames)),
       new Build(RequestAtLeast(1, Protoss.Shuttle)),
-      new TrainContinuously(Protoss.Reaver, 4)),
+      new If(
+        new UnitsAtMost(3, Protoss.Reaver),
+        new TrainContinuously(Protoss.Reaver, 4),
+        new TrainContinuously(Protoss.Observer, 4))),
   
     new If(
       new And(
@@ -50,7 +54,6 @@ class PvPLateGameStandard extends Parallel {
       new Build(RequestAnother(1, Protoss.HighTemplar))),
     
     new PvPIdeas.BuildDragoonsOrZealots,
-    new BuildGasPumps,
     new OnMiningBases(1,
       new Build(
         RequestAtLeast(1, Protoss.Gateway),
@@ -67,17 +70,17 @@ class PvPLateGameStandard extends Parallel {
       new Build(
         RequestAtLeast(5, Protoss.Gateway),
         RequestAtLeast(1, Protoss.Forge),
-        RequestUpgrade(Protoss.GroundDamage),
         RequestAtLeast(1, Protoss.CitadelOfAdun),
-        RequestAtLeast(1, Protoss.TemplarArchives),
+        RequestUpgrade(Protoss.GroundDamage),
         RequestUpgrade(Protoss.ZealotSpeed),
+        RequestAtLeast(1, Protoss.TemplarArchives),
         RequestAtLeast(6, Protoss.Gateway))),
     new UpgradeContinuously(Protoss.GroundDamage),
     new RequireMiningBases(3),
+    new BuildCannonsAtExpansions(3),
     new OnMiningBases(3, new Build(
         RequestAtLeast(2, Protoss.RoboticsFacility),
         RequestAtLeast(12, Protoss.Gateway))),
-    new BuildCannonsAtExpansions(3),
     new RequireMiningBases(4),
     new OnMiningBases(4, new Build(RequestAtLeast(15, Protoss.Gateway))),
     new UpgradeContinuously(Protoss.GroundArmor),

@@ -1,16 +1,16 @@
 package Planning.Plans.Protoss.GamePlans.Standard.PvP
 
 import Macro.Architecture.Blueprint
-import Macro.BuildRequests.RequestAtLeast
+import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
 import Planning.Plan
-import Planning.Plans.Army.Attack
-import Planning.Plans.Compound.{And, If, Parallel, Trigger}
+import Planning.Plans.Compound.{And, Trigger}
 import Planning.Plans.GamePlans.Mode
 import Planning.Plans.Information.Always
 import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder, RequireBareMinimum}
-import Planning.Plans.Macro.Milestones.{EnemyUnitsAtMost, UnitsAtLeast, UnitsAtMost}
+import Planning.Plans.Macro.Expanding.RequireMiningBases
+import Planning.Plans.Macro.Milestones.UnitsAtLeast
 import Planning.Plans.Protoss.Situational.Blueprinter
 import Planning.Plans.Scouting.Scout
 import ProxyBwapi.Races.Protoss
@@ -48,43 +48,34 @@ class PvPOpen2GateRoboObs extends Mode {
       RequestAtLeast(19,  Protoss.Probe),
       RequestAtLeast(1,   Protoss.Dragoon),           // 23 = 19 + ZZ
       RequestAtLeast(20,  Protoss.Probe),
-      RequestAtLeast(1,   Protoss.CitadelOfAdun),     // 26 = 20 + ZZ + D
+      RequestAtLeast(2,   Protoss.Gateway),           // 26 = 20 + ZZ + D
       RequestAtLeast(21,  Protoss.Probe),
       RequestAtLeast(2,   Protoss.Dragoon),           // 27 = 21 + ZZ + D
-      RequestAtLeast(3,   Protoss.Pylon),
-      RequestAtLeast(1,   Protoss.TemplarArchives),
-      RequestAtLeast(4,   Protoss.Zealot),            // 33 = 21 + ZZZZ + DD
       RequestAtLeast(22,  Protoss.Probe),
-      RequestAtLeast(4,   Protoss.Pylon),             // 34 = 22 + ZZZZ + DD
-      RequestAtLeast(23,  Protoss.Probe),
-      RequestAtLeast(2,   Protoss.DarkTemplar),
-      RequestAtLeast(24,  Protoss.Probe)),
-    new RequireSufficientSupply,
-    new If(
-      new And(
-        new EnemyUnitsAtMost(0, Protoss.Observer),
-        new EnemyUnitsAtMost(0, Protoss.Observatory),
-        new UnitsAtMost(2, Protoss.DarkTemplar)),
-      new TrainContinuously(Protoss.DarkTemplar, 3),
-      new TrainContinuously(Protoss.Dragoon)),
-    new TrainWorkersContinuously(oversaturate = true),
+      RequestAtLeast(3,   Protoss.Pylon),
+      RequestUpgrade(Protoss.DragoonRange)),
   
+    new Trigger(
+      new UnitsAtLeast(2, Protoss.Reaver, complete = true),
+      new RequireMiningBases(2)),
+    
+    new RequireSufficientSupply,
+    new TrainWorkersContinuously(oversaturate = true),
+    new TrainContinuously(Protoss.Dragoon),
+    new Build(
+      RequestAtLeast(1, Protoss.RoboticsFacility),
+      RequestAtLeast(1, Protoss.Observatory),
+      RequestAtLeast(1, Protoss.RoboticsSupportBay)),
+    new TrainContinuously(Protoss.Observer, 1),
+    new TrainContinuously(Protoss.Reaver),
+  
+    //Not part of the build, but mineral locking floats a ton of minerals that we might as well use
     new Build(RequestAtLeast(1, Protoss.Forge)),
-    new If(
-      new UnitsAtLeast(4, Protoss.Pylon),
-      new Parallel(
-        new ProposeCannonsAtExpanion,
-        new Build(
-          RequestAtLeast(5, Protoss.Pylon),
-          RequestAtLeast(3, Protoss.PhotonCannon),
-          RequestAtLeast(2, Protoss.Nexus)))),
-    
+    new Build(RequestAtLeast(4, Protoss.Gateway)),
+    new Build(RequestAtLeast(1, Protoss.PhotonCannon)),
+      
     new Trigger(
-      new UnitsAtLeast(1, Protoss.CyberneticsCore),
-      new Scout),
-    
-    new Trigger(
-      new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
-      initialAfter = new Attack)
+      new UnitsAtLeast(2, Protoss.CyberneticsCore),
+      new Scout)
   ))
 }

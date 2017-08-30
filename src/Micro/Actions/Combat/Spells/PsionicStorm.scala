@@ -21,7 +21,7 @@ object PsionicStorm extends Action {
     
     val target = TargetAOE.chooseTarget(
       unit,
-      (if (dying) 8.0 else 12.0) * 32.0,
+      (if (dying) 8.0 else 16.0) * 32.0,
       if (dying) 0.0 else unit.subjectiveValue,
       valueTarget)
     

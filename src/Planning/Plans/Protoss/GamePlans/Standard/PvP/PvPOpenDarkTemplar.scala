@@ -6,7 +6,7 @@ import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{And, If, Parallel, Trigger}
 import Planning.Plans.GamePlans.Mode
-import Planning.Plans.Information.Always
+import Planning.Plans.Information.Never
 import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder, RequireBareMinimum}
@@ -17,7 +17,7 @@ import ProxyBwapi.Races.Protoss
 
 class PvPOpenDarkTemplar extends Mode {
   
-  override val activationCriteria: Plan = new Always //Employing(PvPOpeningDarkTemplar)
+  override val activationCriteria: Plan = new Never //Employing(PvPOpeningDarkTemplar)
   
   override val completionCriteria: Plan = new And(new UnitsAtLeast(2, Protoss.Nexus))
   

@@ -12,6 +12,7 @@ class MeldDarkArchons extends Plan {
   templar.unitMatcher.set(Protoss.DarkTemplar)
   
   override def onUpdate() {
+    templar.release() //We don't want them if they're Dark Archons now.
     templar.acquire(this)
     templar.units.foreach(_.agent.intend(this, new Intention {
       toTravel = Some(With.geography.home.pixelCenter)

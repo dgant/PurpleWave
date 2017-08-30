@@ -8,11 +8,18 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 object Meld extends Action {
   
   override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.agent.canMeld
+    unit.agent.canMeld && (
+      unit.is(Protoss.HighTemplar) ||
+      unit.is(Protoss.DarkTemplar)
+    )
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {
-    val besties = unit.matchups.allies.filter(u => u.friendly.get.agent.canMeld && u.unitClass == unit.unitClass)
+    val besties = unit.zone.units.filter(u =>
+      u != unit
+      && u.friendly.exists(_.agent.canMeld)
+      && u.unitClass == unit.unitClass)
+    
     if (besties.nonEmpty) {
       val bestBestie = besties.minBy(_.pixelDistanceFast(unit))
       if (unit.is(Protoss.HighTemplar)) {

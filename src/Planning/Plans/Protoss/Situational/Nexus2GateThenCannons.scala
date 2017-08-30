@@ -7,17 +7,18 @@ import Planning.Plans.Macro.Build.ProposePlacement
 import ProxyBwapi.Races.Protoss
 
 class Nexus2GateThenCannons extends ProposePlacement {
-  val mainZone      = With.geography.ourMain.zone
-  val naturalBase   = With.geography.ourNatural
-  val naturalZone   = naturalBase.zone
-  val marginPixels  = naturalZone.exit.map(_.centerPixel.pixelDistanceFast(naturalBase.townHallArea.midPixel) - Protoss.Nexus.radialHypotenuse).getOrElse(128.0)
-  val output = Vector(
-    new Blueprint(this, building = Some(Protoss.Pylon)),
-    new Blueprint(this, building = Some(Protoss.Pylon),           requireZone = Some(naturalZone),  placement = Some(PlacementProfiles.wallPylon),    marginPixels = Some(marginPixels - 96.0)),
-    new Blueprint(this, building = Some(Protoss.PhotonCannon),    requireZone = Some(naturalZone),  placement = Some(PlacementProfiles.wallCannon),   marginPixels = Some(marginPixels)),
-    new Blueprint(this, building = Some(Protoss.PhotonCannon),    requireZone = Some(naturalZone),  placement = Some(PlacementProfiles.wallCannon),   marginPixels = Some(marginPixels)),
-    new Blueprint(this, building = Some(Protoss.PhotonCannon),    requireZone = Some(naturalZone),  placement = Some(PlacementProfiles.wallCannon),   marginPixels = Some(marginPixels)),
-    new Blueprint(this, building = Some(Protoss.PhotonCannon),    requireZone = Some(naturalZone),  placement = Some(PlacementProfiles.wallCannon),   marginPixels = Some(marginPixels)))
-  output
+  override lazy val blueprints: Iterable[Blueprint] = {
+    val mainZone = With.geography.ourMain.zone
+    val naturalBase = With.geography.ourNatural
+    val naturalZone = naturalBase.zone
+    val marginPixels = naturalZone.exit.map(_.centerPixel.pixelDistanceFast(naturalBase.townHallArea.midPixel) - Protoss.Nexus.radialHypotenuse).getOrElse(128.0)
+    val output = Vector(
+      new Blueprint(this, building = Some(Protoss.Pylon)),
+      new Blueprint(this, building = Some(Protoss.Pylon), requireZone = Some(naturalZone), placement = Some(PlacementProfiles.wallPylon), marginPixels = Some(marginPixels - 96.0)),
+      new Blueprint(this, building = Some(Protoss.PhotonCannon), requireZone = Some(naturalZone), placement = Some(PlacementProfiles.wallCannon), marginPixels = Some(marginPixels)),
+      new Blueprint(this, building = Some(Protoss.PhotonCannon), requireZone = Some(naturalZone), placement = Some(PlacementProfiles.wallCannon), marginPixels = Some(marginPixels)),
+      new Blueprint(this, building = Some(Protoss.PhotonCannon), requireZone = Some(naturalZone), placement = Some(PlacementProfiles.wallCannon), marginPixels = Some(marginPixels)))
+    output
+  }
 }
 

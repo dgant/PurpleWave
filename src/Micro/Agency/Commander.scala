@@ -135,7 +135,7 @@ class Commander {
       destination = destination.add((unit.id + With.frame / With.configuration.pathRecalculationDelayFrames) % 5 - 2, 0)
     }
     
-    if (unit.pixelDistanceFast(destination) > 0) {
+    if (unit.pixelDistanceFast(destination) > 3) {
       if (unit.is(Terran.Medic)) {
         unit.baseUnit.attack(destination.bwapi)
       }

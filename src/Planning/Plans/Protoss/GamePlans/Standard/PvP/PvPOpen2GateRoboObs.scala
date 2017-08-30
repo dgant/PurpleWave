@@ -27,6 +27,7 @@ class PvPOpen2GateRoboObs extends Mode {
   
   children.set(Vector(
     new RequireBareMinimum,
+    new TrainContinuously(Protoss.Observer, 1), // Make darn sure we get it out ASAP
     new BuildOrder(
       // http://wiki.teamliquid.net/starcraft/2_Gate_Reaver_(vs._Protoss)
       RequestAtLeast(8,   Protoss.Probe),
@@ -61,16 +62,17 @@ class PvPOpen2GateRoboObs extends Mode {
     
     new RequireSufficientSupply,
     new TrainWorkersContinuously(oversaturate = true),
+    new TrainContinuously(Protoss.Reaver),
     new TrainContinuously(Protoss.Dragoon),
     new Build(
+      RequestAtLeast(1, Protoss.Forge),
       RequestAtLeast(1, Protoss.RoboticsFacility),
+      RequestAtLeast(1, Protoss.PhotonCannon),
       RequestAtLeast(1, Protoss.Observatory),
       RequestAtLeast(1, Protoss.RoboticsSupportBay)),
-    new TrainContinuously(Protoss.Observer, 1),
-    new TrainContinuously(Protoss.Reaver),
   
     //Not part of the build, but mineral locking floats a ton of minerals that we might as well use
-    new Build(RequestAtLeast(1, Protoss.Forge)),
+    
     new Build(RequestAtLeast(4, Protoss.Gateway)),
     new Build(RequestAtLeast(1, Protoss.PhotonCannon)),
       

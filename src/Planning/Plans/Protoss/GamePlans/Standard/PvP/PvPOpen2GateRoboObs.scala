@@ -15,7 +15,7 @@ import Planning.Plans.Protoss.Situational.Blueprinter
 import Planning.Plans.Scouting.Scout
 import ProxyBwapi.Races.Protoss
 
-class PvPOpenDarkTemplar extends Mode {
+class PvPOpen2GateRoboObs extends Mode {
   
   override val activationCriteria: Plan = new Always //Employing(PvPOpeningDarkTemplar)
   
@@ -28,7 +28,7 @@ class PvPOpenDarkTemplar extends Mode {
   children.set(Vector(
     new RequireBareMinimum,
     new BuildOrder(
-      // http://wiki.teamliquid.net/starcraft/2_Gateway_Dark_Templar_(vs._Protoss)
+      // http://wiki.teamliquid.net/starcraft/2_Gate_Reaver_(vs._Protoss)
       RequestAtLeast(8,   Protoss.Probe),
       RequestAtLeast(1,   Protoss.Pylon),             // 8
       RequestAtLeast(10,  Protoss.Probe),
@@ -51,7 +51,6 @@ class PvPOpenDarkTemplar extends Mode {
       RequestAtLeast(1,   Protoss.CitadelOfAdun),     // 26 = 20 + ZZ + D
       RequestAtLeast(21,  Protoss.Probe),
       RequestAtLeast(2,   Protoss.Dragoon),           // 27 = 21 + ZZ + D
-      RequestAtLeast(2,   Protoss.Gateway),           // 29 = 21 + ZZ + DD
       RequestAtLeast(3,   Protoss.Pylon),
       RequestAtLeast(1,   Protoss.TemplarArchives),
       RequestAtLeast(4,   Protoss.Zealot),            // 33 = 21 + ZZZZ + DD

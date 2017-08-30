@@ -54,6 +54,7 @@ object StrategyGroups {
     TvEProxyBBS3StartLocations,
     TvEProxy5RaxAllIn,
     TvEMassMarineAllIn,
+    Proxy2Gate2StartLocations,
     Proxy2Gate3StartLocations,
     ProxyDarkTemplar
   )
@@ -102,7 +103,7 @@ object Playbook extends PurpleWavePlaybook {
   // If we don't win with 9-9 Gateways, we probably won't win with 10-12 Gateways either so try something else.
   //
   val strategyOrder = Vector(
-    // Cool stuff
+    // Fun stuff
     TvEProxy5RaxAllIn,
     TvEProxyBBS2StartLocations,
     TvEProxyBBS3StartLocations,
@@ -117,9 +118,14 @@ object Playbook extends PurpleWavePlaybook {
     ProxyHatchSunkens,
     ProxyHatchHydras,
     ProxyHatchZerglings,
+    
+    // Real stuff
+    DarkArchonsWithNoDefense,
     AllPvP,
     AllPvZ,
     AllPvT,
+    Proxy2Gate2StartLocations,
+    PvTEarly1015GateDT,
     PvTEarlyDTExpand,
     PvTEarly1015GateGoon,
     PvTEarly14Nexus,
@@ -127,11 +133,11 @@ object Playbook extends PurpleWavePlaybook {
     PvTLateCarriers,
     PvTLateMassGateway,
     PvTLateArbiters,
+    PvPEarlyFFE,
     PvPEarly1GateZZCore,
-    PvPEarlyFE,
     PvPEarly2Gate1012,
     PvPEarly1GateCore,
-    PvPEarlyFFE,
+    PvPEarlyFE,
     PvPEarly2Gate910,
     PvPMidgameDarkTemplar,
     PvPMidgameObserverReaver,

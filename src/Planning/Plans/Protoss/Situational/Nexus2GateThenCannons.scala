@@ -7,11 +7,17 @@ import Planning.Plans.Macro.Build.ProposePlacement
 import ProxyBwapi.Races.Protoss
 
 class Nexus2GateThenCannons extends ProposePlacement {
-  override lazy val blueprints: Vector[Blueprint] =
-    Vector(
-      new Blueprint(this, building = Some(Protoss.Pylon)),
-      new Blueprint(this, building = Some(Protoss.Pylon),           requireZone = Some(With.geography.ourNatural.zone),  placement = Some(PlacementProfiles.wallPylon)),
-      new Blueprint(this, building = Some(Protoss.PhotonCannon),    requireZone = Some(With.geography.ourNatural.zone),  placement = Some(PlacementProfiles.wallCannon)),
-      new Blueprint(this, building = Some(Protoss.PhotonCannon),    requireZone = Some(With.geography.ourNatural.zone),  placement = Some(PlacementProfiles.wallCannon)))
+  val mainZone      = With.geography.ourMain.zone
+  val naturalBase   = With.geography.ourNatural
+  val naturalZone   = naturalBase.zone
+  val marginPixels  = naturalZone.exit.map(_.centerPixel.pixelDistanceFast(naturalBase.townHallArea.midPixel) - Protoss.Nexus.radialHypotenuse).getOrElse(128.0)
+  val output = Vector(
+    new Blueprint(this, building = Some(Protoss.Pylon)),
+    new Blueprint(this, building = Some(Protoss.Pylon),           requireZone = Some(naturalZone),  placement = Some(PlacementProfiles.wallPylon),    marginPixels = Some(marginPixels - 96.0)),
+    new Blueprint(this, building = Some(Protoss.PhotonCannon),    requireZone = Some(naturalZone),  placement = Some(PlacementProfiles.wallCannon),   marginPixels = Some(marginPixels)),
+    new Blueprint(this, building = Some(Protoss.PhotonCannon),    requireZone = Some(naturalZone),  placement = Some(PlacementProfiles.wallCannon),   marginPixels = Some(marginPixels)),
+    new Blueprint(this, building = Some(Protoss.PhotonCannon),    requireZone = Some(naturalZone),  placement = Some(PlacementProfiles.wallCannon),   marginPixels = Some(marginPixels)),
+    new Blueprint(this, building = Some(Protoss.PhotonCannon),    requireZone = Some(naturalZone),  placement = Some(PlacementProfiles.wallCannon),   marginPixels = Some(marginPixels)))
+  output
 }
 

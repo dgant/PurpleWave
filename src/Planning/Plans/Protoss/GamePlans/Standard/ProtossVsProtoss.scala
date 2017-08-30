@@ -52,7 +52,9 @@ class ProtossVsProtoss extends Parallel {
         RequestAtLeast(14,  Protoss.Probe),
         RequestAtLeast(2,   Protoss.Gateway),
         RequestAtLeast(15,  Protoss.Probe)),
-      new TrainContinuously(Protoss.Zealot),
+      new If(
+        new UnitsAtMost(0, Protoss.CyberneticsCore, complete = true),
+        new TrainContinuously(Protoss.Zealot)),
       new Build(
         RequestAtLeast(2, Protoss.Pylon),
         RequestAtLeast(1, Protoss.Assimilator),

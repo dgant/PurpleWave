@@ -35,9 +35,7 @@ object PlacementProfiles {
     avoidSurfaceArea            = 0.0
   )
   
-  val pylon = new PlacementProfile("Pylon", basic) {
-    preferPowering = 0.25
-  }
+  val pylon = new PlacementProfile("Pylon", basic)
   
   val factory = new PlacementProfile("Factory", basic) {
     preferDistanceFromEnemy = 0.25

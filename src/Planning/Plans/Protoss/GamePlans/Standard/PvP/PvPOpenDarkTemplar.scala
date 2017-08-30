@@ -54,7 +54,7 @@ class PvPOpenDarkTemplar extends Mode {
       RequestAtLeast(2,   Protoss.Dragoon),           // 27 = 21 + ZZ + D
       RequestAtLeast(2,   Protoss.Gateway),           // 29 = 21 + ZZ + DD
       RequestAtLeast(3,   Protoss.Pylon),
-      RequestAtLeast(3,   Protoss.TemplarArchives),
+      RequestAtLeast(1,   Protoss.TemplarArchives),
       RequestAtLeast(4,   Protoss.Zealot),            // 33 = 21 + ZZZZ + DD
       RequestAtLeast(22,  Protoss.Probe),
       RequestAtLeast(4,   Protoss.Pylon),             // 34 = 22 + ZZZZ + DD

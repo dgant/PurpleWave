@@ -399,7 +399,7 @@ class ProtossVsZerg extends Parallel {
     new FindExpansions { scouts.get.unitMatcher.set(Protoss.DarkTemplar) },
     new DefendZones,
     new If(
-      new HaveUpgrade(Protoss.ShuttleSpeed),
+      new UpgradeComplete(Protoss.ShuttleSpeed),
       new DropAttack),
     new If(
       new UnitsAtLeast(4, UnitMatchWarriors, complete = true),

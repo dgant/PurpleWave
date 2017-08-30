@@ -4,7 +4,7 @@ import Lifecycle.With
 import Planning.Plan
 import ProxyBwapi.Upgrades.Upgrade
 
-class HaveUpgrade(upgrade: Upgrade, level: Int = 1, withinFrames: Int = 0) extends Plan {
+class UpgradeComplete(upgrade: Upgrade, level: Int = 1, withinFrames: Int = 0) extends Plan {
   
   description.set("Require an upgrade")
   

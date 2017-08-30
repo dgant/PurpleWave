@@ -13,7 +13,7 @@ class ProtossStandardGamePlan
   extends Parallel (
     new SwitchEnemyRace {
       terran  .set(new ProtossVsTerran)
-      protoss .set(new ProtossVsProtoss)
+      protoss .set(new ProtossVsProtossNew)
       zerg    .set(new ProtossVsZerg)
       random  .set(new ProtossVsRandom)
     },

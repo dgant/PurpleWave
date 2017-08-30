@@ -141,7 +141,7 @@ class ProtossVsTerran extends Parallel {
   
   class TrainZealotsOrDragoons extends If(
     new And(
-      new HaveUpgrade(Protoss.ZealotSpeed, withinFrames = Protoss.Zealot.buildFrames),
+      new UpgradeComplete(Protoss.ZealotSpeed, withinFrames = Protoss.Zealot.buildFrames),
       new Or(
         new UnitsAtLeast(18, Protoss.Dragoon),
         new Check(() => With.self.gas * 5 < With.self.minerals))),

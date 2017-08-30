@@ -98,7 +98,7 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   lazy val attacksGround  : Boolean = effectiveGroundDamage > 0
   lazy val attacksAir     : Boolean = effectiveAirDamage    > 0
   
-  lazy val helpsInCombat: Boolean = rawCanAttack || isSpellcaster || Set(Terran.Bunker).contains(this)
+  lazy val helpsInCombat: Boolean = rawCanAttack || isSpellcaster || Set(Terran.Bunker).contains(this) || this == Zerg.Lurker
   
   lazy val groundRangePixels: Double =
     if      (this == Terran.Bunker)   Terran.Marine.groundRangePixels  + 32.0

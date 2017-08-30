@@ -1,24 +1,24 @@
 package Planning.Plans.Protoss.GamePlans.Standard
 
-import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, _}
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plans.Army.{Attack, ConsiderAttacking, DefendZones, DropAttack}
 import Planning.Plans.Compound._
-import Planning.Plans.Information.Reactive.{EnemyCarriers, EnemyDarkTemplarExists, EnemyDarkTemplarPossible}
+import Planning.Plans.Information.Reactive.EnemyCarriers
 import Planning.Plans.Information.{Employ, Employing}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, FirstEightMinutes}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, MatchMiningBases, RequireMiningBases}
 import Planning.Plans.Macro.Milestones._
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
+import Planning.Plans.Protoss.GamePlans.Standard.PvP.PvPIdeas
 import Planning.Plans.Protoss.ProtossBuilds
 import Planning.Plans.Protoss.Situational.{ForgeFastExpand, Nexus2GateThenCannons}
 import Planning.Plans.Scouting.{Scout, ScoutExpansionsAt}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP._
 
-class ProtossVsProtoss extends Parallel {
+class ProtossVsProtossOld extends Parallel {
   
   description.set("Protoss vs Protoss")
   
@@ -26,8 +26,20 @@ class ProtossVsProtoss extends Parallel {
   // Early game strategies //
   ///////////////////////////
   
-  private class ImplementEarly2Gate910 extends Build(ProtossBuilds.OpeningTwoGate910_WithZealots: _*)
-  private class ImplementEarly2Gate1012 extends Build(ProtossBuilds.OpeningTwoGate1012: _*)
+  private class WeAreTwoGating extends Or(
+    new Employing(PvPEarly2Gate910),
+    new Employing(PvPEarly2Gate1012))
+  
+  private class Implement2Gate extends Parallel(
+    new Trigger(
+      new UnitsAtLeast(4, Protoss.Zealot),
+      initialBefore = new Parallel(
+        new Build(ProtossBuilds.OpeningTwoGate910_WithZealots: _*),
+        new Build(ProtossBuilds.OpeningTwoGate1012: _*),
+        new RequireSufficientSupply,
+        new Build(RequestAnother(2, Protoss.Zealot)),
+        new TrainWorkersContinuously
+      )))
   
   private class ImplementEarly1GateCore extends FirstEightMinutes(
     new Build(ProtossBuilds.Opening_10Gate11Gas13Core: _*))
@@ -67,6 +79,10 @@ class ProtossVsProtoss extends Parallel {
     new Parallel(
       new ForgeFastExpand,
       new Build(ProtossBuilds.FFE_ForgeFirst: _*)))
+  
+  private class OpeningIsComplete extends Or(
+    
+  )
   
   ////////////////////////
   // Midgame strategies //
@@ -133,9 +149,9 @@ class ProtossVsProtoss extends Parallel {
   
   private class TakeNatural extends If(
     new Or(
-      new UnitsAtLeast(8, UnitMatchWarriors),
+      new UnitsAtLeast(10, UnitMatchWarriors),
       new UnitsAtLeast(2, Protoss.PhotonCannon),
-      new UnitsAtLeast(1, Protoss.Reaver),
+      new UnitsAtLeast(2, Protoss.Reaver),
       new UnitsAtLeast(2, Protoss.DarkTemplar)),
     new RequireMiningBases(2)
   ) { description.set("Take our natural when safe")}
@@ -144,46 +160,6 @@ class ProtossVsProtoss extends Parallel {
     new UnitsAtLeast(15, UnitMatchWarriors),
     new RequireMiningBases(3)
   ) { description.set("Take our third base when safe")}
-  
-  ///////////////
-  // Reactions //
-  ///////////////
-  
-  private class ReactToDarkTemplarPossible extends If(
-    new EnemyDarkTemplarPossible,
-    new Parallel(
-      new Build(
-        RequestAtLeast(1, Protoss.RoboticsFacility),
-        RequestAtLeast(1, Protoss.Observatory)),
-      new TrainContinuously(Protoss.Observer, 2)))
-  
-  private class ReactToDarkTemplarExisting extends If(
-    new EnemyDarkTemplarExists,
-    new Parallel(
-      new Build(
-        RequestAtLeast(1, Protoss.RoboticsFacility),
-        RequestAtLeast(1, Protoss.Observatory),
-        RequestAtLeast(1, Protoss.Forge),
-        RequestAtLeast(1, Protoss.PhotonCannon)),
-      new TrainContinuously(Protoss.Observer, 3)))
-  
-  ///////////////
-  // Late game //
-  ///////////////
-  
-  private class BuildDragoonsOrZealots extends If(
-    new Or(
-      new UnitsAtMost(0, Protoss.CyberneticsCore,  complete = true),
-      new UnitsAtMost(0, Protoss.Assimilator,      complete = true),
-      new Check(() => With.self.gas < 30),
-      new Check(() => With.self.gas < 100 && With.self.minerals > With.self.gas * 5),
-      new And(
-        new HaveUpgrade(Protoss.ZealotSpeed, Protoss.Zealot.buildFrames),
-        new UnitsAtLeast(12, Protoss.Dragoon),
-        new Not(new EnemyCarriers))),
-    new TrainContinuously(Protoss.Zealot),
-    new TrainContinuously(Protoss.Dragoon)
-  )
   
   /////////////////
   // Here we go! //
@@ -195,16 +171,15 @@ class ProtossVsProtoss extends Parallel {
     
     // Early game
     new RequireMiningBases(1),
+    new Implement2Gate,
     new Employ(PvPEarly1GateCore,       new ImplementEarly1GateCore),
     new Employ(PvPEarly1GateZZCore,     new ImplementEarly1GateZZCore),
-    new Employ(PvPEarly2Gate910,        new ImplementEarly2Gate910),
-    new Employ(PvPEarly2Gate1012,       new ImplementEarly2Gate1012),
     new Employ(PvPEarlyFE,              new ImplementEarlyFE),
     new Employ(PvPEarlyFFE,             new ImplementEarlyFFE),
     
     // Expanding
-    new ReactToDarkTemplarExisting,
-    new ReactToDarkTemplarPossible,
+    new PvPIdeas.ReactToDarkTemplarPossible,
+    new PvPIdeas.ReactToDarkTemplarExisting,
     new MatchMiningBases,
     new TakeNatural,
     new ExpandAgainstCannons,
@@ -226,7 +201,7 @@ class ProtossVsProtoss extends Parallel {
       new And(
         new UnitsAtLeast(2, Protoss.Dragoon, complete = false),
         new Or(
-          new Not(new Employing(PvPMidgameDarkTemplar)),
+          new Not(new Employing(PvPOpeningDarkTemplar)),
           new UnitsAtLeast(2, Protoss.DarkTemplar, complete = false))),
       new Build(RequestUpgrade(Protoss.DragoonRange))),
     
@@ -251,7 +226,7 @@ class ProtossVsProtoss extends Parallel {
       new Not(new EnemyCarriers),
       new TrainContinuously(Protoss.Reaver, 4)),
     
-    new BuildDragoonsOrZealots,
+    new PvPIdeas.BuildDragoonsOrZealots,
     
     // Midgame
     
@@ -262,7 +237,7 @@ class ProtossVsProtoss extends Parallel {
         new Build(RequestAtLeast(4, Protoss.Gateway)))),
       
     new Employ(PvPMidgame4GateGoon,       new ImplementMidgame4GateGoon),
-    new Employ(PvPMidgameDarkTemplar,     new ImplementMidgameDarkTemplar),
+    new Employ(PvPOpeningDarkTemplar,     new ImplementMidgameDarkTemplar),
     new Employ(PvPMidgameObserverReaver,  new ImplementMidgameObserverReaver),
     new Employ(PvPMidgameReaver,          new ImplementMidgameReaver),
     
@@ -328,7 +303,7 @@ class ProtossVsProtoss extends Parallel {
     new Attack { attackers.get.unitMatcher.set(Protoss.DarkTemplar) },
     new If(
       new And(
-        new Employing(PvPMidgameDarkTemplar),
+        new Employing(PvPOpeningDarkTemplar),
         new Not(new Employing(PvPEarly2Gate910)),
         new Not(new Employing(PvPEarly2Gate1012))),
       new Trigger(

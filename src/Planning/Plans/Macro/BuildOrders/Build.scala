@@ -5,17 +5,17 @@ import Planning.Composition.Property
 import Planning.Plan
 import Lifecycle.With
 
-class Build(initialBuildables: BuildRequest*) extends Plan {
+class Build(initialRequests: BuildRequest*) extends Plan {
   
-  val buildables = new Property[Seq[BuildRequest]](initialBuildables)
+  val requests = new Property[Seq[BuildRequest]](initialRequests)
   
   override def onUpdate() {
     
     description.set(
       "Build " +
-      buildables.get.take(3).map(_.toString).mkString(", ") +
-      (if (buildables.get.size > 3) "..." else ""))
+      requests.get.take(3).map(_.toString).mkString(", ") +
+      (if (requests.get.size > 3) "..." else ""))
     
-    With.scheduler.request(this, buildables.get)
+    With.scheduler.request(this, requests.get)
   }
 }

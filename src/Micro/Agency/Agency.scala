@@ -29,11 +29,11 @@ class Agency {
   
     if ( ! With.latency.isLastFrameOfTurn && finishedExecutingLastTime) return
   
-    agents.keys.filterNot(unit => unit.alive && (unit.complete || unit.unitClass.isBuilding)).foreach(agents.remove)
+    agents.keys.filterNot(validAgent).foreach(agents.remove)
     
     if (agentQueue.isEmpty) {
       // Make sure our orderable units all have agents
-      With.units.ours.filter(_.unitClass.orderable).foreach(getState)
+      With.units.ours.filter(validAgent).foreach(getState)
       agentQueue ++= agents.values.toVector.sortBy(_.lastFrame)
     }
     
@@ -49,5 +49,9 @@ class Agency {
     }
   
     finishedExecutingLastTime = agentQueue.isEmpty
+  }
+  
+  private def validAgent(unit: FriendlyUnitInfo): Boolean = {
+    unit.alive && (unit.complete || unit.unitClass.isBuilding)
   }
 }

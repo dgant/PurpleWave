@@ -317,10 +317,10 @@ class ProtossVsProtoss extends Parallel {
     new If(
       new DoingOneGateCore,
       new If(
-        new UnitsAtLeast(1, Protoss.Pylon, complete = false),
+        new UnitsAtLeast(1, Protoss.CyberneticsCore, complete = false),
         new Scout),
       new If(
-        new UnitsAtLeast(1, Protoss.CyberneticsCore, complete = false),
+        new UnitsAtLeast(1, Protoss.Pylon, complete = false),
         new Scout)),
   
     new DefendZones,

@@ -45,8 +45,8 @@ class Groundskeeper {
   
   def proposalQueue: Iterable[Blueprint] = {
     val ordered = requirementMatches
-      .filter(_.requirement.proposer.isPrioritized)
       .toVector
+      .filter(_.requirement.proposer.isPrioritized)
       .sorted(blueprintMatchOrdering)
       .map(_.proposal)
       .take(With.configuration.buildingPlacementMaximumQueue)

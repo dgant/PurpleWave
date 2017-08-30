@@ -34,7 +34,7 @@ object ShowGroundskeeper extends View {
           .keySet)
         .toVector
         .sortBy(_.proposer.priority)
-        .map(_.toString))
+        .map(_.toString.take(30)))
   
     With.game.drawTextScreen(165, 5 * With.visualization.lineHeightSmall, "Matched:")
     val matches =

@@ -115,10 +115,22 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit) extends UnitInfo(base) {
   def orderTarget       : Option[UnitInfo]  = orderTargetCache.get
   def orderTargetPixel  : Option[Pixel]     = orderTargetPixelCache.get
   
-  private val orderTargetCache      = new CacheFrame(() => { val target   = base.getOrderTarget;          if (target == null)                   None else With.units.getId(target.getID) })
-  private val targetCache           = new CacheFrame(() => { val target   = base.getTarget;               if (target == null)                   None else With.units.getId(target.getID) })
-  private val targetPixelCache      = new CacheFrame(() => { val position = base.getTargetPosition;       if (badPositions.contains(position))  None else Some(new Pixel(position)) })
-  private val orderTargetPixelCache = new CacheFrame(() => { val position = base.getOrderTargetPosition;  if (badPositions.contains(position))  None else Some(new Pixel(position)) })
+  private val orderTargetCache = new CacheFrame(() => {
+    val target = if (unitClass.targetsMatter) base.getOrderTarget else null
+    if (target == null) None else With.units.getId(target.getID)
+  })
+  private val orderTargetPixelCache = new CacheFrame(() => {
+    val position = if (unitClass.targetPositionsMatter) base.getOrderTargetPosition else null
+    if (badPositions.contains(position)) None else Some(new Pixel(position))
+  })
+  private val targetCache = new CacheFrame(() => {
+    val target = if (unitClass.targetsMatter) base.getTarget else null
+    if (target == null) None else With.units.getId(target.getID)
+  })
+  private val targetPixelCache = new CacheFrame(() => {
+    val position = if (unitClass.targetPositionsMatter) base.getTargetPosition else null
+    if (badPositions.contains(position)) None else Some(new Pixel(position))
+  })
   
   def attacking       : Boolean = isAttackingCache.get
   def constructing    : Boolean = isConstructingCache.get
@@ -128,7 +140,7 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit) extends UnitInfo(base) {
   def interruptible   : Boolean = isInterruptibleCache.get
   def morphing        : Boolean = isMorphingCache.get
   def repairing       : Boolean = isRepairingCache.get
-  def teching     : Boolean = isResearchingCache.get
+  def teching         : Boolean = isResearchingCache.get
   def patrolling      : Boolean = isPatrollingCache.get
   def training        : Boolean = isTrainingCache.get
   def upgrading       : Boolean = isUpgradingCache.get

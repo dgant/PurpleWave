@@ -117,16 +117,18 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
     else if (this == Protoss.Arbiter)       32.0 * 9.0
     else maxAirGroundRangePixels
   
-  lazy val tileArea         : TileRectangle = TileRectangle(Tile(0, 0), tileSize)
-  lazy val orderable        : Boolean = ! isSpell && ! Set(Protoss.Interceptor, Protoss.Scarab, Terran.SpiderMine).contains(this)
-  lazy val isResource       : Boolean = isMinerals || isGas
-  lazy val isMinerals       : Boolean = isMineralField
-  lazy val isGas            : Boolean = Vector(Neutral.Geyser, Terran.Refinery, Protoss.Assimilator, Zerg.Extractor).contains(this)
-  lazy val isTownHall       : Boolean = Vector(Terran.CommandCenter, Protoss.Nexus, Zerg.Hatchery, Zerg.Lair, Zerg.Hive).contains(this)
-  lazy val isSiegeTank      : Boolean = this == Terran.SiegeTankSieged || this == Terran.SiegeTankUnsieged
-  lazy val isStaticDefense  : Boolean = isBuilding && attacks || this == Terran.Bunker || this == Protoss.ShieldBattery
-  lazy val isTransport      : Boolean = spaceProvided > 0 && isFlyer && this != Protoss.Carrier
-  lazy val shootsScarabs    : Boolean = this == Protoss.Reaver // Performance shortcut
+  lazy val tileArea               : TileRectangle = TileRectangle(Tile(0, 0), tileSize)
+  lazy val targetsMatter          : Boolean = this != Protoss.Interceptor
+  lazy val targetPositionsMatter  : Boolean = this != Protoss.Interceptor
+  lazy val orderable              : Boolean = ! isSpell && ! Set(Protoss.Interceptor, Protoss.Scarab, Terran.SpiderMine).contains(this)
+  lazy val isResource             : Boolean = isMinerals || isGas
+  lazy val isMinerals             : Boolean = isMineralField
+  lazy val isGas                  : Boolean = Vector(Neutral.Geyser, Terran.Refinery, Protoss.Assimilator, Zerg.Extractor).contains(this)
+  lazy val isTownHall             : Boolean = Vector(Terran.CommandCenter, Protoss.Nexus, Zerg.Hatchery, Zerg.Lair, Zerg.Hive).contains(this)
+  lazy val isSiegeTank            : Boolean = this == Terran.SiegeTankSieged || this == Terran.SiegeTankUnsieged
+  lazy val isStaticDefense        : Boolean = isBuilding && attacks || this == Terran.Bunker || this == Protoss.ShieldBattery
+  lazy val isTransport            : Boolean = spaceProvided > 0 && isFlyer && this != Protoss.Carrier
+  lazy val shootsScarabs          : Boolean = this == Protoss.Reaver // Performance shortcut
   
   lazy val unaffectedByDarkSwarm: Boolean = Vector(
     Terran.SiegeTankSieged,

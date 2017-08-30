@@ -19,6 +19,7 @@ object ProtossChoices {
     ProxyDarkTemplar,
     CarriersFromAnIsland,
     CarriersWithNoDefense,
+    DarkArchonsWithNoDefense,
     AllPvR,
     AllPvT,
     AllPvP,

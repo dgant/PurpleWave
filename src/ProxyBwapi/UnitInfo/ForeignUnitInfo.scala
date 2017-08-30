@@ -171,8 +171,9 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit) extends UnitInfo (originalBa
   ////////////
   
   private def updateOrders() {
-    _target               = baseUnit.getTarget
-    _targetPosition       = baseUnit.getTargetPosition
+    //Performance enhancement -- spare the expensive target calls for irrelevant units
+    _target               = if (unitClass.targetsMatter)         baseUnit.getTarget         else null
+    _targetPosition       = if (unitClass.targetPositionsMatter) baseUnit.getTargetPosition else null
     _command              = baseUnit.getLastCommand
     _order                = baseUnit.getOrder.toString
     _orderTarget          = baseUnit.getOrderTarget

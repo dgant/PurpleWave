@@ -26,12 +26,14 @@ class Agency {
   val agentQueue = new mutable.Queue[Agent]
   
   def run() {
-    
+  
     if ( ! With.latency.isLastFrameOfTurn && finishedExecutingLastTime) return
   
     agents.keys.filterNot(unit => unit.alive && (unit.complete || unit.unitClass.isBuilding)).foreach(agents.remove)
     
     if (agentQueue.isEmpty) {
+      // Make sure our orderable units all have agents
+      With.units.ours.filter(_.unitClass.orderable).foreach(getState)
       agentQueue ++= agents.values.toVector.sortBy(_.lastFrame)
     }
     

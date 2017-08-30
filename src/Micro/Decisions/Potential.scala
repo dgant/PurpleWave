@@ -116,7 +116,7 @@ object Potential {
   }
   
   def exitAttractionAir(unit: FriendlyUnitInfo): Force = {
-    BuildForce.fromPixels(unit.pixelCenter, unit.agent.origin)
+    BuildForce.fromPixels(unit.pixelCenter, unit.agent.origin).normalize
   }
   
   def exitAttractionGround(unit: FriendlyUnitInfo): Force = {

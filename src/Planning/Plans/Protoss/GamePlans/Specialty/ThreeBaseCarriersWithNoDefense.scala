@@ -1,12 +1,12 @@
 package Planning.Plans.Protoss.GamePlans.Specialty
 
 import Lifecycle.With
-import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgradeNext}
+import Macro.BuildRequests.{RequestAnother, RequestAtLeast, RequestTech, RequestUpgradeNext}
 import Planning.Plans.Army.{ConsiderAttacking, DefendZones}
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
-import Planning.Plans.Macro.Expanding.{BuildCannonsAtBases, BuildGasPumps, RequireMiningBases}
+import Planning.Plans.Macro.Expanding.{BuildGasPumps, RemoveMineralBlocksAt, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.{OnGasBases, OnMiningBases, UnitsAtLeast}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Protoss.ProtossBuilds
@@ -65,7 +65,7 @@ class ThreeBaseCarriersWithNoDefense extends Parallel {
       new UnitsAtLeast(1, Protoss.Arbiter),
       new Build(RequestTech(Protoss.Stasis))),
     new If(
-      new UnitsAtLeast(6, Protoss.Carrier),
+      new UnitsAtLeast(12, Protoss.Carrier),
       new Parallel(
         new OnMiningBases(2, new Parallel(new SpamUpgrades, new TechToObservers)),
         new OnMiningBases(3, new Parallel(new TechToArbiters)),
@@ -73,14 +73,16 @@ class ThreeBaseCarriersWithNoDefense extends Parallel {
         new TrainContinuously(Protoss.Arbiter, 2),
         new TrainContinuously(Protoss.Carrier)),
       new Parallel(
-        new TrainContinuously(Protoss.Scout, 3),
+        new TrainContinuously(Protoss.Scout, 1),
         new TrainContinuously(Protoss.Carrier),
         new TrainContinuously(Protoss.Observer, 1))),
     new OnGasBases(1, new Build(RequestAtLeast(3, Protoss.Stargate))),
     new OnGasBases(2, new Build(RequestAtLeast(5, Protoss.Stargate))),
     new OnGasBases(3, new Build(RequestAtLeast(8, Protoss.Stargate))),
     new OnGasBases(4, new Build(RequestAtLeast(12, Protoss.Stargate))),
-    new BuildCannonsAtBases(8),
+    new Build(
+      RequestAnother(6, Protoss.PhotonCannon),
+      RequestAnother(2, Protoss.Pylon)),
     new ExpandOverIsland(12),
     new FindExpansions { scouts.get.unitMatcher.set(Protoss.Scout) },
     new DefendZones,
@@ -88,6 +90,7 @@ class ThreeBaseCarriersWithNoDefense extends Parallel {
       new UnitsAtLeast(8 * 8, Protoss.Interceptor),
       new ConsiderAttacking),
     new FollowBuildOrder,
+    new RemoveMineralBlocksAt(30),
     new Gather,
     new RecruitFreelancers
   ))

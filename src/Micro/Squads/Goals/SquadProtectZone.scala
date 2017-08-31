@@ -5,6 +5,7 @@ import Lifecycle.With
 import Mathematics.Formations.Formation
 import Mathematics.Points.{Pixel, SpecificPoints}
 import Micro.Agency.Intention
+import Performance.Caching.CacheFrame
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.ByOption
 import Utilities.EnrichPixel.EnrichedPixelCollection
@@ -23,7 +24,7 @@ class SquadProtectZone(zone: Zone) extends SquadGoal {
       && u.unitClass.isStaticDefense
       && (squad.enemies.isEmpty || squad.enemies.exists(u.canAttack)))
     
-    lazy val canHuntEnemies  = squad.enemies.exists(e => e.matchups.threatsInRange.isEmpty || e.matchups.vpfNetDiffused > 0.0)
+    lazy val canHuntEnemies  = huntableEnemies.get.nonEmpty
     lazy val canDefendWall   = walls.nonEmpty
     lazy val canDefendHeart  = base.isDefined
     lazy val canDefendChoke  = choke.isDefined
@@ -46,9 +47,17 @@ class SquadProtectZone(zone: Zone) extends SquadGoal {
     }
   }
   
+  private val huntableEnemies = new CacheFrame(() => {
+    squad.enemies.filter(enemy =>
+      enemy.zone == zone &&
+      enemy.unitClass.helpsInCombat &&
+      ! enemy.unitClass.isWorker
+    )
+  })
+  
   def huntEnemies() {
     val center = zone.centroid.pixelCenter
-    val target = squad.enemies.minBy(_.pixelDistanceFast(center)).pixelCenter
+    val target = huntableEnemies.get.minBy(_.pixelDistanceFast(center)).pixelCenter
     squad.recruits.foreach(_.agent.intend(squad.client, new Intention {
       toTravel = Some(target)
       toReturn = Some(center)

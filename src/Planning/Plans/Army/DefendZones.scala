@@ -42,15 +42,17 @@ class DefendZones extends Plan {
       })
   }
   
-  private def isThreatening(enemy: ForeignUnitInfo, zone: Zone): Boolean = {
-    (zone.edges.map(_.centerPixel) :+ zone.centroid.pixelCenter).exists(enemy.framesToTravelTo(_) < 24.0 * 10.0)
-  }
-  
   private def zoneValue(zone: Zone): Double = {
     zone.bases.map(baseValue).sum
   }
   
   private def baseValue(base: Base): Double = {
     (5.0 + base.workers.size) * (if (base.owner.isFriendly) 1.0 else 0.0)
+  }
+  
+  private def isThreatening(enemy: ForeignUnitInfo, zone: Zone): Boolean = {
+    enemy.unitClass.helpsInCombat &&
+    enemy.zone == zone ||
+    enemy.framesToTravelTo(zone.centroid.pixelCenter) < 24.0 * 6.0
   }
 }

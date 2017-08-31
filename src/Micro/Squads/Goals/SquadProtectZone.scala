@@ -15,8 +15,9 @@ class SquadProtectZone(zone: Zone) extends SquadGoal {
   private var lastAction = "ProtectZone"
   override def toString: String = lastAction + zone
   
-  def updateUnits() {
+  override def acceptsHelp: Boolean = false
   
+  def updateUnits() {
     lazy val base   = ByOption.minBy(zone.bases)(_.heart.tileDistanceManhattan(With.intelligence.mostBaselikeEnemyTile))
     lazy val choke  = zone.exit
     lazy val walls  = zone.units.toSeq.filter(u =>

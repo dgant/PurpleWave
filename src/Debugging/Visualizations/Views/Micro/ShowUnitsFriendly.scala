@@ -1,11 +1,10 @@
 package Debugging.Visualizations.Views.Micro
 
-import Debugging.Visualizations.{Colors, ForceColors}
 import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.View
+import Debugging.Visualizations.{Colors, ForceColors}
 import Lifecycle.With
 import Micro.Agency.Agent
-import Micro.Decisions.Potential
 import Utilities.ByOption
 
 object ShowUnitsFriendly extends View {
@@ -104,13 +103,12 @@ object ShowUnitsFriendly extends View {
               forceNormalized.y.toInt),
             pair._1)
         })
-        val sum = Potential.sum(agent.forces.values).normalize(length)
-        DrawMap.line(
-          agent.unit.pixelCenter,
-          agent.unit.pixelCenter.add(
-            sum.x.toInt,
-            sum.y.toInt),
+        if (agent.movingTo.isDefined) {
+          DrawMap.line(
+            agent.unit.pixelCenter,
+            agent.movingTo.get,
             ForceColors.sum)
+        }
       }
       
       

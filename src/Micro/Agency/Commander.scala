@@ -2,6 +2,7 @@ package Micro.Agency
 
 import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile}
+import Mathematics.PurpleMath
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClass.UnitClass
@@ -90,8 +91,13 @@ class Commander {
     var destination = to
     if (unit.flying && unit.pixelDistanceSquared(to) < Math.pow(flyingOvershoot, 2)) {
       val overshoot = unit.pixelCenter.project(to, flyingOvershoot)
-      if (overshoot.valid) destination = overshoot
     }
+    
+    // Limit moves to map edge
+    var margin = Math.max(unit.unitClass.width, unit.unitClass.height)
+    destination = Pixel(
+      PurpleMath.clamp(destination.x, margin, With.mapPixelWidth - margin),
+      PurpleMath.clamp(destination.y, margin, With.mapPixelWidth - margin))
     
     // Mineral walk!
     if (unit.unitClass.isWorker && ! unit.carryingResources

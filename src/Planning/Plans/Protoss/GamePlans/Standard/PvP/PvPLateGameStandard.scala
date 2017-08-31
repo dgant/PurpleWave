@@ -25,11 +25,11 @@ class PvPLateGameStandard extends Parallel {
   
     new TrainMatchingRatio(Protoss.Observer, 1, 2, Seq(MatchingRatio(Protoss.DarkTemplar, 2.0))),
     
-    new If(new UnitsAtLeast(2, Protoss.Dragoon),      new Build(RequestUpgrade(Protoss.DragoonRange))),
-    new If(new UnitsAtLeast(1, Protoss.HighTemplar),  new Build(RequestTech(Protoss.PsionicStorm))),
-    new If(new UnitsAtLeast(2, Protoss.Reaver),       new Build(RequestUpgrade(Protoss.ScarabDamage))),
-    new If(new UnitsAtLeast(3, Protoss.Reaver),       new Build(RequestUpgrade(Protoss.ShuttleSpeed))),
-    new If(new UnitsAtLeast(12, UnitMatchWarriors),   new RequireMiningBases(2)),
+    new If(new UnitsAtLeast(2,  Protoss.Dragoon),     new Build(RequestUpgrade(Protoss.DragoonRange))),
+    new If(new UnitsAtLeast(1,  Protoss.HighTemplar), new Build(RequestTech(Protoss.PsionicStorm))),
+    new If(new UnitsAtLeast(2,  Protoss.Reaver),      new Build(RequestUpgrade(Protoss.ScarabDamage))),
+    new If(new UnitsAtLeast(3,  Protoss.Reaver),      new Build(RequestUpgrade(Protoss.ShuttleSpeed))),
+    new If(new UnitsAtLeast(8,  UnitMatchWarriors),   new RequireMiningBases(2)),
     new If(new UnitsAtLeast(20, UnitMatchWarriors),   new RequireMiningBases(3)),
     new If(new UnitsAtLeast(25, UnitMatchWarriors),   new RequireMiningBases(4)),
     

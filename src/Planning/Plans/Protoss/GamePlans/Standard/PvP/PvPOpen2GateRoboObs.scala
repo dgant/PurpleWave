@@ -6,7 +6,7 @@ import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
 import Planning.Plan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.Mode
-import Planning.Plans.Information.{Employing, Never}
+import Planning.Plans.Information.Employing
 import Planning.Plans.Information.Reactive.EnemyBasesAtLeast
 import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.Build.ProposePlacement
@@ -16,7 +16,7 @@ import Planning.Plans.Macro.Milestones.{EnemyUnitsAtLeast, UnitsAtLeast}
 import Planning.Plans.Protoss.Situational.Blueprinter
 import Planning.Plans.Scouting.Scout
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvP.{PvP1GateRoboObs, PvP2GateRoboObs}
+import Strategery.Strategies.Protoss.PvP.PvP2GateRoboObs
 
 class PvPOpen2GateRoboObs extends Mode {
   
@@ -35,10 +35,7 @@ class PvPOpen2GateRoboObs extends Mode {
     new RequireBareMinimum,
     new If(
       new EnemyUnitsAtLeast(1, Protoss.DarkTemplar),
-      new Parallel(
-        new TrainContinuously(Protoss.Observer, 1),
-        new Build(RequestAtLeast(3, Protoss.PhotonCannon))
-      )),
+      new Build(RequestAtLeast(1, Protoss.Observer))),
     new BuildOrder(
       // http://wiki.teamliquid.net/starcraft/2_Gate_Reaver_(vs._Protoss)
       // We get gas/core faster because of mineral locking + later scout
@@ -77,7 +74,6 @@ class PvPOpen2GateRoboObs extends Mode {
     new TrainContinuously(Protoss.Reaver),
     new TrainContinuously(Protoss.Dragoon),
     new Build(
-      RequestAtLeast(1, Protoss.Forge),
       RequestAtLeast(1, Protoss.RoboticsFacility),
       RequestAtLeast(1, Protoss.Observatory),
       RequestAtLeast(1, Protoss.RoboticsSupportBay),

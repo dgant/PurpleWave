@@ -10,7 +10,7 @@ import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.ByOption
 import Utilities.EnrichPixel.EnrichedPixelCollection
 
-class SquadProtectZone(zone: Zone) extends SquadGoal {
+class SquadDefendZone(zone: Zone) extends SquadGoal {
   
   private var lastAction = "ProtectZone"
   override def toString: String = lastAction + zone
@@ -73,7 +73,7 @@ class SquadProtectZone(zone: Zone) extends SquadGoal {
   }
   
   val wallConcaveWidthRadians : Double = Math.PI * 7.0 / 8.0
-  val wallConcaveWidthPixels  : Double = 32.0 * 6.0
+  val wallConcaveWidthPixels  : Double = 32.0 * 3.0
   
   def defendWall(walls: Seq[UnitInfo]) {
     val centroidSources = Seq(squad.enemies.toSeq.map(_.pixelCenter), zone.exit.map(_.centerPixel).toSeq, Seq(SpecificPoints.middle))

@@ -36,10 +36,7 @@ object PlacementProfiles {
   )
   
   val pylon = new PlacementProfile("Pylon", basic)
-  
-  val factory = new PlacementProfile("Factory", basic) {
-    preferDistanceFromEnemy = 0.25
-  }
+  val factory = new PlacementProfile("Factory", basic)
   
   val tech = new PlacementProfile("Tech", basic) {
     preferDistanceFromEnemy     = 3.0

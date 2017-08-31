@@ -1,7 +1,7 @@
 package Planning.Plans.Army
 
 import Lifecycle.With
-import Micro.Squads.Goals.SquadProtectZone
+import Micro.Squads.Goals.SquadDefendZone
 import Micro.Squads.Squad
 import Planning.Composition.ResourceLocks.LockUnits
 import Planning.Composition.{Property, UnitCountEverything}
@@ -25,6 +25,6 @@ class DefendEntrance extends Plan {
     
     defenders.get.acquire(this)
     squad.conscript(defenders.get.units)
-    squad.goal = new SquadProtectZone(zone)
+    squad.goal = new SquadDefendZone(zone)
   }
 }

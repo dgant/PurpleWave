@@ -3,7 +3,7 @@ package Planning.Plans.Protoss.GamePlans.Standard.PvP
 import Macro.Architecture.Blueprint
 import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
 import Planning.Plan
-import Planning.Plans.Compound.{If, Or, Trigger}
+import Planning.Plans.Compound.{Or, Trigger}
 import Planning.Plans.GamePlans.Mode
 import Planning.Plans.Information.Always
 import Planning.Plans.Information.Reactive.EnemyBasesAtLeast
@@ -11,7 +11,7 @@ import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuousl
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder, RequireBareMinimum}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Macro.Milestones.{EnemyUnitsAtLeast, UnitsAtLeast}
+import Planning.Plans.Macro.Milestones.UnitsAtLeast
 import Planning.Plans.Protoss.Situational.Blueprinter
 import Planning.Plans.Scouting.Scout
 import ProxyBwapi.Races.Protoss
@@ -30,10 +30,6 @@ class PvPOpen1GateRoboObs extends Mode {
   
   children.set(Vector(
     new RequireBareMinimum,
-    new TrainContinuously(Protoss.Observer, 1), // Make darn sure we get it out ASAP
-    new If(
-      new EnemyUnitsAtLeast(1, Protoss.DarkTemplar),
-      new Build(RequestAtLeast(3, Protoss.PhotonCannon))),
     new BuildOrder(
       // http://wiki.teamliquid.net/starcraft/2_Gate_Reaver_(vs._Protoss)
       // We get gas/core faster because of mineral locking + later scout
@@ -64,7 +60,7 @@ class PvPOpen1GateRoboObs extends Mode {
       RequestAtLeast(22,  Protoss.Probe),
       RequestAtLeast(4,   Protoss.Pylon),
       RequestAtLeast(23,  Protoss.Probe),
-      RequestAtLeast(5,   Protoss.Dragoon),
+      RequestAtLeast(5,   Protoss.Dragoon),           // 31 = 23 + Z + DDDD
       RequestAtLeast(1,   Protoss.Observatory)        // 33 = 23 + Z + DDDD
     ),
     

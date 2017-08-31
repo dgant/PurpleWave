@@ -16,10 +16,16 @@ object KiteSafely extends Action {
   
   override def perform(unit: FriendlyUnitInfo) {
     
-    if (unit.readyForAttackOrder && unit.matchups.framesOfSafetyDiffused >= unit.framesToTurnAndShootAndTurnBackAndAccelerate) {
-      Potshot.consider(unit)
-      Target.consider(unit)
-      Attack.consider(unit)
+    if (unit.readyForAttackOrder) {
+      if (unit.matchups.framesOfSafetyDiffused >= unit.framesToTurnAndShootAndTurnBackAndAccelerate) {
+        Potshot.consider(unit)
+        Target.consider(unit)
+        Attack.consider(unit)
+      }
+      // If we're not going anywhere, might as well shoot
+      if (unit.velocity.lengthSquared == 0 && unit.cooldownLeft == 0) {
+        Potshot.consider(unit)
+      }
     }
     
     Avoid.delegate(unit)

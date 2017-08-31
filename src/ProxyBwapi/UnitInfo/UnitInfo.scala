@@ -4,6 +4,7 @@ import Information.Battles.Types.Battle
 import Information.Geography.Types.{Base, Zone}
 import Information.Kill
 import Lifecycle.With
+import Mathematics.Physics.Force
 import Mathematics.Points.{Pixel, Tile, TileRectangle}
 import Mathematics.PurpleMath
 import Micro.Matchups.MatchupAnalysis
@@ -113,7 +114,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit) extends UnitProxy(baseUnit) {
           lastState.defensiveMatrixPoints - defensiveMatrixPoints)
         .getOrElse(0)))
   
-  private lazy val stuckMoveFrames     = 12
+  private lazy val stuckMoveFrames  = 12
   private lazy val stuckAttackFrames = cooldownMaxAirGround + 8
   private lazy val stuckFramesMax    = Math.max(stuckMoveFrames, stuckAttackFrames)
   def seeminglyStuck: Boolean = {
@@ -200,6 +201,8 @@ abstract class UnitInfo(baseUnit: bwapi.Unit) extends UnitProxy(baseUnit) {
   def pixelDistanceTravelling (destination: Pixel)      : Double  = pixelDistanceTravelling(pixelCenter, destination)
   def pixelDistanceTravelling (destination: Tile)       : Double  = pixelDistanceTravelling(pixelCenter, destination.pixelCenter)
   def pixelDistanceTravelling (from: Pixel, to: Pixel)  : Double  = if (flying) from.pixelDistanceFast(to) else from.groundPixels(to)
+  
+  def velocity: Force = Force(velocityX, velocityY)
   
   def canMove: Boolean = canMoveCache.get
   private val canMoveCache = new CacheFrame(() => unitClass.canMove && topSpeed > 0 && canDoAnything && ! burrowed)

@@ -3,7 +3,7 @@ package Planning.Plans.Protoss.GamePlans.Standard.PvP
 import Macro.Architecture.Blueprint
 import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
 import Planning.Plan
-import Planning.Plans.Compound.{Or, Trigger}
+import Planning.Plans.Compound.{If, Or, Parallel, Trigger}
 import Planning.Plans.GamePlans.Mode
 import Planning.Plans.Information.Always
 import Planning.Plans.Information.Reactive.EnemyBasesAtLeast
@@ -11,7 +11,7 @@ import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuousl
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder, RequireBareMinimum}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Macro.Milestones.UnitsAtLeast
+import Planning.Plans.Macro.Milestones.{EnemyUnitsAtLeast, UnitsAtLeast}
 import Planning.Plans.Protoss.Situational.Blueprinter
 import Planning.Plans.Scouting.Scout
 import ProxyBwapi.Races.Protoss
@@ -30,7 +30,13 @@ class PvPOpen2GateRoboObs extends Mode {
   
   children.set(Vector(
     new RequireBareMinimum,
-    new TrainContinuously(Protoss.Observer, 1), // Make darn sure we get it out ASAP
+    
+    new If(
+      new EnemyUnitsAtLeast(1, Protoss.DarkTemplar),
+      new Parallel(
+        new TrainContinuously(Protoss.Observer, 1),
+        new Build(RequestAtLeast(3, Protoss.PhotonCannon))
+      )),
     new BuildOrder(
       // http://wiki.teamliquid.net/starcraft/2_Gate_Reaver_(vs._Protoss)
       // We get gas/core faster because of mineral locking + later scout
@@ -71,14 +77,18 @@ class PvPOpen2GateRoboObs extends Mode {
     new Build(
       RequestAtLeast(1, Protoss.Forge),
       RequestAtLeast(1, Protoss.RoboticsFacility),
-      RequestAtLeast(1, Protoss.PhotonCannon),
       RequestAtLeast(1, Protoss.Observatory),
-      RequestAtLeast(1, Protoss.RoboticsSupportBay)),
+      RequestAtLeast(1, Protoss.RoboticsSupportBay),
+      RequestAtLeast(1, Protoss.Observer)),
   
     //Not part of the build, but mineral locking floats a ton of minerals that we might as well use
-    
-    new Build(RequestAtLeast(3, Protoss.Gateway)),
-    new RequireMiningBases(2),
+    new Trigger(
+      new UnitsAtLeast(1, Protoss.RoboticsSupportBay),
+      initialAfter = new Parallel(
+        new Build(RequestAtLeast(3, Protoss.Gateway)),
+        new RequireMiningBases(2),
+        new Build(RequestAtLeast(6, Protoss.Gateway))
+      )),
       
     new Trigger(
       new UnitsAtLeast(1, Protoss.CyberneticsCore),

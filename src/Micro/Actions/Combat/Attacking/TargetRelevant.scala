@@ -24,6 +24,7 @@ object TargetRelevant extends Action {
           || target.repairing
           || target.hasBeenViolentInLastTwoSeconds
           || target.topSpeed < unit.topSpeedChasing
+          || target.zone.edges.forall(edge => unit.framesToTravelTo(edge.centerPixel) < target.framesToTravelTo(edge.centerPixel))
         )
     )
     

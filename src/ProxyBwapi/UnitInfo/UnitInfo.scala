@@ -2,6 +2,7 @@ package ProxyBwapi.UnitInfo
 
 import Information.Battles.Types.Battle
 import Information.Geography.Types.{Base, Zone}
+import Information.Grids.AbstractGrid
 import Information.Kill
 import Lifecycle.With
 import Mathematics.Physics.Force
@@ -166,6 +167,11 @@ abstract class UnitInfo(baseUnit: bwapi.Unit) extends UnitProxy(baseUnit) {
   
   def base: Option[Base] = cacheBase.get
   private val cacheBase = new CacheFrame(() => ByOption.minBy(zone.bases)(_.heart.tileDistanceFast(tileIncludingCenter)))
+  
+  def mobilityForceGrid : AbstractGrid[Force]   = if (flying) With.grids.mobilityForceAir else With.grids.mobilityForceGround
+  def mobilityGrid      : AbstractGrid[Int]     = if (flying) With.grids.mobilityAir else With.grids.mobilityGround
+  def mobilityForce     : Force                 = mobilityForceGrid.get(tileIncludingCenter)
+  def mobility          : Int                   = mobilityGrid.get(tileIncludingCenter)
   
   def pixelRangeMin: Double = unitClass.groundMinRangeRaw
   def pixelRangeAir: Double = pixelRangeAirCache.get

@@ -14,7 +14,7 @@ object Pardon extends Action {
   
   override def perform(unit: FriendlyUnitInfo) {
     val forceSpreading  = Potential.collisionRepulsion(unit)
-    val forceMobility   = Potential.barrierRepulsion(unit)
+    val forceMobility   = Potential.mobilityAttraction(unit)
     unit.agent.forces.put(ForceColors.spreading,  forceSpreading)
     unit.agent.forces.put(ForceColors.mobility,   forceMobility)
     Gravitate.delegate(unit)

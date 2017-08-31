@@ -67,13 +67,8 @@ object Tickle extends Action {
       attack = false
     }
     
-    // Don't take losing fights
-    if (enemiesAttackingUs.size > 1) {
-      attack = false
-    }
-    
     // If violent enemies completely overpower us, let's back off
-    if (ourStrength < enemyFighterStrength) {
+    if (ourStrength < enemyFighterStrength && dying) {
       attack = false
     }
   

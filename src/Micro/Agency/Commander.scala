@@ -83,21 +83,21 @@ class Commander {
     sleepAttack(unit)
   }
   
+  val flyingOvershoot = 188.0
   def move(unit: FriendlyUnitInfo, to: Pixel) {
     if (unready(unit)) return
     
     // Send flying units past their destination to maximize acceleration
-    val flyingOvershoot = 188.0
     var destination = to
     if (unit.flying && unit.pixelDistanceSquared(to) < Math.pow(flyingOvershoot, 2)) {
       val overshoot = unit.pixelCenter.project(to, flyingOvershoot)
     }
     
     // Limit moves to map edge
-    var margin = Math.max(unit.unitClass.width, unit.unitClass.height)
+    val margin = Math.max(unit.unitClass.width, unit.unitClass.height)
     destination = Pixel(
       PurpleMath.clamp(destination.x, margin, With.mapPixelWidth - margin),
-      PurpleMath.clamp(destination.y, margin, With.mapPixelWidth - margin))
+      PurpleMath.clamp(destination.y, margin, With.mapPixelHeight - margin))
     
     // Mineral walk!
     if (unit.unitClass.isWorker && ! unit.carryingResources

@@ -1,7 +1,7 @@
 package Micro.Actions.Combat.Maneuvering
 
 import Debugging.Visualizations.ForceColors
-import Mathematics.Physics.BuildForce
+import Mathematics.Physics.ForceMath
 import Micro.Actions.Action
 import Micro.Actions.Commands.Gravitate
 import Micro.Decisions.Potential
@@ -20,7 +20,7 @@ object Smuggle extends Action {
     else if (unit.visibleToOpponents && unit.matchups.threats.nonEmpty) {
       val forceThreat     = Potential.threatsRepulsion(unit).normalize(1.5)
       val forceSmuggling  = Potential.smuggleRepulsion(unit)
-      val forceHeading    = BuildForce.fromPixels(unit.pixelCenter, unit.agent.toTravel.getOrElse(unit.pixelCenter))
+      val forceHeading    = ForceMath.fromPixels(unit.pixelCenter, unit.agent.toTravel.getOrElse(unit.pixelCenter))
       unit.agent.forces.put(ForceColors.threat,     forceThreat)
       unit.agent.forces.put(ForceColors.bypassing,  forceSmuggling)
       unit.agent.forces.put(ForceColors.traveling,  forceHeading)

@@ -40,10 +40,10 @@ object ShowUnitsForeign extends View {
     }
     if (showTargets) {
       if (unit.targetPixel.isDefined) {
-        DrawMap.line(unit.pixelCenter, unit.targetPixel.get, unit.player.colorMedium)
+        DrawMap.arrow(unit.pixelCenter, unit.targetPixel.get, unit.player.colorMedium)
       }
       if (unit.target.isDefined) {
-        DrawMap.line(unit.pixelCenter, unit.target.get.pixelCenter, unit.player.colorNeon)
+        DrawMap.arrow(unit.pixelCenter, unit.target.get.pixelCenter, unit.player.colorNeon)
       }
     }
   }

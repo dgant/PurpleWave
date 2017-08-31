@@ -22,7 +22,7 @@ object Duck extends Action {
     
     if (unit.agent.explosions.nonEmpty) {
       val forceExplosion  = Potential.explosionsRepulsion(unit).normalize(3.0)
-      val forceMobility   = Potential.barrierRepulsion(unit).normalize(2.0)
+      val forceMobility   = Potential.mobilityAttraction(unit).normalize(2.0)
       val forceSpreading  = Potential.collisionRepulsion(unit)
       unit.agent.forces.put(ForceColors.threat,     forceExplosion)
       unit.agent.forces.put(ForceColors.mobility,   forceMobility)

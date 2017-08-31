@@ -23,7 +23,7 @@ object Sneak extends Action {
       val forceThreat     = Potential.threatsRepulsion(unit)
       val forceSneaking   = Potential.detectionRepulsion(unit)
       val forceSpreading  = Potential.collisionRepulsion(unit)
-      val forceMobility   = Potential.barrierRepulsion(unit)
+      val forceMobility   = Potential.mobilityAttraction(unit)
       unit.agent.forces.put(ForceColors.threat,     forceThreat)
       unit.agent.forces.put(ForceColors.bypassing,  forceSneaking)
       unit.agent.forces.put(ForceColors.mobility,   forceMobility)

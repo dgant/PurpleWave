@@ -51,6 +51,7 @@ class PvPLateGameStandard extends Parallel {
   
     new If(
       new And(
+        new UpgradeComplete(Protoss.ZealotSpeed, Protoss.ZealotSpeed.upgradeTime(1)),
         new UnitsAtMost(4, Protoss.HighTemplar),
         new UnitsAtLeast(1, Protoss.TemplarArchives, complete = true)),
       new Build(RequestAnother(1, Protoss.HighTemplar))),

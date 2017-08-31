@@ -13,7 +13,7 @@ object ShowUnitsFriendly extends View {
   var showAction      : Boolean = true
   var showCommand     : Boolean = false
   var showOrder       : Boolean = false
-  var showTargets     : Boolean = false
+  var showTargets     : Boolean = true
   var showFormation   : Boolean = true
   var showKiting      : Boolean = false
   var showForces      : Boolean = true
@@ -60,16 +60,16 @@ object ShowUnitsFriendly extends View {
       }
       val targetPosition = agent.unit.targetPixel.orElse(agent.unit.orderTargetPixel)
       if (targetPosition.nonEmpty && agent.unit.target.isEmpty) {
-        DrawMap.line(agent.unit.pixelCenter, targetPosition.get, agent.unit.player.colorDark)
+        DrawMap.arrow(agent.unit.pixelCenter, targetPosition.get, agent.unit.player.colorDark)
       }
       if (agent.movingTo.isDefined) {
-        DrawMap.line(agent.unit.pixelCenter, agent.movingTo.get, Colors.MediumGray)
+        DrawMap.arrow(agent.unit.pixelCenter, agent.movingTo.get, Colors.MediumGray)
       }
       if (agent.toAttack.isDefined) {
-        DrawMap.line(agent.unit.pixelCenter, agent.toAttack.get.pixelCenter, Colors.BrightRed)
+        DrawMap.arrow(agent.unit.pixelCenter, agent.toAttack.get.pixelCenter, Colors.BrightRed)
       }
       if (agent.toGather.isDefined) {
-        DrawMap.line(agent.unit.pixelCenter, agent.toGather.get.pixelCenter, Colors.DarkGreen)
+        DrawMap.arrow(agent.unit.pixelCenter, agent.toGather.get.pixelCenter, Colors.DarkGreen)
       }
     }
     if (showFormation) {

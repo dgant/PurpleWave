@@ -6,7 +6,7 @@ object TargetHeuristicDelay extends TargetHeuristic {
   
   override def evaluate(unit: FriendlyUnitInfo, candidate: UnitInfo): Double = {
     
-    16.0 + Math.max(0.0, unit.framesToGetInRange(candidate) - unit.cooldownLeft)
+    24.0 + Math.max(0.0, unit.framesToGetInRange(candidate) - unit.cooldownLeft)
     
   }
 }

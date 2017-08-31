@@ -100,7 +100,7 @@ class Commander {
       PurpleMath.clamp(destination.y, margin, With.mapPixelHeight - margin))
     
     // Mineral walk!
-    if (unit.unitClass.isWorker && ! unit.carryingResources
+    if (unit.unitClass.isWorker && ! unit.carryingMinerals
       && ! With.mapFileName.toLowerCase.contains("barrier") //Hack -- Great Barrier Reef is ruinous for automatic mineral walking
     ) {
       val from      = unit.pixelCenter

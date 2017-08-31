@@ -27,6 +27,7 @@ object Disengage extends Action {
     lazy val outrange     = unit.canAttack(mostEntangledThreat) && unit.pixelRangeAgainstFromEdge(mostEntangledThreat) > mostEntangledThreat.pixelRangeAgainstFromEdge(unit)
   
     // Bunker? Yes, please.
+    // TODO: Should probably make sure there's room! Otherwise we just spamclick it
     if (bunkers.nonEmpty) {
       val bunker = bunkers.minBy(_.pixelDistanceFast(unit))
       With.commander.rightClick(unit, bunker)

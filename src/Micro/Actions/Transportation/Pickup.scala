@@ -1,6 +1,7 @@
 package Micro.Actions.Transportation
 
 import Micro.Actions.Action
+import Micro.Actions.Combat.Decisionmaking.Disengage
 import Micro.Actions.Commands.Move
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -10,12 +11,16 @@ import Utilities.EnrichPixel.EnrichedPixelCollection
 object Pickup extends Action {
   
   override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.isTransport &&
-    potentialPassengers(unit).nonEmpty
+    unit.isTransport
   }
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     val passengersPotential = potentialPassengers(unit)
+    if (passengersPotential.isEmpty && unit.loadedUnits.isEmpty) {
+      unit.agent.toTravel = Some(unit.agent.origin)
+      Disengage.consider(unit)
+      return
+    }
     val passengersAccepted  = new ArrayBuffer[FriendlyUnitInfo]
     passengersPotential.toSeq.sortBy(_.framesToTravelTo(unit.pixelCenter))
     

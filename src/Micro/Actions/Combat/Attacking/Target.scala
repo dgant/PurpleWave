@@ -15,6 +15,7 @@ object Target extends Action {
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {
+    TargetUndetected.delegate(unit)
     TargetRelevant.delegate(unit)
     var canPillage = false
     canPillage ||= unit.agent.canPillage

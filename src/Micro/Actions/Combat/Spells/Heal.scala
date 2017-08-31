@@ -16,7 +16,10 @@ object Heal extends Action {
     val targets = validTargets(unit)
     val target  = ByOption.minBy(targets)(_.pixelDistanceFast(unit))
     
-    target.foreach(someTarget => With.commander.attackMove(unit, someTarget.pixelCenter))
+    
+    target.foreach(someTarget => {
+      With.commander.attackMove(unit, someTarget.pixelCenter)
+    })
   }
   
   private def validTargets(unit: FriendlyUnitInfo): Vector[UnitInfo] = {

@@ -13,7 +13,6 @@ object Move extends Action {
   
   override def perform(unit: FriendlyUnitInfo) {
     val pixelToMove = unit.agent.toTravel.get
-    unit.agent.movingTo = Some(pixelToMove)
     With.commander.move(unit, pixelToMove)
   }
 }

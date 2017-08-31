@@ -99,6 +99,9 @@ class Commander {
       PurpleMath.clamp(destination.x, margin, With.mapPixelWidth - margin),
       PurpleMath.clamp(destination.y, margin, With.mapPixelHeight - margin))
     
+    // Record the destination. This is mostly for diagnostic purposes (and identifying stuck units) so if the exact value changes later that's okay
+    unit.agent.movingTo = Some(destination)
+    
     // Mineral walk!
     if (unit.unitClass.isWorker && ! unit.carryingMinerals
       && ! With.mapFileName.toLowerCase.contains("barrier") //Hack -- Great Barrier Reef is ruinous for automatic mineral walking
@@ -176,6 +179,7 @@ class Commander {
   
   def useTechOnPixel(unit: FriendlyUnitInfo, tech: Tech, target: Pixel) {
     if (unready(unit)) return
+    unit.agent.movingTo = Some(target)
     unit.baseUnit.useTech(tech.baseType, target.bwapi)
     sleepAttack(unit)
   }

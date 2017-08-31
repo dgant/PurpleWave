@@ -55,6 +55,9 @@ abstract class UnitInfo(baseUnit: bwapi.Unit) extends UnitProxy(baseUnit) {
 
   private val history = new mutable.Queue[UnitState]
   def updateHistory() {
+    // Save JNI overhead by not tracking history of Spider Mines and Interceptors
+    if ( ! unitClass.orderable) return
+    
     lastTarget = target.orElse(lastTarget)
     history.lastOption.foreach(lastState => {
       if (lastState.unitClass != unitClass) {

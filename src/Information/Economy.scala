@@ -2,7 +2,6 @@ package Information
 
 import Information.Geography.Types.Base
 import Lifecycle.With
-import Micro.Actions.Basic.Gather
 import Performance.Caching.CacheFrame
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -44,17 +43,14 @@ class Economy {
   private val ourActiveDrillersCache  = new CacheFrame(() => With.geography.ourBases.flatten(ourActiveDrillers))
   
   def ourActiveGatherers(base: Base): Traversable[FriendlyUnitInfo] = {
-    With.units
-      .inRectangle(base.harvestingArea)
-      .flatten(_.friendly)
-      .filter(unit => unit.unitClass.isWorker && unit.agent.lastAction.contains(Gather))
+    base.units.toSeq.flatMap(_.friendly).filter(unit => unit.agent.toGather.exists(_.base == base) && base.harvestingArea.contains(unit.tileIncludingCenter))
   }
   
-  def ourActiveMiners(base:Base):Traversable[FriendlyUnitInfo] = {
+  def ourActiveMiners(base:Base): Traversable[FriendlyUnitInfo] = {
     ourActiveGatherers(base).filter(_.gatheringMinerals).take(base.minerals.size * 2)
   }
   
-  def ourActiveDrillers(base:Base):Traversable[FriendlyUnitInfo] = {
+  def ourActiveDrillers(base:Base): Traversable[FriendlyUnitInfo] = {
     ourActiveGatherers(base).filter(_.gatheringGas).take(base.gas.count(_.isOurs) * 3)
   }
 }

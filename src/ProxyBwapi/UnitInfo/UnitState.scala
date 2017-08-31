@@ -17,7 +17,7 @@ class UnitState(unit: UnitInfo) {
   val cooldown              : Int               = unit.cooldownLeft
   val unitClass             : UnitClass         = unit.unitClass
   val attackTarget          : Option[UnitInfo]  = unit.target.filter(_.isEnemyOf(unit))
-  var tryingToMove          : Boolean           = unit.targetPixel.exists(_.pixelDistanceFast(unit.pixelCenter) > 32.0)
+  var tryingToMove          : Boolean           = unit.friendly.flatMap(_.agent.movingTo).exists(_.pixelDistanceFast(pixelCenter) > 32)
   
   def tryingToAttack: Boolean = attackTarget.isDefined
   def age: Int = With.frame - frame

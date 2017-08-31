@@ -116,14 +116,15 @@ class Agent(val unit: FriendlyUnitInfo) {
   
   private def resetState() {
     forces.clear()
-    explosions.clear
-    desireTeam         = 1.0
-    desireIndividual   = 1.0
-    targetingProfile   = TargetingProfiles.default
-    pathsAll           = Seq.empty
-    pathsTruncated     = Seq.empty
-    pathsAcceptable    = Seq.empty
-    pathAccepted       = Seq.empty
+    explosions.clear()
+    desireTeam          = 1.0
+    desireIndividual    = 1.0
+    movingTo            = None
+    targetingProfile    = TargetingProfiles.default
+    pathsAll            = Seq.empty
+    pathsTruncated      = Seq.empty
+    pathsAcceptable     = Seq.empty
+    pathAccepted        = Seq.empty
   }
   
   private def followIntent() {

@@ -2,7 +2,6 @@ package Micro.Decisions
 
 import Lifecycle.With
 import Mathematics.Physics.{Force, ForceMath}
-import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
 import Micro.Agency.Explosion
 import ProxyBwapi.Races.Protoss
@@ -93,6 +92,10 @@ object Potential {
   //////////////
 
   def mobilityAttraction(unit: FriendlyUnitInfo): Force = {
+    
+    // When we're in tight spaces (like against a mineral line) this isn't going to help us.
+    if (unit.tileIncludingCenter.adjacent8.filter(_.valid).forall(unit.mobilityGrid.get(_) <= 1)) return new Force
+    
     val mobilityNeed  = 3.0 + ByOption.max(unit.matchups.threatsViolent.map(threat => 2 * threat.pixelRangeAgainstFromCenter(unit) / 32)).getOrElse(0.0)
     val mobilityNow   = unit.mobility
     val mobilityCap   = if (unit.flying) 12 else unit.zone.maxMobility / 2.0

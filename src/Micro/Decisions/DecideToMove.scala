@@ -28,6 +28,7 @@ case class DecideToMove(
   }
   
   override def execute() {
+    agent.agent.movingTo = Some(destination)
     With.commander.move(
       agent,
       if (isCardinalMove)

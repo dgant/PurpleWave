@@ -5,7 +5,6 @@ import Lifecycle.With
 import Mathematics.Formations.Formation
 import Mathematics.Points.{Pixel, SpecificPoints}
 import Micro.Agency.Intention
-import Micro.Squads.Squad
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.ByOption
 import Utilities.EnrichPixel.EnrichedPixelCollection
@@ -31,23 +30,23 @@ class SquadProtectZone(zone: Zone) extends SquadGoal {
     
     if (canHuntEnemies) {
       lastAction = "Hunt intruders in "
-      huntEnemies(squad)
+      huntEnemies()
     }
     else if (canDefendWall) {
       lastAction = "Defend static defense in "
-      defendWall(squad, walls)
+      defendWall(walls)
     }
     else if (canDefendChoke) {
       lastAction = "Defend choke of "
-      defendChoke(squad, choke.get)
+      defendChoke(choke.get)
     }
     else if (canDefendHeart) {
       lastAction = "Defend heart of "
-      defendHeart(squad, base.map(_.heart.pixelCenter).getOrElse(zone.centroid.pixelCenter))
+      defendHeart(base.map(_.heart.pixelCenter).getOrElse(zone.centroid.pixelCenter))
     }
   }
   
-  def huntEnemies(squad: Squad) {
+  def huntEnemies() {
     val center = zone.centroid.pixelCenter
     val target = squad.enemies.minBy(_.pixelDistanceFast(center)).pixelCenter
     squad.recruits.foreach(_.agent.intend(squad.client, new Intention {
@@ -56,45 +55,47 @@ class SquadProtectZone(zone: Zone) extends SquadGoal {
     }))
   }
   
-  def defendWall(squad: Squad, walls: Seq[UnitInfo]) {
-    val centroidSources = Seq(squad.enemies.toSeq.map(_.pixelCenter), zone.exit.map(_.centerPixel).toSeq, Seq(SpecificPoints.middle))
-    val enemyCentroid   = centroidSources.find(_.nonEmpty).head.centroid
-    val wall            = walls.minBy(_.pixelDistanceFast(enemyCentroid))
-    val siegers         = squad.enemies.filter(e => walls.exists(e.canAttack))
-    val maxSiegerRange  = ByOption.max(siegers.map(_.pixelRangeGround)).getOrElse(0.0)
-    val maxWallRange    = walls.map(wall => ByOption.max(siegers.filter(wall.canAttack).map(sieger => wall.pixelRangeAgainstFromCenter(sieger))).getOrElse(0.0)).max
-    
-    squad.recruits.foreach(recruit => {
-      val range           = recruit.effectiveRangePixels
-      val margin          = wall.unitClass.radialHypotenuse + Math.max(32.0, maxWallRange - maxSiegerRange)
-      val formationPoint  = wall.pixelCenter.project(enemyCentroid, margin)
-      recruit.agent.intend(squad.client, new Intention {
-        toTravel = Some(formationPoint)
-        toReturn = Some(formationPoint)
-      })
-    })
-  }
-  
-  def defendHeart(squad: Squad, center: Pixel) {
+  def defendHeart(center: Pixel) {
     squad.recruits.foreach(_.agent.intend(squad.client, new Intention {
       toTravel = Some(center)
       toReturn = if (zone.bases.exists(_.owner.isUs)) Some(center) else None
     }))
   }
   
-  def defendChoke(squad: Squad, choke: Edge) {
+  val wallConcaveWidthRadians : Double = Math.PI * 7.0 / 8.0
+  val wallConcaveWidthPixels  : Double = 32.0 * 6.0
+  
+  def defendWall(walls: Seq[UnitInfo]) {
+    val centroidSources = Seq(squad.enemies.toSeq.map(_.pixelCenter), zone.exit.map(_.centerPixel).toSeq, Seq(SpecificPoints.middle))
+    val enemyCentroid   = centroidSources.find(_.nonEmpty).head.centroid
+    val wall            = walls.minBy(_.pixelDistanceFast(enemyCentroid))
+    val concaveOrigin   = wall.pixelCenter.project(enemyCentroid, 48.0)
+    val concaveAxis     = concaveOrigin.radiansTo(enemyCentroid)
+    val concaveStart    = concaveOrigin.radiateRadians(concaveAxis + wallConcaveWidthRadians, wallConcaveWidthPixels)
+    val concaveEnd      = concaveOrigin.radiateRadians(concaveAxis - wallConcaveWidthRadians, wallConcaveWidthPixels)
+    concave(concaveStart, concaveEnd, concaveOrigin)
+  }
+  
+  def defendChoke(choke: Edge) {
+    val concaveStart  = choke.sidePixels.head
+    val concaveEnd    = choke.sidePixels.last
+    val concaveOrigin = choke.zones.toList
+      .sortBy(_.centroid.tileDistanceFast(With.geography.home))
+      .sortBy( ! _.owner.isUs)
+      .head
+      .centroid
+      .pixelCenter
+    
+    concave(concaveStart, concaveEnd, concaveOrigin)
+  }
+  
+  def concave(start: Pixel, end: Pixel, origin: Pixel) {
     val formation =
       Formation.concave(
         squad.recruits,
-        choke.sidePixels.head,
-        choke.sidePixels.last,
-        choke.zones
-          .toList
-          .sortBy(_.centroid.tileDistanceFast(With.geography.home))
-          .sortBy( ! _.owner.isUs)
-          .head
-          .centroid
-          .pixelCenter)
+        start,
+        end,
+        origin)
   
     squad.recruits.foreach(
       defender => {

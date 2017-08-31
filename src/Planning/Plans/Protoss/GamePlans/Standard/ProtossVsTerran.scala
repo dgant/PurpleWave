@@ -302,7 +302,6 @@ class ProtossVsTerran extends Parallel {
     new CompleteUpgrades,
     
     // Tactics
-    new Aggression(1.1),
     new ScoutAt(16),
     new ScoutExpansionsAt(100),
     new ClearBurrowedBlockers,

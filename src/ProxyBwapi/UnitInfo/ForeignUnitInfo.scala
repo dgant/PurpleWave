@@ -115,7 +115,7 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit) extends UnitInfo (originalBa
   
   def scarabCount       : Int = if (is(Protoss.Reaver)) 3 else 0 // BWAPI probably doens't give this for enemy units. Here's an approximation.
   def interceptorCount  : Int = interceptorCountCache.get
-  private val interceptorCountCache = new CacheFrame(() => baseUnit.getInterceptorCount)
+  private val interceptorCountCache = new CacheFrame(() => if (is(Protoss.Carrier)) baseUnit.getInterceptorCount else 0)
   
   private def updateCombat() {
     _attackStarting           = baseUnit.isStartingAttack

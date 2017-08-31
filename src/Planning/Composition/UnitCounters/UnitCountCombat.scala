@@ -20,7 +20,7 @@ class UnitCountCombat(
   override def continue(units: Iterable[FriendlyUnitInfo]): Boolean = {
     units.foreach(builder.addUnit)
     lastEstimation = EstimateAvatar.calculate(builder)
-    ! isSufficient
+    ! profitable
   }
   
   override def accept(units: Iterable[FriendlyUnitInfo]): Boolean = {
@@ -33,12 +33,12 @@ class UnitCountCombat(
   // Guts //
   //////////
   
-  private def isSufficient: Boolean = {
-    weKillThemAndSurvive || weOverkill
+  private def profitable: Boolean = {
+    weKillThemAndSurvive && weOverkill
   }
   
   private def isAcceptable: Boolean = {
-    alwaysAccept || isSufficient
+    alwaysAccept || profitable
   }
   
   private def weKillThemAndSurvive: Boolean = {

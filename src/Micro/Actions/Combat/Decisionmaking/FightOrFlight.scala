@@ -61,8 +61,8 @@ object FightOrFlight extends Action {
     val bonusDesire   = With.blackboard.aggressionRatio
     val attackGain    = attackReport.get.valueDealt
     val attackLoss    = attackReport.get.valueReceived
-    val retreatGain   = attackReport.get.valueDealt
-    val retreatLoss   = attackReport.get.valueReceived
+    val retreatGain   = retreatReport.get.valueDealt
+    val retreatLoss   = retreatReport.get.valueReceived
     val output        = bonusDesire * attackGain + retreatLoss - attackLoss - retreatGain
     output
   }

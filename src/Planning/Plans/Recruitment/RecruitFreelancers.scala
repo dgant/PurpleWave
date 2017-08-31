@@ -53,9 +53,18 @@ class RecruitFreelancers extends Plan {
       if (squad.needsBuilders)  recruitBest(squad, _.builds)
     })
     
-    // Join the nearest squad.
+    // Join the highest-priority squad which needs the help
     while (candidates.nonEmpty) {
       val candidate = candidates.head
+      squads.foreach(squad => {
+        if (squad.needsAirToAir)      recruitBest(squad, _.airToAir)
+        if (squad.needsAirToGround)   recruitBest(squad, _.airToGround)
+        if (squad.needsAntiAir)       recruitBest(squad, _.antiAir)
+        if (squad.needsAntiGround)    recruitBest(squad, _.antiGround)
+        if (squad.needsSplashAir)     recruitBest(squad, _.splashesAir)
+        if (squad.needsSplashGround)  recruitBest(squad, _.splashesGround)
+        if (squad.needsSiege)         recruitBest(squad, _.sieges)
+      })
       assign(candidate, squads.minBy(distance(candidate, _)))
     }
   }

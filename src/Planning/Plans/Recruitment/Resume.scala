@@ -6,8 +6,10 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 case class Resume(unit: FriendlyUnitInfo) {
   
-  lazy val antiAir        : Boolean = unit.unitClass.attacksAir
+  lazy val antiAir        : Boolean = unit.unitClass.attacksGround
   lazy val antiGround     : Boolean = unit.unitClass.attacksGround
+  lazy val airToAir       : Boolean = unit.flying && antiAir
+  lazy val airToGround    : Boolean = unit.flying && antiGround
   lazy val detects        : Boolean = unit.unitClass.isDetector
   lazy val heals          : Boolean = unit.is(Terran.Medic)
   lazy val repairs        : Boolean = unit.is(Terran.SCV)

@@ -174,7 +174,7 @@ class ProtossVsZerg extends Parallel {
     new Aggression(0.75),
     
     new If(
-      new HaveTech(Protoss.PsionicStorm),
+      new TechComplete(Protoss.PsionicStorm),
       new MeldArchons(40),
       new MeldArchons),
     

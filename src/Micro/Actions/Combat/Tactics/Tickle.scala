@@ -28,7 +28,9 @@ object Tickle extends Action {
   
     val zone                  = unit.agent.toTravel.get.zone
     val exit                  = zone.edges.map(_.centerPixel).sortBy(_.groundPixels(With.geography.home)).headOption.getOrElse(With.geography.home.pixelCenter)
+    val hurtThreshold         = 30
     val dyingThreshold        = 11
+    val hurt                  = unit.totalHealth < hurtThreshold
     val dying                 = unit.totalHealth < dyingThreshold
     val enemies               = unit.matchups.threats
     val enemyFighters         = unit.matchups.threats.filter(_.isBeingViolent)
@@ -67,8 +69,13 @@ object Tickle extends Action {
       attack = false
     }
     
+    // Don't take losing fights
+    if (enemiesAttackingUs.map(_.totalHealth).sum > unit.totalHealth) {
+      attack = false
+    }
+    
     // If violent enemies completely overpower us, let's back off
-    if (ourStrength < enemyFighterStrength && dying) {
+    if (ourStrength < enemyFighterStrength && hurt) {
       attack = false
     }
   
@@ -79,6 +86,11 @@ object Tickle extends Action {
       && enemies.size > 4               // Verus 4-Pool need to start dealing damage immediately
       ) {
       attack = false
+    }
+    
+    // Stay close to the fight
+    if (unit.matchups.framesOfSafetyDiffused > 36) {
+      attack = true
     }
   
     // If we completely overpower the enemy, let's go kill 'em.

@@ -4,7 +4,7 @@ import Lifecycle.With
 import Planning.Plan
 import ProxyBwapi.Techs.Tech
 
-class HaveTech(tech:Tech) extends Plan {
+class TechComplete(tech: Tech) extends Plan {
   
   description.set("Require a tech")
   

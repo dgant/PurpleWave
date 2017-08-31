@@ -45,9 +45,12 @@ class PvPLateGameStandard extends Parallel {
         new UpgradeComplete(Protoss.ShuttleSpeed, 1, Protoss.Shuttle.buildFrames)),
       new Build(RequestAtLeast(1, Protoss.Shuttle)),
       new If(
-        new UnitsAtMost(3, Protoss.Reaver),
+        new And(
+          new Not(new TechComplete(Protoss.PsionicStorm)),
+          new UnitsAtMost(3, Protoss.Reaver)
+        ),
         new TrainContinuously(Protoss.Reaver, 4),
-        new TrainContinuously(Protoss.Observer, 4))),
+        new TrainContinuously(Protoss.Observer, 3))),
   
     new If(
       new And(
@@ -66,23 +69,23 @@ class PvPLateGameStandard extends Parallel {
         RequestAtLeast(1, Protoss.RoboticsFacility),
         RequestUpgrade(Protoss.DragoonRange),
         RequestAtLeast(1, Protoss.Observatory),
-        RequestAtLeast(3, Protoss.Gateway),
-        RequestAtLeast(1, Protoss.RoboticsSupportBay))),
+        RequestAtLeast(3, Protoss.Gateway))),
+    new UpgradeContinuously(Protoss.GroundDamage),
+    new OnMiningBases(2,
+      new If(
+        new UnitsAtLeast(1, Protoss.CitadelOfAdun),
+        new Build(RequestUpgrade(Protoss.ZealotSpeed)))),
     new OnMiningBases(2,
       new Build(
         RequestAtLeast(5, Protoss.Gateway),
         RequestAtLeast(1, Protoss.Forge),
         RequestAtLeast(1, Protoss.CitadelOfAdun),
-        RequestUpgrade(Protoss.GroundDamage),
-        RequestUpgrade(Protoss.ZealotSpeed),
         RequestAtLeast(1, Protoss.TemplarArchives),
-        RequestAtLeast(6, Protoss.Gateway))),
-    new UpgradeContinuously(Protoss.GroundDamage),
+        RequestAtLeast(8, Protoss.Gateway))),
     new RequireMiningBases(3),
     new BuildCannonsAtExpansions(3),
-    new OnMiningBases(3, new Build(
-        RequestAtLeast(2, Protoss.RoboticsFacility),
-        RequestAtLeast(12, Protoss.Gateway))),
+    new OnMiningBases(1, new Build(RequestAtLeast(1, Protoss.RoboticsSupportBay))),
+    new OnMiningBases(3, new Build(RequestAtLeast(12, Protoss.Gateway))),
     new RequireMiningBases(4),
     new OnMiningBases(4, new Build(RequestAtLeast(15, Protoss.Gateway))),
     new UpgradeContinuously(Protoss.GroundArmor),

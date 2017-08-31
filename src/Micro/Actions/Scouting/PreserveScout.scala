@@ -7,7 +7,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 object PreserveScout extends Action {
   
   override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.matchups.threatsViolent.nonEmpty
+    unit.matchups.framesOfSafetyDiffused < 24
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {

@@ -1,8 +1,8 @@
 package Micro.Actions.Commands
 
 import Lifecycle.With
+import Mathematics.Physics.ForceMath
 import Micro.Actions.Action
-import Micro.Decisions.Potential
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Gravitate extends Action {
@@ -15,7 +15,11 @@ object Gravitate extends Action {
   override def perform(unit: FriendlyUnitInfo) {
     val forces          = unit.agent.forces.values
     val origin          = unit.pixelCenter
-    val destination     = Potential.applyForcesForMoveOrder(forces, origin)
+    val forceTotal      = ForceMath.sum(forces)
+    val forceNormal     = forceTotal.normalize(85.0)
+    val forcePoint      = forceNormal.toPoint
+    val destination     = origin.add(forcePoint)
+    
     unit.agent.movingTo = Some(destination)
     With.commander.move(unit, destination)
   }

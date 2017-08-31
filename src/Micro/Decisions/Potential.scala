@@ -11,6 +11,33 @@ import Utilities.ByOption
 
 object Potential {
   
+  //////////////////////////////////////////////
+  //                                          //
+  // Generic. Build your own potential field! //
+  //                                          //
+  //////////////////////////////////////////////
+  
+  def unitAttraction(unit: FriendlyUnitInfo, other: UnitInfo, magnifier: (UnitInfo, UnitInfo) => Double): Force = {
+    unitAttraction(unit, other, magnifier(unit, other))
+  }
+  
+  def unitAttraction(unit: FriendlyUnitInfo, other: UnitInfo, magnitude: Double): Force = {
+    val pixelFrom = unit.pixelCenter
+    val pixelTo   = other.pixelCenter
+    val output    = ForceMath.fromPixels(pixelFrom, pixelTo, magnitude)
+    output
+  }
+  
+  /////////////////////
+  //                 //
+  // Specific fields //
+  //                 //
+  /////////////////////
+  
+  /////////////
+  // Threats //
+  /////////////
+  
   def threatsRepulsion(unit: FriendlyUnitInfo): Force = {
     val threats     = unit.matchups.threats.filterNot(_.is(Protoss.Interceptor))
     val forces      = threats.map(threatRepulsion(unit, _))
@@ -18,13 +45,17 @@ object Potential {
     output
   }
   
-  def threatRepulsion(unit: FriendlyUnitInfo, threat: UnitInfo): Force = {
+  protected def threatRepulsion(unit: FriendlyUnitInfo, threat: UnitInfo): Force = {
     val magnitudeDamage   = threat.dpfOnNextHitAgainst(unit)
-    val magnitudeDistance = Math.max(1.0, 12.0 + threat.framesToGetInRange(unit)) //This may fail vs. static defense -- we may want a bit more force
+    val magnitudeDistance = Math.max(1.0, 12.0 + threat.framesToGetInRange(unit))
     val magnitudeFinal    = magnitudeDamage / magnitudeDistance
     val output            = unitAttraction(unit, threat, -magnitudeFinal)
     output
   }
+  
+  ////////////////
+  // Explosions //
+  ////////////////
   
   def explosionsRepulsion(unit: FriendlyUnitInfo): Force = {
     val explosions  = unit.agent.explosions
@@ -41,6 +72,10 @@ object Potential {
     output
   }
   
+  ///////////////
+  // Detection //
+  ///////////////
+  
   def detectionRepulsion(unit: FriendlyUnitInfo): Force = {
     val detectors   = unit.matchups.enemies.filter(e => e.aliveAndComplete && e.unitClass.isDetector)
     val forces      = detectors.map(detectorRepulsion(unit, _))
@@ -48,22 +83,15 @@ object Potential {
     output
   }
   
-  def detectorRepulsion(unit: FriendlyUnitInfo, detector: UnitInfo): Force = {
+  protected def detectorRepulsion(unit: FriendlyUnitInfo, detector: UnitInfo): Force = {
     val output = unitAttraction(unit, detector, -1.0 / detector.pixelDistanceFast(unit))
     output
   }
   
-  def unitAttraction(unit: FriendlyUnitInfo, other: UnitInfo, magnifier: (UnitInfo, UnitInfo) => Double): Force = {
-    unitAttraction(unit, other, magnifier(unit, other))
-  }
-  
-  def unitAttraction(unit: FriendlyUnitInfo, other: UnitInfo, magnitude: Double): Force = {
-    val pixelFrom = unit.pixelCenter
-    val pixelTo   = other.pixelCenter
-    val output    = ForceMath.fromPixels(pixelFrom, pixelTo, magnitude)
-    output
-  }
-  
+  //////////////
+  // Mobility //
+  //////////////
+
   def mobilityAttraction(unit: FriendlyUnitInfo): Force = {
     val mobilityNeed  = 3.0 + ByOption.max(unit.matchups.threatsViolent.map(threat => 2 * threat.pixelRangeAgainstFromCenter(unit) / 32)).getOrElse(0.0)
     val mobilityNow   = unit.mobility
@@ -74,6 +102,10 @@ object Potential {
     val output        = mobilityForce.normalize(magnitude)
     output
   }
+  
+  ////////////////
+  // Collisions //
+  ////////////////
   
   def collisionRepulsion(unit: FriendlyUnitInfo): Force = {
     if (unit.flying) return new Force
@@ -90,41 +122,36 @@ object Potential {
     output
   }
   
+  /////////////
+  // Exiting //
+  /////////////
+  
   def exitAttraction(unit: FriendlyUnitInfo): Force = {
     if (unit.flying) exitAttractionAir(unit) else exitAttractionGround(unit)
   }
   
-  def exitAttractionAir(unit: FriendlyUnitInfo): Force = {
+  protected def exitAttractionAir(unit: FriendlyUnitInfo): Force = {
     ForceMath.fromPixels(unit.pixelCenter, unit.agent.origin).normalize
   }
   
-  def exitAttractionGround(unit: FriendlyUnitInfo): Force = {
-    val destination = unit.agent.origin.zone
-    
-    val path = With.paths.zonePath(
-      unit.zone,
-      destination)
+  protected def exitAttractionGround(unit: FriendlyUnitInfo): Force = {
+    val zoneNow       = unit.zone
+    val zoneOrigin    = unit.agent.origin.zone
+    val path          = With.paths.zonePath(zoneNow, zoneOrigin)
     
     if (path.isEmpty || path.get.steps.isEmpty) return new Force
     
-    ForceMath.fromPixels(unit.pixelCenter, path.get.steps.head.edge.centerPixel)
+    val forceExiting  = ForceMath.fromPixels(unit.pixelCenter, path.get.steps.head.edge.centerPixel)
+    val forceNormal   = forceExiting.normalize
+    forceNormal
   }
+  
+  ///////////////
+  // Smuggling //
+  ///////////////
   
   def smuggleRepulsion(unit: FriendlyUnitInfo): Force = {
     if (unit.tileIncludingCenter.tileDistanceFromEdge < 5) return new Force
-    -mobilityAttraction(unit)
-  }
-  
-  def cloakAttraction(unit: FriendlyUnitInfo): Force = {
-    if (unit.tileIncludingCenter.tileDistanceFromEdge < 5) return new Force
-    -mobilityAttraction(unit)
-  }
-  
-  def applyForcesForMoveOrder(forces: Traversable[Force], origin: Pixel): Pixel = {
-    val forceTotal  = ForceMath.sum(forces)
-    val forceNormal = forceTotal.normalize(85.0)
-    val forcePoint  = forceNormal.toPoint
-    val output      = origin.add(forcePoint)
-    output
+    -unit.mobilityForce.normalize
   }
 }

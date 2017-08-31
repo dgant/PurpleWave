@@ -96,7 +96,7 @@ object ShowUnitsFriendly extends View {
         agent.forces.foreach(pair => {
           val force           = pair._2
           val forceNormalized = force.normalize(length * force.lengthSlow / maxForce)
-          DrawMap.line(
+          DrawMap.arrow(
             agent.unit.pixelCenter,
             agent.unit.pixelCenter.add(
               forceNormalized.x.toInt,
@@ -104,7 +104,7 @@ object ShowUnitsFriendly extends View {
             pair._1)
         })
         if (agent.movingTo.isDefined) {
-          DrawMap.line(
+          DrawMap.arrow(
             agent.unit.pixelCenter,
             agent.movingTo.get,
             ForceColors.sum)

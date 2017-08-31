@@ -33,8 +33,8 @@ object DrawMap {
     val angleDiff = Math.PI / 8
     triangle(
       end,
-      end.radiateRadians(angleBack + angleDiff, 12),
-      end.radiateRadians(angleBack - angleDiff, 12),
+      end.radiateRadians(angleBack + angleDiff, 9),
+      end.radiateRadians(angleBack - angleDiff, 9),
       color,
       solid = true)
   }

@@ -17,7 +17,10 @@ class SquadDrop(pixel: Pixel) extends SquadGoal {
     }))
     
     if (transports.nonEmpty) {
-      passengers.foreach(passenger => passenger.agent.lastIntent.toTravel = Some(transports.minBy(_.pixelDistanceFast(passenger)).pixelCenter))
+      passengers.foreach(passenger => {
+        passenger.agent.lastIntent.toTravel = Some(transports.minBy(_.pixelDistanceFast(passenger)).pixelCenter)
+        passenger.agent.lastIntent.canBerzerk = passenger.zone == pixel.zone
+      })
     }
   }
   

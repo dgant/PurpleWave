@@ -63,6 +63,7 @@ class Agent(val unit: FriendlyUnitInfo) {
   var canMeld       : Boolean                       = false
   var canScout      : Boolean                       = false
   var canPillage    : Boolean                       = false
+  var canBerzerk    : Boolean                       = false
   
   var targetingProfile: TargetingProfile = TargetingProfiles.default
   
@@ -127,26 +128,27 @@ class Agent(val unit: FriendlyUnitInfo) {
   
   private def followIntent() {
     val intent    = lastIntent
-    toReturn     = intent.toReturn
-    toTravel     = intent.toTravel
-    toAttack     = intent.toAttack
-    toScan       = intent.toScan
-    toGather     = intent.toGather
-    toAddon      = intent.toAddon
-    toBuild      = intent.toBuild
-    toBuildTile  = intent.toBuildTile
-    toTrain      = intent.toTrain
-    toTech       = intent.toTech
-    toFinish     = intent.toFinish
-    toUpgrade    = intent.toUpgrade
-    toForm       = intent.toForm
-    toBoard      = None
-    canFight     = intent.canAttack
-    canFlee      = intent.canFlee
-    canCower     = intent.canCower
-    canMeld      = intent.canMeld
-    canScout     = intent.canScout
-    canPillage   = intent.canPillage
+    toReturn      = intent.toReturn
+    toTravel      = intent.toTravel
+    toAttack      = intent.toAttack
+    toScan        = intent.toScan
+    toGather      = intent.toGather
+    toAddon       = intent.toAddon
+    toBuild       = intent.toBuild
+    toBuildTile   = intent.toBuildTile
+    toTrain       = intent.toTrain
+    toTech        = intent.toTech
+    toFinish      = intent.toFinish
+    toUpgrade     = intent.toUpgrade
+    toForm        = intent.toForm
+    toBoard       = None
+    canFight      = intent.canAttack
+    canFlee       = intent.canFlee
+    canCower      = intent.canCower
+    canMeld       = intent.canMeld
+    canScout      = intent.canScout
+    canPillage    = intent.canPillage
+    canBerzerk    = intent.canBerzerk
   }
   
   private def cleanUp() {

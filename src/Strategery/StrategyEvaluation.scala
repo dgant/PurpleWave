@@ -28,7 +28,7 @@ case class StrategyEvaluation(strategy: Strategy) {
   val interestVsRace      : Double                    = optimisticWinrate(gamesVsRace,      samplesNeeded)
   val interestOnMap       : Double                    = optimisticWinrate(gamesOnMap,       samplesNeeded)
   val interestWithStarts  : Double                    = optimisticWinrate(gamesWithStarts,  samplesNeeded)
-  val interestTotal: Double = weigh(Vector(
+  val interestTotal       : Double = weigh(Vector(
     new WinrateFactor(interestVsEnemy,    gamesVsEnemy.size,    samplesNeeded, importanceVsEnemy),
     new WinrateFactor(interestVsRace,     gamesVsRace.size,     samplesNeeded, importanceVsRace),
     new WinrateFactor(interestOnMap,      gamesOnMap.size,      samplesNeeded, importanceOnMap),

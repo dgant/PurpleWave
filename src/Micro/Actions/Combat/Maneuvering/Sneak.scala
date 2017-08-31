@@ -10,10 +10,12 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 object Sneak extends Action {
   
   override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.cloaked && ( ! unit.effectivelyCloaked ||
-      unit.matchups.threats.nonEmpty &&
-      unit.matchups.enemyDetectors.exists(e =>
-        e.pixelDistanceFast(unit) < 32.0 * ( if(e.unitClass.canMove) 12.0 else 15.0))
+    unit.cloaked && (
+      ! unit.effectivelyCloaked ||
+      (
+        unit.matchups.threats.forall(_.unitClass.isWorker) &&
+        unit.matchups.enemyDetectors.exists(e => e.pixelDistanceFast(unit) < 32.0 * ( if(e.unitClass.canMove) 13.0 else 16.0))
+      )
     )
   }
   

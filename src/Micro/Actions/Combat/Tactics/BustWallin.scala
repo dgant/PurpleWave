@@ -22,14 +22,12 @@ object BustWallin extends Action {
   override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
     val walledInZones = With.geography.zones.filter(_.walledIn)
   
-    walledInZones.nonEmpty                            &&
-    With.enemies.exists(_.race == Race.Terran)        &&
-    unit.agent.canFight                              &&
-    unit.canMove                             &&
+    walledInZones.nonEmpty                      &&
+    With.enemies.exists(_.race == Race.Terran)  &&
+    unit.agent.canFight                         &&
+    unit.canMove                                &&
     walledInZones.flatMap(_.edges).exists(_.centerPixel.pixelDistanceFast(unit.pixelCenter) < 32.0 * 8.0) &&
-    unit.matchups.threats.forall(threat =>
-      unit.inRangeToAttackFast(threat)
-      || ! threat.is(Terran.SiegeTankSieged))
+    unit.matchups.threats.forall(threat => unit.inRangeToAttackFast(threat) || ! threat.is(Terran.SiegeTankSieged))
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {

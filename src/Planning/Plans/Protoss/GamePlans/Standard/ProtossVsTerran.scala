@@ -211,6 +211,7 @@ class ProtossVsTerran extends Parallel {
             RequestAtLeast(2, Protoss.Gateway),
             RequestAtLeast(1, Protoss.Observatory))
         )))),
+    
     new If(
       new EnemyBioAllIn,
       new Build(ProtossBuilds.TechReavers: _*)),
@@ -301,6 +302,7 @@ class ProtossVsTerran extends Parallel {
     new CompleteUpgrades,
     
     // Tactics
+    new Aggression(1.1),
     new ScoutAt(16),
     new ScoutExpansionsAt(100),
     new ClearBurrowedBlockers,
@@ -310,7 +312,6 @@ class ProtossVsTerran extends Parallel {
     new If(
       new And(
         new UnitsAtLeast(12, UnitMatchWarriors, complete = true),
-        new Not(new EnemyBio),
         new Or(
           new UnitsAtLeast(1, Protoss.Observer, complete = true),
           new Not(new EnemyHasShown(Terran.SpiderMine)))),

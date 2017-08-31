@@ -12,17 +12,24 @@ object FightOrFlight extends Action {
   }
   
   override def perform(unit: FriendlyUnitInfo) {
+
+    var decision: Option[Boolean] = None
+    def decide(condition: () => Boolean, shouldEngage: Boolean) {
+      if (decision.isEmpty && condition()) {
+        decision = Some(shouldEngage)
+      }
+    }
   
-    if (unit.effectivelyCloaked)            { unit.agent.shouldEngage = true;                                   return }
-    if (Yolo.active)                        { unit.agent.shouldEngage = true;                                   return }
-    if ( ! unit.agent.canFight)             { unit.agent.shouldEngage = false;                                  return }
-    if (unit.underStorm)                    { unit.agent.shouldEngage = false;                                  return }
-    if (unit.underDisruptionWeb)            { unit.agent.shouldEngage = false;                                  return }
-    if (unit.underDarkSwarm)                { unit.agent.shouldEngage = unit.unitClass.unaffectedByDarkSwarm;   return }
-    if (unit.flying
-      && unit.matchups.threats.forall(_.topSpeed < unit.topSpeed)
-      && unit.matchups.ifAt(24).threatsInRange.isEmpty) {
-      unit.agent.shouldEngage = true
+    decide(() => unit.agent.canBerzerk,     true)
+    decide(() => unit.effectivelyCloaked,   true)
+    decide(() => Yolo.active,               true)
+    decide(() =>  ! unit.agent.canFight,    false)
+    decide(() => unit.underStorm,           false)
+    decide(() => unit.underDisruptionWeb,   false)
+    decide(() => unit.underDarkSwarm,       unit.unitClass.unaffectedByDarkSwarm)
+    decide(() => unit.flying && unit.matchups.threats.forall(_.topSpeed < unit.topSpeed) && unit.matchups.framesOfSafetyDiffused > 24, true)
+    if (decision.isDefined) {
+      unit.agent.shouldEngage = decision.get
       return
     }
     

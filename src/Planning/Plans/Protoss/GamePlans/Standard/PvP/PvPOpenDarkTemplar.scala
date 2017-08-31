@@ -1,10 +1,11 @@
 package Planning.Plans.Protoss.GamePlans.Standard.PvP
 
+import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.BuildRequests.RequestAtLeast
 import Planning.Plan
 import Planning.Plans.Army.Attack
-import Planning.Plans.Compound.{And, If, Parallel, Trigger}
+import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.Mode
 import Planning.Plans.Information.Never
 import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
@@ -26,6 +27,7 @@ class PvPOpenDarkTemplar extends Mode {
   }
   
   children.set(Vector(
+    new Do(() => With.blackboard.gasBankSoftLimit = 450),
     new RequireBareMinimum,
     new BuildOrder(
       // http://wiki.teamliquid.net/starcraft/2_Gateway_Dark_Templar_(vs._Protoss)

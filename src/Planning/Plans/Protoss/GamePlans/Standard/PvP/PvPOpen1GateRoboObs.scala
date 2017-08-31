@@ -1,9 +1,10 @@
 package Planning.Plans.Protoss.GamePlans.Standard.PvP
 
+import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
 import Planning.Plan
-import Planning.Plans.Compound.{Or, Trigger}
+import Planning.Plans.Compound.{Do, Or, Trigger}
 import Planning.Plans.GamePlans.Mode
 import Planning.Plans.Information.Always
 import Planning.Plans.Information.Reactive.EnemyBasesAtLeast
@@ -29,6 +30,7 @@ class PvPOpen1GateRoboObs extends Mode {
   }
   
   children.set(Vector(
+    new Do(() => With.blackboard.gasBankSoftLimit = 450),
     new RequireBareMinimum,
     new BuildOrder(
       // http://wiki.teamliquid.net/starcraft/2_Gate_Reaver_(vs._Protoss)

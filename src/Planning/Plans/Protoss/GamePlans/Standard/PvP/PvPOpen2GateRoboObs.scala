@@ -1,11 +1,12 @@
 package Planning.Plans.Protoss.GamePlans.Standard.PvP
 
+import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
 import Planning.Plan
-import Planning.Plans.Compound.{If, Or, Parallel, Trigger}
+import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.Mode
-import Planning.Plans.Information.Always
+import Planning.Plans.Information.Never
 import Planning.Plans.Information.Reactive.EnemyBasesAtLeast
 import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.Build.ProposePlacement
@@ -18,7 +19,7 @@ import ProxyBwapi.Races.Protoss
 
 class PvPOpen2GateRoboObs extends Mode {
   
-  override val activationCriteria: Plan = new Always //Employing(PvPOpeningDarkTemplar)
+  override val activationCriteria: Plan = new Never
   
   override val completionCriteria: Plan = new Or(
     new EnemyBasesAtLeast(2),
@@ -29,8 +30,8 @@ class PvPOpen2GateRoboObs extends Mode {
   }
   
   children.set(Vector(
+    new Do(() => With.blackboard.gasBankSoftLimit = 450),
     new RequireBareMinimum,
-    
     new If(
       new EnemyUnitsAtLeast(1, Protoss.DarkTemplar),
       new Parallel(

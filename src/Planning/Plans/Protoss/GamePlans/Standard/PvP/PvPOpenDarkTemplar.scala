@@ -29,6 +29,7 @@ class PvPOpenDarkTemplar extends Mode {
     new RequireBareMinimum,
     new BuildOrder(
       // http://wiki.teamliquid.net/starcraft/2_Gateway_Dark_Templar_(vs._Protoss)
+      // We get gas/core faster because of mineral locking + later scout
       RequestAtLeast(8,   Protoss.Probe),
       RequestAtLeast(1,   Protoss.Pylon),             // 8
       RequestAtLeast(10,  Protoss.Probe),

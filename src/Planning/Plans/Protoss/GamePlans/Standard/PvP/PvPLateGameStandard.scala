@@ -1,6 +1,7 @@
 package Planning.Plans.Protoss.GamePlans.Standard.PvP
 
 import Macro.BuildRequests.{RequestAnother, RequestAtLeast, RequestTech, RequestUpgrade}
+import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plans.Army._
 import Planning.Plans.Compound._
 import Planning.Plans.Macro.Automatic._
@@ -23,19 +24,20 @@ class PvPLateGameStandard extends Parallel {
     new TrainWorkersContinuously(oversaturate = true),
     new BuildGasPumps,
   
+    new TrainMatchingRatio(Protoss.Observer, 1, 2, Seq(MatchingRatio(Protoss.DarkTemplar, 2.0))),
+    
     new If(new UnitsAtLeast(2, Protoss.Dragoon),      new Build(RequestUpgrade(Protoss.DragoonRange))),
     new If(new UnitsAtLeast(1, Protoss.HighTemplar),  new Build(RequestTech(Protoss.PsionicStorm))),
     new If(new UnitsAtLeast(2, Protoss.Reaver),       new Build(RequestUpgrade(Protoss.ScarabDamage))),
     new If(new UnitsAtLeast(3, Protoss.Reaver),       new Build(RequestUpgrade(Protoss.ShuttleSpeed))),
-    
-    new TrainMatchingRatio(Protoss.Observer, 1, 2, Seq(MatchingRatio(Protoss.DarkTemplar, 2.0))),
+    new If(new UnitsAtLeast(20, UnitMatchWarriors),   new RequireMiningBases(3)),
+    new If(new UnitsAtLeast(25, UnitMatchWarriors),   new RequireMiningBases(4)),
     
     new If(
       new And(
         new EnemyUnitsAtMost(0, Protoss.Observer),
         new EnemyUnitsAtMost(0, Protoss.PhotonCannon)),
-      new TrainContinuously(Protoss.DarkTemplar, 3),
-      new TrainContinuously(Protoss.DarkTemplar, 1)),
+      new TrainContinuously(Protoss.DarkTemplar, 3)),
   
     new If(
       new And(
@@ -65,7 +67,6 @@ class PvPLateGameStandard extends Parallel {
         RequestAtLeast(1, Protoss.Observatory),
         RequestAtLeast(3, Protoss.Gateway),
         RequestAtLeast(1, Protoss.RoboticsSupportBay))),
-    new RequireMiningBases(2),
     new OnMiningBases(2,
       new Build(
         RequestAtLeast(5, Protoss.Gateway),

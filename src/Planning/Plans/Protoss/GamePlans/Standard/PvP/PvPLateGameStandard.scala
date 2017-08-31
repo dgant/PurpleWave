@@ -19,7 +19,6 @@ class PvPLateGameStandard extends Parallel {
     new MeldArchons(40),
     new ReactToDarkTemplarPossible,
     new ReactToDarkTemplarExisting,
-    new RequireMiningBases(2),
     new RequireSufficientSupply,
     new TrainWorkersContinuously(oversaturate = true),
     new BuildGasPumps,
@@ -30,6 +29,7 @@ class PvPLateGameStandard extends Parallel {
     new If(new UnitsAtLeast(1, Protoss.HighTemplar),  new Build(RequestTech(Protoss.PsionicStorm))),
     new If(new UnitsAtLeast(2, Protoss.Reaver),       new Build(RequestUpgrade(Protoss.ScarabDamage))),
     new If(new UnitsAtLeast(3, Protoss.Reaver),       new Build(RequestUpgrade(Protoss.ShuttleSpeed))),
+    new If(new UnitsAtLeast(12, UnitMatchWarriors),   new RequireMiningBases(2)),
     new If(new UnitsAtLeast(20, UnitMatchWarriors),   new RequireMiningBases(3)),
     new If(new UnitsAtLeast(25, UnitMatchWarriors),   new RequireMiningBases(4)),
     

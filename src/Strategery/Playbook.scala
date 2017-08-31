@@ -56,8 +56,7 @@ object StrategyGroups {
     TvEMassMarineAllIn,
     Proxy2Gate2StartLocations,
     Proxy2Gate3StartLocations,
-    ProxyDarkTemplar,
-    PvPEarly2Gate910
+    ProxyDarkTemplar
   )
 }
 
@@ -134,17 +133,9 @@ object Playbook extends PurpleWavePlaybook {
     PvTLateCarriers,
     PvTLateMassGateway,
     PvTLateArbiters,
-    PvPEarlyFFE,
-    PvPEarly1GateZZCore,
-    PvPEarly2Gate1012,
-    PvPEarly1GateCore,
-    PvPEarlyFE,
-    PvPEarly2Gate910,
-    PvPOpeningDarkTemplar,
-    PvPMidgameObserverReaver,
-    PvPMidgameFE,
-    PvPMidgameReaver,
-    PvPMidgame4GateGoon,
+    PvP2GateDT,
+    PvP1GateRoboObs,
+    PvP2GateRoboObs,
     PvZEarlyFFEConservative,
     PvZEarlyFFEEconomic,
     PvZEarlyFFEGatewayFirst,

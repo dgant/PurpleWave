@@ -6,7 +6,7 @@ import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
 import Planning.Plan
 import Planning.Plans.Compound.{Do, Or, Trigger}
 import Planning.Plans.GamePlans.Mode
-import Planning.Plans.Information.Always
+import Planning.Plans.Information.Employing
 import Planning.Plans.Information.Reactive.EnemyBasesAtLeast
 import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.Build.ProposePlacement
@@ -16,10 +16,11 @@ import Planning.Plans.Macro.Milestones.UnitsAtLeast
 import Planning.Plans.Protoss.Situational.Blueprinter
 import Planning.Plans.Scouting.Scout
 import ProxyBwapi.Races.Protoss
+import Strategery.Strategies.Protoss.PvP.PvP1GateRoboObs
 
 class PvPOpen1GateRoboObs extends Mode {
   
-  override val activationCriteria: Plan = new Always //Employing(PvPOpeningDarkTemplar)
+  override val activationCriteria: Plan = new Employing(PvP1GateRoboObs)
   
   override val completionCriteria: Plan = new Or(
     new EnemyBasesAtLeast(2),

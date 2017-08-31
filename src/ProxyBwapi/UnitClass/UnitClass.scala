@@ -358,7 +358,6 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
     (
         1 * mineralValue
       + 2 * gasValue
-      + buildUnitsBorrowed.map(_.subjectiveValue).sum / 8
     )
     * (if(isWorker) 2 else 1)
     * ((24 * 60 + buildFrames) / buildFrames)

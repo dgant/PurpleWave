@@ -1,13 +1,12 @@
 package Micro.Squads.Goals
 
 import Micro.Squads.Squad
-import Planning.Plan
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitClass.UnitClass
 
 trait SquadGoal {
   
-  var squad: Squad = new Squad(new Plan)
+  var squad: Squad = _
   
   def updateUnits()
   def updateNeeds() {

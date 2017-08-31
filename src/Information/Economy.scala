@@ -43,7 +43,7 @@ class Economy {
   private val ourActiveDrillersCache  = new CacheFrame(() => With.geography.ourBases.flatten(ourActiveDrillers))
   
   def ourActiveGatherers(base: Base): Traversable[FriendlyUnitInfo] = {
-    base.units.toSeq.flatMap(_.friendly).filter(unit => unit.agent.toGather.exists(_.base == base) && base.harvestingArea.contains(unit.tileIncludingCenter))
+    base.units.toSeq.flatMap(_.friendly).filter(unit => unit.agent.toGather.exists(_.base.contains(base)) && base.harvestingArea.contains(unit.tileIncludingCenter))
   }
   
   def ourActiveMiners(base:Base): Traversable[FriendlyUnitInfo] = {

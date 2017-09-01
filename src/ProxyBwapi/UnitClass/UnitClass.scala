@@ -361,9 +361,9 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
     )
     * (if(isWorker) 2 else 1)
     * (if(isZerg) 4 else 3)
-    * ((24 * 60 + buildFrames) / buildFrames)
     * (if (this == Protoss.Carrier)     2 else 1)
     / (if (this == Protoss.Interceptor) 4 else 1)
+    / (if (isTwoUnitsInOneEgg) 2 else 1)
     )
   
   //////////////////////

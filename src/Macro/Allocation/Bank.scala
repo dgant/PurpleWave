@@ -44,7 +44,7 @@ class Bank {
     // If the request is so far in advance that we don't need to save money for it, then don't.
     //
     val framesToEarnCost = Math.max(framesToEarnMinerals(request.minerals), framesToEarnGas(request.gas))
-    if (request.framesAhead > framesToEarnCost)
+    if (request.framesAhead > framesToEarnCost || framesToEarnCost > 24 * 60 * 90)
     {
       request.isSatisfied = false
       request.expectedFrames = expectedFrames(request)

@@ -6,7 +6,7 @@ import bwapi.Race
 object PvZEarly2Gate extends Strategy {
   
   override def choices: Iterable[Iterable[Strategy]] = Vector(
-    ProtossVsZergChoices.midgames
+    ProtossVsZergChoices.midgames.filterNot(followUp => followUp == PvZMidgame2Stargate)
   )
   
   override def ourRaces    : Iterable[Race] = Vector(Race.Protoss)

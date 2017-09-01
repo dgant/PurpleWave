@@ -29,7 +29,7 @@ object Tickle extends Action {
     val zone                  = unit.agent.toTravel.get.zone
     val exit                  = zone.edges.map(_.centerPixel).sortBy(_.groundPixels(With.geography.home)).headOption.getOrElse(With.geography.home.pixelCenter)
     val hurtThreshold         = 30
-    val dyingThreshold        = 11
+    val dyingThreshold        = 6
     val hurt                  = unit.totalHealth < hurtThreshold
     val dying                 = unit.totalHealth < dyingThreshold
     val enemies               = unit.matchups.threats
@@ -90,6 +90,11 @@ object Tickle extends Action {
     // Stay close to the fight
     if (unit.matchups.threats.forall(_.pixelDistanceFast(unit) > 64)) {
       attack = true
+    }
+    
+    // Heal up before going back in
+    if (dying) {
+      attack = false
     }
   
     // If we completely overpower the enemy, let's go kill 'em.

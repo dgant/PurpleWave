@@ -31,7 +31,7 @@ object PlacementProfiles {
     preferSurfaceArea           = 0.75,
     avoidDistanceFromBase       = 0.3,
     avoidDistanceFromEnemy      = 0.0,
-    avoidDistanceFromIdealRange = 0.1,
+    avoidDistanceFromIdealRange = 0.05,
     avoidSurfaceArea            = 0.0
   )
   

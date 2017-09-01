@@ -4,6 +4,6 @@ import Information.StrategyDetection.Generic.{FingerprintAnd, FingerprintComplet
 import ProxyBwapi.Races.Zerg
 
 class Fingerprint10Hatch9Pool extends FingerprintAnd(
-  new FingerprintCompleteBy(Zerg.Hatchery, GameTime(2, 55)),
-  new FingerprintCompleteBy(Zerg.SpawningPool, GameTime(2, 55))
+  new FingerprintCompleteBy(Zerg.Hatchery, GameTime(2, 50)),
+  new FingerprintCompleteBy(Zerg.SpawningPool, GameTime(2, 50))
 )

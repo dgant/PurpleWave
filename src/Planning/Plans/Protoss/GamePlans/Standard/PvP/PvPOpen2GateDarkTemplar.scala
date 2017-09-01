@@ -26,8 +26,8 @@ class PvPOpen2GateDarkTemplar extends Mode {
   
   private class DontGetOurGatewaysUnpoweredBySkynet extends ProposePlacement {
     override lazy val blueprints: Iterable[Blueprint] = Vector(
-      new Blueprint(this, building = Some(Protoss.Pylon),  placement = Some(PlacementProfiles.backPylon)),
-      new Blueprint(this, building = Some(Protoss.Pylon),  placement = Some(PlacementProfiles.backPylon))
+      new Blueprint(this, building = Some(Protoss.Pylon),   placement = Some(PlacementProfiles.backPylon)),
+      new Blueprint(this, building = Some(Protoss.Gateway), placement = Some(PlacementProfiles.backPylon))
     )
   }
   

@@ -16,18 +16,23 @@ import ProxyBwapi.Races.Protoss
 
 class PvPLateGameStandard extends Parallel {
   
-  class BuildLateGameTech extends Parallel(
+  class BuildTechPartOne extends Parallel(
     new Build(
       RequestAtLeast(1, Protoss.RoboticsFacility),
       RequestAtLeast(1, Protoss.Observatory),
       RequestAtLeast(1, Protoss.CitadelOfAdun),
       RequestUpgrade(Protoss.ZealotSpeed),
+      RequestAtLeast(8, Protoss.Gateway),
       RequestAtLeast(1, Protoss.Forge),
-      RequestUpgrade(Protoss.GroundDamage),
+      RequestUpgrade(Protoss.GroundDamage)))
+      
+  class BuildTechPartTwo extends Parallel(
+    new Build(
       RequestAtLeast(1, Protoss.TemplarArchives),
       RequestTech(Protoss.PsionicStorm),
       RequestUpgrade(Protoss.GroundArmor),
       RequestUpgrade(Protoss.HighTemplarEnergy),
+      RequestAtLeast(12, Protoss.Gateway),
       RequestAtLeast(1, Protoss.RoboticsSupportBay),
       RequestUpgrade(Protoss.ShuttleSpeed)) )
   
@@ -39,16 +44,18 @@ class PvPLateGameStandard extends Parallel {
     new TrainWorkersContinuously(oversaturate = true),
     new BuildGasPumps,
   
-    new TrainMatchingRatio(Protoss.Observer, 1, 2, Seq(MatchingRatio(Protoss.DarkTemplar, 2.0))),
+    new TrainMatchingRatio(Protoss.Observer, 1, 3, Seq(MatchingRatio(Protoss.DarkTemplar, 2.0))),
     
-    new If(new UnitsAtLeast(2,  Protoss.Dragoon),     new Build(RequestUpgrade(Protoss.DragoonRange))),
-    new If(new UnitsAtLeast(1,  Protoss.HighTemplar), new Build(RequestTech(Protoss.PsionicStorm))),
-    new If(new UnitsAtLeast(2,  Protoss.Reaver),      new Build(RequestUpgrade(Protoss.ScarabDamage))),
-    new If(new UnitsAtLeast(3,  Protoss.Reaver),      new If(new EnemyBasesAtLeast(3), new Build(RequestUpgrade(Protoss.ShuttleSpeed)))),
-    new If(new UnitsAtLeast(8,  UnitMatchWarriors),   new RequireMiningBases(2)),
-    new If(new UnitsAtLeast(15, UnitMatchWarriors),   new RequireMiningBases(3)),
-    new If(new UnitsAtLeast(17, UnitMatchWarriors),   new BuildLateGameTech),
-    new If(new UnitsAtLeast(25, UnitMatchWarriors),   new RequireMiningBases(4)),
+    new If(new UnitsAtLeast(2,  Protoss.Dragoon),         new Build(RequestUpgrade(Protoss.DragoonRange))),
+    new If(new UnitsAtLeast(1,  Protoss.HighTemplar),     new Build(RequestTech(Protoss.PsionicStorm))),
+    new If(new UnitsAtLeast(2,  Protoss.Reaver),          new Build(RequestUpgrade(Protoss.ScarabDamage))),
+    new If(new UnitsAtLeast(3,  Protoss.Reaver),          new If(new EnemyBasesAtLeast(3), new Build(RequestUpgrade(Protoss.ShuttleSpeed)))),
+    new If(new UnitsAtLeast(8,  UnitMatchWarriors),       new RequireMiningBases(2)),
+    new If(new UnitsAtLeast(15, UnitMatchWarriors),       new RequireMiningBases(3)),
+    new If(new UnitsAtLeast(17, UnitMatchWarriors),       new OnMiningBases(3, new BuildTechPartOne)),
+    new If(new UnitsAtLeast(25, UnitMatchWarriors),       new OnMiningBases(3, new BuildTechPartTwo)),
+    new If(new UnitsAtLeast(30, UnitMatchWarriors),       new RequireMiningBases(4)),
+    new If(new EnemyUnitsAtLeast(1, Protoss.DarkTemplar), new Build(RequestUpgrade(Protoss.ObserverSpeed))),
     
     new If(
       new And(

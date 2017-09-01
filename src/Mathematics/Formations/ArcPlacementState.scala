@@ -23,7 +23,7 @@ class ArcPlacementState(arc: Arc, minimumRadius: Double) {
   }
   
   private def advanceToNextRank() {
-    startRank(currentRadius + 12.0 + 32.0 * 1.141)
+    startRank(currentRadius + 14.0 + 32.0 * 1.141)
   }
   
   def reserveSpace(widthPixels: Double): Pixel = {

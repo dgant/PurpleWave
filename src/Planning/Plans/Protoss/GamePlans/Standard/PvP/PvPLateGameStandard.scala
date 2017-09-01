@@ -15,6 +15,22 @@ import ProxyBwapi.Races.Protoss
 
 class PvPLateGameStandard extends Parallel {
   
+  class BuildLateGameTech extends Parallel(
+    new Build(
+      RequestAtLeast(1, Protoss.RoboticsFacility),
+      RequestAtLeast(1, Protoss.Observatory),
+      RequestAtLeast(1, Protoss.CitadelOfAdun),
+      RequestUpgrade(Protoss.ZealotSpeed),
+      RequestAtLeast(1, Protoss.Forge)),
+    new UpgradeContinuously(Protoss.GroundDamage),
+    new Build(
+      RequestAtLeast(1, Protoss.TemplarArchives),
+      RequestUpgrade(Protoss.HighTemplarEnergy),
+      RequestTech(Protoss.PsionicStorm),
+      RequestAtLeast(1, Protoss.RoboticsSupportBay)),
+    new UpgradeContinuously(Protoss.GroundArmor)
+  )
+  
   children.set(Vector(
     new MeldArchons(40),
     new ReactToDarkTemplarPossible,
@@ -31,6 +47,7 @@ class PvPLateGameStandard extends Parallel {
     new If(new UnitsAtLeast(3,  Protoss.Reaver),      new Build(RequestUpgrade(Protoss.ShuttleSpeed))),
     new If(new UnitsAtLeast(8,  UnitMatchWarriors),   new RequireMiningBases(2)),
     new If(new UnitsAtLeast(20, UnitMatchWarriors),   new RequireMiningBases(3)),
+    new If(new UnitsAtLeast(22, UnitMatchWarriors),   new BuildLateGameTech),
     new If(new UnitsAtLeast(25, UnitMatchWarriors),   new RequireMiningBases(4)),
     
     new If(
@@ -54,10 +71,10 @@ class PvPLateGameStandard extends Parallel {
   
     new If(
       new And(
-        new UpgradeComplete(Protoss.ZealotSpeed, Protoss.ZealotSpeed.upgradeTime(1)),
+        new UpgradeComplete(Protoss.ZealotSpeed, 1, Protoss.ZealotSpeed.upgradeTime(1)),
         new UnitsAtMost(4, Protoss.HighTemplar),
         new UnitsAtLeast(1, Protoss.TemplarArchives, complete = true)),
-      new Build(RequestAnother(1, Protoss.HighTemplar))),
+      new Build(RequestAnother(2, Protoss.HighTemplar))),
     
     new PvPIdeas.BuildDragoonsOrZealots,
     new OnMiningBases(1,

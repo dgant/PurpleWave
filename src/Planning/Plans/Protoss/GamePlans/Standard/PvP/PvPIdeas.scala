@@ -40,7 +40,7 @@ object PvPIdeas {
       new Check(() => With.self.gas < 30),
       new Check(() => With.self.gas < 100 && With.self.minerals > With.self.gas * 5),
       new And(
-        new UpgradeComplete(Protoss.ZealotSpeed, Protoss.Zealot.buildFrames),
+        new UpgradeComplete(Protoss.ZealotSpeed, 1, Protoss.Zealot.buildFrames),
         new UnitsAtLeast(12, Protoss.Dragoon),
         new Not(new EnemyCarriers))),
     new TrainContinuously(Protoss.Zealot),

@@ -19,7 +19,7 @@ class ProtossStandardGamePlan
     },
     new FollowBuildOrder,
     new DefendAgainstProxy,
-    new RemoveMineralBlocksAt(30),
+    new RemoveMineralBlocksAt(40),
     new Gather,
     new RecruitFreelancers,
     new DefendEntrance

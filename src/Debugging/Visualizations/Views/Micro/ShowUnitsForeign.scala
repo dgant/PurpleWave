@@ -2,7 +2,9 @@ package Debugging.Visualizations.Views.Micro
 
 import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.View
+import Information.StrategyDetection.Generic.GameTime
 import Lifecycle.With
+import Mathematics.Points.Pixel
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.ForeignUnitInfo
 
@@ -12,6 +14,7 @@ object ShowUnitsForeign extends View {
   var showFogged      = true
   var showTargets     = true
   var showSaturation  = true
+  var showCountdown   = true
   
   override def renderMap() {
     With.units.enemy.foreach(drawTrackedUnit)
@@ -44,6 +47,13 @@ object ShowUnitsForeign extends View {
       }
       if (unit.target.isDefined) {
         DrawMap.arrow(unit.pixelCenter, unit.target.get.pixelCenter, unit.player.colorNeon)
+      }
+    }
+    if (showCountdown) {
+      if ( ! unit.complete && unit.remainingBuildFrames > 0) {
+        val time = new GameTime(unit.remainingBuildFrames)
+        val pctHp = unit.hitPoints.toDouble / unit.unitClass.maxHitPoints
+        DrawMap.labelBox(Array(time.toString, "%02f".format(pctHp) + "%"), Pixel(unit.x, unit.bottom), drawBackground = true, unit.color)
       }
     }
   }

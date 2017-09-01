@@ -10,8 +10,8 @@ import Planning.Plans.Information.Reactive.EnemyMutalisks
 import Planning.Plans.Information.Scenarios.EnemyStrategy
 import Planning.Plans.Information.{Employ, Employing, StartPositionsAtLeast}
 import Planning.Plans.Macro.Automatic.{MatchingRatio, _}
-import Planning.Plans.Macro.BuildOrders.{Build, FirstEightMinutes, RequireBareMinimum}
-import Planning.Plans.Macro.Expanding.{BuildCannonsAtExpansions, BuildGasPumps, RequireMiningBases}
+import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder, FirstEightMinutes, RequireBareMinimum}
+import Planning.Plans.Macro.Expanding.{BuildCannonsAtBases, BuildCannonsAtExpansions, BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Milestones._
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Protoss.ProtossBuilds
@@ -57,14 +57,14 @@ class ProtossVsZerg extends Parallel {
         new EnemyStrategy(new Fingerprint12Hatch),
         new If(
           new Employing(PvZEarlyFFEGatewayFirst),
-          new Build(ProtossBuilds.FFE_GatewayFirst: _*),
+          new Build(ProtossBuilds.FFE_GatewayFirst_Aggressive: _*),
           new Build(ProtossBuilds.FFE_NexusFirst: _*)),
       new If(
         new Employing(PvZEarlyFFEConservative),
         new Build(ProtossBuilds.FFE_Vs4Pool: _*),
       new If(
         new Employing(PvZEarlyFFEGatewayFirst),
-        new Build(ProtossBuilds.FFE_GatewayFirst: _*),
+        new BuildOrder(ProtossBuilds.FFE_GatewayFirst_Aggressive: _*), //Note -- BuildOrder, not Build! So we can train but not replace Zealots
       new If(
         new Employing(PvZEarlyFFENexusFirst),
         new Build(ProtossBuilds.FFE_NexusFirst: _*),
@@ -163,7 +163,7 @@ class ProtossVsZerg extends Parallel {
       RequestAtLeast(1, Protoss.Observatory),
       RequestAtLeast(1, Protoss.Observer)))
   
-  private class CanBuildDragoons extends Check(() => With.self.minerals < 1000 || With.self.gas > 200)
+  private class HaveEnoughGasForDragoons extends Check(() => With.self.minerals < 1000 || With.self.gas > 250)
   
   /////////////////
   // Here we go! //
@@ -231,6 +231,7 @@ class ProtossVsZerg extends Parallel {
     new BuildDetectionForLurkers,
     new TakeSafeNatural,
     new TakeSafeThirdBase,
+    new If(new EnemyMutalisks, new BuildCannonsAtBases(2)),
     new BuildCannonsAtExpansions(5),
   
     new If(
@@ -242,7 +243,13 @@ class ProtossVsZerg extends Parallel {
       new Build(RequestTech(Protoss.PsionicStorm))),
   
     new If(
-      new UnitsAtLeast(3, Protoss.Reaver, complete = false),
+      new UnitsAtLeast(3, Protoss.Corsair, complete = false),
+      new UpgradeContinuously(Protoss.AirDamage)),
+    
+    new If(
+      new And(
+        new EnemyUnitsAtMost(0, Zerg.Scourge),
+        new UnitsAtLeast(2, Protoss.Reaver, complete = false)),
       new Build(RequestUpgrade(Protoss.ShuttleSpeed))),
     
     new If(
@@ -255,12 +262,8 @@ class ProtossVsZerg extends Parallel {
         new UpgradeContinuously(Protoss.ZealotSpeed))),
   
     new If(
-      new UnitsAtLeast(3, Protoss.Corsair, complete = false),
-      new Build(RequestUpgrade(Protoss.AirDamage, 1))),
-  
-    new If(
       new UnitsAtLeast(6, Protoss.Corsair, complete = false),
-      new Build(RequestUpgrade(Protoss.AirArmor, 1))),
+      new UpgradeContinuously(Protoss.AirArmor)),
   
     new If(
       new And(
@@ -290,11 +293,9 @@ class ProtossVsZerg extends Parallel {
       // Emergency Dragoons
       new And(
         new EnemyMutalisks,
-        new UnitsAtMost(5, Protoss.Corsair)),
-      new If(
-        new CanBuildDragoons,
-        new TrainContinuously(Protoss.Dragoon),
-        new TrainContinuously(Protoss.Zealot)),
+        new UnitsAtMost(5, Protoss.Corsair),
+        new UnitsAtMost(12, Protoss.Dragoon)),
+      new TrainContinuously(Protoss.Dragoon),
       
       // Normal behavior
       new Parallel(
@@ -320,7 +321,13 @@ class ProtossVsZerg extends Parallel {
               new And(
                 new Employing(PvZMidgame5GateDragoons),
                 new UnitsAtMost(15, Protoss.Dragoon)),
-              new UnitsAtLeast(6, Protoss.Zealot))),
+              new And(
+                new HaveEnoughGasForDragoons,
+                new Check(() => {
+                  val zealots   = With.units.ours.toSeq.count(_.is(Protoss.Zealot))
+                  val dragoons  = With.units.ours.toSeq.count(_.is(Protoss.Dragoon))
+                  zealots > 6 && zealots > dragoons * 2
+                })))),
           new TrainContinuously(Protoss.Dragoon),
           new TrainContinuously(Protoss.Zealot)))),
   
@@ -385,9 +392,7 @@ class ProtossVsZerg extends Parallel {
     
     new If(
       new And(
-        new Or(
-          new UnitsAtMost(0, Protoss.DarkTemplar, complete = false),
-          new Not(new Employing(PvZMidgameCorsairDarkTemplar))),
+        new UnitsAtMost(0, Protoss.DarkTemplar, complete = true),
         new EnemyUnitsAtMost(0, Zerg.Spire, complete = true),
         new EnemyUnitsAtMost(0, Zerg.Mutalisk),
         new EnemyUnitsAtMost(0, Zerg.Scourge)),
@@ -399,10 +404,15 @@ class ProtossVsZerg extends Parallel {
     new FindExpansions { scouts.get.unitMatcher.set(Protoss.DarkTemplar) },
     new DefendZones,
     new If(
-      new UpgradeComplete(Protoss.ShuttleSpeed),
+      new And(
+        new EnemyUnitsAtMost(0, Zerg.Scourge),
+        new UpgradeComplete(Protoss.ShuttleSpeed)),
       new DropAttack),
     new If(
-      new UnitsAtLeast(4, UnitMatchWarriors, complete = true),
+      new Or(
+        new UnitsAtLeast(4, UnitMatchWarriors, complete = true),
+        new Employing(PvZEarly2Gate),
+        new Employing(PvZEarlyFFEGatewayFirst)),
       new ConsiderAttacking)
   ))
 }

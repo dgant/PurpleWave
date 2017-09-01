@@ -28,7 +28,7 @@ object PlacementProfiles {
     preferPowering              = 0.3,
     preferDistanceFromEnemy     = 0.6,
     preferCoveringWorkers       = 0.0,
-    preferSurfaceArea           = 1.0,
+    preferSurfaceArea           = 0.75,
     avoidDistanceFromBase       = 0.3,
     avoidDistanceFromEnemy      = 0.0,
     avoidDistanceFromIdealRange = 0.1,

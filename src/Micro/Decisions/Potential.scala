@@ -101,7 +101,7 @@ object Potential {
     val mobilityCap   = if (unit.flying) 12 else unit.zone.maxMobility / 2.0
     val mobilityForce = unit.mobilityForce
     val magnitudeRaw  = Math.min(mobilityNeed, mobilityCap) / mobilityNow / 2.0
-    val magnitude     = PurpleMath.clamp(magnitudeRaw, 0.0, 5.0)
+    val magnitude     = PurpleMath.clamp(magnitudeRaw, 1.0, 5.0)
     val output        = mobilityForce.normalize(magnitude)
     output
   }

@@ -51,8 +51,6 @@ class DefendZones extends Plan {
   }
   
   private def isThreatening(enemy: ForeignUnitInfo, zone: Zone): Boolean = {
-    enemy.unitClass.helpsInCombat &&
-    enemy.zone == zone ||
-    enemy.framesToTravelTo(zone.centroid.pixelCenter) < 24.0 * 6.0
+    enemy.unitClass.helpsInCombat && enemy.zone == zone
   }
 }

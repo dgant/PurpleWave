@@ -6,7 +6,7 @@ import Lifecycle.With
 import Mathematics.Points.Pixel
 import ProxyBwapi.UnitInfo.UnitInfo
 
-class BattleSimulation(val battle: Battle, val weAttack: Boolean) {
+class BattleSimulation(val battle: Battle, val weAttack: Boolean, val hypothetical: Boolean = false) {
   
   private def simulacra(team: Team) = team.units.map(Simulacrum(this, _))
   

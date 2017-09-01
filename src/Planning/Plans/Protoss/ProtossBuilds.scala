@@ -248,22 +248,25 @@ object ProtossBuilds {
     RequestAtLeast(2,   Protoss.Pylon),
     RequestAtLeast(1,   Protoss.Zealot))
   
-  val FFE_GatewayFirst = Vector[BuildRequest] (
+  val FFE_GatewayFirst_Aggressive = Vector[BuildRequest] (
     RequestAtLeast(1,   Protoss.Nexus),
-    RequestAnother(4,   Protoss.Probe),
+    RequestAtLeast(8,   Protoss.Probe),
     RequestAtLeast(1,   Protoss.Pylon),
-    RequestAnother(1,   Protoss.Probe),
+    RequestAtLeast(10,  Protoss.Probe),
     RequestAtLeast(1,   Protoss.Gateway),
-    RequestAnother(2,   Protoss.Probe),
+    RequestAtLeast(12,  Protoss.Probe),
     RequestAtLeast(2,   Protoss.Pylon),
-    RequestAnother(1,   Protoss.Probe),
-    RequestAnother(1,   Protoss.Zealot),
-    RequestAnother(2,   Protoss.Probe),
-    RequestAnother(1,   Protoss.Zealot),
-    RequestAnother(1,   Protoss.Probe),
-    RequestAnother(1,   Protoss.Forge),
-    RequestAnother(1,   Protoss.Zealot),
-    RequestAtLeast(2,   Protoss.Nexus))
+    RequestAtLeast(13,  Protoss.Probe),
+    RequestAtLeast(1,   Protoss.Zealot),
+    RequestAtLeast(15,  Protoss.Probe),
+    RequestAtLeast(2,   Protoss.Zealot),
+    RequestAtLeast(17,  Protoss.Probe),
+    RequestAtLeast(2,   Protoss.Nexus),
+    RequestAtLeast(18,  Protoss.Probe),
+    RequestAnother(3,   Protoss.Zealot),
+    RequestAtLeast(2,   Protoss.Pylon),
+    RequestAtLeast(19,  Protoss.Probe),
+    RequestAtLeast(1,   Protoss.Assimilator))
   
   /////////////////////
   // General-Purpose //

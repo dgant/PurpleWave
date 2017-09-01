@@ -24,7 +24,7 @@ class Analysis(battle: Battle) {
   val hysteresisDesireMax   = PurpleMath.clamp(1.0 /  flexibilityRatio, 1.1, 2.0)
   val desireUrgency         = PurpleMath.clamp(urgencyRatio,      0.8,                  1.8)
   val desireChokiness       = PurpleMath.clamp(chokiness,         0.6,                  1.1)
-  val desireEconomy         = PurpleMath.clamp(economyRatio,      0.9,                  1.3)
+  val desireEconomy         = PurpleMath.clamp(economyRatio,      1.0,                  1.3)
   val desireHysteresis      = PurpleMath.clamp(hysteresis,        hysteresisDesireMin,  hysteresisDesireMax)
   val desireMultiplier      = With.blackboard.aggressionRatio * desireUrgency * desireChokiness * desireEconomy * desireHysteresis
   val attackGains           = battle.estimationSimulationAttack.costToEnemy

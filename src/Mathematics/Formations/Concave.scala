@@ -17,8 +17,8 @@ object Concave {
     val centerToArcRadians = List(
       targetRadians - Math.PI / 2.0,
       targetRadians + Math.PI / 2.0)
-        .sortBy(radians => - targetCenter.radiateRadians(radians, 128.0).pixelDistanceFast(SpecificPoints.middle))
-        .sortBy(radians => targetCenter.radiateRadians(radians, 128.0).zone != origin.zone)
+        .sortBy(radians => -  targetCenter.radiateRadians(radians, 128.0).pixelDistanceFast(SpecificPoints.middle))
+        .sortBy(radians =>    targetCenter.radiateRadians(radians, 128.0).zone != origin.zone)
         .head
     
     val arc = Arc(
@@ -39,7 +39,7 @@ object Concave {
     ranks.foreach(rank => {
       arcPlacement.startRank(rank.head.idealDistance)
       rank.foreach(participant => {
-        participant.pixelAfter = arcPlacement.reserveSpace(2.0 + 2.0 * participant.unitClass.radialHypotenuse)
+        participant.pixelAfter = arcPlacement.reserveSpace(12.0 + 2.0 * participant.unitClass.radialHypotenuse)
       })
     })
   

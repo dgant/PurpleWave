@@ -18,9 +18,10 @@ class SquadDefendZone(zone: Zone) extends SquadGoal {
   override def acceptsHelp: Boolean = false
   
   def updateUnits() {
-    lazy val base   = ByOption.minBy(zone.bases)(_.heart.tileDistanceManhattan(With.intelligence.mostBaselikeEnemyTile))
-    lazy val choke  = zone.exit
-    lazy val walls  = zone.units.toSeq.filter(u =>
+    lazy val unitWidth  = 2.0 * squad.recruits.map(_.unitClass.radialHypotenuse).sum
+    lazy val base       = ByOption.minBy(zone.bases)(_.heart.tileDistanceManhattan(With.intelligence.mostBaselikeEnemyTile))
+    lazy val choke      = zone.exit
+    lazy val walls      = zone.units.toSeq.filter(u =>
       u.isOurs
       && u.unitClass.isStaticDefense
       && (squad.enemies.isEmpty || squad.enemies.exists(u.canAttack)))
@@ -28,7 +29,7 @@ class SquadDefendZone(zone: Zone) extends SquadGoal {
     lazy val canHuntEnemies  = huntableEnemies.get.nonEmpty
     lazy val canDefendWall   = walls.nonEmpty
     lazy val canDefendHeart  = base.isDefined
-    lazy val canDefendChoke  = choke.isDefined
+    lazy val canDefendChoke  = choke.isDefined && choke.get.radiusPixels * 2.0 - 32.0 < unitWidth
     
     if (canHuntEnemies) {
       lastAction = "Hunt intruders in "
@@ -57,12 +58,19 @@ class SquadDefendZone(zone: Zone) extends SquadGoal {
   })
   
   def huntEnemies() {
-    val center = zone.centroid.pixelCenter
-    val target = huntableEnemies.get.minBy(_.pixelDistanceFast(center)).pixelCenter
-    squad.recruits.foreach(_.agent.intend(squad.client, new Intention {
-      toTravel = Some(target)
-      toReturn = Some(center)
-    }))
+    lazy val center        = zone.bases.find(_.owner.isUs).map(_.heart.pixelCenter).getOrElse(zone.centroid.pixelCenter)
+    lazy val target        = huntableEnemies.get.minBy(_.pixelDistanceFast(center))
+    lazy val targetAir     = ByOption.minBy(huntableEnemies.get.filter   (_.flying))(_.pixelDistanceFast(center)).getOrElse(target)
+    lazy val targetGround  = ByOption.minBy(huntableEnemies.get.filterNot(_.flying))(_.pixelDistanceFast(center)).getOrElse(target)
+    squad.recruits.foreach(recruit => {
+      val onlyAir     = recruit.canAttack && ! recruit.unitClass.attacksGround
+      val onlyGround  = recruit.canAttack && ! recruit.unitClass.attacksAir
+      val thisTarget  = if (onlyAir) targetAir else if (onlyGround) targetGround else target
+      recruit.agent.intend(squad.client, new Intention {
+        toTravel = Some(thisTarget.pixelCenter)
+        toReturn = Some(center)
+      })
+    })
   }
   
   def defendHeart(center: Pixel) {
@@ -72,15 +80,15 @@ class SquadDefendZone(zone: Zone) extends SquadGoal {
     }))
   }
   
-  val wallConcaveWidthRadians : Double = Math.PI * 7.0 / 8.0
+  val wallConcaveWidthRadians : Double = Math.PI / 2.0
   val wallConcaveWidthPixels  : Double = 32.0 * 3.0
   
   def defendWall(walls: Seq[UnitInfo]) {
     val centroidSources = Seq(squad.enemies.toSeq.map(_.pixelCenter), zone.exit.map(_.centerPixel).toSeq, Seq(SpecificPoints.middle))
     val enemyCentroid   = centroidSources.find(_.nonEmpty).head.centroid
     val wall            = walls.minBy(_.pixelDistanceFast(enemyCentroid))
-    val concaveOrigin   = wall.pixelCenter.project(enemyCentroid, 48.0)
-    val concaveAxis     = concaveOrigin.radiansTo(enemyCentroid)
+    val concaveOrigin   = wall.pixelCenter.project(enemyCentroid, 96.0)
+    val concaveAxis     = wall.pixelCenter.radiansTo(enemyCentroid)
     val concaveStart    = concaveOrigin.radiateRadians(concaveAxis + wallConcaveWidthRadians, wallConcaveWidthPixels)
     val concaveEnd      = concaveOrigin.radiateRadians(concaveAxis - wallConcaveWidthRadians, wallConcaveWidthPixels)
     concave(concaveStart, concaveEnd, concaveOrigin)
@@ -110,7 +118,10 @@ class SquadDefendZone(zone: Zone) extends SquadGoal {
     squad.recruits.foreach(
       defender => {
         val spot = formation(defender)
-        defender.agent.intend(squad.client, new Intention { toTravel = Some(spot) })
+        defender.agent.intend(squad.client, new Intention {
+          toForm    = Some(spot)
+          toReturn  = Some(spot)
+          toTravel  = Some(spot) })
       })
   }
   

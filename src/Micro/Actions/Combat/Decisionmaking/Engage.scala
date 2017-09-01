@@ -21,5 +21,6 @@ object Engage extends Action {
     Target.delegate(unit)
     AttackAndReposition.consider(unit)
     Attack.consider(unit)
+    Disengage.consider(unit)
   }
 }

@@ -29,9 +29,9 @@ class Scout(scoutCount: Int = 1) extends Plan {
   
   override def isComplete: Boolean = {
     val bases = With.geography.enemyBases
-    if (bases.isEmpty) return false
-    if (lastScoutDeath > 0) return true
-    if (bases.exists(_.zone.walledIn)) return true
+    if (bases.isEmpty)                  return false
+    if (lastScoutDeath > 0)             return true
+    if (bases.exists(_.zone.walledIn))  return true
     false
   }
   

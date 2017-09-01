@@ -2,6 +2,7 @@ package Micro.Actions.Combat.Attacking
 
 import Micro.Actions.Action
 import Micro.Heuristics.Targeting.EvaluateTargets
+import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object TargetAnything extends Action {
@@ -14,7 +15,7 @@ object TargetAnything extends Action {
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {
-    val targets = unit.matchups.targets
+    val targets = unit.matchups.targets.filterNot(_.is(Zerg.Larva))
     unit.agent.toAttack = EvaluateTargets.best(unit, targets)
   }
 }

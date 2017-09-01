@@ -23,12 +23,15 @@ class Intelligence {
       .getOrElse(leastScoutedBases.head.townHallArea.midpoint))
   
   def leastScoutedBases: Iterable[Base] = leastScoutedBasesCache.get
-  private val leastScoutedBasesCache = new CacheFrame(() =>
+  private val leastScoutedBasesCache = new CacheFrame(() => {
+    lazy val weHaveFliers = With.units.ours.exists(_.flying)
     With.geography.bases
       .toVector
+      .filter(base => weHaveFliers || ! base.zone.island)
       .sortBy(_.heart.tileDistanceFast(With.geography.home))
       .sortBy( ! _.isStartLocation)
-      .sortBy(_.lastScoutedFrame))
+      .sortBy(_.lastScoutedFrame)
+  })
   
   def enemyHasShown(unitClass: UnitClass): Boolean = enemyHasShownUnit(unitClass)
   private val enemyHasShownUnit = new mutable.HashSet[UnitClass]

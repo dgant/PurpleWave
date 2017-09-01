@@ -11,7 +11,7 @@ class UpgradeComplete(upgrade: Upgrade, level: Int = 1, withinFrames: Int = 0) e
   override def isComplete: Boolean =
     With.self.getUpgradeLevel(upgrade) >= level ||
     (withinFrames > 0 && With.units.ours.exists(unit =>
-      unit.teching &&
+      unit.upgrading &&
       unit.upgradingType == upgrade &&
       unit.framesBeforeUpgradeComplete <= withinFrames))
 }

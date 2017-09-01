@@ -6,7 +6,7 @@ import Strategery.Strategies.Protoss.PvE._
 import Strategery.Strategies.Protoss.PvP.AllPvP
 import Strategery.Strategies.Protoss.PvR.AllPvR
 import Strategery.Strategies.Protoss.PvT.AllPvT
-import Strategery.Strategies.Protoss.PvZ.{AllPvZ, PvZ4GateAllIn}
+import Strategery.Strategies.Protoss.PvZ.{AllPvZ, PvZ4GateDragoonAllIn}
 import Strategery.Strategies._
 
 object ProtossChoices {
@@ -20,7 +20,7 @@ object ProtossChoices {
     CarriersFromAnIsland,
     CarriersWithNoDefense,
     DarkArchonsWithNoDefense,
-    PvZ4GateAllIn,
+    PvZ4GateDragoonAllIn,
     AllPvR,
     AllPvT,
     AllPvP,

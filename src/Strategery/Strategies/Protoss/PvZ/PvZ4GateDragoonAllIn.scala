@@ -5,7 +5,7 @@ import Planning.Plans.Protoss.GamePlans.Specialty.PvZ4GateAllIn
 import Strategery.Strategies.Strategy
 import bwapi.Race
 
-object PvZ4GateAllIn extends Strategy {
+object PvZ4GateDragoonAllIn extends Strategy {
   
   override def buildGameplan(): Option[Plan] = Some(new PvZ4GateAllIn)
   

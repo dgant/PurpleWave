@@ -7,10 +7,10 @@ class Configuration {
   ///////////////
   
   var gameSpeed           = 0
-  var enableSurrendering  = true
+  var enableSurrendering  = false
   var enableStdOut        = false // StdOut crashes bots on SSCAIT because it blocks forever
-  var enableChat          = true
-  var identifyGhostUnits  = true
+  var enableChat          = false
+  var identifyGhostUnits  = false
   
   //////////////
   // Strategy //
@@ -102,7 +102,7 @@ class Configuration {
   // Visualization //
   ///////////////////
   
-  var visualize                           = true
+  var visualize                           = false
   var visualizationProbabilityHappyVision = 0.1
   var visualizationProbabilityTextOnly    = 0.00
   

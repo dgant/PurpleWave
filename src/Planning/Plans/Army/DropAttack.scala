@@ -55,7 +55,7 @@ class DropAttack extends Plan {
     }
     else {
       With.geography.enemyBases.maxBy(base =>
-        base.workers.size / (1 + base.defenders.size)).heart.pixelCenter
+        base.workers.size.toDouble / (1 + base.defenders.size + base.units.count(u => u.isEnemy && u.unitClass.trainsGroundUnits))).heart.pixelCenter
     }
   }
 }

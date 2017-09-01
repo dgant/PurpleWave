@@ -24,7 +24,8 @@ class ResearchUpgrade(upgrade: Upgrade, level: Int) extends Plan {
   override def onUpdate() {
     if (isComplete) return
     
-    currency.framesAhead = Project.framesToUnits(upgraderClass)
+    val requiredClasses = upgrade.whatsRequired.values.toVector :+ upgraderClass
+    currency.framesAhead = requiredClasses.map(Project.framesToUnits(_)).max
     currency.acquire(this)
     currency.isSpent = With.units.ours.exists(upgrader => upgrader.upgrading && upgrader.upgradingType == upgrade)
     if ( ! currency.satisfied) return

@@ -31,7 +31,7 @@ class Analysis(battle: Battle) {
   val attackLosses          = battle.estimationSimulationAttack.costToUs
   val retreatGains          = battle.estimationSimulationRetreat.costToEnemy
   val retreatLosses         = battle.estimationSimulationRetreat.costToUs
-  val desire                = desireMultiplier * attackGains + retreatLosses - attackLosses - retreatGains
+  val desireTotal           = attackGains + retreatLosses / With.configuration.retreatPreference - retreatGains - attackLosses / desireMultiplier
   
   private def meanFlexibility(units: Seq[UnitInfo]): Double = {
     val fighters = units.filter(_.damageOnHitMax > 0)

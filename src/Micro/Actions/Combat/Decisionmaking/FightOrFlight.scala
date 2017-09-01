@@ -58,12 +58,11 @@ object FightOrFlight extends Action {
     if (attackReport.isEmpty)   return default
     if (retreatReport.isEmpty)  return default
   
-    val bonusDesire   = With.blackboard.aggressionRatio
     val attackGain    = attackReport.get.valueDealt
     val attackLoss    = attackReport.get.valueReceived
     val retreatGain   = retreatReport.get.valueDealt
     val retreatLoss   = retreatReport.get.valueReceived
-    val output        = bonusDesire * attackGain + retreatLoss - attackLoss - retreatGain
+    val output        = attackGain + retreatLoss / With.configuration.retreatPreference - retreatGain - attackLoss / battle.analysis.desireMultiplier
     output
   }
 }

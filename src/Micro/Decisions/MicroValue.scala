@@ -20,7 +20,7 @@ object MicroValue {
   
   def maxSplashFactor(unit: UnitInfo): Double = {
     if(unit.unitClass.dealsRadialSplashDamage || unit.is(Zerg.Lurker))
-      2.5
+      2.0
     else if(unit.is(Zerg.Mutalisk))
       1.5
     else

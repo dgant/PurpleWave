@@ -83,18 +83,17 @@ object Tickle extends Action {
     val workersTotal  = With.units.ours.count(u => u.unitClass.isWorker)
     val workersHere   = With.units.ours.count(u => u.unitClass.isWorker && u.zone == zone)
     if (workersHere * 2 < workersTotal  // Tomorrow, there'll be more of us.
-      && enemies.size > 4               // Verus 4-Pool need to start dealing damage immediately
-      ) {
+      && enemies.size > 4) {            // Verus 4-Pool need to start dealing damage immediately
       attack = false
     }
     
     // Stay close to the fight
-    if (unit.matchups.framesOfSafetyDiffused > 36) {
+    if (unit.matchups.threats.forall(_.pixelDistanceFast(unit) > 64)) {
       attack = true
     }
   
     // If we completely overpower the enemy, let's go kill 'em.
-    var weOverpower = ourStrength > enemyStrength
+    val weOverpower = ourStrength > enemyStrength
     if (weOverpower) {
       attack = true
     }

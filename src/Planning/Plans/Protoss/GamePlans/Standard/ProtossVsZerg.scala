@@ -11,7 +11,7 @@ import Planning.Plans.Information.Scenarios.EnemyStrategy
 import Planning.Plans.Information.{Employ, Employing, StartPositionsAtLeast}
 import Planning.Plans.Macro.Automatic.{MatchingRatio, _}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder, FirstEightMinutes, RequireBareMinimum}
-import Planning.Plans.Macro.Expanding.{BuildCannonsAtBases, BuildCannonsAtExpansions, BuildGasPumps, RequireMiningBases}
+import Planning.Plans.Macro.Expanding.{BuildCannonsAtExpansions, BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Milestones._
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Protoss.ProtossBuilds
@@ -212,6 +212,7 @@ class ProtossVsZerg extends Parallel {
     new FirstEightMinutes(
       new If(
         new And(
+          new EnemyUnitsAtLeast(4, Zerg.Zergling),
           new WeAreFFEing,
           new Or(
             new EnemyStrategy(new Fingerprint9Pool),
@@ -231,12 +232,15 @@ class ProtossVsZerg extends Parallel {
     new BuildDetectionForLurkers,
     new TakeSafeNatural,
     new TakeSafeThirdBase,
-    new If(new EnemyMutalisks, new BuildCannonsAtBases(2)),
     new BuildCannonsAtExpansions(5),
   
     new If(
       new UnitsAtLeast(1, Protoss.Dragoon, complete = false),
       new Build(RequestUpgrade(Protoss.DragoonRange))),
+  
+    new If(
+      new UnitsAtLeast(1, Protoss.Carrier, complete = false),
+      new Build(RequestUpgrade(Protoss.CarrierCapacity))),
   
     new If(
       new UnitsAtLeast(2, Protoss.HighTemplar, complete = false),
@@ -266,19 +270,29 @@ class ProtossVsZerg extends Parallel {
       new UpgradeContinuously(Protoss.AirArmor)),
   
     new If(
+      new UnitsAtLeast(7, Protoss.Corsair, complete = false),
+      new Build(RequestAtLeast(1, Protoss.FleetBeacon))),
+  
+    new If(
+      new UnitsAtLeast(6, Protoss.Corsair),
+      new TrainContinuously(Protoss.Carrier)),
+    
+    new If(
       new And(
         new Employing(PvZMidgameCorsairDarkTemplar),
         new UnitsAtLeast(2, Protoss.DarkTemplar, complete = true)),
       new TrainMatchingRatio(Protoss.Corsair, 5, Int.MaxValue, Seq(MatchingRatio(Zerg.Mutalisk, 1.5))),
       new If(
-        new And(
-          new Employing(PvZMidgameCorsairReaver),
-          new UnitsAtLeast(3, Protoss.Corsair, complete = true)),
-        new TrainMatchingRatio(Protoss.Corsair, 5, Int.MaxValue, Seq(MatchingRatio(Zerg.Mutalisk, 1.5))),
+        new Or(
+          new Employing(PvZMidgame2Stargate),
+          new Employing(PvZMidgameCorsairReaver)),
+        new TrainMatchingRatio(Protoss.Corsair, 8, Int.MaxValue, Seq(MatchingRatio(Zerg.Mutalisk, 1.5))),
         new TrainMatchingRatio(Protoss.Corsair, 1, Int.MaxValue, Seq(MatchingRatio(Zerg.Mutalisk, 1.5))))),
   
     new If(
-      new EnemyUnitsAtLeast(4, Zerg.Mutalisk),
+      new Or(
+        new Employing(PvZMidgame2Stargate),
+        new EnemyUnitsAtLeast(4, Zerg.Mutalisk)),
       new Build(RequestAtLeast(2, Protoss.Stargate))),
     new OnGasBases(2,
       new If(
@@ -286,7 +300,7 @@ class ProtossVsZerg extends Parallel {
         new Build(RequestAtLeast(3, Protoss.Stargate)))),
     
     new TrainMatchingRatio(Protoss.Observer, 0, 3, Seq(MatchingRatio(Zerg.Lurker, 0.5))),
-  
+    
     // Gateway production
     new If(
       
@@ -295,7 +309,7 @@ class ProtossVsZerg extends Parallel {
         new EnemyMutalisks,
         new UnitsAtMost(5, Protoss.Corsair),
         new UnitsAtMost(12, Protoss.Dragoon)),
-      new TrainContinuously(Protoss.Dragoon),
+      new TrainMatchingRatio(Protoss.Dragoon, 8, Int.MaxValue, Seq(MatchingRatio(Zerg.Mutalisk, 0.75))),
       
       // Normal behavior
       new Parallel(
@@ -320,7 +334,7 @@ class ProtossVsZerg extends Parallel {
             new Or(
               new And(
                 new Employing(PvZMidgame5GateDragoons),
-                new UnitsAtMost(15, Protoss.Dragoon)),
+                new UnitsAtMost(8, Protoss.Dragoon)),
               new And(
                 new HaveEnoughGasForDragoons,
                 new Check(() => {
@@ -353,7 +367,9 @@ class ProtossVsZerg extends Parallel {
       RequestUpgrade(Protoss.ZealotSpeed)),
       
     new If(
-      new Not(new Employing(PvZMidgameCorsairReaver)),
+      new And(
+        new Not(new Employing(PvZMidgameCorsairReaver)),
+        new Not(new Employing(PvZMidgame2Stargate))),
       new Build(
         RequestAtLeast(1, Protoss.TemplarArchives),
         RequestUpgrade(Protoss.GroundDamage, 2),
@@ -408,11 +424,6 @@ class ProtossVsZerg extends Parallel {
         new EnemyUnitsAtMost(0, Zerg.Scourge),
         new UpgradeComplete(Protoss.ShuttleSpeed)),
       new DropAttack),
-    new If(
-      new Or(
-        new UnitsAtLeast(4, UnitMatchWarriors, complete = true),
-        new Employing(PvZEarly2Gate),
-        new Employing(PvZEarlyFFEGatewayFirst)),
-      new ConsiderAttacking)
+    new ConsiderAttacking
   ))
 }

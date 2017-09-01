@@ -16,7 +16,7 @@ object Gravitate extends Action {
     val forces          = unit.agent.forces.values
     val origin          = unit.pixelCenter
     val forceTotal      = ForceMath.sum(forces)
-    val forceNormal     = forceTotal.normalize(85.0)
+    val forceNormal     = forceTotal.normalize(125.0)
     val forcePoint      = forceNormal.toPoint
     val destination     = origin.add(forcePoint)
     With.commander.move(unit, destination)

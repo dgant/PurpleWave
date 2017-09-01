@@ -37,7 +37,7 @@ class Battle(
   ///////////////
   
   lazy val analysis = new Analysis(this)
-  lazy val desire: Double = analysis.desire
+  lazy val desire: Double = analysis.desireTotal
   
   lazy val globalSafeToAttack: Boolean = {
     With.blackboard.aggressionRatio * estimationAbstractOffense.costToEnemy - estimationAbstractOffense.costToUs >= 0

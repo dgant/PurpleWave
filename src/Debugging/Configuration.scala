@@ -24,6 +24,7 @@ class Configuration {
   // Micro //
   ///////////
   
+  var retreatPreference               = 1.3
   var assumedBuilderTravelSpeed       = 0.65
   var attackableRangeBuffer           = 4
   var fogPositionDuration             = 24 * 20

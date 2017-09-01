@@ -19,5 +19,6 @@ object ProtossVsZergChoices {
     PvZMidgame5GateDragoons,
     PvZMidgameCorsairDarkTemplar,
     PvZMidgameCorsairReaver,
-    PvZMidgameCorsairSpeedlot)
+    PvZMidgameCorsairSpeedlot,
+    PvZMidgame2Stargate)
 }

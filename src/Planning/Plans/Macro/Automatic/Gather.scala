@@ -79,7 +79,7 @@ class Gather extends Plan {
       val battle = With.battles.byZone(base.zone)
       val distanceToHeart = battle.enemy.centroid.pixelDistanceFast(base.heart.pixelCenter)
       ( ! With.configuration.evacuateDangerousBases
-        || With.geography.ourBases.size < 2
+        || With.geography.ourBases.size < 3
         || battle.estimationAbstract.weSurvive
         || base.zone.exit.exists(_.centerPixel.pixelDistanceFast(battle.enemy.centroid) < distanceToHeart))
     }).toSet

@@ -234,48 +234,24 @@ class ProtossVsZerg extends Parallel {
     new TakeSafeThirdBase,
     new BuildCannonsAtExpansions(5),
   
-    new If(
-      new UnitsAtLeast(1, Protoss.Dragoon, complete = false),
-      new Build(RequestUpgrade(Protoss.DragoonRange))),
-  
-    new If(
-      new UnitsAtLeast(1, Protoss.Carrier, complete = false),
-      new Build(RequestUpgrade(Protoss.CarrierCapacity))),
-  
-    new If(
-      new UnitsAtLeast(2, Protoss.HighTemplar, complete = false),
-      new Build(RequestTech(Protoss.PsionicStorm))),
-  
-    new If(
-      new UnitsAtLeast(3, Protoss.Corsair, complete = false),
-      new UpgradeContinuously(Protoss.AirDamage)),
+    new If(new UnitsAtLeast(1, Protoss.Dragoon),      new Build(RequestUpgrade(Protoss.DragoonRange))),
+    new If(new UnitsAtLeast(1, Protoss.Carrier),      new Build(RequestUpgrade(Protoss.CarrierCapacity))),
+    new If(new UnitsAtLeast(1, Protoss.HighTemplar),  new Build(RequestTech(Protoss.PsionicStorm))),
+    new If(new UnitsAtLeast(3, Protoss.Corsair),      new UpgradeContinuously(Protoss.AirDamage)),
+    new If(new UnitsAtLeast(2, Protoss.Reaver),       new If(new EnemyUnitsAtMost(0, Zerg.Scourge), new Build(RequestUpgrade(Protoss.ShuttleSpeed)))),
     
     new If(
       new And(
-        new EnemyUnitsAtMost(0, Zerg.Scourge),
-        new UnitsAtLeast(2, Protoss.Reaver, complete = false)),
-      new Build(RequestUpgrade(Protoss.ShuttleSpeed))),
-    
-    new If(
-      new And(
-        new UnitsAtLeast(2, UnitMatchWarriors, complete = false),
-        new UnitsAtLeast(1, Protoss.Forge, complete = true),
-        new UnitsAtLeast(1, Protoss.Assimilator, complete = true)),
+        new UnitsAtLeast(2, Protoss.Zealot),
+        new UnitsAtLeast(1, Protoss.Assimilator)),
       new Parallel(
         new UpgradeContinuously(Protoss.GroundDamage),
         new UpgradeContinuously(Protoss.ZealotSpeed))),
   
-    new If(
-      new UnitsAtLeast(6, Protoss.Corsair, complete = false),
-      new UpgradeContinuously(Protoss.AirArmor)),
-  
-    new If(
-      new UnitsAtLeast(7, Protoss.Corsair, complete = false),
-      new Build(RequestAtLeast(1, Protoss.FleetBeacon))),
-  
-    new If(
-      new UnitsAtLeast(6, Protoss.Corsair),
-      new TrainContinuously(Protoss.Carrier)),
+    new If(new UnitsAtLeast(6, Protoss.Corsair), new TrainContinuously(Protoss.Carrier)),
+    new If(new UnitsAtLeast(6, Protoss.Corsair), new UpgradeContinuously(Protoss.AirArmor)),
+    new If(new UnitsAtLeast(7, Protoss.Corsair), new Build(RequestAtLeast(1, Protoss.FleetBeacon))),
+    new If(new UnitsAtLeast(8, Protoss.Corsair), new If(new UnitsAtLeast(1, Protoss.FleetBeacon), new Build(RequestTech(Protoss.DisruptionWeb)))),
     
     new If(
       new And(
@@ -309,7 +285,7 @@ class ProtossVsZerg extends Parallel {
         new EnemyMutalisks,
         new UnitsAtMost(5, Protoss.Corsair),
         new UnitsAtMost(12, Protoss.Dragoon)),
-      new TrainMatchingRatio(Protoss.Dragoon, 8, Int.MaxValue, Seq(MatchingRatio(Zerg.Mutalisk, 0.75))),
+      new TrainMatchingRatio(Protoss.Dragoon, 0, 6, Seq(MatchingRatio(Zerg.Mutalisk, 0.75))),
       
       // Normal behavior
       new Parallel(
@@ -342,7 +318,9 @@ class ProtossVsZerg extends Parallel {
                   val dragoons  = With.units.ours.toSeq.count(_.is(Protoss.Dragoon))
                   zealots > 6 && zealots > dragoons * 2
                 })))),
-          new TrainContinuously(Protoss.Dragoon),
+          new Parallel(
+            new Build(RequestAnother(1, Protoss.Dragoon)),
+            new TrainContinuously(Protoss.Zealot)),
           new TrainContinuously(Protoss.Zealot)))),
   
     new Employ(PvZEarly2Gate,                   new TwoGateFollowUp),

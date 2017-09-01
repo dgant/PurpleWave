@@ -9,7 +9,7 @@ import Planning.Composition.UnitMatchers.UnitMatchMobileFlying
 import Planning.Composition.UnitPreferences.UnitPreferFast
 import Planning.Plan
 
-class ControlEnemyAirspace extends Plan {
+class ControlEnemyAirspace(perBase: Int = 1) extends Plan {
   
   description.set("Fly over enemy bases")
   
@@ -22,7 +22,7 @@ class ControlEnemyAirspace extends Plan {
   override def isComplete: Boolean = With.geography.enemyBases.nonEmpty
   
   override def onUpdate() {
-    flyers.get.unitCounter.set(new UnitCountBetween(0, With.geography.enemyBases.size))
+    flyers.get.unitCounter.set(new UnitCountBetween(0, perBase * With.geography.enemyBases.size))
     flyers.get.acquire(this)
     val unassignedScouts = flyers.get.units.toBuffer
     

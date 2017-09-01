@@ -55,7 +55,7 @@ class PvPLateGameStandard extends Parallel {
     new If(new UnitsAtLeast(15, UnitMatchWarriors),       new RequireMiningBases(3)),
     new If(new UnitsAtLeast(17, UnitMatchWarriors),       new OnMiningBases(2, new BuildTechPartOne)),
     new If(new UnitsAtLeast(25, UnitMatchWarriors),       new OnMiningBases(3, new BuildTechPartTwo)),
-    new If(new UnitsAtLeast(30, UnitMatchWarriors),       new RequireMiningBases(4)),
+    new If(new UnitsAtLeast(50, UnitMatchWarriors),       new RequireMiningBases(4)),
     new If(new EnemyUnitsAtLeast(1, Protoss.DarkTemplar), new Build(RequestUpgrade(Protoss.ObserverSpeed))),
     
     new If(
@@ -104,10 +104,9 @@ class PvPLateGameStandard extends Parallel {
     new OnMiningBases(2,
       new Build(
         RequestAtLeast(5, Protoss.Gateway),
-        RequestAtLeast(1, Protoss.Forge),
         RequestAtLeast(1, Protoss.CitadelOfAdun),
         RequestAtLeast(1, Protoss.TemplarArchives),
-        RequestAtLeast(8, Protoss.Gateway))),
+        RequestAtLeast(7, Protoss.Gateway))),
     new RequireMiningBases(3),
     new OnMiningBases(1, new Build(RequestAtLeast(1, Protoss.RoboticsSupportBay))),
     new OnMiningBases(3, new Build(RequestAtLeast(12, Protoss.Gateway))),

@@ -20,7 +20,7 @@ object Target extends Action {
     var canPillage = false
     canPillage ||= unit.agent.canPillage
     canPillage ||= unit.zone.owner.isEnemy
-    canPillage ||= (With.intelligence.enemyMain.isDefined && With.geography.enemyBases.isEmpty)
+    canPillage ||= (With.intelligence.firstEnemyMain.isDefined && With.geography.enemyBases.isEmpty)
     canPillage ||= Yolo.active
     canPillage &&= unit.matchups.threatsInRange.isEmpty
     if (canPillage) {

@@ -3,12 +3,12 @@ package Planning.Plans.Macro.Expanding
 import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
 import Macro.Architecture.Blueprint
-import Macro.Architecture.Heuristics.PlacementProfiles
+import Macro.Architecture.Heuristics.{PlacementProfile, PlacementProfiles}
 import Macro.BuildRequests.{RequestAnother, RequestAtLeast}
 import Planning.Plan
 import ProxyBwapi.Races.Protoss
 
-class BuildCannonsAtBases(cannonsRequired: Int) extends Plan {
+class BuildCannonsAtBases(cannonsRequired: Int, placement: PlacementProfile = PlacementProfiles.hugWorkersWithCannon) extends Plan {
   
   override def onUpdate() {
     val bases = eligibleBases
@@ -32,7 +32,7 @@ class BuildCannonsAtBases(cannonsRequired: Int) extends Plan {
         building          = Some(Protoss.Pylon),
         requireZone       = Some(zone),
         requireCandidates = Some(zone.tiles),
-        placement  = Some(PlacementProfiles.hugWorkersWithPylon))))
+        placement         = Some(placement))))
     .toMap
   
   private val cannonBlueprintsByZone = With.geography.zones
@@ -43,7 +43,7 @@ class BuildCannonsAtBases(cannonsRequired: Int) extends Plan {
           building          = Some(Protoss.PhotonCannon),
           requireZone       = Some(zone),
           requireCandidates = Some(zone.tiles),
-          placement  = Some(PlacementProfiles.hugWorkersWithCannon)))))
+          placement         = Some(placement)))))
     .toMap
   
   protected def eligibleBases: Iterable[Base] = {

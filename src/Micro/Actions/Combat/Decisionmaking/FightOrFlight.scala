@@ -62,7 +62,7 @@ object FightOrFlight extends Action {
     val attackLoss    = attackReport.get.valueReceived
     val retreatGain   = retreatReport.get.valueDealt
     val retreatLoss   = retreatReport.get.valueReceived
-    val output        = attackGain + retreatLoss / With.configuration.retreatPreference - retreatGain - attackLoss
+    val output        = attackGain + retreatLoss / With.configuration.retreatCaution - retreatGain - attackLoss
     output
   }
 }

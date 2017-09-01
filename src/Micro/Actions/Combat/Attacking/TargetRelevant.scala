@@ -20,6 +20,7 @@ object TargetRelevant extends Action {
   }
   
   def isRelevant(unit: FriendlyUnitInfo, target: UnitInfo): Boolean = {
+    target.visible &&
     target.unitClass.helpsInCombat && (
       unit.inRangeToAttackFast(target)
         || (target.unitClass.isDetector && unit.matchups.alliesIncludingSelf.exists(_.cloaked))

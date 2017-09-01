@@ -6,9 +6,10 @@ import Micro.Agency.Intention
 import Planning.Composition.Property
 import Planning.Composition.ResourceLocks.LockUnits
 import Planning.Composition.UnitCounters.UnitCountExactly
-import Planning.Composition.UnitMatchers.UnitMatchMobile
+import Planning.Composition.UnitMatchers.{UnitMatchAnd, UnitMatchMobile, UnitMatchNot}
 import Planning.Composition.UnitPreferences.UnitPreferFast
 import Planning.Plan
+import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 class FindExpansions extends Plan {
@@ -17,7 +18,12 @@ class FindExpansions extends Plan {
   
   val scouts = new Property[LockUnits](new LockUnits {
     unitCounter.set(UnitCountExactly(1))
-    unitMatcher.set(UnitMatchMobile)
+    unitMatcher.set(UnitMatchAnd(
+      UnitMatchMobile,
+      UnitMatchNot(Terran.Battlecruiser),
+      UnitMatchNot(Terran.Valkyrie),
+      UnitMatchNot(Protoss.Arbiter),
+      UnitMatchNot(Protoss.Carrier)))
     unitPreference.set(UnitPreferFast)
   })
   

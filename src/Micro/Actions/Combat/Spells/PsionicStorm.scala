@@ -3,7 +3,7 @@ package Micro.Actions.Combat.Spells
 import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Heuristics.Spells.TargetAOE
-import ProxyBwapi.Races.Protoss
+import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object PsionicStorm extends Action {
@@ -29,16 +29,19 @@ object PsionicStorm extends Action {
   }
   
   private def valueTarget(target: UnitInfo): Double = {
-    if (target.unitClass.isBuilding) return 0.0
-    if (target.underStorm) return 0.0
-    if (target.invincible) return 0.0
+    if (target.unitClass.isBuilding)  return 0.0
+    if (target.underStorm)            return 0.0
+    if (target.invincible)            return 0.0
+    if (target.is(Zerg.Larva))        return 0.0 //Shouldn't be necessary (0 value) but keep seeing this
+    if (target.is(Zerg.Egg))          return 0.0
+    if (target.is(Zerg.LurkerEgg))    return 0.0
     
     val output = (
       target.subjectiveValue *
       Math.min(112.0, target.totalHealth) *
       (
         if (target.isFriendly)
-          -3.0
+          -10.0
         else if (target.isEnemy)
           1.0
         else

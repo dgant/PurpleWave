@@ -83,7 +83,7 @@ class Commander {
     sleepAttack(unit)
   }
   
-  val flyingOvershoot = 188.0
+  val flyingOvershoot = 288.0
   def move(unit: FriendlyUnitInfo, to: Pixel) {
     if (unready(unit)) return
     

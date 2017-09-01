@@ -24,12 +24,13 @@ class PvPLateGameStandard extends Parallel {
       RequestUpgrade(Protoss.ZealotSpeed),
       RequestAtLeast(8, Protoss.Gateway),
       RequestAtLeast(1, Protoss.Forge),
-      RequestUpgrade(Protoss.GroundDamage)))
+      RequestUpgrade(Protoss.GroundDamage),
+      RequestAtLeast(1, Protoss.TemplarArchives),
+      RequestTech(Protoss.PsionicStorm)))
       
   class BuildTechPartTwo extends Parallel(
     new Build(
-      RequestAtLeast(1, Protoss.TemplarArchives),
-      RequestTech(Protoss.PsionicStorm),
+
       RequestUpgrade(Protoss.GroundArmor),
       RequestUpgrade(Protoss.HighTemplarEnergy),
       RequestAtLeast(12, Protoss.Gateway),
@@ -52,7 +53,7 @@ class PvPLateGameStandard extends Parallel {
     new If(new UnitsAtLeast(3,  Protoss.Reaver),          new If(new EnemyBasesAtLeast(3), new Build(RequestUpgrade(Protoss.ShuttleSpeed)))),
     new If(new UnitsAtLeast(8,  UnitMatchWarriors),       new RequireMiningBases(2)),
     new If(new UnitsAtLeast(15, UnitMatchWarriors),       new RequireMiningBases(3)),
-    new If(new UnitsAtLeast(17, UnitMatchWarriors),       new OnMiningBases(3, new BuildTechPartOne)),
+    new If(new UnitsAtLeast(17, UnitMatchWarriors),       new OnMiningBases(2, new BuildTechPartOne)),
     new If(new UnitsAtLeast(25, UnitMatchWarriors),       new OnMiningBases(3, new BuildTechPartTwo)),
     new If(new UnitsAtLeast(30, UnitMatchWarriors),       new RequireMiningBases(4)),
     new If(new EnemyUnitsAtLeast(1, Protoss.DarkTemplar), new Build(RequestUpgrade(Protoss.ObserverSpeed))),

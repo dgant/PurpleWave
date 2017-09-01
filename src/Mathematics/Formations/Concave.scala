@@ -39,7 +39,7 @@ object Concave {
     ranks.foreach(rank => {
       arcPlacement.startRank(rank.head.idealDistance)
       rank.foreach(participant => {
-        participant.pixelAfter = arcPlacement.reserveSpace(14.0 + 2.0 * participant.unitClass.radialHypotenuse)
+        participant.pixelAfter = arcPlacement.reserveSpace(16.0 + 2.0 * participant.unitClass.radialHypotenuse)
       })
     })
   

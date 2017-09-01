@@ -61,6 +61,11 @@ object PlacementProfiles {
   // Specialty placements //
   //////////////////////////
   
+  val backPylon = new PlacementProfile("Pylon for the back of your base", basic) {
+    preferDistanceFromEnemy     = 1.0
+    avoidDistanceFromIdealRange = 0.0
+  }
+  
   val wallPylon = new PlacementProfile(
     "Pylon for a wall",
     preferZone                  = 1000.0,

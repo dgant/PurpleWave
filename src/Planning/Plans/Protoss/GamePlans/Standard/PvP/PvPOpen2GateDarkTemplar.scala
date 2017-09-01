@@ -2,6 +2,7 @@ package Planning.Plans.Protoss.GamePlans.Standard.PvP
 
 import Lifecycle.With
 import Macro.Architecture.Blueprint
+import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.RequestAtLeast
 import Planning.Plan
 import Planning.Plans.Army.Attack
@@ -23,6 +24,13 @@ class PvPOpen2GateDarkTemplar extends Mode {
   
   override val completionCriteria: Plan = new And(new UnitsAtLeast(2, Protoss.Nexus))
   
+  private class DontGetOurGatewaysUnpoweredBySkynet extends ProposePlacement {
+    override lazy val blueprints: Iterable[Blueprint] = Vector(
+      new Blueprint(this, building = Some(Protoss.Pylon),  placement = Some(PlacementProfiles.backPylon)),
+      new Blueprint(this, building = Some(Protoss.Pylon),  placement = Some(PlacementProfiles.backPylon))
+    )
+  }
+  
   private class ProposeCannonsAtExpanion extends ProposePlacement {
     override lazy val blueprints: Iterable[Blueprint] = Blueprinter.pylonsAndCannonsAtNatural(this, 1, 3)
   }
@@ -30,6 +38,7 @@ class PvPOpen2GateDarkTemplar extends Mode {
   children.set(Vector(
     new Do(() => With.blackboard.gasBankSoftLimit = 450),
     new RequireBareMinimum,
+    new DontGetOurGatewaysUnpoweredBySkynet,
     new BuildOrder(
       // http://wiki.teamliquid.net/starcraft/2_Gateway_Dark_Templar_(vs._Protoss)
       // We get gas/core faster because of mineral locking + later scout

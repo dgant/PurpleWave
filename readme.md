@@ -8,7 +8,7 @@ PurpleWave won 3rd Place in the [2017 IEEE CIG Starcraft Tournament](https://cil
 
 ## Credits
 Thanks to:
-* Antiga / Iruian (Nathan Roth) for strategy advice and consulting
+* Antiga / Iruian (Nathan Roth) for strategy advice and consulting -- so much of the polish in PurpleWave's strategies comes from his wisdom and replay analysis
 * @jaj22/JohnJ for lots of advice navigating Brood War mechanics
 * @IMP42 @AdakiteSystems and @tscmoo for helping me get BWAPI up and running when I was getting started
 * @kovarex @heinermann @bgweber @certicky @krasi0 @davechurchill and the Cognition & Intelligence Lab at Sejong University for making Brood War competitions possible in the first place

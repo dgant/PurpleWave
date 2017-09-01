@@ -28,8 +28,8 @@ class SquadDefendZone(zone: Zone) extends SquadGoal {
     
     lazy val canHuntEnemies  = huntableEnemies.get.nonEmpty
     lazy val canDefendWall   = walls.nonEmpty
+    lazy val canDefendChoke  = choke.isDefined && ( ! With.enemies.exists(_.isZerg) || choke.get.radiusPixels * 2.0 - 32.0 < unitWidth)
     lazy val canDefendHeart  = base.isDefined
-    lazy val canDefendChoke  = choke.isDefined && choke.get.radiusPixels * 2.0 - 32.0 < unitWidth
     
     if (canHuntEnemies) {
       lastAction = "Hunt intruders in "

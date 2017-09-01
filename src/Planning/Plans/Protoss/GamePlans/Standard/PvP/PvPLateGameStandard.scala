@@ -7,7 +7,7 @@ import Planning.Plans.Compound._
 import Planning.Plans.Information.Reactive.EnemyBasesAtLeast
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Macro.Expanding.{BuildCannonsAtExpansions, BuildGasPumps, RequireMiningBases}
+import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Milestones._
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Protoss.GamePlans.Standard.PvP.PvPIdeas.{ReactToDarkTemplarExisting, ReactToDarkTemplarPossible}
@@ -28,7 +28,8 @@ class PvPLateGameStandard extends Parallel {
       RequestTech(Protoss.PsionicStorm),
       RequestUpgrade(Protoss.GroundArmor),
       RequestUpgrade(Protoss.HighTemplarEnergy),
-      RequestAtLeast(1, Protoss.RoboticsSupportBay)) )
+      RequestAtLeast(1, Protoss.RoboticsSupportBay),
+      RequestUpgrade(Protoss.ShuttleSpeed)) )
   
   children.set(Vector(
     new MeldArchons(40),
@@ -45,8 +46,8 @@ class PvPLateGameStandard extends Parallel {
     new If(new UnitsAtLeast(2,  Protoss.Reaver),      new Build(RequestUpgrade(Protoss.ScarabDamage))),
     new If(new UnitsAtLeast(3,  Protoss.Reaver),      new If(new EnemyBasesAtLeast(3), new Build(RequestUpgrade(Protoss.ShuttleSpeed)))),
     new If(new UnitsAtLeast(8,  UnitMatchWarriors),   new RequireMiningBases(2)),
-    new If(new UnitsAtLeast(17, UnitMatchWarriors),   new RequireMiningBases(3)),
-    new If(new UnitsAtLeast(19, UnitMatchWarriors),   new BuildLateGameTech),
+    new If(new UnitsAtLeast(15, UnitMatchWarriors),   new RequireMiningBases(3)),
+    new If(new UnitsAtLeast(17, UnitMatchWarriors),   new BuildLateGameTech),
     new If(new UnitsAtLeast(25, UnitMatchWarriors),   new RequireMiningBases(4)),
     
     new If(
@@ -62,6 +63,7 @@ class PvPLateGameStandard extends Parallel {
       new Build(RequestAtLeast(1, Protoss.Shuttle)),
       new If(
         new And(
+          new Not(new OnMiningBases(3)),
           new Not(new TechComplete(Protoss.PsionicStorm)),
           new UnitsAtMost(3, Protoss.Reaver)
         ),
@@ -99,15 +101,13 @@ class PvPLateGameStandard extends Parallel {
         RequestAtLeast(1, Protoss.TemplarArchives),
         RequestAtLeast(8, Protoss.Gateway))),
     new RequireMiningBases(3),
-    new OnMiningBases(3, new BuildCannonsAtExpansions(3)),
     new OnMiningBases(1, new Build(RequestAtLeast(1, Protoss.RoboticsSupportBay))),
     new OnMiningBases(3, new Build(RequestAtLeast(12, Protoss.Gateway))),
     new RequireMiningBases(4),
     new UpgradeContinuously(Protoss.GroundDamage),
     new OnMiningBases(4, new Build(RequestAtLeast(15, Protoss.Gateway))),
     new UpgradeContinuously(Protoss.GroundArmor),
-  
-    new Aggression(0.85),
+    new Aggression(0.82),
     new ScoutExpansionsAt(90),
     new DefendZones,
     new If(new EnemyBasesAtLeast(3), new DropAttack),

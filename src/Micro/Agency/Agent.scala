@@ -6,7 +6,7 @@ import Mathematics.Points.{Pixel, PixelRay, Tile}
 import Micro.Actions.{Action, Idle}
 import Micro.Decisions.MicroDecision
 import Micro.Heuristics.Targeting.TargetingProfile
-import Performance.Caching.CacheFrame
+import Performance.CacheFrame
 import Planning.Plan
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClass.UnitClass

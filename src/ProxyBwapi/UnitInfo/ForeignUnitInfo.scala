@@ -2,8 +2,8 @@ package ProxyBwapi.UnitInfo
 
 import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile}
-import Performance.Caching.{CacheFrame, Limiter}
-import ProxyBwapi.Players.{PlayerInfo, Players}
+import Performance.CacheFrame
+import ProxyBwapi.Players
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
 import bwapi.{Position, UnitCommand}
@@ -22,20 +22,24 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit) extends UnitInfo (originalBa
   def update(unit: bwapi.Unit) {
     baseUnit = unit
     updateTimeSensitiveInformation()
-    limitMostUpdates.act()
+    updateTimeInsensitiveInformation()
     fixCloakedUnits()
     updateHistory()
   }
   
-  private val limitMostUpdates = new Limiter(1, () => {
-    updateTracking()
-    updateVisibility()
-    updateHealth()
-    updateCombat()
-    updateGeometry()
-    updateMovement()
-    updateOrders()
-    updateStatuses()
+  private var updateCount = 0
+  private def updateTimeInsensitiveInformation() {
+    updateCount += 1
+    if (updateCount % With.configuration.foreignUnitUpdatePeriod == 0) {
+      updateTracking()
+      updateVisibility()
+      updateHealth()
+      updateCombat()
+      updateGeometry()
+      updateMovement()
+      updateOrders()
+      updateStatuses()
+    }
   })
   
   ///////////////////

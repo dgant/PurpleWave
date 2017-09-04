@@ -3,7 +3,7 @@ package Information
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Points.Tile
-import Performance.Caching.CacheFrame
+import Performance.CacheFrame
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitClass.UnitClass
 import bwapi.UnitCommandType

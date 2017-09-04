@@ -9,7 +9,7 @@ import Mathematics.Physics.Force
 import Mathematics.Points.{Pixel, Tile, TileRectangle}
 import Mathematics.PurpleMath
 import Micro.Matchups.MatchupAnalysis
-import Performance.Caching.CacheFrame
+import Performance.CacheFrame
 import ProxyBwapi.Engine.Damage
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitClass.UnitClass

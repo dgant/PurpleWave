@@ -2,7 +2,7 @@ package Planning.Plans.Macro.BuildOrders
 
 import Lifecycle.With
 import Macro.Buildables.Buildable
-import Performance.Caching.CacheFrame
+import Performance.CacheFrame
 import Planning.Plan
 import Planning.Plans.Macro.Build._
 

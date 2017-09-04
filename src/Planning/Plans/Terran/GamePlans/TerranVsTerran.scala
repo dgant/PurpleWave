@@ -4,7 +4,7 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
 import Planning.Composition.UnitCounters.UnitCountOne
-import Planning.Composition.UnitMatchers.{UnitMatchSiegeTank, UnitMatchType, UnitMatchWarriors, UnitMatchWorkers}
+import Planning.Composition.UnitMatchers.{UnitMatchSiegeTank, UnitMatchWarriors, UnitMatchWorkers}
 import Planning.Plans.Army._
 import Planning.Plans.Compound._
 import Planning.Plans.Macro.Automatic._
@@ -28,18 +28,18 @@ class TerranVsTerran extends Parallel {
     },
     new FirstEightMinutes(
       new Build(
-        RequestAtLeast(1, Terran.CommandCenter),
-        RequestAtLeast(9, Terran.SCV),
-        RequestAtLeast(1, Terran.SupplyDepot),
-        RequestAtLeast(11, Terran.SCV),
-        RequestAtLeast(1, Terran.Barracks),
-        RequestAtLeast(12, Terran.SCV),
-        RequestAtLeast(1, Terran.Refinery),
-        RequestAtLeast(15, Terran.SCV),
-        RequestAtLeast(2, Terran.SupplyDepot),
-        RequestAtLeast(16, Terran.SCV),
-        RequestAtLeast(1, Terran.Factory),
-        RequestAtLeast(20, Terran.SCV))),
+        RequestAtLeast(1,   Terran.CommandCenter),
+        RequestAtLeast(9,   Terran.SCV),
+        RequestAtLeast(1,   Terran.SupplyDepot),
+        RequestAtLeast(11,  Terran.SCV),
+        RequestAtLeast(1,   Terran.Barracks),
+        RequestAtLeast(12,  Terran.SCV),
+        RequestAtLeast(1,   Terran.Refinery),
+        RequestAtLeast(15,  Terran.SCV),
+        RequestAtLeast(2,   Terran.SupplyDepot),
+        RequestAtLeast(16,  Terran.SCV),
+        RequestAtLeast(1,   Terran.Factory),
+        RequestAtLeast(20,  Terran.SCV))),
   
     new RequireBareMinimum,
     new FirstEightMinutes(

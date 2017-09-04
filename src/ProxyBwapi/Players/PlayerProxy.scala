@@ -2,7 +2,7 @@ package ProxyBwapi.Players
 
 import Lifecycle.With
 import Mathematics.Points.Tile
-import Performance.Caching.CacheFrame
+import Performance.CacheFrame
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
 import ProxyBwapi.Upgrades.Upgrade

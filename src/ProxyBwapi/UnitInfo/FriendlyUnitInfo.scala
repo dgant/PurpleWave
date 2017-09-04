@@ -3,7 +3,7 @@ package ProxyBwapi.UnitInfo
 import Lifecycle.With
 import Micro.Agency.Agent
 import Micro.Squads.Squad
-import Performance.Caching.CacheFrame
+import Performance.CacheFrame
 import ProxyBwapi.Techs.{Tech, Techs}
 import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
 

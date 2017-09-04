@@ -3,7 +3,7 @@ package Macro.Scheduling
 import Lifecycle.With
 import Macro.BuildRequests.BuildRequest
 import Macro.Buildables.Buildable
-import Performance.Caching.CacheFrame
+import Performance.CacheFrame
 import Planning.Plan
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitClass.UnitClass

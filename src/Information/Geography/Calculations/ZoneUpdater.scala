@@ -3,6 +3,7 @@ package Information.Geography.Calculations
 import Information.Geography.Pathfinding.GroundPathFinder
 import Information.Geography.Types.Zone
 import Lifecycle.With
+import Mathematics.Points.{Pixel, SpecificPoints}
 import ProxyBwapi.Players.Players
 import ProxyBwapi.Races.Terran
 
@@ -45,6 +46,13 @@ object ZoneUpdater {
         zone.owner = pair._1
       }
     }))
+  
+    With.geography.home = With.geography.ourBases
+      .toVector
+      .sortBy( ! _.isStartLocation)
+      .headOption
+      .map(_.townHallArea.startInclusive)
+      .getOrElse(SpecificPoints.tileMiddle)
   }
   
   def updateZone(zone: Zone) {

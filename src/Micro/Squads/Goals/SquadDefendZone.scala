@@ -5,7 +5,7 @@ import Lifecycle.With
 import Mathematics.Formations.Formation
 import Mathematics.Points.{Pixel, SpecificPoints}
 import Micro.Agency.Intention
-import Performance.Caching.CacheFrame
+import Performance.CacheFrame
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.ByOption
 import Utilities.EnrichPixel.EnrichedPixelCollection

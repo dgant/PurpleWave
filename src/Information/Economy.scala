@@ -2,7 +2,7 @@ package Information
 
 import Information.Geography.Types.Base
 import Lifecycle.With
-import Performance.Caching.CacheFrame
+import Performance.CacheFrame
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 class Economy {

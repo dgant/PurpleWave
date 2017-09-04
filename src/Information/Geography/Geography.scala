@@ -4,11 +4,11 @@ import Information.Geography.Calculations.{ZoneBuilder, ZoneUpdater}
 import Information.Geography.Types.{Base, Edge, Zone}
 import Lifecycle.With
 import Mathematics.Points.{SpecificPoints, Tile, TileRectangle}
-import Performance.Caching.{Cache, CacheFrame, Limiter}
+import Performance.CacheFrame
 import ProxyBwapi.UnitInfo.UnitInfo
 
-import scala.collection.mutable
 import scala.collection.JavaConverters._
+import scala.collection.mutable
 
 class Geography {
   
@@ -50,21 +50,12 @@ class Geography {
       }
     }
   
-  def home: Tile = homeCache.get
-  private val homeCache = new Cache(5, () =>
-    ourBases
-      .toVector
-      .sortBy( ! _.isStartLocation)
-      .headOption
-      .map(_.townHallArea.startInclusive)
-      .getOrElse(SpecificPoints.tileMiddle))
-  
-  def update() {
-    zoneUpdateLimiter.act()
-    bases.filter(base => With.game.isVisible(base.townHallArea.midpoint.bwapi)).foreach(base => base.lastScoutedFrame = With.frame)
-  }
-  
-  private val zoneUpdateLimiter = new Limiter(2, () => ZoneUpdater.update())
+  var home: Tile = SpecificPoints.tileMiddle
   
   var naturalsSearched: Boolean = false
+  
+  def update() {
+    ZoneUpdater.update()
+    bases.filter(base => With.game.isVisible(base.townHallArea.midpoint.bwapi)).foreach(base => base.lastScoutedFrame = With.frame)
+  }
 }

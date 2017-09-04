@@ -1,10 +1,10 @@
 package ProxyBwapi.UnitInfo
-import Performance.Caching.{Cache, CacheFrame}
-import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
 import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile}
+import Performance.CacheFrame
 import ProxyBwapi.Players.{PlayerInfo, Players}
 import ProxyBwapi.Races.Protoss
+import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
 import bwapi._
 
 import scala.collection.JavaConverters._
@@ -14,17 +14,17 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit) extends UnitInfo(base) {
   override def equals(obj: Any): Boolean = obj.isInstanceOf[FriendlyUnitProxy] && obj.asInstanceOf[FriendlyUnitProxy].id == id
   override def hashCode(): Int = id.hashCode
   
-  val cacheClass     = new Cache[UnitClass]     (5,  () =>  UnitClasses.get(base.getType))
-  val cachePlayer    = new Cache[PlayerInfo]    (10, () =>  Players.get(base.getPlayer))
-  val cachePixel     = new CacheFrame[Pixel]    (() =>  new Pixel(base.getPosition))
-  val cacheTile      = new CacheFrame[Tile]     (() =>  new Tile(base.getTilePosition))
-  val cacheCompleted = new CacheFrame[Boolean]  (() =>  base.isCompleted)
-  val cacheExists    = new CacheFrame[Boolean]  (() =>  base.exists)
-  val cacheSelected  = new CacheFrame[Boolean]  (() =>  base.isSelected)
-  val cacheId        = new CacheFrame[Int]      (() =>  base.getID)
-  val cachedFlying   = new CacheFrame[Boolean]  (() =>  base.isFlying)
-  val cachedCloaked  = new CacheFrame[Boolean]  (() =>  base.isCloaked)
-  val cachedStasised = new CacheFrame[Boolean]  (() =>  base.isStasised)
+  val cacheClass     = new CacheFrame[UnitClass]  (() =>  UnitClasses.get(base.getType))
+  val cachePlayer    = new CacheFrame[PlayerInfo] (() =>  Players.get(base.getPlayer))
+  val cachePixel     = new CacheFrame[Pixel]      (() =>  new Pixel(base.getPosition))
+  val cacheTile      = new CacheFrame[Tile]       (() =>  new Tile(base.getTilePosition))
+  val cacheCompleted = new CacheFrame[Boolean]    (() =>  base.isCompleted)
+  val cacheExists    = new CacheFrame[Boolean]    (() =>  base.exists)
+  val cacheSelected  = new CacheFrame[Boolean]    (() =>  base.isSelected)
+  val cacheId        = new CacheFrame[Int]        (() =>  base.getID)
+  val cachedFlying   = new CacheFrame[Boolean]    (() =>  base.isFlying)
+  val cachedCloaked  = new CacheFrame[Boolean]    (() =>  base.isCloaked)
+  val cachedStasised = new CacheFrame[Boolean]    (() =>  base.isStasised)
   
   ///////////////////
   // Tracking info //

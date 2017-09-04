@@ -3,7 +3,7 @@ package Information
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Points.Tile
-import Performance.CacheFrame
+import Performance.Cache
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitClass.UnitClass
 import bwapi.UnitCommandType
@@ -12,8 +12,8 @@ import scala.collection.mutable
 
 class Intelligence {
   
-  def mostBaselikeEnemyTile: Tile = mostBaselikeEnemyTileCache.get
-  private val mostBaselikeEnemyTileCache = new CacheFrame(() =>
+  def mostBaselikeEnemyTile: Tile = mostBaselikeEnemyTileCache()
+  private val mostBaselikeEnemyTileCache = new Cache(() =>
     With.units.enemy
       .toVector
       .filter(unit => unit.possiblyStillThere && ! unit.flying && unit.unitClass.isBuilding)
@@ -22,8 +22,8 @@ class Intelligence {
       .headOption
       .getOrElse(leastScoutedBases.head.townHallArea.midpoint))
   
-  def leastScoutedBases: Iterable[Base] = leastScoutedBasesCache.get
-  private val leastScoutedBasesCache = new CacheFrame(() => {
+  def leastScoutedBases: Iterable[Base] = leastScoutedBasesCache()
+  private val leastScoutedBasesCache = new Cache(() => {
     lazy val weHaveFliers = With.units.ours.exists(_.flying)
     With.geography.bases
       .toVector

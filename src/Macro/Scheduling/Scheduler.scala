@@ -3,7 +3,7 @@ package Macro.Scheduling
 import Lifecycle.With
 import Macro.BuildRequests.BuildRequest
 import Macro.Buildables.Buildable
-import Performance.CacheFrame
+import Performance.Cache
 import Planning.Plan
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitClass.UnitClass
@@ -35,8 +35,8 @@ class Scheduler {
     With.scheduler.requestsByPlan.toVector.sortBy(_._1.priority)
   }
   
-  def queue: Iterable[Buildable] = queueCache.get
-  val queueCache = new CacheFrame(() => queueRecalculate)
+  def queue: Iterable[Buildable] = queueCache()
+  val queueCache = new Cache(() => queueRecalculate)
   private def queueRecalculate: Iterable[Buildable] = {
     val requestQueue = requestsByPlan.keys.toVector.sortBy(_.priority).flatten(requestsByPlan)
     val unitsWanted = new CountMap[UnitClass]

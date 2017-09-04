@@ -3,7 +3,7 @@ package ProxyBwapi.UnitInfo
 import Lifecycle.With
 import Micro.Agency.Agent
 import Micro.Squads.Squad
-import Performance.CacheFrame
+import Performance.Cache
 import ProxyBwapi.Techs.{Tech, Techs}
 import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
 
@@ -48,11 +48,11 @@ class FriendlyUnitInfo(base: bwapi.Unit) extends FriendlyUnitProxy(base) {
   // Statuses //
   //////////////
   
-  def loadedUnits: Vector[FriendlyUnitInfo] = loadedUnitsCache.get
-  private val loadedUnitsCache = new CacheFrame(() => base.getLoadedUnits.asScala.flatMap(With.units.get).flatMap(_.friendly).toVector)
+  def loadedUnits: Vector[FriendlyUnitInfo] = loadedUnitsCache()
+  private val loadedUnitsCache = new Cache(() => base.getLoadedUnits.asScala.flatMap(With.units.get).flatMap(_.friendly).toVector)
   
-  def transport: Option[FriendlyUnitInfo] = transportCache.get
-  private val transportCache = new CacheFrame(() => With.units.get(base.getTransport).flatMap(_.friendly))
+  def transport: Option[FriendlyUnitInfo] = transportCache()
+  private val transportCache = new Cache(() => With.units.get(base.getTransport).flatMap(_.friendly))
   
   def canTransport(passenger: FriendlyUnitInfo): Boolean =
     isTransport                       &&

@@ -2,7 +2,7 @@ package Information
 
 import Information.Geography.Types.Base
 import Lifecycle.With
-import Performance.CacheFrame
+import Performance.Cache
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 class Economy {
@@ -25,22 +25,22 @@ class Economy {
   def ourActualTotalMinerals    : Integer = With.self.gatheredMinerals
   def ourActualTotalGas         : Integer = With.self.gatheredGas
   
-  def ourIncomePerFrameMinerals : Double = ourIncomePerFrameMineralsCache.get
-  def ourIncomePerFrameGas      : Double = ourIncomePerFrameGasCache.get
+  def ourIncomePerFrameMinerals : Double = ourIncomePerFrameMineralsCache()
+  def ourIncomePerFrameGas      : Double = ourIncomePerFrameGasCache()
   
-  private val ourIncomePerFrameMineralsCache  = new CacheFrame(() => ourActiveMiners.size   * incomePerFrameMinerals)
-  private val ourIncomePerFrameGasCache       = new CacheFrame(() => ourActiveDrillers.size * incomePerFrameGas)
+  private val ourIncomePerFrameMineralsCache  = new Cache(() => ourActiveMiners.size   * incomePerFrameMinerals)
+  private val ourIncomePerFrameGasCache       = new Cache(() => ourActiveDrillers.size * incomePerFrameGas)
   
   def genericIncomePerFrameMinerals (miners:Int, bases:Int): Double = Math.min(miners, bases * 16)  * incomePerFrameMinerals
   def genericIncomePerFrameGas      (miners:Int, bases:Int): Double = Math.min(miners, bases * 3)   * incomePerFrameGas
   
-  def ourActiveGatherers  : Traversable[FriendlyUnitInfo] = ourActiveGatherersCache.get
-  def ourActiveMiners     : Traversable[FriendlyUnitInfo] = ourActiveMinersCache.get
-  def ourActiveDrillers   : Traversable[FriendlyUnitInfo] = ourActiveDrillersCache.get
+  def ourActiveGatherers  : Traversable[FriendlyUnitInfo] = ourActiveGatherersCache()
+  def ourActiveMiners     : Traversable[FriendlyUnitInfo] = ourActiveMinersCache()
+  def ourActiveDrillers   : Traversable[FriendlyUnitInfo] = ourActiveDrillersCache()
   
-  private val ourActiveGatherersCache = new CacheFrame(() => With.geography.ourBases.flatten(ourActiveGatherers))
-  private val ourActiveMinersCache    = new CacheFrame(() => With.geography.ourBases.flatten(ourActiveMiners))
-  private val ourActiveDrillersCache  = new CacheFrame(() => With.geography.ourBases.flatten(ourActiveDrillers))
+  private val ourActiveGatherersCache = new Cache(() => With.geography.ourBases.flatten(ourActiveGatherers))
+  private val ourActiveMinersCache    = new Cache(() => With.geography.ourBases.flatten(ourActiveMiners))
+  private val ourActiveDrillersCache  = new Cache(() => With.geography.ourBases.flatten(ourActiveDrillers))
   
   def ourActiveGatherers(base: Base): Traversable[FriendlyUnitInfo] = {
     base.units.toSeq.flatMap(_.friendly).filter(unit => unit.agent.toGather.exists(_.base.contains(base)) && base.harvestingArea.contains(unit.tileIncludingCenter))

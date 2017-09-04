@@ -5,7 +5,7 @@ import Lifecycle.With
 import Mathematics.Formations.Formation
 import Mathematics.Points.{Pixel, SpecificPoints}
 import Micro.Agency.Intention
-import Performance.CacheFrame
+import Performance.Cache
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.ByOption
 import Utilities.EnrichPixel.EnrichedPixelCollection
@@ -26,7 +26,7 @@ class SquadDefendZone(zone: Zone) extends SquadGoal {
       && u.unitClass.isStaticDefense
       && (squad.enemies.isEmpty || squad.enemies.exists(u.canAttack)))
     
-    lazy val canHuntEnemies  = huntableEnemies.get.nonEmpty
+    lazy val canHuntEnemies  = huntableEnemies().nonEmpty
     lazy val canDefendWall   = walls.nonEmpty
     lazy val canDefendChoke  = choke.isDefined && ( ! With.enemies.exists(_.isZerg) || choke.get.radiusPixels * 2.0 - 32.0 < unitWidth)
     lazy val canDefendHeart  = base.isDefined
@@ -49,7 +49,7 @@ class SquadDefendZone(zone: Zone) extends SquadGoal {
     }
   }
   
-  private val huntableEnemies = new CacheFrame(() => {
+  private val huntableEnemies = new Cache(() => {
     squad.enemies.filter(enemy =>
       enemy.zone == zone &&
       enemy.unitClass.helpsInCombat &&
@@ -59,9 +59,9 @@ class SquadDefendZone(zone: Zone) extends SquadGoal {
   
   def huntEnemies() {
     lazy val center        = zone.bases.find(_.owner.isUs).map(_.heart.pixelCenter).getOrElse(zone.centroid.pixelCenter)
-    lazy val target        = huntableEnemies.get.minBy(_.pixelDistanceFast(center))
-    lazy val targetAir     = ByOption.minBy(huntableEnemies.get.filter   (_.flying))(_.pixelDistanceFast(center)).getOrElse(target)
-    lazy val targetGround  = ByOption.minBy(huntableEnemies.get.filterNot(_.flying))(_.pixelDistanceFast(center)).getOrElse(target)
+    lazy val target        = huntableEnemies().minBy(_.pixelDistanceFast(center))
+    lazy val targetAir     = ByOption.minBy(huntableEnemies().filter   (_.flying))(_.pixelDistanceFast(center)).getOrElse(target)
+    lazy val targetGround  = ByOption.minBy(huntableEnemies().filterNot(_.flying))(_.pixelDistanceFast(center)).getOrElse(target)
     squad.recruits.foreach(recruit => {
       val onlyAir     = recruit.canAttack && ! recruit.unitClass.attacksGround
       val onlyGround  = recruit.canAttack && ! recruit.unitClass.attacksAir

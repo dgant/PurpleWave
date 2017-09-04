@@ -2,7 +2,7 @@ package Planning.Plans.Macro.BuildOrders
 
 import Lifecycle.With
 import Macro.Buildables.Buildable
-import Performance.CacheFrame
+import Performance.Cache
 import Planning.Plan
 import Planning.Plans.Macro.Build._
 
@@ -18,8 +18,8 @@ class FollowBuildOrder extends Plan {
   private val plans = new mutable.HashMap[Buildable, ListBuffer[Plan]]
   private var queue: Iterable[Buildable] = Vector.empty
   
-  override def getChildren: Iterable[Plan] = getChildrenCache.get
-  private val getChildrenCache = new CacheFrame(() => getChildrenRecalculate)
+  override def getChildren: Iterable[Plan] = getChildrenCache()
+  private val getChildrenCache = new Cache(() => getChildrenRecalculate)
   private def getChildrenRecalculate: Iterable[Plan] = {
     val indexByBuild = new mutable.HashMap[Buildable, Int]
     plans.keys.foreach(build => indexByBuild.put(build, 0))

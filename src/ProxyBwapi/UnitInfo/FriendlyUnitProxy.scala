@@ -1,7 +1,7 @@
 package ProxyBwapi.UnitInfo
 import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile}
-import Performance.CacheFrame
+import Performance.Cache
 import ProxyBwapi.Players.{PlayerInfo, Players}
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
@@ -14,24 +14,24 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit) extends UnitInfo(base) {
   override def equals(obj: Any): Boolean = obj.isInstanceOf[FriendlyUnitProxy] && obj.asInstanceOf[FriendlyUnitProxy].id == id
   override def hashCode(): Int = id.hashCode
   
-  val cacheClass     = new CacheFrame[UnitClass]  (() =>  UnitClasses.get(base.getType))
-  val cachePlayer    = new CacheFrame[PlayerInfo] (() =>  Players.get(base.getPlayer))
-  val cachePixel     = new CacheFrame[Pixel]      (() =>  new Pixel(base.getPosition))
-  val cacheTile      = new CacheFrame[Tile]       (() =>  new Tile(base.getTilePosition))
-  val cacheCompleted = new CacheFrame[Boolean]    (() =>  base.isCompleted)
-  val cacheExists    = new CacheFrame[Boolean]    (() =>  base.exists)
-  val cacheSelected  = new CacheFrame[Boolean]    (() =>  base.isSelected)
-  val cacheId        = new CacheFrame[Int]        (() =>  base.getID)
-  val cachedFlying   = new CacheFrame[Boolean]    (() =>  base.isFlying)
-  val cachedCloaked  = new CacheFrame[Boolean]    (() =>  base.isCloaked)
-  val cachedStasised = new CacheFrame[Boolean]    (() =>  base.isStasised)
+  val cacheClass     = new Cache[UnitClass]  (() =>  UnitClasses.get(base.getType))
+  val cachePlayer    = new Cache[PlayerInfo] (() =>  Players.get(base.getPlayer))
+  val cachePixel     = new Cache[Pixel]      (() =>  new Pixel(base.getPosition))
+  val cacheTile      = new Cache[Tile]       (() =>  new Tile(base.getTilePosition))
+  val cacheCompleted = new Cache[Boolean]    (() =>  base.isCompleted)
+  val cacheExists    = new Cache[Boolean]    (() =>  base.exists)
+  val cacheSelected  = new Cache[Boolean]    (() =>  base.isSelected)
+  val cacheId        = new Cache[Int]        (() =>  base.getID)
+  val cachedFlying   = new Cache[Boolean]    (() =>  base.isFlying)
+  val cachedCloaked  = new Cache[Boolean]    (() =>  base.isCloaked)
+  val cachedStasised = new Cache[Boolean]    (() =>  base.isStasised)
   
   ///////////////////
   // Tracking info //
   ///////////////////
   
-  def player              : PlayerInfo  = cachePlayer.get
-  def unitClass           : UnitClass   = cacheClass.get
+  def player              : PlayerInfo  = cachePlayer()
+  def unitClass           : UnitClass   = cacheClass()
   def lastSeen            : Int         = With.frame
   def possiblyStillThere  : Boolean     = alive
   
@@ -44,54 +44,54 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit) extends UnitInfo(base) {
   // Health //
   ////////////
   
-  def alive                 : Boolean   = cacheExists.get
-  def complete              : Boolean   = cacheCompleted.get
-  def defensiveMatrixPoints : Int       = getDefenseMatrixPointsCache.get
-  def hitPoints             : Int       = getHitPointsCache.get
-  def initialResources      : Int       = getInitialResourcesCache.get
-  def invincible            : Boolean   = isInvincibleCache.get
-  def resourcesLeft         : Int       = getResourcesCache.get
-  def shieldPoints          : Int       = getShieldsCache.get
-  def energy                : Int       = getEnergyCache.get
-  def plagued               : Boolean   = isPlaguedCache.get
+  def alive                 : Boolean   = cacheExists()
+  def complete              : Boolean   = cacheCompleted()
+  def defensiveMatrixPoints : Int       = getDefenseMatrixPointsCache()
+  def hitPoints             : Int       = getHitPointsCache()
+  def initialResources      : Int       = getInitialResourcesCache()
+  def invincible            : Boolean   = isInvincibleCache()
+  def resourcesLeft         : Int       = getResourcesCache()
+  def shieldPoints          : Int       = getShieldsCache()
+  def energy                : Int       = getEnergyCache()
+  def plagued               : Boolean   = isPlaguedCache()
   
-  private val getDefenseMatrixPointsCache   = new CacheFrame(() => base.getDefenseMatrixPoints)
-  private val getHitPointsCache             = new CacheFrame(() => base.getHitPoints)
-  private val getInitialResourcesCache      = new CacheFrame(() => base.getInitialResources)
-  private val isInvincibleCache             = new CacheFrame(() => base.isInvincible)
-  private val getResourcesCache             = new CacheFrame(() => base.getResources)
-  private val getShieldsCache               = new CacheFrame(() => base.getShields)
-  private val getEnergyCache                = new CacheFrame(() => base.getEnergy)
-  private val isPlaguedCache                = new CacheFrame(() => base.isPlagued)
+  private val getDefenseMatrixPointsCache   = new Cache(() => base.getDefenseMatrixPoints)
+  private val getHitPointsCache             = new Cache(() => base.getHitPoints)
+  private val getInitialResourcesCache      = new Cache(() => base.getInitialResources)
+  private val isInvincibleCache             = new Cache(() => base.isInvincible)
+  private val getResourcesCache             = new Cache(() => base.getResources)
+  private val getShieldsCache               = new Cache(() => base.getShields)
+  private val getEnergyCache                = new Cache(() => base.getEnergy)
+  private val isPlaguedCache                = new Cache(() => base.isPlagued)
   
   ////////////
   // Combat //
   ////////////
   
   def interceptors      : Iterable[UnitInfo] = if (is(Protoss.Carrier)) base.getInterceptors.asScala.flatMap(With.units.get) else List.empty
-  def interceptorCount  : Int = interceptorCountCache.get
-  def scarabCount       : Int = scarabCountCache.get
+  def interceptorCount  : Int = interceptorCountCache()
+  def scarabCount       : Int = scarabCountCache()
   
-  def attackStarting            : Boolean = isStartingAttackCache.get
-  def attackAnimationHappening  : Boolean = isAttackFrameCache.get
-  def airCooldownLeft           : Int     = airCooldownLeftCache.get
-  def groundCooldownLeft        : Int     = groundCooldownLeftCache.get
-  def spellCooldownLeft         : Int     = spellCooldownLeftCache.get
+  def attackStarting            : Boolean = isStartingAttackCache()
+  def attackAnimationHappening  : Boolean = isAttackFrameCache()
+  def airCooldownLeft           : Int     = airCooldownLeftCache()
+  def groundCooldownLeft        : Int     = groundCooldownLeftCache()
+  def spellCooldownLeft         : Int     = spellCooldownLeftCache()
   
-  private val isStartingAttackCache   = new CacheFrame(() => base.isStartingAttack)
-  private val isAttackFrameCache      = new CacheFrame(() => base.isAttackFrame)
-  private val interceptorCountCache   = new CacheFrame(() => base.getInterceptorCount)
-  private val scarabCountCache        = new CacheFrame(() => base.getScarabCount)
-  private val airCooldownLeftCache    = new CacheFrame(() => base.getAirWeaponCooldown)
-  private val groundCooldownLeftCache = new CacheFrame(() => base.getGroundWeaponCooldown)
-  private val spellCooldownLeftCache  = new CacheFrame(() => base.getSpellCooldown)
+  private val isStartingAttackCache   = new Cache(() => base.isStartingAttack)
+  private val isAttackFrameCache      = new Cache(() => base.isAttackFrame)
+  private val interceptorCountCache   = new Cache(() => base.getInterceptorCount)
+  private val scarabCountCache        = new Cache(() => base.getScarabCount)
+  private val airCooldownLeftCache    = new Cache(() => base.getAirWeaponCooldown)
+  private val groundCooldownLeftCache = new Cache(() => base.getGroundWeaponCooldown)
+  private val spellCooldownLeftCache  = new Cache(() => base.getSpellCooldown)
   
   //////////////
   // Geometry //
   //////////////
   
-  def pixelCenter : Pixel = cachePixel.get
-  def tileTopLeft : Tile  = cacheTile.get
+  def pixelCenter : Pixel = cachePixel()
+  def tileTopLeft : Tile  = cacheTile()
   def top         : Int   = base.getTop
   def left        : Int   = base.getLeft
   def right       : Int   = base.getRight
@@ -101,84 +101,84 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit) extends UnitInfo(base) {
   // Orders //
   ////////////
   
-  def gatheringMinerals : Boolean = isGatheringMineralsCache.get
-  def gatheringGas      : Boolean = isGatheringGasCache.get
+  def gatheringMinerals : Boolean = isGatheringMineralsCache()
+  def gatheringGas      : Boolean = isGatheringGasCache()
   
-  private val isGatheringMineralsCache  = new CacheFrame(() => base.isGatheringMinerals)
-  private val isGatheringGasCache       = new CacheFrame(() => base.isGatheringGas)
+  private val isGatheringMineralsCache  = new Cache(() => base.isGatheringMinerals)
+  private val isGatheringGasCache       = new Cache(() => base.isGatheringGas)
   
   private val badPositions = Vector(Position.Invalid, Position.None, Position.Unknown)
   
-  def target            : Option[UnitInfo]  = targetCache.get
-  def targetPixel       : Option[Pixel]     = targetPixelCache.get
+  def target            : Option[UnitInfo]  = targetCache()
+  def targetPixel       : Option[Pixel]     = targetPixelCache()
   def order             : String            = base.getOrder.toString
-  def orderTarget       : Option[UnitInfo]  = orderTargetCache.get
-  def orderTargetPixel  : Option[Pixel]     = orderTargetPixelCache.get
+  def orderTarget       : Option[UnitInfo]  = orderTargetCache()
+  def orderTargetPixel  : Option[Pixel]     = orderTargetPixelCache()
   
-  private val orderTargetCache = new CacheFrame(() => {
+  private val orderTargetCache = new Cache(() => {
     val target = if (unitClass.targetsMatter) base.getOrderTarget else null
     if (target == null) None else With.units.getId(target.getID)
   })
-  private val orderTargetPixelCache = new CacheFrame(() => {
+  private val orderTargetPixelCache = new Cache(() => {
     val position = if (unitClass.targetPositionsMatter) base.getOrderTargetPosition else null
     if (badPositions.contains(position)) None else Some(new Pixel(position))
   })
-  private val targetCache = new CacheFrame(() => {
+  private val targetCache = new Cache(() => {
     val target = if (unitClass.targetsMatter) base.getTarget else null
     if (target == null) None else With.units.getId(target.getID)
   })
-  private val targetPixelCache = new CacheFrame(() => {
+  private val targetPixelCache = new Cache(() => {
     val position = if (unitClass.targetPositionsMatter) base.getTargetPosition else null
     if (badPositions.contains(position)) None else Some(new Pixel(position))
   })
   
-  def attacking       : Boolean = isAttackingCache.get
-  def constructing    : Boolean = isConstructingCache.get
-  def following       : Boolean = isFollowingCache.get
-  def holdingPosition : Boolean = isHoldingPositionCache.get
-  def idle            : Boolean = isIdleCache.get
-  def interruptible   : Boolean = isInterruptibleCache.get
-  def morphing        : Boolean = isMorphingCache.get
-  def repairing       : Boolean = isRepairingCache.get
-  def teching         : Boolean = isResearchingCache.get
-  def patrolling      : Boolean = isPatrollingCache.get
-  def training        : Boolean = isTrainingCache.get
-  def upgrading       : Boolean = isUpgradingCache.get
+  def attacking       : Boolean = isAttackingCache()
+  def constructing    : Boolean = isConstructingCache()
+  def following       : Boolean = isFollowingCache()
+  def holdingPosition : Boolean = isHoldingPositionCache()
+  def idle            : Boolean = isIdleCache()
+  def interruptible   : Boolean = isInterruptibleCache()
+  def morphing        : Boolean = isMorphingCache()
+  def repairing       : Boolean = isRepairingCache()
+  def teching         : Boolean = isResearchingCache()
+  def patrolling      : Boolean = isPatrollingCache()
+  def training        : Boolean = isTrainingCache()
+  def upgrading       : Boolean = isUpgradingCache()
   
-  private val isAttackingCache        = new CacheFrame(() => base.isAttacking)
-  private val isConstructingCache     = new CacheFrame(() => base.isConstructing)
-  private val isFollowingCache        = new CacheFrame(() => base.isFollowing)
-  private val isHoldingPositionCache  = new CacheFrame(() => base.isHoldingPosition)
-  private val isIdleCache             = new CacheFrame(() => base.isIdle)
-  private val isInterruptibleCache    = new CacheFrame(() => base.isInterruptible)
-  private val isMorphingCache         = new CacheFrame(() => base.isMorphing)
-  private val isRepairingCache        = new CacheFrame(() => base.isRepairing)
-  private val isResearchingCache      = new CacheFrame(() => base.isResearching)
-  private val isPatrollingCache       = new CacheFrame(() => base.isPatrolling)
-  private val isTrainingCache         = new CacheFrame(() => base.isTraining)
-  private val isUpgradingCache        = new CacheFrame(() => base.isUpgrading)
+  private val isAttackingCache        = new Cache(() => base.isAttacking)
+  private val isConstructingCache     = new Cache(() => base.isConstructing)
+  private val isFollowingCache        = new Cache(() => base.isFollowing)
+  private val isHoldingPositionCache  = new Cache(() => base.isHoldingPosition)
+  private val isIdleCache             = new Cache(() => base.isIdle)
+  private val isInterruptibleCache    = new Cache(() => base.isInterruptible)
+  private val isMorphingCache         = new Cache(() => base.isMorphing)
+  private val isRepairingCache        = new Cache(() => base.isRepairing)
+  private val isResearchingCache      = new Cache(() => base.isResearching)
+  private val isPatrollingCache       = new Cache(() => base.isPatrolling)
+  private val isTrainingCache         = new Cache(() => base.isTraining)
+  private val isUpgradingCache        = new Cache(() => base.isUpgrading)
   
-  def command: Option[UnitCommand]  = getLastCommandCache.get
-  def commandFrame: Int          = getLastCommandFrameCache.get
+  def command: Option[UnitCommand]  = getLastCommandCache()
+  def commandFrame: Int          = getLastCommandFrameCache()
   
-  private val getLastCommandCache      = new CacheFrame(() => Option(base.getLastCommand) )
-  private val getLastCommandFrameCache = new CacheFrame(() => base.getLastCommandFrame)
+  private val getLastCommandCache      = new Cache(() => Option(base.getLastCommand) )
+  private val getLastCommandFrameCache = new Cache(() => base.getLastCommandFrame)
   
-  def trainingQueue: Iterable[UnitClass] = trainingQueueCache.get
+  def trainingQueue: Iterable[UnitClass] = trainingQueueCache()
   
-  private val trainingQueueCache = new CacheFrame(() => base.getTrainingQueue.asScala.map(UnitClasses.get))
+  private val trainingQueueCache = new Cache(() => base.getTrainingQueue.asScala.map(UnitClasses.get))
   
   ////////////////
   // Visibility //
   ////////////////
   
-  def burrowed  : Boolean = isBurrowedCache.get
-  def cloaked   : Boolean = cachedCloaked.get
+  def burrowed  : Boolean = isBurrowedCache()
+  def cloaked   : Boolean = cachedCloaked()
   def detected  : Boolean = base.isDetected
-  def visible   : Boolean = isVisibleCache.get
+  def visible   : Boolean = isVisibleCache()
   
-  private val isBurrowedCache = new CacheFrame(() => base.isBurrowed)
-  private val isVisibleCache = new CacheFrame(() => base.isVisible)
+  private val isBurrowedCache = new Cache(() => base.isBurrowed)
+  private val isVisibleCache = new Cache(() => base.isVisible)
   
   //////////////
   // Movement //
@@ -188,20 +188,20 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit) extends UnitInfo(base) {
   def angleRadians  : Double  = base.getAngle
   def braking       : Boolean = base.isBraking
   def ensnared      : Boolean = base.isEnsnared
-  def flying        : Boolean = cachedFlying.get
+  def flying        : Boolean = cachedFlying()
   def lifted        : Boolean = base.isLifted
-  def lockedDown    : Boolean = cachedIsLockedDown.get
-  def maelstrommed  : Boolean = cachedIsMaelstrommed.get
+  def lockedDown    : Boolean = cachedIsLockedDown()
+  def maelstrommed  : Boolean = cachedIsMaelstrommed()
   def sieged        : Boolean = base.isSieged
-  def stasised      : Boolean = cachedStasised.get
-  def stimmed       : Boolean = cachedIsStimmed.get
+  def stasised      : Boolean = cachedStasised()
+  def stimmed       : Boolean = cachedIsStimmed()
   def stuck         : Boolean = base.isStuck
   def velocityX     : Double  = base.getVelocityX
   def velocityY     : Double  = base.getVelocityY
   
-  private val cachedIsStimmed = new CacheFrame(() => base.isStimmed)
-  private val cachedIsLockedDown = new CacheFrame(() => base.isLockedDown)
-  private val cachedIsMaelstrommed = new CacheFrame(() => base.isMaelstrommed)
+  private val cachedIsStimmed = new Cache(() => base.isStimmed)
+  private val cachedIsLockedDown = new Cache(() => base.isLockedDown)
+  private val cachedIsMaelstrommed = new Cache(() => base.isMaelstrommed)
   
   //////////////
   // Statuses //
@@ -215,23 +215,23 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit) extends UnitInfo(base) {
   def beingGathered       : Boolean = base.isBeingGathered
   def beingHealed         : Boolean = base.isBeingHealed
   def blind               : Boolean = base.isBlind
-  def carryingMinerals    : Boolean = carryingMineralsCache.get
-  def carryingGas         : Boolean = carryingGasCache.get
+  def carryingMinerals    : Boolean = carryingMineralsCache()
+  def carryingGas         : Boolean = carryingGasCache()
   def powered             : Boolean = base.isPowered
-  def selected            : Boolean = cacheSelected.get
+  def selected            : Boolean = cacheSelected()
   def targetable          : Boolean = base.isTargetable
   def underAttack         : Boolean = base.isUnderAttack
   def underDarkSwarm      : Boolean = base.isUnderDarkSwarm
   def underDisruptionWeb  : Boolean = base.isUnderDisruptionWeb
   def underStorm          : Boolean = base.isUnderStorm
   
-  private val carryingMineralsCache = new CacheFrame(() => base.isCarryingMinerals)
-  private val carryingGasCache      = new CacheFrame(() => base.isCarryingGas)
+  private val carryingMineralsCache = new Cache(() => base.isCarryingMinerals)
+  private val carryingGasCache      = new Cache(() => base.isCarryingGas)
   
   def spiderMines: Int = base.getSpiderMineCount
   
   def addon: Option[UnitInfo] = With.units.get(base.getAddon)
   
-  def spaceRemaining: Int = spaceRemainingCache.get
-  private val spaceRemainingCache = new CacheFrame(() => base.getSpaceRemaining)
+  def spaceRemaining: Int = spaceRemainingCache()
+  private val spaceRemainingCache = new Cache(() => base.getSpaceRemaining)
 }

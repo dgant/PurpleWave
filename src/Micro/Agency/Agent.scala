@@ -6,7 +6,7 @@ import Mathematics.Points.{Pixel, PixelRay, Tile}
 import Micro.Actions.{Action, Idle}
 import Micro.Decisions.MicroDecision
 import Micro.Heuristics.Targeting.TargetingProfile
-import Performance.CacheFrame
+import Performance.Cache
 import Planning.Plan
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClass.UnitClass
@@ -79,8 +79,8 @@ class Agent(val unit: FriendlyUnitInfo) {
   // Suggestions //
   /////////////////
   
-  def origin: Pixel = toReturn.getOrElse(originCache.get)
-  private val originCache = new CacheFrame(() => calculateOrigin)
+  def origin: Pixel = toReturn.getOrElse(originCache())
+  private val originCache = new Cache(() => calculateOrigin)
   
   /////////////////
   // Diagnostics //

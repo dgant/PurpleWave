@@ -2,12 +2,12 @@ package Debugging.Visualizations
 
 import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile}
-import Performance.CacheFrame
+import Performance.Cache
 
 class Viewport {
   
-  def start   : Pixel = startCache.get
-  def end     : Pixel = endcache.get
+  def start   : Pixel = startCache()
+  def end     : Pixel = endcache()
   def center  : Pixel = start.midpoint(end)
   
   def centerOn(pixel: Pixel) {
@@ -29,8 +29,8 @@ class Viewport {
     contains(tile.pixelCenter)
   }
   
-  private val startCache  = new CacheFrame[Pixel](() => startRecalculate)
-  private val endcache    = new CacheFrame[Pixel](() => endRecalculate)
+  private val startCache  = new Cache[Pixel](() => startRecalculate)
+  private val endcache    = new Cache[Pixel](() => endRecalculate)
   
   private def startRecalculate  : Pixel = new Pixel(With.game.getScreenPosition)
   private def endRecalculate    : Pixel = start.add(With.configuration.conservativeViewportWidth, With.configuration.conservativeViewportHeight)

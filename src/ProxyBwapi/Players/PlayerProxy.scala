@@ -2,7 +2,7 @@ package ProxyBwapi.Players
 
 import Lifecycle.With
 import Mathematics.Points.Tile
-import Performance.CacheFrame
+import Performance.Cache
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
 import ProxyBwapi.Upgrades.Upgrade
@@ -27,40 +27,40 @@ abstract class PlayerProxy(base:Player) {
   lazy val transportClass : UnitClass = UnitClasses.get(race.getTransport)
   lazy val workerClass    : UnitClass = UnitClasses.get(race.getWorker)
   
-  def gas               : Int = gasCache.get
-  def minerals          : Int = mineralsCache.get
-  def gatheredGas       : Int = gatheredGasCache.get
-  def gatheredMinerals  : Int = gatheredMineralsCache.get
-  def supplyUsed        : Int = supplyUsedCache.get
-  def supplyTotal       : Int = supplyTotalCache.get
+  def gas               : Int = gasCache()
+  def minerals          : Int = mineralsCache()
+  def gatheredGas       : Int = gatheredGasCache()
+  def gatheredMinerals  : Int = gatheredMineralsCache()
+  def supplyUsed        : Int = supplyUsedCache()
+  def supplyTotal       : Int = supplyTotalCache()
   
-  def rawUnits: mutable.Buffer[Unit] = unitsCache.get
+  def rawUnits: mutable.Buffer[Unit] = unitsCache()
   
   def getUpgradeLevel(upgrade: Upgrade):Int = {
     //Further optimization: Stop expiring when at max level
     if ( ! upgradeLevelCaches.contains(upgrade)) {
-      upgradeLevelCaches.put(upgrade, new CacheFrame(() => base.getUpgradeLevel(upgrade.baseType)))
+      upgradeLevelCaches.put(upgrade, new Cache(() => base.getUpgradeLevel(upgrade.baseType)))
     }
-    upgradeLevelCaches(upgrade).get
+    upgradeLevelCaches(upgrade)()
   }
   
   def hasTech(tech: Tech):Boolean = {
     //Further optimization: Stop expiring when researched
     if ( ! techsResearchedCaches.contains(tech)) {
-      techsResearchedCaches.put(tech, new CacheFrame(() => base.hasResearched(tech.baseType)))
+      techsResearchedCaches.put(tech, new Cache(() => base.hasResearched(tech.baseType)))
     }
-    techsResearchedCaches(tech).get
+    techsResearchedCaches(tech)()
   }
   
-  private val gasCache                = new CacheFrame(() => base.gas)
-  private val mineralsCache           = new CacheFrame(() => base.minerals)
-  private val gatheredGasCache        = new CacheFrame(() => base.gatheredGas)
-  private val gatheredMineralsCache   = new CacheFrame(() => base.gatheredMinerals)
-  private val supplyUsedCache         = new CacheFrame(() => base.supplyUsed)
-  private val supplyTotalCache        = new CacheFrame(() => base.supplyTotal)
-  private val unitsCache              = new CacheFrame(() => base.getUnits.asScala)
-  private val upgradeLevelCaches      = new mutable.HashMap[Upgrade, CacheFrame[Int]]
-  private val techsResearchedCaches   = new mutable.HashMap[Tech, CacheFrame[Boolean]]
+  private val gasCache                = new Cache(() => base.gas)
+  private val mineralsCache           = new Cache(() => base.minerals)
+  private val gatheredGasCache        = new Cache(() => base.gatheredGas)
+  private val gatheredMineralsCache   = new Cache(() => base.gatheredMinerals)
+  private val supplyUsedCache         = new Cache(() => base.supplyUsed)
+  private val supplyTotalCache        = new Cache(() => base.supplyTotal)
+  private val unitsCache              = new Cache(() => base.getUnits.asScala)
+  private val upgradeLevelCaches      = new mutable.HashMap[Upgrade, Cache[Int]]
+  private val techsResearchedCaches   = new mutable.HashMap[Tech, Cache[Boolean]]
   
   
 }

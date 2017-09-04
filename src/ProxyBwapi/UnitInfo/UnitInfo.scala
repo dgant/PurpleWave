@@ -9,7 +9,7 @@ import Mathematics.Physics.Force
 import Mathematics.Points.{Pixel, Tile, TileRectangle}
 import Mathematics.PurpleMath
 import Micro.Matchups.MatchupAnalysis
-import Performance.CacheFrame
+import Performance.Cache
 import ProxyBwapi.Engine.Damage
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitClass.UnitClass
@@ -102,11 +102,11 @@ abstract class UnitInfo(baseUnit: bwapi.Unit) extends UnitProxy(baseUnit) {
       movingFrames.map(_.frame).max
   }
   
-  def hasBeenViolentInLastTwoSeconds: Boolean = hasBeenViolentInLastTwoSecondsCache.get
-  private val hasBeenViolentInLastTwoSecondsCache = new CacheFrame(() => history.exists(h => With.framesSince(h.frame) < 48 && h.cooldown > 0))
+  def hasBeenViolentInLastTwoSeconds: Boolean = hasBeenViolentInLastTwoSecondsCache()
+  private val hasBeenViolentInLastTwoSecondsCache = new Cache(() => history.exists(h => With.framesSince(h.frame) < 48 && h.cooldown > 0))
   
-  def damageInLastSecond: Int = damageInLastSecondCache.get
-  private val damageInLastSecondCache = new CacheFrame(() =>
+  def damageInLastSecond: Int = damageInLastSecondCache()
+  private val damageInLastSecondCache = new Cache(() =>
     Math.max(
       0,
       history
@@ -165,11 +165,11 @@ abstract class UnitInfo(baseUnit: bwapi.Unit) extends UnitProxy(baseUnit) {
   def tileArea:             TileRectangle = unitClass.tileArea.add(tileTopLeft)
   def addonArea:            TileRectangle = TileRectangle(Tile(0, 0), Tile(2, 2)).add(tileTopLeft).add(4,1)
   
-  def zone: Zone = cacheZone.get
-  private val cacheZone = new CacheFrame(() => pixelCenter.zone)
+  def zone: Zone = cacheZone()
+  private val cacheZone = new Cache(() => pixelCenter.zone)
   
-  def base: Option[Base] = cacheBase.get
-  private val cacheBase = new CacheFrame(() => ByOption.minBy(zone.bases)(_.heart.tileDistanceFast(tileIncludingCenter)))
+  def base: Option[Base] = cacheBase()
+  private val cacheBase = new Cache(() => ByOption.minBy(zone.bases)(_.heart.tileDistanceFast(tileIncludingCenter)))
   
   def mobilityForceGrid : AbstractGrid[Force]   = if (flying) With.grids.mobilityForceAir else With.grids.mobilityForceGround
   def mobilityGrid      : AbstractGrid[Int]     = if (flying) With.grids.mobilityAir else With.grids.mobilityGround
@@ -177,8 +177,8 @@ abstract class UnitInfo(baseUnit: bwapi.Unit) extends UnitProxy(baseUnit) {
   def mobility          : Int                   = mobilityGrid.get(tileIncludingCenter)
   
   def pixelRangeMin: Double = unitClass.groundMinRangeRaw
-  def pixelRangeAir: Double = pixelRangeAirCache.get
-  private val pixelRangeAirCache = new CacheFrame(() =>
+  def pixelRangeAir: Double = pixelRangeAirCache()
+  private val pixelRangeAirCache = new Cache(() =>
     unitClass.airRangePixels +
       (if (is(Terran.Bunker))                                                 32.0 else 0.0) +
       (if (is(Terran.Bunker)    && player.hasUpgrade(Terran.MarineRange))     32.0 else 0.0) +
@@ -187,8 +187,8 @@ abstract class UnitInfo(baseUnit: bwapi.Unit) extends UnitProxy(baseUnit) {
       (if (is(Protoss.Dragoon)  && player.hasUpgrade(Protoss.DragoonRange))   64.0 else 0.0) +
       (if (is(Zerg.Hydralisk)   && player.hasUpgrade(Zerg.HydraliskRange))    32.0 else 0.0))
   
-  def pixelRangeGround: Double = pixelRangeGroundCache.get
-  private val pixelRangeGroundCache = new CacheFrame(() =>
+  def pixelRangeGround: Double = pixelRangeGroundCache()
+  private val pixelRangeGroundCache = new Cache(() =>
     unitClass.groundRangePixels +
       (if (is(Terran.Bunker))                                               32.0 else 0.0) +
       (if (is(Terran.Bunker)    && player.hasUpgrade(Terran.MarineRange))   32.0 else 0.0) +
@@ -213,15 +213,15 @@ abstract class UnitInfo(baseUnit: bwapi.Unit) extends UnitProxy(baseUnit) {
   
   def velocity: Force = Force(velocityX, velocityY)
   
-  def canMove: Boolean = canMoveCache.get
-  private val canMoveCache = new CacheFrame(() => unitClass.canMove && topSpeed > 0 && canDoAnything && ! burrowed)
+  def canMove: Boolean = canMoveCache()
+  private val canMoveCache = new Cache(() => unitClass.canMove && topSpeed > 0 && canDoAnything && ! burrowed)
   
-  def topSpeedChasing: Double = topSpeedChasingCache.get
-  private val topSpeedChasingCache = new CacheFrame(() => topSpeed * PurpleMath.nanToOne(Math.max(0, cooldownMaxAirGround - unitClass.stopFrames) / cooldownMaxAirGround.toDouble))
+  def topSpeedChasing: Double = topSpeedChasingCache()
+  private val topSpeedChasingCache = new Cache(() => topSpeed * PurpleMath.nanToOne(Math.max(0, cooldownMaxAirGround - unitClass.stopFrames) / cooldownMaxAirGround.toDouble))
   
-  def topSpeed: Double = topSpeedCache.get
+  def topSpeed: Double = topSpeedCache()
   //TODO: Ensnare
-  private val topSpeedCache = new CacheFrame(() =>
+  private val topSpeedCache = new Cache(() =>
     if ( ! canDoAnything || burrowed) 0 else
       (if (stimmed) 1.5 else 1.0) * (
       unitClass.topSpeed * (if (
@@ -248,8 +248,8 @@ abstract class UnitInfo(baseUnit: bwapi.Unit) extends UnitProxy(baseUnit) {
   
   def isTransport: Boolean = unitClass.isTransport && ( ! is(Zerg.Overlord) || player.hasUpgrade(Zerg.OverlordDrops))
   
-  def sightRangePixels: Int = sightRangePixelsCache.get
-  private val sightRangePixelsCache = new CacheFrame(() =>
+  def sightRangePixels: Int = sightRangePixelsCache()
+  private val sightRangePixelsCache = new Cache(() =>
     if (blind) 32 else
     unitClass.sightRangePixels +
       (if (
@@ -269,11 +269,11 @@ abstract class UnitInfo(baseUnit: bwapi.Unit) extends UnitProxy(baseUnit) {
   def ranged  : Boolean = unitClass.rawCanAttack && unitClass.maxAirGroundRangePixels > 32 * 2
   def melee   : Boolean = unitClass.rawCanAttack && ! ranged
   
-  def armorHealth: Int = armorHealthCache.get
-  def armorShield: Int = armorShieldsCache.get
+  def armorHealth: Int = armorHealthCache()
+  def armorShield: Int = armorShieldsCache()
   
-  lazy val armorHealthCache   = new CacheFrame(() => unitClass.armor + unitClass.armorUpgrade.map(player.getUpgradeLevel).getOrElse(0))
-  lazy val armorShieldsCache  = new CacheFrame(() => player.getUpgradeLevel(Protoss.Shields))
+  lazy val armorHealthCache   = new Cache(() => unitClass.armor + unitClass.armorUpgrade.map(player.getUpgradeLevel).getOrElse(0))
+  lazy val armorShieldsCache  = new Cache(() => player.getUpgradeLevel(Protoss.Shields))
   
   def totalHealth: Int = hitPoints + shieldPoints + defensiveMatrixPoints
   
@@ -282,16 +282,16 @@ abstract class UnitInfo(baseUnit: bwapi.Unit) extends UnitProxy(baseUnit) {
   def airDpf    : Double = damageOnHitAir     * attacksAgainstAir     / cooldownMaxAir
   def groundDpf : Double = damageOnHitGround  * attacksAgainstGround  / cooldownMaxGround
   
-  def attacksAgainstAir: Int = attacksAgainstAirCache.get
-  private val attacksAgainstAirCache = new CacheFrame(() => {
+  def attacksAgainstAir: Int = attacksAgainstAirCache()
+  private val attacksAgainstAirCache = new Cache(() => {
     var output = unitClass.airDamageFactorRaw * unitClass.maxAirHitsRaw
     if (output == 0  && is(Terran.Bunker))    output = 4
     if (output == 0  && is(Protoss.Carrier))  output = interceptorCount
     output
   })
   
-  def attacksAgainstGround: Int = attacksAgainstGroundCache.get
-  private val attacksAgainstGroundCache = new CacheFrame(() => {
+  def attacksAgainstGround: Int = attacksAgainstGroundCache()
+  private val attacksAgainstGroundCache = new Cache(() => {
     var output = unitClass.groundDamageFactorRaw * unitClass.maxGroundHitsRaw
     if (output == 0  && is(Terran.Bunker))    output = 4
     if (output == 0  && is(Protoss.Carrier))  output = interceptorCount
@@ -335,11 +335,11 @@ abstract class UnitInfo(baseUnit: bwapi.Unit) extends UnitProxy(baseUnit) {
       0.0
   
   def damageUpgradeLevel  : Int = unitClass.damageUpgradeType.map(player.getUpgradeLevel).getOrElse(0)
-  def damageOnHitGround   : Int = damageOnHitGroundCache.get
-  def damageOnHitAir      : Int = damageOnHitAirCache.get
+  def damageOnHitGround   : Int = damageOnHitGroundCache()
+  def damageOnHitAir      : Int = damageOnHitAirCache()
   def damageOnHitMax      : Int = Math.max(damageOnHitAir, damageOnHitGround)
-  private val damageOnHitGroundCache  = new CacheFrame(() => unitClass.effectiveGroundDamage  + unitClass.groundDamageBonusRaw  * damageUpgradeLevel)
-  private val damageOnHitAirCache     = new CacheFrame(() => unitClass.effectiveAirDamage     + unitClass.airDamageBonusRaw     * damageUpgradeLevel)
+  private val damageOnHitGroundCache  = new Cache(() => unitClass.effectiveGroundDamage  + unitClass.groundDamageBonusRaw  * damageUpgradeLevel)
+  private val damageOnHitAirCache     = new Cache(() => unitClass.effectiveAirDamage     + unitClass.airDamageBonusRaw     * damageUpgradeLevel)
   
   def damageOnHitBeforeShieldsArmorAndDamageType(enemy: UnitInfo): Int = if(enemy.flying) damageOnHitAir else damageOnHitGround
   def damageOnNextHitAgainst(enemy: UnitInfo): Int = {
@@ -372,24 +372,24 @@ abstract class UnitInfo(baseUnit: bwapi.Unit) extends UnitProxy(baseUnit) {
     }
   }
   
-  def canDoAnything: Boolean = canDoAnythingCache.get
-  private val canDoAnythingCache = new CacheFrame(() =>
+  def canDoAnything: Boolean = canDoAnythingCache()
+  private val canDoAnythingCache = new Cache(() =>
     aliveAndComplete  &&
     ( ! unitClass.requiresPsi || powered) &&
     ! stasised        && // These three checks along comprise 6% of our CPU usage. Yes, really.
     ! maelstrommed    &&
     ! lockedDown)
   
-  def canBeAttacked: Boolean = canBeAttackedCache.get
-  private val canBeAttackedCache = new CacheFrame(() =>
+  def canBeAttacked: Boolean = canBeAttackedCache()
+  private val canBeAttackedCache = new Cache(() =>
       alive &&
       (complete || unitClass.isBuilding) &&
       totalHealth > 0 &&
       ! invincible &&
       ! stasised)
   
-  def canAttack: Boolean = canAttackCache.get
-  private val canAttackCache = new CacheFrame(() =>
+  def canAttack: Boolean = canAttackCache()
+  private val canAttackCache = new Cache(() =>
     canDoAnything &&
     ( ! unitClass.shootsScarabs || scarabCount > 0) &&
     (

@@ -5,9 +5,8 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.RequestAtLeast
-import Planning.Composition.UnitCounters.UnitCountBetween
+import Planning.Composition.UnitCounters.UnitCountExcept
 import Planning.Composition.UnitMatchers.UnitMatchWorkers
-import Planning.Composition.UnitPreferences.UnitPreferClose
 import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Compound._
 import Planning.Plans.Macro.Automatic.{Gather, TrainContinuously}
@@ -49,12 +48,11 @@ class Proxy5Rax extends Parallel {
       initialWhenTrue = new Parallel(
         new Scout,
         new Attack,
-        new Gather { workers.unitCounter.set(new UnitCountBetween(0, 4)); workers.unitPreference.set(UnitPreferClose(With.geography.home.pixelCenter)) },
-        new Attack { attackers.get.unitMatcher.set(UnitMatchWorkers) }
-      ),
-      initialWhenFalse = new Parallel(
-        new Gather
-      )
-    )
+        new Attack {
+          attackers.get.unitCounter.set(new UnitCountExcept(4, UnitMatchWorkers))
+          attackers.get.unitMatcher.set(UnitMatchWorkers)
+        })
+    ),
+    new Gather
   ))
 }

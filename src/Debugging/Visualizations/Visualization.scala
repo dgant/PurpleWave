@@ -32,7 +32,7 @@ class Visualization {
   
   var enabled   = true
   var screen    = true
-  var map       = false
+  var map       = true
   var happy     = false
   var textOnly  = false
   
@@ -123,6 +123,8 @@ class Visualization {
     if (initialized) return
     initialized = true
     enabled = With.configuration.visualize
+    screen  = With.configuration.visualizeScreen
+    map     = With.configuration.visualizeMap
     var random = Random.nextDouble()
     random -= With.configuration.visualizationProbabilityHappyVision
     if (random < 0) {

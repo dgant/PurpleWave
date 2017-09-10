@@ -69,7 +69,7 @@ class Configuration {
   /////////////////
   
   var foreignUnitUpdatePeriod             = 4
-  var peformanceFrameMilliseconds         = 20
+  var peformanceFrameMilliseconds         = 30
   var garbageCollectionThresholdMs        = 5
   var initialTaskLengthMilliseconds       = 20
   var performanceMinimumUnitSleep         = 2
@@ -101,6 +101,8 @@ class Configuration {
   ///////////////////
   
   var visualize                           = true
+  var visualizeScreen                     = true
+  var visualizeMap                        = true
   var visualizationProbabilityHappyVision = 0.1
   var visualizationProbabilityTextOnly    = 0.00
   

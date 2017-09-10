@@ -31,7 +31,6 @@ class Attack extends Plan {
           .getOrElse(base.townHallArea.midPixel))
         .getOrElse(With.intelligence.mostBaselikeEnemyTile.pixelCenter)
         
-    
     attackers.get.unitPreference.set(UnitPreferClose(target))
     attackers.get.acquire(this)
     

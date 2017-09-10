@@ -47,6 +47,7 @@ class LockUnits extends ResourceLock {
     candidateQueue ++= candidates.filter(unitMatcher.get.accept)
     
     unitMatcher.get.reset()
+    unitCounter.get.reset()
     
     while (unitCounter.get.continue(desiredUnits) && candidateQueue.nonEmpty) {
       desiredUnits += candidateQueue.dequeue()

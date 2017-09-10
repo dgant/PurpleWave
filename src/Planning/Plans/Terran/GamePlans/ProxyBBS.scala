@@ -5,17 +5,16 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.RequestAtLeast
-import Planning.Composition.UnitCounters.UnitCountBetween
+import Planning.Composition.UnitCounters.UnitCountExcept
 import Planning.Composition.UnitMatchers.UnitMatchWorkers
-import Planning.Composition.UnitPreferences.UnitPreferClose
 import Planning.Plans.Army.{Aggression, AllIn, Attack}
-import Planning.Plans.Compound.{If, Parallel}
+import Planning.Plans.Compound.{And, If, Not, Parallel}
 import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, TrainContinuously}
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, FirstEightMinutes, FollowBuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Milestones.UnitsAtLeast
-import Planning.Plans.Scouting.Scout
+import Planning.Plans.Scouting.{FoundEnemyBase, Scout}
 import Planning.ProxyPlanner
 import ProxyBwapi.Races.Terran
 
@@ -29,11 +28,11 @@ class ProxyBBS extends Parallel {
   }
   
   children.set(Vector(
-    new Aggression(4.0),
+    new Aggression(1.2),
     new ProposePlacement{
       override lazy val blueprints = Vector(
-        new Blueprint(this, building = Some(Terran.Barracks), preferZone = proxyZone, respectHarvesting = false, placement = Some(PlacementProfiles.proxyBuilding)),
-        new Blueprint(this, building = Some(Terran.Barracks), preferZone = proxyZone, respectHarvesting = false, placement = Some(PlacementProfiles.proxyBuilding)))
+        new Blueprint(this, building = Some(Terran.Barracks), preferZone = proxyZone, respectHarvesting = proxyZone.exists( ! _.owner.isUs), placement = Some(PlacementProfiles.proxyBuilding)),
+        new Blueprint(this, building = Some(Terran.Barracks), preferZone = proxyZone, respectHarvesting = proxyZone.exists( ! _.owner.isUs), placement = Some(PlacementProfiles.proxyBuilding)))
     },
     new RequireMiningBases(1),
     new FirstEightMinutes(
@@ -48,12 +47,17 @@ class ProxyBBS extends Parallel {
     new TrainContinuously(Terran.Marine),
     new TrainContinuously(Terran.SCV),
     new If(
-      new UnitsAtLeast(1, Terran.Barracks, complete = true),
+      new And(
+        new Not(new FoundEnemyBase),
+        new UnitsAtLeast(2, Terran.Barracks)),
       new Scout),
     new AllIn(new UnitsAtLeast(10, Terran.Marine, complete = true)),
     new Attack,
     new FollowBuildOrder,
-    new Gather { workers.unitCounter.set(new UnitCountBetween(0, 8)); workers.unitPreference.set(UnitPreferClose(With.geography.home.pixelCenter)) },
-    new Attack { attackers.get.unitMatcher.set(UnitMatchWorkers) }
+    new Attack {
+      attackers.get.unitCounter.set(new UnitCountExcept(8, UnitMatchWorkers))
+      attackers.get.unitMatcher.set(UnitMatchWorkers)
+    },
+    new Gather
   ))
 }

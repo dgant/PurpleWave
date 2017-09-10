@@ -110,8 +110,6 @@ object ShowUnitsFriendly extends View {
             ForceColors.sum)
         }
       }
-      
-      
     }
     
     if (showDesire) {

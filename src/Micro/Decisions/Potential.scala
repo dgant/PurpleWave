@@ -52,6 +52,22 @@ object Potential {
     output
   }
   
+  //////////
+  // Team //
+  //////////
+  
+  def teamAttraction(unit: FriendlyUnitInfo): Force = {
+    val allies                = unit.matchups.allies ++ unit.squad.flatMap(_.recruits)
+    val alliesUseful          = allies.filter(ally => unit.matchups.threats.exists(ally.canAttack))
+    val allyNearestUseful     = ByOption.minBy(alliesUseful)(ally => ally.pixelDistanceFast(unit) - ally.effectiveRangePixels)
+    if (allyNearestUseful.isEmpty) return new Force
+    val allyDistance          = allyNearestUseful.get.pixelDistanceFast(unit)
+    val allyDistanceAlarming  = Math.max(32.0 * 3.0, allyNearestUseful.get.effectiveRangePixels)
+    val magnitude             = Math.min(1.0, allyDistance / allyDistanceAlarming)
+    val output                = unitAttraction(unit, allyNearestUseful.get, magnitude)
+    output
+  }
+  
   ////////////////
   // Explosions //
   ////////////////
@@ -96,7 +112,7 @@ object Potential {
     // When we're in tight spaces (like against a mineral line) this isn't going to help us.
     // if (unit.tileIncludingCenter.adjacent8.filter(_.valid).forall(unit.mobilityGrid.get(_) <= 1)) return new Force
     
-    val mobilityNeed  = 3.0 + ByOption.max(unit.matchups.threatsViolent.map(threat => 2 * threat.pixelRangeAgainstFromCenter(unit) / 32)).getOrElse(0.0)
+    val mobilityNeed  = 5.0 + ByOption.max(unit.matchups.threatsViolent.map(threat => 2 * threat.pixelRangeAgainstFromCenter(unit) / 32)).getOrElse(0.0)
     val mobilityNow   = unit.mobility
     val mobilityCap   = if (unit.flying) 12 else unit.zone.maxMobility / 2.0
     val mobilityForce = unit.mobilityForce

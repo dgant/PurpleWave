@@ -18,11 +18,13 @@ object Avoid extends Action {
     val forceMobility   = Potential.mobilityAttraction(unit)
     val forceExiting    = Potential.exitAttraction(unit).normalize(1.5)
     val forceSpreading  = Potential.collisionRepulsion(unit)
+    val forceRegrouping = Potential.teamAttraction(unit)
     
     unit.agent.forces.put(ForceColors.threat,     forceThreat)
     unit.agent.forces.put(ForceColors.mobility,   forceMobility)
     unit.agent.forces.put(ForceColors.traveling,  forceExiting)
     unit.agent.forces.put(ForceColors.spreading,  forceSpreading)
+    unit.agent.forces.put(ForceColors.regrouping, forceRegrouping)
     Gravitate.delegate(unit)
   }
 }

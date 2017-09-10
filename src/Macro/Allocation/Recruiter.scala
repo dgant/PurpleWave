@@ -15,7 +15,7 @@ class Recruiter {
   def update() {
     
     // Remove ineligible units
-    unitsByLock.values.foreach(_.filterNot(isEligible).foreach(unassign))
+    unitsByLock.values.foreach(_.filterNot(eligible).foreach(unassign))
     
     // Free units held by inactive locks
     unitsByLock.keys.filterNot(activeLocks.contains).foreach(remove)
@@ -24,14 +24,14 @@ class Recruiter {
     // Populate unassigned units
     unassignedUnits.clear()
     With.units.ours
-      .filter(unit => isEligible(unit) && ! unitsByLock.values.exists(_.contains(unit)))
+      .filter(unit => eligible(unit) && ! unitsByLock.values.exists(_.contains(unit)))
       .foreach(unassignedUnits.add)
     
     //If we suspect any bugginess, enable this
     //test
   }
   
-  private def isEligible(unit: FriendlyUnitInfo): Boolean = unit.aliveAndComplete && unit.unitClass.orderable
+  def eligible(unit: FriendlyUnitInfo): Boolean = unit.aliveAndComplete && unit.unitClass.orderable
   
   private def test() {
     //Verify no units are shared between locks

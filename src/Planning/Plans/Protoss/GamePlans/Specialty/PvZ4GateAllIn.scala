@@ -7,11 +7,11 @@ import Planning.Plans.Army.{Aggression, ConsiderAttacking, DefendEntrance, Defen
 import Planning.Plans.Compound._
 import Planning.Plans.Information.Employ
 import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
-import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder, FollowBuildOrder, RequireBareMinimum}
+import Planning.Plans.Macro.BuildOrders._
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RemoveMineralBlocksAt, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.{UnitsAtLeast, UnitsAtMost, UpgradeComplete}
 import Planning.Plans.Protoss.ProtossBuilds
-import Planning.Plans.Protoss.Situational.DefendAgainstProxy
+import Planning.Plans.Protoss.Situational.{Defend2GateAgainst4Pool, DefendAgainstProxy}
 import Planning.Plans.Recruitment.RecruitFreelancers
 import Planning.Plans.Scouting.ScoutAt
 import ProxyBwapi.Races.Protoss
@@ -61,6 +61,8 @@ class PvZ4GateAllIn extends Parallel {
         new UnitsAtMost(20, UnitMatchWarriors),
         new Aggression(3.0),
         new Aggression(5.0))),
+  
+    new FirstEightMinutes(new Defend2GateAgainst4Pool),
     new DefendZones,
     new ScoutAt(10),
     new ConsiderAttacking,

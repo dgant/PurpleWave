@@ -11,7 +11,7 @@ import Planning.Plans.Macro.BuildOrders._
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RemoveMineralBlocksAt, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.{UnitsAtLeast, UnitsAtMost, UpgradeComplete}
 import Planning.Plans.Protoss.ProtossBuilds
-import Planning.Plans.Protoss.Situational.{Defend2GateAgainst4Pool, DefendAgainstProxy}
+import Planning.Plans.Protoss.Situational.{Defend2GateAgainst4Pool, DefendAgainstProxy, TwoGatewaysAtNexus}
 import Planning.Plans.Recruitment.RecruitFreelancers
 import Planning.Plans.Scouting.ScoutAt
 import ProxyBwapi.Races.Protoss
@@ -19,8 +19,11 @@ import Strategery.Strategies.Protoss.PvZ.{PvZ4GateDragoonAllIn, PvZ4GateZealotAl
 
 class PvZ4GateAllIn extends Parallel {
   
+  
+  
   children.set(Vector(
     new RequireBareMinimum,
+    new TwoGatewaysAtNexus,
     new BuildOrder(ProtossBuilds.OpeningTwoGate1012: _*),
     new RequireSufficientSupply,
     new TrainWorkersContinuously,

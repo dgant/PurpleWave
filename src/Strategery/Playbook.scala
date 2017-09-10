@@ -23,7 +23,6 @@ class EmptyPlaybook {
 object StrategyGroups {
   
   val cheese = Vector[Strategy](
-    WorkerRush2StartLocations,
     WorkerRush3StartLocations,
     TvEProxyBBS2StartLocations,
     TvEProxyBBS3StartLocations,
@@ -49,6 +48,7 @@ object StrategyGroups {
   
   val bad = Vector[Strategy](
     CarriersWithNoDefense,
+    WorkerRush2StartLocations,
     WorkerRush3StartLocations,
     TvEProxyBBS2StartLocations,
     TvEProxyBBS3StartLocations,
@@ -118,8 +118,11 @@ object Playbook extends TestingPlaybook {
     ProxyHatchSunkens,
     ProxyHatchHydras,
     ProxyHatchZerglings,
+  
+    /////////////
+    // Protoss //
+    /////////////
     
-    // Real stuff
     DarkArchonsWithNoDefense,
     AllPvP,
     AllPvZ,
@@ -144,7 +147,9 @@ object Playbook extends TestingPlaybook {
     PvZMidgameCorsairDarkTemplar,
     PvZMidgameCorsairSpeedlot,
     PvZMidgame5GateDragoons,
-    PvZMidgameCorsairReaver
+    PvZMidgameCorsairReaver,
+    PvZ4GateDragoonAllIn,
+    PvZ4GateZealotAllIn
   )
   
   val strategyOrderRoundRobin = Vector(

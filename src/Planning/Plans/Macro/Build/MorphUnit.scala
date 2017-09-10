@@ -28,7 +28,7 @@ class MorphUnit(val classToMorph: UnitClass) extends Plan {
     if (isComplete) return
   
     // Duplicated across TrainUnit
-    currencyLock.framesAhead = (
+    currencyLock.framesPreordered = (
       classToMorph.buildUnitsEnabling.map(enablingClass => Project.framesToUnits(enablingClass, 1))
       :+ Project.framesToUnits(morpherClass, 1)).max
     

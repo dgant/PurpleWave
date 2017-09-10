@@ -62,9 +62,9 @@ object StrategyGroups {
 
 class TestingPlaybook extends EmptyPlaybook {
   
-  val strategyToTest = PvTEarly1GateReaver
+  val strategiesToTest = Array(TvEProxyBBS2StartLocations, TvEProxyBBS3StartLocations)
   
-  override lazy val forced: Seq[Strategy] = Seq(AllPvP, AllPvT, AllPvZ, TvTStandard, TvZStandard, strategyToTest)
+  override lazy val forced: Seq[Strategy] = Seq(AllPvP, AllPvT, AllPvZ, TvTStandard, TvZStandard) ++ strategiesToTest
 }
 
 class MacroPlaybook extends EmptyPlaybook {

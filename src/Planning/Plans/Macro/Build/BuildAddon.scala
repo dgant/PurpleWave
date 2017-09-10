@@ -39,7 +39,7 @@ class BuildAddon(val addonClass: UnitClass) extends Plan {
       return
     }
       
-    currencyLock.framesAhead = (addonClass.buildUnitsEnabling.map(enablingClass => Project.framesToUnits(enablingClass, 1)) :+ 0).max
+    currencyLock.framesPreordered = (addonClass.buildUnitsEnabling.map(enablingClass => Project.framesToUnits(enablingClass, 1)) :+ 0).max
     currencyLock.isSpent = addon.isDefined
     currencyLock.acquire(this)
     

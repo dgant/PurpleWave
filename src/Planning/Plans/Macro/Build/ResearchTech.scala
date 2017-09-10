@@ -24,7 +24,7 @@ class ResearchTech(tech: Tech) extends Plan {
   override def onUpdate() {
     if (isComplete) return
     
-    currency.framesAhead = Project.framesToUnits(techerClass)
+    currency.framesPreordered = Project.framesToUnits(techerClass)
     currency.acquire(this)
     currency.isSpent = With.units.ours.exists(techer => techer.teching && techer.techingType == tech)
     if ( ! currency.satisfied) return

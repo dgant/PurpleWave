@@ -30,7 +30,6 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit) extends UnitInfo (originalBa
   
   private var updateCount = 0
   private def updateTimeInsensitiveInformation() {
-    updateCount += 1
     if (updateCount % With.configuration.foreignUnitUpdatePeriod == 0) {
       updateTracking()
       updateVisibility()
@@ -41,6 +40,7 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit) extends UnitInfo (originalBa
       updateOrders()
       updateStatuses()
     }
+    updateCount += 1
   }
   
   ///////////////////

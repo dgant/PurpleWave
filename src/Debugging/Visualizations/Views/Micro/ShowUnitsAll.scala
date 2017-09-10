@@ -12,9 +12,9 @@ import bwapi.Color
 object ShowUnitsAll extends View {
   
   var showHitPoints       = true
-  var showResources       = true
-  var showViolence        = true
-  var showBattleIgnorance = true
+  var showResources       = false
+  var showViolence        = false
+  var showBattleIgnorance = false
   
   override def renderMap() { With.units.all.foreach(renderUnit) }
   

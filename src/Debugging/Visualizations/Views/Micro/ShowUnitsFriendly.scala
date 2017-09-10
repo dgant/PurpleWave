@@ -13,7 +13,7 @@ object ShowUnitsFriendly extends View {
   var showAction      : Boolean = true
   var showCommand     : Boolean = false
   var showOrder       : Boolean = false
-  var showTargets     : Boolean = true
+  var showTargets     : Boolean = false
   var showFormation   : Boolean = true
   var showKiting      : Boolean = false
   var showForces      : Boolean = true
@@ -117,6 +117,7 @@ object ShowUnitsFriendly extends View {
     if (showDesire) {
       val color = if (agent.shouldEngage) Colors.NeonGreen else Colors.NeonRed
       DrawMap.circle(agent.unit.pixelCenter, 8, color)
+      DrawMap.circle(agent.unit.pixelCenter, 7, color)
     }
     
     if (showExplosions) {

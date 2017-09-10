@@ -70,7 +70,7 @@ class Configuration {
   // Performance //
   /////////////////
   
-  var foreignUnitUpdatePeriod             = 6
+  var foreignUnitUpdatePeriod             = 4
   var peformanceFrameMilliseconds         = 20
   var garbageCollectionThresholdMs        = 5
   var initialTaskLengthMilliseconds       = 20

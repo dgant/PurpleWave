@@ -134,13 +134,14 @@ class TerranVsTerran extends Parallel {
     new ScoutAt(14),
     new ScoutExpansionsAt(80),
     new DefendZones,
+    new DropAttack,
     new Trigger(
       new UnitsAtLeast(1, Terran.Wraith, complete = true),
       new Parallel(
-        new Attack,
-        new Attack {
-          attackers.get.unitMatcher.set(UnitMatchWorkers)
-          attackers.get.unitCounter.set(UnitCountOne)
+        new ConsiderAttacking,
+        new ConsiderAttacking {
+          attack.attackers.get.unitMatcher.set(UnitMatchWorkers)
+          attack.attackers.get.unitCounter.set(UnitCountOne)
         })
     ),
     new FollowBuildOrder,

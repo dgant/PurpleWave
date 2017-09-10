@@ -12,8 +12,8 @@ object ShowUnitsForeign extends View {
   
   var showSiegeRadius = true
   var showFogged      = true
-  var showTargets     = true
-  var showSaturation  = true
+  var showTargets     = false
+  var showSaturation  = false
   var showCountdown   = true
   
   override def renderMap() {

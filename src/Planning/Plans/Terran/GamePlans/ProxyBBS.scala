@@ -28,7 +28,7 @@ class ProxyBBS extends Parallel {
   }
   
   children.set(Vector(
-    new Aggression(1.2),
+    new Aggression(1.5),
     new ProposePlacement{
       override lazy val blueprints = Vector(
         new Blueprint(this, building = Some(Terran.Barracks), preferZone = proxyZone, respectHarvesting = proxyZone.exists( ! _.owner.isUs), placement = Some(PlacementProfiles.proxyBuilding)),

@@ -27,6 +27,7 @@ object FightOrFlight extends Action {
     decide(() => unit.underStorm,           false)
     decide(() => unit.underDisruptionWeb,   false)
     decide(() => unit.underDarkSwarm,       unit.unitClass.unaffectedByDarkSwarm)
+    decide(() => unit.base.exists(_.owner.isUs) && unit.matchups.targets.exists(target => target.matchups.targetsInRange.exists(_.unitClass.isWorker)), true)
     decide(() => unit.flying && unit.matchups.threats.forall(_.topSpeed < unit.topSpeed) && unit.matchups.framesOfSafetyDiffused > 24, true)
     if (decision.isDefined) {
       unit.agent.shouldEngage = decision.get

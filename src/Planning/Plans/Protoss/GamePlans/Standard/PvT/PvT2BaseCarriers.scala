@@ -5,7 +5,7 @@ import Planning.Plan
 import Planning.Plans.Army.{ConsiderAttacking, DefendZones}
 import Planning.Plans.Compound.{FlipIf, If, Parallel, Trigger}
 import Planning.Plans.GamePlans.Mode
-import Planning.Plans.Information.Employing
+import Planning.Plans.Information.{Employing, Never}
 import Planning.Plans.Information.Reactive.EnemyBio
 import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
@@ -22,7 +22,7 @@ class PvT2BaseCarriers extends Mode {
   description.set("PvT 2 Base Carriers")
   
   override val activationCriteria: Plan = new Employing(PvT2BaseCarrier)
-  override val completionCriteria: Plan = new UnitsAtLeast(2, Protoss.Nexus, complete = true)
+  override val completionCriteria: Plan = new Never
   
   children.set(Vector(
     new Require2BaseTech,

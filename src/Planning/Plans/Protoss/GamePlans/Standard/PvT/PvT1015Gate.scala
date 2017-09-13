@@ -1,7 +1,7 @@
 package Planning.Plans.Protoss.GamePlans.Standard.PvT
 
 import Planning.Plan
-import Planning.Plans.Army.DefendZones
+import Planning.Plans.Army.{Attack, DefendZones}
 import Planning.Plans.GamePlans.Mode
 import Planning.Plans.Information.Employing
 import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
@@ -27,7 +27,8 @@ class PvT1015Gate extends Mode {
     new TrainContinuously(Protoss.Dragoon),
     new RequireMiningBases(2),
     new ScoutAt(14),
-    new DefendZones
+    new DefendZones,
+    new Attack
   ))
 }
 

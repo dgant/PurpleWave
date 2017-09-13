@@ -6,7 +6,7 @@ import Planning.Plan
 import Planning.Plans.Army.DefendZones
 import Planning.Plans.Compound.{FlipIf, If, Parallel}
 import Planning.Plans.GamePlans.Mode
-import Planning.Plans.Information.Employing
+import Planning.Plans.Information.{Employing, Never}
 import Planning.Plans.Macro.Automatic.{MeldArchons, RequireSufficientSupply, TrainWorkersContinuously}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildCannonsAtExpansions, RequireMiningBases}
@@ -22,7 +22,7 @@ class PvT2BaseArbiters extends Mode {
   description.set("PvT 2 Base Arbiter")
   
   override val activationCriteria: Plan = new Employing(PvT2BaseArbiter)
-  override val completionCriteria: Plan = new UnitsAtLeast(2, Protoss.Nexus, complete = true)
+  override val completionCriteria: Plan = new Never
   
   children.set(Vector(
     new MeldArchons(40),

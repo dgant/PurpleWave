@@ -19,8 +19,6 @@ import Strategery.Strategies.Protoss.PvZ.{PvZ4GateDragoonAllIn, PvZ4GateZealotAl
 
 class PvZ4GateAllIn extends Parallel {
   
-  
-  
   children.set(Vector(
     new RequireBareMinimum,
     new TwoGatewaysAtNexus,
@@ -43,7 +41,7 @@ class PvZ4GateAllIn extends Parallel {
         RequestUpgrade(Protoss.DragoonRange),
         RequestAtLeast(4, Protoss.Gateway)),
       new Trigger(
-        new UnitsAtLeast(20, UnitMatchWarriors),
+        new UnitsAtLeast(12, UnitMatchWarriors),
         initialAfter = new Parallel(
         new RequireMiningBases(2),
         new BuildGasPumps,

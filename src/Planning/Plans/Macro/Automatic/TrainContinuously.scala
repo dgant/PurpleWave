@@ -6,7 +6,11 @@ import Planning.Plan
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitClass.UnitClass
 
-class TrainContinuously(unitClass: UnitClass, maximum: Int = Int.MaxValue) extends Plan {
+class TrainContinuously(
+  unitClass           : UnitClass,
+  maximum             : Int = Int.MaxValue,
+  maximumConcurrently : Int = Int.MaxValue)
+    extends Plan {
   
   description.set("Continuously train " + unitClass)
   
@@ -19,7 +23,10 @@ class TrainContinuously(unitClass: UnitClass, maximum: Int = Int.MaxValue) exten
         List(
           maximum,
           maxDesirable,
-          buildCapacity + With.units.ours.count(unit => unit.aliveAndComplete && unit.unitClass == unitClass))
+          Math.min(
+            maximumConcurrently,
+            buildCapacity)
+          + With.units.ours.count(unit => unit.aliveAndComplete && unit.is(unitClass)))
         .min,
         unitClass))
   }

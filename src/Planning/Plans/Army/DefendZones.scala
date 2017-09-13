@@ -2,6 +2,8 @@ package Planning.Plans.Army
 
 import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
+import Planning.Composition.Property
+import Planning.Composition.UnitMatchers.{UnitMatchWarriors, UnitMatcher}
 import Planning.Plan
 import ProxyBwapi.UnitInfo.ForeignUnitInfo
 
@@ -9,10 +11,11 @@ class DefendZones extends Plan {
   
   private lazy val zones = With.geography.zones.map(zone => (zone, new DefendZone(zone))).toMap
   
+  val defenderMatcher = new Property[UnitMatcher](UnitMatchWarriors)
+  
   override def getChildren: Iterable[Plan] = zones.values
   
   protected override def onUpdate() {
-    
     val zoneScores = zones
       .keys
       .map(zone => (zone, zoneValue(zone)))
@@ -51,6 +54,6 @@ class DefendZones extends Plan {
   }
   
   private def isThreatening(enemy: ForeignUnitInfo, zone: Zone): Boolean = {
-    enemy.unitClass.helpsInCombat && enemy.zone == zone
+    (enemy.unitClass.helpsInCombat || enemy.isTransport) && enemy.zone == zone
   }
 }

@@ -50,11 +50,7 @@ class SquadDefendZone(zone: Zone) extends SquadGoal {
   }
   
   private val huntableEnemies = new Cache(() => {
-    squad.enemies.filter(enemy =>
-      enemy.zone == zone &&
-      enemy.unitClass.helpsInCombat &&
-      ! enemy.unitClass.isWorker
-    )
+    squad.enemies.filter(enemy => enemy.zone == zone && ! enemy.unitClass.isWorker)
   })
   
   def huntEnemies() {

@@ -3,14 +3,16 @@ package Planning.Plans.Protoss.GamePlans.Standard.PvP
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
+import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
+import Planning.Plans.Army.ConsiderAttacking
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.Mode
 import Planning.Plans.Information.Employing
 import Planning.Plans.Information.Reactive.EnemyBasesAtLeast
 import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.Build.ProposePlacement
-import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder, RequireBareMinimum}
+import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Milestones.{EnemyUnitsAtLeast, UnitsAtLeast}
 import Planning.Plans.Protoss.Situational.Blueprinter
@@ -24,7 +26,8 @@ class PvPOpen2GateRoboObs extends Mode {
   
   override val completionCriteria: Plan = new Or(
     new EnemyBasesAtLeast(2),
-    new UnitsAtLeast(2, Protoss.Nexus))
+    new UnitsAtLeast(2, Protoss.Nexus),
+    new UnitsAtLeast(40, UnitMatchWarriors))
   
   private class ProposeCannonsAtExpanion extends ProposePlacement {
     override lazy val blueprints: Iterable[Blueprint] = Blueprinter.pylonsAndCannonsAtNatural(this, 1, 3)
@@ -32,7 +35,6 @@ class PvPOpen2GateRoboObs extends Mode {
   
   children.set(Vector(
     new Do(() => With.blackboard.gasBankSoftLimit = 450),
-    new RequireBareMinimum,
     new If(
       new EnemyUnitsAtLeast(1, Protoss.DarkTemplar),
       new Build(RequestAtLeast(1, Protoss.Observer))),
@@ -67,7 +69,9 @@ class PvPOpen2GateRoboObs extends Mode {
   
     new Trigger(
       new UnitsAtLeast(2, Protoss.Reaver, complete = true),
-      new RequireMiningBases(2)),
+      new Parallel(
+        new RequireMiningBases(2),
+        new ConsiderAttacking)),
     
     new RequireSufficientSupply,
     new TrainWorkersContinuously(oversaturate = true),

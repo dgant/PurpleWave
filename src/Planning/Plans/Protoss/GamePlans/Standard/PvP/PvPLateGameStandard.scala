@@ -30,7 +30,6 @@ class PvPLateGameStandard extends Parallel {
       
   class BuildTechPartTwo extends Parallel(
     new Build(
-
       RequestUpgrade(Protoss.GroundArmor),
       RequestUpgrade(Protoss.HighTemplarEnergy),
       RequestAtLeast(12, Protoss.Gateway),

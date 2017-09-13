@@ -20,8 +20,7 @@ object ProtossBuilds {
     RequestAtLeast(13,  Protoss.Probe),
     RequestAtLeast(1,   Protoss.CyberneticsCore),
     RequestAtLeast(15,  Protoss.Probe),
-    RequestAtLeast(2,   Protoss.Pylon)
-  )
+    RequestAtLeast(2,   Protoss.Pylon))
   
   val Opening_10Gate12Gas14Core = Vector[BuildRequest] (
     RequestAtLeast(1,   Protoss.Nexus),
@@ -34,9 +33,7 @@ object ProtossBuilds {
     RequestAtLeast(14,  Protoss.Probe),
     RequestAtLeast(1,   Protoss.CyberneticsCore),
     RequestAtLeast(15,  Protoss.Probe),
-    RequestAtLeast(2,   Protoss.Pylon)
-  )
-  
+    RequestAtLeast(2,   Protoss.Pylon))
   
   val Opening_1GateZZCore = Vector[BuildRequest] (
     RequestAtLeast(1,   Protoss.Nexus),
@@ -46,8 +43,7 @@ object ProtossBuilds {
     RequestAtLeast(1,   Protoss.Gateway),
     RequestAtLeast(12,  Protoss.Probe),
     RequestAtLeast(1,   Protoss.Assimilator),
-    RequestAtLeast(13,  Protoss.Probe)
-  )
+    RequestAtLeast(13,  Protoss.Probe))
   
   val OpeningTwoGate99 = Vector[BuildRequest] (
     RequestAtLeast(1,   Protoss.Nexus),
@@ -82,7 +78,6 @@ object ProtossBuilds {
     RequestAtLeast(1,   Protoss.Pylon),
     RequestAtLeast(3,   Protoss.Zealot))
   
-  
   val OpeningTwoGate1012 = Vector[BuildRequest] (
     RequestAtLeast(1,   Protoss.Nexus),
     RequestAtLeast(8,   Protoss.Probe),
@@ -97,7 +92,7 @@ object ProtossBuilds {
     RequestAtLeast(2,   Protoss.Pylon),
     RequestAtLeast(3,   Protoss.Zealot))
   
-  val Opening_10Gate15GateDragoons = Vector[BuildRequest] (
+  val Opening10Gate15GateDragoons = Vector[BuildRequest] (
     RequestAtLeast(1,   Protoss.Nexus),
     RequestAtLeast(8,   Protoss.Probe),
     RequestAtLeast(1,   Protoss.Pylon),
@@ -110,12 +105,10 @@ object ProtossBuilds {
     RequestAtLeast(15,  Protoss.Probe),
     RequestAtLeast(2,   Protoss.Gateway),
     RequestAtLeast(2,   Protoss.Pylon),
-    RequestUpgrade(    Protoss.DragoonRange),
-    RequestAtLeast(2,   Protoss.Dragoon),
-    RequestAtLeast(3,   Protoss.Pylon),
-    RequestAtLeast(4,   Protoss.Dragoon),
-    RequestAtLeast(4,   Protoss.Pylon)
-  )
+    RequestAtLeast(1,   Protoss.Dragoon),
+    RequestUpgrade(Protoss.DragoonRange),
+    RequestAtLeast(3,   Protoss.Dragoon),
+    RequestAtLeast(3,   Protoss.Pylon))
   
   val Opening12Nexus = Vector[BuildRequest] (
     RequestAtLeast(1,   Protoss.Nexus),
@@ -182,6 +175,57 @@ object ProtossBuilds {
     RequestAtLeast(1,   Protoss.CyberneticsCore)
   )
   
+  val Opening13Nexus_Long = Vector[BuildRequest] (
+    RequestAtLeast(1,   Protoss.Nexus),
+    RequestAtLeast(8,   Protoss.Probe),
+    RequestAtLeast(1,   Protoss.Pylon),
+    RequestAtLeast(13,  Protoss.Probe),
+    RequestAtLeast(2,   Protoss.Nexus),
+    RequestAtLeast(14,  Protoss.Probe),
+    RequestAtLeast(1,   Protoss.Gateway),
+    RequestAtLeast(15,  Protoss.Probe),
+    RequestAtLeast(1,   Protoss.Assimilator),
+    RequestAtLeast(17,  Protoss.Probe),
+    RequestAtLeast(1,   Protoss.CyberneticsCore),
+    RequestAtLeast(2,   Protoss.Gateway),
+    RequestAtLeast(1,   Protoss.Zealot),
+    RequestAtLeast(19,  Protoss.Probe),
+    RequestAtLeast(2,   Protoss.Pylon),
+    RequestAtLeast(2,   Protoss.Dragoon),
+    RequestUpgrade(Protoss.DragoonRange),
+    RequestAtLeast(21,  Protoss.Probe),
+    RequestAtLeast(3,   Protoss.Pylon),
+    RequestAtLeast(4,   Protoss.Dragoon),
+    RequestAtLeast(23,  Protoss.Probe),
+    RequestAtLeast(4,   Protoss.Pylon),
+    RequestAtLeast(6,   Protoss.Dragoon),
+    RequestAtLeast(25,  Protoss.Probe))
+  
+  val Opening1GateRangeExpand = Vector[BuildRequest] (
+    RequestAtLeast(1,   Protoss.Nexus),
+    RequestAtLeast(8,   Protoss.Probe),
+    RequestAtLeast(1,   Protoss.Pylon),
+    RequestAtLeast(10,  Protoss.Probe),
+    RequestAtLeast(1,   Protoss.Gateway),
+    RequestAtLeast(11,  Protoss.Probe),
+    RequestAtLeast(1,   Protoss.Assimilator),
+    RequestAtLeast(13,  Protoss.Probe),
+    RequestAtLeast(1,   Protoss.CyberneticsCore),
+    RequestAtLeast(15,  Protoss.Probe),
+    RequestAtLeast(2,   Protoss.Pylon),
+    RequestAtLeast(16,  Protoss.Probe),
+    RequestUpgrade(Protoss.DragoonRange),
+    RequestAtLeast(19,  Protoss.Probe),
+    RequestAtLeast(1,   Protoss.Dragoon),
+    RequestAtLeast(2,   Protoss.Nexus),
+    RequestAtLeast(2,   Protoss.Gateway),
+    RequestAtLeast(2,   Protoss.Dragoon),
+    RequestAtLeast(3,   Protoss.Pylon),
+    RequestAtLeast(21,  Protoss.Probe),
+    RequestAtLeast(3,   Protoss.Dragoon),
+    RequestAtLeast(22,  Protoss.Probe),
+    RequestAtLeast(4,   Protoss.Dragoon))
+  
   val OpeningDTExpand = Vector[BuildRequest] (
     RequestAtLeast(1,   Protoss.Nexus),
     RequestAtLeast(8,   Protoss.Probe),
@@ -192,14 +236,15 @@ object ProtossBuilds {
     RequestAtLeast(1,   Protoss.Assimilator),
     RequestAtLeast(13,  Protoss.Probe),
     RequestAtLeast(1,   Protoss.CyberneticsCore),
-    //RequestAtLeast(1,   Protoss.Zealot),
+    RequestAtLeast(14,  Protoss.Probe),
+    RequestAtLeast(1,   Protoss.Zealot),
     RequestAtLeast(2,   Protoss.Pylon),
     RequestAtLeast(16,  Protoss.Probe),
     RequestAtLeast(1,   Protoss.CitadelOfAdun),
     RequestAtLeast(1,   Protoss.Dragoon),
-    RequestAtLeast(19,  Protoss.Probe),
+    RequestAtLeast(17,  Protoss.Probe),
     RequestAtLeast(3,   Protoss.Pylon),
-    RequestAtLeast(20,  Protoss.Probe),
+    RequestAtLeast(18,  Protoss.Probe),
     RequestAtLeast(1,   Protoss.TemplarArchives),
     RequestAtLeast(1,   Protoss.DarkTemplar),
     RequestAtLeast(2,   Protoss.Nexus)

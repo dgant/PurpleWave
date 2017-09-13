@@ -10,14 +10,7 @@ object AllPvT extends Strategy {
       PvTEarly14Nexus,
       PvTEarlyDTExpand,
       PvTEarly1GateRange,
-      PvTEarly1GateReaver,
-      PvTEarly1015GateDT,
-      PvTEarly1015GateGoon,
-      PvTEarly2GateObs),
-    Vector(
-      PvTLateArbiters,
-      PvTLateCarriers,
-      PvTLateMassGateway))
+      PvTEarly1015GateGoon))
   
   override def ourRaces    : Iterable[Race] = Vector(Race.Protoss)
   override def enemyRaces  : Iterable[Race] = Vector(Race.Terran)

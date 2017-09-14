@@ -2,6 +2,7 @@ package ProxyBwapi.UnitTracking
 
 import Lifecycle.With
 import ProxyBwapi.Players.Players
+import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, Orders}
 
 import scala.collection.JavaConverters._
@@ -89,11 +90,12 @@ class ForeignUnitTracker {
     
     lazy val shouldBeVisible  = With.grids.friendlyVision.isSet(unit.tileIncludingCenter)
     lazy val shouldBeDetected = With.grids.friendlyDetection.isSet(unit.tileIncludingCenter)
+    lazy val shouldUnburrow   = unit.is(Terran.SpiderMine) && With.grids.units.get(unit.tileIncludingCenter).exists(unit => unit.isOurs  && ! unit.flying && ! unit.unitClass.floats)
     lazy val wasBurrowing     = unit.burrowed || Array(Orders.Burrowing, Orders.VultureMine).contains(unit.order)
     lazy val wasCloaking      = unit.cloaked  || unit.order == Orders.Cloak
 
     if (shouldBeVisible) {
-      if ( ! shouldBeDetected) {
+      if ( ! shouldBeDetected && ! shouldUnburrow) {
         if (wasBurrowing) {
           unit.flagBurrowed()
           unit.flagUndetected()

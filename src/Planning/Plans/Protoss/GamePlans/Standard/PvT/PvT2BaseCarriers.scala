@@ -9,7 +9,7 @@ import Planning.Plans.Information.Reactive.EnemyBio
 import Planning.Plans.Information.{Employing, Never}
 import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
-import Planning.Plans.Macro.Expanding.{BuildCannonsAtExpansions, RequireMiningBases}
+import Planning.Plans.Macro.Expanding.{BuildCannonsAtBases, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.{EnemyHasTech, UnitsAtLeast}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Protoss.GamePlans.Standard.PvT.PvTIdeas.Require2BaseTech
@@ -32,7 +32,7 @@ class PvT2BaseCarriers extends Mode {
       new UnitsAtLeast(1, Protoss.Carrier, complete = true),
       new Build(RequestUpgrade(Protoss.CarrierCapacity))),
     new FlipIf(
-      new UnitsAtLeast(12, Protoss.Dragoon),
+      new UnitsAtLeast(8, Protoss.Dragoon),
       new TrainContinuously(Protoss.Dragoon),
       new TrainContinuously(Protoss.Carrier)),
     new BuildOrder(
@@ -54,14 +54,14 @@ class PvT2BaseCarriers extends Mode {
       RequestAtLeast(2, Protoss.Stargate),
       RequestAtLeast(4, Protoss.Gateway),
       RequestAtLeast(1, Protoss.Forge)),
-    new BuildCannonsAtExpansions(3),
+    new BuildCannonsAtBases(2),
     new RequireMiningBases(3),
     new Build(RequestAtLeast(4, Protoss.Stargate)),
     new RequireMiningBases(4),
     new UpgradeContinuously(Protoss.AirArmor),
     new UpgradeContinuously(Protoss.AirDamage),
+    new UpgradeContinuously(Protoss.GroundDamage),
     new ScoutExpansionsAt(100),
-    new ConsiderAttacking { attack.attackers.get.unitMatcher.set(Protoss.Carrier) },
     new DefendZones,
     new ConsiderAttacking
   ))

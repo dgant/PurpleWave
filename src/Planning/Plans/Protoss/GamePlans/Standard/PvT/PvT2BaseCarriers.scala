@@ -30,6 +30,13 @@ class PvT2BaseCarriers extends Mode {
     new TrainWorkersContinuously,
     new BuildCannonsAtExpansions(2),
     new If(
+      new EnemyHasTech(Terran.WraithCloak),
+      new Parallel(
+        new Build(
+          RequestAtLeast(1, Protoss.RoboticsFacility),
+          RequestAtLeast(1, Protoss.Observatory)),
+        new PvTIdeas.TrainObservers)),
+    new If(
       new UnitsAtLeast(1, Protoss.Carrier, complete = true),
       new Build(RequestUpgrade(Protoss.CarrierCapacity))),
     new If(
@@ -47,13 +54,6 @@ class PvT2BaseCarriers extends Mode {
     new BuildOrder(
       RequestAtLeast(2, Protoss.Gateway),
       RequestAtLeast(1, Protoss.Stargate)),
-    new If(
-      new EnemyHasTech(Terran.WraithCloak),
-      new Parallel(
-        new Build(
-          RequestAtLeast(1, Protoss.RoboticsFacility),
-          RequestAtLeast(1, Protoss.Observatory)),
-        new PvTIdeas.TrainObservers)),
     new If(
       new EnemyBio,
       new UpgradeContinuously(Protoss.AirArmor),

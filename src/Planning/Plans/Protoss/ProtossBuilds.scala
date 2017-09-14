@@ -227,7 +227,7 @@ object ProtossBuilds {
     RequestAtLeast(4,   Protoss.Dragoon))
   
   val OpeningDTExpand = Vector[BuildRequest] (
-    RequestAtLeast(1,   Protoss.Nexus),
+    // 2-Gate DT Expand based on PvP 2-Gate DT from http://wiki.teamliquid.net/starcraft/2_Gate_DT
     RequestAtLeast(8,   Protoss.Probe),
     RequestAtLeast(1,   Protoss.Pylon),
     RequestAtLeast(10,  Protoss.Probe),
@@ -236,19 +236,24 @@ object ProtossBuilds {
     RequestAtLeast(1,   Protoss.Assimilator),
     RequestAtLeast(13,  Protoss.Probe),
     RequestAtLeast(1,   Protoss.CyberneticsCore),
-    RequestAtLeast(14,  Protoss.Probe),
-    RequestAtLeast(1,   Protoss.Zealot),
+    RequestAtLeast(15,  Protoss.Probe),
     RequestAtLeast(2,   Protoss.Pylon),
     RequestAtLeast(16,  Protoss.Probe),
     RequestAtLeast(1,   Protoss.CitadelOfAdun),
     RequestAtLeast(1,   Protoss.Dragoon),
-    RequestAtLeast(17,  Protoss.Probe),
+    RequestAtLeast(19,  Protoss.Probe),
     RequestAtLeast(3,   Protoss.Pylon),
-    RequestAtLeast(18,  Protoss.Probe),
+    RequestAtLeast(20,  Protoss.Probe),
     RequestAtLeast(1,   Protoss.TemplarArchives),
-    RequestAtLeast(1,   Protoss.DarkTemplar),
-    RequestAtLeast(2,   Protoss.Nexus)
-  )
+    RequestAtLeast(21,  Protoss.Probe),
+    RequestAtLeast(2,   Protoss.Gateway),
+    RequestAtLeast(22,  Protoss.Probe),
+    RequestAtLeast(2,   Protoss.Dragoon),
+    RequestAtLeast(4,   Protoss.Pylon),
+    RequestAtLeast(23,  Protoss.Probe),
+    RequestAtLeast(2,   Protoss.DarkTemplar),
+    RequestAtLeast(24,  Protoss.Probe),
+    RequestAtLeast(2,   Protoss.Nexus))
   
   //////////////////////
   // Protoss vs. Zerg //

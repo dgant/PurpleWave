@@ -55,11 +55,11 @@ object PvTIdeas {
       RequestAtLeast(1, Protoss.RoboticsFacility),
       RequestAtLeast(1, Protoss.Observatory)))
   
-  private class TrainZealotsOrDragoons extends If(
+  class TrainZealotsOrDragoons extends If(
     new And(
       new UpgradeComplete(Protoss.ZealotSpeed, withinFrames = Protoss.Zealot.buildFrames),
       new Or(
-        new UnitsAtLeast(18, Protoss.Dragoon),
+        new UnitsAtLeast(12, Protoss.Dragoon),
         new Check(() => With.self.gas * 5 < With.self.minerals))),
     new TrainContinuously(Protoss.Zealot),
     new TrainContinuously(Protoss.Dragoon))

@@ -19,6 +19,7 @@ object Build extends Action {
       blocker != unit   &&
       ! blocker.flying  &&
       blocker.possiblyStillThere))
+    
     blockers.flatMap(_.friendly).foreach(_.agent.shove(unit))
     if (blockers.exists(_.isEnemy)) {
       unit.agent.canFight = true

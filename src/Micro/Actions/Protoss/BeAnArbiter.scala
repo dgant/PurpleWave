@@ -30,10 +30,13 @@ object BeAnArbiter extends Action {
     }
     else {
       val threats = unit.matchups.threats
+      val threatMagnitude = if (unit.matchups.threatsInRange.nonEmpty) 0.75 else 0.5
       val forcesUmbrella  = friends.map(friend => Potential.unitAttraction(unit, friend, 1.0 / Math.max(24.0, friend.matchups.framesOfSafetyDiffused)))
       val forcesThreats   = threats.map(threat => Potential.unitAttraction(unit, threat, 1.0 / Math.max(24.0, threat.framesBeforeAttacking(unit))))
-      val forceUmbrella   = ForceMath.sum(forcesUmbrella)
-      unit.agent.forces.put(ForceColors.spreading,  forceUmbrella)
+      val forceUmbrella   = ForceMath.sum(forcesUmbrella).normalize
+      val forceThreats    = ForceMath.sum(forcesThreats).normalize(threatMagnitude)
+      unit.agent.forces.put(ForceColors.regrouping,  forceUmbrella)
+      unit.agent.forces.put(ForceColors.regrouping,  forceThreats)
       Gravitate.consider(unit)
     }
   }

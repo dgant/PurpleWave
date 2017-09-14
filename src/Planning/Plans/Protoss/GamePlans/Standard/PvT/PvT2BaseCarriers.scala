@@ -9,8 +9,8 @@ import Planning.Plans.Information.Reactive.EnemyBio
 import Planning.Plans.Information.{Employing, Never}
 import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
-import Planning.Plans.Macro.Expanding.{BuildCannonsAtBases, RequireMiningBases}
-import Planning.Plans.Macro.Milestones.{EnemyHasTech, UnitsAtLeast}
+import Planning.Plans.Macro.Expanding.{BuildCannonsAtExpansions, RequireMiningBases}
+import Planning.Plans.Macro.Milestones.{EnemyHasTech, UnitsAtLeast, UnitsAtMost}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Protoss.GamePlans.Standard.PvT.PvTIdeas.Require2BaseTech
 import Planning.Plans.Scouting.ScoutExpansionsAt
@@ -28,12 +28,21 @@ class PvT2BaseCarriers extends Mode {
     new Require2BaseTech,
     new RequireSufficientSupply,
     new TrainWorkersContinuously,
+    new BuildCannonsAtExpansions(2),
     new If(
       new UnitsAtLeast(1, Protoss.Carrier, complete = true),
       new Build(RequestUpgrade(Protoss.CarrierCapacity))),
+    new If(
+      new UnitsAtLeast(12, Protoss.Zealot, complete = true),
+      new Build(
+        RequestAtLeast(1, Protoss.CitadelOfAdun),
+        RequestUpgrade(Protoss.ZealotSpeed))),
     new FlipIf(
-      new UnitsAtLeast(8, Protoss.Dragoon),
-      new TrainContinuously(Protoss.Dragoon),
+      new UnitsAtLeast(4, Protoss.Dragoon),
+      new If(
+        new UnitsAtMost(15, Protoss.Dragoon),
+        new TrainContinuously(Protoss.Dragoon, 15),
+        new TrainContinuously(Protoss.Zealot)),
       new TrainContinuously(Protoss.Carrier)),
     new BuildOrder(
       RequestAtLeast(2, Protoss.Gateway),
@@ -44,7 +53,7 @@ class PvT2BaseCarriers extends Mode {
         new Build(
           RequestAtLeast(1, Protoss.RoboticsFacility),
           RequestAtLeast(1, Protoss.Observatory)),
-        new TrainContinuously(Protoss.Observer, 3))),
+        new PvTIdeas.TrainObservers)),
     new If(
       new EnemyBio,
       new UpgradeContinuously(Protoss.AirArmor),
@@ -52,17 +61,15 @@ class PvT2BaseCarriers extends Mode {
     new Build(
       RequestAtLeast(1, Protoss.FleetBeacon),
       RequestAtLeast(2, Protoss.Stargate),
-      RequestAtLeast(4, Protoss.Gateway),
-      RequestAtLeast(1, Protoss.Forge)),
-    new BuildCannonsAtBases(2),
+      RequestAtLeast(8, Protoss.Gateway)),
     new RequireMiningBases(3),
     new Build(RequestAtLeast(4, Protoss.Stargate)),
     new RequireMiningBases(4),
-    new UpgradeContinuously(Protoss.AirArmor),
     new UpgradeContinuously(Protoss.AirDamage),
+    new UpgradeContinuously(Protoss.AirArmor),
     new UpgradeContinuously(Protoss.GroundDamage),
-    new ScoutExpansionsAt(100),
     new DefendZones,
+    new ScoutExpansionsAt(100),
     new ConsiderAttacking
   ))
 }

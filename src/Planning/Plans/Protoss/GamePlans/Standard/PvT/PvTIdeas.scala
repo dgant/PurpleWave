@@ -4,7 +4,7 @@ import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plans.Army.{Attack, ConsiderAttacking}
-import Planning.Plans.Compound._
+import Planning.Plans.Compound.{If, _}
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
@@ -20,6 +20,10 @@ object PvTIdeas {
       RequestAtLeast(1, Protoss.Gateway),
       RequestAtLeast(1, Protoss.CyberneticsCore),
       RequestUpgrade(Protoss.DragoonRange)))
+  
+  class AttackWithDarkTemplar extends Attack {
+    attackers.get.unitMatcher.set(Protoss.DarkTemplar)
+  }
   
   class ContainSafely extends If(
     new And(
@@ -59,18 +63,20 @@ object PvTIdeas {
     new TrainContinuously(Protoss.Zealot),
     new TrainContinuously(Protoss.Dragoon))
   
+  class TrainObservers extends If(
+    new EnemyHasTech(Terran.WraithCloak),
+    new TrainContinuously(Protoss.Observer, 5),
+    new If(
+      new EnemyHasShown(Terran.SpiderMine),
+      new TrainContinuously(Protoss.Observer, 3),
+      new TrainContinuously(Protoss.Observer, 1)))
+  
   class TrainArmy extends Parallel(
     new TrainContinuously(Protoss.Carrier),
     new TrainContinuously(Protoss.Arbiter, 3),
     new IfNoDetection_DarkTemplar,
     new OnGasBases(3, new TrainContinuously(Protoss.HighTemplar, 6, 2)),
-    new If(
-      new EnemyHasTech(Terran.WraithCloak),
-      new TrainContinuously(Protoss.Observer, 5),
-      new If(
-        new EnemyHasShown(Terran.SpiderMine),
-        new TrainContinuously(Protoss.Observer, 3),
-        new TrainContinuously(Protoss.Observer, 1))),
+    new TrainObservers,
     new TrainZealotsOrDragoons
   )
 }

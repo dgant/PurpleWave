@@ -122,6 +122,10 @@ object Potential {
     output
   }
   
+  def cliffAttraction(unit: FriendlyUnitInfo): Force = {
+    With.grids.mobilityForceGround.get(unit.tileIncludingCenter).normalize(-1.0)
+  }
+  
   ////////////////
   // Collisions //
   ////////////////

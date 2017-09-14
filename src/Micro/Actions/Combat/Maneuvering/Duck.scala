@@ -46,16 +46,22 @@ object Duck extends Action {
       && ! unit.unitClass.floats) {
       if (threat.burrowed) {
         
-        // Avoid activating the Spider Mine.
-        // Spider Mines rely on normal target acquisition range math, which is 96px + attack range edge-to-edge
-        // However, this is often limited by Spider Mine sight range, which is 96px exactly.
-        // According to jaj22 the acqusition range is center-to-center (unlike most units, which are edge-to-edge)
-        val safetyMarginPixels = 96.0
-        Some(Explosion(
-          threat.pixelCenter,
-          32.0 * 3.0 + safetyMarginPixels,
-          threat.damageOnNextHitAgainst(unit)
-        ))
+        //This extreme behavior makes us do dumb stuff
+        if (false) {
+          // Avoid activating the Spider Mine.
+          // Spider Mines rely on normal target acquisition range math, which is 96px + attack range edge-to-edge
+          // However, this is often limited by Spider Mine sight range, which is 96px exactly.
+          // According to jaj22 the acqusition range is center-to-center (unlike most units, which are edge-to-edge)
+          val safetyMarginPixels = 96.0
+          Some(Explosion(
+            threat.pixelCenter,
+            32.0 * 3.0 + safetyMarginPixels,
+            threat.damageOnNextHitAgainst(unit)
+          ))
+        }
+        else {
+          None
+        }
       }
       else {
         

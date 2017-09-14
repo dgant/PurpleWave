@@ -1,10 +1,10 @@
 package Micro.Actions.Protoss
 
 import Micro.Actions.Action
-import Micro.Actions.Combat.Maneuvering.Avoid
+import Micro.Actions.Combat.Maneuvering.{Avoid, CliffAvoid}
 import Micro.Actions.Commands.{Attack, AttackMove}
 import Micro.Heuristics.Targeting.EvaluateTargets
-import ProxyBwapi.Races.Protoss
+import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders}
 
 object BeACarrier extends Action {
@@ -25,7 +25,11 @@ object BeACarrier extends Action {
     lazy val exitingLeash             = unit.matchups.targets.forall(_.pixelDistanceFast(unit) > 32.0 * 8.0)
     lazy val interceptorsNeedKick     = exitingLeash || ! interceptorsAreShooting
     
-    if (unit.matchups.targets.nonEmpty && interceptorsNeedKick && (unit.matchups.threats.isEmpty || interceptorsTotal > 2)) {
+    if (unit.matchups.threatsInRange.exists(threat => threat.is(Terran.Goliath) || threat.unitClass.isStaticDefense)) {
+      CliffAvoid.consider(unit)
+      Avoid.consider(unit)
+    }
+    else if (unit.matchups.targets.nonEmpty && interceptorsNeedKick && (unit.matchups.threats.isEmpty || interceptorsTotal > 2)) {
       
       // AIIDE 2017 hack for Ximp -- focus down the Carriers
       if (unit.matchups.targets.forall(t => t.flying)) {
@@ -41,6 +45,7 @@ object BeACarrier extends Action {
       }
     }
     else {
+      CliffAvoid.consider(unit)
       Avoid.consider(unit)
     }
   }

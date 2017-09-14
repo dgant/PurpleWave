@@ -15,7 +15,10 @@ object Build extends Action {
   override def perform(unit: FriendlyUnitInfo) {
     
     val buildArea = unit.agent.toBuild.get.tileArea.add(unit.agent.toBuildTile.get)
-    val blockers  = buildArea.expand(2, 2).tiles.flatMap(With.grids.units.get(_).filterNot(_.flying))
+    val blockers  = buildArea.expand(2, 2).tiles.flatMap(With.grids.units.get(_).filter(blocker =>
+      blocker != unit   &&
+      ! blocker.flying  &&
+      blocker.possiblyStillThere))
     blockers.flatMap(_.friendly).foreach(_.agent.shove(unit))
     if (blockers.exists(_.isEnemy)) {
       unit.agent.canFight = true

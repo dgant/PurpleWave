@@ -1,6 +1,6 @@
 package Planning.Plans.Protoss.GamePlans.Standard
 
-import Planning.Plans.Army.DefendEntrance
+import Planning.Plans.Army.{ClearBurrowedBlockers, DefendEntrance}
 import Planning.Plans.Compound.Parallel
 import Planning.Plans.Information.SwitchEnemyRace
 import Planning.Plans.Macro.Automatic.Gather
@@ -17,6 +17,7 @@ class ProtossStandardGamePlan
       zerg    .set(new ProtossVsZerg)
       random  .set(new ProtossVsRandom)
     },
+    new ClearBurrowedBlockers,
     new FollowBuildOrder,
     new DefendAgainstProxy,
     new RemoveMineralBlocksAt(40),

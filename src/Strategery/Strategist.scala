@@ -94,7 +94,7 @@ class Strategist {
     val bestVsEnemy   = evaluated.map(_.winrateVsEnemy).max
     val untested      = evaluated.filter(_.games.isEmpty)
     
-    val bestEvaluation = evaluated.maxBy(_.interestTotal)
+    val bestEvaluation = evaluated.toSeq.sortBy(_.playbookOrder).maxBy(_.interestTotal)
       /*
       if (bestVsEnemy >= With.configuration.rideItOutWinrate) {
         evaluated

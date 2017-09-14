@@ -2,7 +2,7 @@ package Planning.Plans.Protoss.GamePlans.Standard.PvT
 
 import Macro.BuildRequests.RequestAtLeast
 import Planning.Plan
-import Planning.Plans.Army.DefendZones
+import Planning.Plans.Army.{ConsiderAttacking, DefendZones}
 import Planning.Plans.GamePlans.Mode
 import Planning.Plans.Information.Employing
 import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
@@ -27,7 +27,8 @@ class PvT13Nexus extends Mode {
     new TrainContinuously(Protoss.Dragoon),
     new BuildOrder(RequestAtLeast(8, Protoss.Gateway)),
     new ScoutAt(14),
-    new DefendZones
+    new DefendZones,
+    new ConsiderAttacking
   ))
 }
 

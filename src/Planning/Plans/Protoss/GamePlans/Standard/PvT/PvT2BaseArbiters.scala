@@ -29,10 +29,13 @@ class PvT2BaseArbiters extends Mode {
     new Require2BaseTech,
     new RequireSufficientSupply,
     new TrainWorkersContinuously,
+    new BuildCannonsAtExpansions(2),
+    new If(new UnitsAtLeast(30, UnitMatchWarriors), new RequireMiningBases(3)),
     new FlipIf(
-      new UnitsAtLeast(20, UnitMatchWarriors),
+      new UnitsAtLeast(10, UnitMatchWarriors),
       new PvTIdeas.TrainArmy,
       new Parallel(
+        new If(new UnitsAtLeast(2, Protoss.Arbiter), new Build(RequestTech(Protoss.Stasis))),
         new BuildOrder(
           RequestAtLeast(2, Protoss.Gateway),
           RequestAtLeast(1, Protoss.CitadelOfAdun),
@@ -40,25 +43,26 @@ class PvT2BaseArbiters extends Mode {
           RequestAtLeast(1, Protoss.Stargate),
           RequestAtLeast(4, Protoss.Gateway),
           RequestAtLeast(1, Protoss.ArbiterTribunal),
-          RequestUpgrade(Protoss.ArbiterEnergy),
+          RequestUpgrade(Protoss.ZealotSpeed),
           RequestAtLeast(1, Protoss.Arbiter),
           RequestAtLeast(1, Protoss.RoboticsFacility),
-          RequestAtLeast(1, Protoss.Observatory)
+          RequestAtLeast(1, Protoss.Observatory),
+          RequestAtLeast(8, Protoss.Gateway)
         ),
         new RequireMiningBases(3),
-        new If(new UnitsAtLeast(2, Protoss.Arbiter), new Build(RequestTech(Protoss.Stasis))),
         new If(new UnitsAtLeast(2, Protoss.HighTemplar), new Build(RequestTech(Protoss.PsionicStorm))),
-        new BuildOrder(RequestUpgrade(Protoss.ZealotSpeed)),
         new Build(RequestAtLeast(1, Protoss.Forge)),
         new UpgradeContinuously(Protoss.GroundDamage),
-        new BuildCannonsAtExpansions(2),
         new Build(RequestAtLeast(10, Protoss.Gateway)),
-        new OnGasBases(3, new Build(RequestAtLeast(2, Protoss.Stargate))),
+        new OnGasBases(3, new Build(
+          RequestUpgrade(Protoss.ArbiterEnergy),
+          RequestAtLeast(2, Protoss.Stargate))),
         new RequireMiningBases(4),
         new Build(RequestAtLeast(20, Protoss.Gateway))
       )),
     new DefendZones,
     new ScoutExpansionsAt(100),
+    new PvTIdeas.AttackWithDarkTemplar,
     new PvTIdeas.ContainSafely
   ))
 }

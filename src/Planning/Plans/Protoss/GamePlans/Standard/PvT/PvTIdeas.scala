@@ -2,7 +2,7 @@ package Planning.Plans.Protoss.GamePlans.Standard.PvT
 
 import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
-import Planning.Composition.UnitMatchers.UnitMatchWarriors
+import Planning.Composition.UnitMatchers.{UnitMatchCustom, UnitMatchWarriors}
 import Planning.Plans.Army.{Attack, ConsiderAttacking}
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.Macro.Automatic.TrainContinuously
@@ -36,8 +36,9 @@ object PvTIdeas {
   
   private class IfNoDetection_DarkTemplar extends If(
     new And(
+      new UnitsAtMost(0, Protoss.Arbiter),
       new EnemyUnitsNone(Terran.ScienceVessel),
-      new EnemyUnitsNone(Terran.MissileTurret)),
+      new EnemyUnitsNone(UnitMatchCustom((unit) => unit.is(Terran.MissileTurret) && unit.zone.owner.isNeutral))),
     new TrainContinuously(Protoss.DarkTemplar, 3),
     new TrainContinuously(Protoss.DarkTemplar, 1))
   

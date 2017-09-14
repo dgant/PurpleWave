@@ -33,6 +33,7 @@ class PvTDTExpand extends Mode {
       RequestUpgrade(Protoss.DragoonRange),
       RequestAtLeast(4, Protoss.Gateway)),
     new ScoutAt(14),
+    new PvTIdeas.AttackWithDarkTemplar,
     new DefendZones,
     new Trigger(
       new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),

@@ -78,6 +78,14 @@ object PvTIdeas {
     new IfNoDetection_DarkTemplar,
     new OnGasBases(3, new TrainContinuously(Protoss.HighTemplar, 6, 2)),
     new TrainObservers,
-    new TrainZealotsOrDragoons
-  )
+    new TrainZealotsOrDragoons)
+  
+  class GetObserversForCloakedWraiths extends If(
+    new EnemyHasTech(Terran.WraithCloak),
+    new Parallel(
+      new Build(
+        RequestAtLeast(1, Protoss.RoboticsFacility),
+        RequestAtLeast(1, Protoss.Observatory)),
+      new PvTIdeas.TrainObservers))
 }
+

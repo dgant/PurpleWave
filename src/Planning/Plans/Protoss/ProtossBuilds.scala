@@ -240,6 +240,7 @@ object ProtossBuilds {
     RequestAtLeast(2,   Protoss.Pylon),
     RequestAtLeast(16,  Protoss.Probe),
     RequestAtLeast(1,   Protoss.CitadelOfAdun),
+    RequestAtLeast(17,  Protoss.Probe),
     RequestAtLeast(1,   Protoss.Dragoon),
     RequestAtLeast(19,  Protoss.Probe),
     RequestAtLeast(3,   Protoss.Pylon),
@@ -249,8 +250,8 @@ object ProtossBuilds {
     RequestAtLeast(2,   Protoss.Gateway),
     RequestAtLeast(22,  Protoss.Probe),
     RequestAtLeast(2,   Protoss.Dragoon),
-    RequestAtLeast(4,   Protoss.Pylon),
     RequestAtLeast(23,  Protoss.Probe),
+    RequestAtLeast(4,   Protoss.Pylon),
     RequestAtLeast(2,   Protoss.DarkTemplar),
     RequestAtLeast(24,  Protoss.Probe),
     RequestAtLeast(2,   Protoss.Nexus))

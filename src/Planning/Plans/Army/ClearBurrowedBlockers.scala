@@ -5,14 +5,20 @@ import Micro.Agency.Intention
 import Planning.Composition.Property
 import Planning.Composition.ResourceLocks.LockUnits
 import Planning.Composition.UnitCounters.UnitCountOne
-import Planning.Composition.UnitMatchers.UnitMatchMobileDetectors
+import Planning.Composition.UnitMatchers.{UnitMatchCustom, UnitMatchMobileDetectors}
 import Planning.Composition.UnitPreferences.UnitPreferClose
 import Planning.Plan
+
+import scala.util.Random
 
 class ClearBurrowedBlockers extends Plan {
   
   val detector = new Property(new LockUnits)
   detector.get.unitMatcher.set(UnitMatchMobileDetectors)
+  detector.get.unitCounter.set(UnitCountOne)
+  
+  val decoy = new Property(new LockUnits)
+  decoy.get.unitMatcher.set(UnitMatchCustom((unit) => unit.canMove && ! unit.flying && ! unit.unitClass.floats))
   detector.get.unitCounter.set(UnitCountOne)
   
   override def onUpdate(): Unit = {
@@ -25,10 +31,20 @@ class ClearBurrowedBlockers extends Plan {
     
     detector.get.unitPreference.set(UnitPreferClose(target.get))
     detector.get.acquire(this)
-    
-    detector.get.units.foreach(_.agent.intend(this, new Intention {
-      toTravel = target
-      canCower = true
-    }))
+    if (detector.get.units.nonEmpty) {
+      detector.get.units.foreach(_.agent.intend(this, new Intention {
+        toTravel = target
+        canCower = true
+      }))
+      return
+    }
+  
+    if (With.enemies.exists(_.isTerran)) {
+      decoy.get.unitPreference.set(UnitPreferClose(target.get))
+      decoy.get.acquire(this)
+      decoy.get.units.foreach(_.agent.intend(this, new Intention {
+        toTravel = Some(target.get.add(Random.nextInt(160) - 80, Random.nextInt(128) - 64))
+      }))
+    }
   }
 }

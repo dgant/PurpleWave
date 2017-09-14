@@ -35,6 +35,7 @@ class PvT2BaseArbiters extends Mode {
       new UnitsAtLeast(10, UnitMatchWarriors),
       new PvTIdeas.TrainArmy,
       new Parallel(
+        new PvTIdeas.GetObserversForCloakedWraiths,
         new If(new UnitsAtLeast(2, Protoss.Arbiter), new Build(RequestTech(Protoss.Stasis))),
         new BuildOrder(
           RequestAtLeast(2, Protoss.Gateway),
@@ -47,8 +48,7 @@ class PvT2BaseArbiters extends Mode {
           RequestAtLeast(1, Protoss.Arbiter),
           RequestAtLeast(1, Protoss.RoboticsFacility),
           RequestAtLeast(1, Protoss.Observatory),
-          RequestAtLeast(8, Protoss.Gateway)
-        ),
+          RequestAtLeast(8, Protoss.Gateway)),
         new RequireMiningBases(3),
         new If(new UnitsAtLeast(2, Protoss.HighTemplar), new Build(RequestTech(Protoss.PsionicStorm))),
         new Build(RequestAtLeast(1, Protoss.Forge)),

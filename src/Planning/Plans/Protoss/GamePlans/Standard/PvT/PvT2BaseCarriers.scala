@@ -3,18 +3,18 @@ package Planning.Plans.Protoss.GamePlans.Standard.PvT
 import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
 import Planning.Plan
 import Planning.Plans.Army.{ConsiderAttacking, DefendZones}
-import Planning.Plans.Compound.{FlipIf, If, Parallel}
+import Planning.Plans.Compound.{FlipIf, If}
 import Planning.Plans.GamePlans.Mode
 import Planning.Plans.Information.Reactive.EnemyBio
 import Planning.Plans.Information.{Employing, Never}
 import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildCannonsAtExpansions, RequireMiningBases}
-import Planning.Plans.Macro.Milestones.{EnemyHasTech, UnitsAtLeast, UnitsAtMost}
+import Planning.Plans.Macro.Milestones.{UnitsAtLeast, UnitsAtMost}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
-import Planning.Plans.Protoss.GamePlans.Standard.PvT.PvTIdeas.Require2BaseTech
+import Planning.Plans.Protoss.GamePlans.Standard.PvT.PvTIdeas.{GetObserversForCloakedWraiths, Require2BaseTech}
 import Planning.Plans.Scouting.ScoutExpansionsAt
-import ProxyBwapi.Races.{Protoss, Terran}
+import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvT.PvT2BaseCarrier
 
 class PvT2BaseCarriers extends Mode {
@@ -29,13 +29,7 @@ class PvT2BaseCarriers extends Mode {
     new RequireSufficientSupply,
     new TrainWorkersContinuously,
     new BuildCannonsAtExpansions(2),
-    new If(
-      new EnemyHasTech(Terran.WraithCloak),
-      new Parallel(
-        new Build(
-          RequestAtLeast(1, Protoss.RoboticsFacility),
-          RequestAtLeast(1, Protoss.Observatory)),
-        new PvTIdeas.TrainObservers)),
+    new GetObserversForCloakedWraiths,
     new If(
       new UnitsAtLeast(1, Protoss.Carrier, complete = true),
       new Build(RequestUpgrade(Protoss.CarrierCapacity))),

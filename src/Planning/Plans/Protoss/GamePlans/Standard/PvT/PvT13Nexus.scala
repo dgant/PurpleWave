@@ -23,7 +23,7 @@ class PvT13Nexus extends Mode {
   children.set(Vector(
     new BuildOrder(ProtossBuilds.Opening13Nexus_Long: _*),
     new RequireSufficientSupply,
-    new TrainWorkersContinuously,
+    new TrainWorkersContinuously(oversaturate = true),
     new TrainContinuously(Protoss.Dragoon),
     new BuildOrder(RequestAtLeast(8, Protoss.Gateway)),
     new ScoutAt(14),

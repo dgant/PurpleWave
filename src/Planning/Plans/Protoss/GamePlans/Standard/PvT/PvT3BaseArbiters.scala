@@ -9,56 +9,57 @@ import Planning.Plans.GamePlans.Mode
 import Planning.Plans.Information.{Employing, Never}
 import Planning.Plans.Macro.Automatic.{MeldArchons, RequireSufficientSupply, TrainWorkersContinuously}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
-import Planning.Plans.Macro.Expanding.{BuildCannonsAtExpansions, RequireMiningBases}
-import Planning.Plans.Macro.Milestones.{OnGasBases, UnitsAtLeast}
+import Planning.Plans.Macro.Expanding.{BuildCannonsAtExpansions, BuildGasPumps, RequireMiningBases}
+import Planning.Plans.Macro.Milestones.UnitsAtLeast
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
-import Planning.Plans.Protoss.GamePlans.Standard.PvT.PvTIdeas.Require2BaseTech
 import Planning.Plans.Scouting.ScoutExpansionsAt
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvT.PvT2BaseArbiter
+import Strategery.Strategies.Protoss.PvT.PvT3BaseArbiter
 
-class PvT2BaseArbiters extends Mode {
+class PvT3BaseArbiters extends Mode {
   
-  description.set("PvT 2 Base Arbiter")
+  description.set("PvT 3 Base Arbiter")
   
-  override val activationCriteria: Plan = new Employing(PvT2BaseArbiter)
+  override val activationCriteria: Plan = new Employing(PvT3BaseArbiter)
   override val completionCriteria: Plan = new Never
   
   children.set(Vector(
     new MeldArchons(40),
-    new Require2BaseTech,
     new RequireSufficientSupply,
     new TrainWorkersContinuously(oversaturate = true),
     new BuildCannonsAtExpansions(2),
-    new If(new UnitsAtLeast(30, UnitMatchWarriors), new RequireMiningBases(3)),
+    new BuildGasPumps,
     new FlipIf(
-      new UnitsAtLeast(10, UnitMatchWarriors),
-      new PvTIdeas.TrainArmy,
+      new UnitsAtLeast(50, UnitMatchWarriors),
       new Parallel(
-        new PvTIdeas.GetObserversForCloakedWraiths,
-        new If(new UnitsAtLeast(2, Protoss.Arbiter), new Build(RequestTech(Protoss.Stasis))),
+        new PvTIdeas.TrainArmy,
+        new RequireMiningBases(4)),
+      new Parallel(
+        new PvTIdeas.TrainObservers,
+        new If(new UnitsAtLeast(2, Protoss.HighTemplar),  new Build(RequestTech(Protoss.PsionicStorm))),
+        new If(new UnitsAtLeast(2, Protoss.Arbiter),      new Build(RequestTech(Protoss.Stasis))),
         new BuildOrder(
-          RequestAtLeast(2, Protoss.Gateway),
-          RequestAtLeast(1, Protoss.CitadelOfAdun),
-          RequestAtLeast(1, Protoss.TemplarArchives),
-          RequestAtLeast(1, Protoss.Stargate),
-          RequestUpgrade(Protoss.ZealotSpeed),
-          RequestAtLeast(4, Protoss.Gateway),
-          RequestAtLeast(1, Protoss.ArbiterTribunal),
-          RequestAtLeast(1, Protoss.Arbiter),
+          RequestAtLeast(1, Protoss.Gateway),
+          RequestAtLeast(1, Protoss.CyberneticsCore),
+          RequestAtLeast(3, Protoss.Gateway),
           RequestAtLeast(1, Protoss.RoboticsFacility),
           RequestAtLeast(1, Protoss.Observatory),
-          RequestAtLeast(8, Protoss.Gateway)),
-        new RequireMiningBases(3),
-        new If(new UnitsAtLeast(2, Protoss.HighTemplar), new Build(RequestTech(Protoss.PsionicStorm))),
-        new Build(RequestAtLeast(1, Protoss.Forge)),
-        new UpgradeContinuously(Protoss.GroundDamage),
-        new Build(RequestAtLeast(10, Protoss.Gateway)),
-        new OnGasBases(3, new Build(
+          RequestAtLeast(5, Protoss.Gateway),
+          RequestAtLeast(1, Protoss.CitadelOfAdun),
+          RequestUpgrade(Protoss.ZealotSpeed),
+          RequestAtLeast(8, Protoss.Gateway),
+          RequestAtLeast(1, Protoss.TemplarArchives),
+          RequestTech(Protoss.PsionicStorm),
+          RequestAtLeast(1, Protoss.Stargate),
+          RequestUpgrade(Protoss.HighTemplarEnergy),
+          RequestAtLeast(1, Protoss.ArbiterTribunal),
           RequestUpgrade(Protoss.ArbiterEnergy),
-          RequestAtLeast(2, Protoss.Stargate))))),
+          RequestAtLeast(2, Protoss.Forge)),
+        new UpgradeContinuously(Protoss.GroundDamage),
+        new UpgradeContinuously(Protoss.GroundArmor))),
     new RequireMiningBases(4),
     new Build(RequestAtLeast(20, Protoss.Gateway)),
+    new RequireMiningBases(5),
     new DefendZones,
     new EscortSettlers,
     new ScoutExpansionsAt(100),

@@ -14,12 +14,12 @@ import ProxyBwapi.Races.{Protoss, Terran}
 object PvTIdeas {
   
   class Require2BaseTech extends Parallel(
-    new RequireMiningBases(2),
-    new BuildGasPumps,
     new Build(
       RequestAtLeast(1, Protoss.Gateway),
       RequestAtLeast(1, Protoss.CyberneticsCore),
-      RequestUpgrade(Protoss.DragoonRange)))
+      RequestUpgrade(Protoss.DragoonRange)),
+    new RequireMiningBases(2),
+    new BuildGasPumps)
   
   class AttackWithDarkTemplar extends Attack {
     attackers.get.unitMatcher.set(Protoss.DarkTemplar)
@@ -46,7 +46,7 @@ object PvTIdeas {
     new Or(
       new EnemyHasShown(Terran.Vulture),
       new EnemyHasShown(Terran.SpiderMine),
-      new EnemyHasTech(Terran.WraithCloak)),
+      new EnemyHasShownWraithCloak),
     new Build(
       RequestAtLeast(1, Protoss.Pylon),
       RequestAtLeast(1, Protoss.Gateway),
@@ -59,13 +59,13 @@ object PvTIdeas {
     new And(
       new UpgradeComplete(Protoss.ZealotSpeed, withinFrames = Protoss.Zealot.buildFrames),
       new Or(
-        new UnitsAtLeast(12, Protoss.Dragoon),
-        new Check(() => With.self.gas * 5 < With.self.minerals))),
+        new UnitsAtLeast(18, Protoss.Dragoon),
+        new Check(() => With.self.gas * 3 < With.self.minerals))),
     new TrainContinuously(Protoss.Zealot),
     new TrainContinuously(Protoss.Dragoon))
   
   class TrainObservers extends If(
-    new EnemyHasTech(Terran.WraithCloak),
+    new EnemyHasShownWraithCloak,
     new TrainContinuously(Protoss.Observer, 5),
     new If(
       new EnemyHasShown(Terran.SpiderMine),
@@ -81,7 +81,7 @@ object PvTIdeas {
     new TrainZealotsOrDragoons)
   
   class GetObserversForCloakedWraiths extends If(
-    new EnemyHasTech(Terran.WraithCloak),
+    new EnemyHasShownWraithCloak,
     new Parallel(
       new Build(
         RequestAtLeast(1, Protoss.RoboticsFacility),

@@ -2,7 +2,7 @@ package Micro.Actions.Combat.Attacking
 
 import Micro.Actions.Action
 import Micro.Heuristics.Targeting.EvaluateTargets
-import ProxyBwapi.Races.Zerg
+import ProxyBwapi.Races.{Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object TargetRelevant extends Action {
@@ -31,6 +31,7 @@ object TargetRelevant extends Action {
         || target.topSpeed < unit.topSpeedChasing
         || target.zone.edges.forall(edge => unit.framesToTravelTo(edge.centerPixel) < target.framesToTravelTo(edge.centerPixel))
         || (target.is(Zerg.LurkerEgg) && target.matchups.enemyDetectors.isEmpty)
+        || (target.is(Terran.SpiderMine) && ! target.effectivelyCloaked)
       )
   }
 }

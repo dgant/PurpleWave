@@ -239,7 +239,7 @@ class ProtossVsZerg extends Parallel {
     /////////////////
     
     new RequireSufficientSupply,
-    new TrainWorkersContinuously,
+    new TrainWorkersContinuously(oversaturate = true),
     new BuildDetectionForLurkers,
     new TakeSafeNatural,
     new TakeSafeThirdBase,

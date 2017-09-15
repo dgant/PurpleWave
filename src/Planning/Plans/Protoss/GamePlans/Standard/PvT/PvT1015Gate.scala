@@ -23,7 +23,7 @@ class PvT1015Gate extends Mode {
   children.set(Vector(
     new BuildOrder(ProtossBuilds.Opening10Gate15GateDragoons: _*),
     new RequireSufficientSupply,
-    new TrainWorkersContinuously,
+    new TrainWorkersContinuously(oversaturate = true),
     new TrainContinuously(Protoss.Dragoon),
     new RequireMiningBases(2),
     new ScoutAt(14),

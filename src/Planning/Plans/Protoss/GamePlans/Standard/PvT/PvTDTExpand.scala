@@ -24,7 +24,7 @@ class PvTDTExpand extends Mode {
   children.set(Vector(
     new BuildOrder(ProtossBuilds.OpeningDTExpand: _*),
     new RequireSufficientSupply,
-    new TrainWorkersContinuously,
+    new TrainWorkersContinuously(oversaturate = true),
     new If(
       new UnitsAtMost(2, Protoss.DarkTemplar),
       new TrainContinuously(Protoss.DarkTemplar, 3),

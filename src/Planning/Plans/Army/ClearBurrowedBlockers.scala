@@ -19,7 +19,7 @@ class ClearBurrowedBlockers extends Plan {
   
   val decoy = new Property(new LockUnits)
   decoy.get.unitMatcher.set(UnitMatchCustom((unit) => unit.canMove && ! unit.flying && ! unit.unitClass.floats))
-  detector.get.unitCounter.set(UnitCountOne)
+  decoy.get.unitCounter.set(UnitCountOne)
   
   override def onUpdate(): Unit = {
     

@@ -5,7 +5,7 @@ import Macro.Architecture.Blueprint
 import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
-import Planning.Plans.Army.ConsiderAttacking
+import Planning.Plans.Army.{ConsiderAttacking, DefendZones, EscortSettlers}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.Mode
 import Planning.Plans.Information.Employing
@@ -66,12 +66,6 @@ class PvPOpen2GateRoboObs extends Mode {
       RequestAtLeast(22,  Protoss.Probe),
       RequestAtLeast(3,   Protoss.Pylon),
       RequestUpgrade(Protoss.DragoonRange)),
-  
-    new Trigger(
-      new UnitsAtLeast(2, Protoss.Reaver, complete = true),
-      new Parallel(
-        new RequireMiningBases(2),
-        new ConsiderAttacking)),
     
     new RequireSufficientSupply,
     new TrainWorkersContinuously(oversaturate = true),
@@ -94,6 +88,14 @@ class PvPOpen2GateRoboObs extends Mode {
       
     new Trigger(
       new UnitsAtLeast(1, Protoss.CyberneticsCore),
-      new Scout)
+      new Scout),
+  
+    new DefendZones,
+    new EscortSettlers,
+    new Trigger(
+      new UnitsAtLeast(2, Protoss.Reaver, complete = true),
+      new Parallel(
+        new RequireMiningBases(2),
+        new ConsiderAttacking))
   ))
 }

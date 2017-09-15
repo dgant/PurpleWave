@@ -2,7 +2,7 @@ package Micro.Actions.Basic
 
 import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Actions.Combat.Decisionmaking.Fight
+import Micro.Actions.Combat.Decisionmaking.{Fight, FightOrFlight}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Build extends Action {
@@ -23,6 +23,7 @@ object Build extends Action {
     blockers.flatMap(_.friendly).foreach(_.agent.shove(unit))
     if (blockers.exists(_.isEnemy)) {
       unit.agent.canFight = true
+      FightOrFlight.consider(unit)
       Fight.consider(unit)
     }
     else {

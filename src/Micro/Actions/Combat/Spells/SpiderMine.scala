@@ -11,7 +11,7 @@ object SpiderMine extends Action {
     unit.is(Terran.Vulture)                             &&
     With.self.hasTech(Terran.SpiderMinePlant)           &&
     unit.spiderMines > 0                                &&
-    ! unit.zone.owner.isUs                  &&
+    ! unit.zone.owner.isUs                              &&
     unit.matchups.targets.exists( ! _.unitClass.floats) &&
     ! unit.matchups.allies.exists(ally => ! ally.unitClass.floats && ally.pixelDistanceFast(unit) < 96.0)
   }

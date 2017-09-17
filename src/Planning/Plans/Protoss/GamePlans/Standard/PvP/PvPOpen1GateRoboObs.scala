@@ -10,7 +10,7 @@ import Planning.Plans.Information.Employing
 import Planning.Plans.Information.Reactive.EnemyBasesAtLeast
 import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.Build.ProposePlacement
-import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
+import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder, RequireBareMinimum}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Milestones.UnitsAtLeast
 import Planning.Plans.Protoss.Situational.Blueprinter
@@ -32,6 +32,7 @@ class PvPOpen1GateRoboObs extends Mode {
   
   children.set(Vector(
     new Do(() => With.blackboard.gasBankSoftLimit = 450),
+    new RequireBareMinimum,
     new BuildOrder(
       // http://wiki.teamliquid.net/starcraft/2_Gate_Reaver_(vs._Protoss)
       // We get gas/core faster because of mineral locking + later scout

@@ -5,7 +5,7 @@ import Debugging.Visualizations.Views.Economy.{ShowEconomy, ShowScheduler}
 import Debugging.Visualizations.Views.Fun._
 import Debugging.Visualizations.Views.Geography._
 import Debugging.Visualizations.Views.Micro._
-import Debugging.Visualizations.Views.Performance.{ShowPerformanceDetails, ShowPerformanceSummary}
+import Debugging.Visualizations.Views.Performance.{ShowPerformanceDetails, ShowPerformanceSummary, ShowReactionTime}
 import Debugging.Visualizations.Views.Planning._
 import Debugging.Visualizations.Views.{ShowClock, View}
 import Lifecycle.With
@@ -27,7 +27,8 @@ class Visualization {
     ShowBattles,
     ShowUnitsAll,
     ShowUnitsFriendly,
-    ShowUnitsForeign
+    ShowUnitsForeign,
+    ShowReactionTime
   )
   
   var enabled   = true
@@ -67,6 +68,7 @@ class Visualization {
     ShowPerformanceDetails,
     ShowPerformanceSummary,
     ShowPlans,
+    ShowReactionTime,
     ShowResources,
     ShowSquads,
     ShowStrategy,

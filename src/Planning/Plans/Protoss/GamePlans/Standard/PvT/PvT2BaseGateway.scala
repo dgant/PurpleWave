@@ -1,13 +1,13 @@
 package Planning.Plans.Protoss.GamePlans.Standard.PvT
 
-import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
+import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
 import Planning.Plans.Army.{DefendZones, EscortSettlers}
-import Planning.Plans.Compound.{FlipIf, If, Parallel}
+import Planning.Plans.Compound.{FlipIf, Parallel}
 import Planning.Plans.GamePlans.Mode
 import Planning.Plans.Information.Employing
-import Planning.Plans.Macro.Automatic.{MeldArchons, RequireSufficientSupply, TrainWorkersContinuously}
+import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainWorkersContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildCannonsAtExpansions, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.{MiningBasesAtLeast, UnitsAtLeast}
@@ -23,7 +23,6 @@ class PvT2BaseGateway extends Mode {
   override val completionCriteria: Plan = new MiningBasesAtLeast(3)
   
   children.set(Vector(
-    new MeldArchons(40),
     new PvTIdeas.Require2BaseTech,
     new RequireSufficientSupply,
     new TrainWorkersContinuously(oversaturate = true),
@@ -32,22 +31,17 @@ class PvT2BaseGateway extends Mode {
       new UnitsAtLeast(24, UnitMatchWarriors),
       new PvTIdeas.TrainArmy,
       new Parallel(
-        new If(new UnitsAtLeast(1, Protoss.HighTemplar), new Build(RequestTech(Protoss.PsionicStorm))),
         new Build(
           RequestAtLeast(2, Protoss.Gateway),
           RequestAtLeast(1, Protoss.RoboticsFacility),
           RequestAtLeast(3, Protoss.Gateway),
           RequestAtLeast(1, Protoss.Observatory),
-          RequestAtLeast(4, Protoss.Gateway),
-          RequestAtLeast(1, Protoss.CitadelOfAdun),
-          RequestAtLeast(1, Protoss.TemplarArchives),
-          RequestUpgrade(Protoss.ZealotSpeed),
-          RequestAtLeast(6, Protoss.Gateway),
-          RequestTech(Protoss.PsionicStorm),
-          RequestUpgrade(Protoss.HighTemplarEnergy)),
+          RequestAtLeast(4, Protoss.Gateway)),
         new RequireMiningBases(3))),
-    new Build(RequestAtLeast(8, Protoss.Gateway)),
-    new RequireMiningBases(3),
+    new Build(
+      RequestAtLeast(8, Protoss.Gateway),
+      RequestAtLeast(1, Protoss.CitadelOfAdun),
+      RequestUpgrade(Protoss.ZealotSpeed)),
     new DefendZones,
     new EscortSettlers,
     new ScoutExpansionsAt(100),

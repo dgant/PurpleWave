@@ -59,6 +59,5 @@ class PerformanceMonitor {
   
   def disqualified: Boolean =
     framesOver85    > 320 ||
-    framesOver1000  > 10  ||
-    framesOver10000 > 2
+    framesOver1000  > 1
 }

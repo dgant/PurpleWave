@@ -23,7 +23,9 @@ class Agency {
   // Batching //
   //////////////
   
-  val agentQueue = new mutable.Queue[Agent]
+  val agentQueue            = new mutable.Queue[Agent]
+  var lastQueueCompletion   = 0
+  val runtimes              = new mutable.Queue[Int]
   
   def run() {
   
@@ -32,6 +34,10 @@ class Agency {
     agents.keys.filterNot(validAgent).foreach(agents.remove)
     
     if (agentQueue.isEmpty) {
+      runtimes.enqueue(With.framesSince(lastQueueCompletion))
+      while (runtimes.sum > 24 * 10) runtimes.dequeue()
+      lastQueueCompletion = With.frame
+      
       // Make sure our orderable units all have agents
       With.units.ours.filter(validAgent).foreach(getState)
       agentQueue ++= agents.values.toVector.sortBy(_.lastFrame)

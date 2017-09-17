@@ -68,7 +68,6 @@ class TestingPlaybook extends EmptyPlaybook {
 }
 
 class MacroPlaybook extends EmptyPlaybook {
-  
   override lazy val forced    : Seq[Strategy] = StrategyGroups.macroBuilds
   override lazy val disabled  : Seq[Strategy] = StrategyGroups.cheese
 }
@@ -82,7 +81,7 @@ class PurpleCheesePlaybook extends PurpleWavePlaybook  {
   override lazy val forced: Seq[Strategy] = StrategyGroups.cheese
 }
 
-object Playbook extends TestingPlaybook {
+object Playbook extends PurpleWavePlaybook {
   
   //////////////////////
   // Experiment order //

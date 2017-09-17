@@ -27,7 +27,7 @@ class PvT2BaseCarriers extends Mode {
   children.set(Vector(
     new Require2BaseTech,
     new RequireSufficientSupply,
-    new TrainWorkersContinuously(oversaturate = true),
+    new TrainWorkersContinuously,
     new BuildCannonsAtExpansions(2),
     new GetObserversForCloakedWraiths,
     new If(

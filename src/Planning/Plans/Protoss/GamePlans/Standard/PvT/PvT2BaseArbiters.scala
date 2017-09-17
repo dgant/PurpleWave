@@ -28,7 +28,7 @@ class PvT2BaseArbiters extends Mode {
     new MeldArchons(40),
     new Require2BaseTech,
     new RequireSufficientSupply,
-    new TrainWorkersContinuously(oversaturate = true),
+    new TrainWorkersContinuously,
     new BuildCannonsAtExpansions(2),
     new If(new UnitsAtLeast(30, UnitMatchWarriors), new RequireMiningBases(3)),
     new FlipIf(

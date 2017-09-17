@@ -12,7 +12,7 @@ import Planning.Plans.Information.Employing
 import Planning.Plans.Information.Reactive.EnemyBasesAtLeast
 import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.Build.ProposePlacement
-import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
+import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder, RequireBareMinimum}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Milestones.{EnemyUnitsAtLeast, UnitsAtLeast}
 import Planning.Plans.Protoss.Situational.Blueprinter
@@ -35,6 +35,7 @@ class PvPOpen2GateRoboObs extends Mode {
   
   children.set(Vector(
     new Do(() => With.blackboard.gasBankSoftLimit = 450),
+    new RequireBareMinimum,
     new If(
       new EnemyUnitsAtLeast(1, Protoss.DarkTemplar),
       new Build(RequestAtLeast(1, Protoss.Observer))),
@@ -67,6 +68,10 @@ class PvPOpen2GateRoboObs extends Mode {
       RequestAtLeast(3,   Protoss.Pylon),
       RequestUpgrade(Protoss.DragoonRange)),
     
+    new Trigger(
+      new UnitsAtLeast(2, Protoss.Reaver, complete = true),
+      new RequireMiningBases(2)),
+    
     new RequireSufficientSupply,
     new TrainWorkersContinuously(oversaturate = true),
     new TrainContinuously(Protoss.Reaver),
@@ -75,27 +80,16 @@ class PvPOpen2GateRoboObs extends Mode {
       RequestAtLeast(1, Protoss.RoboticsFacility),
       RequestAtLeast(1, Protoss.Observatory),
       RequestAtLeast(1, Protoss.RoboticsSupportBay),
-      RequestAtLeast(1, Protoss.Observer)),
-  
-    //Not part of the build, but mineral locking floats a ton of minerals that we might as well use
-    new Trigger(
-      new UnitsAtLeast(1, Protoss.RoboticsSupportBay),
-      initialAfter = new Parallel(
-        new Build(RequestAtLeast(3, Protoss.Gateway)),
-        new RequireMiningBases(2),
-        new Build(RequestAtLeast(6, Protoss.Gateway))
-      )),
+      RequestAtLeast(1, Protoss.Observer),
+      RequestAtLeast(3, Protoss.Gateway),
+      RequestAtLeast(2, Protoss.Nexus)),
       
-    new Trigger(
-      new UnitsAtLeast(1, Protoss.CyberneticsCore),
-      new Scout),
+    new If(new UnitsAtLeast(1, Protoss.CyberneticsCore), new Scout),
   
     new DefendZones,
     new EscortSettlers,
     new Trigger(
       new UnitsAtLeast(2, Protoss.Reaver, complete = true),
-      new Parallel(
-        new RequireMiningBases(2),
-        new ConsiderAttacking))
+      initialAfter = new ConsiderAttacking)
   ))
 }

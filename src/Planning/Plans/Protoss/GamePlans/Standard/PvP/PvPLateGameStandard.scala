@@ -6,7 +6,7 @@ import Planning.Plans.Army._
 import Planning.Plans.Compound._
 import Planning.Plans.Information.Reactive.EnemyBasesAtLeast
 import Planning.Plans.Macro.Automatic._
-import Planning.Plans.Macro.BuildOrders.Build
+import Planning.Plans.Macro.BuildOrders.{Build, RequireBareMinimum}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Milestones._
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
@@ -23,25 +23,25 @@ class PvPLateGameStandard extends Parallel {
       RequestAtLeast(1, Protoss.CitadelOfAdun),
       RequestUpgrade(Protoss.ZealotSpeed),
       RequestAtLeast(8, Protoss.Gateway),
-      RequestAtLeast(1, Protoss.Forge),
-      RequestUpgrade(Protoss.GroundDamage),
+      RequestAtLeast(1, Protoss.Forge)),
+    new UpgradeContinuously(Protoss.GroundDamage),
+    new Build(
       RequestAtLeast(1, Protoss.TemplarArchives),
       RequestTech(Protoss.PsionicStorm)))
       
   class BuildTechPartTwo extends Parallel(
     new Build(
-      RequestUpgrade(Protoss.GroundArmor),
       RequestUpgrade(Protoss.HighTemplarEnergy),
-      RequestAtLeast(12, Protoss.Gateway),
       RequestAtLeast(1, Protoss.RoboticsSupportBay),
-      RequestUpgrade(Protoss.ShuttleSpeed)) )
+      RequestUpgrade(Protoss.ShuttleSpeed)))
   
   children.set(Vector(
     new MeldArchons(40),
+    new RequireBareMinimum,
     new ReactToDarkTemplarPossible,
     new ReactToDarkTemplarExisting,
     new RequireSufficientSupply,
-    new TrainWorkersContinuously(oversaturate = true),
+    new TrainWorkersContinuously,
     new BuildGasPumps,
   
     new TrainMatchingRatio(Protoss.Observer, 1, 3, Seq(MatchingRatio(Protoss.DarkTemplar, 2.0))),
@@ -51,17 +51,19 @@ class PvPLateGameStandard extends Parallel {
     new If(new UnitsAtLeast(2,  Protoss.Reaver),          new Build(RequestUpgrade(Protoss.ScarabDamage))),
     new If(new UnitsAtLeast(3,  Protoss.Reaver),          new If(new EnemyBasesAtLeast(3), new Build(RequestUpgrade(Protoss.ShuttleSpeed)))),
     new If(new UnitsAtLeast(8,  UnitMatchWarriors),       new RequireMiningBases(2)),
-    new If(new UnitsAtLeast(15, UnitMatchWarriors),       new RequireMiningBases(3)),
+    new If(new UnitsAtLeast(40, UnitMatchWarriors),       new RequireMiningBases(3)),
     new If(new UnitsAtLeast(17, UnitMatchWarriors),       new OnMiningBases(2, new BuildTechPartOne)),
-    new If(new UnitsAtLeast(25, UnitMatchWarriors),       new OnMiningBases(3, new BuildTechPartTwo)),
-    new If(new UnitsAtLeast(50, UnitMatchWarriors),       new RequireMiningBases(4)),
+    new If(new UnitsAtLeast(45, UnitMatchWarriors),       new OnMiningBases(3, new BuildTechPartTwo)),
     new If(new EnemyUnitsAtLeast(1, Protoss.DarkTemplar), new Build(RequestUpgrade(Protoss.ObserverSpeed))),
     
     new If(
       new And(
+        new EnemyUnitsAtMost(0, Protoss.PhotonCannon),
+        new EnemyUnitsAtMost(0, Protoss.Observer)),
+      new TrainContinuously(Protoss.DarkTemplar, 3),
+      new If(
         new EnemyUnitsAtMost(0, Protoss.Observer),
-        new EnemyUnitsAtMost(0, Protoss.PhotonCannon)),
-      new TrainContinuously(Protoss.DarkTemplar, 3)),
+        new TrainContinuously(Protoss.DarkTemplar, 1))),
   
     new If(
       new And(

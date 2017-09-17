@@ -11,7 +11,7 @@ import Planning.Plans.GamePlans.Mode
 import Planning.Plans.Information.Employing
 import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.Build.ProposePlacement
-import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
+import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder, RequireBareMinimum}
 import Planning.Plans.Macro.Milestones.{EnemyUnitsAtMost, UnitsAtLeast, UnitsAtMost}
 import Planning.Plans.Protoss.Situational.Blueprinter
 import Planning.Plans.Scouting.Scout
@@ -21,7 +21,6 @@ import Strategery.Strategies.Protoss.PvP.PvP2GateDT
 class PvPOpen2GateDarkTemplar extends Mode {
   
   override val activationCriteria: Plan = new Employing(PvP2GateDT)
-  
   override val completionCriteria: Plan = new And(new UnitsAtLeast(2, Protoss.Nexus))
   
   private class DontGetOurGatewaysUnpoweredBySkynet extends ProposePlacement {
@@ -37,6 +36,7 @@ class PvPOpen2GateDarkTemplar extends Mode {
   
   children.set(Vector(
     new Do(() => With.blackboard.gasBankSoftLimit = 450),
+    new RequireBareMinimum,
     new DontGetOurGatewaysUnpoweredBySkynet,
     new BuildOrder(
       // http://wiki.teamliquid.net/starcraft/2_Gateway_Dark_Templar_(vs._Protoss)

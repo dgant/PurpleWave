@@ -54,7 +54,8 @@ abstract class UnitInfo(baseUnit: bwapi.Unit) extends UnitProxy(baseUnit) {
   val kills         : mutable.ArrayBuffer[Kill] = new mutable.ArrayBuffer[Kill]
 
   private val history = new mutable.Queue[UnitState]
-  def updateHistory() {
+  def updateCommon() {
+    
     // Save JNI overhead by not tracking history of Spider Mines and Interceptors
     if ( ! unitClass.orderable) return
     
@@ -261,7 +262,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit) extends UnitProxy(baseUnit) {
   // Combat //
   ////////////
   
-  def battle: Option[Battle] = With.battles.byUnit.get(this)
+  def battle: Option[Battle] = With.battles.byUnit.get(this).orElse(With.matchups.entrants.find(_._2.contains(this)).map(_._1))
   def matchups: MatchupAnalysis = With.matchups.get(this)
   
   def ranged  : Boolean = unitClass.rawCanAttack && unitClass.maxAirGroundRangePixels > 32 * 2

@@ -8,10 +8,11 @@ import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, UnitInfo}
 
 class BattleClassifier {
     
-  var global  : Battle                = _
-  var byZone  : Map[Zone, Battle]     = Map.empty
-  var byUnit  : Map[UnitInfo, Battle] = Map.empty
-  var local   : Vector[Battle]        = Vector.empty
+  var global      : Battle                = _
+  var byZone      : Map[Zone, Battle]     = Map.empty
+  var byUnit      : Map[UnitInfo, Battle] = Map.empty
+  var local       : Vector[Battle]        = Vector.empty
+  var lastUpdate  : Int                   = 0
   
   def all: Traversable[Battle] = local ++ byZone.values :+ global
   
@@ -24,6 +25,7 @@ class BattleClassifier {
     replaceBattlesByZone()
     replaceBattlesLocal()
     BattleUpdater.run()
+    
     // If we have the time to do so, run lazy estimations here.
     // Otherwise, it'll run on demand from the Micro task
     if (With.performance.continueRunning) {
@@ -32,6 +34,8 @@ class BattleClassifier {
       local.foreach(_.estimationSimulationRetreat)
       local.foreach(_.desire)
     }
+    
+    lastUpdate = With.frame
   }
   
   private def isEligibleLocal(unit: UnitInfo): Boolean = {
@@ -76,6 +80,7 @@ class BattleClassifier {
           new Team(cluster.filter(_.isOurs).toVector),
           new Team(cluster.filter(_.isEnemy).toVector)))
       .filter(_.happening)
+    
     byUnit = local.flatten(battle => battle.teams.flatMap(_.units).map(unit => (unit, battle))).toMap
   }
   

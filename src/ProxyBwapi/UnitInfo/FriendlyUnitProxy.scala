@@ -37,7 +37,7 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit) extends UnitInfo(base) {
   
   def update(newBase: bwapi.Unit) {
     baseUnit = newBase
-    updateHistory()
+    updateCommon()
   }
   
   ////////////

@@ -25,7 +25,7 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit) extends UnitInfo (originalBa
     updateTimeSensitiveInformation()
     updateTimeInsensitiveInformation()
     fixCloakedUnits()
-    updateHistory()
+    updateCommon()
   }
   
   private var updateCount = 0

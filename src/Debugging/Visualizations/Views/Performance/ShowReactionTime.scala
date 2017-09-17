@@ -23,6 +23,9 @@ object ShowReactionTime extends View {
         if (width > 0) {
           DrawMap.circle(unit.pixelCenter, width, Colors.BrightRed, solid = true)
         }
+        if (With.framesSince(unit.frameDiscovered) < 72) {
+          DrawMap.label(With.framesSince(unit.frameDiscovered).toString, unit.pixelCenter)
+        }
       }
     })
   }

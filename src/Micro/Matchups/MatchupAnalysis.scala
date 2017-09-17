@@ -3,6 +3,7 @@ package Micro.Matchups
 import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
 import Micro.Decisions.MicroValue
+import Performance.MicroReaction
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.ByOption
 
@@ -58,8 +59,8 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
   lazy val framesOfEntanglementPerThreatCurrently : Map[UnitInfo, Double] = threatsViolent.map(threat => (threat, framesOfEntanglementWith(threat))).toMap
   lazy val framesOfEntanglementDiffused           : Double                = ByOption.min(framesOfEntanglementPerThreatDiffused.values).getOrElse(Double.NegativeInfinity)
   lazy val framesOfEntanglementCurrently          : Double                = ByOption.min(framesOfEntanglementPerThreatCurrently.values).getOrElse(Double.NegativeInfinity)
-  lazy val framesOfSafetyDiffused                 : Double                = - ByOption.max(framesOfEntanglementPerThreatDiffused.values).getOrElse(Double.NegativeInfinity)
-  lazy val framesOfSafetyCurrently                : Double                = - ByOption.max(framesOfEntanglementPerThreatCurrently.values).getOrElse(Double.NegativeInfinity)
+  lazy val framesOfSafetyDiffused                 : Double                = - MicroReaction.framesTotal - ByOption.max(framesOfEntanglementPerThreatDiffused.values).getOrElse(Double.NegativeInfinity)
+  lazy val framesOfSafetyCurrently                : Double                = - MicroReaction.framesTotal - ByOption.max(framesOfEntanglementPerThreatCurrently.values).getOrElse(Double.NegativeInfinity)
   lazy val mostEntangledThreatsDiffused           : Vector[UnitInfo]      = threats.sortBy( - framesOfEntanglementPerThreatDiffused(_))
   lazy val mostEntangledThreatsCurrently          : Vector[UnitInfo]      = threats.sortBy( - framesOfEntanglementPerThreatCurrently(_))
   lazy val mostEntangledThreatDiffused            : Option[UnitInfo]      = ByOption.minBy(framesOfEntanglementPerThreatDiffused)(_._2).map(_._1)

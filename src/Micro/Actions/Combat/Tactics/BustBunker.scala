@@ -2,7 +2,7 @@ package Micro.Actions.Combat.Tactics
 
 import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Actions.Combat.Maneuvering.Avoid
+import Micro.Actions.Combat.Maneuvering.{Avoid, KiteSafely}
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import bwapi.Race
@@ -32,15 +32,17 @@ object BustBunker extends Action {
   override protected def perform(unit: FriendlyUnitInfo) {
     
     // Goal: Take down the bunker. Don't take any damage from it.
-  
     // If we're getting shot at by the bunker, back off.
-    if (
-      unit.damageInLastSecond > 0 &&
-      unit.matchups.threats.exists(threat =>
-        threat.is(Terran.Bunker) &&
-        threat.pixelDistanceSlow(unit) < With.configuration.bunkerSafetyMargin)
-      ) {
-      Avoid.delegate(unit)
+    val bunkers = unit.matchups.threats.filter(_.is(Terran.Bunker))
+    if (unit.damageInLastSecond > 0) {
+      KiteSafely.delegate(unit)
     }
+    else if (bunkers.exists(unit.inRangeToAttackSlow)) {
+      With.commander.hold(unit)
+    }
+      
+    else if (
+      unit.matchups.th
+    )
   }
 }

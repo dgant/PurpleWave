@@ -8,7 +8,7 @@ import Planning.Plans.Compound.{If, _}
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
-import Planning.Plans.Macro.Milestones._
+import Planning.Plans.Macro.Milestones.{OnGasBases, _}
 import ProxyBwapi.Races.{Protoss, Terran}
 
 object PvTIdeas {
@@ -49,7 +49,7 @@ object PvTIdeas {
     new Attack,
     new ConsiderAttacking)
   
-  private class IfNoDetection_DarkTemplar extends If(
+  private class TrainDarkTemplar extends If(
     new And(
       new UnitsAtMost(0, Protoss.Arbiter),
       new EnemyUnitsNone(Terran.ScienceVessel),
@@ -74,24 +74,40 @@ object PvTIdeas {
     new And(
       new UpgradeComplete(Protoss.ZealotSpeed, withinFrames = Protoss.Zealot.buildFrames),
       new Or(
-        new UnitsAtLeast(18, Protoss.Dragoon),
-        new Check(() => With.self.gas * 3 < With.self.minerals))),
+        new And(
+          new UnitsAtLeast(18, Protoss.Dragoon),
+          new Check(() => With.units.ours.count(_.is(Protoss.Dragoon)) >= With.units.enemy.count(_.is(Terran.Vulture)))),
+        new Check(() => With.self.minerals > 800 && With.self.gas < 500))),
     new TrainContinuously(Protoss.Zealot),
     new TrainContinuously(Protoss.Dragoon))
   
+  class TrainArbiters extends If(
+    new UnitsAtLeast(40, UnitMatchWarriors),
+    new TrainContinuously(Protoss.Arbiter, 3),
+    new If(
+      new UnitsAtLeast(20, UnitMatchWarriors),
+      new TrainContinuously(Protoss.Arbiter, 2),
+      new TrainContinuously(Protoss.Arbiter, 10)))
+  
   class TrainObservers extends If(
     new EnemyHasShownWraithCloak,
-    new TrainContinuously(Protoss.Observer, 5),
+    new TrainContinuously(Protoss.Observer, 3),
     new If(
       new EnemyHasShown(Terran.SpiderMine),
-      new TrainContinuously(Protoss.Observer, 3),
+      new TrainContinuously(Protoss.Observer, 2),
       new TrainContinuously(Protoss.Observer, 1)))
   
+  class TrainHighTemplar extends OnGasBases(3,
+    new If(
+      new UnitsAtLeast(20, UnitMatchWarriors),
+      new TrainContinuously(Protoss.HighTemplar, 6, 2),
+      new TrainContinuously(Protoss.HighTemplar, 6, 1)))
+    
   class TrainArmy extends Parallel(
+    new TrainArbiters,
     new TrainContinuously(Protoss.Carrier),
-    new TrainContinuously(Protoss.Arbiter, 3),
-    new IfNoDetection_DarkTemplar,
-    new OnGasBases(3, new TrainContinuously(Protoss.HighTemplar, 6, 2)),
+    new TrainDarkTemplar,
+    new TrainHighTemplar,
     new TrainObservers,
     new TrainZealotsOrDragoons)
   

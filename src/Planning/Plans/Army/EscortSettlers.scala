@@ -1,16 +1,16 @@
 package Planning.Plans.Army
 
 import Lifecycle.With
-import Micro.Squads.Goals.{SquadChill, SquadGoal, SquadPush}
+import Mathematics.Points.SpecificPoints
+import Micro.Squads.Goals.SquadPush
 import Planning.Plan
 import Utilities.ByOption
 
 class EscortSettlers extends Plan {
   
-  val recruit: Conscript = new Conscript
-  var goal: SquadGoal = new SquadChill
+  val conscript: Conscript = new Conscript
   
-  override def getChildren: Iterable[Plan] = Array(recruit)
+  override def getChildren: Iterable[Plan] = Array(conscript)
   
   override def onUpdate() {
     
@@ -18,16 +18,16 @@ class EscortSettlers extends Plan {
     
     if (settler.isEmpty) return
     
-    val destination = settler.get.agent.toBuildTile.get
-    val zone        = destination.zone
-    val enemies     = settler.get.matchups.threats.toSet ++ zone.units.filter(u => u.isEnemy && u.canAttack(settler.get))
+    val destination   = settler.get.agent.toBuildTile.get
+    val zone          = destination.zone
+    val enemies       = settler.get.matchups.threats.toSet ++ zone.units.filter(u => u.isEnemy && u.canAttack(settler.get))
+    val enemyClosest  = ByOption.minBy(enemies)(_.pixelDistanceFast(settler.get))
+    val target        = destination.pixelCenter.project(enemyClosest.map(_.pixelCenter).getOrElse(SpecificPoints.middle), 32.0 * 8.0)
     
-    goal = new SquadPush(destination.pixelCenter)
-    
-    recruit.squad.goal  = goal
-    recruit.mustFight   = zone.bases.exists(_.owner.isUs)
-    recruit.overkill    = if (recruit.mustFight) 1.5 else 2.0
-    recruit.enemies     = enemies.toSeq
-    recruit.update()
+    conscript.squad.goal  = new SquadPush(target)
+    conscript.mustFight   = zone.bases.exists(_.owner.isUs)
+    conscript.overkill    = if (conscript.mustFight) 1.5 else 2.0
+    conscript.enemies     = enemies.toSeq
+    conscript.update()
   }
 }

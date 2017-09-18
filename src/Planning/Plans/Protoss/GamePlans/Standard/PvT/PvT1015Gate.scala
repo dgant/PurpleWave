@@ -1,7 +1,8 @@
 package Planning.Plans.Protoss.GamePlans.Standard.PvT
 
 import Planning.Plan
-import Planning.Plans.Army.{Attack, DefendZones}
+import Planning.Plans.Army.{Aggression, Attack, DefendZones}
+import Planning.Plans.Compound.If
 import Planning.Plans.GamePlans.Mode
 import Planning.Plans.Information.Employing
 import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
@@ -21,9 +22,11 @@ class PvT1015Gate extends Mode {
   override val completionCriteria: Plan = new UnitsAtLeast(2, Protoss.Nexus)
   
   children.set(Vector(
+    new Aggression(1.2),
     new BuildOrder(ProtossBuilds.Opening10Gate15GateDragoons: _*),
+    new If(new UnitsAtLeast(5, Protoss.Dragoon), new RequireMiningBases(2)),
     new RequireSufficientSupply,
-    new TrainWorkersContinuously(oversaturate = true),
+    new TrainWorkersContinuously,
     new TrainContinuously(Protoss.Dragoon),
     new RequireMiningBases(2),
     new ScoutAt(14),

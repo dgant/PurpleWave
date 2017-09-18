@@ -58,6 +58,7 @@ class PvT2BaseArbiters extends Mode {
           RequestUpgrade(Protoss.ArbiterEnergy),
           RequestAtLeast(2, Protoss.Stargate))))),
     new RequireMiningBases(4),
+    new UpgradeContinuously(Protoss.GroundArmor),
     new Build(RequestAtLeast(20, Protoss.Gateway)),
     new DefendZones,
     new EscortSettlers,

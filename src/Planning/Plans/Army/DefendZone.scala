@@ -7,10 +7,10 @@ import ProxyBwapi.UnitInfo.ForeignUnitInfo
 
 class DefendZone(zone: Zone) extends Plan {
   
-  val recruit: Conscript = new Conscript
+  val conscript: Conscript = new Conscript
   val goal: SquadDefendZone = new SquadDefendZone(zone)
   
-  override def getChildren: Iterable[Plan] = Array(recruit)
+  override def getChildren: Iterable[Plan] = Array(conscript)
   
   var enemies: Seq[ForeignUnitInfo] = Seq.empty
   
@@ -18,10 +18,10 @@ class DefendZone(zone: Zone) extends Plan {
   
     val ourBase = zone.bases.find(base => base.owner.isUs)
   
-    recruit.squad.goal  = goal
-    recruit.mustFight   = zone.bases.exists(_.owner.isUs)
-    recruit.overkill    = if (recruit.mustFight) 1.5 else 2.0
-    recruit.enemies     = enemies
-    recruit.update()
+    conscript.squad.goal  = goal
+    conscript.mustFight   = zone.bases.exists(_.owner.isUs)
+    conscript.overkill    = if (conscript.mustFight) 1.5 else 2.0
+    conscript.enemies     = enemies
+    conscript.update()
   }
 }

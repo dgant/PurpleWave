@@ -1,6 +1,7 @@
 package Micro.Actions.Protoss
 
 import Micro.Actions.Action
+import Micro.Actions.Combat.Attacking.Target
 import Micro.Actions.Combat.Maneuvering.{Avoid, CliffAvoid}
 import Micro.Actions.Commands.{Attack, AttackMove}
 import Micro.Heuristics.Targeting.EvaluateTargets
@@ -38,7 +39,7 @@ object BeACarrier extends Action {
         Attack.consider(unit)
       }
       else {
-        val attackTarget = unit.matchups.targets.minBy(_.pixelDistanceFast(unit))
+        Target.consider(unit)
         val attackPoint = unit.pixelCenter.project(attackTarget.pixelCenter, 8.0 * 32.0)
         unit.agent.toTravel = Some(attackPoint)
         AttackMove.consider(unit)

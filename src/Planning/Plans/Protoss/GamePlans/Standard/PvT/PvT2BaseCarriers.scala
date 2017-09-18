@@ -1,9 +1,10 @@
 package Planning.Plans.Protoss.GamePlans.Standard.PvT
 
 import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
+import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
 import Planning.Plans.Army.{ConsiderAttacking, DefendZones, EscortSettlers}
-import Planning.Plans.Compound.{FlipIf, If}
+import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.GamePlans.Mode
 import Planning.Plans.Information.Reactive.EnemyBio
 import Planning.Plans.Information.{Employing, Never}
@@ -27,21 +28,25 @@ class PvT2BaseCarriers extends Mode {
   children.set(Vector(
     new Require2BaseTech,
     new RequireSufficientSupply,
-    new TrainWorkersContinuously,
-    new BuildCannonsAtExpansions(2),
+    new TrainWorkersContinuously(oversaturate = true),
+    new BuildCannonsAtExpansions(3),
     new GetObserversForCloakedWraiths,
     new If(
       new UnitsAtLeast(1, Protoss.Carrier, complete = true),
       new Build(RequestUpgrade(Protoss.CarrierCapacity))),
     new If(
-      new UnitsAtLeast(12, Protoss.Zealot, complete = true),
+      new UnitsAtLeast(8, Protoss.Zealot),
       new Build(
         RequestAtLeast(1, Protoss.CitadelOfAdun),
         RequestUpgrade(Protoss.ZealotSpeed))),
-    new FlipIf(
-      new UnitsAtLeast(8, Protoss.Dragoon),
-      new PvTIdeas.TrainZealotsOrDragoons,
-      new TrainContinuously(Protoss.Carrier)),
+    new If(
+      new UnitsAtLeast(8, UnitMatchWarriors),
+      new Parallel(
+        new TrainContinuously(Protoss.Carrier),
+        new TrainContinuously(Protoss.Zealot)),
+      new Parallel(
+        new PvTIdeas.TrainZealotsOrDragoons,
+        new TrainContinuously(Protoss.Carrier))),
     new BuildOrder(
       RequestAtLeast(2, Protoss.Gateway),
       RequestAtLeast(1, Protoss.Stargate)),
@@ -58,10 +63,11 @@ class PvT2BaseCarriers extends Mode {
     new UpgradeContinuously(Protoss.AirDamage),
     new UpgradeContinuously(Protoss.AirArmor),
     new UpgradeContinuously(Protoss.GroundDamage),
-    new RequireMiningBases(4),
     new Build(
-      RequestAtLeast(12, Protoss.Gateway),
-      RequestAtLeast(4, Protoss.Stargate)),
+      RequestAtLeast(1,   Protoss.TemplarArchives),
+      RequestAtLeast(12,  Protoss.Gateway),
+      RequestAtLeast(4,   Protoss.Stargate)),
+    new RequireMiningBases(4),
     new DefendZones,
     new EscortSettlers,
     new ScoutExpansionsAt(100),

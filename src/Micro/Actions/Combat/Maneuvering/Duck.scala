@@ -45,9 +45,10 @@ object Duck extends Action {
       && ! unit.flying
       && ! unit.unitClass.floats) {
       if (threat.burrowed) {
-        
-        //This extreme behavior makes us do dumb stuff
-        if (false) {
+        if (Vector(unit, threat).exists(_.base.exists(_.owner.isUs))) {
+          None
+        }
+        else {
           // Avoid activating the Spider Mine.
           // Spider Mines rely on normal target acquisition range math, which is 96px + attack range edge-to-edge
           // However, this is often limited by Spider Mine sight range, which is 96px exactly.
@@ -59,19 +60,11 @@ object Duck extends Action {
             threat.damageOnNextHitAgainst(unit)
           ))
         }
-        else {
-          None
-        }
       }
       else {
-        
-        // Don't run if we're the target -- instead let other people run away from us.
-        lazy val target = threat.target.orElse(ByOption.minBy(threat.matchups.targets)(_.pixelDistanceFast(threat)))
-        if (target.contains(unit)) {
-          if (unit.canAttack(threat) && unit.readyForAttackOrder) {
-            unit.agent.toAttack = Some(threat)
-            Attack.consider(unit)
-          }
+        if (unit.canAttack(threat) && unit.damageOnNextHitAgainst(threat) >= threat.totalHealth && unit.readyForAttackOrder) {
+          unit.agent.toAttack = Some(threat)
+          Attack.consider(unit)
           None
         }
         else {

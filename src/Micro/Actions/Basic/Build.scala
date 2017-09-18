@@ -3,6 +3,7 @@ package Micro.Actions.Basic
 import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Decisionmaking.{Fight, FightOrFlight}
+import Micro.Actions.Commands.Attack
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Build extends Action {
@@ -21,10 +22,17 @@ object Build extends Action {
       blocker.possiblyStillThere))
     
     blockers.flatMap(_.friendly).foreach(_.agent.shove(unit))
-    if (blockers.exists(_.isEnemy)) {
+    val enemyBlockers = blockers.filter(_.isEnemy)
+    if (enemyBlockers.nonEmpty) {
       unit.agent.canFight = true
-      FightOrFlight.consider(unit)
-      Fight.consider(unit)
+      if (unit.matchups.threats.isEmpty) {
+        unit.agent.toAttack = Some(enemyBlockers.minBy(_.pixelDistanceFast(unit)))
+        Attack.delegate(unit)
+      }
+      else {
+        FightOrFlight.consider(unit)
+        Fight.consider(unit)
+      }
     }
     else {
       With.commander.build(unit, unit.agent.toBuild.get, unit.agent.lastIntent.toBuildTile.get)

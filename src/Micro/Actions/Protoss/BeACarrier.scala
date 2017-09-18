@@ -4,7 +4,7 @@ import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.{Avoid, CliffAvoid}
 import Micro.Actions.Commands.{Attack, AttackMove}
 import Micro.Heuristics.Targeting.EvaluateTargets
-import ProxyBwapi.Races.{Protoss, Terran}
+import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders}
 
 object BeACarrier extends Action {
@@ -25,7 +25,7 @@ object BeACarrier extends Action {
     lazy val exitingLeash             = unit.matchups.targets.forall(_.pixelDistanceFast(unit) > 32.0 * 8.0)
     lazy val interceptorsNeedKick     = exitingLeash || ! interceptorsAreShooting
     
-    if (unit.matchups.threatsInRange.exists(threat => threat.is(Terran.Goliath) || threat.unitClass.isStaticDefense)) {
+    if (unit.matchups.threatsInRange.exists(threat => ! threat.flying || threat.unitClass.isStaticDefense)) {
       CliffAvoid.consider(unit)
       Avoid.consider(unit)
     }

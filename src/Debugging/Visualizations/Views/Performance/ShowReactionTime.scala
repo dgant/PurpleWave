@@ -12,8 +12,12 @@ object ShowReactionTime extends View {
   override def renderMap() {
     (With.units.ours ++ With.units.enemy).toSeq.foreach(unit => {
       val radius = Math.min(unit.unitClass.width, unit.unitClass.height)/2
+      
       if (unit.battle.isEmpty) {
         DrawMap.circle(unit.pixelCenter, radius, Color.Black, solid = true)
+      }
+      else if ( ! With.battles.byUnit.contains(unit)) {
+        DrawMap.circle(unit.pixelCenter, radius, Colors.NeonBlue, solid = true)
       }
       val me = unit.friendly
       if (me.isDefined) {

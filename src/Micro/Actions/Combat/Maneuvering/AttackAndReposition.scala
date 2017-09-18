@@ -39,8 +39,9 @@ object AttackAndReposition extends Action {
     lazy val shouldHug          = target.pixelRangeMin > 0 && target.canAttack(unit) && unit.pixelDistanceFast(target) * 1.75 < target.pixelRangeAgainstFromCenter(unit)
     
     if (shouldAvoid || shouldChase || shouldHug) {
-      val targetMagnitude = 4.0 * unit.pixelDistanceFast(target) / unit.pixelRangeAgainstFromCenter(target)
-      val threatMagnitude = if (unit.matchups.threatsInRange.isEmpty) 0.0 else if (unit.matchups.threatsViolentInRange.isEmpty) 0.5 else 1.0
+      val happy           = unit.matchups.vpfNetDiffused > 0
+      val targetMagnitude = (if (happy) 2.0 else 1.0) * unit.pixelDistanceFast(target) / unit.pixelRangeAgainstFromCenter(target)
+      val threatMagnitude = (if (happy) 1.0 else 2.0)
       val forceTarget     = Potential.unitAttraction(unit, target, targetMagnitude)
       val forceThreat     = Potential.threatsRepulsion(unit).normalize(threatMagnitude)
       val forceMobility   = Potential.mobilityAttraction(unit)

@@ -17,11 +17,8 @@ object BeAnArbiter extends Action {
   
   override protected def perform(unit: FriendlyUnitInfo) {
     val umbrellable = (u: UnitInfo) => ! u.unitClass.isBuilding && u != unit
-    var friends: Seq[UnitInfo] = unit.squadmates.filter(umbrellable)
-    if ( ! friends.exists(_.pixelDistanceFast(unit) < 32.0 * 20.0)) {
-      friends = unit.matchups.allies.filter(umbrellable)
-    }
-    else {
+    val friends = (unit.matchups.allies ++ unit.squadmates).filter(umbrellable)
+    if (friends.nonEmpty) {
       val threats = unit.matchups.threats
       val threatMagnitude = if (unit.matchups.threatsInRange.nonEmpty) 1.0 else 0.25
       val forcesUmbrella  = friends.map(friend => Potential.unitAttraction(unit, friend, 1.0 / Math.max(24.0, friend.matchups.framesOfSafetyDiffused)))

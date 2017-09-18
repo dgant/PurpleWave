@@ -56,8 +56,9 @@ object FightOrFlight extends Action {
     val attackReport  = battle.estimationSimulationAttack.reportCards.get(unit)
     val retreatReport = battle.estimationSimulationRetreat.reportCards.get(unit)
     
-    if (attackReport.isEmpty)   return default
-    if (retreatReport.isEmpty)  return default
+    if (attackReport.isEmpty)         return default
+    if (retreatReport.isEmpty)        return default
+    if (attackReport.get.killed <= 0) return 0.0 // Don't fight just to deal meaningless damage
   
     val attackGain    = attackReport.get.valueDealt
     val attackLoss    = attackReport.get.valueReceived

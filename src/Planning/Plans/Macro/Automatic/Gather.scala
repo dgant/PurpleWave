@@ -63,7 +63,7 @@ class Gather extends Plan {
   }
   
   private def updateResourceInformation() = {
-    ourActiveBases  = With.geography.ourBases.filter(_.townHall.exists(th => th.aliveAndComplete && (th.complete || th.morphing)))
+    ourActiveBases  = With.geography.ourBases.filter(_.townHall.exists(th => th.aliveAndComplete && (th.complete || th.morphing || th.remainingBuildFrames < 24 * 10)))
     allMinerals     = ourActiveBases.flatten(base => base.minerals).filter(_.alive).toSet
     allGas          = ourActiveBases.flatten(base => base.gas).filter(gas => gas.isOurs && gas.aliveAndComplete).toSet
     safeBases       = getSafeBases

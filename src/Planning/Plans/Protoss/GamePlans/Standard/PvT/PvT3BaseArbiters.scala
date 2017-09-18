@@ -30,7 +30,7 @@ class PvT3BaseArbiters extends Mode {
     new BuildCannonsAtExpansions(2),
     new BuildGasPumps,
     new FlipIf(
-      new UnitsAtLeast(24, UnitMatchWarriors),
+      new UnitsAtLeast(18, UnitMatchWarriors),
       new Parallel(
         new PvTIdeas.TrainArmy,
         new RequireMiningBases(4)),

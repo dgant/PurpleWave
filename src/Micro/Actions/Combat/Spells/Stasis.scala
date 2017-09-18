@@ -8,7 +8,7 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object Stasis extends Action {
   
-  override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
+  override def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.is(Protoss.Arbiter)                  &&
     unit.energy >= Protoss.Stasis.energyCost  &&
     With.self.hasTech(Protoss.Stasis)         &&

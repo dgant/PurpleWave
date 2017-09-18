@@ -21,7 +21,7 @@ object Bunk extends Action {
       Seq.empty
   }
   
-  override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
+  override def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.canMove && openBunkersFor(unit).nonEmpty
   }
   

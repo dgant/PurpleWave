@@ -5,7 +5,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Shove extends Action {
   
-  override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
+  override def allowed(unit: FriendlyUnitInfo): Boolean = {
     ! unit.flying &&
     unit.canMove &&
     unit.matchups.threats.nonEmpty

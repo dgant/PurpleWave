@@ -8,7 +8,7 @@ object BeACorsair extends Action {
   
   // Carriers are really finicky.
   
-  override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
+  override def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.aliveAndComplete           &&
     unit.is(Protoss.Corsair)        &&
     unit.matchups.enemies.nonEmpty

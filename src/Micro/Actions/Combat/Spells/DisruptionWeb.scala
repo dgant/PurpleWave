@@ -8,7 +8,7 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object DisruptionWeb extends Action {
   
-  override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
+  override def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.is(Protoss.Corsair)                          &&
     unit.energy >= Protoss.DisruptionWeb.energyCost   &&
     With.self.hasTech(Protoss.DisruptionWeb)          &&

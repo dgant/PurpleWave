@@ -19,7 +19,7 @@ object BustWallin extends Action {
   //
   // So let's equip our units to fight vs. wall-ins.
   
-  override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
+  override def allowed(unit: FriendlyUnitInfo): Boolean = {
     val walledInZones = With.geography.zones.filter(_.walledIn)
   
     walledInZones.nonEmpty                      &&

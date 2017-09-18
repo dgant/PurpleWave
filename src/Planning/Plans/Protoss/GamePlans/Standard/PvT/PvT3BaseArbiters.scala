@@ -8,7 +8,7 @@ import Planning.Plans.Compound.{FlipIf, If, Parallel}
 import Planning.Plans.GamePlans.Mode
 import Planning.Plans.Information.{Employing, Never}
 import Planning.Plans.Macro.Automatic.{MeldArchons, RequireSufficientSupply, TrainWorkersContinuously}
-import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
+import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildCannonsAtExpansions, BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.UnitsAtLeast
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
@@ -33,23 +33,14 @@ class PvT3BaseArbiters extends Mode {
       new UnitsAtLeast(18, UnitMatchWarriors),
       new Parallel(
         new PvTIdeas.TrainArmy,
-        new RequireMiningBases(4)),
+        new Build(RequestAtLeast(12, Protoss.Gateway))),
       new Parallel(
         new PvTIdeas.TrainObservers,
         new If(new UnitsAtLeast(2, Protoss.HighTemplar),  new Build(RequestTech(Protoss.PsionicStorm))),
         new If(new UnitsAtLeast(2, Protoss.Arbiter),      new Build(RequestTech(Protoss.Stasis))),
-        new BuildOrder(
-          RequestAtLeast(1, Protoss.Gateway),
-          RequestAtLeast(1, Protoss.CyberneticsCore),
-          RequestAtLeast(3, Protoss.Gateway),
-          RequestAtLeast(1, Protoss.RoboticsFacility),
-          RequestAtLeast(1, Protoss.Observatory),
-          RequestAtLeast(5, Protoss.Gateway),
-          RequestAtLeast(1, Protoss.CitadelOfAdun),
-          RequestUpgrade(Protoss.ZealotSpeed),
-          RequestAtLeast(8, Protoss.Gateway),
-          RequestAtLeast(1, Protoss.TemplarArchives),
-          RequestTech(Protoss.PsionicStorm),
+        new PvTIdeas.Require3BaseTech,
+        new RequireMiningBases(3),
+        new Build(
           RequestAtLeast(1, Protoss.Stargate),
           RequestUpgrade(Protoss.HighTemplarEnergy),
           RequestAtLeast(1, Protoss.ArbiterTribunal),

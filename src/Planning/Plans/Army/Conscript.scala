@@ -31,7 +31,7 @@ class Conscript extends Plan {
     fighters.get.unitMatcher.set(UnitMatchCombat(enemies))
     fighters.get.unitCounter.set(new UnitCountCombat(enemies, mustFight, overkill))
     fighters.get.unitPreference.set(UnitPreferClose(centroid))
-    fighters.get.acquire(this)
+    fighters.get.acquire(this.parent.getOrElse(this))
   
     squad.enemies = enemies
     squad.conscript(fighters.get.units)

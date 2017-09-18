@@ -1,6 +1,6 @@
 package Debugging.Visualizations
 
-import Debugging.Visualizations.Views.Battles.{ShowBattleDetails, ShowBattles}
+import Debugging.Visualizations.Views.Battles.{ShowBattleDetails, ShowBattleSummary}
 import Debugging.Visualizations.Views.Economy.{ShowEconomy, ShowScheduler}
 import Debugging.Visualizations.Views.Fun._
 import Debugging.Visualizations.Views.Geography._
@@ -24,11 +24,10 @@ class Visualization {
     ShowPerformanceSummary,
     ShowClock,
     ShowStrategy,
-    ShowBattles,
+    ShowBattleSummary,
     ShowUnitsAll,
     ShowUnitsFriendly,
-    ShowUnitsForeign,
-    ShowReactionTime
+    ShowUnitsForeign
   )
   
   var enabled   = true
@@ -42,7 +41,7 @@ class Visualization {
   val lineHeightSmall = 9
   
   lazy val knownViews: Vector[View] = Vector[View](
-    ShowBattles,
+    ShowBattleSummary,
     ShowBattleDetails,
     ShowEconomy,
     ShowScheduler,

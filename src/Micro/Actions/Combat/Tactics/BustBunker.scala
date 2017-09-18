@@ -16,7 +16,7 @@ object BustBunker extends Action {
   // Killing bunkers with Dragoons is an important technique that we can't yet perform on first princples.
   // Range-upgraded Dragoons just barely outrange a Bunker containing non-range-upgraded Marines.
   
-  override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
+  override def allowed(unit: FriendlyUnitInfo): Boolean = {
     With.enemies.exists(_.race == Race.Terran)                    &&
     unit.agent.canFight                                           &&
     unit.canMove                                                  &&

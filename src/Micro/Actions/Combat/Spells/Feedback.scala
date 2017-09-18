@@ -8,7 +8,7 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object Feedback extends Action {
   
-  override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
+  override def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.is(Protoss.DarkArchon)                   &&
     unit.energy >= Protoss.Feedback.energyCost    &&
     unit.matchups.enemies.nonEmpty

@@ -1,10 +1,10 @@
 package Planning.Plans.Protoss.GamePlans.Standard.PvT
 
-import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
+import Macro.BuildRequests.{RequestAtLeast, RequestTech}
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
 import Planning.Plans.Army.{DefendZones, EscortSettlers}
-import Planning.Plans.Compound.{FlipIf, Parallel}
+import Planning.Plans.Compound.{FlipIf, If, Parallel}
 import Planning.Plans.GamePlans.Mode
 import Planning.Plans.Information.Employing
 import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainWorkersContinuously}
@@ -27,21 +27,21 @@ class PvT2BaseGateway extends Mode {
     new RequireSufficientSupply,
     new TrainWorkersContinuously(oversaturate = true),
     new BuildCannonsAtExpansions(2),
+    new If(new UnitsAtLeast(24, UnitMatchWarriors), new RequireMiningBases(3)),
     new FlipIf(
-      new UnitsAtLeast(24, UnitMatchWarriors),
-      new PvTIdeas.TrainArmy,
+      new UnitsAtLeast(18, UnitMatchWarriors),
       new Parallel(
+        new PvTIdeas.TrainArmy,
         new Build(
-          RequestAtLeast(2, Protoss.Gateway),
-          RequestAtLeast(1, Protoss.RoboticsFacility),
           RequestAtLeast(3, Protoss.Gateway),
+          RequestAtLeast(1, Protoss.RoboticsFacility),
           RequestAtLeast(1, Protoss.Observatory),
-          RequestAtLeast(4, Protoss.Gateway)),
-        new RequireMiningBases(3))),
+          RequestAtLeast(8, Protoss.Gateway))),
+      new PvTIdeas.Require3BaseTech),
+    new RequireMiningBases(3),
     new Build(
-      RequestAtLeast(8, Protoss.Gateway),
-      RequestAtLeast(1, Protoss.CitadelOfAdun),
-      RequestUpgrade(Protoss.ZealotSpeed)),
+      RequestTech(Protoss.PsionicStorm),
+      RequestAtLeast(10, Protoss.Gateway)),
     new DefendZones,
     new EscortSettlers,
     new ScoutExpansionsAt(100),

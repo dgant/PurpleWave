@@ -7,7 +7,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Unstick extends Action {
   
-  override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
+  override def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.canMove &&
     unit.seeminglyStuck   &&
     ! unit.is(Protoss.Carrier) //Telling a Carrier to stop withdraws its interceptors. Really harmful. Never seen one get stuck anyhow.

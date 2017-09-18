@@ -13,7 +13,7 @@ import scala.collection.mutable.ListBuffer
 
 object Duck extends Action {
   
-  override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
+  override def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.canMove
   }
   

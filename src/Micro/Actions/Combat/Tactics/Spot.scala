@@ -7,7 +7,7 @@ import Utilities.ByOption
 
 object Spot extends Action {
   
-  override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
+  override def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.canMove && unit.flying && unit.matchups.targets.isEmpty
   }
   

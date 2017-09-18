@@ -10,7 +10,7 @@ import Utilities.EnrichPixel.EnrichedPixelCollection
 
 object Pickup extends Action {
   
-  override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
+  override def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.isTransport
   }
   

@@ -58,7 +58,7 @@ object FightOrFlight extends Action {
     
     if (attackReport.isEmpty)         return default
     if (retreatReport.isEmpty)        return default
-    if (attackReport.get.killed <= 0) return 0.0 // Don't fight just to deal meaningless damage
+    if (attackReport.get.killed <= 0) return default // Don't fight just to deal meaningless damage
   
     val attackGain    = attackReport.get.valueDealt
     val attackLoss    = attackReport.get.valueReceived

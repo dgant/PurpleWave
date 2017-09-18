@@ -6,7 +6,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Cower extends Action {
   
-  override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
+  override def allowed(unit: FriendlyUnitInfo): Boolean = {
     val isHelpless = ! unit.canAttack
     (unit.agent.canCower || isHelpless) &&
       unit.canMove                      &&

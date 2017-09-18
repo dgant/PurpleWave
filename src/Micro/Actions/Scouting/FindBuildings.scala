@@ -9,7 +9,7 @@ import bwapi.{Race, UnitCommandType}
 
 object FindBuildings extends Action {
   
-  override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
+  override def allowed(unit: FriendlyUnitInfo): Boolean = {
     With.geography.enemyBases.nonEmpty
   }
   

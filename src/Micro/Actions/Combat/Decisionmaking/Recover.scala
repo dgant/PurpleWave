@@ -6,7 +6,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Recover extends Action {
   
-  override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
+  override def allowed(unit: FriendlyUnitInfo): Boolean = {
     Seq(
       unit.is(Protoss.Carrier)      && unit.interceptorCount < 4,
       unit.is(Protoss.Reaver)       && unit.scarabCount == 0,

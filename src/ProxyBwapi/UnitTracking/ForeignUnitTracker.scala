@@ -90,7 +90,7 @@ class ForeignUnitTracker {
     
     lazy val shouldBeVisible  = With.grids.friendlyVision.isSet(unit.tileIncludingCenter)
     lazy val shouldBeDetected = With.grids.friendlyDetection.isSet(unit.tileIncludingCenter)
-    lazy val shouldUnburrow   = unit.is(Terran.SpiderMine) && With.units.inTileRadius(unit.tileIncludingCenter, 3).exists(unit => unit.isOurs  && ! unit.flying && ! unit.unitClass.floats)
+    lazy val shouldUnburrow   = unit.is(Terran.SpiderMine) && With.units.inTileRadius(unit.tileIncludingCenter, 2).exists(unit => unit.isOurs  && ! unit.flying && ! unit.unitClass.floats)
     lazy val wasBurrowing     = unit.burrowed || Array(Orders.Burrowing, Orders.VultureMine).contains(unit.order)
     lazy val wasCloaking      = unit.cloaked  || unit.order == Orders.Cloak
   

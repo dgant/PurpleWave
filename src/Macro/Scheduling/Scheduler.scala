@@ -24,7 +24,7 @@ class Scheduler {
   }
   
   def request(requester: Plan, requests: Iterable[BuildRequest]) {
-    requestsByPlan.put(requester, requests)
+    requestsByPlan.put(requester, requests ++ requestsByPlan.getOrElse(requester, Iterable.empty))
   }
   
   def reset() {

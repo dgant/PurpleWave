@@ -11,7 +11,7 @@ import Utilities.EnrichPixel._
 
 object Tickle extends Action {
   
-  override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
+  override def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.agent.lastIntent.canTickle
   }
   

@@ -64,6 +64,7 @@ class Agent(val unit: FriendlyUnitInfo) {
   var canScout      : Boolean                       = false
   var canPillage    : Boolean                       = false
   var canBerzerk    : Boolean                       = false
+  var canCast       : Boolean                       = false
   
   var targetingProfile: TargetingProfile = TargetingProfiles.default
   
@@ -150,6 +151,7 @@ class Agent(val unit: FriendlyUnitInfo) {
     canScout      = intent.canScout
     canPillage    = intent.canPillage
     canBerzerk    = intent.canBerzerk
+    canCast       = false
   }
   
   private def cleanUp() {

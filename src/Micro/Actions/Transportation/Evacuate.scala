@@ -6,7 +6,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Evacuate extends Action {
   
-  override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
+  override def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.isTransport                                  &&
     unit.loadedUnits.nonEmpty                         &&
     With.grids.walkable.get(unit.tileIncludingCenter) &&

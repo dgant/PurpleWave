@@ -15,8 +15,8 @@ object Fight extends Action {
   }
   
   override def perform(unit: FriendlyUnitInfo) {
-    Stim.consider(unit)
     Cast.consider(unit)
+    Stim.consider(unit)
     Bunk.consider(unit)
     Cower.consider(unit)
     Siege.consider(unit)

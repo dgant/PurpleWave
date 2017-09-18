@@ -8,7 +8,7 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object Yamato extends Action {
   
-  override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
+  override def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.is(Terran.Battlecruiser)            &&
     unit.energy >= Terran.Yamato.energyCost  &&
     With.self.hasTech(Terran.Yamato)         &&

@@ -13,7 +13,7 @@ import bwapi.Color
 object ShowBattleDetails extends View {
   
   override def renderScreen() {
-    ShowBattles.localBattle.foreach(battle => {
+    ShowBattleSummary.localBattle.foreach(battle => {
       renderBattleScreen(
         battle,
         battle.estimationSimulationAttack)
@@ -111,7 +111,7 @@ object ShowBattleDetails extends View {
   }
   
   override def renderMap() {
-    ShowBattles.localBattle.foreach(renderBattleMap)
+    ShowBattleSummary.localBattle.foreach(renderBattleMap)
   }
   
   def renderBattleMap(battle: Battle) {

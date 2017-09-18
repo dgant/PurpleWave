@@ -7,7 +7,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Poke extends Action {
   
-  override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
+  override def allowed(unit: FriendlyUnitInfo): Boolean = {
     With.intelligence.enemyMain.isDefined               &&
     unit.matchups.targets.exists(_.unitClass.isWorker)  &&
     unit.matchups.threatsViolent.isEmpty                &&

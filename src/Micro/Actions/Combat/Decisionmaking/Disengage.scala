@@ -10,7 +10,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Disengage extends Action {
   
-  override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
+  override def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.agent.canFlee              &&
     unit.canMove                    &&
     unit.matchups.threats.nonEmpty  &&

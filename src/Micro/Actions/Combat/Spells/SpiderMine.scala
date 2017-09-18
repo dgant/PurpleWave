@@ -7,7 +7,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object SpiderMine extends Action {
   
-  override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
+  override def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.is(Terran.Vulture)                             &&
     With.self.hasTech(Terran.SpiderMinePlant)           &&
     unit.spiderMines > 0                                &&

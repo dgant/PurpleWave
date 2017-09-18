@@ -8,7 +8,7 @@ import bwapi.UnitCommandType
 
 object BlockConstruction extends Action {
   
-  override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
+  override def allowed(unit: FriendlyUnitInfo): Boolean = {
     blockableBuilders(unit).nonEmpty
   }
   

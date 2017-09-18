@@ -9,7 +9,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Sneak extends Action {
   
-  override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
+  override def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.cloaked                                          &&
     ! unit.agent.canBerzerk                               &&
     ! unit.matchups.threats.forall(_.unitClass.isWorker)  &&

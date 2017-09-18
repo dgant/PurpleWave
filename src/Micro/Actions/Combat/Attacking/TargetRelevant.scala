@@ -7,7 +7,7 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object TargetRelevant extends Action {
   
-  override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
+  override def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.agent.canFight           &&
     unit.agent.toAttack.isEmpty   &&
     unit.canAttack                &&
@@ -27,7 +27,7 @@ object TargetRelevant extends Action {
         || target.constructing
         || target.gathering
         || target.repairing
-        || target.hasBeenViolentInLastTwoSeconds
+        || (target.hasBeenViolentInLastTwoSeconds && target.canAttack(unit) && target.topSpeed < unit.topSpeedChasing)
         || target.topSpeed < unit.topSpeedChasing
         || target.zone.edges.forall(edge => unit.framesToTravelTo(edge.centerPixel) < target.framesToTravelTo(edge.centerPixel))
         || (target.is(Zerg.LurkerEgg) && target.matchups.enemyDetectors.isEmpty)

@@ -9,7 +9,7 @@ object Siege extends Action {
   
   val spread: Double = 32.0 * 5.0
   
-  override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
+  override def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.is(Terran.SiegeTankUnsieged) && unit.player.hasTech(Terran.SiegeMode)
   }
   

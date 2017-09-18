@@ -1,7 +1,7 @@
 package Planning.Plans.Protoss.GamePlans.Standard.PvT
 
 import Lifecycle.With
-import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
+import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
 import Planning.Composition.UnitMatchers.{UnitMatchCustom, UnitMatchWarriors}
 import Planning.Plans.Army.{Attack, ConsiderAttacking}
 import Planning.Plans.Compound.{If, _}
@@ -20,6 +20,21 @@ object PvTIdeas {
       RequestUpgrade(Protoss.DragoonRange)),
     new RequireMiningBases(2),
     new BuildGasPumps)
+  
+  class Require3BaseTech extends Parallel(
+    new Require2BaseTech,
+    new Build(
+      RequestAtLeast(2, Protoss.Gateway),
+      RequestAtLeast(1, Protoss.RoboticsFacility),
+      RequestAtLeast(3, Protoss.Gateway),
+      RequestAtLeast(1, Protoss.Observatory),
+      RequestAtLeast(1, Protoss.CitadelOfAdun),
+      RequestAtLeast(4, Protoss.Gateway),
+      RequestUpgrade(Protoss.ZealotSpeed),
+      RequestAtLeast(1, Protoss.TemplarArchives),
+      RequestAtLeast(5, Protoss.Gateway),
+      RequestTech(Protoss.PsionicStorm),
+      RequestAtLeast(1, Protoss.Forge)))
   
   class AttackWithDarkTemplar extends Attack {
     attackers.get.unitMatcher.set(Protoss.DarkTemplar)

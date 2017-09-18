@@ -8,7 +8,7 @@ import Utilities.ByOption
 
 object Heal extends Action {
   
-  override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
+  override def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.is(Terran.Medic) && validTargets(unit).nonEmpty && unit.energy > 0
   }
   

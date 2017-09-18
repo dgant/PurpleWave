@@ -20,7 +20,7 @@ import Planning.Plans.Scouting.Scout
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP.PvP2GateRoboObs
 
-class PvPOpen2GateRoboObs extends Mode {
+class PvPOpen2GateRobo extends Mode {
   
   override val activationCriteria: Plan = new Employing(PvP2GateRoboObs)
   
@@ -68,9 +68,7 @@ class PvPOpen2GateRoboObs extends Mode {
       RequestAtLeast(3,   Protoss.Pylon),
       RequestUpgrade(Protoss.DragoonRange)),
     
-    new Trigger(
-      new UnitsAtLeast(2, Protoss.Reaver, complete = true),
-      new RequireMiningBases(2)),
+    new Trigger(new UnitsAtLeast(1, Protoss.Reaver), new RequireMiningBases(2)),
     
     new RequireSufficientSupply,
     new TrainWorkersContinuously(oversaturate = true),

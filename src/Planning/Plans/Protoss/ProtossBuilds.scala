@@ -228,23 +228,29 @@ object ProtossBuilds {
   
   val OpeningDTExpand = Vector[BuildRequest] (
     // 2-Gate DT Expand based on PvP 2-Gate DT from http://wiki.teamliquid.net/starcraft/2_Gate_DT
+    // We get gas/core faster because of mineral locking + later scout
     RequestAtLeast(8,   Protoss.Probe),
-    RequestAtLeast(1,   Protoss.Pylon),
+    RequestAtLeast(1,   Protoss.Pylon),             // 8
     RequestAtLeast(10,  Protoss.Probe),
-    RequestAtLeast(1,   Protoss.Gateway),
+    RequestAtLeast(1,   Protoss.Gateway),           // 10
     RequestAtLeast(11,  Protoss.Probe),
-    RequestAtLeast(1,   Protoss.Assimilator),
+    RequestAtLeast(1,   Protoss.Assimilator),       // 11
     RequestAtLeast(13,  Protoss.Probe),
-    RequestAtLeast(1,   Protoss.CyberneticsCore),
-    RequestAtLeast(15,  Protoss.Probe),
-    RequestAtLeast(2,   Protoss.Pylon),
+    RequestAtLeast(1,   Protoss.Zealot),            // 13 -- this is important to deny scouting
+    RequestAtLeast(14,  Protoss.Probe),
+    RequestAtLeast(2,   Protoss.Pylon),             // 16 = 14 + Z
     RequestAtLeast(16,  Protoss.Probe),
-    RequestAtLeast(1,   Protoss.CitadelOfAdun),
-    RequestAtLeast(17,  Protoss.Probe),
-    RequestAtLeast(1,   Protoss.Dragoon),
+    RequestAtLeast(1,   Protoss.CyberneticsCore),   // 18 = 16 + Z
+    RequestAtLeast(18,  Protoss.Probe),
+    RequestAtLeast(3,   Protoss.Pylon),             // 20 = 18 + Z
     RequestAtLeast(19,  Protoss.Probe),
-    RequestAtLeast(3,   Protoss.Pylon),
+    RequestAtLeast(1,   Protoss.Dragoon),           // 21 = 19 + Z
     RequestAtLeast(20,  Protoss.Probe),
+    RequestAtLeast(1,   Protoss.CitadelOfAdun),     // 24 = 20 + Z + D
+    RequestAtLeast(21,  Protoss.Probe),
+    RequestAtLeast(2,   Protoss.Dragoon),           // 25 = 21 + Z + D
+    RequestAtLeast(2,   Protoss.Gateway),           // 27 = 21 + Z + DD
+    RequestAtLeast(3,   Protoss.Pylon),
     RequestAtLeast(1,   Protoss.TemplarArchives),
     RequestAtLeast(21,  Protoss.Probe),
     RequestAtLeast(2,   Protoss.Gateway),

@@ -8,7 +8,7 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object Irradiate extends Action {
   
-  override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
+  override def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.is(Terran.ScienceVessel)               &&
     unit.energy >= Terran.Irradiate.energyCost  &&
     With.self.hasTech(Terran.Irradiate)         &&

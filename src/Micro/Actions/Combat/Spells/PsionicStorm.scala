@@ -8,7 +8,7 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object PsionicStorm extends Action {
   
-  override protected def allowed(unit: FriendlyUnitInfo): Boolean = {
+  override def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.is(Protoss.HighTemplar)                    &&
     unit.energy >= Protoss.PsionicStorm.energyCost  &&
     With.self.hasTech(Protoss.PsionicStorm)         &&

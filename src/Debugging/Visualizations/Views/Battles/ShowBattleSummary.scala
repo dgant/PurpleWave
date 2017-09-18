@@ -9,7 +9,7 @@ import Lifecycle.With
 import Mathematics.Points.Pixel
 import Planning.Yolo
 
-object ShowBattles extends View {
+object ShowBattleSummary extends View {
   
   private val tableHeader0  = Pixel(220, 320)
   private val tableHeader1  = tableHeader0.add(125, 0)

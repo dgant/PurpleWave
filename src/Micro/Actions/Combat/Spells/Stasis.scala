@@ -32,8 +32,8 @@ object Stasis extends Action {
     if (target.invincible) return 0.0
   
     target.subjectiveValue *
-    Math.max(1.0, target.matchups.targets.size          / 3.0)  *
-    Math.max(1.0, target.matchups.framesToLiveDiffused  / 72.0) *
+    Math.min(1.0, target.matchups.targets.size          / 3.0)  *
+    Math.min(1.0, target.matchups.framesToLiveDiffused  / 72.0) *
     (
       if(target.isFriendly)
         -2.0

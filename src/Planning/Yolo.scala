@@ -6,7 +6,7 @@ object Yolo {
   
   def active: Boolean =
     With.configuration.enableYolo && (
-      (With.self.supplyUsed > 410 - With.self.minerals / 20)
+      (With.self.supplyUsed > 410 - Math.max(2000, With.self.minerals) / 40)
       || ! With.units.ours.exists(_.unitClass.isWorker)
       || With.geography.ourBases.forall(_.mineralsLeft == 0)
       || With.blackboard.allIn)

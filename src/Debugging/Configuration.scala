@@ -33,7 +33,7 @@ class Configuration {
   var enableMineralWalkInSameZone     = false // Tends to lead to stuck builders
   var pathRecalculationDelayFrames    = 48
   var woundedThresholdHealth          = 40
-  var evacuateDangerousBases          = true
+  var evacuateDangerousBases          = false
   
   var dpfGridDistancePenalty          = 0.5
   var dpfGridMovementPenalty          = 0.5

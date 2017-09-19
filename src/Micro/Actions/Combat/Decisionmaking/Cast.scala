@@ -24,6 +24,7 @@ object Cast extends Action {
     DefensiveMatrix,
     PsionicStorm,
     Stasis,
+    DisruptionWeb,
     MindControl,
     Feedback
   )

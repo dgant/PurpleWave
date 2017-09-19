@@ -20,7 +20,7 @@ object TargetAOE {
       .map(tile => (
         tile,
         tile
-          .adjacent8
+          .adjacent9
           .flatMap(targetsByTile.get)
           .flatten
           .map(targetValues).sum))

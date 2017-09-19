@@ -27,13 +27,17 @@ object DisruptionWeb extends Action {
   }
   
   private def valueTarget(target: UnitInfo): Double = {
-    if (target.underDisruptionWeb) return 0.0
-    if (target.flying) return 0.0
+    if (target.underDisruptionWeb)  return 0.0
+    if (target.flying)              return 0.0
+    if ( ! target.canAttack)        return 0.0
     
     val output = (
+      
+      1.2 *
       target.subjectiveValue *
-      Math.max(1.0, target.matchups.targets.size          / 3.0)  *
-      Math.max(1.0, target.matchups.framesToLiveDiffused  / 72.0) *
+      Math.min(1.0, target.matchups.targets.size          / 3.0)  *
+      Math.min(1.0, target.matchups.framesToLiveDiffused  / 72.0) *
+      (if (target.moving) 0.5 else 1.0) *
       (
         if(target.isFriendly)
           -2.0

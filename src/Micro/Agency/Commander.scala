@@ -77,6 +77,13 @@ class Commander {
     }
   }
   
+  private def limit(unit: FriendlyUnitInfo, destination: Pixel): Pixel = {
+    val margin = Math.max(unit.unitClass.width, unit.unitClass.height)
+    Pixel(
+      PurpleMath.clamp(destination.x, margin, With.mapPixelWidth - margin),
+      PurpleMath.clamp(destination.y, margin, With.mapPixelHeight - margin))
+  }
+  
   def attackMove(unit: FriendlyUnitInfo, destination: Pixel) {
     if (unready(unit)) return
     unit.baseUnit.attack(destination.bwapi)
@@ -94,10 +101,7 @@ class Commander {
     }
     
     // Limit moves to map edge
-    val margin = Math.max(unit.unitClass.width, unit.unitClass.height)
-    destination = Pixel(
-      PurpleMath.clamp(destination.x, margin, With.mapPixelWidth - margin),
-      PurpleMath.clamp(destination.y, margin, With.mapPixelHeight - margin))
+   destination = limit(unit, destination)
     
     // Record the destination. This is mostly for diagnostic purposes (and identifying stuck units) so if the exact value changes later that's okay
     unit.agent.movingTo = Some(destination)

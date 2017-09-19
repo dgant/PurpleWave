@@ -40,9 +40,5 @@ object BustBunker extends Action {
     else if (bunkers.exists(unit.inRangeToAttackSlow)) {
       With.commander.hold(unit)
     }
-      
-    else if (
-      unit.matchups.th
-    )
   }
 }

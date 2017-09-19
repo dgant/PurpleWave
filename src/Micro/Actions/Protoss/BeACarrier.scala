@@ -40,8 +40,10 @@ object BeACarrier extends Action {
       }
       else {
         Target.consider(unit)
-        val attackPoint = unit.pixelCenter.project(attackTarget.pixelCenter, 8.0 * 32.0)
-        unit.agent.toTravel = Some(attackPoint)
+        if (unit.agent.toAttack.isDefined) {
+          val attackPoint = unit.agent.toAttack.get.pixelCenter.project(unit.pixelCenter, 7.5 * 32.0)
+          unit.agent.toTravel = Some(attackPoint)
+        }
         AttackMove.consider(unit)
       }
     }

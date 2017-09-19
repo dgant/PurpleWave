@@ -3,13 +3,18 @@ package Performance
 import Lifecycle.With
 import Utilities.ByOption
 
-object MicroReaction {
+class MicroReaction {
   
   def agencyLast      : Int = With.framesSince(With.agents.lastQueueCompletion)
   def battlesLast     : Int = With.framesSince(With.battles.clustering.lastClusterCompletion)
-  def agencyMax       : Int = ByOption.max(With.agents.runtimes).getOrElse(0)
-  def battlesMax      : Int = ByOption.max(With.battles.clustering.runtimes).getOrElse(0)
-  def agencyAverage   : Int = With.agents.runtimes.sum / Math.max(1, With.agents.runtimes.size)
-  def battlesAverage  : Int = With.battles.clustering.runtimes.sum / Math.max(1, With.battles.clustering.runtimes.size)
+  def agencyMax       : Int = agencyMaxCache()
+  def battlesMax      : Int = battlesMaxCache()
+  def agencyAverage   : Int = agencyAverageCache()
+  def battlesAverage  : Int = battlesAverageCache()
   def framesTotal     : Int = agencyAverage + battlesAverage
+  
+  private val agencyMaxCache      = new Cache(() => ByOption.max(With.agents.runtimes).getOrElse(0))
+  private val battlesMaxCache     = new Cache(() => ByOption.max(With.battles.clustering.runtimes).getOrElse(0))
+  private val agencyAverageCache  = new Cache(() => With.agents.runtimes.sum / Math.max(1, With.agents.runtimes.size))
+  private val battlesAverageCache = new Cache(() => With.battles.clustering.runtimes.sum / Math.max(1, With.battles.clustering.runtimes.size))
 }

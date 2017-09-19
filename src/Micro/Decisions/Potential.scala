@@ -115,7 +115,7 @@ object Potential {
     val mobilityNeed  = 5.0 + ByOption.max(unit.matchups.threats.map(threat => 2 * threat.pixelRangeAgainstFromCenter(unit) / 32)).getOrElse(0.0)
     val mobilityNow   = unit.mobility
     val mobilityCap   = if (unit.flying) 12 else unit.zone.maxMobility / 2.0
-    val mobilityForce = unit.mobilityForce
+    val mobilityForce = unit.mobilityForce.normalize
     val magnitudeRaw  = Math.min(mobilityNeed, mobilityCap) / mobilityNow / 2.0
     val magnitude     = PurpleMath.clamp(magnitudeRaw, 1.0, 5.0)
     val output        = mobilityForce.normalize(magnitude)

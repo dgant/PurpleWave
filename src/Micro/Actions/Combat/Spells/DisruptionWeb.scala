@@ -17,12 +17,10 @@ object DisruptionWeb extends Action {
   
   override protected def perform(unit: FriendlyUnitInfo) {
     
-    val dying = unit.matchups.framesToLiveCurrently < 24.0
-    
     val target = TargetAOE.chooseTarget(
       unit,
-      15.0 * 9.0,
-      unit.subjectiveValue / 240.0,
+      32.0 * 15.0,
+      unit.subjectiveValue,
       valueTarget)
     
     target.foreach(With.commander.useTechOnPixel(unit, Protoss.DisruptionWeb, _))
@@ -30,17 +28,22 @@ object DisruptionWeb extends Action {
   
   private def valueTarget(target: UnitInfo): Double = {
     if (target.underDisruptionWeb) return 0.0
-    if (target.flying) 0.0
+    if (target.flying) return 0.0
     
-    val multiplier =
-        if (target.isFriendly)
+    val output = (
+      target.subjectiveValue *
+      Math.max(1.0, target.matchups.targets.size          / 3.0)  *
+      Math.max(1.0, target.matchups.framesToLiveDiffused  / 72.0) *
+      (
+        if(target.isFriendly)
           -2.0
         else if (target.isEnemy)
           1.0
         else
           0.0
-    val value = target.matchups.vpfDealingCurrently * Math.min(72, target.matchups.framesToLiveCurrently)
-    val output = value * multiplier
+        )
+      )
+    
     output
   }
 }

@@ -80,7 +80,7 @@ class PvPOpen2GateDarkTemplar extends Mode {
         new UnitsAtMost(2, Protoss.DarkTemplar)),
       new TrainContinuously(Protoss.DarkTemplar, 3),
       new TrainContinuously(Protoss.Dragoon)),
-    new TrainWorkersContinuously(oversaturate = true),
+    new TrainWorkersContinuously,
   
     new Build(RequestAtLeast(1, Protoss.Forge)),
     new If(

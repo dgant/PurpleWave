@@ -83,6 +83,8 @@ class Agent(val unit: FriendlyUnitInfo) {
   def origin: Pixel = toReturn.getOrElse(originCache())
   private val originCache = new Cache(() => calculateOrigin)
   
+  def dying: Boolean = Math.min(unit.matchups.framesToLiveDiffused, unit.matchups.framesToLiveCurrently) <= 2 * With.reaction.agencyAverage
+  
   /////////////////
   // Diagnostics //
   /////////////////

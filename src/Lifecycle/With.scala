@@ -20,7 +20,7 @@ import ProxyBwapi.ProxyBWMirror
 import ProxyBwapi.UnitTracking.UnitTracker
 import Strategery.History.History
 import Strategery.Strategist
-import _root_.Performance.{Latency, PerformanceMonitor}
+import _root_.Performance.{Latency, MicroReaction, PerformanceMonitor}
 import bwta.BWTA
 
 import scala.collection.JavaConverters._
@@ -50,6 +50,7 @@ object With {
   var placement       : PlacementScheduler  = _
   var proxy           : ProxyBWMirror       = _
   var prioritizer     : Prioritizer         = _
+  var reaction        : MicroReaction       = _
   var recruiter       : Recruiter           = _
   var scheduler       : Scheduler           = _
   var strategy        : Strategist          = _
@@ -113,6 +114,7 @@ object With {
     performance       = new PerformanceMonitor
     placement         = new PlacementScheduler
     prioritizer       = new Prioritizer
+    reaction          = new MicroReaction
     recruiter         = new Recruiter
     scheduler         = new Scheduler
     strategy          = new Strategist

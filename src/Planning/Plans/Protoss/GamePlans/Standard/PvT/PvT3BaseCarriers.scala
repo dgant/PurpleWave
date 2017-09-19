@@ -4,7 +4,7 @@ import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
 import Planning.Plans.Army.{DefendZones, EscortSettlers}
-import Planning.Plans.Compound.{FlipIf, If, Parallel}
+import Planning.Plans.Compound.{FlipIf, If, Or, Parallel}
 import Planning.Plans.GamePlans.Mode
 import Planning.Plans.Information.{Employing, Never}
 import Planning.Plans.Macro.Automatic.{MeldArchons, RequireSufficientSupply, TrainWorkersContinuously}
@@ -14,13 +14,13 @@ import Planning.Plans.Macro.Milestones.UnitsAtLeast
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Scouting.ScoutExpansionsAt
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvT.PvT3BaseCarrier
+import Strategery.Strategies.Protoss.PvT.{PvT3BaseCarrier, PvT3BaseCorsair}
 
 class PvT3BaseCarriers extends Mode {
   
   description.set("PvT 3 Base Carriers")
   
-  override val activationCriteria: Plan = new Employing(PvT3BaseCarrier)
+  override val activationCriteria: Plan = new Or(new Employing(PvT3BaseCarrier), new Employing(PvT3BaseCorsair))
   override val completionCriteria: Plan = new Never
   
   
@@ -63,7 +63,7 @@ class PvT3BaseCarriers extends Mode {
     new UpgradeContinuously(Protoss.GroundArmor),
     new DefendZones,
     new EscortSettlers,
-    new ScoutExpansionsAt(100),
+    new ScoutExpansionsAt(80),
     new PvTIdeas.AttackWithDarkTemplar,
     new PvTIdeas.ContainSafely
   ))

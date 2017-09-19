@@ -17,12 +17,10 @@ object PsionicStorm extends Action {
   
   override protected def perform(unit: FriendlyUnitInfo) {
     
-    val dying = unit.matchups.framesToLiveCurrently < 24.0
-    
     val target = TargetAOE.chooseTarget(
       unit,
-      (if (dying) 8.0 else 16.0) * 32.0,
-      if (dying) 0.0 else unit.subjectiveValue,
+      (if (unit.agent.dying) 8.0 else 16.0) * 32.0,
+       if (unit.agent.dying) 0.0 else unit.subjectiveValue,
       valueTarget)
     
     target.foreach(With.commander.useTechOnPixel(unit, Protoss.PsionicStorm, _))
@@ -49,6 +47,7 @@ object PsionicStorm extends Action {
       ) /
       target.unitClass.maxTotalHealth
     )
+    
     output
   }
 }

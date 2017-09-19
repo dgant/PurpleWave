@@ -70,7 +70,7 @@ class PvT2BaseCarriers extends Mode {
     new RequireMiningBases(4),
     new DefendZones,
     new EscortSettlers,
-    new ScoutExpansionsAt(100),
+    new ScoutExpansionsAt(80),
     new ConsiderAttacking
   ))
 }

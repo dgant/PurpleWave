@@ -17,12 +17,10 @@ object Stasis extends Action {
   
   override protected def perform(unit: FriendlyUnitInfo) {
     
-    val dying = unit.matchups.framesToLiveCurrently < 24.0
-    
     val target = TargetAOE.chooseTarget(
       unit,
-      (if (dying) 9.0 else 15.0) * 32.0,
-      if (dying) 0.0 else unit.subjectiveValue,
+      (if (unit.agent.dying) 9.0 else 15.0) * 32.0,
+       if (unit.agent.dying) 0.0 else unit.subjectiveValue,
       valueTarget)
     
     target.foreach(With.commander.useTechOnPixel(unit, Protoss.Stasis, _))
@@ -33,15 +31,16 @@ object Stasis extends Action {
     if (target.underStorm) return 0.0
     if (target.invincible) return 0.0
   
-    target.matchups.valuePerDamage *
-      target.matchups.vpfNetDiffused * Math.max(target.matchups.framesToLiveDiffused, 48) *
-      (
-        if(target.isFriendly)
-          -5.0
-        else if (target.isEnemy)
-          1.0
-        else
-          0.0
-      )
+    target.subjectiveValue *
+    Math.max(1.0, target.matchups.targets.size          / 3.0)  *
+    Math.max(1.0, target.matchups.framesToLiveDiffused  / 72.0) *
+    (
+      if(target.isFriendly)
+        -2.0
+      else if (target.isEnemy)
+        1.0
+      else
+        0.0
+    )
   }
 }

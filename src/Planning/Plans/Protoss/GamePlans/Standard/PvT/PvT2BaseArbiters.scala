@@ -62,7 +62,7 @@ class PvT2BaseArbiters extends Mode {
     new Build(RequestAtLeast(20, Protoss.Gateway)),
     new DefendZones,
     new EscortSettlers,
-    new ScoutExpansionsAt(100),
+    new ScoutExpansionsAt(80),
     new PvTIdeas.AttackWithDarkTemplar,
     new PvTIdeas.ContainSafely
   ))

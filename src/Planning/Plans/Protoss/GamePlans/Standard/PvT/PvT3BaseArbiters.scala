@@ -53,7 +53,7 @@ class PvT3BaseArbiters extends Mode {
     new RequireMiningBases(5),
     new DefendZones,
     new EscortSettlers,
-    new ScoutExpansionsAt(100),
+    new ScoutExpansionsAt(80),
     new PvTIdeas.AttackWithDarkTemplar,
     new PvTIdeas.ContainSafely
   ))

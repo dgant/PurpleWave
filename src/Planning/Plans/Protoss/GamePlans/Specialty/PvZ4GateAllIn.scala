@@ -28,7 +28,7 @@ class PvZ4GateAllIn extends Parallel {
     new If(
       new And(
         new UpgradeComplete(Protoss.DragoonRange, 1, Protoss.DragoonRange.upgradeTime(1)),
-        new UnitsAtLeast(2, Protoss.Zealot),
+        new UnitsAtLeast(4, Protoss.Zealot),
         new Check(() => With.self.gas >= 50 )),
       new TrainContinuously(Protoss.Dragoon),
       new TrainContinuously(Protoss.Zealot)),

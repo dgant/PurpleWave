@@ -29,11 +29,11 @@ object PvTIdeas {
       RequestAtLeast(3, Protoss.Gateway),
       RequestAtLeast(1, Protoss.Observatory),
       RequestAtLeast(1, Protoss.CitadelOfAdun),
-      RequestAtLeast(4, Protoss.Gateway),
       RequestUpgrade(Protoss.ZealotSpeed),
       RequestAtLeast(1, Protoss.TemplarArchives),
-      RequestAtLeast(5, Protoss.Gateway),
+      RequestAtLeast(4, Protoss.Gateway),
       RequestTech(Protoss.PsionicStorm),
+      RequestAtLeast(5, Protoss.Gateway),
       RequestAtLeast(1, Protoss.Forge)))
   
   class AttackWithDarkTemplar extends Attack {
@@ -77,7 +77,7 @@ object PvTIdeas {
         new And(
           new UnitsAtLeast(18, Protoss.Dragoon),
           new Check(() => With.units.ours.count(_.is(Protoss.Dragoon)) >= With.units.enemy.count(_.is(Terran.Vulture)))),
-        new Check(() => With.self.minerals > 800 && With.self.gas < 500))),
+        new Check(() => With.self.minerals > 800 && With.self.gas < 100))),
     new TrainContinuously(Protoss.Zealot),
     new TrainContinuously(Protoss.Dragoon))
   

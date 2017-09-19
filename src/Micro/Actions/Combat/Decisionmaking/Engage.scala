@@ -15,7 +15,6 @@ object Engage extends Action {
   }
   
   override def perform(unit: FriendlyUnitInfo) {
-    //Punch.consider(unit)
     Potshot.consider(unit)
     BustWallin.consider(unit)
     Target.delegate(unit)

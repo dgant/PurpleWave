@@ -29,14 +29,14 @@ class PvT2BaseGateway extends Mode {
     new BuildCannonsAtExpansions(2),
     new If(new UnitsAtLeast(24, UnitMatchWarriors), new RequireMiningBases(3)),
     new FlipIf(
-      new UnitsAtLeast(18, UnitMatchWarriors),
+      new UnitsAtLeast(15, UnitMatchWarriors),
       new Parallel(
         new PvTIdeas.TrainArmy,
         new Build(
           RequestAtLeast(3, Protoss.Gateway),
           RequestAtLeast(1, Protoss.RoboticsFacility),
           RequestAtLeast(1, Protoss.Observatory),
-          RequestAtLeast(8, Protoss.Gateway))),
+          RequestAtLeast(5, Protoss.Gateway))),
       new PvTIdeas.Require3BaseTech),
     new RequireMiningBases(3),
     new Build(
@@ -44,7 +44,7 @@ class PvT2BaseGateway extends Mode {
       RequestAtLeast(10, Protoss.Gateway)),
     new DefendZones,
     new EscortSettlers,
-    new ScoutExpansionsAt(100),
+    new ScoutExpansionsAt(80),
     new PvTIdeas.AttackWithDarkTemplar,
     new PvTIdeas.ContainSafely
   ))

@@ -238,7 +238,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit) extends UnitProxy(baseUnit) {
   
   // TODO. We need better math :( BWAPI doesn't define what its accel/turn rate numbers mean.
   // https://github.com/bwapi/bwapi/blob/59b14af21b3c881ce06af8b1ea1d63fa3c8b2df0/bwapi/include/BWAPI/UnitType.h#L555
-  def framesToTurnAndShootAndTurnBackAndAccelerate: Int = unitClass.minStop + unitClass.stopFrames + 24
+  def framesToTurnAndShootAndTurnBackAndAccelerate: Int = unitClass.minStop + unitClass.stopFrames + 8
   
   def projectFrames(framesToLookAhead: Int): Pixel = pixelCenter.add((velocityX * framesToLookAhead).toInt, (velocityY * framesToLookAhead).toInt)
   

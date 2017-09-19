@@ -2,6 +2,7 @@ package Micro.Decisions
 
 import Lifecycle.With
 import Mathematics.Physics.{Force, ForceMath}
+import Mathematics.Points.SpecificPoints
 import Mathematics.PurpleMath
 import Micro.Agency.Explosion
 import ProxyBwapi.Races.Protoss
@@ -108,17 +109,11 @@ object Potential {
   //////////////
 
   def mobilityAttraction(unit: FriendlyUnitInfo): Force = {
-    
-    // When we're in tight spaces (like against a mineral line) this isn't going to help us.
-    // if (unit.tileIncludingCenter.adjacent8.filter(_.valid).forall(unit.mobilityGrid.get(_) <= 1)) return new Force
-    
-    val mobilityNeed  = 5.0 + ByOption.max(unit.matchups.threats.map(threat => 2 * threat.pixelRangeAgainstFromCenter(unit) / 32)).getOrElse(0.0)
-    val mobilityNow   = unit.mobility
-    val mobilityCap   = if (unit.flying) 12 else unit.zone.maxMobility / 2.0
-    val mobilityForce = unit.mobilityForce.normalize
-    val magnitudeRaw  = Math.min(mobilityNeed, mobilityCap) / mobilityNow / 2.0
-    val magnitude     = PurpleMath.clamp(magnitudeRaw, 1.0, 5.0)
-    val output        = mobilityForce.normalize(magnitude)
+    val bestAdjacent  = ByOption.max(unit.tileIncludingCenter.adjacent8.filter(_.valid).map(unit.mobilityGrid.get)).getOrElse(0)
+    val magnitudeNeed = 1.0 / Math.max(1.0, unit.mobility - 1.0)
+    val magnitudeCap  = PurpleMath.nanToZero(bestAdjacent.toDouble / unit.mobility)
+    val magnitude     = Math.min(magnitudeNeed, magnitudeCap)
+    val output        = unit.mobilityForce.normalize(magnitude)
     output
   }
   
@@ -154,17 +149,19 @@ object Potential {
   }
   
   protected def exitAttractionAir(unit: FriendlyUnitInfo): Force = {
-    ForceMath.fromPixels(unit.pixelCenter, unit.agent.origin).normalize
+    val zoneNow       = unit.zone
+    val zoneOrigin    = unit.agent.origin.zone
+    val origin        = if (zoneNow == zoneOrigin) SpecificPoints.middle else unit.agent.origin
+    
+    ForceMath.fromPixels(unit.pixelCenter, origin).normalize
   }
   
   protected def exitAttractionGround(unit: FriendlyUnitInfo): Force = {
     val zoneNow       = unit.zone
     val zoneOrigin    = unit.agent.origin.zone
     val path          = With.paths.zonePath(zoneNow, zoneOrigin)
-    
-    if (path.isEmpty || path.get.steps.isEmpty) return new Force
-    
-    val forceExiting  = ForceMath.fromPixels(unit.pixelCenter, path.get.steps.head.edge.centerPixel)
+    val origin        = if (path.isEmpty || path.get.steps.isEmpty) zoneOrigin.centroid.pixelCenter else path.get.steps.head.edge.centerPixel
+    val forceExiting  = ForceMath.fromPixels(unit.pixelCenter, origin)
     val forceNormal   = forceExiting.normalize
     forceNormal
   }

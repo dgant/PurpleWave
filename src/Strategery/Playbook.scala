@@ -81,7 +81,7 @@ class PurpleCheesePlaybook extends PurpleWavePlaybook  {
   override lazy val forced: Seq[Strategy] = StrategyGroups.cheese
 }
 
-object Playbook extends TestingPlaybook {
+object Playbook extends PurpleWavePlaybook {
   
   //////////////////////
   // Experiment order //

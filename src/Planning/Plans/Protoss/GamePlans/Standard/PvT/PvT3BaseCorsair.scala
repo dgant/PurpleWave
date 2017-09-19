@@ -27,28 +27,31 @@ class PvT3BaseCorsair extends Mode {
     new PvTIdeas.TrainObservers,
     new FlipIf(
       new And(
-        new UnitsAtLeast(18, Protoss.Dragoon),
+        new UnitsAtLeast(15, Protoss.Dragoon),
         new Check(() => With.units.ours.count(_.is(Protoss.Dragoon)) > 4 * With.units.ours.count(_.is(Protoss.Corsair)))),
       new TrainContinuously(Protoss.Dragoon),
       new If(
         new UpgradeComplete(Protoss.CorsairEnergy, withinFrames = Protoss.Corsair.buildFrames),
-        new TrainContinuously(Protoss.Corsair, 8))))
+        new TrainContinuously(Protoss.Corsair, 8))),
+    new Build2BaseTech,
+    new Build(RequestAtLeast(8, Protoss.Gateway)))
   
   class Build2BaseTech extends Parallel(
     new Build(
       RequestAtLeast(3, Protoss.Gateway),
       RequestAtLeast(1, Protoss.RoboticsFacility),
       RequestAtLeast(1, Protoss.Observatory),
-      RequestAtLeast(8, Protoss.Gateway)))
+      RequestAtLeast(5, Protoss.Gateway)))
   
   class Build3BaseTech extends Parallel(
     new Build(
       RequestAtLeast(1, Protoss.Stargate),
+      RequestAtLeast(8, Protoss.Gateway),
       RequestAtLeast(1, Protoss.FleetBeacon),
-      RequestUpgrade(Protoss.CorsairEnergy),
-      RequestAtLeast(10, Protoss.Gateway),
-      RequestAtLeast(2, Protoss.Stargate),
-      RequestTech(Protoss.DisruptionWeb)))
+      RequestUpgrade(Protoss.CorsairEnergy)),
+    new If(new UnitsAtLeast(1, Protoss.FleetBeacon, complete = true), new Build(RequestAtLeast(2, Protoss.Stargate))),
+    new If(new UnitsAtLeast(2, Protoss.Corsair), new Build(RequestTech(Protoss.DisruptionWeb))),
+    new Build(RequestAtLeast(12, Protoss.Gateway)))
   
   children.set(Vector(
     new PvTIdeas.Require2BaseTech,

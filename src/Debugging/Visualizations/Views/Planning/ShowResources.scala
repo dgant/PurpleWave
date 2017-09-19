@@ -8,7 +8,7 @@ object ShowResources extends View {
   override def renderScreen() {
     DrawScreen.table(
       5,
-      5,
+      5 * With.visualization.lineHeightSmall,
       With.scheduler.audit.map(pair => Vector(pair._1) ++ pair._2).map(_.map(_.toString.take(10))))
     
     DrawScreen.table(

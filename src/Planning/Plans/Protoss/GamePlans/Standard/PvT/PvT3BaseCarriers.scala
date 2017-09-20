@@ -9,8 +9,8 @@ import Planning.Plans.GamePlans.Mode
 import Planning.Plans.Information.{Employing, Never}
 import Planning.Plans.Macro.Automatic.{MeldArchons, RequireSufficientSupply, TrainWorkersContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Macro.Expanding.{BuildCannonsAtExpansions, BuildGasPumps, RequireMiningBases}
-import Planning.Plans.Macro.Milestones.UnitsAtLeast
+import Planning.Plans.Macro.Expanding.{BuildCannonsAtExpansions, BuildCannonsAtNatural, BuildGasPumps, RequireMiningBases}
+import Planning.Plans.Macro.Milestones.{OnMiningBases, UnitsAtLeast}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Scouting.ScoutExpansionsAt
 import ProxyBwapi.Races.Protoss
@@ -28,6 +28,7 @@ class PvT3BaseCarriers extends Mode {
     new MeldArchons(40),
     new RequireSufficientSupply,
     new TrainWorkersContinuously(oversaturate = true),
+    new OnMiningBases(3, new BuildCannonsAtNatural(1)),
     new BuildCannonsAtExpansions(3),
     new BuildGasPumps,
     new If(new UnitsAtLeast(1, Protoss.Carrier), new Build(RequestUpgrade(Protoss.CarrierCapacity))),

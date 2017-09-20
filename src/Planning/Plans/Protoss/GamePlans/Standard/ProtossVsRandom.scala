@@ -5,7 +5,7 @@ import Planning.Plans.Army.ConsiderAttacking
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.Information.Employ
 import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
-import Planning.Plans.Macro.BuildOrders.{Build, RequireBareMinimum}
+import Planning.Plans.Macro.BuildOrders.{Build, RequireEssentials}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Milestones.UnitsAtLeast
 import Planning.Plans.Protoss.ProtossBuilds
@@ -19,7 +19,7 @@ class ProtossVsRandom extends Parallel {
   description.set("Protoss vs Random")
   
   children.set(Vector(
-    new RequireBareMinimum,
+    new RequireEssentials,
     new Employ(PvREarly2Gate910AtNatural,
       new Parallel(
         new TwoGatewaysAtNatural,

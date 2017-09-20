@@ -9,7 +9,7 @@ import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.Build.ProposePlacement
-import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder, RequireBareMinimum}
+import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder, RequireEssentials}
 import Planning.Plans.Macro.Milestones.UnitsAtLeast
 import Planning.Plans.Scouting.Scout
 import Planning.ProxyPlanner
@@ -32,7 +32,7 @@ class Proxy8Fact extends Parallel {
         new Blueprint(this, building = Some(Terran.Starport), preferZone = proxyZone, respectHarvesting = false, placement = Some(PlacementProfiles.proxyBuilding)),
         new Blueprint(this, building = Some(Terran.Starport), preferZone = proxyZone, respectHarvesting = false, placement = Some(PlacementProfiles.proxyBuilding)))
     },
-    new RequireBareMinimum,
+    new RequireEssentials,
     new Build(
       RequestAtLeast(1, Terran.CommandCenter),
       RequestAtLeast(8, Terran.SCV),

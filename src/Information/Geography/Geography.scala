@@ -12,25 +12,28 @@ import scala.collection.mutable
 
 class Geography {
   
-  lazy val mapArea        : TileRectangle           = TileRectangle(Tile(0, 0), Tile(With.mapTileWidth, With.mapTileHeight))
-  lazy val allTiles       : Iterable[Tile]          = mapArea.tiles
-  lazy val startBases     : Iterable[Base]          = bases.filter(_.isStartLocation)
-  lazy val startLocations : Iterable[Tile]          = With.game.getStartLocations.asScala.map(new Tile(_))
-  lazy val zones          : Iterable[Zone]          = ZoneBuilder.zones
-  lazy val edges          : Iterable[Edge]          = ZoneBuilder.edges
-  lazy val bases          : Iterable[Base]          = ZoneBuilder.bases
-  lazy val ourMain        : Base                    = With.geography.ourBases.find(_.isStartLocation).get
-  def ourNatural          : Base                    = ourNaturalCache()
-  def ourZones            : Iterable[Zone]          = ourZonesCache()
-  def ourBases            : Iterable[Base]          = ourBasesCache()
-  def ourTownHalls        : Iterable[UnitInfo]      = ourTownHallsCache()
-  def ourHarvestingAreas  : Iterable[TileRectangle] = ourHarvestingAreasCache()
-  def ourBorder           : Iterable[Edge]          = ourBorderCache()
-  def enemyZones          : Iterable[Zone]          = enemyZonesCache()
-  def enemyBases          : Iterable[Base]          = enemyBasesCache()
+  lazy val mapArea            : TileRectangle           = TileRectangle(Tile(0, 0), Tile(With.mapTileWidth, With.mapTileHeight))
+  lazy val allTiles           : Iterable[Tile]          = mapArea.tiles
+  lazy val startBases         : Iterable[Base]          = bases.filter(_.isStartLocation)
+  lazy val startLocations     : Iterable[Tile]          = With.game.getStartLocations.asScala.map(new Tile(_))
+  lazy val zones              : Iterable[Zone]          = ZoneBuilder.zones
+  lazy val edges              : Iterable[Edge]          = ZoneBuilder.edges
+  lazy val bases              : Iterable[Base]          = ZoneBuilder.bases
+  lazy val ourMain            : Base                    = With.geography.ourBases.find(_.isStartLocation).get
+  def ourNatural              : Base                    = ourNaturalCache()
+  def ourZones                : Iterable[Zone]          = ourZonesCache()
+  def ourBases                : Iterable[Base]          = ourBasesCache()
+  def ourSettlements          : Iterable[Base]          = ourSettlementsCache()
+  def ourBasesAndSettlements  : Iterable[Base]          = ourBases ++ ourSettlements
+  def ourTownHalls            : Iterable[UnitInfo]      = ourTownHallsCache()
+  def ourHarvestingAreas      : Iterable[TileRectangle] = ourHarvestingAreasCache()
+  def ourBorder               : Iterable[Edge]          = ourBorderCache()
+  def enemyZones              : Iterable[Zone]          = enemyZonesCache()
+  def enemyBases              : Iterable[Base]          = enemyBasesCache()
   
   private val ourZonesCache           = new Cache(() => zones.filter(_.owner.isUs))
   private val ourBasesCache           = new Cache(() => bases.filter(_.owner.isUs))
+  private val ourSettlementsCache     = new Cache(() => getSettlements)
   private val enemyZonesCache         = new Cache(() => zones.filter(_.owner.isEnemy))
   private val enemyBasesCache         = new Cache(() => bases.filter(_.owner.isEnemy))
   private val ourTownHallsCache       = new Cache(() => ourBases.flatMap(_.townHall))
@@ -49,6 +52,13 @@ class Geography {
         zone
       }
     }
+  
+  private def getSettlements: Seq[Base] = With.units.ours
+    .filter(u => u.agent.toBuild.exists(_.isTownHall))
+    .flatMap(u => u.agent.toBuildTile.map(tile => tile.zone.bases.find(base => base.townHallTile == tile)))
+    .flatten
+    .toSeq
+    .filterNot(_.owner.isUs)
   
   var home: Tile = SpecificPoints.tileMiddle
   

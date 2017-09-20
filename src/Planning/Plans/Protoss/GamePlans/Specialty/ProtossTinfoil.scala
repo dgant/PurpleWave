@@ -6,7 +6,7 @@ import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plans.Army.{Aggression, ConsiderAttacking, DefendEntrance, DropAttack}
 import Planning.Plans.Compound.{And, Check, If, Parallel}
 import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
-import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder, RequireBareMinimum}
+import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder, RequireEssentials}
 import Planning.Plans.Macro.Expanding.{BuildCannonsAtBases, BuildGasPumps, RemoveMineralBlocksAt, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.UnitsAtLeast
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
@@ -20,7 +20,7 @@ class ProtossTinfoil extends Parallel {
   
   children.set(Vector(
     new Aggression(0.7),
-    new RequireBareMinimum,
+    new RequireEssentials,
     new Build(
       RequestAtLeast(8, Protoss.Probe),
       RequestAtLeast(1, Protoss.Pylon),

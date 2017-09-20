@@ -5,12 +5,14 @@ import Micro.Actions.Action
 import Micro.Actions.Combat.Attacking.Potshot
 import Micro.Actions.Commands.Gravitate
 import Micro.Decisions.Potential
+import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Sneak extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.cloaked                                          &&
+    ! unit.matchups.allies.exists(_.is(Protoss.Arbiter))  &&
     ! unit.agent.canBerzerk                               &&
     ! unit.matchups.threats.forall(_.unitClass.isWorker)  &&
     ( ! unit.effectivelyCloaked || unit.matchups.enemyDetectors.exists(e => e.pixelDistanceFast(unit) < 32.0 * ( if(e.unitClass.canMove) 13.0 else 16.0)))

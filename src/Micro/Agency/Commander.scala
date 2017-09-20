@@ -185,7 +185,11 @@ class Commander {
     if (unready(unit)) return
     unit.agent.movingTo = Some(target)
     unit.baseUnit.useTech(tech.baseType, target.bwapi)
-    sleepAttack(unit)
+    if (tech == Terran.SpiderMinePlant) {
+      sleep(unit, 12)
+    } else {
+      sleepAttack(unit)
+    }
   }
   
   def repair(unit: FriendlyUnitInfo, target: UnitInfo) {

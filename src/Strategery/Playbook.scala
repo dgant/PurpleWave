@@ -54,17 +54,18 @@ object StrategyGroups {
     TvEProxyBBS3StartLocations,
     TvEProxy5RaxAllIn,
     TvEMassMarineAllIn,
-    Proxy2Gate2StartLocations,
-    Proxy2Gate3StartLocations,
+    //Proxy2Gate2StartLocations,
+    //Proxy2Gate3StartLocations,
     ProxyDarkTemplar
   )
 }
 
 class TestingPlaybook extends EmptyPlaybook {
   
-  val strategiesToTest = Array(PvTEarly1015GateGoon, PvT3BaseCorsair)
+  val strategiesToTest = Array(Proxy2Gate2StartLocations, Proxy2Gate3StartLocations)
   
-  override lazy val forced: Seq[Strategy] = Seq(AllPvP, AllPvT, AllPvZ, TvTStandard, TvZStandard) ++ strategiesToTest
+  //override lazy val forced: Seq[Strategy] = Seq(AllPvP, AllPvT, AllPvZ, TvTStandard, TvZStandard) ++ strategiesToTest
+  override lazy val forced: Seq[Strategy] = strategiesToTest
 }
 
 class MacroPlaybook extends EmptyPlaybook {
@@ -145,8 +146,7 @@ object Playbook extends PurpleWavePlaybook {
     PvZMidgameCorsairSpeedlot,
     PvZMidgame5GateDragoons,
     PvZMidgameCorsairReaver,
-    PvZ4GateDragoonAllIn,
-    PvZ4GateZealotAllIn
+    PvZ4GateDragoonAllIn
   )
   
   val strategyOrderRoundRobin = Vector(

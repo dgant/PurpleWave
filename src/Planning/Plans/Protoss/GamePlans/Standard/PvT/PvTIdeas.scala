@@ -3,7 +3,7 @@ package Planning.Plans.Protoss.GamePlans.Standard.PvT
 import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
 import Planning.Composition.UnitMatchers.{UnitMatchCustom, UnitMatchWarriors}
-import Planning.Plans.Army.{Attack, ConsiderAttacking}
+import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
@@ -44,10 +44,9 @@ object PvTIdeas {
     new And(
       new UnitsAtLeast(10, UnitMatchWarriors, complete = true),
       new Or(
-        new UnitsAtLeast(1, Protoss.Observer, complete = true),
+        new UnitsAtLeast(2, Protoss.Observer, complete = true),
         new Not(new EnemyHasShown(Terran.SpiderMine)))),
-    new Attack,
-    new ConsiderAttacking)
+    new Attack)
   
   private class TrainDarkTemplar extends If(
     new And(
@@ -73,12 +72,12 @@ object PvTIdeas {
   class TrainZealotsOrDragoons extends If(
     new And(
       new UpgradeComplete(Protoss.ZealotSpeed, withinFrames = Protoss.Zealot.buildFrames),
+      new UnitsAtMost(12, Protoss.Zealot),
+      new Check(() => With.units.ours.count(_.is(Protoss.Dragoon)) >= With.units.enemy.count(_.is(Terran.Vulture))),
       new Or(
-        new And(
-          new UnitsAtLeast(18, Protoss.Dragoon),
-          new Check(() => With.units.ours.count(_.is(Protoss.Dragoon)) >= With.units.enemy.count(_.is(Terran.Vulture)))),
+        new UnitsAtLeast(12, Protoss.Dragoon),
         new Check(() => With.self.minerals > 800 && With.self.gas < 100))),
-    new TrainContinuously(Protoss.Zealot),
+    new TrainContinuously(Protoss.Zealot, 15),
     new TrainContinuously(Protoss.Dragoon))
   
   class TrainArbiters extends If(
@@ -94,7 +93,7 @@ object PvTIdeas {
     new TrainContinuously(Protoss.Observer, 3),
     new If(
       new EnemyHasShown(Terran.SpiderMine),
-      new TrainContinuously(Protoss.Observer, 2),
+      new TrainContinuously(Protoss.Observer, 3),
       new TrainContinuously(Protoss.Observer, 1)))
   
   class TrainHighTemplar extends OnGasBases(3,

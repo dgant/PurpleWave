@@ -9,7 +9,7 @@ import Planning.Plans.Army._
 import Planning.Plans.Compound._
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.Build.ProposePlacement
-import Planning.Plans.Macro.BuildOrders.{Build, FirstEightMinutes, FollowBuildOrder, RequireBareMinimum}
+import Planning.Plans.Macro.BuildOrders.{Build, FirstEightMinutes, FollowBuildOrder, RequireEssentials}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RemoveMineralBlocksAt, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.{OnGasBases, OnMiningBases, UnitsAtLeast}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
@@ -41,7 +41,7 @@ class TerranVsTerran extends Parallel {
         RequestAtLeast(1,   Terran.Factory),
         RequestAtLeast(20,  Terran.SCV))),
   
-    new RequireBareMinimum,
+    new RequireEssentials,
     new FirstEightMinutes(
       new Build(
         RequestAtLeast(1, Terran.Factory),

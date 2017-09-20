@@ -6,7 +6,7 @@ import Planning.Plans.Army._
 import Planning.Plans.Compound._
 import Planning.Plans.Information.Reactive.EnemyBasesAtLeast
 import Planning.Plans.Macro.Automatic._
-import Planning.Plans.Macro.BuildOrders.{Build, RequireBareMinimum}
+import Planning.Plans.Macro.BuildOrders.{Build, RequireEssentials}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Milestones._
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
@@ -37,7 +37,7 @@ class PvPLateGameStandard extends Parallel {
   
   children.set(Vector(
     new MeldArchons(40),
-    new RequireBareMinimum,
+    new RequireEssentials,
     new ReactToDarkTemplarPossible,
     new ReactToDarkTemplarExisting,
     new RequireSufficientSupply,

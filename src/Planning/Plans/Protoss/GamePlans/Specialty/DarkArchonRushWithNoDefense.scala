@@ -5,7 +5,7 @@ import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plans.Army.{ConsiderAttacking, DefendZones}
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.Macro.Automatic._
-import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder, RequireBareMinimum}
+import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder, RequireEssentials}
 import Planning.Plans.Macro.Expanding.{BuildCannonsAtBases, BuildGasPumps, RemoveMineralBlocksAt, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.{OnMiningBases, UnitsAtLeast, UnitsAtMost}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
@@ -17,7 +17,7 @@ class DarkArchonRushWithNoDefense extends Parallel {
   
   children.set(Vector(
     new MeldDarkArchons,
-    new RequireBareMinimum,
+    new RequireEssentials,
     new Build(ProtossBuilds.Opening13Nexus_NoZealot_OneGateCore: _*),
     new RequireMiningBases(2),
     new RequireSufficientSupply,

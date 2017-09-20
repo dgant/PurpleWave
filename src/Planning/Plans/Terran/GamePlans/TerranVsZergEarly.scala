@@ -9,7 +9,7 @@ import Planning.Plans.Compound._
 import Planning.Plans.Information.Employ
 import Planning.Plans.Macro.Automatic.Gather
 import Planning.Plans.Macro.Build.ProposePlacement
-import Planning.Plans.Macro.BuildOrders.{Build, FirstEightMinutes, FollowBuildOrder, RequireBareMinimum}
+import Planning.Plans.Macro.BuildOrders.{Build, FirstEightMinutes, FollowBuildOrder, RequireEssentials}
 import Planning.Plans.Macro.Expanding._
 import Planning.Plans.Macro.Milestones.UnitsAtLeast
 import Planning.Plans.Protoss.Situational.DefendAgainstProxy
@@ -84,7 +84,7 @@ class TerranVsZergEarly extends Parallel {
     ))
   
   children.set(Vector(
-    new RequireBareMinimum,
+    new RequireEssentials,
     new ProposePlacement {
       override lazy val blueprints: Iterable[Blueprint] = Vector(
         new Blueprint(this, building = Some(Terran.Bunker),         preferZone = Some(With.geography.ourNatural.zone)),

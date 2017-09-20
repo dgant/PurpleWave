@@ -12,7 +12,7 @@ import Planning.Plans.Information.Employing
 import Planning.Plans.Information.Reactive.EnemyBasesAtLeast
 import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.Build.ProposePlacement
-import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder, RequireBareMinimum}
+import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder, RequireEssentials}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Milestones.{EnemyUnitsAtLeast, UnitsAtLeast}
 import Planning.Plans.Protoss.Situational.Blueprinter
@@ -35,7 +35,7 @@ class PvPOpen2GateRobo extends Mode {
   
   children.set(Vector(
     new Do(() => With.blackboard.gasBankSoftLimit = 450),
-    new RequireBareMinimum,
+    new RequireEssentials,
     new If(
       new EnemyUnitsAtLeast(1, Protoss.DarkTemplar),
       new Build(RequestAtLeast(1, Protoss.Observer))),

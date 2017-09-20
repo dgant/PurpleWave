@@ -8,7 +8,7 @@ import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.Build.ProposePlacement
-import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder, RequireBareMinimum}
+import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder, RequireEssentials}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.{EnemyUnitsAtLeast, UnitsAtLeast}
 import Planning.Plans.Scouting.{FoundEnemyBase, ScoutAt}
@@ -19,7 +19,7 @@ class ProxyDarkTemplarRush extends Parallel {
   
   children.set(Vector(
     
-    new RequireBareMinimum,
+    new RequireEssentials,
     
     new ProposePlacement {
       override lazy val blueprints: Iterable[Blueprint] = Vector(

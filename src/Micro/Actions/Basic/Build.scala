@@ -15,11 +15,17 @@ object Build extends Action {
   
   override def perform(unit: FriendlyUnitInfo) {
     
+    val distance  = unit.pixelDistanceFast(unit.agent.toBuildTile.get.pixelCenter)
     val buildArea = unit.agent.toBuild.get.tileArea.add(unit.agent.toBuildTile.get)
-    val blockers  = buildArea.expand(2, 2).tiles.flatMap(With.grids.units.get(_).filter(blocker =>
-      blocker != unit   &&
-      ! blocker.flying  &&
-      blocker.possiblyStillThere))
+    val blockers  = if (distance > 32.0 * 8.0) Seq.empty else
+      buildArea
+        .expand(2, 2)
+        .tiles
+        .flatMap(With.grids.units.get(_).filter(blocker =>
+          blocker != unit   &&
+          ! blocker.flying  &&
+          blocker.possiblyStillThere))
+        .toSeq
     
     blockers.flatMap(_.friendly).foreach(_.agent.shove(unit))
     val enemyBlockers = blockers.filter(_.isEnemy)

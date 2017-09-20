@@ -11,9 +11,9 @@ import Planning.Plans.GamePlans.Mode
 import Planning.Plans.Information.Employing
 import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.Build.ProposePlacement
-import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder, RequireBareMinimum}
+import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder, RequireEssentials}
+import Planning.Plans.Macro.Expanding.{BuildCannonsAtNatural, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.{EnemyUnitsAtMost, UnitsAtLeast, UnitsAtMost}
-import Planning.Plans.Protoss.Situational.Blueprinter
 import Planning.Plans.Scouting.Scout
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP.PvP2GateDT
@@ -30,13 +30,9 @@ class PvPOpen2GateDarkTemplar extends Mode {
     )
   }
   
-  private class ProposeCannonsAtExpanion extends ProposePlacement {
-    override lazy val blueprints: Iterable[Blueprint] = Blueprinter.pylonsAndCannonsAtNatural(this, 1, 3)
-  }
-  
   children.set(Vector(
     new Do(() => With.blackboard.gasBankSoftLimit = 450),
-    new RequireBareMinimum,
+    new RequireEssentials,
     new DontGetOurGatewaysUnpoweredBySkynet,
     new BuildOrder(
       // http://wiki.teamliquid.net/starcraft/2_Gateway_Dark_Templar_(vs._Protoss)
@@ -86,11 +82,8 @@ class PvPOpen2GateDarkTemplar extends Mode {
     new If(
       new UnitsAtLeast(4, Protoss.Pylon),
       new Parallel(
-        new ProposeCannonsAtExpanion,
-        new Build(
-          RequestAtLeast(5, Protoss.Pylon),
-          RequestAtLeast(3, Protoss.PhotonCannon),
-          RequestAtLeast(2, Protoss.Nexus)))),
+        new BuildCannonsAtNatural(2),
+        new RequireMiningBases(2))),
     
     new Trigger(
       new UnitsAtLeast(1, Protoss.CyberneticsCore),

@@ -28,7 +28,7 @@ class Analysis(battle: Battle) {
   val hysteresisDesireMin   = PurpleMath.clamp(       flexibilityRatio, 0.5, 0.7)
   val hysteresisDesireMax   = PurpleMath.clamp(1.0 /  flexibilityRatio, 1.1, 1.8)
   val desireTurtling        = PurpleMath.clamp(turtlingRatio, 0.8,  1.0)
-  val desireUrgency         = PurpleMath.clamp(urgencyRatio,  0.8,  1.8)
+  val desireUrgency         = PurpleMath.clamp(urgencyRatio,  0.9,  1.8)
   val desireChokiness       = PurpleMath.clamp(chokeBadness,  0.6,  1.0)
   val desireEconomy         = PurpleMath.clamp(economyRatio,  0.9,  1.3)
   val desireHysteresis      = PurpleMath.clamp(hysteresis,    hysteresisDesireMin,  hysteresisDesireMax)
@@ -47,7 +47,7 @@ class Analysis(battle: Battle) {
     val edge      = zoneUs.edges.find(_.zones.contains(zoneEnemy))
     val edgeWidth = Math.min(32.0 * 2.0, edge.map(_.radiusPixels * 2.0).getOrElse(32.0 * 3.0))
     val ourWidth  = battle.us.units.filterNot(_.flying).map(unit => if (unit.flying) 0.0 else 2.0 * unit.unitClass.radialHypotenuse).sum
-    PurpleMath.nanToOne(1.5 * edgeWidth / ourWidth)
+    PurpleMath.nanToOne(2.5 * edgeWidth / ourWidth)
   }
   
   private def meanFlexibility(units: Seq[UnitInfo]): Double = {

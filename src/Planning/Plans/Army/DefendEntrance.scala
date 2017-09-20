@@ -19,7 +19,7 @@ class DefendEntrance extends Plan {
   
   override def onUpdate() {
     val zone = ByOption
-      .minBy(With.geography.ourBases)(_.heart.groundPixels(With.intelligence.mostBaselikeEnemyTile))
+      .minBy(With.geography.ourBasesAndSettlements)(_.heart.groundPixels(With.intelligence.mostBaselikeEnemyTile))
       .map(_.zone)
       .getOrElse(With.geography.home.zone)
     

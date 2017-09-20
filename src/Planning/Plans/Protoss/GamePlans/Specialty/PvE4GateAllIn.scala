@@ -5,55 +5,52 @@ import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plans.Army.{Aggression, ConsiderAttacking, DefendEntrance, DefendZones}
 import Planning.Plans.Compound._
-import Planning.Plans.Information.Employ
 import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.BuildOrders._
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RemoveMineralBlocksAt, RequireMiningBases}
-import Planning.Plans.Macro.Milestones.{UnitsAtLeast, UnitsAtMost, UpgradeComplete}
+import Planning.Plans.Macro.Milestones.{EnemyHasShownCloakedThreat, UnitsAtLeast, UnitsAtMost, UpgradeComplete}
 import Planning.Plans.Protoss.ProtossBuilds
-import Planning.Plans.Protoss.Situational.{Defend2GateAgainst4Pool, DefendAgainstProxy, TwoGatewaysAtNexus}
+import Planning.Plans.Protoss.Situational.{Defend2GateAgainst4Pool, DefendAgainstProxy, PlaceTwoGatewaysAtNexus}
 import Planning.Plans.Recruitment.RecruitFreelancers
 import Planning.Plans.Scouting.ScoutAt
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvZ.{PvZ4GateDragoonAllIn, PvZ4GateZealotAllIn}
 
-class PvZ4GateAllIn extends Parallel {
+class PvE4GateAllIn extends Parallel {
   
   children.set(Vector(
-    new RequireBareMinimum,
-    new TwoGatewaysAtNexus,
+    new RequireEssentials,
+    new PlaceTwoGatewaysAtNexus,
     new BuildOrder(ProtossBuilds.OpeningTwoGate1012: _*),
     new RequireSufficientSupply,
     new TrainWorkersContinuously,
     new If(
       new And(
-        new UpgradeComplete(Protoss.DragoonRange, 1, Protoss.DragoonRange.upgradeTime(1)),
+        new Check(() => With.self.gas >= 50 ),
         new UnitsAtLeast(4, Protoss.Zealot),
-        new Check(() => With.self.gas >= 50 )),
+        new UpgradeComplete(Protoss.DragoonRange, 1, Protoss.DragoonRange.upgradeTime(1))),
       new TrainContinuously(Protoss.Dragoon),
       new TrainContinuously(Protoss.Zealot)),
-    
-    new Employ(PvZ4GateDragoonAllIn,
-      new Parallel(
-      new Build(
-        RequestAtLeast(1, Protoss.CyberneticsCore),
-        RequestAtLeast(1, Protoss.Assimilator),
-        RequestUpgrade(Protoss.DragoonRange),
-        RequestAtLeast(4, Protoss.Gateway)),
-      new Trigger(
-        new UnitsAtLeast(12, UnitMatchWarriors),
-        initialAfter = new Parallel(
-        new RequireMiningBases(2),
-        new BuildGasPumps,
-        new Build(
-          RequestAtLeast(1, Protoss.RoboticsFacility),
-          RequestAtLeast(1, Protoss.Observatory),
-          RequestAtLeast(3, Protoss.Observer),
-          RequestAtLeast(8, Protoss.Gateway)),
-        new RequireMiningBases(3),
-        new Build(RequestAtLeast(12, Protoss.Gateway)))))),
   
-    new Employ(PvZ4GateZealotAllIn, new Build(RequestAtLeast(5, Protoss.Gateway))),
+    new Build(RequestAtLeast(1, Protoss.CyberneticsCore)),
+    new BuildGasPumps,
+    new Build(RequestUpgrade(Protoss.DragoonRange)),
+  
+    new If(
+      new EnemyHasShownCloakedThreat,
+      new Build(
+        RequestAtLeast(1, Protoss.RoboticsFacility),
+        RequestAtLeast(1, Protoss.Observatory),
+        RequestAtLeast(2, Protoss.Observer))),
+    
+    new Build(RequestAtLeast(4, Protoss.Gateway)),
+    
+    new Trigger(
+      new UnitsAtLeast(12, UnitMatchWarriors),
+      initialAfter = new Parallel(
+        new RequireMiningBases(2),
+        new Build(RequestAtLeast(8, Protoss.Gateway)),
+        new RequireMiningBases(3),
+        new Build(RequestAtLeast(12, Protoss.Gateway)))),
       
     new If(
       new UnitsAtMost(12, UnitMatchWarriors),
@@ -69,7 +66,7 @@ class PvZ4GateAllIn extends Parallel {
     new ConsiderAttacking,
     new FollowBuildOrder,
     new DefendAgainstProxy,
-    new RemoveMineralBlocksAt(30),
+    new RemoveMineralBlocksAt(50),
     new Gather,
     new RecruitFreelancers,
     new DefendEntrance

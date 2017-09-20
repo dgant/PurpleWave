@@ -47,7 +47,7 @@ class BuildCannonsAtBases(cannonsRequired: Int, placement: PlacementProfile = Pl
     .toMap
   
   protected def eligibleBases: Iterable[Base] = {
-    With.geography.ourBases.toSeq.sortBy(_.heart.i) //Arbitrary but stable ordering
+    With.geography.ourBasesAndSettlements
   }
   
   private def cannonZone(zone: Zone): Int = {

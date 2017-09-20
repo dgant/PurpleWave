@@ -9,8 +9,8 @@ import Planning.Plans.GamePlans.Mode
 import Planning.Plans.Information.{Employing, Never}
 import Planning.Plans.Macro.Automatic.{MeldArchons, RequireSufficientSupply, TrainWorkersContinuously}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
-import Planning.Plans.Macro.Expanding.{BuildCannonsAtExpansions, RequireMiningBases}
-import Planning.Plans.Macro.Milestones.{OnGasBases, UnitsAtLeast}
+import Planning.Plans.Macro.Expanding.{BuildCannonsAtExpansions, BuildCannonsAtNatural, RequireMiningBases}
+import Planning.Plans.Macro.Milestones.{OnGasBases, OnMiningBases, UnitsAtLeast}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Protoss.GamePlans.Standard.PvT.PvTIdeas.Require2BaseTech
 import Planning.Plans.Scouting.ScoutExpansionsAt
@@ -29,6 +29,7 @@ class PvT2BaseArbiters extends Mode {
     new Require2BaseTech,
     new RequireSufficientSupply,
     new TrainWorkersContinuously,
+    new OnMiningBases(3, new BuildCannonsAtNatural(1)),
     new BuildCannonsAtExpansions(2),
     new If(new UnitsAtLeast(30, UnitMatchWarriors), new RequireMiningBases(3)),
     new FlipIf(

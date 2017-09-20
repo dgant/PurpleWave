@@ -4,14 +4,14 @@ import Macro.BuildRequests.RequestAtLeast
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, TrainContinuously}
-import Planning.Plans.Macro.BuildOrders.{Build, FirstEightMinutes, FollowBuildOrder, RequireBareMinimum}
+import Planning.Plans.Macro.BuildOrders.{Build, FirstEightMinutes, FollowBuildOrder, RequireEssentials}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import ProxyBwapi.Races.Terran
 
 class MassMarine extends Parallel {
   
   children.set(Vector(
-    new RequireBareMinimum,
+    new RequireEssentials,
     new FirstEightMinutes(
       new Build(
         RequestAtLeast(1, Terran.CommandCenter),

@@ -10,8 +10,8 @@ import Planning.Plans.Information.Reactive.EnemyBio
 import Planning.Plans.Information.{Employing, Never}
 import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
-import Planning.Plans.Macro.Expanding.{BuildCannonsAtExpansions, RequireMiningBases}
-import Planning.Plans.Macro.Milestones.UnitsAtLeast
+import Planning.Plans.Macro.Expanding.{BuildCannonsAtExpansions, BuildCannonsAtNatural, RequireMiningBases}
+import Planning.Plans.Macro.Milestones.{OnMiningBases, UnitsAtLeast}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Protoss.GamePlans.Standard.PvT.PvTIdeas.{GetObserversForCloakedWraiths, Require2BaseTech}
 import Planning.Plans.Scouting.ScoutExpansionsAt
@@ -29,6 +29,7 @@ class PvT2BaseCarriers extends Mode {
     new Require2BaseTech,
     new RequireSufficientSupply,
     new TrainWorkersContinuously(oversaturate = true),
+    new OnMiningBases(3, new BuildCannonsAtNatural(1)),
     new BuildCannonsAtExpansions(3),
     new GetObserversForCloakedWraiths,
     new If(

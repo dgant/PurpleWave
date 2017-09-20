@@ -6,7 +6,7 @@ import ProxyBwapi.Races.Terran
 
 class EnemyHasShownWraithCloak extends Plan {
   
-  description.set("Require enemy to have a tech")
+  description.set("Enemy has wraith cloak")
   
   var triggered = false
   

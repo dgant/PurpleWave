@@ -11,7 +11,7 @@ import Planning.Plans.Information.Reactive.EnemyMutalisks
 import Planning.Plans.Information.Scenarios.EnemyStrategy
 import Planning.Plans.Information.{Employ, Employing, StartPositionsAtLeast}
 import Planning.Plans.Macro.Automatic.{MatchingRatio, _}
-import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder, FirstEightMinutes, RequireBareMinimum}
+import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder, FirstEightMinutes, RequireEssentials}
 import Planning.Plans.Macro.Expanding.{BuildCannonsAtBases, BuildCannonsAtExpansions, BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Milestones._
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
@@ -37,7 +37,7 @@ class ProtossVsZerg extends Parallel {
   
   private class ImplementEarly2Gate extends FirstEightMinutes(
     new Parallel(
-      new TwoGatewaysAtNexus,
+      new PlaceTwoGatewaysAtNexus,
       new Trigger(
         new UnitsAtLeast(2, Protoss.Zealot, complete = true),
         initialBefore = new Build(ProtossBuilds.OpeningTwoGate1012: _*))))
@@ -192,7 +192,7 @@ class ProtossVsZerg extends Parallel {
     // Early game build orders //
     /////////////////////////////
   
-    new RequireBareMinimum,
+    new RequireEssentials,
     new Employ(PvZEarly2Gate, new ImplementEarly2Gate),
     new If(new WeAreFFEing, new FFE),
     

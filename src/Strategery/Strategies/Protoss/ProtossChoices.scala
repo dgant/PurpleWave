@@ -16,6 +16,7 @@ object ProtossChoices {
     WorkerRush3StartLocations,
     Proxy2Gate2StartLocations,
     Proxy2Gate3StartLocations,
+    Stove,
     ProxyDarkTemplar,
     CarriersFromAnIsland,
     CarriersWithNoDefense,

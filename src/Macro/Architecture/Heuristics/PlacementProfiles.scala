@@ -115,9 +115,9 @@ object PlacementProfiles {
   
   val hugWorkersWithCannon = new PlacementProfile(
     "Hug workers with cannon",
-    preferPowering              = 0.1,
+    preferPowering              = 0.2,
     preferCoveringWorkers       = 1.0,
-    avoidSurfaceArea            = 0.25)
+    avoidDistanceFromEnemy      = 0.1)
   
   val cannonAgainstAir = new PlacementProfile(
     "Cannon against air/drops",

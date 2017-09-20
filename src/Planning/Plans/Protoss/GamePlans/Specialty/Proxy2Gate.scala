@@ -64,7 +64,7 @@ class Proxy2Gate extends Parallel {
     new Scout)
   
   children.set(Vector(
-    new Aggression(1.4),
+    new Aggression(1.5),
     new Do(() =>  With.blackboard.maxFramesToSendAdvanceBuilder = Int.MaxValue),
     new Trigger(new UnitsAtLeast(2, Protoss.Gateway),
       initialBefore = new BeforeProxy,

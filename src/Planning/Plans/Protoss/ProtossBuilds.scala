@@ -35,24 +35,13 @@ object ProtossBuilds {
     RequestAtLeast(15,  Protoss.Probe),
     RequestAtLeast(2,   Protoss.Pylon))
   
-  val Opening_1GateZZCore = Vector[BuildRequest] (
-    RequestAtLeast(1,   Protoss.Nexus),
-    RequestAtLeast(8,   Protoss.Probe),
-    RequestAtLeast(1,   Protoss.Pylon),
-    RequestAtLeast(10,  Protoss.Probe),
-    RequestAtLeast(1,   Protoss.Gateway),
-    RequestAtLeast(12,  Protoss.Probe),
-    RequestAtLeast(1,   Protoss.Assimilator),
-    RequestAtLeast(13,  Protoss.Probe))
-  
   val OpeningTwoGate99 = Vector[BuildRequest] (
     RequestAtLeast(1,   Protoss.Nexus),
     RequestAtLeast(8,   Protoss.Probe),
     RequestAtLeast(1,   Protoss.Pylon),
     RequestAtLeast(9,   Protoss.Probe),
     RequestAtLeast(2,   Protoss.Gateway),
-    RequestAtLeast(11,  Protoss.Probe)
-  )
+    RequestAtLeast(11,  Protoss.Probe))
   
   val OpeningTwoGate99_WithZealots = Vector[BuildRequest] (
     RequestAtLeast(1,   Protoss.Nexus),

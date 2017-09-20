@@ -15,7 +15,7 @@ import Planning.Plans.Recruitment.RecruitFreelancers
 import Planning.Plans.Scouting.ScoutAt
 import ProxyBwapi.Races.Protoss
 
-class PvE4GateAllIn extends Parallel {
+class FourGateAllIn extends Parallel {
   
   children.set(Vector(
     new RequireEssentials,

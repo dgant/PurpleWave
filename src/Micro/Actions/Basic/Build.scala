@@ -31,7 +31,9 @@ object Build extends Action {
     val enemyBlockers = blockers.filter(_.isEnemy)
     if (enemyBlockers.nonEmpty) {
       unit.agent.canFight = true
-      if (unit.matchups.threats.isEmpty) {
+      val noThreats   = unit.matchups.threats.isEmpty
+      val allWorkers  = unit.matchups.threats.size == 1 && unit.matchups.threats.head.unitClass.isWorker
+      if (noThreats || allWorkers) {
         unit.agent.toAttack = Some(enemyBlockers.minBy(_.pixelDistanceFast(unit)))
         Attack.delegate(unit)
       }

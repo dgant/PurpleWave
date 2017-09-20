@@ -28,7 +28,8 @@ class Proxy2Gate extends Parallel {
     new TrainWorkersContinuously,
     new Trigger(
       new Check(() => With.frame > 24 * 60 * 3),
-      initialAfter = new TrainContinuously(Protoss.Gateway, 5)))
+      initialAfter = new TrainContinuously(Protoss.Gateway, 5)),
+    new Scout)
   
   private class TransitionPlan extends Parallel(
     new BuildGasPumps,
@@ -77,7 +78,6 @@ class Proxy2Gate extends Parallel {
     new If(new UnitsAtLeast(1, Protoss.Gateway),  new Build(RequestAtLeast(2, Protoss.Gateway))),
     new Trigger(new UnitsAtLeast(2, Protoss.Gateway), initialAfter = new ReactivePlan),
     
-    new Scout,
     new DefendAgainstProxy,
     new Attack,
     new FollowBuildOrder,

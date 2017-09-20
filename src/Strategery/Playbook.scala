@@ -82,7 +82,7 @@ class PurpleCheesePlaybook extends PurpleWavePlaybook  {
   override lazy val forced: Seq[Strategy] = StrategyGroups.cheese
 }
 
-object Playbook extends PurpleWavePlaybook {
+object Playbook extends TestingPlaybook {
   
   //////////////////////
   // Experiment order //
@@ -147,45 +147,5 @@ object Playbook extends PurpleWavePlaybook {
     PvZMidgame5GateDragoons,
     PvZMidgameCorsairReaver,
     PvZ4GateDragoonAllIn
-  )
-  
-  val strategyOrderRoundRobin = Vector(
-    /*
-    WorkerRush2StartLocations,
-    WorkerRush3StartLocations,
-    Proxy2Gate2StartLocations,
-    Proxy2Gate3StartLocations,
-    PvREarly2Gate910,
-    PvREarly2Gate910AtNatural,
-    PvREarly2Gate1012,
-    PvTEarlyDTExpand,
-    PvTEarly4GateAllIn,
-    PvTEarly14Nexus,
-    PvTEarly1015GateGoon,
-    PvTEarly1GateRange,
-    PvTLateMassGateway,
-    PvTLateCarriers,
-    PvTLateArbiters,
-    PvPEarly2Gate910,
-    PvPEarlyFE,
-    PvPEarly1GateZZCore,
-    PvPEarly2Gate1012,
-    PvPEarly1GateCore,
-    PvPEarlyFFE,
-    PvPMidgameDarkTemplar,
-    PvPMidgameReaver,
-    PvPMidgameObserverReaver,
-    PvPMidgameFE,
-    PvPMidgame4GateGoon,
-    PvPMidgameCarriers,
-    PvZEarlyZealotAllIn,
-    PvZEarlyFFEHeavy,
-    PvZEarly2Gate,
-    PvZEarlyFFELight,
-    PvZMidgame5GateDragoons,
-    PvZMidgameCorsairReaver,
-    PvZMidgameCorsairSpeedlot,
-    PvZMidgameCorsairCarrier
-    */
   )
 }

@@ -140,11 +140,8 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
   }
   
   def needBuilder: Boolean = {
-    if (building.isDefined && buildingClass.isTerran) {
-      return true
-    }
-    if (building.isDefined && ! buildingClass.isTerran) {
-      return false
+    if (building.isDefined) {
+      return buildingClass.isTerran
     }
     if (desiredTile.isEmpty) {
       return false

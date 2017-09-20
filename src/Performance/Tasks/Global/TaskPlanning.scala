@@ -8,6 +8,7 @@ class TaskPlanning extends AbstractTask {
   urgency = With.configuration.urgencyPlanning
   
   override protected def onRun() {
+    With.intelligence.update()
     With.bank.update()
     With.recruiter.update()
     With.prioritizer.update()

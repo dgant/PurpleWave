@@ -44,10 +44,10 @@ object ShowGroundskeeper extends View {
         .sortBy(_.proposal.proposer.priority)
     DrawScreen.column(
       165, 7 * With.visualization.lineHeightSmall,
-      matches.map(_.requirement.toString.take(5)))
+      matches.map(_.requirement.toString.take(15)))
     DrawScreen.column(
       265, 7 * With.visualization.lineHeightSmall,
-      matches.map(" => " + _.requirement.toString.take(5)))
+      matches.map(" => " + _.proposal.toString.take(15)))
     
     With.game.drawTextScreen(365, 5 * With.visualization.lineHeightSmall, "Placed:")
     DrawScreen.table(

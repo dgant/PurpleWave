@@ -108,20 +108,14 @@ class Groundskeeper {
   
   def flagFulfilled(requirement: Blueprint, fulfillingUnit: UnitInfo) {
     val proposal = getRepresentativeBlueprintForRequirement(requirement)
-    closeAsFulfilled(requirement, fulfillingUnit)
-    
-    //Sanity check
-    if (proposal.accepts(fulfillingUnit.tileTopLeft)) {
-      closeAsFulfilled(proposal, fulfillingUnit)
-    }
-    else {
-      requirementMatches --= requirementMatches.find(x => x.proposal == proposal && x.requirement == requirement)
-    }
+    removeBlueprint(requirement)
+    proposalsFulfilled.put(proposal,    fulfillingUnit)
+    proposalsFulfilled.put(requirement, fulfillingUnit)
+    requirementMatches --= requirementMatches.find(x => x.proposal == proposal && x.requirement == requirement)
   }
   
   private def closeAsFulfilled(blueprint: Blueprint, fulfillingUnit: UnitInfo) {
-    removeBlueprint(blueprint)
-    proposalsFulfilled.put(blueprint, fulfillingUnit)
+    
   }
   
   def flagUnfulfilled(requirement: Blueprint) {
@@ -194,6 +188,7 @@ class Groundskeeper {
   private def findProposalToMatchWithRequirement(requirement: Blueprint): Option[Blueprint] = {
     proposals
       .diff(requirementMatches.map(_.proposal))
+      .diff(proposalsFulfilled.keySet)
       .toVector
       // CIG 2017 HACK: This needs to match the sort above (priority -> id)
       // Ideally we'd represent this in one Ordering that could be used by both queues,

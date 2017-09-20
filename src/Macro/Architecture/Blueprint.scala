@@ -9,21 +9,21 @@ import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClass.UnitClass
 
 class Blueprint(
-                 val proposer                   : Plan,
-                 val building                   : Option[UnitClass]         = None,
-                 var widthTiles                 : Option[Int]               = None,
-                 var heightTiles                : Option[Int]               = None,
-                 var powers                     : Option[Boolean]           = None,
-                 var requirePower               : Option[Boolean]           = None,
-                 var requireCreep               : Option[Boolean]           = None,
-                 var requireTownHallTile        : Option[Boolean]           = None,
-                 var requireGasTile             : Option[Boolean]           = None,
-                 var placement           : Option[PlacementProfile]  = None,
-                 var marginPixels  : Option[Double]            = None,
-                 val requireCandidates          : Option[Iterable[Tile]]    = None,
-                 var preferZone                 : Option[Zone]              = None,
-                 val requireZone                : Option[Zone]              = None,
-                 var respectHarvesting          : Boolean                   = true) {
+  val proposer            : Plan,
+  val building            : Option[UnitClass]         = None,
+  var widthTiles          : Option[Int]               = None,
+  var heightTiles         : Option[Int]               = None,
+  var powers              : Option[Boolean]           = None,
+  var requirePower        : Option[Boolean]           = None,
+  var requireCreep        : Option[Boolean]           = None,
+  var requireTownHallTile : Option[Boolean]           = None,
+  var requireGasTile      : Option[Boolean]           = None,
+  var placement           : Option[PlacementProfile]  = None,
+  var marginPixels        : Option[Double]            = None,
+  val requireCandidates   : Option[Iterable[Tile]]    = None,
+  var preferZone          : Option[Zone]              = None,
+  val requireZone         : Option[Zone]              = None,
+  var respectHarvesting   : Boolean                   = true) {
   
   var id: Option[Int] = None
   val frameCreated: Int = With.frame
@@ -109,7 +109,7 @@ class Blueprint(
   
   override def toString: String =
     (
-      "#" + proposer.priority +    " " +
+      "#" + proposer.priority + "-" + id.map(_.toString).getOrElse("x") + " " +
       building.map(_.toString + " ").getOrElse("") +
       placement.toString + " " +
       widthTiles + "x" + heightTiles + " " +

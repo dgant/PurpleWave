@@ -18,6 +18,7 @@ object KiteSafely extends Action {
   override def perform(unit: FriendlyUnitInfo) {
     
     if (unit.readyForAttackOrder) {
+      
       if (unit.matchups.framesOfSafetyDiffused >= unit.framesToTurnAndShootAndTurnBackAndAccelerate + With.latency.latencyFrames) {
         Potshot.consider(unit)
         Target.consider(unit)
@@ -25,6 +26,9 @@ object KiteSafely extends Action {
       }
       // If we're not going anywhere, might as well shoot
       if (unit.velocity.lengthSquared == 0) {
+        Potshot.consider(unit)
+      }
+      if (unit.unitClass.minStop < 4) {
         Potshot.consider(unit)
       }
     }

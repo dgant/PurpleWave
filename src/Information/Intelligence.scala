@@ -56,7 +56,7 @@ class Intelligence {
       firstEnemyMain = With.geography.startBases.find(_.owner.isEnemy)
     }
     if (firstEnemyMain.isEmpty) {
-      val possibleMains = With.geography.startBases.filter(base => base.owner.isEnemy || ! base.scouted)
+      val possibleMains = With.geography.startBases.filterNot(_.owner.isUs).filter(base => base.owner.isEnemy || ! base.scouted)
       if (possibleMains.size == 1) {
         firstEnemyMain = possibleMains.headOption
       }

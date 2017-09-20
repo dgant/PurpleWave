@@ -42,6 +42,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
   override def onUpdate() {
     
     if (isComplete) {
+      builderLock.release()
       With.groundskeeper.flagFulfilled(buildingDescriptor, building.get)
       return
     }

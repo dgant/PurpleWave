@@ -35,9 +35,9 @@ class Blueprint(
   requireCreep                = requireCreep                .orElse(Some(building.exists(_.requiresCreep)))
   requireTownHallTile         = requireTownHallTile         .orElse(Some(building.exists(_.isTownHall)))
   requireGasTile              = requireGasTile              .orElse(Some(building.exists(_.isRefinery)))
-  marginPixels   = marginPixels   .orElse(if (building.exists(_.attacks)) building.map(_.effectiveRangePixels.toDouble) else Some(32.0 * 9.0))
+  marginPixels                = marginPixels                .orElse(if (building.exists(_.attacks)) building.map(_.effectiveRangePixels.toDouble) else Some(32.0 * 9.0))
   preferZone                  = preferZone                  .orElse(requireZone)
-  placement            = placement            .orElse(Some(PlacementProfiles.default(this)))
+  placement                   = placement                   .orElse(Some(PlacementProfiles.default(this)))
   
   def fulfilledBy(proposal: Blueprint): Boolean = {
     if (proposal == this) return true

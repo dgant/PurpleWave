@@ -4,6 +4,7 @@ import Lifecycle.With
 import Mathematics.Shapes.Circle
 import Micro.Actions.Action
 import Micro.Actions.Combat.Attacking.Potshot
+import Micro.Actions.Combat.Decisionmaking.Disengage
 import Micro.Actions.Commands.{Attack, Move}
 import Micro.Heuristics.Targeting.EvaluateTargets
 import ProxyBwapi.Races.Terran
@@ -32,6 +33,13 @@ object BustWallin extends Action {
   
   override protected def perform(unit: FriendlyUnitInfo) {
     Potshot.delegate(unit)
+    
+    // Back wounded units off
+    val escapeFrames    = 1.5 * Math.max(0, unit.matchups.framesOfEntanglementDiffused) + 24 + 2 * With.reaction.agencyAverage
+    val damagePerFrame  = unit.matchups.threatsViolent.map(_.dpfOnNextHitAgainst(unit)).sum
+    if (unit.totalHealth < damagePerFrame * escapeFrames) {
+      Disengage.consider(unit)
+    }
   
     val targets =
       if (unit.matchups.targetsInRange.nonEmpty)

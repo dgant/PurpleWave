@@ -3,7 +3,7 @@ package Planning.Plans.Protoss.GamePlans.Specialty
 import Information.Geography.Types.Zone
 import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
-import Planning.Plans.Army.Attack
+import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Compound._
 import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder, FollowBuildOrder, RequireEssentials}
@@ -40,9 +40,8 @@ class Proxy2Gate extends Parallel {
         new UpgradeComplete(Protoss.DragoonRange, 1, Protoss.DragoonRange.upgradeTime(1)),
         new Check(() => With.self.gas >= 50)),
       new TrainContinuously(Protoss.Dragoon),
-      new TrainContinuously(Protoss.Zealot)),
+      new TrainContinuously(Protoss.Zealot, 8)),
     new TrainWorkersContinuously,
-    new Build(RequestAtLeast(3, Protoss.Gateway)),
     new Trigger(
       new UnitsAtLeast(15, Protoss.Probe),
       initialAfter = new Parallel(
@@ -57,14 +56,15 @@ class Proxy2Gate extends Parallel {
           RequestAtLeast(1, Protoss.RoboticsFacility),
           RequestAtLeast(1, Protoss.Observatory)))),
       new Build(RequestUpgrade(Protoss.DragoonRange)),
-      new Build(RequestAtLeast(4, Protoss.Gateway)),
+      new Build(RequestAtLeast(3, Protoss.Gateway)),
       new RequireMiningBases(2),
-      new Build(RequestAtLeast(8, Protoss.Gateway)),
+      new Build(RequestAtLeast(7, Protoss.Gateway)),
       new RequireMiningBases(3),
       new Build(RequestAtLeast(12, Protoss.Gateway)))),
     new Scout)
   
   children.set(Vector(
+    new Aggression(1.4),
     new Do(() =>  With.blackboard.maxFramesToSendAdvanceBuilder = Int.MaxValue),
     new Trigger(new UnitsAtLeast(2, Protoss.Gateway),
       initialBefore = new BeforeProxy,

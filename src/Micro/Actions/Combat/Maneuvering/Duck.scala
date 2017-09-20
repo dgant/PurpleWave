@@ -5,6 +5,7 @@ import Micro.Actions.Action
 import Micro.Actions.Commands.{Attack, Gravitate}
 import Micro.Agency.Explosion
 import Micro.Decisions.Potential
+import Planning.Yolo
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
@@ -14,7 +15,7 @@ import scala.collection.mutable.ListBuffer
 object Duck extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.canMove
+    unit.canMove && ! Yolo.active
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {

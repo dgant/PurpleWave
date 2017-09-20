@@ -48,4 +48,6 @@ case class PlayerInfo(basePlayer:Player) extends PlayerProxy(basePlayer) {
     else if (isNeutral) Colors.NeonTeal
     else if (isAlly)    Colors.NeonBlue
     else                Colors.NeonRed
+  
+  override def toString: String = name
 }

@@ -23,6 +23,7 @@ object BustWallin extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
     val walledInZones = With.geography.zones.filter(_.walledIn)
   
+    ! unit.flying                               &&
     walledInZones.nonEmpty                      &&
     With.enemies.exists(_.race == Race.Terran)  &&
     unit.agent.canFight                         &&

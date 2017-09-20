@@ -23,6 +23,7 @@ class EmptyPlaybook {
 object StrategyGroups {
   
   val cheese = Vector[Strategy](
+    WorkerRush2StartLocations,
     WorkerRush3StartLocations,
     TvEProxyBBS2StartLocations,
     TvEProxyBBS3StartLocations,
@@ -80,11 +81,11 @@ class PurpleWavePlaybook extends EmptyPlaybook {
   override lazy val disabled  : Seq[Strategy] = StrategyGroups.bad
 }
 
-class PurpleCheesePlaybook extends PurpleWavePlaybook  {
+class PurpleCheesePlaybook extends EmptyPlaybook  {
   override lazy val forced: Seq[Strategy] = StrategyGroups.cheese
 }
 
-object Playbook extends TestingPlaybook {
+object Playbook extends PurpleCheesePlaybook {
   
   //////////////////////
   // Experiment order //

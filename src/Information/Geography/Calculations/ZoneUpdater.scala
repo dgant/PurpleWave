@@ -3,7 +3,7 @@ package Information.Geography.Calculations
 import Information.Geography.Pathfinding.GroundPathFinder
 import Information.Geography.Types.Zone
 import Lifecycle.With
-import Mathematics.Points.{Pixel, SpecificPoints}
+import Mathematics.Points.SpecificPoints
 import ProxyBwapi.Players.Players
 import ProxyBwapi.Races.Terran
 

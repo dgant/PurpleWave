@@ -6,8 +6,9 @@ import Planning.Plans.Compound._
 import Planning.Plans.Information.Matchup.EnemyIsTerran
 import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.BuildOrders._
-import Planning.Plans.Macro.Expanding.{BuildCannonsAtNatural, BuildGasPumps, RemoveMineralBlocksAt, RequireMiningBases}
-import Planning.Plans.Macro.Milestones.UnitsAtLeast
+import Planning.Plans.Macro.Expanding._
+import Planning.Plans.Macro.Milestones.{UnitsAtLeast, UnitsAtMost}
+import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Protoss.Situational.{Defend2GateAgainst4Pool, DefendAgainstProxy}
 import Planning.Plans.Recruitment.RecruitFreelancers
 import Planning.Plans.Scouting.ScoutAt
@@ -43,8 +44,12 @@ class Stove extends Parallel {
     RequestAtLeast(1,   Protoss.Assimilator),
     RequestAtLeast(13,  Protoss.Probe),
     RequestAtLeast(1,   Protoss.CyberneticsCore),
-    RequestAtLeast(15,  Protoss.Probe),
-    RequestAtLeast(2,   Protoss.Pylon))
+    RequestAtLeast(14,  Protoss.Probe),
+    RequestAtLeast(1,   Protoss.Zealot),
+    RequestAtLeast(2,   Protoss.Pylon),
+    RequestAtLeast(16,  Protoss.Probe),
+    RequestAtLeast(1,   Protoss.Dragoon),
+    RequestAtLeast(1,   Protoss.Stargate))
   
   children.set(Vector(
     new RequireEssentials,
@@ -56,9 +61,8 @@ class Stove extends Parallel {
     new TrainWorkersContinuously,
     new BuildGasPumps,
     new Trigger(
-      new UnitsAtLeast(1, Protoss.Scout),
-      initialAfter = new Parallel(
-        new RequireMiningBases(2))),
+      new UnitsAtLeast(1, Protoss.PhotonCannon),
+      initialAfter = new RequireMiningBases(2)),
     new If(
       new UnitsAtLeast(1, Protoss.ArbiterTribunal),
       new TrainContinuously(Protoss.Arbiter, 1),
@@ -67,25 +71,36 @@ class Stove extends Parallel {
       new UnitsAtLeast(1, Protoss.Arbiter, complete = true),
       new TrainContinuously(Protoss.Scout),
       new TrainContinuously(Protoss.Scout, 3)),
-    new TrainContinuously(Protoss.Zealot),
+    new If(
+      new And(
+        new EnemyIsTerran,
+        new UnitsAtMost(15, Protoss.Dragoon)),
+      new Parallel(
+        new Build(RequestUpgrade(Protoss.DragoonRange)),
+        new TrainContinuously(Protoss.Dragoon)),
+      new TrainContinuously(Protoss.Zealot)),
     new BuildOrder(
       RequestAtLeast(1, Protoss.Stargate),
       RequestAtLeast(1, Protoss.Scout)),
-    new BuildCannonsAtNatural(2),
+    new RequireMiningBases(2),
+    new BuildCannonsAtNatural(1),
+    new BuildCannonsAtExpansions(2),
     new Build(
-      RequestAtLeast(1, Protoss.Forge),
-      RequestAtLeast(2, Protoss.Nexus),
       RequestAtLeast(1, Protoss.CitadelOfAdun),
       RequestAtLeast(3, Protoss.Gateway),
       RequestAtLeast(1, Protoss.TemplarArchives),
       RequestAtLeast(1, Protoss.ArbiterTribunal),
-      RequestUpgrade(Protoss.ZealotSpeed),
-      RequestAtLeast(10, Protoss.Gateway)),
+      RequestAtLeast(1, Protoss.Forge),
+      RequestUpgrade(Protoss.ZealotSpeed)),
+    new UpgradeContinuously(Protoss.GroundDamage),
+    new Build(RequestAtLeast(10, Protoss.Gateway)),
     new FirstEightMinutes(new Defend2GateAgainst4Pool),
     new DefendZones,
     new ScoutAt(14),
     new Attack { attackers.get.unitMatcher.set(Protoss.Scout) },
-    new ConsiderAttacking,
+    new Trigger(
+      new UnitsAtLeast(1, Protoss.Scout, complete = true),
+      new ConsiderAttacking),
     new FollowBuildOrder,
     new DefendAgainstProxy,
     new RemoveMineralBlocksAt(50),

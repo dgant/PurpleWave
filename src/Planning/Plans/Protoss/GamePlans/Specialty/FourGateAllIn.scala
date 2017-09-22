@@ -10,7 +10,7 @@ import Planning.Plans.Macro.BuildOrders._
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RemoveMineralBlocksAt, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.{EnemyHasShownCloakedThreat, UnitsAtLeast, UnitsAtMost, UpgradeComplete}
 import Planning.Plans.Protoss.ProtossBuilds
-import Planning.Plans.Protoss.Situational.{Defend2GateAgainst4Pool, DefendAgainstProxy, PlaceTwoGatewaysAtNexus}
+import Planning.Plans.Protoss.Situational.{DefendZealotsAgainst4Pool, DefendAgainstProxy, BuildHuggingNexus}
 import Planning.Plans.Recruitment.RecruitFreelancers
 import Planning.Plans.Scouting.ScoutAt
 import ProxyBwapi.Races.Protoss
@@ -19,7 +19,7 @@ class FourGateAllIn extends Parallel {
   
   children.set(Vector(
     new RequireEssentials,
-    new PlaceTwoGatewaysAtNexus,
+    new BuildHuggingNexus,
     new BuildOrder(ProtossBuilds.OpeningTwoGate1012: _*),
     new RequireSufficientSupply,
     new TrainWorkersContinuously,
@@ -60,7 +60,7 @@ class FourGateAllIn extends Parallel {
         new Aggression(3.0),
         new Aggression(5.0))),
   
-    new FirstEightMinutes(new Defend2GateAgainst4Pool),
+    new FirstEightMinutes(new DefendZealotsAgainst4Pool),
     new DefendZones,
     new ScoutAt(10),
     new ConsiderAttacking,

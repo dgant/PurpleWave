@@ -10,7 +10,7 @@ import Planning.Plan
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
 
-class Defend2GateAgainst4Pool extends Plan {
+class DefendZealotsAgainst4Pool extends Plan {
   
   val defenders = new Property[LockUnits](new LockUnits)
   defenders.get.unitMatcher.set(UnitMatchWorkers)

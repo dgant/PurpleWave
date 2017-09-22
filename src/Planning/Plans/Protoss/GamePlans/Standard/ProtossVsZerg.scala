@@ -37,7 +37,7 @@ class ProtossVsZerg extends Parallel {
   
   private class ImplementEarly2Gate extends FirstEightMinutes(
     new Parallel(
-      new PlaceTwoGatewaysAtNexus,
+      new BuildHuggingNexus,
       new Trigger(
         new UnitsAtLeast(2, Protoss.Zealot, complete = true),
         initialBefore = new Build(ProtossBuilds.OpeningTwoGate1012: _*))))
@@ -232,7 +232,7 @@ class ProtossVsZerg extends Parallel {
           new UnitsAtMost(2, Protoss.PhotonCannon, complete = true)),
         new DefendFFEWithProbesAgainst9Pool)),
     
-    new FirstEightMinutes(new Defend2GateAgainst4Pool),
+    new FirstEightMinutes(new DefendZealotsAgainst4Pool),
   
     /////////////////
     // Early macro //

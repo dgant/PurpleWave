@@ -9,12 +9,12 @@ import Planning.Plans.Macro.BuildOrders._
 import Planning.Plans.Macro.Expanding._
 import Planning.Plans.Macro.Milestones.{UnitsAtLeast, UnitsAtMost}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
-import Planning.Plans.Protoss.Situational.{Defend2GateAgainst4Pool, DefendAgainstProxy}
+import Planning.Plans.Protoss.Situational.{DefendAgainstProxy, DefendZealotsAgainst4Pool}
 import Planning.Plans.Recruitment.RecruitFreelancers
 import Planning.Plans.Scouting.ScoutAt
 import ProxyBwapi.Races.Protoss
 
-class Stove extends Parallel {
+class TwoBaseStove extends Parallel {
   
   val zzCoreZ = Vector (
     RequestAtLeast(8,   Protoss.Probe),
@@ -94,7 +94,7 @@ class Stove extends Parallel {
       RequestUpgrade(Protoss.ZealotSpeed)),
     new UpgradeContinuously(Protoss.GroundDamage),
     new Build(RequestAtLeast(10, Protoss.Gateway)),
-    new FirstEightMinutes(new Defend2GateAgainst4Pool),
+    new FirstEightMinutes(new DefendZealotsAgainst4Pool),
     new DefendZones,
     new ScoutAt(14),
     new Attack { attackers.get.unitMatcher.set(Protoss.Scout) },

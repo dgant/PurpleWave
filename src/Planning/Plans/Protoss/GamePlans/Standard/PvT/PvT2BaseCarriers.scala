@@ -1,7 +1,6 @@
 package Planning.Plans.Protoss.GamePlans.Standard.PvT
 
 import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
-import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
 import Planning.Plans.Army.{ConsiderAttacking, DefendZones, EscortSettlers}
 import Planning.Plans.Compound.{And, If, Parallel}
@@ -43,25 +42,25 @@ class PvT2BaseCarriers extends Mode {
         RequestAtLeast(1, Protoss.CitadelOfAdun),
         RequestUpgrade(Protoss.ZealotSpeed))),
     new If(
-      new UnitsAtLeast(8, UnitMatchWarriors),
+      new UnitsAtLeast(1, Protoss.FleetBeacon),
       new Parallel(
         new TrainContinuously(Protoss.Carrier),
         new TrainContinuously(Protoss.Zealot)),
-      new Parallel(
-        new PvTIdeas.TrainZealotsOrDragoons,
-        new TrainContinuously(Protoss.Carrier))),
+      new PvTIdeas.TrainZealotsOrDragoons),
     new BuildOrder(
       RequestAtLeast(2, Protoss.Gateway),
       RequestAtLeast(1, Protoss.Stargate)),
     new If(
-      new EnemyBio,
-      new UpgradeContinuously(Protoss.AirArmor),
-      new UpgradeContinuously(Protoss.AirDamage)),
-    new Build(
+      new UnitsAtLeast(4, Protoss.Carrier),
+      new If(
+        new EnemyBio,
+        new UpgradeContinuously(Protoss.AirArmor),
+        new UpgradeContinuously(Protoss.AirDamage))),
+    new BuildOrder(
       RequestAtLeast(1, Protoss.FleetBeacon),
       RequestAtLeast(2, Protoss.Stargate),
       RequestAtLeast(1, Protoss.Forge),
-      RequestAtLeast(8, Protoss.Gateway)),
+      RequestAtLeast(5, Protoss.Gateway)),
     new RequireMiningBases(3),
     new UpgradeContinuously(Protoss.AirDamage),
     new UpgradeContinuously(Protoss.AirArmor),

@@ -1,44 +1,25 @@
 package Micro.Actions.Combat.Spells
 
-import Lifecycle.With
-import Micro.Actions.Action
-import Micro.Heuristics.Spells.TargetSingle
 import ProxyBwapi.Races.Protoss
-import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import ProxyBwapi.Techs.Tech
+import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitInfo.UnitInfo
 
-object Feedback extends Action {
+object Feedback extends TargetedSpell {
   
-  override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.is(Protoss.DarkArchon)                   &&
-    unit.energy >= Protoss.Feedback.energyCost    &&
-    unit.matchups.enemies.nonEmpty
-  }
+  override protected def casterClass    : UnitClass = Protoss.DarkArchon
+  override protected def tech           : Tech      = Protoss.Feedback
+  override protected def aoe            : Boolean   = false
+  override protected def castRangeTiles : Int       = 10
+  override protected def thresholdValue : Double    = Protoss.DarkArchon.subjectiveValue / 3.0
   
-  override protected def perform(unit: FriendlyUnitInfo) {
-  
-    def valueTarget(target: UnitInfo): Double = {
-      val baseValue =
-        if ( ! target.isEnemy)
-          -1.0
-        else if (target.unitClass.isBuilding)
-          -1.0
-        else if (target.energy >= target.totalHealth)
-          2.0 * target.energy
-        else
-          1.0 * target.energy
-      
-      val multiplier = if (unit.energy > Protoss.MindControl.energyCost + Protoss.Feedback.energyCost) 3 else 1
-      baseValue
-    }
+  override protected def valueTarget(target: UnitInfo): Double = {
+    if (target.unitClass.isBuilding)  return 0.0
+    if ( ! target.isEnemy)            return 0.0
     
-    val target = TargetSingle.chooseTarget(
-      unit,
-      32.0 * 15.0,
-      200,
-      valueTarget)
-    
-    target.foreach(With.commander.useTechOnUnit(unit, Protoss.MindControl, _))
+    val fatalityBonus = if (target.energy >= target.totalHealth) 2.0 else 1.0
+    val damageValue   = Math.min(target.energy, target.totalHealth) / target.unitClass.maxTotalHealth * target.unitClass.subjectiveValue
+    val output        = fatalityBonus * damageValue
+    output
   }
-  
-  
 }

@@ -1,44 +1,25 @@
 package Micro.Actions.Combat.Spells
 
-import Lifecycle.With
-import Micro.Actions.Action
-import Micro.Heuristics.Spells.TargetSingle
-import ProxyBwapi.Races.Protoss
-import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
+import ProxyBwapi.Techs.Tech
+import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitInfo.UnitInfo
 
-object MindControl extends Action {
+object MindControl extends TargetedSpell {
   
-  override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.is(Protoss.DarkArchon)                   &&
-    unit.energy >= Protoss.MindControl.energyCost &&
-    With.self.hasTech(Protoss.MindControl)        &&
-    unit.matchups.enemies.nonEmpty
-  }
+  override protected def casterClass    : UnitClass = Protoss.DarkArchon
+  override protected def tech           : Tech      = Protoss.MindControl
+  override protected def aoe            : Boolean   = false
+  override protected def castRangeTiles : Int       = 8
+  override protected def thresholdValue : Double    = Terran.Wraith.subjectiveValue
   
-  override protected def perform(unit: FriendlyUnitInfo) {
-  
-    def valueTarget(target: UnitInfo): Double = {
-      val output =
-        if ( ! target.isEnemy)
-          -1.0
-        else if (target.unitClass.isBuilding)
-          -1.0
-        else if (target.unitClass.gasValue >= 200)
-          target.subjectiveValue
-        else
-          -1.0
-      
-      output
-    }
+  override protected def valueTarget(target: UnitInfo): Double = {
+    if (target.unitClass.isBuilding)  return 0.0
+    if (target.isFriendly)            return 0.0
+    if (target.stasised)              return 0.0
     
-    val target = TargetSingle.chooseTarget(
-      unit,
-      32.0 * 14.0,
-      0.0,
-      valueTarget)
+    if (target.isTransport && ! target.is(Zerg.Overlord)) return Protoss.Reaver.subjectiveValue / 2.0 + target.subjectiveValue
     
-    target.foreach(With.commander.useTechOnUnit(unit, Protoss.MindControl, _))
+    1.2 * target.subjectiveValue * target.totalHealth / target.unitClass.maxTotalHealth
   }
-  
-  
 }

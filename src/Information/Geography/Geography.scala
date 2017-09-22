@@ -30,6 +30,8 @@ class Geography {
   def ourBorder               : Iterable[Edge]          = ourBorderCache()
   def enemyZones              : Iterable[Zone]          = enemyZonesCache()
   def enemyBases              : Iterable[Base]          = enemyBasesCache()
+  def neutralBases            : Iterable[Base]          = With.geography.bases.filter(_.owner.isNeutral)
+  
   
   private val ourZonesCache           = new Cache(() => zones.filter(_.owner.isUs))
   private val ourBasesCache           = new Cache(() => bases.filter(_.owner.isUs))

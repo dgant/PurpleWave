@@ -12,7 +12,7 @@ object Stim extends Action {
     unit.transport.isEmpty  &&
     unit.canStim            &&
     ! unit.stimmed          && // TODO: stimFrames < With.latency.framesRemaining
-    (unit.matchups.targetsInRange.nonEmpty || unit.matchups.threatsInRange.nonEmpty)
+    (unit.matchups.targetsInRange.nonEmpty || unit.matchups.threatsViolentInRange.nonEmpty)
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {

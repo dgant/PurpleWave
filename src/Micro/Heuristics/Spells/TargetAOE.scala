@@ -28,7 +28,7 @@ object TargetAOE {
     
     if (valueByTile.nonEmpty) {
       val bestTile = valueByTile.maxBy(_._2)
-      if (bestTile._2 > minimumValue) {
+      if (bestTile._2 >= minimumValue) {
         val tile = bestTile._1
         val finalTargets = tile.adjacent9.flatMap(targetsByTile.get).flatten.toSet
         val finalPixels   = finalTargets.map(_.pixelCenter)

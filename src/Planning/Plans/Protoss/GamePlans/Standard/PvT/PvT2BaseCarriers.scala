@@ -4,7 +4,7 @@ import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
 import Planning.Plans.Army.{ConsiderAttacking, DefendZones, EscortSettlers}
-import Planning.Plans.Compound.{If, Parallel}
+import Planning.Plans.Compound.{And, If, Parallel}
 import Planning.Plans.GamePlans.Mode
 import Planning.Plans.Information.Reactive.EnemyBio
 import Planning.Plans.Information.{Employing, Never}
@@ -36,7 +36,9 @@ class PvT2BaseCarriers extends Mode {
       new UnitsAtLeast(1, Protoss.Carrier, complete = true),
       new Build(RequestUpgrade(Protoss.CarrierCapacity))),
     new If(
-      new UnitsAtLeast(8, Protoss.Zealot),
+      new And(
+        new UnitsAtLeast(8, Protoss.Zealot),
+        new UnitsAtLeast(4, Protoss.Carrier)),
       new Build(
         RequestAtLeast(1, Protoss.CitadelOfAdun),
         RequestUpgrade(Protoss.ZealotSpeed))),

@@ -1,51 +1,31 @@
 package Micro.Actions.Combat.Spells
 
-import Lifecycle.With
-import Micro.Actions.Action
-import Micro.Heuristics.Spells.TargetAOE
 import ProxyBwapi.Races.{Protoss, Zerg}
-import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import ProxyBwapi.Techs.Tech
+import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitInfo.UnitInfo
 
-object PsionicStorm extends Action {
+object PsionicStorm extends TargetedSpell {
   
-  override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.is(Protoss.HighTemplar)                    &&
-    unit.energy >= Protoss.PsionicStorm.energyCost  &&
-    With.self.hasTech(Protoss.PsionicStorm)         &&
-    unit.matchups.enemies.nonEmpty
-  }
+  override protected def casterClass    : UnitClass = Protoss.HighTemplar
+  override protected def tech           : Tech      = Protoss.PsionicStorm
+  override protected def aoe            : Boolean   = true
+  override protected def castRangeTiles : Int       = 9
+  override protected def thresholdValue : Double    = casterClass.subjectiveValue
   
-  override protected def perform(unit: FriendlyUnitInfo) {
-    
-    val target = TargetAOE.chooseTarget(
-      unit,
-      (if (unit.agent.dying) 8.0 else 16.0) * 32.0,
-       if (unit.agent.dying) 0.0 else unit.subjectiveValue,
-      valueTarget)
-    
-    target.foreach(With.commander.useTechOnPixel(unit, Protoss.PsionicStorm, _))
-  }
-  
-  private def valueTarget(target: UnitInfo): Double = {
+  override protected def valueTarget(target: UnitInfo): Double = {
     if (target.unitClass.isBuilding)  return 0.0
     if (target.underStorm)            return 0.0
     if (target.invincible)            return 0.0
-    if (target.is(Zerg.Larva))        return 0.0 //Shouldn't be necessary (0 value) but keep seeing this
+    if (target.is(Zerg.Larva))        return 0.0
     if (target.is(Zerg.Egg))          return 0.0
     if (target.is(Zerg.LurkerEgg))    return 0.0
     
     val output = (
       target.subjectiveValue *
-      Math.min(112.0, target.totalHealth) *
-      (
-        if (target.isFriendly)
-          -10.0
-        else if (target.isEnemy)
-          1.0
-        else
-          0.0
-      ) /
-      target.unitClass.maxTotalHealth
+      (Math.min(112.0, target.totalHealth) / target.unitClass.maxTotalHealth) *
+      (if (target.moving) 0.8 else 1.0) *
+      (if (target.isEnemy) 1.0 else -4.0)
     )
     
     output

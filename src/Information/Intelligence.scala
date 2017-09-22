@@ -24,13 +24,14 @@ class Intelligence {
   
   def leastScoutedBases: Iterable[Base] = leastScoutedBasesCache()
   private val leastScoutedBasesCache = new Cache(() => {
+    lazy val enemyBases = if (With.geography.enemyBases.isEmpty) Seq(mostBaselikeEnemyTile) else With.geography.enemyBases.map(_.heart)
     lazy val weHaveFliers = With.units.ours.exists(_.flying)
     With.geography.bases
       .toVector
       .filter(base => weHaveFliers || ! base.zone.island)
       .sortBy(_.heart.tileDistanceFast(With.geography.home))
       .sortBy( ! _.isStartLocation)
-      .sortBy(_.lastScoutedFrame)
+      .sortBy(base => enemyBases.map(_.tileDistanceFast(base.heart)).min / (1.0 + With.framesSince(base.lastScoutedFrame)))
   })
   
   def enemyHasShown(unitClass: UnitClass): Boolean = enemyHasShownUnit(unitClass)

@@ -1,32 +1,19 @@
 package Micro.Actions.Combat.Spells
 
-import Lifecycle.With
-import Micro.Actions.Action
-import Micro.Heuristics.Spells.TargetAOE
 import ProxyBwapi.Races.Protoss
-import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import ProxyBwapi.Techs.Tech
+import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitInfo.UnitInfo
 
-object Stasis extends Action {
+object Stasis extends TargetedSpell {
   
-  override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.is(Protoss.Arbiter)                  &&
-    unit.energy >= Protoss.Stasis.energyCost  &&
-    With.self.hasTech(Protoss.Stasis)         &&
-    unit.matchups.enemies.nonEmpty
-  }
+  override protected def casterClass    : UnitClass = Protoss.Arbiter
+  override protected def tech           : Tech      = Protoss.Stasis
+  override protected def aoe            : Boolean   = true
+  override protected def castRangeTiles : Int       = 9
+  override protected def thresholdValue : Double    = casterClass.subjectiveValue / 2.0
   
-  override protected def perform(unit: FriendlyUnitInfo) {
-    
-    val target = TargetAOE.chooseTarget(
-      unit,
-      (if (unit.agent.dying) 9.0 else 15.0) * 32.0,
-       if (unit.agent.dying) 0.0 else unit.subjectiveValue,
-      valueTarget)
-    
-    target.foreach(With.commander.useTechOnPixel(unit, Protoss.Stasis, _))
-  }
-  
-  private def valueTarget(target: UnitInfo): Double = {
+  override protected def valueTarget(target: UnitInfo): Double = {
     if (target.unitClass.isBuilding) return 0.0
     if (target.underStorm) return 0.0
     if (target.invincible) return 0.0

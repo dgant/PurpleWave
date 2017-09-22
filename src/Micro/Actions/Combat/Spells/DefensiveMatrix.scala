@@ -1,37 +1,32 @@
 package Micro.Actions.Combat.Spells
 
 import Lifecycle.With
-import Micro.Actions.Action
-import Micro.Heuristics.Spells.TargetSingle
 import ProxyBwapi.Races.Terran
+import ProxyBwapi.Techs.Tech
+import ProxyBwapi.UnitClass.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
-object DefensiveMatrix extends Action {
+object DefensiveMatrix extends TargetedSpell {
   
-  override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.is(Terran.ScienceVessel)                     &&
-    unit.energy >= Terran.DefensiveMatrix.energyCost  &&
-    ! With.self.hasTech(Terran.Irradiate)             &&
-    unit.matchups.allies.exists(_.matchups.vpfReceivingCurrently > 0)
+  override protected def casterClass    : UnitClass = Terran.ScienceVessel
+  override protected def tech           : Tech      = Terran.DefensiveMatrix
+  override protected def aoe            : Boolean   = false
+  override protected def castRangeTiles : Int       = 10
+  override protected def thresholdValue : Double    = Terran.Goliath.subjectiveValue
+  
+  override def additionalConditions(unit: FriendlyUnitInfo): Boolean = {
+    ! With.self.hasTech(Terran.Irradiate) &&
+    ! With.self.hasTech(Terran.EMP)
   }
   
-  override protected def perform(unit: FriendlyUnitInfo) {
+  override protected def valueTarget(target: UnitInfo): Double = {
+    if (target.unitClass.isBuilding)      return 0.0
+    if (target.isEnemy)                   return 0.0
+    if (target.defensiveMatrixPoints > 0) return 0.0
   
-    def valueTarget(target: UnitInfo): Double = {
-      if (target.isFriendly && ! target.unitClass.isBuilding && target.defensiveMatrixPoints <= 0)
-        24 * target.matchups.dpfReceivingCurrently + target.damageInLastSecond
-      else
-        -1.0
-    }
-    
-    val target = TargetSingle.chooseTarget(
-      unit,
-      32.0 * 10.0,
-      40.0,
-      valueTarget)
-    
-    target.foreach(With.commander.useTechOnUnit(unit, Terran.DefensiveMatrix, _))
+    val dangerFrames  = 128.0
+    val dangerBonus   = dangerFrames / Math.max(dangerFrames, target.matchups.framesToLiveCurrently)
+    val output        = dangerBonus * target.subjectiveValue
+    output
   }
-  
-  
 }

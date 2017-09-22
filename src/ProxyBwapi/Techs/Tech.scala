@@ -11,12 +11,12 @@ case class Tech(val baseType:TechType) {
   lazy val getRace          = baseType.getRace
   lazy val getWeapon        = baseType.getWeapon
   lazy val mineralPrice     = baseType.mineralPrice
-  lazy val researchFrames     = baseType.researchTime
+  lazy val researchFrames   = baseType.researchTime
   lazy val requiredUnit     = UnitClasses.get(baseType.requiredUnit)
   lazy val targetsPixel     = baseType.targetsPosition
   lazy val targetsUnits     = baseType.targetsUnit
   lazy val whatResearches   = UnitClasses.get(baseType.whatResearches)
   lazy val asString         = baseType.toString.replaceAll("_", " ")
   
-  override def toString:String = asString
+  override def toString: String = asString
 }

@@ -2,19 +2,23 @@ package Planning.Plans.Protoss.GamePlans.Standard.PvP
 
 import Macro.BuildRequests.{RequestAnother, RequestAtLeast, RequestTech, RequestUpgrade}
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
+import Planning.Plan
 import Planning.Plans.Army._
 import Planning.Plans.Compound._
+import Planning.Plans.GamePlans.TemplateMode
 import Planning.Plans.Information.Reactive.EnemyBasesAtLeast
 import Planning.Plans.Macro.Automatic._
-import Planning.Plans.Macro.BuildOrders.{Build, RequireEssentials}
+import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Milestones._
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Protoss.GamePlans.Standard.PvP.PvPIdeas.{ReactToDarkTemplarExisting, ReactToDarkTemplarPossible}
-import Planning.Plans.Scouting.ScoutExpansionsAt
 import ProxyBwapi.Races.Protoss
 
-class PvPLateGameStandard extends Parallel {
+class PvPLateGameStandard extends TemplateMode {
+  
+  override val aggression = 0.82
+  override val scoutExpansionsAt = 90
   
   class BuildTechPartOne extends Parallel(
     new Build(
@@ -35,17 +39,19 @@ class PvPLateGameStandard extends Parallel {
       RequestAtLeast(1, Protoss.RoboticsSupportBay),
       RequestUpgrade(Protoss.ShuttleSpeed)))
   
-  children.set(Vector(
-    new MeldArchons(40),
-    new RequireEssentials,
+  override val emergencyPlans: Vector[Plan] = Vector(
     new ReactToDarkTemplarPossible,
-    new ReactToDarkTemplarExisting,
-    new RequireSufficientSupply,
-    new TrainWorkersContinuously,
-    new BuildGasPumps,
+    new ReactToDarkTemplarExisting)
   
+  override val attackPlan = new Parallel(
+    new If(new EnemyBasesAtLeast(3), new DropAttack),
+    new Attack { attackers.get.unitMatcher.set(Protoss.DarkTemplar) },
+    new ConsiderAttacking
+  )
+  
+  override val buildPlans = Vector(
+    new BuildGasPumps,
     new TrainMatchingRatio(Protoss.Observer, 1, 3, Seq(MatchingRatio(Protoss.DarkTemplar, 2.0))),
-    
     new If(new UnitsAtLeast(2,  Protoss.Dragoon),         new Build(RequestUpgrade(Protoss.DragoonRange))),
     new If(new UnitsAtLeast(1,  Protoss.HighTemplar),     new Build(RequestTech(Protoss.PsionicStorm))),
     new If(new UnitsAtLeast(2,  Protoss.Reaver),          new Build(RequestUpgrade(Protoss.ScarabDamage))),
@@ -55,7 +61,6 @@ class PvPLateGameStandard extends Parallel {
     new If(new UnitsAtLeast(17, UnitMatchWarriors),       new OnMiningBases(2, new BuildTechPartOne)),
     new If(new UnitsAtLeast(45, UnitMatchWarriors),       new OnMiningBases(3, new BuildTechPartTwo)),
     new If(new EnemyUnitsAtLeast(1, Protoss.DarkTemplar), new Build(RequestUpgrade(Protoss.ObserverSpeed))),
-    
     new If(
       new And(
         new EnemyUnitsAtMost(0, Protoss.PhotonCannon),
@@ -64,7 +69,6 @@ class PvPLateGameStandard extends Parallel {
       new If(
         new EnemyUnitsAtMost(0, Protoss.Observer),
         new TrainContinuously(Protoss.DarkTemplar, 1))),
-  
     new If(
       new And(
         new UnitsAtMost(0, Protoss.Shuttle),
@@ -78,7 +82,6 @@ class PvPLateGameStandard extends Parallel {
         ),
         new TrainContinuously(Protoss.Reaver, 4),
         new TrainContinuously(Protoss.Observer, 3))),
-  
     new If(
       new And(
         new UpgradeComplete(Protoss.ZealotSpeed, 1, Protoss.ZealotSpeed.upgradeTime(1)),
@@ -114,12 +117,5 @@ class PvPLateGameStandard extends Parallel {
     new RequireMiningBases(4),
     new UpgradeContinuously(Protoss.GroundDamage),
     new OnMiningBases(4, new Build(RequestAtLeast(15, Protoss.Gateway))),
-    new UpgradeContinuously(Protoss.GroundArmor),
-    new Aggression(0.82),
-    new ScoutExpansionsAt(90),
-    new DefendZones,
-    new If(new EnemyBasesAtLeast(3), new DropAttack),
-    new Attack { attackers.get.unitMatcher.set(Protoss.DarkTemplar) },
-    new ConsiderAttacking
-  ))
+    new UpgradeContinuously(Protoss.GroundArmor))
 }

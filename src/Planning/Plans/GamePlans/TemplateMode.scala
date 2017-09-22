@@ -8,13 +8,14 @@ import Planning.Plans.Macro.BuildOrders.{BuildOrder, FollowBuildOrder, RequireEs
 import Planning.Plans.Macro.Expanding.RemoveMineralBlocksAt
 import Planning.Plans.Protoss.Situational.DefendAgainstProxy
 import Planning.Plans.Recruitment.RecruitFreelancers
-import Planning.Plans.Scouting.ScoutAt
+import Planning.Plans.Scouting.{ScoutAt, ScoutExpansionsAt}
 
 abstract class TemplateMode extends Mode {
   
   val meldArchonsAt         : Int     = 40
   val aggression            : Double  = 1.0
   val removeMineralBlocksAt : Int     = 60
+  val scoutExpansionsAt     : Int     = 100
   
   val buildOrder    : Seq[BuildRequest] = Vector.empty
   val supplyPlan    : Plan              = new RequireSufficientSupply
@@ -23,6 +24,8 @@ abstract class TemplateMode extends Mode {
   val attackPlan    : Plan              = new ConsiderAttacking
   
   val placementPlans: Vector[Plan] = Vector.empty
+  
+  val emergencyPlans: Vector[Plan] = Vector.empty
   
   val buildPlans: Vector[Plan] = Vector.empty
   
@@ -39,6 +42,7 @@ abstract class TemplateMode extends Mode {
     new DefendZones,
     new DefendAgainstProxy,
     new EscortSettlers,
+    new ScoutExpansionsAt(scoutExpansionsAt),
     attackPlan,
     new DefendEntrance,
     new Gather,
@@ -47,11 +51,11 @@ abstract class TemplateMode extends Mode {
   
   children.set(
     placementPlans
-    ++ Vector(
-      new RequireEssentials,
-      new BuildOrder(buildOrder: _*),
-      supplyPlan,
-      workerPlan)
+    ++ Vector(new RequireEssentials)
+    ++ emergencyPlans
+    ++ Vector(new BuildOrder(buildOrder: _*))
+    ++ Vector(supplyPlan)
+    ++ Vector(workerPlan)
     ++ buildPlans
     ++ macroPlans
     ++ tacticsPlans

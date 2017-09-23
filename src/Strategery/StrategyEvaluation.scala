@@ -32,7 +32,7 @@ case class StrategyEvaluation(strategy: Strategy) {
   val interestWithStarts    : Double                    = optimisticWinrate(gamesWithStarts,  samplesNeeded)
   val interestDeterministic : Double                    = weighAllFactors
   val interestStochastic    : Double                    = Random.nextDouble()
-  val interestTotal         : Double                    = With.configuration.strategyRandomness * interestStochastic + (1.0 - With.configuration.strategyRandomness * interestDeterministic)
+  val interestTotal         : Double                    = With.configuration.strategyRandomness * interestStochastic + (1.0 - With.configuration.strategyRandomness) * interestDeterministic
   
   private def weighAllFactors: Double = {
     weigh(Vector(

@@ -4,9 +4,9 @@ import Planning.Composition.Property
 import Planning.Plan
 
 class FlipIf(
-  initialPredicate  : Plan = NoPlan,
-  inititialFirst    : Plan = NoPlan,
-  initialSecond     : Plan = NoPlan)
+  initialPredicate  : Plan = NoPlan(),
+  inititialFirst    : Plan = NoPlan(),
+  initialSecond     : Plan = NoPlan())
     extends Plan {
   
   description.set("Flip if")

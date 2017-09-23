@@ -4,9 +4,9 @@ import Planning.Composition.Property
 import Planning.Plan
 
 class Trigger(
-  initialTrigger  : Plan = NoPlan,
-  initialAfter    : Plan = NoPlan,
-  initialBefore   : Plan = NoPlan)
+  initialTrigger  : Plan = NoPlan(),
+  initialAfter    : Plan = NoPlan(),
+  initialBefore   : Plan = NoPlan())
     extends Plan {
   
   description.set("When triggered")

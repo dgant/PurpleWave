@@ -16,7 +16,7 @@ class PvT13Nexus extends TemplateMode {
   override val activationCriteria = new Employing(PvTEarly14Nexus)
   override val completionCriteria = new UnitsAtLeast(4, Protoss.Dragoon)
   override val aggression         = 0.8
-  override val defaultAttackPlan  = NoPlan
+  override val defaultAttackPlan  = NoPlan()
   override val buildOrder         = ProtossBuilds.Opening13Nexus_Long
   
   override val buildPlans = Vector(

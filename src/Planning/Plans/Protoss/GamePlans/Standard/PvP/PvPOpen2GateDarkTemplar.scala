@@ -22,7 +22,7 @@ class PvPOpen2GateDarkTemplar extends TemplateMode {
   override val completionCriteria = new UnitsAtLeast(2, Protoss.Nexus)
   override val defaultScoutPlan   = new Trigger(new UnitsAtLeast(1, Protoss.CyberneticsCore), initialAfter = new Scout)
   override val defaultAttackPlan  = new Trigger(new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true), initialAfter = new Attack)
-  override val defaultWorkerPlan  = NoPlan
+  override val defaultWorkerPlan  = NoPlan()
   override val blueprints = Vector(
     new Blueprint(this, building = Some(Protoss.Pylon),   placement = Some(PlacementProfiles.backPylon)),
     new Blueprint(this, building = Some(Protoss.Gateway), placement = Some(PlacementProfiles.backPylon)))

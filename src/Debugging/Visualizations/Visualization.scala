@@ -27,7 +27,9 @@ class Visualization {
     ShowBattleSummary,
     ShowUnitsAll,
     ShowUnitsFriendly,
-    ShowUnitsForeign
+    ShowUnitsForeign,
+    // Testing
+    ShowPlans
   )
   
   var enabled   = true

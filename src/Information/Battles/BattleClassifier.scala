@@ -2,7 +2,6 @@ package Information.Battles
 
 import Information.Battles.Clustering.BattleClustering
 import Information.Battles.Types.{Battle, Team}
-import Information.Geography.Types.Zone
 import Lifecycle.With
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, UnitInfo}
 
@@ -38,10 +37,6 @@ class BattleClassifier {
   
   private def isEligibleLocal(unit: UnitInfo): Boolean = {
     isEligible(unit) && unit.likelyStillThere
-  }
-  
-  private def isEligibleZone(unit: UnitInfo): Boolean = {
-    isEligible(unit) && unit.possiblyStillThere
   }
   
   private def isEligibleGlobal(unit: UnitInfo): Boolean = {

@@ -4,9 +4,9 @@ import Planning.Composition.Property
 import Planning.Plan
 
 class If(
-  initialPredicate : Plan = NoPlan,
-  initialWhenTrue  : Plan = NoPlan,
-  initialWhenFalse : Plan = NoPlan)
+  initialPredicate : Plan = NoPlan(),
+  initialWhenTrue  : Plan = NoPlan(),
+  initialWhenFalse : Plan = NoPlan())
     extends Plan {
   
   description.set("If")
@@ -25,4 +25,6 @@ class If(
     else
       delegate(whenFalse.get)
   }
+  
+  override def toString: String = super.toString + " " + predicate.toString
 }

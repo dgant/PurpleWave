@@ -7,10 +7,10 @@ import Planning.Plans.Compound.NoPlan
 import bwapi.Race
 
 class SwitchEnemyRace(
-  whenTerran  : Plan = NoPlan,
-  whenProtoss : Plan = NoPlan,
-  whenZerg    : Plan = NoPlan,
-  whenRandom  : Plan = NoPlan)
+  whenTerran  : Plan = NoPlan(),
+  whenProtoss : Plan = NoPlan(),
+  whenZerg    : Plan = NoPlan(),
+  whenRandom  : Plan = NoPlan())
     extends Plan {
   
   val terran  = new Property[Plan](whenTerran)

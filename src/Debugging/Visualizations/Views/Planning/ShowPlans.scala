@@ -44,6 +44,6 @@ object ShowPlans extends View {
   }
   
   private def isRelevant(plan: Plan): Boolean = {
-    With.prioritizer.isPrioritized(plan) && ! plan.isComplete && plan != NoPlan
+    With.prioritizer.isPrioritized(plan) && ! plan.isComplete && plan != NoPlan()
   }
 }

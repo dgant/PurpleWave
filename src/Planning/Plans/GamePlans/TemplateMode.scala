@@ -15,29 +15,29 @@ import Planning.Plans.Scouting.{ScoutAt, ScoutExpansionsAt}
 
 abstract class TemplateMode extends Mode {
   
-  val meldArchonsAt         : Int               = 40
-  val aggression            : Double            = 1.0
-  val removeMineralBlocksAt : Int               = 60
-  val scoutExpansionsAt     : Int               = 100
-  val superSaturate         : Boolean           = false
-  val blueprints            : Seq[Blueprint]    = Seq.empty
-  val buildOrder            : Seq[BuildRequest] = Vector.empty
-  val emergencyPlans        : Seq[Plan]         = Vector.empty
-  val buildPlans            : Seq[Plan]         = Vector.empty
-  val defaultPlacementPlan  : Plan              = new ProposePlacement(blueprints: _*)
-  val defaultSupplyPlan     : Plan              = new RequireSufficientSupply
-  val defaultWorkerPlan     : Plan              = new TrainWorkersContinuously(superSaturate)
-  val defaultScoutPlan      : Plan              = new ScoutAt(14)
-  val priorityAttackPlan    : Plan              = NoPlan
-  val defaultAttackPlan     : Plan              = new ConsiderAttacking
+  def meldArchonsAt         : Int               = 40
+  def aggression            : Double            = 1.0
+  def removeMineralBlocksAt : Int               = 60
+  def scoutExpansionsAt     : Int               = 100
+  def superSaturate         : Boolean           = false
+  def blueprints            : Seq[Blueprint]    = Seq.empty
+  def buildOrder            : Seq[BuildRequest] = Vector.empty
+  def emergencyPlans        : Seq[Plan]         = Vector.empty
+  def buildPlans            : Seq[Plan]         = Vector.empty
+  def defaultPlacementPlan  : Plan              = new ProposePlacement(blueprints: _*)
+  def defaultSupplyPlan     : Plan              = new RequireSufficientSupply
+  def defaultWorkerPlan     : Plan              = new TrainWorkersContinuously(superSaturate)
+  def defaultScoutPlan      : Plan              = new ScoutAt(14)
+  def priorityAttackPlan    : Plan              = NoPlan()
+  def defaultAttackPlan     : Plan              = new ConsiderAttacking
   
-  val defaultMacroPlans: Vector[Plan] = Vector(
+  def defaultMacroPlans: Vector[Plan] = Vector(
     new MeldArchons(meldArchonsAt),
     new ClearBurrowedBlockers,
     new FollowBuildOrder,
     new RemoveMineralBlocksAt(removeMineralBlocksAt))
   
-  val defaultTacticsPlans: Vector[Plan] = Vector(
+  def defaultTacticsPlans: Vector[Plan] = Vector(
     new Aggression(aggression),
     priorityAttackPlan,
     defaultScoutPlan,

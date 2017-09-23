@@ -7,7 +7,7 @@ import Strategery.Strategies.Strategy
 class Employ(
   strategy        : Strategy,
   implementation  : Plan,
-  alternative     : Plan = NoPlan) extends If(
+  alternative     : Plan = NoPlan()) extends If(
     new Employing(strategy),
     implementation,
     alternative)

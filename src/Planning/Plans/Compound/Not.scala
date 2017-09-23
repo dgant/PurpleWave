@@ -3,7 +3,7 @@ package Planning.Plans.Compound
 import Planning.Composition.Property
 import Planning.Plan
 
-class Not(initialChild: Plan = NoPlan) extends Plan {
+class Not(initialChild: Plan = NoPlan()) extends Plan {
   
   description.set("Not")
   

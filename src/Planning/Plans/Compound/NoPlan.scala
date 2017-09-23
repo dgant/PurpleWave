@@ -2,6 +2,6 @@ package Planning.Plans.Compound
 
 import Planning.Plan
 
-object NoPlan extends Plan {
-  description.set("[Empty]")
+object NoPlan {
+  def apply(): Plan = new Plan { description.set("[Empty]") }
 }

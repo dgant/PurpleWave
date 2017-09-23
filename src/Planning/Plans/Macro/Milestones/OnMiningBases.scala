@@ -5,8 +5,8 @@ import Planning.Plans.Compound.{If, NoPlan}
 
 class OnMiningBases(
   requiredBases : Int,
-  argWhenTrue   : Plan = NoPlan,
-  argWhenFalse  : Plan = NoPlan)
+  argWhenTrue   : Plan = NoPlan(),
+  argWhenFalse  : Plan = NoPlan())
   extends If(
     new MiningBasesAtLeast(requiredBases),
     argWhenTrue,

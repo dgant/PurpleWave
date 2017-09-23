@@ -35,7 +35,7 @@ object ShowReactionTime extends View {
   
   override def renderScreen() {
     DrawScreen.table(
-      0, 7 * With.visualization.lineHeightSmall,
+      5, 5 * With.visualization.lineHeightSmall,
       Vector(
         Vector("", "Agency", "Clustering"),
         Vector("Samples:",    With.agents.runtimes.size.toString,   With.battles.clustering.runtimes.size.toString),

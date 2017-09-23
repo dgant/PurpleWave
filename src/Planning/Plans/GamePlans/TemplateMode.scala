@@ -51,15 +51,23 @@ abstract class TemplateMode extends Mode {
     new RecruitFreelancers
   )
   
-  children.set(
-    Vector(defaultPlacementPlan)
-    ++ Vector(new RequireEssentials)
-    ++ emergencyPlans
-    ++ Vector(new BuildOrder(buildOrder: _*))
-    ++ Vector(defaultSupplyPlan)
-    ++ Vector(defaultWorkerPlan)
-    ++ buildPlans
-    ++ defaultMacroPlans
-    ++ defaultTacticsPlans
-  )
+  private var initialized = false
+  override def onUpdate() {
+    if ( ! initialized) {
+      initialized = true
+      children.set(
+        Vector(defaultPlacementPlan)
+          ++ Vector(new RequireEssentials)
+          ++ emergencyPlans
+          ++ Vector(new BuildOrder(buildOrder: _*))
+          ++ Vector(defaultSupplyPlan)
+          ++ Vector(defaultWorkerPlan)
+          ++ buildPlans
+          ++ defaultMacroPlans
+          ++ defaultTacticsPlans
+      )
+    }
+    super.onUpdate()
+  }
+  
 }

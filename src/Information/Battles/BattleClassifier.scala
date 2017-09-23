@@ -58,19 +58,6 @@ class BattleClassifier {
       new Team(asVectorEnemy  (With.units.enemy .filter(isEligibleGlobal))))
   }
   
-  private def replaceBattlesByZone() {
-    val combatantsOursByZone  = With.units.ours   .filter(isEligibleZone).groupBy(_.tileIncludingCenter.zone)
-    val combatantsEnemyByZone = With.units.enemy  .filter(isEligibleZone).groupBy(_.tileIncludingCenter.zone)
-    byZone = With.geography.zones
-      .map(zone => (
-        zone,
-        new Battle(
-          new Team(asVectorUs     (combatantsOursByZone .getOrElse(zone, Vector.empty))),
-          new Team(asVectorEnemy  (combatantsEnemyByZone.getOrElse(zone, Vector.empty)))
-        )))
-      .toMap
-  }
-  
   private def replaceBattlesLocal() {
     local = clustering.clusters
       .map(cluster =>

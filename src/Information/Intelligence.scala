@@ -6,6 +6,7 @@ import Mathematics.Points.Tile
 import Performance.Cache
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitClass.UnitClass
+import Utilities.ByOption
 import bwapi.UnitCommandType
 
 import scala.collection.mutable
@@ -24,14 +25,14 @@ class Intelligence {
   
   def leastScoutedBases: Iterable[Base] = leastScoutedBasesCache()
   private val leastScoutedBasesCache = new Cache(() => {
-    lazy val enemyBases = if (With.geography.enemyBases.isEmpty) Seq(mostBaselikeEnemyTile) else With.geography.enemyBases.map(_.heart)
+    lazy val enemyBaseHearts = With.geography.enemyBases.map(_.heart)
     lazy val weHaveFliers = With.units.ours.exists(_.flying)
     With.geography.bases
       .toVector
       .filter(base => weHaveFliers || ! base.zone.island)
       .sortBy(_.heart.tileDistanceFast(With.geography.home))
       .sortBy( ! _.isStartLocation)
-      .sortBy(base => enemyBases.map(_.tileDistanceFast(base.heart)).min / (1.0 + With.framesSince(base.lastScoutedFrame)))
+      .sortBy(base => ByOption.min(enemyBaseHearts.map(_.tileDistanceFast(base.heart))).getOrElse(1.0) / (1.0 + With.framesSince(base.lastScoutedFrame)))
   })
   
   def enemyHasShown(unitClass: UnitClass): Boolean = enemyHasShownUnit(unitClass)

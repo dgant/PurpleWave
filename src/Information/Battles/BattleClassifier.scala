@@ -9,12 +9,11 @@ import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, UnitInfo}
 class BattleClassifier {
     
   var global      : Battle                = _
-  var byZone      : Map[Zone, Battle]     = Map.empty
   var byUnit      : Map[UnitInfo, Battle] = Map.empty
   var local       : Vector[Battle]        = Vector.empty
   var lastUpdate  : Int                   = 0
   
-  def all: Traversable[Battle] = local ++ byZone.values :+ global
+  def all: Traversable[Battle] = local :+ global
   
   val clustering = new BattleClustering
   
@@ -22,7 +21,6 @@ class BattleClassifier {
     clustering.enqueue(With.units.all.filter(isEligibleLocal))
     clustering.run()
     replaceBattleGlobal()
-    replaceBattlesByZone()
     replaceBattlesLocal()
     BattleUpdater.run()
     

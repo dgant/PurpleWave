@@ -47,10 +47,9 @@ class Configuration {
   var maxFramesToSendAdvanceBuilder   = 24 * 40
   var maxFramesToTrustBuildRequest    = 24 * 60 * 10
   var baseRadiusPixels                = 32.0 * 15.0
-  var baseMergingRangePixels          = 32.0 * 12.0
+  var baseMergingRadiusPixels         = 32.0 * 12.0
   var blockerMineralThreshold         = 250 // Setting this goofily high as an AIIDE hack to account for the 249-mineral patches on Fortress
   var maxPlacementAge                 = 24 * 3
-  var maxScarabCount                  = 3
   var enableTightBuildingPlacement    = false
   
   /////////////
@@ -58,7 +57,6 @@ class Configuration {
   /////////////
   
   var abstractBattleDistancePixels  = 32.0 * 6.0
-  var battleWorkerCostPerFrame      = 0.25
   var battleMarginTiles             = 20
   var battleMarginPixels            = battleMarginTiles * 32.0
   var battleEstimationFrames        = 24 * 10

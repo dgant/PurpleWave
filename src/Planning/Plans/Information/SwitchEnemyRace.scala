@@ -3,13 +3,14 @@ package Planning.Plans.Information
 import Lifecycle.With
 import Planning.Composition.Property
 import Planning.Plan
+import Planning.Plans.Compound.NoPlan
 import bwapi.Race
 
 class SwitchEnemyRace(
-  whenTerran  : Plan = new Plan,
-  whenProtoss : Plan = new Plan,
-  whenZerg    : Plan = new Plan,
-  whenRandom  : Plan = new Plan)
+  whenTerran  : Plan = NoPlan,
+  whenProtoss : Plan = NoPlan,
+  whenZerg    : Plan = NoPlan,
+  whenRandom  : Plan = NoPlan)
     extends Plan {
   
   val terran  = new Property[Plan](whenTerran)

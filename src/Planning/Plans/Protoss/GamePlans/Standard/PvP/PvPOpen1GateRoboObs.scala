@@ -61,5 +61,5 @@ class PvPOpen1GateRoboObs extends TemplateMode {
     new RequireMiningBases(2),
     new Build(RequestAtLeast(4, Protoss.Gateway)))
   
-  override val scoutPlan: Plan = new Trigger(new UnitsAtLeast(1, Protoss.CyberneticsCore), new Scout)
+  override val defaultScoutPlan: Plan = new Trigger(new UnitsAtLeast(1, Protoss.CyberneticsCore), new Scout)
 }

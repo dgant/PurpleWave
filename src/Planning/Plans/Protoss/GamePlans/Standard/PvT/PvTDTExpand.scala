@@ -1,43 +1,35 @@
 package Planning.Plans.Protoss.GamePlans.Standard.PvT
 
 import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
-import Planning.Plan
-import Planning.Plans.Army.{Attack, DefendZones}
+import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, Trigger}
-import Planning.Plans.GamePlans.Mode
+import Planning.Plans.GamePlans.TemplateMode
 import Planning.Plans.Information.Employing
-import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
-import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
+import Planning.Plans.Macro.Automatic.{TrainContinuously, TrainWorkersContinuously}
+import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Milestones.{UnitsAtLeast, UnitsAtMost}
 import Planning.Plans.Protoss.ProtossBuilds
-import Planning.Plans.Scouting.ScoutAt
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvT.PvTEarlyDTExpand
 
-class PvTDTExpand extends Mode {
+class PvTDTExpand extends TemplateMode {
   
-  description.set("PvT DT Expand")
+  override val activationCriteria     = new Employing(PvTEarlyDTExpand)
+  override val completionCriteria     = new UnitsAtLeast(2, Protoss.Nexus, complete = true)
+  override val buildOrder             = ProtossBuilds.OpeningDTExpand
+  override val defaultWorkerPlan      = new TrainWorkersContinuously(oversaturate = true)
+  override val priorityAttackPlan = new PvTIdeas.AttackWithDarkTemplar
+  override val defaultAttackPlan      = new Trigger(
+    new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
+    initialAfter = new Attack)
   
-  override val activationCriteria: Plan = new Employing(PvTEarlyDTExpand)
-  override val completionCriteria: Plan = new UnitsAtLeast(2, Protoss.Nexus, complete = true)
-  
-  children.set(Vector(
-    new BuildOrder(ProtossBuilds.OpeningDTExpand: _*),
-    new RequireSufficientSupply,
-    new TrainWorkersContinuously(oversaturate = true),
+  override val buildPlans = Vector(
     new If(
       new UnitsAtMost(2, Protoss.DarkTemplar),
       new TrainContinuously(Protoss.DarkTemplar, 3),
       new TrainContinuously(Protoss.Dragoon)),
     new Build(
       RequestUpgrade(Protoss.DragoonRange),
-      RequestAtLeast(4, Protoss.Gateway)),
-    new ScoutAt(14),
-    new PvTIdeas.AttackWithDarkTemplar,
-    new DefendZones,
-    new Trigger(
-      new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
-      initialAfter = new Attack)
-  ))
+      RequestAtLeast(4, Protoss.Gateway)))
 }
 

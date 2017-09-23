@@ -3,6 +3,7 @@ package Planning.Plans.GamePlans
 import Macro.BuildRequests.BuildRequest
 import Planning.Plan
 import Planning.Plans.Army._
+import Planning.Plans.Compound.NoPlan
 import Planning.Plans.Macro.Automatic.{Gather, MeldArchons, RequireSufficientSupply, TrainWorkersContinuously}
 import Planning.Plans.Macro.BuildOrders.{BuildOrder, FollowBuildOrder, RequireEssentials}
 import Planning.Plans.Macro.Expanding.RemoveMineralBlocksAt
@@ -16,34 +17,34 @@ abstract class TemplateMode extends Mode {
   val aggression            : Double  = 1.0
   val removeMineralBlocksAt : Int     = 60
   val scoutExpansionsAt     : Int     = 100
+  val superSaturate         : Boolean = false
   
-  val buildOrder    : Seq[BuildRequest] = Vector.empty
-  val supplyPlan    : Plan              = new RequireSufficientSupply
-  val workerPlan    : Plan              = new TrainWorkersContinuously
-  val scoutPlan     : Plan              = new ScoutAt(14)
-  val attackPlan    : Plan              = new ConsiderAttacking
+  val placementPlans  : Seq[Plan]         = Vector.empty
+  val emergencyPlans  : Seq[Plan]         = Vector.empty
+  val buildPlans      : Seq[Plan]         = Vector.empty
+  val buildOrder      : Seq[BuildRequest] = Vector.empty
   
-  val placementPlans: Vector[Plan] = Vector.empty
+  val defaultSupplyPlan       : Plan = new RequireSufficientSupply
+  val defaultWorkerPlan       : Plan = new TrainWorkersContinuously(superSaturate)
+  val defaultScoutPlan        : Plan = new ScoutAt(14)
+  val defaultAttackPlan       : Plan = new ConsiderAttacking
+  val priorityAttackPlan  : Plan = NoPlan
   
-  val emergencyPlans: Vector[Plan] = Vector.empty
-  
-  val buildPlans: Vector[Plan] = Vector.empty
-  
-  val macroPlans: Vector[Plan] = Vector(
+  val defaultMacroPlans: Vector[Plan] = Vector(
     new MeldArchons(meldArchonsAt),
     new ClearBurrowedBlockers,
     new FollowBuildOrder,
-    new RemoveMineralBlocksAt(removeMineralBlocksAt)
-  )
+    new RemoveMineralBlocksAt(removeMineralBlocksAt))
   
-  val tacticsPlans: Vector[Plan] = Vector(
+  val defaultTacticsPlans: Vector[Plan] = Vector(
     new Aggression(aggression),
-    scoutPlan,
+    priorityAttackPlan,
+    defaultScoutPlan,
     new DefendZones,
     new DefendAgainstProxy,
     new EscortSettlers,
     new ScoutExpansionsAt(scoutExpansionsAt),
-    attackPlan,
+    defaultAttackPlan,
     new DefendEntrance,
     new Gather,
     new RecruitFreelancers
@@ -54,10 +55,10 @@ abstract class TemplateMode extends Mode {
     ++ Vector(new RequireEssentials)
     ++ emergencyPlans
     ++ Vector(new BuildOrder(buildOrder: _*))
-    ++ Vector(supplyPlan)
-    ++ Vector(workerPlan)
+    ++ Vector(defaultSupplyPlan)
+    ++ Vector(defaultWorkerPlan)
     ++ buildPlans
-    ++ macroPlans
-    ++ tacticsPlans
+    ++ defaultMacroPlans
+    ++ defaultTacticsPlans
   )
 }

@@ -10,8 +10,8 @@ class ProtossVsTerran extends ModalGamePlan(
   new PvTDTExpand,
   new PvT2BaseArbiters,
   new PvT2BaseCarriers,
-  new PvT2BaseGateway,
-  new PvT3BaseCorsair,
+  new PvT2BaseGateways,
+  new PvT3BaseCorsairs,
   new PvT3BaseArbiters,
   new PvT3BaseCarriers
 )

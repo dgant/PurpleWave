@@ -2,30 +2,25 @@ package Planning.Plans.Protoss.GamePlans.Standard.PvT
 
 import Macro.BuildRequests.{RequestAtLeast, RequestTech}
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
-import Planning.Plan
-import Planning.Plans.Army.{DefendZones, EscortSettlers}
 import Planning.Plans.Compound.{FlipIf, If, Parallel}
-import Planning.Plans.GamePlans.Mode
+import Planning.Plans.GamePlans.TemplateMode
 import Planning.Plans.Information.Employing
-import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainWorkersContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildCannonsAtExpansions, BuildCannonsAtNatural, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.{MiningBasesAtLeast, OnMiningBases, UnitsAtLeast}
-import Planning.Plans.Scouting.ScoutExpansionsAt
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvT.PvT2BaseGateway
 
-class PvT2BaseGateway extends Mode {
+class PvT2BaseGateways extends TemplateMode {
   
-  description.set("PvT 2 Base Gateway")
+  override val activationCriteria = new Employing(PvT2BaseGateway)
+  override val completionCriteria = new MiningBasesAtLeast(3)
+  override val scoutExpansionsAt  = 60
+  override val emergencyPlans     = Vector(new PvTIdeas.Require2BaseTech)
+  override val priorityAttackPlan = new PvTIdeas.AttackWithDarkTemplar
+  override val defaultAttackPlan  = new PvTIdeas.ContainSafely
   
-  override val activationCriteria: Plan = new Employing(PvT2BaseGateway)
-  override val completionCriteria: Plan = new MiningBasesAtLeast(3)
-  
-  children.set(Vector(
-    new PvTIdeas.Require2BaseTech,
-    new RequireSufficientSupply,
-    new TrainWorkersContinuously(oversaturate = true),
+  override val buildPlans = Vector(
     new OnMiningBases(3, new BuildCannonsAtNatural(1)),
     new BuildCannonsAtExpansions(2),
     new If(new UnitsAtLeast(24, UnitMatchWarriors), new RequireMiningBases(3)),
@@ -42,12 +37,6 @@ class PvT2BaseGateway extends Mode {
     new RequireMiningBases(3),
     new Build(
       RequestTech(Protoss.PsionicStorm),
-      RequestAtLeast(10, Protoss.Gateway)),
-    new DefendZones,
-    new EscortSettlers,
-    new ScoutExpansionsAt(80),
-    new PvTIdeas.AttackWithDarkTemplar,
-    new PvTIdeas.ContainSafely
-  ))
+      RequestAtLeast(10, Protoss.Gateway)))
 }
 

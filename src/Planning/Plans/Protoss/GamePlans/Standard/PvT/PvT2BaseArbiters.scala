@@ -2,33 +2,25 @@ package Planning.Plans.Protoss.GamePlans.Standard.PvT
 
 import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
-import Planning.Plan
-import Planning.Plans.Army.{DefendZones, EscortSettlers}
 import Planning.Plans.Compound.{FlipIf, If, Parallel}
-import Planning.Plans.GamePlans.Mode
-import Planning.Plans.Information.{Employing, Never}
-import Planning.Plans.Macro.Automatic.{MeldArchons, RequireSufficientSupply, TrainWorkersContinuously}
+import Planning.Plans.GamePlans.TemplateMode
+import Planning.Plans.Information.Employing
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildCannonsAtExpansions, BuildCannonsAtNatural, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.{OnGasBases, OnMiningBases, UnitsAtLeast}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
-import Planning.Plans.Protoss.GamePlans.Standard.PvT.PvTIdeas.Require2BaseTech
-import Planning.Plans.Scouting.ScoutExpansionsAt
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvT.PvT2BaseArbiter
 
-class PvT2BaseArbiters extends Mode {
+class PvT2BaseArbiters extends TemplateMode {
   
-  description.set("PvT 2 Base Arbiter")
+  override val activationCriteria = new Employing(PvT2BaseArbiter)
+  override val scoutExpansionsAt  = 60
+  override val emergencyPlans     = Vector(new PvTIdeas.Require2BaseTech)
+  override val priorityAttackPlan = new PvTIdeas.AttackWithDarkTemplar
+  override val defaultAttackPlan  = new PvTIdeas.ContainSafely
   
-  override val activationCriteria: Plan = new Employing(PvT2BaseArbiter)
-  override val completionCriteria: Plan = new Never
-  
-  children.set(Vector(
-    new MeldArchons(40),
-    new Require2BaseTech,
-    new RequireSufficientSupply,
-    new TrainWorkersContinuously,
+  override val buildPlans = Vector(
     new OnMiningBases(3, new BuildCannonsAtNatural(1)),
     new BuildCannonsAtExpansions(2),
     new If(new UnitsAtLeast(30, UnitMatchWarriors), new RequireMiningBases(3)),
@@ -60,12 +52,6 @@ class PvT2BaseArbiters extends Mode {
           RequestAtLeast(2, Protoss.Stargate))))),
     new RequireMiningBases(4),
     new UpgradeContinuously(Protoss.GroundArmor),
-    new Build(RequestAtLeast(20, Protoss.Gateway)),
-    new DefendZones,
-    new EscortSettlers,
-    new ScoutExpansionsAt(80),
-    new PvTIdeas.AttackWithDarkTemplar,
-    new PvTIdeas.ContainSafely
-  ))
+    new Build(RequestAtLeast(20, Protoss.Gateway)))
 }
 

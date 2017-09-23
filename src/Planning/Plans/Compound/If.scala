@@ -4,9 +4,9 @@ import Planning.Composition.Property
 import Planning.Plan
 
 class If(
-  initialPredicate : Plan = new Plan,
-  initialWhenTrue  : Plan = new Plan,
-  initialWhenFalse : Plan = new Plan)
+  initialPredicate : Plan = NoPlan,
+  initialWhenTrue  : Plan = NoPlan,
+  initialWhenFalse : Plan = NoPlan)
     extends Plan {
   
   description.set("If")

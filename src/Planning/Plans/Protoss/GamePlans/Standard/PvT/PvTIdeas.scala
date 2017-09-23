@@ -42,7 +42,7 @@ object PvTIdeas {
   
   class ContainSafely extends If(
     new And(
-      new UnitsAtLeast(10, UnitMatchWarriors, complete = true),
+      new UnitsAtLeast(6, UnitMatchWarriors, complete = true),
       new Or(
         new UnitsAtLeast(2, Protoss.Observer, complete = true),
         new Not(new EnemyHasShown(Terran.SpiderMine)))),

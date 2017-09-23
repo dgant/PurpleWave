@@ -71,9 +71,9 @@ class PvPOpen2GateRobo extends TemplateMode {
       RequestAtLeast(2, Protoss.Nexus),
       RequestAtLeast(1, Protoss.Observer)))
   
-  override val scoutPlan: Plan = new If(new UnitsAtLeast(1, Protoss.CyberneticsCore), new Scout)
+  override val defaultScoutPlan: Plan = new If(new UnitsAtLeast(1, Protoss.CyberneticsCore), new Scout)
   
-  override val attackPlan: Plan = new Trigger(
+  override val defaultAttackPlan: Plan = new Trigger(
     new UnitsAtLeast(2, Protoss.Reaver, complete = true),
     initialAfter = new ConsiderAttacking)
 }

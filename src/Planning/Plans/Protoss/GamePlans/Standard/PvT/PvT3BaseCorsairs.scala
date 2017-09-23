@@ -3,25 +3,23 @@ package Planning.Plans.Protoss.GamePlans.Standard.PvT
 import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
-import Planning.Plan
-import Planning.Plans.Army.{DefendZones, EscortSettlers}
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.Mode
+import Planning.Plans.GamePlans.TemplateMode
 import Planning.Plans.Information.Employing
-import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
+import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildCannonsAtExpansions, BuildCannonsAtNatural, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.{MiningBasesAtLeast, OnMiningBases, UnitsAtLeast, UpgradeComplete}
-import Planning.Plans.Scouting.ScoutExpansionsAt
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvT.PvT3BaseCorsair
 
-class PvT3BaseCorsair extends Mode {
+class PvT3BaseCorsairs extends TemplateMode {
   
-  description.set("PvT 3 Base Corsair")
-  
-  override val activationCriteria: Plan = new Employing(PvT3BaseCorsair)
-  override val completionCriteria: Plan = new MiningBasesAtLeast(4)
+  override val activationCriteria = new Employing(PvT3BaseCorsair)
+  override val completionCriteria = new MiningBasesAtLeast(4)
+  override val scoutExpansionsAt  = 60
+  override val emergencyPlans     = Vector(new PvTIdeas.Require2BaseTech)
+  override val defaultAttackPlan  = new PvTIdeas.ContainSafely
   
   class TrainArmy extends Parallel(
     new PvTIdeas.TrainObservers,
@@ -53,25 +51,17 @@ class PvT3BaseCorsair extends Mode {
     new If(new UnitsAtLeast(2, Protoss.Corsair), new Build(RequestTech(Protoss.DisruptionWeb))),
     new Build(RequestAtLeast(12, Protoss.Gateway)))
   
-  children.set(Vector(
+  override val buildPlans = Vector(
     new PvTIdeas.Require2BaseTech,
-    new RequireSufficientSupply,
-    new TrainWorkersContinuously(oversaturate = true),
-    new OnMiningBases(3, new BuildCannonsAtNatural(1)),
     new OnMiningBases(3, new BuildCannonsAtNatural(1)),
     new BuildCannonsAtExpansions(2),
     new If(new UnitsAtLeast(35, UnitMatchWarriors), new RequireMiningBases(4)),
     new FlipIf(
       new UnitsAtLeast(12, UnitMatchWarriors),
-      new TrainArmy,
+      new PvTIdeas.TrainArmy,
       new Parallel(
         new Build2BaseTech,
         new RequireMiningBases(3),
-        new Build3BaseTech)),
-    new DefendZones,
-    new EscortSettlers,
-    new ScoutExpansionsAt(80),
-    new PvTIdeas.ContainSafely
-  ))
+        new Build3BaseTech)))
 }
 

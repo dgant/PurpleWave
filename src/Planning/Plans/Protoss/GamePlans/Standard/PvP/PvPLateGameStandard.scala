@@ -43,7 +43,7 @@ class PvPLateGameStandard extends TemplateMode {
     new ReactToDarkTemplarPossible,
     new ReactToDarkTemplarExisting)
   
-  override val attackPlan = new Parallel(
+  override val defaultAttackPlan = new Parallel(
     new If(new EnemyBasesAtLeast(3), new DropAttack),
     new Attack { attackers.get.unitMatcher.set(Protoss.DarkTemplar) },
     new ConsiderAttacking

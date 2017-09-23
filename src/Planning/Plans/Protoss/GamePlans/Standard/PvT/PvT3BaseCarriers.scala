@@ -2,34 +2,27 @@ package Planning.Plans.Protoss.GamePlans.Standard.PvT
 
 import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
-import Planning.Plan
-import Planning.Plans.Army.{DefendZones, EscortSettlers}
 import Planning.Plans.Compound.{FlipIf, If, Or, Parallel}
-import Planning.Plans.GamePlans.Mode
-import Planning.Plans.Information.{Employing, Never}
-import Planning.Plans.Macro.Automatic.{MeldArchons, RequireSufficientSupply, TrainWorkersContinuously}
+import Planning.Plans.GamePlans.TemplateMode
+import Planning.Plans.Information.Employing
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildCannonsAtExpansions, BuildCannonsAtNatural, BuildGasPumps, RequireMiningBases}
-import Planning.Plans.Macro.Milestones.{OnMiningBases, UnitsAtLeast}
+import Planning.Plans.Macro.Milestones.UnitsAtLeast
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
-import Planning.Plans.Scouting.ScoutExpansionsAt
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvT.{PvT3BaseCarrier, PvT3BaseCorsair}
 
-class PvT3BaseCarriers extends Mode {
+class PvT3BaseCarriers extends TemplateMode {
   
-  description.set("PvT 3 Base Carriers")
+  override val activationCriteria = new Or(new Employing(PvT3BaseCarrier), new Employing(PvT3BaseCorsair))
+  override val scoutExpansionsAt  = 60
+  override val emergencyPlans     = Vector(new PvTIdeas.Require2BaseTech)
+  override val priorityAttackPlan = new PvTIdeas.AttackWithDarkTemplar
+  override val defaultAttackPlan  = new PvTIdeas.ContainSafely
   
-  override val activationCriteria: Plan = new Or(new Employing(PvT3BaseCarrier), new Employing(PvT3BaseCorsair))
-  override val completionCriteria: Plan = new Never
-  
-  
-  children.set(Vector(
-    new MeldArchons(40),
-    new RequireSufficientSupply,
-    new TrainWorkersContinuously(oversaturate = true),
-    new OnMiningBases(3, new BuildCannonsAtNatural(1)),
+  override val buildPlans = Vector(
     new BuildCannonsAtExpansions(3),
+    new BuildCannonsAtNatural(1),
     new BuildGasPumps,
     new If(new UnitsAtLeast(1, Protoss.Carrier), new Build(RequestUpgrade(Protoss.CarrierCapacity))),
     new FlipIf(
@@ -61,12 +54,6 @@ class PvT3BaseCarriers extends Mode {
     new UpgradeContinuously(Protoss.GroundDamage),
     new Build(RequestAtLeast(20, Protoss.Gateway)),
     new RequireMiningBases(5),
-    new UpgradeContinuously(Protoss.GroundArmor),
-    new DefendZones,
-    new EscortSettlers,
-    new ScoutExpansionsAt(80),
-    new PvTIdeas.AttackWithDarkTemplar,
-    new PvTIdeas.ContainSafely
-  ))
+    new UpgradeContinuously(Protoss.GroundArmor))
 }
 

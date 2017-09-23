@@ -69,7 +69,7 @@ class PvPOpen2GateDarkTemplar extends TemplateMode {
     RequestAtLeast(2,   Protoss.DarkTemplar),
     RequestAtLeast(24,  Protoss.Probe))
   
-  override val workerPlan: Plan = new Plan
+  override val defaultWorkerPlan: Plan = NoPlan
   
   override val buildPlans = Vector(
     new Do(() => With.blackboard.gasBankSoftLimit = 450),
@@ -91,7 +91,7 @@ class PvPOpen2GateDarkTemplar extends TemplateMode {
         new RequireMiningBases(2)))
   )
   
-  override val scoutPlan = new Trigger(new UnitsAtLeast(1, Protoss.CyberneticsCore), initialAfter = new Scout)
+  override val defaultScoutPlan = new Trigger(new UnitsAtLeast(1, Protoss.CyberneticsCore), initialAfter = new Scout)
   
-  override val attackPlan = new Trigger(new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true), initialAfter = new Attack)
+  override val defaultAttackPlan = new Trigger(new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true), initialAfter = new Attack)
 }

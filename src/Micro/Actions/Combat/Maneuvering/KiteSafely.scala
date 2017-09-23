@@ -24,13 +24,16 @@ object KiteSafely extends Action {
         Target.consider(unit)
         Attack.consider(unit)
       }
-      // If we're not going anywhere, might as well shoot
-      if (unit.velocity.lengthSquared == 0) {
+      // If we're not going anywhere, might as well shoot.
+      //
+      // There are probably other good ways to detect this.
+      if (unit.velocity.lengthSquared == 0 || unit.seeminglyStuck) {
         Potshot.consider(unit)
       }
       if (unit.unitClass.minStop < 4) {
         Potshot.consider(unit)
       }
+      
     }
     
     Avoid.delegate(unit)

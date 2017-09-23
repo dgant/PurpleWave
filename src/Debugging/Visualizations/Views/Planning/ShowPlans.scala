@@ -3,6 +3,7 @@ package Debugging.Visualizations.Views.Planning
 import Debugging.Visualizations.Views.View
 import Lifecycle.With
 import Planning.Plan
+import Planning.Plans.Compound.NoPlan
 
 object ShowPlans extends View {
   
@@ -43,6 +44,6 @@ object ShowPlans extends View {
   }
   
   private def isRelevant(plan: Plan): Boolean = {
-    With.prioritizer.isPrioritized(plan) && ! plan.isComplete
+    With.prioritizer.isPrioritized(plan) && ! plan.isComplete && plan != NoPlan
   }
 }

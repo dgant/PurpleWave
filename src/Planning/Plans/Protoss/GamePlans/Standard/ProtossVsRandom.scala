@@ -16,8 +16,6 @@ import Strategery.Strategies.Protoss.PvR.{PvREarly2Gate1012, PvREarly2Gate910, P
 
 class ProtossVsRandom extends Parallel {
   
-  description.set("Protoss vs Random")
-  
   children.set(Vector(
     new RequireEssentials,
     new Employ(PvREarly2Gate910AtNatural,

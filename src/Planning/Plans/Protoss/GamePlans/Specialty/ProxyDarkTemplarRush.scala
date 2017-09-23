@@ -22,7 +22,7 @@ class ProxyDarkTemplarRush extends Parallel {
     new RequireEssentials,
     
     new ProposePlacement {
-      override lazy val blueprints: Iterable[Blueprint] = Vector(
+      override lazy val blueprints: Seq[Blueprint] = Vector(
         new Blueprint(this, building = Some(Protoss.Pylon)),
         new Blueprint(this, building = Some(Protoss.Gateway)),
         new Blueprint(this, building = Some(Protoss.Pylon),   placement = Some(PlacementProfiles.proxyPylon),    preferZone = ProxyPlanner.proxyAutomaticSneaky),

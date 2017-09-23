@@ -7,7 +7,7 @@ import Planning.Plans.Macro.Build.ProposePlacement
 import ProxyBwapi.Races.Protoss
 
 class Nexus2GateThenCannons extends ProposePlacement {
-  override lazy val blueprints: Iterable[Blueprint] = {
+  override lazy val blueprints: Seq[Blueprint] = {
     val mainZone = With.geography.ourMain.zone
     val naturalBase = With.geography.ourNatural
     val naturalZone = naturalBase.zone

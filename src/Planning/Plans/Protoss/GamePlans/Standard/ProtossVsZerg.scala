@@ -23,8 +23,6 @@ import Strategery.Strategies.Protoss.PvZ._
 
 class ProtossVsZerg extends Parallel {
   
-  description.set("Protoss vs. Zerg")
-  
   ////////////////
   // Early game //
   ////////////////
@@ -398,6 +396,7 @@ class ProtossVsZerg extends Parallel {
     new ClearBurrowedBlockers,
     new FindExpansions { scouts.get.unitMatcher.set(Protoss.DarkTemplar) },
     new DefendZones,
+    new EscortSettlers,
     new If(
       new And(
         new EnemyUnitsAtMost(0, Zerg.Scourge),

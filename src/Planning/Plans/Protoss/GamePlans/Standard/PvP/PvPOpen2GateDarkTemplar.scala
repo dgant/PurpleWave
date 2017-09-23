@@ -4,13 +4,11 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.RequestAtLeast
-import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.TemplateMode
 import Planning.Plans.Information.Employing
 import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
-import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildCannonsAtNatural, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.{EnemyUnitsAtMost, UnitsAtLeast, UnitsAtMost}
@@ -20,19 +18,14 @@ import Strategery.Strategies.Protoss.PvP.PvP2GateDT
 
 class PvPOpen2GateDarkTemplar extends TemplateMode {
   
-  override val activationCriteria: Plan = new Employing(PvP2GateDT)
-  
-  override val completionCriteria: Plan = new UnitsAtLeast(2, Protoss.Nexus)
-  
-  override val placementPlans = Vector(
-    // Stop Skynet from unpowering our DT Gateway
-    new ProposePlacement {
-      override lazy val blueprints: Iterable[Blueprint] = Vector(
-        new Blueprint(this, building = Some(Protoss.Pylon),   placement = Some(PlacementProfiles.backPylon)),
-        new Blueprint(this, building = Some(Protoss.Gateway), placement = Some(PlacementProfiles.backPylon))
-      )
-    }
-  )
+  override val activationCriteria = new Employing(PvP2GateDT)
+  override val completionCriteria = new UnitsAtLeast(2, Protoss.Nexus)
+  override val defaultScoutPlan   = new Trigger(new UnitsAtLeast(1, Protoss.CyberneticsCore), initialAfter = new Scout)
+  override val defaultAttackPlan  = new Trigger(new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true), initialAfter = new Attack)
+  override val defaultWorkerPlan  = NoPlan
+  override val blueprints = Vector(
+    new Blueprint(this, building = Some(Protoss.Pylon),   placement = Some(PlacementProfiles.backPylon)),
+    new Blueprint(this, building = Some(Protoss.Gateway), placement = Some(PlacementProfiles.backPylon)))
   
   override val buildOrder = Vector(
     // http://wiki.teamliquid.net/starcraft/2_Gateway_Dark_Templar_(vs._Protoss)
@@ -69,8 +62,6 @@ class PvPOpen2GateDarkTemplar extends TemplateMode {
     RequestAtLeast(2,   Protoss.DarkTemplar),
     RequestAtLeast(24,  Protoss.Probe))
   
-  override val defaultWorkerPlan: Plan = NoPlan
-  
   override val buildPlans = Vector(
     new Do(() => With.blackboard.gasBankSoftLimit = 450),
     new RequireSufficientSupply,
@@ -90,8 +81,4 @@ class PvPOpen2GateDarkTemplar extends TemplateMode {
         new BuildCannonsAtNatural(2),
         new RequireMiningBases(2)))
   )
-  
-  override val defaultScoutPlan = new Trigger(new UnitsAtLeast(1, Protoss.CyberneticsCore), initialAfter = new Scout)
-  
-  override val defaultAttackPlan = new Trigger(new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true), initialAfter = new Attack)
 }

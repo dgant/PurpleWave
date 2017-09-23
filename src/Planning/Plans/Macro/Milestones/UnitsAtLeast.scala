@@ -11,7 +11,7 @@ class UnitsAtLeast(
   
   extends Plan {
   
-  description.set("Require at least " + quantity + " matching units")
+  description.set("Have at least " + quantity + " " + matcher)
   
   override def isComplete: Boolean = With.units.ours.count(unit =>
     ( ! complete || unit.complete) &&

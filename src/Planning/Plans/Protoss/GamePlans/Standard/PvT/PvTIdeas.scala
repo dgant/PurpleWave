@@ -36,9 +36,7 @@ object PvTIdeas {
       RequestAtLeast(5, Protoss.Gateway),
       RequestAtLeast(1, Protoss.Forge)))
   
-  class AttackWithDarkTemplar extends Attack {
-    attackers.get.unitMatcher.set(Protoss.DarkTemplar)
-  }
+  class AttackWithDarkTemplar extends Attack { attackers.get.unitMatcher.set(Protoss.DarkTemplar) }
   
   class ContainSafely extends If(
     new And(

@@ -5,7 +5,7 @@ import Planning.Plan
 
 class HaveGasBases(requiredBases: Int) extends Plan {
   
-  description.set("Require a certain number of gas bases.")
+  description.set("We have " + requiredBases + "+ gas bases.")
   
   override def isComplete: Boolean =
     With.geography.ourBases

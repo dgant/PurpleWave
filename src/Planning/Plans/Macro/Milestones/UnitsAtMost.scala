@@ -11,7 +11,7 @@ class UnitsAtMost(
   
   extends Plan {
   
-  description.set("Require at most " + quantity + " matching units")
+  description.set("Have at most " + quantity + " " + matcher)
   
   override def isComplete: Boolean = With.units.ours.count(unit =>
     ( ! complete || unit.complete) &&

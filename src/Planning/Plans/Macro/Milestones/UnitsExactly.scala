@@ -1,18 +1,19 @@
 package Planning.Plans.Macro.Milestones
 
 import Lifecycle.With
-import Planning.Composition.Property
 import Planning.Composition.UnitMatchers.{UnitMatchAnything, UnitMatcher}
 import Planning.Plan
 
 class UnitsExactly(
-  initialQuantity:Int = 0,
-  initialMatcher:UnitMatcher = UnitMatchAnything) extends Plan {
+  quantity:   Int         = 0,
+  matcher:    UnitMatcher = UnitMatchAnything,
+  complete:   Boolean     = false)
   
-  description.set("Require an exact unit count")
+  extends Plan {
   
-  val quantity    = new Property[Int](initialQuantity)
-  val unitMatcher = new Property[UnitMatcher](initialMatcher)
+  description.set("Have exactly " + quantity + " " + matcher)
   
-  override def isComplete: Boolean = With.units.ours.filter(unitMatcher.get.accept).size == quantity.get
+  override def isComplete: Boolean = With.units.ours.count(unit =>
+    ( ! complete || unit.complete) &&
+      matcher.accept(unit)) == quantity
 }

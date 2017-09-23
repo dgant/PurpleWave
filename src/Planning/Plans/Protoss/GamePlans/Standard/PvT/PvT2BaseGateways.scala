@@ -34,7 +34,6 @@ class PvT2BaseGateways extends TemplateMode {
           RequestAtLeast(1, Protoss.Observatory),
           RequestAtLeast(5, Protoss.Gateway))),
       new PvTIdeas.Require3BaseTech),
-    new RequireMiningBases(3),
     new Build(
       RequestTech(Protoss.PsionicStorm),
       RequestAtLeast(10, Protoss.Gateway)))

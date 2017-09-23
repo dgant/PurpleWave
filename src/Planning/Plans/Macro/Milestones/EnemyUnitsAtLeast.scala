@@ -11,7 +11,7 @@ class EnemyUnitsAtLeast(
   
   extends Plan {
   
-  description.set("Enemy has at least " + quantity + " matching units")
+  description.set("Enemy has at least " + quantity + " " + matcher)
   
   override def isComplete: Boolean = With.units.enemy.count(unit =>
     ( ! complete || unit.complete) &&

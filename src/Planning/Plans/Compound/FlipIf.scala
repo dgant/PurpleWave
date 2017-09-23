@@ -29,4 +29,6 @@ class FlipIf(
       delegate(second.get)
     }
   }
+  
+  override def toString: String = super.toString + ": " + predicate.get.toString
 }

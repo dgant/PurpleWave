@@ -24,15 +24,11 @@ class Gather extends Plan {
   private val resourceByWorker  = new mutable.HashMap[FriendlyUnitInfo, UnitInfo]
   private val workersByResource = new mutable.HashMap[UnitInfo, mutable.HashSet[FriendlyUnitInfo]]
   
-  private var ourActiveBases          : Iterable[Base]                    = Vector.empty
+  private var activeBases             : Iterable[Base]                    = Vector.empty
   private var allWorkers              : Set[FriendlyUnitInfo]             = Set.empty
-  private var allMinerals             : Set[UnitInfo]                     = Set.empty
-  private var allGas                  : Set[UnitInfo]                     = Set.empty
+  private var minerals                : Set[UnitInfo]                     = Set.empty
+  private var gasses                     : Set[UnitInfo]                     = Set.empty
   private var allResources            : Set[UnitInfo]                     = Set.empty
-  private var safeBases               : Set[Base]                         = Set.empty
-  private var safeMinerals            : Set[UnitInfo]                     = Set.empty
-  private var safeGas                 : Set[UnitInfo]                     = Set.empty
-  private var safeResources           : Set[UnitInfo]                     = Set.empty
   private var haveEnoughGas           : Boolean                           = false
   private var workersForGas           : Int                               = 0
   private var workersForMinerals      : Int                               = 0
@@ -63,33 +59,17 @@ class Gather extends Plan {
   }
   
   private def updateResourceInformation() = {
-    ourActiveBases  = With.geography.ourBases.filter(_.townHall.exists(th => th.aliveAndComplete && (th.complete || th.morphing || th.remainingBuildFrames < 24 * 10)))
-    allMinerals     = ourActiveBases.flatten(base => base.minerals).filter(_.alive).toSet
-    allGas          = ourActiveBases.flatten(base => base.gas).filter(gas => gas.isOurs && gas.aliveAndComplete).toSet
-    safeBases       = getSafeBases
-    safeMinerals    = allMinerals.filter(safe)
-    safeGas         = allGas.filter(safe)
-    if (safeMinerals.isEmpty) safeMinerals  = allMinerals
-    if (safeGas.isEmpty)      safeGas       = allGas
-    safeResources = safeMinerals ++ safeGas
-  }
-  
-  private def getSafeBases: Set[Base] = {
-    With.geography.bases.filter(base => {
-      val battle = With.battles.byZone(base.zone)
-      val distanceToHeart = battle.enemy.centroid.pixelDistanceFast(base.heart.pixelCenter)
-      ( ! With.configuration.evacuateDangerousBases
-        || With.geography.ourBases.size < 3
-        || battle.estimationAbstract.weSurvive
-        || base.zone.exit.exists(_.centerPixel.pixelDistanceFast(battle.enemy.centroid) < distanceToHeart))
-    }).toSet
+    activeBases  = With.geography.ourBases.filter(_.townHall.exists(th => th.aliveAndComplete && (th.complete || th.morphing || th.remainingBuildFrames < 24 * 10)))
+    minerals     = activeBases.flatten(base => base.minerals).filter(_.alive).toSet
+    gasses       = activeBases.flatten(base => base.gas).filter(gas => gas.isOurs && gas.aliveAndComplete).toSet
+    allResources = minerals ++ gasses
   }
   
   private def decideLongDistanceMining() {
-    if (safeMinerals.size < 9) {
-      val allSafeMinerals = With.units.neutral.filter(_.unitClass.isMinerals).filter(safe)
-      if (allSafeMinerals.nonEmpty) {
-        safeMinerals ++= allSafeMinerals
+    if (minerals.size < 9) {
+      val globalMinerals = With.units.neutral.filter(_.unitClass.isMinerals)
+      if (globalMinerals.nonEmpty) {
+        minerals ++= globalMinerals
           .toVector
           .sortBy(_.zone.distancePixels(With.geography.home.zone))
           .take(9)
@@ -102,19 +82,19 @@ class Gather extends Plan {
   }
   
   private def removeUnavailableResources() = {
-    workersByResource.keySet.diff(safeResources).foreach(unassignResource)
+    workersByResource.keySet.diff(allResources).foreach(unassignResource)
   }
   
   private def gasWorkers: Int = {
     if (With.self.race == Race.Protoss)
       Vector(
-        safeGas.size * 3,
+        gasses.size * 3,
         allWorkers.size / 3,
         if (haveEnoughGas) 0 else 200)
       .min
     else
       Vector(
-        safeGas.size * 3,
+        gasses.size * 3,
         allWorkers.size / 2,
         if(haveEnoughGas) 0 else 300)
       .min
@@ -124,11 +104,11 @@ class Gather extends Plan {
     haveEnoughGas       = With.self.gas >= Math.max(With.blackboard.gasBankSoftLimit, Math.min(With.blackboard.gasBankHardLimit, With.self.minerals))
     workersForGas       = gasWorkers
     workersForMinerals  = allWorkers.size - workersForGas
-    workersPerGas       = if (safeGas.isEmpty) 0 else workersForGas.toDouble / safeGas.size
-    workersOnGas        = safeGas.toVector.map(gas => workersByResource.get(gas).map(_.size).getOrElse(0)).sum
+    workersPerGas       = if (gasses.isEmpty) 0 else workersForGas.toDouble / gasses.size
+    workersOnGas        = gasses.toVector.map(gas => workersByResource.get(gas).map(_.size).getOrElse(0)).sum
     
     needPerMineral = new mutable.HashMap[UnitInfo, Double] ++
-      safeMinerals
+      minerals
         .map(mineral => (mineral,
           mineralSaturationRatio - workersByResource.get(mineral)
             .map(_.size)
@@ -136,7 +116,7 @@ class Gather extends Plan {
         .toMap
   
     needPerGas = new mutable.HashMap[UnitInfo, Double] ++
-      safeGas.map(gas => (gas,
+      gasses.map(gas => (gas,
         workersPerGas - workersByResource.get(gas)
           .map(_.size)
           .getOrElse(0))).toMap
@@ -158,7 +138,7 @@ class Gather extends Plan {
   var lastFrameUnassigning = 0
   def unassignSupersaturatingWorkers() {
     lastFrameUnassigning = With.frame
-    val supersaturatedMinerals = safeMinerals.filter(needPerMineral(_) < 0)
+    val supersaturatedMinerals = minerals.filter(needPerMineral(_) < 0)
     val supersaturationWorkerGroups = supersaturatedMinerals.flatten(workersByResource.get)
     supersaturationWorkerGroups.foreach(_.drop(2).foreach(unassignWorker))
   }
@@ -169,8 +149,8 @@ class Gather extends Plan {
   }
   
   private def addWorkerToMinerals(worker: FriendlyUnitInfo) {
-    if (safeMinerals.isEmpty) return
-    val mineral = safeMinerals
+    if (minerals.isEmpty) return
+    val mineral = minerals
       .toVector
       .sortBy(_.pixelDistanceSquared(worker.pixelCenter))
       .maxBy(needPerMineral)
@@ -179,8 +159,8 @@ class Gather extends Plan {
   }
 
   private def addWorkerToGas(worker: FriendlyUnitInfo) {
-    if (safeGas.isEmpty) return
-    val gas = safeGas
+    if (gasses.isEmpty) return
+    val gas = gasses
       .toVector
       .sortBy(_.pixelDistanceSquared(worker.pixelCenter))
       .maxBy(needPerGas)
@@ -211,13 +191,6 @@ class Gather extends Plan {
       workersByResource(resource).foreach(unassignWorker)
       workersByResource.remove(resource)
     }
-  }
-  
-  private def safe(resource: UnitInfo): Boolean = {
-    if (resource.unitClass.isMinerals)
-      getSafeBases.exists(_.minerals.contains(resource))
-    else
-      getSafeBases.exists(_.gas.contains(resource))
   }
   
   private def order(worker: FriendlyUnitInfo) {

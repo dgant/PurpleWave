@@ -25,13 +25,11 @@ class Configuration {
   
   var retreatCaution                  = 1.4
   var assumedBuilderTravelSpeed       = 0.65
-  var attackableRangeBuffer           = 4
-  var fogPositionDuration             = 24 * 20
-  var violenceFrameThreshold          = 48
+  var attackableRangeBufferPixels     = 4
+  var fogPositionDurationFrames       = 24 * 20
+  var violenceThresholdFrames         = 48
   var pickupRadiusPixels              = 48 //No idea what actual value is
-  var enableYolo                      = true
   var enablePathRecalculation         = true
-  var enableMineralWalkInSameZone     = false // Tends to lead to stuck builders
   var pathRecalculationDelayFrames    = 48
   var woundedThresholdHealth          = 40
   var evacuateDangerousBases          = false

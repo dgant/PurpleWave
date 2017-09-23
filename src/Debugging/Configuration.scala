@@ -17,7 +17,7 @@ class Configuration {
   //////////////
   
   var rideItOutWinrate    = 0.9
-  var strategyRandomness  = 1.0
+  var strategyRandomness  = 0.5
   
   ///////////
   // Micro //

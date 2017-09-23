@@ -9,7 +9,7 @@ class Trigger(
   initialBefore   : Plan = NoPlan())
     extends Plan {
   
-  description.set("When triggered")
+  description.set("Trigger when")
   
   val trigger = new Property[Plan](initialTrigger)
   val after   = new Property[Plan](initialAfter)
@@ -27,4 +27,6 @@ class Trigger(
     else
       delegate(before.get)
   }
+  
+  override def toString: String = super.toString + ": " + trigger.get.toString
 }

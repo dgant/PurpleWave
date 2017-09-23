@@ -6,7 +6,7 @@ import ProxyBwapi.UnitClass.UnitClass
 
 class EnemyHasShown(unitClass: UnitClass) extends Plan {
   
-  description.set("Enemy has shown a unit")
+  description.set("Enemy has shown a " + unitClass)
   
   override def isComplete: Boolean = With.intelligence.enemyHasShown(unitClass)
 }

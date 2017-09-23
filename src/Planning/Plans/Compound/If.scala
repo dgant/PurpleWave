@@ -26,5 +26,5 @@ class If(
       delegate(whenFalse.get)
   }
   
-  override def toString: String = super.toString + " " + predicate.toString
+  override def toString: String = super.toString + ": " + predicate.get.toString
 }

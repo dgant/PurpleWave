@@ -23,6 +23,7 @@ object TargetRelevant extends Action {
     target.visible &&
     target.unitClass.helpsInCombat && (
       unit.inRangeToAttackFast(target)
+        || (target.isTransport && ! target.is(Zerg.Overlord))
         || (target.unitClass.isDetector && unit.matchups.alliesIncludingSelf.exists(_.cloaked))
         || target.constructing
         || target.gathering

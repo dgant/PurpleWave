@@ -9,8 +9,9 @@ import bwapi.Color
 object ShowReactionTime extends View {
   
   override def renderMap() {
+    return
     (With.units.ours ++ With.units.enemy).toSeq.foreach(unit => {
-      val radius = Math.min(unit.unitClass.width, unit.unitClass.height)/2
+      val radius = unit.unitClass.dimensionMin
       
       if (unit.battle.isEmpty) {
         DrawMap.circle(unit.pixelCenter, radius, Color.Black, solid = true)

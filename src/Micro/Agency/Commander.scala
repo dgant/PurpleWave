@@ -78,10 +78,9 @@ class Commander {
   }
   
   private def limit(unit: FriendlyUnitInfo, destination: Pixel): Pixel = {
-    val margin = Math.max(unit.unitClass.width, unit.unitClass.height)
     Pixel(
-      PurpleMath.clamp(destination.x, margin, With.mapPixelWidth - margin),
-      PurpleMath.clamp(destination.y, margin, With.mapPixelHeight - margin))
+      PurpleMath.clamp(destination.x, unit.unitClass.width  / 2,  With.mapPixelWidth  - unit.unitClass.width  / 2),
+      PurpleMath.clamp(destination.y, unit.unitClass.height / 2,  With.mapPixelHeight - unit.unitClass.height / 2))
   }
   
   def attackMove(unit: FriendlyUnitInfo, destination: Pixel) {

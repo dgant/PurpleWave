@@ -5,13 +5,21 @@ import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
 import Planning.Composition.UnitMatchers.{UnitMatchCustom, UnitMatchWarriors}
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, _}
+import Planning.Plans.Information.Employing
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.{OnGasBases, _}
 import ProxyBwapi.Races.{Protoss, Terran}
+import Strategery.Strategies.Protoss.PvT.{PvT2BaseArbiter, PvT2BaseCarrier}
 
 object PvTIdeas {
+  
+  class TakeSecondGasIfWeNeedIt extends If(
+    new Or(
+      new Employing(PvT2BaseCarrier),
+      new Employing(PvT2BaseArbiter)),
+    new BuildGasPumps)
   
   class Require2BaseTech extends Parallel(
     new Build(

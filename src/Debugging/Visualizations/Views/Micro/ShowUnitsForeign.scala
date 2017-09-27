@@ -29,7 +29,7 @@ object ShowUnitsForeign extends View {
       
     if (showFogged) {
       if ( ! unit.visible || unit.effectivelyCloaked) {
-        DrawMap.circle(unit.pixelCenter, unit.unitClass.width / 2, color)
+        DrawMap.circle(unit.pixelCenter, unit.unitClass.dimensionMin / 2, color)
         DrawMap.label(unit.unitClass.toString, unit.pixelCenter, drawBackground = true, color)
       }
     }

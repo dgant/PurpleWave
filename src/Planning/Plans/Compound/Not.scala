@@ -12,4 +12,6 @@ class Not(initialChild: Plan = NoPlan()) extends Plan {
   override def isComplete: Boolean = ! child.get.isComplete
   
   override def onUpdate() { delegate(child.get) }
+  
+  override def toString: String = super.toString + ": " + child.get
 }

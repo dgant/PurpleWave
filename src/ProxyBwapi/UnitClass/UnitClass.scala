@@ -27,7 +27,9 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   // Geometry //
   //////////////
   
-  def radialHypotenuse: Double = Math.sqrt(width.toDouble * width.toDouble + height.toDouble * height.toDouble)/2.0
+  lazy val dimensionMin: Int = Math.min(width, height)
+  lazy val dimensionMax: Int = Math.max(width, height)
+  lazy val radialHypotenuse: Double = Math.sqrt(width.toDouble * width.toDouble + height.toDouble * height.toDouble)/2.0
   
   ////////////
   // Combat //

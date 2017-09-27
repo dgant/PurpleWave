@@ -1,6 +1,6 @@
 package Debugging.Visualizations.Views.Micro
 
-import Debugging.Visualizations.Colors
+import Debugging.Visualizations.{Colors, Hues}
 import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.View
 import Lifecycle.With
@@ -15,6 +15,7 @@ object ShowUnitsAll extends View {
   var showResources       = false
   var showViolence        = false
   var showBattleIgnorance = false
+  var showMortality       = true
   
   override def renderMap() { With.units.all.foreach(renderUnit) }
   
@@ -49,6 +50,19 @@ object ShowUnitsAll extends View {
     if (showBattleIgnorance) {
       if (unit.battle.isEmpty) {
         DrawMap.circle(unit.pixelCenter, 5, Color.Black, solid = true)
+      }
+    }
+    
+    if (showMortality) {
+      val ttlThreshold  = 4.0
+      val ttlCurrent    = unit.matchups.framesToLiveCurrently.toDouble / 24.0
+      if (ttlCurrent <= ttlThreshold) {
+        val ratio       = ttlCurrent / ttlThreshold
+        val ratio255    = (255 * (1.0 - ratio)).toInt
+        val radiusFull  = unit.unitClass.dimensionMin / 2.0
+        val radiusTtl   = ratio * radiusFull
+        DrawMap.circle(unit.pixelCenter, radiusFull.toInt,  Colors.DarkOrange)
+        DrawMap.circle(unit.pixelCenter, radiusTtl.toInt,   Colors.hsv(Hues.Orange, ratio255, ratio255))
       }
     }
   }

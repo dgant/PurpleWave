@@ -54,15 +54,17 @@ object ShowUnitsAll extends View {
     }
     
     if (showMortality) {
-      val ttlThreshold  = 4.0
+      val ttlThreshold  = 8.0
       val ttlCurrent    = unit.matchups.framesToLiveCurrently.toDouble / 24.0
       if (ttlCurrent <= ttlThreshold) {
         val ratio       = ttlCurrent / ttlThreshold
-        val ratio255    = (255 * (1.0 - ratio)).toInt
-        val radiusFull  = unit.unitClass.dimensionMin / 2.0
-        val radiusTtl   = ratio * radiusFull
-        DrawMap.circle(unit.pixelCenter, radiusFull.toInt,  Colors.DarkOrange)
-        DrawMap.circle(unit.pixelCenter, radiusTtl.toInt,   Colors.hsv(Hues.Orange, ratio255, ratio255))
+        val ratio255    = Math.max(0, (255 * (1.0 - ratio)).toInt)
+        val radius      = Math.max(10.0, unit.unitClass.dimensionMin / 2.0)
+        DrawMap.circle(unit.pixelCenter, radius.toInt,   Colors.hsv(Hues.Red, 255, ratio255),  solid = true)
+        With.game.setTextSize(bwapi.Text.Size.Enum.Large)
+        DrawMap.text(unit.pixelCenter.subtract(4, 10), ttlCurrent.toInt.toString)
+        With.game.setTextSize(bwapi.Text.Size.Enum.Small)
+        
       }
     }
   }

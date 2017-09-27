@@ -19,7 +19,7 @@ class PvT3BaseCorsairs extends TemplateMode {
   override val completionCriteria = new MiningBasesAtLeast(4)
   override val scoutExpansionsAt  = 60
   override val emergencyPlans     = Vector(new PvTIdeas.Require2BaseTech)
-  override val defaultAttackPlan  = new PvTIdeas.ContainSafely
+  override val defaultAttackPlan  = new PvTIdeas.AttackRespectingMines
   
   class TrainArmy extends Parallel(
     new PvTIdeas.TrainObservers,

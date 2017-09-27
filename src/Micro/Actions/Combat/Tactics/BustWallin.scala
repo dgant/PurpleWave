@@ -36,7 +36,7 @@ object BustWallin extends Action {
     Potshot.delegate(unit)
     
     // Back wounded units off
-    val escapeFrames    = 1.5 * Math.max(0, unit.matchups.framesOfEntanglementDiffused) + 24 + 2 * With.reaction.agencyAverage
+    val escapeFrames    = 2.0 * Math.max(0, unit.matchups.framesOfEntanglementDiffused) + 48 + 2 * With.reaction.agencyAverage
     val damagePerFrame  = unit.matchups.threatsViolent.map(_.dpfOnNextHitAgainst(unit)).sum
     if (unit.totalHealth < damagePerFrame * escapeFrames) {
       Disengage.consider(unit)

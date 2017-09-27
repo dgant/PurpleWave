@@ -6,6 +6,7 @@ import Debugging.Visualizations.{Colors, ForceColors}
 import Lifecycle.With
 import Micro.Agency.Agent
 import Utilities.ByOption
+import bwapi.Color
 
 object ShowUnitsFriendly extends View {
   
@@ -114,8 +115,9 @@ object ShowUnitsFriendly extends View {
     
     if (showDesire) {
       val color = if (agent.shouldEngage) Colors.NeonGreen else Colors.NeonRed
-      DrawMap.circle(agent.unit.pixelCenter, 8, color)
-      DrawMap.circle(agent.unit.pixelCenter, 7, color)
+      val pixel = agent.unit.pixelCenter.subtract(0, 6 + agent.unit.unitClass.height / 2)
+      DrawMap.circle(pixel, 3, Color.Black, solid = true)
+      DrawMap.circle(pixel, 2, color,       solid = true)
     }
     
     if (showExplosions) {

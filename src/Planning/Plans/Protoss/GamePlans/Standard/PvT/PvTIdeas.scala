@@ -11,7 +11,7 @@ import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.{OnGasBases, _}
 import ProxyBwapi.Races.{Protoss, Terran}
-import Strategery.Strategies.Protoss.PvT.{PvT2BaseArbiter, PvT2BaseCarrier}
+import Strategery.Strategies.Protoss.PvT._
 
 object PvTIdeas {
   
@@ -46,10 +46,13 @@ object PvTIdeas {
   
   class AttackWithDarkTemplar extends Attack { attackers.get.unitMatcher.set(Protoss.DarkTemplar) }
   
-  class ContainSafely extends If(
+  class AttackRespectingMines extends If(
     new And(
       new UnitsAtLeast(6, UnitMatchWarriors, complete = true),
       new Or(
+        //new Employing(PvTEarly1GateStargate),
+        new Employing(PvTEarly1015GateGoon),
+        new Employing(PvTEarly1GateRange),
         new UnitsAtLeast(2, Protoss.Observer, complete = true),
         new Not(new EnemyHasShown(Terran.SpiderMine)))),
     new Attack)

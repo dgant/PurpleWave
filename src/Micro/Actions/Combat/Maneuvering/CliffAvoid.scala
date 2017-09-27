@@ -12,7 +12,7 @@ object CliffAvoid extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.canMove  &&
     unit.flying   &&
-    unit.matchups.threats.nonEmpty
+    unit.matchups.threats.exists( ! _.flying)
   }
   
   override def perform(unit: FriendlyUnitInfo) {

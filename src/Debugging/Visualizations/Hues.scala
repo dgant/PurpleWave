@@ -2,7 +2,7 @@ package Debugging.Visualizations
 
 object Hues {
   val Red     = 0
-  val Orange  = 32
+  val Orange  = 24
   val Yellow  = 64
   val Green   = 96
   val Teal    = 128

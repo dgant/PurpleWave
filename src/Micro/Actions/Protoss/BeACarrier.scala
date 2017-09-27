@@ -6,7 +6,7 @@ import Micro.Actions.Combat.Maneuvering.{Avoid, CliffAvoid}
 import Micro.Actions.Commands.{Attack, AttackMove}
 import Micro.Heuristics.Targeting.EvaluateTargets
 import ProxyBwapi.Races.Protoss
-import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders}
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders, UnitInfo}
 
 object BeACarrier extends Action {
   
@@ -26,7 +26,15 @@ object BeACarrier extends Action {
     lazy val exitingLeash             = unit.matchups.targets.forall(_.pixelDistanceFast(unit) > 32.0 * 8.0)
     lazy val interceptorsNeedKick     = exitingLeash || ! interceptorsAreShooting
     
-    if (unit.matchups.threatsInRange.exists(threat => ! threat.flying || threat.unitClass.isStaticDefense)) {
+    def threatUnacceptable(threat: UnitInfo): Boolean = {
+      if (threat.flying)                            return false
+      if (threat.damageOnNextHitAgainst(unit) < 5)  return false
+      if (interceptorsTotal > 2 && threat.pixelDistanceFast(unit) < unit.pixelRangeAgainstFromCenter(threat) - 32.0) return false
+      true
+    }
+    
+    val unacceptableThreat = unit.matchups.threatsInRange.find(threatUnacceptable)
+    if (unacceptableThreat.isDefined) {
       CliffAvoid.consider(unit)
       Avoid.consider(unit)
     }

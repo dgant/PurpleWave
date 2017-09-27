@@ -107,6 +107,7 @@ class Groundskeeper {
   }
   
   def flagFulfilled(requirement: Blueprint, fulfillingUnit: UnitInfo) {
+    if (proposalsFulfilled.contains(requirement)) return
     val proposal = getRepresentativeBlueprintForRequirement(requirement)
     removeBlueprint(requirement)
     proposalsFulfilled.put(proposal,    fulfillingUnit)

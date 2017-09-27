@@ -53,7 +53,7 @@ object PlacementProfiles {
     preferZone                  = 1000.0,
     preferNatural               = 2.0,
     preferResources             = 0.5,
-    preferDistanceFromEnemy     = 1.0,
+    preferDistanceFromEnemy     = 1.5,
     avoidDistanceFromBase       = 1.0
   )
   

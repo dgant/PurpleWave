@@ -18,7 +18,7 @@ class PvT3BaseArbiters extends TemplateMode {
   override val scoutExpansionsAt  = 60
   override val emergencyPlans     = Vector(new PvTIdeas.Require2BaseTech)
   override val priorityAttackPlan = new PvTIdeas.AttackWithDarkTemplar
-  override val defaultAttackPlan  = new PvTIdeas.ContainSafely
+  override val defaultAttackPlan  = new PvTIdeas.AttackRespectingMines
   
   override val buildPlans = Vector(
     new BuildCannonsAtExpansions(2),

@@ -31,6 +31,7 @@ object StrategyGroups {
     TvEMassMarineAllIn,
     Proxy2Gate2StartLocations,
     Proxy2Gate3StartLocations,
+    PvTEarly1GateProxy,
     ProxyDarkTemplar,
     Zerg4PoolAllIn,
     ProxyHatchZerglings,
@@ -48,6 +49,7 @@ object StrategyGroups {
   )
   
   val bad = Vector[Strategy](
+    PvTEarly1GateProxy,
     CarriersWithNoDefense,
     WorkerRush2StartLocations,
     WorkerRush3StartLocations,

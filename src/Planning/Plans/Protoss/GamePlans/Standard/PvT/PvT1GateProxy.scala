@@ -21,7 +21,7 @@ class PvT1GateProxy extends Mode {
   override val completionCriteria = new MiningBasesAtLeast(2)
   
   children.set(Vector(
-    new Aggression(1.2),
+    new Aggression(2.0),
     new Trigger(new UnitsAtLeast(1, Protoss.Gateway), initialBefore = new PlaceGatewaysProxied(1, () => ProxyPlanner.proxyAutomaticSneaky)),
     
     new BuildOrder(

@@ -35,6 +35,6 @@ class PvT2BaseGateways extends TemplateMode {
       RequestAtLeast(1,   Protoss.RoboticsFacility),
       RequestAtLeast(3,   Protoss.Gateway),
       RequestAtLeast(1,   Protoss.Observatory),
-      RequestAtLeast(10,  Protoss.Gateway)))
+      RequestAtLeast(11,  Protoss.Gateway)))
 }
 

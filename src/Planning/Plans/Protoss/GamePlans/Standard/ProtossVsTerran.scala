@@ -6,7 +6,8 @@ import Planning.Plans.Protoss.GamePlans.Standard.PvT._
 class ProtossVsTerran extends ModalGamePlan(
   new PvT13Nexus,
   new PvT1GateRange,
-  new PvT1015Gate,
+  new PvT1015GateExpand,
+  new PvT1GateProxy,
   new PvTDTExpand,
   new PvT1GateStargate,
   new PvTStove,

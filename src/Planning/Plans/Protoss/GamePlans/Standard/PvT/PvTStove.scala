@@ -1,20 +1,25 @@
 package Planning.Plans.Protoss.GamePlans.Standard.PvT
 
 import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
+import Planning.Composition.UnitCounters.UnitCountOne
+import Planning.Plans.Army.{Attack, DefendEntrance}
+import Planning.Plans.Compound.If
 import Planning.Plans.GamePlans.TemplateMode
 import Planning.Plans.Information.Employing
 import Planning.Plans.Macro.BuildOrders._
 import Planning.Plans.Macro.Expanding._
-import Planning.Plans.Macro.Milestones.UnitsAtLeast
-import ProxyBwapi.Races.Protoss
+import Planning.Plans.Macro.Milestones.{EnemyHasShown, UnitsAtLeast}
+import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss.PvT.PvTEarlyStove
 
 class PvTStove extends TemplateMode {
   
-  override val activationCriteria = new Employing(PvTEarlyStove)
-  override val completionCriteria = new UnitsAtLeast(1, Protoss.ArbiterTribunal)
-  override def priorityAttackPlan = new PvTIdeas.PriorityAttacks
-  override def scoutAt            = 8
+  override val activationCriteria   = new Employing(PvTEarlyStove)
+  override val completionCriteria   = new UnitsAtLeast(1, Protoss.ArbiterTribunal)
+  override def priorityAttackPlan   = new PvTIdeas.PriorityAttacks
+  override def priorityDefensePlan  = new If(new EnemyHasShown(Terran.Vulture), new DefendEntrance { defenders.get.unitMatcher.set(Protoss.Dragoon); defenders.get.unitCounter.set(UnitCountOne)})
+  override def defaultAttackPlan    = new Attack
+  override def scoutAt              = 8
   
   override val buildOrder = Vector(
     //ZCoreZ, Scout @ Pylon -- from Antiga replay

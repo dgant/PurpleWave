@@ -1,6 +1,7 @@
 package Planning.Plans.Protoss.GamePlans.Standard.PvT
 
 import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
+import Planning.Plans.Army.Attack
 import Planning.Plans.GamePlans.TemplateMode
 import Planning.Plans.Information.Employing
 import Planning.Plans.Macro.Automatic.TrainContinuously
@@ -14,6 +15,7 @@ class PvT1GateStargate extends TemplateMode {
   override val activationCriteria = new Employing(PvTEarly1GateStargate)
   override val completionCriteria = new MiningBasesAtLeast(2)
   override def priorityAttackPlan = new PvTIdeas.PriorityAttacks
+  override def defaultAttackPlan  = new Attack
   override def scoutAt            = 8
   
   override val buildOrder = Vector(

@@ -11,7 +11,7 @@ import Planning.Plans.Protoss.ProtossBuilds
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvT.PvTEarly1015GateGoon
 
-class PvT1015Gate extends TemplateMode {
+class PvT1015GateExpand extends TemplateMode {
   
   override val activationCriteria = new Employing(PvTEarly1015GateGoon)
   override val completionCriteria = new MiningBasesAtLeast(2)

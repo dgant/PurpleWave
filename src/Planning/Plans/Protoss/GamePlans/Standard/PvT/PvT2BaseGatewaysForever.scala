@@ -14,6 +14,7 @@ class PvT2BaseGatewaysForever extends TemplateMode {
   
   override val activationCriteria = new Employing(PvT2BaseGatewayForever)
   override val scoutExpansionsAt  = 60
+  override val aggression         = 1.3
   override val emergencyPlans     = Vector(new PvTIdeas.Require2BaseTech)
   override val priorityAttackPlan = new PvTIdeas.PriorityAttacks
   override val defaultAttackPlan  = new PvTIdeas.AttackRespectingMines

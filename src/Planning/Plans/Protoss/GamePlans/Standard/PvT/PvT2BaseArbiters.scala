@@ -2,9 +2,9 @@ package Planning.Plans.Protoss.GamePlans.Standard.PvT
 
 import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
-import Planning.Plans.Compound.{FlipIf, If, Parallel}
+import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.TemplateMode
-import Planning.Plans.Information.Employing
+import Planning.Plans.Information.{Employing, SafeAtHome}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildCannonsAtExpansions, BuildCannonsAtNatural, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.{OnGasBases, OnMiningBases, UnitsAtLeast}
@@ -23,8 +23,20 @@ class PvT2BaseArbiters extends TemplateMode {
   override val buildPlans = Vector(
     new OnMiningBases(3, new BuildCannonsAtNatural(1)),
     new BuildCannonsAtExpansions(2),
-    new If(new UnitsAtLeast(20, UnitMatchWarriors), new RequireMiningBases(3)),
-    new If(new UnitsAtLeast(30, UnitMatchWarriors), new RequireMiningBases(4)),
+    new If(
+      new Or(
+        new And(
+          new UnitsAtLeast(6, UnitMatchWarriors),
+          new SafeAtHome),
+        new UnitsAtLeast(20, UnitMatchWarriors)),
+      new RequireMiningBases(3)),
+    new If(
+      new Or(
+        new And(
+          new UnitsAtLeast(15, UnitMatchWarriors),
+          new SafeAtHome),
+        new UnitsAtLeast(40, UnitMatchWarriors)),
+      new RequireMiningBases(4)),
     new FlipIf(
       new UnitsAtLeast(10, UnitMatchWarriors),
       new PvTIdeas.TrainArmy,
@@ -50,7 +62,10 @@ class PvT2BaseArbiters extends TemplateMode {
         new OnGasBases(4, new Build(
           RequestUpgrade(Protoss.ArbiterEnergy),
           RequestAtLeast(2, Protoss.Stargate))))),
-    new UpgradeContinuously(Protoss.GroundArmor),
-    new Build(RequestAtLeast(20, Protoss.Gateway)))
+    new OnGasBases(3, new UpgradeContinuously(Protoss.GroundArmor)),
+    new OnMiningBases(2, new Build(RequestAtLeast(11, Protoss.Gateway))),
+    new OnMiningBases(3, new Build(RequestAtLeast(16, Protoss.Gateway))),
+    new OnMiningBases(4, new Build(RequestAtLeast(20, Protoss.Gateway)))
+  )
 }
 

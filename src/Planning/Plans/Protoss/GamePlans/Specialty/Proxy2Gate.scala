@@ -9,7 +9,7 @@ import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, TrainCon
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder, FollowBuildOrder, RequireEssentials}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Milestones._
-import Planning.Plans.Protoss.Situational.{DefendAgainstProxy, PlaceTwoGatewaysProxied}
+import Planning.Plans.Protoss.Situational.{DefendAgainstProxy, PlaceGatewaysProxied}
 import Planning.Plans.Scouting.Scout
 import Planning.ProxyPlanner
 import ProxyBwapi.Races.Protoss
@@ -20,7 +20,7 @@ class Proxy2Gate extends Parallel {
   
   private class BeforeProxy extends Parallel(
     new RequireEssentials,
-    new Trigger(new UnitsAtLeast(2, Protoss.Gateway), initialBefore = new PlaceTwoGatewaysProxied(() => proxyZone)),
+    new Trigger(new UnitsAtLeast(2, Protoss.Gateway), initialBefore = new PlaceGatewaysProxied(2, () => proxyZone)),
     new Build(
       RequestAtLeast(9, Protoss.Probe),
       RequestAtLeast(1, Protoss.Pylon)),

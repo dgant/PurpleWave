@@ -30,6 +30,7 @@ abstract class TemplateMode extends Mode {
   def defaultSupplyPlan     : Plan              = new RequireSufficientSupply
   def defaultWorkerPlan     : Plan              = new TrainWorkersContinuously(superSaturate)
   def defaultScoutPlan      : Plan              = new ScoutAt(scoutAt)
+  def priorityDefensePlan   : Plan              = NoPlan()
   def priorityAttackPlan    : Plan              = NoPlan()
   def defaultAttackPlan     : Plan              = new ConsiderAttacking
   
@@ -41,6 +42,7 @@ abstract class TemplateMode extends Mode {
   
   def defaultTacticsPlans: Vector[Plan] = Vector(
     defaultAggressionPlan,
+    priorityDefensePlan,
     priorityAttackPlan,
     defaultScoutPlan,
     new DefendZones,

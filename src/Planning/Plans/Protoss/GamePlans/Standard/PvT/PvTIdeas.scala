@@ -111,7 +111,7 @@ object PvTIdeas {
       new Or(
         new UnitsAtLeast(12, Protoss.Dragoon),
         new Check(() => With.self.minerals > 800 && With.self.gas < 100))),
-    new TrainContinuously(Protoss.Zealot, 15),
+    new TrainContinuously(Protoss.Zealot, 30),
     new TrainContinuously(Protoss.Dragoon))
   
   class TrainArbiters extends If(

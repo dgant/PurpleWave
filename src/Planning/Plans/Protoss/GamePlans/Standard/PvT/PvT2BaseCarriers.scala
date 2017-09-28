@@ -56,7 +56,6 @@ class PvT2BaseCarriers extends TemplateMode {
     new Build(
       RequestAtLeast(1,   Protoss.TemplarArchives),
       RequestAtLeast(12,  Protoss.Gateway),
-      RequestAtLeast(4,   Protoss.Stargate)),
-    new RequireMiningBases(4))
+      RequestAtLeast(4,   Protoss.Stargate)))
 }
 

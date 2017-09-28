@@ -10,7 +10,7 @@ object ReloadInterceptors extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean =(
     unit.is(Protoss.Carrier)
     && With.self.minerals > Protoss.Interceptor.mineralPrice
-    && unit.interceptorCount < 8
+    && unit.interceptorCount < (if (With.self.hasUpgrade(Protoss.CarrierCapacity)) 8 else 4)
     && unit.trainingQueue.isEmpty
     && unit.matchups.framesToLiveCurrently > Protoss.Interceptor.buildFrames + 48.0
   )

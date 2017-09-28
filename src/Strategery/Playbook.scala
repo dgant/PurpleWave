@@ -50,6 +50,7 @@ object StrategyGroups {
   
   val bad = Vector[Strategy](
     PvTEarly1GateProxy,
+    PvT3BaseCorsair,
     CarriersWithNoDefense,
     WorkerRush2StartLocations,
     WorkerRush3StartLocations,

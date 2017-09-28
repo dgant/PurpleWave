@@ -18,6 +18,7 @@ abstract class TemplateMode extends Mode {
   def meldArchonsAt         : Int               = 40
   def aggression            : Double            = 1.0
   def removeMineralBlocksAt : Int               = 60
+  def scoutAt               : Int               = 14
   def scoutExpansionsAt     : Int               = 100
   def superSaturate         : Boolean           = false
   def blueprints            : Seq[Blueprint]    = Seq.empty
@@ -27,7 +28,7 @@ abstract class TemplateMode extends Mode {
   def defaultPlacementPlan  : Plan              = new ProposePlacement(blueprints: _*)
   def defaultSupplyPlan     : Plan              = new RequireSufficientSupply
   def defaultWorkerPlan     : Plan              = new TrainWorkersContinuously(superSaturate)
-  def defaultScoutPlan      : Plan              = new ScoutAt(14)
+  def defaultScoutPlan      : Plan              = new ScoutAt(scoutAt)
   def priorityAttackPlan    : Plan              = NoPlan()
   def defaultAttackPlan     : Plan              = new ConsiderAttacking
   

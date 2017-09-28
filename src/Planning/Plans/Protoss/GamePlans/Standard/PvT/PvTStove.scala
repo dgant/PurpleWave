@@ -14,7 +14,7 @@ class PvTStove extends TemplateMode {
   override val activationCriteria = new Employing(PvTEarlyStove)
   override val completionCriteria = new UnitsAtLeast(1, Protoss.ArbiterTribunal)
   override def priorityAttackPlan = new PvTIdeas.PriorityAttacks
-  override def scoutExpansionsAt  = 8
+  override def scoutAt            = 8
   
   override val buildOrder = Vector(
     //ZCoreZ, Scout @ Pylon -- from Antiga replay
@@ -52,12 +52,13 @@ class PvTStove extends TemplateMode {
     RequestAtLeast(2,   Protoss.Nexus),
     RequestAtLeast(5,   Protoss.Pylon),
     RequestAtLeast(26,  Protoss.Probe),
-    RequestUpgrade(Protoss.DragoonRange))
+    RequestUpgrade(Protoss.DragoonRange),
+    RequestAtLeast(3,   Protoss.Dragoon))
   
   override def buildPlans = Vector(
     new BuildGasPumps,
-    new PvTIdeas.TrainArmy,
     new Build(
       RequestAtLeast(3, Protoss.Gateway),
-      RequestAtLeast(1, Protoss.ArbiterTribunal)))
+      RequestAtLeast(1, Protoss.ArbiterTribunal)),
+    new PvTIdeas.TrainArmy)
 }

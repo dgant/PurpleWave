@@ -100,8 +100,8 @@ class Configuration {
   var visualize                           = true
   var visualizeScreen                     = true
   var visualizeMap                        = true
-  var visualizationProbabilityHappyVision = 0.1
-  var visualizationProbabilityTextOnly    = 0.00
+  var visualizationProbabilityHappyVision = 0.05
+  var visualizationProbabilityTextOnly    = 0.01
   
   var camera                      = false
   var cameraDynamicSpeed          = false

@@ -322,16 +322,14 @@ abstract class UnitInfo(baseUnit: bwapi.Unit) extends UnitProxy(baseUnit) {
     unitClass.unaffectedByDarkSwarm ||
     With.grids.altitudeBonus.get(tileIncludingCenter) >= With.grids.altitudeBonus.get(enemy.tileIncludingCenter)
   
-  def damageTypeAgainst (enemy: UnitInfo)  : DamageType  = if (enemy.flying) unitClass.airDamageTypeRaw else unitClass.groundDamageTypeRaw
-  def attacksAgainst    (enemy: UnitInfo)  : Int         = if (enemy.flying) attacksAgainstAir          else attacksAgainstGround
+  def damageTypeAgainst (enemy: UnitInfo)  : Damage.Type  = if (enemy.flying) unitClass.groundDamageType else unitClass.airDamageType
+  def attacksAgainst    (enemy: UnitInfo)  : Int          = if (enemy.flying) attacksAgainstAir          else attacksAgainstGround
   
-  def damageScaleAgainstHitPoints(enemy: UnitInfo): Double =
-    if (enemy.flying && airDpf > 0)
-      Damage.scaleBySize(unitClass.airDamageTypeRaw, enemy.unitClass.size)
-    else if (groundDpf > 0)
-      Damage.scaleBySize(unitClass.groundDamageTypeRaw, enemy.unitClass.size)
-    else
-      0.0
+  def damageScaleAgainstHitPoints(enemy: UnitInfo): Double = {
+    if (airDpf    <= 0 && enemy.flying) return 0.0
+    if (groundDpf <= 0)                 return 0.0
+    Damage.scaleBySize(damageTypeAgainst(enemy), enemy.unitClass.size)
+  }
   
   def damageUpgradeLevel  : Int = unitClass.damageUpgradeType.map(player.getUpgradeLevel).getOrElse(0)
   def damageOnHitGround   : Int = damageOnHitGroundCache()
@@ -342,15 +340,11 @@ abstract class UnitInfo(baseUnit: bwapi.Unit) extends UnitProxy(baseUnit) {
   
   def damageOnHitBeforeShieldsArmorAndDamageType(enemy: UnitInfo): Int = if(enemy.flying) damageOnHitAir else damageOnHitGround
   def damageOnNextHitAgainst(enemy: UnitInfo): Int = {
-    damageOnNextHitAgainst(enemy, enemy.shieldPoints)
-  }
-  
-  def damageOnNextHitAgainst(enemy: UnitInfo, enemyShields: Int): Int = {
     val hits                    = attacksAgainst(enemy)
     val damagePerHit            = damageOnHitBeforeShieldsArmorAndDamageType(enemy: UnitInfo)
     val damageScale             = damageScaleAgainstHitPoints(enemy)
     val damageAssignedTotal     = hits * damagePerHit
-    val damageAssignedToShields = Math.min(damageAssignedTotal, enemyShields + enemy.armorShield * hits)
+    val damageAssignedToShields = Math.min(damageAssignedTotal, enemy.shieldPoints + enemy.armorShield * hits)
     val damageToShields         = damageAssignedToShields - enemy.armorShield * hits
     val damageAssignedToHealth  = damageAssignedTotal - damageAssignedToShields
     val damageToHealth          = (damageAssignedToHealth - enemy.armorHealth * hits) * damageScaleAgainstHitPoints(enemy)

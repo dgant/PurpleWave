@@ -1,21 +1,28 @@
 package ProxyBwapi.Engine
 
-import bwapi.{DamageType, UnitSizeType}
-
 object Damage {
-  def scaleBySize(damageType: DamageType, sizeType: UnitSizeType): Double =
+  
+  trait Type {
+    def ratioAgainst(sizeType: Size.Type): Double = Damage.scaleBySize(this, sizeType)
+  }
+  
+  object Normal     extends Type
+  object Concussive extends Type
+  object Explosive  extends Type
+  
+  def scaleBySize(damageType: Type, sizeType: Size.Type): Double =
     damageType match {
-      case DamageType.Concussive =>
+      case Concussive =>
         sizeType match {
-          case UnitSizeType.Large   => 0.25
-          case UnitSizeType.Medium  => 0.5
-          case _                    => 1.0
+          case Size.Large   => 0.25
+          case Size.Medium  => 0.5
+          case _            => 1.0
         }
-      case DamageType.Explosive =>
+      case Explosive =>
         sizeType match {
-          case UnitSizeType.Small   => 0.5
-          case UnitSizeType.Medium  => 0.75
-          case _                    => 1.0
+          case Size.Small   => 0.5
+          case Size.Medium  => 0.75
+          case _            => 1.0
         }
       case _ => 1.0
     }

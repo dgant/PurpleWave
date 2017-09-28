@@ -46,12 +46,15 @@ object PvTIdeas {
   
   class AttackWithDarkTemplar extends Attack { attackers.get.unitMatcher.set(Protoss.DarkTemplar) }
   
+  class AttackWithScouts extends Attack { attackers.get.unitMatcher.set(Protoss.Scout) }
+  
   class AttackWithCarrierFleet extends Trigger(
     new UnitsAtLeast(4, Protoss.Carrier),
     initialAfter = new Attack { attackers.get.unitMatcher.set(Protoss.Carrier) })
   
   class PriorityAttacks extends Parallel(
     new AttackWithDarkTemplar,
+    new AttackWithScouts,
     new AttackWithCarrierFleet)
   
   class AttackRespectingMines extends If(

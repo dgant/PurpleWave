@@ -14,7 +14,7 @@ class PvT1GateStargate extends TemplateMode {
   override val activationCriteria = new Employing(PvTEarly1GateStargate)
   override val completionCriteria = new MiningBasesAtLeast(2)
   override def priorityAttackPlan = new PvTIdeas.PriorityAttacks
-  override def scoutExpansionsAt  = 8
+  override def scoutAt            = 8
   
   override val buildOrder = Vector(
     //ZCoreZ, Scout @ Pylon

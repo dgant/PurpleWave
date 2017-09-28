@@ -6,7 +6,6 @@ import Mathematics.PurpleMath
 import Micro.Decisions.MicroValue
 import ProxyBwapi.Engine.Damage
 import ProxyBwapi.UnitInfo.UnitInfo
-import bwapi.DamageType
 
 class Avatar {
   
@@ -65,18 +64,18 @@ class Avatar {
       efficacy *= 1.75
     }
     
-    vulnerabilityGroundConcussive   = if (   unit.flying) 0.0 else Damage.scaleBySize(DamageType.Concussive, unit.unitClass.size)
-    vulnerabilityGroundExplosive    = if (   unit.flying) 0.0 else Damage.scaleBySize(DamageType.Explosive,  unit.unitClass.size)
-    vulnerabilityGroundNormal       = if (   unit.flying) 0.0 else Damage.scaleBySize(DamageType.Normal,     unit.unitClass.size)
-    vulnerabilityAirConcussive      = if ( ! unit.flying) 0.0 else Damage.scaleBySize(DamageType.Concussive, unit.unitClass.size)
-    vulnerabilityAirExplosive       = if ( ! unit.flying) 0.0 else Damage.scaleBySize(DamageType.Explosive,  unit.unitClass.size)
-    vulnerabilityAirNormal          = if ( ! unit.flying) 0.0 else Damage.scaleBySize(DamageType.Normal,     unit.unitClass.size)
-    dpfGroundConcussiveFocused      = efficacy * (if (unit.unitClass.groundDamageType == DamageType.Concussive) unit.damageOnHitGround else 0.0) / unit.cooldownMaxGround.toDouble
-    dpfGroundExplosiveFocused       = efficacy * (if (unit.unitClass.groundDamageType == DamageType.Explosive)  unit.damageOnHitGround else 0.0) / unit.cooldownMaxGround.toDouble
-    dpfGroundNormalFocused          = efficacy * (if (unit.unitClass.groundDamageType == DamageType.Normal)     unit.damageOnHitGround else 0.0) / unit.cooldownMaxGround.toDouble
-    dpfAirConcussiveFocused         = efficacy * (if (unit.unitClass.airDamageType    == DamageType.Concussive) unit.damageOnHitAir    else 0.0) / unit.cooldownMaxAir.toDouble
-    dpfAirExplosiveFocused          = efficacy * (if (unit.unitClass.airDamageType    == DamageType.Explosive)  unit.damageOnHitAir    else 0.0) / unit.cooldownMaxAir.toDouble
-    dpfAirNormalFocused             = efficacy * (if (unit.unitClass.airDamageType    == DamageType.Normal)     unit.damageOnHitAir    else 0.0) / unit.cooldownMaxAir.toDouble
+    vulnerabilityGroundConcussive   = if (   unit.flying) 0.0 else Damage.scaleBySize(Damage.Concussive, unit.unitClass.size)
+    vulnerabilityGroundExplosive    = if (   unit.flying) 0.0 else Damage.scaleBySize(Damage.Explosive,  unit.unitClass.size)
+    vulnerabilityGroundNormal       = if (   unit.flying) 0.0 else Damage.scaleBySize(Damage.Normal,     unit.unitClass.size)
+    vulnerabilityAirConcussive      = if ( ! unit.flying) 0.0 else Damage.scaleBySize(Damage.Concussive, unit.unitClass.size)
+    vulnerabilityAirExplosive       = if ( ! unit.flying) 0.0 else Damage.scaleBySize(Damage.Explosive,  unit.unitClass.size)
+    vulnerabilityAirNormal          = if ( ! unit.flying) 0.0 else Damage.scaleBySize(Damage.Normal,     unit.unitClass.size)
+    dpfGroundConcussiveFocused      = efficacy * (if (unit.unitClass.groundDamageType == Damage.Concussive) unit.damageOnHitGround else 0.0) / unit.cooldownMaxGround.toDouble
+    dpfGroundExplosiveFocused       = efficacy * (if (unit.unitClass.groundDamageType == Damage.Explosive)  unit.damageOnHitGround else 0.0) / unit.cooldownMaxGround.toDouble
+    dpfGroundNormalFocused          = efficacy * (if (unit.unitClass.groundDamageType == Damage.Normal)     unit.damageOnHitGround else 0.0) / unit.cooldownMaxGround.toDouble
+    dpfAirConcussiveFocused         = efficacy * (if (unit.unitClass.airDamageType    == Damage.Concussive) unit.damageOnHitAir    else 0.0) / unit.cooldownMaxAir.toDouble
+    dpfAirExplosiveFocused          = efficacy * (if (unit.unitClass.airDamageType    == Damage.Explosive)  unit.damageOnHitAir    else 0.0) / unit.cooldownMaxAir.toDouble
+    dpfAirNormalFocused             = efficacy * (if (unit.unitClass.airDamageType    == Damage.Normal)     unit.damageOnHitAir    else 0.0) / unit.cooldownMaxAir.toDouble
     dpfGroundConcussiveUnfocused    = dpfGroundConcussiveFocused  * unfocusedPenalty(unit)
     dpfGroundExplosiveUnfocused     = dpfGroundExplosiveFocused   * unfocusedPenalty(unit)
     dpfGroundNormalUnfocused        = dpfGroundNormalFocused      * unfocusedPenalty(unit)

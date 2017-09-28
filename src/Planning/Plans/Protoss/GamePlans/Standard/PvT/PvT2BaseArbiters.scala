@@ -17,7 +17,7 @@ class PvT2BaseArbiters extends TemplateMode {
   override val activationCriteria = new Employing(PvT2BaseArbiter)
   override val scoutExpansionsAt  = 60
   override val emergencyPlans     = Vector(new PvTIdeas.Require2BaseTech)
-  override val priorityAttackPlan = new PvTIdeas.AttackWithDarkTemplar
+  override val priorityAttackPlan = new PvTIdeas.PriorityAttacks
   override val defaultAttackPlan  = new PvTIdeas.AttackRespectingMines
   
   override val buildPlans = Vector(

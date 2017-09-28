@@ -15,7 +15,7 @@ import Strategery.Strategies.Protoss.PvT._
 
 object PvTIdeas {
   
-  class TakeSecondGasIfWeNeedIt extends If(
+  class BuildSecondGasIfWeNeedIt extends If(
     new Or(
       new Employing(PvT2BaseCarrier),
       new Employing(PvT2BaseArbiter)),
@@ -46,18 +46,37 @@ object PvTIdeas {
   
   class AttackWithDarkTemplar extends Attack { attackers.get.unitMatcher.set(Protoss.DarkTemplar) }
   
+  class AttackWithCarrierFleet extends Trigger(
+    new UnitsAtLeast(4, Protoss.Carrier),
+    initialAfter = new Attack { attackers.get.unitMatcher.set(Protoss.Carrier) })
+  
+  class PriorityAttacks extends Parallel(
+    new AttackWithDarkTemplar,
+    new AttackWithCarrierFleet)
+  
   class AttackRespectingMines extends If(
     new And(
       new UnitsAtLeast(6, UnitMatchWarriors, complete = true),
       new Or(
-        //new Employing(PvTEarly1GateStargate),
         new Employing(PvTEarly1015GateGoon),
-        new Employing(PvTEarly1GateRange),
-        new UnitsAtLeast(2, Protoss.Observer, complete = true),
-        new Not(new EnemyHasShown(Terran.SpiderMine)))),
+        new Employing(PvTEarly1GateStargate),
+        new Employing(PvTEarlyStove),
+        new Not(new EnemyHasShown(Terran.SpiderMine))),
+        new UnitsAtLeast(1, UnitMatchCustom((unit) => unit.is(Protoss.Observer) && With.framesSince(unit.frameDiscovered) > 24 * 10), complete = true)),
     new Attack)
   
-  private class TrainDarkTemplar extends If(
+  class TrainScouts extends If(
+    new And(
+      new UnitsExactly(0, Terran.Goliath),
+      new UnitsAtMost(6, Terran.Marine),
+      new UnitsExactly(0, Protoss.FleetBeacon),
+      new UnitsExactly(0, Protoss.ArbiterTribunal),
+      new Or(
+        new Employing(PvTEarly1GateStargate),
+        new Employing(PvTEarlyStove))),
+    new TrainContinuously(Protoss.Scout, 3))
+  
+  class TrainDarkTemplar extends If(
     new And(
       new UnitsAtMost(0, Protoss.Arbiter),
       new EnemyUnitsNone(Terran.ScienceVessel),
@@ -117,6 +136,7 @@ object PvTIdeas {
     new TrainDarkTemplar,
     new TrainHighTemplar,
     new TrainObservers,
+    new TrainScouts,
     new TrainZealotsOrDragoons)
   
   class GetObserversForCloakedWraiths extends If(

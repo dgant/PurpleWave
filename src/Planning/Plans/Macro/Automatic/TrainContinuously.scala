@@ -33,8 +33,8 @@ class TrainContinuously(
   
   protected def canBuild: Boolean = {
     unitClass.buildTechEnabling.forall(With.self.hasTech) &&
-    unitClass.buildUnitsEnabling.forall(unitClass => With.units.ours.exists(unit => unit.aliveAndComplete && unit.is(unitClass))) &&
-    unitClass.buildUnitsBorrowed.forall(unitClass => With.units.ours.exists(unit => unit.aliveAndComplete && unit.is(unitClass)))
+    unitClass.buildUnitsEnabling.forall(unitClass => With.units.ours.exists(unit => unit.alive && unit.is(unitClass))) &&
+    unitClass.buildUnitsBorrowed.forall(unitClass => With.units.ours.exists(unit => unit.alive && unit.is(unitClass)))
   }
   
   protected def buildCapacity: Int = {

@@ -142,7 +142,7 @@ object ProtossBuilds {
     RequestAtLeast(19,  Protoss.Probe),
     RequestAtLeast(2,   Protoss.Pylon),
     RequestAtLeast(2,   Protoss.Dragoon),
-    RequestUpgrade(    Protoss.DragoonRange),
+    RequestUpgrade(     Protoss.DragoonRange),
     RequestAtLeast(21,  Protoss.Probe),
     RequestAtLeast(3,   Protoss.Pylon),
     RequestAtLeast(4,   Protoss.Dragoon),

@@ -18,9 +18,9 @@ class PvTDTExpand extends TemplateMode {
   override val completionCriteria     = new UnitsAtLeast(2, Protoss.Nexus, complete = true)
   override val buildOrder             = ProtossBuilds.OpeningDTExpand
   override val defaultWorkerPlan      = new TrainWorkersContinuously(oversaturate = true)
-  override val priorityAttackPlan = new PvTIdeas.AttackWithDarkTemplar
+  override val priorityAttackPlan     = new PvTIdeas.PriorityAttacks
   override val defaultAttackPlan      = new Trigger(
-    new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
+    new UnitsAtLeast(1, Protoss.Dragoon, complete = true),
     initialAfter = new Attack)
   
   override val buildPlans = Vector(

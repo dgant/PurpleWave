@@ -17,7 +17,7 @@ class PvT2BaseGateways extends TemplateMode {
   override val completionCriteria = new MiningBasesAtLeast(3)
   override val scoutExpansionsAt  = 60
   override val emergencyPlans     = Vector(new PvTIdeas.Require2BaseTech)
-  override val priorityAttackPlan = new PvTIdeas.AttackWithDarkTemplar
+  override val priorityAttackPlan = new PvTIdeas.PriorityAttacks
   override val defaultAttackPlan  = new PvTIdeas.AttackRespectingMines
   
   override val buildPlans = Vector(

@@ -29,6 +29,7 @@ class Battle(
   
   lazy val estimationAbstract           : Estimation  = BattleUpdater.estimateAvatar(this, geometric = false, weAttack = true,  enemyAttacks = true,  weRetreat = false)
   lazy val estimationAbstractOffense    : Estimation  = BattleUpdater.estimateAvatar(this, geometric = false, weAttack = true,  enemyAttacks = false, weRetreat = false)
+  lazy val estimationAbstractDefense    : Estimation  = BattleUpdater.estimateAvatar(this, geometric = false, weAttack = false, enemyAttacks = true,  weRetreat = false)
   lazy val estimationSimulationAttack   : Estimation  = BattleUpdater.estimateSimulation(this, weAttack = true)
   lazy val estimationSimulationRetreat  : Estimation  = BattleUpdater.estimateSimulation(this, weAttack = false)
   
@@ -39,13 +40,18 @@ class Battle(
   lazy val analysis = new Analysis(this)
   lazy val desire: Double = analysis.desireTotal
   
-  lazy val globalSafeToAttack: Boolean = {
-    val tradesEffectively = With.blackboard.aggressionRatio * estimationAbstractOffense.costToEnemy - estimationAbstractOffense.costToUs >= 0
+  lazy val globalSafeToAttack: Boolean = globalSafe(estimationAbstractOffense, With.blackboard.aggressionRatio)
+  lazy val globalSafeToDefend: Boolean = globalSafe(estimationAbstractDefense, 0.75) || globalSafeToAttack
+  
+  private def globalSafe(estimation: Estimation, discountFactor: Double): Boolean = {
+    val tradesEffectively = discountFactor * estimation.costToEnemy - estimation.costToUs >= 0
     val killsEffectively  =
-      estimationAbstractOffense.enemyDies &&
-      estimationAbstractOffense.weSurvive &&
-      estimationAbstractOffense.costToUs < estimationAbstractOffense.avatarUs.subjectiveValue
+      estimation.enemyDies &&
+      estimation.weSurvive &&
+      estimation.costToUs < estimationAbstractOffense.avatarUs.subjectiveValue
     
     tradesEffectively || killsEffectively
   }
+  
+  
 }

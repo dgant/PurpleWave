@@ -1,6 +1,5 @@
 package Planning.Plans.Protoss.GamePlans.Standard.PvP
 
-import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, RequestAtLeast, RequestUpgrade}
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
@@ -56,7 +55,6 @@ class PvPOpen2GateRobo extends TemplateMode {
     RequestUpgrade(Protoss.DragoonRange))
   
   override val buildPlans = Vector(
-    new Do(() => With.blackboard.gasBankSoftLimit = 450),
     new If(
       new EnemyUnitsAtLeast(1, Protoss.DarkTemplar),
       new Build(RequestAtLeast(1, Protoss.Observer))),

@@ -1,6 +1,5 @@
 package Planning.Plans.Protoss.GamePlans.Standard.PvP
 
-import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.RequestAtLeast
@@ -63,7 +62,6 @@ class PvPOpen2GateDarkTemplar extends TemplateMode {
     RequestAtLeast(24,  Protoss.Probe))
   
   override val buildPlans = Vector(
-    new Do(() => With.blackboard.gasBankSoftLimit = 450),
     new RequireSufficientSupply,
     new If(
       new And(

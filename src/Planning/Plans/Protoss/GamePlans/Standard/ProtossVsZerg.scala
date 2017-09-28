@@ -11,12 +11,13 @@ import Planning.Plans.Information.Reactive.EnemyMutalisks
 import Planning.Plans.Information.Scenarios.EnemyStrategy
 import Planning.Plans.Information.{Employ, Employing, StartPositionsAtLeast}
 import Planning.Plans.Macro.Automatic.{MatchingRatio, _}
-import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder, FirstEightMinutes, RequireEssentials}
-import Planning.Plans.Macro.Expanding.{BuildCannonsAtBases, BuildCannonsAtExpansions, BuildGasPumps, RequireMiningBases}
+import Planning.Plans.Macro.BuildOrders._
+import Planning.Plans.Macro.Expanding._
 import Planning.Plans.Macro.Milestones._
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Protoss.ProtossBuilds
 import Planning.Plans.Protoss.Situational._
+import Planning.Plans.Recruitment.RecruitFreelancers
 import Planning.Plans.Scouting.{FindExpansions, Scout, ScoutAt}
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Protoss.PvZ._
@@ -402,6 +403,16 @@ class ProtossVsZerg extends Parallel {
         new EnemyUnitsAtMost(0, Zerg.Scourge),
         new UpgradeComplete(Protoss.ShuttleSpeed)),
       new DropAttack),
-    new ConsiderAttacking
+    new ConsiderAttacking,
+  
+    //TODO: Kill
+  
+    new ClearBurrowedBlockers,
+    new FollowBuildOrder,
+    new DefendAgainstProxy,
+    new RemoveMineralBlocksAt(40),
+    new Gather,
+    new RecruitFreelancers,
+    new DefendEntrance
   ))
 }

@@ -1,9 +1,8 @@
 package Planning.Plans.Protoss.GamePlans.Standard.PvP
 
-import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
 import Planning.Plan
-import Planning.Plans.Compound.{Do, Or, Trigger}
+import Planning.Plans.Compound.{Or, Trigger}
 import Planning.Plans.GamePlans.TemplateMode
 import Planning.Plans.Information.Employing
 import Planning.Plans.Information.Reactive.EnemyBasesAtLeast
@@ -55,7 +54,6 @@ class PvPOpen1GateRoboObs extends TemplateMode {
     RequestAtLeast(1,   Protoss.Observatory))       // 33 = 23 + Z + DDDD
   
   override val buildPlans: Vector[Plan] = Vector(
-    new Do(() => With.blackboard.gasBankSoftLimit = 450),
     new TrainContinuously(Protoss.Observer, 1),
     new TrainContinuously(Protoss.Dragoon),
     new RequireMiningBases(2),

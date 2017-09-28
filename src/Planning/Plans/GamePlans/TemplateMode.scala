@@ -25,6 +25,7 @@ abstract class TemplateMode extends Mode {
   def buildOrder            : Seq[BuildRequest] = Vector.empty
   def emergencyPlans        : Seq[Plan]         = Vector.empty
   def buildPlans            : Seq[Plan]         = Vector.empty
+  def defaultAggressionPlan : Plan              = new Aggression(aggression)
   def defaultPlacementPlan  : Plan              = new ProposePlacement(blueprints: _*)
   def defaultSupplyPlan     : Plan              = new RequireSufficientSupply
   def defaultWorkerPlan     : Plan              = new TrainWorkersContinuously(superSaturate)
@@ -39,7 +40,7 @@ abstract class TemplateMode extends Mode {
     new RemoveMineralBlocksAt(removeMineralBlocksAt))
   
   def defaultTacticsPlans: Vector[Plan] = Vector(
-    new Aggression(aggression),
+    defaultAggressionPlan,
     priorityAttackPlan,
     defaultScoutPlan,
     new DefendZones,

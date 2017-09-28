@@ -8,8 +8,8 @@ abstract class Mode extends Parallel {
   
   override def isComplete: Boolean = completionCriteria.isComplete || ! activationCriteria.isComplete
   
-  val completionCriteria: Plan = new Never
   val activationCriteria: Plan = new Always
+  val completionCriteria: Plan = new Never
   
   override def onUpdate() {
     if ( ! isComplete) {

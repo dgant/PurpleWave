@@ -5,7 +5,7 @@ import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
 import Planning.Composition.UnitMatchers.{UnitMatchCustom, UnitMatchWarriors}
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, _}
-import Planning.Plans.Information.Employing
+import Planning.Plans.Information.{Employing, SafeToAttack}
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
@@ -59,13 +59,16 @@ object PvTIdeas {
   
   class AttackRespectingMines extends If(
     new And(
-      new UnitsAtLeast(6, UnitMatchWarriors, complete = true),
+      new Or(
+        new SafeToAttack,
+        new UnitsAtLeast(6, UnitMatchWarriors, complete = true)),
       new Or(
         new Employing(PvTEarly1015GateGoon),
         new Employing(PvTEarly1GateStargate),
         new Employing(PvTEarlyStove),
-        new Not(new EnemyHasShown(Terran.SpiderMine))),
-        new UnitsAtLeast(1, UnitMatchCustom((unit) => unit.is(Protoss.Observer) && With.framesSince(unit.frameDiscovered) > 24 * 10), complete = true)),
+        new OnMiningBases(3),
+        new Not(new EnemyHasShown(Terran.SpiderMine)),
+        new UnitsAtLeast(1, UnitMatchCustom((unit) => unit.is(Protoss.Observer) && With.framesSince(unit.frameDiscovered) > 24 * 10), complete = true))),
     new Attack)
   
   class TrainScouts extends If(
@@ -134,11 +137,11 @@ object PvTIdeas {
       new TrainContinuously(Protoss.HighTemplar, 6, 1)))
     
   class TrainArmy extends Parallel(
+    new TrainObservers,
     new TrainArbiters,
     new TrainContinuously(Protoss.Carrier),
     new TrainDarkTemplar,
     new TrainHighTemplar,
-    new TrainObservers,
     new TrainScouts,
     new TrainZealotsOrDragoons)
   

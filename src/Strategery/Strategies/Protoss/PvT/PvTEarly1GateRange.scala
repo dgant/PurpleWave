@@ -8,6 +8,7 @@ object PvTEarly1GateRange extends Strategy {
   override def choices: Iterable[Iterable[Strategy]] = Vector(
     Vector(
       PvT2BaseGateway,
+      PvT2BaseGatewayForever,
       PvT2BaseCarrier,
       PvT3BaseCorsair))
   

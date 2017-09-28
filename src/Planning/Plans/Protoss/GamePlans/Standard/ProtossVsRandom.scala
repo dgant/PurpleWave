@@ -1,15 +1,16 @@
 package Planning.Plans.Protoss.GamePlans.Standard
 
 import Macro.BuildRequests.RequestAtLeast
-import Planning.Plans.Army.ConsiderAttacking
+import Planning.Plans.Army.{ClearBurrowedBlockers, ConsiderAttacking, DefendEntrance}
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.Information.Employ
-import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
-import Planning.Plans.Macro.BuildOrders.{Build, RequireEssentials}
-import Planning.Plans.Macro.Expanding.RequireMiningBases
+import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
+import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder, RequireEssentials}
+import Planning.Plans.Macro.Expanding.{RemoveMineralBlocksAt, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.UnitsAtLeast
 import Planning.Plans.Protoss.ProtossBuilds
-import Planning.Plans.Protoss.Situational.TwoGatewaysAtNatural
+import Planning.Plans.Protoss.Situational.{DefendAgainstProxy, TwoGatewaysAtNatural}
+import Planning.Plans.Recruitment.RecruitFreelancers
 import Planning.Plans.Scouting.Scout
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvR.{PvREarly2Gate1012, PvREarly2Gate910, PvREarly2Gate910AtNatural}
@@ -36,6 +37,16 @@ class ProtossVsRandom extends Parallel {
     new If(
       new UnitsAtLeast(1, Protoss.Pylon, complete = false),
       new Scout),
-    new ConsiderAttacking
+    new ConsiderAttacking,
+    
+    //TODO: Kill
+  
+    new ClearBurrowedBlockers,
+    new FollowBuildOrder,
+    new DefendAgainstProxy,
+    new RemoveMineralBlocksAt(40),
+    new Gather,
+    new RecruitFreelancers,
+    new DefendEntrance
   ))
 }

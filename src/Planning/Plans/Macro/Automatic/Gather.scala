@@ -27,7 +27,7 @@ class Gather extends Plan {
   private var activeBases             : Iterable[Base]                    = Vector.empty
   private var allWorkers              : Set[FriendlyUnitInfo]             = Set.empty
   private var minerals                : Set[UnitInfo]                     = Set.empty
-  private var gasses                     : Set[UnitInfo]                     = Set.empty
+  private var gasses                  : Set[UnitInfo]                     = Set.empty
   private var allResources            : Set[UnitInfo]                     = Set.empty
   private var haveEnoughGas           : Boolean                           = false
   private var workersForGas           : Int                               = 0

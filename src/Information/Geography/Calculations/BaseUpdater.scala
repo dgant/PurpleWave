@@ -17,6 +17,11 @@ object BaseUpdater {
     
     base.owner = base.townHall.map(_.player).getOrElse(With.neutral)
     
+    // Assume ownership of implicit starting location
+    if (base.owner.isNeutral && base.lastScoutedFrame <= 0 && With.intelligence.firstEnemyMain.contains(base)) {
+      base.owner = With.enemy
+    }
+    
     // Assume ownership of occupied base we haven't seen lately
     if (base.owner.isNeutral && With.framesSince(base.lastScoutedFrame) > Protoss.Nexus.buildFrames) {
       base.zone.units

@@ -23,7 +23,8 @@ class PvT2BaseArbiters extends TemplateMode {
   override val buildPlans = Vector(
     new OnMiningBases(3, new BuildCannonsAtNatural(1)),
     new BuildCannonsAtExpansions(2),
-    new If(new UnitsAtLeast(30, UnitMatchWarriors), new RequireMiningBases(3)),
+    new If(new UnitsAtLeast(20, UnitMatchWarriors), new RequireMiningBases(3)),
+    new If(new UnitsAtLeast(30, UnitMatchWarriors), new RequireMiningBases(4)),
     new FlipIf(
       new UnitsAtLeast(10, UnitMatchWarriors),
       new PvTIdeas.TrainArmy,
@@ -42,7 +43,6 @@ class PvT2BaseArbiters extends TemplateMode {
           RequestAtLeast(1, Protoss.RoboticsFacility),
           RequestAtLeast(1, Protoss.Observatory),
           RequestAtLeast(8, Protoss.Gateway)),
-        new RequireMiningBases(3),
         new If(new UnitsAtLeast(2, Protoss.HighTemplar), new Build(RequestTech(Protoss.PsionicStorm))),
         new Build(RequestAtLeast(1, Protoss.Forge)),
         new UpgradeContinuously(Protoss.GroundDamage),
@@ -50,7 +50,6 @@ class PvT2BaseArbiters extends TemplateMode {
         new OnGasBases(4, new Build(
           RequestUpgrade(Protoss.ArbiterEnergy),
           RequestAtLeast(2, Protoss.Stargate))))),
-    new RequireMiningBases(4),
     new UpgradeContinuously(Protoss.GroundArmor),
     new Build(RequestAtLeast(20, Protoss.Gateway)))
 }

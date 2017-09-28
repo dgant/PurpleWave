@@ -21,12 +21,11 @@ class PvT2BaseCarriers extends TemplateMode {
   override val buildPlans = Vector(
     new OnMiningBases(3, new BuildCannonsAtNatural(1)),
     new BuildCannonsAtExpansions(3),
-    new If(
-      new UnitsAtLeast(1, Protoss.Carrier, complete = true),
-      new Build(RequestUpgrade(Protoss.CarrierCapacity))),
+    new If(new UnitsAtLeast(1, Protoss.Carrier, complete = true), new Build(RequestUpgrade(Protoss.CarrierCapacity))),
+    new If(new UnitsAtLeast(4, Protoss.Carrier, complete = true), new RequireMiningBases(3)),
     new If(
       new And(
-        new UnitsAtLeast(8, Protoss.Zealot),
+        new UnitsAtLeast(12, Protoss.Zealot),
         new UnitsAtLeast(4, Protoss.Carrier)),
       new Build(
         RequestAtLeast(1, Protoss.CitadelOfAdun),
@@ -51,7 +50,6 @@ class PvT2BaseCarriers extends TemplateMode {
       RequestAtLeast(2, Protoss.Stargate),
       RequestAtLeast(1, Protoss.Forge),
       RequestAtLeast(5, Protoss.Gateway)),
-    new RequireMiningBases(3),
     new UpgradeContinuously(Protoss.AirDamage),
     new UpgradeContinuously(Protoss.AirArmor),
     new UpgradeContinuously(Protoss.GroundDamage),

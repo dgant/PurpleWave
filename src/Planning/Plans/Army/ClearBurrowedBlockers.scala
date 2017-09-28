@@ -36,7 +36,6 @@ class ClearBurrowedBlockers extends Plan {
         toTravel = target
         canCower = true
       }))
-      return
     }
   
     if (With.enemies.exists(_.isTerran)) {

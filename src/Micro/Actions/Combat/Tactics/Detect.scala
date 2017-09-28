@@ -7,7 +7,10 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 object Detect extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.canMove && unit.unitClass.isDetector
+    unit.canMove              &&
+    unit.unitClass.isDetector &&
+    unit.matchups.enemies.exists(_.effectivelyCloaked) &&
+    unit.matchups.allies.exists(_.canAttack)
   }
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {

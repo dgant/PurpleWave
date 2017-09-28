@@ -1,11 +1,6 @@
 package Planning.Plans.Information
 
 import Lifecycle.With
-import Planning.Plan
+import Planning.Plans.Compound.Check
 
-class StartPositionsAtLeast(count: Int) extends Plan {
-  
-  override def isComplete: Boolean = {
-    With.geography.startLocations.size >= count
-  }
-}
+class StartPositionsAtLeast(count: Int) extends Check(() => With.geography.startLocations.size >= count)

@@ -31,7 +31,6 @@ object StrategyGroups {
     TvEMassMarineAllIn,
     Proxy2Gate2StartLocations,
     Proxy2Gate3StartLocations,
-    Stove,
     ProxyDarkTemplar,
     Zerg4PoolAllIn,
     ProxyHatchZerglings,
@@ -58,14 +57,13 @@ object StrategyGroups {
     TvEMassMarineAllIn,
     //Proxy2Gate2StartLocations,
     //Proxy2Gate3StartLocations,
-    Stove,
     ProxyDarkTemplar
   )
 }
 
 class TestingPlaybook extends EmptyPlaybook {
   
-  val strategiesToTest = Array(Stove)
+  val strategiesToTest = Array(AllPvT)
   
   //override lazy val forced: Seq[Strategy] = Seq(AllPvP, AllPvT, AllPvZ, TvTStandard, TvZStandard) ++ strategiesToTest
   override lazy val forced: Seq[Strategy] = strategiesToTest
@@ -116,7 +114,6 @@ object Playbook extends PurpleWavePlaybook {
     TvZEarlyCCFirst,
     TvZEarly2Rax,
     TvZEarly1RaxGas,
-    Stove,
     ProxyDarkTemplar,
     ProxySunkens,
     ProxyHatchSunkens,

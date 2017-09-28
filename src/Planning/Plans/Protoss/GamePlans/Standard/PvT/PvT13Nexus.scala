@@ -7,7 +7,6 @@ import Planning.Plans.Information.Employing
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Milestones.UnitsAtLeast
-import Planning.Plans.Protoss.GamePlans.Standard.PvT.PvTIdeas.TakeSecondGasIfWeNeedIt
 import Planning.Plans.Protoss.ProtossBuilds
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvT.PvTEarly14Nexus
@@ -23,7 +22,7 @@ class PvT13Nexus extends TemplateMode {
   override val buildPlans = Vector(
     new TrainContinuously(Protoss.Observer, 1),
     new TrainContinuously(Protoss.Dragoon),
-    new TakeSecondGasIfWeNeedIt,
+    new PvTIdeas.BuildSecondGasIfWeNeedIt,
     new Build(
       RequestAtLeast(2, Protoss.Gateway),
       RequestAtLeast(1, Protoss.RoboticsFacility),

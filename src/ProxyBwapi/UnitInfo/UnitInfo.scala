@@ -314,7 +314,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit) extends UnitProxy(baseUnit) {
   def effectiveRangePixels: Double = Math.max(pixelRangeMax, unitClass.effectiveRangePixels)
   
   def missChanceAgainst(enemy: UnitInfo): Double = {
-    if (guaranteedToHit(enemy)) 0.53 else 0.0
+    if (guaranteedToHit(enemy)) 0.0 else 0.53
   }
   def guaranteedToHit(enemy: UnitInfo): Boolean =
     flying                          ||

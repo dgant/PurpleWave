@@ -47,7 +47,7 @@ class PvT2BaseArbiters extends TemplateMode {
         new Build(RequestAtLeast(1, Protoss.Forge)),
         new UpgradeContinuously(Protoss.GroundDamage),
         new Build(RequestAtLeast(10, Protoss.Gateway)),
-        new OnGasBases(3, new Build(
+        new OnGasBases(4, new Build(
           RequestUpgrade(Protoss.ArbiterEnergy),
           RequestAtLeast(2, Protoss.Stargate))))),
     new RequireMiningBases(4),

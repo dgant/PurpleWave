@@ -9,7 +9,7 @@ import Information.Grids.Grids
 import Information._
 import Macro.Allocation._
 import Macro.Architecture.{Architecture, PlacementScheduler}
-import Macro.Scheduling.Scheduler
+import Macro.Scheduling.{MasterBuildOrder, Scheduler}
 import Micro.Agency.{Agency, Commander}
 import Micro.Matchups.MatchupGraph
 import Micro.Squads.Squads
@@ -32,6 +32,7 @@ object With {
   var bank            : Bank                = _
   var blackboard      : Blackboard          = _
   var battles         : BattleClassifier    = _
+  var buildOrder      : MasterBuildOrder    = _
   var camera          : Camera              = _
   var commander       : Commander           = _
   var configuration   : Configuration       = _
@@ -97,8 +98,9 @@ object With {
     agents            = new Agency
     architecture      = new Architecture
     bank              = new Bank
-    blackboard        = new Blackboard
     battles           = new BattleClassifier
+    blackboard        = new Blackboard
+    buildOrder        = new MasterBuildOrder
     camera            = new Camera
     commander         = new Commander
     damageCredit      = new DamageCredit

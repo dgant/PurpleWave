@@ -349,7 +349,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit) extends UnitProxy(baseUnit) {
     val damageAssignedToHealth  = damageAssignedTotal - damageAssignedToShields
     val damageToHealth          = (damageAssignedToHealth - enemy.armorHealth * hits) * damageScaleAgainstHitPoints(enemy)
     val damageDealtTotal        = damageAssignedToHealth + damageAssignedToShields
-    Math.max(1, missChanceAgainst(enemy) * damageDealtTotal).toInt
+    Math.max(1, (1.0 - missChanceAgainst(enemy)) * damageDealtTotal).toInt
   }
   
   def dpfOnNextHitAgainst(enemy: UnitInfo): Double = {

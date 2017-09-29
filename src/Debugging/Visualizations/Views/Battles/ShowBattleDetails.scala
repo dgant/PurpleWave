@@ -97,6 +97,7 @@ object ShowBattleDetails extends View {
       Vector("DTurtling",       "" + "%1.1f".format(battle.analysis.desireTurtling)),
       Vector("DUrgency",        "" + "%1.1f".format(battle.analysis.desireUrgency)),
       Vector("DHysteresis",     "" + "%1.1f".format(battle.analysis.desireHysteresis)),
+      Vector("DMultiplier",     "" + "%1.1f".format(battle.analysis.desireMultiplier)),
       Vector(),
       Vector("DTotal",          "" + "%1.1f".format(battle.desire))
     )

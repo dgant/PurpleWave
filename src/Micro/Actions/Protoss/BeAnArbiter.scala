@@ -13,7 +13,7 @@ object BeAnArbiter extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.aliveAndComplete     &&
     unit.is(Protoss.Arbiter)  &&
-    unit.matchups.threats.nonEmpty
+    unit.matchups.enemies.exists(_.matchups.targets.nonEmpty)
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {

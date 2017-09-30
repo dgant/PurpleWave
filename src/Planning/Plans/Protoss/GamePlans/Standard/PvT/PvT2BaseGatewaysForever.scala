@@ -27,13 +27,7 @@ class PvT2BaseGatewaysForever extends TemplateMode {
         new Parallel(
           new PvTIdeas.TrainObservers,
           new PvTIdeas.TrainHighTemplar,
-          new PvTIdeas.TrainZealotsOrDragoons),
-        new Build(
-          RequestAtLeast(2, Protoss.Gateway),
-          RequestAtLeast(1, Protoss.RoboticsFacility),
-          RequestAtLeast(3, Protoss.Gateway),
-          RequestAtLeast(1, Protoss.Observatory),
-          RequestAtLeast(8, Protoss.Gateway))),
+          new PvTIdeas.TrainZealotsOrDragoons)),
       new Build(
         RequestAtLeast(2, Protoss.Gateway),
         RequestAtLeast(1, Protoss.RoboticsFacility),

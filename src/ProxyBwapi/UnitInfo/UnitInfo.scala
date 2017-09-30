@@ -278,8 +278,8 @@ abstract class UnitInfo(baseUnit: bwapi.Unit) extends UnitProxy(baseUnit) {
   
   def stimAttackSpeedBonus: Int = if (stimmed) 2 else 1
   
-  def airDpf    : Double = damageOnHitAir     * attacksAgainstAir     / cooldownMaxAir
-  def groundDpf : Double = damageOnHitGround  * attacksAgainstGround  / cooldownMaxGround
+  def airDpf    : Double = damageOnHitAir     * attacksAgainstAir     / cooldownMaxAir.toDouble
+  def groundDpf : Double = damageOnHitGround  * attacksAgainstGround  / cooldownMaxGround.toDouble
   
   def attacksAgainstAir: Int = attacksAgainstAirCache()
   private val attacksAgainstAirCache = new Cache(() => {
@@ -313,8 +313,8 @@ abstract class UnitInfo(baseUnit: bwapi.Unit) extends UnitProxy(baseUnit) {
   def pixelRangeAgainstFromCenter (enemy: UnitInfo): Double = pixelRangeAgainstFromEdge(enemy) + unitClass.radialHypotenuse + enemy.unitClass.radialHypotenuse
   def effectiveRangePixels: Double = Math.max(pixelRangeMax, unitClass.effectiveRangePixels)
   
-  def missChanceAgainst(enemy: UnitInfo): Double = {
-    if (guaranteedToHit(enemy)) 0.0 else 0.53
+  def hitChanceAgainst(enemy: UnitInfo): Double = {
+    if (guaranteedToHit(enemy)) 1.0 else 0.47
   }
   def guaranteedToHit(enemy: UnitInfo): Boolean =
     flying                          ||
@@ -342,14 +342,16 @@ abstract class UnitInfo(baseUnit: bwapi.Unit) extends UnitProxy(baseUnit) {
   def damageOnNextHitAgainst(enemy: UnitInfo): Int = {
     val hits                    = attacksAgainst(enemy)
     val damagePerHit            = damageOnHitBeforeShieldsArmorAndDamageType(enemy: UnitInfo)
-    val damageScale             = damageScaleAgainstHitPoints(enemy)
     val damageAssignedTotal     = hits * damagePerHit
     val damageAssignedToShields = Math.min(damageAssignedTotal, enemy.shieldPoints + enemy.armorShield * hits)
     val damageToShields         = damageAssignedToShields - enemy.armorShield * hits
     val damageAssignedToHealth  = damageAssignedTotal - damageAssignedToShields
+    val damageToHealthScale     = damageScaleAgainstHitPoints(enemy)
     val damageToHealth          = (damageAssignedToHealth - enemy.armorHealth * hits) * damageScaleAgainstHitPoints(enemy)
-    val damageDealtTotal        = damageAssignedToHealth + damageAssignedToShields
-    Math.max(1, (1.0 - missChanceAgainst(enemy)) * damageDealtTotal).toInt
+    val damageDealtTotal        = damageToHealth + damageToShields
+    val hitChance               = hitChanceAgainst(enemy)
+    val output                  = (hitChance * Math.max(1.0, damageDealtTotal)).toInt
+    output
   }
   
   def dpfOnNextHitAgainst(enemy: UnitInfo): Double = {
@@ -364,6 +366,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit) extends UnitProxy(baseUnit) {
         damageOnNextHitAgainst(enemy).toDouble / cooldownVs
     }
   }
+  def vpfOnNextHitAgainst(enemy: UnitInfo): Double = dpfOnNextHitAgainst(enemy) / enemy.subjectiveValue
   
   def canDoAnything: Boolean = canDoAnythingCache()
   private val canDoAnythingCache = new Cache(() =>

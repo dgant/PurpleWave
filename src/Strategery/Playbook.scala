@@ -66,7 +66,7 @@ object StrategyGroups {
 
 class TestingPlaybook extends EmptyPlaybook {
   
-  val strategiesToTest = Array(AllPvT)
+  val strategiesToTest = Array(AllPvT, PvTEarly1GateRange, PvT2BaseGatewayForever)
   
   //override lazy val forced: Seq[Strategy] = Seq(AllPvP, AllPvT, AllPvZ, TvTStandard, TvZStandard) ++ strategiesToTest
   override lazy val forced: Seq[Strategy] = strategiesToTest
@@ -86,7 +86,7 @@ class PurpleCheesePlaybook extends EmptyPlaybook  {
   override lazy val forced: Seq[Strategy] = StrategyGroups.cheese
 }
 
-object Playbook extends PurpleWavePlaybook {
+object Playbook extends TestingPlaybook {
   
   //////////////////////
   // Experiment order //

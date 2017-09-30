@@ -13,7 +13,7 @@ object ShowUnitsAll extends View {
   
   var showHitPoints       = true
   var showResources       = false
-  var showViolence        = false
+  var showViolence        = true
   var showBattleIgnorance = false
   var showMortality       = true
   
@@ -32,7 +32,16 @@ object ShowUnitsAll extends View {
         DrawMap.circle(Pixel(unit.pixelCenter.x, unit.top - 7), 5, unit.player.colorMedium, solid = true)
         DrawMap.text(Pixel(unit.pixelCenter.x - 2, unit.top - 12), "!!")
       }
-  
+      if (unit.target.exists(_.isEnemyOf(unit))) {
+        DrawMap.arrow(unit.pixelCenter, unit.target.get.pixelCenter, unit.player.colorBright)
+        DrawMap.labelBox(
+          Vector(
+            unit.damageOnNextHitAgainst(unit.target.get).toString,
+            "%1.1f".format(unit.vpfOnNextHitAgainst(unit.target.get))),
+          unit.pixelCenter.project(unit.target.map(_.pixelCenter).getOrElse(unit.pixelCenter), 24),
+          true,
+          unit.player.colorBright)
+      }
       if (unit.is(Protoss.Scarab)) {
         unit.target.foreach(scarabTarget => Range(1, 6).foreach(r => DrawMap.circle(scarabTarget.pixelCenter, 4 * r)))
       }

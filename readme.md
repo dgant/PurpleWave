@@ -4,7 +4,7 @@
 ## About
 PurpleWave is such a *StarCraft* AI written in Scala. It can play all races and a large variety of strategies.
 
-PurpleWave won 3rd Place in the [2017 IEEE CIG Starcraft Tournament](https://cilab.sejong.ac.kr/sc_competition/?p=1090). It's been ranked as high as #3 on the [SSCAIT Ladder](https://sscaitournament.com/index.php?action=scores). 
+PurpleWave won 3rd Place in the [2017 IEEE CIG Starcraft Tournament](https://cilab.sejong.ac.kr/sc_competition/?p=1090). It's been ranked as high as #2 on the [SSCAIT Ladder](https://sscaitournament.com/index.php?action=scores). 
 
 ## Credits
 Thanks to:

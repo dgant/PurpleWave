@@ -44,27 +44,29 @@ class Strategist {
   }
   
   private def isAppropriate(strategy: Strategy): Boolean = {
-    val ourRace         = With.self.race
-    val enemyRaces      = With.enemies.map(_.race).toSet
-    val isIsland        = isIslandMap
-    val isGround        = ! isIsland
-    val startLocations  = With.geography.startLocations.size
-    val isFfa           = With.enemies.size > 1
+    lazy val ourRace                = With.self.race
+    lazy val enemyRaces             = With.enemies.map(_.race).toSet
+    lazy val isIsland               = isIslandMap
+    lazy val isGround               = ! isIsland
+    lazy val startLocations         = With.geography.startLocations.size
+    lazy val thisGameIsFFA          = With.enemies.size > 1
+    lazy val disabledInPlaybook     = Playbook.disabled.contains(strategy)
+    lazy val disabledOnMap          = strategy.prohibitedMaps.exists(_.matches)
+    lazy val appropriateForOpponent = strategy.restrictedOpponents.isEmpty ||
+      strategy.restrictedOpponents.get
+        .map(_.toLowerCase)
+        .exists(key => With.enemies.map(_.name.toLowerCase).exists(_.contains(key)))
     
-    ! Playbook.disabled.contains(strategy)            &&
-    (strategy.ffa == isFfa)                           && // TODO: Disable non-ffa strategies for FFA
+    ! disabledOnMap                                   &&
+    ! disabledInPlaybook                              &&
+    (strategy.ffa == thisGameIsFFA)                   &&
     (strategy.islandMaps  || ! isIsland)              &&
     (strategy.groundMaps  || ! isGround)              &&
     strategy.ourRaces.exists(_ == ourRace)            &&
     strategy.enemyRaces.exists(enemyRaces.contains)   &&
     strategy.startLocationsMin <= startLocations      &&
     strategy.startLocationsMax >= startLocations      &&
-    (
-      strategy.restrictedOpponents.isEmpty ||
-      strategy.restrictedOpponents.get
-        .map(_.toLowerCase)
-        .exists(key => With.enemies.map(_.name.toLowerCase).exists(_.contains(key)))
-    )
+    appropriateForOpponent
   }
   
   private def heyIsThisAnIslandMap = {

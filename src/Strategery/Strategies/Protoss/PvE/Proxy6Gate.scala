@@ -6,12 +6,13 @@ import Strategery.Maps.MapGroups
 import Strategery.Strategies.Strategy
 import bwapi.Race
 
-object Proxy2Gate3StartLocations extends Strategy {
+object Proxy6Gate extends Strategy {
   
-  override def buildGameplan(): Option[Plan] = { Some(new Proxy2Gate) }
+  override def buildGameplan: Option[Plan] = { Some(new Proxy2Gate) }
   
   override def ourRaces: Iterable[Race] = Vector(Race.Protoss)
   
-  override def startLocationsMin = 3
+  override def startLocationsMax = 2
+  
   override def prohibitedMaps = MapGroups.badForProxying
 }

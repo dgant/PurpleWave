@@ -1,6 +1,7 @@
 package Strategery.Strategies
 
 import Planning.Plan
+import Strategery.Maps.StarCraftMap
 import bwapi.Race
 
 abstract class Strategy {
@@ -20,4 +21,5 @@ abstract class Strategy {
   def startLocationsMax   : Int                       = 24
   def ffa                 : Boolean                   = false
   def restrictedOpponents : Option[Iterable[String]]  = None
+  def prohibitedMaps      : Iterable[StarCraftMap]    = Vector.empty
 }

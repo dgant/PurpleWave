@@ -1,10 +1,12 @@
 package Planning.Plans.Protoss.GamePlans.Standard.PvT
 
+import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
-import Planning.Plans.Compound.{FlipIf, If, Parallel}
+import Planning.Plans.Compound.{Do, FlipIf, If, Parallel}
 import Planning.Plans.GamePlans.TemplateMode
 import Planning.Plans.Information.Employing
+import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Milestones.UnitsAtLeast
 import ProxyBwapi.Races.Protoss
@@ -21,24 +23,22 @@ class PvT2BaseGatewaysForever extends TemplateMode {
   
   override val buildPlans = Vector(
     new If(new UnitsAtLeast(1, Protoss.HighTemplar), new Build(RequestTech(Protoss.PsionicStorm))),
+    new Do(() => With.blackboard.gasBankSoftLimit = 800),
     new FlipIf(
       new UnitsAtLeast(15, UnitMatchWarriors),
       new Parallel(
         new Parallel(
           new PvTIdeas.TrainObservers,
-          new PvTIdeas.TrainHighTemplar,
+          new TrainContinuously(Protoss.HighTemplar, 6, 2),
           new PvTIdeas.TrainZealotsOrDragoons)),
       new Build(
-        RequestAtLeast(2, Protoss.Gateway),
+        RequestAtLeast(1, Protoss.Gateway),
         RequestAtLeast(1, Protoss.RoboticsFacility),
-        RequestAtLeast(3, Protoss.Gateway),
+        RequestAtLeast(2, Protoss.Gateway),
         RequestAtLeast(1, Protoss.Observatory),
-        RequestAtLeast(4, Protoss.Gateway),
         RequestAtLeast(1, Protoss.CitadelOfAdun),
-        RequestAtLeast(5, Protoss.Gateway),
-        RequestUpgrade(Protoss.ZealotSpeed),
         RequestAtLeast(1, Protoss.TemplarArchives),
-        RequestAtLeast(6, Protoss.Gateway))),
+        RequestUpgrade(Protoss.ZealotSpeed))),
     new Build(RequestAtLeast(11, Protoss.Gateway)))
 }
 

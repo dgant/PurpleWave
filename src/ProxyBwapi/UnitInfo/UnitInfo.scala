@@ -49,15 +49,20 @@ abstract class UnitInfo(baseUnit: bwapi.Unit) extends UnitProxy(baseUnit) {
   var frameChangedClass : Int = With.frame
   var completionFrame   : Int = Int.MaxValue // Can't use unitClass during construction
   
-  var lastTarget    : Option[UnitInfo] = None
-  var lastAttacker  : Option[UnitInfo] = None
-  val kills         : mutable.ArrayBuffer[Kill] = new mutable.ArrayBuffer[Kill]
+  var lastTarget      : Option[UnitInfo] = None
+  var lastAttacker    : Option[UnitInfo] = None
+  var lastDamageFrame : Int = 0
+  val kills           : mutable.ArrayBuffer[Kill] = new mutable.ArrayBuffer[Kill]
 
   private val history = new mutable.Queue[UnitState]
   def updateCommon() {
     
     // Save JNI overhead by not tracking history of Spider Mines and Interceptors
     if ( ! unitClass.orderable) return
+    
+    if (history.lastOption.exists(_.totalHealth < totalHealth)) {
+      lastDamageFrame = history.lastOption.get.frame
+    }
     
     lastTarget = target.orElse(lastTarget)
     history.lastOption.foreach(lastState => {
@@ -480,7 +485,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit) extends UnitProxy(baseUnit) {
   
   def effectivelyCloaked: Boolean =
     (burrowed || cloaked) && (
-      if (isFriendly) ! With.grids.enemyDetection.isSet(tileIncludingCenter) && damageInLastSecond == 0
+      if (isFriendly) ! With.grids.enemyDetection.isSet(tileIncludingCenter) && (With.framesSince(lastDamageFrame) > 162 + 2 || ! With.enemies.exists(_.isTerran)) // Scanner sweep. lasts 162 frames. Cloakedness updates on per-unit timer lasting 30 frames. There's also a global cloak timer every 300 frames.
       else            ! detected
     )
   

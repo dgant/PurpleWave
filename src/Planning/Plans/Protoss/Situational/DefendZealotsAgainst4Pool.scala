@@ -30,7 +30,7 @@ class DefendZealotsAgainst4Pool extends Plan {
     if (zealots.isEmpty) {
       return
     }
-    if (zealots.size > 3) {
+    if (zealots.size > 4) {
       return
     }
     if (cannons.nonEmpty) {
@@ -43,7 +43,7 @@ class DefendZealotsAgainst4Pool extends Plan {
       return
     }
     
-    val workersNeeded   = 1 + 2 * zerglings.size - 3 * zealots.size
+    val workersNeeded   = 1 + 3 * zerglings.size - 3 * zealots.size
     val workerCap       = workers.size - 4
     val workersToFight  = Math.max(0, Math.min(workerCap, workersNeeded))
     val target          = zealots.minBy(zealot => zerglings.map(_.pixelDistanceFast(zealot)).min).pixelCenter

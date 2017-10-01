@@ -12,6 +12,7 @@ class UnitState(unit: UnitInfo) {
   val hitPoints             : Int               = unit.hitPoints
   val shieldPoints          : Int               = unit.shieldPoints
   val defensiveMatrixPoints : Int               = unit.defensiveMatrixPoints
+  val totalHealth           : Int               = unit.totalHealth
   val couldMoveThisFrame    : Boolean           = unit.canMove
   val couldAttackThisFrame  : Boolean           = unit.readyForAttackOrder
   val cooldown              : Int               = unit.cooldownLeft

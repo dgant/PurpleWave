@@ -7,13 +7,17 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 object Cancel extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    (
-          unit.unitClass.isBuilding
-      &&  unit.totalHealth < unit.damageInLastSecond * 2
-      &&  ( ! unit.training   || unit.framesBeforeBuildeeComplete < unit.matchups.framesToLiveCurrently)
-      &&  ( ! unit.upgrading  || unit.framesBeforeUpgradeComplete < unit.matchups.framesToLiveCurrently)
-      &&  ( ! unit.teching    || unit.framesBeforeTechComplete    < unit.matchups.framesToLiveCurrently)
-    )
+    lazy val framesCutoff     = 3 * With.reaction.agencyAverage
+    lazy val framesToLive     = Math.min(unit.totalHealth / unit.damageInLastSecond / 24.0, unit.matchups.framesToLiveCurrently)
+    lazy val framesToFinish   = Seq(unit.framesBeforeTechComplete, unit.framesBeforeUpgradeComplete, unit.framesBeforeBuildeeComplete).max
+    lazy val doomed           = framesToLive < framesCutoff
+    lazy val willNeverFinish  = framesToLive < framesToFinish
+    lazy val producing        = unit.training || unit.upgrading || unit.teching
+    lazy val beingBorn        = unit.morphing || unit.beingConstructed
+    lazy val shouldCancel     = beingBorn || (producing && willNeverFinish)
+    
+    val output = unit.unitClass.isBuilding && doomed && shouldCancel
+    output
   }
   
   override def perform(unit: FriendlyUnitInfo) {

@@ -3,6 +3,7 @@ package Planning.Plans.Protoss.GamePlans.Specialty
 import Information.Geography.Types.Zone
 import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
+import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Compound._
 import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
@@ -56,7 +57,8 @@ class Proxy2Gate extends Parallel {
           RequestAtLeast(1, Protoss.RoboticsFacility),
           RequestAtLeast(1, Protoss.Observatory)))),
       new Build(RequestUpgrade(Protoss.DragoonRange)),
-      new Build(RequestAtLeast(3, Protoss.Gateway)),
+      new If(new UnitsAtLeast(12, UnitMatchWarriors), new RequireMiningBases(2)),
+      new Build(RequestAtLeast(4, Protoss.Gateway)),
       new RequireMiningBases(2),
       new Build(RequestAtLeast(7, Protoss.Gateway)),
       new RequireMiningBases(3),

@@ -19,7 +19,7 @@ object HistoryLoader {
   // The order matters (see below) thus meriting the explicit naming
   private val directoriesInDecendingOrderOfRecency = Array(loadFilesDirectory, saveFilesDirectory, seedFilesDirectory)
   
-  def load(): Iterable[HistoricalGame] = {
+  def load(): Seq[HistoricalGame] = {
     val gamesSerialized = loadAllGames(directoriesInDecendingOrderOfRecency)
     val games = HistorySerializer.readGames(gamesSerialized)
     
@@ -29,13 +29,17 @@ object HistoryLoader {
     // As an added check, we are implicitly trusting the more "recent" (read -> write -> seeded training) game associated with a timestamp
     //
     val gamesByTimestamp = new mutable.HashMap[Long, HistoricalGame]
-    games.foreach(game => gamesByTimestamp.put(game.timestamp, gamesByTimestamp.getOrElse(game.timestamp, game)))
-    gamesByTimestamp.values
+    games.foreach(game => gamesByTimestamp(game.timestamp) = gamesByTimestamp.getOrElse(game.timestamp, game))
+    val output = gamesByTimestamp.values.toSeq.sortBy(_.timestamp).reverse
+    output.zipWithIndex.foreach(pair => pair._1.order = pair._2)
+    output
   }
   
   def save(games: Iterable[HistoricalGame]) {
-    val enemyGamesSerialized = HistorySerializer.writeGames(games.filter(_.enemyName == With.history.currentEnemyName))
-    saveGames(saveName, enemyGamesSerialized)
+    val gamesVsOpponent       = games.filter(_.enemyName == With.history.currentEnemyName)
+    val gamesToSave           = gamesVsOpponent.toSeq.sortBy(- _.timestamp).take(With.configuration.maximumGamesHistoryPerOpponent)
+    val gamesToSaveSerialized = HistorySerializer.writeGames(gamesToSave)
+    saveGames(saveName, gamesToSaveSerialized)
   }
   
   private def saveName: String = {

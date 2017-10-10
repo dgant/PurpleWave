@@ -16,8 +16,9 @@ class Configuration {
   // Strategy //
   //////////////
   
-  var rideItOutWinrate    = 0.9
-  var strategyRandomness  = 0.05
+  var targetWinrate    = 0.9
+  var strategyRandomness  = 0.1
+  var historyHalfLife     = 30.0
   
   ///////////
   // Micro //
@@ -71,6 +72,7 @@ class Configuration {
   var initialTaskLengthMilliseconds       = 20
   var performanceMinimumUnitSleep         = 2
   var useFastGroundDistance               = true
+  var maximumGamesHistoryPerOpponent      = 500
   
   var urgentBuildingPlacement             = true
   var urgentBuildingPlacementCutoffFrames = 24 * 60 * 15

@@ -3,6 +3,7 @@ package Strategery
 import Lifecycle.With
 import Planning.Plan
 import Planning.Plans.WinTheGame
+import Strategery.History.HistoricalGame
 import Strategery.Strategies.Protoss.ProtossChoices
 import Strategery.Strategies.Strategy
 import Strategery.Strategies.Terran.TerranChoices
@@ -24,6 +25,11 @@ class Strategist {
     .find(_.buildGameplan().isDefined)
     .map(_.buildGameplan().get)
     .getOrElse(new WinTheGame)
+  
+  lazy val gameWeights: Map[HistoricalGame, Double] = With.history.games.map(game => (
+    game,
+    1.0 / (1.0 + (game.order / With.configuration.historyHalfLife))
+  )).toMap
   
   def selectStrategies: Set[Strategy] = {
     val strategies = filterForcedStrategies(

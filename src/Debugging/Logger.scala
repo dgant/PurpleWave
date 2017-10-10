@@ -55,7 +55,7 @@ class Logger {
   
   private def formatException(exception: Exception): String = {
       exception.getClass.getSimpleName + "\n" +
-      exception.getMessage + "\n"
+      exception.getMessage + "\n" +
       exception.getStackTrace.map(stackElement => {
         stackElement.getClassName + "." +
         stackElement.getMethodName + "(): " +

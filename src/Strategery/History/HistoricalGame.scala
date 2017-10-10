@@ -1,5 +1,6 @@
 package Strategery.History
 
+import Lifecycle.With
 import bwapi.Race
 
 case class HistoricalGame(
@@ -10,4 +11,10 @@ case class HistoricalGame(
   ourRace         : Race,
   enemyRace       : Race,
   won             : Boolean,
-  strategies      : Set[String])
+  strategies      : Set[String],
+  var order       : Int = 0) {
+  
+  // Convenience methods
+  def weight        : Double = With.strategy.gameWeights(this)
+  def winsWeighted  : Double = if (won) weight else 0.0
+}

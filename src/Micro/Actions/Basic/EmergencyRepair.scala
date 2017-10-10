@@ -8,13 +8,13 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 object EmergencyRepair extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.is(Terran.SCV) && eligblePatients(unit).nonEmpty
+    unit.is(Terran.SCV) && eligiblePatients(unit).nonEmpty
     
   }
   
   override def perform(unit: FriendlyUnitInfo) {
   
-    val patients = eligblePatients(unit)
+    val patients = eligiblePatients(unit)
     
     if (patients.isEmpty) return
     
@@ -23,7 +23,7 @@ object EmergencyRepair extends Action {
     With.commander.repair(unit, patient)
   }
   
-  def eligblePatients(repairer: FriendlyUnitInfo): Iterable[UnitInfo] = {
+  def eligiblePatients(repairer: FriendlyUnitInfo): Iterable[UnitInfo] = {
     repairer.matchups.allies.filter(patient =>
       patient.unitClass.isMechanical &&
       (patient.pixelDistanceFast(repairer) < 32 || ! patient.canMove) &&

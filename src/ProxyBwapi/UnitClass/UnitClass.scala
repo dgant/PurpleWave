@@ -70,7 +70,8 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   
   lazy val maxTotalHealth: Int = maxHitPoints + maxShields
   
-  lazy val repairReceivingRate: Double = if (isMechanical) 0.9 * maxHitPoints / Math.max(1.0, buildFrames) else 0.0
+  // Via http://www.starcraftai.com/wiki/Regeneration
+  lazy val repairHpPerFrame: Double = if (isMechanical) 0.9 * maxHitPoints / Math.max(1.0, buildFrames) else 0.0
   
   lazy val effectiveAirDamage: Int =
     if      (this == Terran.Bunker)   Terran.Marine.airDamageRaw

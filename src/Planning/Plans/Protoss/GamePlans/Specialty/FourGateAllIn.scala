@@ -29,6 +29,15 @@ class FourGateAllIn extends TemplateMode {
   
   override def buildPlans = Vector(
     new If(
+      new EnemyHasShownCloakedThreat,
+      new Build(
+        RequestAtLeast(1, Protoss.Assimilator),
+        RequestAtLeast(1, Protoss.CyberneticsCore),
+        RequestAtLeast(1, Protoss.RoboticsFacility),
+        RequestAtLeast(1, Protoss.Observatory),
+        RequestAtLeast(2, Protoss.Observer))),
+    
+    new If(
       new And(
         new Check(() => With.self.gas >= 50),
         new UnitsAtLeast(4, Protoss.Zealot),
@@ -38,13 +47,6 @@ class FourGateAllIn extends TemplateMode {
     new Build(RequestAtLeast(1, Protoss.CyberneticsCore)),
     new BuildGasPumps,
     new Build(RequestUpgrade(Protoss.DragoonRange)),
-  
-    new If(
-      new EnemyHasShownCloakedThreat,
-      new Build(
-        RequestAtLeast(1, Protoss.RoboticsFacility),
-        RequestAtLeast(1, Protoss.Observatory),
-        RequestAtLeast(2, Protoss.Observer))),
     
     new Build(RequestAtLeast(4, Protoss.Gateway)),
     

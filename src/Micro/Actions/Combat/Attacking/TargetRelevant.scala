@@ -20,10 +20,10 @@ object TargetRelevant extends Action {
   }
   
   def isRelevant(unit: FriendlyUnitInfo, target: UnitInfo): Boolean = {
-    target.visible &&
+    if ( ! target.visible) return false
+    if (target.isTransport && ! target.is(Zerg.Overlord)) return true
     target.unitClass.helpsInCombat && (
       unit.inRangeToAttackFast(target)
-        || (target.isTransport && ! target.is(Zerg.Overlord))
         || (target.unitClass.isDetector && unit.matchups.alliesIncludingSelf.exists(_.cloaked))
         || target.constructing
         || target.gathering

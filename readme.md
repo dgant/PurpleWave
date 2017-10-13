@@ -1,10 +1,18 @@
 # PurpleWave
 ### An extensible AI player for *StarCraft: Brood War*
 
+https://github.com/dgant/PurpleWave
+
 ## About
 PurpleWave is a *StarCraft: Brood War* AI written in Scala. It can play all races and a large variety of strategies.
 
-PurpleWave won 3rd Place in the [2017 IEEE CIG Starcraft Tournament](https://cilab.sejong.ac.kr/sc_competition/?p=1090). It's been ranked as high as #2 on the [SSCAIT Ladder](https://sscaitournament.com/index.php?action=scores). 
+PurpleWave has won:
+ * 2nd Place in the [2017 AIIDE StarCraft AI Competition](http://www.cs.mun.ca/~dchurchill/starcraftaicomp/2017/)
+ * 3rd Place in the [2017 IEEE CIG StarCraft AI Competition](https://cilab.sejong.ac.kr/sc_competition/?p=1090)
+ * And has ranked as high as #2 on the [SSCAIT Ladder](https://sscaitournament.com/index.php?action=scores). 
+
+PurpleWave vs. Iron, AIIDE 2017:
+[![PurpleWave vs. Iron, AIIDE 2017](https://img.youtube.com/vi/g33PIqDdTqs/0.jpg)](https://www.youtube.com/watch?v=g33PIqDdTqs)
 
 ## Credits
 Thanks to:

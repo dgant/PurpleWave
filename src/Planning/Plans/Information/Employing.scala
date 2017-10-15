@@ -4,11 +4,11 @@ import Lifecycle.With
 import Planning.Plan
 import Strategery.Strategies.Strategy
 
-class Employing(strategy: Strategy) extends Plan {
+class Employing(strategies: Strategy*) extends Plan {
   
-  override def toString: String = "Employing " + strategy
+  override def toString: String = "Employing " + strategies.mkString("/")
   
   override def isComplete: Boolean = {
-    With.strategy.selected.contains(strategy)
+    strategies.exists(With.strategy.selected.contains)
   }
 }

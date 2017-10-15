@@ -7,7 +7,7 @@ import bwapi.Race
 
 object TerranFFAMassMarine  extends Strategy {
   
-  override def buildGameplan(): Option[Plan] = { Some(new FFAMassMarine) }
+  override def gameplan(): Option[Plan] = { Some(new FFAMassMarine) }
   
   override def ourRaces: Iterable[Race] = Vector(Race.Terran)
   

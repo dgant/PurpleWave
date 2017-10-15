@@ -3,7 +3,7 @@ package Planning.Plans.Protoss.GamePlans.Standard.PvT
 import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plans.Compound.{FlipIf, If, Parallel}
-import Planning.Plans.GamePlans.TemplateMode
+import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Information.Employing
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildCannonsAtExpansions, BuildCannonsAtNatural, BuildGasPumps, RequireMiningBases}
@@ -12,7 +12,7 @@ import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvT.PvT3BaseArbiter
 
-class PvT3BaseArbiters extends TemplateMode {
+class PvT3BaseArbiters extends GameplanModeTemplate {
   
   override val activationCriteria = new Employing(PvT3BaseArbiter)
   override val scoutExpansionsAt  = 60

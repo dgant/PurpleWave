@@ -7,7 +7,7 @@ import bwapi.Race
 
 object TvZStandard extends Strategy {
   
-  override def buildGameplan(): Option[Plan] = Some(new TerranStandardGamePlan)
+  override def gameplan(): Option[Plan] = Some(new TerranStandardGamePlan)
   
   override def choices: Iterable[Iterable[Strategy]] = Vector(
     Vector(

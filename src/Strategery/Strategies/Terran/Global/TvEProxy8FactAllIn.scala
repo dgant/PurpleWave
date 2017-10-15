@@ -9,7 +9,7 @@ object TvEProxy8FactAllIn extends Strategy {
   
   // Currently unusable due to delayed gas mining.
   
-  override def buildGameplan(): Option[Plan] = { Some(new Proxy8Fact) }
+  override def gameplan(): Option[Plan] = { Some(new Proxy8Fact) }
   
   override def ourRaces: Iterable[Race] = Vector(Race.Terran)
   

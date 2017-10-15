@@ -3,7 +3,7 @@ package Planning.Plans.Protoss.GamePlans.Standard.PvT
 import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
 import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Compound.{Parallel, Trigger}
-import Planning.Plans.GamePlans.Mode
+import Planning.Plans.GamePlans.GameplanMode
 import Planning.Plans.Information.Employing
 import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder, FollowBuildOrder}
@@ -15,7 +15,7 @@ import Planning.ProxyPlanner
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvT.PvTEarly1GateProxy
 
-class PvT1GateProxy extends Mode {
+class PvT1GateProxy extends GameplanMode {
   
   override val activationCriteria = new Employing(PvTEarly1GateProxy)
   override val completionCriteria = new MiningBasesAtLeast(2)

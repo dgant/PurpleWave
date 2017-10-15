@@ -4,7 +4,7 @@ import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plans.Compound.{Do, FlipIf, If, Parallel}
-import Planning.Plans.GamePlans.TemplateMode
+import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Information.Employing
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
@@ -12,7 +12,7 @@ import Planning.Plans.Macro.Milestones.UnitsAtLeast
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvT.PvT2BaseGatewayForever
 
-class PvT2BaseGatewaysForever extends TemplateMode {
+class PvT2BaseGatewaysForever extends GameplanModeTemplate {
   
   override val activationCriteria = new Employing(PvT2BaseGatewayForever)
   override val scoutExpansionsAt  = 60

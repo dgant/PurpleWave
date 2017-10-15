@@ -3,26 +3,99 @@ package Strategery.Strategies.Protoss
 import Strategery.Strategies.AllRaces.{WorkerRush2StartLocations, WorkerRush3StartLocations}
 import Strategery.Strategies.Protoss.Other.CarriersFromAnIsland
 import Strategery.Strategies.Protoss.PvE._
-import Strategery.Strategies.Protoss.PvP.AllPvP
-import Strategery.Strategies.Protoss.PvR.AllPvR
-import Strategery.Strategies.Protoss.PvT.AllPvT
-import Strategery.Strategies.Protoss.PvZ.{AllPvZ, PvZ4GateDragoonAllIn}
+import Strategery.Strategies.Protoss.PvP.{PvP1GateRoboObs, PvP2GateDT, PvP2GateRoboObs, PvPProxy2Gate}
+import Strategery.Strategies.Protoss.PvR._
+import Strategery.Strategies.Protoss.PvT._
+import Strategery.Strategies.Protoss.PvZ._
 import Strategery.Strategies._
 
 object ProtossChoices {
   
-  val overall: Iterable[Strategy] = Vector(
+  val pvr = Vector(
+    PvREarly2Gate910,
+    PvREarly2Gate1012,
+    PvREarlyZZCore,
+    PvREarlyZCoreZ,
+    PvRProxy2Gate,
+    PvRTinfoil
+  )
+  
+  /////////
+  // PvT //
+  /////////
+  
+  val pvtOpenersWithoutTransitions = Vector(
+    PvTProxy2Gate,
+    PvTEarly1GateProxy,
+    PvTEarlyNexusFirst
+  )
+  
+  val pvtOpenersTransitioningFrom1Gate = Vector(
+    PvTEarly1GateRange,
+    PvTEarly1GateStargate,
+    PvTEarly1GateStargateTemplar,
+    PvTEarlyDTExpand,
+    PvTEarly1015GateGoon
+  )
+  
+  val pvtOpenersTransitioningFrom2Gate = Vector(
+    PvTEarly1015GateGoon
+  )
+  
+  val pvtOpenersAll: Vector[Strategy] = (pvtOpenersWithoutTransitions ++ pvtOpenersTransitioningFrom1Gate ++ pvtOpenersTransitioningFrom2Gate).distinct
+  
+  /////////
+  // PvP //
+  /////////
+  
+  val pvpOpenersWithoutTransitions = Vector(
+    PvPProxy2Gate,
+    PvP2GateDT
+  )
+  
+  val pvpOpenersWithTransitions = Vector(
+    PvP2GateRoboObs,
+    PvP1GateRoboObs
+  )
+  
+  val pvpOpenersAll: Vector[Strategy] = (pvpOpenersWithoutTransitions ++ pvpOpenersWithTransitions).distinct
+  
+  /////////
+  // PvZ //
+  /////////
+  
+  val pvzOpenersWithoutTransitions = Vector(
+    PvZEarlyFFEConservative,
+    PvZEarlyFFEEconomic,
+    PvZEarlyFFEGatewayFirst,
+    PvZEarlyFFENexusFirst,
+    PvZProxy2Gate
+  )
+  
+  val pvzOpenersTransitioningFrom1Gate = Vector(
+    PvZ4GateDragoonAllIn
+  )
+  
+  val pvzOpenersTransitioningFrom2Gate = Vector(
+    PvZEarly2Gate,
+    PvZ4GateDragoonAllIn
+  )
+  
+  val pvzOpenersAll: Vector[Strategy] = (pvzOpenersWithoutTransitions ++ pvzOpenersTransitioningFrom1Gate ++ pvzOpenersTransitioningFrom2Gate).distinct
+  
+  /////////
+  // All //
+  /////////
+  
+  val gimmickOpeners = Vector(
     WorkerRush2StartLocations,
     WorkerRush3StartLocations,
-    Proxy2Gate2StartLocations,
-    Proxy2Gate3StartLocations,
     ProxyDarkTemplar,
     CarriersFromAnIsland,
     CarriersWithNoDefense,
-    DarkArchonsWithNoDefense,
-    PvZ4GateDragoonAllIn,
-    AllPvR,
-    AllPvT,
-    AllPvP,
-    AllPvZ)
+    DarkArchonsWithNoDefense)
+  
+  val standardOpeners: Vector[Strategy] = (pvr ++ pvtOpenersAll ++ pvpOpenersAll ++ pvzOpenersAll).distinct
+  
+  val all: Vector[Strategy] = (gimmickOpeners ++ standardOpeners).distinct
 }

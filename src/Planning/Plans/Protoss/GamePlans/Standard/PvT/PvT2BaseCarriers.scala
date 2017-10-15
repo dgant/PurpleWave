@@ -2,7 +2,7 @@ package Planning.Plans.Protoss.GamePlans.Standard.PvT
 
 import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
 import Planning.Plans.Compound.{And, If, Parallel}
-import Planning.Plans.GamePlans.TemplateMode
+import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Information.Employing
 import Planning.Plans.Information.Reactive.EnemyBio
 import Planning.Plans.Macro.Automatic.TrainContinuously
@@ -13,7 +13,7 @@ import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvT.PvT2BaseCarrier
 
-class PvT2BaseCarriers extends TemplateMode {
+class PvT2BaseCarriers extends GameplanModeTemplate {
   
   override val activationCriteria   = new Employing(PvT2BaseCarrier)
   override val emergencyPlans       = Vector(new PvTIdeas.Require2BaseTech, new PvTIdeas.GetObserversForCloakedWraiths)

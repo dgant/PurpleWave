@@ -1,38 +1,41 @@
 package Planning.Plans.Protoss.GamePlans.Specialty
 
-import Information.Geography.Types.Zone
 import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
-import Planning.Composition.UnitMatchers.UnitMatchWarriors
-import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Compound._
-import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
-import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder, FollowBuildOrder, RequireEssentials}
-import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
+import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.Information.Employing
+import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
+import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
+import Planning.Plans.Macro.Expanding.BuildGasPumps
 import Planning.Plans.Macro.Milestones._
-import Planning.Plans.Protoss.Situational.{DefendAgainstProxy, PlaceGatewaysProxied}
+import Planning.Plans.Protoss.Situational.PlaceGatewaysProxied
 import Planning.Plans.Scouting.Scout
 import Planning.ProxyPlanner
 import ProxyBwapi.Races.Protoss
+import Strategery.Strategies.Protoss.PvP.PvPProxy2Gate
+import Strategery.Strategies.Protoss.PvR.PvRProxy2Gate
+import Strategery.Strategies.Protoss.PvT.PvTProxy2Gate
+import Strategery.Strategies.Protoss.PvZ.PvZProxy2Gate
 
-class Proxy2Gate extends Parallel {
+class Proxy2Gate extends GameplanModeTemplate {
   
-  lazy val proxyZone: Option[Zone] = ProxyPlanner.proxyAutomaticSneaky
+  override val activationCriteria = new Employing(PvRProxy2Gate, PvTProxy2Gate, PvPProxy2Gate, PvZProxy2Gate)
+  override val completionCriteria = new UpgradeComplete(Protoss.DragoonRange)
+  override def defaultScoutPlan   = new If(new UnitsAtLeast(2, Protoss.Gateway), new Scout)
+  override val aggression         = 1.5
   
   private class BeforeProxy extends Parallel(
-    new RequireEssentials,
-    new Trigger(new UnitsAtLeast(2, Protoss.Gateway), initialBefore = new PlaceGatewaysProxied(2, () => proxyZone)),
-    new Build(
-      RequestAtLeast(9, Protoss.Probe),
+    new PlaceGatewaysProxied(2, () => ProxyPlanner.proxyAutomaticSneaky),
+    new BuildOrder(
+      RequestAtLeast(8, Protoss.Probe),
       RequestAtLeast(1, Protoss.Pylon)),
-    // Build proxies with only one Probe
     new If(new UnitsAtLeast(1, Protoss.Pylon),    new Build(RequestAtLeast(1, Protoss.Gateway))),
     new If(new UnitsAtLeast(1, Protoss.Gateway),  new Build(RequestAtLeast(2, Protoss.Gateway))))
   
   private class AfterProxy extends Parallel(
     new RequireSufficientSupply,
     new BuildOrder(
-      RequestAtLeast(1, Protoss.Pylon),
       RequestAtLeast(1, Protoss.Gateway),
       RequestAtLeast(2, Protoss.Zealot)),
     new TrainContinuously(Protoss.Observer, 2),
@@ -46,34 +49,22 @@ class Proxy2Gate extends Parallel {
     new Trigger(
       new UnitsAtLeast(15, Protoss.Probe),
       initialAfter = new Parallel(
-      new BuildGasPumps,
-      new Build(RequestAtLeast(1, Protoss.CyberneticsCore)),
-      new If(
-        new EnemyHasShownCloakedThreat,
-        new Parallel(
-          new BuildGasPumps,
+        new BuildGasPumps,
+        new Build(RequestAtLeast(1, Protoss.CyberneticsCore)),
+        new If(
+          new EnemyHasShownCloakedThreat,
+          new Parallel(
+            new Build(
+              RequestAtLeast(1, Protoss.RoboticsFacility),
+              RequestAtLeast(1, Protoss.Observatory))))),
         new Build(
-          RequestAtLeast(1, Protoss.CyberneticsCore),
-          RequestAtLeast(1, Protoss.RoboticsFacility),
-          RequestAtLeast(1, Protoss.Observatory)))),
-      new Build(RequestUpgrade(Protoss.DragoonRange)),
-      new If(new UnitsAtLeast(12, UnitMatchWarriors), new RequireMiningBases(2)),
-      new Build(RequestAtLeast(4, Protoss.Gateway)),
-      new RequireMiningBases(2),
-      new Build(RequestAtLeast(7, Protoss.Gateway)),
-      new RequireMiningBases(3),
-      new Build(RequestAtLeast(12, Protoss.Gateway)))),
-    new Scout)
+          RequestUpgrade(Protoss.DragoonRange),
+          RequestAtLeast(4, Protoss.Gateway))))
   
-  children.set(Vector(
-    new Aggression(1.5),
+  override def buildPlans = Vector(
     new Do(() =>  With.blackboard.maxFramesToSendAdvanceBuilder = Int.MaxValue),
     new Trigger(new UnitsAtLeast(2, Protoss.Gateway),
       initialBefore = new BeforeProxy,
-      initialAfter  = new AfterProxy),
-    new DefendAgainstProxy,
-    new Attack,
-    new FollowBuildOrder,
-    new Gather
-  ))
+      initialAfter  = new AfterProxy)
+  )
 }

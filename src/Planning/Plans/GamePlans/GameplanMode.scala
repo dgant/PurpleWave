@@ -4,7 +4,7 @@ import Planning.Plan
 import Planning.Plans.Compound.Parallel
 import Planning.Plans.Information.{Always, Never}
 
-abstract class Mode extends Parallel {
+abstract class GameplanMode extends Parallel {
   
   override def isComplete: Boolean = completionCriteria.isComplete || ! activationCriteria.isComplete
   

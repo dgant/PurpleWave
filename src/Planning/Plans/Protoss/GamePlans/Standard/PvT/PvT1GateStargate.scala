@@ -2,7 +2,7 @@ package Planning.Plans.Protoss.GamePlans.Standard.PvT
 
 import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
 import Planning.Plans.Army.Attack
-import Planning.Plans.GamePlans.TemplateMode
+import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Information.Employing
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.Expanding._
@@ -10,7 +10,7 @@ import Planning.Plans.Macro.Milestones.MiningBasesAtLeast
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvT.PvTEarly1GateStargate
 
-class PvT1GateStargate extends TemplateMode {
+class PvT1GateStargate extends GameplanModeTemplate {
   
   override val activationCriteria = new Employing(PvTEarly1GateStargate)
   override val completionCriteria = new MiningBasesAtLeast(2)

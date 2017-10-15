@@ -7,7 +7,7 @@ import bwapi.Race
 
 object CarriersWithNoDefense extends Strategy {
   
-  override def buildGameplan(): Option[Plan] = { Some(new ThreeBaseCarriersWithNoDefense) }
+  override def gameplan(): Option[Plan] = { Some(new ThreeBaseCarriersWithNoDefense) }
   
   override def ourRaces: Iterable[Race] = Vector(Race.Protoss)
   

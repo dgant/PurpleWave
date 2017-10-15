@@ -1,9 +1,9 @@
 package Planning.Plans.Protoss.GamePlans.Standard
 
-import Planning.Plans.GamePlans.ModalGamePlan
+import Planning.Plans.GamePlans.ModalGameplan
 import Planning.Plans.Protoss.GamePlans.Standard.PvT._
 
-class ProtossVsTerran extends ModalGamePlan(
+class ProtossVsTerran extends ModalGameplan(
   new PvT13Nexus,
   new PvT1GateRange,
   new PvT1015GateExpand,

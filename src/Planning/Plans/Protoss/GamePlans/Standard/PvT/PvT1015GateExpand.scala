@@ -2,7 +2,7 @@ package Planning.Plans.Protoss.GamePlans.Standard.PvT
 
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.If
-import Planning.Plans.GamePlans.TemplateMode
+import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Information.Employing
 import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
@@ -11,7 +11,7 @@ import Planning.Plans.Protoss.ProtossBuilds
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvT.PvTEarly1015GateGoon
 
-class PvT1015GateExpand extends TemplateMode {
+class PvT1015GateExpand extends GameplanModeTemplate {
   
   override val activationCriteria = new Employing(PvTEarly1015GateGoon)
   override val completionCriteria = new MiningBasesAtLeast(2)

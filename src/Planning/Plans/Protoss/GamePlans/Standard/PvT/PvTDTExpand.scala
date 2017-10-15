@@ -3,7 +3,7 @@ package Planning.Plans.Protoss.GamePlans.Standard.PvT
 import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, Trigger}
-import Planning.Plans.GamePlans.TemplateMode
+import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Information.Employing
 import Planning.Plans.Macro.Automatic.{TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
@@ -12,7 +12,7 @@ import Planning.Plans.Protoss.ProtossBuilds
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvT.PvTEarlyDTExpand
 
-class PvTDTExpand extends TemplateMode {
+class PvTDTExpand extends GameplanModeTemplate {
   
   override val activationCriteria     = new Employing(PvTEarlyDTExpand)
   override val completionCriteria     = new UnitsAtLeast(2, Protoss.Nexus, complete = true)

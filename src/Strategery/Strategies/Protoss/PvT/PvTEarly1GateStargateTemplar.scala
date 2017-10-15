@@ -3,15 +3,11 @@ package Strategery.Strategies.Protoss.PvT
 import Strategery.Strategies.Strategy
 import bwapi.Race
 
-object PvTEarly14Nexus extends Strategy {
+object PvTEarly1GateStargateTemplar extends Strategy {
   
   override def choices: Iterable[Iterable[Strategy]] = Vector(
-    Vector(
-      PvT2BaseGateway,
-      PvT2BaseGatewayForever,
-      PvT2BaseCarrier,
-      PvT3BaseCorsair))
+    Vector(PvT2BaseArbiter))
   
   override def ourRaces    : Iterable[Race] = Vector(Race.Protoss)
-  override def enemyRaces  : Iterable[Race] = Vector(Race.Terran)
+  override def enemyRaces  : Iterable[Race] = Vector(Race.Unknown, Race.Terran)
 }

@@ -22,8 +22,8 @@ class Strategist {
   lazy val isIslandMap: Boolean = heyIsThisAnIslandMap
   
   lazy val gameplan: Plan = selected
-    .find(_.buildGameplan().isDefined)
-    .map(_.buildGameplan().get)
+    .find(_.gameplan.isDefined)
+    .map(_.gameplan.get)
     .getOrElse(new WinTheGame)
   
   lazy val gameWeights: Map[HistoricalGame, Double] = With.history.games.map(game => (
@@ -35,7 +35,7 @@ class Strategist {
     val strategies = filterForcedStrategies(
       (
         TerranChoices.overall ++
-        ProtossChoices.overall ++
+        ProtossChoices.all ++
         ZergChoices.overall
       ).filter(isAppropriate))
     strategies.foreach(evaluate)

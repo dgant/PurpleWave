@@ -65,7 +65,7 @@ object PvTIdeas {
       new Or(
         new Employing(PvTEarly1015GateGoon),
         new Employing(PvTEarly1GateStargate),
-        new Employing(PvTEarlyStove),
+        new Employing(PvTEarly1GateStargateTemplar),
         new OnMiningBases(3),
         new Not(new EnemyHasShown(Terran.SpiderMine)),
         new UnitsAtLeast(1, UnitMatchCustom((unit) => unit.is(Protoss.Observer) && With.framesSince(unit.frameDiscovered) > 24 * 10), complete = true))),
@@ -79,7 +79,7 @@ object PvTIdeas {
       new UnitsExactly(0, Protoss.ArbiterTribunal),
       new Or(
         new Employing(PvTEarly1GateStargate),
-        new Employing(PvTEarlyStove))),
+        new Employing(PvTEarly1GateStargateTemplar))),
     new TrainContinuously(Protoss.Scout, 3))
   
   class TrainDarkTemplar extends If(

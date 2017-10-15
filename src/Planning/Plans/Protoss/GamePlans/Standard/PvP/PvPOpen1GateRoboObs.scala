@@ -3,7 +3,7 @@ package Planning.Plans.Protoss.GamePlans.Standard.PvP
 import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
 import Planning.Plan
 import Planning.Plans.Compound.{Or, Trigger}
-import Planning.Plans.GamePlans.TemplateMode
+import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Information.Employing
 import Planning.Plans.Information.Reactive.EnemyBasesAtLeast
 import Planning.Plans.Macro.Automatic.TrainContinuously
@@ -14,7 +14,7 @@ import Planning.Plans.Scouting.Scout
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP.PvP1GateRoboObs
 
-class PvPOpen1GateRoboObs extends TemplateMode {
+class PvPOpen1GateRoboObs extends GameplanModeTemplate {
   
   override val activationCriteria: Plan = new Employing(PvP1GateRoboObs)
   

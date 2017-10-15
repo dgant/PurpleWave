@@ -5,7 +5,7 @@ import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.RequestAtLeast
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.TemplateMode
+import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Information.Employing
 import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
@@ -15,7 +15,7 @@ import Planning.Plans.Scouting.Scout
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP.PvP2GateDT
 
-class PvPOpen2GateDarkTemplar extends TemplateMode {
+class PvPOpen2GateDarkTemplar extends GameplanModeTemplate {
   
   override val activationCriteria = new Employing(PvP2GateDT)
   override val completionCriteria = new UnitsAtLeast(2, Protoss.Nexus)

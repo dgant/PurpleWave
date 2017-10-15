@@ -5,7 +5,7 @@ import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plans.Army.Aggression
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.TemplateMode
+import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders._
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
@@ -14,7 +14,7 @@ import Planning.Plans.Protoss.ProtossBuilds
 import Planning.Plans.Protoss.Situational.BuildHuggingNexus
 import ProxyBwapi.Races.Protoss
 
-class FourGateAllIn extends TemplateMode {
+class FourGateAllIn extends GameplanModeTemplate {
   
   override val scoutAt                = 10
   override def buildOrder             = ProtossBuilds.OpeningTwoGate1012

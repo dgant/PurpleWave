@@ -13,7 +13,7 @@ import Planning.Plans.Protoss.Situational.DefendAgainstProxy
 import Planning.Plans.Recruitment.RecruitFreelancers
 import Planning.Plans.Scouting.{ScoutAt, ScoutExpansionsAt}
 
-abstract class TemplateMode extends Mode {
+abstract class GameplanModeTemplate extends GameplanMode {
   
   def meldArchonsAt         : Int               = 40
   def aggression            : Double            = 1.0

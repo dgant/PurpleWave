@@ -9,5 +9,5 @@ object Zerg2HatchMutaAllIn extends Strategy {
   
   override def ourRaces: Iterable[Race] = Vector(Race.Zerg)
   
-  override def buildGameplan(): Option[Plan] = Some(new Zerg2HatchMuta)
+  override def gameplan(): Option[Plan] = Some(new Zerg2HatchMuta)
 }

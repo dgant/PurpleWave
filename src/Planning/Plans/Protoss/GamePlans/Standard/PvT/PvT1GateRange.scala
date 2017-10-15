@@ -1,7 +1,7 @@
 package Planning.Plans.Protoss.GamePlans.Standard.PvT
 
 import Macro.BuildRequests.RequestAtLeast
-import Planning.Plans.GamePlans.TemplateMode
+import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Information.Employing
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.BuildOrder
@@ -10,7 +10,7 @@ import Planning.Plans.Protoss.ProtossBuilds
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvT.PvTEarly1GateRange
 
-class PvT1GateRange extends TemplateMode {
+class PvT1GateRange extends GameplanModeTemplate {
   
   override val activationCriteria = new Employing(PvTEarly1GateRange)
   override val completionCriteria = new UnitsAtLeast(6, Protoss.Dragoon)

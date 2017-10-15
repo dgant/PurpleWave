@@ -5,7 +5,7 @@ import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
 import Planning.Plans.Army.ConsiderAttacking
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.TemplateMode
+import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Information.Employing
 import Planning.Plans.Information.Reactive.EnemyBasesAtLeast
 import Planning.Plans.Macro.Automatic.TrainContinuously
@@ -16,7 +16,7 @@ import Planning.Plans.Scouting.Scout
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP.PvP2GateRoboObs
 
-class PvPOpen2GateRobo extends TemplateMode {
+class PvPOpen2GateRobo extends GameplanModeTemplate {
   
   override val activationCriteria: Plan = new Employing(PvP2GateRoboObs)
   

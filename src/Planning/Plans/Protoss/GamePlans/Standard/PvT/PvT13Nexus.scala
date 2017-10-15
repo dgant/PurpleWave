@@ -2,18 +2,18 @@ package Planning.Plans.Protoss.GamePlans.Standard.PvT
 
 import Macro.BuildRequests.RequestAtLeast
 import Planning.Plans.Compound.NoPlan
-import Planning.Plans.GamePlans.TemplateMode
+import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Information.Employing
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Milestones.UnitsAtLeast
 import Planning.Plans.Protoss.ProtossBuilds
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvT.PvTEarly14Nexus
+import Strategery.Strategies.Protoss.PvT.PvTEarlyNexusFirst
 
-class PvT13Nexus extends TemplateMode {
+class PvT13Nexus extends GameplanModeTemplate {
   
-  override val activationCriteria = new Employing(PvTEarly14Nexus)
+  override val activationCriteria = new Employing(PvTEarlyNexusFirst)
   override val completionCriteria = new UnitsAtLeast(4, Protoss.Dragoon)
   override val aggression         = 0.8
   override val defaultAttackPlan  = NoPlan()

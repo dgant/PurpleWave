@@ -7,7 +7,7 @@ import bwapi.Race
 
 object PvZ4GateDragoonAllIn extends Strategy {
   
-  override def buildGameplan(): Option[Plan] = Some(new FourGateAllIn)
+  override def gameplan(): Option[Plan] = Some(new FourGateAllIn)
   
   override def ourRaces    : Iterable[Race] = Vector(Race.Protoss)
   override def enemyRaces  : Iterable[Race] = Vector(Race.Zerg)

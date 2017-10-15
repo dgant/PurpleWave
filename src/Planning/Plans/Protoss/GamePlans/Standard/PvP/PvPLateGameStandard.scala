@@ -5,7 +5,7 @@ import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
 import Planning.Plans.Army._
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.TemplateMode
+import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Information.Reactive.EnemyBasesAtLeast
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
@@ -15,7 +15,7 @@ import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Protoss.GamePlans.Standard.PvP.PvPIdeas.{ReactToDarkTemplarExisting, ReactToDarkTemplarPossible}
 import ProxyBwapi.Races.Protoss
 
-class PvPLateGameStandard extends TemplateMode {
+class PvPLateGameStandard extends GameplanModeTemplate {
   
   override val aggression = 0.82
   override val scoutExpansionsAt = 90

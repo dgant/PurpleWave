@@ -16,6 +16,8 @@ class Strategist {
   
   lazy val selected: Set[Strategy] = selectStrategies
   
+  def selectedAppropriate = selected.filter(isAppropriate)
+  
   // Plasma is so weird we need to handle it separately.
   lazy val isPlasma: Boolean = With.game.mapFileName.contains("Plasma")
   
@@ -34,9 +36,9 @@ class Strategist {
   def selectStrategies: Set[Strategy] = {
     val strategies = filterForcedStrategies(
       (
-        TerranChoices.overall ++
+        TerranChoices.all ++
         ProtossChoices.all ++
-        ZergChoices.overall
+        ZergChoices.all
       ).filter(isAppropriate))
     strategies.foreach(evaluate)
     chooseBest(strategies).toSet
@@ -50,8 +52,8 @@ class Strategist {
   }
   
   private def isAppropriate(strategy: Strategy): Boolean = {
-    lazy val ourRace                = With.self.race
-    lazy val enemyRaces             = With.enemies.map(_.race).toSet
+    lazy val ourRace                = With.self.raceInitial
+    lazy val enemyRaces             = With.enemies.map(_.raceInitial).toSet
     lazy val isIsland               = isIslandMap
     lazy val isGround               = ! isIsland
     lazy val startLocations         = With.geography.startLocations.size

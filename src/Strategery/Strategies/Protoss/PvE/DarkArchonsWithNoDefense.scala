@@ -7,7 +7,7 @@ import bwapi.Race
 
 object DarkArchonsWithNoDefense extends Strategy {
   
-  override def gameplan(): Option[Plan] = { Some(new DarkArchonRushWithNoDefense) }
+  override def gameplan: Option[Plan] = { Some(new DarkArchonRushWithNoDefense) }
   
   override def ourRaces: Iterable[Race] = Vector(Race.Protoss)
   

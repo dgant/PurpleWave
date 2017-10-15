@@ -86,7 +86,7 @@ class Gather extends Plan {
   }
   
   private def gasWorkers: Int = {
-    if (With.self.race == Race.Protoss)
+    if (With.self.raceInitial == Race.Protoss)
       Vector(
         gasses.size * 3,
         allWorkers.size / 3,

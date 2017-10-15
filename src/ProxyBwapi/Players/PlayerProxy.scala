@@ -15,17 +15,17 @@ abstract class PlayerProxy(base:Player) {
   
   lazy val id             : Int       = base.getID
   lazy val name           : String    = base.getName
-  lazy val race           : Race      = base.getRace
+  lazy val raceInitial    : Race      = base.getRace
   lazy val isUs           : Boolean   = this == With.self
   lazy val isNeutral      : Boolean   = base.isNeutral
   lazy val isAlly         : Boolean   = base.isAlly(With.game.self)
   lazy val isEnemy        : Boolean   = base.isEnemy(With.game.self)
   lazy val startTile      : Tile      = new Tile(base.getStartLocation)
-  lazy val townHallClass  : UnitClass = UnitClasses.get(race.getCenter)
-  lazy val gasClass       : UnitClass = UnitClasses.get(race.getRefinery)
-  lazy val supplyClass    : UnitClass = UnitClasses.get(race.getSupplyProvider)
-  lazy val transportClass : UnitClass = UnitClasses.get(race.getTransport)
-  lazy val workerClass    : UnitClass = UnitClasses.get(race.getWorker)
+  lazy val townHallClass  : UnitClass = UnitClasses.get(raceInitial.getCenter)
+  lazy val gasClass       : UnitClass = UnitClasses.get(raceInitial.getRefinery)
+  lazy val supplyClass    : UnitClass = UnitClasses.get(raceInitial.getSupplyProvider)
+  lazy val transportClass : UnitClass = UnitClasses.get(raceInitial.getTransport)
+  lazy val workerClass    : UnitClass = UnitClasses.get(raceInitial.getWorker)
   
   def gas               : Int = gasCache()
   def minerals          : Int = mineralsCache()

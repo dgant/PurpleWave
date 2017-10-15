@@ -11,7 +11,7 @@ object DisruptBuilder extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
     With.intelligence.enemyMain.isDefined       &&
-    With.enemies.exists(_.race == Race.Terran)  &&
+    With.enemies.exists(_.raceInitial == Race.Terran)  &&
     disruptableBuilders(unit).nonEmpty
   }
   

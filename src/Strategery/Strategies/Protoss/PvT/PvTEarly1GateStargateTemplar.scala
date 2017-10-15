@@ -9,5 +9,5 @@ object PvTEarly1GateStargateTemplar extends Strategy {
     Vector(PvT2BaseArbiter))
   
   override def ourRaces    : Iterable[Race] = Vector(Race.Protoss)
-  override def enemyRaces  : Iterable[Race] = Vector(Race.Unknown, Race.Terran)
+  override def enemyRaces  : Iterable[Race] = Vector(Race.Terran)
 }

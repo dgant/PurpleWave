@@ -9,5 +9,5 @@ object Zerg4PoolAllIn extends Strategy {
   
   override def ourRaces: Iterable[Race] = Vector(Race.Zerg)
   
-  override def gameplan(): Option[Plan] = Some(new Zerg4Pool)
+  override def gameplan: Option[Plan] = Some(new Zerg4Pool)
 }

@@ -8,7 +8,7 @@ import bwapi.Race
 
 object ProtossFFACarriers extends Strategy {
   
-  override def gameplan(): Option[Plan] = {  Some(new ThreeBaseCarriersWithNoDefense) }
+  override def gameplan: Option[Plan] = {  Some(new ThreeBaseCarriersWithNoDefense) }
   
   override def ourRaces: Iterable[Race] = Vector(Race.Protoss)
   override def ffa = true

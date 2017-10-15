@@ -1,14 +1,16 @@
 package ProxyBwapi.Players
 
 import Debugging.Visualizations.Colors
+import Lifecycle.With
+import Performance.Cache
 import ProxyBwapi.Upgrades.Upgrade
 import bwapi.{Player, Race}
 
 case class PlayerInfo(basePlayer:Player) extends PlayerProxy(basePlayer) {
   
-  lazy val isTerran   : Boolean = race == Race.Terran
-  lazy val isProtoss  : Boolean = race == Race.Protoss
-  lazy val isZerg     : Boolean = race == Race.Zerg
+  def isTerran   : Boolean = raceCurrent == Race.Terran
+  def isProtoss  : Boolean = raceCurrent == Race.Protoss
+  def isZerg     : Boolean = raceCurrent == Race.Zerg
   lazy val isFriendly : Boolean = isUs || isAlly
   
   def hasUpgrade(upgrade: Upgrade): Boolean = getUpgradeLevel(upgrade) > 0
@@ -48,6 +50,14 @@ case class PlayerInfo(basePlayer:Player) extends PlayerProxy(basePlayer) {
     else if (isNeutral) Colors.NeonTeal
     else if (isAlly)    Colors.NeonBlue
     else                Colors.NeonRed
+    
+  private var permanentRace: Option[Race] = None
+  def raceCurrent: Race = raceCurrentCache()
+  private val raceCurrentCache = new Cache(() => {
+    permanentRace = permanentRace.orElse(if (Array(Race.Terran, Race.Protoss, Race.Zerg).contains(raceInitial)) Some(raceInitial) else None)
+    permanentRace = permanentRace.orElse(With.units.all.find(u => u.player == this).map(_.unitClass.race))
+    permanentRace.getOrElse(raceInitial)
+  })
   
   override def toString: String = name
 }

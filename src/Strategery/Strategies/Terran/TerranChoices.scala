@@ -8,7 +8,7 @@ import Strategery.Strategies._
 
 object TerranChoices {
   
-  val overall: Iterable[Strategy] = Vector(
+  val all: Iterable[Strategy] = Vector(
     TvEProxy5RaxAllIn,
     TvEProxyBBS2StartLocations,
     TvEProxyBBS3StartLocations,

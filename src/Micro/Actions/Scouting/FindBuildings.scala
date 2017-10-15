@@ -22,7 +22,7 @@ object FindBuildings extends Action {
           With.grids.walkable.get(tile)         &&
           With.grids.friendlyVision.framesSince(tile) > 24 * 30)
         
-        if (base.owner.race == Race.Zerg) {
+        if (base.owner.raceInitial == Race.Zerg) {
           tiles.filter(tile => With.grids.creep.get(tile) || tile.tileDistanceFast(base.townHallArea.midpoint) < 9.0)
         }
         else {

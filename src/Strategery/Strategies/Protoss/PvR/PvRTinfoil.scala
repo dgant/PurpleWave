@@ -7,7 +7,7 @@ import bwapi.Race
 
 object PvRTinfoil extends Strategy {
   
-  override def gameplan(): Option[Plan] = Some(new ProtossTinfoil)
+  override def gameplan: Option[Plan] = Some(new ProtossTinfoil)
   
   override def ourRaces    : Iterable[Race] = Vector(Race.Protoss)
   override def enemyRaces  : Iterable[Race] = Vector(Race.Unknown)

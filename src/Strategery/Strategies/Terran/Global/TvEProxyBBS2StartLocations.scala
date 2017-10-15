@@ -7,7 +7,7 @@ import bwapi.Race
 
 object TvEProxyBBS2StartLocations extends Strategy {
   
-  override def gameplan(): Option[Plan] = { Some(new ProxyBBS) }
+  override def gameplan: Option[Plan] = { Some(new ProxyBBS) }
   
   override def ourRaces: Iterable[Race] = Vector(Race.Terran)
 

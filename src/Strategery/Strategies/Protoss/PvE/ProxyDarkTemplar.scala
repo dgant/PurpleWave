@@ -8,7 +8,7 @@ import bwapi.Race
 
 object ProxyDarkTemplar extends Strategy {
   
-  override def gameplan(): Option[Plan] = { Some(new ProxyDarkTemplarRush) }
+  override def gameplan: Option[Plan] = { Some(new ProxyDarkTemplarRush) }
   
   override def ourRaces: Iterable[Race] = Vector(Race.Protoss)
   

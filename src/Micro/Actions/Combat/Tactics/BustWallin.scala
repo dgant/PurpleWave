@@ -25,7 +25,7 @@ object BustWallin extends Action {
   
     ! unit.flying                               &&
     walledInZones.nonEmpty                      &&
-    With.enemies.exists(_.race == Race.Terran)  &&
+    With.enemies.exists(_.raceInitial == Race.Terran)  &&
     unit.agent.canFight                         &&
     unit.canMove                                &&
     walledInZones.flatMap(_.edges).exists(_.centerPixel.pixelDistanceFast(unit.pixelCenter) < 32.0 * 8.0) &&

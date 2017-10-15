@@ -22,23 +22,9 @@ class SwitchEnemyRace(
   
   override def getChildren: Iterable[Plan] = Vector(terran.get, protoss.get, zerg.get, random.get)
   
-  private val mysteriousRaces = Vector(Race.Random, Race.Unknown, Race.None)
-  
-  private var permanentRace: Option[Race] = None
-  
   override def onUpdate() {
-    
-    var knownRace = permanentRace.orElse(With.enemies.headOption.map(_.race)).getOrElse(Race.Random)
-    
-    if (mysteriousRaces.contains(knownRace)) {
-      knownRace = With.units.enemy.map(_.unitClass.race).find(unitRace => ! mysteriousRaces.contains(unitRace)).getOrElse(Race.Random)
-    }
-    
-    if ( ! mysteriousRaces.contains(knownRace)) {
-      permanentRace = Some(knownRace)
-    }
-    
-    val matchupPlan = knownRace match {
+
+    val matchupPlan = With.enemy.raceCurrent match {
       case Race.Terran    => terran
       case Race.Protoss   => protoss
       case Race.Zerg      => zerg

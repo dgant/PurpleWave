@@ -5,5 +5,5 @@ import Planning.Plan
 import bwapi.Race
 
 class EnemyIsRace(val race:Race) extends Plan {
-  override def isComplete: Boolean = With.enemies.exists(_.race == Race.Terran)
+  override def isComplete: Boolean = With.enemies.exists(_.raceInitial == Race.Terran)
 }

@@ -9,7 +9,7 @@ object ProxyHatchSunkens extends Strategy {
   
   override def ourRaces: Iterable[Race] = Vector(Race.Zerg)
   
-  override def gameplan(): Option[Plan] = Some(new ProxyHatch)
+  override def gameplan: Option[Plan] = Some(new ProxyHatch)
   
   override def enemyRaces: Iterable[Race] = Vector(Race.Unknown, Race.Terran, Race.Protoss)
 }

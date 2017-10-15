@@ -17,7 +17,7 @@ object BustBunker extends Action {
   // Range-upgraded Dragoons just barely outrange a Bunker containing non-range-upgraded Marines.
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    With.enemies.exists(_.race == Race.Terran)                    &&
+    With.enemies.exists(_.raceInitial == Race.Terran)                    &&
     unit.agent.canFight                                           &&
     unit.canMove                                                  &&
     unit.is(Protoss.Dragoon)                                      &&

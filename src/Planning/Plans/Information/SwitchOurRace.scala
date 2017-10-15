@@ -21,7 +21,7 @@ class SwitchOurRace(
   override def getChildren: Iterable[Plan] = Vector(terran.get, protoss.get, zerg.get)
   override def onUpdate() {
     
-    val matchupPlan = With.self.race match {
+    val matchupPlan = With.self.raceInitial match {
       case Race.Terran    => terran
       case Race.Protoss   => protoss
       case Race.Zerg      => zerg

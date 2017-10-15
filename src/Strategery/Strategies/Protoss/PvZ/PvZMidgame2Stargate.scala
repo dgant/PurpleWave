@@ -6,5 +6,5 @@ import bwapi.Race
 object PvZMidgame2Stargate extends Strategy {
   
   override def ourRaces    : Iterable[Race] = Vector(Race.Protoss)
-  override def enemyRaces  : Iterable[Race] = Vector(Race.Unknown, Race.Zerg)
+  override def enemyRaces  : Iterable[Race] = Vector(Race.Zerg)
 }

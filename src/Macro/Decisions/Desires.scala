@@ -20,14 +20,14 @@ object Desires  {
       override def default(key: UnitClass): Double = 0.0
     }
     
-    if (With.enemy.race == Race.Terran) {
+    if (With.enemy.raceInitial == Race.Terran) {
       desires(Protoss.Dragoon) += 12.0
     }
-    else if (With.enemy.race == Race.Protoss) {
+    else if (With.enemy.raceInitial == Race.Protoss) {
       desires(Protoss.Zealot)  += 2.0
       desires(Protoss.Dragoon) += 6.0
     }
-    else if (With.enemy.race == Race.Zerg) {
+    else if (With.enemy.raceInitial == Race.Zerg) {
       desires(Protoss.Zealot)  += 8.0
       desires(Protoss.Corsair) += 2.0
     }

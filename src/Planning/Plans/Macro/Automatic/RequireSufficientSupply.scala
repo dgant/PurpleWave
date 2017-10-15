@@ -9,7 +9,7 @@ class RequireSufficientSupply extends Plan {
   
   description.set("Require enough supply to avoid supply block")
   
-  val supplyProvider =  UnitClasses.get(With.self.race.getSupplyProvider)
+  val supplyProvider =  UnitClasses.get(With.self.raceInitial.getSupplyProvider)
   
   override def onUpdate() {
     With.scheduler.request(this, RequestAtLeast(totalRequiredRecalculate, supplyProvider))

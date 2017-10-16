@@ -28,8 +28,8 @@ class Visualization {
     ShowUnitsAll,
     ShowUnitsFriendly,
     ShowUnitsForeign,
-  
-    ShowReactionTime
+
+    ShowStrategyEvaluations
   )
   
   var enabled   = true

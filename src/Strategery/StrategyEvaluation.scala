@@ -1,6 +1,7 @@
 package Strategery
 
 import Lifecycle.With
+import Mathematics.PurpleMath
 import Strategery.History.HistoricalGame
 import Strategery.Strategies.Strategy
 
@@ -65,7 +66,7 @@ case class StrategyEvaluation(strategy: Strategy) {
   }
   
   private def winrate(games: Iterable[HistoricalGame]): Double = {
-    games.map(_.winsWeighted).sum
+    PurpleMath.nanToZero(games.map(_.winsWeighted).sum / games.map(_.weight).sum)
   }
   
   private def interest(games: Iterable[HistoricalGame], confidenceSamples: Double): Double = {

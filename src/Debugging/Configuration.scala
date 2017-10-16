@@ -16,7 +16,7 @@ class Configuration {
   // Strategy //
   //////////////
   
-  var targetWinrate    = 0.9
+  var targetWinrate       = 0.9
   var strategyRandomness  = 0.1
   var historyHalfLife     = 30.0
   

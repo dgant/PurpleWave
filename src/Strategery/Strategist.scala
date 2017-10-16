@@ -37,14 +37,16 @@ class Strategist {
   )).toMap
   
   def selectInitialStrategies: Set[Strategy] = {
-    val strategies = filterForcedStrategies(
-      (
-        TerranChoices.all ++
-        ProtossChoices.all ++
-        ZergChoices.all
-      ).filter(isAppropriate))
-    strategies.foreach(evaluate)
-    chooseBest(strategies).toSet
+    val enemyHasKnownRace = With.enemies.exists(_.raceInitial != Race.Unknown)
+    val strategiesUnfiltered = if (enemyHasKnownRace) {
+      TerranChoices.all ++ ProtossChoices.all ++ ZergChoices.all
+    }
+    else {
+      TerranChoices.all ++ ProtossChoices.pvr ++ ZergChoices.all
+    }
+    val strategiesFiltered = filterForcedStrategies(strategiesUnfiltered.filter(isAppropriate))
+    strategiesFiltered.foreach(evaluate)
+    chooseBest(strategiesFiltered).toSet
   }
   
   private def filterForcedStrategies(strategies: Iterable[Strategy]): Iterable[Strategy] = {

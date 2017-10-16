@@ -8,7 +8,7 @@ object Cancel extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
     lazy val framesCutoff     = 3 * With.reaction.agencyAverage
-    lazy val framesToLive     = Math.min(unit.totalHealth / unit.damageInLastSecond / 24.0, unit.matchups.framesToLiveCurrently)
+    lazy val framesToLive     = Math.min(unit.totalHealth / 24.0 / unit.damageInLastSecond, unit.matchups.framesToLiveCurrently)
     lazy val framesToFinish   = Seq(unit.framesBeforeTechComplete, unit.framesBeforeUpgradeComplete, unit.framesBeforeBuildeeComplete).max
     lazy val doomed           = framesToLive < framesCutoff
     lazy val willNeverFinish  = framesToLive < framesToFinish

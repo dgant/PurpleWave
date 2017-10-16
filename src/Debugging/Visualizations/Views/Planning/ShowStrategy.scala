@@ -9,6 +9,6 @@ object ShowStrategy extends View {
     With.game.drawTextScreen(
       5,
       3 * With.visualization.lineHeightSmall,
-      With.strategy.selected.map(_.toString).mkString(", "))
+      With.strategy.selectedCurrently.map(_.toString).mkString(", "))
   }
 }

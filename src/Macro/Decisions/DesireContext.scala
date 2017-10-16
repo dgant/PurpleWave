@@ -14,7 +14,7 @@ class DesireContext {
   
   val enemyUnits  : Map[UnitClass, Int] = countTypes(With.units.enemy)
   val ourUnits    : Map[UnitClass, Int] = countTypes(With.units.ours)
-  val strategies  : Set[Strategy]       = With.strategy.selected
+  val strategies  : Set[Strategy]       = With.strategy.selectedCurrently
   val minerals    : Double              = With.self.minerals  + 24 * 60 * With.economy.ourIncomePerFrameMinerals
   val gas         : Double              = With.self.gas       + 24 * 60 * With.economy.ourIncomePerFrameGas
 }

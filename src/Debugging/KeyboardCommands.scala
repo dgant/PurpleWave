@@ -19,7 +19,7 @@ object KeyboardCommands {
       case "4"          => With.game.setLocalSpeed(0)     ; With.configuration.camera = false
       case "map"        => Manners.chat("The current map is " + With.game.mapName + ": " + With.game.mapFileName)
       case "allin"      => With.blackboard.allIn = true
-      case "strategize" => With.strategy.selectStrategies
+      case "strategize" => With.strategy.selectInitialStrategies
       case _            => With.visualization.tryToggle(text)
     }
   }

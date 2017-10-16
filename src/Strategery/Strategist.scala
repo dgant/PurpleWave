@@ -1,6 +1,7 @@
 package Strategery
 
 import Lifecycle.With
+import Performance.Cache
 import Planning.Plan
 import Planning.Plans.WinTheGame
 import Strategery.History.HistoricalGame
@@ -8,22 +9,24 @@ import Strategery.Strategies.Protoss.ProtossChoices
 import Strategery.Strategies.Strategy
 import Strategery.Strategies.Terran.TerranChoices
 import Strategery.Strategies.Zerg.ZergChoices
+import bwapi.Race
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 class Strategist {
   
-  lazy val selected: Set[Strategy] = selectStrategies
+  lazy val selectedInitially: Set[Strategy] = selectInitialStrategies
   
-  def selectedAppropriate = selected.filter(isAppropriate)
+  def selectedCurrently: Set[Strategy] = selectedCurrentlyCache()
+  private val selectedCurrentlyCache = new Cache(() => selectedInitially.filter(isAppropriate))
   
   // Plasma is so weird we need to handle it separately.
   lazy val isPlasma: Boolean = With.game.mapFileName.contains("Plasma")
   
   lazy val isIslandMap: Boolean = heyIsThisAnIslandMap
   
-  lazy val gameplan: Plan = selected
+  lazy val gameplan: Plan = selectedInitially
     .find(_.gameplan.isDefined)
     .map(_.gameplan.get)
     .getOrElse(new WinTheGame)
@@ -33,7 +36,7 @@ class Strategist {
     1.0 / (1.0 + (game.order / With.configuration.historyHalfLife))
   )).toMap
   
-  def selectStrategies: Set[Strategy] = {
+  def selectInitialStrategies: Set[Strategy] = {
     val strategies = filterForcedStrategies(
       (
         TerranChoices.all ++
@@ -53,13 +56,15 @@ class Strategist {
   
   private def isAppropriate(strategy: Strategy): Boolean = {
     lazy val ourRace                = With.self.raceInitial
-    lazy val enemyRaces             = With.enemies.map(_.raceInitial).toSet
+    lazy val enemyRacesCurrent      = With.enemies.map(_.raceCurrent).toSet
+    lazy val enemyIsRandom          = With.enemies.exists(_.raceInitial == Race.Unknown)
     lazy val isIsland               = isIslandMap
     lazy val isGround               = ! isIsland
     lazy val startLocations         = With.geography.startLocations.size
     lazy val thisGameIsFFA          = With.enemies.size > 1
     lazy val disabledInPlaybook     = Playbook.disabled.contains(strategy)
     lazy val disabledOnMap          = strategy.prohibitedMaps.exists(_.matches)
+    lazy val appropriateForRace     = enemyIsRandom || enemyRacesCurrent.exists(race => strategy.ourRaces.exists(_ == race))
     lazy val appropriateForOpponent = strategy.restrictedOpponents.isEmpty ||
       strategy.restrictedOpponents.get
         .map(_.toLowerCase)
@@ -71,9 +76,9 @@ class Strategist {
     (strategy.islandMaps  || ! isIsland)              &&
     (strategy.groundMaps  || ! isGround)              &&
     strategy.ourRaces.exists(_ == ourRace)            &&
-    strategy.enemyRaces.exists(enemyRaces.contains)   &&
     strategy.startLocationsMin <= startLocations      &&
     strategy.startLocationsMax >= startLocations      &&
+    appropriateForRace                                &&
     appropriateForOpponent
   }
   

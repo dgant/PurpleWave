@@ -46,7 +46,7 @@ class History {
       ourRace         = With.self.raceInitial,
       enemyRace       = currentEnemyRace,
       won             = weWon,
-      strategies      = With.strategy.selected.map(_.toString))
+      strategies      = With.strategy.selectedCurrently.map(_.toString))
     HistoryLoader.save(games.toVector :+ thisGame)
   }
   

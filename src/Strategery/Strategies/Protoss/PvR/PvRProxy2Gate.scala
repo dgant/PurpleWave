@@ -13,7 +13,6 @@ object PvRProxy2Gate extends Strategy {
     ProtossChoices.pvpOpenersWithTransitions,
     ProtossChoices.pvzOpenersTransitioningFrom2Gate)
   
-  override def gameplan   : Option[Plan]    = Some(new Proxy2Gate)
   override def ourRaces   : Iterable[Race]  = Vector(Race.Protoss)
   override def enemyRaces : Iterable[Race]  = Vector(Race.Unknown)
 }

@@ -57,17 +57,19 @@ class Strategist {
   }
   
   private def isAppropriate(strategy: Strategy): Boolean = {
-    lazy val ourRace                = With.self.raceInitial
-    lazy val enemyRacesCurrent      = With.enemies.map(_.raceCurrent).toSet
-    lazy val enemyIsRandom          = With.enemies.exists(_.raceInitial == Race.Unknown)
-    lazy val isIsland               = isIslandMap
-    lazy val isGround               = ! isIsland
-    lazy val startLocations         = With.geography.startLocations.size
-    lazy val thisGameIsFFA          = With.enemies.size > 1
-    lazy val disabledInPlaybook     = Playbook.disabled.contains(strategy)
-    lazy val disabledOnMap          = strategy.prohibitedMaps.exists(_.matches)
-    lazy val appropriateForRace     = enemyIsRandom || enemyRacesCurrent.exists(race => strategy.ourRaces.exists(_ == race))
-    lazy val appropriateForOpponent = strategy.restrictedOpponents.isEmpty ||
+    lazy val ourRace                  = With.self.raceInitial
+    lazy val enemyRacesCurrent        = With.enemies.map(_.raceCurrent).toSet
+    lazy val enemyRaceWasUnknown      = With.enemies.exists(_.raceInitial == Race.Unknown)
+    lazy val enemyRaceStillUnknown    = With.enemies.exists(_.raceCurrent == Race.Unknown)
+    lazy val isIsland                 = isIslandMap
+    lazy val isGround                 = ! isIsland
+    lazy val startLocations           = With.geography.startLocations.size
+    lazy val thisGameIsFFA            = With.enemies.size > 1
+    lazy val disabledInPlaybook       = Playbook.disabled.contains(strategy)
+    lazy val disabledOnMap            = strategy.prohibitedMaps.exists(_.matches)
+    lazy val appropriateForOurRace    = strategy.ourRaces.exists(_ == ourRace)
+    lazy val appropriateForEnemyRace  = strategy.enemyRaces.exists(race => if (race == Race.Unknown) enemyRaceWasUnknown else (enemyRaceStillUnknown || enemyRacesCurrent.contains(race)))
+    lazy val appropriateForOpponent   = strategy.restrictedOpponents.isEmpty ||
       strategy.restrictedOpponents.get
         .map(_.toLowerCase)
         .exists(key => With.enemies.map(_.name.toLowerCase).exists(_.contains(key)))
@@ -77,10 +79,10 @@ class Strategist {
     (strategy.ffa == thisGameIsFFA)                   &&
     (strategy.islandMaps  || ! isIsland)              &&
     (strategy.groundMaps  || ! isGround)              &&
-    strategy.ourRaces.exists(_ == ourRace)            &&
     strategy.startLocationsMin <= startLocations      &&
     strategy.startLocationsMax >= startLocations      &&
-    appropriateForRace                                &&
+    appropriateForOurRace                             &&
+    appropriateForEnemyRace                           &&
     appropriateForOpponent
   }
   

@@ -56,10 +56,10 @@ class Proxy2Gate extends GameplanModeTemplate {
           new Parallel(
             new Build(
               RequestAtLeast(1, Protoss.RoboticsFacility),
-              RequestAtLeast(1, Protoss.Observatory))))),
+              RequestAtLeast(1, Protoss.Observatory)))),
         new Build(
           RequestUpgrade(Protoss.DragoonRange),
-          RequestAtLeast(4, Protoss.Gateway))))
+          RequestAtLeast(4, Protoss.Gateway)))))
   
   override def buildPlans = Vector(
     new Do(() =>  With.blackboard.maxFramesToSendAdvanceBuilder = Int.MaxValue),

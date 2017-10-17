@@ -2,7 +2,6 @@ package Planning.Plans.Protoss.GamePlans.Standard.PvR
 
 import Macro.BuildRequests.RequestAtLeast
 import Planning.Plan
-import Planning.Plans.Compound.And
 import Planning.Plans.GamePlans.GameplanModeTemplateVsRandom
 import Planning.Plans.Information.Employing
 import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
@@ -14,7 +13,7 @@ import Strategery.Strategies.Protoss.PvR.PvREarly2Gate1012
 
 class PvR2Gate1012 extends GameplanModeTemplateVsRandom {
   
-  override val completionCriteriaAdditional = new And(new UnitsAtLeast(2, Protoss.Zealot))
+  override val completionCriteria = new UnitsAtLeast(2, Protoss.Zealot)
   
   override val activationCriteria = new Employing(PvREarly2Gate1012)
   override val buildOrder         = ProtossBuilds.OpeningTwoGate1012

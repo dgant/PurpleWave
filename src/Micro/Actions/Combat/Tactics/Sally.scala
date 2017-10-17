@@ -21,8 +21,7 @@ object Sally extends Action {
   
   def staticDefense(unit: FriendlyUnitInfo): Iterable[UnitInfo] = {
     val output = unit.matchups.allies.filter(staticDefense =>
-      staticDefense.unitClass.topSpeed == 0               && //Buildings, Lurkers, and Siege Tanks
-      staticDefense.unitClass.rawCanAttack                &&
+      staticDefense.unitClass.isStaticDefense             &&
       staticDefense.pixelDistanceFast(unit) < 32.0 * 15.0 &&
       staticDefense.matchups.dpfReceivingDiffused > 0)
     output

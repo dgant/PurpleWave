@@ -14,8 +14,7 @@ import Strategery.Strategies.Protoss.PvR.PvRTinfoil
 class PvRTinfoil extends GameplanModeTemplateVsRandom {
   
   override val activationCriteria = new Employing(PvRTinfoil)
-  
-  override def completionCriteriaAdditional = new UnitsAtLeast(2, Protoss.Dragoon)
+  override val completionCriteria = new UnitsAtLeast(2, Protoss.Dragoon)
   
   override val aggression = 0.7
   

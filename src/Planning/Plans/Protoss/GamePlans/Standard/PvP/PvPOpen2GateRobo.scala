@@ -60,7 +60,7 @@ class PvPOpen2GateRobo extends GameplanModeTemplate {
       new Build(RequestAtLeast(1, Protoss.Observer))),
     new Trigger(new UnitsAtLeast(1, Protoss.Reaver), new RequireMiningBases(2)),
     new TrainContinuously(Protoss.Reaver),
-    new TrainContinuously(Protoss.Dragoon),
+    new TrainContinuously(Protoss.Dragoon, 20),
     new Build(
       RequestAtLeast(1, Protoss.RoboticsFacility),
       RequestAtLeast(1, Protoss.Observatory),

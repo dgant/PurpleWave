@@ -12,6 +12,7 @@ PurpleWave has won:
  * And has ranked as high as #2 on the [SSCAIT Ladder](https://sscaitournament.com/index.php?action=scores). 
 
 PurpleWave vs. Iron, AIIDE 2017:
+
 [![PurpleWave vs. Iron, AIIDE 2017](https://img.youtube.com/vi/g33PIqDdTqs/0.jpg)](https://www.youtube.com/watch?v=g33PIqDdTqs)
 
 ## Credits

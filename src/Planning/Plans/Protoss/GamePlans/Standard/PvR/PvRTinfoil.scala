@@ -1,7 +1,7 @@
 package Planning.Plans.Protoss.GamePlans.Standard.PvR
 
 import Lifecycle.With
-import Macro.BuildRequests.{BuildRequest, RequestAtLeast, RequestUpgrade}
+import Macro.BuildRequests.{BuildRequest, RequestAtLeast}
 import Planning.Plans.Compound.{And, Check, If}
 import Planning.Plans.GamePlans.GameplanModeTemplateVsRandom
 import Planning.Plans.Information.Employing
@@ -14,7 +14,7 @@ import Strategery.Strategies.Protoss.PvR.PvRTinfoil
 class PvRTinfoil extends GameplanModeTemplateVsRandom {
   
   override val activationCriteria = new Employing(PvRTinfoil)
-  override val completionCriteria = new UnitsAtLeast(2, Protoss.Dragoon)
+  override val completionCriteria = new UnitsAtLeast(1, Protoss.CyberneticsCore)
   
   override val aggression = 0.7
   
@@ -35,12 +35,9 @@ class PvRTinfoil extends GameplanModeTemplateVsRandom {
         new UnitsAtLeast(1, Protoss.CyberneticsCore),
         new UnitsAtLeast(1, Protoss.Assimilator)),
       new TrainContinuously(Protoss.Dragoon),
-      new TrainContinuously(Protoss.Zealot)),
+      new TrainContinuously(Protoss.Zealot, 4)),
     new Build(
       RequestAtLeast(1, Protoss.Gateway),
       RequestAtLeast(1, Protoss.Assimilator),
-      RequestAtLeast(1, Protoss.CyberneticsCore),
-      RequestAtLeast(2, Protoss.Gateway),
-      RequestUpgrade(Protoss.DragoonRange),
-      RequestAtLeast(4, Protoss.Gateway)))
+      RequestAtLeast(1, Protoss.CyberneticsCore)))
 }

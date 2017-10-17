@@ -17,16 +17,14 @@ class PvR2Gate1012 extends GameplanModeTemplateVsRandom {
   
   override val activationCriteria = new Employing(PvREarly2Gate1012)
   override val buildOrder         = ProtossBuilds.OpeningTwoGate1012
-  override def scoutAt            = 8
+  override def scoutAt            = 9
   override def defaultAttackPlan  = new Plan
   
   override def buildPlans = Vector(
     new RequireSufficientSupply,
     new TrainWorkersContinuously,
-    new TrainContinuously(Protoss.Zealot),
+    new TrainContinuously(Protoss.Zealot, 4),
     new Build(
       RequestAtLeast(1, Protoss.Assimilator),
-      RequestAtLeast(1, Protoss.CyberneticsCore),
-      RequestAtLeast(4, Protoss.Gateway),
-      RequestAtLeast(1, Protoss.Nexus)))
+      RequestAtLeast(1, Protoss.CyberneticsCore)))
 }

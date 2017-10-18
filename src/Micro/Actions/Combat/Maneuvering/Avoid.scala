@@ -1,6 +1,8 @@
 package Micro.Actions.Combat.Maneuvering
 
 import Debugging.Visualizations.ForceColors
+import Lifecycle.With
+import Mathematics.PurpleMath
 import Micro.Actions.Action
 import Micro.Actions.Commands.Gravitate
 import Micro.Decisions.Potential
@@ -14,10 +16,10 @@ object Avoid extends Action {
   }
   
   override def perform(unit: FriendlyUnitInfo) {
-    val threatBonus     = if (unit.matchups.threatsInRange.nonEmpty) 1.75 else 1.25
-    val exitBonus       = if (unit.agent.origin.zone == unit.zone) 0.5 else 1.25
-    val mobilityBonus   = 2.0 / Math.max(1.0, unit.mobility)
-    val regroupingBonus = 18.0 / Math.max(24.0, unit.matchups.framesOfEntanglementCurrently)
+    val threatBonus     = PurpleMath.clamp(With.reaction.agencyAverage + unit.matchups.framesOfEntanglementCurrently, 12.0, 24.0) / 12.0
+    val exitBonus       = if (unit.agent.origin.zone == unit.zone) 0.5 else 1.0
+    val mobilityBonus   = 1.0 / Math.max(1.0, unit.mobility)
+    val regroupingBonus = 12.0 / Math.max(24.0, unit.matchups.framesOfEntanglementCurrently)
     
     val forceThreat     = Potential.threatsRepulsion(unit).normalize(threatBonus)
     val forceExiting    = Potential.exitAttraction(unit).normalize(exitBonus)

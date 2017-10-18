@@ -58,7 +58,7 @@ case class StrategyEvaluation(strategy: Strategy) {
   // How many (decayed) games before we have confidence in this strategy?
   private def getConfidenceSamples(strategy: Strategy): Double = {
     if (strategy.choices.isEmpty) {
-      1.0
+      2.0
     }
     else {
       Math.min(8.0, strategy.choices.map(_.map(getConfidenceSamples).sum).sum)

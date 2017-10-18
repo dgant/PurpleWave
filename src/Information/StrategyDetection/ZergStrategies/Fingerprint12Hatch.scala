@@ -1,11 +1,11 @@
 package Information.StrategyDetection.ZergStrategies
 
-import Information.StrategyDetection.Generic.{FingerprintAnd, FingerprintNot, FingerprintRace, FingerprintScoutedEnemyBase}
+import Information.StrategyDetection.Generic.{FingerprintAnd, FingerprintNot, FingerprintRace, FingerprintScoutedEnemyBases}
 import bwapi.Race
 
 class Fingerprint12Hatch extends FingerprintAnd(
   new FingerprintRace(Race.Zerg),
-  new FingerprintScoutedEnemyBase,
+  new FingerprintScoutedEnemyBases(2),
   new FingerprintNot(new Fingerprint4Pool),
   new FingerprintNot(new Fingerprint9Pool),
   new FingerprintNot(new FingerprintOverpool),

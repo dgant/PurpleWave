@@ -73,10 +73,6 @@ class PvPOpen2GateDarkTemplar extends GameplanModeTemplate {
     new TrainWorkersContinuously,
   
     new Build(RequestAtLeast(1, Protoss.Forge)),
-    new If(
-      new UnitsAtLeast(4, Protoss.Pylon),
-      new Parallel(
-        new BuildCannonsAtNatural(2),
-        new RequireMiningBases(2)))
-  )
+    new BuildCannonsAtNatural(2),
+    new RequireMiningBases(2))
 }

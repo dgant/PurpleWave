@@ -15,10 +15,9 @@ object Avoid extends Action {
   
   override def perform(unit: FriendlyUnitInfo) {
     val threatBonus     = if (unit.matchups.threatsInRange.nonEmpty) 1.75 else 1.25
-    val exitBonus       = 1.25
+    val exitBonus       = if (unit.agent.origin.zone == unit.zone) 0.5 else 1.25
     val mobilityBonus   = 2.0 / Math.max(1.0, unit.mobility)
-    
-    val regroupingBonus = 24.0 / Math.max(24.0, unit.matchups.framesOfEntanglementCurrently)
+    val regroupingBonus = 18.0 / Math.max(24.0, unit.matchups.framesOfEntanglementCurrently)
     
     val forceThreat     = Potential.threatsRepulsion(unit).normalize(threatBonus)
     val forceExiting    = Potential.exitAttraction(unit).normalize(exitBonus)

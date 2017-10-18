@@ -58,7 +58,7 @@ object Potential {
   //////////
   
   def teamAttraction(unit: FriendlyUnitInfo): Force = {
-    val allies                = unit.matchups.allies ++ unit.squad.map(_.recruits).getOrElse(List.empty)
+    val allies                = (unit.matchups.allies ++ unit.squad.map(_.recruits).getOrElse(List.empty)).filter(_ != unit)
     val alliesUseful          = allies.filter(ally => unit.matchups.threats.exists(ally.canAttack))
     val allyNearestUseful     = ByOption.minBy(alliesUseful)(ally => ally.pixelDistanceFast(unit) - ally.effectiveRangePixels)
     if (allyNearestUseful.isEmpty) return new Force

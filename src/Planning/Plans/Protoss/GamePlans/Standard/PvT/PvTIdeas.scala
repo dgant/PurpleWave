@@ -105,7 +105,11 @@ object PvTIdeas {
   
   class TrainZealotsOrDragoons extends If(
     new And(
-      new UpgradeComplete(Protoss.ZealotSpeed, withinFrames = Protoss.ZealotSpeed.upgradeTime.head._2),
+      new Or(
+        new UpgradeComplete(Protoss.ZealotSpeed, withinFrames = Protoss.ZealotSpeed.upgradeTime.head._2),
+        new And(
+          new UnitsAtLeast(1, Protoss.ArbiterTribunal, complete = true),
+          new UnitsExactly(0, Protoss.Arbiter))),
       new UnitsAtMost(12, Protoss.Zealot),
       new Check(() => With.units.ours.count(_.is(Protoss.Dragoon)) >= With.units.enemy.count(_.is(Terran.Vulture))),
       new Or(

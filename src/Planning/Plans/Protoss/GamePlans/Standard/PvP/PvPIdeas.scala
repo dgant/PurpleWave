@@ -2,14 +2,23 @@ package Planning.Plans.Protoss.GamePlans.Standard.PvP
 
 import Lifecycle.With
 import Macro.BuildRequests.RequestAtLeast
+import Planning.Plans.Army.{Attack, ConsiderAttacking}
 import Planning.Plans.Compound._
 import Planning.Plans.Information.Reactive.{EnemyCarriers, EnemyDarkTemplarExists, EnemyDarkTemplarPossible}
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Macro.Milestones.{UpgradeComplete, UnitsAtLeast, UnitsAtMost}
+import Planning.Plans.Macro.Milestones._
 import ProxyBwapi.Races.Protoss
 
 object PvPIdeas {
+  
+  class AttackSafely extends If(
+    new And(
+      new UnitsAtLeast(1, Protoss.Dragoon),
+      new EnemyUnitsAtMost(0, Protoss.Dragoon),
+      new Not(new EnemyHasUpgrade(Protoss.ZealotSpeed))),
+    new Attack,
+    new ConsiderAttacking)
   
   class ReactToDarkTemplarPossible extends If(
     new EnemyDarkTemplarPossible,
@@ -28,10 +37,10 @@ object PvPIdeas {
     new EnemyDarkTemplarExists,
     new If(
       new UnitsAtLeast(1, Protoss.Observatory),
-      new Build(RequestAtLeast(1, Protoss.Observer))),
-    new If(
-      new UnitsAtLeast(1, Protoss.Forge),
-      new Build(RequestAtLeast(2, Protoss.PhotonCannon))))
+      new Build(RequestAtLeast(1, Protoss.Observer)),
+      new Build(
+        RequestAtLeast(1, Protoss.Forge),
+        RequestAtLeast(2, Protoss.PhotonCannon))))
   
   class BuildDragoonsOrZealots extends If(
     new Or(

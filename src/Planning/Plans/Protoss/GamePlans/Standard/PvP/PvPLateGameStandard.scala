@@ -20,6 +20,16 @@ class PvPLateGameStandard extends GameplanModeTemplate {
   override val aggression = 0.82
   override val scoutExpansionsAt = 90
   
+  override val emergencyPlans: Vector[Plan] = Vector(
+    new ReactToDarkTemplarPossible,
+    new ReactToDarkTemplarExisting)
+  
+  override val defaultAttackPlan = new Parallel(
+    new If(new EnemyBasesAtLeast(3), new DropAttack),
+    new Attack { attackers.get.unitMatcher.set(Protoss.DarkTemplar) },
+    new PvPIdeas.AttackSafely
+  )
+  
   class BuildTechPartOne extends Parallel(
     new Build(
       RequestAtLeast(1, Protoss.RoboticsFacility),
@@ -38,16 +48,6 @@ class PvPLateGameStandard extends GameplanModeTemplate {
       RequestUpgrade(Protoss.HighTemplarEnergy),
       RequestAtLeast(1, Protoss.RoboticsSupportBay),
       RequestUpgrade(Protoss.ShuttleSpeed)))
-  
-  override val emergencyPlans: Vector[Plan] = Vector(
-    new ReactToDarkTemplarPossible,
-    new ReactToDarkTemplarExisting)
-  
-  override val defaultAttackPlan = new Parallel(
-    new If(new EnemyBasesAtLeast(3), new DropAttack),
-    new Attack { attackers.get.unitMatcher.set(Protoss.DarkTemplar) },
-    new ConsiderAttacking
-  )
   
   override val buildPlans = Vector(
     new BuildGasPumps,

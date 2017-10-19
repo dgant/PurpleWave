@@ -3,7 +3,6 @@ package Planning.Plans.Protoss.GamePlans.Standard.PvP
 import Macro.BuildRequests.{BuildRequest, RequestAtLeast, RequestUpgrade}
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
-import Planning.Plans.Army.ConsiderAttacking
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Information.Employing
@@ -18,12 +17,14 @@ import Strategery.Strategies.Protoss.PvP.PvP2GateRoboObs
 
 class PvPOpen2GateRobo extends GameplanModeTemplate {
   
-  override val activationCriteria: Plan = new Employing(PvP2GateRoboObs)
-  
-  override val completionCriteria: Plan = new Or(
+  override val activationCriteria : Plan = new Employing(PvP2GateRoboObs)
+  override val completionCriteria : Plan = new Or(
     new EnemyBasesAtLeast(2),
     new UnitsAtLeast(2, Protoss.Nexus),
     new UnitsAtLeast(40, UnitMatchWarriors))
+  
+  override val defaultScoutPlan   : Plan = new If(new UnitsAtLeast(1, Protoss.CyberneticsCore), new Scout)
+  override def defaultAttackPlan  : Plan = new PvPIdeas.AttackSafely
   
   override val buildOrder: Seq[BuildRequest] = Vector(
     // http://wiki.teamliquid.net/starcraft/2_Gate_Reaver_(vs._Protoss)
@@ -68,10 +69,4 @@ class PvPOpen2GateRobo extends GameplanModeTemplate {
       RequestAtLeast(3, Protoss.Gateway),
       RequestAtLeast(2, Protoss.Nexus),
       RequestAtLeast(1, Protoss.Observer)))
-  
-  override val defaultScoutPlan: Plan = new If(new UnitsAtLeast(1, Protoss.CyberneticsCore), new Scout)
-  
-  override val defaultAttackPlan: Plan = new Trigger(
-    new UnitsAtLeast(2, Protoss.Reaver, complete = true),
-    initialAfter = new ConsiderAttacking)
 }

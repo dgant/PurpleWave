@@ -16,11 +16,10 @@ import Strategery.Strategies.Protoss.PvP.PvP1GateRoboObs
 
 class PvPOpen1GateRoboObs extends GameplanModeTemplate {
   
-  override val activationCriteria: Plan = new Employing(PvP1GateRoboObs)
-  
-  override val completionCriteria: Plan = new Or(
-    new EnemyBasesAtLeast(2),
-    new UnitsAtLeast(1, Protoss.Observer))
+  override val activationCriteria : Plan = new Employing(PvP1GateRoboObs)
+  override val completionCriteria : Plan = new Or(new EnemyBasesAtLeast(2), new UnitsAtLeast(1, Protoss.Observer))
+  override val defaultScoutPlan   : Plan = new Trigger(new UnitsAtLeast(1, Protoss.CyberneticsCore), new Scout)
+  override def defaultAttackPlan  : Plan = new PvPIdeas.AttackSafely
   
   override val buildOrder = Vector(
     RequestAtLeast(8,   Protoss.Probe),
@@ -58,6 +57,4 @@ class PvPOpen1GateRoboObs extends GameplanModeTemplate {
     new TrainContinuously(Protoss.Dragoon),
     new RequireMiningBases(2),
     new Build(RequestAtLeast(4, Protoss.Gateway)))
-  
-  override val defaultScoutPlan: Plan = new Trigger(new UnitsAtLeast(1, Protoss.CyberneticsCore), new Scout)
 }

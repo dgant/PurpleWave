@@ -20,27 +20,27 @@ case class StrategyEvaluation(strategy: Strategy) {
   val gamesVsRace           : Iterable[HistoricalGame]  = games.filter(_.enemyRace      == With.enemy.raceInitial)
   val gamesOnMap            : Iterable[HistoricalGame]  = games.filter(_.mapName        == With.mapFileName)
   val gamesWithStarts       : Iterable[HistoricalGame]  = games.filter(_.startLocations == With.game.getStartLocations.size)
-  val samplesNeeded         : Double                    = getConfidenceSamples(strategy)
+  val patienceGames         : Double                    = getConfidenceSamples(strategy)
   val winrateTotal          : Double                    = winrate(games)
   val winrateVsEnemy        : Double                    = winrate(gamesVsEnemy)
   val winrateVsRace         : Double                    = winrate(gamesVsRace)
   val winrateOnMap          : Double                    = winrate(gamesOnMap)
   val winrateWithStarts     : Double                    = winrate(gamesWithStarts)
-  val interestRaw           : Double                    = interest(games,            samplesNeeded)
-  val interestVsEnemy       : Double                    = interest(gamesVsEnemy,     samplesNeeded)
-  val interestVsRace        : Double                    = interest(gamesVsRace,      samplesNeeded)
-  val interestOnMap         : Double                    = interest(gamesOnMap,       samplesNeeded)
-  val interestWithStarts    : Double                    = interest(gamesWithStarts,  samplesNeeded)
+  val interestRaw           : Double                    = interest(games,            patienceGames)
+  val interestVsEnemy       : Double                    = interest(gamesVsEnemy,     patienceGames)
+  val interestVsRace        : Double                    = interest(gamesVsRace,      patienceGames)
+  val interestOnMap         : Double                    = interest(gamesOnMap,       patienceGames)
+  val interestWithStarts    : Double                    = interest(gamesWithStarts,  patienceGames)
   val interestDeterministic : Double                    = weighAllFactors
   val interestStochastic    : Double                    = Random.nextDouble()
   val interestTotal         : Double                    = With.configuration.strategyRandomness * interestStochastic + (1.0 - With.configuration.strategyRandomness) * interestDeterministic
   
   private def weighAllFactors: Double = {
     weigh(Vector(
-      new WinrateFactor(interestVsEnemy,    gamesVsEnemy.size,    samplesNeeded, importanceVsEnemy),
-      new WinrateFactor(interestVsRace,     gamesVsRace.size,     samplesNeeded, importanceVsRace),
-      new WinrateFactor(interestOnMap,      gamesOnMap.size,      samplesNeeded, importanceOnMap),
-      new WinrateFactor(interestWithStarts, gamesWithStarts.size, samplesNeeded, importanceWithStarts)))
+      new WinrateFactor(interestVsEnemy,    gamesVsEnemy.size,    patienceGames, importanceVsEnemy),
+      new WinrateFactor(interestVsRace,     gamesVsRace.size,     patienceGames, importanceVsRace),
+      new WinrateFactor(interestOnMap,      gamesOnMap.size,      patienceGames, importanceOnMap),
+      new WinrateFactor(interestWithStarts, gamesWithStarts.size, patienceGames, importanceWithStarts)))
   }
   
   private class WinrateFactor(

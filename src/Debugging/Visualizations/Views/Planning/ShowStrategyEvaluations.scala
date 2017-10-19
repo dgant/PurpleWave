@@ -14,32 +14,38 @@ object ShowStrategyEvaluations extends View {
       .sortBy( - _.interestTotal)
     
     drawColumn(5, "Strategy",     evaluations.map(_.strategy.toString))
-    var nextX = 100
+    var nextX = 85
     nextX = moveX(nextX)
     drawColumn(nextX, "Order",    evaluations.map(e => if (e.playbookOrder > 100) "" else e.playbookOrder.toString))
     nextX = moveX(nextX)
-    drawColumn(nextX, "Samps",    evaluations.map(_.samplesNeeded.toString))
+    drawColumn(nextX, "Patience", evaluations.map(_.patienceGames.toString))
     nextX = moveX(nextX)
     drawColumn(nextX, "Games",    evaluations.map(_.games.size.toString))
     nextX = moveX(nextX)
-    drawColumn(nextX, "vFoe",     evaluations.map(_.gamesVsEnemy.size.toString))
+    drawColumn(nextX, "GamesW",   evaluations.map(e => formatGames(e.games.map(_.weight).sum)))
     nextX = moveX(nextX)
-    drawColumn(nextX, "vRace",    evaluations.map(_.gamesVsRace.size.toString))
+    drawColumn(nextX, "vsFoeW",   evaluations.map(e => formatGames(e.gamesVsEnemy.map(_.weight).sum)))
     nextX = moveX(nextX)
-    drawColumn(nextX, "Map",      evaluations.map(_.gamesOnMap.size.toString))
+    drawColumn(nextX, "vsRaceW",  evaluations.map(e => formatGames(e.gamesVsRace.map(_.weight).sum)))
     nextX = moveX(nextX)
-    drawColumn(nextX, "Win",      evaluations.map(e => formatWinrate(e.winrateTotal)))
+    drawColumn(nextX, "onMapW",   evaluations.map(e => formatGames(e.gamesOnMap.map(_.weight).sum)))
     nextX = moveX(nextX)
-    drawColumn(nextX, "vFoe",     evaluations.map(e => formatWinrate(e.winrateVsEnemy)))
+    drawColumn(nextX, "Win",      evaluations.map(e => formatPercentage(e.winrateTotal)))
     nextX = moveX(nextX)
-    drawColumn(nextX, "vRace",    evaluations.map(e => formatWinrate(e.winrateVsRace)))
+    drawColumn(nextX, "vFoe",     evaluations.map(e => formatPercentage(e.winrateVsEnemy)))
     nextX = moveX(nextX)
-    drawColumn(nextX, "Map",      evaluations.map(e => formatWinrate(e.winrateOnMap)))
+    drawColumn(nextX, "vRace",    evaluations.map(e => formatPercentage(e.winrateVsRace)))
     nextX = moveX(nextX)
-    drawColumn(nextX, "Hope",     evaluations.map(e => formatWinrate(e.interestTotal)))
+    drawColumn(nextX, "Map",      evaluations.map(e => formatPercentage(e.winrateOnMap)))
+    nextX = moveX(nextX)
+    drawColumn(nextX, "Hope",     evaluations.map(e => formatPercentage(e.interestTotal)))
   }
   
-  private def formatWinrate(value: Double): String = {
+  private def formatGames(games: Double): String = {
+    "%1.1f".format(games)
+  }
+  
+  private def formatPercentage(value: Double): String = {
     (value * 100.0).toInt + """%%"""
   }
   

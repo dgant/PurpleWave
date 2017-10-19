@@ -80,11 +80,11 @@ object PlacementProfiles {
     "Cannons for a wall",
     preferZone                  = 1000.0,
     preferNatural               = 10.0,
-    preferCoveringWorkers       = 0.25,
-    avoidDistanceFromEntrance   = 0.5,
+    preferCoveringWorkers       = 0.2,
+    avoidDistanceFromEntrance   = 0.7,
     avoidSurfaceArea            = 0.1,
     avoidDistanceFromEnemy      = 0.5,
-    avoidDistanceFromIdealRange = 3.0)
+    avoidDistanceFromIdealRange = 2.0)
   
   val proxyBuilding = new PlacementProfile(
     "Proxy",

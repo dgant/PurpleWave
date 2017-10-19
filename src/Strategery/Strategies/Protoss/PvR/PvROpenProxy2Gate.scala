@@ -1,16 +1,19 @@
 package Strategery.Strategies.Protoss.PvR
 
+import Strategery.Maps.{MapGroups, StarCraftMap}
 import Strategery.Strategies.Protoss.ProtossChoices
 import Strategery.Strategies.Strategy
 import bwapi.Race
 
-object PvREarly2Gate1012 extends Strategy {
+object PvROpenProxy2Gate extends Strategy {
   
   override lazy val choices = Vector(
     ProtossChoices.pvtOpenersTransitioningFrom2Gate,
     ProtossChoices.pvpOpenersWithTransitions,
     ProtossChoices.pvzOpenersTransitioningFrom2Gate)
   
-  override def ourRaces    : Iterable[Race] = Vector(Race.Protoss)
-  override def enemyRaces  : Iterable[Race] = Vector(Race.Unknown)
+  override def ourRaces   : Iterable[Race]  = Vector(Race.Protoss)
+  override def enemyRaces : Iterable[Race]  = Vector(Race.Unknown)
+  
+  override def prohibitedMaps: Iterable[StarCraftMap] = MapGroups.badForProxying
 }

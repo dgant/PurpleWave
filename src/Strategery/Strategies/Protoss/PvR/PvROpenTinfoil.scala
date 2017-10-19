@@ -4,7 +4,7 @@ import Strategery.Strategies.Protoss.ProtossChoices
 import Strategery.Strategies.Strategy
 import bwapi.Race
 
-object PvRTinfoil extends Strategy {
+object PvROpenTinfoil extends Strategy {
   
   override lazy val choices = Vector(
     ProtossChoices.pvtOpenersTransitioningFrom2Gate,

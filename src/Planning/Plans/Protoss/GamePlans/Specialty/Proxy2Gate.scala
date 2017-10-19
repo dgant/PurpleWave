@@ -13,14 +13,14 @@ import Planning.Plans.Protoss.Situational.PlaceGatewaysProxied
 import Planning.Plans.Scouting.Scout
 import Planning.ProxyPlanner
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvP.PvPProxy2Gate
-import Strategery.Strategies.Protoss.PvR.PvRProxy2Gate
+import Strategery.Strategies.Protoss.PvP.PvPOpenProxy2Gate
+import Strategery.Strategies.Protoss.PvR.PvROpenProxy2Gate
 import Strategery.Strategies.Protoss.PvT.PvTProxy2Gate
 import Strategery.Strategies.Protoss.PvZ.PvZProxy2Gate
 
 class Proxy2Gate extends GameplanModeTemplate {
   
-  override val activationCriteria = new Employing(PvRProxy2Gate, PvTProxy2Gate, PvPProxy2Gate, PvZProxy2Gate)
+  override val activationCriteria = new Employing(PvROpenProxy2Gate, PvTProxy2Gate, PvPOpenProxy2Gate, PvZProxy2Gate)
   override val completionCriteria = new UpgradeComplete(Protoss.DragoonRange)
   override def defaultScoutPlan   = new If(new UnitsAtLeast(2, Protoss.Gateway), new Scout)
   override val aggression         = 1.5

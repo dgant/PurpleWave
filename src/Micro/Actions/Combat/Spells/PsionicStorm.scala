@@ -24,7 +24,7 @@ object PsionicStorm extends TargetedSpell {
     val output = (
       target.subjectiveValue *
       (Math.min(112.0, target.totalHealth) / target.unitClass.maxTotalHealth) *
-      (if (target.moving) 0.8 else 1.0) *
+      (if (target.moving) 0.7 else 1.0) *
       (if (target.isEnemy) 1.0 else -4.0)
     )
     

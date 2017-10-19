@@ -3,7 +3,7 @@ package Strategery.Strategies.Protoss
 import Strategery.Strategies.AllRaces.{WorkerRush2StartLocations, WorkerRush3StartLocations}
 import Strategery.Strategies.Protoss.Other.CarriersFromAnIsland
 import Strategery.Strategies.Protoss.PvE._
-import Strategery.Strategies.Protoss.PvP.{PvP1GateRoboObs, PvP2GateDT, PvP2GateRoboObs, PvPProxy2Gate}
+import Strategery.Strategies.Protoss.PvP.{PvP1GateRoboObs, PvPOpen2GateDTExpand, PvPOpen2GateRobo, PvPOpenProxy2Gate}
 import Strategery.Strategies.Protoss.PvR._
 import Strategery.Strategies.Protoss.PvT._
 import Strategery.Strategies.Protoss.PvZ._
@@ -12,12 +12,12 @@ import Strategery.Strategies._
 object ProtossChoices {
   
   val pvr = Vector(
-    PvREarly2Gate910,
-    PvREarly2Gate1012,
-    PvREarlyZZCore,
-    PvREarlyZCoreZ,
-    PvRProxy2Gate,
-    PvRTinfoil
+    PvROpen2Gate910,
+    PvROpen2Gate1012,
+    PvROpenZZCore,
+    PvROpenZCoreZ,
+    PvROpenProxy2Gate,
+    PvROpenTinfoil
   )
   
   /////////
@@ -51,12 +51,12 @@ object ProtossChoices {
   /////////
   
   val pvpOpenersWithoutTransitions = Vector(
-    PvPProxy2Gate,
-    PvP2GateDT
+    PvPOpenProxy2Gate,
+    PvPOpen2GateDTExpand
   )
   
   val pvpOpenersWithTransitions = Vector(
-    PvP2GateRoboObs,
+    PvPOpen2GateRobo,
     PvP1GateRoboObs
   )
   

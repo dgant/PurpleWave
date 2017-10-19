@@ -9,11 +9,11 @@ import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuousl
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Milestones.UnitsAtLeast
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvR.PvRTinfoil
+import Strategery.Strategies.Protoss.PvR.PvROpenTinfoil
 
 class PvRTinfoil extends GameplanModeTemplateVsRandom {
   
-  override val activationCriteria = new Employing(PvRTinfoil)
+  override val activationCriteria = new Employing(PvROpenTinfoil)
   override val completionCriteria = new UnitsAtLeast(1, Protoss.CyberneticsCore)
   
   override val aggression = 0.7
@@ -27,8 +27,6 @@ class PvRTinfoil extends GameplanModeTemplateVsRandom {
     RequestAtLeast(2, Protoss.PhotonCannon))
   
   override def buildPlans = Vector(
-    new RequireSufficientSupply,
-    new TrainWorkersContinuously,
     new If(
       new And(
         new Check(() => With.self.gas >= 50),

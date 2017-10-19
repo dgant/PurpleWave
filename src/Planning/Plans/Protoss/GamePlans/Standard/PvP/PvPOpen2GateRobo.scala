@@ -4,27 +4,22 @@ import Macro.BuildRequests.{BuildRequest, RequestAtLeast, RequestUpgrade}
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Information.Employing
 import Planning.Plans.Information.Reactive.EnemyBasesAtLeast
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Milestones.{EnemyUnitsAtLeast, UnitsAtLeast}
-import Planning.Plans.Scouting.Scout
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvP.PvP2GateRoboObs
+import Strategery.Strategies.Protoss.PvP.PvPOpen2GateRobo
 
-class PvPOpen2GateRobo extends GameplanModeTemplate {
+class PvPOpen2GateRobo extends GameplanModeTemplatePvP {
   
-  override val activationCriteria : Plan = new Employing(PvP2GateRoboObs)
+  override val activationCriteria : Plan = new Employing(PvPOpen2GateRobo)
   override val completionCriteria : Plan = new Or(
     new EnemyBasesAtLeast(2),
     new UnitsAtLeast(2, Protoss.Nexus),
     new UnitsAtLeast(40, UnitMatchWarriors))
-  
-  override val defaultScoutPlan   : Plan = new If(new UnitsAtLeast(1, Protoss.CyberneticsCore), new Scout)
-  override def defaultAttackPlan  : Plan = new PvPIdeas.AttackSafely
   
   override val buildOrder: Seq[BuildRequest] = Vector(
     // http://wiki.teamliquid.net/starcraft/2_Gate_Reaver_(vs._Protoss)

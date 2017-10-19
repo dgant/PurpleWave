@@ -4,12 +4,12 @@ import Strategery.Strategies.Protoss.ProtossChoices
 import Strategery.Strategies.Strategy
 import bwapi.Race
 
-object PvREarly2Gate910 extends Strategy {
+object PvROpenZCoreZ extends Strategy {
   
   override lazy val choices = Vector(
-    ProtossChoices.pvtOpenersTransitioningFrom2Gate,
+    ProtossChoices.pvtOpenersTransitioningFrom1Gate,
     ProtossChoices.pvpOpenersWithTransitions,
-    ProtossChoices.pvzOpenersTransitioningFrom2Gate)
+    ProtossChoices.pvzOpenersTransitioningFrom1Gate)
   
   override def ourRaces    : Iterable[Race] = Vector(Race.Protoss)
   override def enemyRaces  : Iterable[Race] = Vector(Race.Unknown)

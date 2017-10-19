@@ -20,6 +20,8 @@ object PvPIdeas {
     new Attack,
     new ConsiderAttacking)
   
+  class ReactToDarkTemplarEmergencies extends Parallel(new ReactToDarkTemplarExisting, new ReactToDarkTemplarPossible)
+  
   class ReactToDarkTemplarPossible extends If(
     new EnemyDarkTemplarPossible,
     new Parallel(

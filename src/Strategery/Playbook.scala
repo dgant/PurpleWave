@@ -27,7 +27,7 @@ object StrategyGroups {
     TvEProxy5RaxAllIn,
     TvEMassMarineAllIn,
     PvTProxy2Gate,
-    PvPProxy2Gate,
+    PvPOpenProxy2Gate,
     PvZProxy2Gate,
     PvTEarly1GateProxy,
     ProxyDarkTemplar,

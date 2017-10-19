@@ -4,6 +4,7 @@ import Lifecycle.With
 import Performance.Cache
 import Planning.Plan
 import Planning.Plans.WinTheGame
+import ProxyBwapi.Players.Players
 import Strategery.History.HistoricalGame
 import Strategery.Strategies.Protoss.ProtossChoices
 import Strategery.Strategies.Strategy
@@ -64,7 +65,7 @@ class Strategist {
     lazy val isIsland                 = isIslandMap
     lazy val isGround                 = ! isIsland
     lazy val startLocations           = With.geography.startLocations.size
-    lazy val thisGameIsFFA            = With.enemies.size > 1
+    lazy val thisGameIsFFA            = With.enemies.size > 1 && ! Players.all.exists(p => p.isAlly)
     lazy val disabledInPlaybook       = Playbook.disabled.contains(strategy)
     lazy val disabledOnMap            = strategy.prohibitedMaps.exists(_.matches)
     lazy val appropriateForOurRace    = strategy.ourRaces.exists(_ == ourRace)
@@ -74,16 +75,19 @@ class Strategist {
         .map(_.toLowerCase)
         .exists(key => With.enemies.map(_.name.toLowerCase).exists(_.contains(key)))
     
-    ! disabledOnMap                                   &&
-    ! disabledInPlaybook                              &&
-    (strategy.ffa == thisGameIsFFA)                   &&
-    (strategy.islandMaps  || ! isIsland)              &&
-    (strategy.groundMaps  || ! isGround)              &&
-    strategy.startLocationsMin <= startLocations      &&
-    strategy.startLocationsMax >= startLocations      &&
-    appropriateForOurRace                             &&
-    appropriateForEnemyRace                           &&
-    appropriateForOpponent
+    val output =
+      ! disabledOnMap                                   &&
+      ! disabledInPlaybook                              &&
+      (strategy.ffa == thisGameIsFFA)                   &&
+      (strategy.islandMaps  || ! isIsland)              &&
+      (strategy.groundMaps  || ! isGround)              &&
+      strategy.startLocationsMin <= startLocations      &&
+      strategy.startLocationsMax >= startLocations      &&
+      appropriateForOurRace                             &&
+      appropriateForEnemyRace                           &&
+      appropriateForOpponent
+    
+    output
   }
   
   private def heyIsThisAnIslandMap = {

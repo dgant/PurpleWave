@@ -14,21 +14,23 @@ object FightOrFlight extends Action {
   override def perform(unit: FriendlyUnitInfo) {
 
     var decision: Option[Boolean] = None
-    def decide(condition: () => Boolean, shouldEngage: Boolean) {
+    def decide(shouldEngage: Boolean, condition: () => Boolean) {
       if (decision.isEmpty && condition()) {
         decision = Some(shouldEngage)
       }
     }
   
-    decide(() => unit.agent.canBerzerk,     true)
-    decide(() => unit.effectivelyCloaked,   true)
-    decide(() => Yolo.active,               true)
-    decide(() =>  ! unit.agent.canFight,    false)
-    decide(() => unit.underStorm,           false)
-    decide(() => unit.underDisruptionWeb,   false)
-    decide(() => unit.underDarkSwarm,       unit.unitClass.unaffectedByDarkSwarm)
-    decide(() => unit.base.exists(_.owner.isUs) && unit.matchups.targets.exists(target => target.matchups.targetsInRange.exists(_.unitClass.isWorker)), true)
-    decide(() => unit.flying && unit.matchups.threats.forall(_.topSpeed < unit.topSpeed) && unit.matchups.framesOfSafetyDiffused > 24, true)
+    lazy val ignoreWeb    = unit.flying
+    lazy val ignoreSwarm  = unit.unitClass.unaffectedByDarkSwarm
+    decide(true,        () => unit.agent.canBerzerk)
+    decide(true,        () => unit.effectivelyCloaked)
+    decide(true,        () => Yolo.active)
+    decide(false,       () => ! unit.agent.canFight)
+    decide(ignoreWeb,   () => unit.underDisruptionWeb)
+    decide(ignoreSwarm, () => unit.underDarkSwarm)
+    decide(true,        () => unit.matchups.allies.exists(ally => ally.unitClass.isStaticDefense && ally.matchups.targetsInRange.nonEmpty))
+    decide(true,        () => unit.base.exists(_.owner.isUs) && unit.matchups.targets.exists(target => target.matchups.targetsInRange.exists(_.unitClass.isWorker)))
+    decide(true,        () => unit.flying && unit.matchups.threats.forall(_.topSpeed < unit.topSpeed) && unit.matchups.framesOfSafetyDiffused > With.reaction.agencyAverage * 4)
     if (decision.isDefined) {
       unit.agent.shouldEngage = decision.get
       return

@@ -12,7 +12,7 @@ import Planning.Plans.Information.Employing
 import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Macro.Expanding.{BuildCannonsAtNatural, BuildGasPumps, RequireMiningBases}
+import Planning.Plans.Macro.Expanding.{BuildCannonsAtNatural, BuildGasPumps}
 import Planning.Plans.Macro.Milestones.UnitsAtLeast
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP.PvPOpen12Nexus5Zealot
@@ -23,7 +23,7 @@ class PvPOpen12Nexus5Zealot extends GameplanModeTemplate {
     override lazy val blueprints: Seq[Blueprint] = {
       val output = Vector(
         new Blueprint(this, building = Some(Protoss.Pylon)),
-        new Blueprint(this, building = Some(Protoss.Pylon), requireZone = Some(With.geography.ourNatural.zone), placement = Some(PlacementProfiles.wallPylon), marginPixels = Some(marginPixels - 96.0)))
+        new Blueprint(this, building = Some(Protoss.Pylon), requireZone = Some(With.geography.ourNatural.zone), placement = Some(PlacementProfiles.wallPylon)))
       output
     }
   }

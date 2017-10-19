@@ -1,9 +1,9 @@
 package Strategery.Strategies.Protoss
 
 import Strategery.Strategies.AllRaces.{WorkerRush2StartLocations, WorkerRush3StartLocations}
-import Strategery.Strategies.Protoss.Other.CarriersFromAnIsland
+import Strategery.Strategies.Protoss.Other.{CarriersFromAnIsland, ProtossFFACarriers}
 import Strategery.Strategies.Protoss.PvE._
-import Strategery.Strategies.Protoss.PvP.{PvP1GateRoboObs, PvPOpen2GateDTExpand, PvPOpen2GateRobo, PvPOpenProxy2Gate}
+import Strategery.Strategies.Protoss.PvP._
 import Strategery.Strategies.Protoss.PvR._
 import Strategery.Strategies.Protoss.PvT._
 import Strategery.Strategies.Protoss.PvZ._
@@ -17,7 +17,9 @@ object ProtossChoices {
     PvROpenZZCore,
     PvROpenZCoreZ,
     PvROpenProxy2Gate,
-    PvROpenTinfoil
+    PvROpenTinfoil,
+    ProtossFFACarriers,
+    CarriersFromAnIsland
   )
   
   /////////
@@ -57,7 +59,8 @@ object ProtossChoices {
   
   val pvpOpenersWithTransitions = Vector(
     PvPOpen2GateRobo,
-    PvP1GateRoboObs
+    PvPOpen3GateSpeedlots,
+    PvPOpen4GateGoon
   )
   
   val pvpOpenersAll: Vector[Strategy] = (pvpOpenersWithoutTransitions ++ pvpOpenersWithTransitions).distinct
@@ -107,7 +110,8 @@ object ProtossChoices {
     ProxyDarkTemplar,
     CarriersFromAnIsland,
     CarriersWithNoDefense,
-    DarkArchonsWithNoDefense)
+    DarkArchonsWithNoDefense,
+    ProtossFFACarriers)
   
   val standardOpeners: Vector[Strategy] = (pvr ++ pvtOpenersAll ++ pvpOpenersAll ++ pvzOpenersAll).distinct
   

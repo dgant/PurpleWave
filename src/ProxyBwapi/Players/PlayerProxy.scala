@@ -18,7 +18,7 @@ abstract class PlayerProxy(base:Player) {
   lazy val raceInitial    : Race      = base.getRace
   lazy val isUs           : Boolean   = this == With.self
   lazy val isNeutral      : Boolean   = base.isNeutral
-  lazy val isAlly         : Boolean   = base.isAlly(With.game.self)
+  lazy val isAlly         : Boolean   = base.isAlly(With.game.self) && ! isUs
   lazy val isEnemy        : Boolean   = base.isEnemy(With.game.self)
   lazy val startTile      : Tile      = new Tile(base.getStartLocation)
   lazy val townHallClass  : UnitClass = UnitClasses.get(raceInitial.getCenter)

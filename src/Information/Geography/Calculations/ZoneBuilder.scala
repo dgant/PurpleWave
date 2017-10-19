@@ -14,17 +14,33 @@ object ZoneBuilder {
   
   def zones: Iterable[Zone] = {
     With.grids.walkableTerrain.initialize()
-    val names = new mutable.Queue[String] ++ Random.shuffle(PlaceNames.countries)
-    val zones = BWTA.getRegions.asScala.map(buildZone(_, names.dequeue))
+    val names   = Random.shuffle(PlaceNames.countries)
+    val nameQ   = new mutable.Queue[String] ++ names
+    var repeats = 1
+    val zones = BWTA.getRegions.asScala.map(region => {
+      if (nameQ.isEmpty) {
+        repeats += 1
+        names.map(name => name + " " + repeats).foreach(name => nameQ.enqueue(name))
+      }
+      buildZone(region, nameQ.dequeue)
+    })
     mapObviousTilesToZones(zones)
     zones
   }
   
   def edges: Iterable[Edge] = BWTA.getChokepoints.asScala.map(new Edge(_))
   def bases: Iterable[Base] = {
-    val bases = BaseFinder.calculate.map(new Base(_))
-    val names = new mutable.Queue[String] ++ Random.shuffle(PlaceNames.cities)
-    bases.foreach(_.name = names.dequeue)
+    val bases   = BaseFinder.calculate.map(new Base(_))
+    val names   = Random.shuffle(PlaceNames.cities)
+    val nameQ   = new mutable.Queue[String] ++ names
+    var repeats = 1
+    bases.foreach(base => {
+      if (nameQ.isEmpty) {
+        repeats += 1
+        names.map(name => name + " " + repeats).foreach(name => nameQ.enqueue(name))
+      }
+      base.name = nameQ.dequeue
+    })
     bases
   }
   

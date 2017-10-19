@@ -51,11 +51,10 @@ class PvPOpen3GateSpeedlots extends GameplanModeTemplatePvP {
       new TrainContinuously(Protoss.Zealot),
       new Parallel(
         new Build(
-          RequestAtLeast(1, Protoss.Assimilator),
           RequestAtLeast(1, Protoss.CyberneticsCore),
           RequestAtLeast(1, Protoss.CitadelOfAdun),
-          RequestAtLeast(3, Protoss.Gateway),
-          RequestUpgrade(Protoss.ZealotSpeed)),
+          RequestUpgrade(Protoss.ZealotSpeed),
+          RequestAtLeast(3, Protoss.Gateway)),
         new TrainWorkersContinuously,
         new RequireMiningBases(2))))
 }

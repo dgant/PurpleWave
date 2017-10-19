@@ -20,10 +20,10 @@ class ForgeFastExpand extends ProposePlacement {
       new Blueprint(this, building = Some(Protoss.Gateway),                                           placement = Some(PlacementProfiles.hugTownHall),  marginPixels = Some(marginPixels - 64.0)),
       new Blueprint(this, building = Some(Protoss.PhotonCannon),    requireZone = Some(naturalZone),  placement = Some(PlacementProfiles.wallCannon),   marginPixels = Some(marginPixels)),
       new Blueprint(this, building = Some(Protoss.PhotonCannon),    requireZone = Some(naturalZone),  placement = Some(PlacementProfiles.wallCannon),   marginPixels = Some(marginPixels)),
-      new Blueprint(this, building = Some(Protoss.PhotonCannon),    requireZone = Some(naturalZone),  placement = Some(PlacementProfiles.wallCannon),   marginPixels = Some(marginPixels)),
-      new Blueprint(this, building = Some(Protoss.PhotonCannon),    requireZone = Some(naturalZone),  placement = Some(PlacementProfiles.wallCannon),   marginPixels = Some(marginPixels)),
       new Blueprint(this, building = Some(Protoss.Pylon),           requireZone = Some(mainZone)),
-      new Blueprint(this, building = Some(Protoss.Pylon),           preferZone  = Some(mainZone)),
+      new Blueprint(this, building = Some(Protoss.Pylon),           preferZone  = Some(naturalZone),  placement = Some(PlacementProfiles.wallCannon),   marginPixels = Some(marginPixels - 96.0)),
+      new Blueprint(this, building = Some(Protoss.PhotonCannon),    requireZone = Some(naturalZone),  placement = Some(PlacementProfiles.wallCannon),   marginPixels = Some(marginPixels)),
+      new Blueprint(this, building = Some(Protoss.PhotonCannon),    requireZone = Some(naturalZone),  placement = Some(PlacementProfiles.wallCannon),   marginPixels = Some(marginPixels)),
       new Blueprint(this, building = Some(Protoss.CyberneticsCore), preferZone  = Some(mainZone))
     )
     output

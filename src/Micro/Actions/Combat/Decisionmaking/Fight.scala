@@ -3,7 +3,7 @@ package Micro.Actions.Combat.Decisionmaking
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.{Cower, Sneak}
 import Micro.Actions.Combat.Spells.{SpiderMine, Stim}
-import Micro.Actions.Combat.Tactics.{Bunk, BustBunker, Sally, Spot}
+import Micro.Actions.Combat.Tactics.{Bunk, BustBunker, Spot}
 import Micro.Actions.Protoss.{BeACarrier, BeACorsair, BeAnArbiter}
 import Micro.Actions.Terran.{Siege, Unsiege}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -27,7 +27,6 @@ object Fight extends Action {
     Recover.consider(unit)
     SpiderMine.consider(unit)
     BustBunker.consider(unit)
-    Sally.consider(unit)
     Spot.consider(unit)
     Sneak.consider(unit)
     if (unit.agent.shouldEngage) {

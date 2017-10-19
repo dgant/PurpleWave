@@ -29,21 +29,28 @@ object Concave {
     
     val arcPlacement = new ArcPlacementState(arc, targetStart.pixelDistanceFast(targetEnd))
     
-    val ranks = units
+    val walkers = units.filterNot(_.flying)
+    val flyers  = units.filter(_.flying)
+    val ranks   = walkers
       .map(new FormationSlot(_))
-      .groupBy(_.idealDistance)
+      .groupBy(_.idealDistancePixels)
       .values
       .toList
-      .sortBy(_.head.idealDistance)
+      .sortBy(_.head.idealDistancePixels)
     
     ranks.foreach(rank => {
-      arcPlacement.startRank(rank.head.idealDistance)
+      arcPlacement.startRank(rank.head.idealDistancePixels)
       rank.foreach(participant => {
         participant.pixelAfter = arcPlacement.reserveSpace(16.0 + 2.0 * participant.unitClass.radialHypotenuse)
       })
     })
   
-    ranks.flatten
+    val walkerSlots = ranks.flatten
+    val flyerSlots  = flyers.map(flyer => new FormationSlot(flyer))
+    flyerSlots.foreach(slot => slot.pixelAfter = targetCenter.radiateRadians(centerToArcRadians, slot.idealDistancePixels))
+    
+    val output = walkerSlots ++ flyerSlots
+    output
   }
 }
 

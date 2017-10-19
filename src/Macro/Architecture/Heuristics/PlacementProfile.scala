@@ -14,6 +14,7 @@ class PlacementProfile(
   var preferCoveringWorkers       : Double = 0.0,
   var preferSurfaceArea           : Double = 0.0,
   var avoidDistanceFromBase       : Double = 0.0,
+  var avoidDistanceFromEntrance   : Double = 0.0,
   var avoidDistanceFromEnemy      : Double = 0.0,
   var avoidDistanceFromIdealRange : Double = 0.0,
   var avoidSurfaceArea            : Double = 0.0) {
@@ -30,6 +31,7 @@ class PlacementProfile(
       preferCoveringWorkers       = other.preferCoveringWorkers,
       preferSurfaceArea           = other.preferSurfaceArea,
       avoidDistanceFromBase       = other.avoidDistanceFromBase,
+      avoidDistanceFromEntrance   = other.avoidDistanceFromEntrance,
       avoidDistanceFromEnemy      = other.avoidDistanceFromEnemy,
       avoidDistanceFromIdealRange = other.avoidDistanceFromIdealRange,
       avoidSurfaceArea            = other.avoidSurfaceArea
@@ -39,13 +41,14 @@ class PlacementProfile(
   def weightedHeuristics: Iterable[PlacementHeuristicWeight] = {
     Vector(
       new PlacementHeuristicWeight(PlacementHeuristicZone,                    preferZone,                   Colors.MediumRed),
-      new PlacementHeuristicWeight(PlacementHeuristicNatural,                 preferNatural,                Colors.NeonRed),
+      new PlacementHeuristicWeight(PlacementHeuristicNatural,                 preferNatural,                Colors.DarkTeal),
       new PlacementHeuristicWeight(PlacementHeuristicResources,               preferResources,              Colors.NeonOrange),
       new PlacementHeuristicWeight(PlacementHeuristicSpace,                   preferSpace,                  Colors.NeonYellow),
       new PlacementHeuristicWeight(PlacementHeuristicPowering,                preferPowering,               Colors.NeonGreen),
       new PlacementHeuristicWeight(PlacementHeuristicDistanceFromEnemy,       preferDistanceFromEnemy,      Colors.NeonTeal),
       new PlacementHeuristicWeight(PlacementHeuristicSurfaceArea,             preferSurfaceArea,            Colors.NeonViolet),
-      new PlacementHeuristicWeight(PlacementHeuristicDistanceFromBase,        -avoidDistanceFromBase,       Colors.NeonBlue),
+      new PlacementHeuristicWeight(PlacementHeuristicDistanceFromBase,        -avoidDistanceFromBase,       Colors.DarkViolet),
+      new PlacementHeuristicWeight(PlacementHeuristicDistanceFromEntrance,    -avoidDistanceFromEntrance,   Colors.NeonViolet),
       new PlacementHeuristicWeight(PlacementHeuristicDistanceFromEnemy,       -avoidDistanceFromEnemy,      Colors.NeonBlue),
       new PlacementHeuristicWeight(PlacementHeuristicDistanceFromIdealRange,  -avoidDistanceFromIdealRange, Colors.NeonIndigo),
       new PlacementHeuristicWeight(PlacementHeuristicSurfaceArea,             -avoidSurfaceArea,            Colors.NeonViolet)

@@ -302,10 +302,11 @@ object ProtossBuilds {
   
   val FFE_Vs4Pool = Vector[BuildRequest] (
     RequestAtLeast(1,   Protoss.Nexus),
-    RequestAtLeast(8,   Protoss.Probe),
+    RequestAtLeast(7,   Protoss.Probe),
     RequestAtLeast(1,   Protoss.Pylon),
-    RequestAtLeast(9,   Protoss.Probe),
+    RequestAtLeast(8,   Protoss.Probe),
     RequestAtLeast(1,   Protoss.Forge),
+    RequestAtLeast(9,   Protoss.Probe),
     RequestAtLeast(2,   Protoss.PhotonCannon),
     RequestAtLeast(12,  Protoss.Probe),
     RequestAtLeast(3,   Protoss.PhotonCannon),

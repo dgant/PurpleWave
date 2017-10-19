@@ -126,7 +126,7 @@ object Potential {
   ////////////////
   
   def collisionRepulsion(unit: FriendlyUnitInfo): Force = {
-    if (unit.flying) return new Force
+    if (unit.flying && ! unit.matchups.threats.exists(_.unitClass.dealsRadialSplashDamage)) return new Force
     
     val blockers        = unit.matchups.allies.filterNot(_.flying)
     val nearestBlocker  = ByOption.minBy(blockers)(_.pixelsFromEdgeFast(unit))

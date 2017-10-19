@@ -18,8 +18,8 @@ object MindControl extends TargetedSpell {
     if (target.isFriendly)            return 0.0
     if (target.stasised)              return 0.0
     
-    if (target.isTransport && ! target.is(Zerg.Overlord)) return Protoss.Reaver.subjectiveValue / 2.0 + target.subjectiveValue
+    if (target.isTransport && ! target.is(Zerg.Overlord)) return Protoss.Reaver.subjectiveValue + target.subjectiveValue
     
-    1.2 * target.subjectiveValue * target.totalHealth / target.unitClass.maxTotalHealth
+    1.1 * target.subjectiveValue
   }
 }

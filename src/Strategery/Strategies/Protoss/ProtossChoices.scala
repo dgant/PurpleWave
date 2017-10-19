@@ -87,7 +87,7 @@ object ProtossChoices {
     PvZMidgame5GateDragoons
   )
   
-  val pvzMidgameTransitioningFromFFE = Vector(
+  val pvzMidgameTransitioningFromTwoBases = Vector(
     PvZMidgame2Stargate,
     PvZMidgame5GateDragoons,
     PvZMidgameCorsairDarkTemplar,

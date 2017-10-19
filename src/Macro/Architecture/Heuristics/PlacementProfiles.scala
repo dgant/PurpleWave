@@ -72,7 +72,7 @@ object PlacementProfiles {
     preferNatural               = 10.0,
     preferPowering              = 1.0,
     preferCoveringWorkers       = 0.5,
-    avoidDistanceFromBase       = 0.5,
+    avoidDistanceFromEntrance   = 0.5,
     avoidSurfaceArea            = 0.05,
     avoidDistanceFromIdealRange = 0.5)
   
@@ -80,8 +80,8 @@ object PlacementProfiles {
     "Cannons for a wall",
     preferZone                  = 1000.0,
     preferNatural               = 10.0,
-    preferCoveringWorkers       = 0.5,
-    avoidDistanceFromBase       = 1.0,
+    preferCoveringWorkers       = 0.25,
+    avoidDistanceFromEntrance   = 0.5,
     avoidSurfaceArea            = 0.1,
     avoidDistanceFromEnemy      = 0.5,
     avoidDistanceFromIdealRange = 3.0)

@@ -7,7 +7,7 @@ import bwapi.Race
 object PvZEarlyFFEGatewayFirst extends Strategy {
   
   override def choices: Iterable[Iterable[Strategy]] = Vector(
-    ProtossChoices.pvzMidgameTransitioningFromFFE
+    ProtossChoices.pvzMidgameTransitioningFromTwoBases
   )
   
   override def ourRaces    : Iterable[Race] = Vector(Race.Protoss)

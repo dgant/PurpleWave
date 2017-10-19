@@ -67,7 +67,7 @@ object PvTIdeas {
         new Employing(PvTEarly1GateStargate),
         new Employing(PvTEarly1GateStargateTemplar),
         new OnMiningBases(3),
-        new Not(new EnemyHasShown(Terran.SpiderMine)),
+        new Not(new EnemyHasShown(Terran.Vulture)),
         new UnitsAtLeast(1, UnitMatchCustom((unit) => unit.is(Protoss.Observer) && With.framesSince(unit.frameDiscovered) > 24 * 10), complete = true))),
     new Attack)
   

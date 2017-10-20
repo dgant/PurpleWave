@@ -6,10 +6,8 @@ class Blackboard {
   
   var maxFramesToSendAdvanceBuilder: Int = With.configuration.maxFramesToSendAdvanceBuilder
   
-  var gasBankSoftLimit = 450
-  var gasBankHardLimit = Int.MaxValue
-  var allIn: Boolean = false
-  var aggressionRatio: Double = 1.0
-  
-  var zergWasTryingToExpand = false
+  var aggressionRatio   : Double  = 1.0
+  var gasBankSoftLimit  : Int     = 450
+  var gasBankHardLimit  : Int     = Int.MaxValue
+  var allIn             : Boolean = false
 }

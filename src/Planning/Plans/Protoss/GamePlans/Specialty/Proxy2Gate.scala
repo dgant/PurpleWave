@@ -23,7 +23,7 @@ class Proxy2Gate extends GameplanModeTemplate {
   override val activationCriteria = new Employing(PvROpenProxy2Gate, PvTProxy2Gate, PvPOpenProxy2Gate, PvZProxy2Gate)
   override val completionCriteria = new UpgradeComplete(Protoss.DragoonRange)
   override def defaultScoutPlan   = new If(new UnitsAtLeast(2, Protoss.Gateway), new Scout)
-  override val aggression         = 1.5
+  override val aggression         = 1.2
   
   private class BeforeProxy extends Parallel(
     new PlaceGatewaysProxied(2, () => ProxyPlanner.proxyAutomaticSneaky),

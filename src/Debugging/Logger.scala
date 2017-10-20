@@ -10,8 +10,11 @@ import scala.collection.mutable.ListBuffer
 class Logger {
   
   private val logMessages = new ListBuffer[String]
+  private var errorOcurred = false
   
   def flush() {
+    if ( ! errorOcurred) return false;
+    
     val opponents = With.enemies
       .map(_.name)
       .mkString("-")
@@ -25,6 +28,7 @@ class Logger {
   }
   
   def onException(exception: Exception) {
+    errorOcurred = true
     log("An exception was thrown on frame " + With.frame)
     logMessages.append(formatException(exception))
     debug(formatException(exception))
@@ -35,31 +39,30 @@ class Logger {
   }
   
   def warn(message: String) {
+    errorOcurred = true
     log(message)
   }
   
   def error(message: String) {
+    errorOcurred = true
     log(message)
   }
   
   private def log(message: String) {
-    
     logMessages.append(message)
-  
     Manners.chat(message)
-    
     if (With.configuration.enableStdOut) {
       System.out.println(message)
     }
   }
   
   private def formatException(exception: Exception): String = {
-      exception.getClass.getSimpleName + "\n" +
-      exception.getMessage + "\n" +
-      exception.getStackTrace.map(stackElement => {
-        stackElement.getClassName + "." +
-        stackElement.getMethodName + "(): " +
-        stackElement.getLineNumber
+    exception.getClass.getSimpleName + "\n" +
+    exception.getMessage + "\n" +
+    exception.getStackTrace.map(stackElement => {
+      stackElement.getClassName + "." +
+      stackElement.getMethodName + "(): " +
+      stackElement.getLineNumber
     }).mkString("\n")
   }
 }

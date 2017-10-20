@@ -65,13 +65,14 @@ class Intelligence {
     }
   }
   
+  var zergWasTryingToExpand = false
   private def updateZergExpansionAttempt() {
     enemyHasShownUnit ++= With.units.enemy.map(_.unitClass)
     if (With.units.enemy.exists(unit =>
       unit.is(Zerg.Drone) &&
       unit.command.exists(_.getUnitCommandType == UnitCommandType.Build) &&
       unit.targetPixel.exists(_.zone.bases.exists(_.owner.isNeutral)))) {
-      With.blackboard.zergWasTryingToExpand = true
+      zergWasTryingToExpand = true
     }
   }
 }

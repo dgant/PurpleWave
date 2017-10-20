@@ -24,6 +24,7 @@ class Configuration {
   // Micro //
   ///////////
   
+  var concaveMarginPixels             = 4.0
   var retreatCaution                  = 1.4
   var assumedBuilderTravelSpeed       = 0.65
   var attackableRangeBufferPixels     = 4

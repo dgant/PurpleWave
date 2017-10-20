@@ -1,5 +1,6 @@
 package Mathematics.Formations
 
+import Lifecycle.With
 import Mathematics.Points.{Pixel, SpecificPoints}
 import ProxyBwapi.UnitInfo.UnitInfo
 
@@ -41,7 +42,7 @@ object Concave {
     ranks.foreach(rank => {
       arcPlacement.startRank(rank.head.idealDistancePixels)
       rank.foreach(participant => {
-        participant.pixelAfter = arcPlacement.reserveSpace(16.0 + 2.0 * participant.unitClass.radialHypotenuse)
+        participant.pixelAfter = arcPlacement.reserveSpace(With.configuration.concaveMarginPixels + 2.0 * participant.unitClass.radialHypotenuse)
       })
     })
   

@@ -4,7 +4,6 @@ import Planning.Plans.GamePlans.ModalGameplan
 import Planning.Plans.Protoss.GamePlans.Standard.PvP._
 
 class ProtossVsProtoss extends ModalGameplan(
-  /*
   new PvPOpen910Gates,
   new PvPOpen1012Gates,
   new PvPOpen1015Gates,
@@ -15,7 +14,7 @@ class ProtossVsProtoss extends ModalGameplan(
   
   new PvPOneBaseDragoonExpand,
   new PvPOneBaseReaverExpand,
-  */
+  
   new PvPOpen12Nexus5Zealot,
   new PvPOpen2GateRobo,
   new PvPOpen2GateDarkTemplar,

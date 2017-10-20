@@ -13,7 +13,7 @@ class Logger {
   private var errorOcurred = false
   
   def flush() {
-    if ( ! errorOcurred) return false;
+    if ( ! errorOcurred) { return }
     
     val opponents = With.enemies
       .map(_.name)

@@ -8,8 +8,9 @@ case class Force(x: Double, y: Double) {
   def this(point: AbstractPoint) = this(point.x, point.y)
   
   def unary_- = Force(-x, -y)
-  def +(other: Force): Force = Force(x + other.x, y + other.y)
-  def -(other: Force): Force = Force(x - other.x, y - other.y)
+  def +(other: Force)   : Force = Force(x + other.x, y + other.y)
+  def -(other: Force)   : Force = Force(x - other.x, y - other.y)
+  def *(value: Double)  : Force = Force(value * x, value * y)
   
   def lengthSquared: Double = x * x + y * y
   def lengthSlow: Double  = Math.sqrt(lengthSquared)

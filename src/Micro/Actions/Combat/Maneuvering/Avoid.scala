@@ -21,11 +21,11 @@ object Avoid extends Action {
     val mobilityBonus   = 1.0 / Math.max(1.0, unit.mobility)
     val regroupingBonus = 12.0 / Math.max(24.0, unit.matchups.framesOfEntanglementCurrently)
     
-    val forceThreat     = Potential.threatsRepulsion(unit).normalize(threatBonus)
-    val forceExiting    = Potential.exitAttraction(unit).normalize(exitBonus)
-    val forceMobility   = Potential.mobilityAttraction(unit).normalize(mobilityBonus)
-    val forceSpreading  = Potential.collisionRepulsion(unit)
-    val forceRegrouping = Potential.teamAttraction(unit).normalize(regroupingBonus)
+    val forceThreat     = Potential.threatsRepulsion(unit)    * threatBonus
+    val forceExiting    = Potential.exitAttraction(unit)      * exitBonus
+    val forceMobility   = Potential.mobilityAttraction(unit)  * mobilityBonus
+    val forceSpreading  = Potential.collisionRepulsion(unit)  * 0.5
+    val forceRegrouping = Potential.teamAttraction(unit)      * regroupingBonus
     
     unit.agent.forces.put(ForceColors.threat,     forceThreat)
     unit.agent.forces.put(ForceColors.mobility,   forceMobility)

@@ -1,6 +1,6 @@
 package Planning.Plans.Protoss.GamePlans.Standard
 
-import Information.StrategyDetection.ZergStrategies._
+import Information.Intelligence.Fingerprinting.ZergStrategies._
 import Lifecycle.With
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{RequestAnother, RequestAtLeast, RequestTech, RequestUpgrade}

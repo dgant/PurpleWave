@@ -38,7 +38,7 @@ class Analysis(battle: Battle) {
   val retreatLosses         = battle.estimationSimulationRetreat.costToUs
   val desireTotal           = attackGains + retreatLosses / With.configuration.retreatCaution - retreatGains - attackLosses / desireMultiplier
   
-  def getLonelyCannons(nearestBaseOurs: Pixel): Seq[UnitInfo] = {
+  def getLonelyCannons(nearestBaseOurs: Pixel): Set[UnitInfo] = {
     val candidates = nearestBaseOurs.zone.units ++ battle.us.units
     candidates
       .filter(unit =>

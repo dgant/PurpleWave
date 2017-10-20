@@ -1,6 +1,6 @@
-package Information.StrategyDetection.ZergStrategies
+package Information.Intelligence.Fingerprinting.ZergStrategies
 
-import Information.StrategyDetection.Generic.{FingerprintAnd, FingerprintCompleteBy, GameTime}
+import Information.Intelligence.Fingerprinting.Generic.{FingerprintAnd, FingerprintCompleteBy, GameTime}
 import ProxyBwapi.Races.Zerg
 
 class Fingerprint10Hatch9Pool extends FingerprintAnd(

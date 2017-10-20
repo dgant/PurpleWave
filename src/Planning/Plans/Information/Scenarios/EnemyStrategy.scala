@@ -1,6 +1,6 @@
 package Planning.Plans.Information.Scenarios
 
-import Information.StrategyDetection.Fingerprint
+import Information.Intelligence.Fingerprinting.Fingerprint
 import Planning.Plan
 
 class EnemyStrategy(fingerprint: Fingerprint) extends Plan {

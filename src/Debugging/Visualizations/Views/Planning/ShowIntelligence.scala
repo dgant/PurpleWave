@@ -1,18 +1,17 @@
 package Debugging.Visualizations.Views.Planning
 
 import Debugging.Visualizations.Views.View
-import Information.StrategyDetection.ZergStrategies._
 import Lifecycle.With
 
 object ShowIntelligence extends View {
   
-  val fingerprints = Vector(
-    new Fingerprint4Pool,
-    new Fingerprint9Pool,
-    new FingerprintOverpool,
-    new Fingerprint10Hatch9Pool,
-    new Fingerprint12Hatch,
-    new Fingerprint12Pool
+  def fingerprints = Vector(
+    With.intelligence.fingerprints.fingerprint4Pool,
+    With.intelligence.fingerprints.fingerprint9Pool,
+    With.intelligence.fingerprints.fingerprintOverpool,
+    With.intelligence.fingerprints.fingerprint10Hatch9Pool,
+    With.intelligence.fingerprints.fingerprint12Pool,
+    With.intelligence.fingerprints.fingerprint12Hatch
   )
   
   override def renderScreen() {

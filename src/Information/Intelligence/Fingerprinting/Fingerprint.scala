@@ -1,4 +1,4 @@
-package Information.StrategyDetection
+package Information.Intelligence.Fingerprinting
 
 abstract class Fingerprint {
   

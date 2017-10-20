@@ -1,19 +1,24 @@
 package Information
 
 import Information.Geography.Types.Base
+import Information.Intelligence.Fingerprinting.Fingerprints
+import Information.Intelligence.UnitsShown
 import Lifecycle.With
 import Mathematics.Points.Tile
 import Performance.Cache
-import ProxyBwapi.Races.Zerg
-import ProxyBwapi.UnitClass.UnitClass
 import Utilities.ByOption
-import bwapi.UnitCommandType
-
-import scala.collection.mutable
 
 class Intelligence {
   
+  val unitsShown    : UnitsShown    = new UnitsShown
+  val fingerprints  : Fingerprints  = new Fingerprints
+  
+  var firstEnemyMain: Option[Base] = None
+  
+  def leastScoutedBases: Iterable[Base] = leastScoutedBasesCache()
   def mostBaselikeEnemyTile: Tile = mostBaselikeEnemyTileCache()
+  
+  
   private val mostBaselikeEnemyTileCache = new Cache(() =>
     With.units.enemy
       .toVector
@@ -23,7 +28,6 @@ class Intelligence {
       .headOption
       .getOrElse(leastScoutedBases.head.townHallArea.midpoint))
   
-  def leastScoutedBases: Iterable[Base] = leastScoutedBasesCache()
   private val leastScoutedBasesCache = new Cache(() => {
     lazy val enemyBaseHearts = With.geography.enemyBases.map(_.heart)
     lazy val weHaveFliers = With.units.ours.exists(_.flying)
@@ -35,11 +39,6 @@ class Intelligence {
       .sortBy(base => ByOption.min(enemyBaseHearts.map(_.tileDistanceFast(base.heart))).getOrElse(1.0) / (1.0 + With.framesSince(base.lastScoutedFrame)))
   })
   
-  def enemyHasShown(unitClass: UnitClass): Boolean = enemyHasShownUnit(unitClass)
-  private val enemyHasShownUnit = new mutable.HashSet[UnitClass]
-  
-  var firstEnemyMain: Option[Base] = None
-  
   def enemyMain: Option[Base] = {
     firstEnemyMain.filter(base => ! base.scouted || base.owner.isEnemy)
   }
@@ -49,8 +48,8 @@ class Intelligence {
   }
   
   def update() {
+    unitsShown.update()
     updateEnemyMain()
-    updateZergExpansionAttempt()
   }
   
   private def updateEnemyMain() {
@@ -62,17 +61,6 @@ class Intelligence {
       if (possibleMains.size == 1) {
         firstEnemyMain = possibleMains.headOption
       }
-    }
-  }
-  
-  var zergWasTryingToExpand = false
-  private def updateZergExpansionAttempt() {
-    enemyHasShownUnit ++= With.units.enemy.map(_.unitClass)
-    if (With.units.enemy.exists(unit =>
-      unit.is(Zerg.Drone) &&
-      unit.command.exists(_.getUnitCommandType == UnitCommandType.Build) &&
-      unit.targetPixel.exists(_.zone.bases.exists(_.owner.isNeutral)))) {
-      zergWasTryingToExpand = true
     }
   }
 }

@@ -1,4 +1,4 @@
-package Information.StrategyDetection.Generic
+package Information.Intelligence.Fingerprinting.Generic
 
 case class GameTime(minutes: Int, seconds: Int) {
  

@@ -1,6 +1,6 @@
-package Information.StrategyDetection.Generic
+package Information.Intelligence.Fingerprinting.Generic
 
-import Information.StrategyDetection.Fingerprint
+import Information.Intelligence.Fingerprinting.Fingerprint
 
 class FingerprintOr(fingerprints: Fingerprint*) extends Fingerprint {
   

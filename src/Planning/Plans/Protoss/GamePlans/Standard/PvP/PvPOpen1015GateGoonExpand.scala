@@ -12,7 +12,7 @@ import Strategery.Strategies.Protoss.PvP.PvPOpen4GateGoon
 
 class PvPOpen1015GateGoonExpand extends GameplanModeTemplatePvP {
   
-  override val activationCriteria : Plan = new Employing(PvPOpen4GateGoon)
+  override val activationCriteria : Plan = new Employing(PvPOpen1015GateGoon)
   override val defaultWorkerPlan  : Plan = NoPlan()
   
   override val buildOrder: Seq[BuildRequest] = Vector(

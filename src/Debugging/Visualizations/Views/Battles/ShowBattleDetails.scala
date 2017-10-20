@@ -93,7 +93,6 @@ object ShowBattleDetails extends View {
       Vector("Retreat loss",    "" + battle.estimationSimulationRetreat.costToUs.toInt),
       Vector(),
       Vector("DChokiness",      "" + "%1.1f".format(battle.analysis.desireChokiness)),
-      Vector("DEconomy",        "" + "%1.1f".format(battle.analysis.desireEconomy)),
       Vector("DTurtling",       "" + "%1.1f".format(battle.analysis.desireTurtling)),
       Vector("DUrgency",        "" + "%1.1f".format(battle.analysis.desireUrgency)),
       Vector("DHysteresis",     "" + "%1.1f".format(battle.analysis.desireHysteresis)),

@@ -37,9 +37,7 @@ class ProtossFFACarriers extends GameplanModeTemplate {
   
   private class CanBuildZealots extends Or(
     new UnitsExactly(0, Protoss.CyberneticsCore, complete = true),
-    new And(
-      new UnitsAtLeast(8, Protoss.Dragoon),
-      new UpgradeComplete(Protoss.ZealotSpeed, Protoss.Zealot.buildFrames)))
+    new UpgradeComplete(Protoss.ZealotSpeed, 1, Protoss.Zealot.buildFrames))
   
   override def buildPlans: Seq[Plan] = Vector(
     new If(new UnitsAtLeast(1, Protoss.Carrier), new Build(RequestUpgrade(Protoss.CarrierCapacity))),

@@ -3,7 +3,6 @@ package Planning.Plans.Protoss.GamePlans.Standard.PvP
 import Macro.BuildRequests.{BuildRequest, RequestAtLeast, RequestUpgrade}
 import Planning.Plan
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Information.Employing
 import Planning.Plans.Macro.Automatic.RequireSufficientSupply
 import Planning.Plans.Macro.Expanding.RequireMiningBases
@@ -11,7 +10,7 @@ import Planning.Plans.Macro.Milestones.UnitsAtLeast
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP.PvPOpen4GateGoon
 
-class PvPOpen4GateGoon extends GameplanModeTemplate {
+class PvPOpen4GateGoon extends GameplanModeTemplatePvP {
   
   override val activationCriteria : Plan = new Employing(PvPOpen4GateGoon)
   override val defaultWorkerPlan  : Plan = NoPlan()
@@ -51,6 +50,7 @@ class PvPOpen4GateGoon extends GameplanModeTemplate {
   
   override val buildPlans = Vector(
     new RequireSufficientSupply,
+    
     new FlipIf(
       new UnitsAtLeast(20, Protoss.Dragoon),
       new RequireMiningBases(2)))

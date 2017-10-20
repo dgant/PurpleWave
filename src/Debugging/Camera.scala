@@ -25,7 +25,7 @@ class Camera {
   var visibleUnits      : Set[UnitInfo]         = Set.empty
   
   private def totalInterest(unit: UnitInfo): Double = {
-    val interestBattle  = unit.battle.map(interestByBattle).getOrElse(1.0)
+    val interestBattle  = if (unit.battle.isDefined) interestByBattle.getOrElse(unit.battle.get, 0.0) else 0.0
     val interestUnit    = interestByUnit(unit)
     interestBattle * interestUnit * unit.subjectiveValue
   }
@@ -50,6 +50,13 @@ class Camera {
     if (mostInterestingUnit.isDefined) {
       focusOn(mostInterestingUnit.get._1)
     }
+  
+    if (focusUnit != null && focusUnit.battle.isDefined) {
+      setCameraSpeed(With.configuration.cameraDynamicSpeedSlowest)
+    }
+    else {
+      setCameraSpeed(With.configuration.cameraDynamicSpeedFastest)
+    }
     
     tween()
   
@@ -73,7 +80,7 @@ class Camera {
   def tween() {
     if (focusUnit != null && focusUnit.alive) {
       val start = focusUnit.pixelCenter
-      focus = if (focusUnit.battle.nonEmpty) start.project(focusUnit.battle.get.focus, 200) else start
+      focus = if (focusUnit.battle.exists(_.enemy.units.nonEmpty)) start.project(focusUnit.battle.get.focus, 120) else start
       val tweenFraction = Math.max(0.0, Math.min(1.0, (With.framesSince(focusFrame) + 1).toDouble/tweenFrames))
       val tweenPoint    = tweenFrom.project(focus, tweenFrom.pixelDistanceSlow(focus) * tweenFraction)
       With.viewport.centerOn(tweenPoint)

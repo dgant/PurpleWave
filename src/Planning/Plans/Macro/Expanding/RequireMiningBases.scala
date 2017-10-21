@@ -5,6 +5,7 @@ import Lifecycle.With
 import Macro.BuildRequests.RequestAtLeast
 import Planning.Composition.Property
 import Planning.Plan
+import Planning.Plans.Macro.Milestones.AllMiningBases
 
 class RequireMiningBases(basesInitial: Int = 1) extends Plan {
   
@@ -13,9 +14,9 @@ class RequireMiningBases(basesInitial: Int = 1) extends Plan {
   val basesDesired = new Property(basesInitial)
   
   override def onUpdate() {
-    val bases       = With.geography.ourBases.size
-    val miningBases = With.geography.ourBases.count(_.mineralsLeft > With.configuration.maxMineralsBeforeMinedOut)
-    val goal        = basesDesired.get + bases - miningBases
+    val basesAll    = With.geography.ourBases.size
+    val basesMining = AllMiningBases().size
+    val goal        = basesDesired.get + basesAll - basesMining
     
     if (goal > 0) {
       With.scheduler.request(this, RequestAtLeast(goal, With.self.townHallClass))

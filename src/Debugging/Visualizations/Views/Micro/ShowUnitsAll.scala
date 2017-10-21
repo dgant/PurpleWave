@@ -15,7 +15,7 @@ object ShowUnitsAll extends View {
   var showResources       = false
   var showViolence        = true
   var showBattleIgnorance = false
-  var showMortality       = true
+  var showMortality       = false
   
   override def renderMap() { With.units.all.foreach(renderUnit) }
   

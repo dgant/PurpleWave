@@ -12,14 +12,17 @@ class ProtossVsProtoss extends ModalGameplan(
   new PvPOpenCoreZ,
   new PvPOpenGoonFirst,
   
-  new PvPOneBaseDragoonExpand,
+  new PvPOneBaseGoonExpand,
   new PvPOneBaseReaverExpand,
   
+  new PvPOpen1015GateGoonExpand,
+  new PvPOpen1015GateGoonReaverExpand,
+  new PvPOpen1015GateGoonDTs,
   new PvPOpen12Nexus5Zealot,
   new PvPOpen2GateRobo,
   new PvPOpen2GateDarkTemplar,
   new PvPOpen3GateSpeedlots,
   new PvPOpen4GateGoon,
   
-  new PvPLateGameStandard
+  new PvPLateGame
 )

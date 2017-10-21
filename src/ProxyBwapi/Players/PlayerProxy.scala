@@ -5,7 +5,7 @@ import Mathematics.Points.Tile
 import Performance.Cache
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
-import ProxyBwapi.Upgrades.Upgrade
+import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
 import bwapi.{Player, Race, Unit}
 
 import scala.collection.JavaConverters._
@@ -36,12 +36,20 @@ abstract class PlayerProxy(base:Player) {
   
   def rawUnits: mutable.Buffer[Unit] = unitsCache()
   
-  def getUpgradeLevel(upgrade: Upgrade):Int = {
-    //Further optimization: Stop expiring when at max level
-    if ( ! upgradeLevelCaches.contains(upgrade)) {
-      upgradeLevelCaches.put(upgrade, new Cache(() => base.getUpgradeLevel(upgrade.baseType)))
+  private lazy val minUpgradeLevels = new mutable.HashMap[Upgrade, Int] ++ Upgrades.all.map(upgrade => (upgrade, 0))
+  def getUpgradeLevel(upgrade: Upgrade): Int = {
+    if (!upgradeLevelCaches.contains(upgrade)) {
+      upgradeLevelCaches.put(upgrade, new Cache(() => recalculateUpgradeLevel(upgrade)))
     }
     upgradeLevelCaches(upgrade)()
+  }
+  private def recalculateUpgradeLevel(upgrade: Upgrade): Int = {
+    // You can only see upgrades of enemy units that are *currently visible*
+    // So let's add a ratchet.
+    val reportedLevel = base.getUpgradeLevel(upgrade.baseType)
+    val previousLevel = minUpgradeLevels(upgrade)
+    val currentLevel  = Math.max(reportedLevel, previousLevel)
+    currentLevel
   }
   
   def hasTech(tech: Tech):Boolean = {
@@ -61,6 +69,4 @@ abstract class PlayerProxy(base:Player) {
   private val unitsCache              = new Cache(() => base.getUnits.asScala)
   private val upgradeLevelCaches      = new mutable.HashMap[Upgrade, Cache[Int]]
   private val techsResearchedCaches   = new mutable.HashMap[Tech, Cache[Boolean]]
-  
-  
 }

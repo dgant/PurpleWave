@@ -11,16 +11,15 @@ class FingerprintArrivesBy(
   quantity  : Int = 1)
     extends Fingerprint {
   
-  var triggered = false
+  trigger = true
   
-  override def matches: Boolean = {
-    if (triggered) return true
+  override def investigate: Boolean = {
     val units           = With.units.enemy.filter(_.is(unitClass))
     val arrivalFrame    = gameTime.frames
     val arrivalTimes    = units.map(u => (u, arrivaltime(u))).toMap
     val arrivingOnTime  = arrivalTimes.count(_._2 < arrivalFrame)
-    triggered           = arrivingOnTime >= quantity
-    triggered
+    val output          = arrivingOnTime >= quantity
+    output
   }
   
   protected def arrivaltime(unit: UnitInfo): Int = {

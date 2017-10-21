@@ -5,5 +5,5 @@ import Lifecycle.With
 import bwapi.Race
 
 class FingerprintRace(race: Race) extends Fingerprint {
-  override def matches: Boolean = With.enemies.exists(_.raceInitial == race)
+  override def investigate: Boolean = With.enemies.exists(_.raceInitial == race)
 }

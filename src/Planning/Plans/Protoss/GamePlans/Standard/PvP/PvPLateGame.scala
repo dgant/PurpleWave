@@ -15,7 +15,7 @@ import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Protoss.GamePlans.Standard.PvP.PvPIdeas.{ReactToDarkTemplarExisting, ReactToDarkTemplarPossible}
 import ProxyBwapi.Races.Protoss
 
-class PvPLateGameStandard extends GameplanModeTemplate {
+class PvPLateGame extends GameplanModeTemplate {
   
   override val aggression = 0.82
   override val scoutExpansionsAt = 90

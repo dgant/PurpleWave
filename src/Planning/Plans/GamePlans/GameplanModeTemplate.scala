@@ -10,7 +10,6 @@ import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{BuildOrder, FollowBuildOrder, RequireEssentials}
 import Planning.Plans.Macro.Expanding.RemoveMineralBlocksAt
 import Planning.Plans.Protoss.Situational.DefendAgainstProxy
-import Planning.Plans.Recruitment.RecruitFreelancers
 import Planning.Plans.Scouting.{ScoutAt, ScoutExpansionsAt}
 
 abstract class GameplanModeTemplate extends GameplanMode {
@@ -51,8 +50,8 @@ abstract class GameplanModeTemplate extends GameplanMode {
     new ScoutExpansionsAt(scoutExpansionsAt),
     defaultAttackPlan,
     new DefendEntrance,
-    new Gather,
-    new RecruitFreelancers
+    new Gather
+    //new RecruitFreelancers
   )
   
   private var initialized = false

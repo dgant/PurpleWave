@@ -8,5 +8,5 @@ class FingerprintIncompleteBy(
   quantity  : Int = 1)
     extends AbstractFingerprintQuantityBy(unitClass, gameTime) {
   
-  override def matches: Boolean = observed < quantity
+  override def investigate: Boolean = observed < quantity
 }

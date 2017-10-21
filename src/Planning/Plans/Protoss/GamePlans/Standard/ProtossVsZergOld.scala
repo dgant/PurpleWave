@@ -120,17 +120,17 @@ class ProtossVsZergOld extends Parallel {
   
   private class ImplementMidgameCorsairReaver extends Build(
       RequestAtLeast(1, Protoss.Gateway),
-      RequestAtLeast(1, Protoss.Assimilator),
-      RequestAtLeast(1, Protoss.CyberneticsCore),
       RequestAtLeast(2, Protoss.Assimilator),
+      RequestAtLeast(1, Protoss.CyberneticsCore),
       RequestAtLeast(1, Protoss.Stargate),
       RequestAtLeast(1, Protoss.RoboticsFacility),
       RequestAtLeast(1, Protoss.RoboticsSupportBay),
-      RequestUpgrade(Protoss.GroundDamage),
       RequestAtLeast(2, Protoss.Nexus),
+      RequestUpgrade(Protoss.GroundDamage),
+      RequestAtLeast(3, Protoss.Gateway),
+      RequestAtLeast(1, Protoss.CitadelOfAdun),
       RequestAtLeast(4, Protoss.Gateway),
-      RequestAtLeast(2, Protoss.Stargate),
-      RequestAtLeast(2, Protoss.RoboticsFacility))
+      RequestAtLeast(1, Protoss.TemplarArchives))
   
   private class ImplementMidgameCorsairDarkTemplar extends Build(
       RequestAtLeast(1, Protoss.Gateway),
@@ -201,7 +201,7 @@ class ProtossVsZergOld extends Parallel {
     
     new FirstEightMinutes(
       new If(
-        new UnitsAtLeast(1, Protoss.CyberneticsCore, complete = false),
+        new UnitsAtMost(3, Protoss.Gateway, complete = true),
         new Parallel(
           new TrainMatchingRatio(Protoss.PhotonCannon, 2, 6,
             Seq(
@@ -316,8 +316,12 @@ class ProtossVsZergOld extends Parallel {
         new If(
           new And(
             new UnitsAtLeast(1, Protoss.CyberneticsCore, complete = true),
-            new Employing(PvZMidgame5GateDragoons),
-            new UnitsAtMost(10, Protoss.Dragoon)),
+            new Or(
+              new Employing(PvZMidgame5GateDragoons),
+              new Employing(PvZMidgameCorsairReaver)),
+            new Or(
+              new UnitsAtMost(12, Protoss.Dragoon),
+              new UnitsAtLeast(12, Protoss.Zealot))),
           new TrainContinuously(Protoss.Dragoon),
           new TrainContinuously(Protoss.Zealot)))),
   

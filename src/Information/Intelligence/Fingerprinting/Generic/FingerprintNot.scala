@@ -4,5 +4,5 @@ import Information.Intelligence.Fingerprinting.Fingerprint
 
 class FingerprintNot(fingerprint: Fingerprint) extends Fingerprint {
   
-  override def matches: Boolean = ! fingerprint.matches
+  override def investigate: Boolean = ! fingerprint.matches
 }

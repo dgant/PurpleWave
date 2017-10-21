@@ -37,12 +37,14 @@ object PvPIdeas {
   
   class ReactToDarkTemplarExisting extends If(
     new EnemyDarkTemplarExists,
-    new If(
+    new FlipIf(
       new UnitsAtLeast(1, Protoss.Observatory),
       new Build(RequestAtLeast(1, Protoss.Observer)),
       new Build(
         RequestAtLeast(1, Protoss.Forge),
-        RequestAtLeast(2, Protoss.PhotonCannon))))
+        RequestAtLeast(2, Protoss.PhotonCannon),
+        RequestAtLeast(1, Protoss.RoboticsFacility),
+        RequestAtLeast(1, Protoss.Observatory))))
   
   class BuildDragoonsOrZealots extends If(
     new Or(

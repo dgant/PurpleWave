@@ -6,6 +6,9 @@ import Lifecycle.With
 object ShowIntelligence extends View {
   
   def fingerprints = Vector(
+    With.intelligence.fingerprints.fingerprintProxyGateway,
+    With.intelligence.fingerprints.fingerprint2Gate,
+    With.intelligence.fingerprints.fingerprint1GateCore,
     With.intelligence.fingerprints.fingerprint4Pool,
     With.intelligence.fingerprints.fingerprint9Pool,
     With.intelligence.fingerprints.fingerprintOverpool,

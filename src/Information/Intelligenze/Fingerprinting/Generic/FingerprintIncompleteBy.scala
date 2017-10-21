@@ -1,12 +1,12 @@
-package Information.Intelligence.Fingerprinting.Generic
+package Information.Intelligenze.Fingerprinting.Generic
 
 import ProxyBwapi.UnitClass.UnitClass
 
-class FingerprintCompleteBy(
+class FingerprintIncompleteBy(
   unitClass : UnitClass,
   gameTime  : GameTime,
   quantity  : Int = 1)
     extends AbstractFingerprintQuantityBy(unitClass, gameTime) {
   
-  override def investigate: Boolean = observed >= quantity
+  override def investigate: Boolean = observed < quantity
 }

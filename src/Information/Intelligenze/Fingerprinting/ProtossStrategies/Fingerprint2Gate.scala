@@ -1,6 +1,6 @@
-package Information.Intelligence.Fingerprinting.ProtossStrategies
+package Information.Intelligenze.Fingerprinting.ProtossStrategies
 
-import Information.Intelligence.Fingerprinting.Generic.{FingerprintArrivesBy, FingerprintCompleteBy, FingerprintOr, GameTime}
+import Information.Intelligenze.Fingerprinting.Generic.{FingerprintArrivesBy, FingerprintCompleteBy, FingerprintOr, GameTime}
 import ProxyBwapi.Races.Protoss
 
 class Fingerprint2Gate extends FingerprintOr(

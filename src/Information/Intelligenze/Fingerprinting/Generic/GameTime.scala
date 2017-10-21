@@ -1,4 +1,4 @@
-package Information.Intelligence.Fingerprinting.Generic
+package Information.Intelligenze.Fingerprinting.Generic
 
 case class GameTime(minutes: Int, seconds: Int) {
  

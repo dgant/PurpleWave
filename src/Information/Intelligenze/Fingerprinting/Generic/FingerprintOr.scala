@@ -1,6 +1,6 @@
-package Information.Intelligence.Fingerprinting.Generic
+package Information.Intelligenze.Fingerprinting.Generic
 
-import Information.Intelligence.Fingerprinting.Fingerprint
+import Information.Intelligenze.Fingerprinting.Fingerprint
 
 class FingerprintOr(fingerprints: Fingerprint*) extends Fingerprint {
   

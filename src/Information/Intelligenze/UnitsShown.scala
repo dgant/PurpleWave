@@ -1,4 +1,4 @@
-package Information.Intelligence
+package Information.Intelligenze
 
 import Lifecycle.With
 import ProxyBwapi.Players.{PlayerInfo, Players}

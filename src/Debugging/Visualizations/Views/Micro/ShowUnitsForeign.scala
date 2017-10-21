@@ -2,7 +2,7 @@ package Debugging.Visualizations.Views.Micro
 
 import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.View
-import Information.Intelligence.Fingerprinting.Generic.GameTime
+import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import ProxyBwapi.Races.Terran

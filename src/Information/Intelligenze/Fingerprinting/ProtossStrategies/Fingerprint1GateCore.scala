@@ -1,6 +1,6 @@
-package Information.Intelligence.Fingerprinting.ProtossStrategies
+package Information.Intelligenze.Fingerprinting.ProtossStrategies
 
-import Information.Intelligence.Fingerprinting.Generic._
+import Information.Intelligenze.Fingerprinting.Generic._
 import Lifecycle.With
 import ProxyBwapi.Races.Protoss
 

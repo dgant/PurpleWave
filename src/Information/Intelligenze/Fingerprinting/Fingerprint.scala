@@ -1,4 +1,4 @@
-package Information.Intelligence.Fingerprinting
+package Information.Intelligenze.Fingerprinting
 
 abstract class Fingerprint {
   

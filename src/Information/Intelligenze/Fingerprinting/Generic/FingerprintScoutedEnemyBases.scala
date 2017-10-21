@@ -1,6 +1,6 @@
-package Information.Intelligence.Fingerprinting.Generic
+package Information.Intelligenze.Fingerprinting.Generic
 
-import Information.Intelligence.Fingerprinting.Fingerprint
+import Information.Intelligenze.Fingerprinting.Fingerprint
 import Lifecycle.With
 
 class FingerprintScoutedEnemyBases(count: Int) extends Fingerprint {

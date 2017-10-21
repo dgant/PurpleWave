@@ -1,6 +1,6 @@
-package Information.Intelligence.Fingerprinting.ZergStrategies
+package Information.Intelligenze.Fingerprinting.ZergStrategies
 
-import Information.Intelligence.Fingerprinting.Generic.{FingerprintAnd, FingerprintNot, FingerprintRace, FingerprintScoutedEnemyBases}
+import Information.Intelligenze.Fingerprinting.Generic.{FingerprintAnd, FingerprintNot, FingerprintRace, FingerprintScoutedEnemyBases}
 import Lifecycle.With
 import bwapi.Race
 

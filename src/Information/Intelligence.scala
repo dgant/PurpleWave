@@ -1,8 +1,8 @@
 package Information
 
 import Information.Geography.Types.Base
-import Information.Intelligence.Fingerprinting.Fingerprints
-import Information.Intelligence.UnitsShown
+import Information.Intelligenze.Fingerprinting.Fingerprints
+import Information.Intelligenze.UnitsShown
 import Lifecycle.With
 import Mathematics.Points.Tile
 import Performance.Cache

@@ -8,7 +8,7 @@ import Planning.Plans.Compound._
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, FirstEightMinutes, FollowBuildOrder, RequireEssentials}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RemoveMineralBlocksAt, RequireMiningBases}
-import Planning.Plans.Macro.Milestones.{OnGasBases, OnMiningBases, UnitsAtLeast}
+import Planning.Plans.Macro.Milestones.{OnGasBases, IfOnMiningBases, UnitsAtLeast}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Protoss.Situational.DefendAgainstProxy
 import Planning.Plans.Recruitment.RecruitFreelancers
@@ -48,8 +48,8 @@ class TerranVsProtoss extends Parallel {
     new If(
       new Check(() => With.self.minerals > 800),
       new Parallel(
-        new OnMiningBases(2, new Build(RequestAtLeast(5, Terran.Factory)), new Build(RequestAtLeast(2, Terran.Barracks))),
-        new OnMiningBases(3, new Build(RequestAtLeast(8, Terran.Factory)), new Build(RequestAtLeast(3, Terran.Barracks)))
+        new IfOnMiningBases(2, new Build(RequestAtLeast(5, Terran.Factory)), new Build(RequestAtLeast(2, Terran.Barracks))),
+        new IfOnMiningBases(3, new Build(RequestAtLeast(8, Terran.Factory)), new Build(RequestAtLeast(3, Terran.Barracks)))
       )),
     
     new If(new UnitsAtLeast(1, UnitMatchSiegeTank, complete = true), new RequireMiningBases(2)),
@@ -95,8 +95,8 @@ class TerranVsProtoss extends Parallel {
     new TrainContinuously(Terran.Marine),
     new TrainContinuously(Terran.Vulture),
   
-    new OnMiningBases(2, new Build(RequestAtLeast(1, Terran.Starport), RequestAtLeast(3, Terran.Factory), RequestAtLeast(2, Terran.Starport), RequestAtLeast(1, Terran.Armory), RequestAtLeast(1, Terran.Academy), RequestAtLeast(5, Terran.Factory))),
-    new OnMiningBases(3, new Build(RequestAtLeast(5, Terran.Factory), RequestAtLeast(1, Terran.Academy), RequestAtLeast(8, Terran.Factory))),
+    new IfOnMiningBases(2, new Build(RequestAtLeast(1, Terran.Starport), RequestAtLeast(3, Terran.Factory), RequestAtLeast(2, Terran.Starport), RequestAtLeast(1, Terran.Armory), RequestAtLeast(1, Terran.Academy), RequestAtLeast(5, Terran.Factory))),
+    new IfOnMiningBases(3, new Build(RequestAtLeast(5, Terran.Factory), RequestAtLeast(1, Terran.Academy), RequestAtLeast(8, Terran.Factory))),
     new OnGasBases(2, new Build(RequestAtLeast(2, Terran.MachineShop))),
     new OnGasBases(3, new Build(
       RequestAtLeast(3, Terran.MachineShop),

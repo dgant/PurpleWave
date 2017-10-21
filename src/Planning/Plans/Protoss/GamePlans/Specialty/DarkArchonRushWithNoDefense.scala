@@ -7,7 +7,7 @@ import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder, RequireEssentials}
 import Planning.Plans.Macro.Expanding.{BuildCannonsAtBases, BuildGasPumps, RemoveMineralBlocksAt, RequireMiningBases}
-import Planning.Plans.Macro.Milestones.{OnMiningBases, UnitsAtLeast, UnitsAtMost}
+import Planning.Plans.Macro.Milestones.{IfOnMiningBases, UnitsAtLeast, UnitsAtMost}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Protoss.ProtossBuilds
 import Planning.Plans.Recruitment.RecruitFreelancers
@@ -51,8 +51,8 @@ class DarkArchonRushWithNoDefense extends Parallel {
     new BuildCannonsAtBases(1),
     new UpgradeContinuously(Protoss.GroundDamage),
     new UpgradeContinuously(Protoss.GroundArmor),
-    new OnMiningBases(5, new Build(RequestAtLeast(14, Protoss.Gateway))),
-    new OnMiningBases(6, new Build(RequestAtLeast(20, Protoss.Gateway))),
+    new IfOnMiningBases(5, new Build(RequestAtLeast(14, Protoss.Gateway))),
+    new IfOnMiningBases(6, new Build(RequestAtLeast(20, Protoss.Gateway))),
     new RequireMiningBases(5),
     new RequireMiningBases(6),
     new UpgradeContinuously(Protoss.Shields),

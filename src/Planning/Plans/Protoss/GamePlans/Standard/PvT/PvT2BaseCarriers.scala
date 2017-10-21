@@ -8,7 +8,7 @@ import Planning.Plans.Information.Reactive.EnemyBio
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildCannonsAtExpansions, BuildCannonsAtNatural, RequireMiningBases}
-import Planning.Plans.Macro.Milestones.{OnMiningBases, UnitsAtLeast}
+import Planning.Plans.Macro.Milestones.{IfOnMiningBases, UnitsAtLeast}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvT.PvT2BaseCarrier
@@ -19,7 +19,7 @@ class PvT2BaseCarriers extends GameplanModeTemplate {
   override val emergencyPlans       = Vector(new PvTIdeas.Require2BaseTech, new PvTIdeas.GetObserversForCloakedWraiths)
   
   override val buildPlans = Vector(
-    new OnMiningBases(3, new BuildCannonsAtNatural(1)),
+    new IfOnMiningBases(3, new BuildCannonsAtNatural(1)),
     new BuildCannonsAtExpansions(3),
     new If(new UnitsAtLeast(1, Protoss.Carrier, complete = true), new Build(RequestUpgrade(Protoss.CarrierCapacity))),
     new If(new UnitsAtLeast(4, Protoss.Carrier, complete = true), new RequireMiningBases(3)),

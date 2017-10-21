@@ -9,14 +9,16 @@ import Planning.Plans.Information.Employing
 import Planning.Plans.Macro.Automatic.{TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Macro.Milestones.{EnemyUnitsAtMost, UnitsAtLeast, UpgradeComplete}
+import Planning.Plans.Macro.Milestones._
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP.PvPOpen3GateSpeedlots
 
 class PvPOpen3GateSpeedlots extends GameplanModeTemplate {
   
-  override val activationCriteria : Plan = new Employing(PvPOpen3GateSpeedlots)
-  override def defaultWorkerPlan  : Plan = NoPlan()
+  override val activationCriteria : Plan      = new Employing(PvPOpen3GateSpeedlots)
+  override val completionCriteria : Plan      = new MiningBasesAtLeast(2)
+  override def defaultWorkerPlan  : Plan      = NoPlan()
+  override def emergencyPlans     : Seq[Plan] = Seq(new PvPIdeas.ReactToDarkTemplarEmergencies)
   override def defaultAttackPlan  : Plan =
     new If(
       new EnemyUnitsAtMost(0, Protoss.Dragoon),
@@ -48,7 +50,7 @@ class PvPOpen3GateSpeedlots extends GameplanModeTemplate {
   
   override val buildPlans = Vector(
     new FlipIf(
-      new UnitsAtLeast(20, Protoss.Zealot),
+      new UnitsAtLeast(6, Protoss.Zealot),
       new TrainContinuously(Protoss.Zealot),
       new Parallel(
         new Build(
@@ -56,6 +58,6 @@ class PvPOpen3GateSpeedlots extends GameplanModeTemplate {
           RequestAtLeast(1, Protoss.CitadelOfAdun),
           RequestUpgrade(Protoss.ZealotSpeed),
           RequestAtLeast(3, Protoss.Gateway)),
-        new TrainWorkersContinuously,
-        new RequireMiningBases(2))))
+        new TrainWorkersContinuously)),
+    new RequireMiningBases(2))
 }

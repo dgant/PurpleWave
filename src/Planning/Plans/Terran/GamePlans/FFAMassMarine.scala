@@ -6,7 +6,7 @@ import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.BuildOrders.{Build, FirstEightMinutes, FollowBuildOrder, RequireEssentials}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
-import Planning.Plans.Macro.Milestones.{OnGasBases, OnMiningBases, UnitsAtLeast}
+import Planning.Plans.Macro.Milestones.{OnGasBases, IfOnMiningBases, UnitsAtLeast}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import ProxyBwapi.Races.Terran
 
@@ -64,10 +64,10 @@ class FFAMassMarine extends Parallel {
       new UnitsAtLeast(60, Terran.Marine),
       new RequireMiningBases(4)),
     new TrainContinuously(Terran.Marine),
-    new OnMiningBases(1, new Build(RequestAtLeast(6, Terran.Barracks))),
-    new OnMiningBases(2, new Build(RequestAtLeast(12, Terran.Barracks))),
-    new OnMiningBases(3, new Build(RequestAtLeast(18, Terran.Barracks))),
-    new OnMiningBases(4, new Build(RequestAtLeast(24, Terran.Barracks))),
+    new IfOnMiningBases(1, new Build(RequestAtLeast(6, Terran.Barracks))),
+    new IfOnMiningBases(2, new Build(RequestAtLeast(12, Terran.Barracks))),
+    new IfOnMiningBases(3, new Build(RequestAtLeast(18, Terran.Barracks))),
+    new IfOnMiningBases(4, new Build(RequestAtLeast(24, Terran.Barracks))),
     new UpgradeStuffEarly,
     new UpgradeStuffLate,
     new Build(RequestAtLeast(24, Terran.Barracks)),

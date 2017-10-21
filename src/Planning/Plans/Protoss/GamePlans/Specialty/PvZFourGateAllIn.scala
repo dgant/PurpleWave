@@ -19,7 +19,7 @@ import Strategery.Strategies.Protoss.PvZ.PvZ4GateDragoonAllIn
 class PvZFourGateAllIn extends GameplanModeTemplate {
   
   override val activationCriteria     = new Employing(PvZ4GateDragoonAllIn)
-  override val completionCriteria     = new OnMiningBases(2)
+  override val completionCriteria     = new MiningBasesAtLeast(2)
   override val scoutAt                = 10
   override def buildOrder             = ProtossBuilds.OpeningTwoGate1012
   override def defaultPlacementPlan   = new BuildHuggingNexus

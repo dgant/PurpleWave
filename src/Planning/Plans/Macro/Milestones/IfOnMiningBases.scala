@@ -3,7 +3,7 @@ package Planning.Plans.Macro.Milestones
 import Planning.Plan
 import Planning.Plans.Compound.{If, NoPlan}
 
-class OnMiningBases(
+class IfOnMiningBases(
   requiredBases : Int,
   argWhenTrue   : Plan = NoPlan(),
   argWhenFalse  : Plan = NoPlan())

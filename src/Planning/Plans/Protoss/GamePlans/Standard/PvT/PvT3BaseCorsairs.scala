@@ -9,7 +9,7 @@ import Planning.Plans.Information.Employing
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildCannonsAtExpansions, BuildCannonsAtNatural, RequireMiningBases}
-import Planning.Plans.Macro.Milestones.{MiningBasesAtLeast, OnMiningBases, UnitsAtLeast, UpgradeComplete}
+import Planning.Plans.Macro.Milestones.{MiningBasesAtLeast, IfOnMiningBases, UnitsAtLeast, UpgradeComplete}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvT.PvT3BaseCorsair
 
@@ -53,7 +53,7 @@ class PvT3BaseCorsairs extends GameplanModeTemplate {
   
   override val buildPlans = Vector(
     new PvTIdeas.Require2BaseTech,
-    new OnMiningBases(3, new BuildCannonsAtNatural(1)),
+    new IfOnMiningBases(3, new BuildCannonsAtNatural(1)),
     new BuildCannonsAtExpansions(2),
     new If(new UnitsAtLeast(35, UnitMatchWarriors), new RequireMiningBases(4)),
     new FlipIf(

@@ -7,7 +7,7 @@ import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RemoveMineralBlocksAt, RequireMiningBases}
-import Planning.Plans.Macro.Milestones.{OnGasBases, OnMiningBases, UnitsAtLeast}
+import Planning.Plans.Macro.Milestones.{OnGasBases, IfOnMiningBases, UnitsAtLeast}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Protoss.ProtossBuilds
 import Planning.Plans.Recruitment.RecruitFreelancers
@@ -67,8 +67,8 @@ class ThreeBaseCarriersWithNoDefense extends Parallel {
     new If(
       new UnitsAtLeast(12, Protoss.Carrier),
       new Parallel(
-        new OnMiningBases(2, new Parallel(new SpamUpgrades, new TechToObservers)),
-        new OnMiningBases(3, new Parallel(new TechToArbiters)),
+        new IfOnMiningBases(2, new Parallel(new SpamUpgrades, new TechToObservers)),
+        new IfOnMiningBases(3, new Parallel(new TechToArbiters)),
         new TrainContinuously(Protoss.Observer, 2),
         new TrainContinuously(Protoss.Arbiter, 2),
         new TrainContinuously(Protoss.Carrier)),

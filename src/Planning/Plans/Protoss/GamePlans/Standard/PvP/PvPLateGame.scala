@@ -58,8 +58,8 @@ class PvPLateGame extends GameplanModeTemplate {
     new If(new UnitsAtLeast(3,  Protoss.Reaver),          new If(new EnemyBasesAtLeast(3), new Build(RequestUpgrade(Protoss.ShuttleSpeed)))),
     new If(new UnitsAtLeast(8,  UnitMatchWarriors),       new RequireMiningBases(2)),
     new If(new UnitsAtLeast(40, UnitMatchWarriors),       new RequireMiningBases(3)),
-    new If(new UnitsAtLeast(17, UnitMatchWarriors),       new OnMiningBases(2, new BuildTechPartOne)),
-    new If(new UnitsAtLeast(45, UnitMatchWarriors),       new OnMiningBases(3, new BuildTechPartTwo)),
+    new If(new UnitsAtLeast(17, UnitMatchWarriors),       new IfOnMiningBases(2, new BuildTechPartOne)),
+    new If(new UnitsAtLeast(45, UnitMatchWarriors),       new IfOnMiningBases(3, new BuildTechPartTwo)),
     new If(new EnemyUnitsAtLeast(1, Protoss.DarkTemplar), new Build(RequestUpgrade(Protoss.ObserverSpeed))),
     new If(
       new And(
@@ -76,7 +76,7 @@ class PvPLateGame extends GameplanModeTemplate {
       new Build(RequestAtLeast(1, Protoss.Shuttle)),
       new If(
         new And(
-          new Not(new OnMiningBases(3)),
+          new Not(new IfOnMiningBases(3)),
           new Not(new TechComplete(Protoss.PsionicStorm)),
           new UnitsAtMost(3, Protoss.Reaver)
         ),
@@ -90,7 +90,7 @@ class PvPLateGame extends GameplanModeTemplate {
       new Build(RequestAnother(2, Protoss.HighTemplar))),
     
     new PvPIdeas.BuildDragoonsOrZealots,
-    new OnMiningBases(1,
+    new IfOnMiningBases(1,
       new Build(
         RequestAtLeast(1, Protoss.Gateway),
         RequestAtLeast(1, Protoss.Assimilator),
@@ -101,21 +101,21 @@ class PvPLateGame extends GameplanModeTemplate {
         RequestAtLeast(1, Protoss.Observatory),
         RequestAtLeast(3, Protoss.Gateway))),
     new UpgradeContinuously(Protoss.GroundDamage),
-    new OnMiningBases(2,
+    new IfOnMiningBases(2,
       new If(
         new UnitsAtLeast(1, Protoss.CitadelOfAdun),
         new Build(RequestUpgrade(Protoss.ZealotSpeed)))),
-    new OnMiningBases(2,
+    new IfOnMiningBases(2,
       new Build(
         RequestAtLeast(5, Protoss.Gateway),
         RequestAtLeast(1, Protoss.CitadelOfAdun),
         RequestAtLeast(1, Protoss.TemplarArchives),
         RequestAtLeast(7, Protoss.Gateway))),
     new RequireMiningBases(3),
-    new OnMiningBases(1, new Build(RequestAtLeast(1, Protoss.RoboticsSupportBay))),
-    new OnMiningBases(3, new Build(RequestAtLeast(12, Protoss.Gateway))),
+    new IfOnMiningBases(1, new Build(RequestAtLeast(1, Protoss.RoboticsSupportBay))),
+    new IfOnMiningBases(3, new Build(RequestAtLeast(12, Protoss.Gateway))),
     new RequireMiningBases(4),
     new UpgradeContinuously(Protoss.GroundDamage),
-    new OnMiningBases(4, new Build(RequestAtLeast(15, Protoss.Gateway))),
+    new IfOnMiningBases(4, new Build(RequestAtLeast(15, Protoss.Gateway))),
     new UpgradeContinuously(Protoss.GroundArmor))
 }

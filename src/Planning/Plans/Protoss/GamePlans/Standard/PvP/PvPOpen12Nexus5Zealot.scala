@@ -61,7 +61,9 @@ class PvPOpen12Nexus5Zealot extends GameplanModeTemplate {
     new If(
       new UnitsAtLeast(5, UnitMatchWarriors),
       new Parallel(
-        new Build(RequestAtLeast(1, Protoss.CyberneticsCore)),
+        new Build(
+          RequestAtLeast(1, Protoss.Assimilator),
+          RequestAtLeast(1, Protoss.CyberneticsCore)),
         new BuildGasPumps),
       new TrainContinuously(Protoss.Zealot, 5))
   )

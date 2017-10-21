@@ -9,7 +9,7 @@ import Planning.Plans.Information.Reactive.{EnemyLurkers, EnemyMutalisks}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding._
-import Planning.Plans.Macro.Milestones.{OnGasBases, OnMiningBases, UnitsAtLeast}
+import Planning.Plans.Macro.Milestones.{OnGasBases, IfOnMiningBases, UnitsAtLeast}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Scouting.ScoutAt
 import ProxyBwapi.Races.{Terran, Zerg}
@@ -26,7 +26,7 @@ class TerranVsZergMech extends Parallel {
     new TrainContinuously(Terran.Marine),
     
     new Build(RequestAtLeast(1, Terran.Bunker)),
-    new OnMiningBases(2,
+    new IfOnMiningBases(2,
       new Build(
         RequestAtLeast(1, Terran.Barracks),
         RequestAtLeast(1, Terran.Refinery),
@@ -75,7 +75,7 @@ class TerranVsZergMech extends Parallel {
   
     new If(
       new Employing(TvZMidgameWraiths),
-      new OnMiningBases(2, new Build(
+      new IfOnMiningBases(2, new Build(
         RequestAtLeast(1, Terran.Factory),
         RequestAtLeast(2, Terran.Starport),
         RequestAtLeast(1, Terran.EngineeringBay),
@@ -85,7 +85,7 @@ class TerranVsZergMech extends Parallel {
         RequestAtLeast(2, Terran.Factory),
         RequestAtLeast(1, Terran.Armory),
         RequestAtLeast(6, Terran.Barracks))),
-      new OnMiningBases(2, new Build(
+      new IfOnMiningBases(2, new Build(
         RequestAtLeast(1, Terran.Factory),
         RequestAtLeast(1, Terran.MachineShop),
         RequestAtLeast(1, Terran.EngineeringBay),
@@ -95,7 +95,7 @@ class TerranVsZergMech extends Parallel {
         RequestAtLeast(1, Terran.Armory),
         RequestAtLeast(5, Terran.Factory)))
     ),
-    new OnMiningBases(3, new Build(RequestAtLeast(5, Terran.Factory), RequestAtLeast(1, Terran.Academy), RequestAtLeast(8, Terran.Factory))),
+    new IfOnMiningBases(3, new Build(RequestAtLeast(5, Terran.Factory), RequestAtLeast(1, Terran.Academy), RequestAtLeast(8, Terran.Factory))),
     new OnGasBases(2, new Build(RequestAtLeast(2, Terran.MachineShop))),
     new OnGasBases(3, new Build(RequestAtLeast(3, Terran.MachineShop))),
     new RequireMiningBases(2),

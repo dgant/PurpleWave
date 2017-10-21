@@ -7,7 +7,7 @@ import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Information.{Employing, SafeAtHome}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildCannonsAtExpansions, BuildCannonsAtNatural, RequireMiningBases}
-import Planning.Plans.Macro.Milestones.{OnGasBases, OnMiningBases, UnitsAtLeast}
+import Planning.Plans.Macro.Milestones.{OnGasBases, IfOnMiningBases, UnitsAtLeast}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvT.PvT2BaseArbiter
@@ -21,7 +21,7 @@ class PvT2BaseArbiters extends GameplanModeTemplate {
   override val defaultAttackPlan  = new PvTIdeas.AttackRespectingMines
   
   override val buildPlans = Vector(
-    new OnMiningBases(3, new BuildCannonsAtNatural(1)),
+    new IfOnMiningBases(3, new BuildCannonsAtNatural(1)),
     new BuildCannonsAtExpansions(2),
     new If(
       new Or(
@@ -63,9 +63,9 @@ class PvT2BaseArbiters extends GameplanModeTemplate {
           RequestUpgrade(Protoss.ArbiterEnergy),
           RequestAtLeast(2, Protoss.Stargate))))),
     new OnGasBases(3, new UpgradeContinuously(Protoss.GroundArmor)),
-    new OnMiningBases(2, new Build(RequestAtLeast(11, Protoss.Gateway))),
-    new OnMiningBases(3, new Build(RequestAtLeast(16, Protoss.Gateway))),
-    new OnMiningBases(4, new Build(RequestAtLeast(20, Protoss.Gateway)))
+    new IfOnMiningBases(2, new Build(RequestAtLeast(11, Protoss.Gateway))),
+    new IfOnMiningBases(3, new Build(RequestAtLeast(16, Protoss.Gateway))),
+    new IfOnMiningBases(4, new Build(RequestAtLeast(20, Protoss.Gateway)))
   )
 }
 

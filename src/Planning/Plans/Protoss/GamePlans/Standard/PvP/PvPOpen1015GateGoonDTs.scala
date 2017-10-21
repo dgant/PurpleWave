@@ -8,7 +8,7 @@ import Planning.Plans.Information.Employing
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Macro.Milestones.{EnemyUnitsAtMost, OnMiningBases, UnitsAtLeast}
+import Planning.Plans.Macro.Milestones.{EnemyUnitsAtMost, MiningBasesAtLeast, UnitsAtLeast}
 import Planning.Plans.Protoss.ProtossBuilds
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP.PvPOpen1015GateDTs
@@ -16,7 +16,8 @@ import Strategery.Strategies.Protoss.PvP.PvPOpen1015GateDTs
 class PvPOpen1015GateGoonDTs extends GameplanModeTemplate {
   
   override val activationCriteria : Plan      = new Employing(PvPOpen1015GateDTs)
-  override val completionCriteria : Plan      = new OnMiningBases(2)
+  override val completionCriteria : Plan      = new MiningBasesAtLeast(2)
+  override def defaultAttackPlan  : Plan      = new PvPIdeas.AttackSafely
   override def emergencyPlans     : Seq[Plan] = Seq(new PvPIdeas.ReactToDarkTemplarEmergencies)
   
   override val buildOrder: Seq[BuildRequest] =

@@ -7,14 +7,15 @@ import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Information.Employing
 import Planning.Plans.Macro.Automatic.RequireSufficientSupply
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Macro.Milestones.{OnMiningBases, UnitsAtLeast}
+import Planning.Plans.Macro.Milestones.{MiningBasesAtLeast, UnitsAtLeast}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP.PvPOpen4GateGoon
 
 class PvPOpen4GateGoon extends GameplanModeTemplate {
   
   override val activationCriteria : Plan = new Employing(PvPOpen4GateGoon)
-  override val completionCriteria : Plan = new OnMiningBases(2)
+  override val completionCriteria : Plan = new MiningBasesAtLeast(2)
+  override def defaultAttackPlan  : Plan = new PvPIdeas.AttackSafely
   override val defaultWorkerPlan  : Plan = NoPlan()
   
   override val buildOrder: Seq[BuildRequest] = Vector(
@@ -52,7 +53,6 @@ class PvPOpen4GateGoon extends GameplanModeTemplate {
   
   override val buildPlans = Vector(
     new RequireSufficientSupply,
-    
     new FlipIf(
       new UnitsAtLeast(20, Protoss.Dragoon),
       new RequireMiningBases(2)))

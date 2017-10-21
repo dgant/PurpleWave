@@ -27,7 +27,9 @@ class PvPOpen1015GateGoonExpand extends GameplanModeTemplate {
     new FlipIf(
       new And(
         new UnitsAtLeast(5, Protoss.Dragoon),
-        new SafeAtHome),
+        new Or(
+          new UnitsAtLeast(8, Protoss.Dragoon),
+          new SafeAtHome)),
       new Parallel(
         new TrainContinuously(Protoss.Dragoon),
         new Build(RequestAtLeast(4, Protoss.Gateway)),

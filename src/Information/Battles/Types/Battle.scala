@@ -40,8 +40,8 @@ class Battle(
   lazy val analysis = new Analysis(this)
   lazy val desire: Double = analysis.desireTotal
   
-  lazy val globalSafeToAttack: Boolean = globalSafe(estimationAbstractOffense,        With.blackboard.aggressionRatio)
-  lazy val globalSafeToDefend: Boolean = globalSafe(estimationAbstractDefense, 1.0 /  With.blackboard.safetyRatio) || globalSafeToAttack
+  lazy val globalSafeToAttack: Boolean = globalSafe(estimationAbstractOffense, With.blackboard.aggressionRatio)
+  lazy val globalSafeToDefend: Boolean = globalSafe(estimationAbstractDefense, With.blackboard.safetyRatio) || globalSafeToAttack
   
   private def globalSafe(estimation: Estimation, discountFactor: Double): Boolean = {
     val tradesEffectively = discountFactor * estimation.costToEnemy - estimation.costToUs >= 0

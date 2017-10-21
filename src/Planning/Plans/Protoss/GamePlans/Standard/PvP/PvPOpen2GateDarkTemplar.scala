@@ -5,6 +5,7 @@ import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.RequestAtLeast
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
+import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Information.Employing
 import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
@@ -13,7 +14,7 @@ import Planning.Plans.Macro.Milestones.{EnemyUnitsAtMost, UnitsAtLeast, UnitsAtM
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP.PvPOpen2GateDTExpand
 
-class PvPOpen2GateDarkTemplar extends GameplanModeTemplatePvP {
+class PvPOpen2GateDarkTemplar extends GameplanModeTemplate {
   
   override val activationCriteria = new Employing(PvPOpen2GateDTExpand)
   override val defaultWorkerPlan  = NoPlan()

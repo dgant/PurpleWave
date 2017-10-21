@@ -4,6 +4,7 @@ import Macro.BuildRequests.{BuildRequest, RequestAtLeast, RequestUpgrade}
 import Planning.Plan
 import Planning.Plans.Army.{Attack, ConsiderAttacking}
 import Planning.Plans.Compound._
+import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Information.Employing
 import Planning.Plans.Macro.Automatic.{TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
@@ -12,7 +13,7 @@ import Planning.Plans.Macro.Milestones.{EnemyUnitsAtMost, UnitsAtLeast, UpgradeC
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP.PvPOpen3GateSpeedlots
 
-class PvPOpen3GateSpeedlots extends GameplanModeTemplatePvP {
+class PvPOpen3GateSpeedlots extends GameplanModeTemplate {
   
   override val activationCriteria : Plan = new Employing(PvPOpen3GateSpeedlots)
   override def defaultWorkerPlan  : Plan = NoPlan()

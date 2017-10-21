@@ -4,6 +4,7 @@ import Macro.BuildRequests.{BuildRequest, RequestAtLeast, RequestUpgrade}
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
 import Planning.Plans.Compound._
+import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Information.Employing
 import Planning.Plans.Information.Reactive.EnemyBasesAtLeast
 import Planning.Plans.Macro.Automatic.TrainContinuously
@@ -13,7 +14,7 @@ import Planning.Plans.Macro.Milestones.{EnemyUnitsAtLeast, UnitsAtLeast}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP.PvPOpen2GateRobo
 
-class PvPOpen2GateRobo extends GameplanModeTemplatePvP {
+class PvPOpen2GateRobo extends GameplanModeTemplate {
   
   override val activationCriteria : Plan = new Employing(PvPOpen2GateRobo)
   override val completionCriteria : Plan = new Or(

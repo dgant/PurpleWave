@@ -7,7 +7,7 @@ import bwapi.Race
 
 object PvPOpenProxy2Gate extends Strategy {
   
-  override def choices: Iterable[Iterable[Strategy]] = Vector(ProtossChoices.pvpOpenersWithTransitions)
+  override def choices: Iterable[Iterable[Strategy]] = Vector(ProtossChoices.pvpOpenersTransitioningFrom2Gate)
   
   override def ourRaces   : Iterable[Race]  = Vector(Race.Protoss)
   override def enemyRaces : Iterable[Race]  = Vector(Race.Protoss)

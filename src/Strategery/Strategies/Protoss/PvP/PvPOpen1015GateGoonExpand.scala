@@ -3,7 +3,7 @@ package Strategery.Strategies.Protoss.PvP
 import Strategery.Strategies.Strategy
 import bwapi.Race
 
-object PvPOpenZCoreZ extends Strategy {
+object PvPOpen1015GateGoonExpand extends Strategy {
   
   override def ourRaces    : Iterable[Race] = Vector(Race.Protoss)
   override def enemyRaces  : Iterable[Race] = Vector(Race.Protoss)

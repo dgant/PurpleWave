@@ -8,7 +8,7 @@ object PvROpenZZCore extends Strategy {
   
   override lazy val choices = Vector(
     ProtossChoices.pvtOpenersTransitioningFrom1Gate,
-    ProtossChoices.pvpOpenersWithTransitions,
+    ProtossChoices.pvpOpenersTransitioningFrom2Gate,
     ProtossChoices.pvzOpenersTransitioningFrom1Gate)
   
   override def ourRaces    : Iterable[Race] = Vector(Race.Protoss)

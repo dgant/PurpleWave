@@ -1,6 +1,5 @@
 package Planning.Plans.Protoss.GamePlans.Standard
 
-import Information.Intelligence.Fingerprinting.ZergStrategies._
 import Lifecycle.With
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{RequestAnother, RequestAtLeast, RequestTech, RequestUpgrade}
@@ -45,16 +44,16 @@ class ProtossVsZergOld extends Parallel {
     new Parallel(
       new ForgeFastExpand,
       new If(
-        new EnemyStrategy(new Fingerprint4Pool),
+        new EnemyStrategy(With.intelligence.fingerprints.fingerprint4Pool),
         new Build(ProtossBuilds.FFE_Vs4Pool: _*),
       new If(
         new Or(
-          new EnemyStrategy(new Fingerprint9Pool),
-          new EnemyStrategy(new FingerprintOverpool),
-          new EnemyStrategy(new Fingerprint10Hatch9Pool)),
+          new EnemyStrategy(With.intelligence.fingerprints.fingerprint9Pool),
+          new EnemyStrategy(With.intelligence.fingerprints.fingerprintOverpool),
+          new EnemyStrategy(With.intelligence.fingerprints.fingerprint10Hatch9Pool)),
         new Build(ProtossBuilds.FFE_ForgeFirst: _*),
       new If(
-        new EnemyStrategy(new Fingerprint12Hatch),
+        new EnemyStrategy(With.intelligence.fingerprints.fingerprint12Hatch),
         new If(
           new Employing(PvZEarlyFFEGatewayFirst),
           new BuildOrder(ProtossBuilds.FFE_GatewayFirst_Aggressive: _*), //Note -- BuildOrder, not Build! So we can train but not replace Zealots
@@ -71,7 +70,7 @@ class ProtossVsZergOld extends Parallel {
         new Build(ProtossBuilds.FFE_ForgeFirst: _*))))))),
       new RequireMiningBases(2),
       new If(
-        new EnemyStrategy(new Fingerprint10Hatch9Pool),
+        new EnemyStrategy(With.intelligence.fingerprints.fingerprint10Hatch9Pool),
         new Build(RequestAtLeast(4, Protoss.PhotonCannon))),
       new FFEFollowUp
     ))
@@ -212,7 +211,7 @@ class ProtossVsZergOld extends Parallel {
       new If(
         new And(
           new WeAreFFEing,
-          new EnemyStrategy(new Fingerprint4Pool),
+          new EnemyStrategy(With.intelligence.fingerprints.fingerprint4Pool),
           new Check(() => With.frame > 24 * 125),
           new UnitsAtLeast(1, Protoss.PhotonCannon, complete = false),
           new UnitsAtMost(1, Protoss.PhotonCannon, complete = true)),
@@ -224,9 +223,9 @@ class ProtossVsZergOld extends Parallel {
           new EnemyUnitsAtLeast(4, Zerg.Zergling),
           new WeAreFFEing,
           new Or(
-            new EnemyStrategy(new Fingerprint9Pool),
-            new EnemyStrategy(new FingerprintOverpool)),
-          new EnemyStrategy(new Fingerprint10Hatch9Pool),
+            new EnemyStrategy(With.intelligence.fingerprints.fingerprint9Pool),
+            new EnemyStrategy(With.intelligence.fingerprints.fingerprintOverpool)),
+          new EnemyStrategy(With.intelligence.fingerprints.fingerprint10Hatch9Pool),
           new Check(() => With.frame > 24 * 125),
           new UnitsAtMost(2, Protoss.PhotonCannon, complete = true)),
         new DefendFFEWithProbesAgainst9Pool)),

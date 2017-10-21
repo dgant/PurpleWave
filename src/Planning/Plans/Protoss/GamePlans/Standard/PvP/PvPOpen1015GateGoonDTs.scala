@@ -3,6 +3,7 @@ package Planning.Plans.Protoss.GamePlans.Standard.PvP
 import Macro.BuildRequests.{BuildRequest, RequestAtLeast}
 import Planning.Plan
 import Planning.Plans.Compound._
+import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Information.Employing
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
@@ -12,7 +13,7 @@ import Planning.Plans.Protoss.ProtossBuilds
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP.PvPOpen1015GateDTs
 
-class PvPOpen1015GateGoonDTs extends GameplanModeTemplatePvP {
+class PvPOpen1015GateGoonDTs extends GameplanModeTemplate {
   
   override val activationCriteria : Plan      = new Employing(PvPOpen1015GateDTs)
   override val completionCriteria : Plan      = new OnMiningBases(2)

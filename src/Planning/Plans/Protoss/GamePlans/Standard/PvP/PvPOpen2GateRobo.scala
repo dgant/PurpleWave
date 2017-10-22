@@ -18,6 +18,7 @@ class PvPOpen2GateRobo extends GameplanModeTemplate {
   
   override val activationCriteria : Plan = new Employing(PvPOpen2GateRobo)
   override def defaultAttackPlan  : Plan = new PvPIdeas.AttackSafely
+  override val scoutAt            : Int  = 14
   override val completionCriteria : Plan = new Or(
     new EnemyBasesAtLeast(2),
     new UnitsAtLeast(2, Protoss.Nexus),

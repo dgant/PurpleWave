@@ -19,6 +19,8 @@ class PvPOpen3GateSpeedlots extends GameplanModeTemplate {
   override val completionCriteria : Plan      = new MiningBasesAtLeast(2)
   override def defaultWorkerPlan  : Plan      = NoPlan()
   override def emergencyPlans     : Seq[Plan] = Seq(new PvPIdeas.ReactToDarkTemplarEmergencies)
+  override val aggression         : Double    = 1.2
+  override val scoutAt            : Int       = 14
   override def defaultAttackPlan  : Plan =
     new If(
       new EnemyUnitsAtMost(0, Protoss.Dragoon),

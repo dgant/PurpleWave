@@ -14,6 +14,7 @@ class FingerprintArrivesBy(
   trigger = true
   
   override def investigate: Boolean = {
+    // NOTE: THIS IS BUGGED because units can have completionTime Int.MAX which then overflows
     val units           = With.units.enemy.filter(_.is(unitClass))
     val arrivalFrame    = gameTime.frames
     val arrivalTimes    = units.map(u => (u, arrivaltime(u))).toMap

@@ -30,7 +30,7 @@ class PvPOpen12Nexus5Zealot extends GameplanModeTemplate {
   
   override val activationCriteria : Plan = new Employing(PvPOpen12Nexus5Zealot)
   override val completionCriteria : Plan = new UnitsAtLeast(3, Protoss.PhotonCannon, complete = true)
-  
+  override val scoutAt            : Int  = 14
   override def defaultSupplyPlan: Plan = NoPlan()
   override def defaultWorkerPlan: Plan = NoPlan()
   

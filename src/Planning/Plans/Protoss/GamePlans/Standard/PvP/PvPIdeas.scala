@@ -12,6 +12,12 @@ import ProxyBwapi.Races.Protoss
 
 object PvPIdeas {
   
+  class Crummy2GateDetection extends And(
+    new EnemyUnitsAtLeast(2,  Protoss.Gateway,          complete = true),
+    new EnemyUnitsAtMost(0,   Protoss.CyberneticsCore,  complete = true),
+    new EnemyHasShown(Protoss.Zealot, 3),
+    new Not(new EnemyHasShown(Protoss.Dragoon)))
+  
   class AttackSafely extends If(
     new And(
       new UnitsAtLeast(1, Protoss.Dragoon),

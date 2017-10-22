@@ -1,12 +1,10 @@
 package Planning.Plans.Protoss.GamePlans.Standard.PvP
 
-import Lifecycle.With
 import Macro.BuildRequests.RequestAtLeast
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Information.Scenarios.EnemyStrategy
 import Planning.Plans.Information.{Employing, SafeAtHome}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
@@ -26,14 +24,13 @@ class PvPOpen1GateGoonExpand extends GameplanModeTemplate {
   override def buildPlans = Vector(
     new PvPIdeas.BuildDragoonsOrZealots,
     new If(
-      new Or(
-        new EnemyStrategy(With.intelligence.fingerprints.fingerprintProxyGateway),
-        new EnemyStrategy(With.intelligence.fingerprints.fingerprint2Gate)),
-      new Build(RequestAtLeast(3, Protoss.Gateway))),
+      new PvPIdeas.Crummy2GateDetection,
+      new Build(RequestAtLeast(2, Protoss.Gateway))),
     new FlipIf(
       new And(
         new UnitsAtLeast(4, UnitMatchWarriors),
         new SafeAtHome),
-      new Build(RequestAtLeast(4, Protoss.Gateway))),
+      new Build(RequestAtLeast(4, Protoss.Gateway)),
       new RequireMiningBases(2))
+  )
 }

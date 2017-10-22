@@ -16,6 +16,7 @@ class PvPOpen4GateGoon extends GameplanModeTemplate {
   override val activationCriteria : Plan = new Employing(PvPOpen4GateGoon)
   override val completionCriteria : Plan = new MiningBasesAtLeast(2)
   override def defaultAttackPlan  : Plan = new PvPIdeas.AttackSafely
+  override val scoutAt            : Int  = 14
   override val defaultWorkerPlan  : Plan = NoPlan()
   
   override val buildOrder: Seq[BuildRequest] = Vector(

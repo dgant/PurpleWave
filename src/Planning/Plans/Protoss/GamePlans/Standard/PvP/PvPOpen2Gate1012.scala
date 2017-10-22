@@ -19,6 +19,7 @@ class PvPOpen2Gate1012 extends GameplanModeTemplate {
   override val activationCriteria : Plan      = new Employing(PvPOpen2Gate1012)
   override val completionCriteria : Plan      = new MiningBasesAtLeast(2)
   override def defaultAttackPlan  : Plan      = new PvPIdeas.AttackSafely
+  override val scoutAt            : Int       = 12
   override def emergencyPlans     : Seq[Plan] = Seq(new PvPIdeas.ReactToDarkTemplarEmergencies)
   
   override val buildOrder = ProtossBuilds.OpeningTwoGate1012
@@ -41,7 +42,10 @@ class PvPOpen2Gate1012 extends GameplanModeTemplate {
           new EnemyBasesAtLeast(2),
           new If(
             new SafeToAttack,
-            new Build(RequestAtLeast(4, Protoss.Gateway)),
+            new Build(
+              RequestAtLeast(1, Protoss.Assimilator),
+              RequestAtLeast(1, Protoss.CyberneticsCore),
+              RequestAtLeast(4, Protoss.Gateway)),
             new If(
               new SafeAtHome,
               new RequireMiningBases(2)))),

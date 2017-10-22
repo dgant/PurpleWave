@@ -1,5 +1,6 @@
 package Planning.Plans.Protoss.GamePlans.Standard.PvP
 
+import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.RequestAtLeast
@@ -10,18 +11,24 @@ import Planning.Plans.Information.Employing
 import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildCannonsAtNatural, RequireMiningBases}
-import Planning.Plans.Macro.Milestones.{EnemyUnitsAtMost, UnitsAtLeast, UnitsAtMost}
+import Planning.Plans.Macro.Milestones.{EnemyUnitsAtMost, MiningBasesAtLeast, UnitsAtLeast, UnitsAtMost}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP.PvPOpen2GateDTExpand
 
 class PvPOpen2GateDarkTemplar extends GameplanModeTemplate {
   
   override val activationCriteria = new Employing(PvPOpen2GateDTExpand)
+  override val completionCriteria = new MiningBasesAtLeast(2)
   override val defaultWorkerPlan  = NoPlan()
+  override val scoutAt            = 14
   override val defaultAttackPlan  = new Trigger(new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true), initialAfter = new Attack)
-  override val blueprints = Vector(
+  override def blueprints = Vector(
     new Blueprint(this, building = Some(Protoss.Pylon),   placement = Some(PlacementProfiles.backPylon)),
-    new Blueprint(this, building = Some(Protoss.Gateway), placement = Some(PlacementProfiles.backPylon)))
+    new Blueprint(this, building = Some(Protoss.Gateway), placement = Some(PlacementProfiles.backPylon)),
+    new Blueprint(this, building = Some(Protoss.Pylon)),
+    new Blueprint(this, building = Some(Protoss.Pylon)),
+    new Blueprint(this, building = Some(Protoss.Pylon)),
+    new Blueprint(this, building = Some(Protoss.Pylon), requireZone = Some(With.geography.ourNatural.zone)))
   
   override val buildOrder = Vector(
     // http://wiki.teamliquid.net/starcraft/2_Gateway_Dark_Templar_(vs._Protoss)
@@ -65,7 +72,7 @@ class PvPOpen2GateDarkTemplar extends GameplanModeTemplate {
         new EnemyUnitsAtMost(0, Protoss.Observer),
         new EnemyUnitsAtMost(0, Protoss.Observatory),
         new UnitsAtMost(2, Protoss.DarkTemplar)),
-      new TrainContinuously(Protoss.DarkTemplar, 3),
+      new TrainContinuously(Protoss.DarkTemplar, 3, 1),
       new TrainContinuously(Protoss.Dragoon)),
     new TrainWorkersContinuously,
   

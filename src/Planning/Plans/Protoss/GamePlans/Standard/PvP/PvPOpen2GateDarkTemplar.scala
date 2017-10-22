@@ -9,7 +9,6 @@ import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Information.Employing
 import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
-import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildCannonsAtNatural, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.{EnemyUnitsAtMost, MiningBasesAtLeast, UnitsAtLeast, UnitsAtMost}
 import ProxyBwapi.Races.Protoss
@@ -72,11 +71,9 @@ class PvPOpen2GateDarkTemplar extends GameplanModeTemplate {
         new EnemyUnitsAtMost(0, Protoss.Observer),
         new EnemyUnitsAtMost(0, Protoss.Observatory),
         new UnitsAtMost(2, Protoss.DarkTemplar)),
-      new TrainContinuously(Protoss.DarkTemplar, 3, 1),
-      new TrainContinuously(Protoss.Dragoon)),
+        new TrainContinuously(Protoss.DarkTemplar, 3, 1)),
+    new TrainContinuously(Protoss.Dragoon),
     new TrainWorkersContinuously,
-  
-    new Build(RequestAtLeast(1, Protoss.Forge)),
     new BuildCannonsAtNatural(2),
     new RequireMiningBases(2))
 }

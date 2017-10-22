@@ -7,7 +7,7 @@ import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Information.{Employing, SafeAtHome}
 import Planning.Plans.Macro.Automatic.TrainContinuously
-import Planning.Plans.Macro.BuildOrders.Build
+import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Milestones._
 import Planning.Plans.Protoss.ProtossBuilds
@@ -41,9 +41,10 @@ class PvPOpen1GateReaverExpand extends GameplanModeTemplate {
         new SafeAtHome),
       new Build(RequestAtLeast(3, Protoss.Gateway)),
       new Parallel(
-        new Build(
+        new BuildOrder(
           RequestAtLeast(1, Protoss.RoboticsFacility),
-          RequestAtLeast(1, Protoss.RoboticsSupportBay)),
+          RequestAtLeast(1, Protoss.RoboticsSupportBay),
+          RequestAtLeast(1, Protoss.Reaver)),
         new RequireMiningBases(2)))
   )
 }

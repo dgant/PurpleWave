@@ -47,4 +47,8 @@ object PurpleMath {
     else if (angleRadians > twoPi) normalizeAngle(angleRadians - twoPi)
     else    angleRadians
   }
+  
+  def geometricMean(values: Iterable[Double]): Double = {
+    Math.pow(values.product, values.size)
+  }
 }

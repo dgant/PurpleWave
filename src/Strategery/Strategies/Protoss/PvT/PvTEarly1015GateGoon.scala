@@ -9,6 +9,7 @@ object PvTEarly1015GateGoon extends Strategy {
     Vector(
       PvT2BaseGateway,
       PvT2BaseGatewayForever,
+      PvTFastThird,
       PvT2BaseCarrier,
       PvT3BaseCorsair))
   

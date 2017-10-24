@@ -1,6 +1,7 @@
 package Strategery
 
 import Lifecycle.With
+import Mathematics.PurpleMath
 import Performance.Cache
 import Planning.Plan
 import Planning.Plans.WinTheGame
@@ -107,35 +108,25 @@ class Strategist {
     evaluations(strategy)
   }
   
-  private def chooseBest(strategies: Iterable[Strategy]): Iterable[Strategy] = {
-    if (strategies.isEmpty) {
-      return Iterable.empty
-    }
+  private def chooseBest(topLevelStrategies: Iterable[Strategy]): Iterable[Strategy] = {
+    val permutations            = flattenStrategies(topLevelStrategies)
+    val strategies              = permutations.flatten.toVector.distinct
+    val strategyEvaluations     = strategies.map(strategy => (strategy, evaluate(strategy))).toMap
+    val permutationEvaluations  = permutations.map(p => (p, p.map(strategyEvaluations))).toMap
+    val permutationInterest     = permutationEvaluations.map(p => (p._1, PurpleMath.geometricMean(p._2.map(_.interestTotal))))
+    val mostInterest            = permutationInterest.values.max
+    val bestPermutation         = permutationInterest.find(_._2 >= mostInterest).get
+    bestPermutation
     
-    val output        = new ArrayBuffer[Strategy]
-    val evaluated     = strategies.map(evaluate)
-    val bestVsEnemy   = evaluated.map(_.winrateVsEnemy).max
-    val untested      = evaluated.filter(_.games.isEmpty)
-    
-    val bestEvaluation = evaluated.toSeq.sortBy(_.playbookOrder).maxBy(_.interestTotal)
-      /*
-      if (bestVsEnemy >= With.configuration.rideItOutWinrate) {
-        evaluated
-          .filter(_.winrateVsEnemy >= bestVsEnemy)
-          .toVector
-          .minBy(_.playbookOrder)
-      }
-      else if (untested.nonEmpty) {
-        untested.minBy(_.playbookOrder)
-      }
-      else {
-        evaluated.maxBy(_.interestTotal)
-      }*/
-    
-    val bestStrategy = bestEvaluation.strategy
-    output.append(bestStrategy)
-    output ++= bestStrategy.choices.flatMap(choice => chooseBest(filterForcedStrategies(choice.filter(isAppropriate))))
-    output
+  }
+  
+  private def flattenStrategies(strategies: Iterable[Strategy]): Iterable[Iterable[Strategy]] = {
+    strategies.map(s => s.choices.flatMap(c => Iterable(s) ++ flattenStrategies(c)))
+  }
+  
+  private def flattenStrategy(strategy: Strategy): Iterable[Iterable[Strategy]] = {
+    val choices = filterForcedStrategies(strategy.choices.filter(isAppropriate))
+    strategies.map(s => s.choices.flatMap(c => Iterable(s) ++ flattenStrategies(c)))
   }
 }
 

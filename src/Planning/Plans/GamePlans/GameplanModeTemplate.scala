@@ -19,7 +19,7 @@ abstract class GameplanModeTemplate extends GameplanMode {
   def aggression            : Double            = 1.0
   def removeMineralBlocksAt : Int               = 60
   def scoutAt               : Int               = 14
-  def scoutExpansionsAt     : Int               = 100
+  def scoutExpansionsAt     : Int               = 60
   def superSaturate         : Boolean           = false
   def blueprints            : Seq[Blueprint]    = Seq.empty
   def buildOrder            : Seq[BuildRequest] = Vector.empty

@@ -2,7 +2,7 @@ package Micro.Actions.Combat.Tactics
 
 import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Actions.Combat.Maneuvering.{Avoid, KiteSafely}
+import Micro.Actions.Combat.Maneuvering.KiteSafely
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import bwapi.Race
@@ -17,13 +17,14 @@ object BustBunker extends Action {
   // Range-upgraded Dragoons just barely outrange a Bunker containing non-range-upgraded Marines.
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    With.enemies.exists(_.raceInitial == Race.Terran)                    &&
+    With.enemies.exists(_.raceInitial == Race.Terran)             &&
     unit.agent.canFight                                           &&
     unit.canMove                                                  &&
     unit.is(Protoss.Dragoon)                                      &&
     With.self.hasUpgrade(Protoss.DragoonRange)                    &&
     unit.matchups.threats.forall( ! _.is(Terran.SiegeTankSieged)) &&
     unit.matchups.targets.exists(target =>
+      target.visible            &&
       target.aliveAndComplete   &&
       target.is(Terran.Bunker)  &&
       ! target.player.hasUpgrade(Terran.MarineRange))

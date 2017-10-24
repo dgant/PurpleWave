@@ -7,6 +7,8 @@ class ProtossVsTerran extends ModalGameplan(
   new PvT13Nexus,
   new PvT1GateRange,
   new PvT1015GateExpand,
+  new PvT1015GateDT,
+  new PvT4Gate,
   new PvT1GateProxy,
   new PvTDTExpand,
   new PvT1GateStargate,
@@ -15,6 +17,7 @@ class ProtossVsTerran extends ModalGameplan(
   new PvT2BaseCarriers,
   new PvT2BaseGateways,
   new PvT2BaseGatewaysForever,
+  new PvTFastThird,
   new PvT3BaseCorsairs,
   new PvT3BaseArbiters,
   new PvT3BaseCarriers

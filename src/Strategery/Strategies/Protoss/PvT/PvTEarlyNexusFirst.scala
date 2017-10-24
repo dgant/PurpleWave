@@ -9,6 +9,7 @@ object PvTEarlyNexusFirst extends Strategy {
     Vector(
       PvT2BaseGateway,
       PvT2BaseGatewayForever,
+      PvTFastThird,
       PvT2BaseCarrier,
       PvT3BaseCorsair))
   

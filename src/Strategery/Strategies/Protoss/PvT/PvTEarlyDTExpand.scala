@@ -9,6 +9,7 @@ object PvTEarlyDTExpand extends Strategy {
     Vector(
       PvT2BaseGateway,
       PvT2BaseGatewayForever,
+      PvTFastThird,
       PvT2BaseArbiter))
   
   override def ourRaces    : Iterable[Race] = Vector(Race.Protoss)

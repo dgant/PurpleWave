@@ -11,7 +11,7 @@ import Planning.Plans.Macro.Expanding.BuildGasPumps
 import Planning.Plans.Macro.Milestones._
 import Planning.Plans.Protoss.Situational.PlaceGatewaysProxied
 import Planning.Plans.Scouting.Scout
-import Planning.ProxyPlanner
+import Planning.{Plan, ProxyPlanner}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP.PvPOpenProxy2Gate
 import Strategery.Strategies.Protoss.PvR.PvROpenProxy2Gate
@@ -24,12 +24,15 @@ class Proxy2Gate extends GameplanModeTemplate {
   override val completionCriteria = new UpgradeComplete(Protoss.DragoonRange)
   override def defaultScoutPlan   = new If(new UnitsAtLeast(2, Protoss.Gateway), new Scout)
   override val aggression         = 1.2
+  override def defaultSupplyPlan: Plan = NoPlan()
+  override def defaultWorkerPlan: Plan = NoPlan()
   
   private class BeforeProxy extends Parallel(
     new PlaceGatewaysProxied(2, () => ProxyPlanner.proxyAutomaticSneaky),
     new BuildOrder(
       RequestAtLeast(8, Protoss.Probe),
-      RequestAtLeast(1, Protoss.Pylon)),
+      RequestAtLeast(1, Protoss.Pylon),
+      RequestAtLeast(9, Protoss.Probe)),
     new If(new UnitsAtLeast(1, Protoss.Pylon),    new Build(RequestAtLeast(1, Protoss.Gateway))),
     new If(new UnitsAtLeast(1, Protoss.Gateway),  new Build(RequestAtLeast(2, Protoss.Gateway))))
   

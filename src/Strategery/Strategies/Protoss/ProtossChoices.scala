@@ -37,11 +37,13 @@ object ProtossChoices {
     PvTEarly1GateStargate,
     PvTEarly1GateStargateTemplar,
     PvTEarlyDTExpand,
-    PvTEarly1015GateGoon
+    PvTEarly1015GateGoon,
+    PvTEarly4Gate
   )
   
   val pvtOpenersTransitioningFrom2Gate = Vector(
-    PvTEarly1015GateGoon
+    PvTEarly1015GateGoon,
+    PvTEarly4Gate
   )
   
   val pvtOpenersWithTransitions: Vector[Strategy] = (pvtOpenersTransitioningFrom1Gate ++ pvtOpenersTransitioningFrom2Gate).distinct

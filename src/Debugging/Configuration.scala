@@ -16,15 +16,15 @@ class Configuration {
   // Strategy //
   //////////////
   
-  var targetWinrate       = 0.9
-  var strategyRandomness  = 0.1
+  var targetWinrate       = 0.7
+  var strategyRandomness  = 0.2
   var historyHalfLife     = 100.0
   
   ///////////
   // Micro //
   ///////////
   
-  var concaveMarginPixels             = 4.0
+  var concaveMarginPixels             = 16.0
   var retreatCaution                  = 1.4
   var assumedBuilderTravelSpeed       = 0.65
   var attackableRangeBufferPixels     = 4
@@ -106,7 +106,7 @@ class Configuration {
   var visualizationProbabilityHappyVision = 0.05
   var visualizationProbabilityTextOnly    = 0.01
   
-  var camera                      = true
+  var camera                      = false
   var cameraDynamicSpeed          = false
   var cameraDynamicSpeedSlowest   = 30
   var cameraDynamicSpeedFastest   = 0

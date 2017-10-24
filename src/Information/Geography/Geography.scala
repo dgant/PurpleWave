@@ -11,7 +11,6 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 class Geography {
-  
   lazy val mapArea            : TileRectangle           = TileRectangle(Tile(0, 0), Tile(With.mapTileWidth, With.mapTileHeight))
   lazy val allTiles           : Iterable[Tile]          = mapArea.tiles
   lazy val startBases         : Iterable[Base]          = bases.filter(_.isStartLocation)
@@ -19,7 +18,7 @@ class Geography {
   lazy val zones              : Iterable[Zone]          = ZoneBuilder.zones
   lazy val edges              : Iterable[Edge]          = ZoneBuilder.edges
   lazy val bases              : Iterable[Base]          = ZoneBuilder.bases
-  lazy val ourMain            : Base                    = With.geography.ourBases.find(_.isStartLocation).get
+  lazy val ourMain            : Base                    = With.geography.ourBases.find(_.isStartLocation).getOrElse(With.geography.bases.minBy(_.heart.tileDistanceFast(With.self.startTile)))
   def ourNatural              : Base                    = ourNaturalCache()
   def ourZones                : Iterable[Zone]          = ourZonesCache()
   def ourBases                : Iterable[Base]          = ourBasesCache()

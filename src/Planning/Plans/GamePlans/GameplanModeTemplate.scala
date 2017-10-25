@@ -27,6 +27,7 @@ abstract class GameplanModeTemplate extends GameplanMode {
   def buildPlans            : Seq[Plan]         = Vector.empty
   def defaultAggressionPlan : Plan              = new Aggression(aggression)
   def defaultPlacementPlan  : Plan              = new ProposePlacement(blueprints: _*)
+  def defaultArchonPlan     : Plan              = new MeldArchons(meldArchonsAt)
   def defaultSupplyPlan     : Plan              = new RequireSufficientSupply
   def defaultWorkerPlan     : Plan              = new TrainWorkersContinuously(superSaturate)
   def defaultScoutPlan      : Plan              = new ScoutAt(scoutAt)
@@ -34,8 +35,9 @@ abstract class GameplanModeTemplate extends GameplanMode {
   def priorityAttackPlan    : Plan              = NoPlan()
   def defaultAttackPlan     : Plan              = new ConsiderAttacking
   
+  
   def defaultMacroPlans: Vector[Plan] = Vector(
-    new MeldArchons(meldArchonsAt),
+    defaultArchonPlan,
     new ClearBurrowedBlockers,
     new FollowBuildOrder,
     new RemoveMineralBlocksAt(removeMineralBlocksAt))

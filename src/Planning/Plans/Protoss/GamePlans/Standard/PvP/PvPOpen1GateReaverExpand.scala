@@ -1,6 +1,6 @@
 package Planning.Plans.Protoss.GamePlans.Standard.PvP
 
-import Macro.BuildRequests.RequestAtLeast
+import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
 import Planning.Plans.Compound._
@@ -17,10 +17,9 @@ import Strategery.Strategies.Protoss.PvP.PvPOpen1GateReaverExpand
 class PvPOpen1GateReaverExpand extends GameplanModeTemplate {
   
   override val activationCriteria : Plan      = new Employing(PvPOpen1GateReaverExpand)
-  override val completionCriteria : Plan      = new MiningBasesAtLeast(2)
+  override val completionCriteria : Plan      = new And(new MiningBasesAtLeast(2), new UnitsAtLeast(1, Protoss.RoboticsSupportBay))
   override def emergencyPlans     : Seq[Plan] = Seq(new PvPIdeas.ReactToDarkTemplarEmergencies)
   override val aggression         : Double    = 0.8
-  
   
   override val buildOrder = ProtossBuilds.OpeningZCoreZ
   override def buildPlans = Vector(
@@ -39,12 +38,18 @@ class PvPOpen1GateReaverExpand extends GameplanModeTemplate {
       new And(
         new UnitsAtLeast(4, UnitMatchWarriors),
         new SafeAtHome),
-      new Build(RequestAtLeast(3, Protoss.Gateway)),
+      new Build(
+        RequestAtLeast(2, Protoss.Gateway),
+        RequestUpgrade(Protoss.DragoonRange),
+        RequestAtLeast(3, Protoss.Gateway)),
       new Parallel(
         new BuildOrder(
           RequestAtLeast(1, Protoss.RoboticsFacility),
           RequestAtLeast(1, Protoss.RoboticsSupportBay),
           RequestAtLeast(1, Protoss.Reaver)),
-        new RequireMiningBases(2)))
+        new RequireMiningBases(2),
+        new Build(
+          RequestUpgrade(Protoss.DragoonRange),
+          RequestAtLeast(5, Protoss.Gateway))))
   )
 }

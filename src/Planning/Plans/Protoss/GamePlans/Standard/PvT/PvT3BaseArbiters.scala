@@ -24,6 +24,9 @@ class PvT3BaseArbiters extends GameplanModeTemplate {
     new BuildCannonsAtExpansions(2),
     new BuildCannonsAtNatural(1),
     new BuildGasPumps,
+    new Build(
+      RequestAtLeast(1, Protoss.RoboticsFacility),
+      RequestAtLeast(1, Protoss.Observatory)),
     new FlipIf(
       new UnitsAtLeast(18, UnitMatchWarriors),
       new Parallel(
@@ -36,6 +39,9 @@ class PvT3BaseArbiters extends GameplanModeTemplate {
         new PvTIdeas.Require3BaseTech,
         new RequireMiningBases(3),
         new Build(
+          RequestAtLeast(1, Protoss.CitadelOfAdun),
+          
+          RequestAtLeast(1, Protoss.TemplarArchives),
           RequestAtLeast(1, Protoss.Stargate),
           RequestUpgrade(Protoss.HighTemplarEnergy),
           RequestAtLeast(1, Protoss.ArbiterTribunal),

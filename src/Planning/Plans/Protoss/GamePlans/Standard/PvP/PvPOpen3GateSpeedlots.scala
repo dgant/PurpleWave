@@ -8,7 +8,7 @@ import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Information.Employing
 import Planning.Plans.Macro.Automatic.{TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Macro.Expanding.RequireMiningBases
+import Planning.Plans.Macro.Expanding.{BuildCannonsAtNatural, RequireMiningBases}
 import Planning.Plans.Macro.Milestones._
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP.PvPOpen3GateSpeedlots
@@ -61,5 +61,6 @@ class PvPOpen3GateSpeedlots extends GameplanModeTemplate {
           RequestUpgrade(Protoss.ZealotSpeed),
           RequestAtLeast(3, Protoss.Gateway)),
         new TrainWorkersContinuously)),
+    new BuildCannonsAtNatural(2),
     new RequireMiningBases(2))
 }

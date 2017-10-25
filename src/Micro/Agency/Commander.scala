@@ -68,7 +68,14 @@ class Commander {
       unit.baseUnit.attack(target.pixelCenter.bwapi)
     }
     else if (target.visible) {
-      if (unit.readyForAttackOrder || ! unit.target.contains(target) || With.framesSince(unit.lastAttackStartFrame) > unit.cooldownMaxAirGround * 1.5) {
+      lazy val moving           = unit.moving
+      lazy val alreadyInRange   = unit.inRangeToAttackBwapi(target)
+      lazy val overdueToAttack  = unit.cooldownLeft == 0 && With.framesSince(unit.lastAttackStartFrame) > unit.cooldownMaxAirGround
+      lazy val thisIsANewTarget = ! unit.target.contains(target)
+      
+      val shouldOrder = thisIsANewTarget || (overdueToAttack && (moving || alreadyInRange))
+      
+      if (shouldOrder) {
         unit.baseUnit.attack(target.baseUnit)
       }
       sleepAttack(unit)
@@ -264,14 +271,14 @@ class Commander {
   def rally(unit: FriendlyUnitInfo, pixel: Pixel) {
     if (unready(unit)) return
     unit.baseUnit.setRallyPoint(pixel.bwapi)
-    unit.hasSetRallyPoint = true
+    unit.lastSetRally = With.frame
     sleep(unit)
   }
   
   def rally(unit: FriendlyUnitInfo, targetUnit: UnitInfo) {
     if (unready(unit)) return
     unit.baseUnit.setRallyPoint(unit.baseUnit)
-    unit.hasSetRallyPoint = true
+    unit.lastSetRally = With.frame
     sleep(unit)
   }
   

@@ -421,6 +421,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit) extends UnitProxy(baseUnit) {
   def pixelReachMax     (framesAhead: Int): Double = Math.max(pixelReachAir(framesAhead), pixelReachGround(framesAhead))
   def pixelReachAgainst (framesAhead: Int, enemy:UnitInfo): Double = if (enemy.flying) pixelReachAir(framesAhead) else pixelReachGround(framesAhead)
   
+  def inRangeToAttackBwapi(enemy: UnitInfo)                       : Boolean = baseUnit.isInWeaponRange(enemy.baseUnit)
   def inRangeToAttackSlow(enemy: UnitInfo)                        : Boolean = pixelsFromEdgeSlow(enemy) <= pixelRangeAgainstFromEdge(enemy)     + With.configuration.attackableRangeBufferPixels && (pixelRangeMin <= 0.0 || pixelsFromEdgeSlow(enemy) > pixelRangeMin)
   def inRangeToAttackFast(enemy: UnitInfo)                        : Boolean = pixelsFromEdgeFast(enemy) <= pixelRangeAgainstFromEdge(enemy)     + With.configuration.attackableRangeBufferPixels && (pixelRangeMin <= 0.0 || pixelsFromEdgeFast(enemy) > pixelRangeMin)
   def inRangeToAttackSlow(enemy: UnitInfo, framesAhead  : Int)    : Boolean = enemy.projectFrames(framesAhead).pixelDistanceSlow(projectFrames(framesAhead)) <= pixelRangeAgainstFromEdge(enemy) + unitClass.radialHypotenuse + enemy.unitClass.radialHypotenuse + With.configuration.attackableRangeBufferPixels //TODO: Needs min range!

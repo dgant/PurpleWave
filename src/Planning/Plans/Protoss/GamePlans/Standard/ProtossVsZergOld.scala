@@ -302,7 +302,7 @@ class ProtossVsZergOld extends Parallel {
       new And(
         new EnemyMutalisks,
         new UnitsAtMost(5, Protoss.Corsair),
-        new UnitsAtMost(12, Protoss.Dragoon)),
+        new UnitsAtMost(8, Protoss.Dragoon)),
       new Parallel(
         new BuildCannonsAtBases(2, PlacementProfiles.cannonAgainstAir),
         new TrainMatchingRatio(Protoss.Dragoon, 0, 6, Seq(MatchingRatio(Zerg.Mutalisk, 0.75)))),

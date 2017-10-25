@@ -32,11 +32,11 @@ class PvPLateGame extends GameplanModeTemplate {
   
   class BuildTechPartOne extends Parallel(
     new Build(
-      RequestAtLeast(1, Protoss.RoboticsFacility),
-      RequestAtLeast(1, Protoss.Observatory),
       RequestAtLeast(1, Protoss.CitadelOfAdun),
       RequestUpgrade(Protoss.ZealotSpeed),
       RequestAtLeast(8, Protoss.Gateway),
+      RequestAtLeast(1, Protoss.RoboticsFacility),
+      RequestAtLeast(1, Protoss.Observatory),
       RequestAtLeast(1, Protoss.Forge)),
     new UpgradeContinuously(Protoss.GroundDamage),
     new Build(
@@ -49,6 +49,11 @@ class PvPLateGame extends GameplanModeTemplate {
       RequestAtLeast(1, Protoss.RoboticsSupportBay),
       RequestUpgrade(Protoss.ShuttleSpeed)))
   
+  override def defaultArchonPlan: Plan = new If(
+    new TechComplete(Protoss.PsionicStorm),
+    new MeldArchons(meldArchonsAt),
+    new MeldArchons(120)
+  )
   override val buildPlans = Vector(
     new BuildGasPumps,
     new TrainMatchingRatio(Protoss.Observer, 1, 3, Seq(MatchingRatio(Protoss.DarkTemplar, 2.0))),

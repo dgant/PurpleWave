@@ -7,9 +7,9 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 object Rally extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    ! unit.hasSetRallyPoint           &&
-    unit.unitClass.isBuilding         &&
-    unit.unitClass.trainsGroundUnits  &&
+    With.framesSince(unit.lastSetRally) > 24 * 15 &&
+    unit.unitClass.isBuilding                     &&
+    unit.unitClass.trainsGroundUnits              &&
     unit.canDoAnything
   }
   

@@ -30,7 +30,7 @@ class FriendlyUnitInfo(base: bwapi.Unit) extends FriendlyUnitProxy(base) {
   // Orders //
   ////////////
   
-  var hasSetRallyPoint: Boolean = false
+  var lastSetRally: Int = 0
   
   def getBuildUnit  : Option[UnitInfo]  = With.units.get(base.getBuildUnit)
   def techingType   : Tech              = Techs.get(base.getTech)

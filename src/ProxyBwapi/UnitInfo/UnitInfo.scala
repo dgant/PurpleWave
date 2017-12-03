@@ -124,11 +124,11 @@ abstract class UnitInfo(baseUnit: bwapi.Unit) extends UnitProxy(baseUnit) {
           lastState.defensiveMatrixPoints - defensiveMatrixPoints)
         .getOrElse(0)))
   
-  private lazy val stuckMoveFrames    = 8
-  private lazy val stuckAttackFrames  = cooldownMaxAirGround + 8
+  private lazy val stuckMoveFrames    = 6
+  private lazy val stuckAttackFrames  = cooldownMaxAirGround + 6
   private lazy val stuckFramesMax     = Math.max(stuckMoveFrames, stuckAttackFrames)
   def seeminglyStuck: Boolean = {
-    val recentHistory = history.takeRight(stuckFramesMax)
+    val recentHistory = history.takeRight(stuckFramesMax + With.latency.latencyFrames)
     history.size >= stuckFramesMax && (
       history.takeRight(stuckMoveFrames   ).forall(state => state.couldMoveThisFrame    && state.tryingToMove   && state.pixelCenter == pixelCenter) ||
       history.takeRight(stuckAttackFrames ).forall(state => state.couldAttackThisFrame  && state.tryingToAttack && state.pixelCenter == pixelCenter && state.cooldown == 0)

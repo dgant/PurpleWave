@@ -14,7 +14,6 @@ import Strategery.Strategies.Zerg.ZergChoices
 import bwapi.Race
 
 import scala.collection.mutable
-import scala.collection.mutable.ArrayBuffer
 
 class Strategist {
   
@@ -109,24 +108,83 @@ class Strategist {
   }
   
   private def chooseBest(topLevelStrategies: Iterable[Strategy]): Iterable[Strategy] = {
-    val permutations            = flattenStrategies(topLevelStrategies)
+    val permutations            = topLevelStrategies.flatMap(expandStrategy)
     val strategies              = permutations.flatten.toVector.distinct
     val strategyEvaluations     = strategies.map(strategy => (strategy, evaluate(strategy))).toMap
     val permutationEvaluations  = permutations.map(p => (p, p.map(strategyEvaluations))).toMap
     val permutationInterest     = permutationEvaluations.map(p => (p._1, PurpleMath.geometricMean(p._2.map(_.interestTotal))))
     val mostInterest            = permutationInterest.values.max
     val bestPermutation         = permutationInterest.find(_._2 >= mostInterest).get
-    bestPermutation
+    bestPermutation._1
+  }
+  
+  private def filterStrategies(strategies: Iterable[Strategy]): Iterable[Strategy] = {
+    filterForcedStrategies(strategies.filter(isAppropriate))
+  }
+  
+  private def expandStrategy(strategy: Strategy): Iterable[Iterable[Strategy]] = {
     
-  }
-  
-  private def flattenStrategies(strategies: Iterable[Strategy]): Iterable[Iterable[Strategy]] = {
-    strategies.map(s => s.choices.flatMap(c => Iterable(s) ++ flattenStrategies(c)))
-  }
-  
-  private def flattenStrategy(strategy: Strategy): Iterable[Iterable[Strategy]] = {
-    val choices = filterForcedStrategies(strategy.choices.filter(isAppropriate))
-    strategies.map(s => s.choices.flatMap(c => Iterable(s) ++ flattenStrategies(c)))
+    /*
+    1. Start:
+    Groups of(Pick one of these strategies)
+    S:[[ABC],[DEF],[GHI],[JKL]
+    
+    2. Filter illegal choices I, JKL
+    Groups of(Pick one of these legal strategies)
+    S:[[ABC],[DEF],[GH],[]]
+    
+    3. Remove empty choice groups
+    Non-empty groups of (Pick one of these legal strategies)
+    S:
+    [
+      [ABC],
+      [DEF],
+      [GH]
+    ]
+    
+    4. Replace all choices with their expanded counterparts
+    Non-empty groups of(Pick one of these(Chain of strategies)))
+    S:
+    [
+      [
+        [A,A01,A11],
+        [A,A02,A11],
+        ...,
+        [B,B01,B11],
+        [B,B02,B11],
+        ...
+      ],
+      [
+        D...
+      ]
+    ]
+    
+    5. For each row of choices, choose one of each chain
+    */
+    
+    // 1. Groups of(Pick one of these strategies)
+    val choices = strategy.choices
+    
+    // 2. Groups of(Pick one of these legal strategies)
+    val legalChoices = choices.map(filterStrategies)
+    
+    //3. Non-empty groups of (Pick one of these legal strategies)
+    val extantChoices = legalChoices.filter(_.nonEmpty)
+    if (extantChoices.isEmpty) {
+      return Iterable(Iterable(strategy))
+    }
+    
+    //4. Non-empty groups of(Pick one of these(Chain of strategies)))
+    val extantChoicesChains = extantChoices.flatMap(choice => choice.map(expandStrategy))
+    
+    var output = Iterable(Iterable(strategy))
+    extantChoicesChains.foreach(nextChoiceChain =>
+      output = output.flatMap(outputChain =>
+        nextChoiceChain.map(nextChoice =>
+          outputChain ++ nextChoice))
+    )
+    
+    output
   }
 }
 

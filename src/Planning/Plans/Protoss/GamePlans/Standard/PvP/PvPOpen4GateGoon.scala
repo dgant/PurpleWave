@@ -5,7 +5,6 @@ import Planning.Plan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Information.Employing
-import Planning.Plans.Macro.Automatic.RequireSufficientSupply
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Milestones.{MiningBasesAtLeast, UnitsAtLeast}
 import ProxyBwapi.Races.Protoss
@@ -53,7 +52,6 @@ class PvPOpen4GateGoon extends GameplanModeTemplate {
   )
   
   override val buildPlans = Vector(
-    new RequireSufficientSupply,
     new FlipIf(
       new UnitsAtLeast(20, Protoss.Dragoon),
       new RequireMiningBases(2)))

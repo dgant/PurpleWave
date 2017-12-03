@@ -15,7 +15,8 @@ object Cancel extends Action {
     lazy val willNeverFinish  = framesToLive < framesToFinish
     lazy val producing        = unit.training || unit.upgrading || unit.teching
     lazy val beingBorn        = unit.morphing || unit.beingConstructed
-    lazy val shouldCancel     = unpowered || beingBorn || (producing && willNeverFinish)
+    lazy val isDecoy          = unit.unitClass.attacks && unit.matchups.allies.exists(_.isBeingViolent) // Is this correct?
+    lazy val shouldCancel     = (unpowered || beingBorn || (producing && willNeverFinish)) && ! isDecoy
     
     val output = unit.unitClass.isBuilding && doomed && shouldCancel
     output

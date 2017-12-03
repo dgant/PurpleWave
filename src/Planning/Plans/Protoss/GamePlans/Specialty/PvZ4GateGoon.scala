@@ -16,7 +16,7 @@ import Planning.Plans.Protoss.Situational.BuildHuggingNexus
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvZ.PvZ4GateDragoonAllIn
 
-class PvZFourGateAllIn extends GameplanModeTemplate {
+class PvZ4GateGoon extends GameplanModeTemplate {
   
   override val activationCriteria     = new Employing(PvZ4GateDragoonAllIn)
   override val completionCriteria     = new MiningBasesAtLeast(2)

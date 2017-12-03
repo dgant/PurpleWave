@@ -36,7 +36,7 @@ class ProtossVsZergOld extends Parallel {
   private class ImplementEarly2Gate extends FirstEightMinutes(
     new Parallel(
       new BuildHuggingNexus,
-      new BuildOrder(ProtossBuilds.OpeningTwoGate1012: _*))))
+      new BuildOrder(ProtossBuilds.OpeningTwoGate1012: _*)))
   
   private class FFE extends FirstEightMinutes(
     new Parallel(
@@ -268,7 +268,13 @@ class ProtossVsZergOld extends Parallel {
         new UpgradeContinuously(Protoss.GroundDamage),
         new UpgradeContinuously(Protoss.ZealotSpeed))),
   
-    new If(new UnitsAtLeast(6, Protoss.Corsair), new TrainContinuously(Protoss.Carrier)),
+    new If(
+      new And(
+        new UnitsAtLeast(6, Protoss.Corsair),
+        new Or(
+          new UnitsAtLeast(3, Protoss.Reaver),
+          new Employing(PvZMidgame2Stargate))),
+      new TrainContinuously(Protoss.Carrier)),
     new If(new UnitsAtLeast(6, Protoss.Corsair), new UpgradeContinuously(Protoss.AirArmor)),
     new If(new UnitsAtLeast(7, Protoss.Corsair), new Build(RequestAtLeast(1, Protoss.FleetBeacon))),
     new If(new UnitsAtLeast(8, Protoss.Corsair), new If(new UnitsAtLeast(1, Protoss.FleetBeacon), new Build(RequestTech(Protoss.DisruptionWeb)))),

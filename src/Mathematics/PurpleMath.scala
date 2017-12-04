@@ -41,7 +41,7 @@ object PurpleMath {
   
   def signum(int: Int): Int = if (int == 0) 0 else if (int < 0) -1 else 1
   
-  val twoPi = Math.PI * 2
+  val twoPi: Double = Math.PI * 2
   def normalizeAngle(angleRadians: Double): Double = {
     if      (angleRadians < 0) normalizeAngle(angleRadians + twoPi)
     else if (angleRadians > twoPi) normalizeAngle(angleRadians - twoPi)
@@ -49,6 +49,7 @@ object PurpleMath {
   }
   
   def geometricMean(values: Iterable[Double]): Double = {
-    Math.pow(values.product, values.size)
+    if (values.isEmpty) return 1.0
+    Math.pow(values.product, 1.0 / values.size)
   }
 }

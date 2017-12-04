@@ -175,7 +175,7 @@ class Strategist {
     }
     
     //4. Non-empty groups of(Pick one of these(Chain of strategies)))
-    val extantChoicesChains = extantChoices.flatMap(choice => choice.map(expandStrategy))
+    val extantChoicesChains = extantChoices.map(_.flatMap(expandStrategy))
     
     var output = Iterable(Iterable(strategy))
     extantChoicesChains.foreach(nextChoiceChain =>
@@ -184,6 +184,7 @@ class Strategist {
           outputChain ++ nextChoice))
     )
     
+    output = output.map(_.toSet.toIterable)
     output
   }
 }

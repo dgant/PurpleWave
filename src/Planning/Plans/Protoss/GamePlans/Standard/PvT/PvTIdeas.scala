@@ -64,6 +64,8 @@ object PvTIdeas {
         new UnitsAtLeast(6, UnitMatchWarriors, complete = true)),
       new Or(
         new Employing(PvTEarly1015GateGoon),
+        new Employing(PvTEarly1015GateGoonDT),
+        new Employing(PvTEarly4Gate),
         new Employing(PvTEarly1GateStargate),
         new Employing(PvTEarly1GateStargateTemplar),
         new IfOnMiningBases(3),

@@ -60,7 +60,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit) extends UnitProxy(baseUnit) {
     // Save JNI overhead by not tracking history of Spider Mines and Interceptors
     if ( ! unitClass.orderable) return
     
-    if (history.lastOption.exists(_.totalHealth < totalHealth)) {
+    if (history.lastOption.exists(_.totalHealth > totalHealth)) {
       lastDamageFrame = history.lastOption.get.frame
     }
     

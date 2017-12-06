@@ -15,8 +15,8 @@ object Target extends Action {
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {
-    var filtersOptional = Vector(TargetStayCloaked, TargetCombatants)
-    val filtersRequired = Vector(TargetMission, TargetAlmostAnything)
+    var filtersOptional = Vector(TargetCombatants, TargetIgnoreScouts)
+    val filtersRequired = Vector(TargetStayCloaked, TargetMission, TargetAlmostAnything)
     
     do {
       val filters: Vector[TargetFilter] = if (Yolo.active) Vector.empty else filtersOptional ++ filtersRequired
@@ -24,5 +24,7 @@ object Target extends Action {
       filtersOptional = filtersOptional.drop(1)
     }
     while (unit.agent.toAttack.isEmpty && filtersOptional.nonEmpty)
+    
+    val target = unit.agent.toAttack
   }
 }

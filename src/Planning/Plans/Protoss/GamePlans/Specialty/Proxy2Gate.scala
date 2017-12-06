@@ -12,7 +12,7 @@ import Planning.Plans.Macro.Milestones._
 import Planning.Plans.Protoss.Situational.PlaceGatewaysProxied
 import Planning.Plans.Scouting.Scout
 import Planning.{Plan, ProxyPlanner}
-import ProxyBwapi.Races.Protoss
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Strategies.Protoss.PvP.PvPOpenProxy2Gate
 import Strategery.Strategies.Protoss.PvR.PvROpenProxy2Gate
 import Strategery.Strategies.Protoss.PvT.PvTProxy2Gate
@@ -50,7 +50,12 @@ class Proxy2Gate extends GameplanModeTemplate {
       new TrainContinuously(Protoss.Zealot, 8)),
     new TrainWorkersContinuously,
     new Trigger(
-      new UnitsAtLeast(15, Protoss.Probe),
+      new Or(
+        new UnitsAtLeast(15, Protoss.Probe),
+        new EnemyHasShown(Terran.Vulture),
+        new EnemyHasShown(Protoss.Dragoon),
+        new EnemyHasShown(Zerg.Spire),
+        new EnemyUnitsAtLeast(1, Terran.Factory, complete = true)),
       initialAfter = new Parallel(
         new BuildGasPumps,
         new Build(RequestAtLeast(1, Protoss.CyberneticsCore)),

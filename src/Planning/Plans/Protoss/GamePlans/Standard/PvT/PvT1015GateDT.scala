@@ -10,11 +10,11 @@ import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Milestones.{MiningBasesAtLeast, UnitsAtLeast}
 import Planning.Plans.Protoss.ProtossBuilds
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvT.PvTEarly1015GateGoon
+import Strategery.Strategies.Protoss.PvT.PvTEarly1015GateGoonDT
 
 class PvT1015GateDT extends GameplanModeTemplate {
   
-  override val activationCriteria = new Employing(PvTEarly1015GateGoon)
+  override val activationCriteria = new Employing(PvTEarly1015GateGoonDT)
   override val completionCriteria = new MiningBasesAtLeast(2)
   override val aggression         = 1.2
   override val superSaturate      = true

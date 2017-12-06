@@ -4,7 +4,6 @@ import Debugging.Visualizations.Views.Battles.ShowBattleDetails
 import Information.Battles.Estimations.ReportCard
 import Mathematics.Points.Pixel
 import Micro.Decisions.MicroValue
-import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
 
 import scala.collection.mutable
@@ -152,7 +151,7 @@ case class Simulacrum(simulation: BattleSimulation, unit: UnitInfo) {
     val focus           = simulation.focus
     val distanceBefore  = pixel.pixelDistanceFast(focus)
     val distanceAfter   = distanceBefore + unit.topSpeed * SIMULATION_STEP_FRAMES
-    val fleePixel       = focus.project(pixel, distanceAfter)
+    val fleePixel       = focus.project(pixel, distanceAfter).clamp
     if (ShowBattleDetails.inUse) {
       moves += ((pixel, fleePixel))
     }

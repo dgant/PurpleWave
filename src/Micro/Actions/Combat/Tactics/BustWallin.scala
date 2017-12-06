@@ -3,7 +3,6 @@ package Micro.Actions.Combat.Tactics
 import Lifecycle.With
 import Mathematics.Shapes.Circle
 import Micro.Actions.Action
-import Micro.Actions.Combat.Attacking.Potshot
 import Micro.Actions.Combat.Decisionmaking.Disengage
 import Micro.Actions.Commands.{Attack, Move}
 import Micro.Heuristics.Targeting.EvaluateTargets
@@ -23,11 +22,11 @@ object BustWallin extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
     val walledInZones = With.geography.zones.filter(_.walledIn)
   
-    ! unit.flying                               &&
-    walledInZones.nonEmpty                      &&
-    With.enemies.exists(_.raceInitial == Race.Terran)  &&
-    unit.agent.canFight                         &&
-    unit.canMove                                &&
+    ! unit.flying                                       &&
+    walledInZones.nonEmpty                              &&
+    With.enemies.exists(_.raceInitial == Race.Terran)   &&
+    unit.agent.canFight                                 &&
+    unit.canMove                                        &&
     walledInZones.flatMap(_.edges).exists(_.centerPixel.pixelDistanceFast(unit.pixelCenter) < 32.0 * 8.0) &&
     unit.matchups.threats.forall(threat => unit.inRangeToAttackFast(threat) || ! threat.is(Terran.SiegeTankSieged))
   }

@@ -1,4 +1,4 @@
-package Micro.Actions.Combat.Attacking
+package Micro.Actions.Combat.Tactics
 
 import Micro.Actions.Action
 import Micro.Actions.Commands.Attack

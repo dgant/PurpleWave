@@ -98,6 +98,7 @@ class Strategist {
   }
 
   val evaluations = new mutable.HashMap[Strategy, StrategyEvaluation]
+  var permutationInterest: Map[Iterable[Strategy], Double] = Map.empty
   
   def evaluate(strategy: Strategy): StrategyEvaluation = {
     if ( ! evaluations.contains(strategy)) {
@@ -112,7 +113,7 @@ class Strategist {
     val strategies              = permutations.flatten.toVector.distinct
     val strategyEvaluations     = strategies.map(strategy => (strategy, evaluate(strategy))).toMap
     val permutationEvaluations  = permutations.map(p => (p, p.map(strategyEvaluations))).toMap
-    val permutationInterest     = permutationEvaluations.map(p => (p._1, PurpleMath.geometricMean(p._2.map(_.interestTotal))))
+        permutationInterest     = permutationEvaluations.map(p => (p._1, PurpleMath.geometricMean(p._2.map(_.interestTotal))))
     val mostInterest            = permutationInterest.values.max
     val bestPermutation         = permutationInterest.find(_._2 >= mostInterest).get
     bestPermutation._1

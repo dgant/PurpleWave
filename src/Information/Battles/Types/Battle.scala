@@ -37,7 +37,7 @@ class Battle(
   // Judgement //
   ///////////////
   
-  lazy val analysis = new Analysis(this)
+  lazy val analysis = new BattleAnalysis(this)
   lazy val desire: Double = analysis.desireTotal
   
   lazy val globalSafeToAttack: Boolean = globalSafe(estimationAbstractOffense, With.blackboard.aggressionRatio)

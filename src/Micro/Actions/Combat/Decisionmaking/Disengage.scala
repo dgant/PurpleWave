@@ -2,9 +2,8 @@ package Micro.Actions.Combat.Decisionmaking
 
 import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Actions.Combat.Attacking.Potshot
 import Micro.Actions.Combat.Maneuvering.{Avoid, KiteSafely}
-import Micro.Actions.Combat.Tactics.Bunk
+import Micro.Actions.Combat.Tactics.{Bunk, Potshot}
 import Planning.Yolo
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 

@@ -8,7 +8,7 @@ import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.ByOption
 
-class Analysis(battle: Battle) {
+class BattleAnalysis(battle: Battle) {
   def nearestBase(bases: Iterable[Base]): Option[Pixel] = ByOption.minBy(bases.map(_.heart.pixelCenter))(_.groundPixels(battle.focus))
   val nearestBaseOurs       = nearestBase(With.geography.ourBases).getOrElse(With.geography.home.pixelCenter)
   val nearestBaseEnemy      = nearestBase(With.geography.enemyBases).getOrElse(With.intelligence.mostBaselikeEnemyTile.pixelCenter)
@@ -28,7 +28,7 @@ class Analysis(battle: Battle) {
   val hysteresisDesireMin   = PurpleMath.clamp(       flexibilityRatio, 0.5, 0.7)
   val hysteresisDesireMax   = PurpleMath.clamp(1.0 /  flexibilityRatio, 1.1, 1.8)
   val desireTurtling        = PurpleMath.clamp(turtlingRatio, 0.7,  1.0)
-  val desireUrgency         = PurpleMath.clamp(urgencyRatio,  0.9,  1.8)
+  val desireUrgency         = PurpleMath.clamp(urgencyRatio,  0.9,  2.0)
   val desireChokiness       = PurpleMath.clamp(chokeMobility, 0.6,  1.0)
   val desireHysteresis      = PurpleMath.clamp(hysteresis,    hysteresisDesireMin,  hysteresisDesireMax)
   val desireMultiplier      = With.blackboard.aggressionRatio * desireTurtling * desireUrgency * desireChokiness * desireHysteresis
@@ -49,7 +49,6 @@ class Analysis(battle: Battle) {
         unit.is(Zerg.Lurker))
       .filter(cannon => cannon.matchups.targets.isEmpty && cannon.matchups.threatsInRange.isEmpty)
   }
-  
   
   private def getChokeMobility: Double = {
     val zoneUs    = battle.us.centroid.zone

@@ -17,6 +17,8 @@ class FriendlyUnitInfo(base: bwapi.Unit) extends FriendlyUnitProxy(base) {
   def squadmates: Seq[FriendlyUnitInfo] = squad.map(_.recruits).getOrElse(Seq.empty)
   def agent: Agent = With.agents.getState(this)
   def readyForMicro: Boolean = With.commander.ready(this)
+  def teammates: Set[UnitInfo] = teammatesCache()
+  private val teammatesCache = new Cache(() => (squadmates ++ matchups.allies).toSet)
   
   ////////////
   // Health //

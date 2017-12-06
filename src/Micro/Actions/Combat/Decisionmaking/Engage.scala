@@ -1,9 +1,9 @@
 package Micro.Actions.Combat.Decisionmaking
 
 import Micro.Actions.Action
-import Micro.Actions.Combat.Attacking.{Potshot, Target}
+import Micro.Actions.Combat.Attacking.Target
 import Micro.Actions.Combat.Maneuvering.AttackAndReposition
-import Micro.Actions.Combat.Tactics.BustWallin
+import Micro.Actions.Combat.Tactics.{BustWallin, Potshot}
 import Micro.Actions.Commands.Attack
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 

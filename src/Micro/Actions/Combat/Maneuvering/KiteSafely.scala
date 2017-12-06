@@ -2,7 +2,8 @@ package Micro.Actions.Combat.Maneuvering
 
 import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Actions.Combat.Attacking.{Potshot, Target}
+import Micro.Actions.Combat.Attacking.Target
+import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Actions.Commands.Attack
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 

@@ -162,7 +162,7 @@ class Architecture {
     untownhallable  ++= area.tiles
     ungassable      ++= area.tiles
   
-    if (placement.blueprint.powers.get) {
+    if (placement.blueprint.powers.get && ! With.units.ours.exists(_.is(Protoss.Pylon))) {
       addPower(tile)
     }
   

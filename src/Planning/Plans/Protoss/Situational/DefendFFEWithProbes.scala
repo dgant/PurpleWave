@@ -30,7 +30,7 @@ abstract class DefendFFEWithProbes extends Plan {
     defenders.get.unitCounter.set(UnitCountExactly(probeCount))
     defenders.get.acquire(this)
     defenders.get.units.foreach(_.agent.intend(this, new Intention {
-      toTravel = Some(toDefend)
+      toForm = Some(toDefend)
     }))
   }
 }

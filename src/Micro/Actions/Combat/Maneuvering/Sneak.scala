@@ -2,7 +2,7 @@ package Micro.Actions.Combat.Maneuvering
 
 import Debugging.Visualizations.ForceColors
 import Micro.Actions.Action
-import Micro.Actions.Combat.Attacking.Potshot
+import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Actions.Commands.Gravitate
 import Micro.Decisions.Potential
 import ProxyBwapi.Races.Protoss

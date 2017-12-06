@@ -1,7 +1,7 @@
 package Micro.Actions.Combat.Attacking
 
-import Lifecycle.With
 import Micro.Actions.Action
+import Micro.Actions.Combat.Attacking.Filters._
 import Planning.Yolo
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -15,16 +15,14 @@ object Target extends Action {
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {
-    TargetUndetected.delegate(unit)
-    TargetRelevant.delegate(unit)
-    var canPillage = false
-    canPillage ||= unit.agent.canPillage
-    canPillage ||= unit.zone.owner.isEnemy
-    canPillage ||= (With.intelligence.firstEnemyMain.isDefined && With.geography.enemyBases.isEmpty)
-    canPillage ||= Yolo.active
-    canPillage &&= unit.matchups.threatsInRange.isEmpty
-    if (canPillage) {
-      TargetAnything.delegate(unit)
+    var filtersOptional = Vector(TargetStayCloaked, TargetCombatants)
+    val filtersRequired = Vector(TargetMission, TargetAlmostAnything)
+    
+    do {
+      val filters: Vector[TargetFilter] = if (Yolo.active) Vector.empty else filtersOptional ++ filtersRequired
+      ApplyTargetFilters(unit, filters)
+      filtersOptional = filtersOptional.drop(1)
     }
+    while (unit.agent.toAttack.isEmpty && filtersOptional.nonEmpty)
   }
 }

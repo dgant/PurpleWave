@@ -72,6 +72,7 @@ class Visualization {
     ShowSquads,
     ShowStrategy,
     ShowStrategyEvaluations,
+    ShowStrategiesInterest,
     ShowZoneBorderTiles,
     ShowZones,
     ShowZoneLabels,

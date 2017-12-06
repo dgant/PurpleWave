@@ -1,7 +1,7 @@
 package Micro.Actions.Scouting
 
 import Micro.Actions.Action
-import Micro.Actions.Combat.Attacking.Potshot
+import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Actions.Commands.Move
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 

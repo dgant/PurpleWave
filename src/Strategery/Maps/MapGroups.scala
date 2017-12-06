@@ -1,5 +1,5 @@
 package Strategery.Maps
 
 object MapGroups {
-  val badForProxying = Vector(Roadrunner, EmpireOfTheSun)
+  val badForProxying = Vector(Roadrunner, EmpireOfTheSun, TauCross)
 }

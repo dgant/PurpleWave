@@ -2,6 +2,7 @@ package Mathematics.Points
 
 import Information.Geography.Types.Zone
 import Lifecycle.With
+import Mathematics.PurpleMath
 import bwapi.Position
 
 case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
@@ -48,6 +49,11 @@ case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   }
   def divide(scale: Int): Pixel = {
     Pixel(x / scale, y / scale)
+  }
+  def clamp: Pixel = {
+    Pixel(
+      PurpleMath.clamp(x, 0, With.mapPixelWidth),
+      PurpleMath.clamp(y, 0, With.mapPixelHeight))
   }
   def project(destination: Pixel, pixels: Double): Pixel = {
     if (pixels == 0) return this

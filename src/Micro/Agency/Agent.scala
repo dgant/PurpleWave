@@ -80,8 +80,11 @@ class Agent(val unit: FriendlyUnitInfo) {
   // Suggestions //
   /////////////////
   
-  def origin: Pixel = toReturn.getOrElse(originCache())
+  def origin: Pixel = originCache()
   private val originCache = new Cache(() => calculateOrigin)
+  
+  def destination: Pixel = destinationCache()
+  private val destinationCache = new Cache(() => calculateDestination)
   
   def dying: Boolean = Math.min(unit.matchups.framesToLiveDiffused, unit.matchups.framesToLiveCurrently) <= 2 * With.reaction.agencyAverage
   
@@ -176,6 +179,18 @@ class Agent(val unit: FriendlyUnitInfo) {
     }
     else {
       With.geography.home.pixelCenter
+    }
+  }
+  
+  private def calculateDestination: Pixel = {
+    if (toTravel.isDefined) {
+      toTravel.get
+    }
+    else if (toForm.isDefined) {
+      toForm.get
+    }
+    else {
+      origin
     }
   }
   

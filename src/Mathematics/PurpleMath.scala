@@ -25,10 +25,10 @@ object PurpleMath {
   
   def clampRatio(value: Double, ratio: Double): Double = clamp(value, ratio, 1.0 / ratio)
   
-  def clamp(value: Int, value1: Int, value2: Int): Int = {
-    val min = Math.min(value1, value2)
-    val max = Math.max(value1, value2)
-    Math.min(max, Math.max(value, min))
+  def clamp(value: Int, bound0: Int, bound1: Int): Int = {
+    val min = Math.min(bound0, bound1)
+    val max = Math.max(bound0, bound1)
+    Math.min(max, Math.max(min, value))
   }
   
   def clamp(value: Double, value1: Double, value2: Double): Double = {

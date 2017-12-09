@@ -19,7 +19,7 @@ class Conscript extends Plan {
   val fighters = new Property[LockUnits](new LockUnits)
   fighters.get.unitMatcher.set(UnitMatchWarriors)
   
-  val squad = new Squad(parent.getOrElse(this))
+  lazy val squad = new Squad(parent.getOrElse(this))
   
   override def isComplete: Boolean = ! enemies.exists(_.alive)
   

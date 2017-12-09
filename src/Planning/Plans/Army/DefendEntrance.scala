@@ -11,7 +11,7 @@ import Utilities.ByOption
 
 class DefendEntrance extends Plan {
   
-  val squad = new Squad(parent.getOrElse(this))
+  val squad = new Squad(this)
   
   val defenders = new Property[LockUnits](new LockUnits)
   defenders.get.unitMatcher.set(UnitMatchWarriors)

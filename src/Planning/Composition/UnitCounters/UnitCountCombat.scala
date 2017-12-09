@@ -46,6 +46,6 @@ class UnitCountCombat(
   }
   
   private def weOverkill: Boolean = {
-    lastEstimation.costToEnemy * overkill > lastEstimation.costToUs
+    lastEstimation.costToEnemy * overkill >= lastEstimation.costToUs
   }
 }

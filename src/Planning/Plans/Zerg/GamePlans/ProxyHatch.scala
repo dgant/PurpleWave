@@ -35,8 +35,7 @@ class ProxyHatch extends Parallel {
   
   children.set(Vector(
     new Plan { override def onUpdate(): Unit = {
-      With.blackboard.gasBankSoftLimit = if (With.units.ours.exists(_.is(Zerg.Lair))) 400 else 100
-      With.blackboard.gasBankHardLimit = With.blackboard.gasBankSoftLimit
+      With.blackboard.gasLimitFloor = if (With.units.ours.exists(_.is(Zerg.Lair))) 400 else 100
     }},
     new ProposePlacement { override lazy val blueprints = Vector(new Blueprint(this,
       building = Some(Zerg.Extractor),

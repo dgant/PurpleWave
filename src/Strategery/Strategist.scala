@@ -67,7 +67,7 @@ class Strategist {
     lazy val startLocations           = With.geography.startLocations.size
     lazy val thisGameIsFFA            = With.enemies.size > 1 && ! Players.all.exists(p => p.isAlly)
     lazy val disabledInPlaybook       = Playbook.disabled.contains(strategy)
-    lazy val disabledOnMap            = strategy.prohibitedMaps.exists(_.matches)
+    lazy val disabledOnMap            = strategy.prohibitedMaps.exists(_.matches) || (strategy.requiredMaps.nonEmpty && ! strategy.requiredMaps.exists(_.matches))
     lazy val appropriateForOurRace    = strategy.ourRaces.exists(_ == ourRace)
     lazy val appropriateForEnemyRace  = strategy.enemyRaces.exists(race => if (race == Race.Unknown) enemyRaceWasUnknown else (enemyRaceStillUnknown || enemyRacesCurrent.contains(race)))
     lazy val appropriateForOpponent   = strategy.restrictedOpponents.isEmpty ||

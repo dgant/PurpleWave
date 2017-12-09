@@ -1,7 +1,7 @@
 package Strategery.Strategies.Protoss
 
 import Strategery.Strategies.AllRaces.{WorkerRush2StartLocations, WorkerRush3StartLocations}
-import Strategery.Strategies.Protoss.Other.{CarriersFromAnIsland, ProtossFFACarriers}
+import Strategery.Strategies.Protoss.Other.{CarriersFromAnIsland, ProtossBigFFACarriers, ProtossHuntersFFACarriers}
 import Strategery.Strategies.Protoss.PvE._
 import Strategery.Strategies.Protoss.PvP.{PvPOpen1015GateDTs, PvPOpenProxy2Gate, _}
 import Strategery.Strategies.Protoss.PvR._
@@ -18,7 +18,8 @@ object ProtossChoices {
     PvROpenZCoreZ,
     PvROpenProxy2Gate,
     PvROpenTinfoil,
-    ProtossFFACarriers,
+    ProtossBigFFACarriers,
+    ProtossHuntersFFACarriers,
     CarriersFromAnIsland
   )
   
@@ -125,7 +126,7 @@ object ProtossChoices {
     CarriersFromAnIsland,
     CarriersWithNoDefense,
     DarkArchonsWithNoDefense,
-    ProtossFFACarriers)
+    ProtossBigFFACarriers)
   
   val standardOpeners: Vector[Strategy] = (pvr ++ pvtOpenersAll ++ pvpOpenersAll ++ pvzOpenersAll).distinct
   

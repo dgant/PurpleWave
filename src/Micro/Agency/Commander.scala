@@ -1,7 +1,7 @@
 package Micro.Agency
 
 import Lifecycle.With
-import Mathematics.Points.{Pixel, Tile}
+import Mathematics.Points.{Pixel, SpecificPoints, Tile}
 import Mathematics.PurpleMath
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.Techs.Tech
@@ -103,7 +103,12 @@ class Commander {
     // Send flying units past their destination to maximize acceleration
     var destination = to
     if (unit.flying && unit.pixelDistanceSquared(to) < Math.pow(flyingOvershoot, 2)) {
-      val overshoot = unit.pixelCenter.project(to, flyingOvershoot)
+      destination = unit.pixelCenter.project(to, flyingOvershoot)
+      if (destination == unit.pixelCenter) {
+        val signX = PurpleMath.forcedSignum(SpecificPoints.middle.x - destination.x)
+        val signY = PurpleMath.forcedSignum(SpecificPoints.middle.y - destination.y)
+        destination = destination.add((signX * flyingOvershoot).toInt, (signY * flyingOvershoot).toInt)
+      }
     }
     
     // Limit moves to map edge

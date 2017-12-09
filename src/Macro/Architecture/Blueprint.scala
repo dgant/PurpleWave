@@ -96,9 +96,9 @@ class Blueprint(
     val buildArea = relativeBuildArea.add(tile)
   
     def violatesBuildArea(nextTile: Tile): Boolean = {
-      nextTile.zone.perimeter.contains(nextTile)                ||
-      ! With.architecture.buildable(nextTile)                   ||
-      (requireCreep.get   && ! With.grids.creep.get(nextTile))  ||
+      nextTile.zone.perimeter.contains(nextTile)            ||
+      ! With.architecture.buildable(nextTile)               ||
+      (requireCreep.get != With.grids.creep.get(nextTile))  ||
       (respectHarvesting  && With.architecture.isHarvestingArea(nextTile))
     }
     

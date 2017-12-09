@@ -2,7 +2,7 @@ package Planning.Plans.Protoss.GamePlans.Specialty
 
 import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
-import Planning.Plans.Compound._
+import Planning.Plans.Compound.{Or, _}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Information.Employing
 import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
@@ -36,6 +36,13 @@ class Proxy2Gate extends GameplanModeTemplate {
     new If(new UnitsAtLeast(1, Protoss.Pylon),    new Build(RequestAtLeast(1, Protoss.Gateway))),
     new If(new UnitsAtLeast(1, Protoss.Gateway),  new Build(RequestAtLeast(2, Protoss.Gateway))))
   
+  private class MustSwitchToDragoons extends Or(
+    new UnitsAtLeast(15, Protoss.Probe),
+    new EnemyHasShown(Terran.Vulture),
+    new EnemyHasShown(Protoss.Dragoon),
+    new EnemyUnitsAtLeast(1, Zerg.Spire, complete = true),
+    new EnemyUnitsAtLeast(1, Terran.Factory, complete = true))
+  
   private class AfterProxy extends Parallel(
     new RequireSufficientSupply,
     new BuildOrder(
@@ -47,15 +54,14 @@ class Proxy2Gate extends GameplanModeTemplate {
         new UpgradeComplete(Protoss.DragoonRange, 1, Protoss.DragoonRange.upgradeTime(1)),
         new Check(() => With.self.gas >= 50)),
       new TrainContinuously(Protoss.Dragoon),
-      new TrainContinuously(Protoss.Zealot, 8)),
+      new If(
+        new Not(new MustSwitchToDragoons),
+        new TrainContinuously(Protoss.Zealot, 8))),
     new TrainWorkersContinuously,
     new Trigger(
       new Or(
         new UnitsAtLeast(15, Protoss.Probe),
-        new EnemyHasShown(Terran.Vulture),
-        new EnemyHasShown(Protoss.Dragoon),
-        new EnemyHasShown(Zerg.Spire),
-        new EnemyUnitsAtLeast(1, Terran.Factory, complete = true)),
+        new MustSwitchToDragoons),
       initialAfter = new Parallel(
         new BuildGasPumps,
         new Build(RequestAtLeast(1, Protoss.CyberneticsCore)),

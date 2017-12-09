@@ -22,4 +22,5 @@ abstract class Strategy {
   def ffa                 : Boolean                   = false
   def restrictedOpponents : Option[Iterable[String]]  = None
   def prohibitedMaps      : Iterable[StarCraftMap]    = Vector.empty
+  def requiredMaps        : Iterable[StarCraftMap]    = Vector.empty
 }

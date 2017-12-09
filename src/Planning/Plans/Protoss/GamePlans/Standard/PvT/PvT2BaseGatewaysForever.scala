@@ -23,7 +23,7 @@ class PvT2BaseGatewaysForever extends GameplanModeTemplate {
   
   override val buildPlans = Vector(
     new If(new UnitsAtLeast(1, Protoss.HighTemplar), new Build(RequestTech(Protoss.PsionicStorm))),
-    new Do(() => With.blackboard.gasBankSoftLimit = 800),
+    new Do(() => With.blackboard.gasLimitFloor = 800),
     new FlipIf(
       new UnitsAtLeast(15, UnitMatchWarriors),
       new Parallel(

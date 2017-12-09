@@ -38,7 +38,6 @@ class FindExpansions extends Plan {
     scout.agent.intend(this, new Intention {
       toTravel    = getNextScoutingPixel
       canCower    = true
-      canPillage  = true
     })
   
   private def getNextScoutingPixel: Option[Pixel] =

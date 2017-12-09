@@ -8,6 +8,7 @@ import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Composition.UnitMatchers.{UnitMatchCustom, UnitMatchMobileDetectors}
 import Planning.Composition.UnitPreferences.UnitPreferClose
 import Planning.Plan
+import ProxyBwapi.Races.Terran
 
 import scala.util.Random
 
@@ -22,6 +23,13 @@ class ClearBurrowedBlockers extends Plan {
   decoy.get.unitCounter.set(UnitCountOne)
   
   override def onUpdate(): Unit = {
+    
+    if ( ! With.enemies.exists(_.isZerg) && ! With.enemies.exists(_.isTerran)) {
+      return
+    }
+    if ( ! With.enemies.exists(_.isZerg) && With.enemies.forall(With.intelligence.unitsShown(_, Terran.SpiderMine) == 0)) {
+      return
+    }
     
     val target = With.units.ours
       .find(u => u.agent.toBuild.exists(_.isTownHall))

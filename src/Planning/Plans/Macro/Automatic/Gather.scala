@@ -8,7 +8,6 @@ import Planning.Composition.UnitCountEverything
 import Planning.Composition.UnitMatchers.UnitMatchWorkers
 import Planning.Plan
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import bwapi.Race
 
 import scala.collection.mutable
 
@@ -30,6 +29,7 @@ class Gather extends Plan {
   private var gasses                  : Set[UnitInfo]                     = Set.empty
   private var allResources            : Set[UnitInfo]                     = Set.empty
   private var haveEnoughGas           : Boolean                           = false
+  private var gasWorkerTargetRatio    : Double                            = 0.0
   private var workersForGas           : Int                               = 0
   private var workersForMinerals      : Int                               = 0
   private var workersPerMineral       : Double                            = 0.0
@@ -86,26 +86,22 @@ class Gather extends Plan {
   }
   
   private def gasWorkers: Int = {
-    if (With.self.raceInitial == Race.Protoss)
-      Vector(
-        gasses.size * 3,
-        allWorkers.size / 3,
-        if (haveEnoughGas) 0 else 200)
-      .min
-    else
-      Vector(
-        gasses.size * 3,
-        allWorkers.size / 2,
-        if(haveEnoughGas) 0 else 300)
-      .min
+    Vector(
+      gasses.size * 3,
+      Math.max(
+        (allWorkers.size * gasWorkerTargetRatio).toInt,
+        if (haveEnoughGas) 0 else 200))
+    .min
   }
   
   private def decideIdealWorkerDistribution() {
-    haveEnoughGas       = With.self.gas >= Math.max(With.blackboard.gasBankSoftLimit, Math.min(With.blackboard.gasBankHardLimit, With.self.minerals))
-    workersForGas       = gasWorkers
-    workersForMinerals  = allWorkers.size - workersForGas
-    workersPerGas       = if (gasses.isEmpty) 0 else workersForGas.toDouble / gasses.size
-    workersOnGas        = gasses.toVector.map(gas => workersByResource.get(gas).map(_.size).getOrElse(0)).sum
+    val gasLimitFloor     = With.blackboard.gasLimitFloor
+    gasWorkerTargetRatio  = With.blackboard.gasTargetRatio
+    haveEnoughGas         = With.self.gas >= Math.max(gasLimitFloor, With.self.minerals)
+    workersForGas         = gasWorkers
+    workersForMinerals    = allWorkers.size - workersForGas
+    workersPerGas         = if (gasses.isEmpty) 0 else workersForGas.toDouble / gasses.size
+    workersOnGas          = gasses.toVector.map(gas => workersByResource.get(gas).map(_.size).getOrElse(0)).sum
     
     needPerMineral = new mutable.HashMap[UnitInfo, Double] ++
       minerals

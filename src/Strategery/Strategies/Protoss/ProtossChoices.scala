@@ -1,7 +1,7 @@
 package Strategery.Strategies.Protoss
 
 import Strategery.Strategies.AllRaces.{WorkerRush2StartLocations, WorkerRush3StartLocations}
-import Strategery.Strategies.Protoss.Other.{CarriersFromAnIsland, ProtossBigFFACarriers, ProtossHuntersFFACarriers}
+import Strategery.Strategies.Protoss.Other._
 import Strategery.Strategies.Protoss.PvE._
 import Strategery.Strategies.Protoss.PvP.{PvPOpen1015GateDTs, PvPOpenProxy2Gate, _}
 import Strategery.Strategies.Protoss.PvR._
@@ -19,7 +19,11 @@ object ProtossChoices {
     PvROpenProxy2Gate,
     PvROpenTinfoil,
     ProtossBigFFACarriers,
-    ProtossHuntersFFACarriers,
+    ProtossHuntersFFAFFEGatewayCarriers,
+    ProtossHuntersFFAFFEGateway,
+    ProtossHuntersFFAAggroGateway,
+    ProtossHuntersFFAFFEScoutReaver,
+    ProtossHuntersFFAFFECarriers,
     CarriersFromAnIsland
   )
   

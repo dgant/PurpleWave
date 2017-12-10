@@ -38,7 +38,7 @@ object ShowStrategyEvaluations extends View {
     nextX = moveX(nextX)
     drawColumn(nextX, "Map",      evaluations.map(e => formatPercentage(e.winrateOnMap)))
     nextX = moveX(nextX)
-    drawColumn(nextX, "Hope",     evaluations.map(e => formatPercentage(e.interestTotal)))
+    drawColumn(nextX, "Interest", evaluations.map(e => formatPercentage(e.interestTotal)))
   }
   
   private def formatGames(games: Double): String = {

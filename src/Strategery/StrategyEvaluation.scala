@@ -9,15 +9,16 @@ import scala.util.Random
 
 case class StrategyEvaluation(strategy: Strategy) {
   
-  private val importanceVsEnemy       = 100.0
-  private val importanceVsRace        = 1.0
-  private val importanceOnMap         = 3.0
-  private val importanceWithStarts    = 3.0
+  private val importanceVsEnemy     = 100.0
+  private val importanceVsRace      = 1.0
+  private val importanceOnMap       = 3.0
+  private val importanceWithStarts  = 3.0
+  private val multiplayer           = With.enemies.size > 1
   
   val playbookOrder         : Int                       = if (Playbook.strategyOrder.contains(strategy)) Playbook.strategyOrder.indexOf(strategy) else Int.MaxValue
   val games                 : Iterable[HistoricalGame]  = With.history.games.filter(_.strategies.contains(strategy.toString))
-  val gamesVsEnemy          : Iterable[HistoricalGame]  = games.filter(_.enemyName      == With.enemy.name)
-  val gamesVsRace           : Iterable[HistoricalGame]  = games.filter(_.enemyRace      == With.enemy.raceInitial)
+  val gamesVsEnemy          : Iterable[HistoricalGame]  = if (multiplayer) games.filter(_.enemyName == With.enemy.name)         else Iterable.empty
+  val gamesVsRace           : Iterable[HistoricalGame]  = if (multiplayer) games.filter(_.enemyRace == With.enemy.raceInitial)  else Iterable.empty
   val gamesOnMap            : Iterable[HistoricalGame]  = games.filter(_.mapName        == With.mapFileName)
   val gamesWithStarts       : Iterable[HistoricalGame]  = games.filter(_.startLocations == With.game.getStartLocations.size)
   val patienceGames         : Double                    = getConfidenceSamples(strategy)

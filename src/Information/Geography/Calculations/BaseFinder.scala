@@ -6,6 +6,7 @@ import Mathematics.Points.{Tile, TileRectangle}
 import Mathematics.Shapes.Circle
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.ForeignUnitInfo
+import Strategery.Maps.Hunters
 import Utilities.EnrichPixel._
 
 import scala.collection.JavaConverters._
@@ -38,10 +39,11 @@ object BaseFinder {
   }
   
   private def clusterResourcePatches(resources: Iterable[ForeignUnitInfo]): Iterable[Iterable[ForeignUnitInfo]] = {
+    val shouldLimitRegion = ! Hunters.matches // Hack -- fix the top-right position on Hunters
     Clustering.group[ForeignUnitInfo](
       resources,
       With.configuration.baseRadiusPixels,
-      limitRegion = true,
+      limitRegion = shouldLimitRegion,
       (unit) => unit.pixelCenter).values
   }
   

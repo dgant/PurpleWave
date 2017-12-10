@@ -1,14 +1,14 @@
 package Strategery.Strategies.Protoss.Other
 
 import Planning.Plan
-import Planning.Plans.Protoss.GamePlans.Specialty.ProtossHuntersFFACarriers
+import Planning.Plans.Protoss.GamePlans.Specialty.ProtossHuntersFFAFFECarriers
 import Strategery.Maps.{Hunters, StarCraftMap}
 import Strategery.Strategies.Strategy
 import bwapi.Race
 
-object ProtossHuntersFFACarriers extends Strategy {
+object ProtossHuntersFFAFFECarriers extends Strategy {
   
-  override def gameplan: Option[Plan] = {  Some(new ProtossHuntersFFACarriers) }
+  override def gameplan: Option[Plan] = {  Some(new ProtossHuntersFFAFFECarriers) }
   
   override def ourRaces: Iterable[Race] = Vector(Race.Protoss)
   override def ffa = true

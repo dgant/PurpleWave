@@ -1,5 +1,6 @@
 package Planning.Plans.Protoss.Situational
 
+import Information.Geography.Types.Base
 import Lifecycle.With
 import Micro.Squads.Goals.SquadPush
 import Micro.Squads.Squad
@@ -11,6 +12,7 @@ import Planning.Composition.UnitPreferences.UnitPreferClose
 import Planning.Plan
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
+import Utilities.ByOption
 
 class DefendAgainstProxy extends Plan {
   
@@ -59,15 +61,17 @@ class DefendAgainstProxy extends Plan {
   }
   
   private def isProxied(enemy: UnitInfo): Boolean = {
-    val location = enemy.pixelCenter
-    val thresholdDistance = 32.0 * 50.0
-    ! location.zone.owner.isEnemy &&
-    (
-      location.zone.owner.isUs ||
-      With.geography.ourBases.map(_.heart.pixelCenter).exists(p =>
-        p.pixelDistanceFast (location)  < thresholdDistance &&
-        p.groundPixels      (location)  < thresholdDistance)
-    )
+    val pixel                     = enemy.pixelCenter
+    val thresholdDistance         = 32.0 * 50.0
+    def baseDistance(base: Base)  = base.heart.pixelCenter.pixelDistanceFast(pixel)
+    lazy val closestEnemyBase     = ByOption.minBy(With.geography.enemyBases)(_.heart.pixelCenter.pixelDistanceFast(pixel))
+    lazy val closestOurBase       = ByOption.minBy(With.geography.ourBases)(_.heart.pixelCenter.pixelDistanceFast(pixel))
+    lazy val enemyBaseDistance    = closestEnemyBase.map(baseDistance)
+    lazy val ourBaseDistance      = closestEnemyBase.map(baseDistance)
+    lazy val withinOurThreshold   = ourBaseDistance.exists(_ < thresholdDistance)
+    lazy val closerToUs           = enemyBaseDistance.exists(distanceEnemy => ourBaseDistance.exists(distanceOurs => distanceOurs < distanceEnemy))
+    val output = closerToUs && withinOurThreshold
+    output
   }
   
   lazy val scaryTypes = Vector(

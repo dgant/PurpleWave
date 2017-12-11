@@ -86,7 +86,7 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
     val pixelsOutsideRange    = me.pixelDistanceFast(threat) - threat.pixelRangeAgainstFromCenter(me)
     val speedApproaching      = speed(me) + speed(threat)
     val framesToCloseGap      = PurpleMath.nanToInfinity(Math.abs(pixelsOutsideRange) / speedApproaching)
-    val output                = framesToCloseGap * PurpleMath.signum(pixelsOutsideRange)
+    val output                = - framesToCloseGap * PurpleMath.signum(pixelsOutsideRange)
     output
   }
 }

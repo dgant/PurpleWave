@@ -18,7 +18,7 @@ class ProtossHuntersFFAFFEGateway extends GameplanModeTemplate {
   override val activationCriteria   : Plan = new Always
   override def defaultPlacementPlan : Plan = new ForgeFastExpand
   override val defaultScoutPlan     : Plan = NoPlan()
-  override val aggression = 0.6
+  override val aggression = 0.8
   
   override val buildOrder = Vector(
     RequestAtLeast(8,   Protoss.Probe),

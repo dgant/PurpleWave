@@ -11,15 +11,12 @@ import Planning.Plans.Macro.Expanding.{BuildCannonsAtExpansions, BuildGasPumps, 
 import Planning.Plans.Macro.Milestones.{UnitsAtLeast, UnitsExactly, UpgradeComplete}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Protoss.ProtossBuilds
-import Planning.Plans.Protoss.Situational.ForgeFastExpand
 import ProxyBwapi.Races.Protoss
 
 class ProtossHuntersFFAGatewayAggro extends GameplanModeTemplate {
   
   override val activationCriteria   : Plan = new Always
-  override def defaultPlacementPlan : Plan = new ForgeFastExpand
   override val defaultScoutPlan     : Plan = NoPlan()
-  override val aggression = 0.6
   
   override val buildOrder = ProtossBuilds.Opening_10Gate12Gas14Core
   

@@ -6,6 +6,7 @@ import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Avoid
 import Micro.Actions.Commands.Gravitate
 import Micro.Decisions.Potential
+import Planning.Yolo
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
@@ -22,7 +23,7 @@ object BeAnArbiter extends Action {
     lazy val umbrellable  = (u: UnitInfo) => ! u.unitClass.isBuilding && u != unit && u.pixelDistanceFast(unit) < 32.0 * 20.0 && ! u.is(Protoss.Interceptor)
     lazy val friends      = unit.teammates.filter(umbrellable)
     
-    if (threatened) {
+    if (threatened && ! Yolo.active) {
       Avoid.consider(unit)
     }
     else if (friends.nonEmpty) {

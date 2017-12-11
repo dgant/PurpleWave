@@ -3,6 +3,7 @@ package Planning.Plans.Protoss.GamePlans.Specialty
 import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
+import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Information.Always
@@ -32,6 +33,8 @@ class ProtossHuntersFFAFFEScoutReaver extends GameplanModeTemplate {
     RequestAtLeast(18,  Protoss.Probe),
     RequestAtLeast(2,   Protoss.PhotonCannon),
     RequestAtLeast(1,   Protoss.Gateway))
+  
+  override def priorityAttackPlan: Plan = new Attack { attackers.get.unitMatcher.set(Protoss.Scout) }
   
   override def buildPlans: Seq[Plan] = Vector(
     new If(

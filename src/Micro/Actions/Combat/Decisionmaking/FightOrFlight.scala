@@ -30,7 +30,7 @@ object FightOrFlight extends Action {
     decide(ignoreSwarm, () => unit.underDarkSwarm)
     decide(true,        () => unit.matchups.allies.exists(ally => ally.unitClass.isStaticDefense && ally.matchups.targetsInRange.nonEmpty))
     decide(true,        () => unit.base.exists(_.owner.isUs) && unit.matchups.targets.exists(target => target.matchups.targetsInRange.exists(_.unitClass.isWorker)))
-    decide(true,        () => unit.flying && unit.matchups.threats.forall(_.topSpeed < unit.topSpeed) && unit.matchups.framesOfSafetyDiffused > With.reaction.agencyAverage * 4)
+    decide(true,        () => unit.flying && unit.matchups.threats.forall(_.topSpeed < unit.topSpeed) && unit.matchups.framesOfSafetyDiffused > 0.0)
     if (decision.isDefined) {
       unit.agent.shouldEngage = decision.get
       return

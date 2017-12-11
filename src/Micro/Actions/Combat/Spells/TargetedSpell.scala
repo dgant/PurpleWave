@@ -32,7 +32,7 @@ abstract class TargetedSpell extends Action {
   protected def additionalConditions(unit: FriendlyUnitInfo): Boolean = true
   
   override protected def perform(unit: FriendlyUnitInfo) {
-    val framesToReact   = unit.matchups.framesToLiveDiffused - With.reaction.agencyAverage
+    val framesToReact   = unit.matchups.framesToLiveDiffused
     val framesOfSafety  = unit.matchups.framesOfSafetyDiffused
     val safeDistance    = Math.max(0, Math.min(framesToReact, framesOfSafety)) * unit.unitClass.topSpeed
     val totalRange      = safeDistance + 32.0 * castRangeTiles

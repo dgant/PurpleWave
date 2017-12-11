@@ -3,6 +3,7 @@ package Micro.Actions.Protoss
 import Debugging.Visualizations.ForceColors
 import Mathematics.Physics.ForceMath
 import Micro.Actions.Action
+import Micro.Actions.Combat.Maneuvering.Avoid
 import Micro.Actions.Commands.Gravitate
 import Micro.Decisions.Potential
 import ProxyBwapi.Races.Protoss
@@ -17,9 +18,14 @@ object BeAnArbiter extends Action {
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {
-    val umbrellable = (u: UnitInfo) => ! u.unitClass.isBuilding && u != unit && u.pixelDistanceFast(unit) < 32.0 * 20.0
-    val friends = unit.teammates.filter(umbrellable)
-    if (friends.nonEmpty) {
+    lazy val threatened   = unit.matchups.framesOfSafetyDiffused <= 0.0
+    lazy val umbrellable  = (u: UnitInfo) => ! u.unitClass.isBuilding && u != unit && u.pixelDistanceFast(unit) < 32.0 * 20.0 && ! u.is(Protoss.Interceptor)
+    lazy val friends      = unit.teammates.filter(umbrellable)
+    
+    if (threatened) {
+      Avoid.consider(unit)
+    }
+    else if (friends.nonEmpty) {
       val threats = unit.matchups.threats
       val threatMagnitude = if (unit.matchups.threatsInRange.nonEmpty) 1.0 else 0.25
       val forcesUmbrella  = friends.map(friend => Potential.unitAttraction(unit, friend, 1.0 / Math.max(24.0, Math.min(240.0, friend.matchups.framesOfSafetyDiffused))))

@@ -39,8 +39,9 @@ object PurpleMath {
   
   def clampToOne(value: Double): Double = Math.max(0.0, Math.min(1.0, value))
   
-  def signum(int: Int): Int = if (int == 0) 0 else if (int < 0) -1 else 1
-  def forcedSignum(int: Int): Int = if (int < 0) -1 else 1
+  def signum(int: Int)        : Int = if (int == 0) 0 else if (int < 0) -1 else 1
+  def signum(double: Double)  : Int = if (double == 0.0) 0 else if (double < 0) -1 else 1
+  def forcedSignum(int: Int)  : Int = if (int < 0) -1 else 1
   
   val twoPi: Double = Math.PI * 2
   def normalizeAngle(angleRadians: Double): Double = {

@@ -3,7 +3,7 @@ package Planning.Plans.Protoss.GamePlans.Specialty
 import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
-import Planning.Plans.Army.Attack
+import Planning.Plans.Army.{Attack, DropAttack}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Information.Always
@@ -34,7 +34,10 @@ class ProtossHuntersFFAFFEScoutReaver extends GameplanModeTemplate {
     RequestAtLeast(2,   Protoss.PhotonCannon),
     RequestAtLeast(1,   Protoss.Gateway))
   
-  override def priorityAttackPlan: Plan = new Attack { attackers.get.unitMatcher.set(Protoss.Scout) }
+  override def priorityAttackPlan: Plan = new Parallel(
+    new DropAttack,
+    new Attack { attackers.get.unitMatcher.set(Protoss.Scout) }
+  )
   
   override def buildPlans: Seq[Plan] = Vector(
     new If(
@@ -47,6 +50,7 @@ class ProtossHuntersFFAFFEScoutReaver extends GameplanModeTemplate {
     new If(new UnitsAtLeast(1, Protoss.Dragoon),      new Build(RequestUpgrade(Protoss.DragoonRange))),
     new If(new UnitsAtLeast(1, Protoss.HighTemplar),  new Build(RequestTech(Protoss.PsionicStorm))),
     new If(new UnitsAtLeast(2, Protoss.Reaver),       new Build(RequestUpgrade(Protoss.ScarabDamage))),
+    new If(new UnitsAtLeast(1, Protoss.Shuttle),      new Build(RequestUpgrade(Protoss.ShuttleSpeed))),
     new If(new UnitsAtLeast(5, Protoss.Zealot),       new Build(RequestUpgrade(Protoss.ZealotSpeed))),
     new If(new UnitsAtLeast(1, Protoss.FleetBeacon),  new Build(RequestUpgrade(Protoss.ScoutSpeed))),
     new If(new UnitsAtLeast(8, Protoss.Scout),        new Build(RequestUpgrade(Protoss.ScoutVisionRange))),
@@ -56,7 +60,9 @@ class ProtossHuntersFFAFFEScoutReaver extends GameplanModeTemplate {
     new FlipIf(
       new UnitsAtLeast(4, Protoss.Reaver),
       new TrainContinuously(Protoss.Reaver,     8),
-      new TrainContinuously(Protoss.Scout)),
+      new Parallel(
+        new TrainContinuously(Protoss.Shuttle, 2),
+        new TrainContinuously(Protoss.Scout))),
     new TrainContinuously(Protoss.DarkTemplar,  2,  1),
     new TrainContinuously(Protoss.Dragoon,      8,  4),
     new TrainContinuously(Protoss.Zealot),

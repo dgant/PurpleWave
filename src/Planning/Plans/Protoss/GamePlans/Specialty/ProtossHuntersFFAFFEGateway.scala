@@ -2,6 +2,7 @@ package Planning.Plans.Protoss.GamePlans.Specialty
 
 import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
 import Planning.Plan
+import Planning.Plans.Army.DropAttack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Information.Always
@@ -20,6 +21,10 @@ class ProtossHuntersFFAFFEGateway extends GameplanModeTemplate {
   override val defaultScoutPlan     : Plan = NoPlan()
   override val aggression = 0.8
   
+  override def priorityAttackPlan: Plan = new Parallel(
+    new DropAttack
+  )
+  
   override val buildOrder = Vector(
     RequestAtLeast(8,   Protoss.Probe),
     RequestAtLeast(1,   Protoss.Pylon),
@@ -36,6 +41,7 @@ class ProtossHuntersFFAFFEGateway extends GameplanModeTemplate {
     new If(new UnitsAtLeast(1, Protoss.Dragoon),      new Build(RequestUpgrade(Protoss.DragoonRange))),
     new If(new UnitsAtLeast(1, Protoss.HighTemplar),  new Build(RequestTech(Protoss.PsionicStorm))),
     new If(new UnitsAtLeast(2, Protoss.HighTemplar),  new Build(RequestUpgrade(Protoss.HighTemplarEnergy))),
+    new If(new UnitsAtLeast(1, Protoss.Shuttle),      new Build(RequestUpgrade(Protoss.ShuttleSpeed))),
     new If(new UnitsAtLeast(2, Protoss.Observatory),  new Build(RequestUpgrade(Protoss.ObserverSpeed))),
     new If(new UnitsAtLeast(4, Protoss.Zealot),       new Build(RequestUpgrade(Protoss.ZealotSpeed))),
     new If(new UnitsAtLeast(2, Protoss.Arbiter),      new Build(RequestTech(Protoss.Stasis))),
@@ -45,6 +51,7 @@ class ProtossHuntersFFAFFEGateway extends GameplanModeTemplate {
     new TrainContinuously(Protoss.Observer,     2),
     new TrainContinuously(Protoss.HighTemplar,  8,  2),
     new TrainContinuously(Protoss.DarkTemplar,  2,  1),
+    new TrainContinuously(Protoss.Shuttle,      2,  1),
     new TrainContinuously(Protoss.Dragoon,      20, 6),
     new TrainContinuously(Protoss.Zealot),
     new Build(

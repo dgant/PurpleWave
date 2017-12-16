@@ -43,7 +43,7 @@ class ProtossHuntersFFAGatewayAggro extends GameplanModeTemplate {
     new TrainContinuously(Protoss.Reaver,       2),
     new TrainContinuously(Protoss.HighTemplar,  8,  2),
     new TrainContinuously(Protoss.DarkTemplar,  2,  1),
-    new TrainContinuously(Protoss.Shuttle,      2),
+    new TrainContinuously(Protoss.Shuttle,      1),
     new TrainContinuously(Protoss.Dragoon,      20, 6),
     new TrainContinuously(Protoss.Zealot),
     new Build(

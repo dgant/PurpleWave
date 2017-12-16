@@ -61,7 +61,7 @@ class ProtossHuntersFFAFFEScoutReaver extends GameplanModeTemplate {
       new UnitsAtLeast(4, Protoss.Reaver),
       new TrainContinuously(Protoss.Reaver,     8),
       new Parallel(
-        new TrainContinuously(Protoss.Shuttle, 2),
+        new TrainContinuously(Protoss.Shuttle, 1),
         new TrainContinuously(Protoss.Scout))),
     new TrainContinuously(Protoss.DarkTemplar,  2,  1),
     new TrainContinuously(Protoss.Dragoon,      8,  4),

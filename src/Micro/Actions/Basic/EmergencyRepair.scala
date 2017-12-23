@@ -25,7 +25,7 @@ object EmergencyRepair extends Action {
     repairer.teammates.filter(patient =>
       patient.unitClass.isMechanical    &&
       isCloseEnough(repairer, patient)  &&
-      needsRepair(patient)              &&
+      needsRepair(repairer, patient)    &&
       ! patient.moving                  &&
       ! patient.plagued
     )
@@ -47,9 +47,20 @@ object EmergencyRepair extends Action {
     output
   }
   
-  def needsRepair(patient: UnitInfo): Boolean = {
-    patient.canAttack && patient.totalHealth < patient.unitClass.maxTotalHealth ||
-    patient.totalHealth < patient.unitClass.maxTotalHealth * 0.8 ||
-    patient.matchups.dpfReceivingCurrently > 0.0
+  def needsRepair(repairer: FriendlyUnitInfo, patient: UnitInfo): Boolean = {
+    lazy val docsRepairingNow = patient.matchups.repairers.count(_.framesToGetInRange(patient) < 8.0)
+    lazy val repairPerFrame   = 0.9 * patient.unitClass.maxTotalHealth / patient.unitClass.buildFrames
+    lazy val dpfRepairingNow  = repairPerFrame * docsRepairingNow
+    
+    lazy val isAlreadyPatient = patient.matchups.repairers.contains(repairer)
+    lazy val isDefense        = patient.canAttack
+    lazy val isDamaged        = patient.totalHealth < patient.unitClass.maxTotalHealth
+    lazy val isDamagedBadly   = patient.totalHealth < patient.unitClass.maxTotalHealth * 0.5
+    lazy val isDamagedDefense = isDamaged && isDefense
+    lazy val needsMoreRepair  = docsRepairingNow == 0 || patient.matchups.dpfReceivingCurrently >= repairPerFrame * 1.8
+    lazy val needsRepairSoon  = isDefense && patient.matchups.threatsViolent.nonEmpty && docsRepairingNow < 2
+    
+    val output = (isAlreadyPatient || isDamagedBadly || isDamagedDefense) && (needsMoreRepair || needsRepairSoon)
+    output
   }
 }

@@ -3,7 +3,7 @@ package Micro.Actions.Combat.Decisionmaking
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.{Cower, Sneak}
 import Micro.Actions.Combat.Spells.{SpiderMine, Stim}
-import Micro.Actions.Combat.Tactics.{Bunk, BustBunker, Spot}
+import Micro.Actions.Combat.Tactics._
 import Micro.Actions.Protoss.{BeACarrier, BeACorsair, BeAnArbiter}
 import Micro.Actions.Terran.{Siege, Unsiege}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -15,6 +15,7 @@ object Fight extends Action {
   }
   
   override def perform(unit: FriendlyUnitInfo) {
+    StrategicNuke.consider(unit)
     Cast.consider(unit)
     Stim.consider(unit)
     Bunk.consider(unit)
@@ -35,5 +36,6 @@ object Fight extends Action {
     else {
       Disengage.consider(unit)
     }
+    Form.consider(unit)
   }
 }

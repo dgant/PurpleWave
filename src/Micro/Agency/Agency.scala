@@ -1,6 +1,7 @@
 package Micro.Agency
 
 import Lifecycle.With
+import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 import scala.collection.mutable
@@ -58,6 +59,8 @@ class Agency {
   }
   
   private def validAgent(unit: FriendlyUnitInfo): Boolean = {
-    unit.alive && (unit.complete || unit.unitClass.isBuilding)
+    unit.alive                                    &&
+    (unit.complete || unit.unitClass.isBuilding)  &&
+    (unit.unitClass.orderable || unit.is(Protoss.Interceptor))
   }
 }

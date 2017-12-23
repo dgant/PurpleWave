@@ -28,7 +28,7 @@ object Cast extends Action {
     MindControl,
     Feedback,
     GhostCloak,
-    Nuke,
+    TacticalNuke,
     GhostUncloak,
     Lockdown
   )

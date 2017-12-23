@@ -19,6 +19,7 @@ class Intention {
   var toTech      : Option[Tech]      = None
   var toFinish    : Option[UnitInfo]  = None
   var toForm      : Option[Pixel]     = None
+  var toNuke      : Option[Pixel]     = None
   var toUpgrade   : Option[Upgrade]   = None
   var canAttack   : Boolean           = true
   var canFlee     : Boolean           = true

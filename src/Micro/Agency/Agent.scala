@@ -57,6 +57,7 @@ class Agent(val unit: FriendlyUnitInfo) {
   var toForm        : Option[Pixel]                 = None
   var toUpgrade     : Option[Upgrade]               = None
   var toBoard       : Option[FriendlyUnitInfo]      = None
+  var toNuke        : Option[Pixel]                 = None
   var canFight      : Boolean                       = true
   var canFlee       : Boolean                       = true
   var canCower      : Boolean                       = false
@@ -148,6 +149,7 @@ class Agent(val unit: FriendlyUnitInfo) {
     toFinish      = intent.toFinish
     toUpgrade     = intent.toUpgrade
     toForm        = intent.toForm
+    toNuke        = intent.toNuke
     toBoard       = None
     canFight      = intent.canAttack
     canFlee       = intent.canFlee

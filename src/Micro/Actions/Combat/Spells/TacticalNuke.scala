@@ -6,7 +6,7 @@ import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClass.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
-object Nuke extends TargetedSpell {
+object TacticalNuke extends TargetedSpell {
   
   override protected def casterClass    : UnitClass = Terran.Ghost
   override protected def tech           : Tech      = Terran.NuclearStrike

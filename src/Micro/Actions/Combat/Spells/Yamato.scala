@@ -1,5 +1,6 @@
 package Micro.Actions.Combat.Spells
 
+import Micro.Decisions.MicroValue
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClass.UnitClass
@@ -21,7 +22,7 @@ object Yamato extends TargetedSpell {
     val antiAirBonus    = if (target.unitClass.attacksAir) 3.0 else 1.0
     val hitPoints       = target.totalHealth - target.matchups.dpfReceivingCurrently * castFrames
     val dealtDamage     = Math.min(yamatoDamage, hitPoints)
-    val dealtValue      = dealtDamage / target.unitClass.subjectiveValue
+    val dealtValue      = dealtDamage * MicroValue.valuePerDamage(target)
     val output          = antiAirBonus * dealtValue
     output
   }

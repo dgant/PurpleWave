@@ -15,6 +15,6 @@ object WraithUncloak extends Action {
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {
-    With.commander.decloak(unit, Terran.WraithCloak)
+    With.commander.decloak(unit, Terran.GhostCloak)
   }
 }

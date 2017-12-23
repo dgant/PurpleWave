@@ -1,7 +1,7 @@
 package Strategery.Strategies.Protoss.PvE
 
 import Planning.Plan
-import Planning.Plans.Protoss.GamePlans.Specialty.DarkArchonRushWithNoDefense
+import Planning.Plans.GamePlans.Protoss.Standard.PvE.DarkArchonRushWithNoDefense
 import Strategery.Strategies.Strategy
 import bwapi.Race
 

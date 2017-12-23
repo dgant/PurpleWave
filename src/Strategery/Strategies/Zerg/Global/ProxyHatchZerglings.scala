@@ -1,7 +1,7 @@
 package Strategery.Strategies.Zerg.Global
 
 import Planning.Plan
-import Planning.Plans.Zerg.GamePlans.ProxyHatch
+import Planning.Plans.GamePlans.Zerg.ZvE.ProxyHatch
 import Strategery.Strategies.Strategy
 import bwapi.Race
 

@@ -1,7 +1,7 @@
 package Strategery.Strategies.Zerg.Global
 
 import Planning.Plan
-import Planning.Plans.Zerg.GamePlans.Zerg4Pool
+import Planning.Plans.GamePlans.Zerg.ZvE.Zerg4Pool
 import Strategery.Strategies.Strategy
 import bwapi.Race
 

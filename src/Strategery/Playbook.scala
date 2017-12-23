@@ -6,7 +6,7 @@ import Strategery.Strategies.Protoss.PvP._
 import Strategery.Strategies.Protoss.PvT._
 import Strategery.Strategies.Protoss.PvZ._
 import Strategery.Strategies.Strategy
-import Strategery.Strategies.Terran.Global._
+import Strategery.Strategies.Terran.TvE._
 import Strategery.Strategies.Zerg.Global._
 
 class EmptyPlaybook {

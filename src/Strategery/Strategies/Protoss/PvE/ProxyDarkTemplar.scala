@@ -1,7 +1,7 @@
 package Strategery.Strategies.Protoss.PvE
 
 import Planning.Plan
-import Planning.Plans.Protoss.GamePlans.Specialty.ProxyDarkTemplarRush
+import Planning.Plans.GamePlans.Protoss.Standard.PvE.ProxyDarkTemplarRush
 import Strategery.Maps.MapGroups
 import Strategery.Strategies.Strategy
 import bwapi.Race

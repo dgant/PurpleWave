@@ -6,12 +6,13 @@ import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
 import Micro.Decisions.MicroValue
 import ProxyBwapi.UnitInfo.UnitInfo
-import Utilities.ByOption
+import Utilities.{ByOption, Forever}
 
 import scala.collection.mutable
 
 case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
  
+  
   def this(us: UnitInfo) {
     this(us, MatchupConditions(us.pixelCenter, 0))
   }
@@ -59,10 +60,10 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
   lazy val doomedDiffused                         : Boolean               = framesToLiveDiffused <= framesToRetreatDiffused
   lazy val framesOfEntanglementPerThreatDiffused  : Map[UnitInfo, Double] = threats.map(threat => (threat, framesOfEntanglementWith(threat))).toMap
   lazy val framesOfEntanglementPerThreatCurrently : Map[UnitInfo, Double] = threatsViolent.map(threat => (threat, framesOfEntanglementWith(threat))).toMap
-  lazy val framesOfEntanglementDiffused           : Double                = ByOption.min(framesOfEntanglementPerThreatDiffused.values).getOrElse(Double.NegativeInfinity)
-  lazy val framesOfEntanglementCurrently          : Double                = ByOption.min(framesOfEntanglementPerThreatCurrently.values).getOrElse(Double.NegativeInfinity)
-  lazy val framesOfSafetyDiffused                 : Double                = - With.latency.latencyFrames - With.reaction.agencyMax - ByOption.max(framesOfEntanglementPerThreatDiffused.values).getOrElse(Double.NegativeInfinity)
-  lazy val framesOfSafetyCurrently                : Double                = - With.latency.latencyFrames - With.reaction.agencyMax - ByOption.max(framesOfEntanglementPerThreatCurrently.values).getOrElse(Double.NegativeInfinity)
+  lazy val framesOfEntanglementDiffused           : Double                = ByOption.min(framesOfEntanglementPerThreatDiffused.values).getOrElse(- Forever())
+  lazy val framesOfEntanglementCurrently          : Double                = ByOption.min(framesOfEntanglementPerThreatCurrently.values).getOrElse(- Forever())
+  lazy val framesOfSafetyDiffused                 : Double                = - With.latency.latencyFrames - With.reaction.agencyMax - ByOption.max(framesOfEntanglementPerThreatDiffused.values).getOrElse(- Forever())
+  lazy val framesOfSafetyCurrently                : Double                = - With.latency.latencyFrames - With.reaction.agencyMax - ByOption.max(framesOfEntanglementPerThreatCurrently.values).getOrElse(- Forever())
   lazy val mostEntangledThreatsDiffused           : Vector[UnitInfo]      = threats.sortBy( - framesOfEntanglementPerThreatDiffused(_))
   lazy val mostEntangledThreatsCurrently          : Vector[UnitInfo]      = threats.sortBy( - framesOfEntanglementPerThreatCurrently(_))
   lazy val mostEntangledThreatDiffused            : Option[UnitInfo]      = ByOption.minBy(framesOfEntanglementPerThreatDiffused)(_._2).map(_._1)

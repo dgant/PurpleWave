@@ -8,6 +8,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 object WraithCloak extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
+    With.self.hasTech(Terran.WraithCloak)               &&
     unit.is(Terran.Wraith)                              &&
     ! unit.cloaked                                      &&
     unit.energy >= Terran.WraithCloak.energyCost + 10   &&

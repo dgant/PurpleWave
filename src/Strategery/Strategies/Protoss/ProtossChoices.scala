@@ -2,7 +2,6 @@ package Strategery.Strategies.Protoss
 
 import Strategery.Strategies.AllRaces.{WorkerRush2StartLocations, WorkerRush3StartLocations}
 import Strategery.Strategies.Protoss.FFA._
-import Strategery.Strategies.Protoss.Other._
 import Strategery.Strategies.Protoss.PvE._
 import Strategery.Strategies.Protoss.PvP.{PvPOpen1015GateDTs, PvPOpenProxy2Gate, _}
 import Strategery.Strategies.Protoss.PvR._

@@ -98,6 +98,7 @@ class Gather extends Plan {
     val gasLimitFloor     = With.blackboard.gasLimitFloor
     gasWorkerTargetRatio  = With.blackboard.gasTargetRatio
     haveEnoughGas         = With.self.gas >= Math.max(gasLimitFloor, With.self.minerals)
+    
     workersForGas         = gasWorkers
     workersForMinerals    = allWorkers.size - workersForGas
     workersPerGas         = if (gasses.isEmpty) 0 else workersForGas.toDouble / gasses.size

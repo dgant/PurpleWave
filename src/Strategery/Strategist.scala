@@ -4,7 +4,7 @@ import Lifecycle.With
 import Mathematics.PurpleMath
 import Performance.Cache
 import Planning.Plan
-import Planning.Plans.WinTheGame
+import Planning.Plans.StandardGamePlan
 import ProxyBwapi.Players.Players
 import Strategery.History.HistoricalGame
 import Strategery.Strategies.Protoss.ProtossChoices
@@ -30,7 +30,7 @@ class Strategist {
   lazy val gameplan: Plan = selectedInitially
     .find(_.gameplan.isDefined)
     .map(_.gameplan.get)
-    .getOrElse(new WinTheGame)
+    .getOrElse(new StandardGamePlan)
   
   lazy val gameWeights: Map[HistoricalGame, Double] = With.history.games.map(game => (
     game,

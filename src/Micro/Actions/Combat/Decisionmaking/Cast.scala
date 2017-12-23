@@ -26,6 +26,10 @@ object Cast extends Action {
     Stasis,
     DisruptionWeb,
     MindControl,
-    Feedback
+    Feedback,
+    GhostCloak,
+    Nuke,
+    GhostUncloak,
+    Lockdown
   )
 }

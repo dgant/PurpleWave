@@ -220,7 +220,11 @@ abstract class UnitInfo(baseUnit: bwapi.Unit) extends UnitProxy(baseUnit) {
   def velocity: Force = Force(velocityX, velocityY)
   
   def canMove: Boolean = canMoveCache()
-  private val canMoveCache = new Cache(() => unitClass.canMove && topSpeed > 0 && canDoAnything && ! burrowed)
+  private val canMoveCache = new Cache(() =>
+    (unitClass.canMove || (unitClass.isBuilding && flying))
+    && topSpeed > 0
+    && canDoAnything
+    && ! burrowed)
   
   def topSpeedChasing: Double = topSpeedChasingCache()
   private val topSpeedChasingCache = new Cache(() => topSpeed * PurpleMath.nanToOne(Math.max(0, cooldownMaxAirGround - unitClass.stopFrames) / cooldownMaxAirGround.toDouble))

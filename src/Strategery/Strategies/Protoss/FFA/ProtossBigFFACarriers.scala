@@ -1,7 +1,7 @@
 package Strategery.Strategies.Protoss.FFA
 
 import Planning.Plan
-import Planning.Plans.Protoss.GamePlans.Specialty.ProtossBigFFACarriers
+import Planning.Plans.GamePlans.Protoss.Standard.FFA.ProtossBigFFACarriers
 import Strategery.Maps.{Hunters, StarCraftMap}
 import Strategery.Strategies.Strategy
 import bwapi.Race

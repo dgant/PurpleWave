@@ -4,12 +4,12 @@ import Macro.Architecture.Blueprint
 import Macro.BuildRequests.BuildRequest
 import Planning.Plan
 import Planning.Plans.Army._
-import Planning.Plans.Compound.NoPlan
+import Planning.Plans.Compound.{NoPlan, Parallel}
 import Planning.Plans.Macro.Automatic.{Gather, MeldArchons, RequireSufficientSupply, TrainWorkersContinuously}
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{BuildOrder, FollowBuildOrder, RequireEssentials}
 import Planning.Plans.Macro.Expanding.RemoveMineralBlocksAt
-import Planning.Plans.Protoss.Situational.DefendAgainstProxy
+import Planning.Plans.GamePlans.Protoss.Situational.DefendAgainstProxy
 import Planning.Plans.Recruitment.RecruitFreelancers
 import Planning.Plans.Scouting.{ScoutAt, ScoutExpansionsAt}
 
@@ -33,8 +33,7 @@ abstract class GameplanModeTemplate extends GameplanMode {
   def defaultScoutPlan      : Plan              = new ScoutAt(scoutAt)
   def priorityDefensePlan   : Plan              = NoPlan()
   def priorityAttackPlan    : Plan              = NoPlan()
-  def defaultAttackPlan     : Plan              = new ConsiderAttacking
-  
+  def defaultAttackPlan     : Plan              = new Parallel(new DropAttack, new ConsiderAttacking)
   
   def defaultMacroPlans: Vector[Plan] = Vector(
     defaultArchonPlan,
@@ -54,7 +53,8 @@ abstract class GameplanModeTemplate extends GameplanMode {
     defaultAttackPlan,
     new DefendEntrance,
     new Gather,
-    new RecruitFreelancers
+    new RecruitFreelancers,
+    new Scan
   )
   
   private var initialized = false

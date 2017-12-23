@@ -9,7 +9,8 @@ object Unbunk extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.transport.exists(_.is(Terran.Bunker))          &&
-    unit.transport.get.matchups.targetsInRange.isEmpty
+    unit.transport.get.matchups.targetsInRange.isEmpty  &&
+    unit.agent.toForm.forall(_.pixelDistanceFast(unit.pixelCenter) > 32.0 * 5.0)
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {

@@ -10,7 +10,7 @@ import Planning.Plans.GamePlans.Terran.Situational.BunkersAtNatural
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases, RequireMiningBasesFFA}
-import Planning.Plans.Macro.Milestones.{OnGasBases, UnitsAtLeast}
+import Planning.Plans.Macro.Milestones.{EnemyHasShownCloakedThreat, OnGasBases, UnitsAtLeast}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitClass.UnitClass
@@ -55,14 +55,6 @@ class TerranFFA extends GameplanModeTemplate {
     new UpgradeContinuously(Terran.AirArmor),
     new Build(RequestAtLeast(1, Terran.ScienceFacility)))
   
-  override val buildOrder = Vector(
-    RequestAtLeast(8, Terran.SCV),
-    RequestAtLeast(1, Terran.SupplyDepot),
-    RequestAtLeast(14, Terran.SCV),
-    RequestAtLeast(2, Terran.CommandCenter),
-    RequestAtLeast(16, Terran.SCV),
-    RequestAtLeast(2, Terran.Barracks))
-  
   private class BuildScienceFacilityForAddon(addon: UnitClass) extends Plan {
     val build = new Build()
     override def onUpdate() {
@@ -78,6 +70,32 @@ class TerranFFA extends GameplanModeTemplate {
       build.update()
     }
   }
+  
+  override def defaultAttackPlan: Plan = new If(
+    new UnitsAtLeast(20, UnitMatchWarriors),
+    super.defaultAttackPlan)
+  
+  override val buildOrder = Vector(
+    RequestAtLeast(8, Terran.SCV),
+    RequestAtLeast(1, Terran.SupplyDepot),
+    RequestAtLeast(14, Terran.SCV),
+    RequestAtLeast(2, Terran.CommandCenter),
+    RequestAtLeast(16, Terran.SCV),
+    RequestAtLeast(2, Terran.Barracks))
+  
+  override def emergencyPlans: Seq[Plan] = Vector(
+    new If(
+      new UnitsAtLeast(1, Terran.Academy, complete = true),
+      new TrainContinuously(Terran.Comsat, 2)),
+    new If(
+      new EnemyHasShownCloakedThreat,
+      new Build(
+        RequestAtLeast(1, Terran.ScienceVessel),
+        RequestAtLeast(1, Terran.Refinery),
+        RequestAtLeast(1, Terran.Academy),
+        RequestAtLeast(1, Terran.EngineeringBay),
+        RequestAtLeast(2, Terran.MissileTurret)))
+  )
   
   override def buildPlans: Seq[Plan] = Vector(
     new If(

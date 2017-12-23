@@ -1,6 +1,7 @@
 package Macro.Architecture.Heuristics
 
 import Macro.Architecture.Blueprint
+import ProxyBwapi.Races.Terran
 
 object PlacementProfiles {
   
@@ -12,7 +13,7 @@ object PlacementProfiles {
     else if (blueprint.powers.get)
       pylon
     else if (blueprint.building.exists(_.trainsGroundUnits))
-      factory
+      if (blueprint.building.contains(Terran.Barracks)) factoryNoSpace else factory
     else if (blueprint.building.exists(_.attacks))
       wallCannon
     else
@@ -37,6 +38,9 @@ object PlacementProfiles {
   
   val pylon = new PlacementProfile("Pylon", basic)
   val factory = new PlacementProfile("Factory", basic)
+  val factoryNoSpace = new PlacementProfile("Factory", basic) {
+    preferSpace = 0.0
+  }
   
   val tech = new PlacementProfile("Tech", basic) {
     preferDistanceFromEnemy     = 3.0

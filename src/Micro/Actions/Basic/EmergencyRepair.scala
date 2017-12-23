@@ -16,13 +16,14 @@ object EmergencyRepair extends Action {
     
     if (patients.isEmpty) return
     
-    val patient = patients.minBy(_.totalHealth)
+    val patient = patients.minBy(_.pixelDistanceFast(unit))
     
     With.commander.repair(unit, patient)
   }
   
   def eligiblePatients(repairer: FriendlyUnitInfo): Iterable[UnitInfo] = {
     repairer.teammates.filter(patient =>
+      patient.complete                  &&
       patient.unitClass.isMechanical    &&
       isCloseEnough(repairer, patient)  &&
       needsRepair(repairer, patient)    &&
@@ -32,6 +33,8 @@ object EmergencyRepair extends Action {
   }
   
   def isCloseEnough(repairer: FriendlyUnitInfo, patient: UnitInfo): Boolean = {
+    if (repairer.pixelDistanceFast(patient) > 32.0 * 30.0) return false
+    
     lazy val patientLifetime  = Math.max(patient.matchups.framesToLiveCurrently, patient.matchups.framesOfSafetyDiffused)
     lazy val canSaveBunker    = patient.is(Terran.Bunker) && repairer.framesToGetInRange(patient) < patientLifetime * 2
     lazy val canSavePlebian   = repairer.framesToGetInRange(patient) < patientLifetime
@@ -61,6 +64,11 @@ object EmergencyRepair extends Action {
     lazy val needsRepairSoon  = isDefense && patient.matchups.threatsViolent.nonEmpty && docsRepairingNow < 2
     
     val output = (isAlreadyPatient || isDamagedBadly || isDamagedDefense) && (needsMoreRepair || needsRepairSoon)
+    
+    if (output && ! isAlreadyPatient) {
+      patient.matchups.repairers += repairer
+    }
+    
     output
   }
 }

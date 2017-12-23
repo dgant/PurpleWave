@@ -10,6 +10,7 @@ import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.{ByOption, Forever}
 
 import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 
 case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
  
@@ -33,20 +34,20 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
     hypotheticalMatchups(hypotheticalConditions)
   }
   
-  lazy val battle                 : Option[Battle]    = me.battle.orElse(With.matchups.entrants.find(_._2.contains(me)).map(_._1))
-  lazy val enemies                : Vector[UnitInfo]  = if (battle.isEmpty) Vector.empty else battle.get.teamOf(me).opponent.units
-  lazy val alliesIncludingSelf    : Vector[UnitInfo]  = if (battle.isEmpty) Vector.empty else battle.get.teamOf(me).units
-  lazy val allies                 : Vector[UnitInfo]  = alliesIncludingSelf.filterNot(_.id == me.id)
-  lazy val others                 : Vector[UnitInfo]  = enemies ++ allies
-  lazy val allUnits               : Vector[UnitInfo]  = enemies ++ alliesIncludingSelf
-  lazy val enemyDetectors         : Vector[UnitInfo]  = enemies.filter(e => e.aliveAndComplete && e.unitClass.isDetector)
-  lazy val threats                : Vector[UnitInfo]  = enemies.filter(_.canAttack(me))
-  lazy val targets                : Vector[UnitInfo]  = enemies.filter(me.canAttack)
-  lazy val threatsViolent         : Vector[UnitInfo]  = threats.filter(_.isBeingViolentTo(me))
-  lazy val threatsInRange         : Vector[UnitInfo]  = threats.filter(threat => threat.pixelRangeAgainstFromCenter(me) >= threat.pixelDistanceFast(at) - me.pixelsTravelledMax(frame) - threat.pixelsTravelledMax(frame))
-  lazy val threatsViolentInRange  : Vector[UnitInfo]  = threatsInRange.filter(_.isBeingViolentTo(me))
-  lazy val targetsInRange         : Vector[UnitInfo]  = targets.filter(target => target.visible && me.pixelRangeAgainstFromCenter(target) >= target.pixelDistanceFast(at) - me.pixelsTravelledMax(frame) - target.pixelsTravelledMax(frame))
-  lazy val repairers              : Vector[UnitInfo]  = allies.filter(ally => ally.is(Terran.SCV) && ally.target.contains(me))
+  lazy val battle                 : Option[Battle]        = me.battle.orElse(With.matchups.entrants.find(_._2.contains(me)).map(_._1))
+  lazy val enemies                : Vector[UnitInfo]      = if (battle.isEmpty) Vector.empty else battle.get.teamOf(me).opponent.units
+  lazy val alliesIncludingSelf    : Vector[UnitInfo]      = if (battle.isEmpty) Vector.empty else battle.get.teamOf(me).units
+  lazy val allies                 : Vector[UnitInfo]      = alliesIncludingSelf.filterNot(_.id == me.id)
+  lazy val others                 : Vector[UnitInfo]      = enemies ++ allies
+  lazy val allUnits               : Vector[UnitInfo]      = enemies ++ alliesIncludingSelf
+  lazy val enemyDetectors         : Vector[UnitInfo]      = enemies.filter(e => e.aliveAndComplete && e.unitClass.isDetector)
+  lazy val threats                : Vector[UnitInfo]      = enemies.filter(_.canAttack(me))
+  lazy val targets                : Vector[UnitInfo]      = enemies.filter(me.canAttack)
+  lazy val threatsViolent         : Vector[UnitInfo]      = threats.filter(_.isBeingViolentTo(me))
+  lazy val threatsInRange         : Vector[UnitInfo]      = threats.filter(threat => threat.pixelRangeAgainstFromCenter(me) >= threat.pixelDistanceFast(at) - me.pixelsTravelledMax(frame) - threat.pixelsTravelledMax(frame))
+  lazy val threatsViolentInRange  : Vector[UnitInfo]      = threatsInRange.filter(_.isBeingViolentTo(me))
+  lazy val targetsInRange         : Vector[UnitInfo]      = targets.filter(target => target.visible && me.pixelRangeAgainstFromCenter(target) >= target.pixelDistanceFast(at) - me.pixelsTravelledMax(frame) - target.pixelsTravelledMax(frame) && (me.unitClass.groundMinRangeRaw <= 0 || me.pixelsFromEdgeFast(target) > 32.0 * 3.0))
+  lazy val repairers              : ArrayBuffer[UnitInfo] = ArrayBuffer.empty ++ allies.filter(ally => ally.is(Terran.SCV) && ally.target.contains(me))
   
   lazy val valuePerDamage                         : Double                = MicroValue.valuePerDamage(me)
   lazy val vpfDealingDiffused                     : Double                = targetsInRange.map(target => dpfDealingDiffused(target)  * target.matchups.valuePerDamage).sum

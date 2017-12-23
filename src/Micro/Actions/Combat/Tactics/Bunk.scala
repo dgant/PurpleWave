@@ -28,6 +28,7 @@ object Bunk extends Action {
   override protected def perform(unit: FriendlyUnitInfo) {
     val openBunkers         = openBunkersFor(unit)
     val openBunkersEngaged  = openBunkers.filter(_.matchups.targetsInRange.nonEmpty)
+    val openBunkersInForm   = openBunkers.filter(bunker => unit.agent.toForm.exists(_.pixelDistanceFast(bunker.pixelCenter) < 32.0 * 8.0))
     val openBunkerToEnter   = ByOption.minBy(openBunkersEngaged)(_.pixelDistanceFast(unit))
     
     if (openBunkerToEnter.isDefined) {

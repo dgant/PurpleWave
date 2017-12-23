@@ -33,7 +33,7 @@ abstract class GameplanModeTemplate extends GameplanMode {
   def defaultScoutPlan      : Plan              = new ScoutAt(scoutAt)
   def priorityDefensePlan   : Plan              = NoPlan()
   def priorityAttackPlan    : Plan              = NoPlan()
-  def defaultAttackPlan     : Plan              = new Parallel(new DropAttack, new ConsiderAttacking)
+  def defaultAttackPlan     : Plan              = new Parallel(new NukeBase, new DropAttack, new ConsiderAttacking)
   
   def defaultMacroPlans: Vector[Plan] = Vector(
     defaultArchonPlan,

@@ -16,7 +16,7 @@ object DropOff extends Action {
     val fastestPassenger  = unit.loadedUnits.maxBy(_.topSpeed)
     val inZone            = unit.agent.toTravel.forall(_.zone == unit.zone)
     val onRunway          = unit.agent.toTravel.forall(unit.pixelDistanceFast(_) < 32.0 * 6.0)
-    val inHurry           = unit.matchups.framesToLiveCurrently < 24 + 24 * unit.loadedUnits.size + unit.agent.toTravel.map(unit.framesToTravelTo).sum
+    val inHurry           = unit.matchups.framesToLiveDiffused < (24 + With.reaction.agencyMax) * (1 +  unit.loadedUnits.size)
     
     if (inZone && (onRunway || inHurry)) {
       With.commander.unload(unit, unit.loadedUnits.head)

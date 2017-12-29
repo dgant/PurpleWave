@@ -6,9 +6,10 @@ import Macro.Scheduling.Project
 import Micro.Agency.Intention
 import Planning.Composition.ResourceLocks.{LockCurrencyForUnit, LockUnits}
 import Planning.Composition.UnitCounters.UnitCountOne
-import Planning.Composition.UnitMatchers.{UnitMatchAnd, UnitMatchHasAddon}
+import Planning.Composition.UnitMatchers._
 import Planning.Composition.UnitPreferences.UnitPreferNoAddon
 import Planning.Plan
+import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitClass.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -23,6 +24,8 @@ class TrainUnit(val traineeClass: UnitClass) extends Plan {
   val trainerMatcher  =
     if (addonsRequired.isDefined)
       UnitMatchAnd(matchTrainer, UnitMatchHasAddon(addonsRequired.head))
+    else if (traineeClass == Terran.NuclearMissile)
+      UnitMatchAnd(matchTrainer, UnitMatchNot(UnitMatchHasNuke))
     else
       matchTrainer
     

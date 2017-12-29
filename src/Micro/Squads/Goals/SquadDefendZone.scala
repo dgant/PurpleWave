@@ -32,19 +32,19 @@ class SquadDefendZone(zone: Zone) extends SquadGoal {
     lazy val canDefendHeart  = base.isDefined
     
     if (canHuntEnemies) {
-      lastAction = "Hunt intruders in "
+      lastAction = "Scour "
       huntEnemies()
     }
     else if (canDefendWall) {
-      lastAction = "Defend static defense in "
+      lastAction = "Protect wall of "
       defendWall(walls)
     }
     else if (canDefendChoke) {
-      lastAction = "Defend choke of "
+      lastAction = "Protect choke of "
       defendChoke(choke.get)
     }
     else if (canDefendHeart) {
-      lastAction = "Defend heart of "
+      lastAction = "Protect heart of "
       defendHeart(base.map(_.heart.pixelCenter).getOrElse(zone.centroid.pixelCenter))
     }
   }

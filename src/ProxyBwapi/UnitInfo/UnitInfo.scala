@@ -526,5 +526,5 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     else if (likelyStillThere)    player.colorMedium
     else if (possiblyStillThere)  player.colorDark
     else if (likelyStillAlive)    player.colorMidnight
-    else                          Colors.DarkGray
+    else                          Colors.MidnightGray
 }

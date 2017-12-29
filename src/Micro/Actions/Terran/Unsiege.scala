@@ -21,7 +21,7 @@ object Unsiege extends Action {
     lazy val tile             = unit.tileIncludingCenter
     lazy val home             = With.geography.home.pixelCenter
     lazy val otherSiegeTanks  = unit.matchups.allies.filter(_.unitClass.isSiegeTank)
-    lazy val closerSiegeTanks = otherSiegeTanks.filter(_.pixelDistanceFast(unit.agent.toTravel.get) < unit.pixelDistanceFast(unit.agent.toTravel.get) - Siege.spread)
+    lazy val closerSiegeTanks = otherSiegeTanks.filter(_.pixelDistanceTravelling(unit.agent.toTravel.get) < unit.pixelDistanceTravelling(unit.agent.toTravel.get) - Siege.spread)
     lazy val uncheckedThreats = unit.matchups.threatsInRange.filter(threat => threat.matchups.threatsInRange.isEmpty)
     lazy val gettingPickedOff = visibleTargets.isEmpty && uncheckedThreats.nonEmpty
     

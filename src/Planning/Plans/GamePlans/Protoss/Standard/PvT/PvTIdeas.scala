@@ -9,7 +9,7 @@ import Planning.Plans.Information.{Employing, SafeToAttack}
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
-import Planning.Plans.Macro.Milestones.{OnGasBases, _}
+import Planning.Plans.Macro.Milestones.{OnGasPumps, _}
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss.PvT._
 
@@ -136,7 +136,7 @@ object PvTIdeas {
       new TrainContinuously(Protoss.Observer, 3),
       new TrainContinuously(Protoss.Observer, 1)))
   
-  class TrainHighTemplar extends OnGasBases(3,
+  class TrainHighTemplar extends OnGasPumps(3,
     new If(
       new UnitsAtLeast(20, UnitMatchWarriors),
       new TrainContinuously(Protoss.HighTemplar, 6, 2),

@@ -16,13 +16,20 @@ object Heal extends Action {
     val targets = validTargets(unit)
     val target  = ByOption.minBy(targets)(_.pixelDistanceFast(unit))
     
-    
     target.foreach(someTarget => {
       With.commander.attackMove(unit, someTarget.pixelCenter)
     })
   }
   
   private def validTargets(unit: FriendlyUnitInfo): Vector[UnitInfo] = {
-    unit.matchups.allies.filter(u => u.unitClass.isOrganic && ! u.beingHealed && ! u.is(Terran.Medic))
+    unit.matchups.allies.filter(u =>
+      u.unitClass.isOrganic
+      && ! u.beingHealed
+      && ! u.is(Terran.Medic)
+      && (
+        u.hitPoints < u.unitClass.maxHitPoints
+        || u.matchups.dpfReceivingDiffused > 0
+        || u.pixelDistanceFast(unit) > 24.0 // Don't get in the way
+      ) )
   }
 }

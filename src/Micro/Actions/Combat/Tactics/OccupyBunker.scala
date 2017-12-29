@@ -10,6 +10,7 @@ object OccupyBunker extends Action {
   
   override def allowed(unit: FriendlyUnitInfo) = (
     unit.agent.toForm.isDefined
+    && Bunk.classAllowedToBunk(unit)
     && unit.transport.isEmpty
     && unit.matchups.threatsInRange.isEmpty)
   
@@ -20,6 +21,7 @@ object OccupyBunker extends Action {
       .inTileRadius(destination.tileIncluding, 5)
       .filter(bunker =>
         bunker.isOurs
+        && bunker.complete
         && bunker.is(Terran.Bunker)
         && bunker.friendly.get.loadedUnits.size < 4)
   

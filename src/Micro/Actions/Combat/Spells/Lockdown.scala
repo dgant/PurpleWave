@@ -15,9 +15,10 @@ object Lockdown extends TargetedSpell {
   override protected def thresholdValue : Double    = Terran.Ghost.subjectiveValue
   
   override protected def valueTarget(target: UnitInfo): Double = {
-    if ( ! target.isEnemy) return 0.0
+    if ( ! target.isEnemy)                return 0.0
     if ( ! target.unitClass.isMechanical) return 0.0
-    if (target.lockedDown) return 0.0
+    if (target.unitClass.isBuilding)      return 0.0
+    if (target.lockedDown)                return 0.0
     
     val thresholdLifetimeFrames = 24 * 5.0
     val cappedLifetime          = Math.max(thresholdLifetimeFrames, target.matchups.framesToLiveCurrently)

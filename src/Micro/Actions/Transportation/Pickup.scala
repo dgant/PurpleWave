@@ -16,7 +16,7 @@ object Pickup extends Action {
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     val passengersPotential = potentialPassengers(unit)
-    if (passengersPotential.isEmpty && unit.loadedUnits.isEmpty) {
+    if (passengersPotential.isEmpty && unit.loadedUnits.isEmpty && ! unit.unitClass.isDetector) {
       unit.agent.toTravel = Some(unit.agent.origin)
       Disengage.consider(unit)
       return

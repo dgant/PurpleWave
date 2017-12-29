@@ -9,13 +9,13 @@ import Utilities.ByOption
 object Bunk extends Action {
   
   // Firebats, Medics, and SCVs can enter bunkers too but it's less obvious when they should
-  def allowedToBunk(unit: FriendlyUnitInfo): Boolean = Vector(
+  def classAllowedToBunk(unit: FriendlyUnitInfo): Boolean = Vector(
     Terran.Marine,
     Terran.Ghost
   ).contains(unit.unitClass)
   
   def openBunkersFor(forUnit: FriendlyUnitInfo): Seq[UnitInfo] = {
-    if (allowedToBunk(forUnit))
+    if (classAllowedToBunk(forUnit))
       forUnit.matchups.allies.filter(ally => ally.is(Terran.Bunker) && ally.friendly.get.loadedUnits.size < 4)
     else
       Seq.empty

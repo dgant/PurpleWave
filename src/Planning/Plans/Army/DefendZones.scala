@@ -54,6 +54,10 @@ class DefendZones extends Plan {
   }
   
   private def isThreatening(enemy: ForeignUnitInfo, zone: Zone): Boolean = {
-    (enemy.unitClass.helpsInCombat || enemy.isTransport) && enemy.zone == zone
+    (
+      enemy.likelyStillAlive
+      && (enemy.unitClass.helpsInCombat || enemy.isTransport)
+      && enemy.zone == zone
+    )
   }
 }

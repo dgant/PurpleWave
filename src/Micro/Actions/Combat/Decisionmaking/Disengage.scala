@@ -1,6 +1,5 @@
 package Micro.Actions.Combat.Decisionmaking
 
-import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.{Avoid, KiteSafely}
 import Micro.Actions.Combat.Tactics.{Bunk, Potshot}
@@ -18,24 +17,15 @@ object Disengage extends Action {
   
   override protected def perform(unit: FriendlyUnitInfo) {
     
-    val mostEntangledThreat = unit.matchups.mostEntangledThreatDiffused.get
-    
+    lazy val mostEntangledThreat = unit.matchups.mostEntangledThreatDiffused.get
     lazy val bunkers      = Bunk.openBunkersFor(unit)
-    lazy val freeToFlee   = unit.topSpeed        > mostEntangledThreat.topSpeedChasing
-    lazy val freeToChase  = unit.topSpeedChasing > mostEntangledThreat.topSpeed
+    lazy val freeToFlee   = unit.topSpeed        >= mostEntangledThreat.topSpeedChasing
+    lazy val freeToChase  = unit.topSpeedChasing >= mostEntangledThreat.topSpeed
     lazy val outrange     = unit.canAttack(mostEntangledThreat) && unit.pixelRangeAgainstFromEdge(mostEntangledThreat) > mostEntangledThreat.pixelRangeAgainstFromEdge(unit)
-  
-    // Bunker? Yes, please.
-    // TODO: Should probably make sure there's room! Otherwise we just spamclick it
-    if (bunkers.nonEmpty) {
-      val bunker = bunkers.minBy(_.pixelDistanceFast(unit))
-      With.commander.rightClick(unit, bunker)
-      return
-    }
+    lazy val canBait      = mostEntangledThreat.matchups.threatsInRange.exists(ally => ally.matchups.framesOfSafetyDiffused > unit.matchups.framesOfEntanglementDiffused)
     
     if (freeToFlee) {
       if (outrange) {
-        
         if (freeToChase) {
           // Let's chase 'em from a distance
           KiteSafely.consider(unit)
@@ -56,10 +46,7 @@ object Disengage extends Action {
       }
     }
     else {
-      // We can at least trade with them while running away.
-      // Do we want to? There's some complicated tradeoffs to make here.
-      // For now, assume yes.
-      if (outrange) {
+      if (outrange && ! canBait) {
         Potshot.consider(unit)
       }
       Avoid.consider(unit)

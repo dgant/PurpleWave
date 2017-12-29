@@ -8,7 +8,7 @@ import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RemoveMineralBlocksAt, RequireMiningBases}
-import Planning.Plans.Macro.Milestones.{IfOnMiningBases, OnGasBases, UnitsAtLeast}
+import Planning.Plans.Macro.Milestones.{IfOnMiningBases, OnGasPumps, UnitsAtLeast}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Recruitment.RecruitFreelancers
 import Planning.Plans.Scouting.FindExpansions
@@ -76,10 +76,10 @@ class ThreeBaseCarriersWithNoDefense extends Parallel {
         new TrainContinuously(Protoss.Scout, 1),
         new TrainContinuously(Protoss.Carrier),
         new TrainContinuously(Protoss.Observer, 1))),
-    new OnGasBases(1, new Build(RequestAtLeast(3, Protoss.Stargate))),
-    new OnGasBases(2, new Build(RequestAtLeast(5, Protoss.Stargate))),
-    new OnGasBases(3, new Build(RequestAtLeast(8, Protoss.Stargate))),
-    new OnGasBases(4, new Build(RequestAtLeast(12, Protoss.Stargate))),
+    new OnGasPumps(1, new Build(RequestAtLeast(3, Protoss.Stargate))),
+    new OnGasPumps(2, new Build(RequestAtLeast(5, Protoss.Stargate))),
+    new OnGasPumps(3, new Build(RequestAtLeast(8, Protoss.Stargate))),
+    new OnGasPumps(4, new Build(RequestAtLeast(12, Protoss.Stargate))),
     new Build(
       RequestAnother(6, Protoss.PhotonCannon),
       RequestAnother(2, Protoss.Pylon)),

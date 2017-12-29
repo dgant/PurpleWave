@@ -7,7 +7,7 @@ import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Information.{Employing, SafeAtHome}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildCannonsAtExpansions, BuildCannonsAtNatural, RequireMiningBases}
-import Planning.Plans.Macro.Milestones.{OnGasBases, IfOnMiningBases, UnitsAtLeast}
+import Planning.Plans.Macro.Milestones.{OnGasPumps, IfOnMiningBases, UnitsAtLeast}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvT.PvT2BaseArbiter
@@ -59,10 +59,10 @@ class PvT2BaseArbiters extends GameplanModeTemplate {
         new Build(RequestAtLeast(1, Protoss.Forge)),
         new UpgradeContinuously(Protoss.GroundDamage),
         new Build(RequestAtLeast(10, Protoss.Gateway)),
-        new OnGasBases(4, new Build(
+        new OnGasPumps(4, new Build(
           RequestUpgrade(Protoss.ArbiterEnergy),
           RequestAtLeast(2, Protoss.Stargate))))),
-    new OnGasBases(3, new UpgradeContinuously(Protoss.GroundArmor)),
+    new OnGasPumps(3, new UpgradeContinuously(Protoss.GroundArmor)),
     new IfOnMiningBases(2, new Build(RequestAtLeast(11, Protoss.Gateway))),
     new IfOnMiningBases(3, new Build(RequestAtLeast(16, Protoss.Gateway))),
     new IfOnMiningBases(4, new Build(RequestAtLeast(20, Protoss.Gateway)))

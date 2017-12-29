@@ -291,7 +291,7 @@ class ProtossVsZergOld extends Parallel {
         new TrainMatchingRatio(Protoss.Corsair, 8, Int.MaxValue, Seq(MatchingRatio(Zerg.Mutalisk, 1.5))),
         new TrainMatchingRatio(Protoss.Corsair, 1, Int.MaxValue, Seq(MatchingRatio(Zerg.Mutalisk, 1.5))))),
   
-    new OnGasBases(2,
+    new OnGasPumps(2,
       new If(
         new EnemyUnitsAtLeast(13, Zerg.Mutalisk),
         new Build(RequestAtLeast(3, Protoss.Stargate)),

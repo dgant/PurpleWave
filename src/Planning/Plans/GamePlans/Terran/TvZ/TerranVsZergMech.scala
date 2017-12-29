@@ -9,7 +9,7 @@ import Planning.Plans.Information.Reactive.{EnemyLurkers, EnemyMutalisks}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding._
-import Planning.Plans.Macro.Milestones.{IfOnMiningBases, OnGasBases, UnitsAtLeast}
+import Planning.Plans.Macro.Milestones.{IfOnMiningBases, OnGasPumps, UnitsAtLeast}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Scouting.ScoutAt
 import ProxyBwapi.Races.{Terran, Zerg}
@@ -96,8 +96,8 @@ class TerranVsZergMech extends Parallel {
         RequestAtLeast(5, Terran.Factory)))
     ),
     new IfOnMiningBases(3, new Build(RequestAtLeast(5, Terran.Factory), RequestAtLeast(1, Terran.Academy), RequestAtLeast(8, Terran.Factory))),
-    new OnGasBases(2, new Build(RequestAtLeast(2, Terran.MachineShop))),
-    new OnGasBases(3, new Build(RequestAtLeast(3, Terran.MachineShop))),
+    new OnGasPumps(2, new Build(RequestAtLeast(2, Terran.MachineShop))),
+    new OnGasPumps(3, new Build(RequestAtLeast(3, Terran.MachineShop))),
     new RequireMiningBases(2),
     new Build(
       RequestAtLeast(3, Terran.Factory),

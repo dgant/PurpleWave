@@ -57,7 +57,12 @@ class DefendAgainstProxy extends Plan {
   }
   
   private def getProxies: Seq[UnitInfo] = {
-    With.units.enemy.toSeq.filter(e => scaryTypes.contains(e.unitClass) && isProxied(e) && ! e.flying)
+    With.units.enemy.toSeq.filter(e =>
+      e.likelyStillAlive
+      && e.possiblyStillThere
+      && scaryTypes.contains(e.unitClass)
+      && isProxied(e)
+      && ! e.flying)
   }
   
   private def isProxied(enemy: UnitInfo): Boolean = {

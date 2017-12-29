@@ -9,9 +9,9 @@ import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
 
 import scala.collection.JavaConverters._
 
-class FriendlyUnitInfo(base: bwapi.Unit) extends FriendlyUnitProxy(base) {
+class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends FriendlyUnitProxy(base, id) {
   
-  override def friendly: Option[FriendlyUnitInfo] = Some(this)
+  override val friendly: Option[FriendlyUnitInfo] = Some(this)
   
   def squad: Option[Squad] = With.squads.squadByUnit.get(this)
   def squadmates: Seq[FriendlyUnitInfo] = squad.map(_.recruits).getOrElse(Seq.empty)
@@ -54,7 +54,8 @@ class FriendlyUnitInfo(base: bwapi.Unit) extends FriendlyUnitProxy(base) {
   private val loadedUnitsCache = new Cache(() => base.getLoadedUnits.asScala.flatMap(With.units.get).flatMap(_.friendly).toVector)
   
   def transport: Option[FriendlyUnitInfo] = transportCache()
-  private val transportCache = new Cache(() => With.units.get(base.getTransport).flatMap(_.friendly))
+  //isBuilding check: Performance optimization
+  private val transportCache = new Cache(() => if (unitClass.isBuilding) None else With.units.get(base.getTransport).flatMap(_.friendly))
   
   def canTransport(passenger: FriendlyUnitInfo): Boolean =
     isTransport                       &&

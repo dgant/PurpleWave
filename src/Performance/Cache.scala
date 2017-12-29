@@ -4,19 +4,21 @@ import Lifecycle.With
 
 class Cache[T](recalculator: () => T) {
   
+  private var lastValue: T = _
+  private val defaultValue = lastValue
   private var invalidStartingOnThisFrame = 0
-  private var lastValue: Option[T] = None
   
+  @inline
   def apply(): T = {
     if (invalidStartingOnThisFrame <= With.frame) {
-      lastValue = Some(recalculator.apply())
+      lastValue = recalculator()
       invalidStartingOnThisFrame = With.frame + 1
     }
-    lastValue.get
+    lastValue
   }
   
   def invalidate() {
-    lastValue = None
+    lastValue = defaultValue
     invalidStartingOnThisFrame = With.frame
   }
 }

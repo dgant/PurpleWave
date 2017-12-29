@@ -18,25 +18,23 @@ object Unsiege extends Action {
       return
     }
     
-    var unsiege = false
+    lazy val tile             = unit.tileIncludingCenter
+    lazy val home             = With.geography.home.pixelCenter
+    lazy val otherSiegeTanks  = unit.matchups.allies.filter(_.unitClass.isSiegeTank)
+    lazy val closerSiegeTanks = otherSiegeTanks.filter(_.pixelDistanceFast(unit.agent.toTravel.get) < unit.pixelDistanceFast(unit.agent.toTravel.get) - Siege.spread)
+    lazy val uncheckedThreats = unit.matchups.threatsInRange.filter(threat => threat.matchups.threatsInRange.isEmpty)
+    lazy val gettingPickedOff = visibleTargets.isEmpty && uncheckedThreats.nonEmpty
     
-    if (unit.agent.toTravel.isDefined) {
-  
-      lazy val tile             = unit.tileIncludingCenter
-      lazy val home             = With.geography.home.pixelCenter
-      lazy val otherSiegeTanks  = unit.matchups.allies.filter(_.unitClass.isSiegeTank)
-      lazy val closerSiegeTanks = otherSiegeTanks.filter(_.pixelDistanceFast(unit.agent.toTravel.get) < unit.pixelDistanceFast(unit.agent.toTravel.get) - Siege.spread)
-      lazy val uncheckedThreats = unit.matchups.threatsInRange.filter(threat => threat.matchups.threatsInRange.isEmpty)
-      lazy val gettingPickedOff = visibleTargets.isEmpty && uncheckedThreats.nonEmpty
-      
-      unsiege ||= With.grids.chokepoints.get(tile) && tile.zone.owner.isUs
-      unsiege ||= otherSiegeTanks.isEmpty
-      unsiege ||= otherSiegeTanks.nonEmpty && closerSiegeTanks.nonEmpty
-      unsiege ||= closerSiegeTanks.nonEmpty
-      unsiege ||= gettingPickedOff
-    }
+    var shouldUnsiege = false
     
-    if (unsiege) {
+    shouldUnsiege ||= With.grids.chokepoints.get(tile) && tile.zone.owner.isUs
+    shouldUnsiege ||= otherSiegeTanks.isEmpty
+    shouldUnsiege ||= otherSiegeTanks.nonEmpty && closerSiegeTanks.nonEmpty
+    shouldUnsiege ||= closerSiegeTanks.nonEmpty
+    shouldUnsiege ||= gettingPickedOff
+    shouldUnsiege || unit.agent.shovers.nonEmpty
+    
+    if (shouldUnsiege) {
       With.commander.useTech(unit, Terran.SiegeMode)
     }
     

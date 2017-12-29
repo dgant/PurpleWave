@@ -9,7 +9,7 @@ import bwapi._
 
 import scala.collection.JavaConverters._
 
-abstract class FriendlyUnitProxy(base: bwapi.Unit) extends UnitInfo(base) {
+abstract class FriendlyUnitProxy(base: bwapi.Unit, id: Int) extends UnitInfo(base, id) {
   
   override def equals(obj: Any): Boolean = obj.isInstanceOf[FriendlyUnitProxy] && obj.asInstanceOf[FriendlyUnitProxy].id == id
   override def hashCode(): Int = id.hashCode
@@ -21,7 +21,6 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit) extends UnitInfo(base) {
   val cacheCompleted = new Cache[Boolean]    (() =>  base.isCompleted)
   val cacheExists    = new Cache[Boolean]    (() =>  base.exists)
   val cacheSelected  = new Cache[Boolean]    (() =>  base.isSelected)
-  val cacheId        = new Cache[Int]        (() =>  base.getID)
   val cachedFlying   = new Cache[Boolean]    (() =>  base.isFlying)
   val cachedCloaked  = new Cache[Boolean]    (() =>  base.isCloaked)
   val cachedStasised = new Cache[Boolean]    (() =>  base.isStasised)
@@ -117,7 +116,7 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit) extends UnitInfo(base) {
   
   private val orderTargetCache = new Cache(() => {
     val target = if (unitClass.targetsMatter) base.getOrderTarget else null
-    if (target == null) None else With.units.getId(target.getID)
+    if (target == null) None else With.units.get(target)
   })
   private val orderTargetPixelCache = new Cache(() => {
     val position = if (unitClass.targetPositionsMatter) base.getOrderTargetPosition else null
@@ -125,7 +124,7 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit) extends UnitInfo(base) {
   })
   private val targetCache = new Cache(() => {
     val target = if (unitClass.targetsMatter) base.getTarget else null
-    if (target == null) None else With.units.getId(target.getID)
+    if (target == null) None else With.units.get(target)
   })
   private val targetPixelCache = new Cache(() => {
     val position = if (unitClass.targetPositionsMatter) base.getTargetPosition else null
@@ -166,7 +165,12 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit) extends UnitInfo(base) {
   
   def trainingQueue: Iterable[UnitClass] = trainingQueueCache()
   
-  private val trainingQueueCache = new Cache(() => base.getTrainingQueue.asScala.map(UnitClasses.get))
+  private val trainingQueueCache = new Cache(() =>
+    if (unitClass.isBuilding || is(Protoss.Reaver) || is(Protoss.Carrier))
+      base.getTrainingQueue.asScala.map(UnitClasses.get)
+    else
+      Iterable.empty // Performance optimization
+  )
   
   ////////////////
   // Visibility //
@@ -230,7 +234,11 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit) extends UnitInfo(base) {
   
   def spiderMines: Int = base.getSpiderMineCount
   
-  def addon: Option[UnitInfo] = With.units.get(base.getAddon)
+  def addon: Option[UnitInfo] = cachedAddon()
+  private val cachedAddon = new Cache(() => With.units.get(base.getAddon))
+  
+  def hasNuke: Boolean = cachedHasNuke()
+  private val cachedHasNuke = new Cache(() => base.hasNuke)
   
   def spaceRemaining: Int = spaceRemainingCache()
   private val spaceRemainingCache = new Cache(() => base.getSpaceRemaining)

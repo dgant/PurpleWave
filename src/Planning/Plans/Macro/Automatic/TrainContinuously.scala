@@ -40,9 +40,10 @@ class TrainContinuously(
   protected def buildCapacity: Int = {
     val builders = With.units.ours.filter(builder =>
       builder.is(unitClass.whatBuilds._1)
-      && ( ! unitClass.isAddon                                           || builder.addon.isEmpty)
-      && ( ! unitClass.buildUnitsEnabling.contains(Terran.MachineShop)   || builder.addon.isDefined)
-      && ( ! unitClass.buildUnitsEnabling.contains(Terran.ControlTower)  || builder.addon.isDefined))
+      && ( unitClass != Terran.NuclearMissile                           || ! builder.hasNuke)
+      && ( ! unitClass.isAddon                                          || builder.addon.isEmpty)
+      && ( ! unitClass.buildUnitsEnabling.contains(Terran.MachineShop)  || builder.addon.isDefined)
+      && ( ! unitClass.buildUnitsEnabling.contains(Terran.ControlTower) || builder.addon.isDefined))
     
     val builderCount = builders.size
     Vector(

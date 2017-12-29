@@ -38,7 +38,7 @@ abstract class PlayerProxy(base:Player) {
   
   private lazy val minUpgradeLevels = new mutable.HashMap[Upgrade, Int] ++ Upgrades.all.map(upgrade => (upgrade, 0))
   def getUpgradeLevel(upgrade: Upgrade): Int = {
-    if (!upgradeLevelCaches.contains(upgrade)) {
+    if ( ! upgradeLevelCaches.contains(upgrade)) {
       upgradeLevelCaches.put(upgrade, new Cache(() => recalculateUpgradeLevel(upgrade)))
     }
     upgradeLevelCaches(upgrade)()

@@ -9,9 +9,9 @@ import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
 import bwapi.{Position, UnitCommand}
 
-class ForeignUnitInfo(originalBaseUnit: bwapi.Unit) extends UnitInfo (originalBaseUnit) {
+class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo (originalBaseUnit, id) {
   
-  override def foreign: Option[ForeignUnitInfo] = Some(this)
+  override val foreign: Option[ForeignUnitInfo] = Some(this)
   
   def flagDead()        { _alive              = false }
   def flagMissing()     { _possiblyStillThere = false }
@@ -78,11 +78,6 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit) extends UnitInfo (originalBa
   ////////////
   
   private def updateHealth() {
-    
-    //_alive is handled via flagDead()
-  
-    _unitClass              = UnitClasses.get(baseUnit.getType)
-    
     _complete               = baseUnit.isCompleted
     _defensiveMatrixPoints  = baseUnit.getDefenseMatrixPoints
     _initialResources       = baseUnit.getInitialResources
@@ -149,8 +144,6 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit) extends UnitInfo (originalBa
   //////////////
   
   private def updateGeometry() {
-    _pixelCenter  = new Pixel(baseUnit.getPosition)
-    _tileTopLeft  = new Tile(baseUnit.getTilePosition)
     _top          = baseUnit.getTop
     _left         = baseUnit.getLeft
     _right        = baseUnit.getRight
@@ -382,6 +375,7 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit) extends UnitInfo (originalBa
   def underStorm              : Boolean = _underStorm
   
   def addon: Option[UnitInfo] = _addon
+  def hasNuke: Boolean = false
   
   // Cloaked units show up with 0 hit points/shields.
   // Presumably, if we've never seen them, then they're healthier than that.

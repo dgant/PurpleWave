@@ -4,6 +4,7 @@ import Lifecycle.With
 import ProxyBwapi.Players.Players
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, Orders}
+import bwapi.Unit
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable.HashSet
@@ -18,13 +19,12 @@ class ForeignUnitTracker {
   var neutralUnits    : Set[ForeignUnitInfo] = new HashSet[ForeignUnitInfo]
   var enemyGhostUnits : Set[Int]             = new HashSet[Int]
   
-  def get(someUnit  : bwapi.Unit) : Option[ForeignUnitInfo] = get(someUnit.getID)
-  def get(id        : Int)        : Option[ForeignUnitInfo] = unitsByIdKnown.get(id)
-  
+  def get(id: Int): Option[ForeignUnitInfo] = unitsByIdKnown.get(id)
+
   def update() {
     initialize()
   
-    val unitsByIdVisible      = Players.all.filterNot(_.isFriendly).flatMap(_.rawUnits).filter(isValidForeignUnit).map(unit => (unit.getID, unit)).toMap
+    val unitsByIdVisible      = mapValidForeignUnits(Players.all.filterNot(_.isFriendly).flatMap(_.rawUnits))
     val unitsToAdd            = unitsByIdVisible.toSeq.filterNot(pair => unitsByIdKnown   .contains(pair._1))
     val unitsToUpdate         = unitsByIdVisible.toSeq.filter   (pair => unitsByIdKnown   .contains(pair._1))
     val unitsToFlagInvisible  = unitsByIdKnown  .toSeq.filterNot(pair => unitsByIdVisible .contains(pair._1))
@@ -76,7 +76,7 @@ class ForeignUnitTracker {
   }
   
   private def add(unit: bwapi.Unit) {
-    val knownUnit = new ForeignUnitInfo(unit)
+    val knownUnit = new ForeignUnitInfo(unit, unit.getID)
     knownUnit.update(unit)
     unitsByIdKnown.put(knownUnit.id, knownUnit)
   }
@@ -122,21 +122,26 @@ class ForeignUnitTracker {
     unitsByIdKnown.remove(unit.id)
   }
   
-  private def remove(unit: bwapi.Unit) {
-    remove(unit.getID)
-  }
-  
   private def remove(id: Int) {
     unitsByIdKnown.remove(id)
   }
   
-  private def isValidForeignUnit(unit: bwapi.Unit): Boolean = {
+  private def mapValidForeignUnits(units: Iterable[bwapi.Unit]): Map[Int, Unit] = {
+    units
+      .map(unit => (unit.getID, unit))
+      .filter(isValidForeignUnit)
+      .toMap
+  }
+  
+  private def isValidForeignUnit(unitPair: (Int, bwapi.Unit)): Boolean = {
+    val id = unitPair._1
+    val unit = unitPair._2
+    
     if ( ! unit.exists) {
       return false
     }
     
     if (With.configuration.identifyGhostUnits) {
-      val id = unit.getID
       if (enemyGhostUnits.contains(id)) {
         if (With.frame > 5 && unit.isVisible) {
           // Looks like it's a legit unit! It just happened to share an ID with a ghost unit

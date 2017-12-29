@@ -5,9 +5,7 @@ import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.UnitClass.UnitClass
 import bwapi.UnitCommand
 
-abstract class UnitProxy(var baseUnit: bwapi.Unit) {
-    
-  val id: Int = baseUnit.getID
+abstract class UnitProxy(var baseUnit: bwapi.Unit, val id: Int) {
   
   ///////////////////
   // Tracking info //
@@ -137,4 +135,5 @@ abstract class UnitProxy(var baseUnit: bwapi.Unit) {
   def underStorm: Boolean
   
   def addon: Option[UnitInfo]
+  def hasNuke: Boolean
 }

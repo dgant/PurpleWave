@@ -12,7 +12,6 @@ class FriendlyUnitTracker {
   private var friendlyUnits: Set[FriendlyUnitInfo] = new HashSet[FriendlyUnitInfo]
   var ourUnits: Set[FriendlyUnitInfo] = new HashSet[FriendlyUnitInfo]
   
-  def get(someUnit: bwapi.Unit):Option[FriendlyUnitInfo] = get(someUnit.getID)
   def get(id: Int): Option[FriendlyUnitInfo] = unitInfosById.get(id)
   
   def update() {
@@ -26,7 +25,7 @@ class FriendlyUnitTracker {
   
     newBwapiUnitsById.foreach(idToUnit =>
       if ( ! unitInfosById.contains(idToUnit._1))
-        add(idToUnit._1, idToUnit._2))
+        add(idToUnit._2, idToUnit._1))
   
     unitInfosById.foreach(idToUnitInfo =>
       if ( ! newBwapiUnitsById.contains(idToUnitInfo._1))
@@ -41,8 +40,8 @@ class FriendlyUnitTracker {
     remove(unit.getID)
   }
   
-  private def add(id: Int, unit: bwapi.Unit) {
-    val unitInfo = new FriendlyUnitInfo(unit)
+  private def add(unit: bwapi.Unit, id: Int) {
+    val unitInfo = new FriendlyUnitInfo(unit, id)
     unitInfosById.put(id, unitInfo)
   }
   

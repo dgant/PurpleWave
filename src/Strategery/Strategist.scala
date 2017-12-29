@@ -24,8 +24,8 @@ class Strategist {
   
   // Plasma is so weird we need to handle it separately.
   lazy val isPlasma: Boolean = With.game.mapFileName.contains("Plasma")
-  
   lazy val isIslandMap: Boolean = heyIsThisAnIslandMap
+  lazy val isFfa: Boolean = heyIsThisFFA
   
   lazy val gameplan: Plan = selectedInitially
     .find(_.gameplan.isDefined)
@@ -65,7 +65,6 @@ class Strategist {
     lazy val isIsland                 = isIslandMap
     lazy val isGround                 = ! isIsland
     lazy val startLocations           = With.geography.startLocations.size
-    lazy val thisGameIsFFA            = With.enemies.size > 1 && ! Players.all.exists(p => p.isAlly)
     lazy val disabledInPlaybook       = Playbook.disabled.contains(strategy)
     lazy val disabledOnMap            = strategy.prohibitedMaps.exists(_.matches) || (strategy.requiredMaps.nonEmpty && ! strategy.requiredMaps.exists(_.matches))
     lazy val appropriateForOurRace    = strategy.ourRaces.exists(_ == ourRace)
@@ -78,7 +77,7 @@ class Strategist {
     val output =
       ! disabledOnMap                                   &&
       ! disabledInPlaybook                              &&
-      (strategy.ffa == thisGameIsFFA)                   &&
+      (strategy.ffa == isFfa)                           &&
       (strategy.islandMaps  || ! isIsland)              &&
       (strategy.groundMaps  || ! isGround)              &&
       strategy.startLocationsMin <= startLocations      &&
@@ -95,6 +94,10 @@ class Strategist {
       With.geography.startBases.forall(base1 =>
         With.geography.startBases.forall(base2 =>
           base1 == base2 || With.paths.zonePath(base1.zone, base2.zone).isEmpty))
+  }
+  
+  private def heyIsThisFFA = {
+    With.enemies.size > 1 && ! Players.all.exists(p => p.isAlly)
   }
 
   val evaluations = new mutable.HashMap[Strategy, StrategyEvaluation]

@@ -364,6 +364,7 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit) extends UnitInfo (originalBa
     val output        = progressLeft * unitClass.buildFrames - With.framesSince(lastSeen)
     output.toInt
   }
+  
   def remainingUpgradeFrames  : Int     = _remainingUpgradeFrames
   def remainingTechFrames     : Int     = _remainingTechFrames
   def beingConstructed        : Boolean = _beingConstructed

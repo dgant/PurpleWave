@@ -10,7 +10,7 @@ import Planning.Plan
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.EnrichPixel.EnrichedPixelCollection
 
-class Conscript extends Plan {
+class Conscript(val squad: Squad) extends Plan {
   
   var mustFight : Boolean = false
   var overkill  : Double = 2.0
@@ -19,9 +19,7 @@ class Conscript extends Plan {
   val fighters = new Property[LockUnits](new LockUnits)
   fighters.get.unitMatcher.set(UnitMatchWarriors)
   
-  lazy val squad = new Squad(parent.getOrElse(this))
-  
-  override def isComplete: Boolean = ! enemies.exists(_.alive)
+  override def isComplete: Boolean = ! enemies.exists(_.likelyStillAlive)
   
   override def onUpdate() {
     if (isComplete) return

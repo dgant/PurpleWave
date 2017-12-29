@@ -30,12 +30,12 @@ object ShowSquads extends View {
   override def renderScreen() {
     
     val table =
-      Vector(Vector("Client", "Goal", "", "", "", "Recruits", "", "", "Enemies")) ++
+      Vector(Vector("Client", "",  "Goal",  "", "", "Recruits", "", "", "Enemies")) ++
       With.squads.squadsByPriority.map(squad =>
         Vector(
           squad.client.toString,
-          squad.goal.toString,
           "",
+          squad.goal.toString,
           "",
           "",
           enumerateUnits(squad.recruits),
@@ -55,8 +55,8 @@ object ShowSquads extends View {
     val output = counts
       .toSeq
       .sortBy(-_._2.size)
-      .map(p => p._2.size + " " + p._1)
-      .mkString(", ")
+      .map(p => p._2.size + p._1.toString.toLowerCase.take(2))
+      .mkString(" ")
     
     output
   }

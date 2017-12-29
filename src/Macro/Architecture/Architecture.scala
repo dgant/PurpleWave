@@ -204,7 +204,7 @@ class Architecture {
     unwalkable      ++= unbuildable
     unwalkable      ++= forUnwalkable.flatMap(_.tileArea.expand(1, 1).tiles)
     untownhallable  ++= unbuildable
-    ungassable      ++= With.units.all.toSeq.filter(unit => ! unit.player.isNeutral && unit.alive && unit.unitClass.isGas).map(_.tileTopLeft)
+    ungassable      ++= With.units.all.filter(unit => ! unit.player.isNeutral && unit.alive && unit.unitClass.isGas).map(_.tileTopLeft)
       
     if (ShowArchitecturePlacements.inUse) {
       exclusions ++= forUnwalkable.map(unit => Exclusion("Margin for " + unit, unit.tileArea.expand(1, 1)))

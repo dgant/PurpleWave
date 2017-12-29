@@ -17,9 +17,10 @@ import ProxyBwapi.UnitClass.UnitClass
 
 class TerranFFA extends GameplanModeTemplate {
   
-  override def defaultPlacementPlan : Plan = new If (new UnitsAtLeast(1, Terran.Bunker), new BunkersAtNatural(2))
-  override val defaultScoutPlan     : Plan = NoPlan()
-  override val aggression = 0.6
+  override def defaultPlacementPlan : Plan  = new If (new UnitsAtLeast(1, Terran.Bunker), new BunkersAtNatural(2))
+  override val defaultScoutPlan     : Plan  = NoPlan()
+  override val aggression                   = 0.8
+  override val scoutExpansionsAt            = 150
   
   private class UpgradeBio extends Parallel(
     new Build(
@@ -75,7 +76,7 @@ class TerranFFA extends GameplanModeTemplate {
     new UnitsAtLeast(20, UnitMatchWarriors),
     super.defaultAttackPlan)
   
-  override val buildOrder = Vector(
+  override lazy val buildOrder = Vector(
     RequestAtLeast(9,   Terran.SCV),
     RequestAtLeast(1,   Terran.SupplyDepot),
     RequestAtLeast(11,  Terran.SCV),

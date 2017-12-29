@@ -36,6 +36,6 @@ object Fight extends Action {
     else {
       Disengage.consider(unit)
     }
-    Form.consider(unit)
+    OccupyBunker.consider(unit)
   }
 }

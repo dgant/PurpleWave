@@ -18,10 +18,10 @@ class NukeBase extends Plan {
   nukerLock.get.unitCounter.set(UnitCountOne)
   nukerLock.get.interruptable.set(false)
   
-  private val nukeLock= new Property(new LockUnits)
-  nukerLock.get.unitMatcher.set(Terran.NuclearMissile)
-  nukerLock.get.unitCounter.set(UnitCountOne)
-  nukerLock.get.interruptable.set(false)
+  private val nukeLock = new Property(new LockUnits)
+  nukeLock.get.unitMatcher.set(Terran.NuclearMissile)
+  nukeLock.get.unitCounter.set(UnitCountOne)
+  nukeLock.get.interruptable.set(false)
   
   override def onUpdate() {
     nukeLock.get.acquire(this)

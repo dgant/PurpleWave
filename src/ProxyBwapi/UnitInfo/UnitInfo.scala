@@ -1,8 +1,10 @@
 package ProxyBwapi.UnitInfo
 
+import Debugging.Visualizations.Colors
 import Information.Battles.Types.Battle
 import Information.Geography.Types.{Base, Zone}
 import Information.Grids.AbstractGrid
+import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Information.Kill
 import Lifecycle.With
 import Mathematics.Physics.Force
@@ -488,6 +490,17 @@ abstract class UnitInfo(baseUnit: bwapi.Unit) extends UnitProxy(baseUnit) {
     possiblyStillThere &&
     ( ! canMove || With.framesSince(lastSeen) < With.configuration.fogPositionDurationFrames || is(Terran.SiegeTankUnsieged))
   
+  def likelyStillAlive: Boolean =
+    likelyStillThere      ||
+    unitClass.isBuilding  ||
+    unitClass.isWorker    ||
+    With.framesSince(lastSeen) < (
+      if (With.strategy.isFfa)
+        GameTime(2, 0)()
+      else
+        GameTime(5, 0)()
+    )
+  
   def effectivelyCloaked: Boolean =
     (burrowed || cloaked) && (
       if (isFriendly) ! With.grids.enemyDetection.isSet(tileIncludingCenter) && (With.framesSince(lastDamageFrame) > 162 + 2 || ! With.enemies.exists(_.isTerran)) // Scanner sweep. lasts 162 frames. Cloakedness updates on per-unit timer lasting 30 frames. There's also a global cloak timer every 300 frames.
@@ -512,5 +525,6 @@ abstract class UnitInfo(baseUnit: bwapi.Unit) extends UnitProxy(baseUnit) {
     if      (visible)             player.colorBright
     else if (likelyStillThere)    player.colorMedium
     else if (possiblyStillThere)  player.colorDark
-    else                          player.colorMidnight
+    else if (likelyStillAlive)    player.colorMidnight
+    else                          Colors.DarkGray
 }

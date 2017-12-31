@@ -122,10 +122,6 @@ class ForeignUnitTracker {
     unitsByIdKnown.remove(unit.id)
   }
   
-  private def remove(id: Int) {
-    unitsByIdKnown.remove(id)
-  }
-  
   private def mapValidForeignUnits(units: Iterable[bwapi.Unit]): Map[Int, Unit] = {
     units
       .map(unit => (unit.getID, unit))

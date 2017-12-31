@@ -1,6 +1,7 @@
 package ProxyBwapi.UnitClass
 
 import Mathematics.Points.{Tile, TileRectangle}
+import Mathematics.PurpleMath
 import Planning.Composition.UnitMatchers.UnitMatcher
 import ProxyBwapi.Races.{Neutral, Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.{Tech, Techs}
@@ -30,6 +31,20 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   lazy val dimensionMin: Int = Math.min(width, height)
   lazy val dimensionMax: Int = Math.max(width, height)
   lazy val radialHypotenuse: Double = Math.sqrt(width.toDouble * width.toDouble + height.toDouble * height.toDouble)/2.0
+  
+  //////////////
+  // Movement //
+  //////////////
+  
+  lazy val accelerationFrames: Int =
+    if (acceleration > 1)
+      Math.ceil(256.0 * topSpeed / acceleration).toInt
+    else
+      8 // Arbitrary
+  
+  lazy val turn180Frames: Int = PurpleMath.nanToZero(Math.ceil(128.0 / turnRadius)).toInt
+  
+  lazy val framesToTurnAndShootAndTurnBackAndAccelerate: Int = stopFrames + accelerationFrames + turn180Frames
   
   ////////////
   // Combat //
@@ -130,7 +145,7 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   lazy val isGas                  : Boolean = Vector(Neutral.Geyser, Terran.Refinery, Protoss.Assimilator, Zerg.Extractor).contains(this)
   lazy val isTownHall             : Boolean = Vector(Terran.CommandCenter, Protoss.Nexus, Zerg.Hatchery, Zerg.Lair, Zerg.Hive).contains(this)
   lazy val isSiegeTank            : Boolean = this == Terran.SiegeTankSieged || this == Terran.SiegeTankUnsieged
-  lazy val isStaticDefense        : Boolean = isBuilding && attacks || this == Terran.Bunker || this == Protoss.ShieldBattery
+  lazy val isStaticDefense        : Boolean = (isBuilding && attacks || this == Terran.Bunker || this == Protoss.ShieldBattery) && this != Terran.SiegeTankSieged
   lazy val isTransport            : Boolean = spaceProvided > 0 && isFlyer && this != Protoss.Carrier
   lazy val shootsScarabs          : Boolean = this == Protoss.Reaver // Performance shortcut
   
@@ -380,7 +395,6 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   // Well, the stop frames are the main guide (to how many frames of movement are lost by attacking)
   // But that won't strictly tell you how many frames you lose.
   //
-  
   lazy val stopFrames: Int = {
     if (this == Terran.SCV                ) 2
     if (this == Terran.Marine             ) 8   else
@@ -418,6 +432,26 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
     if (this == Protoss.Dragoon           ) 5   else
     if (this == Zerg.Devourer             ) 7   else
     if (this == Protoss.Carrier           ) 48  else
+    0
+  }
+  
+  lazy val attackAnimationFrames: Int = {
+    if (this == Terran.SCV                ) 2   else
+    if (this == Terran.Marine             ) 8   else
+    if (this == Terran.Firebat            ) 8   else
+    if (this == Terran.Ghost              ) 4   else
+    if (this == Terran.Goliath            ) 1   else
+    if (this == Terran.SiegeTankUnsieged  ) 1   else
+    if (this == Terran.SiegeTankSieged    ) 1   else
+    if (this == Protoss.Zealot            ) 8   else
+    if (this == Protoss.Dragoon           ) 9   else
+    if (this == Protoss.DarkTemplar       ) 9   else
+    if (this == Protoss.Reaver            ) 1   else
+    if (this == Protoss.Corsair           ) 8   else
+    if (this == Protoss.Arbiter           ) 5   else
+    if (this == Zerg.Zergling             ) 5   else
+    if (this == Zerg.Hydralisk            ) 3   else
+    if (this == Zerg.Ultralisk            ) 15  else
     0
   }
   

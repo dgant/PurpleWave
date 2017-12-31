@@ -17,6 +17,24 @@ object Disengage extends Action {
   
   override protected def perform(unit: FriendlyUnitInfo) {
     
+    // Styles of fighting,
+    // on approximate continuum of (GET IN) -> (GET OUT):
+    //
+    // * Hug (Dragoon vs. Sieged Tank)
+    // * Fill (Dragoons moving through choke)
+    // * Charge (Zealot vs. Sieged Tank)
+    // * Chase (Corsair vs. Mutalisk)
+    // * Abuse (Dragoon vs. Zealot)
+    // * Breathe (Dragoon vs. Marine)
+    // * Bite (Zealot surrounded by Zerglings)
+    // * Purr (Goliath being repaired)
+    // * Brawl (Zergling vs. Zergling; Marines vs. Carriers)
+    // * Reposition (Dragoons vs. Dragoons)
+    // * Flee (Zealot behind enemy lines)
+    // * Retreat (Zealot running from Zealots)
+    //
+    // Also consider that sometimes we can just *ignore* the threat and continue to our destination
+    
     lazy val mostEntangledThreat = unit.matchups.mostEntangledThreatDiffused.get
     lazy val bunkers      = Bunk.openBunkersFor(unit)
     lazy val freeToFlee   = unit.topSpeed        >= mostEntangledThreat.topSpeedChasing
@@ -33,7 +51,7 @@ object Disengage extends Action {
         else {
           // Example: Two Marines kiting a Zealot
           // The one being targeted shoots while the other flees.
-          if (unit.matchups.framesOfSafetyCurrently > unit.framesToTurnAndShootAndTurnBackAndAccelerate) {
+          if (unit.matchups.framesOfSafetyCurrently > unit.unitClass.framesToTurnAndShootAndTurnBackAndAccelerate) {
             KiteSafely.consider(unit)
           }
           else {

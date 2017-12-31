@@ -8,6 +8,7 @@ import Information.Battles.Types.Battle
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Planning.Yolo
+import Utilities.ByOption
 
 object ShowBattleSummary extends View {
   
@@ -45,15 +46,26 @@ object ShowBattleSummary extends View {
   }
   
   private def drawBattleMap(battle: Battle, estimation: Estimation) {
-    val ourColor            = With.self.colorDark
-    val enemyColor          = With.enemy.colorDark
-    val neutralColor        = Colors.White
-    val winnerStrengthColor = if (estimation.costToEnemy >= estimation.costToUs) ourColor else enemyColor
+    val weWin               = battle.desire > 0.0
+    val ourColorDark        = With.self.colorDark
+    val enemyColorDark      = With.enemy.colorDark
+    val ourColorNeon        = With.self.colorNeon
+    val enemyColorNeon      = With.enemy.colorNeon
+    val neutralColor        = Colors.BrightGray
+    val winnerStrengthColor = if (weWin) ourColorDark else enemyColorDark
+    
+    battle.teams.foreach(team => {
+      val isUs = team == battle.us
+      val centroid = team.centroid
+      val radius = ByOption.max(team.units.map(u => u.unitClass.radialHypotenuse + u.pixelDistanceFast(centroid))).getOrElse(0.0).toInt
+      val thickness = if (weWin == isUs) 2 else 5
+      (0 until thickness).foreach(t => DrawMap.circle(centroid, radius + t, if (isUs) ourColorNeon else enemyColorNeon))
+    })
     DrawMap.circle  (battle.focus,          8,                      neutralColor)
-    DrawMap.circle  (battle.us.vanguard,    8,                      ourColor)
-    DrawMap.circle  (battle.enemy.vanguard, 8,                      enemyColor)
-    DrawMap.line    (battle.focus,          battle.us.vanguard,     ourColor)
-    DrawMap.line    (battle.focus,          battle.enemy.vanguard,  enemyColor)
+    DrawMap.circle  (battle.us.vanguard,    8,                      ourColorDark)
+    DrawMap.circle  (battle.enemy.vanguard, 8,                      enemyColorDark)
+    DrawMap.line    (battle.focus,          battle.us.vanguard,     ourColorDark)
+    DrawMap.line    (battle.focus,          battle.enemy.vanguard,  enemyColorDark)
     With.game.drawCircleMap(battle.focus.bwapi, (battle.us.units ++ battle.enemy.units).map(_.pixelDistanceFast(battle.focus)).max.toInt, neutralColor)
     DrawMap.labelBox(
       Vector(estimation.netValue.toInt.toString),

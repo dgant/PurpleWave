@@ -10,30 +10,17 @@ import Planning.Plans.GamePlans.Terran.Situational.BunkersAtNatural
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBasesFFA}
-import Planning.Plans.Macro.Milestones.{EnemyHasShownCloakedThreat, IfOnMiningBases, OnGasPumps, UnitsAtLeast}
+import Planning.Plans.Macro.Milestones.{EnemyHasShownCloakedThreat, UnitsAtLeast}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitClass.UnitClass
 
-class TerranFFA extends GameplanModeTemplate {
+class TerranFFAMech extends GameplanModeTemplate {
   
-  override def defaultPlacementPlan : Plan  = new If (new UnitsAtLeast(1, Terran.Bunker), new BunkersAtNatural(2))
+  override def defaultPlacementPlan : Plan  = new BunkersAtNatural(2)
   override val defaultScoutPlan     : Plan  = NoPlan()
   override val aggression                   = 0.8
   override val scoutExpansionsAt            = 150
-  
-  private class UpgradeBio extends Parallel(
-    new Build(
-      RequestAtLeast(1, Terran.Academy),
-      RequestTech(Terran.Stim),
-      RequestUpgrade(Terran.MarineRange),
-      RequestAtLeast(2, Terran.EngineeringBay)),
-    new UpgradeContinuously(Terran.BioDamage),
-    new UpgradeContinuously(Terran.BioArmor),
-    new Build(
-      RequestAtLeast(1, Terran.Factory),
-      RequestAtLeast(1, Terran.Starport),
-      RequestAtLeast(1, Terran.ScienceFacility)))
   
   private class UpgradeMech extends Parallel(
     new BuildGasPumps,
@@ -116,7 +103,7 @@ class TerranFFA extends GameplanModeTemplate {
         new TrainContinuously(Terran.Ghost))
     ),
     new If(new UnitsAtLeast(1,  UnitMatchSiegeTank),    new Build(RequestTech(Terran.SiegeMode))),
-    new If(new UnitsAtLeast(12,  UnitMatchWarriors),    new RequireMiningBasesFFA(2)),
+    new If(new UnitsAtLeast(12, UnitMatchWarriors),     new RequireMiningBasesFFA(2)),
     new If(new UnitsAtLeast(30, UnitMatchWarriors),     new RequireMiningBasesFFA(3)),
     new If(new UnitsAtLeast(40, UnitMatchWarriors),     new RequireMiningBasesFFA(4)),
     new If(new UnitsAtLeast(50, UnitMatchWarriors),     new RequireMiningBasesFFA(5)),
@@ -131,7 +118,6 @@ class TerranFFA extends GameplanModeTemplate {
     new If(new UnitsAtLeast(3, Terran.Battlecruiser),   new Build(RequestTech(Terran.Yamato))),
     new If(new UnitsAtLeast(6, Terran.Battlecruiser),   new Build(RequestUpgrade(Terran.BattlecruiserEnergy))),
     new If(new UnitsAtLeast(5, Terran.Battlecruiser),   new UpgradeAir),
-    new If(new UnitsAtLeast(12, Terran.Marine),         new UpgradeBio),
     new If(new UnitsAtLeast(3, UnitMatchSiegeTank),     new UpgradeMech),
     new TrainContinuously(Terran.ScienceVessel, 2, 1),
     new TrainContinuously(Terran.SiegeTankUnsieged, 30),
@@ -149,34 +135,19 @@ class TerranFFA extends GameplanModeTemplate {
       RequestAtLeast(1, Terran.Refinery),
       RequestAtLeast(1, Terran.Academy),
       RequestAtLeast(1, Terran.EngineeringBay),
-      RequestAtLeast(1, Terran.MissileTurret)),
+      RequestTech(Terran.Stim)),
+    new UpgradeContinuously(Terran.BioDamage),
     new RequireMiningBasesFFA(2),
-    new IfOnMiningBases(2,
-      new Build(
-        RequestAtLeast(2, Terran.Bunker),
-        RequestAtLeast(2, Terran.MissileTurret),
-        RequestAtLeast(5, Terran.Barracks))),
+    new Build(
+      RequestAtLeast(2, Terran.Bunker),
+      RequestAtLeast(2, Terran.EngineeringBay),
+      RequestUpgrade(Terran.MarineRange),
+      RequestAtLeast(6, Terran.Barracks)),
+    new UpgradeContinuously(Terran.BioArmor),
     new BuildGasPumps,
-    new FlipIf(
-      new UnitsAtLeast(50, UnitMatchWarriors),
-      new Parallel(
-        new TrainContinuously(Terran.MachineShop),
-        new OnGasPumps(2, new Build(RequestAtLeast(3, Terran.Factory))),
-        new OnGasPumps(3, new Build(RequestAtLeast(5, Terran.Factory))),
-        new OnGasPumps(4, new Build(RequestAtLeast(8, Terran.Factory))),
-        new IfOnMiningBases(2, new Build(RequestAtLeast(6, Terran.Barracks))),
-        new IfOnMiningBases(3, new Build(RequestAtLeast(10, Terran.Barracks))),
-        new IfOnMiningBases(4, new Build(RequestAtLeast(12, Terran.Barracks)))),
-      new OnGasPumps(2,
-        new Parallel(
-          new RequireMiningBasesFFA(4),
-          new Build(RequestAtLeast(1, Terran.Starport)),
-          new BuildScienceFacilityForAddon(Terran.PhysicsLab),
-          new Build(RequestAtLeast(1, Terran.PhysicsLab)),
-          new TrainContinuously(Terran.ControlTower),
-          new OnGasPumps(2, new Build(RequestAtLeast(2, Terran.Starport))),
-          new OnGasPumps(3, new Build(RequestAtLeast(3, Terran.Starport))),
-          new OnGasPumps(4, new Build(RequestAtLeast(4, Terran.Starport)))))),
-    new Build(RequestAtLeast(15, Terran.Barracks))
+    new Build(
+      RequestAtLeast(4, Terran.Factory),
+      RequestAtLeast(10, Terran.Barracks),
+      RequestAtLeast(8, Terran.Factory))
   )
 }

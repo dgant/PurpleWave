@@ -7,9 +7,12 @@ import Utilities.ByOption
 
 object Spot extends Action {
   
-  override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.canMove && unit.flying && unit.matchups.targets.isEmpty
-  }
+  override def allowed(unit: FriendlyUnitInfo): Boolean = (
+    unit.canMove
+    && unit.flying
+    && unit.matchups.targets.isEmpty
+    && (unit.matchups.framesOfSafetyDiffused > 0 || unit.totalHealth > 500)
+  )
   
   override protected def perform(unit: FriendlyUnitInfo) {
     val shooters          = unit.squadmates.filter(_.canAttack)

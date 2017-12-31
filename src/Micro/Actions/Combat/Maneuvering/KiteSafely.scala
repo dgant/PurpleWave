@@ -1,6 +1,5 @@
 package Micro.Actions.Combat.Maneuvering
 
-import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Attacking.Target
 import Micro.Actions.Combat.Tactics.Potshot
@@ -20,7 +19,7 @@ object KiteSafely extends Action {
     
     if (unit.readyForAttackOrder) {
       
-      if (unit.matchups.framesOfSafetyDiffused >= unit.framesToTurnAndShootAndTurnBackAndAccelerate) {
+      if (unit.matchups.framesOfSafetyDiffused > unit.unitClass.framesToTurnAndShootAndTurnBackAndAccelerate) {
         Potshot.consider(unit)
         Target.consider(unit)
         Attack.consider(unit)
@@ -28,8 +27,7 @@ object KiteSafely extends Action {
       
       // If we're not going anywhere, might as well shoot.
       //
-      // There are probably other good ways to detect this.
-      if (unit.velocity.lengthSquared == 0 || unit.seeminglyStuck) {
+      if (unit.seeminglyStuck) {
         Potshot.consider(unit)
       }
       
@@ -39,9 +37,9 @@ object KiteSafely extends Action {
         Potshot.consider(unit)
       }
       
-      // If shooting is cheap, might as well shoot
+      // If shooting is super cheap, might as well shoot
       //
-      if (unit.unitClass.minStop < 4) {
+      if (unit.unitClass.stopFrames <= 2) {
         Potshot.consider(unit)
       }
     }

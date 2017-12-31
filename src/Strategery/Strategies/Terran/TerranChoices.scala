@@ -1,6 +1,6 @@
 package Strategery.Strategies.Terran
 
-import Strategery.Strategies.Terran.FFA.TerranFFA
+import Strategery.Strategies.Terran.FFA.TerranFFABio
 import Strategery.Strategies.Terran.TvE._
 import Strategery.Strategies.Terran.TvT.TvTStandard
 import Strategery.Strategies.Terran.TvZ.TvZStandard
@@ -15,5 +15,5 @@ object TerranChoices {
     TvEMassMarineAllIn,
     TvTStandard,
     TvZStandard,
-    TerranFFA)
+    TerranFFABio)
 }

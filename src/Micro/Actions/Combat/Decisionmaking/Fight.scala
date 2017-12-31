@@ -5,7 +5,6 @@ import Micro.Actions.Combat.Maneuvering.{Cower, Sneak}
 import Micro.Actions.Combat.Spells.{SpiderMine, Stim}
 import Micro.Actions.Combat.Tactics._
 import Micro.Actions.Protoss.{BeACarrier, BeACorsair, BeAnArbiter}
-import Micro.Actions.Terran.{Siege, Unsiege}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Fight extends Action {
@@ -20,8 +19,7 @@ object Fight extends Action {
     Stim.consider(unit)
     Bunk.consider(unit)
     Cower.consider(unit)
-    Siege.consider(unit)
-    Unsiege.consider(unit)
+    Root.consider(unit)
     BeACarrier.consider(unit)
     BeAnArbiter.consider(unit)
     BeACorsair.consider(unit)

@@ -2,7 +2,7 @@ package Micro.Actions.Combat.Attacking.Filters
 
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
-object TargetCombatants extends TargetFilter {
+object TargetFilterCombatants extends TargetFilter {
   
   // If we're fighting, target units that threaten to fight back
   //

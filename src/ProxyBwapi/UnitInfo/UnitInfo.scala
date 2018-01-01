@@ -272,9 +272,6 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   def battle: Option[Battle] = With.battles.byUnit.get(this).orElse(With.matchups.entrants.find(_._2.contains(this)).map(_._1))
   def matchups: MatchupAnalysis = With.matchups.get(this)
   
-  def ranged  : Boolean = unitClass.rawCanAttack && unitClass.maxAirGroundRangePixels > 32 * 2
-  def melee   : Boolean = unitClass.rawCanAttack && ! ranged
-  
   def armorHealth: Int = armorHealthCache()
   def armorShield: Int = armorShieldsCache()
   
@@ -415,7 +412,8 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   // Frame X-1:   Unit's cooldown is 1.   Unit receives attack order.
   // Frame X-1-L: Unit's cooldown is L+1. Send attack order.
   
-  def readyForAttackOrder: Boolean = canAttack && cooldownLeft <= 1 + With.latency.framesRemaining
+  def framesToBeReadyForAttackOrder: Int = cooldownLeft - With.latency.framesRemaining - With.reaction.agencyMin
+  def readyForAttackOrder: Boolean = canAttack && framesToBeReadyForAttackOrder <= 0
   
   def pixelsTravelledMax(framesAhead: Int): Double = if (canMove) topSpeed * framesAhead else 0.0
   def pixelReachAir     (framesAhead: Int): Double = pixelsTravelledMax(framesAhead) + pixelRangeAir
@@ -446,6 +444,11 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   
   def moving: Boolean = velocityX != 0 || velocityY != 0
   
+  def relativeSpeed(other: UnitInfo): Double = {
+    val deltaXY = Force(x - other.x, y - other.y)
+    val deltaV  = velocity
+    deltaXY.lengthFast * (deltaXY.normalize * deltaV.normalize)
+  }
   ////////////
   // Orders //
   ////////////

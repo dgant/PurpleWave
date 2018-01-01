@@ -2,7 +2,7 @@ package Micro.Actions.Combat.Attacking.Filters
 import Lifecycle.With
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
-object TargetStayCloaked extends TargetFilter {
+object TargetFilterStayCloaked extends TargetFilter {
   
   // Preserve cloaked units.
   // Don't compromise their detection.

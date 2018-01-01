@@ -1,5 +1,6 @@
 package Micro.Agency
 
+import Information.Geography.Pathfinding.ZonePath
 import Lifecycle.With
 import Mathematics.Physics.Force
 import Mathematics.Points.{Pixel, PixelRay, Tile}
@@ -76,6 +77,26 @@ class Agent(val unit: FriendlyUnitInfo) {
   var shouldEngage: Boolean = false
   val forces: mutable.Map[Color, Force] = new mutable.HashMap[Color, Force]
   
+  def zonePath(to: Pixel): Option[ZonePath] = {
+    if ( ! cachedZonePath.contains(to)) {
+      cachedZonePath(to) = With.paths.zonePath(unit.zone, to.zone)
+    }
+    cachedZonePath(to)
+  }
+  private var cachedZonePath = new mutable.HashMap[Pixel, Option[ZonePath]]
+  
+  def nextWaypoint(to: Pixel): Pixel = {
+    if (!cachedWaypoint.contains(to)) {
+      val path = zonePath(to)
+      cachedWaypoint(to) =
+        if (path.isEmpty || path.get.steps.isEmpty)
+          origin.zone.centroid.pixelCenter
+        else
+          path.get.steps.head.edge.centerPixel
+    }
+    cachedWaypoint(to)
+  }
+  private var cachedWaypoint = new mutable.HashMap[Pixel, Pixel]
   
   /////////////////
   // Suggestions //
@@ -84,6 +105,7 @@ class Agent(val unit: FriendlyUnitInfo) {
   def origin: Pixel = originCache()
   private val originCache = new Cache(() => calculateOrigin)
   
+  // This is kind of a mess.
   def destination: Pixel = destinationCache()
   private val destinationCache = new Cache(() => calculateDestination)
   
@@ -132,6 +154,8 @@ class Agent(val unit: FriendlyUnitInfo) {
     pathsTruncated      = Seq.empty
     pathsAcceptable     = Seq.empty
     pathAccepted        = Seq.empty
+    cachedZonePath.clear()
+    cachedWaypoint.clear()
   }
   
   private def followIntent() {

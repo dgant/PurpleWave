@@ -8,7 +8,7 @@ import Micro.Actions.Commands.Gravitate
 import Micro.Decisions.Potential
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-object Avoid extends Action {
+object OldAvoid extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.canMove &&

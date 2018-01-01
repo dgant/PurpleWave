@@ -3,7 +3,7 @@ package Micro.Actions.Protoss
 import Debugging.Visualizations.ForceColors
 import Mathematics.Physics.ForceMath
 import Micro.Actions.Action
-import Micro.Actions.Combat.Maneuvering.Avoid
+import Micro.Actions.Combat.Maneuvering.OldAvoid
 import Micro.Actions.Commands.Gravitate
 import Micro.Decisions.Potential
 import Planning.Yolo
@@ -24,7 +24,7 @@ object BeAnArbiter extends Action {
     lazy val friends      = unit.teammates.filter(umbrellable)
     
     if (threatened && ! Yolo.active) {
-      Avoid.consider(unit)
+      OldAvoid.consider(unit)
     }
     else if (friends.nonEmpty) {
       val threats = unit.matchups.threats

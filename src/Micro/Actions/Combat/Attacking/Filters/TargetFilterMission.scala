@@ -3,7 +3,7 @@ package Micro.Actions.Combat.Attacking.Filters
 import Lifecycle.With
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
-object TargetMission extends TargetFilter {
+object TargetFilterMission extends TargetFilter {
   
   // Target units according to our goals.
   // Ignore them if they're distractions.

@@ -50,6 +50,9 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   // Combat //
   ////////////
   
+  lazy val ranged  : Boolean = rawCanAttack && maxAirGroundRangePixels > 32 * 2
+  lazy val melee   : Boolean = rawCanAttack && ! ranged
+  
   lazy val suicides: Boolean = Array(
     Terran.SpiderMine,
     Protoss.Scarab,

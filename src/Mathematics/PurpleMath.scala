@@ -37,7 +37,7 @@ object PurpleMath {
     Math.min(max, Math.max(value, min))
   }
   
-  def clampToOne(value: Double): Double = Math.max(0.0, Math.min(1.0, value))
+  def clampToOne(value: Double): Double = clamp(value, 0.0, 1.0)
   
   def signum(int: Int)        : Int = if (int == 0) 0 else if (int < 0) -1 else 1
   def signum(double: Double)  : Int = if (double == 0.0) 0 else if (double < 0) -1 else 1

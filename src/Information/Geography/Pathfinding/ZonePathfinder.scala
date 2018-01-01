@@ -1,9 +1,12 @@
 package Information.Geography.Pathfinding
 
 import Information.Geography.Types.Zone
+import Utilities.ByOption
 
 object ZonePathfinder {
   
+  // Note that this has the weakness of assuming the path is always from the center of the zone
+  // The shortest path from other points of the zone may be different.
   def find(
     from      : Zone,
     to        : Zone,
@@ -30,9 +33,6 @@ object ZonePathfinder {
         explored + from)
     })
     
-    if (paths.isEmpty)
-      None
-    else
-      Some(paths.minBy(_.lengthPixels))
+    ByOption.minBy(paths)(_.lengthPixels)
   }
 }

@@ -1,10 +1,8 @@
 package Micro.Actions.Combat.Decisionmaking
 
 import Micro.Actions.Action
-import Micro.Actions.Combat.Attacking.Target
-import Micro.Actions.Combat.Maneuvering.AttackAndReposition
-import Micro.Actions.Combat.Tactics.{BustWallin, Potshot}
-import Micro.Actions.Commands.Attack
+import Micro.Actions.Combat.Techniques.Common.Weigh
+import Micro.Actions.Combat.Techniques._
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Engage extends Action {
@@ -15,10 +13,20 @@ object Engage extends Action {
   }
   
   override def perform(unit: FriendlyUnitInfo) {
-    Potshot.consider(unit)
-    BustWallin.consider(unit)
-    Target.delegate(unit)
-    AttackAndReposition.consider(unit)
-    Attack.consider(unit)
+    Weigh.consider(unit,
+      Abuse,
+      Aim,
+      Batter,
+      Brawl,
+      Breathe,
+      Charge,
+      Chase,
+      Fill,
+      Hug,
+      Ignore,
+      Isolate,
+      Purr,
+      Reposition
+    )
   }
 }

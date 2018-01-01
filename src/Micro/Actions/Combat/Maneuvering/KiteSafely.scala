@@ -10,9 +10,9 @@ object KiteSafely extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     unit.canMove
+    && unit.unitClass.ranged
     && unit.matchups.targets.nonEmpty
     && unit.matchups.threats.nonEmpty
-    && unit.ranged
   )
   
   override def perform(unit: FriendlyUnitInfo) {
@@ -44,6 +44,6 @@ object KiteSafely extends Action {
       }
     }
     
-    Avoid.delegate(unit)
+    OldAvoid.delegate(unit)
   }
 }

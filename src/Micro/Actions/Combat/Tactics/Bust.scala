@@ -7,7 +7,7 @@ import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import bwapi.Race
 
-object BustBunker extends Action {
+object Bust extends Action {
   
   // TODO:
   // jaj22: quick bunker test, range goon has at least a 33 pixel variation for where it stops on a straight line attack command.

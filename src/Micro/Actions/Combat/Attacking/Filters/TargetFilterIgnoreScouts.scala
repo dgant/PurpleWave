@@ -2,7 +2,7 @@ package Micro.Actions.Combat.Attacking.Filters
 
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
-object TargetIgnoreScouts extends TargetFilter {
+object TargetFilterIgnoreScouts extends TargetFilter {
   
   // If we need to defend from real threats,
   // ignore scouting workers

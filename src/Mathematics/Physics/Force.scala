@@ -11,6 +11,7 @@ case class Force(x: Double, y: Double) {
   def +(other: Force)   : Force = Force(x + other.x, y + other.y)
   def -(other: Force)   : Force = Force(x - other.x, y - other.y)
   def *(value: Double)  : Force = Force(value * x, value * y)
+  def *(other: Force)   : Double = x * other.x + y * other.y
   
   def lengthSquared: Double = x * x + y * y
   def lengthSlow: Double  = Math.sqrt(lengthSquared)

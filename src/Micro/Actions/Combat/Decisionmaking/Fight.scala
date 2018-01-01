@@ -25,7 +25,7 @@ object Fight extends Action {
     BeACorsair.consider(unit)
     Recover.consider(unit)
     SpiderMine.consider(unit)
-    BustBunker.consider(unit)
+    Bust.consider(unit)
     Spot.consider(unit)
     Sneak.consider(unit)
     if (unit.agent.shouldEngage) {

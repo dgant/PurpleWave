@@ -9,9 +9,10 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object AttackAndReposition extends Action {
   
-  override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.canMove && unit.ranged
-  }
+  override def allowed(unit: FriendlyUnitInfo): Boolean = (
+    unit.canMove
+    && unit.unitClass.ranged
+  )
   
   override def perform(unit: FriendlyUnitInfo) {
   
@@ -45,7 +46,7 @@ object AttackAndReposition extends Action {
       Gravitate.consider(unit)
     }
     else if (shouldAvoid) {
-      Avoid.consider(unit)
+      OldAvoid.consider(unit)
     }
   }
 }

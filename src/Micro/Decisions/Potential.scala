@@ -157,10 +157,8 @@ object Potential {
   }
   
   protected def exitAttractionGround(unit: FriendlyUnitInfo): Force = {
-    val zoneNow       = unit.zone
-    val zoneOrigin    = unit.agent.origin.zone
-    val path          = With.paths.zonePath(zoneNow, zoneOrigin)
-    val origin        = if (path.isEmpty || path.get.steps.isEmpty) zoneOrigin.centroid.pixelCenter else path.get.steps.head.edge.centerPixel
+    val path          = unit.agent.zonePath(unit.agent.origin)
+    val origin        = if (path.isEmpty || path.get.steps.isEmpty) unit.agent.origin.zone.centroid.pixelCenter else path.get.steps.head.edge.centerPixel
     val forceExiting  = ForceMath.fromPixels(unit.pixelCenter, origin)
     val forceNormal   = forceExiting.normalize
     forceNormal

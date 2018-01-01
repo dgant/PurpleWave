@@ -1,6 +1,5 @@
 package Micro.Actions.Combat.Techniques.Common
 
-import Mathematics.PurpleMath
 import Micro.Actions.Action
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
@@ -14,22 +13,20 @@ abstract class ActionTechnique extends Action {
   protected object Mean extends Activator { def apply(values: Seq[Double]): Option[Double] = ByOption.mean(values) }
   protected object RMS  extends Activator { def apply(values: Seq[Double]): Option[Double] = ByOption.rms(values)  }
   
-  val activator = Mean
+  val activator: Activator = Mean
   
   val applicabilityBase = 1.0
   def applicabilitySelf(unit: FriendlyUnitInfo): Double = 1.0
   def applicabilityOther(unit: FriendlyUnitInfo, other: UnitInfo): Option[Double] = Some(1.0)
   
-  def evaluate(unit: FriendlyUnitInfo): Double = {
-    lazy val applicabilitiesOther     = unit.matchups.others.flatMap(applicabilityOther(unit, _))
-    lazy val totalApplicabilityOther  = activator(applicabilitiesOther.map(PurpleMath.clampToOne)).getOrElse(0.0)
-    lazy val totalApplicabilitySelf   = PurpleMath.clampToOne(applicabilitySelf(unit))
-    lazy val output                   = PurpleMath.clampToOne(applicabilityBase) * totalApplicabilitySelf * totalApplicabilitySelf
+  def evaluate(unit: FriendlyUnitInfo): ActionTechniqueEvaluation = {
+   
+    val evaluation = new ActionTechniqueEvaluation(unit, this)
     
     // Performance shortcuts
-    if (applicabilityBase       <= 0.0) return 0.0
-    if (totalApplicabilitySelf  <= 0.0) return 0.0
+    if (applicabilityBase                   <= 0.0) return 0.0
+    if (evaluation.totalApplicabilitySelf   <= 0.0) return 0.0
     
-    output
+    evaluation
   }
 }

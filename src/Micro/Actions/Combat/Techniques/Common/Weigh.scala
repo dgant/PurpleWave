@@ -1,5 +1,6 @@
 package Micro.Actions.Combat.Techniques.Common
 
+import Debugging.Visualizations.Views.Micro.ShowTechniques
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
 
@@ -19,6 +20,10 @@ object Weigh {
       : Option[ActionTechnique] = {
     
     val allowed = techniques.filter(_.allowed(unit))
-    ByOption.maxBy(allowed)(_.evaluate(unit))
+    val evaluations = allowed.map(technique => (technique, technique.evaluate(unit))).toMap
+    if (ShowTechniques.inUse) {
+      unit.agent.techniques ++= evaluations.values
+    }
+    ByOption.maxBy(evaluations)(_._2.totalApplicability)
   }
 }

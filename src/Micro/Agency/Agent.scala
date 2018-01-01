@@ -4,6 +4,7 @@ import Information.Geography.Pathfinding.ZonePath
 import Lifecycle.With
 import Mathematics.Physics.Force
 import Mathematics.Points.{Pixel, PixelRay, Tile}
+import Micro.Actions.Combat.Techniques.Common.ActionTechniqueEvaluation
 import Micro.Actions.{Action, Idle}
 import Micro.Decisions.MicroDecision
 import Micro.Heuristics.Targeting.TargetingProfile
@@ -16,7 +17,7 @@ import ProxyBwapi.Upgrades.Upgrade
 import bwapi.Color
 
 import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 
 class Agent(val unit: FriendlyUnitInfo) {
   
@@ -83,7 +84,7 @@ class Agent(val unit: FriendlyUnitInfo) {
     }
     cachedZonePath(to)
   }
-  private var cachedZonePath = new mutable.HashMap[Pixel, Option[ZonePath]]
+  private val cachedZonePath = new mutable.HashMap[Pixel, Option[ZonePath]]
   
   def nextWaypoint(to: Pixel): Pixel = {
     if (!cachedWaypoint.contains(to)) {
@@ -96,7 +97,7 @@ class Agent(val unit: FriendlyUnitInfo) {
     }
     cachedWaypoint(to)
   }
-  private var cachedWaypoint = new mutable.HashMap[Pixel, Pixel]
+  private val cachedWaypoint = new mutable.HashMap[Pixel, Pixel]
   
   /////////////////
   // Suggestions //
@@ -132,6 +133,8 @@ class Agent(val unit: FriendlyUnitInfo) {
   var pathsAcceptable : Traversable[PixelRay] = Seq.empty
   var pathAccepted    : Traversable[PixelRay] = Seq.empty
   
+  val techniques: ArrayBuffer[ActionTechniqueEvaluation] = new ArrayBuffer[ActionTechniqueEvaluation]
+  
   ///////////////
   // Execution //
   ///////////////
@@ -156,6 +159,7 @@ class Agent(val unit: FriendlyUnitInfo) {
     pathAccepted        = Seq.empty
     cachedZonePath.clear()
     cachedWaypoint.clear()
+    techniques.clear()
   }
   
   private def followIntent() {

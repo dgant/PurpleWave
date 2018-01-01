@@ -2,7 +2,7 @@ package Performance
 
 import Lifecycle.With
 
-class Cache[T](recalculator: () => T) {
+class Cache[T](recalculator: () => T, refreshPeriod: Int = 1) {
   
   private var lastValue: T = _
   private val defaultValue = lastValue
@@ -12,7 +12,7 @@ class Cache[T](recalculator: () => T) {
   def apply(): T = {
     if (invalidStartingOnThisFrame <= With.frame) {
       lastValue = recalculator()
-      invalidStartingOnThisFrame = With.frame + 1
+      invalidStartingOnThisFrame = With.frame + refreshPeriod
     }
     lastValue
   }

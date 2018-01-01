@@ -62,6 +62,9 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     // Save JNI overhead by not tracking history of Spider Mines and Interceptors
     if ( ! unitClass.orderable) return
     
+    // Limit the frequency of history updates
+    if (history.lastOption.exists(_.frame > With.frame - 4) return
+    
     if (history.lastOption.exists(_.totalHealth > totalHealth)) {
       lastDamageFrame = history.lastOption.get.frame
     }
@@ -126,8 +129,8 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
           lastState.defensiveMatrixPoints - defensiveMatrixPoints)
         .getOrElse(0)))
   
-  private lazy val stuckMoveFrames    = 6
-  private lazy val stuckAttackFrames  = cooldownMaxAirGround + 6
+  private lazy val stuckMoveFrames    = 10
+  private lazy val stuckAttackFrames  = stuckMoveFrames + cooldownMaxAirGround
   private lazy val stuckFramesMax     = Math.max(stuckMoveFrames, stuckAttackFrames)
   def seeminglyStuck: Boolean = {
     val recentHistory = history.takeRight(stuckFramesMax + With.latency.latencyFrames)

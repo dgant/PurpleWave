@@ -20,6 +20,13 @@ object Brawl extends ActionTechnique {
   
   override val activator = RMS
   
+  override def applicabilitySelf(unit: FriendlyUnitInfo): Double = {
+    if (unit.unitClass.melee)
+      0.75
+    else
+      0.25
+  }
+  
   override def applicabilityOther(unit: FriendlyUnitInfo, other: UnitInfo): Option[Double] = {
     if (other.isFriendly) return None
     if (other.flying) return None
@@ -27,7 +34,7 @@ object Brawl extends ActionTechnique {
     if ( ! unit.canAttack(other)) return None
     if (other.unitClass.ranged) return Some(0.0)
     
-    val output = PurpleMath.nanToOne(GameTime(0, 1)() / other.framesToGetInRange(unit))
+    val output = PurpleMath.nanToOne(GameTime(0, 1)() / other.framesToGetInRange(unit).toDouble)
     Some(output)
   }
   

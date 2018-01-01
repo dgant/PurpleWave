@@ -17,6 +17,13 @@ object Abuse extends ActionTechnique {
     && unit.matchups.threats.nonEmpty
   )
   
+  override def applicabilitySelf(unit: FriendlyUnitInfo): Double = {
+    if (unit.matchups.framesOfSafetyDiffused > unit.unitClass.framesToTurnAndShootAndTurnBackAndAccelerate)
+      1.0
+    else
+      0.0
+  }
+  
   override def applicabilityOther(unit: FriendlyUnitInfo, other: UnitInfo): Option[Double] = {
     if (other.isFriendly) return None
     if ( ! other.canAttack(unit)) return None

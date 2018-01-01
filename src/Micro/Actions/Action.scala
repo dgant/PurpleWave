@@ -15,6 +15,9 @@ abstract class Action {
     if (( ! requiresReadiness || unit.readyForMicro) && allowed(unit)) {
       if (giveCredit) unit.agent.lastAction = Some(this)
       perform(unit)
+      if (unit.readyForMicro) {
+        unit.agent.lastAction = None
+      }
     }
   }
   

@@ -61,6 +61,7 @@ class Visualization {
     ShowGrids,
     ShowMicroDecisions,
     ShowMobility,
+    ShowTechniques,
     ShowUnitsAll,
     ShowUnitsForeign,
     ShowUnitsFriendly,

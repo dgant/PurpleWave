@@ -1,5 +1,6 @@
 package Micro.Actions.Basic
 
+import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Mathematics.Points.Tile
 import Micro.Actions.Action
@@ -59,7 +60,7 @@ object Build extends Action {
       }
     }
     else {
-      blockersOurs.flatMap(_.friendly).foreach(_.agent.shove(unit))
+      blockersOurs.flatMap(_.friendly).filter(_.matchups.framesOfSafetyDiffused > GameTime(0, 1)()).foreach(_.agent.shove(unit))
       With.commander.build(unit, unit.agent.toBuild.get, unit.agent.lastIntent.toBuildTile.get)
     }
   }

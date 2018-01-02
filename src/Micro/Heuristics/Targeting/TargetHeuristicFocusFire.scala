@@ -8,7 +8,7 @@ object TargetHeuristicFocusFire extends TargetHeuristic {
     
     val doomed = candidate.totalHealth <=
       candidate.matchups.threatsInRange
-        .filter(_.lastTarget.contains(candidate))
+        .filter(threat => threat != unit && threat.lastTarget.contains(candidate))
         .map(_.damageOnNextHitAgainst(candidate))
         .sum
     

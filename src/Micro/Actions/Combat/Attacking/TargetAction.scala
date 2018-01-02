@@ -26,8 +26,6 @@ abstract class TargetAction extends Action {
       filtersOptional = filtersOptional.drop(1)
     }
     while (unit.agent.toAttack.isEmpty && filtersOptional.nonEmpty)
-    
-    val target = unit.agent.toAttack
   }
 }
 

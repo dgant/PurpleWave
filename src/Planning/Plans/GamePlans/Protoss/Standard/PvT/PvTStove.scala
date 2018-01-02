@@ -58,12 +58,14 @@ class PvTStove extends GameplanModeTemplate {
     RequestAtLeast(5,   Protoss.Pylon),
     RequestAtLeast(26,  Protoss.Probe),
     RequestUpgrade(Protoss.DragoonRange),
-    RequestAtLeast(3,   Protoss.Dragoon))
+    RequestAtLeast(3,   Protoss.Dragoon),
+    RequestAtLeast(2,   Protoss.Scout))
   
   override def buildPlans = Vector(
     new BuildGasPumps,
+    new PvTIdeas.TrainArmy,
     new Build(
-      RequestAtLeast(3, Protoss.Gateway),
-      RequestAtLeast(1, Protoss.ArbiterTribunal)),
-    new PvTIdeas.TrainArmy)
+      RequestAtLeast(5, Protoss.Gateway),
+      RequestAtLeast(1, Protoss.ArbiterTribunal))
+    )
 }

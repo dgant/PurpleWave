@@ -3,14 +3,15 @@ package Micro.Actions.Commands
 import Lifecycle.With
 import Mathematics.Physics.ForceMath
 import Micro.Actions.Action
+import Micro.Actions.Combat.Tactics.Potshot
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Gravitate extends Action {
   
-  override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.canMove &&
-    unit.agent.forces.nonEmpty
-  }
+  override def allowed(unit: FriendlyUnitInfo): Boolean = (
+    unit.canMove
+    && unit.agent.forces.nonEmpty
+  )
   
   override def perform(unit: FriendlyUnitInfo) {
     val forces          = unit.agent.forces.values

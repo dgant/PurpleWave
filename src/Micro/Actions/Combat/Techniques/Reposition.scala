@@ -1,8 +1,7 @@
 package Micro.Actions.Combat.Techniques
 
 import Micro.Actions.Combat.Maneuvering.OldAttackAndReposition
-import Micro.Actions.Combat.Techniques.Common.ActionTechnique
-import Micro.Actions.Commands.Attack
+import Micro.Actions.Combat.Techniques.Common.{ActionTechnique, AttackAsSoonAsPossible}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Reposition extends ActionTechnique {
@@ -22,11 +21,7 @@ object Reposition extends ActionTechnique {
   }
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
-    if (unit.readyForAttackOrder
-      || unit.matchups.targetsInRange.isEmpty
-      || unit.matchups.targets.forall(t => unit.pixelsFromEdgeFast(t) > unit.pixelRangeAgainstFromEdge(t) - 32.0)) {
-      Attack.delegate(unit)
-    }
+    AttackAsSoonAsPossible.delegate(unit)
     OldAttackAndReposition.delegate(unit)
   }
 }

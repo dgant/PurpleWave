@@ -166,7 +166,7 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit, id: Int) extends UnitInfo(bas
   def trainingQueue: Iterable[UnitClass] = trainingQueueCache()
   
   private val trainingQueueCache = new Cache(() =>
-    if (unitClass.isBuilding || is(Protoss.Reaver) || is(Protoss.Carrier))
+    if (unitClass.trainsUnits)
       base.getTrainingQueue.asScala.map(UnitClasses.get)
     else
       Iterable.empty // Performance optimization

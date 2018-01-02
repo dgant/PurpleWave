@@ -12,7 +12,7 @@ import Utilities.EnrichPixel.EnrichedPixelCollection
 
 class SquadDefendZone(zone: Zone) extends SquadGoal {
   
-  private var lastAction = "ProtectZone"
+  private var lastAction = "Defend "
   override def toString: String = lastAction + zone
   
   override def acceptsHelp: Boolean = false

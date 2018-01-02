@@ -11,6 +11,7 @@ object PvTEarly1GateRange extends Strategy {
       PvTFastThird,
       PvT2BaseGatewayForever,
       PvT2BaseCarrier,
+      PvT2BaseReaverCarrier,
       PvT3BaseCorsair))
   
   override def ourRaces    : Iterable[Race] = Vector(Race.Protoss)

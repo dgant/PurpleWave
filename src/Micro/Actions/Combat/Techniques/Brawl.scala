@@ -22,7 +22,7 @@ object Brawl extends ActionTechnique {
   
   override def applicabilitySelf(unit: FriendlyUnitInfo): Double = {
     if (unit.unitClass.melee)
-      0.75
+      0.5
     else
       0.25
   }

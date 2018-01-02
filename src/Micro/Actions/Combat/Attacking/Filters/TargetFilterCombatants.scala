@@ -11,7 +11,8 @@ object TargetFilterCombatants extends TargetFilter {
     lazy val targetAssisting  = target.unitClass.helpsInCombat && ! target.unitClass.attacks
     lazy val targetAggressing = target.hasBeenViolentInLastTwoSeconds
     lazy val targetInRange    = actor.inRangeToAttackFast(target)
-    lazy val targetCatchable  = actor.matchups.alliesIncludingSelf.exists(_.topSpeed >= target.topSpeed)
+    lazy val targetBusy       = target.gathering || target.constructing || target.repairing
+    lazy val targetCatchable  = targetBusy || actor.matchups.alliesIncludingSelf.exists(_.topSpeed >= target.topSpeed)
     
     val output = (
       ( ! fighting || targetAssisting || targetAggressing)

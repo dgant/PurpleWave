@@ -4,6 +4,7 @@ import Debugging.Visualizations.ForceColors
 import Mathematics.Physics.ForceMath
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.OldAvoid
+import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Actions.Commands.Gravitate
 import Micro.Decisions.Potential
 import Planning.Yolo
@@ -19,8 +20,10 @@ object BeAnArbiter extends Action {
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {
+    Potshot.consider(unit)
+    
     lazy val threatened   = unit.matchups.framesOfSafetyDiffused <= 0.0
-    lazy val umbrellable  = (u: UnitInfo) => ! u.unitClass.isBuilding && u != unit && u.pixelDistanceFast(unit) < 32.0 * 20.0 && ! u.is(Protoss.Interceptor)
+    lazy val umbrellable  = (u: UnitInfo) => ! u.unitClass.isBuilding && u != unit && ! u.is(Protoss.Interceptor) && ! u.is(Protoss.Arbiter)
     lazy val friends      = unit.teammates.filter(umbrellable)
     
     if (threatened && ! Yolo.active) {

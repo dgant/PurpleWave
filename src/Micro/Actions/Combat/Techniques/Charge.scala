@@ -16,7 +16,7 @@ object Charge extends ActionTechnique {
     && unit.matchups.targets.nonEmpty
   )
   
-  override val applicabilityBase = 0.25
+  override val applicabilityBase = 0.5
   
   override def applicabilityOther(unit: FriendlyUnitInfo, other: UnitInfo): Option[Double] = {
     if (other.isFriendly) return None

@@ -41,7 +41,9 @@ object Chase extends ActionTechnique {
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     Target.delegate(unit)
-    Attack.delegate(unit)
+    if (unit.readyForAttackOrder) {
+      Attack.delegate(unit)
+    }
   
     // TODO: Queue up a move order ASAP; we can't wait for latency
     val target = unit.agent.toAttack

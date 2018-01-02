@@ -1,6 +1,6 @@
 package Micro.Actions.Combat.Techniques
 
-import Micro.Actions.Combat.Techniques.Common.{ActionTechnique, Leave, PotshotAsSoonAsPossible}
+import Micro.Actions.Combat.Techniques.Common.{ActionTechnique, AttackAsSoonAsPossible, Leave}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object Breathe extends ActionTechnique {
@@ -45,7 +45,7 @@ object Breathe extends ActionTechnique {
   }
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
-    PotshotAsSoonAsPossible.delegate(unit)
+    AttackAsSoonAsPossible.delegate(unit)
     Leave.delegate(unit)
   }
 }

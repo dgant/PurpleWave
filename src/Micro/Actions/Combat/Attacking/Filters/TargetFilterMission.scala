@@ -11,13 +11,12 @@ object TargetFilterMission extends TargetFilter {
   def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = {
     lazy val cleanup      = With.intelligence.firstEnemyMain.isDefined && With.geography.enemyBases.isEmpty
     lazy val pillaging    = actor.agent.canPillage || cleanup
-    lazy val canCatch     = actor.topSpeedChasing > target.topSpeed || target.gathering || target.constructing
     lazy val destination  = actor.agent.destination.zone
     lazy val arrived      = actor.zone == destination || target.zone == destination
     lazy val engaged      = actor.squadmates.exists(squadmate => squadmate.zone == actor.zone && squadmate.matchups.threatsInRange.nonEmpty)
     lazy val inRange      = actor.inRangeToAttackFast(target)
     
-    val output = (pillaging && canCatch) || arrived || inRange || engaged
+    val output = pillaging || arrived || inRange || engaged
     
     output
   }

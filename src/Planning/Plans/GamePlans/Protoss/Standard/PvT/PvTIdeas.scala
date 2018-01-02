@@ -18,6 +18,7 @@ object PvTIdeas {
   class BuildSecondGasIfWeNeedIt extends If(
     new Or(
       new Employing(PvT2BaseCarrier),
+      new Employing(PvT2BaseReaverCarrier),
       new Employing(PvT2BaseArbiter)),
     new BuildGasPumps)
   
@@ -75,14 +76,15 @@ object PvTIdeas {
   
   class TrainScouts extends If(
     new And(
-      new UnitsExactly(0, Terran.Goliath),
-      new UnitsAtMost(6, Terran.Marine),
+      new EnemyUnitsAtMost(0, Terran.Goliath),
+      new EnemyUnitsAtMost(6, Terran.Marine),
+      new EnemyUnitsAtMost(8, Terran.MissileTurret),
       new UnitsExactly(0, Protoss.FleetBeacon),
       new UnitsExactly(0, Protoss.ArbiterTribunal),
       new Or(
         new Employing(PvTEarly1GateStargate),
         new Employing(PvTEarly1GateStargateTemplar))),
-    new TrainContinuously(Protoss.Scout, 3))
+    new TrainContinuously(Protoss.Scout, 5))
   
   class TrainDarkTemplar extends If(
     new And(
@@ -128,12 +130,22 @@ object PvTIdeas {
       new TrainContinuously(Protoss.Arbiter, 2),
       new TrainContinuously(Protoss.Arbiter, 10)))
   
+  private class TrainObserversScalingWithArmy extends If(
+    new UnitsAtLeast(1, UnitMatchWarriors),
+    new If(
+      new UnitsAtLeast(12, UnitMatchWarriors),
+      new If(
+        new UnitsAtLeast(24, UnitMatchWarriors),
+        new TrainContinuously(Protoss.Observer, 3)),
+      new TrainContinuously(Protoss.Observer, 2)),
+    new TrainContinuously(Protoss.Observer, 1))
+  
   class TrainObservers extends If(
     new EnemyHasShownWraithCloak,
-    new TrainContinuously(Protoss.Observer, 3),
+    new TrainObserversScalingWithArmy,
     new If(
       new EnemyHasShown(Terran.SpiderMine),
-      new TrainContinuously(Protoss.Observer, 3),
+      new TrainObserversScalingWithArmy,
       new TrainContinuously(Protoss.Observer, 1)))
   
   class TrainHighTemplar extends OnGasPumps(3,
@@ -145,6 +157,7 @@ object PvTIdeas {
   class TrainArmy extends Parallel(
     new TrainObservers,
     new TrainArbiters,
+    new TrainContinuously(Protoss.Reaver, 3),
     new TrainContinuously(Protoss.Carrier),
     new TrainDarkTemplar,
     new TrainHighTemplar,

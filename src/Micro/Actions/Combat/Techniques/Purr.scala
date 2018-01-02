@@ -1,5 +1,6 @@
 package Micro.Actions.Combat.Techniques
 
+import Lifecycle.With
 import Micro.Actions.Combat.Techniques.Common.ActionTechnique
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
@@ -9,6 +10,7 @@ object Purr extends ActionTechnique {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     unit.unitClass.isMechanical
+    && With.self.isTerran
     && unit.totalHealth < unit.unitClass.maxTotalHealth
   )
   

@@ -176,7 +176,10 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   
   lazy val unitsTrained: Array[UnitClass] = UnitClasses.all.filter(_.whatBuilds._1 == this).toArray
   
-  lazy val trainsGroundUnits: Boolean = UnitClasses.all.exists(unit => ! unit.isFlyer && unit.whatBuilds._1 == this)
+  lazy val trainsUnits        : Boolean = UnitClasses.all.exists(unit => unit.whatBuilds._1 == this)
+  lazy val trainsAirUnits     : Boolean = UnitClasses.all.exists(unit => unit.whatBuilds._1 == this && unit.isFlyer)
+  lazy val trainsGroundUnits  : Boolean = UnitClasses.all.exists(unit => unit.whatBuilds._1 == this && ! unit.isFlyer)
+  
   
   lazy val isProtoss : Boolean = race == Race.Protoss
   lazy val isTerran  : Boolean = race == Race.Terran

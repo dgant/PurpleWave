@@ -7,7 +7,7 @@ import Micro.Actions.Commands.{Attack, Gravitate}
 import Micro.Decisions.Potential
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-object AttackAndReposition extends Action {
+object OldAttackAndReposition extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     unit.canMove

@@ -1,5 +1,6 @@
 package Micro.Actions.Combat.Techniques
 
+import Micro.Actions.Combat.Maneuvering.OldAttackAndReposition
 import Micro.Actions.Combat.Techniques.Common.ActionTechnique
 import Micro.Actions.Commands.Attack
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -26,6 +27,6 @@ object Reposition extends ActionTechnique {
       || unit.matchups.targets.forall(t => unit.pixelsFromEdgeFast(t) > unit.pixelRangeAgainstFromEdge(t) - 32.0)) {
       Attack.delegate(unit)
     }
-    Avoid.delegate(unit)
+    OldAttackAndReposition.delegate(unit)
   }
 }

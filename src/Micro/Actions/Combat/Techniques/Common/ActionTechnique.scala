@@ -18,15 +18,4 @@ abstract class ActionTechnique extends Action {
   val applicabilityBase = 1.0
   def applicabilitySelf(unit: FriendlyUnitInfo): Double = 1.0
   def applicabilityOther(unit: FriendlyUnitInfo, other: UnitInfo): Option[Double] = Some(1.0)
-  
-  def evaluate(unit: FriendlyUnitInfo): ActionTechniqueEvaluation = {
-   
-    val evaluation = new ActionTechniqueEvaluation(unit, this)
-    
-    // Performance shortcuts
-    if (applicabilityBase                   <= 0.0) return 0.0
-    if (evaluation.totalApplicabilitySelf   <= 0.0) return 0.0
-    
-    evaluation
-  }
 }

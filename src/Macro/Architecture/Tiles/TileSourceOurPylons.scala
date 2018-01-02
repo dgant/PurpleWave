@@ -5,6 +5,8 @@ import Macro.Architecture.Blueprint
 import Mathematics.Points.Tile
 import ProxyBwapi.Races.Protoss
 
+import scala.collection.mutable
+
 object TileSourceOurPylons extends TileSource {
   
   override def appropriateFor(blueprint: Blueprint): Boolean = {
@@ -12,9 +14,13 @@ object TileSourceOurPylons extends TileSource {
   }
   
   override def tiles(blueprint: Blueprint): Iterable[Tile] = {
-    With.grids.psi3Height.psiPoints.flatMap(point =>
-      With.units.ours
-      .filter(_.is(Protoss.Pylon))
-      .map(_.tileTopLeft.add(point)))
+    val output = new mutable.HashSet[Tile]
+    With.units.ours
+      .foreach(pylon =>
+        if (pylon.is(Protoss.Pylon))
+          With.grids.psi3Height.psiPoints.foreach(point =>
+            pylon.tileTopLeft.add(point)
+          ))
+    output
   }
 }

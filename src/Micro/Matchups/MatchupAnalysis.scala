@@ -45,7 +45,6 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
   lazy val targets                : Vector[UnitInfo]      = enemies.filter(me.canAttack)
   lazy val threatsViolent         : Vector[UnitInfo]      = threats.filter(_.isBeingViolentTo(me))
   lazy val threatsInRange         : Vector[UnitInfo]      = threats.filter(threat => threat.pixelRangeAgainstFromCenter(me) >= threat.pixelDistanceFast(at) - me.pixelsTravelledMax(frame) - threat.pixelsTravelledMax(frame))
-  lazy val threatsViolentInRange  : Vector[UnitInfo]      = threatsInRange.filter(_.isBeingViolentTo(me))
   lazy val targetsInRange         : Vector[UnitInfo]      = targets.filter(target => target.visible && me.pixelRangeAgainstFromCenter(target) >= target.pixelDistanceFast(at) - me.pixelsTravelledMax(frame) - target.pixelsTravelledMax(frame) && (me.unitClass.groundMinRangeRaw <= 0 || me.pixelsFromEdgeFast(target) > 32.0 * 3.0))
   lazy val repairers              : ArrayBuffer[UnitInfo] = ArrayBuffer.empty ++ allies.filter(ally => ally.is(Terran.SCV) && ally.target.contains(me))
   
@@ -87,9 +86,13 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
   
   def framesOfEntanglementWith(threat: UnitInfo): Double = {
     def speed(unit: UnitInfo) = if (unit.canMove) unit.topSpeed else 0.0
-    val pixelsOutsideRange    = me.pixelDistanceFast(threat) - threat.pixelRangeAgainstFromCenter(me)
-    val speedApproaching      = speed(me) + speed(threat)
-    val framesToCloseGap      = PurpleMath.nanToInfinity(Math.abs(pixelsOutsideRange) / speedApproaching)
+    val pixelsOutsideRange    = me.pixelsFromEdgeFast(threat) - threat.pixelRangeAgainstFromEdge(me)
+    // A big definition question: Do we care about how fast they can chase us?
+    // SEMANTICS HACK:
+    // Entanglement: How long before we can  open the gap
+    // Safety: How long before they can close the gap
+    val gapSpeed              = if (pixelsOutsideRange >= 0) speed(threat) else speed(me)
+    val framesToCloseGap      = PurpleMath.nanToInfinity(Math.abs(pixelsOutsideRange) / gapSpeed)
     val output                = - framesToCloseGap * PurpleMath.signum(pixelsOutsideRange)
     output
   }

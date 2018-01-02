@@ -15,16 +15,15 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit, id: Int) extends UnitInfo(bas
   override def equals(obj: Any): Boolean = obj.isInstanceOf[FriendlyUnitProxy] && obj.asInstanceOf[FriendlyUnitProxy].id == id
   override def hashCode(): Int = id.hashCode
   
-  val cacheClass     = new Cache[UnitClass]  (() =>  UnitClasses.get(base.getType), GameTime(0, 1)())
-  val cachePlayer    = new Cache[PlayerInfo] (() =>  Players.get(base.getPlayer))
-  val cachePixel     = new Cache[Pixel]      (() =>  new Pixel(base.getPosition))
-  val cacheTile      = new Cache[Tile]       (() =>  new Tile(base.getTilePosition))
-  val cacheCompleted = new Cache[Boolean]    (() =>  base.isCompleted)
-  val cacheExists    = new Cache[Boolean]    (() =>  base.exists)
-  val cacheSelected  = new Cache[Boolean]    (() =>  base.isSelected)
-  val cachedFlying   = new Cache[Boolean]    (() =>  base.isFlying)
-  val cachedCloaked  = new Cache[Boolean]    (() =>  base.isCloaked)
-  val cachedStasised = new Cache[Boolean]    (() =>  base.isStasised)
+  private val cacheClass     = new Cache[UnitClass]  (() =>  UnitClasses.get(base.getType), GameTime(0, 1)())
+  private val cachePlayer    = new Cache[PlayerInfo] (() =>  Players.get(base.getPlayer))
+  private val cachePixel     = new Cache[Pixel]      (() =>  new Pixel(base.getPosition))
+  private val cacheTile      = new Cache[Tile]       (() =>  new Tile(base.getTilePosition))
+  private val cacheCompleted = new Cache[Boolean]    (() =>  base.isCompleted)
+  private val cacheExists    = new Cache[Boolean]    (() =>  base.exists)
+  private val cacheSelected  = new Cache[Boolean]    (() =>  base.isSelected)
+  private val cachedCloaked  = new Cache[Boolean]    (() =>  base.isCloaked)
+  private val cachedFlying   = new Cache[Boolean]    (() =>  unitClass.canFly         && base.isFlying)
   
   ///////////////////
   // Tracking info //
@@ -192,21 +191,23 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit, id: Int) extends UnitInfo(bas
   def accelerating  : Boolean = base.isAccelerating
   def angleRadians  : Double  = base.getAngle
   def braking       : Boolean = base.isBraking
-  def ensnared      : Boolean = base.isEnsnared
+  def ensnared      : Boolean = ! unitClass.isBuilding && base.isEnsnared
   def flying        : Boolean = cachedFlying()
-  def lifted        : Boolean = base.isLifted
+  def lifted        : Boolean = unitClass.isFlyingBuilding && base.isLifted
   def lockedDown    : Boolean = cachedIsLockedDown()
   def maelstrommed  : Boolean = cachedIsMaelstrommed()
-  def sieged        : Boolean = base.isSieged
+  def sieged        : Boolean = cachedIsSieged()
   def stasised      : Boolean = cachedStasised()
   def stimmed       : Boolean = cachedIsStimmed()
-  def stuck         : Boolean = base.isStuck
-  def velocityX     : Double  = base.getVelocityX
-  def velocityY     : Double  = base.getVelocityY
+  def stuck         : Boolean = unitClass.canMove && base.isStuck
+  def velocityX     : Double  = if (unitClass.canMove) base.getVelocityX else 0
+  def velocityY     : Double  = if (unitClass.canMove) base.getVelocityY else 0
   
-  private val cachedIsStimmed = new Cache(() => base.isStimmed)
-  private val cachedIsLockedDown = new Cache(() => base.isLockedDown)
-  private val cachedIsMaelstrommed = new Cache(() => base.isMaelstrommed)
+  private val cachedIsSieged        = new Cache(() => unitClass.canSiege          &&  base.isSieged)
+  private val cachedIsStimmed       = new Cache(() => unitClass.canBeStasised     &&  base.isStimmed)
+  private val cachedIsLockedDown    = new Cache(() => unitClass.canBeLockedDown   &&  base.isLockedDown)
+  private val cachedStasised        = new Cache(() => unitClass.canBeStasised     &&  base.isStasised)
+  private val cachedIsMaelstrommed  = new Cache(() => unitClass.canBeMaelstrommed &&  base.isMaelstrommed)
   
   //////////////
   // Statuses //

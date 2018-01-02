@@ -20,10 +20,10 @@ object Weigh {
       : Option[ActionTechnique] = {
     
     val allowed = techniques.filter(_.allowed(unit))
-    val evaluations = allowed.map(technique => (technique, technique.evaluate(unit))).toMap
+    val evaluations = allowed.map(technique => (technique, new ActionTechniqueEvaluation(unit, technique))).toMap
     if (ShowTechniques.inUse) {
       unit.agent.techniques ++= evaluations.values
     }
-    ByOption.maxBy(evaluations)(_._2.totalApplicability)
+    ByOption.maxBy(evaluations)(_._2.totalApplicability).map(_._1)
   }
 }

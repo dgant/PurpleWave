@@ -2,15 +2,13 @@ package Micro.Heuristics.Targeting
 
 import Mathematics.Heuristics.Heuristic
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import Utilities.ByOption
 
 object EvaluateTargets {
   
   def best(unit: FriendlyUnitInfo, targets: Iterable[UnitInfo]): Option[UnitInfo] = {
-    
-    if (targets.isEmpty)
-      None
-    else
-      Some(targets.maxBy(target => evaluate(unit, target)))
+    val output = ByOption.maxBy(targets)(evaluate(unit, _))
+    output
   }
   
   def evaluate(unit: FriendlyUnitInfo, target: UnitInfo): Double = {

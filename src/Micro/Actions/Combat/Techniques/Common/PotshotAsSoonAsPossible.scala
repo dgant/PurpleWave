@@ -7,11 +7,12 @@ import Micro.Actions.Commands.Attack
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
 
-object ShootAsSoonAsPossible extends Action {
+object PotshotAsSoonAsPossible extends Action {
   
-  override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.canAttack
-  }
+  override def allowed(unit: FriendlyUnitInfo): Boolean = (
+    unit.canMove
+    && unit.canAttack
+  )
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     val targets               = unit.matchups.targets.filter(PotshotTargetFilter.legal(unit, _))

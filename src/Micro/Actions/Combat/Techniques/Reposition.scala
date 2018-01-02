@@ -1,6 +1,7 @@
 package Micro.Actions.Combat.Techniques
 
-import Micro.Actions.Combat.Techniques.Common.{ActionTechnique, ShootAsSoonAsPossible}
+import Micro.Actions.Combat.Techniques.Common.ActionTechnique
+import Micro.Actions.Commands.Attack
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Reposition extends ActionTechnique {
@@ -10,6 +11,7 @@ object Reposition extends ActionTechnique {
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     unit.canMove
     && unit.canAttack
+    && unit.unitClass.ranged
   )
   
   override val activator = One
@@ -19,7 +21,11 @@ object Reposition extends ActionTechnique {
   }
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
-    ShootAsSoonAsPossible.delegate(unit)
+    if (unit.readyForAttackOrder
+      || unit.matchups.targetsInRange.isEmpty
+      || unit.matchups.targets.forall(t => unit.pixelsFromEdgeFast(t) > unit.pixelRangeAgainstFromEdge(t) - 32.0)) {
+      Attack.delegate(unit)
+    }
     Avoid.delegate(unit)
   }
 }

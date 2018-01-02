@@ -24,7 +24,7 @@ object AttackAndReposition extends Action {
     lazy val target         = unit.agent.toAttack.get
     lazy val shouldChase    = unit.pixelDistanceFast(target) < unit.pixelDistanceFast(target.projectFrames(8))
     lazy val shouldHugTank  = target.pixelRangeMin > 0 && target.canAttack(unit) && unit.pixelDistanceFast(target) * 1.75 < target.pixelRangeAgainstFromCenter(unit)
-    lazy val shouldAvoid    = unit.matchups.threatsViolent.exists(t => (target != t || t.pixelRangeAgainstFromCenter(unit) < unit.pixelRangeAgainstFromCenter(t)))
+    lazy val shouldAvoid    = unit.matchups.threats.exists(t => (target != t || t.pixelRangeAgainstFromCenter(unit) < unit.pixelRangeAgainstFromCenter(t)))
     
     if (unit.readyForAttackOrder || ! unit.inRangeToAttackFast(target)) {
       Attack.delegate(unit)

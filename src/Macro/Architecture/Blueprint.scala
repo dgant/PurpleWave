@@ -102,7 +102,7 @@ class Blueprint(
       (respectHarvesting  && With.architecture.isHarvestingArea(nextTile))
     }
     
-    val violator = buildArea.tiles.find(nextTile => violatesBuildArea(nextTile))
+    val violator = buildArea.tiles.find(violatesBuildArea)
     
     violator.isEmpty
   }

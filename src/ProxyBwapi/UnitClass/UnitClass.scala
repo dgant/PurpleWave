@@ -458,6 +458,20 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
     0
   }
   
+  //////////////////
+  // Capabilities //
+  //////////////////
+  
+  // These largely exist for performance reasons;
+  // We want to avoid calling isTHING methods for units where it will always be true
+  
+  val canFly            : Boolean = isFlyer || isFlyingBuilding
+  val canStim           : Boolean = this == Terran.Marine || this == Terran.Firebat
+  val canSiege          : Boolean = this == Terran.SiegeTankUnsieged || this == Terran.SiegeTankSieged
+  val canBeLockedDown   : Boolean = isMechanical  && ! isBuilding
+  val canBeMaelstrommed : Boolean = isOrganic     && ! isBuilding
+  val canBeStasised     : Boolean = ! isBuilding
+  
   /////////////////
   // Convenience //
   /////////////////

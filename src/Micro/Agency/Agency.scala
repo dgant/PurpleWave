@@ -50,7 +50,7 @@ class Agency {
       val agent = agentQueue.dequeue()
       agent.lastFrame = With.frame
       
-      if (agent.unit.unitClass.orderable) {
+      if (agent.unit.unitClass.orderable && agent.unit.readyForMicro) {
         agent.execute()
       }
     }

@@ -32,7 +32,6 @@ class PlacementStateEvaluating(blueprint: Blueprint) extends PlacementState {
       updateStepNanoseconds(nanosecondsOnStart)
     }
     else if (stillFiltering) {
-      
       // Filter them (in batches)
       var filterCount = 0
       val filterCountMax = batchSize
@@ -102,6 +101,6 @@ class PlacementStateEvaluating(blueprint: Blueprint) extends PlacementState {
       With.configuration.buildingPlacementBatchSize
   
   private def stillSurveying  : Boolean = candidatesUnfiltered.isEmpty
-  private def stillFiltering  : Boolean = candidatesUnfiltered.exists(nextFilteringIndex < _.length) && candidatesFiltered.get.size < With.configuration.buildingPlacementMaxTilesToEvaluate
+  private def stillFiltering  : Boolean = candidatesUnfiltered.exists(nextFilteringIndex < _.length) && candidatesFiltered.get.length < With.configuration.buildingPlacementMaxTilesToEvaluate
   private def stillEvaluating : Boolean = candidatesFiltered.exists(nextEvaluationIndex < _.length)
 }

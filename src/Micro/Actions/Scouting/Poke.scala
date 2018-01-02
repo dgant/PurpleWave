@@ -10,7 +10,7 @@ object Poke extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
     With.intelligence.enemyMain.isDefined               &&
     unit.matchups.targets.exists(_.unitClass.isWorker)  &&
-    unit.matchups.threatsViolent.isEmpty                &&
+    unit.matchups.threats.isEmpty                       &&
     ! unit.wounded
   }
   

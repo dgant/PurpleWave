@@ -6,7 +6,11 @@ object TargetHeuristicFocusFire extends TargetHeuristic {
   
   override def evaluate(unit: FriendlyUnitInfo, candidate: UnitInfo): Double = {
     
-    val doomed = candidate.matchups.threatsViolentInRange.map(_.damageOnNextHitAgainst(candidate)).sum > candidate.totalHealth
+    val doomed = candidate.totalHealth <=
+      candidate.matchups.threatsInRange
+        .filter(_.lastTarget.contains(candidate))
+        .map(_.damageOnNextHitAgainst(candidate))
+        .sum
     
     if (doomed) return 1.0
     

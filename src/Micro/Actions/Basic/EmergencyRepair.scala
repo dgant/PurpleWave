@@ -61,7 +61,7 @@ object EmergencyRepair extends Action {
     lazy val isDamagedBadly   = patient.totalHealth < patient.unitClass.maxTotalHealth * 0.5
     lazy val isDamagedDefense = isDamaged && isDefense
     lazy val needsMoreRepair  = docsRepairingNow == 0 || patient.matchups.dpfReceivingCurrently >= repairPerFrame * 1.8
-    lazy val needsRepairSoon  = isDefense && patient.matchups.threatsViolent.nonEmpty && docsRepairingNow < 2
+    lazy val needsRepairSoon  = isDefense && patient.matchups.threats.nonEmpty && docsRepairingNow < 2
     
     val output = (isAlreadyPatient || isDamagedBadly || isDamagedDefense) && (needsMoreRepair || needsRepairSoon)
     

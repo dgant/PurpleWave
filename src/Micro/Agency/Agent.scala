@@ -230,7 +230,7 @@ class Agent(val unit: FriendlyUnitInfo) {
     // Don't retreat to a Missile Turret against Zerglings, for example
     if (ally.matchups.enemies.nonEmpty && ally.matchups.targets.isEmpty) return false
     
-    if (ally.topSpeed < unit.topSpeed && ally.subjectiveValue > unit.subjectiveValue) {
+    if (ally.topSpeed < unit.topSpeed && ally.unitClass.subjectiveValue > unit.unitClass.subjectiveValue) {
       return true
     }
     

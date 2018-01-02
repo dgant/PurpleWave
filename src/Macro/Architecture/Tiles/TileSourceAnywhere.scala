@@ -11,6 +11,6 @@ object TileSourceAnywhere extends TileSource {
   }
   
   override def tiles(blueprint: Blueprint): Iterable[Tile] = {
-    With.geography.zones.flatMap(_.tilesBuildable)
+    With.geography.allTiles.filter(With.grids.buildable.get)
   }
 }

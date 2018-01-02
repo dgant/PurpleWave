@@ -17,6 +17,7 @@ object KeyboardCommands {
       case "2"          => With.game.setLocalSpeed(60)    ; With.configuration.camera = false
       case "3"          => With.game.setLocalSpeed(30)    ; With.configuration.camera = false
       case "4"          => With.game.setLocalSpeed(0)     ; With.configuration.camera = false
+      case "perform"    => { With.performance.enablePerformanceStops = ! With.performance.enablePerformanceStops; Manners.chat("Performance stops? " + With.performance.enablePerformanceStops) }
       case "map"        => Manners.chat("The current map is " + With.game.mapName + ": " + With.game.mapFileName)
       case "allin"      => With.blackboard.allIn = true
       case "strategize" => With.strategy.selectInitialStrategies

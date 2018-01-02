@@ -1,7 +1,7 @@
 package Micro.Actions.Combat.Techniques
 
 import Micro.Actions.Combat.Tactics.Potshot
-import Micro.Actions.Combat.Techniques.Common.{ActionTechnique, ShootAsSoonAsPossible}
+import Micro.Actions.Combat.Techniques.Common.{ActionTechnique, PotshotAsSoonAsPossible}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object Abuse extends ActionTechnique {
@@ -12,24 +12,18 @@ object Abuse extends ActionTechnique {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     unit.canMove
+    && unit.unitClass.ranged
     && unit.canAttack
     && unit.matchups.targets.nonEmpty
     && unit.matchups.threats.nonEmpty
   )
-  
-  override def applicabilitySelf(unit: FriendlyUnitInfo): Double = {
-    if (unit.matchups.framesOfSafetyDiffused > unit.unitClass.framesToTurnAndShootAndTurnBackAndAccelerate)
-      1.0
-    else
-      0.0
-  }
   
   override def applicabilityOther(unit: FriendlyUnitInfo, other: UnitInfo): Option[Double] = {
     if (other.isFriendly) return None
     if ( ! other.canAttack(unit)) return None
     if ( ! unit.canAttack(other)) return Some(0.0)
     
-    val deltaSpeed = unit.topSpeed - other.topSpeed
+    val deltaSpeed = unit.topSpeedChasing - other.topSpeed
     if (deltaSpeed <= 0) return Some(0.0)
   
     val deltaRange = unit.pixelRangeAgainstFromCenter(other) - other.pixelRangeAgainstFromCenter(unit)
@@ -39,9 +33,11 @@ object Abuse extends ActionTechnique {
   }
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
-    if (unit.matchups.framesOfSafetyDiffused > unit.unitClass.framesToTurnAndShootAndTurnBackAndAccelerate) {
+    lazy val safeToShoot = unit.matchups.framesOfSafetyDiffused > unit.unitClass.framesToTurnAndShootAndTurnBackAndAccelerate
+    lazy val lastChanceToShoot = unit.matchups.targetsInRange.isEmpty || unit.matchups.targets.forall(t => t.pixelDistanceFast(unit) > unit.pixelRangeAgainstFromCenter(t) - 32.0)
+    if (unit.readyForAttackOrder && (safeToShoot || lastChanceToShoot)) {
       Potshot.delegate(unit)
-      ShootAsSoonAsPossible.delegate(unit)
+      PotshotAsSoonAsPossible.delegate(unit)
     }
     
     Avoid.delegate(unit)

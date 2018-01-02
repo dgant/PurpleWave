@@ -4,7 +4,7 @@ class HeuristicWeight[TContext, TCandidate] (
   val heuristic : Heuristic[TContext, TCandidate],
   val weight    : Double) {
   
-  def weighMultiplicatively(context:TContext, candidate:TCandidate):Double = {
+  def weighMultiplicatively(context: TContext, candidate: TCandidate): Double = {
     val result =
       if (weight == 0)
         HeuristicMathMultiplicative.default
@@ -14,7 +14,7 @@ class HeuristicWeight[TContext, TCandidate] (
     result
   }
   
-  def weighAdditively(context:TContext, candidate:TCandidate):Double = {
+  def weighAdditively(context: TContext, candidate: TCandidate): Double = {
     val result =
       if (weight == 0)
         HeuristicMathAdditive.default

@@ -1,6 +1,6 @@
 package Micro.Actions.Combat.Techniques
 
-import Micro.Actions.Combat.Techniques.Common.{ActionTechnique, Leave, ShootAsSoonAsPossible}
+import Micro.Actions.Combat.Techniques.Common.{ActionTechnique, Leave, PotshotAsSoonAsPossible}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object Breathe extends ActionTechnique {
@@ -23,7 +23,7 @@ object Breathe extends ActionTechnique {
     if (other.isFriendly) return None
     if ( ! other.canAttack(unit)) return None
     
-    val distanceOurs    = unit.matchups.targets.map(unit.pixelDistanceFast).min
+    val distanceOurs    = unit.pixelRangeMax
     val distanceTheirs  = other.pixelDistanceFast(unit)
     val distanceDelta   = distanceOurs - distanceTheirs
     
@@ -45,7 +45,7 @@ object Breathe extends ActionTechnique {
   }
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
-    ShootAsSoonAsPossible.delegate(unit)
+    PotshotAsSoonAsPossible.delegate(unit)
     Leave.delegate(unit)
   }
 }

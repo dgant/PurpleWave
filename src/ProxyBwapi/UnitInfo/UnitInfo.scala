@@ -63,7 +63,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     if ( ! unitClass.orderable) return
     
     // Limit the frequency of history updates
-    if (history.lastOption.exists(_.frame > With.frame - 4) return
+    //if (history.lastOption.exists(_.frame > With.frame - 4)) return
     
     if (history.lastOption.exists(_.totalHealth > totalHealth)) {
       lastDamageFrame = history.lastOption.get.frame
@@ -232,12 +232,16 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     && ! burrowed)
   
   def topSpeedChasing: Double = topSpeedChasingCache()
-  private val topSpeedChasingCache = new Cache(() => topSpeed * PurpleMath.nanToOne(Math.max(0, cooldownMaxAirGround - unitClass.stopFrames) / cooldownMaxAirGround.toDouble))
+  private val topSpeedChasingCache = new Cache(() =>
+    topSpeed
+    * PurpleMath.nanToOne(
+      Math.max(0, cooldownMaxAirGround - unitClass.stopFrames)
+      / cooldownMaxAirGround.toDouble))
   
   def topSpeed: Double = topSpeedCache()
-  //TODO: Ensnare
   private val topSpeedCache = new Cache(() =>
     if ( ! canDoAnything || burrowed) 0 else
+      (if (ensnared) 0.5 else 1.0) * // TODO: Is this the multiplier?
       (if (stimmed) 1.5 else 1.0) * (
       unitClass.topSpeed * (if (
         (is(Terran.Vulture)   && player.hasUpgrade(Terran.VultureSpeed))    ||

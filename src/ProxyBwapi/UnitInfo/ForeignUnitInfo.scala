@@ -264,20 +264,20 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo (o
   //////////////
   
   private def updateMovement() {
-    _accelerating = baseUnit.isAccelerating
-    _angle        = baseUnit.getAngle
-    _braking      = baseUnit.isBraking
-    _ensnared     = baseUnit.isEnsnared
-    _flying       = baseUnit.isFlying
-    _lifted       = baseUnit.isLifted
-    _lockedDown   = baseUnit.isLockedDown
-    _maelstrommed = baseUnit.isMaelstrommed
-    _sieged       = baseUnit.isSieged
-    _stasised     = baseUnit.isStasised
-    _stimmed      = baseUnit.isStimmed
-    _stuck        = baseUnit.isStuck
-    _velocityX    = baseUnit.getVelocityX
-    _velocityY    = baseUnit.getVelocityY
+    _accelerating = unitClass.canMove           &&  baseUnit.isAccelerating
+    _angle        =                                 baseUnit.getAngle
+    _braking      = unitClass.canMove           &&  baseUnit.isBraking
+    _ensnared     = ! unitClass.isBuilding      &&  baseUnit.isEnsnared
+    _flying       = unitClass.canFly            &&  baseUnit.isFlying
+    _lifted       = unitClass.isFlyingBuilding  &&  baseUnit.isLifted
+    _lockedDown   = unitClass.canBeLockedDown   &&  baseUnit.isLockedDown
+    _maelstrommed = unitClass.canBeMaelstrommed &&  baseUnit.isMaelstrommed
+    _sieged       = unitClass.canSiege          &&  baseUnit.isSieged
+    _stasised     = unitClass.canBeStasised     &&  baseUnit.isStasised
+    _stimmed      = unitClass.canStim           &&  baseUnit.isStimmed
+    _stuck        = unitClass.canMove           &&  baseUnit.isStuck
+    _velocityX    = if(unitClass.canMove)           baseUnit.getVelocityX else 0
+    _velocityY    = if(unitClass.canMove)           baseUnit.getVelocityY else 0
   }
   
   private var _accelerating   : Boolean   = _

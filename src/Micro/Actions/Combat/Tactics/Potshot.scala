@@ -9,10 +9,10 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 object Potshot extends Action {
   
   object PotshotTargetFilter extends TargetFilter {
-    override def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = {
+    override def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = (
       TargetFilterInRange.legal(actor, target)
-      TargetFilterCombatants.legal(actor, target)
-    }
+      && TargetFilterCombatants.legal(actor, target)
+    )
   }
   
   object PotshotTarget extends TargetAction {

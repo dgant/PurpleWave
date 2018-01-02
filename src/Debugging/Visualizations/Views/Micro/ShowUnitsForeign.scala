@@ -1,5 +1,6 @@
 package Debugging.Visualizations.Views.Micro
 
+import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.View
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
@@ -38,7 +39,7 @@ object ShowUnitsForeign extends View {
         With.game.drawCircleMap(
           unit.pixelCenter.bwapi,
           (unit.pixelRangeGround + unit.unitClass.radialHypotenuse).toInt,
-          color)
+          Colors.DarkOrange)
       }
     }
     if (showTargets) {

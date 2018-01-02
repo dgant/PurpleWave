@@ -108,18 +108,12 @@ object PvTIdeas {
       RequestAtLeast(1, Protoss.Observatory)))
   
   class TrainZealotsOrDragoons extends If(
-    new And(
-      new Or(
-        new UpgradeComplete(Protoss.ZealotSpeed, withinFrames = Protoss.ZealotSpeed.upgradeTime.head._2),
-        new And(
-          new UnitsAtLeast(1, Protoss.ArbiterTribunal, complete = true),
-          new UnitsExactly(0, Protoss.Arbiter))),
-      new UnitsAtMost(12, Protoss.Zealot),
-      new Check(() => With.units.ours.count(_.is(Protoss.Dragoon)) >= With.units.enemy.count(_.is(Terran.Vulture))),
-      new Or(
+    new Or(
+      new Check(() => With.self.minerals > 600 && With.self.gas < 100),
+      new And(
         new UnitsAtLeast(12, Protoss.Dragoon),
-        new Check(() => With.self.minerals > 600 && With.self.gas < 100))),
-    new TrainContinuously(Protoss.Zealot, 30),
+        new UpgradeComplete(Protoss.ZealotSpeed, withinFrames = Protoss.ZealotSpeed.upgradeTime.head._2))),
+    new TrainContinuously(Protoss.Zealot, 30, 4),
     new TrainContinuously(Protoss.Dragoon))
   
   class TrainArbiters extends If(

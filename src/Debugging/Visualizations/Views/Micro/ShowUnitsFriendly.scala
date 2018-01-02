@@ -14,10 +14,10 @@ object ShowUnitsFriendly extends View {
   var showAction      : Boolean = true
   var showCommand     : Boolean = false
   var showOrder       : Boolean = false
-  var showTargets     : Boolean = false
+  var showTargets     : Boolean = true
   var showFormation   : Boolean = true
   var showKiting      : Boolean = false
-  var showForces      : Boolean = true
+  var showForces      : Boolean = false
   var showDesire      : Boolean = true
   var showExplosions  : Boolean = true
   
@@ -75,7 +75,7 @@ object ShowUnitsFriendly extends View {
     }
     if (showFormation) {
       if (agent.toForm.isDefined) {
-        DrawMap.circle(agent.toForm.get, agent.unit.unitClass.radialHypotenuse.toInt, Colors.DarkTeal)
+        DrawMap.circle(agent.toForm.get, agent.unit.unitClass.radialHypotenuse.toInt, Colors.MidnightTeal)
       }
     }
     

@@ -24,7 +24,6 @@ class Visualization {
     ShowPerformanceSummary,
     ShowClock,
     ShowStrategy,
-    ShowBattleSummary,
     ShowUnitsAll,
     ShowUnitsFriendly,
     ShowUnitsForeign

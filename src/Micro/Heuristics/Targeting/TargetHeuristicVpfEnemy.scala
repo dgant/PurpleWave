@@ -9,7 +9,7 @@ object TargetHeuristicVpfEnemy extends TargetHeuristic{
   override def evaluate(unit: FriendlyUnitInfo, candidate: UnitInfo): Double = {
 
     val vpf =
-      if (unit.repairing && unit.target.isDefined) {
+      if ((unit.repairing || unit.constructing) && unit.target.isDefined) {
         unit.target.get.unitClass.repairHpPerFrame * MicroValue.valuePerDamage(unit.target.get)
       }
       else {

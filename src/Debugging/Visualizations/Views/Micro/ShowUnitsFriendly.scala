@@ -4,12 +4,13 @@ import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.View
 import Debugging.Visualizations.{Colors, ForceColors}
 import Lifecycle.With
-import Micro.Agency.Agent
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
 import bwapi.Color
 
 object ShowUnitsFriendly extends View {
   
+  var selectedOnly    : Boolean = false
   var showClient      : Boolean = true
   var showAction      : Boolean = true
   var showCommand     : Boolean = false
@@ -21,61 +22,67 @@ object ShowUnitsFriendly extends View {
   var showDesire      : Boolean = true
   var showExplosions  : Boolean = true
   
-  override def renderMap() { With.agents.all.foreach(renderUnitState) }
+  override def renderMap() { With.units.ours.foreach(renderUnitState) }
   
-  def renderUnitState(agent: Agent) {
-    if ( ! With.viewport.contains(agent.unit.pixelCenter)) return
-    if ( ! agent.unit.unitClass.orderable) return
-    if (agent.unit.transport.isDefined) return
+  def renderUnitState(unit: FriendlyUnitInfo) {
+    val agent = unit.agent
+    if (selectedOnly && ! unit.selected) return
+    if ( ! unit.aliveAndComplete && ! unit.unitClass.isBuilding) return
+    if ( ! With.viewport.contains(unit.pixelCenter)) return
+    if ( ! unit.unitClass.orderable) return
+    if (unit.transport.isDefined) return
     
     if (showClient) {
       agent.lastClient.foreach(plan =>
         DrawMap.label(
           plan.toString,
-          agent.unit.pixelCenter.add(0, -21),
+          unit.pixelCenter.add(0, -21),
           drawBackground = false))
     }
     if (showAction) {
       DrawMap.label(
         agent.lastAction.map(_.name).getOrElse(""),
-        agent.unit.pixelCenter.add(0, -14),
+        unit.pixelCenter.add(0, -14),
         drawBackground = false)
     }
     if (showCommand) {
       DrawMap.label(
-        agent.unit.command.map(_.getUnitCommandType.toString).getOrElse(""),
-        agent.unit.pixelCenter.add(0, -7),
+        unit.command.map(_.getUnitCommandType.toString).getOrElse(""),
+        unit.pixelCenter.add(0, -7),
         drawBackground = false)
     }
     if (showOrder) {
       DrawMap.label(
-        agent.unit.order.toString,
-        agent.unit.pixelCenter.add(0, 0),
+        unit.order.toString,
+        unit.pixelCenter.add(0, 0),
         drawBackground = false)
     }
     
     if (showTargets) {
-      val targetUnit = agent.unit.target.orElse(agent.unit.orderTarget)
+      val targetUnit = unit.target.orElse(unit.orderTarget)
       if (targetUnit.nonEmpty) {
-        DrawMap.line(agent.unit.pixelCenter, targetUnit.get.pixelCenter, agent.unit.player.colorNeon)
+        DrawMap.line(unit.pixelCenter, targetUnit.get.pixelCenter, unit.player.colorNeon)
       }
-      val targetPosition = agent.unit.targetPixel.orElse(agent.unit.orderTargetPixel)
-      if (targetPosition.nonEmpty && agent.unit.target.isEmpty) {
-        DrawMap.arrow(agent.unit.pixelCenter, targetPosition.get, agent.unit.player.colorDark)
+      val targetPosition = unit.targetPixel.orElse(unit.orderTargetPixel)
+      if (targetPosition.nonEmpty && unit.target.isEmpty) {
+        DrawMap.arrow(unit.pixelCenter, targetPosition.get, unit.player.colorDark)
       }
       if (agent.movingTo.isDefined) {
-        DrawMap.arrow(agent.unit.pixelCenter, agent.movingTo.get, Colors.MediumGray)
+        if (selectedOnly) {
+          DrawMap.arrow(unit.pixelCenter, agent.nextWaypoint(agent.movingTo.get), Colors.BrightGray)
+        }
+        DrawMap.arrow(unit.pixelCenter, agent.movingTo.get, Colors.MidnightGray)
       }
       if (agent.toAttack.isDefined) {
-        DrawMap.arrow(agent.unit.pixelCenter, agent.toAttack.get.pixelCenter, Colors.BrightRed)
+        DrawMap.arrow(unit.pixelCenter, agent.toAttack.get.pixelCenter, Colors.NeonYellow)
       }
       if (agent.toGather.isDefined) {
-        DrawMap.arrow(agent.unit.pixelCenter, agent.toGather.get.pixelCenter, Colors.DarkGreen)
+        DrawMap.arrow(unit.pixelCenter, agent.toGather.get.pixelCenter, Colors.MidnightGreen)
       }
     }
     if (showFormation) {
       if (agent.toForm.isDefined) {
-        DrawMap.circle(agent.toForm.get, agent.unit.unitClass.radialHypotenuse.toInt, Colors.MidnightTeal)
+        DrawMap.circle(agent.toForm.get, unit.unitClass.radialHypotenuse.toInt, Colors.MidnightTeal)
       }
     }
     
@@ -98,15 +105,15 @@ object ShowUnitsFriendly extends View {
           val force           = pair._2
           val forceNormalized = force.normalize(length * force.lengthSlow / maxForce)
           DrawMap.arrow(
-            agent.unit.pixelCenter,
-            agent.unit.pixelCenter.add(
+            unit.pixelCenter,
+            unit.pixelCenter.add(
               forceNormalized.x.toInt,
               forceNormalized.y.toInt),
             pair._1)
         })
         if (agent.movingTo.isDefined) {
           DrawMap.arrow(
-            agent.unit.pixelCenter,
+            unit.pixelCenter,
             agent.movingTo.get,
             ForceColors.sum)
         }
@@ -115,7 +122,7 @@ object ShowUnitsFriendly extends View {
     
     if (showDesire) {
       val color = if (agent.shouldEngage) Colors.NeonGreen else Colors.NeonRed
-      val pixel = agent.unit.pixelCenter.subtract(0, 6 + agent.unit.unitClass.height / 2)
+      val pixel = unit.pixelCenter.subtract(0, 6 + unit.unitClass.height / 2)
       DrawMap.circle(pixel, 3, Color.Black, solid = true)
       DrawMap.circle(pixel, 2, color,       solid = true)
     }

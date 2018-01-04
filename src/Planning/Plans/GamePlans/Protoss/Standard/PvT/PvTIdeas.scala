@@ -64,7 +64,7 @@ object PvTIdeas {
         new SafeToAttack,
         new UnitsAtLeast(6, UnitMatchWarriors, complete = true)),
       new Or(
-        new Employing(PvTEarly1015GateGoon),
+        new Employing(PvTEarly1015GateGoonExpand),
         new Employing(PvTEarly1015GateGoonDT),
         new Employing(PvTEarly4Gate),
         new Employing(PvTEarly1GateStargate),
@@ -107,14 +107,14 @@ object PvTIdeas {
       RequestAtLeast(1, Protoss.RoboticsFacility),
       RequestAtLeast(1, Protoss.Observatory)))
   
-  class TrainZealotsOrDragoons extends If(
+  class TrainZealotsOrDragoons extends FlipIf(
     new Or(
       new Check(() => With.self.minerals > 600 && With.self.gas < 100),
       new And(
-        new UnitsAtLeast(12, Protoss.Dragoon),
+        new UnitsAtLeast(8, Protoss.Dragoon),
         new UpgradeComplete(Protoss.ZealotSpeed, withinFrames = Protoss.ZealotSpeed.upgradeTime.head._2))),
-    new TrainContinuously(Protoss.Zealot, 30, 4),
-    new TrainContinuously(Protoss.Dragoon))
+    new TrainContinuously(Protoss.Dragoon),
+    new TrainContinuously(Protoss.Zealot, 30, 6))
   
   class TrainArbiters extends If(
     new UnitsAtLeast(40, UnitMatchWarriors),

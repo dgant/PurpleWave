@@ -86,7 +86,7 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
   
   def framesOfEntanglementWith(threat: UnitInfo): Double = {
     def speed(unit: UnitInfo) = if (unit.canMove) unit.topSpeed else 0.0
-    val pixelsOutsideRange    = me.pixelsFromEdgeFast(threat) - threat.pixelRangeAgainstFromEdge(me)
+    val pixelsOutsideRange    = me.pixelsFromEdgeFast(threat) - threat.pixelRangeAgainstFromEdge(me) - speed(me) * 2.0 * With.reaction.agencyAverage
     // A big definition question: Do we care about how fast they can chase us?
     // SEMANTICS HACK:
     // Entanglement: How long before we can  open the gap

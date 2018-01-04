@@ -179,13 +179,13 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo (o
     _gatheringMinerals    = baseUnit.isGatheringMinerals
     _gatheringGas         = baseUnit.isGatheringGas
     _attacking            = baseUnit.isAttacking
-    _constructing         = baseUnit.isConstructing
+    _constructing         = _order == Orders.ConstructingBuilding // baseUnit.isConstructing
     _following            = baseUnit.isFollowing
     _holdingPosition      = baseUnit.isHoldingPosition
     _idle                 = baseUnit.isIdle
     _interruptible        = baseUnit.isInterruptible
     _morphing             = baseUnit.isMorphing
-    _repairing            = baseUnit.isRepairing
+    _repairing            = _order == Orders.Repair // baseUnit.isRepairing doesn't seem to work
     _researching          = baseUnit.isResearching
     _patrolling           = baseUnit.isPatrolling
     _training             = baseUnit.isTraining

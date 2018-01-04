@@ -451,10 +451,11 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   
   def moving: Boolean = velocityX != 0 || velocityY != 0
   
-  def relativeSpeed(other: UnitInfo): Double = {
-    val deltaXY = Force(x - other.x, y - other.y)
+  def speedApproachingPixel(pixel: Pixel): Double = {
+    val deltaXY = Force(x - pixel.x, y - pixel.y)
     val deltaV  = velocity
-    deltaXY.lengthFast * (deltaXY.normalize * deltaV.normalize)
+    val output  = - velocity.lengthFast * (deltaXY.normalize * velocity.normalize)
+    output
   }
   ////////////
   // Orders //

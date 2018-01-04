@@ -47,7 +47,7 @@ object Chase extends ActionTechnique {
   
     // TODO: Queue up a move order ASAP; we can't wait for latency
     val target = unit.agent.toAttack
-    if (target.exists(_.relativeSpeed(unit) > 0.0)) {
+    if (target.exists(_.speedApproachingPixel(unit.pixelCenter) < 0.0)) {
       unit.agent.toTravel = Some(unit.pixelCenter.project(
         target.get.pixelCenter,
         unit.pixelDistanceFast(target.get) + 32.0))

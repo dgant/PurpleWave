@@ -28,7 +28,7 @@ class BattleAnalysis(battle: Battle) {
   val hysteresisDesireMin   = PurpleMath.clamp(       flexibilityRatio, 0.5, 0.7)
   val hysteresisDesireMax   = PurpleMath.clamp(1.0 /  flexibilityRatio, 1.1, 1.8)
   val desireTurtling        = PurpleMath.clamp(turtlingRatio, 0.7,  1.0)
-  val desireUrgency         = PurpleMath.clamp(urgencyRatio,  0.9,  2.0)
+  val desireUrgency         = PurpleMath.clamp(urgencyRatio,  0.9,  1.8)
   val desireChokiness       = PurpleMath.clamp(chokeMobility, 0.6,  1.0)
   val desireHysteresis      = PurpleMath.clamp(hysteresis,    hysteresisDesireMin,  hysteresisDesireMax)
   val desireMultiplier      = With.blackboard.aggressionRatio * desireTurtling * desireUrgency * desireChokiness * desireHysteresis

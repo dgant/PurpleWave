@@ -25,6 +25,10 @@ class PvTFastThird extends GameplanModeTemplate {
       new PvTIdeas.TrainArmy,
       new Parallel(
         new RequireMiningBases(3),
-        new Build(RequestAtLeast(3, Protoss.Gateway))
+        new Build(
+          RequestAtLeast(3, Protoss.Gateway),
+          RequestAtLeast(1, Protoss.RoboticsFacility),
+          RequestAtLeast(1, Protoss.Observatory),
+          RequestAtLeast(8, Protoss.Gateway))
       )))
 }

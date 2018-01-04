@@ -2,7 +2,7 @@ package Micro.Actions.Combat.Tactics
 
 import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Actions.Combat.Maneuvering.KiteSafely
+import Micro.Actions.Combat.Techniques.Common.Leave
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import bwapi.Race
@@ -36,7 +36,7 @@ object Bust extends Action {
     // If we're getting shot at by the bunker, back off.
     val bunkers = unit.matchups.threats.filter(_.is(Terran.Bunker))
     if (unit.damageInLastSecond > 0) {
-      KiteSafely.delegate(unit)
+      Leave.delegate(unit)
     }
     else if (bunkers.exists(unit.inRangeToAttackSlow)) {
       With.commander.hold(unit)

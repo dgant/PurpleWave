@@ -6,7 +6,7 @@ abstract class StarCraftMap {
   
   def name: String = this.getClass.getSimpleName
   
-  lazy val matches: Boolean = {
+  def matches: Boolean = {
     val nameStub  = clean(name)
     val fileStub  = clean(With.mapFileName)
     val output    = nameStub.contains(fileStub) || fileStub.contains(nameStub)

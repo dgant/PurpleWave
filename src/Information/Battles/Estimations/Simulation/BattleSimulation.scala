@@ -10,13 +10,13 @@ class BattleSimulation(val battle: Battle, val weAttack: Boolean, val hypothetic
   
   private def simulacra(team: Team) = team.units.map(Simulacrum(this, _))
   
-  val estimation  : Estimation          = new Estimation
-  val focus       : Pixel               = battle.focus
-  val unitsOurs   : Vector[Simulacrum]  = simulacra(battle.us)
-  val unitsEnemy  : Vector[Simulacrum]  = simulacra(battle.enemy)
-  val everyone    : Vector[Simulacrum]  = unitsOurs ++ unitsEnemy
+  val estimation      : Estimation          = new Estimation
+  val focus           : Pixel               = battle.focus
+  val unitsOurs       : Vector[Simulacrum]  = simulacra(battle.us)
+  val unitsEnemy      : Vector[Simulacrum]  = simulacra(battle.enemy)
+  val everyone        : Vector[Simulacrum]  = unitsOurs ++ unitsEnemy
   
-  val simulacra: Map[UnitInfo, Simulacrum] = (unitsOurs.filter(_.canMove) ++ unitsEnemy).map(simulacrum => (simulacrum.unit, simulacrum)).toMap
+  val simulacra: Map[UnitInfo, Simulacrum] = (unitsOurs.filter(_.canMove) ++ unitsEnemy).map(simulacrum => (simulacrum.realUnit, simulacrum)).toMap
   
   var updated = true
   
@@ -49,7 +49,7 @@ class BattleSimulation(val battle: Battle, val weAttack: Boolean, val hypothetic
     estimation.deathsEnemy      = unitsEnemy  .count(_.dead)
     estimation.totalUnitsUs     = unitsOurs   .size
     estimation.totalUnitsEnemy  = unitsEnemy  .size
-    estimation.reportCards      ++= everyone  .map(simulacrum => (simulacrum.unit, simulacrum.reportCard))
+    estimation.reportCards      ++= everyone  .map(simulacrum => (simulacrum.realUnit, simulacrum.reportCard))
     estimation.simulation       = Some(this)
   }
 }

@@ -4,7 +4,7 @@ import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.View
 import Information.Battles.Estimations.Estimation
-import Information.Battles.Types.Battle
+import Information.Battles.Types.{Battle, BattleLocal}
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Planning.Yolo
@@ -36,7 +36,7 @@ object ShowBattleSummary extends View {
     localBattle.foreach(battle => drawBattleMap(battle, battle.estimationSimulationAttack))
   }
   
-  def localBattle: Option[Battle] = {
+  def localBattle: Option[BattleLocal] = {
     val selectedUnits = With.units.ours.filter(_.selected)
     val localBattles = if (selectedUnits.nonEmpty) selectedUnits.flatMap(_.battle) else With.battles.local
     if (localBattles.isEmpty)

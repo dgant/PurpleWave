@@ -5,7 +5,7 @@ import Debugging.Visualizations.Rendering.{DrawMap, DrawScreen}
 import Debugging.Visualizations.Views.View
 import Information.Battles.Estimations.Estimation
 import Information.Battles.Estimations.Simulation.Simulacrum
-import Information.Battles.Types.Battle
+import Information.Battles.Types.{Battle, BattleLocal}
 import Lifecycle.With
 import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.Color
@@ -20,7 +20,7 @@ object ShowBattleDetails extends View {
     })
   }
   
-  def renderBattleScreen(battle: Battle, estimation: Estimation) {
+  def renderBattleScreen(battle: BattleLocal, estimation: Estimation) {
     val x = 5
     val y = 7 * With.visualization.lineHeightSmall
     val table = Vector(
@@ -120,14 +120,14 @@ object ShowBattleDetails extends View {
     ShowBattleSummary.localBattle.foreach(renderBattleMap)
   }
   
-  def renderBattleMap(battle: Battle) {
+  def renderBattleMap(battle: BattleLocal) {
     val simulation = battle.estimationSimulationAttack.simulation.get
     simulation.simulacra.values.foreach(renderSimulacrumMap)
   }
   
   def renderSimulacrumMap(sim: Simulacrum) {
     val attacking = sim.simulation.weAttack
-    val color = if (attacking) sim.unit.player.colorNeon else sim.unit.player.colorMidnight
+    val color = if (attacking) sim.realUnit.player.colorNeon else sim.realUnit.player.colorMidnight
     
     sim.moves.foreach(move => DrawMap.arrow(move._1, move._2, color))
     if (sim.dead) {

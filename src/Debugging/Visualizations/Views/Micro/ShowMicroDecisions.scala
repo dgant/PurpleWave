@@ -8,7 +8,9 @@ object ShowMicroDecisions extends View {
   
   override def renderMap() {
     var units = With.units.ours.filter(_.selected)
-    if (units.isEmpty) units = With.units.ours.filter(_.battle.exists(_.happening))
+    if (units.isEmpty) {
+      units = With.units.ours.filter(_.battle.isDefined)
+    }
     units = units
       .filter(unit => With.viewport.contains(unit.pixelCenter))
       .filter(_.agent.microDecisions.nonEmpty)

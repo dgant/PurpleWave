@@ -1,16 +1,16 @@
 package Information.Battles
 
 import Information.Battles.Clustering.BattleClustering
-import Information.Battles.Types.{Battle, Team}
+import Information.Battles.Types.{Battle, BattleGlobal, BattleLocal, Team}
 import Lifecycle.With
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, UnitInfo}
 
 class BattleClassifier {
     
-  var global      : Battle                = _
-  var byUnit      : Map[UnitInfo, Battle] = Map.empty
-  var local       : Vector[Battle]        = Vector.empty
-  var lastUpdate  : Int                   = 0
+  var global      : BattleGlobal                = _
+  var byUnit      : Map[UnitInfo, BattleLocal]  = Map.empty
+  var local       : Vector[BattleLocal]         = Vector.empty
+  var lastUpdate  : Int                         = 0
   
   def all: Traversable[Battle] = local :+ global
   
@@ -48,7 +48,7 @@ class BattleClassifier {
   }
   
   private def replaceBattleGlobal() {
-    global = new Battle(
+    global = new BattleGlobal(
       new Team(asVectorUs     (With.units.ours  .filter(isEligibleGlobal))),
       new Team(asVectorEnemy  (With.units.enemy .filter(isEligibleGlobal))))
   }
@@ -56,10 +56,10 @@ class BattleClassifier {
   private def replaceBattlesLocal() {
     local = clustering.clusters
       .map(cluster =>
-        new Battle(
+        new BattleLocal(
           new Team(cluster.filter(_.isOurs).toVector),
           new Team(cluster.filter(_.isEnemy).toVector)))
-      .filter(_.happening)
+      .filter(_.teams.forall(_.units.exists(_.canAttack)))
     
     byUnit = local.flatten(battle => battle.teams.flatMap(_.units).map(unit => (unit, battle))).toMap
   }

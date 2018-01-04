@@ -9,57 +9,64 @@ import ProxyBwapi.UnitInfo.UnitInfo
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
-case class Simulacrum(simulation: BattleSimulation, unit: UnitInfo) {
+case class Simulacrum(simulation: BattleSimulation, realUnit: UnitInfo) {
   
   // Constant
-  private val SIMULATION_STEP_FRAMES = 8
+  private val SIMULATION_STEP_FRAMES = 4
   
-  val canMove           : Boolean                     = unit.canMove
-  val topSpeed          : Double                      = unit.topSpeed
-  var hitPoints         : Int                         = unit.totalHealth
-  var cooldownShooting  : Int                         = 1 + unit.cooldownLeft
+  // Unit state
+  val canMove           : Boolean                     = realUnit.canMove
+  val topSpeed          : Double                      = realUnit.topSpeed
+  var shieldPoints      : Int                         = realUnit.shieldPoints + realUnit.defensiveMatrixPoints
+  var hitPoints         : Int                         = realUnit.hitPoints
+  var cooldownShooting  : Int                         = 1 + realUnit.cooldownLeft
   var cooldownMoving    : Int                         = 0
-  var pixel             : Pixel                       = unit.pixelCenter
+  var pixel             : Pixel                       = realUnit.pixelCenter
   var dead              : Boolean                     = false
   var target            : Option[Simulacrum]          = None
-  val maxSplashFactor   : Double                      = MicroValue.maxSplashFactor(unit)
   var killed            : Int                         = 0
+  
+  // Modifiers
+  val multiplierSpeed   : Double                      = 1.0 //if (realUnit.flying) 1.0 else
+  val multiplierSplash  : Double                      = MicroValue.maxSplashFactor(realUnit)
+  
+  // Scorekeeping
   var damageDealt       : Double                      = 0.0
   var damageReceived    : Double                      = 0.0
   var valueDealt        : Double                      = 0.0
   var valueReceived     : Double                      = 0.0
-  var valuePerDamage    : Double                      = MicroValue.valuePerDamage(unit)
+  var valuePerDamage    : Double                      = MicroValue.valuePerDamage(realUnit)
   var moves             : ArrayBuffer[(Pixel, Pixel)] = new ArrayBuffer[(Pixel, Pixel)]
   
   lazy val targetQueue: mutable.PriorityQueue[Simulacrum] = (
-    new mutable.PriorityQueue[Simulacrum]()(Ordering.by(x => (x.unit.unitClass.helpsInCombat, - x.pixel.pixelDistanceFast(pixel))))
-      ++ unit.matchups.targets
+    new mutable.PriorityQueue[Simulacrum]()(Ordering.by(x => (x.realUnit.unitClass.helpsInCombat, - x.pixel.pixelDistanceFast(pixel))))
+      ++ realUnit.matchups.targets
         .filter(target =>
-          unit.inRangeToAttackFast(target)
+          realUnit.inRangeToAttackFast(target)
           || simulation.weAttack
-          || ! unit.isOurs)
+          || ! realUnit.isOurs)
         .flatMap(simulation.simulacra.get)
     )
   
   val fighting: Boolean = {
-    if ( ! unit.unitClass.helpsInCombat) {
+    if ( ! realUnit.unitClass.helpsInCombat) {
       false
     }
-    else if (unit.unitClass.isWorker) {
-      unit.isBeingViolent || ( ! unit.gathering && ! unit.constructing)
+    else if (realUnit.unitClass.isWorker) {
+      realUnit.isBeingViolent || ( ! realUnit.gathering && ! realUnit.constructing)
     }
-    else if (unit.isEnemy) {
+    else if (realUnit.isEnemy) {
       true
     }
     else if (simulation.weAttack) {
-      unit.canMove || unit.matchups.targetsInRange.nonEmpty
+      realUnit.canMove || realUnit.matchups.targetsInRange.nonEmpty
     }
     else {
-      ! unit.canMove
+      ! realUnit.canMove
     }
   }
   
-  def splashFactor : Double = if (maxSplashFactor == 1.0) 1.0 else Math.max(1.0, Math.min(targetQueue.count( ! _.dead) / 4.0, maxSplashFactor))
+  def splashFactor : Double = if (multiplierSplash == 1.0) 1.0 else Math.max(1.0, Math.min(targetQueue.count( ! _.dead) / 4.0, multiplierSplash))
   
   def updateDeath() {
     dead = dead || hitPoints <= 0
@@ -110,8 +117,8 @@ case class Simulacrum(simulation: BattleSimulation, unit: UnitInfo) {
     if ( ! targetExists)      return
     if (pixelsFromRange <= 0) return
     
-    val travelFrames    = Math.min(SIMULATION_STEP_FRAMES, unit.framesToTravelPixels(pixelsFromRange))
-    val travelPixel     = pixel.project(victim.pixel, unit.topSpeed * travelFrames)
+    val travelFrames    = Math.min(SIMULATION_STEP_FRAMES, realUnit.framesToTravelPixels(pixelsFromRange))
+    val travelPixel     = pixel.project(victim.pixel, realUnit.topSpeed * travelFrames)
     val originalPixel   = pixel
     cooldownMoving      = travelFrames
     pixel               = travelPixel
@@ -126,20 +133,29 @@ case class Simulacrum(simulation: BattleSimulation, unit: UnitInfo) {
     if ( ! fighting)            return
     if (cooldownShooting > 0)   return
     if ( ! targetExistsInRange) return
-    val victim            = target.get
-    val damage            = Math.min(target.get.hitPoints, unit.damageOnNextHitAgainst(victim.unit))
-    val value             = damage * victim.valuePerDamage
-    cooldownShooting      = Math.max(1, (unit.cooldownMaxAgainst(victim.unit) / splashFactor).toInt)
-    cooldownMoving        = Math.max(cooldownMoving, cooldownMoving + unit.unitClass.stopFrames)
-    damageDealt           += damage
+    val victim = target.get
+    val damageToVictim = Math.min(
+      victim.hitPoints,
+      realUnit.damageOnNextHitAgainst(
+        victim.realUnit,
+        Some(victim.shieldPoints),
+        Some(pixel),
+        Some(victim.pixel)))
+    val damageToShields   = Math.min(victim.shieldPoints, damageToVictim)
+    val damageToHitPoints = damageToVictim - damageToShields
+    val value             = damageToVictim * victim.valuePerDamage
+    cooldownShooting      = Math.max(1, (realUnit.cooldownMaxAgainst(victim.realUnit) / splashFactor).toInt)
+    cooldownMoving        = Math.max(cooldownMoving, cooldownMoving + realUnit.unitClass.stopFrames)
+    damageDealt           += damageToVictim
     valueDealt            += value
-    victim.hitPoints      -= damage
-    victim.damageReceived += damage
+    victim.shieldPoints   -= damageToShields
+    victim.hitPoints      -= damageToHitPoints
+    victim.damageReceived += damageToVictim
     victim.valueReceived  += value
-    dead                  = dead || unit.unitClass.suicides
+    dead                  = dead || realUnit.unitClass.suicides
     simulation.updated    = true
   
-    if (unit.canStim && ! unit.stimmed) {
+    if (realUnit.canStim && ! realUnit.stimmed) {
       cooldownShooting = cooldownShooting / 2
     }
   }
@@ -150,7 +166,7 @@ case class Simulacrum(simulation: BattleSimulation, unit: UnitInfo) {
     if (cooldownMoving > 0) return
     val focus           = simulation.focus
     val distanceBefore  = pixel.pixelDistanceFast(focus)
-    val distanceAfter   = distanceBefore + unit.topSpeed * SIMULATION_STEP_FRAMES
+    val distanceAfter   = distanceBefore + realUnit.topSpeed * SIMULATION_STEP_FRAMES
     val fleePixel       = focus.project(pixel, distanceAfter).clamp
     if (ShowBattleDetails.inUse) {
       moves += ((pixel, fleePixel))
@@ -160,11 +176,11 @@ case class Simulacrum(simulation: BattleSimulation, unit: UnitInfo) {
   }
   
   def valid(target: Simulacrum): Boolean = {
-    ! target.dead && (unit.pixelRangeMin <= 0 || pixel.pixelDistanceFast(target.pixel) >= unit.pixelRangeMin)
+    ! target.dead && (realUnit.pixelRangeMin <= 0 || pixel.pixelDistanceFast(target.pixel) >= realUnit.pixelRangeMin)
   }
   
   def pixelsOutOfRange(simulacrum: Simulacrum): Double = {
-    pixel.pixelDistanceFast(simulacrum.pixel) - unit.pixelRangeAgainstFromCenter(simulacrum.unit)
+    pixel.pixelDistanceFast(simulacrum.pixel) - realUnit.pixelRangeAgainstFromCenter(simulacrum.realUnit)
   }
   
   def targetExists: Boolean = target.exists(valid)

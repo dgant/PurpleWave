@@ -1,7 +1,7 @@
 package ProxyBwapi.UnitInfo
 
 import Debugging.Visualizations.Colors
-import Information.Battles.Types.Battle
+import Information.Battles.Types.{Battle, BattleLocal}
 import Information.Geography.Types.{Base, Zone}
 import Information.Grids.AbstractGrid
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
@@ -276,7 +276,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   // Combat //
   ////////////
   
-  def battle: Option[Battle] = With.battles.byUnit.get(this).orElse(With.matchups.entrants.find(_._2.contains(this)).map(_._1))
+  def battle: Option[BattleLocal] = With.battles.byUnit.get(this).orElse(With.matchups.entrants.find(_._2.contains(this)).map(_._1))
   def matchups: MatchupAnalysis = With.matchups.get(this)
   
   def armorHealth: Int = armorHealthCache()
@@ -324,14 +324,28 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   def pixelRangeAgainstFromCenter (enemy: UnitInfo): Double = pixelRangeAgainstFromEdge(enemy) + unitClass.radialHypotenuse + enemy.unitClass.radialHypotenuse
   def effectiveRangePixels: Double = Math.max(pixelRangeMax, unitClass.effectiveRangePixels)
   
-  def hitChanceAgainst(enemy: UnitInfo): Double = {
-    if (guaranteedToHit(enemy)) 1.0 else 0.47
+  def hitChanceAgainst(
+    enemy : UnitInfo,
+    from  : Option[Pixel] = None,
+    to    : Option[Pixel] = None)
+  : Double = {
+    if (guaranteedToHit(enemy, from, to)) 1.0 else 0.47
   }
-  def guaranteedToHit(enemy: UnitInfo): Boolean =
-    flying                          ||
-    enemy.flying                    ||
-    unitClass.unaffectedByDarkSwarm ||
-    With.grids.altitudeBonus.get(tileIncludingCenter) >= With.grids.altitudeBonus.get(enemy.tileIncludingCenter)
+  
+  def guaranteedToHit(
+    enemy : UnitInfo,
+    from  : Option[Pixel] = None,
+    to    : Option[Pixel] = None)
+  : Boolean = {
+    val tileFrom  = from.getOrElse(pixelCenter).tileIncluding
+    val tileTo    =   to.getOrElse(pixelCenter).tileIncluding
+    (
+      flying
+      || enemy.flying
+      || unitClass.unaffectedByDarkSwarm
+      || With.grids.altitudeBonus.get(tileFrom) >= With.grids.altitudeBonus.get(tileTo)
+    )
+  }
   
   def damageTypeAgainst (enemy: UnitInfo)  : Damage.Type  = if (enemy.flying) unitClass.groundDamageType else unitClass.airDamageType
   def attacksAgainst    (enemy: UnitInfo)  : Int          = if (enemy.flying) attacksAgainstAir          else attacksAgainstGround
@@ -350,17 +364,23 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   private val damageOnHitAirCache     = new Cache(() => unitClass.effectiveAirDamage     + unitClass.airDamageBonusRaw     * damageUpgradeLevel)
   
   def damageOnHitBeforeShieldsArmorAndDamageType(enemy: UnitInfo): Int = if(enemy.flying) damageOnHitAir else damageOnHitGround
-  def damageOnNextHitAgainst(enemy: UnitInfo): Int = {
+  def damageOnNextHitAgainst(
+    enemy   : UnitInfo,
+    shields : Option[Int] = None,
+    from    : Option[Pixel] = None,
+    to      : Option[Pixel] = None)
+      : Int = {
+    val enemyShieldPoints       = shields.getOrElse(enemy.shieldPoints)
     val hits                    = attacksAgainst(enemy)
     val damagePerHit            = damageOnHitBeforeShieldsArmorAndDamageType(enemy: UnitInfo)
     val damageAssignedTotal     = hits * damagePerHit
-    val damageAssignedToShields = Math.min(damageAssignedTotal, enemy.shieldPoints + enemy.armorShield * hits)
+    val damageAssignedToShields = Math.min(damageAssignedTotal, enemyShieldPoints + enemy.armorShield * hits)
     val damageToShields         = damageAssignedToShields - enemy.armorShield * hits
     val damageAssignedToHealth  = damageAssignedTotal - damageAssignedToShields
     val damageToHealthScale     = damageScaleAgainstHitPoints(enemy)
     val damageToHealth          = (damageAssignedToHealth - enemy.armorHealth * hits) * damageScaleAgainstHitPoints(enemy)
     val damageDealtTotal        = damageToHealth + damageToShields
-    val hitChance               = hitChanceAgainst(enemy)
+    val hitChance               = hitChanceAgainst(enemy, from, to)
     val output                  = (hitChance * Math.max(1.0, damageDealtTotal)).toInt
     output
   }

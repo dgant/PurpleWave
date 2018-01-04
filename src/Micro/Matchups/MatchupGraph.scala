@@ -1,6 +1,6 @@
 package Micro.Matchups
 
-import Information.Battles.Types.Battle
+import Information.Battles.Types.BattleLocal
 import Lifecycle.With
 import ProxyBwapi.UnitInfo.UnitInfo
 
@@ -11,7 +11,7 @@ class MatchupGraph {
   private val maxUnitId = 10000 // Per jaj22, as usual
   
   val analyses  = new Array[MatchupAnalysis](maxUnitId)
-  val entrants  = new mutable.HashMap[Battle, mutable.HashSet[UnitInfo]]
+  val entrants  = new mutable.HashMap[BattleLocal, mutable.HashSet[UnitInfo]]
   
   def get(unit: UnitInfo): MatchupAnalysis = {
     if (analyses(unit.id) == null) {
@@ -49,7 +49,7 @@ class MatchupGraph {
     })
   }
   
-  def assignToBattle(unit: UnitInfo): Option[Battle] = {
+  def assignToBattle(unit: UnitInfo): Option[BattleLocal] = {
     val neighbors = With.units.inTileRadius(unit.tileIncludingCenter, 15).filter(_.battle.isDefined).groupBy(_.battle)
     if (neighbors.nonEmpty) {
       neighbors.maxBy(_._2.size)._1

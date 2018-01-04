@@ -8,12 +8,12 @@ import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.ByOption
 
-class BattleAnalysis(battle: Battle) {
+class SimulationParameters (battle: Battle) {
   def nearestBase(bases: Iterable[Base]): Option[Pixel] = ByOption.minBy(bases.map(_.heart.pixelCenter))(_.groundPixels(battle.focus))
   val nearestBaseOurs       = nearestBase(With.geography.ourBases).getOrElse(With.geography.home.pixelCenter)
   val nearestBaseEnemy      = nearestBase(With.geography.enemyBases).getOrElse(With.intelligence.mostBaselikeEnemyTile.pixelCenter)
   val lonelyCannons         = getLonelyCannons(nearestBaseOurs)
-  val turtlingRatio         = Math.pow(0.97, lonelyCannons.size)
+  val turtlingRatio         = Math.pow(0.97, lonelyCannons.size) // TODO: Consider ratio of cannons to army size
   val urgencyOurs           = battle.focus.pixelDistanceFast(nearestBaseEnemy)
   val urgencyEnemy          = battle.focus.pixelDistanceFast(nearestBaseOurs)
   val urgencyRatio          = Math.sqrt(urgencyOurs / urgencyEnemy)
@@ -37,18 +37,22 @@ class BattleAnalysis(battle: Battle) {
     val candidates = nearestBaseOurs.zone.units ++ battle.us.units
     candidates
       .filter(unit =>
-        unit.unitClass.isStaticDefense  ||
-        unit.is(Terran.SiegeTankSieged) ||
-        unit.is(Protoss.Reaver)         ||
-        unit.is(Protoss.HighTemplar)    ||
-        unit.is(Zerg.Lurker))
-      .filter(cannon => cannon.matchups.targets.isEmpty && cannon.matchups.threatsInRange.isEmpty)
+        (
+          unit.unitClass.isStaticDefense
+          || unit.is(Terran.SiegeTankSieged)
+          || unit.is(Protoss.Reaver)
+          || unit.is(Protoss.HighTemplar)
+          || unit.is(Zerg.Lurker)
+        )
+        && unit.matchups.targetsInRange.isEmpty
+        && unit.matchups.threatsInRange.isEmpty)
   }
   
   private def getChokeMobility: Double = {
     val zoneUs    = battle.us.centroid.zone
     val zoneEnemy = battle.enemy.centroid.zone
     if (zoneUs == zoneEnemy) return 1.0
+    val crossers  = battle.us.units
     val edge      = zoneUs.edges.find(_.zones.contains(zoneEnemy))
     val edgeWidth = Math.max(32.0, edge.map(_.radiusPixels * 2.0).getOrElse(32.0 * 10.0))
     val ourWidth  = battle.us.units.filterNot(_.flying).map(unit => if (unit.flying) 0.0 else 2.0 * unit.unitClass.dimensionMax).sum
@@ -61,7 +65,7 @@ class BattleAnalysis(battle: Battle) {
     val denominator       = fighters.map(fighter => fighter.subjectiveValue).sum
     totalFlexibility / Math.max(1.0, denominator)
   }
-    
+  
   private def flexibility(unit: UnitInfo): Double = {
     val rangeFlexibility = unit.pixelRangeMax
     val speedFlexibility = unit.topSpeed * 36.0 * (if (unit.flying) 1.5 else 1.0)

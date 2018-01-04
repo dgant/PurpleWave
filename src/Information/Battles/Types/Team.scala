@@ -9,9 +9,10 @@ class Team(val units: Vector[UnitInfo]) {
   // Populate immediately after construction! //
   //////////////////////////////////////////////
   
-  var battle    : Battle      = _
-  var vanguard  : Pixel       = SpecificPoints.middle
-  var centroid  : Pixel       = SpecificPoints.middle
+  var battle      : Battle      = _
+  var vanguard    : Pixel       = SpecificPoints.middle
+  var centroid    : Pixel       = SpecificPoints.middle
+  var totalValue  : Double      = _
   
   //////////////
   // Features //

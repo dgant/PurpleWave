@@ -1,7 +1,7 @@
 package ProxyBwapi.UnitInfo
 
 import Debugging.Visualizations.Colors
-import Information.Battles.Types.{Battle, BattleLocal}
+import Information.Battles.Types.BattleLocal
 import Information.Geography.Types.{Base, Zone}
 import Information.Grids.AbstractGrid
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
@@ -149,8 +149,6 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   def energyMax     : Int = unitClass.maxEnergy //TODO: Add upgrades
   def mineralsLeft  : Int = if (unitClass.isMinerals) resourcesLeft else 0
   def gasLeft       : Int = if (unitClass.isGas)      resourcesLeft else 0
-  
-  def wounded: Boolean = totalHealth < Math.min(With.configuration.woundedThresholdHealth, unitClass.maxTotalHealth / 3)
   
   ///////////////
   // Economics //

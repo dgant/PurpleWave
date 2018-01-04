@@ -14,7 +14,4 @@ abstract class Battle(
   def teams: Vector[Team] = Vector(us, enemy)
   def teamOf(unit: UnitInfo): Team = if (unit.isFriendly) us else enemy
   def focus: Pixel = teams.map(_.vanguard).centroid
-  
-  lazy val analysis = new BattleAnalysis(this)
-  lazy val desire: Double = analysis.desireTotal
 }

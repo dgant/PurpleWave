@@ -22,12 +22,19 @@ class Configuration {
   var strategyRandomness  = 0.2
   var historyHalfLife     = 100.0
   
+  /////////////
+  // Battles //
+  /////////////
+  
+  var avatarBattleDistancePixels    = 32.0 * 6.0
+  var battleMarginTiles             = 20
+  var battleEstimationFrames        = GameTime(0, 10)()
+  
   ///////////
   // Micro //
   ///////////
   
   var concaveMarginPixels             = 16.0
-  var retreatCaution                  = 1.4
   var assumedBuilderTravelSpeed       = 0.65
   var attackableRangeBufferPixels     = 4
   var fogPositionDurationFrames       = GameTime(0, 20)()
@@ -35,13 +42,7 @@ class Configuration {
   var pickupRadiusPixels              = 48 //No idea what actual value is
   var enablePathRecalculation         = true
   var pathRecalculationDelayFrames    = GameTime(0, 2)()
-  var woundedThresholdHealth          = 40
   var evacuateDangerousBases          = false
-  
-  var dpfGridDistancePenalty          = 0.5
-  var dpfGridMovementPenalty          = 0.5
-  var dpfGridCooldownPenalty          = 0.25
-  var bunkerSafetyMargin              = Math.sqrt(16.0 * 16.0 * 2.0) + Math.sqrt(32.0 * 16.0 * 2.0) + 32.0 * (4.0 + 1.0) + /* This is the margin! */ 8.0
   
   ///////////
   // Macro //
@@ -56,21 +57,11 @@ class Configuration {
   var maxPlacementAgeFrames           = GameTime(0, 3)()
   var enableTightBuildingPlacement    = false
   
-  /////////////
-  // Battles //
-  /////////////
-  
-  var abstractBattleDistancePixels  = 32.0 * 6.0
-  var battleMarginTiles             = 20
-  var battleMarginPixels            = battleMarginTiles * 32.0
-  var battleEstimationFrames        = GameTime(0, 10)()
-  
   /////////////////
   // Performance //
   /////////////////
   
   var foreignUnitUpdatePeriod             = 4
-  var peformanceFrameMilliseconds         = 30
   var garbageCollectionThresholdMs        = 5
   var initialTaskLengthMilliseconds       = 20
   var performanceMinimumUnitSleep         = 2
@@ -80,7 +71,6 @@ class Configuration {
   var urgentBuildingPlacement             = true
   var urgentBuildingPlacementCutoffFrames = GameTime(15, 0)()
   var urgentBuildingPlacementCooldown     = GameTime(0, 1)()
-  var buildingPlacementMaxTilesToCheck    = 8000
   var buildingPlacementMaxTilesToEvaluate = 300
   var buildingPlacementBatchSize          = 300
   var buildingPlacementBatchingStartFrame = GameTime(4, 0)()

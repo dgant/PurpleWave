@@ -29,7 +29,7 @@ class BattleClassifier {
       global.globalSafeToAttack
       local.foreach(_.estimationSimulationAttack)
       local.foreach(_.estimationSimulationRetreat)
-      local.foreach(_.desire)
+      local.foreach(_.netEngageValue)
     }
     
     lastUpdate = With.frame

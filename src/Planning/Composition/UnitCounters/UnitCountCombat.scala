@@ -1,6 +1,7 @@
 package Planning.Composition.UnitCounters
 
-import Information.Battles.Estimations.{AvatarBuilder, Estimation, EstimateAvatar}
+import Information.Battles.Prediction.Estimation.{AvatarBuilder, EstimateAvatar}
+import Information.Battles.Prediction.Prediction
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 class UnitCountCombat(
@@ -10,7 +11,7 @@ class UnitCountCombat(
     extends UnitCounter {
   
   val builder = new AvatarBuilder
-  var lastEstimation: Estimation = _
+  var lastEstimation: Prediction = _
   enemies.foreach(builder.addUnit)
   
   /////////////////

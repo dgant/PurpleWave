@@ -9,6 +9,7 @@ import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.ByOption
 
 class SimulationParameters (battle: Battle) {
+  
   def nearestBase(bases: Iterable[Base]): Option[Pixel] = ByOption.minBy(bases.map(_.heart.pixelCenter))(_.groundPixels(battle.focus))
   val nearestBaseOurs       = nearestBase(With.geography.ourBases).getOrElse(With.geography.home.pixelCenter)
   val nearestBaseEnemy      = nearestBase(With.geography.enemyBases).getOrElse(With.intelligence.mostBaselikeEnemyTile.pixelCenter)

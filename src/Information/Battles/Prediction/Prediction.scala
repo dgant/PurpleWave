@@ -1,12 +1,13 @@
-package Information.Battles.Estimations
+package Information.Battles.Prediction
 
-import Information.Battles.Estimations.Simulation.BattleSimulation
+import Information.Battles.Prediction.Estimation.Avatar
+import Information.Battles.Prediction.Simulation.{Simulation, ReportCard}
 import Lifecycle.With
 import ProxyBwapi.UnitInfo.UnitInfo
 
 import scala.collection.mutable
 
-class Estimation {
+class Prediction {
 
   val frameCalculated: Int = With.frame
   
@@ -22,18 +23,13 @@ class Estimation {
   var deathsUs          = 0.0
   var deathsEnemy       = 0.0
   
-  var simulation: Option[BattleSimulation] = None
+  var simulation: Option[Simulation] = None
   
   var reportCards = new mutable.HashMap[UnitInfo, ReportCard]
   
   def netValue: Double = costToEnemy - costToUs
   
-  def weGainValue     : Boolean = costToEnemy  >   costToUs
-  def weLoseValue     : Boolean = costToEnemy  <   costToUs
   def weSurvive       : Boolean = deathsUs     <   totalUnitsUs || deathsUs == 0
-  def weDie           : Boolean = ! weSurvive
-  def enemyGainValue  : Boolean = costToUs     >   costToEnemy
-  def enemyLoseValue  : Boolean = costToUs     <   costToEnemy
   def enemySurvives   : Boolean = deathsEnemy  <   totalUnitsEnemy || deathsEnemy == 0
   def enemyDies       : Boolean = ! enemySurvives
 }

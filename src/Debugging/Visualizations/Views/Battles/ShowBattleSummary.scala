@@ -3,7 +3,7 @@ package Debugging.Visualizations.Views.Battles
 import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.View
-import Information.Battles.Estimations.Estimation
+import Information.Battles.Prediction.Prediction
 import Information.Battles.Types.{Battle, BattleLocal}
 import Lifecycle.With
 import Mathematics.Points.Pixel
@@ -45,8 +45,8 @@ object ShowBattleSummary extends View {
       Some(localBattles.minBy(battle => battle.focus.pixelDistanceSquared(With.viewport.center)))
   }
   
-  private def drawBattleMap(battle: Battle, estimation: Estimation) {
-    val weWin               = battle.desire > 0.0
+  private def drawBattleMap(battle: BattleLocal, estimation: Prediction) {
+    val weWin               = battle.netEngageValue > 0.0
     val ourColorDark        = With.self.colorDark
     val enemyColorDark      = With.enemy.colorDark
     val ourColorNeon        = With.self.colorNeon
@@ -74,7 +74,7 @@ object ShowBattleSummary extends View {
       backgroundColor = winnerStrengthColor)
   }
   
-  private def drawEstimationReport(estimation: Estimation) {
+  private def drawEstimationReport(estimation: Prediction) {
     With.game.setTextSize(bwapi.Text.Size.Enum.Large)
     With.game.drawTextScreen(tableHeader0.bwapi, With.self.name)
     With.game.drawTextScreen(tableHeader1.bwapi, With.enemy.name)

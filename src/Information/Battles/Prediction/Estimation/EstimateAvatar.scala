@@ -1,12 +1,13 @@
-package Information.Battles.Estimations
+package Information.Battles.Prediction.Estimation
 
+import Information.Battles.Prediction.Prediction
 import Lifecycle.With
 
 object EstimateAvatar {
   
-  def calculate(avatarBuilder: AvatarBuilder): Estimation = {
+  def calculate(avatarBuilder: AvatarBuilder): Prediction = {
     
-    val output = new Estimation
+    val output = new Prediction
     
     output.avatarUs         = avatarBuilder.avatarUs
     output.avatarEnemy      = avatarBuilder.avatarEnemy

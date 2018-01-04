@@ -3,9 +3,9 @@ package Debugging.Visualizations.Views.Battles
 import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.{DrawMap, DrawScreen}
 import Debugging.Visualizations.Views.View
-import Information.Battles.Estimations.Estimation
-import Information.Battles.Estimations.Simulation.Simulacrum
-import Information.Battles.Types.{Battle, BattleLocal}
+import Information.Battles.Prediction.Prediction
+import Information.Battles.Prediction.Simulation.Simulacrum
+import Information.Battles.Types.BattleLocal
 import Lifecycle.With
 import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.Color
@@ -20,7 +20,7 @@ object ShowBattleDetails extends View {
     })
   }
   
-  def renderBattleScreen(battle: BattleLocal, estimation: Estimation) {
+  def renderBattleScreen(battle: BattleLocal, estimation: Prediction) {
     val x = 5
     val y = 7 * With.visualization.lineHeightSmall
     val table = Vector(
@@ -32,9 +32,9 @@ object ShowBattleDetails extends View {
       Vector[String]("Survivors",
         survivorPercentage(estimation.deathsUs,    estimation.totalUnitsUs),
         survivorPercentage(estimation.deathsEnemy, estimation.totalUnitsEnemy)),
-      Vector[String]("Gains",   "%1.2f".format(battle.analysis.attackGains)),
-      Vector[String]("Losses",  "%1.2f".format(battle.analysis.attackLosses)),
-      Vector[String]("Desire",  "%1.2f".format(battle.desire)))
+      Vector[String]("Gains",   "%1.2f".format(battle.attackGains)),
+      Vector[String]("Losses",  "%1.2f".format(battle.attackLosses)),
+      Vector[String]("Net",     "%1.2f".format(battle.netEngageValue)))
     DrawScreen.table(x, y, table)
     
     val y2 = y + (table.length + 4) * With.visualization.lineHeightSmall
@@ -90,15 +90,7 @@ object ShowBattleDetails extends View {
       Vector(),
       Vector("Retreat secs",    "" + battle.estimationSimulationRetreat.frames / 24),
       Vector("Retreat gain",    "" + battle.estimationSimulationRetreat.costToEnemy.toInt),
-      Vector("Retreat loss",    "" + battle.estimationSimulationRetreat.costToUs.toInt),
-      Vector(),
-      Vector("DChokiness",      "" + "%1.1f".format(battle.analysis.desireChokiness)),
-      Vector("DTurtling",       "" + "%1.1f".format(battle.analysis.desireTurtling)),
-      Vector("DUrgency",        "" + "%1.1f".format(battle.analysis.desireUrgency)),
-      Vector("DHysteresis",     "" + "%1.1f".format(battle.analysis.desireHysteresis)),
-      Vector("DMultiplier",     "" + "%1.1f".format(battle.analysis.desireMultiplier)),
-      Vector(),
-      Vector("DTotal",          "" + "%1.1f".format(battle.desire))
+      Vector("Retreat loss",    "" + battle.estimationSimulationRetreat.costToUs.toInt)
     )
     DrawScreen.table(450, y, scoreTable)
   }

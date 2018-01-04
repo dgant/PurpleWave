@@ -1,4 +1,4 @@
-package Information.Battles.Estimations
+package Information.Battles.Prediction.Estimation
 
 import Mathematics.Points.Pixel
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}

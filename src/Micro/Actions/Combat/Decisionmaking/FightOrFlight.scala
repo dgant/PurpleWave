@@ -36,17 +36,13 @@ object FightOrFlight extends Action {
       return
     }
     
-    unit.agent.desireTeam        = unit.battle.map(_.desire).getOrElse(0.0)
+    unit.agent.desireTeam        = unit.battle.map(_.netEngageValue).getOrElse(0.0)
     unit.agent.desireIndividual  = individualDesire(unit)
     
-    // Hysteresis
-    val individualCaution           = 0.2
-    val individualHysteresis        = 0.2
-    val individualThreshold         = individualCaution + (if (unit.agent.shouldEngage) -individualHysteresis else individualHysteresis)
-    val motivatedByDoom             = unit.matchups.doomedDiffused && unit.battle.exists(_.estimationSimulationRetreat.reportCards.get(unit).exists(_.dead))
-    val motivatedIndividually       = unit.agent.desireIndividual > individualThreshold
-    val motivatedCollectively       = unit.agent.desireTeam       > 0.0
-    unit.agent.shouldEngage         = motivatedByDoom || motivatedIndividually || motivatedCollectively
+    val motivatedByDoom       = unit.matchups.doomedDiffused && unit.battle.exists(_.estimationSimulationRetreat.reportCards.get(unit).exists(_.dead))
+    val motivatedIndividually = unit.agent.desireIndividual > 0.0
+    val motivatedCollectively = unit.agent.desireTeam       > 0.0
+    unit.agent.shouldEngage   = motivatedByDoom || motivatedIndividually || motivatedCollectively
   }
   
   private def individualDesire(unit: FriendlyUnitInfo): Double = {
@@ -66,7 +62,7 @@ object FightOrFlight extends Action {
     val attackLoss    = attackReport.get.valueReceived
     val retreatGain   = retreatReport.get.valueDealt
     val retreatLoss   = retreatReport.get.valueReceived
-    val output        = attackGain + retreatLoss / With.configuration.retreatCaution - retreatGain - attackLoss
+    val output        = With.blackboard.aggressionRatio * attackGain + retreatLoss - retreatGain - attackLoss
     output
   }
 }

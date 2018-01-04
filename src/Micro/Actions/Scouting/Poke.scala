@@ -11,7 +11,7 @@ object Poke extends Action {
     With.intelligence.enemyMain.isDefined               &&
     unit.matchups.targets.exists(_.unitClass.isWorker)  &&
     unit.matchups.threats.isEmpty                       &&
-    ! unit.wounded
+    unit.totalHealth > 10
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {

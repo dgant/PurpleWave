@@ -1,7 +1,6 @@
-package Information.Battles.Estimations.Simulation
+package Information.Battles.Prediction.Simulation
 
 import Debugging.Visualizations.Views.Battles.ShowBattleDetails
-import Information.Battles.Estimations.ReportCard
 import Mathematics.Points.Pixel
 import Micro.Decisions.MicroValue
 import ProxyBwapi.UnitInfo.UnitInfo
@@ -9,26 +8,29 @@ import ProxyBwapi.UnitInfo.UnitInfo
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
-case class Simulacrum(simulation: BattleSimulation, realUnit: UnitInfo) {
+class Simulacrum(
+  val simulation  : Simulation,
+  val realUnit    : UnitInfo) {
   
   // Constant
   private val SIMULATION_STEP_FRAMES = 4
   
-  // Unit state
-  val canMove           : Boolean                     = realUnit.canMove
-  val topSpeed          : Double                      = realUnit.topSpeed
-  var shieldPoints      : Int                         = realUnit.shieldPoints + realUnit.defensiveMatrixPoints
-  var hitPoints         : Int                         = realUnit.hitPoints
-  var cooldownShooting  : Int                         = 1 + realUnit.cooldownLeft
-  var cooldownMoving    : Int                         = 0
-  var pixel             : Pixel                       = realUnit.pixelCenter
-  var dead              : Boolean                     = false
-  var target            : Option[Simulacrum]          = None
-  var killed            : Int                         = 0
-  
   // Modifiers
-  val multiplierSpeed   : Double                      = 1.0 //if (realUnit.flying) 1.0 else
-  val multiplierSplash  : Double                      = MicroValue.maxSplashFactor(realUnit)
+  val movementDelay           : Int     = if (simulation.weAttack)  0   else 48
+  val speedMultiplierChoke    : Double  = if (realUnit.flying) 1.0 else simulation.chokeMobility(realUnit.zone)
+  val multiplierSplash        : Double  = MicroValue.maxSplashFactor(realUnit)
+  
+  // Unit state
+  val canMove             : Boolean                     = realUnit.canMove
+  val topSpeed            : Double                      = realUnit.topSpeed * speedMultiplierChoke
+  var shieldPoints        : Int                         = realUnit.shieldPoints + realUnit.defensiveMatrixPoints
+  var hitPoints           : Int                         = realUnit.hitPoints
+  var cooldownShooting    : Int                         = 1 + realUnit.cooldownLeft
+  var cooldownMoving      : Int                         = movementDelay
+  var pixel               : Pixel                       = realUnit.pixelCenter
+  var dead                : Boolean                     = false
+  var target              : Option[Simulacrum]          = None
+  var killed              : Int                         = 0
   
   // Scorekeeping
   var damageDealt       : Double                      = 0.0

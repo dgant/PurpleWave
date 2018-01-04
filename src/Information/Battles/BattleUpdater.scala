@@ -16,7 +16,10 @@ object BattleUpdater {
     battle.teams.foreach(group => {
       val airCentroid = group.units.map(_.pixelCenter).centroid
       val hasGround   = group.units.exists( ! _.flying)
-      group.centroid  = group.units.filterNot(_.flying && hasGround).minBy(_.pixelDistanceSquared(airCentroid)).pixelCenter
+      group.centroid  = ByOption
+        .minBy(group.units.filterNot(_.flying && hasGround))(_.pixelDistanceSquared(airCentroid))
+        .map(_.pixelCenter)
+        .getOrElse(airCentroid)
     })
     
     battle.teams.foreach(group =>

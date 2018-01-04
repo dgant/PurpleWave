@@ -1,22 +1,22 @@
 package Information.Battles.Types
 
-import Information.Battles.Estimations.Estimation
-import Information.Battles.Estimations.Simulation.BattleSimulation
+import Information.Battles.Prediction.Prediction
+import Information.Battles.Prediction.Simulation.Simulation
 import Lifecycle.With
 
 class BattleLocal(us: Team, enemy: Team) extends Battle(us, enemy) {
   
-  lazy val estimationSimulationAttack   : Estimation  = estimateSimulation(this, weAttack = true)
-  lazy val estimationSimulationRetreat  : Estimation  = estimateSimulation(this, weAttack = false)
+  lazy val estimationSimulationAttack   : Prediction  = estimateSimulation(this, weAttack = true)
+  lazy val estimationSimulationRetreat  : Prediction  = estimateSimulation(this, weAttack = false)
   
   lazy val attackGains    : Double = estimationSimulationAttack.costToEnemy
   lazy val attackLosses   : Double = estimationSimulationAttack.costToUs
   lazy val retreatGains   : Double = estimationSimulationRetreat.costToEnemy
   lazy val retreatLosses  : Double = estimationSimulationRetreat.costToUs
-  lazy val desireTotal    : Double = attackGains + retreatLosses / With.configuration.retreatCaution - retreatGains - attackLosses / desireMultiplier
+  lazy val netEngageValue : Double = With.blackboard.aggressionRatio * attackGains + retreatLosses - retreatGains - attackLosses
   
-  def estimateSimulation(battle: Battle, weAttack: Boolean): Estimation = {
-    val simulation = new BattleSimulation(battle, weAttack)
+  def estimateSimulation(battle: BattleLocal, weAttack: Boolean): Prediction = {
+    val simulation = new Simulation(battle, weAttack)
     simulation.run()
     simulation.estimation
   }

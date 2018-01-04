@@ -156,10 +156,5 @@ object ShowUnitsAll extends View {
         DrawMap.box(Pixel(xStartCooldownButton0, yStartCooldown), Pixel(xStartCooldownButton0 + widthCooldownButton, yEndCooldown), Colors.BrightOrange, solid = true)
       }
     }
-    
-    if (unit.wounded) {
-      DrawMap.box(Pixel(xStart - 3, yStartHp - 3), Pixel(xStart + width + 4, yEndHp + 3), unit.color, solid = false)
-      DrawMap.label(":(", Pixel(unit.pixelCenter.x, unit.top + 4), drawBackground = true, unit.color)
-    }
   }
 }

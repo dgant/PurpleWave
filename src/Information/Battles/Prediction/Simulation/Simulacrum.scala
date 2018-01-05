@@ -35,7 +35,7 @@ class Simulacrum(
   var dead                : Boolean                     = false
   var target              : Option[Simulacrum]          = None
   var killed              : Int                         = 0
-  var targetPathLinearity : Double                      = 1.0
+  var targetPathBendiness : Double                      = 1.0
   
   // Scorekeeping
   var damageDealt       : Double                      = 0.0
@@ -116,7 +116,7 @@ class Simulacrum(
     if (target.isDefined ) {
       lazy val distanceByAir    : Double = realUnit.pixelDistanceFast(target.get.realUnit)
       lazy val distanceByGround : Double = realUnit.pixelDistanceTravelling(target.get.realUnit.pixelCenter)
-      targetPathLinearity = Math.min(3.0, PurpleMath.nanToInfinity(distanceByAir / distanceByGround))
+      targetPathBendiness = Math.min(3.0, PurpleMath.nanToInfinity(distanceByAir / distanceByGround))
     }
   }
   
@@ -130,7 +130,7 @@ class Simulacrum(
     if (pixelsFromRange <= 0) return
     
     val travelFrames    = Math.min(SIMULATION_STEP_FRAMES, realUnit.framesToTravelPixels(pixelsFromRange))
-    val travelSpeed     = realUnit.topSpeed * speedMultiplier * targetPathLinearity
+    val travelSpeed     = realUnit.topSpeed * speedMultiplier / targetPathBendiness
     val travelPixel     = pixel.project(victim.pixel, travelSpeed * travelFrames)
     val originalPixel   = pixel
     cooldownMoving      = travelFrames

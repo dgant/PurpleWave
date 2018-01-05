@@ -39,6 +39,48 @@ object GroundPathFinder {
       .min
   }
   
+  // Statefulness in a singleton!
+  // Be careful what you do with this.
+  private val defaultId = -1
+  private val maximumMapTiles = 256 * 256
+  private var currentTileStateId = 0
+  private class TileState {
+    var visitedId         : Long    = defaultId
+    var cameFromValue     : Tile    = _
+    var cameFromId        : Long    = defaultId
+    var distanceFromValue : Int     = _
+    var distanceFromId    : Long    = defaultId
+    var distanceToValue   : Int     = _
+    var distanceToId      : Long    = defaultId
+    def setVisited {
+      visitedId = currentTileStateId
+    }
+    def setCameFrom(value: Tile) {
+      cameFromValue = value
+      cameFromId = currentTileStateId
+    }
+    def setDistanceFrom(value: Int) {
+      distanceFromValue = value
+      distanceFromId = currentTileStateId
+    }
+    def setDistanceTo(value: Int) {
+      distanceToValue = value
+      distanceToId = currentTileStateId
+    }
+    def getVisited      : Boolean       =     visitedId       == currentTileStateId
+    def getCameFrom     : Option[Tile]  = if (cameFromId      == currentTileStateId)  Some(cameFromValue) else None
+    def getDistanceFrom : Int           = if (distanceFromId  == currentTileStateId)  distanceFromValue   else Int.MaxValue
+    def getDistanceTo   : Int           = if (distanceToId    == currentTileStateId)  distanceToValue     else Int.MaxValue
+  }
+  private val tiles = new Array[TileState](maximumMapTiles)
+  private def incrementTileStateId() {
+    if (currentTileStateId == Long.MaxValue) {
+      for (i <- tiles.indices) { tiles(i) = new TileState }
+      currentTileStateId = defaultId
+    }
+    currentTileStateId += 1
+  }
+  
   def manhattanGroundDistanceThroughObstacles(
     start           : Tile,
     end             : Tile,
@@ -50,24 +92,22 @@ object GroundPathFinder {
     // until I reach the top.
     // Baby I'm A*. --Prince
     
-    val visited         = new mutable.HashSet[Tile]
-    val horizon         = new mutable.PriorityQueue[Tile]()(Ordering.by(_.tileDistanceManhattan(end)))
-    val cameFrom        = new mutable.HashMap[Tile, Tile]
-    val distanceFrom    = new mutable.HashMap[Tile, Int] { override def default(key: Tile): Int = Int.MaxValue }
-    val distanceTo      = new mutable.HashMap[Tile, Int] { override def default(key: Tile): Int = Int.MaxValue }
-    distanceTo(start)    = 0
-    distanceFrom(start)  = start.tileDistanceManhattan(end)
+    incrementTileStateId()
+    var totalVisited = 0
+    val horizon      = new mutable.PriorityQueue[Tile]()(Ordering.by(_.tileDistanceManhattan(end)))
+    tiles(start.i).setDistanceTo(0)
+    tiles(start.i).setDistanceFrom(start.tileDistanceManhattan(end))
     horizon += start
     
     while (horizon.nonEmpty) {
       
       val thisTile = horizon.dequeue()
       
-      if ( ! visited.contains(thisTile)) {
-        
-        visited.add(thisTile)
+      if ( ! tiles(thisTile.i).getVisited) {
+        totalVisited += 1
+        tiles(thisTile.i).setVisited
         if (thisTile == end) {
-          return TilePath(start, end, distanceFrom(end), visited.size, Some(assemblePath(cameFrom, end)))
+          return TilePath(start, end, tiles(end.i).getDistanceFrom, totalVisited, Some(assemblePath(end)))
         }
         
         val neighbors = thisTile.adjacent4
@@ -79,31 +119,32 @@ object GroundPathFinder {
           if (neighbor.valid
             && With.grids.walkable.get(neighbor)
             && ! obstacles.contains(neighbor)
-            && ! visited.contains(neighbor)
+            && ! tiles(neighbor.i).getVisited
             && thisTile.tileDistanceManhattan(end) < maximumDistance) {
   
             horizon += neighbor
             
-            val neighborDistanceFrom  = distanceFrom(thisTile) + 1
+            val neighborDistanceFrom  = tiles(thisTile.i).getDistanceFrom + 1
             
-            if (neighborDistanceFrom < distanceFrom(neighbor)) {
-              cameFrom(neighbor)      = thisTile
-              distanceFrom(neighbor)  = neighborDistanceFrom
-              distanceTo(neighbor)    = neighborDistanceFrom + neighbor.tileDistanceManhattan(end)
+            if (neighborDistanceFrom < tiles(neighbor.i).getDistanceFrom) {
+              val tileState = tiles(neighbor.i)
+              tileState.setCameFrom(thisTile)
+              tileState.setDistanceFrom(neighborDistanceFrom)
+              tileState.setDistanceTo(neighborDistanceFrom + neighbor.tileDistanceManhattan(end))
             }
           }
         }
       }
     }
-    TilePath(start, end, Int.MaxValue, visited.size, None)
+    TilePath(start, end, Int.MaxValue, totalVisited, None)
   }
   
-  private def assemblePath(cameFrom: mutable.Map[Tile, Tile], end: Tile): Iterable[Tile] = {
+  private def assemblePath(end: Tile): Iterable[Tile] = {
     val path = new ListBuffer[Tile]
     path += end
     var last = end
-    while (cameFrom.contains(last)) {
-      last = cameFrom(last)
+    while (tiles(last.i).getCameFrom.isDefined) {
+      last = tiles(last.i).getCameFrom.get
       path.append(last)
     }
     path

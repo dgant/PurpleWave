@@ -2,6 +2,7 @@ package Information.Geography.Calculations
 
 import Information.Geography.Pathfinding.GroundPathFinder
 import Information.Geography.Types.Zone
+import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Mathematics.Points.SpecificPoints
 import ProxyBwapi.Players.Players
@@ -69,16 +70,17 @@ object ZoneUpdater {
   
     lazy val canaryTileInside   = zone.tiles.find(With.grids.walkable.get)
     lazy val canaryTileOutside  = zone.exit.map(_.otherSideof(zone)).flatMap(_.tiles.find(With.grids.walkable.get))
-    zone.walledIn =
-      exitBuildings.count(_.is(Terran.SupplyDepot)) >= 1 &&
-        exitBuildings.count(_.is(Terran.Barracks))  >= 1 &&
-        canaryTileInside.exists(tileInside =>
+    zone.walledIn = (
+      With.frame < GameTime(10, 0)()
+      && exitBuildings.exists(_.is(Terran.SupplyDepot))
+      && exitBuildings.exists(_.is(Terran.Barracks))
+      && canaryTileInside.exists(tileInside =>
           canaryTileOutside.exists(tileOutside =>
             ! GroundPathFinder.manhattanGroundDistanceThroughObstacles(
               tileInside,
               tileOutside,
               obstacles = Set.empty,
-              maximumDistance = 100).pathExists))
+              maximumDistance = 100).pathExists)))
   }
   
   

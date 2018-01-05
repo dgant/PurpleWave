@@ -15,7 +15,7 @@ object Retreat extends ActionTechnique {
   override def applicabilitySelf(unit: FriendlyUnitInfo): Double = {
     if (unit.flying) return 0.0
     if (unit.zone == unit.agent.origin.zone) return 0.0
-    0.5
+    0.3
   }
   
   override def applicabilityOther(unit: FriendlyUnitInfo, other: UnitInfo): Option[Double] = {

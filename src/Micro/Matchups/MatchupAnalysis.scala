@@ -1,6 +1,6 @@
 package Micro.Matchups
 
-import Information.Battles.Types.Battle
+import Information.Battles.Types.{Battle, Team}
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
@@ -34,8 +34,10 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
   }
   
   lazy val battle                 : Option[Battle]        = me.battle.orElse(With.matchups.entrants.find(_._2.contains(me)).map(_._1))
-  lazy val enemies                : Vector[UnitInfo]      = if (battle.isEmpty) Vector.empty else battle.get.teamOf(me).opponent.units
-  lazy val alliesIncludingSelf    : Vector[UnitInfo]      = if (battle.isEmpty) Vector.empty else battle.get.teamOf(me).units
+  lazy val team                   : Option[Team]          = battle.map(_.teamOf(me))
+  lazy val zoneUnits              : Vector[UnitInfo]      = me.zone.units.toVector.filter(_.likelyStillThere)
+  lazy val enemies                : Vector[UnitInfo]      = team.map(_.opponent.units).getOrElse(zoneUnits.filter(_.isEnemyOf(me)))
+  lazy val alliesIncludingSelf    : Vector[UnitInfo]      = team.map(_.units).getOrElse(zoneUnits.filter(u => u.isFriendly && u != me) :+ me)
   lazy val allies                 : Vector[UnitInfo]      = alliesIncludingSelf.filterNot(_.id == me.id)
   lazy val others                 : Vector[UnitInfo]      = enemies ++ allies
   lazy val allUnits               : Vector[UnitInfo]      = enemies ++ alliesIncludingSelf

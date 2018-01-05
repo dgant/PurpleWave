@@ -8,7 +8,7 @@ import Mathematics.Points.Tile
 import Micro.Agency.Intention
 import Planning.Composition.ResourceLocks.{LockCurrencyForUnit, LockUnits}
 import Planning.Composition.UnitCounters.UnitCountOne
-import Planning.Composition.UnitPreferences.UnitPreferClose
+import Planning.Composition.UnitPreferences.UnitPreferCloseAndNotMining
 import Planning.Plan
 import ProxyBwapi.UnitClass.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -27,7 +27,6 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
     description.set("Get a builder")
     unitCounter.set(UnitCountOne)
     unitMatcher.set(builderMatcher)
-    unitPreference.set(new UnitPreferClose)
     interruptable.set(false)
   }
     
@@ -81,7 +80,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
     if (orderedTile.isDefined && orderedTile != desiredTile) {
       builderLock.release()
     }
-    builderLock.unitPreference.set(UnitPreferClose(desiredTile.get.pixelCenter))
+    builderLock.unitPreference.set(UnitPreferCloseAndNotMining(desiredTile.get.pixelCenter))
     builderLock.acquire(this)
     
     if (waitForBuilderToRecallUntil.isDefined) {

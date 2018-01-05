@@ -51,7 +51,10 @@ class SquadDefendZone(zone: Zone) extends SquadGoal {
   }
   
   private val huntableEnemies = new Cache(() => {
-    squad.enemies.filter(enemy => enemy.zone == zone && ! enemy.is(Zerg.Drone))
+    squad.enemies.filter(enemy =>
+      enemy.visible
+      && enemy.zone == zone
+      && ! enemy.is(Zerg.Drone))
   })
   
   def huntEnemies() {

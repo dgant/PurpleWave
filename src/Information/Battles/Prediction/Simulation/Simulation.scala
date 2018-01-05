@@ -14,14 +14,14 @@ class Simulation(
   
   private def buildSimulacra(team: Team) = team.units.map(new Simulacrum(this, _))
   
-  val estimation          : Prediction          = new Prediction
-  val focus               : Pixel               = battle.focus
-  val unitsOurs           : Vector[Simulacrum]  = buildSimulacra(battle.us)
-  val unitsEnemy          : Vector[Simulacrum]  = buildSimulacra(battle.enemy)
-  val everyone            : Vector[Simulacrum]  = unitsOurs ++ unitsEnemy
-  var updated             : Boolean             = true
-  lazy val ourWidth       : Double              = battle.us.units.filterNot(_.flying).map(unit => if (unit.flying) 0.0 else unit.unitClass.dimensionMin + unit.unitClass.dimensionMax).sum
-  lazy val chokeMobility  : Map[Zone, Double]   = battle.us.units.map(_.zone).distinct.map(zone => (zone, getChokeMobility(zone))).toMap
+  val estimation            : Prediction          = new Prediction
+  val focus                 : Pixel               = battle.focus
+  val unitsOurs             : Vector[Simulacrum]  = buildSimulacra(battle.us)
+  val unitsEnemy            : Vector[Simulacrum]  = buildSimulacra(battle.enemy)
+  val everyone              : Vector[Simulacrum]  = unitsOurs ++ unitsEnemy
+  var updated               : Boolean             = true
+  lazy val ourWidth         : Double              = battle.us.units.filterNot(_.flying).map(unit => if (unit.flying) 0.0 else unit.unitClass.dimensionMin + unit.unitClass.dimensionMax).sum
+  lazy val chokeMobility    : Map[Zone, Double]   = battle.us.units.map(_.zone).distinct.map(zone => (zone, getChokeMobility(zone))).toMap
   
   val simulacra: Map[UnitInfo, Simulacrum] =
     (unitsOurs.filter(_.canMove) ++ unitsEnemy)

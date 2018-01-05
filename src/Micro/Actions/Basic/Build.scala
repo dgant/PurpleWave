@@ -33,11 +33,11 @@ object Build extends Action {
     def blockersForTile(tile: Tile) = {
       With.grids.units
         .get(tile)
-        .filterNot(_.unitClass.isGas)
         .filter(blocker =>
-          blocker != unit   &&
-            ! blocker.flying  &&
-            blocker.possiblyStillThere)
+          blocker != unit
+          && ! blocker.unitClass.isGas
+          && ! blocker.flying
+          && blocker.likelyStillThere)
     }
     
     val ignoreBlockers = distance > 32.0 * 8.0

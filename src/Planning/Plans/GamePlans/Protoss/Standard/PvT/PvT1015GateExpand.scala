@@ -21,7 +21,7 @@ class PvT1015GateExpand extends GameplanModeTemplate {
   override val buildOrder         = ProtossBuilds.Opening10Gate15GateDragoons
   
   override val buildPlans = Vector(
-    new If(new UnitsAtLeast(5, Protoss.Dragoon), new RequireMiningBases(2)),
+    new If(new UnitsAtLeast(3, Protoss.Dragoon), new RequireMiningBases(2)),
     new TrainContinuously(Protoss.Dragoon),
     new RequireMiningBases(2))
 }

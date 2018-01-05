@@ -27,9 +27,7 @@ class PvT2BaseCarriers extends GameplanModeTemplate {
     new PvTIdeas.Require2BaseTech,
     new If(new UnitsAtLeast(1, Protoss.Carrier, complete = true), new Build(RequestUpgrade(Protoss.CarrierCapacity))),
     new If(
-      new Or(
-        new UnitsAtLeast(24, Protoss.Interceptor),
-        new UnitsAtLeast(20, UnitMatchWarriors)),
+      new UnitsAtLeast(24, Protoss.Interceptor),
       new RequireMiningBases(3)),
     new IfOnMiningBases(3, new BuildCannonsAtNatural(1)),
     new BuildCannonsAtExpansions(3),
@@ -57,7 +55,7 @@ class PvT2BaseCarriers extends GameplanModeTemplate {
               RequestAtLeast(1, Protoss.Stargate),
               RequestAtLeast(1, Protoss.FleetBeacon),
               RequestAtLeast(2, Protoss.Stargate)))),
-        new FlipIf(
+        new If(
           new And(
             new EnemyBio,
             new Employing(PvT2BaseCarrier)),
@@ -71,6 +69,8 @@ class PvT2BaseCarriers extends GameplanModeTemplate {
       RequestAtLeast(1, Protoss.Observatory),
       RequestAtLeast(3, Protoss.Stargate),
       RequestAtLeast(1, Protoss.Forge)),
+    new UpgradeContinuously(Protoss.AirDamage),
+    new UpgradeContinuously(Protoss.AirArmor),
     new UpgradeContinuously(Protoss.GroundDamage),
     new Build(
       RequestAtLeast(1,   Protoss.TemplarArchives),

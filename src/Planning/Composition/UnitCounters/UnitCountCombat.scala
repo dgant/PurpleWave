@@ -22,7 +22,8 @@ class UnitCountCombat(
     units.foreach(builder.addUnit)
     lastEstimation = EstimateAvatar.calculate(builder)
     
-    units.isEmpty || sufficient
+    // Avatar
+    units.isEmpty || ! sufficient
   }
   
   override def accept(units: Iterable[FriendlyUnitInfo]): Boolean = {
@@ -32,5 +33,5 @@ class UnitCountCombat(
     alwaysAccept || sufficient
   }
   
-  private def sufficient: Boolean = lastEstimation.netValue > 0
+  private def sufficient: Boolean = lastEstimation.netValue >= 0
 }

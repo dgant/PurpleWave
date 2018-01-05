@@ -118,4 +118,8 @@ class Recruiter {
   def getUnits(lock: LockUnits): Set[FriendlyUnitInfo] = {
     unitsByLock.get(lock).map(_.toSet).getOrElse(Set.empty)
   }
+  
+  def audit = {
+    unitsByLock.toVector.sortBy(_._1.owner.priority).map(p => (p._1.owner, p._2))
+  }
 }

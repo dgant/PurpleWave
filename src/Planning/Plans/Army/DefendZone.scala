@@ -18,6 +18,10 @@ class DefendZone(zone: Zone) extends Plan {
   
   override def onUpdate() {
   
+    if (enemies.size <= 2 && enemies.forall(e => e.unitClass.isWorker || ! e.canAttack)) {
+      return
+    }
+    
     val ourBase = zone.bases.find(base => base.owner.isUs)
   
     conscript.squad.goal  = goal

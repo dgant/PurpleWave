@@ -39,10 +39,10 @@ object FightOrFlight extends Action {
     unit.agent.desireTeam        = unit.battle.map(_.netEngageValue).getOrElse(0.0)
     unit.agent.desireIndividual  = individualDesire(unit)
     
-    val motivatedByDoom       = unit.matchups.doomedDiffused && unit.battle.exists(_.estimationSimulationRetreat.reportCards.get(unit).exists(_.dead))
-    val motivatedIndividually = unit.agent.desireIndividual > 0.0
-    val motivatedCollectively = unit.agent.desireTeam       > 0.0
-    unit.agent.shouldEngage   = motivatedByDoom || motivatedIndividually || motivatedCollectively
+    lazy val motivatedByDoom       = unit.matchups.doomedDiffused && unit.battle.exists(_.estimationSimulationRetreat.reportCards.get(unit).exists(_.dead))
+    lazy val motivatedIndividually = unit.agent.desireIndividual > 0.0
+    lazy val motivatedCollectively = unit.agent.desireTeam       > 0.0
+    unit.agent.shouldEngage = unit.battle.isEmpty || motivatedByDoom || motivatedIndividually || motivatedCollectively
   }
   
   private def individualDesire(unit: FriendlyUnitInfo): Double = {

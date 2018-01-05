@@ -26,7 +26,7 @@ object Batter extends ActionTechnique {
       && With.enemies.exists(_.raceInitial == Race.Terran)
       && ! unit.matchups.threatsInRange.exists(_.is(Terran.SiegeTankSieged))
       && walledZone(unit).isDefined
-      && walledZone(unit).get.exit.isDefined
+      && walledZone(unit).get.exit.exists(exit => unit.pixelDistanceFast(exit.centerPixel) < 32.0 * 12.0)
     )
   }
   
@@ -81,6 +81,8 @@ object Batter extends ActionTechnique {
       targetRepairers.delegate(unit)
       targetWall.delegate(unit)
     }
+    
+    // TODO: Walk up to the wall when our mobility > 1 and we're not shooting.
     
     if (unit.readyForAttackOrder || unit.agent.toAttack.forall(unit.inRangeToAttackFast)) {
       Attack.delegate(unit)

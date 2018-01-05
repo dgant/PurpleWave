@@ -13,7 +13,6 @@ import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
- 
   
   def this(us: UnitInfo) {
     this(us, MatchupConditions(us.pixelCenter, 0))

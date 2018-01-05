@@ -5,9 +5,7 @@ import Micro.Actions.Combat.Attacking.Filters._
 import Planning.Yolo
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-abstract class TargetAction extends Action {
-  
-  val additionalFilters: Vector[TargetFilter] = Vector.empty
+class TargetAction(val additionalFiltersRequired: TargetFilter*) extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.agent.canFight           &&
@@ -18,7 +16,7 @@ abstract class TargetAction extends Action {
   
   override protected def perform(unit: FriendlyUnitInfo) {
     var filtersOptional = Vector(TargetFilterCombatants, TargetFilterIgnoreScouts)
-    val filtersRequired = Vector(TargetFilterStayCloaked, TargetFilterMission, TargetFilterAlmostAnything) ++ additionalFilters
+    val filtersRequired = Vector(TargetFilterStayCloaked, TargetFilterMission, TargetFilterAlmostAnything) ++ additionalFiltersRequired
     
     do {
       val filters: Vector[TargetFilter] = if (Yolo.active) Vector.empty else filtersOptional ++ filtersRequired

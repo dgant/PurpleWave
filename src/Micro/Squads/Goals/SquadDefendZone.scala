@@ -6,6 +6,7 @@ import Mathematics.Formations.Formation
 import Mathematics.Points.{Pixel, SpecificPoints}
 import Micro.Agency.Intention
 import Performance.Cache
+import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.ByOption
 import Utilities.EnrichPixel.EnrichedPixelCollection
@@ -50,7 +51,7 @@ class SquadDefendZone(zone: Zone) extends SquadGoal {
   }
   
   private val huntableEnemies = new Cache(() => {
-    squad.enemies.filter(enemy => enemy.zone == zone && ! enemy.unitClass.isWorker)
+    squad.enemies.filter(enemy => enemy.zone == zone && ! enemy.is(Zerg.Drone))
   })
   
   def huntEnemies() {

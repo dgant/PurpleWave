@@ -1,7 +1,9 @@
 package Micro.Actions.Combat.Techniques
 
+import Micro.Actions.Combat.Attacking.Target
 import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Actions.Combat.Techniques.Common.{ActionTechnique, PotshotAsSoonAsPossible}
+import Micro.Actions.Commands.Attack
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object Abuse extends ActionTechnique {
@@ -18,12 +20,16 @@ object Abuse extends ActionTechnique {
     && unit.matchups.threats.nonEmpty
   )
   
+  override val activator = Min
+  
   override def applicabilityOther(unit: FriendlyUnitInfo, other: UnitInfo): Option[Double] = {
     if (other.isFriendly) return None
     if ( ! other.canAttack(unit)) return None
-    if ( ! unit.canAttack(other)) return Some(0.0)
+    if ( ! unit.canAttack(other)) return None
     
-    val deltaSpeed = unit.topSpeedChasing - other.topSpeed
+    if (unit.matchups.framesOfEntanglementPerThreatDiffused(other) < 0) return None
+    
+    val deltaSpeed = unit.topSpeed - other.topSpeed
     if (deltaSpeed <= 0) return Some(0.0)
   
     val deltaRange = unit.pixelRangeAgainstFromCenter(other) - other.pixelRangeAgainstFromCenter(unit)
@@ -38,6 +44,8 @@ object Abuse extends ActionTechnique {
     if (unit.readyForAttackOrder && (safeToShoot || lastChanceToShoot)) {
       Potshot.delegate(unit)
       PotshotAsSoonAsPossible.delegate(unit)
+      Target.delegate(unit)
+      Attack.delegate(unit)
     }
     
     Avoid.delegate(unit)

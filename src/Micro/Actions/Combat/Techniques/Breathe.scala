@@ -17,7 +17,7 @@ object Breathe extends ActionTechnique {
   
   override val activator = RMS
   
-  override val applicabilityBase = 0.5
+  override val applicabilityBase = 1.0
   
   override def applicabilityOther(unit: FriendlyUnitInfo, other: UnitInfo): Option[Double] = {
     if (other.isFriendly) return None
@@ -46,6 +46,8 @@ object Breathe extends ActionTechnique {
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     AttackAsSoonAsPossible.delegate(unit)
-    Leave.delegate(unit)
+    if ( ! unit.readyForAttackOrder) {
+      Leave.delegate(unit)
+    }
   }
 }

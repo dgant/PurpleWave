@@ -33,6 +33,7 @@ class Scout(scoutCount: Int = 1) extends Plan {
     if (lastScoutDeath > 0)                                             return true
     if (bases.exists(_.zone.walledIn))                                  return true
     if (bases.exists(_.townHall.isDefined) && scouts.get.units.isEmpty) return true
+    if (With.geography.enemyBases.exists(_.units.exists(u => u.isOurs && ! u.unitClass.isWorker))) return true
     false
   }
   

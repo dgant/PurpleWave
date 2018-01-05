@@ -8,6 +8,7 @@ import Micro.Actions.Combat.Attacking.Target
 import Micro.Actions.Combat.Decisionmaking.{Fight, FightOrFlight}
 import Micro.Actions.Commands.Attack
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Utilities.ByOption
 
 object Build extends Action {
   
@@ -17,6 +18,14 @@ object Build extends Action {
   }
   
   override def perform(unit: FriendlyUnitInfo) {
+    
+    val ourBuilding = With.grids.units.get(unit.agent.toBuildTile.get).find(_.unitClass == unit.agent.toBuild.get)
+    
+    if (ourBuilding.isDefined) {
+      unit.agent.toGather = ByOption.minBy(With.geography.ourBases.flatMap(_.minerals))(_.pixelDistanceFast(unit.pixelCenter))
+      Gather.consider(unit)
+      return
+    }
     
     val distance  = unit.pixelDistanceFast(unit.agent.toBuildTile.get.pixelCenter)
     val buildArea = unit.agent.toBuild.get.tileArea.add(unit.agent.toBuildTile.get)

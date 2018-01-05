@@ -47,7 +47,6 @@ class DropAttack extends Plan {
     squad.conscript(transports)
     paratroopers.foreach(squad.recruit)
     squad.goal = new SquadDrop(target)
-    
   }
   
   protected def attackTarget: Pixel = {

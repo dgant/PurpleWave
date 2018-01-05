@@ -1,6 +1,7 @@
 package Micro.Actions.Combat.Techniques
 
-import Micro.Actions.Combat.Attacking.TargetInRange
+import Micro.Actions.Combat.Attacking.Filters.TargetFilterVisibleInRange
+import Micro.Actions.Combat.Attacking.TargetAction
 import Micro.Actions.Combat.Techniques.Common.ActionTechnique
 import Micro.Actions.Commands.Attack
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -15,8 +16,10 @@ object Aim extends ActionTechnique {
     && ! unit.canMove
   )
   
+  object StaticTarget extends TargetAction(TargetFilterVisibleInRange)
+  
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
-    TargetInRange.delegate(unit)
+    StaticTarget.delegate(unit)
     Attack.delegate(unit)
   }
 }

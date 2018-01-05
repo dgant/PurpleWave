@@ -3,10 +3,9 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvT
 import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
-import Planning.Plans.Compound.{Do, FlipIf, If, Parallel}
+import Planning.Plans.Compound.{Do, FlipIf, If}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Information.Employing
-import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Milestones.UnitsAtLeast
 import ProxyBwapi.Races.Protoss
@@ -26,11 +25,7 @@ class PvT2BaseGatewaysForever extends GameplanModeTemplate {
     new Do(() => With.blackboard.gasLimitFloor = 800),
     new FlipIf(
       new UnitsAtLeast(15, UnitMatchWarriors),
-      new Parallel(
-        new Parallel(
-          new PvTIdeas.TrainObservers,
-          new TrainContinuously(Protoss.HighTemplar, 6, 2),
-          new PvTIdeas.TrainZealotsOrDragoons)),
+      new PvTIdeas.TrainArmy,
       new Build(
         RequestAtLeast(1, Protoss.Gateway),
         RequestAtLeast(1, Protoss.RoboticsFacility),

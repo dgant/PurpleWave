@@ -66,6 +66,7 @@ object PvTIdeas {
       new Or(
         new Employing(PvTEarly1015GateGoonExpand),
         new Employing(PvTEarly1015GateGoonDT),
+        new Employing(PvTEarly1015GateGoonPressure),
         new Employing(PvTEarly4Gate),
         new Employing(PvTEarly1GateStargate),
         new Employing(PvTEarly1GateStargateTemplar),

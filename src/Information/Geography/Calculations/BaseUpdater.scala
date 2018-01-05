@@ -37,7 +37,7 @@ object BaseUpdater {
   
   private def updateAssets(base: Base) {
     base.units          = base.zone.units.filter(_.base.contains(base))
-    base.townHall       = ByOption.minBy(base.units.filter(_.unitClass.isTownHall))(_.tileTopLeft.tileDistanceManhattan(base.townHallTile))
+    base.townHall       = ByOption.minBy(base.units.filter(u => u.unitClass.isTownHall && ! u.flying))(_.tileTopLeft.tileDistanceManhattan(base.townHallTile))
     base.minerals       = base.units.filter(u => u.mineralsLeft > 0 && ! u.isMineralBlocker)
     base.gas            = base.units.filter(_.unitClass.isGas)
     base.workers        = base.units.filter(u => u.player == base.owner && u.unitClass.isWorker)

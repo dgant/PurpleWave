@@ -63,7 +63,7 @@ object Duck extends Action {
         }
       }
       else {
-        if (unit.canAttack(threat) && unit.damageOnNextHitAgainst(threat) >= threat.totalHealth && unit.readyForAttackOrder) {
+        if (unit.canAttack(threat) && unit.damageOnNextHitAgainst(threat) >= threat.totalHealth && unit.readyForAttackOrder && unit.framesBeforeAttacking(threat) < 24) {
           unit.agent.toAttack = Some(threat)
           Attack.consider(unit)
           None

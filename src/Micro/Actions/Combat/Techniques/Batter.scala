@@ -1,78 +1,108 @@
 package Micro.Actions.Combat.Techniques
 
+import Debugging.Visualizations.Colors
+import Debugging.Visualizations.Rendering.DrawMap
+import Information.Geography.Types.Zone
+import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
-import Mathematics.Shapes.Circle
-import Micro.Actions.Combat.Tactics.Potshot
-import Micro.Actions.Combat.Techniques.Common.{ActionTechnique, Leave}
+import Mathematics.PurpleMath
+import Micro.Actions.Combat.Attacking.Filters.TargetFilterWhitelist
+import Micro.Actions.Combat.Attacking.TargetAction
+import Micro.Actions.Combat.Decisionmaking.Disengage
+import Micro.Actions.Combat.Techniques.Common.ActionTechnique
 import Micro.Actions.Commands.{Attack, Move}
-import Micro.Heuristics.Targeting.EvaluateTargets
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Utilities.ByOption
 import bwapi.Race
 
 object Batter extends ActionTechnique {
   
-  // Wall-ins mess with default behavior:
-  // * Zealots try to hit units on the other side.
-  // * Dragoons refuse to walk up the ramp.
-  // * Dragoons are much better when trying to shoot from uphill
-  //
-  // So let's equip our units to fight vs. wall-ins.
-  
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    
-    lazy val walledInZones = With.geography.zones.filter(_.walledIn)
-  
     (
       unit.canMove
       && unit.canAttack
       && ! unit.flying
-      && walledInZones.nonEmpty
       && With.enemies.exists(_.raceInitial == Race.Terran)
-      && walledInZones.flatMap(_.edges).exists(_.centerPixel.pixelDistanceFast(unit.pixelCenter) < 32.0 * 8.0)
       && ! unit.matchups.threatsInRange.exists(_.is(Terran.SiegeTankSieged))
+      && walledZone(unit).isDefined
+      && walledZone(unit).get.exit.isDefined
     )
   }
   
+  private def destinationZone(unit: FriendlyUnitInfo): Zone = unit.agent.destination.zone
+  
+  private def walledZone(unit: FriendlyUnitInfo): Option[Zone] =
+    if (destinationZone(unit).walledIn)
+      Some(destinationZone(unit))
+    else
+      unit.agent
+        .zonePath(unit.agent.destination)
+        .flatMap(_.steps.map(_.to).find(_.walledIn))
+  
   override protected def perform(unit: FriendlyUnitInfo) {
     
-    // TODO: Upgrade all this
+    lazy val wallZone  = walledZone(unit).get
+    lazy val wallExit  = wallZone.exit.get
+    lazy val wallUnits = wallZone.units
+      .filter(u =>
+        u.isEnemy
+        && ! u.flying
+        && u.unitClass.isBuilding
+        && u.pixelDistanceFast(wallExit.centerPixel) < 32.0 * 10.0)
+      .toSeq
+      .sortBy(_.pixelDistanceFast(wallExit.centerPixel))
+  
+    lazy val outsideUnits   = unit.matchups.targetsInRange
+    lazy val repairingUnits = wallUnits.flatMap(_.matchups.repairers)
+    lazy val altitudeHere   = With.grids.altitudeBonus.get(unit.tileIncludingCenter)
+    lazy val altitudeThere  = With.grids.altitudeBonus.get(unit.agent.destination.tileIncluding)
     
-    Potshot.delegate(unit)
+    lazy val legalTargetOutsiders = outsideUnits.filter(_.visible)
+    lazy val legalTargetRepairers = if (unit.pixelRangeGround >= 32.0 * 4.0) repairingUnits.filter(_.visible) else Iterable.empty
+    lazy val legalTargetWall      = wallUnits.filter(_.visible)
     
-    // Back wounded units off
-    val escapeFrames    = 2.0 * Math.max(0, unit.matchups.framesOfEntanglementDiffused) + 24 + 2 * With.reaction.agencyAverage
-    val damagePerFrame  = unit.matchups.threatsInRange.map(_.dpfOnNextHitAgainst(unit)).sum
-    if (unit.totalHealth < damagePerFrame * escapeFrames) {
-      Leave.consider(unit)
+    lazy val targetOutsiders  = new TargetAction(TargetFilterWhitelist(legalTargetOutsiders))
+    lazy val targetRepairers  = new TargetAction(TargetFilterWhitelist(legalTargetRepairers))
+    lazy val targetWall       = new TargetAction(TargetFilterWhitelist(legalTargetWall))
+    
+    lazy val shootingThreats  = unit.matchups.framesOfEntanglementPerThreatDiffused.filter(_._2 > - GameTime(0, 1)())
+    lazy val dpfReceiving     = shootingThreats.map(_._1.dpfOnNextHitAgainst(unit)).sum
+    lazy val framesToLive     = PurpleMath.nanToInfinity(unit.totalHealth / dpfReceiving)
+    lazy val dying            = framesToLive < GameTime(0, 1)()
+    lazy val shouldRetreat = ! unit.agent.shouldEngage || (unit.unitClass.melee && dying)
+    
+    if (shouldRetreat) {
+      Disengage.consider(unit)
     }
   
-    val targets =
-      if (unit.matchups.targetsInRange.nonEmpty)
-        unit.matchups.targetsInRange
-      else if (unit.matchups.targets.nonEmpty)
-        Iterable(unit.matchups.targets.minBy(target => unit.pixelDistanceTravelling(target.pixelCenter)))
-      else
-        Iterable.empty
+    if (unit.readyForMicro) {
+      targetOutsiders.delegate(unit)
+      targetRepairers.delegate(unit)
+      targetWall.delegate(unit)
+    }
     
-    unit.agent.toAttack = EvaluateTargets.best(unit, targets)
-    
-    if (unit.readyForAttackOrder || unit.unitClass.melee) {
+    if (unit.readyForAttackOrder || unit.agent.toAttack.forall(unit.inRangeToAttackFast)) {
       Attack.delegate(unit)
     }
-    else if (unit.agent.toAttack.isDefined) {
-      // Get up in there!
-      val targetUnit = unit.agent.toAttack.get
-      val targetTile = targetUnit.tileIncludingCenter
-      val targetAreaTiles = Circle.points(4).map(targetTile.add)
-      val targetSpots = targetAreaTiles
-        .filter(With.grids.walkable.get)
-        .map(_.pixelCenter)
-        .filter(pixel => unit.pixelDistanceFast(pixel) < unit.pixelDistanceFast(targetUnit))
-      if (targetSpots.nonEmpty) {
-        unit.agent.toTravel = Some(targetSpots.minBy(targetUnit.pixelDistanceFast))
-        Move.delegate(unit)
-      }
+  
+    if (unit.readyForMicro && altitudeHere < altitudeThere) {
+      val walkableTiles = wallUnits
+        .flatMap(building =>
+          building.tileArea.expand(1, 1).tiles
+            .filter(With.grids.walkable.get)
+            .filter(
+              _.pixelCenter.pixelDistanceFast(wallExit.centerPixel)
+              < building.pixelCenter.pixelDistanceFast(wallExit.centerPixel)))
+        .distinct
+      
+      val destination = ByOption.minBy(walkableTiles)(_.pixelCenter.pixelDistanceFast(unit.pixelCenter))
+      unit.agent.toTravel = destination.map(_.pixelCenter).orElse(unit.agent.toTravel)
+      Move.delegate(unit)
+  
+      //TMP
+      walkableTiles.foreach(tile => DrawMap.circle(tile.pixelCenter, 15, Colors.DarkYellow))
+      destination.foreach(tile => DrawMap.circle(tile.pixelCenter, 12, Colors.MediumYellow))
     }
   }
 }

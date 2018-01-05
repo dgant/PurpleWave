@@ -1,8 +1,5 @@
 package Micro.Actions.Combat.Attacking
 
-import Micro.Actions.Combat.Attacking.Filters.TargetFilterInRange
+import Micro.Actions.Combat.Attacking.Filters.TargetFilterVisibleInRange
 
-object TargetInRange extends TargetAction {
-  
-  override val additionalFilters = Vector(TargetFilterInRange)
-}
+object TargetInRange extends TargetAction(TargetFilterVisibleInRange)

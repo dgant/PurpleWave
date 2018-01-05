@@ -25,7 +25,8 @@ class Conscript(val squad: Squad) extends Plan {
     if (isComplete) return
     
     val centroid = enemies.map(_.pixelCenter).centroid
-      
+    
+    fighters.get.release()
     fighters.get.unitMatcher.set(UnitMatchCombat(enemies))
     fighters.get.unitCounter.set(new UnitCountCombat(enemies, mustFight, overkill))
     fighters.get.unitPreference.set(UnitPreferClose(centroid))

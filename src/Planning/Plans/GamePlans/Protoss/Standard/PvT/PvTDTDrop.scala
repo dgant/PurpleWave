@@ -1,6 +1,9 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvT
 
 import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
+import Planning.Composition.Latch
+import Planning.Plan
+import Planning.Plans.Army.DropAttack
 import Planning.Plans.Compound.NoPlan
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Information.Employing
@@ -13,9 +16,11 @@ import Strategery.Strategies.Protoss.PvT.PvTEarlyDTDrop
 class PvTDTDrop extends GameplanModeTemplate {
   
   override val activationCriteria = new Employing(PvTEarlyDTDrop)
-  override val completionCriteria = new UnitsAtLeast(2, Protoss.DarkTemplar)
+  override val completionCriteria = new Latch(new UnitsAtLeast(2, Protoss.DarkTemplar))
   override val superSaturate      = true
   override def defaultAttackPlan  = NoPlan()
+  
+  override def priorityAttackPlan: Plan = new DropAttack
   
   override val buildOrder = Vector(
     RequestAtLeast(8,   Protoss.Probe),

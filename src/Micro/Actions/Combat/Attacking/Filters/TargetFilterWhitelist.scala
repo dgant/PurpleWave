@@ -2,10 +2,8 @@ package Micro.Actions.Combat.Attacking.Filters
 
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
-object TargetFilterInRange extends TargetFilter {
-  
+case class TargetFilterWhitelist(units: Iterable[UnitInfo]) extends TargetFilter {
   def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = {
-    actor.inRangeToAttackFast(target)
+    units.exists(_ == target)
   }
-  
 }

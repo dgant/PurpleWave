@@ -16,8 +16,9 @@ class Simulacrum(
   private val SIMULATION_STEP_FRAMES = 4
   
   // Modifiers
-  val movementDelay           : Int     = if (simulation.weAttack)  0   else 48
-  val speedMultiplierChoke    : Double  = if (realUnit.flying) 1.0 else simulation.chokeMobility(realUnit.zone)
+  val movementDelay           : Int     = if (realUnit.isEnemy || simulation.weAttack)  0   else 48
+  val speedMultiplierChoke    : Double  = if (realUnit.isEnemy || realUnit.flying)      1.0 else simulation.chokeMobility(realUnit.zone)
+  val bonusDistance           : Double  = if (realUnit.isOurs  || realUnit.visible)     0.0 else 32.0 * Math.min(realUnit.mobility, 3)
   val multiplierSplash        : Double  = MicroValue.maxSplashFactor(realUnit)
   
   // Unit state
@@ -181,9 +182,11 @@ class Simulacrum(
     ! target.dead && (realUnit.pixelRangeMin <= 0 || pixel.pixelDistanceFast(target.pixel) >= realUnit.pixelRangeMin)
   }
   
-  def pixelsOutOfRange(simulacrum: Simulacrum): Double = {
-    pixel.pixelDistanceFast(simulacrum.pixel) - realUnit.pixelRangeAgainstFromCenter(simulacrum.realUnit)
-  }
+  def pixelsOutOfRange(target: Simulacrum): Double = (
+    pixel.pixelDistanceFast(target.pixel) -
+    target.bonusDistance -
+    realUnit.pixelRangeAgainstFromCenter(target.realUnit)
+  )
   
   def targetExists: Boolean = target.exists(valid)
   

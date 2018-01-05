@@ -1,19 +1,31 @@
 package Information.Grids.Movement
 
-import Information.Grids.AbstractGrid
+import Information.Grids.ArrayTypes.AbstractGridArray
 import Lifecycle.With
+import Mathematics.Points.Tile
 import ProxyBwapi.UnitInfo.UnitInfo
 
-import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 
-class GridMobilityBuildings extends AbstractGrid[Int] {
+class GridMobilityBuildings extends AbstractGridArray[Int] {
   
-  val values = new mutable.HashMap[Int, Int] {
-    override def default(key: Int): Int = defaultValue
+  override val defaultValue: Int = 256
+  override protected var values: Array[Int] = Array.fill(length) { defaultValue }
+  override def onInitialization() {
+    var i = 0
+    while (i < length) {
+      values(i) = 1 + new Tile(i).tileDistanceFromEdge
+      i += 1
+    }
   }
   
+  val modifiedIndices = new ArrayBuffer[Int]
+  
   override def update() {
-    values.clear()
+    for (modifiedI <- modifiedIndices) {
+      set(modifiedI, defaultValue)
+    }
+    modifiedIndices.clear()
     With.units.all.foreach(exclude)
   }
   
@@ -28,15 +40,14 @@ class GridMobilityBuildings extends AbstractGrid[Int] {
       var i = 0
       while (i < tiles.length) {
         val j = tiles(i).i
-        values(j) = Math.min(values(j), a)
+        if (get(j) == defaultValue) {
+          modifiedIndices += j
+        }
+        set(j, Math.min(get(j), a))
         i += 1
       }
       a -= 1
     }
     area.expand(4, 4).tiles
   }
-  
-  override def get(i: Int): Int = values(i)
-  
-  override def defaultValue: Int = 256
 }

@@ -9,7 +9,7 @@ import scala.collection.mutable
 trait GroundPaths {
   
   //Cache ground distances with a LRU (Least-recently used) cache
-  private val maxCacheSize  = 100000
+  private val maxCacheSize  = 1000000
   private val distanceCache = new mutable.HashMap[(Tile, Tile), Double]
   private val distanceAge   = new mutable.HashMap[(Tile, Tile), Double]
   
@@ -87,10 +87,12 @@ trait GroundPaths {
   private def limitCacheSize() {
     if (distanceCache.keys.size > maxCacheSize) {
       val cutoff = With.frame - 24 * 60
-      distanceAge.filter(_._2 < cutoff).foreach(pair => {
-        distanceCache.remove(pair._1)
-        distanceAge.remove(pair._1)
-      })
+      for(p <- distanceAge) {
+        if (p._2 < cutoff) {
+          distanceCache.remove(p._1)
+          distanceAge.remove(p._1)
+        }
+      }
     }
   }
 }

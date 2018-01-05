@@ -8,7 +8,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 abstract class AbstractGridPsi extends AbstractGridTimestamp {
   
-  private var lastPylons:Set[FriendlyUnitInfo] = Set.empty
+  private var lastPylons: Set[FriendlyUnitInfo] = Set.empty
   
   override def updateTimestamps() {
     

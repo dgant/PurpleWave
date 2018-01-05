@@ -101,9 +101,9 @@ class Simulacrum(
       targetQueue += target.get
     }
     
+    val lastTarget = target
     target = None
     while (target.isEmpty && targetQueue.nonEmpty) {
-      
       // Clear crud from the queue
       while (targetQueue.nonEmpty && ! isValidTarget(targetQueue.head)) {
         targetQueue.dequeue()
@@ -113,7 +113,7 @@ class Simulacrum(
         target = Some(targetQueue.dequeue())
       }
     }
-    if (target.isDefined ) {
+    if (target.isDefined && target != lastTarget) {
       lazy val distanceByAir    : Double = realUnit.pixelDistanceFast(target.get.realUnit)
       lazy val distanceByGround : Double = realUnit.pixelDistanceTravelling(target.get.realUnit.pixelCenter)
       targetPathBendiness = Math.min(3.0, PurpleMath.nanToInfinity(distanceByAir / distanceByGround))

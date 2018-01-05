@@ -1,6 +1,7 @@
 package Information.Battles.Clustering
 
 import Lifecycle.With
+import Mathematics.Shapes.Circle
 import ProxyBwapi.UnitInfo.UnitInfo
 
 import scala.annotation.tailrec
@@ -18,17 +19,35 @@ class BattleClusteringState(seedUnits: Set[UnitInfo]) {
   
   def step() {
     if (isComplete) return
-    
-    val next    = horizon.pop()
-    val allFoes = foesNear(next)
-    val oldFoe  = allFoes.find(unitLinks.contains)
-    val newFoes = allFoes.filterNot(unitLinks.contains)
   
-    newFoes.foreach(unitLinks.put(_, next))
-    if ( ! unitLinks.contains(next)) {
-      unitLinks.put(next, oldFoe.getOrElse(next))
+    var oldFoe: Option[UnitInfo] = None
+    var newFoes     = new ArrayBuffer[UnitInfo]
+    val nextUnit    = horizon.pop()
+    val tileRadius  = radiusTiles(nextUnit)
+    val tileCenter  = nextUnit.tileIncludingCenter
+    for (point <- Circle.points(tileRadius)) {
+      val nextTile = tileCenter.add(point)
+      if (nextTile.valid) {
+        for (neighbor <- With.grids.units.get(nextTile)) {
+          if (neighbor.isEnemyOf(nextUnit) && seedUnits.contains(neighbor)) {
+            if (unitLinks.contains(neighbor)) {
+              if (oldFoe.isEmpty) {
+                oldFoe = Some(neighbor)
+              }
+            }
+            else {
+              newFoes += neighbor
+            }
+          }
+        }
+      }
     }
-    
+    for (newFoe <- newFoes) {
+      unitLinks.put(newFoe, nextUnit)
+    }
+    if ( ! unitLinks.contains(nextUnit)) {
+      unitLinks.put(nextUnit, oldFoe.getOrElse(nextUnit))
+    }
     horizon.pushAll(newFoes.filter(seedUnits.contains))
   }
   
@@ -55,17 +74,6 @@ class BattleClusteringState(seedUnits: Set[UnitInfo]) {
   private def getRoot(unit: UnitInfo): UnitInfo = {
     val linkedUnit = unitLinks(unit)
     if (unit == linkedUnit) unit else getRoot(linkedUnit)
-  }
-  
-  private def foesNear(unit: UnitInfo): Iterable[UnitInfo] = {
-    val tileRadius = radiusTiles(unit)
-    val enemies = With.units
-      .inTileRadius(unit.tileIncludingCenter, tileRadius.toInt)
-      .toIterable
-      .filter(foundUnit =>
-        foundUnit.isEnemyOf(unit) &&
-        seedUnits.contains(foundUnit))
-    enemies
   }
   
   private def radiusTiles(unit: UnitInfo): Int ={

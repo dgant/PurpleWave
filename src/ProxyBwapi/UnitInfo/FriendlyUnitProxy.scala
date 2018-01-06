@@ -231,8 +231,8 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit, id: Int) extends UnitInfo(bas
   def underDisruptionWeb  : Boolean = base.isUnderDisruptionWeb
   def underStorm          : Boolean = base.isUnderStorm
   
-  private val carryingMineralsCache = new Cache(() => base.isCarryingMinerals)
-  private val carryingGasCache      = new Cache(() => base.isCarryingGas)
+  private val carryingMineralsCache = new Cache(() => unitClass.isWorker && base.isCarryingMinerals)
+  private val carryingGasCache      = new Cache(() => unitClass.isWorker && base.isCarryingGas)
   
   def spiderMines: Int = base.getSpiderMineCount
   

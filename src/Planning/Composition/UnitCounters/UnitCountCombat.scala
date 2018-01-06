@@ -23,7 +23,7 @@ class UnitCountCombat(
     lastEstimation = EstimateAvatar.calculate(builder)
     
     // Avatar
-    units.isEmpty || ! sufficient
+    units.isEmpty || ! overkills
   }
   
   override def accept(units: Iterable[FriendlyUnitInfo]): Boolean = {
@@ -33,5 +33,6 @@ class UnitCountCombat(
     alwaysAccept || sufficient
   }
   
-  private def sufficient: Boolean = lastEstimation.netValue >= 0
+  private def overkills   : Boolean = lastEstimation.costToUs  < lastEstimation.costToEnemy / overkill
+  private def sufficient  : Boolean = lastEstimation.costToUs  < lastEstimation.costToEnemy
 }

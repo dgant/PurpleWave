@@ -13,6 +13,9 @@ class BattleClusteringState(seedUnits: Set[UnitInfo]) {
   val unitLinks = new mutable.HashMap[UnitInfo, UnitInfo]
   val horizon: mutable.Stack[UnitInfo] = mutable.Stack[UnitInfo]()
   
+  lazy val exploredFriendly  : Array[Boolean] = new Array(With.geography.allTiles.size)
+  lazy val exploredEnemy     : Array[Boolean] = new Array(With.geography.allTiles.size)
+  
   horizon.pushAll(seedUnits.toSeq.filter(_.isEnemy))
   
   def isComplete: Boolean = horizon.isEmpty
@@ -25,18 +28,23 @@ class BattleClusteringState(seedUnits: Set[UnitInfo]) {
     val nextUnit    = horizon.pop()
     val tileRadius  = radiusTiles(nextUnit)
     val tileCenter  = nextUnit.tileIncludingCenter
+    val isFriendly  = nextUnit.isFriendly
     for (point <- Circle.points(tileRadius)) {
       val nextTile = tileCenter.add(point)
       if (nextTile.valid) {
-        for (neighbor <- With.grids.units.get(nextTile)) {
-          if (neighbor.isEnemyOf(nextUnit) && seedUnits.contains(neighbor)) {
-            if (unitLinks.contains(neighbor)) {
-              if (oldFoe.isEmpty) {
-                oldFoe = Some(neighbor)
+        val exploredGrid = if (isFriendly) exploredFriendly else exploredEnemy
+        if ( ! exploredGrid(nextTile.i) ) {
+          exploredGrid(nextTile.i) = true
+          for (neighbor <- With.grids.units.get(nextTile)) {
+            if (areOppositeTeams(nextUnit, neighbor) && seedUnits.contains(neighbor)) {
+              if (unitLinks.contains(neighbor)) {
+                if (oldFoe.isEmpty) {
+                  oldFoe = Some(neighbor)
+                }
               }
-            }
-            else {
-              newFoes += neighbor
+              else {
+                newFoes += neighbor
+              }
             }
           }
         }
@@ -86,5 +94,10 @@ class BattleClusteringState(seedUnits: Set[UnitInfo]) {
     val tilesLimit      = With.configuration.battleMarginTiles
     val output          = Math.min(tilesLimit, tilesCustom)
     output
+  }
+  
+  @inline
+  private def areOppositeTeams(a: UnitInfo, b: UnitInfo): Boolean = {
+    a.isFriendly != b.isFriendly
   }
 }

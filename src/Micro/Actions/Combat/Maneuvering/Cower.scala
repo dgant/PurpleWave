@@ -13,7 +13,8 @@ object Cower extends Action {
       unit.matchups.threats.nonEmpty    &&
       unit.matchups.threats.exists(threat =>
         threat.topSpeed > unit.topSpeed ||
-        threat.framesBeforeAttacking(unit) < 48.0)
+        threat.framesBeforeAttacking(unit) < 48.0) &&
+      ! unit.agent.shouldEngage
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {

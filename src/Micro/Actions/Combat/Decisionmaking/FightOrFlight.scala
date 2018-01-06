@@ -42,7 +42,8 @@ object FightOrFlight extends Action {
     lazy val motivatedByDoom       = unit.matchups.doomedDiffused && unit.battle.exists(_.estimationSimulationRetreat.reportCards.get(unit).exists(_.dead))
     lazy val motivatedIndividually = unit.agent.desireIndividual > 0.0
     lazy val motivatedCollectively = unit.agent.desireTeam       > 0.0
-    unit.agent.shouldEngage = unit.battle.isEmpty || motivatedByDoom || motivatedIndividually || motivatedCollectively
+    val output = unit.battle.isEmpty || motivatedByDoom || motivatedIndividually || motivatedCollectively
+    unit.agent.shouldEngage = output
   }
   
   private def individualDesire(unit: FriendlyUnitInfo): Double = {

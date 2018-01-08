@@ -19,7 +19,7 @@ object KiteSafely extends Action {
     
     if (unit.readyForAttackOrder) {
       
-      if (unit.matchups.framesOfSafetyDiffused > unit.unitClass.framesToTurnAndShootAndTurnBackAndAccelerate) {
+      if (unit.matchups.framesOfSafetyDiffused > 1.2 * unit.unitClass.framesToTurnAndShootAndTurnBackAndAccelerate) {
         Potshot.consider(unit)
         Target.consider(unit)
         Attack.consider(unit)

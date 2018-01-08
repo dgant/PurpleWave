@@ -33,7 +33,7 @@ class BattleClusteringState(seedUnits: Set[UnitInfo]) {
       val nextTile = tileCenter.add(point)
       if (nextTile.valid) {
         val exploredGrid = if (isFriendly) exploredFriendly else exploredEnemy
-        if ( ! exploredGrid(nextTile.i) ) {
+        if ( ! exploredGrid(nextTile.i)) {
           exploredGrid(nextTile.i) = true
           for (neighbor <- With.grids.units.get(nextTile)) {
             if (areOppositeTeams(nextUnit, neighbor) && seedUnits.contains(neighbor)) {

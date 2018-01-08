@@ -68,7 +68,6 @@ class Configuration {
   var garbageCollectionThresholdMs        = 5
   var initialTaskLengthMilliseconds       = 20
   var performanceMinimumUnitSleep         = 2
-  var useFastGroundDistance               = true
   var maximumGamesHistoryPerOpponent      = 500
   
   var urgentBuildingPlacement             = true

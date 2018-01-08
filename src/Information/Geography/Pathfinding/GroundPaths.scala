@@ -30,20 +30,7 @@ trait GroundPaths {
     val zoneOrigin      = origin.zone
     val zoneDestination = destination.zone
     
-    useAirDistance = zoneOrigin == zoneDestination
-    if ( ! useAirDistance) {
-      val edges = zoneOrigin.edges.filter(_.zones.contains(zoneDestination))
-      // TODO: Check whether the line segment intersects the chokepoint circle
-      // That's not rocket science but I'm sleep deprived and don't want to risk mathematical error with CIG deadline looming.
-      // Here's a very gross approximation.
-      useAirDistance = edges.exists(edge =>
-        edge.centerPixel.pixelDistanceFast(origin) +
-        edge.centerPixel.pixelDistanceFast(destination) +
-        edge.radiusPixels <
-        origin.pixelDistanceFast(destination))
-    }
-     
-    if (useAirDistance) {
+    if (zoneOrigin == zoneDestination) {
       return origin.pixelDistanceFast(destination)
     }
     
@@ -53,9 +40,12 @@ trait GroundPaths {
     groundPixelsByTile(origin.tileIncluding, destination.tileIncluding)
   }
   
-  def groundPixelsByTile(origin: Tile, destination: Tile, requireBwta: Boolean = false): Double = {
-    // Shortcut for a common case
-    if (With.configuration.useFastGroundDistance && origin.zone == destination.zone) {
+  def groundPixelsByTile(
+    origin: Tile,
+    destination: Tile,
+    requireBwta: Boolean = false): Double = {
+
+    if (origin.zone == destination.zone) {
       return origin.pixelCenter.pixelDistanceFast(destination.pixelCenter)
     }
     
@@ -76,7 +66,7 @@ trait GroundPaths {
   
   private def calculateDistance(request: (Tile, Tile), requireBwta: Boolean) {
     val distance =
-      if (With.configuration.useFastGroundDistance && With.frame > 0 && ! requireBwta)
+      if (With.frame > 0 && ! requireBwta)
         GroundPathFinder.groundDistanceFast(request._1.pixelCenter, request._2.pixelCenter)
       else
         BWTA.getGroundDistance(request._1.bwapi, request._2.bwapi)

@@ -15,8 +15,13 @@ class If(
   val whenTrue  = new Property[Plan](initialWhenTrue)
   val whenFalse = new Property[Plan](initialWhenFalse)
   
-  override def getChildren: Iterable[Plan] = Vector(predicate.get, whenTrue.get, whenFalse.get)
-  override def isComplete: Boolean = predicate.get.isComplete && whenTrue.get.isComplete
+  override def getChildren: Iterable[Plan] = {
+    Vector(predicate.get, whenTrue.get, whenFalse.get)
+  }
+  
+  override def isComplete: Boolean = {
+    predicate.get.isComplete && whenTrue.get.isComplete
+  }
   
   override def onUpdate() {
     delegate(predicate.get)

@@ -24,7 +24,7 @@ class WorkerRush extends Trigger {
     new FollowBuildOrder,
     new Trigger(
       new UnitsAtLeast(5, UnitMatchWorkers, complete = true),
-      new Gather {
+      initialAfter = new Gather {
         workers.unitCounter.set(UnitCountExactly(1))
         workers.unitPreference.set(UnitPreferClose(With.geography.home.pixelCenter))
         //workers.interruptable.set(false) // Note that this means we can't build more workers until another Probe spawns. But that also means Probes aren't dying.
@@ -37,7 +37,7 @@ class WorkerRush extends Trigger {
       new EnemyUnitsAtLeast(1, Protoss.PhotonCannon, complete = true),
       new EnemyUnitsAtLeast(1, Zerg.SunkenColony, complete = true)))
   
-  trigger.set(new TimeToEndTheRush)
+  predicate.set(new TimeToEndTheRush)
   before.set(new ExecuteRush)
   after.set(new StandardGamePlan)
 }

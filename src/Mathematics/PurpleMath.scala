@@ -54,4 +54,7 @@ object PurpleMath {
     if (values.isEmpty) return 1.0
     Math.pow(values.product, 1.0 / values.size)
   }
+  
+  def fromBoolean(value: Boolean): Int = if (value) 1 else 0
+  def toBoolean(value: Int): Boolean = value != 0
 }

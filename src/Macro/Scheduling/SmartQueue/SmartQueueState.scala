@@ -15,11 +15,8 @@ import scala.collection.mutable.ArrayBuffer
 class SmartQueueState {
   
   /*
-  TODO List:
-  * Make sure it works
-  * Handle addons
-  *
-   */
+  TODO Handle addons
+  */
   
   var frame           : Int     = With.frame
   var minerals        : Double  = With.self.minerals.toDouble

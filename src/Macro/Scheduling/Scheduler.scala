@@ -8,8 +8,8 @@ import Planning.Plan
 
 class Scheduler {
   
-  val dumbQueue   = new DumbQueue
-  val smartQueue  = new SmartQueue
+  lazy val dumbQueue   = new DumbQueue
+  lazy val smartQueue  = new SmartQueue
   
   private val useSmartQueue = false
   

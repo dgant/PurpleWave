@@ -28,9 +28,16 @@ object FightOrFlight extends Action {
     decide(false,       () => ! unit.agent.canFight)
     decide(ignoreWeb,   () => unit.underDisruptionWeb)
     decide(ignoreSwarm, () => unit.underDarkSwarm)
-    decide(true,        () => unit.matchups.allies.exists(ally => ally.unitClass.isStaticDefense && ally.matchups.targetsInRange.nonEmpty))
     decide(true,        () => unit.base.exists(_.owner.isUs) && unit.matchups.targets.exists(target => target.matchups.targetsInRange.exists(_.unitClass.isWorker)))
     decide(true,        () => unit.flying && unit.matchups.threats.forall(_.topSpeed < unit.topSpeed) && unit.matchups.framesOfSafetyDiffused > 0.0)
+    decide(true,        () => unit.matchups.allies.exists(ally =>
+           ally.canAttack
+      && ! ally.unitClass.canMove
+      &&   ally.subjectiveValue >= unit.subjectiveValue
+      && (
+           ally.matchups.targetsInRange.nonEmpty
+        || ally.matchups.framesOfSafetyDiffused < unit.matchups.framesOfSafetyDiffused)))
+    
     if (decision.isDefined) {
       unit.agent.shouldEngage = decision.get
       return

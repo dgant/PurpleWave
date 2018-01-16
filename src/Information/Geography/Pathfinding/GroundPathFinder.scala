@@ -88,6 +88,14 @@ object GroundPathFinder {
     maximumDistance : Int)
       : TilePath = {
     
+    if (
+         start.i  < 0
+      || end.i    < 0
+      || start.i  >= tiles.length
+      || end.i    >= tiles.length) {
+      return TilePath(start, end, Int.MaxValue, 0, None)
+    }
+    
     // I don't want to stop
     // until I reach the top.
     // Baby I'm A*. --Prince

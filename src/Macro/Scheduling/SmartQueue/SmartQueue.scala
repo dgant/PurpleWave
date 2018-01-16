@@ -2,9 +2,12 @@ package Macro.Scheduling.SmartQueue
 
 import Lifecycle.With
 import Macro.BuildRequests.BuildRequest
+import Macro.Buildables.Buildable
 import Mathematics.PurpleMath
 
 class SmartQueue {
+  
+  var queue: Iterable[Buildable] = Iterable.empty
 
   private var queueState: SmartQueueState = new SmartQueueState
   
@@ -38,6 +41,7 @@ class SmartQueue {
   }
   
   def publish() {
-    
+    // Is this right?!
+    queue = queueState.output.map(_.buildable)
   }
 }

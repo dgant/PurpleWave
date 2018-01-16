@@ -38,7 +38,7 @@ abstract class TargetedSpell extends Action {
     val totalRange      = safeDistance + 32.0 * castRangeTiles
     
     if (aoe) {
-      val targetPixel = TargetAOE.chooseTarget(unit, totalRange, thresholdValue, valueTarget)
+      val targetPixel = TargetAOE.chooseTargetPixel(unit, totalRange, thresholdValue, valueTarget)
       targetPixel.foreach(With.commander.useTechOnPixel(unit, tech, _))
     }
     else {

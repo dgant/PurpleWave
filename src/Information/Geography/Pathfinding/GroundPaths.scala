@@ -153,7 +153,8 @@ trait GroundPaths {
     def getDistanceFrom : Int           = if (distanceFromId  == currentTileStateId)  distanceFromValue   else Int.MaxValue
     def getDistanceTo   : Int           = if (distanceToId    == currentTileStateId)  distanceToValue     else Int.MaxValue
   }
-  private val tiles = new Array[TileState](maximumMapTiles)
+  
+  private val tiles: Array[TileState] = Array.fill(maximumMapTiles){ new TileState }
   private def incrementTileStateId() {
     if (currentTileStateId == Long.MaxValue) {
       for (i <- tiles.indices) { tiles(i) = new TileState }

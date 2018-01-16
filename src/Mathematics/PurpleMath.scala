@@ -1,5 +1,7 @@
 package Mathematics
 
+import Mathematics.Points.Point
+
 object PurpleMath {
   
   val twoPI: Double = 2 * Math.PI
@@ -57,4 +59,17 @@ object PurpleMath {
   
   def fromBoolean(value: Boolean): Int = if (value) 1 else 0
   def toBoolean(value: Int): Boolean = value != 0
+  
+  def broodWarDistance(x1: Int, y1: Int, x2: Int, y2: Int): Double = {
+    val dx = Math.abs(x1 - x2)
+    val dy = Math.abs(y1 - y2)
+    val d   = Math.min(dx, dy)
+    val D   = Math.max(dx, dy)
+    if (D / 4 > d) {
+      return D - D / 16 + d * 3 / 8 - D / 64 + d * 3 / 256
+    }
+    D
+  }
+  
+  def broodWarDistance(a: Point, b: Point): Double = broodWarDistance(a.x, a.y, b.x, b.y)
 }

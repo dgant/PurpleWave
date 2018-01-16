@@ -18,7 +18,7 @@ class Simulacrum(
   private val SIMULATION_STEP_FRAMES = 4
   
   // Modifiers
-  val movementDelay     : Int     = if (realUnit.isEnemy || simulation.weAttack)  0   else With.configuration.retreatMovementDelay
+  val movementDelay     : Int     = if (realUnit.isEnemy || simulation.weAttack)  0   else With.configuration.retreatMovementDelay / (if (realUnit.flying) 2 else 1)
   val speedMultiplier   : Double  = if (realUnit.isEnemy || realUnit.flying)      1.0 else simulation.chokeMobility(realUnit.zone)
   val bonusDistance     : Double  = if (realUnit.isOurs  || realUnit.visible)     0.0 else 32.0 * Math.min(realUnit.mobility, 3)
   val bonusRange        : Double  = if (realUnit.isOurs  || ! realUnit.unitClass.isSiegeTank || ! simulation.weAttack) 0.0 else With.configuration.bonusTankRange
@@ -43,7 +43,7 @@ class Simulacrum(
   var valueDealt        : Double                      = 0.0
   var valueReceived     : Double                      = 0.0
   var kills             : Int                         = 0
-  var valuePerDamage    : Double                      = MicroValue.valuePerDamage(realUnit)
+  var valuePerDamage    : Double                      = realUnit.subjectiveValue / realUnit.unitClass.maxTotalHealth //MicroValue.valuePerDamage(realUnit)
   var moves             : ArrayBuffer[(Pixel, Pixel)] = new ArrayBuffer[(Pixel, Pixel)]
   
   lazy val targetQueue: mutable.PriorityQueue[Simulacrum] = (

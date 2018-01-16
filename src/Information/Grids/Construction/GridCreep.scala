@@ -15,7 +15,7 @@ class GridCreep extends AbstractGridBoolean {
   private val creepPossible: Boolean = Players.all.exists(_.isZerg) || With.units.neutral.exists(_.unitClass.producesCreep)
   
   override def update(): Unit = {
-    if (creepPossible) return
+    if ( ! creepPossible) return
     val length = values.length
     var i = 0
     while (i < length) {

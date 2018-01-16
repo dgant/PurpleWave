@@ -1,8 +1,8 @@
 package Debugging.Visualizations.Views.Micro
 
-import Debugging.Visualizations.{Colors, Hues}
 import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.View
+import Debugging.Visualizations.{Colors, Hues}
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import ProxyBwapi.Races.Protoss
@@ -16,6 +16,7 @@ object ShowUnitsAll extends View {
   var showViolence        = false
   var showBattleIgnorance = false
   var showMortality       = false
+  var showSafety          = true
   
   override def renderMap() { With.units.all.foreach(renderUnit) }
   
@@ -74,7 +75,21 @@ object ShowUnitsAll extends View {
         With.game.setTextSize(bwapi.Text.Size.Enum.Large)
         DrawMap.text(unit.pixelCenter.subtract(4, 10), ttlCurrent.toInt.toString)
         With.game.setTextSize(bwapi.Text.Size.Enum.Small)
+      }
+    }
+    if (showSafety) {
+      if (unit.matchups.framesOfSafetyDiffused < 24 * 4) {
+        val color =
+          if (unit.matchups.framesOfSafetyDiffused <= 0)
+            Colors.NeonRed
+          else if (unit.matchups.framesOfSafetyDiffused <= 24)
+            Colors.NeonOrange
+          else
+            Colors.NeonGreen
         
+        val radius = Math.max(10.0, unit.unitClass.dimensionMin / 2.0)
+        DrawMap.circle(unit.pixelCenter, radius.toInt, color,  solid = true)
+        DrawMap.label(unit.matchups.framesOfEntanglementDiffused.toInt.toString, unit.pixelCenter)
       }
     }
   }

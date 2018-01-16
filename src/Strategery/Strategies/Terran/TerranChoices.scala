@@ -13,6 +13,7 @@ object TerranChoices {
     TvEProxyBBS2StartLocations,
     TvEProxyBBS3StartLocations,
     TvEMassMarineAllIn,
+    TvEMassVulture,
     TvTStandard,
     TvZStandard,
     TerranFFABio)

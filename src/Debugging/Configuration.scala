@@ -30,8 +30,9 @@ class Configuration {
   var battleMarginTiles             = 20
   var battleEstimationFrames        = GameTime(0, 10)()
   var bonusTankRange                = 64.0
-  var retreatMovementDelay          = GameTime(0, 2)()
+  var retreatMovementDelay          = GameTime(0, 1)()
   var nonLethalDamageValue          = 0.1
+  var lastStandMinimumValueRatio    = 0.3
   
   ///////////
   // Micro //

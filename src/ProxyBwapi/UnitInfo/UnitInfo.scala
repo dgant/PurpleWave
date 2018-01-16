@@ -220,12 +220,45 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   def pixelDistanceTravelling (destination: Tile)       : Double  = pixelDistanceTravelling(pixelCenter, destination.pixelCenter)
   def pixelDistanceTravelling (from: Pixel, to: Pixel)  : Double  = if (flying) from.pixelDistanceFast(to) else from.groundPixels(to)
   
+  def pixelsFromEdge(other: UnitInfo): Double  = {
+    val x0me = left
+    val y0me = top
+    val x1me = right
+    val y1me = bottom
+    val x0you = other.left
+    val y0you = other.top
+    val x1you = other.right
+    val y1you = other.bottom
+    if (x1you < x0me) {
+      if (y1you < y0me) {
+        return PurpleMath.broodWarDistance(x1you, y1you, x0me, y0me);
+      } else if (y0you > y1me) {
+        return PurpleMath.broodWarDistance(x1you, y0you, x0me, y1me);
+      } else {
+        return x0me - x1you;
+      }
+    } else if (x0you > x1me) {
+      if (y1you < y0me) {
+        return PurpleMath.broodWarDistance(x0you, y1you, x1me, y0me);
+      } else if (y0you > y1me) {
+        return PurpleMath.broodWarDistance(x0you, y0you, x1me, y1me);
+      } else {
+        return x0you - x1me
+      }
+    } else if (y1you < y0me) {
+      return y0me - y1you
+    } else if (y0you > y1me) {
+      return y0you - y1me
+    }
+    0
+  }
+  
   def velocity: Force = Force(velocityX, velocityY)
   
   def canMove: Boolean = canMoveCache()
   private val canMoveCache = new Cache(() =>
     (unitClass.canMove || (unitClass.isBuilding && flying))
-    && topSpeed > 0
+    && unitClass.topSpeed > 0
     && canDoAnything
     && ! burrowed)
   
@@ -238,7 +271,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   
   def topSpeed: Double = topSpeedCache()
   private val topSpeedCache = new Cache(() =>
-    if ( ! canDoAnything || burrowed) 0 else
+    if ( ! canMove) 0 else
       (if (ensnared) 0.5 else 1.0) * // TODO: Is this the multiplier?
       (if (stimmed) 1.5 else 1.0) * (
       unitClass.topSpeed * (if (

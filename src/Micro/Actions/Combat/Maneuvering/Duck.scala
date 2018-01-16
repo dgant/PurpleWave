@@ -35,7 +35,10 @@ object Duck extends Action {
   private def getExplosions(unit: FriendlyUnitInfo): Iterable[Explosion] = {
     val output = new ListBuffer[Explosion]
     
-    output ++= unit.matchups.threats.flatMap(threat => explosion(unit, threat))
+    output ++= (
+      unit.matchups.threats ++
+      unit.matchups.allies.filter(a => a.is(Terran.SpiderMine) && (a.velocity.lengthSquared > 0 || a.matchups.targetsInRange.nonEmpty)))
+      .flatMap(threat => explosion(unit, threat))
     
     output.filter(explosion => explosion.safetyRadius > unit.pixelDistanceFast(explosion.pixelCenter))
   }
@@ -44,7 +47,7 @@ object Duck extends Action {
     
     if (threat.is(Terran.SpiderMine)
       && ! unit.flying
-      && ! unit.unitClass.floats) {
+      && ( ! unit.unitClass.floats || threat.velocity.lengthSquared > 0)) {
       if (threat.burrowed) {
         if (Vector(unit, threat).exists(_.base.exists(_.owner.isUs))) {
           None

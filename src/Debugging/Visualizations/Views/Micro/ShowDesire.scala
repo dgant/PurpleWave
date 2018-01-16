@@ -23,8 +23,7 @@ object ShowDesire extends View {
     var x = agent.unit.pixelCenter.x
     var y = agent.unit.pixelCenter.y + 28
     var width = 18
-    drawDesire(agent.desireTeam,        x - width / 2,  y, width)
-    drawDesire(agent.desireIndividual,  x,              y, width)
+    drawDesire(agent.netEngagementValue, x - width / 2, y, width)
     
     width = 27
     x = agent.unit.pixelCenter.x

@@ -120,9 +120,7 @@ class Agent(val unit: FriendlyUnitInfo) {
   var lastClient  : Option[Plan]    = None
   var lastAction  : Option[Action]  = None
   
-  var desireTeam        : Double = _
-  var desireIndividual  : Double = _
-  
+  var netEngagementValue: Double = _
   var movingTo: Option[Pixel] = None
   
   var microDecisions              : Vector[MicroDecision] = Vector.empty
@@ -149,8 +147,7 @@ class Agent(val unit: FriendlyUnitInfo) {
   private def resetState() {
     forces.clear()
     explosions.clear()
-    desireTeam          = 1.0
-    desireIndividual    = 1.0
+    netEngagementValue  = 1.0
     movingTo            = None
     targetingProfile    = TargetingProfiles.default
     pathsAll            = Seq.empty

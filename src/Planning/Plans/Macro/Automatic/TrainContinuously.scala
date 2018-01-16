@@ -44,6 +44,7 @@ class TrainContinuously(
       && builder.framesBeforeBecomingComplete < unitClass.buildFrames
       && ( unitClass != Terran.NuclearMissile                           || ! builder.hasNuke)
       && ( ! unitClass.isAddon                                          || builder.addon.isEmpty)
+      && ( ! unitClass.isAddon                                          || unitClass.buildUnitsEnabling.forall(t => With.units.ours.exists(u => u.complete && u.is(t)))) // Hack -- don't reserve buildings before we have the tech to build the addon.
       && ( ! unitClass.buildUnitsEnabling.contains(Terran.MachineShop)  || builder.addon.isDefined)
       && ( ! unitClass.buildUnitsEnabling.contains(Terran.ControlTower) || builder.addon.isDefined))
     

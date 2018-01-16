@@ -29,13 +29,14 @@ object Irradiate extends Action {
           1.0
         else
           -1.0
-      baseValue
+      
+      baseValue * unit.subjectiveValue
     }
     
     val target = TargetSingle.chooseTarget(
       unit,
       32.0 * 14.0,
-      0.0,
+      1.0,
       valueTarget)
     
     target.foreach(With.commander.useTechOnUnit(unit, Terran.Irradiate, _))

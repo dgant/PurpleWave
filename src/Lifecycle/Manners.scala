@@ -16,7 +16,7 @@ object Manners {
   
   def chat(text: String) {
     if (enabled) {
-      With.game.sendText(text)
+      //With.game.sendText(text)
       With.game.printf(text)
     }
   }

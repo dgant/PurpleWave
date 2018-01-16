@@ -63,8 +63,8 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
   lazy val doomedDiffused                         : Boolean               = framesToLiveDiffused <= framesToRetreatDiffused
   lazy val framesOfEntanglementPerThreatDiffused  : Map[UnitInfo, Double] = threats.map(threat => (threat, framesOfEntanglementWith(threat))).toMap
   lazy val framesOfEntanglementPerThreatCurrently : Map[UnitInfo, Double] = threatsViolent.map(threat => (threat, framesOfEntanglementWith(threat))).toMap
-  lazy val framesOfEntanglementDiffused           : Double                = ByOption.min(framesOfEntanglementPerThreatDiffused.values).getOrElse(- Forever())
-  lazy val framesOfEntanglementCurrently          : Double                = ByOption.min(framesOfEntanglementPerThreatCurrently.values).getOrElse(- Forever())
+  lazy val framesOfEntanglementDiffused           : Double                = ByOption.max(framesOfEntanglementPerThreatDiffused.values).getOrElse(- Forever())
+  lazy val framesOfEntanglementCurrently          : Double                = ByOption.max(framesOfEntanglementPerThreatCurrently.values).getOrElse(- Forever())
   lazy val framesOfSafetyDiffused                 : Double                = - With.latency.latencyFrames - With.reaction.agencyMax - ByOption.max(framesOfEntanglementPerThreatDiffused.values).getOrElse(- Forever())
   lazy val framesOfSafetyCurrently                : Double                = - With.latency.latencyFrames - With.reaction.agencyMax - ByOption.max(framesOfEntanglementPerThreatCurrently.values).getOrElse(- Forever())
   lazy val mostEntangledThreatsDiffused           : Vector[UnitInfo]      = threats.sortBy( - framesOfEntanglementPerThreatDiffused(_))
@@ -87,14 +87,22 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
   
   def framesOfEntanglementWith(threat: UnitInfo): Double = {
     def speed(unit: UnitInfo) = if (unit.canMove) unit.topSpeed else 0.0
-    val pixelsOutsideRange    = me.pixelsFromEdgeFast(threat) - threat.pixelRangeAgainstFromEdge(me) - speed(me) * 2.0 * With.reaction.agencyAverage
-    // A big definition question: Do we care about how fast they can chase us?
-    // SEMANTICS HACK:
-    // Entanglement: How long before we can  open the gap
-    // Safety: How long before they can close the gap
-    val gapSpeed              = if (pixelsOutsideRange >= 0) speed(threat) else speed(me)
-    val framesToCloseGap      = PurpleMath.nanToInfinity(Math.abs(pixelsOutsideRange) / gapSpeed)
-    val output                = - framesToCloseGap * PurpleMath.signum(pixelsOutsideRange)
+  
+    lazy val rotatoFrames = if (me.unitClass.canMove) me.unitClass.turn180Frames + me.unitClass.accelerationFrames else 0 //How long for us to turn around and run
+    val threatRangeBonus =
+      if (threat.isFriendly)
+        0.0
+      else
+        (speed(me) + speed(threat)) * (With.reaction.agencyMax + With.latency.framesRemaining)
+    
+    // Use circular distance as an unfavorable estimate of distance
+    // TODO: Can we finally implement BW distance, please?
+    val gapPixels = me.pixelsFromEdgeSlow(threat) - threat.pixelRangeAgainstFromEdge(me) - threatRangeBonus
+    
+    val gapSpeed          = if (gapPixels >= 0) speed(threat) else speed(me)
+    val framesToCloseGap  = PurpleMath.nanToInfinity(Math.abs(gapPixels) / gapSpeed)
+    val output            = framesToCloseGap * PurpleMath.signum( - gapPixels) + rotatoFrames
+    
     output
   }
 }

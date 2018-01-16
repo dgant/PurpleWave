@@ -1,6 +1,5 @@
 package Information.Geography.Calculations
 
-import Information.Geography.Pathfinding.GroundPathFinder
 import Information.Geography.Types.Zone
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
@@ -76,7 +75,7 @@ object ZoneUpdater {
       && exitBuildings.exists(_.is(Terran.Barracks))
       && canaryTileInside.exists(tileInside =>
           canaryTileOutside.exists(tileOutside =>
-            ! GroundPathFinder.manhattanGroundDistanceThroughObstacles(
+            ! With.paths.manhattanGroundDistanceThroughObstacles(
               tileInside,
               tileOutside,
               obstacles = Set.empty,

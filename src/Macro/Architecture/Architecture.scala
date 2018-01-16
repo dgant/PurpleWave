@@ -1,7 +1,7 @@
 package Macro.Architecture
 
 import Debugging.Visualizations.Views.Geography.ShowArchitecturePlacements
-import Information.Geography.Pathfinding.{GroundPathFinder, TilePath}
+import Information.Geography.Pathfinding.{TilePath}
 import Information.Geography.Types.{Edge, Zone}
 import Lifecycle.With
 import Mathematics.Points.{Tile, TileRectangle}
@@ -120,8 +120,8 @@ class Architecture {
     lazy val blockedTiles           = blockedArea.tiles
     lazy val excludedBefore         = unwalkable.toSet
     lazy val excludedAfter          = unwalkable.toSet ++ blockedTiles
-    lazy val pathBefore             = GroundPathFinder.manhattanGroundDistanceThroughObstacles(start, end, excludedBefore, maxTiles)
-    lazy val pathAfter              = GroundPathFinder.manhattanGroundDistanceThroughObstacles(start, end, excludedAfter,  maxTiles)
+    lazy val pathBefore             = With.paths.manhattanGroundDistanceThroughObstacles(start, end, excludedBefore, maxTiles)
+    lazy val pathAfter              = With.paths.manhattanGroundDistanceThroughObstacles(start, end, excludedAfter,  maxTiles)
     
     // Cache the before-path, if we haven't already
     if ( ! existingPaths(edge).valid) {

@@ -171,6 +171,7 @@ class Strategist {
     */
     
     // 1. Groups of(Pick one of these strategies)
+    
     val choices = strategy.choices
     
     // 2. Groups of(Pick one of these legal strategies)

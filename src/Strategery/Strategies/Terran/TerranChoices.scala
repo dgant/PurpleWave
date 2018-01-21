@@ -25,7 +25,8 @@ object TerranChoices {
   /////////
   
   val tvtOpeners = Vector(
-    TvTStandard
+    TvTStandard,
+    TvTPNukeDrop
   )
   
   /////////
@@ -33,6 +34,7 @@ object TerranChoices {
   /////////
   
   val tvpOpeners = Vector(
+    TvTPNukeDrop
   )
   
   /////////

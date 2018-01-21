@@ -473,6 +473,7 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   lazy val canSiege          : Boolean = this == Terran.SiegeTankUnsieged || this == Terran.SiegeTankSieged
   lazy val canBeLockedDown   : Boolean = isMechanical  && ! isBuilding
   lazy val canBeMaelstrommed : Boolean = isOrganic     && ! isBuilding
+  lazy val canBeEnsnared     : Boolean = ! isBuilding
   lazy val canBeStasised     : Boolean = ! isBuilding
   
   /////////////////

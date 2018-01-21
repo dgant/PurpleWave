@@ -51,6 +51,7 @@ class TvRTinfoil extends GameplanModeTemplateVsRandom {
       RequestAtLeast(1, Terran.Refinery),
       RequestAtLeast(1, Terran.Factory),
       RequestAtLeast(1, Terran.MachineShop),
+      RequestAtLeast(2, Terran.Bunker),
       RequestAtLeast(1, Terran.Academy),
       RequestAtLeast(1, Terran.Comsat),
       RequestAtLeast(1, Terran.EngineeringBay),

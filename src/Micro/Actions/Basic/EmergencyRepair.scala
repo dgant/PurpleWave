@@ -1,5 +1,6 @@
 package Micro.Actions.Basic
 
+import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Micro.Actions.Action
 import ProxyBwapi.Races.Terran
@@ -7,9 +8,10 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object EmergencyRepair extends Action {
   
-  override def allowed(unit: FriendlyUnitInfo): Boolean = {
+  override def allowed(unit: FriendlyUnitInfo): Boolean = (
     unit.is(Terran.SCV)
-  }
+      && With.self.minerals + With.economy.ourIncomePerFrameMinerals * GameTime(0, 10)() > 50
+  )
   
   override def perform(unit: FriendlyUnitInfo) {
     val patients = eligiblePatients(unit)

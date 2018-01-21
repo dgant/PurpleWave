@@ -12,7 +12,7 @@ case class PlayerInfo(basePlayer: Player) extends PlayerProxy(basePlayer) {
   def raceCurrent: Race = raceCurrentCache()
   private val raceCurrentCache = new Cache(() => {
     permanentRace = permanentRace.orElse(if (Array(Race.Terran, Race.Protoss, Race.Zerg).contains(raceInitial)) Some(raceInitial) else None)
-    permanentRace = permanentRace.orElse(With.units.all.find(u => u.player == this).map(_.unitClass.race))
+    permanentRace = permanentRace.orElse(With.units.all.find(_.player == this).map(_.unitClass.race))
     permanentRace.getOrElse(raceInitial)
   })
   

@@ -384,7 +384,7 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
         1 * mineralValue
       + 2 * gasValue
     )
-    * (if(isWorker) 2 else 1)
+    * (if(isWorker) 4 else 3)
     * (if(isZerg) 4 else 3)
     * (if (this == Protoss.Carrier)     2 else 1)
     / (if (this == Protoss.Interceptor) 4 else 1)

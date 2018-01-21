@@ -2,6 +2,7 @@ package Planning.Plans.Macro.Automatic
 
 import Information.Geography.Types.Base
 import Lifecycle.With
+import Mathematics.PurpleMath
 import Micro.Agency.Intention
 import Planning.Composition.ResourceLocks.LockUnits
 import Planning.Composition.UnitCountEverything
@@ -96,8 +97,11 @@ class Gather extends Plan {
   
   private def decideIdealWorkerDistribution() {
     val gasLimitFloor     = With.blackboard.gasLimitFloor
+    val gasLimitCeiling   = With.blackboard.gasLimitCeiling
+    val floor             = Math.min(gasLimitFloor, gasLimitCeiling)
+    val ceiling           = Math.max(gasLimitFloor, gasLimitCeiling)
     gasWorkerTargetRatio  = With.blackboard.gasTargetRatio
-    haveEnoughGas         = With.self.gas >= Math.max(gasLimitFloor, With.self.minerals)
+    haveEnoughGas         = With.self.gas >= PurpleMath.clamp(With.self.minerals, floor, ceiling)
     
     workersForGas         = gasWorkers
     workersForMinerals    = allWorkers.size - workersForGas

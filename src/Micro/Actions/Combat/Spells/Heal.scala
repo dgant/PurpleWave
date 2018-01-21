@@ -9,13 +9,19 @@ import Utilities.ByOption
 
 object Heal extends Action {
   
-  override def allowed(unit: FriendlyUnitInfo): Boolean = {
+  override def allowed(unit: FriendlyUnitInfo): Boolean = (
     unit.is(Terran.Medic)
-  }
+    && (unit.matchups.battle.isDefined || unit.agent.toForm.isEmpty)
+  )
   
   override protected def perform(unit: FriendlyUnitInfo) {
     val targets = validTargets(unit)
-    val target  = ByOption.minBy(targets)(_.pixelDistanceFast(unit))
+    val target  = ByOption.minBy(targets)(patient =>
+      if (unit.matchups.battle.isDefined)
+        patient.pixelDistanceFast(unit)
+      else
+        patient.pixelDistanceFast(unit.agent.destination))
+      
     
     target.foreach(someTarget => {
       With.commander.attackMove(unit, someTarget.pixelCenter)

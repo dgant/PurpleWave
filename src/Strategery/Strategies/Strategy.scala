@@ -12,15 +12,16 @@ abstract class Strategy {
   
   def choices: Iterable[Iterable[Strategy]] = Iterable.empty
   
-  def islandMaps          : Boolean                   = false
-  def groundMaps          : Boolean                   = true
-  def multipleEntrances   : Boolean                   = true
-  def ourRaces            : Iterable[Race]            = Vector(Race.Terran, Race.Protoss, Race.Zerg)
-  def enemyRaces          : Iterable[Race]            = Vector(Race.Terran, Race.Protoss, Race.Zerg, Race.Unknown)
-  def startLocationsMin   : Int                       = 2
-  def startLocationsMax   : Int                       = 24
-  def ffa                 : Boolean                   = false
-  def restrictedOpponents : Option[Iterable[String]]  = None
-  def prohibitedMaps      : Iterable[StarCraftMap]    = Vector.empty
-  def requiredMaps        : Iterable[StarCraftMap]    = Vector.empty
+  def islandMaps              : Boolean                   = false
+  def groundMaps              : Boolean                   = true
+  def multipleEntrances       : Boolean                   = true
+  def ourRaces                : Iterable[Race]            = Vector(Race.Terran, Race.Protoss, Race.Zerg)
+  def enemyRaces              : Iterable[Race]            = Vector(Race.Terran, Race.Protoss, Race.Zerg, Race.Unknown)
+  def startLocationsMin       : Int                       = 2
+  def startLocationsMax       : Int                       = 24
+  def ffa                     : Boolean                   = false
+  def restrictedOpponents     : Option[Iterable[String]]  = None
+  def prohibitedMaps          : Iterable[StarCraftMap]    = Vector.empty
+  def requiredMaps            : Iterable[StarCraftMap]    = Vector.empty
+  def minimumGamesVsOpponent  : Int                       = 0
 }

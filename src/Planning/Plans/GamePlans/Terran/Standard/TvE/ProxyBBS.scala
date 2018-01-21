@@ -1,4 +1,4 @@
-package Planning.Plans.GamePlans.Terran.TvE
+package Planning.Plans.GamePlans.Terran.Standard.TvE
 
 import Information.Geography.Types.Zone
 import Lifecycle.With
@@ -8,7 +8,9 @@ import Macro.BuildRequests.RequestAtLeast
 import Planning.Composition.UnitCounters.UnitCountExcept
 import Planning.Composition.UnitMatchers.UnitMatchWorkers
 import Planning.Plans.Army.{Aggression, AllIn, Attack}
-import Planning.Plans.Compound.{And, If, Not, Parallel}
+import Planning.Plans.Compound.{And, If, Not}
+import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.Information.Employing
 import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, TrainContinuously}
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, FirstEightMinutes, FollowBuildOrder}
@@ -17,8 +19,11 @@ import Planning.Plans.Macro.Milestones.UnitsAtLeast
 import Planning.Plans.Scouting.{FoundEnemyBase, Scout}
 import Planning.ProxyPlanner
 import ProxyBwapi.Races.Terran
+import Strategery.Strategies.Terran.TvE.TvEProxyBBS
 
-class ProxyBBS extends Parallel {
+class ProxyBBS extends GameplanModeTemplate {
+  
+  override val activationCriteria = new Employing(TvEProxyBBS)
   
   def proxyZone: Option[Zone] = ProxyPlanner.proxyAutomaticSneaky
   

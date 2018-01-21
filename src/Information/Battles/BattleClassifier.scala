@@ -17,7 +17,7 @@ class BattleClassifier {
   val clustering = new BattleClustering
   
   def run() {
-    clustering.enqueue(With.units.all.filter(isEligibleLocal))
+    clustering.enqueue(With.units.all.filter(BattleClassificationFilters.isEligibleLocal))
     clustering.run()
     replaceBattleGlobal()
     replaceBattlesLocal()
@@ -35,22 +35,12 @@ class BattleClassifier {
     lastUpdate = With.frame
   }
   
-  private def isEligibleLocal(unit: UnitInfo): Boolean = {
-    isEligible(unit) && unit.likelyStillThere
-  }
   
-  private def isEligibleGlobal(unit: UnitInfo): Boolean = {
-    isEligible(unit)
-  }
-  
-  private def isEligible(unit: UnitInfo): Boolean = {
-    unit.likelyStillAlive && (unit.complete || unit.unitClass.isBuilding)
-  }
   
   private def replaceBattleGlobal() {
     global = new BattleGlobal(
-      new Team(asVectorUs     (With.units.ours  .filter(isEligibleGlobal))),
-      new Team(asVectorEnemy  (With.units.enemy .filter(isEligibleGlobal))))
+      new Team(asVectorUs     (With.units.ours  .filter(BattleClassificationFilters.isEligibleGlobal))),
+      new Team(asVectorEnemy  (With.units.enemy .filter(BattleClassificationFilters.isEligibleGlobal))))
   }
   
   private def replaceBattlesLocal() {

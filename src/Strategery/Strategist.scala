@@ -43,7 +43,7 @@ class Strategist {
       TerranChoices.all ++ ProtossChoices.all ++ ZergChoices.all
     }
     else {
-      TerranChoices.all ++ ProtossChoices.pvr ++ ZergChoices.all
+      TerranChoices.tvr ++ ProtossChoices.pvr ++ ZergChoices.all
     }
     val strategiesFiltered = filterForcedStrategies(strategiesUnfiltered.filter(isAppropriate))
     strategiesFiltered.foreach(evaluate)
@@ -62,6 +62,8 @@ class Strategist {
     lazy val enemyRacesCurrent        = With.enemies.map(_.raceCurrent).toSet
     lazy val enemyRaceWasUnknown      = With.enemies.exists(_.raceInitial == Race.Unknown)
     lazy val enemyRaceStillUnknown    = With.enemies.exists(_.raceCurrent == Race.Unknown)
+    lazy val gamesVsEnemy             = With.history.games.count(game => With.enemies.exists(_.name == game.enemyName))
+    lazy val playedEnemyOftenEnough   = gamesVsEnemy >= strategy.minimumGamesVsOpponent
     lazy val isIsland                 = isIslandMap
     lazy val isGround                 = ! isIsland
     lazy val startLocations           = With.geography.startLocations.size
@@ -74,17 +76,19 @@ class Strategist {
         .map(_.toLowerCase)
         .exists(key => With.enemies.map(_.name.toLowerCase).exists(_.contains(key)))
     
-    val output =
-      ! disabledOnMap                                   &&
-      ! disabledInPlaybook                              &&
-      (strategy.ffa == isFfa)                           &&
-      (strategy.islandMaps  || ! isIsland)              &&
-      (strategy.groundMaps  || ! isGround)              &&
-      strategy.startLocationsMin <= startLocations      &&
-      strategy.startLocationsMax >= startLocations      &&
-      appropriateForOurRace                             &&
-      appropriateForEnemyRace                           &&
-      appropriateForOpponent
+    val output = (
+          ! disabledOnMap
+      &&  ! disabledInPlaybook
+      &&  (strategy.ffa == isFfa)
+      &&  (strategy.islandMaps  || ! isIsland)
+      &&  (strategy.groundMaps  || ! isGround)
+      &&  strategy.startLocationsMin <= startLocations
+      &&  strategy.startLocationsMax >= startLocations
+      &&  appropriateForOurRace
+      &&  appropriateForEnemyRace
+      &&  appropriateForOpponent
+      &&  playedEnemyOftenEnough
+    )
     
     output
   }

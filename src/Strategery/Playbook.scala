@@ -1,6 +1,6 @@
 package Strategery
 
-import Strategery.Strategies.AllRaces.{WorkerRush2StartLocations, WorkerRush3StartLocations}
+import Strategery.Strategies.AllRaces.WorkerRush
 import Strategery.Strategies.Protoss.PvE._
 import Strategery.Strategies.Protoss.PvP._
 import Strategery.Strategies.Protoss.PvT._
@@ -15,17 +15,18 @@ class EmptyPlaybook {
   lazy val disabled : Seq[Strategy] = Seq.empty
   
   val none: Seq[Strategy] = Seq.empty
+  
+  val strategyOrder: Seq[Strategy] = Seq.empty
 }
 
 object StrategyGroups {
   
   val cheese = Vector[Strategy](
-    WorkerRush2StartLocations,
-    WorkerRush3StartLocations,
-    TvEProxyBBS2StartLocations,
-    TvEProxyBBS3StartLocations,
-    TvEProxy5RaxAllIn,
-    TvEMassMarineAllIn,
+    WorkerRush,
+    TvEProxyBBS,
+    TvEProxy5Rax,
+    TvEMassMarine,
+    TvEMassVulture,
     PvTProxy2Gate,
     PvPOpenProxy2Gate,
     PvZProxy2Gate,
@@ -41,14 +42,8 @@ object StrategyGroups {
     PvTEarly1GateProxy,
     PvT3BaseCorsair,
     CarriersWithNoDefense,
-    WorkerRush2StartLocations,
-    WorkerRush3StartLocations,
     PvZEarlyFFEGatewayFirst,
     PvZEarlyFFENexusFirst,
-    TvEProxyBBS2StartLocations,
-    TvEProxyBBS3StartLocations,
-    TvEProxy5RaxAllIn,
-    TvEMassMarineAllIn,
     ProxyDarkTemplar
   )
 }
@@ -70,9 +65,5 @@ class PurpleCheesePlaybook extends EmptyPlaybook  {
   override lazy val forced: Seq[Strategy] = StrategyGroups.cheese
 }
 
-object Playbook extends TestingPlaybook {
-
-  val strategyOrder = Vector(
-  )
-  
+object Playbook extends PurpleWavePlaybook {
 }

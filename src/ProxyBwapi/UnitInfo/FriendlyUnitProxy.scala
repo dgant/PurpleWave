@@ -91,10 +91,15 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit, id: Int) extends UnitInfo(bas
   
   def pixelCenter : Pixel = cachePixel()
   def tileTopLeft : Tile  = cacheTile()
-  def top         : Int   = base.getTop
-  def left        : Int   = base.getLeft
-  def right       : Int   = base.getRight
-  def bottom      : Int   = base.getBottom
+  def top         : Int   = cacheTop()
+  def left        : Int   = cacheLeft()
+  def right       : Int   = cacheRight()
+  def bottom      : Int   = cacheBottom()
+  
+  private val cacheTop    = new Cache(() => base.getTop)
+  private val cacheLeft   = new Cache(() => base.getLeft)
+  private val cacheRight  = new Cache(() => base.getRight)
+  private val cacheBottom = new Cache(() => base.getBottom)
   
   ////////////
   // Orders //
@@ -200,8 +205,11 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit, id: Int) extends UnitInfo(bas
   def stasised      : Boolean = cachedStasised()
   def stimmed       : Boolean = cachedIsStimmed()
   def stuck         : Boolean = unitClass.canMove && base.isStuck
-  def velocityX     : Double  = if (unitClass.canMove) base.getVelocityX else 0
-  def velocityY     : Double  = if (unitClass.canMove) base.getVelocityY else 0
+  def velocityX     : Double  = if (unitClass.canMove) cacheVelocityX() else 0
+  def velocityY     : Double  = if (unitClass.canMove) cacheVelocityX() else 0
+  
+  private val cacheVelocityX = new Cache(() => base.getVelocityX)
+  private val cacheVelocityY = new Cache(() => base.getVelocityY)
   
   private val cachedIsSieged        = new Cache(() => unitClass.canSiege          &&  base.isSieged)
   private val cachedIsStimmed       = new Cache(() => unitClass.canBeStasised     &&  base.isStimmed)
@@ -234,7 +242,8 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit, id: Int) extends UnitInfo(bas
   private val carryingMineralsCache = new Cache(() => unitClass.isWorker && base.isCarryingMinerals)
   private val carryingGasCache      = new Cache(() => unitClass.isWorker && base.isCarryingGas)
   
-  def spiderMines: Int = base.getSpiderMineCount
+  def spiderMines: Int = cachedSpiderMines()
+  private val cachedSpiderMines = new Cache(() => base.getSpiderMineCount)
   
   def addon: Option[UnitInfo] = cachedAddon()
   private val cachedAddon = new Cache(() => With.units.get(base.getAddon))

@@ -1,5 +1,6 @@
 package Micro.Matchups
 
+import Information.Battles.BattleClassificationFilters
 import Information.Battles.Types.{Battle, Team}
 import Lifecycle.With
 import Mathematics.Points.Pixel
@@ -35,7 +36,7 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
   
   lazy val battle                 : Option[Battle]        = me.battle.orElse(With.matchups.entrants.find(_._2.contains(me)).map(_._1))
   lazy val team                   : Option[Team]          = battle.map(_.teamOf(me))
-  lazy val zoneUnits              : Vector[UnitInfo]      = me.zone.units.toVector.filter(_.likelyStillThere)
+  lazy val zoneUnits              : Vector[UnitInfo]      = me.zone.units.toVector.filter(BattleClassificationFilters.isEligibleLocal)
   lazy val enemies                : Vector[UnitInfo]      = team.map(_.opponent.units).getOrElse(zoneUnits.filter(_.isEnemyOf(me)))
   lazy val alliesIncludingSelf    : Vector[UnitInfo]      = team.map(_.units).getOrElse(zoneUnits.filter(u => u.isFriendly && u != me) :+ me)
   lazy val allies                 : Vector[UnitInfo]      = alliesIncludingSelf.filterNot(_.id == me.id)
@@ -86,22 +87,23 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
       dpfDealingDiffused(target)
   
   def framesOfEntanglementWith(threat: UnitInfo): Double = {
-    def speed(unit: UnitInfo) = if (unit.canMove) unit.topSpeed else 0.0
-  
-    lazy val rotatoFrames = if (me.unitClass.canMove) me.unitClass.turn180Frames + me.unitClass.accelerationFrames else 0 //How long for us to turn around and run
+    lazy val speedApproachingMe     = me.speedApproachingPixel(threat.pixelCenter)
+    lazy val speedApproachingThreat = threat.speedApproachingPixel(me.pixelCenter)
+    lazy val reaccelerationFrames   = (me.topSpeed + speedApproachingThreat) / me.unitClass.accelerationFrames
+    lazy val turnFrames             = me.unitClass.turn180Frames // TODO: Consider existing angle
+    lazy val blastoffFrames         = if (me.unitClass.canMove) turnFrames + reaccelerationFrames  else 0 //How long for us to turn around and run
+    
     val threatRangeBonus =
       if (threat.isFriendly)
         0.0
       else
-        (speed(me) + speed(threat)) * (With.reaction.agencyMax + With.latency.framesRemaining)
+        Math.max(0.0, (speedApproachingMe + speedApproachingThreat) * (With.reaction.agencyMax + With.latency.framesRemaining))
     
-    // Use circular distance as an unfavorable estimate of distance
-    // TODO: Can we finally implement BW distance, please?
-    val gapPixels = me.pixelsFromEdgeSlow(threat) - threat.pixelRangeAgainstFromEdge(me) - threatRangeBonus
+    val gapPixels = me.pixelsFromEdge(threat) - threat.pixelRangeAgainstFromEdge(me) - threatRangeBonus
     
-    val gapSpeed          = if (gapPixels >= 0) speed(threat) else speed(me)
+    val gapSpeed          = if (gapPixels >= 0) threat.topSpeed else me.topSpeed
     val framesToCloseGap  = PurpleMath.nanToInfinity(Math.abs(gapPixels) / gapSpeed)
-    val output            = framesToCloseGap * PurpleMath.signum( - gapPixels) + rotatoFrames
+    val output            = framesToCloseGap * PurpleMath.signum( - gapPixels) + blastoffFrames
     
     output
   }

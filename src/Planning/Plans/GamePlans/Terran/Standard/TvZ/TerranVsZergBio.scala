@@ -1,24 +1,29 @@
-package Planning.Plans.GamePlans.Terran.TvZ
+package Planning.Plans.GamePlans.Terran.Standard.TvZ
 
 import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
-import Planning.Plans.Army._
+import Planning.Plan
 import Planning.Plans.Compound._
+import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.Terran.Situational.TvZPlacement
+import Planning.Plans.Information.Employing
 import Planning.Plans.Information.Reactive.EnemyMutalisks
-import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
+import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding._
 import Planning.Plans.Macro.Milestones.{IfOnMiningBases, UnitsAtLeast}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
-import Planning.Plans.Scouting.ScoutAt
 import ProxyBwapi.Races.Terran
+import Strategery.Strategies.Terran.TvZ.TvZMidgameBio
 
-class TerranVsZergBio extends Parallel {
+class TerranVsZergBio extends GameplanModeTemplate {
   
-  children.set(Vector(
-    new RequireSufficientSupply,
+  override val activationCriteria: Plan = new Employing(TvZMidgameBio)
+  
+  override def defaultPlacementPlan: Plan = new TvZPlacement
+  
+  override def buildPlans: Seq[Plan] = Vector(
     new TrainContinuously(Terran.Comsat),
-    new TrainWorkersContinuously,
     new TrainContinuously(Terran.ScienceVessel),
     new If(
       new And(
@@ -58,11 +63,8 @@ class TerranVsZergBio extends Parallel {
       RequestUpgrade(Terran.ScienceVesselEnergy)),
     new RequireMiningBases(3),
     new TrainContinuously(Terran.Vulture),
-    new IfOnMiningBases(2, new Build(RequestAtLeast(10,  Terran.Barracks))),
+    new IfOnMiningBases(2, new Build(RequestAtLeast(10, Terran.Barracks))),
     new IfOnMiningBases(3, new Build(RequestAtLeast(15, Terran.Barracks))),
-    new IfOnMiningBases(4, new Build(RequestAtLeast(20, Terran.Barracks))),
-    new ScoutAt(16),
-    new DefendZones,
-    new ConsiderAttacking
-  ))
+    new IfOnMiningBases(4, new Build(RequestAtLeast(20, Terran.Barracks)))
+  )
 }

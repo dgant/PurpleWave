@@ -2,8 +2,9 @@ package Planning.Plans.Macro.Automatic
 
 import Lifecycle.With
 import Macro.BuildRequests.RequestAtLeast
+import Planning.Composition.UnitMatchers.{UnitMatchHatchery, UnitMatchLair, UnitMatchSiegeTank, UnitMatchSpire}
 import Planning.Plan
-import ProxyBwapi.Races.Terran
+import ProxyBwapi.Races.{Terran, Zerg}
 import ProxyBwapi.UnitClass.UnitClass
 
 class TrainContinuously(
@@ -23,11 +24,8 @@ class TrainContinuously(
         List(
           maximum,
           maxDesirable,
-          Math.min(
-            maximumConcurrently,
-            buildCapacity)
-          + With.units.ours.count(unit => unit.aliveAndComplete && unit.is(unitClass)))
-        .min,
+          Math.min(maximumConcurrently, buildCapacity) + currentCount
+        ).min,
         unitClass))
   }
   
@@ -36,6 +34,27 @@ class TrainContinuously(
     unitClass.buildUnitsEnabling.forall(unitClass => With.units.ours.exists(unit => unit.alive && unit.is(unitClass))) &&
     unitClass.buildUnitsBorrowed.forall(unitClass => With.units.ours.exists(unit => unit.alive && unit.is(unitClass)))
   }
+  
+  protected def currentCount: Int = {
+    // Should this just be unit.alive?
+    // Maybe this is compensating for a Scheduler
+    With.units.ours.count(unit => unit.aliveAndComplete && matcher.accept(unit))
+  }
+  
+  protected val matcher =
+    if (unitClass == Terran.SiegeTankSieged || unitClass == Terran.SiegeTankUnsieged) {
+      UnitMatchSiegeTank
+    }
+    else if (unitClass == Zerg.Hatchery) {
+      UnitMatchHatchery
+    }
+    else if (unitClass == Zerg.Lair) {
+      UnitMatchLair
+    }
+    else if (unitClass == Zerg.Spire) {
+      UnitMatchSpire
+    }
+    else unitClass
   
   protected def buildCapacity: Int = {
     val builders = With.units.ours.filter(builder =>

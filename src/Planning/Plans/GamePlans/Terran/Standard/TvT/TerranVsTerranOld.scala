@@ -1,53 +1,57 @@
-package Planning.Plans.GamePlans.Terran.TvT
+package Planning.Plans.GamePlans.Terran.Standard.TvT
 
 import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
 import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Composition.UnitMatchers.{UnitMatchSiegeTank, UnitMatchWarriors, UnitMatchWorkers}
+import Planning.Plan
 import Planning.Plans.Army._
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.Protoss.Situational.DefendAgainstProxy
+import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Terran.Situational.BunkersAtNatural
+import Planning.Plans.Information.Employing
 import Planning.Plans.Macro.Automatic._
-import Planning.Plans.Macro.BuildOrders.{Build, FirstEightMinutes, FollowBuildOrder, RequireEssentials}
-import Planning.Plans.Macro.Expanding.{BuildGasPumps, RemoveMineralBlocksAt, RequireMiningBases}
+import Planning.Plans.Macro.BuildOrders.Build
+import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.{IfOnMiningBases, OnGasPumps, UnitsAtLeast}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
-import Planning.Plans.Recruitment.RecruitFreelancers
-import Planning.Plans.Scouting.{ScoutAt, ScoutExpansionsAt}
 import ProxyBwapi.Races.Terran
+import Strategery.Strategies.Terran.TvT.TvTStandard
 
-class TerranVsTerran extends Parallel {
+class TerranVsTerranOld extends GameplanModeTemplate {
   
-  children.set(Vector(
-    new BunkersAtNatural(1),
-    new FirstEightMinutes(
-      new Build(
-        RequestAtLeast(1,   Terran.CommandCenter),
-        RequestAtLeast(9,   Terran.SCV),
-        RequestAtLeast(1,   Terran.SupplyDepot),
-        RequestAtLeast(11,  Terran.SCV),
-        RequestAtLeast(1,   Terran.Barracks),
-        RequestAtLeast(12,  Terran.SCV),
-        RequestAtLeast(1,   Terran.Refinery),
-        RequestAtLeast(15,  Terran.SCV),
-        RequestAtLeast(2,   Terran.SupplyDepot),
-        RequestAtLeast(16,  Terran.SCV),
-        RequestAtLeast(1,   Terran.Factory),
-        RequestAtLeast(20,  Terran.SCV))),
+  override val activationCriteria = new Employing(TvTStandard)
   
-    new RequireEssentials,
-    new FirstEightMinutes(
-      new Build(
-        RequestAtLeast(1, Terran.Factory),
-        RequestAtLeast(1, Terran.Bunker),
-        RequestAtLeast(1, Terran.MachineShop),
-        RequestAtLeast(1, Terran.Starport))),
+  override def defaultPlacementPlan: Plan = new BunkersAtNatural(1)
   
+  override def defaultAttackPlan: Plan = new Trigger(
+    new UnitsAtLeast(1, Terran.Wraith, complete = true),
+    new Parallel(
+      new ConsiderAttacking,
+      new ConsiderAttacking {
+        attack.attackers.get.unitMatcher.set(UnitMatchWorkers)
+        attack.attackers.get.unitCounter.set(UnitCountOne)
+      }))
+  
+  override val buildOrder = Vector(
+    RequestAtLeast(1,   Terran.CommandCenter),
+    RequestAtLeast(9,   Terran.SCV),
+    RequestAtLeast(1,   Terran.SupplyDepot),
+    RequestAtLeast(11,  Terran.SCV),
+    RequestAtLeast(1,   Terran.Barracks),
+    RequestAtLeast(12,  Terran.SCV),
+    RequestAtLeast(1,   Terran.Refinery),
+    RequestAtLeast(15,  Terran.SCV),
+    RequestAtLeast(2,   Terran.SupplyDepot),
+    RequestAtLeast(16,  Terran.SCV),
+    RequestAtLeast(1,   Terran.Factory),
+    RequestAtLeast(20,  Terran.SCV))
+  
+  override def buildPlans: Seq[Plan] = Vector(
     new Build(
-      RequestAtLeast(1, Terran.SCV),
-      RequestAtLeast(1, Terran.Barracks),
-      RequestAtLeast(1, Terran.Factory)),
+      RequestAtLeast(1, Terran.Bunker),
+      RequestAtLeast(1, Terran.MachineShop),
+      RequestAtLeast(1, Terran.Starport)),
     
     new If(
       new Check(() => With.self.minerals > 800),
@@ -59,11 +63,7 @@ class TerranVsTerran extends Parallel {
     new If(new UnitsAtLeast(1, UnitMatchSiegeTank, complete = true), new RequireMiningBases(2)),
     new If(new UnitsAtLeast(20, UnitMatchWarriors), new RequireMiningBases(3)),
     new If(new UnitsAtLeast(30, UnitMatchWarriors), new RequireMiningBases(4)),
-    
-    new RequireSufficientSupply,
-    new TrainWorkersContinuously,
     new BuildGasPumps,
-    
     new If(new UnitsAtLeast(2,  Terran.SiegeTankUnsieged),  new Build(RequestTech(Terran.SiegeMode))),
     new If(new UnitsAtLeast(3,  Terran.Wraith),             new Build(RequestAtLeast(1, Terran.ControlTower), RequestTech(Terran.WraithCloak))),
     new If(new UnitsAtLeast(2,  Terran.Goliath),            new Build(RequestUpgrade(Terran.GoliathAirRange))),
@@ -124,27 +124,6 @@ class TerranVsTerran extends Parallel {
     new RequireMiningBases(4),
     new Build(RequestAtLeast(12, Terran.Factory)),
     new RequireMiningBases(5),
-    new Build(RequestAtLeast(16, Terran.Factory)),
-    
-    new ScoutAt(14),
-    new ScoutExpansionsAt(80),
-    new DefendZones,
-    new DropAttack,
-    new Trigger(
-      new UnitsAtLeast(1, Terran.Wraith, complete = true),
-      new Parallel(
-        new ConsiderAttacking,
-        new ConsiderAttacking {
-          attack.attackers.get.unitMatcher.set(UnitMatchWorkers)
-          attack.attackers.get.unitCounter.set(UnitCountOne)
-        })
-    ),
-    new FollowBuildOrder,
-    new Scan,
-    new DefendAgainstProxy,
-    new RemoveMineralBlocksAt(40),
-    new Gather,
-    new RecruitFreelancers,
-    new DefendEntrance
-  ))
+    new Build(RequestAtLeast(16, Terran.Factory))
+  )
 }

@@ -1,4 +1,4 @@
-package Planning.Plans.GamePlans.Terran.TvE
+package Planning.Plans.GamePlans.Terran.Standard.TvE
 
 import Information.Geography.Types.Zone
 import Lifecycle.With
@@ -9,6 +9,8 @@ import Planning.Composition.UnitCounters.UnitCountExcept
 import Planning.Composition.UnitMatchers.UnitMatchWorkers
 import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Compound._
+import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.Information.Employing
 import Planning.Plans.Macro.Automatic.{Gather, TrainContinuously}
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, FirstEightMinutes, FollowBuildOrder, RequireEssentials}
@@ -16,8 +18,11 @@ import Planning.Plans.Macro.Milestones.UnitsAtLeast
 import Planning.Plans.Scouting.Scout
 import Planning.ProxyPlanner
 import ProxyBwapi.Races.Terran
+import Strategery.Strategies.Terran.TvE.TvEProxy5Rax
 
-class Proxy5Rax extends Parallel {
+class Proxy5Rax extends GameplanModeTemplate {
+  
+  override val activationCriteria = new Employing(TvEProxy5Rax)
   
   lazy val proxyZone: Option[Zone] = ProxyPlanner.proxyAutomaticAggressive
   

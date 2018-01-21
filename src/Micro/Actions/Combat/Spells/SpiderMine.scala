@@ -8,6 +8,8 @@ import Micro.Heuristics.Spells.TargetAOE
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
+import scala.collection.mutable
+
 object SpiderMine extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
@@ -48,6 +50,15 @@ object SpiderMine extends Action {
     val rangeMinimum = if (vulture.matchups.doomedDiffused) 64.0 else 0.0
     val range = vulture.topSpeed * (vulture.matchups.framesToLiveCurrently - 12)
     val maxRangeTiles = PurpleMath.clamp(range, rangeMinimum, 8.0 * 32.0)
+  
+    //TODO: This is a good candidate for Coordinator since every Vulture will want to recalculate this
+    val victims = vulture.matchups.targets.filterNot(_.unitClass.floats)
+    if (victims.isEmpty) return
+    
+    val saboteursInitial = new mutable.PriorityQueue[UnitInfo]()(Ordering.by(v => victims.map(_.pixelDistanceFast(v)).min))
+    val saboteursFinal = saboteursInitial.take(victims.size).toVector
+    
+    if ( ! saboteursFinal.contains(vulture)) return
     
     val targeter = new Targeter(vulture)
     val targetPixel = TargetAOE.chooseTargetPixel(
@@ -70,13 +81,9 @@ object SpiderMine extends Action {
           0.0
         else if (target.unitClass.isBuilding)
           0.0
-        else if (target.unitClass.floats)
-          0.0
-        else if (target.matchups.threats.exists(v => v.is(Terran.Vulture) && v.pixelDistanceFast(target) < vulture.pixelDistanceFast(target)))
-          0.0
         else
           1.0
-    
+      
       val ownership = if (target.isFriendly) -3.0 else 1.0
       val output = target.subjectiveValue * multiplier * ownership
     

@@ -1,9 +1,11 @@
-package Planning.Plans.GamePlans.Terran.TvZ
+package Planning.Plans.GamePlans.Terran.Standard.TvZ
 
 import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
-import Planning.Plans.Army._
+import Planning.Plan
 import Planning.Plans.Compound._
+import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.GamePlans.Terran.Situational.TvZPlacement
 import Planning.Plans.Information.Employing
 import Planning.Plans.Information.Reactive.{EnemyLurkers, EnemyMutalisks}
 import Planning.Plans.Macro.Automatic._
@@ -11,20 +13,21 @@ import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding._
 import Planning.Plans.Macro.Milestones.{IfOnMiningBases, OnGasPumps, UnitsAtLeast}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
-import Planning.Plans.Scouting.ScoutAt
 import ProxyBwapi.Races.{Terran, Zerg}
-import Strategery.Strategies.Terran.TvZ.TvZMidgameWraiths
+import Strategery.Strategies.Terran.TvZ.{TvZMidgameMech, TvZMidgameWraiths}
 
-class TerranVsZergMech extends Parallel {
+class TerranVsZergMech extends  GameplanModeTemplate {
   
-  children.set(Vector(
-    new RequireSufficientSupply,
+  override val activationCriteria: Plan = new Or(
+    new Employing(TvZMidgameMech),
+    new Employing(TvZMidgameWraiths))
+  
+  override def defaultPlacementPlan: Plan = new TvZPlacement
+  
+  override def buildPlans: Seq[Plan] = Vector(
     new TrainContinuously(Terran.Comsat),
-    new TrainWorkersContinuously,
     new BuildGasPumps,
-    
     new TrainContinuously(Terran.Marine),
-    
     new Build(RequestAtLeast(1, Terran.Bunker)),
     new IfOnMiningBases(2,
       new Build(
@@ -32,7 +35,6 @@ class TerranVsZergMech extends Parallel {
         RequestAtLeast(1, Terran.Refinery),
         RequestAtLeast(1, Terran.Factory),
         RequestAtLeast(1, Terran.MachineShop))),
-    
     new If(new EnemyMutalisks, new Parallel(new BuildMissileTurretsAtBases(3), new TrainContinuously(Terran.Armory, 1), new TrainContinuously(Terran.Starport, 1), new TrainContinuously(Terran.ControlTower, 1))),
     new If(new EnemyLurkers, new Build(RequestAtLeast(1, Terran.EngineeringBay), RequestAtLeast(1, Terran.MissileTurret), RequestAtLeast(1, Terran.Academy))),
       
@@ -118,9 +120,6 @@ class TerranVsZergMech extends Parallel {
     
     new RequireMiningBases(3),
     new TrainContinuously(Terran.Vulture),
-    new Build(RequestAtLeast(16, Terran.Barracks)),
-    new ScoutAt(16),
-    new DefendZones,
-    new ConsiderAttacking
-  ))
+    new Build(RequestAtLeast(16, Terran.Barracks))
+  )
 }

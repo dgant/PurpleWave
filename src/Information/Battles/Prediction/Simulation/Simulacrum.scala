@@ -43,7 +43,7 @@ class Simulacrum(
   var valueDealt        : Double                      = 0.0
   var valueReceived     : Double                      = 0.0
   var kills             : Int                         = 0
-  var valuePerDamage    : Double                      = realUnit.subjectiveValue / realUnit.unitClass.maxTotalHealth //MicroValue.valuePerDamage(realUnit)
+  var valuePerDamage    : Double                      = PurpleMath.nanToZero(realUnit.subjectiveValue.toDouble / realUnit.unitClass.maxTotalHealth)
   var moves             : ArrayBuffer[(Pixel, Pixel)] = new ArrayBuffer[(Pixel, Pixel)]
   
   lazy val targetQueue: mutable.PriorityQueue[Simulacrum] = (

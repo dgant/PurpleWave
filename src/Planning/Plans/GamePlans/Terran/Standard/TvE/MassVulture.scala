@@ -1,4 +1,4 @@
-package Planning.Plans.GamePlans.Terran.TvE
+package Planning.Plans.GamePlans.Terran.Standard.TvE
 
 import Macro.BuildRequests.{RequestAtLeast, RequestTech}
 import Planning.Composition.UnitMatchers.{UnitMatchAnd, UnitMatchMobileFlying, UnitMatchWarriors}
@@ -6,16 +6,23 @@ import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.Information.Employing
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.{EnemyUnitsAtLeast, UnitsAtLeast}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import ProxyBwapi.Races.Terran
+import Strategery.Strategies.Terran.TvE.TvEMassVulture
 
 class MassVulture extends GameplanModeTemplate {
   
-  override def defaultAttackPlan: Plan = new Attack
+  override val activationCriteria = new Employing(TvEMassVulture)
+  
+  override def defaultAttackPlan: Plan =
+    new Trigger(
+      new UnitsAtLeast(1, Terran.Vulture, complete = true),
+      new Attack)
   
   override val buildOrder = Vector(
     RequestAtLeast(1,   Terran.CommandCenter),
@@ -32,12 +39,6 @@ class MassVulture extends GameplanModeTemplate {
   
   override def buildPlans: Seq[Plan] = Vector(
     new Build(RequestAtLeast(1, Terran.Factory)),
-    new If(
-      new EnemyUnitsAtLeast(1, UnitMatchAnd(UnitMatchWarriors, UnitMatchMobileFlying)),
-      new Parallel(
-        new Build(RequestAtLeast(1, Terran.Armory)),
-        new BuildGasPumps,
-        new TrainContinuously(Terran.Goliath))),
     new Trigger(
       new UnitsAtLeast(1, Terran.Vulture),
       new TrainContinuously(Terran.MachineShop, 2)),
@@ -45,11 +46,19 @@ class MassVulture extends GameplanModeTemplate {
     new Trigger(
       new UnitsAtLeast(2, Terran.MachineShop),
       new Build(RequestTech(Terran.SpiderMinePlant))),
-    new TrainContinuously(Terran.Vulture),
-    new Build(RequestAtLeast(3, Terran.Factory)),
+    new If(
+      new EnemyUnitsAtLeast(1, UnitMatchAnd(UnitMatchWarriors, UnitMatchMobileFlying)),
+      new Parallel(
+        new Build(RequestAtLeast(1, Terran.Armory)),
+        new BuildGasPumps,
+        new TrainContinuously(Terran.Goliath),
+        new UpgradeContinuously(Terran.GoliathAirRange),
+        new TrainContinuously(Terran.Marine)),
+      new TrainContinuously(Terran.Vulture)),
+    new Build(RequestAtLeast(5, Terran.Factory)),
     new RequireMiningBases(2),
-    new Build(RequestAtLeast(7, Terran.Factory)),
+    new Build(RequestAtLeast(10, Terran.Factory)),
     new RequireMiningBases(3),
-    new Build(RequestAtLeast(12, Terran.Factory))
+    new Build(RequestAtLeast(15, Terran.Factory))
   )
 }

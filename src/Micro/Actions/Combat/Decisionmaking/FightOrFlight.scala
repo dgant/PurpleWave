@@ -24,6 +24,7 @@ object FightOrFlight extends Action {
     decide(true,        () => unit.agent.canBerzerk)
     decide(true,        () => unit.effectivelyCloaked)
     decide(true,        () => Yolo.active)
+    decide(true,        () => unit.battle.isEmpty)
     decide(true,        () => unit.matchups.threats.isEmpty)
     decide(false,       () => ! unit.agent.canFight)
     decide(false,       () => unit.underDisruptionWeb && ! unit.flying)

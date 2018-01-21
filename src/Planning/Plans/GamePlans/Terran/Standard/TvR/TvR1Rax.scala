@@ -12,12 +12,12 @@ import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Milestones.UnitsAtLeast
 import ProxyBwapi.Races.Terran
-import Strategery.Strategies.Terran.TvR.TvR1RaxFE
+import Strategery.Strategies.Terran.TvR.TvR1Rax
 
 class TvR1Rax extends GameplanModeTemplateVsRandom {
   
-  override val activationCriteria: Plan = new Employing(TvR1RaxFE)
-  override val completionCriteria: Plan = new UnitsAtLeast(4, UnitMatchWarriors)
+  override val activationCriteria: Plan = new Employing(TvR1Rax)
+  override val completionCriteria: Plan = new UnitsAtLeast(2, UnitMatchWarriors)
   
   override val buildOrder = Vector(
     RequestAtLeast(1,   Terran.CommandCenter),
@@ -32,7 +32,6 @@ class TvR1Rax extends GameplanModeTemplateVsRandom {
         new SafeAtHome,
         new UnitsAtLeast(1, Terran.Bunker),
         new UnitsAtLeast(8, Terran.Marine)),
-      
       new BunkersAtNatural(2)),
   
     new TrainContinuously(Terran.Marine),
@@ -41,9 +40,5 @@ class TvR1Rax extends GameplanModeTemplateVsRandom {
       new Build(
         RequestAtLeast(1, Terran.Bunker),
         RequestAtLeast(4, Terran.Barracks))),
-    new FlipIf(
-      new And(
-        new SafeAtHome,
-        new UnitsAtLeast(4, UnitMatchWarriors))),
-      new RequireMiningBases(2))
+    new RequireMiningBases(2))
 }

@@ -3,9 +3,12 @@ package Planning.Plans.Army
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Micro.Agency.Intention
+import Micro.Squads.Goals.SquadDrop
+import Micro.Squads.Squad
 import Planning.Composition.Property
 import Planning.Composition.ResourceLocks.LockUnits
 import Planning.Composition.UnitCounters.UnitCountOne
+import Planning.Composition.UnitMatchers.UnitMatchTransport
 import Planning.Plan
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -23,6 +26,13 @@ class NukeBase extends Plan {
   nukeLock.get.unitCounter.set(UnitCountOne)
   nukeLock.get.interruptable.set(false)
   
+  private val transportLock = new Property(new LockUnits)
+  transportLock.get.unitMatcher.set(UnitMatchTransport)
+  transportLock.get.unitCounter.set(UnitCountOne)
+  transportLock.get.interruptable.set(false)
+  
+  val squad = new Squad(this)
+  
   override def onUpdate() {
     nukeLock.get.acquire(this)
     if ( ! nukeLock.get.isSatisfied) return
@@ -37,8 +47,12 @@ class NukeBase extends Plan {
     val targetBest = ByOption.maxBy(targets)(_._2)
     
     if (targetBest.exists(_._2 >= 0)) {
-      nukerLock.get.units.foreach(nuker => nuker.agent.intend(this, new Intention {
-        toNuke = Some(targetBest.get._1.heart.pixelCenter)
+      val targetPixel = targetBest.get._1.heart.pixelCenter
+      squad.conscript(transportLock.get.units)
+      nukers.foreach(squad.recruit)
+      squad.goal = new SquadDrop(targetPixel)
+      nukers.foreach(nuker => nuker.agent.intend(this, new Intention {
+        toNuke = Some(targetPixel)
       }))
     }
     else {

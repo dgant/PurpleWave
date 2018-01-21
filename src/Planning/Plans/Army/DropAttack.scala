@@ -59,7 +59,6 @@ class DropAttack extends Plan {
   }
   
   protected def evaluateBase(base: Base): Double = {
-    
     val value           = base.workers.size.toDouble
     val distanceNormal  = 32.0 * 50.0
     val distanceGround  = distanceNormal + Math.min(With.geography.home.pixelCenter.groundPixels(base.heart.pixelCenter), 32.0 * 256.0 * 1.41)

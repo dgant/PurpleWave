@@ -4,7 +4,7 @@ import Strategery.Strategies.Strategy
 import Strategery.Strategies.Terran.TerranChoices
 import bwapi.Race
 
-object TvR1RaxFE extends Strategy {
+object TvR1Rax extends Strategy {
   
   override lazy val choices = Vector(
     TerranChoices.tvtOpeners,

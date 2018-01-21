@@ -3,7 +3,7 @@ package Strategery.Strategies.Terran
 import Strategery.Strategies.AllRaces.WorkerRush
 import Strategery.Strategies.Terran.FFA.TerranFFABio
 import Strategery.Strategies.Terran.TvE._
-import Strategery.Strategies.Terran.TvR.{TvR1RaxFE, TvRTinfoil}
+import Strategery.Strategies.Terran.TvR.{TvR1Rax, TvRTinfoil}
 import Strategery.Strategies.Terran.TvT.TvTStandard
 import Strategery.Strategies.Terran.TvZ._
 import Strategery.Strategies._
@@ -15,10 +15,15 @@ object TerranChoices {
   /////////
   
   val tvr = Vector(
+    WorkerRush,
+    TvEProxy5Rax,
+    TvEProxy8Fact,
+    TvEProxyBBS,
     TvEMassMarine,
     TvEMassVulture,
-    TvR1RaxFE,
-    TvRTinfoil)
+    TvR1Rax,
+    TvRTinfoil,
+    TerranFFABio)
   
   /////////
   // TvT //
@@ -54,15 +59,6 @@ object TerranChoices {
   /////////
   // All //
   /////////
-  
-  val gimmickOpeners = Vector(
-    WorkerRush,
-    TvEProxy5Rax,
-    TvEProxy8Fact,
-    TvEProxyBBS,
-    TvEMassMarine,
-    TvEMassVulture,
-    TerranFFABio)
   
   val all: Vector[Strategy] = (gimmickOpeners ++ normalOpeners).distinct
 }

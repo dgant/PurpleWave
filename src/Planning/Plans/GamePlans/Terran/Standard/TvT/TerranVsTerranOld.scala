@@ -22,6 +22,8 @@ class TerranVsTerranOld extends GameplanModeTemplate {
   
   override val activationCriteria = new Employing(TvTStandard)
   
+  
+  
   override def defaultPlacementPlan: Plan = new BunkersAtNatural(1)
   
   override def defaultAttackPlan: Plan = new Trigger(

@@ -4,7 +4,7 @@ import Lifecycle.With
 import Mathematics.Physics.{Force, ForceMath}
 import Mathematics.Points.SpecificPoints
 import Mathematics.PurpleMath
-import Micro.Agency.Explosion
+import Micro.Agency.OldExplosion
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
@@ -80,7 +80,7 @@ object Potential {
     output
   }
   
-  def explosionRepulsion(unit: FriendlyUnitInfo, explosion: Explosion): Force = {
+  def explosionRepulsion(unit: FriendlyUnitInfo, explosion: OldExplosion): Force = {
     val magnitudeDamage   = explosion.damage
     val magnitudeDistance = explosion.safetyRadius / Math.max(1.0, unit.pixelDistanceFast(explosion.pixelCenter))
     val magnitudeFinal    = magnitudeDamage / magnitudeDistance

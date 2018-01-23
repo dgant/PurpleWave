@@ -3,7 +3,7 @@ package Micro.Actions.Combat.Maneuvering
 import Debugging.Visualizations.ForceColors
 import Micro.Actions.Action
 import Micro.Actions.Commands.{Attack, Gravitate}
-import Micro.Agency.Explosion
+import Micro.Agency.OldExplosion
 import Micro.Decisions.Potential
 import Planning.Yolo
 import ProxyBwapi.Races.{Protoss, Terran}
@@ -32,8 +32,8 @@ object Duck extends Action {
     }
   }
   
-  private def getExplosions(unit: FriendlyUnitInfo): Iterable[Explosion] = {
-    val output = new ListBuffer[Explosion]
+  private def getExplosions(unit: FriendlyUnitInfo): Iterable[OldExplosion] = {
+    val output = new ListBuffer[OldExplosion]
     
     output ++= (
       unit.matchups.threats ++
@@ -43,7 +43,7 @@ object Duck extends Action {
     output.filter(explosion => explosion.safetyRadius > unit.pixelDistanceFast(explosion.pixelCenter))
   }
   
-  private def explosion(unit: FriendlyUnitInfo, threat: UnitInfo): Option[Explosion] = {
+  private def explosion(unit: FriendlyUnitInfo, threat: UnitInfo): Option[OldExplosion] = {
     
     if (threat.is(Terran.SpiderMine)
       && ! unit.flying
@@ -58,7 +58,7 @@ object Duck extends Action {
           // However, this is often limited by Spider Mine sight range, which is 96px exactly.
           // According to jaj22 the acqusition range is center-to-center (unlike most units, which are edge-to-edge)
           val safetyMarginPixels = 96.0
-          Some(Explosion(
+          Some(OldExplosion(
             threat.pixelCenter,
             32.0 * 3.0 + safetyMarginPixels,
             threat.damageOnNextHitAgainst(unit)
@@ -73,7 +73,7 @@ object Duck extends Action {
         }
         else {
           val safetyMarginPixels = 0.0
-          Some(Explosion(
+          Some(OldExplosion(
             threat.projectFrames(4),
             32.0 * 2.0 + 10.0 + unit.unitClass.radialHypotenuse + safetyMarginPixels,
             threat.damageOnNextHitAgainst(unit) // 3 is the range; 1 is the safety margin to avoid triggering it
@@ -88,7 +88,7 @@ object Duck extends Action {
       if ( ! target.contains(unit)) {
         val targetPixel = target.map(_.pixelCenter).getOrElse(threat.projectFrames(4))
         val safetyMarginPixels = 32.0
-        Some(Explosion(
+        Some(OldExplosion(
           targetPixel,
           60.0 * + unit.unitClass.radialHypotenuse + safetyMarginPixels,
           threat.damageOnNextHitAgainst(unit)

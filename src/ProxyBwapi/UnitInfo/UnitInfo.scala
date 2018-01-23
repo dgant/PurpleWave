@@ -221,14 +221,17 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   def pixelDistanceTravelling (from: Pixel, to: Pixel)  : Double  = if (flying) from.pixelDistanceFast(to) else from.groundPixels(to)
   
   def pixelsFromEdge(other: UnitInfo): Double  = {
+    pixelsFromBox(Pixel(other.left, other.top), Pixel(other.right, other.bottom))
+  }
+  def pixelsFromBox(start: Pixel, end: Pixel): Double  = {
     val x0me = left
     val y0me = top
     val x1me = right
     val y1me = bottom
-    val x0you = other.left
-    val y0you = other.top
-    val x1you = other.right
-    val y1you = other.bottom
+    val x0you = start.x
+    val y0you = start.y
+    val x1you = end.x
+    val y1you = end.y
     if (x1you < x0me) {
       if (y1you < y0me) {
         return PurpleMath.broodWarDistance(x1you, y1you, x0me, y0me);

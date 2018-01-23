@@ -71,7 +71,7 @@ class Agent(val unit: FriendlyUnitInfo) {
   
   var targetingProfile: TargetingProfile = TargetingProfiles.default
   
-  var explosions: ListBuffer[Explosion] = new ListBuffer[Explosion]
+  var explosions: ListBuffer[OldExplosion] = new ListBuffer[OldExplosion]
   
   var lastStim: Int = 0
   var lastCloak: Int = 0

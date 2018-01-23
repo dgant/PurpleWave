@@ -1,6 +1,6 @@
 package Mathematics
 
-import Mathematics.Points.Point
+import Mathematics.Points.{AbstractPoint, Point}
 
 object PurpleMath {
   
@@ -72,4 +72,50 @@ object PurpleMath {
   }
   
   def broodWarDistance(a: Point, b: Point): Double = broodWarDistance(a.x, a.y, b.x, b.y)
+  
+  def distanceFromLineSegment(
+    point: AbstractPoint,
+    segmentStart: AbstractPoint,
+    segmentEnd: AbstractPoint)
+      : Double = {
+    val x = point.x
+    val y = point.y
+    val x0 = segmentStart.x
+    val y0 = segmentStart.y
+    val x1 = segmentEnd.x
+    val y1 = segmentEnd.y
+    
+    val dx0 = x - x0
+    val dy0 = y - y0
+    val dx1 = x1 - x0
+    val dy1 = y1 - y0
+  
+    val dotProduct = dx0 * dx1 + dy0 * dy1
+    val lengthSquared = dx1 * dx1 + dy1 * dy1
+    var param = -1.0
+    if (lengthSquared != 0) {
+      param = dotProduct / lengthSquared
+    }
+  
+    var xx = 0.0
+    var yy = 0.0
+  
+    if (param < 0) {
+      xx = x0
+      yy = y0
+    }
+    else if (param > 1) {
+      xx = x1
+      yy = y1
+    }
+    else {
+      xx = x0 + param * dx1
+      yy = y0 + param * dy1
+    }
+  
+    var dx = x - xx
+    var dy = y - yy
+    
+    Math.sqrt(dx * dx + dy * dy)
+  }
 }

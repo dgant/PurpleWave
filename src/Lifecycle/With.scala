@@ -11,10 +11,12 @@ import Macro.Allocation._
 import Macro.Architecture.{Architecture, PlacementScheduler}
 import Macro.Scheduling.{MasterBuildOrder, Scheduler}
 import Micro.Agency.{Agency, Commander}
+import Micro.Coordination.Coordinator
 import Micro.Matchups.MatchupGraph
 import Micro.Squads.Squads
 import Performance.TaskQueue.{AbstractTaskQueue, TaskQueueGlobal}
 import Planning.Blackboard
+import ProxyBwapi.Bullets.Bullets
 import ProxyBwapi.Players.{PlayerInfo, Players}
 import ProxyBwapi.ProxyBWMirror
 import ProxyBwapi.UnitTracking.UnitTracker
@@ -33,8 +35,10 @@ object With {
   var blackboard      : Blackboard          = _
   var battles         : BattleClassifier    = _
   var buildOrder      : MasterBuildOrder    = _
+  var bullets         : Bullets             = _
   var camera          : Camera              = _
   var commander       : Commander           = _
+  var coordinator     : Coordinator         = _
   var configuration   : Configuration       = _
   var damageCredit    : DamageCredit        = _
   var economy         : Economy             = _
@@ -101,8 +105,10 @@ object With {
     battles           = new BattleClassifier
     blackboard        = new Blackboard
     buildOrder        = new MasterBuildOrder
+    bullets           = new Bullets
     camera            = new Camera
     commander         = new Commander
+    coordinator       = new Coordinator
     damageCredit      = new DamageCredit
     economy           = new Economy
     groundskeeper     = new Groundskeeper

@@ -73,13 +73,6 @@ object Potential {
   // Explosions //
   ////////////////
   
-  def explosionsRepulsion(unit: FriendlyUnitInfo): Force = {
-    val explosions  = unit.agent.explosions
-    val forces      = explosions.map(explosionRepulsion(unit, _))
-    val output      = ForceMath.sum(forces).normalize
-    output
-  }
-  
   def explosionRepulsion(unit: FriendlyUnitInfo, explosion: OldExplosion): Force = {
     val magnitudeDamage   = explosion.damage
     val magnitudeDistance = explosion.safetyRadius / Math.max(1.0, unit.pixelDistanceFast(explosion.pixelCenter))

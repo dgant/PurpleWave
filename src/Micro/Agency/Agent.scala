@@ -71,8 +71,6 @@ class Agent(val unit: FriendlyUnitInfo) {
   
   var targetingProfile: TargetingProfile = TargetingProfiles.default
   
-  var explosions: ListBuffer[OldExplosion] = new ListBuffer[OldExplosion]
-  
   var lastStim: Int = 0
   var lastCloak: Int = 0
   var shouldEngage: Boolean = false
@@ -146,7 +144,6 @@ class Agent(val unit: FriendlyUnitInfo) {
   
   private def resetState() {
     forces.clear()
-    explosions.clear()
     netEngagementValue  = 1.0
     movingTo            = None
     targetingProfile    = TargetingProfiles.default

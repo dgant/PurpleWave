@@ -1,6 +1,7 @@
 package Micro.Actions.Combat.Spells
 
 import Lifecycle.With
+import Mathematics.Points.Pixel
 import Micro.Actions.Action
 import Micro.Heuristics.Spells.{TargetAOE, TargetSingle}
 import ProxyBwapi.Techs.Tech
@@ -40,10 +41,14 @@ abstract class TargetedSpell extends Action {
     if (aoe) {
       val targetPixel = TargetAOE.chooseTargetPixel(unit, totalRange, thresholdValue, valueTarget)
       targetPixel.foreach(With.commander.useTechOnPixel(unit, tech, _))
+      targetPixel.foreach(onCast(unit, _))
     }
     else {
       val targetUnit = TargetSingle.chooseTarget(unit, totalRange, thresholdValue, valueTarget)
       targetUnit.foreach(With.commander.useTechOnUnit(unit, tech, _))
     }
   }
+  
+  // Event handler for when the unit issues a cast
+  protected def onCast(caster: FriendlyUnitInfo, target: Pixel) {}
 }

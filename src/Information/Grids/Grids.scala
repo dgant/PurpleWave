@@ -3,6 +3,7 @@ package Information.Grids
 
 import Information.Grids.Construction._
 import Information.Grids.Movement._
+import Information.Grids.Spells.GridPsionicStorm
 import Information.Grids.Vision._
 
 class Grids {
@@ -24,6 +25,7 @@ class Grids {
   val mobilityForceGround     = new GridMobilityForceGround
   val psi2Height              = new GridPsi2Height
   val psi3Height              = new GridPsi3Height
+  val psionicStorm            = new GridPsionicStorm
   val units                   = new GridUnits
   val walkable                = new GridWalkable
   val walkableTerrain         = new GridWalkableTerrain

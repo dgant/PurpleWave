@@ -1,9 +1,11 @@
 package Micro.Actions.Combat.Spells
 
+import Lifecycle.With
+import Mathematics.Points.Pixel
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClass.UnitClass
-import ProxyBwapi.UnitInfo.UnitInfo
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object PsionicStorm extends TargetedSpell {
   
@@ -14,6 +16,7 @@ object PsionicStorm extends TargetedSpell {
   override protected def thresholdValue : Double    = casterClass.subjectiveValue / 2.0
   
   override protected def valueTarget(target: UnitInfo): Double = {
+    if (With.grids.psionicStorm.isSet(target.tileIncludingCenter)) return 0.0
     if (target.unitClass.isBuilding)  return 0.0
     if (target.underStorm)            return 0.0
     if (target.invincible)            return 0.0
@@ -29,5 +32,9 @@ object PsionicStorm extends TargetedSpell {
     )
     
     output
+  }
+  
+  override def onCast(caster: FriendlyUnitInfo, target: Pixel) {
+    With.grids.psionicStorm.addPsionicStorm(target)
   }
 }

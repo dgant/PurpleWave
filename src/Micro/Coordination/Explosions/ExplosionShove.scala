@@ -1,5 +1,5 @@
 package Micro.Coordination.Explosions
 
-class ExplosionShove extends Explosion {
+abstract class ExplosionShove extends Explosion {
   
 }

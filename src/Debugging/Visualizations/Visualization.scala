@@ -46,6 +46,7 @@ class Visualization {
     ShowScheduler,
     ShowBlackScreen,
     ShowBulletsAsHearts,
+    ShowExplosions,
     ShowHappyUnits,
     ShowHappyVision,
     ShowIntelligence,

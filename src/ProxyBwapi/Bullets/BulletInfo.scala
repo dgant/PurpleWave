@@ -8,16 +8,16 @@ import bwapi.Bullet
 
 class BulletInfo(bwapi: Bullet) {
   
-  lazy val id           : Int               = bwapi.getID
-  lazy val exists       : Boolean           = bwapi.exists
-  lazy val player       : PlayerInfo        = Players.get(bwapi.getPlayer)
-  lazy val pixel        : Pixel             = new Pixel(bwapi.getPosition)
-  lazy val sourceUnit   : Option[UnitInfo]  = With.units.get(bwapi.getSource)
-  lazy val targetUnit   : Option[UnitInfo]  = With.units.get(bwapi.getTarget)
-  lazy val targetPixel  : Pixel             = new Pixel(bwapi.getTargetPosition)
-  lazy val angleRadians : Double            = bwapi.getAngle
-  lazy val bulletType   : String            = bwapi.getType.toString
-  lazy val velocityX    : Double            = bwapi.getVelocityX
-  lazy val velocityY    : Double            = bwapi.getVelocityY
-  lazy val framesRemaining   : Int               = bwapi.getRemoveTimer
+  lazy val id               : Int               = bwapi.getID
+  lazy val exists           : Boolean           = bwapi.exists
+  lazy val player           : PlayerInfo        = Players.get(bwapi.getPlayer)
+  lazy val pixel            : Pixel             = new Pixel(bwapi.getPosition)
+  lazy val sourceUnit       : Option[UnitInfo]  = With.units.get(bwapi.getSource)
+  lazy val targetUnit       : Option[UnitInfo]  = With.units.get(bwapi.getTarget)
+  lazy val targetPixel      : Pixel             = new Pixel(bwapi.getTargetPosition)
+  lazy val angleRadians     : Double            = bwapi.getAngle
+  lazy val bulletType       : String            = "bababooi" // This crashes :( bwapi.getType.toString
+  lazy val velocityX        : Double            = bwapi.getVelocityX
+  lazy val velocityY        : Double            = bwapi.getVelocityY
+  lazy val framesRemaining  : Int               = bwapi.getRemoveTimer
 }

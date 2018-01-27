@@ -10,9 +10,9 @@ import Planning.Plans.Information.{Employing, SafeAtHome}
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Macro.Milestones.{IfOnMiningBases, MiningBasesAtLeast, UnitsAtLeast}
+import Planning.Plans.Macro.Milestones.{EnemyUnitsAtLeast, IfOnMiningBases, MiningBasesAtLeast, UnitsAtLeast}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
-import ProxyBwapi.Races.Terran
+import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Terran.TvE.TvTPNukeDrop
 
 class TvTPNukeDrop extends GameplanModeTemplate {
@@ -43,6 +43,15 @@ class TvTPNukeDrop extends GameplanModeTemplate {
     new TrainContinuously(Terran.SCV),
     new TrainContinuously(Terran.Ghost, 2, 1),
     new TrainContinuously(Terran.Dropship, 2, 1),
+    new If(
+      new Or(
+        new EnemyUnitsAtLeast(1, Terran.Wraith),
+        new EnemyUnitsAtLeast(1, Protoss.Scout)),
+      new TrainContinuously(Terran.Wraith),
+      new Build(
+        RequestTech(Terran.WraithCloak),
+        RequestAtLeast(2, Terran.Starport))
+    ),
     new FlipIf(
       new And(
         new SafeAtHome,

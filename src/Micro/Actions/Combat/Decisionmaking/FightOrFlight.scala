@@ -49,6 +49,7 @@ object FightOrFlight extends Action {
     
     lazy val motivated = unit.agent.netEngagementValue > 0.0 && estimationAttack.exists(e => e.costToEnemy > e.costToUs * With.configuration.lastStandMinimumValueRatio)
     val output = unit.battle.isEmpty || motivated
+    
     unit.agent.shouldEngage = output
   }
 }

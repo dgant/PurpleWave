@@ -130,6 +130,8 @@ class Gather extends Plan {
         unassignSupersaturatingWorkers()
       }
     
+    // TODO: This is incapable of, say, taking workers off of gas
+    // because those workers will never make it
     unassignedWorkers       = allWorkers.diff(resourceByWorker.keySet)
     numberToAddToGas        = Math.max(0, workersForGas - workersOnGas)
     workersToAddToGas       = unassignedWorkers.take(numberToAddToGas)
@@ -139,9 +141,18 @@ class Gather extends Plan {
   var lastFrameUnassigning = 0
   def unassignSupersaturatingWorkers() {
     lastFrameUnassigning = With.frame
+    val supersaturatedGas = gasses.filter(needPerGas(_) < 0)
     val supersaturatedMinerals = minerals.filter(needPerMineral(_) < 0)
-    val supersaturationWorkerGroups = supersaturatedMinerals.flatten(workersByResource.get)
-    supersaturationWorkerGroups.foreach(_.drop(2).foreach(unassignWorker))
+    supersaturatedMinerals
+      .foreach(mineral =>
+        workersByResource(mineral)
+          .take(Math.ceil(-needPerMineral(mineral)).toInt)
+          .foreach(unassignWorker))
+    supersaturatedGas
+      .foreach(gas =>
+        workersByResource(gas)
+          .take(Math.ceil(-needPerGas(gas)).toInt)
+          .foreach(unassignWorker))
   }
   
   private def distributeUnassignedWorkers() {
@@ -153,7 +164,7 @@ class Gather extends Plan {
     if (minerals.isEmpty) return
     val mineral = minerals
       .toVector
-      .sortBy(_.pixelDistanceSquared(worker.pixelCenter))
+      .sortBy(_.pixelsFromEdge(worker))
       .maxBy(needPerMineral)
     assignWorker(worker, mineral)
     needPerMineral(mineral) -= 1
@@ -163,7 +174,7 @@ class Gather extends Plan {
     if (gasses.isEmpty) return
     val gas = gasses
       .toVector
-      .sortBy(_.pixelDistanceSquared(worker.pixelCenter))
+      .sortBy(_.pixelsFromEdge(worker))
       .maxBy(needPerGas)
     assignWorker(worker, gas)
     needPerGas(gas) -= 1

@@ -147,6 +147,7 @@ class Simulacrum(
     if (cooldownShooting > 0)         return
     if ( ! validTargetExistsInRange)  return
     val victim = target.get
+    val victimWasAliveBefore = victim.hitPoints > 0
     val damageToVictim = Math.min(
       victim.hitPoints,
       realUnit.damageOnNextHitAgainst(
@@ -165,9 +166,11 @@ class Simulacrum(
     victim.hitPoints      -= damageToHitPoints
     victim.damageReceived += damageToVictim
     victim.valueReceived  += valueDamage
-    if (victim.hitPoints <= 0) {
+    if (victim.hitPoints <= 0 && victimWasAliveBefore) {
       kills += 1
-      valueDealt += victim.realUnit.subjectiveValue * (1.0 - With.configuration.nonLethalDamageValue)
+      val killValue = victim.realUnit.subjectiveValue * (1.0 - With.configuration.nonLethalDamageValue)
+      valueDealt += killValue
+      victim.valueReceived += killValue
     }
     dead                  = dead || realUnit.unitClass.suicides
     simulation.updated    = true

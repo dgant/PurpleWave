@@ -17,6 +17,8 @@ abstract class DefendFFEWithProbes extends Plan {
   protected def probeCount: Int
   
   override def onUpdate() {
+    
+    if (With.intel  )
   
     var cannons = With.units.ours.filter(_.is(Protoss.PhotonCannon))
     if (cannons.isEmpty) cannons = With.units.ours.filter(_.is(Protoss.Forge))

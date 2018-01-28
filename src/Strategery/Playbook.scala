@@ -42,8 +42,6 @@ object StrategyGroups {
     PvTEarly1GateProxy,
     PvT3BaseCorsair,
     CarriersWithNoDefense,
-    PvZEarlyFFEGatewayFirst,
-    PvZEarlyFFENexusFirst,
     ProxyDarkTemplar
   )
 }
@@ -65,5 +63,5 @@ class PurpleCheesePlaybook extends EmptyPlaybook  {
   override lazy val forced: Seq[Strategy] = StrategyGroups.cheese
 }
 
-object Playbook extends PurpleWavePlaybook {
+object Playbook extends TestingPlaybook {
 }

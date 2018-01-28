@@ -25,8 +25,8 @@ class WorkerRush extends Trigger {
     new Trigger(
       new UnitsAtLeast(5, UnitMatchWorkers, complete = true),
       initialAfter = new Gather {
-        workers.unitCounter.set(UnitCountExactly(1))
-        workers.unitPreference.set(UnitPreferClose(With.geography.home.pixelCenter))
+        workerLock.unitCounter.set(UnitCountExactly(1))
+        workerLock.unitPreference.set(UnitPreferClose(With.geography.home.pixelCenter))
         //workers.interruptable.set(false) // Note that this means we can't build more workers until another Probe spawns. But that also means Probes aren't dying.
       }),
     new AttackWithWorkers)

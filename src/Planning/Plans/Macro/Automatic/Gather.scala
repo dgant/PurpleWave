@@ -12,7 +12,6 @@ import scala.collection.mutable
 
 class Gather extends Plan {
   
-  
   val workerLock = new LockUnits {
     unitMatcher.set(UnitMatchWorkers)
     unitCounter.set(UnitCountEverything)
@@ -73,17 +72,23 @@ class Gather extends Plan {
   }
   
   private def utility(worker: FriendlyUnitInfo, resource: UnitInfo): Double = {
-    val saturationCap = if (resource.unitClass.isMinerals) 2 else 3
-    val continuity = if (resourceByWorker.get(worker).contains(resource)) 1.2 else 1.0
+    val need =
+      if (gasWorkersNow == gasWorkersMax)
+        1.0
+      else if (resource.unitClass.isGas == (gasWorkersNow < gasWorkersMax))
+        100.0
+      else 1.0
+    val continuity = if (resourceByWorker.get(worker).contains(resource)) 10.0 else 1.0
+    val proximity = resource.base.flatMap(_.townHall).map(_.pixelsFromEdge(resource)).getOrElse(32 * 12)
     val distance = worker.pixelsFromEdge(resource)
     val saturation =
-      if (workersByResource(resource).size >= saturationCap)
-        0.001
+      if (workersByResource(resource).size >= (if (resource.unitClass.isMinerals) 2 else 3))
+        0.1
       else if (resource.unitClass.isMinerals && workersByResource(resource).nonEmpty)
         0.8
       else
         1.0
-    val output = continuity * saturation / Math.log(32.0 + distance)
+    val output = need * continuity * saturation / (128.0 + distance)
     output
   }
   

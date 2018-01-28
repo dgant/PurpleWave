@@ -12,4 +12,6 @@ object PvZEarlyFFEGatewayFirst extends Strategy {
   
   override def ourRaces    : Iterable[Race] = Vector(Race.Protoss)
   override def enemyRaces  : Iterable[Race] = Vector(Race.Zerg)
+  
+  override def minimumGamesVsOpponent: Int = 5
 }

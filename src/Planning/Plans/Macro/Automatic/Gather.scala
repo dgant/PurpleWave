@@ -1,8 +1,6 @@
 package Planning.Plans.Macro.Automatic
 
-import Information.Geography.Types.Base
 import Lifecycle.With
-import Mathematics.PurpleMath
 import Micro.Agency.Intention
 import Planning.Composition.ResourceLocks.LockUnits
 import Planning.Composition.UnitCountEverything

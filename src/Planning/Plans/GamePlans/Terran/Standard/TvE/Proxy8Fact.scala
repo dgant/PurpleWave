@@ -61,7 +61,7 @@ class Proxy8Fact extends GameplanModeTemplate {
         With.blackboard.gasLimitCeiling = 0
       }),
       new Do(() => {
-        With.blackboard.gasTargetRatio = 0.4
+        With.blackboard.gasTargetRatio = 1.0
         With.blackboard.gasLimitFloor = 100
         With.blackboard.gasLimitCeiling = 100
       })),

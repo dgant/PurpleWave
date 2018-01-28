@@ -3,12 +3,12 @@ package Micro.Coordination
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Micro.Coordination.Explosions._
-import ProxyBwapi.Bullets.{BulletInfo, BulletTypes}
+import ProxyBwapi.Bullets.BulletInfo
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
 
-import scala.collection.mutable
 import scala.collection.JavaConverters._
+import scala.collection.mutable
 
 class ExplosionTracker {
   
@@ -23,11 +23,11 @@ class ExplosionTracker {
   }
   
   def explosionFromBullet(bullet: BulletInfo): Option[Explosion] = {
-    if (bullet.bulletType == BulletTypes.EMPMissile)
+    if (bullet.sourceUnit.exists(_.is(Terran.ScienceVessel)))
       Some(new ExplosionEMP(bullet))
-    else if (bullet.bulletType == BulletTypes.SubterraneanSpines)
+    else if (bullet.sourceUnit.exists(_.is(Zerg.Lurker)))
       Some(new ExplosionLurker(bullet))
-    else if (bullet.bulletType == BulletTypes.PsionicStorm)
+    else if (bullet.sourceUnit.exists(_.is(Protoss.HighTemplar)))
       Some(new ExplosionPsionicStorm(bullet))
     None
   }

@@ -5,6 +5,6 @@ class Coordinator {
   val explosions = new ExplosionTracker
   
   def run() {
-    //explosions.run()
+    explosions.run()
   }
 }

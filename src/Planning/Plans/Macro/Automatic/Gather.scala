@@ -20,6 +20,7 @@ class Gather extends Plan {
   }
   
   private val mineralSaturationRatio = 2.0
+  private val gasSaturationRatio = 3.0
   
   private val resourceByWorker  = new mutable.HashMap[FriendlyUnitInfo, UnitInfo]
   private val workersByResource = new mutable.HashMap[UnitInfo, mutable.HashSet[FriendlyUnitInfo]]
@@ -35,13 +36,22 @@ class Gather extends Plan {
   private var workersForMinerals      : Int                               = 0
   private var workersPerMineral       : Double                            = 0.0
   private var workersPerGas           : Double                            = 0.0
+  private var workersOnMinerals       : Int                               = 0
   private var workersOnGas            : Int                               = 0
+  private var excessWorkersOnGas      : Int                               = 0
+  private var excessWorkersOnMinerals : Int                               = 0
   private var unassignedWorkers       : Set[FriendlyUnitInfo]             = Set.empty
   private var numberToAddToGas        : Int                               = 0
   private var workersToAddToMinerals  : Set[FriendlyUnitInfo]             = Set.empty
   private var workersToAddToGas       : Set[FriendlyUnitInfo]             = Set.empty
   private var needPerMineral          : mutable.Map[UnitInfo, Double]     = mutable.HashMap.empty
   private var needPerGas              : mutable.Map[UnitInfo, Double]     = mutable.HashMap.empty
+  
+  private def needPerResource(resource: UnitInfo): Double =
+    if (resource.unitClass.isGas)
+      needPerGas(resource)
+    else
+      needPerMineral(resource)
   
   override def onUpdate() {
     updateWorkerInformation()
@@ -96,62 +106,54 @@ class Gather extends Plan {
   }
   
   private def decideIdealWorkerDistribution() {
-    val gasLimitFloor     = With.blackboard.gasLimitFloor
-    val gasLimitCeiling   = With.blackboard.gasLimitCeiling
-    val floor             = Math.min(gasLimitFloor, gasLimitCeiling)
-    val ceiling           = Math.max(gasLimitFloor, gasLimitCeiling)
-    gasWorkerTargetRatio  = With.blackboard.gasTargetRatio
-    haveEnoughGas         = With.self.gas >= PurpleMath.clamp(With.self.minerals, floor, ceiling)
+    val gasLimitFloor       = With.blackboard.gasLimitFloor
+    val gasLimitCeiling     = With.blackboard.gasLimitCeiling
+    val floor               = Math.min(gasLimitFloor, gasLimitCeiling)
+    val ceiling             = Math.max(gasLimitFloor, gasLimitCeiling)
+    gasWorkerTargetRatio    = With.blackboard.gasTargetRatio
+    haveEnoughGas           = With.self.gas >= PurpleMath.clamp(With.self.minerals, floor, ceiling)
     
-    workersForGas         = gasWorkers
-    workersForMinerals    = allWorkers.size - workersForGas
-    workersPerGas         = if (gasses.isEmpty) 0 else workersForGas.toDouble / gasses.size
-    workersOnGas          = gasses.toVector.map(gas => workersByResource.get(gas).map(_.size).getOrElse(0)).sum
-    
+    val totalWorkers        = allWorkers.size
+    workersForGas           = gasWorkers
+    workersForMinerals      = totalWorkers - workersForGas
+    workersOnGas            = gasses.toVector.map(gas => workersByResource.get(gas).map(_.size).getOrElse(0)).sum
+    workersOnMinerals       = minerals.toVector.map(min => workersByResource.get(min).map(_.size).getOrElse(0)).sum
+    excessWorkersOnGas      = workersOnGas - workersForGas
+    excessWorkersOnMinerals = workersOnMinerals - workersForMinerals
+    workersPerGas           = if (gasses.isEmpty) 0 else Math.max(workersForGas.toDouble / gasses.size, gasSaturationRatio)
     needPerMineral = new mutable.HashMap[UnitInfo, Double] ++
       minerals
         .map(mineral => (mineral,
-          mineralSaturationRatio - workersByResource.get(mineral)
-            .map(_.size)
-            .getOrElse(0)))
+          Math.min(
+            mineralSaturationRatio - workersByResource.get(mineral).map(_.size).sum,
+            Math.ceil(workersForMinerals.toDouble / minerals.size)
+          )))
         .toMap
-  
     needPerGas = new mutable.HashMap[UnitInfo, Double] ++
-      gasses.map(gas => (gas,
-        workersPerGas - workersByResource.get(gas)
-          .map(_.size)
-          .getOrElse(0))).toMap
-  
-    if (
-      With.framesSince(lastFrameUnassigning) > 24 * 5 || (
-      With.framesSince(lastFrameUnassigning) > 24 &&
-      With.units.ours.exists(u =>  u.unitClass.isGas && With.framesSince(u.frameDiscovered) < 48)))
-      {
-        unassignSupersaturatingWorkers()
-      }
-    
-    // TODO: This is incapable of, say, taking workers off of gas
-    // because those workers will never make it
+      gasses
+        .map(gas => (gas,
+          Math.min(
+            gasSaturationRatio - workersByResource.get(gas).map(_.size).sum,
+            Math.ceil(workersForMinerals.toDouble / gasses.size)
+          )))
+        .toMap
+    unassignSupersaturatingWorkers()
     unassignedWorkers       = allWorkers.diff(resourceByWorker.keySet)
     numberToAddToGas        = Math.max(0, workersForGas - workersOnGas)
     workersToAddToGas       = unassignedWorkers.take(numberToAddToGas)
     workersToAddToMinerals  = unassignedWorkers.drop(numberToAddToGas)
   }
   
-  var lastFrameUnassigning = 0
   def unassignSupersaturatingWorkers() {
-    lastFrameUnassigning = With.frame
-    val supersaturatedGas = gasses.filter(needPerGas(_) < 0)
-    val supersaturatedMinerals = minerals.filter(needPerMineral(_) < 0)
-    supersaturatedMinerals
-      .foreach(mineral =>
-        workersByResource(mineral)
-          .take(Math.ceil(-needPerMineral(mineral)).toInt)
-          .foreach(unassignWorker))
-    supersaturatedGas
-      .foreach(gas =>
-        workersByResource(gas)
-          .take(Math.ceil(-needPerGas(gas)).toInt)
+    allResources
+      .toVector
+      .filter(needPerResource(_) < 0)
+      .sortBy(needPerResource)
+      .take(Math.max(excessWorkersOnGas, excessWorkersOnMinerals))
+      .foreach(resource =>
+        workersByResource(resource)
+          .toVector
+          .sortBy(- _.pixelsFromEdge(resource))
           .foreach(unassignWorker))
   }
   

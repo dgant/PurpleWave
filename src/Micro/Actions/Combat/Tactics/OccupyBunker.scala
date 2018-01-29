@@ -25,7 +25,7 @@ object OccupyBunker extends Action {
         && bunker.is(Terran.Bunker)
         && bunker.friendly.get.loadedUnits.size < 4)
   
-    ByOption.minBy(bunkers)(_.pixelDistanceCenter(unit))
+    ByOption.minBy(bunkers)(_.pixelDistanceEdge(unit))
       .foreach(bunker => With.commander.rightClick(unit, bunker))
   }
 }

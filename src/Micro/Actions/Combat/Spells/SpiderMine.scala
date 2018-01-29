@@ -55,7 +55,7 @@ object SpiderMine extends Action {
     val victims = vulture.matchups.targets.filterNot(_.unitClass.floats)
     if (victims.isEmpty) return
     
-    val saboteursInitial = new mutable.PriorityQueue[UnitInfo]()(Ordering.by(v => victims.map(_.pixelDistanceCenter(v)).min))
+    val saboteursInitial = new mutable.PriorityQueue[UnitInfo]()(Ordering.by(v => victims.map(_.pixelDistanceEdge(v)).min))
     val saboteursFinal = saboteursInitial.take(victims.size).toVector
     
     if ( ! saboteursFinal.contains(vulture)) return

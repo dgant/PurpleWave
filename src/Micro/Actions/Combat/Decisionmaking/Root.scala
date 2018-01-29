@@ -46,8 +46,8 @@ object Root extends Action {
     private lazy val turretsInRange       = unit.matchups.targetsInRange.exists(_.unitClass.isStaticDefense)
     private lazy val buildingInRange      = unit.matchups.targetsInRange.exists(_.unitClass.isBuilding)
     private lazy val combatTargets        = unit.matchups.targets.filter(_.unitClass.helpsInCombat)
-    private lazy val targetsInRange       = combatTargets.filter(t => unit.pixelDistanceCenter(t)                         < maxRange)
-    private lazy val targetsNearingRange  = combatTargets.filter(t => unit.pixelDistanceCenter(t.projectFrames(rootTime)) < maxRange)
+    private lazy val targetsInRange       = combatTargets.filter(t => unit.pixelDistanceEdge(t) < maxRange)
+    private lazy val targetsNearingRange  = combatTargets.filter(t => { val p = t.projectFrames(rootTime); unit.pixelDistanceEdge(t.pixelStartAt(p), t.pixelEndAt(p)) < maxRange})
     private lazy val girdForCombat        = targetsInRange.nonEmpty || targetsNearingRange.nonEmpty
     private lazy val leadingPush          = (rootersInPush.size + 1) / 3 > rootersInPushCloser
     private lazy val destinationFarAway   = unit.pixelDistanceCenter(unit.agent.destination) > 32.0 * 4.0

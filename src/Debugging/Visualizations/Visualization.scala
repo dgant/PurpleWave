@@ -59,7 +59,6 @@ class Visualization {
     ShowDesire,
     ShowGroundskeeper,
     ShowGrids,
-    ShowMicroDecisions,
     ShowMobility,
     ShowTechniques,
     ShowUnitsAll,

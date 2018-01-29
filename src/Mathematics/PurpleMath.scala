@@ -1,6 +1,6 @@
 package Mathematics
 
-import Mathematics.Points.{AbstractPoint, Point}
+import Mathematics.Points.AbstractPoint
 
 object PurpleMath {
   
@@ -60,9 +60,10 @@ object PurpleMath {
   def fromBoolean(value: Boolean): Int = if (value) 1 else 0
   def toBoolean(value: Int): Boolean = value != 0
   
-  def broodWarDistance(x1: Int, y1: Int, x2: Int, y2: Int): Double = {
-    val dx = Math.abs(x1 - x2)
-    val dy = Math.abs(y1 - y2)
+  def broodWarDistance(a: AbstractPoint, b: AbstractPoint): Double = broodWarDistance(a.x, a.y, b.x, b.y)
+  def broodWarDistance(x0: Int, y0: Int, x1: Int, y1: Int): Double = {
+    val dx = Math.abs(x0 - x1)
+    val dy = Math.abs(y0 - y1)
     val d   = Math.min(dx, dy)
     val D   = Math.max(dx, dy)
     if (D / 4 > d) {
@@ -70,8 +71,45 @@ object PurpleMath {
     }
     D
   }
-  
-  def broodWarDistance(a: Point, b: Point): Double = broodWarDistance(a.x, a.y, b.x, b.y)
+  def broodWarDistanceBox(
+    p00: AbstractPoint,
+    p01: AbstractPoint,
+    p10: AbstractPoint,
+    p11: AbstractPoint)
+    : Double = broodWarDistanceBox(
+      p00.x, p00.y,
+      p01.x, p01.y,
+      p10.x, p10.y,
+      p11.x, p11.y)
+  def broodWarDistanceBox(
+    x00: Int, y00: Int,
+    x01: Int, y01: Int,
+    x10: Int, y10: Int,
+    x11: Int, y11: Int)
+    : Double = {
+    if (x11 < x00) {
+      if (y11 < y00) {
+        return PurpleMath.broodWarDistance(x11, y11, x00, y00)
+      } else if (y10 > y01) {
+        return PurpleMath.broodWarDistance(x11, y10, x00, y01)
+      } else {
+        return x00 - x11;
+      }
+    } else if (x10 > x01) {
+      if (y11 < y00) {
+        return PurpleMath.broodWarDistance(x10, y11, x01, y00)
+      } else if (y10 > y01) {
+        return PurpleMath.broodWarDistance(x10, y10, x01, y01)
+      } else {
+        return x10 - x01
+      }
+    } else if (y11 < y00) {
+      return y00 - y11
+    } else if (y10 > y01) {
+      return y10 - y01
+    }
+    0
+  }
   
   def distanceFromLineSegment(
     point: AbstractPoint,

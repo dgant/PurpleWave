@@ -114,7 +114,7 @@ class Simulacrum(
       }
     }
     if (target.isDefined && target != lastTarget) {
-      lazy val distanceByAir    : Double = realUnit.pixelDistanceCenter(target.get.realUnit)
+      lazy val distanceByAir    : Double = realUnit.pixelDistanceEdge(target.get.realUnit)
       lazy val distanceByGround : Double = realUnit.pixelDistanceTravelling(target.get.realUnit.pixelCenter)
       targetPathBendiness = Math.min(3.0, PurpleMath.nanToInfinity(distanceByAir / distanceByGround))
     }
@@ -202,7 +202,12 @@ class Simulacrum(
   )
   
   def pixelsOutOfRange(target: Simulacrum): Double = {
-    pixel.pixelDistanceFast(target.pixel) + target.bonusDistance - bonusRange - realUnit.pixelRangeAgainstFromCenter(target.realUnit)
+    val distance = PurpleMath.broodWarDistanceBox(
+      realUnit.pixelStartAt(pixel),
+      realUnit.pixelEndAt(pixel),
+      target.realUnit.pixelStartAt(pixel),
+      target.realUnit.pixelEndAt(pixel))
+    distance - realUnit.pixelRangeAgainst(target.realUnit) - bonusRange + target.bonusDistance
   }
   
   def validTargetExists: Boolean = target.exists(isValidTarget)

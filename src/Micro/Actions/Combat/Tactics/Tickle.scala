@@ -47,7 +47,7 @@ object Tickle extends Action {
     
     // Get in their base!
     if ( ! unit.zone.bases.exists(_.owner.isEnemy)
-      && ! enemies.exists(_.pixelDistanceCenter(unit) < 48.0)
+      && ! enemies.exists(_.pixelDistanceEdge(unit) < 48.0)
       && enemiesAttackingUs.size < 1) {
       Move.consider(unit)
       return
@@ -58,7 +58,7 @@ object Tickle extends Action {
       zone.bases.exists(_.harvestingArea.contains(unit.tileIncludingCenter)
       && enemies.exists(enemy =>
         enemy.zone == zone
-        && enemy.pixelDistanceCenter(unit) < 64.0
+        && enemy.pixelDistanceEdge(unit) < 64.0
         && enemy.pixelDistanceCenter(exit) < unit.pixelDistanceCenter(exit)))) {
       mineralWalkAway(unit)
       return
@@ -88,7 +88,7 @@ object Tickle extends Action {
     }
     
     // Stay close to the fight
-    if (unit.matchups.threats.forall(_.pixelDistanceCenter(unit) > 64)) {
+    if (unit.matchups.threats.forall(_.pixelDistanceEdge(unit) > 64)) {
       attack = true
     }
     
@@ -153,7 +153,7 @@ object Tickle extends Action {
         val validTargets = targets.filter(_.pixelDistanceCenter(exit) - 16.0 <= nearestTargetDistance)
         val bestTarget =
           validTargets
-            .sortBy(target => target.totalHealth * target.pixelDistanceCenter(unit))
+            .sortBy(target => target.totalHealth * target.pixelDistanceEdge(unit))
             .headOption
             .getOrElse(targets.minBy(_.pixelDistanceCenter(exit)))
   
@@ -165,7 +165,7 @@ object Tickle extends Action {
     }
       
     // We're not attacking, so let's hang out and wait for opportunities
-    if (enemiesAttackingUs.nonEmpty || enemies.exists(_.pixelDistanceCenter(unit) < 64.0)) {
+    if (enemiesAttackingUs.nonEmpty || enemies.exists(_.pixelDistanceEdge(unit) < 64.0)) {
       // Extra aggression vs. 4-pool
       if ( ! weOverpower) {
         mineralWalkAway(unit)
@@ -177,8 +177,8 @@ object Tickle extends Action {
           && freebie.armorHealth < 5
           && enemies.forall(defender =>
           defender != freebie
-            && unit.pixelDistanceCenter(defender) >
-            unit.pixelDistanceCenter(freebie)))
+            && unit.pixelDistanceEdge(defender) >
+            unit.pixelDistanceEdge(freebie)))
       unit.agent.toAttack = freebies
       Attack.consider(unit)
       OldAvoid.consider(unit)

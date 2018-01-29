@@ -17,7 +17,7 @@ object Rally extends Action {
     if (unit.unitClass.isTownHall) {
       val minerals = unit.zone.bases.flatMap(_.minerals)
       if (minerals.nonEmpty) {
-        val mineral = minerals.minBy(_.pixelDistanceCenter(unit))
+        val mineral = minerals.minBy(_.pixelDistanceEdge(unit))
         With.commander.rally(unit, mineral.pixelCenter) // Rallying onto the mineral itself doesn't esem to work
       }
     }

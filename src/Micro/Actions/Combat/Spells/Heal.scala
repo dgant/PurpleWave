@@ -18,7 +18,7 @@ object Heal extends Action {
     val targets = validTargets(unit)
     val target  = ByOption.minBy(targets)(patient =>
       if (unit.matchups.battle.isDefined)
-        patient.pixelDistanceCenter(unit)
+        patient.pixelDistanceEdge(unit)
       else
         patient.pixelDistanceCenter(unit.agent.destination))
       
@@ -39,7 +39,7 @@ object Heal extends Action {
   }
   
   private def targetValue(medic: FriendlyUnitInfo, patient: UnitInfo): Double = {
-    val distancePixels  = medic.pixelDistanceCenter(patient)
+    val distancePixels  = medic.pixelDistanceEdge(patient)
     val distanceFrames  = PurpleMath.nanToInfinity(distancePixels / medic.topSpeed)
     val lifetimeFrames  = patient.matchups.framesToLiveDiffused
     val damage          = patient.unitClass.maxHitPoints - patient.hitPoints

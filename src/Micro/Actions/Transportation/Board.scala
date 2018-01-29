@@ -18,7 +18,7 @@ object Board extends Action {
     val transport = unit.agent.toBoard.get
     
     unit.agent.toTravel = Some(transport.pixelCenter)
-    if (transport.pixelDistanceCenter(unit) < With.configuration.pickupRadiusPixels) {
+    if (transport.pixelDistanceEdge(unit) < With.configuration.pickupRadiusPixels) {
       With.commander.hijack(unit)
       With.commander.rightClick(unit, transport)
     }

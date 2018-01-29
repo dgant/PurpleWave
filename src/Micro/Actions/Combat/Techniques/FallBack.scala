@@ -24,7 +24,7 @@ object FallBack extends ActionTechnique {
     if ( ! unit.canAttack(other)) return Some(0.0)
     if (other.topSpeed <= 0.0) return None
     val speedRatio    = unit.topSpeedChasing / other.topSpeed
-    val rangeRatio    = unit.pixelRangeAgainstFromEdge(other) / other.pixelRangeAgainstFromCenter(unit)
+    val rangeRatio    = unit.pixelRangeAgainst(other) / other.pixelRangeAgainst(unit)
     val cooldownRatio = unit.cooldownMaxAgainst(other) / other.cooldownMaxAgainst(unit)
     val output        = speedRatio * rangeRatio * cooldownRatio
     Some(output)

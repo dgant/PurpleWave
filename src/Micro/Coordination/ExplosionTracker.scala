@@ -29,7 +29,8 @@ class ExplosionTracker {
       Some(new ExplosionLurker(bullet))
     else if (bullet.sourceUnit.exists(_.is(Protoss.HighTemplar)))
       Some(new ExplosionPsionicStorm(bullet))
-    None
+    else
+      None
   }
   
   def explosionFromUnit(unit: UnitInfo): Vector[Explosion] = {

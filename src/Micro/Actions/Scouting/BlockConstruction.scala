@@ -13,7 +13,7 @@ object BlockConstruction extends Action {
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {
-    val builder = blockableBuilders(unit).minBy(_.pixelDistanceCenter(unit))
+    val builder = blockableBuilders(unit).minBy(_.pixelDistanceEdge(unit))
     val destination = builder.targetPixel
     
     var fight = false

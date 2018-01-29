@@ -15,7 +15,7 @@ object Sneak extends Action {
     ! unit.matchups.allies.exists(_.is(Protoss.Arbiter))  &&
     ! unit.agent.canBerzerk                               &&
     ! unit.matchups.threats.forall(_.unitClass.isWorker)  &&
-    ( ! unit.effectivelyCloaked || unit.matchups.enemyDetectors.exists(e => e.pixelDistanceCenter(unit) < 32.0 * (if(e.unitClass.canMove) 16.0 else 13.0)))
+    ( ! unit.effectivelyCloaked || unit.matchups.enemyDetectors.exists(e => e.pixelDistanceEdge(unit) < 32.0 * (if(e.unitClass.canMove) 15.0 else 12.0)))
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {

@@ -23,7 +23,7 @@ class EscortSettlers extends Plan {
     val destination   = settler.get.agent.toBuildTile.get
     val zone          = destination.zone
     val enemies       = settler.get.matchups.threats.toSet ++ zone.units.filter(u => u.isEnemy && u.likelyStillAlive && u.canAttack(settler.get))
-    val enemyClosest  = ByOption.minBy(enemies)(_.pixelDistanceCenter(settler.get))
+    val enemyClosest  = ByOption.minBy(enemies)(_.pixelDistanceEdge(settler.get))
     val target        = destination.pixelCenter.project(enemyClosest.map(_.pixelCenter).getOrElse(SpecificPoints.middle), 32.0 * 8.0)
     
     conscript.squad.goal    = new SquadPush(target)

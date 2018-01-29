@@ -60,7 +60,7 @@ object Build extends Action {
       lazy val healthy    = unit.totalHealth > 10 || unit.totalHealth >= unit.matchups.threats.head.totalHealth
       if (noThreats || (allWorkers && healthy)) {
         Target.delegate(unit)
-        unit.agent.toAttack = unit.agent.toAttack.orElse(Some(blockersToKill.minBy(_.pixelDistanceCenter(unit))))
+        unit.agent.toAttack = unit.agent.toAttack.orElse(Some(blockersToKill.minBy(_.pixelDistanceEdge(unit))))
         Attack.delegate(unit)
       }
       else {

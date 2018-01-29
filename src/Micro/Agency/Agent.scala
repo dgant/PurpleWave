@@ -6,7 +6,6 @@ import Mathematics.Physics.Force
 import Mathematics.Points.{Pixel, PixelRay, Tile}
 import Micro.Actions.Combat.Techniques.Common.ActionTechniqueEvaluation
 import Micro.Actions.{Action, Idle}
-import Micro.Decisions.MicroDecision
 import Micro.Heuristics.Targeting.TargetingProfile
 import Performance.Cache
 import Planning.Plan
@@ -121,9 +120,6 @@ class Agent(val unit: FriendlyUnitInfo) {
   var netEngagementValue: Double = _
   var movingTo: Option[Pixel] = None
   
-  var microDecisions              : Vector[MicroDecision] = Vector.empty
-  var microDecisionsUpdateFrame   : Int = 0
-  
   var pathsAll        : Traversable[PixelRay] = Seq.empty
   var pathsTruncated  : Traversable[PixelRay] = Seq.empty
   var pathsAcceptable : Traversable[PixelRay] = Seq.empty
@@ -196,7 +192,7 @@ class Agent(val unit: FriendlyUnitInfo) {
       toForm.get
     }
     else if (anchors.nonEmpty) {
-      anchors.minBy(_.pixelDistanceCenter(unit)).pixelCenter
+      anchors.minBy(_.pixelDistanceEdge(unit)).pixelCenter
     }
     else if (With.geography.ourBases.nonEmpty) {
       With.geography.ourBases.map(_.heart.pixelCenter).minBy(unit.pixelDistanceTravelling)

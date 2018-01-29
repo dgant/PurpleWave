@@ -32,7 +32,7 @@ object Abuse extends ActionTechnique {
     val deltaSpeed = unit.topSpeed - other.topSpeed
     if (deltaSpeed <= 0) return Some(0.0)
   
-    val deltaRange = unit.pixelRangeAgainstFromCenter(other) - other.pixelRangeAgainstFromCenter(unit)
+    val deltaRange = unit.pixelRangeAgainst(other) - other.pixelRangeAgainst(unit)
     if (deltaRange <= 0) return Some(0.0)
     
     Some(1.0)
@@ -40,7 +40,7 @@ object Abuse extends ActionTechnique {
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     lazy val safeToShoot = unit.matchups.framesOfSafetyDiffused > unit.unitClass.framesToTurnAndShootAndTurnBackAndAccelerate
-    lazy val lastChanceToShoot = unit.matchups.targetsInRange.isEmpty || unit.matchups.targets.forall(t => t.pixelDistanceCenter(unit) > unit.pixelRangeAgainstFromCenter(t) - 32.0)
+    lazy val lastChanceToShoot = unit.matchups.targetsInRange.isEmpty || unit.matchups.targets.forall(t => t.pixelDistanceEdge(unit) > unit.pixelRangeAgainst(t) - 32.0)
     if (unit.readyForAttackOrder && (safeToShoot || lastChanceToShoot)) {
       Potshot.delegate(unit)
       PotshotAsSoonAsPossible.delegate(unit)

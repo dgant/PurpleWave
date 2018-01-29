@@ -126,5 +126,9 @@ object ShowUnitsFriendly extends View {
       DrawMap.circle(pixel, 3, Color.Black, solid = true)
       DrawMap.circle(pixel, 2, color,       solid = true)
     }
+    
+    if (showExplosions) {
+      With.coordinator.explosions.all.foreach(_.draw())
+    }
   }
 }

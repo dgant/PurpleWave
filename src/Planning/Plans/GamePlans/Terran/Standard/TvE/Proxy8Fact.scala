@@ -30,10 +30,9 @@ class Proxy8Fact extends GameplanModeTemplate {
     new UnitsAtLeast(1, Terran.Factory, complete = true),
     new Scout)
   
-  lazy val proxyZone: Option[Zone] = ProxyPlanner.proxyMiddle
+  lazy val proxyZone: Option[Zone] = ProxyPlanner.proxyAutomaticSneaky
   override def defaultPlacementPlan: Plan = new ProposePlacement {
     override lazy val blueprints = Vector(
-      new Blueprint(this, building = Some(Terran.Barracks), preferZone = proxyZone, respectHarvesting = false, placement = Some(PlacementProfiles.proxyBuilding)),
       new Blueprint(this, building = Some(Terran.Factory),  preferZone = proxyZone, respectHarvesting = false, placement = Some(PlacementProfiles.proxyBuilding)))
   }
   
@@ -41,7 +40,10 @@ class Proxy8Fact extends GameplanModeTemplate {
     RequestAtLeast(1, Terran.CommandCenter),
     RequestAtLeast(8, Terran.SCV),
     RequestAtLeast(1, Terran.Barracks),
-    RequestAtLeast(1, Terran.Refinery))
+    RequestAtLeast(1, Terran.Refinery),
+    RequestAtLeast(1, Terran.Factory),
+    RequestAtLeast(1, Terran.SupplyDepot),
+    RequestAtLeast(10, Terran.SCV))
   
   override def defaultWorkerPlan: Plan = NoPlan()
   
@@ -66,12 +68,6 @@ class Proxy8Fact extends GameplanModeTemplate {
         With.blackboard.gasLimitFloor = 100
         With.blackboard.gasLimitCeiling = 100
       })),
-    new Trigger(
-      new UnitsAtLeast(1, Terran.Barracks, complete = false),
-      initialAfter = new Build(
-        RequestAtLeast(1, Terran.Factory),
-        RequestAtLeast(1, Terran.SupplyDepot),
-        RequestAtLeast(10, Terran.SCV))),
     new Trigger(
       new UnitsAtLeast(1, Terran.Factory, complete = false),
       initialAfter = new Parallel(

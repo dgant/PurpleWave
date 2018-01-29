@@ -46,8 +46,8 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
   lazy val threats                : Vector[UnitInfo]      = enemies.filter(_.canAttack(me))
   lazy val targets                : Vector[UnitInfo]      = enemies.filter(me.canAttack)
   lazy val threatsViolent         : Vector[UnitInfo]      = threats.filter(_.isBeingViolentTo(me))
-  lazy val threatsInRange         : Vector[UnitInfo]      = threats.filter(threat => threat.pixelRangeAgainstFromCenter(me) >= threat.pixelDistanceCenter(at) - me.pixelsTravelledMax(frame) - threat.pixelsTravelledMax(frame))
-  lazy val targetsInRange         : Vector[UnitInfo]      = targets.filter(target => target.visible && me.pixelRangeAgainstFromCenter(target) >= target.pixelDistanceCenter(at) - me.pixelsTravelledMax(frame) - target.pixelsTravelledMax(frame) && (me.unitClass.groundMinRangeRaw <= 0 || me.pixelDistanceEdge(target) > 32.0 * 3.0))
+  lazy val threatsInRange         : Vector[UnitInfo]      = threats.filter(threat => threat.pixelRangeAgainst(me) >= threat.pixelDistanceEdge(me, at) - me.pixelsTravelledMax(frame) - threat.pixelsTravelledMax(frame))
+  lazy val targetsInRange         : Vector[UnitInfo]      = targets.filter(target => target.visible && me.pixelRangeAgainst(target) >= target.pixelDistanceEdge(me, at) - me.pixelsTravelledMax(frame) - target.pixelsTravelledMax(frame) && (me.unitClass.groundMinRangeRaw <= 0 || me.pixelDistanceEdge(target) > 32.0 * 3.0))
   lazy val repairers              : ArrayBuffer[UnitInfo] = ArrayBuffer.empty ++ allies.filter(ally => ally.is(Terran.SCV) && ally.target.contains(me))
   
   lazy val valuePerDamage                         : Double                = MicroValue.valuePerDamage(me)
@@ -99,7 +99,7 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
       else
         Math.max(0.0, (speedApproachingMe + speedApproachingThreat) * (With.reaction.agencyMax + With.latency.framesRemaining))
     
-    val gapPixels = me.pixelDistanceEdge(threat) - threat.pixelRangeAgainstFromEdge(me) - threatRangeBonus
+    val gapPixels = me.pixelDistanceEdge(threat) - threat.pixelRangeAgainst(me) - threatRangeBonus
     
     val gapSpeed          = if (gapPixels >= 0) threat.topSpeed else me.topSpeed
     val framesToCloseGap  = PurpleMath.nanToInfinity(Math.abs(gapPixels) / gapSpeed)

@@ -207,48 +207,22 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   
   def pixelRangeMax: Double = Math.max(pixelRangeAir, pixelRangeGround)
   
-  def canTraverse             (tile:        Tile)       : Boolean = flying || With.grids.walkable.get(tile)
-  def pixelDistanceCenter     (otherPixel:  Pixel)      : Double  = pixelCenter.pixelDistanceFast(otherPixel)
-  def pixelDistanceCenter     (otherUnit:   UnitInfo)   : Double  = pixelDistanceCenter(otherUnit.pixelCenter)
-  def pixelDistanceEdge       (other:       UnitInfo)   : Double  = pixelsFromBox(Pixel(other.left, other.top), Pixel(other.right, other.bottom))
-  def pixelDistanceSquared    (otherUnit:   UnitInfo)   : Double  = pixelDistanceSquared(otherUnit.pixelCenter)
-  def pixelDistanceSquared    (otherPixel:  Pixel)      : Double  = pixelCenter.pixelDistanceSquared(otherPixel)
-  def pixelDistanceTravelling (destination: Pixel)      : Double  = pixelDistanceTravelling(pixelCenter, destination)
-  def pixelDistanceTravelling (destination: Tile)       : Double  = pixelDistanceTravelling(pixelCenter, destination.pixelCenter)
-  def pixelDistanceTravelling (from: Pixel, to: Pixel)  : Double  = if (flying) from.pixelDistanceFast(to) else from.groundPixels(to)
+  def canTraverse(tile: Tile): Boolean = flying || With.grids.walkable.get(tile)
   
-  def pixelsFromBox(start: Pixel, end: Pixel): Double  = {
-    val x0me = left
-    val y0me = top
-    val x1me = right
-    val y1me = bottom
-    val x0you = start.x
-    val y0you = start.y
-    val x1you = end.x
-    val y1you = end.y
-    if (x1you < x0me) {
-      if (y1you < y0me) {
-        return PurpleMath.broodWarDistance(x1you, y1you, x0me, y0me);
-      } else if (y0you > y1me) {
-        return PurpleMath.broodWarDistance(x1you, y0you, x0me, y1me);
-      } else {
-        return x0me - x1you;
-      }
-    } else if (x0you > x1me) {
-      if (y1you < y0me) {
-        return PurpleMath.broodWarDistance(x0you, y1you, x1me, y0me);
-      } else if (y0you > y1me) {
-        return PurpleMath.broodWarDistance(x0you, y0you, x1me, y1me);
-      } else {
-        return x0you - x1me
-      }
-    } else if (y1you < y0me) {
-      return y0me - y1you
-    } else if (y0you > y1me) {
-      return y0you - y1me
-    }
-    0
-  }
+  def pixelStart                                            : Pixel = Pixel(left, top)
+  def pixelEnd                                              : Pixel = Pixel(right, bottom)
+  def pixelStartAt            (at: Pixel)                   : Pixel = pixelStart.add(at).subtract(pixelCenter)
+  def pixelEndAt              (at: Pixel)                   : Pixel = pixelEnd.add(at).subtract(pixelCenter)
+  def pixelDistanceCenter     (otherPixel:  Pixel)          : Double  = pixelCenter.pixelDistanceFast(otherPixel)
+  def pixelDistanceCenter     (otherUnit:   UnitInfo)       : Double  = pixelDistanceCenter(otherUnit.pixelCenter)
+  def pixelDistanceEdge       (other:       UnitInfo)       : Double  = pixelDistanceEdge(other.pixelStart, other.pixelEnd)
+  def pixelDistanceEdge       (other: UnitInfo, at: Pixel)  : Double  = pixelDistanceEdge(other.pixelStart, other.pixelEnd)
+  def pixelDistanceEdge       (oStart: Pixel, oEnd: Pixel)  : Double  = PurpleMath.broodWarDistanceBox(pixelStart, pixelEnd, oStart, oEnd)
+  def pixelDistanceSquared    (otherUnit:   UnitInfo)       : Double  = pixelDistanceSquared(otherUnit.pixelCenter)
+  def pixelDistanceSquared    (otherPixel:  Pixel)          : Double  = pixelCenter.pixelDistanceSquared(otherPixel)
+  def pixelDistanceTravelling (destination: Pixel)          : Double  = pixelDistanceTravelling(pixelCenter, destination)
+  def pixelDistanceTravelling (destination: Tile)           : Double  = pixelDistanceTravelling(pixelCenter, destination.pixelCenter)
+  def pixelDistanceTravelling (from: Pixel, to: Pixel)      : Double  = if (flying) from.pixelDistanceFast(to) else from.groundPixels(to)
   
   def velocity: Force = Force(velocityX, velocityY)
   
@@ -348,8 +322,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   
   def cooldownMaxAgainst(enemy: UnitInfo): Int = if (enemy.flying) cooldownMaxAir else cooldownMaxGround
   
-  def pixelRangeAgainstFromEdge   (enemy: UnitInfo): Double = if (enemy.flying) pixelRangeAir else pixelRangeGround
-  def pixelRangeAgainstFromCenter (enemy: UnitInfo): Double = pixelRangeAgainstFromEdge(enemy) + unitClass.radialHypotenuse + enemy.unitClass.radialHypotenuse
+  def pixelRangeAgainst(enemy: UnitInfo): Double = if (enemy.flying) pixelRangeAir else pixelRangeGround
   def effectiveRangePixels: Double = Math.max(pixelRangeMax, unitClass.effectiveRangePixels)
   
   def hitChanceAgainst(
@@ -476,14 +449,14 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   def pixelReachMax     (framesAhead: Int): Double = Math.max(pixelReachAir(framesAhead), pixelReachGround(framesAhead))
   def pixelReachAgainst (framesAhead: Int, enemy:UnitInfo): Double = if (enemy.flying) pixelReachAir(framesAhead) else pixelReachGround(framesAhead)
   
-  def inRangeToAttack(enemy: UnitInfo)                    : Boolean = pixelDistanceEdge(enemy) <= pixelRangeAgainstFromEdge(enemy)     + With.configuration.attackableRangeBufferPixels && (pixelRangeMin <= 0.0 || pixelDistanceEdge(enemy) > pixelRangeMin)
-  def inRangeToAttack(enemy: UnitInfo, framesAhead: Int)  : Boolean = enemy.projectFrames(framesAhead).pixelDistanceFast(projectFrames(framesAhead)) <= pixelRangeAgainstFromEdge(enemy) + unitClass.radialHypotenuse + enemy.unitClass.radialHypotenuse + With.configuration.attackableRangeBufferPixels //TODO: Needs min range!
+  def inRangeToAttack(enemy: UnitInfo)                    : Boolean = pixelDistanceEdge(enemy) <= pixelRangeAgainst(enemy)     + With.configuration.attackableRangeBufferPixels && (pixelRangeMin <= 0.0 || pixelDistanceEdge(enemy) > pixelRangeMin)
+  def inRangeToAttack(enemy: UnitInfo, framesAhead: Int)  : Boolean = enemy.projectFrames(framesAhead).pixelDistanceFast(projectFrames(framesAhead)) <= pixelRangeAgainst(enemy) + unitClass.radialHypotenuse + enemy.unitClass.radialHypotenuse + With.configuration.attackableRangeBufferPixels //TODO: Needs min range!
   
   def framesToTravelTo(destination: Pixel)  : Int = framesToTravelPixels(pixelDistanceTravelling(destination))
   def framesToTravelPixels(pixels: Double)  : Int = if (pixels <= 0.0) 0 else if (canMove) Math.max(0, Math.ceil(pixels/topSpeed).toInt) else Int.MaxValue
   
   def framesToGetInRange(enemy: UnitInfo)               : Int = framesToGetInRange(enemy, enemy.pixelCenter)
-  def framesToGetInRange(enemy: UnitInfo, at: Pixel)    : Int = if (canAttack(enemy)) framesToTravelPixels(pixelDistanceCenter(at) - pixelRangeAgainstFromCenter(enemy)) else Int.MaxValue
+  def framesToGetInRange(enemy: UnitInfo, at: Pixel)    : Int = if (canAttack(enemy)) framesToTravelPixels(pixelDistanceEdge(enemy, at) - pixelRangeAgainst(enemy)) else Int.MaxValue
   def framesBeforeAttacking(enemy: UnitInfo)            : Int = framesBeforeAttacking(enemy, enemy.pixelCenter)
   def framesBeforeAttacking(enemy: UnitInfo, at: Pixel) : Int = {
     if (canAttack(enemy)) {

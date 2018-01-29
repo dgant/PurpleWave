@@ -7,7 +7,7 @@ object TargetHeuristicDelay extends TargetHeuristic {
   
   override def evaluate(unit: FriendlyUnitInfo, candidate: UnitInfo): Double = {
     
-    val distanceUs    = unit.pixelDistanceEdge(candidate) - unit.pixelRangeAgainstFromEdge(candidate)
+    val distanceUs    = unit.pixelDistanceEdge(candidate) - unit.pixelRangeAgainst(candidate)
     val distanceTeam  = candidate.battle.map(_.teamOf(candidate).centroid.pixelDistanceFast(candidate.pixelCenter)).getOrElse(0.0)
     val distanceTotal = distanceUs + distanceTeam
     val closingSpeed  = Math.max(unit.topSpeed / 4.0, unit.topSpeed - candidate.topSpeed / 2.0)

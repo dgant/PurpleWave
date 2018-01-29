@@ -32,7 +32,7 @@ object Chase extends ActionTechnique {
     if ( ! weCanAttack  && ! theyCanAttack) return None
     
     // TODO: Really didn't think about this too carefully
-    val weAreOutRanged = unit.pixelRangeAgainstFromEdge(other) < other.pixelRangeAgainstFromEdge(unit)
+    val weAreOutRanged = unit.pixelRangeAgainst(other) < other.pixelRangeAgainst(unit)
     if (weAreOutRanged) return Some(1.0)
     if (other.isBeingViolent) return Some(0.0)
     
@@ -50,7 +50,7 @@ object Chase extends ActionTechnique {
     if (target.exists(_.speedApproachingPixel(unit.pixelCenter) < 0.0)) {
       unit.agent.toTravel = Some(unit.pixelCenter.project(
         target.get.pixelCenter,
-        unit.pixelDistanceCenter(target.get) + 32.0))
+        unit.pixelDistanceEdge(target.get) + 48.0))
       Move.delegate(unit)
     }
   }

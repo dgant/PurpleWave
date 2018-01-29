@@ -23,7 +23,7 @@ abstract class DefendFFEWithProbes extends Plan {
     
     lazy val  zerglings    = With.units.enemy.find(_.is(Zerg.Zergling))
     lazy val  threatSource = zerglings.map(_.pixelCenter).getOrElse(With.intelligence.mostBaselikeEnemyTile.pixelCenter)
-    lazy val  toDefend     = cannons.minBy(_.pixelDistanceFast(threatSource)).pixelCenter.project(threatSource, 64.0)
+    lazy val  toDefend     = cannons.minBy(_.pixelDistanceCenter(threatSource)).pixelCenter.project(threatSource, 64.0)
     
     if (cannons.isEmpty) return
     

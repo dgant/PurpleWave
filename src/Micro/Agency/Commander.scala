@@ -69,7 +69,7 @@ class Commander {
     }
     else if (target.visible) {
       lazy val moving           = unit.moving
-      lazy val alreadyInRange   = unit.inRangeToAttackBwapi(target)
+      lazy val alreadyInRange   = unit.inRangeToAttack(target)
       lazy val overdueToAttack  = unit.cooldownLeft == 0 && With.framesSince(unit.lastAttackStartFrame) > 2.0 * unit.cooldownMaxAirGround
       lazy val thisIsANewTarget = ! unit.target.contains(target)
       
@@ -129,7 +129,7 @@ class Commander {
           .flatMap(_.minerals)
           .find(mineral =>
             mineral.visible && //Can't mineral walk to an invisible mineral
-            mineral.pixelsFromEdgeFast(unit) > 60.0 &&
+            mineral.pixelDistanceEdge(unit) > 60.0 &&
             (
               //Don't get stuck by trying to mineral walk through a mineral
               toZone != fromZone ||
@@ -159,7 +159,7 @@ class Commander {
       destination = destination.add((unit.id + With.frame / With.configuration.pathRecalculationDelayFrames) % 5 - 2, 0)
     }
     
-    if (unit.pixelDistanceFast(destination) > 3) {
+    if (unit.pixelDistanceCenter(destination) > 3) {
       if (unit.is(Terran.Medic)) {
         unit.baseUnit.attack(destination.bwapi)
       }

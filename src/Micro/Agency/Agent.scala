@@ -196,7 +196,7 @@ class Agent(val unit: FriendlyUnitInfo) {
       toForm.get
     }
     else if (anchors.nonEmpty) {
-      anchors.minBy(_.pixelDistanceFast(unit)).pixelCenter
+      anchors.minBy(_.pixelDistanceCenter(unit)).pixelCenter
     }
     else if (With.geography.ourBases.nonEmpty) {
       With.geography.ourBases.map(_.heart.pixelCenter).minBy(unit.pixelDistanceTravelling)

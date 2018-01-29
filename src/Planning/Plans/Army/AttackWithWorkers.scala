@@ -85,7 +85,7 @@ class AttackWithWorkers extends Plan {
     while(unassignedScouts.nonEmpty) {
       unscoutedBases.foreach(base => {
         if (unassignedScouts.nonEmpty) {
-          val scout = unassignedScouts.minBy(_.pixelDistanceFast(base.heart.pixelCenter))
+          val scout = unassignedScouts.minBy(_.pixelDistanceCenter(base.heart.pixelCenter))
           unassignedScouts.remove(scout)
           tickle(scout, base)
         }

@@ -22,12 +22,12 @@ object Build extends Action {
     val ourBuilding = With.grids.units.get(unit.agent.toBuildTile.get).find(_.unitClass == unit.agent.toBuild.get)
     
     if (ourBuilding.isDefined) {
-      unit.agent.toGather = ByOption.minBy(With.geography.ourBases.flatMap(_.minerals))(_.pixelDistanceFast(unit.pixelCenter))
+      unit.agent.toGather = ByOption.minBy(With.geography.ourBases.flatMap(_.minerals))(_.pixelDistanceCenter(unit.pixelCenter))
       Gather.consider(unit)
       return
     }
     
-    val distance  = unit.pixelDistanceFast(unit.agent.toBuildTile.get.pixelCenter)
+    val distance  = unit.pixelDistanceCenter(unit.agent.toBuildTile.get.pixelCenter)
     val buildArea = unit.agent.toBuild.get.tileArea.add(unit.agent.toBuildTile.get)
     
     def blockersForTile(tile: Tile) = {
@@ -60,7 +60,7 @@ object Build extends Action {
       lazy val healthy    = unit.totalHealth > 10 || unit.totalHealth >= unit.matchups.threats.head.totalHealth
       if (noThreats || (allWorkers && healthy)) {
         Target.delegate(unit)
-        unit.agent.toAttack = unit.agent.toAttack.orElse(Some(blockersToKill.minBy(_.pixelDistanceFast(unit))))
+        unit.agent.toAttack = unit.agent.toAttack.orElse(Some(blockersToKill.minBy(_.pixelDistanceCenter(unit))))
         Attack.delegate(unit)
       }
       else {

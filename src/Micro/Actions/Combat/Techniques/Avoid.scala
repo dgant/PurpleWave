@@ -34,8 +34,8 @@ object Avoid extends ActionTechnique {
     val pixelStep       = 16.0
     val here            = unit.pixelCenter
     val there           = unit.pixelCenter.project(unit.agent.nextWaypoint(unit.agent.origin), pixelStep)
-    val distanceHere    = other.pixelDistanceFast(here)
-    val distanceThere   = other.pixelDistanceFast(there)
+    val distanceHere    = other.pixelDistanceCenter(here)
+    val distanceThere   = other.pixelDistanceCenter(there)
     val blockingFactor  = (distanceHere - distanceThere) / pixelStep
     
     Some(blockingFactor)

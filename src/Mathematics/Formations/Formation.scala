@@ -32,10 +32,10 @@ object Formation {
   
     units
       .toArray
-      .sortBy(_.pixelDistanceFast(center))
+      .sortBy(_.pixelDistanceCenter(center))
       .map(unit => {
         val groupSlots = formationSlots(unit.unitClass)
-        val bestSlot = groupSlots.minBy(unit.pixelDistanceFast)
+        val bestSlot = groupSlots.minBy(unit.pixelDistanceCenter)
         groupSlots -= bestSlot
         (unit, bestSlot)
       })

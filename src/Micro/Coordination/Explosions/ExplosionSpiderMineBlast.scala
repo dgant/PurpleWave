@@ -9,8 +9,8 @@ class ExplosionSpiderMineBlast(mine: UnitInfo) extends ExplosionRadial {
   protected val expectedTarget: Option[UnitInfo] = {
     val targets = mine.matchups.targets
     val target = ByOption.minBy(targets)(target => {
-      val distanceNow = target.pixelDistanceFast(mine)
-      val distanceLater = target.pixelDistanceFast(mine.projectFrames(12))
+      val distanceNow = target.pixelDistanceCenter(mine)
+      val distanceLater = target.pixelDistanceCenter(mine.projectFrames(12))
       distanceNow + 2 * distanceLater
     })
     target
@@ -20,7 +20,7 @@ class ExplosionSpiderMineBlast(mine: UnitInfo) extends ExplosionRadial {
       .map(target =>
         mine.pixelCenter.project(
           target.pixelCenter,
-          mine.pixelDistanceFast(target) - mine.pixelRangeGround - target.unitClass.radialHypotenuse))
+          mine.pixelDistanceCenter(target) - mine.pixelRangeGround - target.unitClass.radialHypotenuse))
       .getOrElse(mine.pixelCenter)
   }
   override def radius: Double = 100

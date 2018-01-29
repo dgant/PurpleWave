@@ -21,8 +21,8 @@ object TargetHeuristicVpfOurs extends TargetHeuristic {
     val splashRadius25 = if (target.flying) shooter.unitClass.airSplashRadius25 else shooter.unitClass.groundSplashRadius25
     
     val bystanders = if (shooter.unitClass.splashesFriendly) target.matchups.allUnits else target.matchups.allies
-    val splashed50 = bystanders.filter(bystander => target.flying == bystander.flying && target.pixelDistanceFast(bystander) <= splashRadius50)
-    val splashed25 = bystanders.filter(bystander => target.flying == bystander.flying && target.pixelDistanceFast(bystander) <= splashRadius25 && target.pixelDistanceFast(bystander) > splashRadius50)
+    val splashed50 = bystanders.filter(bystander => target.flying == bystander.flying && target.pixelDistanceCenter(bystander) <= splashRadius50)
+    val splashed25 = bystanders.filter(bystander => target.flying == bystander.flying && target.pixelDistanceCenter(bystander) <= splashRadius25 && target.pixelDistanceCenter(bystander) > splashRadius50)
   
     val splashed50Value = 0.50 * splashed50.map(bystander => MicroValue.valuePerAttack(shooter, bystander)).sum
     val splashed25Value = 0.25 * splashed25.map(bystander => MicroValue.valuePerAttack(shooter, bystander)).sum

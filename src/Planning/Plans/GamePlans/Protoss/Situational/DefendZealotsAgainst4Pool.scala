@@ -46,7 +46,7 @@ class DefendZealotsAgainst4Pool extends Plan {
     val workersNeeded   = 1 + 3 * zerglings.size - 3 * zealots.size
     val workerCap       = workers.size - 4
     val workersToFight  = Math.max(0, Math.min(workerCap, workersNeeded))
-    val target          = zealots.minBy(zealot => zerglings.map(_.pixelDistanceFast(zealot)).min).pixelCenter
+    val target          = zealots.minBy(zealot => zerglings.map(_.pixelDistanceCenter(zealot)).min).pixelCenter
     
     defenders.get.unitCounter.set(UnitCountExactly(workersToFight))
     defenders.get.acquire(this)

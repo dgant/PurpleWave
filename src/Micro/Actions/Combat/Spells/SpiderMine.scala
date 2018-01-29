@@ -29,7 +29,7 @@ object SpiderMine extends Action {
   }
   
   protected def calculateMineTarget(unit: FriendlyUnitInfo, target: Pixel): Pixel = {
-    if (unit.pixelDistanceFast(target) > 32) return target
+    if (unit.pixelDistanceCenter(target) > 32) return target
     if ( ! unit.moving) return target
     val velocity = unit.velocity.normalize(6)
     unit.pixelCenter.add(velocity.x.toInt, velocity.y.toInt)
@@ -40,7 +40,7 @@ object SpiderMine extends Action {
     if (unit.matchups.framesOfSafetyDiffused <= 0) return
     if (With.grids.units.get(unit.tileIncludingCenter).exists(_.is(Terran.SpiderMine))) return
     
-    val choke = unit.zone.edges.find(e => unit.pixelDistanceFast(e.centerPixel) < e.radiusPixels)
+    val choke = unit.zone.edges.find(e => unit.pixelDistanceCenter(e.centerPixel) < e.radiusPixels)
     if (choke.isDefined) {
       placeMine(unit, unit.pixelCenter)
     }
@@ -55,7 +55,7 @@ object SpiderMine extends Action {
     val victims = vulture.matchups.targets.filterNot(_.unitClass.floats)
     if (victims.isEmpty) return
     
-    val saboteursInitial = new mutable.PriorityQueue[UnitInfo]()(Ordering.by(v => victims.map(_.pixelDistanceFast(v)).min))
+    val saboteursInitial = new mutable.PriorityQueue[UnitInfo]()(Ordering.by(v => victims.map(_.pixelDistanceCenter(v)).min))
     val saboteursFinal = saboteursInitial.take(victims.size).toVector
     
     if ( ! saboteursFinal.contains(vulture)) return

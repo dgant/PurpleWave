@@ -38,7 +38,7 @@ object Bust extends Action {
     if (unit.damageInLastSecond > 0) {
       Leave.delegate(unit)
     }
-    else if (bunkers.exists(unit.inRangeToAttackSlow)) {
+    else if (bunkers.exists(unit.inRangeToAttack)) {
       With.commander.hold(unit)
     }
   }

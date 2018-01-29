@@ -31,7 +31,7 @@ class ControlEnemyAirspace(perBase: Int = 1) extends Plan {
       .sortBy(_.lastScoutedFrame)
       .foreach(base => if (unassignedScouts.nonEmpty) {
         val basePixel = base.heart.pixelCenter
-        val scout = unassignedScouts.minBy(_.pixelDistanceFast(basePixel))
+        val scout = unassignedScouts.minBy(_.pixelDistanceCenter(basePixel))
         unassignedScouts -= scout
         scout.agent.intend(this, new Intention {
           toTravel    = Some(basePixel)

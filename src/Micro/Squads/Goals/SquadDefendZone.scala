@@ -59,9 +59,9 @@ class SquadDefendZone(zone: Zone) extends SquadGoal {
   
   def huntEnemies() {
     lazy val center        = zone.bases.find(_.owner.isUs).map(_.heart.pixelCenter).getOrElse(zone.centroid.pixelCenter)
-    lazy val target        = huntableEnemies().minBy(_.pixelDistanceFast(center))
-    lazy val targetAir     = ByOption.minBy(huntableEnemies().filter   (_.flying))(_.pixelDistanceFast(center)).getOrElse(target)
-    lazy val targetGround  = ByOption.minBy(huntableEnemies().filterNot(_.flying))(_.pixelDistanceFast(center)).getOrElse(target)
+    lazy val target        = huntableEnemies().minBy(_.pixelDistanceCenter(center))
+    lazy val targetAir     = ByOption.minBy(huntableEnemies().filter   (_.flying))(_.pixelDistanceCenter(center)).getOrElse(target)
+    lazy val targetGround  = ByOption.minBy(huntableEnemies().filterNot(_.flying))(_.pixelDistanceCenter(center)).getOrElse(target)
     squad.recruits.foreach(recruit => {
       val onlyAir     = recruit.canAttack && ! recruit.unitClass.attacksGround
       val onlyGround  = recruit.canAttack && ! recruit.unitClass.attacksAir
@@ -86,7 +86,7 @@ class SquadDefendZone(zone: Zone) extends SquadGoal {
   def defendWall(walls: Seq[UnitInfo]) {
     val centroidSources = Seq(squad.enemies.toSeq.map(_.pixelCenter), zone.exit.map(_.centerPixel).toSeq, Seq(SpecificPoints.middle))
     val enemyCentroid   = centroidSources.find(_.nonEmpty).head.centroid
-    val wall            = walls.minBy(_.pixelDistanceFast(enemyCentroid))
+    val wall            = walls.minBy(_.pixelDistanceCenter(enemyCentroid))
     val concaveOrigin   = wall.pixelCenter.project(enemyCentroid, 96.0)
     val concaveAxis     = wall.pixelCenter.radiansTo(enemyCentroid)
     val concaveStart    = concaveOrigin.radiateRadians(concaveAxis + wallConcaveWidthRadians, wallConcaveWidthPixels)

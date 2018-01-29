@@ -10,7 +10,7 @@ case class DecideToAttack(argAgent: FriendlyUnitInfo, target: UnitInfo) extends 
   val targetPixel: Pixel = target.pixelCenter
   val destination: Pixel = agent.pixelCenter.project(targetPixel, distanceToCover)
   
-  lazy private val distanceNow      = agent.pixelsFromEdgeFast(target)
+  lazy private val distanceNow      = agent.pixelDistanceEdge(target)
   lazy private val rangeAgainst     = agent.pixelRangeAgainstFromEdge(target)
   lazy private val distanceToCover  = Math.max(0.0,  distanceNow - rangeAgainst)
   

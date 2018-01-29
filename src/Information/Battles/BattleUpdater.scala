@@ -24,7 +24,7 @@ object BattleUpdater {
     
     battle.teams.foreach(group =>
       group.vanguard = ByOption
-        .minBy(group.units)(_.pixelDistanceFast(group.opponent.centroid))
+        .minBy(group.units)(_.pixelDistanceCenter(group.opponent.centroid))
         .map(_.pixelCenter)
         .getOrElse(SpecificPoints.middle))
   }

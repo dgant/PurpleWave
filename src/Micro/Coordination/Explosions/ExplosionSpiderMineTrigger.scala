@@ -13,7 +13,7 @@ class ExplosionSpiderMineTrigger(mine: UnitInfo) extends ExplosionRadial {
   override def affects(unit: UnitInfo): Boolean = (
     (mine.burrowed || (
       With.framesSince(mine.frameDiscovered) < 48)
-      && mine.isEnemy || mine.matchups.targets.exists(_.pixelDistanceFast(mine) <= radius))
+      && mine.isEnemy || mine.matchups.targets.exists(_.pixelDistanceCenter(mine) <= radius))
     && ! unit.flying
     && ! unit.unitClass.floats
     && ! unit.unitClass.isBuilding

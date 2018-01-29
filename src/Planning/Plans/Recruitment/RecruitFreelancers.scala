@@ -36,7 +36,7 @@ class RecruitFreelancers extends Plan {
     }
     
     def distance(candidate: Resume, squad: Squad) {
-      candidate.unit.pixelDistanceFast(squad.centroid)
+      candidate.unit.pixelDistanceCenter(squad.centroid)
     }
     
     def recruitBest(squad: Squad, accept: (Resume) => Boolean) {

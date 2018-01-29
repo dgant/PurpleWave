@@ -50,7 +50,7 @@ class Simulacrum(
     new mutable.PriorityQueue[Simulacrum]()(Ordering.by(x => (x.realUnit.unitClass.helpsInCombat, - x.pixel.pixelDistanceFast(pixel))))
       ++ realUnit.matchups.targets
         .filter(target =>
-          realUnit.inRangeToAttackFast(target)
+          realUnit.inRangeToAttack(target)
           || simulation.weAttack
           || ! realUnit.isOurs)
         .flatMap(simulation.simulacra.get)
@@ -114,7 +114,7 @@ class Simulacrum(
       }
     }
     if (target.isDefined && target != lastTarget) {
-      lazy val distanceByAir    : Double = realUnit.pixelDistanceFast(target.get.realUnit)
+      lazy val distanceByAir    : Double = realUnit.pixelDistanceCenter(target.get.realUnit)
       lazy val distanceByGround : Double = realUnit.pixelDistanceTravelling(target.get.realUnit.pixelCenter)
       targetPathBendiness = Math.min(3.0, PurpleMath.nanToInfinity(distanceByAir / distanceByGround))
     }

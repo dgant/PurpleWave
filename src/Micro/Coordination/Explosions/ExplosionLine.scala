@@ -28,8 +28,8 @@ abstract class ExplosionLine extends Explosion {
   }
   
   override def directionTo(unit: UnitInfo): Force = {
-    val pixelsFromStart = unit.pixelDistanceFast(start)
-    val pixelsFromEnd = unit.pixelDistanceFast(end)
+    val pixelsFromStart = unit.pixelDistanceCenter(start)
+    val pixelsFromEnd = unit.pixelDistanceCenter(end)
     if (pixelsFromEnd > length) {
       return new Force(unit.pixelCenter.subtract(start))
     }

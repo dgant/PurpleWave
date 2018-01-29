@@ -24,7 +24,7 @@ object Breathe extends ActionTechnique {
     if ( ! other.canAttack(unit)) return None
     
     val distanceOurs    = unit.pixelRangeMax
-    val distanceTheirs  = other.pixelDistanceFast(unit)
+    val distanceTheirs  = other.pixelDistanceCenter(unit)
     val distanceDelta   = distanceOurs - distanceTheirs
     
     val rangeOurs       = unit.pixelRangeAgainstFromEdge(unit.matchups.targets.head)

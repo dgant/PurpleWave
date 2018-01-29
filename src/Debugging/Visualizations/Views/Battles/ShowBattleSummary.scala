@@ -57,7 +57,7 @@ object ShowBattleSummary extends View {
     battle.teams.foreach(team => {
       val isUs = team == battle.us
       val centroid = team.centroid
-      val radius = ByOption.max(team.units.map(u => u.unitClass.radialHypotenuse + u.pixelDistanceFast(centroid))).getOrElse(0.0).toInt
+      val radius = ByOption.max(team.units.map(u => u.unitClass.radialHypotenuse + u.pixelDistanceCenter(centroid))).getOrElse(0.0).toInt
       val thickness = if (weWin == isUs) 2 else 5
       (0 until thickness).foreach(t => DrawMap.circle(centroid, radius + t, if (isUs) ourColorNeon else enemyColorNeon))
     })
@@ -66,7 +66,7 @@ object ShowBattleSummary extends View {
     DrawMap.circle  (battle.enemy.vanguard, 8,                      enemyColorDark)
     DrawMap.line    (battle.focus,          battle.us.vanguard,     ourColorDark)
     DrawMap.line    (battle.focus,          battle.enemy.vanguard,  enemyColorDark)
-    With.game.drawCircleMap(battle.focus.bwapi, (battle.us.units ++ battle.enemy.units).map(_.pixelDistanceFast(battle.focus)).max.toInt, neutralColor)
+    With.game.drawCircleMap(battle.focus.bwapi, (battle.us.units ++ battle.enemy.units).map(_.pixelDistanceCenter(battle.focus)).max.toInt, neutralColor)
     DrawMap.labelBox(
       Vector(estimation.netValue.toInt.toString),
       battle.focus.add(24, 0),

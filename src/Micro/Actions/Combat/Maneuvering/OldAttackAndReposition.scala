@@ -22,16 +22,16 @@ object OldAttackAndReposition extends Action {
     }
     
     lazy val target         = unit.agent.toAttack.get
-    lazy val shouldChase    = unit.pixelDistanceFast(target) < unit.pixelDistanceFast(target.projectFrames(8))
-    lazy val shouldHugTank  = target.pixelRangeMin > 0 && target.canAttack(unit) && unit.pixelDistanceFast(target) * 1.75 < target.pixelRangeAgainstFromCenter(unit)
+    lazy val shouldChase    = unit.pixelDistanceCenter(target) < unit.pixelDistanceCenter(target.projectFrames(8))
+    lazy val shouldHugTank  = target.pixelRangeMin > 0 && target.canAttack(unit) && unit.pixelDistanceCenter(target) * 1.75 < target.pixelRangeAgainstFromCenter(unit)
     lazy val shouldAvoid    = unit.matchups.threats.exists(t => (target != t || t.pixelRangeAgainstFromCenter(unit) < unit.pixelRangeAgainstFromCenter(t)))
     
-    if (unit.readyForAttackOrder || ! unit.inRangeToAttackFast(target)) {
+    if (unit.readyForAttackOrder || ! unit.inRangeToAttack(target)) {
       Attack.delegate(unit)
     }
     else if (shouldChase || shouldHugTank) {
       val happy           = unit.matchups.vpfNetDiffused > 0
-      val targetMagnitude = (if (happy) 2.0 else 1.0) * unit.pixelDistanceFast(target) / unit.pixelRangeAgainstFromCenter(target)
+      val targetMagnitude = (if (happy) 2.0 else 1.0) * unit.pixelDistanceCenter(target) / unit.pixelRangeAgainstFromCenter(target)
       val threatMagnitude = (if (happy) 1.0 else 2.0)
       val forceTarget     = Potential.unitAttraction(unit, target, targetMagnitude)
       val forceThreat     = Potential.threatsRepulsion(unit).normalize(threatMagnitude)

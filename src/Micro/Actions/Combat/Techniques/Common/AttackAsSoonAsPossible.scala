@@ -15,7 +15,7 @@ object AttackAsSoonAsPossible extends Action {
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     if (unit.readyForAttackOrder
       || unit.matchups.targetsInRange.isEmpty
-      || unit.matchups.targets.forall(t => unit.pixelsFromEdgeFast(t) > unit.pixelRangeAgainstFromEdge(t) - 32.0)) {
+      || unit.matchups.targets.forall(t => unit.pixelDistanceEdge(t) > unit.pixelRangeAgainstFromEdge(t) - 32.0)) {
       Target.delegate(unit)
       Attack.delegate(unit)
     }

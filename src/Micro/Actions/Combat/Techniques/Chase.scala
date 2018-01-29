@@ -50,7 +50,7 @@ object Chase extends ActionTechnique {
     if (target.exists(_.speedApproachingPixel(unit.pixelCenter) < 0.0)) {
       unit.agent.toTravel = Some(unit.pixelCenter.project(
         target.get.pixelCenter,
-        unit.pixelDistanceFast(target.get) + 32.0))
+        unit.pixelDistanceCenter(target.get) + 32.0))
       Move.delegate(unit)
     }
   }

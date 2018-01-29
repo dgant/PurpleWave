@@ -13,13 +13,13 @@ object BlockConstruction extends Action {
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {
-    val builder = blockableBuilders(unit).minBy(_.pixelDistanceFast(unit))
+    val builder = blockableBuilders(unit).minBy(_.pixelDistanceCenter(unit))
     val destination = builder.targetPixel
     
     var fight = false
     var block = false
     if (destination.isDefined) {
-      if (unit.pixelDistanceFast(destination.get) < builder.pixelDistanceFast(destination.get)) {
+      if (unit.pixelDistanceCenter(destination.get) < builder.pixelDistanceCenter(destination.get)) {
         fight = true
       }
       else {
@@ -45,7 +45,7 @@ object BlockConstruction extends Action {
       (
         builder.command.exists(_.getUnitCommandType == UnitCommandType.Build) ||
         builder.targetPixel.exists(targetPixel =>
-          builder.pixelDistanceFast(targetPixel) < 32.0 * 60.0 &&
+          builder.pixelDistanceCenter(targetPixel) < 32.0 * 60.0 &&
           targetPixel.zone.bases.exists(base =>
             base.townHall.isEmpty &&
             base.townHallArea.contains(targetPixel.tileIncluding)))

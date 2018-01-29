@@ -60,9 +60,9 @@ object Potential {
   def teamAttraction(unit: FriendlyUnitInfo): Force = {
     val allies                = (unit.matchups.allies ++ unit.squad.map(_.recruits).getOrElse(List.empty)).filter(_ != unit)
     val alliesUseful          = allies.filter(ally => unit.matchups.threats.exists(ally.canAttack))
-    val allyNearestUseful     = ByOption.minBy(alliesUseful)(ally => ally.pixelDistanceFast(unit) - ally.effectiveRangePixels)
+    val allyNearestUseful     = ByOption.minBy(alliesUseful)(ally => ally.pixelDistanceCenter(unit) - ally.effectiveRangePixels)
     if (allyNearestUseful.isEmpty) return new Force
-    val allyDistance          = allyNearestUseful.get.pixelDistanceFast(unit)
+    val allyDistance          = allyNearestUseful.get.pixelDistanceCenter(unit)
     val allyDistanceAlarming  = Math.max(32.0 * 3.0, allyNearestUseful.get.effectiveRangePixels)
     val magnitude             = Math.min(1.0, allyDistance / allyDistanceAlarming)
     val output                = unitAttraction(unit, allyNearestUseful.get, magnitude)
@@ -75,7 +75,7 @@ object Potential {
   
   def explosionRepulsion(unit: FriendlyUnitInfo, explosion: OldExplosion): Force = {
     val magnitudeDamage   = explosion.damage
-    val magnitudeDistance = explosion.safetyRadius / Math.max(1.0, unit.pixelDistanceFast(explosion.pixelCenter))
+    val magnitudeDistance = explosion.safetyRadius / Math.max(1.0, unit.pixelDistanceCenter(explosion.pixelCenter))
     val magnitudeFinal    = magnitudeDamage / magnitudeDistance
     val output            = ForceMath.fromPixels(unit.pixelCenter, explosion.pixelCenter, -magnitudeFinal)
     output
@@ -93,7 +93,7 @@ object Potential {
   }
   
   protected def detectorRepulsion(unit: FriendlyUnitInfo, detector: UnitInfo): Force = {
-    val output = unitAttraction(unit, detector, -1.0 / detector.pixelDistanceFast(unit))
+    val output = unitAttraction(unit, detector, -1.0 / detector.pixelDistanceCenter(unit))
     output
   }
   
@@ -122,12 +122,12 @@ object Potential {
     if (unit.flying && ! unit.matchups.threats.exists(_.unitClass.dealsRadialSplashDamage)) return new Force
     
     val blockers        = unit.matchups.allies.filterNot(_.flying)
-    val nearestBlocker  = ByOption.minBy(blockers)(_.pixelsFromEdgeFast(unit))
+    val nearestBlocker  = ByOption.minBy(blockers)(_.pixelDistanceEdge(unit))
     
     if (nearestBlocker.isEmpty) return new Force
     
     val maximumDistance = Math.max(32.0, unit.pixelRangeMax)
-    val blockerDistance = nearestBlocker.get.pixelsFromEdgeFast(unit)
+    val blockerDistance = nearestBlocker.get.pixelDistanceEdge(unit)
     val magnitude       = Math.max(0.0, 1.0 - blockerDistance / maximumDistance)
     val output          = unitAttraction(unit, nearestBlocker.get, - magnitude)
     output

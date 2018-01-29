@@ -24,7 +24,7 @@ object ShowSquads extends View {
         drawBorder = unit.isEnemy,
         unit.player.colorMedium))
   
-    With.game.drawCircleMap(squad.centroid.bwapi, squad.recruits.map(_.pixelDistanceSlow(squad.centroid)).max.toInt, color)
+    With.game.drawCircleMap(squad.centroid.bwapi, squad.recruits.map(_.pixelDistanceCenter(squad.centroid)).max.toInt, color)
   }
   
   override def renderScreen() {

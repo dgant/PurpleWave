@@ -10,7 +10,7 @@ object TargetSingle {
     minimumValue        : Double,
     evaluate            : (UnitInfo) => Double): Option[UnitInfo] = {
     
-    val targets = caster.matchups.others.filter(t => t.pixelDistanceFast(caster) <= searchRadiusPixels && t.visible && ! t.effectivelyCloaked)
+    val targets = caster.matchups.others.filter(t => t.pixelDistanceCenter(caster) <= searchRadiusPixels && t.visible && ! t.effectivelyCloaked)
     
     if (targets.isEmpty) {
       return None

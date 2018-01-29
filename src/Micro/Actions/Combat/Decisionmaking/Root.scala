@@ -35,22 +35,22 @@ object Root extends Action {
     private lazy val rootersInPushCloser  = rootersInPush.count(distanceToGoal(_) < ourDistanceToGoal + pushSpacing)
     
     private lazy val threatsButNoTargets  = unit.matchups.threats.nonEmpty && unit.matchups.targets.isEmpty
-    private lazy val insideNarrowChoke    = unit.zone.edges.exists(e => e.radiusPixels < 32.0 * 4.0 && unit.pixelDistanceFast(e.centerPixel) < e.radiusPixels)
+    private lazy val insideNarrowChoke    = unit.zone.edges.exists(e => e.radiusPixels < 32.0 * 4.0 && unit.pixelDistanceCenter(e.centerPixel) < e.radiusPixels)
     private lazy val beingPickedUp        = unit.agent.toBoard.isDefined
     private lazy val outOfCombat          = unit.matchups.battle.isEmpty
     private lazy val inTheWay             = unit.agent.shovers.nonEmpty
     private lazy val retreating           = ! unit.agent.shouldEngage
     private lazy val protectingBase       = unit.matchups.allies.exists(a => a.unitClass.isBuilding && a.matchups.framesOfSafetyDiffused < unit.matchups.framesOfSafetyDiffused)
     private lazy val insideTurretRange    = unit.matchups.threatsInRange.exists(_.unitClass.isBuilding)
-    private lazy val nearFormationPoint   = unit.agent.toForm.exists(unit.pixelDistanceFast(_) < 32.0 * 6.0)
+    private lazy val nearFormationPoint   = unit.agent.toForm.exists(unit.pixelDistanceCenter(_) < 32.0 * 6.0)
     private lazy val turretsInRange       = unit.matchups.targetsInRange.exists(_.unitClass.isStaticDefense)
     private lazy val buildingInRange      = unit.matchups.targetsInRange.exists(_.unitClass.isBuilding)
     private lazy val combatTargets        = unit.matchups.targets.filter(_.unitClass.helpsInCombat)
-    private lazy val targetsInRange       = combatTargets.filter(t => unit.pixelDistanceFast(t)                         < maxRange)
-    private lazy val targetsNearingRange  = combatTargets.filter(t => unit.pixelDistanceFast(t.projectFrames(rootTime)) < maxRange)
+    private lazy val targetsInRange       = combatTargets.filter(t => unit.pixelDistanceCenter(t)                         < maxRange)
+    private lazy val targetsNearingRange  = combatTargets.filter(t => unit.pixelDistanceCenter(t.projectFrames(rootTime)) < maxRange)
     private lazy val girdForCombat        = targetsInRange.nonEmpty || targetsNearingRange.nonEmpty
     private lazy val leadingPush          = (rootersInPush.size + 1) / 3 > rootersInPushCloser
-    private lazy val destinationFarAway   = unit.pixelDistanceFast(unit.agent.destination) > 32.0 * 4.0
+    private lazy val destinationFarAway   = unit.pixelDistanceCenter(unit.agent.destination) > 32.0 * 4.0
     
     lazy val mustBeUnrooted = (
           (threatsButNoTargets              )

@@ -43,11 +43,11 @@ object Tickle extends Action {
   
     // We want to avoid big drilling stacks
     val centroidSoft    = enemies.map(_.pixelCenter).centroid
-    val centroidHard    = if (enemies.size > 3) enemies.sortBy(_.pixelDistanceFast(centroidSoft)).take(enemies.size/2).map(_.pixelCenter).centroid else centroidSoft //Don't centroid an empty list
+    val centroidHard    = if (enemies.size > 3) enemies.sortBy(_.pixelDistanceCenter(centroidSoft)).take(enemies.size/2).map(_.pixelCenter).centroid else centroidSoft //Don't centroid an empty list
     
     // Get in their base!
     if ( ! unit.zone.bases.exists(_.owner.isEnemy)
-      && ! enemies.exists(_.pixelDistanceFast(unit) < 48.0)
+      && ! enemies.exists(_.pixelDistanceCenter(unit) < 48.0)
       && enemiesAttackingUs.size < 1) {
       Move.consider(unit)
       return
@@ -58,8 +58,8 @@ object Tickle extends Action {
       zone.bases.exists(_.harvestingArea.contains(unit.tileIncludingCenter)
       && enemies.exists(enemy =>
         enemy.zone == zone
-        && enemy.pixelDistanceFast(unit) < 64.0
-        && enemy.pixelDistanceFast(exit) < unit.pixelDistanceFast(exit)))) {
+        && enemy.pixelDistanceCenter(unit) < 64.0
+        && enemy.pixelDistanceCenter(exit) < unit.pixelDistanceCenter(exit)))) {
       mineralWalkAway(unit)
       return
     }
@@ -88,7 +88,7 @@ object Tickle extends Action {
     }
     
     // Stay close to the fight
-    if (unit.matchups.threats.forall(_.pixelDistanceFast(unit) > 64)) {
+    if (unit.matchups.threats.forall(_.pixelDistanceCenter(unit) > 64)) {
       attack = true
     }
     
@@ -125,7 +125,7 @@ object Tickle extends Action {
           target.zone == zone   ||
           // ...unless they're fighting us! Or building a building.
           target.constructing               ||
-          unit.inRangeToAttackFast(target)  ||
+          unit.inRangeToAttack(target)  ||
           (
             target.isBeingViolent &&
             target.pixelDistanceTravelling(zone.centroid) <= unit.pixelDistanceTravelling(zone.centroid)
@@ -135,7 +135,7 @@ object Tickle extends Action {
         (
           // Don't get distracted by workers leaving the base
           target.targetPixel.forall(_.zone == zone) ||
-          unit.inRangeToAttackFast(target)          ||
+          unit.inRangeToAttack(target)          ||
           target.isBeingViolent                     ||
           unit.constructing
         ))
@@ -147,15 +147,15 @@ object Tickle extends Action {
       else if (
         unit.readyForAttackOrder ||
         unit.cooldownLeft - With.latency.framesRemaining <=
-          targets.map(target => unit.framesToTravelPixels(unit.pixelsFromEdgeFast(target))).min) {
+          targets.map(target => unit.framesToTravelPixels(unit.pixelDistanceEdge(target))).min) {
         // Let's pick the outermost target while avoiding drilling stacks
-        val nearestTargetDistance = targets.map(_.pixelDistanceFast(exit)).min
-        val validTargets = targets.filter(_.pixelDistanceFast(exit) - 16.0 <= nearestTargetDistance)
+        val nearestTargetDistance = targets.map(_.pixelDistanceCenter(exit)).min
+        val validTargets = targets.filter(_.pixelDistanceCenter(exit) - 16.0 <= nearestTargetDistance)
         val bestTarget =
           validTargets
-            .sortBy(target => target.totalHealth * target.pixelDistanceFast(unit))
+            .sortBy(target => target.totalHealth * target.pixelDistanceCenter(unit))
             .headOption
-            .getOrElse(targets.minBy(_.pixelDistanceFast(exit)))
+            .getOrElse(targets.minBy(_.pixelDistanceCenter(exit)))
   
         unit.agent.toAttack = Some(bestTarget)
         Attack.consider(unit)
@@ -165,7 +165,7 @@ object Tickle extends Action {
     }
       
     // We're not attacking, so let's hang out and wait for opportunities
-    if (enemiesAttackingUs.nonEmpty || enemies.exists(_.pixelDistanceFast(unit) < 64.0)) {
+    if (enemiesAttackingUs.nonEmpty || enemies.exists(_.pixelDistanceCenter(unit) < 64.0)) {
       // Extra aggression vs. 4-pool
       if ( ! weOverpower) {
         mineralWalkAway(unit)
@@ -177,8 +177,8 @@ object Tickle extends Action {
           && freebie.armorHealth < 5
           && enemies.forall(defender =>
           defender != freebie
-            && unit.pixelDistanceFast(defender) >
-            unit.pixelDistanceFast(freebie)))
+            && unit.pixelDistanceCenter(defender) >
+            unit.pixelDistanceCenter(freebie)))
       unit.agent.toAttack = freebies
       Attack.consider(unit)
       OldAvoid.consider(unit)

@@ -18,7 +18,7 @@ object EmergencyRepair extends Action {
     
     if (patients.isEmpty) return
     
-    val patient = patients.minBy(_.pixelDistanceFast(unit))
+    val patient = patients.minBy(_.pixelDistanceCenter(unit))
     
     With.commander.repair(unit, patient)
   }
@@ -35,18 +35,18 @@ object EmergencyRepair extends Action {
   }
   
   def isCloseEnough(repairer: FriendlyUnitInfo, patient: UnitInfo): Boolean = {
-    if (repairer.pixelDistanceFast(patient) > 32.0 * 30.0) return false
+    if (repairer.pixelDistanceCenter(patient) > 32.0 * 30.0) return false
     
     lazy val patientLifetime  = Math.max(patient.matchups.framesToLiveCurrently, patient.matchups.framesOfSafetyDiffused)
     lazy val canSaveBunker    = patient.is(Terran.Bunker) && repairer.framesToGetInRange(patient) < patientLifetime * 2
     lazy val canSavePlebian   = repairer.framesToGetInRange(patient) < patientLifetime
-    lazy val repairerAdjacent = repairer.pixelsFromEdgeFast(patient) < 16.0
+    lazy val repairerAdjacent = repairer.pixelDistanceEdge(patient) < 16.0
     lazy val patientImmobile  = ! patient.canMove
     lazy val repairerNearest  = patient.matchups.repairers.isEmpty  &&
       patient.framesToGetInRange(patient) < 24 * 4.0                &&
       ! patient.matchups.allies.exists(otherRepairer =>
         otherRepairer != repairer &&
-        otherRepairer.pixelDistanceFast(patient) < repairer.pixelDistanceFast(patient))
+        otherRepairer.pixelDistanceCenter(patient) < repairer.pixelDistanceCenter(patient))
     
     val output = (canSaveBunker || canSavePlebian) && (repairerAdjacent || patientImmobile || repairerNearest)
     output

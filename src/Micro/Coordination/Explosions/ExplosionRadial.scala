@@ -15,7 +15,7 @@ abstract class ExplosionRadial extends Explosion {
   }
   
   def pixelsOfEntanglement(unit: UnitInfo): Double = {
-    radius - unit.pixelDistanceFast(center)
+    radius - unit.pixelDistanceCenter(center)
   }
   
   override def directionTo(unit: UnitInfo): Force = {

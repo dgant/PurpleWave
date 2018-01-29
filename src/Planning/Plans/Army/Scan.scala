@@ -39,7 +39,7 @@ class Scan extends Plan {
       u.matchups.enemies.exists(e =>
         e.is(Terran.SiegeTankSieged)  &&
         e.cooldownLeft == 0           &&
-        e.inRangeToAttackFast(u)      &&
+        e.inRangeToAttack(u)      &&
         ! e.matchups.targetsInRange.exists(_.visible)))
   
     if (contentiousTanks.nonEmpty) {

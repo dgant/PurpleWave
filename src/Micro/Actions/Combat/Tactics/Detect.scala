@@ -34,7 +34,7 @@ object Detect extends Action {
     
     if (finalSpookies.isEmpty) return
     
-    val spookiest = finalSpookies.minBy(x => ( ! x.canAttack, ! x.effectivelyCloaked, x.pixelDistanceFast(unit)))
+    val spookiest = finalSpookies.minBy(x => ( ! x.canAttack, ! x.effectivelyCloaked, x.pixelDistanceCenter(unit)))
     val vantage   = spookiest.pixelCenter.project(unit.agent.destination, 32.0 * 5.0)
     unit.agent.toTravel = Some(vantage)
     Move.delegate(unit)

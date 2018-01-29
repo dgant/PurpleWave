@@ -39,7 +39,7 @@ object Pickup extends Action {
     
     if (passengersAccepted.nonEmpty) {
       val passengerCentroid = passengersAccepted.map(_.pixelCenter).centroid
-      val passengerCentral  = passengersAccepted.minBy(_.pixelDistanceFast(passengerCentroid))
+      val passengerCentral  = passengersAccepted.minBy(_.pixelDistanceCenter(passengerCentroid))
       unit.agent.toTravel = Some(passengerCentral.pixelCenter)
       Move.delegate(unit)
     }

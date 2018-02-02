@@ -128,7 +128,10 @@ object ShowUnitsFriendly extends View {
     }
     
     if (showExplosions) {
-      With.coordinator.explosions.all.foreach(_.draw())
+      With.coordinator.explosions.all.foreach(explosion =>
+        if (With.units.ours.exists(explosion.affects)) {
+          explosion.draw()
+        })
     }
   }
 }

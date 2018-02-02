@@ -45,10 +45,10 @@ class ExplosionTracker {
       output += new ExplosionSpiderMineTrigger(unit)
       output += new ExplosionSpiderMineBlast(unit)
     }
-    if (unit.is(Zerg.InfestedTerran)) {
+    if (unit.is(Zerg.InfestedTerran) && unit.visible) {
       output += new ExplosionInfestedTerran(unit)
     }
-    if (unit.is(Protoss.Scarab)) {
+    if (unit.is(Protoss.Scarab) && unit.visible) {
       output += new ExplosionScarab(unit)
     }
     output.toVector

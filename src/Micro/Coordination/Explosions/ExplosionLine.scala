@@ -8,16 +8,16 @@ import ProxyBwapi.UnitInfo.UnitInfo
 
 abstract class ExplosionLine extends Explosion {
   
-  def thickness: Double
-  def start: Pixel
-  def end: Pixel
+  val thickness: Double
+  val start: Pixel
+  val end: Pixel
   
-  protected val length = start.pixelDistanceSlow(end)
-  protected val angle = start.radiansTo(end)
-  protected val p0 = start.radiateRadians(angle - Math.PI / 2, thickness)
-  protected val p1 = start.radiateRadians(angle + Math.PI / 2, thickness)
-  protected val p2 = start.radiateRadians(angle + Math.PI / 2, thickness)
-  protected val p3 = start.radiateRadians(angle - Math.PI / 2, thickness)
+  protected lazy val length = start.pixelDistanceSlow(end)
+  protected lazy val angle = start.radiansTo(end)
+  protected lazy val p0 = start.radiateRadians(angle - Math.PI / 2, thickness)
+  protected lazy val p1 = start.radiateRadians(angle + Math.PI / 2, thickness)
+  protected lazy val p2 = end.radiateRadians(angle + Math.PI / 2, thickness)
+  protected lazy val p3 = end.radiateRadians(angle - Math.PI / 2, thickness)
   
   override def draw(): Unit = {
     DrawMap.polygonPixels(Iterable(p0, p1, p2, p3), color)

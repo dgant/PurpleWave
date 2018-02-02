@@ -10,17 +10,16 @@ import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Milestones.UnitsAtLeast
 import ProxyBwapi.Races.Terran
-import Strategery.Strategies.Terran.TvZ.TvZEarly1RaxFEConservative
+import Strategery.Strategies.Terran.TvZ.TvZEarlyCCFirst
 
 class TvZCCFirst extends GameplanModeTemplate {
   
-  override val activationCriteria: Plan = new Employing(TvZEarly1RaxFEConservative)
+  override val activationCriteria: Plan = new Employing(TvZEarlyCCFirst)
   override val completionCriteria: Plan = new Latch(new UnitsAtLeast(2, Terran.Barracks))
   
   override def defaultPlacementPlan: Plan = new TvZPlacement
   
   override val buildOrder = Vector(
-    RequestAtLeast(1,   Terran.CommandCenter),
     RequestAtLeast(9,   Terran.SCV),
     RequestAtLeast(1,   Terran.SupplyDepot),
     RequestAtLeast(14,  Terran.SCV),

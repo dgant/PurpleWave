@@ -10,6 +10,6 @@ object TargetingProfiles {
     preferDetectors   =  10.0,
     preferFocusFire   =  0.3,
     avoidPain         =  2.0,
-    avoidDelay        =  0.15,
+    avoidDelay        =  0.175,
     avoidInterceptors =  2.0)
 }

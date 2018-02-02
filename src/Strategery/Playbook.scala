@@ -25,6 +25,7 @@ object StrategyGroups {
     WorkerRush,
     TvEProxyBBS,
     TvEProxy5Rax,
+    TvEProxy8Fact,
     TvEMassMarine,
     TvEMassVulture,
     PvTProxy2Gate,
@@ -39,6 +40,8 @@ object StrategyGroups {
   )
   
   val bad = Vector[Strategy](
+    TvEProxy8Fact,
+    TvEProxy5Rax,
     PvTEarly1GateProxy,
     PvT3BaseCorsair,
     CarriersWithNoDefense,
@@ -63,5 +66,5 @@ class PurpleCheesePlaybook extends EmptyPlaybook  {
   override lazy val forced: Seq[Strategy] = StrategyGroups.cheese
 }
 
-object Playbook extends TestingPlaybook {
+object Playbook extends PurpleWavePlaybook {
 }

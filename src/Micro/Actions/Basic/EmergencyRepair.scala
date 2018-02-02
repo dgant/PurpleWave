@@ -9,8 +9,9 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 object EmergencyRepair extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
-    unit.is(Terran.SCV)
-      && With.self.minerals + With.economy.ourIncomePerFrameMinerals * GameTime(0, 10)() > 50
+    false
+    && unit.is(Terran.SCV)
+    && With.self.minerals + With.economy.ourIncomePerFrameMinerals * GameTime(0, 10)() > 50
   )
   
   override def perform(unit: FriendlyUnitInfo) {

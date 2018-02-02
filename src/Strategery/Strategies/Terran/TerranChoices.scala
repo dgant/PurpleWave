@@ -3,6 +3,7 @@ package Strategery.Strategies.Terran
 import Strategery.Strategies.AllRaces.WorkerRush
 import Strategery.Strategies.Terran.FFA.TerranFFABio
 import Strategery.Strategies.Terran.TvE._
+import Strategery.Strategies.Terran.TvP.{TvPEarly14CC, TvPEarlyFDStrong}
 import Strategery.Strategies.Terran.TvR.{TvR1Rax, TvRTinfoil}
 import Strategery.Strategies.Terran.TvT.TvTStandard
 import Strategery.Strategies.Terran.TvZ._
@@ -39,6 +40,8 @@ object TerranChoices {
   /////////
   
   val tvpOpeners = Vector(
+    TvPEarly14CC,
+    TvPEarlyFDStrong,
     TvTPNukeDrop
   )
   

@@ -109,10 +109,11 @@ class Gather extends Plan {
     
     val continuity  = if (resourceByWorker.get(worker).contains(resource)) 10.0 else 1.0
     val proximity   = resource.base.flatMap(_.townHall).map(_.pixelDistanceEdge(resource)).getOrElse(32 * 12)
-    val distance    = worker.pixelDistanceEdge(resource)
+    val distance    = worker.pixelDistanceEdge(resource) + resource.remainingBuildFrames * worker.topSpeed
+    val currentWorkerCount = workersByResource(resource).count(_ != worker)
     val saturation  =
       if (resource.unitClass.isMinerals) {
-        workersByResource(resource).size match {
+        currentWorkerCount match {
           case 0 => 1.0
           case 1 => 0.8
           case 2 => 0.1
@@ -120,7 +121,7 @@ class Gather extends Plan {
         }
       }
       else {
-        workersByResource(resource).size match {
+        currentWorkerCount match {
           case 0 => 1.0
           case 1 => 1.0
           case 2 => 1.0

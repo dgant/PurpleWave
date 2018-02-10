@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvE
 
-import Macro.BuildRequests.{RequestAtLeast, RequestTech}
+import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
 import Planning.Composition.UnitMatchers.{UnitMatchAnd, UnitMatchMobileFlying, UnitMatchWarriors}
 import Planning.Plan
 import Planning.Plans.Army.Attack
@@ -46,6 +46,7 @@ class MassVulture extends GameplanModeTemplate {
     new Trigger(
       new UnitsAtLeast(2, Terran.MachineShop),
       new Build(RequestTech(Terran.SpiderMinePlant))),
+    new TrainContinuously(Terran.Wraith),
     new If(
       new EnemyUnitsAtLeast(1, UnitMatchAnd(UnitMatchWarriors, UnitMatchMobileFlying)),
       new Parallel(
@@ -55,10 +56,23 @@ class MassVulture extends GameplanModeTemplate {
         new UpgradeContinuously(Terran.GoliathAirRange),
         new TrainContinuously(Terran.Marine)),
       new TrainContinuously(Terran.Vulture)),
-    new Build(RequestAtLeast(5, Terran.Factory)),
     new RequireMiningBases(2),
-    new Build(RequestAtLeast(10, Terran.Factory)),
+    new Build(
+      RequestAtLeast(1, Terran.Armory),
+      RequestAtLeast(1, Terran.Academy),
+      RequestAtLeast(2, Terran.Comsat),
+      RequestAtLeast(6, Terran.Factory),
+      RequestUpgrade(Terran.MechDamage)),
     new RequireMiningBases(3),
+    new Build(
+      RequestAtLeast(3, Terran.Comsat),
+      RequestUpgrade(Terran.MechArmor),
+      RequestAtLeast(1, Terran.Starport),
+      RequestAtLeast(8, Terran.Factory),
+      RequestAtLeast(1, Terran.ScienceFacility),
+      RequestAtLeast(2, Terran.Armory)),
+    new UpgradeContinuously(Terran.MechDamage),
+    new UpgradeContinuously(Terran.MechArmor),
     new Build(RequestAtLeast(15, Terran.Factory))
   )
 }

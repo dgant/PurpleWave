@@ -14,12 +14,12 @@ object TargetHeuristicDetectors extends TargetHeuristic {
     
     var detects = candidate.unitClass.isDetector
     
-    detects ||= candidate.constructing && candidate.target.exists(_.is(
+    detects ||= candidate.constructing && candidate.target.exists(_.isAny(
       Terran.EngineeringBay,
       Terran.MissileTurret,
       Terran.Academy))
     
-    detects ||= candidate.is(
+    detects ||= candidate.isAny(
       Terran.Comsat,
       Terran.EngineeringBay,
       Terran.ControlTower,

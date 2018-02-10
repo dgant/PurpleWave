@@ -25,7 +25,7 @@ class Attack extends Plan {
     
     val target =
       ByOption
-        .maxBy(With.geography.enemyBases)(base => (1 + base.workers.size) * (base.mineralsLeft + base.gasLeft) / (1.0 + base.defenders.map(_.subjectiveValue).sum))
+        .maxBy(With.geography.enemyBases)(base => (8 + base.workers.size) * (base.mineralsLeft + base.gasLeft) / (1.0 + base.defenders.map(_.subjectiveValue).sum))
         .map(base => ByOption.minBy(base.units.filter(u => u.isEnemy && u.unitClass.isBuilding))(_.pixelDistanceCenter(base.townHallArea.midPixel))
           .map(_.pixelCenter)
           .getOrElse(base.townHallArea.midPixel))

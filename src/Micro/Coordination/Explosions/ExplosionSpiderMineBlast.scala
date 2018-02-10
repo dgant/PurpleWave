@@ -6,15 +6,14 @@ import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.ByOption
 
 class ExplosionSpiderMineBlast(mine: UnitInfo) extends ExplosionRadial {
-  protected val expectedTarget: Option[UnitInfo] = {
-    val targets = mine.matchups.targets
-    val target = ByOption.minBy(targets)(target => {
-      val distanceNow = target.pixelDistanceEdge(mine)
-      val distanceLater = target.pixelDistanceEdge(mine, mine.projectFrames(12))
-      distanceNow + 2 * distanceLater
-    })
+  
+  protected def expectedTarget: Option[UnitInfo] = {
+    val targetPosition = mine.orderTargetPixel.getOrElse(mine.pixelCenter)
+    val target = ByOption.minBy(mine.matchups.targets)(_.pixelDistanceEdge(targetPosition))
+    if (target.forall(_.pixelDistanceEdge(targetPosition) > radius)) return None
     target
   }
+  
   override def center: Pixel = {
     expectedTarget
       .map(target =>
@@ -25,7 +24,22 @@ class ExplosionSpiderMineBlast(mine: UnitInfo) extends ExplosionRadial {
   }
   override def radius: Double = 100
   
-  override def affects(unit: UnitInfo): Boolean = expectedTarget.isDefined && ! unit.flying && ! unit.unitClass.isBuilding
+  override def affects(unit: UnitInfo): Boolean = (
+    expectedTarget.isDefined
+    && ! unit.flying
+    && ! unit.unitClass.isBuilding
+    && ! (
+      expectedTarget.contains(unit)
+      && unit.matchups.targets.exists(target =>
+        target.subjectiveValue > unit.subjectiveValue
+        && mine.canAttack(target)
+        && mine.pixelDistanceEdge(target) < mine.pixelDistanceEdge(unit)))
+    && ! (
+      center == mine.pixelCenter
+      && unit.canAttack(mine)
+      && unit.readyForAttackOrder
+      && unit.pixelRangeAgainst(mine) > radius)
+  )
   
   override def framesRemaining: Double = GameTime(0, 1)()
 }

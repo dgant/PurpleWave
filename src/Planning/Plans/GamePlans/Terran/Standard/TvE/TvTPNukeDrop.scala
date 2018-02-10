@@ -10,7 +10,7 @@ import Planning.Plans.Information.{Employing, SafeAtHome}
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Macro.Milestones.{EnemyUnitsAtLeast, IfOnMiningBases, MiningBasesAtLeast, UnitsAtLeast}
+import Planning.Plans.Macro.Milestones._
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Terran.TvE.TvTPNukeDrop

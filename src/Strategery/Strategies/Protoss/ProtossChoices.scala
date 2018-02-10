@@ -43,6 +43,7 @@ object ProtossChoices {
     PvTEarly1GateStargate,
     PvTEarly1GateReaver,
     PvTEarly1GateStargateTemplar,
+    //PvTEarly1BaseCarrier,
     PvTEarlyDTExpand,
     PvTEarly1015GateGoonDT,
     PvTEarly1015GateGoonExpand,
@@ -106,6 +107,7 @@ object ProtossChoices {
   
   val pvzOpenersTransitioningFrom2Gate = Vector(
     PvZEarly2Gate,
+    PvZEarly2Gate99,
     PvZ4GateDragoonAllIn
   )
   

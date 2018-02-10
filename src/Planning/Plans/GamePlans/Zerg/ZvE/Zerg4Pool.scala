@@ -6,7 +6,7 @@ import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Composition.UnitMatchers.UnitMatchWorkers
 import Planning.Plans.Army.{Aggression, AllIn, Attack}
 import Planning.Plans.Compound.{If, _}
-import Planning.Plans.Macro.Automatic.{AddSupplyWhenSupplyBlocked, Gather}
+import Planning.Plans.Macro.Automatic.{AddSupplyWhenSupplyBlocked, Gather, TrainContinuously}
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
 import Planning.Plans.Macro.Milestones.UnitsAtLeast
 import Planning.Plans.Scouting.FoundEnemyBase
@@ -30,11 +30,17 @@ class Zerg4Pool extends Parallel {
         attackers.get.unitCounter.set(UnitCountOne)
         attackers.get.unitMatcher.set(UnitMatchWorkers)
       }),
+    new Trigger(
+      new Check(() => With.self.minerals >= 300),
+      new Build(
+        RequestAtLeast(2, Zerg.Hatchery),
+        RequestAtLeast(6, Zerg.Drone))),
     new Build(RequestAtLeast(12,  Zerg.Zergling)),
     new AllIn(new UnitsAtLeast(12, Zerg.Zergling)),
     new If(
       new Check(() => With.units.ours.count(_.is(Zerg.Larva)) >= 2),
       new AddSupplyWhenSupplyBlocked),
+    new TrainContinuously(Zerg.Zergling),
     new Attack,
     new FollowBuildOrder,
     new Gather

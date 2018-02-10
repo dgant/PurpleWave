@@ -8,11 +8,11 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Disengage extends Action {
   
-  override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.agent.canFlee              &&
-    unit.matchups.threats.nonEmpty  &&
-    ! Yolo.active
-  }
+  override def allowed(unit: FriendlyUnitInfo): Boolean = (
+    unit.agent.canFlee
+    && unit.matchups.threats.nonEmpty
+    && ! Yolo.active
+  )
   
   override protected def perform(unit: FriendlyUnitInfo) {
     Weigh.consider(unit,

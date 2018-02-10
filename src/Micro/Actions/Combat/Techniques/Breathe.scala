@@ -19,6 +19,11 @@ object Breathe extends ActionTechnique {
   
   override val applicabilityBase = 1.0
   
+  override def applicabilitySelf(unit: FriendlyUnitInfo): Double = {
+    if (unit.unitClass.melee) return 0.0
+    1.0
+  }
+  
   override def applicabilityOther(unit: FriendlyUnitInfo, other: UnitInfo): Option[Double] = {
     if (other.isFriendly) return None
     if ( ! other.canAttack(unit)) return None

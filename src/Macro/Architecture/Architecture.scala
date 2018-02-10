@@ -185,7 +185,13 @@ class Architecture {
   
   private def recalculateUnbuildable() {
     unbuildable ++= With.units.ours
-      .filter(unit => unit.unitClass.isBuilding && ! unit.flying)
+      .filter(unit =>
+        ! unit.flying && (
+          unit.isEnemy
+          || unit.is(Zerg.Larva)
+          || unit.is(Zerg.Egg)
+          || unit.is(Zerg.Lurker)
+          || unit.unitClass.isBuilding))
       .flatMap(unit =>
         if (usuallyNeedsMargin(unit.unitClass))
           unit.tileArea.expand(1, 1).tiles

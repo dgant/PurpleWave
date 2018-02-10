@@ -11,7 +11,7 @@ class Nexus2GateThenCannons extends ProposePlacement {
     val mainZone = With.geography.ourMain.zone
     val naturalBase = With.geography.ourNatural
     val naturalZone = naturalBase.zone
-    val marginPixels = naturalZone.exit.map(_.centerPixel.pixelDistanceFast(naturalBase.townHallArea.midPixel) - Protoss.Nexus.radialHypotenuse).getOrElse(128.0)
+    val marginPixels = naturalZone.exit.map(_.pixelCenter.pixelDistanceFast(naturalBase.townHallArea.midPixel) - Protoss.Nexus.radialHypotenuse).getOrElse(128.0)
     val output = Vector(
       new Blueprint(this, building = Some(Protoss.Pylon)),
       new Blueprint(this, building = Some(Protoss.Pylon), requireZone = Some(naturalZone), placement = Some(PlacementProfiles.wallPylon), marginPixels = Some(marginPixels - 96.0)),

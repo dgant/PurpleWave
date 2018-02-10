@@ -15,7 +15,7 @@ abstract class ExplosionRectangular extends Explosion {
   }
   
   def pixelsOfEntanglement(unit: UnitInfo): Double = {
-    unit.pixelDistanceEdge(start, end)
+    -unit.pixelDistanceEdge(start, end)
   }
   
   override def directionTo(unit: UnitInfo): Force = {

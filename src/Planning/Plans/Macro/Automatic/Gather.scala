@@ -1,5 +1,6 @@
 package Planning.Plans.Macro.Automatic
 
+import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Micro.Agency.Intention
 import Planning.Composition.ResourceLocks.LockUnits
@@ -28,14 +29,27 @@ class Gather extends Plan {
   var resourceByWorker = new mutable.HashMap[FriendlyUnitInfo, UnitInfo]
   
   override def onUpdate() {
-    countUnits()
     setGoals()
+    countUnits()
     workers.foreach(updateWorker)
   }
   
+  private def setGoals() {
+    val belowFloor    = With.self.gas < With.blackboard.gasLimitFloor
+    val aboveCeiling  = With.self.gas > With.blackboard.gasLimitCeiling
+    gasWorkersMax =
+      if (belowFloor)
+        workers.size
+      else if (aboveCeiling)
+        0
+      else
+        (workers.size * With.blackboard.gasTargetRatio).toInt
+  }
+  
   private def countUnits() {
-    minerals  = With.geography.ourBases.flatMap(_.minerals).toSet
-    gasses    = With.geography.ourBases.flatMap(_.gas.flatMap(_.friendly).filter(u => u.gasLeft > 0 && u.complete)).toSet
+    val activeBases = With.geography.ourBases.filter(_.townHall.exists(hall => hall.morphing || hall.remainingBuildFrames < GameTime(0, 10)()))
+    minerals  = activeBases.flatMap(_.minerals).toSet
+    gasses    = activeBases.flatMap(_.gas.flatMap(_.friendly).filter(u => u.gasLeft > 0 && u.complete)).toSet
     if (minerals.isEmpty) {
       minerals = With.geography.bases.flatMap(_.minerals).toSet
     }
@@ -49,23 +63,11 @@ class Gather extends Plan {
     workerLock.acquire(this)
     workers = workerLock.units
     
-    gasWorkersNow = 0
     workersByResource.clear()
     resourceByWorker.clear()
     resources.foreach(resource => workersByResource(resource) = new mutable.HashSet[FriendlyUnitInfo])
     workers.foreach(unit => unit.agent.lastIntent.toGather.foreach(resource => assign(unit, resource)))
-  }
-  
-  private def setGoals() {
-    val belowFloor    = With.self.gas < With.blackboard.gasLimitFloor
-    val aboveCeiling  = With.self.gas > With.blackboard.gasLimitCeiling
-    gasWorkersMax =
-      if (belowFloor)
-        workers.size
-      else if (aboveCeiling)
-        0
-      else
-        (workers.size * With.blackboard.gasTargetRatio).toInt
+    gasWorkersNow = resourceByWorker.count(_._2.unitClass.isGas)
   }
   
   private def isActiveGas(resource: UnitInfo): Boolean = resource.gasLeft > 0
@@ -115,7 +117,7 @@ class Gather extends Plan {
       if (resource.unitClass.isMinerals) {
         currentWorkerCount match {
           case 0 => 1.0
-          case 1 => 0.8
+          case 1 => 0.6
           case 2 => 0.1
           case _ => 0.0
         }
@@ -125,7 +127,7 @@ class Gather extends Plan {
           case 0 => 1.0
           case 1 => 1.0
           case 2 => 1.0
-          case 3 => 0.1
+          case 3 => 0.0001
           case _ => 0.0
         }
       }

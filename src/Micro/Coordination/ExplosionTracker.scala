@@ -25,8 +25,8 @@ class ExplosionTracker {
   def explosionFromBullet(bullet: BulletInfo): Option[Explosion] = {
     if (bullet.sourceUnit.exists(_.is(Terran.ScienceVessel)))
       Some(new ExplosionEMP(bullet))
-    else if (bullet.sourceUnit.exists(_.is(Zerg.Lurker)))
-      Some(new ExplosionLurker(bullet))
+    else if (bullet.sourceUnit.exists(_.is(Zerg.Lurker)) && bullet.sourceUnit.get.isEnemy)
+      Some(new ExplosionLurkerNow(bullet))
     else if (bullet.sourceUnit.exists(_.is(Protoss.HighTemplar)))
       Some(new ExplosionPsionicStorm(bullet))
     else
@@ -41,15 +41,18 @@ class ExplosionTracker {
       output += new ExplosionIrradiate()(unit)
     }
     */
-    if (unit.is(Terran.SpiderMine)) {
+    if (unit.is(Terran.SpiderMine) && unit.battle.isDefined) {
       output += new ExplosionSpiderMineTrigger(unit)
       output += new ExplosionSpiderMineBlast(unit)
     }
     if (unit.is(Zerg.InfestedTerran) && unit.visible) {
       output += new ExplosionInfestedTerran(unit)
     }
-    if (unit.is(Protoss.Scarab) && unit.visible) {
+    if (unit.is(Protoss.Scarab) && unit.visible && ! unit.isOurs) {
       output += new ExplosionScarab(unit)
+    }
+    if (unit.is(Zerg.Lurker) && unit.battle.isDefined && ! unit.isOurs) {
+      unit.matchups.targetsInRange.foreach(target => output += new ExplosionLurkerSoon(unit, target))
     }
     output.toVector
   }

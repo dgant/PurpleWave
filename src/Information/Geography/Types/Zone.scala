@@ -27,13 +27,14 @@ class Zone(
   lazy val  island          : Boolean           = ! With.geography.startBases.map(_.zone).exists(otherZone => this != otherZone && With.paths.zonePath(this, otherZone).isDefined)
   lazy val  tilesBuildable  : Array[Tile]       = { With.grids.buildableTerrain.initialize(); tiles.filter(With.grids.buildableTerrain.get).toArray }
   lazy val  maxMobility     : Int               = ByOption.max(tiles.map(With.grids.mobilityGround.get)).getOrElse(0)
+  lazy val  unwalkable      : Boolean           = ! tiles.exists(With.grids.walkable.get)
   
   lazy val exit: Option[Edge] = {
     if (edges.isEmpty)
       None
     else
       // Uses ground distance, but seems to work okay
-      Some(edges.minBy(edge => With.geography.startLocations.map(_.groundPixels(edge.centerPixel)).max))
+      Some(edges.minBy(edge => With.geography.startLocations.map(_.groundPixels(edge.pixelCenter)).max))
   }
   
   var units     : Set[UnitInfo] = Set.empty

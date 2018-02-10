@@ -13,6 +13,6 @@ object TargetHeuristicDelay extends TargetHeuristic {
     val closingSpeed  = Math.max(unit.topSpeed / 4.0, unit.topSpeed - candidate.topSpeed / 2.0)
     val framesToClose = PurpleMath.nanToInfinity(distanceTotal / closingSpeed)
     
-    24.0 + Math.max(0.0, framesToClose - unit.cooldownLeft)
+    8.0 + Math.max(0.0, framesToClose - unit.cooldownLeft)
   }
 }

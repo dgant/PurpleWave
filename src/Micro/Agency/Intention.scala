@@ -29,4 +29,5 @@ class Intention {
   var canScout    : Boolean           = false
   var canPillage  : Boolean           = false
   var canBerzerk  : Boolean           = false
+  var canLiftoff  : Boolean           = false
 }

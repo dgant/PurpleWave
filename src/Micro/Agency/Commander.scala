@@ -1,5 +1,6 @@
 package Micro.Agency
 
+import Debugging.Visualizations.Views.Micro.ShowUnitsFriendly
 import Lifecycle.With
 import Mathematics.Points.{Pixel, SpecificPoints, Tile}
 import Mathematics.PurpleMath
@@ -9,6 +10,7 @@ import ProxyBwapi.UnitClass.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders, UnitInfo}
 import ProxyBwapi.Upgrades.Upgrade
 import Utilities.CountMap
+import bwapi.UnitCommandType
 
 // Commander is responsible for issuing unit commands
 // in a way that Brood War handles gracefully,
@@ -59,6 +61,10 @@ class Commander {
   
   def attack(unit: FriendlyUnitInfo, target: UnitInfo) {
     if (unready(unit)) return
+    if ( ! unit.readyForAttackOrder) { // Necessary or redundant?
+      sleep(unit)
+      return
+    }
   
     // TODO: Fix attack cancelling for Photon Cannons
     if (unit.is(Protoss.PhotonCannon)) return
@@ -77,6 +83,9 @@ class Commander {
       
       if (shouldOrder) {
         unit.baseUnit.attack(target.baseUnit)
+        if (ShowUnitsFriendly.inUse) {
+          ShowUnitsFriendly.drawAttackCommand(unit, target)
+        }
       }
       sleepAttack(unit)
     } else {
@@ -89,10 +98,18 @@ class Commander {
       PurpleMath.clamp(destination.x, unit.unitClass.width  / 2,  With.mapPixelWidth  - unit.unitClass.width  / 2),
       PurpleMath.clamp(destination.y, unit.unitClass.height / 2,  With.mapPixelHeight - unit.unitClass.height / 2))
   }
-  
+
   def attackMove(unit: FriendlyUnitInfo, destination: Pixel) {
     if (unready(unit)) return
-    unit.baseUnit.attack(destination.bwapi)
+    
+    val alreadyAttackMovingThere = unit.command.exists(c =>
+      c.getUnitCommandType.toString == UnitCommandType.Attack_Move.toString &&
+      new Pixel(c.getTargetPosition).pixelDistanceFast(destination) < 128)
+    
+    if ( ! alreadyAttackMovingThere || unit.seeminglyStuck) {
+      unit.baseUnit.attack(destination.bwapi)
+    }
+    
     sleepAttack(unit)
   }
   
@@ -321,6 +338,24 @@ class Commander {
   def decloak(unit: FriendlyUnitInfo, tech: Tech) {
     if (unready(unit)) return
     unit.baseUnit.decloak()
+    sleep(unit)
+  }
+  
+  def burrow(unit: FriendlyUnitInfo) {
+    if (unready(unit)) return
+    unit.baseUnit.burrow()
+    sleep(unit)
+  }
+  
+  def unburrow(unit: FriendlyUnitInfo) {
+    if (unready(unit)) return
+    unit.baseUnit.unburrow()
+    sleep(unit)
+  }
+  
+  def lift(unit: FriendlyUnitInfo) {
+    if (unready(unit)) return
+    unit.baseUnit.lift()
     sleep(unit)
   }
   

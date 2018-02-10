@@ -53,7 +53,11 @@ class UnitTracker {
   }
   
   def onUnitDestroy(unit: bwapi.Unit) {
+    get(unit).foreach(unitInfo => if (unitInfo.isEnemy) {
+      With.blackboard.enemyUnitDied = true
+    })
     friendlyUnitTracker.onUnitDestroy(unit)
     foreignUnitTracker.onUnitDestroy(unit)
+    
   }
 }

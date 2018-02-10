@@ -130,7 +130,7 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   lazy val airRangePixels: Double =
     if      (this == Terran.Bunker)   Terran.Marine.groundRangePixels  + 32.0
     else if (this == Protoss.Carrier) 32.0 * 8.0
-    else                              groundRangeRaw
+    else                              airRangeRaw
   lazy val maxAirGroundRangePixels  : Double = Math.max(groundRangePixels, airRangePixels)
   lazy val effectiveRangePixels     : Double =
     if (isDetector)                         32.0 * 11.0

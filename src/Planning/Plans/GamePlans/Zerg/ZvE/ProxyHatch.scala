@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Zerg.ZvE
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
-import Macro.BuildRequests.RequestAtLeast
+import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
 import Planning.Composition.UnitCounters.UnitCountExactly
 import Planning.Composition.UnitMatchers.{UnitMatchMobileFlying, UnitMatchWorkers}
 import Planning.Plans.Army.{Aggression, Attack}
@@ -14,10 +14,11 @@ import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
 import Planning.Plans.Macro.Expanding.BuildGasPumps
 import Planning.Plans.Macro.Milestones.UnitsAtLeast
+import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Scouting.ScoutAt
 import Planning.{Plan, ProxyPlanner}
 import ProxyBwapi.Races.Zerg
-import Strategery.Strategies.Zerg.Global.{ProxyHatchHydras, ProxyHatchSunkens, ProxyHatchZerglings}
+import Strategery.Strategies.Zerg.ZvE.{ProxyHatchHydras, ProxyHatchSunkens, ProxyHatchZerglings}
 
 class ProxyHatch extends Parallel {
   
@@ -29,9 +30,9 @@ class ProxyHatch extends Parallel {
   private class WeHaveEnoughSunkens extends UnitsAtLeast(3, Zerg.SunkenColony, complete = false)
   
   private def blueprintCreepColonyNatural: Blueprint = new Blueprint(this,
-    building          = Some(Zerg.CreepColony),
-    requireZone       = ProxyPlanner.proxyEnemyNatural,
-    placement  = Some(PlacementProfiles.proxyCannon))
+    building     = Some(Zerg.CreepColony),
+    requireZone  = ProxyPlanner.proxyEnemyNatural,
+    placement    = Some(PlacementProfiles.proxyCannon))
   
   children.set(Vector(
     new Plan { override def onUpdate(): Unit = {
@@ -94,20 +95,24 @@ class ProxyHatch extends Parallel {
       new Parallel(
         new AddSupplyWhenSupplyBlocked,
         new TrainContinuously(Zerg.Zergling),
-        new If(
-          new And(
-            new WeKnowWhereToProxy,
-            new Check(() => ! With.units.ours.exists(_.is(Zerg.Larva)))),
-          new TrainContinuously(Zerg.Hatchery)))),
+        new Trigger(
+          new WeKnowWhereToProxy,
+          new TrainContinuously(Zerg.Hatchery, 5, 1)))),
   
     new Employ(ProxyHatchHydras,
       new Parallel(
+        new Do(() => {
+          With.blackboard.gasTargetRatio = 2.0 / 12.0
+          With.blackboard.gasLimitCeiling = 150
+        }),
         new Build(RequestAtLeast(1, Zerg.HydraliskDen)),
         new RequireSufficientSupply,
         new If(
           new UnitsAtLeast(1, Zerg.HydraliskDen, complete = false),
           new TrainContinuously(Zerg.Hydralisk),
-          new TrainContinuously(Zerg.Zergling)))),
+          new TrainContinuously(Zerg.Zergling)),
+        new UpgradeContinuously(Zerg.HydraliskSpeed),
+        new UpgradeContinuously(Zerg.HydraliskRange))),
   
     new Employ(ProxyHatchSunkens,
       new Parallel(
@@ -117,15 +122,18 @@ class ProxyHatch extends Parallel {
           initialAfter = new Trigger(
             new WeHaveEnoughSunkens,
             initialBefore = new Parallel(
-              new TrainContinuously(Zerg.Zergling),
-              new TrainContinuously(Zerg.CreepColony, 2)),
+              new TrainContinuously(Zerg.CreepColony, 2),
+              new TrainContinuously(Zerg.Zergling)),
             initialAfter = new Parallel(
               new RequireSufficientSupply,
               new TrainContinuously(Zerg.Mutalisk),
               new BuildGasPumps,
-              new TrainWorkersContinuously,
-              new Build(RequestAtLeast(1, Zerg.Lair)),
-              new Build(RequestAtLeast(1, Zerg.Spire)),
+              new Build(RequestAtLeast(18, Zerg.Drone)),
+              new TrainContinuously(Zerg.Zergling),
+              new Build(
+                RequestAtLeast(1, Zerg.Lair),
+                RequestUpgrade(Zerg.ZerglingSpeed),
+                RequestAtLeast(1, Zerg.Spire)),
               new TrainContinuously(Zerg.CreepColony, 1),
               new TrainContinuously(Zerg.Hatchery, 8)
             ))))),

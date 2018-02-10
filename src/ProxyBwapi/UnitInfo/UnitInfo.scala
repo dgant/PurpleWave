@@ -12,9 +12,9 @@ import Mathematics.Points.{Pixel, Tile, TileRectangle}
 import Mathematics.PurpleMath
 import Micro.Matchups.MatchupAnalysis
 import Performance.Cache
+import Planning.Composition.UnitMatchers.UnitMatcher
 import ProxyBwapi.Engine.Damage
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
-import ProxyBwapi.UnitClass.UnitClass
 import Utilities.ByOption
 import bwapi._
 
@@ -37,7 +37,10 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     tileIncludingCenter.toString + " " + pixelCenter.toString
   }
   
-  def is(unitClasses: UnitClass*): Boolean = unitClasses.contains(unitClass)
+  def is(unitMatcher: UnitMatcher): Boolean = unitMatcher.accept(this)
+  def isAny(unitMatchers: UnitMatcher*): Boolean = unitMatchers.exists(_.accept(this))
+  def isAll(unitMatchers: UnitMatcher*): Boolean = unitMatchers.forall(_.accept(this))
+  
   
   //////////////////
   // Statefulness //
@@ -218,6 +221,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   def pixelDistanceEdge       (other:       UnitInfo)       : Double  = pixelDistanceEdge(other.pixelStart, other.pixelEnd)
   def pixelDistanceEdge       (other: UnitInfo, at: Pixel)  : Double  = pixelDistanceEdge(other.pixelStart, other.pixelEnd)
   def pixelDistanceEdge       (oStart: Pixel, oEnd: Pixel)  : Double  = PurpleMath.broodWarDistanceBox(pixelStart, pixelEnd, oStart, oEnd)
+  def pixelDistanceEdge       (destination: Pixel)          : Double  = PurpleMath.broodWarDistanceBox(pixelStart, pixelEnd, destination, destination)
   def pixelDistanceSquared    (otherUnit:   UnitInfo)       : Double  = pixelDistanceSquared(otherUnit.pixelCenter)
   def pixelDistanceSquared    (otherPixel:  Pixel)          : Double  = pixelCenter.pixelDistanceSquared(otherPixel)
   def pixelDistanceTravelling (destination: Pixel)          : Double  = pixelDistanceTravelling(pixelCenter, destination)
@@ -428,14 +432,14 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
       || (is(Zerg.Lurker)     && burrowed)
     )))
   
-  def canAttack(enemy: UnitInfo): Boolean =
-    canAttack                             &&
-    enemy.canBeAttacked                   &&
-    ! enemy.effectivelyCloaked            && // Eh.
-    ! enemy.friendly.exists(_.transport.isDefined) &&
-    (if (enemy.flying) unitClass.attacksAir else unitClass.attacksGround) &&
-    ( ! enemy.unitClass.floats || ! unitClass.suicides || ! is(Terran.SpiderMine))
-  
+  def canAttack(enemy: UnitInfo): Boolean = (
+    canAttack
+    && enemy.canBeAttacked
+    && ! enemy.effectivelyCloaked // Eh.
+    && ! enemy.friendly.exists(_.transport.isDefined)
+    && (if (enemy.flying) unitClass.attacksAir else unitClass.attacksGround)
+    && ! ((enemy.unitClass.floats || enemy.unitClass.isBuilding) && is(Terran.SpiderMine))
+  )
   // Frame X:     Unit's cooldown is 0.   Unit starts attacking.
   // Frame X-1:   Unit's cooldown is 1.   Unit receives attack order.
   // Frame X-1-L: Unit's cooldown is L+1. Send attack order.

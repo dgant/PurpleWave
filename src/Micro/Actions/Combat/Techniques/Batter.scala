@@ -26,7 +26,7 @@ object Batter extends ActionTechnique {
       && With.enemies.exists(_.raceInitial == Race.Terran)
       && ! unit.matchups.threatsInRange.exists(_.is(Terran.SiegeTankSieged))
       && walledZone(unit).isDefined
-      && walledZone(unit).get.exit.exists(exit => unit.pixelDistanceCenter(exit.centerPixel) < 32.0 * 12.0)
+      && walledZone(unit).get.exit.exists(exit => unit.pixelDistanceCenter(exit.pixelCenter) < 32.0 * 12.0)
     )
   }
   
@@ -49,9 +49,9 @@ object Batter extends ActionTechnique {
         u.isEnemy
         && ! u.flying
         && u.unitClass.isBuilding
-        && u.pixelDistanceCenter(wallExit.centerPixel) < 32.0 * 10.0)
+        && u.pixelDistanceCenter(wallExit.pixelCenter) < 32.0 * 10.0)
       .toSeq
-      .sortBy(_.pixelDistanceCenter(wallExit.centerPixel))
+      .sortBy(_.pixelDistanceCenter(wallExit.pixelCenter))
   
     lazy val outsideUnits   = unit.matchups.targetsInRange
     lazy val repairingUnits = wallUnits.flatMap(_.matchups.repairers)
@@ -94,8 +94,8 @@ object Batter extends ActionTechnique {
           building.tileArea.expand(1, 1).tiles
             .filter(With.grids.walkable.get)
             .filter(
-              _.pixelCenter.pixelDistanceFast(wallExit.centerPixel)
-              < building.pixelCenter.pixelDistanceFast(wallExit.centerPixel)))
+              _.pixelCenter.pixelDistanceFast(wallExit.pixelCenter)
+              < building.pixelCenter.pixelDistanceFast(wallExit.pixelCenter)))
         .distinct
       
       val destination = ByOption.minBy(walkableTiles)(_.pixelCenter.pixelDistanceFast(unit.pixelCenter))

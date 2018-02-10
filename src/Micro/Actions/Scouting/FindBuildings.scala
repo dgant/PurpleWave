@@ -49,7 +49,7 @@ object FindBuildings extends Action {
     unit.matchups.targets.filter(builder =>
       builder.unitClass.isWorker &&
       (
-        builder.command.exists(_.getUnitCommandType == UnitCommandType.Build) ||
+        builder.command.exists(_.getUnitCommandType.toString == UnitCommandType.Build.toString) ||
         builder.targetPixel.exists(targetPixel => targetPixel.zone.bases.exists(_.townHallArea.contains(targetPixel.tileIncluding)))
       ))
   }

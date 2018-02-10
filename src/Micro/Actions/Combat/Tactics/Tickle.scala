@@ -5,7 +5,7 @@ import Micro.Actions.Action
 import Micro.Actions.Basic.MineralWalk
 import Micro.Actions.Combat.Maneuvering.OldAvoid
 import Micro.Actions.Commands.{Attack, Move}
-import ProxyBwapi.Races.Zerg
+import ProxyBwapi.Races.{Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.EnrichPixel._
 
@@ -27,7 +27,7 @@ object Tickle extends Action {
     var attack                = true
   
     val zone                  = unit.agent.toTravel.get.zone
-    val exit                  = zone.edges.map(_.centerPixel).sortBy(_.groundPixels(With.geography.home)).headOption.getOrElse(With.geography.home.pixelCenter)
+    val exit                  = zone.edges.map(_.pixelCenter).sortBy(_.groundPixels(With.geography.home)).headOption.getOrElse(With.geography.home.pixelCenter)
     val hurtThreshold         = 30
     val dyingThreshold        = 6
     val hurt                  = unit.totalHealth < hurtThreshold
@@ -163,10 +163,14 @@ object Tickle extends Action {
         return
       }
     }
-      
+    
+    // SCVs shouldn't kite
+    if (unit.is(Terran.SCV)) {
+      return
+    }
+    
     // We're not attacking, so let's hang out and wait for opportunities
     if (enemiesAttackingUs.nonEmpty || enemies.exists(_.pixelDistanceEdge(unit) < 64.0)) {
-      // Extra aggression vs. 4-pool
       if ( ! weOverpower) {
         mineralWalkAway(unit)
       }

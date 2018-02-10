@@ -2,6 +2,7 @@ package Information.Intelligenze.Fingerprinting.Generic
 
 import Information.Intelligenze.Fingerprinting.Fingerprint
 import Lifecycle.With
+import Mathematics.PurpleMath
 import ProxyBwapi.UnitClass.UnitClass
 import ProxyBwapi.UnitInfo.UnitInfo
 
@@ -34,8 +35,9 @@ class FingerprintArrivesBy(
       else
         Int.MaxValue)
     
-    val completionTime  = Math.max(With.frame, unit.completionFrame)
+    val completionTime  = PurpleMath.clamp(unit.completionFrame, With.frame, With.frame + unit.unitClass.buildFrames)
     val arrivalTime     = completionTime + travelTime
-    arrivalTime
+    val output          = Math.min(With.frame, arrivalTime)
+    output
   }
 }

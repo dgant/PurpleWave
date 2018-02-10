@@ -22,7 +22,7 @@ object ZonePathfinder {
     }
     val edges = from.edges
       .filterNot(edge => explored.contains(edge.otherSideof(from)))
-      .sortBy(_.centerPixel.pixelDistanceFast(from.centroid.pixelCenter))
+      .sortBy(_.pixelCenter.pixelDistanceFast(from.centroid.pixelCenter))
     
     val paths = edges.flatMap(edge => {
       val nextZone = edge.otherSideof(from)

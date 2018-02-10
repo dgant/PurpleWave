@@ -107,8 +107,8 @@ trait GroundPaths {
       return With.paths.impossiblyLargeDistance
     }
     
-    val fromEdgeTiles = fromZone.edges.map(_.centerPixel.tileIncluding)
-    val toEdgeTiles   =   toZone.edges.map(_.centerPixel.tileIncluding)
+    val fromEdgeTiles = fromZone.edges.map(_.pixelCenter.tileIncluding)
+    val toEdgeTiles   =   toZone.edges.map(_.pixelCenter.tileIncluding)
     
     fromEdgeTiles.map(fromEdgeTile =>
       toEdgeTiles.map(toEdgeTile =>

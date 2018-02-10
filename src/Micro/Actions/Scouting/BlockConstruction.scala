@@ -43,7 +43,7 @@ object BlockConstruction extends Action {
     unit.matchups.targets.filter(builder =>
       builder.unitClass.isWorker &&
       (
-        builder.command.exists(_.getUnitCommandType == UnitCommandType.Build) ||
+        builder.command.exists(_.getUnitCommandType.toString == UnitCommandType.Build.toString) ||
         builder.targetPixel.exists(targetPixel =>
           builder.pixelDistanceCenter(targetPixel) < 32.0 * 60.0 &&
           targetPixel.zone.bases.exists(base =>

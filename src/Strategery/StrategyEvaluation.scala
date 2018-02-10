@@ -17,10 +17,14 @@ case class StrategyEvaluation(strategy: Strategy) {
   
   val playbookOrder         : Int                       = if (Playbook.strategyOrder.contains(strategy)) Playbook.strategyOrder.indexOf(strategy) else Int.MaxValue
   val games                 : Iterable[HistoricalGame]  = With.history.games.filter(_.strategies.contains(strategy.toString))
-  val gamesVsEnemy          : Iterable[HistoricalGame]  = if (multiplayer) games.filter(_.enemyName == With.enemy.name)         else Iterable.empty
-  val gamesVsRace           : Iterable[HistoricalGame]  = if (multiplayer) games.filter(_.enemyRace == With.enemy.raceInitial)  else Iterable.empty
+  val gamesVsEnemy          : Iterable[HistoricalGame]  = if (multiplayer) Iterable.empty else games.filter(_.enemyName == With.enemy.name)
+  val gamesVsRace           : Iterable[HistoricalGame]  = if (multiplayer) Iterable.empty else games.filter(_.enemyRace == With.enemy.raceInitial)
   val gamesOnMap            : Iterable[HistoricalGame]  = games.filter(_.mapName        == With.mapFileName)
   val gamesWithStarts       : Iterable[HistoricalGame]  = games.filter(_.startLocations == With.game.getStartLocations.size)
+  val numberGamesVsEnemy    : Double                    = gamesVsEnemy.size
+  val numberGamesVsRace     : Double                    = gamesVsRace.size
+  val numberGamesOnMap      : Double                    = gamesOnMap.size
+  val numberGamesWithStarts : Double                    = gamesWithStarts.size
   val patienceGames         : Double                    = getConfidenceSamples(strategy)
   val winrateTotal          : Double                    = winrate(games)
   val winrateVsEnemy        : Double                    = winrate(gamesVsEnemy)

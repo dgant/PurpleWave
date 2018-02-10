@@ -1,11 +1,11 @@
-package Strategery.Strategies.Zerg.Global
+package Strategery.Strategies.Zerg.ZvE
 
 import Planning.Plan
 import Planning.Plans.GamePlans.Zerg.ZvE.ProxyHatch
 import Strategery.Strategies.Strategy
 import bwapi.Race
 
-object ProxyHatchHydras extends Strategy {
+object ProxyHatchZerglings extends Strategy {
   
   override def ourRaces: Iterable[Race] = Vector(Race.Zerg)
   

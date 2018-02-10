@@ -22,7 +22,7 @@ object Rally extends Action {
       }
     }
     else {
-      unit.zone.exit.foreach(exit => With.commander.rally(unit, exit.centerPixel))
+      unit.zone.exit.foreach(exit => With.commander.rally(unit, exit.pixelCenter))
     }
   }
 }

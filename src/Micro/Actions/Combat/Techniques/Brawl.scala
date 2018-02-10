@@ -1,7 +1,6 @@
 package Micro.Actions.Combat.Techniques
 
-import Information.Intelligenze.Fingerprinting.Generic.GameTime
-import Mathematics.PurpleMath
+import Lifecycle.With
 import Micro.Actions.Combat.Attacking.Target
 import Micro.Actions.Combat.Techniques.Common.ActionTechnique
 import Micro.Actions.Commands.AttackMove
@@ -21,10 +20,7 @@ object Brawl extends ActionTechnique {
   override val activator = RMS
   
   override def applicabilitySelf(unit: FriendlyUnitInfo): Double = {
-    if (unit.unitClass.melee)
-      0.5
-    else
-      0.25
+    if (unit.unitClass.melee) 1.0 else 0.0
   }
   
   override def applicabilityOther(unit: FriendlyUnitInfo, other: UnitInfo): Option[Double] = {
@@ -34,8 +30,9 @@ object Brawl extends ActionTechnique {
     if ( ! unit.canAttack(other)) return None
     if (other.unitClass.ranged) return Some(0.0)
     
-    val output = PurpleMath.nanToOne(GameTime(0, 1)() / other.framesToGetInRange(unit).toDouble)
-    Some(output)
+    val framesBeforeContact = unit.pixelDistanceEdge(other) / (unit.topSpeed + other.topSpeed)
+    val framesBeforeReacting = With.reaction.agencyMax + unit.unitClass.turn180Frames
+    Some(2.0 * framesBeforeReacting / (1.0 + framesBeforeContact))
   }
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {

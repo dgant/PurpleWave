@@ -14,7 +14,7 @@ class Edge(choke: Chokepoint) {
     else
       zones.head // On Pathfinder there's an edge with the same zone on both sides. Grrr.
   
-  lazy val centerPixel  : Pixel = new Pixel(choke.getCenter)
+  lazy val pixelCenter  : Pixel = new Pixel(choke.getCenter)
   lazy val radiusPixels : Double = choke.getWidth / 2
   lazy val sidePixels   : Seq[Pixel] = Vector(new Pixel(choke.getSides.first), new Pixel(choke.getSides.second))
   lazy val zones        : Vector[Zone] =
@@ -25,5 +25,5 @@ class Edge(choke: Chokepoint) {
       _.centroid.pixelCenter.pixelDistanceSquared(
         new Pixel(region.getCenter))))
   
-  def contains(pixel: Pixel): Boolean = centerPixel.pixelDistanceFast(pixel) <= radiusPixels
+  def contains(pixel: Pixel): Boolean = pixelCenter.pixelDistanceFast(pixel) <= radiusPixels
 }

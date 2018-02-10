@@ -1,4 +1,4 @@
-package Strategery.Strategies.Zerg.Global
+package Strategery.Strategies.Zerg.ZvE
 
 import Planning.Plan
 import Planning.Plans.GamePlans.Zerg.ZvE.ProxyHatch

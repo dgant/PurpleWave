@@ -14,11 +14,7 @@ object Scout extends Action {
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {
-    if (
-      unit.matchups.threats.forall(_.unitClass.isWorker) &&
-      (unit.totalHealth >= unit.unitClass.maxTotalHealth || unit.matchups.framesToLiveDiffused > 24)) {
-      Potshot.consider(unit)
-    }
+    Potshot.consider(unit)
     PreserveScout.consider(unit)
     DisruptBuilder.consider(unit)
     BlockConstruction.consider(unit)

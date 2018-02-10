@@ -10,8 +10,19 @@ object Manners {
       && With.self.minerals < 50
       && With.units.enemy.exists(_.unitClass.isWorker)
       && With.units.enemy.exists(_.unitClass.isResourceDepot)) {
-      With.game.leaveGame()
+      surrender()
     }
+    if (With.configuration.enableSurrendering
+      && (
+      With.performance.framesOver85 > 1000
+      || With.performance.framesOver1000 > 15
+      || With.performance.framesOver10000 > 3)) {
+      surrender()
+    }
+  }
+  
+  private def surrender() {
+    With.game.leaveGame()
   }
   
   def chat(text: String) {

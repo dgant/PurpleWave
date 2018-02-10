@@ -84,7 +84,7 @@ class SquadDefendZone(zone: Zone) extends SquadGoal {
   val wallConcaveWidthPixels  : Double = 32.0 * 3.0
   
   def defendWall(walls: Seq[UnitInfo]) {
-    val centroidSources = Seq(squad.enemies.toSeq.map(_.pixelCenter), zone.exit.map(_.centerPixel).toSeq, Seq(SpecificPoints.middle))
+    val centroidSources = Seq(squad.enemies.toSeq.map(_.pixelCenter), zone.exit.map(_.pixelCenter).toSeq, Seq(SpecificPoints.middle))
     val enemyCentroid   = centroidSources.find(_.nonEmpty).head.centroid
     val wall            = walls.minBy(_.pixelDistanceCenter(enemyCentroid))
     val concaveOrigin   = wall.pixelCenter.project(enemyCentroid, 96.0)

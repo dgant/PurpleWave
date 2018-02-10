@@ -1,6 +1,8 @@
 package Strategery.Strategies.Zerg
 
-import Strategery.Strategies.Zerg.Global._
+import Strategery.Strategies.Zerg.ZvE._
+import Strategery.Strategies.Zerg.ZvP.HydraBust
+import Strategery.Strategies.Zerg.ZvT.TwoHatchMuta
 import Strategery.Strategies._
 
 object ZergChoices {
@@ -10,6 +12,11 @@ object ZergChoices {
     ProxyHatchZerglings,
     ProxyHatchHydras,
     ProxyHatchSunkens,
-    ProxySunkens
+    //ProxySunkens,
+    NinePoolMuta,
+    NineHatchLings,
+    OneHatchLurker,
+    HydraBust,
+    TwoHatchMuta
   )
 }

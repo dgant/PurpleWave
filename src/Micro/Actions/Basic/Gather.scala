@@ -15,7 +15,7 @@ object Gather extends Action {
   override def perform(unit: FriendlyUnitInfo) {
   
     Potshot.consider(unit)
-    
+    val resource = unit.agent.toGather.get
     if ( ! unit.agent.toGather.exists(_.zone == unit.zone)) {
       if (unit.matchups.threats.exists(_.framesBeforeAttacking(unit) < 36)) {
         Fight.consider(unit)

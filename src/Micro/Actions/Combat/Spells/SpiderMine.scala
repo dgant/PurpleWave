@@ -40,7 +40,7 @@ object SpiderMine extends Action {
     if (unit.matchups.framesOfSafetyDiffused <= 0) return
     if (With.grids.units.get(unit.tileIncludingCenter).exists(_.is(Terran.SpiderMine))) return
     
-    val choke = unit.zone.edges.find(e => unit.pixelDistanceCenter(e.centerPixel) < e.radiusPixels)
+    val choke = unit.zone.edges.find(e => unit.pixelDistanceCenter(e.pixelCenter) < e.radiusPixels)
     if (choke.isDefined) {
       placeMine(unit, unit.pixelCenter)
     }
@@ -52,7 +52,7 @@ object SpiderMine extends Action {
     val maxRangeTiles = PurpleMath.clamp(range, rangeMinimum, 8.0 * 32.0)
   
     //TODO: This is a good candidate for Coordinator since every Vulture will want to recalculate this
-    val victims = vulture.matchups.targets.filterNot(_.unitClass.floats)
+    val victims = vulture.matchups.enemies.filter(enemy => ! enemy.flying && ! enemy.unitClass.floats && ! enemy.unitClass.isBuilding)
     if (victims.isEmpty) return
     
     val saboteursInitial = new mutable.PriorityQueue[UnitInfo]()(Ordering.by(v => victims.map(_.pixelDistanceEdge(v)).min))
@@ -84,7 +84,14 @@ object SpiderMine extends Action {
         else
           1.0
       
-      val ownership = if (target.isFriendly) -3.0 else 1.0
+      val ownership =
+        if (target.isFriendly)
+          if (target.is(Terran.Vulture))
+            0.0
+          else
+            -3.0
+        else
+          1.0
       val output = target.subjectiveValue * multiplier * ownership
     
       output

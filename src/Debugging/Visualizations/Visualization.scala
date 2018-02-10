@@ -26,7 +26,8 @@ class Visualization {
     ShowStrategy,
     ShowUnitsAll,
     ShowUnitsFriendly,
-    ShowUnitsForeign
+    ShowUnitsForeign,
+    ShowExplosions
   )
   
   var enabled   = true

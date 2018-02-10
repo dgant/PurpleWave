@@ -7,7 +7,7 @@ import Strategery.Strategies.Protoss.PvT._
 import Strategery.Strategies.Protoss.PvZ._
 import Strategery.Strategies.Strategy
 import Strategery.Strategies.Terran.TvE._
-import Strategery.Strategies.Zerg.Global._
+import Strategery.Strategies.Zerg.ZvE._
 
 class EmptyPlaybook {
   
@@ -45,13 +45,15 @@ object StrategyGroups {
     PvTEarly1GateProxy,
     PvT3BaseCorsair,
     CarriersWithNoDefense,
-    ProxyDarkTemplar
+    ProxyDarkTemplar,
+    PvZEarlyFFENexusFirst,
+    PvZMidgame2Stargate
   )
 }
 
 class TestingPlaybook extends EmptyPlaybook {
   
-  val strategiesToTest: Seq[Strategy] = Seq(TvEProxy8Fact)
+  val strategiesToTest: Seq[Strategy] = Seq(WorkerRushLiftoff)
   
   //override lazy val forced: Seq[Strategy] = Seq(AllPvP, AllPvT, AllPvZ, TvTStandard, TvZStandard) ++ strategiesToTest
   override lazy val forced: Seq[Strategy] = strategiesToTest

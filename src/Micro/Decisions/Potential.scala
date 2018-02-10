@@ -126,9 +126,9 @@ object Potential {
     
     if (nearestBlocker.isEmpty) return new Force
     
-    val maximumDistance = Math.max(32.0, unit.pixelRangeMax)
+    val maximumDistance = Math.max(32.0, unit.pixelRangeMax / 2.0)
     val blockerDistance = nearestBlocker.get.pixelDistanceEdge(unit)
-    val magnitude       = Math.max(0.0, 1.0 - blockerDistance / maximumDistance)
+    val magnitude       = PurpleMath.clamp(maximumDistance / (1.0 + blockerDistance), 0.0, 1.0)
     val output          = unitAttraction(unit, nearestBlocker.get, - magnitude)
     output
   }
@@ -151,7 +151,7 @@ object Potential {
   
   protected def exitAttractionGround(unit: FriendlyUnitInfo): Force = {
     val path          = unit.agent.zonePath(unit.agent.origin)
-    val origin        = if (path.isEmpty || path.get.steps.isEmpty) unit.agent.origin.zone.centroid.pixelCenter else path.get.steps.head.edge.centerPixel
+    val origin        = if (path.isEmpty || path.get.steps.isEmpty) unit.agent.origin.zone.centroid.pixelCenter else path.get.steps.head.edge.pixelCenter
     val forceExiting  = ForceMath.fromPixels(unit.pixelCenter, origin)
     val forceNormal   = forceExiting.normalize
     forceNormal

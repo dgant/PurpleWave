@@ -3,7 +3,7 @@ package Strategery.Strategies.Terran
 import Strategery.Strategies.AllRaces.WorkerRush
 import Strategery.Strategies.Terran.FFA.TerranFFABio
 import Strategery.Strategies.Terran.TvE._
-import Strategery.Strategies.Terran.TvP.{TvPEarly14CC, TvPEarlyFDStrong}
+import Strategery.Strategies.Terran.TvP.TvPEarlyFDStrong
 import Strategery.Strategies.Terran.TvR.{TvR1Rax, TvRTinfoil}
 import Strategery.Strategies.Terran.TvT.TvTStandard
 import Strategery.Strategies.Terran.TvZ._
@@ -17,9 +17,10 @@ object TerranChoices {
   
   val tvr = Vector(
     WorkerRush,
-    TvEProxy5Rax,
-    TvEProxy8Fact,
-    TvEProxyBBS,
+    //WorkerRushLiftoff,
+    //TvEProxy5Rax,
+    //TvEProxy8Fact,
+    //TvEProxyBBS,
     TvEMassMarine,
     TvEMassVulture,
     TvR1Rax,
@@ -31,8 +32,8 @@ object TerranChoices {
   /////////
   
   val tvtOpeners = Vector(
-    TvTStandard,
-    TvTPNukeDrop
+    TvTStandard
+    //TvTPNukeDrop
   )
   
   /////////
@@ -40,9 +41,9 @@ object TerranChoices {
   /////////
   
   val tvpOpeners = Vector(
-    TvPEarly14CC,
-    TvPEarlyFDStrong,
-    TvTPNukeDrop
+    //TvPEarly14CC,
+    TvPEarlyFDStrong
+    //TvTPNukeDrop
   )
   
   /////////

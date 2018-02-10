@@ -5,8 +5,8 @@ import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
+import Planning.Plans.Information.Employing
 import Planning.Plans.Information.Reactive.EnemyBio
-import Planning.Plans.Information.{Employ, Employing}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildCannonsAtExpansions, BuildCannonsAtNatural, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.{IfOnMiningBases, UnitsAtLeast}
@@ -40,8 +40,10 @@ class PvT2BaseCarriers extends GameplanModeTemplate {
         new BuildOrder(RequestAtLeast(3, Protoss.Gateway))),
       
       new Parallel(
-        new Employ(
-          PvT2BaseReaverCarrier,
+        new If(
+          new Or(
+            new Employing(PvT2BaseReaverCarrier),
+            new EnemyBio),
           new Build(
             RequestAtLeast(1, Protoss.RoboticsFacility),
             RequestAtLeast(1, Protoss.RoboticsSupportBay))),
@@ -59,8 +61,8 @@ class PvT2BaseCarriers extends GameplanModeTemplate {
           new And(
             new EnemyBio,
             new Employing(PvT2BaseCarrier)),
-          new UpgradeContinuously(Protoss.AirDamage),
-          new UpgradeContinuously(Protoss.AirArmor)))),
+          new UpgradeContinuously(Protoss.AirArmor),
+          new UpgradeContinuously(Protoss.AirDamage)))),
     
     new Build(
       RequestAtLeast(5, Protoss.Gateway),

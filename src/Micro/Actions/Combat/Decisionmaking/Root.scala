@@ -1,6 +1,5 @@
 package Micro.Actions.Combat.Decisionmaking
 
-import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Micro.Actions.Action
 import Planning.Composition.UnitMatchers.UnitMatchSiegeTank
@@ -24,7 +23,7 @@ object Root extends Action {
         
     private def distanceToGoal(u: FriendlyUnitInfo): Double = u.pixelDistanceTravelling(unit.agent.destination)
     private val pushSpacing = 32.0 * 5.0
-    private val rootTime = GameTime(0, 2)()
+    private val framesToRoot = 12
     
     private lazy val weAreALurker         = Zerg.Lurker.accept(unit)
     private lazy val weAreATank           = UnitMatchSiegeTank.accept(unit)
@@ -35,7 +34,7 @@ object Root extends Action {
     private lazy val rootersInPushCloser  = rootersInPush.count(distanceToGoal(_) < ourDistanceToGoal + pushSpacing)
     
     private lazy val threatsButNoTargets  = unit.matchups.threats.nonEmpty && unit.matchups.targets.isEmpty
-    private lazy val insideNarrowChoke    = unit.zone.edges.exists(e => e.radiusPixels < 32.0 * 4.0 && unit.pixelDistanceCenter(e.centerPixel) < e.radiusPixels)
+    private lazy val insideNarrowChoke    = unit.zone.edges.exists(e => e.radiusPixels < 32.0 * 4.0 && unit.pixelDistanceCenter(e.pixelCenter) < e.radiusPixels)
     private lazy val beingPickedUp        = unit.agent.toBoard.isDefined
     private lazy val outOfCombat          = unit.matchups.battle.isEmpty
     private lazy val inTheWay             = unit.agent.shovers.nonEmpty
@@ -47,8 +46,9 @@ object Root extends Action {
     private lazy val buildingInRange      = unit.matchups.targetsInRange.exists(_.unitClass.isBuilding)
     private lazy val combatTargets        = unit.matchups.targets.filter(_.unitClass.helpsInCombat)
     private lazy val targetsInRange       = combatTargets.filter(t => unit.pixelDistanceEdge(t) < maxRange)
-    private lazy val targetsNearingRange  = combatTargets.filter(t => { val p = t.projectFrames(rootTime); unit.pixelDistanceEdge(t.pixelStartAt(p), t.pixelEndAt(p)) < maxRange})
+    private lazy val targetsNearingRange  = combatTargets.filter(t => { val p = t.projectFrames(framesToRoot); unit.pixelDistanceEdge(t.pixelStartAt(p), t.pixelEndAt(p)) < maxRange})
     private lazy val girdForCombat        = targetsInRange.nonEmpty || targetsNearingRange.nonEmpty
+    private lazy val duckForCover         = weAreALurker && unit.matchups.enemyDetectors.isEmpty && unit.matchups.framesOfSafetyDiffused < framesToRoot
     private lazy val leadingPush          = (rootersInPush.size + 1) / 3 > rootersInPushCloser
     private lazy val destinationFarAway   = unit.pixelDistanceCenter(unit.agent.destination) > 32.0 * 4.0
     
@@ -68,6 +68,7 @@ object Root extends Action {
       ||  (weAreATank && buildingInRange    )
       ||  (leadingPush                      )
       ||  (girdForCombat                    )
+      ||  (duckForCover                     )
     )
     lazy val wantsToUnroot = (
           (mustBeUnrooted                   )
@@ -91,7 +92,7 @@ object Root extends Action {
         return
       }
       if (weAreALurker) {
-        // Burrow
+        With.commander.burrow(unit)
       }
       if (weAreATank) {
         With.commander.useTech(unit, Terran.SiegeMode)
@@ -103,7 +104,7 @@ object Root extends Action {
         return
       }
       if (weAreALurker) {
-        // Unburrow
+        With.commander.unburrow(unit)
       }
       if (weAreATank) {
         With.commander.useTech(unit, Terran.SiegeMode)

@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvZ
 import Lifecycle.With
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{RequestAnother, RequestAtLeast, RequestTech, RequestUpgrade}
-import Planning.Composition.UnitMatchers.UnitMatchWarriors
+import Planning.Composition.UnitMatchers.{UnitMatchWarriors, UnitMatchWorkers}
 import Planning.Plans.Army._
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
@@ -37,6 +37,9 @@ class ProtossVsZergOld extends Parallel {
     new Parallel(
       new BuildHuggingNexus,
       new BuildOrder(ProtossBuilds.OpeningTwoGate1012: _*)))
+  
+  private class ImplementEarly2Gate99 extends FirstEightMinutes(
+    new BuildOrder(ProtossBuilds.OpeningTwoGate99: _*))
   
   private class FFE extends FirstEightMinutes(
     new Parallel(
@@ -106,20 +109,20 @@ class ProtossVsZergOld extends Parallel {
       RequestAtLeast(1, Protoss.Gateway),
       RequestAtLeast(1, Protoss.Assimilator),
       RequestAtLeast(1, Protoss.CyberneticsCore),
-      RequestAtLeast(2, Protoss.Assimilator),
       RequestAtLeast(1, Protoss.Stargate),
       RequestAtLeast(1, Protoss.CitadelOfAdun),
       RequestUpgrade(Protoss.GroundDamage),
       RequestUpgrade(Protoss.ZealotSpeed),
       RequestAtLeast(2, Protoss.Nexus),
+      RequestAtLeast(2, Protoss.Assimilator),
       RequestAtLeast(1, Protoss.TemplarArchives),
       RequestAtLeast(4, Protoss.Gateway))
   
   private class ImplementMidgameCorsairReaver extends Build(
       RequestAtLeast(1, Protoss.Gateway),
-      RequestAtLeast(2, Protoss.Assimilator),
       RequestAtLeast(1, Protoss.CyberneticsCore),
       RequestAtLeast(1, Protoss.Stargate),
+      RequestAtLeast(2, Protoss.Assimilator),
       RequestAtLeast(1, Protoss.RoboticsFacility),
       RequestAtLeast(1, Protoss.RoboticsSupportBay),
       RequestAtLeast(2, Protoss.Nexus),
@@ -133,9 +136,9 @@ class ProtossVsZergOld extends Parallel {
       RequestAtLeast(1, Protoss.Gateway),
       RequestAtLeast(1, Protoss.Assimilator),
       RequestAtLeast(1, Protoss.CyberneticsCore),
-      RequestAtLeast(2, Protoss.Assimilator),
       RequestAtLeast(1, Protoss.Stargate),
       RequestAtLeast(1, Protoss.CitadelOfAdun),
+      RequestAtLeast(2, Protoss.Assimilator),
       RequestAtLeast(1, Protoss.TemplarArchives),
       RequestAtLeast(2, Protoss.Nexus),
       RequestAtLeast(4, Protoss.Gateway))
@@ -146,10 +149,11 @@ class ProtossVsZergOld extends Parallel {
     RequestAtLeast(1, Protoss.CyberneticsCore),
     RequestAtLeast(2, Protoss.Assimilator),
     RequestAtLeast(1, Protoss.Stargate),
-    RequestAtLeast(1, Protoss.CitadelOfAdun),
+    RequestAtLeast(2, Protoss.Gateway),
     RequestAtLeast(2, Protoss.Nexus),
-    RequestAtLeast(2, Protoss.Stargate),
-    RequestAtLeast(4, Protoss.Gateway))
+    RequestAtLeast(1, Protoss.CitadelOfAdun),
+    RequestAtLeast(4, Protoss.Gateway),
+    RequestAtLeast(2, Protoss.Stargate))
   
   ///////////
   // Macro //
@@ -204,6 +208,7 @@ class ProtossVsZergOld extends Parallel {
   
     new RequireEssentials,
     new Employ(PvZEarly2Gate, new ImplementEarly2Gate),
+    new Employ(PvZEarly2Gate99, new ImplementEarly2Gate),
     new If(new WeAreFFEing, new FFE),
     
     ///////////////////
@@ -336,9 +341,8 @@ class ProtossVsZergOld extends Parallel {
             new Or(
               new Employing(PvZMidgame5GateDragoons),
               new Employing(PvZMidgameCorsairReaver)),
-            new Or(
-              new UnitsAtMost(12, Protoss.Dragoon),
-              new UnitsAtLeast(12, Protoss.Zealot))),
+            new UnitsAtMost(10, Protoss.Dragoon),
+            new Check(() => With.self.gas > 100 || With.self.minerals < 400)),
           new TrainContinuously(Protoss.Dragoon),
           new TrainContinuously(Protoss.Zealot)))),
   
@@ -348,7 +352,11 @@ class ProtossVsZergOld extends Parallel {
     new Employ(PvZMidgameCorsairReaver,         new ImplementMidgameCorsairReaver),
     new Employ(PvZMidgameCorsairSpeedlot,       new ImplementMidgameCorsairSpeedlot),
     new Employ(PvZMidgame2Stargate,             new ImplementMidgame2Stargate),
-    new BuildGasPumps,
+    new If(
+      new Or(
+        new UnitsAtLeast(32, UnitMatchWorkers),
+        new Check(() => With.self.minerals > 1000)),
+      new BuildGasPumps),
   
     /////////////////////
     // Late game macro //

@@ -66,6 +66,7 @@ class Agent(val unit: FriendlyUnitInfo) {
   var canScout      : Boolean                       = false
   var canPillage    : Boolean                       = false
   var canBerzerk    : Boolean                       = false
+  var canLiftoff    : Boolean                       = false
   var canCast       : Boolean                       = false
   
   var targetingProfile: TargetingProfile = TargetingProfiles.default
@@ -90,7 +91,7 @@ class Agent(val unit: FriendlyUnitInfo) {
         if (path.isEmpty || path.get.steps.isEmpty)
           origin.zone.centroid.pixelCenter
         else
-          path.get.steps.head.edge.centerPixel
+          path.get.steps.head.edge.pixelCenter
     }
     cachedWaypoint(to)
   }
@@ -176,6 +177,7 @@ class Agent(val unit: FriendlyUnitInfo) {
     canScout      = intent.canScout
     canPillage    = intent.canPillage
     canBerzerk    = intent.canBerzerk
+    canLiftoff    = intent.canLiftoff
     canCast       = false
   }
   

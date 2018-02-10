@@ -5,6 +5,7 @@ import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
 import Planning.Composition.UnitMatchers.{UnitMatchCustom, UnitMatchWarriors}
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, _}
+import Planning.Plans.Information.Reactive.EnemyBio
 import Planning.Plans.Information.{Employing, SafeToAttack}
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
@@ -145,7 +146,9 @@ object PvTIdeas {
   
   class TrainHighTemplar extends OnGasPumps(3,
     new If(
-      new UnitsAtLeast(20, UnitMatchWarriors),
+      new Or(
+        new UnitsAtLeast(20, UnitMatchWarriors),
+        new EnemyBio),
       new TrainContinuously(Protoss.HighTemplar, 6, 2),
       new TrainContinuously(Protoss.HighTemplar, 6, 1)))
     

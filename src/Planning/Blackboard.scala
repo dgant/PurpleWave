@@ -12,4 +12,6 @@ class Blackboard {
   var gasLimitCeiling   : Int     = 100000
   var gasTargetRatio    : Double  = if (With.self.isProtoss) 3.0 / 10.0 else 3.0 / 8.0
   var allIn             : Boolean = false
+  var yoloEnabled       : Boolean = true
+  var enemyUnitDied     : Boolean = false
 }

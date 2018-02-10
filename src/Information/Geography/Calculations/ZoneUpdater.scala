@@ -63,7 +63,7 @@ object ZoneUpdater {
   
     val exitBuildings = zone.exit.map(exit =>
       With.units
-        .inTileRadius(exit.centerPixel.tileIncluding, 10)
+        .inTileRadius(exit.pixelCenter.tileIncluding, 10)
         .filter(u => u.unitClass.isBuilding && ! u.flying))
       .getOrElse(List.empty)
   

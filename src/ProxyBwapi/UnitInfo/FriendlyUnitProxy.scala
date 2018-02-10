@@ -168,8 +168,10 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit, id: Int) extends UnitInfo(bas
   private val getLastCommandCache      = new Cache(() => Option(base.getLastCommand) )
   private val getLastCommandFrameCache = new Cache(() => base.getLastCommandFrame)
   
+  def buildType: UnitClass = buildTypeCache()
   def trainingQueue: Iterable[UnitClass] = trainingQueueCache()
   
+  private val buildTypeCache = new Cache(() => UnitClasses.get(base.getBuildType))
   private val trainingQueueCache = new Cache(() =>
     if (unitClass.trainsUnits)
       base.getTrainingQueue.asScala.map(UnitClasses.get)

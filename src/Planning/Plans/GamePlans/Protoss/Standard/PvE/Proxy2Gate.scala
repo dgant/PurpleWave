@@ -41,7 +41,8 @@ class Proxy2Gate extends GameplanModeTemplate {
     new EnemyHasShown(Terran.Vulture),
     new EnemyHasShown(Protoss.Dragoon),
     new EnemyUnitsAtLeast(1, Zerg.Spire, complete = true),
-    new EnemyUnitsAtLeast(1, Terran.Factory, complete = true))
+    new EnemyUnitsAtLeast(1, Terran.Factory, complete = true),
+    new Check(() => With.geography.enemyZones.exists(_.walledIn)))
   
   private class AfterProxy extends Parallel(
     new RequireSufficientSupply,

@@ -21,6 +21,7 @@ object Idle extends Action {
   }
   
   private val actions = Vector(
+    Liftoff,
     Cancel,
     Unbunk,
     Meld,

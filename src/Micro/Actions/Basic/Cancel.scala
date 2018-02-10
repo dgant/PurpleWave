@@ -8,8 +8,8 @@ object Cancel extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
     lazy val unpowered        = unit.unitClass.requiresPsi && ! unit.powered
-    lazy val framesCutoff     = 1.5 * With.reaction.agencyAverage
-    lazy val framesToLive     = Math.min(unit.totalHealth / 24.0 / unit.damageInLastSecond, unit.matchups.framesToLiveCurrently)
+    lazy val framesCutoff     = 12 + With.reaction.agencyAverage
+    lazy val framesToLive     = unit.matchups.framesToLiveCurrently
     lazy val framesToFinish   = Seq(unit.framesBeforeTechComplete, unit.framesBeforeUpgradeComplete, unit.framesBeforeBuildeeComplete).max
     lazy val doomed           = framesToLive < framesCutoff
     lazy val willNeverFinish  = framesToLive < framesToFinish
@@ -18,7 +18,7 @@ object Cancel extends Action {
     lazy val isDecoy          = unit.unitClass.attacks && unit.matchups.allies.exists(_.isBeingViolent) // Is this correct?
     lazy val shouldCancel     = (unpowered || beingBorn || (producing && willNeverFinish)) && ! isDecoy
     
-    val output = unit.unitClass.isBuilding && doomed && shouldCancel
+    val output = (unit.unitClass.isBuilding || unit.morphing) && doomed && shouldCancel
     output
   }
   

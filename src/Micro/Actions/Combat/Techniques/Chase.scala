@@ -3,6 +3,7 @@ package Micro.Actions.Combat.Techniques
 import Micro.Actions.Combat.Attacking.Target
 import Micro.Actions.Combat.Techniques.Common.ActionTechnique
 import Micro.Actions.Commands.{Attack, Move}
+import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object Chase extends ActionTechnique {
@@ -16,6 +17,7 @@ object Chase extends ActionTechnique {
   )
   
   override def applicabilitySelf(unit: FriendlyUnitInfo): Double = {
+    if (unit.is(Zerg.Lurker)) return 0.0
     if (unit.unitClass.minStop > 0) return 0.0
     if (unit.unitClass.attackAnimationFrames > 2) return 0.0
     1.0

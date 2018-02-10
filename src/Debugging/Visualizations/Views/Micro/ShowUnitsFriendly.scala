@@ -4,7 +4,7 @@ import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.View
 import Debugging.Visualizations.{Colors, ForceColors}
 import Lifecycle.With
-import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
 import bwapi.Color
 
@@ -20,7 +20,6 @@ object ShowUnitsFriendly extends View {
   var showKiting      : Boolean = false
   var showForces      : Boolean = false
   var showDesire      : Boolean = true
-  var showExplosions  : Boolean = true
   
   override def renderMap() { With.units.ours.foreach(renderUnitState) }
   
@@ -126,12 +125,9 @@ object ShowUnitsFriendly extends View {
       DrawMap.circle(pixel, 3, Color.Black, solid = true)
       DrawMap.circle(pixel, 2, color,       solid = true)
     }
-    
-    if (showExplosions) {
-      With.coordinator.explosions.all.foreach(explosion =>
-        if (With.units.ours.exists(explosion.affects)) {
-          explosion.draw()
-        })
-    }
+  }
+  
+  def drawAttackCommand(attacker: UnitInfo, victim: UnitInfo) {
+    DrawMap.circle(attacker.pixelCenter, attacker.unitClass.radialHypotenuse.toInt, Colors.BrightViolet)
   }
 }

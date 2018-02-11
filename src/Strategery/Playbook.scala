@@ -1,13 +1,11 @@
 package Strategery
 
-import Strategery.Strategies.AllRaces.WorkerRush
 import Strategery.Strategies.Protoss.PvE._
-import Strategery.Strategies.Protoss.PvP._
 import Strategery.Strategies.Protoss.PvT._
 import Strategery.Strategies.Protoss.PvZ._
 import Strategery.Strategies.Strategy
 import Strategery.Strategies.Terran.TvE._
-import Strategery.Strategies.Zerg.ZvE._
+import Strategery.Strategies.Zerg.ZvT.TwoHatchMuta
 
 class EmptyPlaybook {
   
@@ -20,25 +18,6 @@ class EmptyPlaybook {
 }
 
 object StrategyGroups {
-  
-  val cheese = Vector[Strategy](
-    WorkerRush,
-    TvEProxyBBS,
-    TvEProxy5Rax,
-    TvEProxy8Fact,
-    TvEMassMarine,
-    TvEMassVulture,
-    PvTProxy2Gate,
-    PvPOpenProxy2Gate,
-    PvZProxy2Gate,
-    PvTEarly1GateProxy,
-    ProxyDarkTemplar,
-    Zerg4PoolAllIn,
-    ProxyHatchZerglings,
-    ProxyHatchSunkens,
-    ProxyHatchHydras
-  )
-  
   val bad = Vector[Strategy](
     TvEProxy8Fact,
     TvEProxy5Rax,
@@ -52,8 +31,7 @@ object StrategyGroups {
 }
 
 class TestingPlaybook extends EmptyPlaybook {
-  
-  val strategiesToTest: Seq[Strategy] = Seq(WorkerRushLiftoff)
+  val strategiesToTest: Seq[Strategy] = Seq(TwoHatchMuta)
   
   //override lazy val forced: Seq[Strategy] = Seq(AllPvP, AllPvT, AllPvZ, TvTStandard, TvZStandard) ++ strategiesToTest
   override lazy val forced: Seq[Strategy] = strategiesToTest
@@ -64,9 +42,4 @@ class PurpleWavePlaybook extends EmptyPlaybook {
   override lazy val disabled  : Seq[Strategy] = StrategyGroups.bad
 }
 
-class PurpleCheesePlaybook extends EmptyPlaybook  {
-  override lazy val forced: Seq[Strategy] = StrategyGroups.cheese
-}
-
-object Playbook extends PurpleWavePlaybook {
-}
+object Playbook extends TestingPlaybook {}

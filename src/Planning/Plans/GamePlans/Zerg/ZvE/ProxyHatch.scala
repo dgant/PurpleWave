@@ -26,12 +26,13 @@ class ProxyHatch extends Parallel {
     With.blackboard.maxFramesToSendAdvanceBuilder = Int.MaxValue
     super.onUpdate()
   }
+  
   private class WeKnowWhereToProxy extends Check(() => ProxyPlanner.proxyEnemyNatural.isDefined)
   private class WeHaveEnoughSunkens extends UnitsAtLeast(3, Zerg.SunkenColony, complete = false)
   
   private def blueprintCreepColonyNatural: Blueprint = new Blueprint(this,
     building     = Some(Zerg.CreepColony),
-    requireZone  = ProxyPlanner.proxyEnemyNatural,
+    requireZone  = if (With.enemy.isTerran) ProxyPlanner.proxyEnemyNatural else ProxyPlanner.proxyMiddle,
     placement    = Some(PlacementProfiles.proxyCannon))
   
   children.set(Vector(
@@ -103,7 +104,8 @@ class ProxyHatch extends Parallel {
       new Parallel(
         new Do(() => {
           With.blackboard.gasTargetRatio = 2.0 / 12.0
-          With.blackboard.gasLimitCeiling = 150
+          With.blackboard.gasLimitFloor = 50
+          With.blackboard.gasLimitCeiling = 175
         }),
         new Build(RequestAtLeast(1, Zerg.HydraliskDen)),
         new RequireSufficientSupply,

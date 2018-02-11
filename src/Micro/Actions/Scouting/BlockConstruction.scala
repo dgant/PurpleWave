@@ -8,9 +8,9 @@ import bwapi.UnitCommandType
 
 object BlockConstruction extends Action {
   
-  override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    blockableBuilders(unit).nonEmpty
-  }
+  override def allowed(unit: FriendlyUnitInfo): Boolean = (
+    blockableBuilders(unit).nonEmpty && ! unit.flying
+  )
   
   override protected def perform(unit: FriendlyUnitInfo) {
     val builder = blockableBuilders(unit).minBy(_.pixelDistanceEdge(unit))

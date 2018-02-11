@@ -12,7 +12,7 @@ import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{BuildOrder, FollowBuildOrder, RequireEssentials}
 import Planning.Plans.Macro.Expanding.RemoveMineralBlocksAt
 import Planning.Plans.Recruitment.RecruitFreelancers
-import Planning.Plans.Scouting.{ScoutAt, ScoutExpansionsAt}
+import Planning.Plans.Scouting.{ChillOverlords, ScoutAt, ScoutExpansionsAt}
 
 abstract class GameplanModeTemplate extends GameplanMode {
   
@@ -58,6 +58,7 @@ abstract class GameplanModeTemplate extends GameplanMode {
     defaultAttackPlan,
     new DefendEntrance,
     new Gather,
+    new ChillOverlords,
     new RecruitFreelancers,
     new Scan
   )

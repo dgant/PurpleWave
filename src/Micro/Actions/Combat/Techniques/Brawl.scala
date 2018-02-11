@@ -17,10 +17,8 @@ object Brawl extends ActionTechnique {
     && unit.matchups.threats.exists(_.unitClass.melee)
   )
   
-  override val activator = RMS
-  
   override def applicabilitySelf(unit: FriendlyUnitInfo): Double = {
-    if (unit.unitClass.melee) 1.0 else 0.0
+    if (unit.unitClass.melee && unit.matchups.threats.exists(_.unitClass.melee)) 1.0 else 0.0
   }
   
   override def applicabilityOther(unit: FriendlyUnitInfo, other: UnitInfo): Option[Double] = {

@@ -23,7 +23,7 @@ object Root extends Action {
         
     private def distanceToGoal(u: FriendlyUnitInfo): Double = u.pixelDistanceTravelling(unit.agent.destination)
     private val pushSpacing = 32.0 * 5.0
-    private val framesToRoot = 12
+    private val framesToRoot = 18
     
     private lazy val weAreALurker         = Zerg.Lurker.accept(unit)
     private lazy val weAreATank           = UnitMatchSiegeTank.accept(unit)
@@ -46,9 +46,9 @@ object Root extends Action {
     private lazy val buildingInRange      = unit.matchups.targetsInRange.exists(_.unitClass.isBuilding)
     private lazy val combatTargets        = unit.matchups.targets.filter(_.unitClass.helpsInCombat)
     private lazy val targetsInRange       = combatTargets.filter(t => unit.pixelDistanceEdge(t) < maxRange)
-    private lazy val targetsNearingRange  = combatTargets.filter(t => { val p = t.projectFrames(framesToRoot); unit.pixelDistanceEdge(t.pixelStartAt(p), t.pixelEndAt(p)) < maxRange})
+    private lazy val targetsNearingRange  = combatTargets.filter(t => { val p = t.projectFrames(framesToRoot); unit.pixelDistanceEdge(t.pixelStartAt(p), t.pixelEndAt(p)) < maxRange - 32})
     private lazy val girdForCombat        = targetsInRange.nonEmpty || targetsNearingRange.nonEmpty
-    private lazy val duckForCover         = weAreALurker && unit.matchups.enemyDetectors.isEmpty && unit.matchups.framesOfSafetyDiffused < framesToRoot
+    private lazy val duckForCover         = false && (weAreALurker && unit.matchups.enemyDetectors.isEmpty && unit.matchups.framesOfSafetyDiffused < framesToRoot)
     private lazy val leadingPush          = (rootersInPush.size + 1) / 3 > rootersInPushCloser
     private lazy val destinationFarAway   = unit.pixelDistanceCenter(unit.agent.destination) > 32.0 * 4.0
     

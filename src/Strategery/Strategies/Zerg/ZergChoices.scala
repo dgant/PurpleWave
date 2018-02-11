@@ -12,7 +12,6 @@ object ZergChoices {
     ProxyHatchZerglings,
     ProxyHatchHydras,
     ProxyHatchSunkens,
-    //ProxySunkens,
     NinePoolMuta,
     NineHatchLings,
     OneHatchLurker,

@@ -2,6 +2,7 @@ package Micro.Actions.Combat.Techniques
 
 import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Actions.Combat.Techniques.Common.{ActionTechnique, Leave}
+import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object FallBack extends ActionTechnique {
@@ -15,6 +16,11 @@ object FallBack extends ActionTechnique {
     && unit.unitClass.ranged
     && unit.matchups.targets.nonEmpty
   )
+  
+  override def applicabilitySelf(unit: FriendlyUnitInfo): Double = {
+    if (unit.is(Zerg.Lurker)) return 0.0
+    1.0
+  }
   
   override val applicabilityBase: Double = 0.5
   

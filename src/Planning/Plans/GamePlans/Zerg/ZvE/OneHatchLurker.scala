@@ -3,12 +3,13 @@ package Planning.Plans.GamePlans.Zerg.ZvE
 import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, RequestAtLeast, RequestTech, RequestUpgrade}
 import Planning.Plan
-import Planning.Plans.Compound.{Do, If, NoPlan}
+import Planning.Plans.Army.Attack
+import Planning.Plans.Compound.{Do, If, NoPlan, Parallel}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Macro.Milestones.UnitsAtMost
+import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
+import Planning.Plans.Macro.Milestones.{UnitsAtLeast, UnitsAtMost}
 import ProxyBwapi.Races.Zerg
 
 class OneHatchLurker extends GameplanModeTemplate {
@@ -23,6 +24,12 @@ class OneHatchLurker extends GameplanModeTemplate {
     RequestAtLeast(6, Zerg.Zergling))
   
   override def defaultScoutPlan: Plan = NoPlan()
+  
+  override def defaultAttackPlan: Plan = new If(
+    new UnitsAtLeast(1, Zerg.Lurker),
+    new Attack,
+    super.defaultAttackPlan
+  )
   
   override def buildPlans: Seq[Plan] = Vector(
     new If(
@@ -45,12 +52,21 @@ class OneHatchLurker extends GameplanModeTemplate {
     new If(
       new UnitsAtMost(0, Zerg.HydraliskDen),
       new TrainContinuously(Zerg.Zergling)),
-    new Build(RequestTech(Zerg.LurkerMorph)),
-    new TrainContinuously(Zerg.Lurker),
-    new TrainContinuously(Zerg.Hydralisk, 4, 2),
-    new RequireMiningBases(2),
-    new Build(RequestUpgrade(Zerg.ZerglingSpeed)),
-    new TrainContinuously(Zerg.Zergling),
-    new RequireMiningBases(3)
+    new If(
+      new UnitsAtMost(4, Zerg.Lurker),
+      new Parallel(
+        new Build(RequestTech(Zerg.LurkerMorph)),
+        new TrainContinuously(Zerg.Lurker),
+        new TrainContinuously(Zerg.Hydralisk, 4, 2),
+        new RequireMiningBases(2),
+        new TrainContinuously(Zerg.Zergling),
+        new Build(RequestUpgrade(Zerg.ZerglingSpeed))),
+      new Parallel(
+        new RequireMiningBases(2),
+        new Build(RequestAtLeast(1, Zerg.Spire)),
+        new TrainContinuously(Zerg.Mutalisk),
+        new TrainContinuously(Zerg.Drone))),
+    new BuildGasPumps,
+    new TrainContinuously(Zerg.Hatchery, 5, 1)
   )
 }

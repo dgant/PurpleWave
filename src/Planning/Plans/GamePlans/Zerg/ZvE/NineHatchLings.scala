@@ -4,7 +4,7 @@ import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, RequestAtLeast, RequestUpgrade}
 import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Plan
-import Planning.Plans.Army.{AllIn, Attack}
+import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Information.Matchup.EnemyIsZerg
@@ -37,7 +37,7 @@ class NineHatchLings extends GameplanModeTemplate {
       new Or(
         new EnemyUnitsAtLeast(1, Zerg.Mutalisk),
         new EnemyUnitsAtLeast(1, Terran.Vulture)),
-      new AllIn
+      new Aggression(1.5)
     ),
     new Build(RequestAtLeast(9, Zerg.Drone)),
     new TrainContinuously(Zerg.Zergling),

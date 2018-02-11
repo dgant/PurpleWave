@@ -3,7 +3,7 @@ package Micro.Actions.Combat.Decisionmaking
 import Lifecycle.With
 import Micro.Actions.Action
 import Planning.Yolo
-import ProxyBwapi.Races.Protoss
+import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object FightOrFlight extends Action {
@@ -22,10 +22,11 @@ object FightOrFlight extends Action {
     }
   
     decide(true,        () => unit.agent.canBerzerk)
-    decide(true,        () => unit.effectivelyCloaked)
     decide(true,        () => Yolo.active)
     decide(true,        () => unit.battle.isEmpty)
     decide(true,        () => unit.matchups.threats.isEmpty)
+    decide(true,        () => unit.effectivelyCloaked)
+    decide(true,        () => unit.is(Zerg.Lurker) && unit.matchups.enemyDetectors.isEmpty)
     decide(false,       () => ! unit.agent.canFight)
     decide(false,       () => unit.underDisruptionWeb && ! unit.flying)
     decide(false,       () => unit.underDarkSwarm     && ! unit.unitClass.unaffectedByDarkSwarm && unit.matchups.targetsInRange.forall(t => ! t.flying || t.underDarkSwarm))

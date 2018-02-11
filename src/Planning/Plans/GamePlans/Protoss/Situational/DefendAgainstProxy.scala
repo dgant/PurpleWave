@@ -71,10 +71,10 @@ class DefendAgainstProxy extends Plan {
     def baseDistance(base: Base)  = base.heart.pixelCenter.pixelDistanceFast(pixel)
     lazy val closestEnemyBase     = ByOption.minBy(With.geography.enemyBases)(_.heart.pixelCenter.pixelDistanceFast(pixel))
     lazy val closestOurBase       = ByOption.minBy(With.geography.ourBases)(_.heart.pixelCenter.pixelDistanceFast(pixel))
-    lazy val enemyBaseDistance    = closestEnemyBase.map(baseDistance)
-    lazy val ourBaseDistance      = closestEnemyBase.map(baseDistance)
-    lazy val withinOurThreshold   = ourBaseDistance.exists(_ < thresholdDistance)
-    lazy val closerToUs           = enemyBaseDistance.exists(distanceEnemy => ourBaseDistance.exists(distanceOurs => distanceOurs < distanceEnemy))
+    lazy val enemyBaseDistance    = closestEnemyBase.map(baseDistance).getOrElse(With.geography.startBases.map(baseDistance).max)
+    lazy val ourBaseDistance      = closestOurBase.map(baseDistance).getOrElse(Double.PositiveInfinity)
+    lazy val withinOurThreshold   = ourBaseDistance < thresholdDistance
+    lazy val closerToUs           = ourBaseDistance < enemyBaseDistance
     val output = closerToUs && withinOurThreshold
     output
   }

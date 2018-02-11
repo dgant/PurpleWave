@@ -14,9 +14,6 @@ object Breathe extends ActionTechnique {
     && unit.matchups.targets.nonEmpty
     && unit.matchups.threats.nonEmpty
   )
-  
-  override val activator = RMS
-  
   override val applicabilityBase = 1.0
   
   override def applicabilitySelf(unit: FriendlyUnitInfo): Double = {
@@ -28,16 +25,11 @@ object Breathe extends ActionTechnique {
     if (other.isFriendly) return None
     if ( ! other.canAttack(unit)) return None
     
-    val distanceOurs    = unit.pixelRangeMax
-    val distanceTheirs  = other.pixelDistanceEdge(unit)
-    val distanceDelta   = distanceOurs - distanceTheirs
+    val rangeOurs   = if (unit.canAttack(other)) unit.pixelRangeAgainst(other) else unit.pixelRangeMax
+    val rangeTheirs = other.pixelRangeAgainst(unit)
+    val rangeDelta  = rangeOurs - rangeTheirs
     
-    val rangeOurs       = unit.pixelRangeAgainst(unit.matchups.targets.head)
-    val rangeTheirs     = other.pixelRangeAgainst(unit)
-    val rangeDelta      = rangeOurs - rangeTheirs
-    
-    // Does this even make sense?
-    val safetyMargin    = rangeDelta + distanceDelta
+    val safetyMargin = rangeDelta
     
     // This is a good candidate for weighing relevance.
     if (safetyMargin <= 0.0) return Some(0.0)

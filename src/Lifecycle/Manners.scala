@@ -17,7 +17,7 @@ object Manners {
       With.performance.framesOver85 > 1000
       || With.performance.framesOver1000 > 15
       || With.performance.framesOver10000 > 3)) {
-      surrender()
+      //surrender()
     }
   }
   

@@ -1,5 +1,6 @@
 package Micro.Actions.Combat.Tactics
 
+import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Micro.Actions.Action
 import Micro.Actions.Commands.Move
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -11,7 +12,7 @@ object Spot extends Action {
     unit.canMove
     && unit.flying
     && unit.matchups.targets.isEmpty
-    && (unit.matchups.framesOfSafetyDiffused > 0 || unit.totalHealth > 500)
+    && (unit.matchups.framesOfSafetyDiffused > GameTime(0, 4)() || unit.totalHealth > 500)
   )
   
   override protected def perform(unit: FriendlyUnitInfo) {

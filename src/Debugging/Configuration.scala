@@ -19,8 +19,8 @@ class Configuration {
   //////////////
   
   var targetWinrate       = 0.7
-  var strategyRandomness  = 0.05
-  var historyHalfLife     = 100.0
+  var strategyRandomness  = 0.1
+  var historyHalfLife     = 50.0
   
   /////////////
   // Battles //

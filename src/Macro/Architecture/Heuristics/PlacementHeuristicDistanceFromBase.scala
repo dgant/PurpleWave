@@ -16,12 +16,18 @@ object PlacementHeuristicDistanceFromBase extends PlacementHeuristic {
         val from  = base.townHallArea.midPixel
         val to    = candidate.pixelCenter
         
+        var baseDistance = 0.0
+        
         // Performance optimization. Town hall placements matter more so use the zone distance as well.
         if (blueprint.requireTownHallTile.get) {
-          totalDistance += from.zone.distancePixels(to.zone)
+          baseDistance += from.zone.distancePixels(to.zone)
+        }
+        baseDistance += from.pixelDistanceFast(to)
+        if ( ! base.townHall.exists(_.complete)) {
+          baseDistance *= 0.5
         }
         
-        totalDistance += from.pixelDistanceFast(to)
+        totalDistance += baseDistance
       })
       Math.max(128.0, totalDistance)
     }

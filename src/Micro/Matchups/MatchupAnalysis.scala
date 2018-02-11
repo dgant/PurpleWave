@@ -86,20 +86,20 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
     else
       dpfDealingDiffused(target)
   
-  def framesOfEntanglementWith(threat: UnitInfo): Double = {
+  def framesOfEntanglementWith(threat: UnitInfo, fixedRange: Option[Double] = None): Double = {
     lazy val speedApproachingMe     = me.speedApproachingPixel(threat.pixelCenter)
     lazy val speedApproachingThreat = threat.speedApproachingPixel(me.pixelCenter)
     lazy val reaccelerationFrames   = (me.topSpeed + speedApproachingThreat) / me.unitClass.accelerationFrames
     lazy val turnFrames             = me.unitClass.turn180Frames // TODO: Consider existing angle
     lazy val blastoffFrames         = if (me.unitClass.canMove) turnFrames + reaccelerationFrames  else 0 //How long for us to turn around and run
-    
-    val threatRangeBonus =
+    lazy val threatRangeBonus =
       if (threat.isFriendly)
         0.0
       else
         Math.max(0.0, (speedApproachingMe + speedApproachingThreat) * (With.reaction.agencyMax + With.latency.framesRemaining))
     
-    val gapPixels = me.pixelDistanceEdge(threat) - threat.pixelRangeAgainst(me) - threatRangeBonus
+    val effectiveRange = fixedRange.getOrElse(threat.pixelRangeAgainst(me) + threatRangeBonus)
+    val gapPixels = me.pixelDistanceEdge(threat) - effectiveRange
     
     val gapSpeed          = if (gapPixels >= 0) threat.topSpeed else me.topSpeed
     val framesToCloseGap  = PurpleMath.nanToInfinity(Math.abs(gapPixels) / gapSpeed)

@@ -9,11 +9,12 @@ import bwapi.Race
 
 object DisruptBuilder extends Action {
   
-  override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    With.intelligence.enemyMain.isDefined       &&
-    With.enemies.exists(_.raceInitial == Race.Terran)  &&
-    disruptableBuilders(unit).nonEmpty
-  }
+  override def allowed(unit: FriendlyUnitInfo): Boolean = (
+    unit.canAttack
+    && With.intelligence.enemyMain.isDefined
+    && With.enemies.exists(_.raceInitial == Race.Terran)
+    && disruptableBuilders(unit).nonEmpty
+  )
   
   override protected def perform(unit: FriendlyUnitInfo) {
     val builders = disruptableBuilders(unit)

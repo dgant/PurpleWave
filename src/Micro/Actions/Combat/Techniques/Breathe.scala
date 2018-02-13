@@ -1,5 +1,7 @@
 package Micro.Actions.Combat.Techniques
 
+import Micro.Actions.Combat.Tactics.Potshot
+import Micro.Actions.Combat.Techniques.Common.Activators.WeightedMean
 import Micro.Actions.Combat.Techniques.Common.{ActionTechnique, AttackAsSoonAsPossible, Leave}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
@@ -13,27 +15,23 @@ object Breathe extends ActionTechnique {
     && unit.canAttack
     && unit.matchups.targets.nonEmpty
     && unit.matchups.threats.nonEmpty
+    && ! unit.unitClass.melee
   )
-  override val applicabilityBase = 1.0
   
-  override def applicabilitySelf(unit: FriendlyUnitInfo): Double = {
-    if (unit.unitClass.melee) return 0.0
-    1.0
-  }
+  override val activator = new WeightedMean(this)
+  
+  override val applicabilityBase = 1.0
   
   override def applicabilityOther(unit: FriendlyUnitInfo, other: UnitInfo): Option[Double] = {
     if (other.isFriendly) return None
     if ( ! other.canAttack(unit)) return None
     
-    val rangeOurs   = if (unit.canAttack(other)) unit.pixelRangeAgainst(other) else unit.pixelRangeMax
+    val rangeOurs   = unit.pixelRangeAgainst(unit.matchups.targets.head)
     val rangeTheirs = other.pixelRangeAgainst(unit)
     val rangeDelta  = rangeOurs - rangeTheirs
+    if (rangeDelta <= 0.0) return Some(0.0)
     
-    val safetyMargin = rangeDelta
-    
-    // This is a good candidate for weighing relevance.
-    if (safetyMargin <= 0.0) return Some(0.0)
-    
+    val distanceRatio   = Math.min(1.0, unit.pixelRangeAgainst(other) / unit.pixelDistanceEdge(other))
     val cooldownOurs    = unit.cooldownMaxAgainst(unit.matchups.targets.head)
     val cooldownTheirs  = other.cooldownMaxAgainst(unit)
     val cooldownRatio   = cooldownOurs / cooldownTheirs
@@ -42,6 +40,7 @@ object Breathe extends ActionTechnique {
   }
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
+    Potshot.delegate(unit)
     AttackAsSoonAsPossible.delegate(unit)
     if ( ! unit.readyForAttackOrder) {
       Leave.delegate(unit)

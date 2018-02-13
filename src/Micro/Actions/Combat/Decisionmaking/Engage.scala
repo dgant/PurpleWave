@@ -24,6 +24,7 @@ object Engage extends Action {
       Fill,
       Hug,
       Isolate,
+      March,
       Purr,
       Reposition
     )

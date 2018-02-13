@@ -9,9 +9,11 @@ import ProxyBwapi.UnitClass.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 class TrainContinuously(
-  unitClass           : UnitClass,
-  maximum             : Int = Int.MaxValue,
-  maximumConcurrently : Int = Int.MaxValue)
+  unitClass                 : UnitClass,
+  maximumTotal              : Int = Int.MaxValue,
+  maximumConcurrently       : Int = Int.MaxValue,
+  maximumTotalRatio         : Double = 1.0,
+  maximumConcurrentlyRatio  : Double = 1.0)
     extends Plan {
     
   description.set("Continuously train " + unitClass)
@@ -19,22 +21,16 @@ class TrainContinuously(
   override def onUpdate() {
     if ( ! canBuild) return
     
-    val unitsMaximum          = maximum
-    val unitsMaximumDesirable = maxDesirable
-    val buildersAvailable     = builders
-    val buildersOccupied      = builders.toSeq.map(_.unitClass).distinct.map(With.scheduler.dumbPumps.consumed).sum
-    val capacityTotal         = buildersAvailable.size - buildersOccupied
-    val capacityLeft          = buildCapacity - builders.map(_.unitClass).map(With.scheduler.dumbPumps.consumed).sum
+    val unitsMaximum            = maximumTotal
+    val unitsMaximumDesirable   = maxDesirable
+    val buildersExisting        = builders
+    val buildersOccupied        = buildersExisting.toSeq.map(_.unitClass).distinct.map(With.scheduler.dumbPumps.consumed).sum
+    val capacityMaximum         = (buildersExisting.size * maximumConcurrentlyRatio).toInt
+    val cacpityMaximumDesirable = Math.min(maximumConcurrently, capacityMaximum)
+    val capacityFinal           = capacityMaximum - buildersOccupied
+    val quantityToRequest       = List(maximumTotal, maxDesirable,currentCount + capacityFinal).min
     
-    With.scheduler.request(
-      this,
-      RequestAtLeast(
-        List(
-          maximum,
-          maxDesirable,
-          Math.min(maximumConcurrently, buildCapacity) + currentCount
-        ).min,
-        unitClass))
+    With.scheduler.request(this, RequestAtLeast(quantityToRequest, unitClass))
   }
   
   protected def canBuild: Boolean = {

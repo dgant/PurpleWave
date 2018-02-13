@@ -2,7 +2,7 @@ package Micro.Actions.Combat.Techniques
 
 import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Actions.Combat.Techniques.Common.{ActionTechnique, Leave}
-import ProxyBwapi.Races.Zerg
+import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object FallBack extends ActionTechnique {
@@ -18,22 +18,22 @@ object FallBack extends ActionTechnique {
   )
   
   override def applicabilitySelf(unit: FriendlyUnitInfo): Double = {
-    if (unit.is(Zerg.Lurker)) return 0.0
-    1.0
+    if (unit.is(Protoss.Dragoon)) return 1.0
+    if (unit.is(Terran.Vulture)) return 1.0
+    if (unit.is(Terran.SiegeTankUnsieged)) return 1.0
+    0.0
   }
   
-  override val applicabilityBase: Double = 0.5
+  override val applicabilityBase: Double = 0.50
   
   override def applicabilityOther(unit: FriendlyUnitInfo, other: UnitInfo): Option[Double] = {
     if (other.isFriendly) return None
     if ( ! other.canAttack(unit)) return None
     if ( ! unit.canAttack(other)) return Some(0.0)
-    if (other.topSpeed <= 0.0) return None
-    val speedRatio    = unit.topSpeedChasing / other.topSpeed
-    val rangeRatio    = unit.pixelRangeAgainst(other) / other.pixelRangeAgainst(unit)
-    val cooldownRatio = unit.cooldownMaxAgainst(other) / other.cooldownMaxAgainst(unit)
-    val output        = speedRatio * rangeRatio * cooldownRatio
-    Some(output)
+    
+    if (unit.topSpeed >= other.topSpeed) return Some(0.0)
+    if (unit.pixelRangeAgainst(other) <= other.pixelRangeAgainst(unit)) return Some(0.0)
+    Some(1.0)
   }
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {

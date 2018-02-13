@@ -11,13 +11,13 @@ import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildCannonsAtExpansions, BuildGasPumps, RequireMiningBases, RequireMiningBasesFFA}
 import Planning.Plans.Macro.Milestones.UnitsAtLeast
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
-import Planning.Plans.GamePlans.Protoss.Situational.ForgeFastExpand
+import Planning.Plans.GamePlans.Protoss.Situational.PlacementForgeFastExpand
 import ProxyBwapi.Races.Protoss
 
 class ProtossHuntersFFAFFEGatewayCarriers extends GameplanModeTemplate {
   
   override val activationCriteria   : Plan = new Always
-  override def defaultPlacementPlan : Plan = new ForgeFastExpand
+  override def defaultPlacementPlan : Plan = new PlacementForgeFastExpand
   override val defaultScoutPlan     : Plan = NoPlan()
   override val aggression = 0.6
   

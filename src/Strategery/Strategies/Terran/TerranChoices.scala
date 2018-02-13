@@ -1,6 +1,5 @@
 package Strategery.Strategies.Terran
 
-import Strategery.Strategies.AllRaces.WorkerRush
 import Strategery.Strategies.Terran.FFA.TerranFFABio
 import Strategery.Strategies.Terran.TvE._
 import Strategery.Strategies.Terran.TvP.TvPEarlyFDStrong
@@ -16,7 +15,6 @@ object TerranChoices {
   /////////
   
   val tvr = Vector(
-    WorkerRush,
     //WorkerRushLiftoff,
     //TvEProxy5Rax,
     //TvEProxy8Fact,

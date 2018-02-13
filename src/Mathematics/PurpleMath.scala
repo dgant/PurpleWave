@@ -93,7 +93,7 @@ object PurpleMath {
       } else if (y10 > y01) {
         return PurpleMath.broodWarDistance(x11, y10, x00, y01)
       } else {
-        return x00 - x11;
+        return x00 - x11
       }
     } else if (x10 > x01) {
       if (y11 < y00) {

@@ -21,7 +21,14 @@ object Retreat extends ActionTechnique {
   }
   
   override def applicabilityOther(unit: FriendlyUnitInfo, other: UnitInfo): Option[Double] = {
-    if (other.isFriendly) return None
+    if (other.isFriendly) {
+      if (other.flying || unit.flying)
+        return None
+      if (other.pixelDistanceEdge(unit) > 2.0 * unit.unitClass.radialHypotenuse)
+        return None
+      return Some(0.0)
+    }
+      
     if ( ! other.canAttack(unit)) return None
     if (other.pixelDistanceCenter(unit.agent.origin) < unit.pixelDistanceCenter(unit.agent.origin))
       Some(0.0)

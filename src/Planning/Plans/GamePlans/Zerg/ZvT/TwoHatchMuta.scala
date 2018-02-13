@@ -76,8 +76,15 @@ class TwoHatchMuta extends GameplanModeTemplate {
           RequestAtLeast(1, Zerg.SpawningPool),
           RequestAtLeast(1, Zerg.Extractor)))),
     new If(
-      new Check(() => With.self.gas >  80 || With.self.minerals < 200),
-      new TrainContinuously(Zerg.Mutalisk)),
+      new Check(() => With.self.gas > 70 || With.self.minerals < 200),
+      new If(
+        new And(
+          new EnemyUnitsAtLeast(3, Zerg.Mutalisk),
+          new Check(() =>
+            With.units.ours.count(_.is(Zerg.Mutalisk)) * 2 >=
+            With.units.ours.count(_.is(Zerg.Scourge)))),
+        new TrainContinuously(Zerg.Scourge),
+        new TrainContinuously(Zerg.Mutalisk))),
     new If(
       new And(
         new Or(

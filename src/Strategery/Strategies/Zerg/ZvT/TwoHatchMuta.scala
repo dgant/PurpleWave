@@ -9,5 +9,7 @@ object TwoHatchMuta extends Strategy {
   
   override def ourRaces: Iterable[Race] = Vector(Race.Zerg)
   
+  override def minimumGamesVsOpponent: Int = 2
+  
   override def gameplan: Option[Plan] = { Some(new TwoHatchMuta) }
 }

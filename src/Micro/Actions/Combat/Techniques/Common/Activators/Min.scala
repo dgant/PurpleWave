@@ -6,6 +6,6 @@ import Utilities.ByOption
 
 class Min(technique: ActionTechnique) extends Activator {
   override def apply(unit: FriendlyUnitInfo, others: Seq[UnitInfo]): Option[Double] = {
-    ByOption.min(others.map(other => technique.significanceOther(unit, other)))
+    ByOption.min(others.flatMap(other => technique.applicabilityOther(unit, other)))
   }
 }

@@ -131,6 +131,7 @@ object ProtossChoices {
   
   val gimmickOpeners = Vector(
     WorkerRush,
+    MassPhotonCannon,
     ProxyDarkTemplar,
     CarriersFromAnIsland,
     CarriersWithNoDefense,

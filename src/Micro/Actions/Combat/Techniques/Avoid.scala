@@ -19,7 +19,7 @@ object Avoid extends ActionTechnique {
   override def applicabilitySelf(unit: FriendlyUnitInfo): Double = {
     val meleeFactor   = if (unit.unitClass.ranged) 1.0 else 0.75
     val visionFactor  = if (With.grids.enemyVision.isSet(unit.tileIncludingCenter)) 0.5 else 1.0
-    val safetyFactor  = PurpleMath.clampToOne(unit.matchups.framesOfEntanglementDiffused / 24.0)
+    val safetyFactor  = PurpleMath.clampToOne((36.0 + unit.matchups.framesOfEntanglementDiffused) / 24.0)
     val output        = meleeFactor * visionFactor * safetyFactor
     output
   }

@@ -9,7 +9,7 @@ import Planning.Plans.Information.Employing
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Milestones.UnitsAtLeast
-import Planning.Plans.GamePlans.Protoss.Situational.ForgeFastExpand
+import Planning.Plans.GamePlans.Protoss.Situational.PlacementForgeFastExpand
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvR.PvROpenTinfoil
 
@@ -20,7 +20,7 @@ class PvRTinfoil extends GameplanModeTemplateVsRandom {
   
   override val aggression = 0.7
   
-  override def defaultPlacementPlan: Plan = new ForgeFastExpand
+  override def defaultPlacementPlan: Plan = new PlacementForgeFastExpand
   
   override def buildOrder: Seq[BuildRequest] = Vector(
     RequestAtLeast(8, Protoss.Probe),

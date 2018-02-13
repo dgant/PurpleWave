@@ -8,7 +8,11 @@ import Macro.BuildRequests.{RequestAnother, RequestAtLeast}
 import Planning.Plan
 import ProxyBwapi.Races.Protoss
 
-class BuildCannonsAtBases(cannonsRequired: Int, placement: PlacementProfile = PlacementProfiles.hugWorkersWithCannon) extends Plan {
+class BuildCannonsAtBases(
+  cannonsRequired  : Int,
+  placementPylon   : PlacementProfile = PlacementProfiles.hugWorkersWithPylon,
+  placementCannon  : PlacementProfile = PlacementProfiles.hugWorkersWithCannon)
+  extends Plan {
   
   override def onUpdate() {
     val bases = eligibleBases
@@ -32,7 +36,7 @@ class BuildCannonsAtBases(cannonsRequired: Int, placement: PlacementProfile = Pl
         building          = Some(Protoss.Pylon),
         requireZone       = Some(zone),
         requireCandidates = Some(zone.tiles),
-        placement         = Some(placement))))
+        placement         = Some(placementPylon))))
     .toMap
   
   private val cannonBlueprintsByZone = With.geography.zones
@@ -43,7 +47,7 @@ class BuildCannonsAtBases(cannonsRequired: Int, placement: PlacementProfile = Pl
           building          = Some(Protoss.PhotonCannon),
           requireZone       = Some(zone),
           requireCandidates = Some(zone.tiles),
-          placement         = Some(placement)))))
+          placement         = Some(placementCannon)))))
     .toMap
   
   protected def eligibleBases: Iterable[Base] = {

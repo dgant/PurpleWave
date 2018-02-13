@@ -43,7 +43,7 @@ class ProtossVsZergOld extends Parallel {
   
   private class FFE extends FirstEightMinutes(
     new Parallel(
-      new ForgeFastExpand,
+      new PlacementForgeFastExpand,
       new If(
         new EnemyStrategy(With.intelligence.fingerprints.fingerprint4Pool),
         new BuildOrder(ProtossBuilds.FFE_Vs4Pool: _*),

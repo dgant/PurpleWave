@@ -1,5 +1,6 @@
 package Micro.Actions.Combat.Techniques
 
+import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Micro.Actions.Combat.Attacking.Target
 import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Actions.Combat.Techniques.Common.Activators.Min
@@ -28,7 +29,8 @@ object Abuse extends ActionTechnique {
     if ( ! other.canAttack(unit)) return None
     if ( ! unit.canAttack(other)) return None
     
-    if (unit.matchups.framesOfEntanglementPerThreatDiffused(other) < unit.unitClass.framesToTurnAndShootAndTurnBackAndAccelerate) return None
+    val framesOfSafetyAgainst = - unit.matchups.framesOfEntanglementPerThreatDiffused(other)
+    if (framesOfSafetyAgainst < unit.unitClass.framesToTurnAndShootAndTurnBackAndAccelerate) return Some(0.0)
     
     val deltaSpeed = unit.topSpeed - other.topSpeed
     if (deltaSpeed <= 0) return Some(0.0)
@@ -47,9 +49,11 @@ object Abuse extends ActionTechnique {
       PotshotAsSoonAsPossible.delegate(unit)
       Target.delegate(unit)
       Attack.delegate(unit)
+      if (unit.agent.toAttack.isEmpty) return
     }
-    
-    Avoid.delegate(unit)
+    if (unit.matchups.framesOfSafetyDiffused < GameTime(0, 2)()) {
+      Avoid.delegate(unit)
+    }
   }
   
 }

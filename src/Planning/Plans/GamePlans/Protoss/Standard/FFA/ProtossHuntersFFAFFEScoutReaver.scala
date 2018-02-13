@@ -6,7 +6,7 @@ import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.GamePlans.Protoss.Situational.ForgeFastExpand
+import Planning.Plans.GamePlans.Protoss.Situational.PlacementForgeFastExpand
 import Planning.Plans.Information.Always
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
@@ -18,7 +18,7 @@ import ProxyBwapi.Races.Protoss
 class ProtossHuntersFFAFFEScoutReaver extends GameplanModeTemplate {
   
   override val activationCriteria   : Plan = new Always
-  override def defaultPlacementPlan : Plan = new ForgeFastExpand
+  override def defaultPlacementPlan : Plan = new PlacementForgeFastExpand
   override val defaultScoutPlan     : Plan = NoPlan()
   override val aggression = 0.6
   

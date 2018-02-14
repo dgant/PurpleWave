@@ -57,7 +57,10 @@ class Simulacrum(
     )
   
   val fighting: Boolean = {
-    if ( ! realUnit.unitClass.helpsInCombat) {
+    if ( ! realUnit.canAttack) {
+      false
+    }
+    else if ( ! realUnit.unitClass.helpsInCombat) {
       false
     }
     else if (realUnit.unitClass.isWorker) {

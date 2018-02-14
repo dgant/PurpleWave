@@ -146,6 +146,9 @@ object PvTIdeas {
   
   class TrainHighTemplar extends OnGasPumps(3,
     new If(
+      new UnitsAtLeast(1, Protoss.HighTemplar),
+      new Build(RequestTech(Protoss.PsionicStorm))),
+    new If(
       new Or(
         new UnitsAtLeast(20, UnitMatchWarriors),
         new EnemyBio),

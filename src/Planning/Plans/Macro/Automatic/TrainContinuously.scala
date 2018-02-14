@@ -12,7 +12,6 @@ class TrainContinuously(
   unitClass                 : UnitClass,
   maximumTotal              : Int = Int.MaxValue,
   maximumConcurrently       : Int = Int.MaxValue,
-  maximumTotalRatio         : Double = 1.0,
   maximumConcurrentlyRatio  : Double = 1.0)
     extends Plan {
     
@@ -21,15 +20,19 @@ class TrainContinuously(
   override def onUpdate() {
     if ( ! canBuild) return
     
-    val unitsMaximum            = maximumTotal
-    val unitsMaximumDesirable   = maxDesirable
+    val unitsNow                = currentCount
+    val unitsMaximum            = maximumTotal - unitsNow
+    val unitsMaximumDesirable   = maxDesirable - unitsNow
     val buildersExisting        = builders
     val buildersOccupied        = buildersExisting.toSeq.map(_.unitClass).distinct.map(With.scheduler.dumbPumps.consumed).sum
     val capacityMaximum         = (buildersExisting.size * maximumConcurrentlyRatio).toInt
     val cacpityMaximumDesirable = Math.min(maximumConcurrently, capacityMaximum)
-    val capacityFinal           = capacityMaximum - buildersOccupied
-    val quantityToRequest       = List(maximumTotal, maxDesirable,currentCount + capacityFinal).min
+    val capacityFinal           = Math.max(0, capacityMaximum - buildersOccupied)
+    val quantityToRequest       = List(maximumTotal, maxDesirable, unitsNow + capacityFinal).min
     
+    (unitClass.buildUnitsBorrowed ++ unitClass.buildUnitsSpent).foreach(builderClass =>
+      With.scheduler.dumbPumps.consume(builderClass, capacityFinal))
+        
     With.scheduler.request(this, RequestAtLeast(quantityToRequest, unitClass))
   }
   

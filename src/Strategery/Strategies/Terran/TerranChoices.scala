@@ -2,8 +2,6 @@ package Strategery.Strategies.Terran
 
 import Strategery.Strategies.Terran.FFA.TerranFFABio
 import Strategery.Strategies.Terran.TvE._
-import Strategery.Strategies.Terran.TvP.TvPEarlyFDStrong
-import Strategery.Strategies.Terran.TvR.{TvR1Rax, TvRTinfoil}
 import Strategery.Strategies.Terran.TvT.TvTStandard
 import Strategery.Strategies.Terran.TvZ._
 import Strategery.Strategies._
@@ -19,10 +17,12 @@ object TerranChoices {
     //TvEProxy5Rax,
     //TvEProxy8Fact,
     //TvEProxyBBS,
-    TvEMassMarine,
+    TvEMassBio,
     TvEMassVulture,
-    TvR1Rax,
-    TvRTinfoil,
+    //TvR1Rax,
+    //TvRTinfoil,
+    TvEMassGoliath,
+    TvE2PortWraith,
     TerranFFABio)
   
   /////////
@@ -40,7 +40,7 @@ object TerranChoices {
   
   val tvpOpeners = Vector(
     //TvPEarly14CC,
-    TvPEarlyFDStrong
+    //TvPEarlyFDStrong
     //TvTPNukeDrop
   )
   
@@ -49,9 +49,9 @@ object TerranChoices {
   /////////
   
   val tvzOpeners = Vector(
-    TvZEarlyCCFirst,
+    //TvZEarlyCCFirst,
     TvZEarly1RaxGas,
-    TvZEarly1RaxFEEconomic,
+    //TvZEarly1RaxFEEconomic,
     TvZEarly1RaxFEConservative,
     TvZEarly2Rax
   )

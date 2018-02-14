@@ -21,9 +21,7 @@ class Scheduler {
   }
   
   def request(requester: Plan, theRequest: BuildRequest) {
-    (theRequest.buildable.buildersOccupied ++ theRequest.buildable.buildersBorrowed ++ theRequest.buildable.buildersOccupied)
-      .foreach(c => dumbPumps.consume(c.unit, 1))
-      request(requester, Iterable(theRequest))
+    request(requester, Iterable(theRequest))
   }
   
   def request(requester: Plan, requests: Iterable[BuildRequest]) {

@@ -25,12 +25,11 @@ class Scout(scoutCount: Int = 1) extends Plan {
   })
   
   var acquiredScouts: Iterable[FriendlyUnitInfo] = Iterable.empty
-  var lastScoutDeath: Int = -24 * 60
   
   override def isComplete: Boolean = {
     val bases = With.geography.enemyBases
     if (bases.isEmpty)                                                  return false
-    if (lastScoutDeath > 0)                                             return true
+    if (With.blackboard.lastScoutDeath > 0)                             return true
     if (bases.exists(_.zone.walledIn))                                  return true
     if (bases.exists(_.townHall.isDefined) && scouts.get.units.isEmpty) return true
     if (With.geography.enemyBases.exists(_.units.exists(u => u.isOurs && ! u.unitClass.isWorker))) return true
@@ -43,9 +42,9 @@ class Scout(scoutCount: Int = 1) extends Plan {
     val scoutsDied = acquiredScouts.nonEmpty && acquiredScouts.exists( ! _.alive)
     if (scoutsDied) {
       acquiredScouts = List.empty
-      lastScoutDeath = With.frame
+      With.blackboard.lastScoutDeath = With.frame
     }
-    if (With.framesSince(lastScoutDeath) < 24 * 30) {
+    if (With.framesSince(With.blackboard.lastScoutDeath) < 24 * 30) {
       return
     }
   

@@ -14,9 +14,17 @@ object FindBuildings extends Action {
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {
+    val basesToScout =
+      With.geography.enemyBases ++ (
+        if (With.enemy.isZerg
+          && With.geography.ourBases.size >= 2
+          && With.geography.enemyBases.size == 2)
+          With.geography.neutralBases.toVector.sortBy(_.townHallTile.groundPixels(With.intelligence.mostBaselikeEnemyTile)).take(3)
+        else
+          Vector.empty)
+    
     val tilesToScout = With.geography.enemyBases
       .flatMap(base => {
-        
         val tiles = base.zone.tiles.filter(tile =>
           ! base.harvestingArea.contains(tile)  && //Don't walk into worker line
           With.grids.walkable.get(tile)         &&

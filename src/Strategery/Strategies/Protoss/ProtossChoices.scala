@@ -43,7 +43,7 @@ object ProtossChoices {
     PvTEarly1GateStargate,
     PvTEarly1GateReaver,
     PvTEarly1GateStargateTemplar,
-    //PvTEarly1BaseCarrier,
+    PvTEarly1BaseCarrier,
     PvTEarlyDTExpand,
     PvTEarly1015GateGoonDT,
     PvTEarly1015GateGoonExpand,

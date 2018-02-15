@@ -48,6 +48,14 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
     
     building = building
       .orElse(
+        if (buildingClass.isTerran)
+          With.units.ours.find(unit =>
+            ! unit.complete
+            && unit.is(buildingClass)
+            && unit.buildUnit.isEmpty)
+        else None
+      )
+      .orElse(
         orderedTile
           .map(tile => With.units.ours.find(unit =>
             unit.is(buildingClass) &&
@@ -56,7 +64,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
       .filter(b =>
         b.isOurs  &&
         b.alive   &&
-        b.getBuildUnit.forall(_.friendly.forall(_.agent.lastClient.contains(this)))) //Don't jack another (Terran) building
+        b.buildUnit.forall(_.friendly.forall(_.agent.lastClient.contains(this)))) //Don't jack another (Terran) building
      
   
     desiredTile = acquireDesiredTile()

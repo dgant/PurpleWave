@@ -18,7 +18,7 @@ abstract class GameplanModeTemplate extends GameplanMode {
   
   def meldArchonsAt         : Int               = 40
   def aggression            : Double            = 1.0
-  def removeMineralBlocksAt : Int               = 60
+  def removeMineralBlocksAt : Int               = 40
   def scoutAt               : Int               = 14
   def scoutExpansionsAt     : Int               = 60
   def superSaturate         : Boolean           = false

@@ -41,18 +41,33 @@ class ExplosionTracker {
       output += new ExplosionIrradiate()(unit)
     }
     */
-    if (unit.is(Terran.SpiderMine) && unit.battle.isDefined) {
+    if (unit.is(Terran.SpiderMine)
+      && With.grids.friendlyVision.isSet(unit.tileIncludingCenter)
+      && unit.battle.isDefined
+      && unit.matchups.targets.exists(_.pixelDistanceEdge(unit) < 32 * 8)) {
       output += new ExplosionSpiderMineTrigger(unit)
       output += new ExplosionSpiderMineBlast(unit)
     }
-    if (unit.is(Zerg.InfestedTerran) && unit.visible) {
+    if (unit.is(Zerg.InfestedTerran)
+      && unit.visible
+      && unit.battle.isDefined
+      && unit.matchups.targets.exists(_.pixelDistanceEdge(unit) < 32 * 8)) {
       output += new ExplosionInfestedTerran(unit)
     }
     if (unit.is(Protoss.Scarab) && unit.visible && ! unit.isOurs) {
       output += new ExplosionScarab(unit)
     }
-    if (unit.is(Zerg.Lurker) && unit.battle.isDefined && ! unit.isOurs) {
-      unit.matchups.targetsInRange.foreach(target => output += new ExplosionLurkerSoon(unit, target))
+    if (unit.is(Zerg.Lurker)
+      && ! unit.isOurs
+      && unit.burrowed
+      && With.grids.friendlyVision.isSet(unit.tileIncludingCenter)
+      && unit.battle.isDefined
+      && unit.matchups.targets.exists(_.pixelDistanceEdge(unit) < 32 * 8)) {
+      // TODO:
+      // * Don't do it if the Lurker isn't about to fire
+      // * Don't do it if we're trying to attack the Lurker and have shorter range
+      // * Associate these explosions with the unit so we don't spam-check this explosion for the whole map
+      // unit.matchups.targetsInRange.foreach(target => output += new ExplosionLurkerSoon(unit, target))
     }
     output.toVector
   }

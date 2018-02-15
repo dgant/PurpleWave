@@ -19,7 +19,6 @@ class SquadDefendZone(zone: Zone) extends SquadGoal {
   override def acceptsHelp: Boolean = false
   
   def updateUnits() {
-    lazy val unitWidth  = 2.0 * squad.recruits.map(_.unitClass.radialHypotenuse).sum
     lazy val base       = ByOption.minBy(zone.bases)(_.heart.tileDistanceManhattan(With.intelligence.mostBaselikeEnemyTile))
     lazy val choke      = zone.exit
     lazy val walls      = zone.units.toSeq.filter(u =>
@@ -29,7 +28,7 @@ class SquadDefendZone(zone: Zone) extends SquadGoal {
     
     lazy val canHuntEnemies  = huntableEnemies().nonEmpty
     lazy val canDefendWall   = walls.nonEmpty
-    lazy val canDefendChoke  = choke.isDefined && ( ! With.enemies.exists(_.isZerg) || choke.get.radiusPixels * 2.0 - 32.0 < unitWidth)
+    lazy val canDefendChoke  = choke.isDefined && ( ! With.enemies.exists(_.isZerg) || squad.recruits.size >= 6)
     lazy val canDefendHeart  = base.isDefined
     
     if (canHuntEnemies) {

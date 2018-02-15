@@ -20,18 +20,18 @@ class TrainContinuously(
   override def onUpdate() {
     if ( ! canBuild) return
     
-    val unitsNow                = currentCount
-    val unitsMaximum            = maximumTotal - unitsNow
-    val unitsMaximumDesirable   = maxDesirable - unitsNow
-    val buildersExisting        = builders
-    val buildersOccupied        = buildersExisting.toSeq.map(_.unitClass).distinct.map(With.scheduler.dumbPumps.consumed).sum
-    val capacityMaximum         = (buildersExisting.size * maximumConcurrentlyRatio).toInt
-    val cacpityMaximumDesirable = Math.min(maximumConcurrently, capacityMaximum)
-    val capacityFinal           = Math.max(0, capacityMaximum - buildersOccupied)
-    val quantityToRequest       = List(maximumTotal, maxDesirable, unitsNow + capacityFinal).min
+    val unitsNow                 = currentCount
+    val unitsMaximum             = maximumTotal
+    val unitsMaximumDesirable    = maxDesirable
+    val buildersExisting         = builders
+    val buildersOccupied         = buildersExisting.toSeq.map(_.unitClass).distinct.map(With.scheduler.dumbPumps.consumed).sum
+    val capacityMaximum          = (buildersExisting.size * maximumConcurrentlyRatio).toInt
+    val capacityFinal            = Math.max(0, Math.min(maximumConcurrently, capacityMaximum - buildersOccupied))
+    val quantityToAdd            = List(unitsMaximum, unitsMaximumDesirable, capacityFinal).min
+    val quantityToRequest        = List(unitsMaximum, unitsMaximumDesirable, capacityFinal + unitsNow).min
     
     (unitClass.buildUnitsBorrowed ++ unitClass.buildUnitsSpent).foreach(builderClass =>
-      With.scheduler.dumbPumps.consume(builderClass, capacityFinal))
+      With.scheduler.dumbPumps.consume(builderClass, quantityToAdd))
         
     With.scheduler.request(this, RequestAtLeast(quantityToRequest, unitClass))
   }

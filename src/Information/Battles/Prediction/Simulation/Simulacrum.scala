@@ -18,7 +18,7 @@ class Simulacrum(
   private val SIMULATION_STEP_FRAMES = 4
   
   // Modifiers
-  val movementDelay     : Int     = if (realUnit.isEnemy || simulation.weAttack)  0   else With.configuration.retreatMovementDelay / (if (realUnit.flying) 2 else 1)
+  val movementDelay     : Int     = if (realUnit.isEnemy || simulation.weAttack)  0   else realUnit.unitClass.framesToTurn(Math.PI) + 2 * realUnit.unitClass.accelerationFrames + With.configuration.retreatMovementDelay
   val speedMultiplier   : Double  = if (realUnit.isEnemy || realUnit.flying)      1.0 else simulation.chokeMobility(realUnit.zone)
   val bonusDistance     : Double  = if (realUnit.isOurs  || realUnit.visible)     0.0 else 32.0 * Math.min(realUnit.mobility, 3)
   val bonusRange        : Double  = if (realUnit.isOurs  || ! realUnit.unitClass.isSiegeTank || ! simulation.weAttack) 0.0 else With.configuration.bonusTankRange

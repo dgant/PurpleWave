@@ -1,8 +1,10 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvE
 
+import Lifecycle.With
 import Macro.BuildRequests.RequestAtLeast
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
+import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Information.Employing
@@ -12,13 +14,13 @@ import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Milestones.{EnemyHasShownCloakedThreat, UnitsAtLeast, UnitsAtMost}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import ProxyBwapi.Races.Terran
-import Strategery.Strategies.Terran.TvE.TvEMassBio
+import Strategery.Strategies.Terran.TvE.TvEMassGoliath
 
 class MassGoliath extends GameplanModeTemplate {
   
-  override val activationCriteria = new Employing(TvEMassBio)
+  override val activationCriteria = new Employing(TvEMassGoliath)
   
-  override val aggression = 0.8
+  override val aggression = 0.7
   
   override val buildOrder = Vector(
     RequestAtLeast(9, Terran.SCV),
@@ -36,8 +38,9 @@ class MassGoliath extends GameplanModeTemplate {
     RequestAtLeast(1, Terran.Factory))
   
   override def defaultAttackPlan: Plan = new If(
-    new UnitsAtLeast(20, UnitMatchWarriors),
-    super.defaultAttackPlan)
+    new UnitsAtLeast(35, UnitMatchWarriors),
+    super.defaultAttackPlan,
+    new Attack { attackers.get.unitMatcher.set(Terran.Vulture)} )
   
   override def emergencyPlans: Seq[Plan] = Seq(
     new TrainContinuously(Terran.Comsat),
@@ -53,19 +56,21 @@ class MassGoliath extends GameplanModeTemplate {
   
   override def buildPlans: Seq[Plan] = Vector(
     new If(
-      new UnitsAtLeast(10, UnitMatchWarriors),
+      new UnitsAtLeast(15, UnitMatchWarriors),
       new UpgradeContinuously(Terran.MechDamage)),
     
     new If(
-      new UnitsAtLeast(15, UnitMatchWarriors),
+      new UnitsAtLeast(25, UnitMatchWarriors),
       new UpgradeContinuously(Terran.MechArmor)),
   
     new If(
-      new UnitsAtLeast(15, UnitMatchWarriors),
-      new UpgradeContinuously(Terran.GoliathAirRange)),
+      new UnitsAtLeast(20, UnitMatchWarriors),
+      new Parallel(
+        new Build(RequestAtLeast(1, Terran.MachineShop)),
+        new UpgradeContinuously(Terran.GoliathAirRange))),
   
     new If(
-      new UnitsAtLeast(25, UnitMatchWarriors),
+      new UnitsAtLeast(40, UnitMatchWarriors),
       new Build(
         RequestAtLeast(1, Terran.Starport),
         RequestAtLeast(1, Terran.ScienceFacility),
@@ -75,18 +80,20 @@ class MassGoliath extends GameplanModeTemplate {
       new UnitsAtLeast(10, UnitMatchWarriors),
       new RequireMiningBases(2)),
     new If(
-      new UnitsAtLeast(20, UnitMatchWarriors),
+      new UnitsAtLeast(35, UnitMatchWarriors),
       new RequireMiningBases(3)),
     new If(
-      new UnitsAtLeast(30, UnitMatchWarriors),
+      new UnitsAtLeast(50, UnitMatchWarriors),
       new RequireMiningBases(4)),
     new If(
-      new UnitsAtLeast(40, UnitMatchWarriors),
+      new UnitsAtLeast(70, UnitMatchWarriors),
       new RequireMiningBases(5)),
   
     new TrainContinuously(Terran.Marine, 4),
     new If(
-      new UnitsAtMost(0, Terran.Armory, complete = true),
+      new Or(
+        new UnitsAtMost(0, Terran.Armory, complete = true),
+        new Check(() => With.self.minerals > 600 && With.self.gas < 50)),
       new TrainContinuously(Terran.Vulture),
       new TrainContinuously(Terran.Goliath)),
   

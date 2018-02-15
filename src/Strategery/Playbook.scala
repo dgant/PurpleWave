@@ -5,6 +5,8 @@ import Strategery.Strategies.Protoss.PvT._
 import Strategery.Strategies.Protoss.PvZ._
 import Strategery.Strategies.Strategy
 import Strategery.Strategies.Terran.TvE._
+import Strategery.Strategies.Terran.TvR.{TvR1Rax, TvRTinfoil}
+import Strategery.Strategies.Terran.TvZ._
 
 class EmptyPlaybook {
   
@@ -18,21 +20,32 @@ class EmptyPlaybook {
 
 object StrategyGroups {
   val bad = Vector[Strategy](
-    TvEProxy8Fact,
+    WorkerRushLiftoff,
+    TvR1Rax,
+    TvRTinfoil,
     TvEProxy5Rax,
+    TvEProxy8Fact,
+    TvEProxyBBS,
+    TvEMassGoliath,
+    TvE2PortWraith,
+    TvZEarlyCCFirst,
+    TvZEarly1RaxGas,
+    TvZEarly1RaxFEEconomic,
+    TvZEarly1RaxFEConservative,
+    TvZEarly2Rax,
     PvTEarly1GateProxy,
     PvT3BaseCorsair,
     CarriersWithNoDefense,
     ProxyDarkTemplar,
     PvZEarlyFFENexusFirst,
+    PvZEarlyFFEGatewayFirst,
     PvZMidgame2Stargate
   )
 }
 
 class TestingPlaybook extends EmptyPlaybook {
-  val strategiesToTest: Seq[Strategy] = Seq(TvEMassGoliath)
+  val strategiesToTest: Seq[Strategy] = Seq(PvTEarly1BaseCarrier)
   
-  //override lazy val forced: Seq[Strategy] = Seq(AllPvP, AllPvT, AllPvZ, TvTStandard, TvZStandard) ++ strategiesToTest
   override lazy val forced: Seq[Strategy] = strategiesToTest
 }
 

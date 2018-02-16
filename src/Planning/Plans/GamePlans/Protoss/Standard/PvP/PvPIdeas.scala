@@ -60,7 +60,7 @@ object PvPIdeas {
       new GasAtMost(30),
       new And(
         new GasAtMost(100),
-        new Check(() => With.self.minerals > With.self.gas * 5),
+        new Check(() => With.self.minerals > With.self.gas * 5)),
       new And(
         new UpgradeComplete(Protoss.ZealotSpeed, 1, Protoss.Zealot.buildFrames),
         new UnitsAtLeast(12, Protoss.Dragoon),

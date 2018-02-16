@@ -4,11 +4,11 @@ import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
 import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Compound.{Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanMode
-import Planning.Plans.Information.Employing
+import Planning.Plans.Predicates.Employing
 import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder, FollowBuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Macro.Milestones.{MiningBasesAtLeast, UnitsAtLeast}
+import Planning.Plans.Predicates.Milestones.{MiningBasesAtLeast, UnitsAtLeast}
 import Planning.Plans.GamePlans.Protoss.Situational.PlaceGatewaysProxied
 import Planning.Plans.Scouting.ScoutAt
 import Planning.ProxyPlanner

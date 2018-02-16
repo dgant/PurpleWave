@@ -6,13 +6,14 @@ import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Information.Always
+import Planning.Plans.Predicates.Always
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildCannonsAtExpansions, BuildGasPumps, RequireMiningBases}
-import Planning.Plans.Macro.Milestones.{UnitsAtLeast, UnitsExactly, UpgradeComplete}
+import Planning.Plans.Predicates.Milestones.{UnitsAtLeast, UnitsExactly, UpgradeComplete}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.GamePlans.Protoss.Situational.PlacementForgeFastExpand
+import Planning.Plans.Predicates.Economy.{GasAtLeast, MineralsAtMost}
 import ProxyBwapi.Races.Protoss
 
 class ProtossBigFFACarriers extends GameplanModeTemplate {
@@ -55,7 +56,7 @@ class ProtossBigFFACarriers extends GameplanModeTemplate {
         new UnitsAtLeast(8, UnitMatchWarriors),
         new Or(
           new Not(new CanBuildZealots),
-          new Check(() => With.self.gas > 300 || With.self.minerals < 1000))),
+          new Or(new GasAtLeast(300), new MineralsAtMost(1000)),
       new Parallel(
         new If(
           new CanBuildZealots,

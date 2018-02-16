@@ -8,7 +8,7 @@ import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder, RequireEssentials}
 import Planning.Plans.Macro.Expanding.{BuildCannonsAtBases, BuildGasPumps, RemoveMineralBlocksAt, RequireMiningBases}
-import Planning.Plans.Macro.Milestones.{IfOnMiningBases, UnitsAtLeast, UnitsAtMost}
+import Planning.Plans.Predicates.Milestones.{IfOnMiningBases, UnitsAtLeast, UnitsAtMost}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Recruitment.RecruitFreelancers
 import ProxyBwapi.Races.Protoss

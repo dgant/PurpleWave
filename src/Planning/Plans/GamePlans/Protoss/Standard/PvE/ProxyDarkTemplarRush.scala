@@ -10,7 +10,7 @@ import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, TrainCon
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder, RequireEssentials}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
-import Planning.Plans.Macro.Milestones.{EnemyUnitsAtLeast, UnitsAtLeast}
+import Planning.Plans.Predicates.Milestones.{EnemyUnitsAtLeast, UnitsAtLeast}
 import Planning.Plans.Scouting.{FoundEnemyBase, ScoutAt}
 import Planning.ProxyPlanner
 import ProxyBwapi.Races.Protoss

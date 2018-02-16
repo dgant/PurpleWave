@@ -8,11 +8,12 @@ import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Information.Matchup.EnemyIsZerg
+import Planning.Plans.Predicates.Matchup.EnemyIsZerg
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
-import Planning.Plans.Macro.Milestones.{EnemyUnitsAtLeast, UnitsAtLeast, UnitsAtMost}
+import Planning.Plans.Predicates.Economy.{GasAtMost, MineralsAtLeast}
+import Planning.Plans.Predicates.Milestones.{EnemyUnitsAtLeast, UnitsAtLeast, UnitsAtMost}
 import ProxyBwapi.Races.{Terran, Zerg}
 
 class NinePoolMuta extends GameplanModeTemplate {
@@ -90,13 +91,13 @@ class NinePoolMuta extends GameplanModeTemplate {
       new Build(RequestAtLeast(1, Zerg.CreepColony))),
     new If(
       new Or(
-        new Check(() => With.self.minerals >= 350),
+        new MineralsAtLeast(350),
         new Not(new EnemyIsZerg)),
       new RequireMiningBases(2)),
     new If(
       new And(
-        new Check(() => With.self.minerals >= 150),
-        new Check(() => With.self.gas < 100),
+        new MineralsAtLeast(150),
+        new GasAtMost(100),
         new UnitsAtLeast(2, Zerg.Larva)),
       new If(
         new And(
@@ -107,7 +108,7 @@ class NinePoolMuta extends GameplanModeTemplate {
         new TrainContinuously(Zerg.Drone),
         new Parallel(new TrainContinuously(Zerg.Zergling)))),
     new If(
-      new Check(() => With.self.minerals >= 300),
+      new MineralsAtLeast(300),
       new BuildGasPumps,
       new TrainContinuously(Zerg.Hatchery, 8, 1))
   )

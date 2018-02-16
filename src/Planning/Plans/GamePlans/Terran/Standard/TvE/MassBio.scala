@@ -8,13 +8,14 @@ import Planning.Plan
 import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Information.Employing
-import Planning.Plans.Information.Reactive.EnemyMutalisks
+import Planning.Plans.Predicates.Employing
+import Planning.Plans.Predicates.Reactive.EnemyMutalisks
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Macro.Milestones._
+import Planning.Plans.Predicates.Milestones._
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
+import Planning.Plans.Predicates.Economy.MineralsAtLeast
 import ProxyBwapi.Races.{Terran, Zerg}
 import Strategery.Strategies.Terran.TvE.TvEMassBio
 
@@ -41,7 +42,7 @@ class MassBio extends GameplanModeTemplate {
   override def priorityAttackPlan: Plan = new Trigger(
     new TechComplete(Terran.Stim, stimThreshold),
     new If(
-      new Check(() => With.frame < GameTime(7, 0)()),
+      new FrameAtMost(GameTime(7, 0)()),
       new Parallel(
         new Aggression(1.6),
         new Attack),
@@ -63,12 +64,12 @@ class MassBio extends GameplanModeTemplate {
   
   override def buildPlans: Seq[Plan] = Vector(
     new Trigger(
-      new SupplyAtLeastDoubleThis(24),
+      new SupplyOutOf200(24),
       new Build(
         RequestAtLeast(1, Terran.Refinery),
         RequestAtLeast(1, Terran.Academy))),
     new Trigger(
-      new SupplyAtLeastDoubleThis(27),
+      new SupplyOutOf200(27),
       new Build(
         RequestAtLeast(3, Terran.Barracks),
         RequestTech(Terran.Stim))),
@@ -130,12 +131,12 @@ class MassBio extends GameplanModeTemplate {
         new UpgradeContinuously(Terran.BioArmor))),
     new Trigger(
       new Or(
-        new SupplyAtLeastDoubleThis(30),
-        new Check(() => With.self.minerals > 400)),
+        new SupplyOutOf200(30),
+        new MineralsAtLeast(400)),
       new If(
         new Or(
           new Check(() => With.units.ours.count(_.is(Terran.Barracks)) < 5 * With.geography.ourBases.size),
-          new Check(() => With.self.minerals > 600)),
+          new MineralsAtLeast(600)),
         new TrainContinuously(Terran.Barracks, 30, 3)))
   )
 }

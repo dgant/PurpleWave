@@ -5,9 +5,9 @@ import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Plans.Army.{Attack, DefendEntrance}
 import Planning.Plans.Compound.If
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Information.Employing
+import Planning.Plans.Predicates.Employing
 import Planning.Plans.Macro.BuildOrders._
-import Planning.Plans.Macro.Milestones.{EnemyHasShown, UnitsAtLeast}
+import Planning.Plans.Predicates.Milestones.{EnemyHasShown, UnitsAtLeast}
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss.PvT.PvTEarly1GateStargateTemplar
 

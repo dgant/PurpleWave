@@ -1,11 +1,11 @@
 package Planning.Plans.Macro.Expanding
 
 import Planning.Plans.Compound.If
-import Planning.Plans.Macro.Milestones.SupplyAtLeastDoubleThis
+import Planning.Plans.Predicates.Milestones.SupplyOutOf200
 
 class RemoveMineralBlocksAt(minimumSupply:Int)
   extends If(
-    new SupplyAtLeastDoubleThis(minimumSupply),
+    new SupplyOutOf200(minimumSupply),
     new RemoveMineralBlocks) {
   
   description.set("Remove a mineral block at " + minimumSupply + " supply")

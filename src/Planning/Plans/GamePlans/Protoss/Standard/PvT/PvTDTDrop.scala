@@ -6,10 +6,10 @@ import Planning.Plan
 import Planning.Plans.Army.DropAttack
 import Planning.Plans.Compound.NoPlan
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Information.Employing
+import Planning.Plans.Predicates.Employing
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.BuildOrder
-import Planning.Plans.Macro.Milestones.UnitsAtLeast
+import Planning.Plans.Predicates.Milestones.UnitsAtLeast
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvT.PvTEarlyDTDrop
 

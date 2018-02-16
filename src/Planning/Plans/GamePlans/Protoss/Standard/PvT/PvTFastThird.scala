@@ -3,10 +3,10 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvT
 import Macro.BuildRequests.RequestAtLeast
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Information.Employing
+import Planning.Plans.Predicates.Employing
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Macro.Milestones.{MiningBasesAtLeast, UnitsAtLeast}
+import Planning.Plans.Predicates.Milestones.{MiningBasesAtLeast, UnitsAtLeast}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvT.PvTFastThird
 

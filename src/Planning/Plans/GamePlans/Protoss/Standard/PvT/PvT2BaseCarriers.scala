@@ -3,16 +3,18 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvT
 import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
+import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Information.Employing
-import Planning.Plans.Information.Reactive.EnemyBio
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildCannonsAtExpansions, BuildCannonsAtNatural, RequireMiningBases}
-import Planning.Plans.Macro.Milestones.{IfOnMiningBases, UnitsAtLeast}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
+import Planning.Plans.Predicates.Economy.MineralsAtLeast
+import Planning.Plans.Predicates.Employing
+import Planning.Plans.Predicates.Milestones.{IfOnMiningBases, UnitsAtLeast}
+import Planning.Plans.Predicates.Reactive.EnemyBio
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvT.{PvT2BaseCarrier, PvT2BaseReaverCarrier}
+import Strategery.Strategies.Protoss.PvT.{PvT2BaseCarrier, PvT2BaseReaverCarrier, PvTEarly1BaseCarrier}
 
 class PvT2BaseCarriers extends GameplanModeTemplate {
   
@@ -20,14 +22,20 @@ class PvT2BaseCarriers extends GameplanModeTemplate {
   override val emergencyPlans       = Vector(new PvTIdeas.Require2BaseTech, new PvTIdeas.GetObserversForCloakedWraiths)
   
   override def defaultAttackPlan: Plan = new If(
-    new UnitsAtLeast(24, Protoss.Interceptor),
-    super.defaultAttackPlan)
+    new Or(
+      new UnitsAtLeast(24, Protoss.Interceptor),
+      new Employing(PvTEarly1BaseCarrier)),
+    new Attack)
   
   override val buildPlans = Vector(
     new PvTIdeas.Require2BaseTech,
-    new If(new UnitsAtLeast(1, Protoss.Carrier, complete = true), new Build(RequestUpgrade(Protoss.CarrierCapacity))),
     new If(
-      new UnitsAtLeast(24, Protoss.Interceptor),
+      new UnitsAtLeast(1, Protoss.Interceptor),
+      new Build(RequestUpgrade(Protoss.CarrierCapacity))),
+    new If(
+      new Or(
+        new UnitsAtLeast(24, Protoss.Interceptor),
+        new MineralsAtLeast(700)),
       new RequireMiningBases(3)),
     new IfOnMiningBases(3, new BuildCannonsAtNatural(1)),
     new BuildCannonsAtExpansions(3),

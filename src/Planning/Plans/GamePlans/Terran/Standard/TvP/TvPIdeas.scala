@@ -6,7 +6,7 @@ import Planning.Plan
 import Planning.Plans.Compound.{Check, If, Parallel}
 import Planning.Plans.Macro.Automatic.{TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Macro.Milestones.EnemyHasShownCloakedThreat
+import Planning.Plans.Predicates.Milestones.EnemyHasShownCloakedThreat
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import ProxyBwapi.Races.{Protoss, Terran}
 

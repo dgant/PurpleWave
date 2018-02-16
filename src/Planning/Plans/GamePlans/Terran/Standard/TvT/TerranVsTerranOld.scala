@@ -1,6 +1,5 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvT
 
-import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
 import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Composition.UnitMatchers.{UnitMatchSiegeTank, UnitMatchWarriors, UnitMatchWorkers}
@@ -9,12 +8,13 @@ import Planning.Plans.Army._
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Terran.Situational.BunkersAtNatural
-import Planning.Plans.Information.Employing
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
-import Planning.Plans.Macro.Milestones.{IfOnMiningBases, OnGasPumps, UnitsAtLeast}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
+import Planning.Plans.Predicates.Economy.MineralsAtLeast
+import Planning.Plans.Predicates.Employing
+import Planning.Plans.Predicates.Milestones.{IfOnMiningBases, OnGasPumps, UnitsAtLeast}
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvT.TvTStandard
 
@@ -56,7 +56,7 @@ class TerranVsTerranOld extends GameplanModeTemplate {
       RequestAtLeast(1, Terran.Starport)),
     
     new If(
-      new Check(() => With.self.minerals > 800),
+      new MineralsAtLeast(800),
       new Parallel(
         new IfOnMiningBases(2, new Build(RequestAtLeast(5, Terran.Factory)), new Build(RequestAtLeast(2, Terran.Barracks))),
         new IfOnMiningBases(3, new Build(RequestAtLeast(8, Terran.Factory)), new Build(RequestAtLeast(3, Terran.Barracks)))

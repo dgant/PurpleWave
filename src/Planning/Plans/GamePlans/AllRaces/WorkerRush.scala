@@ -9,7 +9,7 @@ import Planning.Plans.Army.AttackWithWorkers
 import Planning.Plans.Compound.{And, _}
 import Planning.Plans.Macro.Automatic.{Gather, TrainContinuously}
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
-import Planning.Plans.Macro.Milestones.{EnemyUnitsAtLeast, EnemyUnitsAtMost, UnitsAtLeast}
+import Planning.Plans.Predicates.Milestones.{EnemyUnitsAtLeast, EnemyUnitsAtMost, UnitsAtLeast}
 import Planning.Plans.StandardGamePlan
 import ProxyBwapi.Races.{Protoss, Zerg}
 

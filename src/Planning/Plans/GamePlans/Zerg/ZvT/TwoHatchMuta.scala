@@ -8,11 +8,12 @@ import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Information.Matchup.EnemyIsZerg
+import Planning.Plans.Predicates.Matchup.EnemyIsZerg
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
-import Planning.Plans.Macro.Milestones.{EnemyUnitsAtLeast, UnitsAtMost, UpgradeComplete}
+import Planning.Plans.Predicates.Economy.{GasAtLeast, MineralsAtLeast, MineralsAtMost}
+import Planning.Plans.Predicates.Milestones.{EnemyUnitsAtLeast, UnitsAtMost, UpgradeComplete}
 import ProxyBwapi.Races.{Terran, Zerg}
 
 class TwoHatchMuta extends GameplanModeTemplate {
@@ -76,7 +77,7 @@ class TwoHatchMuta extends GameplanModeTemplate {
           RequestAtLeast(1, Zerg.SpawningPool),
           RequestAtLeast(1, Zerg.Extractor)))),
     new If(
-      new Check(() => With.self.gas > 70 || With.self.minerals < 200),
+      new Or(new GasAtLeast(70), new MineralsAtMost(200)),
       new If(
         new And(
           new EnemyUnitsAtLeast(3, Zerg.Mutalisk),
@@ -120,7 +121,7 @@ class TwoHatchMuta extends GameplanModeTemplate {
         With.units.ours.count(_.gasLeft > 0)),
       new BuildGasPumps()),
     new If(
-      new Check(() => With.self.minerals >= 300),
+      new MineralsAtLeast(300),
       new TrainContinuously(Zerg.Hatchery, 5, 1))
   )
 }

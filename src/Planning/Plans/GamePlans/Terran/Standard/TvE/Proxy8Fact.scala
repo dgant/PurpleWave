@@ -8,11 +8,12 @@ import Macro.BuildRequests.{BuildRequest, RequestAtLeast}
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Information.Employing
+import Planning.Plans.Predicates.Employing
 import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Macro.Milestones.UnitsAtLeast
+import Planning.Plans.Predicates.Economy.{GasAtLeast, SupplyBlocked}
+import Planning.Plans.Predicates.Milestones.UnitsAtLeast
 import Planning.Plans.Scouting.Scout
 import Planning.{Plan, ProxyPlanner}
 import ProxyBwapi.Races.Terran
@@ -56,7 +57,7 @@ class Proxy8Fact extends GameplanModeTemplate {
     new If(
       new And(
         new Or(
-          new Check(() => With.self.gas >= 100),
+          new GasAtLeast(100),
           new UnitsAtLeast(1, Terran.Factory))),
       new Do(() => {
         With.blackboard.gasTargetRatio = 0
@@ -72,7 +73,7 @@ class Proxy8Fact extends GameplanModeTemplate {
       new UnitsAtLeast(1, Terran.Factory, complete = false),
       initialAfter = new Parallel(
         new If(
-          new Check(() => With.self.supplyUsed >= With.self.supplyTotal),
+          new SupplyBlocked,
           new RequireSufficientSupply),
         new TrainContinuously(Terran.Wraith),
         new TrainContinuously(Terran.Vulture),

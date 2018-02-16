@@ -26,7 +26,7 @@ class TrainContinuously(
     val buildersExisting         = builders
     val buildersOccupied         = buildersExisting.toSeq.map(_.unitClass).distinct.map(With.scheduler.dumbPumps.consumed).sum
     val capacityMaximum          = (buildersExisting.size * maximumConcurrentlyRatio).toInt
-    val capacityFinal            = Math.max(0, Math.min(maximumConcurrently, capacityMaximum - buildersOccupied))
+    val capacityFinal            = Math.max(0, Vector(maximumConcurrently, capacityMaximum, Math.max(1, capacityMaximum - buildersOccupied)).min)
     val quantityToAdd            = List(unitsMaximum, unitsMaximumDesirable, capacityFinal).min
     val quantityToRequest        = List(unitsMaximum, unitsMaximumDesirable, capacityFinal + unitsNow).min
     

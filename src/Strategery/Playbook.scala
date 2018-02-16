@@ -35,6 +35,7 @@ object StrategyGroups {
     TvZEarly2Rax,
     PvTEarly1GateProxy,
     PvT3BaseCorsair,
+    MassPhotonCannon,
     CarriersWithNoDefense,
     ProxyDarkTemplar,
     PvZEarlyFFENexusFirst,
@@ -54,4 +55,4 @@ class PurpleWavePlaybook extends EmptyPlaybook {
   override lazy val disabled  : Seq[Strategy] = StrategyGroups.bad
 }
 
-object Playbook extends TestingPlaybook {}
+object Playbook extends PurpleWavePlaybook {}

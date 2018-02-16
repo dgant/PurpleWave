@@ -3,7 +3,7 @@ package Planning.Plans.Army
 import Lifecycle.With
 import Planning.Composition.Property
 import Planning.Plan
-import Planning.Plans.Information.Always
+import Planning.Plans.Predicates.Always
 
 class AllIn(initialPredicate: Plan = new Always) extends Plan {
   

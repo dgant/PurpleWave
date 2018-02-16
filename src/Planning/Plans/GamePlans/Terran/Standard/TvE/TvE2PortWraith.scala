@@ -1,18 +1,18 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvE
 
-import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, RequestTech}
 import Planning.Composition.UnitMatchers.{UnitMatchOr, UnitMatchSiegeTank}
 import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Information.Employing
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
-import Planning.Plans.Macro.Milestones._
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
+import Planning.Plans.Predicates.Economy.GasAtMost
+import Planning.Plans.Predicates.Employing
+import Planning.Plans.Predicates.Milestones._
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvE.TvE2PortWraith
 
@@ -52,7 +52,7 @@ class TvE2PortWraith extends GameplanModeTemplate {
   
   override def buildPlans: Seq[Plan] = Vector(
     new If(
-      new Check(() => With.self.gas < 300),
+      new GasAtMost(300),
       new BuildGasPumps),
     new TrainContinuously(Terran.Comsat),
     new TrainContinuously(Terran.ControlTower, 1),

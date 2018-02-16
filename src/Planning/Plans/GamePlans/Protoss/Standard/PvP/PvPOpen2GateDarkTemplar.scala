@@ -7,10 +7,10 @@ import Macro.BuildRequests.RequestAtLeast
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Information.Employing
+import Planning.Plans.Predicates.Employing
 import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.Expanding.{BuildCannonsAtNatural, RequireMiningBases}
-import Planning.Plans.Macro.Milestones.{EnemyUnitsAtMost, MiningBasesAtLeast, UnitsAtLeast, UnitsAtMost}
+import Planning.Plans.Predicates.Milestones.{EnemyUnitsAtMost, MiningBasesAtLeast, UnitsAtLeast, UnitsAtMost}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP.PvPOpen2GateDTExpand
 

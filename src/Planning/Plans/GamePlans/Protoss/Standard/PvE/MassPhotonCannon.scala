@@ -10,9 +10,10 @@ import Planning.Plans.GamePlans.Protoss.Situational.PlacementForgeFastExpand
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildCannonsAtBases, BuildCannonsAtExpansions, BuildGasPumps, RequireMiningBases}
-import Planning.Plans.Macro.Milestones._
+import Planning.Plans.Predicates.Milestones._
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
-import ProxyBwapi.Races.{Protoss, Zerg}
+import Planning.Plans.Predicates.Economy.{GasAtLeast, MineralsAtLeast, MineralsAtMost}
+import ProxyBwapi.Races.Protoss
 
 class MassPhotonCannon extends GameplanModeTemplate {
   
@@ -63,7 +64,7 @@ class MassPhotonCannon extends GameplanModeTemplate {
   override def defaultAttackPlan: Plan = new If(
     new Or(
       new UnitsAtLeast(40, Protoss.Interceptor),
-      new Check(() => With.self.supplyUsed > 190 * 2)),
+      new SupplyOutOf200(190)),
     new Attack)
   
   override def defaultPlacementPlan: Plan = new PlacementForgeFastExpand
@@ -84,18 +85,13 @@ class MassPhotonCannon extends GameplanModeTemplate {
     new If(
       new UnitsAtLeast(8, Protoss.Zealot),
       new UpgradeContinuously(Protoss.ZealotSpeed)),
-    new If(
-      new Or(
-        new EnemyUnitsAtLeast(1, Zerg.Scourge),
-        new EnemyUnitsAtLeast(1, Zerg.Mutalisk)),
-      new TrainContinuously(Protoss.Corsair, 8)),
     new TrainContinuously(Protoss.HighTemplar, 12),
     new TrainContinuously(Protoss.Carrier),
     new TrainContinuously(Protoss.Reaver),
     new If(
       new Or(
         new UnitsAtMost(0, Protoss.FleetBeacon),
-        new Check(() => With.self.minerals > 400)),
+        new MineralsAtLeast(400)),
       new If(
         new Or(
           new UnitsAtMost(0, Protoss.CyberneticsCore, complete = true),
@@ -125,7 +121,9 @@ class MassPhotonCannon extends GameplanModeTemplate {
         With.geography.ourBases.size * 6)),
       new Parallel(
         new If(
-          new Check(() => pylonCount * 4 < cannonCount),
+          new Check(() =>
+            pylonCount * 4 < cannonCount
+            && (cannonCount < 4 || With.units.ours.exists(_.is(Protoss.CyberneticsCore)))),
           new TrainContinuously(Protoss.Pylon, 200, 2)),
         new TrainContinuously(Protoss.PhotonCannon, 400, 6)),
       new Parallel(
@@ -139,7 +137,9 @@ class MassPhotonCannon extends GameplanModeTemplate {
             RequestAtLeast(1, Protoss.Observatory),
             RequestAtLeast(2, Protoss.Observer))),
         new If(
-          new Check(() => With.self.minerals < 400 && With.self.gas > 500),
+          new And(
+            new MineralsAtMost(400),
+            new GasAtLeast(500)),
           new Build(
             RequestAtLeast(1, Protoss.CitadelOfAdun),
             RequestAtLeast(1, Protoss.TemplarArchives),

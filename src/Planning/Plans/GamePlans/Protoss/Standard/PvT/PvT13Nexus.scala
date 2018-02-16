@@ -3,11 +3,11 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvT
 import Macro.BuildRequests.RequestAtLeast
 import Planning.Plans.Compound.{And, NoPlan}
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Information.Employing
+import Planning.Plans.Predicates.Employing
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.BuildGasPumps
-import Planning.Plans.Macro.Milestones.UnitsAtLeast
+import Planning.Plans.Predicates.Milestones.UnitsAtLeast
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvT.PvTEarlyNexusFirst

@@ -10,11 +10,11 @@ import Planning.Composition.UnitMatchers.UnitMatchWorkers
 import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Information.Employing
+import Planning.Plans.Predicates.Employing
 import Planning.Plans.Macro.Automatic.{Gather, TrainContinuously}
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, FirstEightMinutes, FollowBuildOrder, RequireEssentials}
-import Planning.Plans.Macro.Milestones.UnitsAtLeast
+import Planning.Plans.Predicates.Milestones.UnitsAtLeast
 import Planning.Plans.Scouting.Scout
 import Planning.ProxyPlanner
 import ProxyBwapi.Races.Terran

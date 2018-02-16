@@ -1,8 +1,8 @@
 package Planning.Plans.Macro.Automatic
 
-import Lifecycle.With
-import Planning.Plans.Compound.{Check, If}
+import Planning.Plans.Compound.If
+import Planning.Plans.Predicates.Economy.SupplyBlocked
 
 class AddSupplyWhenSupplyBlocked extends If(
-  new Check(() => With.self.supplyUsed >= With.self.supplyTotal),
+  new SupplyBlocked,
   new RequireSufficientSupply)

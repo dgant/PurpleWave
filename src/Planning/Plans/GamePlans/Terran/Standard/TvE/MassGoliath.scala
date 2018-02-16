@@ -1,18 +1,18 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvE
 
-import Lifecycle.With
 import Macro.BuildRequests.RequestAtLeast
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Information.Employing
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
-import Planning.Plans.Macro.Milestones.{EnemyHasShownCloakedThreat, UnitsAtLeast, UnitsAtMost}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
+import Planning.Plans.Predicates.Economy.{GasAtMost, MineralsAtLeast}
+import Planning.Plans.Predicates.Employing
+import Planning.Plans.Predicates.Milestones.{EnemyHasShownCloakedThreat, UnitsAtLeast, UnitsAtMost}
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvE.TvEMassGoliath
 
@@ -93,7 +93,7 @@ class MassGoliath extends GameplanModeTemplate {
     new If(
       new Or(
         new UnitsAtMost(0, Terran.Armory, complete = true),
-        new Check(() => With.self.minerals > 600 && With.self.gas < 50)),
+        new And(new MineralsAtLeast(600), new GasAtMost(50))),
       new TrainContinuously(Terran.Vulture),
       new TrainContinuously(Terran.Goliath)),
   

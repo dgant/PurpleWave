@@ -3,10 +3,10 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvR
 import Macro.BuildRequests.RequestAtLeast
 import Planning.Plan
 import Planning.Plans.GamePlans.GameplanModeTemplateVsRandom
-import Planning.Plans.Information.Employing
+import Planning.Plans.Predicates.Employing
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Macro.Milestones.UnitsAtLeast
+import Planning.Plans.Predicates.Milestones.UnitsAtLeast
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvR.PvROpen2Gate1012

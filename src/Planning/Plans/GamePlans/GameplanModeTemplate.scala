@@ -1,12 +1,12 @@
 package Planning.Plans.GamePlans
 
-import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.BuildRequests.BuildRequest
 import Planning.Plan
 import Planning.Plans.Army._
-import Planning.Plans.Compound.{Check, If, NoPlan}
+import Planning.Plans.Compound.{If, NoPlan, Not}
 import Planning.Plans.GamePlans.Protoss.Situational.DefendAgainstProxy
+import Planning.Plans.Predicates.Matchup.WeAreZerg
 import Planning.Plans.Macro.Automatic.{Gather, MeldArchons, RequireSufficientSupply, TrainWorkersContinuously}
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{BuildOrder, FollowBuildOrder, RequireEssentials}
@@ -30,7 +30,7 @@ abstract class GameplanModeTemplate extends GameplanMode {
   def defaultPlacementPlan  : Plan              = new ProposePlacement(blueprints: _*)
   def defaultArchonPlan     : Plan              = new MeldArchons(meldArchonsAt)
   def defaultSupplyPlan     : Plan              = new RequireSufficientSupply
-  def defaultWorkerPlan     : Plan              = new If(new Check(() => ! With.self.isZerg), new TrainWorkersContinuously(superSaturate))
+  def defaultWorkerPlan     : Plan              = new If(new Not(new WeAreZerg), new TrainWorkersContinuously(superSaturate))
   def defaultScoutPlan      : Plan              = new ScoutAt(scoutAt)
   def priorityDefensePlan   : Plan              = NoPlan()
   def priorityAttackPlan    : Plan              = NoPlan()

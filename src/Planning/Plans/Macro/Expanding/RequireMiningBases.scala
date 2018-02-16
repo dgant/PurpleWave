@@ -5,7 +5,7 @@ import Lifecycle.With
 import Macro.BuildRequests.RequestAtLeast
 import Planning.Composition.Property
 import Planning.Plan
-import Planning.Plans.Macro.Milestones.AllMiningBases
+import Planning.Plans.Predicates.Milestones.AllMiningBases
 import ProxyBwapi.Races.Zerg
 
 class RequireMiningBases(basesInitial: Int = 1) extends Plan {

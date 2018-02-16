@@ -5,10 +5,10 @@ import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plans.Army.Aggression
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Information.{Employ, Employing}
+import Planning.Plans.Predicates.{Employ, Employing}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildCannonsAtExpansions, BuildCannonsAtNatural, RequireMiningBases}
-import Planning.Plans.Macro.Milestones.{UnitsAtLeast, UnitsAtMost}
+import Planning.Plans.Predicates.Milestones.{UnitsAtLeast, UnitsAtMost}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvT.{PvT3BaseCarrier, PvT3BaseCorsair, PvT3BaseReaverCarrier}

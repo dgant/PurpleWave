@@ -5,10 +5,10 @@ import Planning.Composition.Latch
 import Planning.Plan
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Terran.Situational.TvZPlacement
-import Planning.Plans.Information.Employing
+import Planning.Plans.Predicates.Employing
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Macro.Milestones.UnitsAtLeast
+import Planning.Plans.Predicates.Milestones.UnitsAtLeast
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvZ.TvZEarlyCCFirst
 

@@ -10,7 +10,7 @@ import Planning.Plans.GamePlans.Terran.Situational.BunkersAtNatural
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBasesFFA}
-import Planning.Plans.Macro.Milestones.{EnemyHasShownCloakedThreat, UnitsAtLeast}
+import Planning.Plans.Predicates.Milestones.{EnemyHasShownCloakedThreat, UnitsAtLeast}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import ProxyBwapi.Races.Terran
 

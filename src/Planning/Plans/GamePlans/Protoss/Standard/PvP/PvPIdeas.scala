@@ -4,10 +4,11 @@ import Lifecycle.With
 import Macro.BuildRequests.RequestAtLeast
 import Planning.Plans.Army.{Attack, ConsiderAttacking}
 import Planning.Plans.Compound._
-import Planning.Plans.Information.Reactive.{EnemyCarriers, EnemyDarkTemplarExists, EnemyDarkTemplarPossible}
+import Planning.Plans.Predicates.Reactive.{EnemyCarriers, EnemyDarkTemplarExists, EnemyDarkTemplarPossible}
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Macro.Milestones._
+import Planning.Plans.Predicates.Economy.GasAtMost
+import Planning.Plans.Predicates.Milestones._
 import ProxyBwapi.Races.Protoss
 
 object PvPIdeas {
@@ -56,8 +57,10 @@ object PvPIdeas {
     new Or(
       new UnitsAtMost(0, Protoss.CyberneticsCore,  complete = true),
       new UnitsAtMost(0, Protoss.Assimilator,      complete = true),
-      new Check(() => With.self.gas < 30),
-      new Check(() => With.self.gas < 100 && With.self.minerals > With.self.gas * 5),
+      new GasAtMost(30),
+      new And(
+        new GasAtMost(100),
+        new Check(() => With.self.minerals > With.self.gas * 5),
       new And(
         new UpgradeComplete(Protoss.ZealotSpeed, 1, Protoss.Zealot.buildFrames),
         new UnitsAtLeast(12, Protoss.Dragoon),

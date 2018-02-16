@@ -5,12 +5,13 @@ import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
 import Planning.Composition.UnitMatchers.{UnitMatchCustom, UnitMatchWarriors}
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, _}
-import Planning.Plans.Information.Reactive.EnemyBio
-import Planning.Plans.Information.{Employing, SafeToAttack}
+import Planning.Plans.Predicates.Reactive.EnemyBio
+import Planning.Plans.Predicates.{Employing, SafeToAttack}
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
-import Planning.Plans.Macro.Milestones.{OnGasPumps, _}
+import Planning.Plans.Predicates.Economy.{GasAtMost, MineralsAtLeast}
+import Planning.Plans.Predicates.Milestones.{OnGasPumps, _}
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss.PvT._
 
@@ -25,6 +26,7 @@ object PvTIdeas {
   
   class Require2BaseTech extends Parallel(
     new Build(
+      RequestAtLeast(1, Protoss.Pylon),
       RequestAtLeast(1, Protoss.Gateway),
       RequestAtLeast(1, Protoss.CyberneticsCore),
       RequestUpgrade(Protoss.DragoonRange)),
@@ -111,7 +113,9 @@ object PvTIdeas {
   
   class TrainZealotsOrDragoons extends FlipIf(
     new Or(
-      new Check(() => With.self.minerals > 600 && With.self.gas < 100),
+      new And(
+        new MineralsAtLeast(600),
+        new GasAtMost(100)),
       new And(
         new UnitsAtLeast(8, Protoss.Dragoon),
         new UpgradeComplete(Protoss.ZealotSpeed, withinFrames = Protoss.ZealotSpeed.upgradeTime.head._2))),

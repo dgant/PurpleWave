@@ -4,11 +4,11 @@ import Macro.BuildRequests.{BuildRequest, RequestAtLeast}
 import Planning.Plan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Information.{Employing, SafeAtHome}
+import Planning.Plans.Predicates.{Employing, SafeAtHome}
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Macro.Milestones.{MiningBasesAtLeast, UnitsAtLeast}
+import Planning.Plans.Predicates.Milestones.{MiningBasesAtLeast, UnitsAtLeast}
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP.PvPOpen1015GateGoonExpand

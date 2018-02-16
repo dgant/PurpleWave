@@ -10,8 +10,9 @@ import Planning.Plans.GamePlans.Terran.Situational.BunkersAtNatural
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBasesFFA}
-import Planning.Plans.Macro.Milestones.{EnemyHasShownCloakedThreat, UnitsAtLeast}
+import Planning.Plans.Predicates.Milestones.{EnemyHasShownCloakedThreat, UnitsAtLeast}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
+import Planning.Plans.Predicates.Economy.GasAtLeast
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitClass.UnitClass
 
@@ -95,7 +96,7 @@ class TerranFFAMech extends GameplanModeTemplate {
     new If(
       new And(
         new UnitsAtLeast(20, UnitMatchWarriors),
-        new Check(() => With.self.gas > 1000)),
+        new GasAtLeast(1000)),
       new Parallel(
         new Build(RequestAtLeast(1, Terran.Factory)),
         new BuildScienceFacilityForAddon(Terran.CovertOps),

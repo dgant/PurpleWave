@@ -5,11 +5,12 @@ import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
 import Planning.Plans.Compound.{Or, _}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.Situational.PlaceGatewaysProxied
-import Planning.Plans.Information.Employing
+import Planning.Plans.Predicates.Employing
 import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.BuildGasPumps
-import Planning.Plans.Macro.Milestones._
+import Planning.Plans.Predicates.Economy.GasAtLeast
+import Planning.Plans.Predicates.Milestones._
 import Planning.Plans.Scouting.Scout
 import Planning.{Plan, ProxyPlanner}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
@@ -42,7 +43,7 @@ class Proxy2Gate extends GameplanModeTemplate {
     new EnemyHasShown(Protoss.Dragoon),
     new EnemyUnitsAtLeast(1, Zerg.Spire, complete = true),
     new EnemyUnitsAtLeast(1, Terran.Factory, complete = true),
-    new Check(() => With.geography.enemyZones.exists(_.walledIn)))
+    new EnemyWalledIn)
   
   private class AfterProxy extends Parallel(
     new RequireSufficientSupply,
@@ -53,7 +54,7 @@ class Proxy2Gate extends GameplanModeTemplate {
     new If(
       new And(
         new UpgradeComplete(Protoss.DragoonRange, 1, Protoss.DragoonRange.upgradeTime(1)),
-        new Check(() => With.self.gas >= 50)),
+        new GasAtLeast(50)),
       new TrainContinuously(Protoss.Dragoon),
       new If(
         new Not(new MustSwitchToDragoons),

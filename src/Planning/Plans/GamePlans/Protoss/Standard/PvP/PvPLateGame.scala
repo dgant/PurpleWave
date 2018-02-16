@@ -6,11 +6,11 @@ import Planning.Plan
 import Planning.Plans.Army._
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Information.Reactive.EnemyBasesAtLeast
+import Planning.Plans.Predicates.Reactive.EnemyBasesAtLeast
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
-import Planning.Plans.Macro.Milestones._
+import Planning.Plans.Predicates.Milestones._
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvPIdeas.{ReactToDarkTemplarExisting, ReactToDarkTemplarPossible}
 import ProxyBwapi.Races.Protoss

@@ -11,7 +11,7 @@ import Planning.Plans.Compound.{If, _}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.Build.ProposePlacement
-import Planning.Plans.Macro.Milestones.UnitsAtLeast
+import Planning.Plans.Predicates.Milestones.UnitsAtLeast
 import Planning.Plans.Scouting.Scout
 import Planning.{Plan, ProxyPlanner}
 import ProxyBwapi.Races.Zerg

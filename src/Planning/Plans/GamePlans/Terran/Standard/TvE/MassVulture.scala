@@ -6,11 +6,11 @@ import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Information.Employing
+import Planning.Plans.Predicates.Employing
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
-import Planning.Plans.Macro.Milestones.{EnemyUnitsAtLeast, UnitsAtLeast}
+import Planning.Plans.Predicates.Milestones.{EnemyUnitsAtLeast, UnitsAtLeast}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvE.TvEMassVulture

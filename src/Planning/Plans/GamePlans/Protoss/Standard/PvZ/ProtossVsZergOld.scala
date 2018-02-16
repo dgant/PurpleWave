@@ -1,5 +1,6 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvZ
 
+import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{RequestAnother, RequestAtLeast, RequestTech, RequestUpgrade}
@@ -8,14 +9,15 @@ import Planning.Plans.Army._
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.GamePlans.Protoss.Situational._
-import Planning.Plans.Information.Reactive.EnemyMutalisks
-import Planning.Plans.Information.Scenarios.EnemyStrategy
-import Planning.Plans.Information.{Employ, Employing, SafeAtHome, StartPositionsAtLeast}
+import Planning.Plans.Predicates.Reactive.EnemyMutalisks
+import Planning.Plans.Predicates.Scenarios.EnemyStrategy
+import Planning.Plans.Predicates.{Employ, Employing, SafeAtHome, StartPositionsAtLeast}
 import Planning.Plans.Macro.Automatic.{MatchingRatio, _}
 import Planning.Plans.Macro.BuildOrders._
 import Planning.Plans.Macro.Expanding._
-import Planning.Plans.Macro.Milestones._
+import Planning.Plans.Predicates.Milestones._
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
+import Planning.Plans.Predicates.Economy.{GasAtLeast, MineralsAtLeast, MineralsAtMost}
 import Planning.Plans.Recruitment.RecruitFreelancers
 import Planning.Plans.Scouting.{FindExpansions, Scout, ScoutAt}
 import ProxyBwapi.Races.{Protoss, Zerg}
@@ -39,7 +41,9 @@ class ProtossVsZergOld extends Parallel {
       new BuildOrder(ProtossBuilds.OpeningTwoGate1012: _*)))
   
   private class ImplementEarly2Gate99 extends FirstEightMinutes(
-    new BuildOrder(ProtossBuilds.OpeningTwoGate99: _*))
+    new Parallel(
+      new BuildHuggingNexus,
+      new BuildOrder(ProtossBuilds.OpeningTwoGate99: _*)))
   
   private class FFE extends FirstEightMinutes(
     new Parallel(
@@ -208,7 +212,7 @@ class ProtossVsZergOld extends Parallel {
   
     new RequireEssentials,
     new Employ(PvZEarly2Gate, new ImplementEarly2Gate),
-    new Employ(PvZEarly2Gate99, new ImplementEarly2Gate),
+    new Employ(PvZEarly2Gate99, new ImplementEarly2Gate99),
     new If(new WeAreFFEing, new FFE),
     
     ///////////////////
@@ -229,7 +233,7 @@ class ProtossVsZergOld extends Parallel {
         new And(
           new WeAreFFEing,
           new EnemyStrategy(With.intelligence.fingerprints.fingerprint4Pool),
-          new Check(() => With.frame > 24 * 125),
+          new FrameAtLeast(GameTime(2, 5)()),
           new UnitsAtLeast(1, Protoss.PhotonCannon, complete = false),
           new UnitsAtMost(1, Protoss.PhotonCannon, complete = true)),
         new DefendFFEWithProbesAgainst4Pool)),
@@ -243,7 +247,7 @@ class ProtossVsZergOld extends Parallel {
             new EnemyStrategy(With.intelligence.fingerprints.fingerprint9Pool),
             new EnemyStrategy(With.intelligence.fingerprints.fingerprintOverpool)),
           new EnemyStrategy(With.intelligence.fingerprints.fingerprint10Hatch9Pool),
-          new Check(() => With.frame > 24 * 125),
+          new FrameAtLeast(GameTime(2, 5)()),
           new UnitsAtMost(2, Protoss.PhotonCannon, complete = true)),
         new DefendFFEWithProbesAgainst9Pool)),
     
@@ -342,7 +346,7 @@ class ProtossVsZergOld extends Parallel {
               new Employing(PvZMidgame5GateDragoons),
               new Employing(PvZMidgameCorsairReaver)),
             new UnitsAtMost(10, Protoss.Dragoon),
-            new Check(() => With.self.gas > 100 || With.self.minerals < 400)),
+            new Or(new GasAtLeast(100), new MineralsAtMost(400))),
           new TrainContinuously(Protoss.Dragoon),
           new TrainContinuously(Protoss.Zealot)))),
   
@@ -355,7 +359,7 @@ class ProtossVsZergOld extends Parallel {
     new If(
       new Or(
         new UnitsAtLeast(32, UnitMatchWorkers),
-        new Check(() => With.self.minerals > 1000)),
+        new MineralsAtLeast(1000)),
       new BuildGasPumps),
   
     /////////////////////

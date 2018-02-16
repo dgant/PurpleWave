@@ -7,10 +7,11 @@ import Planning.Plan
 import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Information.Matchup.EnemyIsZerg
+import Planning.Plans.Predicates.Matchup.EnemyIsZerg
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Macro.Milestones.{EnemyUnitsAtLeast, UnitsAtLeast, UpgradeComplete}
+import Planning.Plans.Predicates.Economy.{GasAtLeast, MineralsAtLeast}
+import Planning.Plans.Predicates.Milestones.{EnemyUnitsAtLeast, UnitsAtLeast, UpgradeComplete}
 import ProxyBwapi.Races.{Terran, Zerg}
 
 class NineHatchLings extends GameplanModeTemplate {
@@ -48,14 +49,14 @@ class NineHatchLings extends GameplanModeTemplate {
           RequestAtLeast(1, Zerg.Extractor),
           RequestUpgrade(Zerg.ZerglingSpeed)),
         new Trigger(
-          new Check(() => With.self.gas >= 100),
+          new GasAtLeast(100),
           new Do(() => {
             With.blackboard.gasTargetRatio = 0
             With.blackboard.gasLimitFloor = 0
             With.blackboard.gasLimitCeiling = 0
           })),
         new If(
-          new Check(() => With.self.minerals > 280),
+          new MineralsAtLeast(280),
           new Build(RequestAtLeast(3, Zerg.Hatchery)))))
   )
 }

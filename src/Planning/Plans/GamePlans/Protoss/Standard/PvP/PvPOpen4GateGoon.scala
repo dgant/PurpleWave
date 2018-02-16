@@ -4,9 +4,9 @@ import Macro.BuildRequests.{BuildRequest, RequestAtLeast, RequestUpgrade}
 import Planning.Plan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Information.Employing
+import Planning.Plans.Predicates.Employing
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Macro.Milestones.{MiningBasesAtLeast, UnitsAtLeast}
+import Planning.Plans.Predicates.Milestones.{MiningBasesAtLeast, UnitsAtLeast}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP.PvPOpen4GateGoon
 

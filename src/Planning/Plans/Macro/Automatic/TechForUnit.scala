@@ -4,7 +4,7 @@ import Macro.BuildRequests.RequestTech
 import Planning.Composition.UnitMatchers.UnitMatcher
 import Planning.Plans.Compound.If
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Macro.Milestones.UnitsAtLeast
+import Planning.Plans.Predicates.Milestones.UnitsAtLeast
 import ProxyBwapi.Techs.Tech
 
 class TechForUnit(quantity: Int, unit: UnitMatcher, tech: Tech) extends If(

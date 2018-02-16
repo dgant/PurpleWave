@@ -4,7 +4,7 @@ import Planning.Plans.Compound.Serial
 import Planning.Plans.GamePlans.Terran.Standard.TvP.TerranVsProtoss
 import Planning.Plans.GamePlans.Terran.Standard.TvT.TerranVsTerran
 import Planning.Plans.GamePlans.Terran.Standard.TvZ.TerranVsZerg
-import Planning.Plans.Information.SwitchEnemyRace
+import Planning.Plans.Predicates.Matchup.SwitchEnemyRace
 
 class TerranStandardGamePlan extends Serial(
   new TerranVsRandom,

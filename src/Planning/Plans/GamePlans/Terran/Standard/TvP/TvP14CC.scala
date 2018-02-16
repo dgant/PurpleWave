@@ -6,10 +6,10 @@ import Planning.Plan
 import Planning.Plans.Compound.{NoPlan, Trigger}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Terran.Situational.BunkersAtNatural
-import Planning.Plans.Information.Employing
+import Planning.Plans.Predicates.Employing
 import Planning.Plans.Macro.Automatic.{TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Macro.Milestones.UnitsAtLeast
+import Planning.Plans.Predicates.Milestones.UnitsAtLeast
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvP.TvPEarly14CC
 

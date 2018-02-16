@@ -8,7 +8,7 @@ import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.Protoss.Situational.{DefendAgainstProxy, PlaceGatewaysProxied}
 import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder, RequireEssentials}
-import Planning.Plans.Macro.Milestones._
+import Planning.Plans.Predicates.Milestones._
 import Planning.Plans.Scouting.Scout
 import Planning.ProxyPlanner
 import ProxyBwapi.Races.Protoss

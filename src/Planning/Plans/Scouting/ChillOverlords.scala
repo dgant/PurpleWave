@@ -5,7 +5,7 @@ import Micro.Agency.Intention
 import Planning.Composition.ResourceLocks.LockUnits
 import Planning.Composition.UnitCountEverything
 import Planning.Plan
-import Planning.Plans.Macro.Milestones.EnemyHasShownCloakedThreat
+import Planning.Plans.Predicates.Milestones.EnemyHasShownCloakedThreat
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption

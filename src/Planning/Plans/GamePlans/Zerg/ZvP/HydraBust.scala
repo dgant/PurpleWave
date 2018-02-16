@@ -8,7 +8,8 @@ import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.BuildOrder
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Macro.Milestones.{EnemyUnitsAtLeast, UnitsAtMost}
+import Planning.Plans.Predicates.Economy.{GasAtLeast, MineralsAtLeast, MineralsAtMost}
+import Planning.Plans.Predicates.Milestones.{EnemyUnitsAtLeast, UnitsAtMost}
 import Planning.Plans.Scouting.Scout
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 
@@ -22,7 +23,7 @@ class HydraBust extends GameplanModeTemplate {
     RequestAtLeast(1, Zerg.SpawningPool))
   
   override def defaultScoutPlan = new Trigger(
-    new Check(() => With.self.minerals >= 300),
+    new MineralsAtLeast(300),
     new Scout)
   
   private class AddSunkens extends Parallel(
@@ -57,10 +58,10 @@ class HydraBust extends GameplanModeTemplate {
       RequestAtLeast(25, Zerg.Drone),
       RequestUpgrade(Zerg.HydraliskRange)),
     new If(
-      new Check(() =>
-        With.self.gas >= 25
-        || With.self.minerals < 300
-        || With.units.ours.count(_.is(Zerg.Larva)) < 5),
+      new Or(
+        new GasAtLeast(25),
+        new MineralsAtMost(300),
+        new UnitsAtMost(5, Zerg.Larva)),
       new TrainContinuously(Zerg.Hydralisk),
       new TrainContinuously(Zerg.Zergling)),
     new If(

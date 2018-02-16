@@ -4,10 +4,10 @@ import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
 import Planning.Plans.Compound.{If, Trigger}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
-import Planning.Plans.Information.Employing
+import Planning.Plans.Predicates.Employing
 import Planning.Plans.Macro.Automatic.{TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Macro.Milestones.{UnitsAtLeast, UnitsAtMost}
+import Planning.Plans.Predicates.Milestones.{UnitsAtLeast, UnitsAtMost}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvT.PvTEarlyDTExpand
 

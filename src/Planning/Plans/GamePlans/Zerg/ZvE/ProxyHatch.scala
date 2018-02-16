@@ -8,12 +8,12 @@ import Planning.Composition.UnitCounters.UnitCountExactly
 import Planning.Composition.UnitMatchers.{UnitMatchMobileFlying, UnitMatchWorkers}
 import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Compound.{If, _}
-import Planning.Plans.Information.Employ
+import Planning.Plans.Predicates.Employ
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
 import Planning.Plans.Macro.Expanding.BuildGasPumps
-import Planning.Plans.Macro.Milestones.UnitsAtLeast
+import Planning.Plans.Predicates.Milestones.UnitsAtLeast
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Scouting.ScoutAt
 import Planning.{Plan, ProxyPlanner}

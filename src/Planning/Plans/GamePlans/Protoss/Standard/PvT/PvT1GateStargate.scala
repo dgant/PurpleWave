@@ -3,10 +3,10 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvT
 import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
 import Planning.Plans.Army.Attack
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Information.Employing
+import Planning.Plans.Predicates.Employing
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.Expanding._
-import Planning.Plans.Macro.Milestones.MiningBasesAtLeast
+import Planning.Plans.Predicates.Milestones.MiningBasesAtLeast
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvT.PvTEarly1GateStargate
 

@@ -5,7 +5,7 @@ import Planning.Plans.GamePlans.Protoss.Standard.PvP.ProtossVsProtoss
 import Planning.Plans.GamePlans.Protoss.Standard.PvR.ProtossVsRandom
 import Planning.Plans.GamePlans.Protoss.Standard.PvT.ProtossVsTerran
 import Planning.Plans.GamePlans.Protoss.Standard.PvZ.ProtossVsZerg
-import Planning.Plans.Information.SwitchEnemyRace
+import Planning.Plans.Predicates.Matchup.SwitchEnemyRace
 
 class ProtossStandardGamePlan extends Serial(
   new ProtossVsRandom,

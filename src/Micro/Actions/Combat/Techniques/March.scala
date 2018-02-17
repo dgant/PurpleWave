@@ -21,6 +21,7 @@ object March extends ActionTechnique {
   
   override def applicabilitySelf(unit: FriendlyUnitInfo): Double = {
     if (unit.flying) return 0.0
+    if (unit.matchups.allies.exists(_.matchups.threatsInRange.nonEmpty)) return 0.0
     val collisionDistance = ByOption.min(unit.matchups.allies.filterNot(_.flying).map(_.pixelDistanceEdge(unit)))
     collisionDistance.map(d => Math.min(1.0, 32.0 / (1.0 + d))).getOrElse(0.0)
   }

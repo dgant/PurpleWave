@@ -89,7 +89,7 @@ class Commander {
       }
       sleepAttack(unit)
     } else {
-      move(unit, target.pixelCenter)
+      move(unit, unit.pixelCenter)
     }
   }
   

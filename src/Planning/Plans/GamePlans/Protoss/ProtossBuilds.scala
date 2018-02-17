@@ -70,6 +70,38 @@ object ProtossBuilds {
     RequestAtLeast(16,  Protoss.Probe),
     RequestAtLeast(1,   Protoss.CyberneticsCore))
   
+  val Opening_4GateDragoon = Vector[BuildRequest] (
+    RequestAtLeast(1,   Protoss.Nexus),
+    RequestAtLeast(8,   Protoss.Probe),
+    RequestAtLeast(1,   Protoss.Pylon),
+    RequestAtLeast(10,  Protoss.Probe),
+    RequestAtLeast(1,   Protoss.Gateway),
+    RequestAtLeast(12,  Protoss.Probe),
+    RequestAtLeast(2,   Protoss.Pylon),
+    RequestAtLeast(13,  Protoss.Probe),
+    RequestAtLeast(1,   Protoss.Zealot),
+    RequestAtLeast(14,  Protoss.Probe),
+    RequestAtLeast(1,   Protoss.Assimilator),
+    RequestAtLeast(15,  Protoss.Probe),
+    RequestAtLeast(1,   Protoss.CyberneticsCore),
+    RequestAtLeast(16,  Protoss.Probe),
+    RequestAtLeast(2,   Protoss.Zealot),
+    RequestAtLeast(18,  Protoss.Probe),
+    RequestAtLeast(3,   Protoss.Pylon),
+    RequestAtLeast(19,  Protoss.Probe),
+    RequestAtLeast(1,   Protoss.Dragoon),
+    RequestAtLeast(20,  Protoss.Probe),
+    RequestUpgrade(Protoss.DragoonRange),
+    RequestAtLeast(21,  Protoss.Probe),
+    RequestAtLeast(2,   Protoss.Dragoon),
+    RequestAtLeast(23,  Protoss.Probe),
+    RequestAtLeast(4,   Protoss.Gateway),
+    RequestAtLeast(3,   Protoss.Dragoon),
+    RequestAtLeast(4,   Protoss.Pylon),
+    RequestAtLeast(7,   Protoss.Dragoon),
+    RequestAtLeast(5,   Protoss.Pylon),
+    RequestAtLeast(11,   Protoss.Dragoon)
+  )
   val Opening_10Gate11Gas13Core = Vector[BuildRequest] (
     RequestAtLeast(1,   Protoss.Nexus),
     RequestAtLeast(8,   Protoss.Probe),

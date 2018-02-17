@@ -3,6 +3,7 @@ package Micro.Actions.Basic
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Micro.Actions.Action
+import Micro.Actions.Combat.Decisionmaking.{Disengage, Engage}
 import Micro.Actions.Combat.Tactics.Potshot
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -12,6 +13,8 @@ object Gather extends Action {
     unit.agent.toGather.isDefined
   }
   
+  private val combatWindow = GameTime(0, 2)()
+  
   override def perform(unit: FriendlyUnitInfo) {
   
     Potshot.consider(unit)
@@ -19,23 +22,26 @@ object Gather extends Action {
     lazy val zoneNow      = unit.zone
     lazy val zoneTo       = resource.zone
     lazy val transferring = With.geography.ourZones.forall(z => z != zoneNow && z != zoneTo)
-    lazy val threatened   = unit.matchups.framesOfSafetyDiffused < GameTime(0, 2)()
-    lazy val beckoned =
-      unit.matchups.targets.exists(target =>
+    lazy val threatened   = unit.matchups.framesOfSafetyDiffused < combatWindow
+    lazy val atResource   = unit.pixelDistanceEdge(resource) < 32.0 * 5.0
+    lazy val beckoned     = unit.matchups.targets.exists(target =>
         ! target.unitClass.isWorker
-        && target.target.exists(ally =>
-          ally.pixelDistanceEdge(unit) < 128))
-    /*
-    val resource = unit.agent.toGather.get
-    if (unit.agent.toGather.exists(_.zone == unit.zone)) {
-      if (unit.matchups.threats.exists(_.framesBeforeAttacking(unit) < 36)) {
-        Fight.consider(unit)
-      }
+        && With.framesSince(target.lastAttackStartFrame) < combatWindow
+        && unit.framesToGetInRange(target) < combatWindow
+        && target.matchups.targets.exists(ally =>
+          ally.totalHealth < 200
+          && ally.canAttack
+          && ally.matchups.framesOfEntanglementPerThreatDiffused
+            .get(target)
+            .exists(_ < GameTime(0, 2)())))
+    
+    if (atResource && unit.totalHealth > 13 && beckoned) {
+      Engage.consider(unit)
     }
-    else {
-      if (unit.matchups.framesOfSafetyDiffused < 24)
+    if (transferring && threatened) {
+      unit.agent.canFight = false
+      Disengage.consider(unit)
     }
-    */
     
     With.commander.gather(unit, unit.agent.toGather.get)
   }

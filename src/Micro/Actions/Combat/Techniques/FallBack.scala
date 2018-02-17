@@ -13,6 +13,7 @@ object FallBack extends ActionTechnique {
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     unit.canMove
     && unit.canAttack
+    && unit.agent.canFight
     && unit.unitClass.ranged
     && unit.matchups.targets.nonEmpty
   )

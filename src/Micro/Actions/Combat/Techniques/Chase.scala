@@ -1,5 +1,6 @@
 package Micro.Actions.Combat.Techniques
 
+import Lifecycle.With
 import Micro.Actions.Combat.Attacking.Target
 import Micro.Actions.Combat.Techniques.Common.ActionTechnique
 import Micro.Actions.Commands.{Attack, Move}
@@ -26,33 +27,39 @@ object Chase extends ActionTechnique {
   override def applicabilityOther(unit: FriendlyUnitInfo, other: UnitInfo): Option[Double] = {
     if (other.isFriendly) return None
     
-    val weCanAttack   = unit.canAttack(other)
-    val theyCanAttack = other.canAttack(unit)
-    
+    lazy val weCanAttack   = unit.canAttack(other)
+    lazy val theyCanAttack = other.canAttack(unit)
+    lazy val rangeUs     = unit.pixelRangeAgainst(other)
+    lazy val rangeEnemy  = other.pixelRangeAgainst(unit)
+  
+    if ( ! weCanAttack  && ! theyCanAttack) return None
     if (theyCanAttack   && ! weCanAttack)   return Some(0.0)
     if (weCanAttack     && ! theyCanAttack) return Some(1.0)
-    if ( ! weCanAttack  && ! theyCanAttack) return None
-    
-    // TODO: Really didn't think about this too carefully
-    val weAreOutRanged = unit.pixelRangeAgainst(other) < other.pixelRangeAgainst(unit)
-    if (weAreOutRanged) return Some(1.0)
-    if (other.isBeingViolent) return Some(0.0)
+    if (unit.flying     && other.flying)    return Some(1.0)
+    if (rangeUs < rangeEnemy)               return Some(1.0)
+    if (other.isBeingViolent)               return Some(0.0)
     
     Some(1.0)
   }
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     Target.delegate(unit)
+    if (unit.agent.toAttack.isEmpty) return
+    
     if (unit.readyForAttackOrder) {
       Attack.delegate(unit)
     }
-  
+    
+    // Chase the target down
     // TODO: Queue up a move order ASAP; we can't wait for latency
-    val target = unit.agent.toAttack
-    if (target.exists(_.speedApproachingPixel(unit.pixelCenter) < 0.0)) {
-      unit.agent.toTravel = Some(unit.pixelCenter.project(
-        target.get.pixelCenter,
-        unit.pixelDistanceEdge(target.get) + 48.0))
+    val target = unit.agent.toAttack.get
+    if (target.speedApproachingPixel(unit.pixelCenter) <= 0.0) {
+      val targetProjected = target.projectFrames(unit.framesToBeReadyForAttackOrder)
+      val distanceToTravel = Math.max(
+        unit.pixelDistanceCenter(targetProjected),
+        unit.unitClass.haltDistance + unit.topSpeed * With.reaction.agencyMax)
+      val targetPixel = unit.pixelCenter.project(targetProjected, distanceToTravel)
+      unit.agent.toTravel = Some(targetPixel)
       Move.delegate(unit)
     }
   }

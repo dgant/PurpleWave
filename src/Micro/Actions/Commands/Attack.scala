@@ -24,6 +24,7 @@ object Attack extends Action {
       }
       Move.delegate(unit)
     }
+    
     With.commander.attack(unit, unit.agent.toAttack.get)
   }
 }

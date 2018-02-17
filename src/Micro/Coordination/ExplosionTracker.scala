@@ -26,7 +26,8 @@ class ExplosionTracker {
     if (bullet.sourceUnit.exists(_.is(Terran.ScienceVessel)))
       Some(new ExplosionEMP(bullet))
     else if (bullet.sourceUnit.exists(_.is(Zerg.Lurker)) && bullet.sourceUnit.get.isEnemy)
-      Some(new ExplosionLurkerNow(bullet))
+      None
+      //Some(new ExplosionLurkerNow(bullet))
     else if (bullet.sourceUnit.exists(_.is(Protoss.HighTemplar)))
       Some(new ExplosionPsionicStorm(bullet))
     else

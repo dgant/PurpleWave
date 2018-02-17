@@ -16,6 +16,7 @@ object Abuse extends ActionTechnique {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     unit.canMove
+    && unit.agent.canFight
     && unit.unitClass.ranged
     && unit.canAttack
     && unit.matchups.targets.nonEmpty

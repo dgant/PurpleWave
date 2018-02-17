@@ -2,6 +2,7 @@ package Micro.Matchups
 
 import Information.Battles.BattleClassificationFilters
 import Information.Battles.Types.{Battle, Team}
+import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
@@ -68,6 +69,7 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
   lazy val framesOfEntanglementCurrently          : Double                = ByOption.max(framesOfEntanglementPerThreatCurrently.values).getOrElse(- Forever())
   lazy val framesOfSafetyDiffused                 : Double                = - With.latency.latencyFrames - With.reaction.agencyMax - ByOption.max(framesOfEntanglementPerThreatDiffused.values).getOrElse(- Forever())
   lazy val framesOfSafetyCurrently                : Double                = - With.latency.latencyFrames - With.reaction.agencyMax - ByOption.max(framesOfEntanglementPerThreatCurrently.values).getOrElse(- Forever())
+  lazy val pixelsOfFreedom                        : Double                = if (me.flying) GameTime(1, 0)() else ByOption.min(others.filter( ! _.flying).map(_.pixelDistanceEdge(me))).getOrElse(GameTime(1, 0)())
   lazy val mostEntangledThreatsDiffused           : Vector[UnitInfo]      = threats.sortBy( - framesOfEntanglementPerThreatDiffused(_))
   lazy val mostEntangledThreatsCurrently          : Vector[UnitInfo]      = threats.sortBy( - framesOfEntanglementPerThreatCurrently(_))
   lazy val mostEntangledThreatDiffused            : Option[UnitInfo]      = ByOption.minBy(framesOfEntanglementPerThreatDiffused)(_._2).map(_._1)
@@ -87,21 +89,19 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
       dpfDealingDiffused(target)
   
   def framesOfEntanglementWith(threat: UnitInfo, fixedRange: Option[Double] = None): Double = {
-    lazy val speedApproachingMe     = me.speedApproachingPixel(threat.pixelCenter)
-    lazy val speedApproachingThreat = threat.speedApproachingPixel(me.pixelCenter)
-    lazy val reaccelerationFrames   = (me.topSpeed + speedApproachingThreat) / me.unitClass.accelerationFrames
-    lazy val turnFrames             = me.unitClass.turn180Frames // TODO: Consider existing angle
-    lazy val blastoffFrames         = if (me.unitClass.canMove) turnFrames + reaccelerationFrames  else 0 //How long for us to turn around and run
-    lazy val threatRangeBonus =
-      if (threat.isFriendly)
-        0.0
-      else
-        Math.max(0.0, (speedApproachingMe + speedApproachingThreat) * (With.reaction.agencyMax + With.latency.framesRemaining))
+    lazy val approachSpeedMe      = me.speedApproachingPixel(threat.pixelCenter)
+    lazy val approachSpeedThreat  = threat.speedApproachingPixel(me.pixelCenter)
+    lazy val approachSpeedTotal   = approachSpeedMe + approachSpeedThreat
+    lazy val framesToTurn         = me.unitClass.framesToTurn(me.angleRadians - threat.pixelCenter.radiansTo(me.pixelCenter))
+    lazy val framesToAccelerate   = (me.topSpeed + approachSpeedThreat) / me.unitClass.accelerationFrames
+    lazy val blastoffFrames       = if (me.unitClass.canMove) framesToTurn + framesToAccelerate else 0 //How long for us to turn around and run
+    lazy val reactionFrames       = With.reaction.agencyMax + With.latency.framesRemaining
+    lazy val threatRangeBonus     = if (threat.isFriendly) 0.0 else Math.max(0.0, approachSpeedTotal * reactionFrames)
     
     val effectiveRange = fixedRange.getOrElse(threat.pixelRangeAgainst(me) + threatRangeBonus)
     val gapPixels = me.pixelDistanceEdge(threat) - effectiveRange
     
-    val gapSpeed          = if (gapPixels >= 0) threat.topSpeed else me.topSpeed
+    val gapSpeed          = if (gapPixels >= 0 && threat.canMove) threat.topSpeed else me.topSpeed
     val framesToCloseGap  = PurpleMath.nanToInfinity(Math.abs(gapPixels) / gapSpeed)
     val output            = framesToCloseGap * PurpleMath.signum( - gapPixels) + blastoffFrames
     

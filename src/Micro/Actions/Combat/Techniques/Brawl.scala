@@ -18,19 +18,14 @@ object Brawl extends ActionTechnique {
   )
   
   override def applicabilitySelf(unit: FriendlyUnitInfo): Double = {
-    if (unit.unitClass.melee && unit.matchups.threats.exists(_.unitClass.melee)) 1.0 else 0.0
+    lazy val brawlers = unit.matchups.threats.filter(t => t.unitClass.melee && inBrawlRange(unit, t))
+    if (unit.unitClass.melee && brawlers.size >= 3) 1.0 else 0.0
   }
   
-  override def applicabilityOther(unit: FriendlyUnitInfo, other: UnitInfo): Option[Double] = {
-    if (other.isFriendly) return None
-    if (other.flying) return None
-    if ( ! other.canAttack(unit)) return None
-    if ( ! unit.canAttack(other)) return None
-    if (other.unitClass.ranged) return Some(0.0)
-    
+  private def inBrawlRange(unit: FriendlyUnitInfo, other: UnitInfo): Boolean = {
     val framesBeforeContact = unit.pixelDistanceEdge(other) / (unit.topSpeed + other.topSpeed)
     val framesBeforeReacting = With.reaction.agencyMax + unit.unitClass.turn180Frames
-    Some(2.0 * framesBeforeReacting / (1.0 + framesBeforeContact))
+    framesBeforeReacting >= framesBeforeContact
   }
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {

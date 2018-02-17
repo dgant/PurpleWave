@@ -21,7 +21,6 @@ object Disengage extends Action {
       Avoid,
       FallBack,
       Ignore,
-      Isolate,
       Purr,
       Retreat)
   }

@@ -100,13 +100,14 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     history.enqueue(new UnitState(this))
   }
   
-  def lastAttackStartFrame: Int = {
+  def lastAttackStartFrame: Int = cacheLastAttackStartFrame()
+  private def cacheLastAttackStartFrame = new Cache(() => {
     val attackStartingStates = history.filter(_.attackStarting)
     if (attackStartingStates.isEmpty)
       0
     else
       attackStartingStates.map(_.frame).max
-  }
+  })
   
   def lastMovementFrame: Int = {
     val movingFrames = history.filter(_.velocitySquared > 0)
@@ -422,22 +423,24 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   
   def canAttack: Boolean = canAttackCache()
   private val canAttackCache = new Cache(() =>
-    canDoAnything &&
-    ( ! unitClass.shootsScarabs || scarabCount > 0) &&
-    (
+    canDoAnything
+    && ( ! unitClass.shootsScarabs || scarabCount > 0)
+    && (
       unitClass.rawCanAttack
       || (is(Terran.Bunker)
       || (is(Protoss.Carrier) && interceptorCount > 0)
       || (is(Protoss.Reaver)  && scarabCount > 0)
       || (is(Zerg.Lurker)     && burrowed)
-    )))
+    ))
+    && (flying || ! underDisruptionWeb)
+    && (unitClass.unaffectedByDarkSwarm || ! underDarkSwarm))
   
   def canAttack(enemy: UnitInfo): Boolean = (
     canAttack
     && enemy.canBeAttacked
-    && ! enemy.effectivelyCloaked // Eh.
-    && ! enemy.friendly.exists(_.transport.isDefined)
     && (if (enemy.flying) unitClass.attacksAir else unitClass.attacksGround)
+    && ! enemy.effectivelyCloaked
+    && ! friendly.exists(_.transport.isDefined)
     && ! ((enemy.unitClass.floats || enemy.unitClass.isBuilding) && is(Terran.SpiderMine))
   )
   // Frame X:     Unit's cooldown is 0.   Unit starts attacking.
@@ -453,7 +456,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   def pixelReachMax     (framesAhead: Int): Double = Math.max(pixelReachAir(framesAhead), pixelReachGround(framesAhead))
   def pixelReachAgainst (framesAhead: Int, enemy:UnitInfo): Double = if (enemy.flying) pixelReachAir(framesAhead) else pixelReachGround(framesAhead)
   
-  def inRangeToAttack(enemy: UnitInfo)                    : Boolean = pixelDistanceEdge(enemy) <= pixelRangeAgainst(enemy)     + With.configuration.attackableRangeBufferPixels && (pixelRangeMin <= 0.0 || pixelDistanceEdge(enemy) > pixelRangeMin)
+  def inRangeToAttack(enemy: UnitInfo)                    : Boolean = pixelDistanceEdge(enemy) <= pixelRangeAgainst(enemy) + With.configuration.attackableRangeBufferPixels && (pixelRangeMin <= 0.0 || pixelDistanceEdge(enemy) > pixelRangeMin)
   def inRangeToAttack(enemy: UnitInfo, framesAhead: Int)  : Boolean = enemy.projectFrames(framesAhead).pixelDistanceFast(projectFrames(framesAhead)) <= pixelRangeAgainst(enemy) + unitClass.radialHypotenuse + enemy.unitClass.radialHypotenuse + With.configuration.attackableRangeBufferPixels //TODO: Needs min range!
   
   def framesToTravelTo(destination: Pixel)  : Int = framesToTravelPixels(pixelDistanceTravelling(destination))

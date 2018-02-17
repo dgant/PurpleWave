@@ -48,7 +48,8 @@ object Root extends Action {
     private lazy val targetsInRange       = combatTargets.filter(t => unit.pixelDistanceEdge(t) < maxRange)
     private lazy val targetsNearingRange  = combatTargets.filter(t => { val p = t.projectFrames(framesToRoot); unit.pixelDistanceEdge(t.pixelStartAt(p), t.pixelEndAt(p)) < maxRange - 32})
     private lazy val girdForCombat        = targetsInRange.nonEmpty || targetsNearingRange.nonEmpty
-    private lazy val duckForCover         = false && (weAreALurker && unit.matchups.enemyDetectors.isEmpty && unit.matchups.framesOfSafetyDiffused < framesToRoot)
+    private lazy val artilleryOutOfRange  = unit.matchups.targets.filter(t => t.canAttack(unit) && t.pixelRangeAgainst(unit) >unit.pixelRangeAgainst(t) && t.inRangeToAttack(unit))
+    private lazy val duckForCover         = false && (weAreALurker && unit.matchups.enemyDetectors.isEmpty && unit.matchups.framesOfSafetyDiffused < framesToRoot && (artilleryOutOfRange.isEmpty || ! With.enemy.isTerran)) // Root for safety, but not in range of Tanks if they can scan us
     private lazy val leadingPush          = (rootersInPush.size + 1) / 3 > rootersInPushCloser
     private lazy val destinationFarAway   = unit.pixelDistanceCenter(unit.agent.destination) > 32.0 * 4.0
     

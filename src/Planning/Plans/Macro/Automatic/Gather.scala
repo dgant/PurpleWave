@@ -1,5 +1,6 @@
 package Planning.Plans.Macro.Automatic
 
+import Information.Geography.Types.{Base, Zone}
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Micro.Agency.Intention
@@ -28,6 +29,8 @@ class Gather extends Plan {
   var workersByResource = new mutable.HashMap[UnitInfo, mutable.HashSet[FriendlyUnitInfo]]
   var resourceByWorker = new mutable.HashMap[FriendlyUnitInfo, UnitInfo]
   
+  private val transfersLegal = new mutable.HashSet[(Zone, Zone)]
+  
   override def onUpdate() {
     setGoals()
     countUnits()
@@ -48,6 +51,7 @@ class Gather extends Plan {
   
   private def countUnits() {
     val activeBases = With.geography.ourBases.filter(_.townHall.exists(hall => hall.morphing || hall.remainingBuildFrames < GameTime(0, 10)()))
+    calculateTransferPaths(activeBases)
     minerals  = activeBases.flatMap(_.minerals).toSet
     gasses    = activeBases.flatMap(_.gas.flatMap(_.friendly).filter(u => u.gasLeft > 0 && u.complete)).toSet
     if (minerals.isEmpty) {
@@ -68,6 +72,23 @@ class Gather extends Plan {
     resources.foreach(resource => workersByResource(resource) = new mutable.HashSet[FriendlyUnitInfo])
     workers.foreach(unit => unit.agent.lastIntent.toGather.foreach(resource => assign(unit, resource)))
     gasWorkersNow = resourceByWorker.count(_._2.unitClass.isGas)
+  }
+  
+  private def calculateTransferPaths(bases: Iterable[Base]) {
+    transfersLegal.clear()
+    val baseZones = bases.map(_.zone).toSet
+    baseZones.foreach(zone1 =>
+      baseZones.foreach(zone2 => {
+        val path = With.paths.zonePath(zone1, zone2)
+        val pathZones: Iterable[Zone] = path.map(_.steps.map(_.to).filter(zone => zone != zone1 && zone != zone2)).getOrElse(Iterable.empty)
+        val pathZonesDanger = pathZones.filter(zone =>
+                zone.units.exists(e => e.isEnemy  && e.unitClass.attacksGround)
+          && !  zone.units.exists(a => a.isOurs   && a.unitClass.attacksGround))
+        if (pathZonesDanger.isEmpty) {
+          transfersLegal += ((zone1, zone2))
+          transfersLegal += ((zone2, zone1))
+        }
+      }))
   }
   
   private def isActiveGas(resource: UnitInfo): Boolean = resource.gasLeft > 0
@@ -109,6 +130,7 @@ class Gather extends Plan {
       else
         1.0
     
+    val safety      = if ( ! worker.zone.bases.exists(_.owner.isUs) || transfersLegal.contains((worker.zone, resource.zone))) 100.0 else 1.0
     val continuity  = if (resourceByWorker.get(worker).contains(resource)) 10.0 else 1.0
     val proximity   = resource.base.flatMap(_.townHall).map(_.pixelDistanceEdge(resource)).getOrElse(32 * 12)
     val distance    = worker.pixelDistanceEdge(resource) + resource.remainingBuildFrames * worker.topSpeed

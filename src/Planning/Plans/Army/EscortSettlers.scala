@@ -16,7 +16,10 @@ class EscortSettlers extends Plan {
   
   override def onUpdate() {
     
-    val settler = ByOption.minBy(With.units.ours.filter(u => u.agent.toBuild.exists(_.isTownHall)))(_.id)
+    val settler = ByOption.minBy(With.units.ours.filter(builder =>
+      builder.agent.toBuildTile.exists(tile =>
+        tile.zone.bases.exists(base =>
+          base.townHall.forall( ! _.complete)))))(_.matchups.framesOfSafetyCurrently)
     
     if (settler.isEmpty) return
     

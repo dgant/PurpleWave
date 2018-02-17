@@ -21,7 +21,7 @@ object Gather extends Action {
     lazy val resource     = unit.agent.toGather.get
     lazy val zoneNow      = unit.zone
     lazy val zoneTo       = resource.zone
-    lazy val transferring = With.geography.ourZones.forall(z => z != zoneNow && z != zoneTo)
+    lazy val transferring = zoneNow != zoneTo && ! zoneNow.edges.exists(_.otherSideof(zoneNow) == zoneTo)
     lazy val threatened   = unit.matchups.framesOfSafetyDiffused < combatWindow
     lazy val atResource   = unit.pixelDistanceEdge(resource) < 32.0 * 5.0
     lazy val beckoned     = unit.matchups.targets.exists(target =>

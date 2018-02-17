@@ -85,7 +85,8 @@ class Agent(val unit: FriendlyUnitInfo) {
   private val cachedZonePath = new mutable.HashMap[Pixel, Option[ZonePath]]
   
   def nextWaypoint(to: Pixel): Pixel = {
-    if (!cachedWaypoint.contains(to)) {
+    if (unit.flying) return to
+    if ( ! cachedWaypoint.contains(to)) {
       val path = zonePath(to)
       cachedWaypoint(to) =
         if (path.isEmpty || path.get.steps.isEmpty)

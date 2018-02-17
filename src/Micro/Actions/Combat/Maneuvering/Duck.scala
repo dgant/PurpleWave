@@ -19,7 +19,7 @@ object Duck extends Action {
   override protected def perform(unit: FriendlyUnitInfo) {
     lazy val reactionFrames =
       With.reaction.agencyMax
-      + unit.unitClass.turn180Frames
+      + unit.unitClass.framesToTurn180
       + unit.unitClass.accelerationFrames
     val explosions = With.coordinator.explosions.all
       .filter(explosion =>

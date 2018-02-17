@@ -196,7 +196,7 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit, id: Int) extends UnitInfo(bas
   //////////////
   
   def accelerating  : Boolean = base.isAccelerating
-  def angleRadians  : Double  = base.getAngle
+  def angleRadians  : Double  = cachedAngleRadians()
   def braking       : Boolean = base.isBraking
   def ensnared      : Boolean = cachedIsEnsnared()
   def flying        : Boolean = cachedFlying()
@@ -210,6 +210,7 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit, id: Int) extends UnitInfo(bas
   def velocityX     : Double  = if (unitClass.canMove) cacheVelocityX() else 0
   def velocityY     : Double  = if (unitClass.canMove) cacheVelocityX() else 0
   
+  private val cachedAngleRadians = new Cache(() => base.getAngle)
   private val cacheVelocityX = new Cache(() => base.getVelocityX)
   private val cacheVelocityY = new Cache(() => base.getVelocityY)
   private val cachedIsSieged        = new Cache(() => unitClass.canSiege          &&  base.isSieged)

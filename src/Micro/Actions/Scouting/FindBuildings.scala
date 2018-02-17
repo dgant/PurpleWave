@@ -16,14 +16,14 @@ object FindBuildings extends Action {
   override protected def perform(unit: FriendlyUnitInfo) {
     val basesToScout =
       With.geography.enemyBases ++ (
-        if (With.enemy.isZerg
-          && With.geography.ourBases.size >= 2
-          && With.geography.enemyBases.size == 2)
-          With.geography.neutralBases.toVector.sortBy(_.townHallTile.groundPixels(With.intelligence.mostBaselikeEnemyTile)).take(3)
+        if (With.geography.enemyBases.size >= With.geography.ourBases.size)
+          With.geography.neutralBases.toVector
+            .sortBy(_.townHallTile.groundPixels(With.intelligence.mostBaselikeEnemyTile))
+            .take(if (With.enemy.isZerg) 5 else 1)
         else
           Vector.empty)
     
-    val tilesToScout = With.geography.enemyBases
+    val tilesToScout = basesToScout
       .flatMap(base => {
         val tiles = base.zone.tiles.filter(tile =>
           ! base.harvestingArea.contains(tile)  && //Don't walk into worker line
@@ -45,7 +45,7 @@ object FindBuildings extends Action {
       With.grids.friendlyVision.framesSince(tile)))
     
     val force = pulls.map(_.apply(unit.pixelCenter)).reduce(_ + _)
-    
+      
     //TODO: Use actual potential flow so we can avoid obstacles and threats
     val target = unit.pixelCenter.add(force.normalize(64.0).toPoint)
     val tileToScout = tilesToScout.minBy(_.pixelCenter.pixelDistanceFast(target))

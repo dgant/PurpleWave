@@ -92,7 +92,7 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
     lazy val approachSpeedMe      = me.speedApproachingPixel(threat.pixelCenter)
     lazy val approachSpeedThreat  = threat.speedApproachingPixel(me.pixelCenter)
     lazy val approachSpeedTotal   = approachSpeedMe + approachSpeedThreat
-    lazy val framesToTurn         = me.unitClass.framesToTurn(me.angleRadians - threat.pixelCenter.radiansTo(me.pixelCenter))
+    lazy val framesToTurn         = me.unitClass.framesToTurn180 // Should be this, but for performance limitations: me.unitClass.framesToTurn(me.angleRadians - threat.pixelCenter.radiansTo(me.pixelCenter))
     lazy val framesToAccelerate   = (me.topSpeed + approachSpeedThreat) / me.unitClass.accelerationFrames
     lazy val blastoffFrames       = if (me.unitClass.canMove) framesToTurn + framesToAccelerate else 0 //How long for us to turn around and run
     lazy val reactionFrames       = With.reaction.agencyMax + With.latency.framesRemaining

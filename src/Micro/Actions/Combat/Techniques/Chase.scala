@@ -57,7 +57,7 @@ object Chase extends ActionTechnique {
       val targetProjected = target.projectFrames(unit.framesToBeReadyForAttackOrder)
       val distanceToTravel = Math.max(
         unit.pixelDistanceCenter(targetProjected),
-        unit.unitClass.haltDistance + unit.topSpeed * With.reaction.agencyMax)
+        unit.unitClass.haltPixels + unit.topSpeed * With.reaction.agencyMax)
       val targetPixel = unit.pixelCenter.project(targetProjected, distanceToTravel)
       unit.agent.toTravel = Some(targetPixel)
       Move.delegate(unit)

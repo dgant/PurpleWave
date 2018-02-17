@@ -44,14 +44,13 @@ class PvZ4GateGoon extends GameplanModeTemplate {
     new If(
       new And(
         new GasAtLeast(50),
-        new UnitsAtLeast(4, Protoss.Zealot),
+        new UnitsAtLeast(6, Protoss.Zealot),
         new UpgradeComplete(Protoss.DragoonRange, 1, Protoss.DragoonRange.upgradeTime(1))),
       new TrainContinuously(Protoss.Dragoon),
       new TrainContinuously(Protoss.Zealot)),
     new Build(RequestAtLeast(1, Protoss.CyberneticsCore)),
     new BuildGasPumps,
     new Build(RequestUpgrade(Protoss.DragoonRange)),
-    
     new Build(RequestAtLeast(4, Protoss.Gateway)),
     
     new Trigger(

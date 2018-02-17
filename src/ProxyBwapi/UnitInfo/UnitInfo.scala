@@ -432,8 +432,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
       || (is(Protoss.Reaver)  && scarabCount > 0)
       || (is(Zerg.Lurker)     && burrowed)
     ))
-    && (flying || ! underDisruptionWeb)
-    && (unitClass.unaffectedByDarkSwarm || ! underDarkSwarm))
+    && (flying || ! underDisruptionWeb))
   
   def canAttack(enemy: UnitInfo): Boolean = (
     canAttack
@@ -442,11 +441,12 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     && ! enemy.effectivelyCloaked
     && ! friendly.exists(_.transport.isDefined)
     && ! ((enemy.unitClass.floats || enemy.unitClass.isBuilding) && is(Terran.SpiderMine))
+    && (unitClass.unaffectedByDarkSwarm || ! enemy.underDarkSwarm)
   )
+  
   // Frame X:     Unit's cooldown is 0.   Unit starts attacking.
   // Frame X-1:   Unit's cooldown is 1.   Unit receives attack order.
   // Frame X-1-L: Unit's cooldown is L+1. Send attack order.
-  
   def framesToBeReadyForAttackOrder: Int = cooldownLeft - With.latency.framesRemaining - With.reaction.agencyMin
   def readyForAttackOrder: Boolean = canAttack && framesToBeReadyForAttackOrder <= 0
   

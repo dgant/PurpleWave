@@ -42,11 +42,11 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
     else
       8 // Arbitrary
   
-  lazy val turn180Frames: Int = framesToTurn(Math.PI)
+  lazy val framesToTurn180: Int = framesToTurn(Math.PI)
   
   def framesToTurn(radians: Double): Int = Math.abs(PurpleMath.nanToZero(Math.ceil(128.0 * radians / Math.PI / turnRadius))).toInt
   
-  lazy val framesToTurnAndShootAndTurnBackAndAccelerate: Int = stopFrames + accelerationFrames + turn180Frames
+  lazy val framesToTurnAndShootAndTurnBackAndAccelerate: Int = stopFrames + accelerationFrames + framesToTurn180
   
   ////////////
   // Combat //

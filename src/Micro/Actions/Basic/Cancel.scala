@@ -11,14 +11,14 @@ object Cancel extends Action {
     lazy val framesCutoff     = 12 + With.reaction.agencyAverage
     lazy val framesToLive     = unit.matchups.framesToLiveCurrently
     lazy val framesToFinish   = Seq(unit.framesBeforeTechComplete, unit.framesBeforeUpgradeComplete, unit.framesBeforeBuildeeComplete).max
-    lazy val doomed           = framesToLive < framesCutoff
-    lazy val willNeverFinish  = framesToLive < framesToFinish
+    lazy val doomed           = unit.matchups.threatsInRange.nonEmpty && framesToLive < framesCutoff
+    lazy val willNeverFinish  = unit.matchups.threatsInRange.nonEmpty && framesToLive < framesToFinish
     lazy val producing        = unit.training || unit.upgrading || unit.teching
     lazy val beingBorn        = unit.morphing || unit.beingConstructed
     lazy val isDecoy          = unit.unitClass.attacks && unit.matchups.allies.exists(_.isBeingViolent) // Is this correct?
     lazy val shouldCancel     = (unpowered || beingBorn || (producing && willNeverFinish)) && ! isDecoy
     
-    val output = (unit.unitClass.isBuilding || unit.morphing) && doomed && shouldCancel
+    val output = (unit.unitClass.isBuilding || unit.morphing) && shouldCancel && doomed
     output
   }
   

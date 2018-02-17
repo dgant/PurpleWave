@@ -32,13 +32,14 @@ object Avoid extends ActionTechnique {
     if (path.isEmpty) return None
     
     val pixelStep       = 16.0
+    val baseValue       = 0.25
     val here            = unit.pixelCenter
     val there           = unit.pixelCenter.project(unit.agent.nextWaypoint(unit.agent.origin), pixelStep)
     val distanceHere    = other.pixelDistanceCenter(here)
     val distanceThere   = other.pixelDistanceCenter(there)
     val blockingFactor  = (distanceHere - distanceThere) / pixelStep
-    
-    Some(blockingFactor)
+    val output          = baseValue + (1.0 - baseValue) * Math.max(blockingFactor, 0)
+    Some(output)
   }
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {

@@ -17,7 +17,7 @@ import Planning.Plans.Macro.BuildOrders._
 import Planning.Plans.Macro.Expanding._
 import Planning.Plans.Predicates.Milestones._
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
-import Planning.Plans.Predicates.Economy.{GasAtLeast, MineralsAtLeast, MineralsAtMost}
+import Planning.Plans.Predicates.Economy.{GasAtLeast, GasAtMost, MineralsAtLeast, MineralsAtMost}
 import Planning.Plans.Recruitment.RecruitFreelancers
 import Planning.Plans.Scouting.{FindExpansions, Scout, ScoutAt}
 import ProxyBwapi.Races.{Protoss, Zerg}
@@ -312,7 +312,11 @@ class ProtossVsZergOld extends Parallel {
     
     // Gateway production
     new If(
-      
+      new And(
+        new MineralsAtLeast(600),
+        new GasAtMost(49)),
+      new TrainContinuously(Protoss.Zealot)),
+    new If(
       // Emergency Dragoons
       new And(
         new EnemyMutalisks,

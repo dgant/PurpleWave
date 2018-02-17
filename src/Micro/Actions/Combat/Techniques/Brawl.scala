@@ -24,7 +24,7 @@ object Brawl extends ActionTechnique {
   
   private def inBrawlRange(unit: FriendlyUnitInfo, other: UnitInfo): Boolean = {
     val framesBeforeContact = unit.pixelDistanceEdge(other) / (unit.topSpeed + other.topSpeed)
-    val framesBeforeReacting = With.reaction.agencyMax + unit.unitClass.turn180Frames
+    val framesBeforeReacting = With.reaction.agencyMax + unit.unitClass.framesToTurn180
     framesBeforeReacting >= framesBeforeContact
   }
   

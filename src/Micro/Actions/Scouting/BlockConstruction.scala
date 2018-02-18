@@ -10,7 +10,9 @@ import bwapi.UnitCommandType
 object BlockConstruction extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
-    blockableBuilders(unit).nonEmpty && ! unit.flying
+    blockableBuilders(unit).nonEmpty
+      && ! unit.flying
+      && With.geography.enemyBases.nonEmpty
   )
   
   override protected def perform(unit: FriendlyUnitInfo) {
@@ -49,8 +51,8 @@ object BlockConstruction extends Action {
       
       lazy val movingToPossibleExpansion = targetBase.exists(base =>
         base.owner.isNeutral &&
-        base.heart.groundPixels(enemyBase.heart.pixelCenter) <
-        base.heart.groundPixels(With.geography.home))
+          base.heart.groundPixels(enemyBase.heart.pixelCenter) <
+          base.heart.groundPixels(With.geography.home))
       
       lazy val suspiciouslyIdle = targetBase.exists(base =>
         base.owner == builder.player

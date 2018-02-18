@@ -1,9 +1,10 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvT
 
 import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
+import Planning.Composition.UnitCounters.UnitCountExactly
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
-import Planning.Plans.Army.Attack
+import Planning.Plans.Army.{Attack, DefendEntrance}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
@@ -20,6 +21,13 @@ class PvT2BaseCarriers extends GameplanModeTemplate {
   
   override val activationCriteria   = new Or(new Employing(PvT2BaseCarrier), new Employing(PvT2BaseReaverCarrier))
   override val emergencyPlans       = Vector(new PvTIdeas.Require2BaseTech, new PvTIdeas.GetObserversForCloakedWraiths)
+  
+  override def priorityAttackPlan = new Parallel(
+    new DefendEntrance {
+      defenders.get.unitMatcher.set(Protoss.Dragoon)
+      defenders.get.unitCounter.set(UnitCountExactly(2))
+    },
+    new PvTIdeas.PriorityAttacks)
   
   override def defaultAttackPlan: Plan = new If(
     new Or(

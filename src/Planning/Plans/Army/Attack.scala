@@ -37,7 +37,10 @@ class Attack extends Plan {
     if (attackers.get.units.isEmpty) return
     
     val attackIntent = new Intention { toTravel = Some(target) }
-    attackers.get.units.foreach(_.agent.intend(this, attackIntent))
+    attackers.get.units.foreach(attacker => {
+      With.intelligence.higlightScout(attacker)
+      attacker.agent.intend(this, attackIntent)
+    })
   
     squad.goal = new SquadPush(target)
     squad.enemies = With.units.enemy.filter(e =>

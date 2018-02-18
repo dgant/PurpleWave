@@ -14,7 +14,7 @@ class PvT1015GatePressure extends GameplanModeTemplate {
   
   override val activationCriteria = new Employing(PvTEarly1015GateGoonPressure)
   override val completionCriteria = new MiningBasesAtLeast(2)
-  override val aggression         = 1.4
+  override val aggression         = 1.2
   override val superSaturate      = true
   override val defaultAttackPlan  = new Attack
   override val buildOrder         = ProtossBuilds.Opening10Gate15GateDragoons

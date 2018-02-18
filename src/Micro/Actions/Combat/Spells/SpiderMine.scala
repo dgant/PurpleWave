@@ -52,7 +52,7 @@ object SpiderMine extends Action {
     val maxRangeTiles = PurpleMath.clamp(range, rangeMinimum, 8.0 * 32.0)
   
     //TODO: This is a good candidate for Coordinator since every Vulture will want to recalculate this
-    val victims = vulture.matchups.enemies.filter(enemy => ! enemy.flying && ! enemy.unitClass.floats && ! enemy.unitClass.isBuilding)
+    val victims = vulture.matchups.enemies.filter(_.unitClass.canBeTargetedBySpiderMines)
     if (victims.isEmpty) return
     
     val saboteursInitial = new mutable.PriorityQueue[UnitInfo]()(Ordering.by(v => victims.map(_.pixelDistanceEdge(v)).min))

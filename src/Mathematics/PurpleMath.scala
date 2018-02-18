@@ -160,4 +160,21 @@ object PurpleMath {
   def fastSigmoid(x: Double): Double = {
     x / (1.0 + Math.abs(x))
   }
+  
+  private val piOver4 = Math.PI / 4.0
+  private val pi3Over4 = 3 * Math.PI / 4.0
+  def fastAtan2(y: Double, x: Double): Double = {
+    var r = 0.0
+    var angle = 0.0
+    val absY = Math.abs(y) + 0.000000001
+    if (x < 0.0) {
+      r = (x + absY) / (absY - x)
+      angle = pi3Over4
+    } else {
+      r = (x - absY) / (absY + x)
+      angle = piOver4
+    }
+    angle += r * (0.1963 * r * r - 0.9817 * r)
+    if (y < 0.0) -angle else angle
+  }
 }

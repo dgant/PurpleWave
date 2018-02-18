@@ -63,7 +63,7 @@ case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     val delta = destination.subtract(this)
     delta.multiply(pixels/distance).add(this)
   }
-  private val radiansOverAngle = 2.0 * Math.PI / 256.0
+  private val radiansOverDegrees = 2.0 * Math.PI / 256.0
   def radiateRadians(angleRadians: Double, pixels: Double): Pixel = {
     add(
       (pixels * Math.cos(angleRadians)).toInt,
@@ -73,13 +73,13 @@ case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     // According to JohnJ, Brood War understands 256 angles
     // The BWAPI interface reduces this to a double (radians) with the cartesian origin (pointing right)
     // We'll use 256 (to match the engine behavior) and the BWAPI origin
-    radiateRadians(radiansOverAngle * angleDegrees, pixels)
+    radiateRadians(radiansOverDegrees * angleDegrees, pixels)
   }
   def degreesTo(other: Pixel): Double = {
-    Math.atan2(other.y - y, other.x - x) / radiansOverAngle
+    radiansTo(other) / radiansOverDegrees
   }
   def radiansTo(other: Pixel): Double = {
-    Math.atan2(other.y - y, other.x - x)
+    PurpleMath.fastAtan2(other.y - y, other.x - x)
   }
   def midpoint(pixel: Pixel): Pixel = {
     add(pixel).divide(2)

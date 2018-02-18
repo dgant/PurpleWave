@@ -21,7 +21,7 @@ object Duck extends Action {
       With.reaction.agencyMax
       + unit.unitClass.framesToTurn180
       + unit.unitClass.accelerationFrames
-    val explosions = With.coordinator.explosions.all
+    val explosions = With.coordinator.explosions.nearUnit(unit)
       .filter(explosion =>
         explosion.affects(unit)
         && framesOfEntanglement(unit, explosion) > - reactionFrames)
@@ -29,6 +29,7 @@ object Duck extends Action {
     if (explosions.nonEmpty) {
       val forces = explosions.map(explosion =>
         explosion.directionTo(unit).normalize(framesOfEntanglement(unit, explosion) + reactionFrames))
+      
       val force = ForceMath.sum(forces).normalize
       unit.agent.forces.put(ForceColors.threat, force)
       Gravitate.delegate(unit)

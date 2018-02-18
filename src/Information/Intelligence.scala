@@ -25,7 +25,9 @@ class Intelligence {
   private var lastScoutFrame = 0
   private var flyingScout = false
   def higlightScout(unit: UnitInfo) {
-    scoutTiles += unit.tileIncludingCenter
+    if (scoutTiles.size < 5) {
+      scoutTiles += unit.tileIncludingCenter
+    }
     flyingScout = flyingScout || unit.flying
   }
   
@@ -71,6 +73,7 @@ class Intelligence {
     unitsShown.update()
     updateEnemyMain()
     flyingScout = false
+    scoutTiles.clear()
   }
   
   private def updateEnemyMain() {

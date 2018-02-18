@@ -15,7 +15,7 @@ import Performance.Cache
 import Planning.Composition.UnitMatchers.UnitMatcher
 import ProxyBwapi.Engine.Damage
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
-import Utilities.ByOption
+import ProxyBwapi.UnitClass.UnitClass
 import bwapi._
 
 import scala.collection.mutable
@@ -193,21 +193,21 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   def pixelRangeAir: Double = pixelRangeAirCache()
   private val pixelRangeAirCache = new Cache(() =>
     unitClass.airRangePixels +
-      (if (is(Terran.Bunker))                                                 32.0 else 0.0) +
-      (if (is(Terran.Bunker)    && player.hasUpgrade(Terran.MarineRange))     32.0 else 0.0) +
-      (if (is(Terran.Marine)    && player.hasUpgrade(Terran.MarineRange))     32.0 else 0.0) +
-      (if (is(Terran.Goliath)   && player.hasUpgrade(Terran.GoliathAirRange)) 96.0 else 0.0) +
-      (if (is(Protoss.Dragoon)  && player.hasUpgrade(Protoss.DragoonRange))   64.0 else 0.0) +
-      (if (is(Zerg.Hydralisk)   && player.hasUpgrade(Zerg.HydraliskRange))    32.0 else 0.0))
+      (if (isBunker())                                                  32.0 else 0.0) +
+      (if (isBunker()     && player.hasUpgrade(Terran.MarineRange))     32.0 else 0.0) +
+      (if (isMarine()     && player.hasUpgrade(Terran.MarineRange))     32.0 else 0.0) +
+      (if (isGoliath()    && player.hasUpgrade(Terran.GoliathAirRange)) 96.0 else 0.0) +
+      (if (isDragoon()    && player.hasUpgrade(Protoss.DragoonRange))   64.0 else 0.0) +
+      (if (isHydralisk()  && player.hasUpgrade(Zerg.HydraliskRange))    32.0 else 0.0))
   
   def pixelRangeGround: Double = pixelRangeGroundCache()
   private val pixelRangeGroundCache = new Cache(() =>
     unitClass.groundRangePixels +
-      (if (is(Terran.Bunker))                                               32.0 else 0.0) +
-      (if (is(Terran.Bunker)    && player.hasUpgrade(Terran.MarineRange))   32.0 else 0.0) +
-      (if (is(Terran.Marine)    && player.hasUpgrade(Terran.MarineRange))   32.0 else 0.0) +
-      (if (is(Protoss.Dragoon)  && player.hasUpgrade(Protoss.DragoonRange)) 64.0 else 0.0) +
-      (if (is(Zerg.Hydralisk)   && player.hasUpgrade(Zerg.HydraliskRange))  32.0 else 0.0))
+      (if (isBunker())                                                32.0 else 0.0) +
+      (if (isBunker()     && player.hasUpgrade(Terran.MarineRange))   32.0 else 0.0) +
+      (if (isMarine()     && player.hasUpgrade(Terran.MarineRange))   32.0 else 0.0) +
+      (if (isDragoon()    && player.hasUpgrade(Protoss.DragoonRange)) 64.0 else 0.0) +
+      (if (isHydralisk()  && player.hasUpgrade(Zerg.HydraliskRange))  32.0 else 0.0))
   
   def pixelRangeMax: Double = Math.max(pixelRangeAir, pixelRangeGround)
   
@@ -357,8 +357,8 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   def attacksAgainst    (enemy: UnitInfo)  : Int          = if (enemy.flying) attacksAgainstAir          else attacksAgainstGround
   
   def damageScaleAgainstHitPoints(enemy: UnitInfo): Double = {
-    if (airDpf    <= 0 && enemy.flying) return 0.0
-    if (groundDpf <= 0)                 return 0.0
+    if (airDpf    <= 0 && enemy.flying)   return 0.0
+    if (groundDpf <= 0&& ! enemy.flying)  return 0.0
     Damage.scaleBySize(damageTypeAgainst(enemy), enemy.unitClass.size)
   }
   
@@ -439,10 +439,21 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     && enemy.canBeAttacked
     && (if (enemy.flying) unitClass.attacksAir else unitClass.attacksGround)
     && ! enemy.effectivelyCloaked
-    && ! friendly.exists(_.transport.isDefined)
-    && ! ((enemy.unitClass.floats || enemy.unitClass.isBuilding) && is(Terran.SpiderMine))
+    && ! friendly.exists(_.loaded)
+    && (enemy.unitClass.canBeTargetedBySpiderMines || ! isSpiderMine())
     && (unitClass.unaffectedByDarkSwarm || ! enemy.underDarkSwarm)
   )
+  
+  // Stupid, but helps performance
+  protected class CacheIs(unitClass: UnitClass) extends Cache(() => is(unitClass))
+  protected lazy val isSpiderMine         : CacheIs = new CacheIs(Terran.SpiderMine)
+  protected lazy val isBunker             : CacheIs = new CacheIs(Terran.Bunker)
+  protected lazy val isMarine             : CacheIs = new CacheIs(Terran.Marine)
+  protected lazy val isGoliath            : CacheIs = new CacheIs(Terran.Goliath)
+  protected lazy val isSiegeTankUnsieged  : CacheIs = new CacheIs(Terran.SiegeTankUnsieged)
+  protected lazy val isDragoon            : CacheIs = new CacheIs(Protoss.Dragoon)
+  protected lazy val isInterceptor        : CacheIs = new CacheIs(Protoss.Interceptor)
+  protected lazy val isHydralisk          : CacheIs = new CacheIs(Zerg.Hydralisk)
   
   // Frame X:     Unit's cooldown is 0.   Unit starts attacking.
   // Frame X-1:   Unit's cooldown is 1.   Unit receives attack order.
@@ -473,7 +484,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     else Int.MaxValue
   }
   
-  def canStim: Boolean = (is(Terran.Marine) || is(Terran.Firebat)) && player.hasTech(Terran.Stim) && hitPoints > 10
+  def canStim: Boolean = unitClass.canStim && player.hasTech(Terran.Stim) && hitPoints > 10
   
   def moving: Boolean = velocityX != 0 || velocityY != 0
   
@@ -521,7 +532,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   
   def likelyStillThere: Boolean =
     possiblyStillThere &&
-    ( ! canMove || With.framesSince(lastSeen) < With.configuration.fogPositionDurationFrames || is(Terran.SiegeTankUnsieged))
+    ( ! canMove || With.framesSince(lastSeen) < With.configuration.fogPositionDurationFrames || isSiegeTankUnsieged())
   
   def likelyStillAlive: Boolean =
     likelyStillThere      ||

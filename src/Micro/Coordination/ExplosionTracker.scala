@@ -1,5 +1,6 @@
 package Micro.Coordination
 
+import Information.Battles.Types.Battle
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Micro.Coordination.Explosions._
@@ -9,54 +10,65 @@ import ProxyBwapi.UnitInfo.UnitInfo
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 
 class ExplosionTracker {
   
-  var all: Vector[Explosion] = Vector.empty
+  def all: Set[Explosion] = byBattle.values.flatten.toSet
+  private val byBattle: mutable.HashMap[Battle, ArrayBuffer[Explosion]] = mutable.HashMap.empty
   
-  def run() {
-    val bullets = With.bullets.all.flatMap(explosionFromBullet)
-    val units = With.units.all.flatMap(explosionFromUnit)
-    val nukes = With.game.getNukeDots.asScala.map(new Pixel(_)).map(explosionFromNuke)
-    // TODO: Shoves
-    all = Vector.empty ++ bullets ++ units ++ nukes
+  def nearUnit(unit: UnitInfo): Iterable[Explosion] = {
+    if (unit.battle.isDefined)
+      byBattle.getOrElse(unit.battle.get, Iterable.empty)
+    else
+      Iterable.empty
   }
   
-  def explosionFromBullet(bullet: BulletInfo): Option[Explosion] = {
-    if (bullet.sourceUnit.exists(_.is(Terran.ScienceVessel)))
-      Some(new ExplosionEMP(bullet))
-    else if (bullet.sourceUnit.exists(_.is(Zerg.Lurker)) && bullet.sourceUnit.get.isEnemy)
-      None
-      //Some(new ExplosionLurkerNow(bullet))
-    else if (bullet.sourceUnit.exists(_.is(Protoss.HighTemplar)))
-      Some(new ExplosionPsionicStorm(bullet))
-    else
-      None
+  protected def addToBattle(unit: UnitInfo, explosion: Explosion) {
+    unit.battle.foreach(addToBattle(_, explosion))
+  }
+  
+  protected def addToBattle(battle: Battle, explosion: Explosion) {
+    byBattle(battle) = byBattle.getOrElse(battle, ArrayBuffer.empty)
+    byBattle(battle) += explosion
+  }
+  
+  protected def addToNearbyUnits(pixel: Pixel, explosion: Explosion) {
+    val units = With.units.inTileRadius(pixel.tileIncluding, 8)
+    val battles = units.flatMap(_.battle).toSet
+    battles.foreach(addToBattle(_, explosion))
+  }
+  
+  def run() {
+    byBattle.clear()
+    With.bullets.all.foreach(explosionFromBullet)
+    With.units.all.foreach(explosionFromUnit)
+    With.game.getNukeDots.asScala.map(new Pixel(_)).foreach(explosionFromNuke)
+  }
+  
+  def explosionFromBullet(bullet: BulletInfo) {
+    val sourceUnit = bullet.sourceUnit
+    if (sourceUnit.exists(_.is(Terran.ScienceVessel)))
+      addToBattle(sourceUnit.get, new ExplosionEMP(bullet))
+    else if (sourceUnit.exists(_.is(Zerg.Lurker)) && bullet.sourceUnit.get.isEnemy)
+      addToBattle(sourceUnit.get, new ExplosionLurkerNow(bullet))
+    else if (sourceUnit.exists(_.is(Protoss.HighTemplar)))
+      addToBattle(sourceUnit.get, new ExplosionPsionicStorm(bullet))
   }
   
   def explosionFromUnit(unit: UnitInfo): Vector[Explosion] = {
     val output = new mutable.ArrayBuffer[Explosion]
-    // TODO -- add irradiate property
-    /*
-    if (unit.irradiated) {
-      output += new ExplosionIrradiate()(unit)
+    if (unit.irradiated)
+      addToBattle(unit, new ExplosionIrradiateSplash(unit))
+    if (unit.is(Terran.SpiderMine)) {
+      addToBattle(unit, new ExplosionSpiderMineTrigger(unit))
+      addToBattle(unit, new ExplosionSpiderMineBlast(unit))
     }
-    */
-    if (unit.is(Terran.SpiderMine)
-      && With.grids.friendlyVision.isSet(unit.tileIncludingCenter)
-      && unit.battle.isDefined
-      && unit.matchups.targets.exists(_.pixelDistanceEdge(unit) < 32 * 8)) {
-      output += new ExplosionSpiderMineTrigger(unit)
-      output += new ExplosionSpiderMineBlast(unit)
-    }
-    if (unit.is(Zerg.InfestedTerran)
-      && unit.visible
-      && unit.battle.isDefined
-      && unit.matchups.targets.exists(_.pixelDistanceEdge(unit) < 32 * 8)) {
-      output += new ExplosionInfestedTerran(unit)
+    if (unit.is(Zerg.InfestedTerran)) {
+      addToBattle(unit, new ExplosionInfestedTerran(unit))
     }
     if (unit.is(Protoss.Scarab) && unit.visible && ! unit.isOurs) {
-      output += new ExplosionScarab(unit)
+      addToNearbyUnits(unit.pixelCenter, new ExplosionScarab(unit))
     }
     if (unit.is(Zerg.Lurker)
       && ! unit.isOurs
@@ -73,7 +85,7 @@ class ExplosionTracker {
     output.toVector
   }
   
-  def explosionFromNuke(dot: Pixel): Explosion = {
-    new ExplosionNuke(dot)
+  def explosionFromNuke(dot: Pixel) {
+    addToNearbyUnits(dot, new ExplosionNuke(dot))
   }
 }

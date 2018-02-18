@@ -46,7 +46,7 @@ class DefendZones extends Plan {
   }
   
   private def zoneValue(zone: Zone): Double = {
-    zone.bases.map(baseValue).sum
+    zone.bases.map(baseValue).sum + zone.units.filter(u => u.unitClass.isBuilding && u.isOurs).map(_.subjectiveValue).sum
   }
   
   private def baseValue(base: Base): Double = {

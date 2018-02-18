@@ -4,18 +4,17 @@ import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
 import Planning.Composition.UnitCounters.UnitCountExactly
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
-import Planning.Plans.Army.{Attack, DefendEntrance}
+import Planning.Plans.Army.DefendEntrance
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
-import Planning.Plans.Macro.Expanding.{BuildCannonsAtExpansions, BuildCannonsAtNatural, RequireMiningBases}
+import Planning.Plans.Macro.Expanding.{BuildCannonsAtExpansions, BuildCannonsAtNatural}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
-import Planning.Plans.Predicates.Economy.MineralsAtLeast
 import Planning.Plans.Predicates.Employing
 import Planning.Plans.Predicates.Milestones.{IfOnMiningBases, UnitsAtLeast}
 import Planning.Plans.Predicates.Reactive.EnemyBio
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvT.{PvT2BaseCarrier, PvT2BaseReaverCarrier, PvTEarly1BaseCarrier}
+import Strategery.Strategies.Protoss.PvT.{PvT2BaseCarrier, PvT2BaseReaverCarrier}
 
 class PvT2BaseCarriers extends GameplanModeTemplate {
   
@@ -29,50 +28,41 @@ class PvT2BaseCarriers extends GameplanModeTemplate {
     },
     new PvTIdeas.PriorityAttacks)
   
-  override def defaultAttackPlan: Plan = new If(
-    new Or(
-      new UnitsAtLeast(24, Protoss.Interceptor),
-      new Employing(PvTEarly1BaseCarrier)),
-    new Attack)
+  override def defaultAttackPlan: Plan = new PvTIdeas.AttackRespectingMines
   
   override val buildPlans = Vector(
     new PvTIdeas.Require2BaseTech,
     new If(
-      new UnitsAtLeast(1, Protoss.Interceptor),
+      new UnitsAtLeast(2, Protoss.Carrier, complete = true),
       new Build(RequestUpgrade(Protoss.CarrierCapacity))),
-    new If(
-      new Or(
-        new UnitsAtLeast(24, Protoss.Interceptor),
-        new MineralsAtLeast(700)),
-      new RequireMiningBases(3)),
     new IfOnMiningBases(3, new BuildCannonsAtNatural(1)),
     new BuildCannonsAtExpansions(3),
     
     new FlipIf(
       new UnitsAtLeast(12, UnitMatchWarriors),
-      
+      new PvTIdeas.TrainArmy,
       new Parallel(
-        new PvTIdeas.TrainArmy,
-        new BuildOrder(RequestAtLeast(3, Protoss.Gateway))),
-      
-      new Parallel(
+        new Build(
+          RequestAtLeast(1, Protoss.RoboticsFacility),
+          RequestAtLeast(3, Protoss.Gateway),
+          RequestAtLeast(1, Protoss.Observatory)),
         new If(
           new Or(
             new Employing(PvT2BaseReaverCarrier),
             new EnemyBio),
-          new Build(
-            RequestAtLeast(1, Protoss.RoboticsFacility),
-            RequestAtLeast(1, Protoss.RoboticsSupportBay))),
+          new Build(RequestAtLeast(1, Protoss.RoboticsSupportBay))),
         new If(
           new Or(
             new Employing(PvT2BaseCarrier),
             new UnitsAtLeast(1, Protoss.Reaver),
             new UnitsAtLeast(1, Protoss.Stargate)),
           new Parallel(
-            new Build(
+            new BuildOrder(
               RequestAtLeast(1, Protoss.Stargate),
               RequestAtLeast(1, Protoss.FleetBeacon),
-              RequestAtLeast(2, Protoss.Stargate)))),
+              RequestAtLeast(2, Protoss.Stargate),
+              RequestAtLeast(2, Protoss.Carrier),
+              RequestUpgrade(Protoss.AirDamage)))),
         new If(
           new And(
             new EnemyBio,

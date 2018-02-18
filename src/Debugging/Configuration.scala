@@ -79,7 +79,7 @@ class Configuration {
   var buildingPlacementBatchingStartFrame = GameTime(4, 0)()
   var buildingPlacementMaximumQueue       = 12
   var buildingPlacementTestsPathing       = false
-  var unitHistoryAge                      = GameTime(0, 3)()
+  var unitHistoryAge                      = 24 * 2 + 12
   
   var urgencyManners            = 1
   var urgencyEconomy            = 1

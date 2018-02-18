@@ -269,6 +269,7 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo (o
     _braking      = unitClass.canMove           &&  baseUnit.isBraking
     _ensnared     = ! unitClass.isBuilding      &&  baseUnit.isEnsnared
     _flying       = unitClass.canFly            &&  baseUnit.isFlying
+    _irradiated   = unitClass.canBeIrradiated   &&  baseUnit.isIrradiated
     _lifted       = unitClass.isFlyingBuilding  &&  baseUnit.isLifted
     _lockedDown   = unitClass.canBeLockedDown   &&  baseUnit.isLockedDown
     _maelstrommed = unitClass.canBeMaelstrommed &&  baseUnit.isMaelstrommed
@@ -285,6 +286,7 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo (o
   private var _braking        : Boolean   = _
   private var _ensnared       : Boolean   = _
   private var _flying         : Boolean   = _
+  private var _irradiated     : Boolean   = _
   private var _lifted         : Boolean   = _
   private var _lockedDown     : Boolean   = _
   private var _maelstrommed   : Boolean   = _
@@ -300,6 +302,7 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo (o
   def braking       : Boolean = _braking
   def ensnared      : Boolean = _ensnared
   def flying        : Boolean = _flying
+  def irradiated    : Boolean = _irradiated
   def lifted        : Boolean = _lifted
   def lockedDown    : Boolean = _lockedDown
   def maelstrommed  : Boolean = _maelstrommed

@@ -16,7 +16,7 @@ class PvT4Gate extends GameplanModeTemplate {
   override val completionCriteria = new MiningBasesAtLeast(2)
   override val aggression         = 1.2
   override val defaultAttackPlan  = new Attack
-  override val buildOrder         = ProtossBuilds.Opening10Gate15GateDragoons
+  override val buildOrder         = ProtossBuilds.Opening_4GateDragoon
   
   override val buildPlans = Vector(
     new RequireMiningBases(2),

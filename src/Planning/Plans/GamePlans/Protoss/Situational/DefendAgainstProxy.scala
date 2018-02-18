@@ -1,6 +1,7 @@
 package Planning.Plans.GamePlans.Protoss.Situational
 
 import Information.Geography.Types.Base
+import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Micro.Squads.Goals.SquadPush
 import Micro.Squads.Squad
@@ -23,6 +24,10 @@ class DefendAgainstProxy extends Plan {
   
   override def onUpdate() {
   
+    if (With.frame > GameTime(5, 0)()) {
+      return
+    }
+    
     val proxies = getProxies.sortBy(_.totalHealth).sortBy(_.remainingBuildFrames)
     val squad = new Squad(this)
     

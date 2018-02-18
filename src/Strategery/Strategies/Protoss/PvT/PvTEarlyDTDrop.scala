@@ -8,7 +8,6 @@ object PvTEarlyDTDrop extends Strategy {
   override def choices: Iterable[Iterable[Strategy]] = Vector(
     Vector(
       PvT2BaseArbiter,
-      PvT2BaseReaverCarrier,
       PvT2BaseGateway,
       PvT2BaseGatewayForever,
       PvTFastThird))

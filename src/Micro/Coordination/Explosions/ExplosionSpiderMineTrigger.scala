@@ -11,9 +11,7 @@ class ExplosionSpiderMineTrigger(mine: UnitInfo) extends ExplosionRadial {
   override def center: Pixel = mine.pixelCenter
   override def radius: Double = 96 + mine.pixelRangeMax
   override def affects(unit: UnitInfo): Boolean = (
-    ! unit.flying
-    && ! unit.unitClass.floats
-    && ! unit.unitClass.isBuilding
+    unit.unitClass.canBeTargetedBySpiderMines
     && unit.isEnemyOf(mine)
     && (mine.burrowed || (
       With.framesSince(mine.frameDiscovered) < 48)

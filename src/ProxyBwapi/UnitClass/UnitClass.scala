@@ -72,6 +72,11 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
       Zerg.Drone)
     .contains(this)
   
+  lazy val canBeTargetedBySpiderMines: Boolean = (
+    ! floats
+    && ! isFlyer
+    && ! isBuilding)
+  
   lazy val splashesFriendly: Boolean = Array(
       Terran.SiegeTankSieged,
       Terran.SpiderMine,
@@ -470,13 +475,17 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   // These largely exist for performance reasons;
   // We want to avoid calling isTHING methods for units where it will always be true
   
-  lazy val canFly            : Boolean = isFlyer || isFlyingBuilding
-  lazy val canStim           : Boolean = this == Terran.Marine || this == Terran.Firebat
-  lazy val canSiege          : Boolean = this == Terran.SiegeTankUnsieged || this == Terran.SiegeTankSieged
-  lazy val canBeLockedDown   : Boolean = isMechanical  && ! isBuilding
-  lazy val canBeMaelstrommed : Boolean = isOrganic     && ! isBuilding
-  lazy val canBeEnsnared     : Boolean = ! isBuilding
-  lazy val canBeStasised     : Boolean = ! isBuilding
+  lazy val canFly               : Boolean = isFlyer || isFlyingBuilding
+  lazy val canBurrow            : Boolean = Vector(Terran.SpiderMine, Zerg.Drone, Zerg.Zergling, Zerg.Hydralisk, Zerg.Lurker, Zerg.Defiler).contains(this)
+  lazy val canStim              : Boolean = this == Terran.Marine || this == Terran.Firebat
+  lazy val canSiege             : Boolean = this == Terran.SiegeTankUnsieged || this == Terran.SiegeTankSieged
+  lazy val canBeIrradiated      : Boolean = ! isBuilding
+  lazy val canBeIrradiateBurned : Boolean = ! isBuilding && isOrganic
+  lazy val canBeLockedDown      : Boolean = ! isBuilding && isMechanical
+  lazy val canBeMaelstrommed    : Boolean = ! isBuilding && isOrganic
+  lazy val canBeEnsnared        : Boolean = ! isBuilding
+  lazy val canBeStasised        : Boolean = ! isBuilding
+  lazy val canBeTransported     : Boolean = ! isBuilding && spaceRequired <= 8 // BWAPI gives 255 for unloadable units
   
   /////////////////
   // Convenience //

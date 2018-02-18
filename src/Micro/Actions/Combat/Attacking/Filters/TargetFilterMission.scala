@@ -19,7 +19,7 @@ object TargetFilterMission extends TargetFilter {
     lazy val inRange      = actor.inRangeToAttack(target)
     lazy val atOurWorkers = target.base.exists(_.owner.isUs) && target.matchups.targetsInRange.exists(_.unitClass.isWorker)
   
-    lazy val alliesAssisting  = actor.matchups.allies.exists(ally =>
+    lazy val alliesAssisting  = target.matchups.threats.exists(ally =>
       ally.topSpeed >= target.topSpeed
       && ally.framesBeforeAttacking(target) < GameTime(0, 1)())
   

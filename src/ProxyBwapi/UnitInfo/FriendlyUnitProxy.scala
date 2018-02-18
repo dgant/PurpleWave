@@ -22,8 +22,6 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit, id: Int) extends UnitInfo(bas
   private val cacheCompleted = new Cache[Boolean]    (() =>  base.isCompleted)
   private val cacheExists    = new Cache[Boolean]    (() =>  base.exists)
   private val cacheSelected  = new Cache[Boolean]    (() =>  base.isSelected)
-  private val cachedCloaked  = new Cache[Boolean]    (() =>  base.isCloaked)
-  private val cachedFlying   = new Cache[Boolean]    (() =>  unitClass.canFly && base.isFlying)
   
   ///////////////////
   // Tracking info //
@@ -96,10 +94,11 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit, id: Int) extends UnitInfo(bas
   def right       : Int   = cacheRight()
   def bottom      : Int   = cacheBottom()
   
-  private val cacheTop    = new Cache(() => base.getTop)
-  private val cacheLeft   = new Cache(() => base.getLeft)
-  private val cacheRight  = new Cache(() => base.getRight)
-  private val cacheBottom = new Cache(() => base.getBottom)
+  private val useRealDimensions = ! isInterceptor() && ! isSpiderMine()
+  private val cacheTop    = new Cache(() => if (useRealDimensions) base.getTop    else pixelCenter.y - unitClass.height / 2)
+  private val cacheLeft   = new Cache(() => if (useRealDimensions) base.getLeft   else pixelCenter.x - unitClass.width  / 2)
+  private val cacheRight  = new Cache(() => if (useRealDimensions) base.getRight  else pixelCenter.x + unitClass.width  / 2)
+  private val cacheBottom = new Cache(() => if (useRealDimensions) base.getBottom else pixelCenter.y + unitClass.height / 2)
   
   ////////////
   // Orders //
@@ -183,13 +182,15 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit, id: Int) extends UnitInfo(bas
   // Visibility //
   ////////////////
   
-  def burrowed  : Boolean = isBurrowedCache()
+  def burrowed  : Boolean = unitClass.canBurrow && isBurrowedCache()
   def cloaked   : Boolean = cachedCloaked()
-  def detected  : Boolean = base.isDetected
+  def detected  : Boolean = isDetectedCache()
   def visible   : Boolean = isVisibleCache()
   
   private val isBurrowedCache = new Cache(() => base.isBurrowed)
-  private val isVisibleCache = new Cache(() => base.isVisible)
+  private val cachedCloaked   = new Cache(() => base.isCloaked)
+  private val isDetectedCache = new Cache(() => base.isDetected)
+  private val isVisibleCache  = new Cache(() => base.isVisible)
   
   //////////////
   // Movement //
@@ -199,26 +200,32 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit, id: Int) extends UnitInfo(bas
   def angleRadians  : Double  = cachedAngleRadians()
   def braking       : Boolean = base.isBraking
   def ensnared      : Boolean = cachedIsEnsnared()
-  def flying        : Boolean = (unitClass.isFlyer || unitClass.isFlyingBuilding) && cachedFlying()
-  def lifted        : Boolean = unitClass.isFlyingBuilding && base.isLifted
+  def flying        : Boolean = cachedFlying()
+  def irradiated    : Boolean = cachedIrradiated()
+  def lifted        : Boolean = cachedLifted()
+  def loaded        : Boolean = cachedLoaded()
   def lockedDown    : Boolean = cachedIsLockedDown()
   def maelstrommed  : Boolean = cachedIsMaelstrommed()
   def sieged        : Boolean = cachedIsSieged()
   def stasised      : Boolean = cachedStasised()
   def stimmed       : Boolean = cachedIsStimmed()
   def stuck         : Boolean = unitClass.canMove && base.isStuck
-  def velocityX     : Double  = if (unitClass.canMove) cacheVelocityX() else 0
-  def velocityY     : Double  = if (unitClass.canMove) cacheVelocityX() else 0
+  def velocityX     : Double  = if (unitClass.canMove || lifted) cacheVelocityX() else 0
+  def velocityY     : Double  = if (unitClass.canMove || lifted) cacheVelocityY() else 0
   
-  private val cachedAngleRadians = new Cache(() => base.getAngle)
-  private val cacheVelocityX = new Cache(() => base.getVelocityX)
-  private val cacheVelocityY = new Cache(() => base.getVelocityY)
-  private val cachedIsSieged        = new Cache(() => unitClass.canSiege          &&  base.isSieged)
-  private val cachedIsStimmed       = new Cache(() => unitClass.canBeStasised     &&  base.isStimmed)
-  private val cachedIsLockedDown    = new Cache(() => unitClass.canBeLockedDown   &&  base.isLockedDown)
-  private val cachedStasised        = new Cache(() => unitClass.canBeStasised     &&  base.isStasised)
-  private val cachedIsEnsnared      = new Cache(() => unitClass.canBeEnsnared     &&  base.isEnsnared)
-  private val cachedIsMaelstrommed  = new Cache(() => unitClass.canBeMaelstrommed &&  base.isMaelstrommed)
+  private val cachedAngleRadians    = new Cache(() => base.getAngle)
+  private val cacheVelocityX        = new Cache(() => base.getVelocityX)
+  private val cacheVelocityY        = new Cache(() => base.getVelocityY)
+  private val cachedFlying          = new Cache(() => (unitClass.canFly || lifted)  && base.isFlying)
+  private val cachedLifted          = new Cache(() => unitClass.isFlyingBuilding    && base.isLifted)
+  private val cachedLoaded          = new Cache(() => unitClass.canBeTransported    && base.isLoaded)
+  private val cachedIrradiated      = new Cache(() => unitClass.canBeIrradiated     && base.isIrradiated)
+  private val cachedIsSieged        = new Cache(() => unitClass.canSiege            && base.isSieged)
+  private val cachedIsStimmed       = new Cache(() => unitClass.canBeStasised       && base.isStimmed)
+  private val cachedIsLockedDown    = new Cache(() => unitClass.canBeLockedDown     && base.isLockedDown)
+  private val cachedStasised        = new Cache(() => unitClass.canBeStasised       && base.isStasised)
+  private val cachedIsEnsnared      = new Cache(() => unitClass.canBeEnsnared       && base.isEnsnared)
+  private val cachedIsMaelstrommed  = new Cache(() => unitClass.canBeMaelstrommed   && base.isMaelstrommed)
   
   //////////////
   // Statuses //

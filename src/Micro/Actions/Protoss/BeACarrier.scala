@@ -1,10 +1,10 @@
 package Micro.Actions.Protoss
 
+import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Micro.Actions.Action
 import Micro.Actions.Combat.Attacking.Target
-import Micro.Actions.Combat.Maneuvering.{OldAvoid, CliffAvoid}
-import Micro.Actions.Commands.{Attack, AttackMove}
-import Micro.Heuristics.Targeting.EvaluateTargets
+import Micro.Actions.Combat.Maneuvering.{CliffAvoid, OldAvoid}
+import Micro.Actions.Commands.AttackMove
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders, UnitInfo}
 
@@ -23,7 +23,7 @@ object BeACarrier extends Action {
     lazy val interceptorsTotal        = unit.interceptors.count(_.aliveAndComplete)
     lazy val interceptorsFighting     = unit.interceptors.count(i => interceptorActiveOrders.contains(i.order))
     lazy val interceptorsAreShooting  = interceptorsFighting >= interceptorsTotal - 1
-    lazy val exitingLeash             = unit.matchups.targets.forall(_.pixelDistanceEdge(unit) > 32.0 * 7.0)
+    lazy val exitingLeash             = unit.matchups.targets.filter(_.matchups.framesToLiveDiffused > GameTime(0, 2)()).forall(_.pixelDistanceEdge(unit) > 32.0 * 7.0)
     lazy val interceptorsNeedKick     = interceptorsTotal > 0 && (exitingLeash || ! interceptorsAreShooting)
     
     def threatUnacceptable(threat: UnitInfo): Boolean = {
@@ -39,21 +39,12 @@ object BeACarrier extends Action {
       OldAvoid.consider(unit)
     }
     else if (unit.matchups.targets.nonEmpty && interceptorsNeedKick && (unit.matchups.threats.isEmpty || interceptorsTotal > 2)) {
-      
-      // AIIDE 2017 hack for Ximp -- focus down the Carriers
-      if (unit.matchups.targets.forall(t => t.flying)) {
-        val carriers = unit.matchups.targets.filterNot(_.is(Protoss.Interceptor))
-        unit.agent.toAttack = EvaluateTargets.best(unit, carriers)
-        Attack.consider(unit)
+      Target.consider(unit)
+      if (unit.agent.toAttack.isDefined) {
+        val attackPoint = unit.agent.toAttack.get.pixelCenter.project(unit.pixelCenter, 7.5 * 32.0)
+        unit.agent.toTravel = Some(attackPoint)
       }
-      else {
-        Target.consider(unit)
-        if (unit.agent.toAttack.isDefined) {
-          val attackPoint = unit.agent.toAttack.get.pixelCenter.project(unit.pixelCenter, 7.5 * 32.0)
-          unit.agent.toTravel = Some(attackPoint)
-        }
-        AttackMove.consider(unit)
-      }
+      AttackMove.consider(unit)
     }
     else {
       CliffAvoid.consider(unit)

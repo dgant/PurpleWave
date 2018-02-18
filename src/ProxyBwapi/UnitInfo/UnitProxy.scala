@@ -102,6 +102,7 @@ abstract class UnitProxy(var baseUnit: bwapi.Unit, val id: Int) {
   def braking: Boolean
   def ensnared: Boolean
   def flying: Boolean
+  def irradiated: Boolean
   def lifted: Boolean
   def lockedDown: Boolean
   def maelstrommed: Boolean

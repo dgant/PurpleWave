@@ -456,8 +456,9 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   def pixelReachMax     (framesAhead: Int): Double = Math.max(pixelReachAir(framesAhead), pixelReachGround(framesAhead))
   def pixelReachAgainst (framesAhead: Int, enemy:UnitInfo): Double = if (enemy.flying) pixelReachAir(framesAhead) else pixelReachGround(framesAhead)
   
-  def inRangeToAttack(enemy: UnitInfo)                    : Boolean = pixelDistanceEdge(enemy) <= pixelRangeAgainst(enemy) + With.configuration.attackableRangeBufferPixels && (pixelRangeMin <= 0.0 || pixelDistanceEdge(enemy) > pixelRangeMin)
-  def inRangeToAttack(enemy: UnitInfo, framesAhead: Int)  : Boolean = enemy.projectFrames(framesAhead).pixelDistanceFast(projectFrames(framesAhead)) <= pixelRangeAgainst(enemy) + unitClass.radialHypotenuse + enemy.unitClass.radialHypotenuse + With.configuration.attackableRangeBufferPixels //TODO: Needs min range!
+  def inRangeToAttack(enemy: UnitInfo)                    : Boolean = inRangeToAttack(enemy, enemy.pixelCenter)
+  def inRangeToAttack(enemy: UnitInfo, targetAt: Pixel)   : Boolean = pixelDistanceEdge(enemy) <= pixelRangeAgainst(enemy) + With.configuration.attackableRangeBufferPixels && (pixelRangeMin <= 0.0 || pixelDistanceEdge(enemy, targetAt) > pixelRangeMin)
+  def inRangeToAttack(enemy: UnitInfo, framesAhead: Int)  : Boolean = inRangeToAttack(enemy, enemy.projectFrames(framesAhead))
   
   def framesToTravelTo(destination: Pixel)  : Int = framesToTravelPixels(pixelDistanceTravelling(destination))
   def framesToTravelPixels(pixels: Double)  : Int = if (pixels <= 0.0) 0 else if (canMove) Math.max(0, Math.ceil(pixels/topSpeed).toInt) else Int.MaxValue

@@ -13,7 +13,8 @@ object TargetFilterMission extends TargetFilter {
     lazy val cleanup      = With.intelligence.firstEnemyMain.isDefined && With.geography.enemyBases.isEmpty
     lazy val pillaging    = actor.agent.canPillage || cleanup
     lazy val destination  = actor.agent.destination.zone
-    lazy val arrived      = actor.zone == destination || target.zone == destination
+    lazy val targetZone   = target.zone
+    lazy val arrived      = targetZone == destination || targetZone.bases.exists(_.owner == destination.owner)
     lazy val engaged      = actor.matchups.allies.exists(_.matchups.threatsInRange.nonEmpty)
     lazy val inRange      = actor.inRangeToAttack(target)
     lazy val atOurWorkers = target.base.exists(_.owner.isUs) && target.matchups.targetsInRange.exists(_.unitClass.isWorker)

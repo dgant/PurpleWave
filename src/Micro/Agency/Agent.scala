@@ -90,7 +90,7 @@ class Agent(val unit: FriendlyUnitInfo) {
       val path = zonePath(to)
       cachedWaypoint(to) =
         if (path.isEmpty || path.get.steps.isEmpty)
-          origin.zone.centroid.pixelCenter
+          to
         else
           path.get.steps.head.edge.pixelCenter
     }

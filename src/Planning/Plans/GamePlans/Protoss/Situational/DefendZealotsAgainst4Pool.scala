@@ -6,6 +6,7 @@ import Planning.Composition.Property
 import Planning.Composition.ResourceLocks.LockUnits
 import Planning.Composition.UnitCounters.UnitCountExactly
 import Planning.Composition.UnitMatchers.UnitMatchWorkers
+import Planning.Composition.UnitPreferences.UnitPreferClose
 import Planning.Plan
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
@@ -49,9 +50,11 @@ class DefendZealotsAgainst4Pool extends Plan {
     val target          = zealots.minBy(zealot => zerglings.map(_.pixelDistanceEdge(zealot)).min).pixelCenter
     
     defenders.get.unitCounter.set(UnitCountExactly(workersToFight))
+    defenders.get.unitPreference.set(UnitPreferClose(target))
     defenders.get.acquire(this)
     defenders.get.units.foreach(_.agent.intend(this, new Intention {
       toTravel = Some(target)
+      canBerzerk = true
     }))
   }
 }

@@ -2,6 +2,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvZ
 
 import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
+import Planning.Plan
 import Planning.Plans.Army.Aggression
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
@@ -13,7 +14,7 @@ import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Predicates.Economy.GasAtLeast
 import Planning.Plans.Predicates.Employing
 import Planning.Plans.Predicates.Milestones._
-import ProxyBwapi.Races.Protoss
+import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Protoss.PvZ.PvZ4GateDragoonAllIn
 
 class PvZ4GateGoon extends GameplanModeTemplate {
@@ -31,6 +32,12 @@ class PvZ4GateGoon extends GameplanModeTemplate {
       new Aggression(3.0),
       new Aggression(5.0)))
   
+  override def defaultAttackPlan: Plan = new If(
+    new Or(
+      new EnemyUnitsAtMost(0, UnitMatchWarriors),
+      new UnitsAtLeast(4, UnitMatchWarriors, complete = true)),
+    super.defaultAttackPlan)
+  
   override def buildPlans = Vector(
     new If(
       new EnemyHasShownCloakedThreat,
@@ -44,7 +51,9 @@ class PvZ4GateGoon extends GameplanModeTemplate {
     new If(
       new And(
         new GasAtLeast(50),
-        new UnitsAtLeast(6, Protoss.Zealot),
+        new Or(
+          new UnitsAtLeast(6, Protoss.Zealot),
+          new EnemyHasShown(Zerg.Mutalisk)),
         new UpgradeComplete(Protoss.DragoonRange, 1, Protoss.DragoonRange.upgradeTime(1))),
       new TrainContinuously(Protoss.Dragoon),
       new TrainContinuously(Protoss.Zealot)),

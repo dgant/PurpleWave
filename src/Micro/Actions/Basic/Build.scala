@@ -6,7 +6,7 @@ import Mathematics.Points.Tile
 import Micro.Actions.Action
 import Micro.Actions.Combat.Attacking.Target
 import Micro.Actions.Combat.Decisionmaking.{Fight, FightOrFlight}
-import Micro.Actions.Commands.Attack
+import Micro.Actions.Commands.{Attack, Move}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
 
@@ -70,6 +70,16 @@ object Build extends Action {
     }
     else {
       blockersOurs.flatMap(_.friendly).filter(_.matchups.framesOfSafetyDiffused > GameTime(0, 1)()).foreach(_.agent.shove(unit))
+      
+      val buildPixel = unit.agent.toBuildTile.get.pixelCenter
+      val waypoint = unit.agent.nextWaypoint(buildPixel)
+      if (
+        unit.zone != buildPixel.zone
+        && unit.pixelDistanceCenter(buildPixel) > 32.0 * 5.0
+        && unit.pixelDistanceCenter(waypoint) > unit.unitClass.haltPixels) {
+        unit.agent.toTravel = Some(waypoint)
+        Move.delegate(unit)
+      }
       With.commander.build(unit, unit.agent.toBuild.get, unit.agent.lastIntent.toBuildTile.get)
     }
   }

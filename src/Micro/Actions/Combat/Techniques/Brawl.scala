@@ -18,7 +18,7 @@ object Brawl extends ActionTechnique {
   )
   
   override def applicabilitySelf(unit: FriendlyUnitInfo): Double = {
-    lazy val brawlers = unit.matchups.threats.filter(t => t.unitClass.melee && inBrawlRange(unit, t))
+    lazy val brawlers = unit.matchups.threats.filter(t => ! t.flying && t.unitClass.melee && inBrawlRange(unit, t))
     if (unit.unitClass.melee && brawlers.size >= 3) 1.0 else 0.0
   }
   

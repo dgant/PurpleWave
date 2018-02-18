@@ -156,4 +156,8 @@ object PurpleMath {
     
     Math.sqrt(dx * dx + dy * dy)
   }
+  
+  def fastSigmoid(x: Double): Double = {
+    x / (1.0 + Math.abs(x))
+  }
 }

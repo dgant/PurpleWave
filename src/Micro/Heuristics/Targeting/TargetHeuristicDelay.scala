@@ -15,7 +15,9 @@ object TargetHeuristicDelay extends TargetHeuristic {
     val distanceTeam        = candidate.battle.map(_.teamOf(candidate).centroid.pixelDistanceFast(candidate.pixelCenter)).getOrElse(0.0)
     val distanceGoal        = candidate.pixelDistanceCenter(unit.agent.destination)
     val distanceTotal       = distanceUs + distanceTeam
-    val closingSpeed        = Math.max(unit.topSpeed / 4.0, unit.topSpeed - candidate.topSpeed / 2.0)
+    val speedUs             = unit.topSpeed
+    val speedEnemy          = if (candidate.gathering) 0.0 else candidate.topSpeed
+    val closingSpeed        = Math.max(speedUs / 2.0, speedUs - speedEnemy / 2.0)
     val radiansAway         = Math.abs(unit.angleRadians - unit.pixelCenter.radiansTo(candidate.pixelCenter))
     val framesToClose       = PurpleMath.nanToInfinity(distanceTotal / closingSpeed)
     val framesToTurn        = unit.unitClass.framesToTurn(radiansAway)

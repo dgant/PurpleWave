@@ -113,6 +113,14 @@ class Commander {
     sleepAttack(unit)
   }
   
+  def patrol(unit: FriendlyUnitInfo, destination: Pixel) {
+    if (unready(unit)) return
+    
+    unit.baseUnit.patrol(destination.bwapi)
+    
+    sleepAttack(unit)
+  }
+  
   val flyingOvershoot = 288.0
   def move(unit: FriendlyUnitInfo, to: Pixel) {
     if (unready(unit)) return

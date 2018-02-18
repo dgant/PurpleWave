@@ -23,7 +23,7 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit, id: Int) extends UnitInfo(bas
   private val cacheExists    = new Cache[Boolean]    (() =>  base.exists)
   private val cacheSelected  = new Cache[Boolean]    (() =>  base.isSelected)
   private val cachedCloaked  = new Cache[Boolean]    (() =>  base.isCloaked)
-  private val cachedFlying   = new Cache[Boolean]    (() =>  unitClass.canFly         && base.isFlying)
+  private val cachedFlying   = new Cache[Boolean]    (() =>  unitClass.canFly && base.isFlying)
   
   ///////////////////
   // Tracking info //
@@ -199,7 +199,7 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit, id: Int) extends UnitInfo(bas
   def angleRadians  : Double  = cachedAngleRadians()
   def braking       : Boolean = base.isBraking
   def ensnared      : Boolean = cachedIsEnsnared()
-  def flying        : Boolean = cachedFlying()
+  def flying        : Boolean = (unitClass.isFlyer || unitClass.isFlyingBuilding) && cachedFlying()
   def lifted        : Boolean = unitClass.isFlyingBuilding && base.isLifted
   def lockedDown    : Boolean = cachedIsLockedDown()
   def maelstrommed  : Boolean = cachedIsMaelstrommed()
@@ -228,19 +228,34 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit, id: Int) extends UnitInfo(bas
   def remainingUpgradeFrames  : Int = base.getRemainingUpgradeTime
   def remainingTechFrames     : Int = base.getRemainingResearchTime
   
-  def beingConstructed    : Boolean = base.isBeingConstructed
-  def beingGathered       : Boolean = base.isBeingGathered
-  def beingHealed         : Boolean = base.isBeingHealed
-  def blind               : Boolean = base.isBlind
+  private val remainingBuildFramesCache = new Cache(() => base.getRemainingBuildTime)
+  private val remainingUpgradeFramesCache = new Cache(() => base.getRemainingUpgradeTime)
+  private val remainingTechFramesCache = new Cache(() => base.getRemainingResearchTime)
+  
+  def beingConstructed    : Boolean = beingConstructedCache()
+  def beingGathered       : Boolean = beingGatheredCache()
+  def beingHealed         : Boolean = beingHealedCache()
+  def blind               : Boolean = blindCache()
   def carryingMinerals    : Boolean = carryingMineralsCache()
   def carryingGas         : Boolean = carryingGasCache()
-  def powered             : Boolean = base.isPowered
+  def powered             : Boolean = poweredCache()
   def selected            : Boolean = cacheSelected()
-  def targetable          : Boolean = base.isTargetable
-  def underAttack         : Boolean = base.isUnderAttack
-  def underDarkSwarm      : Boolean = base.isUnderDarkSwarm
-  def underDisruptionWeb  : Boolean = base.isUnderDisruptionWeb
-  def underStorm          : Boolean = base.isUnderStorm
+  def targetable          : Boolean = targetableCache()
+  def underAttack         : Boolean = underAttackCache()
+  def underDarkSwarm      : Boolean = underDarkSwarmCache()
+  def underDisruptionWeb  : Boolean = underDisruptionWebCache()
+  def underStorm          : Boolean = underStormCache()
+  
+  private val beingConstructedCache = new Cache(() => base.isBeingConstructed)
+  private val beingGatheredCache = new Cache(() => base.isBeingGathered)
+  private val beingHealedCache = new Cache(() => base.isBeingHealed)
+  private val blindCache = new Cache(() => base.isBlind)
+  private val poweredCache = new Cache(() => base.isPowered)
+  private val targetableCache = new Cache(() => base.isTargetable)
+  private val underAttackCache = new Cache(() => base.isUnderAttack)
+  private val underDarkSwarmCache = new Cache(() => base.isUnderDarkSwarm)
+  private val underDisruptionWebCache = new Cache(() => base.isUnderDisruptionWeb)
+  private val underStormCache = new Cache(() => base.isUnderStorm)
   
   private val carryingMineralsCache = new Cache(() => unitClass.isWorker && base.isCarryingMinerals)
   private val carryingGasCache      = new Cache(() => unitClass.isWorker && base.isCarryingGas)

@@ -208,9 +208,9 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo (o
   def order             : String              = _order
   def orderTarget       : Option[UnitInfo]    = if (_target == null) None else With.units.get(_orderTarget)
   def orderTargetPixel  : Option[Pixel]       = if (badPositions.contains(_orderTargetPosition)) None else Some(new Pixel(_orderTargetPosition))
+  def gatheringMinerals : Boolean             = _gatheringMinerals
+  def gatheringGas      : Boolean             = _gatheringGas
   
-  def gatheringMinerals   : Boolean = baseUnit.isGatheringMinerals
-  def gatheringGas        : Boolean = baseUnit.isGatheringGas
   
   private var _attacking        : Boolean = _
   private var _constructing     : Boolean = _

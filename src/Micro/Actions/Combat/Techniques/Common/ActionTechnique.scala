@@ -18,6 +18,6 @@ abstract class ActionTechnique extends Action {
       .getOrElse(
         other,
         unit.matchups.framesOfEntanglementWith(other, Some(other.unitClass.effectiveRangePixels)))
-    (1.0 + PurpleMath.fastSigmoid(framesOfInvolvement / 12.0)) / 2.0
+    PurpleMath.fastSigmoid(framesOfInvolvement / 12.0)
   }
 }

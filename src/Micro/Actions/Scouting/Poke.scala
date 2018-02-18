@@ -34,7 +34,6 @@ object Poke extends Action {
       unit.agent.toTravel = Some(With.geography.home.pixelCenter)
       Move.delegate(unit)
     }
-  
     
     lazy val targetDistance = unit.pixelRangeAgainst(target) + target.unitClass.radialHypotenuse + unit.unitClass.radialHypotenuse
     lazy val targetPosition = target.pixelCenter.radiateRadians(-target.angleRadians, targetDistance)

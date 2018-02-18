@@ -19,7 +19,7 @@ trait ZonePaths {
     }
     
     if ( ! paths(from).contains(to)) {
-      paths(from)(to) = ZonePathfinder.find(from, to)
+      paths(from)(to) = ZonePathfinder.find(from, from, to)
     }
     
     paths(from)(to)

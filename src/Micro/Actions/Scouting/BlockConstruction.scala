@@ -15,32 +15,20 @@ object BlockConstruction extends Action {
   
   override protected def perform(unit: FriendlyUnitInfo) {
     val builder = blockableBuilders(unit).minBy(_.pixelDistanceEdge(unit))
-    val destination = builder.targetPixel
+    val destination = builder.targetPixel.getOrElse(builder.pixelCenter)
     
-    var fight = false
-    var block = false
-    if (destination.isDefined) {
-      if (unit.pixelDistanceCenter(destination.get) < builder.pixelDistanceCenter(destination.get)) {
-        fight = true
-      }
-      else {
-        block = true
-      }
+    if (unit.framesToGetInRange(builder) > With.reaction.agencyAverage) {
+      unit.agent.toTravel = Some(unit.pixelCenter.project(builder.pixelCenter,
+        unit.pixelDistanceCenter(builder)
+        + unit.unitClass.haltPixels
+        + unit.topSpeed * With.reaction.agencyAverage))
+      Move.delegate(unit)
+    }
+    else if (unit.readyForAttackOrder) {
+      Attack.delegate(unit)
     }
     else {
-      fight = true
-    }
-    if (fight) {
-      unit.agent.toAttack = Some(builder)
-      if (unit.pixelDistanceEdge(builder) >= 16 || unit.readyForAttackOrder) {
-        Attack.delegate(unit)
-      } else {
-        Avoid.delegate(unit)
-      }
-    }
-    else if (block) {
-      unit.agent.toTravel = destination
-      Move.delegate(unit)
+      Avoid.delegate(unit)
     }
   }
   
@@ -48,20 +36,33 @@ object BlockConstruction extends Action {
     lazy val enemyBase = With.geography.enemyBases.headOption
       .getOrElse(With.geography.startBases.minBy(_.lastScoutedFrame))
     
-    unit.matchups.targets.filter(builder =>
-      builder.unitClass.isWorker &&
-      (
-        builder.command.exists(_.getUnitCommandType.toString == UnitCommandType.Build.toString)
-        || builder.targetPixel.exists(targetPixel =>
-          builder.pixelDistanceCenter(targetPixel) < 32.0 * 60.0 &&
-          targetPixel.zone.bases.exists(base =>
-            base.townHall.isEmpty &&
-            base.townHallArea.contains(targetPixel.tileIncluding)))
-        || builder.base.exists(base =>
-          base.heart.groundPixels(With.geography.home) <
-          base.heart.groundPixels(enemyBase.heart.pixelCenter)
-          && builder.pixelDistanceCenter(base.heart.pixelCenter) <
-          unit.pixelDistanceCenter(base.heart.pixelCenter) + 64)
-      ))
+    unit.matchups.targets.filter(builder => {
+      
+      lazy val hasBuildOrder = builder.command.exists(_.getUnitCommandType.toString == UnitCommandType.Build.toString)
+      lazy val targetPixel = builder.targetPixel.getOrElse(builder.pixelCenter)
+      lazy val targetBase = targetPixel.base
+      
+      lazy val movingToTownHallArea = (
+        builder.pixelDistanceCenter(targetPixel) < 32.0 * 60.0
+        && targetBase.exists(_.townHall.isEmpty)
+        && targetBase.exists(_.townHallArea.contains(targetPixel.tileIncluding)))
+      
+      lazy val movingToPossibleExpansion = targetBase.exists(base =>
+        base.owner.isNeutral &&
+        base.heart.groundPixels(enemyBase.heart.pixelCenter) <
+        base.heart.groundPixels(With.geography.home))
+      
+      lazy val suspiciouslyIdle = targetBase.exists(base =>
+        base.owner == builder.player
+        && ! builder.gathering
+        && ! builder.hasBeenViolentInLastTwoSeconds)
+      
+      val output = builder.unitClass.isWorker && (
+        movingToTownHallArea
+        || movingToPossibleExpansion
+        || suspiciouslyIdle)
+      
+      output
+    })
   }
 }

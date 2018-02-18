@@ -6,7 +6,10 @@ import Information.Intelligenze.UnitsShown
 import Lifecycle.With
 import Mathematics.Points.Tile
 import Performance.Cache
+import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.ByOption
+
+import scala.collection.mutable
 
 class Intelligence {
   
@@ -18,6 +21,13 @@ class Intelligence {
   def leastScoutedBases: Iterable[Base] = leastScoutedBasesCache()
   def mostBaselikeEnemyTile: Tile = mostBaselikeEnemyTileCache()
   
+  private val scoutTiles = new mutable.ListBuffer[Tile]
+  private var lastScoutFrame = 0
+  private var flyingScout = false
+  def higlightScout(unit: UnitInfo) {
+    scoutTiles += unit.tileIncludingCenter
+    flyingScout = flyingScout || unit.flying
+  }
   
   private val mostBaselikeEnemyTileCache = new Cache(() =>
     With.units.enemy
@@ -30,13 +40,23 @@ class Intelligence {
   
   private val leastScoutedBasesCache = new Cache(() => {
     lazy val enemyBaseHearts = With.geography.enemyBases.map(_.heart)
-    lazy val weHaveFliers = With.units.ours.exists(_.flying)
     With.geography.bases
       .toVector
-      .filter(base => weHaveFliers || ! base.zone.island)
-      .sortBy(_.heart.tileDistanceFast(With.geography.home))
-      .sortBy( ! _.isStartLocation)
-      .sortBy(base => ByOption.min(enemyBaseHearts.map(_.tileDistanceFast(base.heart))).getOrElse(1.0) / (1.0 + With.framesSince(base.lastScoutedFrame)))
+      .filter( ! _.zone.island || flyingScout)
+      .sortBy(base => {
+        val heart = base.heart.pixelCenter
+        val distanceFromEnemyBase = ByOption.min(enemyBaseHearts.map(_.groundPixels(heart))).getOrElse(1.0)
+        val distanceFromScout =
+          if (scoutTiles.isEmpty)
+            1.0
+          else if (flyingScout)
+            scoutTiles.map(_.pixelCenter.pixelDistanceFast(heart)).min
+          else
+            scoutTiles.map(_.groundPixels(heart)).min
+        val informationAge = 1.0 + With.framesSince(base.lastScoutedFrame)
+        - informationAge / distanceFromScout / distanceFromEnemyBase
+      })
+      .sortBy(base => ! (base.isStartLocation && base.lastScoutedFrame <= 0))
   })
   
   def enemyMain: Option[Base] = {
@@ -50,6 +70,7 @@ class Intelligence {
   def update() {
     unitsShown.update()
     updateEnemyMain()
+    flyingScout = false
   }
   
   private def updateEnemyMain() {

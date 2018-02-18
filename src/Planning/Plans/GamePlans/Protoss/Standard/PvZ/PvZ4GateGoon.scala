@@ -22,15 +22,19 @@ class PvZ4GateGoon extends GameplanModeTemplate {
   override val activationCriteria     = new Employing(PvZ4GateDragoonAllIn)
   override val completionCriteria     = new MiningBasesAtLeast(2)
   override val scoutAt                = 10
+  override val scoutExpansionsAt      = 90
   override def buildOrder             = ProtossBuilds.OpeningTwoGate1012
   override def defaultPlacementPlan   = new BuildHuggingNexus
   override def defaultAggressionPlan  = new If(
-    new UnitsAtMost(12, UnitMatchWarriors),
-    new Aggression(1.0),
+    new UnitsAtMost(8, UnitMatchWarriors, complete = true),
+    new Aggression(1.2),
     new If(
-      new UnitsAtMost(20, UnitMatchWarriors),
-      new Aggression(3.0),
-      new Aggression(5.0)))
+      new UnitsAtMost(10, UnitMatchWarriors, complete = true),
+      new Aggression(2.2),
+      new If(
+        new UnitsAtMost(20, UnitMatchWarriors, complete = true),
+        new Aggression(3.0),
+        new Aggression(5.0))))
   
   override def defaultAttackPlan: Plan = new If(
     new Or(

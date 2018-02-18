@@ -34,11 +34,13 @@ class FindExpansions extends Plan {
     scouts.get.units.foreach(orderScout)
   }
   
-  private def orderScout(scout: FriendlyUnitInfo) =
+  private def orderScout(scout: FriendlyUnitInfo) = {
+    With.intelligence.higlightScout(scout)
     scout.agent.intend(this, new Intention {
-      toTravel    = getNextScoutingPixel
-      canCower    = true
+      toTravel = getNextScoutingPixel
+      canCower = true
     })
+  }
   
   private def getNextScoutingPixel: Option[Pixel] =
     With.intelligence.leastScoutedBases

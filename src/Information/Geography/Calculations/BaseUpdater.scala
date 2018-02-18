@@ -41,7 +41,7 @@ object BaseUpdater {
     base.minerals       = base.units.filter(u => u.mineralsLeft > 0 && ! u.isMineralBlocker)
     base.gas            = base.units.filter(_.unitClass.isGas)
     base.workers        = base.units.filter(u => u.player == base.owner && u.unitClass.isWorker)
-    base.defenders      = base.units.filter(u => u.player == base.owner && u.unitClass.helpsInCombat)
+    base.defenders      = base.units.filter(u => u.player == base.owner && u.unitClass.helpsInCombat && ! u.unitClass.isWorker)
     base.mineralsLeft   = base.minerals.toSeq.map(_.mineralsLeft).sum
     base.gasLeft        = base.gas.toSeq.map(_.gasLeft).sum
     base.harvestingArea = (Vector(base.townHallArea) ++ (base.minerals.filter(_.mineralsLeft > With.configuration.blockerMineralThreshold) ++ base.gas).map(_.tileArea)).boundary

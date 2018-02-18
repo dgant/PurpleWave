@@ -3,21 +3,21 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvZ
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.Architecture.Heuristics.PlacementProfiles
-import Macro.BuildRequests.{RequestAnother, RequestAtLeast, RequestTech, RequestUpgrade}
+import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
 import Planning.Composition.UnitMatchers.{UnitMatchWarriors, UnitMatchWorkers}
 import Planning.Plans.Army._
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.GamePlans.Protoss.Situational._
-import Planning.Plans.Predicates.Reactive.EnemyMutalisks
-import Planning.Plans.Predicates.Scenarios.EnemyStrategy
-import Planning.Plans.Predicates.{Employ, Employing, SafeAtHome, StartPositionsAtLeast}
 import Planning.Plans.Macro.Automatic.{MatchingRatio, _}
 import Planning.Plans.Macro.BuildOrders._
 import Planning.Plans.Macro.Expanding._
-import Planning.Plans.Predicates.Milestones._
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Predicates.Economy.{GasAtLeast, GasAtMost, MineralsAtLeast, MineralsAtMost}
+import Planning.Plans.Predicates.Milestones._
+import Planning.Plans.Predicates.Reactive.EnemyMutalisks
+import Planning.Plans.Predicates.Scenarios.EnemyStrategy
+import Planning.Plans.Predicates.{Employ, Employing, SafeAtHome, StartPositionsAtLeast}
 import Planning.Plans.Recruitment.RecruitFreelancers
 import Planning.Plans.Scouting.{FindExpansions, Scout, ScoutAt}
 import ProxyBwapi.Races.{Protoss, Zerg}
@@ -275,7 +275,10 @@ class ProtossVsZergOld extends Parallel {
         new UnitsAtLeast(1, Protoss.Assimilator, complete = true)),
       new Parallel(
         new UpgradeContinuously(Protoss.GroundDamage),
-        new UpgradeContinuously(Protoss.ZealotSpeed))),
+        new UpgradeContinuously(Protoss.ZealotSpeed),
+        new If(
+          new UnitsAtLeast(2, Protoss.Forge),
+          new UpgradeContinuously(Protoss.GroundArmor)))),
   
     new If(
       new And(
@@ -302,10 +305,10 @@ class ProtossVsZergOld extends Parallel {
   
     new OnGasPumps(2,
       new If(
-        new EnemyUnitsAtLeast(13, Zerg.Mutalisk),
+        new EnemyUnitsAtLeast(18, Zerg.Mutalisk),
         new Build(RequestAtLeast(3, Protoss.Stargate)),
         new If(
-          new EnemyUnitsAtLeast(7, Zerg.Mutalisk),
+          new EnemyUnitsAtLeast(10, Zerg.Mutalisk),
           new Build(RequestAtLeast(2, Protoss.Stargate))))),
     
     new TrainMatchingRatio(Protoss.Observer, 0, 3, Seq(MatchingRatio(Zerg.Lurker, 0.5))),
@@ -339,10 +342,8 @@ class ProtossVsZergOld extends Parallel {
           new TrainContinuously(Protoss.Shuttle, 1),
           new TrainContinuously(Protoss.Reaver, 6)),
         new If(
-          new And(
-            new UnitsAtLeast(1, Protoss.TemplarArchives, complete = true),
-            new Not(new Employing(PvZMidgameCorsairReaver))),
-          new Build(RequestAnother(2, Protoss.HighTemplar))),
+          new UnitsAtLeast(1, Protoss.TemplarArchives, complete = true),
+          new TrainContinuously(Protoss.HighTemplar, 12, 3)),
         new If(
           new And(
             new UnitsAtLeast(1, Protoss.CyberneticsCore, complete = true),

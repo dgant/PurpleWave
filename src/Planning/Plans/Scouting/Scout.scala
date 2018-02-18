@@ -73,6 +73,7 @@ class Scout(scoutCount: Int = 1) extends Plan {
     
     acquiredScouts.foreach(scout =>
       if (scoutingDestinations.nonEmpty) {
+        With.intelligence.higlightScout(scout)
         scout.agent.intend(this, new Intention {
         toTravel = Some(scoutingDestinations.dequeue())
         canScout = true

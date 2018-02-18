@@ -20,7 +20,6 @@ object Chase extends ActionTechnique {
   override def applicabilitySelf(unit: FriendlyUnitInfo): Double = {
     if (unit.is(Zerg.Lurker)) return 0.0
     if (unit.unitClass.minStop > 0) return 0.0
-    if (unit.unitClass.attackAnimationFrames > 2) return 0.0
     1.0
   }
   

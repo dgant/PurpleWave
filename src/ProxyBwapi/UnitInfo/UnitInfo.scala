@@ -182,7 +182,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   private val cacheZone = new Cache(() => pixelCenter.zone)
   
   def base: Option[Base] = cacheBase()
-  private val cacheBase = new Cache(() => ByOption.minBy(zone.bases)(_.heart.tileDistanceFast(tileIncludingCenter)))
+  private val cacheBase = new Cache(() => pixelCenter.base)
   
   def mobilityForceGrid : AbstractGrid[Force]   = if (flying) With.grids.mobilityForceAir else With.grids.mobilityForceGround
   def mobilityGrid      : AbstractGrid[Int]     = if (flying) With.grids.mobilityAir else With.grids.mobilityGround

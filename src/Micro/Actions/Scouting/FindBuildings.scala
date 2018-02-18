@@ -8,11 +8,21 @@ import Micro.Actions.Commands.Move
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import bwapi.{Race, UnitCommandType}
 
-object FindBuildings extends Action {
+object FindBuildings extends AbstractFindBuildings {
+  override protected val boredomFrames = 24 * 30
+}
+
+object FindBuildingsWhenBored extends AbstractFindBuildings {
+  override protected val boredomFrames = 24 * 3
+}
+
+abstract class AbstractFindBuildings extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
     With.geography.enemyBases.nonEmpty
   }
+  
+  protected val boredomFrames: Int
   
   override protected def perform(unit: FriendlyUnitInfo) {
     def nearestNeutralBases(count: Int): Iterable[Base] = {
@@ -33,9 +43,9 @@ object FindBuildings extends Action {
     val tilesToScout = basesToScout
       .flatMap(base => {
         val tiles = base.zone.tiles.filter(tile =>
-          ! base.harvestingArea.contains(tile)  && //Don't walk into worker line
-            With.grids.walkable.get(tile)         &&
-            With.grids.friendlyVision.framesSince(tile) > 24 * 30)
+          ! base.harvestingArea.contains(tile) //Don't walk into worker line
+          && With.grids.walkable.get(tile)
+          && With.grids.friendlyVision.framesSince(tile) > boredomFrames)
       
         if (base.owner.raceInitial == Race.Zerg) {
           tiles.filter(tile => With.grids.creep.get(tile) || tile.tileDistanceFast(base.townHallArea.midpoint) < 9.0)

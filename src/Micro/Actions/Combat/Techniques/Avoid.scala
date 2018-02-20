@@ -2,7 +2,7 @@ package Micro.Actions.Combat.Techniques
 
 import Lifecycle.With
 import Mathematics.PurpleMath
-import Micro.Actions.Combat.Maneuvering.OldAvoid
+import Micro.Actions.Combat.Maneuvering.{GooseChase, OldAvoid}
 import Micro.Actions.Combat.Techniques.Common.ActionTechnique
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 

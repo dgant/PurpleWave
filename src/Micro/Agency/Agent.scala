@@ -129,6 +129,8 @@ class Agent(val unit: FriendlyUnitInfo) {
   
   val techniques: ArrayBuffer[ActionTechniqueEvaluation] = new ArrayBuffer[ActionTechniqueEvaluation]
   
+  var fightReason: String = ""
+  
   ///////////////
   // Execution //
   ///////////////
@@ -152,6 +154,7 @@ class Agent(val unit: FriendlyUnitInfo) {
     cachedZonePath.clear()
     cachedWaypoint.clear()
     techniques.clear()
+    fightReason = ""
   }
   
   private def followIntent() {

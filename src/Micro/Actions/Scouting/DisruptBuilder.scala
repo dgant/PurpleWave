@@ -14,6 +14,7 @@ object DisruptBuilder extends Action {
     && With.intelligence.enemyMain.isDefined
     && With.enemies.exists(_.raceInitial == Race.Terran)
     && disruptableBuilders(unit).nonEmpty
+    && unit.matchups.threatsViolent.isEmpty
   )
   
   override protected def perform(unit: FriendlyUnitInfo) {

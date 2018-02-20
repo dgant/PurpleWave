@@ -32,7 +32,7 @@ class Configuration {
   var bonusTankRange                = 64.0
   var retreatMovementDelay          = 8 //GameTime(0, 1)()
   var nonLethalDamageValue          = 0.1
-  var lastStandMinimumValueRatio    = 0.3
+  var lastStandMinimumValueRatio    = 0.4
   
   ///////////
   // Micro //
@@ -60,6 +60,7 @@ class Configuration {
   var blockerMineralThreshold         = 250 // Setting this goofily high as an AIIDE hack to account for the 249-mineral patches on Fortress
   var maxPlacementAgeFrames           = GameTime(0, 3)()
   var enableTightBuildingPlacement    = false
+  var bankIncomeConfidence            = 0.8
   
   /////////////////
   // Performance //

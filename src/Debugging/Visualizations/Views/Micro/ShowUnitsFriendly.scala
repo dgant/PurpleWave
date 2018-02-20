@@ -18,8 +18,9 @@ object ShowUnitsFriendly extends View {
   var showTargets     : Boolean = false
   var showFormation   : Boolean = true
   var showKiting      : Boolean = false
-  var showForces      : Boolean = true
-  var showDesire      : Boolean = false
+  var showForces      : Boolean = false
+  var showDesire      : Boolean = true
+  var showFightReason : Boolean = true
   
   override def renderMap() { With.units.ours.foreach(renderUnitState) }
   
@@ -31,30 +32,42 @@ object ShowUnitsFriendly extends View {
     if ( ! unit.unitClass.orderable) return
     if (unit.transport.isDefined) return
     
+    var labelY = -28
+    if (showFightReason) {
+      DrawMap.label(
+        unit.agent.fightReason,
+        unit.pixelCenter.add(0, labelY),
+        drawBackground = false)
+      labelY += 7
+    }
     if (showClient) {
       agent.lastClient.foreach(plan =>
         DrawMap.label(
           plan.toString,
-          unit.pixelCenter.add(0, -21),
+          unit.pixelCenter.add(0, labelY),
           drawBackground = false))
+      labelY += 7
     }
     if (showAction) {
       DrawMap.label(
         agent.lastAction.map(_.name).getOrElse(""),
-        unit.pixelCenter.add(0, -14),
+        unit.pixelCenter.add(0, labelY),
         drawBackground = false)
+      labelY += 7
     }
     if (showCommand) {
       DrawMap.label(
         unit.command.map(_.getUnitCommandType.toString).getOrElse(""),
-        unit.pixelCenter.add(0, -7),
+        unit.pixelCenter.add(0, labelY),
         drawBackground = false)
+      labelY += 7
     }
     if (showOrder) {
       DrawMap.label(
         unit.order.toString,
-        unit.pixelCenter.add(0, 0),
+        unit.pixelCenter.add(0, labelY),
         drawBackground = false)
+      labelY += 7
     }
     
     if (showTargets) {

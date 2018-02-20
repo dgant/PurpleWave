@@ -1,8 +1,9 @@
 package Micro.Actions.Combat.Techniques
 
+import Micro.Actions.Combat.Decisionmaking.Leave
 import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Actions.Combat.Techniques.Common.Activators.WeightedMean
-import Micro.Actions.Combat.Techniques.Common.{ActionTechnique, AttackAsSoonAsPossible, Leave}
+import Micro.Actions.Combat.Techniques.Common.{ActionTechnique, AttackAsSoonAsPossible}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object Breathe extends ActionTechnique {

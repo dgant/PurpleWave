@@ -8,7 +8,7 @@ import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Actions.Combat.Attacking.Filters.TargetFilterWhitelist
 import Micro.Actions.Combat.Attacking.TargetAction
-import Micro.Actions.Combat.Decisionmaking.Disengage
+import Micro.Actions.Combat.Decisionmaking.Leave
 import Micro.Actions.Combat.Techniques.Common.ActionTechnique
 import Micro.Actions.Commands.{Attack, Move}
 import ProxyBwapi.Races.Terran
@@ -70,10 +70,10 @@ object Batter extends ActionTechnique {
     lazy val dpfReceiving     = shootingThreats.map(_._1.dpfOnNextHitAgainst(unit)).sum
     lazy val framesToLive     = PurpleMath.nanToInfinity(unit.totalHealth / dpfReceiving)
     lazy val dying            = framesToLive < GameTime(0, 1)()
-    lazy val shouldRetreat = ! unit.agent.shouldEngage || (unit.unitClass.melee && dying)
+    lazy val shouldRetreat    = ! unit.agent.shouldEngage || (unit.unitClass.melee && dying)
     
     if (shouldRetreat) {
-      Disengage.consider(unit)
+      Leave.consider(unit)
     }
   
     if (unit.readyForMicro) {

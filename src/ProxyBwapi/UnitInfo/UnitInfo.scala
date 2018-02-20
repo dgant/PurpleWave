@@ -213,10 +213,10 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   
   def canTraverse(tile: Tile): Boolean = flying || With.grids.walkable.get(tile)
   
-  def pixelStart                                            : Pixel = Pixel(left, top)
-  def pixelEnd                                              : Pixel = Pixel(right, bottom)
-  def pixelStartAt            (at: Pixel)                   : Pixel = pixelStart.add(at).subtract(pixelCenter)
-  def pixelEndAt              (at: Pixel)                   : Pixel = pixelEnd.add(at).subtract(pixelCenter)
+  def pixelStart                                            : Pixel   = Pixel(left, top)
+  def pixelEnd                                              : Pixel   = Pixel(right, bottom)
+  def pixelStartAt            (at: Pixel)                   : Pixel   = at.subtract(pixelCenter).add(left, top)
+  def pixelEndAt              (at: Pixel)                   : Pixel   = at.subtract(pixelCenter).add(right, bottom)
   def pixelDistanceCenter     (otherPixel:  Pixel)          : Double  = pixelCenter.pixelDistanceFast(otherPixel)
   def pixelDistanceCenter     (otherUnit:   UnitInfo)       : Double  = pixelDistanceCenter(otherUnit.pixelCenter)
   def pixelDistanceEdge       (other:       UnitInfo)       : Double  = pixelDistanceEdge(other.pixelStart, other.pixelEnd)
@@ -353,7 +353,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     )
   }
   
-  def damageTypeAgainst (enemy: UnitInfo)  : Damage.Type  = if (enemy.flying) unitClass.groundDamageType else unitClass.airDamageType
+  def damageTypeAgainst (enemy: UnitInfo)  : Damage.Type  = if (enemy.flying) unitClass.airDamageType    else unitClass.groundDamageType
   def attacksAgainst    (enemy: UnitInfo)  : Int          = if (enemy.flying) attacksAgainstAir          else attacksAgainstGround
   
   def damageScaleAgainstHitPoints(enemy: UnitInfo): Double = {
@@ -384,7 +384,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     val damageToShields         = damageAssignedToShields - enemy.armorShield * hits
     val damageAssignedToHealth  = damageAssignedTotal - damageAssignedToShields
     val damageToHealthScale     = damageScaleAgainstHitPoints(enemy)
-    val damageToHealth          = (damageAssignedToHealth - enemy.armorHealth * hits) * damageScaleAgainstHitPoints(enemy)
+    val damageToHealth          = Math.max(0.0, (damageAssignedToHealth - enemy.armorHealth * hits) * damageToHealthScale)
     val damageDealtTotal        = damageToHealth + damageToShields
     val hitChance               = hitChanceAgainst(enemy, from, to)
     val output                  = (hitChance * Math.max(1.0, damageDealtTotal)).toInt

@@ -13,7 +13,7 @@ abstract class WeightedActivator(technique: ActionTechnique) extends Activator {
       .filter(_._1.isDefined)
       .map(pair => (pair._1.get, pair._2))
     
-    if (applicabilityAndSignificance.map(_._2).sum == 0.0) return None
+    if (applicabilityAndSignificance.map(_._1).sum == 0.0) return None
     
     Some(aggregate(applicabilityAndSignificance))
   }

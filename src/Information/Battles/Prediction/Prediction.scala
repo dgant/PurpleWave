@@ -1,7 +1,7 @@
 package Information.Battles.Prediction
 
 import Information.Battles.Prediction.Estimation.Avatar
-import Information.Battles.Prediction.Simulation.{Simulation, ReportCard}
+import Information.Battles.Prediction.Simulation.{ReportCard, Simulation, SimulationEvent}
 import Lifecycle.With
 import ProxyBwapi.UnitInfo.UnitInfo
 
@@ -26,6 +26,7 @@ class Prediction {
   var simulation: Option[Simulation] = None
   
   var reportCards = new mutable.HashMap[UnitInfo, ReportCard]
+  var events: Iterable[SimulationEvent] = Iterable.empty
   
   def netValue: Double = costToEnemy - costToUs
   

@@ -3,13 +3,12 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvT
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
-import Planning.Composition.UnitMatchers.UnitMatchOr
-import Planning.Plans.Army.DropAttack
+import Planning.Plans.Army.DropReaver
 import Planning.Plans.Compound.{If, NoPlan}
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Predicates.Employing
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding._
+import Planning.Plans.Predicates.Employing
 import Planning.Plans.Predicates.Milestones.{MiningBasesAtLeast, UnitsAtLeast}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvT.PvTEarly1GateReaver
@@ -23,8 +22,8 @@ class PvT1GateReaver extends GameplanModeTemplate {
   override def scoutAt            = 8
   
   override def defaultDropPlan = new If (
-    new UnitsAtLeast(1, Protoss.Reaver),
-    new DropAttack { paratrooperMatcher.set(UnitMatchOr(Protoss.Zealot, Protoss.Reaver)) })
+    new UnitsAtLeast(1, Protoss.Reaver, complete = true),
+    new DropReaver)
 
   // Hide the Robotics Facility
   override def blueprints = Vector(

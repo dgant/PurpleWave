@@ -59,6 +59,7 @@ class Simulation(
     estimation.totalUnitsEnemy  = unitsEnemy  .size
     estimation.reportCards      ++= everyone  .map(simulacrum => (simulacrum.realUnit, simulacrum.reportCard))
     estimation.simulation       = Some(this)
+    estimation.events           = everyone.flatMap(_.events).sortBy(_.frame)
   }
   
   private def getChokeMobility(zoneUs: Zone): Double = {

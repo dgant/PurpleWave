@@ -1,12 +1,12 @@
 package Micro.Actions.Transportation
 
 import Micro.Actions.Action
-import Micro.Actions.Combat.Decisionmaking.Disengage
+import Micro.Actions.Combat.Decisionmaking.Leave
 import Micro.Actions.Commands.Move
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Utilities.EnrichPixel.EnrichedPixelCollection
 
 import scala.collection.mutable.ArrayBuffer
-import Utilities.EnrichPixel.EnrichedPixelCollection
 
 object Pickup extends Action {
   
@@ -18,7 +18,7 @@ object Pickup extends Action {
     val passengersPotential = potentialPassengers(unit)
     if (passengersPotential.isEmpty && unit.loadedUnits.isEmpty && ! unit.unitClass.isDetector) {
       unit.agent.toTravel = Some(unit.agent.origin)
-      Disengage.consider(unit)
+      Leave.consider(unit)
       return
     }
     val passengersAccepted  = new ArrayBuffer[FriendlyUnitInfo]
@@ -47,8 +47,8 @@ object Pickup extends Action {
   
   protected def potentialPassengers(unit: FriendlyUnitInfo): Iterable[FriendlyUnitInfo] = {
     unit.squad.map(_.recruits.filter(passenger =>
-      ! passenger.zone.owner.isEnemy  &&
-      unit.canTransport(passenger)                &&
-      passenger.matchups.threatsInRange.isEmpty)).getOrElse(Iterable.empty)
+      ! passenger.zone.owner.isEnemy
+      && unit.canTransport(passenger)
+      && passenger.matchups.threatsInRange.isEmpty)).getOrElse(Iterable.empty)
   }
 }

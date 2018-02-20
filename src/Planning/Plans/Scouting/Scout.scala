@@ -15,7 +15,7 @@ import scala.collection.mutable
 
 class Scout(scoutCount: Int = 1) extends Plan {
   
-  description.set("Scout the enemy with a worker")
+  description.set("Scout")
   
   val scouts = new Property[LockUnits](new LockUnits {
     unitCounter.set(UnitCountExactly(scoutCount))

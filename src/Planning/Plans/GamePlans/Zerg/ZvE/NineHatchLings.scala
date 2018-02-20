@@ -4,13 +4,13 @@ import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, RequestAtLeast, RequestUpgrade}
 import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Plan
-import Planning.Plans.Army.{Aggression, Attack}
+import Planning.Plans.Army.{AllIn, Attack}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Predicates.Matchup.EnemyIsZerg
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Predicates.Economy.{GasAtLeast, MineralsAtLeast}
+import Planning.Plans.Predicates.Matchup.EnemyIsZerg
 import Planning.Plans.Predicates.Milestones.{EnemyUnitsAtLeast, UnitsAtLeast, UpgradeComplete}
 import ProxyBwapi.Races.{Terran, Zerg}
 
@@ -38,8 +38,7 @@ class NineHatchLings extends GameplanModeTemplate {
       new Or(
         new EnemyUnitsAtLeast(1, Zerg.Mutalisk),
         new EnemyUnitsAtLeast(1, Terran.Vulture)),
-      new Aggression(1.5)
-    ),
+      new AllIn),
     new Build(RequestAtLeast(9, Zerg.Drone)),
     new TrainContinuously(Zerg.Zergling),
     new Trigger(

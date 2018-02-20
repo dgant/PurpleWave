@@ -30,11 +30,11 @@ class PvZ4GateGoon extends GameplanModeTemplate {
     new Aggression(1.2),
     new If(
       new UnitsAtMost(10, UnitMatchWarriors, complete = true),
-      new Aggression(2.2),
+      new Aggression(1.8),c
       new If(
         new UnitsAtMost(20, UnitMatchWarriors, complete = true),
-        new Aggression(3.0),
-        new Aggression(5.0))))
+        new Aggression(2.5),
+        new Aggression(3.0))))
   
   override def defaultAttackPlan: Plan = new If(
     new Or(

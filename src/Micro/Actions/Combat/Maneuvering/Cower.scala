@@ -1,7 +1,7 @@
 package Micro.Actions.Combat.Maneuvering
 
 import Micro.Actions.Action
-import Micro.Actions.Combat.Decisionmaking.Disengage
+import Micro.Actions.Combat.Decisionmaking.Leave
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Cower extends Action {
@@ -18,6 +18,6 @@ object Cower extends Action {
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {
-    Disengage.delegate(unit)
+    Leave.delegate(unit)
   }
 }

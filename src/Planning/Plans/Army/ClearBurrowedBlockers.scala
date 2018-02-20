@@ -1,5 +1,6 @@
 package Planning.Plans.Army
 
+import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Micro.Agency.Intention
 import Planning.Composition.Property
@@ -46,7 +47,7 @@ class ClearBurrowedBlockers extends Plan {
       }))
     }
   
-    if (With.enemies.exists(_.isTerran)) {
+    if (With.enemies.exists(_.isTerran) && detector.get.units.forall(_.framesToTravelTo(target.get) > GameTime(0, 5)())) {
       decoy.get.unitPreference.set(UnitPreferClose(target.get))
       decoy.get.acquire(this)
       decoy.get.units.foreach(_.agent.intend(this, new Intention {

@@ -1,6 +1,5 @@
 package Debugging.Visualizations.Views.Battles
 
-import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.{DrawMap, DrawScreen}
 import Debugging.Visualizations.Views.View
 import Information.Battles.Prediction.Prediction
@@ -22,7 +21,7 @@ object ShowBattleDetails extends View {
   
   def renderBattleScreen(battle: BattleLocal, estimation: Prediction) {
     val x = 5
-    val y = 7 * With.visualization.lineHeightSmall
+    val y = 4 * With.visualization.lineHeightSmall
     val table = Vector(
       Vector[String]("", With.self.name, With.enemy.name),
       Vector[String]("", if (estimation.weSurvive) "Survives" else "", if (estimation.enemySurvives) "Survives" else ""),
@@ -121,13 +120,18 @@ object ShowBattleDetails extends View {
     val attacking = sim.simulation.weAttack
     val color = if (attacking) sim.realUnit.player.colorNeon else sim.realUnit.player.colorMidnight
     
-    sim.moves.foreach(move => DrawMap.arrow(move._1, move._2, color))
+    sim.events.foreach(_.draw())
     if (sim.dead) {
-      DrawMap.circle(
-        sim.pixel,
-        5,
-        if (attacking) Colors.NeonOrange else Colors.MidnightOrange,
-        solid = true)
+      val dark = sim.realUnit.player.colorMidnight
+      val skullColor = sim.realUnit.player.colorNeon
+      DrawMap.box(sim.pixel.add(-3, 0), sim.pixel.add(3, 8), dark, solid = false)
+      DrawMap.circle(sim.pixel, 5, skullColor,  solid = true)
+      DrawMap.circle(sim.pixel, 5, dark,        solid = false)
+      DrawMap.box(sim.pixel.add(-2, 1), sim.pixel.add(2, 7), skullColor,  solid = true)
+      DrawMap.box(sim.pixel.add(-2, -2), sim.pixel.add(-1, -1), Color.Black, solid = true)
+      DrawMap.box(sim.pixel.add(2,  -2), sim.pixel.add(1,  -1), Color.Black, solid = true)
+      DrawMap.line(sim.pixel.add(-1, 3), sim.pixel.add(-2, 8), dark)
+      DrawMap.line(sim.pixel.add(1,  3), sim.pixel.add(2,  8), dark)
     }
   }
 }

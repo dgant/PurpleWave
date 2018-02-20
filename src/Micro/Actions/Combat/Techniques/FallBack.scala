@@ -1,7 +1,8 @@
 package Micro.Actions.Combat.Techniques
 
+import Micro.Actions.Combat.Decisionmaking.Leave
 import Micro.Actions.Combat.Tactics.Potshot
-import Micro.Actions.Combat.Techniques.Common.{ActionTechnique, Leave}
+import Micro.Actions.Combat.Techniques.Common.ActionTechnique
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 

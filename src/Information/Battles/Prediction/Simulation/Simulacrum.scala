@@ -15,7 +15,7 @@ class Simulacrum(
   val realUnit    : UnitInfo) {
   
   // Constant
-  private val SIMULATION_STEP_FRAMES = 4
+  private val SIMULATION_STEP_FRAMES = 6
   
   // Modifiers
   val movementDelay     : Int     = if (realUnit.isEnemy || simulation.weAttack)  0   else realUnit.unitClass.framesToTurn(Math.PI) + 2 * realUnit.unitClass.accelerationFrames + With.configuration.retreatMovementDelay
@@ -34,29 +34,29 @@ class Simulacrum(
   var pixel               : Pixel                       = realUnit.pixelCenter
   var dead                : Boolean                     = false
   var target              : Option[Simulacrum]          = None
-  var killed              : Int                         = 0
-  var targetPathBendiness : Double                      = 1.0
+  var pathBendiness       : Double                      = 1.0
+  val fleePixel           : Pixel                       = simulation.focus.project(pixel, 1000).clamp
   
   // Scorekeeping
-  var damageDealt       : Double                      = 0.0
-  var damageReceived    : Double                      = 0.0
-  var valueDealt        : Double                      = 0.0
-  var valueReceived     : Double                      = 0.0
-  var kills             : Int                         = 0
-  var valuePerDamage    : Double                      = PurpleMath.nanToZero(realUnit.subjectiveValue.toDouble / realUnit.unitClass.maxTotalHealth)
-  var moves             : ArrayBuffer[(Pixel, Pixel)] = new ArrayBuffer[(Pixel, Pixel)]
+  val valuePerDamage    : Double                        = PurpleMath.nanToZero(realUnit.subjectiveValue.toDouble / realUnit.unitClass.maxTotalHealth)
+  var damageDealt       : Double                        = 0.0
+  var damageReceived    : Double                        = 0.0
+  var valueDealt        : Double                        = 0.0
+  var valueReceived     : Double                        = 0.0
+  var kills             : Int                           = 0
+  var events            : ArrayBuffer[SimulationEvent]  = new ArrayBuffer[SimulationEvent]
   
   lazy val targetQueue: mutable.PriorityQueue[Simulacrum] = (
     new mutable.PriorityQueue[Simulacrum]()(Ordering.by(x => (x.realUnit.unitClass.helpsInCombat, - x.pixel.pixelDistanceFast(pixel))))
       ++ realUnit.matchups.targets
         .filter(target =>
-          realUnit.inRangeToAttack(target)
-          || simulation.weAttack
+          simulation.weAttack
+          || realUnit.inRangeToAttack(target)
           || ! realUnit.isOurs)
         .flatMap(simulation.simulacra.get)
     )
   
-  val fighting: Boolean = {
+  var fighting: Boolean = {
     if ( ! realUnit.canAttack) {
       false
     }
@@ -76,8 +76,6 @@ class Simulacrum(
       ! realUnit.canMove
     }
   }
-  
-  def splashFactor : Double = if (multiplierSplash == 1.0) 1.0 else Math.max(1.0, Math.min(targetQueue.count( ! _.dead) / 4.0, multiplierSplash))
   
   def updateDeath() {
     dead = dead || hitPoints <= 0
@@ -99,103 +97,105 @@ class Simulacrum(
     if ( ! fighting)                                return
     if (cooldownMoving > 0 || cooldownShooting > 0) return
     if (validTargetExistsInRange)                   return
-    if (validTargetExists) {
-      //Target is out of range, but maybe we can get them later. Put them back in the queue.
-      targetQueue += target.get
-    }
-    
+  
     val lastTarget = target
+    target.foreach(targetQueue.+=)
     target = None
     while (target.isEmpty && targetQueue.nonEmpty) {
-      // Clear crud from the queue
-      while (targetQueue.nonEmpty && ! isValidTarget(targetQueue.head)) {
-        targetQueue.dequeue()
-      }
-      
-      if (targetQueue.nonEmpty) {
-        target = Some(targetQueue.dequeue())
+      val candidate = targetQueue.dequeue()
+      if (isValidTarget(candidate)) {
+        target = Some(candidate)
       }
     }
-    if (target.isDefined && target != lastTarget) {
-      lazy val distanceByAir    : Double = realUnit.pixelDistanceEdge(target.get.realUnit)
-      lazy val distanceByGround : Double = realUnit.pixelDistanceTravelling(target.get.realUnit.pixelCenter)
-      targetPathBendiness = Math.min(3.0, PurpleMath.nanToInfinity(distanceByAir / distanceByGround))
+    if (target.isEmpty) {
+      fighting = false
+    }
+    else if (target != lastTarget) {
+      val distanceByAir     : Double = realUnit.pixelDistanceEdge(target.get.realUnit)
+      val distanceTraveling : Double = realUnit.pixelDistanceTravelling(target.get.realUnit.pixelCenter)
+      pathBendiness = PurpleMath.clamp(PurpleMath.nanToInfinity(distanceByAir / distanceTraveling), 1.0, 3.0)
     }
   }
   
   def tryToChaseTarget() {
-    lazy val victim          = target.get
-    lazy val pixelsFromRange = pixelsOutOfRange(victim)
-    if ( ! canMove)           return
-    if ( ! fighting)          return
-    if (cooldownMoving > 0)   return
-    if ( ! validTargetExists) return
-    if (pixelsFromRange <= 0) return
-    
-    val travelFrames    = Math.min(SIMULATION_STEP_FRAMES, realUnit.framesToTravelPixels(pixelsFromRange))
-    val travelSpeed     = realUnit.topSpeed * speedMultiplier / targetPathBendiness
-    val travelPixel     = pixel.project(victim.pixel, travelSpeed * travelFrames)
-    val originalPixel   = pixel
-    cooldownMoving      = travelFrames
-    pixel               = travelPixel
-    simulation.updated  = true
-  
-    if (ShowBattleDetails.inUse) {
-      moves += ((originalPixel, travelPixel))
-    }
+    if ( ! fighting)              return
+    if (validTargetExistsInRange) return
+    if ( ! validTargetExists)     return
+    moveTowards(target.get.pixel)
   }
   
   def tryToStrikeTarget() {
     if ( ! fighting)                  return
     if (cooldownShooting > 0)         return
     if ( ! validTargetExistsInRange)  return
-    val victim = target.get
-    val victimWasAliveBefore = victim.hitPoints > 0
-    val damageToVictim = Math.min(
-      victim.hitPoints,
-      realUnit.damageOnNextHitAgainst(
-        victim.realUnit,
-        Some(victim.shieldPoints),
-        Some(pixel),
-        Some(victim.pixel)))
-    val damageToShields   = Math.min(victim.shieldPoints, damageToVictim)
-    val damageToHitPoints = damageToVictim - damageToShields
-    val valueDamage       = damageToVictim * victim.valuePerDamage * With.configuration.nonLethalDamageValue
-    cooldownShooting      = Math.max(1, (realUnit.cooldownMaxAgainst(victim.realUnit) / splashFactor).toInt)
-    cooldownMoving        = Math.max(cooldownMoving, cooldownMoving + realUnit.unitClass.stopFrames)
-    damageDealt           += damageToVictim
-    valueDealt            += valueDamage
-    victim.shieldPoints   -= damageToShields
-    victim.hitPoints      -= damageToHitPoints
-    victim.damageReceived += damageToVictim
-    victim.valueReceived  += valueDamage
-    if (victim.hitPoints <= 0 && victimWasAliveBefore) {
-      kills += 1
-      val killValue = victim.realUnit.subjectiveValue * (1.0 - With.configuration.nonLethalDamageValue)
-      valueDealt += killValue
-      victim.valueReceived += killValue
-    }
-    dead                  = dead || realUnit.unitClass.suicides
-    simulation.updated    = true
-  
-    if (realUnit.canStim && ! realUnit.stimmed) {
-      cooldownShooting = cooldownShooting / 2
-    }
+    dealDamage(target.get)
   }
   
   def tryToRunAway() {
-    if (fighting)           return
+    if (fighting) return
+    pathBendiness = 1.0
+    moveTowards(fleePixel)
+  }
+  
+  private def dealDamage(victim: Simulacrum) {
+    val splashFactor      = if (multiplierSplash == 1.0) 1.0 else Math.max(1.0, Math.min(targetQueue.count( ! _.dead) / 4.0, multiplierSplash))
+    val victimWasAlive    = victim.hitPoints > 0
+    val damageToVictim    = Math.min(victim.hitPoints, realUnit.damageOnNextHitAgainst(victim.realUnit, Some(victim.shieldPoints), Some(pixel), Some(victim.pixel)))
+    val damageToShields   = Math.min(victim.shieldPoints, damageToVictim)
+    val damageToHitPoints = damageToVictim - damageToShields
+    val valueDamage       = damageToVictim * victim.valuePerDamage * With.configuration.nonLethalDamageValue
+    val cooldownDivisor   = if (realUnit.canStim && ! realUnit.stimmed) 2 else 1
+    cooldownShooting      = (realUnit.cooldownMaxAgainst(victim.realUnit) / splashFactor / cooldownDivisor).toInt
+    cooldownMoving        += realUnit.unitClass.stopFrames + realUnit.unitClass.accelerationFrames / 2
+    valueDealt            += valueDamage
+    damageDealt           += damageToVictim
+    victim.valueReceived  += valueDamage
+    victim.damageReceived += damageToVictim
+    victim.shieldPoints   -= damageToShields
+    victim.hitPoints      -= damageToHitPoints
+    dead                  = realUnit.unitClass.suicides
+    if (victimWasAlive && victim.hitPoints <= 0) {
+      val valueKill = victim.realUnit.subjectiveValue * (1.0 - With.configuration.nonLethalDamageValue)
+      kills += 1
+      valueDealt += valueKill
+      victim.valueReceived += valueKill
+    }
+    
+    addEvent(() => SimulationEventAttack(
+      simulation.estimation.frames,
+      this,
+      victim,
+      damageToHitPoints + damageToShields,
+      victim.hitPoints <= 0
+    ))
+  }
+  
+  private def moveTowards(destination: Pixel) {
     if ( ! canMove)         return
     if (cooldownMoving > 0) return
-    val focus           = simulation.focus
-    val distanceBefore  = pixel.pixelDistanceFast(focus)
-    val distanceAfter   = distanceBefore + realUnit.topSpeed * SIMULATION_STEP_FRAMES
-    val fleePixel       = focus.project(pixel, distanceAfter).clamp
+    val effectiveSpeed    = topSpeed / pathBendiness
+    val distancePerStep   = effectiveSpeed * SIMULATION_STEP_FRAMES
+    val distanceBefore    = pixel.pixelDistanceFast(destination)
+    val distanceAfter     = Math.max(0.0, distanceBefore - effectiveSpeed * SIMULATION_STEP_FRAMES)
+    val distanceTraveled  = distanceBefore - distanceAfter
+    val framesTraveled    = (distanceTraveled / effectiveSpeed).toInt
+    val pixelBefore       = pixel
+    val pixelAfter        = pixel.project(destination, distanceTraveled)
+    pixel                 = pixelAfter
+    cooldownMoving        = framesTraveled
+    addEvent(() => SimulationEventMove(
+      simulation.estimation.frames,
+      this,
+      pixelBefore,
+      pixelAfter,
+      framesTraveled
+    ))
+  }
+  
+  private def addEvent(event: () => SimulationEvent) {
     if (ShowBattleDetails.inUse) {
-      moves += ((pixel, fleePixel))
+      events += event()
     }
-    pixel           = fleePixel
-    cooldownMoving  = SIMULATION_STEP_FRAMES
   }
   
   def isValidTarget(target: Simulacrum): Boolean = (
@@ -205,19 +205,17 @@ class Simulacrum(
   )
   
   def pixelsOutOfRange(target: Simulacrum): Double = {
-    val distance = PurpleMath.broodWarDistanceBox(
+    val actualDistance = PurpleMath.broodWarDistanceBox(
       realUnit.pixelStartAt(pixel),
       realUnit.pixelEndAt(pixel),
-      target.realUnit.pixelStartAt(pixel),
-      target.realUnit.pixelEndAt(pixel))
-    distance - realUnit.pixelRangeAgainst(target.realUnit) - bonusRange + target.bonusDistance
+      target.realUnit.pixelStartAt(target.pixel),
+      target.realUnit.pixelEndAt(target.pixel))
+    val output = actualDistance + target.bonusDistance - realUnit.pixelRangeAgainst(target.realUnit) - bonusRange
+    output
   }
   
-  def validTargetExists: Boolean = target.exists(isValidTarget)
-  
-  def validTargetExistsInRange: Boolean = {
-    validTargetExists && pixelsOutOfRange(target.get) <= 0
-  }
+  def validTargetExists       : Boolean = target.exists(isValidTarget)
+  def validTargetExistsInRange: Boolean = validTargetExists && pixelsOutOfRange(target.get) <= 0
   
   def reportCard: ReportCard = ReportCard(
     simulacrum      = this,
@@ -227,6 +225,7 @@ class Simulacrum(
     damageDealt     = damageDealt,
     damageReceived  = damageReceived,
     dead            = dead,
-    killed          = killed
+    kills           = kills,
+    events          = events
   )
 }

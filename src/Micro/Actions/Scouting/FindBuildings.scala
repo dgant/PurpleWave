@@ -54,6 +54,7 @@ abstract class AbstractFindBuildings extends Action {
           tiles
         }
       })
+      .filter(With.grids.buildableTerrain.get)
   
     if (tilesToScout.isEmpty) return
   

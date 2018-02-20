@@ -8,8 +8,11 @@ import Utilities.ByOption
 
 object Spot extends Action {
   
+  // This is all pretty terrible.
+  
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     unit.canMove
+    && ! unit.canAttack
     && unit.flying
     && unit.matchups.targets.isEmpty
     && (unit.matchups.framesOfSafetyDiffused > GameTime(0, 4)() || unit.totalHealth > 500)

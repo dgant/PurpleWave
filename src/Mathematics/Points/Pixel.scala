@@ -79,7 +79,7 @@ case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     radiansTo(other) / radiansOverDegrees
   }
   def radiansTo(other: Pixel): Double = {
-    PurpleMath.fastAtan2(other.y - y, other.x - x)
+    PurpleMath.atan2(other.y - y, other.x - x)
   }
   def midpoint(pixel: Pixel): Pixel = {
     add(pixel).divide(2)

@@ -58,19 +58,23 @@ class ExplosionTracker {
   
   def explosionFromUnit(unit: UnitInfo): Vector[Explosion] = {
     val output = new mutable.ArrayBuffer[Explosion]
-    if (unit.irradiated)
+    if (unit.irradiated) {
       addToBattle(unit, new ExplosionIrradiateSplash(unit))
-    if (unit.is(Terran.SpiderMine)) {
+    }
+    else if (unit.is(Terran.SpiderMine)) {
       addToBattle(unit, new ExplosionSpiderMineTrigger(unit))
       addToBattle(unit, new ExplosionSpiderMineBlast(unit))
     }
-    if (unit.is(Zerg.InfestedTerran)) {
+    else if (unit.is(Zerg.InfestedTerran)) {
       addToBattle(unit, new ExplosionInfestedTerran(unit))
     }
-    if (unit.is(Protoss.Scarab) && unit.visible && ! unit.isOurs) {
+    else if (unit.is(Protoss.Scarab) && unit.visible && ! unit.isOurs) {
       addToNearbyUnits(unit.pixelCenter, new ExplosionScarab(unit))
     }
-    if (unit.is(Zerg.Lurker)
+    else if (unit.is(Terran.NuclearMissile)) {
+      addToNearbyUnits(unit.pixelCenter, new ExplosionNuke(unit.targetPixel.getOrElse(unit.pixelCenter)))
+    }
+    else if (unit.is(Zerg.Lurker)
       && ! unit.isOurs
       && unit.burrowed
       && With.grids.friendlyVision.isSet(unit.tileIncludingCenter)

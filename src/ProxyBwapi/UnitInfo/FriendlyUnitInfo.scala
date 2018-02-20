@@ -58,8 +58,6 @@ class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends FriendlyUnitProxy(base
   private val transportCache = new Cache(() =>
     if (unitClass.isBuilding)
       None
-    else if (visible)
-      None
     else
       With.units.get(base.getTransport).flatMap(_.friendly))
   

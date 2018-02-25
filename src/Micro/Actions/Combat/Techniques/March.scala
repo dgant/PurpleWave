@@ -31,7 +31,7 @@ object March extends ActionTechnique {
     if ( ! unit.canAttack(other)) return None
     if ( ! other.canAttack(unit)) return None
   
-    if (other.speedApproachingPixel(unit.pixelCenter) > 0) return Some(1.0)
+    if (other.speedApproaching(unit.pixelCenter) > 0) return Some(1.0)
     if (unit.topSpeedChasing > other.topSpeed) return Some(0.0)
     Some(24.0 / (1.0 + unit.framesToGetInRange(other)))
   }

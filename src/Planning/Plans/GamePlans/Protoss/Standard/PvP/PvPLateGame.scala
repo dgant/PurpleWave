@@ -13,6 +13,7 @@ import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Predicates.Milestones._
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvPIdeas.{ReactToDarkTemplarExisting, ReactToDarkTemplarPossible}
+import Planning.Plans.Macro.Protoss.MeldArchons
 import ProxyBwapi.Races.Protoss
 
 class PvPLateGame extends GameplanModeTemplate {
@@ -88,7 +89,7 @@ class PvPLateGame extends GameplanModeTemplate {
         new TrainContinuously(Protoss.Observer, 3))),
     new If(
       new And(
-        new UpgradeComplete(Protoss.ZealotSpeed, 1, Protoss.ZealotSpeed.upgradeTime(1)),
+        new UpgradeComplete(Protoss.ZealotSpeed, 1, Protoss.ZealotSpeed.upgradeFrames(1)),
         new UnitsAtMost(4, Protoss.HighTemplar),
         new UnitsAtLeast(1, Protoss.TemplarArchives, complete = true)),
       new Build(RequestAnother(2, Protoss.HighTemplar))),

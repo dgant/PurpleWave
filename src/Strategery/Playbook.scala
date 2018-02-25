@@ -6,6 +6,7 @@ import Strategery.Strategies.Protoss.PvZ._
 import Strategery.Strategies.Strategy
 import Strategery.Strategies.Terran.TvE._
 import Strategery.Strategies.Terran.TvR.{TvR1Rax, TvRTinfoil}
+import Strategery.Strategies.Terran.TvT.TvTStandard
 import Strategery.Strategies.Terran.TvZ._
 
 class EmptyPlaybook {
@@ -25,9 +26,9 @@ object StrategyGroups {
     TvRTinfoil,
     TvEProxy5Rax,
     TvEProxy8Fact,
-    TvEProxyBBS,
     TvEMassGoliath,
     TvE2PortWraith,
+    TvTStandard,
     TvZEarlyCCFirst,
     TvZEarly1RaxGas,
     TvZEarly1RaxFEEconomic,
@@ -45,7 +46,7 @@ object StrategyGroups {
 }
 
 class TestingPlaybook extends EmptyPlaybook {
-  val strategiesToTest: Seq[Strategy] = Seq(PvTEarly1BaseCarrier)
+  val strategiesToTest: Seq[Strategy] = Seq(TvETurtleMech)
   
   override lazy val forced: Seq[Strategy] = strategiesToTest
 }

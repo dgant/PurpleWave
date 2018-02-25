@@ -21,7 +21,8 @@ class BattleGlobal(us: Team, enemy: Team) extends Battle(us, enemy) {
       estimation.weSurvive &&
       estimation.costToUs < estimationAbstractOffense.avatarUs.subjectiveValue
     
-    tradesEffectively || killsEffectively
+    (estimation.totalUnitsUs > 0 || estimation.totalUnitsEnemy == 0) &&
+    (tradesEffectively || killsEffectively)
   }
   
   private def estimateAvatar(

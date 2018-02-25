@@ -72,7 +72,7 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
       Zerg.Drone)
     .contains(this)
   
-  lazy val canBeTargetedBySpiderMines: Boolean = (
+  lazy val triggersSpiderMines: Boolean = (
     ! floats
     && ! isFlyer
     && ! isBuilding)
@@ -336,10 +336,10 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
     val output = new ListBuffer[UnitClass]
   
     // Archons
-    addBuildUnitIf(output, Protoss.HighTemplar,         Protoss.Archon)
-    addBuildUnitIf(output, Protoss.HighTemplar,         Protoss.Archon)
-    addBuildUnitIf(output, Protoss.DarkTemplar,         Protoss.DarkArchon)
-    addBuildUnitIf(output, Protoss.DarkTemplar,         Protoss.DarkArchon)
+    addBuildUnitIf(output, Protoss.Archon,              Protoss.HighTemplar)
+    addBuildUnitIf(output, Protoss.Archon,              Protoss.HighTemplar)
+    addBuildUnitIf(output, Protoss.DarkArchon,          Protoss.DarkTemplar)
+    addBuildUnitIf(output, Protoss.DarkArchon,          Protoss.DarkTemplar)
     
     // Larva (All Zerg non-building units except Lurker/Guardian/Devourer)
     addBuildUnitIf(output, Zerg.Drone,                  Zerg.Larva)

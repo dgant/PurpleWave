@@ -6,14 +6,19 @@ object Listener extends BWEventListener{
   val mirror:bwapi.Mirror = new bwapi.Mirror()
   var bot:Option[Bot] = None
 
+  var lastException: Option[Exception] = None
+  var lastStackTrace: Option[String] = None
+  var doesThisCodeEvenGetExecuted: Int = 0
+  
   def initialize(): Unit = {
     try {
       mirror.getModule.setEventListener(this)
-      mirror.startGame
+      mirror.startGame()
     }
     catch { case exception: Exception =>
-      val dontLoseTheExceptionWhileDebugging = exception
-      val dontLoseTheStackTraceWhileDebugging = exception.getStackTrace
+      lastException = Some(exception)
+      lastStackTrace = Some(exception.getStackTrace.toString)
+      doesThisCodeEvenGetExecuted = 123
       val setABreakpointHere = 12345
     }
   }
@@ -22,17 +27,18 @@ object Listener extends BWEventListener{
     try {
       With.game = mirror.getGame
       bot = Some(new Bot())
-      bot.get.onStart
+      bot.get.onStart()
     }
     catch { case exception: Exception =>
-      val dontLoseTheExceptionWhileDebugging = exception
-      val dontLoseTheStackTraceWhileDebugging = exception.getStackTrace
+      lastException = Some(exception)
+      lastStackTrace = Some(exception.getStackTrace.toString)
+      doesThisCodeEvenGetExecuted = 456
       val setABreakpointHere = 12345
     }
   }
 
   override def onEnd(b: Boolean):                         Unit = { bot.get.onEnd(b) }
-  override def onFrame():                                 Unit = { bot.get.onFrame }
+  override def onFrame():                                 Unit = { bot.get.onFrame() }
   override def onSendText(s: String):                     Unit = { bot.get.onSendText(s) }
   override def onReceiveText(player: Player, s: String):  Unit = { bot.get.onReceiveText(player, s) }
   override def onPlayerLeft(player: Player):              Unit = { bot.get.onPlayerLeft(player) }

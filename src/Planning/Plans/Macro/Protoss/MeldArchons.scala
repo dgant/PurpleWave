@@ -1,4 +1,4 @@
-package Planning.Plans.Macro.Automatic
+package Planning.Plans.Macro.Protoss
 
 import Lifecycle.With
 import Micro.Agency.Intention

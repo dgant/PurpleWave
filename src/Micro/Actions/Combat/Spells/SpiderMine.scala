@@ -1,10 +1,12 @@
 package Micro.Actions.Combat.Spells
 
+import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
 import Micro.Actions.Action
-import Micro.Heuristics.Spells.TargetAOE
+import Micro.Actions.Combat.Attacking.Filters.TargetFilter
+import Micro.Actions.Combat.Attacking.TargetAction
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
@@ -12,11 +14,11 @@ import scala.collection.mutable
 
 object SpiderMine extends Action {
   
-  override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.is(Terran.Vulture)                             &&
-    With.self.hasTech(Terran.SpiderMinePlant)           &&
-    unit.spiderMines > 0
-  }
+  override def allowed(unit: FriendlyUnitInfo): Boolean = (
+    unit.is(Terran.Vulture)
+    && With.self.hasTech(Terran.SpiderMinePlant)
+    && unit.spiderMines > 0
+  )
   
   override protected def perform(unit: FriendlyUnitInfo) {
     layTrap(unit)
@@ -38,36 +40,48 @@ object SpiderMine extends Action {
   protected def layTrap(unit: FriendlyUnitInfo) {
     if (unit.spiderMines < 2) return
     if (unit.matchups.framesOfSafetyDiffused <= 0) return
-    if (With.grids.units.get(unit.tileIncludingCenter).exists(_.is(Terran.SpiderMine))) return
     
-    val choke = unit.zone.edges.find(e => unit.pixelDistanceCenter(e.pixelCenter) < e.radiusPixels)
-    if (choke.isDefined) {
+    lazy val inChoke = unit.zone.edges.exists(e => unit.pixelDistanceCenter(e.pixelCenter) < e.radiusPixels)
+    lazy val mineSpace = ! unit.tileArea.expand(1, 1).tiles.exists(With.grids.units.get(_).exists(_.is(Terran.SpiderMine)))
+    lazy val retreating = unit.matchups.threats.nonEmpty && ! unit.agent.shouldEngage
+    lazy val timeToMine  = unit.matchups.framesOfSafetyDiffused > GameTime(0, 2)()
+    lazy val inWorkerLine = unit.base.exists(base => base.owner.isUs && base.harvestingArea.contains(unit.tileIncludingCenter))
+    if (mineSpace
+      && timeToMine
+      && ! inWorkerLine
+      && ((inChoke && unit.spiderMines == 3) || retreating)) {
       placeMine(unit, unit.pixelCenter)
     }
   }
   
+  private object TargetFilterTriggersMines extends TargetFilter {
+    override def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = target.unitClass.triggersSpiderMines
+  }
+  
   protected def sabotage(vulture: FriendlyUnitInfo) {
+    if (vulture.cooldownLeft <= 0) return
     val rangeMinimum = if (vulture.matchups.doomedDiffused) 64.0 else 0.0
     val range = vulture.topSpeed * (vulture.matchups.framesToLiveCurrently - 12)
     val maxRangeTiles = PurpleMath.clamp(range, rangeMinimum, 8.0 * 32.0)
   
     //TODO: This is a good candidate for Coordinator since every Vulture will want to recalculate this
-    val victims = vulture.matchups.enemies.filter(_.unitClass.canBeTargetedBySpiderMines)
+    val victims = vulture.matchups.enemies.filter(_.unitClass.triggersSpiderMines)
     if (victims.isEmpty) return
     
-    val saboteursInitial = new mutable.PriorityQueue[UnitInfo]()(Ordering.by(v => victims.map(_.pixelDistanceEdge(v)).min))
-    val saboteursFinal = saboteursInitial.take(victims.size).toVector
+    // TODO: Also capture other threats in range of targets like siege tanks
+    val saboteurs = vulture.matchups.alliesIncludingSelf.filter(u => u.is(Terran.Vulture) && u.friendly.exists(_.spiderMines > 0))
+    val minesweepers = vulture.matchups.threats.count(_.pixelRangeGround > 32 * 4)
+    if (saboteurs.size < minesweepers) return
     
+    val saboteursInitial  = new mutable.PriorityQueue[UnitInfo]()(Ordering.by(v => victims.map(_.pixelDistanceEdge(v)).min)) ++ saboteurs
+    val saboteursFinal    = saboteursInitial.take(2 * victims.size).toVector
     if ( ! saboteursFinal.contains(vulture)) return
     
-    val targeter = new Targeter(vulture)
-    val targetPixel = TargetAOE.chooseTargetPixel(
-      vulture,
-      maxRangeTiles,
-      vulture.subjectiveValue / 3.0,
-      targeter.valueTarget)
-    
-    targetPixel.foreach(finalTarget => placeMine(vulture, finalTarget))
+    new TargetAction(TargetFilterTriggersMines).delegate(vulture)
+    val mineDistance = 20 + vulture.unitClass.radialHypotenuse
+    val targetPixel = vulture.agent.toAttack.map(target => target.pixelCenter.project(vulture.pixelCenter, mineDistance))
+    targetPixel.foreach(placeMine(vulture, _))
+    vulture.agent.toAttack = None
   }
   
   private class Targeter(vulture: FriendlyUnitInfo) {

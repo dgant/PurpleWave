@@ -7,10 +7,11 @@ import Planning.Plans.Army._
 import Planning.Plans.Compound.{If, NoPlan, Not}
 import Planning.Plans.GamePlans.Protoss.Situational.DefendAgainstProxy
 import Planning.Plans.Predicates.Matchup.WeAreZerg
-import Planning.Plans.Macro.Automatic.{Gather, MeldArchons, RequireSufficientSupply, TrainWorkersContinuously}
+import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, TrainWorkersContinuously}
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{BuildOrder, FollowBuildOrder, RequireEssentials}
 import Planning.Plans.Macro.Expanding.RemoveMineralBlocksAt
+import Planning.Plans.Macro.Protoss.MeldArchons
 import Planning.Plans.Recruitment.RecruitFreelancers
 import Planning.Plans.Scouting.{ChillOverlords, ScoutAt, ScoutExpansionsAt}
 

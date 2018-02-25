@@ -5,7 +5,8 @@ import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plans.Compound.{And, FlipIf, Or, Parallel}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Macro.Expanding.{BuildCannonsAtExpansions, RequireMiningBases}
+import Planning.Plans.Macro.Expanding.RequireMiningBases
+import Planning.Plans.Macro.Protoss.BuildCannonsAtExpansions
 import Planning.Plans.Predicates.Milestones.{MiningBasesAtLeast, UnitsAtLeast}
 import Planning.Plans.Predicates.{Employing, SafeAtHome}
 import ProxyBwapi.Races.Protoss

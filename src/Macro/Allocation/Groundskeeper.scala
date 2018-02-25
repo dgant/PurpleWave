@@ -3,7 +3,6 @@ package Macro.Allocation
 import Lifecycle.With
 import Macro.Architecture.{Blueprint, BlueprintMatch, Placement}
 import Mathematics.Points.Tile
-import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
 
 import scala.collection.mutable
@@ -108,8 +107,10 @@ class Groundskeeper {
   }
   
   def flagFulfilled(requirement: Blueprint, fulfillingUnit: UnitInfo) {
-    //Terrible hack
-    if (proposalsFulfilled.contains(requirement) && fulfillingUnit.is(Protoss.PhotonCannon)) return
+    // 2-24-18 made a change here that may break everything because building placement is a disaster
+    if (proposalsFulfilled.exists(_._2 == fulfillingUnit)) {
+      return
+    }
     val proposal = getRepresentativeBlueprintForRequirement(requirement)
     removeBlueprint(requirement)
     proposalsFulfilled.put(proposal,    fulfillingUnit)

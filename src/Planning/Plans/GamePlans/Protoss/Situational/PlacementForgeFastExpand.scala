@@ -17,7 +17,7 @@ class PlacementForgeFastExpand extends ProposePlacement {
       new Blueprint(this, building = Some(Protoss.PhotonCannon),    requireZone = Some(naturalZone),  placement = Some(PlacementProfiles.wallCannon),   marginPixels = Some(marginPixels)),
       new Blueprint(this, building = Some(Protoss.PhotonCannon),    requireZone = Some(naturalZone),  placement = Some(PlacementProfiles.wallCannon),   marginPixels = Some(marginPixels)),
       new Blueprint(this, building = Some(Protoss.Forge),                                             placement = Some(PlacementProfiles.hugTownHall),  marginPixels = Some(marginPixels - 96.0)),
-      new Blueprint(this, building = Some(Protoss.Gateway),                                           placement = Some(PlacementProfiles.hugTownHall),  marginPixels = Some(marginPixels - 64.0)),
+      new Blueprint(this, building = Some(Protoss.Gateway),         preferZone  = Some(naturalZone),  placement = Some(PlacementProfiles.hugTownHall),  marginPixels = Some(marginPixels - 64.0)),
       new Blueprint(this, building = Some(Protoss.PhotonCannon),    requireZone = Some(naturalZone),  placement = Some(PlacementProfiles.wallCannon),   marginPixels = Some(marginPixels)),
       new Blueprint(this, building = Some(Protoss.PhotonCannon),    requireZone = Some(naturalZone),  placement = Some(PlacementProfiles.wallCannon),   marginPixels = Some(marginPixels)),
       new Blueprint(this, building = Some(Protoss.Pylon),           requireZone = Some(mainZone)),

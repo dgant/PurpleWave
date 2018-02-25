@@ -30,7 +30,7 @@ class PvZ4GateGoon extends GameplanModeTemplate {
     new Aggression(1.2),
     new If(
       new UnitsAtMost(10, UnitMatchWarriors, complete = true),
-      new Aggression(1.8),c
+      new Aggression(1.8),
       new If(
         new UnitsAtMost(20, UnitMatchWarriors, complete = true),
         new Aggression(2.5),
@@ -62,7 +62,7 @@ class PvZ4GateGoon extends GameplanModeTemplate {
         new Or(
           new UnitsAtLeast(6, Protoss.Zealot),
           new EnemyHasShown(Zerg.Mutalisk)),
-        new UpgradeComplete(Protoss.DragoonRange, 1, Protoss.DragoonRange.upgradeTime(1))),
+        new UpgradeComplete(Protoss.DragoonRange, 1, Protoss.DragoonRange.upgradeFrames(1))),
       new TrainContinuously(Protoss.Dragoon),
       new TrainContinuously(Protoss.Zealot)),
     new BuildGasPumps,

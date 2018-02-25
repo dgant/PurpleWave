@@ -22,12 +22,15 @@ class Scan extends Plan {
     }
     
     // TODO: Actually check whether we can attack the darned thing.
-    val cloakedThreats = With.units.enemy.filter(u =>
-      u.effectivelyCloaked &&
-      u.matchups.targets.nonEmpty)
+    val cloakedTargets = With.units.enemy.filter(ninja =>
+      ninja.effectivelyCloaked
+      && ninja.matchups.targets.nonEmpty
+      && ninja.matchups.enemies.exists(defender =>
+        (if (ninja.flying) defender.unitClass.attacksAir else defender.unitClass.attacksGround)
+        && defender.inRangeToAttack(ninja)))
     
-    if (cloakedThreats.nonEmpty) {
-      val biggestThreat = cloakedThreats.maxBy(_.matchups.vpfDealingDiffused)
+    if (cloakedTargets.nonEmpty) {
+      val biggestThreat = cloakedTargets.maxBy(_.matchups.vpfDealingDiffused)
       scan(biggestThreat.pixelCenter)
       return
     }

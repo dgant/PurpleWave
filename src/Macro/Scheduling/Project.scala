@@ -77,7 +77,7 @@ object Project {
     
     // Are we not even at the previous level?
     if (With.self.getUpgradeLevel(upgrade) < level - 1) {
-      framesToUpgrade(upgrade, level - 1) + upgrade.upgradeTime(level)
+      framesToUpgrade(upgrade, level - 1) + upgrade.upgradeFrames(level)
     }
   
     // How much longer before the upgrade finishes?
@@ -88,6 +88,6 @@ object Project {
     
     // Do we need to build the thing that upgrades this?
     val framesToUpgrader = framesToUnits(upgrade.whatUpgrades)
-    framesToUpgrader + upgrade.upgradeTime(level)
+    framesToUpgrader + upgrade.upgradeFrames(level)
   }
 }

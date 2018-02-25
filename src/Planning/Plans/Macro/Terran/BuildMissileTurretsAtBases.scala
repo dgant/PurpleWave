@@ -1,4 +1,4 @@
-package Planning.Plans.Macro.Expanding
+package Planning.Plans.Macro.Terran
 
 import Information.Geography.Types.Base
 import Lifecycle.With

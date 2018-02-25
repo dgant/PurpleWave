@@ -3,7 +3,7 @@ package Micro.Actions.Combat.Techniques
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Micro.Actions.Combat.Attacking.Target
 import Micro.Actions.Combat.Tactics.Potshot
-import Micro.Actions.Combat.Techniques.Common.Activators.Min
+import Micro.Actions.Combat.Techniques.Common.Activators.WeightedMean
 import Micro.Actions.Combat.Techniques.Common.{ActionTechnique, PotshotAsSoonAsPossible}
 import Micro.Actions.Commands.Attack
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -23,7 +23,7 @@ object Abuse extends ActionTechnique {
     && unit.matchups.threats.nonEmpty
   )
   
-  override val activator = new Min(this)
+  override val activator = new WeightedMean(this)
   
   override def applicabilityOther(unit: FriendlyUnitInfo, other: UnitInfo): Option[Double] = {
     if (other.isFriendly) return None
@@ -33,8 +33,15 @@ object Abuse extends ActionTechnique {
     val framesOfSafetyAgainst = - unit.matchups.framesOfEntanglementPerThreatDiffused.getOrElse(other, 0.0)
     if (framesOfSafetyAgainst < unit.unitClass.framesToTurnAndShootAndTurnBackAndAccelerate) return Some(0.0)
     
-    val deltaSpeed = unit.topSpeed - other.topSpeed
-    if (deltaSpeed <= 0) return Some(0.0)
+    lazy val deltaThreats = other.matchups.threats.size - unit.matchups.threats.size
+    lazy val deltaSpeed = unit.topSpeed - other.topSpeed
+    lazy val canOle = (
+      deltaSpeed == 0.0
+        && deltaThreats > 0
+        && ! other.inRangeToAttack(unit)
+        && ! other.inRangeToAttack(unit, unit.unitClass.framesToTurnAndShootAndTurnBackAndAccelerate))
+    
+    if (deltaSpeed <= 0 && ! canOle) return Some(0.0)
   
     val deltaRange = unit.pixelRangeAgainst(other) - other.pixelRangeAgainst(unit)
     if (deltaRange <= 0) return Some(0.0)
@@ -48,7 +55,6 @@ object Abuse extends ActionTechnique {
     if (unit.readyForAttackOrder && (safeToShoot || lastChanceToShoot)) {
       Potshot.delegate(unit)
       PotshotAsSoonAsPossible.delegate(unit)
-      Target.delegate(unit)
       Attack.delegate(unit)
       if (unit.agent.toAttack.isEmpty) return
     }

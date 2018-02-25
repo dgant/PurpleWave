@@ -18,6 +18,7 @@ class Blueprint(
   var requireCreep        : Option[Boolean]           = None,
   var requireTownHallTile : Option[Boolean]           = None,
   var requireGasTile      : Option[Boolean]           = None,
+  var requireResourceGap  : Option[Boolean]           = None,
   var placement           : Option[PlacementProfile]  = None,
   var marginPixels        : Option[Double]            = None,
   val requireCandidates   : Option[Iterable[Tile]]    = None,
@@ -35,6 +36,7 @@ class Blueprint(
   requireCreep                = requireCreep                .orElse(Some(building.exists(_.requiresCreep)))
   requireTownHallTile         = requireTownHallTile         .orElse(Some(building.exists(_.isTownHall)))
   requireGasTile              = requireGasTile              .orElse(Some(building.exists(_.isRefinery)))
+  requireResourceGap          = requireResourceGap          .orElse(Some(building.exists(_.isTownHall)))
   marginPixels                = marginPixels                .orElse(if (building.exists(_.attacks)) building.map(_.effectiveRangePixels.toDouble) else Some(32.0 * 9.0))
   preferZone                  = preferZone                  .orElse(requireZone)
   placement                   = placement                   .orElse(Some(PlacementProfiles.default(this)))
@@ -95,12 +97,14 @@ class Blueprint(
     
     val buildArea = relativeBuildArea.add(tile)
   
-    def violatesBuildArea(nextTile: Tile): Boolean = {
-      nextTile.zone.perimeter.contains(nextTile)            ||
-      ! With.architecture.buildable(nextTile)               ||
-      (requireCreep.get != With.grids.creep.get(nextTile))  ||
-      (respectHarvesting  && With.architecture.isHarvestingArea(nextTile))
-    }
+    def violatesBuildArea(nextTile: Tile): Boolean = (
+      nextTile.zone.perimeter.contains(nextTile)
+      || ! With.architecture.buildable(nextTile)
+      || (requireCreep.get != With.grids.creep.get(nextTile))
+      || (respectHarvesting && With.architecture.isHarvestingArea(nextTile))
+      || (requireResourceGap.get && ! With.grids.buildableTownHall.get(nextTile))
+      || With.grids.units.get(nextTile).exists(u => ! u.flying && u.isEnemy || ! u.canMove)
+    )
     
     val violator = buildArea.tiles.find(violatesBuildArea)
     

@@ -21,6 +21,7 @@ object ShowUnitsFriendly extends View {
   var showForces      : Boolean = false
   var showDesire      : Boolean = true
   var showFightReason : Boolean = true
+  var showDistance    : Boolean = false
   
   override def renderMap() { With.units.ours.foreach(renderUnitState) }
   
@@ -137,6 +138,15 @@ object ShowUnitsFriendly extends View {
       val pixel = unit.pixelCenter.subtract(0, 6 + unit.unitClass.height / 2)
       DrawMap.circle(pixel, 3, Color.Black, solid = true)
       DrawMap.circle(pixel, 2, color,       solid = true)
+    }
+    
+    if (showDistance) {
+      DrawMap.arrow(unit.pixelCenter, agent.destination, Color.Black)
+      DrawMap.label(
+        unit.pixelDistanceTravelling(unit.agent.destination).toInt.toString,
+        agent.unit.pixelCenter.add(0, 21),
+        drawBackground = true,
+        Color.Black)
     }
   }
   

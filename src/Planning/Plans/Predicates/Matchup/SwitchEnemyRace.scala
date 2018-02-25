@@ -22,15 +22,19 @@ class SwitchEnemyRace(
   
   override def getChildren: Iterable[Plan] = Vector(terran.get, protoss.get, zerg.get, random.get)
   
+  override def isComplete: Boolean = appropriatePlan.isComplete
+  
   override def onUpdate() {
-
+    delegate(appropriatePlan)
+  }
+  
+  protected def appropriatePlan: Plan = {
     val matchupPlan = With.enemy.raceCurrent match {
       case Race.Terran    => terran
       case Race.Protoss   => protoss
       case Race.Zerg      => zerg
       case _              => random
     }
-  
-    delegate(matchupPlan.get)
+    matchupPlan.get
   }
 }

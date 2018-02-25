@@ -8,7 +8,8 @@ import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Predicates.Employing
 import Planning.Plans.Macro.Automatic.{TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Macro.Expanding.{BuildCannonsAtNatural, RequireMiningBases}
+import Planning.Plans.Macro.Expanding.RequireMiningBases
+import Planning.Plans.Macro.Protoss.BuildCannonsAtNatural
 import Planning.Plans.Predicates.Milestones._
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP.PvPOpen3GateSpeedlots

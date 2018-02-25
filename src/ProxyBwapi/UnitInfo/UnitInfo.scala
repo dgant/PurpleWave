@@ -440,7 +440,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     && (if (enemy.flying) unitClass.attacksAir else unitClass.attacksGround)
     && ! enemy.effectivelyCloaked
     && ! friendly.exists(_.loaded)
-    && (enemy.unitClass.canBeTargetedBySpiderMines || ! isSpiderMine())
+    && (enemy.unitClass.triggersSpiderMines || ! isSpiderMine())
     && (unitClass.unaffectedByDarkSwarm || ! enemy.underDarkSwarm)
   )
   
@@ -488,7 +488,8 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   
   def moving: Boolean = velocityX != 0 || velocityY != 0
   
-  def speedApproachingPixel(pixel: Pixel): Double = {
+  def speedApproaching(other: UnitInfo): Double = speedApproaching(other.pixelCenter)
+  def speedApproaching(pixel: Pixel): Double = {
     val deltaXY = Force(x - pixel.x, y - pixel.y)
     val deltaV  = velocity
     val output  = - velocity.lengthFast * (deltaXY.normalize * velocity.normalize)

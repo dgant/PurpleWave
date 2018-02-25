@@ -1,4 +1,4 @@
-package Planning.Plans.Macro.Expanding
+package Planning.Plans.Macro.Protoss
 
 import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With

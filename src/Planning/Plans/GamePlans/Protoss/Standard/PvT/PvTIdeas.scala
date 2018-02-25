@@ -118,7 +118,7 @@ object PvTIdeas {
         new GasAtMost(100)),
       new And(
         new UnitsAtLeast(8, Protoss.Dragoon),
-        new UpgradeComplete(Protoss.ZealotSpeed, withinFrames = Protoss.ZealotSpeed.upgradeTime.head._2))),
+        new UpgradeComplete(Protoss.ZealotSpeed, withinFrames = Protoss.ZealotSpeed.upgradeFrames.head._2))),
     new TrainContinuously(Protoss.Dragoon),
     new TrainContinuously(Protoss.Zealot, 30, 6))
   

@@ -12,6 +12,7 @@ import scala.collection.mutable
 
 class LockUnits extends ResourceLock {
   
+  var canPoach        = new Property[Boolean](false)
   var interruptable   = new Property[Boolean](true)
   val unitMatcher     = new Property[UnitMatcher](UnitMatchAnything)
   val unitPreference  = new Property[UnitPreference](UnitPreferAnything)
@@ -21,6 +22,7 @@ class LockUnits extends ResourceLock {
   
   var isSatisfied:Boolean = false
   override def satisfied: Boolean = isSatisfied
+  
   override def acquire(plan: Plan) {
     owner = plan
     With.recruiter.add(this)

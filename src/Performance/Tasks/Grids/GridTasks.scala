@@ -11,6 +11,7 @@ abstract class GridTask[T](grid: AbstractGrid[T]) extends AbstractTask {
 class TaskGridAltitudeBonus     extends GridTask(With.grids.altitudeBonus)
 class TaskGridBuildable         extends GridTask(With.grids.buildable)
 class TaskGridBuildableTerrain  extends GridTask(With.grids.buildableTerrain)
+class TaskGridBuildableTownHall extends GridTask(With.grids.buildableTownHall)
 class TaskGridChokepoints       extends GridTask(With.grids.chokepoints)
 class TaskGridCreep             extends GridTask(With.grids.creep)
 class TaskGridEnemyDetection    extends GridTask(With.grids.enemyDetection)

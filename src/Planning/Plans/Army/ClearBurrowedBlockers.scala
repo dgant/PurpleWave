@@ -20,7 +20,7 @@ class ClearBurrowedBlockers extends Plan {
   detector.get.unitCounter.set(UnitCountOne)
   
   val decoy = new Property(new LockUnits)
-  decoy.get.unitMatcher.set(UnitMatchCustom((unit) => unit.canMove && unit.unitClass.canBeTargetedBySpiderMines))
+  decoy.get.unitMatcher.set(UnitMatchCustom((unit) => unit.canMove && unit.unitClass.triggersSpiderMines))
   decoy.get.unitCounter.set(UnitCountOne)
   
   override def onUpdate(): Unit = {

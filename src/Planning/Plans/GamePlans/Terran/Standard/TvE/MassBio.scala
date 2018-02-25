@@ -8,15 +8,14 @@ import Planning.Plan
 import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Predicates.Employing
-import Planning.Plans.Predicates.Reactive.EnemyMutalisks
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Predicates.Milestones._
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Predicates.Economy.MineralsAtLeast
-import ProxyBwapi.Races.{Terran, Zerg}
+import Planning.Plans.Predicates.Employing
+import Planning.Plans.Predicates.Milestones._
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Strategies.Terran.TvE.TvEMassBio
 
 class MassBio extends GameplanModeTemplate {
@@ -118,15 +117,19 @@ class MassBio extends GameplanModeTemplate {
             8 * With.units.ours.count(_.is(Terran.Medic))),
           new TrainContinuously(Terran.Medic, maximumConcurrentlyRatio = 0.67)),
         new If(
-          new Not(new EnemyMutalisks),
-          new TrainContinuously(Terran.Firebat, maximumConcurrentlyRatio = 0.34)),
+          new Or(
+            new EnemyUnitsAtLeast(3, Protoss.Zealot),
+            new EnemyUnitsAtLeast(1, Zerg.Zergling)),
+          new TrainContinuously(Terran.Firebat, maximumConcurrentlyRatio = 0.34, maximumTotal = 2)),
         new TrainContinuously(Terran.Marine)
         )),
   
     new IfOnMiningBases(2,
       new Parallel(
-        new Build(RequestAtLeast(1, Terran.EngineeringBay)),
         new UpgradeContinuously(Terran.MarineRange),
+        new Build(
+          RequestAtLeast(6, Terran.Barracks),
+          RequestAtLeast(1, Terran.EngineeringBay)),
         new UpgradeContinuously(Terran.BioDamage),
         new UpgradeContinuously(Terran.BioArmor))),
     new Trigger(

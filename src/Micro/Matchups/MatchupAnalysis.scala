@@ -7,7 +7,6 @@ import Lifecycle.With
 import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
 import Micro.Decisions.MicroValue
-import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.{ByOption, Forever}
 
@@ -49,7 +48,8 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
   lazy val threatsViolent         : Vector[UnitInfo]      = threats.filter(_.isBeingViolentTo(me))
   lazy val threatsInRange         : Vector[UnitInfo]      = threats.filter(threat => threat.pixelRangeAgainst(me) >= threat.pixelDistanceEdge(me, at) - me.pixelsTravelledMax(frame) - threat.pixelsTravelledMax(frame))
   lazy val targetsInRange         : Vector[UnitInfo]      = targets.filter(target => target.visible && me.pixelRangeAgainst(target) >= target.pixelDistanceEdge(me, at) - me.pixelsTravelledMax(frame) - target.pixelsTravelledMax(frame) && (me.unitClass.groundMinRangeRaw <= 0 || me.pixelDistanceEdge(target) > 32.0 * 3.0))
-  lazy val repairers              : ArrayBuffer[UnitInfo] = ArrayBuffer.empty ++ allies.filter(ally => ally.is(Terran.SCV) && ally.target.contains(me))
+  
+  def repairers: ArrayBuffer[UnitInfo] = ArrayBuffer.empty ++ allies.filter(_.friendly.exists(_.agent.toRepair.contains(me)))
   
   lazy val valuePerDamage                         : Double                = MicroValue.valuePerDamage(me)
   lazy val vpfDealingDiffused                     : Double                = targetsInRange.map(target => dpfDealingDiffused(target)  * target.matchups.valuePerDamage).sum
@@ -89,13 +89,13 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
       dpfDealingDiffused(target)
   
   def framesOfEntanglementWith(threat: UnitInfo, fixedRange: Option[Double] = None): Double = {
-    lazy val approachSpeedMe      = me.speedApproachingPixel(threat.pixelCenter)
-    lazy val approachSpeedThreat  = threat.speedApproachingPixel(me.pixelCenter)
+    lazy val approachSpeedMe      = me.speedApproaching(threat.pixelCenter)
+    lazy val approachSpeedThreat  = threat.speedApproaching(me.pixelCenter)
     lazy val approachSpeedTotal   = approachSpeedMe + approachSpeedThreat
     lazy val framesToTurn         = me.unitClass.framesToTurn180 // Should be this, but for performance limitations: me.unitClass.framesToTurn(me.angleRadians - threat.pixelCenter.radiansTo(me.pixelCenter))
-    lazy val framesToAccelerate   = (me.topSpeed + approachSpeedThreat) / me.unitClass.accelerationFrames
+    lazy val framesToAccelerate   = (me.topSpeed + approachSpeedMe + approachSpeedThreat) / me.unitClass.accelerationFrames
     lazy val blastoffFrames       = if (me.unitClass.canMove) framesToTurn + framesToAccelerate else 0 //How long for us to turn around and run
-    lazy val reactionFrames       = With.reaction.agencyMax + With.latency.framesRemaining
+    lazy val reactionFrames       = With.reaction.agencyMax + 2 * With.latency.framesRemaining
     lazy val threatRangeBonus     = if (threat.isFriendly) 0.0 else Math.max(0.0, approachSpeedTotal * reactionFrames)
     
     val effectiveRange = fixedRange.getOrElse(threat.pixelRangeAgainst(me) + threatRangeBonus)

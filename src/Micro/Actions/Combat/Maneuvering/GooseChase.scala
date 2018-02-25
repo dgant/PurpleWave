@@ -7,9 +7,10 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 object GooseChase extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
-    unit.canMove
+    false
+    && unit.canMove
     && unit.matchups.threats.nonEmpty
-    && unit.matchups.threats.forall(unit.topSpeed > _.topSpeed)
+    && unit.matchups.threats.forall(unit.topSpeed > _.topSpeed * 1.5)
   )
   
   override protected def perform(unit: FriendlyUnitInfo) {

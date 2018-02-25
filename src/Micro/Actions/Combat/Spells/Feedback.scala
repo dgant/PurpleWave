@@ -14,11 +14,11 @@ object Feedback extends TargetedSpell {
   override protected def thresholdValue : Double    = Protoss.DarkArchon.subjectiveValue / 3.0
   
   override protected def valueTarget(target: UnitInfo): Double = {
-    if (target.unitClass.isBuilding)  return 0.0
-    if ( ! target.isEnemy)            return 0.0
+    if (target.unitClass.isBuilding)  return -1.0
+    if ( ! target.isEnemy)            return -1.0
     
     val fatalityBonus = if (target.energy >= target.totalHealth) 2.0 else 1.0
-    val damageValue   = Math.min(target.energy, target.totalHealth) / target.unitClass.maxTotalHealth * target.unitClass.subjectiveValue
+    val damageValue   = target.unitClass.subjectiveValue * Math.min(target.energy, target.totalHealth) / target.unitClass.maxTotalHealth
     val output        = fatalityBonus * damageValue
     output
   }

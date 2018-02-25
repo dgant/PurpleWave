@@ -4,20 +4,19 @@ import Information.Geography.Types.Zone
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
-import Macro.BuildRequests.RequestAtLeast
-import Planning.Composition.UnitCounters.UnitCountExcept
+import Macro.BuildRequests.{BuildRequest, RequestAtLeast}
+import Planning.Composition.UnitCounters.UnitCountExactly
 import Planning.Composition.UnitMatchers.UnitMatchWorkers
-import Planning.Plans.Army.{Aggression, AllIn, Attack}
-import Planning.Plans.Compound.{And, If, Not}
+import Planning.Plans.Army.Attack
+import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Predicates.Employing
-import Planning.Plans.Macro.Automatic.{Gather, RequireSufficientSupply, TrainContinuously}
+import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.Build.ProposePlacement
-import Planning.Plans.Macro.BuildOrders.{Build, FirstEightMinutes, FollowBuildOrder}
-import Planning.Plans.Macro.Expanding.RequireMiningBases
+import Planning.Plans.Macro.BuildOrders.Build
+import Planning.Plans.Predicates.Employing
 import Planning.Plans.Predicates.Milestones.UnitsAtLeast
-import Planning.Plans.Scouting.{FoundEnemyBase, Scout}
-import Planning.ProxyPlanner
+import Planning.Plans.Predicates.Reactive.EnemyBasesAtLeast
+import Planning.{Plan, ProxyPlanner}
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvE.TvEProxyBBS
 
@@ -25,44 +24,56 @@ class ProxyBBS extends GameplanModeTemplate {
   
   override val activationCriteria = new Employing(TvEProxyBBS)
   
-  def proxyZone: Option[Zone] = ProxyPlanner.proxyAutomaticSneaky
+  override def aggression: Double = 1.5
   
-  override def onUpdate(): Unit = {
-    With.blackboard.maxFramesToSendAdvanceBuilder = Int.MaxValue
-    super.onUpdate()
-  }
+  lazy val proxyZone: Option[Zone] = ProxyPlanner.proxyAutomaticAggressive
   
-  children.set(Vector(
-    new Aggression(1.5),
+  override def defaultScoutPlan: Plan = NoPlan()
+  
+  override def defaultAttackPlan: Plan = new Parallel(
+    new Attack,
+    new Trigger(
+      new UnitsAtLeast(1, Terran.Marine, complete = false),
+      new Attack {
+        attackers.get.unitCounter.set(UnitCountExactly(2))
+        attackers.get.unitMatcher.set(UnitMatchWorkers)
+      })
+  )
+  
+  override def defaultWorkerPlan: Plan = NoPlan()
+  override def defaultSupplyPlan: Plan = NoPlan()
+  
+  override def buildOrder: Seq[BuildRequest] = Vector(
+    RequestAtLeast(1, Terran.CommandCenter),
+    RequestAtLeast(8, Terran.SCV),
+    RequestAtLeast(2, Terran.Barracks),
+    RequestAtLeast(1, Terran.SupplyDepot),
+    RequestAtLeast(9, Terran.SCV),
+    RequestAtLeast(1, Terran.Marine))
+  
+  override def buildPlans: Seq[Plan] = Vector(
+    new Do(() => With.blackboard.maxFramesToSendAdvanceBuilder = Int.MaxValue),
     new ProposePlacement{
       override lazy val blueprints = Vector(
-        new Blueprint(this, building = Some(Terran.Barracks), preferZone = proxyZone, respectHarvesting = proxyZone.exists( ! _.owner.isUs), placement = Some(PlacementProfiles.proxyBuilding)),
-        new Blueprint(this, building = Some(Terran.Barracks), preferZone = proxyZone, respectHarvesting = proxyZone.exists( ! _.owner.isUs), placement = Some(PlacementProfiles.proxyBuilding)))
+        new Blueprint(this, building = Some(Terran.Barracks), preferZone = proxyZone, respectHarvesting = false, placement = Some(PlacementProfiles.proxyBuilding)),
+        new Blueprint(this, building = Some(Terran.Barracks), preferZone = proxyZone, respectHarvesting = false, placement = Some(PlacementProfiles.proxyBuilding)))
     },
-    new RequireMiningBases(1),
-    new FirstEightMinutes(
-      new Build(
-        RequestAtLeast(1, Terran.CommandCenter),
-        RequestAtLeast(8, Terran.SCV),
-        RequestAtLeast(2, Terran.Barracks),
-        RequestAtLeast(9, Terran.SCV),
-        RequestAtLeast(1, Terran.SupplyDepot),
-        RequestAtLeast(1, Terran.Marine))),
-    new RequireSufficientSupply,
     new TrainContinuously(Terran.Marine),
-    new TrainContinuously(Terran.SCV),
+    new Build(RequestAtLeast(10, Terran.SCV)),
     new If(
       new And(
-        new Not(new FoundEnemyBase),
-        new UnitsAtLeast(2, Terran.Barracks)),
-      new Scout),
-    new AllIn(new UnitsAtLeast(10, Terran.Marine, complete = true)),
-    new Attack,
-    new FollowBuildOrder,
-    new Attack {
-      attackers.get.unitCounter.set(new UnitCountExcept(8, UnitMatchWorkers))
-      attackers.get.unitMatcher.set(UnitMatchWorkers)
-    },
-    new Gather
-  ))
+        new UnitsAtLeast(9, Terran.SCV),
+        new EnemyBasesAtLeast(1)),
+      new Parallel(
+        new ProposePlacement {
+          override lazy val blueprints = Vector(
+            new Blueprint(this, building = Some(Terran.Bunker), preferZone = With.geography.enemyBases.headOption.map(_.zone), respectHarvesting = false),
+            new Blueprint(this, building = Some(Terran.Bunker), preferZone = With.geography.enemyBases.headOption.map(_.zone), respectHarvesting = false),
+            new Blueprint(this, building = Some(Terran.Bunker), preferZone = With.geography.enemyBases.headOption.map(_.zone), respectHarvesting = false),
+            new Blueprint(this, building = Some(Terran.Bunker), preferZone = With.geography.enemyBases.headOption.map(_.zone), respectHarvesting = false)
+          )
+        },
+        new TrainContinuously(Terran.Bunker, 3, 1)
+      ))
+  )
 }

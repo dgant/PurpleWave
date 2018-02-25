@@ -10,7 +10,7 @@ import Micro.Coordination.Explosions.Explosion
 import Planning.Yolo
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-object Duck extends Action {
+object Dodge extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.canMove && ! Yolo.active

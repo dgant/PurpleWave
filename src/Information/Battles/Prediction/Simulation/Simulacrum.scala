@@ -5,6 +5,7 @@ import Lifecycle.With
 import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
 import Micro.Decisions.MicroValue
+import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.UnitInfo
 
 import scala.collection.mutable
@@ -22,11 +23,12 @@ class Simulacrum(
   val speedMultiplier   : Double  = if (realUnit.isEnemy || realUnit.flying)      1.0 else simulation.chokeMobility(realUnit.zone)
   val bonusDistance     : Double  = if (realUnit.isOurs  || realUnit.visible)     0.0 else 32.0 * Math.min(realUnit.mobility, 3)
   val bonusRange        : Double  = if (realUnit.isOurs  || ! realUnit.unitClass.isSiegeTank || ! simulation.weAttack) 0.0 else With.configuration.bonusTankRange
+  val multiplierDamage  : Double  = if (realUnit.unitClass.isWorker && realUnit.gathering) 0.1 else 1.0
   val multiplierSplash  : Double  = MicroValue.maxSplashFactor(realUnit)
   
   // Unit state
   val canMove             : Boolean                     = realUnit.canMove
-  val topSpeed            : Double                      = realUnit.topSpeed * speedMultiplier
+  var topSpeed            : Double                      = realUnit.topSpeed * speedMultiplier
   var shieldPoints        : Int                         = realUnit.shieldPoints + realUnit.defensiveMatrixPoints
   var hitPoints           : Int                         = realUnit.hitPoints
   var cooldownShooting    : Int                         = 1 + realUnit.cooldownLeft
@@ -75,6 +77,12 @@ class Simulacrum(
     else {
       ! realUnit.canMove
     }
+  }
+  
+  if (realUnit.is(Zerg.Lurker) && ! realUnit.burrowed) {
+    cooldownShooting = 36
+    topSpeed = 0
+    true
   }
   
   def updateDeath() {

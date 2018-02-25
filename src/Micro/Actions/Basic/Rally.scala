@@ -6,12 +6,12 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Rally extends Action {
   
-  override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    With.framesSince(unit.lastSetRally) > 24 * 15 &&
-    unit.unitClass.isBuilding                     &&
-    unit.unitClass.trainsGroundUnits              &&
-    unit.canDoAnything
-  }
+  override def allowed(unit: FriendlyUnitInfo): Boolean = (
+    With.framesSince(unit.lastSetRally) > 24 * 15
+    && unit.unitClass.isBuilding
+    && unit.unitClass.trainsGroundUnits
+    && unit.canDoAnything
+  )
   
   override def perform(unit: FriendlyUnitInfo) {
     if (unit.unitClass.isTownHall) {

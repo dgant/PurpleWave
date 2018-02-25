@@ -1,6 +1,5 @@
 package Micro.Actions.Combat.Attacking.Filters
 
-import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
@@ -20,11 +19,11 @@ object TargetFilterMission extends TargetFilter {
     lazy val atOurWorkers = target.base.exists(_.owner.isUs) && target.matchups.targetsInRange.exists(_.unitClass.isWorker)
   
     lazy val alliesAssisting  = target.matchups.threats.exists(ally =>
-      ally.topSpeed >= target.topSpeed
-      && ally.framesBeforeAttacking(target) < GameTime(0, 1)())
+      (ally.topSpeed >= target.topSpeed || ally.pixelRangeAgainst(target) >= target.pixelRangeAgainst(ally))
+      && ally.framesBeforeAttacking(target) <= actor.framesBeforeAttacking(target))
   
     lazy val targetBusy       = target.gathering || target.constructing || target.repairing
-    lazy val targetCatchable  = actor.inRangeToAttack(target) || targetBusy || alliesAssisting
+    lazy val targetCatchable  = actor.topSpeed >= target.topSpeed || actor.inRangeToAttack(target) || targetBusy || alliesAssisting
     
     val output = (targetCatchable || atOurWorkers) && (pillaging || arrived || inRange || engaged)
     

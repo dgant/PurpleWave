@@ -20,15 +20,16 @@ class TrainContinuously(
   override def onUpdate() {
     if ( ! canBuild) return
     
-    val unitsNow                 = currentCount
-    val unitsMaximum             = maximumTotal
-    val unitsMaximumDesirable    = maxDesirable
-    val buildersExisting         = builders
-    val buildersOccupied         = buildersExisting.toSeq.map(_.unitClass).distinct.map(With.scheduler.dumbPumps.consumed).sum
-    val capacityMaximum          = (buildersExisting.size * maximumConcurrentlyRatio).toInt
-    val capacityFinal            = Math.max(0, Vector(maximumConcurrently, capacityMaximum, Math.max(1, capacityMaximum - buildersOccupied)).min)
-    val quantityToAdd            = List(unitsMaximum, unitsMaximumDesirable, capacityFinal).min
-    val quantityToRequest        = List(unitsMaximum, unitsMaximumDesirable, capacityFinal + unitsNow).min
+    val unitsNow                = currentCount
+    val unitsMaximum            = maximumTotal
+    val unitsMaximumDesirable   = maxDesirable
+    val buildersSpawning        = if (unitClass.whatBuilds._1 == Zerg.Larva) With.units.ours.count(u => u.complete && u.unitClass.producesLarva) else 0
+    val buildersExisting        = builders
+    val buildersOccupied        = buildersExisting.toSeq.map(_.unitClass).distinct.map(With.scheduler.dumbPumps.consumed).sum
+    val capacityMaximum         = ((buildersExisting.size + buildersSpawning) * maximumConcurrentlyRatio).toInt
+    val capacityFinal           = Math.max(0, Vector(maximumConcurrently, capacityMaximum, Math.max(1, capacityMaximum - buildersOccupied)).min)
+    val quantityToAdd           = List(unitsMaximum, unitsMaximumDesirable, capacityFinal).min
+    val quantityToRequest       = List(unitsMaximum, unitsMaximumDesirable, capacityFinal + unitsNow).min
     
     (unitClass.buildUnitsBorrowed ++ unitClass.buildUnitsSpent).foreach(builderClass =>
       With.scheduler.dumbPumps.consume(builderClass, quantityToAdd))
@@ -45,7 +46,9 @@ class TrainContinuously(
   protected def currentCount: Int = {
     // Should this just be unit.alive?
     // Maybe this is compensating for a Scheduler
-    With.units.ours.count(unit => unit.aliveAndComplete && matcher.accept(unit))
+    With.units.ours.count(unit =>
+      (unit.alive && matcher.accept(unit))
+      || (unit.is(Zerg.Egg) && unit.buildType == unitClass))
   }
   
   protected val matcher =

@@ -22,6 +22,7 @@ class Scout(scoutCount: Int = 1) extends Plan {
     unitMatcher.set(UnitMatchAnd(UnitMatchWorkers, UnitMatchNotHoldingResources))
     unitPreference.set(UnitPreferClose(SpecificPoints.middle))
     interruptable.set(false)
+    canPoach.set(true)
   })
   
   var acquiredScouts: Iterable[FriendlyUnitInfo] = Iterable.empty
@@ -31,6 +32,7 @@ class Scout(scoutCount: Int = 1) extends Plan {
     if (bases.isEmpty)                                                  return false
     if (With.blackboard.lastScoutDeath > 0)                             return true
     if (bases.exists(_.zone.walledIn))                                  return true
+    if (bases.exists(_.units.exists(_.unitClass.isStaticDefense)))      return true
     if (bases.exists(_.townHall.isDefined) && scouts.get.units.isEmpty) return true
     if (With.geography.enemyBases.exists(_.units.exists(u => u.isOurs && ! u.unitClass.isWorker))) return true
     false
@@ -60,7 +62,6 @@ class Scout(scoutCount: Int = 1) extends Plan {
     else {
       scoutingDestinations ++= enemyStartBases.map(_.townHallArea.midPixel)
     }
-    
     
     if (acquiredScouts.size > scoutsDesired) {
       scouts.get.release()

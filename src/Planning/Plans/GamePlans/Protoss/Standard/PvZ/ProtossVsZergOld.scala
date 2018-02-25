@@ -12,6 +12,7 @@ import Planning.Plans.GamePlans.Protoss.Situational._
 import Planning.Plans.Macro.Automatic.{MatchingRatio, _}
 import Planning.Plans.Macro.BuildOrders._
 import Planning.Plans.Macro.Expanding._
+import Planning.Plans.Macro.Protoss.{BuildCannonsAtBases, BuildCannonsAtExpansions, MeldArchons}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Predicates.Economy.{GasAtLeast, GasAtMost, MineralsAtLeast, MineralsAtMost}
 import Planning.Plans.Predicates.Milestones._
@@ -235,7 +236,7 @@ class ProtossVsZergOld extends Parallel {
           new EnemyStrategy(With.intelligence.fingerprints.fingerprint4Pool),
           new FrameAtLeast(GameTime(2, 5)()),
           new UnitsAtLeast(1, Protoss.PhotonCannon, complete = false),
-          new UnitsAtMost(1, Protoss.PhotonCannon, complete = true)),
+          new UnitsAtMost(2, Protoss.PhotonCannon, complete = true)),
         new DefendFFEWithProbesAgainst4Pool)),
   
     new FirstEightMinutes(

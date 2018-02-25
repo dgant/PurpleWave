@@ -8,8 +8,9 @@ import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Predicates.Employing
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Macro.Expanding.{BuildCannonsAtExpansions, BuildCannonsAtNatural, RequireMiningBases}
-import Planning.Plans.Predicates.Milestones.{MiningBasesAtLeast, IfOnMiningBases, UnitsAtLeast, UpgradeComplete}
+import Planning.Plans.Macro.Expanding.RequireMiningBases
+import Planning.Plans.Macro.Protoss.{BuildCannonsAtExpansions, BuildCannonsAtNatural}
+import Planning.Plans.Predicates.Milestones.{IfOnMiningBases, MiningBasesAtLeast, UnitsAtLeast, UpgradeComplete}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvT.PvT3BaseCorsair
 

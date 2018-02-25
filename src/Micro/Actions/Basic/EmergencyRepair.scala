@@ -9,7 +9,7 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 object EmergencyRepair extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
-    false
+    true
     && unit.is(Terran.SCV)
     && With.self.minerals + With.economy.ourIncomePerFrameMinerals * GameTime(0, 10)() > 50
   )
@@ -21,17 +21,20 @@ object EmergencyRepair extends Action {
     
     val patient = patients.minBy(_.pixelDistanceEdge(unit))
     
+    unit.agent.toRepair = Some(patient)
     With.commander.repair(unit, patient)
   }
   
   def eligiblePatients(repairer: FriendlyUnitInfo): Iterable[UnitInfo] = {
     repairer.teammates.filter(patient =>
-      patient.complete                  &&
-      patient.unitClass.isMechanical    &&
-      isCloseEnough(repairer, patient)  &&
-      needsRepair(repairer, patient)    &&
-      ! patient.moving                  &&
-      ! patient.plagued
+      patient != repairer
+      && patient.complete
+      && patient.unitClass.isMechanical
+      && isCloseEnough(repairer, patient)
+      && needsRepair(repairer, patient)
+      && ! patient.is(Terran.SCV)
+      && ! patient.moving
+      && ! patient.plagued
     )
   }
   
@@ -43,18 +46,18 @@ object EmergencyRepair extends Action {
     lazy val canSavePlebian   = repairer.framesToGetInRange(patient) < patientLifetime
     lazy val repairerAdjacent = repairer.pixelDistanceEdge(patient) < 16.0
     lazy val patientImmobile  = ! patient.canMove
-    lazy val repairerNearest  = patient.matchups.repairers.isEmpty  &&
-      patient.framesToGetInRange(patient) < 24 * 4.0                &&
-      ! patient.matchups.allies.exists(otherRepairer =>
+    lazy val repairerNearest  = (patient.matchups.repairers.isEmpty
+      && patient.framesToGetInRange(patient) < 24 * 4.0
+      && ! patient.matchups.allies.exists(otherRepairer =>
         otherRepairer != repairer &&
-        otherRepairer.pixelDistanceEdge(patient) < repairer.pixelDistanceEdge(patient))
+        otherRepairer.pixelDistanceEdge(patient) < repairer.pixelDistanceEdge(patient)))
     
     val output = (canSaveBunker || canSavePlebian) && (repairerAdjacent || patientImmobile || repairerNearest)
     output
   }
   
   def needsRepair(repairer: FriendlyUnitInfo, patient: UnitInfo): Boolean = {
-    lazy val docsRepairingNow = patient.matchups.repairers.count(_.framesToGetInRange(patient) < 8.0)
+    lazy val docsRepairingNow = patient.matchups.repairers.size
     lazy val repairPerFrame   = 0.9 * patient.unitClass.maxTotalHealth / patient.unitClass.buildFrames
     lazy val dpfRepairingNow  = repairPerFrame * docsRepairingNow
     

@@ -23,6 +23,7 @@ object FightOrFlight extends Action {
     }
   
     decide(true,  "Berzerk",    () => unit.agent.canBerzerk)
+    decide(true,  "CantFlee",   () => ! unit.agent.canFlee)
     decide(true,  "YOLO",       () => Yolo.active)
     decide(true,  "Bored",      () => unit.battle.isEmpty)
     decide(true,  "No threats", () => unit.matchups.threats.isEmpty)

@@ -8,7 +8,8 @@ import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.Predicates.Always
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Macro.Expanding.{BuildCannonsAtExpansions, BuildGasPumps, RequireMiningBases, RequireMiningBasesFFA}
+import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases, RequireMiningBasesFFA}
+import Planning.Plans.Macro.Protoss.BuildCannonsAtExpansions
 import Planning.Plans.Predicates.Milestones.UnitsAtLeast
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import ProxyBwapi.Races.Protoss

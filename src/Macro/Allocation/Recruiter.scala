@@ -52,11 +52,6 @@ class Recruiter {
   }
   
   def add(lock: LockUnits) {
-    //This lock is already up to date. Chill.
-    if (activeLocks.contains(lock)) {
-      //  return
-    }
-  
     activeLocks.add(lock)
     unitsByLock(lock) = unitsByLock.getOrElse(lock, mutable.Set.empty)
     tryToSatisfy(lock)
@@ -71,8 +66,8 @@ class Recruiter {
     val assignedToLowerPriority = unitsByLock.keys
       .toSeq
       .filter(otherRequest =>
-        otherRequest.interruptable.get &&
-        lock.owner.priority < otherRequest.owner.priority)
+        (otherRequest.interruptable.get || lock.canPoach.get)
+        && lock.owner.priority < otherRequest.owner.priority)
       .flatMap(getUnits)
     
     lock.offerUnits(unassignedUnits ++ assignedToLowerPriority)

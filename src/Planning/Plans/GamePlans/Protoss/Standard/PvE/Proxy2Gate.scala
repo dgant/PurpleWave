@@ -53,7 +53,7 @@ class Proxy2Gate extends GameplanModeTemplate {
     new TrainContinuously(Protoss.Observer, 2),
     new If(
       new And(
-        new UpgradeComplete(Protoss.DragoonRange, 1, Protoss.DragoonRange.upgradeTime(1)),
+        new UpgradeComplete(Protoss.DragoonRange, 1, Protoss.DragoonRange.upgradeFrames(1)),
         new GasAtLeast(50)),
       new TrainContinuously(Protoss.Dragoon),
       new If(

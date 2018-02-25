@@ -11,12 +11,12 @@ object MindControl extends TargetedSpell {
   override protected def tech           : Tech      = Protoss.MindControl
   override protected def aoe            : Boolean   = false
   override protected def castRangeTiles : Int       = 8
-  override protected def thresholdValue : Double    = Protoss.DarkArchon.subjectiveValue
+  override protected def thresholdValue : Double    = 0.5 * Protoss.DarkArchon.subjectiveValue
   
   override protected def valueTarget(target: UnitInfo): Double = {
-    if (target.unitClass.isBuilding)  return 0.0
-    if (target.isFriendly)            return 0.0
-    if (target.stasised)              return 0.0
+    if (target.unitClass.isBuilding)  return -1.0
+    if (target.isFriendly)            return -1.0
+    if (target.stasised)              return -1.0
     
     var targetValue = target.subjectiveValue
     if (target.isTransport && ! target.is(Zerg.Overlord)) {

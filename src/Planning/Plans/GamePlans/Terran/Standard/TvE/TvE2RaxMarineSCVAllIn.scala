@@ -1,6 +1,5 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvE
 
-import Lifecycle.With
 import Macro.BuildRequests.RequestAtLeast
 import Planning.Composition.UnitCounters.UnitCountExcept
 import Planning.Composition.UnitMatchers.UnitMatchWorkers
@@ -25,13 +24,10 @@ class TvE2RaxMarineSCVAllIn extends GameplanModeTemplate {
     new ScoutAt(10))
   
   override def defaultAttackPlan: Plan = new Trigger(
-    new UnitsAtLeast(10, Terran.Marine),
+    new UnitsAtLeast(8, Terran.Marine),
     new Parallel(
       new Aggression(2.0),
-      new Trigger(
-        new Check(() => With.units.ours.count(u => u.unitClass.isWorker && ! u.base.exists(_.isOurMain))>= 3),
-        new Attack
-      ),
+      new Attack,
       new Attack {
         attackers.get.unitCounter.set(new UnitCountExcept(5, UnitMatchWorkers))
         attackers.get.unitMatcher.set(UnitMatchWorkers)

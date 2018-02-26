@@ -36,10 +36,12 @@ class MassBio extends GameplanModeTemplate {
       RequestAtLeast(2, Terran.SupplyDepot),
       RequestAtLeast(2, Terran.Marine))
   
-  private val stimThreshold = 15
+  private val stimThreshold = 24 * 15
   
   override def priorityAttackPlan: Plan = new Trigger(
-    new TechComplete(Terran.Stim, stimThreshold),
+    new And(
+      new UnitsAtLeast(2, Terran.Medic, complete = true),
+      new TechComplete(Terran.Stim, stimThreshold)),
     new If(
       new FrameAtMost(GameTime(7, 0)()),
       new Parallel(
@@ -72,6 +74,11 @@ class MassBio extends GameplanModeTemplate {
       new Build(
         RequestAtLeast(3, Terran.Barracks),
         RequestTech(Terran.Stim))),
+    new Trigger(
+      new Or(
+        new EnemyUnitsAtLeast(1, Terran.Vulture),
+        new EnemyUnitsAtLeast(1, Protoss.Dragoon)),
+      new UpgradeContinuously(Terran.MarineRange)),
     new Trigger(
       new MiningBasesAtLeast(3),
       new Do(() => {

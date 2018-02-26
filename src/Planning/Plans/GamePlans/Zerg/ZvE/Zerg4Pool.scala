@@ -15,7 +15,7 @@ import ProxyBwapi.Races.Zerg
 class Zerg4Pool extends Parallel {
   
   children.set(Vector(
-    new Aggression(2.0),
+    new Aggression(4.0),
     new If(
       new FoundEnemyBase,
       new Build(RequestAtLeast(3, Zerg.Drone)),

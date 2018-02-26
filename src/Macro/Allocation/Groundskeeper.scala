@@ -118,10 +118,6 @@ class Groundskeeper {
     requirementMatches --= requirementMatches.find(x => x.proposal == proposal && x.requirement == requirement)
   }
   
-  private def closeAsFulfilled(blueprint: Blueprint, fulfillingUnit: UnitInfo) {
-    
-  }
-  
   def flagUnfulfilled(requirement: Blueprint) {
     val proposal = getRepresentativeBlueprintForRequirement(requirement)
     addProposal(proposal)

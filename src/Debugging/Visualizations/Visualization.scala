@@ -50,6 +50,7 @@ class Visualization {
     ShowExplosions,
     ShowHappyUnits,
     ShowHappyVision,
+    ShowHistory,
     ShowIntelligence,
     ShowTextOnly,
     ShowTextOnlyUnits,

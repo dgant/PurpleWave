@@ -8,6 +8,7 @@ import Strategery.Strategies.Terran.TvE._
 import Strategery.Strategies.Terran.TvR.{TvR1Rax, TvRTinfoil}
 import Strategery.Strategies.Terran.TvT.TvTStandard
 import Strategery.Strategies.Terran.TvZ._
+import Strategery.Strategies.Zerg.ZvZ.ProxySunkens
 
 class EmptyPlaybook {
   
@@ -20,7 +21,7 @@ class EmptyPlaybook {
 }
 
 object StrategyGroups {
-  val bad = Vector[Strategy](
+  val disabled = Vector[Strategy](
     WorkerRushLiftoff,
     TvR1Rax,
     TvRTinfoil,
@@ -41,7 +42,8 @@ object StrategyGroups {
     ProxyDarkTemplar,
     PvZEarlyFFENexusFirst,
     PvZEarlyFFEGatewayFirst,
-    PvZMidgame2Stargate
+    PvZMidgame2Stargate,
+    ProxySunkens
   )
 }
 
@@ -53,7 +55,7 @@ class TestingPlaybook extends EmptyPlaybook {
 
 class PurpleWavePlaybook extends EmptyPlaybook {
   override lazy val forced    : Seq[Strategy] = none
-  override lazy val disabled  : Seq[Strategy] = StrategyGroups.bad
+  override lazy val disabled  : Seq[Strategy] = StrategyGroups.disabled
 }
 
 object Playbook extends PurpleWavePlaybook {}

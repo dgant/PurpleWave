@@ -141,8 +141,9 @@ class TvETurtleMech extends GameplanModeTemplate {
       )),
     new If(
       new Check(() =>
-      With.units.enemy
-        .filter(_.is(UnitMatchAnd(UnitMatchWarriors, UnitMatchMobileFlying)))
+      With.units.ours.count(_.is(UnitMatchSiegeTank)) / 6
+      + (if (With.units.enemy.exists(_.is(UnitMatchAnd(UnitMatchWarriors, UnitMatchMobileFlying)))) 3 else 0)
+      + With.units.enemy.filter(_.is(UnitMatchAnd(UnitMatchWarriors, UnitMatchMobileFlying)))
         .map(u => {
           val c = u.unitClass
           if (c == Terran.Battlecruiser)  5 else

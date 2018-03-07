@@ -13,8 +13,9 @@ object FightOrFlight extends Action {
   }
   
   override def perform(unit: FriendlyUnitInfo) {
-
+  
     var decision: Option[Boolean] = None
+  
     def decide(shouldEngage: Boolean, description: String, condition: () => Boolean) {
       if (decision.isEmpty && condition()) {
         unit.agent.fightReason = description
@@ -22,31 +23,35 @@ object FightOrFlight extends Action {
       }
     }
   
-    decide(true,  "Berzerk",    () => unit.agent.canBerzerk)
-    decide(true,  "CantFlee",   () => ! unit.agent.canFlee)
-    decide(true,  "YOLO",       () => Yolo.active)
-    decide(true,  "Bored",      () => unit.battle.isEmpty)
-    decide(true,  "No threats", () => unit.matchups.threats.isEmpty)
-    decide(true,  "Cloaked",    () => unit.effectivelyCloaked)
-    decide(true,  "Lurking",    () => unit.is(Zerg.Lurker) && unit.matchups.enemyDetectors.isEmpty)
-    decide(false, "Pacifist",   () => ! unit.agent.canFight)
-    decide(false, "Disrupted",  () => unit.underDisruptionWeb && ! unit.flying)
-    decide(false, "Swarmed",    () => unit.underDarkSwarm     && ! unit.unitClass.unaffectedByDarkSwarm && unit.matchups.targetsInRange.forall(t => ! t.flying || t.underDarkSwarm))
-    decide(true,  "Workers",    () => unit.matchups.targets.exists(_.matchups.targetsInRange.exists(ally => ally.unitClass.isWorker && ally.base.exists(_.owner.isUs))))
-    decide(true,  "Anchors",    () => unit.matchups.allies.exists(ally =>
-      ! ally.unitClass.isWorker
-      &&  ally.canAttack
-      &&  ally.unitClass.topSpeed <= Protoss.HighTemplar.topSpeed
-      &&  ally.subjectiveValue >= unit.subjectiveValue
-      && (
-           ally.matchups.targetsInRange.nonEmpty
-        || ally.matchups.framesOfSafetyDiffused < unit.matchups.framesOfSafetyDiffused)))
-    
+    decide(true, "Berzerk", () => unit.agent.canBerzerk)
+    decide(true, "CantFlee", () => !unit.agent.canFlee)
+    decide(true, "YOLO", () => Yolo.active)
+    decide(true, "Bored", () => unit.battle.isEmpty)
+    decide(true, "No threats", () => unit.matchups.threats.isEmpty)
+    decide(true, "Cloaked", () => unit.effectivelyCloaked)
+    decide(true, "Lurking", () => unit.is(Zerg.Lurker) && unit.matchups.enemyDetectors.isEmpty)
+    decide(false, "Pacifist", () => !unit.agent.canFight)
+    decide(false, "Disrupted", () => unit.underDisruptionWeb && !unit.flying)
+    decide(false, "Swarmed", () => unit.underDarkSwarm && !unit.unitClass.unaffectedByDarkSwarm && unit.matchups.targetsInRange.forall(t => !t.flying || t.underDarkSwarm))
+    decide(true, "Workers", () => unit.matchups.targets.exists(_.matchups.targetsInRange.exists(ally => ally.unitClass.isWorker && ally.base.exists(_.owner.isUs))))
+    decide(true, "Anchors", () => unit.matchups.allies.exists(ally =>
+      !ally.unitClass.isWorker
+        && ally.canAttack
+        && ally.unitClass.topSpeed <= Protoss.HighTemplar.topSpeed
+        && ally.subjectiveValue > unit.subjectiveValue
+        && (
+        ally.matchups.targetsInRange.nonEmpty
+          || ally.matchups.framesOfSafetyDiffused < unit.matchups.framesOfSafetyDiffused)))
+  
     if (decision.isDefined) {
       unit.agent.shouldEngage = decision.get
       return
     }
     
+    applyEstimation(unit)
+  }
+  
+  private def applyEstimation(unit: FriendlyUnitInfo) {
     lazy val estimationAttack     = unit.battle.map(_.estimationSimulationAttack)
     lazy val estimationRetreat    = unit.battle.map(_.estimationSimulationRetreat)
     lazy val reportAttack         = estimationAttack.map(_.reportCards.get(unit)).getOrElse(None)

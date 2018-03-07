@@ -28,7 +28,7 @@ class Configuration {
   
   var avatarBattleDistancePixels    = 32.0 * 6.0
   var battleMarginTiles             = 20
-  var battleEstimationFrames        = GameTime(0, 10)()
+  var battleEstimationFrames        = GameTime(0, 8)()
   var bonusTankRange                = 64.0
   var retreatMovementDelay          = 8 //GameTime(0, 1)()
   var nonLethalDamageValue          = 0.1

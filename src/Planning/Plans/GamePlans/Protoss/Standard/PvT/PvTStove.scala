@@ -1,24 +1,30 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvT
 
 import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
+import Planning.Composition.Latch
 import Planning.Composition.UnitCounters.UnitCountOne
-import Planning.Plans.Army.{Attack, DefendEntrance}
+import Planning.Plans.Army.{ConsiderAttacking, DefendEntrance}
 import Planning.Plans.Compound.If
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Predicates.Employing
 import Planning.Plans.Macro.BuildOrders._
+import Planning.Plans.Macro.Expanding.BuildGasPumps
+import Planning.Plans.Predicates.Employing
 import Planning.Plans.Predicates.Milestones.{EnemyHasShown, UnitsAtLeast}
+import Planning.Plans.Scouting.ScoutOn
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss.PvT.PvTEarly1GateStargateTemplar
 
 class PvTStove extends GameplanModeTemplate {
   
   override val activationCriteria   = new Employing(PvTEarly1GateStargateTemplar)
-  override val completionCriteria   = new UnitsAtLeast(1, Protoss.ArbiterTribunal)
+  override val completionCriteria   = new Latch(new UnitsAtLeast(1, Protoss.ArbiterTribunal))
   override def priorityAttackPlan   = new PvTIdeas.PriorityAttacks
   override def priorityDefensePlan  = new If(new EnemyHasShown(Terran.Vulture), new DefendEntrance { defenders.get.unitMatcher.set(Protoss.Dragoon); defenders.get.unitCounter.set(UnitCountOne)})
-  override def defaultAttackPlan    = new Attack
-  override def scoutAt              = 9
+  override def defaultScoutPlan     = new ScoutOn(Protoss.Pylon)
+  
+  override def defaultAttackPlan = new If(
+      new Latch(new UnitsAtLeast(1, Protoss.Scout, complete = true)),
+      new ConsiderAttacking)
   
   override val buildOrder = Vector(
     //CoreZ, Scout @ Pylon -- from Antiga replay
@@ -63,10 +69,16 @@ class PvTStove extends GameplanModeTemplate {
   
   override def buildPlans = Vector(
     new PvTIdeas.TrainArmy,
+    new BuildGasPumps,
+    new If(
+      new EnemyHasShown(Terran.SpiderMine),
+      new Build(
+        RequestAtLeast(1, Protoss.RoboticsFacility),
+        RequestUpgrade(Protoss.DragoonRange),
+        RequestAtLeast(1, Protoss.Observatory))),
     new Build(
       RequestAtLeast(2, Protoss.Gateway),
       RequestUpgrade(Protoss.DragoonRange),
       RequestAtLeast(1, Protoss.ArbiterTribunal),
-      RequestAtLeast(4, Protoss.Gateway)
-    ))
+      RequestAtLeast(4, Protoss.Gateway)))
 }

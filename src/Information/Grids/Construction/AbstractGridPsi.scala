@@ -10,19 +10,25 @@ abstract class AbstractGridPsi extends AbstractGridTimestamp {
   
   private var lastPylons: Set[FriendlyUnitInfo] = Set.empty
   
-  override def updateTimestamps() {
-    
+  override def needsUpdate: Boolean = {
     val newPylons = pylons
-    if (newPylons == lastPylons) return
+    val output = newPylons == lastPylons
     lastPylons = newPylons
-    
-    pylons.foreach(pylon =>
+    output
+  }
+  
+  private val wrapThreshold = 18
+  override def updateTimestamps() {
+    pylons.foreach(pylon => {
+      val pylonTile = pylon.tileIncludingCenter
       psiPoints.foreach(point => {
         val tile = pylon.tileTopLeft.add(point)
-        if (tile.valid) {
+        if (tile.valid
+          && Math.abs(tile.x - pylonTile.x) < wrapThreshold
+          && Math.abs(tile.y - pylonTile.y) < wrapThreshold) {
           set(tile, frameUpdated)
         }
-      }))
+      })})
   }
   
   val psiPoints: Array[Point]

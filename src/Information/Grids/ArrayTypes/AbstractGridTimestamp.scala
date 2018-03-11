@@ -16,9 +16,13 @@ abstract class AbstractGridTimestamp extends AbstractGridInt {
   def everFlagged(tile: Tile): Boolean = get(tile) > 0
   def framesSince(tile: Tile): Int = frameUpdated - get(tile)
   
+  protected def needsUpdate: Boolean = true
+  
   final override def update() {
-    frameUpdated = With.frame
-    updateTimestamps()
+    if (needsUpdate) {
+      frameUpdated = With.frame
+      updateTimestamps()
+    }
   }
   
   override def repr(value: Int): String = if (value >= frameUpdated) "true" else ""

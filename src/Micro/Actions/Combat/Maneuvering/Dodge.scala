@@ -29,7 +29,9 @@ object Dodge extends Action {
         && framesOfEntanglement(unit, explosion) > - reactionFrames)
     
     if (explosions.nonEmpty) {
-      if (canAttackMines && explosions.forall(_.isInstanceOf[ExplosionSpiderMineTrigger])) {
+      if (canAttackMines
+        && explosions.forall(_.isInstanceOf[ExplosionSpiderMineTrigger])
+        && unit.matchups.allies.exists(_.unitClass.isDetector)) {
         return
       }
       

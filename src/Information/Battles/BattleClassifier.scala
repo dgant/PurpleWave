@@ -30,6 +30,7 @@ class BattleClassifier {
       local.foreach(_.estimationSimulationAttack)
       local.foreach(_.estimationSimulationRetreat)
       local.foreach(_.netEngageValue)
+      local.foreach(_.shouldFight)
     }
     
     lastUpdate = With.frame

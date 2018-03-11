@@ -6,7 +6,6 @@ class ProtossVsTerran extends ModalGameplan(
   new PvT1015GateDT,
   new PvT4Gate,
   new PvT1GateReaver,
-  new PvT1GateStargate,
   new PvTStove,
   new PvTBasic
 )

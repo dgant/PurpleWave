@@ -4,7 +4,7 @@ import Debugging.Visualizations.ForceColors
 import Lifecycle.With
 import Mathematics.PurpleMath
 import Micro.Actions.Action
-import Micro.Actions.Commands.Gravitate
+import Micro.Actions.Commands.{Gravitate, Move}
 import Micro.Decisions.Potential
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -34,5 +34,6 @@ object OldAvoid extends Action {
     //unit.agent.forces.put(ForceColors.spreading,  forceSpreading)
     //unit.agent.forces.put(ForceColors.regrouping, forceRegrouping)
     Gravitate.delegate(unit)
+    Move.delegate(unit)
   }
 }

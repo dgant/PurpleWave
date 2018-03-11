@@ -17,7 +17,7 @@ class BattleLocal(us: Team, enemy: Team) extends Battle(us, enemy) {
   lazy val distanceUs     : Double  = focus.pixelDistanceFast(With.geography.home.pixelCenter)
   lazy val distanceEnemy  : Double  = focus.pixelDistanceFast(With.intelligence.mostBaselikeEnemyTile.pixelCenter)
   lazy val distanceRatio  : Double  = distanceUs / (distanceUs + distanceEnemy)
-  lazy val urgency        : Double  = distanceRatio / 10.0
+  lazy val urgency        : Double  = Math.max(0.0, 0.5 - distanceRatio / 2.0)
   lazy val valueUs        : Double  = us.units.map(_.subjectiveValue).sum
   lazy val valueEnemy     : Double  = enemy.units.map(_.subjectiveValue).sum
   lazy val attackGains    : Double  = estimationSimulationAttack.costToEnemy
@@ -28,7 +28,7 @@ class BattleLocal(us: Team, enemy: Team) extends Battle(us, enemy) {
   lazy val retreatLosses  : Double  = estimationSimulationRetreat.costToUs
   lazy val ratioAttack    : Double  = PurpleMath.nanToInfinity(attackGains / (attackGains + attackLosses))
   lazy val ratioSnipe     : Double  = PurpleMath.nanToInfinity(snipeGains / (snipeGains + snipeLosses))
-  lazy val ratioTarget    : Double  = Math.min(2.0, PurpleMath.nanToZero((With.battles.global.valueRatioTarget + hysteresis + urgency) / With.blackboard.aggressionRatio))
+  lazy val ratioTarget    : Double  = Math.min(2.0, PurpleMath.nanToZero((With.battles.global.valueRatioTarget + hysteresis - urgency) / With.blackboard.aggressionRatio))
   lazy val netEngageValue : Double  = With.blackboard.aggressionRatio * attackGains + retreatLosses - retreatGains - attackLosses
   lazy val shouldFight    : Boolean = ratioAttack > ratioTarget || ratioSnipe > ratioTarget
   

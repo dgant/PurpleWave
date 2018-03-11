@@ -23,4 +23,5 @@ object Roadrunner extends StarCraftMap
 object TauCross extends StarCraftMap
 object LaMancha extends StarCraftMap
 object Benzene extends StarCraftMap
+object HeartbreakRidge extends StarCraftMap
 object Hunters extends StarCraftMap

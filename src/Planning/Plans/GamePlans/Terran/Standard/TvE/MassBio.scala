@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvE
 
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
-import Macro.BuildRequests.{RequestAtLeast, RequestTech}
+import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
 import Planning.Composition.UnitMatchers.{UnitMatchSiegeTank, UnitMatchWarriors}
 import Planning.Plan
 import Planning.Plans.Army.{Aggression, Attack}
@@ -14,6 +14,7 @@ import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Predicates.Economy.MineralsAtLeast
 import Planning.Plans.Predicates.Employing
+import Planning.Plans.Predicates.Matchup.EnemyIsZerg
 import Planning.Plans.Predicates.Milestones._
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Strategies.Terran.TvE.TvEMassBio
@@ -64,6 +65,12 @@ class MassBio extends GameplanModeTemplate {
       new TrainContinuously(Terran.MissileTurret, 2)))
   
   override def buildPlans: Seq[Plan] = Vector(
+    new If(
+      new EnemyIsZerg,
+      new TrainContinuously(Terran.ScienceVessel, 12)),
+    new If(
+      new UnitsAtLeast(2, Terran.ScienceVessel),
+      new Build(RequestTech(Terran.Irradiate))),
     new Trigger(
       new SupplyOutOf200(24),
       new Build(
@@ -145,8 +152,19 @@ class MassBio extends GameplanModeTemplate {
             RequestAtLeast(3, Terran.MachineShop),
             RequestAtLeast(1, Terran.Starport)),
           new Build(
-            RequestAtLeast(6, Terran.Barracks))),
-        new Build(RequestAtLeast(1, Terran.EngineeringBay)),
+            RequestAtLeast(5, Terran.Barracks))),
+        new If(
+          new EnemyIsZerg,
+          new Build(
+            RequestAtLeast(1, Terran.EngineeringBay),
+            RequestAtLeast(1, Terran.Factory),
+            RequestUpgrade(Terran.BioDamage),
+            RequestAtLeast(2, Terran.Refinery),
+            RequestAtLeast(1, Terran.Starport),
+            RequestAtLeast(1, Terran.ScienceFacility),
+            RequestAtLeast(2, Terran.Starport),
+            RequestAtLeast(2, Terran.ControlTower)),
+          new Build(RequestAtLeast(1, Terran.EngineeringBay))),
         new UpgradeContinuously(Terran.BioDamage),
         new UpgradeContinuously(Terran.BioArmor))),
     new Trigger(

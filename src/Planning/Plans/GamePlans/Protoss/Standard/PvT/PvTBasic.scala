@@ -2,6 +2,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvT
 
 import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
 import Planning.Composition.Latch
+import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
@@ -38,7 +39,6 @@ class PvTBasic extends GameplanModeTemplate {
     new If(new Employing(PvT21Nexus),   new Build(ProtossBuilds.Opening21Nexus_Robo: _*)),
     new If(new Employing(PvTDTExpand),  new Build(ProtossBuilds.OpeningDTExpand: _*)))
   
-  
   class EmployingCarriers extends Employing(PvT2BaseCarrier, PvT3BaseCarrier)
   class EmployingArbiters extends Employing(PvT2BaseArbiter, PvT3BaseArbiter)
   
@@ -58,8 +58,40 @@ class PvTBasic extends GameplanModeTemplate {
     new Not(new SafeAtHome),
     new MiningBasesAtLeast(3))
   
+  class AddTech extends Parallel(
+    new If(
+      new Employing(PvT2BaseCarrier, PvT2BaseArbiter),
+      new BuildGasPumps),
+    new If(
+      new And(
+        new EmployingCarriers,
+        new ReadyForTech),
+      new Parallel(
+        new BuildGasPumps,
+        new Build(
+          RequestAtLeast(1, Protoss.Stargate),
+          RequestAtLeast(4, Protoss.Gateway),
+          RequestAtLeast(1, Protoss.FleetBeacon),
+          RequestAtLeast(2, Protoss.Stargate)))),
+    new If(
+      new And(
+        new EmployingArbiters,
+        new ReadyForTech),
+      new Parallel(
+        new BuildGasPumps,
+        new Build(
+          RequestAtLeast(1, Protoss.CitadelOfAdun),
+          RequestAtLeast(1, Protoss.TemplarArchives),
+          RequestAtLeast(1, Protoss.Stargate),
+          RequestAtLeast(4, Protoss.Gateway),
+          RequestAtLeast(1, Protoss.ArbiterTribunal),
+          RequestTech(Protoss.Stasis)))))
+  
   override val buildPlans = Vector(
     new RequireMiningBases(2),
+    new If(
+      new UnitsAtLeast(30, UnitMatchWarriors),
+      new AddTech),
     new If(
       new UnitsAtLeast(2, Protoss.Carrier),
       new Parallel(
@@ -97,41 +129,12 @@ class PvTBasic extends GameplanModeTemplate {
           new Employing(PvT3BaseCarrier, PvT3BaseArbiter))),
       new UpgradeContinuously(Protoss.ObserverSpeed)),
     new If(
-      new Employing(PvT2BaseCarrier, PvT2BaseArbiter),
-      new BuildGasPumps),
-    new If(
-      new Or(
-        new EnemyUnitsAtLeast(2, Terran.CommandCenter),
-        new EnemyBasesAtLeast(2)),
+      new ReadyForThirdBase,
       new RequireMiningBases(3)),
-    new If(
-      new And(
-        new EmployingCarriers,
-        new ReadyForTech),
-      new Parallel(
-        new BuildGasPumps,
-        new Build(
-          RequestAtLeast(1, Protoss.Stargate),
-          RequestAtLeast(4, Protoss.Gateway),
-          RequestAtLeast(1, Protoss.FleetBeacon),
-          RequestAtLeast(2, Protoss.Stargate)))),
-    new If(
-      new And(
-        new EmployingArbiters,
-        new ReadyForTech),
-      new Parallel(
-        new BuildGasPumps,
-        new Build(
-          RequestAtLeast(1, Protoss.CitadelOfAdun),
-          RequestAtLeast(1, Protoss.TemplarArchives),
-          RequestAtLeast(1, Protoss.Stargate),
-          RequestAtLeast(4, Protoss.Gateway),
-          RequestAtLeast(1, Protoss.ArbiterTribunal),
-          RequestTech(Protoss.Stasis)))),
+    new AddTech,
     new If(
       new Not(new SafeAtHome),
       new Build(RequestAtLeast(6, Protoss.Gateway))),
-    new RequireMiningBases(3),
     new Build(RequestAtLeast(1, Protoss.Forge)),
     new BuildGasPumps,
     new Build(

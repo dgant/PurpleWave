@@ -230,8 +230,12 @@ class Architecture {
   }
   
   private def addPower(tile: Tile) {
-    powered2Height  ++= With.grids.psi2Height.psiPoints.map(tile.add)
-    powered3Height  ++= With.grids.psi3Height.psiPoints.map(tile.add)
+    def isValid(neighbor: Tile, origin: Tile): Boolean = (
+      Math.abs(neighbor.x - tile.x) < 18
+      && Math.abs(neighbor.y - tile.y) < 18
+    )
+    With.grids.psi2Height.psiPoints.map(tile.add).map(neighbor => if (isValid(neighbor, tile)) powered2Height += tile)
+    With.grids.psi3Height.psiPoints.map(tile.add).map(neighbor => if (isValid(neighbor, tile)) powered3Height += tile)
   }
   
   /////////////////

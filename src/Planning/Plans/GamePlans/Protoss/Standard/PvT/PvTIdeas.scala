@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvT
 
 import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, RequestTech}
-import Planning.Composition.UnitMatchers.{UnitMatchCustom, UnitMatchSiegeTank, UnitMatchWarriors}
+import Planning.Composition.UnitMatchers.{UnitMatchCustom, UnitMatchWarriors}
 import Planning.Plans.Army.{Attack, ConsiderAttacking}
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.Macro.Automatic.TrainContinuously
@@ -37,7 +37,6 @@ object PvTIdeas {
       new Or(
         new Employing(PvTEarly1015GateGoonDT),
         new Employing(PvTEarly4Gate),
-        new Employing(PvTEarly1GateStargate),
         new Employing(PvTEarly1GateStargateTemplar),
         new IfOnMiningBases(3),
         new Not(new EnemyHasShown(Terran.Vulture)),
@@ -59,9 +58,7 @@ object PvTIdeas {
       new EnemyUnitsAtMost(8, Terran.MissileTurret),
       new UnitsExactly(0, Protoss.FleetBeacon),
       new UnitsExactly(0, Protoss.ArbiterTribunal),
-      new Or(
-        new Employing(PvTEarly1GateStargate),
-        new Employing(PvTEarly1GateStargateTemplar))),
+      new Employing(PvTEarly1GateStargateTemplar)),
     new TrainContinuously(Protoss.Scout, 5))
   
   class TrainDarkTemplar extends If(
@@ -128,7 +125,7 @@ object PvTIdeas {
       new Or(
         new And(
           new HaveGasPumps(3),
-          new EnemyUnitsAtLeast(6, UnitMatchSiegeTank)),
+          new EnemyUnitsAtLeast(12, Terran.Goliath)),
         new And(
           new HaveGasPumps(2),
           new EnemyBio))),
@@ -136,12 +133,7 @@ object PvTIdeas {
         new If(
           new UnitsAtLeast(1, Protoss.HighTemplar),
           new Build(RequestTech(Protoss.PsionicStorm))),
-        new If(
-          new Or(
-            new UnitsAtLeast(20, UnitMatchWarriors),
-            new EnemyBio),
-          new TrainContinuously(Protoss.HighTemplar, 6, 2),
-          new TrainContinuously(Protoss.HighTemplar, 6, 1))))
+        new TrainContinuously(Protoss.HighTemplar, 5, 1)))
     
   class TrainArmy extends Parallel(
     new TrainObservers,

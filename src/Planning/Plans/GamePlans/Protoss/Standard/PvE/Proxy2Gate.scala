@@ -22,7 +22,7 @@ import Strategery.Strategies.Protoss.PvZ.PvZProxy2Gate
 class Proxy2Gate extends GameplanModeTemplate {
   
   override val activationCriteria = new Employing(PvROpenProxy2Gate, PvTProxy2Gate, PvPOpenProxy2Gate, PvZProxy2Gate)
-  override val completionCriteria = new UpgradeComplete(Protoss.DragoonRange)
+  override val completionCriteria = new UpgradeComplete(Protoss.DragoonRange, 1, Protoss.DragoonRange.upgradeFrames(1))
   override def defaultScoutPlan   = new If(new UnitsAtLeast(2, Protoss.Gateway), new Scout)
   override val aggression         = 1.2
   override def defaultSupplyPlan: Plan = NoPlan()

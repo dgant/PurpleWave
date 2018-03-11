@@ -20,6 +20,11 @@ class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends FriendlyUnitProxy(base
   def teammates: Seq[UnitInfo] = teammatesCache()
   private val teammatesCache = new Cache(() => (squadmates ++ matchups.allies).distinct)
   
+  override def updateCommon() {
+    super.updateCommon()
+    knownToEnemyOnce = knownToEnemyOnce || visibleToOpponents
+  }
+  
   ////////////
   // Health //
   ////////////
@@ -41,6 +46,9 @@ class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends FriendlyUnitProxy(base
   ////////////////
   // Visibility //
   ////////////////
+  
+  private var knownToEnemyOnce: Boolean = false
+  def knownToEnemy: Boolean = knownToEnemyOnce
   
   //////////////
   // Movement //

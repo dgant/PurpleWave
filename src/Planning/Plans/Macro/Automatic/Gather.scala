@@ -32,6 +32,8 @@ class Gather extends Plan {
   private val transfersLegal = new mutable.HashSet[(Zone, Zone)]
   
   override def onUpdate() {
+    workerLock.acquire(this)
+    workers = workerLock.units
     setGoals()
     countUnits()
     workers.foreach(updateWorker)
@@ -64,8 +66,6 @@ class Gather extends Plan {
     if (resources.isEmpty) {
       return
     }
-    workerLock.acquire(this)
-    workers = workerLock.units
     
     workersByResource.clear()
     resourceByWorker.clear()

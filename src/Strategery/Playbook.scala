@@ -1,6 +1,7 @@
 package Strategery
 
 import Strategery.Strategies.Protoss.PvE._
+import Strategery.Strategies.Protoss.PvP.PvPOpen3GateSpeedlots
 import Strategery.Strategies.Protoss.PvT._
 import Strategery.Strategies.Protoss.PvZ._
 import Strategery.Strategies.Strategy
@@ -35,20 +36,19 @@ object StrategyGroups {
     TvZEarly1RaxFEEconomic,
     TvZEarly1RaxFEConservative,
     TvZEarly2Rax,
-    PvTEarly1GateProxy,
-    PvT3BaseCorsair,
-    MassPhotonCannon,
-    CarriersWithNoDefense,
-    ProxyDarkTemplar,
+    PvPOpen3GateSpeedlots,
     PvZEarlyFFENexusFirst,
     PvZEarlyFFEGatewayFirst,
     PvZMidgame2Stargate,
+    MassPhotonCannon,
+    CarriersWithNoDefense,
+    ProxyDarkTemplar,
     ProxySunkens
   )
 }
 
 class TestingPlaybook extends EmptyPlaybook {
-  val strategiesToTest: Seq[Strategy] = Seq(TvETurtleMech)
+  val strategiesToTest: Seq[Strategy] = Seq(PvT21Nexus, PvT2BaseCarrier)
   
   override lazy val forced: Seq[Strategy] = strategiesToTest
 }
@@ -58,4 +58,4 @@ class PurpleWavePlaybook extends EmptyPlaybook {
   override lazy val disabled  : Seq[Strategy] = StrategyGroups.disabled
 }
 
-object Playbook extends PurpleWavePlaybook {}
+object Playbook extends TestingPlaybook {}

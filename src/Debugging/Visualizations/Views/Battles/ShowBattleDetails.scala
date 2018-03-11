@@ -20,6 +20,41 @@ object ShowBattleDetails extends View {
   }
   
   def renderBattleScreen(battle: BattleLocal, estimation: Prediction) {
+    val barHeight       = With.visualization.lineHeightSmall
+    val x               = 5
+    var y0              = 4 * With.visualization.lineHeightSmall
+    var y1              = y0 + barHeight
+    var y2              = y1 + 5
+    var y3              = y2 + barHeight
+    val y4              = y3 + 5
+    val denominator     = 630 * With.battles.global.valueUsArmy + With.battles.global.valueEnemyArmy
+    val xGlobalUs       = (With.battles.global.valueUsArmyKnown    / denominator).toInt
+    val xGlobalEnemy    = (With.battles.global.valueEnemyArmy / denominator).toInt
+    val xArmyUs         = (battle.valueUs     / denominator).toInt
+    val xArmyEnemy      = (battle.valueEnemy  / denominator).toInt
+    val xSurvivorsUs    = (Math.max(0, battle.valueUs     - battle.attackLosses) / denominator).toInt
+    val xSurvivorsEnemy = (Math.max(0, battle.valueEnemy  - battle.attackGains) / denominator).toInt
+  
+    /*
+    drawBar(x-1,  y0-1, xGlobalUs+2,      barHeight+2,  Color.White)
+    drawBar(x-1,  y2-1, xGlobalEnemy+2,   barHeight+2,  Color.White)
+    drawBar(x,    y0,   xGlobalUs,        barHeight,    Color.Black)
+    drawBar(x,    y2,   xGlobalEnemy,     barHeight,    Color.Black)
+    drawBar(x,    y0,   xArmyUs,          barHeight,    With.self.colorDark)
+    drawBar(x,    y2,   xArmyEnemy,       barHeight,    With.enemy.colorDark)
+    drawBar(x,    y0,   xSurvivorsUs,     barHeight,    With.self.colorNeon)
+    drawBar(x,    y2,   xSurvivorsEnemy,  barHeight,    With.enemy.colorNeon)
+    */
+    DrawScreen.table(x, y4, Vector(
+      Vector("Global",      "%1.2f".format(With.battles.global.valueRatioTarget)),
+      Vector("Attack",      "%1.2f".format(battle.ratioAttack)),
+      Vector("Snipe",       "%1.2f".format(battle.ratioSnipe)),
+      Vector("Target",      "%1.2f".format(battle.ratioTarget)),
+      Vector("Hysteresis",  "%1.2f".format(battle.hysteresis))
+    ))
+  }
+  
+  def renderBattleScreenOld(battle: BattleLocal, estimation: Prediction) {
     val x = 5
     val y = 4 * With.visualization.lineHeightSmall
     val table = Vector(
@@ -94,7 +129,7 @@ object ShowBattleDetails extends View {
     DrawScreen.table(450, y, scoreTable)
   }
   
-  def drawBar(x: Int, y: Int, dx: Int, dy: Int, color: Color, label: String) {
+  def drawBar(x: Int, y: Int, dx: Int, dy: Int, color: Color, label: String = "") {
     With.game.drawBoxScreen(x, y, x+dx, y+dy, color, true)
     With.game.drawTextScreen(x + 2, y + 1, label)
   }
@@ -124,14 +159,14 @@ object ShowBattleDetails extends View {
     if (sim.dead) {
       val dark = sim.realUnit.player.colorMidnight
       val skullColor = sim.realUnit.player.colorNeon
-      DrawMap.box(sim.pixel.add(-3, 0), sim.pixel.add(3, 8), dark, solid = false)
+      DrawMap.box(sim.pixel.add(-3, 0), sim.pixel.add(4, 8), dark, solid = false)
       DrawMap.circle(sim.pixel, 5, skullColor,  solid = true)
       DrawMap.circle(sim.pixel, 5, dark,        solid = false)
-      DrawMap.box(sim.pixel.add(-2, 1), sim.pixel.add(2, 7), skullColor,  solid = true)
-      DrawMap.box(sim.pixel.add(-2, -2), sim.pixel.add(-1, -1), Color.Black, solid = true)
-      DrawMap.box(sim.pixel.add(2,  -2), sim.pixel.add(1,  -1), Color.Black, solid = true)
-      DrawMap.line(sim.pixel.add(-1, 3), sim.pixel.add(-2, 8), dark)
-      DrawMap.line(sim.pixel.add(1,  3), sim.pixel.add(2,  8), dark)
+      DrawMap.box(sim.pixel.add(-2,  1), sim.pixel.add(2, 7), skullColor,  solid = true)
+      DrawMap.box(sim.pixel.add(-2, -2), sim.pixel.add(0, 0), Color.Black, solid = true)
+      DrawMap.box(sim.pixel.add(1,  -2), sim.pixel.add(3, 0), Color.Black, solid = true)
+      DrawMap.line(sim.pixel.add(-1, 3), sim.pixel.add(-2, 9), dark)
+      DrawMap.line(sim.pixel.add(1,  3), sim.pixel.add(2,  9), dark)
     }
   }
 }

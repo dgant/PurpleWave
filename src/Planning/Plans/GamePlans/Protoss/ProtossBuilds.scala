@@ -267,6 +267,30 @@ object ProtossBuilds {
     RequestAtLeast(22,  Protoss.Probe),
     RequestAtLeast(4,   Protoss.Dragoon))
   
+  val Opening21Nexus_Robo = Vector[BuildRequest] (
+    RequestAtLeast(8,   Protoss.Probe),
+    RequestAtLeast(1,   Protoss.Pylon),
+    RequestAtLeast(10,  Protoss.Probe),
+    RequestAtLeast(1,   Protoss.Gateway),
+    RequestAtLeast(12,  Protoss.Probe),
+    RequestAtLeast(1,   Protoss.Assimilator),
+    RequestAtLeast(13,  Protoss.Probe),
+    RequestAtLeast(1,   Protoss.CyberneticsCore),
+    RequestAtLeast(15,  Protoss.Probe),
+    RequestAtLeast(2,   Protoss.Pylon),
+    RequestAtLeast(16,  Protoss.Probe),
+    RequestUpgrade(Protoss.DragoonRange),
+    RequestAtLeast(19,  Protoss.Probe),
+    RequestAtLeast(1,   Protoss.Dragoon),
+    RequestAtLeast(2,   Protoss.Nexus),
+    RequestAtLeast(2,   Protoss.Gateway),
+    RequestAtLeast(2,   Protoss.Dragoon),
+    RequestAtLeast(3,   Protoss.Pylon),
+    RequestAtLeast(3,   Protoss.Dragoon),
+    RequestAtLeast(20,  Protoss.Probe),
+    RequestAtLeast(4,   Protoss.Dragoon),
+    RequestAtLeast(1,   Protoss.RoboticsFacility))
+  
   val OpeningDTExpand = Vector[BuildRequest] (
     // 2-Gate DT Expand based on PvP 2-Gate DT from http://wiki.teamliquid.net/starcraft/2_Gate_DT
     // We get gas/core faster because of mineral locking + later scout

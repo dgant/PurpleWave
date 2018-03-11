@@ -127,7 +127,7 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   lazy val attacksAir     : Boolean = effectiveAirDamage    > 0
   def attacks(enemy: UnitClass): Boolean = if (enemy.isFlyer) attacksAir else attacksGround
   
-  lazy val helpsInCombat: Boolean = rawCanAttack || isSpellcaster || Set(Terran.Bunker).contains(this) || this == Zerg.Lurker
+  lazy val helpsInCombat: Boolean = rawCanAttack || isSpellcaster || Set(Terran.Bunker).contains(this) || this == Zerg.Lurker || this == Protoss.Carrier
   
   lazy val groundRangePixels: Double =
     if      (this == Terran.Bunker)   Terran.Marine.groundRangePixels  + 32.0

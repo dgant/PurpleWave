@@ -18,12 +18,10 @@ class Simulacrum(
   // Constant
   private val SIMULATION_STEP_FRAMES = 6
   
-  // Modifiers
   val movementDelay     : Int     = if (realUnit.isEnemy || simulation.weAttack)  0   else realUnit.unitClass.framesToTurn(Math.PI) + 2 * realUnit.unitClass.accelerationFrames + With.configuration.retreatMovementDelay
-  val speedMultiplier   : Double  = if (realUnit.isEnemy || realUnit.flying)      1.0 else simulation.chokeMobility(realUnit.zone)
+  val speedMultiplier   : Double  = if (realUnit.isEnemy || realUnit.flying)      1.0 else Math.max(0.75, simulation.chokeMobility(realUnit.zone))
   val bonusDistance     : Double  = if (realUnit.isOurs  || realUnit.visible)     0.0 else 32.0 * Math.min(realUnit.mobility, 3)
   val bonusRange        : Double  = if (realUnit.isOurs  || ! realUnit.unitClass.isSiegeTank || ! simulation.weAttack) 0.0 else With.configuration.bonusTankRange
-  val multiplierDamage  : Double  = if (realUnit.unitClass.isWorker && realUnit.gathering) 0.1 else 1.0
   val multiplierSplash  : Double  = MicroValue.maxSplashFactor(realUnit)
   
   // Unit state
@@ -52,13 +50,13 @@ class Simulacrum(
     new mutable.PriorityQueue[Simulacrum]()(Ordering.by(x => (x.realUnit.unitClass.helpsInCombat, - x.pixel.pixelDistanceFast(pixel))))
       ++ realUnit.matchups.targets
         .filter(target =>
-          simulation.weAttack
+          ! simulation.fleeing
           || realUnit.inRangeToAttack(target)
           || ! realUnit.isOurs)
         .flatMap(simulation.simulacra.get)
     )
   
-  var fighting: Boolean = {
+  var fightingInitially: Boolean = {
     if ( ! realUnit.canAttack) {
       false
     }
@@ -66,19 +64,18 @@ class Simulacrum(
       false
     }
     else if (realUnit.unitClass.isWorker) {
-      realUnit.isBeingViolent || ( ! realUnit.gathering && ! realUnit.constructing)
+      realUnit.hasBeenViolentInLastTwoSeconds
     }
     else if (realUnit.isEnemy) {
       true
     }
-    else if (simulation.weAttack) {
-      realUnit.canMove || realUnit.matchups.targetsInRange.nonEmpty
-    }
     else {
-      ! realUnit.canMove
+      realUnit.canMove || realUnit.matchups.targetsInRange.nonEmpty
     }
   }
   
+  var fighting: Boolean = fightingInitially
+    
   if (realUnit.is(Zerg.Lurker) && ! realUnit.burrowed) {
     cooldownShooting = 36
     topSpeed = 0
@@ -91,6 +88,7 @@ class Simulacrum(
   
   def step() {
     if (dead) return
+    if (simulation.fleeing && realUnit.isFriendly) fighting = false
     cooldownMoving    -= 1
     cooldownShooting  -= 1
     tryToAcquireTarget()

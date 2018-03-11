@@ -14,7 +14,7 @@ case class Force(x: Double, y: Double) {
   def *(other: Force)   : Double = x * other.x + y * other.y
   
   def lengthSquared: Double = x * x + y * y
-  def lengthSlow: Double  = Math.sqrt(lengthSquared)
+  lazy val lengthSlow: Double = Math.sqrt(lengthSquared)
   def lengthFast: Double = {
     // Octagonal distance
     // https://en.wikibooks.org/wiki/Algorithms/Distance_approximations#Octagonal
@@ -33,6 +33,14 @@ case class Force(x: Double, y: Double) {
       Force(
         scale * x / length,
         scale * y / length)
+  }
+  
+  def clipMin(scale: Double): Force = {
+    if (scale * scale >= lengthSquared) this else normalize(scale)
+  }
+  
+  def clipMax(scale: Double): Force = {
+    if (scale * scale <= lengthSquared) this else normalize(scale)
   }
   
   def toPoint: Point = Point(x.toInt, y.toInt)

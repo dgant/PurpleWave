@@ -21,7 +21,7 @@ object PvPIdeas {
   
   class AttackSafely extends If(
     new Or(
-      new UnitsAtLeast(1, Protoss.Observer),
+      new UnitsAtLeast(1, Protoss.Observer, complete = true),
       new Not(new EnemyDarkTemplarExists)),
     new If(
       new And(
@@ -29,7 +29,7 @@ object PvPIdeas {
         new EnemyUnitsAtMost(0, Protoss.Dragoon),
         new Not(new EnemyHasUpgrade(Protoss.ZealotSpeed))),
       new Attack,
-      new ConsiderAttacking)
+      new ConsiderAttacking))
   
   class ReactToDarkTemplarEmergencies extends Parallel(new ReactToDarkTemplarExisting, new ReactToDarkTemplarPossible)
   

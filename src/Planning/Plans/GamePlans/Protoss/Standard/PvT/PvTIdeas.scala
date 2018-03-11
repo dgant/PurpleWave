@@ -1,52 +1,20 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvT
 
 import Lifecycle.With
-import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
+import Macro.BuildRequests.{RequestAtLeast, RequestTech}
 import Planning.Composition.UnitMatchers.{UnitMatchCustom, UnitMatchWarriors}
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, _}
-import Planning.Plans.Predicates.Reactive.EnemyBio
-import Planning.Plans.Predicates.{Employing, SafeToAttack}
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Predicates.Economy.{GasAtMost, MineralsAtLeast}
 import Planning.Plans.Predicates.Milestones.{OnGasPumps, _}
+import Planning.Plans.Predicates.Reactive.EnemyBio
+import Planning.Plans.Predicates.{Employing, SafeToAttack}
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss.PvT._
 
 object PvTIdeas {
-  
-  class BuildSecondGasIfWeNeedIt extends If(
-    new Or(
-      new Employing(PvT2BaseCarrier),
-      new Employing(PvT2BaseReaverCarrier),
-      new Employing(PvT2BaseArbiter)),
-    new BuildGasPumps)
-  
-  class Require2BaseTech extends Parallel(
-    new Build(
-      RequestAtLeast(1, Protoss.Pylon),
-      RequestAtLeast(1, Protoss.Gateway),
-      RequestAtLeast(1, Protoss.CyberneticsCore),
-      RequestUpgrade(Protoss.DragoonRange)),
-    new RequireMiningBases(2),
-    new BuildGasPumps)
-  
-  class Require3BaseTech extends Parallel(
-    new Require2BaseTech,
-    new Build(
-      RequestAtLeast(2, Protoss.Gateway),
-      RequestAtLeast(1, Protoss.RoboticsFacility),
-      RequestAtLeast(3, Protoss.Gateway),
-      RequestAtLeast(1, Protoss.Observatory),
-      RequestAtLeast(1, Protoss.CitadelOfAdun),
-      RequestUpgrade(Protoss.ZealotSpeed),
-      RequestAtLeast(1, Protoss.TemplarArchives),
-      RequestAtLeast(4, Protoss.Gateway),
-      RequestTech(Protoss.PsionicStorm),
-      RequestAtLeast(5, Protoss.Gateway),
-      RequestAtLeast(1, Protoss.Forge)))
   
   class AttackWithDarkTemplar extends Attack { attackers.get.unitMatcher.set(Protoss.DarkTemplar) }
   
@@ -67,9 +35,7 @@ object PvTIdeas {
         new SafeToAttack,
         new UnitsAtLeast(6, UnitMatchWarriors, complete = true)),
       new Or(
-        new Employing(PvTEarly1015GateGoonExpand),
         new Employing(PvTEarly1015GateGoonDT),
-        new Employing(PvTEarly1015GateGoonPressure),
         new Employing(PvTEarly4Gate),
         new Employing(PvTEarly1GateStargate),
         new Employing(PvTEarly1GateStargateTemplar),
@@ -77,6 +43,14 @@ object PvTIdeas {
         new Not(new EnemyHasShown(Terran.Vulture)),
         new UnitsAtLeast(1, UnitMatchCustom((unit) => unit.is(Protoss.Observer) && With.framesSince(unit.frameDiscovered) > 24 * 10), complete = true))),
     new Attack)
+  
+  class EmergencyBuilds extends Parallel(
+    new If(
+      new And(new Employing(PvT13Nexus), new EnemyUnitsAtLeast(1, Terran.Marine), new UnitsAtMost(0, Protoss.CyberneticsCore, complete = true)),
+      new Parallel(
+        new TrainContinuously(Protoss.Zealot),
+        new Build(RequestAtLeast(2, Protoss.Gateway))))
+  )
   
   class TrainScouts extends If(
     new And(

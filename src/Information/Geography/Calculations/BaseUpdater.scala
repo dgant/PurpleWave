@@ -15,7 +15,9 @@ object BaseUpdater {
   
   private def updateOwner(base: Base) {
     
-    base.owner = base.townHall.map(_.player).getOrElse(With.neutral)
+    // Derive the owner from the current town hall
+    // If we have previously inferred the base's owner, maintain the inference
+    base.owner = base.townHall.map(_.player).getOrElse(if (base.scouted) With.neutral else base.owner)
     
     // Assume ownership of implicit starting location
     if (base.owner.isNeutral && base.lastScoutedFrame <= 0 && With.intelligence.firstEnemyMain.contains(base)) {

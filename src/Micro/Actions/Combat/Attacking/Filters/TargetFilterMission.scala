@@ -1,6 +1,7 @@
 package Micro.Actions.Combat.Attacking.Filters
 
 import Lifecycle.With
+import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object TargetFilterMission extends TargetFilter {
@@ -16,6 +17,7 @@ object TargetFilterMission extends TargetFilter {
     lazy val arrived      = targetZone == destination || targetZone.bases.exists(_.owner == destination.owner)
     lazy val engaged      = actor.matchups.allies.exists(_.matchups.threatsInRange.nonEmpty)
     lazy val inRange      = actor.inRangeToAttack(target)
+    lazy val isNearbyMine = target.is(Terran.SpiderMine) && ! target.effectivelyCloaked && actor.pixelRangeAgainst(target) > 96.0 && actor.pixelDistanceCenter(target) < 32.0 * 12.0
     lazy val atOurWorkers = target.base.exists(_.owner.isUs) && target.matchups.targetsInRange.exists(_.unitClass.isWorker)
   
     lazy val alliesAssisting  = target.matchups.threats.exists(ally =>
@@ -25,7 +27,7 @@ object TargetFilterMission extends TargetFilter {
     lazy val targetBusy       = target.gathering || target.constructing || target.repairing
     lazy val targetCatchable  = actor.topSpeed >= target.topSpeed || actor.inRangeToAttack(target) || targetBusy || alliesAssisting
     
-    val output = (targetCatchable || atOurWorkers) && (pillaging || arrived || inRange || engaged)
+    val output = (targetCatchable || atOurWorkers) && (pillaging || arrived || inRange || engaged || isNearbyMine)
     
     output
   }

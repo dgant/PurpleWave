@@ -23,7 +23,7 @@ class Geography {
   def ourZones                : Iterable[Zone]          = ourZonesCache()
   def ourBases                : Iterable[Base]          = ourBasesCache()
   def ourSettlements          : Iterable[Base]          = ourSettlementsCache()
-  def ourBasesAndSettlements  : Iterable[Base]          = ourBases ++ ourSettlements
+  def ourBasesAndSettlements  : Iterable[Base]          = (ourBases ++ ourSettlements).toSet.toVector
   def ourTownHalls            : Iterable[UnitInfo]      = ourTownHallsCache()
   def ourHarvestingAreas      : Iterable[TileRectangle] = ourHarvestingAreasCache()
   def ourBorder               : Iterable[Edge]          = ourBorderCache()
@@ -54,12 +54,14 @@ class Geography {
       }
     }
   
-  private def getSettlements: Seq[Base] = With.units.ours
+  private def getSettlements: Iterable[Base] = (Set.empty
+  ++ With.geography.bases.toVector.filter(_.units.exists(u => u.isOurs && u.unitClass.isBuilding))
+  ++ With.units.ours
     .filter(u => u.agent.toBuild.exists(_.isTownHall))
     .flatMap(u => u.agent.toBuildTile.map(tile => tile.zone.bases.find(base => base.townHallTile == tile)))
     .flatten
-    .toSeq
     .filterNot(_.owner.isUs)
+  )
   
   var home: Tile = SpecificPoints.tileMiddle
   

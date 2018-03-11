@@ -14,7 +14,7 @@ import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP.PvPOpen1GateReaverExpand
 
-class PvPOpen1GateReaverExpand extends GameplanModeTemplate {
+class PvP1GateReaverExpand extends GameplanModeTemplate {
   
   override val activationCriteria : Plan      = new Employing(PvPOpen1GateReaverExpand)
   override val completionCriteria : Plan      = new And(new MiningBasesAtLeast(2), new UnitsAtLeast(1, Protoss.RoboticsSupportBay))

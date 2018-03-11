@@ -8,14 +8,13 @@ import Planning.Plans.Compound.{If, NoPlan}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding._
-import Planning.Plans.Predicates.Employing
 import Planning.Plans.Predicates.Milestones.{MiningBasesAtLeast, UnitsAtLeast}
+import Planning.Plans.Predicates.Never
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvT.PvTEarly1GateReaver
 
 class PvT1GateReaver extends GameplanModeTemplate {
   
-  override val activationCriteria = new Employing(PvTEarly1GateReaver)
+  override val activationCriteria = new Never
   override val completionCriteria = new MiningBasesAtLeast(2)
   override val superSaturate      = true
   override def defaultAttackPlan  = NoPlan()

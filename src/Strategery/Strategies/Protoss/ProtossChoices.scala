@@ -33,28 +33,20 @@ object ProtossChoices {
   
   val pvtOpenersWithoutTransitions = Vector(
     PvTProxy2Gate,
-    PvTEarly1GateProxy,
-    PvTEarlyNexusFirst,
-    PvTEarlyDTDrop
+    PvT13Nexus
   )
   
   val pvtOpenersTransitioningFrom1Gate = Vector(
-    PvTEarly1GateRange,
+    PvT21Nexus,
     PvTEarly1GateStargate,
-    PvTEarly1GateReaver,
     PvTEarly1GateStargateTemplar,
-    PvTEarly1BaseCarrier,
-    PvTEarlyDTExpand,
     PvTEarly1015GateGoonDT,
-    PvTEarly1015GateGoonExpand,
-    PvTEarly1015GateGoonPressure,
     PvTEarly4Gate
   )
   
   val pvtOpenersTransitioningFrom2Gate = Vector(
     PvTEarly1015GateGoonDT,
-    PvTEarly1015GateGoonExpand,
-    PvTEarly1015GateGoonPressure,
+    PvT21Nexus,
     PvTEarly4Gate
   )
   

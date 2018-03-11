@@ -12,6 +12,11 @@ class GridEnemyVision extends AbstractGridTimestamp {
         if (unit.aliveAndComplete && unit.likelyStillThere)
         Circle.points(unit.sightRangePixels/32)
           .map(unit.tileIncludingCenter.add)
-          .foreach(set(_, frameUpdated)))
+          .foreach(tile =>
+            if (unit.flying ||
+              With.grids.altitudeBonus.get(unit.tileIncludingCenter)
+              >= With.grids.altitudeBonus.get(tile))
+              set(tile, frameUpdated)
+            ))
   }
 }

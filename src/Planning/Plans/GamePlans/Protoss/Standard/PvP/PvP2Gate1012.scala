@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvP
 
-import Macro.BuildRequests.RequestAtLeast
+import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
 import Planning.Plan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
@@ -14,7 +14,7 @@ import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP.PvPOpen2Gate1012
 
-class PvPOpen2Gate1012 extends GameplanModeTemplate {
+class PvP2Gate1012 extends GameplanModeTemplate {
   
   override val activationCriteria : Plan      = new Employing(PvPOpen2Gate1012)
   override val completionCriteria : Plan      = new MiningBasesAtLeast(2)
@@ -62,6 +62,7 @@ class PvPOpen2Gate1012 extends GameplanModeTemplate {
   
     new Build(
       RequestAtLeast(2, Protoss.Gateway),
+      RequestUpgrade(Protoss.DragoonRange),
       RequestAtLeast(1, Protoss.RoboticsFacility),
       RequestAtLeast(1, Protoss.RoboticsSupportBay)),
     

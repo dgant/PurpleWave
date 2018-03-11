@@ -24,7 +24,9 @@ object Heal extends Action {
     
     target.foreach(someTarget => {
       val targetPixel = unit.pixelCenter.project(someTarget.pixelCenter, unit.pixelDistanceEdge(someTarget) - 16.0)
-      With.commander.attackMove(unit, targetPixel)
+      if (someTarget.pixelDistanceCenter(unit) < 96.0) {
+        With.commander.attackMove(unit, targetPixel)
+      }
     })
   }
   

@@ -24,7 +24,7 @@ object FightOrFlight extends Action {
     }
   
     decide(true, "Berzerk", () => unit.agent.canBerzerk)
-    decide(true, "CantFlee", () => !unit.agent.canFlee)
+    decide(true, "CantFlee", () => ! unit.agent.canFlee)
     decide(true, "YOLO", () => Yolo.active)
     decide(true, "Bored", () => unit.battle.isEmpty)
     decide(true, "No threats", () => unit.matchups.threats.isEmpty)
@@ -33,9 +33,9 @@ object FightOrFlight extends Action {
     decide(false, "Pacifist", () => !unit.agent.canFight)
     decide(false, "Disrupted", () => unit.underDisruptionWeb && !unit.flying)
     decide(false, "Swarmed", () => unit.underDarkSwarm && !unit.unitClass.unaffectedByDarkSwarm && unit.matchups.targetsInRange.forall(t => !t.flying || t.underDarkSwarm))
-    decide(true, "Workers", () => unit.matchups.targets.exists(_.matchups.targetsInRange.exists(ally => ally.unitClass.isWorker && ally.base.exists(_.owner.isUs))))
+    decide(true, "Workers", () => unit.matchups.targets.exists(_.matchups.targetsInRange.exists(ally => ally.gathering || ally.constructing)))
     decide(true, "Anchors", () => unit.matchups.allies.exists(ally =>
-      !ally.unitClass.isWorker
+      ! ally.unitClass.isWorker
         && ally.canAttack
         && ally.unitClass.topSpeed <= Protoss.HighTemplar.topSpeed
         && ally.subjectiveValue > unit.subjectiveValue
@@ -45,6 +45,7 @@ object FightOrFlight extends Action {
   
     if (decision.isDefined) {
       unit.agent.shouldEngage = decision.get
+      unit.agent.combatHysteresisFrames = 0
       return
     }
     
@@ -52,42 +53,15 @@ object FightOrFlight extends Action {
   }
   
   private def applyEstimation(unit: FriendlyUnitInfo) {
-    lazy val estimationAttack     = unit.battle.map(_.estimationSimulationAttack)
-    lazy val estimationRetreat    = unit.battle.map(_.estimationSimulationRetreat)
-    lazy val reportAttack         = estimationAttack.map(_.reportCards.get(unit)).getOrElse(None)
-    lazy val reportRetreat        = estimationRetreat.map(_.reportCards.get(unit)).getOrElse(None)
-    lazy val netAttackValue       = estimationAttack.map(_.netValue).getOrElse(0.0)
-    lazy val netEngagementValue   = unit.battle.map(_.netEngageValue).getOrElse(0.0)
-    lazy val attackingProfitable  = netAttackValue >= 0.0
-    lazy val attackingIsBetter    = netEngagementValue >= 0.0
-    lazy val attackingHasPurpose  = estimationAttack.exists(e => e.costToEnemy > e.costToUs * With.configuration.lastStandMinimumValueRatio)
-    lazy val deadAttacking        = reportAttack.exists(_.dead)
-    lazy val deadRetreating       = reportRetreat.exists(_.dead)
-    lazy val shouldEngage         = attackingIsBetter && (attackingProfitable || attackingHasPurpose)
-    if (shouldEngage) {
-      if (attackingProfitable) {
-        unit.agent.fightReason = "Profiting"
-      }
-      else {
-        unit.agent.fightReason = "Resigned"
-      }
-    }
-    else {
-      if (deadAttacking && deadRetreating) {
-        unit.agent.fightReason = "Terrified"
-      }
-      else if (deadAttacking) {
-        unit.agent.fightReason = "Relieved"
-      }
-      else if (deadRetreating) {
-        unit.agent.fightReason = "Abandoned"
-      }
-      else {
-        unit.agent.fightReason = "Hungry"
-      }
-    }
+    if (unit.battle.isEmpty) return
+    val battle = unit.battle.get
+    val shouldEngage = battle.shouldFight
   
-    unit.agent.netEngagementValue = netEngagementValue
+    if (unit.agent.shouldEngage != shouldEngage) {
+      unit.agent.combatHysteresisFrames = With.configuration.battleHysteresisFrames
+    }
+    unit.agent.fightReason = ""
+    unit.agent.netEngagementValue = 0.0 // TODO
     unit.agent.shouldEngage = shouldEngage
   }
 }

@@ -1,8 +1,7 @@
 package Micro.Actions.Combat.Techniques
 
-import Lifecycle.With
 import Mathematics.PurpleMath
-import Micro.Actions.Combat.Maneuvering.{GooseChase, OldAvoid}
+import Micro.Actions.Combat.Maneuvering.OldAvoid
 import Micro.Actions.Combat.Techniques.Common.ActionTechnique
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
@@ -18,7 +17,7 @@ object Avoid extends ActionTechnique {
   
   override def applicabilitySelf(unit: FriendlyUnitInfo): Double = {
     val meleeFactor   = if (unit.unitClass.ranged) 1.0 else 0.75
-    val visionFactor  = if (With.grids.enemyVision.isSet(unit.tileIncludingCenter)) 0.5 else 1.0
+    val visionFactor  = if (unit.visibleToOpponents) 1.0 else 0.5
     val safetyFactor  = PurpleMath.clampToOne((36.0 + unit.matchups.framesOfEntanglementDiffused) / 24.0)
     val output        = meleeFactor * visionFactor * safetyFactor
     output

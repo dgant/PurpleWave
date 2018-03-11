@@ -7,6 +7,7 @@ import Planning.Plan
 import ProxyBwapi.Races.{Terran, Zerg}
 import ProxyBwapi.UnitClass.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import Utilities.ByOption
 
 class TrainContinuously(
   unitClass                 : UnitClass,
@@ -20,21 +21,30 @@ class TrainContinuously(
   override def onUpdate() {
     if ( ! canBuild) return
     
-    val unitsNow                = currentCount
-    val unitsMaximum            = maximumTotal
-    val unitsMaximumDesirable   = maxDesirable
-    val buildersSpawning        = if (unitClass.whatBuilds._1 == Zerg.Larva) With.units.ours.count(u => u.complete && u.unitClass.producesLarva) else 0
-    val buildersExisting        = builders
-    val buildersOccupied        = buildersExisting.toSeq.map(_.unitClass).distinct.map(With.scheduler.dumbPumps.consumed).sum
-    val capacityMaximum         = ((buildersExisting.size + buildersSpawning) * maximumConcurrentlyRatio).toInt
-    val capacityFinal           = Math.max(0, Vector(maximumConcurrently, capacityMaximum, Math.max(1, capacityMaximum - buildersOccupied)).min)
-    val quantityToAdd           = List(unitsMaximum, unitsMaximumDesirable, capacityFinal).min
-    val quantityToRequest       = List(unitsMaximum, unitsMaximumDesirable, capacityFinal + unitsNow).min
+    val unitsNow                  = currentCount
+    val unitsMaximum              = maximumTotal
+    val unitsMaximumDesirable     = maxDesirable
+    val buildersSpawning          = if (unitClass.whatBuilds._1 == Zerg.Larva) With.units.ours.count(u => u.complete && u.unitClass.producesLarva) else 0
+    val buildersExisting          = builders.toVector
+    val buildersReserved          = buildersExisting.map(_.unitClass).distinct.map(With.scheduler.dumbPumps.consumed).sum
+    val buildersReadiness         = getBuilderReadiness(buildersExisting)
+    val capacityMaximum           = ((buildersExisting.size + buildersSpawning) * maximumConcurrentlyRatio).toInt
+    val capacityFinal             = Math.max(0, Vector(maximumConcurrently, capacityMaximum, buildersReadiness * Math.max(1, capacityMaximum - buildersReserved)).min).toInt
+    val quantityToAdd             = List(unitsMaximum, unitsMaximumDesirable, capacityFinal).min
+    val quantityToRequest         = List(unitsMaximum, unitsMaximumDesirable, capacityFinal + unitsNow).min
     
     (unitClass.buildUnitsBorrowed ++ unitClass.buildUnitsSpent).foreach(builderClass =>
       With.scheduler.dumbPumps.consume(builderClass, quantityToAdd))
         
     With.scheduler.request(this, RequestAtLeast(quantityToRequest, unitClass))
+  }
+  
+  private def getBuilderReadiness(builders: Vector[FriendlyUnitInfo]): Double = {
+    val output = ByOption
+      .mean(builders.map(b => 1.0 - Math.min(1.0, Math.max(b.framesBeforeBuildeeComplete, b.remainingBuildFrames).toDouble / unitClass.buildFrames)))
+      .getOrElse(0.5)
+    
+    output
   }
   
   protected def canBuild: Boolean = {

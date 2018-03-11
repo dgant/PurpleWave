@@ -37,6 +37,7 @@ class Agent(val unit: FriendlyUnitInfo) {
   // History //
   /////////////
   
+  var combatHysteresisFrames: Int = 0
   var lastIntent: Intention = new Intention
   var shovers: ListBuffer[FriendlyUnitInfo] = new ListBuffer[FriendlyUnitInfo]
   
@@ -139,6 +140,8 @@ class Agent(val unit: FriendlyUnitInfo) {
   def execute() {
     resetState()
     followIntent()
+    combatHysteresisFrames = Math.max(0, combatHysteresisFrames - With.framesSince(lastFrame))
+    lastFrame = With.frame
     Idle.consider(unit)
     cleanUp()
   }

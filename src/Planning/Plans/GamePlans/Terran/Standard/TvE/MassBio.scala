@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvE
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, RequestTech}
-import Planning.Composition.UnitMatchers.UnitMatchWarriors
+import Planning.Composition.UnitMatchers.{UnitMatchSiegeTank, UnitMatchWarriors}
 import Planning.Plan
 import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Compound._
@@ -92,6 +92,9 @@ class MassBio extends GameplanModeTemplate {
     new If(
       new TechComplete(Terran.Stim),
       new RequireMiningBases(2)),
+    new If(
+      new UnitsAtLeast(1, UnitMatchSiegeTank),
+      new Build(RequestTech(Terran.SiegeMode))),
     new IfOnMiningBases(3,
       new If(
         new UnitsAtLeast(60, UnitMatchWarriors),
@@ -113,7 +116,8 @@ class MassBio extends GameplanModeTemplate {
     new If(
       new UnitsAtLeast(65, UnitMatchWarriors),
       new RequireMiningBases(5)),
-    
+  
+    new TrainContinuously(Terran.SiegeTankUnsieged),
     new If(
       new UnitsAtMost(0, Terran.Academy, complete = true),
       new TrainContinuously(Terran.Marine),
@@ -134,9 +138,15 @@ class MassBio extends GameplanModeTemplate {
     new IfOnMiningBases(2,
       new Parallel(
         new UpgradeContinuously(Terran.MarineRange),
-        new Build(
-          RequestAtLeast(6, Terran.Barracks),
-          RequestAtLeast(1, Terran.EngineeringBay)),
+        new If(
+          new EnemyUnitsAtLeast(1, UnitMatchSiegeTank),
+          new Build(
+            RequestAtLeast(3, Terran.Factory),
+            RequestAtLeast(3, Terran.MachineShop),
+            RequestAtLeast(1, Terran.Starport)),
+          new Build(
+            RequestAtLeast(6, Terran.Barracks))),
+        new Build(RequestAtLeast(1, Terran.EngineeringBay)),
         new UpgradeContinuously(Terran.BioDamage),
         new UpgradeContinuously(Terran.BioArmor))),
     new Trigger(

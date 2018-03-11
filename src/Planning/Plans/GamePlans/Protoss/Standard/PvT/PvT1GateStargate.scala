@@ -42,5 +42,5 @@ class PvT1GateStargate extends GameplanModeTemplate {
     new PvTIdeas.TrainScouts,
     new TrainContinuously(Protoss.Dragoon),
     new RequireMiningBases(2),
-    new PvTIdeas.BuildSecondGasIfWeNeedIt)
+    new BuildGasPumps)
 }

@@ -30,6 +30,7 @@ abstract class GameplanModeTemplate extends GameplanMode {
   def defaultAggressionPlan : Plan              = new Aggression(aggression)
   def defaultPlacementPlan  : Plan              = new ProposePlacement(blueprints: _*)
   def defaultArchonPlan     : Plan              = new MeldArchons(meldArchonsAt)
+  def defaultBuildOrder     : Plan              = new BuildOrder(buildOrder: _*)
   def defaultSupplyPlan     : Plan              = new RequireSufficientSupply
   def defaultWorkerPlan     : Plan              = new If(new Not(new WeAreZerg), new TrainWorkersContinuously(superSaturate))
   def defaultScoutPlan      : Plan              = new ScoutAt(scoutAt)
@@ -72,7 +73,7 @@ abstract class GameplanModeTemplate extends GameplanMode {
         Vector(defaultPlacementPlan)
           ++ Vector(new RequireEssentials)
           ++ emergencyPlans
-          ++ Vector(new BuildOrder(buildOrder: _*))
+          ++ Vector(defaultBuildOrder)
           ++ Vector(defaultSupplyPlan)
           ++ Vector(defaultWorkerPlan)
           ++ buildPlans

@@ -14,7 +14,7 @@ import Planning.Plans.Predicates.Milestones.{EnemyUnitsAtLeast, UnitsAtLeast}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP.PvPOpen2GateRobo
 
-class PvPOpen2GateRobo extends GameplanModeTemplate {
+class PvP2GateRobo extends GameplanModeTemplate {
   
   override val activationCriteria : Plan = new Employing(PvPOpen2GateRobo)
   override def defaultAttackPlan  : Plan = new PvPIdeas.AttackSafely

@@ -8,8 +8,7 @@ object PvTEarly1GateStargate extends Strategy {
   override def choices: Iterable[Iterable[Strategy]] = Vector(
     Vector(
       PvT2BaseArbiter,
-      PvT2BaseCarrier,
-      PvT2BaseReaverCarrier))
+      PvT2BaseCarrier))
   
   override def ourRaces    : Iterable[Race] = Vector(Race.Protoss)
   override def enemyRaces  : Iterable[Race] = Vector(Race.Terran)

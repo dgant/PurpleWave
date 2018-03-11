@@ -13,7 +13,7 @@ import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP.PvPOpen1GateGoonExpand
 
-class PvPOpen1GateGoonExpand extends GameplanModeTemplate {
+class PvP1GateGoonExpand extends GameplanModeTemplate {
   
   override val activationCriteria : Plan      = new Employing(PvPOpen1GateGoonExpand)
   override val completionCriteria : Plan      = new MiningBasesAtLeast(2)

@@ -48,8 +48,6 @@ class Agency {
     while (doContinue && agentQueue.nonEmpty) {
       doContinue = doContinue && With.performance.continueRunning
       val agent = agentQueue.dequeue()
-      agent.lastFrame = With.frame
-      
       if (agent.unit.unitClass.orderable && agent.unit.alive && agent.unit.readyForMicro) {
         agent.execute()
       }

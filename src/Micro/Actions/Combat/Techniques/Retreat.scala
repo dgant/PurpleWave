@@ -12,7 +12,7 @@ object Retreat extends ActionTechnique {
     unit.canMove
   }
   
-  override val applicabilityBase: Double = 0.25
+  override val applicabilityBase: Double = 0.5
   
   override def applicabilitySelf(unit: FriendlyUnitInfo): Double = {
     if (unit.flying) return 0.0

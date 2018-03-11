@@ -21,5 +21,7 @@ abstract class AbstractGridTimestamp extends AbstractGridInt {
     updateTimestamps()
   }
   
+  override def repr(value: Int): String = if (value >= frameUpdated) "true" else ""
+  
   protected def updateTimestamps()
 }

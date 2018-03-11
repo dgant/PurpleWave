@@ -18,7 +18,7 @@ import Planning.Plans.Predicates.Milestones.UnitsAtLeast
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP.PvPOpen12Nexus5Zealot
 
-class PvPOpen12Nexus5Zealot extends GameplanModeTemplate {
+class PvP12Nexus5Zealot extends GameplanModeTemplate {
   
   class PylonAtNatural extends ProposePlacement {
     override lazy val blueprints: Seq[Blueprint] = {

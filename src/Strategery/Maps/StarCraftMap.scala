@@ -17,3 +17,10 @@ abstract class StarCraftMap {
     mapString.toLowerCase.replaceAll("[^a-z]", "")
   }
 }
+
+object EmpireOfTheSun extends StarCraftMap
+object Roadrunner extends StarCraftMap
+object TauCross extends StarCraftMap
+object LaMancha extends StarCraftMap
+object Benzene extends StarCraftMap
+object Hunters extends StarCraftMap

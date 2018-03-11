@@ -3,7 +3,7 @@ package Micro.Actions.Combat.Maneuvering
 import Debugging.Visualizations.ForceColors
 import Mathematics.Physics.ForceMath
 import Micro.Actions.Action
-import Micro.Actions.Commands.Gravitate
+import Micro.Actions.Commands.{Gravitate, Move}
 import Micro.Decisions.Potential
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -26,6 +26,7 @@ object Smuggle extends Action {
       unit.agent.forces.put(ForceColors.bypassing,  forceSmuggling)
       unit.agent.forces.put(ForceColors.traveling,  forceHeading)
       Gravitate.delegate(unit)
+      Move.delegate(unit)
     }
     
   }

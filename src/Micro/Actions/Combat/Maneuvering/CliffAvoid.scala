@@ -3,7 +3,7 @@ package Micro.Actions.Combat.Maneuvering
 import Debugging.Visualizations.ForceColors
 import Mathematics.PurpleMath
 import Micro.Actions.Action
-import Micro.Actions.Commands.Gravitate
+import Micro.Actions.Commands.{Gravitate, Move}
 import Micro.Decisions.Potential
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -34,5 +34,6 @@ object CliffAvoid extends Action {
     unit.agent.forces.put(ForceColors.bypassing,  forceCliffing)
     unit.agent.forces.put(ForceColors.regrouping, forceRegrouping)
     Gravitate.delegate(unit)
+    Move.delegate(unit)
   }
 }

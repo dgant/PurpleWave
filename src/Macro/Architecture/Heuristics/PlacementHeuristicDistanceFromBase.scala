@@ -26,8 +26,9 @@ object PlacementHeuristicDistanceFromBase extends PlacementHeuristic {
         if ( ! base.townHall.exists(_.complete)) {
           baseDistance *= 0.5
         }
+        val scaledDistance = Math.pow(baseDistance, 0.5)
         
-        totalDistance += baseDistance
+        totalDistance += scaledDistance
       })
       Math.max(128.0, totalDistance)
     }

@@ -1,4 +1,5 @@
 package Strategery.Strategies.Protoss.PvT
+import Strategery.Maps.Benzene
 import Strategery.Strategies.Strategy
 import bwapi.Race
 
@@ -19,6 +20,6 @@ object PvT21Nexus extends PvTOpener
 object PvTDTExpand extends PvTOpener
 object PvTEarly4Gate extends PvTOpener
 object PvT2BaseCarrier extends PvTStrategy
-object PvT3BaseCarrier extends PvTStrategy
+object PvT3BaseCarrier extends PvTStrategy { override val prohibitedMaps = Vector(Benzene) }
 object PvT2BaseArbiter extends PvTStrategy
 object PvT3BaseArbiter extends PvTStrategy

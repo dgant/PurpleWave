@@ -3,7 +3,7 @@ package Micro.Actions.Combat.Maneuvering
 import Debugging.Visualizations.ForceColors
 import Micro.Actions.Action
 import Micro.Actions.Combat.Tactics.Potshot
-import Micro.Actions.Commands.Gravitate
+import Micro.Actions.Commands.{Gravitate, Move}
 import Micro.Decisions.Potential
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -31,6 +31,7 @@ object Sneak extends Action {
       unit.agent.forces.put(ForceColors.mobility,   forceMobility)
       unit.agent.forces.put(ForceColors.spreading,  forceSpreading)
       Gravitate.delegate(unit)
+      Move.delegate(unit)
     }
   }
 }

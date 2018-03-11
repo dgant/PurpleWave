@@ -2,7 +2,7 @@ package Micro.Actions.Basic
 
 import Debugging.Visualizations.ForceColors
 import Micro.Actions.Action
-import Micro.Actions.Commands.Gravitate
+import Micro.Actions.Commands.{Gravitate, Move}
 import Micro.Decisions.Potential
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -19,5 +19,6 @@ object Pardon extends Action {
     unit.agent.forces.put(ForceColors.spreading,  forcePardoning)
     unit.agent.forces.put(ForceColors.mobility,   forceMobility)
     Gravitate.delegate(unit)
+    Move.delegate(unit)
   }
 }

@@ -5,9 +5,8 @@ import Mathematics.Physics.ForceMath
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.OldAvoid
 import Micro.Actions.Combat.Tactics.Potshot
-import Micro.Actions.Commands.Gravitate
+import Micro.Actions.Commands.{Gravitate, Move}
 import Micro.Decisions.Potential
-import Planning.Yolo
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
@@ -27,11 +26,8 @@ object BeAnArbiter extends Action {
     lazy val threatened   = unit.matchups.framesOfSafetyDiffused <= 0.0
     lazy val umbrellable  = (u: UnitInfo) => ! u.unitClass.isBuilding && u != unit && ! u.is(Protoss.Interceptor) && ! u.is(Protoss.Arbiter)
     lazy val friends      = unit.teammates.filter(umbrellable)
-    
-    if (threatened && ! Yolo.active) {
-      OldAvoid.consider(unit)
-    }
-    else if (friends.nonEmpty) {
+
+    if (friends.nonEmpty) {
       val forcesUmbrella = friends.map(friend =>
         Potential.unitAttraction(
           unit,
@@ -54,5 +50,9 @@ object BeAnArbiter extends Action {
       unit.agent.forces.put(ForceColors.target,     forceForward)
       Gravitate.consider(unit)
     }
+    if (threatened) {
+      OldAvoid.consider(unit)
+    }
+    Move.delegate(unit)
   }
 }

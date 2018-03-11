@@ -3,7 +3,7 @@ package Micro.Actions.Combat.Maneuvering
 import Debugging.Visualizations.ForceColors
 import Micro.Actions.Action
 import Micro.Actions.Combat.Attacking.Target
-import Micro.Actions.Commands.{Attack, Gravitate}
+import Micro.Actions.Commands.{Attack, Gravitate, Move}
 import Micro.Decisions.Potential
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -44,6 +44,7 @@ object OldAttackAndReposition extends Action {
       unit.agent.forces.put(ForceColors.spreading,  forceSpreading)
       unit.agent.forces.put(ForceColors.regrouping, forceRegrouping)
       Gravitate.consider(unit)
+      Move.delegate(unit)
     }
     else if (shouldAvoid) {
       OldAvoid.consider(unit)

@@ -1,6 +1,5 @@
 package Micro.Actions.Commands
 
-import Lifecycle.With
 import Mathematics.Physics.ForceMath
 import Micro.Actions.Action
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -19,6 +18,6 @@ object Gravitate extends Action {
     val forceNormal     = forceTotal.normalize(Math.max(80, unit.unitClass.haltPixels))
     val forcePoint      = forceNormal.toPoint
     val destination     = origin.add(forcePoint)
-    With.commander.move(unit, destination)
+    unit.agent.toTravel = Some(destination)
   }
 }

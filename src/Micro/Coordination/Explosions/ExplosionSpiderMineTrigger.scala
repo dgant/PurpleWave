@@ -9,7 +9,7 @@ class ExplosionSpiderMineTrigger(mine: UnitInfo) extends ExplosionRadial {
   // However, this is often limited by Spider Mine sight range, which is 96px exactly.
   // According to jaj22 the acqusition range is center-to-center (unlike most units, which are edge-to-edge)
   override def center: Pixel = mine.pixelCenter
-  override def radius: Double = 96 + mine.pixelRangeMax
+  override def radius: Double = 96 + 32 + mine.pixelRangeMax
   override def affects(unit: UnitInfo): Boolean = (
     unit.unitClass.triggersSpiderMines
     && unit.isEnemyOf(mine)

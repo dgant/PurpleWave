@@ -1,6 +1,7 @@
 package Information.Geography.Calculations
 
 import Information.Geography.Types.Base
+import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import ProxyBwapi.Races.Protoss
 import Utilities.ByOption
@@ -26,9 +27,10 @@ object BaseUpdater {
     
     // Assume ownership of occupied base we haven't seen lately
     if (base.owner.isNeutral && With.framesSince(base.lastScoutedFrame) > Protoss.Nexus.buildFrames) {
-      base.zone.units
-        .find(unit => unit.isEnemy && ! unit.flying && unit.unitClass.isBuilding)
-        .foreach(enemyBuilding => base.owner = enemyBuilding.player)
+      val building = base.zone.units.find(unit => unit.isEnemy && ! unit.flying && unit.unitClass.isBuilding)
+      if (building.exists(_.lastSeen > base.lastScoutedFrame + GameTime(0, 15)())) {
+        base.owner = building.get.player
+      }
     }
     
     // Assume ownership of unscouted main from natural

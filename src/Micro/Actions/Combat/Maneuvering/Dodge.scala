@@ -5,8 +5,8 @@ import Lifecycle.With
 import Mathematics.Physics.ForceMath
 import Mathematics.PurpleMath
 import Micro.Actions.Action
-import Micro.Actions.Commands.Gravitate
-import Micro.Coordination.Explosions.Explosion
+import Micro.Actions.Commands.{Gravitate, Move}
+import Micro.Coordination.Explosions.{Explosion, ExplosionSpiderMineTrigger}
 import Planning.Yolo
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -17,6 +17,8 @@ object Dodge extends Action {
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {
+    lazy val canAttackMines = unit.unitClass.attacksGround && unit.pixelRangeGround > 96.0
+    
     lazy val reactionFrames =
       With.reaction.agencyMax
       + unit.unitClass.framesToTurn180
@@ -27,12 +29,17 @@ object Dodge extends Action {
         && framesOfEntanglement(unit, explosion) > - reactionFrames)
     
     if (explosions.nonEmpty) {
+      if (canAttackMines && explosions.forall(_.isInstanceOf[ExplosionSpiderMineTrigger])) {
+        return
+      }
+      
       val forces = explosions.map(explosion =>
         explosion.directionTo(unit).normalize(framesOfEntanglement(unit, explosion) + reactionFrames))
       
       val force = ForceMath.sum(forces).normalize
       unit.agent.forces.put(ForceColors.threat, force)
       Gravitate.delegate(unit)
+      Move.delegate(unit)
     }
   }
   

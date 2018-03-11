@@ -2,13 +2,13 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvT
 
 import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, RequestTech}
-import Planning.Composition.UnitMatchers.{UnitMatchCustom, UnitMatchWarriors}
-import Planning.Plans.Army.Attack
+import Planning.Composition.UnitMatchers.{UnitMatchCustom, UnitMatchSiegeTank, UnitMatchWarriors}
+import Planning.Plans.Army.{Attack, ConsiderAttacking}
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Predicates.Economy.{GasAtMost, MineralsAtLeast}
-import Planning.Plans.Predicates.Milestones.{OnGasPumps, _}
+import Planning.Plans.Predicates.Milestones._
 import Planning.Plans.Predicates.Reactive.EnemyBio
 import Planning.Plans.Predicates.{Employing, SafeToAttack}
 import ProxyBwapi.Races.{Protoss, Terran}
@@ -33,7 +33,7 @@ object PvTIdeas {
     new And(
       new Or(
         new SafeToAttack,
-        new UnitsAtLeast(6, UnitMatchWarriors, complete = true)),
+        new UnitsAtLeast(10, UnitMatchWarriors, complete = true)),
       new Or(
         new Employing(PvTEarly1015GateGoonDT),
         new Employing(PvTEarly4Gate),
@@ -42,7 +42,7 @@ object PvTIdeas {
         new IfOnMiningBases(3),
         new Not(new EnemyHasShown(Terran.Vulture)),
         new UnitsAtLeast(1, UnitMatchCustom((unit) => unit.is(Protoss.Observer) && With.framesSince(unit.frameDiscovered) > 24 * 10), complete = true))),
-    new Attack)
+    new ConsiderAttacking)
   
   class EmergencyBuilds extends Parallel(
     new If(
@@ -122,16 +122,26 @@ object PvTIdeas {
       new TrainObserversScalingWithArmy,
       new TrainContinuously(Protoss.Observer, 1)))
   
-  class TrainHighTemplar extends OnGasPumps(3,
-    new If(
-      new UnitsAtLeast(1, Protoss.HighTemplar),
-      new Build(RequestTech(Protoss.PsionicStorm))),
-    new If(
+  class TrainHighTemplar extends If(
+    new And(
+      new UnitsAtLeast(8, UnitMatchWarriors),
       new Or(
-        new UnitsAtLeast(20, UnitMatchWarriors),
-        new EnemyBio),
-      new TrainContinuously(Protoss.HighTemplar, 6, 2),
-      new TrainContinuously(Protoss.HighTemplar, 6, 1)))
+        new And(
+          new HaveGasPumps(3),
+          new EnemyUnitsAtLeast(6, UnitMatchSiegeTank)),
+        new And(
+          new HaveGasPumps(2),
+          new EnemyBio))),
+      new Parallel(
+        new If(
+          new UnitsAtLeast(1, Protoss.HighTemplar),
+          new Build(RequestTech(Protoss.PsionicStorm))),
+        new If(
+          new Or(
+            new UnitsAtLeast(20, UnitMatchWarriors),
+            new EnemyBio),
+          new TrainContinuously(Protoss.HighTemplar, 6, 2),
+          new TrainContinuously(Protoss.HighTemplar, 6, 1))))
     
   class TrainArmy extends Parallel(
     new TrainObservers,

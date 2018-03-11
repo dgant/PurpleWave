@@ -34,11 +34,6 @@ class PvTBasic extends GameplanModeTemplate {
   
   override val buildPlans = Vector(
     new RequireMiningBases(2),
-    new PvTIdeas.TrainArmy,
-    new BuildCannonsAtExpansions(2),
-    new If(
-      new UnitsAtLeast(1, Protoss.HighTemplar),
-      new Build(RequestTech(Protoss.PsionicStorm))),
     new If(
       new UnitsAtLeast(2, Protoss.Carrier),
       new Parallel(
@@ -47,6 +42,11 @@ class PvTBasic extends GameplanModeTemplate {
           new UpgradeContinuously(Protoss.AirArmor),
           new UpgradeContinuously(Protoss.AirDamage)),
         new UpgradeContinuously(Protoss.CarrierCapacity))),
+    new PvTIdeas.TrainArmy,
+    new BuildCannonsAtExpansions(2),
+    new If(
+      new UnitsAtLeast(1, Protoss.HighTemplar),
+      new Build(RequestTech(Protoss.PsionicStorm))),
     new UpgradeContinuously(Protoss.GroundDamage),
     new Build(
       RequestAtLeast(2, Protoss.Gateway),

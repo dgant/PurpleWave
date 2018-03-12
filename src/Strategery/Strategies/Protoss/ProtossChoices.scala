@@ -64,7 +64,6 @@ object ProtossChoices {
     PvPOpen12Nexus5Zealot,
     PvPOpen1015GateDTs,
     PvPOpen1015GateGoonExpand,
-    PvPOpen1015GateReaverExpand,
     PvPOpenProxy2Gate
   )
   
@@ -74,7 +73,6 @@ object ProtossChoices {
   )
   
   val pvpOpenersTransitioningFrom1GateCore = Vector(
-    PvPOpen1GateGoonExpand,
     PvPOpen1GateReaverExpand,
     PvPOpen4GateGoon
   )

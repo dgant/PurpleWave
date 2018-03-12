@@ -26,7 +26,7 @@ class UnitClassProxy(val baseType: UnitType) {
   lazy val dimensionRight           = baseType.dimensionRight
   lazy val dimensionUp              = baseType.dimensionUp
   lazy val gasPrice                 = baseType.gasPrice
-  lazy val haltPixels               = baseType.haltDistance / 256
+  lazy val haltPixels               = if (this == Protoss.DarkTemplar) 0 else baseType.haltDistance / 256
   lazy val permanentlyCloaked       = baseType.hasPermanentCloak
   lazy val height                   = baseType.height
   lazy val isAddon                  = baseType.isAddon

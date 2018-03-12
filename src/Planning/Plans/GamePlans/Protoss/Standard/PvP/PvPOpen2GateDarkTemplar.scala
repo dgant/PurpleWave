@@ -4,6 +4,7 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.RequestAtLeast
+import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
@@ -64,6 +65,8 @@ class PvPOpen2GateDarkTemplar extends GameplanModeTemplate {
     RequestAtLeast(23,  Protoss.Probe),
     RequestAtLeast(2,   Protoss.DarkTemplar),
     RequestAtLeast(24,  Protoss.Probe))
+  
+  override def emergencyPlans: Seq[Plan] = Seq(new PvPIdeas.ReactToFFE)
   
   override val buildPlans = Vector(
     new RequireSufficientSupply,

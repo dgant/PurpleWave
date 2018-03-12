@@ -4,17 +4,20 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{BuildRequest, RequestAtLeast}
+import Planning.Composition.Latch
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Predicates.Employing
-import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
+import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainWorkersContinuously}
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.BuildGasPumps
 import Planning.Plans.Macro.Protoss.BuildCannonsAtNatural
+import Planning.Plans.Predicates.Employing
 import Planning.Plans.Predicates.Milestones.UnitsAtLeast
+import Planning.Plans.Predicates.Reactive.{EnemyBasesAtLeast, EnemyBasesAtMost}
+import Planning.Plans.Scouting.ScoutOn
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP.PvPOpen12Nexus5Zealot
 
@@ -30,12 +33,13 @@ class PvP12Nexus5Zealot extends GameplanModeTemplate {
   }
   
   override val activationCriteria : Plan = new Employing(PvPOpen12Nexus5Zealot)
-  override val completionCriteria : Plan = new UnitsAtLeast(3, Protoss.PhotonCannon, complete = true)
-  override val scoutAt            : Int  = 14
+  override val completionCriteria : Plan = new Latch(new Or(new UnitsAtLeast(3, Protoss.PhotonCannon, complete = true), new EnemyBasesAtLeast(2)))
+  override def defaultScoutPlan   : Plan = new ScoutOn(Protoss.Gateway, quantity = 2)
   override def defaultSupplyPlan: Plan = NoPlan()
   override def defaultWorkerPlan: Plan = NoPlan()
-  
   override def defaultPlacementPlan: Plan = new PylonAtNatural
+  
+  override def emergencyPlans: Seq[Plan] = Seq(new PvPIdeas.ReactToDarkTemplarEmergencies)
   
   override val buildOrder: Seq[BuildRequest] = Vector(
     // http://wiki.teamliquid.net/starcraft/Fast_Expand_(vs._Protoss)
@@ -56,16 +60,18 @@ class PvP12Nexus5Zealot extends GameplanModeTemplate {
   )
   
   override val buildPlans = Vector(
-    new BuildCannonsAtNatural(3),
+    new If(
+      new EnemyBasesAtMost(1),
+      new BuildCannonsAtNatural(3)),
     new RequireSufficientSupply,
     new TrainWorkersContinuously,
-    new If(
+    new FlipIf(
       new UnitsAtLeast(5, UnitMatchWarriors),
+      new PvPIdeas.TrainArmy,
       new Parallel(
         new Build(
           RequestAtLeast(1, Protoss.Assimilator),
           RequestAtLeast(1, Protoss.CyberneticsCore)),
-        new BuildGasPumps),
-      new TrainContinuously(Protoss.Zealot, 5))
+        new BuildGasPumps))
   )
 }

@@ -50,7 +50,8 @@ object ShowBattleDetails extends View {
       Vector("Attack",      "%1.2f".format(battle.ratioAttack)),
       Vector("Snipe",       "%1.2f".format(battle.ratioSnipe)),
       Vector("Target",      "%1.2f".format(battle.ratioTarget)),
-      Vector("Hysteresis",  "%1.2f".format(battle.hysteresis))
+      Vector("Hysteresis",  "%1.2f".format(battle.hysteresis)),
+      Vector("Urgency",     "%1.2f".format(battle.urgency))
     ))
   }
   

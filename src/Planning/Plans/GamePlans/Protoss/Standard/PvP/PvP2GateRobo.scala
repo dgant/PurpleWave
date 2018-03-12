@@ -5,12 +5,11 @@ import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.Predicates.Employing
-import Planning.Plans.Predicates.Reactive.EnemyBasesAtLeast
-import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
+import Planning.Plans.Predicates.Employing
 import Planning.Plans.Predicates.Milestones.{EnemyUnitsAtLeast, UnitsAtLeast}
+import Planning.Plans.Predicates.Reactive.EnemyBasesAtLeast
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvP.PvPOpen2GateRobo
 
@@ -26,7 +25,6 @@ class PvP2GateRobo extends GameplanModeTemplate {
   
   override val buildOrder: Seq[BuildRequest] = Vector(
     // http://wiki.teamliquid.net/starcraft/2_Gate_Reaver_(vs._Protoss)
-    // We get gas/core faster because of mineral locking + later scout
     RequestAtLeast(8,   Protoss.Probe),
     RequestAtLeast(1,   Protoss.Pylon),             // 8
     RequestAtLeast(10,  Protoss.Probe),
@@ -58,8 +56,7 @@ class PvP2GateRobo extends GameplanModeTemplate {
       new EnemyUnitsAtLeast(1, Protoss.DarkTemplar),
       new Build(RequestAtLeast(1, Protoss.Observer))),
     new Trigger(new UnitsAtLeast(1, Protoss.Reaver), new RequireMiningBases(2)),
-    new TrainContinuously(Protoss.Reaver),
-    new TrainContinuously(Protoss.Dragoon, 20),
+    new PvPIdeas.TrainArmy,
     new Build(
       RequestAtLeast(1, Protoss.RoboticsFacility),
       RequestAtLeast(1, Protoss.Observatory),

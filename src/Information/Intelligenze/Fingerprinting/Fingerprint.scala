@@ -3,11 +3,15 @@ package Information.Intelligenze.Fingerprinting
 abstract class Fingerprint {
   
   private var triggered: Boolean = false
-  var trigger: Boolean = false
+  var sticky: Boolean = false
   
   final def matches: Boolean = {
-    if (trigger && triggered) return true
-    triggered = investigate
+    if (sticky && triggered) {
+      return true
+    }
+    if (investigate) {
+      triggered = true
+    }
     triggered
   }
   

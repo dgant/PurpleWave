@@ -3,23 +3,22 @@ package Information.Intelligenze.Fingerprinting.Generic
 import Information.Intelligenze.Fingerprinting.Fingerprint
 import Lifecycle.With
 import Mathematics.PurpleMath
-import ProxyBwapi.UnitClass.UnitClass
+import Planning.Composition.UnitMatchers.UnitMatcher
 import ProxyBwapi.UnitInfo.UnitInfo
 
 class FingerprintArrivesBy(
-  unitClass : UnitClass,
-  gameTime  : GameTime,
-  quantity  : Int = 1)
+  unitMatcher : UnitMatcher,
+  gameTime    : GameTime,
+  quantity    : Int = 1)
     extends Fingerprint {
   
-  trigger = true
+  sticky = true
   
   override def investigate: Boolean = {
-    // NOTE: THIS IS BUGGED because units can have completionTime Int.MAX which then overflows
-    val units           = With.units.enemy.filter(_.is(unitClass))
-    val arrivalFrame    = gameTime.frames
+    val units           = With.units.enemy.filter(_.is(unitMatcher))
+    val targetFrame     = gameTime.frames
     val arrivalTimes    = units.map(u => (u, arrivaltime(u))).toMap
-    val arrivingOnTime  = arrivalTimes.count(_._2 < arrivalFrame)
+    val arrivingOnTime  = arrivalTimes.count(_._2 < targetFrame)
     val output          = arrivingOnTime >= quantity
     output
   }
@@ -37,7 +36,6 @@ class FingerprintArrivesBy(
     
     val completionTime  = PurpleMath.clamp(unit.completionFrame, With.frame, With.frame + unit.unitClass.buildFrames)
     val arrivalTime     = completionTime + travelTime
-    val output          = Math.min(With.frame, arrivalTime)
-    output
+    arrivalTime
   }
 }

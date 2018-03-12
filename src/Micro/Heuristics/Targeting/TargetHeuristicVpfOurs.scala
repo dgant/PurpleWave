@@ -5,8 +5,9 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 object TargetHeuristicVpfOurs extends TargetHeuristic {
   
   override def evaluate(unit: FriendlyUnitInfo, candidate: UnitInfo): Double = {
-    val multiplier = 240
-    val output = multiplier * valuePerAttack(unit, candidate) / unit.cooldownMaxAgainst(candidate)
+    val multiplierBase = 240
+    val multiplierMiner = if (candidate.gatheringMinerals) 2.0 else 1.0
+    val output = multiplierBase * multiplierMiner * valuePerAttack(unit, candidate) / unit.cooldownMaxAgainst(candidate)
     output
   }
   

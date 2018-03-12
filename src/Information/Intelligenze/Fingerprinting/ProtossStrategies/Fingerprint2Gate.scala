@@ -4,8 +4,8 @@ import Information.Intelligenze.Fingerprinting.Generic.{FingerprintArrivesBy, Fi
 import ProxyBwapi.Races.Protoss
 
 class Fingerprint2Gate extends FingerprintOr(
-  new FingerprintArrivesBy(Protoss.Zealot,    GameTime(4, 0), 2),
-  new FingerprintCompleteBy(Protoss.Gateway,  GameTime(2, 30))) {
+  new FingerprintArrivesBy(Protoss.Zealot,    GameTime(3, 40), 2),
+  new FingerprintCompleteBy(Protoss.Gateway,  GameTime(2, 25), 2)) {
 
-  trigger = true
+  sticky = true
 }

@@ -1,6 +1,7 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvP
 
 import Macro.BuildRequests.BuildRequest
+import Planning.Composition.Latch
 import Planning.Plan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
@@ -15,10 +16,11 @@ import Strategery.Strategies.Protoss.PvP.PvPOpen4GateGoon
 class PvPOpen4GateGoon extends GameplanModeTemplate {
   
   override val activationCriteria : Plan = new Employing(PvPOpen4GateGoon)
-  override val completionCriteria : Plan = new MiningBasesAtLeast(2)
+  override val completionCriteria : Plan = new Latch(new MiningBasesAtLeast(2))
   override def defaultAttackPlan  : Plan = new PvPIdeas.AttackSafely
   override val scoutAt            : Int  = 14
   override val defaultWorkerPlan  : Plan = NoPlan()
+  override def emergencyPlans: Seq[Plan] = Vector(new PvPIdeas.ReactToDarkTemplarEmergencies)
   
   override val buildOrder: Seq[BuildRequest] = ProtossBuilds.Opening_4GateDragoon
   

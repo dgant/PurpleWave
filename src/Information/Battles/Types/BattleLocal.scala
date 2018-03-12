@@ -16,8 +16,8 @@ class BattleLocal(us: Team, enemy: Team) extends Battle(us, enemy) {
   lazy val hysteresis     : Double  = ByOption.mean(us.units.filter(_.canMove).map(hysteresisRatio)).getOrElse(0.0)
   lazy val distanceUs     : Double  = focus.pixelDistanceFast(With.geography.home.pixelCenter)
   lazy val distanceEnemy  : Double  = focus.pixelDistanceFast(With.intelligence.mostBaselikeEnemyTile.pixelCenter)
-  lazy val distanceRatio  : Double  = distanceUs / (distanceUs + distanceEnemy)
-  lazy val urgency        : Double  = Math.max(0.0, 0.5 - distanceRatio / 2.0)
+  lazy val distanceRatio  : Double  = distanceEnemy / (distanceUs + distanceEnemy)
+  lazy val urgency        : Double  = PurpleMath.clamp(0.5 * (distanceRatio - 0.5), 0.0, 0.5)
   lazy val valueUs        : Double  = us.units.map(_.subjectiveValue).sum
   lazy val valueEnemy     : Double  = enemy.units.map(_.subjectiveValue).sum
   lazy val attackGains    : Double  = estimationSimulationAttack.costToEnemy
@@ -43,7 +43,7 @@ class BattleLocal(us: Team, enemy: Team) extends Battle(us, enemy) {
     val agent     = unit.friendly.get.agent
     val patience  = agent.combatHysteresisFrames.toDouble / With.configuration.battleHysteresisFrames
     val sign      = if (agent.shouldEngage) -1.0 else 1.0
-    val output    = patience * sign * With.configuration.battleHysteresisRatio
+    val output    = patience * sign * With.configuration.battleHysteresisRatio * (if(unit.unitClass.melee) 2.0 else 1.0)
     output
   }
 }

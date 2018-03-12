@@ -2,13 +2,19 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvP
 
 import Lifecycle.With
 import Macro.BuildRequests.RequestAtLeast
+import Planning.Composition.UnitMatchers.{UnitMatchAnd, UnitMatchEnergyAtMost, UnitMatchWarriors}
 import Planning.Plans.Army.{Attack, ConsiderAttacking}
-import Planning.Plans.Compound._
+import Planning.Plans.Compound.{If, _}
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
+import Planning.Plans.Macro.Expanding.RequireMiningBases
+import Planning.Plans.Macro.Protoss.{BuildCannonsAtBases, MeldArchons}
+import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Predicates.Economy.GasAtMost
 import Planning.Plans.Predicates.Milestones._
-import Planning.Plans.Predicates.Reactive.{EnemyCarriers, EnemyDarkTemplarExists, EnemyDarkTemplarPossible}
+import Planning.Plans.Predicates.Reactive.{EnemyBasesAtLeast, EnemyCarriers, EnemyDarkTemplarExists, EnemyDarkTemplarPossible}
+import Planning.Plans.Predicates.SafeAtHome
+import Planning.Plans.Predicates.Scenarios.WeAreBeingProxied
 import ProxyBwapi.Races.Protoss
 
 object PvPIdeas {
@@ -19,6 +25,7 @@ object PvPIdeas {
     new EnemyHasShown(Protoss.Zealot, 3),
     new Not(new EnemyHasShown(Protoss.Dragoon)))
   
+  class AttackWithDarkTemplar extends Attack { attackers.get.unitMatcher.set(Protoss.DarkTemplar) }
   class AttackSafely extends If(
     new Or(
       new UnitsAtLeast(1, Protoss.Observer, complete = true),
@@ -29,35 +36,90 @@ object PvPIdeas {
         new EnemyUnitsAtMost(0, Protoss.Dragoon),
         new Not(new EnemyHasUpgrade(Protoss.ZealotSpeed))),
       new Attack,
-      new ConsiderAttacking))
+      new If(
+        new UnitsAtLeast(15, UnitMatchWarriors),
+        new Attack,
+        new ConsiderAttacking)))
   
   class ReactToDarkTemplarEmergencies extends Parallel(new ReactToDarkTemplarExisting, new ReactToDarkTemplarPossible)
-  
   class ReactToDarkTemplarPossible extends If(
     new EnemyDarkTemplarPossible,
     new Parallel(
+      new BuildCannonsAtBases(1),
+      new TrainContinuously(Protoss.Observer, 1, 1),
+      new TrainContinuously(Protoss.Observatory, 1, 1),
       new If(
-        new UnitsAtLeast(1, Protoss.RoboticsFacility),
-        new Build(
-          RequestAtLeast(1, Protoss.Observatory),
-          RequestAtLeast(1, Protoss.Observer)),
-        new Build(
-          RequestAtLeast(1, Protoss.Forge),
-          RequestAtLeast(1, Protoss.PhotonCannon),
-          RequestAtLeast(1, Protoss.RoboticsFacility)))))
-  
+        new UnitsAtMost(0, Protoss.Observatory),
+        new TrainContinuously(Protoss.Forge, 1, 1)),
+      new TrainContinuously(Protoss.RoboticsFacility, 1, 1)))
   class ReactToDarkTemplarExisting extends If(
     new EnemyDarkTemplarExists,
-    new FlipIf(
-      new UnitsAtLeast(1, Protoss.Observatory),
-      new Build(RequestAtLeast(1, Protoss.Observer)),
-      new Build(
-        RequestAtLeast(1, Protoss.Forge),
-        RequestAtLeast(2, Protoss.PhotonCannon),
-        RequestAtLeast(1, Protoss.RoboticsFacility),
-        RequestAtLeast(1, Protoss.Observatory))))
+    new Parallel(
+      new If(
+        new And(
+        new UnitsAtMost(1, Protoss.Observer),
+        new UnitsAtLeast(1, Protoss.Forge)),
+      new BuildCannonsAtBases(2)),
+      new TrainContinuously(Protoss.Observer, 1, 1),
+      new TrainContinuously(Protoss.Observatory, 1, 1),
+      new If(
+        new UnitsAtMost(1, Protoss.Observer, complete = true),
+        new TrainContinuously(Protoss.Forge, 1, 1)),
+      new TrainContinuously(Protoss.RoboticsFacility, 1, 1)))
   
-  class BuildDragoonsOrZealots extends If(
+  class ReactToFFE extends If(
+    new And(
+      new Not(new WeAreBeingProxied),
+      new EnemyUnitsAtLeast(1, Protoss.PhotonCannon),
+      new SafeAtHome),
+    new RequireMiningBases(2))
+  
+  class ReactToExpansion extends If(
+    new And(
+      new EnemyBasesAtLeast(2),
+      new MiningBasesAtMost(1)),
+    new Trigger(
+      new And(
+        new SafeAtHome,
+        new UnitsAtLeast(1, Protoss.CyberneticsCore),
+        new UnitsAtLeast(1, Protoss.Assimilator)),
+      // Match if it we're already on Dragoon tech
+      new RequireMiningBases(2),
+      // Otherwise, let's go all in with Zealots
+      new FlipIf(
+        new SafeAtHome,
+        new Parallel(
+          new TrainContinuously(Protoss.Probe, 19),
+          new Build(RequestAtLeast(4, Protoss.Gateway))),
+        new Parallel(
+          new PvPIdeas.TrainDragoonsOrZealots,
+          new UpgradeContinuously(Protoss.DragoonRange)))))
+  
+  class TakeBase2 extends If(
+    new Or(
+      new UnitsAtLeast(2, Protoss.Reaver, complete = true),
+      new And(
+        new SafeAtHome,
+        new UnitsAtLeast(8, UnitMatchWarriors, complete = true)),
+      new UnitsAtLeast(16, UnitMatchWarriors, complete = true)),
+    new RequireMiningBases(2))
+  
+  class TakeBase3 extends If(
+    new Or(
+      new UnitsAtLeast(40, UnitMatchWarriors),
+      new And(
+        new SafeAtHome,
+        new Or(
+          new EnemyCarriers,
+          new EnemyBasesAtLeast(3)))),
+    new RequireMiningBases(2))
+  
+  class MeldArchonsPvP extends MeldArchons(49) {
+    override def minimumArchons: Int = Math.min(8, With.units.enemy.count(_.is(Protoss.Zealot)) / 3)
+    templar.unitMatcher.set(UnitMatchAnd(Protoss.HighTemplar, UnitMatchEnergyAtMost(75)))
+  }
+  
+  class TrainDragoonsOrZealots extends If(
     new And(
       new Not(new EnemyCarriers),
       new Or(
@@ -72,5 +134,23 @@ object PvPIdeas {
           new UnitsAtLeast(12, Protoss.Dragoon)))),
     new TrainContinuously(Protoss.Zealot),
     new TrainContinuously(Protoss.Dragoon))
-  
+    
+  class TrainReactiveDarkTemplar extends If(
+    new And(
+      new EnemyUnitsAtMost(0, Protoss.PhotonCannon),
+      new EnemyUnitsAtMost(0, Protoss.Observer)),
+    new TrainContinuously(Protoss.DarkTemplar, 3),
+    new If(
+      new EnemyUnitsAtMost(0, Protoss.Observer),
+      new TrainContinuously(Protoss.DarkTemplar, 1)))
+    
+  class TrainArmy extends Parallel(
+    new TrainContinuously(Protoss.Carrier),
+    new If(new UnitsAtMost(0, Protoss.PhotonCannon), new TrainContinuously(Protoss.Observer, 1, 1)),
+    new TrainReactiveDarkTemplar,
+    new If(new Not(new EnemyCarriers), new TrainContinuously(Protoss.Reaver, 4)),
+    new If(new UnitsAtLeast(12, UnitMatchWarriors), new TrainContinuously(Protoss.HighTemplar, 6, 2)),
+    new TrainDragoonsOrZealots,
+    new TrainContinuously(Protoss.Observer, 2)
+  )
 }

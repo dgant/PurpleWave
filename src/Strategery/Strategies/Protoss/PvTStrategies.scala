@@ -1,6 +1,6 @@
-package Strategery.Strategies.Protoss.PvT
+package Strategery.Strategies.Protoss
+
 import Strategery.Maps.{MapGroups, StarCraftMap}
-import Strategery.Strategies.Protoss.ProtossChoices
 import Strategery.Strategies.Strategy
 import bwapi.Race
 

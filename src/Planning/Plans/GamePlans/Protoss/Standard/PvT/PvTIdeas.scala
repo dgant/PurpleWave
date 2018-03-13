@@ -12,7 +12,7 @@ import Planning.Plans.Predicates.Milestones._
 import Planning.Plans.Predicates.Reactive.EnemyBio
 import Planning.Plans.Predicates.{Employing, SafeToAttack}
 import ProxyBwapi.Races.{Protoss, Terran}
-import Strategery.Strategies.Protoss.PvT._
+import Strategery.Strategies.Protoss.{PvT13Nexus, PvTEarly1015GateGoonDT, PvTEarly1GateStargateTemplar, PvTEarly4Gate}
 
 object PvTIdeas {
   

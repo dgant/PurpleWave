@@ -7,14 +7,15 @@ import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvPIdeas.ReactToDarkTemplarEmergencies
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
-import Planning.Plans.Macro.Protoss.{BuildCannonsAtExpansions, BuildCannonsAtNatural}
+import Planning.Plans.Macro.Expanding.{BuildGasPumps, MatchMiningBases, RequireMiningBases}
+import Planning.Plans.Macro.Protoss.BuildCannonsAtExpansions
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Predicates.Economy.GasAtMost
 import Planning.Plans.Predicates.Milestones._
 import Planning.Plans.Predicates.Reactive.EnemyCarriers
-import Planning.Plans.Predicates.SafeAtHome
+import Planning.Plans.Predicates.{Employing, SafeAtHome}
 import ProxyBwapi.Races.Protoss
+import Strategery.Strategies.Protoss.PvPLateGameCarrier
 
 class PvPLateGame extends GameplanModeTemplate {
   
@@ -40,10 +41,15 @@ class PvPLateGame extends GameplanModeTemplate {
       RequestAtLeast(1, Protoss.RoboticsSupportBay),
       RequestAtLeast(3, Protoss.Gateway),
       RequestAtLeast(1, Protoss.Observatory),
-      RequestAtLeast(2, Protoss.Assimilator),
-      RequestAtLeast(4, Protoss.Gateway),
+      RequestAtLeast(2, Protoss.Assimilator)),
+    new If(
+      new EnemyHasShownCloakedThreat,
+      new UpgradeContinuously(Protoss.ObserverSpeed)),
+    new If(
+      new Not(new EnemyCarriers),
+      new UpgradeContinuously(Protoss.ZealotSpeed)),
+    new Build(
       RequestAtLeast(1, Protoss.CitadelOfAdun),
-      RequestUpgrade(Protoss.ZealotSpeed),
       RequestAtLeast(1, Protoss.Forge),
       RequestAtLeast(1, Protoss.TemplarArchives)),
     new UpgradeContinuously(Protoss.GroundDamage),
@@ -51,7 +57,10 @@ class PvPLateGame extends GameplanModeTemplate {
     new OnGasPumps(3,
       new Build(
         RequestAtLeast(2, Protoss.Forge),
-        RequestUpgrade(Protoss.HighTemplarEnergy))))
+        RequestUpgrade(Protoss.HighTemplarEnergy),
+        RequestAtLeast(1, Protoss.Stargate),
+        RequestAtLeast(1, Protoss.ArbiterTribunal),
+        RequestTech(Protoss.Stasis))))
   
   class CarrierTransition extends Parallel(
     new Build(RequestAtLeast(1, Protoss.Stargate)),
@@ -70,32 +79,33 @@ class PvPLateGame extends GameplanModeTemplate {
     new PvPIdeas.TakeBase3,
     new If(new EnemyUnitsAtLeast(1, Protoss.DarkTemplar), new UpgradeContinuously(Protoss.ObserverSpeed)),
   
+    new BuildCannonsAtExpansions(2),
     new FlipIf(
       new Or(
         new UnitsAtLeast(40, UnitMatchWarriors),
         new And(
           new UnitsAtLeast(25, UnitMatchWarriors),
           new SafeAtHome)),
+      new PvPIdeas.TrainArmy,
       new Parallel(
-        new PvPIdeas.TrainArmy,
-        new If(
-          new And(
-            new Not(new EnemyCarriers),
-            new Not(new SafeAtHome)),
-          new BuildCannonsAtNatural(4)),
-      new BuildCannonsAtExpansions(2)),
-      new BuildTech),
+        new MatchMiningBases,
+        new BuildTech)),
     new FlipIf(
       new SafeAtHome,
       new Build(RequestAtLeast(8, Protoss.Gateway)),
       new RequireMiningBases(3)),
-    new OnGasPumps(3,
+    new If(
+      new And(
+        new Employing(PvPLateGameCarrier),
+        new HaveGasPumps(3)),
       new CarrierTransition,
       new Build(RequestAtLeast(12, Protoss.Gateway))),
     new RequireMiningBases(4),
     new FlipIf(
       new SafeAtHome,
       new Build(RequestAtLeast(12, Protoss.Gateway)),
-      new RequireMiningBases(5))
+      new RequireMiningBases(5)),
+    new RequireMiningBases(6),
+    new UpgradeContinuously(Protoss.Shields)
   )
 }

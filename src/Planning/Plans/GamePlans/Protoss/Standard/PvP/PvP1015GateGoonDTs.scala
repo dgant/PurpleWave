@@ -13,9 +13,9 @@ import Planning.Plans.Predicates.Employing
 import Planning.Plans.Predicates.Milestones.{EnemyUnitsAtMost, MiningBasesAtLeast, UnitsAtLeast}
 import Planning.Plans.Scouting.ScoutOn
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvP.PvPOpen1015GateDTs
+import Strategery.Strategies.Protoss.PvPOpen1015GateDTs
 
-class PvPOpen1015GateGoonDTs extends GameplanModeTemplate {
+class PvP1015GateGoonDTs extends GameplanModeTemplate {
   
   override val activationCriteria : Plan  = new Employing(PvPOpen1015GateDTs)
   override val completionCriteria : Plan  = new Latch(new MiningBasesAtLeast(2))
@@ -25,7 +25,6 @@ class PvPOpen1015GateGoonDTs extends GameplanModeTemplate {
   
   override def emergencyPlans: Seq[Plan] = Seq(
     new PvPIdeas.ReactToDarkTemplarEmergencies,
-    new PvPIdeas.ReactToExpansion,
     new PvPIdeas.ReactToFFE)
   
   override val buildOrder: Seq[BuildRequest] =

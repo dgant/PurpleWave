@@ -17,7 +17,7 @@ import Planning.Plans.Predicates.Milestones._
 import Planning.Plans.Predicates.Reactive.{EnemyBasesAtLeast, EnemyBio}
 import Planning.Plans.Predicates.{Employing, Never, SafeAtHome}
 import ProxyBwapi.Races.{Protoss, Terran}
-import Strategery.Strategies.Protoss.PvT.{PvT2BaseArbiter, _}
+import Strategery.Strategies.Protoss._
 
 class PvTBasic extends GameplanModeTemplate {
   override val activationCriteria     = new Employing(PvT13Nexus, PvT21Nexus, PvTDTExpand, PvT2BaseCarrier, PvT2BaseArbiter, PvT3BaseCarrier, PvT3BaseArbiter)

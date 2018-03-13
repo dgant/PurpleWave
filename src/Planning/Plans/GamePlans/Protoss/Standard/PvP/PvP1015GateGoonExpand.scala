@@ -13,7 +13,7 @@ import Planning.Plans.Predicates.Milestones.{MiningBasesAtLeast, UnitsAtLeast}
 import Planning.Plans.Predicates.{Employing, SafeAtHome}
 import Planning.Plans.Scouting.ScoutOn
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvP.PvPOpen1015GateDTs
+import Strategery.Strategies.Protoss.PvPOpen1015GateDTs
 
 class PvP1015GateGoonExpand extends GameplanModeTemplate {
   

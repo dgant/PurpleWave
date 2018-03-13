@@ -15,7 +15,7 @@ import Planning.Plans.Predicates.Milestones._
 import Planning.Plans.Predicates.{Employing, SafeAtHome}
 import Planning.Plans.Scouting.ScoutOn
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvP.PvPOpen2Gate1012
+import Strategery.Strategies.Protoss.PvPOpen2Gate1012
 
 class PvP2Gate1012 extends GameplanModeTemplate {
   

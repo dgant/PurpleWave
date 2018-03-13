@@ -12,9 +12,9 @@ import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Protoss.BuildCannonsAtNatural
 import Planning.Plans.Predicates.Milestones._
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvP.PvPOpen3GateSpeedlots
+import Strategery.Strategies.Protoss.PvPOpen3GateSpeedlots
 
-class PvPOpen3GateSpeedlots extends GameplanModeTemplate {
+class PvP3GateSpeedlots extends GameplanModeTemplate {
   
   override val activationCriteria : Plan      = new Employing(PvPOpen3GateSpeedlots)
   override val completionCriteria : Plan      = new MiningBasesAtLeast(2)

@@ -10,7 +10,7 @@ import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Predicates.Milestones.{MiningBasesAtLeast, UnitsAtLeast}
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvT.PvTEarly1015GateGoonDT
+import Strategery.Strategies.Protoss.PvTEarly1015GateGoonDT
 
 class PvT1015GateDT extends GameplanModeTemplate {
   

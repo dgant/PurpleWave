@@ -131,7 +131,9 @@ object PvPIdeas {
           new Check(() => With.self.minerals > With.self.gas * 5)),
         new And(
           new UpgradeComplete(Protoss.ZealotSpeed, 1, Protoss.Zealot.buildFrames),
-          new UnitsAtLeast(12, Protoss.Dragoon)))),
+          new Or(
+            new UnitsAtLeast(12, Protoss.Dragoon),
+            new Check(() => With.self.minerals > With.self.gas * 3))))),
     new TrainContinuously(Protoss.Zealot),
     new TrainContinuously(Protoss.Dragoon))
     
@@ -148,6 +150,7 @@ object PvPIdeas {
     new TrainContinuously(Protoss.Carrier),
     new If(new UnitsAtMost(0, Protoss.PhotonCannon), new TrainContinuously(Protoss.Observer, 1, 1)),
     new TrainReactiveDarkTemplar,
+    new If(new UnitsAtLeast(12, UnitMatchWarriors), new TrainContinuously(Protoss.Arbiter, 2, 1)),
     new If(new Not(new EnemyCarriers), new TrainContinuously(Protoss.Reaver, 4)),
     new If(new UnitsAtLeast(12, UnitMatchWarriors), new TrainContinuously(Protoss.HighTemplar, 6, 2)),
     new TrainDragoonsOrZealots,

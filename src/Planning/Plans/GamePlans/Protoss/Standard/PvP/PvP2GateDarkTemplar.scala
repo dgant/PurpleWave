@@ -14,9 +14,9 @@ import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Protoss.BuildCannonsAtNatural
 import Planning.Plans.Predicates.Milestones.{EnemyUnitsAtMost, MiningBasesAtLeast, UnitsAtLeast, UnitsAtMost}
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvP.PvPOpen2GateDTExpand
+import Strategery.Strategies.Protoss.PvPOpen2GateDTExpand
 
-class PvPOpen2GateDarkTemplar extends GameplanModeTemplate {
+class PvP2GateDarkTemplar extends GameplanModeTemplate {
   
   override val activationCriteria = new Employing(PvPOpen2GateDTExpand)
   override val completionCriteria = new MiningBasesAtLeast(2)

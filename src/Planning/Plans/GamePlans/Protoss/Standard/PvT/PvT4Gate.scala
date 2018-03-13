@@ -8,7 +8,7 @@ import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Predicates.Employing
 import Planning.Plans.Predicates.Milestones.MiningBasesAtLeast
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvT.PvTEarly4Gate
+import Strategery.Strategies.Protoss.PvTEarly4Gate
 
 class PvT4Gate extends GameplanModeTemplate {
   

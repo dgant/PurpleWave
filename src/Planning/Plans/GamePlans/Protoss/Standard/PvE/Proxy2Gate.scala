@@ -14,9 +14,8 @@ import Planning.Plans.Predicates.Milestones._
 import Planning.Plans.Scouting.Scout
 import Planning.{Plan, ProxyPlanner}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
-import Strategery.Strategies.Protoss.PvP.PvPOpenProxy2Gate
+import Strategery.Strategies.Protoss.{PvPOpenProxy2Gate, PvTProxy2Gate}
 import Strategery.Strategies.Protoss.PvR.PvROpenProxy2Gate
-import Strategery.Strategies.Protoss.PvT.PvTProxy2Gate
 import Strategery.Strategies.Protoss.PvZ.PvZProxy2Gate
 
 class Proxy2Gate extends GameplanModeTemplate {

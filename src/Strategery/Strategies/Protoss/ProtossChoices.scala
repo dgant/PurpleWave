@@ -3,9 +3,7 @@ package Strategery.Strategies.Protoss
 import Strategery.Strategies.AllRaces.WorkerRush
 import Strategery.Strategies.Protoss.FFA._
 import Strategery.Strategies.Protoss.PvE._
-import Strategery.Strategies.Protoss.PvP.{PvPOpen1015GateDTs, PvPOpenProxy2Gate, _}
 import Strategery.Strategies.Protoss.PvR._
-import Strategery.Strategies.Protoss.PvT._
 import Strategery.Strategies.Protoss.PvZ._
 import Strategery.Strategies._
 
@@ -60,10 +58,8 @@ object ProtossChoices {
   
   val pvpOpenersWithoutTransitions = Vector(
     PvPOpen2GateDTExpand,
-    PvPOpen2GateRobo,
     PvPOpen12Nexus5Zealot,
     PvPOpen1015GateDTs,
-    PvPOpen1015GateGoonExpand,
     PvPOpenProxy2Gate
   )
   
@@ -74,6 +70,7 @@ object ProtossChoices {
   
   val pvpOpenersTransitioningFrom1GateCore = Vector(
     PvPOpen1GateReaverExpand,
+    PvPOpen2GateRobo,
     PvPOpen4GateGoon
   )
   

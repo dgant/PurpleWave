@@ -12,7 +12,7 @@ import Planning.Plans.Predicates.Employing
 import Planning.Plans.Predicates.Milestones.{EnemyHasShown, UnitsAtLeast}
 import Planning.Plans.Scouting.ScoutOn
 import ProxyBwapi.Races.{Protoss, Terran}
-import Strategery.Strategies.Protoss.PvT.PvTEarly1GateStargateTemplar
+import Strategery.Strategies.Protoss.PvTEarly1GateStargateTemplar
 
 class PvTStove extends GameplanModeTemplate {
   

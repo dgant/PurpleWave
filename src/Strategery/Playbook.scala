@@ -1,8 +1,8 @@
 package Strategery
 
 import Strategery.Strategies.Protoss.PvE._
-import Strategery.Strategies.Protoss.PvP.{PvPOpen2GateDTExpand, PvPOpen3GateSpeedlots}
 import Strategery.Strategies.Protoss.PvZ._
+import Strategery.Strategies.Protoss.{PvPOpen3GateSpeedlots, PvPOpen4GateGoon}
 import Strategery.Strategies.Strategy
 import Strategery.Strategies.Terran.TvE._
 import Strategery.Strategies.Terran.TvR.{TvR1Rax, TvRTinfoil}
@@ -47,7 +47,7 @@ object StrategyGroups {
 }
 
 class TestingPlaybook extends EmptyPlaybook {
-  val strategiesToTest: Seq[Strategy] = Seq(PvPOpen2GateDTExpand)
+  val strategiesToTest: Seq[Strategy] = Seq(PvPOpen4GateGoon)
   
   override lazy val forced: Seq[Strategy] = strategiesToTest
 }

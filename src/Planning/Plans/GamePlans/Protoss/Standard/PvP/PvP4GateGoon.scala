@@ -11,9 +11,9 @@ import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Predicates.Employing
 import Planning.Plans.Predicates.Milestones.{MiningBasesAtLeast, UnitsAtLeast}
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvP.PvPOpen4GateGoon
+import Strategery.Strategies.Protoss.PvPOpen4GateGoon
 
-class PvPOpen4GateGoon extends GameplanModeTemplate {
+class PvP4GateGoon extends GameplanModeTemplate {
   
   override val activationCriteria : Plan = new Employing(PvPOpen4GateGoon)
   override val completionCriteria : Plan = new Latch(new MiningBasesAtLeast(2))

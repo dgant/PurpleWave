@@ -19,7 +19,7 @@ import Planning.Plans.Predicates.Milestones.UnitsAtLeast
 import Planning.Plans.Predicates.Reactive.{EnemyBasesAtLeast, EnemyBasesAtMost}
 import Planning.Plans.Scouting.ScoutOn
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvP.PvPOpen12Nexus5Zealot
+import Strategery.Strategies.Protoss.PvPOpen12Nexus5Zealot
 
 class PvP12Nexus5Zealot extends GameplanModeTemplate {
   

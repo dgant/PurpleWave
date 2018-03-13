@@ -13,12 +13,12 @@ object ShowUnitsFriendly extends View {
   var selectedOnly    : Boolean = false
   var showClient      : Boolean = true
   var showAction      : Boolean = true
-  var showCommand     : Boolean = false
+  var showCommand     : Boolean = true
   var showOrder       : Boolean = false
-  var showTargets     : Boolean = false
+  var showTargets     : Boolean = true
   var showFormation   : Boolean = true
-  var showKiting      : Boolean = false
-  var showForces      : Boolean = false
+  var showKiting      : Boolean = true
+  var showForces      : Boolean = true
   var showDesire      : Boolean = true
   var showFightReason : Boolean = true
   var showDistance    : Boolean = false

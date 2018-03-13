@@ -16,7 +16,7 @@ import Planning.Plans.Predicates.Scenarios.EnemyStrategy
 import Planning.Plans.Predicates.{Employing, SafeAtHome}
 import Planning.Plans.Scouting.FoundEnemyBase
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvP.PvPOpen1GateReaverExpand
+import Strategery.Strategies.Protoss.PvPOpen1GateReaverExpand
 
 class PvP1GateReaverExpand extends GameplanModeTemplate {
   

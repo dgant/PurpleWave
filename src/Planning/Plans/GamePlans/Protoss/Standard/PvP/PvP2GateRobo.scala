@@ -11,7 +11,7 @@ import Planning.Plans.Predicates.Employing
 import Planning.Plans.Predicates.Milestones.{EnemyUnitsAtLeast, UnitsAtLeast}
 import Planning.Plans.Predicates.Reactive.EnemyBasesAtLeast
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvP.PvPOpen2GateRobo
+import Strategery.Strategies.Protoss.PvPOpen2GateRobo
 
 class PvP2GateRobo extends GameplanModeTemplate {
   
@@ -29,8 +29,8 @@ class PvP2GateRobo extends GameplanModeTemplate {
     RequestAtLeast(1,   Protoss.Pylon),             // 8
     RequestAtLeast(10,  Protoss.Probe),
     RequestAtLeast(1,   Protoss.Gateway),           // 10
-    RequestAtLeast(11,  Protoss.Probe),
-    RequestAtLeast(1,   Protoss.Assimilator),       // 11
+    RequestAtLeast(12,  Protoss.Probe),
+    RequestAtLeast(1,   Protoss.Assimilator),       // 12
     RequestAtLeast(13,  Protoss.Probe),
     RequestAtLeast(1,   Protoss.Zealot),            // 13
     RequestAtLeast(14,  Protoss.Probe),

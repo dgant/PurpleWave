@@ -63,7 +63,7 @@ object Build extends Action {
         unit.agent.toAttack = unit.agent.toAttack.orElse(Some(blockersToKill.minBy(_.pixelDistanceEdge(unit))))
         Attack.delegate(unit)
       }
-      else {
+      else if (unit.matchups.threats.exists( ! _.unitClass.isWorker)) {
         FightOrFlight.consider(unit)
         Fight.consider(unit)
       }

@@ -18,6 +18,7 @@ object BlockConstruction extends Action {
   override protected def perform(unit: FriendlyUnitInfo) {
     val builder = blockableBuilders(unit).minBy(_.pixelDistanceEdge(unit))
     val destination = builder.targetPixel.getOrElse(builder.pixelCenter)
+    unit.agent.toAttack = Some(builder)
     
     if (unit.framesToGetInRange(builder) > With.reaction.agencyAverage) {
       unit.agent.toTravel = Some(unit.pixelCenter.project(builder.pixelCenter,
@@ -26,7 +27,7 @@ object BlockConstruction extends Action {
         + unit.topSpeed * With.reaction.agencyAverage))
       Move.delegate(unit)
     }
-    else if (unit.readyForAttackOrder) {
+    else if (unit.readyForAttackOrder || unit.pixelDistanceEdge(builder) > 16) {
       Attack.delegate(unit)
     }
     else {

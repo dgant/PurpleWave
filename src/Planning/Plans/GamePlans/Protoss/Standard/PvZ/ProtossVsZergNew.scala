@@ -44,7 +44,6 @@ class ProtossVsZergNew extends GameplanModeTemplate {
     
     // Basic army
     new TrainContinuously(Protoss.DarkTemplar, 1),
-    new TrainContinuously(Protoss.Corsair, 1),
     new IfOnMiningBases(2, new TrainContinuously(Protoss.Reaver, 6)),
     new TrainContinuously(Protoss.Observer, 1),
     new If(
@@ -54,9 +53,14 @@ class ProtossVsZergNew extends GameplanModeTemplate {
       new Or(
         new UnitsAtMost(10, Protoss.HighTemplar),
         new UnitsAtMost(8, Protoss.Archon)),
-      new TrainContinuously(Protoss.HighTemplar)),
+      new TrainContinuously(Protoss.HighTemplar, 20, 3)),
     new BuildCannonsAtExpansions(5),
-    new TrainContinuously(Protoss.Zealot)
+    new TrainContinuously(Protoss.Zealot),
+    new If(
+      new And(
+        new UnitsAtMost(8, Zerg.Hydralisk),
+        new UnitsAtMost(1, Zerg.SporeColony)),
+      new TrainContinuously(Protoss.Corsair, 6))
   )
   
   class AddHighPriorityTech extends Parallel(

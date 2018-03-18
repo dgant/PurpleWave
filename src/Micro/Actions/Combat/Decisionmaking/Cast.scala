@@ -2,6 +2,7 @@ package Micro.Actions.Combat.Decisionmaking
 
 import Micro.Actions.Action
 import Micro.Actions.Combat.Spells._
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Cast extends Action {
@@ -12,7 +13,21 @@ object Cast extends Action {
   
   override protected def perform(unit: FriendlyUnitInfo) {
     unit.agent.canCast = spells.exists(_.allowed(unit))
-    spells.foreach(_.consider(unit))
+    
+    if (unit.agent.canCast) {
+      spells.foreach(_.consider(unit))
+    }
+    if (unit.readyForMicro
+      && unit.matchups.threats.nonEmpty
+      && unit.isAny(
+        Terran.ScienceVessel,
+        Protoss.Arbiter,
+        Protoss.DarkArchon,
+        Protoss.HighTemplar,
+        Zerg.Defiler,
+        Zerg.Queen)) {
+      unit.agent.shouldEngage = false
+    }
   }
   
   val spells = Array(

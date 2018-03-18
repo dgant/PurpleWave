@@ -53,10 +53,15 @@ class Commander {
   
   def hold(unit: FriendlyUnitInfo) {
     if (unready(unit)) return
-    if ( ! unit.holdingPosition) {
+    if (unit.moving && ! unit.holdingPosition) {
       unit.baseUnit.holdPosition()
     }
-    sleep(unit)
+    if (unit.matchups.targetsInRange.nonEmpty) {
+      sleepAttack(unit)
+    }
+    else {
+      sleep(unit)
+    }
   }
   
   def attack(unit: FriendlyUnitInfo, target: UnitInfo) {
@@ -76,7 +81,7 @@ class Commander {
     else if (target.visible) {
       lazy val moving           = unit.moving
       lazy val alreadyInRange   = unit.inRangeToAttack(target)
-      lazy val overdueToAttack  = unit.cooldownLeft == 0 && With.framesSince(unit.lastAttackStartFrame) > 2.0 * unit.cooldownMaxAirGround
+      lazy val overdueToAttack  = unit.cooldownLeft == 0 && With.framesSince(unit.lastFrameStartingAttack) > 2.0 * unit.cooldownMaxAirGround
       lazy val thisIsANewTarget = ! unit.target.contains(target)
       
       val shouldOrder = thisIsANewTarget || (overdueToAttack && (moving || alreadyInRange))

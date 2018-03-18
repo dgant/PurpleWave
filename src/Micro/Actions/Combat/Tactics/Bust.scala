@@ -1,5 +1,6 @@
 package Micro.Actions.Combat.Tactics
 
+import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Decisionmaking.Leave
@@ -35,7 +36,7 @@ object Bust extends Action {
     // Goal: Take down the bunker. Don't take any damage from it.
     // If we're getting shot at by the bunker, back off.
     val bunkers = unit.matchups.threats.filter(_.is(Terran.Bunker))
-    if (unit.damageInLastSecond > 0) {
+    if (With.framesSince(unit.lastFrameTakingDamage) < GameTime(0, 1)()) {
       Leave.delegate(unit)
     }
     else if (bunkers.exists(unit.inRangeToAttack)) {

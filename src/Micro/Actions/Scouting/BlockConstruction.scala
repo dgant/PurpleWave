@@ -58,7 +58,7 @@ object BlockConstruction extends Action {
       lazy val suspiciouslyIdle = targetBase.exists(base =>
         base.owner == builder.player
         && ! builder.gathering
-        && ! builder.hasBeenViolentInLastTwoSeconds)
+        && ! builder.attacking)
       
       val output = builder.unitClass.isWorker && (
         movingToTownHallArea

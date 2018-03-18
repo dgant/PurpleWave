@@ -64,7 +64,7 @@ class Simulacrum(
       false
     }
     else if (realUnit.unitClass.isWorker) {
-      realUnit.hasBeenViolentInLastTwoSeconds
+      realUnit.attacking
     }
     else if (realUnit.isEnemy) {
       true

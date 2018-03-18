@@ -121,7 +121,6 @@ object PvTIdeas {
   
   class TrainHighTemplar extends If(
     new And(
-      new UnitsAtLeast(8, UnitMatchWarriors),
       new Or(
         new And(
           new HaveGasPumps(3),

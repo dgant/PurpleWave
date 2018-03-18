@@ -22,8 +22,12 @@ class ProtossVsZergNew extends GameplanModeTemplate {
   private class TrainAndUpgradeArmy extends Parallel(
     new If(
       new EnemyHasShownCloakedThreat,
-      new TrainContinuously(Protoss.Observer, 3),
-      new Parallel()),
+      new Parallel(
+        new TrainContinuously(Protoss.Observer, 3),
+        new If(
+          new SafeAtHome,
+          new UpgradeContinuously(Protoss.ObserverSpeed))),
+      new TrainContinuously(Protoss.Observer, 1)),
     
     // Emergency Dragoons
     new If(
@@ -88,6 +92,7 @@ class ProtossVsZergNew extends GameplanModeTemplate {
         RequestAtLeast(3, Protoss.Gateway),
         RequestAtLeast(1, Protoss.RoboticsFacility),
         RequestAtLeast(1, Protoss.Observatory))),
+    new UpgradeContinuously(Protoss.ObserverSpeed),
     new IfOnMiningBases(3,
       new Build(
         RequestAtLeast(5, Protoss.Gateway),
@@ -105,8 +110,8 @@ class ProtossVsZergNew extends GameplanModeTemplate {
       new Parallel(
         new AddHighPriorityTech,
         new PvZIdeas.TakeSafeThirdBase,
+        new AddLowPriorityTech,
         new PvZIdeas.TakeSafeFourthBase)),
-    new AddLowPriorityTech,
     new PvZIdeas.AddGateways
   )
 }

@@ -30,7 +30,7 @@ class Configuration {
   var battleMarginTiles             = 20
   var battleEstimationFrames        = GameTime(0, 8)()
   var battleHysteresisFrames        = GameTime(0, 3)()
-  var battleHysteresisRatio         = 0.15
+  var battleHysteresisRatio         = 0.175
   var bonusTankRange                = 64.0
   var retreatMovementDelay          = 8 //GameTime(0, 1)()
   var nonLethalDamageValue          = 0.1

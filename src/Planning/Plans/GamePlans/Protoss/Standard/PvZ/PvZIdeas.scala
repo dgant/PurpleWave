@@ -40,11 +40,11 @@ object PvZIdeas {
     new Or(
       new And(
         new SafeToAttack,
-        new UnitsAtLeast(18, UnitMatchWarriors, complete = true)),
+        new UnitsAtLeast(24, UnitMatchWarriors, complete = true)),
       new And(
         new SafeAtHome,
-        new UnitsAtLeast(24, UnitMatchWarriors, complete = true)),
-      new UnitsAtLeast(30, UnitMatchWarriors, complete = true)),
+        new UnitsAtLeast(30, UnitMatchWarriors, complete = true)),
+      new UnitsAtLeast(36, UnitMatchWarriors, complete = true)),
     new RequireMiningBases(4))
   
   class BuildDetectionForLurkers extends Parallel(

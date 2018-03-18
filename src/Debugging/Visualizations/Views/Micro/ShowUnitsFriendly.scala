@@ -78,7 +78,7 @@ object ShowUnitsFriendly extends View {
       }
       val targetPosition = unit.targetPixel.orElse(unit.orderTargetPixel)
       if (targetPosition.nonEmpty && unit.target.isEmpty) {
-        DrawMap.arrow(unit.pixelCenter, targetPosition.get, unit.player.colorDark)
+        DrawMap.line(unit.pixelCenter, targetPosition.get, unit.player.colorDark)
       }
       if (agent.movingTo.isDefined) {
         if (selectedOnly) {

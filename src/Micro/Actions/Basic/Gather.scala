@@ -26,7 +26,7 @@ object Gather extends Action {
     lazy val atResource   = unit.pixelDistanceEdge(resource) < 32.0 * 4.0
     lazy val beckoned     = unit.battle.isDefined && unit.matchups.targets.exists(target =>
         ! target.unitClass.isWorker
-        && With.framesSince(target.lastAttackStartFrame) < combatWindow
+        && With.framesSince(target.lastFrameStartingAttack) < combatWindow
         && unit.framesToGetInRange(target) < combatWindow
         && target.matchups.targets.exists(ally =>
           ally.totalHealth < 200

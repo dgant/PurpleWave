@@ -46,103 +46,59 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   // Statefulness //
   //////////////////
   
-  def creditKill(kill: Kill) {
-    kills += kill
-  }
+  val frameDiscovered           : Int = With.frame
+  var completionFrame           : Int = Int.MaxValue // Can't use unitClass during construction
+  var lastHitPoints             : Int = _
+  var lastShieldPoints          : Int = _
+  var lastDefensiveMatrixPoints : Int = _
+  var lastCooldown              : Int = _
+  var lastFrameTakingDamage     : Int = _
+  var lastFrameTryingToMove     : Int = _
+  var lastFrameTryingToAttack   : Int = _
+  var lastFrameStartingAttack        : Int = _
+  var framesFailingToMove       : Int = 0
+  var framesFailingToAttack     : Int = 0
+  var lastAttacker              : Option[UnitInfo] = None
+  def lastTotalHealthPoints: Int = lastHitPoints + lastShieldPoints + lastDefensiveMatrixPoints
   
-  val frameDiscovered   : Int = With.frame
-  var frameChangedClass : Int = With.frame
-  var completionFrame   : Int = Int.MaxValue // Can't use unitClass during construction
-  
-  var lastTarget      : Option[UnitInfo] = None
-  var lastAttacker    : Option[UnitInfo] = None
-  var lastDamageFrame : Int = 0
-  val kills           : mutable.ArrayBuffer[Kill] = new mutable.ArrayBuffer[Kill]
+  def creditKill(kill: Kill) { kills += kill }
+  val kills: mutable.ArrayBuffer[Kill] = new mutable.ArrayBuffer[Kill]
 
-  private val history = new mutable.Queue[UnitState]
   def updateCommon() {
-    
-    // Save JNI overhead by not tracking history of Spider Mines and Interceptors
-    if ( ! unitClass.orderable) return
-    
-    // Limit the frequency of history updates
-    //if (history.lastOption.exists(_.frame > With.frame - 4)) return
-    
-    if (history.lastOption.exists(_.totalHealth > totalHealth)) {
-      lastDamageFrame = history.lastOption.get.frame
+    val thisFrame = With.frame
+    if (totalHealth < lastTotalHealthPoints) {
+      lastFrameTakingDamage = thisFrame
     }
-    
-    lastTarget = target.orElse(lastTarget)
-    history.lastOption.foreach(lastState => {
-      if (lastState.unitClass != unitClass) {
-        frameChangedClass = With.frame
-      }
-      if (lastState.cooldown < cooldownLeft && lastState.attackTarget.nonEmpty) {
-        val target = lastState.attackTarget.get
-        target.lastAttacker = Some(this)
-        With.damageCredit.onDamage(this, target)
-      }
-    })
+    if (cooldownLeft > lastCooldown) {
+      lastFrameStartingAttack = thisFrame
+    }
+    val moving = velocityX != 0 || velocityY != 0
+    lazy val couldMove = unitClass.canMove
+    lazy val tryingToMove = friendly.flatMap(_.agent.movingTo).exists(_.pixelDistanceFast(pixelCenter) > 32)
+    lazy val tryingToAttack = target.exists(_.isEnemyOf(this))
+    if ( ! moving && couldMove && tryingToMove) {
+      framesFailingToMove += 1
+    }
+    else {
+      framesFailingToMove = 0
+    }
+    if ( ! moving && couldMove && tryingToMove) {
+      framesFailingToMove += 1
+    }
+    else {
+      framesFailingToMove = 0
+    }
+    if (lastFrameStartingAttack == thisFrame && target.nonEmpty) {
+      With.damageCredit.onDamage(this, target.get)
+    }
     if ( ! complete) {
       completionFrame = With.frame + remainingBuildFrames
     }
-    addHistory()
   }
-  
-  def addHistory() {
-    // Don't stuff the queue while the game is paused
-    if (history.lastOption.exists(_.frame == With.frame)) return
-  
-    while (history.headOption.exists(_.age > With.configuration.unitHistoryAge)) {
-      history.dequeue()
-    }
-    
-    history.enqueue(new UnitState(this))
-  }
-  
-  def lastAttackStartFrame: Int = cacheLastAttackStartFrame()
-  private def cacheLastAttackStartFrame = new Cache(() => {
-    val attackStartingStates = history.filter(_.attackStarting)
-    if (attackStartingStates.isEmpty)
-      0
-    else
-      attackStartingStates.map(_.frame).max
-  })
-  
-  def lastMovementFrame: Int = {
-    val movingFrames = history.filter(_.velocitySquared > 0)
-    if (movingFrames.isEmpty)
-      With.framesSince(frameDiscovered)
-    else
-      movingFrames.map(_.frame).max
-  }
-  
-  def hasBeenViolentInLastTwoSeconds: Boolean = hasBeenViolentInLastTwoSecondsCache()
-  private val hasBeenViolentInLastTwoSecondsCache = new Cache(() => history.exists(h => With.framesSince(h.frame) < 48 && h.cooldown > 0))
-  
-  def damageInLastSecond: Int = damageInLastSecondCache()
-  private val damageInLastSecondCache = new Cache(() =>
-    Math.max(
-      0,
-      history
-        .filter(_.age > 24)
-        .lastOption
-        .map(lastState =>
-          lastState.hitPoints             - hitPoints     +
-          lastState.shieldPoints          - shieldPoints  +
-          lastState.defensiveMatrixPoints - defensiveMatrixPoints)
-        .getOrElse(0)))
   
   private lazy val stuckMoveFrames    = 10
   private lazy val stuckAttackFrames  = stuckMoveFrames + cooldownMaxAirGround
-  private lazy val stuckFramesMax     = Math.max(stuckMoveFrames, stuckAttackFrames)
-  def seeminglyStuck: Boolean = {
-    val recentHistory = history.takeRight(stuckFramesMax + With.latency.latencyFrames)
-    history.size >= stuckFramesMax && (
-      history.takeRight(stuckMoveFrames   ).forall(state => state.couldMoveThisFrame    && state.tryingToMove   && state.pixelCenter == pixelCenter) ||
-      history.takeRight(stuckAttackFrames ).forall(state => state.couldAttackThisFrame  && state.tryingToAttack && state.pixelCenter == pixelCenter && state.cooldown == 0)
-    )
-  }
+  def seeminglyStuck: Boolean = framesFailingToMove > stuckMoveFrames || framesFailingToAttack > stuckAttackFrames
   
   ////////////
   // Health //
@@ -551,7 +507,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
       if (isFriendly)
         ! With.grids.enemyDetection.isSet(tileIncludingCenter)
         && (
-          Math.min(With.framesSince(friendly.map(_.agent.lastCloak).getOrElse(0)), With.framesSince(lastDamageFrame)) > 162 + 2
+          Math.min(With.framesSince(friendly.map(_.agent.lastCloak).getOrElse(0)), With.framesSince(lastFrameTakingDamage)) > 162 + 2
           || ! With.enemies.exists(_.isTerran))
           // Scanner sweep.
           // lasts 162 frames.

@@ -18,7 +18,12 @@ object Cancel extends Action {
     lazy val isDecoy          = unit.unitClass.attacks && unit.matchups.allies.exists(_.isBeingViolent) // Is this correct?
     lazy val shouldCancel     = (unpowered || beingBorn || (producing && willNeverFinish)) && ! isDecoy
     
-    val output = (unit.unitClass.isBuilding || unit.morphing) && shouldCancel && doomed
+    val output = (
+      (unit.unitClass.isBuilding || unit.morphing)
+      && shouldCancel
+      && (doomed || unpowered)
+    )
+    
     output
   }
   

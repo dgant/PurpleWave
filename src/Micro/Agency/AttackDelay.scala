@@ -41,11 +41,11 @@ object AttackDelay {
   }
   
   private def nextSafeOrderFrameInGeneral(unit: FriendlyUnitInfo): Int = {
-    unit.lastAttackStartFrame + unit.unitClass.stopFrames - With.latency.latencyFrames  + inexplicableExperimentalSafetyMargin
+    unit.lastFrameStartingAttack + unit.unitClass.stopFrames - With.latency.latencyFrames  + inexplicableExperimentalSafetyMargin
   }
   
   private def nextSafeOrderFrameDragoon(dragoon: FriendlyUnitInfo): Int = {
-    dragoon.lastAttackStartFrame + 1 + 9 - With.latency.latencyFrames                   + inexplicableExperimentalSafetyMargin
+    dragoon.lastFrameStartingAttack + 1 + 9 - With.latency.latencyFrames                   + inexplicableExperimentalSafetyMargin
   }
   
   /*

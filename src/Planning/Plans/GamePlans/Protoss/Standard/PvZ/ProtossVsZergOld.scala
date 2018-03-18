@@ -4,107 +4,39 @@ import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
-import Planning.Composition.UnitMatchers.{UnitMatchWarriors, UnitMatchWorkers}
+import Planning.Composition.UnitMatchers.UnitMatchWorkers
+import Planning.Plan
 import Planning.Plans.Army._
 import Planning.Plans.Compound.{If, _}
-import Planning.Plans.GamePlans.Protoss.ProtossBuilds
+import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.Situational._
 import Planning.Plans.Macro.Automatic.{MatchingRatio, _}
 import Planning.Plans.Macro.BuildOrders._
 import Planning.Plans.Macro.Expanding._
-import Planning.Plans.Macro.Protoss.{BuildCannonsAtBases, BuildCannonsAtExpansions, MeldArchons}
+import Planning.Plans.Macro.Protoss.{BuildCannonsAtBases, BuildCannonsAtExpansions}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Predicates.Economy.{GasAtLeast, GasAtMost, MineralsAtLeast, MineralsAtMost}
 import Planning.Plans.Predicates.Milestones._
 import Planning.Plans.Predicates.Reactive.EnemyMutalisks
 import Planning.Plans.Predicates.Scenarios.EnemyStrategy
-import Planning.Plans.Predicates.{Employ, Employing, SafeAtHome, StartPositionsAtLeast}
-import Planning.Plans.Recruitment.RecruitFreelancers
-import Planning.Plans.Scouting.{FindExpansions, Scout, ScoutAt}
+import Planning.Plans.Predicates.{Employ, Employing}
+import Planning.Plans.Scouting.FindExpansions
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Protoss.PvZ._
 
-class ProtossVsZergOld extends Parallel {
+class ProtossVsZergOld extends GameplanModeTemplate {
   
-  ////////////////
-  // Early game //
-  ////////////////
-  
-  private class WeAreFFEing extends Or(
+  private class WeFFEd extends Or(
     new Employing(PvZEarlyFFEEconomic),
     new Employing(PvZEarlyFFEConservative),
     new Employing(PvZEarlyFFEGatewayFirst),
     new Employing(PvZEarlyFFENexusFirst))
   
-  private class ImplementEarly2Gate extends FirstEightMinutes(
-    new Parallel(
-      new BuildHuggingNexus,
-      new BuildOrder(ProtossBuilds.OpeningTwoGate1012: _*)))
-  
-  private class ImplementEarly2Gate99 extends FirstEightMinutes(
-    new Parallel(
-      new BuildHuggingNexus,
-      new BuildOrder(ProtossBuilds.OpeningTwoGate99: _*)))
-  
-  private class FFE extends FirstEightMinutes(
-    new Parallel(
-      new PlacementForgeFastExpand,
-      new If(
-        new EnemyStrategy(With.intelligence.fingerprints.fingerprint4Pool),
-        new BuildOrder(ProtossBuilds.FFE_Vs4Pool: _*),
-      new If(
-        new Or(
-          new EnemyStrategy(With.intelligence.fingerprints.fingerprint9Pool),
-          new EnemyStrategy(With.intelligence.fingerprints.fingerprintOverpool),
-          new EnemyStrategy(With.intelligence.fingerprints.fingerprint10Hatch9Pool)),
-        new BuildOrder(ProtossBuilds.FFE_ForgeFirst: _*),
-      new If(
-        new EnemyStrategy(With.intelligence.fingerprints.fingerprint12Hatch),
-        new If(
-          new Employing(PvZEarlyFFEGatewayFirst),
-          new BuildOrder(ProtossBuilds.FFE_GatewayFirst_Aggressive: _*), //Note -- BuildOrder, not Build! So we can train but not replace Zealots
-          new BuildOrder(ProtossBuilds.FFE_NexusFirst: _*)),
-      new If(
-        new Employing(PvZEarlyFFEConservative),
-        new BuildOrder(ProtossBuilds.FFE_Vs4Pool: _*),
-      new If(
-        new Employing(PvZEarlyFFEGatewayFirst),
-        new BuildOrder(ProtossBuilds.FFE_GatewayFirst_Aggressive: _*), //Note -- BuildOrder, not Build! So we can train but not replace Zealots
-      new If(
-        new Employing(PvZEarlyFFENexusFirst),
-        new BuildOrder(ProtossBuilds.FFE_NexusFirst: _*),
-        new BuildOrder(ProtossBuilds.FFE_ForgeFirst: _*))))))),
-      new RequireMiningBases(2),
-      new If(
-        new EnemyStrategy(With.intelligence.fingerprints.fingerprint10Hatch9Pool),
-        new Build(RequestAtLeast(4, Protoss.PhotonCannon))),
-      new FFEFollowUp
-    ))
-  
-  private class FFEFollowUp extends Build(
-    RequestAtLeast(1, Protoss.Forge),
-    RequestAtLeast(2, Protoss.PhotonCannon),
-    RequestAtLeast(2, Protoss.Nexus),
-    RequestAtLeast(1, Protoss.Gateway),
-    RequestAtLeast(1, Protoss.CyberneticsCore),
-    RequestAtLeast(3, Protoss.PhotonCannon))
-  
-  private class TwoGateFollowUp extends Build(
-    RequestAtLeast(1, Protoss.Assimilator),
-    RequestAtLeast(1, Protoss.CyberneticsCore),
-    RequestAtLeast(2, Protoss.Nexus),
-    RequestAtLeast(1, Protoss.Stargate),
-    RequestAtLeast(4, Protoss.Gateway))
-  
-  /////////////
-  // Midgame //
-  /////////////
-  
   private class ImplementMidgame5GateDragoons extends Build(
-      RequestAtLeast(1, Protoss.Gateway),
+      RequestAtLeast(2, Protoss.Gateway),
       RequestAtLeast(1, Protoss.Assimilator),
       RequestAtLeast(1, Protoss.CyberneticsCore),
-      RequestAtLeast(1, Protoss.Zealot),
+      RequestAtLeast(3, Protoss.Gateway),
       RequestUpgrade(Protoss.DragoonRange),
       RequestAtLeast(3, Protoss.Gateway),
       RequestAtLeast(2, Protoss.Nexus),
@@ -160,79 +92,17 @@ class ProtossVsZergOld extends Parallel {
     RequestAtLeast(4, Protoss.Gateway),
     RequestAtLeast(2, Protoss.Stargate))
   
-  ///////////
-  // Macro //
-  ///////////
+  override def aggression: Double = 0.75
   
-  private class TakeSafeNatural extends If(
-    new Or(
-      new And(
-        new SafeAtHome,
-        new UnitsAtLeast(12, UnitMatchWarriors)),
-      new UnitsAtLeast(6, UnitMatchWarriors)),
-    new RequireMiningBases(2))
+  override def defaultPlacementPlan: Plan = new If(
+    new WeFFEd,
+    new PlacementForgeFastExpand)
   
-  private class TakeSafeThirdBase extends If(
-    new Or(
-      new And(
-        new SafeAtHome,
-        new UnitsAtLeast(15, UnitMatchWarriors)),
-      new UnitsAtLeast(24, UnitMatchWarriors)),
-    new RequireMiningBases(3))
-  
-  private class BuildDetectionForLurkers extends If(
-    new Or(
-      new EnemyHasShown(Zerg.Lurker),
-      new EnemyHasShown(Zerg.LurkerEgg),
-      new And(
-        new SafeAtHome,
-        new EnemyHasShown(Zerg.Hydralisk),
-        new EnemyHasShown(Zerg.Lair))),
-    new Build(
-      RequestAtLeast(1, Protoss.CyberneticsCore),
-      RequestAtLeast(1, Protoss.RoboticsFacility),
-      RequestAtLeast(1, Protoss.Observatory),
-      RequestAtLeast(1, Protoss.Observer)))
-  
-  /////////////////
-  // Here we go! //
-  /////////////////
-  
-  children.set(Vector(
-    
-    new Aggression(0.75),
-    
-    new If(
-      new TechComplete(Protoss.PsionicStorm),
-      new MeldArchons(40),
-      new MeldArchons),
-    
-    /////////////////////////////
-    // Early game build orders //
-    /////////////////////////////
-  
-    new RequireEssentials,
-    new Employ(PvZEarly2Gate, new ImplementEarly2Gate),
-    new Employ(PvZEarly2Gate99, new ImplementEarly2Gate99),
-    new If(new WeAreFFEing, new FFE),
-    
-    ///////////////////
-    // Early defense //
-    ///////////////////
-    
-    new FirstEightMinutes(
-      new If(
-        new UnitsAtMost(2, Protoss.Gateway, complete = true),
-        new Parallel(
-          new TrainMatchingRatio(Protoss.PhotonCannon, 2, 6,
-            Seq(
-              MatchingRatio(Zerg.Zergling, 0.3),
-              MatchingRatio(Zerg.Hydralisk, 0.75)))))),
-  
+  override def priorityDefensePlan: Plan = new Parallel(
     new FirstEightMinutes(
       new If(
         new And(
-          new WeAreFFEing,
+          new WeFFEd,
           new EnemyStrategy(With.intelligence.fingerprints.fingerprint4Pool),
           new FrameAtLeast(GameTime(2, 5)()),
           new UnitsAtLeast(1, Protoss.PhotonCannon, complete = false),
@@ -243,7 +113,7 @@ class ProtossVsZergOld extends Parallel {
       new If(
         new And(
           new EnemyUnitsAtLeast(4, Zerg.Zergling),
-          new WeAreFFEing,
+          new WeFFEd,
           new Or(
             new EnemyStrategy(With.intelligence.fingerprints.fingerprint9Pool),
             new EnemyStrategy(With.intelligence.fingerprints.fingerprintOverpool)),
@@ -251,18 +121,22 @@ class ProtossVsZergOld extends Parallel {
           new FrameAtLeast(GameTime(2, 5)()),
           new UnitsAtMost(2, Protoss.PhotonCannon, complete = true)),
         new DefendFFEWithProbesAgainst9Pool)),
-    
-    new FirstEightMinutes(new DefendZealotsAgainst4Pool),
   
-    /////////////////
-    // Early macro //
-    /////////////////
+    new FirstEightMinutes(new DefendZealotsAgainst4Pool))
+  
+  override def buildPlans: Seq[Plan] = Vector(
+    new FirstEightMinutes(
+      new If(
+        new UnitsAtMost(2, Protoss.Gateway, complete = true),
+        new Parallel(
+          new TrainMatchingRatio(Protoss.PhotonCannon, 2, 6,
+            Seq(
+              MatchingRatio(Zerg.Zergling, 0.3),
+              MatchingRatio(Zerg.Hydralisk, 0.75)))))),
     
-    new RequireSufficientSupply,
-    new TrainWorkersContinuously(oversaturate = true),
-    new BuildDetectionForLurkers,
-    new TakeSafeNatural,
-    new TakeSafeThirdBase,
+    new PvZIdeas.BuildDetectionForLurkers,
+    new PvZIdeas.TakeSafeNatural,
+    new PvZIdeas.TakeSafeThirdBase,
     new BuildCannonsAtExpansions(5),
   
     new If(new UnitsAtLeast(1, Protoss.Dragoon),      new Build(RequestUpgrade(Protoss.DragoonRange))),
@@ -291,7 +165,7 @@ class ProtossVsZergOld extends Parallel {
     new If(new UnitsAtLeast(6, Protoss.Corsair), new UpgradeContinuously(Protoss.AirArmor)),
     new If(new UnitsAtLeast(7, Protoss.Corsair), new Build(RequestAtLeast(1, Protoss.FleetBeacon))),
     new If(new UnitsAtLeast(8, Protoss.Corsair), new If(new UnitsAtLeast(1, Protoss.FleetBeacon), new Build(RequestTech(Protoss.DisruptionWeb)))),
-    
+
     new If(
       new And(
         new Employing(PvZMidgameCorsairDarkTemplar),
@@ -311,7 +185,7 @@ class ProtossVsZergOld extends Parallel {
         new If(
           new EnemyUnitsAtLeast(10, Zerg.Mutalisk),
           new Build(RequestAtLeast(2, Protoss.Stargate))))),
-    
+  
     new TrainMatchingRatio(Protoss.Observer, 0, 3, Seq(MatchingRatio(Zerg.Lurker, 0.5))),
     
     // Gateway production
@@ -356,21 +230,16 @@ class ProtossVsZergOld extends Parallel {
           new TrainContinuously(Protoss.Dragoon),
           new TrainContinuously(Protoss.Zealot)))),
   
-    new Employ(PvZEarly2Gate,                   new TwoGateFollowUp),
-    new Employ(PvZMidgame5GateDragoons,         new ImplementMidgame5GateDragoons),
-    new Employ(PvZMidgameCorsairDarkTemplar,    new ImplementMidgameCorsairDarkTemplar),
-    new Employ(PvZMidgameCorsairReaver,         new ImplementMidgameCorsairReaver),
-    new Employ(PvZMidgameCorsairSpeedlot,       new ImplementMidgameCorsairSpeedlot),
-    new Employ(PvZMidgame2Stargate,             new ImplementMidgame2Stargate),
+    new Employ(PvZMidgame5GateDragoons,       new ImplementMidgame5GateDragoons),
+    new Employ(PvZMidgameCorsairDarkTemplar,  new ImplementMidgameCorsairDarkTemplar),
+    new Employ(PvZMidgameCorsairReaver,       new ImplementMidgameCorsairReaver),
+    new Employ(PvZMidgameCorsairSpeedlot,     new ImplementMidgameCorsairSpeedlot),
+    new Employ(PvZMidgame2Stargate,           new ImplementMidgame2Stargate),
     new If(
       new Or(
         new UnitsAtLeast(32, UnitMatchWorkers),
         new MineralsAtLeast(1000)),
       new BuildGasPumps),
-  
-    /////////////////////
-    // Late game macro //
-    /////////////////////
     
     new Build(
       RequestAtLeast(3, Protoss.Gateway),
@@ -412,18 +281,6 @@ class ProtossVsZergOld extends Parallel {
     /////////////
     
     new If(
-      new WeAreFFEing,
-      new If(
-        new And(
-          new Not(new Employing(PvZEarlyFFEConservative)),
-          new Check(() => With.units.ours.exists(u => u.is(Protoss.Pylon) && With.framesSince(u.frameDiscovered) > 24))),
-        new If(
-          new StartPositionsAtLeast(4),
-          new Scout(2),
-          new Scout(1))),
-      new ScoutAt(14)),
-    
-    new If(
       new And(
         new EnemyUnitsAtMost(0, Zerg.Spire, complete = true),
         new EnemyUnitsAtMost(0, Zerg.Mutalisk),
@@ -433,22 +290,6 @@ class ProtossVsZergOld extends Parallel {
         new If(
           new UnitsAtMost(0, Protoss.DarkTemplar),
           new ControlEnemyAirspace { flyers.get.unitMatcher.set(Protoss.Corsair) }))),
-  
-    new ClearBurrowedBlockers,
-    new FindExpansions { scouts.get.unitMatcher.set(Protoss.DarkTemplar) },
-    new DefendZones,
-    new EscortSettlers,
-    new DropAttack,
-    new ConsiderAttacking,
-  
-    //TODO: Kill
-  
-    new ClearBurrowedBlockers,
-    new FollowBuildOrder,
-    new DefendAgainstProxy,
-    new RemoveMineralBlocksAt(40),
-    new Gather,
-    new RecruitFreelancers,
-    new DefendEntrance
-  ))
+    new FindExpansions { scouts.get.unitMatcher.set(Protoss.DarkTemplar) }
+  )
 }

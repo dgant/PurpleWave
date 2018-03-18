@@ -28,8 +28,15 @@ class TrainContinuously(
     val buildersExisting          = builders.toVector
     val buildersReserved          = buildersExisting.map(_.unitClass).distinct.map(With.scheduler.dumbPumps.consumed).sum
     val buildersReadiness         = getBuilderReadiness(buildersExisting)
+    val minerals                  = With.self.minerals  // To improve: Measure existing expediture commitments
+    val gas                       = With.self.gas       // To improve: Measure existing expediture commitments
+    val mineralPrice              = unitClass.mineralPrice
+    val gasPrice                  = unitClass.gasPrice
+    val budgetedByMinerals        = if (mineralPrice  <= 0) 400 else (minerals + With.economy.ourIncomePerFrameMinerals * unitClass.buildFrames) / mineralPrice
+    val budgetedByGas             = if (gasPrice      <= 0) 400 else (gas      + With.economy.ourIncomePerFrameGas      * unitClass.buildFrames) / gasPrice
+    val budgeted                  = Math.min(budgetedByMinerals, budgetedByGas)
     val capacityMaximum           = ((buildersExisting.size + buildersSpawning) * maximumConcurrentlyRatio).toInt
-    val capacityFinal             = Math.max(0, Vector(maximumConcurrently, capacityMaximum, buildersReadiness * Math.max(1, capacityMaximum - buildersReserved)).min).toInt
+    val capacityFinal             = Math.max(0, Vector(maximumConcurrently, capacityMaximum, budgeted, buildersReadiness * Math.max(1, capacityMaximum - buildersReserved)).min).toInt
     val quantityToAdd             = List(unitsMaximum, unitsMaximumDesirable, capacityFinal).min
     val quantityToRequest         = List(unitsMaximum, unitsMaximumDesirable, capacityFinal + unitsNow).min
     

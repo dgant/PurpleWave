@@ -8,7 +8,7 @@ import Planning.Composition.UnitPreferences.UnitPreferLowEnergy
 import Planning.Plan
 import ProxyBwapi.Races.Protoss
 
-class MeldArchons(maxEnergy: Int = 200) extends Plan {
+class MeldArchons(maxEnergy: Int = 250) extends Plan {
   
   protected def minimumArchons: Int = 0
   

@@ -1,6 +1,5 @@
 package Information
 
-import Information.Geography.Types.Base
 import Lifecycle.With
 import Performance.Cache
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -28,29 +27,17 @@ class Economy {
   def ourIncomePerFrameMinerals : Double = ourIncomePerFrameMineralsCache()
   def ourIncomePerFrameGas      : Double = ourIncomePerFrameGasCache()
   
-  private val ourIncomePerFrameMineralsCache  = new Cache(() => ourActiveMiners.size   * incomePerFrameMinerals)
-  private val ourIncomePerFrameGasCache       = new Cache(() => ourActiveDrillers.size * incomePerFrameGas)
+  def ourActiveMiners   : Int = ourActiveMinersCache()
+  def ourActiveDrillers : Int = ourActiveDrillersCache()
   
-  def genericIncomePerFrameMinerals (miners:Int, bases:Int): Double = Math.min(miners, bases * 16)  * incomePerFrameMinerals
-  def genericIncomePerFrameGas      (miners:Int, bases:Int): Double = Math.min(miners, bases * 3)   * incomePerFrameGas
+  private val ourPatchesMineralsCache = new Cache(() => With.geography.ourBases.toSeq.map(_.minerals.size).sum)
+  private val ourPatchesGasCache      = new Cache(() => With.geography.ourBases.toSeq.map(_.gas.count(g => g.complete && g.isOurs)).sum)
+  private val ourActiveMinersCache    = new Cache(() => With.units.ours.count(u => isActivelyMining(u) && u.gatheringMinerals))
+  private val ourActiveDrillersCache  = new Cache(() => With.units.ours.count(u => isActivelyMining(u) && u.gatheringGas))
+  private val ourIncomePerFrameMineralsCache  = new Cache(() => Math.min(2.0 * ourPatchesMineralsCache(), ourActiveMinersCache())   * incomePerFrameMinerals)
+  private val ourIncomePerFrameGasCache       = new Cache(() => Math.min(3.0 * ourPatchesGasCache(),      ourActiveDrillersCache()) * incomePerFrameGas)
   
-  def ourActiveGatherers  : Traversable[FriendlyUnitInfo] = ourActiveGatherersCache()
-  def ourActiveMiners     : Traversable[FriendlyUnitInfo] = ourActiveMinersCache()
-  def ourActiveDrillers   : Traversable[FriendlyUnitInfo] = ourActiveDrillersCache()
-  
-  private val ourActiveGatherersCache = new Cache(() => With.geography.ourBases.flatten(ourActiveGatherers))
-  private val ourActiveMinersCache    = new Cache(() => With.geography.ourBases.flatten(ourActiveMiners))
-  private val ourActiveDrillersCache  = new Cache(() => With.geography.ourBases.flatten(ourActiveDrillers))
-  
-  def ourActiveGatherers(base: Base): Traversable[FriendlyUnitInfo] = {
-    base.units.toSeq.flatMap(_.friendly).filter(unit => unit.agent.toGather.exists(_.base.contains(base)) && base.harvestingArea.contains(unit.tileIncludingCenter))
-  }
-  
-  def ourActiveMiners(base:Base): Traversable[FriendlyUnitInfo] = {
-    ourActiveGatherers(base).filter(_.gatheringMinerals).take(base.minerals.size * 2)
-  }
-  
-  def ourActiveDrillers(base:Base): Traversable[FriendlyUnitInfo] = {
-    ourActiveGatherers(base).filter(_.gatheringGas).take(base.gas.count(_.isOurs) * 3)
+  private def isActivelyMining(unit: FriendlyUnitInfo): Boolean = {
+    unit.agent.toGather.exists(_.pixelDistanceEdge(unit) < 32.0 * 8.0)
   }
 }

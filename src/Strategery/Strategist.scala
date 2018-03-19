@@ -2,7 +2,6 @@ package Strategery
 
 import Lifecycle.With
 import Mathematics.PurpleMath
-import Performance.Cache
 import Planning.Plan
 import Planning.Plans.StandardGamePlan
 import ProxyBwapi.Players.Players
@@ -18,9 +17,20 @@ import scala.collection.mutable
 class Strategist {
   
   lazy val selectedInitially: Set[Strategy] = selectInitialStrategies
-  
-  def selectedCurrently: Set[Strategy] = selectedCurrentlyCache()
-  private val selectedCurrentlyCache = new Cache(() => selectedInitially.filter(isAppropriate))
+   
+  private var enemyRaceAtLastCheck: Race = With.enemy.raceInitial
+  var selectedLast: Option[Set[Strategy]] = None
+  def selectedCurrently: Set[Strategy] = {
+    val enemyRaceNow = With.enemy.raceCurrent
+    if (selectedLast.isEmpty) {
+      selectedLast = Some(selectedInitially)
+    }
+    else if (enemyRaceAtLastCheck != enemyRaceNow) {
+      selectedLast = Some(selectedInitially.filter(isAppropriate))
+    }
+    enemyRaceAtLastCheck = enemyRaceNow
+    selectedLast.get
+  }
   
   // Plasma is so weird we need to handle it separately.
   lazy val isPlasma: Boolean = With.game.mapFileName.contains("Plasma")

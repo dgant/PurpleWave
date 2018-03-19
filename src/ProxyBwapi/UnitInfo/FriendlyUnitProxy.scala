@@ -75,10 +75,10 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit, id: Int) extends UnitInfo(bas
   def groundCooldownLeft        : Int     = groundCooldownLeftCache()
   def spellCooldownLeft         : Int     = spellCooldownLeftCache()
   
-  private val isStartingAttackCache   = new Cache(() => base.isStartingAttack)
-  private val isAttackFrameCache      = new Cache(() => base.isAttackFrame)
-  private val interceptorCountCache   = new Cache(() => base.getInterceptorCount)
-  private val scarabCountCache        = new Cache(() => base.getScarabCount)
+  private val isStartingAttackCache   = new Cache(() => unitClass.rawCanAttack && base.isStartingAttack)
+  private val isAttackFrameCache      = new Cache(() => unitClass.rawCanAttack && base.isAttackFrame)
+  private val interceptorCountCache   = new Cache(() => if (is(Protoss.Carrier)) base.getInterceptorCount else 0)
+  private val scarabCountCache        = new Cache(() => if (is(Protoss.Reaver)) base.getScarabCount else 0)
   private val airCooldownLeftCache    = new Cache(() => base.getAirWeaponCooldown)
   private val groundCooldownLeftCache = new Cache(() => base.getGroundWeaponCooldown)
   private val spellCooldownLeftCache  = new Cache(() => base.getSpellCooldown)
@@ -231,13 +231,13 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit, id: Int) extends UnitInfo(bas
   // Statuses //
   //////////////
   
-  def remainingBuildFrames    : Int = base.getRemainingBuildTime
-  def remainingUpgradeFrames  : Int = base.getRemainingUpgradeTime
-  def remainingTechFrames     : Int = base.getRemainingResearchTime
+  def remainingBuildFrames    : Int = remainingBuildFramesCache()
+  def remainingUpgradeFrames  : Int = remainingUpgradeFramesCache()
+  def remainingTechFrames     : Int = remainingTechFramesCache()
   
-  private val remainingBuildFramesCache = new Cache(() => base.getRemainingBuildTime)
+  private val remainingBuildFramesCache   = new Cache(() => base.getRemainingBuildTime)
   private val remainingUpgradeFramesCache = new Cache(() => base.getRemainingUpgradeTime)
-  private val remainingTechFramesCache = new Cache(() => base.getRemainingResearchTime)
+  private val remainingTechFramesCache    = new Cache(() => base.getRemainingResearchTime)
   
   def beingConstructed    : Boolean = beingConstructedCache()
   def beingGathered       : Boolean = beingGatheredCache()

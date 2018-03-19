@@ -4,7 +4,6 @@ import Strategery.Strategies.AllRaces.WorkerRush
 import Strategery.Strategies.Protoss.FFA._
 import Strategery.Strategies.Protoss.PvE._
 import Strategery.Strategies.Protoss.PvR._
-import Strategery.Strategies.Protoss.PvZ._
 import Strategery.Strategies._
 
 object ProtossChoices {
@@ -99,14 +98,11 @@ object ProtossChoices {
   )
   
   val pvzMidgameTransitioningFromOneBase = Vector(
-    PvZMidgame5GateDragoons
+    PvZMidgameGatewayAttack
   )
   
   val pvzMidgameTransitioningFromTwoBases = Vector(
-    PvZMidgame2Stargate,
-    PvZMidgame5GateDragoons,
-    PvZMidgameCorsairDarkTemplar,
-    PvZMidgameCorsairReaver,
+    PvZMidgameGatewayAttack,
     PvZMidgameCorsairSpeedlot
   )
   

@@ -1,14 +1,17 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvZ
 
+import Lifecycle.With
 import Macro.BuildRequests.RequestAtLeast
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
-import Planning.Plans.Compound.{And, If, Or, Parallel}
+import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.Protoss.Situational.PlacementForgeFastExpand
 import Planning.Plans.Macro.Automatic.{MatchingRatio, TrainContinuously, TrainMatchingRatio}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
+import Planning.Plans.Macro.Protoss.BuildCannonsAtExpansions
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Predicates.Milestones._
+import Planning.Plans.Predicates.Reactive.EnemyMutalisks
 import Planning.Plans.Predicates.{SafeAtHome, SafeToAttack}
 import ProxyBwapi.Races.{Protoss, Zerg}
 
@@ -29,22 +32,22 @@ object PvZIdeas {
     new Or(
       new And(
         new SafeToAttack,
-        new UnitsAtLeast(12, UnitMatchWarriors, complete = true)),
+        new UnitsAtLeast(15, UnitMatchWarriors, complete = true)),
       new And(
         new SafeAtHome,
-        new UnitsAtLeast(15, UnitMatchWarriors, complete = true)),
-      new UnitsAtLeast(20, UnitMatchWarriors, complete = true)),
+        new UnitsAtLeast(20, UnitMatchWarriors, complete = true)),
+      new UnitsAtLeast(25, UnitMatchWarriors, complete = true)),
     new RequireMiningBases(3))
   
   class TakeSafeFourthBase extends If(
     new Or(
       new And(
         new SafeToAttack,
-        new UnitsAtLeast(24, UnitMatchWarriors, complete = true)),
+        new UnitsAtLeast(30, UnitMatchWarriors, complete = true)),
       new And(
         new SafeAtHome,
-        new UnitsAtLeast(30, UnitMatchWarriors, complete = true)),
-      new UnitsAtLeast(36, UnitMatchWarriors, complete = true)),
+        new UnitsAtLeast(35, UnitMatchWarriors, complete = true)),
+      new UnitsAtLeast(40, UnitMatchWarriors, complete = true)),
     new RequireMiningBases(4))
   
   class BuildDetectionForLurkers extends Parallel(
@@ -88,4 +91,52 @@ object PvZIdeas {
     new IfOnMiningBases(3, new Build(RequestAtLeast(12, Protoss.Gateway))),
     new IfOnMiningBases(4, new Build(RequestAtLeast(16, Protoss.Gateway))),
     new IfOnMiningBases(5, new Build(RequestAtLeast(20, Protoss.Gateway))))
+  
+  class TrainAndUpgradeArmy extends Parallel(
+    new If(
+      new EnemyHasShownCloakedThreat,
+      new Parallel(
+        new TrainContinuously(Protoss.Observer, 3),
+        new If(
+          new SafeAtHome,
+          new UpgradeContinuously(Protoss.ObserverSpeed))),
+      new TrainContinuously(Protoss.Observer, 1)),
+    
+    // Emergency Dragoons
+    new If(
+      new EnemyMutalisks,
+      new Parallel(
+        new TrainMatchingRatio(Protoss.Corsair, 3, 8,   Seq(MatchingRatio(Zerg.Mutalisk, 0.9))),
+        new TrainMatchingRatio(Protoss.Dragoon, 0, 10,  Seq(MatchingRatio(Zerg.Mutalisk, 1.25))),
+        new TrainContinuously(Protoss.Stargate, 1))),
+    
+    // Upgrades
+    new UpgradeContinuously(Protoss.GroundDamage),
+    new If(new UnitsAtLeast(1, Protoss.Corsair), new UpgradeContinuously(Protoss.AirDamage)),
+    new If(
+      new Or(
+        new UnitsAtLeast(2, Protoss.Forge),
+        new UpgradeComplete(Protoss.GroundDamage, 3)),
+      new UpgradeContinuously(Protoss.GroundArmor)),
+    
+    // Basic army
+    new TrainContinuously(Protoss.DarkTemplar, 1),
+    new IfOnMiningBases(2, new TrainContinuously(Protoss.Reaver, 6)),
+    new TrainContinuously(Protoss.Observer, 1),
+    new If(
+      new Check(() => With.units.ours.count(_.is(Protoss.Dragoon)) < With.units.ours.count(_.is(Protoss.Zealot)) / 1.75 - 2),
+      new TrainContinuously(Protoss.Dragoon, maximumConcurrentlyRatio = 0.5)),
+    new If(
+      new Or(
+        new UnitsAtMost(10, Protoss.HighTemplar),
+        new UnitsAtMost(8, Protoss.Archon)),
+      new TrainContinuously(Protoss.HighTemplar, 20, 3)),
+    new BuildCannonsAtExpansions(5),
+    new TrainContinuously(Protoss.Zealot),
+    new If(
+      new And(
+        new UnitsAtMost(8, Zerg.Hydralisk),
+        new UnitsAtMost(1, Zerg.SporeColony)),
+      new TrainContinuously(Protoss.Corsair, 6))
+  )
 }

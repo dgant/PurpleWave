@@ -1,8 +1,7 @@
 package Strategery
 
 import Strategery.Strategies.Protoss.PvE._
-import Strategery.Strategies.Protoss.PvPOpen3GateSpeedlots
-import Strategery.Strategies.Protoss.PvZ._
+import Strategery.Strategies.Protoss._
 import Strategery.Strategies.Strategy
 import Strategery.Strategies.Terran.TvE._
 import Strategery.Strategies.Terran.TvR.{TvR1Rax, TvRTinfoil}
@@ -11,13 +10,10 @@ import Strategery.Strategies.Terran.TvZ._
 import Strategery.Strategies.Zerg.ZvZ.ProxySunkens
 
 class EmptyPlaybook {
-  
-  lazy val forced   : Seq[Strategy] = Seq.empty
-  lazy val disabled : Seq[Strategy] = Seq.empty
-  
   val none: Seq[Strategy] = Seq.empty
-  
-  val strategyOrder: Seq[Strategy] = Seq.empty
+  lazy val forced   : Seq[Strategy] = none
+  lazy val disabled : Seq[Strategy] = none
+  val strategyOrder: Seq[Strategy] = none
 }
 
 object StrategyGroups {
@@ -38,7 +34,6 @@ object StrategyGroups {
     PvPOpen3GateSpeedlots,
     PvZEarlyFFENexusFirst,
     PvZEarlyFFEGatewayFirst,
-    PvZMidgame2Stargate,
     MassPhotonCannon,
     CarriersWithNoDefense,
     ProxyDarkTemplar,
@@ -47,14 +42,13 @@ object StrategyGroups {
 }
 
 class TestingPlaybook extends EmptyPlaybook {
-  val strategiesToTest: Seq[Strategy] = Seq(PvZEarlyFFEEconomic)
+  val strategiesToTest: Seq[Strategy] = Seq(PvZEarlyFFEEconomic, PvZMidgameGatewayAttack)
   
   override lazy val forced: Seq[Strategy] = strategiesToTest
 }
 
 class PurpleWavePlaybook extends EmptyPlaybook {
-  override lazy val forced    : Seq[Strategy] = none
   override lazy val disabled  : Seq[Strategy] = StrategyGroups.disabled
 }
 
-object Playbook extends TestingPlaybook {}
+object Playbook extends PurpleWavePlaybook {}

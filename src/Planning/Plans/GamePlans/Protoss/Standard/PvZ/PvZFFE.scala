@@ -16,7 +16,7 @@ import Planning.Plans.Predicates.Milestones.UnitsAtLeast
 import Planning.Plans.Predicates.Scenarios.EnemyStrategy
 import Planning.Plans.Scouting.{Scout, ScoutOn}
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvZ.{PvZEarlyFFEConservative, PvZEarlyFFEEconomic, PvZEarlyFFEGatewayFirst, PvZEarlyFFENexusFirst}
+import Strategery.Strategies.Protoss.{PvZEarlyFFEConservative, PvZEarlyFFEEconomic, PvZEarlyFFEGatewayFirst, PvZEarlyFFENexusFirst}
 
 class PvZFFE extends GameplanModeTemplate {
   

@@ -27,7 +27,9 @@ object BlockConstruction extends Action {
         + unit.topSpeed * With.reaction.agencyAverage))
       Move.delegate(unit)
     }
-    else if (unit.readyForAttackOrder || unit.pixelDistanceEdge(builder) > 16) {
+    else if (unit.readyForAttackOrder
+      || unit.totalHealth > builder.totalHealth
+      || unit.pixelDistanceEdge(builder) > 8) {
       Attack.delegate(unit)
     }
     else {

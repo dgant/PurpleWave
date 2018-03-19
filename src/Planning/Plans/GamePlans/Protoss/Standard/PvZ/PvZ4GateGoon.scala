@@ -15,7 +15,7 @@ import Planning.Plans.Predicates.Economy.GasAtLeast
 import Planning.Plans.Predicates.Employing
 import Planning.Plans.Predicates.Milestones._
 import ProxyBwapi.Races.{Protoss, Zerg}
-import Strategery.Strategies.Protoss.PvZ.PvZ4GateDragoonAllIn
+import Strategery.Strategies.Protoss.PvZ4GateDragoonAllIn
 
 class PvZ4GateGoon extends GameplanModeTemplate {
   

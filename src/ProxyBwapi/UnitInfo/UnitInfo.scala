@@ -55,7 +55,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   var lastFrameTakingDamage     : Int = _
   var lastFrameTryingToMove     : Int = _
   var lastFrameTryingToAttack   : Int = _
-  var lastFrameStartingAttack        : Int = _
+  var lastFrameStartingAttack   : Int = _
   var framesFailingToMove       : Int = 0
   var framesFailingToAttack     : Int = 0
   var lastAttacker              : Option[UnitInfo] = None
@@ -94,6 +94,10 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     if ( ! complete) {
       completionFrame = With.frame + remainingBuildFrames
     }
+    lastHitPoints             = hitPoints
+    lastShieldPoints          = shieldPoints
+    lastDefensiveMatrixPoints = defensiveMatrixPoints
+    lastCooldown              = cooldownLeft
   }
   
   private lazy val stuckMoveFrames    = 10

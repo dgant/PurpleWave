@@ -24,8 +24,8 @@ object ShowEconomy extends View {
     val mineralAccuracy       = Math.min(mineralAccuracyRatio, 1.0 / mineralAccuracyRatio)
     val gasAccuracy           = Math.min(gasAccuracyRatio, 1.0 / gasAccuracyRatio)
     val values = Vector(
-      With.economy.ourActiveMiners.size,
-      With.economy.ourActiveDrillers.size,
+      With.economy.ourActiveMiners,
+      With.economy.ourActiveDrillers,
       (With.economy.ourIncomePerFrameMinerals * 24 * 60).toInt,
       (With.economy.ourIncomePerFrameGas * 24 * 60).toInt,
       With.economy.ourEstimatedTotalMinerals.toInt,

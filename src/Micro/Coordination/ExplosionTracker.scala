@@ -5,6 +5,7 @@ import Lifecycle.With
 import Mathematics.Points.Pixel
 import Micro.Coordination.Explosions._
 import ProxyBwapi.Bullets.BulletInfo
+import ProxyBwapi.Players.Players
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
 
@@ -47,15 +48,19 @@ class ExplosionTracker {
   }
   
   def explosionFromBullet(bullet: BulletInfo) {
-    val sourceUnit = bullet.sourceUnit
-    if (sourceUnit.exists(_.is(Terran.ScienceVessel)))
+    lazy val someTerran   = Players.all.exists(_.isTerran)
+    lazy val someProtoss  = Players.all.exists(_.isProtoss)
+    lazy val someZerg     = Players.all.exists(_.isZerg)
+    lazy val sourceUnit   = bullet.sourceUnit
+    if (someTerran && sourceUnit.exists(_.is(Terran.ScienceVessel)))
       addToBattle(sourceUnit.get, new ExplosionEMP(bullet))
-    else if (sourceUnit.exists(_.is(Zerg.Lurker)) && bullet.sourceUnit.get.isEnemy) {
+    else if (someZerg && sourceUnit.exists(_.is(Zerg.Lurker)) && bullet.sourceUnit.get.isEnemy) {
       // Makes units do dumb things. Maybe limit it to when there's 1-2 nearby Lurkers max
       //addToBattle(sourceUnit.get, new ExplosionLurkerNow(bullet))
     }
-    else if (sourceUnit.exists(_.is(Protoss.HighTemplar)))
+    else if (someProtoss && sourceUnit.exists(_.is(Protoss.HighTemplar))) {
       addToBattle(sourceUnit.get, new ExplosionPsionicStorm(bullet))
+    }
   }
   
   def explosionFromUnit(unit: UnitInfo): Vector[Explosion] = {

@@ -1,5 +1,6 @@
 package Mathematics.Points
 
+import Mathematics.Physics.Force
 import Mathematics.PurpleMath
 
 case class PixelRay(from: Pixel, to: Pixel) {
@@ -8,8 +9,9 @@ case class PixelRay(from: Pixel, to: Pixel) {
     this(from, from.radiateRadians(angleRadians, lengthPixels))
   }
   
-  def lengthFast: Double = from.pixelDistanceFast(to)
-  def lengthSlow: Double = from.pixelDistanceSlow(to)
+  lazy val radians: Double = PurpleMath.atan2(to.y - from.y, to.x - from.x)
+  lazy val length: Double = from.pixelDistance(to)
+  lazy val toForce: Force = Force(to.x - from.x, to.y - from.y)
   
   def tilesIntersected: Array[Tile] = {
     

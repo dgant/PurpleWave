@@ -7,7 +7,7 @@ object TargetingProfiles {
   def default = new TargetingProfile(
     preferVpfEnemy    =  0.5,
     preferVpfOurs     =  1.0,
-    preferDetectors   =  12.0,
+    preferDetectors   =  8.0,
     avoidPain         =  0.0,
-    avoidDelay        =  0.3)
+    avoidDelay        =  0.4)
 }

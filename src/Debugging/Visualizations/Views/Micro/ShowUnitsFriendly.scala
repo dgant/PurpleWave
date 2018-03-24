@@ -4,6 +4,7 @@ import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.View
 import Debugging.Visualizations.{Colors, ForceColors}
 import Lifecycle.With
+import Mathematics.Points.PixelRay
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
 import bwapi.Color
@@ -17,8 +18,8 @@ object ShowUnitsFriendly extends View {
   var showOrder       : Boolean = false
   var showTargets     : Boolean = true
   var showFormation   : Boolean = true
-  var showKiting      : Boolean = true
-  var showForces      : Boolean = true
+  var showRayPaths    : Boolean = true
+  var showForces      : Boolean = false
   var showDesire      : Boolean = true
   var showFightReason : Boolean = true
   var showDistance    : Boolean = false
@@ -99,15 +100,15 @@ object ShowUnitsFriendly extends View {
       }
     }
     
-    if (showKiting) {
-      agent.pathsAll.foreach(ray => ray.tilesIntersected.foreach(tile => DrawMap.box(
-        tile.topLeftPixel.add(1, 1),
-        tile.bottomRightPixel.subtract(1, 1),
-        if (With.grids.walkable.get(tile)) Colors.BrightBlue else Colors.BrightRed)))
-      agent.pathsAll.foreach(ray => DrawMap.line(ray.from, ray.to, Colors.MediumGray))
-      agent.pathsTruncated.foreach(ray => DrawMap.line(ray.from, ray.to, Colors.MediumGreen))
-      agent.pathsAcceptable.foreach(ray => DrawMap.line(ray.from, ray.to, Colors.BrightGreen))
-      agent.pathAccepted.foreach(ray => { DrawMap.line(ray.from, ray.to, Colors.NeonGreen); DrawMap.circle(ray.to, 4, Colors.NeonGreen, solid = true) })
+    if (showRayPaths) {
+      def drawPath(ray: PixelRay, color: Color) {
+        ray.tilesIntersected.foreach(tile => DrawMap.box(
+          tile.topLeftPixel.add(1, 1),
+          tile.bottomRightPixel.subtract(1, 1),
+          if (With.grids.walkable.get(tile)) color else Colors.BrightRed))
+      }
+      agent.pathsAll.foreach(drawPath(_, Colors.BrightBlue))
+      agent.pathsAcceptable.foreach(drawPath(_, Colors.BrightYellow))
     }
     
     if (showForces) {

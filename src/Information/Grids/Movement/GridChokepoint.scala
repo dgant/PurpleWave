@@ -10,7 +10,7 @@ class GridChokepoint extends AbstractGridBoolean {
     
     indices.foreach(i => {
       val center = new Tile(i).pixelCenter
-      set(i, edges.exists(edge => edge.pixelCenter.pixelDistanceFast(center) <= edge.radiusPixels + 64.0))
+      set(i, edges.exists(edge => edge.pixelCenter.pixelDistance(center) <= edge.radiusPixels + 64.0))
     })
   }
 }

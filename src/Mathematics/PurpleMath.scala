@@ -71,6 +71,16 @@ object PurpleMath {
     }
     D - D / 16 + d * 3 / 8 - D / 64 + d * 3 / 256
   }
+  def broodWarDistanceDouble(x0: Double, y0: Double, x1: Double, y1: Double): Double = {
+    val dx = Math.abs(x0 - x1)
+    val dy = Math.abs(y0 - y1)
+    val d   = Math.min(dx, dy)
+    val D   = Math.max(dx, dy)
+    if (d < D / 4) {
+      return D
+    }
+    D - D / 16 + d * 3 / 8 - D / 64 + d * 3 / 256
+  }
   def broodWarDistanceBox(
     p00: AbstractPoint,
     p01: AbstractPoint,
@@ -164,6 +174,6 @@ object PurpleMath {
   private val piOver4 = Math.PI / 4.0
   private val pi3Over4 = 3 * Math.PI / 4.0
   def atan2(y: Double, x: Double): Double = {
-   Math.atan2(y, x)
+   normalizeAngle(Math.atan2(y, x))
   }
 }

@@ -47,7 +47,7 @@ class Simulacrum(
   var events            : ArrayBuffer[SimulationEvent]  = new ArrayBuffer[SimulationEvent]
   
   lazy val targetQueue: mutable.PriorityQueue[Simulacrum] = (
-    new mutable.PriorityQueue[Simulacrum]()(Ordering.by(x => (x.realUnit.unitClass.helpsInCombat, - x.pixel.pixelDistanceFast(pixel))))
+    new mutable.PriorityQueue[Simulacrum]()(Ordering.by(x => (x.realUnit.unitClass.helpsInCombat, - x.pixel.pixelDistance(pixel))))
       ++ realUnit.matchups.targets
         .filter(target =>
           ! simulation.fleeing
@@ -181,7 +181,7 @@ class Simulacrum(
     if (cooldownMoving > 0) return
     val effectiveSpeed    = topSpeed / pathBendiness
     val distancePerStep   = effectiveSpeed * SIMULATION_STEP_FRAMES
-    val distanceBefore    = pixel.pixelDistanceFast(destination)
+    val distanceBefore    = pixel.pixelDistance(destination)
     val distanceAfter     = Math.max(0.0, distanceBefore - effectiveSpeed * SIMULATION_STEP_FRAMES)
     val distanceTraveled  = distanceBefore - distanceAfter
     val framesTraveled    = (distanceTraveled / effectiveSpeed).toInt
@@ -207,7 +207,7 @@ class Simulacrum(
   def isValidTarget(target: Simulacrum): Boolean = (
     ! target.dead
     && target.hitPoints > 0
-    && (realUnit.pixelRangeMin <= 0 || pixel.pixelDistanceFast(target.pixel) >= realUnit.pixelRangeMin)
+    && (realUnit.pixelRangeMin <= 0 || pixel.pixelDistance(target.pixel) >= realUnit.pixelRangeMin)
   )
   
   def pixelsOutOfRange(target: Simulacrum): Double = {

@@ -32,7 +32,7 @@ trait GroundPaths {
     val zoneDestination = destination.zone
     
     if (zoneOrigin == zoneDestination) {
-      return origin.pixelDistanceFast(destination)
+      return origin.pixelDistance(destination)
     }
     
     // This approximation -- calculating ground distance at tile resolution -- can potentially bite us.
@@ -47,7 +47,7 @@ trait GroundPaths {
     requireBwta: Boolean = false): Double = {
 
     if (origin.zone == destination.zone) {
-      return origin.pixelCenter.pixelDistanceFast(destination.pixelCenter)
+      return origin.pixelCenter.pixelDistance(destination.pixelCenter)
     }
     
     val request = (origin, destination)
@@ -97,7 +97,7 @@ trait GroundPaths {
     val toZone = to.zone
     
     if (fromZone == toZone) {
-      return from.pixelDistanceFast(to)
+      return from.pixelDistance(to)
     }
     
     if ( ! With.paths.groundPathExists(
@@ -112,8 +112,8 @@ trait GroundPaths {
     
     fromEdgeTiles.map(fromEdgeTile =>
       toEdgeTiles.map(toEdgeTile =>
-        from.pixelDistanceFast(fromEdgeTile.pixelCenter) +
-          to.pixelDistanceFast(  toEdgeTile.pixelCenter) +
+        from.pixelDistance(fromEdgeTile.pixelCenter) +
+          to.pixelDistance(  toEdgeTile.pixelCenter) +
           With.paths.groundPixelsByTile(
             fromEdgeTile,
             toEdgeTile,

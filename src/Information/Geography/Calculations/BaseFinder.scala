@@ -25,7 +25,7 @@ object BaseFinder {
     
     // Get every resource that isn't a mineral block and isn't tied to a start location
     val baseResources = allResources.filterNot(_.isMineralBlocker)
-    val expoResources = baseResources.filterNot(r => startPixels.exists(_.pixelDistanceFast(r.pixelCenter) <= With.configuration.baseRadiusPixels))
+    val expoResources = baseResources.filterNot(r => startPixels.exists(_.pixelDistance(r.pixelCenter) <= With.configuration.baseRadiusPixels))
     
     // Cluster the expansion resources
     val clusters = clusterResourcePatches(expoResources)
@@ -106,7 +106,7 @@ object BaseFinder {
         output += base.startInclusive
     
         // Real lazy -- just remove all conflicting candidates (instead of, say, picking the best one or something)
-        val conflicts = basesLeft.filter(_.midPixel.pixelDistanceFast(base.midPixel) < With.configuration.baseMergingRadiusPixels)
+        val conflicts = basesLeft.filter(_.midPixel.pixelDistance(base.midPixel) < With.configuration.baseMergingRadiusPixels)
         basesLeft --= conflicts
     })
     

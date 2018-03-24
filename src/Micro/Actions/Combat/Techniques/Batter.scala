@@ -94,11 +94,11 @@ object Batter extends ActionTechnique {
           building.tileArea.expand(1, 1).tiles
             .filter(With.grids.walkable.get)
             .filter(
-              _.pixelCenter.pixelDistanceFast(wallExit.pixelCenter)
-              < building.pixelCenter.pixelDistanceFast(wallExit.pixelCenter)))
+              _.pixelCenter.pixelDistance(wallExit.pixelCenter)
+              < building.pixelCenter.pixelDistance(wallExit.pixelCenter)))
         .distinct
       
-      val destination = ByOption.minBy(walkableTiles)(_.pixelCenter.pixelDistanceFast(unit.pixelCenter))
+      val destination = ByOption.minBy(walkableTiles)(_.pixelCenter.pixelDistance(unit.pixelCenter))
       unit.agent.toTravel = destination.map(_.pixelCenter).orElse(unit.agent.toTravel)
       Move.delegate(unit)
   

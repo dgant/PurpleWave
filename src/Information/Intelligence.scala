@@ -52,7 +52,7 @@ class Intelligence {
           if (scoutTiles.isEmpty)
             1.0
           else if (flyingScout)
-            scoutTiles.map(_.pixelCenter.pixelDistanceFast(heart)).min
+            scoutTiles.map(_.pixelCenter.pixelDistance(heart)).min
           else
             scoutTiles.map(_.groundPixels(heart)).min
         val informationAge = 1.0 + With.framesSince(base.lastScoutedFrame)

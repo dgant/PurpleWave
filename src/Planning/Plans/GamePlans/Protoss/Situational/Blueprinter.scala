@@ -16,7 +16,7 @@ object Blueprinter {
     
     val naturalBase   = With.geography.ourNatural
     val naturalZone   = naturalBase.zone
-    val marginPixels  = Math.max(0, naturalZone.exit.map(_.pixelCenter.pixelDistanceFast(naturalBase.townHallArea.midPixel) - Protoss.Nexus.radialHypotenuse).getOrElse(128.0))
+    val marginPixels  = Math.max(0, naturalZone.exit.map(_.pixelCenter.pixelDistance(naturalBase.townHallArea.midPixel) - Protoss.Nexus.radialHypotenuse).getOrElse(128.0))
     
     val pylons = (0 to pylonCount).map(i =>
       new Blueprint(plan,

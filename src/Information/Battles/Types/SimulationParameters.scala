@@ -15,8 +15,8 @@ class SimulationParameters (battle: Battle) {
   val nearestBaseEnemy      = nearestBase(With.geography.enemyBases).getOrElse(With.intelligence.mostBaselikeEnemyTile.pixelCenter)
   val lonelyCannons         = getLonelyCannons(nearestBaseOurs)
   val turtlingRatio         = Math.pow(0.97, lonelyCannons.size) // TODO: Consider ratio of cannons to army size
-  val urgencyOurs           = battle.focus.pixelDistanceFast(nearestBaseEnemy)
-  val urgencyEnemy          = battle.focus.pixelDistanceFast(nearestBaseOurs)
+  val urgencyOurs           = battle.focus.pixelDistance(nearestBaseEnemy)
+  val urgencyEnemy          = battle.focus.pixelDistance(nearestBaseOurs)
   val urgencyRatio          = Math.sqrt(urgencyOurs / urgencyEnemy)
   val chokeMobility         = getChokeMobility
   val flexibilityOurs       = meanFlexibility(battle.us.units)

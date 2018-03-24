@@ -25,5 +25,5 @@ class Edge(choke: Chokepoint) {
       _.centroid.pixelCenter.pixelDistanceSquared(
         new Pixel(region.getCenter))))
   
-  def contains(pixel: Pixel): Boolean = pixelCenter.pixelDistanceFast(pixel) <= radiusPixels
+  def contains(pixel: Pixel): Boolean = pixelCenter.pixelDistance(pixel) <= radiusPixels
 }

@@ -16,6 +16,6 @@ object PlacementHeuristicDistanceFromIdealRange extends PlacementHeuristic {
     
     // TODO: Once we add some better math tools use distance from line instead
     
-    Math.abs(targetDistance - candidatePixel.pixelDistanceFast(zone.exit.get.pixelCenter))
+    Math.abs(targetDistance - candidatePixel.pixelDistance(zone.exit.get.pixelCenter))
   }
 }

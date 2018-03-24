@@ -58,7 +58,7 @@ case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   }
   def project(destination: Pixel, pixels: Double): Pixel = {
     if (pixels == 0) return this
-    val distance = pixelDistanceSlow(destination)
+    val distance = pixelDistance(destination)
     if (distance == 0) return this
     val delta = destination.subtract(this)
     delta.multiply(pixels/distance).add(this)
@@ -84,16 +84,7 @@ case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   def midpoint(pixel: Pixel): Pixel = {
     add(pixel).divide(2)
   }
-  def pixelDistanceSlow(pixel: Pixel): Double = {
-    Math.sqrt(pixelDistanceSquared(pixel))
-  }
-  def pixelDistanceFast(pixel: Pixel): Double = {
-    // Octagonal distance
-    // https://en.wikibooks.org/wiki/Algorithms/Distance_approximations#Octagonal
-    val dx = Math.abs(x - pixel.x)
-    val dy = Math.abs(y - pixel.y)
-    0.941256 * Math.max(dx, dy) + Math.min(dx, dy) * 0.414213562
-  }
+  def pixelDistance(pixel: Pixel): Double = PurpleMath.broodWarDistance(x, y, pixel.x, pixel.y)
   def pixelDistanceSquared(pixel: Pixel): Int = {
     val dx = x - pixel.x
     val dy = y - pixel.y
@@ -112,7 +103,7 @@ case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     With.geography.zoneByTile(tileIncluding)
   }
   def base: Option[Base] = {
-    ByOption.minBy(zone.bases)(_.heart.pixelCenter.pixelDistanceFast(this))
+    ByOption.minBy(zone.bases)(_.heart.pixelCenter.pixelDistance(this))
   }
   def groundPixels(other: Tile): Double = {
     With.paths.groundPixels(this, other.pixelCenter)

@@ -12,7 +12,7 @@ abstract class ExplosionLine extends Explosion {
   val start: Pixel
   val end: Pixel
   
-  protected lazy val length = start.pixelDistanceSlow(end)
+  protected lazy val length = start.pixelDistance(end)
   protected lazy val angle = start.radiansTo(end)
   protected lazy val p0 = start.radiateRadians(angle - Math.PI / 2, thickness)
   protected lazy val p1 = start.radiateRadians(angle + Math.PI / 2, thickness)

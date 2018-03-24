@@ -62,7 +62,7 @@ class DropAttack extends Plan {
     val value           = base.workers.size.toDouble
     val distanceNormal  = 32.0 * 50.0
     val distanceGround  = distanceNormal + Math.min(With.geography.home.pixelCenter.groundPixels(base.heart.pixelCenter), 32.0 * 256.0 * 1.41)
-    val distanceAir     = distanceNormal + With.geography.home.pixelCenter.pixelDistanceFast(base.heart.pixelCenter)
+    val distanceAir     = distanceNormal + With.geography.home.pixelCenter.pixelDistance(base.heart.pixelCenter)
     val safety          = (1.0 +  base.defenders.size)
     val output          = value * distanceGround / safety / distanceAir
     output

@@ -9,7 +9,7 @@ object PlacementHeuristicDistanceFromBase extends PlacementHeuristic {
   override def evaluate(blueprint: Blueprint, candidate: Tile): Double = {
   
     if (With.geography.ourBases.isEmpty)
-      With.geography.home.pixelCenter.pixelDistanceFast(candidate.pixelCenter)
+      With.geography.home.pixelCenter.pixelDistance(candidate.pixelCenter)
     else {
       var totalDistance = 0.0
       With.geography.ourBases.foreach(base => {
@@ -22,7 +22,7 @@ object PlacementHeuristicDistanceFromBase extends PlacementHeuristic {
         if (blueprint.requireTownHallTile.get) {
           baseDistance += from.zone.distancePixels(to.zone)
         }
-        baseDistance += from.pixelDistanceFast(to)
+        baseDistance += from.pixelDistance(to)
         if ( ! base.townHall.exists(_.complete)) {
           baseDistance *= 0.5
         }

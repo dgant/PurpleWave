@@ -74,7 +74,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     }
     val moving = velocityX != 0 || velocityY != 0
     lazy val couldMove = unitClass.canMove
-    lazy val tryingToMove = friendly.flatMap(_.agent.movingTo).exists(_.pixelDistanceFast(pixelCenter) > 32)
+    lazy val tryingToMove = friendly.flatMap(_.agent.movingTo).exists(_.pixelDistance(pixelCenter) > 32)
     lazy val tryingToAttack = target.exists(_.isEnemyOf(this))
     if ( ! moving && couldMove && tryingToMove) {
       framesFailingToMove += 1
@@ -177,7 +177,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   def pixelEnd                                              : Pixel   = Pixel(right, bottom)
   def pixelStartAt            (at: Pixel)                   : Pixel   = at.subtract(pixelCenter).add(left, top)
   def pixelEndAt              (at: Pixel)                   : Pixel   = at.subtract(pixelCenter).add(right, bottom)
-  def pixelDistanceCenter     (otherPixel:  Pixel)          : Double  = pixelCenter.pixelDistanceFast(otherPixel)
+  def pixelDistanceCenter     (otherPixel:  Pixel)          : Double  = pixelCenter.pixelDistance(otherPixel)
   def pixelDistanceCenter     (otherUnit:   UnitInfo)       : Double  = pixelDistanceCenter(otherUnit.pixelCenter)
   def pixelDistanceEdge       (other:       UnitInfo)       : Double  = pixelDistanceEdge(other.pixelStart, other.pixelEnd)
   def pixelDistanceEdge       (other: UnitInfo, at: Pixel)  : Double  = pixelDistanceEdge(other.pixelStart, other.pixelEnd)
@@ -187,7 +187,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   def pixelDistanceSquared    (otherPixel:  Pixel)          : Double  = pixelCenter.pixelDistanceSquared(otherPixel)
   def pixelDistanceTravelling (destination: Pixel)          : Double  = pixelDistanceTravelling(pixelCenter, destination)
   def pixelDistanceTravelling (destination: Tile)           : Double  = pixelDistanceTravelling(pixelCenter, destination.pixelCenter)
-  def pixelDistanceTravelling (from: Pixel, to: Pixel)      : Double  = if (flying) from.pixelDistanceFast(to) else from.groundPixels(to)
+  def pixelDistanceTravelling (from: Pixel, to: Pixel)      : Double  = if (flying) from.pixelDistance(to) else from.groundPixels(to)
   
   def velocity: Force = Force(velocityX, velocityY)
   

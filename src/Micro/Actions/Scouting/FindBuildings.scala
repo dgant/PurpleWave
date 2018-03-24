@@ -66,7 +66,7 @@ abstract class AbstractFindBuildings extends Action {
       
     //TODO: Use actual potential flow so we can avoid obstacles and threats
     val target = unit.pixelCenter.add(force.normalize(64.0).toPoint)
-    val tileToScout = tilesToScout.minBy(_.pixelCenter.pixelDistanceFast(target))
+    val tileToScout = tilesToScout.minBy(_.pixelCenter.pixelDistance(target))
     unit.agent.toTravel = Some(tileToScout.pixelCenter)
     Move.delegate(unit)
   }

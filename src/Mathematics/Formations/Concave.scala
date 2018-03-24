@@ -18,7 +18,7 @@ object Concave {
     val centerToArcRadians = List(
       targetRadians - Math.PI / 2.0,
       targetRadians + Math.PI / 2.0)
-        .sortBy(radians => -  targetCenter.radiateRadians(radians, 128.0).pixelDistanceFast(SpecificPoints.middle))
+        .sortBy(radians => -  targetCenter.radiateRadians(radians, 128.0).pixelDistance(SpecificPoints.middle))
         .sortBy(radians =>    targetCenter.radiateRadians(radians, 128.0).zone != origin.zone)
         .head
     
@@ -26,9 +26,9 @@ object Concave {
       Math.PI, // Configurable.
       targetCenter,
       centerToArcRadians,
-      targetStart.pixelDistanceFast(targetEnd))
+      targetStart.pixelDistance(targetEnd))
     
-    val arcPlacement = new ArcPlacementState(arc, targetStart.pixelDistanceFast(targetEnd))
+    val arcPlacement = new ArcPlacementState(arc, targetStart.pixelDistance(targetEnd))
     
     val walkers = units.filterNot(_.flying)
     val flyers  = units.filter(_.flying)

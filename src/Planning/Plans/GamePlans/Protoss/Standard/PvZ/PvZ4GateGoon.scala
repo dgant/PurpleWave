@@ -1,6 +1,7 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvZ
 
-import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
+import Lifecycle.With
+import Macro.BuildRequests.RequestAtLeast
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
 import Planning.Plans.Army.Aggression
@@ -52,16 +53,11 @@ class PvZ4GateGoon extends GameplanModeTemplate {
         RequestAtLeast(1, Protoss.Observatory),
         RequestAtLeast(2, Protoss.Observer))),
     new If(
-      new UnitsAtLeast(1, Protoss.Assimilator, complete = true),
-      new Build(
-        RequestAtLeast(1, Protoss.CyberneticsCore),
-        RequestUpgrade(Protoss.DragoonRange))),
-    new If(
       new And(
         new GasAtLeast(50),
         new Or(
-          new UnitsAtLeast(6, Protoss.Zealot),
-          new EnemyHasShown(Zerg.Mutalisk)),
+          new Check(() => With.units.ours.count(_.is(Protoss.Zealot)) > With.units.ours.count(_.is(Protoss.Dragoon))),
+          new Check(() => With.units.enemy.count(_.is(Zerg.Mutalisk)) > With.units.ours.count(_.is(Protoss.Dragoon)))),
         new UpgradeComplete(Protoss.DragoonRange, 1, Protoss.DragoonRange.upgradeFrames(1))),
       new TrainContinuously(Protoss.Dragoon),
       new TrainContinuously(Protoss.Zealot)),

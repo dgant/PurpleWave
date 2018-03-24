@@ -141,7 +141,7 @@ class WorkerRushLiftoff extends Parallel {
     val zone = tile.zone
     val scoreZoneSize   = 1.0 + zone.tiles.size
     val scoreDistance   = 1.0 + ByOption.min(With.units.enemy.filter(_.canMove).map(_.framesToTravelTo(zone.centroid.pixelCenter).toDouble)).getOrElse(With.intelligence.mostBaselikeEnemyTile.tileDistanceFast(tile))
-    val scoreObscurity  = 1.0 + tile.zone.edges.map(_.pixelCenter.pixelDistanceFast(tile.pixelCenter)).sum
+    val scoreObscurity  = 1.0 + tile.zone.edges.map(_.pixelCenter.pixelDistance(tile.pixelCenter)).sum
     val scoreCrossing   = 1.0 + zoneCrossings.getOrElse(zone, 2)
     val scoreBase       = 1.0 + zone.bases.size
     val scoreStarting   = 1.0 + zone.bases.count(_.isStartLocation)
@@ -154,7 +154,7 @@ class WorkerRushLiftoff extends Parallel {
   
   private def evaluateAirTile(tile: Tile): Double = {
     val scoreIsland     = if (tile.zone.island || tile.zone.unwalkable) 1000000.0 else 1.0
-    val scoreObscurity  = 1.0 + tile.zone.edges.map(_.pixelCenter.pixelDistanceFast(tile.pixelCenter)).sum
+    val scoreObscurity  = 1.0 + tile.zone.edges.map(_.pixelCenter.pixelDistance(tile.pixelCenter)).sum
     val scoreCentrality = 1.0 + tile.tileDistanceFromEdge
     val scoreAltitude   = 1.0 + With.grids.altitudeBonus.get(tile)
     val scoreTotal      = scoreIsland * scoreAltitude *  scoreObscurity / scoreCentrality

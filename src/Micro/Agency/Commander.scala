@@ -109,7 +109,7 @@ class Commander {
     
     val alreadyAttackMovingThere = unit.command.exists(c =>
       c.getUnitCommandType.toString == UnitCommandType.Attack_Move.toString &&
-      new Pixel(c.getTargetPosition).pixelDistanceFast(destination) < 128)
+      new Pixel(c.getTargetPosition).pixelDistance(destination) < 128)
     
     if ( ! alreadyAttackMovingThere || unit.seeminglyStuck) {
       unit.baseUnit.attack(destination.bwapi)

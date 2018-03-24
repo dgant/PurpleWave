@@ -1,6 +1,7 @@
 package Mathematics.Physics
 
 import Mathematics.Points.{AbstractPoint, Point}
+import Mathematics.PurpleMath
 
 case class Force(x: Double, y: Double) {
   
@@ -13,18 +14,12 @@ case class Force(x: Double, y: Double) {
   def *(value: Double)  : Force = Force(value * x, value * y)
   def *(other: Force)   : Double = x * other.x + y * other.y
   
-  def lengthSquared: Double = x * x + y * y
+  lazy val radians: Double = PurpleMath.atan2(y, x)
+  lazy val lengthSquared: Double = x * x + y * y
   lazy val lengthSlow: Double = Math.sqrt(lengthSquared)
-  def lengthFast: Double = {
-    // Octagonal distance
-    // https://en.wikibooks.org/wiki/Algorithms/Distance_approximations#Octagonal
-    val ax = Math.abs(x)
-    val ay = Math.abs(y)
-    0.941256 * Math.max(ax, ay) + Math.min(ax, ay) * 0.414213562
-  }
+  lazy val lengthFast: Double = PurpleMath.broodWarDistanceDouble(0.0, 0.0, x, y)
   
   def normalize: Force = normalize(1.0)
-  
   def normalize(scale: Double): Force = {
     val length = Math.sqrt(x*x+y*y)
     if (length == 0)

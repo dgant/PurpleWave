@@ -82,7 +82,7 @@ class Camera {
       val start = focusUnit.pixelCenter
       focus = if (focusUnit.battle.exists(_.enemy.units.nonEmpty)) start.project(focusUnit.battle.get.focus, 120) else start
       val tweenFraction = Math.max(0.0, Math.min(1.0, (With.framesSince(focusFrame) + 1).toDouble/tweenFrames))
-      val tweenPoint    = tweenFrom.project(focus, tweenFrom.pixelDistanceSlow(focus) * tweenFraction)
+      val tweenPoint    = tweenFrom.project(focus, tweenFrom.pixelDistance(focus) * tweenFraction)
       With.viewport.centerOn(tweenPoint)
     }
   }

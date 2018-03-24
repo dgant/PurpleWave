@@ -127,7 +127,7 @@ object Potential {
     
     if (nearestBlocker.isEmpty) return new Force
     
-    val maximumDistance = 8 * (unit.topSpeed + nearestBlocker.get.topSpeed)
+    val maximumDistance = 12 * (unit.topSpeed + nearestBlocker.get.topSpeed)
     val blockerDistance = nearestBlocker.get.pixelDistanceEdge(unit)
     val magnitude       = PurpleMath.clampToOne(maximumDistance / (1.0 + blockerDistance))
     val output          = unitAttraction(unit, nearestBlocker.get, - magnitude)

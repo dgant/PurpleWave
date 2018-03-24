@@ -17,7 +17,6 @@ object PvPOpen2GateRobo           extends PvPOpening
 object PvPOpen3GateSpeedlots      extends PvPOpening
 object PvPOpen4GateGoon           extends PvPOpening
 object PvPOpen12Nexus5Zealot      extends PvPOpening
-object PvPOpen1015GateDTs         extends PvPOpening
 object PvPOpenProxy2Gate          extends PvPOpening {
   override def choices: Iterable[Iterable[Strategy]] = Vector(ProtossChoices.pvpOpenersTransitioningFrom2Gate)
   override def prohibitedMaps: Iterable[StarCraftMap] = MapGroups.badForProxying

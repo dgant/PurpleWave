@@ -3,6 +3,7 @@ package Micro.Actions.Combat.Maneuvering
 import Debugging.Visualizations.ForceColors
 import Mathematics.Physics.ForceMath
 import Micro.Actions.Action
+import Micro.Actions.Combat.Techniques.Avoid
 import Micro.Actions.Commands.{Gravitate, Move}
 import Micro.Decisions.Potential
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -15,7 +16,7 @@ object Smuggle extends Action {
   
   override def perform(unit: FriendlyUnitInfo) {
     if (unit.matchups.threats.exists(_.framesBeforeAttacking(unit) < 24)) {
-      OldAvoid.delegate(unit)
+      Avoid.delegate(unit)
     }
     else if (unit.visibleToOpponents && unit.matchups.threats.nonEmpty) {
       val threatMagnitude = if (unit.matchups.threatsInRange.nonEmpty) 2.0 else 1.0

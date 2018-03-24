@@ -3,8 +3,8 @@ package Micro.Actions.Protoss
 import Debugging.Visualizations.ForceColors
 import Mathematics.Physics.ForceMath
 import Micro.Actions.Action
-import Micro.Actions.Combat.Maneuvering.OldAvoid
 import Micro.Actions.Combat.Tactics.Potshot
+import Micro.Actions.Combat.Techniques.Avoid
 import Micro.Actions.Commands.{Gravitate, Move}
 import Micro.Decisions.Potential
 import ProxyBwapi.Races.Protoss
@@ -51,7 +51,7 @@ object BeAnArbiter extends Action {
       Gravitate.consider(unit)
     }
     if (threatened) {
-      OldAvoid.consider(unit)
+      Avoid.consider(unit)
     }
     Move.delegate(unit)
   }

@@ -13,26 +13,34 @@ object Gravitate extends Action {
     && unit.agent.forces.nonEmpty
   )
   
-  private val rayDistance = 32.0 * 4.0
+  private val rayDistance = 32.0 * 2.5
   private val cardinal8directions = (0.0 until 2.0 by 0.25).map(_ * Math.PI).toVector
+
   
   override def perform(unit: FriendlyUnitInfo) {
-    val framesAhead     = With.reaction.agencyAverage + 1
-    val distance        = unit.unitClass.haltPixels + framesAhead * (unit.topSpeed + framesAhead * unit.unitClass.accelerationFrames / 2)
-    val forces          = unit.agent.forces.values
-    val origin          = unit.pixelCenter
-    val forceTotal      = ForceMath.sum(forces)
+    val framesAhead       = With.reaction.agencyAverage + 1
+    val distanceRequired  = unit.unitClass.haltPixels + framesAhead * (unit.topSpeed + framesAhead * unit.unitClass.accelerationFrames / 2)
+    val forces            = unit.agent.forces.values
+    val origin            = unit.pixelCenter
+    val forceTotal        = ForceMath.sum(forces)
+    val rayLength         = Math.max(rayDistance, distanceRequired)
     
+    def makeRay(radians: Double): PixelRay = {
+      PixelRay(unit.pixelCenter, unit.pixelCenter.radiateRadians(radians, rayLength))
+    }
     
-    if (unit.flying) {
-      val destination = unit.pixelCenter.add(forceTotal.normalize(distance).toPoint)
+    lazy val forceRadians = forceTotal.radians
+    lazy val ray          = makeRay(forceRadians)
+    lazy val rayWalkable  = ray.tilesIntersected.forall(With.grids.walkable.get)
+    
+    if (unit.flying || rayWalkable) {
+      val destination = unit.pixelCenter.add(forceTotal.normalize(distanceRequired).toPoint)
       unit.agent.toTravel = Some(destination)
       return
     }
     
-    val forceRadians    = forceTotal.radians
-    val angles          = cardinal8directions.filter(r => Math.abs(r - forceRadians) <= Math.PI / 2.0) :+ forceRadians
-    val paths           = angles.map(angle => PixelRay(unit.pixelCenter, unit.pixelCenter.radiateRadians(angle, rayDistance)))
+    val angles          = cardinal8directions.filter(r => Math.abs(r - forceRadians) <= Math.PI / 2.0)
+    val paths           = angles.map(makeRay)
     val pathsTruncated  = paths.map(ray =>
       PixelRay(
         ray.from,

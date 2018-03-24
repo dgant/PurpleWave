@@ -3,7 +3,7 @@ package Micro.Actions.Combat.Tactics
 import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Basic.MineralWalk
-import Micro.Actions.Combat.Maneuvering.OldAvoid
+import Micro.Actions.Combat.Techniques.Avoid
 import Micro.Actions.Commands.{Attack, Move}
 import ProxyBwapi.Races.{Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -185,7 +185,7 @@ object Tickle extends Action {
             unit.pixelDistanceEdge(freebie)))
       unit.agent.toAttack = freebies
       Attack.consider(unit)
-      OldAvoid.consider(unit)
+      Avoid.consider(unit)
     }
   }
   

@@ -3,7 +3,8 @@ package Micro.Actions.Protoss
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Micro.Actions.Action
 import Micro.Actions.Combat.Attacking.Target
-import Micro.Actions.Combat.Maneuvering.{CliffAvoid, OldAvoid}
+import Micro.Actions.Combat.Maneuvering.CliffAvoid
+import Micro.Actions.Combat.Techniques.Avoid
 import Micro.Actions.Commands.AttackMove
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders, UnitInfo}
@@ -37,7 +38,7 @@ object BeACarrier extends Action {
     val unacceptableThreat = unit.matchups.threatsInRange.find(threatUnacceptable)
     if (unacceptableThreat.isDefined) {
       CliffAvoid.consider(unit)
-      OldAvoid.consider(unit)
+      Avoid.consider(unit)
     }
     else if (unit.matchups.targets.nonEmpty && interceptorsNeedKick && (unit.matchups.threats.isEmpty || interceptorsTotal > 2)) {
       Target.consider(unit)
@@ -49,7 +50,7 @@ object BeACarrier extends Action {
     }
     else {
       CliffAvoid.consider(unit)
-      OldAvoid.consider(unit)
+      Avoid.consider(unit)
     }
   }
 }

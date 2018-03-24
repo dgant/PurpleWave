@@ -455,6 +455,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     val output  = - velocity.lengthFast * (deltaXY.normalize * velocity.normalize)
     output
   }
+  
   ////////////
   // Orders //
   ////////////

@@ -65,9 +65,13 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit, id: Int) extends UnitInfo(bas
   // Combat //
   ////////////
   
-  def interceptors      : Iterable[UnitInfo] = if (is(Protoss.Carrier)) base.getInterceptors.asScala.flatMap(With.units.get) else List.empty
+  def interceptors      : Iterable[UnitInfo] = interceptorsCache()
   def interceptorCount  : Int = interceptorCountCache()
   def scarabCount       : Int = scarabCountCache()
+  
+  private val interceptorsCache       = new Cache(() => if (is(Protoss.Carrier)) base.getInterceptors.asScala.flatMap(With.units.get) else List.empty)
+  private val interceptorCountCache   = new Cache(() => if (is(Protoss.Carrier)) base.getInterceptorCount else 0)
+  private val scarabCountCache        = new Cache(() => if (is(Protoss.Reaver)) base.getScarabCount else 0)
   
   def attackStarting            : Boolean = isStartingAttackCache()
   def attackAnimationHappening  : Boolean = isAttackFrameCache()
@@ -77,8 +81,6 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit, id: Int) extends UnitInfo(bas
   
   private val isStartingAttackCache   = new Cache(() => unitClass.rawCanAttack && base.isStartingAttack)
   private val isAttackFrameCache      = new Cache(() => unitClass.rawCanAttack && base.isAttackFrame)
-  private val interceptorCountCache   = new Cache(() => if (is(Protoss.Carrier)) base.getInterceptorCount else 0)
-  private val scarabCountCache        = new Cache(() => if (is(Protoss.Reaver)) base.getScarabCount else 0)
   private val airCooldownLeftCache    = new Cache(() => base.getAirWeaponCooldown)
   private val groundCooldownLeftCache = new Cache(() => base.getGroundWeaponCooldown)
   private val spellCooldownLeftCache  = new Cache(() => base.getSpellCooldown)

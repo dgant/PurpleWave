@@ -36,18 +36,35 @@ class GridMobilityBuildings extends AbstractGridArray[Int] {
     val area = unit.tileArea
     var a = 4
     while (a >= 0) {
-      val tiles = area.expand(a, a).tiles
-      var i = 0
-      while (i < tiles.length) {
-        val j = tiles(i).i
-        if (get(j) == defaultValue) {
-          modifiedIndices += j
+      val unitClass = unit.unitClass
+      val xUnit     = unit.tileTopLeft.x
+      val yUnit     = unit.tileTopLeft.y
+      val xUnitEnd  = xUnit + unitClass.tileWidth
+      val yUnitEnd  = yUnit + unitClass.tileHeight
+      val xAreaMin  = xUnit     - a
+      val xAreaEnd  = xUnitEnd  + a
+      val yAreaMin  = yUnit     - a
+      val yAreaEnd  = yUnitEnd  + a
+      
+      var x = xAreaMin
+      while (x < xAreaEnd) {
+        var y = yAreaMin
+        while (y < xAreaEnd) {
+          if (x >= 0
+            && y >= 0
+            && x < With.mapTileWidth
+            && y < With.mapTileHeight) {
+            val j = x + y * With.mapTileWidth
+            if (values(j) == defaultValue) {
+              modifiedIndices += j
+            }
+            values(j) = Math.min(values(j), a)
+          }
+          y += 1
         }
-        set(j, Math.min(get(j), a))
-        i += 1
+        x += 1
       }
       a -= 1
     }
-    area.expand(4, 4).tiles
   }
 }

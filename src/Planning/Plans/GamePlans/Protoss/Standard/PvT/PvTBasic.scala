@@ -4,7 +4,7 @@ import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
 import Planning.Composition.Latch
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
-import Planning.Plans.Compound._
+import Planning.Plans.Compound.{Or, _}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.GamePlans.Protoss.Standard.PvT.PvTIdeas.AttackRespectingMines
@@ -39,10 +39,23 @@ class PvTBasic extends GameplanModeTemplate {
     new If(new Employing(PvT21Nexus),   new Build(ProtossBuilds.Opening21Nexus_Robo: _*)),
     new If(new Employing(PvTDTExpand),  new Build(ProtossBuilds.OpeningDTExpand: _*)))
   
+  class ThreeBaseTech extends Employing(PvT3BaseCarrier, PvT3BaseArbiter)
   class EmployingCarriers extends Employing(PvT2BaseCarrier, PvT3BaseCarrier)
   class EmployingArbiters extends Employing(PvT2BaseArbiter, PvT3BaseArbiter)
   
+  class NeedObservers extends Or(
+    new EnemyHasShownCloakedThreat,
+    new EnemyUnitsAtLeast(2, Terran.Vulture),
+    new EnemyUnitsAtLeast(2, Terran.Factory))
+  
   class ReadyForThirdBase extends Or(
+    new And(
+      new ThreeBaseTech,
+      new SafeAtHome,
+      new UnitsAtLeast(6, UnitMatchWarriors),
+      new Or(
+        new Not(new NeedObservers),
+        new UnitsAtLeast(1, Protoss.Observer, complete = true))),
     new And(
       new EnemyBasesAtLeast(2),
       new SafeAtHome),
@@ -116,10 +129,7 @@ class PvTBasic extends GameplanModeTemplate {
         new UnitsAtMost(0, Protoss.TemplarArchives)),
       new Build(RequestAtLeast(1, Protoss.RoboticsSupportBay))),
     new If(
-      new Or(
-        new EnemyHasShownCloakedThreat,
-        new EnemyUnitsAtLeast(2, Terran.Vulture),
-        new EnemyUnitsAtLeast(2, Terran.Factory)),
+      new NeedObservers,
       new Build(RequestAtLeast(1, Protoss.Observatory))),
     new If(
       new And(

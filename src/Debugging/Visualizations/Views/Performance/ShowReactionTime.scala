@@ -40,9 +40,9 @@ object ShowReactionTime extends View {
       Vector(
         Vector("", "Agency", "Clustering"),
         Vector("Samples:",    With.agents.runtimes.size.toString,   With.battles.clustering.runtimes.size.toString),
-        Vector("Last:",       With.reaction.agencyLast.toString,    With.reaction.battlesLast.toString),
-        Vector("Max:",        With.reaction.agencyMax.toString,     With.reaction.battlesMax.toString),
-        Vector("Avg:",        With.reaction.agencyAverage.toString, With.reaction.battlesAverage.toString),
+        Vector("Last:",       With.reaction.agencyLast.toString,    With.reaction.clusteringLast.toString),
+        Vector("Max:",        With.reaction.agencyMax.toString,     With.reaction.clusteringMax.toString),
+        Vector("Avg:",        With.reaction.agencyAverage.toString, With.reaction.clusteringAverage.toString),
         Vector("Avg Total:",  With.reaction.framesTotal.toString)))
   }
 }

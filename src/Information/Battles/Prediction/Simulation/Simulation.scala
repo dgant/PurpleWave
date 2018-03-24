@@ -6,6 +6,7 @@ import Information.Geography.Types.Zone
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
+import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
 
 class Simulation(
@@ -13,7 +14,10 @@ class Simulation(
   val weAttack  : Boolean,
   val weSnipe   : Boolean) {
   
-  private def buildSimulacra(team: Team) = team.units.map(new Simulacrum(this, _))
+  private def buildSimulacra(team: Team) = team.units.filter(legalForSimulation).map(new Simulacrum(this, _))
+  private def legalForSimulation(unit: UnitInfo): Boolean = {
+    unit.invincible && ! unit.is(Protoss.Interceptor)
+  }
   
   val estimation            : Prediction          = new Prediction
   val focus                 : Pixel               = battle.focus
@@ -29,6 +33,8 @@ class Simulation(
     (unitsOurs.filter(_.canMove) ++ unitsEnemy)
       .map(simulacrum => (simulacrum.realUnit, simulacrum))
       .toMap
+  
+  
   
   def complete: Boolean = (
     estimation.frames > With.configuration.battleEstimationFrames

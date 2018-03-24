@@ -150,7 +150,7 @@ object PvPIdeas {
     new TrainContinuously(Protoss.Carrier),
     new If(new UnitsAtMost(0, Protoss.PhotonCannon), new TrainContinuously(Protoss.Observer, 1, 1)),
     new TrainReactiveDarkTemplar,
-    new If(new UnitsAtLeast(12, UnitMatchWarriors), new TrainContinuously(Protoss.Arbiter, 2, 1)),
+    new If(new UnitsAtLeast(12, UnitMatchWarriors), new TrainContinuously(Protoss.Arbiter, 8, 2)),
     new If(new Not(new EnemyCarriers), new TrainContinuously(Protoss.Reaver, 4)),
     new If(new UnitsAtLeast(12, UnitMatchWarriors), new TrainContinuously(Protoss.HighTemplar, 6, 2)),
     new TrainDragoonsOrZealots,

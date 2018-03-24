@@ -2,7 +2,7 @@ package Micro.Actions.Commands
 
 import Lifecycle.With
 import Micro.Actions.Action
-import ProxyBwapi.Races.Zerg
+import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Attack extends Action {
@@ -16,6 +16,12 @@ object Attack extends Action {
     if (unit.is(Zerg.Lurker) && ! unit.burrowed) {
       unit.agent.toTravel = Some(unit.agent.toAttack.get.pixelCenter)
       Move.delegate(unit)
+    }
+    
+    if (unit.agent.toAttack.get.is(Protoss.Interceptor)
+    || (unit.agent.toAttack.get.is(Protoss.Carrier) && ! unit.inRangeToAttack(unit.agent.toAttack.get))) {
+      unit.agent.toTravel = unit.agent.toAttack.map(_.pixelCenter)
+      AttackMove.delegate(unit)
     }
     
     With.commander.attack(unit, unit.agent.toAttack.get)

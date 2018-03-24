@@ -9,11 +9,11 @@ abstract class View {
   def renderScreen(): Unit = {}
   def renderMap(): Unit = {}
   
-  def inUse: Boolean = {
-    With.visualization.enabled &&
-    With.visualization.views.contains(this) &&
-    (With.visualization.map || With.visualization.screen)
-  }
+  def inUse: Boolean = (
+    With.visualization.enabled
+    && With.visualization.views.contains(this)
+    && (With.visualization.map || With.visualization.screen)
+  )
   
   def mapInUse: Boolean = {
     inUse && With.visualization.map

@@ -30,21 +30,7 @@ object ShowBattleDetails extends View {
     val denominator     = 630 * With.battles.global.valueUsArmy + With.battles.global.valueEnemyArmy
     val xGlobalUs       = (With.battles.global.valueUsArmyKnown    / denominator).toInt
     val xGlobalEnemy    = (With.battles.global.valueEnemyArmy / denominator).toInt
-    val xArmyUs         = (battle.valueUs     / denominator).toInt
-    val xArmyEnemy      = (battle.valueEnemy  / denominator).toInt
-    val xSurvivorsUs    = (Math.max(0, battle.valueUs     - battle.attackLosses) / denominator).toInt
-    val xSurvivorsEnemy = (Math.max(0, battle.valueEnemy  - battle.attackGains) / denominator).toInt
-  
-    /*
-    drawBar(x-1,  y0-1, xGlobalUs+2,      barHeight+2,  Color.White)
-    drawBar(x-1,  y2-1, xGlobalEnemy+2,   barHeight+2,  Color.White)
-    drawBar(x,    y0,   xGlobalUs,        barHeight,    Color.Black)
-    drawBar(x,    y2,   xGlobalEnemy,     barHeight,    Color.Black)
-    drawBar(x,    y0,   xArmyUs,          barHeight,    With.self.colorDark)
-    drawBar(x,    y2,   xArmyEnemy,       barHeight,    With.enemy.colorDark)
-    drawBar(x,    y0,   xSurvivorsUs,     barHeight,    With.self.colorNeon)
-    drawBar(x,    y2,   xSurvivorsEnemy,  barHeight,    With.enemy.colorNeon)
-    */
+    
     DrawScreen.table(x, y4, Vector(
       Vector("Global",      "%1.2f".format(With.battles.global.valueRatioTarget)),
       Vector("Attack",      "%1.2f".format(battle.ratioAttack)),
@@ -69,7 +55,7 @@ object ShowBattleDetails extends View {
         survivorPercentage(estimation.deathsEnemy, estimation.totalUnitsEnemy)),
       Vector[String]("Gains",   "%1.2f".format(battle.attackGains)),
       Vector[String]("Losses",  "%1.2f".format(battle.attackLosses)),
-      Vector[String]("Net",     "%1.2f".format(battle.netEngageValue)))
+      Vector[String]("Net",     "%1.2f".format(battle.attackGains - battle.attackLosses)))
     DrawScreen.table(x, y, table)
     
     val y2 = y + (table.length + 4) * With.visualization.lineHeightSmall
@@ -121,11 +107,7 @@ object ShowBattleDetails extends View {
     val scoreTable = Vector(
       Vector("Attack secs",     "" + battle.estimationSimulationAttack.frames / 24),
       Vector("Attack gain",     "" + battle.estimationSimulationAttack.costToEnemy.toInt),
-      Vector("Attack loss",     "" + battle.estimationSimulationAttack.costToUs.toInt),
-      Vector(),
-      Vector("Retreat secs",    "" + battle.estimationSimulationRetreat.frames / 24),
-      Vector("Retreat gain",    "" + battle.estimationSimulationRetreat.costToEnemy.toInt),
-      Vector("Retreat loss",    "" + battle.estimationSimulationRetreat.costToUs.toInt)
+      Vector("Attack loss",     "" + battle.estimationSimulationAttack.costToUs.toInt)
     )
     DrawScreen.table(450, y, scoreTable)
   }

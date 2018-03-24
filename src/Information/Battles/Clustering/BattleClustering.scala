@@ -8,7 +8,7 @@ import scala.collection.mutable
 class BattleClustering {
   
   var lastClusterCompletion = 0
-  val runtimes              = new mutable.Queue[Int]
+  val runtimes = new mutable.Queue[Int]
   
   private var nextUnits:          Traversable[UnitInfo] = Vector.empty
   private var clusterInProgress:  BattleClusteringState = new BattleClusteringState(Set.empty)

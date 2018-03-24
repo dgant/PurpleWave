@@ -19,13 +19,13 @@ class Strategist {
   lazy val selectedInitially: Set[Strategy] = selectInitialStrategies
    
   private var enemyRaceAtLastCheck: Race = With.enemy.raceInitial
-  var selectedLast: Option[Set[Strategy]] = None
+  private var selectedLast: Option[Set[Strategy]] = None
   def selectedCurrently: Set[Strategy] = {
     val enemyRaceNow = With.enemy.raceCurrent
     if (selectedLast.isEmpty) {
       selectedLast = Some(selectedInitially)
     }
-    else if (enemyRaceAtLastCheck != enemyRaceNow) {
+    else if (enemyRaceAtLastCheck != enemyRaceNow || With.frame < 5) { // Hack fix
       selectedLast = Some(selectedInitially.filter(isAppropriate))
     }
     enemyRaceAtLastCheck = enemyRaceNow

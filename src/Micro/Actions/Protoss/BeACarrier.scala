@@ -27,6 +27,7 @@ object BeACarrier extends Action {
     lazy val interceptorsNeedKick     = interceptorsTotal > 0 && (exitingLeash || ! interceptorsAreShooting)
     
     def threatUnacceptable(threat: UnitInfo): Boolean = {
+      if (! threat.canMove)                         return true
       if (threat.flying)                            return false
       if (threat.damageOnNextHitAgainst(unit) < 5)  return false
       if (interceptorsTotal > 2 && threat.pixelDistanceEdge(unit) < unit.pixelRangeAgainst(threat) - 32.0) return false

@@ -5,9 +5,11 @@ import Information.Battles.Types.{Battle, BattleGlobal, BattleLocal, Team}
 import Lifecycle.With
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, UnitInfo}
 
+import scala.collection.mutable
+
 class BattleClassifier {
     
-  var global      : BattleGlobal                = _
+  var global      : BattleGlobal                = new BattleGlobal(new Team(Vector.empty), new Team(Vector.empty))
   var byUnit      : Map[UnitInfo, BattleLocal]  = Map.empty
   var local       : Vector[BattleLocal]         = Vector.empty
   var lastUpdate  : Int                         = 0
@@ -16,43 +18,58 @@ class BattleClassifier {
   
   val clustering = new BattleClustering
   
+  var lastEstimationCompletion = 0
+  val estimationRuntimes = new mutable.Queue[Int]
+  
+  private var nextBattleGlobal: Option[BattleGlobal] = None
+  private var nextBattlesLocal: Vector[BattleLocal] = Vector.empty
   def run() {
-    clustering.enqueue(With.units.all.filter(BattleClassificationFilters.isEligibleLocal))
-    clustering.run()
-    replaceBattleGlobal()
-    replaceBattlesLocal()
-    BattleUpdater.run()
-    
-    // If we have the time to do so, run lazy estimations here.
-    // Otherwise, it'll run on demand from the Micro task
-    if (With.performance.continueRunning) {
-      global.globalSafeToAttack
-      local.foreach(_.estimationSimulationAttack)
-      local.foreach(_.estimationSimulationRetreat)
-      local.foreach(_.netEngageValue)
-      local.foreach(_.shouldFight)
+    val steps: Vector[() => Any] = (
+      Vector[() => Any]()
+      ++ Vector(() => BattleUpdater.run())
+      ++ nextBattlesLocal.map(battle => () => battle.estimationSimulationAttack)
+      ++ nextBattlesLocal.map(battle => () => battle.estimationSimulationSnipe)
+      ++ nextBattlesLocal.map(battle => () => battle.shouldFight)
+      ++ Vector(() => trackPerformance())
+      ++ nextBattleGlobal.map(battle => () => battle.globalSafeToAttack)
+      ++ Vector(() => replaceBattlesLocal())
+      ++ Vector(() => replaceBattleGlobal())
+      ++ Vector(() => runClustering())
+    )
+    for (step <- steps) {
+      if ( ! With.performance.continueRunning) return
+      step()
     }
-    
-    lastUpdate = With.frame
   }
   
+  def trackPerformance() {
+    estimationRuntimes.enqueue(With.framesSince(lastEstimationCompletion))
+    while (estimationRuntimes.sum > 24 * 30) estimationRuntimes.dequeue()
+    lastEstimationCompletion = With.frame
+  }
   
-  
-  private def replaceBattleGlobal() {
-    global = new BattleGlobal(
-      new Team(asVectorUs     (With.units.ours  .filter(BattleClassificationFilters.isEligibleGlobal))),
-      new Team(asVectorEnemy  (With.units.enemy .filter(BattleClassificationFilters.isEligibleGlobal))))
+  def runClustering() {
+    clustering.enqueue(With.units.all.filter(BattleClassificationFilters.isEligibleLocal))
+    clustering.run()
   }
   
   private def replaceBattlesLocal() {
-    local = clustering.clusters
+    local = nextBattlesLocal
+    byUnit = local.flatten(battle => battle.teams.flatMap(_.units).map(unit => (unit, battle))).toMap
+    nextBattlesLocal = clustering.clusters
       .map(cluster =>
         new BattleLocal(
           new Team(cluster.filter(_.isOurs).toVector),
           new Team(cluster.filter(_.isEnemy).toVector)))
       .filter(_.teams.forall(_.units.exists(_.canAttack)))
-    
-    byUnit = local.flatten(battle => battle.teams.flatMap(_.units).map(unit => (unit, battle))).toMap
+  }
+  
+  
+  private def replaceBattleGlobal() {
+    nextBattleGlobal.foreach(global = _)
+    global = new BattleGlobal(
+      new Team(asVectorUs     (With.units.ours  .filter(BattleClassificationFilters.isEligibleGlobal))),
+      new Team(asVectorEnemy  (With.units.enemy .filter(BattleClassificationFilters.isEligibleGlobal))))
   }
   
   private def asVectorUs    (units: Traversable[FriendlyUnitInfo]) : Vector[UnitInfo] = units.map(_.asInstanceOf[UnitInfo]).toVector

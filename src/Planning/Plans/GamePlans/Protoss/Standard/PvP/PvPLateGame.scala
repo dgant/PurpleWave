@@ -15,7 +15,7 @@ import Planning.Plans.Predicates.Milestones._
 import Planning.Plans.Predicates.Reactive.EnemyCarriers
 import Planning.Plans.Predicates.{Employing, SafeAtHome}
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvPLateGameCarrier
+import Strategery.Strategies.Protoss.{PvPLateGameCarrier, PvPLateGameGateway}
 
 class PvPLateGame extends GameplanModeTemplate {
   
@@ -57,10 +57,12 @@ class PvPLateGame extends GameplanModeTemplate {
     new OnGasPumps(3,
       new Build(
         RequestAtLeast(2, Protoss.Forge),
-        RequestUpgrade(Protoss.HighTemplarEnergy),
-        RequestAtLeast(1, Protoss.Stargate),
-        RequestAtLeast(1, Protoss.ArbiterTribunal),
-        RequestTech(Protoss.Stasis))))
+        RequestUpgrade(Protoss.HighTemplarEnergy))))
+  
+  class ArbiterTransition extends Build(
+    RequestAtLeast(1, Protoss.Stargate),
+    RequestAtLeast(1, Protoss.ArbiterTribunal),
+    RequestTech(Protoss.Stasis))
   
   class CarrierTransition extends Parallel(
     new Build(RequestAtLeast(1, Protoss.Stargate)),
@@ -80,6 +82,7 @@ class PvPLateGame extends GameplanModeTemplate {
     new If(new EnemyUnitsAtLeast(1, Protoss.DarkTemplar), new UpgradeContinuously(Protoss.ObserverSpeed)),
   
     new BuildCannonsAtExpansions(2),
+    
     new FlipIf(
       new Or(
         new UnitsAtLeast(40, UnitMatchWarriors),
@@ -90,21 +93,36 @@ class PvPLateGame extends GameplanModeTemplate {
       new Parallel(
         new MatchMiningBases,
         new BuildTech)),
+    
     new FlipIf(
       new SafeAtHome,
       new Build(RequestAtLeast(8, Protoss.Gateway)),
       new RequireMiningBases(3)),
+      
     new If(
       new And(
-        new Employing(PvPLateGameCarrier),
+        new Or(
+          new Employing(PvPLateGameCarrier),
+          new UnitsAtLeast(8, Protoss.Arbiter)),
         new HaveGasPumps(3)),
       new CarrierTransition,
       new Build(RequestAtLeast(12, Protoss.Gateway))),
+  
+    new If(
+      new And(
+        new Or(
+          new Employing(PvPLateGameGateway),
+          new UnitsAtLeast(8, Protoss.Carrier)),
+        new HaveGasPumps(3)),
+      new ArbiterTransition),
+    
     new RequireMiningBases(4),
+      
     new FlipIf(
       new SafeAtHome,
       new Build(RequestAtLeast(12, Protoss.Gateway)),
       new RequireMiningBases(5)),
+      
     new RequireMiningBases(6),
     new UpgradeContinuously(Protoss.Shields)
   )

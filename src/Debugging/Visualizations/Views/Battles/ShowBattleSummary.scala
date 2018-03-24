@@ -4,7 +4,7 @@ import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.View
 import Information.Battles.Prediction.Prediction
-import Information.Battles.Types.{Battle, BattleLocal}
+import Information.Battles.Types.BattleLocal
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Planning.Yolo
@@ -46,7 +46,7 @@ object ShowBattleSummary extends View {
   }
   
   private def drawBattleMap(battle: BattleLocal, estimation: Prediction) {
-    val weWin               = battle.netEngageValue > 0.0
+    val weWin               = battle.shouldFight
     val ourColorDark        = With.self.colorDark
     val enemyColorDark      = With.enemy.colorDark
     val ourColorNeon        = With.self.colorNeon

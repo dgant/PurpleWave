@@ -7,6 +7,7 @@ import Lifecycle.With
 import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
 import Micro.Decisions.MicroValue
+import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.{ByOption, Forever}
 
@@ -90,7 +91,7 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
   
   def framesOfEntanglementWith(threat: UnitInfo, fixedRange: Option[Double] = None): Double = {
     lazy val approachSpeedMe      = me.speedApproaching(threat.pixelCenter)
-    lazy val approachSpeedThreat  = threat.speedApproaching(me.pixelCenter)
+    lazy val approachSpeedThreat  = if (threat.is(Protoss.Interceptor)) 0.0 else threat.speedApproaching(me.pixelCenter)
     lazy val approachSpeedTotal   = approachSpeedMe + approachSpeedThreat
     lazy val framesToTurn         = me.unitClass.framesToTurn180 // Should be this, but for performance limitations: me.unitClass.framesToTurn(me.angleRadians - threat.pixelCenter.radiansTo(me.pixelCenter))
     lazy val framesToAccelerate   = (me.topSpeed + approachSpeedMe + approachSpeedThreat) / me.unitClass.accelerationFrames

@@ -18,15 +18,20 @@ object TargetHeuristicVpfOurs extends TargetHeuristic {
     if ( ! shooter.unitClass.dealsRadialSplashDamage) {
       return directValueAgainstTarget
     }
+    
+    def splashValue(bystander: UnitInfo, maxDistance: Double, damageRatio: Double): Double = {
+      if (bystander.flying != target.flying) return 0.0
+      if (bystander.pixelDistanceCenter(target) > maxDistance) return 0.0
+      damageRatio * MicroValue.valuePerAttack(shooter, bystander)
+    }
+  
     val splashRadius50 = if (target.flying) shooter.unitClass.airSplashRadius50 else shooter.unitClass.groundSplashRadius50
     val splashRadius25 = if (target.flying) shooter.unitClass.airSplashRadius25 else shooter.unitClass.groundSplashRadius25
-    
     val bystanders = if (shooter.unitClass.splashesFriendly) target.matchups.allUnits else target.matchups.allies
-    val splashed50 = bystanders.filter(bystander => target.flying == bystander.flying && target.pixelDistanceCenter(bystander) <= splashRadius50)
-    val splashed25 = bystanders.filter(bystander => target.flying == bystander.flying && target.pixelDistanceCenter(bystander) <= splashRadius25 && target.pixelDistanceCenter(bystander) > splashRadius50)
-  
-    val splashed50Value = 0.50 * splashed50.map(bystander => MicroValue.valuePerAttack(shooter, bystander)).sum
-    val splashed25Value = 0.25 * splashed25.map(bystander => MicroValue.valuePerAttack(shooter, bystander)).sum
+    var splashed50Value = 0.0
+    var splashed25Value = 0.0
+    bystanders.foreach(bystander => splashed50Value += splashValue(bystander, splashRadius50, 0.5))
+    bystanders.foreach(bystander => splashed25Value += splashValue(bystander, splashRadius25, 0.25))
     
     val output = directValueAgainstTarget + splashed50Value + splashed25Value
     output

@@ -23,7 +23,7 @@ object PvZ2Gate99 extends PvZ2GateOpening
 object PvZProxy2Gate extends PvZ2GateOpening {
   override def prohibitedMaps: Iterable[StarCraftMap] = MapGroups.badForProxying
 }
-object PvZ4GateDragoonAllIn extends Strategy {
+object PvZ4GateDragoonAllIn extends PvZStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Vector(ProtossChoices.pvzMidgameTransitioningFromOneBase)
 }
 object PvZEarlyFFEConservative      extends PvZFFEOpening

@@ -71,7 +71,7 @@ object PvTIdeas {
   
   private class IfCloakedThreats_Observers extends If(
     new Or(
-      new EnemyHasShown(Terran.Vulture),
+      new Check(() => With.units.enemy.exists(u => u.is(Terran.Vulture) && u.spiderMines > 0)),
       new EnemyHasShown(Terran.SpiderMine),
       new EnemyHasShownWraithCloak),
     new Build(
@@ -137,7 +137,7 @@ object PvTIdeas {
   class TrainArmy extends Parallel(
     new TrainObservers,
     new TrainArbiters,
-    new TrainContinuously(Protoss.Reaver, 3),
+    new If(new EnemyBio, new TrainContinuously(Protoss.Reaver, 3)),
     new TrainContinuously(Protoss.Carrier),
     new TrainDarkTemplar,
     new TrainHighTemplar,

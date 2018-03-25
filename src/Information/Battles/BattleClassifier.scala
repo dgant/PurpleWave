@@ -3,7 +3,10 @@ package Information.Battles
 import Information.Battles.Clustering.BattleClustering
 import Information.Battles.Types.{Battle, BattleGlobal, BattleLocal, Team}
 import Lifecycle.With
+import Mathematics.Points.SpecificPoints
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, UnitInfo}
+import Utilities.ByOption
+import Utilities.EnrichPixel._
 
 import scala.collection.mutable
 
@@ -26,7 +29,10 @@ class BattleClassifier {
   def run() {
     val steps: Vector[() => Any] = (
       Vector[() => Any]()
-      ++ Vector(() => BattleUpdater.run())
+      ++ Vector(() => local.foreach(updateBattle))
+      ++ Vector(() => updateBattle(global))
+      ++ Vector(() => nextBattlesLocal.foreach(updateBattle))
+      ++ Vector(() => nextBattleGlobal.foreach(updateBattle))
       ++ nextBattlesLocal.map(battle => () => battle.estimationSimulationAttack)
       ++ nextBattlesLocal.map(battle => () => battle.estimationSimulationSnipe)
       ++ nextBattlesLocal.map(battle => () => battle.shouldFight)
@@ -64,6 +70,8 @@ class BattleClassifier {
       .filter(_.teams.forall(_.units.exists(_.canAttack)))
   }
   
+  private def asVectorUs    (units: Traversable[FriendlyUnitInfo]) : Vector[UnitInfo] = units.map(_.asInstanceOf[UnitInfo]).toVector
+  private def asVectorEnemy (units: Traversable[ForeignUnitInfo])  : Vector[UnitInfo] = units.map(_.asInstanceOf[UnitInfo]).toVector
   private def replaceBattleGlobal() {
     nextBattleGlobal.foreach(global = _)
     global = new BattleGlobal(
@@ -71,6 +79,20 @@ class BattleClassifier {
       new Team(asVectorEnemy  (With.units.enemy .filter(BattleClassificationFilters.isEligibleGlobal))))
   }
   
-  private def asVectorUs    (units: Traversable[FriendlyUnitInfo]) : Vector[UnitInfo] = units.map(_.asInstanceOf[UnitInfo]).toVector
-  private def asVectorEnemy (units: Traversable[ForeignUnitInfo])  : Vector[UnitInfo] = units.map(_.asInstanceOf[UnitInfo]).toVector
+  private def updateBattle(battle: Battle) {
+    battle.teams.foreach(group => {
+      val airCentroid = group.units.map(_.pixelCenter).centroid
+      val hasGround   = group.units.exists( ! _.flying)
+      group.centroid  = ByOption
+        .minBy(group.units.filterNot(_.flying && hasGround))(_.pixelDistanceSquared(airCentroid))
+        .map(_.pixelCenter)
+        .getOrElse(airCentroid)
+    })
+    
+    battle.teams.foreach(group =>
+      group.vanguard = ByOption
+        .minBy(group.units)(_.pixelDistanceCenter(group.opponent.centroid))
+        .map(_.pixelCenter)
+        .getOrElse(SpecificPoints.middle))
+  }
 }

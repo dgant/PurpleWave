@@ -5,6 +5,7 @@ import Micro.Actions.Action
 import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Actions.Commands.{Gravitate, Move}
 import Micro.Decisions.Potential
+import Planning.Yolo
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -13,6 +14,7 @@ object Sneak extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     unit.cloaked
     && unit.canMove
+    && ! Yolo.active
     && ! unit.matchups.allies.exists(_.is(Protoss.Arbiter))
     && ! unit.agent.canBerzerk
     && ! unit.matchups.threats.forall(_.unitClass.isWorker)

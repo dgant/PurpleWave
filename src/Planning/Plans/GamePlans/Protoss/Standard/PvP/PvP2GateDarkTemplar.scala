@@ -13,6 +13,7 @@ import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuousl
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Protoss.BuildCannonsAtNatural
 import Planning.Plans.Predicates.Milestones.{EnemyUnitsAtMost, MiningBasesAtLeast, UnitsAtLeast, UnitsAtMost}
+import Planning.Plans.Scouting.ScoutOn
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvPOpen2GateDTExpand
 
@@ -21,7 +22,7 @@ class PvP2GateDarkTemplar extends GameplanModeTemplate {
   override val activationCriteria = new Employing(PvPOpen2GateDTExpand)
   override val completionCriteria = new MiningBasesAtLeast(2)
   override val defaultWorkerPlan  = NoPlan()
-  override val scoutAt            = 14
+  override val defaultScoutPlan   = new ScoutOn(Protoss.Gateway)
   override val defaultAttackPlan  = new Trigger(new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true), initialAfter = new Attack)
   override def blueprints = Vector(
     new Blueprint(this, building = Some(Protoss.Pylon),   placement = Some(PlacementProfiles.backPylon)),

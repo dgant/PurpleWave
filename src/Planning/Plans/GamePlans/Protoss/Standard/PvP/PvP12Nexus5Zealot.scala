@@ -32,12 +32,12 @@ class PvP12Nexus5Zealot extends GameplanModeTemplate {
     }
   }
   
-  override val activationCriteria : Plan = new Employing(PvPOpen12Nexus5Zealot)
-  override val completionCriteria : Plan = new Latch(new Or(new UnitsAtLeast(3, Protoss.PhotonCannon, complete = true), new EnemyBasesAtLeast(2)))
-  override def defaultScoutPlan   : Plan = new ScoutOn(Protoss.Gateway, quantity = 2)
-  override def defaultSupplyPlan: Plan = NoPlan()
-  override def defaultWorkerPlan: Plan = NoPlan()
-  override def defaultPlacementPlan: Plan = new PylonAtNatural
+  override val activationCriteria   : Plan = new Employing(PvPOpen12Nexus5Zealot)
+  override val completionCriteria   : Plan = new Latch(new Or(new UnitsAtLeast(3, Protoss.PhotonCannon, complete = true), new EnemyBasesAtLeast(2)))
+  override def defaultScoutPlan     : Plan = new ScoutOn(Protoss.Gateway, quantity = 2)
+  override def defaultSupplyPlan    : Plan = NoPlan()
+  override def defaultWorkerPlan    : Plan = NoPlan()
+  override def defaultPlacementPlan : Plan = new PylonAtNatural
   
   override def emergencyPlans: Seq[Plan] = Seq(new PvPIdeas.ReactToDarkTemplarEmergencies)
   

@@ -5,7 +5,7 @@ import Mathematics.Points.{Pixel, Tile}
 import Performance.Cache
 import ProxyBwapi.Players.Players
 import ProxyBwapi.Players.PlayerInfo
-import ProxyBwapi.Races.Protoss
+import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
 import bwapi.{Position, UnitCommand}
 
@@ -115,7 +115,9 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo (o
   
   def scarabCount       : Int = if (is(Protoss.Reaver)) 3 else 0 // BWAPI probably doens't give this for enemy units. Here's an approximation.
   def interceptorCount  : Int = interceptorCountCache()
-  private val interceptorCountCache = new Cache(() => if (is(Protoss.Carrier)) baseUnit.getInterceptorCount else 0)
+  def spiderMines       : Int = spiderMineCountCache()
+  private val interceptorCountCache = new Cache(() => if (is(Protoss.Carrier))  baseUnit.getInterceptorCount  else 0)
+  private val spiderMineCountCache  = new Cache(() => if (is(Terran.Vulture))   baseUnit.getSpiderMineCount   else 0)
   
   private def updateCombat() {
     _attackStarting           = baseUnit.isStartingAttack

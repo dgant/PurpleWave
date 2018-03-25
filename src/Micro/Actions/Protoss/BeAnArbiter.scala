@@ -1,7 +1,8 @@
 package Micro.Actions.Protoss
 
 import Debugging.Visualizations.ForceColors
-import Mathematics.Physics.ForceMath
+import Lifecycle.With
+import Mathematics.Physics.{Force, ForceMath}
 import Micro.Actions.Action
 import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Actions.Combat.Techniques.Avoid
@@ -9,31 +10,33 @@ import Micro.Actions.Commands.{Gravitate, Move}
 import Micro.Decisions.Potential
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import Utilities.EnrichPixel._
 
 object BeAnArbiter extends Action {
   
-  override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.aliveAndComplete     &&
-    unit.is(Protoss.Arbiter)  &&
-    unit.matchups.enemies.exists(_.matchups.targets.nonEmpty)
-  }
+  override def allowed(unit: FriendlyUnitInfo): Boolean = (
+    unit.aliveAndComplete
+    && unit.is(Protoss.Arbiter)
+    && unit.matchups.enemies.exists(_.matchups.targets.nonEmpty)
+  )
   
   override protected def perform(unit: FriendlyUnitInfo) {
     Potshot.consider(unit)
     
-    val presumedDelay = 48.0
+    val threatened      = unit.matchups.framesOfSafetyDiffused <= 0.0
+    val umbrellable     = (u: UnitInfo) => ! u.unitClass.isBuilding && u != unit && ! u.is(Protoss.Interceptor) && ! u.is(Protoss.Arbiter)
+    val friends         = unit.teammates.filter(umbrellable)
     
-    lazy val threatened   = unit.matchups.framesOfSafetyDiffused <= 0.0
-    lazy val umbrellable  = (u: UnitInfo) => ! u.unitClass.isBuilding && u != unit && ! u.is(Protoss.Interceptor) && ! u.is(Protoss.Arbiter)
-    lazy val friends      = unit.teammates.filter(umbrellable)
-
     if (friends.nonEmpty) {
-      val forcesUmbrella = friends.map(friend =>
-        Potential.unitAttraction(
-          unit,
-          friend,
-          Math.max(1.0, 48.0 + friend.matchups.framesOfEntanglementDiffused)))
-      
+      val friendCentroid = friends.map(_.pixelCenter).centroid
+      unit.agent.toTravel = Some(friendCentroid)
+    }
+    
+    val framesOfSafetyRequired = Math.max(0, 48 - With.framesSince(unit.lastFrameTakingDamage))
+    if (unit.matchups.framesOfSafetyDiffused <= framesOfSafetyRequired) {
+      Avoid.delegate(unit)
+    }
+    else if (friends.nonEmpty) {
       val forcesThreats = unit.matchups.enemies
         .map(enemy =>
           Potential.unitAttraction(
@@ -42,17 +45,13 @@ object BeAnArbiter extends Action {
             enemy.matchups.targets.size
             + 2.0 * enemy.matchups.targetsInRange.size))
   
-      val forceUmbrella = ForceMath.sum(forcesUmbrella).normalize
-      val forceThreats  = ForceMath.sum(forcesThreats).normalize(0.5)
-      val forceForward  = ForceMath.fromPixels(unit.pixelCenter, unit.agent.destination, 0.5)
+      val forceUmbrella = new Force(unit.agent.destination.subtract(unit.pixelCenter)).normalize
+      val forceThreats  = ForceMath.sum(forcesThreats)
       unit.agent.forces.put(ForceColors.regrouping, forceUmbrella)
       unit.agent.forces.put(ForceColors.threat,     forceThreats)
-      unit.agent.forces.put(ForceColors.target,     forceForward)
       Gravitate.consider(unit)
     }
-    if (threatened) {
-      Avoid.consider(unit)
-    }
+    
     Move.delegate(unit)
   }
 }

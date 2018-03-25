@@ -2,6 +2,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvE
 
 import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
+import Planning.Plans.Army.Aggression
 import Planning.Plans.Compound.{Or, _}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.Situational.PlaceGatewaysProxied
@@ -22,7 +23,6 @@ class Proxy2Gate extends GameplanModeTemplate {
   override val activationCriteria = new Employing(PvROpenProxy2Gate, PvTProxy2Gate, PvPOpenProxy2Gate, PvZProxy2Gate)
   override val completionCriteria = new UpgradeComplete(Protoss.DragoonRange, 1, Protoss.DragoonRange.upgradeFrames(1))
   override def defaultScoutPlan   = new If(new UnitsAtLeast(2, Protoss.Gateway), new Scout)
-  override val aggression         = 1.2
   override def defaultSupplyPlan: Plan = NoPlan()
   override def defaultWorkerPlan: Plan = NoPlan()
   
@@ -44,6 +44,10 @@ class Proxy2Gate extends GameplanModeTemplate {
     new EnemyWalledIn)
   
   private class AfterProxy extends Parallel(
+    new If(
+      new UnitsAtLeast(1, Protoss.Dragoon, complete = true),
+      new Aggression(1.0),
+      new Aggression(1.8)),
     new RequireSufficientSupply,
     new BuildOrder(
       RequestAtLeast(1, Protoss.Gateway),

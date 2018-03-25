@@ -38,6 +38,7 @@ abstract class UnitProxy(var baseUnit: bwapi.Unit, val id: Int) {
   def interceptors: Iterable[UnitInfo]
   def interceptorCount: Int
   def scarabCount: Int
+  def spiderMines: Int
   
   def attackStarting: Boolean
   def attackAnimationHappening: Boolean

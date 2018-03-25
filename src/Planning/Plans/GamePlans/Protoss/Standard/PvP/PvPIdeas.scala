@@ -43,7 +43,11 @@ object PvPIdeas {
       new Or(
         new UnitsAtLeast(0, Protoss.Reaver),
         new UnitsAtLeast(1, Protoss.Shuttle),
-        new UnitsAtLeast(15, UnitMatchWarriors))),
+        new UnitsAtLeast(15, UnitMatchWarriors)),
+      new Or(
+        new UnitsAtMost(1, Protoss.Nexus),
+        new UnitsAtLeast(5, Protoss.Gateway),
+        new UnitsAtLeast(20, UnitMatchWarriors))),
     new Attack)
   
   class ReactToDarkTemplarEmergencies extends Parallel(new ReactToDarkTemplarExisting, new ReactToDarkTemplarPossible)
@@ -151,7 +155,7 @@ object PvPIdeas {
     new If(new UnitsAtMost(0, Protoss.PhotonCannon), new TrainContinuously(Protoss.Observer, 1)),
     new If(new Not(new EnemyCarriers), new TrainDarkTemplar),
     new If(new UnitsAtLeast(12, UnitMatchWarriors), new TrainContinuously(Protoss.Arbiter, 8, 2)),
-    new If(new Not(new EnemyCarriers), new TrainContinuously(Protoss.Reaver, 4)),
+    new If(new Not(new EnemyCarriers), new TrainContinuously(Protoss.Reaver, 2)),
     new If(new UnitsAtLeast(12, UnitMatchWarriors), new TrainContinuously(Protoss.HighTemplar, 6, 2)),
     new TrainDragoonsOrZealots,
     new TrainContinuously(Protoss.Observer, 2)

@@ -16,9 +16,9 @@ object Ignore extends ActionTechnique {
   override val activator = One
   
   override def applicabilitySelf(unit: FriendlyUnitInfo): Double = (
-    unit.matchups.framesOfSafetyDiffused
-      / GameTime(0, 8)()
-      / (if (With.grids.enemyVision.isSet(unit.tileIncludingCenter)) 2.0 else 1.0)
+    (if (With.grids.enemyVision.isSet(unit.tileIncludingCenter)) 1.0 else 2.0)
+    * unit.matchups.framesOfSafetyDiffused
+    / GameTime(0, 10)()
   )
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {

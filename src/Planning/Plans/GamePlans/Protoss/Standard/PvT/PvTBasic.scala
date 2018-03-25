@@ -158,6 +158,9 @@ class PvTBasic extends GameplanModeTemplate {
       new Build(RequestAtLeast(3, Protoss.Stargate))),
     new RequireMiningBases(4),
     new If(
+      new EmployingCarriers,
+      new OnGasPumps(4, new Build(RequestAtLeast(2, Protoss.CyberneticsCore)))),
+    new If(
       new Or(
         new Employing(PvT2BaseCarrier),
         new Employing(PvT3BaseCarrier)),

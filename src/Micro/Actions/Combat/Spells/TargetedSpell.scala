@@ -15,6 +15,7 @@ abstract class TargetedSpell extends Action {
   protected def aoe             : Boolean
   protected def castRangeTiles  : Int
   protected def thresholdValue  : Double
+  protected def frameDuration   : Double = 0.0
   
   protected def valueTarget(target: UnitInfo): Double
   
@@ -39,7 +40,7 @@ abstract class TargetedSpell extends Action {
     val totalRange      = safeDistance + 32.0 * castRangeTiles
     
     if (aoe) {
-      val targetPixel = TargetAOE.chooseTargetPixel(unit, totalRange, thresholdValue, valueTarget)
+      val targetPixel = TargetAOE.chooseTargetPixel(unit, totalRange, thresholdValue, valueTarget, frameDuration * 0.5)
       targetPixel.foreach(With.commander.useTechOnPixel(unit, tech, _))
       targetPixel.foreach(onCast(unit, _))
     }

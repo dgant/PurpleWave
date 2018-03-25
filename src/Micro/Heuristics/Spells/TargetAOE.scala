@@ -6,15 +6,20 @@ import Utilities.EnrichPixel.EnrichedPixelCollection
 
 object TargetAOE {
   
+  def projectTarget(target: UnitInfo, framesAhead: Double): Pixel = {
+    target.projectFrames(framesAhead)
+  }
+  
   def chooseTargetPixel(
     caster              : UnitInfo,
     searchRadiusPixels  : Double,
     minimumValue        : Double,
-    evaluate            : (UnitInfo) => Double)
+    evaluate            : (UnitInfo) => Double,
+    projectionFrames    : Double = 0.0)
     : Option[Pixel] = {
     
     val targets       = caster.matchups.allUnits.filter(target => (target.visible || target.burrowed) && target.pixelDistanceCenter(caster) <= searchRadiusPixels)
-    val targetsByTile = targets.groupBy(_.tileIncludingCenter)
+    val targetsByTile = targets.groupBy(projectTarget(_, projectionFrames).tileIncluding)
     val targetValues  = targets.map(target => (target, evaluate(target))).toMap
     
     val valueByTile = targetsByTile.keys

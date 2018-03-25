@@ -21,6 +21,7 @@ object FallBack extends ActionTechnique {
   
   override def applicabilitySelf(unit: FriendlyUnitInfo): Double = {
     if (unit.is(Protoss.Dragoon)) return 1.0
+    if (unit.is(Protoss.Reaver)) return 1.0
     if (unit.is(Terran.Vulture)) return 1.0
     if (unit.is(Terran.SiegeTankUnsieged)) return 1.0
     0.0

@@ -13,15 +13,16 @@ import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Predicates.Economy.GasAtMost
 import Planning.Plans.Predicates.Milestones._
 import Planning.Plans.Predicates.Reactive.EnemyCarriers
-import Planning.Plans.Predicates.{Employing, SafeAtHome}
+import Planning.Plans.Predicates.{Employing, SafeAtHome, SafeToAttack}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.{PvPLateGameCarrier, PvPLateGameGateway}
 
 class PvPLateGame extends GameplanModeTemplate {
   
   override val scoutExpansionsAt = 90
-  
   override val emergencyPlans: Vector[Plan] = Vector(new ReactToDarkTemplarEmergencies)
+  
+  override def aggression: Double = 0.8
   
   override def priorityAttackPlan: Plan = new PvPIdeas.AttackWithDarkTemplar
   override val defaultAttackPlan = new PvPIdeas.AttackSafely
@@ -95,7 +96,7 @@ class PvPLateGame extends GameplanModeTemplate {
         new BuildTech)),
     
     new FlipIf(
-      new SafeAtHome,
+      new SafeToAttack,
       new Build(RequestAtLeast(8, Protoss.Gateway)),
       new RequireMiningBases(3)),
       

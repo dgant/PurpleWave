@@ -97,7 +97,9 @@ class BattleClusteringState(seedUnits: Set[UnitInfo]) {
   }
   
   @inline
-  private def areOppositeTeams(a: UnitInfo, b: UnitInfo): Boolean = {
+  private def areOppositeTeams(a: UnitInfo, b: UnitInfo): Boolean = (
     a.isFriendly != b.isFriendly
-  }
+    && ! a.isNeutral
+    && ! b.isNeutral
+  )
 }

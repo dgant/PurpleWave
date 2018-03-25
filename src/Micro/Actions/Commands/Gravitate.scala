@@ -13,17 +13,17 @@ object Gravitate extends Action {
     && unit.agent.forces.nonEmpty
   )
   
-  private val rayDistance = 32.0 * 2.5
+  private val rayDistance = 32.0 * 3.0
   private val cardinal8directions = (0.0 until 2.0 by 0.25).map(_ * Math.PI).toVector
 
   
   override def perform(unit: FriendlyUnitInfo) {
     val framesAhead       = With.reaction.agencyAverage + 1
-    val distanceRequired  = unit.unitClass.haltPixels + framesAhead * (unit.topSpeed + framesAhead * unit.unitClass.accelerationFrames / 2)
+    val minDistance       = unit.unitClass.haltPixels + framesAhead * (unit.topSpeed + 0.5 * framesAhead * unit.topSpeed / Math.max(1, unit.unitClass.accelerationFrames))
     val forces            = unit.agent.forces.values
     val origin            = unit.pixelCenter
     val forceTotal        = ForceMath.sum(forces)
-    val rayLength         = Math.max(rayDistance, distanceRequired)
+    val rayLength         = Math.max(rayDistance, minDistance)
     
     def makeRay(radians: Double): PixelRay = {
       PixelRay(unit.pixelCenter, unit.pixelCenter.radiateRadians(radians, rayLength))
@@ -34,13 +34,13 @@ object Gravitate extends Action {
     lazy val rayWalkable  = ray.tilesIntersected.forall(With.grids.walkable.get)
     
     if (unit.flying || rayWalkable) {
-      val destination = unit.pixelCenter.add(forceTotal.normalize(distanceRequired).toPoint)
+      val destination = unit.pixelCenter.add(forceTotal.normalize(rayLength).toPoint)
       unit.agent.toTravel = Some(destination)
       return
     }
     
     val angles          = cardinal8directions.filter(r => Math.abs(r - forceRadians) <= Math.PI / 2.0)
-    val paths           = angles.map(makeRay)
+    val paths           = angles.map(makeRay) :+ ray
     val pathsTruncated  = paths.map(ray =>
       PixelRay(
         ray.from,

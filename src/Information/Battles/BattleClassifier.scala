@@ -64,7 +64,6 @@ class BattleClassifier {
       .filter(_.teams.forall(_.units.exists(_.canAttack)))
   }
   
-  
   private def replaceBattleGlobal() {
     nextBattleGlobal.foreach(global = _)
     global = new BattleGlobal(

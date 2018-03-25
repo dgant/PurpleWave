@@ -16,7 +16,7 @@ class Simulation(
   
   private def buildSimulacra(team: Team) = team.units.filter(legalForSimulation).map(new Simulacrum(this, _))
   private def legalForSimulation(unit: UnitInfo): Boolean = {
-    unit.invincible && ! unit.is(Protoss.Interceptor)
+    ! unit.invincible && ! unit.is(Protoss.Interceptor)
   }
   
   val estimation            : Prediction          = new Prediction
@@ -33,8 +33,6 @@ class Simulation(
     (unitsOurs.filter(_.canMove) ++ unitsEnemy)
       .map(simulacrum => (simulacrum.realUnit, simulacrum))
       .toMap
-  
-  
   
   def complete: Boolean = (
     estimation.frames > With.configuration.battleEstimationFrames

@@ -6,15 +6,13 @@ import ProxyBwapi.Races.Protoss
 
 class EnemyDarkTemplarPossible extends Plan {
   
-  description.set("Is the enemy threatening Dark Templar?")
-  
   override def isComplete: Boolean = {
-    With.units.enemy.exists(unit =>
-      unit.is(Protoss.DarkTemplar)      ||
-      unit.is(Protoss.HighTemplar)      ||
-      unit.is(Protoss.Archon)           ||
-      unit.is(Protoss.DarkArchon)       ||
-      unit.is(Protoss.CitadelOfAdun)    ||
-      unit.is(Protoss.TemplarArchives))
+    With.units.enemy.exists(_.isAny(
+      Protoss.DarkTemplar,
+      Protoss.HighTemplar,
+      Protoss.Archon,
+      Protoss.DarkArchon,
+      Protoss.CitadelOfAdun,
+      Protoss.TemplarArchives))
   }
 }

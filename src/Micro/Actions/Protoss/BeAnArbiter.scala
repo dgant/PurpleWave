@@ -52,7 +52,7 @@ object BeAnArbiter extends Action {
         32 * 15,
         Double.NegativeInfinity,
         evaluateForCloaking,
-        12,
+        24,
         (tile) => Circle.points(3).map(tile.add))
       unit.agent.toTravel = destination.orElse(
         Some(needUmbrella

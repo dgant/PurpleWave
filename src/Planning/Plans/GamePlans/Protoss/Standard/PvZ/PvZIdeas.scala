@@ -10,6 +10,7 @@ import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Protoss.BuildCannonsAtExpansions
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
+import Planning.Plans.Predicates.Economy.GasAtLeast
 import Planning.Plans.Predicates.Milestones._
 import Planning.Plans.Predicates.Reactive.EnemyMutalisks
 import Planning.Plans.Predicates.{SafeAtHome, SafeToAttack}
@@ -111,13 +112,13 @@ object PvZIdeas {
         new TrainContinuously(Protoss.Stargate, 1))),
     
     // Upgrades
-    new UpgradeContinuously(Protoss.GroundDamage),
-    new If(new UnitsAtLeast(1, Protoss.Corsair), new UpgradeContinuously(Protoss.AirDamage)),
     new If(
       new Or(
         new UnitsAtLeast(2, Protoss.Forge),
         new UpgradeComplete(Protoss.GroundDamage, 3)),
       new UpgradeContinuously(Protoss.GroundArmor)),
+    new UpgradeContinuously(Protoss.GroundDamage),
+    new If(new UnitsAtLeast(1, Protoss.Corsair), new UpgradeContinuously(Protoss.AirDamage)),
     
     // Basic army
     new TrainContinuously(Protoss.DarkTemplar, 1),
@@ -130,7 +131,10 @@ object PvZIdeas {
       new Or(
         new UnitsAtMost(10, Protoss.HighTemplar),
         new UnitsAtMost(8, Protoss.Archon)),
-      new TrainContinuously(Protoss.HighTemplar, 20, 3)),
+      new If(
+        new GasAtLeast(200),
+        new TrainContinuously(Protoss.HighTemplar, 20, 3),
+        new TrainContinuously(Protoss.HighTemplar, 20, 1))),
     new BuildCannonsAtExpansions(5),
     new TrainContinuously(Protoss.Zealot),
     new If(

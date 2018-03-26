@@ -14,7 +14,6 @@ class ForeignUnitTracker {
   
   private val unitsByIdKnown = new mutable.HashMap[Int, ForeignUnitInfo].empty
   
-  var foreignUnits    : Set[ForeignUnitInfo] = new HashSet[ForeignUnitInfo]
   var enemyUnits      : Set[ForeignUnitInfo] = new HashSet[ForeignUnitInfo]
   var neutralUnits    : Set[ForeignUnitInfo] = new HashSet[ForeignUnitInfo]
   var enemyGhostUnits : Set[Int]             = new HashSet[Int]
@@ -33,9 +32,8 @@ class ForeignUnitTracker {
     unitsToUpdate.foreach(pair => unitsByIdKnown(pair._1).update(pair._2))
   
     //Could speed things up by diffing instead of recreating these
-    foreignUnits = unitsByIdKnown.values.toSet
-    enemyUnits   = foreignUnits.filter(_.player.isEnemy)
-    neutralUnits = foreignUnits.filter(_.player.isNeutral)
+    enemyUnits   = unitsByIdKnown.values.filter(_.player.isEnemy).toSet
+    neutralUnits = unitsByIdKnown.values.filter(_.player.isNeutral).toSet
   
     unitsToFlagInvisible.foreach(_._2.flagInvisible())
     invalidatePositions()
@@ -46,7 +44,7 @@ class ForeignUnitTracker {
   }
   
   private def invalidatePositions() {
-    foreignUnits.foreach(updateMissing)
+    unitsByIdKnown.values.foreach(updateMissing)
   }
   
   private def initialize() {

@@ -30,7 +30,8 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo (o
   
   private var updateCount = 0
   private def updateTimeInsensitiveInformation() {
-    if (updateCount % With.configuration.foreignUnitUpdatePeriod == 0) {
+    if (updateCount == 0
+      || (updateCount + id) % With.configuration.foreignUnitUpdatePeriod == 0) {
       updateTracking()
       updateVisibility()
       updateHealth()
@@ -245,7 +246,7 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo (o
   ////////////////
   
   private def updateVisibility() {
-    _burrowed = baseUnit.isBurrowed
+    _burrowed = unitClass.canBurrow && baseUnit.isBurrowed
     _cloaked  = baseUnit.isCloaked
     _detected = baseUnit.isDetected
     _visible  = baseUnit.isVisible

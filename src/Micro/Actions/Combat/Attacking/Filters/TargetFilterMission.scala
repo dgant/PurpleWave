@@ -26,8 +26,9 @@ object TargetFilterMission extends TargetFilter {
   
     lazy val targetBusy       = target.gathering || target.constructing || target.repairing
     lazy val targetCatchable  = actor.topSpeed >= target.topSpeed || actor.inRangeToAttack(target) || targetBusy || alliesAssisting
+    lazy val targetReachable  = target.visible || actor.flying || ! target.flying || With.grids.walkable.get(target.tileIncludingCenter)
     
-    val output = (targetCatchable || atOurWorkers) && (pillaging || arrived || inRange || engaged || isNearbyMine)
+    val output = targetReachable && (targetCatchable || atOurWorkers) && (pillaging || arrived || inRange || engaged || isNearbyMine)
     
     output
   }

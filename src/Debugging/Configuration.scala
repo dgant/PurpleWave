@@ -27,7 +27,9 @@ class Configuration {
   /////////////
   
   var avatarBattleDistancePixels    = 32.0 * 6.0
-  var battleMarginTiles             = 20
+  var battleMarginTileBase          = 5
+  var battleMarginTileMinimum       = 25
+  var battleMarginTileMaximum       = 40
   var battleEstimationFrames        = GameTime(0, 8)()
   var battleHysteresisFrames        = GameTime(0, 3)()
   var battleHysteresisRatio         = 0.175

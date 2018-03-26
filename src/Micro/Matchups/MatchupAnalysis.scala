@@ -1,5 +1,6 @@
 package Micro.Matchups
 
+import Information.Battles.BattleClassificationFilters
 import Information.Battles.Types.{Battle, Team}
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
@@ -34,14 +35,16 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
     hypotheticalMatchups(hypotheticalConditions)
   }
   
+  // Default is necessary for killing empty bases because no Battle is happening
+  lazy val defaultUnits           : Vector[UnitInfo]      = if (me.canAttack) me.zone.units.toVector.filter(u => u.isEnemy && BattleClassificationFilters.isEligibleLocal(u)) else Vector.empty
   lazy val battle                 : Option[Battle]        = me.battle.orElse(With.matchups.entrants.find(_._2.contains(me)).map(_._1))
   lazy val team                   : Option[Team]          = battle.map(_.teamOf(me))
-  lazy val defaultUnits           : Vector[UnitInfo]      = Vector.empty // me.zone.units.toVector.filter(BattleClassificationFilters.isEligibleLocal)
   lazy val enemies                : Vector[UnitInfo]      = team.map(_.opponent.units).getOrElse(defaultUnits.filter(_.isEnemyOf(me)))
-  lazy val alliesIncludingSelf    : Vector[UnitInfo]      = team.map(_.units).getOrElse(defaultUnits.filter(u => u.isFriendly && u != me) :+ me)
-  lazy val allies                 : Vector[UnitInfo]      = alliesIncludingSelf.filterNot(_.id == me.id)
+  lazy val alliesInclSelf         : Vector[UnitInfo]      = team.map(_.units).getOrElse(defaultUnits.filter(u => u.isFriendly && u != me) :+ me)
+  lazy val alliesInclSelfCloaked  : Vector[UnitInfo]      = alliesInclSelf.filter(_.cloaked)
+  lazy val allies                 : Vector[UnitInfo]      = alliesInclSelf.filterNot(_.id == me.id)
   lazy val others                 : Vector[UnitInfo]      = enemies ++ allies
-  lazy val allUnits               : Vector[UnitInfo]      = enemies ++ alliesIncludingSelf
+  lazy val allUnits               : Vector[UnitInfo]      = enemies ++ alliesInclSelf
   lazy val enemyDetectors         : Vector[UnitInfo]      = enemies.filter(e => e.aliveAndComplete && e.unitClass.isDetector)
   lazy val threats                : Vector[UnitInfo]      = enemies.filter(_.canAttack(me))
   lazy val targets                : Vector[UnitInfo]      = enemies.filter(me.canAttack)

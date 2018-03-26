@@ -18,13 +18,6 @@ class TargetAction(val additionalFiltersRequired: TargetFilter*) extends Action 
     var filtersOptional = Vector(TargetFilterCombatants, TargetFilterIgnoreScouts)
     val filtersRequired = Vector(TargetFilterStayCloaked, TargetFilterMission, TargetFilterAlmostAnything) ++ additionalFiltersRequired
     
-    // For debugging
-    def audit = (filtersOptional ++ filtersRequired).map(f => (
-      f,
-      unit.matchups.targets.filter(t => f.legal(unit, t)),
-      unit.matchups.targets.filterNot(t => f.legal(unit, t))
-    ))
-    
     do {
       val filters: Vector[TargetFilter] = if (Yolo.active) Vector.empty else filtersOptional ++ filtersRequired
       ApplyTargetFilters(unit, filters)

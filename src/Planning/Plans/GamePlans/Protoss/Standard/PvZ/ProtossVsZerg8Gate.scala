@@ -26,10 +26,10 @@ class ProtossVsZerg8Gate extends GameplanModeTemplate {
       RequestAtLeast(1, Protoss.CitadelOfAdun),
       RequestUpgrade(Protoss.DragoonRange),
       RequestUpgrade(Protoss.ZealotSpeed),
-      RequestAtLeast(8, Protoss.Gateway),
-      RequestAtLeast(1, Protoss.TemplarArchives)),
-    new BuildGasPumps,
-    new UpgradeContinuously(Protoss.GroundDamage))
+      RequestAtLeast(6, Protoss.Gateway),
+      RequestAtLeast(1, Protoss.TemplarArchives),
+      RequestAtLeast(8, Protoss.Gateway)),
+    new BuildGasPumps)
       
   class LateTech extends Parallel(
     new Build(

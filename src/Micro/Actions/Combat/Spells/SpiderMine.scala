@@ -69,7 +69,7 @@ object SpiderMine extends Action {
     if (victims.isEmpty) return
     
     // TODO: Also capture other threats in range of targets like siege tanks
-    val saboteurs = vulture.matchups.alliesIncludingSelf.filter(u => u.is(Terran.Vulture) && u.friendly.exists(_.spiderMines > 0))
+    val saboteurs = vulture.matchups.alliesInclSelf.filter(u => u.is(Terran.Vulture) && u.friendly.exists(_.spiderMines > 0))
     val minesweepers = vulture.matchups.threats.count(_.pixelRangeGround > 32 * 4)
     if (saboteurs.size < minesweepers) return
     

@@ -219,7 +219,12 @@ class Commander {
   def useTechOnUnit(unit: FriendlyUnitInfo, tech: Tech, target: UnitInfo) {
     if (unready(unit)) return
     unit.baseUnit.useTech(tech.baseType, target.baseUnit)
-    sleep(unit)
+    if (tech == Protoss.ArchonMeld || tech == Protoss.DarkArchonMeld) {
+      sleep(unit, 48)
+    }
+    else {
+      sleep(unit)
+    }
   }
   
   def useTechOnPixel(unit: FriendlyUnitInfo, tech: Tech, target: Pixel) {

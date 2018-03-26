@@ -1,7 +1,9 @@
 package Information.Battles.Clustering
 
 import Lifecycle.With
+import Mathematics.PurpleMath
 import Mathematics.Shapes.Circle
+import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
 
 import scala.annotation.tailrec
@@ -86,13 +88,12 @@ class BattleClusteringState(seedUnits: Set[UnitInfo]) {
   
   private def radiusTiles(unit: UnitInfo): Int ={
     val tilesDetecting  = if (unit.unitClass.isDetector) 11 else 0
-    val tilesCasting    = if (unit.unitClass.isSpellcaster) 32 * 8 else 0
-    val tilesAttacking  = unit.pixelRangeMax.toInt / 32
-    val tilesMoving     = (unit.topSpeed * 24 * 4 / 32).toInt
-    val tilesMargin     = 4 * Math.max(36,  With.reaction.framesTotal)
-    val tilesCustom     = tilesMargin + tilesMoving + Vector(tilesCasting, tilesAttacking, tilesDetecting).max
-    val tilesLimit      = With.configuration.battleMarginTiles
-    val output          = Math.min(tilesLimit, tilesCustom)
+    val tilesCasting    = if (unit.unitClass.isSpellcaster) 10 else 0
+    val tilesAttacking  = Math.ceil(unit.pixelRangeMax / 32).toInt
+    val tilesSpeed      = if (unit.is(Protoss.Interceptor)) 8 else (unit.topSpeed * With.reaction.clusteringMax / 32).toInt
+    val tilesMargin     = Math.max(tilesSpeed, With.configuration.battleMarginTileBase)
+    val tilesCustom     = tilesMargin + Vector(tilesCasting, tilesAttacking, tilesDetecting).max
+    val output          = PurpleMath.clamp(tilesCustom, With.configuration.battleMarginTileMinimum, With.configuration.battleMarginTileMaximum)
     output
   }
   

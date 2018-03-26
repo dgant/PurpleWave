@@ -8,7 +8,7 @@ object TargetHeuristicDetectors extends TargetHeuristic {
   
   override def evaluate(unit: FriendlyUnitInfo, candidate: UnitInfo): Double = {
     
-    val cloakedFighter = unit.matchups.alliesIncludingSelf.find(ally => ally.cloaked && ally.matchups.targets.nonEmpty)
+    val cloakedFighter = unit.matchups.alliesInclSelfCloaked.find(_.matchups.targets.nonEmpty)
     
     if (cloakedFighter.isEmpty) return HeuristicMathMultiplicative.default
     

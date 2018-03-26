@@ -11,7 +11,7 @@ import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Protoss.BuildCannonsAtExpansions
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Predicates.Economy.GasAtLeast
-import Planning.Plans.Predicates.Milestones._
+import Planning.Plans.Predicates.Milestones.{EnemyHasShownCloakedThreat, _}
 import Planning.Plans.Predicates.Reactive.EnemyMutalisks
 import Planning.Plans.Predicates.{SafeAtHome, SafeToAttack}
 import ProxyBwapi.Races.{Protoss, Zerg}
@@ -51,11 +51,10 @@ object PvZIdeas {
       new UnitsAtLeast(40, UnitMatchWarriors, complete = true)),
     new RequireMiningBases(4))
   
-  class BuildDetectionForLurkers extends Parallel(
+  class ReactToLurkers extends Parallel(
     new If(
       new Or(
-        new EnemyHasShown(Zerg.Lurker),
-        new EnemyHasShown(Zerg.LurkerEgg),
+        new EnemyHasShownCloakedThreat,
         new And(
           new SafeAtHome,
           new EnemyHasShown(Zerg.Hydralisk),
@@ -76,6 +75,16 @@ object PvZIdeas {
       new Parallel(
         new TrainContinuously(Protoss.Observer, 3),
         new UpgradeContinuously(Protoss.ObserverSpeed))))
+  
+  class ReactToMutalisks extends If(
+    new EnemyMutalisks,
+    new Build(
+      RequestAtLeast(1, Protoss.Assimilator),
+      RequestAtLeast(1, Protoss.CyberneticsCore)),
+    new Parallel(
+      new TrainMatchingRatio(Protoss.Corsair, 3, 8,   Seq(MatchingRatio(Zerg.Mutalisk, 0.9))),
+      new TrainMatchingRatio(Protoss.Dragoon, 0, 10,  Seq(MatchingRatio(Zerg.Mutalisk, 1.25))),
+      new TrainContinuously(Protoss.Stargate, 1)))
   
   class AddEarlyCannons extends If(
     new UnitsAtMost(2, Protoss.Gateway, complete = true),
@@ -102,14 +111,6 @@ object PvZIdeas {
           new SafeAtHome,
           new UpgradeContinuously(Protoss.ObserverSpeed))),
       new TrainContinuously(Protoss.Observer, 1)),
-    
-    // Emergency Dragoons
-    new If(
-      new EnemyMutalisks,
-      new Parallel(
-        new TrainMatchingRatio(Protoss.Corsair, 3, 8,   Seq(MatchingRatio(Zerg.Mutalisk, 0.9))),
-        new TrainMatchingRatio(Protoss.Dragoon, 0, 10,  Seq(MatchingRatio(Zerg.Mutalisk, 1.25))),
-        new TrainContinuously(Protoss.Stargate, 1))),
     
     // Upgrades
     new If(

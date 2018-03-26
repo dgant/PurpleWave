@@ -87,12 +87,12 @@ object ProtossChoices {
   )
   
   val pvzOpenersTransitioningFrom1Gate = Vector(
+    PvZ4Gate99,
     PvZ4GateDragoonAllIn
   )
   
   val pvzOpenersTransitioningFrom2Gate = Vector(
-    //PvZEarly2Gate,
-    //PvZEarly2Gate99,
+    PvZ4Gate99,
     PvZ4GateDragoonAllIn
   )
   

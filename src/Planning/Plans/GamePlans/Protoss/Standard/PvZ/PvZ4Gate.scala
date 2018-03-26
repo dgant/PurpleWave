@@ -10,7 +10,7 @@ import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.GamePlans.Protoss.Situational.BuildHuggingNexus
-import Planning.Plans.Macro.Automatic.TrainContinuously
+import Planning.Plans.Macro.Automatic.{TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.BuildOrders._
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
@@ -19,7 +19,7 @@ import Planning.Plans.Predicates.Employing
 import Planning.Plans.Predicates.Milestones._
 import Planning.Plans.Scouting.ScoutOn
 import ProxyBwapi.Races.{Protoss, Zerg}
-import Strategery.Strategies.Protoss.PvZ4GateDragoonAllIn
+import Strategery.Strategies.Protoss.{PvZ4Gate99, PvZ4GateDragoonAllIn}
 
 class PvZ4Gate extends GameplanModeTemplate {
   
@@ -27,17 +27,18 @@ class PvZ4Gate extends GameplanModeTemplate {
   override val completionCriteria     = new Latch(new MiningBasesAtLeast(2))
   override val scoutExpansionsAt      = 90
   override def buildOrder             = ProtossBuilds.OpeningTwoGate1012
+  override def defaultWorkerPlan      = NoPlan()
   override def defaultScoutPlan       = new ScoutOn(Protoss.Pylon)
   override def defaultPlacementPlan   = new BuildHuggingNexus
   override def defaultAggressionPlan  = new If(
     new UnitsAtMost(8, UnitMatchWarriors, complete = true),
-    new Aggression(1.3),
+    new Aggression(1.2),
     new If(
       new UnitsAtMost(10, UnitMatchWarriors, complete = true),
-      new Aggression(1.5),
+      new Aggression(1.4),
       new If(
         new UnitsAtMost(15, UnitMatchWarriors, complete = true),
-        new Aggression(2.2),
+        new Aggression(2.0),
         new Aggression(3.0))))
   
   override def defaultAttackPlan: Plan = new If(
@@ -56,21 +57,30 @@ class PvZ4Gate extends GameplanModeTemplate {
         RequestAtLeast(1, Protoss.Observatory),
         RequestAtLeast(2, Protoss.Observer))),
   
-    new UpgradeContinuously(Protoss.DragoonRange),
+    new Trigger(
+      new UnitsAtLeast(24, UnitMatchWarriors),
+      new RequireMiningBases(2)),
+  
+    new If(
+      new GasAtLeast(150),
+      new UpgradeContinuously(Protoss.DragoonRange)),
+    
     new If(
       new And(
         new GasAtLeast(50),
         new UnitsAtLeast(1, Protoss.CyberneticsCore, complete = true),
+        new UpgradeComplete(Protoss.DragoonRange, 1, Protoss.DragoonRange.upgradeFrames),
         new Or(
           new UnitsAtLeast(15, Protoss.Zealot),
           new Check(() => With.units.ours.count(_.is(Protoss.Zealot)) > With.units.ours.count(_.is(Protoss.Dragoon))),
           new Check(() => With.units.enemy.count(_.is(Zerg.Mutalisk)) * 1.5 > With.units.ours.count(_.is(Protoss.Dragoon))))),
       new TrainContinuously(Protoss.Dragoon),
       new TrainContinuously(Protoss.Zealot)),
+    new TrainWorkersContinuously,
     
     new Build(
+      RequestAtLeast(1, Protoss.CyberneticsCore), // Of course, the Assimilator SHOULD go first but then we mine too much gas from it
       RequestAtLeast(1, Protoss.Assimilator),
-      RequestAtLeast(1, Protoss.CyberneticsCore),
       RequestAtLeast(4, Protoss.Gateway)),
     
     new Trigger(
@@ -79,3 +89,8 @@ class PvZ4Gate extends GameplanModeTemplate {
   )
 }
 
+class PvZ4Gate99 extends PvZ4Gate {
+  override val activationCriteria = new Employing(PvZ4Gate99)
+  override def defaultScoutPlan   = new ScoutOn(Protoss.Gateway, quantity = 2)
+  override def buildOrder         = ProtossBuilds.OpeningTwoGate99
+}

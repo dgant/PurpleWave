@@ -52,7 +52,8 @@ class ProtossVsZergSpeedlotTemplar extends GameplanModeTemplate {
         RequestUpgrade(Protoss.ScarabDamage))))
   
   override def emergencyPlans: Seq[Plan] = Seq(
-    new PvZIdeas.BuildDetectionForLurkers
+    new PvZIdeas.ReactToLurkers,
+    new PvZIdeas.ReactToMutalisks
   )
   
   override def buildPlans: Seq[Plan] = Vector(

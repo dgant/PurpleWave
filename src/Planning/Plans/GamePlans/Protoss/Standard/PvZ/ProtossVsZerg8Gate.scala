@@ -7,7 +7,7 @@ import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.BuildGasPumps
-import Planning.Plans.Macro.Protoss.{BuildCannonsAtExpansions, MeldArchons}
+import Planning.Plans.Macro.Protoss.{BuildCannonsAtExpansions, BuildCannonsAtNatural, MeldArchons}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Predicates.Milestones._
 import Planning.Plans.Predicates.{Employing, SafeAtHome}
@@ -46,7 +46,8 @@ class ProtossVsZerg8Gate extends GameplanModeTemplate {
   )
   
   override def emergencyPlans: Seq[Plan] = Seq(
-    new PvZIdeas.BuildDetectionForLurkers
+    new PvZIdeas.ReactToLurkers,
+    new PvZIdeas.ReactToMutalisks
   )
   
   override def buildPlans: Seq[Plan] = Vector(
@@ -57,6 +58,9 @@ class ProtossVsZerg8Gate extends GameplanModeTemplate {
       RequestAtLeast(1, Protoss.Forge)),
     new PvZIdeas.AddEarlyCannons,
     new BuildCannonsAtExpansions(5),
+    new If(
+      new UnitsAtLeast(3, Protoss.Nexus),
+      new BuildCannonsAtNatural(2)),
     new If(
       new UnitsAtLeast(40, UnitMatchWarriors),
       new Parallel(

@@ -32,6 +32,7 @@ object StrategyGroups {
     TvZEarly1RaxFEConservative,
     TvZEarly2Rax,
     PvPOpen3GateSpeedlots,
+    PvZ4Gate99,
     PvZEarlyFFENexusFirst,
     PvZEarlyFFEGatewayFirst,
     MassPhotonCannon,
@@ -42,7 +43,7 @@ object StrategyGroups {
 }
 
 class TestingPlaybook extends EmptyPlaybook {
-  val strategiesToTest: Seq[Strategy] = Seq(PvTDTExpand, PvT2BaseArbiter, PvZ4GateDragoonAllIn, PvZMidgameGatewayAttack)
+  val strategiesToTest: Seq[Strategy] = Seq(PvZ4GateDragoonAllIn)
   
   override lazy val forced: Seq[Strategy] = strategiesToTest
 }

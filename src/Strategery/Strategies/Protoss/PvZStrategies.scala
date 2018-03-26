@@ -26,6 +26,9 @@ object PvZProxy2Gate extends PvZ2GateOpening {
 object PvZ4GateDragoonAllIn extends PvZStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Vector(ProtossChoices.pvzMidgameTransitioningFromOneBase)
 }
+object PvZ4Gate99 extends PvZStrategy {
+  override def choices: Iterable[Iterable[Strategy]] = Vector(ProtossChoices.pvzMidgameTransitioningFromOneBase)
+}
 object PvZEarlyFFEConservative      extends PvZFFEOpening
 object PvZEarlyFFEEconomic          extends PvZFFEOpening
 object PvZEarlyFFEGatewayFirst      extends PvZFFEOpening { override def minimumGamesVsOpponent: Int = 5 }

@@ -25,7 +25,7 @@ object TargetHeuristicVpfEnemy extends TargetHeuristic{
             Zerg.SporeColony)))) {
         
         // Hack math just to get this target into consideration
-        Protoss.Dragoon.subjectiveValue.toDouble / GameTime(0, 10)()
+        Protoss.Dragoon.subjectiveValue.toDouble / GameTime(0, 4)()
       }
       else {
         candidate.matchups.vpfDealingDiffused

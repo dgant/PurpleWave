@@ -15,16 +15,17 @@ import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Predicates.Economy.GasAtLeast
 import Planning.Plans.Predicates.Employing
 import Planning.Plans.Predicates.Milestones._
+import Planning.Plans.Scouting.ScoutOn
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Protoss.PvZ4GateDragoonAllIn
 
-class PvZ4GateGoon extends GameplanModeTemplate {
+class PvZ4Gate extends GameplanModeTemplate {
   
   override val activationCriteria     = new Employing(PvZ4GateDragoonAllIn)
   override val completionCriteria     = new MiningBasesAtLeast(2)
-  override val scoutAt                = 10
   override val scoutExpansionsAt      = 90
   override def buildOrder             = ProtossBuilds.OpeningTwoGate1012
+  override def defaultScoutPlan       = new ScoutOn(Protoss.Gateway)
   override def defaultPlacementPlan   = new BuildHuggingNexus
   override def defaultAggressionPlan  = new If(
     new UnitsAtMost(8, UnitMatchWarriors, complete = true),

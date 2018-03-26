@@ -3,14 +3,17 @@ package Micro.Actions.Protoss
 import Debugging.Visualizations.ForceColors
 import Lifecycle.With
 import Mathematics.Physics.{Force, ForceMath}
+import Mathematics.PurpleMath
+import Mathematics.Shapes.Circle
 import Micro.Actions.Action
 import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Actions.Combat.Techniques.Avoid
 import Micro.Actions.Commands.{Gravitate, Move}
 import Micro.Decisions.Potential
+import Micro.Heuristics.Spells.TargetAOE
+import Planning.Composition.UnitMatchers.UnitMatchBuilding
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.EnrichPixel._
 
 object BeAnArbiter extends Action {
   
@@ -20,24 +23,49 @@ object BeAnArbiter extends Action {
     && unit.matchups.enemies.exists(_.matchups.targets.nonEmpty)
   )
   
+  protected def needsUmbrella(target: UnitInfo): Boolean =
+    ! target.isAny(
+      Protoss.Arbiter,
+      Protoss.DarkTemplar,
+      Protoss.Interceptor,
+      Protoss.Observer,
+      UnitMatchBuilding)
+  
+  protected def evaluateForCloaking(target: UnitInfo): Double = {
+    if ( ! target.isFriendly) return 0.0
+    if ( ! needsUmbrella(target)) return 0.0
+    val value       = target.subjectiveValue
+    val multiplier  = 1.0 + PurpleMath.fastSigmoid(target.matchups.framesOfEntanglementDiffused)
+    val output      = value * multiplier
+    output
+  }
+  
   override protected def perform(unit: FriendlyUnitInfo) {
     Potshot.consider(unit)
     
-    val threatened      = unit.matchups.framesOfSafetyDiffused <= 0.0
-    val umbrellable     = (u: UnitInfo) => ! u.unitClass.isBuilding && u != unit && ! u.is(Protoss.Interceptor) && ! u.is(Protoss.Arbiter)
-    val friends         = unit.teammates.filter(umbrellable)
+    val threatened   = unit.matchups.framesOfSafetyDiffused <= 0.0
+    val needUmbrella = unit.teammates.filter(needsUmbrella)
     
-    if (friends.nonEmpty) {
-      val friendCentroid = friends.map(_.pixelCenter).centroid
-      unit.agent.toTravel = Some(friendCentroid)
+    if (needUmbrella.nonEmpty) {
+      val destination = TargetAOE.chooseTargetPixel(
+        unit,
+        32 * 15,
+        Double.NegativeInfinity,
+        evaluateForCloaking,
+        12,
+        (tile) => Circle.points(3).map(tile.add))
+      unit.agent.toTravel = destination.orElse(
+        Some(needUmbrella
+          .minBy(_.pixelDistanceCenter(unit.agent.destination))
+          .pixelCenter))
     }
     
     val framesOfSafetyRequired = Math.max(0, 48 - With.framesSince(unit.lastFrameTakingDamage))
     if (unit.matchups.framesOfSafetyDiffused <= framesOfSafetyRequired) {
       Avoid.delegate(unit)
     }
-    else if (friends.nonEmpty) {
-      val forcesThreats = unit.matchups.enemies
+    else if (needUmbrella.nonEmpty) {
+      val forcesThreats = unit.matchups.threats
         .map(enemy =>
           Potential.unitAttraction(
             unit,

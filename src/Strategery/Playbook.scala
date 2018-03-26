@@ -42,7 +42,7 @@ object StrategyGroups {
 }
 
 class TestingPlaybook extends EmptyPlaybook {
-  val strategiesToTest: Seq[Strategy] = Seq(PvZEarlyFFEEconomic, PvZMidgameGatewayAttack)
+  val strategiesToTest: Seq[Strategy] = Seq(PvTDTExpand, PvT2BaseArbiter, PvZEarlyFFEEconomic, PvZMidgameGatewayAttack)
   
   override lazy val forced: Seq[Strategy] = strategiesToTest
 }
@@ -51,4 +51,4 @@ class PurpleWavePlaybook extends EmptyPlaybook {
   override lazy val disabled  : Seq[Strategy] = StrategyGroups.disabled
 }
 
-object Playbook extends PurpleWavePlaybook {}
+object Playbook extends TestingPlaybook {}

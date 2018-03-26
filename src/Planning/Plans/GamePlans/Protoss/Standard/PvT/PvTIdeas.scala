@@ -64,6 +64,7 @@ object PvTIdeas {
   class TrainDarkTemplar extends If(
     new And(
       new UnitsAtMost(0, Protoss.Arbiter),
+      new EnemyUnitsAtMost(3, Terran.Vulture),
       new EnemyUnitsNone(Terran.ScienceVessel),
       new EnemyUnitsNone(UnitMatchCustom((unit) => unit.is(Terran.MissileTurret) && unit.zone.owner.isNeutral))),
     new TrainContinuously(Protoss.DarkTemplar, 3),

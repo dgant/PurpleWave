@@ -39,7 +39,7 @@ object Gravitate extends Action {
       return
     }
     
-    val angles          = cardinal8directions.filter(r => Math.abs(r - forceRadians) <= Math.PI / 2.0)
+    val angles          = cardinal8directions.filter(r => Math.abs(r - forceRadians) <= Math.PI * 0.75)
     val paths           = angles.map(makeRay) :+ ray
     val pathsTruncated  = paths.map(ray =>
       PixelRay(
@@ -53,7 +53,7 @@ object Gravitate extends Action {
             .map(_.pixelCenter.pixelDistance(ray.from))
             .getOrElse(0.0))))
     
-    val pathAccepted = pathsTruncated.maxBy(ray => ray.length * Math.cos(ray.radians - forceRadians))
+    val pathAccepted = pathsTruncated.maxBy(ray => ray.length * (1.0 + Math.cos(ray.radians - forceRadians)))
     
     unit.agent.pathsAll = paths
     unit.agent.pathsTruncated = pathsTruncated

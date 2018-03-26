@@ -26,8 +26,7 @@ object TargetAOE {
     val valueByTile = targetsByTile.keys
       .map(tile => (
         tile,
-        tile
-          .adjacent9
+        tileMapper(tile)
           .flatMap(targetsByTile.get)
           .flatten
           .map(targetValues).sum))

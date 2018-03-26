@@ -12,7 +12,7 @@ object ShowGrids extends View {
     renderGridArray(With.grids.mobilityBuildings, 0, 0)
   }
   
-  private def renderGridArray[T](map:AbstractGrid[T], offsetX:Int = 0, offsetY:Int = 0) {
+  private def renderGridArray[T](map: AbstractGrid[T], offsetX: Int = 0, offsetY: Int = 0) {
     val viewportTiles = TileRectangle(With.viewport.start.tileIncluding, With.viewport.end.tileIncluding)
     viewportTiles.tiles
       .filterNot(tile => map.get(tile) == map.defaultValue)
@@ -21,7 +21,7 @@ object ShowGrids extends View {
         map.repr(map.get(tile))))
   }
   
-  private def renderGrid[T](map:AbstractGrid[T], offsetX:Int=0, offsetY:Int=0) {
+  private def renderGrid[T](map: AbstractGrid[T], offsetX: Int=0, offsetY: Int=0) {
     With.geography.allTiles
       .foreach(Tile => DrawMap.text(
         Tile.topLeftPixel.add(offsetX*16, offsetY*13),

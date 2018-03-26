@@ -11,7 +11,7 @@ import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.GamePlans.Protoss.Situational.BuildHuggingNexus
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders._
-import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
+import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Predicates.Economy.GasAtLeast
 import Planning.Plans.Predicates.Employing
 import Planning.Plans.Predicates.Milestones._
@@ -53,25 +53,26 @@ class PvZ4Gate extends GameplanModeTemplate {
         RequestAtLeast(1, Protoss.RoboticsFacility),
         RequestAtLeast(1, Protoss.Observatory),
         RequestAtLeast(2, Protoss.Observer))),
+    
     new If(
       new And(
         new GasAtLeast(50),
         new Or(
+          new UnitsAtLeast(15, Protoss.Zealot),
           new Check(() => With.units.ours.count(_.is(Protoss.Zealot)) > With.units.ours.count(_.is(Protoss.Dragoon))),
           new Check(() => With.units.enemy.count(_.is(Zerg.Mutalisk)) > With.units.ours.count(_.is(Protoss.Dragoon)))),
         new UpgradeComplete(Protoss.DragoonRange, 1, Protoss.DragoonRange.upgradeFrames(1))),
       new TrainContinuously(Protoss.Dragoon),
       new TrainContinuously(Protoss.Zealot)),
-    new BuildGasPumps,
-    new Build(RequestAtLeast(4, Protoss.Gateway)),
+    
+    new Build(
+      RequestAtLeast(1, Protoss.Assimilator),
+      RequestAtLeast(1, Protoss.CyberneticsCore),
+      RequestAtLeast(4, Protoss.Gateway)),
     
     new Trigger(
       new UnitsAtLeast(12, UnitMatchWarriors),
-      initialAfter = new Parallel(
-        new RequireMiningBases(2),
-        new Build(RequestAtLeast(8, Protoss.Gateway)),
-        new RequireMiningBases(3),
-        new Build(RequestAtLeast(12, Protoss.Gateway))))
+      new RequireMiningBases(2))
   )
 }
 

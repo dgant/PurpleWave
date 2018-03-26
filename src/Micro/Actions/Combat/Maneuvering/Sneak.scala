@@ -1,7 +1,9 @@
 package Micro.Actions.Combat.Maneuvering
 
 import Debugging.Visualizations.ForceColors
+import Mathematics.Physics.Force
 import Micro.Actions.Action
+import Micro.Actions.Combat.Attacking.Target
 import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Actions.Commands.{Gravitate, Move}
 import Micro.Decisions.Potential
@@ -24,14 +26,12 @@ object Sneak extends Action {
   override protected def perform(unit: FriendlyUnitInfo) {
     Potshot.delegate(unit)
     if (unit.readyForMicro) {
+      Target.delegate(unit)
+      val forceTarget     = unit.agent.toAttack.map(target => new Force(target.pixelCenter - unit.pixelCenter).normalize).getOrElse(new Force)
       val forceThreat     = Potential.threatsRepulsion(unit)
       val forceSneaking   = Potential.detectionRepulsion(unit)
-      val forceSpreading  = Potential.collisionRepulsion(unit)
-      val forceMobility   = Potential.mobilityAttraction(unit)
       unit.agent.forces.put(ForceColors.threat,     forceThreat)
       unit.agent.forces.put(ForceColors.bypassing,  forceSneaking)
-      unit.agent.forces.put(ForceColors.mobility,   forceMobility)
-      unit.agent.forces.put(ForceColors.spreading,  forceSpreading)
       Gravitate.delegate(unit)
       Move.delegate(unit)
     }

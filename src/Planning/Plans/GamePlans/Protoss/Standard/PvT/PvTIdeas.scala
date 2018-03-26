@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvT
 
 import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, RequestTech}
-import Planning.Composition.UnitMatchers.{UnitMatchCustom, UnitMatchWarriors}
+import Planning.Composition.UnitMatchers.{UnitMatchCustom, UnitMatchOr, UnitMatchWarriors}
 import Planning.Plans.Army.{Attack, ConsiderAttacking}
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.Macro.Automatic.TrainContinuously
@@ -62,13 +62,14 @@ object PvTIdeas {
     new TrainContinuously(Protoss.Scout, 5))
   
   class TrainDarkTemplar extends If(
-    new And(
-      new UnitsAtMost(0, Protoss.Arbiter),
-      new EnemyUnitsAtMost(3, Terran.Vulture),
-      new EnemyUnitsNone(Terran.ScienceVessel),
-      new EnemyUnitsNone(UnitMatchCustom((unit) => unit.is(Terran.MissileTurret) && unit.zone.owner.isNeutral))),
-    new TrainContinuously(Protoss.DarkTemplar, 3),
-    new TrainContinuously(Protoss.DarkTemplar, 1))
+    new UnitsAtMost(0, UnitMatchOr(Protoss.Arbiter, Protoss.ArbiterTribunal)),
+    new If(
+      new And(
+        new EnemyUnitsAtMost(3, Terran.Vulture),
+        new EnemyUnitsNone(Terran.ScienceVessel),
+        new EnemyUnitsNone(UnitMatchCustom((unit) => unit.is(Terran.MissileTurret) && unit.zone.owner.isNeutral))),
+      new TrainContinuously(Protoss.DarkTemplar, 3),
+      new TrainContinuously(Protoss.DarkTemplar, 1)))
   
   private class IfCloakedThreats_Observers extends If(
     new Or(

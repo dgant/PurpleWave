@@ -49,7 +49,7 @@ class GridMobilityBuildings extends AbstractGridArray[Int] {
       var x = xAreaMin
       while (x < xAreaEnd) {
         var y = yAreaMin
-        while (y < xAreaEnd) {
+        while (y < yAreaEnd) {
           if (x >= 0
             && y >= 0
             && x < With.mapTileWidth

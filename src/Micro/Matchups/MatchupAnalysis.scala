@@ -1,6 +1,5 @@
 package Micro.Matchups
 
-import Information.Battles.BattleClassificationFilters
 import Information.Battles.Types.{Battle, Team}
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
@@ -37,9 +36,9 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
   
   lazy val battle                 : Option[Battle]        = me.battle.orElse(With.matchups.entrants.find(_._2.contains(me)).map(_._1))
   lazy val team                   : Option[Team]          = battle.map(_.teamOf(me))
-  lazy val zoneUnits              : Vector[UnitInfo]      = me.zone.units.toVector.filter(BattleClassificationFilters.isEligibleLocal)
-  lazy val enemies                : Vector[UnitInfo]      = team.map(_.opponent.units).getOrElse(zoneUnits.filter(_.isEnemyOf(me)))
-  lazy val alliesIncludingSelf    : Vector[UnitInfo]      = team.map(_.units).getOrElse(zoneUnits.filter(u => u.isFriendly && u != me) :+ me)
+  lazy val defaultUnits           : Vector[UnitInfo]      = Vector.empty // me.zone.units.toVector.filter(BattleClassificationFilters.isEligibleLocal)
+  lazy val enemies                : Vector[UnitInfo]      = team.map(_.opponent.units).getOrElse(defaultUnits.filter(_.isEnemyOf(me)))
+  lazy val alliesIncludingSelf    : Vector[UnitInfo]      = team.map(_.units).getOrElse(defaultUnits.filter(u => u.isFriendly && u != me) :+ me)
   lazy val allies                 : Vector[UnitInfo]      = alliesIncludingSelf.filterNot(_.id == me.id)
   lazy val others                 : Vector[UnitInfo]      = enemies ++ allies
   lazy val allUnits               : Vector[UnitInfo]      = enemies ++ alliesIncludingSelf

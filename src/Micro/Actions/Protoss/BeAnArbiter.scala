@@ -35,7 +35,7 @@ object BeAnArbiter extends Action {
     if ( ! target.isFriendly) return 0.0
     if ( ! needsUmbrella(target)) return 0.0
     val value       = target.subjectiveValue
-    val multiplier  = 1.0 + PurpleMath.fastSigmoid(target.matchups.framesOfEntanglementDiffused)
+    val multiplier  = 2.0 + PurpleMath.fastSigmoid(Math.max(-48, target.matchups.framesOfEntanglementDiffused))
     val output      = value * multiplier
     output
   }

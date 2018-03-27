@@ -24,7 +24,7 @@ class Intelligence {
   private val scoutTiles = new mutable.ListBuffer[Tile]
   private var lastScoutFrame = 0
   private var flyingScout = false
-  def higlightScout(unit: UnitInfo) {
+  def highlightScout(unit: UnitInfo) {
     if (scoutTiles.size < 5) {
       scoutTiles += unit.tileIncludingCenter
     }
@@ -74,6 +74,7 @@ class Intelligence {
     updateEnemyMain()
     flyingScout = false
     scoutTiles.clear()
+    fingerprints.all.foreach(_.update())
   }
   
   private def updateEnemyMain() {

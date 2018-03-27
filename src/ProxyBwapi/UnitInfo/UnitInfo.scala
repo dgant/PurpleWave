@@ -91,7 +91,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     if (lastFrameStartingAttack == thisFrame && target.nonEmpty) {
       With.damageCredit.onDamage(this, target.get)
     }
-    if ( ! complete) {
+    if ( ! complete || completionFrame > 24 * 60 * 90) {
       completionFrame = With.frame + remainingBuildFrames
     }
     lastHitPoints             = hitPoints

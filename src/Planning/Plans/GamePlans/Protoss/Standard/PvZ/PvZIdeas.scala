@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvZ
 
 import Lifecycle.With
-import Macro.BuildRequests.RequestAtLeast
+import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.Protoss.Situational.PlacementForgeFastExpand
@@ -87,7 +87,9 @@ object PvZIdeas {
       new TrainContinuously(Protoss.Stargate, 1)))
   
   class AddEarlyCannons extends If(
-    new UnitsAtMost(2, Protoss.Gateway, complete = true),
+    new And(
+      new UnitsAtLeast(1, Protoss.Forge),
+      new UnitsAtMost(2, Protoss.Gateway, complete = true)),
     new Parallel(
       new PlacementForgeFastExpand,
       new TrainMatchingRatio(Protoss.PhotonCannon, 2, 6,
@@ -114,11 +116,20 @@ object PvZIdeas {
     
     // Upgrades
     new If(
-      new Or(
-        new UnitsAtLeast(2, Protoss.Forge),
-        new UpgradeComplete(Protoss.GroundDamage, 3)),
-      new UpgradeContinuously(Protoss.GroundArmor)),
-    new UpgradeContinuously(Protoss.GroundDamage),
+      new UnitsAtLeast(1, Protoss.TemplarArchives),
+      new Parallel(
+        new If(
+          new Or(
+            new UnitsAtLeast(2, Protoss.Forge),
+            new UpgradeComplete(Protoss.GroundDamage, 3)),
+          new UpgradeContinuously(Protoss.GroundArmor),
+          new UpgradeContinuously(Protoss.GroundDamage))),
+      new Parallel(
+        new If(
+          new UpgradeComplete(Protoss.GroundDamage),
+          new Build(RequestUpgrade(Protoss.GroundArmor)),
+          new Build(RequestUpgrade(Protoss.GroundDamage))))),
+    
     new If(new UnitsAtLeast(1, Protoss.Corsair), new UpgradeContinuously(Protoss.AirDamage)),
     
     // Basic army

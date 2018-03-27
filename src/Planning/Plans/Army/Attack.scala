@@ -38,7 +38,7 @@ class Attack extends Plan {
     
     val attackIntent = new Intention { toTravel = Some(target) }
     attackers.get.units.foreach(attacker => {
-      With.intelligence.higlightScout(attacker)
+      With.intelligence.highlightScout(attacker)
       attacker.agent.intend(this, attackIntent)
     })
   

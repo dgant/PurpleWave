@@ -72,12 +72,21 @@ class Scout(scoutCount: Int = 1) extends Plan {
     scouts.get.acquire(this)
     acquiredScouts = scouts.get.units
     
-    acquiredScouts.foreach(scout =>
-      if (scoutingDestinations.nonEmpty) {
-        With.intelligence.higlightScout(scout)
-        scout.agent.intend(this, new Intention {
-        toTravel = Some(scoutingDestinations.dequeue())
-        canScout = true
-      })})
+    val unassignedScouts = new mutable.ListBuffer[FriendlyUnitInfo]
+    unassignedScouts ++= acquiredScouts
+    
+    while (unassignedScouts.nonEmpty && scoutingDestinations.nonEmpty) {
+      val destination = scoutingDestinations.dequeue()
+      val scout = unassignedScouts.minBy(_.pixelDistanceTravelling(destination))
+      unassignedScouts -= scout
+      
+      With.intelligence.highlightScout(scout)
+      
+      val intention = new Intention
+      intention.toTravel = Some(destination)
+      intention.canScout = true
+      intention.
+      scout.agent.intend(this, intention)
+    }
   }
 }

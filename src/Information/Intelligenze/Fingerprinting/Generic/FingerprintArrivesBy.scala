@@ -12,7 +12,7 @@ class FingerprintArrivesBy(
   quantity    : Int = 1)
     extends Fingerprint {
   
-  sticky = true
+  override val sticky = true
   
   override def investigate: Boolean = {
     val units           = With.units.enemy.filter(_.is(unitMatcher))

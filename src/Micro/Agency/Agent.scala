@@ -58,6 +58,7 @@ class Agent(val unit: FriendlyUnitInfo) {
   var toFinish      : Option[UnitInfo]              = None
   var toForm        : Option[Pixel]                 = None
   var toUpgrade     : Option[Upgrade]               = None
+  var toLeash       : Option[Leash]                 = None
   var toBoard       : Option[FriendlyUnitInfo]      = None
   var toNuke        : Option[Pixel]                 = None
   var toRepair      : Option[UnitInfo]              = None
@@ -175,6 +176,7 @@ class Agent(val unit: FriendlyUnitInfo) {
     toTech        = intent.toTech
     toFinish      = intent.toFinish
     toUpgrade     = intent.toUpgrade
+    toLeash       = intent.toLeash
     toForm        = intent.toForm
     toNuke        = intent.toNuke
     toRepair      = None
@@ -201,6 +203,9 @@ class Agent(val unit: FriendlyUnitInfo) {
     }
     else if (toForm.isDefined) {
       toForm.get
+    }
+    else if (toLeash.isDefined) {
+      toLeash.get.pixelCenter
     }
     else if (anchors.nonEmpty) {
       anchors.minBy(_.pixelDistanceEdge(unit)).pixelCenter

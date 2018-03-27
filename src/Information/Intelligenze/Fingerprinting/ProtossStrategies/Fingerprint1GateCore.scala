@@ -14,5 +14,5 @@ class Fingerprint1GateCore extends FingerprintOr(
     new FingerprintCompleteBy(Protoss.CyberneticsCore,  GameTime(4, 0)),
     new FingerprintCompleteBy(Protoss.Dragoon,          GameTime(5, 0)))) {
   
-  sticky = true
+  override val sticky = true
 }

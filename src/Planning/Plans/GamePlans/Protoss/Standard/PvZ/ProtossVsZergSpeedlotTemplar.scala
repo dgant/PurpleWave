@@ -15,7 +15,7 @@ import Strategery.Strategies.Protoss.PvZMidgameCorsairSpeedlot
 class ProtossVsZergSpeedlotTemplar extends GameplanModeTemplate {
   
   override val activationCriteria = new Employing(PvZMidgameCorsairSpeedlot)
-  override def aggression: Double = 0.75
+  override def aggression: Double = 0.85
   
   class AddHighPriorityTech extends Parallel(
     new If(
@@ -57,17 +57,16 @@ class ProtossVsZergSpeedlotTemplar extends GameplanModeTemplate {
   )
   
   override def buildPlans: Seq[Plan] = Vector(
-    new PvZIdeas.TakeSafeNatural,
     new PvZIdeas.AddEarlyCannons,
-    new FlipIf(
-      new SafeAtHome,
-      new PvZIdeas.TrainAndUpgradeArmy,
-      new Parallel(
-        new AddHighPriorityTech,
-        new PvZIdeas.TakeSafeThirdBase,
-        new PvZIdeas.TakeSafeFourthBase,
-        new IfOnMiningBases(4, new AddLowPriorityTech))),
-    new PvZIdeas.AddGateways,
-    new AddLowPriorityTech
+    new PvZIdeas.TakeSafeNatural,
+    new PvZIdeas.TakeSafeThirdBase,
+    new PvZIdeas.TakeSafeFourthBase,
+    new PvZIdeas.TrainAndUpgradeArmy,
+    new AddHighPriorityTech,
+    new If(
+      new Not(new SafeAtHome),
+      new Build(RequestAtLeast(4, Protoss.Gateway))),
+    new AddLowPriorityTech,
+    new PvZIdeas.AddGateways
   )
 }

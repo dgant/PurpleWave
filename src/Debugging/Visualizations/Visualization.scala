@@ -30,11 +30,11 @@ class Visualization {
     ShowExplosions
   )
   
-  var enabled   = true
-  var screen    = true
-  var map       = true
-  var happy     = false
-  var textOnly  = false
+  var enabled   : Boolean = _
+  var screen    : Boolean = _
+  var map       : Boolean = _
+  var happy     : Boolean = _
+  var textOnly  : Boolean = _
   
   //////////////
   

@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Protoss.Situational
 
 import Lifecycle.With
-import Micro.Agency.Intention
+import Micro.Agency.{Intention, Leash}
 import Planning.Composition.Property
 import Planning.Composition.ResourceLocks.LockUnits
 import Planning.Composition.UnitCounters.UnitCountBetween
@@ -38,6 +38,7 @@ abstract class DefendFFEWithProbes extends Plan {
       canFlee   = false
       toForm    = Some(toDefend)
       toTravel  = Some(toDefend)
+      toLeash   = Some(Leash(toDefend, 32.0 * 5.0))
     }))
   }
 }

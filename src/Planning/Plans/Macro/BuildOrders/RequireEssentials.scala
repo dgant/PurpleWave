@@ -9,7 +9,7 @@ import Planning.Plans.Predicates.Milestones.UnitsAtMost
 import ProxyBwapi.Races.Zerg
 
 class RequireEssentials extends Parallel(
-  new Build(RequestAtLeast(1, With.self.workerClass)),
+  new Build(RequestAtLeast(3, With.self.workerClass)),
   new If(
     new Or(
       new Not(new WeAreZerg),

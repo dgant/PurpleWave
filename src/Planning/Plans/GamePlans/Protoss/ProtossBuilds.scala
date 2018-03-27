@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Protoss
 
-import Macro.BuildRequests.{BuildRequest, RequestAnother, RequestAtLeast, RequestUpgrade}
+import Macro.BuildRequests.{BuildRequest, RequestAtLeast, RequestUpgrade}
 import ProxyBwapi.Races.Protoss
 
 object ProtossBuilds {
@@ -266,31 +266,6 @@ object ProtossBuilds {
     RequestUpgrade(Protoss.DragoonRange),
     RequestAtLeast(3,   Protoss.Pylon))
   
-  val Opening1GateRangeExpand = Vector[BuildRequest] (
-    RequestAtLeast(1,   Protoss.Nexus),
-    RequestAtLeast(8,   Protoss.Probe),
-    RequestAtLeast(1,   Protoss.Pylon),
-    RequestAtLeast(10,  Protoss.Probe),
-    RequestAtLeast(1,   Protoss.Gateway),
-    RequestAtLeast(11,  Protoss.Probe),
-    RequestAtLeast(1,   Protoss.Assimilator),
-    RequestAtLeast(13,  Protoss.Probe),
-    RequestAtLeast(1,   Protoss.CyberneticsCore),
-    RequestAtLeast(15,  Protoss.Probe),
-    RequestAtLeast(2,   Protoss.Pylon),
-    RequestAtLeast(16,  Protoss.Probe),
-    RequestUpgrade(Protoss.DragoonRange),
-    RequestAtLeast(19,  Protoss.Probe),
-    RequestAtLeast(1,   Protoss.Dragoon),
-    RequestAtLeast(2,   Protoss.Nexus),
-    RequestAtLeast(2,   Protoss.Gateway),
-    RequestAtLeast(2,   Protoss.Dragoon),
-    RequestAtLeast(3,   Protoss.Pylon),
-    RequestAtLeast(21,  Protoss.Probe),
-    RequestAtLeast(3,   Protoss.Dragoon),
-    RequestAtLeast(22,  Protoss.Probe),
-    RequestAtLeast(4,   Protoss.Dragoon))
-  
   val Opening21Nexus_Robo = Vector[BuildRequest] (
     RequestAtLeast(8,   Protoss.Probe),
     RequestAtLeast(1,   Protoss.Pylon),
@@ -355,92 +330,45 @@ object ProtossBuilds {
   // Protoss vs. Zerg //
   //////////////////////
   
-  val ZZCoreZ = Vector (
-    RequestAtLeast(8,   Protoss.Probe),
-    RequestAtLeast(1,   Protoss.Pylon),
-    RequestAtLeast(10,  Protoss.Probe),
-    RequestAtLeast(1,   Protoss.Gateway),
-    RequestAtLeast(12,  Protoss.Probe),
-    RequestAtLeast(2,   Protoss.Pylon),
-    RequestAtLeast(13,  Protoss.Probe),
-    RequestAtLeast(1,   Protoss.Zealot),
-    RequestAtLeast(14,  Protoss.Probe),
-    RequestAtLeast(1,   Protoss.Assimilator),
-    RequestAtLeast(15,  Protoss.Probe),
-    RequestAtLeast(2,   Protoss.Zealot),
-    RequestAtLeast(16,  Protoss.Probe),
-    RequestAtLeast(1,   Protoss.CyberneticsCore),
-    RequestAtLeast(17,  Protoss.Probe),
-    RequestAtLeast(3,   Protoss.Zealot),
-    RequestAtLeast(3,   Protoss.Pylon))
-  
   val FFE_Vs4Pool = Vector[BuildRequest] (
     RequestAtLeast(1,   Protoss.Nexus),
-    RequestAtLeast(9,   Protoss.Probe),
+    RequestAtLeast(8,   Protoss.Probe),
     RequestAtLeast(1,   Protoss.Pylon),
-    RequestAtLeast(2,   Protoss.PhotonCannon),
-    RequestAtLeast(11,  Protoss.Probe),
-    RequestAtLeast(3,   Protoss.PhotonCannon),
-    RequestAtLeast(15,  Protoss.Probe),
-    RequestAtLeast(2,   Protoss.Nexus),
-    RequestAtLeast(2,   Protoss.Pylon))
+    RequestAtLeast(1,   Protoss.Forge),
+    RequestAtLeast(2,   Protoss.PhotonCannon))
   
-  val FFE_ForgeFirst = Vector[BuildRequest] (
+  val FFE_Conservative = Vector[BuildRequest] (
+    RequestAtLeast(1,   Protoss.Nexus),
+    RequestAtLeast(8,   Protoss.Probe),
+    RequestAtLeast(1,   Protoss.Pylon),
+    RequestAtLeast(9,   Protoss.Probe),
+    RequestAtLeast(1,   Protoss.Forge),
+    RequestAtLeast(2,   Protoss.PhotonCannon))
+  
+  val FFE_ForgeCannonNexus = Vector[BuildRequest] (
     RequestAtLeast(1,   Protoss.Nexus),
     RequestAtLeast(8,   Protoss.Probe),
     RequestAtLeast(1,   Protoss.Pylon),
     RequestAtLeast(10,  Protoss.Probe),
     RequestAtLeast(1,   Protoss.Forge),
-    RequestAtLeast(11,  Protoss.Probe), // Normally 12; 11 is protection against 4/5 pools
+    RequestAtLeast(12,  Protoss.Probe),
     RequestAtLeast(2,   Protoss.PhotonCannon),
     RequestAtLeast(16,  Protoss.Probe),
     RequestAtLeast(2,   Protoss.Nexus),
     RequestAtLeast(3,   Protoss.PhotonCannon),
     RequestAtLeast(2,   Protoss.Pylon))
   
-  val FFE_NexusFirst = Vector[BuildRequest] (
+  val FFE_NexusGatewayForge = Vector[BuildRequest] (
     RequestAtLeast(1,   Protoss.Nexus),
     RequestAtLeast(8,   Protoss.Probe),
     RequestAtLeast(1,   Protoss.Pylon),
-    RequestAtLeast(13,  Protoss.Probe),
-    RequestAtLeast(2,   Protoss.Nexus),
-    RequestAtLeast(1,   Protoss.Forge),
-    RequestAtLeast(15,  Protoss.Probe),
-    RequestAtLeast(1,   Protoss.Gateway),
-    RequestAtLeast(1,   Protoss.PhotonCannon),
-    RequestAtLeast(2,   Protoss.Pylon),
-    RequestAtLeast(1,   Protoss.Zealot))
-  
-  val FFE_GatewayFirst_Aggressive = Vector[BuildRequest] (
-    RequestAtLeast(1,   Protoss.Nexus),
-    RequestAtLeast(8,   Protoss.Probe),
-    RequestAtLeast(1,   Protoss.Pylon),
-    RequestAtLeast(10,  Protoss.Probe),
-    RequestAtLeast(1,   Protoss.Gateway),
     RequestAtLeast(12,  Protoss.Probe),
-    RequestAtLeast(2,   Protoss.Pylon),
-    RequestAtLeast(13,  Protoss.Probe),
-    RequestAtLeast(1,   Protoss.Zealot),
-    RequestAtLeast(15,  Protoss.Probe),
-    RequestAtLeast(2,   Protoss.Zealot),
-    RequestAtLeast(17,  Protoss.Probe),
     RequestAtLeast(2,   Protoss.Nexus),
-    RequestAtLeast(18,  Protoss.Probe),
-    RequestAnother(3,   Protoss.Zealot),
-    RequestAtLeast(2,   Protoss.Pylon),
-    RequestAtLeast(19,  Protoss.Probe),
-    RequestAtLeast(1,   Protoss.Assimilator))
-  
-  /////////////////////
-  // General-Purpose //
-  /////////////////////
-  
-  val TechReavers = Vector[BuildRequest] (
-    RequestAtLeast(1,   Protoss.Pylon),
+    RequestAtLeast(14,  Protoss.Probe),
     RequestAtLeast(1,   Protoss.Gateway),
-    RequestAtLeast(1,   Protoss.Assimilator),
-    RequestAtLeast(1,   Protoss.CyberneticsCore),
-    RequestAtLeast(1,   Protoss.RoboticsFacility),
-    RequestAtLeast(1,   Protoss.RoboticsSupportBay)
-  )
+    RequestAtLeast(15,  Protoss.Probe),
+    RequestAtLeast(1,   Protoss.Forge),
+    RequestAtLeast(16,  Protoss.Probe),
+    RequestAtLeast(1,   Protoss.Zealot),
+    RequestAtLeast(2,   Protoss.PhotonCannon))
 }

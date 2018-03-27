@@ -21,6 +21,7 @@ class Intention {
   var toForm      : Option[Pixel]     = None
   var toNuke      : Option[Pixel]     = None
   var toUpgrade   : Option[Upgrade]   = None
+  var toLeash     : Option[Leash]     = None
   var canAttack   : Boolean           = true
   var canFlee     : Boolean           = true
   var canCower    : Boolean           = false

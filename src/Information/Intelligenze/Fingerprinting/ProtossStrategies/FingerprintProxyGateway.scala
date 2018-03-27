@@ -7,5 +7,5 @@ class FingerprintProxyGateway extends FingerprintOr(
   new FingerprintArrivesBy(Protoss.Zealot,    GameTime(2, 50)),
   new FingerprintCompleteBy(Protoss.Gateway,  GameTime(2,  5))) {
   
-  sticky = true
+  override val sticky = true
 }

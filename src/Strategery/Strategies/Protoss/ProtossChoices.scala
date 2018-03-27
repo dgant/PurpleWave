@@ -81,8 +81,6 @@ object ProtossChoices {
   val pvzOpenersWithoutTransitions = Vector(
     PvZEarlyFFEConservative,
     PvZEarlyFFEEconomic,
-    PvZEarlyFFEGatewayFirst,
-    PvZEarlyFFENexusFirst,
     PvZProxy2Gate
   )
   

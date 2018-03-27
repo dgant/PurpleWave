@@ -35,7 +35,7 @@ class FindExpansions extends Plan {
   }
   
   private def orderScout(scout: FriendlyUnitInfo) = {
-    With.intelligence.higlightScout(scout)
+    With.intelligence.highlightScout(scout)
     scout.agent.intend(this, new Intention {
       toTravel = getNextScoutingPixel
       canCower = true

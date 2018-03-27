@@ -69,7 +69,7 @@ class PvZ4Gate extends GameplanModeTemplate {
       new And(
         new GasAtLeast(50),
         new UnitsAtLeast(1, Protoss.CyberneticsCore, complete = true),
-        new UpgradeComplete(Protoss.DragoonRange, 1, Protoss.DragoonRange.upgradeFrames),
+        new UpgradeComplete(Protoss.DragoonRange, 1, Protoss.DragoonRange.upgradeFrames(1)),
         new Or(
           new UnitsAtLeast(15, Protoss.Zealot),
           new Check(() => With.units.ours.count(_.is(Protoss.Zealot)) > With.units.ours.count(_.is(Protoss.Dragoon))),

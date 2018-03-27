@@ -1,8 +1,9 @@
 package Macro.Architecture
 
 import Debugging.Visualizations.Views.Geography.ShowArchitecturePlacements
-import Information.Geography.Pathfinding.{TilePath}
+import Information.Geography.Pathfinding.TilePath
 import Information.Geography.Types.{Edge, Zone}
+import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Mathematics.Points.{Tile, TileRectangle}
 import Mathematics.Shapes.Spiral
@@ -226,16 +227,23 @@ class Architecture {
   ///////////
   
   private def recalculatePower() {
-    With.units.ours.filter(_.is(Protoss.Pylon)).map(_.tileTopLeft).foreach(addPower)
+    With.units.ours.foreach(unit =>
+      if (
+        unit.is(Protoss.Pylon)
+        && (
+          With.framesSince(unit.completionFrame) < GameTime(0, 5)()
+          || (
+            ! unit.complete
+            && unit.zone.units.forall(other => ! other.is(Protoss.Pylon) || ! other.complete)
+          )
+        )) {
+        addPower(unit.tileTopLeft)
+      })
   }
   
   private def addPower(tile: Tile) {
-    def isValid(neighbor: Tile, origin: Tile): Boolean = (
-      Math.abs(neighbor.x - tile.x) < 18
-      && Math.abs(neighbor.y - tile.y) < 18
-    )
-    With.grids.psi2Height.psiPoints.map(tile.add).map(neighbor => if (isValid(neighbor, tile)) powered2Height += tile)
-    With.grids.psi3Height.psiPoints.map(tile.add).map(neighbor => if (isValid(neighbor, tile)) powered3Height += tile)
+    With.grids.psi2Height.psiPoints.map(tile.add).map(neighbor => if (neighbor.valid) powered2Height += neighbor)
+    With.grids.psi3Height.psiPoints.map(tile.add).map(neighbor => if (neighbor.valid) powered3Height += neighbor)
   }
   
   /////////////////

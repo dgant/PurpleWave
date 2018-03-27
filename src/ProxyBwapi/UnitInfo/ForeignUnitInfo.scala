@@ -49,6 +49,7 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo (o
   ///////////////////
   
   private def updateTimeSensitiveInformation() {
+    _complete           = baseUnit.isCompleted
     _lastSeen           = With.frame
     _possiblyStillThere = true
     _hitPoints          = if (effectivelyCloaked) if (_hitPoints == 0) _unitClass.maxHitPoints  else _hitPoints     else baseUnit.getHitPoints
@@ -79,7 +80,6 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo (o
   ////////////
   
   private def updateHealth() {
-    _complete               = baseUnit.isCompleted
     _defensiveMatrixPoints  = baseUnit.getDefenseMatrixPoints
     _initialResources       = baseUnit.getInitialResources
     _invincible             = baseUnit.isInvincible
@@ -357,8 +357,9 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo (o
   private var _addon                  : Option[UnitInfo] = None
   
   def remainingBuildFrames: Int = {
+    if (complete) return 0
     val startingHp    = 1 + unitClass.maxHitPoints / 10
-    val progress      = (hitPoints - startingHp) / (unitClass.maxTotalHealth - startingHp).toDouble
+    val progress      = Math.max(0.0, (hitPoints - startingHp).toDouble / (unitClass.maxTotalHealth - startingHp))
     val progressLeft  = 1.0 - progress
     val output        = progressLeft * unitClass.buildFrames - With.framesSince(lastSeen)
     output.toInt

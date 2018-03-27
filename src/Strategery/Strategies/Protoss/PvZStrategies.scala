@@ -31,8 +31,6 @@ object PvZ4Gate99 extends PvZStrategy {
 }
 object PvZEarlyFFEConservative      extends PvZFFEOpening
 object PvZEarlyFFEEconomic          extends PvZFFEOpening
-object PvZEarlyFFEGatewayFirst      extends PvZFFEOpening { override def minimumGamesVsOpponent: Int = 5 }
-object PvZEarlyFFENexusFirst        extends PvZFFEOpening { override def minimumGamesVsOpponent: Int = 5 }
 object PvZMidgameCorsairSpeedlot    extends PvZStrategy
 object PvZMidgameGatewayAttack      extends PvZStrategy
 //object PvZMidgameCorsairDarkTemplar extends PvZStrategy

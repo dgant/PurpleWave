@@ -30,6 +30,7 @@ object PlacementHeuristicDistanceFromBase extends PlacementHeuristic {
         
         totalDistance += scaledDistance
       })
+      totalDistance = totalDistance / Math.max(1, With.geography.ourBases.size)
       Math.max(128.0, totalDistance)
     }
   }

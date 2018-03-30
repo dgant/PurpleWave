@@ -34,46 +34,61 @@ class PvPLateGame extends GameplanModeTemplate {
   override def priorityAttackPlan: Plan = new PvPIdeas.AttackWithDarkTemplar
   override val defaultAttackPlan = new PvPIdeas.AttackSafely
   
-  
   override def defaultArchonPlan: Plan = new PvPIdeas.MeldArchonsPvP
+  
+  class RoboTech extends Parallel(
+    new Build(
+      RequestAtLeast(1, Protoss.RoboticsFacility),
+      RequestAtLeast(1, Protoss.Observatory)),
+    new If(
+      new UnitsAtMost(0, Protoss.TemplarArchives),
+      new Build(RequestAtLeast(1, Protoss.RoboticsSupportBay))),
+    new If(
+      new EnemyHasShownCloakedThreat,
+      new UpgradeContinuously(Protoss.ObserverSpeed)))
+  
+  class TemplarTech extends Parallel(
+    new Build(
+      RequestAtLeast(1, Protoss.CitadelOfAdun),
+      RequestAtLeast(1, Protoss.TemplarArchives)),
+    new If(
+      new UnitsAtMost(0, Protoss.Observatory),
+      new BuildCannonsAtNatural(2)))
+  
+  class Upgrades extends Parallel(
+    new Build(RequestAtLeast(1, Protoss.Forge)),
+    new If(
+      new UpgradeComplete(Protoss.GroundDamage, 3),
+      new UpgradeContinuously(Protoss.GroundArmor),
+      new UpgradeContinuously(Protoss.GroundDamage)))
   
   class BuildTech extends Parallel(
     new Build(RequestAtLeast(1, Protoss.Gateway)),
-    new If(
-      new GasAtMost(300),
-      new BuildGasPumps),
     new Build(
       RequestAtLeast(1, Protoss.Assimilator),
       RequestAtLeast(1, Protoss.CyberneticsCore),
       RequestUpgrade(Protoss.DragoonRange)),
+    new If(
+      new GasAtMost(300),
+      new BuildGasPumps),
     
     new FlipIf(
       new Latch(new UnitsAtLeast(1, Protoss.TemplarArchives)),
       
       // Robo first (default)
       new Parallel(
-        new Build(
-          RequestAtLeast(1, Protoss.RoboticsFacility),
-          RequestAtLeast(1, Protoss.Observatory),
-          RequestAtLeast(1, Protoss.RoboticsSupportBay),
-          RequestAtLeast(2, Protoss.Gateway)),
+        new RoboTech,
+        new Build(RequestAtLeast(2, Protoss.Gateway)),
         new BuildGasPumps,
-        new Build(RequestAtLeast(1, Protoss.Forge)),
-        new UpgradeContinuously(Protoss.GroundDamage),
-        new If(
-          new EnemyHasShownCloakedThreat,
-          new UpgradeContinuously(Protoss.ObserverSpeed))),
+        new Build(RequestAtLeast(5, Protoss.Gateway)),
+        new Upgrades),
       
       // Citadel first (ie. DT follow-up)
       new Parallel(
-        new Build(
-          RequestAtLeast(1, Protoss.CitadelOfAdun),
-          RequestAtLeast(1, Protoss.TemplarArchives)),
-        new If(
-          new UnitsAtMost(0, Protoss.Observatory),
-          new BuildCannonsAtNatural(2)),
         new Build(RequestAtLeast(3, Protoss.Gateway)),
-        new BuildGasPumps)),
+        new TemplarTech,
+        new BuildGasPumps,
+        new Build(RequestAtLeast(5, Protoss.Gateway)))),
     
     new If(
       new Not(new EnemyCarriers),
@@ -103,6 +118,10 @@ class PvPLateGame extends GameplanModeTemplate {
     new If(new EnemyUnitsAtLeast(1, Protoss.DarkTemplar), new UpgradeContinuously(Protoss.ObserverSpeed)),
   
     new BuildCannonsAtExpansions(3),
+  
+    new If(
+      new SafeAtHome,
+      new MatchMiningBases),
     
     new FlipIf(
       new Or(
@@ -111,14 +130,23 @@ class PvPLateGame extends GameplanModeTemplate {
           new UnitsAtLeast(25, UnitMatchWarriors),
           new SafeAtHome)),
       new PvPIdeas.TrainArmy,
-      new Parallel(
-        new MatchMiningBases,
-        new BuildTech)),
+      new BuildTech),
 
     new FlipIf(
       new SafeToAttack,
-      new Build(RequestAtLeast(8, Protoss.Gateway)),
+      new If(
+        new UnitsAtLeast(1, Protoss.RoboticsSupportBay),
+        new Build(RequestAtLeast(6, Protoss.Gateway)),
+        new Build(RequestAtLeast(8, Protoss.Gateway))),
       new RequireMiningBases(3)),
+  
+    new FlipIf(
+      new SafeToAttack,
+      new If(
+        new UnitsAtLeast(1, Protoss.RoboticsSupportBay),
+        new Build(RequestAtLeast(9, Protoss.Gateway)),
+        new Build(RequestAtLeast(11, Protoss.Gateway))),
+      new RequireMiningBases(4)),
       
     new If(
       new And(
@@ -139,10 +167,13 @@ class PvPLateGame extends GameplanModeTemplate {
   
     new Build(RequestAtLeast(10, Protoss.Gateway)),
     new RequireMiningBases(4),
-      
+  
     new FlipIf(
-      new SafeAtHome,
-      new Build(RequestAtLeast(12, Protoss.Gateway)),
+      new SafeToAttack,
+      new If(
+        new UnitsAtLeast(1, Protoss.RoboticsSupportBay),
+        new Build(RequestAtLeast(12, Protoss.Gateway)),
+        new Build(RequestAtLeast(14, Protoss.Gateway))),
       new RequireMiningBases(5)),
       
     new RequireMiningBases(6),

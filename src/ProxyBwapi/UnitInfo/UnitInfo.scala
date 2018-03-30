@@ -101,7 +101,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   }
   
   private lazy val stuckMoveFrames    = 10
-  private lazy val stuckAttackFrames  = stuckMoveFrames + cooldownMaxAirGround
+  private lazy val stuckAttackFrames  = Math.max(stuckMoveFrames, cooldownMaxAirGround)
   def seeminglyStuck: Boolean = framesFailingToMove > stuckMoveFrames || framesFailingToAttack > stuckAttackFrames
   
   ////////////
@@ -152,7 +152,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   def pixelRangeMin: Double = unitClass.groundMinRangeRaw
   def pixelRangeAir: Double = pixelRangeAirCache()
   private val pixelRangeAirCache = new Cache(() =>
-    unitClass.airRangePixels +
+    unitClass.pixelRangeAir +
       (if (isBunker())                                                  32.0 else 0.0) +
       (if (isBunker()     && player.hasUpgrade(Terran.MarineRange))     32.0 else 0.0) +
       (if (isMarine()     && player.hasUpgrade(Terran.MarineRange))     32.0 else 0.0) +
@@ -162,7 +162,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   
   def pixelRangeGround: Double = pixelRangeGroundCache()
   private val pixelRangeGroundCache = new Cache(() =>
-    unitClass.groundRangePixels +
+    unitClass.pixelRangeGround +
       (if (isBunker())                                                32.0 else 0.0) +
       (if (isBunker()     && player.hasUpgrade(Terran.MarineRange))   32.0 else 0.0) +
       (if (isMarine()     && player.hasUpgrade(Terran.MarineRange))   32.0 else 0.0) +
@@ -428,7 +428,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   def pixelReachAgainst (framesAhead: Int, enemy:UnitInfo): Double = if (enemy.flying) pixelReachAir(framesAhead) else pixelReachGround(framesAhead)
   
   def inRangeToAttack(enemy: UnitInfo)                    : Boolean = inRangeToAttack(enemy, enemy.pixelCenter)
-  def inRangeToAttack(enemy: UnitInfo, targetAt: Pixel)   : Boolean = pixelDistanceEdge(enemy) <= pixelRangeAgainst(enemy) + With.configuration.attackableRangeBufferPixels && (pixelRangeMin <= 0.0 || pixelDistanceEdge(enemy, targetAt) > pixelRangeMin)
+  def inRangeToAttack(enemy: UnitInfo, targetAt: Pixel)   : Boolean = pixelDistanceEdge(enemy) <= pixelRangeAgainst(enemy) && (pixelRangeMin <= 0.0 || pixelDistanceEdge(enemy, targetAt) > pixelRangeMin)
   def inRangeToAttack(enemy: UnitInfo, framesAhead: Int)  : Boolean = inRangeToAttack(enemy, enemy.projectFrames(framesAhead))
   
   def framesToTravelTo(destination: Pixel)  : Int = framesToTravelPixels(pixelDistanceTravelling(destination))

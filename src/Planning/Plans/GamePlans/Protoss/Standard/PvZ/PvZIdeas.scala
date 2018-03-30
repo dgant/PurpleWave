@@ -78,21 +78,24 @@ object PvZIdeas {
   
   class ReactToMutalisks extends If(
     new EnemyMutalisks,
-    new Build(
-      RequestAtLeast(1, Protoss.Assimilator),
-      RequestAtLeast(1, Protoss.CyberneticsCore)),
     new Parallel(
-      new TrainMatchingRatio(Protoss.Corsair, 3, 8,   Seq(MatchingRatio(Zerg.Mutalisk, 0.9))),
-      new TrainMatchingRatio(Protoss.Dragoon, 0, 10,  Seq(MatchingRatio(Zerg.Mutalisk, 1.25))),
-      new TrainContinuously(Protoss.Stargate, 1)))
+      new Build(
+        RequestAtLeast(1, Protoss.Assimilator),
+        RequestAtLeast(1, Protoss.CyberneticsCore)),
+      new Parallel(
+        new TrainMatchingRatio(Protoss.Corsair, 3, 8,   Seq(MatchingRatio(Zerg.Mutalisk, 0.9))),
+        new TrainMatchingRatio(Protoss.Dragoon, 0, 10,  Seq(MatchingRatio(Zerg.Mutalisk, 1.25))),
+        new TrainContinuously(Protoss.Stargate, 1),
+        new Build(RequestUpgrade(Protoss.DragoonRange)))))
   
   class AddEarlyCannons extends If(
     new And(
       new UnitsAtLeast(1, Protoss.Forge),
-      new UnitsAtMost(2, Protoss.Gateway, complete = true)),
+      new UnitsAtMost(3, Protoss.Gateway, complete = true),
+      new UnitsAtMost(8, UnitMatchWarriors)),
     new Parallel(
       new PlacementForgeFastExpand,
-      new TrainMatchingRatio(Protoss.PhotonCannon, 2, 6,
+      new TrainMatchingRatio(Protoss.PhotonCannon, 2, 8,
         Seq(
           MatchingRatio(Zerg.Zergling, 0.3),
           MatchingRatio(Zerg.Hydralisk, 0.75)))))
@@ -130,14 +133,12 @@ object PvZIdeas {
           new Build(RequestUpgrade(Protoss.GroundArmor)),
           new Build(RequestUpgrade(Protoss.GroundDamage))))),
     
-    new If(new UnitsAtLeast(1, Protoss.Corsair), new UpgradeContinuously(Protoss.AirDamage)),
-    
     // Basic army
     new TrainContinuously(Protoss.DarkTemplar, 1),
     new IfOnMiningBases(2, new TrainContinuously(Protoss.Reaver, 6)),
     new TrainContinuously(Protoss.Observer, 1),
     new If(
-      new Check(() => With.units.ours.count(_.is(Protoss.Dragoon)) < With.units.ours.count(_.is(Protoss.Zealot)) / 1.75 - 2),
+      new Check(() => With.units.ours.count(_.is(Protoss.Dragoon)) < With.units.ours.count(_.is(Protoss.Zealot)) * 3 - 24),
       new TrainContinuously(Protoss.Dragoon, maximumConcurrentlyRatio = 0.5)),
     new If(
       new Or(
@@ -151,8 +152,10 @@ object PvZIdeas {
     new TrainContinuously(Protoss.Zealot),
     new If(
       new And(
+        new SafeAtHome,
         new UnitsAtMost(8, Zerg.Hydralisk),
         new UnitsAtMost(1, Zerg.SporeColony)),
-      new TrainContinuously(Protoss.Corsair, 6))
+      new TrainContinuously(Protoss.Corsair, 6),
+      new TrainContinuously(Protoss.Corsair, 1))
   )
 }

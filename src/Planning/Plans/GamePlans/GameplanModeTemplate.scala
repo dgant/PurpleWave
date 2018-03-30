@@ -55,6 +55,7 @@ abstract class GameplanModeTemplate extends GameplanMode {
     defaultScoutPlan,
     new DefendZones,
     new DefendAgainstProxy,
+    new DefendAgainstWorkerRush,
     new EscortSettlers,
     new ScoutExpansionsAt(scoutExpansionsAt),
     defaultAttackPlan,

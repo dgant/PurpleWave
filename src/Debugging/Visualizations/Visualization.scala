@@ -1,6 +1,6 @@
 package Debugging.Visualizations
 
-import Debugging.Visualizations.Views.Battles.{ShowBattleDetails, ShowBattleSummary}
+import Debugging.Visualizations.Views.Battles.{ShowBattleDetails, ShowBattleSummary, ShowClustering}
 import Debugging.Visualizations.Views.Economy.{ShowEconomy, ShowScheduler}
 import Debugging.Visualizations.Views.Fun._
 import Debugging.Visualizations.Views.Geography._
@@ -24,10 +24,11 @@ class Visualization {
     ShowPerformanceSummary,
     ShowClock,
     ShowStrategy,
-    ShowUnitsAll,
-    ShowUnitsFriendly,
-    ShowUnitsForeign,
-    ShowExplosions
+    //ShowUnitsAll,
+    //ShowUnitsFriendly,
+    //ShowUnitsForeign,
+    ShowExplosions,
+    ShowClustering
   )
   
   var enabled   : Boolean = _
@@ -58,6 +59,7 @@ class Visualization {
     ShowArchitectureHeuristics,
     ShowArchitecturePaths,
     ShowBases,
+    ShowClustering,
     ShowDesire,
     ShowGroundskeeper,
     ShowGrids,

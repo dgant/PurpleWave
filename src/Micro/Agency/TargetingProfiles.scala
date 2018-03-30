@@ -9,5 +9,5 @@ object TargetingProfiles {
     preferVpfOurs     =  1.0,
     preferDetectors   =  8.0,
     avoidPain         =  0.0,
-    avoidDelay        =  0.4)
+    avoidDelay        =  0.5)
 }

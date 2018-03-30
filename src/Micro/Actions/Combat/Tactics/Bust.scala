@@ -23,7 +23,7 @@ object Bust extends Action {
     unit.canMove                                                  &&
     unit.is(Protoss.Dragoon)                                      &&
     With.self.hasUpgrade(Protoss.DragoonRange)                    &&
-    unit.matchups.threats.forall( ! _.is(Terran.SiegeTankSieged)) &&
+    unit.matchups.threatsInRange.forall( ! _.is(Terran.SiegeTankSieged)) &&
     unit.matchups.targets.exists(target =>
       target.visible            &&
       target.aliveAndComplete   &&
@@ -32,14 +32,13 @@ object Bust extends Action {
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {
-    
     // Goal: Take down the bunker. Don't take any damage from it.
     // If we're getting shot at by the bunker, back off.
     val bunkers = unit.matchups.threats.filter(_.is(Terran.Bunker))
     if (With.framesSince(unit.lastFrameTakingDamage) < GameTime(0, 1)()) {
       Leave.delegate(unit)
     }
-    else if (bunkers.exists(unit.inRangeToAttack)) {
+    else if (unit.matchups.targetsInRange.nonEmpty) {
       With.commander.hold(unit)
     }
   }

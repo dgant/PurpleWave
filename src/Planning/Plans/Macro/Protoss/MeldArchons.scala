@@ -10,6 +10,7 @@ import ProxyBwapi.Races.Protoss
 
 class MeldArchons(maxEnergy: Int = 250) extends Plan {
   
+  protected def maximumTemplar: Int = 100
   protected def minimumArchons: Int = 0
   
   val templar = new LockUnits
@@ -18,8 +19,9 @@ class MeldArchons(maxEnergy: Int = 250) extends Plan {
   
   override def onUpdate() {
     val templarLow    = With.units.ours.count(u => u.is(Protoss.HighTemplar) && u.energy < maxEnergy)
+    val templarExcess = With.units.ours.count(_.is(Protoss.HighTemplar)) - maximumTemplar
     val archonsNow    = With.units.ours.count(_.is(Protoss.Archon))
-    val archonsToAdd  = Math.max(0, minimumArchons - archonsNow)
+    val archonsToAdd  = Vector(0, minimumArchons - archonsNow, templarExcess / 2).max
     val templarToMeld = Math.max(templarLow, 2 * archonsToAdd)
     templar.unitCounter.set(new UnitCountBetween(0, templarToMeld))
     

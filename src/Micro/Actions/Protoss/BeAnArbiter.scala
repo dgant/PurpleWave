@@ -18,9 +18,7 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 object BeAnArbiter extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
-    unit.aliveAndComplete
-    && unit.is(Protoss.Arbiter)
-    && unit.matchups.enemies.exists(_.matchups.targets.nonEmpty)
+    unit.aliveAndComplete && unit.is(Protoss.Arbiter)
   )
   
   protected def needsUmbrella(target: UnitInfo): Boolean =
@@ -43,7 +41,7 @@ object BeAnArbiter extends Action {
   override protected def perform(unit: FriendlyUnitInfo) {
     Potshot.consider(unit)
     
-    val threatened   = unit.matchups.framesOfSafetyDiffused <= 0.0
+    val threatened   = unit.matchups.framesOfSafetyDiffused <= 12.0
     val needUmbrella = unit.teammates.filter(needsUmbrella)
     
     if (needUmbrella.nonEmpty) {

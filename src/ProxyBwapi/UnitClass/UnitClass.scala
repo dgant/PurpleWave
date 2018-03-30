@@ -52,7 +52,7 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   // Combat //
   ////////////
   
-  lazy val ranged  : Boolean = rawCanAttack && maxAirGroundRangePixels > 32 * 2
+  lazy val ranged  : Boolean = rawCanAttack && pixelRangeMax > 32 * 2
   lazy val melee   : Boolean = rawCanAttack && ! ranged
   
   lazy val suicides: Boolean = Array(
@@ -129,22 +129,24 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   
   lazy val helpsInCombat: Boolean = rawCanAttack || isSpellcaster || Set(Terran.Bunker).contains(this) || this == Zerg.Lurker || this == Protoss.Carrier
   
-  lazy val groundRangePixels: Double =
-    if      (this == Terran.Bunker)   Terran.Marine.groundRangePixels  + 32.0
+  lazy val pixelRangeGround: Double =
+    if      (this == Terran.Bunker)   Terran.Marine.pixelRangeGround  + 32.0
     else if (this == Protoss.Carrier) 32.0 * 8.0
     else if (this == Protoss.Reaver)  32.0 * 8.0
     else                              groundRangeRaw
-  lazy val airRangePixels: Double =
-    if      (this == Terran.Bunker)   Terran.Marine.groundRangePixels  + 32.0
+  lazy val pixelRangeAir: Double =
+    if      (this == Terran.Bunker)   Terran.Marine.pixelRangeGround  + 32.0
     else if (this == Protoss.Carrier) 32.0 * 8.0
     else                              airRangeRaw
-  lazy val maxAirGroundRangePixels  : Double = Math.max(groundRangePixels, airRangePixels)
-  lazy val effectiveRangePixels     : Double =
+  
+  lazy val pixelRangeMax: Double = Math.max(pixelRangeGround, pixelRangeAir)
+  
+  lazy val effectiveRangePixels: Double =
     if (isDetector)                         32.0 * 11.0
     else if (this == Terran.Battlecruiser)  32.0 * 10.0
     else if (this == Protoss.HighTemplar)   32.0 * 9.0
     else if (this == Protoss.Arbiter)       32.0 * 9.0
-    else maxAirGroundRangePixels
+    else pixelRangeMax
   
   lazy val tileArea               : TileRectangle = TileRectangle(Tile(0, 0), tileSize)
   lazy val targetsMatter          : Boolean = this != Protoss.Interceptor

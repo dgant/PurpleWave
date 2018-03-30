@@ -1,7 +1,7 @@
 package Micro.Actions.Combat.Maneuvering
 
 import Micro.Actions.Action
-import Micro.Actions.Combat.Decisionmaking.Leave
+import Micro.Actions.Commands.Move
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Yank extends Action {
@@ -13,6 +13,7 @@ object Yank extends Action {
   
   override protected def perform(unit: FriendlyUnitInfo) {
     unit.agent.canFlee = true
-    Leave.delegate(unit)
+    unit.agent.toTravel = Some(unit.agent.toLeash.get.pixelCenter)
+    Move.delegate(unit)
   }
 }

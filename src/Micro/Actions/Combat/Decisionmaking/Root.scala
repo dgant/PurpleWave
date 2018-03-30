@@ -29,7 +29,7 @@ object Root extends Action {
     private lazy val weAreALurker         = Zerg.Lurker.accept(unit)
     private lazy val weAreATank           = UnitMatchSiegeTank.accept(unit)
     private lazy val weAreRooted          = (weAreALurker && unit.burrowed) || unit.is(Terran.SiegeTankSieged)
-    private lazy val maxRange             = if (unit.is(Terran.SiegeTankUnsieged)) Terran.SiegeTankSieged.groundRangePixels else unit.pixelRangeGround
+    private lazy val maxRange             = if (unit.is(Terran.SiegeTankUnsieged)) Terran.SiegeTankSieged.pixelRangeGround else unit.pixelRangeGround
     private lazy val ourDistanceToGoal    = distanceToGoal(unit)
     private lazy val rootersInPush        = unit.squadmates.filter(s => unit != s && Zerg.Lurker.accept(s) || UnitMatchSiegeTank.accept(s))
     private lazy val rootersInPushCloser  = rootersInPush.count(distanceToGoal(_) < ourDistanceToGoal + pushSpacing)

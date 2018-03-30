@@ -11,7 +11,10 @@ object Project {
   
   // Frames before we could possibly have this unit, not counting costs
   //
-  def framesToUnits(unitClass: UnitClass, quantity: Int = 1, unitsInCycle: Array[UnitClass] = Array.empty): Int = {
+  def framesToUnits(
+    unitClass: UnitClass,
+    quantity: Int = 1,
+    unitsInCycle: Array[UnitClass] = Array.empty): Int = {
     
     val unitsOfClass          = With.units.ours.filter(_.is(unitClass))
     val unitsOfClassComplete  = unitsOfClass.filter(_.complete)

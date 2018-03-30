@@ -150,11 +150,25 @@ object PvPIdeas {
     
   class TrainArmy extends Parallel(
     new TrainContinuously(Protoss.Carrier),
-    new If(new UnitsAtMost(0, Protoss.PhotonCannon), new TrainContinuously(Protoss.Observer, 1)),
-    new If(new Not(new EnemyCarriersOnly), new TrainDarkTemplar),
-    new If(new UnitsAtLeast(12, UnitMatchWarriors), new TrainContinuously(Protoss.Arbiter, 8, 2)),
-    new If(new Not(new EnemyCarriersOnly), new TrainContinuously(Protoss.Reaver, 2)),
-    new If(new UnitsAtLeast(12, UnitMatchWarriors), new TrainContinuously(Protoss.HighTemplar, 6, 2)),
+    new If(
+      new And(
+        new Not(new EnemyCarriersOnly),
+        new UnitsAtMost(0, Protoss.PhotonCannon)),
+      new TrainContinuously(Protoss.Observer, 1)),
+    new If(
+      new Not(new EnemyCarriersOnly),
+      new TrainDarkTemplar),
+    new If(
+      new UnitsAtLeast(12, UnitMatchWarriors),
+      new TrainContinuously(Protoss.Arbiter, 8, 2)),
+    new If(
+      new And(
+        new Not(new EnemyCarriersOnly),
+        new UnitsAtMost(0, Protoss.TemplarArchives)),
+      new TrainContinuously(Protoss.Reaver, 2)),
+    new If(
+      new UnitsAtLeast(12, UnitMatchWarriors),
+      new TrainContinuously(Protoss.HighTemplar, 6, 2)),
     new TrainDragoonsOrZealots,
     new TrainContinuously(Protoss.Observer, 2)
   )

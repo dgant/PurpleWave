@@ -14,8 +14,8 @@ object Brawl extends ActionTechnique {
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     unit.canMove
     && ! unit.unitClass.isWorker
-    && unit.matchups.targets.exists(_.unitClass.melee)
-    && unit.matchups.threats.exists(_.unitClass.melee)
+    && unit.matchups.targets.exists(t => ! t.flying && t.unitClass.melee)
+    && unit.matchups.threats.exists(t => ! t.flying && t.unitClass.melee && t.pixelDistanceEdge(unit) < 32.0)
   )
   
   override def applicabilitySelf(unit: FriendlyUnitInfo): Double = {

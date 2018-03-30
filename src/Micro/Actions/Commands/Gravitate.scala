@@ -33,7 +33,7 @@ object Gravitate extends Action {
     lazy val ray          = makeRay(forceRadians)
     lazy val rayWalkable  = ray.tilesIntersected.forall(With.grids.walkable.get)
     
-    if (unit.flying || rayWalkable) {
+    if (unit.flying || unit.agent.destination.zone != unit.zone || rayWalkable) {
       val destination = unit.pixelCenter.add(forceTotal.normalize(rayLength).toPoint)
       unit.agent.toTravel = Some(destination)
       return

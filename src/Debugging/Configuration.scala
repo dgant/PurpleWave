@@ -28,8 +28,8 @@ class Configuration {
   
   var avatarBattleDistancePixels    = 32.0 * 6.0
   var battleMarginTileBase          = 5
-  var battleMarginTileMinimum       = 25
-  var battleMarginTileMaximum       = 40
+  var battleMarginTileMinimum       = 18
+  var battleMarginTileMaximum       = 30
   var battleEstimationFrames        = GameTime(0, 8)()
   var battleHysteresisFrames        = GameTime(0, 3)()
   var battleHysteresisRatio         = 0.175
@@ -44,7 +44,6 @@ class Configuration {
   
   var concaveMarginPixels             = 16.0
   var assumedBuilderTravelSpeed       = 0.65
-  var attackableRangeBufferPixels     = 4
   var fogPositionDurationFrames       = GameTime(0, 20)()
   var violenceThresholdFrames         = GameTime(0, 2)()
   var pickupRadiusPixels              = 48 //No idea what actual value is

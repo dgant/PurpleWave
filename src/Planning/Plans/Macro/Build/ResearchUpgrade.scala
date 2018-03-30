@@ -6,6 +6,7 @@ import Micro.Agency.Intention
 import Planning.Composition.ResourceLocks._
 import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Plan
+import ProxyBwapi.UnitClass.UnitClasses
 import ProxyBwapi.Upgrades.Upgrade
 
 class ResearchUpgrade(upgrade: Upgrade, level: Int) extends Plan {
@@ -24,7 +25,11 @@ class ResearchUpgrade(upgrade: Upgrade, level: Int) extends Plan {
   override def onUpdate() {
     if (isComplete) return
     
-    val requiredClasses = upgrade.whatsRequired.get(level).toVector :+ upgraderClass
+    val requiredClasses = (upgrade.whatsRequired.get(level).toVector :+ upgraderClass).filterNot(_ == UnitClasses.None)
+    
+    // Don't even stick a projected expenditure in the queue if we're this far out.
+    if (requiredClasses.exists(c => ! With.units.ours.exists(_.is(c)))) return
+    
     currency.framesPreordered = requiredClasses.map(Project.framesToUnits(_)).max
     currency.acquire(this)
     currency.isSpent = With.units.ours.exists(upgrader => upgrader.upgrading && upgrader.upgradingType == upgrade)

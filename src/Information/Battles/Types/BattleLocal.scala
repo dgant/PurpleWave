@@ -12,11 +12,13 @@ class BattleLocal(us: Team, enemy: Team) extends Battle(us, enemy) {
   lazy val estimationSimulationAttack   : Prediction  = estimateSimulation(this, weAttack = true,   weSnipe = false)
   lazy val estimationSimulationSnipe    : Prediction  = estimateSimulation(this, weAttack = true,   weSnipe = true)
   
+  lazy val turrets                  = us.units.filter(u => ! u.canMove && ! u.canAttack)
+  lazy val canTurtle      : Boolean = turrets.nonEmpty && turrets.forall(_.matchups.targetsInRange.isEmpty)
   lazy val hysteresis     : Double  = ByOption.mean(us.units.filter(_.canMove).map(hysteresisRatio)).getOrElse(0.0)
   lazy val distanceUs     : Double  = focus.pixelDistance(With.geography.home.pixelCenter)
   lazy val distanceEnemy  : Double  = focus.pixelDistance(With.intelligence.mostBaselikeEnemyTile.pixelCenter)
   lazy val distanceRatio  : Double  = distanceEnemy / (distanceUs + distanceEnemy)
-  lazy val urgency        : Double  = PurpleMath.clamp(0.5 * (distanceRatio - 0.5), 0.0, 0.5)
+  lazy val urgency        : Double  = if (canTurtle) 0.0 else PurpleMath.clamp(0.5 * (distanceRatio - 0.5), 0.0, 0.5)
   lazy val attackGains    : Double  = estimationSimulationAttack.costToEnemy
   lazy val attackLosses   : Double  = estimationSimulationAttack.costToUs
   lazy val snipeGains     : Double  = estimationSimulationSnipe.costToEnemy

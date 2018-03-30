@@ -7,6 +7,8 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 class TargetAction(val additionalFiltersRequired: TargetFilter*) extends Action {
   
+  val additionalFiltersOptional: Vector[TargetFilter] = Vector.empty
+  
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
     unit.agent.canFight           &&
     unit.agent.toAttack.isEmpty   &&
@@ -15,7 +17,7 @@ class TargetAction(val additionalFiltersRequired: TargetFilter*) extends Action 
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {
-    var filtersOptional = Vector(TargetFilterCombatants, TargetFilterIgnoreScouts)
+    var filtersOptional = additionalFiltersOptional ++ Vector(TargetFilterCombatants, TargetFilterIgnoreScouts)
     val filtersRequired = Vector(TargetFilterStayCloaked, TargetFilterMission, TargetFilterAlmostAnything) ++ additionalFiltersRequired
     
     do {

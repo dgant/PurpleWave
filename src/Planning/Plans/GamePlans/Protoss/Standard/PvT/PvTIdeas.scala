@@ -40,7 +40,8 @@ object PvTIdeas {
         new Employing(PvTEarly1GateStargateTemplar),
         new IfOnMiningBases(3),
         new Not(new EnemyHasShown(Terran.Vulture)),
-        new UnitsAtLeast(1, UnitMatchCustom((unit) => unit.is(Protoss.Observer) && With.framesSince(unit.frameDiscovered) > 24 * 10), complete = true))),
+        new UnitsAtLeast(1, UnitMatchCustom((unit) => unit.is(Protoss.Observer) && With.framesSince(unit.frameDiscovered) > 24 * 10), complete = true),
+        new UnitsAtLeast(20, UnitMatchWarriors, complete = true))),
     new ConsiderAttacking)
   
   class EmergencyBuilds extends Parallel(

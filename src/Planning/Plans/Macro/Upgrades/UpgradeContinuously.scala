@@ -13,6 +13,7 @@ class UpgradeContinuously(upgrade: Upgrade, maxLevel: Int = 3) extends Plan {
   
   override def onUpdate() {
     if (isComplete) return
+    if ( ! With.units.ours.exists(_.is(upgrade.whatUpgrades))) return
     With.scheduler.request(this, RequestUpgrade(upgrade, With.self.getUpgradeLevel(upgrade) + 1))
   }
 }

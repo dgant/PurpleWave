@@ -7,7 +7,7 @@ import Mathematics.PurpleMath
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClass.UnitClass
-import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders, UnitInfo}
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import ProxyBwapi.Upgrades.Upgrade
 import Utilities.CountMap
 import bwapi.UnitCommandType
@@ -74,11 +74,7 @@ class Commander {
     // TODO: Fix attack cancelling for Photon Cannons
     if (unit.is(Protoss.PhotonCannon)) return
     
-    if (unit.interceptors.exists(_.order == Orders.InterceptorAttack)) {
-      // Carriers lose most of their DPS with direct attack orders
-      unit.baseUnit.attack(target.pixelCenter.bwapi)
-    }
-    else if (target.visible) {
+    if (target.visible) {
       lazy val moving           = unit.moving
       lazy val alreadyInRange   = unit.inRangeToAttack(target)
       lazy val overdueToAttack  = unit.cooldownLeft == 0 && With.framesSince(unit.lastFrameStartingAttack) > 2.0 * unit.cooldownMaxAirGround
@@ -374,6 +370,11 @@ class Commander {
   def lift(unit: FriendlyUnitInfo) {
     if (unready(unit)) return
     unit.baseUnit.lift()
+    sleep(unit)
+  }
+  
+  def pass(unit: FriendlyUnitInfo) {
+    if (unready(unit)) return
     sleep(unit)
   }
   

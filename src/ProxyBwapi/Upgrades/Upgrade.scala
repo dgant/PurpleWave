@@ -15,7 +15,7 @@ case class Upgrade(val baseType: UpgradeType) {
   lazy val asString             = baseType.toString.replaceAll("_", " ")
   
   lazy val gasPrice             = levels.map(i => (i, baseType.gasPrice(i))).toMap
-  lazy val upgradeFrames          = levels.map(i => (i, baseType.upgradeTime(i))).toMap
+  lazy val upgradeFrames        = levels.map(i => (i, baseType.upgradeTime(i))).toMap
   lazy val whatsRequired        = levels.map(i => (i, UnitClasses.get(baseType.whatsRequired(i)))).toMap
   
   override def toString:String = asString

@@ -4,18 +4,19 @@ import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
 import Planning.Composition.Latch
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
-import Planning.Plans.Compound.{Or, _}
+import Planning.Plans.Compound.{Or, Parallel, _}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.GamePlans.Protoss.Standard.PvT.PvTIdeas.AttackRespectingMines
 import Planning.Plans.Macro.Automatic.TrainWorkersContinuously
-import Planning.Plans.Macro.BuildOrders.Build
+import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.BuildCannonsAtExpansions
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Predicates.Milestones._
 import Planning.Plans.Predicates.Reactive.{EnemyBasesAtLeast, EnemyBio}
 import Planning.Plans.Predicates.{Employing, Never, SafeAtHome}
+import Planning.Plans.Scouting.ScoutOn
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss._
 
@@ -26,6 +27,12 @@ class PvTBasic extends GameplanModeTemplate {
   override val defaultWorkerPlan      = new TrainWorkersContinuously(oversaturate = true)
   override val priorityAttackPlan     = new PvTIdeas.PriorityAttacks
   
+  override def defaultScoutPlan: Plan = new Parallel(
+    new If(new Employing(PvT13Nexus),       new ScoutOn(Protoss.Nexus, quantity = 2)),
+    new If(new Employing(PvT21Nexus),       new ScoutOn(Protoss.Gateway)),
+    new If(new Employing(PvT2GateObserver), new ScoutOn(Protoss.Pylon)),
+    new If(new Employing(PvTDTExpand),      new ScoutOn(Protoss.Pylon)))
+  
   override val defaultAttackPlan = new If(
     new Or(
       new Not(new Employing(PvTDTExpand)),
@@ -35,9 +42,10 @@ class PvTBasic extends GameplanModeTemplate {
   override def emergencyPlans: Seq[Plan] = Vector(new PvTIdeas.EmergencyBuilds)
   
   override def defaultBuildOrder: Plan = new Parallel(
-    new If(new Employing(PvT13Nexus),   new Build(ProtossBuilds.Opening13Nexus_NoZealot_TwoGateways: _*)),
-    new If(new Employing(PvT21Nexus),   new Build(ProtossBuilds.Opening21Nexus_Robo: _*)),
-    new If(new Employing(PvTDTExpand),  new Build(ProtossBuilds.OpeningDTExpand: _*)))
+    new If(new Employing(PvT13Nexus),       new BuildOrder(ProtossBuilds.Opening13Nexus_NoZealot_TwoGateways: _*)),
+    new If(new Employing(PvT21Nexus),       new BuildOrder(ProtossBuilds.Opening21Nexus_Robo: _*)),
+    new If(new Employing(PvT2GateObserver), new BuildOrder(ProtossBuilds.Opening2GateObserver: _*)),
+    new If(new Employing(PvTDTExpand),      new BuildOrder(ProtossBuilds.OpeningDTExpand: _*)))
   
   class ThreeBaseTech extends Employing(PvT3BaseCarrier, PvT3BaseArbiter)
   class EmployingCarriers extends Employing(PvT2BaseCarrier, PvT3BaseCarrier)
@@ -83,9 +91,11 @@ class PvTBasic extends GameplanModeTemplate {
         new BuildGasPumps,
         new Build(
           RequestAtLeast(1, Protoss.Stargate),
-          RequestAtLeast(4, Protoss.Gateway),
-          RequestAtLeast(1, Protoss.FleetBeacon),
-          RequestAtLeast(2, Protoss.Stargate)))),
+          RequestAtLeast(3, Protoss.Gateway),
+          RequestAtLeast(1, Protoss.FleetBeacon)),
+        new If(
+          new UnitsAtLeast(1, Protoss.FleetBeacon),
+          new Build(RequestAtLeast(2, Protoss.Stargate))))),
     new If(
       new And(
         new EmployingArbiters,
@@ -114,10 +124,20 @@ class PvTBasic extends GameplanModeTemplate {
           new UpgradeContinuously(Protoss.AirDamage)),
         new UpgradeContinuously(Protoss.CarrierCapacity))),
     new BuildCannonsAtExpansions(2),
+    // Don't sit around with one StarGate while spending all our gas
+    new If(
+      new And(
+        new EmployingCarriers,
+        new SafeAtHome,
+        new UnitsAtLeast(1, Protoss.Stargate, complete = true)),
+      new Build(
+        RequestAtLeast(1, Protoss.FleetBeacon),
+        RequestAtLeast(1, Protoss.Stargate))),
     new PvTIdeas.TrainArmy,
     new If(
       new UnitsAtLeast(1, Protoss.HighTemplar),
       new Build(RequestTech(Protoss.PsionicStorm))),
+    new UpgradeContinuously(Protoss.ZealotSpeed),
     new UpgradeContinuously(Protoss.GroundDamage),
     new Build(
       RequestAtLeast(2, Protoss.Gateway),
@@ -170,9 +190,11 @@ class PvTBasic extends GameplanModeTemplate {
     new Build(RequestAtLeast(2, Protoss.Forge)),
     new UpgradeContinuously(Protoss.GroundArmor),
     new Build(RequestAtLeast(1, Protoss.TemplarArchives)),
-    new Build(RequestAtLeast(20, Protoss.Gateway)),
+    new Build(RequestAtLeast(16, Protoss.Gateway)),
     new RequireMiningBases(5),
-    new UpgradeContinuously(Protoss.Shields)
+    new Build(RequestAtLeast(20, Protoss.Gateway)),
+    new UpgradeContinuously(Protoss.Shields),
+    new Build(RequestAtLeast(24, Protoss.Gateway))
   )
 }
 

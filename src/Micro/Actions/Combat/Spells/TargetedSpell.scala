@@ -2,6 +2,7 @@ package Micro.Actions.Combat.Spells
 
 import Lifecycle.With
 import Mathematics.Points.Pixel
+import Mathematics.PurpleMath
 import Micro.Actions.Action
 import Micro.Heuristics.Spells.{TargetAOE, TargetSingle}
 import ProxyBwapi.Techs.Tech
@@ -34,9 +35,9 @@ abstract class TargetedSpell extends Action {
   protected def additionalConditions(unit: FriendlyUnitInfo): Boolean = true
   
   override protected def perform(unit: FriendlyUnitInfo) {
-    val framesToReact   = unit.matchups.framesToLiveDiffused
+    val framesToLive    = unit.matchups.framesToLiveDiffused
     val framesOfSafety  = unit.matchups.framesOfSafetyDiffused
-    val safeDistance    = Math.max(0, Math.min(framesToReact, framesOfSafety)) * unit.unitClass.topSpeed
+    val safeDistance    = PurpleMath.clamp(framesToLive * unit.topSpeed, 0.0, 32.0 * 8.0)
     val totalRange      = safeDistance + 32.0 * castRangeTiles
     
     if (aoe) {

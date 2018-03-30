@@ -13,6 +13,14 @@ object Move extends Action {
   
   override def perform(unit: FriendlyUnitInfo) {
     val pixelToMove = unit.agent.toTravel.get
-    With.commander.move(unit, pixelToMove)
+    
+    if (unit.agent.shouldEngage
+      && With.reaction.agencyAverage > 12
+      && ! unit.unitClass.isWorker) {
+      With.commander.attackMove(unit, pixelToMove)
+    }
+    else {
+      With.commander.move(unit, pixelToMove)
+    }
   }
 }

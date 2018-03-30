@@ -23,6 +23,9 @@ class ResearchTech(tech: Tech) extends Plan {
   
   override def onUpdate() {
     if (isComplete) return
+  
+    // Don't even stick a projected expenditure in the queue if we're this far out.
+    if ( ! With.units.ours.exists(_.is(techerClass))) return
     
     currency.framesPreordered = Project.framesToUnits(techerClass)
     currency.acquire(this)

@@ -55,12 +55,10 @@ object Avoid extends ActionTechnique {
     val forceMobility   = Potential.mobilityAttraction(unit)  * mobilityBonus
     val forceSpreading  = Potential.collisionRepulsion(unit)
     val forceRegrouping = Potential.teamAttraction(unit)      * regroupingBonus
-    //val forceOptimizing = (forceExiting + forceSpreading + forceMobility).clipMin(1.0)
     
     unit.agent.forces.put(ForceColors.threat,     forceThreat)
     unit.agent.forces.put(ForceColors.mobility,   forceMobility)
     unit.agent.forces.put(ForceColors.traveling,  forceExiting)
-    //unit.agent.forces.put(ForceColors.traveling,  forceOptimizing)
     unit.agent.forces.put(ForceColors.spreading,  forceSpreading)
     unit.agent.forces.put(ForceColors.regrouping, forceRegrouping)
     Gravitate.delegate(unit)

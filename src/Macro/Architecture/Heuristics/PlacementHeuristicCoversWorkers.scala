@@ -9,7 +9,7 @@ object PlacementHeuristicCoversWorkers extends PlacementHeuristic {
     candidate.zone.bases
       .map(
         _.harvestingArea.tiles.count(
-          _.tileDistanceFast(candidate) * 32.0
+          _.tileDistanceFast(candidate)
           <= blueprint.marginPixels.get))
       .sum
   }

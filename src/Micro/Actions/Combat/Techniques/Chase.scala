@@ -4,7 +4,7 @@ import Lifecycle.With
 import Micro.Actions.Combat.Attacking.Target
 import Micro.Actions.Combat.Techniques.Common.ActionTechnique
 import Micro.Actions.Commands.{Attack, Move}
-import ProxyBwapi.Races.Zerg
+import ProxyBwapi.Races.{Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object Chase extends ActionTechnique {
@@ -15,6 +15,7 @@ object Chase extends ActionTechnique {
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     unit.canMove
     && unit.canAttack
+    && ! unit.is(Terran.SCV) // SCVs are just really bad at this
   )
   
   override def applicabilitySelf(unit: FriendlyUnitInfo): Double = {
@@ -57,7 +58,7 @@ object Chase extends ActionTechnique {
     // Chase the target down
     // TODO: Queue up a move order ASAP; we can't wait for latency
     
-    if (target.speedApproaching(unit.pixelCenter) <= 0.0) {
+    if (target.speedApproaching(unit.pixelCenter) < 0.0) {
       val targetProjected = target.projectFrames(unit.framesToBeReadyForAttackOrder)
       val distanceToTravel = Math.max(
         unit.pixelDistanceCenter(targetProjected),

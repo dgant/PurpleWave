@@ -66,7 +66,7 @@ object ShowUnitsAll extends View {
     
     if (showMortality) {
       val ttlThreshold  = 8.0
-      val ttlCurrent    = unit.matchups.framesToLiveDiffused.toDouble / 24.0
+      val ttlCurrent    = unit.matchups.framesToLive.toDouble / 24.0
       if (ttlCurrent <= ttlThreshold) {
         val ratio       = ttlCurrent / ttlThreshold
         val ratio255    = Math.max(0, (255 * (1.0 - ratio)).toInt)
@@ -78,18 +78,18 @@ object ShowUnitsAll extends View {
       }
     }
     if (showSafety) {
-      if (unit.matchups.framesOfSafetyDiffused < 24 * 4) {
+      if (unit.matchups.framesOfSafety < 24 * 4) {
         val color =
-          if (unit.matchups.framesOfSafetyDiffused <= 0)
+          if (unit.matchups.framesOfSafety <= 0)
             Colors.NeonRed
-          else if (unit.matchups.framesOfSafetyDiffused <= 24)
+          else if (unit.matchups.framesOfSafety <= 24)
             Colors.NeonOrange
           else
             Colors.NeonGreen
         
         val radius = Math.max(10.0, unit.unitClass.dimensionMin / 2.0)
         DrawMap.circle(unit.pixelCenter, radius.toInt, color,  solid = true)
-        DrawMap.label(unit.matchups.framesOfEntanglementDiffused.toInt.toString, unit.pixelCenter)
+        DrawMap.label(unit.matchups.framesOfEntanglement.toInt.toString, unit.pixelCenter)
       }
     }
   }

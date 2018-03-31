@@ -18,7 +18,7 @@ object Reposition extends ActionTechnique {
   override val activator = One
   
   override def applicabilitySelf(unit: FriendlyUnitInfo): Double = {
-    - unit.matchups.vpfNetDiffused
+    - unit.matchups.vpfNet
   }
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {

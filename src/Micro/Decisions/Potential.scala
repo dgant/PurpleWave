@@ -46,7 +46,7 @@ object Potential {
   }
   
   protected def threatRepulsion(unit: FriendlyUnitInfo, threat: UnitInfo): Force = {
-    val entanglement          = unit.matchups.framesOfEntanglementPerThreatDiffused.getOrElse(threat, threat.framesToGetInRange(unit).toDouble)
+    val entanglement          = unit.matchups.framesOfEntanglementPerThreat.getOrElse(threat, threat.framesToGetInRange(unit).toDouble)
     val magnitudeEntanglement = 1.0 + PurpleMath.fastSigmoid(-entanglement/24.0)
     val magnitudeDamage       = threat.dpfOnNextHitAgainst(unit)
     val magnitudeFinal        = magnitudeDamage * magnitudeEntanglement

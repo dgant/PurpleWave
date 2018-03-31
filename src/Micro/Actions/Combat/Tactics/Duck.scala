@@ -14,8 +14,8 @@ object Duck extends Action {
     && With.self.hasTech(Zerg.Burrow)
     && Vector(Zerg.Zergling, Zerg.Hydralisk, Zerg.Defiler).contains(unit.unitClass)
     && unit.matchups.enemyDetectors.isEmpty
-    && (unit.matchups.framesToLiveDiffused < Math.max(16, unit.matchups.framesOfEntanglementDiffused)
-      || unit.matchups.framesOfEntanglementPerThreatDiffused.exists(pair => pair._1.topSpeed > unit.topSpeed && pair._2 > -burrowFrames))
+    && (unit.matchups.framesToLive < Math.max(16, unit.matchups.framesOfEntanglement)
+      || unit.matchups.framesOfEntanglementPerThreat.exists(pair => pair._1.topSpeed > unit.topSpeed && pair._2 > -burrowFrames))
   )
   
   override protected def perform(unit: FriendlyUnitInfo) {

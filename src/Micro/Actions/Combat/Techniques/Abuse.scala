@@ -30,7 +30,7 @@ object Abuse extends ActionTechnique {
     if ( ! other.canAttack(unit)) return None
     if ( ! unit.canAttack(other)) return None
     
-    val framesOfSafetyAgainst = - unit.matchups.framesOfEntanglementPerThreatDiffused.getOrElse(other, 0.0)
+    val framesOfSafetyAgainst = - unit.matchups.framesOfEntanglementPerThreat.getOrElse(other, 0.0)
     if (framesOfSafetyAgainst < unit.unitClass.framesToTurnAndShootAndTurnBackAndAccelerate) return Some(0.0)
     
     lazy val deltaThreats = other.matchups.threats.size - unit.matchups.threats.size
@@ -50,7 +50,7 @@ object Abuse extends ActionTechnique {
   }
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
-    lazy val safeToShoot = unit.matchups.framesOfSafetyDiffused > unit.unitClass.framesToTurnAndShootAndTurnBackAndAccelerate
+    lazy val safeToShoot = unit.matchups.framesOfSafety > unit.unitClass.framesToTurnAndShootAndTurnBackAndAccelerate
     lazy val lastChanceToShoot = unit.matchups.targetsInRange.isEmpty || unit.matchups.targets.forall(t => t.pixelDistanceEdge(unit) > unit.pixelRangeAgainst(t) - 32.0)
     if (unit.readyForAttackOrder && (safeToShoot || lastChanceToShoot)) {
       Potshot.delegate(unit)
@@ -58,7 +58,7 @@ object Abuse extends ActionTechnique {
       Attack.delegate(unit)
       if (unit.agent.toAttack.isEmpty) return
     }
-    if (unit.matchups.framesOfSafetyDiffused < GameTime(0, 2)()) {
+    if (unit.matchups.framesOfSafety < GameTime(0, 2)()) {
       Avoid.delegate(unit)
     }
   }

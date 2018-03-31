@@ -2,7 +2,6 @@ package Micro.Matchups
 
 import Information.Battles.BattleClassificationFilters
 import Information.Battles.Types.{Battle, Team}
-import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
@@ -41,20 +40,16 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
   
   def repairers: ArrayBuffer[UnitInfo] = ArrayBuffer.empty ++ allies.filter(_.friendly.exists(_.agent.toRepair.contains(me)))
   
-  lazy val valuePerDamage                         : Double                = MicroValue.valuePerDamage(me)
-  lazy val vpfDealingDiffused                     : Double                = targetsInRange.map(target => dpfDealingDiffused(target)  * target.matchups.valuePerDamage).sum
-  lazy val dpfReceivingDiffused                   : Double                = threatsInRange.map(_.matchups.dpfDealingDiffused(me)).sum
-  lazy val vpfReceivingDiffused                   : Double                = valuePerDamage * dpfReceivingDiffused
-  lazy val vpfNetDiffused                         : Double                = vpfDealingDiffused   - vpfReceivingDiffused
-  lazy val framesToLiveDiffused                   : Double                = PurpleMath.nanToInfinity(me.totalHealth / dpfReceivingDiffused)
-  lazy val doomedDiffused                         : Boolean               = framesToLiveDiffused <= framesToRetreatDiffused
-  lazy val framesOfEntanglementPerThreatDiffused  : Map[UnitInfo, Double] = threats.map(threat => (threat, framesOfEntanglementWith(threat))).toMap
-  lazy val framesOfEntanglementDiffused           : Double                = ByOption.max(framesOfEntanglementPerThreatDiffused.values).getOrElse(- Forever())
-  lazy val framesOfSafetyDiffused                 : Double                = - With.latency.latencyFrames - With.reaction.agencyMax - ByOption.max(framesOfEntanglementPerThreatDiffused.values).getOrElse(- Forever())
-  lazy val pixelsOfFreedom                        : Double                = if (me.flying) GameTime(1, 0)() else ByOption.min(others.filter( ! _.flying).map(_.pixelDistanceEdge(me))).getOrElse(GameTime(1, 0)())
-  lazy val mostEntangledThreatsDiffused           : Vector[UnitInfo]      = threats.sortBy( - framesOfEntanglementPerThreatDiffused(_))
-  lazy val mostEntangledThreatDiffused            : Option[UnitInfo]      = ByOption.minBy(framesOfEntanglementPerThreatDiffused)(_._2).map(_._1)
-  def framesToRetreatDiffused   : Double = Math.max(0.0, framesOfEntanglementDiffused)
+  lazy val valuePerDamage                 : Double                = MicroValue.valuePerDamage(me)
+  lazy val vpfDealing                     : Double                = targetsInRange.map(target => dpfDealingDiffused(target)  * target.matchups.valuePerDamage).sum
+  lazy val dpfReceiving                   : Double                = threatsInRange.map(_.matchups.dpfDealingDiffused(me)).sum
+  lazy val vpfReceiving                   : Double                = valuePerDamage * dpfReceiving
+  lazy val vpfNet                         : Double                = vpfDealing   - vpfReceiving
+  lazy val framesToLive                   : Double                = PurpleMath.nanToInfinity(me.totalHealth / dpfReceiving)
+  lazy val doomed                         : Boolean               = framesToLive <= framesOfEntanglement
+  lazy val framesOfEntanglementPerThreat  : Map[UnitInfo, Double] = threats.map(threat => (threat, framesOfEntanglementWith(threat))).toMap
+  lazy val framesOfEntanglement           : Double                = ByOption.max(framesOfEntanglementPerThreat.values).getOrElse(- Forever())
+  lazy val framesOfSafety                 : Double                = - With.latency.latencyFrames - With.reaction.agencyMax - ByOption.max(framesOfEntanglementPerThreat.values).getOrElse(- Forever())
   
   def dpfDealingDiffused  (target: UnitInfo): Double = me.dpfOnNextHitAgainst(target) / Math.max(1.0, targetsInRange.size)
   

@@ -69,7 +69,7 @@ object Build extends Action {
       }
     }
     else {
-      blockersOurs.flatMap(_.friendly).filter(_.matchups.framesOfSafetyDiffused > GameTime(0, 1)()).foreach(_.agent.shove(unit))
+      blockersOurs.flatMap(_.friendly).filter(_.matchups.framesOfSafety > GameTime(0, 1)()).foreach(_.agent.shove(unit))
       
       val buildPixel = unit.agent.toBuildTile.get.pixelCenter
       val waypoint = unit.agent.nextWaypoint(buildPixel)

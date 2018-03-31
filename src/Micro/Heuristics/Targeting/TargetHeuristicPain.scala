@@ -9,7 +9,7 @@ object TargetHeuristicPain extends TargetHeuristic {
   
     val travelPixels  = Math.max(0.0, unit.pixelDistanceEdge(candidate) - unit.pixelRangeAgainst(candidate))
     val firingPixel   = unit.pixelCenter.project(candidate.pixelCenter, travelPixels)
-    val vpfNow        = unit.matchups.vpfReceivingDiffused
+    val vpfNow        = unit.matchups.vpfReceiving
     val vpfThere      = unit.matchups.threats
       .map(threat =>
         if (threat.inRangeToAttack(unit, firingPixel)) {

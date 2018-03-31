@@ -12,7 +12,7 @@ object ReloadInterceptors extends Action {
     && With.self.minerals > Protoss.Interceptor.mineralPrice
     && unit.interceptorCount < (if (With.self.hasUpgrade(Protoss.CarrierCapacity)) 8 else 4)
     && unit.trainingQueue.isEmpty
-    && unit.matchups.framesToLiveDiffused > Protoss.Interceptor.buildFrames + 48.0
+    && unit.matchups.framesToLive > Protoss.Interceptor.buildFrames + 48.0
   )
   
   override def perform(unit: FriendlyUnitInfo) {

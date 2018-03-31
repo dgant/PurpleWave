@@ -28,8 +28,8 @@ object ShowDesire extends View {
     width = 27
     x = agent.unit.pixelCenter.x
     y = agent.unit.pixelCenter.y + 28 + With.visualization.lineHeightSmall + 2
-    drawNumber(agent.unit.matchups.vpfDealingDiffused,    x - width,  y, width, With.self.colorMedium)
-    drawNumber(agent.unit.matchups.vpfReceivingDiffused,  x,          y, width, With.enemy.colorMedium)
+    drawNumber(agent.unit.matchups.vpfDealing,    x - width,  y, width, With.self.colorMedium)
+    drawNumber(agent.unit.matchups.vpfReceiving,  x,          y, width, With.enemy.colorMedium)
   }
   
   def drawDesire(desire: Double, x: Int, y: Int, width: Int) {

@@ -21,7 +21,7 @@ object DisruptionWeb extends TargetedSpell {
     val output = (
       target.subjectiveValue *
       Math.min(1.0, target.matchups.targets.size          / 3.0)  *
-      Math.min(1.0, target.matchups.framesToLiveDiffused  / 72.0) *
+      Math.min(1.0, target.matchups.framesToLive  / 72.0) *
       (if (target.moving) 0.5 else 1.0) *
       (if (target.isEnemy) 1.0 else -2.0)
     )

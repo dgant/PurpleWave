@@ -12,7 +12,7 @@ object GhostCloak extends Action {
     unit.is(Terran.Ghost)                                                   &&
     ! unit.cloaked                                                          &&
     unit.energy >= Terran.GhostCloak.energyCost + 30                        &&
-    unit.matchups.framesOfSafetyDiffused < 12 + With.reaction.agencyAverage &&
+    unit.matchups.framesOfSafety < 12 + With.reaction.agencyAverage &&
     ! With.grids.enemyDetection.isSet(unit.tileIncludingCenter)
   }
   

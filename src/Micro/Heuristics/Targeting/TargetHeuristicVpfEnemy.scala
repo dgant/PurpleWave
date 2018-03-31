@@ -28,7 +28,7 @@ object TargetHeuristicVpfEnemy extends TargetHeuristic{
         Protoss.Dragoon.subjectiveValue.toDouble / GameTime(0, 4)()
       }
       else {
-        candidate.matchups.vpfDealingDiffused
+        candidate.matchups.vpfDealing
       }
   
     if (unit.gathering) {

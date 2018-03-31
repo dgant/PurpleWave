@@ -43,11 +43,11 @@ object Heal extends Action {
   private def targetValue(medic: FriendlyUnitInfo, patient: UnitInfo): Double = {
     val distancePixels  = medic.pixelDistanceEdge(patient)
     val distanceFrames  = PurpleMath.nanToInfinity(distancePixels / medic.topSpeed)
-    val lifetimeFrames  = patient.matchups.framesToLiveDiffused
+    val lifetimeFrames  = patient.matchups.framesToLive
     val damage          = patient.unitClass.maxHitPoints - patient.hitPoints
-    val safety          = PurpleMath.signum(Math.max(0.0, patient.matchups.framesOfSafetyDiffused))
-    val receiving       = PurpleMath.signum(patient.matchups.vpfReceivingDiffused)
-    val dealing         = PurpleMath.signum(patient.matchups.vpfDealingDiffused)
+    val safety          = PurpleMath.signum(Math.max(0.0, patient.matchups.framesOfSafety))
+    val receiving       = PurpleMath.signum(patient.matchups.vpfReceiving)
+    val dealing         = PurpleMath.signum(patient.matchups.vpfDealing)
     val valueWorthwhile = PurpleMath.clamp(Math.min(lifetimeFrames, safety) - distanceFrames, 1.0, 24.0)
     val valueTrading    = (1.0 + receiving) * (1.0 + dealing)
     val output          = (1.0 + damage) * valueWorthwhile * valueTrading

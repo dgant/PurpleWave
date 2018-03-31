@@ -23,7 +23,7 @@ object Irradiate extends Action {
           -1.0
         else if ( ! target.unitClass.isOrganic)
           -1.0
-        else if (target.matchups.framesToLiveDiffused < 24 * 20)
+        else if (target.matchups.framesToLive < 24 * 20)
           -1.0
         else if (target.unitClass.gasPrice >= 0)
           1.0

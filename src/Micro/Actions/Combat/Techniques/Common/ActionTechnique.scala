@@ -14,7 +14,7 @@ abstract class ActionTechnique extends Action {
   def applicabilityOther(unit: FriendlyUnitInfo, other: UnitInfo): Option[Double] = Some(1.0)
   def significanceOther(unit: FriendlyUnitInfo, other: UnitInfo): Double = {
     val framesOfInvolvement = unit.matchups
-      .framesOfEntanglementPerThreatDiffused
+      .framesOfEntanglementPerThreat
       .getOrElse(other, Double.NegativeInfinity)
     0.5 + PurpleMath.fastSigmoid(framesOfInvolvement / 12.0) / 2.0
   }

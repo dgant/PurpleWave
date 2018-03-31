@@ -20,7 +20,7 @@ object Yamato extends TargetedSpell {
     val yamatoDamage    = 260.0
     val castFrames      = 72.0
     val antiAirBonus    = if (target.unitClass.attacksAir) 3.0 else 1.0
-    val hitPoints       = target.totalHealth - target.matchups.dpfReceivingDiffused * castFrames
+    val hitPoints       = target.totalHealth - target.matchups.dpfReceiving * castFrames
     val dealtDamage     = Math.min(yamatoDamage, hitPoints)
     val dealtValue      = dealtDamage * MicroValue.valuePerDamage(target)
     val output          = antiAirBonus * dealtValue

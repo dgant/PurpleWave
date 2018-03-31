@@ -26,7 +26,7 @@ object Detect extends Action {
       e.effectivelyCloaked
       && e.matchups.targets.nonEmpty)
     
-    if (superSpookies.isEmpty && unit.matchups.framesOfSafetyDiffused <= 0) {
+    if (superSpookies.isEmpty && unit.matchups.framesOfSafety <= 0) {
       Disengage.delegate(unit)
     }
     

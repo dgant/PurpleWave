@@ -80,13 +80,13 @@ object BeACarrier extends Action {
     }
     
     lazy val canLeave                 = airToAirSupply(unit.matchups.threats) < airToAirSupply(unit.matchups.alliesInclSelf)
-    lazy val exitingLeash             = unit.matchups.targets.filter(_.matchups.framesToLiveDiffused > 48).forall(_.pixelDistanceEdge(unit) > 32.0 * 7.0)
+    lazy val exitingLeash             = unit.matchups.targets.filter(_.matchups.framesToLive > 48).forall(_.pixelDistanceEdge(unit) > 32.0 * 7.0)
     lazy val inRangeNeedlessly        = unit.matchups.threatsInRange.exists(shouldNeverHitUs)
     lazy val interceptorsTotal        = unit.interceptors.count(_.aliveAndComplete)
     lazy val interceptorsFighting     = unit.interceptors.count(_.pixelCenter != unit.pixelCenter)
     lazy val interceptorsAreShooting  = interceptorsFighting >= interceptorsTotal - 1
     lazy val interceptorsNeedKick     = interceptorsTotal > 0 && (exitingLeash || ! interceptorsAreShooting)
-    lazy val safeHere                 = unit.matchups.framesOfSafetyDiffused >= 0 || unit.totalHealth > 150
+    lazy val safeHere                 = unit.matchups.framesOfSafety >= 0 || unit.totalHealth > 150
     lazy val happyFightingHere        = unit.agent.shouldEngage && ! inRangeNeedlessly && safeHere
     lazy val shouldFight              = safeHere || (interceptorsTotal > 1 && ! canLeave)
     

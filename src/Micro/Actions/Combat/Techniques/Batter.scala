@@ -66,7 +66,7 @@ object Batter extends ActionTechnique {
     lazy val targetRepairers  = new TargetAction(TargetFilterWhitelist(legalTargetRepairers))
     lazy val targetWall       = new TargetAction(TargetFilterWhitelist(legalTargetWall))
     
-    lazy val shootingThreats  = unit.matchups.framesOfEntanglementPerThreatDiffused.filter(_._2 > - GameTime(0, 1)())
+    lazy val shootingThreats  = unit.matchups.framesOfEntanglementPerThreat.filter(_._2 > - GameTime(0, 1)())
     lazy val dpfReceiving     = shootingThreats.map(_._1.dpfOnNextHitAgainst(unit)).sum
     lazy val framesToLive     = PurpleMath.nanToInfinity(unit.totalHealth / dpfReceiving)
     lazy val dying            = framesToLive < GameTime(0, 1)()

@@ -40,7 +40,7 @@ object Root extends Action {
     private lazy val outOfCombat          = unit.matchups.battle.isEmpty
     private lazy val inTheWay             = unit.agent.shovers.nonEmpty
     private lazy val retreating           = ! unit.agent.shouldEngage
-    private lazy val protectingBase       = unit.matchups.allies.exists(a => a.unitClass.isBuilding && a.matchups.framesOfSafetyDiffused < unit.matchups.framesOfSafetyDiffused)
+    private lazy val protectingBase       = unit.matchups.allies.exists(a => a.unitClass.isBuilding && a.matchups.framesOfSafety < unit.matchups.framesOfSafety)
     private lazy val insideTurretRange    = unit.matchups.threatsInRange.exists(_.unitClass.isBuilding)
     private lazy val nearFormationPoint   = unit.agent.toForm.exists(unit.pixelDistanceCenter(_) < 32.0 * 6.0)
     private lazy val turretsInRange       = unit.matchups.targetsInRange.exists(_.unitClass.isStaticDefense)
@@ -50,7 +50,7 @@ object Root extends Action {
     private lazy val targetsNearingRange  = combatTargets.filter(t => { val p = t.projectFrames(framesToRoot); unit.pixelDistanceEdge(t.pixelStartAt(p), t.pixelEndAt(p)) < maxRange - 32})
     private lazy val girdForCombat        = targetsInRange.nonEmpty || targetsNearingRange.nonEmpty
     private lazy val artilleryOutOfRange  = unit.matchups.targets.filter(t => t.canAttack(unit) && t.pixelRangeAgainst(unit) >unit.pixelRangeAgainst(t) && t.inRangeToAttack(unit))
-    private lazy val duckForCover         = false && (weAreALurker && unit.matchups.enemyDetectors.isEmpty && unit.matchups.framesOfSafetyDiffused < framesToRoot && (artilleryOutOfRange.isEmpty || ! With.enemy.isTerran)) // Root for safety, but not in range of Tanks if they can scan us
+    private lazy val duckForCover         = false && (weAreALurker && unit.matchups.enemyDetectors.isEmpty && unit.matchups.framesOfSafety < framesToRoot && (artilleryOutOfRange.isEmpty || ! With.enemy.isTerran)) // Root for safety, but not in range of Tanks if they can scan us
     private lazy val letsKillThemAlready  = weAreALurker && unit.agent.toAttack.exists(_.pixelDistanceEdge(unit) < 64.0)
     private lazy val leadingPush          = ! unit.agent.destination.zone.owner.isUs && (rootersInPush.size + 1) / 3 > rootersInPushCloser
     private lazy val destinationFarAway   = unit.pixelDistanceCenter(unit.agent.destination) > 32.0 * 4.0 && ! nearFormationPoint

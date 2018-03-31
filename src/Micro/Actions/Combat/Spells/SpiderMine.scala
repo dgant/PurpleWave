@@ -39,12 +39,12 @@ object SpiderMine extends Action {
   
   protected def layTrap(unit: FriendlyUnitInfo) {
     if (unit.spiderMines < 2) return
-    if (unit.matchups.framesOfSafetyDiffused <= 0) return
+    if (unit.matchups.framesOfSafety <= 0) return
     
     lazy val inChoke = unit.zone.edges.exists(e => unit.pixelDistanceCenter(e.pixelCenter) < e.radiusPixels)
     lazy val mineSpace = ! unit.tileArea.expand(1, 1).tiles.exists(With.grids.units.get(_).exists(_.is(Terran.SpiderMine)))
     lazy val retreating = unit.matchups.threats.nonEmpty && ! unit.agent.shouldEngage
-    lazy val timeToMine  = unit.matchups.framesOfSafetyDiffused > GameTime(0, 2)()
+    lazy val timeToMine  = unit.matchups.framesOfSafety > GameTime(0, 2)()
     lazy val inWorkerLine = unit.base.exists(base => base.owner.isUs && base.harvestingArea.contains(unit.tileIncludingCenter))
     if (mineSpace
       && timeToMine
@@ -60,8 +60,8 @@ object SpiderMine extends Action {
   
   protected def sabotage(vulture: FriendlyUnitInfo) {
     if (vulture.cooldownLeft <= 0) return
-    val rangeMinimum = if (vulture.matchups.doomedDiffused) 64.0 else 0.0
-    val range = vulture.topSpeed * (vulture.matchups.framesToLiveDiffused - 12)
+    val rangeMinimum = if (vulture.matchups.doomed) 64.0 else 0.0
+    val range = vulture.topSpeed * (vulture.matchups.framesToLive - 12)
     val maxRangeTiles = PurpleMath.clamp(range, rangeMinimum, 8.0 * 32.0)
   
     //TODO: This is a good candidate for Coordinator since every Vulture will want to recalculate this

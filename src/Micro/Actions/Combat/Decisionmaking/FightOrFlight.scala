@@ -40,7 +40,7 @@ object FightOrFlight extends Action {
         && ally.unitClass.topSpeed <= Protoss.HighTemplar.topSpeed
         && ally.subjectiveValue > unit.subjectiveValue
         && (ally.matchups.targetsInRange.nonEmpty || ( ! ally.canAttack && ally.matchups.enemies.exists(_.pixelDistanceEdge(ally) < ally.effectiveRangePixels)))
-        && ally.matchups.framesOfSafetyDiffused < unit.matchups.framesOfSafetyDiffused))
+        && ally.matchups.framesOfSafety < unit.matchups.framesOfSafety))
   
     if (decision.isDefined) {
       unit.agent.shouldEngage = decision.get

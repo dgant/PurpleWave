@@ -31,7 +31,7 @@ object OldAttackAndReposition extends Action {
       Attack.delegate(unit)
     }
     else if (shouldChase || shouldHugTank) {
-      val happy           = unit.matchups.vpfNetDiffused > 0
+      val happy           = unit.matchups.vpfNet > 0
       val targetMagnitude = (if (happy) 2.0 else 1.0) * unit.pixelDistanceEdge(target) / unit.pixelRangeAgainst(target)
       val threatMagnitude = (if (happy) 1.0 else 2.0)
       val forceTarget     = Potential.unitAttraction(unit, target, targetMagnitude)

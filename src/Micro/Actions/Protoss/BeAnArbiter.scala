@@ -33,7 +33,7 @@ object BeAnArbiter extends Action {
     if ( ! target.isFriendly) return 0.0
     if ( ! needsUmbrella(target)) return 0.0
     val value       = target.subjectiveValue
-    val multiplier  = 2.0 + PurpleMath.fastSigmoid(Math.max(-48, target.matchups.framesOfEntanglementDiffused))
+    val multiplier  = 2.0 + PurpleMath.fastSigmoid(Math.max(-48, target.matchups.framesOfEntanglement))
     val output      = value * multiplier
     output
   }
@@ -41,7 +41,7 @@ object BeAnArbiter extends Action {
   override protected def perform(unit: FriendlyUnitInfo) {
     Potshot.consider(unit)
     
-    val threatened   = unit.matchups.framesOfSafetyDiffused <= 12.0
+    val threatened   = unit.matchups.framesOfSafety <= 12.0
     val needUmbrella = unit.teammates.filter(needsUmbrella)
     
     if (needUmbrella.nonEmpty) {
@@ -59,7 +59,7 @@ object BeAnArbiter extends Action {
     }
     
     val framesOfSafetyRequired = Math.max(0, 48 - With.framesSince(unit.lastFrameTakingDamage))
-    if (unit.matchups.framesOfSafetyDiffused <= framesOfSafetyRequired) {
+    if (unit.matchups.framesOfSafety <= framesOfSafetyRequired) {
       Avoid.delegate(unit)
     }
     else if (needUmbrella.nonEmpty) {

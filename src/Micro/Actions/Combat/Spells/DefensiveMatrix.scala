@@ -25,7 +25,7 @@ object DefensiveMatrix extends TargetedSpell {
     if (target.defensiveMatrixPoints > 0) return 0.0
   
     val dangerFrames  = 128.0
-    val dangerBonus   = dangerFrames / Math.max(dangerFrames, target.matchups.framesToLiveDiffused)
+    val dangerBonus   = dangerFrames / Math.max(dangerFrames, target.matchups.framesToLive)
     val output        = dangerBonus * target.subjectiveValue
     output
   }

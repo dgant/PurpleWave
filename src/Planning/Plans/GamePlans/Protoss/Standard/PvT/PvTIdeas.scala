@@ -9,14 +9,18 @@ import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Predicates.Economy.{GasAtMost, MineralsAtLeast}
 import Planning.Plans.Predicates.Milestones._
-import Planning.Plans.Predicates.Reactive.EnemyBio
+import Planning.Plans.Predicates.Reactive.{EnemyBasesAtLeast, EnemyBio}
 import Planning.Plans.Predicates.{Employing, SafeToAttack}
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss.{PvT13Nexus, PvTEarly1015GateGoonDT, PvTEarly1GateStargateTemplar, PvTEarly4Gate}
 
 object PvTIdeas {
   
-  class AttackWithDarkTemplar extends Attack { attackers.get.unitMatcher.set(Protoss.DarkTemplar) }
+  class AttackWithDarkTemplar extends If(
+    new Or(
+      new EnemyUnitsNone(Protoss.Observer),
+      new EnemyBasesAtLeast(3)),
+    new Attack { attackers.get.unitMatcher.set(Protoss.DarkTemplar) })
   
   class AttackWithScouts extends Attack { attackers.get.unitMatcher.set(Protoss.Scout) }
   

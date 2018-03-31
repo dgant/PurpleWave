@@ -105,7 +105,7 @@ object Potential {
   def mobilityAttraction(unit: FriendlyUnitInfo): Force = {
     val bestAdjacent  = ByOption.max(unit.tileIncludingCenter.adjacent8.filter(_.valid).map(unit.mobilityGrid.get)).getOrElse(0)
     val magnitudeNeed = 1.0 / Math.max(1.0, unit.mobility - 1.0)
-    val magnitudeCap  = PurpleMath.nanToZero(bestAdjacent.toDouble / unit.mobility)
+    val magnitudeCap  = (1.0 + bestAdjacent.toDouble) / (1.0 + unit.mobility)
     val magnitude     = Math.min(magnitudeNeed, magnitudeCap)
     val output        = unit.mobilityForce.normalize(magnitude)
     output
@@ -122,7 +122,7 @@ object Potential {
   def collisionRepulsion(unit: FriendlyUnitInfo): Force = {
     if (unit.flying && ! unit.matchups.threats.exists(_.unitClass.dealsRadialSplashDamage)) return new Force
     
-    val blockers        = unit.matchups.allies.filter(u => ! u.flying && u.unitClass.isBuilding)
+    val blockers        = unit.matchups.allies.filter(u => ! u.flying && ! u.unitClass.isBuilding)
     val nearestBlocker  = ByOption.minBy(blockers)(_.pixelDistanceEdge(unit))
     
     if (nearestBlocker.isEmpty) return new Force

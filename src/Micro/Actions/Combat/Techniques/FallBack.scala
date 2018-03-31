@@ -27,7 +27,7 @@ object FallBack extends ActionTechnique {
     0.0
   }
   
-  override val applicabilityBase: Double = 0.50
+  override val applicabilityBase: Double = 0.75
   
   override def applicabilityOther(unit: FriendlyUnitInfo, other: UnitInfo): Option[Double] = {
     if (other.isFriendly) return None

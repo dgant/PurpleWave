@@ -24,7 +24,7 @@ class PvPLateGame extends GameplanModeTemplate {
   override val scoutExpansionsAt = 90
   override val emergencyPlans: Vector[Plan] = Vector(new ReactToDarkTemplarEmergencies)
   
-  override def aggression: Double = 0.85
+  override def aggression: Double = 0.92
   
   override def defaultWorkerPlan: Plan = new If(
     new SafeAtHome,
@@ -50,17 +50,19 @@ class PvPLateGame extends GameplanModeTemplate {
   class TemplarTech extends Parallel(
     new Build(
       RequestAtLeast(1, Protoss.CitadelOfAdun),
-      RequestAtLeast(1, Protoss.TemplarArchives)),
+      RequestAtLeast(1, Protoss.TemplarArchives),
+      RequestAtLeast(1, Protoss.Forge)),
     new If(
       new UnitsAtMost(0, Protoss.Observatory),
       new BuildCannonsAtNatural(2)))
   
   class Upgrades extends Parallel(
-    new Build(RequestAtLeast(1, Protoss.Forge)),
     new If(
-      new UpgradeComplete(Protoss.GroundDamage, 3),
-      new UpgradeContinuously(Protoss.GroundArmor),
-      new UpgradeContinuously(Protoss.GroundDamage)))
+      new Or(
+        new UnitsAtLeast(2, Protoss.Forge, complete = true),
+        new UpgradeComplete(Protoss.GroundDamage, 3)),
+      new UpgradeContinuously(Protoss.GroundArmor)),
+    new UpgradeContinuously(Protoss.GroundDamage))
   
   class BuildTech extends Parallel(
     new Build(RequestAtLeast(1, Protoss.Gateway)),
@@ -71,7 +73,8 @@ class PvPLateGame extends GameplanModeTemplate {
     new If(
       new GasAtMost(300),
       new BuildGasPumps),
-    
+  
+    new Upgrades,
     new FlipIf(
       new Latch(new UnitsAtLeast(1, Protoss.TemplarArchives)),
       
@@ -80,8 +83,7 @@ class PvPLateGame extends GameplanModeTemplate {
         new RoboTech,
         new Build(RequestAtLeast(2, Protoss.Gateway)),
         new BuildGasPumps,
-        new Build(RequestAtLeast(5, Protoss.Gateway)),
-        new Upgrades),
+        new Build(RequestAtLeast(5, Protoss.Gateway))),
       
       // Citadel first (ie. DT follow-up)
       new Parallel(
@@ -140,6 +142,8 @@ class PvPLateGame extends GameplanModeTemplate {
         new Build(RequestAtLeast(8, Protoss.Gateway))),
       new RequireMiningBases(3)),
   
+    new Build(RequestAtLeast(2, Protoss.Forge)),
+    
     new FlipIf(
       new SafeToAttack,
       new If(

@@ -9,7 +9,7 @@ object Cancel extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
     lazy val unpowered        = unit.unitClass.requiresPsi && ! unit.powered
     lazy val framesCutoff     = 12 + With.reaction.agencyAverage
-    lazy val framesToLive     = unit.matchups.framesToLiveCurrently
+    lazy val framesToLive     = unit.matchups.framesToLiveDiffused
     lazy val framesToFinish   = Seq(unit.framesBeforeTechComplete, unit.framesBeforeUpgradeComplete, unit.framesBeforeBuildeeComplete).max
     lazy val doomed           = unit.matchups.threatsInRange.nonEmpty && framesToLive < framesCutoff
     lazy val willNeverFinish  = unit.matchups.threatsInRange.nonEmpty && framesToLive < framesToFinish

@@ -23,7 +23,12 @@ object PvPIdeas {
     new EnemyCarriers,
     new EnemyUnitsAtMost(6, UnitMatchAnd(UnitMatchWarriors,  UnitMatchNot(UnitMatchMobileFlying))))
   
-  class AttackWithDarkTemplar extends Attack { attackers.get.unitMatcher.set(Protoss.DarkTemplar) }
+  class AttackWithDarkTemplar extends If(
+    new Or(
+      new EnemyUnitsNone(Protoss.Observer),
+      new EnemyBasesAtLeast(3)),
+    new Attack { attackers.get.unitMatcher.set(Protoss.DarkTemplar) })
+  
   class AttackSafely extends If(
     new And(
       new Or(

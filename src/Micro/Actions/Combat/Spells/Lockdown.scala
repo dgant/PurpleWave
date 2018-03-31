@@ -21,7 +21,7 @@ object Lockdown extends TargetedSpell {
     if (target.lockedDown)                return 0.0
     
     val thresholdLifetimeFrames = 24 * 5.0
-    val cappedLifetime          = Math.max(thresholdLifetimeFrames, target.matchups.framesToLiveCurrently)
+    val cappedLifetime          = Math.max(thresholdLifetimeFrames, target.matchups.framesToLiveDiffused)
     val fractionalValue         = cappedLifetime / thresholdLifetimeFrames
     val targetValueAbsolute     = target.subjectiveValue * fractionalValue
     val targetValueNow          = target.matchups.vpfDealingDiffused * cappedLifetime

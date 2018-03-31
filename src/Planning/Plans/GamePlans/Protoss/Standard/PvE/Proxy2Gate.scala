@@ -2,6 +2,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvE
 
 import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
+import Planning.Composition.UnitMatchers.UnitMatchOr
 import Planning.Plans.Army.Aggression
 import Planning.Plans.Compound.{Or, _}
 import Planning.Plans.GamePlans.GameplanModeTemplate
@@ -11,6 +12,7 @@ import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuousl
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.BuildGasPumps
 import Planning.Plans.Predicates.Economy.GasAtLeast
+import Planning.Plans.Predicates.Matchup.EnemyIsProtoss
 import Planning.Plans.Predicates.Milestones._
 import Planning.Plans.Scouting.Scout
 import Planning.{Plan, ProxyPlanner}
@@ -47,7 +49,15 @@ class Proxy2Gate extends GameplanModeTemplate {
     new If(
       new UnitsAtLeast(1, Protoss.Dragoon, complete = true),
       new Aggression(1.0),
-      new Aggression(1.8)),
+      new If(
+        new And(
+          new EnemyIsProtoss,
+          new EnemyUnitsAtLeast(1, UnitMatchOr(
+            Protoss.CyberneticsCore,
+            Protoss.Assimilator,
+            Protoss.Dragoon))),
+        new Aggression(5.0),
+        new Aggression(1.9))),
     new RequireSufficientSupply,
     new BuildOrder(
       RequestAtLeast(1, Protoss.Gateway),

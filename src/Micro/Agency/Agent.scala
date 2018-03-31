@@ -112,8 +112,6 @@ class Agent(val unit: FriendlyUnitInfo) {
   def destination: Pixel = destinationCache()
   private val destinationCache = new Cache(() => calculateDestination)
   
-  def dying: Boolean = Math.min(unit.matchups.framesToLiveDiffused, unit.matchups.framesToLiveCurrently) <= 2 * With.reaction.agencyAverage
-  
   /////////////////
   // Diagnostics //
   /////////////////

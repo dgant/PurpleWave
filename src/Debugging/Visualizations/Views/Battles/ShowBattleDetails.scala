@@ -28,7 +28,7 @@ object ShowBattleDetails extends View {
     var y3              = y2 + barHeight
     val y4              = y3 + 5
     val denominator     = 630 * With.battles.global.valueUsArmy + With.battles.global.valueEnemyArmy
-    val xGlobalUs       = (With.battles.global.valueUsArmyKnown    / denominator).toInt
+    val xGlobalUs       = (With.battles.global.valueUsArmy    / denominator).toInt
     val xGlobalEnemy    = (With.battles.global.valueEnemyArmy / denominator).toInt
     
     DrawScreen.table(x, y4, Vector(

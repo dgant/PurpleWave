@@ -11,7 +11,6 @@ import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.{ByOption, Forever}
 
-import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
@@ -22,18 +21,6 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
   
   lazy val at     : Pixel = conditions.at
   lazy val frame  : Int   = conditions.framesAhead
-  
-  lazy val hypotheticalMatchups = new mutable.HashMap[MatchupConditions, MatchupAnalysis]
-  
-  def ifAt(elsewhere: Pixel): MatchupAnalysis = ifAt(elsewhere, frame)
-  def ifAt(framesAhead: Int): MatchupAnalysis = ifAt(at, framesAhead)
-  private def ifAt(elsewhere: Pixel, framesAhead: Int): MatchupAnalysis = {
-    val hypotheticalConditions = MatchupConditions(elsewhere, framesAhead)
-    if ( ! hypotheticalMatchups.contains(hypotheticalConditions)) {
-      hypotheticalMatchups.put(hypotheticalConditions, MatchupAnalysis(me, hypotheticalConditions))
-    }
-    hypotheticalMatchups(hypotheticalConditions)
-  }
   
   // Default is necessary for killing empty bases because no Battle is happening
   lazy val defaultUnits           : Vector[UnitInfo]      = if (me.canAttack) me.zone.units.toVector.filter(u => u.isEnemy && BattleClassificationFilters.isEligibleLocal(u)) else Vector.empty
@@ -56,40 +43,20 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
   
   lazy val valuePerDamage                         : Double                = MicroValue.valuePerDamage(me)
   lazy val vpfDealingDiffused                     : Double                = targetsInRange.map(target => dpfDealingDiffused(target)  * target.matchups.valuePerDamage).sum
-  lazy val vpfDealingCurrently                    : Double                = targetsInRange.map(target => dpfDealingCurrently(target) * target.matchups.valuePerDamage).sum
   lazy val dpfReceivingDiffused                   : Double                = threatsInRange.map(_.matchups.dpfDealingDiffused(me)).sum
-  lazy val dpfReceivingCurrently                  : Double                = threatsInRange.map(_.matchups.dpfDealingCurrently(me)).sum
   lazy val vpfReceivingDiffused                   : Double                = valuePerDamage * dpfReceivingDiffused
-  lazy val vpfReceivingCurrently                  : Double                = valuePerDamage * dpfReceivingCurrently
   lazy val vpfNetDiffused                         : Double                = vpfDealingDiffused   - vpfReceivingDiffused
-  lazy val vpfNetCurrently                        : Double                = vpfDealingCurrently  - vpfReceivingCurrently
   lazy val framesToLiveDiffused                   : Double                = PurpleMath.nanToInfinity(me.totalHealth / dpfReceivingDiffused)
-  lazy val framesToLiveCurrently                  : Double                = PurpleMath.nanToInfinity(me.totalHealth / dpfReceivingCurrently)
   lazy val doomedDiffused                         : Boolean               = framesToLiveDiffused <= framesToRetreatDiffused
   lazy val framesOfEntanglementPerThreatDiffused  : Map[UnitInfo, Double] = threats.map(threat => (threat, framesOfEntanglementWith(threat))).toMap
-  lazy val framesOfEntanglementPerThreatCurrently : Map[UnitInfo, Double] = threatsViolent.map(threat => (threat, framesOfEntanglementWith(threat))).toMap
   lazy val framesOfEntanglementDiffused           : Double                = ByOption.max(framesOfEntanglementPerThreatDiffused.values).getOrElse(- Forever())
-  lazy val framesOfEntanglementCurrently          : Double                = ByOption.max(framesOfEntanglementPerThreatCurrently.values).getOrElse(- Forever())
   lazy val framesOfSafetyDiffused                 : Double                = - With.latency.latencyFrames - With.reaction.agencyMax - ByOption.max(framesOfEntanglementPerThreatDiffused.values).getOrElse(- Forever())
-  lazy val framesOfSafetyCurrently                : Double                = - With.latency.latencyFrames - With.reaction.agencyMax - ByOption.max(framesOfEntanglementPerThreatCurrently.values).getOrElse(- Forever())
   lazy val pixelsOfFreedom                        : Double                = if (me.flying) GameTime(1, 0)() else ByOption.min(others.filter( ! _.flying).map(_.pixelDistanceEdge(me))).getOrElse(GameTime(1, 0)())
   lazy val mostEntangledThreatsDiffused           : Vector[UnitInfo]      = threats.sortBy( - framesOfEntanglementPerThreatDiffused(_))
-  lazy val mostEntangledThreatsCurrently          : Vector[UnitInfo]      = threats.sortBy( - framesOfEntanglementPerThreatCurrently(_))
   lazy val mostEntangledThreatDiffused            : Option[UnitInfo]      = ByOption.minBy(framesOfEntanglementPerThreatDiffused)(_._2).map(_._1)
-  lazy val mostEntangledThreatCurrently           : Option[UnitInfo]      = ByOption.minBy(framesOfEntanglementPerThreatCurrently)(_._2).map(_._1)
   def framesToRetreatDiffused   : Double = Math.max(0.0, framesOfEntanglementDiffused)
-  def framesToRetreatCurrently  : Double = Math.max(0.0, framesOfEntanglementCurrently)
   
   def dpfDealingDiffused  (target: UnitInfo): Double = me.dpfOnNextHitAgainst(target) / Math.max(1.0, targetsInRange.size)
-  def dpfDealingCurrently (target: UnitInfo): Double =
-    if ( ! me.canAttack)
-      0.0
-    else if(me.target.contains(target))
-      me.dpfOnNextHitAgainst(target)
-    else if (me.target.isDefined)
-      0.0
-    else
-      dpfDealingDiffused(target)
   
   def framesOfEntanglementWith(threat: UnitInfo, fixedRange: Option[Double] = None): Double = {
     lazy val approachSpeedMe      = me.speedApproaching(threat.pixelCenter)

@@ -25,8 +25,10 @@ class PvP4GateGoon extends GameplanModeTemplate {
   override val buildOrder: Seq[BuildRequest] = ProtossBuilds.Opening_4GateDragoon
   
   override val buildPlans = Vector(
-    new FlipIf(
+    new If(
       new UnitsAtLeast(20, Protoss.Dragoon),
-      new RequireMiningBases(2),
-      new TrainContinuously(Protoss.Dragoon)))
+      new RequireMiningBases(2)),
+    new TrainContinuously(Protoss.Dragoon)
+  )
+    
 }

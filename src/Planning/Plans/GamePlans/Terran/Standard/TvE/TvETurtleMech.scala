@@ -16,6 +16,7 @@ import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Terran.{BuildBunkersAtExpansions, BuildMissileTurretsAtBases, PopulateBunkers}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Predicates.Economy.{GasAtLeast, MineralsAtMost}
+import Planning.Plans.Predicates.Matchup.EnemyIsZerg
 import Planning.Plans.Predicates.Milestones.{EnemyHasShownCloakedThreat, EnemyUnitsAtLeast, IfOnMiningBases, UnitsAtLeast}
 import Planning.Plans.Predicates.{Employing, SafeAtHome, SafeToAttack}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
@@ -27,10 +28,12 @@ class TvETurtleMech extends GameplanModeTemplate {
   
   override def defaultPlacementPlan: Plan = new ProposePlacement {
     override lazy val blueprints: Seq[Blueprint] = Vector(
-      new Blueprint(this, building = Some(Terran.Bunker),       requireZone = Some(With.geography.ourNatural.zone)),
-      new Blueprint(this, building = Some(Terran.Barracks),     preferZone  = Some(With.geography.ourNatural.zone)),
-      new Blueprint(this, building = Some(Terran.SupplyDepot),  preferZone  = Some(With.geography.ourNatural.zone)),
-      new Blueprint(this, building = Some(Terran.SupplyDepot),  preferZone  = Some(With.geography.ourNatural.zone))
+      new Blueprint(this, building = Some(Terran.Bunker),         requireZone = Some(With.geography.ourNatural.zone)),
+      new Blueprint(this, building = Some(Terran.Barracks),       preferZone  = Some(With.geography.ourNatural.zone)),
+      new Blueprint(this, building = Some(Terran.SupplyDepot),    preferZone  = Some(With.geography.ourNatural.zone)),
+      new Blueprint(this, building = Some(Terran.SupplyDepot),    preferZone  = Some(With.geography.ourNatural.zone)),
+      new Blueprint(this, building = Some(Terran.MissileTurret),  requireZone = Some(With.geography.ourNatural.zone)),
+      new Blueprint(this, building = Some(Terran.MissileTurret),  preferZone  = Some(With.geography.ourNatural.zone))
     )
   }
   
@@ -38,7 +41,7 @@ class TvETurtleMech extends GameplanModeTemplate {
   
   override def defaultAttackPlan: Plan = new Parallel(
     new If(
-      new UnitsAtLeast(6, UnitMatchSiegeTank, complete = true),
+      new UnitsAtLeast(5, UnitMatchSiegeTank, complete = true),
       new If(
         new SafeToAttack,
         new Parallel(
@@ -49,7 +52,7 @@ class TvETurtleMech extends GameplanModeTemplate {
           })
       )),
     new If(
-      new UnitsAtLeast(20, Terran.Vulture),
+      new UnitsAtLeast(16, UnitMatchOr(Terran.Vulture, Terran.Goliath)),
       new Attack { attackers.get.unitMatcher.set(Terran.Vulture) })
   )
   
@@ -142,14 +145,14 @@ class TvETurtleMech extends GameplanModeTemplate {
     new If(
       new Check(() =>
       With.units.ours.count(_.is(UnitMatchSiegeTank)) / 6
-      + (if (With.units.enemy.exists(_.is(UnitMatchAnd(UnitMatchWarriors, UnitMatchMobileFlying)))) 3 else 0)
+      + (if (With.units.enemy.exists(_.is(UnitMatchAnd(UnitMatchWarriors, UnitMatchMobileFlying)))) 6 else 0)
       + With.units.enemy.filter(_.is(UnitMatchAnd(UnitMatchWarriors, UnitMatchMobileFlying)))
         .map(u => {
           val c = u.unitClass
-          if (c == Terran.Battlecruiser)  5 else
-          if (c == Protoss.Carrier)       6 else
-          if (c == Zerg.Guardian)         3 else
-          2
+          if (c == Terran.Battlecruiser)  6 else
+          if (c == Protoss.Carrier)       7 else
+          if (c == Zerg.Guardian)         4 else
+          3
           })
         .sum
         > With.units.ours.count(_.is(Terran.Goliath))),
@@ -166,19 +169,25 @@ class TvETurtleMech extends GameplanModeTemplate {
       new Parallel(
         new TrainContinuously(Terran.Wraith, 2),
         new TrainContinuously(Terran.SiegeTankUnsieged))),
-    new TrainContinuously(Terran.Vulture)
+    new If(
+      new And(
+        new EnemyIsZerg,
+        new UnitsAtLeast(1, Terran.Armory, complete = true)),
+      new TrainContinuously(Terran.Goliath),
+      new TrainContinuously(Terran.Vulture))
   )
   
   private class BuildProduction extends Parallel(
-    new IfOnMiningBases(1, new Build(RequestAtLeast(2, Terran.Factory))),
+    new IfOnMiningBases(1, new Build(RequestAtLeast(1, Terran.Factory))),
     new IfOnMiningBases(1, new Build(RequestAtLeast(1, Terran.MachineShop))),
     new If(new EnemyUnitsAtLeast(1, UnitMatchSiegeTank),  new Build(RequestAtLeast(1, Terran.Starport))),
     new If(new EnemyUnitsAtLeast(1, Protoss.Reaver),      new Build(RequestAtLeast(1, Terran.Starport))),
     new If(new EnemyUnitsAtLeast(1, Protoss.Shuttle),     new Build(RequestAtLeast(1, Terran.Starport))),
     new IfOnMiningBases(2, new Build(RequestAtLeast(4, Terran.Factory))),
     new IfOnMiningBases(2, new Build(RequestAtLeast(2, Terran.MachineShop))),
-    new IfOnMiningBases(2, new Build(RequestAtLeast(6, Terran.Factory))),
-    new IfOnMiningBases(3, new Build(RequestAtLeast(8, Terran.Factory)))
+    new IfOnMiningBases(2, new Build(RequestAtLeast(5, Terran.Factory))),
+    new IfOnMiningBases(3, new Build(RequestAtLeast(8, Terran.Factory))),
+    new IfOnMiningBases(4, new Build(RequestAtLeast(12, Terran.Factory)))
   )
   
   override def buildPlans: Seq[Plan] = Vector(
@@ -195,11 +204,13 @@ class TvETurtleMech extends GameplanModeTemplate {
     
     new BuildOrder(
       RequestAtLeast(1, Terran.Factory),
-      RequestAtLeast(2, Terran.Refinery),
       RequestAtLeast(1, Terran.MachineShop),
+      RequestAtLeast(1, Terran.EngineeringBay),
       RequestAtLeast(2, Terran.Factory),
       RequestAtLeast(1, Terran.SiegeTankUnsieged),
-      RequestTech(Terran.SiegeMode)),
+      RequestTech(Terran.SiegeMode),
+      RequestAtLeast(1, Terran.MissileTurret),
+      RequestAtLeast(2, Terran.Refinery)),
     
     new BuildGasPumps,
   

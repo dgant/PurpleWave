@@ -29,7 +29,7 @@ class PvP2Gate1012 extends GameplanModeTemplate {
   }
   
   override val activationCriteria : Plan  = new Employing(PvPOpen2Gate1012)
-  override val completionCriteria : Plan  = new Latch(new UnitsAtLeast(1, Protoss.Forge))
+  override val completionCriteria : Plan  = new Latch(new UnitsAtLeast(2, Protoss.PhotonCannon))
   override def defaultAttackPlan  : Plan  = new PvPIdeas.AttackSafely
   override val defaultScoutPlan   : Plan  = new ScoutOn(Protoss.Pylon)
   
@@ -57,9 +57,7 @@ class PvP2Gate1012 extends GameplanModeTemplate {
       new Build(
         RequestAtLeast(1, Protoss.Assimilator),
         RequestAtLeast(1, Protoss.CyberneticsCore))),
-    new If(
-      new Not(new SafeAtHome),
-      new BuildCannonsAtNatural(2)),
+    new BuildCannonsAtNatural(2),
     new Build(
       RequestAtLeast(1, Protoss.Forge),
       RequestAtLeast(2, Protoss.Gateway),

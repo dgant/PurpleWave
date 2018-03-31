@@ -38,6 +38,7 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   }
   
   def is(unitMatcher: UnitMatcher): Boolean = unitMatcher.accept(this)
+  def isNone(unitMatchers: UnitMatcher*): Boolean = ! unitMatchers.exists(_.accept(this))
   def isAny(unitMatchers: UnitMatcher*): Boolean = unitMatchers.exists(_.accept(this))
   def isAll(unitMatchers: UnitMatcher*): Boolean = unitMatchers.forall(_.accept(this))
   
@@ -73,20 +74,21 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
       lastFrameStartingAttack = thisFrame
     }
     val moving = velocityX != 0 || velocityY != 0
-    lazy val couldMove = unitClass.canMove
-    lazy val tryingToMove = friendly.flatMap(_.agent.movingTo).exists(_.pixelDistance(pixelCenter) > 32)
-    lazy val tryingToAttack = target.exists(_.isEnemyOf(this))
-    if ( ! moving && couldMove && tryingToMove) {
+    lazy val couldMove          = unitClass.canMove
+    lazy val tryingToMove       = friendly.flatMap(_.agent.movingTo).exists(_.pixelDistance(pixelCenter) > 32)
+    lazy val tryingToAttackHere = target.exists(t => t.isEnemyOf(this) &&  inRangeToAttack(t))
+    lazy val tryingToAttackAway = target.exists(t => t.isEnemyOf(this) && ! inRangeToAttack(t))
+    if ( ! moving && couldMove && (tryingToMove || tryingToAttackAway)) {
       framesFailingToMove += 1
     }
     else {
       framesFailingToMove = 0
     }
-    if ( ! moving && couldMove && tryingToMove) {
-      framesFailingToMove += 1
+    if (tryingToAttackHere && cooldownLeft == 0) {
+      framesFailingToAttack += 1
     }
     else {
-      framesFailingToMove = 0
+      framesFailingToAttack = 0
     }
     if (lastFrameStartingAttack == thisFrame && target.nonEmpty) {
       With.damageCredit.onDamage(this, target.get)

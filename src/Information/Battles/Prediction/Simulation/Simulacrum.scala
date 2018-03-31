@@ -146,17 +146,18 @@ class Simulacrum(
   private def dealDamage(victim: Simulacrum) {
     val splashFactor      = if (multiplierSplash == 1.0) 1.0 else Math.max(1.0, Math.min(targetQueue.count( ! _.dead) / 4.0, multiplierSplash))
     val victimWasAlive    = victim.hitPoints > 0
-    val damageToVictim    = Math.min(victim.hitPoints, realUnit.damageOnNextHitAgainst(victim.realUnit, Some(victim.shieldPoints), Some(pixel), Some(victim.pixel)))
-    val damageToShields   = Math.min(victim.shieldPoints, damageToVictim)
-    val damageToHitPoints = damageToVictim - damageToShields
-    val valueDamage       = damageToVictim * victim.valuePerDamage * With.configuration.nonLethalDamageValue
+    val damage            = realUnit.damageOnNextHitAgainst(victim.realUnit, Some(victim.shieldPoints), from = Some(pixel), to = Some(victim.pixel))
+    val damageTotal       = Math.min(victim.hitPoints, damage)
+    val damageToShields   = Math.min(victim.shieldPoints, damageTotal)
+    val damageToHitPoints = damageTotal - damageToShields
+    val valueDamage       = damageTotal * victim.valuePerDamage * With.configuration.nonLethalDamageValue
     val cooldownDivisor   = if (realUnit.canStim && ! realUnit.stimmed) 2 else 1
     cooldownShooting      = (realUnit.cooldownMaxAgainst(victim.realUnit) / splashFactor / cooldownDivisor).toInt
     cooldownMoving        += realUnit.unitClass.stopFrames + realUnit.unitClass.accelerationFrames / 2
     valueDealt            += valueDamage
-    damageDealt           += damageToVictim
+    damageDealt           += damageTotal
     victim.valueReceived  += valueDamage
-    victim.damageReceived += damageToVictim
+    victim.damageReceived += damageTotal
     victim.shieldPoints   -= damageToShields
     victim.hitPoints      -= damageToHitPoints
     dead                  = realUnit.unitClass.suicides

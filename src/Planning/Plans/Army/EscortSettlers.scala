@@ -4,6 +4,7 @@ import Lifecycle.With
 import Mathematics.Points.SpecificPoints
 import Micro.Squads.Goals.SquadPush
 import Micro.Squads.Squad
+import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
 import Utilities.ByOption
 
@@ -19,7 +20,7 @@ class EscortSettlers extends Plan {
     val settler = ByOption.minBy(With.units.ours.filter(builder =>
       builder.agent.toBuildTile.exists(tile =>
         tile.zone.bases.exists(base =>
-          base.townHall.forall( ! _.complete)))))(_.matchups.framesOfSafetyCurrently)
+          base.townHall.forall( ! _.complete)))))(_.matchups.threats.exists(_.is(UnitMatchWarriors)))
     
     if (settler.isEmpty) return
     

@@ -66,7 +66,7 @@ object ShowUnitsAll extends View {
     
     if (showMortality) {
       val ttlThreshold  = 8.0
-      val ttlCurrent    = unit.matchups.framesToLiveCurrently.toDouble / 24.0
+      val ttlCurrent    = unit.matchups.framesToLiveDiffused.toDouble / 24.0
       if (ttlCurrent <= ttlThreshold) {
         val ratio       = ttlCurrent / ttlThreshold
         val ratio255    = Math.max(0, (255 * (1.0 - ratio)).toInt)

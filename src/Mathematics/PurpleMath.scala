@@ -167,7 +167,9 @@ object PurpleMath {
     Math.sqrt(dx * dx + dy * dy)
   }
   
-  def fastSigmoid(x: Double): Double = {
+  def fastTanh(x: Double): Double = {
+    if (x.isPosInfinity) return 1.0
+    if (x.isNegInfinity) return -1.0
     x / (1.0 + Math.abs(x))
   }
   

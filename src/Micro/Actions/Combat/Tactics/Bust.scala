@@ -17,19 +17,20 @@ object Bust extends Action {
   // Killing bunkers with Dragoons is an important technique that we can't yet perform on first princples.
   // Range-upgraded Dragoons just barely outrange a Bunker containing non-range-upgraded Marines.
   
-  override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    With.enemies.exists(_.raceInitial == Race.Terran)             &&
-    unit.agent.canFight                                           &&
-    unit.canMove                                                  &&
-    unit.is(Protoss.Dragoon)                                      &&
-    With.self.hasUpgrade(Protoss.DragoonRange)                    &&
-    unit.matchups.threatsInRange.forall( ! _.is(Terran.SiegeTankSieged)) &&
-    unit.matchups.targets.exists(target =>
-      target.visible            &&
-      target.aliveAndComplete   &&
-      target.is(Terran.Bunker)  &&
-      ! target.player.hasUpgrade(Terran.MarineRange))
-  }
+  override def allowed(unit: FriendlyUnitInfo): Boolean = (
+    unit.totalHealth >= unit.unitClass.maxHitPoints + 12
+    && With.enemies.exists(_.raceInitial == Race.Terran)
+    && unit.agent.canFight
+    && unit.canMove
+    && unit.is(Protoss.Dragoon)
+    && With.self.hasUpgrade(Protoss.DragoonRange)
+    && unit.matchups.threatsInRange.forall( ! _.is(Terran.SiegeTankSieged))
+    && unit.matchups.targets.exists(target =>
+        target.visible
+        && target.aliveAndComplete
+        && target.is(Terran.Bunker)
+        && ! target.player.hasUpgrade(Terran.MarineRange))
+  )
   
   override protected def perform(unit: FriendlyUnitInfo) {
     // Goal: Take down the bunker. Don't take any damage from it.

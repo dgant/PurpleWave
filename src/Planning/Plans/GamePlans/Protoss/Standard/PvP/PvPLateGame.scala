@@ -4,6 +4,7 @@ import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
 import Planning.Composition.Latch
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
+import Planning.Plans.Army.DefendZones
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvPIdeas.ReactToDarkTemplarEmergencies
@@ -17,7 +18,7 @@ import Planning.Plans.Predicates.Milestones._
 import Planning.Plans.Predicates.Reactive.EnemyCarriers
 import Planning.Plans.Predicates.{Employing, SafeAtHome, SafeToAttack}
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.{PvPLateGameCarrier, PvPLateGameGateway}
+import Strategery.Strategies.Protoss.{PvPLateGameArbiter, PvPLateGameCarrier}
 
 class PvPLateGame extends GameplanModeTemplate {
   
@@ -33,6 +34,9 @@ class PvPLateGame extends GameplanModeTemplate {
   
   override def priorityAttackPlan: Plan = new PvPIdeas.AttackWithDarkTemplar
   override val defaultAttackPlan = new PvPIdeas.AttackSafely
+  
+  override def priorityDefensePlan: Plan = new DefendZones { defenderMatcher.set(Protoss.Corsair) }
+  
   
   override def defaultArchonPlan: Plan = new PvPIdeas.MeldArchonsPvP
   
@@ -164,22 +168,28 @@ class PvPLateGame extends GameplanModeTemplate {
     new If(
       new And(
         new Or(
-          new Employing(PvPLateGameGateway),
+          new Employing(PvPLateGameArbiter),
           new UnitsAtLeast(8, Protoss.Carrier)),
         new HaveGasPumps(3)),
       new ArbiterTransition),
   
-    new Build(RequestAtLeast(10, Protoss.Gateway)),
-    new RequireMiningBases(4),
+    new FlipIf(
+      new SafeToAttack,
+      new Build(RequestAtLeast(12, Protoss.Gateway)),
+      new RequireMiningBases(4)),
+  
+    new If(
+      new EnemyUnitsAtLeast(3, Protoss.Shuttle),
+      new Build(
+        RequestAtLeast(1, Protoss.Stargate),
+        RequestAtLeast(1, Protoss.Corsair))),
   
     new FlipIf(
       new SafeToAttack,
-      new If(
-        new UnitsAtLeast(1, Protoss.RoboticsSupportBay),
-        new Build(RequestAtLeast(12, Protoss.Gateway)),
-        new Build(RequestAtLeast(14, Protoss.Gateway))),
+      new Build(RequestAtLeast(20, Protoss.Gateway)),
       new RequireMiningBases(5)),
-      
+  
+    new Build(RequestAtLeast(20, Protoss.Gateway)),
     new RequireMiningBases(6),
     new UpgradeContinuously(Protoss.Shields)
   )

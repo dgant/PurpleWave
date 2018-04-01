@@ -3,18 +3,20 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvP
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
-import Macro.BuildRequests.RequestAtLeast
+import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
 import Planning.Composition.Latch
 import Planning.Plan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
+import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Protoss.BuildCannonsAtNatural
 import Planning.Plans.Predicates.Milestones._
 import Planning.Plans.Predicates.Reactive.EnemyDarkTemplarPossible
+import Planning.Plans.Predicates.Scenarios.EnemyStrategy
 import Planning.Plans.Predicates.{Employing, SafeAtHome}
 import Planning.Plans.Scouting.ScoutOn
 import ProxyBwapi.Races.Protoss
@@ -29,7 +31,7 @@ class PvP2Gate1012 extends GameplanModeTemplate {
   }
   
   override val activationCriteria : Plan  = new Employing(PvPOpen2Gate1012)
-  override val completionCriteria : Plan  = new Latch(new UnitsAtLeast(2, Protoss.PhotonCannon))
+  override val completionCriteria : Plan  = new Latch(new UnitsAtLeast(5, Protoss.Gateway))
   override def defaultAttackPlan  : Plan  = new PvPIdeas.AttackSafely
   override val defaultScoutPlan   : Plan  = new ScoutOn(Protoss.Pylon)
   
@@ -47,13 +49,22 @@ class PvP2Gate1012 extends GameplanModeTemplate {
   override val buildOrder = ProtossBuilds.OpeningTwoGate1012Expand
   override def buildPlans = Vector(
     new RequireMiningBases(2),
+    new TrainContinuously(Protoss.Observer, 1),
     new FlipIf(
       new Or(
         new SafeAtHome,
         new EnemyHasShown(Protoss.Dragoon),
         new EnemyHasShown(Protoss.Assimilator),
         new EnemyHasShown(Protoss.CyberneticsCore)),
-      new PvPIdeas.TrainArmy,
+      new If(
+        new UnitsAtLeast(1, Protoss.CyberneticsCore, complete = true),
+        new TrainContinuously(Protoss.Dragoon),
+        new If(
+          new And(
+            new SafeAtHome,
+            new Not(new EnemyStrategy(With.intelligence.fingerprints.fingerprint2Gate))),
+          new TrainContinuously(Protoss.Zealot, 5),
+          new TrainContinuously(Protoss.Zealot, 7))),
       new Build(
         RequestAtLeast(1, Protoss.Assimilator),
         RequestAtLeast(1, Protoss.CyberneticsCore))),
@@ -61,6 +72,12 @@ class PvP2Gate1012 extends GameplanModeTemplate {
     new Build(
       RequestAtLeast(1, Protoss.Forge),
       RequestAtLeast(2, Protoss.Gateway),
-      RequestAtLeast(1, Protoss.RoboticsFacility))
+      RequestUpgrade(Protoss.DragoonRange),
+      RequestAtLeast(1, Protoss.RoboticsFacility),
+      RequestAtLeast(4, Protoss.Gateway),
+      RequestUpgrade(Protoss.GroundDamage),
+      RequestAtLeast(2, Protoss.Assimilator),
+      RequestAtLeast(1, Protoss.Observatory),
+      RequestAtLeast(6, Protoss.Gateway))
   )
 }

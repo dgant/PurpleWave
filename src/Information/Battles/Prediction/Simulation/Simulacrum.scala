@@ -47,7 +47,7 @@ class Simulacrum(
   var events            : ArrayBuffer[SimulationEvent]  = new ArrayBuffer[SimulationEvent]
   
   lazy val targetQueue: mutable.PriorityQueue[Simulacrum] = (
-    new mutable.PriorityQueue[Simulacrum]()(Ordering.by(x => (x.realUnit.unitClass.helpsInCombat, - x.pixel.pixelDistance(pixel))))
+    new mutable.PriorityQueue[Simulacrum]()(Ordering.by(x => (x.realUnit.unitClass.dealsDamage, - x.pixel.pixelDistance(pixel))))
       ++ realUnit.matchups.targets
         .filter(target =>
           ! simulation.fleeing
@@ -60,7 +60,7 @@ class Simulacrum(
     if ( ! realUnit.canAttack) {
       false
     }
-    else if ( ! realUnit.unitClass.helpsInCombat) {
+    else if ( ! realUnit.unitClass.dealsDamage) {
       false
     }
     else if (realUnit.unitClass.isWorker) {

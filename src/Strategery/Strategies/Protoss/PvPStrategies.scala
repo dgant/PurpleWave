@@ -7,7 +7,7 @@ import bwapi.Race
 class PvPOpening extends Strategy {
   override def ourRaces   : Iterable[Race]  = Vector(Race.Protoss)
   override def enemyRaces : Iterable[Race]  = Vector(Race.Protoss)
-  override def choices: Iterable[Iterable[Strategy]] = Iterable(Iterable(PvPLateGameCarrier, PvPLateGameGateway))
+  override def choices: Iterable[Iterable[Strategy]] = Iterable(Iterable(PvPLateGameCarrier, PvPLateGameArbiter))
 }
 
 object PvPOpen1GateReaverExpand   extends PvPOpening
@@ -23,4 +23,4 @@ object PvPOpenProxy2Gate          extends PvPOpening {
 }
 
 object PvPLateGameCarrier extends Strategy
-object PvPLateGameGateway extends Strategy
+object PvPLateGameArbiter extends Strategy

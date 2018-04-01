@@ -46,7 +46,7 @@ class Avatar {
     val splashFactor = MicroValue.maxSplashFactor(unit)
     
     val geometric     = nearestEnemy.isDefined
-    val contributes   = unit.unitClass.helpsInCombat
+    val contributes   = unit.unitClass.dealsDamage
     val range         = unit.pixelRangeMax + 32.0 * (if (attacking || ! unit.canMove) 1.0 else 3.0)
     val pixelsAway    = if (geometric) unit.pixelDistanceCenter(nearestEnemy.get) else With.configuration.avatarBattleDistancePixels
     val framesAway    = if (pixelsAway <= range) 0.0 else if (chasing) Double.PositiveInfinity else PurpleMath.nanToInfinity(Math.max(0.0, pixelsAway - range) / unit.topSpeed * 0.5)

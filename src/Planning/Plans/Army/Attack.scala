@@ -51,7 +51,7 @@ class Attack extends Plan {
     squad.enemies = With.units.enemy.filter(e =>
       e.likelyStillAlive
       && e.possiblyStillThere
-      && e.unitClass.helpsInCombat
+      && e.unitClass.dealsDamage
       && ( ! e.unitClass.isBuilding || e.zone == target.zone))
     squad.conscript(attackers.get.units)
   }

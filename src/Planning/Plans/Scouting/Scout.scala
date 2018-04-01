@@ -17,6 +17,8 @@ class Scout(scoutCount: Int = 1) extends Plan {
   
   description.set("Scout")
   
+  var useScoutingBehaviors = true
+  
   val scouts = new Property[LockUnits](new LockUnits {
     unitCounter.set(UnitCountExactly(scoutCount))
     unitMatcher.set(UnitMatchAnd(UnitMatchWorkers, UnitMatchNotHoldingResources))
@@ -85,7 +87,7 @@ class Scout(scoutCount: Int = 1) extends Plan {
       
       val intention = new Intention
       intention.toTravel = Some(destination)
-      intention.canScout = true
+      intention.canScout = useScoutingBehaviors
       scout.agent.intend(this, intention)
     }
   }

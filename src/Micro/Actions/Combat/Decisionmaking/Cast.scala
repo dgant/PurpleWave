@@ -1,5 +1,6 @@
 package Micro.Actions.Combat.Decisionmaking
 
+import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Micro.Actions.Action
 import Micro.Actions.Combat.Spells._
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
@@ -25,7 +26,8 @@ object Cast extends Action {
         Protoss.DarkArchon,
         Protoss.HighTemplar,
         Zerg.Defiler,
-        Zerg.Queen)) {
+        Zerg.Queen)
+      && unit.matchups.framesOfSafety < GameTime(0, 5)()) {
       unit.agent.shouldEngage = false
     }
   }

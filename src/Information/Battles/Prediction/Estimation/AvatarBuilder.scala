@@ -60,9 +60,9 @@ class AvatarBuilder {
   }
   
   private def eligible(unit: UnitInfo): Boolean = {
-    if ( ! unit.unitClass.helpsInCombat)                              return false
+    if ( ! unit.unitClass.dealsDamage)                              return false
     if (unit.unitClass.isWorker   && ! unit.isBeingViolent)           return false
-    if (unit.unitClass.isBuilding && ! unit.unitClass.helpsInCombat)  return false
+    if (unit.unitClass.isBuilding && ! unit.unitClass.dealsDamage)  return false
     if (unit.is(Terran.SpiderMine))                                   return false
     if (unit.is(Protoss.Scarab))                                      return false
     if (unit.is(Protoss.Interceptor))                                 return false

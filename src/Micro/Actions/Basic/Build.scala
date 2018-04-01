@@ -7,6 +7,7 @@ import Micro.Actions.Action
 import Micro.Actions.Combat.Attacking.Target
 import Micro.Actions.Combat.Decisionmaking.{Fight, FightOrFlight}
 import Micro.Actions.Commands.{Attack, Move}
+import Planning.Yolo
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
 
@@ -40,7 +41,7 @@ object Build extends Action {
           && blocker.likelyStillThere)
     }
     
-    val ignoreBlockers = distance > 32.0 * 8.0
+    val ignoreBlockers        = distance > 32.0 * 8.0 || Yolo.active
     lazy val blockersIn       = if (ignoreBlockers) Seq.empty else buildArea.tiles.flatMap(blockersForTile).toSeq
     lazy val blockersNear     = if (ignoreBlockers) Seq.empty else buildArea.expand(2, 2).tiles.flatMap(blockersForTile).toSeq
     lazy val blockersOurs     = blockersNear.filter(_.isOurs)

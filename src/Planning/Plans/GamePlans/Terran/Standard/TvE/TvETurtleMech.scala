@@ -16,7 +16,7 @@ import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Terran.{BuildBunkersAtExpansions, BuildMissileTurretsAtBases, PopulateBunkers}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Predicates.Economy.{GasAtLeast, MineralsAtMost}
-import Planning.Plans.Predicates.Matchup.EnemyIsZerg
+import Planning.Plans.Predicates.Matchup.{EnemyIsProtoss, EnemyIsZerg}
 import Planning.Plans.Predicates.Milestones.{EnemyHasShownCloakedThreat, EnemyUnitsAtLeast, IfOnMiningBases, UnitsAtLeast}
 import Planning.Plans.Predicates.{Employing, SafeAtHome, SafeToAttack}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
@@ -138,8 +138,11 @@ class TvETurtleMech extends GameplanModeTemplate {
     new If(
       new EnemyHasShownCloakedThreat,
       new Parallel(
-        new TrainContinuously(Terran.ControlTower, 2),
+        new If(
+          new UnitsAtLeast(2, Terran.Factory),
+          new Build(RequestAtLeast(1, Terran.Starport))),
         new TrainContinuously(Terran.ScienceFacility, 1),
+        new TrainContinuously(Terran.ControlTower, 2),
         new TrainContinuously(Terran.ScienceVessel, 2)
       )),
     new If(
@@ -159,6 +162,7 @@ class TvETurtleMech extends GameplanModeTemplate {
       new Parallel(
         new Build(RequestAtLeast(1, Terran.Armory)),
         new BuildGasPumps,
+        new TrainContinuously(Terran.Valkyrie, 4),
         new TrainContinuously(Terran.Goliath),
         new UpgradeContinuously(Terran.GoliathAirRange),
         new TrainContinuously(Terran.Marine))),
@@ -183,6 +187,9 @@ class TvETurtleMech extends GameplanModeTemplate {
     new If(new EnemyUnitsAtLeast(1, UnitMatchSiegeTank),  new Build(RequestAtLeast(1, Terran.Starport))),
     new If(new EnemyUnitsAtLeast(1, Protoss.Reaver),      new Build(RequestAtLeast(1, Terran.Starport))),
     new If(new EnemyUnitsAtLeast(1, Protoss.Shuttle),     new Build(RequestAtLeast(1, Terran.Starport))),
+    new If(new EnemyIsZerg, new Build(RequestAtLeast(1, Terran.Armory))),
+    new IfOnMiningBases(1, new Build(RequestAtLeast(2, Terran.Factory))),
+    new If(new Not(new EnemyIsProtoss), new Build(RequestAtLeast(1, Terran.Starport))),
     new IfOnMiningBases(2, new Build(RequestAtLeast(4, Terran.Factory))),
     new IfOnMiningBases(2, new Build(RequestAtLeast(2, Terran.MachineShop))),
     new IfOnMiningBases(2, new Build(RequestAtLeast(5, Terran.Factory))),

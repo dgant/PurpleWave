@@ -19,8 +19,8 @@ object PlacementHeuristicDistanceFromEnemy extends PlacementHeuristic {
       val from = base.townHallArea.midPixel
       val to = candidate.pixelCenter
   
-      // Performance optimization. Town hall placements matter more so use the zone distance as well.
-      if (blueprint.requireTownHallTile.get) {
+      // Performance optimization.
+      if (blueprint.requireTownHallTile.get || blueprint.building.exists(_.dealsDamage)) {
         totalDistance += from.zone.distancePixels(to.zone)
       }
       

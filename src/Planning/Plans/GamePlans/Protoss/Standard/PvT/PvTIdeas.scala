@@ -2,6 +2,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvT
 
 import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, RequestTech}
+import Planning.Composition.Latch
 import Planning.Composition.UnitMatchers.{UnitMatchCustom, UnitMatchOr, UnitMatchWarriors}
 import Planning.Plans.Army.{Attack, ConsiderAttacking}
 import Planning.Plans.Compound.{If, _}
@@ -144,7 +145,8 @@ object PvTIdeas {
   class TrainArmy extends Parallel(
     new TrainObservers,
     new TrainArbiters,
-    new If(new EnemyBio, new TrainContinuously(Protoss.Reaver, 3)),
+    new If(          new EnemyBio,  new TrainContinuously(Protoss.Reaver, 4)),
+    new If(new Latch(new EnemyBio), new TrainContinuously(Protoss.Reaver, 2)),
     new TrainContinuously(Protoss.Carrier),
     new TrainDarkTemplar,
     new TrainHighTemplar,

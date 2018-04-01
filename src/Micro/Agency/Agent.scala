@@ -229,7 +229,7 @@ class Agent(val unit: FriendlyUnitInfo) {
   }
   
   private def isAnchor(ally: UnitInfo): Boolean = {
-    if ( ! ally.unitClass.helpsInCombat) return false
+    if ( ! ally.unitClass.dealsDamage) return false
     
     // Don't retreat to a Missile Turret against Zerglings, for example
     if (ally.matchups.enemies.nonEmpty && ally.matchups.targets.isEmpty) return false

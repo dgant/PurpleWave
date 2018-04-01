@@ -85,25 +85,31 @@ class SquadDefendZone(zone: Zone) extends SquadGoal {
   def defendWall(walls: Seq[UnitInfo]) {
     val centroidSources = Seq(squad.enemies.toSeq.map(_.pixelCenter), zone.exit.map(_.pixelCenter).toSeq, Seq(SpecificPoints.middle))
     val enemyCentroid   = centroidSources.find(_.nonEmpty).head.centroid
-    val wall            = walls.minBy(_.pixelDistanceCenter(enemyCentroid))
+    val wall            = walls.minBy(_.pixelDistanceTravelling(enemyCentroid))
     val concaveOrigin   = wall.pixelCenter.project(enemyCentroid, 96.0)
     val concaveAxis     = wall.pixelCenter.radiansTo(enemyCentroid)
     val concaveStart    = concaveOrigin.radiateRadians(concaveAxis + wallConcaveWidthRadians, wallConcaveWidthPixels)
     val concaveEnd      = concaveOrigin.radiateRadians(concaveAxis - wallConcaveWidthRadians, wallConcaveWidthPixels)
-    concave(concaveStart, concaveEnd, concaveOrigin)
+    defendLine(concaveStart, concaveEnd)
   }
   
   def defendChoke(choke: Edge) {
-    val concaveStart  = choke.sidePixels.head
-    val concaveEnd    = choke.sidePixels.last
-    val concaveOrigin = choke.zones.toList
-      .sortBy(_.centroid.tileDistanceFast(With.geography.home))
-      .sortBy( ! _.owner.isUs)
-      .head
-      .centroid
-      .pixelCenter
-    
-    concave(concaveStart, concaveEnd, concaveOrigin)
+    defendLine(choke.sidePixels.head, choke.sidePixels.last)
+  }
+  
+  def defendLine(from: Pixel, to: Pixel) {
+    val concaveMidpoint = from.midpoint(to)
+    val concaveRadians  = from.radiansTo(to)
+    val someDistance    = 96.0
+    val rightAngle      = Math.PI / 2.0
+    val origins         = Vector(
+      concaveMidpoint.radiateRadians(concaveRadians + rightAngle, someDistance),
+      concaveMidpoint.radiateRadians(concaveRadians - rightAngle, someDistance))
+    val origin = origins.minBy(o =>
+      if (With.geography.ourBases.isEmpty) 0.0
+      else With.geography.ourBases.map(_.heart.pixelCenter.groundPixels(o)).min)
+  
+    concave(from, to, origin)
   }
   
   def concave(start: Pixel, end: Pixel, origin: Pixel) {

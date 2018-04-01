@@ -14,10 +14,6 @@ class UnitsAtMost(
   description.set("Have at most " + quantity + " " + matcher)
   
   override def isComplete: Boolean = (
-    With.units.ours
-      .count(unit =>
-        ( ! complete || unit.complete)
-        && matcher.accept(unit))
-      <= quantity
+    With.units.ours.count(unit => ( ! complete || unit.complete) && matcher.accept(unit)) <= quantity
   )
 }

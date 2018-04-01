@@ -28,7 +28,6 @@ class Visualization {
     ShowUnitsFriendly,
     ShowUnitsForeign,
     ShowExplosions,
-    ShowClustering,
     ShowBattleSummary
   )
   

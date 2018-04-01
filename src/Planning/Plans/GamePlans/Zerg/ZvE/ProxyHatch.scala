@@ -8,17 +8,17 @@ import Planning.Composition.UnitCounters.UnitCountExactly
 import Planning.Composition.UnitMatchers.{UnitMatchMobileFlying, UnitMatchWorkers}
 import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Compound.{If, _}
-import Planning.Plans.Predicates.Employ
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.Build.ProposePlacement
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
 import Planning.Plans.Macro.Expanding.BuildGasPumps
-import Planning.Plans.Predicates.Milestones.UnitsAtLeast
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
+import Planning.Plans.Predicates.Employ
+import Planning.Plans.Predicates.Milestones.{UnitsAtLeast, UnitsAtMost}
 import Planning.Plans.Scouting.ScoutAt
 import Planning.{Plan, ProxyPlanner}
 import ProxyBwapi.Races.Zerg
-import Strategery.Strategies.Zerg.ZvE.{ProxyHatchHydras, ProxyHatchSunkens, ProxyHatchZerglings}
+import Strategery.Strategies.Zerg.{ProxyHatchHydras, ProxyHatchSunkens, ProxyHatchZerglings}
 
 class ProxyHatch extends Parallel {
   
@@ -129,14 +129,16 @@ class ProxyHatch extends Parallel {
             initialAfter = new Parallel(
               new RequireSufficientSupply,
               new TrainContinuously(Zerg.Mutalisk),
+              new Build(RequestAtLeast(24, Zerg.Drone)),
               new BuildGasPumps,
-              new Build(RequestAtLeast(18, Zerg.Drone)),
               new TrainContinuously(Zerg.Zergling),
               new Build(
                 RequestAtLeast(1, Zerg.Lair),
                 RequestUpgrade(Zerg.ZerglingSpeed),
                 RequestAtLeast(1, Zerg.Spire)),
-              new TrainContinuously(Zerg.CreepColony, 1),
+              new If(
+                new UnitsAtMost(6, Zerg.SunkenColony),
+                new TrainContinuously(Zerg.CreepColony, 1)),
               new TrainContinuously(Zerg.Hatchery, 8)
             ))))),
       

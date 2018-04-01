@@ -16,6 +16,7 @@ abstract class ActionTechnique extends Action {
     val framesOfInvolvement = unit.matchups
       .framesOfEntanglementPerThreat
       .getOrElse(other, Double.NegativeInfinity)
-    0.5 + PurpleMath.fastSigmoid(framesOfInvolvement / 12.0) / 2.0
+    
+    0.5 + PurpleMath.fastTanh(framesOfInvolvement / 12.0) / 2.0
   }
 }

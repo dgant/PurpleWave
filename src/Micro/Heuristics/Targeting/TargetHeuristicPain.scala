@@ -1,27 +1,30 @@
 package Micro.Heuristics.Targeting
+
+import Mathematics.Heuristics.HeuristicMathMultiplicative
+import Mathematics.PurpleMath
 import Micro.Decisions.MicroValue
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object TargetHeuristicPain extends TargetHeuristic {
   
   override def evaluate(unit: FriendlyUnitInfo, candidate: UnitInfo): Double = {
-    if (unit.matchups.threats.isEmpty) return 1.0
   
-    val travelPixels  = Math.max(0.0, unit.pixelDistanceEdge(candidate) - unit.pixelRangeAgainst(candidate))
-    val firingPixel   = unit.pixelCenter.project(candidate.pixelCenter, travelPixels)
-    val vpfNow        = unit.matchups.vpfReceiving
-    val vpfThere      = unit.matchups.threats
-      .map(threat =>
-        if (threat.inRangeToAttack(unit, firingPixel)) {
-          val threatTargets = threat.matchups.targetsInRange.size + (if (threat.inRangeToAttack(unit)) 0.0 else 1.0)
-          val threatVpfDiffused = MicroValue.valuePerFrame(threat, unit) / threatTargets
-          threatVpfDiffused
-        }
-        else
-          0.0)
-      .sum
-  
-    240 * vpfThere - vpfNow
+    val threats = unit.matchups.threats.take(20)
+    
+    if (threats.isEmpty) return HeuristicMathMultiplicative.default
+    val distance        = unit.pixelDistanceEdge(candidate)
+    val travelPixels    = Math.max(0.0, distance - unit.pixelRangeAgainst(candidate))
+    val firingPosition  = candidate.pixelCenter.project(unit.pixelCenter, unit.pixelRangeAgainst(candidate))
+    val painStanding = threats
+        .map(threat =>
+          if (threat.inRangeToAttack(unit, firingPosition))
+            MicroValue.valuePerFrame(threat, unit)
+          else 0.0)
+        .sum / threats.size
+    val painWalking = PurpleMath.nanToZero(travelPixels / unit.unitClass.topSpeed) * unit.matchups.vpfReceiving
+    
+    val output = 24.0 * (painWalking + painStanding) / threats.size
+    output
   }
   
 }

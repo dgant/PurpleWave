@@ -14,7 +14,7 @@ import Planning.Plans.Macro.Automatic.{TrainContinuously, TrainWorkersContinuous
 import Planning.Plans.Macro.BuildOrders._
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
-import Planning.Plans.Predicates.Economy.GasAtLeast
+import Planning.Plans.Predicates.Economy.{GasAtLeast, MineralsAtLeast}
 import Planning.Plans.Predicates.Employing
 import Planning.Plans.Predicates.Milestones._
 import Planning.Plans.Scouting.ScoutOn
@@ -32,14 +32,14 @@ class PvZ4Gate extends GameplanModeTemplate {
   override def defaultPlacementPlan   = new BuildHuggingNexus
   override def defaultAggressionPlan  = new If(
     new UnitsAtMost(8, UnitMatchWarriors, complete = true),
-    new Aggression(1.2),
+    new Aggression(1.0),
     new If(
       new UnitsAtMost(10, UnitMatchWarriors, complete = true),
-      new Aggression(1.4),
+      new Aggression(1.2),
       new If(
         new UnitsAtMost(15, UnitMatchWarriors, complete = true),
-        new Aggression(2.0),
-        new Aggression(3.0))))
+        new Aggression(1.4),
+        new Aggression(2.0))))
   
   override def defaultAttackPlan: Plan = new If(
     new Or(
@@ -58,7 +58,9 @@ class PvZ4Gate extends GameplanModeTemplate {
         RequestAtLeast(2, Protoss.Observer))),
   
     new Trigger(
-      new UnitsAtLeast(24, UnitMatchWarriors),
+      new Or(
+        new MineralsAtLeast(800),
+        new UnitsAtLeast(24, UnitMatchWarriors)),
       new RequireMiningBases(2)),
   
     new If(
@@ -81,11 +83,7 @@ class PvZ4Gate extends GameplanModeTemplate {
     new Build(
       RequestAtLeast(1, Protoss.CyberneticsCore), // Of course, the Assimilator SHOULD go first but then we mine too much gas from it
       RequestAtLeast(1, Protoss.Assimilator),
-      RequestAtLeast(4, Protoss.Gateway)),
-    
-    new Trigger(
-      new UnitsAtLeast(12, UnitMatchWarriors),
-      new RequireMiningBases(2))
+      RequestAtLeast(4, Protoss.Gateway))
   )
 }
 

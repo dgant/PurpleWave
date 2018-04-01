@@ -36,6 +36,7 @@ object PvPIdeas {
         new Not(new EnemyDarkTemplarExists)),
       new Or(
         new SafeToAttack,
+        new EnemyBasesAtLeast(3),
         new And(
           new UnitsAtLeast(1, Protoss.Dragoon),
           new EnemyUnitsAtMost(0, Protoss.Dragoon),

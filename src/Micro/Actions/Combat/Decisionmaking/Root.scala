@@ -45,7 +45,7 @@ object Root extends Action {
     private lazy val nearFormationPoint   = unit.agent.toForm.exists(unit.pixelDistanceCenter(_) < 32.0 * 6.0)
     private lazy val turretsInRange       = unit.matchups.targetsInRange.exists(_.unitClass.isStaticDefense)
     private lazy val buildingInRange      = unit.matchups.targetsInRange.exists(_.unitClass.isBuilding)
-    private lazy val combatTargets        = unit.matchups.enemies.filter(e => (unit.canAttack(e) && e.unitClass.helpsInCombat) || (e.is(Zerg.Lurker) && ! e.inRangeToAttack(unit)))
+    private lazy val combatTargets        = unit.matchups.enemies.filter(e => (unit.canAttack(e) && e.unitClass.dealsDamage) || (e.is(Zerg.Lurker) && ! e.inRangeToAttack(unit)))
     private lazy val targetsInRange       = combatTargets.filter(t => unit.pixelDistanceEdge(t) < maxRange)
     private lazy val targetsNearingRange  = combatTargets.filter(t => { val p = t.projectFrames(framesToRoot); unit.pixelDistanceEdge(t.pixelStartAt(p), t.pixelEndAt(p)) < maxRange - 32})
     private lazy val girdForCombat        = targetsInRange.nonEmpty || targetsNearingRange.nonEmpty

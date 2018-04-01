@@ -5,7 +5,7 @@ import Macro.BuildRequests.BuildRequest
 import Macro.Buildables.Buildable
 import Performance.Cache
 import Planning.Plan
-import ProxyBwapi.Races.Terran
+import ProxyBwapi.Races.{Terran, Zerg}
 import ProxyBwapi.UnitClass.UnitClass
 import Utilities.{CountMap, CountMapper}
 
@@ -62,10 +62,11 @@ class DumbQueue {
     }
     else {
       val unit = request.buildable.unitOption.get
-      val differenceBefore = Math.max(0, unitsWanted(unit) - unitsActual(unit))
-      unitsWanted.put(unit, request.add + Math.max(unitsWanted(unit), unitsActual(unit)))
+      var unitCountActual = unitsActual(unit)
+      val differenceBefore = Math.max(0, unitsWanted(unit) - unitCountActual)
+      unitsWanted.put(unit, request.add + Math.max(unitsWanted(unit), unitCountActual))
       unitsWanted.put(unit, Math.max(unitsWanted(unit), request.require))
-      val differenceAfter = unitsWanted(unit) - unitsActual(unit)
+      val differenceAfter = unitsWanted(unit) - unitCountActual
       var differenceChange = differenceAfter - differenceBefore
       if (unit.isTwoUnitsInOneEgg) {
         differenceChange = (1 + differenceChange) / 2

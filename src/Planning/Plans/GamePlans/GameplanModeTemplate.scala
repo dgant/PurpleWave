@@ -39,7 +39,7 @@ abstract class GameplanModeTemplate extends GameplanMode {
   def defaultNukePlan       : Plan              = new NukeBase
   def defaultAttackPlan     : Plan              = new ConsiderAttacking
   def defaultDropPlan       : Plan              = new DropAttack
-  
+  def defaultOverlordPlan   : Plan              = new ChillOverlords
   def defaultMacroPlans: Vector[Plan] = Vector(
     defaultArchonPlan,
     new ClearBurrowedBlockers,
@@ -61,7 +61,7 @@ abstract class GameplanModeTemplate extends GameplanMode {
     defaultAttackPlan,
     new DefendEntrance,
     new Gather,
-    new ChillOverlords,
+    defaultOverlordPlan,
     new RecruitFreelancers,
     new Scan
   )

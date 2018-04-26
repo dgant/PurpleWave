@@ -18,7 +18,7 @@ object TargetHeuristicPain extends TargetHeuristic {
     val painStanding = threats
         .map(threat =>
           if (threat.inRangeToAttack(unit, firingPosition))
-            MicroValue.valuePerFrame(threat, unit)
+            MicroValue.valuePerFrameCurrentHp(threat, unit)
           else 0.0)
         .sum / threats.size
     val painWalking = PurpleMath.nanToZero(travelPixels / unit.unitClass.topSpeed) * unit.matchups.vpfReceiving

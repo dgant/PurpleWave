@@ -24,6 +24,10 @@ object Attack extends Action {
       AttackMove.delegate(unit)
     }
     
+    if (unit.unitClass.accelerationFrames <= 1 && unit.matchups.targetsInRange.forall(_ == unit.agent.toAttack)) {
+      With.commander.hold(unit)
+    }
+    
     With.commander.attack(unit, unit.agent.toAttack.get)
   }
 }

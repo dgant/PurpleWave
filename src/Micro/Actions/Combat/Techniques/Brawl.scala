@@ -1,9 +1,10 @@
 package Micro.Actions.Combat.Techniques
 
 import Lifecycle.With
-import Micro.Actions.Combat.Attacking.Target
+import Micro.Actions.Combat.Attacking.Filters.TargetFilterWhitelist
+import Micro.Actions.Combat.Attacking.{Target, TargetAction, TargetInRange}
 import Micro.Actions.Combat.Techniques.Common.ActionTechnique
-import Micro.Actions.Commands.AttackMove
+import Micro.Actions.Commands.Attack
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object Brawl extends ActionTechnique {
@@ -20,7 +21,7 @@ object Brawl extends ActionTechnique {
   
   override def applicabilitySelf(unit: FriendlyUnitInfo): Double = {
     lazy val brawlers = unit.matchups.threats.filter(t => ! t.flying && t.unitClass.melee && inBrawlRange(unit, t))
-    if (unit.unitClass.melee && brawlers.size >= 3) 1.0 else 0.0
+    if (unit.unitClass.melee && brawlers.size >= 4) 1.0 else 0.0
   }
   
   private def inBrawlRange(unit: FriendlyUnitInfo, other: UnitInfo): Boolean = {
@@ -30,9 +31,11 @@ object Brawl extends ActionTechnique {
   }
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
-    if (unit.unitClass.melee)
+    lazy val targetsNear = unit.matchups.targets.filter(t => unit.framesBeforeAttacking(t) < With.reaction.agencyMax)
+    lazy val targetNear = new TargetAction(TargetFilterWhitelist(targetsNear))
+    TargetInRange.delegate(unit)
+    targetNear.delegate(unit)
     Target.delegate(unit)
-    unit.agent.toTravel = unit.agent.toAttack.map(_.pixelCenter)
-    AttackMove.delegate(unit)
+    Attack.delegate(unit)
   }
 }

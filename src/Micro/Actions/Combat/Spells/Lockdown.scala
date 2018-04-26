@@ -24,7 +24,7 @@ object Lockdown extends TargetedSpell {
     val cappedLifetime          = Math.max(thresholdLifetimeFrames, target.matchups.framesToLive)
     val fractionalValue         = cappedLifetime / thresholdLifetimeFrames
     val targetValueAbsolute     = target.subjectiveValue * fractionalValue
-    val targetValueNow          = target.matchups.vpfDealing * cappedLifetime
+    val targetValueNow          = target.matchups.vpfDealingInRange * cappedLifetime
     val targetValueDetecting    = if(target.unitClass.isDetector) ByOption.max(target.matchups.enemies.filter(_.cloaked).map(_.subjectiveValue.toDouble)).getOrElse(0.0) else 0.0
     val values                  = Vector(targetValueAbsolute, targetValueNow, targetValueDetecting)
     val output: Double          = values.max

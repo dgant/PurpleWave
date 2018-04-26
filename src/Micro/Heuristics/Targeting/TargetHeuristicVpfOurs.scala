@@ -13,7 +13,7 @@ object TargetHeuristicVpfOurs extends TargetHeuristic {
   
   def valuePerAttack(shooter: FriendlyUnitInfo, target: UnitInfo): Double = {
     
-    val directValueAgainstTarget = MicroValue.valuePerAttack(shooter, target)
+    val directValueAgainstTarget = MicroValue.valuePerAttackCurrentHp(shooter, target)
     
     if ( ! shooter.unitClass.dealsRadialSplashDamage) {
       return directValueAgainstTarget
@@ -22,7 +22,7 @@ object TargetHeuristicVpfOurs extends TargetHeuristic {
     def splashValue(bystander: UnitInfo, maxDistance: Double, damageRatio: Double): Double = {
       if (bystander.flying != target.flying) return 0.0
       if (bystander.pixelDistanceCenter(target) > maxDistance) return 0.0
-      damageRatio * MicroValue.valuePerAttack(shooter, bystander)
+      damageRatio * MicroValue.valuePerAttackCurrentHp(shooter, bystander)
     }
   
     val splashRadius50 = if (target.flying) shooter.unitClass.airSplashRadius50 else shooter.unitClass.groundSplashRadius50

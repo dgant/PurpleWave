@@ -19,6 +19,6 @@ class DamageCredit {
   def onDamage(from: UnitInfo, to: UnitInfo) {
     value(from.player)(from.unitClass) =
       value(from.player).getOrElse(from.unitClass, 0.0) +
-      MicroValue.valuePerAttack(from, to )
+      MicroValue.valuePerAttackMaxHp(from, to )
   }
 }

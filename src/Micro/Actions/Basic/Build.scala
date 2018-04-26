@@ -7,6 +7,7 @@ import Micro.Actions.Action
 import Micro.Actions.Combat.Attacking.Target
 import Micro.Actions.Combat.Decisionmaking.{Fight, FightOrFlight}
 import Micro.Actions.Commands.{Attack, Move}
+import Planning.Composition.UnitMatchers.UnitMatchWorkers
 import Planning.Yolo
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
@@ -64,24 +65,25 @@ object Build extends Action {
         unit.agent.toAttack = unit.agent.toAttack.orElse(Some(blockersToKill.minBy(_.pixelDistanceEdge(unit))))
         Attack.delegate(unit)
       }
-      else if (unit.matchups.threats.exists( ! _.unitClass.isWorker)) {
+      else if (unit.matchups.threats.exists( ! _.is(UnitMatchWorkers))) {
         FightOrFlight.consider(unit)
         Fight.consider(unit)
       }
     }
-    else {
-      blockersOurs.flatMap(_.friendly).filter(_.matchups.framesOfSafety > GameTime(0, 1)()).foreach(_.agent.shove(unit))
-      
-      val buildPixel = unit.agent.toBuildTile.get.pixelCenter
-      val waypoint = unit.agent.nextWaypoint(buildPixel)
-      if (
-        unit.zone != buildPixel.zone
-        && unit.pixelDistanceCenter(buildPixel) > 32.0 * 5.0
-        && unit.pixelDistanceCenter(waypoint) > unit.unitClass.haltPixels) {
-        unit.agent.toTravel = Some(waypoint)
-        Move.delegate(unit)
-      }
-      With.commander.build(unit, unit.agent.toBuild.get, unit.agent.lastIntent.toBuildTile.get)
+    
+    if ( ! unit.readyForMicro) return
+    
+    blockersOurs.flatMap(_.friendly).filter(_.matchups.framesOfSafety > GameTime(0, 1)()).foreach(_.agent.shove(unit))
+    
+    val buildPixel = unit.agent.toBuildTile.get.pixelCenter
+    val waypoint = unit.agent.nextWaypoint(buildPixel)
+    if (
+      unit.zone != buildPixel.zone
+      && unit.pixelDistanceCenter(buildPixel) > 32.0 * 5.0
+      && unit.pixelDistanceCenter(waypoint) > unit.unitClass.haltPixels) {
+      unit.agent.toTravel = Some(waypoint)
+      Move.delegate(unit)
     }
+    With.commander.build(unit, unit.agent.toBuild.get, unit.agent.lastIntent.toBuildTile.get)
   }
 }

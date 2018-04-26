@@ -1,6 +1,7 @@
 package Micro.Heuristics.Targeting
 
 class TargetingProfile(
+  var preferVpfEnemy    : Double = 0.0,
   var preferVpfOurs     : Double = 0.0,
   var preferDetectors   : Double = 0.0,
   var avoidDelay        : Double = 0.0,
@@ -8,6 +9,7 @@ class TargetingProfile(
   
   def weightedHeuristics: Iterable[TargetHeuristicWeight] = {
     Vector(
+      new TargetHeuristicWeight(TargetHeuristicVpfEnemy,      preferVpfEnemy),
       new TargetHeuristicWeight(TargetHeuristicVpfOurs,       preferVpfOurs),
       new TargetHeuristicWeight(TargetHeuristicDetectors,     preferDetectors),
       new TargetHeuristicWeight(TargetHeuristicDelay,         -avoidDelay),

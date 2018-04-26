@@ -31,7 +31,7 @@ object FightOrFlight extends Action {
     decide(false, "Scarabs",    () => unit.is(Protoss.Reaver) && unit.scarabCount == 0)
     decide(true,  "Cloaked",    () => unit.effectivelyCloaked)
     decide(true,  "Lurking",    () => unit.is(Zerg.Lurker) && unit.matchups.enemyDetectors.isEmpty)
-    decide(false, "Pacifist",   () => !unit.agent.canFight)
+    decide(false, "Pacifist",   () => ! unit.agent.canFight)
     decide(false, "Disrupted",  () => unit.underDisruptionWeb && ! unit.flying)
     decide(false, "Swarmed",    () => unit.underDarkSwarm && !unit.unitClass.unaffectedByDarkSwarm && unit.matchups.targetsInRange.forall(t => !t.flying || t.underDarkSwarm))
     decide(true,  "Workers",    () => unit.matchups.targets.exists(_.matchups.targetsInRange.exists(ally => ally.target.exists(_.zone == ally.zone)  && ally.gathering || ally.constructing)))

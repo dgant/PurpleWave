@@ -47,7 +47,7 @@ object Heal extends Action {
     val damage          = patient.unitClass.maxHitPoints - patient.hitPoints
     val safety          = PurpleMath.signum(Math.max(0.0, patient.matchups.framesOfSafety))
     val receiving       = PurpleMath.signum(patient.matchups.vpfReceiving)
-    val dealing         = PurpleMath.signum(patient.matchups.vpfDealing)
+    val dealing         = PurpleMath.signum(patient.matchups.vpfDealingInRange)
     val valueWorthwhile = PurpleMath.clamp(Math.min(lifetimeFrames, safety) - distanceFrames, 1.0, 24.0)
     val valueTrading    = (1.0 + receiving) * (1.0 + dealing)
     val output          = (1.0 + damage) * valueWorthwhile * valueTrading

@@ -6,16 +6,35 @@ import ProxyBwapi.UnitInfo.UnitInfo
 
 object MicroValue {
   
-  def valuePerDamage(unit: UnitInfo): Double = {
+  def valuePerDamageMaxHp(unit: UnitInfo): Double = {
     PurpleMath.nanToZero(unit.subjectiveValue / unit.totalHealth.toDouble)
   }
   
-  def valuePerAttack(from: UnitInfo, to: UnitInfo): Double = {
-    from.damageOnNextHitAgainst(to) * valuePerDamage(to)
+  def valuePerDamageCurrentHp(unit: UnitInfo): Double = {
+    PurpleMath.nanToZero(unit.subjectiveValue / unit.totalHealth.toDouble)
   }
   
-  def valuePerFrame(from: UnitInfo, to: UnitInfo): Double = {
-    PurpleMath.nanToOne(from.damageOnNextHitAgainst(to) * valuePerDamage(to) / from.cooldownMaxAgainst(to))
+  def valuePerAttackMaxHp(from: UnitInfo, to: UnitInfo): Double = {
+    from.damageOnNextHitAgainst(to) * valuePerDamageMaxHp(to)
+  }
+  
+  def valuePerAttackCurrentHp(from: UnitInfo, to: UnitInfo): Double = {
+    from.damageOnNextHitAgainst(to) * valuePerDamageCurrentHp(to)
+  }
+  
+  def valuePerFrameMaxHp(from: UnitInfo, to: UnitInfo): Double = {
+    PurpleMath.nanToOne(valuePerAttackMaxHp(from, to) / from.cooldownMaxAgainst(to))
+  }
+  
+  def valuePerFrameCurrentHp(from: UnitInfo, to: UnitInfo): Double = {
+    PurpleMath.nanToOne(valuePerAttackCurrentHp(from, to) / from.cooldownMaxAgainst(to))
+  }
+  
+  def valuePerFrameRepairing(target: UnitInfo): Double = {
+    val valuePerDamage = MicroValue.valuePerDamageMaxHp(target)
+    val damagePerFrame = PurpleMath.nanToZero(0.9 * target.unitClass.maxHitPoints / target.unitClass.buildFrames)
+    val valuePerFrame = valuePerDamage * damagePerFrame
+    valuePerFrame
   }
   
   def maxSplashFactor(unit: UnitInfo): Double = {

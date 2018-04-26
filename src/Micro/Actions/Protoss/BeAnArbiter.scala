@@ -7,7 +7,6 @@ import Mathematics.PurpleMath
 import Mathematics.Shapes.Circle
 import Micro.Actions.Action
 import Micro.Actions.Combat.Tactics.Potshot
-import Micro.Actions.Combat.Techniques.Avoid
 import Micro.Actions.Commands.{Gravitate, Move}
 import Micro.Decisions.Potential
 import Micro.Heuristics.Spells.TargetAOE
@@ -44,7 +43,10 @@ object BeAnArbiter extends Action {
     val threatened   = unit.matchups.framesOfSafety <= 12.0
     val needUmbrella = unit.teammates.filter(needsUmbrella)
     
-    if (needUmbrella.nonEmpty) {
+    if (needUmbrella.isEmpty) {
+      unit.agent.shouldEngage = false
+    }
+    else {
       val destination = TargetAOE.chooseTargetPixel(
         unit,
         32 * 15,
@@ -57,10 +59,14 @@ object BeAnArbiter extends Action {
           .minBy(_.pixelDistanceCenter(unit.agent.destination))
           .pixelCenter))
     }
-    
-    val framesOfSafetyRequired = Math.max(0, 48 - With.framesSince(unit.lastFrameTakingDamage))
+  
+    val forceUmbrella = new Force(unit.agent.toTravel.get.subtract(unit.pixelCenter)).normalize
+    val framesOfSafetyRequired = Math.max(12, 48 - With.framesSince(unit.lastFrameTakingDamage))
     if (unit.matchups.framesOfSafety <= framesOfSafetyRequired) {
-      Avoid.delegate(unit)
+      val forceThreat = Potential.threatsRepulsion(unit).normalize(2.0)
+      unit.agent.forces.put(ForceColors.regrouping, forceUmbrella)
+      unit.agent.forces.put(ForceColors.threat, forceThreat)
+      Gravitate.consider(unit)
     }
     else if (needUmbrella.nonEmpty) {
       val forcesThreats = unit.matchups.threats
@@ -68,13 +74,12 @@ object BeAnArbiter extends Action {
           Potential.unitAttraction(
             unit,
             enemy,
-            enemy.matchups.targets.size
+                    enemy.matchups.targets.size
             + 2.0 * enemy.matchups.targetsInRange.size))
   
-      val forceUmbrella = new Force(unit.agent.destination.subtract(unit.pixelCenter)).normalize
       val forceThreats  = ForceMath.sum(forcesThreats)
       unit.agent.forces.put(ForceColors.regrouping, forceUmbrella)
-      unit.agent.forces.put(ForceColors.threat,     forceThreats)
+      unit.agent.forces.put(ForceColors.target,     forceThreats)
       Gravitate.consider(unit)
     }
     

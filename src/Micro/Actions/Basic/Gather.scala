@@ -38,7 +38,7 @@ object Gather extends Action {
     if (atResource && unit.totalHealth > 13 && beckoned) {
       Engage.consider(unit)
     }
-    if (transferring && threatened) {
+    if (transferring && threatened && unit.visibleToOpponents) {
       unit.agent.canFight = false
       Disengage.consider(unit)
     }

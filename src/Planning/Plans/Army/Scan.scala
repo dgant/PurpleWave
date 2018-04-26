@@ -31,7 +31,7 @@ class Scan extends Plan {
         && defender.inRangeToAttack(ninja)))
     
     if (cloakedTargets.nonEmpty) {
-      val biggestThreat = cloakedTargets.maxBy(_.matchups.vpfDealing)
+      val biggestThreat = cloakedTargets.maxBy(_.matchups.vpfDealingInRange)
       scan(biggestThreat.pixelCenter)
       return
     }

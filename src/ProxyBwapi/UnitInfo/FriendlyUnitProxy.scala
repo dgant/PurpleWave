@@ -91,16 +91,6 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit, id: Int) extends UnitInfo(bas
   
   def pixelCenter : Pixel = cachePixel()
   def tileTopLeft : Tile  = cacheTile()
-  def top         : Int   = cacheTop()
-  def left        : Int   = cacheLeft()
-  def right       : Int   = cacheRight()
-  def bottom      : Int   = cacheBottom()
-  
-  private val useRealDimensions = ! isInterceptor() && ! isSpiderMine()
-  private val cacheTop    = new Cache(() => if (useRealDimensions) base.getTop    else pixelCenter.y - unitClass.height / 2)
-  private val cacheLeft   = new Cache(() => if (useRealDimensions) base.getLeft   else pixelCenter.x - unitClass.width  / 2)
-  private val cacheRight  = new Cache(() => if (useRealDimensions) base.getRight  else pixelCenter.x + unitClass.width  / 2)
-  private val cacheBottom = new Cache(() => if (useRealDimensions) base.getBottom else pixelCenter.y + unitClass.height / 2)
   
   ////////////
   // Orders //

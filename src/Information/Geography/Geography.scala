@@ -19,6 +19,7 @@ class Geography {
   lazy val edges              : Iterable[Edge]          = ZoneBuilder.edges
   lazy val bases              : Iterable[Base]          = ZoneBuilder.bases
   lazy val ourMain            : Base                    = With.geography.ourBases.find(_.isStartLocation).getOrElse(With.geography.bases.minBy(_.heart.tileDistanceFast(With.self.startTile)))
+  lazy val rushDistances      : Vector[Double]          = startLocations.flatMap(s1 => startLocations.filterNot(_ == s1).map(s2 => s1.groundPixels(s2))).toSet.toVector
   def ourNatural              : Base                    = ourNaturalCache()
   def ourZones                : Iterable[Zone]          = ourZonesCache()
   def ourBases                : Iterable[Base]          = ourBasesCache()

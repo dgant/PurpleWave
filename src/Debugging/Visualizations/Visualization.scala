@@ -21,7 +21,7 @@ class Visualization {
   
   var views = mutable.ArrayBuffer(
     // Evergreen views
-    ShowPerformanceSummary,
+    ShowRushDistances,
     ShowClock,
     ShowStrategy,
     ShowUnitsAll,
@@ -40,48 +40,6 @@ class Visualization {
   //////////////
   
   val lineHeightSmall = 9
-  
-  lazy val knownViews: Vector[View] = Vector[View](
-    ShowBattleSummary,
-    ShowBattleDetails,
-    ShowEconomy,
-    ShowScheduler,
-    ShowBlackScreen,
-    ShowBulletsAsHearts,
-    ShowExplosions,
-    ShowHappyUnits,
-    ShowHappyVision,
-    ShowHistory,
-    ShowIntelligence,
-    ShowTextOnly,
-    ShowTextOnlyUnits,
-    ShowArchitecturePlacements,
-    ShowArchitectureHeuristics,
-    ShowArchitecturePaths,
-    ShowBases,
-    ShowClustering,
-    ShowDesire,
-    ShowGroundskeeper,
-    ShowGrids,
-    ShowMobility,
-    ShowTechniques,
-    ShowUnitsAll,
-    ShowUnitsForeign,
-    ShowUnitsFriendly,
-    ShowPerformanceDetails,
-    ShowPerformanceSummary,
-    ShowPlans,
-    ShowReactionTime,
-    ShowResources,
-    ShowSquads,
-    ShowStrategy,
-    ShowStrategyEvaluations,
-    ShowStrategiesInterest,
-    ShowZoneBorderTiles,
-    ShowZones,
-    ShowZoneLabels,
-    ShowZonePathDemo
-  )
   
   def toggle(view: View) {
     if (views.contains(view)) {
@@ -143,4 +101,47 @@ class Visualization {
       }
     }
   }
+  
+  lazy val knownViews: Vector[View] = Vector[View](
+    ShowBattleSummary,
+    ShowBattleDetails,
+    ShowEconomy,
+    ShowScheduler,
+    ShowBlackScreen,
+    ShowBulletsAsHearts,
+    ShowExplosions,
+    ShowHappyUnits,
+    ShowHappyVision,
+    ShowHistory,
+    ShowIntelligence,
+    ShowTextOnly,
+    ShowTextOnlyUnits,
+    ShowArchitecturePlacements,
+    ShowArchitectureHeuristics,
+    ShowArchitecturePaths,
+    ShowBases,
+    ShowClustering,
+    ShowDesire,
+    ShowGroundskeeper,
+    ShowGrids,
+    ShowMobility,
+    ShowTechniques,
+    ShowUnitsAll,
+    ShowUnitsForeign,
+    ShowUnitsFriendly,
+    ShowPerformanceDetails,
+    ShowPerformanceSummary,
+    ShowPlans,
+    ShowReactionTime,
+    ShowResources,
+    ShowRushDistances,
+    ShowSquads,
+    ShowStrategy,
+    ShowStrategyEvaluations,
+    ShowStrategiesInterest,
+    ShowZoneBorderTiles,
+    ShowZones,
+    ShowZoneLabels,
+    ShowZonePathDemo
+  )
 }

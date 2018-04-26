@@ -36,7 +36,6 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo (o
       updateVisibility()
       updateHealth()
       updateCombat()
-      updateGeometry()
       updateMovement()
       updateOrders()
       updateStatuses()
@@ -146,26 +145,11 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo (o
   // Geometry //
   //////////////
   
-  private def updateGeometry() {
-    _top          = baseUnit.getTop
-    _left         = baseUnit.getLeft
-    _right        = baseUnit.getRight
-    _bottom       = baseUnit.getBottom
-  }
-  
   private var _pixelCenter : Pixel  = Pixel(0, 0)
   private var _tileTopLeft : Tile   = Tile(0, 0)
-  private var _top         : Int    = _
-  private var _left        : Int    = _
-  private var _right       : Int    = _
-  private var _bottom      : Int    = _
   
   def pixelCenter : Pixel   = _pixelCenter
   def tileTopLeft : Tile    = _tileTopLeft
-  def top         : Int     = _top
-  def left        : Int     = _left
-  def right       : Int     = _right
-  def bottom      : Int     = _bottom
   
   ////////////
   // Orders //

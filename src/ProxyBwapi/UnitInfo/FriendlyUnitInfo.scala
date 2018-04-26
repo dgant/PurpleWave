@@ -27,14 +27,6 @@ class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends FriendlyUnitProxy(base
   }
   
   ////////////
-  // Health //
-  ////////////
-  
-  //////////////
-  // Geometry //
-  //////////////
-  
-  ////////////
   // Orders //
   ////////////
   

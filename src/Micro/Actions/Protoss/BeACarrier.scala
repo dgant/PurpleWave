@@ -6,7 +6,7 @@ import Micro.Actions.Combat.Attacking.Filters.TargetFilter
 import Micro.Actions.Combat.Attacking.TargetAction
 import Micro.Actions.Combat.Maneuvering.CliffAvoid
 import Micro.Actions.Commands.{Attack, AttackMove}
-import ProxyBwapi.Races.Protoss
+import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
 
@@ -26,8 +26,16 @@ object BeACarrier extends Action {
   }
   
   object CarrierTargetFilterShootsUp extends TargetFilter {
-    override def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean =
-      target.canAttack(actor)
+    override def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = {
+      lazy val isRepairer = (
+        target.is(Terran.SCV)
+        && target.matchups.allies.exists(t => t.canAttack(actor) && target.pixelDistanceEdge(t) < 32))
+  
+      // Anything that can hit us or our interceptors
+      val inRange = target.pixelDistanceEdge(actor) < target.pixelRangeAir + 32.0 * 8.0
+  
+      inRange && (target.canAttack(actor) || isRepairer)
+    }
   }
   
   object CarrierTargetFilterInRange extends TargetFilter {
@@ -42,9 +50,9 @@ object BeACarrier extends Action {
   
   object CarrierTarget extends TargetAction(CarrierTargetFilterIgnoreInterceptors) {
     override val additionalFiltersOptional = Vector(
-      CarrierTargetFilterShootsUp,
       CarrierTargetFilterInRange,
-      CarrierTargetFilterInLeash
+      CarrierTargetFilterInLeash,
+      CarrierTargetFilterShootsUp
     )
   }
   

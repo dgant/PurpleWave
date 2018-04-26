@@ -74,7 +74,6 @@ class Blueprint(
     
     val thisZone = tile.zone
   
-  
     if (thisZone.island && ! With.strategy.isPlasma) {
       return false
     }
@@ -103,7 +102,7 @@ class Blueprint(
       || (requireCreep.get != With.grids.creep.get(nextTile))
       || (respectHarvesting && With.architecture.isHarvestingArea(nextTile))
       || (requireResourceGap.get && ! With.grids.buildableTownHall.get(nextTile))
-      || With.grids.units.get(nextTile).exists(u => ! u.flying && u.isEnemy || ! u.canMove)
+      || ( ! requireTownHallTile.get &&With.grids.units.get(nextTile).exists(u => ! u.flying && u.isEnemy || ! u.canMove))
     )
     
     val violator = buildArea.tiles.find(violatesBuildArea)

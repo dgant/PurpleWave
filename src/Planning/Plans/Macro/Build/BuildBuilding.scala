@@ -65,8 +65,7 @@ class BuildBuilding(val buildingClass: UnitClass) extends Plan {
         b.isOurs  &&
         b.alive   &&
         b.buildUnit.forall(_.friendly.forall(_.agent.lastClient.contains(this)))) //Don't jack another (Terran) building
-     
-  
+    
     desiredTile = acquireDesiredTile()
   
     if (desiredTile.isEmpty) {

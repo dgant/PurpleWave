@@ -49,7 +49,7 @@ object Build extends Action {
     lazy val blockersEnemy    = blockersNear.filter(_.isEnemy)
     lazy val blockersMineral  = blockersIn.filter(_.unitClass.isMinerals)
     lazy val blockersNeutral  = blockersIn.filter(blocker => blocker.isNeutral && ! blockersMineral.contains(blocker)).filterNot(_.invincible)
-    lazy val blockersToKill   = if (blockersEnemy.nonEmpty) blockersEnemy else blockersNeutral
+    lazy val blockersToKill   = (if (blockersEnemy.nonEmpty) blockersEnemy else blockersNeutral).filter(unit.canAttack)
     
     if (blockersMineral.nonEmpty && blockersEnemy.isEmpty) {
       unit.agent.toGather = Some(blockersMineral.head)

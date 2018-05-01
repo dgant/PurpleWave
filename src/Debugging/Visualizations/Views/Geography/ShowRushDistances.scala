@@ -16,10 +16,10 @@ object ShowRushDistances extends View {
       y,
       Vector(
         Vector(
-          "Rush distances: ",
-          distances.min.toString,
-          PurpleMath.mean(distances).toString,
-          distances.max.toString
+          "Rush : ",
+          distances.min.toInt.toString,
+          PurpleMath.mean(distances).toInt.toString,
+          distances.max.toInt.toString
         )))
   }
   

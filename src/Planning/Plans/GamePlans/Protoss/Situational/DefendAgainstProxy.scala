@@ -38,7 +38,7 @@ class DefendAgainstProxy extends Plan {
     val workersRequired = proxies.map(proxy =>
       (
         proxy,
-        if (proxy.canAttack)
+        if (proxy.unitClass.rawCanAttack)
           if (proxy.complete)
             6
           else

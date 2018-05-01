@@ -24,6 +24,9 @@ class PvP2GateRobo extends GameplanModeTemplate {
     new UnitsAtLeast(2, Protoss.Nexus),
     new UnitsAtLeast(40, UnitMatchWarriors))
   
+  override def emergencyPlans: Seq[Plan] = Seq(
+    new PvPIdeas.ReactToFFE
+  )
   override val buildOrder: Seq[BuildRequest] = Vector(
     // http://wiki.teamliquid.net/starcraft/2_Gate_Reaver_(vs._Protoss)
     RequestAtLeast(8,   Protoss.Probe),

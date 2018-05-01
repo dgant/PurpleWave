@@ -13,6 +13,7 @@ import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.BuildCannonsAtExpansions
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
+import Planning.Plans.Predicates.Economy.GasAtLeast
 import Planning.Plans.Predicates.Milestones._
 import Planning.Plans.Predicates.Reactive.{EnemyBasesAtLeast, EnemyBio}
 import Planning.Plans.Predicates.{Employing, Never, SafeAtHome}
@@ -108,7 +109,12 @@ class PvTBasic extends GameplanModeTemplate {
           RequestAtLeast(1, Protoss.Stargate),
           RequestAtLeast(4, Protoss.Gateway),
           RequestAtLeast(1, Protoss.ArbiterTribunal),
-          RequestTech(Protoss.Stasis)))))
+          RequestTech(Protoss.Stasis)),
+        new If(
+          new Or(
+            new OnGasPumps(4),
+            new GasAtLeast(500)),
+          new Build(RequestAtLeast(2, Protoss.Stargate))))))
   
   override val buildPlans = Vector(
     new RequireMiningBases(2),

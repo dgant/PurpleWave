@@ -23,6 +23,7 @@ object Gather extends Action {
     lazy val zoneTo       = resource.zone
     lazy val transferring = zoneNow != zoneTo && ! zoneNow.edges.exists(_.otherSideof(zoneNow) == zoneTo)
     lazy val threatened   = unit.battle.isDefined && unit.matchups.framesOfSafety < combatWindow
+    lazy val threatCloser = unit.matchups.threats.exists(_.pixelDistanceCenter(resource.pixelCenter) < unit.pixelDistanceCenter(resource.pixelCenter))
     lazy val atResource   = unit.pixelDistanceEdge(resource) < 32.0 * 4.0
     lazy val beckoned     = unit.battle.isDefined && unit.matchups.targets.exists(target =>
         ! target.unitClass.isWorker
@@ -38,7 +39,7 @@ object Gather extends Action {
     if (atResource && unit.totalHealth > 13 && beckoned) {
       Engage.consider(unit)
     }
-    if (transferring && threatened && unit.visibleToOpponents) {
+    if (transferring && threatened && unit.visibleToOpponents && threatCloser) {
       unit.agent.canFight = false
       Disengage.consider(unit)
     }

@@ -54,19 +54,23 @@ class PvPLateGame extends GameplanModeTemplate {
   class TemplarTech extends Parallel(
     new Build(
       RequestAtLeast(1, Protoss.CitadelOfAdun),
-      RequestAtLeast(1, Protoss.TemplarArchives),
-      RequestAtLeast(1, Protoss.Forge)),
+      RequestAtLeast(1, Protoss.TemplarArchives)),
     new If(
       new UnitsAtMost(0, Protoss.Observatory),
       new BuildCannonsAtNatural(2)))
   
   class Upgrades extends Parallel(
+    new Build(RequestAtLeast(1, Protoss.Forge)),
     new If(
       new Or(
         new UnitsAtLeast(2, Protoss.Forge, complete = true),
-        new UpgradeComplete(Protoss.GroundDamage, 3)),
+        new UpgradeComplete(Protoss.GroundDamage, 3),
+        new And(
+          new UpgradeComplete(Protoss.GroundDamage),
+          new UnitsAtMost(0, Protoss.TemplarArchives))),
       new UpgradeContinuously(Protoss.GroundArmor)),
-    new UpgradeContinuously(Protoss.GroundDamage))
+    new UpgradeContinuously(Protoss.GroundDamage),
+    new Build(RequestAtLeast(2, Protoss.Forge)))
   
   class BuildTech extends Parallel(
     new Build(RequestAtLeast(1, Protoss.Gateway)),
@@ -78,7 +82,10 @@ class PvPLateGame extends GameplanModeTemplate {
       new GasAtMost(300),
       new BuildGasPumps),
   
-    new Upgrades,
+    new If(
+      new IfOnMiningBases(3),
+      new Upgrades),
+    
     new FlipIf(
       new Latch(new UnitsAtLeast(1, Protoss.TemplarArchives)),
       
@@ -123,8 +130,6 @@ class PvPLateGame extends GameplanModeTemplate {
     new PvPIdeas.TakeBase3,
     new If(new EnemyUnitsAtLeast(1, Protoss.DarkTemplar), new UpgradeContinuously(Protoss.ObserverSpeed)),
   
-    new BuildCannonsAtExpansions(3),
-  
     new If(
       new SafeAtHome,
       new MatchMiningBases),
@@ -146,16 +151,11 @@ class PvPLateGame extends GameplanModeTemplate {
         new Build(RequestAtLeast(8, Protoss.Gateway))),
       new RequireMiningBases(3)),
   
-    new Build(RequestAtLeast(2, Protoss.Forge)),
+    new BuildCannonsAtExpansions(3),
     
-    new FlipIf(
-      new SafeToAttack,
-      new If(
-        new UnitsAtLeast(1, Protoss.RoboticsSupportBay),
-        new Build(RequestAtLeast(9, Protoss.Gateway)),
-        new Build(RequestAtLeast(11, Protoss.Gateway))),
-      new RequireMiningBases(4)),
-      
+    new Build(RequestAtLeast(11, Protoss.Gateway)),
+    new RequireMiningBases(4),
+    
     new If(
       new And(
         new Or(

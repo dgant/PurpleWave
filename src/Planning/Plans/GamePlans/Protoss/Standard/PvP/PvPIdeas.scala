@@ -30,28 +30,32 @@ object PvPIdeas {
     new Attack { attackers.get.unitMatcher.set(Protoss.DarkTemplar) })
   
   class AttackSafely extends If(
-    new And(
-      new Or(
-        new UnitsAtLeast(1, Protoss.Observer, complete = true),
-        new Not(new EnemyDarkTemplarExists)),
-      new Or(
-        new SafeToAttack,
-        new EnemyBasesAtLeast(3),
-        new And(
-          new UnitsAtLeast(1, Protoss.Dragoon),
-          new EnemyUnitsAtMost(0, Protoss.Dragoon),
-          new Not(new EnemyHasUpgrade(Protoss.ZealotSpeed)))),
-      new Or(
-        new UnitsAtMost(0, Protoss.Dragoon),
-        new UpgradeComplete(Protoss.DragoonRange)),
-      new Or(
-        new UnitsAtLeast(0, Protoss.Reaver),
-        new UnitsAtLeast(1, Protoss.Shuttle),
-        new UnitsAtLeast(15, UnitMatchWarriors)),
-      new Or(
-        new UnitsAtMost(1, Protoss.Nexus),
-        new UnitsAtLeast(5, Protoss.Gateway),
-        new UnitsAtLeast(20, UnitMatchWarriors))),
+    new Or(
+      new And(
+        new EnemyUnitsAtLeast(1, Protoss.Forge),
+        new EnemyUnitsAtMost(0, UnitMatchWarriors)),
+      new And(
+        new Or(
+          new UnitsAtLeast(1, Protoss.Observer, complete = true),
+          new Not(new EnemyDarkTemplarExists)),
+        new Or(
+          new SafeToAttack,
+          new EnemyBasesAtLeast(3),
+          new And(
+            new UnitsAtLeast(1, Protoss.Dragoon),
+            new EnemyUnitsAtMost(0, Protoss.Dragoon),
+            new Not(new EnemyHasUpgrade(Protoss.ZealotSpeed)))),
+        new Or(
+          new UnitsAtMost(0, Protoss.Dragoon),
+          new UpgradeComplete(Protoss.DragoonRange)),
+        new Or(
+          new UnitsAtLeast(0, Protoss.Reaver),
+          new UnitsAtLeast(1, Protoss.Shuttle),
+          new UnitsAtLeast(15, UnitMatchWarriors)),
+        new Or(
+          new UnitsAtMost(1, Protoss.Nexus),
+          new UnitsAtLeast(5, Protoss.Gateway),
+          new UnitsAtLeast(20, UnitMatchWarriors)))),
     new Attack)
   
   class ReactToDarkTemplarEmergencies extends Parallel(new ReactToDarkTemplarExisting, new ReactToDarkTemplarPossible)

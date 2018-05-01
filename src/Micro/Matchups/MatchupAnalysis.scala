@@ -41,11 +41,11 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
   def repairers: ArrayBuffer[UnitInfo] = ArrayBuffer.empty ++ allies.filter(_.friendly.exists(_.agent.toRepair.contains(me)))
   
   lazy val valuePerDamage                 : Double                = MicroValue.valuePerDamageCurrentHp(me)
-  lazy val vpfDealingMax                  : Double                = targets.map(MicroValue.valuePerFrameCurrentHp(me, _)).max
-  lazy val vpfDealingInRange              : Double                = targetsInRange.map(MicroValue.valuePerFrameCurrentHp(me, _)).max
+  lazy val vpfDealingMax                  : Double                = ByOption.max(targets.map(MicroValue.valuePerFrameCurrentHp(me, _))).getOrElse(0.0)
+  lazy val vpfDealingInRange              : Double                = ByOption.max(targetsInRange.map(MicroValue.valuePerFrameCurrentHp(me, _))).getOrElse(0.0)
   lazy val dpfReceiving                   : Double                = threatsInRange.map(_.matchups.dpfDealingDiffused(me)).sum
   lazy val vpfReceiving                   : Double                = valuePerDamage * dpfReceiving
-  lazy val vpfNet                         : Double                = vpfDealingInRange   - vpfReceiving
+  lazy val vpfNet                         : Double                = vpfDealingInRange - vpfReceiving
   lazy val framesToLive                   : Double                = PurpleMath.nanToInfinity(me.totalHealth / dpfReceiving)
   lazy val doomed                         : Boolean               = framesToLive <= framesOfEntanglement
   lazy val framesOfEntanglementPerThreat  : Map[UnitInfo, Double] = threats.map(threat => (threat, framesOfEntanglementWith(threat))).toMap

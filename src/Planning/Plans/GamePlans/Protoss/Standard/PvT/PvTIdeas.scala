@@ -101,14 +101,6 @@ object PvTIdeas {
     new TrainContinuously(Protoss.Dragoon),
     new TrainContinuously(Protoss.Zealot, 30, 5))
   
-  class TrainArbiters extends If(
-    new UnitsAtLeast(40, UnitMatchWarriors),
-    new TrainContinuously(Protoss.Arbiter, 3),
-    new If(
-      new UnitsAtLeast(20, UnitMatchWarriors),
-      new TrainContinuously(Protoss.Arbiter, 2),
-      new TrainContinuously(Protoss.Arbiter, 10)))
-  
   private class TrainObserversScalingWithArmy extends If(
     new UnitsAtLeast(1, UnitMatchWarriors),
     new If(
@@ -144,7 +136,7 @@ object PvTIdeas {
     
   class TrainArmy extends Parallel(
     new TrainObservers,
-    new TrainArbiters,
+    new TrainContinuously(Protoss.Arbiter),
     new If(          new EnemyBio,  new TrainContinuously(Protoss.Reaver, 4)),
     new If(new Latch(new EnemyBio), new TrainContinuously(Protoss.Reaver, 2)),
     new TrainContinuously(Protoss.Carrier),

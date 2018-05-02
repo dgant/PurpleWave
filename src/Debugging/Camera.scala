@@ -43,7 +43,7 @@ class Camera {
         (unit, interestNew)
       }).toMap
     
-    val eligibleUnits       = With.units.ours.filterNot(unit => unit.is(Protoss.Interceptor) || unit.is(Protoss.Scarab) || unit.is(Terran.SpiderMine))
+    val eligibleUnits       = With.units.ours.filterNot(_.isAny(Protoss.Interceptor, Protoss.Scarab, Terran.SpiderMine))
     val unitInterests       = With.units.ours.map(unit => (unit, totalInterest(unit)))
     val mostInterestingUnit = ByOption.maxBy(unitInterests)(_._2)
     

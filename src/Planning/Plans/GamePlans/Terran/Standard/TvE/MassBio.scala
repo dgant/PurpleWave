@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvE
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
-import Planning.Composition.UnitMatchers.{UnitMatchSiegeTank, UnitMatchWarriors}
+import Planning.Composition.UnitMatchers.{UnitMatchOr, UnitMatchSiegeTank, UnitMatchWarriors}
 import Planning.Plan
 import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Compound._
@@ -131,7 +131,7 @@ class MassBio extends GameplanModeTemplate {
       new Parallel(
         new If(
           new Check(() =>
-            With.units.countOurs(u => u.is(Terran.Marine) || u.is(Terran.Firebat)) >
+            With.units.countOurs(Terran.Marine, Terran.Firebat) >
             8 * With.units.countOurs(Terran.Medic)),
           new TrainContinuously(Terran.Medic, maximumConcurrentlyRatio = 0.67)),
         new If(

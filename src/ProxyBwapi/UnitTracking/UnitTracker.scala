@@ -19,12 +19,12 @@ class UnitTracker {
   def all: Seq[UnitInfo] = ours.toVector ++ enemy ++ neutral
   
   private val counterOurs = new UnitCounter(() => ours)
-  def countOurs(matcher: UnitMatcher): Int = counterOurs(matcher)
+  def countOurs(matcher: UnitMatcher*): Int = counterOurs(matcher: _*)
   def countOurs(predicate: (FriendlyUnitInfo) => Boolean): Int = counterOurs(predicate)
   def ours: Set[FriendlyUnitInfo] = friendlyUnitTracker.ourUnits
   
   private val counterEnemy = new UnitCounter(() => enemy)
-  def countEnemy(matcher: UnitMatcher): Int = counterEnemy(matcher)
+  def countEnemy(matcher: UnitMatcher*): Int = counterEnemy(matcher: _*)
   def countEnemy(predicate: (ForeignUnitInfo) => Boolean): Int = counterEnemy(predicate)
   def enemy: Set[ForeignUnitInfo] = foreignUnitTracker.enemyUnits
   

@@ -1,11 +1,11 @@
 package Planning.Plans.Predicates.Milestones
 
 import Lifecycle.With
-import Planning.Composition.UnitMatchers.{UnitMatchAnything, UnitMatcher}
+import Planning.Composition.UnitMatchers.{UnitMatchAnd, UnitMatchAnything, UnitMatchComplete, UnitMatcher}
 import Planning.Plan
 
 class UnitsAtMost(
-  quantity:   Int         = 0,
+  quantity:   Int,
   matcher:    UnitMatcher = UnitMatchAnything,
   complete:   Boolean     = false)
   
@@ -13,7 +13,15 @@ class UnitsAtMost(
   
   description.set("Have at most " + quantity + " " + matcher)
   
-  override def isComplete: Boolean = (
-    With.units.countOurs(unit => ( ! complete || unit.complete) && matcher.accept(unit)) <= quantity
-  )
+  override def isComplete: Boolean = {
+    val quantityFound =
+      if (complete) {
+        With.units.countOurs(UnitMatchAnd(UnitMatchComplete, matcher))
+      }
+      else {
+        With.units.countOurs(matcher)
+      }
+    val output = quantityFound <= quantity
+    output
+  }
 }

@@ -1,7 +1,7 @@
 package Planning.Plans.Predicates.Milestones
 
 import Lifecycle.With
-import Planning.Composition.UnitMatchers.{UnitMatchAnything, UnitMatcher}
+import Planning.Composition.UnitMatchers.{UnitMatchAnd, UnitMatchAnything, UnitMatchComplete, UnitMatcher}
 import Planning.Plan
 
 class EnemyUnitsAtMost(
@@ -13,7 +13,15 @@ class EnemyUnitsAtMost(
   
   description.set("Enemy has at most " + quantity + " " + matcher)
   
-  override def isComplete: Boolean = With.units.countEnemy(unit =>
-    ( ! complete || unit.complete) &&
-    matcher.accept(unit)) <= quantity
+  override def isComplete: Boolean = {
+    val quantityFound =
+      if (complete) {
+        With.units.countEnemy(UnitMatchAnd(UnitMatchComplete, matcher))
+      }
+      else {
+        With.units.countEnemy(matcher)
+      }
+    val output = quantityFound <= quantity
+    output
+  }
 }

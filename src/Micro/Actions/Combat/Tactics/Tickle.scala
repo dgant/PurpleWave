@@ -5,6 +5,7 @@ import Micro.Actions.Action
 import Micro.Actions.Basic.MineralWalk
 import Micro.Actions.Combat.Techniques.Avoid
 import Micro.Actions.Commands.{Attack, Move}
+import Planning.Composition.UnitMatchers.UnitMatchWorkers
 import ProxyBwapi.Races.{Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.EnrichPixel._
@@ -80,7 +81,7 @@ object Tickle extends Action {
     }
   
     // Wait for re-enforcements
-    val workersTotal  = With.units.countOurs(u => u.unitClass.isWorker)
+    val workersTotal  = With.units.countOurs(UnitMatchWorkers)
     val workersHere   = With.units.countOurs(u => u.unitClass.isWorker && u.zone == zone)
     if (workersHere * 2 < workersTotal  // Tomorrow, there'll be more of us.
       && enemies.size > 4) {            // Verus 4-Pool need to start dealing damage immediately

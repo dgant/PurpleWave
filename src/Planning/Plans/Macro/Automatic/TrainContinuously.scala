@@ -24,7 +24,7 @@ class TrainContinuously(
     val unitsNow                  = currentCount
     val unitsMaximum              = maximumTotal
     val unitsMaximumDesirable     = maxDesirable
-    val buildersSpawning          = if (unitClass.whatBuilds._1 == Zerg.Larva) With.units.countOurs(u => u.complete && u.unitClass.producesLarva) else 0
+    val buildersSpawning          = if (unitClass.whatBuilds._1 == Zerg.Larva) With.units.countOurs(UnitMatchAnd(UnitMatchHatchery, UnitMatchComplete)) else 0
     val buildersExisting          = builders.toVector
     val buildersReserved          = buildersExisting.map(_.unitClass).distinct.map(With.scheduler.dumbPumps.consumed).sum
     val buildersReadiness         = getBuilderReadiness(buildersExisting)

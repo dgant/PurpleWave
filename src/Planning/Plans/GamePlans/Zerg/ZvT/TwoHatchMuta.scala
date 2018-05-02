@@ -4,6 +4,7 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{BuildRequest, RequestAtLeast, RequestUpgrade}
+import Planning.Composition.UnitMatchers.UnitMatchWorkers
 import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
@@ -96,7 +97,7 @@ class TwoHatchMuta extends GameplanModeTemplate {
     new If(
       new Or(
         new Check(() =>
-          With.units.countOurs(_.unitClass.isWorker) / 9 >
+          With.units.countOurs(UnitMatchWorkers) / 9 >
           With.geography.bases.size),
         new And(
           new UnitsAtMost(0, Zerg.Mutalisk),
@@ -117,7 +118,7 @@ class TwoHatchMuta extends GameplanModeTemplate {
       RequestAtLeast(1, Zerg.Spire)),
     new If(
       new Check(() =>
-        With.units.countOurs(_.unitClass.isWorker) / 6 >
+        With.units.countOurs(UnitMatchWorkers) / 6 >
         With.units.countOurs(_.gasLeft > 0)),
       new BuildGasPumps()),
     new If(

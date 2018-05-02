@@ -2,10 +2,10 @@ package Planning.Plans.Predicates.Milestones
 
 import Planning.Plan
 import Lifecycle.With
-import Planning.Composition.UnitMatchers.{UnitMatchAnything, UnitMatcher}
+import Planning.Composition.UnitMatchers.{UnitMatchAnd, UnitMatchAnything, UnitMatchComplete, UnitMatcher}
 
 class UnitsAtLeast(
-  quantity  : Int         = 0,
+  quantity  : Int,
   matcher   : UnitMatcher = UnitMatchAnything,
   complete  : Boolean     = false)
   
@@ -13,7 +13,15 @@ class UnitsAtLeast(
   
   description.set("Have at least " + quantity + " " + matcher)
   
-  override def isComplete: Boolean = With.units.countOurs(unit =>
-    ( ! complete || unit.complete) &&
-    matcher.accept(unit)) >= quantity
+  override def isComplete: Boolean = {
+    val quantityFound =
+      if (complete) {
+        With.units.countOurs(UnitMatchAnd(UnitMatchComplete, matcher))
+      }
+      else {
+        With.units.countOurs(matcher)
+      }
+    val output = quantityFound >= quantity
+    output
+  }
 }

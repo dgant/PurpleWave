@@ -55,8 +55,8 @@ class BuildCannonsAtBases(
   }
   
   private def cannonZone(zone: Zone): Int = {
-    lazy val pylonsInZone    = With.units.ours.filter(unit => unit.is(Protoss.Pylon)        && unit.zone == zone)
-    lazy val cannonsInZone   = With.units.ours.filter(unit => unit.is(Protoss.PhotonCannon) && unit.zone == zone)
+    lazy val pylonsInZone    = zone.units.filter(_.is(Protoss.Pylon))
+    lazy val cannonsInZone   = zone.units.filter(_.is(Protoss.PhotonCannon))
     lazy val cannonsToAdd    = cannonsRequired - cannonsInZone.size
     
     if (cannonsToAdd <= 0) {

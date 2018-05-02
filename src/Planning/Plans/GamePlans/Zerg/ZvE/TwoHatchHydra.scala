@@ -2,6 +2,7 @@ package Planning.Plans.GamePlans.Zerg.ZvE
 
 import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, RequestAtLeast, RequestTech}
+import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
@@ -45,7 +46,7 @@ class TwoHatchHydra extends GameplanModeTemplate {
           new Do(() => With.blackboard.gasLimitCeiling = 175),
           new Do(() => With.blackboard.gasLimitCeiling = 225)))),
     new If(
-      new Check(() => With.units.countOurs(_.unitClass.isWorker) < 8 * With.geography.ourBases.size),
+      new Check(() => With.units.countOurs(UnitMatchWarriors) < 8 * With.geography.ourBases.size),
       new TrainWorkersContinuously),
     new TrainContinuously(Zerg.Lurker, 8, 2),
     new If(

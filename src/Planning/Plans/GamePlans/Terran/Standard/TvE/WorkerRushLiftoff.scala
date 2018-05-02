@@ -7,7 +7,7 @@ import Mathematics.Points.{Pixel, Tile}
 import Micro.Agency.Intention
 import Planning.Composition.ResourceLocks.LockUnits
 import Planning.Composition.UnitCountEverything
-import Planning.Composition.UnitMatchers.{UnitMatchWorkers, UnitMatcher}
+import Planning.Composition.UnitMatchers.{UnitMatchAnd, UnitMatchComplete, UnitMatchWorkers, UnitMatcher}
 import Planning.Plans.Army.AttackWithWorkers
 import Planning.Plans.Compound._
 import Planning.Plans.Macro.BuildOrders.{BuildOrder, FollowBuildOrder}
@@ -48,7 +48,7 @@ class WorkerRushLiftoff extends Parallel {
     pickBestGroundPixel()
     pickBestAirPixel()
     
-    if (With.units.countOurs(u => u.complete && u.is(Terran.SCV)) >= 5) {
+    if (With.units.countOurs(UnitMatchAnd(Terran.SCV, UnitMatchComplete)) >= 5) {
       finishedTraining = true
     }
     if (finishedTraining) {

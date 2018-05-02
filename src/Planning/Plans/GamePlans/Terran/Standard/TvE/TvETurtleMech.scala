@@ -147,7 +147,7 @@ class TvETurtleMech extends GameplanModeTemplate {
       )),
     new If(
       new Check(() =>
-      With.units.ours.count(_.is(UnitMatchSiegeTank)) / 6
+      With.units.countOurs(UnitMatchSiegeTank) / 6
       + (if (With.units.enemy.exists(_.is(UnitMatchAnd(UnitMatchWarriors, UnitMatchMobileFlying)))) 6 else 0)
       + With.units.enemy.filter(_.is(UnitMatchAnd(UnitMatchWarriors, UnitMatchMobileFlying)))
         .map(u => {
@@ -158,7 +158,7 @@ class TvETurtleMech extends GameplanModeTemplate {
           3
           })
         .sum
-        > With.units.ours.count(_.is(Terran.Goliath))),
+        > With.units.countOurs(Terran.Goliath)),
       new Parallel(
         new Build(RequestAtLeast(1, Terran.Armory)),
         new BuildGasPumps,
@@ -205,8 +205,8 @@ class TvETurtleMech extends GameplanModeTemplate {
     
     new If(
       new Check(() =>
-        With.units.ours.count(_.is(Terran.Marine))
-        < 4 * With.units.ours.count(_.is(Terran.Bunker))),
+        With.units.countOurs(Terran.Marine)
+        < 4 * With.units.countOurs(Terran.Bunker)),
       new TrainContinuously(Terran.Marine)),
     
     new BuildOrder(

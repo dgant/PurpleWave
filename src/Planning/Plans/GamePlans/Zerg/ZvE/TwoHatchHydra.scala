@@ -45,7 +45,7 @@ class TwoHatchHydra extends GameplanModeTemplate {
           new Do(() => With.blackboard.gasLimitCeiling = 175),
           new Do(() => With.blackboard.gasLimitCeiling = 225)))),
     new If(
-      new Check(() => With.units.ours.count(_.unitClass.isWorker) < 8 * With.geography.ourBases.size),
+      new Check(() => With.units.countOurs(_.unitClass.isWorker) < 8 * With.geography.ourBases.size),
       new TrainWorkersContinuously),
     new TrainContinuously(Zerg.Lurker, 8, 2),
     new If(

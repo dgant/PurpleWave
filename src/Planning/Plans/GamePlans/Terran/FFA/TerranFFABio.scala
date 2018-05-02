@@ -85,8 +85,8 @@ class TerranFFABio extends GameplanModeTemplate {
     new TrainContinuously(Terran.Ghost, 5, 2),
     new If(
       new Check(() =>
-        With.units.ours.count(_.is(Terran.Marine)).toDouble /
-        (1 + With.units.ours.count(_.is(Terran.Medic)))
+        With.units.countOurs(Terran.Marine).toDouble /
+        (1 + With.units.countOurs(Terran.Medic))
         >= 4.0),
       new TrainContinuously(Terran.Medic, 20, 2)),
     new TrainContinuously(Terran.Marine),

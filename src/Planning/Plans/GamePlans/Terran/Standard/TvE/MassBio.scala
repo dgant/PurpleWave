@@ -131,8 +131,8 @@ class MassBio extends GameplanModeTemplate {
       new Parallel(
         new If(
           new Check(() =>
-            With.units.ours.count(u => u.is(Terran.Marine) || u.is(Terran.Firebat)) >
-            8 * With.units.ours.count(_.is(Terran.Medic))),
+            With.units.countOurs(u => u.is(Terran.Marine) || u.is(Terran.Firebat)) >
+            8 * With.units.countOurs(Terran.Medic)),
           new TrainContinuously(Terran.Medic, maximumConcurrentlyRatio = 0.67)),
         new If(
           new Or(
@@ -173,7 +173,7 @@ class MassBio extends GameplanModeTemplate {
         new MineralsAtLeast(400)),
       new If(
         new Or(
-          new Check(() => With.units.ours.count(_.is(Terran.Barracks)) < 5 * With.geography.ourBases.size),
+          new Check(() => With.units.countOurs(Terran.Barracks) < 5 * With.geography.ourBases.size),
           new MineralsAtLeast(600)),
         new TrainContinuously(Terran.Barracks, 30, 3)))
   )

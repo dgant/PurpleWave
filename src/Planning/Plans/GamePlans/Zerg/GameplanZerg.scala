@@ -204,9 +204,9 @@ abstract class GameplanZerg extends GameplanModeTemplate {
       new TrainContinuously(Zerg.Hydralisk),
       new If(
         new Check(() => {
-          val ourMutalisks    = With.units.ours.count(_.is(Zerg.Mutalisk))
-          val ourScourge      = With.units.ours.count(_.is(Zerg.Scourge))
-          val enemyMutalisks  = With.units.enemy.count(_.is(Zerg.Mutalisk))
+          val ourMutalisks    = With.units.countOurs(Zerg.Mutalisk)
+          val ourScourge      = With.units.countOurs(Zerg.Scourge)
+          val enemyMutalisks  = With.units.countEnemy(Zerg.Mutalisk)
           (
             enemyMutalisks > 0
               && ourScourge < enemyMutalisks * 2

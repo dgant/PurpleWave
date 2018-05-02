@@ -10,7 +10,7 @@ abstract class AbstractFingerprintQuantityBy(
     extends Fingerprint {
 
   def observed: Int = {
-    With.units.enemy.count(u =>
+    With.units.countEnemy(u =>
       u.is(unitClass)
         && u.completionFrame <= gameTime.frames)
   }

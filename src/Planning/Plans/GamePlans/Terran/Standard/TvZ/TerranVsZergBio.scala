@@ -30,7 +30,7 @@ class TerranVsZergBio extends GameplanModeTemplate {
       new And(
         new UnitsAtLeast(1, Terran.Academy, complete = true),
         new UnitsAtLeast(3, Terran.Marine, complete = true),
-        new Check(() => With.units.ours.count(_.is(Terran.Marine)) > 6 * With.units.ours.count(_.is(Terran.Medic)))
+        new Check(() => With.units.countOurs(Terran.Marine) > 6 * With.units.countOurs(Terran.Medic))
       ),
       new TrainContinuously(Terran.Medic, 12),
       new TrainContinuously(Terran.Marine)

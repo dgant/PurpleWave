@@ -74,8 +74,8 @@ class PvZ4Gate extends GameplanModeTemplate {
         new UpgradeComplete(Protoss.DragoonRange, 1, Protoss.DragoonRange.upgradeFrames(1)),
         new Or(
           new UnitsAtLeast(15, Protoss.Zealot),
-          new Check(() => With.units.ours.count(_.is(Protoss.Zealot)) > With.units.ours.count(_.is(Protoss.Dragoon))),
-          new Check(() => With.units.enemy.count(_.is(Zerg.Mutalisk)) * 1.5 > With.units.ours.count(_.is(Protoss.Dragoon))))),
+          new Check(() => With.units.countOurs(Protoss.Zealot) > With.units.countOurs(Protoss.Dragoon)),
+          new Check(() => With.units.countEnemy(Zerg.Mutalisk) * 1.5 > With.units.countOurs(Protoss.Dragoon)))),
       new TrainContinuously(Protoss.Dragoon),
       new TrainContinuously(Protoss.Zealot)),
     new TrainWorkersContinuously,

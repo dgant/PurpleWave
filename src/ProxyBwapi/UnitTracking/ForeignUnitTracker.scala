@@ -1,9 +1,10 @@
 package ProxyBwapi.UnitTracking
 
 import Lifecycle.With
+import Performance.UnitCounter
 import ProxyBwapi.Players.Players
 import ProxyBwapi.Races.Terran
-import ProxyBwapi.UnitInfo.{ForeignUnitInfo, Orders}
+import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, Orders}
 import bwapi.Unit
 
 import scala.collection.JavaConverters._
@@ -19,7 +20,7 @@ class ForeignUnitTracker {
   var enemyGhostUnits : Set[Int]             = new HashSet[Int]
   
   def get(id: Int): Option[ForeignUnitInfo] = unitsByIdKnown.get(id)
-
+  
   def update() {
     initialize()
   

@@ -46,9 +46,8 @@ class LockUnits extends ResourceLock {
   
     val desiredUnits    = With.recruiter.getUnits(this).to[mutable.Set]
     val candidateQueue  = new mutable.PriorityQueue[FriendlyUnitInfo]()(Ordering.by( - unitPreference.get.preference(_))) //Negative because priority queue is highest-first
-    candidateQueue ++= candidates.filter(unitMatcher.get.accept)
+    candidateQueue      ++= candidates.filter(unitMatcher.get.accept)
     
-    unitMatcher.get.reset()
     unitCounter.get.reset()
     
     while (unitCounter.get.continue(desiredUnits) && candidateQueue.nonEmpty) {

@@ -12,6 +12,6 @@ class EnemyCarriers extends Plan {
     With.units.enemy.exists(_.is(Protoss.Carrier))      ||
     With.units.enemy.exists(_.is(Protoss.Interceptor))  ||
     With.units.enemy.exists(_.is(Protoss.FleetBeacon))  ||
-    With.units.enemy.count(_.is(Protoss.PhotonCannon))  > 6
+    With.units.countEnemy(Protoss.PhotonCannon) > 6
   }
 }

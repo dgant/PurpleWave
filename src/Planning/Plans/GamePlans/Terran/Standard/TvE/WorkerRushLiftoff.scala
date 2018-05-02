@@ -48,7 +48,7 @@ class WorkerRushLiftoff extends Parallel {
     pickBestGroundPixel()
     pickBestAirPixel()
     
-    if (With.units.ours.count(u => u.complete && u.is(Terran.SCV)) >= 5) {
+    if (With.units.countOurs(u => u.complete && u.is(Terran.SCV)) >= 5) {
       finishedTraining = true
     }
     if (finishedTraining) {

@@ -138,10 +138,10 @@ object PvZIdeas {
     new IfOnMiningBases(2, new TrainContinuously(Protoss.Reaver, 6)),
     new TrainContinuously(Protoss.Observer, 1),
     new If(
-      new Check(() => With.units.ours.count(_.is(Protoss.Dragoon)) < With.units.enemy.count(_.is(Zerg.Lurker)) * 3),
+      new Check(() => With.units.countOurs(Protoss.Dragoon) < With.units.countEnemy(Zerg.Lurker) * 3),
       new TrainContinuously(Protoss.Dragoon),
       new If(
-        new Check(() => With.units.ours.count(_.is(Protoss.Dragoon)) < With.units.ours.count(_.is(Protoss.Zealot)) * 3 - 24),
+        new Check(() => With.units.countOurs(Protoss.Dragoon) < With.units.countOurs(Protoss.Zealot) * 3 - 24),
         new TrainContinuously(Protoss.Dragoon, maximumConcurrentlyRatio = 0.5))),
     new If(
       new Or(

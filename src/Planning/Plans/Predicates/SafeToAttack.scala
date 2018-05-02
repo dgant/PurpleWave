@@ -17,11 +17,11 @@ class SafeToAttack extends Plan {
   }
   
   private def countOurs(unitMatcher: UnitMatcher): Int = {
-    With.units.ours.count(_.is(unitMatcher))
+    With.units.countOurs(unitMatcher)
   }
   
   private def countEnemy(unitMatcher: UnitMatcher): Int = {
-    With.units.enemy.count(_.is(unitMatcher))
+    With.units.countEnemy(unitMatcher)
   }
   
   private def pvtSafeToAttack: Boolean = {
@@ -58,12 +58,14 @@ class SafeToAttack extends Plan {
     val zealotsEnemy  = countEnemy(Protoss.Zealot)
     val dragoonsEnemy = countEnemy(Protoss.Dragoon)
     val archonsEnemy  = countEnemy(Protoss.Archon)
+    val shuttlesEnemy = countEnemy(Protoss.Shuttle)
     
-    val scoreDragoon = 1.25
-    val scoreSpeedlot = 1.5
-    val scoreReaver = 2.0
-    val scoreArchon = 2.0
-    val scoreCarrier = 3.0
+    val scoreDragoon  = 1.0
+    val scoreSpeedlot = 1.0
+    val scoreReaver   = 2.0
+    val scoreShuttle  = 2.0 * scoreReaver
+    val scoreArchon   = 2.0
+    val scoreCarrier  = 3.0
     
     val scoreUs = (
         dragoonsUs  * (if (rangeUs) scoreDragoon else 0.0)
@@ -75,9 +77,8 @@ class SafeToAttack extends Plan {
     val scoreEnemy = (
         dragoonsEnemy  * (if (rangeEnemy) scoreDragoon else 0.0)
       + zealotsEnemy   * (if (speedEnemy) scoreSpeedlot else 0.0)
-      // Ignore enemy Reavers
       + archonsEnemy   * scoreArchon
-      // Ignore enemy Carriers
+      + shuttlesEnemy * scoreShuttle
     )
     val output = scoreEnemy == 0 || scoreEnemy <= scoreUs * With.blackboard.aggressionRatio
     output 

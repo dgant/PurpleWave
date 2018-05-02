@@ -40,8 +40,8 @@ class TvPMidgameBioTank extends GameplanModeTemplate {
     new TrainContinuously(Terran.SiegeTankUnsieged),
     new If(
       new Check(() =>
-        With.units.ours.count(_.is(Terran.Marine)) / 7 >
-        With.units.ours.count(_.is(Terran.Medic))),
+        With.units.countOurs(Terran.Marine) / 7 >
+        With.units.countOurs(Terran.Medic)),
       new TrainContinuously(Terran.Medic, 8, 2)),
     new TrainContinuously(Terran.Marine),
     new Build(

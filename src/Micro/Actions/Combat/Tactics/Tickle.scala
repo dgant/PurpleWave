@@ -80,8 +80,8 @@ object Tickle extends Action {
     }
   
     // Wait for re-enforcements
-    val workersTotal  = With.units.ours.count(u => u.unitClass.isWorker)
-    val workersHere   = With.units.ours.count(u => u.unitClass.isWorker && u.zone == zone)
+    val workersTotal  = With.units.countOurs(u => u.unitClass.isWorker)
+    val workersHere   = With.units.countOurs(u => u.unitClass.isWorker && u.zone == zone)
     if (workersHere * 2 < workersTotal  // Tomorrow, there'll be more of us.
       && enemies.size > 4) {            // Verus 4-Pool need to start dealing damage immediately
       attack = false

@@ -8,6 +8,6 @@ class AddAddons(unitClass: UnitClass, maximum: Int = Int.MaxValue) extends Train
   description.set("Continuously add on " + unitClass)
   
   override protected def buildCapacity: Int = {
-    With.units.ours.count(b => b.is(unitClass.whatBuilds._1) && b.addon.isEmpty)
+    With.units.countOurs(b => b.is(unitClass.whatBuilds._1) && b.addon.isEmpty)
   }
 }

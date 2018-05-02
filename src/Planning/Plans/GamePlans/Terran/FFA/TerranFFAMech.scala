@@ -47,8 +47,8 @@ class TerranFFAMech extends GameplanModeTemplate {
   private class BuildScienceFacilityForAddon(addon: UnitClass) extends Plan {
     val build = new Build()
     override def onUpdate() {
-      val numberOfCovertOps         = With.units.ours.count(_.is(Terran.CovertOps))
-      val numberOfPhysicsLab        = With.units.ours.count(_.is(Terran.PhysicsLab))
+      val numberOfCovertOps         = With.units.countOurs(Terran.CovertOps)
+      val numberOfPhysicsLab        = With.units.countOurs(Terran.PhysicsLab)
       val numberOfThisAddon         = if (addon == Terran.CovertOps) numberOfCovertOps else numberOfPhysicsLab
       val numberOfOtherAddon        = numberOfCovertOps + numberOfPhysicsLab - numberOfThisAddon
       val numberOfScienceFacilities = if (numberOfThisAddon > 0) 0 else 1 + numberOfOtherAddon
@@ -125,10 +125,10 @@ class TerranFFAMech extends GameplanModeTemplate {
     new TrainContinuously(Terran.Ghost, 5, 2),
     new If(
       new Check(() =>
-        With.units.ours.count(_.is(Terran.Marine)).toDouble /
+        With.units.countOurs(Terran.Marine).toDouble /
         Math.max(
           1.0,
-          With.units.ours.count(_.is(Terran.Medic)))
+          With.units.countOurs(Terran.Medic))
         >= 4.0),
       new TrainContinuously(Terran.Medic, 20, 2)),
     new TrainContinuously(Terran.Marine),

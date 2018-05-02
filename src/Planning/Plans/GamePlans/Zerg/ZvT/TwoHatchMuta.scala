@@ -82,8 +82,8 @@ class TwoHatchMuta extends GameplanModeTemplate {
         new And(
           new EnemyUnitsAtLeast(3, Zerg.Mutalisk),
           new Check(() =>
-            With.units.ours.count(_.is(Zerg.Mutalisk)) * 2 >=
-            With.units.ours.count(_.is(Zerg.Scourge)))),
+            With.units.countOurs(Zerg.Mutalisk) * 2 >=
+            With.units.countOurs(Zerg.Scourge))),
         new TrainContinuously(Zerg.Scourge),
         new TrainContinuously(Zerg.Mutalisk))),
     new If(
@@ -96,7 +96,7 @@ class TwoHatchMuta extends GameplanModeTemplate {
     new If(
       new Or(
         new Check(() =>
-          With.units.ours.count(_.unitClass.isWorker) / 9 >
+          With.units.countOurs(_.unitClass.isWorker) / 9 >
           With.geography.bases.size),
         new And(
           new UnitsAtMost(0, Zerg.Mutalisk),
@@ -117,8 +117,8 @@ class TwoHatchMuta extends GameplanModeTemplate {
       RequestAtLeast(1, Zerg.Spire)),
     new If(
       new Check(() =>
-        With.units.ours.count(_.unitClass.isWorker) / 6 >
-        With.units.ours.count(_.gasLeft > 0)),
+        With.units.countOurs(_.unitClass.isWorker) / 6 >
+        With.units.countOurs(_.gasLeft > 0)),
       new BuildGasPumps()),
     new If(
       new MineralsAtLeast(300),

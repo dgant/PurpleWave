@@ -20,7 +20,7 @@ class RequireMiningBases(basesInitial: Int = 1) extends Plan {
     val goal        = basesDesired.get + basesAll - basesMining
     
     // TODO: This math is bad
-    val misleadingTownHalls = With.units.ours.count(u => u.is(Zerg.Lair) || u.is(Zerg.Hive))
+    val misleadingTownHalls = With.units.countOurs(u => u.is(Zerg.Lair) || u.is(Zerg.Hive))
     
     if (goal > 0) {
       With.scheduler.request(this, RequestAtLeast(goal - misleadingTownHalls, With.self.townHallClass))

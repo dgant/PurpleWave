@@ -20,8 +20,8 @@ class DefendAgainstWorkerRush extends Plan {
       .toSet
   
     lazy val attackingCentroid = attackingWorkers.map(_.pixelCenter).centroid
-    lazy val ourWorkers = With.units.ours.count(_.is(UnitMatchWorkers))
-    lazy val ourCombatUnits = With.units.ours.count(_.is(UnitMatchWarriors))
+    lazy val ourWorkers = With.units.countOurs(UnitMatchWorkers)
+    lazy val ourCombatUnits = With.units.countOurs(UnitMatchWarriors)
     
     if (attackingWorkers.size < 3 || ourCombatUnits >= 3) return
       

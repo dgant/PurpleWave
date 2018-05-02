@@ -7,7 +7,7 @@ import scala.collection.immutable.HashSet
 import scala.collection.mutable
 
 class FriendlyUnitTracker {
-  
+    
   private val unitInfosById = new mutable.HashMap[Int, FriendlyUnitInfo].empty
   private var friendlyUnits: Set[FriendlyUnitInfo] = new HashSet[FriendlyUnitInfo]
   var ourUnits: Set[FriendlyUnitInfo] = new HashSet[FriendlyUnitInfo]

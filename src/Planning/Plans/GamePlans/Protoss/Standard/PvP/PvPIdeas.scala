@@ -129,7 +129,7 @@ object PvPIdeas {
     new RequireMiningBases(2))
   
   class MeldArchonsPvP extends MeldArchons(49) {
-    override def minimumArchons: Int = Math.min(8, With.units.enemy.count(_.is(Protoss.Zealot)) / 3)
+    override def minimumArchons: Int = Math.min(8, With.units.countEnemy(Protoss.Zealot) / 3)
     templar.unitMatcher.set(UnitMatchAnd(Protoss.HighTemplar, UnitMatchEnergyAtMost(75)))
   }
   

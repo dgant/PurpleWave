@@ -9,10 +9,10 @@ class EnemyBio extends Plan {
   description.set("Is the enemy threatening Terran Bio?")
   
   override def isComplete: Boolean = {
-    With.units.enemy.count(unit => unit.is(Terran.Marine))    > 8   ||
-    With.units.enemy.count(unit => unit.is(Terran.Barracks))  > 1   ||
-    With.units.enemy.count(unit => unit.is(Terran.Medic))     > 1   ||
-    With.units.enemy.count(unit => unit.is(Terran.Firebat))   > 1   ||
+    With.units.countEnemy(unit => unit.is(Terran.Marine))    > 8   ||
+    With.units.countEnemy(unit => unit.is(Terran.Barracks))  > 1   ||
+    With.units.countEnemy(unit => unit.is(Terran.Medic))     > 1   ||
+    With.units.countEnemy(unit => unit.is(Terran.Firebat))   > 1   ||
     With.enemies.exists(_.hasTech(Terran.Stim))                     ||
     With.enemies.exists(_.getUpgradeLevel(Terran.MarineRange) > 0)
   }

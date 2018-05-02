@@ -22,7 +22,7 @@ object ShowRushDistances extends View {
   */
   override def renderScreen() {
     val x = 5
-    val y = 2 * With.visualization.lineHeightSmall
+    val y = 1 * With.visualization.lineHeightSmall
     val distances = With.geography.rushDistances
     DrawScreen.table(
       x,

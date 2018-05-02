@@ -9,6 +9,6 @@ class EnemyMassZerglings extends Plan {
   description.set("Is the enemy threatening mass zerglings?")
   
   override def isComplete: Boolean = {
-    With.units.enemy.count(unit => unit.is(Zerg.Zergling)) > 20
+    With.units.countEnemy(unit => unit.is(Zerg.Zergling)) > 20
   }
 }

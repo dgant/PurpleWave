@@ -57,8 +57,8 @@ class MassPhotonCannon extends GameplanModeTemplate {
         RequestAtLeast(2, Protoss.Nexus),
         RequestAtLeast(3, Protoss.PhotonCannon))
   
-  private def pylonCount = With.units.ours.count(_.is(Protoss.Pylon))
-  private def cannonCount = With.units.ours.count(_.is(Protoss.PhotonCannon))
+  private def pylonCount = With.units.countOurs(Protoss.Pylon)
+  private def cannonCount = With.units.countOurs(Protoss.PhotonCannon)
   
   override def scoutExpansionsAt: Int = 400
   
@@ -118,7 +118,7 @@ class MassPhotonCannon extends GameplanModeTemplate {
     new BuildCannonsAtBases(4),
     new FlipIf(
       new Check(() => cannonCount >= Math.min(
-        With.units.ours.count(_.is(Protoss.Probe)) / 5,
+        With.units.countOurs(Protoss.Probe) / 5,
         With.geography.ourBases.size * 6)),
       new Parallel(
         new If(

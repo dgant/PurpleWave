@@ -103,7 +103,7 @@ class NinePoolMuta extends GameplanModeTemplate {
         new And(
           new UnitsAtMost(24, Zerg.Drone),
           new Check(() =>
-            With.units.ours.count(_.is(Zerg.Drone)) / 9 <
+            With.units.countOurs(Zerg.Drone) / 9 <
             With.geography.ourBases.size)),
         new TrainContinuously(Zerg.Drone),
         new Parallel(new TrainContinuously(Zerg.Zergling)))),

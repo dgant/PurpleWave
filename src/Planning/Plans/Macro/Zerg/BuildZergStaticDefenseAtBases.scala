@@ -41,7 +41,7 @@ class BuildZergStaticDefenseAtBases(
   }
   
   private def placeBuildingsInZone(zone: Zone): Int = {
-    lazy val towersInZone = With.units.ours.count(unit => Vector(Zerg.CreepColony, towerClass).contains(unit.unitClass) && unit.zone == zone)
+    lazy val towersInZone = With.units.countOurs(unit => Vector(Zerg.CreepColony, towerClass).contains(unit.unitClass) && unit.zone == zone)
     lazy val creepColoniesToAdd = towersRequired - towersInZone
     
     if (creepColoniesToAdd <= 0) {

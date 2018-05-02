@@ -13,7 +13,7 @@ class UnitsAtLeast(
   
   description.set("Have at least " + quantity + " " + matcher)
   
-  override def isComplete: Boolean = With.units.ours.count(unit =>
+  override def isComplete: Boolean = With.units.countOurs(unit =>
     ( ! complete || unit.complete) &&
     matcher.accept(unit)) >= quantity
 }

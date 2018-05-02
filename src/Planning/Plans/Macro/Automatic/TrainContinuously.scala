@@ -24,7 +24,7 @@ class TrainContinuously(
     val unitsNow                  = currentCount
     val unitsMaximum              = maximumTotal
     val unitsMaximumDesirable     = maxDesirable
-    val buildersSpawning          = if (unitClass.whatBuilds._1 == Zerg.Larva) With.units.ours.count(u => u.complete && u.unitClass.producesLarva) else 0
+    val buildersSpawning          = if (unitClass.whatBuilds._1 == Zerg.Larva) With.units.countOurs(u => u.complete && u.unitClass.producesLarva) else 0
     val buildersExisting          = builders.toVector
     val buildersReserved          = buildersExisting.map(_.unitClass).distinct.map(With.scheduler.dumbPumps.consumed).sum
     val buildersReadiness         = getBuilderReadiness(buildersExisting)
@@ -63,7 +63,7 @@ class TrainContinuously(
   protected def currentCount: Int = {
     // Should this just be unit.alive?
     // Maybe this is compensating for a Scheduler
-    With.units.ours.count(unit =>
+    With.units.countOurs(unit =>
       (unit.alive && matcher.accept(unit))
       || (unit.is(Zerg.Egg) && unit.buildType == unitClass))
   }

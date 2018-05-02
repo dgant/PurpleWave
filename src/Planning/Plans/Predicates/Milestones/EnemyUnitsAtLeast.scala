@@ -13,7 +13,7 @@ class EnemyUnitsAtLeast(
   
   description.set("Enemy has at least " + quantity + " " + matcher)
   
-  override def isComplete: Boolean = With.units.enemy.count(unit =>
+  override def isComplete: Boolean = With.units.countEnemy(unit =>
     ( ! complete || unit.complete) &&
     matcher.accept(unit)) >= quantity
 }

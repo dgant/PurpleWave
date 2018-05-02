@@ -47,7 +47,7 @@ class DefendAgainstProxy extends Plan {
           3
       )).toMap
     val totalWorkersRequired = workersRequired.values.sum
-    val maxWorkers = With.units.ours.count(_.unitClass.isWorker) - 5
+    val maxWorkers = With.units.countOurs(_.unitClass.isWorker) - 5
     val finalWorkers = Math.min(totalWorkersRequired, maxWorkers)
     defenders.get.unitCounter.set(new UnitCountBetween(0, finalWorkers))
     defenders.get.unitPreference.set(UnitPreferClose(proxies.head.pixelCenter))

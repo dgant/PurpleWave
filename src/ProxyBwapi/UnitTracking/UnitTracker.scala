@@ -3,9 +3,9 @@ package ProxyBwapi.UnitTracking
 import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile, TileRectangle}
 import Mathematics.Shapes.Circle
+import Performance.UnitCounter
+import Planning.Composition.UnitMatchers.UnitMatcher
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, UnitInfo}
-
-import scala.collection.JavaConverters._
 
 class UnitTracker {
   
@@ -18,15 +18,17 @@ class UnitTracker {
   
   def all: Seq[UnitInfo] = ours.toVector ++ enemy ++ neutral
   
+  private val counterOurs = new UnitCounter(() => ours)
+  def countOurs(matcher: UnitMatcher): Int = counterOurs(matcher)
+  def countOurs(predicate: (FriendlyUnitInfo) => Boolean): Int = counterOurs(predicate)
   def ours: Set[FriendlyUnitInfo] = friendlyUnitTracker.ourUnits
   
+  private val counterEnemy = new UnitCounter(() => enemy)
+  def countEnemy(matcher: UnitMatcher): Int = counterEnemy(matcher)
+  def countEnemy(predicate: (ForeignUnitInfo) => Boolean): Int = counterEnemy(predicate)
   def enemy: Set[ForeignUnitInfo] = foreignUnitTracker.enemyUnits
   
   def neutral: Set[ForeignUnitInfo] = foreignUnitTracker.neutralUnits
-  
-  private def remap(units: java.util.Vector[bwapi.Unit]): Iterable[UnitInfo] = {
-    units.asScala.flatMap(get).toVector
-  }
   
   def inTileRadius(tile: Tile, tiles: Int): Traversable[UnitInfo] = {
     inTiles(Circle.points(tiles).map(tile.add).filter(_.valid))

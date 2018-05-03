@@ -31,4 +31,5 @@ class Intention {
   var canPillage  : Boolean           = false
   var canBerzerk  : Boolean           = false
   var canLiftoff  : Boolean           = false
+  var canCancel   : Boolean           = false
 }

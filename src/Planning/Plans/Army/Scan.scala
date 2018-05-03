@@ -18,6 +18,9 @@ class Scan extends Plan {
   var lastScan = 0
   
   override def onUpdate() {
+    if (With.units.countOurs(Terran.Comsat) == 0) {
+      return
+    }
     if (With.framesSince(lastScan) < 72) {
       return
     }

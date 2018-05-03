@@ -4,11 +4,11 @@ import Lifecycle.With
 import bwapi.UnitType
 
 object UnitClasses {
-  def all:Iterable[UnitClass] = With.proxy.unitClassByTypeName.values
-  def None:UnitClass = get(UnitType.None)
-  def Unknown:UnitClass = get(UnitType.Unknown)
+  def all: Iterable[UnitClass] = With.proxy.unitClassByTypeName.values
+  def None: UnitClass = get(UnitType.None)
+  def Unknown: UnitClass = get(UnitType.Unknown)
   
-  def get(unitType: UnitType):UnitClass = {
+  def get(unitType: UnitType): UnitClass = {
     
     //This implementation is goofy but necessary. Here's why.
     //

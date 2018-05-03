@@ -71,6 +71,7 @@ class Agent(val unit: FriendlyUnitInfo) {
   var canBerzerk    : Boolean                       = false
   var canLiftoff    : Boolean                       = false
   var canCast       : Boolean                       = false
+  var canCancel     : Boolean                       = false
   
   var targetingProfile: TargetingProfile = TargetingProfiles.default
   
@@ -188,6 +189,7 @@ class Agent(val unit: FriendlyUnitInfo) {
     canBerzerk    = intent.canBerzerk
     canLiftoff    = intent.canLiftoff
     canCast       = false
+    canCancel     = intent.canCancel
   }
   
   private def cleanUp() {

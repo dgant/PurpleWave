@@ -7,10 +7,9 @@ import Planning.Plan
 import Planning.Plans.Army.DefendZones
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
-import Planning.Plans.GamePlans.Protoss.Standard.PvP.PvPIdeas.ReactToDarkTemplarEmergencies
 import Planning.Plans.Macro.Automatic.TrainWorkersContinuously
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Macro.Expanding.{BuildGasPumps, MatchMiningBases, RequireMiningBases}
+import Planning.Plans.Macro.Expanding.{BuildGasPumps, MatchMiningBases, RequireBases, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.{BuildCannonsAtExpansions, BuildCannonsAtNatural}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Predicates.Economy.GasAtMost
@@ -23,7 +22,10 @@ import Strategery.Strategies.Protoss.{PvPLateGameArbiter, PvPLateGameCarrier}
 class PvPLateGame extends GameplanModeTemplate {
   
   override val scoutExpansionsAt = 90
-  override val emergencyPlans: Vector[Plan] = Vector(new ReactToDarkTemplarEmergencies)
+  override val emergencyPlans: Vector[Plan] = Vector(
+    new PvPIdeas.ReactToDarkTemplarEmergencies,
+    new PvPIdeas.ReactToCannonRush
+  )
   
   override def aggression: Double = 0.92
   
@@ -36,7 +38,6 @@ class PvPLateGame extends GameplanModeTemplate {
   override val defaultAttackPlan = new PvPIdeas.AttackSafely
   
   override def priorityDefensePlan: Plan = new DefendZones { defenderMatcher.set(Protoss.Corsair) }
-  
   
   override def defaultArchonPlan: Plan = new PvPIdeas.MeldArchonsPvP
   
@@ -149,15 +150,20 @@ class PvPLateGame extends GameplanModeTemplate {
         new UnitsAtLeast(1, Protoss.RoboticsSupportBay),
         new Build(RequestAtLeast(6, Protoss.Gateway)),
         new Build(RequestAtLeast(8, Protoss.Gateway))),
-      new RequireMiningBases(3)),
+      new RequireBases(3)),
   
     new BuildCannonsAtExpansions(3),
     
     new Build(RequestAtLeast(11, Protoss.Gateway)),
-    new RequireMiningBases(4),
+    new RequireMiningBases(3),
+  
+    new If(
+      new SafeToAttack,
+      new RequireMiningBases(4)),
     
     new If(
       new And(
+        new SafeAtHome,
         new Or(
           new Employing(PvPLateGameCarrier),
           new UnitsAtLeast(8, Protoss.Arbiter)),

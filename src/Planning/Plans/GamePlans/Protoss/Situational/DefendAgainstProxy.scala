@@ -8,7 +8,7 @@ import Micro.Squads.Squad
 import Planning.Composition.Property
 import Planning.Composition.ResourceLocks.LockUnits
 import Planning.Composition.UnitCounters.UnitCountBetween
-import Planning.Composition.UnitMatchers.UnitMatchWorkers
+import Planning.Composition.UnitMatchers.{UnitMatchOr, UnitMatchWarriors, UnitMatchWorkers}
 import Planning.Composition.UnitPreferences.UnitPreferClose
 import Planning.Plan
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
@@ -18,7 +18,7 @@ import Utilities.ByOption
 class DefendAgainstProxy extends Plan {
   
   val defenders = new Property[LockUnits](new LockUnits)
-  defenders.get.unitMatcher.set(UnitMatchWorkers)
+  defenders.get.unitMatcher.set(UnitMatchOr(UnitMatchWorkers, UnitMatchWarriors))
   
   var lastProxyCount = 0
   
@@ -54,6 +54,7 @@ class DefendAgainstProxy extends Plan {
     if (lastProxyCount > proxies.size) {
       defenders.get.release()
     }
+    lastProxyCount = proxies.size
     defenders.get.acquire(this)
   
     squad.enemies = proxies

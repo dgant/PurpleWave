@@ -7,6 +7,8 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 object Cancel extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
+    if (unit.agent.canCancel) return true
+    
     lazy val unpowered        = unit.unitClass.requiresPsi && ! unit.powered
     lazy val framesCutoff     = 12 + With.reaction.agencyAverage
     lazy val framesToLive     = unit.matchups.framesToLive

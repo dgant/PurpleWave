@@ -32,6 +32,10 @@ class PvP3GateSpeedlots extends GameplanModeTemplate {
           new UnitsAtLeast(14, Protoss.Zealot)),
         initialAfter = new Attack))
   
+  override def emergencyPlans: Seq[Plan] = Seq(
+    new PvPIdeas.ReactToCannonRush
+  )
+  
   override val buildOrder: Seq[BuildRequest] = Vector(
     // http://wiki.teamliquid.net/starcraft/3_Gate_Speedzeal_(vs._Protoss)
     RequestAtLeast(8,   Protoss.Probe),

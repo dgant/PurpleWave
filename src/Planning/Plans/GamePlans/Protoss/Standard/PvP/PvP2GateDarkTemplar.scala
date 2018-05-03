@@ -67,7 +67,10 @@ class PvP2GateDarkTemplar extends GameplanModeTemplate {
     RequestAtLeast(2,   Protoss.DarkTemplar),
     RequestAtLeast(24,  Protoss.Probe))
   
-  override def emergencyPlans: Seq[Plan] = Seq(new PvPIdeas.ReactToFFE)
+  override def emergencyPlans: Seq[Plan] = Seq(
+    new PvPIdeas.ReactToCannonRush,
+    new PvPIdeas.ReactToFFE
+  )
   
   override val buildPlans = Vector(
     new RequireSufficientSupply,

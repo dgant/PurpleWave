@@ -5,7 +5,7 @@ import Macro.BuildRequests.RequestAtLeast
 import Planning.Composition.UnitMatchers._
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound.{If, _}
-import Planning.Plans.Macro.Automatic.TrainContinuously
+import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Macro.Protoss.{BuildCannonsAtBases, MeldArchons}
@@ -13,9 +13,10 @@ import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Predicates.Economy.GasAtMost
 import Planning.Plans.Predicates.Milestones._
 import Planning.Plans.Predicates.Reactive.{EnemyBasesAtLeast, EnemyCarriers, EnemyDarkTemplarExists, EnemyDarkTemplarPossible}
-import Planning.Plans.Predicates.Scenarios.WeAreBeingProxied
-import Planning.Plans.Predicates.{SafeAtHome, SafeToAttack}
+import Planning.Plans.Predicates.Scenarios.{EnemyStrategy, WeAreBeingProxied}
+import Planning.Plans.Predicates.{Employing, SafeAtHome, SafeToAttack}
 import ProxyBwapi.Races.Protoss
+import Strategery.Strategies.Protoss.PvPOpen4GateGoon
 
 object PvPIdeas {
   
@@ -30,33 +31,30 @@ object PvPIdeas {
     new Attack { attackers.get.unitMatcher.set(Protoss.DarkTemplar) })
   
   class AttackSafely extends If(
-    new Or(
-      new And(
-        new EnemyUnitsAtLeast(1, Protoss.Forge),
-        new EnemyUnitsAtMost(0, UnitMatchWarriors)),
-      new And(
-        new Or(
-          new UnitsAtLeast(1, Protoss.Observer, complete = true),
-          new Not(new EnemyDarkTemplarExists)),
-        new Or(
-          new SafeToAttack,
-          new EnemyBasesAtLeast(3),
-          new And(
-            new UnitsAtLeast(1, Protoss.Dragoon),
-            new EnemyUnitsAtMost(0, Protoss.Dragoon),
-            new Not(new EnemyHasUpgrade(Protoss.ZealotSpeed)))),
-        new Or(
-          new UnitsAtMost(0, Protoss.Dragoon),
-          new UpgradeComplete(Protoss.DragoonRange)),
-        new Or(
-          new UnitsAtLeast(0, Protoss.Reaver),
-          new UnitsAtLeast(1, Protoss.Shuttle),
-          new UnitsAtLeast(15, UnitMatchWarriors)),
-        new Or(
-          new UnitsAtMost(1, Protoss.Nexus),
-          new UnitsAtLeast(5, Protoss.Gateway),
-          new UnitsAtLeast(20, UnitMatchWarriors)))),
+    new And(
+      new Or(
+        new UnitsAtLeast(1, Protoss.Observer, complete = true),
+        new Not(new EnemyDarkTemplarExists)),
+      new Or(
+        new EnemyStrategy(With.intelligence.fingerprints.fingerprintCannonRush),
+        new Employing(PvPOpen4GateGoon),
+        new SafeToAttack,
+        new MiningBasesAtLeast(3),
+        new EnemyBasesAtLeast(3))),
     new Attack)
+  
+  class ReactToCannonRush extends If(
+    new EnemyStrategy(With.intelligence.fingerprints.fingerprintCannonRush),
+    new Parallel(
+      new RequireSufficientSupply,
+      new TrainWorkersContinuously,
+      new TrainContinuously(Protoss.Reaver, 2),
+      new TrainDragoonsOrZealots,
+      new Build(
+        RequestAtLeast(1, Protoss.Gateway),
+        RequestAtLeast(1, Protoss.CyberneticsCore),
+        RequestAtLeast(1, Protoss.RoboticsFacility),
+        RequestAtLeast(1, Protoss.RoboticsSupportBay))))
   
   class ReactToDarkTemplarEmergencies extends Parallel(new ReactToDarkTemplarExisting, new ReactToDarkTemplarPossible)
   class ReactToDarkTemplarPossible extends If(
@@ -168,9 +166,7 @@ object PvPIdeas {
     new If(
       new Not(new EnemyCarriersOnly),
       new TrainDarkTemplar),
-    new If(
-      new UnitsAtLeast(12, UnitMatchWarriors),
-      new TrainContinuously(Protoss.Arbiter, 8, 2)),
+    new TrainContinuously(Protoss.Arbiter),
     new If(
       new And(
         new Not(new EnemyCarriersOnly),

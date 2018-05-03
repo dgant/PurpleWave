@@ -146,19 +146,24 @@ class TvETurtleMech extends GameplanModeTemplate {
         new TrainContinuously(Terran.ScienceVessel, 2)
       )),
     new If(
-      new Check(() =>
-      With.units.countOurs(UnitMatchSiegeTank) / 6
-      + (if (With.units.enemy.exists(_.is(UnitMatchAnd(UnitMatchWarriors, UnitMatchMobileFlying)))) 6 else 0)
-      + With.units.enemy.filter(_.is(UnitMatchAnd(UnitMatchWarriors, UnitMatchMobileFlying)))
-        .map(u => {
-          val c = u.unitClass
-          if (c == Terran.Battlecruiser)  6 else
-          if (c == Protoss.Carrier)       7 else
-          if (c == Zerg.Guardian)         4 else
-          3
-          })
-        .sum
-        > With.units.countOurs(Terran.Goliath)),
+      new Check(() => {
+        val tanks = With.units.countOurs(UnitMatchSiegeTank)
+        val enemyHasFlyers = With.units.enemy.exists(_.is(UnitMatchAnd(UnitMatchWarriors, UnitMatchMobileFlying)))
+        val enemyFlyerStrength = With.units.enemy.map(u =>
+          if (u.is(Terran.Battlecruiser)) 6 else
+          if (u.is(Terran.Wraith))        2 else
+          if (u.is(Protoss.Carrier))      7 else
+          if (u.is(Protoss.Interceptor))  0 else
+          if (u.is(Protoss.Scout))        3 else
+          if (u.is(Zerg.Guardian))        4 else
+          if (u.is(Zerg.Mutalisk))        3 else
+          0).sum
+        
+        val goliathsNeeded = tanks/6 + (if (enemyHasFlyers) 6 else 0) + enemyFlyerStrength
+        val goliathsNow = With.units.countOurs(Terran.Goliath)
+        val output = goliathsNeeded > goliathsNow
+        output
+      }),
       new Parallel(
         new Build(RequestAtLeast(1, Terran.Armory)),
         new BuildGasPumps,

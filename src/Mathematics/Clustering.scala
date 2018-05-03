@@ -9,10 +9,10 @@ import scala.collection.mutable
 object Clustering {
   
   def groupUnits(
-    units:Iterable[UnitInfo],
-    radius:Int,
-    limitRegion:Boolean = false)
-      :mutable.HashMap[UnitInfo, mutable.HashSet[UnitInfo]] = {
+    units         : Iterable[UnitInfo],
+    radius        : Int,
+    limitRegion   : Boolean = false)
+      : mutable.HashMap[UnitInfo, mutable.HashSet[UnitInfo]] = {
     group(units, radius, limitRegion, (u) => u.pixelCenter)
   }
   

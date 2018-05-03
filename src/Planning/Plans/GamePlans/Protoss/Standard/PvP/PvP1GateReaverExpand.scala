@@ -7,7 +7,7 @@ import Planning.Plan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
-import Planning.Plans.Macro.Automatic.{TrainContinuously, TrainWorkersContinuously}
+import Planning.Plans.Macro.Automatic.TrainWorkersContinuously
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Predicates.Milestones._
@@ -24,6 +24,10 @@ class PvP1GateReaverExpand extends GameplanModeTemplate {
   override def defaultWorkerPlan: Plan = new TrainWorkersContinuously(true)
   override val defaultAttackPlan: Plan = new PvPIdeas.AttackSafely
   
+  override def emergencyPlans: Seq[Plan] = Vector(
+    new PvPIdeas.ReactToCannonRush
+  )
+  
   override val buildOrder = ProtossBuilds.OpeningZCoreZ
   override def buildPlans = Vector(
     
@@ -31,7 +35,6 @@ class PvP1GateReaverExpand extends GameplanModeTemplate {
       new UnitsAtLeast(2, Protoss.Reaver, complete = true),
       new RequireMiningBases(2)),
   
-    new TrainContinuously(Protoss.Observer, 1),
     new PvPIdeas.TrainArmy,
   
     new If(

@@ -14,7 +14,8 @@ object BattleClassificationFilters {
   
   private def isEligible(unit: UnitInfo): Boolean = (
     unit.likelyStillAlive
-      && (unit.complete || unit.unitClass.isBuilding || unit.is(Zerg.LurkerEgg) || unit.is(Zerg.Egg))
       && ! unit.unitClass.isSpell
+      && ! unit.invincible
+      && (unit.complete || unit.unitClass.isBuilding || unit.isAny(Zerg.LurkerEgg, Zerg.Egg, Zerg.Cocoon))
   )
 }

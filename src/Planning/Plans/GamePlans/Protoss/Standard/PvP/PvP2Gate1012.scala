@@ -43,6 +43,7 @@ class PvP2Gate1012 extends GameplanModeTemplate {
     new If(
       new EnemyDarkTemplarPossible,
       new BuildCannonsAtNatural(2)),
+    new PvPIdeas.ReactToCannonRush,
     new PvPIdeas.ReactToFFE,
     new PvPIdeas.ReactToExpansion
   )

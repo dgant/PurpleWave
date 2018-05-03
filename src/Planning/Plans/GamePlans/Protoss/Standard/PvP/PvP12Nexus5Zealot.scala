@@ -39,7 +39,10 @@ class PvP12Nexus5Zealot extends GameplanModeTemplate {
   override def defaultWorkerPlan    : Plan = NoPlan()
   override def defaultPlacementPlan : Plan = new PylonAtNatural
   
-  override def emergencyPlans: Seq[Plan] = Seq(new PvPIdeas.ReactToDarkTemplarEmergencies)
+  override def emergencyPlans: Seq[Plan] = Seq(
+    new PvPIdeas.ReactToDarkTemplarEmergencies,
+    new PvPIdeas.ReactToCannonRush
+  )
   
   override val buildOrder: Seq[BuildRequest] = Vector(
     // http://wiki.teamliquid.net/starcraft/Fast_Expand_(vs._Protoss)

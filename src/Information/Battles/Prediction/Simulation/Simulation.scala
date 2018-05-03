@@ -16,7 +16,7 @@ class Simulation(
   
   private def buildSimulacra(team: Team) = team.units.filter(legalForSimulation).map(new Simulacrum(this, _))
   private def legalForSimulation(unit: UnitInfo): Boolean = {
-    ! unit.invincible && ! unit.is(Protoss.Interceptor)
+    ! unit.invincible && ! unit.isAny(Protoss.Interceptor, Protoss.Scarab)
   }
   
   val estimation            : Prediction          = new Prediction

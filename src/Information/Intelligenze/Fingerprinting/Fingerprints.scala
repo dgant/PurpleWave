@@ -1,6 +1,6 @@
 package Information.Intelligenze.Fingerprinting
 
-import Information.Intelligenze.Fingerprinting.ProtossStrategies.{Fingerprint1GateCore, Fingerprint2Gate, FingerprintProxyGateway}
+import Information.Intelligenze.Fingerprinting.ProtossStrategies.{Fingerprint1GateCore, Fingerprint2Gate, FingerprintCannonRush, FingerprintProxyGateway}
 import Information.Intelligenze.Fingerprinting.ZergStrategies._
 
 import scala.collection.mutable
@@ -15,6 +15,7 @@ class Fingerprints {
   }
   
   lazy val fingerprintProxyGateway = addFingerprint(new FingerprintProxyGateway)
+  lazy val fingerprintCannonRush   = addFingerprint(new FingerprintCannonRush)
   lazy val fingerprint2Gate        = addFingerprint(new Fingerprint2Gate)
   lazy val fingerprint1GateCore    = addFingerprint(new Fingerprint1GateCore)
   lazy val fingerprint4Pool        = addFingerprint(new Fingerprint4Pool)

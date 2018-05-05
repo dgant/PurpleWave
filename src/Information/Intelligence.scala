@@ -21,6 +21,7 @@ class Intelligence {
   def leastScoutedBases: Iterable[Base] = leastScoutedBasesCache()
   def mostBaselikeEnemyTile: Tile = mostBaselikeEnemyTileCache()
   
+  // A shared queue of bases to scout
   private val nextBasesToScout = new Cache(() => new mutable.Queue[Base] ++ leastScoutedBases)
   def nextBaseToScout: Base = {
     val queue = nextBasesToScout()

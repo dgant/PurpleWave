@@ -112,15 +112,17 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   private def cooldownZeroBecomesInfinity(cooldown: Int): Int = if (cooldown == 0) Int.MaxValue else cooldown
   
   lazy val airDamageCooldown: Int =
-    if      (this == Terran.Bunker)   Terran.Marine.airDamageCooldown
-    else if (this == Protoss.Carrier) Protoss.Interceptor.airDamageCooldown
-    else                              cooldownZeroBecomesInfinity(airDamageCooldownRaw)
+    if      (this == Terran.Bunker)       Terran.Marine.airDamageCooldown
+    else if (this == Protoss.Carrier)     Protoss.Interceptor.airDamageCooldown
+    else if (this == Protoss.Interceptor) 45 // Reasonable approximation; Interceptors mostly are on "cooldown" due to movement
+    else                                  cooldownZeroBecomesInfinity(airDamageCooldownRaw)
     
   lazy val groundDamageCooldown: Int =
-    if      (this == Terran.Bunker)   Terran.Marine.groundDamageCooldown
-    else if (this == Protoss.Carrier) Protoss.Interceptor.groundDamageCooldown
-    else if (this == Protoss.Reaver)  60
-    else                              cooldownZeroBecomesInfinity(groundDamageCooldownRaw)
+    if      (this == Terran.Bunker)       Terran.Marine.groundDamageCooldown
+    else if (this == Protoss.Carrier)     Protoss.Interceptor.airDamageCooldown
+    else if (this == Protoss.Interceptor) 45 // Reasonable approximation; Interceptors mostly are on "cooldown" due to movement
+    else if (this == Protoss.Reaver)      60
+    else                                  cooldownZeroBecomesInfinity(groundDamageCooldownRaw)
   
   lazy val attacks        : Boolean = attacksGround || attacksAir
   lazy val attacksGround  : Boolean = effectiveGroundDamage > 0

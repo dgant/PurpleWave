@@ -180,21 +180,21 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   
   def canTraverse(tile: Tile): Boolean = flying || With.grids.walkable.get(tile)
   
-  def pixelStart                                            : Pixel   = Pixel(left, top)
-  def pixelEnd                                              : Pixel   = Pixel(right, bottom)
-  def pixelStartAt            (at: Pixel)                   : Pixel   = at.subtract(pixelCenter).add(left, top)
-  def pixelEndAt              (at: Pixel)                   : Pixel   = at.subtract(pixelCenter).add(right, bottom)
-  def pixelDistanceCenter     (otherPixel:  Pixel)          : Double  = pixelCenter.pixelDistance(otherPixel)
-  def pixelDistanceCenter     (otherUnit:   UnitInfo)       : Double  = pixelDistanceCenter(otherUnit.pixelCenter)
-  def pixelDistanceEdge       (other:       UnitInfo)       : Double  = pixelDistanceEdge(other.pixelStart, other.pixelEnd)
-  def pixelDistanceEdge       (other: UnitInfo, at: Pixel)  : Double  = pixelDistanceEdge(other.pixelStart, other.pixelEnd)
-  def pixelDistanceEdge       (oStart: Pixel, oEnd: Pixel)  : Double  = PurpleMath.broodWarDistanceBox(pixelStart, pixelEnd, oStart, oEnd)
-  def pixelDistanceEdge       (destination: Pixel)          : Double  = PurpleMath.broodWarDistanceBox(pixelStart, pixelEnd, destination, destination)
-  def pixelDistanceSquared    (otherUnit:   UnitInfo)       : Double  = pixelDistanceSquared(otherUnit.pixelCenter)
-  def pixelDistanceSquared    (otherPixel:  Pixel)          : Double  = pixelCenter.pixelDistanceSquared(otherPixel)
-  def pixelDistanceTravelling (destination: Pixel)          : Double  = pixelDistanceTravelling(pixelCenter, destination)
-  def pixelDistanceTravelling (destination: Tile)           : Double  = pixelDistanceTravelling(pixelCenter, destination.pixelCenter)
-  def pixelDistanceTravelling (from: Pixel, to: Pixel)      : Double  = if (flying) from.pixelDistance(to) else from.groundPixels(to)
+  def pixelStart                                                : Pixel   = Pixel(left, top)
+  def pixelEnd                                                  : Pixel   = Pixel(right, bottom)
+  def pixelStartAt            (at: Pixel)                       : Pixel   = at.subtract(pixelCenter).add(left, top)
+  def pixelEndAt              (at: Pixel)                       : Pixel   = at.subtract(pixelCenter).add(right, bottom)
+  def pixelDistanceCenter     (otherPixel:  Pixel)              : Double  = pixelCenter.pixelDistance(otherPixel)
+  def pixelDistanceCenter     (otherUnit:   UnitInfo)           : Double  = pixelDistanceCenter(otherUnit.pixelCenter)
+  def pixelDistanceEdge       (other:       UnitInfo)           : Double  = pixelDistanceEdge(other.pixelStart, other.pixelEnd)
+  def pixelDistanceEdge       (other: UnitInfo, otherAt: Pixel) : Double  = pixelDistanceEdge(otherAt.subtract(other.unitClass.dimensionLeft, other.unitClass.dimensionUp), otherAt.add(other.unitClass.dimensionRight, other.unitClass.dimensionDown))
+  def pixelDistanceEdge       (oStart: Pixel, oEnd: Pixel)      : Double  = PurpleMath.broodWarDistanceBox(pixelStart, pixelEnd, oStart, oEnd)
+  def pixelDistanceEdge       (destination: Pixel)              : Double  = PurpleMath.broodWarDistanceBox(pixelStart, pixelEnd, destination, destination)
+  def pixelDistanceSquared    (otherUnit:   UnitInfo)           : Double  = pixelDistanceSquared(otherUnit.pixelCenter)
+  def pixelDistanceSquared    (otherPixel:  Pixel)              : Double  = pixelCenter.pixelDistanceSquared(otherPixel)
+  def pixelDistanceTravelling (destination: Pixel)              : Double  = pixelDistanceTravelling(pixelCenter, destination)
+  def pixelDistanceTravelling (destination: Tile)               : Double  = pixelDistanceTravelling(pixelCenter, destination.pixelCenter)
+  def pixelDistanceTravelling (from: Pixel, to: Pixel)          : Double  = if (flying) from.pixelDistance(to) else from.groundPixels(to)
   
   def velocity: Force = Force(velocityX, velocityY)
   
@@ -434,17 +434,17 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   def pixelReachMax     (framesAhead: Int): Double = Math.max(pixelReachAir(framesAhead), pixelReachGround(framesAhead))
   def pixelReachAgainst (framesAhead: Int, enemy:UnitInfo): Double = if (enemy.flying) pixelReachAir(framesAhead) else pixelReachGround(framesAhead)
   
-  def inRangeToAttack(enemy: UnitInfo)                    : Boolean = inRangeToAttack(enemy, enemy.pixelCenter)
-  def inRangeToAttack(enemy: UnitInfo, targetAt: Pixel)   : Boolean = pixelDistanceEdge(enemy) <= pixelRangeAgainst(enemy) && (pixelRangeMin <= 0.0 || pixelDistanceEdge(enemy, targetAt) > pixelRangeMin)
+  def inRangeToAttack(enemy: UnitInfo)                    : Boolean = pixelDistanceEdge(enemy)          <= pixelRangeAgainst(enemy) && (pixelRangeMin <= 0.0 || pixelDistanceEdge(enemy)          > pixelRangeMin)
+  def inRangeToAttack(enemy: UnitInfo, enemyAt: Pixel)    : Boolean = pixelDistanceEdge(enemy, enemyAt) <= pixelRangeAgainst(enemy) && (pixelRangeMin <= 0.0 || pixelDistanceEdge(enemy, enemyAt) > pixelRangeMin)
   def inRangeToAttack(enemy: UnitInfo, framesAhead: Int)  : Boolean = inRangeToAttack(enemy, enemy.projectFrames(framesAhead))
   
   def framesToTravelTo(destination: Pixel)  : Int = framesToTravelPixels(pixelDistanceTravelling(destination))
   def framesToTravelPixels(pixels: Double)  : Int = if (pixels <= 0.0) 0 else if (canMove) Math.max(0, Math.ceil(pixels/topSpeed).toInt) else Int.MaxValue
   
-  def framesToGetInRange(enemy: UnitInfo)               : Int = framesToGetInRange(enemy, enemy.pixelCenter)
-  def framesToGetInRange(enemy: UnitInfo, at: Pixel)    : Int = if (canAttack(enemy)) framesToTravelPixels(pixelDistanceEdge(enemy, at) - pixelRangeAgainst(enemy)) else Int.MaxValue
-  def framesBeforeAttacking(enemy: UnitInfo)            : Int = framesBeforeAttacking(enemy, enemy.pixelCenter)
-  def framesBeforeAttacking(enemy: UnitInfo, at: Pixel) : Int = {
+  def framesToGetInRange(enemy: UnitInfo)                 : Int = if (canAttack(enemy)) framesToTravelPixels(pixelDistanceEdge(enemy)           - pixelRangeAgainst(enemy)) else Int.MaxValue
+  def framesToGetInRange(enemy: UnitInfo, enemyAt: Pixel) : Int = if (canAttack(enemy)) framesToTravelPixels(pixelDistanceEdge(enemy, enemyAt)  - pixelRangeAgainst(enemy)) else Int.MaxValue
+  def framesBeforeAttacking(enemy: UnitInfo)              : Int = framesBeforeAttacking(enemy, enemy.pixelCenter)
+  def framesBeforeAttacking(enemy: UnitInfo, at: Pixel)   : Int = {
     if (canAttack(enemy)) {
       Math.max(cooldownLeft, framesToGetInRange(enemy))
     }

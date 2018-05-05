@@ -58,7 +58,7 @@ class Scout(scoutCount: Int = 1) extends Plan {
     
     val getNextScoutBase = () => {
       if (enemyStartBases.isEmpty) {
-        With.intelligence.nextBaseToScout
+        With.intelligence.dequeueNextBaseToScout
       }
       else {
         enemyStartBases.head
@@ -78,7 +78,7 @@ class Scout(scoutCount: Int = 1) extends Plan {
     unassignedScouts ++= acquiredScouts
     
     while (unassignedScouts.nonEmpty) {
-      val destination = With.intelligence.nextBaseToScout.heart.pixelCenter
+      val destination = With.intelligence.dequeueNextBaseToScout.heart.pixelCenter
       val scout = unassignedScouts.minBy(_.pixelDistanceTravelling(destination))
       unassignedScouts -= scout
       

@@ -54,10 +54,10 @@ object Gravitate extends Action {
             .getOrElse(0.0))))
     
     val pathAccepted = pathsTruncated.maxBy(ray => ray.length * (1.0 + Math.cos(ray.radians - forceRadians)))
-    
+    val commandPixel = unit.pixelCenter.project(pathAccepted.to, minDistance)
     unit.agent.pathsAll = paths
     unit.agent.pathsTruncated = pathsTruncated
     unit.agent.pathsAcceptable = Vector(pathAccepted)
-    unit.agent.toTravel = Some(pathAccepted.to)
+    unit.agent.toTravel = Some(commandPixel)
   }
 }

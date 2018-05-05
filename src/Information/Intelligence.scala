@@ -23,7 +23,7 @@ class Intelligence {
   
   // A shared queue of bases to scout
   private val nextBasesToScout = new Cache(() => new mutable.Queue[Base] ++ leastScoutedBases)
-  def nextBaseToScout: Base = {
+  def dequeueNextBaseToScout: Base = {
     val queue = nextBasesToScout()
     if (queue.isEmpty) queue ++= leastScoutedBases
     val output = queue.dequeue()

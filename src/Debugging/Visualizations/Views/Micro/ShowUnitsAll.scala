@@ -14,7 +14,7 @@ object ShowUnitsAll extends View {
   var showHitPoints       = true
   var showResources       = false
   var showViolence        = false
-  var showBattleIgnorance = false
+  var showBattleIgnorance = true
   var showMortality       = false
   var showSafety          = false
   

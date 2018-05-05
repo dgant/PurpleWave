@@ -503,16 +503,17 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     possiblyStillThere &&
     ( ! canMove || With.framesSince(lastSeen) < With.configuration.fogPositionDurationFrames || isSiegeTankUnsieged())
   
-  def likelyStillAlive: Boolean =
-    likelyStillThere      ||
-    unitClass.isBuilding  ||
-    unitClass.isWorker    ||
-    With.framesSince(lastSeen) < (
+  def likelyStillAlive: Boolean = (
+    likelyStillThere
+    || unitClass.isBuilding
+    || unitClass.isWorker
+    || With.framesSince(lastSeen) < (
       if (With.strategy.isFfa)
         GameTime(2, 0)()
       else
         GameTime(5, 0)()
     )
+  )
   
   def effectivelyCloaked: Boolean =
     (burrowed || cloaked) && (

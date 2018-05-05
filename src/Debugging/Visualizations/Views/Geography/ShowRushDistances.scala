@@ -17,6 +17,7 @@ object ShowRushDistances extends View {
   Heartbreak Ridge: 5066
   Icarus: 4492 - 4900 - 5278
   La Mancha: 4441 - 4950 - 5715
+  Luna: 4559 - 5102 - 5634
   Neo Moon Glaive: 4687 - 4750 - 4846
   Python: 4096 -  4458 - 5312
   Roadrunner: 4567 - 4858 - 5402

@@ -31,12 +31,14 @@ class SafeToAttack extends Plan {
     val dragoons  = countOurs(Protoss.Dragoon)
     val archons   = countOurs(Protoss.Archon)
     val scouts    = countOurs(Protoss.Scout)
+    val zealots   = countOurs(Protoss.Zealot)
     
     val us = (
         4 * carriers
       + 4 * reavers
       + 3 * dragoons
       + 2 * archons
+      + 0.2 * zealots
       + scouts
     )
     val delta   = us - vultures * With.blackboard.aggressionRatio

@@ -78,7 +78,7 @@ class Commander {
       lazy val moving           = unit.moving
       lazy val alreadyInRange   = unit.inRangeToAttack(target)
       lazy val overdueToAttack  = unit.cooldownLeft == 0 && With.framesSince(unit.lastFrameStartingAttack) > 2.0 * unit.cooldownMaxAirGround
-      lazy val thisIsANewTarget = ! unit.target.contains(target)
+      lazy val thisIsANewTarget = ! unit.orderTarget.contains(target)
       
       val shouldOrder = thisIsANewTarget || (overdueToAttack && (moving || alreadyInRange))
       

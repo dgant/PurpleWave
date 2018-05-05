@@ -1,14 +1,14 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvT
 
 import Lifecycle.With
-import Macro.BuildRequests.{RequestAtLeast, RequestTech}
+import Macro.BuildRequests.RequestAtLeast
 import Planning.Composition.Latch
 import Planning.Composition.UnitMatchers.{UnitMatchCustom, UnitMatchOr, UnitMatchWarriors}
 import Planning.Plans.Army.{Attack, ConsiderAttacking}
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Predicates.Economy.{GasAtMost, MineralsAtLeast}
+import Planning.Plans.Predicates.Economy.{GasAtLeast, GasAtMost, MineralsAtLeast}
 import Planning.Plans.Predicates.Milestones._
 import Planning.Plans.Predicates.Reactive.{EnemyBasesAtLeast, EnemyBio}
 import Planning.Plans.Predicates.{Employing, SafeToAttack}
@@ -120,19 +120,12 @@ object PvTIdeas {
       new TrainContinuously(Protoss.Observer, 1)))
   
   class TrainHighTemplar extends If(
-    new And(
+    new Or(
+      new EnemyBio,
       new Or(
-        new And(
-          new HaveGasPumps(3),
-          new EnemyUnitsAtLeast(12, Terran.Goliath)),
-        new And(
-          new HaveGasPumps(2),
-          new EnemyBio))),
-      new Parallel(
-        new If(
-          new UnitsAtLeast(1, Protoss.HighTemplar),
-          new Build(RequestTech(Protoss.PsionicStorm))),
-        new TrainContinuously(Protoss.HighTemplar, 5, 1)))
+        new GasAtLeast(800),
+        new UnitsAtLeast(1, Protoss.ArbiterTribunal)),
+    new TrainContinuously(Protoss.HighTemplar, maximumConcurrently = 3)))
     
   class TrainArmy extends Parallel(
     new TrainObservers,

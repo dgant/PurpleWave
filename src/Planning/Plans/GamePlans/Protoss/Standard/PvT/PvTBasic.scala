@@ -109,6 +109,7 @@ class PvTBasic extends GameplanModeTemplate {
           RequestAtLeast(1, Protoss.Stargate),
           RequestAtLeast(4, Protoss.Gateway),
           RequestAtLeast(1, Protoss.ArbiterTribunal),
+          RequestUpgrade(Protoss.ArbiterEnergy),
           RequestTech(Protoss.Stasis)),
         new If(
           new Or(
@@ -139,12 +140,16 @@ class PvTBasic extends GameplanModeTemplate {
       new Build(
         RequestAtLeast(1, Protoss.FleetBeacon),
         RequestAtLeast(1, Protoss.Stargate))),
-    new PvTIdeas.TrainArmy,
+    new UpgradeContinuously(Protoss.ArbiterEnergy),
+    new If(
+      new UnitsAtLeast(1, Protoss.Arbiter, complete = true),
+      new Build(RequestTech(Protoss.Stasis))),
     new If(
       new UnitsAtLeast(1, Protoss.HighTemplar),
       new Build(RequestTech(Protoss.PsionicStorm))),
     new UpgradeContinuously(Protoss.ZealotSpeed),
     new UpgradeContinuously(Protoss.GroundDamage),
+    new PvTIdeas.TrainArmy,
     new Build(
       RequestAtLeast(2, Protoss.Gateway),
       RequestUpgrade(Protoss.DragoonRange),

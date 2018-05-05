@@ -15,6 +15,7 @@ class PerformanceMonitor {
   var framesOver10000 = 0
   
   var enablePerformanceStops = With.configuration.enablePerformanceStops // For disabling performance stops while debugging
+  var enablePerformanceSurrenders = With.configuration.enablePerformanceSurrender
   
   def startFrame() {
     millisecondsBefore = System.currentTimeMillis()

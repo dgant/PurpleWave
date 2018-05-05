@@ -67,7 +67,7 @@ class BattleClassifier {
         new BattleLocal(
           new Team(cluster.filter(_.isOurs).toVector),
           new Team(cluster.filter(_.isEnemy).toVector)))
-      .filter(_.teams.forall(_.units.exists(_.canAttack)))
+      .filter(_.teams.forall(_.units.exists(u => u.canAttack || u.unitClass.isSpellcaster)))
   }
   
   private def asVectorUs    (units: Traversable[FriendlyUnitInfo]) : Vector[UnitInfo] = units.map(_.asInstanceOf[UnitInfo]).toVector

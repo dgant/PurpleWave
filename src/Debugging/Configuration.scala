@@ -8,10 +8,11 @@ class Configuration {
   // Manners //
   /////////////
   
-  var enableSurrendering     = true
-  var enablePerformanceStops = false
-  var enableStdOut           = false // StdOut crashes bots on SSCAIT because it blocks forever
-  var enableChat             = true
+  var enableSurrenders            = true
+  var enablePerformanceStops      = true
+  var enablePerformanceSurrender  = false
+  var enableStdOut                = false // StdOut crashes bots on SSCAIT because it blocks forever
+  var enableChat                  = true
   
   ///////////////
   // Operation //

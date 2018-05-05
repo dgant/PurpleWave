@@ -15,8 +15,8 @@ class BattleClusteringState(seedUnits: Set[UnitInfo]) {
   val unitLinks = new mutable.HashMap[UnitInfo, UnitInfo]
   val horizon: mutable.Stack[UnitInfo] = mutable.Stack[UnitInfo]()
   
-  lazy val exploredFriendly  : Array[Boolean] = new Array(With.geography.allTiles.size)
-  lazy val exploredEnemy     : Array[Boolean] = new Array(With.geography.allTiles.size)
+  lazy val exploredFriendly  : Array[Boolean] = new Array(With.geography.allTiles.length)
+  lazy val exploredEnemy     : Array[Boolean] = new Array(With.geography.allTiles.length)
   
   horizon.pushAll(seedUnits.toSeq.filter(_.isEnemy))
   

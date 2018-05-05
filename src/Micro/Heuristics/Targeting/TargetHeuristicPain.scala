@@ -1,6 +1,7 @@
 package Micro.Heuristics.Targeting
 
 import Mathematics.Heuristics.HeuristicMathMultiplicative
+import Mathematics.PurpleMath
 import Micro.Decisions.MicroValue
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
@@ -20,7 +21,7 @@ object TargetHeuristicPain extends TargetHeuristic {
             MicroValue.valuePerFrameCurrentHp(threat, unit)
           else 0.0)
         .sum / threats.size
-    val painWalking = 0 //PurpleMath.nanToZero(travelPixels / unit.unitClass.topSpeed) * unit.matchups.vpfReceiving
+    val painWalking = PurpleMath.nanToZero(travelPixels / unit.unitClass.topSpeed) * unit.matchups.vpfReceiving
     
     val output = 24.0 * (painWalking + painStanding) / threats.size
     output

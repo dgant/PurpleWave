@@ -50,4 +50,4 @@ class PurpleWavePlaybook extends EmptyPlaybook {
   override lazy val disabled  : Seq[Strategy] = StrategyGroups.disabled
 }
 
-object Playbook extends TestingPlaybook {}
+object Playbook extends PurpleWavePlaybook {}

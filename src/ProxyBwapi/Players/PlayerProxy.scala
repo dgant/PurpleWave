@@ -36,7 +36,7 @@ abstract class PlayerProxy(base:Player) {
   
   def rawUnits: mutable.Buffer[Unit] = unitsCache()
   
-  private lazy val minUpgradeLevels = new mutable.HashMap[Upgrade, Int] ++ Upgrades.all.map(upgrade => (upgrade, 0))
+  private lazy val maxUpgradeLevels = new mutable.HashMap[Upgrade, Int] ++ Upgrades.all.map(upgrade => (upgrade, 0))
   def getUpgradeLevel(upgrade: Upgrade): Int = {
     if ( ! upgradeLevelCaches.contains(upgrade)) {
       upgradeLevelCaches.put(upgrade, new Cache(() => recalculateUpgradeLevel(upgrade)))
@@ -47,8 +47,9 @@ abstract class PlayerProxy(base:Player) {
     // You can only see upgrades of enemy units that are *currently visible*
     // So let's add a ratchet.
     val reportedLevel = base.getUpgradeLevel(upgrade.baseType)
-    val previousLevel = minUpgradeLevels(upgrade)
+    val previousLevel = maxUpgradeLevels(upgrade)
     val currentLevel  = Math.max(reportedLevel, previousLevel)
+    maxUpgradeLevels(upgrade) = currentLevel
     currentLevel
   }
   

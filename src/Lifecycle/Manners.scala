@@ -5,15 +5,16 @@ object Manners {
   def enabled: Boolean = With.configuration.enableChat
   
   def run() {
-    if (With.configuration.enableSurrendering
+    if (With.configuration.enableSurrenders
       && With.self.supplyUsed == 0
       && With.self.minerals < 50
       && With.units.enemy.exists(_.unitClass.isWorker)
       && With.units.enemy.exists(_.unitClass.isResourceDepot)) {
       surrender()
     }
-    if (With.configuration.enableSurrendering
+    if (With.configuration.enableSurrenders
       && With.performance.enablePerformanceStops
+      && With.performance.enablePerformanceSurrenders
       && With.performance.framesOver85 > 1000) {
       With.logger.error("Quitting due to performance failure")
       surrender()

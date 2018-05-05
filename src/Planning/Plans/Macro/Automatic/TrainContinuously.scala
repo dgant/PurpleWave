@@ -23,9 +23,7 @@ class TrainContinuously(
   
     val doubleEggMultiplier       = if (unitClass.isTwoUnitsInOneEgg) 2 else 1
     val unitsNow                  = currentCount
-    val unitsMaximum              = maximumTotal
-    val unitsMaximumDesirable     = maxDesirable
-    val unitsToAddCeiling         = Math.min(maximumTotal, maxDesirable) - unitsNow
+    val unitsToAddCeiling         = Math.max(0, Math.min(maximumTotal, maxDesirable) - unitsNow)
     val buildersSpawning          = if (unitClass.whatBuilds._1 == Zerg.Larva) With.units.countOurs(UnitMatchAnd(UnitMatchHatchery, UnitMatchComplete)) else 0
     val buildersExisting          = builders.toVector
     val buildersReserved          = buildersExisting.map(_.unitClass).distinct.map(With.scheduler.dumbPumps.consumed).sum
@@ -42,7 +40,7 @@ class TrainContinuously(
     val budgetedByGas             = if (gasPrice      <= 0) 400 else (gas      + (1.0 - buildersReadiness) * With.economy.ourIncomePerFrameGas      * unitClass.buildFrames) / gasPrice
     val budgeted                  = Math.ceil(Math.min(budgetedByMinerals, budgetedByGas))
     
-    val buildersToConsume         = Math.max(0, Vector(maximumConcurrently, builderOutputCap, budgeted, unitsMaximumDesirable / doubleEggMultiplier).min.toInt)
+    val buildersToConsume         = Math.max(0, Vector(maximumConcurrently, builderOutputCap, budgeted, unitsToAddCeiling / doubleEggMultiplier).min.toInt)
     val unitsToAdd                = buildersToConsume * doubleEggMultiplier
     val unitsToRequest            = unitsNow + unitsToAdd
     

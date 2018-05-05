@@ -2,6 +2,7 @@ package Micro.Actions.Combat.Decisionmaking
 
 import Lifecycle.With
 import Micro.Actions.Action
+import Planning.Composition.UnitMatchers.UnitMatchWorkers
 import Planning.Yolo
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -34,7 +35,7 @@ object FightOrFlight extends Action {
     decide(false, "Pacifist",   () => ! unit.agent.canFight)
     decide(false, "Disrupted",  () => unit.underDisruptionWeb && ! unit.flying)
     decide(false, "Swarmed",    () => unit.underDarkSwarm && !unit.unitClass.unaffectedByDarkSwarm && unit.matchups.targetsInRange.forall(t => !t.flying || t.underDarkSwarm))
-    decide(true,  "Workers",    () => unit.matchups.targets.exists(_.matchups.targetsInRange.exists(ally => ally.target.exists(_.zone == ally.zone)  && ally.gathering || ally.constructing)))
+    decide(true,  "Workers",    () => unit.matchups.allies.exists(ally => ally.is(UnitMatchWorkers) && ally.base.exists(_.owner.isUs) && ally.matchups.threats.exists(threat => unit.canAttack(threat) && threat.framesToGetInRange(ally) < Math.max(72, unit.framesToGetInRange(threat)))))
     decide(true,  "Anchors",    () => unit.matchups.allies.exists(ally =>
       ! ally.unitClass.isWorker
         && ally.canAttack

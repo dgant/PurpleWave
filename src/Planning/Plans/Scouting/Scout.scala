@@ -1,7 +1,7 @@
 package Planning.Plans.Scouting
 
 import Lifecycle.With
-import Mathematics.Points.{Pixel, SpecificPoints}
+import Mathematics.Points.SpecificPoints
 import Micro.Agency.Intention
 import Planning.Composition.Property
 import Planning.Composition.ResourceLocks.LockUnits
@@ -55,15 +55,14 @@ class Scout(scoutCount: Int = 1) extends Plan {
   
     val enemyStartBases = With.geography.startBases.filter(_.owner.isEnemy)
     var scoutsDesired: Int = 1
-    var scoutingDestinations: mutable.Queue[Pixel]  = mutable.Queue.empty
     
-    if (enemyStartBases.isEmpty) {
-      val unscoutedStartLocations = With.geography.startBases.filterNot(_.lastScoutedFrame > 0)
-      scoutsDesired = Math.max(1, Math.min(scoutCount, unscoutedStartLocations.size))
-      scoutingDestinations ++= With.intelligence.leastScoutedBases.filter( ! _.zone.island).map(_.townHallArea.midPixel)
-    }
-    else {
-      scoutingDestinations ++= enemyStartBases.map(_.townHallArea.midPixel)
+    val getNextScoutBase = () => {
+      if (enemyStartBases.isEmpty) {
+        With.intelligence.nextBaseToScout
+      }
+      else {
+        enemyStartBases.head
+      }
     }
     
     if (acquiredScouts.size > scoutsDesired) {
@@ -71,15 +70,15 @@ class Scout(scoutCount: Int = 1) extends Plan {
     }
     
     scouts.get.unitCounter.set(UnitCountExactly(scoutsDesired))
-    scouts.get.unitPreference.set(UnitPreferClose(scoutingDestinations.head))
+    scouts.get.unitPreference.set(UnitPreferClose(With.intelligence.leastScoutedBases.head.heart.pixelCenter))
     scouts.get.acquire(this)
     acquiredScouts = scouts.get.units
     
     val unassignedScouts = new mutable.ListBuffer[FriendlyUnitInfo]
     unassignedScouts ++= acquiredScouts
     
-    while (unassignedScouts.nonEmpty && scoutingDestinations.nonEmpty) {
-      val destination = scoutingDestinations.dequeue()
+    while (unassignedScouts.nonEmpty) {
+      val destination = With.intelligence.nextBaseToScout.heart.pixelCenter
       val scout = unassignedScouts.minBy(_.pixelDistanceTravelling(destination))
       unassignedScouts -= scout
       

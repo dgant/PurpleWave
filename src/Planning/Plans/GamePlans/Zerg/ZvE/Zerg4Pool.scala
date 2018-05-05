@@ -28,17 +28,13 @@ class Zerg4Pool extends Parallel {
           new UnitsAtLeast(2, Zerg.Larva)),
         GameTime(0, 10)()),
       new Aggression(99),
-      new Aggression(2.0)),
+      new Aggression(1.5)),
     
     new Do(() => {
       With.blackboard.gasTargetRatio = 0
       With.blackboard.gasLimitFloor = 0
       With.blackboard.gasLimitCeiling = 0
     }),
-    
-    new If(
-      new FivePool,
-      new BuildOrder(RequestAtLeast(5, Zerg.Drone))),
   
     new If(
       new And(
@@ -55,10 +51,9 @@ class Zerg4Pool extends Parallel {
       new And(
         new UnitsAtLeast(1, Zerg.SpawningPool),
         new UnitsAtLeast(4, Zerg.Drone),
-        new Or(
-          new FivePool,
-          new Latch(new MineralsAtLeast(126))),
-          new Scout)),
+        new Latch(new MineralsAtLeast(126))),
+      new Scout),
+    
     new ExtractorTrick,
     new TrainContinuously(Zerg.Zergling),
     

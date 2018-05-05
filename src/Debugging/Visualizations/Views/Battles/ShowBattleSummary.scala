@@ -24,7 +24,7 @@ object ShowBattleSummary extends View {
   
   override def renderScreen() {
     With.game.drawTextScreen(army0.bwapi, "Offense:")
-    With.game.drawTextScreen(army1.bwapi, "+" + With.battles.global.estimationAbstractOffense.costToEnemy.toInt)
+    With.game.drawTextScreen(army1.bwapi, "+" + With.battles.global.estimationAbstractOffense.costToEnemy.toInt + " x " + "%1.2f".format(With.blackboard.aggressionRatio))
     With.game.drawTextScreen(army2.bwapi, "-" + With.battles.global.estimationAbstractOffense.costToUs.toInt)
     localBattle.foreach(battle => drawEstimationReport(battle.estimationSimulationAttack))
     if (Yolo.active && With.frame / 24 % 2 == 0) {

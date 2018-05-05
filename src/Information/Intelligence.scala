@@ -21,6 +21,14 @@ class Intelligence {
   def leastScoutedBases: Iterable[Base] = leastScoutedBasesCache()
   def mostBaselikeEnemyTile: Tile = mostBaselikeEnemyTileCache()
   
+  private val nextBasesToScout = new Cache(() => new mutable.Queue[Base] ++ leastScoutedBases)
+  def nextBaseToScout: Base = {
+    val queue = nextBasesToScout()
+    if (queue.isEmpty) queue ++= leastScoutedBases
+    val output = queue.dequeue()
+    output
+  }
+  
   private val scoutTiles = new mutable.ListBuffer[Tile]
   private var lastScoutFrame = 0
   private var flyingScout = false
@@ -42,21 +50,27 @@ class Intelligence {
   
   private val leastScoutedBasesCache = new Cache(() => {
     lazy val enemyBaseHearts = With.geography.enemyBases.map(_.heart)
+    if (scoutTiles.isEmpty) {
+      scoutTiles.append(With.geography.home)
+    }
     With.geography.bases
       .toVector
       .filter( ! _.zone.island || flyingScout)
       .sortBy(base => {
-        val heart = base.heart.pixelCenter
-        val distanceFromEnemyBase = ByOption.min(enemyBaseHearts.map(_.groundPixels(heart))).getOrElse(1.0)
+        val heartMain = base.heart.pixelCenter
+        val heartNatural = base.natural.getOrElse(base).heart.pixelCenter
+        val hearts = Vector(heartMain, heartNatural)
+        val distanceFromEnemyBase = ByOption.min(enemyBaseHearts.map(_.groundPixels(heartMain))).getOrElse(1.0)
         val distanceFromScout =
-          if (scoutTiles.isEmpty)
-            1.0
-          else if (flyingScout)
-            scoutTiles.map(_.pixelCenter.pixelDistance(heart)).min
-          else
-            scoutTiles.map(_.groundPixels(heart)).min
+          if (flyingScout) {
+            hearts.map(heart => scoutTiles.map(_.pixelCenter.pixelDistance(heart)).min).sum
+          }
+          else {
+            hearts.map(heart => scoutTiles.map(_.groundPixels(heart)).min).sum
+          }
         val informationAge = 1.0 + With.framesSince(base.lastScoutedFrame)
-        - informationAge / distanceFromScout / distanceFromEnemyBase
+        val output = (distanceFromScout + distanceFromEnemyBase) / informationAge
+        output
       })
       .sortBy(base => ! (base.isStartLocation && base.lastScoutedFrame <= 0))
   })

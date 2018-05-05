@@ -1,7 +1,7 @@
 package Planning.Plans.Scouting
 
+import Information.Geography.Types.Base
 import Lifecycle.With
-import Mathematics.Points.Pixel
 import Micro.Agency.Intention
 import Planning.Composition.Property
 import Planning.Composition.ResourceLocks.LockUnits
@@ -37,14 +37,21 @@ class FindExpansions extends Plan {
   private def orderScout(scout: FriendlyUnitInfo) = {
     With.intelligence.highlightScout(scout)
     scout.agent.intend(this, new Intention {
-      toTravel = getNextScoutingPixel
+      toTravel = getNextScoutingBase.map(_.heart.pixelCenter)
       canCower = true
     })
   }
   
-  private def getNextScoutingPixel: Option[Pixel] =
-    With.intelligence.leastScoutedBases
-      .filter(base => base.owner.isNeutral && ( ! base.zone.island || With.strategy.isPlasma))
-      .map(_.townHallArea.midPixel)
-      .headOption
+  private def getNextScoutingBase: Option[Base] = {
+    def acceptable(base: Base) = {
+      base.owner.isNeutral && ( ! base.zone.island || With.strategy.isPlasma)
+    }
+    val baseFirst = With.intelligence.nextBaseToScout
+    var baseNext = baseFirst
+    do {
+      if (acceptable(baseNext)) return Some(baseNext)
+      baseNext = With.intelligence.nextBaseToScout
+    } while (baseNext != baseFirst)
+    None
+  }
 }

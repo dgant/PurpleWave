@@ -374,11 +374,11 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   
   def canDoAnything: Boolean = canDoAnythingCache()
   private val canDoAnythingCache = new Cache(() =>
-    aliveAndComplete  &&
-    ( ! unitClass.requiresPsi || powered) &&
-    ! stasised        && // These three checks along comprise 6% of our CPU usage. Yes, really.
-    ! maelstrommed    &&
-    ! lockedDown)
+    aliveAndComplete
+    && ( ! unitClass.requiresPsi || powered)
+    && ! stasised
+    && ! maelstrommed
+    && ! lockedDown)
   
   def canBeAttacked: Boolean = canBeAttackedCache()
   private val canBeAttackedCache = new Cache(() =>

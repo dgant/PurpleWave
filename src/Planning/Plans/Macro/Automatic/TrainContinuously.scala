@@ -20,30 +20,36 @@ class TrainContinuously(
   
   override def onUpdate() {
     if ( ! canBuild) return
-    
+  
+    val doubleEggMultiplier       = if (unitClass.isTwoUnitsInOneEgg) 2 else 1
     val unitsNow                  = currentCount
     val unitsMaximum              = maximumTotal
     val unitsMaximumDesirable     = maxDesirable
+    val unitsToAddCeiling         = Math.min(maximumTotal, maxDesirable) - unitsNow
     val buildersSpawning          = if (unitClass.whatBuilds._1 == Zerg.Larva) With.units.countOurs(UnitMatchAnd(UnitMatchHatchery, UnitMatchComplete)) else 0
     val buildersExisting          = builders.toVector
     val buildersReserved          = buildersExisting.map(_.unitClass).distinct.map(With.scheduler.dumbPumps.consumed).sum
     val buildersReadiness         = getBuilderReadiness(buildersExisting)
+    val buildersTotal             = buildersExisting.size + buildersSpawning
+    val buildersAllocatable       = Math.max(0, Math.min(buildersTotal * maximumConcurrentlyRatio, buildersTotal - buildersReserved))
+    val builderOutputCap          = Math.ceil(buildersReadiness * buildersAllocatable)
+    
     val minerals                  = With.self.minerals  // To improve: Measure existing expediture commitments
     val gas                       = With.self.gas       // To improve: Measure existing expediture commitments
     val mineralPrice              = unitClass.mineralPrice
     val gasPrice                  = unitClass.gasPrice
     val budgetedByMinerals        = if (mineralPrice  <= 0) 400 else (minerals + (1.0 - buildersReadiness) * With.economy.ourIncomePerFrameMinerals * unitClass.buildFrames) / mineralPrice
     val budgetedByGas             = if (gasPrice      <= 0) 400 else (gas      + (1.0 - buildersReadiness) * With.economy.ourIncomePerFrameGas      * unitClass.buildFrames) / gasPrice
-    val budgeted                  = Math.min(budgetedByMinerals, budgetedByGas)
-    val capacityMaximum           = ((buildersExisting.size + buildersSpawning) * maximumConcurrentlyRatio).toInt
-    val capacityFinal             = Math.max(0, Vector(maximumConcurrently, capacityMaximum, budgeted, buildersReadiness * Math.max(1, capacityMaximum - buildersReserved)).min).toInt
-    val quantityToAdd             = List(unitsMaximum, unitsMaximumDesirable, capacityFinal).min
-    val quantityToRequest         = List(unitsMaximum, unitsMaximumDesirable, capacityFinal + unitsNow).min
+    val budgeted                  = Math.ceil(Math.min(budgetedByMinerals, budgetedByGas))
+    
+    val buildersToConsume         = Math.max(0, Vector(maximumConcurrently, builderOutputCap, budgeted, unitsMaximumDesirable / doubleEggMultiplier).min.toInt)
+    val unitsToAdd                = buildersToConsume * doubleEggMultiplier
+    val unitsToRequest            = unitsNow + unitsToAdd
     
     (unitClass.buildUnitsBorrowed ++ unitClass.buildUnitsSpent).foreach(builderClass =>
-      With.scheduler.dumbPumps.consume(builderClass, quantityToAdd))
+      With.scheduler.dumbPumps.consume(builderClass, buildersToConsume))
         
-    With.scheduler.request(this, RequestAtLeast(quantityToRequest, unitClass))
+    With.scheduler.request(this, RequestAtLeast(unitsToRequest, unitClass))
   }
   
   private def getBuilderReadiness(builders: Vector[FriendlyUnitInfo]): Double = {
@@ -54,11 +60,11 @@ class TrainContinuously(
     output
   }
   
-  protected def canBuild: Boolean = {
-    unitClass.buildTechEnabling.forall(With.self.hasTech) &&
-    unitClass.buildUnitsEnabling.forall(unitClass => With.units.ours.exists(unit => unit.alive && unit.is(unitClass))) &&
-    unitClass.buildUnitsBorrowed.forall(unitClass => With.units.ours.exists(unit => unit.alive && unit.is(unitClass)))
-  }
+  protected def canBuild: Boolean = (
+    unitClass.buildTechEnabling.forall(With.self.hasTech)
+    && unitClass.buildUnitsEnabling.forall(unitClass => With.units.existsOurs(unitClass))
+    && unitClass.buildUnitsBorrowed.forall(unitClass => With.units.existsOurs(unitClass))
+  )
   
   protected def currentCount: Int = {
     // Should this just be unit.alive?

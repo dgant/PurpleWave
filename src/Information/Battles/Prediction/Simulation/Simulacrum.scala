@@ -20,7 +20,6 @@ class Simulacrum(
   
   val movementDelay     : Int     = if (realUnit.isEnemy || simulation.weAttack)  0   else realUnit.unitClass.framesToTurn(Math.PI) + 2 * realUnit.unitClass.accelerationFrames + With.configuration.retreatMovementDelay
   val speedMultiplier   : Double  = if (realUnit.isEnemy || realUnit.flying)      1.0 else Math.max(0.75, simulation.chokeMobility.getOrElse(realUnit.zone, 1.0))
-  val bonusDistance     : Double  = if (realUnit.isOurs  || realUnit.visible)     0.0 else 32.0 * Math.min(realUnit.mobility, 3)
   val bonusRange        : Double  = if (realUnit.isOurs  || ! realUnit.unitClass.isSiegeTank || ! simulation.weAttack) 0.0 else With.configuration.bonusTankRange
   val multiplierSplash  : Double  = MicroValue.maxSplashFactor(realUnit)
   
@@ -217,7 +216,7 @@ class Simulacrum(
       realUnit.pixelEndAt(pixel),
       target.realUnit.pixelStartAt(target.pixel),
       target.realUnit.pixelEndAt(target.pixel))
-    val output = actualDistance + target.bonusDistance - realUnit.pixelRangeAgainst(target.realUnit) - bonusRange
+    val output = actualDistance - realUnit.pixelRangeAgainst(target.realUnit) - bonusRange
     output
   }
   

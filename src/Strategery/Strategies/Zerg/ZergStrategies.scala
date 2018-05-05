@@ -60,6 +60,6 @@ object ProxyHatchZerglings extends ZergStrategy {
   override def enemyRaces: Iterable[Race] = Vector(Race.Unknown, Race.Terran)
 }
 
-object Zerg4PoolAllIn extends ZergStrategy {
+object Zerg4Pool extends ZergStrategy {
   override def gameplan: Option[Plan] = Some(new Zerg4Pool)
 }

@@ -19,7 +19,6 @@ class PvP3GateSpeedlots extends GameplanModeTemplate {
   override val activationCriteria : Plan      = new Employing(PvPOpen3GateSpeedlots)
   override val completionCriteria : Plan      = new MiningBasesAtLeast(2)
   override def defaultWorkerPlan  : Plan      = NoPlan()
-  override def emergencyPlans     : Seq[Plan] = Seq(new PvPIdeas.ReactToDarkTemplarEmergencies)
   override val aggression         : Double    = 1.2
   override val scoutAt            : Int       = 14
   override def defaultAttackPlan  : Plan =
@@ -33,8 +32,8 @@ class PvP3GateSpeedlots extends GameplanModeTemplate {
         initialAfter = new Attack))
   
   override def emergencyPlans: Seq[Plan] = Seq(
-    new PvPIdeas.ReactToCannonRush
-  )
+    new PvPIdeas.ReactToCannonRush,
+    new PvPIdeas.ReactToDarkTemplarEmergencies)
   
   override val buildOrder: Seq[BuildRequest] = Vector(
     // http://wiki.teamliquid.net/starcraft/3_Gate_Speedzeal_(vs._Protoss)

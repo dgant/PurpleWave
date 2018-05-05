@@ -32,7 +32,7 @@ class ChillOverlords extends Plan {
   
   private def chillOut(overlord: FriendlyUnitInfo) {
     val intent = new Intention
-    intent.toTravel = Some(ByOption.minBy(With.geography.bases.map(_.heart.pixelCenter))(overlord.pixelDistanceSquared).getOrElse(With.geography.home.pixelCenter))
+    intent.toTravel = Some(ByOption.minBy(With.geography.ourBases.map(_.heart.pixelCenter))(overlord.pixelDistanceSquared).getOrElse(With.geography.home.pixelCenter))
     intent.canCower = true
     overlord.agent.intend(this, intent)
   }

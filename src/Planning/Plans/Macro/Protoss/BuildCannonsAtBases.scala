@@ -19,7 +19,7 @@ class BuildCannonsAtBases(
     val zones = bases.map(_.zone).toSet.toArray
     
     if (zones.nonEmpty) {
-      if (With.units.ours.exists(_.is(Protoss.Forge))) {
+      if (With.units.existsOurs(Protoss.Forge)) {
         val cannonsRequired = zones.map(cannonZone).sum
         With.scheduler.request(this, RequestAnother(cannonsRequired, Protoss.PhotonCannon))
       }

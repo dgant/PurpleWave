@@ -16,7 +16,7 @@ class BuildMissileTurretsAtBases(initialCount: Int) extends Plan {
   override def onUpdate() {
     val bases = eligibleBases
     if (eligibleBases.nonEmpty) {
-      if (With.units.ours.exists(_.is(Terran.EngineeringBay))) {
+      if (With.units.existsOurs(Terran.EngineeringBay)) {
         eligibleBases.foreach(turretBase)
       }
       else {

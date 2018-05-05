@@ -5,7 +5,7 @@ import Strategery.Strategies._
 object ZergChoices {
   
   val all: Iterable[Strategy] = Vector(
-    Zerg4PoolAllIn,
+    Zerg4Pool,
     FivePoolProxySunkens,
     ProxyHatchZerglings,
     ProxyHatchHydras,

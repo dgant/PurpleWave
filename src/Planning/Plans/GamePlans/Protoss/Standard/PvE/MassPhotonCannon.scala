@@ -124,7 +124,7 @@ class MassPhotonCannon extends GameplanModeTemplate {
         new If(
           new Check(() =>
             pylonCount * 4 < cannonCount
-            && (cannonCount < 4 || With.units.ours.exists(_.is(Protoss.CyberneticsCore)))),
+            && (cannonCount < 4 || With.units.existsOurs(Protoss.CyberneticsCore))),
           new TrainContinuously(Protoss.Pylon, 200, 2)),
         new TrainContinuously(Protoss.PhotonCannon, 400, 6)),
       new Parallel(

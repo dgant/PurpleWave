@@ -25,7 +25,7 @@ class ResearchTech(tech: Tech) extends Plan {
     if (isComplete) return
   
     // Don't even stick a projected expenditure in the queue if we're this far out.
-    if ( ! With.units.ours.exists(_.is(techerClass))) return
+    if ( ! With.units.existsOurs(techerClass)) return
     
     currency.framesPreordered = Project.framesToUnits(techerClass)
     currency.acquire(this)

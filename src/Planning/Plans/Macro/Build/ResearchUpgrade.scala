@@ -28,7 +28,7 @@ class ResearchUpgrade(upgrade: Upgrade, level: Int) extends Plan {
     val requiredClasses = (upgrade.whatsRequired.get(level).toVector :+ upgraderClass).filterNot(_ == UnitClasses.None)
     
     // Don't even stick a projected expenditure in the queue if we're this far out.
-    if (requiredClasses.exists(c => ! With.units.ours.exists(_.is(c)))) return
+    if (requiredClasses.exists(c => ! With.units.existsOurs(c))) return
     
     currency.framesPreordered = requiredClasses.map(Project.framesToUnits(_)).max
     currency.acquire(this)

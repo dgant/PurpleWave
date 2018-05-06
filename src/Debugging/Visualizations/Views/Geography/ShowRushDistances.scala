@@ -13,7 +13,7 @@ object ShowRushDistances extends View {
   Andromeda: 4940 - 5404 - 6083
   Benzene: 6140
   Circuit Breakers: 4396 - 5098 - 5696
-  Destination:
+  Destination: 5216
   Empire of the Sun: 4211 - 4894 - 5600
   Fighting Spirit: 4563 - 5043 - 5776
   Heartbreak Ridge: 5066

@@ -51,8 +51,7 @@ object PvTIdeas {
       new And(new Employing(PvT13Nexus), new EnemyUnitsAtLeast(1, Terran.Marine), new UnitsAtMost(0, Protoss.CyberneticsCore, complete = true)),
       new Parallel(
         new TrainContinuously(Protoss.Zealot),
-        new Build(RequestAtLeast(2, Protoss.Gateway))))
-  )
+        new Build(RequestAtLeast(2, Protoss.Gateway)))))
   
   class TrainScouts extends If(
     new And(

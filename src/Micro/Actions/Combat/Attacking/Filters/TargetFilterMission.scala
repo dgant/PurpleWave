@@ -28,7 +28,7 @@ object TargetFilterMission extends TargetFilter {
     lazy val targetCatchable  = actor.topSpeed >= target.topSpeed || actor.inRangeToAttack(target) || targetBusy || alliesAssisting
     lazy val targetReachable  = target.visible || actor.flying || ! target.flying || With.grids.walkableTerrain.get(target.tileIncludingCenter)
     
-    val output = targetReachable && (targetCatchable || atOurWorkers) && (pillaging || arrived || inRange || engaged || isNearbyMine)
+    val output = targetReachable && (targetCatchable || atOurWorkers) // && (pillaging || arrived || inRange || engaged || isNearbyMine)
     
     output
   }

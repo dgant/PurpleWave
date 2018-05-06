@@ -18,7 +18,7 @@ object Bust extends Action {
   // Range-upgraded Dragoons just barely outrange a Bunker containing non-range-upgraded Marines.
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
-    unit.totalHealth >= unit.unitClass.maxHitPoints + 12
+    unit.totalHealth >= unit.unitClass.maxHitPoints + 12 // Don't take hull damage
     && With.enemies.exists(_.raceInitial == Race.Terran)
     && unit.agent.canFight
     && unit.canMove

@@ -3,7 +3,7 @@ package Micro.Actions.Basic
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Actions.Combat.Decisionmaking.{Disengage, Engage}
+import Micro.Actions.Combat.Decisionmaking.{Disengage, Engage, FightOrFlight}
 import Micro.Actions.Combat.Tactics.Potshot
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -25,7 +25,7 @@ object Gather extends Action {
     lazy val threatened   = unit.battle.isDefined && unit.matchups.framesOfSafety < combatWindow
     lazy val threatCloser = unit.matchups.threats.exists(_.pixelDistanceCenter(resource.pixelCenter) < unit.pixelDistanceCenter(resource.pixelCenter))
     lazy val atResource   = unit.pixelDistanceEdge(resource) < 32.0 * 4.0
-    lazy val beckoned     = unit.battle.isDefined && unit.matchups.targets.exists(target =>
+    lazy val beckoned     = unit.battle.isDefined  && unit.matchups.targets.exists(target =>
         ! target.unitClass.isWorker
         && With.framesSince(target.lastFrameStartingAttack) < combatWindow
         && unit.framesToGetInRange(target) < combatWindow
@@ -37,7 +37,11 @@ object Gather extends Action {
             .exists(_ < GameTime(0, 2)())))
     
     if (atResource && unit.totalHealth > 13 && beckoned) {
-      Engage.consider(unit)
+      FightOrFlight.delegate(unit)
+      // Unintuitive, but shouldEngage means we have sufficient army help
+      if (! unit.agent.shouldEngage) {
+        Engage.consider(unit)
+      }
     }
     if (transferring && threatened && unit.visibleToOpponents && threatCloser) {
       unit.agent.canFight = false

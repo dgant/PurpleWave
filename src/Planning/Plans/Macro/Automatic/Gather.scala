@@ -55,7 +55,7 @@ class Gather extends Plan {
     val activeBases = With.geography.ourBases.filter(_.townHall.exists(hall => hall.morphing || hall.remainingBuildFrames < GameTime(0, 10)()))
     calculateTransferPaths(activeBases)
     minerals  = activeBases.flatMap(_.minerals).toSet
-    gasses    = activeBases.flatMap(_.gas.flatMap(_.friendly).filter(u => u.gasLeft > 0 && u.complete)).toSet
+    gasses    = activeBases.flatMap(_.gas.flatMap(_.friendly).filter(u => u.complete)).toSet
     if (minerals.isEmpty) {
       minerals = With.geography.bases.flatMap(_.minerals).toSet
     }
@@ -91,7 +91,7 @@ class Gather extends Plan {
       }))
   }
   
-  private def isActiveGas(resource: UnitInfo): Boolean = resource.gasLeft > 0
+  private def isActiveGas(resource: UnitInfo): Boolean = resource.unitClass.isGas
   
   private def assign(worker: FriendlyUnitInfo, resource: UnitInfo) {
     unassign(worker)
@@ -122,13 +122,16 @@ class Gather extends Plan {
   }
   
   private def utility(worker: FriendlyUnitInfo, resource: UnitInfo): Double = {
+    val depleted = resource.gasLeft + resource.mineralsLeft < 100
     val need =
+      (if (depleted) 0.2 else 1.0) * (
       if (gasWorkersNow == gasWorkersMax)
         1.0
-      else if (resource.unitClass.isGas == (gasWorkersNow < gasWorkersMax))
+      else if (resource.unitClass.isGas == (gasWorkersNow < gasWorkersMax) && ! depleted)
         100.0
       else
         1.0
+      )
     
     val safety      = if ( ! worker.zone.bases.exists(_.owner.isUs) || transfersLegal.contains((worker.zone, resource.zone))) 100.0 else 1.0
     val continuity  = if (resourceByWorker.get(worker).contains(resource)) 10.0 else 1.0

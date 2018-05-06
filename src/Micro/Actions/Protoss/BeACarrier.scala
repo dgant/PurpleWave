@@ -80,23 +80,26 @@ object BeACarrier extends Action {
       units.map(u => if (u.flying) u.unitClass.supplyRequired else 0).sum
     }
     def shouldNeverHitUs(threat: UnitInfo): Boolean = {
-      if ( ! threat.canMove)                        return true
-      if (threat.flying)                            return false
-      if (threat.damageOnNextHitAgainst(unit) < 5)  return false
-      if (interceptorsTotal > 2 && threat.pixelDistanceEdge(unit) < unit.pixelRangeAgainst(threat) - 32.0) return false
+      // Never stand in range of static defense
+      if ( ! threat.canMove) return true
+      
+      // We can't always run from faster flying units
+      if (threat.flying && threat.topSpeed >= unit.topSpeed)  return false
+      
+      // We can't kite Goliaths, but we should only take shots from them when we actually want to fight
+      if (unit.agent.shouldEngage
+        && unit.interceptorCount > 2
+        && threat.pixelRangeAgainst(unit) > 32.0 * 6.0 ) return false
+      
       true
     }
     
     lazy val canLeave                 = airToAirSupply(unit.matchups.threats) < airToAirSupply(unit.matchups.alliesInclSelf)
     lazy val exitingLeash             = unit.matchups.targets.filter(_.matchups.framesToLive > 48).forall(_.pixelDistanceEdge(unit) > 32.0 * 7.0)
     lazy val inRangeNeedlessly        = unit.matchups.threatsInRange.exists(shouldNeverHitUs)
-    lazy val interceptorsTotal        = unit.interceptors.count(_.aliveAndComplete)
-    lazy val interceptorsFighting     = unit.interceptors.count(_.pixelCenter != unit.pixelCenter)
-    lazy val interceptorsAreShooting  = interceptorsFighting >= interceptorsTotal - 1
-    lazy val interceptorsNeedKick     = interceptorsTotal > 0 && (exitingLeash || ! interceptorsAreShooting)
     lazy val safeHere                 = unit.matchups.framesOfSafety >= 0 || unit.totalHealth > 150
     lazy val happyFightingHere        = unit.agent.shouldEngage && ! inRangeNeedlessly && safeHere
-    lazy val shouldFight              = safeHere || (interceptorsTotal > 1 && ! canLeave)
+    lazy val shouldFight              = happyFightingHere || (unit.interceptorCount > 1 && ! canLeave)
     
     if (shouldFight) {
       // Avoid changing targets (causes interceptors to not attack)

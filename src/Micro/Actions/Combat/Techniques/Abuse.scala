@@ -1,9 +1,8 @@
 package Micro.Actions.Combat.Techniques
 
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
-import Micro.Actions.Combat.Attacking.Target
 import Micro.Actions.Combat.Tactics.Potshot
-import Micro.Actions.Combat.Techniques.Common.Activators.WeightedMean
+import Micro.Actions.Combat.Techniques.Common.Activators.WeightedMin
 import Micro.Actions.Combat.Techniques.Common.{ActionTechnique, PotshotAsSoonAsPossible}
 import Micro.Actions.Commands.Attack
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -23,7 +22,7 @@ object Abuse extends ActionTechnique {
     && unit.matchups.threats.nonEmpty
   )
   
-  override val activator = new WeightedMean(this)
+  override val activator = new WeightedMin(this)
   
   override def applicabilityOther(unit: FriendlyUnitInfo, other: UnitInfo): Option[Double] = {
     if (other.isFriendly) return None

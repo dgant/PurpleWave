@@ -9,9 +9,9 @@ import Planning.Plans.Compound.{If, _}
 import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Predicates.Economy.{GasAtLeast, GasAtMost, MineralsAtLeast}
+import Planning.Plans.Predicates.Employing
 import Planning.Plans.Predicates.Milestones._
 import Planning.Plans.Predicates.Reactive.{EnemyBasesAtLeast, EnemyBio}
-import Planning.Plans.Predicates.{Employing, SafeToAttack}
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss.{PvT13Nexus, PvTEarly1015GateGoonDT, PvTEarly1GateStargateTemplar, PvTEarly4Gate}
 
@@ -35,18 +35,15 @@ object PvTIdeas {
     new AttackWithCarrierFleet)
   
   class AttackRespectingMines extends If(
-    new And(
-      new Or(
-        new SafeToAttack,
-        new UnitsAtLeast(10, UnitMatchWarriors, complete = true)),
-      new Or(
-        new Employing(PvTEarly1015GateGoonDT),
-        new Employing(PvTEarly4Gate),
-        new Employing(PvTEarly1GateStargateTemplar),
-        new IfOnMiningBases(3),
-        new Not(new EnemyHasShown(Terran.Vulture)),
-        new UnitsAtLeast(1, UnitMatchCustom((unit) => unit.is(Protoss.Observer) && With.framesSince(unit.frameDiscovered) > 24 * 10), complete = true),
-        new UnitsAtLeast(20, UnitMatchWarriors, complete = true))),
+    new Or(
+      new Employing(PvTEarly1015GateGoonDT),
+      new Employing(PvTEarly4Gate),
+      new Employing(PvTEarly1GateStargateTemplar),
+      new IfOnMiningBases(3),
+      new EnemyBio,
+      new Not(new EnemyHasShown(Terran.Vulture)),
+      new UnitsAtLeast(1, UnitMatchCustom((unit) => unit.is(Protoss.Observer) && With.framesSince(unit.frameDiscovered) > 24 * 10), complete = true),
+      new UnitsAtLeast(20, UnitMatchWarriors, complete = true)),
     new ConsiderAttacking)
   
   class EmergencyBuilds extends Parallel(
@@ -122,16 +119,15 @@ object PvTIdeas {
   class TrainHighTemplar extends If(
     new Or(
       new EnemyBio,
-      new Or(
-        new GasAtLeast(800),
-        new UnitsAtLeast(1, Protoss.ArbiterTribunal)),
-    new TrainContinuously(Protoss.HighTemplar, maximumConcurrently = 3)))
+      new And(
+        new Latch(new UnitsAtLeast(1, Protoss.ArbiterTribunal, complete = true)),
+        new GasAtLeast(500))),
+    new TrainContinuously(Protoss.HighTemplar, maximumConcurrently = 3))
     
   class TrainArmy extends Parallel(
     new TrainObservers,
     new TrainContinuously(Protoss.Arbiter),
-    new If(          new EnemyBio,  new TrainContinuously(Protoss.Reaver, 4)),
-    new If(new Latch(new EnemyBio), new TrainContinuously(Protoss.Reaver, 2)),
+    new If(new EnemyBio, new TrainContinuously(Protoss.Reaver, 4)),
     new TrainContinuously(Protoss.Carrier),
     new TrainDarkTemplar,
     new TrainHighTemplar,

@@ -1,15 +1,15 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvT
 
-import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
+import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
 import Planning.Composition.Latch
 import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Plans.Army.{ConsiderAttacking, DefendEntrance}
-import Planning.Plans.Compound.If
+import Planning.Plans.Compound.{If, Or}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.Macro.BuildOrders._
-import Planning.Plans.Macro.Expanding.BuildGasPumps
+import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Predicates.Employing
-import Planning.Plans.Predicates.Milestones.{EnemyHasShown, UnitsAtLeast}
+import Planning.Plans.Predicates.Milestones.{EnemyHasShown, MiningBasesAtLeast, UnitsAtLeast}
 import Planning.Plans.Scouting.ScoutOn
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss.PvTEarly1GateStargateTemplar
@@ -17,7 +17,7 @@ import Strategery.Strategies.Protoss.PvTEarly1GateStargateTemplar
 class PvTStove extends GameplanModeTemplate {
   
   override val activationCriteria   = new Employing(PvTEarly1GateStargateTemplar)
-  override val completionCriteria   = new Latch(new UnitsAtLeast(1, Protoss.ArbiterTribunal))
+  override val completionCriteria   = new Latch(new Or(new MiningBasesAtLeast(3), new UnitsAtLeast(1, Protoss.ArbiterTribunal)))
   override def priorityAttackPlan   = new PvTIdeas.PriorityAttacks
   override def priorityDefensePlan  = new If(new EnemyHasShown(Terran.Vulture), new DefendEntrance { defenders.get.unitMatcher.set(Protoss.Dragoon); defenders.get.unitCounter.set(UnitCountOne)})
   override def defaultScoutPlan     = new ScoutOn(Protoss.Pylon)
@@ -68,6 +68,9 @@ class PvTStove extends GameplanModeTemplate {
     RequestAtLeast(3,   Protoss.DarkTemplar))
   
   override def buildPlans = Vector(
+    new If(
+      new UnitsAtLeast(1, Protoss.HighTemplar),
+      new Build(RequestTech(Protoss.PsionicStorm))),
     new PvTIdeas.TrainArmy,
     new BuildGasPumps,
     new If(
@@ -80,5 +83,6 @@ class PvTStove extends GameplanModeTemplate {
       RequestAtLeast(2, Protoss.Gateway),
       RequestUpgrade(Protoss.DragoonRange),
       RequestAtLeast(1, Protoss.ArbiterTribunal),
-      RequestAtLeast(4, Protoss.Gateway)))
+      RequestAtLeast(6, Protoss.Gateway)),
+    new RequireMiningBases(3))
 }

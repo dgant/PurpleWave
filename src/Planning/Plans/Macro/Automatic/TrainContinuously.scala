@@ -30,7 +30,7 @@ class TrainContinuously(
     val buildersReadiness         = getBuilderReadiness(buildersExisting)
     val buildersTotal             = buildersExisting.size + buildersSpawning
     val buildersAllocatable       = Math.max(0, Math.min(buildersTotal * maximumConcurrentlyRatio, buildersTotal - buildersReserved))
-    val builderOutputCap          = Math.ceil(buildersReadiness * buildersAllocatable)
+    val builderOutputCap          = Math.max(1, Math.round(buildersReadiness * buildersAllocatable))
     
     val minerals                  = With.self.minerals  // To improve: Measure existing expediture commitments
     val gas                       = With.self.gas       // To improve: Measure existing expediture commitments
@@ -38,7 +38,7 @@ class TrainContinuously(
     val gasPrice                  = unitClass.gasPrice
     val budgetedByMinerals        = if (mineralPrice  <= 0) 400 else (minerals + (1.0 - buildersReadiness) * With.economy.ourIncomePerFrameMinerals * unitClass.buildFrames) / mineralPrice
     val budgetedByGas             = if (gasPrice      <= 0) 400 else (gas      + (1.0 - buildersReadiness) * With.economy.ourIncomePerFrameGas      * unitClass.buildFrames) / gasPrice
-    val budgeted                  = Math.ceil(Math.min(budgetedByMinerals, budgetedByGas))
+    val budgeted                  = Math.max(1, Math.round(Math.min(budgetedByMinerals, budgetedByGas)))
     
     val buildersToConsume         = Math.max(0, Vector(maximumConcurrently, builderOutputCap, budgeted, unitsToAddCeiling / doubleEggMultiplier).min.toInt)
     val unitsToAdd                = buildersToConsume * doubleEggMultiplier

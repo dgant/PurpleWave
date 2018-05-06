@@ -23,6 +23,6 @@ class EnemyBio extends Plan {
       + With.units.countEnemy(Terran.Medic)
     )
     
-    enemyBio > 2 * enemyMech
+    enemyBio > Math.max(8, 2 * enemyMech)
   }
 }

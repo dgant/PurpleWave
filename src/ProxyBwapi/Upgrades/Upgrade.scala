@@ -1,6 +1,6 @@
 package ProxyBwapi.Upgrades
 
-import ProxyBwapi.UnitClass.UnitClasses
+import ProxyBwapi.UnitClasses.UnitClasses
 import bwapi.UpgradeType
 
 case class Upgrade(val baseType: UpgradeType) {

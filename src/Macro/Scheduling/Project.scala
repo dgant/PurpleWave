@@ -2,7 +2,7 @@ package Macro.Scheduling
 
 import Lifecycle.With
 import ProxyBwapi.Techs.Tech
-import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.Upgrades.Upgrade
 
 object Project {

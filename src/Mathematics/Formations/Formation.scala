@@ -1,7 +1,7 @@
 package Mathematics.Formations
 
 import Mathematics.Points.Pixel
-import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 import scala.collection.mutable

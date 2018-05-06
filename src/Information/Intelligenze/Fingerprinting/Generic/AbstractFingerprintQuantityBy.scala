@@ -2,7 +2,7 @@ package Information.Intelligenze.Fingerprinting.Generic
 
 import Information.Intelligenze.Fingerprinting.Fingerprint
 import Lifecycle.With
-import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitClasses.UnitClass
 
 abstract class AbstractFingerprintQuantityBy(
   unitClass : UnitClass,

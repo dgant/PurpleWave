@@ -1,7 +1,7 @@
 package Macro.Decisions
 
 import ProxyBwapi.Races.Protoss
-import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitClasses.UnitClass
 
 object DesireScales {
   

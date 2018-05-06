@@ -8,7 +8,7 @@ import Planning.Composition.ResourceLocks.{LockCurrencyForUnit, LockUnits}
 import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Composition.UnitMatchers.{UnitMatchAnd, UnitMatcher}
 import Planning.Plan
-import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.UnitInfo
 
 class BuildAddon(val addonClass: UnitClass) extends Plan {

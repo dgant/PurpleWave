@@ -2,7 +2,7 @@ package Planning.Plans.Macro.Automatic
 
 import Lifecycle.With
 import Planning.Composition.UnitMatchers.UnitMatcher
-import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitClasses.UnitClass
 
 class TrainMatchingRatio(
   unitClass     : UnitClass,

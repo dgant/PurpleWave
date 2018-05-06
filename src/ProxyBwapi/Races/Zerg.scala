@@ -1,7 +1,7 @@
 package ProxyBwapi.Races
 
 import ProxyBwapi.Techs.Techs
-import ProxyBwapi.UnitClass.UnitClasses
+import ProxyBwapi.UnitClasses.UnitClasses
 import ProxyBwapi.Upgrades.Upgrades
 import bwapi.{TechType, UnitType, UpgradeType}
 

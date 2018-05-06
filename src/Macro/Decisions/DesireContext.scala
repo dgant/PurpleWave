@@ -1,7 +1,7 @@
 package Macro.Decisions
 
 import Lifecycle.With
-import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.UnitInfo
 import Strategery.Strategies.Strategy
 

@@ -2,7 +2,7 @@ package ProxyBwapi.UnitInfo
 
 import Mathematics.Points.{Pixel, Tile}
 import ProxyBwapi.Players.PlayerInfo
-import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitClasses.UnitClass
 import bwapi.UnitCommand
 
 abstract class UnitProxy(var baseUnit: bwapi.Unit, val id: Int) {

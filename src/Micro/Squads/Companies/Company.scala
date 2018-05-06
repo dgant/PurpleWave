@@ -1,6 +1,6 @@
 package Micro.Squads.Companies
 
-import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 trait Company {

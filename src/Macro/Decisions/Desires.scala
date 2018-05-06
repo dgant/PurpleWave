@@ -3,7 +3,7 @@ package Macro.Decisions
 import Lifecycle.With
 import Mathematics.PurpleMath
 import ProxyBwapi.Races.Protoss
-import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitClasses.UnitClass
 import bwapi.Race
 
 import scala.collection.mutable

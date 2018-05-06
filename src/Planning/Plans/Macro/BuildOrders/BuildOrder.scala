@@ -4,7 +4,7 @@ import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, RequestAtLeast}
 import Planning.Composition.Property
 import Planning.Plan
-import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitClasses.UnitClass
 
 import scala.collection.mutable
 

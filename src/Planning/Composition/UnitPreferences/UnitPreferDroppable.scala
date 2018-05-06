@@ -1,6 +1,6 @@
 package Planning.Composition.UnitPreferences
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
-import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object UnitPreferDroppable extends UnitPreference {

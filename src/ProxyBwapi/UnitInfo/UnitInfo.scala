@@ -15,7 +15,7 @@ import Performance.Cache
 import Planning.Composition.UnitMatchers.UnitMatcher
 import ProxyBwapi.Engine.Damage
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
-import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitClasses.UnitClass
 import bwapi._
 
 import scala.collection.mutable

@@ -2,7 +2,7 @@ package Micro.Squads.Goals
 
 import Micro.Squads.Squad
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
-import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitClasses.UnitClass
 
 trait SquadGoal {
   

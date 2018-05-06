@@ -6,7 +6,7 @@ import Macro.Architecture.Heuristics.{PlacementProfile, PlacementProfiles}
 import Mathematics.Points.{Tile, TileRectangle}
 import Planning.Plan
 import ProxyBwapi.Races.Protoss
-import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitClasses.UnitClass
 
 class Blueprint(
   val proposer            : Plan,

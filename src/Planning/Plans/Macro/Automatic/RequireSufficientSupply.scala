@@ -3,7 +3,7 @@ package Planning.Plans.Macro.Automatic
 import Lifecycle.With
 import Macro.BuildRequests.RequestAtLeast
 import Planning.Plan
-import ProxyBwapi.UnitClass.UnitClasses
+import ProxyBwapi.UnitClasses.UnitClasses
 
 class RequireSufficientSupply extends Plan {
   

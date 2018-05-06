@@ -5,7 +5,7 @@ import Macro.BuildRequests.RequestAtLeast
 import Planning.Composition.UnitMatchers._
 import Planning.Plan
 import ProxyBwapi.Races.{Terran, Zerg}
-import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
 

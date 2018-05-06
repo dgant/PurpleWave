@@ -10,7 +10,7 @@ import Planning.Composition.ResourceLocks.{LockCurrencyForUnit, LockUnits}
 import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Composition.UnitPreferences.UnitPreferCloseAndNotMining
 import Planning.Plan
-import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 class BuildBuilding(val buildingClass: UnitClass) extends Plan {

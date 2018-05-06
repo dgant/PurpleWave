@@ -1,7 +1,7 @@
 package Macro.Buildables
 
 import ProxyBwapi.Techs.Tech
-import ProxyBwapi.UnitClass.UnitClasses
+import ProxyBwapi.UnitClasses.UnitClasses
 
 case class BuildableTech(tech: Tech) extends Buildable {
   

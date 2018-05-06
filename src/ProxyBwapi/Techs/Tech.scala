@@ -1,6 +1,6 @@
 package ProxyBwapi.Techs
 
-import ProxyBwapi.UnitClass.UnitClasses
+import ProxyBwapi.UnitClasses.UnitClasses
 import bwapi.TechType
 
 case class Tech(val baseType:TechType) {

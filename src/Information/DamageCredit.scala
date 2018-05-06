@@ -3,7 +3,7 @@ package Information
 import Lifecycle.With
 import Micro.Decisions.MicroValue
 import ProxyBwapi.Players.{PlayerInfo, Players}
-import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.UnitInfo
 
 import scala.collection.mutable

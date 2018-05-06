@@ -14,7 +14,7 @@ import Planning.Plans.Predicates.Milestones.{EnemyHasShownCloakedThreat, UnitsAt
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Predicates.Economy.GasAtLeast
 import ProxyBwapi.Races.Terran
-import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitClasses.UnitClass
 
 class TerranFFAMech extends GameplanModeTemplate {
   

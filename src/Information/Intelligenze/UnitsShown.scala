@@ -2,7 +2,7 @@ package Information.Intelligenze
 
 import Lifecycle.With
 import ProxyBwapi.Players.{PlayerInfo, Players}
-import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
+import ProxyBwapi.UnitClasses.{UnitClass, UnitClasses}
 
 import scala.collection.mutable
 

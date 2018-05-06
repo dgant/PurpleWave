@@ -6,7 +6,7 @@ import Mathematics.PurpleMath
 import Micro.Actions.Action
 import Micro.Heuristics.Spells.{TargetAOE, TargetSingle}
 import ProxyBwapi.Techs.Tech
-import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 abstract class TargetedSpell extends Action {

@@ -1,6 +1,6 @@
 package Macro.Scheduling.SmartQueue
 
-import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitClasses.UnitClass
 
 class SmartQueueEventBirthUnit(frame: Int, unitClass: UnitClass) extends SmartQueueEvent(frame) {
   override def apply(queueState: SmartQueueState): Unit = {

@@ -1,7 +1,7 @@
 package Macro.Buildables
 
 import ProxyBwapi.Techs.Tech
-import ProxyBwapi.UnitClass._
+import ProxyBwapi.UnitClasses._
 import ProxyBwapi.Upgrades.Upgrade
 
 abstract class Buildable {

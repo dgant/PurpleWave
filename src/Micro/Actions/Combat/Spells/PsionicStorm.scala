@@ -5,7 +5,7 @@ import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Tech
-import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object PsionicStorm extends TargetedSpell {

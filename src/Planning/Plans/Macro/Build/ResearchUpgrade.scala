@@ -7,7 +7,7 @@ import Planning.Composition.ResourceLocks._
 import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Composition.UnitPreferences.UnitPreferIdle
 import Planning.Plan
-import ProxyBwapi.UnitClass.UnitClasses
+import ProxyBwapi.UnitClasses.UnitClasses
 import ProxyBwapi.Upgrades.Upgrade
 
 class ResearchUpgrade(upgrade: Upgrade, level: Int) extends Plan {

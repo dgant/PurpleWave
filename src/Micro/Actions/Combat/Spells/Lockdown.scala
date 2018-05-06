@@ -2,7 +2,7 @@ package Micro.Actions.Combat.Spells
 
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.Techs.Tech
-import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo._
 import Utilities.ByOption
 

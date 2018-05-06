@@ -1,7 +1,7 @@
 package Planning.Plans.Macro.Automatic
 
 import Lifecycle.With
-import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitClasses.UnitClass
 
 class AddAddons(unitClass: UnitClass, maximum: Int = Int.MaxValue) extends TrainContinuously(unitClass, maximum) {
   

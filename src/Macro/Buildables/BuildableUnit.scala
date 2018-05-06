@@ -1,6 +1,6 @@
 package Macro.Buildables
 
-import ProxyBwapi.UnitClass._
+import ProxyBwapi.UnitClasses._
 
 case class BuildableUnit(val unit: UnitClass) extends Buildable {
   

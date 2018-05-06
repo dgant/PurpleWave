@@ -1,6 +1,6 @@
 package Macro.Buildables
 
-import ProxyBwapi.UnitClass.UnitClasses
+import ProxyBwapi.UnitClasses.UnitClasses
 import ProxyBwapi.Upgrades.Upgrade
 
 case class BuildableUpgrade(upgrade:Upgrade, level:Int=1) extends Buildable {

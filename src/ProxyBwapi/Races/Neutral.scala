@@ -1,6 +1,6 @@
 package ProxyBwapi.Races
 
-import ProxyBwapi.UnitClass.UnitClasses
+import ProxyBwapi.UnitClasses.UnitClasses
 import bwapi.UnitType
 
 object Neutral {

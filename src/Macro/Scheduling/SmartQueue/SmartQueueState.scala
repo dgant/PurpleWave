@@ -5,7 +5,7 @@ import Macro.BuildRequests.BuildRequest
 import Macro.Buildables.{Buildable, BuildableUnit}
 import Mathematics.PurpleMath
 import ProxyBwapi.Techs.{Tech, Techs}
-import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
 import Utilities.CountMap
 

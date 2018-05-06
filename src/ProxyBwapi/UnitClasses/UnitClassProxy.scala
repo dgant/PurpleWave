@@ -1,4 +1,4 @@
-package ProxyBwapi.UnitClass
+package ProxyBwapi.UnitClasses
 
 import Mathematics.Points.Tile
 import ProxyBwapi.Engine.{Damage, Size}

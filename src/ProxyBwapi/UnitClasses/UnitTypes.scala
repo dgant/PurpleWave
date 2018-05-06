@@ -1,4 +1,4 @@
-package ProxyBwapi.UnitClass
+package ProxyBwapi.UnitClasses
 
 import bwapi.UnitType
 

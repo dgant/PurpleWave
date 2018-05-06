@@ -10,7 +10,7 @@ import Micro.Heuristics.Targeting.TargetingProfile
 import Performance.Cache
 import Planning.Plan
 import ProxyBwapi.Techs.Tech
-import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import ProxyBwapi.Upgrades.Upgrade
 import bwapi.Color

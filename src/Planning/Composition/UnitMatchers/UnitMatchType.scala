@@ -1,6 +1,6 @@
 package Planning.Composition.UnitMatchers
 
-import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.UnitInfo
 
 case class UnitMatchType(unitClass: UnitClass) extends UnitMatcher {

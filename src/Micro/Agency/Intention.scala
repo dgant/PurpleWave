@@ -2,7 +2,7 @@ package Micro.Agency
 
 import Mathematics.Points.{Pixel, Tile}
 import ProxyBwapi.Techs.Tech
-import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.UnitInfo
 import ProxyBwapi.Upgrades.Upgrade
 

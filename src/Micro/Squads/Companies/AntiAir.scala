@@ -1,7 +1,7 @@
 package Micro.Squads.Companies
 
 import Micro.Squads.Squad
-import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitClasses.UnitClass
 
 class AntiAir(squad: Squad) extends Company {
   

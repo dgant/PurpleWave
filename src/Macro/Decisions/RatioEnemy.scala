@@ -1,6 +1,6 @@
 package Macro.Decisions
 
-import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitClasses.UnitClass
 
 case class RatioEnemy(
   unit      : UnitClass,

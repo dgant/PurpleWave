@@ -3,7 +3,7 @@ package Micro.Actions.Combat.Spells
 import Lifecycle.With
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.Techs.Tech
-import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object DefensiveMatrix extends TargetedSpell {

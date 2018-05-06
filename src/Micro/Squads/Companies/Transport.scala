@@ -2,7 +2,7 @@ package Micro.Squads.Companies
 
 import Micro.Squads.Squad
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
-import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitClasses.UnitClass
 
 class Transport(squad: Squad) extends Company {
   

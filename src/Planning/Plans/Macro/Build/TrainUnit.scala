@@ -12,7 +12,7 @@ import Planning.Composition.UnitMatchers._
 import Planning.Composition.UnitPreferences.{UnitPreferIdle, UnitPreference}
 import Planning.Plan
 import ProxyBwapi.Races.Terran
-import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 class TrainUnit(val traineeClass: UnitClass) extends Plan {

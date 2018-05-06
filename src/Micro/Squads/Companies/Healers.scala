@@ -2,7 +2,7 @@ package Micro.Squads.Companies
 
 import Micro.Squads.Squad
 import ProxyBwapi.Races.Terran
-import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitClasses.UnitClass
 
 class Healers(squad: Squad) extends Company {
   

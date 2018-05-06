@@ -3,7 +3,7 @@ package Micro.Actions.Combat.Spells
 import Micro.Decisions.MicroValue
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.Techs.Tech
-import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo._
 
 object Yamato extends TargetedSpell {

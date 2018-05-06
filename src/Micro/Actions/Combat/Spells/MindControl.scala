@@ -2,7 +2,7 @@ package Micro.Actions.Combat.Spells
 
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.Techs.Tech
-import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.UnitInfo
 
 object MindControl extends TargetedSpell {

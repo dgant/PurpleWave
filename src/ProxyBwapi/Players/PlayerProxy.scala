@@ -4,7 +4,7 @@ import Lifecycle.With
 import Mathematics.Points.Tile
 import Performance.Cache
 import ProxyBwapi.Techs.Tech
-import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
+import ProxyBwapi.UnitClasses.{UnitClass, UnitClasses}
 import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
 import bwapi.{Player, Race, Unit}
 

@@ -1,6 +1,6 @@
 package Planning.Composition.ResourceLocks
 
-import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitClasses.UnitClass
 
 class LockCurrencyForUnit(unitClass: UnitClass) extends LockCurrency {
   

@@ -1,6 +1,6 @@
 package Macro.Scheduling.DumbQueue
 
-import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitClasses.UnitClass
 import Utilities.CountMap
 
 class DumbPumps {

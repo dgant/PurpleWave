@@ -7,7 +7,7 @@ import Macro.Architecture.Heuristics.{PlacementProfile, PlacementProfiles}
 import Macro.BuildRequests.RequestAnother
 import Planning.Plan
 import ProxyBwapi.Races.Zerg
-import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitClasses.UnitClass
 
 class BuildZergStaticDefenseAtBases(
   towerClass: UnitClass,

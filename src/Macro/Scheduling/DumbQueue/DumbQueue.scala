@@ -6,7 +6,7 @@ import Macro.Buildables.Buildable
 import Performance.Cache
 import Planning.Plan
 import ProxyBwapi.Races.{Terran, Zerg}
-import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitClasses.UnitClass
 import Utilities.{CountMap, CountMapper}
 
 import scala.collection.mutable

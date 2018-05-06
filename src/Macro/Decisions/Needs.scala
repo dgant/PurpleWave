@@ -1,7 +1,7 @@
 package Macro.Decisions
 
 import Lifecycle.With
-import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitClasses.UnitClass
 import Utilities.CountMap
 
 import scala.collection.mutable

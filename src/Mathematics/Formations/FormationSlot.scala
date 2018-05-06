@@ -2,7 +2,7 @@ package Mathematics.Formations
 
 import Mathematics.Points.Pixel
 import ProxyBwapi.Races.Terran
-import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.UnitInfo
 
 class FormationSlot(unit: UnitInfo) {

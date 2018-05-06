@@ -1,6 +1,6 @@
 package Information.Intelligenze.Fingerprinting.Generic
 
-import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitClasses.UnitClass
 
 class FingerprintIncompleteBy(
   unitClass : UnitClass,

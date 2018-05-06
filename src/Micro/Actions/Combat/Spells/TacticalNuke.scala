@@ -4,7 +4,7 @@ import Lifecycle.With
 import Planning.Composition.UnitMatchers.{UnitMatchAnd, UnitMatchComplete}
 import ProxyBwapi.Races.{Terran, Zerg}
 import ProxyBwapi.Techs.Tech
-import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object TacticalNuke extends TargetedSpell {

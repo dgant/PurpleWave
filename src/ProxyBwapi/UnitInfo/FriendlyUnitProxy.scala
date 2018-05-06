@@ -5,7 +5,7 @@ import Mathematics.Points.{Pixel, Tile}
 import Performance.Cache
 import ProxyBwapi.Players.{PlayerInfo, Players}
 import ProxyBwapi.Races.Protoss
-import ProxyBwapi.UnitClass.{UnitClass, UnitClasses}
+import ProxyBwapi.UnitClasses.{UnitClass, UnitClasses}
 import bwapi._
 
 import scala.collection.JavaConverters._

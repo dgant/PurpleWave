@@ -4,7 +4,7 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.BuildRequests.RequestAtLeast
 import Planning.Plan
-import ProxyBwapi.UnitClass.UnitClass
+import ProxyBwapi.UnitClasses.UnitClass
 
 class BuildGasPumps(quantity: Int = Int.MaxValue, pumpType: UnitClass = With.self.gasClass) extends Plan {
   

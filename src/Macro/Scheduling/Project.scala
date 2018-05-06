@@ -26,12 +26,12 @@ object Project {
     }
     
     // Are we building what we need already?
-    val incomplete = unitsOfClass.filterNot(_.complete).toVector.sortBy(_.framesBeforeBecomingComplete)
+    val incomplete = unitsOfClass.filterNot(_.complete).toVector.sortBy(_.remainingCompletionFrames)
     if (incomplete.size >= shortfall) {
       return incomplete
         .take(shortfall)
         .last
-        .framesBeforeBecomingComplete
+        .remainingCompletionFrames
     }
     
     // Do we need to build other units to build this?

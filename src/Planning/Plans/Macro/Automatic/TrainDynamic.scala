@@ -9,7 +9,7 @@ import ProxyBwapi.UnitClass.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
 
-class TrainContinuously(
+class TrainDynamic(
   unitClass                 : UnitClass,
   maximumTotal              : Int = Int.MaxValue,
   maximumConcurrently       : Int = Int.MaxValue,

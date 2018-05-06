@@ -4,14 +4,16 @@ import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
 import Planning.Composition.Latch
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
-import Planning.Plans.Compound.{Or, Parallel, _}
+import Planning.Plans.Compound.{And, Or, Parallel, _}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
+import Planning.Plans.GamePlans.Protoss.Standard.PvT.PvTIdeas.TrainMinimumDragoons
 import Planning.Plans.Macro.Automatic.TrainWorkersContinuously
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.BuildCannonsAtExpansions
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
+import Planning.Plans.Predicates.Economy.MineralsAtLeast
 import Planning.Plans.Predicates.Milestones._
 import Planning.Plans.Predicates.Reactive.{EnemyBasesAtLeast, EnemyBio}
 import Planning.Plans.Predicates.{Employing, Never, SafeAtHome, SafeToAttack}
@@ -51,11 +53,18 @@ class PvTBasic extends GameplanModeTemplate {
     new EnemyUnitsAtLeast(2, Terran.Vulture),
     new EnemyUnitsAtLeast(2, Terran.Factory))
   
+  class PreparedForBio extends Latch(
+    new Or(
+      new UnitsAtLeast(1, Protoss.Reaver),
+      new TechComplete(Protoss.PsionicStorm)))
+  
   class ReadyForThirdBase extends And(
     new Or(
       new EmployingThreeBase,
+      new And(new EnemyBio, new PreparedForBio),
       new Latch(new UnitsAtLeast(1, Protoss.Arbiter, complete = true)),
-      new Latch(new UnitsAtLeast(4, Protoss.Carrier))),
+      new Latch(new UnitsAtLeast(4, Protoss.Carrier)),
+      new MineralsAtLeast(1000)),
     new Or(
       new EnemyBasesAtLeast(2),
       new And(
@@ -69,6 +78,7 @@ class PvTBasic extends GameplanModeTemplate {
     new ReadyForThirdBase,
     new SafeToAttack,
     new Or(
+      new And(new EnemyBio, new PreparedForBio),
       new Latch(new UnitsAtLeast(6, Protoss.Carrier, complete = true)),
       new Latch(new UnitsAtLeast(3, Protoss.Arbiter, complete = true))))
   
@@ -99,9 +109,10 @@ class PvTBasic extends GameplanModeTemplate {
       new Parallel(
         new If(
           new UnitsAtLeast(2, Protoss.CyberneticsCore),
-          new Parallel(
-            new UpgradeContinuously(Protoss.AirArmor),
-            new UpgradeContinuously(Protoss.AirDamage)),
+          new FlipIf(
+            new EnemyBio,
+            new UpgradeContinuously(Protoss.AirDamage),
+            new UpgradeContinuously(Protoss.AirArmor)),
           new If(
             new And(
               new Not(new UpgradeComplete(Protoss.AirArmor, 3)),
@@ -121,9 +132,25 @@ class PvTBasic extends GameplanModeTemplate {
     new If(
       new UnitsAtLeast(4, Protoss.Zealot),
       new UpgradeContinuously(Protoss.ZealotSpeed)),
+    
+    // Double-spin, or prioritize armor vs. bio
     new If(
       new UnitsAtLeast(8, UnitMatchWarriors),
-      new UpgradeContinuously(Protoss.GroundDamage)))
+      new If(
+        new UnitsAtLeast(2, Protoss.Forge),
+        new FlipIf(
+          new EnemyBio,
+          new UpgradeContinuously(Protoss.GroundDamage),
+          new UpgradeContinuously(Protoss.GroundArmor)),
+        new If(
+          new And(
+            new Not(new UpgradeComplete(Protoss.GroundArmor, 3)),
+            new Or(
+              new UpgradeComplete(Protoss.GroundDamage, 3),
+              new EnemyBio)),
+          new UpgradeContinuously(Protoss.GroundArmor),
+          new UpgradeContinuously(Protoss.GroundDamage))))
+  )
   
   class LateGameTech extends Parallel(
     new BuildGasPumps,
@@ -145,10 +172,16 @@ class PvTBasic extends GameplanModeTemplate {
       new Parallel(
         new Build(
           RequestAtLeast(1, Protoss.CitadelOfAdun),
-          RequestAtLeast(1, Protoss.TemplarArchives),
-          RequestAtLeast(1, Protoss.Stargate),
-          RequestAtLeast(4, Protoss.Gateway),
-          RequestAtLeast(1, Protoss.ArbiterTribunal)))))
+          RequestAtLeast(1, Protoss.TemplarArchives)),
+        new If(
+          new Not(new EnemyBio),
+          new Build(
+            RequestAtLeast(1, Protoss.Stargate),
+            RequestAtLeast(3, Protoss.Gateway),
+            RequestAtLeast(1, Protoss.ArbiterTribunal)),
+          new Build(
+            RequestAtLeast(3, Protoss.Gateway),
+            RequestAtLeast(2, Protoss.Forge))))))
   
   override val buildPlans = Vector(
     
@@ -169,6 +202,7 @@ class PvTBasic extends GameplanModeTemplate {
         new PvTIdeas.TrainArmy,
         new ObserverTech),
       new Parallel(
+        new TrainMinimumDragoons,
         new ObserverTech,
         new LateGameTech)),
     

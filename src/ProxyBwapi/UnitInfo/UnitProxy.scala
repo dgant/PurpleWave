@@ -118,7 +118,7 @@ abstract class UnitProxy(var baseUnit: bwapi.Unit, val id: Int) {
   // Statuses //
   //////////////
 
-  def remainingBuildFrames: Int
+  def remainingCompletionFrames: Int
   def remainingUpgradeFrames: Int
   def remainingTechFrames: Int
   

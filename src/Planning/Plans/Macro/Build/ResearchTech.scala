@@ -5,6 +5,7 @@ import Macro.Scheduling.Project
 import Micro.Agency.Intention
 import Planning.Composition.ResourceLocks.{LockCurrencyForTech, LockUnits}
 import Planning.Composition.UnitCounters.UnitCountOne
+import Planning.Composition.UnitPreferences.UnitPreferIdle
 import Planning.Plan
 import ProxyBwapi.Techs.Tech
 
@@ -15,6 +16,7 @@ class ResearchTech(tech: Tech) extends Plan {
   val techers = new LockUnits {
     unitCounter.set(UnitCountOne)
     unitMatcher.set(techerClass)
+    unitPreference.set(UnitPreferIdle)
   }
   
   description.set("Tech " + tech)

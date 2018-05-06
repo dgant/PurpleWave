@@ -28,7 +28,7 @@ class DefendAgainstProxy extends Plan {
       return
     }
     
-    val proxies = getProxies.sortBy(_.totalHealth).sortBy(_.remainingBuildFrames)
+    val proxies = getProxies.sortBy(_.totalHealth).sortBy(_.remainingCompletionFrames)
     val squad = new Squad(this)
     
     if (proxies.isEmpty) return

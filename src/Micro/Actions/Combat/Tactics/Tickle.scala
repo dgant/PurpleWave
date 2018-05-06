@@ -114,7 +114,7 @@ object Tickle extends Action {
       val staticDefense = unit.matchups.targets.filter(u => u.unitClass.isBuilding && u.unitClass.rawCanAttack)
       if (staticDefense.nonEmpty) {
         unit.agent.toAttack = staticDefense
-          .sortBy(_.remainingBuildFrames)
+          .sortBy(_.remainingCompletionFrames)
           .sortBy(_.totalHealth)
           .headOption
         Attack.delegate(unit)

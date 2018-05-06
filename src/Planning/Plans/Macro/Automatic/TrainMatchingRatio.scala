@@ -1,7 +1,7 @@
 package Planning.Plans.Macro.Automatic
 
 import Lifecycle.With
-import Planning.Composition.UnitMatchers.{UnitMatchAlive, UnitMatchAnd, UnitMatcher}
+import Planning.Composition.UnitMatchers.UnitMatcher
 import ProxyBwapi.UnitClass.UnitClass
 
 class TrainMatchingRatio(
@@ -19,5 +19,5 @@ class TrainMatchingRatio(
 }
 
 case class MatchingRatio (enemyMatcher: UnitMatcher,  ratio: Double) {
-  def quantity: Double = With.units.countEnemy(UnitMatchAnd(UnitMatchAlive, enemyMatcher)) * ratio
+  def quantity: Double = With.units.countEnemy(enemyMatcher) * ratio
 }

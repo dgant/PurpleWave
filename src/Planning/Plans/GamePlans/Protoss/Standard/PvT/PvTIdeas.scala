@@ -2,11 +2,10 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvT
 
 import Lifecycle.With
 import Macro.BuildRequests.RequestAtLeast
-import Planning.Composition.Latch
 import Planning.Composition.UnitMatchers.{UnitMatchCustom, UnitMatchOr, UnitMatchWarriors}
 import Planning.Plans.Army.{Attack, ConsiderAttacking}
 import Planning.Plans.Compound.{If, _}
-import Planning.Plans.Macro.Automatic.TrainContinuously
+import Planning.Plans.Macro.Automatic.{MatchingRatio, TrainContinuously, TrainMatchingRatio}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Predicates.Economy.{GasAtLeast, GasAtMost, MineralsAtLeast}
 import Planning.Plans.Predicates.Employing
@@ -53,6 +52,44 @@ object PvTIdeas {
         new TrainContinuously(Protoss.Zealot),
         new Build(RequestAtLeast(2, Protoss.Gateway)))))
   
+  class TrainMinimumDragoons extends TrainMatchingRatio(
+    Protoss.Dragoon, 1, 20,
+    Seq(
+      MatchingRatio(Terran.Vulture, 0.6),
+      MatchingRatio(Terran.Wraith, 0.5)))
+  
+  class TrainDarkTemplar extends If(
+    new UnitsAtMost(0, UnitMatchOr(Protoss.Arbiter, Protoss.ArbiterTribunal)),
+    new If(
+      new And(
+        new EnemyUnitsAtMost(5, Terran.Vulture),
+        new EnemyUnitsNone(Terran.ScienceVessel),
+        new EnemyUnitsNone(UnitMatchCustom((unit) => unit.is(Terran.MissileTurret) && unit.zone.owner.isNeutral))),
+      new TrainContinuously(Protoss.DarkTemplar, 3)))
+  
+  private class TrainObservers extends If(
+    new UnitsAtLeast(24, UnitMatchWarriors),
+    new TrainContinuously(Protoss.Observer, 4),
+    new If(
+      new UnitsAtLeast(18, UnitMatchWarriors),
+      new TrainContinuously(Protoss.Observer, 3),
+      new If(
+        new UnitsAtLeast(12, UnitMatchWarriors),
+        new TrainContinuously(Protoss.Observer, 2),
+        new If(
+          new UnitsAtLeast(3, UnitMatchWarriors),
+          new TrainContinuously(Protoss.Observer, 1)))))
+  
+  class TrainReaversAgainstBio extends TrainMatchingRatio(Protoss.Reaver, 0, 5, Seq(MatchingRatio(Terran.Marine, 1.0/6.0)))
+  
+  class TrainHighTemplarWithSpareGas extends If(
+    new GasAtLeast(800),
+    new TrainContinuously(Protoss.HighTemplar, maximumConcurrently = 1))
+  
+  class TrainHighTemplarAgainstBio extends If(
+    new EnemyBio,
+    new TrainMatchingRatio(Protoss.HighTemplar, 1, 6, Seq(MatchingRatio(Terran.Marine, 1.0/5.0))))
+  
   class TrainScouts extends If(
     new And(
       new EnemyUnitsAtMost(0, Terran.Goliath),
@@ -62,29 +99,6 @@ object PvTIdeas {
       new UnitsExactly(0, Protoss.ArbiterTribunal),
       new Employing(PvTEarly1GateStargateTemplar)),
     new TrainContinuously(Protoss.Scout, 5))
-  
-  class TrainDarkTemplar extends If(
-    new UnitsAtMost(0, UnitMatchOr(Protoss.Arbiter, Protoss.ArbiterTribunal)),
-    new If(
-      new And(
-        new EnemyUnitsAtMost(3, Terran.Vulture),
-        new EnemyUnitsNone(Terran.ScienceVessel),
-        new EnemyUnitsNone(UnitMatchCustom((unit) => unit.is(Terran.MissileTurret) && unit.zone.owner.isNeutral))),
-      new TrainContinuously(Protoss.DarkTemplar, 3),
-      new TrainContinuously(Protoss.DarkTemplar, 1)))
-  
-  private class IfCloakedThreats_Observers extends If(
-    new Or(
-      new Check(() => With.units.enemy.exists(u => u.is(Terran.Vulture) && u.spiderMines > 0)),
-      new EnemyHasShown(Terran.SpiderMine),
-      new EnemyHasShownWraithCloak),
-    new Build(
-      RequestAtLeast(1, Protoss.Pylon),
-      RequestAtLeast(1, Protoss.Gateway),
-      RequestAtLeast(1, Protoss.Assimilator),
-      RequestAtLeast(1, Protoss.CyberneticsCore),
-      RequestAtLeast(1, Protoss.RoboticsFacility),
-      RequestAtLeast(1, Protoss.Observatory)))
   
   class TrainZealotsOrDragoons extends FlipIf(
     new Or(
@@ -97,39 +111,15 @@ object PvTIdeas {
     new TrainContinuously(Protoss.Dragoon),
     new TrainContinuously(Protoss.Zealot, 30, 5))
   
-  private class TrainObserversScalingWithArmy extends If(
-    new UnitsAtLeast(1, UnitMatchWarriors),
-    new If(
-      new UnitsAtLeast(12, UnitMatchWarriors),
-      new If(
-        new UnitsAtLeast(24, UnitMatchWarriors),
-        new TrainContinuously(Protoss.Observer, 3)),
-      new TrainContinuously(Protoss.Observer, 2)),
-    new TrainContinuously(Protoss.Observer, 1))
-  
-  class TrainObservers extends If(
-    new EnemyHasShownWraithCloak,
-    new TrainObserversScalingWithArmy,
-    new If(
-      new EnemyHasShown(Terran.SpiderMine),
-      new TrainObserversScalingWithArmy,
-      new TrainContinuously(Protoss.Observer, 1)))
-  
-  class TrainHighTemplar extends If(
-    new Or(
-      new EnemyBio,
-      new And(
-        new Latch(new UnitsAtLeast(1, Protoss.ArbiterTribunal, complete = true)),
-        new GasAtLeast(500))),
-    new TrainContinuously(Protoss.HighTemplar, maximumConcurrently = 3))
-    
   class TrainArmy extends Parallel(
-    new TrainObservers,
-    new TrainContinuously(Protoss.Arbiter),
-    new If(new EnemyBio, new TrainContinuously(Protoss.Reaver, 4)),
-    new TrainContinuously(Protoss.Carrier),
     new TrainDarkTemplar,
-    new TrainHighTemplar,
+    new TrainReaversAgainstBio,
+    new TrainObservers,
+    new TrainMinimumDragoons,
+    new TrainHighTemplarAgainstBio,
+    new TrainContinuously(Protoss.Arbiter),
+    new TrainContinuously(Protoss.Carrier),
+    new TrainHighTemplarWithSpareGas,
     new TrainScouts,
     new TrainZealotsOrDragoons)
   

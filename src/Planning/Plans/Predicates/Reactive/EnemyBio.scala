@@ -11,11 +11,11 @@ class EnemyBio extends Plan {
   
   override def isComplete: Boolean = {
     val enemyMech = (
-        With.units.countEnemy(UnitMatchSiegeTank)
+        2 * With.units.countEnemy(UnitMatchSiegeTank)
+      + 3 * With.units.countEnemy(Terran.Battlecruiser)
       + With.units.countEnemy(Terran.Vulture)
       + With.units.countEnemy(Terran.Goliath)
       + With.units.countEnemy(Terran.Wraith)
-      + With.units.countEnemy(Terran.Battlecruiser)
     )
     val enemyBio = (
       With.units.countEnemy(Terran.Marine)
@@ -23,6 +23,6 @@ class EnemyBio extends Plan {
       + With.units.countEnemy(Terran.Medic)
     )
     
-    enemyBio > Math.max(8, 2 * enemyMech)
+    enemyBio > Math.max(8, enemyMech)
   }
 }

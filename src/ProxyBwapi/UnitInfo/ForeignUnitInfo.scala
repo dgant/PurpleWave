@@ -340,7 +340,7 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo (o
   private var _underStorm             : Boolean = _
   private var _addon                  : Option[UnitInfo] = None
   
-  def remainingBuildFrames: Int = {
+  def remainingCompletionFrames: Int = {
     if (complete) return 0
     val startingHp    = 1 + unitClass.maxHitPoints / 10
     val progress      = Math.max(0.0, (hitPoints - startingHp).toDouble / (unitClass.maxTotalHealth - startingHp))

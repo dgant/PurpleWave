@@ -73,9 +73,4 @@ class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends FriendlyUnitProxy(base
     passenger.canMove                 &&
     passenger.transport.isEmpty       &&
     spaceRemaining >= passenger.unitClass.spaceRequired
-  
-  def framesBeforeTechComplete      : Int = base.getRemainingResearchTime
-  def framesBeforeUpgradeComplete   : Int = base.getRemainingUpgradeTime
-  def framesBeforeBuildeeComplete   : Int = base.getRemainingTrainTime
-  def framesBeforeBecomingComplete  : Int = base.getRemainingBuildTime
 }

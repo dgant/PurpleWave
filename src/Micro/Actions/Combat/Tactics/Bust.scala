@@ -19,14 +19,14 @@ object Bust extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     unit.totalHealth >= unit.unitClass.maxHitPoints + 12 // Don't take hull damage
-    && With.enemies.exists(_.raceInitial == Race.Terran)
+    && With.enemies.exists(_.raceCurrent == Race.Terran)
     && unit.agent.canFight
     && unit.canMove
     && unit.is(Protoss.Dragoon)
     && With.self.hasUpgrade(Protoss.DragoonRange)
     && unit.matchups.threatsInRange.forall( ! _.is(Terran.SiegeTankSieged))
     && unit.matchups.targets.exists(target =>
-        target.visible
+        (target.visible || With.grids.altitudeBonus.get(unit.tileIncludingCenter) == With.grids.altitudeBonus.get(target.tileIncludingCenter))
         && target.aliveAndComplete
         && target.is(Terran.Bunker)
         && ! target.player.hasUpgrade(Terran.MarineRange))

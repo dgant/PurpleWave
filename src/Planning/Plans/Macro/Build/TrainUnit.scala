@@ -9,7 +9,7 @@ import Micro.Agency.Intention
 import Planning.Composition.ResourceLocks.{LockCurrencyForUnit, LockUnits}
 import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Composition.UnitMatchers._
-import Planning.Composition.UnitPreferences.UnitPreference
+import Planning.Composition.UnitPreferences.{UnitPreferIdle, UnitPreference}
 import Planning.Plan
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitClass.UnitClass
@@ -34,6 +34,7 @@ class TrainUnit(val traineeClass: UnitClass) extends Plan {
   val trainerLock = new LockUnits {
     unitMatcher.set(trainerMatcher)
     unitCounter.set(UnitCountOne)
+    unitPreference.set(UnitPreferIdle)
   }
   
   private var trainer: Option[FriendlyUnitInfo] = None
@@ -76,7 +77,7 @@ class TrainUnit(val traineeClass: UnitClass) extends Plan {
     }
   }
   private def updateTrainerPreference() {
-    val preference = new UnitPreference {
+    val locationPreference = new UnitPreference {
       override def preference(unit: FriendlyUnitInfo): Double = {
         val safetyFramesMin = GameTime(0, 1)()
         val safetyFramesMax = GameTime(0, 10)()
@@ -95,7 +96,7 @@ class TrainUnit(val traineeClass: UnitClass) extends Plan {
       }
     }
     
-    trainerLock.unitPreference.set(preference)
+    trainerLock.unitPreference.set(locationPreference)
   }
   
   override def visualize() {

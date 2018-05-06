@@ -223,13 +223,15 @@ abstract class FriendlyUnitProxy(base: bwapi.Unit, id: Int) extends UnitInfo(bas
   // Statuses //
   //////////////
   
-  def remainingBuildFrames    : Int = remainingBuildFramesCache()
+  def remainingCompletionFrames    : Int = remainingBuildFramesCache()
   def remainingUpgradeFrames  : Int = remainingUpgradeFramesCache()
   def remainingTechFrames     : Int = remainingTechFramesCache()
+  def remainingTrainFrames    : Int = remainingTrainFramesCache()
   
-  private val remainingBuildFramesCache   = new Cache(() => base.getRemainingBuildTime)
-  private val remainingUpgradeFramesCache = new Cache(() => base.getRemainingUpgradeTime)
-  private val remainingTechFramesCache    = new Cache(() => base.getRemainingResearchTime)
+  private val remainingTrainFramesCache   = new Cache(() => if ( ! unitClass.trainsUnits) 0 else base.getRemainingTrainTime)
+  private val remainingBuildFramesCache   = new Cache(() => if (complete) 0 else base.getRemainingBuildTime)
+  private val remainingUpgradeFramesCache = new Cache(() => if (unitClass.upgradesWhat.isEmpty) 0 else base.getRemainingUpgradeTime)
+  private val remainingTechFramesCache    = new Cache(() => if (unitClass.techsWhat.isEmpty) 0 else base.getRemainingResearchTime)
   
   def beingConstructed    : Boolean = beingConstructedCache()
   def beingGathered       : Boolean = beingGatheredCache()

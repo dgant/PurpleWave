@@ -89,7 +89,7 @@ class BattleClusteringState(seedUnits: Set[UnitInfo]) {
   private def radiusTiles(unit: UnitInfo): Int ={
     val tilesDetecting  = if (unit.unitClass.isDetector) 11 else 0
     val tilesCasting    = if (unit.unitClass.isSpellcaster) 10 else 0
-    val tilesAttacking  = Math.ceil(unit.pixelRangeMax / 32).toInt
+    val tilesAttacking  = 1 + Math.ceil(unit.pixelRangeMax / 32).toInt
     val tilesSpeed      = if (unit.is(Protoss.Interceptor)) 8 else (unit.topSpeed * With.reaction.clusteringMax / 32).toInt
     val tilesMargin     = Math.max(tilesSpeed, With.configuration.battleMarginTileBase)
     val tilesCustom     = tilesMargin + Vector(tilesCasting, tilesAttacking, tilesDetecting).max

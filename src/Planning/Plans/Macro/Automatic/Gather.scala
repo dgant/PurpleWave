@@ -52,7 +52,7 @@ class Gather extends Plan {
   }
   
   private def countUnits() {
-    val activeBases = With.geography.ourBases.filter(_.townHall.exists(hall => hall.morphing || hall.remainingBuildFrames < GameTime(0, 10)()))
+    val activeBases = With.geography.ourBases.filter(_.townHall.exists(hall => hall.morphing || hall.remainingCompletionFrames < GameTime(0, 10)()))
     calculateTransferPaths(activeBases)
     minerals  = activeBases.flatMap(_.minerals).toSet
     gasses    = activeBases.flatMap(_.gas.flatMap(_.friendly).filter(u => u.complete)).toSet
@@ -136,7 +136,7 @@ class Gather extends Plan {
     val safety      = if ( ! worker.zone.bases.exists(_.owner.isUs) || transfersLegal.contains((worker.zone, resource.zone))) 100.0 else 1.0
     val continuity  = if (resourceByWorker.get(worker).contains(resource)) 10.0 else 1.0
     val proximity   = resource.base.flatMap(_.townHall).map(_.pixelDistanceEdge(resource)).getOrElse(32 * 12)
-    val distance    = Math.log(worker.pixelDistanceEdge(resource) + Math.max(0, resource.remainingBuildFrames - worker.pixelDistanceEdge(resource) / Math.max(1.0, worker.topSpeed)))
+    val distance    = Math.log(worker.pixelDistanceEdge(resource) + Math.max(0, resource.remainingCompletionFrames - worker.pixelDistanceEdge(resource) / Math.max(1.0, worker.topSpeed)))
     val currentWorkerCount = workersByResource(resource).count(_ != worker)
     val saturation  =
       if (resource.unitClass.isMinerals) {

@@ -51,8 +51,8 @@ object ShowUnitsForeign extends View {
       }
     }
     if (showCountdown) {
-      if ( ! unit.complete && unit.remainingBuildFrames > 0) {
-        val time = new GameTime(unit.remainingBuildFrames)
+      if ( ! unit.complete && unit.remainingCompletionFrames > 0) {
+        val time = new GameTime(unit.remainingCompletionFrames)
         val pctHp = unit.hitPoints.toDouble / unit.unitClass.maxHitPoints
         DrawMap.labelBox(Array(time.toString, "%02f".format(pctHp) + "%"), Pixel(unit.x, unit.bottom), drawBackground = true, unit.color)
       }

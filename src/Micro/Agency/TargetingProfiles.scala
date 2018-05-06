@@ -5,9 +5,9 @@ import Micro.Heuristics.Targeting.TargetingProfile
 object TargetingProfiles {
   
   def default = new TargetingProfile(
-    preferVpfEnemy    =  0.25,
-    preferVpfOurs     =  0.25,
+    preferVpfEnemy    =  0.5,
+    preferVpfOurs     =  0.5,
     preferDetectors   =  8.0,
-    avoidDelay        =  0.05,
+    avoidDelay        =  1.0,
     avoidPain         =  1.0)
 }

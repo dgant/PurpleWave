@@ -45,21 +45,21 @@ class SmartQueueState {
     .toSeq
     .foreach(unit => {
       val unitClass = unit.unitClass
-      if (unit.framesBeforeBecomingComplete > 0) {
-        events += new SmartQueueEventBirthUnit(frame + unit.framesBeforeBecomingComplete, unitClass)
+      if (unit.remainingCompletionFrames > 0) {
+        events += new SmartQueueEventBirthUnit(frame + unit.remainingCompletionFrames, unitClass)
       }
       else {
         unitsNow(unitClass) += 1
         var framesBeforeFreedom: Option[Int] = None
-        if (unit.framesBeforeBuildeeComplete > 0) {
-          framesBeforeFreedom = Some(unit.framesBeforeBuildeeComplete)
+        if (unit.remainingTrainFrames > 0) {
+          framesBeforeFreedom = Some(unit.remainingTrainFrames)
         }
-        else if (unit.framesBeforeUpgradeComplete > 0) {
-          framesBeforeFreedom = Some(unit.framesBeforeUpgradeComplete)
+        else if (unit.remainingUpgradeFrames > 0) {
+          framesBeforeFreedom = Some(unit.remainingUpgradeFrames)
           upgradesQueued.add(unit.upgradingType, 1)
         }
-        else if (unit.framesBeforeTechComplete > 0) {
-          framesBeforeFreedom = Some(unit.framesBeforeTechComplete)
+        else if (unit.remainingTechFrames > 0) {
+          framesBeforeFreedom = Some(unit.remainingTechFrames)
           techsQueued.add(unit.techingType, 1)
         }
           

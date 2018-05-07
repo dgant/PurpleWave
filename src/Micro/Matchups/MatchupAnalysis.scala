@@ -31,6 +31,7 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
   lazy val allies                 : Vector[UnitInfo]      = alliesInclSelf.filterNot(_.id == me.id)
   lazy val others                 : Vector[UnitInfo]      = enemies ++ allies
   lazy val allUnits               : Vector[UnitInfo]      = enemies ++ alliesInclSelf
+  lazy val allyDetectors          : Vector[UnitInfo]      = allies.filter(e => e.aliveAndComplete && e.unitClass.isDetector)
   lazy val enemyDetectors         : Vector[UnitInfo]      = enemies.filter(e => e.aliveAndComplete && e.unitClass.isDetector)
   lazy val threats                : Vector[UnitInfo]      = enemies.filter(_.canAttack(me))
   lazy val targets                : Vector[UnitInfo]      = enemies.filter(me.canAttack)

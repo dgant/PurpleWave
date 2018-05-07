@@ -3,7 +3,7 @@ package Information.Geography.Calculations
 import Information.Geography.Types.Base
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
-import Planning.Composition.UnitMatchers.{UnitMatchWarriors, UnitMatchWorkers}
+import Planning.Composition.UnitMatchers.UnitMatchWorkers
 import ProxyBwapi.Races.Protoss
 import Utilities.ByOption
 import Utilities.EnrichPixel._
@@ -46,7 +46,7 @@ object BaseUpdater {
     base.minerals       = base.units.filter(u => u.mineralsLeft > 0 && ! u.isMineralBlocker)
     base.gas            = base.units.filter(_.unitClass.isGas)
     base.workers        = base.units.filter(u => u.player == base.owner && u.is(UnitMatchWorkers))
-    base.defenders      = base.units.filter(u => u.player == base.owner && u.is(UnitMatchWarriors))
+    base.defenders      = base.units.filter(u => u.player == base.owner && u.unitClass.rawCanAttack)
     base.mineralsLeft   = base.minerals.toSeq.map(_.mineralsLeft).sum
     base.gasLeft        = base.gas.toSeq.map(_.gasLeft).sum
     base.harvestingArea = (Vector(base.townHallArea) ++ (base.minerals.filter(_.mineralsLeft > With.configuration.blockerMineralThreshold) ++ base.gas).map(_.tileArea)).boundary

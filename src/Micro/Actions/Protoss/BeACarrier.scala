@@ -6,6 +6,7 @@ import Micro.Actions.Combat.Attacking.Filters.TargetFilter
 import Micro.Actions.Combat.Attacking.TargetAction
 import Micro.Actions.Combat.Maneuvering.CliffAvoid
 import Micro.Actions.Commands.{Attack, AttackMove}
+import Planning.Yolo
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.ByOption
@@ -94,12 +95,12 @@ object BeACarrier extends Action {
       true
     }
     
-    lazy val canLeave                 = airToAirSupply(unit.matchups.threats) < airToAirSupply(unit.matchups.alliesInclSelf)
-    lazy val exitingLeash             = unit.matchups.targets.filter(_.matchups.framesToLive > 48).forall(_.pixelDistanceEdge(unit) > 32.0 * 7.0)
-    lazy val inRangeNeedlessly        = unit.matchups.threatsInRange.exists(shouldNeverHitUs)
-    lazy val safeHere                 = unit.matchups.framesOfSafety >= 0 || unit.totalHealth > 150
-    lazy val happyFightingHere        = unit.agent.shouldEngage && ! inRangeNeedlessly && safeHere
-    lazy val shouldFight              = happyFightingHere || (unit.interceptorCount > 1 && ! canLeave)
+    lazy val canLeave           = airToAirSupply(unit.matchups.threats) < airToAirSupply(unit.matchups.alliesInclSelf)
+    lazy val exitingLeash       = unit.matchups.targets.filter(_.matchups.framesToLive > 48).forall(_.pixelDistanceEdge(unit) > 32.0 * 7.0)
+    lazy val inRangeNeedlessly  = unit.matchups.threatsInRange.exists(shouldNeverHitUs)
+    lazy val safeHere           = unit.matchups.framesOfSafety >= 0 || unit.totalHealth > 150
+    lazy val happyFightingHere  = unit.agent.shouldEngage && ! inRangeNeedlessly && safeHere
+    lazy val shouldFight        = unit.interceptorCount > 0 && (Yolo.active || happyFightingHere || (unit.interceptorCount > 1 && ! canLeave))
     
     if (shouldFight) {
       // Avoid changing targets (causes interceptors to not attack)

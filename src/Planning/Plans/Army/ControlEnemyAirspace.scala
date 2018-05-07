@@ -6,7 +6,7 @@ import Planning.Composition.Property
 import Planning.Composition.ResourceLocks.LockUnits
 import Planning.Composition.UnitCounters.{UnitCountBetween, UnitCountExactly}
 import Planning.Composition.UnitMatchers.UnitMatchMobileFlying
-import Planning.Composition.UnitPreferences.UnitPreferFast
+import Planning.Composition.UnitPreferences.UnitPreferScout
 import Planning.Plan
 
 class ControlEnemyAirspace(perBase: Int = 1) extends Plan {
@@ -16,7 +16,7 @@ class ControlEnemyAirspace(perBase: Int = 1) extends Plan {
   val flyers = new Property[LockUnits](new LockUnits {
     unitCounter.set(UnitCountExactly(0))
     unitMatcher.set(UnitMatchMobileFlying)
-    unitPreference.set(UnitPreferFast)
+    unitPreference.set(UnitPreferScout)
   })
   
   override def isComplete: Boolean = With.geography.enemyBases.nonEmpty

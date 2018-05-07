@@ -22,7 +22,8 @@ object TargetFilterMission extends TargetFilter {
   
     lazy val alliesAssisting  = target.matchups.threats.exists(ally =>
       ally != actor
-      && (ally.topSpeed >= target.topSpeed || ally.pixelRangeAgainst(target) >= target.pixelRangeAgainst(ally))
+      && ally.unitClass.orderable
+      && (ally.topSpeed >= target.topSpeed || ally.topSpeed > actor.topSpeed || ally.inRangeToAttack(target) )
       && ally.framesBeforeAttacking(target) <= actor.framesBeforeAttacking(target))
   
     lazy val targetBusy       = target.gathering || target.constructing || target.repairing

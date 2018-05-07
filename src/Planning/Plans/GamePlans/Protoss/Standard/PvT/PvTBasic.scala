@@ -4,6 +4,7 @@ import Macro.BuildRequests.{RequestAtLeast, RequestTech, RequestUpgrade}
 import Planning.Composition.Latch
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
 import Planning.Plan
+import Planning.Plans.Army.Aggression
 import Planning.Plans.Compound.{And, Or, Parallel, _}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
@@ -69,7 +70,7 @@ class PvTBasic extends GameplanModeTemplate {
       new EnemyBasesAtLeast(2),
       new And(
         new SafeAtHome,
-        new UnitsAtLeast(8, UnitMatchWarriors))),
+        new UnitsAtLeast(6, UnitMatchWarriors))),
     new Or(
       new Not(new NeedObservers),
       new UnitsAtLeast(1, Protoss.Observer, complete = true)))
@@ -79,8 +80,8 @@ class PvTBasic extends GameplanModeTemplate {
     new SafeToAttack,
     new Or(
       new And(new EnemyBio, new PreparedForBio),
-      new Latch(new UnitsAtLeast(6, Protoss.Carrier, complete = true)),
-      new Latch(new UnitsAtLeast(3, Protoss.Arbiter, complete = true))))
+      new Latch(new UnitsAtLeast(4, Protoss.Carrier, complete = true)),
+      new Latch(new UnitsAtLeast(2, Protoss.Arbiter, complete = true))))
   
   class BasicTech extends Parallel(
     new Build(
@@ -133,9 +134,17 @@ class PvTBasic extends GameplanModeTemplate {
       new UnitsAtLeast(4, Protoss.Zealot),
       new UpgradeContinuously(Protoss.ZealotSpeed)),
     
+    // Get upgrades with Arbiter builds, vs. Bio, or when maxed on air upgrades
     // Double-spin, or prioritize armor vs. bio
     new If(
-      new UnitsAtLeast(8, UnitMatchWarriors),
+      new And(
+        new UnitsAtLeast(8, UnitMatchWarriors),
+        new Or(
+          new EmployingArbiters,
+          new EnemyBio,
+          new And(
+            new UpgradeComplete(Protoss.AirDamage, 2),
+            new UpgradeComplete(Protoss.AirArmor, 2)))),
       new If(
         new UnitsAtLeast(2, Protoss.Forge),
         new FlipIf(
@@ -184,6 +193,13 @@ class PvTBasic extends GameplanModeTemplate {
             RequestAtLeast(2, Protoss.Forge))))))
   
   override val buildPlans = Vector(
+    new If(
+      new And(
+        new EmployingCarriers,
+        new UnitsAtLeast(1, Protoss.Stargate),
+        new UnitsAtMost(12, Protoss.Interceptor)),
+      new Aggression(0.8),
+      new Aggression(1.0)),
     
     new RequireMiningBases(2),
     new If(

@@ -3,7 +3,6 @@ package Information.Battles.Types
 import Information.Battles.Prediction.Estimation.{AvatarBuilder, EstimateAvatar}
 import Information.Battles.Prediction.Prediction
 import Lifecycle.With
-import Mathematics.PurpleMath
 import ProxyBwapi.UnitInfo.UnitInfo
 
 class BattleGlobal(us: Team, enemy: Team) extends Battle(us, enemy) {
@@ -18,7 +17,7 @@ class BattleGlobal(us: Team, enemy: Team) extends Battle(us, enemy) {
   def sumValue(units: Iterable[UnitInfo]): Double = units.toVector.map(_.subjectiveValue).sum
   lazy val valueEnemyArmy   : Double = sumValue(With.units.enemy.filter(u => u.unitClass.dealsDamage))
   lazy val valueUsArmy      : Double = sumValue(With.units.ours.filter(u => u.unitClass.dealsDamage))
-  lazy val valueRatioTarget : Double = Math.min(With.configuration.battleValueTarget, PurpleMath.nanToOne(valueEnemyArmy / (valueEnemyArmy + valueUsArmy)))
+  lazy val valueRatioTarget : Double = With.configuration.battleValueTarget // Math.min(With.configuration.battleValueTarget, PurpleMath.nanToOne(valueEnemyArmy / (valueEnemyArmy + valueUsArmy)))
   
   private def globalSafe(estimation: Prediction, discountFactor: Double): Boolean = {
     val tradesEffectively = discountFactor * estimation.costToEnemy - estimation.costToUs >= 0

@@ -66,7 +66,7 @@ object BeAnArbiter extends Action {
     val forceUmbrella = new Force(unit.agent.destination.subtract(unit.pixelCenter)).normalize
     val framesOfSafetyRequired = Math.max(12, 48 - With.framesSince(unit.lastFrameTakingDamage))
     if (unit.matchups.framesOfSafety <= framesOfSafetyRequired) {
-      val forceThreat = Potential.threatsRepulsion(unit).normalize(2.0)
+      val forceThreat = Potential.threatsRepulsion(unit).normalize(3.0)
       unit.agent.forces.put(ForceColors.regrouping, forceUmbrella)
       unit.agent.forces.put(ForceColors.threat, forceThreat)
       Gravitate.consider(unit)

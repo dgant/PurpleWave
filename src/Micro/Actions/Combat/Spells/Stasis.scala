@@ -18,15 +18,22 @@ object Stasis extends TargetedSpell {
     if (target.underStorm) return 0.0
     if (target.invincible) return 0.0
   
-    target.subjectiveValue *
-    Math.min(1.0, target.matchups.targets.size / 3.0)  *
-    (
-      if(target.isFriendly)
-        -2.0
-      else if (target.isEnemy)
-        1.0
-      else
-        0.0
-    )
+    val teamValue =
+      Math.min(1.0, target.matchups.targets.size / 3.0)  *
+      (
+        if(target.isFriendly)
+          -2.0
+        else if (target.isEnemy) {
+          1.0 +
+          (if (target.unitClass.isDetector) {
+            1.0 / (1.0 + target.matchups.allyDetectors.size)
+          } else 0.0)
+        }
+        else
+          0.0
+      )
+    
+    val output = target.subjectiveValue * teamValue
+    output
   }
 }

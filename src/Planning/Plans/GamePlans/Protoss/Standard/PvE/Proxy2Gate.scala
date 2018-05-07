@@ -3,14 +3,14 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvE
 import Lifecycle.With
 import Macro.BuildRequests.{RequestAtLeast, RequestUpgrade}
 import Planning.Composition.UnitMatchers.UnitMatchOr
-import Planning.Plans.Army.Aggression
+import Planning.Plans.Army.{Aggression, Attack}
 import Planning.Plans.Compound.{Or, _}
 import Planning.Plans.GamePlans.GameplanModeTemplate
 import Planning.Plans.GamePlans.Protoss.Situational.PlaceGatewaysProxied
 import Planning.Plans.Predicates.Employing
 import Planning.Plans.Macro.Automatic.{RequireSufficientSupply, TrainContinuously, TrainWorkersContinuously}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
-import Planning.Plans.Macro.Expanding.BuildGasPumps
+import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Predicates.Economy.GasAtLeast
 import Planning.Plans.Predicates.Matchup.EnemyIsProtoss
 import Planning.Plans.Predicates.Milestones._
@@ -27,6 +27,7 @@ class Proxy2Gate extends GameplanModeTemplate {
   override def defaultScoutPlan   = new If(new UnitsAtLeast(2, Protoss.Gateway), new Scout)
   override def defaultSupplyPlan: Plan = NoPlan()
   override def defaultWorkerPlan: Plan = NoPlan()
+  override def defaultAttackPlan: Plan = new Attack
   
   private class BeforeProxy extends Parallel(
     new PlaceGatewaysProxied(2, () => ProxyPlanner.proxyAutomaticSneaky),
@@ -87,7 +88,9 @@ class Proxy2Gate extends GameplanModeTemplate {
               RequestAtLeast(1, Protoss.Observatory)))),
         new Build(
           RequestUpgrade(Protoss.DragoonRange),
-          RequestAtLeast(4, Protoss.Gateway)))))
+          RequestAtLeast(3, Protoss.Gateway)),
+        new RequireMiningBases(2),
+        new Build(RequestAtLeast(5, Protoss.Gateway)))))
   
   override def buildPlans = Vector(
     new Do(() =>  With.blackboard.maxFramesToSendAdvanceBuilder = Int.MaxValue),

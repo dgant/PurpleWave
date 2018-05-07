@@ -34,8 +34,8 @@ class Configuration {
   /////////////
   
   var avatarBattleDistancePixels    = 32.0 * 6.0
-  var battleMarginTileBase          = 13
-  var battleMarginTileMinimum       = 3
+  var battleMarginTileBase          = 12 + 2
+  var battleMarginTileMinimum       = 12 + 2
   var battleMarginTileMaximum       = 12 * 2 + 2 // A bit over double Siege Tank range
   var battleEstimationFrames        = GameTime(0, 8)()
   var battleHysteresisFrames        = GameTime(0, 5)()

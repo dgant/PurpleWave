@@ -122,7 +122,7 @@ class Gather extends Plan {
   }
   
   private def utility(worker: FriendlyUnitInfo, resource: UnitInfo): Double = {
-    val depleted = resource.gasLeft + resource.mineralsLeft < 100
+    val depleted = resource.gasLeft + resource.mineralsLeft == 0
     val need =
       (if (depleted) 0.2 else 1.0) * (
       if (gasWorkersNow == gasWorkersMax)

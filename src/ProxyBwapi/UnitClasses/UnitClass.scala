@@ -3,6 +3,7 @@ package ProxyBwapi.UnitClasses
 import Mathematics.Points.{Tile, TileRectangle}
 import Mathematics.PurpleMath
 import Planning.Composition.UnitMatchers.UnitMatcher
+import ProxyBwapi.Players.Players
 import ProxyBwapi.Races.{Neutral, Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.{Tech, Techs}
 import ProxyBwapi.UnitInfo.UnitInfo
@@ -482,12 +483,12 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   lazy val canBurrow            : Boolean = Vector(Terran.SpiderMine, Zerg.Drone, Zerg.Zergling, Zerg.Hydralisk, Zerg.Lurker, Zerg.Defiler).contains(this)
   lazy val canStim              : Boolean = this == Terran.Marine || this == Terran.Firebat
   lazy val canSiege             : Boolean = this == Terran.SiegeTankUnsieged || this == Terran.SiegeTankSieged
-  lazy val canBeIrradiated      : Boolean = ! isBuilding
-  lazy val canBeIrradiateBurned : Boolean = ! isBuilding && isOrganic
-  lazy val canBeLockedDown      : Boolean = ! isBuilding && isMechanical
-  lazy val canBeMaelstrommed    : Boolean = ! isBuilding && isOrganic
-  lazy val canBeEnsnared        : Boolean = ! isBuilding
-  lazy val canBeStasised        : Boolean = ! isBuilding
+  lazy val canBeIrradiated      : Boolean = Players.all.exists(_.isTerran)  && ! isBuilding
+  lazy val canBeIrradiateBurned : Boolean = Players.all.exists(_.isTerran)  && ! isBuilding && isOrganic
+  lazy val canBeLockedDown      : Boolean = Players.all.exists(_.isTerran)  && ! isBuilding && isMechanical
+  lazy val canBeMaelstrommed    : Boolean = Players.all.exists(_.isProtoss) && ! isBuilding && isOrganic
+  lazy val canBeEnsnared        : Boolean = Players.all.exists(_.isZerg)    && ! isBuilding
+  lazy val canBeStasised        : Boolean = Players.all.exists(_.isProtoss) && ! isBuilding
   lazy val canBeTransported     : Boolean = ! isBuilding && spaceRequired <= 8 // BWAPI gives 255 for unloadable units
   
   /////////////////

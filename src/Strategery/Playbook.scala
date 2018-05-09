@@ -31,7 +31,6 @@ object StrategyGroups {
     TvZEarly1RaxFEEconomic,
     TvZEarly1RaxFEConservative,
     TvZEarly2Rax,
-    PvTEarly4Gate,
     PvPOpen3GateSpeedlots,
     PvZ4Gate99,
     MassPhotonCannon,

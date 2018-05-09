@@ -26,6 +26,7 @@ object PlacementHeuristicDistanceFromEnemy extends PlacementHeuristic {
       
       totalDistance += from.pixelDistance(to)
     })
+    
     Math.max(128.0, totalDistance)
   }
 }

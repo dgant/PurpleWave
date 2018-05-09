@@ -181,6 +181,24 @@ object ProtossBuilds {
     RequestAtLeast(3,   Protoss.Dragoon),
     RequestAtLeast(3,   Protoss.Pylon))
   
+  val Opening10Gate15GateDragoonDT = Opening10Gate15GateDragoons ++ Vector[BuildRequest] (
+    RequestAtLeast(16,  Protoss.Probe),
+    RequestAtLeast(1,   Protoss.CitadelOfAdun),
+    RequestAtLeast(5,   Protoss.Dragoon),
+    RequestAtLeast(17,  Protoss.Probe),
+    RequestAtLeast(1,   Protoss.TemplarArchives),
+    RequestAtLeast(18,  Protoss.Probe),
+    RequestAtLeast(2,   Protoss.DarkTemplar),
+    RequestAtLeast(19,  Protoss.Probe),
+    RequestAtLeast(2,   Protoss.Nexus)
+  )
+  
+  val Opening10Gate15GateExpand = Opening10Gate15GateDragoons ++ Vector[BuildRequest] (
+    RequestAtLeast(5,   Protoss.Dragoon),
+    RequestAtLeast(2,   Protoss.Nexus),
+    RequestAtLeast(20,  Protoss.Probe)
+  )
+  
   val Opening12Nexus = Vector[BuildRequest] (
     RequestAtLeast(1,   Protoss.Nexus),
     RequestAtLeast(8,   Protoss.Probe),

@@ -10,21 +10,21 @@ abstract class PvTStrategy extends Strategy {
 }
 abstract class PvTBasicOpener extends PvTStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Vector(Vector(
-    PvT2BaseCarrier,
     PvT2BaseArbiter,
-    PvT3BaseCarrier,
-    PvT3BaseArbiter
+    PvT3BaseArbiter,
+    PvT2BaseCarrier,
+    PvT3BaseCarrier
   ))
 }
 object PvT13Nexus extends PvTBasicOpener
 object PvT21Nexus extends PvTBasicOpener
+object PvT1015Expand extends PvTBasicOpener
 object PvT2GateObserver extends PvTBasicOpener
-object PvTEarly4Gate extends PvTBasicOpener
 object PvTDTExpand extends PvTBasicOpener {
   override def choices: Iterable[Iterable[Strategy]] = Vector(Vector(
     PvT2BaseArbiter,
-    PvT3BaseCarrier,
-    PvT3BaseArbiter
+    PvT3BaseArbiter,
+    PvT3BaseCarrier
   ))
 }
 object PvTEarly1015GateGoonDT extends PvTStrategy {

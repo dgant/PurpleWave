@@ -75,9 +75,8 @@ class PvTBasic extends GameplanModeTemplate {
       new MineralsAtLeast(1000)),
     new Or(
       new EnemyBasesAtLeast(2),
-      new And(
-        new SafeAtHome,
-        new UnitsAtLeast(6, UnitMatchWarriors))),
+      new And(new EnemyBio, new PreparedForBio),
+      new And(new SafeAtHome, new UnitsAtLeast(6, UnitMatchWarriors))),
     new Or(
       new Not(new NeedObservers),
       new UnitsAtLeast(1, Protoss.Observer, complete = true)))
@@ -86,6 +85,7 @@ class PvTBasic extends GameplanModeTemplate {
     new ReadyForThirdBase,
     new SafeToAttack,
     new Or(
+      new EnemyBasesAtLeast(3),
       new And(new EnemyBio, new PreparedForBio),
       new Latch(new UnitsAtLeast(4, Protoss.Carrier, complete = true)),
       new Latch(new UnitsAtLeast(2, Protoss.Arbiter, complete = true))))
@@ -165,39 +165,89 @@ class PvTBasic extends GameplanModeTemplate {
               new UpgradeComplete(Protoss.GroundDamage, 3),
               new EnemyBio)),
           new UpgradeContinuously(Protoss.GroundArmor),
-          new UpgradeContinuously(Protoss.GroundDamage))))
-  )
+          new UpgradeContinuously(Protoss.GroundDamage)))))
   
   class LateGameTech extends Parallel(
     new BuildGasPumps,
     new If(
-      new EmployingCarriers,
+      new EnemyBio,
       new Parallel(
         new If(
-          new EnemyBio,
-          new Build(RequestAtLeast(1, Protoss.RoboticsSupportBay))),
+          new And(
+            new UnitsAtMost(0, Protoss.TemplarArchives),
+            new UnitsAtLeast(1, Protoss.RoboticsFacility)),
+          new Build(
+            RequestAtLeast(1, Protoss.RoboticsSupportBay),
+            RequestAtLeast(5, Protoss.Gateway))),
         new Build(
-          RequestAtLeast(1, Protoss.Stargate),
-          RequestAtLeast(3, Protoss.Gateway),
-          RequestAtLeast(1, Protoss.FleetBeacon)),
+            RequestAtLeast(1, Protoss.CitadelOfAdun),
+            RequestAtLeast(5, Protoss.Gateway),
+            RequestAtLeast(1, Protoss.TemplarArchives),
+            RequestAtLeast(2, Protoss.Forge),
+            RequestUpgrade(Protoss.HighTemplarEnergy))),
+      new Parallel(
         new If(
-          new UnitsAtLeast(1, Protoss.FleetBeacon),
-          new Build(RequestAtLeast(2, Protoss.Stargate))))),
+          new EmployingCarriers,
+          new Parallel(
+            new If(
+              new IfOnMiningBases(3),
+              new Build(RequestAtLeast(4, Protoss.Gateway))),
+            new Build(
+              RequestAtLeast(1, Protoss.Stargate),
+              RequestAtLeast(1, Protoss.FleetBeacon)),
+            new If(
+              new UnitsAtLeast(1, Protoss.FleetBeacon),
+              new If(
+                new And(
+                  new IfOnMiningBases(3),
+                  new EnemyBasesAtLeast(2),
+                  new Or(
+                    new Employing(PvT13Nexus),
+                    new Employing(PvT21Nexus),
+                    new Employing(PvT1015Expand))),
+                new Build(RequestAtLeast(3, Protoss.Stargate)),
+                new Build(RequestAtLeast(2, Protoss.Stargate)))))),
+        new If(
+          new Or(
+            new EmployingArbiters,
+            new And(
+              new EmployingCarriers,
+              new UnitsAtLeast(8, Protoss.Carrier))),
+          new Parallel(
+            new Build(
+              RequestAtLeast(1, Protoss.CitadelOfAdun),
+              RequestAtLeast(1, Protoss.TemplarArchives)),
+              new Build(
+                RequestAtLeast(1, Protoss.Stargate),
+                RequestAtLeast(3, Protoss.Gateway),
+                RequestAtLeast(1, Protoss.ArbiterTribunal)))))))
+  
+  class BonusTech extends Parallel(
     new If(
-      new EmployingArbiters,
+      new OnGasPumps(3),
       new Parallel(
-        new Build(
-          RequestAtLeast(1, Protoss.CitadelOfAdun),
-          RequestAtLeast(1, Protoss.TemplarArchives)),
         new If(
-          new Not(new EnemyBio),
-          new Build(
-            RequestAtLeast(1, Protoss.Stargate),
-            RequestAtLeast(3, Protoss.Gateway),
-            RequestAtLeast(1, Protoss.ArbiterTribunal)),
-          new Build(
-            RequestAtLeast(3, Protoss.Gateway),
-            RequestAtLeast(2, Protoss.Forge))))))
+          new EmployingArbiters,
+          new Build(RequestAtLeast(2, Protoss.Stargate))),
+        new If(
+          new EmployingCarriers,
+          new Parallel(
+            new Build(RequestAtLeast(3, Protoss.Stargate)),
+            new UpgradeContinuously(Protoss.AirArmor),
+            new UpgradeContinuously(Protoss.AirDamage))),
+        new Build(RequestAtLeast(2, Protoss.Forge)),
+        new UpgradeContinuously(Protoss.GroundArmor),
+        new Build(RequestAtLeast(1, Protoss.TemplarArchives)))),
+    new If(
+      new OnGasPumps(4),
+      new If(
+        new EmployingCarriers,
+        new Build(RequestAtLeast(2, Protoss.CyberneticsCore)))),
+    new If(
+      new IfOnMiningBases(4),
+      new If(
+        new EmployingCarriers,
+        new Build(RequestAtLeast(3, Protoss.Stargate)))))
   
   override val buildPlans = Vector(
     
@@ -216,39 +266,22 @@ class PvTBasic extends GameplanModeTemplate {
       new SafeAtHome,
       new Parallel(
         new PvTIdeas.TrainArmy,
-        new ObserverTech),
+        new If(
+          new Or(
+            new EnemyHasShownCloakedThreat,
+            new And(
+              new Not(new EnemyBio),
+              new EnemyUnitsAtLeast(1, Terran.Vulture))),
+          new ObserverTech)),
       new Parallel(
         new TrainMinimumDragoons,
         new ObserverTech,
-        new LateGameTech)),
-    
-    new Build(RequestAtLeast(6, Protoss.Gateway)),
-    
-    // Maybe move this up before army
-    // (and the 4-pump one too)
-    new If(
-      new OnGasPumps(3),
-      new Parallel(
-        new If(
-          new EmployingArbiters,
-          new Build(RequestAtLeast(2, Protoss.Stargate))),
-        new If(
-          new EmployingCarriers,
-          new Parallel(
-            new Build(RequestAtLeast(3, Protoss.Stargate)),
-            new UpgradeContinuously(Protoss.AirArmor),
-            new UpgradeContinuously(Protoss.AirDamage))),
-        new Build(RequestAtLeast(2, Protoss.Forge)),
-        new UpgradeContinuously(Protoss.GroundArmor),
-        new Build(RequestAtLeast(1, Protoss.TemplarArchives)))),
-  
-    // Maybe move this up before army
-    // (and the 4-pump one too)
-    new If(
-      new OnGasPumps(4),
-      new If(
-        new EmployingCarriers,
-        new Build(RequestAtLeast(2, Protoss.CyberneticsCore)))),
+        new LateGameTech,
+        new FlipIf(
+          new SafeAtHome,
+          new Build(RequestAtLeast(6, Protoss.Gateway)),
+          new BonusTech
+        ))),
   
     new RequireMiningBases(3),
     new Build(RequestAtLeast(1, Protoss.CitadelOfAdun)),

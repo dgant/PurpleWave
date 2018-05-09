@@ -12,7 +12,7 @@ import Planning.Plans.Predicates.Employing
 import Planning.Plans.Predicates.Milestones._
 import Planning.Plans.Predicates.Reactive.{EnemyBasesAtLeast, EnemyBio}
 import ProxyBwapi.Races.{Protoss, Terran}
-import Strategery.Strategies.Protoss.{PvT13Nexus, PvTEarly1015GateGoonDT, PvTEarly1GateStargateTemplar, PvTEarly4Gate}
+import Strategery.Strategies.Protoss.{PvT1015Expand, PvT13Nexus, PvTEarly1015GateGoonDT, PvTEarly1GateStargateTemplar}
 
 object PvTIdeas {
   
@@ -35,8 +35,8 @@ object PvTIdeas {
   
   class AttackRespectingMines extends If(
     new Or(
+      new Employing(PvT1015Expand),
       new Employing(PvTEarly1015GateGoonDT),
-      new Employing(PvTEarly4Gate),
       new Employing(PvTEarly1GateStargateTemplar),
       new IfOnMiningBases(3),
       new EnemyBio,
@@ -117,8 +117,10 @@ object PvTIdeas {
     new TrainObservers,
     new TrainMinimumDragoons,
     new TrainHighTemplarAgainstBio,
-    new TrainContinuously(Protoss.Arbiter),
-    new TrainContinuously(Protoss.Carrier),
+    new FlipIf(
+      new Check(() => With.units.countOurs(Protoss.Carrier) >= Math.max(8, 4 * With.units.countOurs(Protoss.Arbiter))),
+      new TrainContinuously(Protoss.Carrier),
+      new TrainContinuously(Protoss.Arbiter)),
     new TrainHighTemplarWithSpareGas,
     new TrainScouts,
     new TrainZealotsOrDragoons)

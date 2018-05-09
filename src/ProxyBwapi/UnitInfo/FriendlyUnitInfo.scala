@@ -51,6 +51,16 @@ class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends FriendlyUnitProxy(base
   // Statuses //
   //////////////
   
+  def trainee: Option[FriendlyUnitInfo] = traineeCache()
+  private val traineeCache = new Cache[Option[FriendlyUnitInfo]](() =>
+    if (training)
+      With.units.ours.find(u =>
+        ! u.complete
+        && u.alive
+        && u.pixelCenter == pixelCenter
+        && is(u.unitClass.whatBuilds._1))
+    else None)
+  
   def loadedUnits: Vector[FriendlyUnitInfo] = loadedUnitsCache()
   private val loadedUnitsCache = new Cache(() =>
     if (isAny(Terran.Bunker, Terran.Dropship, Protoss.Shuttle, Zerg.Overlord))
@@ -73,4 +83,6 @@ class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends FriendlyUnitProxy(base
     passenger.canMove                 &&
     passenger.transport.isEmpty       &&
     spaceRemaining >= passenger.unitClass.spaceRequired
+  
+  override def subjectiveValue: Int = super.subjectiveValue + trainee.map(_.subjectiveValue).sum
 }

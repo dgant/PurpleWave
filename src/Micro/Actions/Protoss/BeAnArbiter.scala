@@ -73,7 +73,7 @@ object BeAnArbiter extends Action {
       Move.delegate(unit)
     }
     else if (needUmbrella.nonEmpty) {
-      val forcesThreats = unit.matchups.threats
+      val forcesThreats = unit.matchups.enemies
         .map(enemy =>
           Potential.unitAttraction(
             unit,

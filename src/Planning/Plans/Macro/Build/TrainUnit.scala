@@ -42,23 +42,16 @@ class TrainUnit(val traineeClass: UnitClass) extends Plan {
   
   override def isComplete: Boolean = trainee.exists(_.aliveAndComplete)
   
-  def matches(candidateTrainee: FriendlyUnitInfo, candidateTrainer: FriendlyUnitInfo): Boolean = {
-    ! candidateTrainee.complete       &&
-    candidateTrainee.alive            &&
-    candidateTrainee.is(traineeClass) &&
-    candidateTrainee.pixelCenter == candidateTrainer.pixelCenter
-  }
-  
   override def onUpdate() {
     if (isComplete) return
   
     // Trainee dead? Forget we had one.
     // Have a trainer but no trainee? Check for trainee.
     
-    trainee = trainee.filter(theTrainee => trainer.exists(theTrainer => matches(theTrainee, theTrainer)))
+    trainee = trainee.filter(theTrainee => trainer.exists(_.trainee.exists(_.is(traineeClass))))
     
     if (trainer.isDefined && trainee.isEmpty) {
-      trainee = With.units.ours.find(unit => matches(unit, trainer.get))
+      trainee = trainer.flatMap(_.trainee.filter(_.is(traineeClass)))
     }
   
     // Duplicated across MorphUnit

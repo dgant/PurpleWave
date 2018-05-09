@@ -29,13 +29,20 @@ class PvTBasic extends GameplanModeTemplate {
   override val defaultWorkerPlan      = new TrainWorkersContinuously(oversaturate = true)
   override val priorityAttackPlan     = new PvTIdeas.PriorityAttacks
   
-  override def defaultAggressionPlan: Plan = new If(
-    new And(
-      new EmployingCarriers,
-      new UnitsAtLeast(1, Protoss.Stargate),
-      new UnitsAtMost(12, Protoss.Interceptor)),
-    new Aggression(0.8),
-    new Aggression(1.0))
+  override def defaultAggressionPlan: Plan =
+    new If(
+      new And(
+        new EmployingCarriers,
+        new UnitsAtLeast(1, Protoss.Stargate),
+        new UnitsAtMost(32, Protoss.Interceptor)),
+      new Aggression(0.8),
+      new If(
+        new And(
+          new EmployingArbiters,
+          new UnitsAtLeast(1, Protoss.Stargate),
+          new UnitsAtMost(1, Protoss.Arbiter, complete = true)),
+        new Aggression(0.9),
+        new Aggression(1.0)))
   
   override def defaultScoutPlan: Plan = new Parallel(
     new If(new Employing(PvT13Nexus),       new ScoutOn(Protoss.Nexus, quantity = 2)),

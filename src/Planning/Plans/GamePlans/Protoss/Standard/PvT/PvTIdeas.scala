@@ -106,10 +106,10 @@ object PvTIdeas {
         new MineralsAtLeast(600),
         new GasAtMost(200)),
       new And(
-        new UnitsAtLeast(10, Protoss.Dragoon),
+        new UnitsAtLeast(12, Protoss.Dragoon),
         new UpgradeComplete(Protoss.ZealotSpeed, withinFrames = Protoss.ZealotSpeed.upgradeFrames.head._2))),
     new TrainContinuously(Protoss.Dragoon),
-    new TrainContinuously(Protoss.Zealot, 30, 5))
+    new TrainContinuously(Protoss.Zealot))
   
   class TrainArmy extends Parallel(
     new TrainDarkTemplar,

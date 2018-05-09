@@ -2,10 +2,11 @@ package Micro.Actions.Combat.Tactics
 
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
+import Mathematics.Points.Pixel
 import Micro.Actions.Action
 import Micro.Actions.Combat.Decisionmaking.Leave
 import ProxyBwapi.Races.{Protoss, Terran}
-import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import bwapi.Race
 
 object Bust extends Action {
@@ -17,6 +18,15 @@ object Bust extends Action {
   // Killing bunkers with Dragoons is an important technique that we can't yet perform on first princples.
   // Range-upgraded Dragoons just barely outrange a Bunker containing non-range-upgraded Marines.
   
+  protected def safeFromThreat(
+    dragoon: FriendlyUnitInfo,
+    threat: UnitInfo,
+    pixel: Pixel): Boolean = (
+    threat.is(Terran.Bunker)
+    || threat.is(Terran.Marine)
+    || threat.pixelDistanceEdge(dragoon, pixel) > threat.pixelRangeAgainst(dragoon) + 48.0
+  )
+  
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     unit.totalHealth >= unit.unitClass.maxHitPoints + 12 // Don't take hull damage
     && With.enemies.exists(_.raceCurrent == Race.Terran)
@@ -24,12 +34,17 @@ object Bust extends Action {
     && unit.canMove
     && unit.is(Protoss.Dragoon)
     && With.self.hasUpgrade(Protoss.DragoonRange)
-    && unit.matchups.threatsInRange.forall( ! _.is(Terran.SiegeTankSieged))
-    && unit.matchups.targets.exists(target =>
-        (target.visible || With.grids.altitudeBonus.get(unit.tileIncludingCenter) == With.grids.altitudeBonus.get(target.tileIncludingCenter))
-        && target.aliveAndComplete
-        && target.is(Terran.Bunker)
-        && ! target.player.hasUpgrade(Terran.MarineRange))
+    && unit.matchups.threats.forall(threat => safeFromThreat(unit, threat, unit.pixelCenter))
+    && unit.matchups.targets.exists(bunker =>
+        (bunker.visible || With.grids.altitudeBonus.get(unit.tileIncludingCenter) == With.grids.altitudeBonus.get(bunker.tileIncludingCenter))
+        && bunker.aliveAndComplete
+        && ! bunker.player.hasUpgrade(Terran.MarineRange)
+        && bunker.is(Terran.Bunker)
+        && unit.matchups.threats.forall(threat =>
+          safeFromThreat(
+            unit,
+            threat,
+            unit.pixelCenter.project(bunker.pixelCenter, unit.pixelDistanceEdge(bunker) - unit.pixelRangeAgainst(bunker)))))
   )
   
   override protected def perform(unit: FriendlyUnitInfo) {

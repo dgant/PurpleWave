@@ -54,8 +54,8 @@ object BeAnArbiter extends Action {
         umbrellaSearchRadius,
         Protoss.Zealot.subjectiveValue,
         evaluateForCloaking,
-        24,
-        (tile) => Circle.points(3).map(tile.add),
+        12,
+        (tile) => Circle.points(2).map(tile.add),
         Some(needUmbrellaNearby))
       unit.agent.toTravel = destination.orElse(
         Some(needUmbrella

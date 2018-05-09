@@ -7,7 +7,7 @@ import Strategery.Strategies.Terran.TvE._
 import Strategery.Strategies.Terran.TvR.{TvR1Rax, TvRTinfoil}
 import Strategery.Strategies.Terran.TvT.TvTStandard
 import Strategery.Strategies.Terran.TvZ._
-import Strategery.Strategies.Zerg.{FivePoolProxySunkens, Zerg4Pool}
+import Strategery.Strategies.Zerg.FivePoolProxySunkens
 
 class EmptyPlaybook {
   val none: Seq[Strategy] = Seq.empty
@@ -31,6 +31,7 @@ object StrategyGroups {
     TvZEarly1RaxFEEconomic,
     TvZEarly1RaxFEConservative,
     TvZEarly2Rax,
+    PvTEarly4Gate,
     PvPOpen3GateSpeedlots,
     PvZ4Gate99,
     MassPhotonCannon,
@@ -41,7 +42,7 @@ object StrategyGroups {
 }
 
 class TestingPlaybook extends EmptyPlaybook {
-  val strategiesToTest: Seq[Strategy] = Seq(Zerg4Pool)
+  val strategiesToTest: Seq[Strategy] = Seq(PvT2BaseCarrier)
   
   override lazy val forced: Seq[Strategy] = strategiesToTest
 }

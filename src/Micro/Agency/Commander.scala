@@ -80,7 +80,10 @@ class Commander {
       lazy val overdueToAttack  = unit.cooldownLeft == 0 && With.framesSince(unit.lastFrameStartingAttack) > 2.0 * unit.cooldownMaxAirGround
       lazy val thisIsANewTarget = ! unit.orderTarget.contains(target)
       
-      val shouldOrder = thisIsANewTarget || (overdueToAttack && (moving || alreadyInRange))
+      val shouldOrder = (
+        thisIsANewTarget
+        || (overdueToAttack && (moving || alreadyInRange))
+        || (target.isFriendly && unit.is(Protoss.Carrier))) // Carrier warmup
       
       if (shouldOrder) {
         unit.baseUnit.attack(target.baseUnit)

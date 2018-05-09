@@ -12,7 +12,7 @@ import Mathematics.Points.{Pixel, Tile, TileRectangle}
 import Mathematics.PurpleMath
 import Micro.Matchups.MatchupAnalysis
 import Performance.Cache
-import Planning.Composition.UnitMatchers.UnitMatcher
+import Planning.Composition.UnitMatchers.{UnitMatchSiegeTank, UnitMatcher}
 import ProxyBwapi.Engine.Damage
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
@@ -501,7 +501,10 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   
   def likelyStillThere: Boolean =
     possiblyStillThere &&
-    ( ! canMove || With.framesSince(lastSeen) < With.configuration.fogPositionDurationFrames || isSiegeTankUnsieged())
+    ( ! canMove
+      || With.framesSince(lastSeen) < With.configuration.fogPositionDurationFrames
+      || is(UnitMatchSiegeTank)
+      || base.exists(_.owner == player))
   
   def likelyStillAlive: Boolean = (
     likelyStillThere

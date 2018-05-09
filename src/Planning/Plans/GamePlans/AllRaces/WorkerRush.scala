@@ -16,6 +16,9 @@ import ProxyBwapi.Races.{Protoss, Zerg}
 class WorkerRush extends Trigger {
   
   private class ExecuteRush extends Parallel(
+    // We get confused because our builder is also our gatherer,
+    // so we send it "in advance" but then we have no income
+    new Do(() => With.blackboard.maxFramesToSendAdvanceBuilder = 0),
     new If(
       new Check(() => With.self.supplyUsed == With.self.supplyTotal),
       new Build(RequestAnother(1, With.self.supplyClass))

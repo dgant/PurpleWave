@@ -29,6 +29,14 @@ class PvTBasic extends GameplanModeTemplate {
   override val defaultWorkerPlan      = new TrainWorkersContinuously(oversaturate = true)
   override val priorityAttackPlan     = new PvTIdeas.PriorityAttacks
   
+  override def defaultAggressionPlan: Plan = new If(
+    new And(
+      new EmployingCarriers,
+      new UnitsAtLeast(1, Protoss.Stargate),
+      new UnitsAtMost(12, Protoss.Interceptor)),
+    new Aggression(0.8),
+    new Aggression(1.0))
+  
   override def defaultScoutPlan: Plan = new Parallel(
     new If(new Employing(PvT13Nexus),       new ScoutOn(Protoss.Nexus, quantity = 2)),
     new If(new Employing(PvT21Nexus),       new ScoutOn(Protoss.Gateway)),
@@ -51,8 +59,7 @@ class PvTBasic extends GameplanModeTemplate {
   
   class NeedObservers extends Or(
     new EnemyHasShownCloakedThreat,
-    new EnemyUnitsAtLeast(2, Terran.Vulture),
-    new EnemyUnitsAtLeast(2, Terran.Factory))
+    new Latch(new EnemyUnitsAtLeast(4, Terran.Vulture)))
   
   class PreparedForBio extends Latch(
     new Or(
@@ -193,13 +200,6 @@ class PvTBasic extends GameplanModeTemplate {
             RequestAtLeast(2, Protoss.Forge))))))
   
   override val buildPlans = Vector(
-    new If(
-      new And(
-        new EmployingCarriers,
-        new UnitsAtLeast(1, Protoss.Stargate),
-        new UnitsAtMost(12, Protoss.Interceptor)),
-      new Aggression(0.8),
-      new Aggression(1.0)),
     
     new RequireMiningBases(2),
     new If(
@@ -224,6 +224,8 @@ class PvTBasic extends GameplanModeTemplate {
     
     new Build(RequestAtLeast(6, Protoss.Gateway)),
     
+    // Maybe move this up before army
+    // (and the 4-pump one too)
     new If(
       new OnGasPumps(3),
       new Parallel(
@@ -240,6 +242,8 @@ class PvTBasic extends GameplanModeTemplate {
         new UpgradeContinuously(Protoss.GroundArmor),
         new Build(RequestAtLeast(1, Protoss.TemplarArchives)))),
   
+    // Maybe move this up before army
+    // (and the 4-pump one too)
     new If(
       new OnGasPumps(4),
       new If(

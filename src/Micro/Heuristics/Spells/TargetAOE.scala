@@ -20,7 +20,11 @@ object TargetAOE {
     candidates          : Option[Iterable[UnitInfo]] = None)
     : Option[Pixel] = {
     
-    val targets       = candidates.getOrElse(caster.matchups.allUnits.filter(target => (target.visible || target.burrowed) && target.pixelDistanceCenter(caster) <= searchRadiusPixels))
+    val targets = candidates
+      .getOrElse(caster.matchups.allUnits.filter(target =>
+        (target.visible || target.burrowed)
+        && target.pixelDistanceCenter(caster) <= searchRadiusPixels))
+      .filter( ! _.invincible)
     val targetsByTile = targets.groupBy(projectTarget(_, projectionFrames).tileIncluding)
     val targetValues  = targets.map(target => (target, evaluate(target))).toMap
     

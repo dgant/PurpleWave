@@ -174,7 +174,7 @@ class PvTBasic extends GameplanModeTemplate {
       new Parallel(
         new If(
           new And(
-            new UnitsAtMost(0, Protoss.TemplarArchives),
+            new UnitsExactly(0, Protoss.TemplarArchives),
             new UnitsAtLeast(1, Protoss.RoboticsFacility)),
           new Build(
             RequestAtLeast(1, Protoss.RoboticsSupportBay),

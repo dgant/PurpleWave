@@ -37,10 +37,10 @@ class Attack extends Plan {
           val resources           = base.mineralsLeft + base.gasLeft
           val distance            = attackerCenter.pixelDistance(base.heart.pixelCenter)
           val defenders           = base.defenders.map(_.subjectiveValue).sum
-          val resourcesProjected  = Math.max(resources / 4.0, resources - With.economy.incomePerFrameMinerals * 15 * age)
+          val resourcesProjected  = Math.max(resources / 4.0, resources - With.economy.incomePerFrameMinerals * 20 * age)
           val distanceLog         = 1 + Math.log(1 + distance)
           val defendersLog        = 1 + Math.log(1 + defenders)
-          val output              = (1.0 + resourcesProjected) / distanceLog / defendersLog
+          val output              = (1.0 + resourcesProjected) / distanceLog // / defendersLog
           output
         })
         .map(base => ByOption.minBy(base.units.filter(u => u.isEnemy && u.unitClass.isBuilding))(_.pixelDistanceCenter(base.townHallArea.midPixel))

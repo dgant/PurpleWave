@@ -64,12 +64,13 @@ object BeAnArbiter extends Action {
     }
   
     val forceUmbrella = new Force(unit.agent.destination.subtract(unit.pixelCenter)).normalize
-    val framesOfSafetyRequired = Math.max(12, 48 - With.framesSince(unit.lastFrameTakingDamage))
+    val framesOfSafetyRequired = Math.max(0, 48 - With.framesSince(unit.lastFrameTakingDamage))
     if (unit.matchups.framesOfSafety <= framesOfSafetyRequired) {
-      val forceThreat = Potential.threatsRepulsion(unit).normalize(3.0)
+      val forceThreat = Potential.threatsRepulsion(unit)
       unit.agent.forces.put(ForceColors.regrouping, forceUmbrella)
       unit.agent.forces.put(ForceColors.threat, forceThreat)
       Gravitate.consider(unit)
+      Move.delegate(unit)
     }
     else if (needUmbrella.nonEmpty) {
       val forcesThreats = unit.matchups.threats
@@ -80,12 +81,11 @@ object BeAnArbiter extends Action {
                     enemy.matchups.targets.size
             + 2.0 * enemy.matchups.targetsInRange.size))
   
-      val forceThreats  = ForceMath.sum(forcesThreats)
+      val forceThreats  = ForceMath.sum(forcesThreats).normalize
       unit.agent.forces.put(ForceColors.regrouping, forceUmbrella)
       unit.agent.forces.put(ForceColors.target,     forceThreats)
       Gravitate.consider(unit)
+      Move.delegate(unit)
     }
-    
-    Move.delegate(unit)
   }
 }

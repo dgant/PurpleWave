@@ -39,7 +39,7 @@ object FightOrFlight extends Action {
       val base = u.base
       (
         ally.isDefined
-        && base.isDefined
+        && base.exists(unit.base.contains)
         && u.unitClass.isWorker
         && (
           // Worker is mining in base

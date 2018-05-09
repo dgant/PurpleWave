@@ -45,7 +45,7 @@ class FindExpansions extends Plan {
   var lastReleaseFrame = 0
   
   override def onUpdate() {
-    if (With.framesSince(lastReleaseFrame) > GameTime(0, 15)()) {
+    if (false && With.framesSince(lastReleaseFrame) > GameTime(0, 15)()) {
       scouts.get.release()
       lastReleaseFrame = With.frame
     }

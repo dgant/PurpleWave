@@ -59,7 +59,7 @@ class DefendAgainstProxy extends Plan {
   
     squad.enemies = proxies
     squad.conscript(defenders.get.units)
-    squad.setGoal(new GoalPush(proxies.head.pixelCenter) { berzerk = true })
+    squad.setGoal(new GoalPush(proxies.head.pixelCenter))
   }
   
   private def getProxies: Seq[UnitInfo] = {

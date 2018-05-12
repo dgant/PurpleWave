@@ -31,11 +31,7 @@ class Proxy5Rax extends GameplanModeTemplate {
     new Attack,
     new Trigger(
       new UnitsAtLeast(1, Terran.Marine, complete = false),
-      new Attack {
-        attackers.get.unitCounter.set(new UnitCountExcept(3, UnitMatchWorkers))
-        attackers.get.unitMatcher.set(UnitMatchWorkers)
-      })
-  )
+      new Attack(UnitMatchWorkers, new UnitCountExcept(3, UnitMatchWorkers))))
   
   override def defaultWorkerPlan: Plan = NoPlan()
   override def defaultSupplyPlan: Plan = NoPlan()

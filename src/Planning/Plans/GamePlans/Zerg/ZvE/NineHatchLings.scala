@@ -31,7 +31,7 @@ class NineHatchLings extends GameplanModeTemplate {
       new UpgradeComplete(Zerg.ZerglingSpeed),
       new Not(new EnemyIsZerg)),
     new Attack,
-    new Attack { attackers.get.unitCounter.set(UnitCountOne) })
+    new Attack(attackerCounter = UnitCountOne))
   
   override def buildPlans: Seq[Plan] = Vector(
     new If(

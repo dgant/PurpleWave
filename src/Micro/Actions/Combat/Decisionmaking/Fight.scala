@@ -2,7 +2,7 @@ package Micro.Actions.Combat.Decisionmaking
 
 import Micro.Actions.Action
 import Micro.Actions.Combat.Duck
-import Micro.Actions.Combat.Maneuvering.{Cower, GooseChase, Sneak}
+import Micro.Actions.Combat.Maneuvering.{GooseChase, Sneak}
 import Micro.Actions.Combat.Spells.{SpiderMine, Stim}
 import Micro.Actions.Combat.Tactics._
 import Micro.Actions.Protoss.{BeACarrier, BeACorsair, BeAnArbiter}
@@ -22,7 +22,6 @@ object Fight extends Action {
     Cast.consider(unit)
     Stim.consider(unit)
     Bunk.consider(unit)
-    Cower.consider(unit)
     Root.consider(unit)
     BeACarrier.consider(unit)
     BeAnArbiter.consider(unit)

@@ -5,7 +5,7 @@ import Planning.Composition.UnitMatchers.UnitMatcher
 import Planning.{Plan, Yolo}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 
-class SafeToAttack extends Plan {
+class SafeToMoveOut extends Plan {
   override def isComplete: Boolean = {
     if (Yolo.active) return true
     

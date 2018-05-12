@@ -40,7 +40,7 @@ class MassGoliath extends GameplanModeTemplate {
   override def defaultAttackPlan: Plan = new If(
     new UnitsAtLeast(35, UnitMatchWarriors),
     super.defaultAttackPlan,
-    new Attack { attackers.get.unitMatcher.set(Terran.Vulture)} )
+    new Attack(Terran.Vulture))
   
   override def emergencyPlans: Seq[Plan] = Seq(
     new TrainContinuously(Terran.Comsat),

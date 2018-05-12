@@ -3,7 +3,6 @@ package Planning.Plans.GamePlans.Terran.Standard.TvE
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.BuildRequests.{BuildRequest, RequestAtLeast, RequestTech, RequestUpgrade}
-import Planning.Composition.UnitCounters.UnitCountExactly
 import Planning.Composition.UnitMatchers._
 import Planning.Plan
 import Planning.Plans.Army.{Aggression, Attack}
@@ -18,7 +17,7 @@ import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Predicates.Economy.{GasAtLeast, MineralsAtMost}
 import Planning.Plans.Predicates.Matchup.{EnemyIsProtoss, EnemyIsZerg}
 import Planning.Plans.Predicates.Milestones.{EnemyHasShownCloakedThreat, EnemyUnitsAtLeast, IfOnMiningBases, UnitsAtLeast}
-import Planning.Plans.Predicates.{Employing, SafeAtHome, SafeToAttack}
+import Planning.Plans.Predicates.{Employing, SafeAtHome, SafeToMoveOut}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Strategies.Terran.TvE.TvETurtleMech
 
@@ -42,18 +41,10 @@ class TvETurtleMech extends GameplanModeTemplate {
   override def defaultAttackPlan: Plan = new Parallel(
     new If(
       new UnitsAtLeast(5, UnitMatchSiegeTank, complete = true),
-      new If(
-        new SafeToAttack,
-        new Parallel(
-          new Attack,
-          new Attack {
-            attackers.get.unitMatcher.set(Terran.SCV)
-            attackers.get.unitCounter.set(UnitCountExactly(3))
-          })
-      )),
+      new If(new SafeToMoveOut, new Attack)),
     new If(
-      new UnitsAtLeast(16, UnitMatchOr(Terran.Vulture, Terran.Goliath)),
-      new Attack { attackers.get.unitMatcher.set(Terran.Vulture) })
+      new UnitsAtLeast(4, UnitMatchOr(Terran.Vulture, Terran.Goliath)),
+      new Attack(Terran.Vulture))
   )
   
   override def emergencyPlans: Seq[Plan] = Vector(

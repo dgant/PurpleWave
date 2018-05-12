@@ -26,15 +26,15 @@ trait GoalBasic extends SquadGoal {
   final protected object Qualities {
     object Cloaked extends Quality {
       def matches(u: UnitInfo): Boolean = u.isAny(Terran.Ghost, Terran.Wraith, Protoss.Arbiter, Protoss.DarkTemplar, Protoss.Observer, Zerg.Lurker, Zerg.LurkerEgg)
-      val counteredBy: Array[Quality] = Array(Detector)
+      lazy val counteredBy: Array[Quality] = Array(Detector)
     }
     object Combat extends Quality {
       def matches(u: UnitInfo): Boolean = u.canAttack
-      val counteredBy: Array[Quality] = Array(Combat)
+      lazy val counteredBy: Array[Quality] = Array(Combat)
     }
     object Detector extends Quality {
       def matches(u: UnitInfo): Boolean = u.unitClass.isDetector
-      val counteredBy: Array[Quality] = Array.empty
+      lazy val counteredBy: Array[Quality] = Array.empty
       override def counterScaling(input: Double): Double = 5.0 * input
     }
     val all: Vector[Quality] = Vector(
@@ -83,7 +83,7 @@ trait GoalBasic extends SquadGoal {
   }
   
   protected def offerCritical(candidates: Iterable[FriendlyUnitInfo]): Iterable[FriendlyUnitInfo] = {
-    lazy val sorted = sortNearest(candidates)
+    lazy val sorted = sortAndFilterCandidates(candidates)
     val output = new mutable.ArrayBuffer[FriendlyUnitInfo]
     val newbiesByQuality  = new CountMap[Quality]
     enemiesByQuality.foreach(pair => {
@@ -95,7 +95,7 @@ trait GoalBasic extends SquadGoal {
   }
   
   protected def offerImportant(candidates: Iterable[FriendlyUnitInfo]): Iterable[FriendlyUnitInfo] = {
-    lazy val sorted = sortNearest(candidates)
+    lazy val sorted = sortAndFilterCandidates(candidates)
     val output = new mutable.ArrayBuffer[FriendlyUnitInfo]
     enemiesByQuality.foreach(pair => {
       if (pair._2 > Math.max(0.0, pair._1.counterScaling(pair._1.counteredBy.map(recruitsByQuality(_)).sum))) {
@@ -122,7 +122,7 @@ trait GoalBasic extends SquadGoal {
   protected def acceptsHelp: Boolean = true
   protected def equippedSufficiently: Boolean = true
   protected def destination: Pixel = With.intelligence.mostBaselikeEnemyTile.pixelCenter
-  protected def sortNearest(candidates: Iterable[FriendlyUnitInfo]): Iterable[FriendlyUnitInfo] = {
+  protected def sortAndFilterCandidates(candidates: Iterable[FriendlyUnitInfo]): Iterable[FriendlyUnitInfo] = {
     candidates.toVector.sortBy(_.pixelDistanceTravelling(destination))
   }
   

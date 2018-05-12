@@ -20,13 +20,13 @@ object PvTIdeas {
     new Or(
       new EnemyUnitsNone(Protoss.Observer),
       new EnemyBasesAtLeast(3)),
-    new Attack { attackers.get.unitMatcher.set(Protoss.DarkTemplar) })
+    new Attack(Protoss.DarkTemplar))
   
-  class AttackWithScouts extends Attack { attackers.get.unitMatcher.set(Protoss.Scout) }
+  class AttackWithScouts extends Attack(Protoss.Scout)
   
   class AttackWithCarrierFleet extends Trigger(
     new UnitsAtLeast(4, Protoss.Carrier),
-    initialAfter = new Attack { attackers.get.unitMatcher.set(Protoss.Carrier) })
+    initialAfter = new Attack(Protoss.Carrier))
   
   class PriorityAttacks extends Parallel(
     new AttackWithDarkTemplar,

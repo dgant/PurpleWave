@@ -28,12 +28,7 @@ class TvE2RaxMarineSCVAllIn extends GameplanModeTemplate {
     new Parallel(
       new Aggression(2.0),
       new Attack,
-      new Attack {
-        attackers.get.unitCounter.set(new UnitCountExcept(5, UnitMatchWorkers))
-        attackers.get.unitMatcher.set(UnitMatchWorkers)
-      }
-    )
-  )
+      new Attack(UnitMatchWorkers, new UnitCountExcept(5, UnitMatchWorkers))))
   
   override def defaultSupplyPlan: Plan = new If(
     new Or(

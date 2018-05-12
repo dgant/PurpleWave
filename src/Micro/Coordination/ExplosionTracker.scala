@@ -54,9 +54,9 @@ class ExplosionTracker {
     lazy val sourceUnit   = bullet.sourceUnit
     if (someTerran && sourceUnit.exists(_.is(Terran.ScienceVessel)))
       addToBattle(sourceUnit.get, new ExplosionEMP(bullet))
-    else if (someZerg && sourceUnit.exists(_.is(Zerg.Lurker)) && bullet.sourceUnit.get.isEnemy) {
-      // Makes units do dumb things. Maybe limit it to when there's 1-2 nearby Lurkers max
-      //addToBattle(sourceUnit.get, new ExplosionLurkerNow(bullet))
+    else if (someZerg
+      && sourceUnit.exists(u => u.is(Zerg.Lurker) && u.isEnemy && u.effectivelyCloaked)) {
+      addToBattle(sourceUnit.get, new ExplosionLurkerNow(bullet))
     }
     else if (someProtoss && sourceUnit.exists(_.is(Protoss.HighTemplar))) {
       addToBattle(sourceUnit.get, new ExplosionPsionicStorm(bullet))

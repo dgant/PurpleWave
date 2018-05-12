@@ -22,14 +22,9 @@ class ThirteenPoolMuta extends GameplanModeTemplate {
   
   override def defaultScoutPlan: Plan = new If(
     new Not(new FoundEnemyBase),
-    new Attack {
-      attackers.get.unitMatcher.set(Zerg.Zergling)
-      attackers.get.unitCounter.set(UnitCountOne)
-    })
+    new Attack(Zerg.Zergling, UnitCountOne))
   
-  override def defaultAttackPlan: Plan = new Attack {
-    attackers.get.unitMatcher.set(Zerg.Mutalisk)
-  }
+  override def defaultAttackPlan: Plan = new Attack(Zerg.Mutalisk)
   
   override def defaultBuildOrder: Plan = new Parallel (
     new BuildOrder(

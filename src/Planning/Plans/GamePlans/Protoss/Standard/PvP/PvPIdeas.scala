@@ -14,7 +14,7 @@ import Planning.Plans.Predicates.Economy.GasAtMost
 import Planning.Plans.Predicates.Milestones._
 import Planning.Plans.Predicates.Reactive.{EnemyBasesAtLeast, EnemyCarriers, EnemyDarkTemplarExists, EnemyDarkTemplarPossible}
 import Planning.Plans.Predicates.Scenarios.{EnemyStrategy, WeAreBeingProxied}
-import Planning.Plans.Predicates.{Employing, SafeAtHome, SafeToAttack}
+import Planning.Plans.Predicates.{Employing, SafeAtHome, SafeToMoveOut}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvPOpen4GateGoon
 
@@ -28,7 +28,7 @@ object PvPIdeas {
     new Or(
       new EnemyUnitsNone(Protoss.Observer),
       new EnemyBasesAtLeast(3)),
-    new Attack { attackers.get.unitMatcher.set(Protoss.DarkTemplar) })
+    new Attack(Protoss.DarkTemplar))
   
   class AttackSafely extends If(
     new And(
@@ -38,7 +38,7 @@ object PvPIdeas {
       new Or(
         new EnemyStrategy(With.intelligence.fingerprints.fingerprintCannonRush),
         new Employing(PvPOpen4GateGoon),
-        new SafeToAttack,
+        new SafeToMoveOut,
         new MiningBasesAtLeast(3),
         new EnemyBasesAtLeast(3))),
     new Attack)

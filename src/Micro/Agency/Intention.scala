@@ -24,11 +24,9 @@ class Intention {
   var toLeash     : Option[Leash]     = None
   var canAttack   : Boolean           = true
   var canFlee     : Boolean           = true
-  var canCower    : Boolean           = false
   var canMeld     : Boolean           = false
   var canTickle   : Boolean           = false
   var canScout    : Boolean           = false
-  var canPillage  : Boolean           = false
   var canBerzerk  : Boolean           = false
   var canLiftoff  : Boolean           = false
   var canCancel   : Boolean           = false

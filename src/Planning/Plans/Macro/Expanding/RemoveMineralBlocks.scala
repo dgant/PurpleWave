@@ -31,7 +31,6 @@ class RemoveMineralBlocks extends Plan {
     miners.get.acquire(this)
     miners.get.units.foreach(_.agent.intend(this, new Intention {
       toGather = Some(mineral)
-      canCower = true
     }))
   }
 }

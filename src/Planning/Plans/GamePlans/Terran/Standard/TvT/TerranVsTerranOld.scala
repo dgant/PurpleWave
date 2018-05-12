@@ -13,7 +13,7 @@ import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Predicates.Economy.MineralsAtLeast
-import Planning.Plans.Predicates.Employing
+import Planning.Plans.Predicates.{Employing, SafeToMoveOut}
 import Planning.Plans.Predicates.Milestones.{IfOnMiningBases, OnGasPumps, UnitsAtLeast}
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvT.TvTStandard
@@ -28,12 +28,11 @@ class TerranVsTerranOld extends GameplanModeTemplate {
   
   override def defaultAttackPlan: Plan = new Trigger(
     new UnitsAtLeast(1, Terran.Wraith, complete = true),
-    new Parallel(
-      new ConsiderAttacking,
-      new ConsiderAttacking {
-        attack.attackers.get.unitMatcher.set(UnitMatchWorkers)
-        attack.attackers.get.unitCounter.set(UnitCountOne)
-      }))
+    new If(
+      new SafeToMoveOut,
+      new Parallel(
+        new Attack,
+        new Attack(UnitMatchWorkers, UnitCountOne))))
   
   override val buildOrder = Vector(
     RequestAtLeast(1,   Terran.CommandCenter),

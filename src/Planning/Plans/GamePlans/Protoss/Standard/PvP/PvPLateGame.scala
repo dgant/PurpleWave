@@ -15,7 +15,7 @@ import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Predicates.Economy.GasAtMost
 import Planning.Plans.Predicates.Milestones._
 import Planning.Plans.Predicates.Reactive.EnemyCarriers
-import Planning.Plans.Predicates.{Employing, SafeAtHome, SafeToAttack}
+import Planning.Plans.Predicates.{Employing, SafeAtHome, SafeToMoveOut}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.{PvPLateGameArbiter, PvPLateGameCarrier}
 
@@ -145,7 +145,7 @@ class PvPLateGame extends GameplanModeTemplate {
       new BuildTech),
 
     new FlipIf(
-      new SafeToAttack,
+      new SafeToMoveOut,
       new If(
         new UnitsAtLeast(1, Protoss.RoboticsSupportBay),
         new Build(RequestAtLeast(6, Protoss.Gateway)),
@@ -158,7 +158,7 @@ class PvPLateGame extends GameplanModeTemplate {
     new RequireMiningBases(3),
   
     new If(
-      new SafeToAttack,
+      new SafeToMoveOut,
       new RequireMiningBases(4)),
     
     new If(
@@ -180,7 +180,7 @@ class PvPLateGame extends GameplanModeTemplate {
       new ArbiterTransition),
   
     new FlipIf(
-      new SafeToAttack,
+      new SafeToMoveOut,
       new Build(RequestAtLeast(12, Protoss.Gateway)),
       new RequireMiningBases(4)),
   
@@ -191,7 +191,7 @@ class PvPLateGame extends GameplanModeTemplate {
         RequestAtLeast(1, Protoss.Corsair))),
   
     new FlipIf(
-      new SafeToAttack,
+      new SafeToMoveOut,
       new Build(RequestAtLeast(20, Protoss.Gateway)),
       new RequireMiningBases(5)),
   

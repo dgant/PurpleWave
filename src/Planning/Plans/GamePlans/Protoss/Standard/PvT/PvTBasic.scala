@@ -17,7 +17,7 @@ import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Predicates.Economy.MineralsAtLeast
 import Planning.Plans.Predicates.Milestones._
 import Planning.Plans.Predicates.Reactive.{EnemyBasesAtLeast, EnemyBio}
-import Planning.Plans.Predicates.{Employing, Never, SafeAtHome, SafeToAttack}
+import Planning.Plans.Predicates.{Employing, Never, SafeAtHome, SafeToMoveOut}
 import Planning.Plans.Scouting.ScoutOn
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss._
@@ -90,7 +90,7 @@ class PvTBasic extends GameplanModeTemplate {
   
   class ReadyForFourthBase extends And(
     new ReadyForThirdBase,
-    new SafeToAttack,
+    new SafeToMoveOut,
     new Or(
       new EnemyBasesAtLeast(3),
       new And(new EnemyBio, new PreparedForBio),
@@ -260,7 +260,9 @@ class PvTBasic extends GameplanModeTemplate {
     new BasicTech,
     new CriticalUpgrades,
     new FlipIf(
-      new SafeAtHome,
+      new And(
+        new SafeAtHome,
+        new UnitsAtLeast(12, UnitMatchWarriors)), // Gotta do better than this
       new Parallel(
         new PvTIdeas.TrainArmy,
         new If(

@@ -76,7 +76,6 @@ class WorkerRushLiftoff extends Parallel {
   private def runAway(unit: FriendlyUnitInfo) {
     val intent = new Intention {
       canAttack = false
-      canCower = true
       toTravel = Some(bestGroundPixel)
     }
     unit.agent.intend(this, intent)
@@ -85,15 +84,14 @@ class WorkerRushLiftoff extends Parallel {
   private def flyAway(unit: FriendlyUnitInfo) {
     val intent = new Intention {
       canAttack = false
-      canCower = true
       canLiftoff = true
       toTravel = Some(bestAirPixel)
     }
     unit.agent.intend(this, intent)
   }
   
-  protected lazy val baseZones = With.geography.bases.map(_.zone)
-  protected lazy val baseZonePaths =
+  private lazy val baseZones = With.geography.bases.map(_.zone)
+  private lazy val baseZonePaths =
     baseZones.flatMap(zone1 =>
       baseZones.flatMap(zone2 =>
         With.paths.zonePath(zone1, zone2)))

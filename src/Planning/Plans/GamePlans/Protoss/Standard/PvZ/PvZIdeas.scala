@@ -13,7 +13,7 @@ import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Predicates.Economy.GasAtLeast
 import Planning.Plans.Predicates.Milestones.{EnemyHasShownCloakedThreat, _}
 import Planning.Plans.Predicates.Reactive.EnemyMutalisks
-import Planning.Plans.Predicates.{SafeAtHome, SafeToAttack}
+import Planning.Plans.Predicates.{SafeAtHome, SafeToMoveOut}
 import ProxyBwapi.Races.{Protoss, Zerg}
 
 object PvZIdeas {
@@ -21,7 +21,7 @@ object PvZIdeas {
   class TakeSafeNatural extends If(
     new Or(
       new And(
-        new SafeToAttack,
+        new SafeToMoveOut,
         new UnitsAtLeast(6, UnitMatchWarriors, complete = true)),
       new And(
         new SafeAtHome,
@@ -32,7 +32,7 @@ object PvZIdeas {
   class TakeSafeThirdBase extends If(
     new Or(
       new And(
-        new SafeToAttack,
+        new SafeToMoveOut,
         new UnitsAtLeast(15, UnitMatchWarriors, complete = true)),
       new And(
         new SafeAtHome,
@@ -43,7 +43,7 @@ object PvZIdeas {
   class TakeSafeFourthBase extends If(
     new Or(
       new And(
-        new SafeToAttack,
+        new SafeToMoveOut,
         new UnitsAtLeast(30, UnitMatchWarriors, complete = true)),
       new And(
         new SafeAtHome,

@@ -18,8 +18,8 @@ class ProtossVsZergSpeedlotTemplar extends GameplanModeTemplate {
   override def aggression: Double = 0.85
   
   override def defaultAttackPlan: Plan = new Parallel(
-    new Attack { attackers.get.unitMatcher.set(Protoss.Corsair) },
-    new Attack { attackers.get.unitMatcher.set(Protoss.DarkTemplar) },
+    new Attack(Protoss.Corsair),
+    new Attack(Protoss.DarkTemplar),
     super.defaultAttackPlan
   )
   

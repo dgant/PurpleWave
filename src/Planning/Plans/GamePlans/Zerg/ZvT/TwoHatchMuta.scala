@@ -30,7 +30,7 @@ class TwoHatchMuta extends GameplanModeTemplate {
     new Blueprint(this, building = Some(Zerg.CreepColony), requireZone = Some(With.geography.ourNatural.zone), placement = Some(PlacementProfiles.hugTownHall)))
   
   override def defaultAttackPlan: Plan = new Parallel(
-    new Attack { attackers.get.unitMatcher.set(Zerg.Mutalisk) },
+    new Attack(Zerg.Mutalisk),
     new If(
       new Or(
         new Not(new EnemyIsZerg),

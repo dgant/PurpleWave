@@ -2,16 +2,15 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvE
 
 import Lifecycle.With
 import Macro.BuildRequests.{RequestAnother, RequestAtLeast, RequestTech, RequestUpgradeNext}
-import Planning.Plans.Army.{ConsiderAttacking, DefendZones}
+import Planning.Plans.Army.{Attack, ConsiderAttacking, DefendZones}
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, FollowBuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RemoveMineralBlocksAt, RequireMiningBases}
-import Planning.Plans.Predicates.Milestones.{IfOnMiningBases, OnGasPumps, UnitsAtLeast}
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
+import Planning.Plans.Predicates.Milestones.{IfOnMiningBases, OnGasPumps, UnitsAtLeast}
 import Planning.Plans.Recruitment.RecruitFreelancers
-import Planning.Plans.Scouting.FindExpansions
 import ProxyBwapi.Races.Protoss
 
 class ThreeBaseCarriersWithNoDefense extends Parallel {
@@ -84,7 +83,7 @@ class ThreeBaseCarriersWithNoDefense extends Parallel {
       RequestAnother(6, Protoss.PhotonCannon),
       RequestAnother(2, Protoss.Pylon)),
     new ExpandOverIsland(12),
-    new FindExpansions { scouts.get.unitMatcher.set(Protoss.Scout) },
+    new Attack(Protoss.Scout), // TODO: Scout expansions, don't attack
     new DefendZones,
     new If(
       new UnitsAtLeast(8 * 8, Protoss.Interceptor),

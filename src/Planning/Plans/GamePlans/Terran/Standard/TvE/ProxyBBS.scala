@@ -34,11 +34,7 @@ class ProxyBBS extends GameplanModeTemplate {
     new Attack,
     new Trigger(
       new UnitsAtLeast(1, Terran.Marine, complete = false),
-      new Attack {
-        attackers.get.unitCounter.set(UnitCountExactly(2))
-        attackers.get.unitMatcher.set(UnitMatchWorkers)
-      })
-  )
+      new Attack(UnitMatchWorkers, UnitCountExactly(2))))
   
   override def defaultWorkerPlan: Plan = NoPlan()
   override def defaultSupplyPlan: Plan = NoPlan()

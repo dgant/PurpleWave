@@ -154,11 +154,8 @@ class ProxyHatch extends Parallel {
           new UnitsAtLeast(2, Zerg.Hatchery,      complete = false),
           new UnitsAtLeast(1, Zerg.SpawningPool,  complete = false),
           new Not(new WeHaveEnoughSunkens)),
-        new Attack {
-          attackers.get.unitMatcher.set(UnitMatchWorkers)
-          attackers.get.unitCounter.set(UnitCountExactly(2))
-        },
-        new Attack { attackers.get.unitMatcher.set(UnitMatchMobileFlying) })),
+        new Attack(UnitMatchWorkers, UnitCountExactly(2)),
+        new Attack(UnitMatchMobileFlying))),
     
     new Gather
   ))

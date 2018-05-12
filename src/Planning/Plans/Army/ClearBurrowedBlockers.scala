@@ -43,7 +43,6 @@ class ClearBurrowedBlockers extends Plan {
     if (detector.get.units.nonEmpty) {
       detector.get.units.foreach(_.agent.intend(this, new Intention {
         toTravel = target
-        canCower = true
       }))
     }
   

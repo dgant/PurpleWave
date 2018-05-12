@@ -35,7 +35,7 @@ class ProtossHuntersFFAFFEScoutReaver extends GameplanModeTemplate {
     RequestAtLeast(2,   Protoss.PhotonCannon),
     RequestAtLeast(1,   Protoss.Gateway))
   
-  override def priorityAttackPlan: Plan = new Attack { attackers.get.unitMatcher.set(Protoss.Scout) }
+  override def priorityAttackPlan: Plan = new Attack(Protoss.Scout)
   
   override def buildPlans: Seq[Plan] = Vector(
     new If(

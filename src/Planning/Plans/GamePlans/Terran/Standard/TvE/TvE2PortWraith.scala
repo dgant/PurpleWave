@@ -20,8 +20,8 @@ class TvE2PortWraith extends GameplanModeTemplate {
   
   override val activationCriteria: Plan = new Employing(TvE2PortWraith)
   override def defaultAttackPlan = new Parallel(
-    new Attack { attackers.get.unitMatcher.set(Terran.Wraith) },
-    new Attack { attackers.get.unitMatcher.set(Terran.Vulture) }
+    new Attack(Terran.Wraith),
+    new Attack(Terran.Vulture)
   )
   
   override val buildOrder = Vector(

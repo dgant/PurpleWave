@@ -117,7 +117,6 @@ class Gather extends Plan {
     assign(worker, bestResource)
     worker.agent.intend(this, new Intention {
       toGather = resourceByWorker.get(worker)
-      canCower = true
     })
   }
   

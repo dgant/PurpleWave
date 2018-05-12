@@ -4,11 +4,11 @@ import Mathematics.Points.Pixel
 import Micro.Agency.Intention
 import Utilities.ByOption
 
-class SquadDrop(destination: Pixel) extends SquadGoal {
+class GoalDrop(destination: Pixel) extends GoalBasic {
   
   override def toString: String = "Drop on " + destination.zone.name
   
-  def updateUnits() {
+  override def run() {
     val transports            = squad.recruits.filter   (_.isTransport)
     val convoys               = squad.recruits.filterNot(_.isTransport).filter(_.flying )
     val passengers            = squad.recruits.filterNot(_.isTransport).filter( ! _.flying )
@@ -44,10 +44,5 @@ class SquadDrop(destination: Pixel) extends SquadGoal {
     }))
   }
   
-  override def acceptsHelp              : Boolean = true
-  override def shouldRequireAntiAir     : Boolean = false
-  override def shouldRequireAntiGround  : Boolean = false
-  override def shouldRequireAirToAir    : Boolean = squad.enemies.exists(_.flying)
-  override def shouldRequireAirToGround : Boolean = true
-  override def shouldRequireTransport   : Boolean = true
+  override def acceptsHelp: Boolean = false
 }

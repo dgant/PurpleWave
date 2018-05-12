@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Protoss.Situational
 import Information.Geography.Types.Base
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
-import Micro.Squads.Goals.SquadPush
+import Micro.Squads.Goals.GoalPush
 import Micro.Squads.Squad
 import Planning.Composition.Property
 import Planning.Composition.ResourceLocks.LockUnits
@@ -59,7 +59,7 @@ class DefendAgainstProxy extends Plan {
   
     squad.enemies = proxies
     squad.conscript(defenders.get.units)
-    squad.goal = new SquadPush(proxies.head.pixelCenter) { berzerk = true }
+    squad.setGoal(new GoalPush(proxies.head.pixelCenter) { berzerk = true })
   }
   
   private def getProxies: Seq[UnitInfo] = {

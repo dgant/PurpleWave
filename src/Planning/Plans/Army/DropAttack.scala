@@ -3,7 +3,7 @@ package Planning.Plans.Army
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Points.Pixel
-import Micro.Squads.Goals.SquadDrop
+import Micro.Squads.Goals.GoalDrop
 import Micro.Squads.Squad
 import Planning.Composition.Property
 import Planning.Composition.ResourceLocks.LockUnits
@@ -46,7 +46,7 @@ class DropAttack extends Plan {
     
     squad.conscript(transports)
     paratroopers.foreach(squad.recruit)
-    squad.goal = new SquadDrop(target)
+    squad.setGoal(new GoalDrop(target))
   }
   
   protected def attackTarget: Pixel = {

@@ -11,14 +11,14 @@ import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.ByOption
 import Utilities.EnrichPixel.EnrichedPixelCollection
 
-class SquadDefendZone(zone: Zone) extends SquadGoal {
+class GoalDefendZone(zone: Zone) extends GoalBasic {
   
   private var lastAction = "Defend "
   override def toString: String = lastAction + zone
   
   override def acceptsHelp: Boolean = false
   
-  def updateUnits() {
+  override def run() {
     lazy val base       = ByOption.minBy(zone.bases)(_.heart.tileDistanceManhattan(With.intelligence.mostBaselikeEnemyTile))
     lazy val choke      = zone.exit
     lazy val walls      = zone.units.toSeq.filter(u =>

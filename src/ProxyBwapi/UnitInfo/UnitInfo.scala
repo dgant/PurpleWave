@@ -127,7 +127,6 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
     + scarabCount * Protoss.Scarab.subjectiveValue
     + interceptorCount * Protoss.Interceptor.subjectiveValue
     + friendly.map(_.loadedUnits.map(_.subjectiveValue).sum).sum
-    + trainee
   )
   
   //////////////

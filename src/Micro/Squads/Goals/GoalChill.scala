@@ -2,9 +2,9 @@ package Micro.Squads.Goals
 
 import Micro.Agency.Intention
 
-class SquadChill extends SquadGoal {
+class GoalChill extends GoalBasic {
   
-  def updateUnits() {
+  override def run() {
     squad.recruits.foreach(_.agent.intend(squad.client, new Intention))
   }
 }

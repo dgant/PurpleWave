@@ -16,7 +16,7 @@ object TargetFilterFutility extends TargetFilter {
       && (ally.topSpeed >= target.topSpeed || ally.topSpeed > actor.topSpeed || ally.inRangeToAttack(target) )
       && ally.framesBeforeAttacking(target) <= actor.framesBeforeAttacking(target))
   
-    lazy val targetBusy       = target.gathering || target.constructing || target.repairing
+    lazy val targetBusy       = target.gathering || target.constructing || target.repairing || ! target.canMove
     lazy val targetCatchable  = actor.topSpeed >= target.topSpeed || actor.inRangeToAttack(target) || targetBusy || alliesAssisting
     lazy val targetReachable  = target.visible || actor.flying || ! target.flying || With.grids.walkableTerrain.get(target.tileIncludingCenter)
     

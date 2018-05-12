@@ -9,7 +9,7 @@ class Squads {
   var all: mutable.Set[Squad] = new mutable.HashSet[Squad]
   var squadByUnit: mutable.Map[FriendlyUnitInfo, Squad] = new mutable.HashMap[FriendlyUnitInfo, Squad]
   
-  def squadsByPriority: Seq[Squad] = all.toSeq.sortBy(_.client.priority)
+  def allByPriority: Seq[Squad] = all.toSeq.sortBy(_.client.priority)
   
   def reset() {
     all.clear()
@@ -18,7 +18,7 @@ class Squads {
   
   def commission(squad: Squad) {
     all += squad
-    squad.recruits.foreach(squadByUnit(_) = squad)
+    squad.recruits.foreach(addUnit(squad, _))
   }
   
   def addUnit(squad: Squad, unit: FriendlyUnitInfo) {
@@ -26,6 +26,6 @@ class Squads {
   }
   
   def update() {
-    all.foreach(_.update())
+    allByPriority.foreach(_.update())
   }
 }

@@ -3,7 +3,7 @@ package Planning.Plans.Army
 
 import Lifecycle.With
 import Micro.Agency.Intention
-import Micro.Squads.Goals.SquadPush
+import Micro.Squads.Goals.GoalPush
 import Micro.Squads.Squad
 import Planning.Composition.ResourceLocks.LockUnits
 import Planning.Composition.UnitMatchers.UnitMatchWarriors
@@ -54,7 +54,7 @@ class Attack extends Plan {
       attacker.agent.intend(this, attackIntent)
     })
   
-    squad.goal = new SquadPush(target)
+    squad.setGoal(new GoalPush(target))
     squad.enemies = With.units.enemy.filter(e =>
       e.likelyStillAlive
       && e.possiblyStillThere

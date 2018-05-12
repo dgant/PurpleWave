@@ -44,10 +44,6 @@ class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends FriendlyUnitProxy(base
   def knownToEnemy: Boolean = knownToEnemyOnce
   
   //////////////
-  // Movement //
-  //////////////
-  
-  //////////////
   // Statuses //
   //////////////
   

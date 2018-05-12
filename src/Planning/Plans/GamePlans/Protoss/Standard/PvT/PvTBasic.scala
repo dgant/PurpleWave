@@ -231,31 +231,21 @@ class PvTBasic extends GameplanModeTemplate {
   
   class BonusTech extends Parallel(
     new If(
-      new OnGasPumps(3),
+      new And(
+        new EmployingArbiters,
+        new OnGasPumps(3)),
+      new Build(
+        RequestAtLeast(2, Protoss.Stargate),
+        RequestAtLeast(2, Protoss.Forge))),
+    new If(
+      new And(
+        new EmployingCarriers,
+        new OnGasPumps(3)),
       new Parallel(
-        new If(
-          new EmployingArbiters,
-          new Build(RequestAtLeast(2, Protoss.Stargate))),
-        new If(
-          new EmployingCarriers,
-          new Parallel(
-            new Build(RequestAtLeast(3, Protoss.Stargate)),
-            new UpgradeContinuously(Protoss.AirArmor),
-            new UpgradeContinuously(Protoss.AirDamage))),
-        new Build(RequestAtLeast(2, Protoss.Forge)),
-        new UpgradeContinuously(Protoss.GroundArmor),
-        new Build(RequestAtLeast(1, Protoss.TemplarArchives)))),
-    new If(
-      new OnGasPumps(4),
-      new If(
-        new EmployingCarriers,
-        new Build(RequestAtLeast(2, Protoss.CyberneticsCore)))),
-    new If(
-      new IfOnMiningBases(4),
-      new If(
-        new EmployingCarriers,
-        new Build(RequestAtLeast(3, Protoss.Stargate)))))
-  
+        new Build(
+          RequestAtLeast(2, Protoss.CyberneticsCore),
+          RequestAtLeast(3, Protoss.Stargate)))))
+      
   override val buildPlans = Vector(
     
     new RequireMiningBases(2),

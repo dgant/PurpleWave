@@ -3,7 +3,7 @@ package Planning.Plans.Army
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Micro.Agency.Intention
-import Micro.Squads.Goals.SquadDrop
+import Micro.Squads.Goals.GoalDrop
 import Micro.Squads.Squad
 import Planning.Composition.Property
 import Planning.Composition.ResourceLocks.LockUnits
@@ -50,7 +50,7 @@ class NukeBase extends Plan {
       val targetPixel = targetBest.get._1.heart.pixelCenter
       squad.conscript(transportLock.get.units)
       nukers.foreach(squad.recruit)
-      squad.goal = new SquadDrop(targetPixel)
+      squad.setGoal(new GoalDrop(targetPixel))
       nukers.foreach(nuker => nuker.agent.intend(this, new Intention {
         toNuke = Some(targetPixel)
       }))

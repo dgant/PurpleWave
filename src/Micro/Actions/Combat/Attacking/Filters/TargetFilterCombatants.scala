@@ -11,7 +11,7 @@ object TargetFilterCombatants extends TargetFilter {
     
     if (actor.battle.forall(_.estimationSimulationAttack.deathsUs == 0)) return true
     
-    lazy val teamEngaged = (actor.teammates :+ actor).exists(_.matchups.framesOfSafety <= 0.0)
+    lazy val teamEngaged = (actor.teammates + actor).exists(_.matchups.framesOfSafety <= 0.0)
     
     val output = (
       target.unitClass.dealsDamage

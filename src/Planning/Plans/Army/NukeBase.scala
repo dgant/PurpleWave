@@ -48,7 +48,7 @@ class NukeBase extends Plan {
     
     if (targetBest.exists(_._2 >= 0)) {
       val targetPixel = targetBest.get._1.heart.pixelCenter
-      squad.conscript(transportLock.get.units)
+      transportLock.get.units.foreach(squad.recruit)
       nukers.foreach(squad.recruit)
       squad.setGoal(new GoalDrop(targetPixel))
       nukers.foreach(nuker => nuker.agent.intend(this, new Intention {

@@ -19,7 +19,7 @@ class PvTStove extends GameplanModeTemplate {
   override val activationCriteria   = new Employing(PvTEarly1GateStargateTemplar)
   override val completionCriteria   = new Latch(new Or(new MiningBasesAtLeast(3), new UnitsAtLeast(1, Protoss.ArbiterTribunal)))
   override def priorityAttackPlan   = new PvTIdeas.PriorityAttacks
-  override def priorityDefensePlan  = new If(new EnemyHasShown(Terran.Vulture), new DefendEntrance { defenders.get.unitMatcher.set(Protoss.Dragoon); defenders.get.unitCounter.set(UnitCountOne)})
+  override def priorityDefensePlan  = new If(new EnemyHasShown(Terran.Vulture), new DefendEntrance(Protoss.Dragoon, UnitCountOne))
   override def defaultScoutPlan     = new ScoutOn(Protoss.Pylon)
   
   override def defaultAttackPlan = new If(

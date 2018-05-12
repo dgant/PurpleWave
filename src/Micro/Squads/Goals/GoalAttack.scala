@@ -3,9 +3,6 @@ package Micro.Squads.Goals
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Micro.Agency.Intention
-import Planning.Composition.UnitCountEverything
-import Planning.Composition.UnitCounters.UnitCounter
-import Planning.Composition.UnitMatchers.{UnitMatchWarriors, UnitMatcher}
 import Utilities.ByOption
 import Utilities.EnrichPixel._
 
@@ -13,15 +10,11 @@ class GoalAttack extends GoalBasic {
   
   override def toString: String = "Attack " + target.zone.name
   
-  var unitMatcher: UnitMatcher = UnitMatchWarriors
-  var unitCounter: UnitCounter = UnitCountEverything
   var target: Pixel = With.intelligence.mostBaselikeEnemyTile.pixelCenter
   var berzerk: Boolean = false
   
-  override protected def acceptsHelp: Boolean = unitCounter.continue(squad.recruits)
-  
   override def run() {
-    squad.recruits.foreach(attacker => {
+    squad.units.foreach(attacker => {
       With.intelligence.highlightScout(attacker)
       attacker.agent.intend(squad.client, new Intention {
         toTravel = Some(target)
@@ -36,7 +29,7 @@ class GoalAttack extends GoalBasic {
   }
   
   protected def chooseTarget() {
-    val attackerCenter = squad.recruits.map(_.pixelCenter).centroid
+    val attackerCenter = squad.units.map(_.pixelCenter).centroid
     target =
       ByOption
         .maxBy(With.geography.enemyBases)(base => {

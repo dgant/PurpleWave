@@ -13,10 +13,10 @@ import scala.collection.mutable
 class GoalFindExpansions extends GoalBasic {
   
   override def run() {
-    squad.recruits.foreach(orderScout)
+    squad.units.foreach(orderScout)
   }
   
-  override def acceptsHelp: Boolean = squad.recruits.size < PurpleMath.clamp(With.self.supplyUsed / 80, 1, With.geography.neutralBases.size)
+  override def acceptsHelp: Boolean = squad.units.size < PurpleMath.clamp(With.self.supplyUsed / 80, 1, With.geography.neutralBases.size)
   
   override def sortAndFilterCandidates(candidates: Iterable[FriendlyUnitInfo]): Iterable[FriendlyUnitInfo] = {
     val output = new mutable.PriorityQueue[FriendlyUnitInfo]()(Ordering.by(scoutPreference))

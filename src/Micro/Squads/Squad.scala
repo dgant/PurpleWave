@@ -7,8 +7,6 @@ import Planning.Plan
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.EnrichPixel.EnrichedPixelCollection
 
-import scala.collection.mutable.ArrayBuffer
-
 trait SquadWithGoal {
   private var ourGoal: SquadGoal = new GoalChill
   def goal: SquadGoal = ourGoal
@@ -21,30 +19,27 @@ trait SquadWithGoal {
 class Squad(val client: Plan) extends SquadWithGoal {
   
   var enemies: Iterable[UnitInfo] = Iterable.empty
-  var recruits: ArrayBuffer[FriendlyUnitInfo] = ArrayBuffer.empty
+  def units: Set[FriendlyUnitInfo] = With.squads.units(this)
   
   def update() {
-    if (recruits.nonEmpty) {
+    if (units.nonEmpty) {
       goal.squad = this
       goal.run()
     }
   }
   
-  def conscript(units: Iterable[FriendlyUnitInfo]) {
-    recruits.clear()
-    recruits ++= units
+  def commission(): Unit = {
     With.squads.commission(this)
   }
   
   def recruit(unit: FriendlyUnitInfo) {
-    recruits += unit
     With.squads.addUnit(this, unit)
   }
   
   def centroid: Pixel = {
-    if (recruits.isEmpty)
+    if (units.isEmpty)
       With.geography.home.pixelCenter
     else
-      recruits.map(_.pixelCenter).centroid
+      units.map(_.pixelCenter).centroid
   }
 }

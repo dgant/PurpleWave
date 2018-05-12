@@ -5,6 +5,9 @@ import Mathematics.Points.Pixel
 import Micro.Agency.Intention
 import Micro.Squads.RecruitmentLevel
 import Micro.Squads.RecruitmentLevel.RecruitmentLevel
+import Planning.Composition.UnitCountEverything
+import Planning.Composition.UnitCounters.UnitCounter
+import Planning.Composition.UnitMatchers.{UnitMatchWarriors, UnitMatcher}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.CountMap
@@ -58,7 +61,7 @@ trait GoalBasic extends SquadGoal {
     enemiesByQuality.clear()
     recruitsByQuality.clear()
     countQualities(enemiesByQuality, squad.enemies)
-    countQualities(recruitsByQuality, squad.recruits)
+    countQualities(recruitsByQuality, squad.units)
   }
   
   /////////////////////////////
@@ -66,7 +69,7 @@ trait GoalBasic extends SquadGoal {
   /////////////////////////////
   
   override def run() {
-    squad.recruits.foreach(_.agent.intend(squad.client, new Intention {
+    squad.units.foreach(_.agent.intend(squad.client, new Intention {
       toTravel = Some(destination)
     }))
   }
@@ -119,11 +122,13 @@ trait GoalBasic extends SquadGoal {
   // Subclass API //
   //////////////////
   
-  protected def acceptsHelp: Boolean = true
+  protected var unitMatcher: UnitMatcher = UnitMatchWarriors
+  protected var unitCounter: UnitCounter = UnitCountEverything
+  protected def acceptsHelp: Boolean = unitCounter.continue(squad.units)
   protected def equippedSufficiently: Boolean = true
   protected def destination: Pixel = With.intelligence.mostBaselikeEnemyTile.pixelCenter
   protected def sortAndFilterCandidates(candidates: Iterable[FriendlyUnitInfo]): Iterable[FriendlyUnitInfo] = {
-    candidates.toVector.sortBy(_.pixelDistanceTravelling(destination))
+    candidates.toVector.filter(unitMatcher.accept).sortBy(_.pixelDistanceTravelling(destination))
   }
   
 }

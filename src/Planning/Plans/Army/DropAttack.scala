@@ -44,7 +44,7 @@ class DropAttack extends Plan {
     
     if (paratroopers.isEmpty) return
     
-    squad.conscript(transports)
+    transports.foreach(squad.recruit)
     paratroopers.foreach(squad.recruit)
     squad.setGoal(new GoalDrop(target))
   }

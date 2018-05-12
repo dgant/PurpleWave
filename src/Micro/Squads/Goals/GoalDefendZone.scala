@@ -11,9 +11,10 @@ import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.ByOption
 import Utilities.EnrichPixel.EnrichedPixelCollection
 
-class GoalDefendZone(zone: Zone) extends GoalBasic {
+class GoalDefendZone(var zone: Zone) extends GoalBasic {
   
   private var lastAction = "Defend "
+  
   override def toString: String = lastAction + zone
   
   override def acceptsHelp: Boolean = false
@@ -28,7 +29,7 @@ class GoalDefendZone(zone: Zone) extends GoalBasic {
     
     lazy val canHuntEnemies  = huntableEnemies().nonEmpty
     lazy val canDefendWall   = walls.nonEmpty
-    lazy val canDefendChoke  = choke.isDefined && ( ! With.enemies.exists(_.isZerg) || squad.recruits.size >= 6)
+    lazy val canDefendChoke  = choke.isDefined && ( ! With.enemies.exists(_.isZerg) || squad.units.size >= 6)
     lazy val canDefendHeart  = base.isDefined
     
     if (canHuntEnemies) {
@@ -61,7 +62,7 @@ class GoalDefendZone(zone: Zone) extends GoalBasic {
     lazy val target        = huntableEnemies().minBy(_.pixelDistanceCenter(center))
     lazy val targetAir     = ByOption.minBy(huntableEnemies().filter   (_.flying))(_.pixelDistanceCenter(center)).getOrElse(target)
     lazy val targetGround  = ByOption.minBy(huntableEnemies().filterNot(_.flying))(_.pixelDistanceCenter(center)).getOrElse(target)
-    squad.recruits.foreach(recruit => {
+    squad.units.foreach(recruit => {
       val onlyAir     = recruit.canAttack && ! recruit.unitClass.attacksGround
       val onlyGround  = recruit.canAttack && ! recruit.unitClass.attacksAir
       val thisTarget  = if (onlyAir) targetAir else if (onlyGround) targetGround else target
@@ -73,7 +74,7 @@ class GoalDefendZone(zone: Zone) extends GoalBasic {
   }
   
   def defendHeart(center: Pixel) {
-    squad.recruits.foreach(_.agent.intend(squad.client, new Intention {
+    squad.units.foreach(_.agent.intend(squad.client, new Intention {
       toTravel = Some(center)
       toReturn = if (zone.bases.exists(_.owner.isUs)) Some(center) else None
     }))
@@ -115,12 +116,12 @@ class GoalDefendZone(zone: Zone) extends GoalBasic {
   def concave(start: Pixel, end: Pixel, origin: Pixel) {
     val formation =
       Formation.concave(
-        squad.recruits,
+        squad.units,
         start,
         end,
         origin)
   
-    squad.recruits.foreach(
+    squad.units.foreach(
       defender => {
         val spot = formation(defender)
         defender.agent.intend(squad.client, new Intention {

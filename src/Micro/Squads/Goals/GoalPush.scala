@@ -8,7 +8,7 @@ class GoalPush(var pixel: Pixel) extends GoalBasic {
   override def toString: String = "Attack " + pixel.zone.name
   
   override def run() {
-    squad.recruits.foreach(_.agent.intend(squad.client, new Intention {
+    squad.units.foreach(_.agent.intend(squad.client, new Intention {
       toTravel = Some(pixel)
     }))
   }

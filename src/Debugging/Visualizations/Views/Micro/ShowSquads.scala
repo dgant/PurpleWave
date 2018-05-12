@@ -10,12 +10,12 @@ import ProxyBwapi.UnitInfo.UnitInfo
 object ShowSquads extends View {
   
   override def renderMap() {
-    With.squads.allByPriority.reverse.filter(_.recruits.nonEmpty).foreach(renderSquadMap)
+    With.squads.allByPriority.reverse.filter(_.units.nonEmpty).foreach(renderSquadMap)
   }
   
   def renderSquadMap(squad: Squad) {
     val color = squadColors(squad.hashCode % squadColors.length)
-    (squad.recruits ++ squad.enemies).foreach(unit =>
+    (squad.units ++ squad.enemies).foreach(unit =>
       DrawMap.label(
         squad.goal.toString,
         unit.pixelCenter.add(0, unit.unitClass.height),
@@ -24,7 +24,7 @@ object ShowSquads extends View {
         drawBorder = unit.isEnemy,
         unit.player.colorMedium))
   
-    With.game.drawCircleMap(squad.centroid.bwapi, squad.recruits.map(_.pixelDistanceCenter(squad.centroid)).max.toInt, color)
+    With.game.drawCircleMap(squad.centroid.bwapi, squad.units.map(_.pixelDistanceCenter(squad.centroid)).max.toInt, color)
   }
   
   override def renderScreen() {
@@ -38,7 +38,7 @@ object ShowSquads extends View {
           "",
           "",
           "",
-          enumerateUnits(squad.recruits),
+          enumerateUnits(squad.units),
           "",
           enumerateUnits(squad.enemies)))
   

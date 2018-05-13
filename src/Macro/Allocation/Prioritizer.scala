@@ -13,11 +13,11 @@ class Prioritizer {
   var nextPriority = 0
   
   def update() {
-    //For debugging only!
-    val sortedPriorities = priorities.toList.sortBy(_._2)
     nextPriority = 0
     priorities.clear()
   }
+  
+  def audit = priorities.toList.sortBy(_._2)
   
   def isPrioritized(plan: Plan): Boolean = {
     priorities.contains(plan)

@@ -2,14 +2,11 @@ package Planning.Plans.Army
 
 import Information.Geography.Types.Zone
 import Micro.Squads.Goals.GoalDefendZone
-import Micro.Squads.Squad
-import Planning.Plan
 import ProxyBwapi.UnitInfo.ForeignUnitInfo
 
-class DefendZone(zone: Zone) extends Plan {
+class DefendZone(zone: Zone) extends SquadPlan[GoalDefendZone] {
   
-  val squad: Squad = new Squad(this)
-  val goal: GoalDefendZone = new GoalDefendZone(zone)
+  val goal: GoalDefendZone = new GoalDefendZone
   var enemies: Seq[ForeignUnitInfo] = Seq.empty
   
   override def onUpdate() {
@@ -17,9 +14,9 @@ class DefendZone(zone: Zone) extends Plan {
     if (enemies.size < 3 && enemies.forall(e => e.unitClass.isWorker || ! e.canAttack)) {
       return
     }
-  
-    squad.setGoal(goal)
-    squad.enemies = enemies
-    squad.commission()
+    
+    goal.zone = zone
+    goal.squad.enemies = enemies
+    super.onUpdate()
   }
 }

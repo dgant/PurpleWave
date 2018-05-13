@@ -26,27 +26,11 @@ class Recruiter {
     With.units.ours
       .filter(unit => eligible(unit) && ! unitsByLock.values.exists(_.contains(unit)))
       .foreach(unassignedUnits.add)
-    
-    //If we suspect any bugginess, enable this
-    //test
   }
   
   def eligible(unit: FriendlyUnitInfo): Boolean = unit.aliveAndComplete && unit.unitClass.orderable
   
-  private def test() {
-    //Verify no units are shared between locks
-    unitsByLock.foreach(pair1 =>
-      unitsByLock.foreach(pair2 =>
-        if (pair1 != pair2) {
-          val intersection = pair1._2.intersect(pair2._2)
-          if (intersection.nonEmpty) {
-            With.logger.warn(pair1._1.toString + " and " + pair2._1.toString + " share " + intersection.size + " units")
-          }
-        }
-      ))
-  }
-  
-  def onUnitDestroyed(unit:FriendlyUnitInfo) {
+  def onUnitDestroyed(unit: FriendlyUnitInfo) {
     unassign(unit)
     unassignedUnits.remove(unit)
   }
@@ -60,8 +44,9 @@ class Recruiter {
   def inquire(lock: LockUnits): Option[Iterable[FriendlyUnitInfo]] = {
   
     // Offer batches of unit for the lock to choose.
-    //   Batch 0: Units not assigned
-    //   Batch 1+: Units assigned to weaker-priority locks
+    //  Batch 0: Current units
+    //  Batch 1: Unassigned units
+    //  Batch 2+: Units assigned to weaker-priority locks
     //
     val assignedToLowerPriority = unitsByLock.keys
       .toSeq
@@ -70,7 +55,11 @@ class Recruiter {
         && lock.owner.priority < otherRequest.owner.priority)
       .flatMap(getUnits)
     
-    lock.offerUnits(unassignedUnits ++ assignedToLowerPriority)
+    lock.offerUnits(
+      Iterable.empty
+        ++ unitsByLock.getOrElse(lock, Iterable.empty)
+        ++ unassignedUnits
+        ++ assignedToLowerPriority)
   }
   
   private def tryToSatisfy(lock: LockUnits) {

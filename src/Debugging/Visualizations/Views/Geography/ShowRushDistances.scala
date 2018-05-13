@@ -25,6 +25,8 @@ object ShowRushDistances extends View {
   Python: 4096 -  4458 - 5312
   Roadrunner: 4567 - 4858 - 5402
   Tau Cross: 5433 - 5800 - 6236
+  
+  Neo Aztec: 5107 - 5305 - 5484
   */
   override def renderScreen() {
     val x = 5
@@ -35,7 +37,8 @@ object ShowRushDistances extends View {
       y,
       Vector(
         Vector(
-          "Rush: ",
+          With.mapFileName,
+          "",
           distances.min.toInt.toString,
           PurpleMath.mean(distances).toInt.toString,
           distances.max.toInt.toString

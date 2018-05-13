@@ -9,7 +9,9 @@ import Planning.Composition.UnitMatchers.{UnitMatchWarriors, UnitMatcher}
 class Attack(
   attackerMatcher: UnitMatcher = UnitMatchWarriors,
   attackerCounter: UnitCounter = UnitCountEverything)
-  extends BasicSquad[GoalAttack] {
+  extends SquadPlan[GoalAttack] {
+  
+  override val goal: GoalAttack = new GoalAttack
   
   override def onUpdate() {
     goal.unitMatcher = attackerMatcher

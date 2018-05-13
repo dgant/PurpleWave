@@ -48,6 +48,7 @@ object ShowSquads extends View {
   def enumerateUnits(units: Iterable[UnitInfo]): String = {
     
     val counts = units
+      .toVector
       .map(_.unitClass)
       .groupBy(x => x)
     

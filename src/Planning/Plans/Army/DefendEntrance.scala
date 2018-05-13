@@ -10,7 +10,9 @@ import Utilities.ByOption
 class DefendEntrance(
   unitMatcher: UnitMatcher = UnitMatchWarriors,
   unitCounter: UnitCounter = UnitCountEverything)
-  extends BasicSquad[GoalDefendZone] {
+  extends SquadPlan[GoalDefendZone] {
+  
+  override val goal: GoalDefendZone = new GoalDefendZone
   
   override def onUpdate() {
     goal.unitMatcher = unitMatcher

@@ -11,13 +11,12 @@ import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.ByOption
 import Utilities.EnrichPixel.EnrichedPixelCollection
 
-class GoalDefendZone(var zone: Zone) extends GoalBasic {
+class GoalDefendZone extends GoalBasic {
   
   private var lastAction = "Defend "
-  
   override def toString: String = lastAction + zone
   
-  override def acceptsHelp: Boolean = false
+  var zone: Zone = _
   
   override def run() {
     lazy val base       = ByOption.minBy(zone.bases)(_.heart.tileDistanceManhattan(With.intelligence.mostBaselikeEnemyTile))

@@ -4,10 +4,10 @@ import Micro.Squads.Goals.SquadGoal
 import Micro.Squads.Squad
 import Planning.Plan
 
-class BasicSquad[T <: SquadGoal](implicit t: Manifest[T]) extends Plan {
+abstract class SquadPlan[T <: SquadGoal] extends Plan {
   
   val squad: Squad = new Squad(this)
-  val goal: T = t.runtimeClass.newInstance.asInstanceOf[T]
+  val goal: T
   
   override def onUpdate() {
     squad.setGoal(goal)

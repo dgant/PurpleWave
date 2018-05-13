@@ -14,6 +14,7 @@ class GoalAttack extends GoalBasic {
   var berzerk: Boolean = false
   
   override def run() {
+    chooseTarget()
     squad.units.foreach(attacker => {
       With.intelligence.highlightScout(attacker)
       attacker.agent.intend(squad.client, new Intention {
@@ -28,7 +29,7 @@ class GoalAttack extends GoalBasic {
         && ( ! e.unitClass.isBuilding || e.zone == target.zone))
   }
   
-  protected def chooseTarget() {
+  protected def chooseTarget(): Unit = {
     val attackerCenter = squad.units.map(_.pixelCenter).centroid
     target =
       ByOption

@@ -12,8 +12,6 @@ import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.CountMap
 
-import scala.collection.mutable
-
 trait GoalBasic extends SquadGoal {
   
   ///////////////
@@ -28,7 +26,10 @@ trait GoalBasic extends SquadGoal {
   
   final protected object Qualities {
     object Cloaked extends Quality {
-      def matches(u: UnitInfo): Boolean = u.isAny(Terran.Ghost, Terran.Wraith, Protoss.Arbiter, Protoss.DarkTemplar, Protoss.Observer, Zerg.Lurker, Zerg.LurkerEgg)
+      def matches(u: UnitInfo): Boolean = u.burrowed || u.isAny(
+        Terran.Ghost, Terran.Wraith, Terran.SpiderMine,
+        Protoss.Arbiter, Protoss.DarkTemplar, Protoss.Observer,
+        Zerg.Lurker, Zerg.LurkerEgg) || (u.is(Terran.Vulture) && u.player.hasTech(Terran.SpiderMinePlant))
       lazy val counteredBy: Array[Quality] = Array(Detector)
     }
     object Combat extends Quality {
@@ -50,18 +51,18 @@ trait GoalBasic extends SquadGoal {
   final private val enemiesByQuality  = new CountMap[Quality]
   final private val recruitsByQuality = new CountMap[Quality]
   private var lastUpdateFrame: Int = -1
-  private def countQualities(counter: CountMap[Quality], units: Iterable[UnitInfo]) {
-    units.foreach(unit =>
-      Qualities.all.foreach(quality =>
-        if (quality.matches(unit)) counter.add(quality, unit.subjectiveValue)))
+  private def countUnit(unit: UnitInfo) {
+    val counter = if (unit.isFriendly) recruitsByQuality else enemiesByQuality
+    Qualities.all.foreach(quality =>
+      if (quality.matches(unit)) counter.add(quality, unit.subjectiveValue))
   }
   private def updateCounts() {
     if (lastUpdateFrame >= With.frame) return
     lastUpdateFrame = With.frame
     enemiesByQuality.clear()
     recruitsByQuality.clear()
-    countQualities(enemiesByQuality, squad.enemies)
-    countQualities(recruitsByQuality, squad.units)
+    squad.units.foreach(countUnit)
+    squad.enemies.foreach(countUnit)
   }
   
   /////////////////////////////
@@ -74,56 +75,79 @@ trait GoalBasic extends SquadGoal {
     }))
   }
   
-  final override def offer(candidates: Iterable[FriendlyUnitInfo], recruitmentNeed: RecruitmentLevel): Iterable[FriendlyUnitInfo] = {
+  final override def offer(candidates: Iterable[FriendlyUnitInfo], recruitmentNeed: RecruitmentLevel) {
     updateCounts()
     if ( ! acceptsHelp) return Iterable.empty
     recruitmentNeed match {
       case RecruitmentLevel.Critical  => offerCritical(candidates)
-      case RecruitmentLevel.Important => offerUseless(candidates)
+      case RecruitmentLevel.Important => offerImportant(candidates)
       case RecruitmentLevel.Useful    => offerUseful(candidates)
       case RecruitmentLevel.Useless   => offerUseless(candidates)
     }
   }
   
-  protected def offerCritical(candidates: Iterable[FriendlyUnitInfo]): Iterable[FriendlyUnitInfo] = {
+  protected def offerCritical(candidates: Iterable[FriendlyUnitInfo]) {
     lazy val sorted = sortAndFilterCandidates(candidates)
-    val output = new mutable.ArrayBuffer[FriendlyUnitInfo]
-    val newbiesByQuality  = new CountMap[Quality]
-    enemiesByQuality.foreach(pair => {
-      if (pair._2 > 0 && pair._1.counteredBy.forall(recruitsByQuality(_) == 0)) {
-        val recruit = sorted.find(pair._1.matches)
-        recruit.foreach(output += _)
-      }})
-    output
+    if ( ! acceptsHelp) return
+    for (candidate <- sorted) {
+      if ( ! acceptsHelp) return
+      if (enemiesByQuality.exists{ case (quality, count) => (
+        count > 0
+          && quality.counteredBy.exists(_.matches(candidate))
+          && recruitsByQuality(quality) == 0)}) {
+        addCandidate(candidate)
+      }
+    }
   }
   
-  protected def offerImportant(candidates: Iterable[FriendlyUnitInfo]): Iterable[FriendlyUnitInfo] = {
+  protected def offerImportant(candidates: Iterable[FriendlyUnitInfo]) {
     lazy val sorted = sortAndFilterCandidates(candidates)
-    val output = new mutable.ArrayBuffer[FriendlyUnitInfo]
-    enemiesByQuality.foreach(pair => {
-      if (pair._2 > Math.max(0.0, pair._1.counterScaling(pair._1.counteredBy.map(recruitsByQuality(_)).sum))) {
-        val recruit = sorted.find(pair._1.matches)
-        recruit.foreach(output += _)
-      }})
-    output
+    if ( ! acceptsHelp) return
+    for (candidate <- sorted) {
+      if ( ! acceptsHelp) return
+      if (enemiesByQuality.exists{ case (quality, count) => (
+        count > 0
+        && quality.counteredBy.exists(counter =>
+          counter.matches(candidate)
+          && quality.counterScaling(recruitsByQuality(quality)) <= enemiesByQuality(quality)) )}) {
+        addCandidate(candidate)
+      }
+    }
   }
   
-  protected def offerUseful(candidates: Iterable[FriendlyUnitInfo]): Iterable[FriendlyUnitInfo] = {
-    candidates.filter(candidate =>
-      enemiesByQuality.exists(pair =>
-        pair._2 > 0 && pair._1.counteredBy.exists(_.matches(candidate))))
+  protected def offerUseful(candidates: Iterable[FriendlyUnitInfo]) {
+    lazy val sorted = sortAndFilterCandidates(candidates)
+    if ( ! acceptsHelp) return
+    for (candidate <- sorted) {
+      if ( ! acceptsHelp) return
+      if (enemiesByQuality.exists{ case (quality, count) => (
+        count > 0
+        && quality.counteredBy.exists(_.matches(candidate)))}) {
+        addCandidate(candidate)
+      }
+    }
   }
   
-  protected def offerUseless(candidates: Iterable[FriendlyUnitInfo]): Iterable[FriendlyUnitInfo] = {
-    candidates
+  protected def offerUseless(candidates: Iterable[FriendlyUnitInfo]) {
+    for (candidate <- candidates) {
+      if ( ! acceptsHelp) return
+      if (unitMatcher.accept(candidate)) {
+        addCandidate(candidate)
+      }
+    }
+  }
+  
+  protected def addCandidate(unit: FriendlyUnitInfo) {
+    squad.recruit(unit)
+    countUnit(unit)
   }
   
   //////////////////
   // Subclass API //
   //////////////////
   
-  protected var unitMatcher: UnitMatcher = UnitMatchWarriors
-  protected var unitCounter: UnitCounter = UnitCountEverything
+  var unitMatcher: UnitMatcher = UnitMatchWarriors
+  var unitCounter: UnitCounter = UnitCountEverything
   protected def acceptsHelp: Boolean = unitCounter.continue(squad.units)
   protected def equippedSufficiently: Boolean = true
   protected def destination: Pixel = With.intelligence.mostBaselikeEnemyTile.pixelCenter

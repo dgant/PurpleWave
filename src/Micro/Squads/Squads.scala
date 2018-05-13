@@ -1,5 +1,6 @@
 package Micro.Squads
 
+import Lifecycle.With
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 import scala.collection.mutable
@@ -9,6 +10,7 @@ class Squads {
   val all: mutable.Set[Squad] = new mutable.HashSet[Squad]
   val unitsBySquad: mutable.Map[Squad, mutable.HashSet[FriendlyUnitInfo]] = new mutable.HashMap[Squad, mutable.HashSet[FriendlyUnitInfo]]
   val squadByUnit: mutable.Map[FriendlyUnitInfo, Squad] = new mutable.HashMap[FriendlyUnitInfo, Squad]
+  val freelancers: mutable.Set[FriendlyUnitInfo] = new mutable.HashSet[FriendlyUnitInfo]
   
   def allByPriority: Seq[Squad] = all.toSeq.sortBy(_.client.priority)
   def units(squad: Squad): Set[FriendlyUnitInfo] = unitsBySquad.get(squad).map(_.toSet).getOrElse(Set.empty)
@@ -18,6 +20,18 @@ class Squads {
     all.clear()
     squadByUnit.clear()
     unitsBySquad.clear()
+    freelancers.clear()
+  }
+  
+  def addFreelancer(unit: FriendlyUnitInfo) {
+    freelancers += unit
+  }
+  
+  def assignFreelancers() {
+    RecruitmentLevel.values.foreach(recruitmentLevel =>
+      With.squads.allByPriority.foreach(squad => {
+        squad.goal.offer(freelancers, recruitmentLevel)
+      }))
   }
   
   def commission(squad: Squad) {
@@ -26,6 +40,7 @@ class Squads {
   }
   
   def removeUnit(unit: FriendlyUnitInfo) {
+    freelancers += unit
     squadByUnit.get(unit).foreach(unitsBySquad(_).remove(unit))
     squadByUnit.remove(unit)
   }
@@ -34,6 +49,7 @@ class Squads {
     removeUnit(unit)
     squadByUnit(unit) = squad
     unitsBySquad(squad) += unit
+    freelancers -= unit
   }
   
   def update() {

@@ -21,6 +21,7 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
     .replace("Resource_", "")
     .replace("Critter_", "")
     .replace("Special_", "")
+    .replace("Vulture_Spider", "Spider")
     .replaceAll("_", " ")
   
   override def toString: String = asStringNeat

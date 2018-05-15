@@ -4,11 +4,11 @@ import Lifecycle.With
 import Micro.Squads.Goals.GoalDefendZone
 import Planning.Composition.UnitCountEverything
 import Planning.Composition.UnitCounters.UnitCounter
-import Planning.Composition.UnitMatchers.{UnitMatchWarriors, UnitMatcher}
+import Planning.Composition.UnitMatchers.{UnitMatchRecruitableForCombat, UnitMatcher}
 import Utilities.ByOption
 
 class DefendEntrance(
-  unitMatcher: UnitMatcher = UnitMatchWarriors,
+  unitMatcher: UnitMatcher = UnitMatchRecruitableForCombat,
   unitCounter: UnitCounter = UnitCountEverything)
   extends SquadPlan[GoalDefendZone] {
   

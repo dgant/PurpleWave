@@ -12,6 +12,8 @@ import scala.collection.mutable
 
 class GoalFindExpansions extends GoalBasic {
   
+  override def toString: String = "Find enemy expansions"
+  
   override def run() {
     squad.units.foreach(orderScout)
   }

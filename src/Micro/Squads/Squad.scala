@@ -22,10 +22,7 @@ class Squad(val client: Plan) extends SquadWithGoal {
   def units: Set[FriendlyUnitInfo] = With.squads.units(this)
   
   def update() {
-    if (units.nonEmpty) {
-      goal.squad = this
-      goal.run()
-    }
+    goal.run()
   }
   
   def commission(): Unit = {

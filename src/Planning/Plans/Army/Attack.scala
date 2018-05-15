@@ -4,10 +4,10 @@ package Planning.Plans.Army
 import Micro.Squads.Goals.GoalAttack
 import Planning.Composition.UnitCountEverything
 import Planning.Composition.UnitCounters.UnitCounter
-import Planning.Composition.UnitMatchers.{UnitMatchWarriors, UnitMatcher}
+import Planning.Composition.UnitMatchers.{UnitMatchRecruitableForCombat, UnitMatcher}
 
 class Attack(
-  attackerMatcher: UnitMatcher = UnitMatchWarriors,
+  attackerMatcher: UnitMatcher = UnitMatchRecruitableForCombat,
   attackerCounter: UnitCounter = UnitCountEverything)
   extends SquadPlan[GoalAttack] {
   

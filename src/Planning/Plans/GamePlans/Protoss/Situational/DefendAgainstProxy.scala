@@ -58,6 +58,7 @@ class DefendAgainstProxy extends Plan {
     defenders.get.acquire(this)
   
     squad.enemies = proxies
+    squad.commission()
     defenders.get.units.foreach(squad.recruit)
     squad.setGoal(new GoalPush(proxies.head.pixelCenter))
   }

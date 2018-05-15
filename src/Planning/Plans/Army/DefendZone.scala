@@ -14,9 +14,9 @@ class DefendZone(zone: Zone) extends SquadPlan[GoalDefendZone] {
     if (enemies.size < 3 && enemies.forall(e => e.unitClass.isWorker || ! e.canAttack)) {
       return
     }
-    
+  
+    squad.enemies = enemies
     goal.zone = zone
-    goal.squad.enemies = enemies
     super.onUpdate()
   }
 }

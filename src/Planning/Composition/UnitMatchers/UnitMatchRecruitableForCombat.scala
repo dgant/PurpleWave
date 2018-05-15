@@ -1,0 +1,3 @@
+package Planning.Composition.UnitMatchers
+
+object UnitMatchRecruitableForCombat extends UnitMatchAnd(UnitMatchMobile, UnitMatchNot(UnitMatchWorkers))

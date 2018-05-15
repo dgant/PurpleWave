@@ -26,7 +26,10 @@ object ShowRushDistances extends View {
   Roadrunner: 4567 - 4858 - 5402
   Tau Cross: 5433 - 5800 - 6236
   
+  Arcadia: 4216 - 5216 - 6008
+  Pathfinder: 4716 - 4767 - 4850
   Neo Aztec: 5107 - 5305 - 5484
+  Neo Sniper Ridge: 4640 - 5163 - 5881
   */
   override def renderScreen() {
     val x = 5

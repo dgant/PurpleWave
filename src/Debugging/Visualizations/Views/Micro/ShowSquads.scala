@@ -10,7 +10,7 @@ import ProxyBwapi.UnitInfo.UnitInfo
 object ShowSquads extends View {
   
   override def renderMap() {
-    With.squads.allByPriority.reverse.filter(_.units.nonEmpty).foreach(renderSquadMap)
+    With.squads.allByPriority.filter(_.units.nonEmpty).foreach(renderSquadMap)
   }
   
   def renderSquadMap(squad: Squad) {

@@ -8,8 +8,21 @@ import Mathematics.PurpleMath
 object ShowRushDistances extends View {
   
   /*
-  Known distances:
+  Known ramp widths
+  -----------------
+  Andromeda: 160 (because it's cut incorrectly)
+  Destination: 30, 28
+  Fighting Spirit: 32
+  Heartbreak Ridge: 40
+  Hitchhiker: 44 36
   
+  Alchemist: 128 (because it's cut incorrectly)
+  Neo Chupung-Ryeong: 32
+  */
+  
+  /*
+  Known distances
+  ---------------
   Andromeda: 4940 - 5404 - 6083
   Benzene: 6140
   Circuit Breakers: 4396 - 5098 - 5696
@@ -26,9 +39,13 @@ object ShowRushDistances extends View {
   Roadrunner: 4567 - 4858 - 5402
   Tau Cross: 5433 - 5800 - 6236
   
+  Alchemist: 4073 - 4640 - 5151
   Arcadia: 4216 - 5216 - 6008
+  Destination 1.1: 6604
+  Hitchhiker: 4438
   Pathfinder: 4716 - 4767 - 4850
   Neo Aztec: 5107 - 5305 - 5484
+  Neo Chupung-Ryeong: 4569
   Neo Sniper Ridge: 4640 - 5163 - 5881
   */
   override def renderScreen() {
@@ -46,6 +63,14 @@ object ShowRushDistances extends View {
           PurpleMath.mean(distances).toInt.toString,
           distances.max.toInt.toString
         )))
+    DrawScreen.table(
+      x,
+      y + With.visualization.lineHeightSmall,
+      Vector(
+        Vector(
+          "Ramp width",
+          "")
+        ++ With.geography.ourMain.zone.edges.map(_.radiusPixels.toInt.toString)))
   }
   
 }

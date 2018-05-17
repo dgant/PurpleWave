@@ -1,6 +1,7 @@
 package Information.Geography.Pathfinding
 
 import Information.Geography.Types.Zone
+import ProxyBwapi.UnitInfo.UnitInfo
 
 import scala.collection.mutable
 
@@ -23,5 +24,11 @@ trait ZonePaths {
     }
     
     paths(from)(to)
+  }
+  
+  def zonePathUnits(from: Zone, to: Zone): Set[UnitInfo] = {
+    val zones = zonePath(from, to).map(_.zones).getOrElse(Vector(from, to).distinct)
+    val output = zones.map(_.units).fold(Set.empty)(_ ++ _)
+    output
   }
 }

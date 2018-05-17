@@ -70,13 +70,4 @@ abstract class AbstractFindBuildings extends Action {
     unit.agent.toTravel = Some(tileToScout.pixelCenter)
     Move.delegate(unit)
   }
-  
-  def blockableBuilders(unit: FriendlyUnitInfo): Iterable[UnitInfo] = {
-    unit.matchups.targets.filter(builder =>
-      builder.unitClass.isWorker &&
-      (
-        builder.command.exists(_.getUnitCommandType.toString == UnitCommandType.Build.toString) ||
-        builder.targetPixel.exists(targetPixel => targetPixel.zone.bases.exists(_.townHallArea.contains(targetPixel.tileIncluding)))
-      ))
-  }
 }

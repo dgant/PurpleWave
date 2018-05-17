@@ -23,6 +23,7 @@ object Bust extends Action {
     threat: UnitInfo,
     pixel: Pixel): Boolean = (
     threat.is(Terran.Bunker)
+    || threat.is(Terran.SCV)
     || threat.is(Terran.Marine)
     || threat.is(Terran.Vulture)
     || threat.pixelDistanceEdge(dragoon, pixel) > threat.pixelRangeAgainst(dragoon) + 48.0

@@ -2,11 +2,12 @@ package Micro.Squads.Goals
 
 import Information.Geography.Types.Base
 import Lifecycle.With
+import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
 import Micro.Agency.Intention
-import Planning.Composition.UnitMatchers.{UnitMatchAnd, UnitMatchMobile, UnitMatchNot}
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Utilities.ByOption
 
 import scala.collection.mutable
 
@@ -14,41 +15,55 @@ class GoalFindExpansions extends GoalBasic {
   
   override def toString: String = "Find enemy expansions"
   
-  override def run() {
-    squad.units.foreach(orderScout)
-  }
-  
   override def acceptsHelp: Boolean = squad.units.size < PurpleMath.clamp(With.self.supplyUsed / 80, 1, With.geography.neutralBases.size)
   
-  override def sortAndFilterCandidates(candidates: Iterable[FriendlyUnitInfo]): Iterable[FriendlyUnitInfo] = {
-    val output = new mutable.PriorityQueue[FriendlyUnitInfo]()(Ordering.by(scoutPreference))
-    candidates.foreach(u => if (u.is(
-        UnitMatchAnd(
-          UnitMatchMobile,
-          UnitMatchNot(Terran.Battlecruiser),
-          UnitMatchNot(Terran.Valkyrie),
-          UnitMatchNot(Protoss.Arbiter),
-          UnitMatchNot(Protoss.Carrier))))
-      output += u)
-    output
+  protected var destinationByScout: mutable.ArrayBuffer[(FriendlyUnitInfo, Pixel)] = new mutable.ArrayBuffer[(FriendlyUnitInfo, Pixel)]
+  protected var destinationFrame: Int = 0
+  override protected def destination: Pixel = {
+    if (destinationFrame < With.frame) {
+      destinationByScout.clear()
+      destinationFrame = With.frame
+    }
+    destinationByScout.headOption.map(_._2).getOrElse(baseToPixel(With.intelligence.peekNextBaseToScout))
+  }
+  protected def baseToPixel(base: Base): Pixel = base.heart.pixelCenter
+  
+  override def run() {
+    squad.units.foreach(unit => {
+      With.intelligence.highlightScout(unit)
+      val scoutPixel = destinationByScout.find(_._1 == unit).map(_._2).getOrElse(destination)
+      unit.agent.intend(squad.client, new Intention {
+        toTravel = Some(scoutPixel)
+      })
+    })
   }
   
+  override protected def offerCritical(candidates: Iterable[FriendlyUnitInfo]): Unit = {}
+  override protected def offerImportant(candidates: Iterable[FriendlyUnitInfo]): Unit = {
+    if ( ! acceptsHelp) return
+    var foundCandidate: Option[FriendlyUnitInfo] = None
+    do {
+      foundCandidate = ByOption.minBy(candidates.filter(unitMatcher.accept))(scoutPreference)
+      foundCandidate.foreach(newScout => {
+        addCandidate(newScout)
+        destinationByScout.append((newScout, baseToPixel(With.intelligence.dequeueNextBaseToScout)))
+      })
+    } while(foundCandidate.nonEmpty && acceptsHelp)
+  }
+  override protected def offerUseful(candidates: Iterable[FriendlyUnitInfo]): Unit = {}
+  override protected def offerUseless(candidates: Iterable[FriendlyUnitInfo]): Unit = {}
+  
   private def scoutPreference(unit: FriendlyUnitInfo): Double = {
+    val scoutDestination = baseToPixel(With.intelligence.peekNextBaseToScout)
     if (unit.canMove) (
-      - unit.topSpeed
-        * (if (unit.flying) 1.5 else 1.0)
-        * (if (unit.cloaked) 1.5 else 1.0)
-        / unit.pixelDistanceCenter(With.intelligence.leastScoutedBases.head.heart.pixel)
+      unit.framesToTravelTo(scoutDestination)
+        * (if (unit.flying) 1.0 else 1.5)
+        * (if (unit.cloaked) 1.0 else 1.5)
+        * (if (unit.is(Protoss.Zealot) && With.enemies.map(With.intelligence.unitsShown(_, Terran.Vulture)).sum > 0) 3.0 else 1.0)
+        / unit.pixelDistanceCenter(scoutDestination)
       )
     else
       Double.MaxValue
-  }
-  
-  private def orderScout(scout: FriendlyUnitInfo) = {
-    With.intelligence.highlightScout(scout)
-    scout.agent.intend(squad.client, new Intention {
-      toTravel = getNextScoutingBase.map(_.heart.pixelCenter)
-    })
   }
   
   private def getNextScoutingBase: Option[Base] = {

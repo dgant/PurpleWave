@@ -1,16 +1,18 @@
 package Planning.Plans.Army
 
 import Lifecycle.With
-import Mathematics.Points.SpecificPoints
-import Micro.Squads.Goals.GoalPush
-import Micro.Squads.Squad
-import Planning.Composition.UnitMatchers.UnitMatchWarriors
-import Planning.Plan
+import Micro.Squads.Goals.GoalEscort
+import Planning.Composition.UnitCountEverything
+import Planning.Composition.UnitCounters.UnitCounter
+import Planning.Composition.UnitMatchers.{UnitMatchRecruitableForCombat, UnitMatchWarriors, UnitMatcher}
 import Utilities.ByOption
 
-class EscortSettlers extends Plan {
+class EscortSettlers(
+    attackerMatcher: UnitMatcher = UnitMatchRecruitableForCombat,
+    attackerCounter: UnitCounter = UnitCountEverything)
+  extends SquadPlan[GoalEscort] {
   
-  val squad: Squad = new Squad(this)
+  override val goal: GoalEscort = new GoalEscort
   
   override def onUpdate() {
     
@@ -22,13 +24,9 @@ class EscortSettlers extends Plan {
     if (settler.isEmpty) return
     
     val destination   = settler.get.agent.toBuildTile.get
-    val zone          = destination.zone
-    val enemies       = settler.get.matchups.threats.toSet ++ zone.units.filter(u => u.isEnemy && u.likelyStillAlive && u.canAttack(settler.get))
-    val enemyClosest  = ByOption.minBy(enemies)(_.pixelDistanceEdge(settler.get))
-    val target        = destination.pixelCenter.project(enemyClosest.map(_.pixelCenter).getOrElse(SpecificPoints.middle), 32.0 * 8.0)
-    
-    squad.setGoal(new GoalPush(target))
-    squad.enemies = enemies.toSeq
-    squad.commission()
+    val enemies       = With.paths.zonePathUnits(settler.get.zone, destination.zone).filter(u => u.isEnemy)
+    goal.principal    = settler
+    squad.enemies     = enemies
+    super.onUpdate()
   }
 }

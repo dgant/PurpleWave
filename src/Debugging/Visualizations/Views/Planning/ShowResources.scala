@@ -13,6 +13,7 @@ object ShowResources extends View {
       .take(25)
       .map(request =>
         Iterable(
+          "",
           if (request.isSpent)
             "Spent"
           else if (request.satisfied)
@@ -28,15 +29,14 @@ object ShowResources extends View {
           request.owner.toString
         ))
           
-    val defaultLength = 4
     var lineLast = Iterable("not happenin")
     val output = new ArrayBuffer[Iterable[String]]()
     rawText.foreach(lineNext => {
       var lineFinal = lineNext
-      if (lineFinal == lineLast.takeRight(defaultLength)) {
-        output.dropRight(1)
+      if (lineFinal.drop(1) == lineLast.drop(1)) {
+        output.trimEnd(1)
         lineFinal = lineLast
-        if (lineFinal.size == defaultLength) {
+        if (lineFinal.head == "") {
           lineFinal = Iterable("x2") ++ lineFinal
         }
         else {

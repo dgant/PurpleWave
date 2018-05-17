@@ -8,17 +8,19 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.EnrichPixel.EnrichedPixelCollection
 
 trait SquadWithGoal {
-  private var ourGoal: SquadGoal = new GoalChill
+  private var ourGoal: SquadGoal = _
   def goal: SquadGoal = ourGoal
   def setGoal(goal: SquadGoal) {
     ourGoal = goal
     goal.squad = this.asInstanceOf[Squad]
   }
+  setGoal(new GoalChill)
 }
 
 class Squad(val client: Plan) extends SquadWithGoal {
   
   var enemies: Iterable[UnitInfo] = Iterable.empty
+  var previousUnits: Set[FriendlyUnitInfo] = Set.empty
   def units: Set[FriendlyUnitInfo] = With.squads.units(this)
   
   def update() {

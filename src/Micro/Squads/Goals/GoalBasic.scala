@@ -32,8 +32,45 @@ trait GoalBasic extends SquadGoal {
         Zerg.Lurker, Zerg.LurkerEgg) || (u.is(Terran.Vulture) && u.player.hasTech(Terran.SpiderMinePlant))
       lazy val counteredBy: Array[Quality] = Array(Detector)
     }
+    object SpiderMine extends Quality {
+      override def matches(u: UnitInfo): Boolean = u.is(Terran.SpiderMine)
+      override val counteredBy: Array[Quality] = Array(AntiVulture)
+    }
+    object AntiSpiderMine extends Quality {
+      override def matches(u: UnitInfo): Boolean = u.attacksAgainstGround > 0 && (
+        u.flying
+        || u.unitClass.floats
+        || u.damageOnHitGround >= Terran.SpiderMine.maxHitPoints
+        || u.pixelRangeGround > 32.0 * 3.0)
+      override val counteredBy: Array[Quality] = Array.empty
+    }
+    object Vulture extends Quality {
+      override def matches(u: UnitInfo): Boolean = u.is(Terran.Vulture)
+      override val counteredBy: Array[Quality] = Array(AntiVulture)
+    }
+    object AntiVulture extends Quality {
+      override def matches(u: UnitInfo): Boolean = (u.is(UnitMatchWarriors)
+        && ! u.isAny(Protoss.Zealot, Protoss.DarkTemplar, Protoss.Scout, Protoss.Arbiter, Protoss.Carrier, Zerg.Zergling))
+      override val counteredBy: Array[Quality] = Array.empty
+    }
+    object Air extends Quality {
+      def matches(u: UnitInfo): Boolean = u.flying
+      lazy val counteredBy: Array[Quality] = Array(AntiAir)
+    }
+    object Ground extends Quality {
+      def matches(u: UnitInfo): Boolean = u.flying
+      lazy val counteredBy: Array[Quality] = Array(AntiGround)
+    }
+    object AntiAir extends Quality {
+      def matches(u: UnitInfo): Boolean = u.is(UnitMatchCombatSpellcaster) || u.attacksAgainstAir > 0
+      lazy val counteredBy: Array[Quality] = Array.empty
+    }
+    object AntiGround extends Quality {
+      def matches(u: UnitInfo): Boolean = u.is(UnitMatchCombatSpellcaster) || (u.attacksAgainstGround > 0 && ! u.unitClass.isWorker)
+      lazy val counteredBy: Array[Quality] = Array.empty
+    }
     object Combat extends Quality {
-      def matches(u: UnitInfo): Boolean = (u.canAttack && ! u.unitClass.isWorker) || u.is(UnitMatchCombatSpellcaster)
+      def matches(u: UnitInfo): Boolean = (u.canAttack && ! u.unitClass.isWorker)
       lazy val counteredBy: Array[Quality] = Array(Combat)
     }
     object Detector extends Quality {
@@ -43,6 +80,14 @@ trait GoalBasic extends SquadGoal {
     }
     val all: Vector[Quality] = Vector(
       Cloaked,
+      SpiderMine,
+      AntiSpiderMine,
+      Vulture,
+      AntiVulture,
+      Air,
+      Ground,
+      AntiAir,
+      AntiGround,
       Combat,
       Detector
     )
@@ -86,59 +131,69 @@ trait GoalBasic extends SquadGoal {
     }
   }
   
+  protected def offerConditional(
+    candidates: Iterable[FriendlyUnitInfo],
+    condition: (FriendlyUnitInfo, Quality) => Boolean) {
+    if ( ! acceptsHelp) return
+    val qualities = enemiesByQuality
+      .keys
+      .toVector
+      .filter(_.counteredBy.nonEmpty)
+      .sortBy(quality => -enemiesByQuality(quality) / Math.max(1, recruitsByQuality(quality)))
+    qualities.foreach(quality => {
+      if (acceptsHelp) {
+        val candidatesSorted = sortAndFilterCandidates(candidates, Some(quality))
+        candidatesSorted.foreach(candidate => {
+          if (acceptsHelp && condition(candidate, quality)) {
+            addCandidate(candidate)
+          }
+        })
+      }
+    })
+  }
+  
+  protected val counterMin = 1.5
+  protected val counterMax = 3.0
+  
   protected def offerCritical(candidates: Iterable[FriendlyUnitInfo]) {
-    lazy val sorted = sortAndFilterCandidates(candidates)
-    for (candidate <- sorted) {
-      if ( ! acceptsHelp) return
-      if (enemiesByQuality.exists{ case (quality, count) => (
+    offerConditional(
+      candidates,
+      (candidate, quality) =>
         // Enemy quality is represented
-        count > 0
+        enemiesByQuality(quality) > 0
         // Candidate counters it
         && quality.counteredBy.exists(_.matches(candidate))
         // And we have no recruits countering it
-        && recruitsByQuality(quality) == 0)}) {
-        
-        addCandidate(candidate)
-      }
-    }
+        && recruitsByQuality(quality) == 0)
   }
   
   protected def offerImportant(candidates: Iterable[FriendlyUnitInfo]) {
-    lazy val sorted = sortAndFilterCandidates(candidates)
-    for (candidate <- sorted) {
-      if ( ! acceptsHelp) return
-      if (enemiesByQuality.exists { case (quality, count) => (
+    offerConditional(
+      candidates,
+      (candidate, quality) =>
         // Enemy quality is represented
-        count > 0
+        enemiesByQuality(quality) > 0
         // Candidate counters it
         && quality.counteredBy.exists(_.matches(candidate))
-        // We are understaffed for countering it
-        && quality.counterScaling(recruitsByQuality(quality)) <= enemiesByQuality(quality) )}) {
-        
-        addCandidate(candidate)
-      }
-    }
+        // And we have no recruits countering it
+        && quality.counterScaling(recruitsByQuality(quality)) <= enemiesByQuality(quality) * counterMin)
   }
   
   protected def offerUseful(candidates: Iterable[FriendlyUnitInfo]) {
-    lazy val sorted = sortAndFilterCandidates(candidates)
-    for (candidate <- sorted) {
-      if ( ! acceptsHelp) return
-      if (enemiesByQuality.exists{ case (quality, count) => (
+    offerConditional(
+      candidates,
+      (candidate, quality) =>
         // Enemy quality is represented
-        count > 0
+        enemiesByQuality(quality) > 0
         // Candidate counters it
-        && quality.counteredBy.exists(_.matches(candidate)))}) {
-        
-        addCandidate(candidate)
-      }
-    }
+        && quality.counteredBy.exists(_.matches(candidate))
+        // And we have no recruits countering it
+        && quality.counterScaling(recruitsByQuality(quality)) <= enemiesByQuality(quality) * counterMax)
   }
   
   protected def offerUseless(candidates: Iterable[FriendlyUnitInfo]) {
     for (candidate <- candidates) {
       if (unitMatcher.accept(candidate)) {
-        
         addCandidate(candidate)
       }
     }
@@ -158,8 +213,18 @@ trait GoalBasic extends SquadGoal {
   protected def acceptsHelp: Boolean = unitCounter.continue(squad.units)
   protected def equippedSufficiently: Boolean = true
   protected def destination: Pixel = With.intelligence.mostBaselikeEnemyTile.pixelCenter
-  protected def sortAndFilterCandidates(candidates: Iterable[FriendlyUnitInfo]): Iterable[FriendlyUnitInfo] = {
-    candidates.toVector.filter(unitMatcher.accept).sortBy(_.pixelDistanceTravelling(destination))
+  protected def sortAndFilterCandidates(
+    candidates: Iterable[FriendlyUnitInfo],
+    enemyQuality: Option[Quality] = None):
+    Iterable[FriendlyUnitInfo] = {
+    candidates
+      .toVector
+      .filter(u =>
+        unitMatcher.accept(u)
+        && enemyQuality.forall(_.counteredBy.exists(_.matches(u))))
+      .sortBy(unit =>
+        (if (squad.previousUnits.contains(unit)) 1.0 else 1.15) // stickiness
+        * unit.pixelDistanceTravelling(destination))
   }
   
 }

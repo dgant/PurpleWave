@@ -17,6 +17,7 @@ class Squads {
   def squad(unit: FriendlyUnitInfo): Option[Squad] = squadByUnit.get(unit)
   
   def reset() {
+    all.foreach(squad => squad.previousUnits = squad.units)
     all.clear()
     squadByUnit.clear()
     unitsBySquad.clear()

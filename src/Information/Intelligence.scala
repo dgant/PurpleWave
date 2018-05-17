@@ -13,20 +13,26 @@ import scala.collection.mutable
 
 class Intelligence {
   
-  val unitsShown    : UnitsShown    = new UnitsShown
-  val fingerprints  : Fingerprints  = new Fingerprints
-  
+  val unitsShown: UnitsShown = new UnitsShown
+  val fingerprints: Fingerprints = new Fingerprints
   var firstEnemyMain: Option[Base] = None
   
   def leastScoutedBases: Iterable[Base] = leastScoutedBasesCache()
   def mostBaselikeEnemyTile: Tile = mostBaselikeEnemyTileCache()
   
   // A shared queue of bases to scout
-  private val nextBasesToScout = new Cache(() => new mutable.Queue[Base] ++ leastScoutedBases)
-  def dequeueNextBaseToScout: Base = {
-    val queue = nextBasesToScout()
+  private val nextBasesToScoutCache = new Cache(() => new mutable.Queue[Base] ++ leastScoutedBases)
+  private def populateNextBasesToScout() {
+    val queue = nextBasesToScoutCache()
     if (queue.isEmpty) queue ++= leastScoutedBases
-    val output = queue.dequeue()
+  }
+  def peekNextBaseToScout: Base = {
+    populateNextBasesToScout()
+    nextBasesToScoutCache().head
+  }
+  def dequeueNextBaseToScout: Base = {
+    populateNextBasesToScout()
+    val output = nextBasesToScoutCache().dequeue()
     output
   }
   

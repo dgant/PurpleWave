@@ -16,9 +16,6 @@ import scala.collection.mutable
 
 class Strategist {
     
-  
-    
-    
   lazy val selectedInitially: Set[Strategy] = selectInitialStrategies
    
   private var enemyRaceAtLastCheck: Race = With.enemy.raceInitial

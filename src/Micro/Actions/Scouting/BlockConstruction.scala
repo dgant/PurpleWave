@@ -4,8 +4,7 @@ import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Techniques.Avoid
 import Micro.Actions.Commands.{Attack, Move}
-import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import bwapi.UnitCommandType
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders, UnitInfo}
 
 object BlockConstruction extends Action {
   
@@ -37,13 +36,21 @@ object BlockConstruction extends Action {
     }
   }
   
+  private val buildOrders = Vector(
+    Orders.PlaceBuilding,
+    Orders.ZergBuildingMorph,
+    Orders.ConstructingBuilding,
+    Orders.CreateProtossBuilding,
+    Orders.PlaceProtossBuilding
+  )
+  
   def blockableBuilders(unit: FriendlyUnitInfo): Iterable[UnitInfo] = {
     lazy val enemyBase = With.geography.enemyBases.headOption
       .getOrElse(With.geography.startBases.minBy(_.lastScoutedFrame))
     
     unit.matchups.targets.filter(builder => {
       
-      lazy val hasBuildOrder = builder.command.exists(_.getUnitCommandType.toString == UnitCommandType.Build.toString)
+      lazy val hasBuildOrder = buildOrders.contains(builder.order)
       lazy val targetPixel = builder.targetPixel.getOrElse(builder.pixelCenter)
       lazy val targetBase = targetPixel.base
       

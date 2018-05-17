@@ -9,7 +9,7 @@ import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitClasses.{UnitClass, UnitClasses}
 import bwapi.{Position, UnitCommand}
 
-class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo (originalBaseUnit, id) {
+class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo(originalBaseUnit, id) {
   
   override val foreign: Option[ForeignUnitInfo] = Some(this)
   
@@ -159,7 +159,6 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo (o
     //Performance enhancement -- spare the expensive target calls for irrelevant units
     _target               = if (unitClass.targetsMatter)         baseUnit.getTarget         else null
     _targetPosition       = if (unitClass.targetPositionsMatter) baseUnit.getTargetPosition else null
-    _command              = baseUnit.getLastCommand
     _order                = baseUnit.getOrder.toString
     _orderTarget          = baseUnit.getOrderTarget
     _orderTargetPosition  = baseUnit.getOrderTargetPosition
@@ -181,7 +180,6 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo (o
   
   private var _target               : bwapi.Unit  = _
   private var _targetPosition       : Position    = Position.None
-  private var _command              : UnitCommand = _
   private var _order                : String      = "Stop"
   private var _orderTarget          : bwapi.Unit  = _
   private var _orderTargetPosition  : Position    = Position.None
@@ -191,7 +189,6 @@ class ForeignUnitInfo(originalBaseUnit: bwapi.Unit, id: Int) extends UnitInfo (o
   private val badPositions = Vector(Position.Invalid, Position.None, Position.Unknown, null)
   def target            : Option[UnitInfo]    = if (_target == null) None else With.units.get(_target)
   def targetPixel       : Option[Pixel]       = if (badPositions.contains(_targetPosition)) None else Some(new Pixel(_targetPosition))
-  def command           : Option[UnitCommand] = Option(_command)
   def order             : String              = _order
   def orderTarget       : Option[UnitInfo]    = if (_target == null) None else With.units.get(_orderTarget)
   def orderTargetPixel  : Option[Pixel]       = if (badPositions.contains(_orderTargetPosition)) None else Some(new Pixel(_orderTargetPosition))

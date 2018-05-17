@@ -6,7 +6,6 @@ import Mathematics.Physics.{Force, ForceMath}
 import Mathematics.PurpleMath
 import Mathematics.Shapes.Circle
 import Micro.Actions.Action
-import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Actions.Commands.{Gravitate, Move}
 import Micro.Decisions.Potential
 import Micro.Heuristics.Spells.TargetAOE
@@ -38,17 +37,12 @@ object BeAnArbiter extends Action {
   }
   
   override protected def perform(unit: FriendlyUnitInfo) {
-    Potshot.consider(unit)
-    
     val umbrellaSearchRadius  = 32.0 * 20.0
     val threatened            = unit.matchups.framesOfSafety <= 12.0
     val needUmbrella          = unit.teammates.filter(needsUmbrella)
     val needUmbrellaNearby    = needUmbrella.filter(_.pixelDistanceCenter(unit) < umbrellaSearchRadius)
     
-    if (needUmbrella.isEmpty) {
-      unit.agent.shouldEngage = false
-    }
-    else {
+    if (needUmbrella.nonEmpty) {
       val destination = TargetAOE.chooseTargetPixel(
         unit,
         umbrellaSearchRadius,
@@ -86,6 +80,9 @@ object BeAnArbiter extends Action {
       unit.agent.forces.put(ForceColors.target,     forceThreats)
       Gravitate.consider(unit)
       Move.delegate(unit)
+    }
+    if (unit.matchups.framesOfSafety < 48 || unit.matchups.threats.exists(_.topSpeed > unit.topSpeed)) {
+      unit.agent.shouldEngage = false
     }
   }
 }

@@ -7,5 +7,7 @@ case class ZonePathNode(
   to   : Zone,
   edge : Edge) {
   
+  lazy val zones: Vector[Zone] = Vector(from, to)
+  
   lazy val length: Double = edge.zones.map(zone => edge.pixelCenter.pixelDistance(zone.centroid.pixelCenter)).sum
 }

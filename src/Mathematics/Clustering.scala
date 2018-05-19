@@ -2,19 +2,10 @@ package Mathematics
 
 import Lifecycle.With
 import Mathematics.Points.Pixel
-import ProxyBwapi.UnitInfo.UnitInfo
 
 import scala.collection.mutable
 
 object Clustering {
-  
-  def groupUnits(
-    units         : Iterable[UnitInfo],
-    radius        : Int,
-    limitRegion   : Boolean = false)
-      : mutable.HashMap[UnitInfo, mutable.HashSet[UnitInfo]] = {
-    group(units, radius, limitRegion, (u) => u.pixelCenter)
-  }
   
   def group[T](
     things        : Iterable[T],
@@ -56,6 +47,12 @@ object Clustering {
     val radiusSquared = radius * radius
     
     //Yes, this includes the unit itself
-    things.map(thing => (thing, things.filter(extractPixel(_).pixelDistanceSquared(extractPixel(thing)) <= radiusSquared))).toMap
+    things.map(thing =>
+      (
+        thing,
+        things
+          .filter(otherThing =>
+            extractPixel(otherThing).pixelDistanceSquared(extractPixel(thing))
+            <= radiusSquared))).toMap
   }
 }

@@ -17,15 +17,16 @@ class Architecture {
   
   lazy val harvestingTiles: Set[Tile] = With.geography.bases.flatMap(_.harvestingArea.tiles).toSet
   
-  val exclusions      : mutable.ArrayBuffer[Exclusion]            = new mutable.ArrayBuffer[Exclusion]
-  val unbuildable     : mutable.Set[Tile]                         = new mutable.HashSet[Tile]
-  val unwalkable      : mutable.Set[Tile]                         = new mutable.HashSet[Tile]
-  val ungassable      : mutable.Set[Tile]                         = new mutable.HashSet[Tile]
-  val untownhallable  : mutable.Set[Tile]                         = new mutable.HashSet[Tile]
-  val creep           : mutable.Set[Tile]                         = new mutable.HashSet[Tile]
-  val powered2Height  : mutable.Set[Tile]                         = new mutable.HashSet[Tile]
-  val powered3Height  : mutable.Set[Tile]                         = new mutable.HashSet[Tile]
-  val existingPaths   : mutable.HashMap[Edge, TilePathCache]      = new mutable.HashMap[Edge, TilePathCache]
+  val exclusions        : mutable.ArrayBuffer[Exclusion]            = new mutable.ArrayBuffer[Exclusion]
+  val unbuildable       : mutable.Set[Tile]                         = new mutable.HashSet[Tile]
+  val unwalkable        : mutable.Set[Tile]                         = new mutable.HashSet[Tile]
+  val ungassable        : mutable.Set[Tile]                         = new mutable.HashSet[Tile]
+  val untownhallable    : mutable.Set[Tile]                         = new mutable.HashSet[Tile]
+  val creep             : mutable.Set[Tile]                         = new mutable.HashSet[Tile]
+  val powered2Height    : mutable.Set[Tile]                         = new mutable.HashSet[Tile]
+  val powered3Height    : mutable.Set[Tile]                         = new mutable.HashSet[Tile]
+  val existingPaths     : mutable.HashMap[Edge, TilePathCache]      = new mutable.HashMap[Edge, TilePathCache]
+  var accessibleZones   : Vector[Zone]                              = Vector.empty
   
   class TilePathCache {
     var path  : Option[TilePath]  = None
@@ -64,6 +65,7 @@ class Architecture {
     powered3Height  .clear()
     recalculateExclusions()
     recalculatePower()
+    recalculateBuilderAccess()
     updatePaths()
   }
   
@@ -253,7 +255,18 @@ class Architecture {
   private def canaryTile(zone: Zone): Tile = {
     Spiral.points(20)
       .map(zone.centroid.add)
+      .filter(_.valid)
       .find(walkable)
       .getOrElse(zone.centroid)
+  }
+  
+  private def recalculateBuilderAccess() {
+    val zonesWithBuilder = With.geography.zones.filter(_.units.exists(u => u.isOurs && u.unitClass.isWorker))
+    accessibleZones = With.geography.zones
+      .filter(zone =>
+        ! zone.unwalkable
+        && zonesWithBuilder.exists(builderZone =>
+          With.paths.zonePath(builderZone, zone).isDefined))
+      .toVector
   }
 }

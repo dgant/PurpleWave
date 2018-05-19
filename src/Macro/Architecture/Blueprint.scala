@@ -58,11 +58,9 @@ class Blueprint(
   def relativeBuildArea   : TileRectangle = TileRectangle(relativeBuildStart, relativeBuildEnd)
   
   def accepts(tile: Tile): Boolean = {
-    
     if ( ! tile.valid) {
       return false
     }
-    
     if (requirePower.get) {
       if (heightTiles.get == 3 && ! With.grids.psi3Height.isSet(tile) && ! With.architecture.powered3Height.contains(tile)) {
         return false
@@ -71,29 +69,25 @@ class Blueprint(
         return false
       }
     }
-    
     val thisZone = tile.zone
-  
-    if (thisZone.island && ! With.strategy.isPlasma) {
+    if (thisZone.island
+      && ! With.strategy.isPlasma
+      && ! With.architecture.accessibleZones.contains(thisZone)) {
       return false
     }
-    
     if (requireZone.isDefined && ! requireZone.contains(thisZone)) {
       return false
     }
-  
     if (requireTownHallTile.get) {
       val legal   = thisZone.bases.exists(_.townHallTile == tile)
       val blocked = With.architecture.untownhallable.contains(tile)
       return legal && ! blocked
     }
-  
     if (requireGasTile.get) {
       val legal   = thisZone.bases.exists(_.gas.exists(_.tileTopLeft == tile))
       val blocked = With.architecture.ungassable.contains(tile)
       return legal && ! blocked
     }
-    
     val buildArea = relativeBuildArea.add(tile)
   
     def violatesBuildArea(nextTile: Tile): Boolean = (

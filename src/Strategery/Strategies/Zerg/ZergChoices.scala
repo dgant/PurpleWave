@@ -16,6 +16,7 @@ object ZergChoices {
     OneHatchLurker,
     HydraBust,
     TwoHatchMuta,
-    TwoHatchHydra
+    TwoHatchHydra,
+    ZergSparkle
   )
 }

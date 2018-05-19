@@ -139,7 +139,7 @@ object DrawMap {
   }
   
   def irrelevant(points: Iterable[Pixel]): Boolean = {
-    points.forall(irrelevant)
+    With.configuration.visualizationCullViewport && points.forall(irrelevant)
   }
   def irrelevant(pixel: Pixel): Boolean = {
     val buffer = 32 * 4

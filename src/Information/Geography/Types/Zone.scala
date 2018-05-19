@@ -24,7 +24,7 @@ class Zone(
   lazy val  centroid        : Tile              = if (tiles.isEmpty) new Pixel(bwtaRegion.getCenter).tileIncluding else tiles.minBy(_.tileDistanceSquared(new Pixel(bwtaRegion.getCenter).tileIncluding))
   lazy val  area            : Double            = bwtaRegion.getPolygon.getArea
   lazy val  points          : Iterable[Pixel]   = bwtaRegion.getPolygon.getPoints.asScala.map(new Pixel(_)).toVector
-  lazy val  island          : Boolean           = ! With.geography.startBases.map(_.zone).exists(otherZone => this != otherZone && With.paths.zonePath(this, otherZone).isDefined)
+  lazy val  island          : Boolean           = With.geography.startBases.count(base => With.paths.zonePath(this, base.zone).isDefined) < 2
   lazy val  tilesBuildable  : Array[Tile]       = { With.grids.buildableTerrain.initialize(); tiles.filter(With.grids.buildableTerrain.get).toArray }
   lazy val  maxMobility     : Int               = ByOption.max(tiles.map(With.grids.mobilityGround.get)).getOrElse(0)
   lazy val  unwalkable      : Boolean           = ! tiles.exists(With.grids.walkable.get)

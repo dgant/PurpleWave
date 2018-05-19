@@ -49,7 +49,7 @@ object BeAnArbiter extends Action {
         Protoss.Zealot.subjectiveValue,
         evaluateForCloaking,
         12,
-        (tile) => Circle.points(2).map(tile.add),
+        (tile) => Circle.points(2).map(tile.add).filter(_.valid),
         Some(needUmbrellaNearby))
       unit.agent.toTravel = destination.orElse(
         Some(needUmbrella

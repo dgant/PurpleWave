@@ -56,6 +56,7 @@ object ZoneBuilder {
       .points(5)
       .view
       .map(tile.add)
+      .filter(_.valid)
       .flatMap(neighborTile => zones.view.find(candidate => candidate.tiles.contains(neighborTile)))
       .headOption
     matchingZone

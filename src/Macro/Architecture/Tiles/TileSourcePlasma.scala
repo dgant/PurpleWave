@@ -27,7 +27,8 @@ object TileSourcePlasma extends TileSource {
       With.geography.ourBases.flatMap(base =>
         Spiral
           .points(18)
-          .map(base.heart.add))
+          .map(base.heart.add)
+          .filter(_.valid))
     }
   }
 }

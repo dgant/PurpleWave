@@ -14,9 +14,11 @@ class GridEnemyVision extends AbstractGridTimestamp {
           .points(unit.sightRangePixels/32)
           .foreach(point => {
             val tile = unit.tileIncludingCenter.add(point)
-            if (unit.flying
-              || With.grids.altitudeBonus.get(unit.tileIncludingCenter)
-                >= With.grids.altitudeBonus.get(tile))
+            if (tile.valid
+              && (
+                unit.flying
+                || With.grids.altitudeBonus.get(unit.tileIncludingCenter)
+                  >= With.grids.altitudeBonus.get(tile)))
               set(tile, frameUpdated)
           }))
   }

@@ -41,9 +41,10 @@ class GoalFindExpansions extends GoalBasic {
   override protected def offerCritical(candidates: Iterable[FriendlyUnitInfo]): Unit = {}
   override protected def offerImportant(candidates: Iterable[FriendlyUnitInfo]): Unit = {
     if ( ! acceptsHelp) return
+    var remainingCandidates = candidates
     var foundCandidate: Option[FriendlyUnitInfo] = None
     do {
-      foundCandidate = ByOption.minBy(candidates.filter(unitMatcher.accept))(scoutPreference)
+      foundCandidate = ByOption.minBy(filterCandidates(candidates))(scoutPreference)
       foundCandidate.foreach(newScout => {
         addCandidate(newScout)
         destinationByScout.append((newScout, baseToPixel(With.intelligence.dequeueNextBaseToScout)))

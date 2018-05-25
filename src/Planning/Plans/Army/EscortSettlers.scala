@@ -4,11 +4,11 @@ import Lifecycle.With
 import Micro.Squads.Goals.GoalEscort
 import Planning.Composition.UnitCountEverything
 import Planning.Composition.UnitCounters.UnitCounter
-import Planning.Composition.UnitMatchers.{UnitMatchRecruitableForCombat, UnitMatchWarriors, UnitMatchWorkers, UnitMatcher}
+import Planning.Composition.UnitMatchers._
 import Utilities.ByOption
 
 class EscortSettlers(
-    attackerMatcher: UnitMatcher = UnitMatchRecruitableForCombat,
+    attackerMatcher: UnitMatcher = UnitMatchAnd(UnitMatchRecruitableForCombat, UnitMatchNot(UnitMatchWorkers)),
     attackerCounter: UnitCounter = UnitCountEverything)
   extends SquadPlan[GoalEscort] {
   

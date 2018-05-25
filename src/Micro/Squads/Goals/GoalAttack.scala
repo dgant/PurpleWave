@@ -23,11 +23,11 @@ class GoalAttack extends GoalBasic {
         canBerzerk = berzerk
       })
     })
-    squad.enemies = With.units.enemy.filter(e =>
-      e.likelyStillAlive
-        && e.possiblyStillThere
-        && e.unitClass.dealsDamage
-        && ( ! e.unitClass.isBuilding || e.zone == target.zone))
+    
+    val allEnemies = With.units.enemy.filter(e => e.likelyStillAlive && e.possiblyStillThere)
+    val defenders = allEnemies.filter(e => e.unitClass.dealsDamage && ( ! e.unitClass.isBuilding || e.zone == target.zone))
+    squad.enemies = defenders
+        
   }
   
   protected def chooseTarget(): Unit = {

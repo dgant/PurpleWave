@@ -14,7 +14,9 @@ import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireBases
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
+import Planning.Plans.Predicates.Economy.MineralsAtLeast
 import Planning.Plans.Predicates.Milestones.UnitsAtLeast
+import Planning.Plans.Predicates.SafeAtHome
 import Planning.Plans.Scouting.{ChillOverlords, FoundEnemyBase, Scout}
 import ProxyBwapi.Races.{Neutral, Zerg}
 
@@ -59,7 +61,7 @@ class ZergSparkle extends GameplanModeTemplate {
       RequestAtLeast(23, Zerg.Drone),
       RequestAtLeast(4, Zerg.Overlord), // 34 supply available
       RequestAtLeast(2, Zerg.Extractor), // -5 Drone
-      RequestAtLeast(24, Zerg.Drone)), // 20 drones
+      RequestAtLeast(24, Zerg.Drone)), // 20 drones -- if we use larva intelligently we can fit one more in here
     new RequireBases(3),
     new BuildOrder(RequestAtLeast(7, Zerg.Mutalisk))
   )
@@ -76,15 +78,22 @@ class ZergSparkle extends GameplanModeTemplate {
     new Trigger(
       new UnitsAtLeast(1, Zerg.Spire, complete = true),
       new Parallel(
-        new BuildOrder(RequestAtLeast(1, Zerg.Zergling)),// 0 supply left
+        new BuildOrder(RequestAtLeast(1, Zerg.Zergling)), // 0 supply left
         super.defaultSupplyPlan,
-        new TrainContinuously(Zerg.Drone, 10),
+        new If(
+          new SafeAtHome,
+          new TrainContinuously(Zerg.Drone, 18),
+          new TrainContinuously(Zerg.Drone, 10)),
         new UpgradeContinuously(Zerg.AirArmor),
         new If(
           new Check(() => With.self.gas >= Math.min(100, With.self.minerals)),
           new TrainContinuously(Zerg.Mutalisk),
           new TrainContinuously(Zerg.Drone, 25)),
-        new Build(RequestAtLeast(3, Zerg.Extractor)))
+        new If(
+          new Or(
+            new UnitsAtLeast(24, Zerg.Drone),
+            new MineralsAtLeast(200)),
+          new Build(RequestAtLeast(3, Zerg.Extractor))))
     )
   )
     

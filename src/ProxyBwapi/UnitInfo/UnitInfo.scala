@@ -122,11 +122,12 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   
   lazy val isMineralBlocker: Boolean = unitClass.isMinerals && mineralsLeft < With.configuration.blockerMineralThreshold
   
-  def subjectiveValue: Int = (
+  def subjectiveValue: Int = subjectiveValueCache()
+  private val subjectiveValueCache = new Cache(() =>
     unitClass.subjectiveValue
-    + scarabCount * Protoss.Scarab.subjectiveValue
-    + interceptorCount * Protoss.Interceptor.subjectiveValue
-    + friendly.map(_.loadedUnits.map(_.subjectiveValue).sum).sum
+      + scarabCount * Protoss.Scarab.subjectiveValue
+      + interceptorCount * Protoss.Interceptor.subjectiveValue
+      + friendly.map(_.loadedUnits.map(_.subjectiveValue).sum).sum
   )
   
   //////////////

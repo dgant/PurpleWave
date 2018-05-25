@@ -142,7 +142,7 @@ trait GoalBasic extends SquadGoal {
       .sortBy(quality => -enemiesByQuality(quality) / Math.max(1, recruitsByQuality(quality)))
     qualities.foreach(quality => {
       if (acceptsHelp) {
-        val candidatesSorted = sortAndFilterCandidates(candidates, Some(quality))
+        val candidatesSorted = filterAndSortCandidates(candidates, Some(quality))
         candidatesSorted.foreach(candidate => {
           if (acceptsHelp && condition(candidate, quality)) {
             addCandidate(candidate)
@@ -200,6 +200,7 @@ trait GoalBasic extends SquadGoal {
   }
   
   protected def addCandidate(unit: FriendlyUnitInfo) {
+    if (unit.squad.isDefined) return
     squad.recruit(unit)
     countUnit(unit)
   }
@@ -213,18 +214,25 @@ trait GoalBasic extends SquadGoal {
   protected def acceptsHelp: Boolean = unitCounter.continue(squad.units)
   protected def equippedSufficiently: Boolean = true
   protected def destination: Pixel = With.intelligence.mostBaselikeEnemyTile.pixelCenter
-  protected def sortAndFilterCandidates(
+  protected def filterCandidates(
+    candidates: Iterable[FriendlyUnitInfo],
+    enemyQuality: Option[Quality] = None): Iterable[FriendlyUnitInfo] = {
+    candidates
+      .filter(u =>
+        unitMatcher.accept(u)
+          && u.squad.isEmpty
+          && enemyQuality.forall(_.counteredBy.exists(_.matches(u))))
+  }
+  
+  protected def filterAndSortCandidates(
     candidates: Iterable[FriendlyUnitInfo],
     enemyQuality: Option[Quality] = None):
     Iterable[FriendlyUnitInfo] = {
-    candidates
-      .toVector
-      .filter(u =>
-        unitMatcher.accept(u)
-        && enemyQuality.forall(_.counteredBy.exists(_.matches(u))))
-      .sortBy(unit =>
-        (if (squad.previousUnits.contains(unit)) 1.0 else 1.15) // stickiness
-        * unit.pixelDistanceTravelling(destination))
+      filterCandidates(candidates, enemyQuality)
+        .toVector
+        .sortBy(unit =>
+          (if (squad.previousUnits.contains(unit)) 1.0 else 1.15) // stickiness
+          * unit.pixelDistanceTravelling(destination))
   }
   
 }

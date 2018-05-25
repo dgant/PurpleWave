@@ -31,7 +31,9 @@ class Squads {
   def assignFreelancers() {
     RecruitmentLevel.values.foreach(recruitmentLevel =>
       With.squads.allByPriority.foreach(squad => {
-        squad.goal.offer(freelancers, recruitmentLevel)
+        // Copy out freelancers to avoid modifying the set while iterating through it.
+        val nextFreelancers = freelancers.toVector
+        squad.goal.offer(nextFreelancers, recruitmentLevel)
       }))
   }
   

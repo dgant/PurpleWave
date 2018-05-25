@@ -4,8 +4,10 @@ import Information.Geography.Calculations.{ZoneBuilder, ZoneUpdater}
 import Information.Geography.Types.{Base, Edge, Zone}
 import Lifecycle.With
 import Mathematics.Points.{SpecificPoints, Tile, TileRectangle}
+import Mathematics.Shapes.Spiral
 import Performance.Cache
 import ProxyBwapi.UnitInfo.UnitInfo
+import Utilities.ByOption
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
@@ -32,7 +34,6 @@ class Geography {
   def enemyBases              : Iterable[Base]          = enemyBasesCache()
   def neutralBases            : Iterable[Base]          = With.geography.bases.filter(_.owner.isNeutral)
   
-  
   private val ourZonesCache           = new Cache(() => zones.filter(_.owner.isUs))
   private val ourBasesCache           = new Cache(() => bases.filter(_.owner.isUs))
   private val ourSettlementsCache     = new Cache(() => getSettlements)
@@ -47,8 +48,21 @@ class Geography {
   private lazy val zoneByTileCache =
     new mutable.HashMap[Tile, Zone] {
       override def default(key: Tile): Zone = {
-        val zone = zones
+        val zone: Zone = zones
           .find(_.tiles.contains(key))
+          .orElse(
+            ByOption
+              .maxBy(
+                Spiral
+                  .points(8)
+                  .map(point => {
+                    val neighbor = key.add(point)
+                    if (neighbor.valid) zones.find(_.tiles.contains(neighbor)) else None
+                  })
+                  .filter(_.isDefined)
+                  .map(z => z.get)
+                  .groupBy(x => x))(_._2.size)
+              .map(_._1))
           .getOrElse(zones.minBy(_.centroid.tileDistanceSquared(key)))
         put(key, zone)
         zone

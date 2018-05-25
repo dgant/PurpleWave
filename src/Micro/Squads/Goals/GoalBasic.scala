@@ -58,7 +58,7 @@ trait GoalBasic extends SquadGoal {
       lazy val counteredBy: Array[Quality] = Array(AntiAir)
     }
     object Ground extends Quality {
-      def matches(u: UnitInfo): Boolean = u.flying
+      def matches(u: UnitInfo): Boolean = ! u.flying
       lazy val counteredBy: Array[Quality] = Array(AntiGround)
     }
     object AntiAir extends Quality {
@@ -93,8 +93,8 @@ trait GoalBasic extends SquadGoal {
     )
   }
   
-  final private val enemiesByQuality  = new CountMap[Quality]
-  final private val recruitsByQuality = new CountMap[Quality]
+  final protected val enemiesByQuality  = new CountMap[Quality]
+  final protected val recruitsByQuality = new CountMap[Quality]
   private var lastUpdateFrame: Int = -1
   private def countUnit(unit: UnitInfo) {
     val counter = if (unit.isFriendly) recruitsByQuality else enemiesByQuality

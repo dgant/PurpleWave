@@ -3,6 +3,7 @@ package Micro.Squads.Goals
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Micro.Agency.Intention
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.ByOption
 import Utilities.EnrichPixel._
 
@@ -49,4 +50,9 @@ class GoalAttack extends GoalBasic {
           .getOrElse(base.townHallArea.midPixel))
         .getOrElse(With.intelligence.mostBaselikeEnemyTile.pixelCenter)
   }
+  
+  override protected def offerUseful(candidates: Iterable[FriendlyUnitInfo]) {
+    candidates.foreach(addCandidate)
+  }
+  override protected def offerUseless(candidates: Iterable[FriendlyUnitInfo]) {}
 }

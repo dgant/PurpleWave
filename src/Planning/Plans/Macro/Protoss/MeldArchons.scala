@@ -18,6 +18,10 @@ class MeldArchons(maxEnergy: Int = 250) extends Plan {
   templar.unitPreference.set(UnitPreferLowEnergy)
   
   override def onUpdate() {
+    // Fast check
+    val proceed = With.self.isProtoss && With.units.existsOurs(Protoss.HighTemplar)
+    if ( ! proceed) return
+    
     val templarLow    = With.units.countOurs(u => u.is(Protoss.HighTemplar) && u.energy < maxEnergy)
     val templarExcess = With.units.countOurs(Protoss.HighTemplar) - maximumTemplar
     val archonsNow    = With.units.countOurs(Protoss.Archon)

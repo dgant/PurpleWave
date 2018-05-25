@@ -32,8 +32,8 @@ object Avoid extends ActionTechnique {
     if (other.isFriendly) return None
     if ( ! other.canAttack(unit)) return None
     
-    val path = unit.agent.zonePath(unit.agent.origin)
-    if (path.isEmpty) return None
+    lazy val path = unit.agent.zonePath(unit.agent.origin)
+    if ( ! unit.flying && path.isEmpty) return None
     
     val pixelStep       = 16.0
     val baseValue       = 0.25

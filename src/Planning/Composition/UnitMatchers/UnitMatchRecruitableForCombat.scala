@@ -1,3 +1,8 @@
 package Planning.Composition.UnitMatchers
 
-object UnitMatchRecruitableForCombat extends UnitMatchAnd(UnitMatchMobile, UnitMatchNot(UnitMatchWorkers))
+import ProxyBwapi.Races.Zerg
+
+object UnitMatchRecruitableForCombat extends UnitMatchAnd(
+  UnitMatchMobile,
+  UnitMatchNot(UnitMatchWorkers),
+  UnitMatchNot(Zerg.Larva))

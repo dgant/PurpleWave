@@ -103,7 +103,7 @@ case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     With.geography.zoneByTile(tileIncluding)
   }
   def base: Option[Base] = {
-    ByOption.minBy(zone.bases)(_.heart.pixelCenter.pixelDistance(this))
+    ByOption.minBy(zone.bases)(_.heart.pixelCenter.pixelDistanceSquared(this))
   }
   def groundPixels(other: Tile): Double = {
     With.paths.groundPixels(this, other.pixelCenter)

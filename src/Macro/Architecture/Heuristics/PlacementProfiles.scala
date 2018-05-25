@@ -75,7 +75,7 @@ object PlacementProfiles {
   
   val wallPylon = new PlacementProfile(
     "Pylon for a wall",
-    preferZone                  = 1000.0,
+    preferZone                  = 100.0,
     preferNatural               = 10.0,
     preferPowering              = 1.0,
     preferCoveringWorkers       = 0.5,
@@ -85,7 +85,7 @@ object PlacementProfiles {
   
   val wallCannon = new PlacementProfile(
     "Cannons for a wall",
-    preferZone                  = 1000.0,
+    preferZone                  = 100.0,
     preferNatural               = 10.0,
     preferCoveringWorkers       = 0.2,
     avoidDistanceFromEntrance   = 1.0,
@@ -95,14 +95,14 @@ object PlacementProfiles {
   
   val proxyBuilding = new PlacementProfile(
     "Proxy",
-    preferZone                  = 1000.0,
+    preferZone                  = 100.0,
     avoidDistanceFromBase       = 1.0,
     avoidDistanceFromEnemy      = 3.0,
     avoidSurfaceArea            = 1.0)
   
   val proxyPylon = new PlacementProfile(
     "Proxy Pylon",
-    preferZone                  = 1000.0,
+    preferZone                  = 100.0,
     preferPowering              = 1.0,
     avoidDistanceFromBase       = 1.0,
     avoidDistanceFromEnemy      = 3.0,
@@ -110,7 +110,7 @@ object PlacementProfiles {
   
   val proxyCannon = new PlacementProfile(
     "Proxy cannon",
-    preferZone                  = 1000.0,
+    preferZone                  = 100.0,
     avoidDistanceFromEnemy      = 3.0,
     avoidSurfaceArea            = 1.0)
   

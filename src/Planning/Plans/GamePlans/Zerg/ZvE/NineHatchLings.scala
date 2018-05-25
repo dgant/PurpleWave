@@ -36,6 +36,7 @@ class NineHatchLings extends GameplanModeTemplate {
   override def buildPlans: Seq[Plan] = Vector(
     new If(
       new Or(
+        new EnemyUnitsAtLeast(1, Zerg.Spire, complete = true),
         new EnemyUnitsAtLeast(1, Zerg.Mutalisk),
         new EnemyUnitsAtLeast(1, Terran.Vulture)),
       new AllIn),

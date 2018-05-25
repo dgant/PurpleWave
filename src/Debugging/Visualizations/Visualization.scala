@@ -28,8 +28,7 @@ class Visualization {
     ShowUnitsFriendly,
     ShowUnitsForeign,
     ShowExplosions,
-    ShowBattleSummary,
-    ShowSquads
+    ShowBattleSummary
   )
   
   var enabled   : Boolean = _

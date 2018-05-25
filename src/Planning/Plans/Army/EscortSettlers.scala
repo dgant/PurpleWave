@@ -4,7 +4,7 @@ import Lifecycle.With
 import Micro.Squads.Goals.GoalEscort
 import Planning.Composition.UnitCountEverything
 import Planning.Composition.UnitCounters.UnitCounter
-import Planning.Composition.UnitMatchers.{UnitMatchRecruitableForCombat, UnitMatchWarriors, UnitMatcher}
+import Planning.Composition.UnitMatchers.{UnitMatchRecruitableForCombat, UnitMatchWarriors, UnitMatchWorkers, UnitMatcher}
 import Utilities.ByOption
 
 class EscortSettlers(
@@ -17,9 +17,10 @@ class EscortSettlers(
   override def onUpdate() {
     
     val settler = ByOption.minBy(With.units.ours.filter(builder =>
-      builder.agent.toBuildTile.exists(tile =>
-        tile.zone.bases.exists(base =>
-          base.townHall.forall( ! _.complete)))))(_.matchups.threats.exists(_.is(UnitMatchWarriors)))
+      builder.is(UnitMatchWorkers)
+      && builder.agent.toBuildTile.exists(
+        _.base.exists(
+          _.townHall.forall( ! _.complete)))))(_.matchups.threats.exists(_.is(UnitMatchWarriors)))
     
     if (settler.isEmpty) return
     

@@ -34,6 +34,10 @@ class NukeBase extends Plan {
   val squad = new Squad(this)
   
   override def onUpdate() {
+    // Fast check
+    val proceed = With.self.isTerran && With.units.existsOurs(Terran.NuclearMissile)
+    if ( ! proceed) return
+    
     nukeLock.get.acquire(this)
     if ( ! nukeLock.get.isSatisfied) return
     

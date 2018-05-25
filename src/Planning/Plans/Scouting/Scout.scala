@@ -54,7 +54,7 @@ class Scout(scoutCount: Int = 1) extends Plan {
     }
   
     val enemyStartBases = With.geography.startBases.filter(_.owner.isEnemy)
-    var scoutsDesired: Int = 1
+    val scoutsDesired: Int = Math.min(scoutCount, With.geography.startLocations.size - 1)
     
     val getNextScoutBase = () => {
       if (enemyStartBases.isEmpty) {

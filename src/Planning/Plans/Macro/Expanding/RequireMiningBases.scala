@@ -5,7 +5,7 @@ import Planning.Plans.Predicates.Milestones.AllMiningBases
 
 class RequireMiningBases(basesInitial: Int = 1) extends RequireBases(basesInitial) {
   
-  override def toString: String = "Require " + basesDesired.get + English.pluralize(" base", basesDesired.get)
+  override def toString: String = "Require " + basesDesired.get + English.pluralize(" mining bases", basesDesired.get)
   
   override protected def basesNow: Int = {
     AllMiningBases().size

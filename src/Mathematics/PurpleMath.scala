@@ -2,6 +2,8 @@ package Mathematics
 
 import Mathematics.Points.AbstractPoint
 
+import scala.util.Random
+
 object PurpleMath {
   
   val twoPI: Double = 2 * Math.PI
@@ -177,5 +179,9 @@ object PurpleMath {
   private val pi3Over4 = 3 * Math.PI / 4.0
   def atan2(y: Double, x: Double): Double = {
    normalizeAngle(Math.atan2(y, x))
+  }
+  
+  def sample[T](seq: Seq[T]): T = {
+    seq(Random.nextInt(seq.size))
   }
 }

@@ -4,6 +4,7 @@ import Information.Geography.Types.{Base, Edge, Zone}
 import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile, TileRectangle}
 import Mathematics.Shapes.Spiral
+import Utilities.ByOption
 import bwta.{BWTA, Polygon, Region}
 
 import scala.collection.JavaConverters._
@@ -52,14 +53,13 @@ object ZoneBuilder {
   }
   
   def assignTile(tile: Tile, zones: Iterable[Zone]): Boolean = {
-    val matchingZone = Spiral
+    val neighborZones = Spiral
       .points(5)
-      .view
       .map(tile.add)
       .filter(_.valid)
       .flatMap(neighborTile => zones.view.find(candidate => candidate.tiles.contains(neighborTile)))
-      .headOption
-    matchingZone
+    val consensusZone = ByOption.maxBy(neighborZones.groupBy(x => x))(_._2.size).map(_._1)
+    consensusZone
       .getOrElse(zones.minBy(_.centroid.tileDistanceSquared(tile)))
       .tiles
       .add(tile)

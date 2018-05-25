@@ -1,7 +1,8 @@
 package Mathematics.Points
 
-import Information.Geography.Types.Zone
+import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
+import Utilities.ByOption
 import bwapi.TilePosition
 
 case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
@@ -114,6 +115,9 @@ case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   }
   def zone: Zone = {
     With.geography.zoneByTile(this)
+  }
+  def base: Option[Base] = {
+    ByOption.minBy(zone.bases)(_.heart.tileDistanceSquared(this))
   }
   def groundPixels(other: Pixel): Double = {
     With.paths.groundPixels(pixelCenter, other)

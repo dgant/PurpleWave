@@ -9,12 +9,12 @@ import ProxyBwapi.Races.Zerg
 
 class RequireBases(basesInitial: Int = 1) extends Plan {
   
-  override def toString: String = "Require " + basesDesired.get + English.pluralize(" mining base", basesDesired.get)
+  override def toString: String = "Require " + basesDesired.get + English.pluralize(" bases", basesDesired.get)
   
   val basesDesired = new Property(basesInitial)
   
   protected def basesNow: Int = {
-    With.geography.bases.size
+    With.geography.ourBases.size
   }
   
   override def onUpdate() {

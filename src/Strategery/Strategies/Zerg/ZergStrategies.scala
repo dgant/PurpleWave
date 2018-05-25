@@ -11,12 +11,10 @@ import bwapi.Race
 class ZergStrategy extends Strategy {
   override def ourRaces: Iterable[Race] = Vector(Race.Zerg)
 }
-
 object TwoHatchMuta extends ZergStrategy {
   override def gameplan: Option[Plan] = { Some(new TwoHatchMuta) }
   override def minimumGamesVsOpponent: Int = 2
 }
-
 object FivePoolProxySunkens extends ZergStrategy {
   override def gameplan: Option[Plan] = Some(new Zerg5PoolProxySunkens)
   override def enemyRaces: Iterable[Race] = Vector(Race.Zerg)
@@ -44,17 +42,14 @@ object OneHatchLurker extends ZergStrategy {
   override def gameplan: Option[Plan] = Some(new OneHatchLurker)
   override def enemyRaces: Iterable[Race] = Vector(Race.Terran, Race.Protoss)
 }
-
 object ProxyHatchSunkens extends ZergStrategy {
   override def gameplan: Option[Plan] = Some(new ProxyHatch)
   override def enemyRaces: Iterable[Race] = Vector(Race.Unknown, Race.Terran)
 }
-
 object ProxyHatchHydras extends ZergStrategy {
   override def gameplan: Option[Plan] = Some(new ProxyHatch)
   override def enemyRaces: Iterable[Race] = Vector(Race.Unknown, Race.Terran)
 }
-
 object ProxyHatchZerglings extends ZergStrategy {
   override def gameplan: Option[Plan] = Some(new ProxyHatch)
   override def enemyRaces: Iterable[Race] = Vector(Race.Unknown, Race.Terran)

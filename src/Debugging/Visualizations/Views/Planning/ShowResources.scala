@@ -37,7 +37,7 @@ object ShowResources extends View {
         output.trimEnd(1)
         lineFinal = lineLast
         if (lineFinal.head == "") {
-          lineFinal = Iterable("x2") ++ lineFinal
+          lineFinal = Iterable("x2") ++ lineFinal.drop(1)
         }
         else {
           val x = lineFinal.head

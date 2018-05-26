@@ -4,7 +4,7 @@ import Lifecycle.With
 import Micro.Actions.Combat.Targeting.Target
 import Micro.Actions.Combat.Techniques.Common.ActionTechnique
 import Micro.Actions.Commands.{Attack, Move}
-import ProxyBwapi.Races.{Terran, Zerg}
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object Chase extends ActionTechnique {
@@ -27,16 +27,16 @@ object Chase extends ActionTechnique {
   override def applicabilityOther(unit: FriendlyUnitInfo, other: UnitInfo): Option[Double] = {
     if (other.isFriendly) return None
     
-    lazy val weCanAttack   = unit.canAttack(other)
-    lazy val theyCanAttack = other.canAttack(unit)
-    lazy val rangeUs     = unit.pixelRangeAgainst(other)
-    lazy val rangeEnemy  = other.pixelRangeAgainst(unit)
+    lazy val weCanAttack    = unit.canAttack(other)
+    lazy val theyCanAttack  = other.canAttack(unit)
+    lazy val rangeUs        = unit.pixelRangeAgainst(other)
+    lazy val rangeEnemy     = other.pixelRangeAgainst(unit)
   
-    if ( ! weCanAttack  && ! theyCanAttack) return None
-    if (theyCanAttack   && ! weCanAttack)   return Some(0.0)
-    if (weCanAttack     && ! theyCanAttack) return Some(1.0)
-    if (rangeUs < rangeEnemy)               return Some(1.0)
-    if (other.isBeingViolent)               return Some(0.0)
+    if ( ! weCanAttack  && ! theyCanAttack)                   return None
+    if (theyCanAttack   && ! weCanAttack)                     return Some(0.0)
+    if (weCanAttack     && ! theyCanAttack)                   return Some(1.0)
+    if (rangeUs < rangeEnemy && ! other.is(Protoss.Corsair))  return Some(1.0) // Corsairs attack too quickly to make use of increased range
+    if (other.isBeingViolent)                                 return Some(0.0)
     Some(1.0)
   }
   

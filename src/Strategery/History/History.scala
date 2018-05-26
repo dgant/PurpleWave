@@ -15,7 +15,7 @@ class History {
   lazy val currentEnemyName : String  = With.enemy.name
   lazy val currentEnemyRace : Race    = With.enemy.raceInitial
   
-  private var message = new mutable.ArrayBuffer[String]
+  var message = new mutable.ArrayBuffer[String]
   def onStart() {
     message += " "
     message += " "

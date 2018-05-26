@@ -1,11 +1,11 @@
 package Planning.Plans.GamePlans.Zerg.ZvE
 
+import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Macro.BuildRequests.RequestAtLeast
 import Micro.Agency.Intention
 import Planning.Composition.ResourceLocks.LockUnits
 import Planning.Composition.UnitCountEverything
-import Planning.Composition.UnitCounters.UnitCountOne
 import Planning.Plan
 import Planning.Plans.Army.Attack
 import Planning.Plans.Compound._
@@ -14,10 +14,9 @@ import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireBases
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
-import Planning.Plans.Predicates.Economy.MineralsAtLeast
-import Planning.Plans.Predicates.Milestones.{UnitsAtLeast, UpgradeComplete}
+import Planning.Plans.Predicates.Milestones.{EnemyUnitsAtMost, FrameAtLeast, UnitsAtLeast, UpgradeComplete}
 import Planning.Plans.Predicates.SafeAtHome
-import Planning.Plans.Scouting.{ChillOverlords, FoundEnemyBase, Scout}
+import Planning.Plans.Scouting.{FoundEnemyBase, Scout}
 import ProxyBwapi.Races.{Neutral, Zerg}
 
 class ZergSparkle extends GameplanModeTemplate {
@@ -38,19 +37,14 @@ class ZergSparkle extends GameplanModeTemplate {
   
   override def aggression: Double = 0.8
   
-  override def defaultScoutPlan: Plan = new If(
-    new Not(new FoundEnemyBase),
-    new Attack(Zerg.Zergling, UnitCountOne))
-  
   override def defaultAttackPlan: Plan = new Attack(Zerg.Mutalisk)
   
   override def defaultBuildOrder: Plan = new Parallel (
     new BuildOrder(
       RequestAtLeast(9, Zerg.Drone),
       RequestAtLeast(2, Zerg.Overlord),
-      RequestAtLeast(12, Zerg.Drone),
-      RequestAtLeast(1, Zerg.SpawningPool), // -1 Drone
       RequestAtLeast(13, Zerg.Drone),
+      RequestAtLeast(1, Zerg.SpawningPool), // -1 Drone
       RequestAtLeast(1, Zerg.Extractor), // -2 Drone
       RequestAtLeast(15, Zerg.Drone)),
     new RequireBases(2), // -3 Drone
@@ -67,11 +61,10 @@ class ZergSparkle extends GameplanModeTemplate {
     new BuildOrder(RequestAtLeast(7, Zerg.Mutalisk))
   )
   
-  override def defaultOverlordPlan = new If(
+  override def defaultScoutPlan = new If(
     new If(
-      new FoundEnemyBase,
-      new ChillOverlords,
-      new Scout(8) { scouts.get.unitMatcher.set(Zerg.Overlord) }))
+      new Not(new FoundEnemyBase),
+      new Scout(15) { scouts.get.unitMatcher.set(Zerg.Overlord) }))
   
   override def defaultSupplyPlan: Plan = NoPlan()
   override def buildPlans: Seq[Plan] = Vector(
@@ -79,9 +72,13 @@ class ZergSparkle extends GameplanModeTemplate {
     new Trigger(
       new UnitsAtLeast(1, Zerg.Spire, complete = true),
       new Parallel(
-        new BuildOrder(
-          RequestAtLeast(25, Zerg.Drone),
-          RequestAtLeast(1, Zerg.Zergling)), // 0 supply left
+        new If(
+          new Or(
+            new EnemyUnitsAtMost(0, Zerg.Mutalisk),
+            new UnitsAtLeast(10, Zerg.Mutalisk)),
+          // We would like to build another Drone here but this is technically difficult due to limitations on how BuildOrder works
+          new Build(RequestAtLeast(1, Zerg.Zergling)),
+          new BuildOrder(RequestAtLeast(6, Zerg.Overlord))),
         super.defaultSupplyPlan,
         new If(
           new SafeAtHome,
@@ -98,11 +95,8 @@ class ZergSparkle extends GameplanModeTemplate {
           new TrainContinuously(Zerg.Mutalisk),
           new TrainContinuously(Zerg.Drone, 25)),
         new If(
-          new Or(
-            new UnitsAtLeast(24, Zerg.Drone),
-            new MineralsAtLeast(200)),
-          new Build(RequestAtLeast(3, Zerg.Extractor))))
-    )
-  )
-    
+          new And(
+            new UnitsAtLeast(18, Zerg.Drone),
+            new FrameAtLeast(GameTime(7, 0)())), // Psi Disruptor won't die before this
+          new Build(RequestAtLeast(3, Zerg.Extractor))))))
 }

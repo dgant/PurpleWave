@@ -16,15 +16,16 @@ object ShowTechniques extends View {
     DrawScreen.table(
       5,
       7 * With.visualization.lineHeightSmall,
-      Vector(Vector("Technique", "Activator", "Total", "Base", "Self", "Others")) ++
+      Vector(Vector("Technique", "Activator", "", "Base", "Self", "Others", "Total")) ++
       techniques.map(t =>
         Vector(
           t.technique.getClass.getSimpleName.replaceAllLiterally("$", ""),
           t.technique.activator.getClass.getSimpleName.replaceAllLiterally("$", ""),
-          format(t.totalApplicability),
+          "",
           format(t.technique.applicabilityBase),
           format(t.totalApplicabilitySelf),
-          format(t.totalApplicabilityOther)
+          format(t.totalApplicabilityOther),
+          format(t.totalApplicability)
       )))
   }
   

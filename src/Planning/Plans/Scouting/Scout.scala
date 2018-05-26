@@ -5,7 +5,7 @@ import Mathematics.Points.SpecificPoints
 import Micro.Agency.Intention
 import Planning.Composition.Property
 import Planning.Composition.ResourceLocks.LockUnits
-import Planning.Composition.UnitCounters.UnitCountExactly
+import Planning.Composition.UnitCounters.{UnitCountBetween, UnitCountExactly}
 import Planning.Composition.UnitMatchers.{UnitMatchAnd, UnitMatchNotHoldingResources, UnitMatchWorkers}
 import Planning.Composition.UnitPreferences.UnitPreferClose
 import Planning.Plan
@@ -69,7 +69,7 @@ class Scout(scoutCount: Int = 1) extends Plan {
       scouts.get.release()
     }
     
-    scouts.get.unitCounter.set(UnitCountExactly(scoutsDesired))
+    scouts.get.unitCounter.set(new UnitCountBetween(1, scoutsDesired))
     scouts.get.unitPreference.set(UnitPreferClose(With.intelligence.leastScoutedBases.head.heart.pixelCenter))
     scouts.get.acquire(this)
     acquiredScouts = scouts.get.units

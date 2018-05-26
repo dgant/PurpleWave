@@ -1,5 +1,7 @@
 package Lifecycle
 
+import Information.Intelligenze.Fingerprinting.Generic.GameTime
+
 object Manners {
   
   def enabled: Boolean = With.configuration.enableChat
@@ -18,6 +20,9 @@ object Manners {
       && With.performance.framesOver85 > 1000) {
       With.logger.error("Quitting due to performance failure")
       surrender()
+    }
+    if (With.frame == GameTime(0, 20)()) {
+      With.history.message.foreach(chat)
     }
   }
   

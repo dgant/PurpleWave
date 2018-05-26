@@ -8,7 +8,7 @@ class ActionTechniqueEvaluation(
   val technique: ActionTechnique) {
   
   lazy val applicabilitiesOther     : Vector[Double]  = unit.matchups.others.flatMap(technique.applicabilityOther(unit, _)).map(PurpleMath.clampToOne)
-  lazy val totalApplicabilityOther  : Double          = technique.activator(unit, unit.matchups.others).getOrElse(0.0)
+  lazy val totalApplicabilityOther  : Double          = PurpleMath.nanToZero(technique.activator(unit, unit.matchups.others).getOrElse(0.0))
   lazy val totalApplicabilitySelf   : Double          = PurpleMath.clampToOne(technique.applicabilitySelf(unit))
   lazy val totalApplicability       : Double          = evaluate
   

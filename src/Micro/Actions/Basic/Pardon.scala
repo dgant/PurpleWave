@@ -16,7 +16,7 @@ object Pardon extends Action {
     val forcesPardoning = unit.agent.shovers.map(shover => Potential.unitAttraction(unit, shover, -1.0))
     val forcePardoning  = forcesPardoning.reduce(_ + _).normalize
     val forceMobility   = Potential.mobilityAttraction(unit)
-    unit.agent.forces.put(ForceColors.spreading,  forcePardoning)
+    unit.agent.forces.put(ForceColors.spacing,  forcePardoning)
     unit.agent.forces.put(ForceColors.mobility,   forceMobility)
     Gravitate.delegate(unit)
     Move.delegate(unit)

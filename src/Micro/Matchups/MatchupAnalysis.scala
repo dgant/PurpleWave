@@ -6,7 +6,7 @@ import Lifecycle.With
 import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
 import Micro.Decisions.MicroValue
-import ProxyBwapi.Races.Protoss
+import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.{ByOption, Forever}
 
@@ -42,8 +42,8 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
   def repairers: ArrayBuffer[UnitInfo] = ArrayBuffer.empty ++ allies.filter(_.friendly.exists(_.agent.toRepair.contains(me)))
   
   lazy val valuePerDamage                 : Double                = MicroValue.valuePerDamageCurrentHp(me)
-  lazy val vpfDealingMax                  : Double                = ByOption.max(targets.map(MicroValue.valuePerFrameCurrentHp(me, _))).getOrElse(0.0)
-  lazy val vpfDealingInRange              : Double                = ByOption.max(targetsInRange.map(MicroValue.valuePerFrameCurrentHp(me, _))).getOrElse(0.0)
+  lazy val vpfDealingMax                  : Double                = splashFactorMax * ByOption.max(targets.map(MicroValue.valuePerFrameCurrentHp(me, _))).getOrElse(0.0)
+  lazy val vpfDealingInRange              : Double                = splashFactorInRange * ByOption.max(targetsInRange.map(MicroValue.valuePerFrameCurrentHp(me, _))).getOrElse(0.0)
   lazy val dpfReceiving                   : Double                = threatsInRange.map(_.matchups.dpfDealingDiffused(me)).sum
   lazy val vpfReceiving                   : Double                = valuePerDamage * dpfReceiving
   lazy val vpfNet                         : Double                = vpfDealingInRange - vpfReceiving
@@ -53,7 +53,7 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
   lazy val framesOfEntanglement           : Double                = ByOption.max(framesOfEntanglementPerThreat.values).getOrElse(- Forever())
   lazy val framesOfSafety                 : Double                = - With.latency.latencyFrames - With.reaction.agencyMax - ByOption.max(framesOfEntanglementPerThreat.values).getOrElse(- Forever().toDouble)
   
-  def dpfDealingDiffused  (target: UnitInfo): Double = me.dpfOnNextHitAgainst(target) / Math.max(1.0, targetsInRange.size)
+  def dpfDealingDiffused(target: UnitInfo): Double = splashFactorInRange * me.dpfOnNextHitAgainst(target) / Math.max(1.0, targetsInRange.size)
   
   def framesOfEntanglementWith(threat: UnitInfo, fixedRange: Option[Double] = None): Double = {
     lazy val approachSpeedMe      = me.speedApproaching(threat.pixelCenter)
@@ -73,5 +73,20 @@ case class MatchupAnalysis(me: UnitInfo, conditions: MatchupConditions) {
     val output            = framesToCloseGap * PurpleMath.signum( - gapPixels) + blastoffFrames
     
     output
+  }
+  
+  lazy val splashFactorMax: Double = splashFactorForUnits(targets)
+  lazy val splashFactorInRange: Double = splashFactorForUnits(targetsInRange)
+  
+  protected def splashFactorForUnits(targetsConsidered: Iterable[UnitInfo]): Double = {
+    val min = targetsConsidered.size
+    val max =
+      if(me.unitClass.dealsRadialSplashDamage || me.is(Zerg.Lurker))
+        2.5
+      else if(me.is(Zerg.Mutalisk))
+        1.25
+      else
+        1.0
+    Math.min(min, max)
   }
 }

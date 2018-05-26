@@ -1,7 +1,6 @@
 package Micro.Decisions
 
 import Mathematics.PurpleMath
-import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.UnitInfo
 
 object MicroValue {
@@ -35,14 +34,5 @@ object MicroValue {
     val damagePerFrame = PurpleMath.nanToZero(0.9 * target.unitClass.maxHitPoints / target.unitClass.buildFrames)
     val valuePerFrame = valuePerDamage * damagePerFrame
     valuePerFrame
-  }
-  
-  def maxSplashFactor(unit: UnitInfo): Double = {
-    if(unit.unitClass.dealsRadialSplashDamage || unit.is(Zerg.Lurker))
-      2.0
-    else if(unit.is(Zerg.Mutalisk))
-      1.5
-    else
-      1.0
   }
 }

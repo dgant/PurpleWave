@@ -35,10 +35,8 @@ object Chase extends ActionTechnique {
     if ( ! weCanAttack  && ! theyCanAttack) return None
     if (theyCanAttack   && ! weCanAttack)   return Some(0.0)
     if (weCanAttack     && ! theyCanAttack) return Some(1.0)
-    if (unit.flying     && other.flying)    return Some(1.0)
     if (rangeUs < rangeEnemy)               return Some(1.0)
     if (other.isBeingViolent)               return Some(0.0)
-    
     Some(1.0)
   }
   

@@ -4,7 +4,6 @@ import Debugging.Visualizations.Views.Battles.ShowBattleDetails
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
-import Micro.Decisions.MicroValue
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.UnitInfo
 
@@ -21,7 +20,7 @@ class Simulacrum(
   val movementDelay     : Int     = if (realUnit.isEnemy || simulation.weAttack)  0   else realUnit.unitClass.framesToTurn(Math.PI) + 2 * realUnit.unitClass.accelerationFrames + With.configuration.retreatMovementDelay
   val speedMultiplier   : Double  = if (realUnit.isEnemy || realUnit.flying)      1.0 else Math.max(0.75, simulation.chokeMobility.getOrElse(realUnit.zone, 1.0))
   val bonusRange        : Double  = if (realUnit.isOurs  || ! realUnit.unitClass.isSiegeTank || ! simulation.weAttack) 0.0 else With.configuration.bonusTankRange
-  val multiplierSplash  : Double  = MicroValue.maxSplashFactor(realUnit)
+  val multiplierSplash  : Double  = realUnit.matchups.splashFactorMax
   
   // Unit state
   val canMove             : Boolean                     = realUnit.canMove

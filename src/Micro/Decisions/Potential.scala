@@ -70,6 +70,42 @@ object Potential {
     output
   }
   
+  ////////////
+  // Splash //
+  ////////////
+  
+  protected def splashRepulsionMagnitude(splashRadius: Double): (UnitInfo, UnitInfo) => Double = {
+    (self, ally) => {
+      val denominator = splashRadius
+      val numerator = - Math.max(0.0, denominator - self.pixelDistanceEdge(ally))
+      numerator / denominator
+    }
+  }
+  
+  def splashRepulsion(unit: FriendlyUnitInfo): Force = {
+    
+    val splashThreats = unit.matchups.threats.filter(_.unitClass.dealsRadialSplashDamage)
+    if (splashThreats.isEmpty) return new Force
+    
+    val splashRadius: Double = ByOption.max(splashThreats.map(_.unitClass.airSplashRadius25.toDouble)).getOrElse(0.0)
+    if (splashRadius <= 0) return new Force
+  
+    val splashAllies = unit.matchups.allies.filter(ally =>
+      ! ally.unitClass.isBuilding
+      && (ally.flying == unit.flying || splashThreats.take(3).exists(_.canAttack(ally))))
+  
+    def splashRepulsionMagnitude(self: UnitInfo, ally: UnitInfo): Double = {
+      val denominator = splashRadius + self.unitClass.radialHypotenuse
+      val numerator   = - Math.max(0.0, denominator - self.pixelDistanceEdge(ally))
+      val output      = numerator / denominator
+      output
+    }
+    
+    val forces  = splashAllies.map(Potential.unitAttraction(unit, _, magnifier = splashRepulsionMagnitude))
+    val output  = ForceMath.sum(forces).normalize(forces.map(_.lengthFast).max)
+    output
+  }
+  
   ////////////////
   // Explosions //
   ////////////////

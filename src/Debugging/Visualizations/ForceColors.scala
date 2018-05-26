@@ -5,7 +5,8 @@ object ForceColors {
   lazy val target     = Colors.NeonOrange
   lazy val bypassing  = Colors.NeonYellow
   lazy val mobility   = Colors.NeonGreen
-  lazy val spreading  = Colors.NeonTeal
+  lazy val spacing    = Colors.NeonTeal
+  lazy val spreading  = Colors.NeonViolet
   lazy val traveling  = Colors.NeonBlue
   lazy val regrouping = Colors.NeonIndigo
   lazy val sum        = Colors.White

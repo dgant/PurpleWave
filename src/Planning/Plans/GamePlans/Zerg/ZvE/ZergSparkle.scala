@@ -79,7 +79,9 @@ class ZergSparkle extends GameplanModeTemplate {
     new Trigger(
       new UnitsAtLeast(1, Zerg.Spire, complete = true),
       new Parallel(
-        new BuildOrder(RequestAtLeast(1, Zerg.Zergling)), // 0 supply left
+        new BuildOrder(
+          RequestAtLeast(25, Zerg.Drone),
+          RequestAtLeast(1, Zerg.Zergling)), // 0 supply left
         super.defaultSupplyPlan,
         new If(
           new SafeAtHome,

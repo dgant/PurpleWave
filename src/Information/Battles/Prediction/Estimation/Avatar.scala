@@ -3,7 +3,6 @@ package Information.Battles.Prediction.Estimation
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
-import Micro.Decisions.MicroValue
 import ProxyBwapi.Engine.Damage
 import ProxyBwapi.UnitInfo.UnitInfo
 
@@ -43,7 +42,7 @@ class Avatar {
     
     this()
   
-    val splashFactor = MicroValue.maxSplashFactor(unit)
+    val splashFactor = unit.matchups.splashFactorMax // Funky that this uses matchups
     
     val geometric     = nearestEnemy.isDefined
     val contributes   = unit.unitClass.dealsDamage

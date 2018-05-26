@@ -1,7 +1,7 @@
 package Micro.Actions.Combat.Techniques
 
 import Lifecycle.With
-import Micro.Actions.Combat.Attacking.Target
+import Micro.Actions.Combat.Targeting.Target
 import Micro.Actions.Combat.Techniques.Common.ActionTechnique
 import Micro.Actions.Commands.{Attack, Move}
 import ProxyBwapi.Races.{Terran, Zerg}

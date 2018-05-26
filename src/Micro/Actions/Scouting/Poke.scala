@@ -2,8 +2,8 @@ package Micro.Actions.Scouting
 
 import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Actions.Combat.Attacking.Filters.TargetFilterWhitelist
-import Micro.Actions.Combat.Attacking.TargetAction
+import Micro.Actions.Combat.Targeting.Filters.TargetFilterWhitelist
+import Micro.Actions.Combat.Targeting.TargetAction
 import Micro.Actions.Combat.Techniques.Avoid
 import Micro.Actions.Commands.{Attack, Move}
 import ProxyBwapi.Races.Terran

@@ -1,8 +1,10 @@
 package Strategery.History
 
-import Lifecycle.{Manners, With}
+import Lifecycle.With
 import Utilities.CountMap
 import bwapi.Race
+
+import scala.collection.mutable
 
 class History {
   
@@ -13,28 +15,29 @@ class History {
   lazy val currentEnemyName : String  = With.enemy.name
   lazy val currentEnemyRace : Race    = With.enemy.raceInitial
   
+  private var message = new mutable.ArrayBuffer[String]
   def onStart() {
-    Manners.chat(" ")
-    Manners.chat(" ")
-    Manners.chat("Good luck on " + currentMapName + ", " + currentEnemyName + "!")
-    Manners.chat(" ")
+    message += " "
+    message += " "
+    message += "Good luck on " + currentMapName + ", " + currentEnemyName + "!"
+    message += " "
     
-    val mapWins         = games.count(g => g.mapName        == currentMapName   &&    g.won)
-    val mapLosses       = games.count(g => g.mapName        == currentMapName   &&  ! g.won)
-    val startWins       = games.count(g => g.startLocations == currentStarts    &&    g.won)
-    val startLosses     = games.count(g => g.startLocations == currentStarts    &&  ! g.won)
-    val enemyRaceWins   = games.count(g => g.enemyRace      == currentEnemyRace &&    g.won)
-    val enemyRaceLosses = games.count(g => g.enemyRace      == currentEnemyRace &&  ! g.won)
-    val ourRaceWins     = games.count(g => g.ourRace        == With.self.raceInitial   &&    g.won)
-    val ourRaceLosses   = games.count(g => g.ourRace        == With.self.raceInitial   &&  ! g.won)
-    val vsWins          = games.count(g => g.enemyName      == currentEnemyName &&    g.won)
-    val vsLosses        = games.count(g => g.enemyName      == currentEnemyName &&  ! g.won)
+    val mapWins         = games.count(g => g.mapName        == currentMapName         &&    g.won)
+    val mapLosses       = games.count(g => g.mapName        == currentMapName         &&  ! g.won)
+    val startWins       = games.count(g => g.startLocations == currentStarts          &&    g.won)
+    val startLosses     = games.count(g => g.startLocations == currentStarts          &&  ! g.won)
+    val enemyRaceWins   = games.count(g => g.enemyRace      == currentEnemyRace       &&    g.won)
+    val enemyRaceLosses = games.count(g => g.enemyRace      == currentEnemyRace       &&  ! g.won)
+    val ourRaceWins     = games.count(g => g.ourRace        == With.self.raceInitial  &&    g.won)
+    val ourRaceLosses   = games.count(g => g.ourRace        == With.self.raceInitial  &&  ! g.won)
+    val vsWins          = games.count(g => g.enemyName      == currentEnemyName       &&    g.won)
+    val vsLosses        = games.count(g => g.enemyName      == currentEnemyName       &&  ! g.won)
     
-    Manners.chat("On this map: "                                              + mapWins       + " - " + mapLosses)
-    Manners.chat("With "          + currentStarts     + " start locations: "  + startWins     + " - " + startLosses)
-    Manners.chat("As "            + With.self.raceInitial    + ": "                  + ourRaceWins   + " - " + ourRaceLosses)
-    Manners.chat("Vs. "           + currentEnemyRace  + ": "                  + enemyRaceWins + " - " + enemyRaceLosses)
-    Manners.chat("Vs. "           + currentEnemyName  + ": "                  + vsWins        + " - " + vsLosses)
+    message += "On this map: "                                         + mapWins       + " - " + mapLosses
+    message += "With "  + currentStarts         + " start locations: "  + startWins     + " - " + startLosses
+    message += "As "    + With.self.raceInitial + ": "                  + ourRaceWins   + " - " + ourRaceLosses
+    message += "Vs. "   + currentEnemyRace      + ": "                  + enemyRaceWins + " - " + enemyRaceLosses
+    message += "Vs. "   + currentEnemyName      + ": "                  + vsWins        + " - " + vsLosses
   }
   
   def onEnd(weWon: Boolean) {

@@ -24,7 +24,7 @@ object TargetHeuristicVpfEnemy extends TargetHeuristic {
     
     val vpfNow = candidate.matchups.vpfDealingInRange
     val vpfMax = candidate.matchups.vpfDealingMax
-    val output = (vpfMax + vpfNow) / baseline
+    val output = MicroValue.maxSplashFactor(candidate) * (vpfMax + vpfNow) / baseline
     output
   }
   

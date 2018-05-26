@@ -5,8 +5,8 @@ import Lifecycle.With
 import Mathematics.Points.Pixel
 import Mathematics.PurpleMath
 import Micro.Actions.Action
-import Micro.Actions.Combat.Attacking.Filters.TargetFilter
-import Micro.Actions.Combat.Attacking.TargetAction
+import Micro.Actions.Combat.Targeting.Filters.TargetFilter
+import Micro.Actions.Combat.Targeting.TargetAction
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 

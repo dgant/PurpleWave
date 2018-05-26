@@ -1,8 +1,8 @@
 package Micro.Actions.Combat.Techniques
 
 import Lifecycle.With
-import Micro.Actions.Combat.Attacking.Filters.TargetFilterWhitelist
-import Micro.Actions.Combat.Attacking.{Target, TargetAction, TargetInRange}
+import Micro.Actions.Combat.Targeting.Filters.TargetFilterWhitelist
+import Micro.Actions.Combat.Targeting.{Target, TargetAction, TargetInRange}
 import Micro.Actions.Combat.Techniques.Common.ActionTechnique
 import Micro.Actions.Commands.Attack
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}

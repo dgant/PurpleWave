@@ -1,8 +1,8 @@
 package Micro.Actions.Combat.Tactics
 
 import Micro.Actions.Action
-import Micro.Actions.Combat.Attacking.Filters.{TargetFilter, TargetFilterCombatants, TargetFilterVisibleInRange}
-import Micro.Actions.Combat.Attacking.TargetAction
+import Micro.Actions.Combat.Targeting.Filters.{TargetFilter, TargetFilterCombatants, TargetFilterVisibleInRange}
+import Micro.Actions.Combat.Targeting.TargetAction
 import Micro.Actions.Commands.Attack
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 

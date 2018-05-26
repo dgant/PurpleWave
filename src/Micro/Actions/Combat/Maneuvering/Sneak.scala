@@ -3,7 +3,7 @@ package Micro.Actions.Combat.Maneuvering
 import Debugging.Visualizations.ForceColors
 import Mathematics.Physics.Force
 import Micro.Actions.Action
-import Micro.Actions.Combat.Attacking.Target
+import Micro.Actions.Combat.Targeting.Target
 import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Actions.Commands.{Gravitate, Move}
 import Micro.Decisions.Potential

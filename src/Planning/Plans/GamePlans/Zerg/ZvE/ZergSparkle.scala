@@ -15,7 +15,7 @@ import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireBases
 import Planning.Plans.Macro.Upgrades.UpgradeContinuously
 import Planning.Plans.Predicates.Economy.MineralsAtLeast
-import Planning.Plans.Predicates.Milestones.UnitsAtLeast
+import Planning.Plans.Predicates.Milestones.{UnitsAtLeast, UpgradeComplete}
 import Planning.Plans.Predicates.SafeAtHome
 import Planning.Plans.Scouting.{ChillOverlords, FoundEnemyBase, Scout}
 import ProxyBwapi.Races.{Neutral, Zerg}
@@ -50,6 +50,7 @@ class ZergSparkle extends GameplanModeTemplate {
       RequestAtLeast(2, Zerg.Overlord),
       RequestAtLeast(12, Zerg.Drone),
       RequestAtLeast(1, Zerg.SpawningPool), // -1 Drone
+      RequestAtLeast(13, Zerg.Drone),
       RequestAtLeast(1, Zerg.Extractor), // -2 Drone
       RequestAtLeast(15, Zerg.Drone)),
     new RequireBases(2), // -3 Drone
@@ -84,7 +85,12 @@ class ZergSparkle extends GameplanModeTemplate {
           new SafeAtHome,
           new TrainContinuously(Zerg.Drone, 18),
           new TrainContinuously(Zerg.Drone, 10)),
-        new UpgradeContinuously(Zerg.AirArmor),
+        new If(
+          new And(
+            new UpgradeComplete(Zerg.AirArmor, 2),
+            new Not(new UpgradeComplete(Zerg.AirDamage, 3))),
+          new UpgradeContinuously(Zerg.AirDamage),
+          new UpgradeContinuously(Zerg.AirArmor)),
         new If(
           new Check(() => With.self.gas >= Math.min(100, With.self.minerals)),
           new TrainContinuously(Zerg.Mutalisk),

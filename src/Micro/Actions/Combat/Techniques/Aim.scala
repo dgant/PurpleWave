@@ -1,7 +1,7 @@
 package Micro.Actions.Combat.Techniques
 
-import Micro.Actions.Combat.Attacking.Filters.TargetFilterVisibleInRange
-import Micro.Actions.Combat.Attacking.TargetAction
+import Micro.Actions.Combat.Targeting.Filters.TargetFilterVisibleInRange
+import Micro.Actions.Combat.Targeting.TargetAction
 import Micro.Actions.Combat.Techniques.Common.ActionTechnique
 import Micro.Actions.Commands.Attack
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo

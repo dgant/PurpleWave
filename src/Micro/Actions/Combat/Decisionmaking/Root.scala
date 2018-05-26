@@ -2,7 +2,7 @@ package Micro.Actions.Combat.Decisionmaking
 
 import Lifecycle.With
 import Micro.Actions.Action
-import Micro.Actions.Combat.Attacking.Target
+import Micro.Actions.Combat.Targeting.Target
 import Planning.Composition.UnitMatchers.UnitMatchSiegeTank
 import ProxyBwapi.Races.{Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders}

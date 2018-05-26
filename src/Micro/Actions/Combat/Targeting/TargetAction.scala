@@ -1,7 +1,7 @@
-package Micro.Actions.Combat.Attacking
+package Micro.Actions.Combat.Targeting
 
 import Micro.Actions.Action
-import Micro.Actions.Combat.Attacking.Filters._
+import Micro.Actions.Combat.Targeting.Filters._
 import Micro.Heuristics.Targeting.EvaluateTargets
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 

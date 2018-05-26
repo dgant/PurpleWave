@@ -1,6 +1,6 @@
 package Micro.Actions.Combat.Techniques
 
-import Micro.Actions.Combat.Attacking.Target
+import Micro.Actions.Combat.Targeting.Target
 import Micro.Actions.Combat.Techniques.Common.ActionTechnique
 import Micro.Actions.Commands.Attack
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}

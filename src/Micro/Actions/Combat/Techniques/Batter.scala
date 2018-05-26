@@ -6,8 +6,8 @@ import Information.Geography.Types.Zone
 import Information.Intelligenze.Fingerprinting.Generic.GameTime
 import Lifecycle.With
 import Mathematics.PurpleMath
-import Micro.Actions.Combat.Attacking.Filters.TargetFilterWhitelist
-import Micro.Actions.Combat.Attacking.TargetAction
+import Micro.Actions.Combat.Targeting.Filters.TargetFilterWhitelist
+import Micro.Actions.Combat.Targeting.TargetAction
 import Micro.Actions.Combat.Decisionmaking.Leave
 import Micro.Actions.Combat.Techniques.Common.ActionTechnique
 import Micro.Actions.Commands.{Attack, Move}

@@ -1,8 +1,8 @@
 package Micro.Actions.Protoss
 
 import Micro.Actions.Action
-import Micro.Actions.Combat.Attacking.Filters.TargetFilter
-import Micro.Actions.Combat.Attacking.TargetAction
+import Micro.Actions.Combat.Targeting.Filters.TargetFilter
+import Micro.Actions.Combat.Targeting.TargetAction
 import Micro.Actions.Combat.Maneuvering.CliffAvoid
 import Micro.Actions.Commands.{Attack, AttackMove, Move}
 import Planning.Yolo

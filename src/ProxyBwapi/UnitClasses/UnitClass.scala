@@ -90,8 +90,10 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
       Terran.Valkyrie,
       Terran.SpiderMine,
       Protoss.Archon,
+      Protoss.Corsair,
       Protoss.Reaver,
       Protoss.Scarab,
+      Zerg.Devourer, // Well, SORT of
       Zerg.InfestedTerran)
     .contains(this)
   

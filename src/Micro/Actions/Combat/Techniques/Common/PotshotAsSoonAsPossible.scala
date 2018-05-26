@@ -1,7 +1,7 @@
 package Micro.Actions.Combat.Techniques.Common
 
 import Micro.Actions.Action
-import Micro.Actions.Combat.Attacking.Target
+import Micro.Actions.Combat.Targeting.Target
 import Micro.Actions.Combat.Tactics.Potshot.PotshotTargetFilter
 import Micro.Actions.Commands.Attack
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo

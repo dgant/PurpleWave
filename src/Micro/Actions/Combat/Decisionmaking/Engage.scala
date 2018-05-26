@@ -24,7 +24,8 @@ object Engage extends Action {
       //Fill,
       //Hug,
       Purr,
-      Reposition
+      Reposition,
+      Spread
     )
   }
 }

@@ -1,4 +1,4 @@
-package Micro.Actions.Combat.Attacking.Filters
+package Micro.Actions.Combat.Targeting.Filters
 
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}

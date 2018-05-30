@@ -3,6 +3,7 @@ package Micro.Actions.Commands
 import Lifecycle.With
 import Mathematics.Physics.ForceMath
 import Mathematics.Points.PixelRay
+import Mathematics.PurpleMath
 import Micro.Actions.Action
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -15,6 +16,10 @@ object Gravitate extends Action {
   
   private val rayDistance = 32.0 * 3.0
   private val cardinal8directions = (0.0 until 2.0 by 0.25).map(_ * Math.PI).toVector
+  
+  def useShortAreaPathfinding(unit: FriendlyUnitInfo): Boolean = {
+    ! unit.flying && unit.agent.destination.zone == unit.zone
+  }
 
   
   override def perform(unit: FriendlyUnitInfo) {
@@ -33,13 +38,13 @@ object Gravitate extends Action {
     lazy val ray          = makeRay(forceRadians)
     lazy val rayWalkable  = ray.tilesIntersected.forall(With.grids.walkable.get)
     
-    if (unit.flying || unit.agent.destination.zone != unit.zone || rayWalkable) {
+    if ( ! useShortAreaPathfinding(unit: FriendlyUnitInfo) || rayWalkable) {
       val destination = unit.pixelCenter.add(forceTotal.normalize(rayLength).toPoint)
       unit.agent.toTravel = Some(destination)
       return
     }
     
-    val angles          = cardinal8directions.filter(r => Math.abs(r - forceRadians) <= Math.PI * 0.75)
+    val angles          = cardinal8directions.filter(r => Math.abs(PurpleMath.radiansTo(r, forceRadians)) <= Math.PI * 0.75)
     val paths           = angles.map(makeRay) :+ ray
     val pathsTruncated  = paths.map(ray =>
       PixelRay(

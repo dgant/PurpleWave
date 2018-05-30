@@ -4,9 +4,9 @@ import Mathematics.Points.Pixel
 import ProxyBwapi.Bullets.BulletInfo
 import ProxyBwapi.UnitInfo.UnitInfo
 
-class ExplosionPsionicStorm(psionicStorm: BulletInfo) extends ExplosionRectangular {
-  override def start: Pixel = psionicStorm.pixel.subtract(48, 48)
-  override def end: Pixel = psionicStorm.pixel.add(48, 48)
+class ExplosionPsionicStorm(psionicStorm: BulletInfo) extends ExplosionRadial {
   override def affects(unit: UnitInfo): Boolean = ! unit.unitClass.isBuilding
   override def framesRemaining: Double = psionicStorm.framesRemaining
+  override def center: Pixel = psionicStorm.pixel
+  override def radius: Double = 64 // Maybe wider?
 }

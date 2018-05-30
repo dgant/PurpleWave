@@ -47,11 +47,15 @@ object PurpleMath {
   def signum(double: Double)  : Int = if (double == 0.0) 0 else if (double < 0) -1 else 1
   def forcedSignum(int: Int)  : Int = if (int < 0) -1 else 1
   
-  val twoPi: Double = Math.PI * 2
+  val twoPi: Double = Math.PI * 2.0
   def normalizeAngle(angleRadians: Double): Double = {
     if      (angleRadians < 0) normalizeAngle(angleRadians + twoPi)
     else if (angleRadians > twoPi) normalizeAngle(angleRadians - twoPi)
     else    angleRadians
+  }
+  def radiansTo(from: Double, to: Double): Double = {
+    val distance = normalizeAngle(to - from)
+    if (distance > Math.PI) distance - twoPI else distance
   }
   
   def geometricMean(values: Iterable[Double]): Double = {

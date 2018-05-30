@@ -4,7 +4,7 @@ import Micro.Actions.Action
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-object Recover extends Action {
+object Reload extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
     Seq(

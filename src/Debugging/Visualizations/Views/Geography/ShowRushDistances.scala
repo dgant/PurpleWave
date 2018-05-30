@@ -17,7 +17,9 @@ object ShowRushDistances extends View {
   Hitchhiker: 44 36
   
   Alchemist: 128 (because it's cut incorrectly)
+  Match Point: 92
   Neo Chupung-Ryeong: 32
+  Tau Cross: 39
   */
   
   /*
@@ -41,12 +43,14 @@ object ShowRushDistances extends View {
   
   Alchemist: 4073 - 4640 - 5151
   Arcadia: 4216 - 5216 - 6008
-  Destination 1.1: 6604
+  Destination 1.1: 6604? 5216?
   Hitchhiker: 4438
   Pathfinder: 4716 - 4767 - 4850
+  Match Point: 6000
   Neo Aztec: 5107 - 5305 - 5484
   Neo Chupung-Ryeong: 4569
   Neo Sniper Ridge: 4640 - 5163 - 5881
+  Tau Cross: 5318 - 5538 - 5731
   */
   override def renderScreen() {
     val x = 5

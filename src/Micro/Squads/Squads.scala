@@ -29,6 +29,7 @@ class Squads {
   }
   
   def assignFreelancers() {
+    With.squads.allByPriority.foreach(_.goal.prepareForCandidates())
     RecruitmentLevel.values.foreach(recruitmentLevel =>
       With.squads.allByPriority.foreach(squad => {
         // Copy out freelancers to avoid modifying the set while iterating through it.

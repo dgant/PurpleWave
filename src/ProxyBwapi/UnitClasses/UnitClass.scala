@@ -375,7 +375,7 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
     // Zerg morphs
     addBuildUnitIf(output, Zerg.Lurker,                 Zerg.Hydralisk)
     addBuildUnitIf(output, Zerg.Guardian,               Zerg.Mutalisk)
-    addBuildUnitIf(output, Zerg.Defiler,                Zerg.Mutalisk)
+    addBuildUnitIf(output, Zerg.Devourer,               Zerg.Mutalisk)
     addBuildUnitIf(output, Zerg.Lair,                   Zerg.Hatchery)
     addBuildUnitIf(output, Zerg.Hive,                   Zerg.Lair)
     addBuildUnitIf(output, Zerg.SunkenColony,           Zerg.CreepColony)

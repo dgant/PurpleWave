@@ -21,11 +21,8 @@ class RequireBases(basesInitial: Int = 1) extends Plan {
     val basesAll    = With.geography.ourBases.size
     val goal        = basesDesired.get + basesAll - basesNow
     
-    // TODO: This math is bad
-    val misleadingTownHalls = With.units.countOurs(Zerg.Lair, Zerg.Hive)
-    
     if (goal > 0) {
-      With.scheduler.request(this, RequestAtLeast(goal - misleadingTownHalls, With.self.townHallClass))
+      With.scheduler.request(this, RequestAtLeast(goal, With.self.townHallClass))
     }
   }
 }

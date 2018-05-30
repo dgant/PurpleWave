@@ -4,6 +4,7 @@ import Lifecycle.With
 import Mathematics.Physics.{Force, ForceMath}
 import Mathematics.Points.SpecificPoints
 import Mathematics.PurpleMath
+import Micro.Actions.Commands.Gravitate
 import Micro.Agency.OldExplosion
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -47,7 +48,7 @@ object Potential {
   
   protected def threatRepulsion(unit: FriendlyUnitInfo, threat: UnitInfo): Force = {
     val entanglement          = unit.matchups.framesOfEntanglementPerThreat.getOrElse(threat, threat.framesToGetInRange(unit).toDouble)
-    val magnitudeEntanglement = 1.0 + PurpleMath.fastTanh(-entanglement/24.0)
+    val magnitudeEntanglement = 1.0 + PurpleMath.fastTanh(entanglement/24.0)
     val magnitudeDamage       = threat.dpfOnNextHitAgainst(unit)
     val magnitudeFinal        = magnitudeDamage * magnitudeEntanglement
     val output                = unitAttraction(unit, threat, -magnitudeFinal)
@@ -93,6 +94,7 @@ object Potential {
     val splashAllies = unit.matchups.allies.filter(ally =>
       ! ally.unitClass.isBuilding
       && (ally.flying == unit.flying || splashThreats.take(3).exists(_.canAttack(ally))))
+    if (splashAllies.isEmpty) return new Force
   
     def splashRepulsionMagnitude(self: UnitInfo, ally: UnitInfo): Double = {
       val denominator = splashRadius + self.unitClass.radialHypotenuse
@@ -139,6 +141,7 @@ object Potential {
   //////////////
 
   def mobilityAttraction(unit: FriendlyUnitInfo): Force = {
+    //if (Gravitate.useShortAreaPathfinding(unit)) return new Force
     val bestAdjacent  = ByOption.max(unit.tileIncludingCenter.adjacent8.filter(_.valid).map(unit.mobilityGrid.get)).getOrElse(0)
     val magnitudeNeed = 1.0 / Math.max(1.0, unit.mobility - 1.0)
     val magnitudeCap  = (1.0 + bestAdjacent.toDouble) / (1.0 + unit.mobility)
@@ -165,7 +168,7 @@ object Potential {
     
     val maximumDistance = 12 * (unit.topSpeed + nearestBlocker.get.topSpeed)
     val blockerDistance = nearestBlocker.get.pixelDistanceEdge(unit)
-    val magnitude       = PurpleMath.clampToOne(maximumDistance / (1.0 + blockerDistance))
+    val magnitude       = 1.0 - PurpleMath.clampToOne(blockerDistance / (1.0 + maximumDistance))
     val output          = unitAttraction(unit, nearestBlocker.get, - magnitude)
     output
   }

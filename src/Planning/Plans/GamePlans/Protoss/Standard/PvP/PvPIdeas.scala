@@ -40,7 +40,11 @@ object PvPIdeas {
         new Employing(PvPOpen4GateGoon),
         new SafeToMoveOut,
         new MiningBasesAtLeast(3),
-        new EnemyBasesAtLeast(3))),
+        new EnemyBasesAtLeast(3)),
+      new Or(
+        new Not(new EnemyStrategy(With.intelligence.fingerprints.fingerprint2Gate)),
+        new UpgradeComplete(Protoss.DragoonRange),
+        new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true))),
     new Attack)
   
   class ReactToCannonRush extends If(
@@ -78,6 +82,15 @@ object PvPIdeas {
         RequestAtLeast(1, Protoss.RoboticsFacility),
         RequestAtLeast(1, Protoss.Observatory)),
       new TrainContinuously(Protoss.Observer, 3)))
+  
+  class ReactToTwoGate extends If(
+    new And(
+      new EnemyStrategy(With.intelligence.fingerprints.fingerprint2Gate),
+      new UnitsAtMost(0, Protoss.Forge),
+      new Or(
+        new UnitsAtMost(1, Protoss.Gateway, complete = true),
+        new Not(new SafeAtHome))),
+    new Build(RequestAtLeast(1, Protoss.ShieldBattery)))
   
   class ReactToFFE extends If(
     new And(

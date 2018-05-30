@@ -7,7 +7,7 @@ import Performance.Cache
 import Planning.Plan
 import ProxyBwapi.Races.{Terran, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
-import Utilities.{CountMap, CountMapper}
+import Utilities.CountMap
 
 import scala.collection.mutable
 
@@ -31,11 +31,24 @@ class DumbQueue {
   val queueCache = new Cache(() => {
     val requestQueue = requestsByPlan.keys.toVector.sortBy(_.priority).flatten(requestsByPlan)
     val unitsWanted = new CountMap[UnitClass]
-    val unitsActual: CountMap[UnitClass] = CountMapper
-      .make(With.units.ours
-        .filter(_.aliveAndComplete)
-        .groupBy(u => if (u.is(Terran.SiegeTankSieged)) Terran.SiegeTankUnsieged else u.unitClass)
-        .mapValues(_.size))
+    val unitsActual = new CountMap[UnitClass]
+      With.units.ours.foreach(unit =>
+        if (unit.aliveAndComplete) {
+          unitsActual.add(unit.unitClass, 1)
+          if (unit.is(Terran.SiegeTankSieged)) {
+            unitsActual.add(Terran.SiegeTankUnsieged, 1)
+          }
+          if (unit.is(Zerg.GreaterSpire)) {
+            unitsActual.add(Zerg.Spire, 1)
+          }
+          if (unit.is(Zerg.Lair)) {
+            unitsActual.add(Zerg.Hatchery, 1)
+          }
+          if (unit.is(Zerg.Hive)) {
+            unitsActual.add(Zerg.Lair, 1)
+            unitsActual.add(Zerg.Hatchery, 1)
+          }
+        })
     requestQueue.flatten(buildable => getUnfulfilledBuildables(buildable, unitsWanted, unitsActual))
   })
   

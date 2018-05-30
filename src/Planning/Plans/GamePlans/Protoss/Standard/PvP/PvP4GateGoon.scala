@@ -20,7 +20,7 @@ class PvP4GateGoon extends GameplanModeTemplate {
   override def defaultAttackPlan  : Plan = new PvPIdeas.AttackSafely
   override val scoutAt            : Int  = 14
   override val defaultWorkerPlan  : Plan = NoPlan()
-  override def emergencyPlans: Seq[Plan] = Vector(new PvPIdeas.ReactToDarkTemplarEmergencies)
+  override def emergencyPlans: Seq[Plan] = Vector(new PvPIdeas.ReactToDarkTemplarEmergencies, new PvPIdeas.ReactToTwoGate)
   
   override val buildOrder: Seq[BuildRequest] = ProtossBuilds.Opening_4GateDragoon
   

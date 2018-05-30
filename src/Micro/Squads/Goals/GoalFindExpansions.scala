@@ -20,13 +20,13 @@ class GoalFindExpansions extends GoalBasic {
   protected var destinationByScout: mutable.ArrayBuffer[(FriendlyUnitInfo, Pixel)] = new mutable.ArrayBuffer[(FriendlyUnitInfo, Pixel)]
   protected var destinationFrame: Int = 0
   override protected def destination: Pixel = {
-    if (destinationFrame < With.frame) {
-      destinationByScout.clear()
-      destinationFrame = With.frame
-    }
     destinationByScout.headOption.map(_._2).getOrElse(baseToPixel(With.intelligence.peekNextBaseToScout))
   }
   protected def baseToPixel(base: Base): Pixel = base.heart.pixelCenter
+  
+  override def prepareForCandidates() {
+    destinationByScout.clear()
+  }
   
   override def run() {
     squad.units.foreach(unit => {

@@ -5,5 +5,5 @@ import Lifecycle.With
 
 class GridMobilityForceGround extends AbstractGridMobilityForce {
   
-  override protected def underlyingGrid: AbstractGrid[Int] = With.grids.mobilityGround
+  override protected def underlyingGrid: AbstractGrid[Int] = With.grids.mobilityTerrain
 }

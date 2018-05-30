@@ -29,9 +29,6 @@ object Abuse extends ActionTechnique {
     if ( ! other.canAttack(unit)) return None
     if ( ! unit.canAttack(other)) return None
     
-    val framesOfSafetyAgainst = - unit.matchups.framesOfEntanglementPerThreat.getOrElse(other, 0.0)
-    if (framesOfSafetyAgainst < unit.unitClass.framesToTurnAndShootAndTurnBackAndAccelerate) return Some(0.0)
-    
     lazy val deltaThreats = other.matchups.threats.size - unit.matchups.threats.size
     lazy val deltaSpeed = unit.topSpeed - other.topSpeed
     lazy val canOle = (

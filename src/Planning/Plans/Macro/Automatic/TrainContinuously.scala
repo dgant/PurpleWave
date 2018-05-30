@@ -43,10 +43,12 @@ class TrainContinuously(
     val buildersToConsume         = Math.max(0, Vector(maximumConcurrently, builderOutputCap, budgeted, unitsToAddCeiling / doubleEggMultiplier).min.toInt)
     val unitsToAdd                = buildersToConsume * doubleEggMultiplier
     val unitsToRequest            = unitsNow + unitsToAdd
+  
+    // This check is necessitated by our tendency to request Scourge even when unitsToAdd is 0
+    if (unitsToAdd == 0) return
     
     (unitClass.buildUnitsBorrowed ++ unitClass.buildUnitsSpent).foreach(builderClass =>
       With.scheduler.dumbPumps.consume(builderClass, buildersToConsume))
-        
     With.scheduler.request(this, RequestAtLeast(unitsToRequest, unitClass))
   }
   

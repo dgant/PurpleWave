@@ -109,7 +109,7 @@ class Configuration {
   
   var visualize                           = true
   var visualizeScreen                     = true
-  var visualizeMap                        = false
+  var visualizeMap                        = true
   var visualizationProbabilityHappyVision = 0.05
   var visualizationProbabilityTextOnly    = 0.01
   var visualizationCullViewport           = true

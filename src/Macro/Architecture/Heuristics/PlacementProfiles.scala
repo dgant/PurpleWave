@@ -1,7 +1,7 @@
 package Macro.Architecture.Heuristics
 
 import Macro.Architecture.Blueprint
-import ProxyBwapi.Races.Terran
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 
 object PlacementProfiles {
   
@@ -14,7 +14,7 @@ object PlacementProfiles {
       pylon
     else if (blueprint.building.exists(_.trainsGroundUnits))
       if (blueprint.building.contains(Terran.Barracks)) factoryNoSpace else factory
-    else if (blueprint.building.exists(_.attacks))
+    else if (blueprint.building.exists(building => building.attacks || building == Zerg.CreepColony || building == Protoss.ShieldBattery))
       wallCannon
     else
       tech

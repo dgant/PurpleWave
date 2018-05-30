@@ -8,6 +8,7 @@ trait SquadGoal {
   var squad: Squad = _
   
   def run()
+  def prepareForCandidates() {}
   def offer(candidates: Iterable[FriendlyUnitInfo], recruitmentNeed: RecruitmentLevel)
   
   override def toString: String = getClass.getSimpleName.replaceAllLiterally("$", "")

@@ -25,7 +25,8 @@ class PvP1GateReaverExpand extends GameplanModeTemplate {
   override val defaultAttackPlan: Plan = new PvPIdeas.AttackSafely
   
   override def emergencyPlans: Seq[Plan] = Vector(
-    new PvPIdeas.ReactToCannonRush
+    new PvPIdeas.ReactToCannonRush,
+    new PvPIdeas.ReactToTwoGate
   )
   
   override val buildOrder = ProtossBuilds.OpeningZCoreZ

@@ -26,7 +26,8 @@ class PvP2GateRobo extends GameplanModeTemplate {
   
   override def emergencyPlans: Seq[Plan] = Seq(
     new PvPIdeas.ReactToCannonRush,
-    new PvPIdeas.ReactToFFE
+    new PvPIdeas.ReactToFFE,
+    new PvPIdeas.ReactToTwoGate
   )
   
   override val buildOrder: Seq[BuildRequest] = Vector(

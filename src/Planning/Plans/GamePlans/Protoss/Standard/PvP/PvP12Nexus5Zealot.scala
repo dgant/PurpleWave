@@ -41,7 +41,8 @@ class PvP12Nexus5Zealot extends GameplanModeTemplate {
   
   override def emergencyPlans: Seq[Plan] = Seq(
     new PvPIdeas.ReactToDarkTemplarEmergencies,
-    new PvPIdeas.ReactToCannonRush
+    new PvPIdeas.ReactToCannonRush,
+    new PvPIdeas.ReactToTwoGate
   )
   
   override val buildOrder: Seq[BuildRequest] = Vector(

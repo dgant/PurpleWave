@@ -8,10 +8,12 @@ import Utilities.ByOption
 
 object Recharge extends Action {
   
+  // Note: Recharge Shields range is 2
+  
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     unit.canMove
     && unit.shieldPoints < unit.unitClass.maxShields / 2
-    && unit.totalHealth < unit.unitClass.maxTotalHealth / 3.0
+    && unit.totalHealth < unit.unitClass.maxTotalHealth / 2.0
   )
   
   protected def validBattery(unit: UnitInfo): Boolean = (

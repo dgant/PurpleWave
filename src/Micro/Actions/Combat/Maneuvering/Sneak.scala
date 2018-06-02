@@ -28,7 +28,7 @@ object Sneak extends Action {
     if (unit.readyForMicro) {
       Target.delegate(unit)
       val forceTarget     = unit.agent.toAttack.map(target => new Force(target.pixelCenter - unit.pixelCenter).normalize).getOrElse(new Force)
-      val forceThreat     = Potential.threatsRepulsion(unit)
+      val forceThreat     = Potential.avoidThreats(unit)
       val forceSneaking   = Potential.detectionRepulsion(unit)
       unit.agent.forces.put(ForceColors.threat,     forceThreat)
       unit.agent.forces.put(ForceColors.bypassing,  forceSneaking)

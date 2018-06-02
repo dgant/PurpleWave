@@ -7,6 +7,7 @@ import Mathematics.PurpleMath
 import Micro.Actions.Action
 import Micro.Actions.Commands.{Gravitate, Move}
 import Micro.Coordination.Explosions.{Explosion, ExplosionSpiderMineTrigger}
+import Micro.Decisions.Potential
 import Planning.Yolo
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -38,8 +39,12 @@ object Dodge extends Action {
       val forces = explosions.map(explosion =>
         explosion.directionTo(unit).normalize(framesOfEntanglement(unit, explosion) + reactionFrames))
       
-      val force = ForceMath.sum(forces).normalize
-      unit.agent.forces.put(ForceColors.threat, force)
+      val forceDodging = ForceMath.sum(forces).normalize
+      val forcesSpacing = Potential.resistTerrain(unit)
+      val forcesMobility = Potential.collisionResistances(unit)
+      unit.agent.forces.put(ForceColors.threat, forceDodging)
+      unit.agent.resistances.put(ForceColors.spacing, forcesSpacing)
+      unit.agent.resistances.put(ForceColors.mobility, forcesMobility)
       Gravitate.delegate(unit)
       Move.delegate(unit)
     }

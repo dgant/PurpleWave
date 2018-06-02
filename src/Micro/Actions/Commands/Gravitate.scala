@@ -6,6 +6,7 @@ import Mathematics.Points.PixelRay
 import Mathematics.PurpleMath
 import Micro.Actions.Action
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Utilities.ByOption
 
 object Gravitate extends Action {
   
@@ -23,12 +24,13 @@ object Gravitate extends Action {
 
   
   override def perform(unit: FriendlyUnitInfo) {
-    val framesAhead       = With.reaction.agencyAverage + 1
-    val minDistance       = unit.unitClass.haltPixels + framesAhead * (unit.topSpeed + 0.5 * framesAhead * unit.topSpeed / Math.max(1, unit.unitClass.accelerationFrames))
-    val forces            = unit.agent.forces.values
-    val origin            = unit.pixelCenter
-    val forceTotal        = ForceMath.sum(forces)
-    val rayLength         = Math.max(rayDistance, minDistance)
+    val framesAhead = With.reaction.agencyAverage + 1
+    val minDistance = unit.unitClass.haltPixels + framesAhead * (unit.topSpeed + 0.5 * framesAhead * unit.topSpeed / Math.max(1, unit.unitClass.accelerationFrames))
+    val forces      = unit.agent.forces.values
+    val origin      = unit.pixelCenter
+    val forceSum    = ForceMath.sum(forces).normalize
+    val forceTotal  = ByOption.maxBy(unit.agent.resistances.values.flatten)(_.lengthSquared).foldLeft(forceSum)(ForceMath.resist(_, _).normalize)
+    val rayLength   = Math.max(rayDistance, minDistance)
     
     def makeRay(radians: Double): PixelRay = {
       PixelRay(unit.pixelCenter, unit.pixelCenter.radiateRadians(radians, rayLength))

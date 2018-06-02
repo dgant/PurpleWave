@@ -36,11 +36,11 @@ object Reposition extends ActionTechnique {
     Target.delegate(unit)
     
     var forceTarget     = new Force
-    val forceThreat     = Potential.threatsRepulsion(unit)
-    val forceMobility   = Potential.mobilityAttraction(unit)
-    val forceSpacing    = Potential.collisionRepulsion(unit)
-    val forceSpreading  = Potential.splashRepulsion(unit)
-    val forceRegrouping = Potential.teamAttraction(unit)
+    val forceThreat     = Potential.avoidThreats(unit)
+    val forceSpreading  = Potential.preferSpreading(unit)
+    val forceRegrouping = Potential.preferRegrouping(unit)
+    val forceSpacing    = Potential.avoidCollision(unit)
+    val resistancesTerrain = Potential.resistTerrain(unit)
   
     unit.agent.toAttack.foreach(target => {
       val targetMagnitude = PurpleMath.nanToOne((With.reaction.agencyAverage + unit.framesBeforeAttacking(target)) / unit.framesToBeReadyForAttackOrder)
@@ -49,10 +49,10 @@ object Reposition extends ActionTechnique {
     
     unit.agent.forces.put(ForceColors.target,     forceTarget)
     unit.agent.forces.put(ForceColors.threat,     forceThreat)
-    unit.agent.forces.put(ForceColors.mobility,   forceMobility)
-    unit.agent.forces.put(ForceColors.spacing,    forceSpacing)
     unit.agent.forces.put(ForceColors.spreading,  forceSpreading)
     unit.agent.forces.put(ForceColors.regrouping, forceRegrouping)
+    unit.agent.forces.put(ForceColors.spacing,    forceSpacing)
+    unit.agent.resistances.put(ForceColors.mobility,  resistancesTerrain)
     Gravitate.consider(unit)
     Move.delegate(unit)
   }

@@ -2,7 +2,7 @@ package Micro.Decisions
 
 import Lifecycle.With
 import Mathematics.Physics.{Force, ForceMath}
-import Mathematics.Points.SpecificPoints
+import Mathematics.Points.{Pixel, SpecificPoints}
 import Mathematics.PurpleMath
 import Micro.Actions.Commands.Gravitate
 import Micro.Agency.OldExplosion
@@ -29,6 +29,14 @@ object Potential {
     output
   }
   
+  def unitResistance(unit: FriendlyUnitInfo, pixelFrom: Pixel, range: Double): Force = {
+    val pixelTo   = unit.pixelCenter
+    val distance  = unit.pixelDistanceEdge(pixelFrom)
+    val magnitude = Math.max(0, range - distance) / range
+    val output    = ForceMath.fromPixels(pixelFrom, pixelTo, magnitude)
+    output
+  }
+  
   /////////////////////
   //                 //
   // Specific fields //
@@ -39,7 +47,7 @@ object Potential {
   // Threats //
   /////////////
   
-  def threatsRepulsion(unit: FriendlyUnitInfo): Force = {
+  def avoidThreats(unit: FriendlyUnitInfo): Force = {
     val threats     = unit.matchups.threats.filterNot(_.is(Protoss.Interceptor))
     val forces      = threats.map(threatRepulsion(unit, _))
     val output      = ForceMath.sum(forces).normalize
@@ -59,7 +67,8 @@ object Potential {
   // Team //
   //////////
   
-  def teamAttraction(unit: FriendlyUnitInfo): Force = {
+  def preferRegrouping(unit: FriendlyUnitInfo): Force = {
+    if (unit.base.exists(_.owner.isUs)) return new Force
     val allies                = (unit.matchups.allies ++ unit.squad.map(_.units).getOrElse(List.empty)).filter(_ != unit)
     val alliesUseful          = allies.filter(ally => unit.matchups.threats.exists(ally.canAttack))
     val allyNearestUseful     = ByOption.minBy(alliesUseful)(ally => ally.pixelDistanceCenter(unit) - ally.effectiveRangePixels)
@@ -83,7 +92,7 @@ object Potential {
     }
   }
   
-  def splashRepulsion(unit: FriendlyUnitInfo): Force = {
+  def preferSpreading(unit: FriendlyUnitInfo): Force = {
     
     val splashThreats = unit.matchups.threats.filter(_.unitClass.dealsRadialSplashDamage)
     if (splashThreats.isEmpty) return new Force
@@ -139,8 +148,42 @@ object Potential {
   //////////////
   // Mobility //
   //////////////
+  
+  def resistTerrain(unit: FriendlyUnitInfo): Vector[Force] = {
+    if (unit.flying) airResistances(unit) else groundResistances(unit)
+  }
+  
+  def airResistances(unit: FriendlyUnitInfo): Vector[Force] = {
+    val boundary = 32.0 * 3.0
+    val output = Vector(
+      unitResistance(unit, Pixel(0,                   unit.y),              boundary),
+      unitResistance(unit, Pixel(With.mapPixelWidth,  unit.y),              boundary),
+      unitResistance(unit, Pixel(unit.x,              0),                   boundary),
+      unitResistance(unit, Pixel(unit.x,              With.mapPixelHeight), boundary)
+    )
+    .filter(_.lengthSquared > 0)
+    output
+  }
+  
+  def groundResistances(unit: FriendlyUnitInfo): Vector[Force] = {
+    unit
+      .tileIncludingCenter
+      .toRectangle
+      .expand(2, 2)
+      .tiles
+      .filter(tile => ! tile.valid || ! With.grids.walkable.get(tile))
+      .map(tile =>
+        unitResistance(
+          unit,
+          // Want to push against the unit's edge, but beware that units can sometimes stand on unwalkable tiles,
+          // especially buildings/terrain that don't fill the tile completely.
+          unit.pixelCenter.project(tile.pixelCenter, 1.0 + unit.pixelDistanceEdge(tile.pixelCenter)),
+          48.0))
+      .filter(_.lengthSquared > 0)
+      .toVector
+  }
 
-  def mobilityAttraction(unit: FriendlyUnitInfo): Force = {
+  def preferMobility(unit: FriendlyUnitInfo): Force = {
     //if (Gravitate.useShortAreaPathfinding(unit)) return new Force
     val bestAdjacent  = ByOption.max(unit.tileIncludingCenter.adjacent8.filter(_.valid).map(unit.mobilityGrid.get)).getOrElse(0)
     val magnitudeNeed = 1.0 / Math.max(1.0, unit.mobility - 1.0)
@@ -158,10 +201,18 @@ object Potential {
   // Collisions //
   ////////////////
   
-  def collisionRepulsion(unit: FriendlyUnitInfo): Force = {
+  def collisionResistances(unit: FriendlyUnitInfo): Vector[Force] = {
+    if (unit.flying) return Vector.empty
+    unit.matchups.others
+      .filter(u => ! u.unitClass.isBuilding && ! u.flying)
+      .map(neighbor => unitResistance(unit, neighbor.pixelCenter, 2.0 * unit.unitClass.radialHypotenuse))
+      .filter(_.lengthSquared > 0)
+  }
+  
+  def avoidCollision(unit: FriendlyUnitInfo): Force = {
     if (unit.flying) return new Force
     
-    val blockers        = unit.matchups.allies.filter(u => ! u.flying && ! u.unitClass.isBuilding)
+    val blockers        = unit.matchups.others.filter(u => ! u.flying && ! u.unitClass.isBuilding)
     val nearestBlocker  = ByOption.minBy(blockers)(_.pixelDistanceEdge(unit))
     
     if (nearestBlocker.isEmpty) return new Force
@@ -177,7 +228,7 @@ object Potential {
   // Exiting //
   /////////////
   
-  def exitAttraction(unit: FriendlyUnitInfo): Force = {
+  def preferExit(unit: FriendlyUnitInfo): Force = {
     if (unit.flying) exitAttractionAir(unit) else exitAttractionGround(unit)
   }
   
@@ -206,3 +257,4 @@ object Potential {
     -unit.mobilityForce.normalize
   }
 }
+

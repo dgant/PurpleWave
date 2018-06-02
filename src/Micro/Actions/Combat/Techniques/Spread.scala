@@ -52,7 +52,7 @@ object Spread extends ActionTechnique {
   
     Target.delegate(unit)
     
-    val forceSpreading    = Potential.splashRepulsion(unit)
+    val forceSpreading    = Potential.preferSpreading(unit)
     var forceTarget       = new Force
     
     unit.agent.toAttack.foreach(target => {

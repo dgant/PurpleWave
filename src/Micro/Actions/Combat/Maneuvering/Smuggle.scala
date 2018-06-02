@@ -20,7 +20,7 @@ object Smuggle extends Action {
     }
     else if (unit.visibleToOpponents && unit.matchups.threats.nonEmpty) {
       val threatMagnitude = if (unit.matchups.threatsInRange.nonEmpty) 2.0 else 1.0
-      val forceThreat     = Potential.threatsRepulsion(unit).normalize(threatMagnitude)
+      val forceThreat     = Potential.avoidThreats(unit).normalize(threatMagnitude)
       val forceSmuggling  = Potential.smuggleRepulsion(unit)
       val forceHeading    = ForceMath.fromPixels(unit.pixelCenter, unit.agent.toTravel.getOrElse(unit.pixelCenter))
       unit.agent.forces.put(ForceColors.threat,     forceThreat)

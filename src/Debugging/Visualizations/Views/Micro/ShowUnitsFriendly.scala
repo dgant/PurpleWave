@@ -115,7 +115,7 @@ object ShowUnitsFriendly extends View {
       val length = 96.0
       val maxForce = ByOption.max(agent.forces.values.map(_.lengthSlow)).getOrElse(0.0)
       if (maxForce > 0.0) {
-        agent.forces.foreach(pair => {
+        (agent.forces ++ agent.resistances.flatMap(p => p._2.map(f => (p._1, f)))).foreach(pair => {
           val force           = pair._2
           val forceNormalized = force.normalize(length * force.lengthSlow / maxForce)
           DrawMap.arrow(

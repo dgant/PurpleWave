@@ -15,8 +15,16 @@ case class PixelRay(from: Pixel, to: Pixel) {
   
   def tilesIntersected: Array[Tile] = {
     
-    if (to.x == from.x) return (from.y / 32 to to.y / 32).map(tileY => Tile(to.x/32, tileY)).toArray
-    if (to.y == from.y) return (from.x / 32 to to.x / 32).map(tileX => Tile(tileX, to.y/32)).toArray
+    if (to.x == from.x) {
+      val direction = PurpleMath.signum(to.y - from.y)
+      if (direction == 0) return Array(to.tileIncluding)
+      return (from.y / 32 to to.y / 32 by direction).map(tileY => Tile(to.x/32, tileY)).toArray
+    }
+    if (to.y == from.y) {
+      val direction = PurpleMath.signum(to.x - from.x)
+      if (direction == 0) return Array(to.tileIncluding)
+      return (from.x / 32 to to.x / 32 by direction).map(tileX => Tile(tileX, to.y/32)).toArray
+    }
     
     val gridSize    = 32
     val signX       = PurpleMath.signum(to.x - from.x)

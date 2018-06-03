@@ -21,7 +21,7 @@ object ShowUnitsFriendly extends View {
   var showRayPaths    : Boolean = true
   var showForces      : Boolean = true
   var showDesire      : Boolean = true
-  var showFightReason : Boolean = false
+  var showFightReason : Boolean = true
   var showDistance    : Boolean = false
   
   override def renderMap() { With.units.ours.foreach(renderUnitState) }

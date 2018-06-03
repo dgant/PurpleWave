@@ -1,6 +1,6 @@
 package ProxyBwapi.UnitClasses
 
-import Mathematics.Points.{Tile, TileRectangle}
+import Mathematics.Points.{Point, Tile, TileRectangle}
 import Mathematics.PurpleMath
 import Planning.Composition.UnitMatchers.UnitMatcher
 import ProxyBwapi.Players.Players
@@ -33,6 +33,12 @@ case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatch
   lazy val dimensionMin: Int = Math.min(width, height)
   lazy val dimensionMax: Int = Math.max(width, height)
   lazy val radialHypotenuse: Double = Math.sqrt(width.toDouble * width.toDouble + height.toDouble * height.toDouble)/2.0
+  
+  def topLeft     : Point = Point(dimensionLeft, dimensionUp)
+  def topRight    : Point = Point(dimensionRight, dimensionUp)
+  def bottomLeft  : Point = Point(dimensionLeft, dimensionDown)
+  def bottomRight : Point = Point(dimensionRight, dimensionDown)
+  def corners: Vector[Point] = Vector(topLeft, topRight, bottomLeft, bottomRight)
   
   //////////////
   // Movement //

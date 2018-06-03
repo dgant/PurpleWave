@@ -34,7 +34,8 @@ object PvPIdeas {
     new And(
       new Or(
         new UnitsAtLeast(1, Protoss.Observer, complete = true),
-        new Not(new EnemyDarkTemplarExists)),
+        new Not(new EnemyDarkTemplarExists),
+        new EnemyUnitsAtMost(0, Protoss.Arbiter)),
       new Or(
         new EnemyStrategy(With.intelligence.fingerprints.fingerprintCannonRush),
         new Employing(PvPOpen4GateGoon),
@@ -43,7 +44,7 @@ object PvPIdeas {
         new EnemyBasesAtLeast(3)),
       new Or(
         new Not(new EnemyStrategy(With.intelligence.fingerprints.fingerprint2Gate)),
-        new UpgradeComplete(Protoss.DragoonRange),
+        new UnitsAtLeast(1, Protoss.Dragoon, complete = true),
         new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true))),
     new Attack)
   
@@ -90,7 +91,28 @@ object PvPIdeas {
       new Or(
         new UnitsAtMost(1, Protoss.Gateway, complete = true),
         new Not(new SafeAtHome))),
-    new Build(RequestAtLeast(1, Protoss.ShieldBattery)))
+    new Parallel(
+      new If(
+        new UnitsAtMost(7, UnitMatchWarriors),
+        new Parallel(
+          new RequireSufficientSupply,
+          new TrainArmy)),
+      new UpgradeContinuously(Protoss.DragoonRange),
+      new If(
+        new UnitsAtLeast(1, Protoss.CyberneticsCore),
+        new Build(
+          RequestAtLeast(2, Protoss.Gateway),
+          RequestAtLeast(1, Protoss.ShieldBattery)))))
+  
+  class ReactToArbiters extends If(
+    new Or(
+      new EnemyUnitsAtLeast(1, Protoss.Arbiter),
+      new EnemyUnitsAtLeast(1, Protoss.ArbiterTribunal)),
+    new Parallel(
+      new Build(
+        RequestAtLeast(1, Protoss.RoboticsFacility),
+        RequestAtLeast(1, Protoss.Observatory)),
+    new TrainContinuously(Protoss.Observer, 2)))
   
   class ReactToFFE extends If(
     new And(

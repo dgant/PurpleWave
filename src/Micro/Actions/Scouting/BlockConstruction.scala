@@ -49,31 +49,12 @@ object BlockConstruction extends Action {
       .getOrElse(With.geography.startBases.minBy(_.lastScoutedFrame))
     
     unit.matchups.targets.filter(builder => {
-      
-      lazy val hasBuildOrder = buildOrders.contains(builder.order)
-      lazy val targetPixel = builder.targetPixel.getOrElse(builder.pixelCenter)
-      lazy val targetBase = targetPixel.base
-      
-      lazy val movingToTownHallArea = (
-        builder.pixelDistanceCenter(targetPixel) < 32.0 * 60.0
-        && targetBase.exists(_.townHall.isEmpty)
-        && targetBase.exists(_.townHallArea.contains(targetPixel.tileIncluding)))
-      
-      lazy val movingToPossibleExpansion = targetBase.exists(base =>
-        base.owner.isNeutral &&
-          base.heart.groundPixels(enemyBase.heart.pixelCenter) <
-          base.heart.groundPixels(With.geography.home))
-      
-      lazy val suspiciouslyIdle = targetBase.exists(base =>
-        base.owner == builder.player
-        && ! builder.gathering
-        && ! builder.attacking)
-      
-      val output = builder.unitClass.isWorker && (
-        movingToTownHallArea
-        || movingToPossibleExpansion
-        || suspiciouslyIdle)
-      
+      lazy val hasBuildOrder  = buildOrders.contains(builder.order)
+      lazy val hasMoveOrder   = builder.order == Orders.Move
+      lazy val targetPixel    = builder.orderTargetPixel.orElse(builder.targetPixel).getOrElse(builder.pixelCenter)
+      lazy val movingToRelevantBase = hasBuildOrder && targetPixel.base.exists(base =>
+        (base.owner.isEnemy || (base.owner.isNeutral && ! base.isStartLocation)))
+      val output = builder.unitClass.isWorker && (hasBuildOrder || movingToRelevantBase)
       output
     })
   }

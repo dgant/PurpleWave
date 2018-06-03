@@ -31,7 +31,7 @@ object Gravitate extends Action {
     val forceSum    = ForceMath.sum(forces).normalize
     val forceTotal  = ByOption.maxBy(unit.agent.resistances.values.flatten)(_.lengthSquared).foldLeft(forceSum)(ForceMath.resist(_, _).normalize)
     val rayLength   = Math.max(rayDistance, minDistance)
-    
+    val pathfind    = useShortAreaPathfinding(unit)
     def makeRay(radians: Double): PixelRay = {
       PixelRay(unit.pixelCenter, unit.pixelCenter.radiateRadians(radians, rayLength))
     }
@@ -40,15 +40,20 @@ object Gravitate extends Action {
     lazy val ray          = makeRay(forceRadians)
     lazy val rayWalkable  = ray.tilesIntersected.forall(With.grids.walkable.get)
     
-    if ( ! useShortAreaPathfinding(unit: FriendlyUnitInfo) || rayWalkable) {
-      val destination = unit.pixelCenter.add(forceTotal.normalize(rayLength).toPoint)
+    if ( ! pathfind || rayWalkable) {
+      var destination = unit.pixelCenter.add(forceTotal.normalize(rayLength).toPoint)
+      // Prevent unit from getting confused from trying to move too close to unwalkable tiles
+      if ( ! unit.unitClass.corners.map(destination.add(_).tileIncluding).forall(unit.canTraverse)) {
+        destination = destination.tileIncluding.pixelCenter
+      }
       unit.agent.toTravel = Some(destination)
+      
       return
     }
     
-    val angles          = cardinal8directions.filter(r => Math.abs(PurpleMath.radiansTo(r, forceRadians)) <= Math.PI * 0.75)
-    val paths           = angles.map(makeRay) :+ ray
-    val pathsTruncated  = paths.map(ray =>
+    val angles = cardinal8directions.filter(r => Math.abs(PurpleMath.radiansTo(r, forceRadians)) <= Math.PI * 0.75)
+    val paths = angles.map(makeRay) :+ ray
+    val pathsTruncated = paths.map(ray =>
       PixelRay(
         ray.from,
         ray.from.project(

@@ -34,22 +34,19 @@ object FightOrFlight extends Action {
     decide(false, "Pacifist",   () => ! unit.agent.canFight)
     decide(false, "Disrupted",  () => unit.underDisruptionWeb && ! unit.flying)
     decide(false, "Swarmed",    () => unit.underDarkSwarm && !unit.unitClass.unaffectedByDarkSwarm && unit.matchups.targetsInRange.forall(t => !t.flying || t.underDarkSwarm))
-    /*
     decide(true,  "Workers",    () => unit.matchups.allies.exists(u => {
-      val ally = u.friendly
-      val base = u.base
-      (
-        ally.isDefined
-        && base.exists(unit.base.contains)
-        && u.unitClass.isWorker
-        && (
-          // Worker is mining in base
-          (u.gathering && ally.exists(base => ally.get.orderTarget.exists(_.base == base)))
-          // Worker is building, in base
-          || (u.constructing && (ally.get.buildUnit.isDefined))
-          || (ally.get.agent.toAttack.isDefined))
-          )}))
-    */
+      val ally = u.friendly.get
+      val base = u.base.filter(_.owner.isUs)
+      val output = (
+        ally.unitClass.isWorker
+        && base.isDefined
+        && base.exists(ally.base.contains)
+        && ally.matchups.framesOfSafety <= unit.matchups.framesOfSafety
+        && ally.base.exists(_.units.exists(resource => resource.resourcesLeft > 0 && resource.pixelDistanceCenter(ally) < With.configuration.workerDefenseRadiusPixels))
+      )
+      output
+    }))
+    
     decide(true, "Anchors", () => unit.matchups.allies.exists(ally =>
       ! ally.unitClass.isWorker
         && ally.canAttack

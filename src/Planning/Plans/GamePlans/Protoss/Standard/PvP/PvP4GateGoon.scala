@@ -10,6 +10,7 @@ import Planning.Plans.Macro.Automatic.TrainContinuously
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Predicates.Employing
 import Planning.Plans.Predicates.Milestones.{MiningBasesAtLeast, UnitsAtLeast}
+import Planning.Plans.Scouting.ScoutOn
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvPOpen4GateGoon
 
@@ -18,7 +19,7 @@ class PvP4GateGoon extends GameplanModeTemplate {
   override val activationCriteria : Plan = new Employing(PvPOpen4GateGoon)
   override val completionCriteria : Plan = new Latch(new MiningBasesAtLeast(2))
   override def defaultAttackPlan  : Plan = new PvPIdeas.AttackSafely
-  override val scoutAt            : Int  = 14
+  override def defaultScoutPlan   : Plan = new ScoutOn(Protoss.Pylon)
   override val defaultWorkerPlan  : Plan = NoPlan()
   override def emergencyPlans: Seq[Plan] = Vector(new PvPIdeas.ReactToDarkTemplarEmergencies, new PvPIdeas.ReactToTwoGate)
   

@@ -27,6 +27,25 @@ object Recharge extends Action {
     var batteries = unit.matchups.allies.filter(validBattery)
     if (batteries.isEmpty) batteries = unit.zone.units.filter(validBattery).toVector
     val battery = ByOption.minBy(batteries)(_.pixelDistanceEdge(unit))
-    battery.foreach(With.commander.rightClick(unit, _))
+    if (battery.isEmpty) return
+    
+    
+    unit.agent.toTravel = battery.map(_.pixelCenter)
+  
+    // Shield battery range is 2 tiles.
+    // Don't right click it from too far -- that gets you killed en route.
+    val inRangeToRecharge = unit.pixelDistanceEdge(battery.get) < 32.0 * 3.0
+    val safeToRecharge = unit.matchups.threats.forall(threat => {
+      val distanceMeThreat      = unit.pixelDistanceEdge(threat) + threat.pixelRangeAgainst(unit)
+      val distanceMeBattery     = unit.pixelDistanceEdge(battery.get)
+      val distanceThreatBattery = threat.pixelDistanceEdge(battery.get)
+      val safe =
+        distanceMeBattery < distanceThreatBattery ||
+        distanceMeBattery < distanceMeThreat
+      safe
+    })
+    if (inRangeToRecharge || safeToRecharge) {
+      battery.foreach(With.commander.rightClick(unit, _))
+    }
   }
 }

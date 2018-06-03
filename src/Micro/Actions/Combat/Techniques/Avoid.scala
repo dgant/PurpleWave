@@ -48,9 +48,9 @@ object Avoid extends ActionTechnique {
   
   override def perform(unit: FriendlyUnitInfo) {
     val bonusAvoidThreats = PurpleMath.clamp(With.reaction.agencyAverage + unit.matchups.framesOfEntanglement, 12.0, 24.0) / 12.0
-    val bonusPreferExit   = if (unit.agent.origin.zone == unit.zone) 0.25 else 1.0
+    val bonusPreferExit   = if (unit.agent.origin.zone == unit.zone) 0.5 else 1.0
     val bonusRegrouping   = 18.0 / Math.max(24.0, unit.matchups.framesOfEntanglement)
-    val bonusMobility     = bonusRegrouping
+    val bonusMobility     = 1.0
     
     val forceThreat     = Potential.avoidThreats(unit)      * bonusAvoidThreats
     val forceSpacing    = Potential.avoidCollision(unit)

@@ -12,25 +12,29 @@ object ShowRushDistances extends View {
   -----------------
   Andromeda: 160 (because it's cut incorrectly)
   Destination: 30, 28
-  Fighting Spirit: 32
+  Fighting Spirit: 33
+  Great Barrier Reef: 36
   Heartbreak Ridge: 40
   Hitchhiker: 44 36
   
   Alchemist: 128 (because it's cut incorrectly)
+  Arcadia: 31
+  Luna the Final: 38
   Match Point: 92
   Neo Chupung-Ryeong: 32
   Tau Cross: 39
-  */
   
-  /*
+  
   Known distances
   ---------------
   Andromeda: 4940 - 5404 - 6083
+  Arcadia: 4216 - 5216 - 6008
   Benzene: 6140
   Circuit Breakers: 4396 - 5098 - 5696
   Destination: 5216
   Empire of the Sun: 4211 - 4894 - 5600
   Fighting Spirit: 4563 - 5043 - 5776
+  Great Barrier Reef: 4507 - 2679 - 4798
   Heartbreak Ridge: 5066
   Icarus: 4492 - 4900 - 5278
   Jade: 4559 - 5102 - 5634
@@ -46,10 +50,12 @@ object ShowRushDistances extends View {
   Destination 1.1: 6604? 5216?
   Hitchhiker: 4438
   Pathfinder: 4716 - 4767 - 4850
+  Luna the Final: 4641 - 5114 - 5841
   Match Point: 6000
   Neo Aztec: 5107 - 5305 - 5484
   Neo Chupung-Ryeong: 4569
   Neo Sniper Ridge: 4640 - 5163 - 5881
+  Ride of the Valkyries: ???
   Tau Cross: 5318 - 5538 - 5731
   */
   override def renderScreen() {

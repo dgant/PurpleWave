@@ -137,10 +137,16 @@ abstract class UnitInfo(baseUnit: bwapi.Unit, id: Int) extends UnitProxy(baseUni
   def x: Int = pixelCenter.x
   def y: Int = pixelCenter.y
   
-  def left    = x - unitClass.dimensionLeft
-  def right   = x + unitClass.dimensionRight
-  def top     = y - unitClass.dimensionUp
-  def bottom  = y + unitClass.dimensionDown
+  def left    : Int = x - unitClass.dimensionLeft
+  def right   : Int = x + unitClass.dimensionRight
+  def top     : Int = y - unitClass.dimensionUp
+  def bottom  : Int = y + unitClass.dimensionDown
+  
+  def topLeft     : Pixel = Pixel(left, top)
+  def topRight    : Pixel = Pixel(right, top)
+  def bottomLeft  : Pixel = Pixel(left, bottom)
+  def bottomRight : Pixel = Pixel(right, bottom)
+  def corners: Vector[Pixel] = Vector(topLeft, topRight, bottomLeft, bottomRight)
   
   def tileIncludingCenter:  Tile          = pixelCenter.tileIncluding
   def tileArea:             TileRectangle = unitClass.tileArea.add(tileTopLeft)
